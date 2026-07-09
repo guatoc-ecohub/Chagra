@@ -21,8 +21,18 @@
  *
  * Con esto las ~726 clases de color del PWA (incluidas las de opacidad) se
  * vuelven theme-aware DE UNA, sin overrides clase-por-clase en themes.css.
+ *
+ * PREVIEW VIVO DE TEMAS (galería del selector, 2026-07-08): los selectores
+ * [data-theme="biopunk"] / [data-theme="biopunk2"] acompañan a :root en ESTE
+ * MISMO bloque (cero duplicación de valores) para que un CONTENEDOR anidado
+ * con ese atributo re-ancle la piel base aunque el tema global de <html> sea
+ * uno claro (las custom properties heredan del ancestro MÁS CERCANO que las
+ * define). En la app real es un no-op: useTheme NUNCA escribe esos ids en
+ * <html> (les quita data-theme). Ver ThemeLivePreview.jsx.
  * =========================================================================== */
-:root {
+:root,
+[data-theme="biopunk"],
+[data-theme="biopunk2"] {
   /* slate — escala neutra (chrome oscuro biopunk). Tailwind default exacto. */
   --c-slate-50: 248 250 252;
   --c-slate-100: 241 245 249;
@@ -585,6 +595,64 @@
   .ss-sun { animation: none; }
 }
 
+/* ── Salud del Suelo · 2ª pasada visual ──────────────────────────────────────
+ * Utilidades de microinteracción del Cuaderno del Suelo. Solo transform y
+ * opacity (GPU-friendly, sin filter/blur animado); todo se apaga con
+ * prefers-reduced-motion. */
+
+/* Entrada de cada pilar al navegar (el wrapper lleva key={pilar}). */
+.ss-enter { animation: ss-enter-in 0.35s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+@keyframes ss-enter-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Aparición escalonada de tarjetas (delay por --d inline). */
+.ss-rise { animation: ss-rise-in 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) var(--d, 0s) both; }
+@keyframes ss-rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Superficie táctil viva: leve lift en hover, asiento en active y foco
+ * accesible visible con el acento del tema. */
+.ss-tap { transition: transform 0.18s ease, border-color 0.18s ease; }
+@media (hover: hover) {
+  .ss-tap:hover { transform: translateY(-2px); }
+}
+.ss-tap:active { transform: translateY(0) scale(0.99); }
+.ss-tap:focus-visible,
+.ss-focus:focus-visible {
+  outline: 2px solid rgb(var(--t-accent-rgb));
+  outline-offset: 2px;
+}
+/* El chevrón de una superficie ss-tap se asoma hacia la acción. */
+.ss-chev { transition: transform 0.2s ease; }
+@media (hover: hover) {
+  .ss-tap:hover .ss-chev { transform: translateX(3px); }
+}
+
+/* Fotos de tarjeta: zoom lentísimo al pasar el mouse (solo dispositivos
+ * con hover; en táctil no hace nada). */
+.ss-photo { transition: transform 0.7s cubic-bezier(0.2, 0.6, 0.2, 1); }
+@media (hover: hover) {
+  .ss-card:hover .ss-photo { transform: scale(1.05); }
+}
+
+/* Entradas del cuaderno: foco con el acento del tema en vez del gris. */
+.ss-input:focus {
+  outline: none;
+  border-color: rgb(var(--t-accent-rgb) / 0.7);
+  box-shadow: 0 0 0 3px rgb(var(--t-accent-rgb) / 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ss-enter, .ss-rise { animation: none; opacity: 1; transform: none; }
+  .ss-tap, .ss-chev, .ss-photo { transition: none; }
+  .ss-tap:hover, .ss-tap:active { transform: none; }
+  .ss-card:hover .ss-photo { transform: none; }
+}
+
 /* ===========================================================================
  * VIDA DEL SUELO — micro-animaciones del 4º pilar "La vida del suelo"
  * (SaludSueloScreen → PilarVida). El anillo del ciclo gira muy lento y la
@@ -655,6 +723,57 @@
   .pc-drops path { animation: none; opacity: 0.6; }
 }
 
+/* ── Poscosecha · 2ª pasada visual ───────────────────────────────────────────
+ * Microinteracciones del cuaderno de la despensa. Solo transform y opacity
+ * (GPU-friendly, sin filter/blur animado); reusa los keyframes ss-enter-in /
+ * ss-rise-in de Salud del Suelo. Todo se apaga con prefers-reduced-motion. */
+
+/* Entrada de cada pilar al navegar (el wrapper lleva key={pilar}). */
+.pc-enter { animation: ss-enter-in 0.35s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+
+/* Aparición escalonada de tarjetas (delay por --d inline). */
+.pc-rise { animation: ss-rise-in 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) var(--d, 0s) both; }
+
+/* Resultado de calculadora que "aterriza" al aparecer. */
+.pc-pop { animation: pc-pop-in 0.32s cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+@keyframes pc-pop-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Superficie táctil viva: leve lift en hover, asiento en active y foco
+ * accesible visible con el acento del tema. */
+.pc-tap { transition: transform 0.18s ease, border-color 0.18s ease; }
+@media (hover: hover) {
+  .pc-tap:hover { transform: translateY(-2px); }
+  .pc-tap:hover .pc-chev { transform: translateX(3px); }
+  .pc-card:hover .pc-photo { transform: scale(1.05); }
+}
+.pc-tap:active { transform: translateY(0) scale(0.99); }
+.pc-tap:focus-visible,
+.pc-focus:focus-visible {
+  outline: 2px solid rgb(var(--t-accent-rgb));
+  outline-offset: 2px;
+}
+.pc-chev { transition: transform 0.2s ease; }
+
+/* Fotos de tarjeta: zoom lentísimo al pasar el mouse (solo con hover). */
+.pc-photo { transition: transform 0.7s cubic-bezier(0.2, 0.6, 0.2, 1); }
+
+/* Entradas del cuaderno: foco con el acento del tema en vez del gris. */
+.pc-input:focus {
+  outline: none;
+  border-color: rgb(var(--t-accent-rgb) / 0.7);
+  box-shadow: 0 0 0 3px rgb(var(--t-accent-rgb) / 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-enter, .pc-rise, .pc-pop { animation: none; opacity: 1; transform: none; }
+  .pc-tap, .pc-chev, .pc-photo { transition: none; }
+  .pc-tap:hover, .pc-tap:active { transform: none; }
+  .pc-card:hover .pc-photo { transform: none; }
+}
+
 /* ===========================================================================
  * ALMACENAMIENTO Y CONSERVACIÓN — el sol respira sobre el silo hermético
  * (AlmacenamientoScreen). Sutil e infinito muy lento; se apaga con
@@ -683,16 +802,99 @@
 }
 
 /* ===========================================================================
- * PLÁTANO Y BANANO — el sol respira sobre la mata madre-hijo-nieto
- * (PlatanoBananoScreen). Mismo latido sutil que el silo; se apaga con
- * prefers-reduced-motion.
+ * PLÁTANO Y BANANO — 2ª pasada visual (PlatanoBananoScreen).
+ * La postal del platanal: hero foto-forward con deriva lenta, titulares en
+ * Baloo 2 (misma voz cálida de Mi Finca Viva; el @font-face duplica el de
+ * finca-viva-hero.css a propósito — el navegador lo dedupe por src), entrada
+ * escalonada del hub, transición suave entre pilares y microinteracciones
+ * solo transform/opacity (GPU). TODO se apaga con prefers-reduced-motion.
  * =========================================================================== */
+@font-face {
+  font-family: 'Baloo 2';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/baloo2-latin.woff2') format('woff2');
+}
+.pb-display {
+  font-family: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  letter-spacing: 0.01em;
+}
+
+/* Sol de la ilustración: respira. Hojas de la mata: mecidas por el viento. */
 .pb-sun {
   transform-origin: 210px 26px;
   animation: pc-breathe 4s ease-in-out infinite;
 }
+.pb-hojas {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: pb-sway 6s ease-in-out infinite;
+}
+.pb-hojas-2 { animation-delay: 1.4s; animation-duration: 5.2s; }
+.pb-hojas-3 { animation-delay: 0.7s; animation-duration: 4.6s; }
+@keyframes pb-sway {
+  0%, 100% { transform: rotate(-1.3deg); }
+  50% { transform: rotate(1.3deg); }
+}
+
+/* Transición entre hub y pilares (el contenedor se re-monta con key). */
+.pb-view { animation: pb-view-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes pb-view-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Entrada escalonada del hub: cada bloque sube con su retardo (--pb-d). */
+.pb-rise {
+  animation: pb-view-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--pb-d, 0ms);
+}
+
+/* Hero: la foto deriva muy lento (postal viva; solo transform). */
+.pb-hero-img {
+  animation: pb-drift 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes pb-drift {
+  from { transform: scale(1) translateY(0); }
+  to { transform: scale(1.07) translateY(-1.5%); }
+}
+
+/* Tarjetas navegables: levitan al hover, la foto acerca, el chevrón empuja. */
+.pb-card { transition: transform 0.18s ease, border-color 0.18s ease; }
+.pb-card:active { transform: scale(0.985); }
+.pb-thumb img { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+.pb-chev { transition: transform 0.18s ease; }
+@media (hover: hover) {
+  .pb-card:hover { transform: translateY(-2px); }
+  .pb-card:hover .pb-thumb img { transform: scale(1.09); }
+  .pb-card:hover .pb-chev { transform: translateX(3px); }
+}
+
+/* El resultado de la calculadora "aterriza" cuando cambia (key en el número). */
+.pb-pop {
+  display: inline-block;
+  animation: pb-pop 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes pb-pop {
+  from { opacity: 0.3; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Foco visible al teclado, con el acento del tema. */
+.pb-focus:focus-visible {
+  outline: 2px solid rgb(var(--t-accent-rgb));
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .pb-sun { animation: none; }
+  .pb-sun, .pb-hojas, .pb-hero-img, .pb-pop { animation: none; }
+  .pb-view, .pb-rise { animation: none; opacity: 1; transform: none; }
+  .pb-card, .pb-thumb img, .pb-chev { transition: none; }
+  .pb-card:hover { transform: none; }
+  .pb-card:hover .pb-thumb img { transform: none; }
 }
 
 /* ===========================================================================

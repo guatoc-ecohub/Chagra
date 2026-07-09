@@ -4,9 +4,9 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import { useMemo, useState } from 'react';
 import {
-  ChevronLeft, ChevronRight, ArrowRight, Info, AlertTriangle, CheckCircle2,
+  ChevronLeft, ChevronRight, Info, AlertTriangle, CheckCircle2,
   Scissors, Warehouse, FlaskConical, Sun, Snowflake, Droplets, Wind,
-  Sprout, Wheat, ShieldCheck,
+  Sprout, Wheat, ShieldCheck, Camera,
 } from 'lucide-react';
 import {
   GRANOS,
@@ -35,7 +35,56 @@ import {
  * CERO invención: las cifras salen de poscosechaCalculator.js (grounded al DR
  * nacional/internacional); los slots no cerrados se marcan grounded-pendiente.
  * La matemática del secado es balance de masa exacto.
+ *
+ * 2ª pasada visual: hero con foto real (reutiliza /public/almacenamiento — cero
+ * assets nuevos), pilares como camino de pasos, microinteracciones GPU-friendly
+ * (transform/opacity, utilidades pc-* en index.css) y foco accesible con el
+ * acento del tema. Todo se apaga con prefers-reduced-motion.
  */
+
+/* ── Fotos reales con crédito CC visible. REUTILIZA las ya publicadas en
+ *    /public/almacenamiento (bundle al tope: cero bytes nuevos). Requisito de
+ *    las licencias CC: autor + licencia + enlace a la fuente, siempre visibles.
+ *    Espejo de /public/almacenamiento/creditos.json. ─────────────────────────── */
+const FOTOS = {
+  'secado-maiz': { autor: 'Cut angles', licencia: 'CC BY-SA 4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Maize_drying.jpg', alt: 'Grano de maíz secándose al sol antes de guardarlo.' },
+  'plaga-gorgojo': { autor: 'Natasha Wright, Bugwood.org', licencia: 'CC BY 3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Maize_Weevil_-_Sitophilus_zeamais.jpg', alt: 'Gorgojo del maíz (Sitophilus zeamais) visto de cerca.' },
+};
+
+function CreditoFoto({ slug, className = '' }) {
+  const c = FOTOS[slug];
+  if (!c) return null;
+  return (
+    <a
+      href={c.fuenteUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`pc-focus flex items-center gap-1 truncate text-[9px] text-slate-300 underline decoration-slate-600 underline-offset-2 ${className}`}
+      title={`${c.autor} · ${c.licencia} · Wikimedia Commons`}
+    >
+      <Camera size={9} className="shrink-0" aria-hidden="true" />
+      <span className="truncate">Foto: {c.autor} · {c.licencia} · Wikimedia</span>
+    </a>
+  );
+}
+
+function Foto({ slug, ratio = 'aspect-[16/10]', className = '' }) {
+  const c = FOTOS[slug];
+  if (!c) return null;
+  return (
+    <figure className={`relative overflow-hidden bg-slate-800 ${className}`}>
+      <img
+        src={`/almacenamiento/${slug}.jpg`}
+        alt={c.alt}
+        loading="lazy"
+        className={`pc-photo w-full ${ratio} object-cover`}
+      />
+      <figcaption className="absolute inset-x-0 bottom-0 bg-slate-950/82 px-2 py-1 backdrop-blur-sm">
+        <CreditoFoto slug={slug} />
+      </figcaption>
+    </figure>
+  );
+}
 
 /* ── Ilustración SVG propia: canasta con sol, gotas de agua que se van y grano ── */
 function DespensaIlustracion() {
@@ -89,6 +138,8 @@ const COLOR_MAP = {
   slate: { text: 'text-slate-300', border: 'border-slate-700/50', bg: 'bg-slate-900/50', dot: 'bg-slate-500' },
 };
 
+const INPUT_CLS = 'rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-white placeholder:text-slate-500 pc-input';
+
 /* ═══════════════════════════════ Componente ═══════════════════════════════ */
 /**
  * @param {Object} props
@@ -115,7 +166,7 @@ export default function PoscosechaScreen({ onBack, onNavigate }) {
           type="button"
           onClick={volver}
           aria-label="Volver"
-          className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
+          className="pc-tap pc-focus w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
         >
           <ChevronLeft size={20} />
         </button>
@@ -125,7 +176,8 @@ export default function PoscosechaScreen({ onBack, onNavigate }) {
         </div>
       </header>
 
-      <div className="px-4 pb-10">
+      {/* key={pilar} reinicia la animación de entrada al navegar entre pilares */}
+      <div key={pilar} className="pc-enter px-4 pb-10">
         {pilar === 'hub' && <Hub onIr={setPilar} onNavigate={onNavigate} />}
         {pilar === 'cosecha' && <PilarCosecha />}
         {pilar === 'guardar' && <PilarGuardar />}
@@ -144,17 +196,28 @@ function Hub({ onIr, onNavigate }) {
   ];
   return (
     <div className="flex flex-col gap-4">
-      {/* Gancho — la magnitud del problema */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
-        <div className="p-4 pb-3">
-          <DespensaIlustracion />
+      {/* Gancho — hero con foto real (secado al sol) y la magnitud del problema */}
+      <section className="pc-rise pc-card rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+        <div className="relative overflow-hidden">
+          <img
+            src="/almacenamiento/secado-maiz.jpg"
+            alt={FOTOS['secado-maiz'].alt}
+            className="pc-photo w-full aspect-[16/9] object-cover"
+          />
+          {/* Velo de contraste para leer sobre la foto (gradiente estático, sin filter) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/35 to-slate-950/5" aria-hidden="true" />
+          <span className="absolute top-2 right-2 rounded-full bg-slate-950/80 px-2 py-0.5 max-w-[70%]">
+            <CreditoFoto slug="secado-maiz" />
+          </span>
+          <div className="absolute inset-x-0 bottom-0 px-4 pb-3">
+            <p className="text-[13px] uppercase tracking-wide font-bold text-amber-300">El problema</p>
+            <p className="mt-1 text-lg text-slate-100 leading-snug">
+              <span className="font-black text-white">Colombia pierde cerca de 1 de cada 3 productos</span> entre la mata y la venta.
+            </p>
+          </div>
         </div>
-        <div className="px-4 pb-4">
-          <p className="text-[13px] uppercase tracking-wide font-bold text-slate-400">El problema</p>
-          <p className="mt-1 text-[15px] text-slate-100 leading-snug">
-            <span className="font-bold">Colombia pierde cerca de 1 de cada 3 productos</span> entre la mata y la venta.
-          </p>
-          <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+        <div className="px-4 pt-3 pb-4">
+          <p className="text-sm text-slate-300 leading-relaxed">
             Son <span className="font-semibold text-slate-100">{PERDIDA_PAIS.toneladasMt} millones de toneladas al año</span>{' '}
             ({PERDIDA_PAIS.porcentajeOferta} % de la comida del país). La mayor parte se evita{' '}
             <span className="font-semibold text-slate-100">con manejo, no con plata</span>: sombra, suavidad, limpieza y buen guardado.
@@ -163,38 +226,48 @@ function Hub({ onIr, onNavigate }) {
         </div>
       </section>
 
-      {/* Tres pilares */}
-      <div className="flex flex-col gap-3">
+      {/* Tres pilares — el camino de la cosecha, paso a paso */}
+      <div className="flex flex-col">
         {pilares.map((p, i) => {
           const c = COLOR_MAP[p.accent];
           const Icono = p.icon;
           return (
-            <button
-              key={p.key}
-              type="button"
-              onClick={() => onIr(p.key)}
-              className={`text-left rounded-2xl border ${c.border} ${c.bg} p-4 flex items-start gap-3 hover:border-opacity-100 transition-colors motion-reduce:transition-none active:scale-[0.99]`}
-            >
-              <span
-                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                style={{ backgroundColor: 'rgb(var(--t-accent-rgb) / 0.20)' }}
+            <div key={p.key} className="pc-rise flex flex-col" style={{ '--d': `${0.08 * (i + 1)}s` }}>
+              {i > 0 ? <span aria-hidden="true" className="ml-[2.3rem] h-3 w-0.5 rounded bg-slate-700/70" /> : null}
+              <button
+                type="button"
+                onClick={() => onIr(p.key)}
+                className={`pc-tap pc-focus text-left rounded-2xl border ${c.border} ${c.bg} p-4 flex items-start gap-3`}
               >
-                <Icono size={22} className={c.text} />
-              </span>
-              <span className="flex-1 min-w-0">
-                <span className="text-[11px] font-bold text-slate-500">Paso {i + 1}</span>
-                <span className="block text-[15px] font-bold text-white leading-tight">{p.titulo}</span>
-                <span className="block text-sm text-slate-300 mt-0.5 leading-snug">{p.desc}</span>
-              </span>
-              <ChevronRight size={20} className="text-slate-500 shrink-0 mt-2" />
-            </button>
+                <span className="relative shrink-0 mt-0.5">
+                  <span
+                    className="w-11 h-11 rounded-xl flex items-center justify-center"
+                    style={{ backgroundColor: 'rgb(var(--t-accent-rgb) / 0.20)' }}
+                  >
+                    <Icono size={22} className={c.text} />
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className={`absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full ${c.dot} text-slate-950 text-[11px] font-black flex items-center justify-center`}
+                  >
+                    {i + 1}
+                  </span>
+                </span>
+                <span className="flex-1 min-w-0">
+                  <span className="sr-only">Paso {i + 1}: </span>
+                  <span className="block text-[15px] font-bold text-white leading-tight">{p.titulo}</span>
+                  <span className="block text-sm text-slate-300 mt-0.5 leading-snug">{p.desc}</span>
+                </span>
+                <ChevronRight size={20} className="pc-chev text-slate-500 shrink-0 mt-2" />
+              </button>
+            </div>
           );
         })}
       </div>
 
       {/* Puente honesto a herramientas existentes del mismo mundo */}
       {onNavigate ? (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-3">
+        <div className="pc-rise rounded-xl border border-slate-800 bg-slate-900/50 p-3" style={{ '--d': '0.32s' }}>
           <p className="text-xs uppercase tracking-wide font-bold text-slate-400 mb-2">También en Chagra</p>
           <div className="flex flex-col gap-2">
             <PuenteBoton
@@ -222,14 +295,14 @@ function PuenteBoton({ icon, titulo, sub, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left rounded-xl border border-slate-700/60 bg-slate-800/40 p-3 flex items-center gap-3 hover:border-slate-600 transition-colors motion-reduce:transition-none"
+      className="pc-tap pc-focus w-full text-left rounded-xl border border-slate-700/60 bg-slate-800/40 p-3 flex items-center gap-3 hover:border-slate-600"
     >
       <Icon size={20} className="shrink-0" style={{ color: 'rgb(var(--t-accent-rgb))' }} />
       <span className="flex-1 min-w-0">
         <span className="block text-sm font-bold text-slate-100 leading-tight">{titulo}</span>
         <span className="block text-xs text-slate-400 leading-snug">{sub}</span>
       </span>
-      <ChevronRight size={18} className="text-slate-500 shrink-0" />
+      <ChevronRight size={18} className="pc-chev text-slate-500 shrink-0" />
     </button>
   );
 }
@@ -243,13 +316,13 @@ function PilarCosecha() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-slate-300 leading-relaxed">
+      <p className="pc-rise text-sm text-slate-300 leading-relaxed">
         El punto de cosecha se lee con los ojos (color), la mano (firmeza) y el calendario
         (días desde la flor). Cosechar en el punto es la <span className="font-semibold text-slate-100">primera defensa</span> contra la pérdida.
       </p>
 
       {/* Aguacate Hass — índice por materia seca (calculadora insignia) */}
-      <section className="rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-4">
+      <section className="pc-rise rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-4" style={{ '--d': '0.08s' }}>
         <div className="flex items-center gap-2">
           <Sprout size={20} className="text-emerald-300 shrink-0" />
           <h3 className="text-[15px] font-bold text-emerald-200">Aguacate Hass: por materia seca</h3>
@@ -270,12 +343,12 @@ function PilarCosecha() {
             onChange={(e) => setMsClean(e.target.value)}
             placeholder="ej. 22"
             aria-label="Materia seca del aguacate en porcentaje"
-            className="flex-1 min-w-0 rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-slate-500"
+            className={`flex-1 min-w-0 ${INPUT_CLS}`}
           />
           <span className="text-xs text-slate-400 shrink-0">%</span>
         </div>
         {res ? (
-          <div className={`mt-3 rounded-xl border ${c.border} ${c.bg} p-3 flex items-start gap-2`}>
+          <div className={`pc-pop mt-3 rounded-xl border ${c.border} ${c.bg} p-3 flex items-start gap-2`}>
             <span className={`w-2 h-2 rounded-full ${c.dot} mt-1.5 shrink-0`} aria-hidden="true" />
             <p className={`text-sm ${c.text} leading-snug`}>{res.label}</p>
           </div>
@@ -293,11 +366,13 @@ function PilarCosecha() {
           titulo="Uchuva"
           texto="El punto se lee por el color del capacho (cáliz) y del fruto. La variedad andina llega a ~14,5 °Brix, buenos para consumo y guardado."
           fuente="AGROSAVIA · confianza media-alta"
+          delay="0.16s"
         />
         <RegistroCosecha
           titulo="Climatéricos (banano, plátano, mango, tomate, papaya)"
           texto="Se cosechan fisiológicamente maduros pero FIRMES y maduran después. Para consumo local puede esperar más color; para transporte largo, coséchelos más verdes."
           fuente="FAO · confianza alta"
+          delay="0.24s"
         />
       </div>
 
@@ -310,9 +385,9 @@ function PilarCosecha() {
   );
 }
 
-function RegistroCosecha({ titulo, texto, fuente }) {
+function RegistroCosecha({ titulo, texto, fuente, delay = '0s' }) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
+    <div className="pc-rise rounded-xl border border-slate-800 bg-slate-900/60 p-3" style={{ '--d': delay }}>
       <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
         <Wheat size={16} style={{ color: 'rgb(var(--t-accent-rgb))' }} />
         {titulo}
@@ -327,11 +402,20 @@ function RegistroCosecha({ titulo, texto, fuente }) {
 function PilarGuardar() {
   return (
     <div className="flex flex-col gap-5">
+      {/* Firma del pilar: la despensa bajo el sol (las gotas de humedad se van) */}
+      <section className="pc-rise rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+        <div className="p-4 pb-2"><DespensaIlustracion /></div>
+        <p className="px-4 pb-4 text-sm text-slate-300 leading-relaxed">
+          Secar es sacar el agua: <span className="font-semibold text-slate-100">la materia seca no cambia</span>.
+          Aquí calcule cuánta agua debe salir y aprenda a curar sin confundir las recetas.
+        </p>
+      </section>
+
       {/* 2a. Calculadora de secado de grano (determinista) */}
       <CalculadoraSecado />
 
       {/* 2b. Curado — dos recetas OPUESTAS */}
-      <section>
+      <section className="pc-rise" style={{ '--d': '0.16s' }}>
         <h2 className="text-sm uppercase tracking-wide font-bold text-slate-400 mb-2 flex items-center gap-2">
           <Droplets size={15} /> Curado: dos recetas opuestas
         </h2>
@@ -346,7 +430,7 @@ function PilarGuardar() {
       </section>
 
       {/* 2c. Daño por frío */}
-      <section className="rounded-2xl border border-sky-800/40 bg-sky-950/20 p-4">
+      <section className="pc-rise rounded-2xl border border-sky-800/40 bg-sky-950/20 p-4" style={{ '--d': '0.24s' }}>
         <div className="flex items-center gap-2">
           <Snowflake size={18} className="text-sky-300 shrink-0" />
           <h3 className="text-[15px] font-bold text-sky-200">Ojo con el frío en los tropicales</h3>
@@ -365,17 +449,20 @@ function PilarGuardar() {
         </ul>
       </section>
 
-      {/* 2d. Grano hermético — sin química */}
-      <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-3">
-        <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-          <ShieldCheck size={16} style={{ color: 'rgb(var(--t-accent-rgb))' }} />
-          El silo hermético mata el gorgojo sin veneno
-        </h3>
-        <p className="text-sm text-slate-300 mt-1 leading-snug">
-          Grano seco (12–13 %) en recipiente limpio y BIEN tapado: el aire se acaba y las plagas mueren sin químico.
-          En bodega abierta se pierde más del 5 % al año; con silo hermético, casi nada.
-        </p>
-        <p className="mt-1.5 text-[11px] text-slate-500">Fuente: FAO / SciELO · confianza media-alta.</p>
+      {/* 2d. Grano hermético — sin química (con el enemigo #1 en foto) */}
+      <section className="pc-rise pc-card rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden" style={{ '--d': '0.32s' }}>
+        <Foto slug="plaga-gorgojo" ratio="aspect-[16/7]" className="border-b border-slate-800" />
+        <div className="p-3">
+          <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+            <ShieldCheck size={16} style={{ color: 'rgb(var(--t-accent-rgb))' }} />
+            El silo hermético mata el gorgojo sin veneno
+          </h3>
+          <p className="text-sm text-slate-300 mt-1 leading-snug">
+            Grano seco (12–13 %) en recipiente limpio y BIEN tapado: el aire se acaba y las plagas mueren sin químico.
+            En bodega abierta se pierde más del 5 % al año; con silo hermético, casi nada.
+          </p>
+          <p className="mt-1.5 text-[11px] text-slate-500">Fuente: FAO / SciELO · confianza media-alta.</p>
+        </div>
       </section>
     </div>
   );
@@ -427,7 +514,7 @@ function CalculadoraSecado() {
   const yaSeco = humedadNum != null && Number.isFinite(humedadNum) && humedadNum > 0 && humedadNum <= objetivo;
 
   return (
-    <section className="rounded-2xl border border-amber-800/40 bg-amber-950/20 p-4">
+    <section className="pc-rise rounded-2xl border border-amber-800/40 bg-amber-950/20 p-4" style={{ '--d': '0.08s' }}>
       <div className="flex items-center gap-2">
         <Sun size={20} className="text-amber-300 shrink-0" />
         <h3 className="text-[15px] font-bold text-amber-200">Calculadora de secado de grano</h3>
@@ -448,7 +535,7 @@ function CalculadoraSecado() {
               type="button"
               onClick={() => setGrano(key)}
               aria-pressed={activo}
-              className={`min-h-[40px] px-3 rounded-full border text-sm font-semibold transition-colors motion-reduce:transition-none ${
+              className={`pc-tap pc-focus min-h-[40px] px-3 rounded-full border text-sm font-semibold ${
                 activo ? 'border-transparent text-white' : 'bg-slate-800 border-slate-700 text-slate-200 hover:border-slate-500'
               }`}
               style={activo ? { backgroundColor: 'rgb(var(--t-accent-rgb) / 0.25)', boxShadow: 'inset 0 0 0 2px rgb(var(--t-accent-rgb))' } : undefined}
@@ -477,7 +564,7 @@ function CalculadoraSecado() {
             onChange={(e) => setPeso(clean(e.target.value))}
             placeholder="ej. 100"
             aria-label="Peso mojado del grano"
-            className="w-full rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-slate-500"
+            className={`w-full ${INPUT_CLS} px-2.5`}
           />
           <p className="mt-1 text-[10px] text-slate-500">kg, arrobas o bultos</p>
         </div>
@@ -493,7 +580,7 @@ function CalculadoraSecado() {
             onChange={(e) => setHumedad(clean(e.target.value))}
             placeholder="ej. 22"
             aria-label="Humedad actual del grano en porcentaje"
-            className="w-full rounded-lg bg-slate-800 border border-slate-700 px-2.5 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-slate-500"
+            className={`w-full ${INPUT_CLS} px-2.5`}
           />
           <p className="mt-1 text-[10px] text-slate-500">objetivo: {objetivo} %</p>
         </div>
@@ -501,7 +588,7 @@ function CalculadoraSecado() {
 
       {/* Resultado */}
       {res ? (
-        <div className="mt-3 rounded-xl border border-emerald-700/50 bg-emerald-950/30 p-4">
+        <div className="pc-pop mt-3 rounded-xl border border-emerald-700/50 bg-emerald-950/30 p-4">
           <div className="flex items-center gap-2">
             <CheckCircle2 size={18} className="text-emerald-300 shrink-0" />
             <p className="text-sm font-bold text-emerald-200">Para guardar sin moho</p>
@@ -516,7 +603,7 @@ function CalculadoraSecado() {
           </p>
         </div>
       ) : yaSeco ? (
-        <div className="mt-3 rounded-xl border border-emerald-700/50 bg-emerald-950/30 p-3 flex items-start gap-2.5">
+        <div className="pc-pop mt-3 rounded-xl border border-emerald-700/50 bg-emerald-950/30 p-3 flex items-start gap-2.5">
           <CheckCircle2 size={20} className="text-emerald-300 shrink-0 mt-0.5" />
           <p className="text-sm text-emerald-100">
             <span className="font-bold">Ya está en punto.</span> Ese grano está igual o más seco que la humedad segura;
@@ -530,7 +617,7 @@ function CalculadoraSecado() {
       )}
 
       <details className="mt-3 rounded-lg border border-amber-800/30 bg-amber-950/10 p-2.5">
-        <summary className="text-xs font-bold text-amber-200/90 cursor-pointer">Cómo se calcula</summary>
+        <summary className="pc-focus text-xs font-bold text-amber-200/90 cursor-pointer rounded">Cómo se calcula</summary>
         <p className="mt-1.5 text-xs text-amber-100/70 leading-relaxed">
           Balance de masa exacto: la materia seca no cambia al secar, solo se va agua.
           Peso final = peso × (100 − humedad actual) ÷ (100 − humedad objetivo). Las humedades seguras vienen del
@@ -545,16 +632,17 @@ function CalculadoraSecado() {
 function PilarTransformar({ onNavigate }) {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-slate-300 leading-relaxed">
+      <p className="pc-rise text-sm text-slate-300 leading-relaxed">
         El excedente que se iba a perder puede volverse producto vendible que dura meses. Cada línea tiene
         <span className="font-semibold text-slate-100"> un punto crítico de inocuidad</span> — casi siempre calor, limpieza y empaque sellado.
       </p>
 
       <div className="flex flex-col gap-3">
-        {TRANSFORMACIONES.map((t) => (
+        {TRANSFORMACIONES.map((t, i) => (
           <article
             key={t.id}
-            className={`rounded-2xl border p-4 ${t.critico ? 'border-rose-700/50 bg-rose-950/20' : 'border-slate-800 bg-slate-900/60'}`}
+            className={`pc-rise rounded-2xl border p-4 ${t.critico ? 'border-rose-700/50 bg-rose-950/20' : 'border-slate-800 bg-slate-900/60'}`}
+            style={{ '--d': `${0.06 * (i + 1)}s` }}
           >
             <h3 className={`text-[15px] font-bold ${t.critico ? 'text-rose-200' : 'text-slate-100'}`}>{t.titulo}</h3>
             <p className="text-sm text-slate-300 mt-1 leading-snug">{t.resumen}</p>
@@ -571,7 +659,7 @@ function PilarTransformar({ onNavigate }) {
       </div>
 
       {/* Inocuidad: dos capas */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+      <section className="pc-rise rounded-2xl border border-slate-800 bg-slate-900/60 p-4" style={{ '--d': '0.4s' }}>
         <div className="flex items-center gap-2">
           <ShieldCheck size={18} style={{ color: 'rgb(var(--t-accent-rgb))' }} className="shrink-0" />
           <h3 className="text-[15px] font-bold text-slate-100">Inocuidad: lo gratis primero</h3>

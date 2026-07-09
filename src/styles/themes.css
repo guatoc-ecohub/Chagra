@@ -61,7 +61,13 @@
  *       --acento-deep #a8612f · minimalista = --acento-deep #1d4639.
  * Sin esto, nature pintaba wordmark/hint con el acento claro #d98a4f (medido)
  * en vez de los tostados #b86a32/#a8612f del demo. */
-:root {
+/* Los selectores [data-theme="biopunk"/"biopunk2"] acompañan a :root para que
+ * un contenedor anidado re-ancle el acento base (preview vivo de la galería
+ * de temas — ThemeLivePreview.jsx). No-op en la app real: useTheme nunca
+ * escribe esos ids en <html>. */
+:root,
+[data-theme="biopunk"],
+[data-theme="biopunk2"] {
   --t-accent-rgb: 25, 201, 154;  /* teal neón biopunk (demo #19c79a) */
   --t-accent-strong-rgb: 59, 232, 166;  /* teal brillante (demo #3be8a6) */
   --t-accent-deep-rgb: 25, 201, 154;    /* = acento (demo --teal) */
@@ -461,29 +467,28 @@
  *    ClimaStrip, PestMonitoringWindow, etc. mantienen su estilo).
  * =========================================================================== */
 
-/* Superficie + borde del badge → tarjeta/línea suave del tema. */
+/* Superficie + borde del badge → tarjeta/línea suave del tema.
+ * NOTA semáforo 2026-07: los overrides de [data-testid="ai-beta-badge"]
+ * [data-confidence-level="low"] que vivían acá se retiraron — colapsaban el
+ * nivel "low" (rojo) a tinta verde neutra en los claros, contradiciendo el
+ * semáforo de confianza. El sello nuevo (src/styles/sello-confianza.css) ya
+ * trae su propio override AA por tema claro para el nivel rojo. */
 [data-theme="minimalista"] [data-testid="altitude-badge"],
 [data-theme="nature"] [data-testid="altitude-badge"],
-[data-theme="minimalista"] [data-testid="ai-beta-badge"][data-confidence-level="low"],
-[data-theme="nature"] [data-testid="ai-beta-badge"][data-confidence-level="low"],
-[data-theme="verde-vivo"] [data-testid="altitude-badge"],
-[data-theme="verde-vivo"] [data-testid="ai-beta-badge"][data-confidence-level="low"]{
+[data-theme="verde-vivo"] [data-testid="altitude-badge"]{
   background-color: rgb(var(--c-surface-raised)) !important;
   border-color: rgb(var(--c-surface-border)) !important;
 }
 
 /* Tinta del badge → tinta profunda del tema (AA sobre papel/crema). Cubre los 4
- * pisos térmicos (orange/amber/green/indigo) y el nivel low (rose) de un golpe,
- * sin enumerar familias, porque está anclado al badge. */
-[data-theme="minimalista"] [data-testid="altitude-badge"],
-[data-theme="minimalista"] [data-testid="ai-beta-badge"][data-confidence-level="low"] {
+ * pisos térmicos (orange/amber/green/indigo) de un golpe, sin enumerar
+ * familias, porque está anclado al badge. */
+[data-theme="minimalista"] [data-testid="altitude-badge"] {
   color: rgb(var(--c-emerald-400)) !important;  /* salvia oscura minimalista (AA) */
   text-shadow: none !important;
 }
 [data-theme="nature"] [data-testid="altitude-badge"],
-[data-theme="nature"] [data-testid="ai-beta-badge"][data-confidence-level="low"],
-[data-theme="verde-vivo"] [data-testid="altitude-badge"],
-[data-theme="verde-vivo"] [data-testid="ai-beta-badge"][data-confidence-level="low"]{
+[data-theme="verde-vivo"] [data-testid="altitude-badge"]{
   color: rgb(var(--c-emerald-700)) !important;  /* verde profundo cálido (AA) */
   text-shadow: none !important;
 }

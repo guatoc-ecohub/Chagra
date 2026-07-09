@@ -80,6 +80,9 @@ const messages = {
     pendientes: 'Pendientes',
     errorGeneral: 'Algo no salió bien. Inténtelo otra vez.',
     errorSincronizar: 'No se pudieron subir los cambios. Chagra vuelve a intentar solo.',
+    dataLossCheckFailed: 'No se pudo verificar el estado de pérdida de datos.',
+    dataRecoveryFailed: 'No se pudieron recuperar los datos desde FarmOS.',
+    backupReadFailed: 'No se pudo leer el archivo.',
     sinConexionPendientes: (count) =>
       `Sin señal. ${count} registro${count !== 1 ? 's' : ''} guardado${count !== 1 ? 's' : ''} en su teléfono.`,
     sinConexionSinPendientes: 'Sin señal. Sus datos quedaron guardados en el teléfono.',
@@ -101,6 +104,23 @@ const messages = {
       entendiendo: 'Entendiendo tu pregunta',
       consultando: 'Consultando el catálogo y tu chagra',
       escribiendo: 'Escribiendo tu respuesta',
+    },
+    // Loading contextual (lever de velocidad PERCIBIDA): PASOS visibles dentro
+    // de cada fase del "pensando". La fase REAL la marca el pipeline
+    // (thinkingPhase en AgentScreen); dentro de 'consultando' — el tramo más
+    // largo (grounding: catálogo + grafo AGE + guards/fuentes) — los pasos
+    // rotan temporizados (~2s, sin loop: avanzan y se quedan en el último)
+    // para que la espera de 22-34s se sienta viva y con avance, no colgada.
+    // Ícono + texto corto: legible para baja alfabetización.
+    fasesPasos: {
+      transcribiendo: [{ icon: '🎙️', texto: 'Escuchando tu voz' }],
+      entendiendo: [{ icon: '🌱', texto: 'Entendiendo tu pregunta' }],
+      consultando: [
+        { icon: '📖', texto: 'Consultando el catálogo' },
+        { icon: '🌾', texto: 'Revisando el grafo de tu finca' },
+        { icon: '🔍', texto: 'Verificando las fuentes' },
+      ],
+      escribiendo: [{ icon: '✍️', texto: 'Preparando la respuesta' }],
     },
     confianzaAlta: 'Confianza alta',
     confianzaMedia: 'Confianza media',

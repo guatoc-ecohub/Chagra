@@ -116,6 +116,8 @@ const CicloCultivoScreen = lazy(() => import('./components/CicloCultivoScreen'))
 const GerminacionScreen = lazy(() => import('./components/GerminacionScreen'));
 const CicloNutrientesScreen = lazy(() => import('./components/CicloNutrientesScreen'));
 const CalendarioFincaScreen = lazy(() => import('./components/CalendarioFincaScreen'));
+const AlmanaqueScreen = lazy(() => import('./components/almanaque/AlmanaqueScreen'));
+const AnoFincaScreen = lazy(() => import('./components/anofinca/AnoFincaScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
 // Módulo "Agua de la finca": cosecha de lluvia (calculadora determinista),
@@ -131,6 +133,65 @@ const AromaticasScreen = lazy(() => import('./components/aromaticas/AromaticasSc
 // beneficio). Photo-forward (patrón Agua) y groundeado en el grafo
 // (species.coffea_arabica) + Cenicafé; la pulpa cierra ciclo hacia el compost.
 const CafeScreen = lazy(() => import('./components/cafe/CafeScreen'));
+// Mundo "La uchuva" (dentro de Cultivos y semillas): la fruta andina de
+// exportación, de CLIMA FRÍO de altura (óptimo 1.800–2.800 msnm) — contraste
+// didáctico con mango/cítricos (tierra caliente). 6 estaciones photo-forward:
+// clima+altura / semilla+siembra / tutorado+poda / plagas (pulgón, polilla,
+// minador, marchitez por Fusarium — sin dosis) / cosecha por el color del
+// capacho (NTC 4580) / poscosecha de exportación. Groundeado al grafo
+// (species.physalis_peruviana, pest edges → AFFECTS) + cycle-content Tier A
+// (AGROSAVIA/ICA/POWO/GBIF). Fotos CC reales con crédito visible.
+const UchuvaScreen = lazy(() => import('./components/uchuva/UchuvaScreen'));
+// Mundo "La botica campesina": la huerta MEDICINAL de la finca andina
+// (caléndula, manzanilla, toronjil, cidrón, saúco, ortiga, llantén; la ruda
+// como planta de respeto). Photo-forward (patrón Café/Agua) con fotos CC.
+// Dominio de salud: todo enmarcado como USO TRADICIONAL (saber popular), nunca
+// medicina/cura/dosis; cultivo groundeado en el catálogo Chagra. Complementa
+// —no duplica— la huerta de aromáticas de la cocina.
+const BoticaScreen = lazy(() => import('./components/botica/BoticaScreen'));
+// Mundo "Frutales de la finca con vida": los frutales del solar campesino
+// (cítricos, aguacate, mango, guayaba, mora, lulo, tomate de árbol, papaya),
+// cada uno con su ficha de cultivo. Photo-forward (patrón Café/Agua) y
+// groundeado en el grafo (pest_controllers) + perennialCycles (AGROSAVIA).
+const FrutalesScreen = lazy(() => import('./components/frutales/FrutalesScreen'));
+// Mundo "El aguacate": la profundización dedicada del cultivo bandera de alto
+// valor (Hass y criollos de montaña). Photo-forward (patrón Café) y groundeado
+// en el grafo (species.persea_americana: pest_controllers, compatible_with,
+// antagonist_of, biopreparados) + perennialCycles (AGROSAVIA). NO es duplicado:
+// el aguacate sigue teniendo su ficha rápida dentro del mundo Frutales; aquí se
+// profundiza (injerto/patrón, drenaje contra Phytophthora, floración tipo A/B).
+const AguacateScreen = lazy(() => import('./components/aguacate/AguacateScreen'));
+// Mundo "Los cítricos": profundización DEDICADA del frutal cítrico (naranja,
+// mandarina, limón y lima) en 5 estaciones photo-forward (patrón Café). Refuerza
+// el grounding térmico: el cítrico es de clima cálido-templado (0–1800 msnm; el
+// limón Tahití hasta ~2100), NO de frío alto. Groundeado en el grafo
+// (citrus_sinensis/reticulata/latifolia + pest_controllers) + AGROSAVIA/ICA.
+const CitricosScreen = lazy(() => import('./components/citricos/CitricosScreen'));
+// Mundo "La caña y la panela" (5 estaciones: la caña / siembra y manejo /
+// plagas / corte / la panela). Photo-forward (patrón Café) y groundeado en el
+// grafo (Diatraea AFFECTS caña; Cotesia/Trichogramma CONTROLS Diatraea) +
+// Cenicaña/AGROSAVIA/FEDEPANELA/INVIMA; el bagazo cierra ciclo hacia el compost.
+const CanaScreen = lazy(() => import('./components/cana/CanaScreen'));
+// Mundo "El mango" (5 estaciones: variedad+siembra / piso térmico+agua /
+// floración+cuaje / plagas / cosecha+despensa). Profundización dedicada del
+// mango (como el café o la caña), más allá de la ficha en Frutales.
+// Photo-forward (patrón Café) y groundeado en el grafo (mangifera_indica:
+// pest_controllers → antracnosis/Anastrepha; compatible_with) + perennialCycles
+// (AGROSAVIA); honestidad térmica (tierra cálida <1200 msnm; >1800 NO va).
+const MangoScreen = lazy(() => import('./components/mango/MangoScreen'));
+const RestauracionScreen = lazy(() => import('./components/restauracion/RestauracionScreen'));
+// Mundo "Quinua y granos andinos": recuperación de los granos ancestrales de la
+// montaña (quinua, amaranto/bledo, chía, cañihua y tarwi). Photo-forward (patrón
+// Café) y groundeado en las fichas de ciclo (cycle-content) + nutrición ICBF; el
+// desaponificado de la quinua es el paso clave; mildiú sin dosis químicas.
+const QuinuaScreen = lazy(() => import('./components/quinua/QuinuaScreen'));
+// Mundo "El fique y las fibras": el cultivo de ladera (Furcraea andina/cabuya)
+// contado por su ciclo — planta+ladera (control de erosión), cría/manejo,
+// desfibrado (penca→fibra), usos/cultura (cabuya, empaques, artesanía) y el
+// aprovechamiento del bagazo/jugo sin contaminar el agua. Photo-forward (patrón
+// Café) y groundeado en el catálogo (furcraea_andina.json) + Agrosavia; sin
+// plagas ni dosis inventadas (lo que el grafo no tiene = "dato en camino").
+const FiqueScreen = lazy(() => import('./components/fique/FiqueScreen'));
 const MilpaScreen = lazy(() => import('./components/milpa/MilpaScreen'));
 // "El clima que viene": traductor campesino de los boletines IDEAM/ENSO. Lee la
 // fase ENSO en vivo (ensoService) y remite a la Mesa Técnica Agroclimática — no
@@ -147,6 +208,11 @@ const SemillaScreen = lazy(() => import('./components/semilla/SemillaScreen'));
 // secado de grano a humedad segura) y transformar el excedente con su punto
 // crítico de inocuidad. Cifras grounded al DR nacional/internacional.
 const PoscosechaScreen = lazy(() => import('./components/PoscosechaScreen'));
+// Tablero "Mi cosecha": producción y rendimiento del piloto con SU dato propio
+// (por cultivo, mes a mes y por lote), agregado por cosechaService sobre los
+// log--harvest que HarvestLog ya registra (offline-first). Solo VISTA: el
+// registro sigue viviendo en 'cosechar'.
+const MiCosechaScreen = lazy(() => import('./components/cosecha/MiCosechaScreen'));
 // Módulo "Almacenamiento y Conservación de Alimentos" (mundo Mercado y despensa):
 // EXTIENDE/absorbe la poscosecha, enfocado en guardar a mediano/largo plazo. 4
 // pilares — almacenar (troja/silo hermético + calculadora de pérdida evitada y
@@ -180,6 +246,14 @@ const CacaoScreen = lazy(() => import('./components/cacao/CacaoScreen'));
 // Vecinas + plagas del grafo chagra_kg (public/grafo-relations.json); cero dosis
 // químicas; "dato en camino" donde el grafo aún no respalda. Fotos CC con crédito.
 const HortalizasScreen = lazy(() => import('./components/HortalizasScreen'));
+// Módulo "Tubérculos y raíces" (mundo Cultivos y semillas): el pancoger de raíz.
+// Ficha de cultivo por tubérculo (siembra tubérculo-semilla/esqueje/colino,
+// luz/agua/piso térmico, aporque, vecinas, plagas con manejo agroecológico,
+// cosecha y conservación/curado) para papa, papa criolla, yuca, arracacha, ñame,
+// batata, oca, cubio y ulluco. Vecinas + plagas del grafo chagra_kg
+// (public/grafo-relations.json); cero dosis químicas; "dato en camino" donde el
+// grafo aún no respalda. Fotos CC con crédito visible.
+const TuberculosScreen = lazy(() => import('./components/TuberculosScreen'));
 // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home): un mundo por dentro —
 // las funciones existentes agrupadas por lugar. Re-rutea, no reimplementa.
 const MundoScreen = lazy(() => import('./components/MundoScreen'));
@@ -252,6 +326,10 @@ const MundoSubsuelo = lazy(() => import('./components/juego/MundoSubsuelo'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
+// Entrada Pro GATED por capability `avatar-espiritu` (módulo del repo privado
+// chagra-pro). La pantalla pública NO contiene código visual: solo consulta el
+// registry y monta el módulo Pro si está presente; si no, fallback discreto.
+const EspirituProScreen = lazy(() => import('./components/EspirituProScreen'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 import { fincaVivaHomePerfilActivo } from './config/fincaVivaHomeFlag';
 import { esExtensionistaActual } from './config/extensionistaAccess';
@@ -288,6 +366,8 @@ const VIEW_LOADING_LABELS = {
   ciclo_vivo: 'Abriendo el ciclo vivo…',
   calendario: 'Abriendo el calendario…',
   calendario_finca: 'Abriendo el calendario…',
+  almanaque: 'Abriendo el almanaque…',
+  ano_finca: 'Recorriendo su año…',
   mapa: 'Abriendo el mapa…',
   mercado: 'Abriendo el mercado…',
   mercados: 'Abriendo el mercado…',
@@ -365,6 +445,10 @@ const HASH_VIEW_ROUTES = {
   'ciclo-nutrientes': 'ciclo_nutrientes',
   calendario: 'calendario_finca',
   'calendario-finca': 'calendario_finca',
+  almanaque: 'almanaque',
+  'almanaque-campesino': 'almanaque',
+  'ano-finca': 'ano_finca',
+  'ano-de-la-finca': 'ano_finca',
   animales: 'animales',
   'animales-gallinas': 'animales_gallinas',
   'animales-abejas': 'animales_abejas',
@@ -401,6 +485,60 @@ const HASH_VIEW_ROUTES = {
   'el-cafe': 'cafe',
   cafetal: 'cafe',
   cafeto: 'cafe',
+  uchuva: 'uchuva',
+  'la-uchuva': 'uchuva',
+  aguaymanto: 'uchuva',
+  uvilla: 'uchuva',
+  guchuva: 'uchuva',
+  physalis: 'uchuva',
+  botica: 'botica',
+  'botica-campesina': 'botica',
+  medicinales: 'botica',
+  'plantas-medicinales': 'botica',
+  'huerta-medicinal': 'botica',
+  frutales: 'frutales',
+  frutal: 'frutales',
+  'arboles-frutales': 'frutales',
+  'frutales-finca': 'frutales',
+  aguacate: 'aguacate',
+  'el-aguacate': 'aguacate',
+  palta: 'aguacate',
+  cura: 'aguacate',
+  hass: 'aguacate',
+  persea: 'aguacate',
+  citricos: 'citricos',
+  cítricos: 'citricos',
+  'los-citricos': 'citricos',
+  citrico: 'citricos',
+  naranja: 'citricos',
+  mandarina: 'citricos',
+  limon: 'citricos',
+  limón: 'citricos',
+  lima: 'citricos',
+  cana: 'cana',
+  caña: 'cana',
+  'la-cana': 'cana',
+  panela: 'cana',
+  trapiche: 'cana',
+  canaveral: 'cana',
+  cañaveral: 'cana',
+  mango: 'mango',
+  'el-mango': 'mango',
+  mangifera: 'mango',
+  manga: 'mango',
+  mancera: 'mango',
+  restauracion: 'restauracion',
+  'restauracion-bosque': 'restauracion',
+  'bosque-de-alimentos': 'restauracion',
+  'bosque-comestible': 'restauracion',
+  agroforesteria: 'restauracion',
+  'food-forest': 'restauracion',
+  fique: 'fique',
+  'el-fique': 'fique',
+  cabuya: 'fique',
+  penca: 'fique',
+  furcraea: 'fique',
+  fibras: 'fique',
   'milpa-cultivo': 'milpa_cultivo',
   'tres-hermanas': 'milpa_cultivo',
   'salud-suelo': 'salud_suelo',
@@ -442,6 +580,11 @@ const HASH_VIEW_ROUTES = {
   hortalizas: 'hortalizas',
   huerta: 'hortalizas',
   verduras: 'hortalizas',
+  tuberculos: 'tuberculos',
+  'tuberculos-raices': 'tuberculos',
+  raices: 'tuberculos',
+  papa: 'tuberculos',
+  yuca: 'tuberculos',
   // Curso guiado + deep-links profundos usados por la landing (chagra.bio):
   // permiten que chagra.app/#curso, /#sembrar, /#voz, /#milpa, /#biopreparados,
   // /#sanidad y /#cosechar caigan en su vista real (antes caían a dashboard).
@@ -456,6 +599,11 @@ const HASH_VIEW_ROUTES = {
   sanidad: 'sanidad_sintoma',
   'sanidad-sintoma': 'sanidad_sintoma',
   cosechar: 'cosechar',
+  'mi-cosecha': 'mi_cosecha',
+  micosecha: 'mi_cosecha',
+  // Entrada Pro (capability avatar-espiritu). Gated: sin módulo Pro cargado
+  // la pantalla degrada a fallback discreto.
+  espiritu: 'espiritu_pro',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -464,13 +612,17 @@ const MODULE_VIEWS = new Set([
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol', 'compost',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'animales_conejos', 'animales_caprinos', 'estiercol',
-  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'insumos', 'biopreparados',
+  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'sembrar', 'cosechar', 'mi_cosecha', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'uchuva', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'frutales', 'aguacate', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'almanaque', 'suelo', 'agua', 'cafe', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'cana', 'mango', 'restauracion', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'fique', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'platano', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'cacao', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
-  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'hortalizas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
+  'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'hortalizas', 'tuberculos', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'milpa_cultivo', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'plagas', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
@@ -1161,6 +1313,12 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'espiritu_pro':
+        return (
+          <ErrorBoundary>
+            <EspirituProScreen onBack={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
       case 'sembrar':
         return (
           <ErrorBoundary>
@@ -1171,6 +1329,20 @@ export default function App() {
         return (
           <ErrorBoundary>
             <HarvestLog onBack={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
+      case 'mi_cosecha':
+        // Tablero de producción/rendimiento (ver lazy import arriba). Entra
+        // desde el mundo Cultivos y semillas (junto a 'cosechar').
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mi cosecha">
+              <MiCosechaScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'insumos':
@@ -1603,6 +1775,25 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'ano_finca':
+        // Módulo EL AÑO DE LA FINCA: la línea de tiempo del año del usuario —
+        // qué sembró, cosechó, trabajó y floreció (registros reales: ciclos,
+        // log--harvest, eventos) y lo que viene (calendario groundeado por su
+        // altitud). Complementa al calendario_finca (agenda por planta/capa) y
+        // al almanaque (el año a lo grande): esta es la vista TEMPORAL de SU
+        // finca. cosechaService es SOLO LECTURA aquí ("Mi cosecha" es dueña
+        // del tablero de cantidades).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El año de la finca">
+              <AnoFincaScreen
+                onBack={() => navigate('dashboard')}
+                onHome={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'suelo':
         return (
           <ErrorBoundary>
@@ -1710,6 +1901,20 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'tuberculos':
+        // Módulo "Tubérculos y raíces" (mundo Cultivos y semillas): el pancoger de
+        // raíz. Ficha de cultivo por tubérculo (siembra tubérculo-semilla/esqueje/
+        // colino, luz/agua/piso térmico, aporque, vecinas, plagas con manejo
+        // agroecológico, cosecha y conservación/curado). Vecinas + plagas grounded
+        // al grafo chagra_kg (public/grafo-relations.json); cero dosis químicas;
+        // "dato en camino" donde el grafo aún no respalda. Fotos CC con crédito.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Tubérculos y raíces">
+              <TuberculosScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'cromatografia':
         return (
           <ErrorBoundary>
@@ -1741,6 +1946,19 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'almanaque':
+        // Vista HERMANA de calendario_finca (no la duplica): el "Almanaque de la
+        // finca" enseña el año campesino a lo grande — aguas y secas, qué da cada
+        // piso térmico (ventanas de cosecha grounded en perennialCycles) y el
+        // saber lunar tradicional (cultura, no receta). Photo-forward reusando
+        // fotos CC ya en /public; enlaza al calendario grounded de detalle.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Almanaque de la finca">
+              <AlmanaqueScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'cafe':
         // Mundo "El café" (5 estaciones: variedad+siembra / sombra+suelo /
         // broca+roya / flor+cosecha / beneficio). Photo-forward con fotos CC y
@@ -1750,6 +1968,153 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El café">
               <CafeScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'uchuva':
+        // Mundo "La uchuva" (Physalis peruviana, dentro de Cultivos y semillas):
+        // la fruta andina de exportación, de clima FRÍO de altura. 6 estaciones
+        // photo-forward (clima+altura / siembra / tutorado+poda / plagas sin
+        // veneno / cosecha por el color del capacho / poscosecha de exportación).
+        // Groundeado al grafo (physalis_peruviana) + cycle-content Tier A
+        // (AGROSAVIA/ICA/POWO/GBIF); cifras de sitio = "dato en camino".
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La uchuva">
+              <UchuvaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'botica':
+        // Mundo "La botica campesina" (5 estaciones: barriga y nervios / piel y
+        // heridas / gripa y tónico / cultivar la botica / con cuidado). La huerta
+        // MEDICINAL de la finca andina, photo-forward con fotos CC. Dominio de
+        // salud: todo enmarcado como USO TRADICIONAL (saber popular), sin claims
+        // de cura ni dosis; cultivo groundeado en el catálogo Chagra. Vetos
+        // honestos (ruda abortiva/fototóxica) + disclaimer "consulte al médico".
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La botica campesina">
+              <BoticaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'frutales':
+        // Mundo "Frutales de la finca con vida": ficha de cultivo por frutal
+        // (propagación/injerto, siembra y distancias, piso térmico, plagas y
+        // enfermedades, poda, cosecha y poscosecha). Photo-forward con fotos CC
+        // y groundeado en el grafo (pest_controllers → AFFECTS/CONTROLS) +
+        // perennialCycles (AGROSAVIA); sin dosis químicas (cifras de sitio =
+        // "dato en camino"). Vive dentro del mundo Cultivos.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Frutales de la finca">
+              <FrutalesScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'aguacate':
+        // Mundo "El aguacate": profundización dedicada del cultivo bandera de
+        // alto valor (Hass y criollos de montaña). 5 estaciones photo-forward
+        // (variedad+siembra / suelo+agua / plagas / flor+polinización A/B /
+        // cosecha). Groundeado en el grafo (persea_americana: pest_controllers,
+        // compatible_with, antagonist_of, biopreparados) + perennialCycles
+        // (AGROSAVIA); sin dosis químicas (cifras de sitio = "dato en camino").
+        // Convive con la ficha de aguacate del mundo Frutales (no la duplica).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El aguacate">
+              <AguacateScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'citricos':
+        // Mundo "Los cítricos": profundización DEDICADA del frutal cítrico
+        // (naranja, mandarina, limón y lima) en 5 estaciones photo-forward
+        // (variedades+injerto / piso térmico / siembra+poda / plagas+HLB /
+        // abono+cosecha). Refuerza el grounding térmico correcto: cítrico de
+        // clima cálido-templado (0–1800 msnm; Tahití ~2100), NO de frío alto.
+        // Groundeado en el grafo (citrus_* + pest_controllers → AFFECTS/CONTROLS)
+        // + AGROSAVIA/ICA; sin dosis inventadas (cifras de sitio = "dato en
+        // camino"); la gomosis (ausente del grafo) se declara faltante, no se inventa.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Los cítricos">
+              <CitricosScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'cana':
+        // Mundo "La caña y la panela" (5 estaciones: la caña / siembra y manejo /
+        // plagas / corte / la panela). Photo-forward con fotos CC y groundeado en
+        // el grafo (Diatraea AFFECTS caña; Cotesia/Trichogramma CONTROLS Diatraea) +
+        // Cenicaña/AGROSAVIA/FEDEPANELA/INVIMA; panela SIN clarol ni químicos y sin
+        // dosis inventadas (cifras de sitio = "dato en camino").
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La caña y la panela">
+              <CanaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mango':
+        // Mundo "El mango" (5 estaciones: variedad+siembra / piso térmico+agua /
+        // floración+cuaje / plagas / cosecha+despensa). Profundización dedicada
+        // del mango, photo-forward con fotos CC y groundeado en el grafo
+        // (mangifera_indica: antracnosis/Anastrepha vía pest_controllers,
+        // compatible_with) + perennialCycles (AGROSAVIA). Honestidad térmica:
+        // tierra cálida (<1200 msnm) sí, por encima de ~1800 NO va. Sin dosis
+        // químicas inventadas (cifras de sitio = "dato en camino").
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mango">
+              <MangoScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'restauracion':
+        // Mundo "Restauración y bosque de alimentos" (dentro de "Diseño de la
+        // finca"): COMPLEMENTA reforestación/silvopastoreo/páramo con el enfoque
+        // food-forest — los 7 estratos, la sucesión ecológica y la restauración
+        // del suelo, como MÉTODO. 5 estaciones photo-forward (fotos CC reusadas de
+        // otros mundos, 0 KB de aporte). GROUNDING RESPONSABLE: toda especie es un
+        // id real de public/grafo-relations.json (el test de grounding lo verifica);
+        // nada de especies inventadas; cifras de sitio = "dato en camino".
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Restauración y bosque de alimentos">
+              <RestauracionScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'quinua':
+        // Mundo "Quinua y granos andinos" (dentro de Cultivos y semillas):
+        // recuperación de granos ancestrales alto-andinos. 5 estaciones photo-
+        // forward — los granos (quinua/amaranto/chía/cañihua/tarwi) y su valor /
+        // siembra y piso térmico / el desaponificado de la quinua (lavar el
+        // amargo, paso clave) + desamargado del tarwi / mildiú (Peronospora
+        // variabilis) con manejo agroecológico sin dosis químicas / cosecha,
+        // trilla y valor nutricional (proteína completa, sin gluten, hierro).
+        // Groundeado en cycle-content + nutricion-humana ICBF; cifras de sitio =
+        // "dato en camino". Fotos CC reales con crédito visible.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Quinua y granos andinos">
+              <QuinuaScreen onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'fique':
+        // Mundo "El fique y las fibras" (5 estaciones: la planta y la ladera /
+        // cría y manejo / el desfibrado / usos y cultura / bagazo y jugo).
+        // Photo-forward con fotos CC y groundeado en el catálogo Chagra
+        // (furcraea_andina.json) + Agrosavia; sin dosis ni plagas inventadas
+        // (lo que el grafo aún no tiene = "dato en camino"). Vive dentro del
+        // mundo Cultivos; su back vuelve al hub de cultivos.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El fique y las fibras">
+              <FiqueScreen onBack={() => navigate('mundo_cultivos')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2148,8 +2513,11 @@ export default function App() {
       {/* AgentFab (colibrí flotante "respuesta lista") en TODAS las pantallas
           MENOS el home/dashboard (operador 2026-06-06): en el home el colibrí
           ya es el botón de ENVIAR del compositor, así que el FAB flotante ahí
-          duplicaría el ave. Sigue en el resto para anunciar "respuesta lista". */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && <AgentFab onNavigate={navigate} />}
+          duplicaría el ave. Sigue en el resto para anunciar "respuesta lista".
+          Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
+          CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
+          no conoce al agente — ruido en su primer flujo. */}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.

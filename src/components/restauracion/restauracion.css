@@ -1,0 +1,45 @@
+/*
+ * restauracion.css — micro-animaciones del mundo "Restauración y bosque de
+ * alimentos". Mismos principios que cafe.css / agua.css:
+ *   · Sutiles y baratas (solo transform/opacity, nada de layout).
+ *   · prefers-reduced-motion las apaga todas.
+ *   · Los colores salen de las clases Tailwind del componente (paleta slate +
+ *     acentos verde/esmeralda), que reaccionan a los temas vía data-theme; aquí
+ *     solo hay movimiento, ningún color de tema fijado.
+ */
+
+/* Entrada suave del contenido de la estación al cambiar de pestaña. */
+@keyframes rest-seccion-entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.rest-seccion {
+  animation: rest-seccion-entra 0.3s ease-out;
+}
+
+/* Estación activa: aro que pulsa una sola vez al seleccionar. */
+@keyframes rest-estacion-pulso {
+  0% { transform: scale(0.94); opacity: 0.5; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.rest-estacion-activa {
+  animation: rest-estacion-pulso 0.45s ease-out;
+}
+
+/* Fotos reales: aparición suave (solo opacity, sin reflow) al montarse. */
+@keyframes rest-foto-entra {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.rest-foto {
+  animation: rest-foto-entra 0.5s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rest-seccion,
+  .rest-estacion-activa,
+  .rest-foto {
+    animation: none;
+  }
+}

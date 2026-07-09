@@ -93,6 +93,30 @@ export function isReloadSafe() {
 }
 
 /**
+ * Desregistra el SW activo sin tocar IndexedDB ni limpiar site data.
+ *
+ * @param {object} [deps]
+ * @param {() => Promise<ServiceWorkerRegistration|null>} [deps.getRegistration]
+ * @returns {Promise<boolean>} true si se encontró una registration y se intentó desregistrar.
+ */
+export async function unregisterRegisteredServiceWorker({
+  getRegistration = () =>
+    navigator.serviceWorker.getRegistration(),
+} = {}) {
+  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return false;
+  try {
+    const registration = await getRegistration();
+    if (!registration) return false;
+    if (typeof registration.unregister === 'function') {
+      await registration.unregister();
+    }
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
  * Registra el Service Worker e instala el flujo de AUTO-UPDATE seguro.
  *
  * Idempotente respecto al guard interno por llamada (cada `registerServiceWorker`

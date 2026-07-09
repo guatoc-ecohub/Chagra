@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, Upload, X } from 'lucide-react';
+import { AlertTriangle, RefreshCcw, Upload, X } from 'lucide-react';
+import { MSG } from '../config/messages';
 import { shouldWarnDataLoss } from '../services/emptyDbDetector';
+import { recoverDataFromFarmOS } from '../services/dataRecovery';
 
 /**
  * DataLossBanner — banner rojo prominente que aparece cuando detectamos que
@@ -29,6 +31,7 @@ export default function DataLossBanner({ onDismiss }) {
   const [status, setStatus] = useState({ shouldWarn: false, lastKnownCount: 0, lastMarkedAt: null });
   const [hidden, setHidden] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
+  const [isRecovering, setIsRecovering] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -37,7 +40,7 @@ export default function DataLossBanner({ onDismiss }) {
         if (mounted) setStatus(s);
       })
       .catch((err) => {
-        console.warn('[DataLossBanner] No se pudo chequear data-loss status:', err);
+        console.warn('[DataLossBanner] Failed to check data-loss status:', err);
       });
     return () => {
       mounted = false;
@@ -66,7 +69,7 @@ export default function DataLossBanner({ onDismiss }) {
               ¿Hiciste clear cache?
             </p>
             <p className="text-sm mt-1 leading-snug">
-              No encontramos tu información local.{' '}
+              No encontramos tu informacion local.{' '}
               {status.lastKnownCount > 0 ? (
                 <>
                   Antes tenías al menos <strong>{status.lastKnownCount}</strong> activos registrados
@@ -77,17 +80,39 @@ export default function DataLossBanner({ onDismiss }) {
               )}
             </p>
             <p className="text-xs mt-2 leading-snug text-red-100/90">
-              Esto puede pasar si borraste el cache del navegador o reinstalaste la app.
-              Lo que estaba sin sincronizar con FarmOS (fotos, plantas nuevas) se perdió.
+              Tus datos guardados en la nube de Chagra estan a salvo; toca aqui para recuperarlos.
             </p>
             <div className="flex flex-wrap gap-2 mt-3">
               <button
                 type="button"
-                onClick={() => setShowImportModal(true)}
+                onClick={async () => {
+                  setIsRecovering(true);
+                  try {
+                    await recoverDataFromFarmOS();
+                    setHidden(true);
+                    onDismiss?.();
+                  } catch (err) {
+                    console.warn('[DataLossBanner] Failed to recover data from FarmOS:', err);
+                  } finally {
+                    setIsRecovering(false);
+                  }
+                }}
+                disabled={isRecovering}
+                className="px-3 py-2 rounded-lg bg-emerald-300 text-slate-950 font-black text-sm flex items-center gap-2 hover:bg-emerald-200 transition-colors min-h-[40px] disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <RefreshCcw size={16} aria-hidden="true" className={isRecovering ? 'animate-spin' : ''} />
+                {isRecovering ? 'Recuperando...' : 'Recuperar mis datos'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowImportModal(true);
+                }}
                 className="px-3 py-2 rounded-lg bg-white text-red-900 font-bold text-sm flex items-center gap-2 hover:bg-red-50 transition-colors min-h-[40px]"
+                disabled={isRecovering}
               >
                 <Upload size={16} aria-hidden="true" />
-                Importar copia anterior
+                Importar copia
               </button>
               <button
                 type="button"
@@ -95,8 +120,9 @@ export default function DataLossBanner({ onDismiss }) {
                   setHidden(true);
                   onDismiss?.();
                 }}
-                className="px-3 py-2 rounded-lg bg-red-800 text-red-100 font-bold text-sm flex items-center gap-2 hover:bg-red-700 transition-colors min-h-[40px]"
+                className="px-3 py-2 rounded-lg bg-red-800 text-red-100 font-bold text-sm flex items-center gap-2 hover:bg-red-700 transition-colors min-h-[40px] disabled:opacity-60 disabled:cursor-not-allowed"
                 aria-label="Cerrar advertencia"
+                disabled={isRecovering}
               >
                 <X size={16} aria-hidden="true" />
                 Entendido
@@ -150,7 +176,7 @@ function ImportPreviewModal({ onClose }) {
         localStorageKeys: Object.keys(parsed.localStorage || {}).length,
       });
     } catch (err) {
-      setError(err.message || 'No se pudo leer el archivo.');
+      setError(err.message || MSG.status.backupReadFailed);
     }
   };
 

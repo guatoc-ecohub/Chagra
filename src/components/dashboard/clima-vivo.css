@@ -1,0 +1,95 @@
+/**
+ * clima-vivo.css — animaciones sutiles del módulo de clima.
+ *
+ * Presupuesto GPU (bundle al tope 24.9/25 MB → cero assets nuevos, solo CSS):
+ *   - SOLO `transform` y `opacity` (composited, no repaint). Nada de
+ *     filter/blur/box-shadow ANIMADOS.
+ *   - Duraciones largas y amplitudes de ~1-4 px: el clima "respira", no baila.
+ *   - `prefers-reduced-motion: reduce` → todo estático y legible (las gotas
+ *     de lluvia quedan visibles porque su opacidad base está en el markup).
+ *
+ * Consumidor: ClimaIconoVivo.jsx (íconos SVG del pronóstico) y las celdas de
+ * día de ClimaStrip (`.clima-dia-card`).
+ */
+
+/* Los grupos animados de un SVG rotan/escalan sobre su propio centro. */
+.cv-anim {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+}
+
+@keyframes cv-rayos-girar {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes cv-sol-latir {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+}
+
+@keyframes cv-nube-vagar {
+    0%, 100% { transform: translateX(-0.9px); }
+    50% { transform: translateX(0.9px); }
+}
+
+@keyframes cv-gota-caer {
+    0% { transform: translateY(-1.5px); opacity: 0; }
+    35% { opacity: 1; }
+    100% { transform: translateY(3.5px); opacity: 0; }
+}
+
+@keyframes cv-niebla-vagar {
+    0%, 100% { transform: translateX(-1.4px); opacity: 0.5; }
+    50% { transform: translateX(1.4px); opacity: 0.95; }
+}
+
+@keyframes cv-copo-girar {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Entrada escalonada de las celdas del pronóstico (una sola vez). */
+@keyframes cv-entrar {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.cv-rayos { animation: cv-rayos-girar 48s linear infinite; }
+.cv-sol { animation: cv-sol-latir 6s ease-in-out infinite; }
+.cv-nube { animation: cv-nube-vagar 7s ease-in-out infinite; }
+.cv-nube-lenta { animation: cv-nube-vagar 11s ease-in-out infinite reverse; }
+.cv-gota { animation: cv-gota-caer 1.6s ease-in infinite; }
+.cv-gota-2 { animation-delay: 0.45s; }
+.cv-gota-3 { animation-delay: 0.9s; }
+.cv-niebla-1 { animation: cv-niebla-vagar 6s ease-in-out infinite; }
+.cv-niebla-2 { animation: cv-niebla-vagar 8s ease-in-out infinite; animation-delay: 1.2s; }
+.cv-copo { animation: cv-copo-girar 36s linear infinite; }
+
+.clima-dia-card {
+    animation: cv-entrar 0.45s ease both;
+    animation-delay: calc(var(--cv-i, 0) * 45ms);
+    transition: transform 0.18s ease;
+}
+
+.clima-dia-card:hover { transform: translateY(-2px); }
+
+@media (prefers-reduced-motion: reduce) {
+    .cv-rayos,
+    .cv-sol,
+    .cv-nube,
+    .cv-nube-lenta,
+    .cv-gota,
+    .cv-niebla-1,
+    .cv-niebla-2,
+    .cv-copo,
+    .clima-dia-card {
+        animation: none;
+    }
+
+    .clima-dia-card {
+        transition: none;
+    }
+
+    .clima-dia-card:hover { transform: none; }
+}

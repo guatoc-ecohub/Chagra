@@ -7,6 +7,8 @@ import './styles/motion.css'
 import './styles/temas-fase2.css'
 import './styles/juego-pulido.css'
 import './styles/clima-atmosfera.css'
+import './styles/sello-confianza.css'
+import './styles/panel-procedencia.css'
 import App from './App.jsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ModoCampoProvider } from './hooks/ModoCampoContext'
@@ -17,7 +19,7 @@ import { PRIMARY_WORKER_NAME } from './config/workerConfig'
 import { renameWorker } from './services/assetService'
 import { getAccessToken } from './services/authService'
 import { registerServiceWorker } from './services/swRegistration'
-import { runSelfHealCheck, RUNNING_BUILD_SHA } from './services/versionCheck'
+import { runSelfHealCheck, installBundleRecoveryGuards, RUNNING_BUILD_SHA } from './services/versionCheck'
 
 // Exponer el SHA del bundle CORRIENDO para diagnóstico + el smoke post-deploy
 // (tests/e2e-real/sw-self-heal.smoke.mjs compara window.__CHAGRA_BUILD_SHA__
@@ -84,6 +86,8 @@ if ('serviceWorker' in navigator) {
 
   registerServiceWorker();
 }
+
+installBundleRecoveryGuards();
 
 // Auto-recuperación por versión (self-heal) — NO depende del ciclo de vida del
 // SW. Compara el SHA del bundle corriendo (__BUILD_SHA__) contra /version.json

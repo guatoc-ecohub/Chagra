@@ -75,7 +75,9 @@ describe('ChatBubble — badge de fuente (verificado vs generativo)', () => {
     const badge = screen.getByTestId('source-badge');
     expect(badge).toBeInTheDocument();
     expect(badge).toHaveAttribute('data-source', 'tool-no-match');
-    expect(badge).toHaveTextContent(/Tool sin match/i);
+    // Pulido semáforo 2026-07: label en español llano (antes "Tool sin match",
+    // jerga técnica que el campesino no lee). Semántica intacta (data-source).
+    expect(badge).toHaveTextContent(/No está en el catálogo/i);
     expect(badge).toHaveTextContent(/especie/i);
   });
 
@@ -473,21 +475,23 @@ describe('ChatBubble — badges anti-alucinación (#18 fuente · #19 auto-correg
     const badge = screen.getByTestId('confianza-badge');
     expect(badge).toHaveAttribute('data-confianza', 'alta');
     expect(badge).toHaveTextContent(/Confianza alta/i);
-    expect(badge.className).toMatch(/emerald/);
+    // Pulido semáforo 2026-07: el color vive en data-nivel (CSS
+    // sello-confianza.css), ya no en clases Tailwind por familia.
+    expect(badge).toHaveAttribute('data-nivel', 'verde');
   });
 
   test('#20 confianza media → badge ámbar (amber)', () => {
     render(<ChatBubble message={base({ tool_used: 'get_biopreparados', grounded: true, confianza: 'media' })} />);
     const badge = screen.getByTestId('confianza-badge');
     expect(badge).toHaveAttribute('data-confianza', 'media');
-    expect(badge.className).toMatch(/amber/);
+    expect(badge).toHaveAttribute('data-nivel', 'ambar');
   });
 
   test('#20 confianza baja → badge gris (slate)', () => {
     render(<ChatBubble message={base({ tool_used: 'get_biopreparados', grounded: true, confianza: 'baja' })} />);
     const badge = screen.getByTestId('confianza-badge');
     expect(badge).toHaveAttribute('data-confianza', 'baja');
-    expect(badge.className).toMatch(/slate/);
+    expect(badge).toHaveAttribute('data-nivel', 'gris');
   });
 
   test('#20 sin confianza → NO renderiza el badge', () => {

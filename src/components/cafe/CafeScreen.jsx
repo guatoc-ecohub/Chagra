@@ -40,6 +40,12 @@ import './cafe.css';
  * pest_controllers, compatible_with, biopreparados) y en Cenicafé/FNC. Las
  * cifras que dependen del sitio (densidad, dosis) NO se inventan: son "dato en
  * camino" (SlotPendiente) o se remiten al análisis de suelo / al agente.
+ *
+ * 2ª PASADA VISUAL (byte-neutral, sin fotos nuevas): hero de portada con foto
+ * real + vapor SVG (firma del mundo), Ken Burns de una pasada en los heros,
+ * entradas escalonadas por estación, timeline en pasos ordenados, tarjetas con
+ * hover/focus vivos y borde-código de roya. Todo GPU-friendly
+ * (transform/opacity) y apagado con prefers-reduced-motion (cafe.css).
  */
 
 /** Chip honesto para cifras aún sin grounding (mismo criterio que Agua). */
@@ -61,7 +67,7 @@ function SlotPendiente({ children = null }) {
  * texto encima quede legible al sol. */
 const creditoDe = (slug) => CREDITOS_FOTOS_CAFE.find((c) => c.slug === slug)?.autor || '';
 
-function FotoCafe({ slug, alt, ratio = 'aspect-[16/10]', rounded = '', Fallback = Coffee, children = null }) {
+function FotoCafe({ slug, alt, ratio = 'aspect-[16/10]', rounded = '', Fallback = Coffee, kenburns = false, children = null }) {
   const [ok, setOk] = useState(true);
   const credito = creditoDe(slug);
   const IconoFallback = Fallback;
@@ -74,7 +80,7 @@ function FotoCafe({ slug, alt, ratio = 'aspect-[16/10]', rounded = '', Fallback 
           loading="lazy"
           decoding="async"
           onError={() => setOk(false)}
-          className="cafe-foto absolute inset-0 w-full h-full object-cover"
+          className={`${kenburns ? 'cafe-foto--kenburns' : 'cafe-foto'} absolute inset-0 w-full h-full object-cover`}
         />
       ) : (
         <div className="absolute inset-0 grid place-items-center" aria-hidden="true">
@@ -90,6 +96,24 @@ function FotoCafe({ slug, alt, ratio = 'aspect-[16/10]', rounded = '', Fallback 
         </span>
       )}
     </div>
+  );
+}
+
+/** Vapor de café (firma del mundo): tres hilos SVG que suben en loop sobre
+ * el hero de portada. Decorativo, solo transform/opacity, se apaga con
+ * prefers-reduced-motion (cafe.css). */
+function VaporCafe() {
+  return (
+    <svg
+      viewBox="0 0 34 40"
+      fill="none"
+      aria-hidden="true"
+      className="absolute top-2.5 right-3.5 w-8 h-10 text-white/55 pointer-events-none"
+    >
+      <path className="cafe-vapor" d="M9 34c-3-4 3-7 0-11s2-7 0-10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path className="cafe-vapor cafe-vapor--2" d="M17 36c-3-4 3-7 0-11s2-7 0-10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path className="cafe-vapor cafe-vapor--3" d="M25 34c-3-4 3-7 0-11s2-7 0-10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
   );
 }
 
@@ -117,12 +141,12 @@ function EstacionSiembra() {
     <section className="cafe-seccion space-y-4" data-testid="estacion-siembra">
       {/* Hero con foto real del cafetal */}
       <div className="rounded-2xl border border-amber-800/40 overflow-hidden bg-[#241811]/60">
-        <FotoCafe slug="cafetal" alt="Cafetal con árboles de sombra en la montaña colombiana" ratio="aspect-[16/9]" Fallback={Coffee}>
+        <FotoCafe slug="cafetal" alt="Cafetal con árboles de sombra en la montaña colombiana" ratio="aspect-[16/9]" kenburns Fallback={Coffee}>
           <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-amber-200">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-amber-200">
               <Coffee size={14} aria-hidden="true" /> El cultivo bandera
             </p>
-            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">Todo empieza por escoger bien la mata</h3>
+            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow [text-wrap:balance]">Todo empieza por escoger bien la mata</h3>
           </div>
         </FotoCafe>
       </div>
@@ -144,9 +168,16 @@ function EstacionSiembra() {
       <div className="rounded-2xl border border-slate-700/60 bg-[#241811]/50 p-4 space-y-2.5" data-testid="cafe-variedades">
         <p className="flex items-center gap-2 text-sm font-black text-amber-200 uppercase tracking-wide">
           <Coffee size={16} aria-hidden="true" /> Las variedades y la roya
+          <span aria-hidden="true" className="flex-1 h-px bg-gradient-to-r from-amber-500/40 to-transparent" />
         </p>
         {VARIEDADES_CAFE.map((v) => (
-          <div key={v.id} className="rounded-xl border border-slate-700/50 bg-slate-950/40 p-3" data-testid={`variedad-${v.id}`}>
+          <div
+            key={v.id}
+            className={`cafe-card rounded-xl border border-slate-700/50 border-l-2 ${
+              v.roya === 'resistente' ? 'border-l-emerald-500/60' : 'border-l-amber-500/60'
+            } bg-slate-950/40 p-3`}
+            data-testid={`variedad-${v.id}`}
+          >
             <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-slate-100 leading-tight">
               {v.nombre}
               <ChipRoya estado={v.roya} />
@@ -162,16 +193,16 @@ function EstacionSiembra() {
       <div className="rounded-2xl border border-emerald-800/40 overflow-hidden bg-[#241811]/50">
         <FotoCafe slug="almacigo" alt="Almácigo de café: chapolas y plántulas en bolsa en el vivero" ratio="aspect-[16/9]" Fallback={Sprout}>
           <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-emerald-200">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-emerald-200">
               <Sprout size={14} aria-hidden="true" /> El almácigo
             </p>
-            <h3 className="text-lg font-black text-[#ffffff] leading-tight drop-shadow">De la chapola a la mata de cruz</h3>
+            <h3 className="text-lg font-black text-[#ffffff] leading-tight drop-shadow [text-wrap:balance]">De la chapola a la mata de cruz</h3>
           </div>
         </FotoCafe>
         <div className="p-4">
           <ol className="space-y-3">
             {PASOS_ALMACIGO.map((paso, i) => (
-              <li key={paso.id} className="flex gap-3" data-testid={`almacigo-${paso.id}`}>
+              <li key={paso.id} className="cafe-paso cafe-paso--verde flex gap-3" data-testid={`almacigo-${paso.id}`}>
                 <span aria-hidden="true" className="shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-black grid place-items-center">
                   {i + 1}
                 </span>
@@ -202,12 +233,12 @@ function EstacionSombra({ onNavigate }) {
   return (
     <section className="cafe-seccion space-y-4" data-testid="estacion-sombra">
       <div className="rounded-2xl border border-emerald-800/40 overflow-hidden bg-[#241811]/60">
-        <FotoCafe slug="cafetal" alt="Café bajo la sombra de guamos y plátano" ratio="aspect-[16/9]" Fallback={Trees}>
+        <FotoCafe slug="cafetal" alt="Café bajo la sombra de guamos y plátano" ratio="aspect-[16/9]" kenburns Fallback={Trees}>
           <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-emerald-200">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-emerald-200">
               <Trees size={14} aria-hidden="true" /> Buenas vecinas
             </p>
-            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">El café no vive solo</h3>
+            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow [text-wrap:balance]">El café no vive solo</h3>
           </div>
         </FotoCafe>
       </div>
@@ -222,9 +253,10 @@ function EstacionSombra({ onNavigate }) {
       <div className="rounded-2xl border border-slate-700/60 bg-[#241811]/50 p-4 space-y-2.5" data-testid="cafe-sombra">
         <p className="flex items-center gap-2 text-sm font-black text-emerald-200 uppercase tracking-wide">
           <Leaf size={16} aria-hidden="true" /> Con quién sembrar el café
+          <span aria-hidden="true" className="flex-1 h-px bg-gradient-to-r from-emerald-500/40 to-transparent" />
         </p>
         {SOMBRA_ASOCIACION.map((a) => (
-          <div key={a.id} className="rounded-xl border border-slate-700/50 bg-slate-950/40 p-3" data-testid={`sombra-${a.id}`}>
+          <div key={a.id} className="cafe-card rounded-xl border border-slate-700/50 border-l-2 border-l-emerald-500/50 bg-slate-950/40 p-3" data-testid={`sombra-${a.id}`}>
             <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-sm font-bold text-slate-100 leading-tight">
               {a.nombre}
               <span className="text-[11px] italic font-normal text-slate-400">{a.cientifico}</span>
@@ -242,6 +274,7 @@ function EstacionSombra({ onNavigate }) {
       <div className="rounded-2xl border border-amber-800/40 bg-[#241811]/50 p-4 space-y-3" data-testid="cafe-suelo">
         <p className="flex items-center gap-2 text-sm font-black text-amber-200 uppercase tracking-wide">
           <Mountain size={16} aria-hidden="true" /> Qué come el café
+          <span aria-hidden="true" className="flex-1 h-px bg-gradient-to-r from-amber-500/40 to-transparent" />
         </p>
         <ul className="space-y-3">
           {SUELO_CAFE.map((s) => (
@@ -267,7 +300,7 @@ function EstacionSombra({ onNavigate }) {
             type="button"
             data-testid="cafe-ir-suelo"
             onClick={() => onNavigate('salud_suelo')}
-            className="w-full flex items-center gap-3 rounded-xl border border-slate-700/60 bg-slate-900/40 p-3 text-left active:bg-slate-800/60 transition-colors"
+            className="cafe-cta w-full flex items-center gap-3 rounded-xl border border-slate-700/60 bg-slate-900/40 p-3 text-left active:bg-slate-800/60"
           >
             <span aria-hidden="true" className="shrink-0 w-9 h-9 rounded-lg bg-amber-500/15 grid place-items-center">
               <Mountain size={18} className="text-amber-300" />
@@ -276,7 +309,7 @@ function EstacionSombra({ onNavigate }) {
               <span className="block text-sm font-bold text-slate-100 leading-tight">Cuaderno del suelo</span>
               <span className="block text-xs text-slate-400 leading-tight mt-0.5">Lea su análisis y corrija la acidez antes de abonar.</span>
             </span>
-            <ChevronRight size={18} className="shrink-0 text-slate-500" aria-hidden="true" />
+            <ChevronRight size={18} className="cafe-cta-flecha shrink-0 text-slate-500" aria-hidden="true" />
           </button>
         )}
       </div>
@@ -290,13 +323,13 @@ const ICONO_MAL = { broca: Bug, roya: Leaf };
 function MalCard({ mal }) {
   const Icono = ICONO_MAL[mal.id] || Bug;
   return (
-    <article className="rounded-2xl border border-rose-800/40 bg-[#241811]/50 overflow-hidden" data-testid={`mal-${mal.id}`}>
-      <FotoCafe slug={mal.foto} alt={`${mal.nombre} (${mal.cientifico}) en el café`} ratio="aspect-[16/9]" Fallback={Icono}>
+    <article className="rounded-2xl border border-rose-800/40 bg-[#241811]/50 overflow-hidden shadow-md shadow-black/30" data-testid={`mal-${mal.id}`}>
+      <FotoCafe slug={mal.foto} alt={`${mal.nombre} (${mal.cientifico}) en el café`} ratio="aspect-[16/9]" kenburns Fallback={Icono}>
         <div className="absolute inset-0 flex flex-col justify-end p-4">
-          <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-rose-200">
+          <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-rose-200">
             <Icono size={14} aria-hidden="true" /> {mal.tipo}
           </p>
-          <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">{mal.nombre}</h3>
+          <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow [text-wrap:balance]">{mal.nombre}</h3>
           <p className="text-[11px] italic text-white/70 leading-tight">{mal.cientifico}</p>
         </div>
       </FotoCafe>
@@ -306,11 +339,12 @@ function MalCard({ mal }) {
         <div>
           <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-rose-300 mb-1.5">
             <TriangleAlert size={14} aria-hidden="true" /> Cómo reconocerla
+            <span aria-hidden="true" className="flex-1 h-px bg-gradient-to-r from-rose-500/40 to-transparent" />
           </p>
           <ul className="space-y-1.5">
             {mal.reconocer.map((r, i) => (
-              <li key={i} className="flex gap-1.5 text-xs leading-snug text-slate-200">
-                <span aria-hidden="true" className="text-rose-400 shrink-0">•</span>{r}
+              <li key={i} className="flex gap-2 text-xs leading-snug text-slate-200">
+                <span aria-hidden="true" className="mt-1 w-1.5 h-1.5 rounded-full bg-rose-400/80 shrink-0" />{r}
               </li>
             ))}
           </ul>
@@ -319,10 +353,11 @@ function MalCard({ mal }) {
         <div>
           <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-emerald-300 mb-2">
             <ShieldCheck size={14} aria-hidden="true" /> Cómo manejarla sin veneno
+            <span aria-hidden="true" className="flex-1 h-px bg-gradient-to-r from-emerald-500/40 to-transparent" />
           </p>
           <ul className="space-y-2">
             {mal.manejo.map((m, i) => (
-              <li key={i} className="rounded-lg border border-slate-700/50 bg-slate-950/40 p-2.5">
+              <li key={i} className="cafe-card rounded-lg border border-slate-700/50 border-l-2 border-l-emerald-500/50 bg-slate-950/40 p-2.5">
                 <p className="text-sm font-bold text-slate-100 leading-tight">{m.titulo}</p>
                 <p className="text-xs leading-snug text-slate-300 mt-0.5">{m.detalle}</p>
               </li>
@@ -368,7 +403,7 @@ function EstacionMales({ onNavigate }) {
             type="button"
             data-testid="cafe-ir-biopreparados"
             onClick={() => onNavigate('biopreparados', { back: 'dashboard' })}
-            className="w-full flex items-center gap-3 rounded-xl border border-slate-700/60 bg-slate-900/40 p-3 text-left active:bg-slate-800/60 transition-colors"
+            className="cafe-cta w-full flex items-center gap-3 rounded-xl border border-slate-700/60 bg-slate-900/40 p-3 text-left active:bg-slate-800/60"
           >
             <span aria-hidden="true" className="shrink-0 w-9 h-9 rounded-lg bg-emerald-500/15 grid place-items-center">
               <FlaskConical size={18} className="text-emerald-300" />
@@ -377,13 +412,13 @@ function EstacionMales({ onNavigate }) {
               <span className="block text-sm font-bold text-slate-100 leading-tight">Biopreparados paso a paso</span>
               <span className="block text-xs text-slate-400 leading-tight mt-0.5">Caldo bordelés, cola de caballo con ceniza y más, con su receta.</span>
             </span>
-            <ChevronRight size={18} className="shrink-0 text-slate-500" aria-hidden="true" />
+            <ChevronRight size={18} className="cafe-cta-flecha shrink-0 text-slate-500" aria-hidden="true" />
           </button>
           <button
             type="button"
             data-testid="cafe-ir-sanidad"
             onClick={() => onNavigate('sanidad_sintoma')}
-            className="w-full flex items-center gap-3 rounded-xl border border-slate-700/60 bg-slate-900/40 p-3 text-left active:bg-slate-800/60 transition-colors"
+            className="cafe-cta w-full flex items-center gap-3 rounded-xl border border-slate-700/60 bg-slate-900/40 p-3 text-left active:bg-slate-800/60"
           >
             <span aria-hidden="true" className="shrink-0 w-9 h-9 rounded-lg bg-rose-500/15 grid place-items-center">
               <Bug size={18} className="text-rose-300" />
@@ -392,7 +427,7 @@ function EstacionMales({ onNavigate }) {
               <span className="block text-sm font-bold text-slate-100 leading-tight">Mi mata está enferma</span>
               <span className="block text-xs text-slate-400 leading-tight mt-0.5">Diga qué le ve y sepa qué es y cómo manejarla.</span>
             </span>
-            <ChevronRight size={18} className="shrink-0 text-slate-500" aria-hidden="true" />
+            <ChevronRight size={18} className="cafe-cta-flecha shrink-0 text-slate-500" aria-hidden="true" />
           </button>
         </div>
       )}
@@ -406,26 +441,26 @@ function EstacionCosecha() {
   return (
     <section className="cafe-seccion space-y-4" data-testid="estacion-cosecha">
       <div className="rounded-2xl border border-pink-800/30 overflow-hidden bg-[#241811]/60">
-        <FotoCafe slug="flor" alt="Flores blancas de café tras las lluvias" ratio="aspect-[16/9]" Fallback={Flower2}>
+        <FotoCafe slug="flor" alt="Flores blancas de café tras las lluvias" ratio="aspect-[16/9]" kenburns Fallback={Flower2}>
           <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-pink-100">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-pink-100">
               <Flower2 size={14} aria-hidden="true" /> De la flor al grano
             </p>
-            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">La lluvia manda la floración</h3>
+            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow [text-wrap:balance]">La lluvia manda la floración</h3>
           </div>
         </FotoCafe>
       </div>
 
       {/* Datos duros del ciclo (grounded del grafo) */}
       <div className="grid grid-cols-2 gap-2" data-testid="cafe-ciclo-datos">
-        <div className="rounded-xl border border-amber-700/40 bg-slate-950/40 p-3">
+        <div className="cafe-card rounded-xl border border-amber-700/40 bg-slate-950/40 p-3">
           <p className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-amber-300 mb-1">
             <CalendarDays size={13} aria-hidden="true" /> Picos de cosecha
           </p>
           <p className="text-sm font-bold text-slate-100 leading-tight">{c.picosCosecha}</p>
           <p className="text-[10px] text-slate-400 mt-0.5">Régimen bimodal (dos cosechas al año)</p>
         </div>
-        <div className="rounded-xl border border-amber-700/40 bg-slate-950/40 p-3">
+        <div className="cafe-card rounded-xl border border-amber-700/40 bg-slate-950/40 p-3">
           <p className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-amber-300 mb-1">
             <Mountain size={13} aria-hidden="true" /> Dónde y cuándo
           </p>
@@ -438,10 +473,13 @@ function EstacionCosecha() {
 
       {/* Pasos del ciclo flor→cereza */}
       <div className="rounded-2xl border border-slate-700/60 bg-[#241811]/50 p-4">
-        <p className="text-sm font-black text-slate-100 uppercase tracking-wide mb-3">El grano, mes a mes</p>
+        <p className="flex items-center gap-2 text-sm font-black text-slate-100 uppercase tracking-wide mb-3">
+          El grano, mes a mes
+          <span aria-hidden="true" className="flex-1 h-px bg-gradient-to-r from-amber-500/40 to-transparent" />
+        </p>
         <ol className="space-y-3">
           {c.pasos.map((paso, i) => (
-            <li key={paso.id} className="flex gap-3" data-testid={`ciclo-${paso.id}`}>
+            <li key={paso.id} className="cafe-paso flex gap-3" data-testid={`ciclo-${paso.id}`}>
               <span aria-hidden="true" className="shrink-0 w-6 h-6 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-black grid place-items-center">
                 {i + 1}
               </span>
@@ -459,10 +497,10 @@ function EstacionCosecha() {
       <div className="rounded-2xl border border-red-800/40 overflow-hidden bg-[#241811]/50" data-testid="cafe-recoleccion">
         <FotoCafe slug="cereza" alt="Cerezas de café rojas y maduras en la rama, listas para la recolección selectiva" ratio="aspect-[16/9]" Fallback={Scissors}>
           <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-red-200">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-red-200">
               <Scissors size={14} aria-hidden="true" /> Recolección selectiva
             </p>
-            <h3 className="text-lg font-black text-[#ffffff] leading-tight drop-shadow">{RECOLECCION_SELECTIVA.titulo}</h3>
+            <h3 className="text-lg font-black text-[#ffffff] leading-tight drop-shadow [text-wrap:balance]">{RECOLECCION_SELECTIVA.titulo}</h3>
           </div>
         </FotoCafe>
         <div className="p-4">
@@ -487,12 +525,12 @@ function EstacionBeneficio({ onNavigate }) {
   return (
     <section className="cafe-seccion space-y-4" data-testid="estacion-beneficio">
       <div className="rounded-2xl border border-amber-800/40 overflow-hidden bg-[#241811]/60">
-        <FotoCafe slug="secado" alt="Café pergamino secándose al sol en la marquesina" ratio="aspect-[16/9]" Fallback={Sun}>
+        <FotoCafe slug="secado" alt="Café pergamino secándose al sol en la marquesina" ratio="aspect-[16/9]" kenburns Fallback={Sun}>
           <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-amber-200">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-amber-200">
               <Coffee size={14} aria-hidden="true" /> El beneficio
             </p>
-            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow">Del grano rojo al café seco</h3>
+            <h3 className="text-xl font-black text-[#ffffff] leading-tight drop-shadow [text-wrap:balance]">Del grano rojo al café seco</h3>
           </div>
         </FotoCafe>
       </div>
@@ -508,11 +546,11 @@ function EstacionBeneficio({ onNavigate }) {
         {PASOS_BENEFICIO.map((paso, i) => {
           const Icono = ICONO_BENEFICIO[paso.icono] || Coffee;
           return (
-            <li key={paso.id} className="rounded-2xl border border-slate-700/60 bg-[#241811]/50 p-4" data-testid={`beneficio-${paso.id}`}>
+            <li key={paso.id} className="cafe-card rounded-2xl border border-slate-700/60 bg-[#241811]/50 p-4" data-testid={`beneficio-${paso.id}`}>
               <div className="flex items-start gap-3">
                 <span aria-hidden="true" className="shrink-0 w-9 h-9 rounded-xl bg-amber-500/15 grid place-items-center relative">
                   <Icono size={18} className="text-amber-300" />
-                  <span className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-amber-500 text-[11px] font-black text-[#241811] grid place-items-center">{i + 1}</span>
+                  <span className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-amber-500 ring-2 ring-[#241811] text-[11px] font-black text-[#241811] grid place-items-center">{i + 1}</span>
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-slate-100 leading-tight">{paso.titulo}</p>
@@ -539,10 +577,10 @@ function EstacionBeneficio({ onNavigate }) {
       <div className="rounded-2xl border border-lime-800/40 overflow-hidden bg-lime-950/20" data-testid="cafe-pulpa-abono">
         <FotoCafe slug="pulpa" alt="Pulpa de café amontonada para compostar" ratio="aspect-[16/9]" Fallback={Recycle}>
           <div className="absolute inset-0 flex flex-col justify-end p-4">
-            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-lime-200">
+            <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-lime-200">
               <Recycle size={14} aria-hidden="true" /> Cerrar el ciclo
             </p>
-            <h3 className="text-lg font-black text-[#ffffff] leading-tight drop-shadow">{PULPA_ABONO.titulo}</h3>
+            <h3 className="text-lg font-black text-[#ffffff] leading-tight drop-shadow [text-wrap:balance]">{PULPA_ABONO.titulo}</h3>
           </div>
         </FotoCafe>
         <div className="p-4 space-y-3">
@@ -560,7 +598,7 @@ function EstacionBeneficio({ onNavigate }) {
               type="button"
               data-testid="cafe-ir-compost"
               onClick={() => onNavigate(PULPA_ABONO.enlaceMundo)}
-              className="w-full flex items-center gap-3 rounded-xl border border-lime-700/50 bg-lime-900/20 p-3 text-left active:bg-lime-900/40 transition-colors"
+              className="cafe-cta w-full flex items-center gap-3 rounded-xl border border-lime-700/50 bg-lime-900/20 p-3 text-left active:bg-lime-900/40"
             >
               <span aria-hidden="true" className="shrink-0 w-9 h-9 rounded-lg bg-lime-500/20 grid place-items-center">
                 <Recycle size={18} className="text-lime-300" />
@@ -569,7 +607,7 @@ function EstacionBeneficio({ onNavigate }) {
                 <span className="block text-sm font-bold text-slate-100 leading-tight">{PULPA_ABONO.enlaceLabel}</span>
                 <span className="block text-xs text-slate-400 leading-tight mt-0.5">Vaya al mundo «Del corral al abono»: compostaje y lombricultura.</span>
               </span>
-              <ChevronRight size={18} className="shrink-0 text-slate-500" aria-hidden="true" />
+              <ChevronRight size={18} className="cafe-cta-flecha shrink-0 text-slate-500" aria-hidden="true" />
             </button>
           )}
         </div>
@@ -621,52 +659,83 @@ export default function CafeScreen({ onBack, onNavigate = undefined }) {
 
   return (
     <ScreenShell title="El café" icon={Coffee} onBack={onBack}>
-      <div className="max-w-2xl mx-auto p-4 space-y-4" data-testid="cafe-screen">
-        {/* Portada breve del mundo */}
-        <div className="rounded-2xl border border-amber-800/40 bg-[#241811]/50 p-4">
-          <p className="flex items-center gap-2 text-sm font-black text-amber-200 leading-tight">
-            <Coffee size={18} aria-hidden="true" className="shrink-0" />
-            El café, de la semilla a la taza
-          </p>
-          <p className="mt-1.5 text-xs italic leading-snug text-slate-400">
-            El cultivo bandera del campesino colombiano, contado por su ciclo: escoger
-            la variedad, criar la mata, defenderla de la broca y la roya, cosechar el
-            grano maduro y beneficiarlo — hasta devolverle al suelo la pulpa hecha abono.
-          </p>
+      <div className="cafe-mundo max-w-2xl mx-auto p-4 space-y-4" data-testid="cafe-screen">
+        {/* Portada del mundo: hero con foto real (cerezas maduras) + vapor. */}
+        <div className="rounded-2xl border border-amber-800/40 overflow-hidden bg-[#241811]/60 shadow-lg shadow-black/40">
+          <FotoCafe
+            slug="cereza"
+            alt="Cerezas de café rojas y maduras en la rama"
+            ratio="aspect-[16/10]"
+            kenburns
+            Fallback={Coffee}
+          >
+            <VaporCafe />
+            <div className="absolute inset-0 flex flex-col justify-end p-4">
+              <p className="cafe-hero-linea flex items-center gap-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-amber-200">
+                <Coffee size={14} aria-hidden="true" /> El ciclo cafetero
+              </p>
+              <h2 className="cafe-hero-linea cafe-hero-linea--2 mt-0.5 text-2xl font-black text-white leading-tight drop-shadow [text-wrap:balance]">
+                El café, de la semilla a la taza
+              </h2>
+              <p className="cafe-hero-linea cafe-hero-linea--3 mt-1.5 text-xs italic leading-snug text-white/85 drop-shadow-sm">
+                El cultivo bandera del campesino colombiano, contado por su ciclo: escoger
+                la variedad, criar la mata, defenderla de la broca y la roya, cosechar el
+                grano maduro y beneficiarlo — hasta devolverle al suelo la pulpa hecha abono.
+              </p>
+            </div>
+          </FotoCafe>
         </div>
 
-        {/* Navegación entre estaciones (2×3, legible al sol) */}
+        {/* Navegación entre estaciones (2×3, legible al sol). El numeral marca
+            el orden real del ciclo cafetero: siembra → sombra → sanidad →
+            cosecha → beneficio. */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2" role="tablist" aria-label="Estaciones del café">
-          {ESTACIONES_CAFE.map((e) => {
+          {ESTACIONES_CAFE.map((e, i) => {
             const activo = estacion === e.id;
             return (
               <button
                 key={e.id}
                 type="button"
                 role="tab"
+                id={`tab-cafe-${e.id}`}
+                aria-controls="panel-cafe-estacion"
                 aria-selected={activo}
                 data-testid={`estacion-tab-${e.id}`}
                 onClick={() => setEstacion(e.id)}
-                className={`rounded-xl border px-2 py-2.5 text-center transition-colors min-h-[56px] ${
+                className={`cafe-tab relative rounded-xl border px-2 pt-2.5 pb-3 text-center min-h-[56px] ${
                   activo
-                    ? 'cafe-estacion-activa border-amber-500/70 bg-amber-500/15 text-amber-100'
+                    ? 'cafe-estacion-activa border-amber-500/70 bg-gradient-to-b from-amber-500/20 to-amber-500/5 text-amber-100'
                     : 'border-slate-700 bg-[#241811]/50 text-slate-300 active:bg-slate-800/70'
                 }`}
               >
+                <span
+                  aria-hidden="true"
+                  className={`absolute top-1 right-1.5 text-[9px] font-black tabular-nums ${activo ? 'text-amber-300' : 'text-slate-600'}`}
+                >
+                  {i + 1}
+                </span>
                 <span className="block text-sm font-black leading-tight">{e.titulo}</span>
                 <span className={`block text-[10px] leading-tight mt-0.5 ${activo ? 'text-amber-200/90' : 'text-slate-500'}`}>
                   {e.descripcion}
                 </span>
+                {activo && (
+                  <span
+                    aria-hidden="true"
+                    className="cafe-tab-indicador absolute bottom-1 left-1/2 -ml-3 w-6 h-0.5 rounded-full bg-amber-400/90"
+                  />
+                )}
               </button>
             );
           })}
         </div>
 
-        {estacion === 'siembra' && <EstacionSiembra />}
-        {estacion === 'sombra' && <EstacionSombra onNavigate={onNavigate} />}
-        {estacion === 'males' && <EstacionMales onNavigate={onNavigate} />}
-        {estacion === 'cosecha' && <EstacionCosecha />}
-        {estacion === 'beneficio' && <EstacionBeneficio onNavigate={onNavigate} />}
+        <div role="tabpanel" id="panel-cafe-estacion" aria-labelledby={`tab-cafe-${estacion}`}>
+          {estacion === 'siembra' && <EstacionSiembra />}
+          {estacion === 'sombra' && <EstacionSombra onNavigate={onNavigate} />}
+          {estacion === 'males' && <EstacionMales onNavigate={onNavigate} />}
+          {estacion === 'cosecha' && <EstacionCosecha />}
+          {estacion === 'beneficio' && <EstacionBeneficio onNavigate={onNavigate} />}
+        </div>
 
         {/* Créditos de todas las fotos del mundo (cumplimiento licencia abierta) */}
         <CreditosFotos />
@@ -677,7 +746,7 @@ export default function CafeScreen({ onBack, onNavigate = undefined }) {
             type="button"
             data-testid="cafe-preguntar-agente"
             onClick={() => onNavigate('agente', { prefilledPrompt: '¿Cómo manejo la roya y la broca en mi cafetal sin veneno?' })}
-            className="w-full flex items-center gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/40 p-3.5 text-left active:bg-slate-800/60 transition-colors"
+            className="cafe-cta w-full flex items-center gap-3 rounded-2xl border border-amber-800/40 bg-gradient-to-r from-amber-950/40 to-slate-900/40 p-3.5 text-left active:bg-slate-800/60"
           >
             <span aria-hidden="true" className="shrink-0 w-10 h-10 rounded-xl bg-amber-500/15 grid place-items-center">
               <Coffee size={20} className="text-amber-300" />
@@ -686,7 +755,7 @@ export default function CafeScreen({ onBack, onNavigate = undefined }) {
               <span className="block text-sm font-bold text-slate-100 leading-tight">¿Su cafetal es distinto?</span>
               <span className="block text-xs text-slate-400 leading-tight mt-0.5">Cuénteselo al agente: él conoce su finca, su clima y su altura.</span>
             </span>
-            <ChevronRight size={18} className="shrink-0 text-slate-500" aria-hidden="true" />
+            <ChevronRight size={18} className="cafe-cta-flecha shrink-0 text-slate-500" aria-hidden="true" />
           </button>
         )}
       </div>
