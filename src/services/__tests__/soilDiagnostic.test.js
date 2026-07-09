@@ -164,3 +164,39 @@ describe('formatearGroundingSuelo', () => {
     expect(f).toContain('DR-SUELOS-1');
   });
 });
+
+describe('persistencia del último diagnóstico (panel de vitalidad)', () => {
+  it('round-trip: guardar → leer devuelve problemas + ts + fuente', async () => {
+    const { guardarDiagnosticoSuelo, getDiagnosticoSueloGuardado, DIAG_SUELO_STORAGE_KEY } = await import('../soilDiagnostic');
+    localStorage.removeItem(DIAG_SUELO_STORAGE_KEY);
+    expect(getDiagnosticoSueloGuardado()).toBeNull();
+
+    const d = diagnosticarSuelo('tengo tierra amarilla pegajosa y sale helecho');
+    expect(guardarDiagnosticoSuelo(d)).toBe(true);
+
+    const leido = getDiagnosticoSueloGuardado();
+    expect(leido).not.toBeNull();
+    expect(leido.sin_datos).toBe(false);
+    expect(leido.problemas).toEqual(d.problemas);
+    expect(Number.isFinite(leido.ts)).toBe(true);
+    expect(leido.fuente).toContain('DR-SUELOS-1');
+    localStorage.removeItem(DIAG_SUELO_STORAGE_KEY);
+  });
+
+  it('NO persiste sin_datos ni shapes inválidos', async () => {
+    const { guardarDiagnosticoSuelo, getDiagnosticoSueloGuardado, DIAG_SUELO_STORAGE_KEY } = await import('../soilDiagnostic');
+    localStorage.removeItem(DIAG_SUELO_STORAGE_KEY);
+    expect(guardarDiagnosticoSuelo(diagnosticarSuelo(''))).toBe(false);
+    expect(guardarDiagnosticoSuelo(null)).toBe(false);
+    expect(getDiagnosticoSueloGuardado()).toBeNull();
+  });
+
+  it('entrada corrupta en localStorage → null (no revienta el home)', async () => {
+    const { getDiagnosticoSueloGuardado, DIAG_SUELO_STORAGE_KEY } = await import('../soilDiagnostic');
+    localStorage.setItem(DIAG_SUELO_STORAGE_KEY, '{no-es-json');
+    expect(getDiagnosticoSueloGuardado()).toBeNull();
+    localStorage.setItem(DIAG_SUELO_STORAGE_KEY, JSON.stringify({ problemas: 'no-array' }));
+    expect(getDiagnosticoSueloGuardado()).toBeNull();
+    localStorage.removeItem(DIAG_SUELO_STORAGE_KEY);
+  });
+});

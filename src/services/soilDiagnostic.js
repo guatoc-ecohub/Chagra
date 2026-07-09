@@ -189,6 +189,54 @@ export function diagnosticarSuelo(descripcion) {
   };
 }
 
+/* ── persistencia del último diagnóstico (panel de vitalidad) ────────────── */
+
+/** Clave localStorage del último diagnóstico REAL de suelo del usuario. */
+export const DIAG_SUELO_STORAGE_KEY = 'chagra_diag_suelo_v1';
+
+/**
+ * Guarda el último diagnóstico REAL (no `sin_datos`) para que el home
+ * (PanelVitalidadEspiritu, eje 🪱 El suelo) pueda leerlo sin recalcular.
+ * Solo persiste lo mínimo trazable: problemas + fecha + fuente. Falla en
+ * silencio (incógnito/cuota): el panel simplemente sigue en "dato en camino".
+ *
+ * @param {DiagnosticoResult} diagnostico — resultado de diagnosticarSuelo
+ * @returns {boolean} true si quedó guardado
+ */
+export function guardarDiagnosticoSuelo(diagnostico) {
+  if (!diagnostico || diagnostico.sin_datos || !Array.isArray(diagnostico.problemas)) return false;
+  try {
+    localStorage.setItem(DIAG_SUELO_STORAGE_KEY, JSON.stringify({
+      problemas: diagnostico.problemas,
+      sin_datos: false,
+      ts: Date.now(),
+      fuente: diagnostico.fuente || SOIL_DATA.fuente,
+    }));
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Último diagnóstico de suelo guardado (o null si nunca se hizo uno).
+ * Shape compatible con vitalidadEspirituService.ejeSuelo: {problemas[],
+ * sin_datos, ts, fuente}. Entrada corrupta → null (nunca revienta el home).
+ *
+ * @returns {{problemas: string[], sin_datos: boolean, ts: number, fuente: string}|null}
+ */
+export function getDiagnosticoSueloGuardado() {
+  try {
+    const raw = localStorage.getItem(DIAG_SUELO_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.problemas)) return null;
+    return { sin_datos: false, ...parsed };
+  } catch (_) {
+    return null;
+  }
+}
+
 function buscarEnmienda(id) {
   const e = SOIL_DATA.enmiendas.find((enm) => enm.id === id);
   return e ? { id: e.id, nombre: e.nombre, problema_que_corrige: e.problema_que_corrige, dosis_orientativa: e.dosis_orientativa, precaucion: e.precaucion, fuente: e.fuente } : null;

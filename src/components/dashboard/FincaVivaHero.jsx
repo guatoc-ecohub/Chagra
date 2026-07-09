@@ -10,6 +10,7 @@ import useAssetStore from '../../store/useAssetStore';
 import useCosechaStore from '../../store/useCosechaStore';
 import { buildFincaScene } from '../../services/fincaSceneService';
 import { buildVitalidadEspiritu } from '../../services/vitalidadEspirituService';
+import { getDiagnosticoSueloGuardado } from '../../services/soilDiagnostic';
 import { selectSceneVariant, SCENE_KINDS } from '../../services/fincaSceneProfileSelector';
 import { getProfile, saveProfile, getInvernaderoEstructura, hasManualModuleVisibility } from '../../services/userProfileService';
 import { esPerfilUrbano } from '../../services/homeModuleSelector';
@@ -333,6 +334,11 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
     if (!organismoActivo) return null;
     let snapshot = null;
     try { snapshot = getCachedClimaSnapshot(); } catch (_) { /* sin señal guardada */ }
+    // 🪱 El suelo: el ÚLTIMO diagnóstico REAL que el usuario hizo en la
+    // pantalla de suelo (DR-SUELOS-1), persistido por guardarDiagnosticoSuelo.
+    // Nunca hizo uno → null → el eje queda honesto en "dato en camino".
+    let diagSuelo = null;
+    try { diagSuelo = getDiagnosticoSueloGuardado(); } catch (_) { /* sin diagnóstico */ }
     return buildVitalidadEspiritu({
       scene,
       processes,
@@ -340,6 +346,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
       climaSnapshot: snapshot,
       condicion: atmosfera?.condicion || null,
       harvestSummary: cosechaSummary,
+      diagSuelo,
     });
     // `atmosfera` también re-lee el snapshot cacheado (se refresca con el
     // MISMO evento CLIMA_UPDATED_EVENT que alimenta el cielo de la escena).
