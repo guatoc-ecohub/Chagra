@@ -3731,16 +3731,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
 
         {/* Tip de primera vez (feat/onboarding-ayuda): cómo pedir diagnóstico
             con foto. Apunta al botón 📷 real del compositor de abajo;
-            descartable y no se repite (contextTips). */}
+            descartable y no se repite (contextTips). Variante 'subtle' = una
+            línea discreta, NO tarjeta (operador 2026-07-08: el aviso grande
+            gritaba encima del compositor). */}
         {state !== STATE_RECORDING && !agentAttachment && (
           <ContextTip
             id="foto-diagnostico"
+            variant="subtle"
             emoji="📷"
             title="¿Una mata enferma? Mándeme una foto"
-            className="mb-2"
+            className="mb-1.5"
           >
-            Toque la cámara aquí abajo y tome la foto cerquita de la hoja, con
-            buena luz de día. Yo le digo qué veo.
+            ¿Una mata enferma? Toque la cámara aquí abajo y mándeme la foto.
           </ContextTip>
         )}
 
