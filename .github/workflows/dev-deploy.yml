@@ -50,7 +50,6 @@ jobs:
         env:
           VITE_FARMOS_URL: ""
           VITE_FARMOS_CLIENT_ID: farm
-          VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
           VITE_USE_SIDECAR_AGRO_MCP: "true"
           VITE_FINCA_VIVA_HOME_PERFIL: "true"
           # Registro unificado (#23): puerta única "Registrar" (voz + manual) en

@@ -68,17 +68,6 @@ jobs:
       # (liviano, sin eslint OOM). Gate de calidad = donde debe estar: el commit/PR.
 
       - if: env.SKIP_DEPLOY != '1'
-        name: Verify secrets
-        run: |
-          if [ -z "${{ secrets.VITE_HA_ACCESS_TOKEN }}" ]; then
-            echo "::warning::VITE_HA_ACCESS_TOKEN secret is empty"
-          else
-            echo "HA token present (${#VITE_HA_ACCESS_TOKEN} chars)"
-          fi
-        env:
-          VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
-
-      - if: env.SKIP_DEPLOY != '1'
         name: Set deploy-time version
         # Bump de versión movido de pre-commit (lefthook auto-bump-version) a
         # deploy-time para eliminar colisiones entre PRs paralelos — raíz del
@@ -104,7 +93,6 @@ jobs:
           VITE_BUILD_SHA: ${{ github.sha }}
           VITE_FARMOS_URL: ""
           VITE_FARMOS_CLIENT_ID: farm
-          VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
           # Operador: username inyectado en build desde secret (anti-leak: NUNCA
           # hardcodeado en el source publico). Habilita esOperador -> vision total.
           VITE_OPERATOR_USERNAME: ${{ secrets.OPERATOR_USERNAME }}
