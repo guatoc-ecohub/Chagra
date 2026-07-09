@@ -963,8 +963,10 @@ export default function App() {
     // campesino — se monta sin sesión (no lee ni escribe datos reales).
     if (hash === 'mockups/home-campesino') {
       Promise.resolve().then(() => navigate('mockup_home_campesino'));
-    // Mockups dev (#/mockups/*): vistas aisladas de decisión visual — se
-    // montan sin sesión (datos de muestra, no tocan datos reales).
+      return;
+    }
+    // Mockup dev (#/mockups/montana-mundos): navegación como paisaje de pisos
+    // térmicos — se monta sin sesión (datos de muestra, no toca datos reales).
     if (hash === 'mockups/montana-mundos') {
       Promise.resolve().then(() => navigate('mockup_montana_mundos'));
       return;
@@ -1012,7 +1014,10 @@ export default function App() {
         return;
       }
       if (routeView === 'mockup_home_campesino') {
-      // Mockups dev: sin gate ni sesión (datos de muestra).
+        navigate(routeView);
+        return;
+      }
+      // Mockup dev: sin gate ni sesión (datos de muestra).
       if (routeView === 'mockup_montana_mundos') {
         navigate(routeView);
         return;
@@ -2691,7 +2696,6 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && !currentView.startsWith('mockup_') && <AgentFab onNavigate={navigate} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && !currentView.startsWith('mockup_') && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
