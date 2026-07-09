@@ -502,6 +502,82 @@ html[data-theme="biopunk"] .mf-indice-item {
 html:not([data-theme]) .mf-indice-txt small,
 html[data-theme="biopunk"] .mf-indice-txt small { color: rgb(var(--c-slate-300)); }
 
+/* ── Entrada Pro: EL ESPÍRITU DE SU FINCA ─────────────────────────────────────
+   Banda discreta bajo la grilla de mundos (gated por capability
+   avatar-espiritu — sin módulo Pro no se renderiza). No es una lámina de
+   papel más: es una VENTANA DE NOCHE en el cuaderno — la finca entera vista
+   como un solo ser vivo. Autocontenida en oscuro (misma clave #0f172a de la
+   experiencia), así lee igual sobre el cuaderno crema y sobre los temas navy. */
+.mf-espiritu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 12px;
+  min-height: 58px;
+  padding: 10px 14px;
+  border-radius: 15px;
+  border: 1.5px solid rgba(94, 234, 178, 0.28);
+  background:
+    radial-gradient(120% 160% at 12% 20%, rgba(45, 212, 160, 0.16), transparent 55%),
+    linear-gradient(120deg, #0f172a, #123028);
+  color: #d9f5e6;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mf-espiritu-glifo {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  color: #5eeab2;
+  background: rgba(94, 234, 178, 0.1);
+  animation: mf-espiritu-respira 4.5s ease-in-out infinite;
+}
+.mf-espiritu-txt { flex: 1 1 auto; min-width: 0; }
+.mf-espiritu-txt b {
+  display: block;
+  font-family: var(--mf-display, 'Baloo 2', 'Nunito', system-ui, sans-serif);
+  font-weight: 800;
+  font-size: 14.5px;
+  color: #eafcf2;
+}
+.mf-espiritu-txt small {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: rgba(217, 245, 230, 0.78);
+}
+.mf-espiritu-sello {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(94, 234, 178, 0.45);
+  color: #5eeab2;
+}
+.mf-espiritu:focus-visible {
+  outline: 3px solid #5eeab2;
+  outline-offset: 2px;
+}
+.mf-espiritu:active { transform: scale(0.99); }
+/* La respiración del espíritu: el aura del glifo crece y afloja, lenta. */
+@keyframes mf-espiritu-respira {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(94, 234, 178, 0.0); transform: scale(1); }
+  50% { box-shadow: 0 0 0 6px rgba(94, 234, 178, 0.12); transform: scale(1.05); }
+}
+/* Sobre los temas navy la banda ya es oscura: solo afinar el borde al sistema. */
+html:not([data-theme]) .mf-espiritu,
+html[data-theme="biopunk"] .mf-espiritu {
+  border-color: color-mix(in srgb, #5eeab2 30%, rgb(var(--c-surface-border, 51 65 85)));
+}
+
 /* ── Accesibilidad de movimiento ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .mf-card {
@@ -511,6 +587,8 @@ html[data-theme="biopunk"] .mf-indice-txt small { color: rgb(var(--c-slate-300))
   .mf-card:active,
   .mf-entrada:active { transform: none; }
   .mf-entrada { transition: none; }
+  .mf-espiritu-glifo { animation: none; }
+  .mf-espiritu:active { transform: none; }
   @media (hover: hover) {
     .mf-card:hover { transform: none; }
   }
