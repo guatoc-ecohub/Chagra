@@ -2573,9 +2573,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         if (kokoroReady) {
           // Free 7→10 fix-pack #4: streaming frase-por-frase reduce la
           // latencia hasta-primer-audio de "esperar respuesta entera"
-          // (3-23s) a "esperar primera frase" (<2s). Internamente fallback
-          // a speakKokoro/speak en caso de error en la primera frase.
-          speakSentences(responseBody, { rate: 0.9, pitch: 1.0 })
+          // (3-23s) a "esperar primera frase" (<2s). Sin rate hardcodeado:
+          // hereda la velocidad preferida del operador (getPreferredRate).
+          speakSentences(responseBody)
             .then((ok) => { if (!ok) warnIfMute(); })
             .catch(() => warnIfMute());
         } else {

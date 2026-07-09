@@ -1,25 +1,25 @@
 /**
- * VoiceSelector — Task #124 (2026-05-24).
+ * VoiceSelector — la voz de Chagra (rediseño de mínima fricción, 2026-07-09).
  *
- * Componente de Settings para elegir la voz Kokoro del asistente Chagra
- * y la velocidad de reproducción. Persiste preferencias en localStorage
- * vía `ttsService.setPreferredVoice` / `setPreferredRate`.
+ * El operador quiere que el campesino elija la voz OYENDO, con el mínimo de
+ * pasos y sin jerga. Antes había un dropdown + una lista "comparar" + un botón
+ * "Guardar" aparte + un slider: demasiados pasos y vocabulario técnico
+ * ("catálogo upstream", "acento neutro hispano").
  *
- * Diseñado para integrarse dentro de ProfileScreen (sección "Voz del
- * asistente") o cualquier futura pantalla de Ajustes. Mobile-first:
- * botones grandes (min-h 48px), sin scroll horizontal, dropdown nativo
- * que respeta el selector OS en mobile.
+ * Rediseño:
+ *   - Una tarjeta GRANDE por voz. UN TOQUE hace dos cosas a la vez: pone esa
+ *     voz como la de Chagra (persiste de una, sin botón Guardar) y la
+ *     REPRODUCE para que el usuario la oiga. La última que toca queda puesta.
+ *   - La voz puesta se marca con un check y "Puesta". Cero jerga.
+ *   - Velocidad opcional en 3 botones grandes (Despacio / Normal / Rápido),
+ *     no un slider fino.
  *
- * Contrato UX:
- *   - Dropdown con voces curadas (`KOKORO_VOICES` desde ttsService).
- *   - Botón "Probar" por voz → llama speakKokoro con frase fija.
- *   - Botón "Guardar" persiste voice + rate y flash de confirmación.
- *   - El estado del dropdown es local hasta apretar "Guardar".
- *   - Si Kokoro no está disponible, "Probar" cae al fallback speak()
- *     transparente (lo maneja speakKokoro internamente).
+ * Las voces vienen de KOKORO_VOICES (curadas por el oído del operador). La
+ * reproducción usa speakKokoro, que ahora prefiere kokoro SIEMPRE y nunca
+ * salta a la voz robótica del navegador (ver ttsService: consistencia de voz).
  */
-import React, { useState, useRef } from 'react';
-import { Volume2, Play, Save, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { Volume2, Play, Check } from 'lucide-react';
 import {
   speakKokoro,
   stop as stopTTS,
@@ -28,48 +28,56 @@ import {
   getPreferredRate,
   setPreferredRate,
   KOKORO_VOICES,
-  DEFAULT_KOKORO_VOICE,
-  KOKORO_RATE_MIN,
-  KOKORO_RATE_MAX,
 } from '../../services/ttsService';
 
 const SAMPLE_TEXT =
-  'Hola, soy el asistente Chagra. Probemos cómo suena mi voz en su finca.';
+  'Buenas, soy Chagra. Cuénteme qué le pasa a su matica y le ayudo.';
+
+// Velocidad en 3 pasos claros (mapean al rango soportado por ttsService).
+const SPEEDS = [
+  { id: 'slow', label: 'Despacio', rate: 0.85 },
+  { id: 'normal', label: 'Normal', rate: 1.0 },
+  { id: 'fast', label: 'Rápido', rate: 1.1 },
+];
+
+function speedIdFromRate(rate) {
+  // El más cercano gana (defensivo ante valores viejos como 0.9).
+  let best = SPEEDS[1];
+  let bestDelta = Infinity;
+  for (const s of SPEEDS) {
+    const d = Math.abs(s.rate - rate);
+    if (d < bestDelta) { bestDelta = d; best = s; }
+  }
+  return best.id;
+}
 
 export default function VoiceSelector() {
   const [selectedVoice, setSelectedVoice] = useState(() => getPreferredVoice());
-  const [rate, setRate] = useState(() => getPreferredRate());
-  const [savedFlash, setSavedFlash] = useState(false);
-  const [previewingVoice, setPreviewingVoice] = useState(null);
-  const flashTimerRef = useRef(null);
+  const [speedId, setSpeedId] = useState(() => speedIdFromRate(getPreferredRate()));
+  const [playingVoice, setPlayingVoice] = useState(null);
 
-  const handlePreview = async (voiceId) => {
-    // Cortar cualquier audio previo (preview, agente, lo que sea) antes
-    // de mandar el nuevo sample. Sin esto el operador escucha samples
-    // encimados si presiona "Probar" varias veces seguidas.
+  const currentRate = SPEEDS.find((s) => s.id === speedId)?.rate ?? 1.0;
+
+  // UN toque: elige la voz (persiste de una) + la reproduce para oírla.
+  const handleChooseAndPlay = async (voiceId) => {
     stopTTS();
-    setPreviewingVoice(voiceId);
+    setSelectedVoice(voiceId);
+    setPreferredVoice(voiceId); // persiste inmediato — sin botón "Guardar"
+    setPlayingVoice(voiceId);
     try {
-      await speakKokoro(SAMPLE_TEXT, { voice: voiceId, rate });
+      await speakKokoro(SAMPLE_TEXT, { voice: voiceId, rate: currentRate });
     } catch (_) {
-      // speakKokoro ya cae a Web Speech internamente. Si falla hasta acá
-      // es algo más raro; no romper la UI por un preview.
+      // speakKokoro nunca lanza hasta aquí (maneja su propio fallback); si
+      // pasara, no rompemos la UI.
     } finally {
-      setPreviewingVoice(null);
+      setPlayingVoice(null);
     }
   };
 
-  const handleSave = () => {
-    setPreferredVoice(selectedVoice);
-    setPreferredRate(rate);
-    setSavedFlash(true);
-    if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
-    flashTimerRef.current = setTimeout(() => setSavedFlash(false), 1500);
+  const handleSpeed = (speed) => {
+    setSpeedId(speed.id);
+    setPreferredRate(speed.rate);
   };
-
-  const selectedVoiceMeta =
-    KOKORO_VOICES.find((v) => v.id === selectedVoice) ||
-    KOKORO_VOICES.find((v) => v.id === DEFAULT_KOKORO_VOICE);
 
   return (
     <div
@@ -79,142 +87,102 @@ export default function VoiceSelector() {
       <div className="flex items-center gap-2 px-1">
         <Volume2 size={18} className="text-violet-400" />
         <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
-          Voz del asistente
+          La voz de Chagra
         </h3>
       </div>
 
-      <p className="text-[11px] text-slate-500 leading-relaxed px-1">
-        Elija la voz con la que Chagra IA leerá sus respuestas. Pruebe cada
-        opción y guarde la que mejor le suene en su finca. Se usa Kokoro
-        TTS local; el catálogo upstream tiene varias voces probadas para
-        acento más neutro hispano.
+      <p className="text-xs text-slate-400 leading-relaxed px-1">
+        Toque una voz para escucharla. La que toque queda puesta.
       </p>
 
-      <label className="flex flex-col gap-2">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">
-          Voz
-        </span>
-        <select
-          value={selectedVoice}
-          onChange={(e) => setSelectedVoice(e.target.value)}
-          className="p-3 rounded-xl bg-slate-800 border border-slate-700 focus:border-violet-500 outline-none text-white text-base min-h-[48px] appearance-none"
-          aria-label="Seleccionar voz del asistente"
-          data-testid="voice-dropdown"
-        >
-          {KOKORO_VOICES.map((voice) => (
-            <option key={voice.id} value={voice.id}>
-              {voice.label}
-            </option>
-          ))}
-        </select>
-        {selectedVoiceMeta && (
-          <span className="text-[10px] text-slate-500 leading-snug px-1">
-            {selectedVoiceMeta.description}
-          </span>
-        )}
-      </label>
-
-      {/* Botón Probar para la voz seleccionada en el dropdown */}
-      <button
-        type="button"
-        onClick={() => handlePreview(selectedVoice)}
-        disabled={previewingVoice !== null}
-        className="w-full p-3 rounded-xl font-bold flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-violet-400 transition-colors min-h-[48px] disabled:opacity-50"
-        data-testid="voice-preview-button"
-      >
-        <Play size={18} />
-        {previewingVoice === selectedVoice
-          ? 'Reproduciendo...'
-          : 'Probar esta voz'}
-      </button>
-
-      {/* Lista de previews rápidos por voz — útil para comparar A/B */}
-      <div className="space-y-2">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-wide px-1">
-          Comparar voces
-        </span>
-        <div className="grid grid-cols-1 gap-2">
-          {KOKORO_VOICES.map((voice) => (
+      {/* Tarjetas grandes de voz — un toque elige y reproduce. */}
+      <div className="flex flex-col gap-3">
+        {KOKORO_VOICES.map((voice) => {
+          const isSelected = voice.id === selectedVoice;
+          const isPlaying = playingVoice === voice.id;
+          return (
             <button
               key={voice.id}
               type="button"
-              onClick={() => handlePreview(voice.id)}
-              disabled={previewingVoice !== null}
-              className={`p-3 rounded-xl flex items-center justify-between gap-2 transition-colors min-h-[48px] disabled:opacity-50 ${
-                voice.id === selectedVoice
-                  ? 'bg-violet-900/30 border border-violet-700/50'
-                  : 'bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800'
+              onClick={() => handleChooseAndPlay(voice.id)}
+              disabled={playingVoice !== null && !isPlaying}
+              data-testid={`voice-option-${voice.id}`}
+              aria-pressed={isSelected}
+              aria-label={`Voz ${voice.label}. ${isSelected ? 'Puesta. ' : ''}Tocar para escuchar y poner.`}
+              className={`w-full text-left rounded-2xl p-4 border transition-all flex items-center gap-4 min-h-[72px] active:scale-[0.99] motion-reduce:active:scale-100 disabled:opacity-50 ${
+                isSelected
+                  ? 'bg-violet-900/30 border-violet-600/60'
+                  : 'bg-slate-800/50 border-slate-700/60 hover:bg-slate-800'
               }`}
-              data-testid={`voice-row-${voice.id}`}
             >
-              <span className="flex flex-col items-start text-left flex-1 min-w-0">
-                <span className="text-sm font-bold text-slate-200 truncate w-full">
+              {/* Círculo de reproducir — señal grande y clara de "tocar = oír". */}
+              <span
+                className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border ${
+                  isSelected
+                    ? 'bg-violet-600/40 border-violet-500/60'
+                    : 'bg-slate-900/60 border-slate-700'
+                }`}
+                aria-hidden="true"
+              >
+                <Play
+                  size={22}
+                  className={isPlaying ? 'text-violet-300 animate-pulse' : 'text-violet-300'}
+                />
+              </span>
+
+              <span className="flex flex-col flex-1 min-w-0">
+                <span className="text-base font-bold text-white leading-tight">
                   {voice.label}
                 </span>
-                <span className="text-[10px] text-slate-500 truncate w-full">
-                  {voice.gender}
+                <span className="text-xs text-slate-400 leading-snug mt-0.5">
+                  {isPlaying ? 'Escuchando…' : voice.description}
                 </span>
               </span>
-              <Play
-                size={16}
-                className={
-                  previewingVoice === voice.id
-                    ? 'text-violet-400 animate-pulse'
-                    : 'text-slate-400'
-                }
-              />
+
+              {isSelected && (
+                <span
+                  className="flex items-center gap-1 text-[11px] font-bold text-violet-300 shrink-0"
+                  data-testid={`voice-puesta-${voice.id}`}
+                >
+                  <Check size={16} aria-hidden="true" /> Puesta
+                </span>
+              )}
             </button>
-          ))}
+          );
+        })}
+      </div>
+
+      {/* Velocidad — opcional, 3 botones grandes en vez de un slider fino. */}
+      <div className="space-y-2 pt-1">
+        <span className="text-xs font-bold text-slate-400 uppercase tracking-wide px-1">
+          Qué tan rápido habla
+        </span>
+        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Velocidad de la voz">
+          {SPEEDS.map((speed) => {
+            const active = speed.id === speedId;
+            return (
+              <button
+                key={speed.id}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => handleSpeed(speed)}
+                data-testid={`voice-speed-${speed.id}`}
+                className={`p-3 rounded-xl text-sm font-bold transition-colors min-h-[48px] border ${
+                  active
+                    ? 'bg-violet-900/30 border-violet-600/60 text-violet-200'
+                    : 'bg-slate-800/50 border-slate-700/60 text-slate-300 hover:bg-slate-800'
+                }`}
+              >
+                {speed.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Slider de velocidad */}
-      <label className="flex flex-col gap-2">
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">
-          Velocidad ({rate.toFixed(2)}x)
-        </span>
-        <input
-          type="range"
-          min={KOKORO_RATE_MIN}
-          max={KOKORO_RATE_MAX}
-          step="0.05"
-          value={rate}
-          onChange={(e) => setRate(Number.parseFloat(e.target.value))}
-          className="w-full accent-violet-500 min-h-[24px]"
-          aria-label="Velocidad de reproducción de la voz"
-          data-testid="voice-rate-slider"
-        />
-        <div className="flex justify-between text-[10px] text-slate-500 px-1">
-          <span>Más lenta ({KOKORO_RATE_MIN}x)</span>
-          <span>Más rápida ({KOKORO_RATE_MAX}x)</span>
-        </div>
-      </label>
-
-      <button
-        type="button"
-        onClick={handleSave}
-        className={`w-full p-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all min-h-[48px] ${
-          savedFlash
-            ? 'bg-violet-600 text-white'
-            : 'bg-slate-800 hover:bg-slate-700 text-violet-400'
-        }`}
-        data-testid="voice-save-button"
-      >
-        {savedFlash ? (
-          <>
-            <Check size={18} /> Guardado
-          </>
-        ) : (
-          <>
-            <Save size={18} /> Guardar preferencias
-          </>
-        )}
-      </button>
-
-      <p className="text-[10px] text-slate-500 text-center leading-relaxed">
-        Las preferencias se guardan localmente en su dispositivo. La voz
-        por defecto es <strong className="text-slate-400">Dora</strong>
-        {' '}para no romper a operadores ya acostumbrados.
+      <p className="text-[11px] text-slate-500 text-center leading-relaxed">
+        Lo que elija se guarda solo, en su teléfono.
       </p>
     </div>
   );

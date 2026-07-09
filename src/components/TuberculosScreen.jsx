@@ -6,9 +6,9 @@ import { useState } from 'react';
 import {
   ChevronLeft, Sprout, Sun, Droplets, Mountain, Bug, ShieldCheck,
   Leaf, Ban, Scissors, Package, Info, FlaskConical, ArrowRight, Users,
-  Shovel, Camera,
+  Shovel, Camera, Utensils, ExternalLink,
 } from 'lucide-react';
-import { TUBERCULOS, getTuberculo, tieneDato, DATO_EN_CAMINO } from '../services/tuberculosData';
+import { TUBERCULOS, getTuberculo, tieneDato, DATO_EN_CAMINO, FUENTES_INSTITUCIONALES } from '../services/tuberculosData';
 
 /**
  * TuberculosScreen — mini-app "Tubérculos y raíces" (mundo Cultivos y semillas).
@@ -320,6 +320,13 @@ function Ficha({ t, onNavigate }) {
         <p className="text-sm text-slate-200 leading-relaxed">{t.cosecha}</p>
       </Bloque>
 
+      {/* Usos en la cocina y la casa */}
+      {t.usos && (
+        <Bloque icon={Utensils} accent={c} titulo="Usos">
+          <p className="text-sm text-slate-200 leading-relaxed">{t.usos}</p>
+        </Bloque>
+      )}
+
       {/* Conservación / curado */}
       <Bloque icon={Package} accent={c} titulo="Conservación y curado">
         <p className="text-sm text-slate-200 leading-relaxed">{t.conservacion}</p>
@@ -333,10 +340,30 @@ function Ficha({ t, onNavigate }) {
         </button>
       </Bloque>
 
-      <p className="text-[11px] text-slate-500 leading-relaxed">
-        Ficha de cultivo: {t.fuentes.cultivo} · Las relaciones (vecinas y plagas) salen del grafo Chagra;
-        los datos que aún no están se muestran como "dato en camino".
-      </p>
+      <div className="rounded-2xl border border-slate-800 bg-slate-950/40 px-4 pt-3 pb-4">
+        <p className="text-[11px] uppercase tracking-wide font-bold text-slate-400 flex items-center gap-1.5">
+          <Info size={13} aria-hidden="true" /> Fuentes
+        </p>
+        <p className="mt-1.5 text-[11px] text-slate-500 leading-relaxed">
+          Ficha de cultivo: {t.fuentes.cultivo} · Las relaciones (vecinas y plagas) salen del grafo Chagra;
+          los datos que aún no están se muestran como "dato en camino".
+        </p>
+        <p className="mt-2 text-[11px] text-slate-500">Manejo integrado de plagas (MIP) y sanidad — instituciones de referencia:</p>
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
+          {FUENTES_INSTITUCIONALES.map((f) => (
+            <a
+              key={f.sigla}
+              href={f.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={f.nombre}
+              className="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/60 px-2 py-0.5 text-[12px] text-sky-300 underline decoration-slate-600 underline-offset-2 hover:bg-slate-900"
+            >
+              <ExternalLink size={11} className="shrink-0" aria-hidden="true" /> {f.sigla}
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

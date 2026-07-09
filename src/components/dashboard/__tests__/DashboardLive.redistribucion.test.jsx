@@ -145,9 +145,22 @@ describe('Home F2 — reestructuración 2.0 "Los mundos de mi finca" (V4)', () =
     expect(ancla).toBe(block);
   });
 
-  test('LOS MUNDOS: la grilla monta los 9 mundos con su copy', async () => {
+  test('LOS MUNDOS arrancan PLEGADOS tras "Toda mi finca" (usabilidad #5) y un toque los abre completos', async () => {
     render(<DashboardLive onNavigate={vi.fn()} />);
     const block = await screen.findByTestId('bloque-mundos');
+    // Plegados por defecto: el primer pantallazo son las 6 puertas del hero,
+    // no ~13 tarjetas + ~35 chips. La grilla NO está montada aún.
+    expect(within(block).queryByTestId('mundos-finca')).toBeNull();
+    const abrir = within(block).getByTestId('abrir-mundos');
+    expect(abrir).toBeInTheDocument();
+    fireEvent.click(abrir); // un solo toque: reachability intacta
+    expect(within(block).getByTestId('mundos-finca')).toBeInTheDocument();
+  });
+
+  test('LOS MUNDOS: la grilla (abierta) monta los 9 mundos con su copy', async () => {
+    render(<DashboardLive onNavigate={vi.fn()} />);
+    const block = await screen.findByTestId('bloque-mundos');
+    fireEvent.click(within(block).getByTestId('abrir-mundos'));
     expect(within(block).getByTestId('mundos-finca')).toBeInTheDocument();
     for (const id of ['cultivos', 'suelo', 'agua', 'abono', 'sanidad', 'clima', 'animales', 'mercado', 'disenio']) {
       expect(within(block).getByTestId(`mundo-${id}`)).toBeInTheDocument();
@@ -160,7 +173,8 @@ describe('Home F2 — reestructuración 2.0 "Los mundos de mi finca" (V4)', () =
   test('mundos con pantalla propia navegan a la ruta mundo; los directos a su vista', async () => {
     const onNavigate = vi.fn();
     render(<DashboardLive onNavigate={onNavigate} />);
-    await screen.findByTestId('bloque-mundos');
+    const block = await screen.findByTestId('bloque-mundos');
+    fireEvent.click(within(block).getByTestId('abrir-mundos'));
 
     // Cultivos tiene PORTADA a medida (hub) → navega a su vista propia.
     fireEvent.click(screen.getByTestId('mundo-cultivos'));

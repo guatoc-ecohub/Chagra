@@ -163,23 +163,34 @@ describe('ttsService — XTTS-v2 voz colombiana (task #124)', () => {
 
   describe('speakXTTS fallback a Kokoro', () => {
     it('intenta fallback a speakKokoro cuando XTTS retorna HTTP error', async () => {
-      fetchMock.mockRejectedValueOnce(new Error('HTTP 500'));
+      // XTTS falla una vez; el fallback a Kokoro responde OK al primer intento
+      // (sin reintentos), así el total es exactamente 2 llamadas.
+      fetchMock
+        .mockRejectedValueOnce(new Error('HTTP 500'))
+        .mockResolvedValue({
+          ok: true,
+          blob: async () => new Blob(['fake-audio'], { type: 'audio/opus' }),
+        });
 
-      // speakXTTS debería intentar fallback a Kokoro
-      // Kokoro también llamará a fetch, así que esperamos 2 llamadas
       await speakXTTS('Test');
 
-      // Debería haber intentado fetch para XTTS y luego para Kokoro
+      // 1 fetch para XTTS (falla) + 1 para Kokoro (ok al primer intento).
       expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock.mock.calls[1][0]).toBe('/api/kokoro/tts');
     });
 
     it('intenta fallback a speakKokoro cuando response no es ok', async () => {
-      fetchMock.mockRejectedValueOnce(new Error('HTTP 404'));
+      fetchMock
+        .mockRejectedValueOnce(new Error('HTTP 404'))
+        .mockResolvedValue({
+          ok: true,
+          blob: async () => new Blob(['fake-audio'], { type: 'audio/opus' }),
+        });
 
       await speakXTTS('Test');
 
-      // Debería haber intentado fetch para XTTS y luego para Kokoro
       expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock.mock.calls[1][0]).toBe('/api/kokoro/tts');
     });
 
     // TODO: Test de timeout requiere mock complejo de AbortController + timers
