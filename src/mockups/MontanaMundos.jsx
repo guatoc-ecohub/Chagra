@@ -136,7 +136,9 @@ function Animalito({ x, y, s = 1, clase = 'mm-oveja' }) {
   );
 }
 
-export default function MontanaMundos({ onBack }) {
+// `onBack` con default: los tests montan el mockup sin prop (TS2741 del gate
+// tsc en checkJs infiere el prop como requerido si no tiene valor por defecto).
+export default function MontanaMundos({ onBack = null }) {
   const [dir, setDir] = useState('naturalista');
   const [modo, setModo] = useState('finca'); // 'finca' | 'montana'
   const [piso, setPiso] = useState(PISO_FINCA);
