@@ -4,6 +4,7 @@ import ChatBubble from './ChatBubble';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import DeepResearchCard from '../DeepResearchCard';
 import InsightProactivoCard from '../Aprende/InsightProactivoCard';
+import ThinkingSteps from './ThinkingSteps';
 import { MSG } from '../../config/messages';
 
 // Bug piloto 2026-06-04 (B): "para devolverme tengo que ir hasta el inicio de
@@ -28,12 +29,14 @@ const FLOATING_BACK_THRESHOLD_PX = 160;
  * @param {Function} props.onCancelDeepResearch - Callback para cancelar una investigación profunda en curso.
  * @param {Function} [props.onAyudaAction] - Callback del deep-link «Abrir …» de la ayuda groundeada (AYUDA_FUNCIONES).
  * @param {Object|null} [props.proactiveGreeting=null] - Datos del saludo proactivo dinámico.
- * @param {string|null} [props.thinkingLabel=null] - Fase visible del pipeline mientras
- *   se espera el primer token ("Entendiendo tu pregunta", "Consultando el catálogo…").
- *   Si es null cae al "Pensando" genérico — perceived performance, la espera avanza.
+ * @param {string|null} [props.thinkingPhase=null] - Fase REAL del pipeline mientras
+ *   se espera el primer token ('entendiendo' | 'consultando' | 'escribiendo' | ...).
+ *   ThinkingSteps la traduce a pasos contextuales con ícono ("Consultando el
+ *   catálogo…" → "Revisando el grafo…") y rota los de la fase larga. Si es
+ *   null cae al "Pensando" genérico — perceived performance, la espera avanza.
  * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
  */
-export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, thinkingLabel = null, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, onDismissInsight, onAyudaAction, proactiveGreeting = null, onBack }) {
+export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, thinkingPhase = null, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, onDismissInsight, onAyudaAction, proactiveGreeting = null, onBack }) {
   const bottomRef = useRef(null);
   const scrollRef = useRef(null);
   // (B) Botón "Volver" flotante: visible solo cuando el operador se alejó del
@@ -258,7 +261,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
             <span>Chagra</span>
           </div>
           <div className="v3-card text-sm italic text-slate-300" aria-live="polite">
-            {thinkingLabel || MSG.agente.pensandoTexto}
+            <ThinkingSteps phase={thinkingPhase} />
             <span className="inline-block ml-1 animate-thinkingDot">·</span>
             <span className="inline-block ml-0.5 animate-thinkingDot [animation-delay:200ms]">·</span>
             <span className="inline-block ml-0.5 animate-thinkingDot [animation-delay:400ms]">·</span>

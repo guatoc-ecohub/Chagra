@@ -3609,7 +3609,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         messages={messages}
         streamingContent={streamingContent}
         isStreaming={state === STATE_THINKING}
-        thinkingLabel={MSG.agente.fases[thinkingPhase] || null}
+        thinkingPhase={thinkingPhase}
         onConsentNeeded={handleFeedbackConsentNeeded}
         onRetryOrphan={handleRetryOrphan}
         onCancelDeepResearch={handleCancelDeepResearch}
