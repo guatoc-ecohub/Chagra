@@ -25,6 +25,24 @@ import {
   trackJsErrors,
 } from './f2TestUtils';
 
+/**
+ * goto tolerante al net::ERR_ABORTED de la PRIMERA visita: el service worker se
+ * registra y puede abortar la navegación en curso (más probable bajo carga o en
+ * el primer compile del dev server). Reintenta una vez. Mismo patrón que
+ * guardian-selector.spec.js — hace el spec robusto también en local.
+ */
+async function gotoReady(page, url = '/') {
+  for (let intento = 0; intento < 3; intento += 1) {
+    try {
+      await page.goto(url, { waitUntil: 'domcontentloaded' });
+      return;
+    } catch (err) {
+      if (intento === 2 || !/ERR_ABORTED|detached/.test(String(err))) throw err;
+      await page.waitForTimeout(800);
+    }
+  }
+}
+
 /** Siembra ciclos + cosecha REALES en IndexedDB (la puerta de producción). */
 async function sembrarFincaReal(page) {
   await page.evaluate(async () => {
@@ -82,14 +100,14 @@ test.describe('Panel de vitalidad del espíritu (home menú vivo)', () => {
     const errors = trackJsErrors(page);
     await seedSession(page);
     await mockBackendBasico(context);
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await gotoReady(page, '/');
 
     const flagOn = await flagF2Activa(page);
     test.skip(!flagOn, 'Build sin VITE_FINCA_VIVA_HOME_PERFIL — el hero F2 no se monta');
 
     await login(page);
     await sembrarFincaReal(page);
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await gotoReady(page, '/');
     await page.waitForLoadState('networkidle').catch(() => {});
 
     // El hero F2 y, DENTRO de él, el panel (no huérfano).
@@ -153,12 +171,12 @@ test.describe('Panel de vitalidad del espíritu (home menú vivo)', () => {
   test('finca vacía: el panel no fabrica números (todo "—" o no aparece)', async ({ page, context }) => {
     await seedSession(page, { user: 'e2e-pve-vacia' });
     await mockBackendBasico(context);
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await gotoReady(page, '/');
     const flagOn = await flagF2Activa(page);
     test.skip(!flagOn, 'Build sin VITE_FINCA_VIVA_HOME_PERFIL — el hero F2 no se monta');
 
     await login(page, { user: 'e2e-pve-vacia' });
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    await gotoReady(page, '/');
     await expect(page.getByTestId('finca-viva-hero')).toBeVisible({ timeout: 20000 });
 
     const panel = page.getByTestId('panel-vitalidad-espiritu');
