@@ -1,0 +1,303 @@
+/*
+ * arbol-de-mundos.css — animaciones y piel del MENÚ-ÁRBOL ORGÁNICO (adm-) y
+ * del RELOJ DEL FRAILEJÓN (adm-reloj-) del home biopunk.
+ *
+ * Todo CSS puro (cero JS por frame), prefijo `adm-` para no chocar con el
+ * resto del home. prefers-reduced-motion apaga TODAS las animaciones dejando
+ * un estado estático digno (misma receta que scene-finca-organismo.css).
+ */
+
+.adm {
+  position: relative;
+  margin: 0 0 1rem;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(13, 30, 68, 0.85), rgba(2, 4, 12, 0.95) 70%),
+    #04060f;
+  border: 1px solid rgba(45, 255, 196, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(2, 4, 12, 0.6),
+    0 12px 40px rgba(0, 0, 0, 0.45),
+    inset 0 0 60px rgba(45, 255, 196, 0.04);
+}
+
+.adm-head {
+  padding: 1rem 1.1rem 0.25rem;
+}
+
+.adm-tit {
+  margin: 0;
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #eafff6;
+  text-shadow: 0 0 18px rgba(45, 255, 196, 0.35);
+}
+
+.adm-sub {
+  margin: 0.3rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  color: #9fd4c4;
+}
+
+.adm-lienzo {
+  position: relative;
+  width: 100%;
+}
+
+.adm-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── vainas (las entradas a los mundos) ─────────────────────────────────── */
+
+.adm-nodo {
+  cursor: pointer;
+  outline: none;
+}
+
+.adm-vaina-halo {
+  opacity: 0.55;
+  animation: adm-halo 3.6s ease-in-out infinite;
+}
+
+.adm-vaina-nucleo {
+  animation: adm-nucleo 3.6s ease-in-out infinite;
+}
+
+.adm-espora {
+  animation: adm-espora 5s ease-in-out infinite;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 3px #eafff6);
+}
+
+/* foco/hover visibles: la membrana se enciende (accesibilidad teclado) */
+.adm-nodo:hover .adm-vaina-membrana,
+.adm-nodo:focus-visible .adm-vaina-membrana {
+  stroke: #eafff6;
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 8px var(--adm-acc, #2dffc4));
+}
+
+.adm-nodo:focus-visible .adm-vaina-halo {
+  opacity: 1;
+}
+
+.adm-nodo:active .adm-vaina-membrana {
+  filter: drop-shadow(0 0 12px var(--adm-acc, #2dffc4));
+}
+
+/* ── savia que fluye por tronco y ramas ─────────────────────────────────── */
+
+.adm-sap {
+  stroke-dasharray: 6 46;
+  animation: adm-sap 3.2s linear infinite;
+}
+
+.adm-sap-tronco {
+  stroke-dasharray: 10 70;
+  animation-duration: 4.2s;
+}
+
+/* ── corazón que late + ondas ───────────────────────────────────────────── */
+
+.adm-heart {
+  transform-origin: 195px 614px;
+  animation: adm-beat 2.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(45, 255, 196, 0.55));
+}
+
+.adm-heart-wave {
+  transform-origin: 195px 614px;
+  animation: adm-wave 2.4s ease-out infinite;
+  opacity: 0;
+}
+
+.adm-hw2 {
+  animation-delay: 0.6s;
+}
+
+/* ── noche viva: estrellas y cocuyos ────────────────────────────────────── */
+
+.adm-tw {
+  animation: adm-tw 3.4s ease-in-out infinite;
+}
+
+.adm-t2 { animation-delay: -1.2s; }
+.adm-t3 { animation-delay: -2.3s; }
+
+.adm-fly {
+  animation: adm-fly 9s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px currentcolor);
+}
+
+.adm-f2 { animation-delay: -3s; animation-duration: 11s; }
+.adm-f3 { animation-delay: -6s; animation-duration: 10s; }
+
+/* ── EL RELOJ DEL FRAILEJÓN (pie del árbol) ─────────────────────────────── */
+
+.adm-reloj {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: calc(100% - 2rem);
+  margin: 0 1rem 1rem;
+  padding: 0.7rem 0.9rem;
+  min-height: 96px;
+  border-radius: 1rem;
+  border: 1px solid rgba(157, 255, 63, 0.28);
+  background: rgba(7, 16, 48, 0.55);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.adm-reloj:hover,
+.adm-reloj:focus-visible {
+  border-color: rgba(45, 255, 196, 0.7);
+  box-shadow: 0 0 18px rgba(45, 255, 196, 0.18);
+  outline: none;
+}
+
+.adm-reloj-svg {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 96px;
+}
+
+.adm-reloj-anillo {
+  transform-origin: 60px 60px;
+  animation: adm-anillo 0.9s ease-out backwards;
+}
+
+.adm-reloj-anillo-actual {
+  filter: drop-shadow(0 0 4px rgba(45, 255, 196, 0.8));
+}
+
+.adm-reloj-marca {
+  animation: adm-aparece 0.9s ease-out backwards;
+}
+
+.adm-reloj-corazon {
+  transform-origin: 60px 60px;
+  animation: adm-beat-suave 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 181, 79, 0.7));
+}
+
+.adm-reloj-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.adm-reloj-cab {
+  font-family: ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: #9dff3f;
+  opacity: 0.85;
+}
+
+.adm-reloj-anios {
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #eafff6;
+  line-height: 1.2;
+}
+
+.adm-reloj-nota {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: #9fd4c4;
+}
+
+.adm-reloj-ir {
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #2dffc4;
+}
+
+/* ── keyframes ──────────────────────────────────────────────────────────── */
+
+@keyframes adm-sap {
+  to { stroke-dashoffset: -52; }
+}
+
+@keyframes adm-halo {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.85; }
+}
+
+@keyframes adm-nucleo {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+@keyframes adm-espora {
+  0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+  50% { transform: translate(4px, -5px); opacity: 1; }
+}
+
+@keyframes adm-beat {
+  0%, 100% { transform: scale(1); }
+  12% { transform: scale(1.12); }
+  24% { transform: scale(1); }
+  36% { transform: scale(1.08); }
+  48% { transform: scale(1); }
+}
+
+@keyframes adm-beat-suave {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.14); }
+}
+
+@keyframes adm-wave {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+@keyframes adm-tw {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+@keyframes adm-fly {
+  0%, 100% { transform: translate(0, 0); opacity: 0.4; }
+  25% { transform: translate(16px, -14px); opacity: 1; }
+  55% { transform: translate(-10px, -26px); opacity: 0.6; }
+  80% { transform: translate(8px, -8px); opacity: 0.95; }
+}
+
+@keyframes adm-anillo {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes adm-aparece {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── reduced motion: quietud digna, nada desaparece ─────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .adm *,
+  .adm-reloj * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .adm-heart-wave { opacity: 0.35; }
+  .adm-sap { stroke-dasharray: none; opacity: 0.5; }
+  .adm-reloj-anillo,
+  .adm-reloj-marca { opacity: 1; }
+}
