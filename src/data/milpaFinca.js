@@ -263,6 +263,37 @@ export const PLAGAS = [
   },
 ];
 
+/* ── Umbral y ventana de manejo del gusano cogollero ─────────────────────
+ * GROUNDING de FUENTE OFICIAL, extraído por lectura directa (visión) de la
+ * cartilla técnica; ver Chagra-strategy/ops/GROUNDING-PDFS-2026-07-09.md.
+ * Complementa PLAGAS (que trae la señal y los controladores) con las CIFRAS
+ * DURAS de MONITOREO y DECISIÓN de manejo integrado del cogollero, cada una con
+ * su página [FUENTE ... pág. X]. Son cifras de decisión agroecológica/MIP
+ * (cuándo intervenir y con qué agente BIOLÓGICO o microbiológico); NO son dosis
+ * de agroquímico de síntesis, coherente con la regla de honestidad del módulo.
+ *
+ * Fuente: AGROSAVIA (Corpoica), "Manejo integrado del gusano cogollero del
+ * maíz, Spodoptera frugiperda", en: I Curso-Taller Internacional de Control
+ * Biológico (Corpoica-MIP), págs. 157-160. */
+export const UMBRAL_MANEJO_COGOLLERO = {
+  titulo: 'Cuándo intervenir el cogollero',
+  cientifico: 'Spodoptera frugiperda (J.E. Smith)',
+  monitoreo:
+    'Revise el lote una o dos veces por semana. Para el conteo se examinan sitios de 50 a 100 plantas continuas y en cada sitio se cuentan las plantas con "daño fresco" de cogollero (el cogollo raspado y con aserrín recientes). El número de sitios a revisar se ajusta al tamaño del lote, inspeccionando entre el 1 % y el 2 % de la población de plantas. [FUENTE AGROSAVIA/Corpoica, pág. 157]',
+  umbral:
+    'El umbral de acción es del 40 %: cuando el porcentaje de plantas con "daño fresco" supera el 40 %, se acude al manejo microbiológico de las larvas (hongo Nomuraea rileyi o Bacillus thuringiensis). Por debajo de ese nivel, el control biológico natural suele bastar. [FUENTE AGROSAVIA/Corpoica, págs. 157 y 159]',
+  ventanaTemprana:
+    'Aproveche el clima como aliado: las lluvias continuas en las primeras tres semanas después de la siembra ahogan muchas larvas pequeñas dentro del cogollo (control físico natural), y regar por aspersión en horas de la noche estorba la oviposición del adulto. Por eso conviene sembrar al empezar el tiempo de lluvias. [FUENTE AGROSAVIA/Corpoica, pág. 158]',
+  controlBiologicoNatural:
+    'De forma natural, parasitoides, depredadores y entomopatógenos reducen más del 50 % de la población de larvas y pupas. Un depredador clave es la avispa Polistes erythrocephalus: se recomienda trasladar sus nidos a chozas cerca del maíz para concentrar su acción sobre el cogollero. [FUENTE AGROSAVIA/Corpoica, pág. 157]',
+  liberacionParasitoides:
+    'Refuerzo con liberaciones de parasitoides de huevos desde la emergencia de las plantas y por dos o tres semanas: Telenomus remus, Trichogramma atopovirilia y Trichogramma exiguum, fraccionando la dosis en cuatro o cinco liberaciones sincronizadas con la oviposición de la plaga. [FUENTE AGROSAVIA/Corpoica, pág. 158]',
+  aplicacionMicrobiologica:
+    'Si toca el manejo microbiológico, asperje cuando la planta esté por debajo del estado de "maíz rodillero", dirigiendo la solución al cogollo con alto volumen de agua (200-400 L/ha) para que escurra hasta donde está la larva; Bt o Nomuraea rileyi a razón de 1,0 kg/ha. Las larvas muertas se ponen oscuras y flácidas; la evaluación final se hace cinco o seis días después. [FUENTE AGROSAVIA/Corpoica, pág. 159]',
+  fuente:
+    'AGROSAVIA (Corpoica) — "Manejo integrado del gusano cogollero del maíz, Spodoptera frugiperda" (Corpoica-MIP), págs. 157-160. Detalle y páginas en GROUNDING-PDFS-2026-07-09.md.',
+};
+
 /* Biopreparados destacados de la milpa (todos existen en el grafo). El módulo
  * de biopreparados de Chagra trae la receta y la seguridad de cada uno. */
 export const BIOPREPARADOS_MILPA = [
