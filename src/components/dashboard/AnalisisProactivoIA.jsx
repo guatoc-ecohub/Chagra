@@ -286,11 +286,11 @@ export default function AnalisisProactivoIA({ sensors = [], climaSnapshot = null
                             className="absolute -top-1 -right-1 text-emerald-300 animate-pulse"
                         />
                     </div>
+                    {/* Sin jerga de ingeniero (usabilidad campesina #1): antes
+                        "Análisis Chagra · IA local". El recado es la figura del
+                        campo: lo que Chagra le deja dicho hoy. */}
                     <span className="text-[10px] font-bold text-cyan-200 uppercase tracking-[0.18em]">
-                        Análisis Chagra
-                    </span>
-                    <span className="px-1.5 py-0.5 rounded text-[8px] font-black bg-emerald-500/15 text-emerald-200 uppercase tracking-wider">
-                        IA local
+                        El recado de Chagra
                     </span>
                     <span className="ml-auto text-[9px] text-slate-500" aria-hidden>
                         {hora.icono}
@@ -369,11 +369,11 @@ export default function AnalisisProactivoIA({ sensors = [], climaSnapshot = null
                     type="button"
                     onClick={handleAgent}
                     className="mt-3 w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/15 border border-cyan-600/30 transition-colors text-left group"
-                    aria-label="Hablar con el agente Chagra sobre este análisis"
+                    aria-label="Pregúntele a Chagra sobre este recado"
                 >
                     <span className="flex items-center gap-1.5 text-[11px] text-cyan-100">
                         <TrendingUp size={12} className="text-cyan-300" />
-                        Habla con el agente sobre esto
+                        Pregúntele a Chagra sobre esto
                     </span>
                     <ArrowRight
                         size={13}

@@ -4,7 +4,7 @@
  * la TAREA i18n de ADR-050 (transversal a toda la app), fuera del alcance de esta
  * feature visual — mismo criterio que MiFincaVivaHomeCard.jsx, FincaCards.jsx y
  * FincaRedInstitucional.jsx en este mismo directorio. */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import useAssetStore from '../../store/useAssetStore';
 import { buildFincaScene } from '../../services/fincaSceneService';
@@ -108,10 +108,13 @@ const COLIBRI_REAL = colibriRealActivo();
  *   la MISMA página, bajo el hero, así que el portal "Gestionar" la REVELA con un
  *   scroll a su ancla — NO navega a otra vista (mucho menos al juego). Si no se
  *   pasa, cae a un scroll directo al ancla #finca-gestion (mismo destino).
+ * @param {Function} [props.onTodaMiFinca]  revela LOS MUNDOS completos (la
+ *   puerta "Toda mi finca"): DashboardLive expande el bloque plegado y hace
+ *   scroll. Sin callback, cae a un scroll directo al ancla #bloque-mundos.
  * @param {React.ReactNode} [props.children]  escena alterna (red institucional).
  * @param {string} [props.titulo]  título accesible (default "Mi finca viva").
  */
-export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, children, titulo }) {
+export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, onTodaMiFinca, children, titulo }) {
   // Piel del tema activo: el ícono de marca del agente (la A roja en biopunk, la
   // sol-mano en verde-vivo, etc.) sigue al tema, igual que la escena toma su piel
   // del tema vía los tokens --c-*/--fvh-* del CSS. Con la flag OFF este hero no se
@@ -135,6 +138,19 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
       if (seccion?.scrollIntoView) seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
+  // La puerta "Toda mi finca" abre LOS MUNDOS completos, que viven en la hoja
+  // bajo el hero (DashboardLive los revela con onTodaMiFinca: expandir +
+  // scroll). Sin callback, cae a un scroll directo al ancla del bloque.
+  const irATodaMiFinca = () => {
+    if (onTodaMiFinca) { onTodaMiFinca(); return; }
+    if (typeof document !== 'undefined') {
+      const seccion = document.getElementById('bloque-mundos');
+      if (seccion?.scrollIntoView) seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  // El bloque "Registrar en la finca" sigue alcanzable por scroll en la misma
+  // página (irAGestion queda como puente del ancla para quien lo necesite).
+  void irAGestion;
 
   // ── Datos reales de la finca (offline-first) ─────────────────────────────
   const [processes, setProcesses] = useState([]);
@@ -289,24 +305,67 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
   // usan). Tras el split vive en biopunk2 (donde quedó la Finca Organismo).
   const organismoActivo = escenaVivaActiva && temaEfectivo === 'biopunk2';
 
-  // ── ENTRADA AL MUNDO ANIMALES desde la escena ────────────────────────────
-  // El potrero (vaca + gallinas) de la Finca Organismo es un punto de entrada
-  // tappable al mundo de los animales — con el MISMO gate por perfil que usa
-  // el home para esconder ese mundo (DashboardLive.mostrarAnimales): un urbano
-  // de balcón/terraza no lo ve; control manual del home (#1560) y operador lo
-  // conservan. Mismo destino que MundosDeMiFinca: la portada del mundo.
+  // ── GATE DE ANIMALES (entrada al mundo + puerta "Mis animales") ───────────
+  // `mostrarAnimales` gobierna DOS entradas al mundo animales con el MISMO
+  // criterio que DashboardLive.mostrarAnimales (el usuario solo ve lo que
+  // necesita): (a) el potrero tappable (vaca + gallinas) de la Finca Organismo
+  // [#2229] y (b) la puerta "Mis animales" [#2230]. Un urbano de balcón/terraza
+  // no las ve; el control manual del home (#1560) y el operador las conservan.
   const [mostrarAnimales] = useState(() => {
     try {
       if (esOperadorActual()) return true;
       if (hasManualModuleVisibility()) return true;
       return !esPerfilUrbano(getProfile());
     } catch (_) {
-      return true; // Fail-open: no esconder la entrada por un error.
+      return true; // Fail-open: no esconder la entrada/puerta por un error.
     }
   });
   const onAnimales = mostrarAnimales
     ? () => onNavigate?.('mundo', { mundo: 'animales' })
     : null;
+
+  // ── MODO "PLENO SOL" (usabilidad campesina #7) ────────────────────────────
+  // Alto contraste claro para leer el teléfono a mediodía al aire libre: el
+  // biopunk nocturno va bien de noche, pero al rayo del sol un fondo oscuro
+  // no se ve. AUTOMÁTICO de día (deriveAtmosphere → luz 'dia') con override
+  // MANUAL persistido ('1' forzado ON, '0' forzado OFF, ausente = auto).
+  const [solPref, setSolPref] = useState(() => {
+    try { return localStorage.getItem(PLENO_SOL_KEY) || 'auto'; }
+    catch (_) { return 'auto'; }
+  });
+  const plenoSol = solPref === '1' || (solPref === 'auto' && tonoLuz(atmosfera) === 'dia');
+  const alternarSol = () => {
+    const next = plenoSol ? '0' : '1';
+    setSolPref(next);
+    try { localStorage.setItem(PLENO_SOL_KEY, next); } catch (_) { /* incógnito */ }
+  };
+
+  // ── "ESCUCHAR" 🔊 (usabilidad campesina #6, baja alfabetización) ──────────
+  // Lee la pantalla en voz alta con el TTS propio (kokoro + fallback Web
+  // Speech, ttsService). Import perezoso: el peso del TTS no entra al chunk
+  // del home salvo que se use. Mientras habla, el botón pasa a "Parar".
+  const [hablando, setHablando] = useState(false);
+  const ttsUnsubRef = useRef(null);
+  useEffect(() => () => { if (ttsUnsubRef.current) ttsUnsubRef.current(); }, []);
+  const textoEscuchar = () => {
+    const puertasTxt = 'sus matas, sus animales, el tiempo, vender, aprender, o toda su finca';
+    const estadoTxt = poblada
+      ? 'Todo tranquilo en su finca.'
+      : 'Su finca está empezando. Registre su primera siembra y la escena cobra vida.';
+    return `Buenas, soy Chagra. Esta es su finca viva. ${estadoTxt} `
+      + 'Toque el botón verde grande, hable, y yo le contesto. '
+      + `También puede entrar a: ${puertasTxt}.`;
+  };
+  const escuchar = async () => {
+    try {
+      const tts = await import('../../services/ttsService');
+      if (!ttsUnsubRef.current) {
+        ttsUnsubRef.current = tts.onSpeakingChange((v) => setHablando(!!v));
+      }
+      if (tts.isAudioPlaying()) { tts.stop(); return; }
+      await tts.speakSentences(textoEscuchar());
+    } catch (_) { /* sin audio disponible: el botón no rompe el home */ }
+  };
 
   return (
     <section
@@ -315,6 +374,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
       className="fvh"
       data-luz={atmosfera.luz || undefined}
       data-clima={atmosfera.condicion || undefined}
+      data-plenosol={plenoSol ? '1' : undefined}
     >
       <div className="fvh-shell">
         {/* ── TOPBAR (con jerarquía y aire — feedback #3) ───────────────────── */}
@@ -486,8 +546,14 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                          (#34): la estructura de cada escena porta el marcador
                          fvh-estructura solo si fue declarada. `onAnimales`
                          (gate por perfil) vuelve tappable el potrero de la
-                         Finca Organismo — las demás escenas lo ignoran hoy. */
-                      <EscenaViva estructura={estructuraFinca} onAnimales={onAnimales} />
+                         Finca Organismo → mundo animales [#2229]; `onPregunte`
+                         vuelve TAPPABLE el corazón-semilla → abre el agente
+                         [#2230]; las demás escenas los ignoran hoy. */
+                      <EscenaViva
+                        estructura={estructuraFinca}
+                        onAnimales={onAnimales}
+                        onPregunte={abrirAgente}
+                      />
                     ) : (
                       <SceneFinca
                         poblada={poblada}
@@ -548,25 +614,58 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
 
           {/* ── COLUMNA derecha en desktop / debajo en móvil ────────────────── */}
           <div className="fvh-aside">
-            {/* COMPOSITOR DEL AGENTE */}
+            {/* LA acción dominante: "PREGUNTE" (usabilidad campesina #2).
+                Antes "preguntar" aparecía en 4 formas sin que ninguna mandara
+                (la A del header, el globo del colibrí, este compositor y un
+                portal). Ahora ESTE botón manda: grande (≥96px), late como el
+                corazón de la escena y habla en cristiano. Las otras entradas
+                quedan de apoyo (la A del header, el corazón de la escena). */}
             <div className="fvh-composer-wrap">
               <button
                 type="button"
-                className="fvh-composer"
+                className="fvh-composer fvh-composer--pregunte"
                 onClick={abrirAgente}
                 data-testid="finca-viva-agent-fab"
-                aria-label="Pregúntele a Chagra"
+                aria-label="Pregúntele a Chagra: toque y hable, Chagra le contesta"
               >
-                <span className="av" aria-hidden="true"><ColibriAvatar /></span>
-                <span className="ph">Pregúntele a Chagra…</span>
-                <span className="mic" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
-                    <rect x="9" y="3" width="6" height="11" rx="3" fill="#1f3300" />
-                    <path d="M6 11a6 6 0 0 0 12 0M12 17v3" stroke="#1f3300" strokeWidth="2" strokeLinecap="round" />
+                <span className="fvh-corazon-btn" aria-hidden="true">
+                  <span className="fvh-corazon-pulso" />
+                  <span className="fvh-corazon-pulso fvh-corazon-pulso2" />
+                  <svg viewBox="0 0 24 24" width="30" height="30" fill="none" aria-hidden="true">
+                    <rect x="9" y="3" width="6" height="11" rx="3" fill="#12260a" />
+                    <path d="M6 11a6 6 0 0 0 12 0M12 17v3M8.5 20h7" stroke="#12260a" strokeWidth="2.2" strokeLinecap="round" />
                   </svg>
                 </span>
+                <span className="fvh-pregunte-txt">
+                  <b>Pregunte</b>
+                  <small>Toque y hable. Chagra le contesta.</small>
+                </span>
               </button>
-              <div className="fvh-composer-hint">Toque 🎙️ y pregunte en voz alta — o escriba arriba</div>
+              {/* Escuchar (🔊 lee la pantalla, baja alfabetización) + Pleno sol
+                  (alto contraste de mediodía). Pareja de pastillas bajo la
+                  acción dominante. */}
+              <div className="fvh-audio-sol">
+                <button
+                  type="button"
+                  className="fvh-escuchar"
+                  data-testid="fvh-escuchar"
+                  aria-pressed={hablando}
+                  aria-label={hablando ? 'Parar la lectura en voz alta' : 'Escuchar: Chagra le lee la pantalla en voz alta'}
+                  onClick={escuchar}
+                >
+                  {hablando ? '⏹ Parar' : '🔊 Escuchar'}
+                </button>
+                <button
+                  type="button"
+                  className="fvh-sol-toggle"
+                  data-testid="fvh-pleno-sol"
+                  aria-pressed={plenoSol}
+                  aria-label={plenoSol ? 'Volver a la vista de noche' : 'Pleno sol: vista clara para leer a mediodía'}
+                  onClick={alternarSol}
+                >
+                  {plenoSol ? '🌙 Noche' : '☀️ Pleno sol'}
+                </button>
+              </div>
 
               {/* NIVEL DE RESPUESTA — junto al agente, porque define CÓMO le
                   responde Chagra. Renombrado del antiguo "Campesino/Experto"
@@ -600,33 +699,36 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
               </div>
             </div>
 
-            {/* HERO TEXT */}
+            {/* HERO TEXT — sin jerga de ingeniero (antes "SU AGENTE
+                AGROECOLÓGICO"): palabras del campo. */}
             <div className="fvh-hero-saludo">
-              <div className="h-small">SU AGENTE AGROECOLÓGICO</div>
+              <div className="h-small">CHAGRA, SU COMPAÑERO DE CAMPO</div>
               <h1 dangerouslySetInnerHTML={{ __html: HERO[escala][0] }} />
               <p>{HERO[escala][1]}</p>
             </div>
           </div>
         </main>
 
-        {/* ── 4 PORTALES = LUGARES DE LA FINCA ───────────────────────────────── */}
-        <div className="fvh-portales-tit">Lugares de su finca <span /></div>
-        <nav className="fvh-portales" aria-label="Lugares de su finca" data-testid="finca-viva-portales">
-          {buildPortales({ onNavigate, abrirAgente, irAGestion, scene, poblada, escala }).map((p) => (
+        {/* ── LAS 6 PUERTAS (usabilidad campesina #5) ─────────────────────────
+            Antes: 4 portales con descripción + ~20 tarjetas + ~35 chips abajo.
+            Ahora: SEIS puertas de una-dos palabras, dibujo grande + palabra
+            grande, targets ≥96px (#8). Cada una enruta a un mundo/vista que YA
+            existe (nada nuevo que mantener). "Toda mi finca" abre los mundos
+            completos en la hoja de abajo. */}
+        <div className="fvh-portales-tit">¿A dónde va? <span /></div>
+        <nav className="fvh-puertas" aria-label="Puertas de su finca" data-testid="finca-viva-puertas">
+          {buildPuertas({ onNavigate, irATodaMiFinca, mostrarAnimales }).map((p, i) => (
             <button
               key={p.id}
               type="button"
-              className={`fvh-portal ${p.clase}`}
+              className={`fvh-puerta t-${p.tinte}`}
+              data-testid={`puerta-${p.id}`}
               onClick={p.onClick}
-              style={{ animationDelay: p.delay }}
-              aria-label={`${p.titulo}: ${p.desc}`}
+              style={{ animationDelay: `${0.08 + i * 0.06}s` }}
+              aria-label={`${p.nombre}: abre ${p.abre}`}
             >
-              <span className="ir" aria-hidden="true">Entrar →</span>
-              {p.placeSvg}
-              <span className="fvh-p-scrim" aria-hidden="true" />
-              <span className="fvh-p-nuevo">{p.badge}</span>
-              <div className="p-head"><div className="p-emoji" aria-hidden="true">{p.emoji}</div><h3>{p.titulo}</h3></div>
-              <p>{p.desc}</p>
+              <span className="fvh-puerta-emoji" aria-hidden="true">{p.emoji}</span>
+              <span className="fvh-puerta-nombre">{p.nombre}</span>
             </button>
           ))}
         </nav>
@@ -1062,35 +1164,6 @@ function ColibriVuela() {
   );
 }
 
-/** Mismo colibrí en versión avatar redondo para el compositor del agente. */
-function ColibriAvatar() {
-  return (
-    <svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true">
-      <defs>
-        <linearGradient id="fvh-colibri-av-plum" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#34d399" />
-          <stop offset="45%" stopColor="#10b981" />
-          <stop offset="75%" stopColor="#22d3ee" />
-          <stop offset="100%" stopColor="#a78bfa" />
-        </linearGradient>
-        <radialGradient id="fvh-colibri-av-gor" cx="50%" cy="50%" r="50%">
-          <stop offset="0" stopColor="#fde68a" />
-          <stop offset="50%" stopColor="#f59e0b" />
-          <stop offset="100%" stopColor="#dc2626" />
-        </radialGradient>
-      </defs>
-      <path d="M8 26 L2 22 L6 28 L1 32 L7 31 L5 37 L12 30 Z" fill="url(#fvh-colibri-av-plum)" opacity="0.9" />
-      <path d="M20 22 Q10 15 4 22 Q11 29 21 25 Z" fill="url(#fvh-colibri-av-plum)" opacity="0.6" />
-      <ellipse cx="22" cy="25" rx="11" ry="6.6" fill="url(#fvh-colibri-av-plum)" transform="rotate(-16 22 25)" />
-      <circle cx="33" cy="20" r="5.6" fill="url(#fvh-colibri-av-plum)" />
-      <ellipse cx="34" cy="24" rx="3" ry="2" fill="url(#fvh-colibri-av-gor)" opacity="0.95" />
-      <circle cx="34.4" cy="18.6" r="1.3" fill="#0c0a09" />
-      <circle cx="34" cy="18.2" r="0.45" fill="#fff" />
-      <path d="M38.5 20 Q46 22 47 27" fill="none" stroke="#e2e8f0" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 // ── Catálogos de texto (refinados del mockup F2) ───────────────────────────
 
 /**
@@ -1127,259 +1200,39 @@ const HERO = {
     'Camine a un lugar de la finca, o escríbame abajo. Hablo claro y solo con datos verificados.',
   ],
 };
+// Un solo "pregunte" que mande (usabilidad campesina #2): el globo del colibrí
+// ya NO repite "pregúnteme aquí abajo" — saluda y orienta; preguntar vive en
+// el botón grande "Pregunte" (y en el corazón de la escena biopunk).
 const COLIBRI = {
-  balcon: ['Buenas, soy Chagra', 'Su balcón está al día. Toque una matera o pregúnteme aquí abajo.'],
-  invernadero: ['Buenas, soy Chagra', 'Sus hileras están bien. ¿Reviso riego o plagas? Pregúnteme abajo.'],
-  finca: ['Buenas, soy Chagra', 'Todo tranquilo en su finca. Toque un lugar para entrar, o pregúnteme aquí abajo.'],
+  balcon: ['Buenas, soy Chagra', 'Su balcón está al día. Toque una matera para verla de cerca.'],
+  invernadero: ['Buenas, soy Chagra', 'Sus hileras están bien. Toque un lugar para revisarlo.'],
+  finca: ['Buenas, soy Chagra', 'Todo tranquilo en su finca. Toque una puerta para entrar.'],
 };
 
+// Preferencia persistida del modo "pleno sol" ('1' ON, '0' OFF, ausente=auto).
+const PLENO_SOL_KEY = 'chagra:home:pleno-sol';
+
 /**
- * Los 4 portales/lugares del home F2 ("Mi finca", "Aprender", "Jugar",
- * "Pregúntele a Chagra"). El badge del portal "Mi finca" refleja el DATO
- * REAL de la finca (0 siembras → "EMPIECE AQUÍ"; con siembras → resumen real).
+ * LAS 6 PUERTAS del home (usabilidad campesina #5): una-dos palabras, dibujo
+ * grande, targets ≥96px. Cada puerta enruta a un mundo/vista que YA existe:
+ *   · Mis matas     → la portada del mundo Cultivos ('mundo_cultivos').
+ *   · Mis animales  → el mundo Animales ('mundo' + {mundo:'animales'}),
+ *                     gateado por perfil (mostrarAnimales, igual que el home).
+ *   · El tiempo     → 'hoy_finca' (su día: lluvia, heladas y avisos).
+ *   · Vender        → 'mercado'.
+ *   · Aprender      → 'aprende'.
+ *   · Toda mi finca → LOS MUNDOS completos en la hoja de abajo (revelar).
  */
-function buildPortales({ onNavigate, abrirAgente, irAGestion, scene, poblada, escala }) {
-  const total = Number(scene?.totalCultivos) || 0;
-  const animales = Array.isArray(scene?.animales) ? scene.animales.length : 0;
-  let badgeGestionar;
-  if (!poblada || total + animales === 0) {
-    badgeGestionar = escala === 'balcon'
-      ? 'EMPIECE AQUÍ · 0 materas'
-      : escala === 'invernadero'
-        ? 'EMPIECE AQUÍ · 0 trasplantes'
-        : 'EMPIECE AQUÍ · 0 siembras';
-  } else {
-    const partes = [];
-    if (total > 0) partes.push(total === 1 ? '1 siembra' : `${total} siembras`);
-    if (animales > 0) partes.push('animales');
-    badgeGestionar = partes.join(' · ') || 'Su finca';
-  }
-
-  return [
-    {
-      id: 'gestionar',
-      titulo: 'Mi finca',
-      desc: 'Registre y cuide sus siembras, zonas y animales.',
-      emoji: '🌱',
-      clase: 'p-gestionar',
-      delay: '.1s',
-      badge: badgeGestionar,
-      placeSvg: <PlaceGestionar />,
-      // GESTIÓN, no el juego: revela la sección de registros/acciones de la
-      // finca (siembras, zonas, animales) en esta misma página. El bug viejo
-      // mandaba a onNavigate('juego') — el mismo destino que el portal "Jugar".
-      onClick: () => irAGestion(),
-    },
-    {
-      id: 'aprender',
-      titulo: 'Aprender',
-      desc: 'Suelo vivo, milpa, biopreparados, MIP y fenología.',
-      emoji: '📚',
-      clase: 'p-aprender',
-      delay: '.18s',
-      badge: '5 lecciones',
-      placeSvg: <PlaceAprender />,
-      onClick: () => onNavigate?.('aprende'),
-    },
-    {
-      id: 'jugar',
-      titulo: 'Jugar',
-      desc: 'Haga crecer su finca y defiéndala jugando.',
-      emoji: '🎮',
-      clase: 'p-jugar',
-      delay: '.26s',
-      badge: 'Mi Finca Viva',
-      placeSvg: <PlaceJugar />,
-      onClick: () => onNavigate?.('juego'),
-    },
-    {
-      id: 'agente',
-      titulo: 'Pregúntele a Chagra',
-      desc: 'Pregunte lo que sea: respuestas con su fuente.',
-      emoji: '💬',
-      clase: 'p-agente',
-      delay: '.34s',
-      badge: 'Voz y foto',
-      placeSvg: <PlaceAgente />,
-      onClick: () => abrirAgente(),
-    },
+function buildPuertas({ onNavigate, irATodaMiFinca, mostrarAnimales }) {
+  const puertas = [
+    { id: 'matas', emoji: '🌱', nombre: 'Mis matas', tinte: 'verde', abre: 'sus siembras y cultivos', onClick: () => onNavigate?.('mundo_cultivos') },
+    { id: 'animales', emoji: '🐔', nombre: 'Mis animales', tinte: 'teja', abre: 'sus gallinas, cerdos y demás animales', onClick: () => onNavigate?.('mundo', { mundo: 'animales' }) },
+    { id: 'tiempo', emoji: '🌦️', nombre: 'El tiempo', tinte: 'cielo', abre: 'el clima de hoy y los próximos días', onClick: () => onNavigate?.('hoy_finca') },
+    { id: 'vender', emoji: '🧺', nombre: 'Vender', tinte: 'ambar', abre: 'precios, mercado y su despensa', onClick: () => onNavigate?.('mercado') },
+    { id: 'aprender', emoji: '📖', nombre: 'Aprender', tinte: 'uva', abre: 'las lecciones y guías del campo', onClick: () => onNavigate?.('aprende') },
+    { id: 'finca', emoji: '🏡', nombre: 'Toda mi finca', tinte: 'menta', abre: 'todos los mundos de su finca', onClick: () => irATodaMiFinca() },
   ];
-}
-
-// ── SVG de los 4 portales (place-svg) ────────────────────────────────────────
-// Cada portal es un LUGAR ilustrado con horizonte, tierra y un foco propio
-// (parcela con casita · rancho de lectura · isla de juego · claro del agente).
-// Sin <text> con emoji dentro del SVG: en Android/iOS viejos esos glifos
-// renderizan monocromos o vacíos — todo es dibujo vectorial propio.
-
-function PlaceGestionar() {
-  return (
-    <svg className="place-svg" viewBox="0 0 180 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      {/* amanecer del lugar: sol suave + loma de fondo */}
-      <circle cx="146" cy="26" r="14" fill="#ffe08a" opacity=".5" />
-      <circle cx="146" cy="26" r="8" fill="#ffedb3" opacity=".8" />
-      <path d="M-4 66 Q50 42 104 62 T184 58 V90 H-4 Z" fill="#356b42" opacity=".55" />
-      {/* parcela isométrica con surcos */}
-      <polygon points="90,44 152,80 90,116 28,80" fill="#3f7a4e" />
-      <polygon points="90,44 152,80 90,82 28,80" fill="#4f9460" opacity=".7" />
-      <g stroke="#2f6b3a" strokeWidth="2.4" strokeLinecap="round" fill="none" opacity=".7">
-        <path d="M56 82 L90 100" /><path d="M70 74 L108 95" /><path d="M84 66 L122 87" />
-      </g>
-      {/* matas en hilera (tallo + copa + fruto) */}
-      <g className="fvh-p-mata">
-        <g strokeLinecap="round">
-          <path d="M64 84 v-12" stroke="#2f6b3a" strokeWidth="2.2" fill="none" />
-          <circle cx="64" cy="69" r="5" fill="#7fc06f" /><circle cx="62" cy="67" r="2.6" fill="#a7e17a" />
-          <circle cx="67" cy="72" r="2" fill="#ff5d44" />
-        </g>
-        <g strokeLinecap="round">
-          <path d="M88 96 v-13" stroke="#2f6b3a" strokeWidth="2.2" fill="none" />
-          <circle cx="88" cy="79" r="5.5" fill="#7fc06f" /><circle cx="86" cy="77" r="2.8" fill="#a7e17a" />
-          <circle cx="91" cy="82" r="2" fill="#ffd24d" />
-        </g>
-        <g strokeLinecap="round">
-          <path d="M112 88 v-11" stroke="#2f6b3a" strokeWidth="2.2" fill="none" />
-          <circle cx="112" cy="73" r="4.6" fill="#7fc06f" /><circle cx="110" cy="71" r="2.4" fill="#a7e17a" />
-        </g>
-      </g>
-      {/* casita campesina al fondo (pared clara, techo terracota, humo) */}
-      <g transform="translate(38 52)">
-        <path className="fvh-p-humo" d="M14 -12 q-3 -5 1 -8 q4 -3 1 -7" stroke="#f4efe2" strokeWidth="2.2" fill="none" strokeLinecap="round" opacity=".75" />
-        <rect x="11" y="-14" width="5" height="8" fill="#8a5a38" />
-        <polygon points="0,-6 13,-16 26,-6" fill="#c2562f" />
-        <polygon points="2,-6 24,-6 24,10 2,10" fill="#f6efe0" />
-        <rect x="10" y="0" width="6" height="10" fill="#7a5230" />
-        <rect x="4" y="-2" width="4.5" height="4.5" fill="#9fc9d8" />
-        <rect x="18" y="-2" width="4.5" height="4.5" fill="#9fc9d8" />
-      </g>
-      {/* letrero de madera de la parcela */}
-      <g transform="translate(126 92)">
-        <rect x="6" y="0" width="3" height="12" rx="1.5" fill="#7a5230" />
-        <rect x="-2" y="-8" width="19" height="10" rx="2.5" fill="#caa066" />
-        <path d="M2 -3 h11" stroke="#7a5230" strokeWidth="1.6" strokeLinecap="round" />
-      </g>
-    </svg>
-  );
-}
-function PlaceAprender() {
-  return (
-    <svg className="place-svg" viewBox="0 0 180 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      {/* tarde dorada + loma ocre */}
-      <circle cx="34" cy="24" r="12" fill="#ffe6a8" opacity=".55" />
-      <path d="M-4 70 Q60 48 120 66 T184 62 V96 H-4 Z" fill="#9a5f24" opacity=".45" />
-      {/* explanada de tierra */}
-      <polygon points="90,50 152,84 90,118 28,84" fill="#c47b2f" />
-      <polygon points="90,50 152,84 90,86 28,84" fill="#d18c3f" opacity=".7" />
-      {/* rancho de lectura: paja a trazos + horcones + libro abierto DIBUJADO */}
-      <g transform="translate(90 58)">
-        <polygon points="-30,16 0,0 30,16 24,20 0,7 -24,20" fill="#a85d28" />
-        <polygon points="-26,17 0,4 26,17 0,17" fill="#8a4b20" opacity=".9" />
-        <g stroke="#e8bd7a" strokeWidth="1.4" opacity=".65" strokeLinecap="round">
-          <path d="M-20 13 L0 3" /><path d="M-12 15 L2 8" /><path d="M20 13 L0 3" /><path d="M12 15 L-2 8" />
-        </g>
-        <g stroke="#7a5230" strokeWidth="3" strokeLinecap="round">
-          <path d="M-22 18 V36" /><path d="M22 18 V36" />
-        </g>
-        {/* mesa + libro abierto (páginas blancas, lomo, renglones) */}
-        <polygon points="-16,34 0,26 16,34 0,42" fill="#8a6038" />
-        <g className="fvh-p-libro">
-          <path d="M-11 30 Q-5 26 0 28 L0 36 Q-5 34 -11 37 Z" fill="#fdf8ea" />
-          <path d="M11 30 Q5 26 0 28 L0 36 Q5 34 11 37 Z" fill="#f4ecd8" />
-          <path d="M0 28 V36" stroke="#c9b98e" strokeWidth="1" />
-          <g stroke="#b9a87c" strokeWidth=".9" opacity=".8">
-            <path d="M-8 31 Q-4 29 -1.5 30" /><path d="M-8 33.5 Q-4 31.5 -1.5 32.5" />
-            <path d="M8 31 Q4 29 1.5 30" /><path d="M8 33.5 Q4 31.5 1.5 32.5" />
-          </g>
-        </g>
-      </g>
-      {/* hojas-página que flotan (el saber que vuela) */}
-      <g className="fvh-p-hoja" fill="#e6c873" opacity=".9">
-        <path d="M132 52 q6 -4 10 0 q-4 6 -10 0 Z" />
-        <path d="M44 64 q5 -4 9 0 q-4 5 -9 0 Z" opacity=".8" />
-      </g>
-    </svg>
-  );
-}
-function PlaceJugar() {
-  return (
-    <svg className="place-svg" viewBox="0 0 180 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      {/* cielo lúdico con estrellitas de juego */}
-      <g fill="#e8f6ff" className="fvh-p-brillo">
-        <path d="M38 26 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2 Z" opacity=".9" />
-        <path d="M142 34 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6 Z" opacity=".7" />
-      </g>
-      {/* isla-tablero: casillas isométricas alternadas */}
-      <polygon points="90,50 152,84 90,118 28,84" fill="#4f8fc0" />
-      <g>
-        <polygon points="90,58 121,75 90,92 59,75" fill="#9fe3ee" opacity=".9" />
-        <polygon points="90,58 105.5,66.5 90,75 74.5,66.5" fill="#7fc06f" />
-        <polygon points="105.5,66.5 121,75 105.5,83.5 90,75" fill="#c8f0f6" />
-        <polygon points="74.5,66.5 90,75 74.5,83.5 59,75" fill="#c8f0f6" />
-        <polygon points="90,75 105.5,83.5 90,92 74.5,83.5" fill="#7fc06f" />
-      </g>
-      {/* dado isométrico */}
-      <g className="fvh-p-dado" transform="translate(90 66)">
-        <polygon points="0,-10 11,-4 0,2 -11,-4" fill="#fdf8ea" />
-        <polygon points="-11,-4 0,2 0,15 -11,9" fill="#dfe8ea" />
-        <polygon points="11,-4 0,2 0,15 11,9" fill="#c3d3d8" />
-        <circle cx="0" cy="-4.5" r="1.8" fill="#38506a" />
-        <circle cx="-5.5" cy="3.5" r="1.6" fill="#38506a" /><circle cx="-5.5" cy="9" r="1.6" fill="#38506a" />
-        <circle cx="5.5" cy="3.5" r="1.6" fill="#38506a" /><circle cx="5.5" cy="9" r="1.6" fill="#38506a" /><circle cx="5.5" cy="6.2" r="1.6" fill="#38506a" />
-      </g>
-      {/* banderín de meta */}
-      <g transform="translate(124 78)">
-        <path d="M0 14 V-10" stroke="#38506a" strokeWidth="2.4" strokeLinecap="round" />
-        <path d="M0 -10 L14 -6 L0 -2 Z" fill="#ff5d44" />
-      </g>
-      {/* mariquita dibujada (fauna aliada del juego) */}
-      <g className="fvh-p-bicho" transform="translate(50 88)">
-        <ellipse cx="0" cy="0" rx="6" ry="4.6" fill="#e0532f" />
-        <path d="M0 -4.6 V4.6" stroke="#3a2024" strokeWidth="1.2" />
-        <circle cx="-2.4" cy="-1.4" r="1.1" fill="#3a2024" /><circle cx="2.6" cy="1" r="1.1" fill="#3a2024" />
-        <circle cx="0" cy="-5.4" r="2" fill="#3a2024" />
-      </g>
-      {/* mariposa dibujada */}
-      <g className="fvh-p-bicho" transform="translate(128 58)" style={{ animationDelay: '.6s' }}>
-        <path d="M0 0 q-6 -7 -10 -2 q-2 4 5 5 Z" fill="#f2b441" />
-        <path d="M0 0 q6 -7 10 -2 q2 4 -5 5 Z" fill="#ffd24d" />
-        <path d="M0 -2 V5" stroke="#5a4329" strokeWidth="1.3" strokeLinecap="round" />
-      </g>
-    </svg>
-  );
-}
-function PlaceAgente() {
-  return (
-    <svg className="place-svg" viewBox="0 0 180 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      {/* claro crepuscular con estrellas del agente */}
-      <g fill="#e9e3ff" className="fvh-p-brillo">
-        <circle cx="36" cy="26" r="1.6" /><circle cx="146" cy="22" r="1.3" /><circle cx="120" cy="38" r="1" />
-      </g>
-      <polygon points="90,50 152,84 90,118 28,84" fill="#5d4db0" />
-      <polygon points="90,50 152,84 90,86 28,84" fill="#6f5ec4" opacity=".65" />
-      {/* claro luminoso: anillos concéntricos que laten */}
-      <circle cx="90" cy="80" r="30" fill="#11281f" />
-      <circle className="fvh-p-anillo" cx="90" cy="80" r="30" fill="none" stroke="#a3e635" strokeWidth="2.5" opacity=".8" />
-      <circle className="fvh-p-anillo" cx="90" cy="80" r="36" fill="none" stroke="#a3e635" strokeWidth="1.2" opacity=".35" style={{ animationDelay: '.9s' }} />
-      {/* colibrí insignia (pico largo, gorget ámbar) */}
-      <g transform="translate(74 72)">
-        <path d="M4 12 L-3 9 L1 14 L-4 17 L3 16 Z" fill="#8b5cf6" opacity=".85" />
-        <ellipse cx="9" cy="10" rx="9" ry="5" fill="#10b981" transform="rotate(-16 9 10)" />
-        <circle cx="18" cy="7" r="4.4" fill="#06b6d4" />
-        <ellipse cx="19" cy="10" rx="2.4" ry="1.6" fill="#f59e0b" />
-        <circle cx="19" cy="6" r="1" fill="#0c0a09" />
-        <path d="M22 7 Q30 8 33 12" fill="none" stroke="#e2e8f0" strokeWidth="1.4" strokeLinecap="round" />
-        <path d="M10 7 Q3 1 -3 5 Q4 12 12 8 Z" fill="#8b5cf6" opacity="0.8" />
-      </g>
-      {/* globo de conversación con puntitos (la voz del agente) */}
-      <g className="fvh-p-globo" transform="translate(114 50)">
-        <rect x="-14" y="-10" width="30" height="18" rx="9" fill="#fdf8ea" />
-        <path d="M-6 7 L-10 14 L-1 8 Z" fill="#fdf8ea" />
-        <circle cx="-6" cy="-1" r="1.8" fill="#5d4db0" />
-        <circle cx="1" cy="-1" r="1.8" fill="#5d4db0" />
-        <circle cx="8" cy="-1" r="1.8" fill="#5d4db0" />
-      </g>
-    </svg>
-  );
+  return mostrarAnimales ? puertas : puertas.filter((p) => p.id !== 'animales');
 }
 
 // ════════════════════════════════════════════════════════════════════════════

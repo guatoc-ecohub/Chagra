@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, cleanup, waitFor, within } from '@testing-library/react';
+import { render, screen, cleanup, waitFor, within, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 
@@ -101,8 +101,11 @@ describe('DashboardLive — operador/extensionista ve los mundos (aditivo, no re
     expect(screen.getByTestId('finca-viva-hero').getAttribute('data-titulo'))
       .toBe('Red de fincas que acompaño');
 
-    // Y la hoja .fvh-resto NO se oculta: la grilla de mundos está presente.
+    // Y la hoja .fvh-resto NO se oculta: el bloque de mundos está presente.
+    // Desde la usabilidad campesina #5 los mundos arrancan PLEGADOS ("Toda mi
+    // finca"): un toque abre la grilla completa (reachability intacta).
     const bloque = screen.getByTestId('bloque-mundos');
+    fireEvent.click(within(bloque).getByTestId('abrir-mundos'));
     expect(within(bloque).getByTestId('mundos-finca')).toBeInTheDocument();
     // La hoja completa se renderiza (antes era null para el extensionista).
     expect(screen.getByTestId('fvh-resto')).toBeInTheDocument();

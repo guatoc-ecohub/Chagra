@@ -39,10 +39,15 @@
  *   gallinas) navega al mundo de los animales. `null`/ausente = el perfil no
  *   ve ese mundo (gate `mostrarAnimales` del home) y el potrero queda
  *   decorativo, sin rol ni foco.
+ * @param {?() => void} [props.onPregunte] al tocar el CORAZÓN-SEMILLA abre el
+ *   agente ("Pregunte"): la metáfora central de la escena deja de ser
+ *   decoración y se vuelve LA acción principal (usabilidad campesina #4).
+ *   Sin handler, el corazón queda como arte (sin rol ni foco).
  */
-export default function SceneFincaOrganismo({ estructura, onAnimales }) {
+export default function SceneFincaOrganismo({ estructura, onAnimales, onPregunte }) {
   const conEstructura = !!estructura?.tiene;
   const conAnimales = typeof onAnimales === 'function';
+  const conPregunte = typeof onPregunte === 'function';
   const ariaEscena =
     'Su finca convertida en organismo bioluminiscente, con el sol o la luna según la hora y el cielo real de su vereda: un corazón-semilla late bajo la tierra y su red de micorrizas conecta las raíces de cada planta, con lombrices y bichitos trabajando el suelo; una quebrada baja de la montaña, cultivos con savia de neón, invernadero-célula que respira, potrero con vaca y gallinas, campesino con su perro y colibrí de luz.';
   return (
@@ -50,10 +55,10 @@ export default function SceneFincaOrganismo({ estructura, onAnimales }) {
       className="fvo-svg"
       viewBox="0 0 390 486"
       preserveAspectRatio="xMidYMid slice"
-      /* con el potrero tappable el SVG deja de ser imagen plana: role="img"
-         volvería PRESENTACIONALES a sus hijos y el botón de los animales no
-         existiría para lectores de pantalla. */
-      role={conAnimales ? 'group' : 'img'}
+      /* con el potrero y/o el corazón tappables el SVG deja de ser imagen
+         plana: role="img" volvería PRESENTACIONALES a sus hijos y los botones
+         (animales / "Pregunte") no existirían para lectores de pantalla. */
+      role={(conAnimales || conPregunte) ? 'group' : 'img'}
       aria-label={ariaEscena}
       data-testid="fvo-escena"
     >
@@ -862,10 +867,36 @@ export default function SceneFincaOrganismo({ estructura, onAnimales }) {
         <path d="M327.6,445.4 Q326,444 325.2,442.6" stroke="#d8ff6a" strokeWidth=".7" fill="none" opacity=".8" />
       </g>
 
-      {/* ============ CORAZÓN-SEMILLA MICORRÍZICO (la vida bajo la tierra) ============ */}
+      {/* ============ CORAZÓN-SEMILLA MICORRÍZICO (la vida bajo la tierra) ============
+          Con `onPregunte` el corazón entero es un BOTÓN (tap / Enter / Espacio)
+          que abre el agente — el mismo patrón del potrero→animales: la metáfora
+          central deja de ser decoración y pasa a ser LA acción de preguntar.
+          Sin handler queda como arte (aria-hidden, sin foco). */}
+      <g
+        className={`fvo-corazon-grupo${conPregunte ? ' fvo-corazon-tap' : ''}`}
+        data-testid="fvo-corazon"
+        {...(conPregunte
+          ? {
+              role: 'button',
+              tabIndex: 0,
+              'aria-label': 'El corazón de su finca: toque y pregúntele a Chagra con su voz.',
+              onClick: () => onPregunte(),
+              onKeyDown: (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onPregunte();
+                }
+              },
+            }
+          : { 'aria-hidden': true })}
+      >
       {/* cámara de suelo: da contexto y contraste al órgano */}
       <ellipse cx="195" cy="406" rx="42" ry="36" fill="#02040c" opacity=".55" />
       <ellipse cx="195" cy="406" rx="42" ry="36" fill="none" stroke="#0f3a30" strokeWidth="1" opacity=".55" />
+      {/* halo-invitación del tap (solo cuando el corazón es botón) */}
+      {conPregunte && (
+        <circle className="fvo-corazon-halo" cx="195" cy="406" r="32" fill="none" stroke="#2dffc4" strokeWidth="1.2" opacity=".5" />
+      )}
       {/* ondas de latido */}
       <circle className="fvo-heart-wave" cx="195" cy="406" r="24" fill="none" stroke="#2dffc4" strokeWidth="1.6" />
       <circle className="fvo-heart-wave" style={{ animationDelay: '.6s' }} cx="195" cy="406" r="24" fill="none" stroke="#ff4fd8" strokeWidth="1" />
@@ -899,6 +930,8 @@ export default function SceneFincaOrganismo({ estructura, onAnimales }) {
         <circle cx="195" cy="407" r="9.5" fill="#bfffe9" opacity=".3" />
         <circle cx="195" cy="407" r="5.2" fill="#eafff6" />
         <circle cx="195" cy="407" r="2.2" fill="#ff8fe4" />
+      </g>
+      {/* cierre del grupo tappable del corazón (la etiqueta va aparte, abajo) */}
       </g>
 
       {/* nutrientes viajando */}
@@ -940,10 +973,13 @@ export default function SceneFincaOrganismo({ estructura, onAnimales }) {
         </g>
       </g>
 
-      {/* etiqueta viva */}
-      <g fontFamily="ui-monospace,monospace" fontSize="7.5" letterSpacing="2" opacity=".65">
+      {/* etiqueta viva — con el corazón tappable invita a la acción (y deja
+          la jerga de laboratorio: "micorrízica" no es palabra del campo) */}
+      <g fontFamily="ui-monospace,monospace" fontSize="7.5" letterSpacing="2" opacity=".65" aria-hidden="true">
         <text x="195" y="452" fill="#2dffc4" textAnchor="middle">CORAZÓN DE LA FINCA · VIVO</text>
-        <text x="195" y="464" fill="#5b7f93" textAnchor="middle" letterSpacing="1">la red micorrízica conecta cada planta</text>
+        <text x="195" y="464" fill="#5b7f93" textAnchor="middle" letterSpacing="1">
+          {conPregunte ? 'toque el corazón y pregúntele a Chagra' : 'las raíces de su finca están conectadas'}
+        </text>
       </g>
     </svg>
   );

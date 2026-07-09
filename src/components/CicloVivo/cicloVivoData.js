@@ -51,7 +51,7 @@ export const PHASES = [
     key: 'crecimiento', name: 'Crecimiento', short: 'Crece', color: '#4C7A3D',
     functions: [
       { label: 'Tómele foto', cap: 'diagnostico_foto', camera: true },
-      { label: 'Plagas de esta etapa (MIP)', cap: 'mip_plagas' },
+      { label: 'Plagas de esta etapa', cap: 'mip_plagas' }, // sin la sigla MIP (jerga) en la UI
       { label: 'Nutrición', cap: 'nutricion' },
       { label: 'Asociaciones', cap: 'asociaciones' },
       { label: '¿En qué fase va?', cap: 'fenologia' },
