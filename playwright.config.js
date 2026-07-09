@@ -156,6 +156,18 @@ export default defineConfig({
         reducedMotion: 'reduce',
         screenshot: 'off',
         trace: 'retain-on-failure',
+        // QA de cierre go-live F2 (2026-07-05): deploy.yml/dev-deploy.yml YA
+        // sirven VITE_FINCA_VIVA_HOME_PERFIL=true en prod y stg — el home
+        // "Finca Viva" (FincaVivaHero + MundosDeMiFinca) y el ScreenShellF2
+        // (header de TODAS las pantallas) son lo que el usuario ve de verdad.
+        // El puerto 5173 (proyectos chromium/mobile-*, ~50 specs legacy que
+        // asumen el composer/TopBar clásico) se deja INTOCADO con la flag OFF
+        // para no romper esa suite hoy. La suite `visual` sola apunta al
+        // servidor 5174 (flag ON, ver `webServer` abajo) para que los
+        // baselines reflejen el estado nuevo — es el propósito de este
+        // re-baseline (ver tests/visual/finca-viva-temas.spec.js, que dejó de
+        // auto-skipearse con esto).
+        baseURL: 'http://localhost:5174',
       },
     },
   ],
@@ -167,16 +179,40 @@ export default defineConfig({
   ...(process.env.PLAYWRIGHT_BASE_URL
     ? {}
     : {
-        webServer: {
-          command: 'npx vite --port=5173 --strictPort',
-          url: 'http://localhost:5173',
-          reuseExistingServer: !process.env.CI,
-          timeout: 120_000,
-          env: {
-            VITE_FARMOS_URL: process.env.VITE_FARMOS_URL || '',
-            VITE_FARMOS_CLIENT_ID: process.env.VITE_FARMOS_CLIENT_ID || 'farm',
-            VITE_OPERATOR_USERNAME: process.env.VITE_OPERATOR_USERNAME || 'op-test',
+        webServer: [
+          {
+            command: 'npx vite --port=5173 --strictPort',
+            url: 'http://localhost:5173',
+            reuseExistingServer: !process.env.CI,
+            timeout: 120_000,
+            env: {
+              VITE_FARMOS_URL: process.env.VITE_FARMOS_URL || '',
+              VITE_FARMOS_CLIENT_ID: process.env.VITE_FARMOS_CLIENT_ID || 'farm',
+              VITE_OPERATOR_USERNAME: process.env.VITE_OPERATOR_USERNAME || 'op-test',
+            },
           },
-        },
+          // Segundo server, SOLO para el proyecto `visual` (ver `baseURL`
+          // arriba): mismo build, con la flag F2 ON — la realidad de
+          // prod/stg. Puerto propio para no chocar con el 5173 de arriba;
+          // ambos corren en paralelo durante `npx playwright test`.
+          {
+            command: 'npx vite --port=5174 --strictPort',
+            url: 'http://localhost:5174',
+            reuseExistingServer: !process.env.CI,
+            timeout: 120_000,
+            env: {
+              VITE_FARMOS_URL: process.env.VITE_FARMOS_URL || '',
+              VITE_FARMOS_CLIENT_ID: process.env.VITE_FARMOS_CLIENT_ID || 'farm',
+              VITE_OPERATOR_USERNAME: process.env.VITE_OPERATOR_USERNAME || 'op-test',
+              VITE_FINCA_VIVA_HOME_PERFIL: 'true',
+              // El pipeline sidecar (resolve-entities/nlu/tools) también está
+              // ON en prod/stg (deploy.yml + dev-deploy.yml) — sin esto el
+              // AgentScreen nunca llama esos endpoints y los mocks de
+              // agente-responde-desde-todas-partes.spec.js quedarían sin
+              // ejercitar.
+              VITE_USE_SIDECAR_AGRO_MCP: 'true',
+            },
+          },
+        ],
       }),
 });
