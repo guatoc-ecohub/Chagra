@@ -97,6 +97,10 @@ const BotonAnarquiaMockup = lazy(() => import('./mockups/BotonAnarquia'));
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
+// Mockup dev del HOME CON OJOS DE CAMPESINO (rediseño de jerarquía del home:
+// preguntar + anotar + 6 puertas grandes). Ruta #/mockups/home-campesino —
+// sin gate ni sesión (datos de muestra, no toca datos reales).
+const HomeCampesinoMockup = lazy(() => import('./mockups/HomeCampesino'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -425,6 +429,7 @@ const LoadingFallback = ({ view = null }) => {
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 const HASH_VIEW_ROUTES = {
+  'mockups/home-campesino': 'mockup_home_campesino',
   'mockups/boton-anarquia': 'mockup_boton_anarquia',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
@@ -930,6 +935,12 @@ export default function App() {
       Promise.resolve().then(() => navigate('mockup_boton_anarquia'));
       return;
     }
+    // Mockup dev (#/mockups/home-campesino): rediseño del home con ojos de
+    // campesino — se monta sin sesión (no lee ni escribe datos reales).
+    if (hash === 'mockups/home-campesino') {
+      Promise.resolve().then(() => navigate('mockup_home_campesino'));
+      return;
+    }
 
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
@@ -969,6 +980,10 @@ export default function App() {
         return;
       }
       if (routeView === 'mockup_boton_anarquia') {
+        navigate(routeView);
+        return;
+      }
+      if (routeView === 'mockup_home_campesino') {
         navigate(routeView);
         return;
       }
@@ -1285,6 +1300,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Mockup Botón Anarquía">
               <BotonAnarquiaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_home_campesino':
+        // Mockup dev del home con ojos de campesino (rediseño de jerarquía).
+        // Full-screen, sin gate — solo para decidir dirección.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Home Campesino">
+              <HomeCampesinoMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2601,7 +2626,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && !currentView.startsWith('mockup_') && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
