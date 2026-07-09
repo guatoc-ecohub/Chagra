@@ -1,6 +1,6 @@
 // Sync conflict strategy (Task 109): Logs append-only idempotent by id.
 // Assets LWW at field level. Queue dedup by transaction id (upsert).
-import { sendToFarmOS, fetchFromFarmOS } from './apiService';
+import { sendToFarmOS, fetchFromFarmOS, uploadBinaryToFarmOS } from './apiService';
 import { openDB, STORES } from '../db/dbCore';
 import { logCache } from '../db/logCache';
 import { newId } from '../utils/id';
@@ -478,12 +478,16 @@ export class SyncManager {
         const diagnoses = [];
 
         for (const item of mediaItems) {
-          // Paso A: POST /api/file/upload con FormData
-          const formData = new FormData();
+          // Paso A: subir el binario por el flujo NATIVO de Drupal 10
+          // (upload por campo, octet-stream). BUG FIX 2026-07-08: la ruta
+          // vieja POST /api/file/upload (FormData) NO existe en farmOS 4.x
+          // (404 verificado en vivo) — la evidencia nunca subía y el warn
+          // "no bloqueante" se lo tragaba. El file queda temporal hasta que
+          // el Paso B lo referencia en el log (ahí Drupal lo hace permanente).
           const filename = `evidence_${logId}_${item.id}.webp`;
-          formData.append('file', item.blob, filename);
-
-          const fileResult = await sendToFarmOS('/api/file/upload', formData, 'POST');
+          const fileResult = await uploadBinaryToFarmOS(item.blob, filename, {
+            entity: 'log', bundle: 'observation', field: 'file',
+          });
           const fileUuid = fileResult?.data?.id;
           if (fileUuid) {
             fileUuids.push({ type: 'file--file', id: fileUuid });
