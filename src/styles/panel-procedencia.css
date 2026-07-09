@@ -1,0 +1,221 @@
+/* ============================================================================
+ * PANEL DE PROCEDENCIA — "¿de dónde sale esta respuesta?" del agente Chagra.
+ *
+ * Compañero del semáforo de confianza (sello-confianza.css): al tocar el
+ * sello del semáforo se abre esta tarjeta, cosida al cuaderno de campo, con
+ * un renglón por afirmación fuerte (entidad del grafo) y sus chips de
+ * procedencia: fuente (catálogo/Agrosavia/OpenAlex/DOI), nivel de curaduría
+ * y confianza del match.
+ *
+ * Carácter: cálido y campesino — papel, puntada punteada, hoja al lado de
+ * cada entidad — NO académico frío. El "sin verificar" se pinta con la
+ * misma dignidad que el verde: honestidad como rasgo de confianza.
+ *
+ * Theming: hereda las vars --c-* de index.css (los temas de papel ya
+ * remapean emerald/amber/slate a tintas AA). GPU-friendly (solo
+ * transform/opacity al abrir) + prefers-reduced-motion.
+ * ========================================================================== */
+
+.procedencia-panel {
+  --proc-rgb: var(--c-slate-400, 148 163 184);
+  flex-basis: 100%;
+  padding: 10px 12px;
+  border: 1px dashed rgb(var(--proc-rgb) / 0.45); /* puntada del cuaderno */
+  border-left: 3px solid rgb(var(--proc-rgb) / 0.8); /* costura del nivel */
+  border-radius: 6px 12px 12px 6px;
+  background: rgb(var(--proc-rgb) / 0.07);
+  font-family: 'Nunito', system-ui, sans-serif;
+  animation: procedencia-abre 0.2s ease both;
+}
+.procedencia-panel[data-nivel="verde"] { --proc-rgb: var(--c-emerald-500, 16 185 129); }
+.procedencia-panel[data-nivel="ambar"] { --proc-rgb: var(--c-amber-500, 245 158 11); }
+.procedencia-panel[data-nivel="rojo"]  { --proc-rgb: 244 63 94; } /* rose-500 */
+
+.procedencia-titulo {
+  margin: 0 0 4px;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: rgb(var(--c-slate-200, 226 232 240));
+}
+
+.procedencia-explica {
+  margin: 0 0 4px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgb(var(--c-slate-300, 203 213 225));
+}
+
+.procedencia-motivo {
+  margin: 0 0 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-style: italic;
+  color: rgb(var(--proc-rgb) / 0.95);
+}
+
+/* ── Renglones por afirmación ─────────────────────────────────────────────── */
+.procedencia-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.procedencia-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 7px 9px;
+  border-radius: 10px;
+  background: rgb(var(--c-surface-card, 15 23 42) / 0.55);
+  border: 1px solid rgb(var(--c-slate-400, 148 163 184) / 0.18);
+}
+
+.procedencia-entidad {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 800;
+  font-style: italic; /* binomio linneano, como en el cuaderno */
+  color: rgb(var(--c-slate-200, 226 232 240));
+}
+.procedencia-entidad-hoja {
+  flex: none;
+  color: rgb(var(--c-emerald-500, 16 185 129));
+}
+
+.procedencia-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Chip pequeño de procedencia — pariente del .sello pero más sobrio. */
+.procedencia-chip {
+  --chip-rgb: var(--c-slate-400, 148 163 184);
+  --chip-texto-rgb: var(--c-slate-300, 203 213 225);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--chip-rgb) / 0.35);
+  background: rgb(var(--chip-rgb) / 0.1);
+  color: rgb(var(--chip-texto-rgb));
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.procedencia-chip[data-nivel="verde"] {
+  --chip-rgb: var(--c-emerald-500, 16 185 129);
+  --chip-texto-rgb: var(--c-emerald-300, 110 231 183);
+}
+.procedencia-chip[data-nivel="ambar"] {
+  --chip-rgb: var(--c-amber-500, 245 158 11);
+  --chip-texto-rgb: var(--c-amber-300, 252 211 77);
+}
+.procedencia-chip-fuente {
+  --chip-rgb: var(--c-sky-400, 56 189 248);
+  --chip-texto-rgb: var(--c-sky-300, 125 211 252);
+}
+a.procedencia-chip {
+  cursor: pointer;
+  transition: border-color 0.16s ease, background-color 0.16s ease;
+}
+a.procedencia-chip:hover {
+  border-color: rgb(var(--chip-rgb) / 0.65);
+  background: rgb(var(--chip-rgb) / 0.18);
+}
+a.procedencia-chip:focus-visible {
+  outline: 2px solid rgb(var(--chip-rgb) / 0.85);
+  outline-offset: 2px;
+}
+.procedencia-chip-confianza {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Sin procedencia (rojo honesto) + pie del panel ──────────────────────── */
+.procedencia-vacia {
+  margin: 0;
+  padding: 7px 9px;
+  border-radius: 10px;
+  background: rgb(var(--proc-rgb) / 0.08);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgb(var(--c-slate-300, 203 213 225));
+}
+
+.procedencia-pie {
+  margin: 8px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.4;
+  color: rgb(var(--c-slate-400, 148 163 184));
+}
+
+/* ── Temas de papel (claros): tinta oscura AA sobre crema ─────────────────── */
+[data-theme="minimalista"] .procedencia-titulo,
+[data-theme="nature"] .procedencia-titulo,
+[data-theme="verde-vivo"] .procedencia-titulo,
+[data-theme="minimalista"] .procedencia-entidad,
+[data-theme="nature"] .procedencia-entidad,
+[data-theme="verde-vivo"] .procedencia-entidad {
+  color: rgb(var(--c-slate-700, 51 65 85));
+}
+[data-theme="minimalista"] .procedencia-explica,
+[data-theme="nature"] .procedencia-explica,
+[data-theme="verde-vivo"] .procedencia-explica,
+[data-theme="minimalista"] .procedencia-vacia,
+[data-theme="nature"] .procedencia-vacia,
+[data-theme="verde-vivo"] .procedencia-vacia {
+  color: rgb(var(--c-slate-600, 71 85 105));
+}
+[data-theme="minimalista"] .procedencia-panel[data-nivel="rojo"],
+[data-theme="nature"] .procedencia-panel[data-nivel="rojo"],
+[data-theme="verde-vivo"] .procedencia-panel[data-nivel="rojo"] {
+  --proc-rgb: 225 29 72; /* rose-600 AA sobre papel */
+}
+[data-theme="minimalista"] .procedencia-item,
+[data-theme="nature"] .procedencia-item,
+[data-theme="verde-vivo"] .procedencia-item {
+  background: rgb(255 255 255 / 0.55);
+}
+[data-theme="minimalista"] .procedencia-chip[data-nivel="verde"],
+[data-theme="nature"] .procedencia-chip[data-nivel="verde"],
+[data-theme="verde-vivo"] .procedencia-chip[data-nivel="verde"] {
+  --chip-texto-rgb: var(--c-emerald-600, 5 150 105);
+}
+[data-theme="minimalista"] .procedencia-chip[data-nivel="ambar"],
+[data-theme="nature"] .procedencia-chip[data-nivel="ambar"],
+[data-theme="verde-vivo"] .procedencia-chip[data-nivel="ambar"] {
+  --chip-texto-rgb: var(--c-amber-700, 180 83 9);
+}
+[data-theme="minimalista"] .procedencia-chip-fuente,
+[data-theme="nature"] .procedencia-chip-fuente,
+[data-theme="verde-vivo"] .procedencia-chip-fuente {
+  --chip-texto-rgb: var(--c-sky-700, 3 105 161);
+}
+
+@keyframes procedencia-abre {
+  from { transform: translateY(-3px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .procedencia-panel { animation: none !important; }
+  a.procedencia-chip { transition: none !important; }
+}

@@ -2306,6 +2306,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             grounding_semaphore: groundingDecisionMeta.semaphore,
             grounding_policy: groundingDecisionMeta.policy,
             grounding_reason: groundingDecisionMeta.reason,
+            // PANEL DE PROCEDENCIA (lever moat anti-alucinación visible):
+            // la procedencia POR-AFIRMACIÓN [{entity_id, confidence, source,
+            // validation_level}] que el sidecar ya computa viaja completa en
+            // la metadata del turno — el ChatBubble la pinta como semáforo de
+            // confianza + panel expandible (SemaforoConfianza.jsx) sin volver
+            // a pedir nada. Serializable (JSON plano) → persiste en historial.
+            grounding_provenance: Array.isArray(groundingDecisionMeta.provenance)
+              ? groundingDecisionMeta.provenance
+              : [],
           }
         : {};
       sourceMetadata = {
