@@ -544,6 +544,22 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         }
     }, []);
 
+    // LOS MUNDOS PLEGADOS (usabilidad campesina #5): la grilla completa de
+    // mundos (~13 tarjetas + ~35 chips) ya no está siempre abierta en el home
+    // — el primer pantallazo son las 6 PUERTAS del hero. "Toda mi finca" (la
+    // sexta puerta) o el botón ancho del bloque la despliegan. Todo sigue
+    // alcanzable con UN toque; MundosDeMiFinca no cambia.
+    const [mundosAbiertos, setMundosAbiertos] = useState(false);
+    const revelarMundos = useCallback(() => {
+        setMundosAbiertos(true);
+        if (typeof document === 'undefined') return;
+        // El scroll corre tras el render del bloque expandido.
+        requestAnimationFrame(() => {
+            const seccion = document.getElementById('bloque-mundos');
+            if (seccion?.scrollIntoView) seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }, []);
+
     // ── Helpers de render (compartidos entre el layout F2 y el legacy) ────────
     // Rótulo de bloque con la barrita de color. Función pura que DEVUELVE JSX (no
     // un componente, para no violar react-hooks/static-components al definirlo
@@ -693,6 +709,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                         onNavigate={onNavigate}
                         onOpenAgent={() => onNavigate('agente')}
                         onGestionar={revelarGestion}
+                        onTodaMiFinca={revelarMundos}
                         titulo={esExtensionista ? 'Red de fincas que acompaño' : 'Mi finca viva'}
                     >
                         {esExtensionista ? (
@@ -867,12 +884,37 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     vieja vive DENTRO de su mundo (mundosFinca.js es la fuente
                     única; el test de reachability congela el contrato). El gate
                     de Animales por perfil se conserva (mostrarAnimales). */}
-                <div className="px-4 pt-4 fvh-resto-block" data-testid="bloque-mundos">
-                    <MundosDeMiFinca
-                        onNavigate={onNavigate}
-                        mostrarAnimales={mostrarAnimales}
-                        plantsCount={plantsCount}
-                    />
+                <div id="bloque-mundos" className="px-4 pt-4 fvh-resto-block" data-testid="bloque-mundos" style={{ scrollMarginTop: '88px' }}>
+                    {mundosAbiertos ? (
+                        <MundosDeMiFinca
+                            onNavigate={onNavigate}
+                            mostrarAnimales={mostrarAnimales}
+                            plantsCount={plantsCount}
+                        />
+                    ) : (
+                        // PLEGADO (default): una sola puerta ancha ≥96px. La
+                        // grilla completa se abre aquí o desde la puerta "Toda
+                        // mi finca" del hero (revelarMundos).
+                        <button
+                            type="button"
+                            data-testid="abrir-mundos"
+                            onClick={revelarMundos}
+                            aria-expanded={false}
+                            aria-label="Toda mi finca: abrir todos los mundos de su finca"
+                            className={`w-full dash-tile ${fincaVivaFlag ? 'fvh-tile-claro' : 'bg-slate-900/60'} border border-slate-800 border-l-4 border-l-teal-500 rounded-2xl p-4 min-h-[96px] text-left active:bg-slate-800/70 transition-colors flex items-center gap-4`}
+                        >
+                            <span aria-hidden="true" className="shrink-0 w-14 h-14 rounded-2xl bg-teal-700/20 border border-teal-600/40 flex items-center justify-center text-3xl">
+                                🏡
+                            </span>
+                            <span className="min-w-0 flex-1">
+                                <span className="text-lg font-black block leading-tight fvh-tile-label text-teal-500">Toda mi finca</span>
+                                <span className={`text-xs mt-1 leading-snug block fvh-tile-desc ${fincaVivaFlag ? '' : 'text-slate-400'}`}>
+                                    Todos los mundos: suelo, agua, sanidad, mercado y más
+                                </span>
+                            </span>
+                            <ChevronRight size={22} className="shrink-0 text-slate-500" aria-hidden="true" />
+                        </button>
+                    )}
                 </div>
 
                 {/* El Ciclo Vivo: portal a la rueda de las 7 fases. Estado real
@@ -909,6 +951,17 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                         className="text-xs font-bold underline underline-offset-2 fvh-block-label"
                     >
                         Ayuda
+                    </button>
+                    <span aria-hidden="true" className="fvh-block-label">·</span>
+                    {/* "Jugar" conserva su entrada en el home: antes era uno de
+                        los 4 portales del hero (reemplazados por las 6 puertas);
+                        el juego sigue alcanzable desde aquí. */}
+                    <button
+                        type="button"
+                        onClick={() => onNavigate('juego')}
+                        className="text-xs font-bold underline underline-offset-2 fvh-block-label"
+                    >
+                        Jugar
                     </button>
                 </div>
             </>
