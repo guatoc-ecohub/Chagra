@@ -664,6 +664,20 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         </div>
     ));
 
+    // SU GUARDIÁN — el espíritu de la finca (mockup #/mockups/avatar-biopunk).
+    // Vive en AMBOS layouts (F2 y legacy/prod) para que sea público y no
+    // huérfano, pero DESPUÉS de los mundos/ciclo (nunca sobre "Registrar":
+    // el primer scroll es de la acción diaria, bug UX 2026-07-04). Especies
+    // nativas colombianas REALES (grounded); la elección PERSISTE en el perfil
+    // (guardian_especie) y re-tiñe su propio HUD + emite
+    // chagra:guardian-changed para el saludo/espíritu.
+    const bloqueGuardian = (
+        <div className={`px-4 pt-3 ${fincaVivaFlag ? 'fvh-resto-block' : ''}`} data-testid="bloque-guardian">
+            {blockLabel('Su guardián', 'from-teal-400 to-violet-400')}
+            <GuardianEspiritu />
+        </div>
+    );
+
     return (
         <div
             className="relative flex flex-col w-full h-full overflow-y-auto pb-6"
@@ -801,16 +815,6 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                 </div>
             )}
 
-            {/* SU GUARDIÁN — el espíritu de la finca (mockup #/mockups/avatar-biopunk).
-                Vive en el menú vivo en AMBOS layouts (F2 y legacy/prod) para que sea
-                público y no huérfano. Especies nativas colombianas REALES (grounded);
-                la elección PERSISTE en el perfil (guardian_especie) y re-tiñe su
-                propio HUD + emite chagra:guardian-changed para el saludo/espíritu. */}
-            <div className="px-4 pt-3 fvh-resto-block" data-testid="bloque-guardian">
-                {blockLabel('Su guardián', 'from-teal-400 to-violet-400')}
-                <GuardianEspiritu />
-            </div>
-
             {fincaVivaFlag ? (
             /* ════════════════════════════════════════════════════════════════
                HOME F2 — REESTRUCTURACIÓN 2.0 "LOS MUNDOS DE MI FINCA" (V4).
@@ -945,6 +949,9 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     )}
                 </div>
 
+                {/* Su guardián: identidad/espíritu, después de los mundos. */}
+                {bloqueGuardian}
+
                 {/* El Ciclo Vivo: portal a la rueda de las 7 fases. Estado real
                     por función desde chagra-stats.json (se enciende solo). */}
                 <div className="px-4 pt-3 fvh-resto-block">
@@ -1015,6 +1022,9 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             <div className="px-4 pt-3">
                 <CicloVivoWidget onNavigate={onNavigate} />
             </div>
+
+            {/* Su guardián: identidad/espíritu de la finca (bajo el fold). */}
+            {bloqueGuardian}
 
             {/* Top problemas activos (casos de estudio). */}
             <div className="px-4 pt-3">

@@ -811,7 +811,11 @@ export function getGuardianEspecie() {
  * desconocidos para no corromper el perfil. Emite `chagra:guardian-changed` y
  * `chagra:profile-changed` para que el home/saludo re-lean el espíritu en vivo.
  *
- * @param {'abeja'|'oso'|'chivito'|'danta'|'rana'} id
+ * El tipo del parámetro es `string` a propósito (no la unión literal del
+ * roster): la validación es EN RUNTIME contra GUARDIAN_ESPECIE_IDS — ids
+ * desconocidos (perfil corrupto, input externo, tests) devuelven null.
+ *
+ * @param {string} id  uno de GUARDIAN_ESPECIE_IDS ('abeja'|'oso'|'chivito'|'danta'|'rana')
  * @returns {Object|null} perfil resultante, o null si el id era inválido
  */
 export function setGuardianEspecie(id) {
