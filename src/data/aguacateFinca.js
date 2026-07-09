@@ -299,6 +299,15 @@ export const MALES_AGUACATE = [
 ];
 
 /**
+ * Fuente de la sección de plagas — el grafo Chagra da los nodos y el manejo, y
+ * la autoridad publicada es la guía de AGROSAVIA (verificada contra Crossref en
+ * el DR grounding-aguacate-hass-plagas-colombia, 2026-06-19). No añade plagas
+ * fuera del grafo: solo cita la fuente que respalda las que ya están.
+ */
+export const MALES_FUENTE =
+  'Grafo Chagra (persea_americana) + AGROSAVIA — Carabalí Muñoz, Caicedo Vallejo y Holguín (2021), “Guía para el reconocimiento y manejo de las principales plagas de aguacate cv. Hass en Colombia”, DOI 10.21930/agrosavia.nbook.7404913 (verificado Crossref).';
+
+/**
  * Biopreparados de apoyo — GROUNDED: la lista propia de persea_americana en el
  * grafo. Son apoyo agroecológico, no reemplazan el manejo cultural (drenaje,
  * recolección, material sano). No se dan dosis de veneno de síntesis.
@@ -353,7 +362,7 @@ export const FLORACION_POLINIZACION = {
   ],
   abejas: 'Quien lleva el polen de flor a flor son las ABEJAS. Un huerto con colmenas cerca, flores alrededor y sin venenos en plena floración cuaja mucho mejor. Cuidar los polinizadores es cuidar la cosecha.',
   tipoCriolloNota: 'El tipo floral exacto de un criollo local se confirma observando el árbol (a qué hora abre la flor hembra); no se puede afirmar de memoria por variedad.',
-  fuente: 'AGROSAVIA, Universidad Nacional de Colombia (biología floral del aguacate)',
+  fuente: 'AGROSAVIA, Universidad Nacional de Colombia (biología floral del aguacate); polinizadores: Carabalí et al. (2017), “Insectos polinizadores del aguacate cv. Hass en Colombia”, DOI 10.21930/978-958-740-235-3 (verificado Crossref)',
 };
 
 /* ────────────────────────────────────────────────────────────────────────
