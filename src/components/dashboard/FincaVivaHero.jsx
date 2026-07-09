@@ -7,7 +7,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import useAssetStore from '../../store/useAssetStore';
+import useCosechaStore from '../../store/useCosechaStore';
 import { buildFincaScene } from '../../services/fincaSceneService';
+import { buildVitalidadEspiritu } from '../../services/vitalidadEspirituService';
 import { selectSceneVariant, SCENE_KINDS } from '../../services/fincaSceneProfileSelector';
 import { getProfile, saveProfile, getInvernaderoEstructura, hasManualModuleVisibility } from '../../services/userProfileService';
 import { esPerfilUrbano } from '../../services/homeModuleSelector';
@@ -40,6 +42,11 @@ import NotificationsBell from '../NotificationsBell';
 //   · minimalista → "Un solo trazo" (line-art que se dibuja sobre papel).
 // Las escalas balcon/invernadero conservan sus escenas isométricas intactas.
 import SceneFincaOrganismo from './SceneFincaOrganismo';
+// PANEL DE VITALIDAD DEL ESPÍRITU — la lectura de vida del organismo (mockup
+// aprobado #/mockups/avatar-biopunk), groundeada con los registros REALES de
+// la finca (ver vitalidadEspirituService). Solo se monta con la escena
+// Finca Organismo (biopunk2), debajo de la escena.
+import PanelVitalidadEspiritu from './PanelVitalidadEspiritu';
 import SceneFincaNature from './SceneFincaNature';
 import SceneHuertoVivo from './SceneHuertoVivo';
 import SceneTrazoMinimal from './SceneTrazoMinimal';
@@ -367,6 +374,39 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
     } catch (_) { /* sin audio disponible: el botón no rompe el home */ }
   };
 
+  // ── PANEL DE VITALIDAD DEL ESPÍRITU (solo con la Finca Organismo) ─────────
+  // Cada valor sale de una fuente REAL (contrato en vitalidadEspirituService):
+  // vitalidad = scene.vitalidad (ciclos reales) · especies = procesos +
+  // plantas-asset · clima = snapshot guardado + condición de la atmósfera (la
+  // MISMA de la escena) · cosechas = useCosechaStore (log--harvest reales) ·
+  // suelo = diagnóstico DR-SUELOS-1 cuando exista (hoy no se persiste →
+  // "dato en camino", nunca un número inventado).
+  const plantAssets = useAssetStore((s) => s.plants);
+  const cosechaSummary = useCosechaStore((s) => s.summary);
+  useEffect(() => {
+    if (!organismoActivo || cosechaSummary) return;
+    // Carga offline-first de los log--harvest (IDB). Si falla, el contador
+    // queda honesto en "dato en camino" (el store guarda el error).
+    useCosechaStore.getState().loadHarvests().catch(() => {});
+    // Solo debe dispararse al activar la escena; el summary llega por el store.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [organismoActivo]);
+  const vitalidadEspiritu = useMemo(() => {
+    if (!organismoActivo) return null;
+    let snapshot = null;
+    try { snapshot = getCachedClimaSnapshot(); } catch (_) { /* sin señal guardada */ }
+    return buildVitalidadEspiritu({
+      scene,
+      processes,
+      plants: plantAssets,
+      climaSnapshot: snapshot,
+      condicion: atmosfera?.condicion || null,
+      harvestSummary: cosechaSummary,
+    });
+    // `atmosfera` también re-lee el snapshot cacheado (se refresca con el
+    // MISMO evento CLIMA_UPDATED_EVENT que alimenta el cielo de la escena).
+  }, [organismoActivo, scene, processes, plantAssets, cosechaSummary, atmosfera]);
+
   return (
     <section
       data-testid="finca-viva-hero"
@@ -610,6 +650,14 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                 <div className="fvh-institucional">{children}</div>
               )}
             </div>
+
+            {/* ── PANEL DE VITALIDAD DEL ESPÍRITU (mockup avatar-biopunk) ──
+                La lectura de vida del organismo, DEBAJO de la escena (no tapa
+                el potrero/la vaca ni el globo del colibrí). Datos 100% reales;
+                lo que falte se pinta "—" = dato en camino. */}
+            {vitalidadEspiritu && tieneFincaPropia && (
+              <PanelVitalidadEspiritu modelo={vitalidadEspiritu} />
+            )}
           </div>
 
           {/* ── COLUMNA derecha en desktop / debajo en móvil ────────────────── */}
