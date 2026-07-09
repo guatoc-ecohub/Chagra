@@ -371,7 +371,9 @@ function HiloSalud({ valor, color }) {
   );
 }
 
-export default function AvatarGameLibre() {
+/** @param {{ onBack?: () => void }} props */
+export default function AvatarGameLibre({ onBack }) {
+  const volver = onBack || (() => { window.location.hash = ''; });
   const [espirituId, setEspirituId] = useState('chivito');
   // Arranca en 2031 (medio paño): la primera impresión muestra la figura
   // tejiéndose, y de ahí se recorre hacia atrás o hacia el porvenir.
@@ -417,6 +419,7 @@ export default function AvatarGameLibre() {
       <div className="telar-marco">
         {/* ── Cabezal ── */}
         <header className="telar-cabezal">
+          <button type="button" className="telar-volver" onClick={volver} aria-label="Volver al inicio">←</button>
           <p className="telar-ceja">El telar de la finca · mockup</p>
           <h1 className="telar-titulo">Finca La Esperanza</h1>
           <p className="telar-sub">Choachí, Cundinamarca · 2.650 msnm</p>
