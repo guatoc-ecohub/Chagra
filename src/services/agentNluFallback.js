@@ -94,6 +94,27 @@ function _norm(text) {
 }
 
 /**
+ * ¿El mensaje es un SALUDO/smalltalk puro ("hola", "buenos días", "gracias")?
+ * Mismo criterio que la deflección (c) de planNluFallback: matchea GREETING_RE
+ * y es corto (≤4 palabras) — así "buenas, ¿cómo cuido el aguacate?" NO cuenta
+ * como saludo puro. Exportado para que AgentScreen no pinte el semáforo de
+ * confianza en turnos puramente conversacionales (bug A6 auditoría IA
+ * 2026-07-08: "hola chagra" salía con semáforo ROJO "Sin verificar" — marcar
+ * un saludo igual que un dato dudoso vacía de significado el semáforo).
+ *
+ * @param {*} userMessage
+ * @returns {boolean}
+ */
+export function esSaludoPuro(userMessage) {
+  if (typeof userMessage !== 'string' || userMessage.trim().length === 0) {
+    return false;
+  }
+  const norm = _norm(userMessage.trim());
+  const wordCount = norm.split(/\s+/).filter(Boolean).length;
+  return GREETING_RE.test(norm) && wordCount <= 4;
+}
+
+/**
  * ¿La entidad es una plaga? (kind del sidecar). Tolerante a sinónimos español.
  */
 function _isPest(e) {
@@ -158,9 +179,7 @@ export function planNluFallback(userMessage, resolvedEntities = null) {
   // El saludo PURO solo deflecta si ES el mensaje (≤4 palabras): un saludo que
   // prefija una pregunta real ("buenas, cómo cuido el aguacate") NO se deflecta.
   // Meta-ayuda y consejo general son auto-contenidos → deflectan sin importar largo.
-  const wordCount = norm.split(/\s+/).filter(Boolean).length;
-  const isPureGreeting = GREETING_RE.test(norm) && wordCount <= 4;
-  if (isPureGreeting || META_QUERY_RE.test(norm) || GENERIC_MANEJO_RE.test(norm)) {
+  if (esSaludoPuro(query) || META_QUERY_RE.test(norm) || GENERIC_MANEJO_RE.test(norm)) {
     return null;
   }
 
