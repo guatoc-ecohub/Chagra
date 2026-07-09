@@ -118,6 +118,8 @@ export const MUNDOS_FINCA = [
         // la ficha corta que vive en "Frutales de la finca". La tarjeta navega
         // directo, sin pantalla intermedia.
         directo: { view: 'mango' },
+    },
+    {
         id: 'citricos',
         titulo: 'Los cítricos',
         emoji: '🍊',
@@ -128,6 +130,8 @@ export const MUNDOS_FINCA = [
         // grounding térmico (cálido-templado, NO frío alto). La tarjeta navega
         // directo, sin pantalla intermedia.
         directo: { view: 'citricos' },
+    },
+    {
         id: 'botica',
         titulo: 'La botica campesina',
         emoji: '🌿',
