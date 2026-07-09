@@ -15,6 +15,14 @@ import { MSG } from '../../config/messages';
 // no estamos viendo el header.
 const FLOATING_BACK_THRESHOLD_PX = 160;
 
+// Bug visual Vi4 (auditoría IA 2026-07-08): el botón flotante TAPABA las
+// primeras palabras de cada línea mientras el operador LEÍA (peor en 320px).
+// El botón es un overlay — siempre va a cubrir algo — así que la corrección
+// es temporal, no espacial: visible mientras el operador scrollea (cuando lo
+// necesita para salir) y se esconde solo tras esta pausa sin scroll (cuando
+// está leyendo). Cualquier scroll nuevo lo trae de vuelta.
+const FLOATING_BACK_IDLE_HIDE_MS = 2200;
+
 /**
  * Área de historial de mensajes del chat con el agente. Renderiza burbujas de
  * chat, tarjetas de Deep Research, saludo proactivo dinámico y estados vacíos.
@@ -43,10 +51,28 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
   // inicio (header fuera de vista). Arriba del todo lo ocultamos porque el
   // header ya ofrece su propio "Volver" y no queremos duplicar affordance.
   const [showFloatingBack, setShowFloatingBack] = useState(false);
+  // (Vi4) Timer del auto-ocultado por inactividad de scroll. Ref, no state:
+  // solo lo toca el handler; no debe re-renderizar.
+  const floatingBackIdleTimerRef = useRef(null);
 
   const handleScroll = useCallback((e) => {
     const top = e?.target?.scrollTop ?? scrollRef.current?.scrollTop ?? 0;
-    setShowFloatingBack(top > FLOATING_BACK_THRESHOLD_PX);
+    const lejosDelInicio = top > FLOATING_BACK_THRESHOLD_PX;
+    setShowFloatingBack(lejosDelInicio);
+    // (Vi4) El botón se esconde solo cuando el scroll se queda quieto — así
+    // no tapa el texto mientras el operador lee. Cada evento de scroll
+    // reinicia la cuenta; al vencer, el botón se va hasta el próximo scroll.
+    if (floatingBackIdleTimerRef.current) clearTimeout(floatingBackIdleTimerRef.current);
+    if (lejosDelInicio) {
+      floatingBackIdleTimerRef.current = setTimeout(() => {
+        setShowFloatingBack(false);
+      }, FLOATING_BACK_IDLE_HIDE_MS);
+    }
+  }, []);
+
+  // (Vi4) Limpieza del timer al desmontar (evita setState sobre componente muerto).
+  useEffect(() => () => {
+    if (floatingBackIdleTimerRef.current) clearTimeout(floatingBackIdleTimerRef.current);
   }, []);
 
   // Fuente ÚNICA del auto-scroll del chat (tarea #58). El contenedor scrollable
