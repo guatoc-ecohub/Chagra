@@ -84,7 +84,7 @@ describe('routeUtterance', () => {
       });
     } else {
       expect(r).toMatchObject({ tipo: 'agente' });
-      if ('prompt' in esperado) {
+      if (r.tipo === 'agente' && 'prompt' in esperado) {
         expect(r.prompt).toBe(esperado.prompt);
       }
     }
