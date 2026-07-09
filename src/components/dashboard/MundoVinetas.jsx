@@ -89,6 +89,51 @@ function VinetaCafe() {
     );
 }
 
+/** 🥑 El aguacate — árbol cargado en la loma y un aguacate partido con su pepa. */
+function VinetaAguacate() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#e4efd0" />
+            {/* montaña fría-moderada al fondo (piso del Hass) */}
+            <path d="M-4 44 L40 18 L86 44 Z" fill="#a9c58f" opacity=".7" />
+            <path d="M60 46 L112 16 L168 46 Z" fill="#93b578" opacity=".75" />
+            {/* sol suave de montaña */}
+            <circle cx="150" cy="20" r="10" fill="#eef3c4" />
+            {/* laderas */}
+            <path d="M-4 46 Q60 34 120 46 T184 42 V90 H-4 Z" fill="#7a9e4a" />
+            <path d="M-4 62 Q70 50 184 60 V90 H-4 Z" fill="#5b7f2a" />
+            {/* árbol de aguacate cargado (copa redonda, tronco, frutos colgando) */}
+            <g transform="translate(58 24)">
+                <path d="M0 40 V18" stroke="#7a5230" strokeWidth="4" strokeLinecap="round" fill="none" />
+                <path d="M0 30 q-9 -2 -13 -8 M0 26 q9 -2 13 -9" stroke="#7a5230" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+                <circle cx="0" cy="6" r="17" fill="#2f6b3a" />
+                <circle cx="-9" cy="0" r="9" fill="#3f8f4e" />
+                <circle cx="9" cy="2" r="9" fill="#3f8f4e" />
+                <circle cx="0" cy="-6" r="8" fill="#4c8a44" />
+                {/* aguacates colgando (verde oscuro, forma de pera) */}
+                <g fill="#3a5a1f">
+                    <path d="M-8 12 q-3.4 0 -3.4 4 q0 4.6 3.4 5.6 q3.4 -1 3.4 -5.6 q0 -4 -3.4 -4 Z" />
+                    <path d="M7 10 q-3 0 -3 3.6 q0 4.2 3 5 q3 -0.8 3 -5 q0 -3.6 -3 -3.6 Z" />
+                    <path d="M0 16 q-2.6 0 -2.6 3.2 q0 3.6 2.6 4.4 q2.6 -0.8 2.6 -4.4 q0 -3.2 -2.6 -3.2 Z" />
+                </g>
+            </g>
+            {/* aguacate partido en primer plano: mitad con pepa grande */}
+            <g transform="translate(120 60)">
+                <ellipse cx="0" cy="16" rx="20" ry="5" fill="#3a5219" opacity=".45" />
+                {/* cáscara (forma de pera, verde-morado del Hass) */}
+                <path d="M0 -20 q-15 4 -15 20 q0 15 15 16 q15 -1 15 -16 q0 -16 -15 -20 Z" fill="#40662a" />
+                {/* pulpa */}
+                <path d="M0 -14 q-10 3 -10 14 q0 10 10 11 q10 -1 10 -11 q0 -11 -10 -14 Z" fill="#c7d96a" />
+                {/* aro más maduro junto a la pepa */}
+                <path d="M0 -9 q-6 2 -6 9 q0 6 6 6.6 q6 -0.6 6 -6.6 q0 -7 -6 -9 Z" fill="#e2d98f" />
+                {/* pepa grande */}
+                <ellipse cx="0" cy="1" rx="5.4" ry="6.4" fill="#8a5a2f" />
+                <ellipse cx="-1.4" cy="-1" rx="1.8" ry="2.4" fill="#a9702f" opacity=".8" />
+            </g>
+        </svg>
+    );
+}
+
 /** 🥮 La caña y la panela — cañaveral, trapiche y bloque de panela al sol. */
 function VinetaCana() {
     return (
@@ -130,6 +175,111 @@ function VinetaCana() {
         </svg>
     );
 }
+
+/** 🍊 Los cítricos — arbolito cargado de naranjas al sol de tierra caliente. */
+function VinetaCitricos() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#f7e6c8" />
+            {/* sol fuerte de tierra caliente */}
+            <circle cx="150" cy="20" r="11" fill="#ffd98a" />
+            <circle cx="150" cy="20" r="6.5" fill="#fff0c4" />
+            {/* loma del huerto cítrico */}
+            <path d="M-4 52 Q60 40 120 50 T184 46 V90 H-4 Z" fill="#8fae4e" />
+            <path d="M-4 66 Q70 54 184 62 V90 H-4 Z" fill="#6f9138" />
+            {/* hileras de arbolitos cítricos al fondo (copas redondas con fruta) */}
+            <g>
+                <g><circle cx="24" cy="52" r="7" fill="#3f7a3a" /><circle cx="22" cy="50" r="1.6" fill="#f6a11f" /><circle cx="27" cy="54" r="1.6" fill="#f6a11f" /></g>
+                <g><circle cx="128" cy="50" r="7" fill="#3f7a3a" /><circle cx="126" cy="48" r="1.6" fill="#f6a11f" /><circle cx="131" cy="52" r="1.6" fill="#f6a11f" /></g>
+                <g><circle cx="152" cy="53" r="6" fill="#4c8a44" /><circle cx="151" cy="51" r="1.5" fill="#f6a11f" /></g>
+            </g>
+            {/* árbol cítrico protagonista, cargado de naranjas */}
+            <g transform="translate(78 40)">
+                {/* tronco */}
+                <path d="M0 40 V22" stroke="#7a5230" strokeWidth="4.4" strokeLinecap="round" />
+                <path d="M0 30 q-8 -2 -12 -8 M0 26 q8 -2 12 -8" stroke="#7a5230" strokeWidth="2.8" strokeLinecap="round" fill="none" />
+                {/* copa densa */}
+                <circle cx="0" cy="6" r="22" fill="#2f6b3a" />
+                <circle cx="-13" cy="2" r="12" fill="#3f8f4e" />
+                <circle cx="13" cy="4" r="12" fill="#3f8f4e" />
+                <circle cx="0" cy="-8" r="12" fill="#4c8a44" />
+                {/* naranjas repartidas en la copa */}
+                <g>
+                    <circle cx="-12" cy="4" r="3.6" fill="#f6931f" /><circle cx="-13.5" cy="2.5" r="1" fill="#ffc65c" />
+                    <circle cx="2" cy="10" r="3.8" fill="#ef8317" /><circle cx="0.5" cy="8.5" r="1" fill="#ffc65c" />
+                    <circle cx="12" cy="6" r="3.6" fill="#f6931f" /><circle cx="10.5" cy="4.5" r="1" fill="#ffc65c" />
+                    <circle cx="-4" cy="-6" r="3.4" fill="#ef8317" /><circle cx="-5.2" cy="-7.2" r=".9" fill="#ffc65c" />
+                    <circle cx="8" cy="-4" r="3.2" fill="#f6931f" />
+                    <circle cx="-16" cy="-4" r="3" fill="#ef8317" />
+                </g>
+                {/* azahar (florecita blanca del cítrico) */}
+                <g fill="#fbfaf3">
+                    <circle cx="16" cy="-8" r="1.5" /><circle cx="-9" cy="-12" r="1.5" />
+                </g>
+            </g>
+        </svg>
+    );
+}
+
+/** 🌿 La botica campesina — repisa con frascos de hierbas, mortero y mata en flor. */
+function VinetaBotica() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#dcecd0" />
+            {/* pared cálida de la cocina/despensa */}
+            <path d="M0 0 H180 V58 H0 Z" fill="#e7efd8" />
+            {/* repisa de madera con los frascos de la botica */}
+            <rect x="86" y="30" width="94" height="6" rx="1.5" fill="#a0764a" />
+            <rect x="86" y="36" width="94" height="2.4" fill="#7a5230" opacity=".6" />
+            {/* frascos de hierbas secas sobre la repisa */}
+            <g>
+                {/* frasco 1 — flores anaranjadas (caléndula) */}
+                <rect x="96" y="14" width="14" height="16" rx="2.5" fill="#cfe2f0" opacity=".85" />
+                <rect x="98" y="10" width="10" height="5" rx="1.5" fill="#8a5a38" />
+                <g fill="#e8912f"><circle cx="100" cy="24" r="2.2" /><circle cx="105" cy="21" r="2.2" /><circle cx="104" cy="26" r="2" /></g>
+                {/* frasco 2 — hoja verde (toronjil/cidrón) */}
+                <rect x="118" y="12" width="14" height="18" rx="2.5" fill="#d6ecd0" opacity=".85" />
+                <rect x="120" y="8" width="10" height="5" rx="1.5" fill="#4c7a3d" />
+                <g stroke="#3f8f4e" strokeWidth="1.8" strokeLinecap="round" fill="none"><path d="M122 26 q2 -8 4 -11" /><path d="M127 26 q0 -7 2 -10" /></g>
+                {/* frasco 3 — flor blanca (saúco/manzanilla) */}
+                <rect x="140" y="15" width="14" height="15" rx="2.5" fill="#eef3ea" opacity=".85" />
+                <rect x="142" y="11" width="10" height="5" rx="1.5" fill="#8a5a38" />
+                <g fill="#f6f2e4"><circle cx="145" cy="24" r="2" /><circle cx="149" cy="22" r="2" /><circle cx="150" cy="26" r="1.8" /></g>
+                <circle cx="147.5" cy="23.5" r="1.2" fill="#e8c04a" />
+            </g>
+            {/* mortero y mano de moler (machacar la hierba) */}
+            <g transform="translate(120 44)">
+                <path d="M-12 0 Q0 16 12 0 Z" fill="#9a8a72" />
+                <path d="M-12 0 Q0 6 12 0" stroke="#6b5c48" strokeWidth="1.6" fill="none" />
+                <ellipse cx="0" cy="0" rx="12" ry="3.2" fill="#b7a992" />
+                <path d="M6 -2 L14 -14" stroke="#7a5230" strokeWidth="3.4" strokeLinecap="round" />
+            </g>
+            {/* mata medicinal en flor en primer plano (caléndula) a la izquierda */}
+            <path d="M-4 52 Q30 44 62 52 V90 H-4 Z" fill="#8fae5f" />
+            <g transform="translate(34 40)">
+                <path d="M0 34 V6" stroke="#3f7d3f" strokeWidth="3" strokeLinecap="round" fill="none" />
+                {/* hojas */}
+                <path d="M0 22 Q-12 20 -16 9 Q-4 9 0 18 Z" fill="#4c8a44" />
+                <path d="M0 16 Q12 14 16 3 Q4 3 0 12 Z" fill="#3f8f4e" />
+                {/* flor anaranjada radiada */}
+                <g transform="translate(0 4)">
+                    <g fill="#e8912f">
+                        <ellipse cx="0" cy="-9" rx="2" ry="4.5" />
+                        <ellipse cx="9" cy="0" rx="4.5" ry="2" />
+                        <ellipse cx="-9" cy="0" rx="4.5" ry="2" />
+                        <ellipse cx="0" cy="9" rx="2" ry="4.5" />
+                        <ellipse cx="6.4" cy="-6.4" rx="4" ry="2" transform="rotate(45 6.4 -6.4)" />
+                        <ellipse cx="-6.4" cy="-6.4" rx="4" ry="2" transform="rotate(-45 -6.4 -6.4)" />
+                        <ellipse cx="6.4" cy="6.4" rx="4" ry="2" transform="rotate(-45 6.4 6.4)" />
+                        <ellipse cx="-6.4" cy="6.4" rx="4" ry="2" transform="rotate(45 -6.4 6.4)" />
+                    </g>
+                    <circle cx="0" cy="0" r="4" fill="#a85b1f" />
+                </g>
+            </g>
+        </svg>
+    );
+}
+
 
 /** 🌱 El suelo vivo — corte de tierra en capas con raíces y lombriz. */
 function VinetaSuelo() {
@@ -391,11 +541,59 @@ function VinetaDisenio() {
     );
 }
 
+/** 🥭 El mango — árbol grande de tierra caliente, cargado de mangos, sol fuerte. */
+function VinetaMango() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#f7e6c9" />
+            {/* sol fuerte de tierra caliente */}
+            <circle cx="150" cy="20" r="12" fill="#ffcf6b" />
+            <circle cx="150" cy="20" r="7" fill="#ffe3a0" />
+            {/* loma cálida */}
+            <path d="M-4 54 Q60 44 120 52 T184 48 V90 H-4 Z" fill="#a9b95a" />
+            <path d="M-4 66 Q70 56 184 62 V90 H-4 Z" fill="#7f9a3e" />
+            {/* tronco del árbol de mango */}
+            <path d="M56 78 L56 46 M56 60 q-8 -3 -13 -10 M56 54 q9 -3 14 -11" stroke="#7a5230" strokeWidth="4.6" strokeLinecap="round" fill="none" />
+            {/* copa densa y redonda del mango (varios lóbulos de fronda) */}
+            <g fill="#2f6b3a">
+                <circle cx="40" cy="34" r="18" />
+                <circle cx="64" cy="28" r="20" />
+                <circle cx="82" cy="40" r="16" />
+                <circle cx="52" cy="46" r="16" />
+            </g>
+            <g fill="#3f8f4e" opacity=".9">
+                <circle cx="46" cy="30" r="10" />
+                <circle cx="70" cy="34" r="10" />
+                <circle cx="60" cy="24" r="8" />
+            </g>
+            {/* mangos colgando en la copa (amarillo-naranja con cachete rojizo) */}
+            <g>
+                <ellipse cx="38" cy="44" rx="4" ry="5.4" fill="#f0a52e" transform="rotate(12 38 44)" />
+                <ellipse cx="56" cy="48" rx="4" ry="5.4" fill="#ec9a26" transform="rotate(-8 56 48)" />
+                <ellipse cx="72" cy="46" rx="4" ry="5.4" fill="#f0a52e" transform="rotate(10 72 46)" />
+                <ellipse cx="48" cy="38" rx="3.6" ry="4.8" fill="#ef8f24" transform="rotate(-6 48 38)" />
+                <ellipse cx="66" cy="38" rx="3.6" ry="4.8" fill="#f2ab34" transform="rotate(8 66 38)" />
+            </g>
+            {/* cachete rojizo del mango protagonista en primer plano */}
+            <g transform="translate(126 60)">
+                <ellipse cx="0" cy="10" rx="16" ry="4" fill="#6b3f16" opacity=".4" />
+                <ellipse cx="0" cy="0" rx="12" ry="9" fill="#f0a52e" />
+                <path d="M-11 -2 Q-4 -10 8 -8 Q2 -2 -2 2 Z" fill="#e2582a" opacity=".85" />
+                <path d="M0 -9 q2 -4 -1 -6" stroke="#6b8a2f" strokeWidth="2" strokeLinecap="round" fill="none" />
+            </g>
+        </svg>
+    );
+}
+
 /** Viñeta por id de mundo (fuente única para tarjeta + pantalla de mundo). */
 const VINETAS = {
     cultivos: VinetaCultivos,
     cafe: VinetaCafe,
+    aguacate: VinetaAguacate,
     cana: VinetaCana,
+    mango: VinetaMango,
+    citricos: VinetaCitricos,
+    botica: VinetaBotica,
     suelo: VinetaSuelo,
     agua: VinetaAgua,
     abono: VinetaAbono,

@@ -54,6 +54,7 @@ export const MUNDOS_FINCA = [
             { view: 'platano', label: 'Plátano y banano', desc: 'El pancoger de la casa: variedades, siembra, la mata madre-hijo-nieto, sigatoka y picudo, y aprovechar el pseudotallo', emoji: '🍌' },
             { view: 'cacao', label: 'El cacao', desc: 'Cultivo bandera de la paz: clones, sombra, monilia y escoba, y el beneficio que hace el precio', emoji: '🍫' },
             { view: 'frutales', label: 'Frutales de la finca', desc: 'Cítricos, aguacate, mango, guayaba, mora, lulo, tomate de árbol y papaya: cómo se propagan e injertan, siembra y distancias, piso térmico, plagas sin veneno, poda y cosecha', emoji: '🍊' },
+            { view: 'uchuva', label: 'La uchuva', desc: 'La fruta andina de exportación, de tierra fría de altura: por qué pide frío, semilla y siembra, tutorado y poda, plagas sin veneno (pulgón, polilla, minador, Fusarium), el punto de cosecha por el color del capacho y la poscosecha de exportación', emoji: '🏮' },
             { view: 'hortalizas', label: 'Hortalizas de la huerta', desc: 'La comida diaria de la casa: siembra, agua, vecinas, plagas y cosecha de tomate, cebolla, zanahoria y más', emoji: '🥕' },
             { view: 'tuberculos', label: 'Tubérculos y raíces', desc: 'El pancoger de raíz: papa y criolla, yuca, arracacha, ñame, batata, oca, cubio y ulluco — siembra, aporque, plagas y curado', emoji: '🥔' },
             { view: 'quinua', label: 'Quinua y granos andinos', desc: 'Granos ancestrales del frío alto-andino: quinua, amaranto, cañihua, chía y tarwi; siembra, el desaponificado (lavar el amargo), mildiú sin veneno, cosecha y su valor nutricional (proteína completa, sin gluten)', emoji: '🌾' },
@@ -83,6 +84,19 @@ export const MUNDOS_FINCA = [
         directo: { view: 'cafe' },
     },
     {
+        id: 'aguacate',
+        titulo: 'El aguacate',
+        emoji: '🥑',
+        lema: 'El cultivo bandera de alto valor: piso térmico e injerto, drenaje contra la pudrición, flor tipo A/B y cosecha',
+        tinte: ['#5b7f2a', '#e4efd0'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones: variedad y
+        // siembra / suelo y agua / plagas / flor y polinización A/B / cosecha).
+        // Profundización dedicada del Hass y los criollos de montaña; el
+        // aguacate conserva su ficha rápida dentro del mundo Frutales (no la
+        // duplica). La tarjeta navega directo, sin pantalla intermedia.
+        directo: { view: 'aguacate' },
+    },
+    {
         id: 'cana',
         titulo: 'La caña y la panela',
         emoji: '🥮',
@@ -92,6 +106,46 @@ export const MUNDOS_FINCA = [
         // siembra y manejo / plagas / corte / la panela). Cultura panelera
         // colombiana. La tarjeta navega directo, sin pantalla intermedia.
         directo: { view: 'cana' },
+    },
+    {
+        id: 'mango',
+        titulo: 'El mango',
+        emoji: '🥭',
+        lema: 'El rey de la tierra cálida: variedad e injerto, piso térmico, floración, antracnosis y mosca, cosecha y despensa',
+        tinte: ['#c9791f', '#f7e6c9'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones del ciclo del
+        // mango). Profundización dedicada (como el café o la caña), más allá de
+        // la ficha corta que vive en "Frutales de la finca". La tarjeta navega
+        // directo, sin pantalla intermedia.
+        directo: { view: 'mango' },
+    },
+    {
+        id: 'citricos',
+        titulo: 'Los cítricos',
+        emoji: '🍊',
+        lema: 'Naranja, mandarina, limón y lima: variedad e injerto, piso térmico, plagas y HLB, y cosecha',
+        tinte: ['#c9791f', '#f7e6c8'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones del ciclo
+        // cítrico). Profundización dedicada del frutal cítrico que refuerza el
+        // grounding térmico (cálido-templado, NO frío alto). La tarjeta navega
+        // directo, sin pantalla intermedia.
+        directo: { view: 'citricos' },
+    },
+    {
+        id: 'botica',
+        titulo: 'La botica campesina',
+        emoji: '🌿',
+        lema: 'Las matas que curan de la casa: para qué se usan (uso tradicional) y cómo se cultivan',
+        tinte: ['#3f7d4e', '#dcecd0'],
+        // Mundo de una sola pantalla (photo-forward, 5 estaciones: barriga y
+        // nervios / piel y heridas / gripa y tónico / cultivar la botica / con
+        // cuidado). La huerta MEDICINAL de la finca andina (caléndula, manzanilla,
+        // toronjil, cidrón, saúco, ortiga, llantén, y la ruda como planta de
+        // respeto). Complementa —no duplica— la huerta de aromáticas de la cocina.
+        // Dominio de salud: todo enmarcado como USO TRADICIONAL (saber popular),
+        // nunca medicina/cura; cultivo groundeado en el catálogo Chagra. La
+        // tarjeta navega directo, sin pantalla intermedia.
+        directo: { view: 'botica' },
     },
     {
         id: 'suelo',

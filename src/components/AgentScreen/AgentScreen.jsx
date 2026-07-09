@@ -2306,6 +2306,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             grounding_semaphore: groundingDecisionMeta.semaphore,
             grounding_policy: groundingDecisionMeta.policy,
             grounding_reason: groundingDecisionMeta.reason,
+            // PANEL DE PROCEDENCIA (lever moat anti-alucinación visible):
+            // la procedencia POR-AFIRMACIÓN [{entity_id, confidence, source,
+            // validation_level}] que el sidecar ya computa viaja completa en
+            // la metadata del turno — el ChatBubble la pinta como semáforo de
+            // confianza + panel expandible (SemaforoConfianza.jsx) sin volver
+            // a pedir nada. Serializable (JSON plano) → persiste en historial.
+            grounding_provenance: Array.isArray(groundingDecisionMeta.provenance)
+              ? groundingDecisionMeta.provenance
+              : [],
           }
         : {};
       sourceMetadata = {
@@ -3600,7 +3609,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         messages={messages}
         streamingContent={streamingContent}
         isStreaming={state === STATE_THINKING}
-        thinkingLabel={MSG.agente.fases[thinkingPhase] || null}
+        thinkingPhase={thinkingPhase}
         onConsentNeeded={handleFeedbackConsentNeeded}
         onRetryOrphan={handleRetryOrphan}
         onCancelDeepResearch={handleCancelDeepResearch}
@@ -3722,16 +3731,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
 
         {/* Tip de primera vez (feat/onboarding-ayuda): cómo pedir diagnóstico
             con foto. Apunta al botón 📷 real del compositor de abajo;
-            descartable y no se repite (contextTips). */}
+            descartable y no se repite (contextTips). Variante 'subtle' = una
+            línea discreta, NO tarjeta (operador 2026-07-08: el aviso grande
+            gritaba encima del compositor). */}
         {state !== STATE_RECORDING && !agentAttachment && (
           <ContextTip
             id="foto-diagnostico"
+            variant="subtle"
             emoji="📷"
             title="¿Una mata enferma? Mándeme una foto"
-            className="mb-2"
+            className="mb-1.5"
           >
-            Toque la cámara aquí abajo y tome la foto cerquita de la hoja, con
-            buena luz de día. Yo le digo qué veo.
+            ¿Una mata enferma? Toque la cámara aquí abajo y mándeme la foto.
           </ContextTip>
         )}
 

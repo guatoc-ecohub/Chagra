@@ -276,6 +276,27 @@ function FichaFrutal({ frutal, onNavigate }) {
         </span>
       </p>
 
+      {/* Profundización dedicada: el aguacate tiene su propio mundo (cultivo
+          bandera de alto valor). Solo aparece en la ficha del aguacate — no
+          duplica, lleva al detalle (injerto/patrón, drenaje, flor A/B). */}
+      {frutal.id === 'aguacate' && typeof onNavigate === 'function' && (
+        <button
+          type="button"
+          data-testid="frutales-ir-aguacate"
+          onClick={() => onNavigate('aguacate')}
+          className="w-full flex items-center gap-3 rounded-2xl border border-lime-700/50 bg-lime-900/20 p-3.5 text-left active:bg-lime-900/40 transition-colors"
+        >
+          <span aria-hidden="true" className="shrink-0 w-10 h-10 rounded-xl bg-lime-500/20 grid place-items-center text-xl">
+            🥑
+          </span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-sm font-bold text-slate-100 leading-tight">El aguacate, a fondo</span>
+            <span className="block text-xs text-slate-400 leading-tight mt-0.5">Su mundo dedicado: piso térmico e injerto, drenaje contra la pudrición, floración tipo A/B y el punto de cosecha.</span>
+          </span>
+          <ChevronRight size={18} className="shrink-0 text-slate-500" aria-hidden="true" />
+        </button>
+      )}
+
       {/* Puentes a los mundos hermanos de sanidad */}
       {typeof onNavigate === 'function' && (
         <div className="grid grid-cols-1 gap-2">

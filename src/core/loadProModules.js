@@ -14,11 +14,31 @@
  * Módulos Pro esperados (actualizar cuando se agreguen al catálogo
  * privado):
  *   - gremios-receta-pro (capability: enriched-guild-suggestions)
+ *   - avatar-espiritu-pro (capability: avatar-espiritu)
  *   - export-ecocert-pro (capability: export-ecocert)  [v0.9.0+]
  *   - plan-nutricion-pro (capability: auto-plan-nutricion) [v0.9.1+]
+ *
+ * REACT COMPARTIDO: algunos módulos Pro traen componentes React
+ * pre-construidos (ESM de navegador). Para que usen la MISMA instancia de
+ * React que el público (si no, los hooks rompen con "Invalid hook call"),
+ * este loader publica `globalThis.__CHAGRA_VENDOR__ = { React, jsxRuntime }`
+ * ANTES de importar cualquier módulo Pro. El bundle Pro resuelve `react` /
+ * `react/jsx-runtime` contra ese global (ver chagra-pro/.../build.mjs).
  */
 
+import React from 'react';
+import * as JsxRuntime from 'react/jsx-runtime';
 import { registry } from './moduleRegistry';
+
+// Expone el React del host para los módulos Pro que traen componentes
+// pre-construidos. Idempotente; solo se llama cuando hay módulos Pro que
+// cargar (no toca el global en un build puro OSS).
+function ensureVendorGlobals() {
+  if (typeof globalThis === 'undefined') return;
+  if (!globalThis.__CHAGRA_VENDOR__) {
+    globalThis.__CHAGRA_VENDOR__ = { React, jsxRuntime: JsxRuntime };
+  }
+}
 
 // Vite resuelve import.meta.glob en build-time. El path con variable
 // de entorno no se resuelve estáticamente, así que el bundle público no
@@ -28,7 +48,7 @@ const PRO_MODULES_ENV = (import.meta.env && import.meta.env.VITE_PRO_MODULES_PAT
 
 // Lista explícita de módulos Pro que conocemos. Añadir aquí cuando
 // el equipo Pro confirme el id y capability del nuevo módulo.
-const KNOWN_PRO_MODULES = ['gremios-receta-pro', 'voice-entity-extractor-pro'];
+const KNOWN_PRO_MODULES = ['gremios-receta-pro', 'voice-entity-extractor-pro', 'avatar-espiritu-pro'];
 
 export async function loadProModules() {
   if (!PRO_MODULES_ENV) {
@@ -37,6 +57,9 @@ export async function loadProModules() {
     }
     return { loaded: [], skipped: KNOWN_PRO_MODULES };
   }
+
+  // Publica el React del host antes de importar módulos Pro (React compartido).
+  ensureVendorGlobals();
 
   const loaded = [];
   const skipped = [];

@@ -95,7 +95,7 @@ export default function VoiceStatusStrip({
   const showRepeat = phase === 'idle' && canRepeat && typeof onRepeat === 'function';
   const showNotice = typeof notice === 'string' && notice.length > 0;
 
-  if (!isListening && !isThinking && !isSpeaking && !showRepeat && !showNotice) {
+  if (!isListening && !isSpeaking && !showRepeat && !showNotice) {
     return null;
   }
 
@@ -104,7 +104,7 @@ export default function VoiceStatusStrip({
       <style>{STRIP_CSS}</style>
 
       {/* Estado activo: ícono + animación + frase corta, grande y legible */}
-      {(isListening || isThinking || isSpeaking) && (
+      {(isListening || isSpeaking) && (
         <div
           className={`flex items-center gap-3 rounded-2xl px-4 py-3 border ${
             isListening

@@ -1,0 +1,46 @@
+/*
+ * aguacate.css — micro-animaciones del mundo "El aguacate".
+ *
+ * Mismos principios que cafe.css / agua.css:
+ *   · Sutiles y baratas (solo transform/opacity, nada de layout).
+ *   · prefers-reduced-motion las apaga todas.
+ *   · Los colores salen de las clases Tailwind del componente (paleta slate +
+ *     acentos lima/verde/violeta), que reaccionan a los temas vía data-theme;
+ *     aquí solo hay movimiento, ningún color de tema fijado.
+ */
+
+/* Entrada suave del contenido de la estación al cambiar de pestaña. */
+@keyframes aguacate-seccion-entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.aguacate-seccion {
+  animation: aguacate-seccion-entra 0.3s ease-out;
+}
+
+/* Estación activa: aro que pulsa una sola vez al seleccionar. */
+@keyframes aguacate-estacion-pulso {
+  0% { transform: scale(0.94); opacity: 0.5; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.aguacate-estacion-activa {
+  animation: aguacate-estacion-pulso 0.45s ease-out;
+}
+
+/* Fotos reales: aparición suave (solo opacity, sin reflow) al montarse. */
+@keyframes aguacate-foto-entra {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.aguacate-foto {
+  animation: aguacate-foto-entra 0.5s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aguacate-seccion,
+  .aguacate-estacion-activa,
+  .aguacate-foto {
+    animation: none;
+  }
+}

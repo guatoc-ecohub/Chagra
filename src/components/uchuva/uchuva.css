@@ -1,0 +1,180 @@
+/*
+ * uchuva.css — micro-animaciones del mundo "La uchuva" (patrón de cafe.css).
+ *
+ * Mismos principios que agua.css / cafe.css:
+ *   · Sutiles y baratas (SOLO transform/opacity — nada de layout, filter ni
+ *     blur animado; GPU-friendly).
+ *   · prefers-reduced-motion las apaga TODAS.
+ *   · Los colores salen de las clases Tailwind del componente (paleta slate +
+ *     acentos índigo-frío/ámbar-capacho), que reaccionan a los temas vía
+ *     data-theme; aquí solo hay movimiento y acentos rgb() puntuales.
+ */
+
+/* ── Entrada escalonada del contenido al cambiar de estación ───────────── */
+@keyframes uchuva-entra {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.uchuva-seccion > * {
+  animation: uchuva-entra 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.uchuva-seccion > *:nth-child(2) { animation-delay: 60ms; }
+.uchuva-seccion > *:nth-child(3) { animation-delay: 120ms; }
+.uchuva-seccion > *:nth-child(4) { animation-delay: 180ms; }
+.uchuva-seccion > *:nth-child(5) { animation-delay: 240ms; }
+.uchuva-seccion > *:nth-child(n+6) { animation-delay: 300ms; }
+
+/* ── Estación activa: aro que pulsa una sola vez al seleccionar ────────── */
+@keyframes uchuva-estacion-pulso {
+  0% { transform: scale(0.94); opacity: 0.5; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.uchuva-estacion-activa {
+  animation: uchuva-estacion-pulso 0.45s ease-out;
+}
+
+/* Pestañas de estación: respuesta táctil y de puntero con vida. */
+.uchuva-tab {
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+@media (hover: hover) {
+  .uchuva-tab:hover { transform: translateY(-2px); }
+}
+.uchuva-tab:active { transform: scale(0.97); }
+
+/* Indicador de la estación activa: se despliega desde el centro. */
+@keyframes uchuva-indicador-entra {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.uchuva-tab-indicador {
+  transform-origin: center;
+  animation: uchuva-indicador-entra 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Fotos reales ───────────────────────────────────────────────────────
+ * Aparición suave (solo opacity); los heros además "asientan" con un Ken
+ * Burns de una sola pasada (scale 1.06 → 1). */
+@keyframes uchuva-foto-entra {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.uchuva-foto {
+  animation: uchuva-foto-entra 0.5s ease-out;
+}
+@keyframes uchuva-kenburns {
+  from { transform: scale(1.06); }
+  to { transform: scale(1); }
+}
+.uchuva-foto--kenburns {
+  animation:
+    uchuva-foto-entra 0.6s ease-out both,
+    uchuva-kenburns 8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Texto del hero de portada: entra por líneas, escalonado. */
+.uchuva-hero-linea { animation: uchuva-entra 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.uchuva-hero-linea--2 { animation-delay: 0.14s; }
+.uchuva-hero-linea--3 { animation-delay: 0.28s; }
+
+/* ── El capacho (firma del mundo) ───────────────────────────────────────
+ * La farolita SVG se mece despacio, como colgando de la rama, y su baya
+ * interior late apenas. Solo transform/opacity. */
+@keyframes uchuva-capacho-mece {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+.uchuva-capacho-glyph {
+  transform-origin: 50% 12%;
+  animation: uchuva-capacho-mece 4.5s ease-in-out infinite;
+}
+@keyframes uchuva-capacho-late {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.55; }
+}
+.uchuva-capacho-baya { animation: uchuva-capacho-late 3.2s ease-in-out infinite; }
+
+/* ── Escala de color del capacho (verde → pajizo → naranja) ─────────────
+ * El punto de cosecha se LEE como degradado. Decorativa. */
+.uchuva-escala-color {
+  background: linear-gradient(
+    to right,
+    rgb(74 152 74) 0%,
+    rgb(163 190 90) 30%,
+    rgb(230 200 90) 55%,
+    rgb(240 160 50) 80%,
+    rgb(230 120 30) 100%
+  );
+}
+
+/* ── Tarjetas vivas ─────────────────────────────────────────────────────
+ * Lift sutil + acento ámbar al pasar el puntero; en táctil no hay hover
+ * pegajoso (media hover:hover). */
+.uchuva-card {
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+@media (hover: hover) {
+  .uchuva-card:hover {
+    transform: translateY(-2px);
+    border-color: rgb(251 191 36 / 0.4);
+  }
+}
+
+/* CTAs (puentes a otros mundos): la flecha "invita" al pasar el puntero. */
+.uchuva-cta {
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.uchuva-cta-flecha { transition: transform 0.2s ease; }
+@media (hover: hover) {
+  .uchuva-cta:hover { border-color: rgb(251 191 36 / 0.45); }
+  .uchuva-cta:hover .uchuva-cta-flecha { transform: translateX(3px); }
+}
+
+/* ── Timeline de pasos ordenados (siembra) ──────────────────────────────
+ * Hilo que conecta los círculos numerados: la secuencia se LEE como camino. */
+.uchuva-paso { position: relative; }
+.uchuva-paso:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 28px;
+  bottom: -10px;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, rgb(251 191 36 / 0.4), rgb(251 191 36 / 0.05));
+}
+.uchuva-paso--verde:not(:last-child)::before {
+  background: linear-gradient(to bottom, rgb(52 211 153 / 0.4), rgb(52 211 153 / 0.05));
+}
+
+/* ── Accesibilidad: foco visible en todo el mundo uchuva ────────────────── */
+.uchuva-mundo :is(button, a):focus-visible {
+  outline: 2px solid rgb(251 191 36 / 0.85);
+  outline-offset: 2px;
+}
+
+/* ── prefers-reduced-motion: TODO quieto ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .uchuva-seccion > *,
+  .uchuva-estacion-activa,
+  .uchuva-tab-indicador,
+  .uchuva-foto,
+  .uchuva-foto--kenburns,
+  .uchuva-hero-linea,
+  .uchuva-capacho-glyph,
+  .uchuva-capacho-baya {
+    animation: none;
+  }
+  .uchuva-tab,
+  .uchuva-card,
+  .uchuva-cta,
+  .uchuva-cta-flecha {
+    transition: none;
+  }
+  @media (hover: hover) {
+    .uchuva-tab:hover,
+    .uchuva-card:hover { transform: none; }
+    .uchuva-cta:hover .uchuva-cta-flecha { transform: none; }
+  }
+}

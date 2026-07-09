@@ -72,6 +72,21 @@ describe('ContextTip', () => {
     expect(onMore).toHaveBeenCalled();
   });
 
+  it('variant="subtle" es una línea discreta: sin tarjeta ni botón Entendido, "x" descarta y marca visto', () => {
+    render(
+      <ContextTip id="foto-diagnostico" variant="subtle" emoji="📷" title="¿Una mata enferma? Mándeme una foto">
+        ¿Una mata enferma? Toque la cámara aquí abajo y mándeme la foto.
+      </ContextTip>,
+    );
+    const tip = screen.getByTestId('context-tip-foto-diagnostico');
+    expect(tip.className).not.toMatch(/bg-emerald-950/); // sin fondo de tarjeta
+    expect(screen.queryByRole('button', { name: /^entendido$/i })).toBeNull();
+    expect(screen.getByRole('note')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /entendido, ocultar/i }));
+    expect(screen.queryByTestId('context-tip-foto-diagnostico')).toBeNull();
+    expect(hasSeenTip('foto-diagnostico')).toBe(true);
+  });
+
   it('es no intrusivo: role=note, no dialog modal', () => {
     render(
       <ContextTip id="tip-a11y" emoji="💡" title="Tip">
