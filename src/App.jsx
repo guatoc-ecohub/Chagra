@@ -326,6 +326,10 @@ const MundoSubsuelo = lazy(() => import('./components/juego/MundoSubsuelo'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
+// Entrada Pro GATED por capability `avatar-espiritu` (módulo del repo privado
+// chagra-pro). La pantalla pública NO contiene código visual: solo consulta el
+// registry y monta el módulo Pro si está presente; si no, fallback discreto.
+const EspirituProScreen = lazy(() => import('./components/EspirituProScreen'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 import { fincaVivaHomePerfilActivo } from './config/fincaVivaHomeFlag';
 import { esExtensionistaActual } from './config/extensionistaAccess';
@@ -597,6 +601,9 @@ const HASH_VIEW_ROUTES = {
   cosechar: 'cosechar',
   'mi-cosecha': 'mi_cosecha',
   micosecha: 'mi_cosecha',
+  // Entrada Pro (capability avatar-espiritu). Gated: sin módulo Pro cargado
+  // la pantalla degrada a fallback discreto.
+  espiritu: 'espiritu_pro',
 };
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
@@ -1304,6 +1311,12 @@ export default function App() {
                 <MundoSubsuelo />
               </ScreenShell>
             </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'espiritu_pro':
+        return (
+          <ErrorBoundary>
+            <EspirituProScreen onBack={() => navigate('dashboard')} />
           </ErrorBoundary>
         );
       case 'sembrar':
