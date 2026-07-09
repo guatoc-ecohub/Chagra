@@ -44,6 +44,81 @@ import { PISO_TERMICO_INFO } from '../services/locationService';
  *                          entrar al home ya poblado (demo público). Si no se
  *                          pasa, el botón no se muestra.
  */
+/**
+ * Ancla VISUAL por pregunta (refinamiento tarea #16, baja alfabetización):
+ * cada pregunta abre con un emoji grande + una "miga" de categoría en palabras
+ * llanas. La usuaria sabe DE QUÉ le están preguntando antes de leer una letra.
+ * Solo presentación: no toca PROFILE_QUESTIONS ni lo que se guarda.
+ */
+const CATEGORY_META = {
+  identidad: { label: 'Sobre usted', emoji: '👋' },
+  finca: { label: 'Su tierra', emoji: '🏡' },
+  experiencia: { label: 'Su experiencia', emoji: '🌱' },
+  objetivos: { label: 'Sus metas', emoji: '🎯' },
+  preferencias: { label: 'A su gusto', emoji: '💬' },
+};
+
+const QUESTION_EMOJI = {
+  nombre: '👋',
+  region: '🗺️',
+  vocacion: '🧑‍🌾',
+  rol: '🌾',
+  finca_tipo: '🏡',
+  finca_hectareas: '📏',
+  finca_altitud: '🏔️',
+  invernadero_tiene: '🏠',
+  invernadero_forma: '📐',
+  invernadero_tamano: '📏',
+  composicion: '🌽',
+  cultivos_actuales: '🌱',
+  animales: '🐄',
+  gallinas_manejo: '🐔',
+  restauracion_objetivo: '🌳',
+  anios_cultivando: '🗓️',
+  manejo: '🍃',
+  problemas: '🐛',
+  objetivo: '🎯',
+  cultivos_interes: '✨',
+  nivel_respuestas: '💬',
+  notif_clima: '🌦️',
+  estrato: '🏙️',
+  espacio_urbano: '🪟',
+  riego: '💧',
+};
+
+/**
+ * Emoji por OPCIÓN para las preguntas cuyos labels no lo traen ya (varias del
+ * catálogo sí: rol, composición, animales...). Ícono legible junto a cada
+ * botón = escoger sin leer. Solo presentación.
+ */
+const OPTION_EMOJI = {
+  vocacion: { campesino: '🧑‍🌾', urbano: '🏙️', tecnico: '🔬', curioso: '🌱' },
+  finca_tipo: { rural: '⛰️', balcon: '🪟', terraza: '🏠', invernadero: '🏕️' },
+  finca_hectareas: { menos_1: '🌱', '1_5': '🌿', '5_20': '🌳', mas_20: '🌲' },
+  gallinas_manejo: { libres: '🌾', galpon: '🏠', corral: '🚧', mixto: '🔄' },
+  anios_cultivando: { apenas: '🌱', menos_5: '🌿', '5_15': '🌳', toda_vida: '🌲' },
+  manejo: { organico: '🍃', convencional: '🧪', mixto: '⚖️', transicion: '🔄' },
+  problemas: { plagas: '🐛', enfermedades: '🍂', clima: '🌦️', suelo: '🪨', malezas: '🌿', mercado: '🧺' },
+  objetivo: { producir_mas: '🧺', reducir_quimicos: '🍃', aprender: '📖', registrar: '📝', biodiversidad: '🦋', vender: '🤝' },
+  nivel_respuestas: { simple: '💬', detallado: '📖', maestro: '🎓' },
+  notif_clima: { si: '🔔', no: '🔕' },
+  estrato: { '1_2': '🏘️', '3_4': '🏙️', '5_6': '🌆' },
+  espacio_urbano: { materas: '🪴', balcon_lleno: '🪟', terraza_grande: '🏠' },
+  riego: { lluvia: '🌧️', manguera: '🚿', goteo: '💧', acequia: '⛲' },
+};
+
+/**
+ * Ejemplos TOCABLES para las preguntas de texto ("mucho ejemplo, poco
+ * texto"): un toque llena el campo — la usuaria no tiene que redactar. En las
+ * preguntas de lista (cultivos) los toques se van sumando con coma.
+ */
+const EXAMPLE_CHIPS = {
+  region: { values: ['Choachí', 'Fómeque', 'Cauca', 'Boyacá'], append: false },
+  cultivos_actuales: { values: ['Café', 'Plátano', 'Tomate', 'Mora', 'Maíz'], append: true },
+  cultivos_interes: { values: ['Aguacate', 'Cacao', 'Uchuva', 'Hortalizas'], append: true },
+  invernadero_tamano: { values: ['6 x 10 metros', 'Uno pequeño', 'Media hectárea'], append: false },
+};
+
 export default function OnboardingProfile({ onComplete, onClose = undefined, onExplorarEjemplo = undefined }) {
   const [answers, setAnswers] = useState(() => getProfile());
   const [index, setIndex] = useState(0);
@@ -129,6 +204,9 @@ export default function OnboardingProfile({ onComplete, onClose = undefined, onE
             </h1>
             <p className="text-xs text-slate-400">
               Pregunta {Math.min(index + 1, total)} de {total}
+              {progress >= 75 && (
+                <span className="text-amber-300 font-medium"> · ¡Ya casi termina!</span>
+              )}
             </p>
           </div>
           <button
@@ -140,16 +218,17 @@ export default function OnboardingProfile({ onComplete, onClose = undefined, onE
           </button>
         </div>
 
-        {/* Progress bar */}
+        {/* Progress bar — más gruesa y con gradiente cálido: el avance se VE
+            sin leer el contador (baja alfabetización). */}
         <div
-          className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden"
+          className="h-2 w-full rounded-full bg-slate-800 overflow-hidden"
           role="progressbar"
           aria-valuenow={progress}
           aria-valuemin={0}
           aria-valuemax={100}
         >
           <div
-            className="h-full bg-emerald-500 transition-all duration-300"
+            className="h-full rounded-full bg-gradient-to-r from-emerald-600 via-emerald-500 to-lime-400 transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -191,7 +270,7 @@ export default function OnboardingProfile({ onComplete, onClose = undefined, onE
           <button
             type="button"
             onClick={goBack}
-            className="inline-flex items-center gap-1 px-3 py-2.5 rounded-xl text-slate-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-1 px-3 py-3 min-h-[48px] rounded-xl text-slate-400 hover:text-white transition-colors"
           >
             <ChevronLeft size={18} /> Atrás
           </button>
@@ -199,7 +278,7 @@ export default function OnboardingProfile({ onComplete, onClose = undefined, onE
           <button
             type="button"
             onClick={skipQuestion}
-            className="text-xs text-slate-500 hover:text-slate-300 underline underline-offset-2"
+            className="px-2 py-3 min-h-[48px] text-xs text-slate-500 hover:text-slate-300 underline underline-offset-2"
           >
             Saltar pregunta
           </button>
@@ -209,15 +288,15 @@ export default function OnboardingProfile({ onComplete, onClose = undefined, onE
           <button
             type="button"
             onClick={goNext}
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 px-6 py-3 min-h-[48px] rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-base font-bold shadow-lg shadow-emerald-900/40 transition-all"
           >
             {index >= total - 1 ? (
               <>
-                <Check size={18} /> Terminar
+                <Check size={19} /> Terminar
               </>
             ) : (
               <>
-                Siguiente <ChevronRight size={18} />
+                Siguiente <ChevronRight size={19} />
               </>
             )}
           </button>
@@ -279,22 +358,70 @@ function PisoTermicoQuickPick({ selected, onPick }) {
  */
 function QuestionView({ question, value, onChange, onChangeOther, extraAnswers, onAdvanceSingle }) {
   const { type, title, help, options, placeholder, unit } = question;
+  const catMeta = CATEGORY_META[question.category] || CATEGORY_META.identidad;
+  const emoji = QUESTION_EMOJI[question.id] || catMeta.emoji;
+  const optionEmoji = OPTION_EMOJI[question.id] || {};
+  const chips = EXAMPLE_CHIPS[question.id];
+
+  // Un toque en un ejemplo llena el campo. En preguntas de lista (cultivos)
+  // los toques se suman con coma; repetir el toque no duplica.
+  const pickExample = (ejemplo) => {
+    if (!chips?.append || !value) {
+      onChange(ejemplo);
+      return;
+    }
+    const partes = String(value).split(',').map((s) => s.trim()).filter(Boolean);
+    if (partes.some((p) => p.toLowerCase() === ejemplo.toLowerCase())) return;
+    onChange([...partes, ejemplo].join(', '));
+  };
 
   return (
-    <div className="py-4">
-      <h2 className="text-xl font-bold text-white leading-snug">{title}</h2>
-      {help && <p className="text-sm text-slate-400 mt-1.5 leading-relaxed">{help}</p>}
+    <div className="py-4 anim-brota">
+      {/* Ancla visual: emoji grande + miga de categoría. La usuaria ubica el
+          tema de la pregunta de un vistazo, antes de leer. */}
+      <div className="flex items-center gap-3.5">
+        <div
+          className="w-16 h-16 shrink-0 rounded-2xl bg-emerald-900/30 border border-emerald-700/40 flex items-center justify-center text-4xl leading-none"
+          aria-hidden="true"
+        >
+          {emoji}
+        </div>
+        <div className="min-w-0">
+          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-400/90">
+            {catMeta.label}
+          </p>
+          <h2 className="text-xl font-bold text-white leading-snug mt-0.5">{title}</h2>
+        </div>
+      </div>
+      {help && <p className="text-sm text-slate-400 mt-2.5 leading-relaxed">{help}</p>}
 
       <div className="mt-5 space-y-2.5">
         {type === 'text' && (
-          <input
-            type="text"
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={placeholder}
-            autoFocus
-            className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/60"
-          />
+          <>
+            <input
+              type="text"
+              value={value || ''}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={placeholder}
+              autoFocus
+              className="w-full px-4 py-3.5 text-base rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/60"
+            />
+            {chips && (
+              <div className="flex flex-wrap items-center gap-2 pt-1 anim-brota" style={{ '--i': 1 }}>
+                <span className="text-xs text-slate-500">Toque un ejemplo:</span>
+                {chips.values.map((ej) => (
+                  <button
+                    key={ej}
+                    type="button"
+                    onClick={() => pickExample(ej)}
+                    className="px-3 py-1.5 rounded-full text-sm bg-slate-900 border border-slate-700 text-slate-300 hover:border-emerald-600 hover:text-emerald-200 active:scale-95 transition-all"
+                  >
+                    {ej}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {type === 'number' && (
@@ -306,7 +433,7 @@ function QuestionView({ question, value, onChange, onChangeOther, extraAnswers, 
               onChange={(e) => onChange(e.target.value)}
               placeholder={placeholder}
               autoFocus
-              className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/60"
+              className="w-full px-4 py-3.5 text-base rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/60"
             />
             {unit && (
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-500 pointer-events-none">
@@ -325,8 +452,9 @@ function QuestionView({ question, value, onChange, onChangeOther, extraAnswers, 
         )}
 
         {type === 'single' &&
-          options.map((opt) => {
+          options.map((opt, i) => {
             const selected = value === opt.value;
+            const optEmoji = optionEmoji[opt.value];
             return (
               <button
                 key={opt.value}
@@ -338,22 +466,29 @@ function QuestionView({ question, value, onChange, onChangeOther, extraAnswers, 
                   // volver atrás.
                   if (onAdvanceSingle) setTimeout(onAdvanceSingle, 180);
                 }}
-                className={`w-full text-left px-4 py-3 rounded-xl border transition-colors flex items-center justify-between gap-2 ${
+                className={`anim-brota w-full text-left px-4 py-3.5 min-h-[52px] rounded-xl border transition-all active:scale-[0.99] flex items-center justify-between gap-2 ${
                   selected
-                    ? 'bg-emerald-900/30 border-emerald-600 text-white'
-                    : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-slate-600'
+                    ? 'bg-emerald-900/40 border-emerald-500 ring-1 ring-emerald-500/40 text-white'
+                    : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-slate-500'
                 }`}
+                style={{ '--i': i + 1 }}
               >
-                <span>{opt.label}</span>
+                <span className="flex items-center gap-2.5 text-[15px]">
+                  {optEmoji && (
+                    <span className="text-xl leading-none shrink-0" aria-hidden="true">{optEmoji}</span>
+                  )}
+                  <span>{opt.label}</span>
+                </span>
                 {selected && <Check size={18} className="text-emerald-400 shrink-0" />}
               </button>
             );
           })}
 
         {type === 'multi' &&
-          options.map((opt) => {
+          options.map((opt, i) => {
             const arr = Array.isArray(value) ? value : [];
             const selected = arr.includes(opt.value);
+            const optEmoji = optionEmoji[opt.value];
             return (
               <button
                 key={opt.value}
@@ -364,19 +499,25 @@ function QuestionView({ question, value, onChange, onChangeOther, extraAnswers, 
                     : [...arr, opt.value];
                   onChange(next);
                 }}
-                className={`w-full text-left px-4 py-3 rounded-xl border transition-colors flex items-center justify-between gap-2 ${
+                className={`anim-brota w-full text-left px-4 py-3.5 min-h-[52px] rounded-xl border transition-all active:scale-[0.99] flex items-center justify-between gap-2 ${
                   selected
-                    ? 'bg-emerald-900/30 border-emerald-600 text-white'
-                    : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-slate-600'
+                    ? 'bg-emerald-900/40 border-emerald-500 ring-1 ring-emerald-500/40 text-white'
+                    : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-slate-500'
                 }`}
+                style={{ '--i': i + 1 }}
               >
-                <span>{opt.label}</span>
+                <span className="flex items-center gap-2.5 text-[15px]">
+                  {optEmoji && (
+                    <span className="text-xl leading-none shrink-0" aria-hidden="true">{optEmoji}</span>
+                  )}
+                  <span>{opt.label}</span>
+                </span>
                 <span
-                  className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
+                  className={`w-6 h-6 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
                     selected ? 'bg-emerald-600 border-emerald-600' : 'border-slate-600'
                   }`}
                 >
-                  {selected && <Check size={14} className="text-white" />}
+                  {selected && <Check size={15} className="text-white" />}
                 </span>
               </button>
             );
