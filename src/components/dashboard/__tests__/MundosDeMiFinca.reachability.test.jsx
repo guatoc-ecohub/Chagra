@@ -140,7 +140,10 @@ describe('MundoScreen — el mundo por dentro re-rutea a las vistas reales', () 
     expect(botones.length).toBe(MUNDOS_FINCA.length);
     fireEvent.click(within(indice).getByRole('button', { name: /El suelo vivo/ }));
     expect(onNavigate).toHaveBeenCalledWith('mundo', { mundo: 'suelo' });
-    fireEvent.click(within(indice).getByRole('button', { name: /^El agua/ }));
+    // Nota: el título del mundo agua es "El agua"; existe además el mundo
+    // "El aguacate", que comparte prefijo. Selecciono por el título exacto
+    // (getByText exacto no confunde "El agua" con "El aguacate").
+    fireEvent.click(within(indice).getByText('El agua').closest('button'));
     expect(onNavigate).toHaveBeenCalledWith('agua', undefined);
   });
 });

@@ -1,0 +1,46 @@
+/*
+ * citricos.css — micro-animaciones del mundo "Los cítricos".
+ *
+ * Mismos principios que cafe.css / frutales.css:
+ *   · Sutiles y baratas (solo transform/opacity, nada de layout).
+ *   · prefers-reduced-motion las apaga todas.
+ *   · Los colores salen de las clases Tailwind del componente (paleta slate +
+ *     acentos ámbar/naranja), que reaccionan a los temas vía data-theme; aquí
+ *     solo hay movimiento, ningún color de tema fijado.
+ */
+
+/* Entrada suave del contenido de la estación al cambiar de pestaña. */
+@keyframes citricos-seccion-entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.citricos-seccion {
+  animation: citricos-seccion-entra 0.3s ease-out;
+}
+
+/* Estación activa: aro que pulsa una sola vez al seleccionar. */
+@keyframes citricos-estacion-pulso {
+  0% { transform: scale(0.94); opacity: 0.5; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.citricos-estacion-activa {
+  animation: citricos-estacion-pulso 0.45s ease-out;
+}
+
+/* Fotos reales: aparición suave (solo opacity, sin reflow) al montarse. */
+@keyframes citricos-foto-entra {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.citricos-foto {
+  animation: citricos-foto-entra 0.5s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .citricos-seccion,
+  .citricos-estacion-activa,
+  .citricos-foto {
+    animation: none;
+  }
+}
