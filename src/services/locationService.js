@@ -26,7 +26,8 @@
  */
 
 import { deriveThermalZoneFromAltitud } from './externalAiPromptBuilder.js';
-import { findNearestMunicipio } from '../utils/colombiaLocations.js';
+import { findNearestMunicipio, findMunicipio } from '../utils/colombiaLocations.js';
+import { lookupVereda } from './veredaLookupService.js';
 
 const NOMINATIM_TIMEOUT_MS = 8000;
 
@@ -197,8 +198,13 @@ export async function reverseGeocode(lat, lng) {
     const vereda = a.city || a.town || a.village || a.hamlet || null;
     const municipio = a.county || a.municipality || null;
     const departamento = a.state || a.region || null;
+    // BARRIO urbano (reescritura onboarding §2): en cabeceras/ciudades OSM sí
+    // trae suburb/neighbourhood — es el equivalente urbano de la vereda para
+    // el saludo/clima ("Chapinero" en vez de nada).
+    const barrio = a.suburb || a.neighbourhood || a.quarter || null;
     return {
       vereda,
+      barrio,
       municipio,
       departamento,
       pais: a.country || null,
@@ -301,7 +307,16 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
     lat,
     lng,
     vereda: null,
+    /** @type {'poligono_dane'|'centroide_dane'|'nominatim'|null} de dónde salió la vereda */
+    vereda_fuente: null,
+    /** @type {string|null} código DANE de la vereda (si vino del dataset) */
+    vereda_codigo: null,
+    /** Veredas del municipio para la corrección inline (picker). */
+    veredaOptions: [],
+    barrio: null,
     municipio: null,
+    /** @type {string|null} DIVIPOLA 5 dígitos del municipio resuelto */
+    municipio_codigo: null,
     departamento: null,
     altitud: altitudDada,
     /** @type {AltitudFuente|null} */
@@ -314,6 +329,8 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
   const geo = await reverseGeocode(lat, lng);
   if (geo) {
     result.vereda = geo.vereda;
+    result.vereda_fuente = geo.vereda ? 'nominatim' : null;
+    result.barrio = geo.barrio || null;
     result.municipio = geo.municipio;
     result.departamento = geo.departamento;
   }
@@ -327,6 +344,42 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
     if (nearest) {
       result.municipio = result.municipio || nearest.name;
       result.departamento = result.departamento || nearest.departamento;
+    }
+  }
+
+  // Código DIVIPOLA del municipio: del match DANE por nombre (si Nominatim lo
+  // resolvió) o del nearest-centroid. Habilita el lookup de vereda por polígono.
+  if (nearest?.codigo) {
+    result.municipio_codigo = String(nearest.codigo);
+  } else if (result.municipio) {
+    const hit = findMunicipio(
+      result.departamento ? `${result.municipio}, ${result.departamento}` : result.municipio,
+    );
+    if (hit?.codigo) {
+      result.municipio_codigo = String(hit.codigo);
+      // Normalizar el nombre al catálogo DANE (consistencia con clima/saludo).
+      result.municipio = hit.name;
+      result.departamento = result.departamento || hit.departamento;
+    }
+  }
+
+  // VEREDA por POINT-IN-POLYGON contra el dataset DANE del municipio
+  // (reescritura onboarding §2.2): la geometría manda sobre el "lugar nombrado
+  // más cercano" de Nominatim (caso operador: Nominatim decía "Potrero Grande"
+  // cuando la finca está en "El Curí"). Degrada con gracia: sin dataset del
+  // municipio (404/offline sin cache) se conserva el guess de Nominatim, y
+  // `veredaOptions` queda para la corrección inline cuando haya datos.
+  if (result.municipio_codigo) {
+    try {
+      const vLookup = await lookupVereda({ lat, lng, municipioCodigo: result.municipio_codigo });
+      result.veredaOptions = vLookup.opciones;
+      if (vLookup.vereda) {
+        result.vereda = vLookup.vereda.nombre;
+        result.vereda_codigo = vLookup.vereda.codigo;
+        result.vereda_fuente = vLookup.metodo === 'poligono' ? 'poligono_dane' : 'centroide_dane';
+      }
+    } catch (e) {
+      console.debug('[location] lookupVereda fail:', e?.message || e);
     }
   }
 
@@ -366,8 +419,18 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
 }
 
 /**
- * Consulta de elevación puntual (Open-Elevation público o el override
- * VITE_ELEVATION_API_URL). Degrada a null sin lanzar.
+ * Consulta de elevación puntual. Degrada a null sin lanzar.
+ *
+ * Fuente por defecto (reescritura onboarding §2.4): **Open-Meteo Elevation**
+ * (Copernicus DEM GLO-90, sin API key, alta disponibilidad) — el MISMO
+ * proveedor que ya usa climaService (cero host nuevo, repo-público-safe).
+ * Reemplaza a open-elevation.com (host flaky, cuota 1000 req/mes) que hacía
+ * caer la altitud a la cabecera municipal y envenenaba el piso térmico.
+ *
+ * Override: VITE_ELEVATION_API_URL. Se aceptan AMBOS formatos de query y de
+ * respuesta para que un override estilo Open-Elevation siga funcionando:
+ *   - Open-Meteo:       ?latitude=..&longitude=..  → { elevation: [n] }
+ *   - Open-Elevation:   ?locations=lat,lng         → { results: [{ elevation }] }
  *
  * @param {number} lat
  * @param {number} lng
@@ -376,12 +439,17 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
 async function fetchElevation(lat, lng) {
   if (typeof navigator !== 'undefined' && navigator.onLine === false) return null;
   try {
-    const baseUrl =
-      import.meta.env?.VITE_ELEVATION_API_URL || 'https://api.open-elevation.com/api/v1/lookup';
-    const url = `${baseUrl}?locations=${lat},${lng}`;
+    const override = import.meta.env?.VITE_ELEVATION_API_URL;
+    const url = override
+      ? `${override}?locations=${lat},${lng}&latitude=${lat}&longitude=${lng}`
+      : `https://api.open-meteo.com/v1/elevation?latitude=${lat}&longitude=${lng}`;
     const res = await fetch(url);
     if (!res.ok) return null;
     const data = await res.json();
+    // Formato Open-Meteo: { elevation: [n] }
+    const om = Array.isArray(data?.elevation) ? data.elevation[0] : null;
+    if (typeof om === 'number' && Number.isFinite(om)) return om;
+    // Formato Open-Elevation: { results: [{ elevation: n }] }
     const ele = data?.results?.[0]?.elevation;
     return ele != null ? ele : null;
   } catch (e) {

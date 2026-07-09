@@ -110,22 +110,111 @@ describe('resolveUbicacion — altitud_fuente (#1213-regresion backfill cabecera
     expect(r.altitud_fuente).not.toBe('elevation_api');
   });
 
-  it('altitud_fuente=elevation_api cuando viene de Open-Elevation (online)', async () => {
-    // Simular red disponible y Open-Elevation respondiendo.
+  it('altitud_fuente=elevation_api cuando viene de Open-Meteo Elevation (online)', async () => {
+    // Simular red disponible y Open-Meteo Elevation respondiendo (fuente por
+    // defecto desde la reescritura del onboarding §2.4 — Copernicus GLO-90).
     vi.stubGlobal('navigator', { onLine: true });
     vi.stubGlobal('fetch', async (url) => {
-      if (String(url).includes('open-elevation') || String(url).includes('lookup')) {
+      if (String(url).includes('open-meteo.com/v1/elevation')) {
         return {
           ok: true,
-          json: async () => ({ results: [{ elevation: 2490 }] }),
+          json: async () => ({ elevation: [2490] }),
         };
       }
-      // Nominatim offline (no respondemos para forzar el fallback DANE).
+      // Nominatim/veredas offline (no respondemos para forzar el fallback DANE).
       return { ok: false };
     });
     const r = await resolveUbicacion({ lat: 4.527, lng: -73.922 });
-    // Con Open-Elevation respondiendo la fuente debe ser elevation_api.
     expect(r.altitud_fuente).toBe('elevation_api');
     expect(r.altitud).toBe(2490);
+  });
+
+  it('override VITE_ELEVATION_API_URL estilo Open-Elevation sigue funcionando', async () => {
+    // La forma de respuesta { results: [{ elevation }] } se sigue aceptando.
+    vi.stubGlobal('navigator', { onLine: true });
+    vi.stubGlobal('fetch', async (url) => {
+      if (String(url).includes('locations=')) {
+        return { ok: true, json: async () => ({ results: [{ elevation: 1881 }] }) };
+      }
+      return { ok: false };
+    });
+    vi.stubEnv('VITE_ELEVATION_API_URL', 'https://mi-proxy.example/api/v1/lookup');
+    try {
+      const r = await resolveUbicacion({ lat: 4.527, lng: -73.922 });
+      expect(r.altitud).toBe(1881);
+      expect(r.altitud_fuente).toBe('elevation_api');
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+});
+
+describe('resolveUbicacion — vereda por point-in-polygon DANE (reescritura onboarding)', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('expone municipio_codigo DIVIPOLA resuelto offline', async () => {
+    vi.stubGlobal('navigator', { onLine: false });
+    const r = await resolveUbicacion({ lat: 4.527, lng: -73.922, altitud: 2580 });
+    expect(r.municipio).toMatch(/Choach/);
+    expect(r.municipio_codigo).toBe('25181');
+  });
+
+  it('la vereda por polígono DANE manda sobre el guess de Nominatim (Potrero Grande → El Curí)', async () => {
+    const { _resetVeredaLookupCache } = await import('../veredaLookupService.js');
+    _resetVeredaLookupCache();
+    const fs = await import('node:fs');
+    const veredas25181 = JSON.parse(fs.readFileSync('public/veredas/25181.json', 'utf-8'));
+    vi.stubGlobal('navigator', { onLine: true });
+    vi.stubGlobal('fetch', async (url) => {
+      const u = String(url);
+      if (u.includes('/reverse')) {
+        // Caso REAL del operador: Nominatim devuelve el lugar nombrado más
+        // cercano ("Potrero Grande") en vez de la vereda real ("El Curí").
+        return {
+          ok: true,
+          json: async () => ({
+            address: { city: 'Potrero Grande', county: 'Choachí', state: 'Cundinamarca' },
+            display_name: 'Potrero Grande, Choachí, Cundinamarca',
+          }),
+        };
+      }
+      if (u.includes('/veredas/25181.json')) {
+        return { ok: true, status: 200, json: async () => veredas25181 };
+      }
+      return { ok: false };
+    });
+    // Punto interior REAL de la vereda El Curí (dataset DANE, gen-veredas.mjs).
+    const r = await resolveUbicacion({ lat: 4.58263, lng: -73.95823, altitud: 2200 });
+    expect(r.vereda).toBe('El Curi');
+    expect(r.vereda_fuente).toBe('poligono_dane');
+    expect(r.vereda_codigo).toBe('25181010');
+    // Y las opciones para la corrección inline traen TODAS las del municipio.
+    expect(r.veredaOptions.length).toBe(35);
+    expect(r.veredaOptions.some((o) => o.nombre_dane === 'POTRERO GRANDE')).toBe(true);
+  });
+
+  it('sin dataset del municipio conserva el guess de Nominatim', async () => {
+    const { _resetVeredaLookupCache } = await import('../veredaLookupService.js');
+    _resetVeredaLookupCache();
+    vi.stubGlobal('navigator', { onLine: true });
+    vi.stubGlobal('fetch', async (url) => {
+      const u = String(url);
+      if (u.includes('/reverse')) {
+        return {
+          ok: true,
+          json: async () => ({
+            address: { city: 'La Esperanza', county: 'Choachí', state: 'Cundinamarca' },
+          }),
+        };
+      }
+      return { ok: false, status: 404 };
+    });
+    const r = await resolveUbicacion({ lat: 4.527, lng: -73.922, altitud: 2200 });
+    expect(r.vereda).toBe('La Esperanza');
+    expect(r.vereda_fuente).toBe('nominatim');
+    expect(r.vereda_codigo).toBeNull();
   });
 });

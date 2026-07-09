@@ -259,8 +259,14 @@ self.addEventListener('fetch', (event) => {
   // rutas → recarga offline = agente sin grounding (degradaba a respuesta sin
   // contexto). Un slug nuevo tras un deploy del corpus se baja la primera vez
   // que se lo pide estando online (cache-miss → fetch → put).
+  //   - /veredas/<codDANE>.json     (polígonos DANE de veredas por municipio,
+  //     reescritura onboarding 2026-07: cache-on-use — se baja SOLO el archivo
+  //     del municipio del usuario la primera vez online y de ahí en adelante el
+  //     picker de veredas y el point-in-polygon funcionan offline. En el bucket
+  //     grounding a propósito: sobrevive deploys igual que el corpus.)
   const isGrounding =
     url.pathname.startsWith('/cycle-content/') ||
+    url.pathname.startsWith('/veredas/') ||
     url.pathname === '/rag-embeddings.json' ||
     url.pathname === '/grafo-relations.json';
   if (isGrounding && event.request.method === 'GET') {
