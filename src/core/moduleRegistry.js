@@ -28,6 +28,33 @@
 class ModuleRegistry {
   constructor() {
     this._modules = new Map();
+    // Suscriptores a cambios del registro. Los módulos Pro se cargan ASYNC
+    // (loadProModules corre después del primer render), así que la UI que
+    // gatea por capability necesita enterarse cuando un módulo aterriza —
+    // sin esto, un chequeo único al montar se pierde el registro tardío y
+    // la entrada Pro queda invisible aunque el módulo esté servido.
+    this._listeners = new Set();
+  }
+
+  /**
+   * Suscribe un callback a cambios del registro (register/unregister).
+   * Contrato compatible con useSyncExternalStore: devuelve el unsubscribe.
+   * @param {() => void} fn
+   * @returns {() => void}
+   */
+  subscribe(fn) {
+    this._listeners.add(fn);
+    return () => this._listeners.delete(fn);
+  }
+
+  _notify() {
+    for (const fn of this._listeners) {
+      try {
+        fn();
+      } catch (e) {
+        console.warn('[registry] listener falló:', e);
+      }
+    }
   }
 
   register(module_) {
@@ -39,10 +66,12 @@ class ModuleRegistry {
       console.warn(`[registry] sobreescribiendo módulo existente "${module_.id}"`);
     }
     this._modules.set(module_.id, module_);
+    this._notify();
   }
 
   unregister(id) {
     this._modules.delete(id);
+    this._notify();
   }
 
   has(id) {

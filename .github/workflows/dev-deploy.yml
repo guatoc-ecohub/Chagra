@@ -61,6 +61,14 @@ jobs:
           # deploy.yml (prod) → prod conserva el colibrí 2D / video actual.
           VITE_COLIBRI: "true"
           VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
+          # AVATAR-ESPIRITU / módulos Pro: mismo valor y patrón que deploy.yml
+          # (prod). Sin esta variable, loadProModules.js ni intenta el import
+          # dinámico y en dev #/espiritu caía SIEMPRE al fallback "no
+          # disponible en su plan" aunque los bundles Pro estuvieran servidos.
+          # Los bundles viven montados en el docroot bajo /pro-modules/ (FUERA
+          # del repo público — anti-leak OSS/Pro); si el path no resuelve, el
+          # import falla en silencio y la UI degrada a build puro OSS.
+          VITE_PRO_MODULES_PATH: "/pro-modules"
 
       - if: env.SKIP_DEPLOY != '1'
         name: Deploy to dev
@@ -87,8 +95,13 @@ jobs:
           # tocar sus permisos/borrarlo con --delete y aborta con exit 23
           # (partial transfer) -> deploy PARCIAL -> index.html referencia
           # assets que nunca se copiaron -> pantalla negra. Lo dejamos intacto.
+          #
+          # --exclude='/pro-modules/': bundles Pro pre-construidos montados
+          # manualmente en el docroot (NO vienen en dist/ — anti-leak OSS/Pro,
+          # ver VITE_PRO_MODULES_PATH arriba y deploy.yml de prod). Sin el
+          # exclude, --delete los borraria en cada deploy de dev.
           rsync -avzO --no-perms --delete --no-group --chmod=F644 \
-            --exclude='/assets/' --exclude='/mockups/' dist/ "$TARGET/"
+            --exclude='/assets/' --exclude='/mockups/' --exclude='/pro-modules/' dist/ "$TARGET/"
           rsync -avzO --no-perms --no-group --chmod=F644 dist/assets/ "$TARGET/assets/"
           find "$TARGET/assets/" -type f -mtime +30 -delete || true
           find "$TARGET" -type f -user runner ! -perm 644 -exec chmod 644 {} + || true
