@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import veredas25181 from '../../../public/veredas/25181.json' with { type: 'json' };
 import {
   getPisoTermicoInfo,
   PISO_TERMICO_INFO,
@@ -165,8 +166,6 @@ describe('resolveUbicacion — vereda por point-in-polygon DANE (reescritura onb
   it('la vereda por polígono DANE manda sobre el guess de Nominatim (Potrero Grande → El Curí)', async () => {
     const { _resetVeredaLookupCache } = await import('../veredaLookupService.js');
     _resetVeredaLookupCache();
-    const fs = await import('node:fs');
-    const veredas25181 = JSON.parse(fs.readFileSync('public/veredas/25181.json', 'utf-8'));
     vi.stubGlobal('navigator', { onLine: true });
     vi.stubGlobal('fetch', async (url) => {
       const u = String(url);

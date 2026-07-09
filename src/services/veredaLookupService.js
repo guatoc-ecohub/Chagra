@@ -38,7 +38,7 @@ const memoryCache = new Map();
  *
  * @param {number} lng
  * @param {number} lat
- * @param {Array<[number, number]>} ring
+ * @param {Array<Array<number>>} ring
  * @returns {boolean}
  */
 export function pointInRing(lng, lat, ring) {
@@ -63,7 +63,7 @@ export function pointInRing(lng, lat, ring) {
  *
  * @param {number} lat
  * @param {number} lng
- * @param {{type: 'Polygon'|'MultiPolygon', coordinates: Array}|null|undefined} geometry
+ * @param {{type: string, coordinates: Array<any>}|null|undefined} geometry
  * @returns {boolean}
  */
 export function pointInGeometry(lat, lng, geometry) {
@@ -122,7 +122,8 @@ export async function loadVeredasMunicipio(codigoDane) {
   // cachea: cuando vuelva la señal, el siguiente intento debe ir a la red.
   let cacheable = false;
   try {
-    const base = (import.meta.env?.BASE_URL || '/').replace(/\/$/, '');
+    // Cast a any: ImportMeta no declara `env` en el jsconfig (vite lo inyecta).
+    const base = ((/** @type {any} */ (import.meta)).env?.BASE_URL || '/').replace(/\/$/, '');
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     try {
@@ -158,7 +159,7 @@ export async function loadVeredasMunicipio(codigoDane) {
  *
  * @param {number} lat
  * @param {number} lng
- * @param {Array<{centroide?: [number, number]|null}>} veredas
+ * @param {Array<{centroide?: Array<number>|null}>} veredas
  * @returns {Object|null} la vereda más cercana, o null
  */
 export function nearestVeredaByCentroid(lat, lng, veredas) {
@@ -242,9 +243,9 @@ export async function lookupVereda({ lat, lng, municipioCodigo }) {
  * cuyo nombre contiene el query (tolerante a tildes/mayúsculas). Query vacío
  * devuelve todas (para el modo "bajar la lista y tocar").
  *
- * @param {Array<{nombre: string, nombre_dane?: string}>} opciones
+ * @param {Array<{nombre?: string, nombre_dane?: string}>} opciones
  * @param {string} query
- * @returns {Array}
+ * @returns {Array<any>}
  */
 export function filterVeredaOptions(opciones, query = '') {
   if (!Array.isArray(opciones)) return [];

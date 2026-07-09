@@ -8,8 +8,6 @@
  * El fixture es el dataset REAL generado por scripts/gen-veredas.mjs.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import fs from 'node:fs';
-import path from 'node:path';
 import {
   pointInRing,
   pointInGeometry,
@@ -22,10 +20,9 @@ import {
   _resetVeredaLookupCache,
 } from '../veredaLookupService.js';
 
-// Dataset REAL de Choachí (35 veredas DANE) — mismo archivo que sirve la PWA.
-const CHOACHI = JSON.parse(
-  fs.readFileSync(path.resolve(process.cwd(), 'public/veredas/25181.json'), 'utf-8'),
-);
+// Dataset REAL de Choachí (35 veredas DANE) — mismo archivo que sirve la PWA
+// (import estático con attribute JSON, mismo patrón que colombiaLocations.js).
+import CHOACHI from '../../../public/veredas/25181.json' with { type: 'json' };
 
 // Punto interior REAL de la vereda El Curí (calculado por gen-veredas.mjs).
 const EL_CURI_POINT = { lat: 4.58263, lng: -73.95823 };
@@ -131,7 +128,7 @@ describe('nearestVeredaByCentroid', () => {
   it('ignora centroides inválidos y degrada a null sin candidatos', () => {
     expect(nearestVeredaByCentroid(4.5, -74.0, [{ centroide: null }])).toBeNull();
     expect(nearestVeredaByCentroid(NaN, -74.0, veredas)).toBeNull();
-    expect(nearestVeredaByCentroid(4.5, -74.0, 'no-array')).toBeNull();
+    expect(nearestVeredaByCentroid(4.5, -74.0, /** @type {any} */ ('no-array'))).toBeNull();
   });
 });
 
@@ -150,7 +147,8 @@ describe('loadVeredasMunicipio / lookupVereda — carga on-demand con degradaci�
     expect(d1.veredas.length).toBe(35);
     expect(d2).toBe(d1);
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(String(fetchMock.mock.calls[0][0])).toContain('/veredas/25181.json');
+    const primeraUrl = /** @type {any[][]} */ (fetchMock.mock.calls)[0][0];
+    expect(String(primeraUrl)).toContain('/veredas/25181.json');
   });
 
   it('404 (municipio no generado) devuelve null y NO reintenta en bucle', async () => {

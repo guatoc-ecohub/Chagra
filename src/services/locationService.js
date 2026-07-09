@@ -175,7 +175,7 @@ function getNominatimBase() {
  *
  * @param {number} lat
  * @param {number} lng
- * @returns {Promise<{vereda: string|null, municipio: string|null, departamento: string|null, pais: string|null, display: string|null}|null>}
+ * @returns {Promise<{vereda: string|null, barrio: string|null, municipio: string|null, departamento: string|null, pais: string|null, display: string|null}|null>}
  */
 export async function reverseGeocode(lat, lng) {
   if (typeof lat !== 'number' || typeof lng !== 'number') return null;
@@ -292,7 +292,14 @@ export async function forwardGeocode(query) {
  * @param {number} [params.altitud] - msnm si ya se conoce (evita red)
  * @returns {Promise<{
  *   lat: number, lng: number,
- *   municipio: string|null, departamento: string|null,
+ *   vereda: string|null,
+ *   vereda_fuente: 'poligono_dane'|'centroide_dane'|'nominatim'|null,
+ *   vereda_codigo: string|null,
+ *   veredaOptions: Array<{codigo: string, nombre: string, nombre_dane: string}>,
+ *   barrio: string|null,
+ *   municipio: string|null,
+ *   municipio_codigo: string|null,
+ *   departamento: string|null,
  *   altitud: number|null,
  *   altitud_fuente: AltitudFuente|null,
  *   pisoTermico: Object|null,
