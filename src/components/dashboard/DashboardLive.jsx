@@ -67,6 +67,7 @@ import MundosDeMiFinca from './MundosDeMiFinca';
 // persiste en el perfil (userProfileService: guardian_especie). Vive en el menú
 // vivo (ambos layouts) para que sea público, no huérfano.
 import GuardianEspiritu from './GuardianEspiritu';
+import ArbolDeMundos from './ArbolDeMundos';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
 import AIStatusFooter from './AIStatusFooter';
@@ -901,11 +902,26 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     de Animales por perfil se conserva (mostrarAnimales). */}
                 <div id="bloque-mundos" className="px-4 pt-4 fvh-resto-block" data-testid="bloque-mundos" style={{ scrollMarginTop: '88px' }}>
                     {mundosAbiertos ? (
-                        <MundosDeMiFinca
-                            onNavigate={onNavigate}
-                            mostrarAnimales={mostrarAnimales}
-                            plantsCount={plantsCount}
-                        />
+                        <>
+                            {/* EL ÁRBOL DE SU FINCA (vista rica del tema biopunk,
+                                mockup aprobado #/mockups/avatar-biopunk): los mismos
+                                mundos como RAMAS VIVAS que brotan del corazón + el
+                                RELOJ DEL FRAILEJÓN (años reales, un anillo por año).
+                                Fuente única y rutas = mundosFinca.js; en temas
+                                no-biopunk devuelve null. La grilla de abajo queda
+                                INTACTA (fallback simple y contrato de
+                                reachability). */}
+                            <ArbolDeMundos
+                                onNavigate={onNavigate}
+                                mostrarAnimales={mostrarAnimales}
+                                plantsCount={plantsCount}
+                            />
+                            <MundosDeMiFinca
+                                onNavigate={onNavigate}
+                                mostrarAnimales={mostrarAnimales}
+                                plantsCount={plantsCount}
+                            />
+                        </>
                     ) : (
                         // PLEGADO (default): una sola puerta ancha ≥96px. La
                         // grilla completa se abre aquí o desde la puerta "Toda
