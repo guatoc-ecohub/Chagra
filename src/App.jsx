@@ -922,6 +922,8 @@ export default function App() {
     }
     if (hash === 'mockups/avatar-libre') {
       Promise.resolve().then(() => navigate('mockup_avatar_libre'));
+      return;
+    }
     // Mockup dev (#/mockups/boton-anarquia): vista aislada de decisión visual
     // — se monta sin sesión (no lee ni escribe datos reales).
     if (hash === 'mockups/boton-anarquia') {
@@ -963,6 +965,9 @@ export default function App() {
         return;
       }
       if (routeView === 'mockup_avatar_verde_vivo' || routeView === 'mockup_avatar_libre') {
+        navigate(routeView);
+        return;
+      }
       if (routeView === 'mockup_boton_anarquia') {
         navigate(routeView);
         return;
