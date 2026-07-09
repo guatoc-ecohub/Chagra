@@ -9,6 +9,7 @@ import {
   Shovel, Camera,
 } from 'lucide-react';
 import { TUBERCULOS, getTuberculo, tieneDato, DATO_EN_CAMINO } from '../services/tuberculosData';
+import './tuberculos-vivo.css';
 
 /**
  * TuberculosScreen — mini-app "Tubérculos y raíces" (mundo Cultivos y semillas).
@@ -126,7 +127,7 @@ export default function TuberculosScreen({ onBack, onNavigate }) {
           type="button"
           onClick={volver}
           aria-label="Volver"
-          className="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
+          className="tb-focus tb-press w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center shrink-0"
         >
           <ChevronLeft size={20} />
         </button>
@@ -151,12 +152,38 @@ export default function TuberculosScreen({ onBack, onNavigate }) {
 function Hub({ onSel }) {
   return (
     <div className="flex flex-col gap-4">
-      {/* Gancho: el pancoger de raíz */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
-        <Foto slug="hero" ratio="aspect-[16/9]" className="rounded-none border-0 border-b border-slate-800" Fallback={Sprout} />
+      {/* Gancho: el pancoger de raíz, con el título sobre la foto de la cosecha andina */}
+      <section className="tb-in rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden" style={{ '--tb-i': 0 }}>
+        <figure className="tb-hero relative overflow-hidden border-b border-slate-800 bg-slate-800">
+          <img
+            src="/tuberculos/hero.jpg"
+            alt={FOTOS.hero.alt}
+            decoding="async"
+            className="w-full aspect-[16/9] object-cover"
+          />
+          {/* Velo de tierra: legible al sol sin tapar la foto */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/25 to-transparent" aria-hidden="true" />
+          <div className="absolute inset-x-0 bottom-6 px-4 pb-1.5">
+            <p className="text-[11px] uppercase tracking-[0.2em] font-bold text-amber-300">Cultivos y semillas</p>
+            <p className="mt-0.5 text-[22px] font-extrabold text-white leading-tight drop-shadow [text-wrap:balance]">
+              El pancoger de raíz
+            </p>
+          </div>
+          <figcaption className="absolute inset-x-0 bottom-0 bg-slate-950/82 px-2 py-1 backdrop-blur-sm">
+            <a
+              href={FOTOS.hero.fuenteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 truncate text-[9px] text-slate-300 underline decoration-slate-600 underline-offset-2"
+              title={`${FOTOS.hero.autor} · ${FOTOS.hero.licencia} · Wikimedia Commons`}
+            >
+              <Camera size={9} className="shrink-0" aria-hidden="true" />
+              <span className="truncate">Foto: {FOTOS.hero.autor} · {FOTOS.hero.licencia} · Wikimedia</span>
+            </a>
+          </figcaption>
+        </figure>
         <div className="px-4 pt-3 pb-4">
-          <p className="text-[13px] uppercase tracking-wide font-bold text-slate-400">El pancoger de raíz</p>
-          <p className="mt-1 text-[15px] text-slate-100 leading-snug">
+          <p className="text-[15px] text-slate-100 leading-snug">
             La comida de fondo de la olla campesina, la que llena y se guarda: cada tubérculo con su ficha de cultivo —
             <span className="font-bold text-amber-300"> siembra, aporque, plagas y cosecha</span>.
           </p>
@@ -168,18 +195,23 @@ function Hub({ onSel }) {
       </section>
 
       {/* Cómo se siembra un tubérculo (casi ninguno de semilla) */}
-      <section className="rounded-2xl border border-lime-800/40 bg-lime-950/15 px-4 pt-3 pb-4">
+      <section className="tb-in rounded-2xl border border-lime-800/40 bg-lime-950/15 px-4 pt-3 pb-4" style={{ '--tb-i': 1 }}>
         <h2 className="text-[13px] uppercase tracking-wide font-bold flex items-center gap-1.5 text-lime-300">
           <Sprout size={15} aria-hidden="true" /> Casi ninguno se siembra de semilla
+          <span className="h-px flex-1 bg-gradient-to-r from-current to-transparent opacity-25" aria-hidden="true" />
         </h2>
         <p className="mt-1.5 text-sm text-slate-300 leading-relaxed">
           Los tubérculos y raíces se siembran de un pedazo de la misma mata. Estas son las tres formas:
         </p>
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          {FORMAS_SIEMBRA.map((f) => {
+          {FORMAS_SIEMBRA.map((f, i) => {
             const Icono = f.icon;
             return (
-              <div key={f.titulo} className="rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2.5">
+              <div
+                key={f.titulo}
+                className="tb-in rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2.5"
+                style={{ '--tb-i': i + 2 }}
+              >
                 <p className="text-[13px] font-bold text-lime-200 flex items-center gap-1.5">
                   <Icono size={14} className="shrink-0" aria-hidden="true" /> {f.titulo}
                 </p>
@@ -190,9 +222,9 @@ function Hub({ onSel }) {
         </div>
       </section>
 
-      {/* Grilla de tubérculos — photo-forward */}
+      {/* Grilla de tubérculos — photo-forward, cada surco levanta al tacto */}
       <div className="grid grid-cols-2 gap-3">
-        {TUBERCULOS.map((t) => {
+        {TUBERCULOS.map((t, i) => {
           const c = COLOR_MAP[t.accent] || COLOR_MAP.slate;
           return (
             <button
@@ -200,12 +232,17 @@ function Hub({ onSel }) {
               type="button"
               data-testid={`tuberculo-${t.id}`}
               onClick={() => onSel(t.id)}
-              className={`group text-left rounded-2xl border ${c.border} bg-slate-900/60 overflow-hidden hover:bg-slate-900 transition-colors`}
+              style={{ '--tb-i': i + 5 }}
+              className={`tb-card tb-in group text-left rounded-2xl border ${c.border} bg-slate-900/60 overflow-hidden hover:bg-slate-900`}
             >
               <Foto slug={t.foto} ratio="aspect-[4/3]" className="rounded-none border-0" />
               <div className="px-3 pt-2 pb-3">
                 <p className="text-[15px] font-bold text-white leading-tight">
                   <span aria-hidden="true">{t.emoji}</span> {t.nombre}
+                </p>
+                <p className={`mt-0.5 text-[11px] italic ${c.text} flex items-center gap-1.5 truncate`}>
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${c.dot}`} aria-hidden="true" />
+                  <span className="truncate">{t.cientifico}</span>
                 </p>
                 <p className="mt-0.5 text-[11px] text-slate-400 leading-snug line-clamp-2">{t.resumen}</p>
               </div>
@@ -214,7 +251,7 @@ function Hub({ onSel }) {
         })}
       </div>
 
-      <p className="text-[11px] text-slate-500 leading-relaxed">
+      <p className="tb-in text-[11px] text-slate-500 leading-relaxed" style={{ '--tb-i': TUBERCULOS.length + 5 }}>
         Fotos con licencia Creative Commons (autor + licencia visibles). Datos de cultivo:
         pancoger andino SENA / Agrosavia / ICA / FAO. Vecinas y plagas: grafo Chagra.
       </p>
@@ -228,10 +265,10 @@ function Ficha({ t, onNavigate }) {
   return (
     <div className="flex flex-col gap-4">
       {/* Portada */}
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
-        <Foto slug={t.foto} ratio="aspect-[16/9]" className="rounded-none border-0 border-b border-slate-800" />
+      <section className="tb-in rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden" style={{ '--tb-i': 0 }}>
+        <Foto slug={t.foto} ratio="aspect-[16/9]" className="tb-hero rounded-none border-0 border-b border-slate-800" />
         <div className="px-4 pt-3 pb-4">
-          <p className="text-xl font-bold text-white leading-tight">
+          <p className="text-[22px] font-extrabold tracking-tight text-white leading-tight [text-wrap:balance]">
             <span aria-hidden="true">{t.emoji}</span> {t.nombre}
           </p>
           <p className={`mt-0.5 text-xs italic ${c.text}`}>{t.cientifico}</p>
@@ -241,33 +278,33 @@ function Ficha({ t, onNavigate }) {
       </section>
 
       {/* Siembra */}
-      <Bloque icon={Sprout} accent={c} titulo="Siembra">
+      <Bloque icon={Sprout} accent={c} titulo="Siembra" orden={1}>
         <Dato etiqueta="Cómo" valor={t.siembra.metodo} />
         <Dato etiqueta="Distancia" valor={t.siembra.distancia} />
         <Dato etiqueta="Profundidad" valor={t.siembra.profundidad} />
       </Bloque>
 
       {/* Clima: luz / agua / piso térmico */}
-      <Bloque icon={Sun} accent={c} titulo="Luz, agua y piso térmico">
+      <Bloque icon={Sun} accent={c} titulo="Luz, agua y piso térmico" orden={2}>
         <FilaIcono icon={Sun} texto={t.clima.luz} />
         <FilaIcono icon={Droplets} texto={t.clima.agua} />
         <FilaIcono icon={Mountain} texto={t.clima.piso} />
       </Bloque>
 
       {/* Aporque — propio de los tubérculos */}
-      <Bloque icon={Shovel} accent={c} titulo="Aporque">
+      <Bloque icon={Shovel} accent={c} titulo="Aporque" orden={3}>
         <p className="text-sm text-slate-200 leading-relaxed">{t.aporque}</p>
       </Bloque>
 
       {/* Vecinas (grafo) */}
-      <Bloque icon={Users} accent={c} titulo="Con quién se lleva">
+      <Bloque icon={Users} accent={c} titulo="Con quién se lleva" orden={4}>
         <Vecinas titulo="Buenas vecinas" icon={Leaf} tono="emerald" lista={t.vecinasBuenas} />
         <Vecinas titulo="Malas vecinas" icon={Ban} tono="rose" lista={t.vecinasMalas} />
         <p className="mt-1 text-[10px] text-slate-500">Fuente: {t.fuentes.relaciones}</p>
       </Bloque>
 
       {/* Plagas y manejo agroecológico (grafo) */}
-      <Bloque icon={Bug} accent={c} titulo="Plagas y manejo sin veneno">
+      <Bloque icon={Bug} accent={c} titulo="Plagas y manejo sin veneno" orden={5}>
         {tieneDato(t.plagas) ? (
           <div className="flex flex-col gap-2">
             {t.plagas.map((p) => (
@@ -302,7 +339,7 @@ function Ficha({ t, onNavigate }) {
             <button
               type="button"
               onClick={() => onNavigate?.('biopreparados', { back: 'dashboard' })}
-              className="mt-2 inline-flex items-center gap-1 text-[13px] text-emerald-300 underline underline-offset-2"
+              className="tb-link mt-2 inline-flex items-center gap-1 text-[13px] text-emerald-300 underline underline-offset-2"
             >
               <FlaskConical size={13} aria-hidden="true" /> Ver las recetas paso a paso
               <ArrowRight size={12} aria-hidden="true" />
@@ -316,24 +353,24 @@ function Ficha({ t, onNavigate }) {
       </Bloque>
 
       {/* Cosecha */}
-      <Bloque icon={Scissors} accent={c} titulo="Cosecha">
+      <Bloque icon={Scissors} accent={c} titulo="Cosecha" orden={6}>
         <p className="text-sm text-slate-200 leading-relaxed">{t.cosecha}</p>
       </Bloque>
 
       {/* Conservación / curado */}
-      <Bloque icon={Package} accent={c} titulo="Conservación y curado">
+      <Bloque icon={Package} accent={c} titulo="Conservación y curado" orden={7}>
         <p className="text-sm text-slate-200 leading-relaxed">{t.conservacion}</p>
         <button
           type="button"
           onClick={() => onNavigate?.('almacenamiento')}
-          className="mt-2 inline-flex items-center gap-1 text-[13px] text-sky-300 underline underline-offset-2"
+          className="tb-link mt-2 inline-flex items-center gap-1 text-[13px] text-sky-300 underline underline-offset-2"
         >
           <Package size={13} aria-hidden="true" /> Guardar y conservar sin que se dañe
           <ArrowRight size={12} aria-hidden="true" />
         </button>
       </Bloque>
 
-      <p className="text-[11px] text-slate-500 leading-relaxed">
+      <p className="tb-in text-[11px] text-slate-500 leading-relaxed" style={{ '--tb-i': 8 }}>
         Ficha de cultivo: {t.fuentes.cultivo} · Las relaciones (vecinas y plagas) salen del grafo Chagra;
         los datos que aún no están se muestran como "dato en camino".
       </p>
@@ -342,11 +379,12 @@ function Ficha({ t, onNavigate }) {
 }
 
 /* ─────────────────────────────── Piezas de UI ─────────────────────────────── */
-function Bloque({ icon: Icono, accent, titulo, children }) {
+function Bloque({ icon: Icono, accent, titulo, orden = 0, children }) {
   return (
-    <section className={`rounded-2xl border ${accent.border} ${accent.bg} px-4 pt-3 pb-4`}>
+    <section className={`tb-in rounded-2xl border ${accent.border} ${accent.bg} px-4 pt-3 pb-4`} style={{ '--tb-i': orden }}>
       <h2 className={`text-[13px] uppercase tracking-wide font-bold flex items-center gap-1.5 ${accent.text}`}>
         <Icono size={15} aria-hidden="true" /> {titulo}
+        <span className="h-px flex-1 bg-gradient-to-r from-current to-transparent opacity-25" aria-hidden="true" />
       </h2>
       <div className="mt-2">{children}</div>
     </section>

@@ -1,0 +1,70 @@
+/* ===========================================================================
+ * TUBÉRCULOS Y RAÍCES — 2ª pasada visual (TuberculosScreen).
+ *
+ * "La cosecha desenterrada": los bloques salen de la tierra escalonados
+ * (suben desde abajo como el tubérculo al voltear el surco), las tarjetas
+ * levantan al tacto y la foto del hero llega con un acercamiento lento de
+ * una sola pasada. Todo es transform/opacity (GPU-friendly, sin filter/blur
+ * animado) y TODO se apaga con prefers-reduced-motion. Cero bytes de assets
+ * nuevos.
+ * =========================================================================== */
+
+/* Desentierre escalonado: cada bloque/tarjeta entra con su índice (--tb-i). */
+@keyframes tb-desenterrar {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tb-in {
+  animation: tb-desenterrar 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--tb-i, 0) * 60ms);
+}
+
+/* Tarjeta-surco: levanta al pasar y se asienta al presionar. */
+.tb-card {
+  transition: transform 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+}
+.tb-card:hover { transform: translateY(-3px); }
+.tb-card:active { transform: translateY(-1px) scale(0.985); }
+
+/* La foto de la tarjeta respira: zoom sutil solo-transform dentro de su marco. */
+.tb-card img { transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); }
+.tb-card:hover img { transform: scale(1.05); }
+
+/* Hero: la foto llega con un acercamiento lentísimo, una sola vez. */
+.tb-hero img {
+  animation: tb-acercar 13s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: center 60%;
+}
+@keyframes tb-acercar {
+  from { transform: scale(1.07); }
+  to { transform: scale(1); }
+}
+
+/* Enlaces internos de la ficha (biopreparados, almacenamiento): empujón leve. */
+.tb-link { transition: transform 0.2s ease; }
+.tb-link:hover { transform: translateX(2px); }
+
+/* Botón volver: se asienta al presionar. */
+.tb-press { transition: transform 0.15s ease, background-color 0.15s ease; }
+.tb-press:active { transform: scale(0.94); }
+
+/* Foco accesible y vivo, con el acento del tema (fallback ámbar de la papa). */
+.tb-focus:focus-visible,
+.tb-card:focus-visible,
+.tb-link:focus-visible {
+  outline: 3px solid rgb(var(--t-accent-rgb, 251 191 36) / 0.9);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.tb-card:focus-visible { border-radius: 16px; }
+
+/* Reduced motion: quieto todo — entradas, zooms, levantes y presiones. */
+@media (prefers-reduced-motion: reduce) {
+  .tb-in { animation: none; }
+  .tb-hero img { animation: none; }
+  .tb-card, .tb-card img, .tb-link, .tb-press { transition: none; }
+  .tb-card:hover, .tb-card:active { transform: none; }
+  .tb-card:hover img { transform: none; }
+  .tb-link:hover { transform: none; }
+  .tb-press:active { transform: none; }
+}
