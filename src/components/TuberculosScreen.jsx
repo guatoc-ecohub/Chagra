@@ -9,6 +9,8 @@ import {
   Shovel, Camera, Utensils, ExternalLink,
 } from 'lucide-react';
 import { TUBERCULOS, getTuberculo, tieneDato, DATO_EN_CAMINO, FUENTES_INSTITUCIONALES } from '../services/tuberculosData';
+import LaminaSiembra from './tuberculos/LaminaSiembra';
+import LaminaAporque from './tuberculos/LaminaAporque';
 
 /**
  * TuberculosScreen — mini-app "Tubérculos y raíces" (mundo Cultivos y semillas).
@@ -175,6 +177,15 @@ function Hub({ onSel }) {
         <p className="mt-1.5 text-sm text-slate-300 leading-relaxed">
           Los tubérculos y raíces se siembran de un pedazo de la misma mata. Estas son las tres formas:
         </p>
+        {/* Lámina propia (SVG de cuaderno de campo): las tres formas de siembra en corte. */}
+        <div className="mt-3 rounded-xl border border-slate-800 bg-slate-950/40 px-2 py-2">
+          <LaminaSiembra />
+          <div className="mt-0.5 grid grid-cols-3 gap-1 text-center text-[10px] font-semibold text-lime-200/90">
+            <span>Tubérculo-semilla</span>
+            <span>Esqueje / estaca</span>
+            <span>Colino</span>
+          </div>
+        </div>
         <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           {FORMAS_SIEMBRA.map((f) => {
             const Icono = f.icon;
@@ -256,6 +267,10 @@ function Ficha({ t, onNavigate }) {
 
       {/* Aporque — propio de los tubérculos */}
       <Bloque icon={Shovel} accent={c} titulo="Aporque">
+        {/* Lámina propia (SVG en corte): arrimar tierra al pie tapa el cuello. */}
+        <div className="mb-2.5 rounded-xl border border-slate-800 bg-slate-950/40 px-2 py-2">
+          <LaminaAporque />
+        </div>
         <p className="text-sm text-slate-200 leading-relaxed">{t.aporque}</p>
       </Bloque>
 

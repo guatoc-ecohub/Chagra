@@ -32,6 +32,11 @@ describe('TuberculosScreen — hub', () => {
     // El explicador "casi ninguno se siembra de semilla"
     expect(screen.getByText(/Casi ninguno se siembra de semilla/i)).toBeInTheDocument();
   });
+
+  it('el hub trae la lámina SVG propia de las tres formas de siembra', () => {
+    render(<TuberculosScreen onBack={vi.fn()} onNavigate={vi.fn()} />);
+    expect(screen.getByTestId('lamina-siembra')).toBeInTheDocument();
+  });
 });
 
 describe('TuberculosScreen — ficha de cultivo', () => {
@@ -56,6 +61,9 @@ describe('TuberculosScreen — ficha de cultivo', () => {
     // Plaga insignia de la papa grounded en el grafo + manejo biológico
     expect(screen.getByText(/tizón tardío/i)).toBeInTheDocument();
     expect(screen.getByText(/Polilla guatemalteca de la papa/i)).toBeInTheDocument();
+
+    // La ficha trae la lámina SVG propia del aporque (en corte)
+    expect(screen.getByTestId('lamina-aporque')).toBeInTheDocument();
   });
 
   it('la batata muestra el picudo (Cylas) groundeado con su control biológico', () => {
