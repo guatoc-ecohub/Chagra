@@ -258,13 +258,16 @@ async function main() {
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
   let index = { _meta: {}, municipios: {} };
-  if (fs.existsSync(INDEX_PATH)) {
-    try {
-      index = JSON.parse(fs.readFileSync(INDEX_PATH, 'utf-8'));
+  // Lectura directa con catch (sin existsSync previo — evita TOCTOU): índice
+  // ausente o corrupto → se regenera desde cero.
+  try {
+    const parsed = JSON.parse(fs.readFileSync(INDEX_PATH, 'utf-8'));
+    if (parsed && typeof parsed === 'object') {
+      index = parsed;
       index.municipios = index.municipios || {};
-    } catch {
-      /* índice corrupto → regenerar */
     }
+  } catch {
+    /* índice ausente/corrupto → regenerar */
   }
 
   let ok = 0;
