@@ -24,7 +24,6 @@ import TopBar from '../TopBar';
 
 // Mocks: sub-componentes pesados o que tocan store global. No nos importan
 // para este test del TopBar.
-vi.mock('../EnvironmentalCard', () => ({ default: () => <div data-testid="env-stub" /> }));
 vi.mock('../AltitudeBadge', () => ({ default: () => <div data-testid="alt-stub" /> }));
 vi.mock('../OfflineChip', () => ({ default: () => <div data-testid="chip-stub" /> }));
 vi.mock('../NotificationsBell', () => ({
