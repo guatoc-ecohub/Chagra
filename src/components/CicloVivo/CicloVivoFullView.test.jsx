@@ -17,9 +17,16 @@ vi.mock('../../services/userProfileService', () => ({
 vi.mock('../../services/altitudeService', () => ({
   getDeviceAltitude: vi.fn().mockResolvedValue(null),
 }));
+const { getPrecioSipsa } = vi.hoisted(() => ({
+  getPrecioSipsa: vi.fn(),
+}));
+vi.mock('../../services/sidecarClient', () => ({
+  getPrecioSipsa,
+}));
 
 import CicloVivoFullView from './CicloVivoFullView';
 import { PHASES } from './cicloVivoData';
+import { __TEST__ as sipsaPriceTest } from '../../hooks/useSipsaLatestPrice';
 
 function buildCaps(overrides = {}) {
   const caps = {};
@@ -53,9 +60,15 @@ describe('CicloVivoFullView', () => {
   beforeEach(() => {
     profileData = {};
     saveProfile.mockClear();
+    getPrecioSipsa.mockReset();
+    getPrecioSipsa.mockResolvedValue(null);
     try { globalThis.localStorage.clear(); } catch { /* ignore */ }
   });
-  afterEach(() => { vi.unstubAllGlobals(); cleanup(); });
+  afterEach(() => {
+    sipsaPriceTest.clearCache();
+    vi.unstubAllGlobals();
+    cleanup();
+  });
 
   it('dibuja la rueda con los 7 nodos de fase', async () => {
     stubStatsFetch(buildCaps());
@@ -136,5 +149,32 @@ describe('CicloVivoFullView', () => {
     const select = screen.getByLabelText('Especie del cultivo');
     fireEvent.change(select, { target: { value: 'papa' } });
     expect(saveProfile).toHaveBeenCalledWith({ ciclo_vivo_especie: 'papa' });
+  });
+
+  it('muestra el precio SIPSA vivo en el motor y en la fase de cosecha', async () => {
+    stubStatsFetch(buildCaps());
+    getPrecioSipsa.mockResolvedValueOnce({
+      available: true,
+      price: {
+        producto: 'Maiz',
+        plaza: 'Corabastos',
+        fecha: '2026-07-01',
+        precio_promedio_cop_kg: 1450,
+      },
+      central_abastos: 'Corabastos, Bogotá',
+      frescura: {
+        fecha_dato: '2026-07-01',
+        desactualizado: false,
+      },
+    });
+
+    const { container } = render(<CicloVivoFullView onBack={() => {}} onNavigate={() => {}} />);
+    await waitFor(() => expect(container.querySelector('.cv-wnode')).toBeTruthy());
+    expect(await screen.findByText('$1.450 COP/kg')).toBeInTheDocument();
+
+    openNode(container, 5);
+    const priceChips = screen.getAllByRole('button', { name: /Precio SIPSA/i });
+    expect(priceChips.length).toBeGreaterThanOrEqual(2);
+    expect(priceChips.some((chip) => chip.getAttribute('title')?.includes('Corabastos, Bogotá'))).toBe(true);
   });
 });

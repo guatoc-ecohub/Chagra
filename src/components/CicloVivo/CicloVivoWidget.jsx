@@ -7,11 +7,14 @@
  * (`/chagra-stats.json` → `capacidades`), así que la tarjeta también se
  * actualiza sola cuando un artefacto se enciende.
  */
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import './cicloVivo.css';
 import { GLYPHS } from './cicloVivoArte';
-import { PHASES, resolverEstado } from './cicloVivoData';
+import { PHASES, resolverEstado, resolverEspecie } from './cicloVivoData';
 import { useChagraStats } from '../../hooks/useChagraStats';
+import { pisoTermicoFromAltitud } from '../../data/cropSuggestions';
+import { getProfile } from '../../services/userProfileService';
+import { useSipsaLatestPrice } from '../../hooks/useSipsaLatestPrice';
 
 /** Cuenta funciones distintas del ciclo por estado, contra la fuente de verdad. */
 function resumirEstados(capacidades) {
@@ -32,6 +35,19 @@ export default function CicloVivoWidget({ onNavigate }) {
   const { data: stats } = useChagraStats();
   const capacidades = stats && stats.capacidades ? stats.capacidades : null;
   const conteo = useMemo(() => resumirEstados(capacidades), [capacidades]);
+  const [profile] = useState(() => {
+    try { return getProfile() || {}; } catch { return {}; }
+  });
+  const spKey = resolverEspecie(
+    profile.ciclo_vivo_especie,
+    profile.piso_termico || pisoTermicoFromAltitud(profile.finca_altitud),
+  );
+  const sipsaPrice = useSipsaLatestPrice({ speciesKey: spKey });
+  const priceText = sipsaPrice.summary.live
+    ? `SIPSA ${sipsaPrice.summary.label}`
+    : sipsaPrice.loading
+      ? 'SIPSA consultando'
+      : 'SIPSA sin dato';
 
   const abrir = () => { if (onNavigate) onNavigate('ciclo_vivo'); };
 
@@ -60,6 +76,12 @@ export default function CicloVivoWidget({ onNavigate }) {
             <span className="cvivo-state-pill activo">{conteo.activo} listas</span>
             {conteo.parcial > 0 ? <span className="cvivo-state-pill parcial">{conteo.parcial} parcial</span> : null}
             {conteo.proximamente > 0 ? <span className="cvivo-state-pill proximamente">{conteo.proximamente} en camino</span> : null}
+            <span
+              className={`cvivo-state-pill precio ${sipsaPrice.summary.live ? 'live' : 'quiet'}`}
+              title={sipsaPrice.summary.sublabel || 'Sin dato SIPSA'}
+            >
+              {priceText}
+            </span>
           </span>
         </span>
 

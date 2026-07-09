@@ -20,6 +20,7 @@ import {
   resolverEspecie, resolverEstado, ESTADO_BADGE,
 } from './cicloVivoData';
 import { useChagraStats } from '../../hooks/useChagraStats';
+import { useSipsaLatestPrice } from '../../hooks/useSipsaLatestPrice';
 import { getProfile, saveProfile } from '../../services/userProfileService';
 import { pisoTermicoFromAltitud } from '../../data/cropSuggestions';
 import { getDeviceAltitude } from '../../services/altitudeService';
@@ -49,6 +50,21 @@ function CameraIco() {
       <circle cx="12" cy="13" r="3.4" fill="none" stroke="currentColor" strokeWidth="1.9" />
       <circle cx="18.6" cy="10.1" r=".95" fill="currentColor" />
     </svg>
+  );
+}
+
+function PriceStack({ summary, loading }) {
+  const sub = summary.live
+    ? summary.sublabel
+    : loading
+      ? 'Consultando precio SIPSA'
+      : 'Sin dato SIPSA';
+  return (
+    <span className="cv-chip-stack">
+      <span className="cv-chip-main">Precio SIPSA</span>
+      <span className="cv-chip-sub">{summary.live ? summary.label : (loading ? 'Consultando' : 'Sin dato')}</span>
+      <span className="cv-chip-subtle">{sub}</span>
+    </span>
   );
 }
 /** Glifo de fase (inner SVG generado por GLYPHS[key]). */
@@ -101,6 +117,7 @@ export default function CicloVivoFullView({ onBack, onNavigate }) {
   const wheelRef = useRef(null);
 
   const sp = SPECIES[spKey] || SPECIES.maiz;
+  const sipsaPrice = useSipsaLatestPrice({ speciesKey: spKey });
 
   const showToast = useCallback((msg) => {
     setToast(msg);
@@ -217,7 +234,7 @@ export default function CicloVivoFullView({ onBack, onNavigate }) {
           <span className="cv-cta-arrow"><Chev /></span>
         </button>
 
-        <MotorStrip capacidades={capacidades} onNav={navegarCap} />
+        <MotorStrip capacidades={capacidades} onNav={navegarCap} sipsaPrice={sipsaPrice} />
 
         <div className={'cv-backdrop' + (panelOpen ? ' open' : '')} onClick={closePanel} />
         <PhasePanel
@@ -229,6 +246,7 @@ export default function CicloVivoFullView({ onBack, onNavigate }) {
           onClose={closePanel}
           onNav={navegarCap}
           onJump={(i) => openPanel((i + PHASES.length) % PHASES.length)}
+          sipsaPrice={sipsaPrice}
         />
 
         <div className={'cv-toast' + (toast ? ' show' : '')} role="status">{toast}</div>
@@ -238,7 +256,7 @@ export default function CicloVivoFullView({ onBack, onNavigate }) {
 }
 
 /* ---- Tira "motor del agente" (capacidades transversales) ---- */
-function MotorStrip({ capacidades, onNav }) {
+function MotorStrip({ capacidades, onNav, sipsaPrice }) {
   return (
     <div className="cv-motor">
       <p className="cv-motor-title">Motor del agente</p>
@@ -246,17 +264,24 @@ function MotorStrip({ capacidades, onNav }) {
         {MOTOR_CAPS.map((capId) => {
           const { estado, nota, view } = resolverEstado(capId, capacidades);
           const badge = ESTADO_BADGE[estado];
-          const label = capId === 'rag_grounding' ? 'Respuestas con fuentes' : 'Acciones del agente';
+          const isPrice = capId === 'precio_sipsa';
+          const label = isPrice
+            ? 'Precio SIPSA'
+            : capId === 'rag_grounding'
+              ? 'Respuestas con fuentes'
+              : 'Acciones del agente';
           return (
             <button
               key={capId}
               type="button"
               className={'cv-chip is-' + estado}
               style={{ '--cv-pcolor': '#5B8A52' }}
-              title={nota}
+              title={isPrice ? sipsaPrice?.summary?.sublabel || nota : nota}
               onClick={() => onNav(estado, view, label)}
             >
-              {label}
+              {isPrice ? (
+                <PriceStack summary={sipsaPrice?.summary || { live: false, label: 'Sin dato', sublabel: '' }} loading={Boolean(sipsaPrice?.loading)} />
+              ) : label}
               {badge ? <span className="cv-badge">{badge}</span> : null}
             </button>
           );
@@ -267,7 +292,7 @@ function MotorStrip({ capacidades, onNav }) {
 }
 
 /* ---- Panel de fase con sus chips de función ---- */
-function PhasePanel({ open, index, faseActiva, species, capacidades, onClose, onNav, onJump }) {
+function PhasePanel({ open, index, faseActiva, species, capacidades, onClose, onNav, onJump, sipsaPrice }) {
   const p = PHASES[index];
   if (!p) return null;
   const prev = PHASES[(index + PHASES.length - 1) % PHASES.length];
@@ -312,18 +337,22 @@ function PhasePanel({ open, index, faseActiva, species, capacidades, onClose, on
           const badge = ESTADO_BADGE[estado];
           const isPrimary = idx === 0 && estado === 'activo';
           const cls = 'cv-chip is-' + estado + (isPrimary ? ' is-primary' : '');
+          const isPrice = fn.cap === 'precio_sipsa';
+          const priceSummary = sipsaPrice?.summary || { live: false, label: 'Sin dato', sublabel: '' };
           return (
             <button
               key={fn.cap + ':' + idx}
               type="button"
               className={cls}
               style={{ '--cv-pcolor': p.color }}
-              title={nota}
+              title={isPrice ? priceSummary.sublabel || nota : nota}
               aria-disabled={estado === 'proximamente'}
               onClick={() => onNav(estado, view, fn.label)}
             >
               {fn.camera ? <span className="cv-chip-ico"><CameraIco /></span> : null}
-              {fn.label}
+              {isPrice ? (
+                <PriceStack summary={priceSummary} loading={Boolean(sipsaPrice?.loading)} />
+              ) : fn.label}
               {badge ? <span className="cv-badge">{badge}</span> : null}
             </button>
           );

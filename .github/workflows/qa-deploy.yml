@@ -53,7 +53,6 @@ jobs:
         env:
           VITE_FARMOS_URL: ""
           VITE_FARMOS_CLIENT_ID: farm
-          VITE_HA_ACCESS_TOKEN: ${{ secrets.VITE_HA_ACCESS_TOKEN }}
           VITE_USE_SIDECAR_AGRO_MCP: "true"
           VITE_CHAGRA_MCP_TOKEN: ${{ secrets.VITE_CHAGRA_MCP_TOKEN }}
 
