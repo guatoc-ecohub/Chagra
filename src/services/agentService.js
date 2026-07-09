@@ -1577,10 +1577,22 @@ export function buildFincaContext({
       let l = `${c.label || 'cultivo'} en etapa ${c.stage || '—'}`;
       if (c.days != null) l += ` (hace ${c.days} días)`;
       if (c.topRisk) l += `, riesgo de plaga: ${c.topRisk}`;
+      // Enfermedad ANOTADA en la bitácora del ciclo (dato factual del usuario).
+      if (c.disease) l += `, enfermedad observada en la bitácora: ${c.disease}`;
       return l;
     }).filter(Boolean);
     if (cycleLines.length) {
       lines.push(`Ciclos activos del usuario (aterriza la respuesta en estos): ${cycleLines.join(' · ')}.`);
+      // Instrucción de PROACTIVIDAD: si un ciclo trae una enfermedad observada en
+      // su bitácora, el agente debe MENCIONARLA aunque el usuario no pregunte por
+      // ella — es una alerta sanitaria que el usuario ya registró. NO inventar
+      // enfermedades; solo las que aparecen arriba.
+      const conEnfermedad = activeCycles.filter((c) => c.disease);
+      if (conEnfermedad.length > 0) {
+        lines.push(
+          `ALERTA SANITARIA: el usuario anotó en la bitácora una posible enfermedad en ${conEnfermedad.map((c) => `${c.label || 'su cultivo'} (${c.disease})`).join(', ')}. Menciónala PROACTIVAMENTE al inicio de tu respuesta —aunque la pregunta sea de otro tema— con una recomendación de manejo seguro (sin prometer cura química). NO inventes otras enfermedades.`,
+        );
+      }
     }
   }
 

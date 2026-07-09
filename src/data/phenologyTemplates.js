@@ -45,6 +45,9 @@ import pisumSativum from './phenology-templates/pisum_sativum.v1.json';
  * @property {number} version
  * @property {Array<{name:string, reference:string, url:string}>} sources
  * @property {PhenologyStage[]} stages
+ * @property {{sowing_to_harvest_min_days?: number, sowing_to_harvest_max_days?: number, natural_death_days?: number}} [lifecycle] -
+ *   bloque opcional de días explícitos siembra→cosecha/muerte natural (curado por especie),
+ *   usado por phenologyCalculator.calculateLifecycleEnd cuando está presente.
  */
 
 /** @type {Map<string, PhenologyTemplate>} */

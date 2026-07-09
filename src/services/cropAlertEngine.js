@@ -32,6 +32,7 @@ import { getPestRisksByStage } from './climateCycleService';
 import { getEnsoServicePhase, getEnsoLabel } from './ensoService';
 import { getPrecioSipsa } from './sidecarClient';
 import { resolveProductoFromSlug } from './sipsaPriceMap';
+import { getActiveDiseaseForCycle } from './diseaseObservationService';
 
 const SEVERITY_BY_RISK = { 'crítico': 'danger', critico: 'danger', alto: 'warning' };
 
@@ -143,6 +144,11 @@ export async function runCropAlerts() {
   let emitted = 0;
   let cleared = 0;
   for (const c of cycles) {
+    // `a` es la bolsa de atributos del ciclo (forma variable según el proceso
+    // FarmProcess de turno) — @type any a propósito, mismo criterio que el
+    // resto de accesos sueltos de este bloque (current_stage/subject_slug/
+    // subject_label no están en el tipo estrecho de FarmProcess.attributes).
+    /** @type {any} */
     const a = c?.attributes || {};
     const id = c?.process_id || c?.id;
     if (!id) continue;
@@ -176,6 +182,37 @@ export async function runCropAlerts() {
     const priceDelta = await evalHarvestPriceAlert(id, a);
     emitted += priceDelta.emitted;
     cleared += priceDelta.cleared;
+
+    // ── Enfermedad observada en la BITÁCORA del ciclo ──────────────────────
+    // El usuario anotó un síntoma de enfermedad: el agente debe saberlo
+    // PROACTIVAMENTE. Es un dato FACTUAL (el usuario lo escribió), no inferido.
+    // Canal separado (`crop_disease_<id>`) del riesgo de plaga por etapa para
+    // que coexistan y se de-dupliquen por su cuenta.
+    const diseaseType = `crop_disease_${id}`;
+    let disease = null;
+    try {
+      disease = await getActiveDiseaseForCycle(id, a.subject_slug);
+    } catch {
+      disease = null;
+    }
+    if (disease && disease.isDisease) {
+      const named = disease.pathogen
+        ? disease.pathogen
+        : 'Síntoma de enfermedad a vigilar';
+      const control = disease.control ? ` ${disease.control}` : '';
+      emit('alertTriggered', {
+        type: diseaseType,
+        severity: disease.severity === 'alto' ? 'warning' : 'info',
+        title: `Posible enfermedad en ${a.subject_label || 'tu cultivo'}`,
+        message: `${named}.${control}`.trim(),
+        source: 'crop',
+        processId: id,
+      });
+      emitted++;
+    } else {
+      emit('alertCleared', { type: diseaseType });
+      cleared++;
+    }
   }
 
   // Alerta de TEMPORADA ENSO (El Niño/La Niña) — una sola, no por ciclo. Solo

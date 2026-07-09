@@ -942,16 +942,27 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       try {
         const { listFarmProcesses } = await import('../../db/farmProcessCache');
         const { getPestRisksByStage } = await import('../../services/climateCycleService');
+        const { getActiveDiseaseForCycle } = await import('../../services/diseaseObservationService');
         const STAGE_LBL = { sowing: 'Siembra', emergence: 'Brotó', vegetative: 'Creciendo', flowering: 'Floración', fruiting: 'Frutos', harvest_window: 'Cosecha', closed: 'Terminado' };
         const cycles = (await listFarmProcesses({ status: 'active' })) || [];
-        return cycles.slice(0, 5).map((c) => {
+        return await Promise.all(cycles.slice(0, 5).map(async (c) => {
           const at = c.attributes || {};
+          const id = c.process_id || c.id;
           const base = String(at.current_stage || '').replace(/_confirmed$/, '');
           const days = at.created_at ? Math.max(0, Math.round((Date.now() - at.created_at) / 86400000)) : null;
           const risks = (() => { try { return getPestRisksByStage(at.current_stage, at.subject_slug) || []; } catch { return []; } })();
           const top = risks.find((r) => r.risk === 'crítico' || r.risk === 'alto');
-          return { label: at.subject_label, stage: STAGE_LBL[base] || base, days, topRisk: top ? `${top.pest} (${top.risk})` : null };
-        });
+          // Enfermedad observada en la BITÁCORA del ciclo (dato factual del usuario).
+          // El agente debe conocerla SIN que el usuario la repita en su pregunta.
+          const disease = await (async () => {
+            try {
+              const d = await getActiveDiseaseForCycle(id, at.subject_slug);
+              if (!d || !d.isDisease) return null;
+              return d.pathogen || 'síntoma de enfermedad sin identificar';
+            } catch { return null; }
+          })();
+          return { label: at.subject_label, stage: STAGE_LBL[base] || base, days, topRisk: top ? `${top.pest} (${top.risk})` : null, disease };
+        }));
       } catch { return []; }
     })();
     const fincaContext = isPriceQuery

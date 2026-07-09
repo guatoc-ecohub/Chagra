@@ -21,4 +21,27 @@ describe('buildFincaContext — activeCycles', () => {
     const out = buildFincaContext({ activeCycles: [] });
     expect(out).not.toMatch(/Ciclos activos del usuario/);
   });
+
+  it('inyecta enfermedad de bitácora + instrucción de proactividad', () => {
+    const out = buildFincaContext({
+      activeCycles: [{
+        label: 'Lechuga',
+        stage: 'Creciendo',
+        days: 30,
+        topRisk: null,
+        disease: 'Mildeo velloso (Bremia lactucae)',
+      }],
+    });
+    expect(out).toMatch(/enfermedad observada en la bitácora: Mildeo velloso \(Bremia lactucae\)/);
+    expect(out).toMatch(/ALERTA SANITARIA/);
+    expect(out).toMatch(/PROACTIVAMENTE/);
+    expect(out).toMatch(/Lechuga \(Mildeo velloso/);
+  });
+
+  it('sin enfermedad NO agrega la alerta sanitaria', () => {
+    const out = buildFincaContext({
+      activeCycles: [{ label: 'Lechuga', stage: 'Creciendo', days: 30, topRisk: null, disease: null }],
+    });
+    expect(out).not.toMatch(/ALERTA SANITARIA/);
+  });
 });

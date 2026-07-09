@@ -9,15 +9,19 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-const { listFarmProcesses, getPestRisksByStage, getPrecioSipsa } = vi.hoisted(() => ({
+const { listFarmProcesses, getPestRisksByStage, getPrecioSipsa, getActiveDiseaseForCycle } = vi.hoisted(() => ({
   listFarmProcesses: vi.fn(),
   getPestRisksByStage: vi.fn(),
   getPrecioSipsa: vi.fn(),
+  getActiveDiseaseForCycle: vi.fn(),
 }));
 
 vi.mock('../../db/farmProcessCache', () => ({ listFarmProcesses }));
 vi.mock('../climateCycleService', () => ({ getPestRisksByStage }));
 vi.mock('../sidecarClient', () => ({ getPrecioSipsa }));
+// Sin enfermedad en bitácora por defecto: el canal crop_disease solo agrega un
+// 'alertCleared' por ciclo. Mockeado para no tocar IDB real en este test de plaga.
+vi.mock('../diseaseObservationService', () => ({ getActiveDiseaseForCycle }));
 
 import { runCropAlerts } from '../cropAlertEngine';
 
@@ -51,6 +55,7 @@ beforeEach(() => {
   getPestRisksByStage.mockReset();
   getPrecioSipsa.mockReset();
   getPrecioSipsa.mockResolvedValue(null); // por defecto: sidecar sin dato
+  getActiveDiseaseForCycle.mockReset().mockResolvedValue(null);
   events = [];
   vi.spyOn(window, 'dispatchEvent').mockImplementation((ev) => {
     events.push({ name: ev.type, detail: ev.detail });
@@ -78,11 +83,13 @@ describe('cropAlertEngine.runCropAlerts', () => {
     listFarmProcesses.mockResolvedValue([cycle('p2', 'sowing')]);
     getPestRisksByStage.mockReturnValue([]);
     const res = await runCropAlerts();
-    // 2 limpiezas: la de plaga (crop_pest_p2) + la de precio (crop_price_p2,
-    // etapa 'sowing' no aplica al aviso de precio).
-    expect(res.cleared).toBe(2);
+    // 3 limpiezas por ciclo sin novedad: plaga (crop_pest_p2), precio (crop_price_p2,
+    // etapa 'sowing' no aplica al aviso de precio) y enfermedad de bitácora
+    // (crop_disease_p2, sin enfermedad → clear).
+    expect(res.cleared).toBe(3);
     expect(events.some((e) => e.name === 'alertCleared' && e.detail.type === 'crop_pest_p2')).toBe(true);
     expect(events.some((e) => e.name === 'alertCleared' && e.detail.type === 'crop_price_p2')).toBe(true);
+    expect(events.some((e) => e.name === 'alertCleared' && e.detail.type === 'crop_disease_p2')).toBe(true);
     expect(events.some((e) => e.name === 'alertTriggered')).toBe(false);
   });
 
