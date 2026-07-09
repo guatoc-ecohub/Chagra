@@ -255,7 +255,7 @@ function EstacionDesfibrado() {
   return (
     <section className="fique-seccion space-y-4" data-testid="estacion-desfibrado">
       <div className="rounded-2xl border border-emerald-800/40 overflow-hidden bg-[#1a2412]/60">
-        <FotoFique slug="fibra" alt="Fibra de fique beneficiada y peinada, lista para hilar la cabuya" ratio="aspect-[16/9]" Fallback={Feather}>
+        <FotoFique slug="fibra" alt="Fibra vegetal en bruto secándose al sol hasta quedar blanca, como la cabuya del fique" ratio="aspect-[16/9]" Fallback={Feather}>
           <div className="absolute inset-0 flex flex-col justify-end p-4">
             <p className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-emerald-200">
               <Scissors size={14} aria-hidden="true" /> El beneficio
