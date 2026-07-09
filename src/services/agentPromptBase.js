@@ -371,9 +371,8 @@ export function buildExpertModeBlock() {
 
 /**
  * buildModoExpertoBlock — bloque MODO EXPERTO ESTRUCTURADO con CONTRATO
- * verificable. Reemplaza el experto simple con un bloque que exige nombre
- * científico, dosis con unidad, mecanismo de acción y piso térmico cuando
- * el grounding lo provea.
+ * verificable. Reemplaza el experto simple con un bloque que pide precisión
+ * y honestidad cuando hay grounding, sin delegar la trazabilidad al modelo.
  *
  * @param {object} opts
  * @param {string} [opts.nivelRespuestas] - 'simple' | 'detallado'
@@ -386,13 +385,13 @@ export function buildModoExpertoBlock(opts = {}) {
   if (nivelRespuestas !== 'detallado') return '';
 
   const contrato = hasGrounding
-    ? `CONTRATO CITA: científico exacto de ENTIDADES RESUELTAS/DATOS VERIFICADOS, dosis con unidad (ej: 1x10^9 conidias/mL), mecanismo de acción, piso térmico si grounding la menciona.`
+    ? `CONTRATO TÉCNICO: usa la evidencia disponible con precisión; no inventes datos numéricos, dosis ni nombres científicos.`
     : `CONTRATO TÉCNICO: profundiza en por qué/factores/integración; si no hay datos del catálogo, dilo explícitamente.`;
 
   return `=== MODO EXPERTO ===
 ${contrato}
 PROHIBICIONES: NO uses técnica para disimular incertidumbre; NO inventes dosis/datos numéricos; NO mezcles datos de especies.
-RESPUESTA: preciso, citado cuando hay evidencia, honesto cuando no la haya.
+RESPUESTA: preciso y honesto. Si hay evidencia, úsala con claridad; si no la hay, dilo de frente.
 === FIN ===`;
 }
 
@@ -680,13 +679,6 @@ Responde en español colombiano (tú/usted, sin voseo argentino). Sé específic
   // buildResponseModeBlock arriba a partir de nivel_respuestas; NO reenviamos
   // nivelRespuestas a buildProfileContext para no duplicar el bloque de nivel.
   sections.push(buildProfileContext(finca, { climaQuery: CLIMA_QUERY_RE.test(mention) }));
-
-  if (profileMode === 'experto') {
-    const footer = buildSourceFooter({ toolEvidence, resolvedEntities, hasCorpus });
-    if (footer) {
-      sections.push(footer.replace(/^\n\n/, ''));
-    }
-  }
 
   return sections.join('\n\n');
 }

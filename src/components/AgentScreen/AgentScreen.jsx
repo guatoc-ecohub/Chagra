@@ -102,6 +102,7 @@ import DeepResearchCard from '../DeepResearchCard';
 import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildPriceAnswer, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud, groupAndLimitCultivos } from '../../services/agentService';
 import { buildPriceReferenceAnswer } from '../../services/marketplaceService';
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence, truncateEdgesBlock } from '../../services/agentPromptBase';
+import { appendScientificFooter } from '../../services/semaforoConfianza';
 // Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
 import { summarizeSkyForGrounding } from '../../services/skyConditionService';
 import { assembleSystemContent, TOP_N_RAG } from '../../services/promptAssembler';
@@ -2270,7 +2271,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // `valid`—. La cobertura taxonómica la dan los guards síncronos de
       // applyOutputGuards (#1332 binomio benéfico + 5/5b sustitución/companion)
       // y el grounding de resolve-entities. Ver outputGuards.js.
-      let response = guarded.text;
+      const responseBody = guarded.text;
       agentSounds.chime();
 
       const { intent } = parseIntent(text);
@@ -2324,6 +2325,17 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         ...groundingSemaphoreMeta,
         auto_corrected: guarded.modified === true,
       };
+      const profileMode = (() => {
+        try {
+          return getProfile()?.nivel_respuestas || '';
+        } catch (_) {
+          return '';
+        }
+      })();
+      const response = appendScientificFooter(responseBody, {
+        mode: profileMode,
+        metadata: sourceMetadata,
+      });
 
       // AFFECTS-GATE (auditoría anti-contaminación cruzada de cultivo, 2026-07):
       // el sello "Catálogo verificado" NO debe pintarse cuando la evidencia
@@ -2354,7 +2366,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                 .filter((e) => e && (['pest', 'plaga'].includes(e.kind)))
                 .map((e) => resolvePestAffects(e.canonical_id || e.mentioned, maps))
                 .filter(Boolean),
-              ...scanTextForPestAffects(response, maps),
+              ...scanTextForPestAffects(responseBody, maps),
             ];
             const gateResult = detectCrossCropContamination({ cropInFocusIds, pestAffectsList });
             if (gateResult.crossCrop) {
@@ -2392,7 +2404,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             .map((e) => e?.nombre_cientifico)
             .filter((n) => typeof n === 'string' && n.trim().length > 0);
           if (expected.length > 0) {
-            const pv = await postValidate(response, expected);
+            const pv = await postValidate(responseBody, expected);
             sourceMetadata = mergePostValidateMetadata(sourceMetadata, pv);
             if (sourceMetadata.hallucinated_names || sourceMetadata.suspect_names) {
               console.debug('[sidecar] post-validate flags', {
@@ -2422,7 +2434,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // expandir el dato. Funciones puras (detectarSlugEnTexto/elegirInsight).
       let insightProactivo = null;
       try {
-        const textoTurno = `${text || ''} ${response || ''}`;
+        const textoTurno = `${text || ''} ${responseBody || ''}`;
         const slug = detectarSlugEnTexto(textoTurno);
         if (slug) {
           const candidato = elegirInsight(slug, insightsVistosRef.current);
@@ -2541,11 +2553,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // latencia hasta-primer-audio de "esperar respuesta entera"
           // (3-23s) a "esperar primera frase" (<2s). Internamente fallback
           // a speakKokoro/speak en caso de error en la primera frase.
-          speakSentences(response, { rate: 0.9, pitch: 1.0 })
+          speakSentences(responseBody, { rate: 0.9, pitch: 1.0 })
             .then((ok) => { if (!ok) warnIfMute(); })
             .catch(() => warnIfMute());
         } else {
-          const utterance = speak(response, { rate: 0.9, pitch: 1.0 });
+          const utterance = speak(responseBody, { rate: 0.9, pitch: 1.0 });
           if (!utterance) warnIfMute();
         }
       }
@@ -2567,7 +2579,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             ...(intent.quantity && intent.unit && { quantity: intent.quantity, unit: intent.unit }),
           },
           intent: text,
-          llm_response: response,
+          llm_response: responseBody,
           timestamp: new Date().toISOString(),
         };
         const result = await executeAction(proposal, operatorId);

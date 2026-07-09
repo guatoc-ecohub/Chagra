@@ -433,17 +433,14 @@ describe('presupuesto del prompt ensamblado (regresión GR-10)', () => {
       expect(assembled.content).not.toContain('=== MODO EXPERTO ===');
     });
 
-    it('INYECTA MODO EXPERTO CONTRATO CITA cuando nivelRespuestas es "detallado" con grounding', () => {
+    it('INYECTA MODO EXPERTO CONTRATO TÉCNICO cuando nivelRespuestas es "detallado" con grounding', () => {
       const { assembled } = assembleForQuery({
         ...QUERIES.q1_relacional,
         nivelRespuestas: 'detallado',
       });
       expect(assembled.content).toContain('=== MODO EXPERTO ===');
-      expect(assembled.content).toContain('CONTRATO CITA:');
-      expect(assembled.content).toContain('científico exacto');
-      expect(assembled.content).toContain('dosis con unidad');
-      expect(assembled.content).toContain('mecanismo de acción');
-      expect(assembled.content).toContain('piso térmico');
+      expect(assembled.content).toContain('CONTRATO TÉCNICO:');
+      expect(assembled.content).toContain('evidencia disponible');
     });
 
     it('INYECTA MODO EXPERTO CONTRATO TÉCNICO cuando es "detallado" sin grounding', () => {
