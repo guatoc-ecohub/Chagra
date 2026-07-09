@@ -68,9 +68,11 @@ const NIVELES_DISPUTA = new Set(['disputed', 'en_disputa']);
  *            trazable sin revisión.
  *   ROJO   → sin procedencia, o nada trazable ni revisado (sin verificar).
  *
- * @param {Array<{entity_id?: string, confidence?: number, source?: string|null,
- *   validation_level?: string|null, disputed?: boolean,
- *   verificado_openalex?: boolean}>|null|undefined} provenance
+ * Total y defensiva: acepta cualquier input (no-array, items basura) sin
+ * lanzar. La forma esperada de cada item es {entity_id, confidence, source,
+ * validation_level, disputed?, verificado_openalex?}.
+ *
+ * @param {*} provenance
  * @returns {{ nivel: 'verde'|'ambar'|'rojo', motivo: string }}
  */
 export function nivelDeProvenance(provenance) {
@@ -169,8 +171,11 @@ export function computeSemaforoTurno(metadata) {
   const base = backend || policyNivel;
   const refine = provenance ? nivelDeProvenance(provenance) : null;
 
+  /** @type {'verde'|'ambar'|'rojo'} */
   let nivel;
+  /** @type {string} */
   let motivo;
+  /** @type {'sidecar'|'cliente'|'sidecar+cliente'} */
   let origen;
   if (base && refine) {
     // Peor-de-los-dos: el refine de curaduría solo degrada, nunca sube.
@@ -339,8 +344,10 @@ export function humanizarEntidad(entityId) {
 }
 
 /**
- * Confianza 0..1 → porcentaje entero 0..100 (clamp defensivo, NaN → null).
- * @param {number|null|undefined} confidence
+ * Confianza 0..1 → porcentaje entero 0..100 (clamp defensivo: acepta
+ * cualquier input; null/undefined/''/no-numérico → null, fuera de rango se
+ * recorta a [0,100]).
+ * @param {*} confidence
  * @returns {number|null}
  */
 export function confianzaPorcentaje(confidence) {
