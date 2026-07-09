@@ -12,15 +12,29 @@
  * Aquí el aro de la propia A hace de borde del botón: el ícono llena TODO el
  * FAB y las herramientas sobresalen del aro (como en la Ⓐ pintada en un muro).
  *
- * Tres variantes lado a lado, cada una con un lenguaje de animación distinto:
- *   01 LA FORJA      — caída con gravedad, rebote, chispas y encendido neón.
- *   02 LA SIMBIOSIS  — las herramientas brotan en espiral; savia + esporas.
- *   03 EL MACHETAZO  — esténcil callejero: golpes secos, salpicadura, flicker.
+ * Cuatro variantes lado a lado, cada una con un lenguaje de animación distinto:
+ *   01 LA FORJA             — caída con gravedad, rebote, chispas y neón.
+ *   02 LA SIMBIOSIS         — las herramientas brotan en espiral; savia + esporas.
+ *   03 EL MACHETAZO         — esténcil callejero: golpes secos, salpicadura, flicker.
+ *   04 EL MACHETAZO FORJADO — los golpes del 03 con la paleta neón rojo/ámbar del 01.
  *
  * Técnica: SVG + CSS puro (cero deps, cero fotos). Solo transform / opacity /
  * stroke-dashoffset (GPU-friendly, sin filter animado). La A la forman SOLO
  * las herramientas — no hay ninguna A dibujada aparte (ni trazo, ni glow, ni
  * savia sobre los ejes): quitarla fue decisión del operador (v2, 2026-07-09).
+ *
+ * v3 (2026-07-09): FIX X→A. El bug: la regla blanket `transform-box: fill-box;
+ * transform-origin: center` (necesaria para las animaciones) también aplicaba
+ * al atributo `transform` de los grupos de POSICIÓN de cada herramienta (en
+ * SVG2 el atributo mapea a la propiedad CSS), así que `rotate(±21)` pivotaba
+ * sobre el CENTRO del propio bbox de la herramienta y no sobre el ápice tras
+ * el translate: la parte de arriba de cada diagonal se abría hacia afuera y
+ * las dos se CRUZABAN a media altura → se leía X/tijera, no A. El fix es la
+ * clase `.ba-tool` (transform-box: view-box + origin 0 0 = semántica SVG
+ * nativa): las diagonales convergen en el ápice y divergen hacia abajo sin
+ * cruzarse. La sección "antes (X) / ahora (A)" conserva el render viejo
+ * (`.ba-legacy` re-aplica el pivote roto) para comparar lado a lado.
+ * Además: variante 04 = el gesto de El Machetazo con los colores de La Forja.
  * Cada ciclo termina con un HOLD de ~2 s+ con la Ⓐ armada, quieta y legible,
  * y recién ahí reinicia. `prefers-reduced-motion` apaga todo y deja la Ⓐ
  * ensamblada (estado base = fotograma final). Ruta sin gate ni sesión: es un
@@ -76,7 +90,7 @@ const AZADON_BLADE = 'M -6 7 L 4 8.5 L 5.5 22 L -10 19 Z';
 function Pala({ skin }) {
   if (skin === 'stencil') {
     return (
-      <g transform={PALA_POS}>
+      <g className="ba-tool" transform={PALA_POS}>
         <path d={PALA_GRIP} fill="none" stroke="#ece3cf" strokeWidth="8.5" strokeLinecap="round" />
         <path d={PALA_SHAFT} fill="none" stroke="#ece3cf" strokeWidth="10.5" strokeLinecap="round" />
         <path d={PALA_BLADE} fill="#ece3cf" />
@@ -87,7 +101,7 @@ function Pala({ skin }) {
     ? { line: '#35e0a1', hi: '#8fffd2', fill: '#11382a' }
     : { line: '#e8402e', hi: '#ff6b57', fill: '#571106' };
   return (
-    <g transform={PALA_POS}>
+    <g className="ba-tool" transform={PALA_POS}>
       <path d={PALA_GRIP} fill="none" stroke={c.line} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
       <path d={PALA_SHAFT} fill="none" stroke={c.line} strokeWidth="8.5" strokeLinecap="round" />
       <path d={PALA_BLADE} fill={c.fill} stroke={c.hi} strokeWidth="3.4" strokeLinejoin="round" />
@@ -98,7 +112,7 @@ function Pala({ skin }) {
 function Machete({ skin }) {
   if (skin === 'stencil') {
     return (
-      <g transform={MACHETE_POS}>
+      <g className="ba-tool" transform={MACHETE_POS}>
         <path d={MACHETE_HANDLE} fill="none" stroke="#ece3cf" strokeWidth="10.5" strokeLinecap="round" />
         <path d={MACHETE_GUARD} fill="none" stroke="#ece3cf" strokeWidth="6.5" strokeLinecap="round" />
         <path d={MACHETE_BLADE} fill="#ece3cf" />
@@ -109,7 +123,7 @@ function Machete({ skin }) {
     ? { line: '#35e0a1', hi: '#8fffd2', fill: '#11382a', filo: '#ff5f4d' }
     : { line: '#e8402e', hi: '#ff6b57', fill: '#571106', filo: '#ff6b57' };
   return (
-    <g transform={MACHETE_POS}>
+    <g className="ba-tool" transform={MACHETE_POS}>
       <path d={MACHETE_HANDLE} fill="none" stroke={c.line} strokeWidth="8.5" strokeLinecap="round" />
       <path d={MACHETE_GUARD} fill="none" stroke={c.line} strokeWidth="5" strokeLinecap="round" />
       <path d={MACHETE_BLADE} fill={c.fill} stroke={c.hi} strokeWidth="3.2" strokeLinejoin="round" />
@@ -122,7 +136,7 @@ function Machete({ skin }) {
 function Azadon({ skin }) {
   if (skin === 'stencil') {
     return (
-      <g transform={AZADON_POS}>
+      <g className="ba-tool" transform={AZADON_POS}>
         <path d={AZADON_HANDLE} fill="none" stroke="#ece3cf" strokeWidth="10.5" strokeLinecap="round" />
         <path d={AZADON_NECK} fill="none" stroke="#ece3cf" strokeWidth="7" strokeLinecap="round" />
         <path d={AZADON_BLADE} fill="#ece3cf" />
@@ -133,7 +147,7 @@ function Azadon({ skin }) {
     ? { line: '#35e0a1', hi: '#8fffd2', fill: '#11382a' }
     : { line: '#e8402e', hi: '#ff6b57', fill: '#571106' };
   return (
-    <g transform={AZADON_POS}>
+    <g className="ba-tool" transform={AZADON_POS}>
       <path d={AZADON_HANDLE} fill="none" stroke={c.line} strokeWidth="8.5" strokeLinecap="round" />
       <path d={AZADON_NECK} fill="none" stroke={c.line} strokeWidth="5" strokeLinecap="round" />
       <path d={AZADON_BLADE} fill={c.fill} stroke={c.hi} strokeWidth="3.2" strokeLinejoin="round" />
@@ -298,6 +312,65 @@ function FabMachetazo() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// VARIANTE 04 — EL MACHETAZO FORJADO (los golpes del 03, los colores del 01)
+// Reusa TODOS los keyframes b3-* (shake, golpes, estelas, splats, flicker):
+// solo cambia la piel — aro rojo marca, herramientas neón, salpicadura ámbar
+// como chispa de fragua.
+// ─────────────────────────────────────────────────────────────────────────────
+function FabMachetazoForjado() {
+  return (
+    <svg viewBox="0 0 140 140" className="ba-svg b3-root" aria-hidden="true">
+      <circle cx="70" cy="74" r="46" fill="#150907" />
+      <g className="b3-shake">
+        {/* aro estampado, pero en el neón de La Forja */}
+        <g className="b3-aro">
+          <circle cx="70" cy="74" r="46" fill="none" stroke="#c93b2a" strokeWidth="8" />
+          <circle cx="70" cy="74" r="46" fill="none" stroke="#ff6b57" strokeWidth="1.4" opacity="0.35" />
+          <circle
+            className="b3-grunge" cx="70" cy="74" r="41" fill="none"
+            stroke="#ffb03a" strokeWidth="1.6" strokeDasharray="18 26 7 40 24 14" opacity="0.5"
+          />
+        </g>
+
+        {/* la Ⓐ neón estampada a golpes */}
+        <g className="b3-tools">
+          <g className="b3-pala"><Pala skin="neon" /></g>
+          <g className="b3-azadon"><Azadon skin="neon" /></g>
+          <g className="b3-machete"><Machete skin="neon" /></g>
+        </g>
+
+        {/* estelas de velocidad, encendidas */}
+        <polygon className="b3-streak b3-streak-pala" points="60,-28 69,-30 72,48 66,49" fill="#ff6b57" opacity="0" />
+        <g className="b3-streak b3-streak-azadon" stroke="#ff6b57" strokeWidth="3" strokeLinecap="round" opacity="0">
+          <line x1="78" y1="82" x2="130" y2="80" />
+          <line x1="86" y1="94" x2="132" y2="93" />
+        </g>
+        <polygon className="b3-streak b3-streak-machete" points="86,6 92,1 122,110 114,112" fill="#ff6b57" opacity="0" />
+
+        {/* salpicaduras ÁMBAR — chispas de fragua que quedan de recuerdo */}
+        <g className="b3-splat b3-splat-a" fill="#ffb03a">
+          <circle cx="34" cy="118" r="3.2" />
+          <circle cx="26" cy="110" r="1.8" />
+          <circle cx="43" cy="126" r="1.4" />
+          <circle cx="21" cy="121" r="1.1" />
+        </g>
+        <g className="b3-splat b3-splat-b" fill="#ffb03a">
+          <circle cx="122" cy="84" r="2.8" />
+          <circle cx="128" cy="94" r="1.6" />
+          <circle cx="117" cy="76" r="1.2" />
+        </g>
+        <g className="b3-splat b3-splat-c" fill="#ffb03a">
+          <circle cx="112" cy="120" r="3.4" />
+          <circle cx="120" cy="112" r="1.9" />
+          <circle cx="104" cy="128" r="1.5" />
+          <circle cx="126" cy="124" r="1.2" />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Tarjeta de variante: demo grande + fila a tamaño real + ficha
 // ─────────────────────────────────────────────────────────────────────────────
 function VarianteCard({ num, nombre, lema, desc, specs, children }) {
@@ -344,7 +417,7 @@ export default function BotonAnarquia({ onBack }) {
         </nav>
 
         <header className="ba-hero">
-          <p className="ba-eyebrow">FAB del agente · reemplazo del botón Ⓐ · 3 variantes</p>
+          <p className="ba-eyebrow">FAB del agente · reemplazo del botón Ⓐ · 4 variantes · X→A arreglada</p>
           <h1 className="ba-title">
             Ⓐ de anarquía.<br />Ⓐ de agricultura.
           </h1>
@@ -388,13 +461,56 @@ export default function BotonAnarquia({ onBack }) {
           >
             <FabMachetazo />
           </VarianteCard>
+
+          <VarianteCard
+            num="04"
+            nombre="El Machetazo Forjado"
+            lema="los golpes del 03, el neón del 01"
+            desc="El mismo esténcil de tres golpes secos de El Machetazo — la pala se CLAVA, el azadón entra de hachazo, el machete corta y el botón se sacude salpicando — pero vestido con la piel de La Forja: aro rojo marca, herramientas neón encendidas y salpicadura ámbar como chispa de fragua."
+            specs="loop 6 s · hold ~2.3 s con la A armada · golpes del 03 + paleta neón rojo/ámbar del 01"
+          >
+            <FabMachetazoForjado />
+          </VarianteCard>
         </main>
+
+        <section className="ba-compare" aria-label="Antes y ahora del arreglo de la A">
+          <h2 className="ba-compare-title">antes (X) → ahora (A)</h2>
+          <p className="ba-compare-sub">
+            El render viejo giraba cada herramienta sobre su propio centro: las
+            empuñaduras sobresalían por encima del punto de encuentro y las dos
+            diagonales se <b>cruzaban</b> a media altura — se leía X de tijera.
+            Ahora pala y machete pivotan sobre el <b>ápice</b>: se tocan arriba,
+            divergen hacia abajo sin cruzarse y el azadón queda de travesaño —
+            se lee A.
+          </p>
+          <div className="ba-compare-grid">
+            {[
+              { nombre: '01 · La Forja', Fab: FabForja },
+              { nombre: '02 · La Simbiosis', Fab: FabSimbiosis },
+              { nombre: '03 · El Machetazo', Fab: FabMachetazo },
+            ].map((v) => (
+              <div className="ba-compare-col" key={v.nombre}>
+                <span className="ba-compare-name">{v.nombre}</span>
+                <div className="ba-compare-pair">
+                  <figure className="ba-compare-cell ba-legacy">
+                    <span className="ba-fab" style={{ width: 108, height: 108 }}><v.Fab /></span>
+                    <figcaption>antes (X)</figcaption>
+                  </figure>
+                  <figure className="ba-compare-cell">
+                    <span className="ba-fab" style={{ width: 108, height: 108 }}><v.Fab /></span>
+                    <figcaption>ahora (A)</figcaption>
+                  </figure>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         <footer className="ba-foot">
           <p>
             SVG + CSS puro (transform/opacity, cero filtros animados, cero deps) ·{' '}
             con <code>prefers-reduced-motion</code> la Ⓐ queda ensamblada y quieta ·{' '}
-            misma geometría en las tres — solo cambia la piel y el gesto.
+            misma geometría en las cuatro — solo cambia la piel y el gesto.
           </p>
         </footer>
       </div>
@@ -512,6 +628,44 @@ const BA_CSS = `
   font-family: ui-monospace, monospace; color: rgba(47, 230, 166, 0.75);
 }
 
+/* ══ comparación antes (X) / ahora (A) ═══════════════════════════════════ */
+.ba-compare {
+  margin-top: 34px; padding: 18px 18px 16px;
+  border: 1px solid rgba(217, 229, 220, 0.12); border-radius: 18px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.ba-compare-title {
+  margin: 0 0 8px; font-size: 1.15rem; font-weight: 800;
+  letter-spacing: 0.05em; text-transform: uppercase; color: #f2f7f3;
+}
+.ba-compare-sub {
+  margin: 0 0 16px; font-size: 0.86rem; line-height: 1.5;
+  color: rgba(217, 229, 220, 0.72); max-width: 780px;
+}
+.ba-compare-sub b { color: #f2f7f3; }
+.ba-compare-grid {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+}
+.ba-compare-col { display: flex; flex-direction: column; gap: 8px; }
+.ba-compare-name {
+  font-family: ui-monospace, 'Cascadia Mono', 'JetBrains Mono', monospace;
+  font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(217, 229, 220, 0.55);
+}
+.ba-compare-pair { display: flex; gap: 12px; }
+.ba-compare-cell {
+  margin: 0; flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 8px; padding: 14px 8px 10px;
+  border-radius: 12px; background: rgba(0, 0, 0, 0.32); overflow: hidden;
+}
+.ba-compare-cell figcaption {
+  font-family: ui-monospace, 'Cascadia Mono', 'JetBrains Mono', monospace;
+  font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase;
+  color: #2fe6a6;
+}
+.ba-compare-cell.ba-legacy figcaption { color: #ff6b57; }
+
 /* herramientas y capas animadas: transform en unidades del viewBox */
 .ba-svg g, .ba-svg circle, .ba-svg line, .ba-svg polygon, .ba-svg path {
   transform-box: fill-box;
@@ -524,6 +678,23 @@ const BA_CSS = `
 .ba-svg .b3-aro, .ba-svg .b3-grunge {
   transform-box: view-box;
   transform-origin: 70px 74px;
+}
+/* FIX X→A: los grupos de POSICIÓN de cada herramienta (atributo transform =
+   translate al ápice + rotate) deben pivotar sobre el ORIGEN LOCAL tras el
+   translate (semántica SVG nativa), no sobre el centro de su bbox. Con la
+   regla blanket de arriba, rotate(±21) giraba cada diagonal sobre su propio
+   centro: las empuñaduras se abrían hacia afuera por ENCIMA del punto de
+   encuentro y las dos diagonales se CRUZABAN → X. Con view-box + origin 0 0
+   convergen en el ápice y divergen hacia abajo sin cruzarse → A. */
+.ba-svg .ba-tool {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+/* "antes (X)": re-aplica el pivote roto SOLO dentro de la sección de
+   comparación, para que el operador vea el render viejo junto al nuevo. */
+.ba-legacy .ba-svg .ba-tool {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 /* ══ 01 · LA FORJA ═══════════════════════════════════════════════════════
