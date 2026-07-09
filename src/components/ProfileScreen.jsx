@@ -1070,9 +1070,9 @@ function AgentVoiceSection() {
         <div className="flex flex-col gap-0.5 flex-1">
           <span className="text-sm font-bold text-slate-200">Voz del agente activa</span>
           <span className="text-xs text-slate-400 leading-snug">
-            Cuando está activa, Chagra IA lee en voz alta sus respuestas (Kokoro TTS,
-            con respaldo al sintetizador del navegador). Doble click en el avatar
-            colibrí silencia o reactiva sin abrir esta pantalla.
+            Cuando está activa, Chagra IA lee en voz alta sus respuestas con una
+            sola voz natural. Doble click en el avatar colibrí silencia o
+            reactiva sin abrir esta pantalla.
           </span>
         </div>
         <button
