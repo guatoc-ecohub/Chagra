@@ -67,35 +67,43 @@ function applyVoseoGuard(text) {
  * otras voces ef_ / em_ en futuras iteraciones. Si descubrimos una voz
  * específicamente colombiana en upstream, la agregamos acá.
  */
+/*
+ * ACTUALIZACIÓN 2026-07-09 (voz de Chagra): el bloque de arriba quedó
+ * DESACTUALIZADO. Se verificó el catálogo REAL contra el servidor (/health):
+ * la lista servible es KOKORO_VOICES (abajo), curada por el oído del operador
+ * — pm_santa (DEFAULT), if_sara, em_alex. Se retiró la vieja voz por defecto
+ * del selector por decisión del operador.
+ *
+ * GOTCHA IMPORTANTE: `ef_aoede`/`ef_kore` NO existen en el servidor (son
+ * `af_aoede`/`af_kore`, inglesas). Ante una voz desconocida el servidor cae
+ * SILENCIOSAMENTE a su DEFAULT_VOICE — por eso una preferencia vieja hacía
+ * "sonar" la voz retirada. La guarda toServableVoice() coacciona cualquier voz
+ * no servible a la default (santa) antes de ir al server: la voz retirada nunca
+ * suena, ni por el fallback del servidor.
+ */
 export const KOKORO_VOICES = Object.freeze([
   {
-    id: 'ef_dora',
-    label: 'Dora (femenina, default)',
-    description: 'Voz por defecto. Tono suave. Puede sentirse con acento anglo.',
-    gender: 'femenina',
+    id: 'pm_santa',
+    label: 'Santa',
+    description: 'Voz de hombre, cálida y tranquila.',
+    gender: 'masculina',
   },
   {
-    id: 'ef_aoede',
-    label: 'Aoede (femenina, más neutra)',
-    description: 'Voz femenina musical. Acento hispano más neutro según comunidad.',
-    gender: 'femenina',
-  },
-  {
-    id: 'ef_kore',
-    label: 'Kore (femenina, articulación firme)',
-    description: 'Voz femenina con articulación clara. Buena para campo con ruido.',
+    id: 'if_sara',
+    label: 'Sara',
+    description: 'Voz de mujer, dulce y cercana.',
     gender: 'femenina',
   },
   {
     id: 'em_alex',
-    label: 'Alex (masculina, cálida)',
-    description: 'Voz masculina cálida. Alternativa al perfil femenino.',
+    label: 'Álex',
+    description: 'Voz de hombre, natural y de tono medio.',
     gender: 'masculina',
   },
 ]);
 
-export const DEFAULT_KOKORO_VOICE = 'ef_dora';
-export const DEFAULT_KOKORO_RATE = 0.9;
+export const DEFAULT_KOKORO_VOICE = 'pm_santa';
+export const DEFAULT_KOKORO_RATE = 1.0;
 export const KOKORO_RATE_MIN = 0.85;
 export const KOKORO_RATE_MAX = 1.1;
 
@@ -113,7 +121,33 @@ export const XTTS_ENABLED_KEY = 'chagra:tts:xtts_enabled';
 const STORAGE_KEY_VOICE = 'chagra:tts:voice';
 const STORAGE_KEY_RATE = 'chagra:tts:rate';
 
+// Consistencia de voz (2026-07-09): por defecto NO caemos a la voz del
+// navegador (window.speechSynthesis, robótica y con acento). El operador
+// reportó "a veces habla una voz y luego otra": era este fallback saltando a
+// media sesión cuando kokoro fallaba/timeouteaba. Preferimos UNA sola voz
+// natural: si kokoro falla, reintentamos y, si no, silencio consistente.
+// Este flag deja al operador reactivar el respaldo del navegador a propósito.
+const STORAGE_KEY_BROWSER_FALLBACK = 'chagra:tts:browser_fallback';
+
 const VALID_VOICE_IDS = new Set(KOKORO_VOICES.map((v) => v.id));
+
+/**
+ * Coerciona una voz a una que EXISTE de verdad en el servidor kokoro.
+ *
+ * Orden del operador (2026-07-09): dora NUNCA debe sonar, ni siquiera en el
+ * fallback del servidor. El servidor kokoro, ante una voz DESCONOCIDA, cae
+ * SILENCIOSAMENTE a su DEFAULT_VOICE (ef_dora) — por eso "a veces sonaba dora"
+ * aunque se quitó del selector: una preferencia vieja como 'ef_aoede'/'ef_kore'
+ * (voces inglesas inexistentes) o la propia 'ef_dora' viajaba al server y este
+ * la resolvía a dora.
+ *
+ * Garantía dura: si la voz pedida NO está en KOKORO_VOICES (las que sabemos que
+ * existen de verdad), la sustituimos por DEFAULT_KOKORO_VOICE (santa). Así el
+ * servidor jamás recibe una voz que resuelva a dora.
+ */
+function toServableVoice(voice) {
+  return VALID_VOICE_IDS.has(voice) ? voice : DEFAULT_KOKORO_VOICE;
+}
 
 /**
  * Task #124: lee la voz Kokoro preferida persistida en localStorage.
@@ -213,6 +247,39 @@ export function setXTTSEnabled(enabled) {
   try {
     if (typeof localStorage === 'undefined') return false;
     localStorage.setItem(XTTS_ENABLED_KEY, String(enabled));
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Consistencia de voz (2026-07-09): ¿permitir el respaldo a la voz del
+ * navegador (window.speechSynthesis) cuando kokoro falla?
+ *
+ * Default FALSE: preferimos una sola voz natural. Si kokoro no responde,
+ * reintentamos y, si aun así falla, guardamos silencio en vez de cambiar
+ * abruptamente a la voz robótica del navegador (era la causa del "a veces
+ * habla una voz y luego otra"). El operador puede reactivarlo a propósito.
+ */
+export function getBrowserVoiceFallback() {
+  try {
+    if (typeof localStorage === 'undefined') return false;
+    return localStorage.getItem(STORAGE_KEY_BROWSER_FALLBACK) === 'true';
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Persiste la preferencia de respaldo a la voz del navegador.
+ *
+ * @returns {boolean} true si guardó, false si storage falló.
+ */
+export function setBrowserVoiceFallback(enabled) {
+  try {
+    if (typeof localStorage === 'undefined') return false;
+    localStorage.setItem(STORAGE_KEY_BROWSER_FALLBACK, String(!!enabled));
     return true;
   } catch (_) {
     return false;
@@ -403,26 +470,79 @@ export function splitIntoSentences(text) {
   return sentences.filter((s) => s.length > 0);
 }
 
+// ──────────────────────────────────────────────────────────────────────────
+// Reintentos + política de fallback (consistencia de voz, 2026-07-09)
+// ──────────────────────────────────────────────────────────────────────────
+// Un blip transitorio de kokoro (503 por saturación de GPU/CPU, timeout, un
+// corte de red momentáneo) NO debe cambiar de voz a media respuesta. Antes de
+// rendirnos reintentamos con un backoff corto. AbortError (el operador apretó
+// stop()) NUNCA se reintenta.
+export const KOKORO_MAX_RETRIES = 2;
+const KOKORO_RETRY_BASE_MS = 250;
+
+function clampRate(rate) {
+  const r = Number.isFinite(rate) ? rate : DEFAULT_KOKORO_RATE;
+  return Math.min(KOKORO_RATE_MAX, Math.max(KOKORO_RATE_MIN, r));
+}
+
+/**
+ * POST a /api/kokoro/tts con reintentos + backoff. Devuelve el blob de audio.
+ * Lanza el último error si agota los reintentos, o AbortError si el signal
+ * se abortó (no se reintenta en ese caso).
+ */
+async function fetchKokoroBlob(cleanText, voice, format, lang, signal) {
+  let lastErr = null;
+  for (let attempt = 0; attempt <= KOKORO_MAX_RETRIES; attempt++) {
+    if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+    try {
+      const res = await fetch('/api/kokoro/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: cleanText, voice, format, lang }),
+        signal,
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.blob();
+    } catch (e) {
+      if (e?.name === 'AbortError') throw e;
+      lastErr = e;
+      if (attempt < KOKORO_MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, KOKORO_RETRY_BASE_MS * (attempt + 1)));
+      }
+    }
+  }
+  throw lastErr || new Error('kokoro TTS falló');
+}
+
+/**
+ * Fallback CONSISTENTE cuando kokoro falla definitivamente.
+ *
+ * Por defecto: SILENCIO (return null) — no cambiamos a la voz robótica del
+ * navegador. Solo si el operador activó `setBrowserVoiceFallback(true)` a
+ * propósito usamos speak() (Web Speech). Esto garantiza "una sola voz": el
+ * campesino nunca oye a Chagra saltar de la voz neuronal a la del navegador
+ * a media sesión.
+ */
+function browserFallback(text, options) {
+  if (getBrowserVoiceFallback()) {
+    return speak(text, options);
+  }
+  return null;
+}
+
 /**
  * Sintetiza una sola frase con Kokoro y devuelve un blob URL listo para Audio.
- * Internamente reusa el endpoint /api/kokoro/tts.
+ * Internamente reusa fetchKokoroBlob (con reintentos).
  *
- * Lanza si HTTP no-OK o si la frase está vacía. El caller (speakSentences)
- * captura el error y decide si fallback a speak() Web Speech.
+ * Lanza si agota reintentos; devuelve null si la frase está vacía. El caller
+ * (speakSentences) captura el error y decide (por defecto, silencio).
  *
  * @returns {Promise<string|null>} blob URL o null si frase vacía.
  */
 async function synthesizeSentence(sentence, voice, format, lang, signal) {
   const clean = sanitizeForTTS(sentence);
   if (!clean || clean.length === 0) return null;
-  const res = await fetch('/api/kokoro/tts', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: clean, voice, format, lang }),
-    signal,
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const blob = await res.blob();
+  const blob = await fetchKokoroBlob(clean, voice, format, lang, signal);
   return URL.createObjectURL(blob);
 }
 
@@ -430,9 +550,10 @@ async function synthesizeSentence(sentence, voice, format, lang, signal) {
  * Reproduce un blob URL como Audio, retorna Promise que resuelve al onended.
  * Setea currentKokoroAudio/currentKokoroUrl para que stop() pueda matarlo.
  */
-function playSentenceBlob(url) {
+function playSentenceBlob(url, rate) {
   return new Promise((resolve, reject) => {
     const audio = new Audio(url);
+    audio.playbackRate = clampRate(rate);
     currentKokoroAudio = audio;
     currentKokoroUrl = url;
     const cleanup = () => {
@@ -486,7 +607,12 @@ export async function speakSentences(text, options = {}) {
     voice = getPreferredVoice(),
     format = 'opus',
     lang = 'es',
+    rate = getPreferredRate(),
   } = options;
+
+  // toServableVoice: la voz que viaja al server SIEMPRE existe → dora nunca
+  // suena por el fallback silencioso del servidor (orden operador 2026-07-09).
+  const servableVoice = toServableVoice(voice);
 
   stop();
   sentenceQueueCancelled = false;
@@ -515,7 +641,7 @@ export async function speakSentences(text, options = {}) {
   const prefetch = (idx) => {
     if (idx >= sentences.length || sentenceQueueCancelled) return null;
     return synthesizeSentence(
-      sentences[idx], voice, format, lang, sentenceQueueController.signal
+      sentences[idx], servableVoice, format, lang, sentenceQueueController.signal
     ).catch((e) => {
       if (e?.name !== 'AbortError') {
         console.warn('[TTS streaming] sentence prefetch failed:', e.message);
@@ -550,13 +676,15 @@ export async function speakSentences(text, options = {}) {
       const next = i + 1 < sentences.length ? prefetch(i + 1) : null;
       if (prefetched) {
         try {
-          await playSentenceBlob(prefetched);
+          await playSentenceBlob(prefetched, rate);
           firstFrameSucceeded = true;
         } catch (e) {
           console.warn('[TTS streaming] playback error frase', i, ':', e?.message || e);
-          // Para frases tardías que fallan, fallback Web Speech por frase.
+          // Consistencia de voz: NO saltamos a la voz del navegador a media
+          // respuesta. browserFallback = silencio salvo que el operador haya
+          // activado el respaldo del navegador a propósito.
           if (i > 0 && !sentenceQueueCancelled) {
-            try { speak(sentences[i], options); } catch (_) { /* ignore */ }
+            try { browserFallback(sentences[i], options); } catch (_) { /* ignore */ }
           }
         }
       }
@@ -744,13 +872,14 @@ export async function isKokoroAvailable() {
 
 export async function speakKokoro(text, options = {}) {
   // Task #124: si el caller NO pasa `voice` explícito, usar la voz
-  // preferida del operador desde localStorage (fallback ef_dora si
-  // no hay preferencia o storage inaccesible). Callers que pasan voice
-  // explícito (tests, casos avanzados) conservan ese override.
+  // preferida del operador desde localStorage (fallback a DEFAULT_KOKORO_VOICE
+  // = santa si no hay preferencia o storage inaccesible). Callers que pasan
+  // voice explícito (tests, casos avanzados) conservan ese override.
   const {
     voice = getPreferredVoice(),
     format = 'opus',
     lang = 'es',
+    rate = getPreferredRate(),
   } = options;
 
   stop();
@@ -773,17 +902,13 @@ export async function speakKokoro(text, options = {}) {
   }
 
   try {
-    const res = await fetch('/api/kokoro/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: cleanText, voice, format, lang }),
-    });
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const blob = await res.blob();
+    // fetchKokoroBlob reintenta con backoff ante blips transitorios antes de
+    // rendirse — así un 503/timeout momentáneo no cambia de voz.
+    // toServableVoice: dora nunca suena, ni por fallback del server.
+    const blob = await fetchKokoroBlob(cleanText, toServableVoice(voice), format, lang);
     const url = URL.createObjectURL(blob);
     const audio = new Audio(url);
+    audio.playbackRate = clampRate(rate);
 
     currentKokoroUrl = url;
     currentKokoroAudio = audio;
@@ -802,12 +927,17 @@ export async function speakKokoro(text, options = {}) {
     notifySpeaking(true);
     return audio;
   } catch (e) {
-    console.warn('[TTS] Kokoro failed, fallback to Web Speech:', e.message);
-    // Si el play() falló después de notificar, limpiar antes del fallback —
-    // speak() gestionará su propio onstart/onend.
+    if (e?.name === 'AbortError') {
+      // stop() del operador: no es un fallo, no hacer fallback.
+      notifySpeaking(false);
+      return null;
+    }
+    // Kokoro falló tras reintentos. Por defecto NO cambiamos a la voz robótica
+    // del navegador (evita el "a veces habla una voz y luego otra"): silencio
+    // consistente salvo que el operador haya activado el respaldo del navegador.
+    console.warn('[TTS] Kokoro falló tras reintentos:', e?.message || e);
     notifySpeaking(false);
-    speak(text, options);
-    return null;
+    return browserFallback(text, options);
   }
 }
 
@@ -916,12 +1046,10 @@ export function isPaused() {
 export async function replayLast({ useKokoro = null } = {}) {
   if (!lastSpoken) return false;
   const opts = lastSpokenOptions || {};
-  // Decisión por defecto: probar Kokoro si la última vez fue Kokoro
-  // (heurística: opts trae `voice` ef_*). Sino Web Speech.
-  const shouldUseKokoro =
-    useKokoro !== null
-      ? useKokoro
-      : typeof opts.voice === 'string' && opts.voice.startsWith('ef_');
+  // Preferimos SIEMPRE kokoro (voz consistente). El heurístico viejo miraba
+  // opts.voice.startsWith('ef_') y fallaba con las voces masculinas (em_*),
+  // mandándolas a la voz del navegador. El caller puede forzar con useKokoro.
+  const shouldUseKokoro = useKokoro !== null ? useKokoro : true;
   try {
     if (shouldUseKokoro) {
       await speakKokoro(lastSpoken, opts);
@@ -942,6 +1070,28 @@ export function getLastSpoken() {
 
 export function init() {
   loadVoices();
+}
+
+// Hook E2E (solo con ?e2e en la URL): expone el servicio de voz para que
+// Playwright verifique la CONSISTENCIA — que un fallo de kokoro NO salte a la
+// voz robótica del navegador. En prod nadie navega con ?e2e y solo expone
+// funciones de voz (sin datos ni secretos). Mismo patrón que window.__doomPlayer.
+if (typeof window !== 'undefined') {
+  try {
+    const hasE2EParam =
+      typeof location !== 'undefined' && new URLSearchParams(location.search).has('e2e');
+    if (hasE2EParam) {
+      // window no tiene tipada la prop de test → cast puntual (irreducible).
+      /** @type {any} */ (window).__ttsE2E = {
+        speakKokoro,
+        speakSentences,
+        getBrowserVoiceFallback,
+        setBrowserVoiceFallback,
+      };
+    }
+  } catch (_) {
+    /* noop — el hook E2E nunca debe romper el arranque */
+  }
 }
 
 export default {
@@ -972,8 +1122,13 @@ export default {
   setPreferredRate,
   getXTTSEnabled,
   setXTTSEnabled,
+  // Consistencia de voz (2026-07-09): política de respaldo a la voz del
+  // navegador (default OFF → una sola voz natural).
+  getBrowserVoiceFallback,
+  setBrowserVoiceFallback,
   KOKORO_VOICES,
   DEFAULT_KOKORO_VOICE,
+  DEFAULT_KOKORO_RATE,
   DEFAULT_COLOMBIAN_VOICE,
   XTTS_TIMEOUT_MS,
 };

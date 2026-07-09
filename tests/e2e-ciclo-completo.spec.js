@@ -185,9 +185,9 @@ test.describe('Ciclo completo del cultivo (offline-first)', () => {
     await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-pass');
     await page.getByRole('button', { name: /ingresar/i }).click();
 
-    // Dashboard cargado: el dashboard en vivo muestra "Cola de tareas"
+    // Dashboard cargado: el dashboard en vivo muestra "Tareas pendientes"
     // en su pie. (No hay OnboardingHero en DashboardLive.)
-    await expect(page.getByText('Cola de tareas')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('Tareas pendientes')).toBeVisible({ timeout: 15_000 });
 
     // ─── Paso 1: Navegar a Sembrar ──────────────────────────────
     // Vía el evento de navegación interno del app (ver nota 1 del header).

@@ -305,12 +305,12 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
   // usan). Tras el split vive en biopunk2 (donde quedó la Finca Organismo).
   const organismoActivo = escenaVivaActiva && temaEfectivo === 'biopunk2';
 
-  // ── GATE DE ANIMALES (entrada al mundo + puerta "Mis animales") ───────────
-  // `mostrarAnimales` gobierna DOS entradas al mundo animales con el MISMO
-  // criterio que DashboardLive.mostrarAnimales (el usuario solo ve lo que
-  // necesita): (a) el potrero tappable (vaca + gallinas) de la Finca Organismo
-  // [#2229] y (b) la puerta "Mis animales" [#2230]. Un urbano de balcón/terraza
-  // no las ve; el control manual del home (#1560) y el operador las conservan.
+  // ── GATE DE ANIMALES (potrero de la escena + puerta "Mis animales") ───────
+  // Mismo criterio que DashboardLive.mostrarAnimales (el usuario solo ve lo
+  // que necesita): gobierna DOS entradas al mundo de los animales — el potrero
+  // tappable (vaca + gallinas) de la Finca Organismo y la puerta "Mis
+  // animales". Un urbano de balcón/terraza no ve ninguna; el control manual
+  // del home (#1560) y el operador las conservan. Fail-open ante error.
   const [mostrarAnimales] = useState(() => {
     try {
       if (esOperadorActual()) return true;
@@ -546,9 +546,9 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                          (#34): la estructura de cada escena porta el marcador
                          fvh-estructura solo si fue declarada. `onAnimales`
                          (gate por perfil) vuelve tappable el potrero de la
-                         Finca Organismo → mundo animales [#2229]; `onPregunte`
-                         vuelve TAPPABLE el corazón-semilla → abre el agente
-                         [#2230]; las demás escenas los ignoran hoy. */
+                         Finca Organismo; `onPregunte` vuelve TAPPABLE el
+                         corazón-semilla (abre el agente). Las demás escenas
+                         ignoran ambos handlers hoy. */
                       <EscenaViva
                         estructura={estructuraFinca}
                         onAnimales={onAnimales}

@@ -440,7 +440,8 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
     try {
       const kokoroReady = await isKokoroAvailable();
       if (kokoroReady) {
-        await speakKokoro(message.content, { rate: 0.9, pitch: 1.0 });
+        // Sin rate hardcodeado: hereda la velocidad preferida del operador.
+        await speakKokoro(message.content);
       } else {
         speak(message.content, { rate: 0.9, pitch: 1.0 });
       }

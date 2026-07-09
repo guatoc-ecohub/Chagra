@@ -42,6 +42,11 @@
   align-items: center;
   gap: 5px;
   padding: 3px 9px 3px 4px;
+  /* Bug visual Vi2 (auditoría IA 2026-07-08): labels largos ("Fuente
+   * verificable: Agrosavia/Corpoica — manejo integrado…") desbordaban la
+   * burbuja por la derecha en nature/biopunk. El sello nunca puede ser más
+   * ancho que su contenedor: el texto interno hace wrap (abajo). */
+  max-width: 100%;
   border-radius: 999px;
   border: 1px solid rgb(var(--sello-rgb) / 0.38);
   background: rgb(var(--sello-rgb) / 0.12);
@@ -135,7 +140,15 @@ button.sello[aria-expanded="true"] {
 }
 
 .sello-texto {
-  white-space: nowrap;
+  /* Bug visual Vi2: antes `white-space: nowrap` — una cita larga se salía de
+   * la burbuja y se cortaba contra el margen. Ahora el texto envuelve DENTRO
+   * del sello (que a su vez respeta max-width: 100% del card). Los sellos
+   * cortos ("Dato respaldado") siguen viéndose de una sola línea. */
+  white-space: normal;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  line-height: 1.3;
+  text-align: left;
   padding-top: 1px; /* óptico: centra el x-height de Nunito contra la lámpara */
 }
 .sello-texto .sello-sub {

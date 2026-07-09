@@ -271,6 +271,42 @@ export const MALES_CAFE = [
 export const NOTA_SIN_RECETAS_QUIMICAS =
   'Aquí no encontrará dosis de veneno: el manejo es agroecológico e integrado (recolección, control biológico y biopreparados). Para su caso concreto, hable con su técnico del comité de cafeteros o con el agente.';
 
+/**
+ * UMBRAL Y VENTANA DE MANEJO DE LA BROCA — grounding de FUENTE OFICIAL Cenicafé
+ * (FNC), extraído por lectura directa (visión) de las cartillas técnicas; ver
+ * Chagra-strategy/ops/GROUNDING-PDFS-2026-07-09.md. Complementa MALES_CAFE (que
+ * trae el reconocimiento y el RE-RE) con las CIFRAS DURAS de DECISIÓN de manejo,
+ * cada una con su página exacta [FUENTE ... pág. X]. Son cifras de MONITOREO y de
+ * decisión agroecológica/MIP (cuándo y con qué intervenir por vía biológica y
+ * cultural); NO son dosis de veneno de síntesis — esas se omiten a propósito,
+ * igual que en NOTA_SIN_RECETAS_QUIMICAS.
+ *
+ * Fuentes:
+ *  - Cenicafé, Avances Técnicos 445 (julio 2014), "Recomendaciones para la
+ *    reducción del riesgo en la caficultura de Colombia ante un evento climático
+ *    de El Niño", pág. 9 (recomendaciones para el manejo integrado de la broca).
+ *  - Benavides M., P.; Arévalo M. "Manejo integrado: una estrategia para el
+ *    control de la broca del café en Colombia." Cenicafé 53(1):39-48. 2002.
+ */
+export const UMBRAL_MANEJO_BROCA = {
+  titulo: 'Cuándo y cómo intervenir la broca',
+  periodoCritico:
+    'El ataque de la broca se concentra en una ventana: empiece a evaluar la infestación a partir de los 120 días después de la floración principal en zonas de dos cosechas al año, y a los 90 días en zonas de una sola floración. [FUENTE Cenicafé, Avances Técnicos 445, pág. 9]',
+  umbral:
+    'Se llega al momento de intervenir cuando la infestación supera el 2 % de los frutos Y más del 50 % de las brocas están en posición de penetración A y B (la broca apenas entrando al fruto, todavía alcanzable). Ese doble criterio —cuántos frutos y en qué posición está la broca— es el que marca el punto. [FUENTE Cenicafé, Avances Técnicos 445, pág. 9]',
+  calidadExportable:
+    'La meta de calidad: para vender café pergamino seco Tipo Federación (calidad exportable) la infestación de broca debe quedar por debajo del 5 %. En la finca de referencia bajó de un 30 % de infestación a que el 83 % de la cosecha se vendiera como Tipo Federación tras adoptar el manejo integrado. [FUENTE Cenicafé 53(1):39-48, 2002, pág. 39]',
+  practicas: [
+    'Haga el repase apenas termine la cosecha principal y la mitaca: no deje frutos maduros, sobremaduros ni secos en la mata ni en el suelo. [FUENTE Cenicafé, Av. Téc. 445, pág. 9]',
+    'Deje dos surcos de "árboles trampa" con fruto y coséchelos cada quince días durante dos meses; luego zoquéelos eliminando todos los frutos. Capturan la broca que emerge de los frutos del suelo. [FUENTE Cenicafé 53(1), 2002, pág. 41]',
+    'En cosecha, evite que la broca voladora escape a la siguiente florada: costales cerrados, y solarice pasillas y flotes bajo plástico por 48 horas antes de secarlas. [FUENTE Cenicafé, Av. Téc. 445, pág. 9]',
+  ],
+  controlBiologico:
+    'El hongo Beauveria bassiana se asperja sobre las brocas que emergen de los frutos caídos al suelo, en dosis del orden de 5 × 10⁸ esporas por hectárea (cepa con patogenicidad a la broca mayor al 90 %); es refuerzo del RE-RE, no lo reemplaza. [FUENTE Cenicafé 53(1):39-48, 2002, pág. 41]',
+  fuente:
+    'Cenicafé (FNC): Avances Técnicos 445 (2014) y Cenicafé 53(1):39-48 (2002), "Manejo integrado: una estrategia para el control de la broca del café en Colombia" (Benavides & Arévalo). Detalle y páginas en GROUNDING-PDFS-2026-07-09.md.',
+};
+
 /* ────────────────────────────────────────────────────────────────────────
  * ESTACIÓN 4 · FLOR Y COSECHA
  * ──────────────────────────────────────────────────────────────────────── */

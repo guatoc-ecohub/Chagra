@@ -67,7 +67,7 @@ import { buildAyudaResponse } from '../../services/ayudaAgentResponder';
 // turno NO debe saltarse el grounding: este router PURO deriva el tool obvio
 // (entidad resuelta o keyword → get_species/get_pest_controllers/get_biopreparados)
 // para intentar AL MENOS una consulta al grafo en vez de caer a generativo puro.
-import { planNluFallback } from '../../services/agentNluFallback';
+import { planNluFallback, esSaludoPuro } from '../../services/agentNluFallback';
 import { planKnowledgeIntent, hasSoilDiagnosticIntent } from '../../services/knowledgeIntentRouter';
 // Fix misroute "papa precio" (2026-07-05): router PURO que detecta intención
 // de PRECIO/MERCADO ANTES de planKnowledgeIntent/planNlu — garantiza que
@@ -206,6 +206,19 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // banner — la primera query caerá al cold-start clásico con su propio
   // indicador ("pensando...") que ya cubre la espera percibida.
   const ollamaWarmStatus = useOllamaWarmStore((s) => s.status);
+  const startOllamaWarmup = useOllamaWarmStore((s) => s.startWarmup);
+  // Bug visual Vi1 (auditoría IA 2026-07-08): el banner "Preparando agente
+  // IA" quedaba pegado PARA SIEMPRE si el status nunca salía de 'unknown'
+  // (rutas de entrada que no pasan por login/dashboard no disparaban el
+  // warm-up → nadie resolvía el estado). Kick idempotente al montar: si
+  // nadie calentó todavía, lo intentamos aquí y el status transiciona a
+  // warming → warm/failed, y el banner se va solo.
+  useEffect(() => {
+    if (useOllamaWarmStore.getState().status === 'unknown') {
+      startOllamaWarmup();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // Task #121: queue UX del agente. Permite 2 preguntas max (1 procesando +
   // 1 pendiente). 3ra rechazada con toast claro. ETA dinámico basado en
   // EMA de latencia por modelo (ruta simple más rápida, ruta complex más
@@ -2302,7 +2315,16 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // pinte SIN volver a calcularlo — el semáforo es 1:1 con lo que el
       // agente ya decidió. Graceful: sin decisión del sidecar → no añade nada
       // (no contamina sourceMetadata con null).
-      const groundingSemaphoreMeta = groundingDecisionMeta
+      //
+      // Bug A6 (auditoría IA 2026-07-08): un saludo puro ("hola chagra")
+      // salía con semáforo ROJO "Sin verificar — se lo decimos de frente".
+      // Es correcto que el sidecar diga abstain (cero entidades), pero un
+      // turno puramente conversacional NO es un dato que verificar: marcarlo
+      // rojo igual que un dato dudoso vacía de significado el semáforo. Para
+      // saludos/smalltalk (mismo criterio esSaludoPuro de la deflección NLU)
+      // NO adjuntamos la metadata del semáforo → la UI no pinta semáforo
+      // (estado neutro), igual que un turno sin señal de grounding.
+      const groundingSemaphoreMeta = groundingDecisionMeta && !esSaludoPuro(text)
         ? {
             grounding_semaphore: groundingDecisionMeta.semaphore,
             grounding_policy: groundingDecisionMeta.policy,
@@ -2551,9 +2573,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         if (kokoroReady) {
           // Free 7→10 fix-pack #4: streaming frase-por-frase reduce la
           // latencia hasta-primer-audio de "esperar respuesta entera"
-          // (3-23s) a "esperar primera frase" (<2s). Internamente fallback
-          // a speakKokoro/speak en caso de error en la primera frase.
-          speakSentences(responseBody, { rate: 0.9, pitch: 1.0 })
+          // (3-23s) a "esperar primera frase" (<2s). Sin rate hardcodeado:
+          // hereda la velocidad preferida del operador (getPreferredRate).
+          speakSentences(responseBody)
             .then((ok) => { if (!ok) warnIfMute(); })
             .catch(() => warnIfMute());
         } else {
@@ -3478,7 +3500,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       {/* ── Header estilo ScreenShell (2026-06-08): superficie OPACA por token
           (.agent-bar-surface) + acciones globales. Antes bg-slate-900/50 dejaba
           pasar la foto detrás del título y los íconos (fix legibilidad 2026-06-15). ── */}
-      <header className="px-4 py-3 flex items-center gap-2 border-b border-slate-800 agent-bar-surface shrink-0">
+      {/* Bug visual Vi3 (auditoría IA 2026-07-08): en 320px los 6 controles de
+          44px + gaps + padding sumaban más que el viewport → el título se
+          encimaba con los íconos y el avatar pisaba el texto; en 412px el
+          subtítulo se clipaba sin gracia. Fix: padding/gap compactos bajo
+          400px, botón Home oculto bajo 360px (Volver sigue presente), avatar
+          shrink-0 y subtítulo con truncate (elipsis, nunca encimado). */}
+      <header className="px-2 min-[400px]:px-4 py-3 flex items-center gap-1 min-[400px]:gap-2 border-b border-slate-800 agent-bar-surface shrink-0">
         {/* Back */}
         <button
           type="button"
@@ -3492,7 +3520,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         <button
           type="button"
           onClick={() => window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'dashboard' }))}
-          className="p-3 rounded-full bg-slate-800 hover:bg-emerald-700/40 hover:text-emerald-200 active:bg-emerald-700/60 transition-all text-emerald-400 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+          className="max-[359px]:hidden p-3 rounded-full bg-slate-800 hover:bg-emerald-700/40 hover:text-emerald-200 active:bg-emerald-700/60 transition-all text-emerald-400 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
           aria-label="Volver al inicio"
           title="Inicio"
         >
@@ -3511,12 +3539,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             if (ok) agentSounds.chime();
           }}
           ariaLabel="Chagra IA — doble click silencia/reactiva voz"
+          className="shrink-0"
         />
         <div className="flex-1 min-w-0">
           <h1 className="text-sm font-bold text-white leading-tight truncate">Chagra IA</h1>
           {/* Theme-aware (2026-06-10): clases Tailwind (van por --c-*) en vez
               de hex inline que ignoraba los temas. + estado "hablando". */}
-          <p className={`text-[10px] font-semibold uppercase tracking-wider leading-tight ${
+          <p className={`text-[10px] font-semibold uppercase tracking-wider leading-tight truncate ${
             state === STATE_THINKING ? 'text-amber-500'
               : state === STATE_RECORDING ? 'text-violet-400'
               : isVoicePlaying ? 'text-emerald-400'
@@ -3598,8 +3627,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           Aparece solo en status 'unknown' o 'warming' — en 'warm' o 'failed'
           queda oculto. Se mostraría típicamente si el operador navega al
           agente MUY rápido tras login antes que termine el warm-up (~25-40s
-          en GPU M6000). Spinner CSS con animación spin de Tailwind. */}
-      {(ollamaWarmStatus === 'warming' || ollamaWarmStatus === 'unknown') && (
+          en GPU M6000). Spinner CSS con animación spin de Tailwind.
+          Bug visual Vi1 (auditoría IA 2026-07-08): además del status, el
+          banner SOLO vive mientras el chat está vacío — al primer mensaje
+          (el agente ya demostró estar respondiendo) desaparece, aunque el
+          warm-up siga en vuelo. Antes quedaba pegado sobre la conversación
+          entera dando sensación de "cargando eternamente". */}
+      {(ollamaWarmStatus === 'warming' || ollamaWarmStatus === 'unknown') && messages.length === 0 && (
         <div
           className="px-4 py-2 mx-4 mt-2 rounded-lg bg-amber-900/30 border border-amber-800/50 flex items-center gap-2"
           data-testid="ollama-warming-banner"
@@ -3694,12 +3728,23 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           red de capacidades (única fuente, igual que el home). Operador 2026-06-18:
           el acceso a capacidades es SOLO por este botón o el ícono del tema en
           el compositor, nunca por chips de texto. */}
+      {/* Bug visual Vi5 (auditoría IA 2026-07-08): el CTA quedaba casi
+          invisible (crema sobre crema). Causa doble: (1) el wrapper NO
+          escapaba del velo `.agent-scrim` (absolute inset-0, crema ~0.94 en
+          temas claros) que pintaba ENCIMA — mismo bug ya corregido en el
+          empty-state y el compositor con `relative z-10`; (2) el fondo
+          `bg-emerald-700/45` translúcido sobre crema dejaba el texto claro
+          sin contraste. Ahora: z-10 + acento sólido `bg-emerald-600 text-white`
+          — el par exacto de la EXCEPCIÓN de themes.css ("sobre un botón de
+          acento sólido el blanco sigue siendo lo correcto"): en los temas
+          claros text-white vira a tinta café salvo sobre bg-emerald-500/600,
+          donde se mantiene #fff sobre el verde oscuro del tema (AA). */}
       {messages.length === 0 && (
-        <div className="px-4 pb-1 pt-1 shrink-0">
+        <div className="relative z-10 px-4 pb-1 pt-1 shrink-0">
           <button
             type="button"
             onClick={() => setSheetOpen(true)}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-emerald-400/60 bg-emerald-700/45 text-emerald-50 text-sm font-semibold shadow-lg shadow-emerald-950/40 active:scale-[.98] transition-transform"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-emerald-400/60 bg-emerald-600 text-white text-sm font-semibold shadow-lg shadow-emerald-950/40 active:scale-[.98] transition-transform"
             aria-label="Abrir la mano de Chagra"
             data-testid="agent-mano-trigger"
           >

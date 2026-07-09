@@ -17,9 +17,9 @@
  *   - Sin handler onBack, no se renderiza (backward compat / empty state).
  */
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, it, expect, vi, beforeAll } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterEach } from 'vitest';
 import ChatHistory from '../ChatHistory';
 
 // jsdom no implementa scrollIntoView — ChatHistory lo llama en su efecto de
@@ -74,6 +74,49 @@ describe('ChatHistory — botón Volver flotante (alcanzable sin scroll al inici
     const scroller = container.querySelector('[data-testid="chat-scroll"]');
     scrollContainerTo(scroller, 400);
     expect(screen.queryByTestId('chat-floating-back')).toBeNull();
+  });
+
+  // Bug visual Vi4 (auditoría IA 2026-07-08): el botón flotante tapaba las
+  // primeras palabras del mensaje mientras el operador LEÍA. Ahora se
+  // auto-oculta tras una pausa sin scroll y reaparece con cualquier scroll.
+  describe('auto-ocultado por inactividad (no tapar el texto al leer)', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('tras la pausa sin scroll, el botón se esconde solo', () => {
+      vi.useFakeTimers();
+      const { container } = render(<ChatHistory messages={longConversation} onBack={vi.fn()} onConsentNeeded={vi.fn()} onRetryOrphan={vi.fn()} onCancelDeepResearch={vi.fn()} />);
+      const scroller = container.querySelector('[data-testid="chat-scroll"]');
+      scrollContainerTo(scroller, 400);
+      expect(screen.getByTestId('chat-floating-back')).toBeInTheDocument();
+      act(() => vi.advanceTimersByTime(3000));
+      expect(screen.queryByTestId('chat-floating-back')).toBeNull();
+    });
+
+    it('un scroll nuevo lo trae de vuelta después de esconderse', () => {
+      vi.useFakeTimers();
+      const { container } = render(<ChatHistory messages={longConversation} onBack={vi.fn()} onConsentNeeded={vi.fn()} onRetryOrphan={vi.fn()} onCancelDeepResearch={vi.fn()} />);
+      const scroller = container.querySelector('[data-testid="chat-scroll"]');
+      scrollContainerTo(scroller, 400);
+      act(() => vi.advanceTimersByTime(3000));
+      expect(screen.queryByTestId('chat-floating-back')).toBeNull();
+      scrollContainerTo(scroller, 500);
+      expect(screen.getByTestId('chat-floating-back')).toBeInTheDocument();
+    });
+
+    it('cada evento de scroll reinicia la cuenta (no parpadea mientras scrollea)', () => {
+      vi.useFakeTimers();
+      const { container } = render(<ChatHistory messages={longConversation} onBack={vi.fn()} onConsentNeeded={vi.fn()} onRetryOrphan={vi.fn()} onCancelDeepResearch={vi.fn()} />);
+      const scroller = container.querySelector('[data-testid="chat-scroll"]');
+      scrollContainerTo(scroller, 400);
+      act(() => vi.advanceTimersByTime(1500));
+      scrollContainerTo(scroller, 600); // sigue scrolleando antes del timeout
+      act(() => vi.advanceTimersByTime(1500)); // 1.5s desde el ÚLTIMO scroll (< 2.2s)
+      expect(screen.getByTestId('chat-floating-back')).toBeInTheDocument();
+      act(() => vi.advanceTimersByTime(1000)); // ya pasó la pausa completa
+      expect(screen.queryByTestId('chat-floating-back')).toBeNull();
+    });
   });
 
   it('el contenedor scrollable reserva padding inferior para que el último mensaje no quede tapado por el input fijo', () => {

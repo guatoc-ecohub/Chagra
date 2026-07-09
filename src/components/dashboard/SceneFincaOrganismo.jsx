@@ -57,8 +57,8 @@ export default function SceneFincaOrganismo({ estructura, onAnimales, onPregunte
       preserveAspectRatio="xMidYMid slice"
       /* con el potrero y/o el corazón tappables el SVG deja de ser imagen
          plana: role="img" volvería PRESENTACIONALES a sus hijos y los botones
-         (animales / "Pregunte") no existirían para lectores de pantalla. */
-      role={(conAnimales || conPregunte) ? 'group' : 'img'}
+         (animales y "Pregunte") no existirían para lectores de pantalla. */
+      role={conAnimales || conPregunte ? 'group' : 'img'}
       aria-label={ariaEscena}
       data-testid="fvo-escena"
     >

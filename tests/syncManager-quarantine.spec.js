@@ -80,7 +80,7 @@ const loginAndWaitForMain = async (page, context) => {
   await page.getByLabel(/usuario/i).fill('e2e-quarantine-op');
   await page.getByRole('textbox', { name: /contraseña/i }).fill('e2e-quarantine-pass');
   await page.getByRole('button', { name: /ingresar/i }).click();
-  await expect(page.getByText('Cola de tareas')).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText('Tareas pendientes')).toBeVisible({ timeout: 15_000 });
 };
 
 // Helper: insertar una transacción manualmente en `pending_transactions`
