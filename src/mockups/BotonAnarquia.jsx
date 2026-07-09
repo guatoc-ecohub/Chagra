@@ -18,8 +18,11 @@
  *   03 EL MACHETAZO  — esténcil callejero: golpes secos, salpicadura, flicker.
  *
  * Técnica: SVG + CSS puro (cero deps, cero fotos). Solo transform / opacity /
- * stroke-dashoffset (GPU-friendly, sin filter animado — el "glow" son trazos
- * duplicados translúcidos). `prefers-reduced-motion` apaga todo y deja la Ⓐ
+ * stroke-dashoffset (GPU-friendly, sin filter animado). La A la forman SOLO
+ * las herramientas — no hay ninguna A dibujada aparte (ni trazo, ni glow, ni
+ * savia sobre los ejes): quitarla fue decisión del operador (v2, 2026-07-09).
+ * Cada ciclo termina con un HOLD de ~2 s+ con la Ⓐ armada, quieta y legible,
+ * y recién ahí reinicia. `prefers-reduced-motion` apaga todo y deja la Ⓐ
  * ensamblada (estado base = fotograma final). Ruta sin gate ni sesión: es un
  * mockup para decidir dirección, no toca datos.
  */
@@ -45,8 +48,10 @@ const PALA_BLADE = 'M -8.5 74 C -10 87 -5.5 99 0 111 C 5.5 99 10 87 8.5 74 C 3.5
 
 // MACHETE (diagonal derecha). Local: pomo/mango (0,2)-(0,26), guarda, hoja
 // que se ensancha con lomo recto y filo curvo hasta la punta (13.5,~96).
-// Colocado: nace junto al vértice (73.5,20), −19.5° → punta ~(114,104).
-const MACHETE_POS = 'translate(73.5 20) rotate(-19.5)';
+// Colocado: el pomo casi TOCA la empuñadura de la pala en el vértice (72,15)
+// — las dos diagonales convergen arriba y la A se lee sin duda — −19.5° →
+// punta ~(112,105).
+const MACHETE_POS = 'translate(71.5 14.5) rotate(-19.5)';
 const MACHETE_HANDLE = 'M 0 2 L 0 26';
 const MACHETE_GUARD = 'M -6 27 L 7 27';
 const MACHETE_BLADE = 'M -3.5 29 L -3.5 78 Q -3.5 90 8 99 L 13.5 92.5 Q 6.5 86 6 73 L 6 29 Z';
@@ -61,11 +66,6 @@ const AZADON_HANDLE = 'M 8 0 L 100 0';
 const AZADON_NECK = 'M 12 -1 C 4 0 0 3 -1 9';
 const AZADON_BLADE = 'M -6 7 L 4 8.5 L 5.5 22 L -10 19 Z';
 
-// Ejes simplificados de la A (para capas de glow / savia): las tres barras.
-const EJE_PALA = 'M 68 16 L 35 118';
-const EJE_MACHETE = 'M 74 22 L 113 103';
-const EJE_AZADON = 'M 24 88 L 120 88';
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Herramientas por variante — mismos trazos, tres pieles:
 //   neon    → trazo rojo marca + relleno vino profundo (biopunk actual)
@@ -77,20 +77,20 @@ function Pala({ skin }) {
   if (skin === 'stencil') {
     return (
       <g transform={PALA_POS}>
-        <path d={PALA_GRIP} fill="none" stroke="#ece3cf" strokeWidth="7.5" strokeLinecap="round" />
-        <path d={PALA_SHAFT} fill="none" stroke="#ece3cf" strokeWidth="9" strokeLinecap="round" />
+        <path d={PALA_GRIP} fill="none" stroke="#ece3cf" strokeWidth="8.5" strokeLinecap="round" />
+        <path d={PALA_SHAFT} fill="none" stroke="#ece3cf" strokeWidth="10.5" strokeLinecap="round" />
         <path d={PALA_BLADE} fill="#ece3cf" />
       </g>
     );
   }
   const c = skin === 'bio'
-    ? { line: '#35e0a1', hi: '#8fffd2', fill: '#0b2f23' }
-    : { line: '#e8402e', hi: '#ff6b57', fill: '#4a0a00' };
+    ? { line: '#35e0a1', hi: '#8fffd2', fill: '#11382a' }
+    : { line: '#e8402e', hi: '#ff6b57', fill: '#571106' };
   return (
     <g transform={PALA_POS}>
-      <path d={PALA_GRIP} fill="none" stroke={c.line} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d={PALA_SHAFT} fill="none" stroke={c.line} strokeWidth="6.5" strokeLinecap="round" />
-      <path d={PALA_BLADE} fill={c.fill} stroke={c.hi} strokeWidth="3" strokeLinejoin="round" />
+      <path d={PALA_GRIP} fill="none" stroke={c.line} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={PALA_SHAFT} fill="none" stroke={c.line} strokeWidth="8.5" strokeLinecap="round" />
+      <path d={PALA_BLADE} fill={c.fill} stroke={c.hi} strokeWidth="3.4" strokeLinejoin="round" />
     </g>
   );
 }
@@ -99,22 +99,22 @@ function Machete({ skin }) {
   if (skin === 'stencil') {
     return (
       <g transform={MACHETE_POS}>
-        <path d={MACHETE_HANDLE} fill="none" stroke="#ece3cf" strokeWidth="9" strokeLinecap="round" />
-        <path d={MACHETE_GUARD} fill="none" stroke="#ece3cf" strokeWidth="6" strokeLinecap="round" />
+        <path d={MACHETE_HANDLE} fill="none" stroke="#ece3cf" strokeWidth="10.5" strokeLinecap="round" />
+        <path d={MACHETE_GUARD} fill="none" stroke="#ece3cf" strokeWidth="6.5" strokeLinecap="round" />
         <path d={MACHETE_BLADE} fill="#ece3cf" />
       </g>
     );
   }
   const c = skin === 'bio'
-    ? { line: '#35e0a1', hi: '#8fffd2', fill: '#0b2f23', filo: '#ff5f4d' }
-    : { line: '#e8402e', hi: '#ff6b57', fill: '#4a0a00', filo: '#ff6b57' };
+    ? { line: '#35e0a1', hi: '#8fffd2', fill: '#11382a', filo: '#ff5f4d' }
+    : { line: '#e8402e', hi: '#ff6b57', fill: '#571106', filo: '#ff6b57' };
   return (
     <g transform={MACHETE_POS}>
-      <path d={MACHETE_HANDLE} fill="none" stroke={c.line} strokeWidth="6.5" strokeLinecap="round" />
-      <path d={MACHETE_GUARD} fill="none" stroke={c.line} strokeWidth="4.5" strokeLinecap="round" />
-      <path d={MACHETE_BLADE} fill={c.fill} stroke={c.hi} strokeWidth="2.6" strokeLinejoin="round" />
+      <path d={MACHETE_HANDLE} fill="none" stroke={c.line} strokeWidth="8.5" strokeLinecap="round" />
+      <path d={MACHETE_GUARD} fill="none" stroke={c.line} strokeWidth="5" strokeLinecap="round" />
+      <path d={MACHETE_BLADE} fill={c.fill} stroke={c.hi} strokeWidth="3.2" strokeLinejoin="round" />
       {/* filo — la línea de vida del machete */}
-      <path d={MACHETE_FILO} fill="none" stroke={c.filo} strokeWidth="3" strokeLinecap="round" />
+      <path d={MACHETE_FILO} fill="none" stroke={c.filo} strokeWidth="3.2" strokeLinecap="round" />
     </g>
   );
 }
@@ -123,20 +123,20 @@ function Azadon({ skin }) {
   if (skin === 'stencil') {
     return (
       <g transform={AZADON_POS}>
-        <path d={AZADON_HANDLE} fill="none" stroke="#ece3cf" strokeWidth="9" strokeLinecap="round" />
-        <path d={AZADON_NECK} fill="none" stroke="#ece3cf" strokeWidth="6.5" strokeLinecap="round" />
+        <path d={AZADON_HANDLE} fill="none" stroke="#ece3cf" strokeWidth="10.5" strokeLinecap="round" />
+        <path d={AZADON_NECK} fill="none" stroke="#ece3cf" strokeWidth="7" strokeLinecap="round" />
         <path d={AZADON_BLADE} fill="#ece3cf" />
       </g>
     );
   }
   const c = skin === 'bio'
-    ? { line: '#35e0a1', hi: '#8fffd2', fill: '#0b2f23' }
-    : { line: '#e8402e', hi: '#ff6b57', fill: '#4a0a00' };
+    ? { line: '#35e0a1', hi: '#8fffd2', fill: '#11382a' }
+    : { line: '#e8402e', hi: '#ff6b57', fill: '#571106' };
   return (
     <g transform={AZADON_POS}>
-      <path d={AZADON_HANDLE} fill="none" stroke={c.line} strokeWidth="6.5" strokeLinecap="round" />
-      <path d={AZADON_NECK} fill="none" stroke={c.line} strokeWidth="4.5" strokeLinecap="round" />
-      <path d={AZADON_BLADE} fill={c.fill} stroke={c.hi} strokeWidth="2.6" strokeLinejoin="round" />
+      <path d={AZADON_HANDLE} fill="none" stroke={c.line} strokeWidth="8.5" strokeLinecap="round" />
+      <path d={AZADON_NECK} fill="none" stroke={c.line} strokeWidth="5" strokeLinecap="round" />
+      <path d={AZADON_BLADE} fill={c.fill} stroke={c.hi} strokeWidth="3.2" strokeLinejoin="round" />
     </g>
   );
 }
@@ -180,14 +180,7 @@ function FabForja() {
       />
       <circle cx="70" cy="74" r="46" fill="none" stroke="#ff6b57" strokeWidth="1.4" opacity="0.35" />
 
-      {/* glow de la Ⓐ completa — trazos anchos translúcidos (cero filtros) */}
-      <g className="b1-glow" fill="none" stroke="#ff5a46" strokeWidth="13" strokeLinecap="round" opacity="0">
-        <path d={EJE_PALA} />
-        <path d={EJE_MACHETE} />
-        <path d={EJE_AZADON} />
-        <circle cx="70" cy="74" r="46" strokeWidth="11" />
-      </g>
-
+      {/* la A la arman SOLO las herramientas — sin trazos de A dibujados aparte */}
       {/* herramientas: caen en orden pala → machete → azadón */}
       <g className="b1-pala"><Pala skin="neon" /></g>
       <g className="b1-machete"><Machete skin="neon" /></g>
@@ -231,13 +224,6 @@ function FabSimbiosis() {
         />
       </g>
 
-      {/* destello al completarse la Ⓐ */}
-      <g className="b2-bloom" fill="none" stroke="#8fffd2" strokeWidth="12" strokeLinecap="round" opacity="0">
-        <path d={EJE_PALA} />
-        <path d={EJE_MACHETE} />
-        <path d={EJE_AZADON} />
-      </g>
-
       {/* estelas fantasma (mismo brote, desfasado y tenue) */}
       <g className="b2-orb b2-orb-pala b2-estela"><Pala skin="bio" /></g>
       <g className="b2-orb b2-orb-azadon b2-estela"><Azadon skin="bio" /></g>
@@ -248,14 +234,7 @@ function FabSimbiosis() {
       <g className="b2-orb b2-orb-azadon"><Azadon skin="bio" /></g>
       <g className="b2-orb b2-orb-machete"><Machete skin="bio" /></g>
 
-      {/* savia: pulsos de luz recorriendo la Ⓐ ya ensamblada */}
-      <g className="b2-savia" fill="none" stroke="#c8ffe9" strokeWidth="2.4" strokeLinecap="round" strokeDasharray="4 12" opacity="0">
-        <path d={EJE_PALA} pathLength="96" />
-        <path d={EJE_MACHETE} pathLength="96" />
-        <path d={EJE_AZADON} pathLength="96" />
-      </g>
-
-      {/* esporas que se desprenden de la Ⓐ viva */}
+      {/* esporas que se desprenden de la Ⓐ viva (celebración breve, luego calma) */}
       {esporas.map((e, i) => (
         <circle key={i} className={`b2-espora ${e.kf}`} cx={e.x} cy={e.y} r={i % 2 ? 1.7 : 2.3} fill="#b8ffe3" opacity="0" />
       ))}
@@ -274,10 +253,6 @@ function FabMachetazo() {
         {/* aro estampado con aerosol + anillo grunge discontinuo */}
         <g className="b3-aro">
           <circle cx="70" cy="74" r="46" fill="none" stroke="#ece3cf" strokeWidth="8" />
-          <circle
-            cx="70" cy="74" r="46" fill="none" stroke="#ece3cf" strokeWidth="8"
-            strokeDasharray="30 7 55 5 40 9 62 4" opacity="0.0"
-          />
           <circle
             className="b3-grunge" cx="70" cy="74" r="41" fill="none"
             stroke="#d43222" strokeWidth="1.6" strokeDasharray="18 26 7 40 24 14" opacity="0.5"
@@ -375,9 +350,10 @@ export default function BotonAnarquia({ onBack }) {
           </h1>
           <p className="ba-sub">
             Tres herramientas caen y se ensamblan: la <b>pala</b> es una diagonal, el{' '}
-            <b>azadón</b> el travesaño y el <b>machete</b> completa la A. El aro de la
-            propia Ⓐ hace de borde del botón — sin círculo externo, el ícono llena todo
-            el FAB y las herramientas se asoman por fuera del aro.
+            <b>azadón</b> el travesaño y el <b>machete</b> completa la A — la A la
+            forman <b>solo las herramientas</b>, sin ningún trazo dibujado encima. El
+            aro de la propia Ⓐ hace de borde del botón, y al final de cada ciclo la Ⓐ
+            armada se queda quieta ~2 s antes de volver a armarse.
           </p>
           <p className="ba-hint">Toca cualquier botón para repetir el ensamble.</p>
         </header>
@@ -386,9 +362,9 @@ export default function BotonAnarquia({ onBack }) {
           <VarianteCard
             num="01"
             nombre="La Forja"
-            lema="cae con peso, golpea, se enciende"
-            desc="El aro se traza solo, como marcado a soplete. Cada herramienta cae con gravedad y rebota al clavarse — onda y chispas en cada golpe. Con el azadón puesto, la Ⓐ completa se enciende en neón y queda respirando."
-            specs="loop 5.8 s · trazo neón de la marca actual · chispas ámbar de fragua"
+            lema="cae con peso, golpea, se queda"
+            desc="El aro se traza solo, como marcado a soplete. Cada herramienta cae con gravedad y rebota al clavarse — onda y chispas en cada golpe. Con el azadón puesto, la Ⓐ de herramientas queda armada, quieta y legible casi 3 segundos."
+            specs="loop 7.2 s · hold ~2.8 s con la A armada · trazo neón · chispas ámbar"
           >
             <FabForja />
           </VarianteCard>
@@ -396,9 +372,9 @@ export default function BotonAnarquia({ onBack }) {
           <VarianteCard
             num="02"
             nombre="La Simbiosis"
-            lema="brota en espiral, corre savia"
-            desc="El aro es una membrana viva que respira. Las herramientas no caen: brotan girando en espiral como zarcillos que buscan su lugar. Al ensamblarse, pulsos de savia recorren la Ⓐ y suelta esporas que flotan hacia arriba."
-            specs="loop 7 s · bioluminiscencia verde-menta · acento rojo solo en el filo"
+            lema="brota en espiral, suelta esporas"
+            desc="El aro es una membrana viva que respira. Las herramientas no caen: brotan girando en espiral como zarcillos que buscan su lugar. Al ensamblarse suelta unas esporas que flotan hacia arriba y la Ⓐ queda quieta 2 segundos."
+            specs="loop 8 s · hold ~2 s con la A armada · bioluminiscencia verde-menta"
           >
             <FabSimbiosis />
           </VarianteCard>
@@ -407,8 +383,8 @@ export default function BotonAnarquia({ onBack }) {
             num="03"
             nombre="El Machetazo"
             lema="tres golpes secos y salpicadura"
-            desc="Esténcil de aerosol sobre el muro: el aro se estampa, la pala se CLAVA, el azadón entra de hachazo y el machete corta al final — el botón entero se sacude con cada golpe y la pintura salpica. Remata con un parpadeo de neón roto."
-            specs="loop 5.2 s · esténcil hueso + salpicadura roja · micro-sacudida por golpe"
+            desc="Esténcil de aerosol sobre el muro: el aro se estampa, la pala se CLAVA, el azadón entra de hachazo y el machete corta al final — el botón entero se sacude con cada golpe y la pintura salpica. Un parpadeo de neón roto y la Ⓐ queda estampada, quieta, más de 2 segundos."
+            specs="loop 6 s · hold ~2.3 s con la A armada · esténcil hueso + salpicadura roja"
           >
             <FabMachetazo />
           </VarianteCard>
@@ -429,7 +405,8 @@ export default function BotonAnarquia({ onBack }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // CSS — todo el movimiento vive aquí. Convención: b1-* Forja, b2-* Simbiosis,
 // b3-* Machetazo, ba-* página. Cada ciclo es UNA animación infinita por
-// elemento con fases en porcentajes (ensamble → vida → fundido → reset).
+// elemento con fases en porcentajes (ensamble → HOLD ~2 s+ con la A armada y
+// quieta → fundido → reset).
 // ─────────────────────────────────────────────────────────────────────────────
 const BA_CSS = `
 /* ══ página ══════════════════════════════════════════════════════════════ */
@@ -549,341 +526,323 @@ const BA_CSS = `
   transform-origin: 70px 74px;
 }
 
-/* ══ 01 · LA FORJA ═══════════════════════════════════════════════════════ */
-.b1-root { animation: b1-fade 5.8s linear infinite; }
+/* ══ 01 · LA FORJA ═══════════════════════════════════════════════════════
+   7.2 s: ensamble 0–4.0 s → HOLD con la A armada y quieta 4.0–6.8 s (~2.8 s)
+   → fundido y reset. Mismos tiempos absolutos de caída que la v1 (5.8 s). */
+.b1-root { animation: b1-fade 7.2s linear infinite; }
 @keyframes b1-fade {
   0% { opacity: 0; }
-  1.5%, 94% { opacity: 1; }
+  1.2%, 94.5% { opacity: 1; }
   98%, 100% { opacity: 0; }
 }
 .b1-aro {
   stroke-dasharray: 290;
-  animation: b1-aro 5.8s linear infinite;
+  animation: b1-aro 7.2s linear infinite;
 }
 @keyframes b1-aro {
-  0%, 2% { stroke-dashoffset: 290; }
-  11% { stroke-dashoffset: 0; }
+  0%, 1.6% { stroke-dashoffset: 290; }
+  8.9% { stroke-dashoffset: 0; }
   100% { stroke-dashoffset: 0; }
 }
-.b1-pala { animation: b1-pala 5.8s linear infinite; }
+.b1-pala { animation: b1-pala 7.2s linear infinite; }
 @keyframes b1-pala {
-  0%, 14% {
+  0%, 11.3% {
     transform: translate(-24px, -118px) rotate(-36deg);
     opacity: 0;
     animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
   }
-  15% { opacity: 1; }
-  22% {
+  12.1% { opacity: 1; }
+  17.7% {
     transform: translate(0, 2.5px) rotate(1.6deg);
     animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
   }
-  26%, 100% { transform: none; opacity: 1; }
+  21%, 100% { transform: none; opacity: 1; }
 }
-.b1-machete { animation: b1-machete 5.8s linear infinite; }
+.b1-machete { animation: b1-machete 7.2s linear infinite; }
 @keyframes b1-machete {
-  0%, 30% {
+  0%, 24.2% {
     transform: translate(26px, -124px) rotate(42deg);
     opacity: 0;
     animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
   }
-  31% { opacity: 1; }
-  38% {
+  25% { opacity: 1; }
+  30.6% {
     transform: translate(0, 2.5px) rotate(-1.6deg);
     animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
   }
-  42%, 100% { transform: none; opacity: 1; }
+  33.8%, 100% { transform: none; opacity: 1; }
 }
-.b1-azadon { animation: b1-azadon 5.8s linear infinite; }
+.b1-azadon { animation: b1-azadon 7.2s linear infinite; }
 @keyframes b1-azadon {
-  0%, 48% {
+  0%, 38.7% {
     transform: translate(116px, -36px) rotate(300deg) scale(0.85);
     opacity: 0;
     animation-timing-function: cubic-bezier(0.3, 0.4, 0.55, 1);
   }
-  49.5% { opacity: 1; }
-  59% {
+  39.9% { opacity: 1; }
+  47.5% {
     transform: translate(-3px, 0) rotate(-7deg) scale(1);
     animation-timing-function: cubic-bezier(0.25, 0.9, 0.4, 1);
   }
-  63%, 100% { transform: none; opacity: 1; }
+  50.8%, 100% { transform: none; opacity: 1; }
 }
-.b1-glow { animation: b1-glow 5.8s ease-in-out infinite; }
-@keyframes b1-glow {
-  0%, 62% { opacity: 0; }
-  66% { opacity: 0.55; }
-  73% { opacity: 0.14; }
-  80% { opacity: 0.3; }
-  87% { opacity: 0.14; }
-  94%, 100% { opacity: 0.18; }
-}
-.b1-onda { animation-duration: 5.8s; animation-timing-function: ease-out; animation-iteration-count: infinite; }
+.b1-onda { animation-duration: 7.2s; animation-timing-function: ease-out; animation-iteration-count: infinite; }
 .b1-onda-a { animation-name: b1-onda-a; }
 .b1-onda-b { animation-name: b1-onda-b; }
 .b1-onda-c { animation-name: b1-onda-c; }
 @keyframes b1-onda-a {
-  0%, 21.5% { transform: scale(0.25); opacity: 0; }
-  23% { opacity: 0.85; }
-  32%, 100% { transform: scale(2.3); opacity: 0; }
+  0%, 17.3% { transform: scale(0.25); opacity: 0; }
+  18.5% { opacity: 0.85; }
+  25.8%, 100% { transform: scale(2.3); opacity: 0; }
 }
 @keyframes b1-onda-b {
-  0%, 37.5% { transform: scale(0.25); opacity: 0; }
-  39% { opacity: 0.85; }
-  48%, 100% { transform: scale(2.3); opacity: 0; }
+  0%, 30.2% { transform: scale(0.25); opacity: 0; }
+  31.4% { opacity: 0.85; }
+  38.7%, 100% { transform: scale(2.3); opacity: 0; }
 }
 @keyframes b1-onda-c {
-  0%, 58.5% { transform: scale(0.25); opacity: 0; }
-  60% { opacity: 0.85; }
-  69%, 100% { transform: scale(2.3); opacity: 0; }
+  0%, 47.1% { transform: scale(0.25); opacity: 0; }
+  48.3% { opacity: 0.85; }
+  55.6%, 100% { transform: scale(2.3); opacity: 0; }
 }
-.ba-spark { animation-duration: 5.8s; animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); animation-iteration-count: infinite; }
+.ba-spark { animation-duration: 7.2s; animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); animation-iteration-count: infinite; }
 .b1-sp-a { animation-name: b1-sp-a; }
 .b1-sp-b { animation-name: b1-sp-b; }
 .b1-sp-c { animation-name: b1-sp-c; }
 @keyframes b1-sp-a {
-  0%, 22% { transform: none; opacity: 0; }
-  23.5% { opacity: 1; }
-  31%, 100% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr)); opacity: 0; }
+  0%, 17.7% { transform: none; opacity: 0; }
+  18.9% { opacity: 1; }
+  25%, 100% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr)); opacity: 0; }
 }
 @keyframes b1-sp-b {
-  0%, 38% { transform: none; opacity: 0; }
-  39.5% { opacity: 1; }
-  47%, 100% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr)); opacity: 0; }
+  0%, 30.6% { transform: none; opacity: 0; }
+  31.8% { opacity: 1; }
+  37.9%, 100% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr)); opacity: 0; }
 }
 @keyframes b1-sp-c {
-  0%, 59% { transform: none; opacity: 0; }
-  60.5% { opacity: 1; }
-  68%, 100% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr)); opacity: 0; }
+  0%, 47.5% { transform: none; opacity: 0; }
+  48.7% { opacity: 1; }
+  54.8%, 100% { transform: translate(var(--sx), var(--sy)) rotate(var(--sr)); opacity: 0; }
 }
 
-/* ══ 02 · LA SIMBIOSIS ═══════════════════════════════════════════════════ */
-.b2-root { animation: b2-fade 7s linear infinite; }
+/* ══ 02 · LA SIMBIOSIS ═══════════════════════════════════════════════════
+   8 s: brote 0–3.8 s → esporas 3.9–5.6 s → HOLD con la A quieta 5.6–7.6 s
+   (~2 s; la membrana deja de respirar y los poros de girar) → reset. */
+.b2-root { animation: b2-fade 8s linear infinite; }
 @keyframes b2-fade {
   0% { opacity: 0; }
-  2%, 95% { opacity: 1; }
+  1.8%, 95% { opacity: 1; }
   99%, 100% { opacity: 0; }
 }
 .b2-membrana {
   transform-box: view-box;
   transform-origin: 70px 74px;
-  animation: b2-membrana 7s ease-in-out infinite;
+  animation: b2-membrana 8s ease-in-out infinite;
 }
 @keyframes b2-membrana {
   0% { transform: scale(0.93); opacity: 0; }
-  5% { opacity: 1; }
-  6% { transform: scale(1); }
-  20% { transform: scale(1.014); }
-  34% { transform: scale(1); }
-  50% { transform: scale(1.016); }
-  66% { transform: scale(1); }
-  81% { transform: scale(1.013); }
-  95%, 100% { transform: scale(1); opacity: 1; }
+  4.4% { opacity: 1; }
+  5.3% { transform: scale(1); }
+  17.5% { transform: scale(1.014); }
+  30% { transform: scale(1); }
+  44% { transform: scale(1.016); }
+  58% { transform: scale(1); }
+  66%, 100% { transform: scale(1); opacity: 1; }
 }
 .b2-poros {
   transform-box: view-box;
   transform-origin: 70px 74px;
-  animation: b2-poros 7s linear infinite;
+  animation: b2-poros 8s linear infinite;
 }
 @keyframes b2-poros {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(16deg); }
+  0% { transform: rotate(0deg); }
+  66%, 100% { transform: rotate(16deg); }
 }
 .b2-orb { transform-box: view-box; transform-origin: 70px 74px; }
-.b2-orb-pala { animation: b2-orb-pala 7s cubic-bezier(0.22, 0.75, 0.25, 1) infinite; }
+.b2-orb-pala { animation: b2-orb-pala 8s cubic-bezier(0.22, 0.75, 0.25, 1) infinite; }
 @keyframes b2-orb-pala {
-  0%, 6% { transform: rotate(-168deg) scale(0.4); opacity: 0; }
-  9% { opacity: 1; }
-  28%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
+  0%, 5.3% { transform: rotate(-168deg) scale(0.4); opacity: 0; }
+  7.9% { opacity: 1; }
+  24.5%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
 }
-.b2-orb-azadon { animation: b2-orb-azadon 7s cubic-bezier(0.22, 0.75, 0.25, 1) infinite; }
+.b2-orb-azadon { animation: b2-orb-azadon 8s cubic-bezier(0.22, 0.75, 0.25, 1) infinite; }
 @keyframes b2-orb-azadon {
-  0%, 20% { transform: rotate(152deg) scale(0.45); opacity: 0; }
-  23% { opacity: 1; }
-  42%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
+  0%, 17.5% { transform: rotate(152deg) scale(0.45); opacity: 0; }
+  20.1% { opacity: 1; }
+  36.8%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
 }
-.b2-orb-machete { animation: b2-orb-machete 7s cubic-bezier(0.22, 0.75, 0.25, 1) infinite; }
+.b2-orb-machete { animation: b2-orb-machete 8s cubic-bezier(0.22, 0.75, 0.25, 1) infinite; }
 @keyframes b2-orb-machete {
-  0%, 33% { transform: rotate(-128deg) scale(0.45); opacity: 0; }
-  36% { opacity: 1; }
-  54%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
+  0%, 28.9% { transform: rotate(-128deg) scale(0.45); opacity: 0; }
+  31.5% { opacity: 1; }
+  47.3%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
 }
 .b2-estela { opacity: 0; }
 .b2-estela.b2-orb-pala { animation-name: b2-orb-pala-e; }
 .b2-estela.b2-orb-azadon { animation-name: b2-orb-azadon-e; }
 .b2-estela.b2-orb-machete { animation-name: b2-orb-machete-e; }
 @keyframes b2-orb-pala-e {
-  0%, 8% { transform: rotate(-168deg) scale(0.4); opacity: 0; }
-  11% { opacity: 0.28; }
-  25% { opacity: 0.18; }
-  31%, 100% { transform: rotate(0deg) scale(1); opacity: 0; }
+  0%, 7% { transform: rotate(-168deg) scale(0.4); opacity: 0; }
+  9.6% { opacity: 0.28; }
+  21.9% { opacity: 0.18; }
+  27.1%, 100% { transform: rotate(0deg) scale(1); opacity: 0; }
 }
 @keyframes b2-orb-azadon-e {
-  0%, 22% { transform: rotate(152deg) scale(0.45); opacity: 0; }
-  25% { opacity: 0.28; }
-  39% { opacity: 0.18; }
-  45%, 100% { transform: rotate(0deg) scale(1); opacity: 0; }
+  0%, 19.3% { transform: rotate(152deg) scale(0.45); opacity: 0; }
+  21.9% { opacity: 0.28; }
+  34.1% { opacity: 0.18; }
+  39.4%, 100% { transform: rotate(0deg) scale(1); opacity: 0; }
 }
 @keyframes b2-orb-machete-e {
-  0%, 35% { transform: rotate(-128deg) scale(0.45); opacity: 0; }
-  38% { opacity: 0.28; }
-  51% { opacity: 0.18; }
-  57%, 100% { transform: rotate(0deg) scale(1); opacity: 0; }
+  0%, 30.6% { transform: rotate(-128deg) scale(0.45); opacity: 0; }
+  33.3% { opacity: 0.28; }
+  44.6% { opacity: 0.18; }
+  49.9%, 100% { transform: rotate(0deg) scale(1); opacity: 0; }
 }
-.b2-bloom { animation: b2-bloom 7s ease-in-out infinite; }
-@keyframes b2-bloom {
-  0%, 53% { opacity: 0; }
-  57% { opacity: 0.6; }
-  66%, 100% { opacity: 0; }
-}
-.b2-savia { animation: b2-savia 7s linear infinite; }
-@keyframes b2-savia {
-  0%, 55% { opacity: 0; stroke-dashoffset: 0; }
-  59% { opacity: 0.9; }
-  92% { opacity: 0.9; stroke-dashoffset: -128; }
-  96%, 100% { opacity: 0; stroke-dashoffset: -136; }
-}
-.b2-espora { animation-duration: 7s; animation-timing-function: ease-out; animation-iteration-count: infinite; }
+.b2-espora { animation-duration: 8s; animation-timing-function: ease-out; animation-iteration-count: infinite; }
 .b2-es-a { animation-name: b2-es-a; }
 .b2-es-b { animation-name: b2-es-b; }
 .b2-es-c { animation-name: b2-es-c; }
 @keyframes b2-es-a {
-  0%, 58% { transform: none; opacity: 0; }
-  61% { opacity: 0.9; }
-  74%, 100% { transform: translate(3px, -26px); opacity: 0; }
+  0%, 49% { transform: none; opacity: 0; }
+  52% { opacity: 0.9; }
+  63%, 100% { transform: translate(3px, -26px); opacity: 0; }
 }
 @keyframes b2-es-b {
-  0%, 66% { transform: none; opacity: 0; }
-  69% { opacity: 0.9; }
-  84%, 100% { transform: translate(-4px, -28px); opacity: 0; }
+  0%, 52% { transform: none; opacity: 0; }
+  55% { opacity: 0.9; }
+  66%, 100% { transform: translate(-4px, -28px); opacity: 0; }
 }
 @keyframes b2-es-c {
-  0%, 74% { transform: none; opacity: 0; }
-  77% { opacity: 0.9; }
-  92%, 100% { transform: translate(2px, -24px); opacity: 0; }
+  0%, 55% { transform: none; opacity: 0; }
+  58% { opacity: 0.9; }
+  70%, 100% { transform: translate(2px, -24px); opacity: 0; }
 }
 
-/* ══ 03 · EL MACHETAZO ═══════════════════════════════════════════════════ */
-.b3-root { animation: b3-fade 5.2s linear infinite; }
+/* ══ 03 · EL MACHETAZO ═══════════════════════════════════════════════════
+   6 s: golpes 0–2.25 s → flicker 3.2–3.35 s → HOLD con la A estampada y
+   quieta 3.35–5.64 s (~2.3 s) → reset. */
+.b3-root { animation: b3-fade 6s linear infinite; }
 @keyframes b3-fade {
   0% { opacity: 0; }
-  1%, 95% { opacity: 1; }
-  98.5%, 100% { opacity: 0; }
+  0.9%, 94% { opacity: 1; }
+  98%, 100% { opacity: 0; }
 }
 .b3-aro {
   transform-box: view-box;
   transform-origin: 70px 74px;
-  animation: b3-aro 5.2s cubic-bezier(0.2, 0.8, 0.3, 1) infinite;
+  animation: b3-aro 6s cubic-bezier(0.2, 0.8, 0.3, 1) infinite;
 }
 @keyframes b3-aro {
   0% { transform: scale(1.32); opacity: 0; }
-  5%, 100% { transform: scale(1); opacity: 1; }
+  4.3%, 100% { transform: scale(1); opacity: 1; }
 }
 .b3-grunge {
   transform-box: view-box;
   transform-origin: 70px 74px;
-  animation: b3-grunge 5.2s linear infinite;
+  animation: b3-grunge 6s linear infinite;
 }
 @keyframes b3-grunge {
-  0%, 5% { opacity: 0; transform: rotate(-8deg); }
-  9%, 100% { opacity: 0.5; transform: rotate(0deg); }
+  0%, 4.3% { opacity: 0; transform: rotate(-8deg); }
+  7.8%, 100% { opacity: 0.5; transform: rotate(0deg); }
 }
-.b3-shake { animation: b3-shake 5.2s linear infinite; }
+.b3-shake { animation: b3-shake 6s linear infinite; }
 @keyframes b3-shake {
-  0%, 12.6% { transform: none; }
-  13.1% { transform: translate(-2.6px, 1.6px); }
-  13.7% { transform: translate(2.1px, -1.1px); }
-  14.3% { transform: translate(-1px, 0.5px); }
-  15%, 26.6% { transform: none; }
-  27.1% { transform: translate(2.6px, 1.1px); }
-  27.7% { transform: translate(-2.1px, -1.1px); }
-  28.5%, 40.6% { transform: none; }
-  41.1% { transform: translate(-3.1px, 2.1px); }
-  41.8% { transform: translate(2.6px, -1.6px); }
-  42.5% { transform: translate(-1px, 1px); }
-  43.2%, 100% { transform: none; }
+  0%, 10.9% { transform: none; }
+  11.4% { transform: translate(-2.6px, 1.6px); }
+  11.9% { transform: translate(2.1px, -1.1px); }
+  12.4% { transform: translate(-1px, 0.5px); }
+  13%, 23.1% { transform: none; }
+  23.5% { transform: translate(2.6px, 1.1px); }
+  24% { transform: translate(-2.1px, -1.1px); }
+  24.7%, 35.2% { transform: none; }
+  35.6% { transform: translate(-3.1px, 2.1px); }
+  36.2% { transform: translate(2.6px, -1.6px); }
+  36.8% { transform: translate(-1px, 1px); }
+  37.4%, 100% { transform: none; }
 }
-.b3-pala { animation: b3-pala 5.2s linear infinite; }
+.b3-pala { animation: b3-pala 6s linear infinite; }
 @keyframes b3-pala {
-  0%, 10% {
+  0%, 8.7% {
     transform: translate(-8px, -138px) rotate(-22deg);
     opacity: 0;
     animation-timing-function: cubic-bezier(0.7, 0, 1, 0.6);
   }
-  10.6% { opacity: 1; }
-  13% { transform: translate(0, 3px); animation-timing-function: cubic-bezier(0.2, 0.9, 0.4, 1); }
-  14.6%, 100% { transform: none; opacity: 1; }
+  9.2% { opacity: 1; }
+  11.3% { transform: translate(0, 3px); animation-timing-function: cubic-bezier(0.2, 0.9, 0.4, 1); }
+  12.7%, 100% { transform: none; opacity: 1; }
 }
-.b3-azadon { animation: b3-azadon 5.2s linear infinite; }
+.b3-azadon { animation: b3-azadon 6s linear infinite; }
 @keyframes b3-azadon {
-  0%, 24% {
+  0%, 20.8% {
     transform: translate(144px, -8px) rotate(30deg);
     opacity: 0;
     animation-timing-function: cubic-bezier(0.7, 0, 1, 0.6);
   }
-  24.6% { opacity: 1; }
-  27% { transform: translate(-4px, 0); animation-timing-function: cubic-bezier(0.2, 0.9, 0.4, 1); }
-  28.6%, 100% { transform: none; opacity: 1; }
+  21.3% { opacity: 1; }
+  23.4% { transform: translate(-4px, 0); animation-timing-function: cubic-bezier(0.2, 0.9, 0.4, 1); }
+  24.8%, 100% { transform: none; opacity: 1; }
 }
-.b3-machete { animation: b3-machete 5.2s linear infinite; }
+.b3-machete { animation: b3-machete 6s linear infinite; }
 @keyframes b3-machete {
-  0%, 38% {
+  0%, 32.9% {
     transform: translate(86px, -120px) rotate(48deg) scale(1.08);
     opacity: 0;
     animation-timing-function: cubic-bezier(0.7, 0, 1, 0.6);
   }
-  38.6% { opacity: 1; }
-  41% { transform: translate(-2px, 2px); animation-timing-function: cubic-bezier(0.2, 0.9, 0.4, 1); }
-  42.6%, 100% { transform: none; opacity: 1; }
+  33.5% { opacity: 1; }
+  35.5% { transform: translate(-2px, 2px); animation-timing-function: cubic-bezier(0.2, 0.9, 0.4, 1); }
+  36.9%, 100% { transform: none; opacity: 1; }
 }
-.b3-streak { animation-duration: 5.2s; animation-timing-function: ease-out; animation-iteration-count: infinite; }
+.b3-streak { animation-duration: 6s; animation-timing-function: ease-out; animation-iteration-count: infinite; }
 .b3-streak-pala { animation-name: b3-streak-pala; }
 .b3-streak-azadon { animation-name: b3-streak-azadon; }
 .b3-streak-machete { animation-name: b3-streak-machete; }
 @keyframes b3-streak-pala {
-  0%, 12.4% { transform: none; opacity: 0; }
-  13.4% { opacity: 0.7; }
-  18%, 100% { transform: translate(0, 14px); opacity: 0; }
+  0%, 10.8% { transform: none; opacity: 0; }
+  11.6% { opacity: 0.7; }
+  15.6%, 100% { transform: translate(0, 14px); opacity: 0; }
 }
 @keyframes b3-streak-azadon {
-  0%, 26.4% { transform: none; opacity: 0; }
-  27.4% { opacity: 0.7; }
-  32%, 100% { transform: translate(-16px, 0); opacity: 0; }
+  0%, 22.9% { transform: none; opacity: 0; }
+  23.8% { opacity: 0.7; }
+  27.7%, 100% { transform: translate(-16px, 0); opacity: 0; }
 }
 @keyframes b3-streak-machete {
-  0%, 40.4% { transform: none; opacity: 0; }
-  41.4% { opacity: 0.8; }
-  46.5%, 100% { transform: translate(-8px, 12px); opacity: 0; }
+  0%, 35% { transform: none; opacity: 0; }
+  35.9% { opacity: 0.8; }
+  40.3%, 100% { transform: translate(-8px, 12px); opacity: 0; }
 }
-.b3-splat { animation-duration: 5.2s; animation-timing-function: cubic-bezier(0.2, 0.9, 0.35, 1); animation-iteration-count: infinite; }
+.b3-splat { animation-duration: 6s; animation-timing-function: cubic-bezier(0.2, 0.9, 0.35, 1); animation-iteration-count: infinite; }
 .b3-splat-a { animation-name: b3-splat-a; }
 .b3-splat-b { animation-name: b3-splat-b; }
 .b3-splat-c { animation-name: b3-splat-c; }
 @keyframes b3-splat-a {
-  0%, 12.8% { transform: scale(0.3); opacity: 0; }
-  14.6%, 100% { transform: scale(1); opacity: 1; }
+  0%, 11.1% { transform: scale(0.3); opacity: 0; }
+  12.7%, 100% { transform: scale(1); opacity: 1; }
 }
 @keyframes b3-splat-b {
-  0%, 26.8% { transform: scale(0.3); opacity: 0; }
-  28.6%, 100% { transform: scale(1); opacity: 1; }
+  0%, 23.2% { transform: scale(0.3); opacity: 0; }
+  24.8%, 100% { transform: scale(1); opacity: 1; }
 }
 @keyframes b3-splat-c {
-  0%, 40.8% { transform: scale(0.3); opacity: 0; }
-  42.6%, 100% { transform: scale(1); opacity: 1; }
+  0%, 35.4% { transform: scale(0.3); opacity: 0; }
+  36.9%, 100% { transform: scale(1); opacity: 1; }
 }
-.b3-tools { animation: b3-flicker 5.2s linear infinite; }
+.b3-tools { animation: b3-flicker 6s linear infinite; }
 @keyframes b3-flicker {
-  0%, 61% { opacity: 1; }
-  62% { opacity: 0.45; }
-  62.8% { opacity: 1; }
-  63.6% { opacity: 0.6; }
-  64.4%, 100% { opacity: 1; }
+  0%, 52.9% { opacity: 1; }
+  53.7% { opacity: 0.45; }
+  54.4% { opacity: 1; }
+  55.1% { opacity: 0.6; }
+  55.8%, 100% { opacity: 1; }
 }
 
 /* ══ reduced motion: la Ⓐ ensamblada, quieta y digna ═════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   .ba-svg, .ba-svg * { animation: none !important; }
   .b1-aro { stroke-dashoffset: 0; }
-  .b1-glow { opacity: 0.16; }
-  .b2-savia { opacity: 0.5; }
+  .ba-spark { opacity: 0; }
   .b3-grunge { opacity: 0.5; }
 }
 
