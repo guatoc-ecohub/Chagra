@@ -380,6 +380,6 @@ export const CREDITOS_FOTOS_QUINUA = [
   { slug: 'amaranto', autor: 'C T Johansson', licencia: 'CC BY 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Amaranthus_caudatus-IMG_9190.jpg' },
   { slug: 'chia', autor: 'Pancrat', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Salvia_hispanica_0a.jpg' },
   { slug: 'tarwi', autor: 'Michael Hermann', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Tarwi_(Lupinus_mutabilis),_cultivated_near_Puno,_Peru_(February_2015).JPG' },
-  { slug: 'canihua', autor: 'Michael Hermann', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Canihua_at_Atuncolla_near_Sillustani_Juliaca.jpg' },
+  { slug: 'canihua', autor: 'Crops for the Future', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Canihua_(Chenopodium_pallidicaule).jpg' },
   { slug: 'grano', autor: 'Ben pcc', licencia: 'Dominio público', licenciaUrl: 'https://commons.wikimedia.org/wiki/Help:Public_domain', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:QuinoaGrains.jpg' },
 ];
