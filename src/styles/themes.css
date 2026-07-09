@@ -636,7 +636,17 @@
 [data-theme="verde-vivo"] .text-amber-200,
 [data-theme="verde-vivo"] .text-amber-300,
 [data-theme="verde-vivo"] .text-amber-400,
-[data-theme="verde-vivo"] .text-amber-500{
+[data-theme="verde-vivo"] .text-amber-500,
+/* Variantes con ALPHA (QA temas 2026-07-09, bug #2): `text-amber-200/90` y
+ * `text-amber-100/90` son clases APARTE que este bloque no cubría → el
+ * subtítulo de la tab activa de los mundos quedaba ámbar pálido sobre
+ * durazno (ilegible en nature/verde-vivo). Mismo ocre oscuro AA. */
+[data-theme="minimalista"] .text-amber-100\/90,
+[data-theme="minimalista"] .text-amber-200\/90,
+[data-theme="nature"] .text-amber-100\/90,
+[data-theme="nature"] .text-amber-200\/90,
+[data-theme="verde-vivo"] .text-amber-100\/90,
+[data-theme="verde-vivo"] .text-amber-200\/90{
   color: rgb(160, 76, 20) !important;
   text-shadow: none !important;
 }
@@ -738,7 +748,17 @@
 [data-theme="verde-vivo"] .text-indigo-300{ color: rgb(55 48 163) !important; text-shadow: none !important; }
 [data-theme="nature"] .text-cyan-200,
 [data-theme="minimalista"] .text-cyan-200,
-[data-theme="verde-vivo"] .text-cyan-200{ color: rgb(21 94 117) !important; text-shadow: none !important; }
+[data-theme="verde-vivo"] .text-cyan-200,
+/* cyan-300 y su variante alpha (QA temas 2026-07-09, bug de Agua): el
+ * subtítulo de la tab activa ("Del techo al tanque…") usa `text-cyan-300/90`
+ * y los titulares de sección `text-cyan-300` — cian claro sin remapear sobre
+ * card clara = ilegible en nature/verde-vivo. Mismo cian profundo AA. */
+[data-theme="nature"] .text-cyan-300,
+[data-theme="minimalista"] .text-cyan-300,
+[data-theme="verde-vivo"] .text-cyan-300,
+[data-theme="nature"] .text-cyan-300\/90,
+[data-theme="minimalista"] .text-cyan-300\/90,
+[data-theme="verde-vivo"] .text-cyan-300\/90{ color: rgb(21 94 117) !important; text-shadow: none !important; }
 [data-theme="nature"] .text-green-300,
 [data-theme="minimalista"] .text-green-300,
 [data-theme="verde-vivo"] .text-green-300{ color: rgb(22 101 52) !important; text-shadow: none !important; }
@@ -832,6 +852,105 @@
 [data-theme="nature"] [class*="bg-white\/"],
 [data-theme="verde-vivo"] [class*="bg-white\/"]{
   background-color: rgb(var(--c-surface-raised) / 0.55) !important;
+}
+
+/* ===========================================================================
+ * §3e. TEXTO SOBRE FOTO (QA temas 2026-07-09, bug #1 — el peor).
+ *    Los mundos "photo-forward" (café/agua/cacao/fique/…) ponen el título del
+ *    héroe SOBRE la foto, protegido por un scrim negro FIJO
+ *    (`bg-gradient-to-t from-black/85 …`, ver FotoCafe/FotoAgua/etc.). Ese
+ *    scrim NO lo vira el remapeo de temas claros, así que ahí la tinta CLARA
+ *    original (blanco/ámbar/cian claro) sigue siendo la correcta — pero los
+ *    remapeos de §3bis/§3d la viraban a tinta oscura → título ilegible sobre
+ *    la foto (medido: "El café, de la semilla a la taza" casi negro sobre
+ *    cerezas en nature/minimalista/verde-vivo).
+ *    CONTEXTO: el scrim siempre es un hermano ANTERIOR del overlay de texto
+ *    (o su contenedor directo, caso SpeciesFicha/SaludSuelo), así que
+ *    `[class*="from-black"]` + `~ *` identifica "estoy sobre una foto" sin
+ *    tocar 20 JSX. Revertimos a los literales Tailwind (paridad exacta con
+ *    biopunk, que el QA validó como "se lee perfecto"). Especificidad (0,3,0)
+ *    > remapeos genéricos (0,2,0). Solo temas claros.
+ * =========================================================================== */
+
+/* Blancos: el título del héroe y sus variantes con alpha vuelven a blanco. */
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-white{ color: #fff !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-white\/70{ color: rgb(255 255 255 / 0.7) !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-white\/60{ color: rgb(255 255 255 / 0.6) !important; }
+
+/* Slate: la rampa está INVERTIDA en claros (slate-100 = tinta oscura) → sobre
+ * el scrim negro quedaba oscuro-sobre-oscuro. Literales Tailwind claros. */
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-slate-100{ color: #f1f5f9 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-slate-100\/95{ color: rgb(241 245 249 / 0.95) !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-slate-200{ color: #e2e8f0 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-slate-300{ color: #cbd5e1 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-slate-300\/90{ color: rgb(203 213 225 / 0.9) !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-slate-400{ color: #94a3b8 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-slate-500{ color: #64748b !important; }
+
+/* Familias de acento que §3bis/§3d viran a tono -700/-800 oscuro (correcto
+ * sobre crema, ilegible sobre el scrim negro): de vuelta al literal claro. */
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) :is(.text-amber-100, .text-amber-100\/90){ color: #fef3c7 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) :is(.text-amber-200, .text-amber-200\/90){ color: #fde68a !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-amber-300{ color: #fcd34d !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-amber-400{ color: #fbbf24 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) :is(.text-emerald-100, .text-emerald-100\/90){ color: #d1fae5 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) :is(.text-emerald-200, .text-emerald-200\/90, .text-emerald-200\/70){ color: #a7f3d0 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-emerald-300{ color: #6ee7b7 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-rose-200{ color: #fecdd3 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-rose-300{ color: #fda4af !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-sky-200{ color: #bae6fd !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) :is(.text-cyan-200, .text-cyan-300, .text-cyan-300\/90){ color: #a5f3fc !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-teal-200{ color: #99f6e4 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-teal-300{ color: #5eead4 !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-orange-200{ color: #fed7aa !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-indigo-200{ color: #c7d2fe !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-red-200{ color: #fecaca !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-violet-200{ color: #ddd6fe !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-green-300{ color: #86efac !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-blue-300{ color: #93c5fd !important; }
+:is([data-theme="minimalista"], [data-theme="nature"], [data-theme="verde-vivo"])
+  :is([class*="from-black"], [class*="from-black"] ~ *) .text-pink-300{ color: #f9a8d4 !important; }
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * §3f. PARDO CAFETERO HARD-CODEADO (QA temas 2026-07-09, bug #2): las cards y
+ * tabs de los mundos Café/Almanaque usan `bg-[#241811]/50|60` (tierra tostada,
+ * fuera de la indirección CSS-var). Sobre la crema de los temas claros quedaba
+ * un pardo sucio que no combina con la tinta remapeada (subtítulos de tabs
+ * invisibles). → superficie de card del tema, como el resto de cards. En
+ * biopunk/biopunk2 (sin remap) el pardo original se conserva. */
+[data-theme="minimalista"] [class*="bg-[#241811]"],
+[data-theme="nature"] [class*="bg-[#241811]"],
+[data-theme="verde-vivo"] [class*="bg-[#241811]"]{
+  background-color: rgb(var(--c-surface-card)) !important;
 }
 
 /* ===========================================================================

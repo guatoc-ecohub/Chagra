@@ -4,7 +4,36 @@
  */
 import { MUNDOS_FINCA } from './mundosFinca';
 import MundoVineta from './MundoVinetas';
+import { useProCapability } from '../../hooks/useProCapability';
 import './mundos-finca.css';
+
+/**
+ * Glifo del espíritu de la finca: una llama-hoja con su brote adentro,
+ * dibujada a mano (SVG inline, cero assets). Acompaña la entrada Pro de
+ * abajo; el color lo hereda del texto (currentColor).
+ */
+function EspirituGlyph() {
+    return (
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" aria-hidden="true">
+            {/* aura exterior (llama/hoja) */}
+            <path
+                d="M12 2.6c3.6 3.4 6.4 6.8 6.4 10.6 0 4.4-2.9 7.6-6.4 8.2-3.5-.6-6.4-3.8-6.4-8.2C5.6 9.4 8.4 6 12 2.6Z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinejoin="round"
+                opacity="0.9"
+            />
+            {/* brote interior */}
+            <path
+                d="M12 17.5v-4.2m0 0c0-2 1.3-3.2 3-3.4.1 2.1-1 3.4-3 3.4Zm0-1.2c0-1.6-1-2.6-2.4-2.8-.1 1.7.8 2.8 2.4 2.8Z"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
+    );
+}
 
 /**
  * MundosDeMiFinca — la grilla de LOS MUNDOS DE MI FINCA en el home F2.
@@ -28,6 +57,13 @@ import './mundos-finca.css';
  */
 export default function MundosDeMiFinca({ onNavigate, mostrarAnimales = true, plantsCount = 0 }) {
     const mundos = MUNDOS_FINCA.filter((m) => m.gate !== 'animales' || mostrarAnimales);
+    // Entrada Pro "El espíritu de su finca" (capability avatar-espiritu,
+    // módulo del repo privado chagra-pro). GATE por capability: solo se
+    // renderiza cuando el módulo Pro está cargado en el registry — mismo
+    // criterio permisivo-estructural de EspirituProScreen. Para cuentas /
+    // builds sin Pro: CERO rastro (ni botón muerto ni teaser). Reactivo:
+    // loadProModules es async, la banda aparece sola cuando el módulo llega.
+    const tieneEspiritu = useProCapability('avatar-espiritu');
 
     const abrir = (m) => {
         if (m.portada) onNavigate?.(m.portada);
@@ -99,6 +135,31 @@ export default function MundosDeMiFinca({ onNavigate, mostrarAnimales = true, pl
                     );
                 })}
             </div>
+
+            {/* ── Entrada Pro: EL ESPÍRITU DE SU FINCA (#/espiritu) ──────────
+                Banda discreta DEBAJO de la grilla (no es un mundo más: es la
+                finca ENTERA vista como un solo ser vivo — y la política de la
+                grilla es ~10 tarjetas top-level). El corazón de la escena ya
+                se usó para "Pregunte" (#2230), por eso la entrada vive aquí.
+                Gate arriba (tieneEspiritu): sin módulo Pro no se renderiza. */}
+            {tieneEspiritu && (
+                <button
+                    type="button"
+                    className="mf-espiritu"
+                    data-testid="entrada-espiritu"
+                    onClick={() => onNavigate?.('espiritu_pro')}
+                    aria-label="El espíritu de su finca: véala respirar como un solo ser vivo (experiencia de su plan)"
+                >
+                    <span className="mf-espiritu-glifo" aria-hidden="true">
+                        <EspirituGlyph />
+                    </span>
+                    <span className="mf-espiritu-txt">
+                        <b>El espíritu de su finca</b>
+                        <small>Véala respirar: toda su finca como un solo ser vivo</small>
+                    </span>
+                    <span className="mf-espiritu-sello" aria-hidden="true">Pro</span>
+                </button>
+            )}
         </section>
     );
 }

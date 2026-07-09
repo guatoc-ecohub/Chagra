@@ -751,6 +751,33 @@ export async function pestVsDiseaseGuard(userMessage) {
 }
 
 /**
+ * POST-LLM companion species guard. Valida la respuesta ya generada del
+ * agente contra el catalogo y devuelve un bloque de correccion listo para
+ * anteponer. Es fail-safe: si el endpoint cae, el turno sigue igual.
+ *
+ * @param {string} responseText - salida final del LLM ya generada.
+ * @returns {Promise<null | {
+ *   has_companion_species: boolean,
+ *   system_prompt_block: string,
+ *   reason: string,
+ * }>}
+ */
+export async function companionSpeciesGuard(responseText) {
+  if (!responseText || typeof responseText !== 'string' || !responseText.trim()) return null;
+  const raw = await postJson('/companion-species-guard', { response: responseText }, TOOL_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  const hasCompanionSpecies =
+    raw.has_companion_species === true ||
+    raw.has_companion === true ||
+    raw.needs_correction === true;
+  return {
+    has_companion_species: hasCompanionSpecies,
+    system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
+    reason: typeof raw.reason === 'string' ? raw.reason : '',
+  };
+}
+
+/**
  * Capa 2 anti-alucinación (cross-check de contexto). Llama
  * `POST ${BASE}/post-validate` con el TEXTO que el LLM ya generó y, opcional,
  * los `nombre_cientifico` de las entidades que la capa 1 resolvió para el turno

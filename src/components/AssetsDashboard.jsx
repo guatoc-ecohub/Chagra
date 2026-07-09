@@ -1645,12 +1645,16 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   return (
     <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="p-4 bg-slate-950 border-b border-slate-800 flex items-center gap-4 shrink-0 shadow-md">
+      {/* QA temas 2026-07-09: en 390px el título flex-1 no podía encoger (sin
+          min-w-0) y el grupo de acciones empujaba el botón de sincronizar
+          FUERA del borde derecho. Gap/padding compactos en angosto + título
+          truncable + nombre de finca más corto → los 4 controles caben. */}
+      <header className="px-2 py-4 min-[480px]:px-4 bg-slate-950 border-b border-slate-800 flex items-center gap-2 min-[480px]:gap-4 shrink-0 shadow-md">
         <button onClick={/** @type {React.MouseEventHandler<HTMLButtonElement>} */ (onBack)} aria-label="Volver al panel principal" className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[48px] min-w-[48px] flex justify-center items-center shrink-0">
           <ArrowLeft size={24} aria-hidden="true" />
         </button>
-        <h2 className="text-2xl font-black flex-1">Activos</h2>
-        <div className="flex items-center gap-2">
+        <h2 className="text-xl min-[480px]:text-2xl font-black flex-1 min-w-0 truncate">Activos</h2>
+        <div className="flex items-center gap-1.5 min-[480px]:gap-2 shrink-0">
           {/* Toggle Lista / Mapa (Fase 17.3) */}
           <div className="flex bg-slate-800 rounded-lg p-1">
             <button
@@ -1681,7 +1685,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
             data-testid="assets-finca-switcher"
           >
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse group-hover:scale-125 transition-transform"></div>
-            <span className="truncate max-w-[10ch]">{fincaNombre}</span>
+            <span className="truncate max-w-[7ch] min-[480px]:max-w-[10ch]">{fincaNombre}</span>
             {hasMultipleFincas && (
               <ChevronDown size={12} aria-hidden="true" className="-mr-0.5 opacity-80 group-hover:translate-y-0.5 transition-transform" />
             )}
@@ -1810,10 +1814,12 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       {viewMode === 'list' && activeTab === 'plant' && !currentZoneId && (
         <div className="flex-1">
           {lands.length === 0 && orphanPlants.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-slate-500">
+            <div className="flex flex-col items-center justify-center py-12 px-6 text-center text-slate-500">
+              {/* QA temas 2026-07-09: el empty-state iba pegado al borde (sin
+                  padding lateral ni text-center) y con jerga técnica en tuteo. */}
               <MapPin size={48} className="mb-3 opacity-30" />
               <p className="text-lg">Sin zonas registradas</p>
-              <p className="text-sm mt-1">Crea una zona (asset--land) desde FarmOS o la tab Infraestructura</p>
+              <p className="text-sm mt-1">Cree su primera zona desde la pestaña Infraestructura, o desde farmOS</p>
             </div>
           ) : (
             <Virtuoso

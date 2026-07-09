@@ -1,0 +1,191 @@
+/*
+ * guardian-espiritu.css — el SELECTOR DEL GUARDIÁN (espíritu de la finca) en el
+ * home vivo. Estética biopunk portada 1:1 del mockup aprobado
+ * #/mockups/avatar-biopunk (AvatarGameBiopunk): tarjeta oscura de savia, chips
+ * de especie con glow neón por acento, nombre científico en itálica.
+ *
+ * El acento (--ge-acc / --ge-acc-rgb) lo re-tiñe el guardián elegido, igual que
+ * el HUD del mockup. Respeta prefers-reduced-motion.
+ */
+
+.ge {
+  --ge-savia: #2dffc4;
+  --ge-crema: #eafff6;
+  --ge-tinta: #a9c3d2;
+  --ge-mono: ui-monospace, 'SF Mono', 'Roboto Mono', monospace;
+  --ge-acc: #ffb54f;
+  --ge-acc-rgb: 255, 181, 79;
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  padding: 14px 14px 16px;
+  border: 1px solid rgba(45, 255, 196, 0.16);
+  background:
+    radial-gradient(120% 90% at 12% -10%, rgba(var(--ge-acc-rgb), 0.14), transparent 60%),
+    linear-gradient(180deg, #071030 0%, #060c22 60%, #04081a 100%);
+  box-shadow: 0 8px 40px rgba(2, 4, 18, 0.55), inset 0 0 40px rgba(45, 255, 196, 0.05);
+  transition: box-shadow 0.5s ease, border-color 0.5s ease;
+}
+.ge.on-glow {
+  border-color: rgba(var(--ge-acc-rgb), 0.4);
+  box-shadow: 0 8px 46px rgba(2, 4, 18, 0.6), 0 0 40px rgba(var(--ge-acc-rgb), 0.14),
+    inset 0 0 40px rgba(45, 255, 196, 0.05);
+}
+
+/* estrellas de fondo, sutiles */
+.ge-stars { position: absolute; inset: 0; pointer-events: none; opacity: 0.7; }
+
+/* ---------------------------- cabecera ----------------------------------- */
+.ge-head { position: relative; display: flex; flex-direction: column; gap: 2px; margin-bottom: 12px; }
+.ge-kicker {
+  font-family: var(--ge-mono);
+  font-size: 9.5px;
+  letter-spacing: 2.4px;
+  color: var(--ge-savia);
+  opacity: 0.85;
+}
+.ge-title {
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 1.15;
+  letter-spacing: 0.2px;
+  color: var(--ge-crema);
+  margin: 0;
+}
+.ge-sub { font-size: 11.5px; color: var(--ge-tinta); margin: 2px 0 0; line-height: 1.35; }
+
+/* --------------------------- héroe (guardián elegido) -------------------- */
+.ge-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(var(--ge-acc-rgb), 0.1), rgba(var(--ge-acc-rgb), 0.02));
+  border: 1px solid rgba(var(--ge-acc-rgb), 0.28);
+  margin-bottom: 12px;
+}
+.ge-hero-avatar {
+  flex: 0 0 auto;
+  width: 78px;
+  height: 78px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 36%, rgba(var(--ge-acc-rgb), 0.28), rgba(var(--ge-acc-rgb), 0.02) 70%);
+}
+.ge-hero-avatar svg { width: 100%; height: 100%; }
+.ge-hero-txt { min-width: 0; }
+.ge-hero-rol {
+  font-family: var(--ge-mono);
+  font-size: 8.5px;
+  letter-spacing: 1.8px;
+  color: var(--ge-savia);
+  opacity: 0.9;
+  margin: 0 0 1px;
+}
+.ge-hero-nombre { font-size: 17px; font-weight: 800; color: var(--ge-crema); margin: 0; line-height: 1.1; }
+.ge-hero-cientifico {
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ge-acc);
+  margin: 1px 0 0;
+  transition: color 0.4s ease;
+}
+.ge-hero-frase { font-size: 11.5px; color: var(--ge-tinta); margin: 4px 0 0; line-height: 1.35; }
+.ge-hero-fuente {
+  display: inline-block;
+  margin-top: 5px;
+  font-family: var(--ge-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.6px;
+  color: rgba(169, 195, 210, 0.7);
+}
+
+/* --------------------------- chips de especie --------------------------- */
+.ge-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+}
+.ge-chip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 6px 9px;
+  border-radius: 14px;
+  border: 1px solid rgba(45, 255, 196, 0.18);
+  background: rgba(13, 30, 68, 0.5);
+  color: var(--ge-tinta);
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.18s ease, border-color 0.25s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+.ge-chip-avatar {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 36%, rgba(45, 255, 196, 0.16), rgba(45, 255, 196, 0.01) 70%);
+}
+.ge-chip-avatar svg { width: 100%; height: 100%; }
+.ge-chip-nombre { font-size: 11px; font-weight: 700; line-height: 1.15; color: var(--ge-crema); }
+.ge-chip-eje { font-size: 8.5px; line-height: 1.2; color: rgba(169, 195, 210, 0.8); }
+.ge-chip:hover { border-color: rgba(45, 255, 196, 0.42); transform: translateY(-1px); }
+.ge-chip.on {
+  border-color: var(--ge-chip-acc, var(--ge-savia));
+  background: linear-gradient(180deg, rgba(var(--ge-chip-acc-rgb), 0.24), rgba(var(--ge-chip-acc-rgb), 0.05));
+  box-shadow: 0 0 20px rgba(var(--ge-chip-acc-rgb), 0.38);
+}
+.ge-chip.on .ge-chip-avatar {
+  background: radial-gradient(circle at 42% 36%, rgba(var(--ge-chip-acc-rgb), 0.4), rgba(var(--ge-chip-acc-rgb), 0.05) 72%);
+}
+.ge-chip.on .ge-chip-nombre { color: #fff; }
+.ge-chip:focus-visible { outline: 2px solid var(--ge-crema); outline-offset: 2px; }
+.ge-chip-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 9px;
+  line-height: 1;
+  color: #04160f;
+  background: var(--ge-chip-acc, var(--ge-savia));
+  box-shadow: 0 0 8px rgba(var(--ge-chip-acc-rgb), 0.7);
+}
+
+/* -------------------------- animaciones (biopunk) ------------------------ */
+.ge-av-vuela { animation: ge-vuela 3.4s ease-in-out infinite; transform-origin: center; }
+.ge-av-flota { animation: ge-flota 3.8s ease-in-out infinite; transform-origin: center; }
+.ge-ala { animation: ge-ala 0.28s ease-in-out infinite alternate; transform-origin: 4px 0; }
+.ge-aleteo { animation: ge-aleteo 0.16s ease-in-out infinite alternate; transform-origin: -1px -5px; }
+
+@keyframes ge-vuela {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50% { transform: translateY(-3px) rotate(1.5deg); }
+}
+@keyframes ge-flota {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2.5px); }
+}
+@keyframes ge-ala {
+  from { transform: scaleY(0.72) rotate(-6deg); }
+  to { transform: scaleY(1) rotate(4deg); }
+}
+@keyframes ge-aleteo {
+  from { transform: scaleX(0.55); opacity: 0.5; }
+  to { transform: scaleX(1); opacity: 0.8; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ge-av-vuela, .ge-av-flota, .ge-ala, .ge-aleteo { animation: none !important; }
+  .ge-chip { transition: none; }
+}

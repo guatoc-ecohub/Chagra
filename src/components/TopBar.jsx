@@ -169,7 +169,7 @@ export default function TopBar({ onNavigate, onLogout }) {
           onClick={() => onNavigate('dashboard')}
           aria-label={isBreathing ? 'Chagra está procesando' : 'Volver al inicio'}
           title={isBreathing ? 'Chagra está pensando…' : 'Volver al inicio'}
-          className="font-bold flex items-center gap-2 shrink-0 rounded-lg px-2 py-1 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
+          className="font-bold flex items-center gap-2 min-w-0 shrink rounded-lg px-2 py-1 hover:bg-slate-800/60 active:bg-slate-700 transition-colors min-h-[44px]"
         >
           {/* Ícono del tema (A de anarquía o similar según tema) */}
           <span
@@ -186,7 +186,7 @@ export default function TopBar({ onNavigate, onLogout }) {
               su mano en el campo
             </span>
             {locationLabel && (
-              <span className="mt-1 inline-block whitespace-normal break-words rounded-lg border border-emerald-400/20 bg-emerald-950/25 px-2 py-1 text-[10px] leading-snug text-emerald-200/95 font-medium max-w-[50vw]">
+              <span className="mt-1 truncate max-w-[min(50vw,200px)] min-w-0 shrink rounded-lg border border-emerald-400/20 bg-emerald-950/25 px-2 py-1 text-[10px] leading-snug text-emerald-200/95 font-medium">
                 {locationLabel}
               </span>
             )}
