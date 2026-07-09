@@ -139,7 +139,7 @@ describe('UchuvaScreen — puente al agente y créditos', () => {
     for (const cr of CREDITOS_FOTOS_UCHUVA) {
       expect(cr.autor).toBeTruthy();
       expect(cr.licencia).toBeTruthy();
-      expect(cr.fuenteUrl).toMatch(/commons\.wikimedia\.org/);
+      expect(cr.fuenteUrl).toMatch(/^https?:\/\/([a-z0-9-]+\.)*wikimedia\.org\//);
     }
   });
 });
