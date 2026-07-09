@@ -303,7 +303,7 @@ export const NOTA_SIN_RECETAS =
  * para auditoría de licencias, este arreglo pinta la UI). Requisito de las
  * licencias CC-BY/CC-BY-SA: atribución visible. Si una foto no carga, la tarjeta
  * cae con gracia a un ícono.
- * @type {{slug:string,autor:string,licencia:string,licenciaUrl:string,fuenteUrl:string}[]}
+ * @type {{slug:string,autor:string,licencia:string,licenciaUrl:string,fuenteUrl:string,aproximada?:boolean,nota?:string}[]}
  */
 export const CREDITOS_FOTOS_FIQUE = [
   { slug: 'planta', autor: 'Dick Culbert', licencia: 'CC BY 2.0', licenciaUrl: 'https://creativecommons.org/licenses/by/2.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Furcraea_andina_(9172593946).jpg' },
