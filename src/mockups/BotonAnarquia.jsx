@@ -41,7 +41,7 @@ import React, { useState } from 'react';
 // PALA (diagonal izquierda). Local: empuñadura D (estribo abierto) arriba,
 // mango a (0,78), hoja puntuda hasta (0,111). Colocada: vértice (68.5,13),
 // 18° → punta ~(34,118). La empuñadura asoma por fuera del aro (vértice Ⓐ).
-const PALA_POS = 'translate(68.5 13) rotate(18)';
+const PALA_POS = 'translate(70 11) rotate(21)';
 const PALA_GRIP = 'M -7 13 L -7 6 A 7 7 0 0 1 7 6 L 7 13';
 const PALA_SHAFT = 'M 0 11 L 0 78';
 const PALA_BLADE = 'M -8.5 74 C -10 87 -5.5 99 0 111 C 5.5 99 10 87 8.5 74 C 3.5 78 -3.5 78 -8.5 74 Z';
@@ -51,7 +51,7 @@ const PALA_BLADE = 'M -8.5 74 C -10 87 -5.5 99 0 111 C 5.5 99 10 87 8.5 74 C 3.5
 // Colocado: el pomo casi TOCA la empuñadura de la pala en el vértice (72,15)
 // — las dos diagonales convergen arriba y la A se lee sin duda — −19.5° →
 // punta ~(112,105).
-const MACHETE_POS = 'translate(71.5 14.5) rotate(-19.5)';
+const MACHETE_POS = 'translate(70 11) rotate(-21)';
 const MACHETE_HANDLE = 'M 0 2 L 0 26';
 const MACHETE_GUARD = 'M -6 27 L 7 27';
 const MACHETE_BLADE = 'M -3.5 29 L -3.5 78 Q -3.5 90 8 99 L 13.5 92.5 Q 6.5 86 6 73 L 6 29 Z';
@@ -61,8 +61,8 @@ const MACHETE_FILO = 'M 8 99 L 13.5 92.5';
 // izquierdo el cuello dobla hacia abajo y remata en la hoja perpendicular,
 // pequeña y pegada al mango. Colocado en (22,88): el mango sobresale del aro
 // por ambos lados y la cabeza queda abajo-izquierda (contrapeso del machete).
-const AZADON_POS = 'translate(22 88)';
-const AZADON_HANDLE = 'M 8 0 L 100 0';
+const AZADON_POS = 'translate(40 82)';
+const AZADON_HANDLE = 'M 8 0 L 58 0';
 const AZADON_NECK = 'M 12 -1 C 4 0 0 3 -1 9';
 const AZADON_BLADE = 'M -6 7 L 4 8.5 L 5.5 22 L -10 19 Z';
 
