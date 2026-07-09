@@ -61,7 +61,7 @@ const FOTOS = {
   'cosecha-aguacate': { autor: 'Kekiwiyi', licencia: 'CC BY-SA 4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Avocado_harvest_01.jpg', alt: 'Mano sosteniendo aguacates verdes recién cosechados.' },
   'cosecha-uchuva': { autor: 'Ivar Leidus', licencia: 'CC BY-SA 4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Physalis_peruviana_calix_open_close-up.jpg', alt: 'Uchuva con el capacho (cáliz) abierto mostrando el fruto naranja.' },
   'cosecha-platano': { autor: 'Henry Doe', licencia: 'CC0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Green_Plantains_(Unsplash).jpg', alt: 'Racimo de plátanos verdes, firmes.' },
-  'secado-maiz': { autor: 'Cut angles', licencia: 'CC BY-SA 4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Maize_drying.jpg', alt: 'Grano de maíz secándose al sol.' },
+  'secado-maiz': { autor: 'Adam Jones', licencia: 'CC BY-SA 2.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Corn_Cobs_Drying_on_Tarp_-_Khang_Ninh_Commune_-_Ba_Be_-_Vietnam_(48107604988).jpg', alt: 'Mazorcas de maíz secándose al sol sobre una lona.' },
   'secado-cafe': { autor: 'JPDAFT', licencia: 'CC0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:%22Helda%22_for_drying_coffee_in_Colombia.jpg', alt: 'Café en pergamino secándose al sol en un patio de una finca colombiana.' },
   'plaga-gorgojo': { autor: 'Natasha Wright, Bugwood.org', licencia: 'CC BY 3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Maize_Weevil_-_Sitophilus_zeamais.jpg', alt: 'Gorgojo del maíz (Sitophilus zeamais) visto de cerca.' },
   'moho-maiz': { autor: 'UIUC', licencia: 'CC BY-SA 3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Corn_mold.jpg', alt: 'Mazorca de maíz con moho: donde crece el hongo de la aflatoxina.' },
