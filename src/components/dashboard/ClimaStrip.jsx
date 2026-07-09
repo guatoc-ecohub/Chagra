@@ -8,6 +8,7 @@ import { FORECAST_THRESHOLDS } from '../../constants/alertThresholds';
 import { FARM_CONFIG } from '../../config/defaults';
 import useFincaActiveStore from '../../services/fincaActiveStore';
 import { getProfile, getProfileMunicipio } from '../../services/userProfileService';
+import { summarizeProfileLocation, formatLocationLabel } from '../../services/locationDisplay';
 import ClimaIconoVivo from './ClimaIconoVivo';
 
 /**
@@ -176,6 +177,7 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
         return resolveGeo(getProfile(), municipio);
         // eslint-disable-next-line react-hooks/exhaustive-deps -- getProfile y resolveGeo son funciones estables
     }, [municipio, tick]);
+    const profileLocation = useMemo(() => summarizeProfileLocation(getProfile()), [tick]);
 
     // mitad geo de #364 (2026-06-03): ¿la ubicación GUARDADA es demasiado
     // gruesa para afirmar el municipio/zona con confianza? Pasa cuando el
@@ -327,7 +329,7 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
     });
 
     const hasReal = filled.some((d) => d.tempMaxC != null);
-    const headerLabel = (municipio || '').split(',')[0] || 'su finca';
+    const headerLabel = formatLocationLabel(profileLocation) || (municipio || '').split(',')[0] || 'su finca';
 
     // ── Piso térmico (grounding térmico por ALTITUD GUARDADA del perfil) ──
     // Refuerza visualmente el dato que el agente más confunde: a qué piso

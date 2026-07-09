@@ -6,6 +6,8 @@ import { getProfile, saveProfile } from '../services/userProfileService';
 import { getPisoTermicoInfo } from '../services/locationService';
 import { useAutosave } from '../hooks/useAutosave';
 import { MSG } from '../config/messages.js';
+import { summarizeProfileLocation, formatLocationContext } from '../services/locationDisplay';
+import LocationCorrectionInline from './location/LocationCorrectionInline';
 
 /**
  * OnboardingHero, empty-state cold-start del dashboard (DR-030 QW5).
@@ -51,6 +53,7 @@ export default function OnboardingHero({ onNavigate, compact = false }) {
 
   const { savedState: obState, save: obSave } = useAutosave('onboarding-hero', { lastCta: null, pisoConfirmed: false });
   const [profile] = useState(() => getProfile());
+  const profileLocation = summarizeProfileLocation(profile);
   const [pisoConfirmado, setPisoConfirmado] = useState(() => obState.pisoConfirmed || profile.piso_confirmado === '1');
   const altitud = Number(profile.finca_altitud);
   const pisoInfo = Number.isFinite(altitud) && profile.finca_altitud !== '' && profile.finca_altitud != null
@@ -168,6 +171,11 @@ export default function OnboardingHero({ onNavigate, compact = false }) {
               <p className="text-sm text-slate-400 mt-1">¿Es correcto?</p>
             </div>
           </div>
+          {profileLocation.label && (
+            <p className="text-xs text-slate-400">
+              {formatLocationContext(profileLocation)}
+            </p>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -184,6 +192,9 @@ export default function OnboardingHero({ onNavigate, compact = false }) {
               <Pencil size={18} aria-hidden="true" /> Corregir
             </button>
           </div>
+          {profileLocation.label && (
+            <LocationCorrectionInline profile={profile} title="Corregir barrio o vereda" compact />
+          )}
         </div>
       )}
     </>

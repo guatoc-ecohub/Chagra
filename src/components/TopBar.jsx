@@ -12,6 +12,7 @@ import { getOperatorPhoto } from '../services/operatorPhotoService';
 import { findMunicipio } from '../utils/colombiaLocations';
 import { useTheme } from '../hooks/useTheme';
 import { iconForTheme } from './dashboard/themeIcon';
+import { summarizeProfileLocation, formatLocationContext } from '../services/locationDisplay';
 
 /**
  * TopBar, header persistente con identidad del operador (DR-030 QW2).
@@ -71,26 +72,10 @@ export default function TopBar({ onNavigate, onLogout }) {
   // y, si falta, resuelve `region` contra el dataset DANE local (offline).
   const profileMunicipio = getProfileMunicipio();
   const municipio = activeFinca?.municipio || profileMunicipio || FARM_CONFIG?.MUNICIPIO || null;
-  // Vereda: el dataset DANE no la trae; solo aparece si el perfil/finca la tiene
-  // de onboarding manual. Si no, se omite sin romper (municipio + altitud bastan).
-  const vereda = activeFinca?.vereda || profile?.vereda || null;
-  // Altitud: prioriza la real de la finca (perfil/finca activa); si el perfil no
-  // la trae (onboarding sin altitud), cae a la altitud curada del municipio en
-  // el dataset DANE — así el chip siempre muestra municipio + altitud aunque la
-  // captura fina de la altitud real la complete el otro flujo (coarse-location).
+  const location = summarizeProfileLocation({ ...profile, ...activeFinca, municipio });
   const daneAltitud = municipio ? findMunicipio(String(municipio).split(',')[0])?.altitud : null;
-  const altitud =
-    activeFinca?.altitud ||
-    profile?.finca_altitud ||
-    profile?.altitud ||
-    FARM_CONFIG?.ALTITUD_MSNM ||
-    daneAltitud ||
-    null;
-  const locationLabel = [
-    vereda,
-    municipio ? String(municipio).split(',')[0] : null,
-    altitud ? `${altitud} msnm` : null,
-  ].filter(Boolean).join(' · ');
+  const altitud = location.altitud || activeFinca?.altitud || profile?.finca_altitud || profile?.altitud || FARM_CONFIG?.ALTITUD_MSNM || daneAltitud || null;
+  const locationLabel = formatLocationContext({ ...location, altitud }) || null;
 
   useEffect(() => {
     const onLocUpdated = () => setProfileTick((t) => t + 1);

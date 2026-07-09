@@ -23,6 +23,7 @@ import { iconForTheme } from './themeIcon';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import { lunarPhase, solarTimes, moonPathD } from '../../utils/skyEphemeris';
 import { resolveClimaLocation, getCachedClimaSnapshot } from '../../services/climaService';
+import { summarizeProfileLocation, formatLocationContext } from '../../services/locationDisplay';
 import {
     fetchSkyConditions,
     getCachedSkyConditions,
@@ -346,7 +347,18 @@ export default function AgentHero({ onNavigate }) {
     const themeSwapped = prevThemeRef.current !== theme;
     useEffect(() => { prevThemeRef.current = theme; }, [theme]);
     // ── Perfil real para sugerencias contextuales ─────────────────────────────
-    const profile = getProfile();
+    const [profileTick, setProfileTick] = useState(0);
+    const profile = (() => { void profileTick; return getProfile(); })();
+    useEffect(() => {
+        const refresh = () => setProfileTick((t) => t + 1);
+        window.addEventListener('chagra:location-updated', refresh);
+        window.addEventListener('chagra:profile-updated', refresh);
+        return () => {
+            window.removeEventListener('chagra:location-updated', refresh);
+            window.removeEventListener('chagra:profile-updated', refresh);
+        };
+    }, []);
+    const profileLocation = useMemo(() => summarizeProfileLocation(profile), [profile]);
     const altitud = profile?.finca_altitud || profile?.altitud || null;
 
     // ── Escena: sol/luna REALISTA (nubosidad real + fase lunar real) ──────────
@@ -1946,6 +1958,11 @@ export default function AgentHero({ onNavigate }) {
                         ) : (
                             <p className="agentport-sub">
                                 {expertoActive ? SUB_EXPERTO : SUB_CAMPESINO}
+                            </p>
+                        )}
+                        {profileLocation.label && (
+                            <p className="agentport-sub agentport-sub-location">
+                                {formatLocationContext(profileLocation)}
                             </p>
                         )}
                     </div>

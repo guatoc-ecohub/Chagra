@@ -16,6 +16,7 @@ import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciar
 import { deriveAtmosphere } from '../../services/atmosphereService';
 import { resolveClimaLocation, getCachedClimaSnapshot, CLIMA_UPDATED_EVENT } from '../../services/climaService';
 import { clasificarPisoTermico } from '../../services/pisoTermicoClassifier';
+import { summarizeProfileLocation } from '../../services/locationDisplay';
 import { useTheme, resolveAutoTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
@@ -120,6 +121,16 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
   // del tema vía los tokens --c-*/--fvh-* del CSS. Con la flag OFF este hero no se
   // monta, así que esto solo corre en dev.
   const { theme } = useTheme();
+  const [profileTick, setProfileTick] = useState(0);
+  useEffect(() => {
+    const refresh = () => setProfileTick((t) => t + 1);
+    window.addEventListener('chagra:location-updated', refresh);
+    window.addEventListener('chagra:profile-updated', refresh);
+    return () => {
+      window.removeEventListener('chagra:location-updated', refresh);
+      window.removeEventListener('chagra:profile-updated', refresh);
+    };
+  }, []);
   const abrirAgente = () => {
     if (onOpenAgent) onOpenAgent();
     else onNavigate?.('agente');
@@ -177,7 +188,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
   );
 
   // ── Ubicación real de la finca (vereda · municipio · msnm · piso) ─────────
-  const ubicacion = useMemo(() => buildUbicacion(), []);
+  const ubicacion = useMemo(() => buildUbicacion(profileTick), [profileTick]);
 
   // ── ¿Operador? (override de escala SOLO para QA, oculto al usuario) ───────
   const operador = useMemo(() => {
@@ -765,10 +776,10 @@ function buildUbicacion() {
   let perfil = {};
   try { perfil = getProfile() || {}; } catch (_) { perfil = {}; }
   try { loc = resolveClimaLocation({ profile: perfil }) || {}; } catch (_) { loc = {}; }
-
-  const vereda = limpiar(loc.vereda || perfil.vereda);
-  const municipio = limpiar(loc.municipio || perfil.municipio);
-  const departamento = limpiar(loc.departamento || perfil.departamento);
+  const profileLocation = summarizeProfileLocation({ ...perfil, ...loc });
+  const vereda = limpiar(loc.sublocalidad || profileLocation.sublocalidad);
+  const municipio = limpiar(loc.municipio || profileLocation.municipio);
+  const departamento = limpiar(loc.departamento || profileLocation.departamento);
 
   const msnm = primerNumero([loc.elevation, perfil.finca_altitud]);
   let piso = limpiar(perfil.piso_termico);
@@ -781,7 +792,7 @@ function buildUbicacion() {
   // Parte geográfica: "Vereda X · Municipio, Depto" (sin redundar el departamento
   // si ya aparece en el municipio compuesto).
   const geo = [];
-  if (vereda) geo.push(`Vereda ${vereda}`);
+  if (vereda) geo.push(`${profileLocation.tipo === 'barrio' ? 'Barrio' : 'Vereda'} ${vereda}`);
   if (municipio) geo.push(departamento ? `${municipio}, ${departamento}` : municipio);
   else if (departamento) geo.push(departamento);
   const lugar = geo.length ? geo.join(' · ') : null;

@@ -21,6 +21,7 @@ import {
 } from './glosarioCaucaService.js';
 import { filterVoseo as _filterVoseo } from './voseoFilter.js';
 import { buildUserProfileBlock, getProfile } from './userProfileService.js';
+import { summarizeProfileLocation } from './locationDisplay.js';
 import { findMunicipio } from '../utils/colombiaLocations.js';
 import { buildEnsoAgentLines } from './ensoContext.js';
 
@@ -474,12 +475,13 @@ export function buildProfileContext(finca, opts = {}) {
   const veredaContext = (() => {
     try {
       const p = getProfile();
-      if (!p || typeof p !== 'object' || !p.vereda) return '';
-      const location = [p.vereda, p.municipio, p.departamento].filter(Boolean).join(', ');
-      const source = p.vereda_source ? ` Fuente: ${p.vereda_source}.` : '';
-      return `\n\nCONTEXTO DE VEREDA OSM:
-- Ubicación veredal confirmada: ${location}.${source}
-- Usa la vereda para adaptar clima local, pendiente, acceso y recomendaciones de campo cuando sea relevante.
+      if (!p || typeof p !== 'object') return '';
+      const location = summarizeProfileLocation(p);
+      if (!location.sublocalidad) return '';
+      const formatted = location.labelWithContext || location.label || location.sublocalidad;
+      return `\n\nCONTEXTO DE UBICACIÓN:
+- Ubicación confirmada: ${formatted}.
+- Usa barrio o vereda para adaptar clima local, pendiente, acceso y recomendaciones de campo cuando sea relevante.
 - Si la consulta requiere precisión predial, pide confirmación de coordenadas o altitud antes de afirmar.`;
     } catch (_) {
       return '';

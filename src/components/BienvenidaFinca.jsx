@@ -30,7 +30,7 @@ import { MSG } from '../config/messages.js';
  *      si ya corre instalada, lo celebra.
  *   5. Ubicación mágica — "¿dónde está su tierra?" como momento de magia, no
  *      como formulario. El CTA delega en la ruta EXISTENTE
- *      'ubicacion-detectada' (LocationDetectedScreen: GPS + vereda + montaña
+ *      'ubicacion-detectada' (LocationDetectedScreen: GPS + barrio/vereda + montaña
  *      de pisos térmicos). Cero lógica nueva de permisos/datos.
  *
  * PHOTO-FORWARD: los momentos 3 y 4 llevan foto real CC de campo colombiano/
