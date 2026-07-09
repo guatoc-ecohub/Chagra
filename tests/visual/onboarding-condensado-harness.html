@@ -1,0 +1,25 @@
+<!doctype html>
+<!--
+  onboarding-condensado-harness.html — Harness AISLADO para verificar el
+  ONBOARDING CONDENSADO (reescritura 2026-07-08: 19 preguntas → 3 pantallas).
+  Monta el componente REAL OnboardingCondensado SIN pasar por el router/auth
+  de la app. El script tests/visual/onboarding-condensado-verify.mjs lo usa
+  para verificar en Chromium real (NixOS nix-store):
+    - el botón "Ubicar mi finca" detecta y muestra la VEREDA (PIP DANE),
+    - la corrección inline funciona (picker de veredas del municipio),
+    - el flujo son ≤3 pantallas de contenido.
+
+  Uso: vite (dev) sirve este HTML; Playwright navega a
+       /tests/visual/onboarding-condensado-harness.html?seed=<base64-json>
+-->
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Onboarding condensado — harness de verificación</title>
+  </head>
+  <body class="bg-slate-950">
+    <div id="onb-root"></div>
+    <script type="module" src="./onboarding-condensado-harness.jsx"></script>
+  </body>
+</html>
