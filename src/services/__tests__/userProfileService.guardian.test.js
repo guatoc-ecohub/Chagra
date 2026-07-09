@@ -44,7 +44,10 @@ describe('userProfileService — guardián / espíritu de la finca', () => {
 
   it('ignora ids desconocidos (no corrompe el perfil, no inventa fauna)', () => {
     setGuardianEspecie('abeja');
-    const res = setGuardianEspecie('unicornio');
+    // Prueba negativa a propósito: un id fuera del roster. El cast evita el
+    // error de tsc (el parámetro es la unión de ids válidos) sin perder la
+    // verificación de que la función RECHAZA en runtime lo que no conoce.
+    const res = setGuardianEspecie(/** @type {any} */ ('unicornio'));
     expect(res).toBeNull();
     // El guardián válido previo se conserva.
     expect(getGuardianEspecie()).toBe('abeja');
