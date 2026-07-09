@@ -111,8 +111,19 @@ const poligono = (lados, r, giro = 0) =>
   }).join(' ');
 
 const HEXAGONO = poligono(6, 118, -Math.PI / 2);
-const TRIANGULO_A = poligono(3, 118, -Math.PI / 2);
-const TRIANGULO_B = poligono(3, 118, Math.PI / 2);
+/* Micelio: hifas orgánicas que brotan del centro (reemplaza la geometría de
+   estrella de dos triángulos). Red viva, no símbolo. */
+const MICELIO = Array.from({ length: 9 }, (_, k) => {
+  const a = (k / 9) * Math.PI * 2 + (k % 2 ? 0.16 : -0.11);
+  const r1 = 118 * (0.6 + (k % 3) * 0.13);
+  const ex = (CV + Math.cos(a) * r1).toFixed(1), ey = (CV + Math.sin(a) * r1).toFixed(1);
+  const px = (CV + Math.cos(a) * r1 * 0.5 + Math.cos(a + Math.PI / 2) * (k % 2 ? 13 : -15)).toFixed(1);
+  const py = (CV + Math.sin(a) * r1 * 0.5 + Math.sin(a + Math.PI / 2) * (k % 2 ? 13 : -15)).toFixed(1);
+  const fa = a + (k % 2 ? 0.55 : -0.55);
+  const bx = (CV + Math.cos(a) * r1 * 0.62).toFixed(1), by = (CV + Math.sin(a) * r1 * 0.62).toFixed(1);
+  const fx = (CV + Math.cos(fa) * r1 * 0.92).toFixed(1), fy = (CV + Math.sin(fa) * r1 * 0.92).toFixed(1);
+  return `M ${CV} ${CV} Q ${px} ${py} ${ex} ${ey} M ${bx} ${by} T ${fx} ${fy}`;
+});
 
 /* Ticks del astrolabio: 12 marcas fijas cada 30°. */
 const TICKS = Array.from({ length: 12 }, (_, k) => {
@@ -215,8 +226,9 @@ function PortalUmbral({ nivel, historia, fase, cierre }) {
         </g>
         <g className="portal-geo portal-geo-b">
           <circle cx={CV} cy={CV} r={104} fill="none" strokeDasharray="26 12" />
-          <polygon points={TRIANGULO_A} fill="none" />
-          <polygon points={TRIANGULO_B} fill="none" />
+          {MICELIO.map((d, i) => (
+            <path key={i} d={d} fill="none" className="portal-micelio" />
+          ))}
         </g>
         <g className="portal-ticks">
           {TICKS.map((tk, k) => (
