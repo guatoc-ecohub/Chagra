@@ -1,0 +1,78 @@
+{
+  "_meta": {
+    "source": "Veredas de Colombia (Nivel de Referencia de Veredas / CRVeredas) — DANE-UPRA-ESRI Colombia via ArcGIS REST",
+    "sourceUrl": "https://ags.esri.co/arcgis/rest/services/DatosAbiertos/VEREDAS_2016/MapServer/0",
+    "tolerance": 0.0005,
+    "municipios": 13,
+    "veredas": 315,
+    "generatedAt": "2026-07-09",
+    "note": "Dataset servido on-demand desde public/veredas/ (fuera del bundle JS)."
+  },
+  "municipios": {
+    "11001": {
+      "nombre": "Bogotá, D.C.",
+      "departamento": "Bogotá, D.C.",
+      "veredas": 66
+    },
+    "25126": {
+      "nombre": "Cajicá",
+      "departamento": "Cundinamarca",
+      "veredas": 4
+    },
+    "25151": {
+      "nombre": "Caqueza",
+      "departamento": "Cundinamarca",
+      "veredas": 35
+    },
+    "25175": {
+      "nombre": "Chía",
+      "departamento": "Cundinamarca",
+      "veredas": 8
+    },
+    "25178": {
+      "nombre": "Chipaque",
+      "departamento": "Cundinamarca",
+      "veredas": 24
+    },
+    "25181": {
+      "nombre": "Choachí",
+      "departamento": "Cundinamarca",
+      "veredas": 35
+    },
+    "25279": {
+      "nombre": "Fomeque",
+      "departamento": "Cundinamarca",
+      "veredas": 33
+    },
+    "25322": {
+      "nombre": "Guasca",
+      "departamento": "Cundinamarca",
+      "veredas": 14
+    },
+    "25377": {
+      "nombre": "La Calera",
+      "departamento": "Cundinamarca",
+      "veredas": 30
+    },
+    "25758": {
+      "nombre": "Sopó",
+      "departamento": "Cundinamarca",
+      "veredas": 15
+    },
+    "25841": {
+      "nombre": "Ubaque",
+      "departamento": "Cundinamarca",
+      "veredas": 20
+    },
+    "25845": {
+      "nombre": "Une",
+      "departamento": "Cundinamarca",
+      "veredas": 17
+    },
+    "25899": {
+      "nombre": "Zipaquirá",
+      "departamento": "Cundinamarca",
+      "veredas": 14
+    }
+  }
+}

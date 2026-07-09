@@ -22,6 +22,13 @@ const LAZY_EXCLUDED_PREFIXES = [
   join(DIST, 'vendor', 'speech-commands'),
   join(DIST, 'models', 'speech-commands'),
   join(DIST, 'models', 'hola-chagra'),
+  // VEREDAS DANE: el dataset de veredas particionado por municipio
+  // (public/veredas/{codDANE}.json) se sirve ON-DEMAND — el geo-onboarding
+  // descarga SOLO el archivo del municipio detectado. NO está en el precache
+  // del SW (ASSETS_TO_CACHE en public/sw.js); se cachea cache-on-use como las
+  // fichas de cycle-content. No pesa en el arranque, así que la generación
+  // nacional completa (~50-150 MB) no debe romper el techo de 25 MB.
+  join(DIST, 'veredas'),
 ];
 
 function formatSize(bytes) {
