@@ -283,7 +283,7 @@ const clamp01 = (v) => Math.max(0, Math.min(100, v));
 /* etiqueta-cápsula reutilizable dentro de los SVG                             */
 /* ------------------------------------------------------------------------- */
 
-function TagSvg({ x, y, texto, ancho }) {
+function TagSvg({ x, y, texto, ancho = 0 }) {
   const w = ancho || texto.length * 4.6 + 16;
   return (
     <g className="agb-tag" aria-hidden="true">
