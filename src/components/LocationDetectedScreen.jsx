@@ -28,6 +28,7 @@ import { useFincaActiveStore } from '../services/fincaActiveStore';
 import { getProfile, saveProfile, resolveAltitudToSave } from '../services/userProfileService';
 import { getDepartamentos, getMunicipios, findMunicipio } from '../utils/colombiaLocations';
 import { searchVeredasEnMunicipio } from '../services/veredaService';
+import { summarizeProfileLocation, formatLocationContext } from '../services/locationDisplay';
 
 // Fix del marcador por defecto de Leaflet (bundlers no resuelven las URLs
 // relativas del CSS). Mismo patrón que MultiFincaGlobe.
@@ -264,6 +265,7 @@ export default function LocationDetectedScreen({
   // confiamos en la altitud derivada; el campesino corrige su altura real
   // (ej. finca a 2580 msnm vs cabecera 1923). Vacío = usar la derivada.
   const [manualAltitud, setManualAltitud] = useState('');
+  const profileLocation = summarizeProfileLocation(getProfile());
   const markerRef = useRef(null);
   const setFincaIndoorZone = useFincaActiveStore((s) => s.setIndoorZone);
 
@@ -271,6 +273,8 @@ export default function LocationDetectedScreen({
   useEffect(() => {
     let alive = true;
     if (coords && typeof coords.lat === 'number' && typeof coords.lng === 'number') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- arranque
+      // por coordenadas: sincroniza la carga inicial con la resolución async.
       setLoading(true);
       resolveUbicacion({ lat: coords.lat, lng: coords.lng, altitud })
         .then((r) => {
@@ -332,6 +336,8 @@ export default function LocationDetectedScreen({
    */
   useEffect(() => {
     if (coords || initialMunicipio || loc) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- lanzar la
+    // geolocalización automática al montar es el flujo esperado aquí.
     detectMyLocation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -399,6 +405,8 @@ export default function LocationDetectedScreen({
             ...enriched,
             lat,
             lng,
+            sublocalidad: exact?.name || rawVereda,
+            tipo: 'vereda',
             vereda: exact?.name || rawVereda,
             vereda_source: exact?.source || 'typed',
             vereda_display_name: exact?.display_name || null,
@@ -474,6 +482,8 @@ export default function LocationDetectedScreen({
         ...enriched,
         lat,
         lng,
+        sublocalidad: vereda.name,
+        tipo: 'vereda',
         vereda: vereda.name,
         vereda_source: vereda.source || 'selected',
         vereda_display_name: vereda.display_name || null,
@@ -583,13 +593,16 @@ export default function LocationDetectedScreen({
     saveProfile({
       ubicacion_lat: loc.lat,
       ubicacion_lng: loc.lng,
-      vereda: loc.vereda || undefined,
+      sublocalidad: loc.sublocalidad || loc.vereda || loc.barrio || undefined,
+      tipo_sublocalidad: loc.tipo || (loc.barrio ? 'barrio' : loc.vereda ? 'vereda' : undefined),
+      barrio: loc.tipo === 'barrio' ? (loc.sublocalidad || loc.barrio || undefined) : undefined,
+      vereda: loc.tipo === 'vereda' ? (loc.sublocalidad || loc.vereda || undefined) : undefined,
       vereda_source: loc.vereda_source || undefined,
       vereda_display_name: loc.vereda_display_name || undefined,
       municipio: loc.municipio || undefined,
       departamento: loc.departamento || undefined,
       region: loc.municipio
-        ? [loc.vereda, loc.municipio, loc.departamento].filter(Boolean).join(', ')
+        ? [loc.sublocalidad || loc.vereda || loc.barrio, loc.municipio, loc.departamento].filter(Boolean).join(', ')
         : undefined,
       // #coarse-location / #1213-fix: guardamos la altitud EFECTIVA con coalesce.
       // `altitud_source: 'manual'` señala que el usuario la fijó a mano.
@@ -609,8 +622,9 @@ export default function LocationDetectedScreen({
     try {
       window.dispatchEvent(
         new CustomEvent('chagra:location-updated', {
-          detail: {
-            vereda: loc.vereda || null,
+        detail: {
+            sublocalidad: loc.sublocalidad || loc.vereda || loc.barrio || null,
+            tipo: loc.tipo || null,
             municipio: loc.municipio || null,
             departamento: loc.departamento || null,
           },
@@ -881,9 +895,13 @@ export default function LocationDetectedScreen({
               <MapPin size={18} className="text-emerald-400 mt-0.5 shrink-0" />
               <div>
                 <p className="text-sm font-bold text-white">
-                  {loc.vereda
-                    ? `${loc.vereda}, ${loc.municipio || 'Municipio'}`
-                    : loc.municipio || 'Ubicación detectada'}
+                  {formatLocationContext({
+                    tipo: loc.tipo || null,
+                    sublocalidad: loc.sublocalidad || loc.vereda || loc.barrio || null,
+                    municipio: loc.municipio || null,
+                    departamento: loc.departamento || null,
+                    altitud: effectiveAltitud,
+                  }) || profileLocation.labelWithContext || profileLocation.label || loc.municipio || 'Ubicación detectada'}
                 </p>
                 {loc.departamento && (
                   <p className="text-xs text-slate-400">{loc.departamento}, Colombia</p>

@@ -26,9 +26,12 @@
  */
 
 import { deriveThermalZoneFromAltitud } from './externalAiPromptBuilder.js';
-import { findNearestMunicipio } from '../utils/colombiaLocations.js';
+import { findMunicipio, findNearestMunicipio } from '../utils/colombiaLocations.js';
+import { resolveVereda } from './veredasGeometry.js';
 
 const NOMINATIM_TIMEOUT_MS = 8000;
+const VEREDAS_INDEX_URL = '/veredas/index.json';
+const veredasCache = new Map();
 
 /**
  * Umbral (en metros) del radio de incertidumbre `position.coords.accuracy`
@@ -192,17 +195,28 @@ export async function reverseGeocode(lat, lng) {
     const data = await res.json();
     const a = data?.address || {};
 
-    // En Colombia: city=vereda, county=municipio, state=departamento
-    // city puede ser vereda O cabecera municipal, así que la extraemos
-    const vereda = a.city || a.town || a.village || a.hamlet || null;
-    const municipio = a.county || a.municipality || null;
+    const municipio = a.county || a.municipality || a.city || a.town || a.village || a.hamlet || null;
     const departamento = a.state || a.region || null;
+    const barrio = a.suburb || a.neighbourhood || a.quarter || a.city_district || null;
+    const veredaNominatim = a.city || a.town || a.village || a.hamlet || null;
+
+    const municipioHit = municipio ? findMunicipio(municipio) : null;
+    const municipioCodigo = municipioHit?.codigo || municipioHit?.cod_mpio || municipioHit?.id || null;
+    const municipioFallback = municipioCodigo ? municipioHit : findNearestMunicipio(lat, lng);
+    const rural = !barrio && municipioCodigo ? await resolveVeredaFromMunicipio(lat, lng, municipioCodigo) : null;
+    const tipo = barrio ? 'barrio' : rural ? 'vereda' : veredaNominatim ? 'vereda' : null;
+    const sublocalidad = barrio || rural?.nombre || veredaNominatim || null;
+    const label = tipo && sublocalidad ? `${tipo === 'barrio' ? 'Barrio' : 'Vereda'} ${sublocalidad}` : null;
     return {
-      vereda,
-      municipio,
+      sublocalidad,
+      tipo,
+      municipio: municipioFallback?.name || municipio || null,
       departamento,
       pais: a.country || null,
       display: data?.display_name || null,
+      label,
+      barrio: tipo === 'barrio' ? sublocalidad : null,
+      vereda: tipo === 'vereda' ? sublocalidad : null,
     };
   } catch (e) {
     console.debug('[location] reverseGeocode fail:', e?.message || e);
@@ -300,6 +314,9 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
   const result = {
     lat,
     lng,
+    sublocalidad: null,
+    tipo: null,
+    barrio: null,
     vereda: null,
     municipio: null,
     departamento: null,
@@ -313,7 +330,10 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
   // Reverse-geocoding (online, graceful degrade).
   const geo = await reverseGeocode(lat, lng);
   if (geo) {
-    result.vereda = geo.vereda;
+    result.sublocalidad = geo.sublocalidad;
+    result.tipo = geo.tipo;
+    result.barrio = geo.barrio || null;
+    result.vereda = geo.vereda || null;
     result.municipio = geo.municipio;
     result.departamento = geo.departamento;
   }
@@ -327,6 +347,24 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
     if (nearest) {
       result.municipio = result.municipio || nearest.name;
       result.departamento = result.departamento || nearest.departamento;
+    }
+  }
+
+  if (!result.tipo) {
+    const explicitMunicipioHit = result.municipio ? findMunicipio(result.municipio) : null;
+    const municipalityCode =
+      (explicitMunicipioHit?.codigo || explicitMunicipioHit?.cod_mpio || explicitMunicipioHit?.id || null) ||
+      nearest?.codigo ||
+      nearest?.cod_mpio ||
+      nearest?.id ||
+      null;
+    if (municipalityCode) {
+      const rural = await resolveVeredaFromMunicipio(lat, lng, municipalityCode);
+      if (rural) {
+        result.sublocalidad = rural.nombre;
+        result.tipo = 'vereda';
+        result.vereda = rural.nombre;
+      }
     }
   }
 
@@ -363,6 +401,32 @@ export async function resolveUbicacion({ lat, lng, altitud = null }) {
   }
 
   return result;
+}
+
+async function resolveVeredaFromMunicipio(lat, lng, codDane) {
+  const cacheKey = String(codDane);
+  if (veredasCache.has(cacheKey)) {
+    return resolveVereda(lat, lng, veredasCache.get(cacheKey));
+  }
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return null;
+
+  try {
+    const indexRes = await fetch(VEREDAS_INDEX_URL, { headers: { Accept: 'application/json' } });
+    if (!indexRes.ok) return null;
+    const index = await indexRes.json();
+    const hasMunicipio = Boolean(index?.municipios?.[cacheKey]);
+    if (!hasMunicipio) return null;
+
+    const res = await fetch(`/veredas/${cacheKey}.json`, { headers: { Accept: 'application/json' } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const veredas = Array.isArray(data?.veredas) ? data.veredas : [];
+    veredasCache.set(cacheKey, veredas);
+    return resolveVereda(lat, lng, veredas);
+  } catch (e) {
+    console.debug('[location] resolveVeredaFromMunicipio fail:', e?.message || e);
+    return null;
+  }
 }
 
 /**

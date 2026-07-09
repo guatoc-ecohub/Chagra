@@ -1,9 +1,18 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   getPisoTermicoInfo,
   PISO_TERMICO_INFO,
   resolveUbicacion,
 } from '../locationService.js';
+
+const CHOACHI_VEREDAS = JSON.parse(
+  readFileSync(resolve(globalThis.process.cwd(), 'public/veredas/25181.json'), 'utf8'),
+);
+const VEREDAS_INDEX = JSON.parse(
+  readFileSync(resolve(globalThis.process.cwd(), 'public/veredas/index.json'), 'utf8'),
+);
 
 describe('locationService (#201) — piso térmico offline-safe', () => {
   it('clasifica cálido a baja altitud', () => {
@@ -64,6 +73,85 @@ describe('resolveUbicacion — fallback OFFLINE de municipio/altitud (#338)', ()
     expect(r.altitud).toBe(2640);
     expect(r.pisoTermico?.slug).toBe('frío');
     expect(r.municipio).toMatch(/Bogot/);
+  });
+});
+
+describe('resolveUbicacion — barrio urbano y vereda rural', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it('Bogota urbana resuelve barrio desde Nominatim y no usa veredas', async () => {
+    vi.stubGlobal('navigator', { onLine: true });
+    const fetchMock = vi.fn(async (url) => {
+      const s = String(url);
+      if (s.includes('nominatim')) {
+        return {
+          ok: true,
+          json: async () => ({
+            address: {
+              suburb: 'Chapinero',
+              county: 'Bogotá, D.C.',
+              state: 'Bogotá, D.C.',
+              country: 'Colombia',
+            },
+            display_name: 'Chapinero, Bogotá, D.C., Colombia',
+          }),
+        };
+      }
+      return { ok: false };
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const r = await resolveUbicacion({ lat: 4.648, lng: -74.055 });
+
+    expect(r.tipo).toBe('barrio');
+    expect(r.sublocalidad).toBe('Chapinero');
+    expect(r.municipio).toMatch(/Bogot/);
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes('/veredas/'))).toBe(false);
+  });
+
+  it('Choachi rural resuelve vereda El Curi por point-in-polygon', async () => {
+    vi.stubGlobal('navigator', { onLine: true });
+    const fetchMock = vi.fn(async (url) => {
+      const s = String(url);
+      if (s.includes('nominatim')) {
+        return {
+          ok: true,
+          json: async () => ({
+            address: {
+              city: 'El Curi',
+              county: 'Choachí',
+              state: 'Cundinamarca',
+              country: 'Colombia',
+            },
+            display_name: 'El Curi, Choachí, Cundinamarca, Colombia',
+          }),
+        };
+      }
+      if (s.endsWith('/veredas/index.json')) {
+        return {
+          ok: true,
+          json: async () => VEREDAS_INDEX,
+        };
+      }
+      if (s.endsWith('/veredas/25181.json')) {
+        return {
+          ok: true,
+          json: async () => CHOACHI_VEREDAS,
+        };
+      }
+      return { ok: false };
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const r = await resolveUbicacion({ lat: 4.582682, lng: -73.958276 });
+
+    expect(r.tipo).toBe('vereda');
+    expect(r.sublocalidad).toBe('El Curi');
+    expect(r.vereda).toBe('El Curi');
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes('/veredas/25181.json'))).toBe(true);
   });
 });
 

@@ -42,7 +42,8 @@ export async function getVeredaFromGPS(lat, lng) {
       return { vereda: null, municipio: null, departamento: null, source: 'nominatim-fail' };
     }
 
-    const vereda = result.vereda || null;
+    const vereda = result.tipo === 'vereda' ? result.sublocalidad || result.vereda || null : result.vereda || null;
+    const barrio = result.tipo === 'barrio' ? result.sublocalidad || result.barrio || null : result.barrio || null;
     const county = result.municipio || null;
     const state = result.departamento || null;
 
@@ -51,6 +52,7 @@ export async function getVeredaFromGPS(lat, lng) {
 
     return {
       vereda,
+      barrio,
       municipio: municipioValidado?.name || county || null,
       departamento: state || null,
       source: 'nominatim',

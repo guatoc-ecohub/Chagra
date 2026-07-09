@@ -43,6 +43,7 @@ export const CLIMA_UPDATED_EVENT = 'chagra:clima:updated';
 
 import { getClimaSnapshot } from './sidecarClient.js';
 import { getProfile, getProfileMunicipio } from './userProfileService.js';
+import { summarizeProfileLocation } from './locationDisplay.js';
 import { findMunicipio } from '../utils/colombiaLocations.js';
 import { recordLiveEnsoStatus, applyEnsoOverride } from './ensoService.js';
 
@@ -80,6 +81,7 @@ function profileElevation(profile) {
  */
 export function resolveClimaLocation(opts = {}) {
     const profile = opts.profile && typeof opts.profile === 'object' ? opts.profile : getProfile();
+    const profileLocation = summarizeProfileLocation(profile);
     const explicitLat = numericCoord(opts.lat);
     const explicitLng = numericCoord(opts.lng);
     const explicitElevation = plausibleMsnm(opts.elevation);
@@ -91,7 +93,8 @@ export function resolveClimaLocation(opts = {}) {
             elevation: explicitElevation ?? profileElevation(profile) ?? undefined,
             municipio: opts.municipio || profile?.municipio || getProfileMunicipio() || undefined,
             departamento: opts.departamento || profile?.departamento || undefined,
-            vereda: opts.vereda || profile?.vereda || undefined,
+            sublocalidad: opts.sublocalidad || profileLocation.sublocalidad || opts.vereda || profile?.vereda || undefined,
+            tipo: opts.tipo || profileLocation.tipo || (opts.vereda ? 'vereda' : undefined),
             source: opts.source || profile?.vereda_source || profile?.ubicacion_source || 'explicit',
             precision: 'exact',
         };
@@ -106,7 +109,8 @@ export function resolveClimaLocation(opts = {}) {
             elevation: explicitElevation ?? profileElevation(profile) ?? undefined,
             municipio: profile?.municipio || getProfileMunicipio() || undefined,
             departamento: profile?.departamento || undefined,
-            vereda: profile?.vereda || undefined,
+            sublocalidad: profileLocation.sublocalidad || profile?.vereda || undefined,
+            tipo: profileLocation.tipo || (profile?.vereda ? 'vereda' : undefined),
             source: profile?.vereda_source || profile?.ubicacion_source || 'profile',
             precision: 'exact',
         };
@@ -123,7 +127,8 @@ export function resolveClimaLocation(opts = {}) {
         elevation: explicitElevation ?? profileElevation(profile) ?? plausibleMsnm(hit.altitud) ?? undefined,
         municipio: hit.name || municipio,
         departamento: hit.departamento || profile?.departamento || undefined,
-        vereda: profile?.vereda || undefined,
+        sublocalidad: profileLocation.sublocalidad || profile?.vereda || undefined,
+        tipo: profileLocation.tipo || (profile?.vereda ? 'vereda' : undefined),
         source: 'municipio-centroid',
         precision: 'centroid',
     };

@@ -32,6 +32,8 @@ import ProfileSwitcher from './Settings/ProfileSwitcher';
 import { useTheme, getSelectableThemes } from '../hooks/useTheme';
 import { fincaVivaHomePerfilActivo } from '../config/fincaVivaHomeFlag';
 import { MSG } from '../config/messages';
+import { summarizeProfileLocation, formatLocationContext } from '../services/locationDisplay';
+import LocationCorrectionInline from './location/LocationCorrectionInline';
 
 const TTL_OPTIONS = [
   { id: '1d', label: '1 día' },
@@ -117,6 +119,7 @@ const SECTION_LABELS = Object.fromEntries(SECTIONS.map((s) => [s.id, s.label]));
 export default function ProfileScreen({ onBack, onHome }) {
   // null = hub (el morral). string = sección enfocada.
   const [section, setSection] = useState(null);
+  const [profileTick, setProfileTick] = useState(0);
 
   const [name, setName] = useState(() =>
     typeof window !== 'undefined'
@@ -128,6 +131,7 @@ export default function ProfileScreen({ onBack, onHome }) {
       ? localStorage.getItem('chagra:operator:role') || 'operador_campo'
       : 'operador_campo'
   );
+  const profile = (() => { void profileTick; return getProfile(); })();
 
   // Foto de perfil del operador (feature recuperada 2026-06-15). Persiste
   // local (localStorage) + sincroniza a FarmOS cuando hay sesión, vía
@@ -150,6 +154,16 @@ export default function ProfileScreen({ onBack, onHome }) {
     return () => {
       window.removeEventListener('chagra:operator-update', refresh);
       window.removeEventListener('storage', refresh);
+    };
+  }, []);
+
+  useEffect(() => {
+    const refresh = () => setProfileTick((t) => t + 1);
+    window.addEventListener('chagra:location-updated', refresh);
+    window.addEventListener('chagra:profile-updated', refresh);
+    return () => {
+      window.removeEventListener('chagra:location-updated', refresh);
+      window.removeEventListener('chagra:profile-updated', refresh);
     };
   }, []);
 
@@ -312,7 +326,8 @@ export default function ProfileScreen({ onBack, onHome }) {
   const themeLabel = selectableThemes.find((t) => t.id === theme)?.label || theme;
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
   const activeFincaSlug = useFincaActiveStore((s) => s.activeFincaSlug);
-  const municipio = (() => {
+  const profileLocation = summarizeProfileLocation(profile);
+  const municipio = profileLocation.municipio || (() => {
     try { return getProfileMunicipio(); } catch (_) { return null; }
   })();
   const modulosVisibles = HOME_MODULES.filter((m) => moduleVisibility[m.id] !== false).length;
@@ -323,7 +338,7 @@ export default function ProfileScreen({ onBack, onHome }) {
     datos: currentRoleLabel,
     apariencia: `Tema: ${themeLabel}`,
     agente: `${ttsEnabled ? 'Voz activa' : 'Voz apagada'} · ${nivelLabel}`,
-    finca: municipio ? String(municipio).split(',')[0] : activeFincaSlug,
+    finca: formatLocationContext(profileLocation) || municipio || activeFincaSlug,
     inicio: `${modulosVisibles} de ${HOME_MODULES.length} módulos`,
     privacidad: telemetryConsent ? 'Métricas anónimas activas' : 'Solo en tu dispositivo',
     respaldo: 'Copia local + PDF',
@@ -413,11 +428,11 @@ export default function ProfileScreen({ onBack, onHome }) {
               <div className="min-w-0 flex-1">
                 <h2 className="text-xl font-black text-white leading-tight break-words">{name}</h2>
                 <p className="text-[11px] text-emerald-400 uppercase tracking-widest font-bold mt-0.5">{currentRoleLabel}</p>
-                {(municipio || activeFincaSlug) && (
+                {(profileLocation.label || municipio || activeFincaSlug) && (
                   <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
                     <MapPin size={11} aria-hidden="true" className="shrink-0" />
                     <span className="truncate">
-                      {[activeFincaSlug, municipio ? String(municipio).split(',')[0] : null].filter(Boolean).join(' · ')}
+                      {[profileLocation.label || activeFincaSlug, municipio ? String(municipio).split(',')[0] : null].filter(Boolean).join(' · ')}
                     </span>
                   </p>
                 )}
@@ -720,6 +735,8 @@ export default function ProfileScreen({ onBack, onHome }) {
               </div>
               <ChevronRight size={18} className="text-slate-500" />
             </button>
+
+            <LocationCorrectionInline profile={profile} title="Corregir barrio o vereda" />
 
             {/* Multifinca + GPS (062.7 indoor override + 062.8 privacy) */}
             <MultifincaGpsSection />
