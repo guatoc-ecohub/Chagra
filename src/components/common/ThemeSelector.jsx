@@ -89,12 +89,21 @@ export function ThemeScene({ p }) {
           style={{ width: '80%', height: 12, bottom: -6, right: -14, backgroundColor: p.accent, opacity: 0.7 }}
         />
       </div>
-      {/* Mini chat: burbuja agente (card) + burbuja usuario (acento) */}
+      {/* Mini chat: burbuja agente (card, con muestra "Aa" en la tinta real
+          del tema — así se ve cómo LEE el texto sobre ese fondo) + burbuja
+          usuario (acento). La tipografía es la misma de la app (heredada). */}
       <div className="flex-1 flex flex-col justify-center gap-1 px-1.5 py-1">
         <span
-          className="h-3 w-3/4 rounded-md rounded-bl-[3px]"
+          className="h-3 w-3/4 rounded-md rounded-bl-[3px] flex items-center px-1"
           style={{ backgroundColor: p.card, border: `1px solid ${p.border}` }}
-        />
+        >
+          <span
+            className="font-black select-none"
+            style={{ fontSize: 8, lineHeight: 1, color: p.ink }}
+          >
+            Aa
+          </span>
+        </span>
         <span
           className="h-3 w-1/2 rounded-md rounded-br-[3px] self-end"
           style={{ backgroundColor: p.accent, opacity: 0.9 }}
@@ -160,15 +169,19 @@ export default function ThemeSelector() {
             aria-pressed={active}
             data-testid={`theme-card-${t.id}`}
             onClick={() => setTheme(t.id)}
-            className={`group text-left rounded-2xl border-2 overflow-hidden transition-all active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100 ${
+            className={`group text-left rounded-2xl border-2 overflow-hidden transition-all active:scale-95 motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 ${
               active
                 ? 'border-emerald-500 bg-emerald-900/20 shadow-[0_0_18px_rgba(16,185,129,0.25)]'
                 : 'border-slate-800 bg-slate-900/40 hover:border-slate-600'
             }`}
           >
-            {/* Mini-teléfono: la previsualización real del tema */}
-            <div className="relative w-full aspect-[5/4] border-b border-slate-800/60">
-              {t.id === 'auto' ? <AutoScene /> : <ThemeScene p={p} />}
+            {/* Mini-teléfono: la previsualización real del tema. La escena
+                hace un zoom sutil al pasar el dedo/cursor (se apaga con
+                prefers-reduced-motion). */}
+            <div className="relative w-full aspect-[5/4] border-b border-slate-800/60 overflow-hidden">
+              <div className="w-full h-full transition-transform duration-300 group-hover:scale-[1.06] group-focus-visible:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100 motion-reduce:group-focus-visible:scale-100">
+                {t.id === 'auto' ? <AutoScene /> : <ThemeScene p={p} />}
+              </div>
               {active && (
                 <span
                   className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg"
