@@ -9,6 +9,7 @@ import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
 import FeedbackButtons from '../FeedbackButtons';
 import AIBetaBadge from '../AIBetaBadge';
+import SemaforoConfianza from './SemaforoConfianza';
 
 function formatTime(timestamp) {
   if (!timestamp) return '';
@@ -521,6 +522,12 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
               etiquetas sueltas apiladas con estilos distintos. */}
           {!isUser && !isStreaming && !message._orphan_recovery && (
             <div className="mt-1.5 sello-fila" data-testid="sello-fila">
+              {/* SEMÁFORO DE CONFIANZA por-respuesta + PANEL DE PROCEDENCIA
+                  por-afirmación (lever moat anti-alucinación visible). Va
+                  PRIMERO en la fila (es el titular) y NO depende del pref
+                  showSourceBadges: decisión del operador, TODAS las cuentas.
+                  Graceful: sin señal de grounding en metadata → no pinta. */}
+              <SemaforoConfianza metadata={message.metadata} />
               <AIBetaBadge
                 confidence={message._grounded?.confidence ?? message.metadata?.confidence}
               />
