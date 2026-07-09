@@ -3504,7 +3504,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           44px + gaps + padding sumaban más que el viewport → el título se
           encimaba con los íconos y el avatar pisaba el texto; en 412px el
           subtítulo se clipaba sin gracia. Fix: padding/gap compactos bajo
-          400px, botón Home oculto bajo 360px (Volver sigue presente), avatar
+          400px, botón Home oculto bajo 420px (Volver sigue presente; QA temas
+          2026-07-09: en 390px el Home dejaba el título en "Chag…"), avatar
           shrink-0 y subtítulo con truncate (elipsis, nunca encimado). */}
       <header className="px-2 min-[400px]:px-4 py-3 flex items-center gap-1 min-[400px]:gap-2 border-b border-slate-800 agent-bar-surface shrink-0">
         {/* Back */}
@@ -3520,7 +3521,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         <button
           type="button"
           onClick={() => window.dispatchEvent(new CustomEvent('chagra:nav', { detail: 'dashboard' }))}
-          className="max-[359px]:hidden p-3 rounded-full bg-slate-800 hover:bg-emerald-700/40 hover:text-emerald-200 active:bg-emerald-700/60 transition-all text-emerald-400 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+          className="max-[419px]:hidden p-3 rounded-full bg-slate-800 hover:bg-emerald-700/40 hover:text-emerald-200 active:bg-emerald-700/60 transition-all text-emerald-400 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
           aria-label="Volver al inicio"
           title="Inicio"
         >
