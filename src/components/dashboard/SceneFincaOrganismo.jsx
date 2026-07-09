@@ -13,6 +13,15 @@
  *     neón, casita campesina con fogón (brasas), campesino con ruana +
  *     farol + perro criollo, frailejones que exhalan luz, luna verde
  *     bioluminiscente, cocuyos, aurora de páramo, niebla y hongos con esporas.
+ *   · QUEBRADA bioluminiscente que baja de la montaña por las terrazas y
+ *     remansa en un pocito que se filtra hacia la red micorrízica; platanera
+ *     con racimo neón junto a la casita; polillas rondando el farol y una
+ *     cordillera lejana + rayo del astro que dan profundidad de capas.
+ *   · POTRERO con VACA bioluminiscente (respira, pasta y espanta con la
+ *     cola) + 3 GALLINAS que picotean: es la ENTRADA VIVA al mundo de los
+ *     animales — si `onAnimales` llega, el grupo es un botón (tap/Enter)
+ *     que navega al módulo; sin handler queda como arte decorativo (el
+ *     MISMO gate por perfil que esconde el mundo Animales en el home).
  *
  * Solo se monta con el tema biopunk (lo decide FincaVivaHero); los demás
  * temas conservan sus escenas isométricas intactas. Las clases/ids llevan
@@ -26,16 +35,26 @@
  *   el invernadero-célula de la escena lleva el data-testid/data-forma del
  *   contrato de FincaVivaHero.estructura.test.jsx (misma semántica que
  *   SceneFinca: el marcador aparece SOLO si la estructura está declarada).
+ * @param {?() => void} [props.onAnimales] al tocar el potrero (vaca +
+ *   gallinas) navega al mundo de los animales. `null`/ausente = el perfil no
+ *   ve ese mundo (gate `mostrarAnimales` del home) y el potrero queda
+ *   decorativo, sin rol ni foco.
  */
-export default function SceneFincaOrganismo({ estructura }) {
+export default function SceneFincaOrganismo({ estructura, onAnimales }) {
   const conEstructura = !!estructura?.tiene;
+  const conAnimales = typeof onAnimales === 'function';
+  const ariaEscena =
+    'Su finca convertida en organismo bioluminiscente, con el sol o la luna según la hora y el cielo real de su vereda: un corazón-semilla late bajo la tierra y su red de micorrizas conecta las raíces de cada planta, con lombrices y bichitos trabajando el suelo; una quebrada baja de la montaña, cultivos con savia de neón, invernadero-célula que respira, potrero con vaca y gallinas, campesino con su perro y colibrí de luz.';
   return (
     <svg
       className="fvo-svg"
       viewBox="0 0 390 486"
       preserveAspectRatio="xMidYMid slice"
-      role="img"
-      aria-label="Su finca convertida en organismo bioluminiscente, con el sol o la luna según la hora y el cielo real de su vereda: un corazón-semilla late bajo la tierra y su red de micorrizas conecta las raíces de cada planta, con lombrices y bichitos trabajando el suelo; cultivos con savia de neón, invernadero-célula que respira, campesino con su perro y colibrí de luz."
+      /* con el potrero tappable el SVG deja de ser imagen plana: role="img"
+         volvería PRESENTACIONALES a sus hijos y el botón de los animales no
+         existiría para lectores de pantalla. */
+      role={conAnimales ? 'group' : 'img'}
+      aria-label={ariaEscena}
       data-testid="fvo-escena"
     >
       <defs>
@@ -88,6 +107,16 @@ export default function SceneFincaOrganismo({ estructura }) {
         <linearGradient id="fvo-tallo" x1="0" y1="1" x2="0" y2="0">
           <stop offset="0" stopColor="#0f8f6c" />
           <stop offset="1" stopColor="#9dff3f" />
+        </linearGradient>
+        {/* agua de la quebrada: azul profundo que se enciende hacia el remanso */}
+        <linearGradient id="fvo-agua-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#0a2b4a" />
+          <stop offset="1" stopColor="#12466e" />
+        </linearGradient>
+        {/* rayo del astro: cae en diagonal sobre la finca y se disuelve */}
+        <linearGradient id="fvo-rayo-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#eafff6" stopOpacity=".14" />
+          <stop offset="1" stopColor="#eafff6" stopOpacity="0" />
         </linearGradient>
         <filter id="fvo-blur8"><feGaussianBlur stdDeviation="8" /></filter>
         <filter id="fvo-blur3"><feGaussianBlur stdDeviation="3" /></filter>
@@ -217,9 +246,17 @@ export default function SceneFincaOrganismo({ estructura }) {
         </g>
       </g>
 
-      {/* ============ MONTAÑAS ============ */}
+      {/* ============ MONTAÑAS (3 capas = profundidad) ============ */}
+      {/* cordillera LEJANA: la capa nueva de atrás, casi cielo — con la niebla
+          que deriva entre capas la escena gana paralaje sin mover montañas */}
+      <path d="M0,196 C55,162 130,186 210,164 C285,146 340,172 390,152 L390,262 L0,262 Z" fill="#071126" />
+      <ellipse className="fvo-fog fvo-g3" cx="180" cy="196" rx="170" ry="13" fill="#9fd4ff" opacity=".05" filter="url(#fvo-blur8)" />
       <path d="M0,206 C60,176 122,196 190,180 C258,166 322,192 390,174 L390,262 L0,262 Z" fill="#0a1734" />
       <path d="M0,234 C70,208 150,228 232,212 C302,200 352,220 390,208 L390,282 L0,282 Z" fill="#0d1e40" />
+
+      {/* rayo del astro: la luz de la luna/el sol cae en diagonal sobre la
+          finca (respira suave; da volumen de iluminación a toda la escena) */}
+      <path className="fvo-rayo" d="M292,88 L188,336 L390,336 L346,86 Z" fill="url(#fvo-rayo-grad)" />
 
       {/* frailejones que exhalan luz (páramo) */}
       <g className="fvo-frailejon" strokeLinecap="round">
@@ -254,6 +291,35 @@ export default function SceneFincaOrganismo({ estructura }) {
         <path d="M0,296 C90,286 190,296 280,288 C330,284 364,290 390,284 L390,336 L0,336 Z" fill="#123354" />
         <path d="M0,296 C90,286 190,296 280,288 C330,284 364,290 390,284" fill="none" stroke="#2dffc4" strokeWidth="1.2" opacity=".5" />
 
+        {/* ============ QUEBRADA BIOLUMINISCENTE (el agua de la finca) ============
+            Baja de la montaña por el costado izquierdo, salta las terrazas en
+            dos cascaditas y remansa en un pocito al pie de la milpa. El flujo
+            es el mismo truco de las hifas (dash que corre); el remanso ondea. */}
+        <g aria-hidden="true">
+          {/* cauce (lecho oscuro + agua) */}
+          <path d="M14,232 C6,248 24,262 14,278 C4,294 22,308 12,320 C9,326 5,331 2,334" fill="none" stroke="#0a2b4a" strokeWidth="9" strokeLinecap="round" />
+          <path d="M14,232 C6,248 24,262 14,278 C4,294 22,308 12,320 C9,326 5,331 2,334" fill="none" stroke="#123f66" strokeWidth="6" strokeLinecap="round" />
+          {/* corriente neón (dos hilos desfasados) */}
+          <path className="fvo-agua" d="M14,232 C6,248 24,262 14,278 C4,294 22,308 12,320 C9,326 5,331 2,334" fill="none" stroke="#4fd8ff" strokeWidth="1.8" strokeLinecap="round" opacity=".8" style={{ filter: 'drop-shadow(0 0 3px rgba(79,216,255,.6))' }} />
+          <path className="fvo-agua fvo-a2" d="M16,234 C9,249 25,263 16,279 C7,294 23,308 14,320" fill="none" stroke="#bfeaff" strokeWidth=".9" strokeLinecap="round" opacity=".6" />
+          {/* cascaditas donde el agua salta cada terraza */}
+          <line className="fvo-destello" x1="15" y1="256" x2="14" y2="262" stroke="#bfeaff" strokeWidth="2.2" strokeLinecap="round" opacity=".8" />
+          <line className="fvo-destello" style={{ animationDelay: '-1.3s' }} x1="13" y1="294" x2="12" y2="300" stroke="#bfeaff" strokeWidth="2" strokeLinecap="round" opacity=".75" />
+          {/* pocito / remanso (refleja la luz del cielo y ondea) */}
+          <ellipse cx="18" cy="331" rx="19" ry="4.4" fill="url(#fvo-agua-grad)" />
+          <ellipse cx="18" cy="331" rx="19" ry="4.4" fill="none" stroke="#4fd8ff" strokeWidth=".9" opacity=".7" />
+          <ellipse className="fvo-reflejo" cx="12" cy="330.4" rx="6.5" ry="1.3" fill="#bfeaff" opacity=".45" />
+          <ellipse className="fvo-onda" cx="18" cy="331" rx="6" ry="1.6" fill="none" stroke="#4fd8ff" strokeWidth=".8" />
+          <ellipse className="fvo-onda fvo-on2" cx="18" cy="331" rx="6" ry="1.6" fill="none" stroke="#bfeaff" strokeWidth=".6" />
+          {/* juncos de la orilla + luciérnaga de agua */}
+          <g stroke="#0f8f6c" strokeWidth="1.2" strokeLinecap="round" fill="none">
+            <path className="fvo-sap fvo-s3" d="M33,330 C33,324 34,320 33,316" />
+            <path className="fvo-sap fvo-s5" d="M36,331 C36,326 37,323 36.5,319" />
+          </g>
+          <circle cx="33" cy="315" r="1.2" fill="#d8ff6a" style={{ filter: 'drop-shadow(0 0 3px #9dff3f)' }} />
+          <circle className="fvo-fly fvo-f5" cx="26" cy="320" r="1.2" fill="#4fd8ff" style={{ filter: 'drop-shadow(0 0 4px #4fd8ff)' }} />
+        </g>
+
         {/* casita campesina con fogón */}
         <g>
           <rect x="52" y="250" width="26" height="17" rx="1.5" fill="#160f2e" />
@@ -265,6 +331,31 @@ export default function SceneFincaOrganismo({ estructura }) {
           <circle className="fvo-brasa" cx="74" cy="238" r="1.5" fill="#ff7a3d" />
           <circle className="fvo-brasa fvo-br2" cx="75.5" cy="238" r="1.1" fill="#ffb54f" />
           <circle className="fvo-brasa fvo-br3" cx="73" cy="238" r=".9" fill="#ff4fd8" />
+          {/* la puerta abierta derrama luz cálida al patio */}
+          <ellipse className="fvo-ventana" cx="71.5" cy="268.5" rx="6.5" ry="1.8" fill="#ffb54f" opacity=".16" />
+        </g>
+
+        {/* platanera del patio: hojas que arquean con venas de savia y un
+            racimo con su bellota neón (queda medio detrás del cafetal — capa) */}
+        <g aria-hidden="true">
+          <path d="M92,296 C92,284 91,274 92,266" fill="none" stroke="#14503c" strokeWidth="3" strokeLinecap="round" />
+          <path className="fvo-sap fvo-s2" d="M92,294 C92,284 91.4,274 92,267" fill="none" stroke="#2dffc4" strokeWidth=".8" opacity=".6" strokeLinecap="round" />
+          <path d="M92,266 C83,264 76,257.5 74,250 C80.5,250 89,255.5 92,262 Z" fill="#14503c" stroke="#2dffc4" strokeWidth=".5" strokeOpacity=".35" />
+          <path d="M92,266 C101,264 108,257.5 110,250 C103.5,250 95,255.5 92,262 Z" fill="#14503c" stroke="#2dffc4" strokeWidth=".5" strokeOpacity=".35" />
+          <path d="M92,264 C86,258 84,250 86.5,243 C90.5,247.5 93,256 92.4,262 Z" fill="#186047" stroke="#2dffc4" strokeWidth=".5" strokeOpacity=".35" />
+          <path d="M92,264 C98,258 100,250 97.5,243 C93.5,247.5 91,256 91.6,262 Z" fill="#186047" stroke="#2dffc4" strokeWidth=".5" strokeOpacity=".35" />
+          {/* venas de las hojas (laten con la savia) */}
+          <g className="fvo-sap fvo-s4" fill="none" stroke="#9dff3f" strokeWidth=".6" opacity=".65" strokeLinecap="round">
+            <path d="M92,264 C86,260 81,255 78,251" />
+            <path d="M92,264 C98,260 103,255 106,251" />
+            <path d="M91.6,262 C90,255 88.6,250 87.6,246" />
+            <path d="M92.4,262 C94,255 95.4,250 96.4,246" />
+          </g>
+          {/* racimo + bellota (flor) colgando */}
+          <path d="M92,268 C89.6,269.5 88.4,271.5 88.6,274" fill="none" stroke="#0f8f6c" strokeWidth="1" />
+          <circle className="fvo-berry fvo-b2" cx="89.6" cy="269.6" r="1.3" fill="#ffd76a" style={{ filter: 'drop-shadow(0 0 3px #ffb54f)' }} />
+          <circle className="fvo-berry fvo-b4" cx="88" cy="271.6" r="1.3" fill="#ffd76a" style={{ filter: 'drop-shadow(0 0 3px #ffb54f)' }} />
+          <path d="M88.6,274 L87.4,277.6 L90,277.2 Z" fill="#ff4fd8" style={{ filter: 'drop-shadow(0 0 3px #ff4fd8)' }} />
         </g>
 
         {/* cafetales con cerezas neón (terraza alta) */}
@@ -375,6 +466,133 @@ export default function SceneFincaOrganismo({ estructura }) {
           {/* base / cimiento luminoso */}
           <rect x="247" y="328" width="102" height="5" rx="2.5" fill="#0c2a20" />
           <rect x="247" y="328" width="102" height="1.6" rx="1" fill="#2dffc4" opacity=".7" />
+        </g>
+
+        {/* ============ POTRERO: VACA + 3 GALLINAS = ENTRADA AL MUNDO ANIMALES ============
+            El grupo entero es la puerta viva al módulo de animales: con
+            `onAnimales` es un botón (tap / Enter / Espacio) con halo-invitación
+            y etiqueta; sin handler (gate por perfil) queda como arte. La vaca
+            respira, pasta y espanta con la cola; las gallinas picotean. */}
+        <g
+          className="fvo-animales"
+          data-testid="fvo-animales"
+          {...(conAnimales
+            ? {
+                role: 'button',
+                tabIndex: 0,
+                'data-tap': '1',
+                'aria-label': 'Los animales de su finca: la vaca y las gallinas. Toque para entrar al mundo de los animales.',
+                onClick: () => onAnimales(),
+                onKeyDown: (e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onAnimales();
+                  }
+                },
+              }
+            : { 'aria-hidden': true })}
+        >
+          {/* pasto del potrero */}
+          <ellipse cx="222" cy="278" rx="31" ry="5.5" fill="#16405a" opacity=".5" />
+          <g stroke="#9dff3f" strokeWidth=".8" strokeLinecap="round" opacity=".6" fill="none">
+            <path d="M197,278 L196,274.4" /><path d="M199.5,278.4 L199.5,275" />
+            <path d="M246,276 L245,272.6" /><path d="M248.5,276.4 L249,273.2" />
+            <path d="M215,282 L214.4,279" /><path d="M231,282.4 L231.6,279.4" />
+          </g>
+
+          {/* cerca viva del potrero (madera oscura + hilos neón) */}
+          <g>
+            <g fill="#241c3e">
+              <rect x="194.2" y="244.5" width="1.8" height="10.5" rx=".9" />
+              <rect x="208.2" y="243.8" width="1.8" height="10.5" rx=".9" />
+              <rect x="222.2" y="243.5" width="1.8" height="10.5" rx=".9" />
+              <rect x="236.2" y="243.8" width="1.8" height="10.5" rx=".9" />
+              <rect x="250.2" y="244.5" width="1.8" height="10.5" rx=".9" />
+            </g>
+            <path d="M194,247.4 C208,246.2 238,246.2 252,247.4" fill="none" stroke="#b28dff" strokeWidth=".9" opacity=".55" />
+            <path d="M194,251.4 C208,250.2 238,250.2 252,251.4" fill="none" stroke="#2dffc4" strokeWidth=".9" opacity=".5" />
+            <circle className="fvo-nodo" cx="223.1" cy="243.2" r="1" fill="#d8ff6a" style={{ filter: 'drop-shadow(0 0 3px #9dff3f)' }} />
+          </g>
+
+          {/* VACA bioluminiscente (mira hacia la casa; el organismo la abraza:
+              sus manchas laten con el MISMO pulso de la red micorrízica) */}
+          <g className="fvo-vaca">
+            <ellipse cx="221" cy="280" rx="18" ry="3" fill="#000" opacity=".35" />
+            {/* cola (espanta de a ratos) + borla-cocuyo */}
+            <g className="fvo-vaca-cola">
+              <path d="M236.5,258 C240.5,262 241.5,268 239.5,274" fill="none" stroke="#241c3e" strokeWidth="1.6" strokeLinecap="round" />
+              <circle cx="239.5" cy="275" r="1.9" fill="#2dffc4" style={{ filter: 'drop-shadow(0 0 4px #2dffc4)' }} />
+            </g>
+            {/* patas con pezuñas de luz */}
+            <g stroke="#241c3e" strokeWidth="3" strokeLinecap="round">
+              <path d="M210,271 L209.4,279" /><path d="M215.5,272.5 L215.5,279.6" />
+              <path d="M228.5,272.5 L228.5,279.6" /><path d="M234,271 L234.6,279" />
+            </g>
+            <g fill="#b28dff" opacity=".8">
+              <circle cx="209.4" cy="279.6" r=".9" /><circle cx="215.5" cy="280.2" r=".9" />
+              <circle cx="228.5" cy="280.2" r=".9" /><circle cx="234.6" cy="279.6" r=".9" />
+            </g>
+            {/* cuerpo (respira) con manchas que laten al pulso del corazón */}
+            <g className="fvo-vaca-cuerpo">
+              <ellipse cx="222" cy="264" rx="16" ry="9.5" fill="#241c3e" stroke="#b28dff" strokeWidth=".8" strokeOpacity=".45" />
+              <path className="fvo-mancha" d="M210,259 C215,255.5 221,256 223.5,260 C221,264.5 213.5,265.5 209.5,262.5 Z" fill="#2dffc4" style={{ filter: 'drop-shadow(0 0 4px rgba(45,255,196,.7))' }} />
+              <path className="fvo-mancha fvo-m2" d="M229,266 C233.5,264 237,266 236,269.5 C233,271.5 228.5,270.5 227.5,268 Z" fill="#4fd8ff" style={{ filter: 'drop-shadow(0 0 3px rgba(79,216,255,.7))' }} />
+              <circle className="fvo-mancha fvo-m3" cx="216" cy="269" r="2.4" fill="#ff8fe4" style={{ filter: 'drop-shadow(0 0 3px rgba(255,143,228,.7))' }} />
+              {/* ubre con su lucecita (la leche también es vida) */}
+              <path d="M226.5,272.5 a3.2,2.6 0 0 0 6.2,0 Z" fill="#ff9ee8" opacity=".85" />
+            </g>
+            {/* cabeza: pasta y se alza a mirar; orejas que espantan */}
+            <g className="fvo-vaca-cabeza">
+              <path d="M209,258 L213,260" stroke="#241c3e" strokeWidth="5" strokeLinecap="round" />
+              <ellipse cx="204.5" cy="257" rx="6.2" ry="5" fill="#241c3e" stroke="#b28dff" strokeWidth=".7" strokeOpacity=".4" />
+              {/* cachos de luna */}
+              <g fill="none" stroke="#e8dcff" strokeWidth="1.2" strokeLinecap="round">
+                <path d="M201.5,252.6 C200,250 200.8,248.4 202.8,247.8" />
+                <path d="M207.5,252.4 C209,250 208.4,248.2 206.4,247.8" />
+              </g>
+              <path className="fvo-vaca-oreja" d="M209.5,254 Q212.5,251.5 213.5,253.5 Q212,256 209.8,256 Z" fill="#3a2f52" />
+              {/* hocico + ollar */}
+              <ellipse cx="200" cy="259.5" rx="3.4" ry="2.5" fill="#3a2f52" />
+              <circle cx="198.8" cy="259.3" r=".5" fill="#0a0618" />
+              {/* ojo de cocuyo */}
+              <circle cx="206" cy="255.8" r="1.05" fill="#2dffc4" style={{ filter: 'drop-shadow(0 0 3px #2dffc4)' }} />
+              <circle cx="206.35" cy="255.45" r=".35" fill="#eafff6" />
+              {/* mancha de la frente */}
+              <path className="fvo-mancha fvo-m2" d="M203,253.6 C204.6,252.6 206.4,253 206.8,254.4 C205.6,255.6 203.6,255.4 203,253.6 Z" fill="#2dffc4" opacity=".7" />
+            </g>
+          </g>
+
+          {/* 3 GALLINAS que picotean (cada una con su color y su ritmo) */}
+          <GallinaLuz x={205} y={281} cuerpo="#ffb54f" cola="#ff9d3f" clase="" />
+          <GallinaLuz x={220.5} y={283.5} cuerpo="#ff8fe4" cola="#d86ac0" clase="fvo-ga2" espejo />
+          <GallinaLuz x={237} y={281} cuerpo="#8fc8ef" cola="#5a9fd4" clase="fvo-ga3" />
+
+          {/* halo-invitación + etiqueta (solo cuando el potrero es la puerta
+              al módulo; el anillo de foco lo enciende :focus-visible) */}
+          {conAnimales && (
+            <g>
+              <ellipse className="fvo-cta-halo" cx="222" cy="264" rx="34" ry="22" fill="none" stroke="#ffb54f" strokeWidth="1" />
+              <ellipse className="fvo-cta-anillo" cx="222" cy="264" rx="34" ry="22" fill="none" stroke="#ffd76a" strokeWidth="1.4" opacity="0" />
+              <text
+                className="fvo-cta-tag"
+                x="222"
+                y="238"
+                fill="#ffb54f"
+                fontFamily="ui-monospace,monospace"
+                fontSize="7"
+                letterSpacing="1.5"
+                textAnchor="middle"
+              >
+                LOS ANIMALES ▸
+              </text>
+              {/* zona de tap generosa (invisible) sobre todo el potrero.
+                  OJO: sin <title> a propósito — un <title> en el subárbol
+                  aporta un rect degenerado en el origen del SVG y Chromium
+                  infla el boundingClientRect del botón hasta cubrir media
+                  escena (el aria-label del grupo ya cubre accesibilidad). */}
+              <rect x="190" y="230" width="66" height="58" fill="#000" opacity="0" style={{ pointerEvents: 'all' }} />
+            </g>
+          )}
         </g>
 
         {/* ============ MILPA FRONTAL: maíz de savia neón ============ */}
@@ -489,12 +707,18 @@ export default function SceneFincaOrganismo({ estructura }) {
           <path d="M250,329.5 Q252.5,331.4 255,329.4" stroke="#2dffc4" strokeWidth=".8" fill="none" opacity=".8" />
         </g>
 
+        {/* polillas rondando el farol (la luz siempre convoca su corte) */}
+        <circle className="fvo-polilla" cx="233" cy="318" r="1" fill="#eafff6" opacity=".8" />
+        <circle className="fvo-polilla fvo-po2" cx="244" cy="321" r=".8" fill="#ffe6c9" opacity=".75" />
+
         {/* cocuyos */}
         <circle className="fvo-fly" cx="100" cy="272" r="1.7" fill="#d8ff6a" style={{ filter: 'drop-shadow(0 0 4px #d8ff6a)' }} />
         <circle className="fvo-fly fvo-f2" cx="210" cy="258" r="1.5" fill="#2dffc4" style={{ filter: 'drop-shadow(0 0 4px #2dffc4)' }} />
         <circle className="fvo-fly fvo-f3" cx="172" cy="300" r="1.4" fill="#ff4fd8" style={{ filter: 'drop-shadow(0 0 4px #ff4fd8)' }} />
         <circle className="fvo-fly fvo-f4" cx="248" cy="318" r="1.6" fill="#d8ff6a" style={{ filter: 'drop-shadow(0 0 4px #d8ff6a)' }} />
         <circle className="fvo-fly fvo-f5" cx="30" cy="290" r="1.4" fill="#4fd8ff" style={{ filter: 'drop-shadow(0 0 4px #4fd8ff)' }} />
+        <circle className="fvo-fly fvo-f2" style={{ animationDelay: '-6s, -1.8s', filter: 'drop-shadow(0 0 4px #d8ff6a)' }} cx="140" cy="264" r="1.3" fill="#d8ff6a" />
+        <circle className="fvo-fly fvo-f3" style={{ animationDelay: '-2.4s, -1.1s', filter: 'drop-shadow(0 0 4px #ff8fe4)' }} cx="356" cy="304" r="1.4" fill="#ff8fe4" />
       </g>
 
       {/* niebla de páramo */}
@@ -685,9 +909,18 @@ export default function SceneFincaOrganismo({ estructura }) {
       <circle className="fvo-spark fvo-p5" r="1.9" fill="#ff9ee8" />
       <circle className="fvo-spark fvo-p6" r="2.2" fill="#bfffe9" />
 
+      {/* el pocito se FILTRA: el agua alimenta la red micorrízica (gotea al
+          bulbo más cercano — la quebrada también es parte del organismo) */}
+      <g aria-hidden="true">
+        <path className="fvo-hypha fvo-slow" d="M20,336 C26,342 32,346 38,348" fill="none" stroke="#4fd8ff" strokeWidth=".9" opacity=".5" />
+        <g stroke="#4fd8ff" strokeWidth=".8" strokeLinecap="round" opacity=".35">
+          <path d="M10,338 L9,344" /><path d="M18,339 L17.4,346" /><path d="M27,338 L26.4,343" />
+        </g>
+      </g>
+
       {/* hongos bioluminiscentes en el borde del corte */}
       <g>
-        <g transform="translate(22,336)">
+        <g transform="translate(58,336)">
           <path d="M0,0 L0,-7" stroke="#9fd4ff" strokeWidth="2" strokeLinecap="round" opacity=".8" />
           <path className="fvo-cap" d="M-7,-6 A7,4.6 0 0 1 7,-6 Z" fill="#4fd8ff" style={{ filter: 'drop-shadow(0 0 6px #4fd8ff)' }} />
           <path d="M4,0 L4,-5" stroke="#9fd4ff" strokeWidth="1.6" strokeLinecap="round" opacity=".7" />
@@ -713,5 +946,58 @@ export default function SceneFincaOrganismo({ estructura }) {
         <text x="195" y="464" fill="#5b7f93" textAnchor="middle" letterSpacing="1">la red micorrízica conecta cada planta</text>
       </g>
     </svg>
+  );
+}
+
+/**
+ * GallinaLuz — gallina criolla bioluminiscente del potrero. Picotea con el
+ * ritmo de su clase (`fvo-gallina` + variante) — la animación vive en
+ * scene-finca-organismo.css. Coordenadas locales: el (0,0) es el piso bajo
+ * el cuerpo; mira a la DERECHA salvo `espejo` (que también invierte el
+ * sentido del picoteo vía la clase `fvo-ga-esp`).
+ *
+ * @param {Object} props
+ * @param {number} props.x posición (viewBox) del piso bajo la gallina.
+ * @param {number} props.y ídem.
+ * @param {string} props.cuerpo color del plumaje.
+ * @param {string} props.cola color de la cola/ala (más oscuro).
+ * @param {string} [props.clase] variante de ritmo (fvo-ga2 / fvo-ga3).
+ * @param {boolean} [props.espejo] mirar a la izquierda.
+ */
+function GallinaLuz({ x, y, cuerpo, cola, clase = '', espejo = false }) {
+  return (
+    /* el translate vive en su PROPIO <g>: la animación CSS (transform) del
+       picoteo PISARÍA el atributo transform si compartieran elemento y la
+       gallina se iría al origen del SVG (bug real de la 1.ª pasada). */
+    <g transform={`translate(${x},${y})`} aria-hidden="true">
+      <ellipse cx="0" cy=".6" rx="4.2" ry="1" fill="#000" opacity=".3" />
+      <g className={`fvo-gallina ${clase}${espejo ? ' fvo-ga-esp' : ''}`.trim()}>
+        <g transform={espejo ? 'scale(-1,1)' : undefined}>
+          {/* patas */}
+          <g stroke="#d8ff6a" strokeWidth=".9" strokeLinecap="round" opacity=".9">
+            <path d="M-1.2,-2.2 L-1.4,0" /><path d="M1.4,-2.2 L1.6,0" />
+          </g>
+          {/* cola */}
+          <path d="M-4.2,-6.5 Q-7.6,-9.5 -6.6,-12 Q-3.6,-10 -3.2,-7 Z" fill={cola} />
+          {/* cuerpo */}
+          <path
+            d="M-4.8,-5.5 C-4.6,-8.6 -1.6,-10.2 1.2,-9.6 C4.4,-9 5.6,-6.4 4.4,-4 C3.2,-1.8 -1.2,-1.4 -3.4,-3 C-4.4,-3.8 -4.9,-4.5 -4.8,-5.5 Z"
+            fill={cuerpo}
+            stroke="#eafff6"
+            strokeWidth=".4"
+            strokeOpacity=".3"
+          />
+          {/* ala */}
+          <path d="M-2.8,-6 Q-.4,-8 2,-6.2 Q-.2,-4.6 -2.8,-6 Z" fill={cola} opacity=".85" />
+          {/* cabeza con cresta neón */}
+          <circle cx="4.6" cy="-10.6" r="2.2" fill={cuerpo} />
+          <path d="M3.6,-12.6 Q3.9,-14.4 5.2,-14 Q5.6,-12.6 4.9,-12.2 Z" fill="#ff4fd8" style={{ filter: 'drop-shadow(0 0 2px #ff4fd8)' }} />
+          <path d="M6.7,-10.8 L9,-10 L6.7,-9.4 Z" fill="#ffd76a" />
+          <circle cx="5.9" cy="-9" r=".7" fill="#ff4fd8" opacity=".8" />
+          <circle cx="5.2" cy="-11" r=".55" fill="#0a0618" />
+          <circle cx="5.4" cy="-11.2" r=".2" fill="#eafff6" />
+        </g>
+      </g>
+    </g>
   );
 }

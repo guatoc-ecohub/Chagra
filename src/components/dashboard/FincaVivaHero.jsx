@@ -9,7 +9,8 @@ import { listFarmProcesses } from '../../db/farmProcessCache';
 import useAssetStore from '../../store/useAssetStore';
 import { buildFincaScene } from '../../services/fincaSceneService';
 import { selectSceneVariant, SCENE_KINDS } from '../../services/fincaSceneProfileSelector';
-import { getProfile, saveProfile, getInvernaderoEstructura } from '../../services/userProfileService';
+import { getProfile, saveProfile, getInvernaderoEstructura, hasManualModuleVisibility } from '../../services/userProfileService';
+import { esPerfilUrbano } from '../../services/homeModuleSelector';
 import { getOperatorPhoto } from '../../services/operatorPhotoService';
 import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciarAccess';
 import { deriveAtmosphere } from '../../services/atmosphereService';
@@ -288,6 +289,25 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
   // usan). Tras el split vive en biopunk2 (donde quedó la Finca Organismo).
   const organismoActivo = escenaVivaActiva && temaEfectivo === 'biopunk2';
 
+  // ── ENTRADA AL MUNDO ANIMALES desde la escena ────────────────────────────
+  // El potrero (vaca + gallinas) de la Finca Organismo es un punto de entrada
+  // tappable al mundo de los animales — con el MISMO gate por perfil que usa
+  // el home para esconder ese mundo (DashboardLive.mostrarAnimales): un urbano
+  // de balcón/terraza no lo ve; control manual del home (#1560) y operador lo
+  // conservan. Mismo destino que MundosDeMiFinca: la portada del mundo.
+  const [mostrarAnimales] = useState(() => {
+    try {
+      if (esOperadorActual()) return true;
+      if (hasManualModuleVisibility()) return true;
+      return !esPerfilUrbano(getProfile());
+    } catch (_) {
+      return true; // Fail-open: no esconder la entrada por un error.
+    }
+  });
+  const onAnimales = mostrarAnimales
+    ? () => onNavigate?.('mundo', { mundo: 'animales' })
+    : null;
+
   return (
     <section
       data-testid="finca-viva-hero"
@@ -464,8 +484,10 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, ch
                       /* ESCENA VIVA DEL TEMA ACTIVO (organismo/árbol de la
                          vida/huerto/trazo). Lleva la estructura declarada
                          (#34): la estructura de cada escena porta el marcador
-                         fvh-estructura solo si fue declarada. */
-                      <EscenaViva estructura={estructuraFinca} />
+                         fvh-estructura solo si fue declarada. `onAnimales`
+                         (gate por perfil) vuelve tappable el potrero de la
+                         Finca Organismo — las demás escenas lo ignoran hoy. */
+                      <EscenaViva estructura={estructuraFinca} onAnimales={onAnimales} />
                     ) : (
                       <SceneFinca
                         poblada={poblada}
