@@ -35,6 +35,20 @@ export const FUENTES = {
   pancoger: 'Pancoger andino colombiano — SENA / Agrosavia / ICA / FAO.',
 };
 
+/**
+ * FUENTES_INSTITUCIONALES — instituciones de referencia (con URL verificable) para
+ * el manejo integrado de plagas (MIP), la sanidad y el cultivo. Son las páginas
+ * oficiales de las entidades que respaldan el pancoger colombiano; las fichas las
+ * enlazan para que el productor pueda ir a la fuente. NO se enlazan URLs profundas
+ * no verificadas: se enlaza la casa de cada institución.
+ */
+export const FUENTES_INSTITUCIONALES = [
+  { sigla: 'AGROSAVIA', nombre: 'Corporación Colombiana de Investigación Agropecuaria', url: 'https://www.agrosavia.co' },
+  { sigla: 'ICA', nombre: 'Instituto Colombiano Agropecuario', url: 'https://www.ica.gov.co' },
+  { sigla: 'CIAT', nombre: 'Alliance of Bioversity International & CIAT (yuca)', url: 'https://alliancebioversityciat.org' },
+  { sigla: 'FAO', nombre: 'Org. de las Naciones Unidas para la Alimentación y la Agricultura', url: 'https://www.fao.org' },
+];
+
 /** Texto único para cualquier campo que el grafo todavía no respalda. */
 export const DATO_EN_CAMINO = 'Dato en camino: el grafo aún no tiene este dato para este tubérculo.';
 
@@ -99,6 +113,7 @@ export const TUBERCULOS = [
     aporque: 'Cuando la mata tiene 25-30 cm, arrímele tierra al pie tapando el cuello. El aporque da más tubérculos, los tapa del sol (que los pone verdes y amargos) y le cierra el paso a la polilla. Repítalo en la floración.',
     cosecha: 'A los 4-6 meses, cuando la mata amarillea y se seca. Afloje con azadón sin herir el tubérculo y deje orear a la sombra.',
     conservacion: 'Cúrela unos días en sitio oscuro y ventilado para que cicatrice la cáscara; guárdela en oscuridad total (la luz la enverdece y le forma solanina, que es tóxica). En fresco y oscuro aguanta semanas. La que va para semilla, en cambio, déjela en luz difusa para que "verdee" y brote sana.',
+    usos: 'Sancocho, papa salada, puré, papas chorreadas y papa a la francesa. Es una de las tres papas del ajiaco santafereño. También se procesa en harina y almidón.',
     // Grafo: solanum_tuberosum compatible_with (resuelto con RESOLVER).
     vecinasBuenas: ['Chocho (altramuz)', 'Arveja', 'Cubio (mashua)'],
     vecinasMalas: [], // grafo sin arista de antagonismo para la parda pastusa
@@ -138,6 +153,7 @@ export const TUBERCULOS = [
     aporque: 'Aporque bien: la criolla forma tubérculos muy superficiales y sin tierra encima se enverdecen. Arrímele tierra al pie a los 25-30 cm.',
     cosecha: 'Más rápida que la común: a los 4-5 meses. Cuando la mata amarillea, arranque con cuidado que la cáscara es delgada.',
     conservacion: 'Poca guarda: la criolla no tiene reposo (dormancia), se brota y se arruga rápido. Consúmala pronto o procésela (pelada y congelada, o precocida). En oscuro y fresco, pocos días.',
+    usos: 'El amarillito del ajiaco y el sancocho: criolla salada, guisada, papas chorreadas y la popular papa criolla frita. Se comercializa precocida y congelada.',
     // Grafo: solanum_phureja compatible_with.
     vecinasBuenas: ['Aliso', 'Mauka (chago)', 'Ortiga', 'Maíz'],
     // Grafo: solanum_phureja antagonist_of.
@@ -174,6 +190,7 @@ export const TUBERCULOS = [
     aporque: 'A los 2-3 meses arrímele tierra al pie: tapa las raíces que engordan y sostiene la mata del viento.',
     cosecha: 'Larga: 8-12 meses (más en tierra fría). Afloje la tierra y arranque la mata halando del tallo; saque toda la raíz de una vez, que en tierra se pasa.',
     conservacion: 'La yuca se "raya" (se pudre) a los 2-3 días de arrancada. Consúmala pronto o consérvela: encerada, enterrada en tierra húmeda, o pelada y congelada. La yuca brava (amarga) hay que rallarla, exprimirla y tostarla para sacarle el ácido antes de comer (casabe, fariña, mañoco); la dulce se cocina directo.',
+    usos: 'Yuca cocida del sancocho, frita, en buñuelo y enyucado. La brava se procesa en casabe, fariña y mañoco. Del almidón (yuca agria) salen el pandebono y el pandeyuca.',
     // Grafo: manihot_esculenta compatible_with.
     vecinasBuenas: ['Borojó', 'Guandul (frijol de palo)', 'Zapallo', 'Ahuyama', 'Plátano', 'Frijol', 'Sacha inchi', 'Maíz'],
     vecinasMalas: [], // grafo sin arista de antagonismo
@@ -212,6 +229,7 @@ export const TUBERCULOS = [
     aporque: 'Aporque a los 3-4 meses tapando el cuello: la raíz reservante engorda mejor con tierra encima.',
     cosecha: 'Larga: 10-14 meses. Cuando el follaje amarillea, arranque y separe las raíces engrosadas del cuello (la cepa).',
     conservacion: 'Se pasa rápido como la yuca; consuma pronto o refrigere unos pocos días. Guarde el cuello (la cepa) para volver a sembrar los colinos.',
+    usos: 'Raíz suave del sancocho y las sopas de clima frío; puré, coladas y compotas. Por su digestibilidad se usa en alimentación infantil. Las hojas y tallos tiernos también se comen.',
     // Grafo: arracacia_xanthorrhiza compatible_with.
     vecinasBuenas: ['Oca (hibia)', 'Papa (sabanera)', 'Cubio (mashua)', 'Maíz'],
     vecinasMalas: [], // grafo sin arista de antagonismo
@@ -245,6 +263,7 @@ export const TUBERCULOS = [
     aporque: 'Se siembra en camellón o caballón alto para que el tubérculo engorde en tierra suelta; arrímele tierra al montículo a medida que crece.',
     cosecha: 'Larga: 8-11 meses, cuando el bejuco se seca. Escarbe con cuidado que el tubérculo es grande y se parte fácil.',
     conservacion: 'Buena guarda si se cura: en sitio fresco, seco y ventilado, sobre zarzo o troja, aguanta varios meses. No lo golpee, que por la herida se pudre.',
+    usos: 'Ñame cocido, en puré y en el sancocho costeño; base del mote de ñame. Se muele en harina para coladas y amasijos.',
     vecinasBuenas: [], // grafo sin arista de compatibilidad para el ñame
     vecinasMalas: [],
     // Grafo: pest_controllers (antracnosis del follaje, familia Colletotrichum).
@@ -277,6 +296,7 @@ export const TUBERCULOS = [
     aporque: 'Se siembra en camellón o caballón alto para que la raíz engorde. Levante las guías de vez en cuando: si enraízan por todo lado, dan puro bejuco y poca batata.',
     cosecha: 'A los 4-6 meses, cuando la hoja empieza a amarillear. Escarbe con cuidado, que la batata se magulla fácil.',
     conservacion: 'El CURADO es la clave: deje la batata unos días en sitio cálido y húmedo para que cicatrice la cáscara, y luego guárdela en fresco y seco — así aguanta meses. Ojo con el picudo (gorgojo, Cylas): coseche a tiempo y no deje batatas ni residuos expuestos, porque ahí se cría.',
+    usos: 'Batata cocida, asada o en dulce (dulce de batata cortado); también frita en hojuelas. Las hojas tiernas se comen como verdura. La de pulpa anaranjada es rica en betacaroteno.',
     // Grafo: ipomoea_batatas compatible_with.
     vecinasBuenas: ['Frijol', 'Maíz'],
     vecinasMalas: [], // grafo sin arista de antagonismo
@@ -310,6 +330,7 @@ export const TUBERCULOS = [
     aporque: 'Aporque bien: la oca forma tubérculos superficiales, como la papa criolla, y sin tierra encima se enverdecen.',
     cosecha: 'Larga: 6-8 meses, después de las primeras heladas, cuando la mata se seca.',
     conservacion: 'Asoléela unos días después de cosechada: el sol le baja el ácido (oxálico) y la vuelve dulce — el "endulzado" al sol. Guardada en fresco y oscuro aguanta semanas.',
+    usos: 'Se come cocida, asada o en dulce después de asolearla (queda dulce), y en las sopas del altiplano. También se deshidrata para guardarla.',
     // Grafo: oxalis_tuberosa compatible_with.
     vecinasBuenas: ['Arracacha', 'Papa (sabanera)', 'Cubio (mashua)', 'Maíz'],
     vecinasMalas: [], // grafo sin arista de antagonismo
@@ -343,6 +364,7 @@ export const TUBERCULOS = [
     aporque: 'Aporque al pie tapando el cuello para que engorden más tubérculos.',
     cosecha: 'Larga: 6-8 meses. Rinde mucho y resiste bien las plagas del suelo.',
     conservacion: 'Se guarda bien en fresco. Asoléelo unos días para bajarle el picante y el amargo antes de comerlo. Aguanta semanas.',
+    usos: 'Cocido en sopas y guisos del páramo; se asolea para bajarle el picante y el amargo antes de comerlo.',
     // Grafo: tropaeolum_tuberosum compatible_with.
     vecinasBuenas: ['Arracacha', 'Oca (hibia)', 'Papa (sabanera)', 'Maíz'],
     vecinasMalas: [], // grafo sin arista de antagonismo
@@ -373,6 +395,7 @@ export const TUBERCULOS = [
     aporque: 'Aporque bien: forma sus tubercitos de colores muy superficiales.',
     cosecha: 'Larga: 6-8 meses, cuando la mata se seca tras las heladas.',
     conservacion: 'Se guarda razonable en fresco y oscuro. La cáscara es delgada y se magulla, así que manéjelo con cuidado.',
+    usos: 'El chuguo o ulluco de las sopas y guisos andinos: da un mucílago que espesa el caldo y no se pela. La hoja tierna se come como espinaca.',
     vecinasBuenas: [], // grafo sin arista de compatibilidad para el ulluco
     vecinasMalas: [],
     // Grafo: pest_controllers.
