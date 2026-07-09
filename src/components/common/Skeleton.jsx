@@ -15,6 +15,7 @@ import React from 'react';
  *
  * Sin dependencias: pure tailwind + animate-pulse del propio Tailwind 3.
  */
+/** @param {{ variant?: string, width?: string|number, height?: string|number, className?: string, rounded?: string, ariaLabel?: string }} props */
 export default function Skeleton({
   variant = 'line',
   width,

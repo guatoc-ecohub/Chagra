@@ -97,7 +97,7 @@ describe('PlantaPorVozScreen — módulo unificado', () => {
   });
 
   it('si la planta no tiene slug resoluble, vuelve a captura (sin dossier)', async () => {
-    buildPlantDossier.mockResolvedValueOnce(null);
+    vi.mocked(buildPlantDossier).mockResolvedValueOnce(null);
     render(<PlantaPorVozScreen onBack={() => {}} onSave={() => {}} />);
     fireEvent.click(screen.getByText('simular guardado'));
     await waitFor(() => expect(screen.getByTestId('voice-capture-mock')).toBeTruthy());

@@ -17,13 +17,14 @@ describe('gpsFincaDetector', () => {
     });
 
     it('returns symmetric distance', () => {
-      const a = [4.5167, -73.9333];
-      const b = [4.5500, -73.9000];
+      const a = /** @type {[number, number]} */ ([4.5167, -73.9333]);
+      const b = /** @type {[number, number]} */ ([4.5500, -73.9000]);
       expect(distanceKm(a, b)).toBeCloseTo(distanceKm(b, a), 5);
     });
   });
 
   describe('detectFincaByGps', () => {
+    /** @type {{ slug: string, nombre: string, coords: [number, number] }[]} */
     const fincas = [
       { slug: 'guatoc', nombre: 'Guatoc', coords: [4.5167, -73.9333] },
       { slug: 'los-sitios', nombre: 'Los Sitios', coords: [4.5500, -73.9000] },
@@ -34,6 +35,7 @@ describe('gpsFincaDetector', () => {
     });
 
     it('returns permission_denied when geolocation throws code 1', async () => {
+      // @ts-expect-error — el test stubbea geolocation (read-only en lib.dom)
       globalThis.navigator.geolocation = {
         getCurrentPosition: (_ok, err) => err({ code: 1, message: 'denied' }),
       };
@@ -45,14 +47,17 @@ describe('gpsFincaDetector', () => {
     it('returns geolocation_unavailable when API missing', async () => {
       const original = globalThis.navigator.geolocation;
       // @ts-ignore
+      // @ts-expect-error — el test stubbea geolocation (read-only en lib.dom)
       delete globalThis.navigator.geolocation;
       const result = await detectFincaByGps(fincas);
       expect(result.reason).toBe('geolocation_unavailable');
+      // @ts-expect-error — el test stubbea geolocation (read-only en lib.dom)
       globalThis.navigator.geolocation = original;
     });
 
     it('matches the closest finca when within range', async () => {
       // Operador exactamente en Guatoc
+      // @ts-expect-error — el test stubbea geolocation (read-only en lib.dom)
       globalThis.navigator.geolocation = {
         getCurrentPosition: (ok) =>
           ok({ coords: { latitude: 4.5167, longitude: -73.9333, accuracy: 5 } }),
@@ -64,6 +69,7 @@ describe('gpsFincaDetector', () => {
 
     it('returns out_of_range when farther than maxDistanceKm', async () => {
       // Operador a >100 km
+      // @ts-expect-error — el test stubbea geolocation (read-only en lib.dom)
       globalThis.navigator.geolocation = {
         getCurrentPosition: (ok) =>
           ok({ coords: { latitude: 10.0, longitude: -75.0, accuracy: 5 } }),
@@ -75,6 +81,7 @@ describe('gpsFincaDetector', () => {
 
     it('picks the nearer of two equidistant-ish fincas', async () => {
       // Posición más cerca de Los Sitios que Guatoc
+      // @ts-expect-error — el test stubbea geolocation (read-only en lib.dom)
       globalThis.navigator.geolocation = {
         getCurrentPosition: (ok) =>
           ok({ coords: { latitude: 4.5450, longitude: -73.9050, accuracy: 5 } }),

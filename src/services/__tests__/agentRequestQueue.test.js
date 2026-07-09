@@ -98,7 +98,7 @@ describe('agentRequestQueue — enqueueRequest', () => {
     const id2 = await enqueueRequest({ prompt: '' });
     expect(id2).toBeNull();
     
-    const id3 = await enqueueRequest({ prompt: 123 });
+    const id3 = await enqueueRequest({ prompt: /** @type {any} */ (123) }); // input inválido a propósito
     expect(id3).toBeNull();
     
     const all = await listRequests();

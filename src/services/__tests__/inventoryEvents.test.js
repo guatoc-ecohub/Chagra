@@ -35,6 +35,7 @@ const PAYLOADS = {
   [EVENT_TYPES.PRODUCED]: { item_id: 'panela', delta: 8 },
 };
 
+/** @param {string} [eventType] @param {Object} [overrides] */
 function validEntry(eventType = EVENT_TYPES.RECEIVED, overrides = {}) {
   return {
     id: VALID_ULID,

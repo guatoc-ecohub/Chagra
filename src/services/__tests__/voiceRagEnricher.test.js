@@ -56,7 +56,7 @@ const RETAMO_DOC = {
 // Mock de fetch para servir docs species. Las llamadas a retrieve están
 // mockeadas independientemente; aquí solo manejamos /cycle-content/<slug>.json.
 function setupFetchMock(map) {
-  globalThis.fetch = vi.fn((url) => {
+  globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
     const match = String(url).match(/\/cycle-content\/([^.]+)\.json/);
     if (!match) {
       return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
@@ -72,7 +72,7 @@ function setupFetchMock(map) {
       headers: { get: (h) => (h.toLowerCase() === 'content-type' ? 'application/json' : '') },
       json: () => Promise.resolve(doc),
     });
-  });
+  })));
 }
 
 describe('voiceRagEnricher', () => {
@@ -142,7 +142,7 @@ describe('voiceRagEnricher', () => {
 
   describe('enrichEntity', () => {
     it('species válida → enriched con companions, antagonists, biopreparados', async () => {
-      retrieve.mockResolvedValueOnce([
+      vi.mocked(retrieve).mockResolvedValueOnce([
         { species: 'fresa', score: 8.2, text: 'companions caléndula ajo' },
         { species: 'fresa', score: 6.1, text: 'biopreparados bocashi caldo bordelés' },
       ]);
@@ -164,7 +164,7 @@ describe('voiceRagEnricher', () => {
     });
 
     it('species invasora → flag + warnings con sustitutas nativas', async () => {
-      retrieve.mockResolvedValueOnce([
+      vi.mocked(retrieve).mockResolvedValueOnce([
         { species: 'ulex_europaeus', score: 7.5, text: 'retamo espinoso invasor' },
       ]);
       setupFetchMock({ ulex_europaeus: RETAMO_DOC });
@@ -180,7 +180,7 @@ describe('voiceRagEnricher', () => {
     });
 
     it('sin hits del RAG → null (degrade)', async () => {
-      retrieve.mockResolvedValueOnce([]);
+      vi.mocked(retrieve).mockResolvedValueOnce([]);
       setupFetchMock({});
 
       const result = await enrichEntity({ crop: 'unobtanium', quantity: 1, location: '' });
@@ -188,7 +188,7 @@ describe('voiceRagEnricher', () => {
     });
 
     it('fetch del doc falla (404) → null', async () => {
-      retrieve.mockResolvedValueOnce([
+      vi.mocked(retrieve).mockResolvedValueOnce([
         { species: 'fake_slug', score: 3.0, text: 'something' },
       ]);
       setupFetchMock({});  // map vacío → 404 para cualquier slug
@@ -198,7 +198,7 @@ describe('voiceRagEnricher', () => {
     });
 
     it('doc sin companions/biopreparados/warnings útiles → null', async () => {
-      retrieve.mockResolvedValueOnce([
+      vi.mocked(retrieve).mockResolvedValueOnce([
         { species: 'minimal', score: 2.0, text: 'x' },
       ]);
       setupFetchMock({
@@ -215,7 +215,7 @@ describe('voiceRagEnricher', () => {
     });
 
     it('retrieve lanza error → null (no propaga)', async () => {
-      retrieve.mockRejectedValueOnce(new Error('corpus cold'));
+      vi.mocked(retrieve).mockRejectedValueOnce(new Error('corpus cold'));
 
       const result = await enrichEntity({ crop: 'fresa', quantity: 1, location: '' });
       expect(result).toBeNull();
@@ -231,7 +231,7 @@ describe('voiceRagEnricher', () => {
 
   describe('enrichEntitiesWithRag', () => {
     it('procesa array completo y devuelve summary correcto', async () => {
-      retrieve
+      vi.mocked(retrieve)
         .mockResolvedValueOnce([{ species: 'fresa', score: 8.0 }])
         .mockResolvedValueOnce([{ species: 'ulex_europaeus', score: 5.0 }])
         .mockResolvedValueOnce([]);  // tercera entidad sin hit
@@ -269,7 +269,7 @@ describe('voiceRagEnricher', () => {
     });
 
     it('preserva campos originales de cada entidad', async () => {
-      retrieve.mockResolvedValueOnce([{ species: 'fresa', score: 8.0 }]);
+      vi.mocked(retrieve).mockResolvedValueOnce([{ species: 'fresa', score: 8.0 }]);
       setupFetchMock({ fresa: FRESA_DOC });
 
       const input = [{ crop: 'fresa', quantity: 50, location: 'tunel' }];

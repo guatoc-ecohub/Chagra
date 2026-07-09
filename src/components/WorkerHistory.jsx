@@ -101,6 +101,7 @@ function toMs(ts) {
   return n < 1e12 ? n * 1000 : n;
 }
 
+/** @param {{ onBack: () => void, onEntryClick?: (entry: object) => void }} props */
 export default function WorkerHistory({ onBack, onEntryClick }) {
   const redesign = fincaVivaHomePerfilActivo();
 

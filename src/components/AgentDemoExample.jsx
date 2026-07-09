@@ -54,6 +54,7 @@ const DEMO_AGENT_RESPONSE = `Por la descripción puede ser deficiencia de hierro
 
 const AGENT_REPLY_DELAY_MS = 1000;
 
+/** @param {{ onClose?: () => void, autoStart?: boolean }} props */
 export default function AgentDemoExample({ onClose, autoStart = true }) {
   const [showAgentReply, setShowAgentReply] = useState(false);
   const timerRef = useRef(null);

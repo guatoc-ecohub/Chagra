@@ -120,12 +120,12 @@ const CATALOG = [
 beforeEach(() => {
   vi.clearAllMocks();
   __resetDirectorioCache();
-  getAllSpecies.mockResolvedValue(CATALOG);
-  getSpeciesById.mockImplementation(async (id) => CATALOG.find((s) => s.id === id) || null);
-  getAllBiopreparados.mockResolvedValue([]);
-  getRelationsForSpecies.mockResolvedValue(null);
-  resolvePestSynonym.mockResolvedValue(null);
-  findLocalImage.mockResolvedValue(null);
+  vi.mocked(getAllSpecies).mockResolvedValue(CATALOG);
+  vi.mocked(getSpeciesById).mockImplementation(async (id) => CATALOG.find((s) => s.id === id) || null);
+  vi.mocked(getAllBiopreparados).mockResolvedValue([]);
+  vi.mocked(getRelationsForSpecies).mockResolvedValue(null);
+  vi.mocked(resolvePestSynonym).mockResolvedValue(null);
+  vi.mocked(findLocalImage).mockResolvedValue(null);
 });
 
 describe('searchSpecies', () => {
@@ -190,14 +190,14 @@ describe('searchSpecies', () => {
   });
 
   it('degrada a [] si el catálogo no carga', async () => {
-    getAllSpecies.mockRejectedValueOnce(new Error('db down'));
+    vi.mocked(getAllSpecies).mockRejectedValueOnce(new Error('db down'));
     expect(await searchSpecies('frijol')).toEqual([]);
   });
 });
 
 describe('buildSpeciesFicha', () => {
   it('null si la especie no existe', async () => {
-    getSpeciesById.mockResolvedValueOnce(null);
+    vi.mocked(getSpeciesById).mockResolvedValueOnce(null);
     expect(await buildSpeciesFicha('inexistente')).toBeNull();
   });
 
@@ -226,7 +226,7 @@ describe('buildSpeciesFicha', () => {
   });
 
   it('une plagas del catálogo con controladores del grafo', async () => {
-    getRelationsForSpecies.mockResolvedValueOnce({
+    vi.mocked(getRelationsForSpecies).mockResolvedValueOnce({
       compatible_with: ['zea_mays'],
       antagonist_of: [],
       biopreparados: [{ id: 'beauveria_bassiana', nombre: 'Beauveria bassiana' }],
@@ -241,7 +241,7 @@ describe('buildSpeciesFicha', () => {
   });
 
   it('reconcilia amenazas de papa con el puente de sinonimia del grafo', async () => {
-    getRelationsForSpecies.mockResolvedValueOnce({
+    vi.mocked(getRelationsForSpecies).mockResolvedValueOnce({
       compatible_with: [],
       antagonist_of: [],
       biopreparados: [],
@@ -250,7 +250,7 @@ describe('buildSpeciesFicha', () => {
         { plaga: 'Gusano blanco del maíz (gallina ciega)', controladores: ['Beauveria bassiana'] },
       ],
     });
-    resolvePestSynonym.mockImplementation(async (term) => {
+    vi.mocked(resolvePestSynonym).mockImplementation(async (term) => {
       if (term === 'Tizón de la vaina del arroz') {
         return { plaga: 'Rhizoctonia solani', especiesAfectadas: ['solanum_tuberosum'] };
       }
@@ -270,14 +270,14 @@ describe('buildSpeciesFicha', () => {
   });
 
   it('enriquece biopreparado con dosis del catálogo si el id coincide', async () => {
-    getAllBiopreparados.mockResolvedValueOnce([
+    vi.mocked(getAllBiopreparados).mockResolvedValueOnce([
       {
         id: 'caldo_bordeles',
         nombre: 'Caldo bordelés',
         data: JSON.stringify({ tipo: 'caldo', dosis: '1%', uso: 'Foliar preventivo', ingredientes: ['sulfato de cobre', 'cal'] }),
       },
     ]);
-    getRelationsForSpecies.mockResolvedValueOnce({
+    vi.mocked(getRelationsForSpecies).mockResolvedValueOnce({
       biopreparados: [{ id: 'caldo_bordeles', nombre: 'Caldo bordelés' }],
       pest_controllers: [],
     });
@@ -288,7 +288,7 @@ describe('buildSpeciesFicha', () => {
   });
 
   it('expone la imagen cuando el resolver la encuentra', async () => {
-    findLocalImage.mockResolvedValueOnce({
+    vi.mocked(findLocalImage).mockResolvedValueOnce({
       url: 'https://x/img.jpg', thumbUrl: 'https://x/thumb.jpg',
       license: 'CC-BY', rightsHolder: 'Foto', source: 'iNaturalist', sourceUrl: 'https://x',
     });
@@ -302,7 +302,7 @@ describe('buildSpeciesFicha', () => {
   });
 
   it('no lanza si el grafo cae; degrada secciones a vacío', async () => {
-    getRelationsForSpecies.mockRejectedValueOnce(new Error('grafo offline'));
+    vi.mocked(getRelationsForSpecies).mockRejectedValueOnce(new Error('grafo offline'));
     const f = await buildSpeciesFicha('phaseolus_vulgaris');
     expect(f).toBeTruthy();
     expect(f.biopreparados).toEqual([]);

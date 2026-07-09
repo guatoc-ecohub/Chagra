@@ -34,6 +34,7 @@ import { hasSeenTip, markTipSeen } from '../services/contextTips';
  *                tarjeta grita, ej. encima del compositor del agente;
  *                operador 2026-07-08). Misma mecánica contextTips.
  */
+/** @param {{ id: string, emoji?: string, title?: string, children?: import('react').ReactNode, moreLabel?: string, onMore?: () => void, className?: string, variant?: 'card' | 'subtle' }} props */
 export default function ContextTip({ id, emoji, title, children, moreLabel = null, onMore = null, className = '', variant = 'card' }) {
   const [visible, setVisible] = useState(() => !hasSeenTip(id));
 

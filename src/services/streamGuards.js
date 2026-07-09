@@ -117,7 +117,7 @@ const HINT_OVERLAP_CHARS = 16;
  * Un probe que reviente jamás tumba el stream (try/catch por probe).
  *
  * @param {string} partialText — texto acumulado del stream hasta ahora.
- * @param {{userMessage?: string|null}} [ctx] — pregunta cruda del usuario
+ * @param {{userMessage?: string|null}} [ctx] - pregunta cruda del usuario
  *   (gates de intención de los guards de mezcla/fermento/residuo).
  * @returns {{danger: boolean, reason: string|null}}
  */
@@ -149,9 +149,9 @@ export function sniffStreamDanger(partialText, { userMessage = null } = {}) {
  * respuesta nueva; el final de ESA respuesta pasa igual por el guard final).
  *
  * @param {object} [opts]
- * @param {string|null} [opts.userMessage] — pregunta cruda del usuario.
- * @param {number} [opts.scanMinChars] — piso del throttle (chars nuevos).
- * @param {string} [opts.placeholder] — texto visible mientras se retiene.
+ * @param {string|null} [opts.userMessage] - pregunta cruda del usuario.
+ * @param {number} [opts.scanMinChars] - piso del throttle (chars nuevos).
+ * @param {string} [opts.placeholder] - texto visible mientras se retiene.
  * @returns {{
  *   check: (fullText: string) => string,
  *   isDangerLatched: () => boolean,

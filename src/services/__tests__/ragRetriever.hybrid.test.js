@@ -26,8 +26,10 @@ const EMBEDDINGS = {
   coffea_noise: [0, 0, 1],
 };
 
+/** @returns {typeof globalThis.fetch} */
 function setupFetchMock({ includeEmbeddings }) {
-  return vi.fn((url) => {
+  // eslint-disable-next-line no-extra-parens -- cast JSDoc: el mock cubre solo el subset de Response usado
+  return /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
     const u = String(url);
     if (u.endsWith('/cycle-content/manifest.json')) {
       return Promise.resolve({
@@ -73,7 +75,7 @@ function setupFetchMock({ includeEmbeddings }) {
       });
     }
     return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
-  });
+  })));
 }
 
 describe('ragRetriever - hybrid fusion', () => {

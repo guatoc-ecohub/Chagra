@@ -7,8 +7,9 @@ vi.mock('../speciesResolver', () => ({
 import { resolveSpecies } from '../speciesResolver';
 import { loadCaseStudyDemos } from '../caseStudyDemoLoader';
 
+/** @returns {typeof fetch} */
 function makeFetchMock(manifest, cases) {
-  return vi.fn((url) => {
+  return /** @type {typeof fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
     if (url.endsWith('/manifest.json')) {
       return Promise.resolve({ ok: true, json: () => Promise.resolve(manifest) });
     }
@@ -18,7 +19,7 @@ function makeFetchMock(manifest, cases) {
       return Promise.resolve({ ok: true, json: () => Promise.resolve(found) });
     }
     return Promise.resolve({ ok: false });
-  });
+  })));
 }
 
 function makeStore() {
@@ -35,12 +36,12 @@ function makeStore() {
 }
 
 beforeEach(() => {
-  resolveSpecies.mockReset();
+  vi.mocked(resolveSpecies).mockReset();
 });
 
 describe('loadCaseStudyDemos — wiring speciesResolver', () => {
   it('preserva species_ids resueltos (exact match)', async () => {
-    resolveSpecies.mockImplementation((id) =>
+    vi.mocked(resolveSpecies).mockImplementation((id) =>
       Promise.resolve({ slug: id, match: 'exact', confidence: 1 })
     );
     const manifest = { cases: ['case1.json'] };
@@ -55,7 +56,7 @@ describe('loadCaseStudyDemos — wiring speciesResolver', () => {
   });
 
   it('reemplaza por fuzzy slug cuando confidence ≥ 0.6', async () => {
-    resolveSpecies.mockImplementation((id) => {
+    vi.mocked(resolveSpecies).mockImplementation((id) => {
       if (id === 'tomatico_extraño') {
         return Promise.resolve({ slug: 'solanum_lycopersicum_cherry', match: 'fuzzy', confidence: 0.8 });
       }
@@ -69,7 +70,7 @@ describe('loadCaseStudyDemos — wiring speciesResolver', () => {
   });
 
   it('dropea species sin match (skip silencioso) sin afectar el caso', async () => {
-    resolveSpecies.mockImplementation((id) => {
+    vi.mocked(resolveSpecies).mockImplementation((id) => {
       if (id === 'valid') return Promise.resolve({ slug: 'valid', match: 'exact', confidence: 1 });
       return Promise.resolve(null);
     });
@@ -83,7 +84,7 @@ describe('loadCaseStudyDemos — wiring speciesResolver', () => {
   });
 
   it('dropea fuzzy con confidence < 0.6', async () => {
-    resolveSpecies.mockImplementation(() =>
+    vi.mocked(resolveSpecies).mockImplementation(() =>
       Promise.resolve({ slug: 'algo', match: 'fuzzy', confidence: 0.4 })
     );
     const manifest = { cases: ['c.json'] };
@@ -102,7 +103,7 @@ describe('loadCaseStudyDemos — wiring speciesResolver', () => {
   });
 
   it('si resolveSpecies throws, NO falla el caso (defensivo)', async () => {
-    resolveSpecies.mockImplementation(() => Promise.reject(new Error('boom')));
+    vi.mocked(resolveSpecies).mockImplementation(() => Promise.reject(new Error('boom')));
     const manifest = { cases: ['c.json'] };
     const cases = [{ id: 'c', subject: { species_ids: ['x'] } }];
     const store = makeStore();

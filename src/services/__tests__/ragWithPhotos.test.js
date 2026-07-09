@@ -35,6 +35,7 @@ function fakeBlob(label = 'jpg') {
   return { __blob: true, label };
 }
 
+/** @param {{ id: any, speciesSlug: string, capturedAt: string, label?: string }} p */
 function fakePhoto({ id, speciesSlug, capturedAt, label }) {
   return {
     id,
@@ -54,13 +55,13 @@ describe('ragWithPhotos.retrieveWithPhotos', () => {
   });
 
   it('devuelve shape { passages, photosBySpecies } con fotos agrupadas por species_slug', async () => {
-    retrieve.mockResolvedValueOnce([
+    vi.mocked(retrieve).mockResolvedValueOnce([
       { key: 'valor_pedagogico', text: 'La fresa…', species: 'fragaria_test', score: 3.2 },
       { key: 'feeding_plan_markdown', text: '### Plan…', species: 'fragaria_test', score: 2.1 },
       { key: 'valor_pedagogico', text: 'El café…', species: 'coffea_test', score: 1.7 },
     ]);
 
-    listUserPhotosBySpecies.mockImplementation(async (slug) => {
+    vi.mocked(listUserPhotosBySpecies).mockImplementation(async (slug) => {
       if (slug === 'fragaria_test') {
         return [
           fakePhoto({ id: 1, speciesSlug: 'fragaria_test', capturedAt: '2026-05-10T10:00:00Z' }),
@@ -93,10 +94,10 @@ describe('ragWithPhotos.retrieveWithPhotos', () => {
   });
 
   it('respeta el override photosPerSpecies', async () => {
-    retrieve.mockResolvedValueOnce([
+    vi.mocked(retrieve).mockResolvedValueOnce([
       { key: 'k', text: 't', species: 'fragaria_test', score: 1 },
     ]);
-    listUserPhotosBySpecies.mockResolvedValueOnce([
+    vi.mocked(listUserPhotosBySpecies).mockResolvedValueOnce([
       fakePhoto({ id: 1, speciesSlug: 'fragaria_test', capturedAt: '2026-05-10T10:00:00Z' }),
       fakePhoto({ id: 2, speciesSlug: 'fragaria_test', capturedAt: '2026-05-15T10:00:00Z' }),
       fakePhoto({ id: 3, speciesSlug: 'fragaria_test', capturedAt: '2026-05-18T10:00:00Z' }),
@@ -108,10 +109,10 @@ describe('ragWithPhotos.retrieveWithPhotos', () => {
   });
 
   it('species sin fotos quedan con array vacío', async () => {
-    retrieve.mockResolvedValueOnce([
+    vi.mocked(retrieve).mockResolvedValueOnce([
       { key: 'k', text: 't', species: 'lechuga_test', score: 1 },
     ]);
-    listUserPhotosBySpecies.mockResolvedValueOnce([]);
+    vi.mocked(listUserPhotosBySpecies).mockResolvedValueOnce([]);
 
     const result = await retrieveWithPhotos('lechuga', 3);
     expect(result.passages).toHaveLength(1);
@@ -119,19 +120,19 @@ describe('ragWithPhotos.retrieveWithPhotos', () => {
   });
 
   it('propaga topK al llamar retrieve', async () => {
-    retrieve.mockResolvedValueOnce([]);
+    vi.mocked(retrieve).mockResolvedValueOnce([]);
     await retrieveWithPhotos('algo', 7);
     expect(retrieve).toHaveBeenCalledWith('algo', 7);
   });
 
   it('topK default = 5 cuando no se pasa', async () => {
-    retrieve.mockResolvedValueOnce([]);
+    vi.mocked(retrieve).mockResolvedValueOnce([]);
     await retrieveWithPhotos('algo');
     expect(retrieve).toHaveBeenCalledWith('algo', 5);
   });
 
   it('si retrieve devuelve [], no llama listUserPhotosBySpecies y devuelve mapa vacío', async () => {
-    retrieve.mockResolvedValueOnce([]);
+    vi.mocked(retrieve).mockResolvedValueOnce([]);
 
     const result = await retrieveWithPhotos('query sin matches', 5);
     expect(result.passages).toEqual([]);
@@ -140,7 +141,7 @@ describe('ragWithPhotos.retrieveWithPhotos', () => {
   });
 
   it('si retrieve devuelve passages sin species_slug, no rompe y mapa queda vacío', async () => {
-    retrieve.mockResolvedValueOnce([
+    vi.mocked(retrieve).mockResolvedValueOnce([
       { key: 'k', text: 'pasaje suelto sin species' },
       { key: 'k2', text: 'otro sin species', species: null },
     ]);
@@ -152,11 +153,11 @@ describe('ragWithPhotos.retrieveWithPhotos', () => {
   });
 
   it('si una species rompe listUserPhotosBySpecies, las otras siguen', async () => {
-    retrieve.mockResolvedValueOnce([
+    vi.mocked(retrieve).mockResolvedValueOnce([
       { key: 'k', text: 't', species: 'fragaria_test', score: 2 },
       { key: 'k', text: 't', species: 'coffea_test', score: 1 },
     ]);
-    listUserPhotosBySpecies.mockImplementation(async (slug) => {
+    vi.mocked(listUserPhotosBySpecies).mockImplementation(async (slug) => {
       if (slug === 'fragaria_test') throw new Error('IDB exploded for fragaria');
       if (slug === 'coffea_test') {
         return [fakePhoto({ id: 9, speciesSlug: 'coffea_test', capturedAt: '2026-05-17T00:00:00Z' })];
@@ -171,7 +172,7 @@ describe('ragWithPhotos.retrieveWithPhotos', () => {
   });
 
   it('photosPerSpecies: 0 desactiva el join lateral', async () => {
-    retrieve.mockResolvedValueOnce([
+    vi.mocked(retrieve).mockResolvedValueOnce([
       { key: 'k', text: 't', species: 'fragaria_test', score: 1 },
     ]);
     const result = await retrieveWithPhotos('q', 5, { photosPerSpecies: 0 });
@@ -181,17 +182,17 @@ describe('ragWithPhotos.retrieveWithPhotos', () => {
   });
 
   it('si retrieve lanza excepción, devuelve shape vacío sin propagar', async () => {
-    retrieve.mockRejectedValueOnce(new Error('boom'));
+    vi.mocked(retrieve).mockRejectedValueOnce(new Error('boom'));
     const result = await retrieveWithPhotos('q', 5);
     expect(result).toEqual({ passages: [], photosBySpecies: {} });
     expect(listUserPhotosBySpecies).not.toHaveBeenCalled();
   });
 
   it('photos sin capturedAt quedan al final (fallback createdAt)', async () => {
-    retrieve.mockResolvedValueOnce([
+    vi.mocked(retrieve).mockResolvedValueOnce([
       { key: 'k', text: 't', species: 'fragaria_test', score: 1 },
     ]);
-    listUserPhotosBySpecies.mockResolvedValueOnce([
+    vi.mocked(listUserPhotosBySpecies).mockResolvedValueOnce([
       { id: 1, speciesSlug: 'fragaria_test', blob: fakeBlob(), createdAt: '2026-05-10T10:00:00Z' },
       { id: 2, speciesSlug: 'fragaria_test', blob: fakeBlob(), capturedAt: '2026-05-15T10:00:00Z' },
       { id: 3, speciesSlug: 'fragaria_test', blob: fakeBlob() }, // sin fecha

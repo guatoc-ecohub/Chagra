@@ -103,10 +103,11 @@ export default function HarvestLog({ onBack, onSave }) {
   const [medianHint, setMedianHint] = useState(null); // { median, count } | null
   const [syncedOffline, setSyncedOffline] = useState(false);
   const [view, setView] = useState('form'); // 'form' | 'success'
-  const [touched, setTouched] = useState({});
+  const [touched, setTouched] = useState(/** @type {Record<string, boolean>} */ ({}));
 
   // Bug 069.10 — validación inline (subArea, product, quantity, date)
   const errors = useMemo(() => {
+    /** @type {Record<string, string>} */
     const e = {};
     const today = new Date().toISOString().split('T')[0];
     if (!formData.subArea) e.subArea = 'Selecciona el sub-área';
@@ -364,7 +365,7 @@ export default function HarvestLog({ onBack, onSave }) {
           label="Observaciones"
           hint="opcional"
           name="notes"
-          rows="3"
+          rows={3}
           value={formData.notes}
           onChange={handleInput}
           placeholder="Ej: fruta pequeña, algo picada por pájaros…"

@@ -38,6 +38,10 @@ export function FieldError({ children }) {
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
  * @param {string} [props.name]
+ * @param {string} [props.value]
+ * @param {(e: any) => void} [props.onChange]
+ * @param {() => void} [props.onBlur]
+ * @param {boolean} [props.required]
  * @param {string} [props.placeholder]
  */
 export function TextField({ label, hint, Icon, error, ...rest }) {
@@ -61,6 +65,10 @@ export function TextField({ label, hint, Icon, error, ...rest }) {
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
  * @param {string} [props.name]
+ * @param {string} [props.value]
+ * @param {(e: any) => void} [props.onChange]
+ * @param {() => void} [props.onBlur]
+ * @param {boolean} [props.required]
  * @param {string|number} [props.step]
  * @param {string|number} [props.min]
  */
@@ -87,6 +95,10 @@ export function NumberField({ label, hint, Icon, error, ...rest }) {
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
  * @param {string} [props.name]
+ * @param {string} [props.value]
+ * @param {(e: any) => void} [props.onChange]
+ * @param {() => void} [props.onBlur]
+ * @param {boolean} [props.required]
  * @param {Array<{value: string, label: string}>} props.options
  * @param {string} [props.placeholder]
  */
@@ -116,6 +128,11 @@ export function SelectField({ label, hint, Icon, error, options, placeholder, ..
  * @param {import('react').ComponentType<{size?: number}>} [props.Icon]
  * @param {string} [props.error]
  * @param {string} [props.name]
+ * @param {string} [props.value]
+ * @param {(e: any) => void} [props.onChange]
+ * @param {() => void} [props.onBlur]
+ * @param {boolean} [props.required]
+ * @param {number} [props.rows]
  */
 export function TextAreaField({ label, hint, Icon, error, ...rest }) {
   return (

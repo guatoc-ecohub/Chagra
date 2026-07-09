@@ -574,7 +574,7 @@ export function crearObservacionDesdeRaw(rawData) {
 /**
  * Valida si una interpretación indica suelo vivo.
  *
- * @param {InterpretacionCromatografia} interpretacion - Interpretación a verificar
+ * @param {Partial<InterpretacionCromatografia> | null | undefined} interpretacion - Interpretación a verificar
  * @returns {boolean} - true si el suelo está vivo
  */
 export function esSueloVivo(interpretacion) {
@@ -584,7 +584,7 @@ export function esSueloVivo(interpretacion) {
 /**
  * Valida si una interpretación indica suelo degradado.
  *
- * @param {InterpretacionCromatografia} interpretacion - Interpretación a verificar
+ * @param {Partial<InterpretacionCromatografia> | null | undefined} interpretacion - Interpretación a verificar
  * @returns {boolean} - true si el suelo está degradado
  */
 export function esSueloDegradado(interpretacion) {
@@ -596,7 +596,7 @@ export function esSueloDegradado(interpretacion) {
 /**
  * Valida si una interpretación indica suelo químicalizado.
  *
- * @param {InterpretacionCromatografia} interpretacion - Interpretación a verificar
+ * @param {Partial<InterpretacionCromatografia> | null | undefined} interpretacion - Interpretación a verificar
  * @returns {boolean} - true si el suelo está químicalizado
  */
 export function esSueloQuimicalizado(interpretacion) {

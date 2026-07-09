@@ -127,14 +127,14 @@ beforeEach(() => {
   recorderState.reset.mockClear();
 
   // Reset profile mocks to default values
-  getProfile.mockReturnValue({
+  vi.mocked(getProfile).mockReturnValue({
     nivel_respuestas: 'simple',
     vereda: 'Vereda Test',
     finca_altitud: 1800,
     municipio: 'Subachoque, Cundinamarca',
   });
-  getProfileMunicipio.mockReturnValue('Subachoque, Cundinamarca');
-  saveProfile.mockClear();
+  vi.mocked(getProfileMunicipio).mockReturnValue('Subachoque, Cundinamarca');
+  vi.mocked(saveProfile).mockClear();
   
   // Forzamos reduced-motion=true para navegación sincrónica
   window.matchMedia = vi.fn().mockImplementation((q) => ({
@@ -345,7 +345,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
 
   describe('5. toggle Campesino/Experto cambia nivel_respuestas', () => {
     test('inicia en Campesino (simple) por defecto', () => {
-      getProfile.mockReturnValue({
+      vi.mocked(getProfile).mockReturnValue({
         nivel_respuestas: 'simple',
         municipio: 'Subachoque, Cundinamarca',
         vereda: 'Vereda Test',
@@ -368,7 +368,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
     });
 
     test('si el perfil tiene detallado: inicia en Experto', () => {
-      getProfile.mockReturnValue({
+      vi.mocked(getProfile).mockReturnValue({
         nivel_respuestas: 'detallado',
         municipio: 'Subachoque, Cundinamarca',
         vereda: 'Vereda Test',
@@ -384,7 +384,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
     });
 
     test('cambiar a Experto: persiste nivel_respuestas=detallado', async () => {
-      getProfile.mockReturnValue({
+      vi.mocked(getProfile).mockReturnValue({
         nivel_respuestas: 'simple',
         municipio: 'Subachoque, Cundinamarca',
         vereda: 'Vereda Test',
@@ -409,7 +409,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
     });
 
     test('cambiar a Campesino: persiste nivel_respuestas=simple', async () => {
-      getProfile.mockReturnValue({
+      vi.mocked(getProfile).mockReturnValue({
         nivel_respuestas: 'detallado',
         municipio: 'Subachoque, Cundinamarca',
         vereda: 'Vereda Test',
@@ -434,7 +434,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
     });
 
     test('el saludo cambia al hacer click en el toggle (simple -> detallado)', async () => {
-      getProfile.mockReturnValue({
+      vi.mocked(getProfile).mockReturnValue({
         nivel_respuestas: 'simple',
         municipio: 'Subachoque, Cundinamarca',
         vereda: 'Vereda Test',
@@ -461,7 +461,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
 
     test('el subtítulo es contextual cuando hay cultivos, genérico cuando no hay', () => {
       // CON cultivos: se muestra sugerencia contextual
-      getProfile.mockReturnValue({
+      vi.mocked(getProfile).mockReturnValue({
         nivel_respuestas: 'simple',
         municipio: 'Subachoque, Cundinamarca',
         vereda: 'Vereda Test',
@@ -479,7 +479,7 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
     });
 
     test('click al mismo nivel NO llama saveProfile (no-op)', async () => {
-      getProfile.mockReturnValue({
+      vi.mocked(getProfile).mockReturnValue({
         nivel_respuestas: 'simple',
         municipio: 'Subachoque, Cundinamarca',
         vereda: 'Vereda Test',
@@ -575,13 +575,13 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
   describe('integración completa: flujo de usuario real', () => {
     test('usuario entra, ve ubicación, cambia a Experto, pregunta por cultivo, navega', async () => {
       // Setup: usuario con perfil completo
-      getProfile.mockReturnValue({
+      vi.mocked(getProfile).mockReturnValue({
         nivel_respuestas: 'simple',
         municipio: 'Subachoque, Cundinamarca',
         vereda: 'Vereda La Esperanza',
         finca_altitud: 1800,
       });
-      getProfileMunicipio.mockReturnValue('Subachoque, Cundinamarca');
+      vi.mocked(getProfileMunicipio).mockReturnValue('Subachoque, Cundinamarca');
       
       const onNavigate = vi.fn();
       const { container } = render(<AgentHero onNavigate={onNavigate} />);

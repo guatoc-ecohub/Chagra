@@ -32,14 +32,8 @@
  *   - "Pennisetum clandestinum" (kikuyo) → sinonimia: el nombre aceptado hoy
  *     es Cenchrus clandestinus → se corrigió el campo `cientifico`.
  */
-// @types/node no está instalado en el repo (gap conocido, ver
-// RestauracionScreen.test.jsx / dataJsonValidity.test.js): tsc no resuelve
-// los specifiers "node:*". Runtime (vitest/node) sí los resuelve.
-// @ts-expect-error TS2591 — ver comentario arriba.
 import fs from 'node:fs';
-// @ts-expect-error TS2591 — ver comentario arriba.
 import path from 'node:path';
-// @ts-expect-error TS2591 — ver comentario arriba.
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import ESPECIES_DATA from '../../data/restauracion-especies.json';

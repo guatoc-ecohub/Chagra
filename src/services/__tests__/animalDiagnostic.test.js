@@ -1,12 +1,6 @@
 import { describe, it, expect } from 'vitest';
-// @types/node no está instalado en el repo (gap conocido, ya tolerado en
-// citricosFinca.test.js / RestauracionScreen.test.jsx): tsc no resuelve los
-// specifiers "node:*". Runtime (vitest/node) sí los resuelve.
-// @ts-expect-error TS2591 — ver comentario arriba.
 import { readFileSync } from 'node:fs';
-// @ts-expect-error TS2591 — ver comentario arriba.
 import { fileURLToPath } from 'node:url';
-// @ts-expect-error TS2591 — ver comentario arriba.
 import path from 'node:path';
 import { detectarEspecie, recomendarForraje, recomendarAlimentosPecuarios, getGuardas, diagnosticarAnimal, formatearGroundingAnimal } from '../animalDiagnostic';
 import ANIMAL_DATA from '../../data/animal-diagnostics.json';

@@ -79,6 +79,7 @@ function prefillAgent(prompt) {
     } catch { /* privacy mode — el agente abre vacío, no rompe */ }
 }
 
+/** @param {{ onBack?: () => void, onHome?: () => void, onNavigate?: (view: string, params?: object) => void }} props */
 export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
     const activeAlerts = useAlertStore((s) => s.activeAlerts);
 

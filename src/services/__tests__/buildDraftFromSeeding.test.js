@@ -50,7 +50,7 @@ const makeSeedingPayload = (overrides = {}) => ({
 describe('buildDraftFromSeeding', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    getAllSpecies.mockResolvedValue(mockCatalog);
+    vi.mocked(getAllSpecies).mockResolvedValue(mockCatalog);
   });
 
   it('retorna null si el payload no es log--seeding', async () => {
@@ -148,7 +148,7 @@ describe('buildDraftFromSeeding', () => {
   });
 
   it('tolera fallo del catalogo sin propagar error', async () => {
-    getAllSpecies.mockRejectedValue(new Error('DB error'));
+    vi.mocked(getAllSpecies).mockRejectedValue(new Error('DB error'));
     const payload = makeSeedingPayload({
       attributes: { name: 'Siembra de café - N/A', timestamp: '2026-06-10T00:00:00+00:00', status: 'done' },
     });

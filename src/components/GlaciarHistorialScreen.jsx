@@ -45,6 +45,7 @@ const ESTADO_EMOJI = {
 /**
  * GlaciarHistorialScreen — pantalla principal del historial.
  */
+/** @param {{ onBack: () => void, onHome?: () => void }} props */
 export default function GlaciarHistorialScreen({ onBack, onHome }) {
   const [reportes, setReportes] = useState([]);
   const [loading, setLoading] = useState(true);

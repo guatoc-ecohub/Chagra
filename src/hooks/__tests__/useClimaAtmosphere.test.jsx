@@ -24,7 +24,7 @@ describe('useClimaAtmosphere', () => {
 
   it('no falla con atmosfera deshabilitada', async () => {
     const { isAtmosphereEnabled } = await import('../../services/atmosphereService.js');
-    isAtmosphereEnabled.mockReturnValueOnce(false);
+    vi.mocked(isAtmosphereEnabled).mockReturnValueOnce(false);
     const { result } = renderHook(() => useClimaAtmosphere());
     expect(result).toBeDefined();
   });

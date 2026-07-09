@@ -36,7 +36,7 @@ import * as sidecarClient from '../sidecarClient.js';
 import * as ollamaStream from '../ollamaStream.js';
 
 function mockVisionResponse(json) {
-  ollamaStream.streamOllama.mockResolvedValueOnce(JSON.stringify(json));
+  vi.mocked(ollamaStream.streamOllama).mockResolvedValueOnce(JSON.stringify(json));
 }
 
 describe('recognizeSpeciesGrounded', () => {
@@ -45,7 +45,7 @@ describe('recognizeSpeciesGrounded', () => {
     // V-11 (#231): recognizeSpecies cachea por hash; los tests reusan los
     // mismos bytes de blob → limpiar para que cada caso pegue al mock.
     clearCache();
-    sidecarClient.isSidecarEnabled.mockReturnValue(true);
+    vi.mocked(sidecarClient.isSidecarEnabled).mockReturnValue(true);
     // Browser online por default.
     Object.defineProperty(globalThis, 'navigator', {
       value: { onLine: true },
@@ -64,7 +64,7 @@ describe('recognizeSpeciesGrounded', () => {
       confidence: 0.92,
       alternatives: [],
     });
-    sidecarClient.callTool.mockResolvedValueOnce({
+    vi.mocked(sidecarClient.callTool).mockResolvedValueOnce({
       available: true,
       results: [
         {
@@ -105,7 +105,7 @@ describe('recognizeSpeciesGrounded', () => {
       confidence: 0.78,
       alternatives: [],
     });
-    sidecarClient.callTool.mockResolvedValueOnce({
+    vi.mocked(sidecarClient.callTool).mockResolvedValueOnce({
       available: true,
       results: [
         {
@@ -129,7 +129,7 @@ describe('recognizeSpeciesGrounded', () => {
   });
 
   it('status:sidecar-disabled si el sidecar está apagado vía feature flag', async () => {
-    sidecarClient.isSidecarEnabled.mockReturnValue(false);
+    vi.mocked(sidecarClient.isSidecarEnabled).mockReturnValue(false);
     mockVisionResponse({
       common_name_es: 'tomate',
       scientific_name: 'Solanum lycopersicum',
@@ -194,7 +194,7 @@ describe('recognizeSpeciesGrounded', () => {
         { scientific_name: 'Coffea liberica', confidence: 0.15 },
       ],
     });
-    sidecarClient.callTool.mockResolvedValueOnce({
+    vi.mocked(sidecarClient.callTool).mockResolvedValueOnce({
       available: true,
       results: [
         { species_id: 'coffea_arabica', valid: true, confidence_adjusted: 0.6 },
@@ -227,7 +227,7 @@ describe('recognizeSpeciesGrounded', () => {
       confidence: 0.86,
       alternatives: [],
     });
-    sidecarClient.callTool.mockResolvedValueOnce({
+    vi.mocked(sidecarClient.callTool).mockResolvedValueOnce({
       available: true,
       results: [
         {
@@ -258,7 +258,7 @@ describe('recognizeSpeciesGrounded', () => {
       confidence: 0.91,
       alternatives: [],
     });
-    sidecarClient.callTool.mockResolvedValueOnce({
+    vi.mocked(sidecarClient.callTool).mockResolvedValueOnce({
       available: true,
       results: [
         {
@@ -289,7 +289,7 @@ describe('recognizeSpeciesGrounded', () => {
       confidence: 0.93,
       alternatives: [],
     });
-    sidecarClient.callTool.mockResolvedValueOnce({
+    vi.mocked(sidecarClient.callTool).mockResolvedValueOnce({
       available: true,
       results: [
         { species_id: 'coffea_arabica', valid: true, confidence_adjusted: 0.93 },
@@ -310,7 +310,7 @@ describe('recognizeSpeciesGrounded', () => {
       confidence: 0.95,
       alternatives: [],
     });
-    sidecarClient.callTool.mockResolvedValueOnce(null);
+    vi.mocked(sidecarClient.callTool).mockResolvedValueOnce(null);
 
     const blob = new Blob(['fake'], { type: 'image/jpeg' });
     const result = await recognizeSpeciesGrounded(blob);
@@ -330,7 +330,7 @@ describe('recognizeSpeciesGrounded', () => {
         confidence: 0.88,
         alternatives: [],
       });
-      sidecarClient.callTool.mockResolvedValueOnce({
+      vi.mocked(sidecarClient.callTool).mockResolvedValueOnce({
         available: true,
         results: [{ species_id: 'coffea_arabica', valid: true, confidence_adjusted: 0.88 }],
       });
@@ -339,7 +339,7 @@ describe('recognizeSpeciesGrounded', () => {
       await recognizeSpeciesGrounded(blob);
 
       // El 4to argumento de streamOllama es options. meta debe ser función.
-      const [, , , opts] = ollamaStream.streamOllama.mock.calls[0];
+      const [, , , opts] = vi.mocked(ollamaStream.streamOllama).mock.calls[0];
       expect(typeof opts.meta).toBe('function');
 
       // Resolver el thunk DESPUÉS del flujo completo: debe contener
@@ -357,7 +357,7 @@ describe('recognizeSpeciesGrounded', () => {
         confidence: 0.7,
         alternatives: [],
       });
-      sidecarClient.callTool.mockResolvedValueOnce({
+      vi.mocked(sidecarClient.callTool).mockResolvedValueOnce({
         available: true,
         results: [{ species_id: 'mangosteenia_colombiana', valid: false, confidence_adjusted: 0, reason: 'not_in_catalog' }],
       });
@@ -365,7 +365,7 @@ describe('recognizeSpeciesGrounded', () => {
       const blob = new Blob(['fake'], { type: 'image/jpeg' });
       await recognizeSpeciesGrounded(blob);
 
-      const [, , , opts] = ollamaStream.streamOllama.mock.calls[0];
+      const [, , , opts] = vi.mocked(ollamaStream.streamOllama).mock.calls[0];
       const resolved = opts.meta();
       expect(resolved.confidence).toBeCloseTo(0.7);
       expect(resolved.grounded_status).toBe('rejected');
@@ -378,7 +378,7 @@ describe('recognizeSpeciesGrounded', () => {
         confidence: 0.81,
         alternatives: [],
       });
-      sidecarClient.callTool.mockResolvedValueOnce({
+      vi.mocked(sidecarClient.callTool).mockResolvedValueOnce({
         available: true,
         results: [{ species_id: 'solanum_tuberosum', valid: true, confidence_adjusted: 0.81 }],
       });
@@ -386,7 +386,7 @@ describe('recognizeSpeciesGrounded', () => {
       const blob = new Blob(['fake'], { type: 'image/jpeg' });
       await recognizeSpeciesGrounded(blob);
 
-      const [, , , opts] = ollamaStream.streamOllama.mock.calls[0];
+      const [, , , opts] = vi.mocked(ollamaStream.streamOllama).mock.calls[0];
       const resolved = opts.meta();
       expect(resolved.confidence).toBeCloseTo(0.81);
       expect(resolved.grounded_status).toBe('partial-match');
@@ -397,7 +397,7 @@ describe('recognizeSpeciesGrounded', () => {
       // cualquier early-return en la telemetría (incluido degraded). El
       // test legacy esperaba null porque asumía que finalize no escribía
       // en degraded paths — pero sí lo hace desde V-05.
-      sidecarClient.isSidecarEnabled.mockReturnValue(false);
+      vi.mocked(sidecarClient.isSidecarEnabled).mockReturnValue(false);
       mockVisionResponse({
         common_name_es: 'tomate',
         scientific_name: 'Solanum lycopersicum',
@@ -408,7 +408,7 @@ describe('recognizeSpeciesGrounded', () => {
       const blob = new Blob(['fake'], { type: 'image/jpeg' });
       await recognizeSpeciesGrounded(blob);
 
-      const [, , , opts] = ollamaStream.streamOllama.mock.calls[0];
+      const [, , , opts] = vi.mocked(ollamaStream.streamOllama).mock.calls[0];
       const resolved = opts.meta();
       expect(resolved.confidence).toBeCloseTo(0.6);
       expect(resolved.grounded_status).toBe('sidecar-disabled');

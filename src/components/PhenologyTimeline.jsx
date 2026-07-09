@@ -54,6 +54,7 @@ const confidenceColor = (c) => {
  *   - observedStages: Array<{code, observed_at, confidence}> (opcional)
  *   - compact: boolean (default false), modo resumen para tarjeta pequeña
  */
+/** @param {{ speciesSlug: string, sowingDate: number, altitudeM?: number, phenologyTemplate?: object, category?: string, observedStages?: any[], compact?: boolean }} props */
 export default function PhenologyTimeline({
   speciesSlug,
   sowingDate,

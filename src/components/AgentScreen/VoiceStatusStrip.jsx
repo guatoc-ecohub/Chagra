@@ -81,6 +81,7 @@ function ThinkingDots() {
   );
 }
 
+/** @param {{ phase?: string, canRepeat?: boolean, notice?: string, onRepeat?: () => void, onStopSpeaking?: () => void, onDismissNotice?: () => void }} props */
 export default function VoiceStatusStrip({
   phase = 'idle',
   canRepeat = false,

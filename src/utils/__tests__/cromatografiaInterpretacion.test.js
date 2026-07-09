@@ -23,8 +23,12 @@ import {
   obtenerRecomendaciones,
 } from '../cromatografiaInterpretacion';
 
+/** @typedef {import('../cromatografiaInterpretacion').ObservacionZona} ObservacionZona */
+/** @typedef {import('../cromatografiaInterpretacion').InterpretacionCromatografia} InterpretacionCromatografia */
+
 describe('interpretarCromatografia', () => {
   it('debería diagnosticar suelo vivo con patrones claros', () => {
+    /** @type {ObservacionZona[]} */
     const observaciones = [
       { zona: 'central', colores: ['blanco'], descripcion: 'Centro claro' },
       { zona: 'media', colores: ['marron_oscuro'], descripcion: 'Humus estable' },
@@ -43,6 +47,7 @@ describe('interpretarCromatografia', () => {
   });
 
   it('debería diagnosticar suelo degradado con zonas grises', () => {
+    /** @type {ObservacionZona[]} */
     const observaciones = [
       { zona: 'central', colores: ['gris'], descripcion: 'Centro oscuro' },
       { zona: 'media', colores: ['gris'], descripcion: 'Materia orgánica degradada' },
@@ -58,6 +63,7 @@ describe('interpretarCromatografia', () => {
   });
 
   it('debería diagnosticar suelo químicalizado con anillos blancos', () => {
+    /** @type {ObservacionZona[]} */
     const observaciones = [
       { zona: 'central', colores: ['blanco'], descripcion: 'Anillos blancos' },
       { zona: 'media', colores: ['blanco', 'gris'], descripcion: 'Sales acumuladas' },
@@ -73,6 +79,7 @@ describe('interpretarCromatografia', () => {
   });
 
   it('debería retornar incertidumbre_alta con observaciones ambiguas', () => {
+    /** @type {ObservacionZona[]} */
     const observaciones = [
       { zona: 'central', colores: ['blanco'], descripcion: 'Centro' },
       { zona: 'media', colores: ['blanco'], descripcion: 'Media' },
@@ -86,6 +93,7 @@ describe('interpretarCromatografia', () => {
   });
 
   it('debería rechazar observaciones inválidas', () => {
+    /** @type {ObservacionZona[]} */
     const observaciones = [
       { zona: 'zonainvalida', colores: ['marron_oscuro'] },
     ];
@@ -98,6 +106,7 @@ describe('interpretarCromatografia', () => {
   });
 
   it('debería rechazar colores inválidos', () => {
+    /** @type {ObservacionZona[]} */
     const observaciones = [
       { zona: 'central', colores: ['colorinvalido'] },
     ];
@@ -110,7 +119,7 @@ describe('interpretarCromatografia', () => {
   });
 
   it('debería rechazar entradas no-arreglo', () => {
-    const resultado = interpretarCromatografia('no es un arreglo');
+    const resultado = interpretarCromatografia(/** @type {any} */ ('no es un arreglo'));
 
     expect(resultado.estado).toBe('incertidumbre_alta');
     expect(resultado.mensaje).toContain('deben ser un arreglo');
@@ -293,6 +302,7 @@ describe('crearObservacionDesdeRaw', () => {
 
 describe('esSueloVivo', () => {
   it('debería retornar true para suelo vivo con confianza >= 0.5', () => {
+    /** @type {Partial<InterpretacionCromatografia>} */
     const interpretacion = {
       estado: 'vivo',
       confianza: 0.8,
@@ -302,6 +312,7 @@ describe('esSueloVivo', () => {
   });
 
   it('debería retornar false para suelo vivo con baja confianza', () => {
+    /** @type {Partial<InterpretacionCromatografia>} */
     const interpretacion = {
       estado: 'vivo',
       confianza: 0.4,
@@ -324,6 +335,7 @@ describe('esSueloVivo', () => {
 
 describe('esSueloDegradado', () => {
   it('debería retornar true para suelo degradado con confianza >= 0.5', () => {
+    /** @type {Partial<InterpretacionCromatografia>} */
     const interpretacion = {
       estado: 'degradado',
       confianza: 0.7,
@@ -333,6 +345,7 @@ describe('esSueloDegradado', () => {
   });
 
   it('debería retornar false para suelo degradado con baja confianza', () => {
+    /** @type {Partial<InterpretacionCromatografia>} */
     const interpretacion = {
       estado: 'degradado',
       confianza: 0.3,
@@ -349,6 +362,7 @@ describe('esSueloDegradado', () => {
 
 describe('esSueloQuimicalizado', () => {
   it('debería retornar true para suelo químicalizado con confianza >= 0.5', () => {
+    /** @type {Partial<InterpretacionCromatografia>} */
     const interpretacion = {
       estado: 'quimicalizado',
       confianza: 0.6,
@@ -358,6 +372,7 @@ describe('esSueloQuimicalizado', () => {
   });
 
   it('debería retornar false para suelo químicalizado con baja confianza', () => {
+    /** @type {Partial<InterpretacionCromatografia>} */
     const interpretacion = {
       estado: 'quimicalizado',
       confianza: 0.4,
@@ -408,6 +423,7 @@ describe('obtenerRecomendaciones', () => {
 
 describe('casos integrados realistas', () => {
   it('debería interpretar cromatograma completo de suelo regenerado', () => {
+    /** @type {ObservacionZona[]} */
     const observaciones = [
       { zona: 'central', colores: ['blanco'], descripcion: 'Centro claro, sales disponibles' },
       { zona: 'media', colores: ['marron_oscuro'], descripcion: 'Anillo marrón bien definido' },
@@ -423,6 +439,7 @@ describe('casos integrados realistas', () => {
   });
 
   it('debería interpretar cromatograma de suelo convencional agotado', () => {
+    /** @type {ObservacionZona[]} */
     const observaciones = [
       { zona: 'central', colores: ['gris'], descripcion: 'Centro oscuro' },
       { zona: 'media', colores: ['gris'], descripcion: 'Zona gris difusa' },
@@ -436,6 +453,7 @@ describe('casos integrados realistas', () => {
   });
 
   it('debería interpretar cromatograma de suelo con exceso de químicos', () => {
+    /** @type {ObservacionZona[]} */
     const observaciones = [
       { zona: 'central', colores: ['blanco'], descripcion: 'Anillos blancos marcados' },
       { zona: 'media', colores: ['blanco', 'gris'], descripcion: 'Sales y degradación' },
@@ -450,6 +468,7 @@ describe('casos integrados realistas', () => {
   });
 
   it('debería manejar observaciones mínimas con baja confianza', () => {
+    /** @type {ObservacionZona[]} */
     const observaciones = [
       { zona: 'central', colores: ['blanco'] },
       { zona: 'media', colores: ['marron_oscuro'] },

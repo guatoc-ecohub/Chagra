@@ -106,7 +106,7 @@ function installFetchMock() {
 
 beforeEach(() => {
   _resetGuildCache();
-  retrieve.mockReset();
+  vi.mocked(retrieve).mockReset();
   installFetchMock();
 });
 
@@ -149,7 +149,7 @@ describe('parseCompanionsMarkdown', () => {
 
 describe('suggestGuildsFor (RAG-based)', () => {
   it('devuelve forma { companions, antagonists, strata } con datos del corpus', async () => {
-    retrieve.mockResolvedValueOnce([
+    vi.mocked(retrieve).mockResolvedValueOnce([
       { species: 'coffea_arabica', score: 5, text: 'café' },
       { species: 'alnus_acuminata', score: 2, text: 'aliso' },
     ]);
@@ -169,7 +169,7 @@ describe('suggestGuildsFor (RAG-based)', () => {
   });
 
   it('cada companion trae slug + name + reason', async () => {
-    retrieve.mockResolvedValueOnce([{ species: 'coffea_arabica', score: 5, text: 't' }]);
+    vi.mocked(retrieve).mockResolvedValueOnce([{ species: 'coffea_arabica', score: 5, text: 't' }]);
     const result = await suggestGuildsFor('coffea_arabica');
     for (const c of result.companions) {
       expect(c.slug).toBeTruthy();
@@ -179,7 +179,7 @@ describe('suggestGuildsFor (RAG-based)', () => {
   });
 
   it('strata incluye al target y a los candidatos (cuando hay roles inferibles)', async () => {
-    retrieve.mockResolvedValueOnce([
+    vi.mocked(retrieve).mockResolvedValueOnce([
       { species: 'coffea_arabica', score: 5, text: 't' },
       { species: 'alnus_acuminata', score: 2, text: 'a' },
     ]);
@@ -190,7 +190,7 @@ describe('suggestGuildsFor (RAG-based)', () => {
   });
 
   it('dedup: un mismo companion no aparece dos veces aunque venga en hits y markdown', async () => {
-    retrieve.mockResolvedValueOnce([
+    vi.mocked(retrieve).mockResolvedValueOnce([
       { species: 'coffea_arabica', score: 5, text: 't' },
       { species: 'alnus_acuminata', score: 3, text: 'a' },
       { species: 'alnus_acuminata', score: 2, text: 'b' },
@@ -209,7 +209,7 @@ describe('suggestGuildsFor (RAG-based)', () => {
   });
 
   it('si retrieve falla, hace fallback al curado en lugar de tirar la UI', async () => {
-    retrieve.mockRejectedValueOnce(new Error('corpus offline'));
+    vi.mocked(retrieve).mockRejectedValueOnce(new Error('corpus offline'));
     // coffea_arabica está en speciesDefaults (capa 1: zea_mays, phaseolus_vulgaris, psidium_guajava)
     // No tendremos cycle-content tampoco (fetch sintético solo aplica si invocan).
     globalThis.fetch = vi.fn(async () => new Response(null, { status: 404 }));
@@ -219,7 +219,7 @@ describe('suggestGuildsFor (RAG-based)', () => {
   });
 
   it('si el corpus no cubre la species ni hay defaults, devuelve listas vacías (no truena)', async () => {
-    retrieve.mockResolvedValueOnce([]);
+    vi.mocked(retrieve).mockResolvedValueOnce([]);
     const result = await suggestGuildsFor('especie_inexistente_xyz');
     expect(result.companions).toEqual([]);
     expect(result.antagonists).toEqual([]);
@@ -229,7 +229,7 @@ describe('suggestGuildsFor (RAG-based)', () => {
 describe('suggestPolyculture (cross-reference)', () => {
   it('sugiere companions cruzados de un set: milpa zea+frijol+calabaza', async () => {
     // Cada llamada interna a suggestGuildsFor hace su propio retrieve.
-    retrieve
+    vi.mocked(retrieve)
       .mockResolvedValueOnce([{ species: 'zea_mays', score: 5, text: 't' }])
       .mockResolvedValueOnce([{ species: 'phaseolus_vulgaris', score: 5, text: 't' }])
       .mockResolvedValueOnce([{ species: 'cucurbita_maxima', score: 5, text: 't' }]);
@@ -241,7 +241,7 @@ describe('suggestPolyculture (cross-reference)', () => {
   });
 
   it('excluye las species ya plantadas', async () => {
-    retrieve
+    vi.mocked(retrieve)
       .mockResolvedValueOnce([{ species: 'zea_mays', score: 5, text: 't' }])
       .mockResolvedValueOnce([{ species: 'phaseolus_vulgaris', score: 5, text: 't' }]);
     const result = await suggestPolyculture(['zea_mays', 'phaseolus_vulgaris']);
@@ -253,7 +253,7 @@ describe('suggestPolyculture (cross-reference)', () => {
   });
 
   it('species sugerida por múltiples cultivos pesa más (votes > 1)', async () => {
-    retrieve
+    vi.mocked(retrieve)
       .mockResolvedValueOnce([{ species: 'zea_mays', score: 5, text: 't' }])
       .mockResolvedValueOnce([{ species: 'phaseolus_vulgaris', score: 5, text: 't' }]);
     const result = await suggestPolyculture(['zea_mays', 'phaseolus_vulgaris']);
@@ -279,7 +279,7 @@ describe('suggestPolyculture (cross-reference)', () => {
       roles_in_guild: ['herb'],
     };
 
-    retrieve
+    vi.mocked(retrieve)
       .mockResolvedValueOnce([{ species: 'phaseolus_vulgaris', score: 5, text: 't' }])
       .mockResolvedValueOnce([{ species: 'solanum_lycopersicum', score: 5, text: 't' }]);
 
@@ -307,7 +307,7 @@ describe('suggestPolyculture (cross-reference)', () => {
       antagonists: [],
       roles_in_guild: ['crop'],
     };
-    retrieve.mockResolvedValueOnce([{ species: 'test_big', score: 5, text: 't' }]);
+    vi.mocked(retrieve).mockResolvedValueOnce([{ species: 'test_big', score: 5, text: 't' }]);
 
     const result = await suggestPolyculture(['test_big']);
     expect(result.companions.length).toBeLessThanOrEqual(8);

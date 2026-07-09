@@ -16,6 +16,7 @@ import { listAvailableRegions } from '../services/regionalismsService';
  *
  * Anti-apropiación: región amazónica muestra banner de respeto a saberes propios.
  */
+/** @param {{ onNavigateToDemo?: () => void }} props */
 export default function HelpRegionSelector({ onNavigateToDemo }) {
   const [open, setOpen] = useState(false);
   const voiceRegion = usePrefsStore((s) => s.voiceRegion);

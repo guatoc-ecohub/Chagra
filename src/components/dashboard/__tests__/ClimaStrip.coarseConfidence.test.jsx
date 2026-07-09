@@ -50,27 +50,27 @@ vi.mock('../../../services/userProfileService', () => {
 import { getProfile, getProfileMunicipio } from '../../../services/userProfileService';
 
 beforeEach(() => {
-    fetchClimaSnapshot.mockReset();
-    fetchClimaSnapshot.mockResolvedValue(null);
-    findMunicipio.mockReset();
-    findMunicipio.mockReturnValue(null);
-    getProfile.mockReset();
-    getProfile.mockReturnValue({});
-    getProfileMunicipio.mockReset();
-    getProfileMunicipio.mockImplementation(() => getProfile()?.municipio ?? null);
+    vi.mocked(fetchClimaSnapshot).mockReset();
+    vi.mocked(fetchClimaSnapshot).mockResolvedValue(null);
+    vi.mocked(findMunicipio).mockReset();
+    vi.mocked(findMunicipio).mockReturnValue(null);
+    vi.mocked(getProfile).mockReset();
+    vi.mocked(getProfile).mockReturnValue({});
+    vi.mocked(getProfileMunicipio).mockReset();
+    vi.mocked(getProfileMunicipio).mockImplementation(() => getProfile()?.municipio ?? null);
 });
 
 describe('ClimaStrip — degradación de confianza con ubicación guardada gruesa', () => {
     test('ubicación guardada GRUESA → muestra aviso "Confirme su ubicación" (no afirma el municipio)', async () => {
         // Perfil del operador: coords + municipio guardados, PERO la lectura fue
         // gruesa (accuracy 12 km, Brave) y nunca corrigió la altitud a mano.
-        getProfile.mockReturnValue({
+        vi.mocked(getProfile).mockReturnValue({
             municipio: 'Bogotá',
             ubicacion_lat: 4.61,
             ubicacion_lng: -74.08,
             ubicacion_accuracy: 12000,
         });
-        getProfileMunicipio.mockReturnValue('Bogotá');
+        vi.mocked(getProfileMunicipio).mockReturnValue('Bogotá');
         render(<ClimaStrip onNavigate={vi.fn()} />);
 
         const warning = await screen.findByTestId('clima-coarse-warning');
@@ -78,13 +78,13 @@ describe('ClimaStrip — degradación de confianza con ubicación guardada grues
     });
 
     test('aviso gruesa → CTA navega a ubicacion-detectada (mini-mapa)', async () => {
-        getProfile.mockReturnValue({
+        vi.mocked(getProfile).mockReturnValue({
             municipio: 'Bogotá',
             ubicacion_lat: 4.61,
             ubicacion_lng: -74.08,
             ubicacion_accuracy: 12000,
         });
-        getProfileMunicipio.mockReturnValue('Bogotá');
+        vi.mocked(getProfileMunicipio).mockReturnValue('Bogotá');
         const onNavigate = vi.fn();
         render(<ClimaStrip onNavigate={onNavigate} />);
 
@@ -94,13 +94,13 @@ describe('ClimaStrip — degradación de confianza con ubicación guardada grues
     });
 
     test('ubicación PRECISA (accuracy fino) → NO muestra el aviso de confianza', async () => {
-        getProfile.mockReturnValue({
+        vi.mocked(getProfile).mockReturnValue({
             municipio: 'Choachí',
             ubicacion_lat: 4.53,
             ubicacion_lng: -73.92,
             ubicacion_accuracy: 35,
         });
-        getProfileMunicipio.mockReturnValue('Choachí');
+        vi.mocked(getProfileMunicipio).mockReturnValue('Choachí');
         render(<ClimaStrip onNavigate={vi.fn()} />);
 
         await screen.findByText(/Clima en/i);
@@ -108,14 +108,14 @@ describe('ClimaStrip — degradación de confianza con ubicación guardada grues
     });
 
     test('ubicación gruesa pero altitud confirmada a mano → NO molesta', async () => {
-        getProfile.mockReturnValue({
+        vi.mocked(getProfile).mockReturnValue({
             municipio: 'Choachí',
             ubicacion_lat: 4.53,
             ubicacion_lng: -73.92,
             ubicacion_accuracy: 12000,
             altitud_source: 'manual',
         });
-        getProfileMunicipio.mockReturnValue('Choachí');
+        vi.mocked(getProfileMunicipio).mockReturnValue('Choachí');
         render(<ClimaStrip onNavigate={vi.fn()} />);
 
         await screen.findByText(/Clima en/i);
@@ -125,13 +125,13 @@ describe('ClimaStrip — degradación de confianza con ubicación guardada grues
 
 describe('ClimaStrip — re-fijar ubicación siempre alcanzable (re-pin)', () => {
     test('con municipio, hay un botón prominente para corregir la ubicación → ubicacion-detectada', async () => {
-        getProfile.mockReturnValue({
+        vi.mocked(getProfile).mockReturnValue({
             municipio: 'Choachí',
             ubicacion_lat: 4.53,
             ubicacion_lng: -73.92,
             ubicacion_accuracy: 35,
         });
-        getProfileMunicipio.mockReturnValue('Choachí');
+        vi.mocked(getProfileMunicipio).mockReturnValue('Choachí');
         const onNavigate = vi.fn();
         render(<ClimaStrip onNavigate={onNavigate} />);
 
@@ -141,13 +141,13 @@ describe('ClimaStrip — re-fijar ubicación siempre alcanzable (re-pin)', () =>
     });
 
     test('sin onNavigate, el re-pin despacha el evento global chagra:nav', async () => {
-        getProfile.mockReturnValue({
+        vi.mocked(getProfile).mockReturnValue({
             municipio: 'Choachí',
             ubicacion_lat: 4.53,
             ubicacion_lng: -73.92,
             ubicacion_accuracy: 35,
         });
-        getProfileMunicipio.mockReturnValue('Choachí');
+        vi.mocked(getProfileMunicipio).mockReturnValue('Choachí');
         const eventSpy = vi.fn();
         window.addEventListener('chagra:nav', eventSpy);
         render(<ClimaStrip />);

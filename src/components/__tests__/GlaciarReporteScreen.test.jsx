@@ -24,6 +24,7 @@ vi.mock('../../hooks/useGeolocation', () => ({
 vi.mock('../PhotoCaptureField', () => ({ default: () => null }));
 
 // Mock del store IDB (no tocamos IndexedDB en el test de UI).
+/** @type {import('vitest').Mock} */
 const saveMock = vi.fn(() => Promise.resolve({ id: 'glaciar-test' }));
 vi.mock('../../db/glaciarReportes', () => ({
   glaciarReportes: {
@@ -39,8 +40,11 @@ vi.mock('../../db/glaciarReportes', () => ({
 // loadDraft puede sembrar un borrador (simula descarte de pestaña por iOS) y
 // saveDraft/clearDraft se espían.
 let draftToLoad = null; // lo que loadDraft() devuelve al montar
+/** @type {import('vitest').Mock} */
 const saveDraftMock = vi.fn(() => Promise.resolve(true));
+/** @type {import('vitest').Mock} */
 const loadDraftMock = vi.fn(() => Promise.resolve(draftToLoad));
+/** @type {import('vitest').Mock} */
 const clearDraftMock = vi.fn(() => Promise.resolve());
 vi.mock('../../db/glaciarDraft', () => ({
   saveDraft: (...a) => saveDraftMock(...a),
@@ -53,6 +57,7 @@ vi.mock('../../utils/imageProcessor', () => ({
 }));
 
 // U-1: mock del helper de almacenamiento persistente (no tocamos navigator).
+/** @type {import('vitest').Mock} */
 const requestPersistentStorageMock = vi.fn(() => Promise.resolve(true));
 vi.mock('../../utils/persistStorage', () => ({
   requestPersistentStorage: (...a) => requestPersistentStorageMock(...a),
@@ -129,7 +134,7 @@ describe('GlaciarReporteScreen — guardado', () => {
     render(<GlaciarReporteScreen onBack={() => {}} />);
 
     // Montaña (requisito nuevo).
-    const selects = screen.getAllByRole('combobox');
+    const selects = /** @type {HTMLSelectElement[]} */ (screen.getAllByRole('combobox'));
     fireEvent.change(selects[0], { target: { value: 'ruiz' } });
 
     // Capturar GPS.
@@ -159,7 +164,7 @@ describe('GlaciarReporteScreen — guardado', () => {
   it('en modo borde guarda como observación sin exigir dureza', async () => {
     render(<GlaciarReporteScreen onBack={() => {}} />);
 
-    const selects = screen.getAllByRole('combobox');
+    const selects = /** @type {HTMLSelectElement[]} */ (screen.getAllByRole('combobox'));
     fireEvent.change(selects[0], { target: { value: 'cocuy_ritacuba' } });
     fireEvent.click(screen.getByText(/Modo borde \(no pisar\)/i));
     fireEvent.click(screen.getByRole('button', { name: /Capturar ubicación/i }));
@@ -199,7 +204,7 @@ describe('GlaciarReporteScreen — U-1 almacenamiento persistente', () => {
     render(<GlaciarReporteScreen onBack={() => {}} />);
     requestPersistentStorageMock.mockClear();
 
-    const selects = screen.getAllByRole('combobox');
+    const selects = /** @type {HTMLSelectElement[]} */ (screen.getAllByRole('combobox'));
     fireEvent.change(selects[0], { target: { value: 'ruiz' } });
     fireEvent.click(screen.getByRole('button', { name: /Capturar ubicación/i }));
     clickSuperficie('Hielo de glaciar (azul)');
@@ -216,7 +221,7 @@ describe('GlaciarReporteScreen — U-1 almacenamiento persistente', () => {
 describe('GlaciarReporteScreen — U-3 autosave del borrador (IndexedDB)', () => {
   it('autosalva el form en IndexedDB al digitar (montaña/superficie)', async () => {
     render(<GlaciarReporteScreen onBack={() => {}} />);
-    const selects = screen.getAllByRole('combobox');
+    const selects = /** @type {HTMLSelectElement[]} */ (screen.getAllByRole('combobox'));
     fireEvent.change(selects[0], { target: { value: 'ruiz' } });
     clickSuperficie('Hielo de glaciar (azul)');
 
@@ -242,7 +247,7 @@ describe('GlaciarReporteScreen — U-3 autosave del borrador (IndexedDB)', () =>
 
     // La montaña restaurada debe quedar seleccionada (tras el load async).
     await waitFor(() => {
-      const selects = screen.getAllByRole('combobox');
+      const selects = /** @type {HTMLSelectElement[]} */ (screen.getAllByRole('combobox'));
       expect(selects[0].value).toBe('tolima');
     });
     // El punto fijo restaurado aparece en su input.
@@ -253,7 +258,7 @@ describe('GlaciarReporteScreen — U-3 autosave del borrador (IndexedDB)', () =>
 
   it('limpia el borrador (clearDraft) al guardar el reporte con éxito', async () => {
     render(<GlaciarReporteScreen onBack={() => {}} />);
-    const selects = screen.getAllByRole('combobox');
+    const selects = /** @type {HTMLSelectElement[]} */ (screen.getAllByRole('combobox'));
     fireEvent.change(selects[0], { target: { value: 'ruiz' } });
     fireEvent.click(screen.getByRole('button', { name: /Capturar ubicación/i }));
     clickSuperficie('Hielo de glaciar (azul)');
@@ -277,7 +282,7 @@ describe('GlaciarReporteScreen — U-3 autosave del borrador (IndexedDB)', () =>
     expect(screen.getByText('Punto Glaciar')).toBeTruthy();
     // El form arranca vacío (sin montaña seleccionada).
     await waitFor(() => {
-      const selects = screen.getAllByRole('combobox');
+      const selects = /** @type {HTMLSelectElement[]} */ (screen.getAllByRole('combobox'));
       expect(selects[0].value).toBe('');
     });
   });
@@ -340,7 +345,7 @@ describe('GlaciarReporteScreen — U-6 qué falta para guardar', () => {
     // y el panel recoge las coords ya capturadas (el mock expone position por
     // render). Mismo patrón que los tests de guardado de este archivo.
     fireEvent.click(screen.getByRole('button', { name: /Capturar ubicación/i }));
-    const selects = screen.getAllByRole('combobox');
+    const selects = /** @type {HTMLSelectElement[]} */ (screen.getAllByRole('combobox'));
     fireEvent.change(selects[0], { target: { value: 'ruiz' } });
     await waitFor(() => {
       const panel = getPanel();

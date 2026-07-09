@@ -76,11 +76,11 @@ beforeEach(() => {
   pilotData = new Map();
   setOnline(true);
   vi.clearAllMocks();
-  global.fetch.mockResolvedValue({
+  vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
     ok: true,
     status: 200,
     json: async () => ({ ok: true, ingested: 0, dropped: 0 }),
-  });
+  })));
   fetchWithAuthRetry.mockImplementation((...args) => global.fetch(...args));
 });
 
@@ -109,7 +109,7 @@ describe('usageTelemetrySync — syncUsageTelemetry', () => {
   it('no-op sin consentimiento (default OFF)', async () => {
     vi.unstubAllEnvs();
     const { syncUsageTelemetry } = await import('../usageTelemetrySync.js');
-    getTelemetryConsent.mockReturnValue(false);
+    vi.mocked(getTelemetryConsent).mockReturnValue(false);
     seedEvent();
 
     const result = await syncUsageTelemetry();
@@ -121,7 +121,7 @@ describe('usageTelemetrySync — syncUsageTelemetry', () => {
   it('no-op offline', async () => {
     vi.unstubAllEnvs();
     const { syncUsageTelemetry } = await import('../usageTelemetrySync.js');
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(false);
     seedEvent();
 
@@ -134,7 +134,7 @@ describe('usageTelemetrySync — syncUsageTelemetry', () => {
   it('no-op si no hay eventos pendientes', async () => {
     vi.unstubAllEnvs();
     const { syncUsageTelemetry } = await import('../usageTelemetrySync.js');
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     const result = await syncUsageTelemetry();
@@ -148,7 +148,7 @@ describe('usageTelemetrySync — syncUsageTelemetry', () => {
     vi.stubEnv('VITE_SIDECAR_URL', 'https://chagra.example.co/api');
     vi.stubEnv('VITE_CHAGRA_MCP_TOKEN', 'tok-xyz');
     const { syncUsageTelemetry } = await import('../usageTelemetrySync.js');
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
 
     seedEvent({
@@ -184,7 +184,7 @@ describe('usageTelemetrySync — syncUsageTelemetry', () => {
   it('marca synced: true tras 2xx', async () => {
     vi.unstubAllEnvs();
     const { syncUsageTelemetry } = await import('../usageTelemetrySync.js');
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
     seedEvent({ id: 'pt_sync', synced: false });
 
@@ -198,11 +198,11 @@ describe('usageTelemetrySync — syncUsageTelemetry', () => {
   it('falla silente si el endpoint responde error (no marca synced)', async () => {
     vi.unstubAllEnvs();
     const { syncUsageTelemetry } = await import('../usageTelemetrySync.js');
-    getTelemetryConsent.mockReturnValue(true);
+    vi.mocked(getTelemetryConsent).mockReturnValue(true);
     setOnline(true);
     seedEvent({ id: 'pt_err', synced: false });
 
-    global.fetch.mockResolvedValue({ ok: false, status: 500 });
+    vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({ ok: false, status: 500 })));
 
     const result = await syncUsageTelemetry();
 
@@ -213,7 +213,7 @@ describe('usageTelemetrySync — syncUsageTelemetry', () => {
   it('falla silente si hay excepción (no lanza)', async () => {
     vi.unstubAllEnvs();
     const { syncUsageTelemetry } = await import('../usageTelemetrySync.js');
-    getTelemetryConsent.mockImplementation(() => {
+    vi.mocked(getTelemetryConsent).mockImplementation(() => {
       throw new Error('localStorage error');
     });
 
@@ -238,11 +238,11 @@ describe('usageTelemetrySync — fetchUsageSummary', () => {
       active_sessions: 3,
       named_users_enabled: false,
     };
-    global.fetch.mockResolvedValue({
+    vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
       ok: true,
       status: 200,
       json: async () => summary,
-    });
+    })));
 
     const result = await fetchUsageSummary();
 
@@ -256,7 +256,7 @@ describe('usageTelemetrySync — fetchUsageSummary', () => {
   it('devuelve null si el endpoint responde error', async () => {
     vi.unstubAllEnvs();
     const { fetchUsageSummary } = await import('../usageTelemetrySync.js');
-    global.fetch.mockResolvedValue({ ok: false, status: 503 });
+    vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({ ok: false, status: 503 })));
 
     const result = await fetchUsageSummary();
 
