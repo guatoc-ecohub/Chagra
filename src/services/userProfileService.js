@@ -774,6 +774,56 @@ export function setNotificationStyle(style) {
   return profile;
 }
 
+// ─── Guardián / espíritu de la finca (selector del home vivo) ───────────────
+
+/**
+ * IDs válidos del GUARDIÁN (espíritu de la finca). Cada uno corresponde a una
+ * especie nativa colombiana REAL y verificable — nombre científico grounded en
+ * el catálogo/grafo de Chagra (fauna emblemática, NUNCA inventada). La lista
+ * canónica con nombre común/científico/fuente vive en el componente
+ * `GuardianEspiritu.jsx` (fuente de verdad visual); acá solo validamos el id
+ * persistido para no corromper el perfil.
+ *
+ *   - abeja:   Tetragonisca angustula (abeja angelita) — grounded animal-diagnostics.json
+ *   - oso:     Tremarctos ornatus (oso andino/de anteojos) — grounded cycle-content, psa.json
+ *   - chivito: Oxypogon guerinii (chivito/barbudito de páramo) — grounded puya_clava_herculis.json
+ *   - danta:   Tapirus pinchaque (danta de montaña) — grounded vaccinium_floribundum.json
+ *   - rana:    Phyllobates terribilis (rana dorada) — endémica del Chocó, real y verificable
+ */
+export const GUARDIAN_ESPECIE_IDS = Object.freeze(['abeja', 'oso', 'chivito', 'danta', 'rana']);
+/** Guardián por defecto: la abeja angelita (protagonista del mockup aprobado). */
+export const DEFAULT_GUARDIAN_ESPECIE = 'abeja';
+
+/**
+ * Lee el guardián (espíritu de la finca) elegido por el usuario. Devuelve el id
+ * persistido si es válido; `null` si el usuario aún no ha elegido (para que el
+ * home pueda distinguir "sin elegir" de "eligió el default").
+ *
+ * @returns {'abeja'|'oso'|'chivito'|'danta'|'rana'|null}
+ */
+export function getGuardianEspecie() {
+  const v = getProfile()?.guardian_especie;
+  return GUARDIAN_ESPECIE_IDS.includes(v) ? v : null;
+}
+
+/**
+ * Persiste el guardián elegido en el perfil (`guardian_especie`). Ignora ids
+ * desconocidos para no corromper el perfil. Emite `chagra:guardian-changed` y
+ * `chagra:profile-changed` para que el home/saludo re-lean el espíritu en vivo.
+ *
+ * @param {'abeja'|'oso'|'chivito'|'danta'|'rana'} id
+ * @returns {Object|null} perfil resultante, o null si el id era inválido
+ */
+export function setGuardianEspecie(id) {
+  if (!GUARDIAN_ESPECIE_IDS.includes(id)) return null;
+  const profile = saveProfile({ guardian_especie: id });
+  try {
+    window.dispatchEvent(new CustomEvent('chagra:guardian-changed', { detail: { id } }));
+    window.dispatchEvent(new CustomEvent('chagra:profile-changed', { detail: { guardian_especie: id } }));
+  } catch (_) { /* SSR/tests sin window — la elección ya quedó persistida */ }
+  return profile;
+}
+
 /** Marca el onboarding de perfil como completado. */
 export function markProfileDone() {
   if (!hasStorage()) return;
