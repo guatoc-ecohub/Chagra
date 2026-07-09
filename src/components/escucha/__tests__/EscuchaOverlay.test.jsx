@@ -19,6 +19,12 @@ const stopMock = vi.fn(async () => ({
   mimeType: 'audio/webm',
 }));
 const resetMock = vi.fn();
+const setUserAgent = (ua) => {
+  Object.defineProperty(window.navigator, 'userAgent', {
+    value: ua,
+    configurable: true,
+  });
+};
 
 vi.mock('../../../hooks/useVoiceRecorder', () => ({
   default: () => ({
@@ -53,6 +59,7 @@ const abrirWidget = async (fuente = 'tap') => {
 describe('EscuchaOverlay', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36');
   });
 
   it('cerrado no renderiza nada', () => {
@@ -132,6 +139,50 @@ describe('EscuchaOverlay', () => {
     expect(navSpy).not.toHaveBeenCalled();
     expect(transcribeMock).not.toHaveBeenCalled();
     window.removeEventListener('chagraNavigate', navSpy);
+  });
+
+  it('el botón de escucha abre y cierra el overlay sin romper', async () => {
+    render(
+      <>
+        <EscuchaFab />
+        <EscuchaOverlay />
+      </>,
+    );
+
+    fireEvent.click(screen.getByTestId('escucha-fab'));
+    await screen.findByTestId('escucha-overlay');
+    expect(startMock).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByTestId('escucha-cancelar'));
+    await waitFor(() => expect(screen.queryByTestId('escucha-overlay')).toBeNull());
+  });
+
+  it('permiso denegado en Android muestra un mensaje claro y no crashea', async () => {
+    setUserAgent('Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/126 Mobile Safari/537.36');
+    startMock.mockRejectedValueOnce(new Error('NotAllowedError: Permission denied'));
+
+    render(<EscuchaOverlay />);
+    await abrirWidget();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('escucha-overlay').dataset.fase).toBe('error');
+    });
+    expect(screen.getByText(/permiso del navegador/i)).toBeTruthy();
+    expect(screen.queryByText(/iPhone/i)).toBeNull();
+  });
+
+  it('permiso denegado en iPhone muestra guía específica de Safari', async () => {
+    setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1');
+    startMock.mockRejectedValueOnce(new Error('NotAllowedError: Permission denied'));
+
+    render(<EscuchaOverlay />);
+    await abrirWidget('wakeword');
+
+    await waitFor(() => {
+      expect(screen.getByTestId('escucha-overlay').dataset.fase).toBe('error');
+    });
+    expect(screen.getByText(/iPhone/i)).toBeTruthy();
+    expect(screen.getByText(/Safari/i)).toBeTruthy();
   });
 
   it('Whisper caído → guarda el audio para reintento y ofrece teclado', async () => {

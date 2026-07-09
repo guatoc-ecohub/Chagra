@@ -303,11 +303,11 @@ export const NOTA_SIN_RECETAS =
  * para auditoría de licencias, este arreglo pinta la UI). Requisito de las
  * licencias CC-BY/CC-BY-SA: atribución visible. Si una foto no carga, la tarjeta
  * cae con gracia a un ícono.
- * @type {{slug:string,autor:string,licencia:string,licenciaUrl:string,fuenteUrl:string}[]}
+ * @type {{slug:string,autor:string,licencia:string,licenciaUrl:string,fuenteUrl:string,aproximada?:boolean,nota?:string}[]}
  */
 export const CREDITOS_FOTOS_FIQUE = [
   { slug: 'planta', autor: 'Dick Culbert', licencia: 'CC BY 2.0', licenciaUrl: 'https://creativecommons.org/licenses/by/2.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Furcraea_andina_(9172593946).jpg' },
   { slug: 'cabuya', autor: 'Alejandro Bayer Tamayo', licencia: 'CC BY-SA 2.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/2.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Fique_-_Cabuya_(Furcraea_cabuya)_-_Flickr_-_Alejandro_Bayer.jpg' },
-  { slug: 'fibra', autor: 'Alix Joya (Curití)', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:FIQUE-_Alix_Joya_Curiti_.jpg' },
+  { slug: 'fibra', autor: 'WRI Staff', licencia: 'CC BY 2.0', licenciaUrl: 'https://creativecommons.org/licenses/by/2.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:SisalFarmDrying.jpg', aproximada: true, nota: 'Fibra de agave (sisal) secandose al sol; ilustra la fibra en bruto. La cabuya de fique se beneficia y seca igual.' },
   { slug: 'artesania', autor: 'Bioversity International', licencia: 'CC BY 2.0', licenciaUrl: 'https://creativecommons.org/licenses/by/2.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Weaving_fique_fibre_for_bags.jpg' },
 ];

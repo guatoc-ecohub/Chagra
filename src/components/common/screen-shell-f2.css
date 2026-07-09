@@ -132,8 +132,13 @@ html[data-luz="noche"][data-theme="minimalista"] .screen-shell-f2 {
   gap: 8px;
   min-width: 0;
   color: var(--ssf2-titulo);
-  white-space: nowrap;
+}
+/* La elipsis vive en el span del texto, no en el <h1> flex (si no, el nodo de
+   texto —flex-item anónimo— se recorta sin elipsis). QA-VISUAL 2026-07-08. */
+.screen-shell-f2-title-text {
+  min-width: 0;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 .screen-shell-f2-title-icon {

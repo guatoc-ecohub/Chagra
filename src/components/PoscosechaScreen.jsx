@@ -59,7 +59,7 @@ function CreditoFoto({ slug, className = '' }) {
       href={c.fuenteUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={`pc-focus flex items-center gap-1 truncate text-[9px] text-slate-300 underline decoration-slate-600 underline-offset-2 ${className}`}
+      className={`pc-focus flex items-center gap-1 truncate text-[9px] text-slate-100 underline decoration-slate-400 underline-offset-2 [text-shadow:0_1px_2px_rgba(0,0,0,0.9)] ${className}`}
       title={`${c.autor} · ${c.licencia} · Wikimedia Commons`}
     >
       <Camera size={9} className="shrink-0" aria-hidden="true" />
@@ -79,7 +79,9 @@ function Foto({ slug, ratio = 'aspect-[16/10]', className = '' }) {
         loading="lazy"
         className={`pc-photo w-full ${ratio} object-cover`}
       />
-      <figcaption className="absolute inset-x-0 bottom-0 bg-slate-950/82 px-2 py-1 backdrop-blur-sm">
+      {/* Franja del crédito: fondo casi opaco para pasar contraste incluso sobre
+          fotos claras (p.ej. el gorgojo blanco) — QA-VISUAL-MUNDOS 2026-07-08. */}
+      <figcaption className="absolute inset-x-0 bottom-0 bg-slate-950/90 px-2 py-1 backdrop-blur-sm">
         <CreditoFoto slug={slug} />
       </figcaption>
     </figure>
@@ -206,7 +208,7 @@ function Hub({ onIr, onNavigate }) {
           />
           {/* Velo de contraste para leer sobre la foto (gradiente estático, sin filter) */}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/35 to-slate-950/5" aria-hidden="true" />
-          <span className="absolute top-2 right-2 rounded-full bg-slate-950/80 px-2 py-0.5 max-w-[70%]">
+          <span className="absolute top-2 right-2 rounded-full bg-slate-950/90 px-2 py-0.5 max-w-[70%]">
             <CreditoFoto slug="secado-maiz" />
           </span>
           <div className="absolute inset-x-0 bottom-0 px-4 pb-3">

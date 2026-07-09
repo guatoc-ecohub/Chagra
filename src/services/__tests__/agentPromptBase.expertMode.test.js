@@ -30,13 +30,9 @@ describe('buildModoExpertoBlock', () => {
 
     expect(block).toContain('=== MODO EXPERTO ===');
     expect(block).toContain('=== FIN ===');
-    expect(block).toContain('CONTRATO CITA:');
-    expect(block).toContain('científico exacto');
-    expect(block).toContain('dosis con unidad');
-    expect(block).toContain('mecanismo de acción');
-    expect(block).toContain('piso térmico');
-    expect(block).toContain('ENTIDADES RESUELTAS');
-    expect(block).toContain('DATOS VERIFICADOS');
+    expect(block).toContain('CONTRATO TÉCNICO:');
+    expect(block).toContain('evidencia disponible');
+    expect(block).not.toContain('citado');
   });
 
   it('INYECTA bloque SIN grounding cuando nivel es "detallado" pero hasGrounding es false', () => {
@@ -61,8 +57,8 @@ describe('buildModoExpertoBlock', () => {
     const block = buildModoExpertoBlock({ nivelRespuestas: 'detallado', hasGrounding: true });
 
     expect(block).toContain('RESPUESTA:');
-    expect(block).toContain('preciso, citado');
-    expect(block).toContain('honesto cuando no la haya');
+    expect(block).toContain('preciso y honesto');
+    expect(block).toContain('Si hay evidencia, úsala con claridad');
   });
 });
 
@@ -206,9 +202,9 @@ describe('integración buildResponseModeBlock con experto estructurado', () => {
     expect(block).toContain('CONTRATO TÉCNICO');
   });
 
-  it('buildResponseModeBlock("detallado", true) devuelve CONTRATO CITA', () => {
+  it('buildResponseModeBlock("detallado", true) devuelve CONTRATO TÉCNICO', () => {
     const block = buildResponseModeBlock('detallado', true);
-    expect(block).toContain('CONTRATO CITA:');
+    expect(block).toContain('CONTRATO TÉCNICO:');
   });
 
   it('buildResponseModeBlock("simple") NO devuelve MODO EXPERTO', () => {

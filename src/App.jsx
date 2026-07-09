@@ -553,6 +553,24 @@ const HASH_VIEW_ROUTES = {
   penca: 'fique',
   furcraea: 'fique',
   fibras: 'fique',
+  // Mundo "Quinua y granos andinos" (dentro de Cultivos y semillas). El switch
+  // ya tenía el `case 'quinua'` pero faltaba la ruta hash → #quinua caía al
+  // dashboard (bug funcional QA-VISUAL-MUNDOS 2026-07-08: mundo inalcanzable por
+  // deep-link/QR). Aliases = los granos que cubre + nombre científico, igual
+  // que los mundos hermanos (mango→mangifera, uchuva→physalis).
+  quinua: 'quinua',
+  'granos-andinos': 'quinua',
+  'granos-ancestrales': 'quinua',
+  granos: 'quinua',
+  quinoa: 'quinua',
+  chenopodium: 'quinua',
+  amaranto: 'quinua',
+  bledo: 'quinua',
+  chia: 'quinua',
+  chía: 'quinua',
+  cañihua: 'quinua',
+  canihua: 'quinua',
+  tarwi: 'quinua',
   'milpa-cultivo': 'milpa_cultivo',
   'tres-hermanas': 'milpa_cultivo',
   'salud-suelo': 'salud_suelo',
