@@ -246,6 +246,7 @@ export default function CicloVivoFullView({ onBack, onNavigate }) {
           onClose={closePanel}
           onNav={navegarCap}
           onJump={(i) => openPanel((i + PHASES.length) % PHASES.length)}
+          sipsaPrice={sipsaPrice}
         />
 
         <div className={'cv-toast' + (toast ? ' show' : '')} role="status">{toast}</div>
