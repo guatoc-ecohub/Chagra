@@ -84,9 +84,36 @@
 
 /* ── Cabezal ──────────────────────────────────────────────────────────────── */
 .telar-cabezal {
+  position: relative;
   text-align: center;
   margin-bottom: 34px;
   animation: telarSubir 0.8s 0.15s ease-out both;
+}
+.telar-volver {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--lana-tenue);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.telar-volver:hover {
+  color: #f0e9d8;
+  border-color: rgba(255, 255, 255, 0.32);
+}
+.telar-volver:focus-visible {
+  outline: 2px solid var(--lana-tenue);
+  outline-offset: 3px;
 }
 .telar-ceja {
   font-family: var(--mono);
