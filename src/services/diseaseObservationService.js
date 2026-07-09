@@ -49,7 +49,7 @@ const KNOWN_PATHOGENS = {
  * Analiza un texto de observación y devuelve la enfermedad detectada o null.
  *
  * @param {string} text — texto de la observación (campesino)
- * @param {string} [speciesSlug] — para nombrar el patógeno típico de la especie
+ * @param {string} [speciesSlug] - para nombrar el patógeno típico de la especie
  * @returns {{ isDisease: boolean, pathogen: string|null, severity: string, control: string|null, symptom: string }|null}
  */
 export function detectDiseaseInText(text, speciesSlug) {

@@ -50,7 +50,7 @@ describe('formatLifecycleEnd', () => {
   });
 
   it('devuelve cadena vacía si no hay estimación', () => {
-    expect(formatLifecycleEnd({ source: 'unavailable', naturalDeath: null })).toBe('');
+    expect(formatLifecycleEnd({ harvestStart: null, harvestEnd: null, naturalDeath: null, source: 'unavailable', confidence: 0 })).toBe('');
     expect(formatLifecycleEnd(null)).toBe('');
   });
 });

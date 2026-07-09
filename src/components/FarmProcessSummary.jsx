@@ -9,7 +9,7 @@ import { calculateLifecycleEnd, formatLifecycleEnd, getCurrentStage } from '../s
  * Muestra además la ETAPA ESTIMADA según la fecha de siembra REAL (ciclo a mitad)
  * y la FECHA ESPERADA DE FIN DE CICLO / muerte natural (senescencia).
  */
-export default function FarmProcessSummary({ process, lastObservation, pestRisks, altitudeM, compact = false }) {
+export default function FarmProcessSummary({ process, lastObservation, pestRisks, altitudeM = null, compact = false }) {
   const attributes = process?.attributes;
   const sowingDate = attributes?.created_at || null;
   const slug = attributes?.subject_slug || null;

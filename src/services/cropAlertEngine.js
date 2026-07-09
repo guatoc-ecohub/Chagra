@@ -144,6 +144,11 @@ export async function runCropAlerts() {
   let emitted = 0;
   let cleared = 0;
   for (const c of cycles) {
+    // `a` es la bolsa de atributos del ciclo (forma variable según el proceso
+    // FarmProcess de turno) — @type any a propósito, mismo criterio que el
+    // resto de accesos sueltos de este bloque (current_stage/subject_slug/
+    // subject_label no están en el tipo estrecho de FarmProcess.attributes).
+    /** @type {any} */
     const a = c?.attributes || {};
     const id = c?.process_id || c?.id;
     if (!id) continue;

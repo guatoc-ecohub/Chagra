@@ -37,7 +37,7 @@ beforeEach(() => {
   getEnsoLabel.mockReset().mockReturnValue('Neutral');
   events = [];
   vi.spyOn(window, 'dispatchEvent').mockImplementation((ev) => {
-    events.push({ name: ev.type, detail: ev.detail });
+    events.push({ name: ev.type, detail: /** @type {CustomEvent} */ (ev).detail });
     return true;
   });
 });

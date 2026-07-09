@@ -318,6 +318,7 @@ export function deriveCurrentStage({ speciesSlug, sowingDate, altitudeM, now, te
  * @returns {LifecycleEnd}
  */
 export function calculateLifecycleEnd({ speciesSlug, sowingDate, altitudeM }) {
+  /** @type {LifecycleEnd} */
   const unavailable = {
     harvestStart: null,
     harvestEnd: null,
