@@ -393,7 +393,7 @@ async function login(page, user) {
   await page.getByRole('textbox', { name: /usuario/i }).fill(user.username);
   await page.locator('input[type="password"]').fill('e2e-pass');
   await page.getByRole('button', { name: /ingresar/i }).click();
-  await expect(page.getByText(/Soy Chagra|Cola de tareas|Mis plantas/i).first()).toBeVisible({ timeout: 25_000 });
+  await expect(page.getByText(/Soy Chagra|Tareas pendientes|Mis plantas/i).first()).toBeVisible({ timeout: 25_000 });
 }
 
 async function navigate(page, view) {

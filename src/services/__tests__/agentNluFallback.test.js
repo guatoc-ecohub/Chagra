@@ -22,7 +22,7 @@
  *     keyword de biopreparado > especie por defecto.
  */
 import { describe, it, expect } from 'vitest';
-import { planNluFallback } from '../agentNluFallback.js';
+import { planNluFallback, esSaludoPuro } from '../agentNluFallback.js';
 
 describe('planNluFallback — invariante: NUNCA devuelve null para un mensaje agro real', () => {
   it('mensaje vacío / no-string → null (no hay nada que groundear)', () => {
@@ -173,5 +173,31 @@ describe('planNluFallback — entidades de baja calidad no rompen', () => {
     const plan = planNluFallback('cómo riego el café', 'no-soy-array');
     expect(plan.tool).toBe('get_species');
     expect(plan.source).toBe('fallback_default_species');
+  });
+});
+
+// Bug A6 auditoría IA 2026-07-08: "hola chagra" salía con semáforo ROJO.
+// esSaludoPuro es el criterio compartido (deflección NLU + gate del semáforo
+// en AgentScreen): saludo/smalltalk corto → turno conversacional, sin semáforo.
+describe('esSaludoPuro — saludo/smalltalk puro vs pregunta real', () => {
+  it('saludos sueltos → true (con y sin tildes, mayúsculas)', () => {
+    for (const s of ['hola', 'hola chagra', 'Buenos días', 'buenas tardes', 'qué más', 'gracias', 'HOLA']) {
+      expect(esSaludoPuro(s), s).toBe(true);
+    }
+  });
+
+  it('saludo que PREFIJA una pregunta real (>4 palabras) → false', () => {
+    expect(esSaludoPuro('buenas, ¿cómo cuido el aguacate?')).toBe(false);
+    expect(esSaludoPuro('hola chagra, mi mata de café tiene hojas amarillas')).toBe(false);
+  });
+
+  it('pregunta agro directa → false', () => {
+    expect(esSaludoPuro('¿a cómo está la papa?')).toBe(false);
+  });
+
+  it('input no-string / vacío → false (defensivo)', () => {
+    for (const bad of [null, undefined, '', '   ', 42, {}]) {
+      expect(esSaludoPuro(bad)).toBe(false);
+    }
   });
 });

@@ -177,16 +177,20 @@
 .mf-chip {
   font-size: 11.5px;
   font-weight: 700;
-  line-height: 1;
-  padding: 4px 7px;
-  border-radius: 999px;
+  /* Fix chips truncados (usabilidad campesina #3): antes nowrap + overflow
+     hidden cortaba las etiquetas largas a media palabra en móvil
+     ("Almacenamiento y conse…"). Ahora la etiqueta ENVUELVE dentro de la
+     pastilla — se lee completa siempre. */
+  line-height: 1.2;
+  padding: 4px 8px;
+  border-radius: 12px;
   background: var(--mf-b, #eef3e2);
   border: 1px solid color-mix(in srgb, var(--mf-a, #3f8f4e) 35%, transparent);
   color: var(--mf-tinta);
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: left;
 }
 .mf-chip--mas,
 .mf-chip--entrar {

@@ -17,7 +17,7 @@ import { render, screen, fireEvent, cleanup, within } from '@testing-library/rea
 import '@testing-library/jest-dom';
 
 import TuberculosScreen from './TuberculosScreen';
-import { TUBERCULOS, getTuberculo, tieneDato } from '../services/tuberculosData';
+import { TUBERCULOS, getTuberculo, tieneDato, FUENTES_INSTITUCIONALES } from '../services/tuberculosData';
 
 afterEach(() => cleanup());
 
@@ -46,6 +46,12 @@ describe('TuberculosScreen — ficha de cultivo', () => {
     expect(screen.getByRole('heading', { name: /Plagas y manejo sin veneno/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^Cosecha$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Conservación y curado/i })).toBeInTheDocument();
+
+    // Usos en la cocina + fuentes institucionales con URL (MIP)
+    expect(screen.getByRole('heading', { name: /^Usos$/i })).toBeInTheDocument();
+    const agrosavia = screen.getByRole('link', { name: /AGROSAVIA/i });
+    expect(agrosavia).toHaveAttribute('href', 'https://www.agrosavia.co');
+    expect(screen.getByRole('link', { name: /^CIAT/i })).toHaveAttribute('href', 'https://alliancebioversityciat.org');
 
     // Plaga insignia de la papa grounded en el grafo + manejo biológico
     expect(screen.getByText(/tizón tardío/i)).toBeInTheDocument();
@@ -99,7 +105,16 @@ describe('tuberculosData — invariantes de grounding', () => {
       expect(t.clima.luz && t.clima.agua && t.clima.piso).toBeTruthy();
       expect(t.aporque).toBeTruthy();
       expect(t.cosecha && t.conservacion).toBeTruthy();
+      expect(t.usos).toBeTruthy();
       expect(t.fuentes.relaciones).toMatch(/Grafo Chagra/);
+    }
+  });
+
+  it('las fuentes institucionales (MIP) traen sigla y URL http verificable', () => {
+    expect(FUENTES_INSTITUCIONALES.length).toBeGreaterThan(0);
+    for (const f of FUENTES_INSTITUCIONALES) {
+      expect(f.sigla && f.nombre).toBeTruthy();
+      expect(f.url).toMatch(/^https:\/\//);
     }
   });
 

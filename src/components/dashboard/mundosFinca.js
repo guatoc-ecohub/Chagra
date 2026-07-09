@@ -123,7 +123,9 @@ export const MUNDOS_FINCA = [
         id: 'citricos',
         titulo: 'Los cítricos',
         emoji: '🍊',
-        lema: 'Naranja, mandarina, limón y lima: variedad e injerto, piso térmico, plagas y HLB, y cosecha',
+        // Sin siglas de ingeniero en el home (#1): HLB se nombra como lo conoce
+        // el campo — "el dragón amarillo" (la pantalla del mundo ya lo explica).
+        lema: 'Naranja, mandarina, limón y lima: variedad e injerto, piso térmico, plagas como el dragón amarillo, y cosecha',
         tinte: ['#c9791f', '#f7e6c8'],
         // Mundo de una sola pantalla (photo-forward, 5 estaciones del ciclo
         // cítrico). Profundización dedicada del frutal cítrico que refuerza el
