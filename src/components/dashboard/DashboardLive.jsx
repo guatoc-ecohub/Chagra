@@ -62,6 +62,7 @@ import CicloVivoWidget from '../CicloVivo/CicloVivoWidget';
 // las funciones dispersas del home F2 en 9 mundos coherentes (mundosFinca.js).
 // Solo se monta con la flag F2 ON; el legacy conserva sus tiles.
 import MundosDeMiFinca from './MundosDeMiFinca';
+import ArbolDeMundos from './ArbolDeMundos';
 import ClimaStrip from './ClimaStrip';
 import HoyEnFincaStrip from './HoyEnFincaStrip';
 import AIStatusFooter from './AIStatusFooter';
@@ -885,6 +886,18 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     única; el test de reachability congela el contrato). El gate
                     de Animales por perfil se conserva (mostrarAnimales). */}
                 <div id="bloque-mundos" className="px-4 pt-4 fvh-resto-block" data-testid="bloque-mundos" style={{ scrollMarginTop: '88px' }}>
+                    {/* EL ÁRBOL DE SU FINCA (vista rica del tema biopunk, mockup
+                        aprobado #/mockups/avatar-biopunk): los mismos mundos como
+                        RAMAS VIVAS que brotan del corazón + el RELOJ DEL FRAILEJÓN
+                        (años reales, un anillo por año). Fuente única y rutas =
+                        mundosFinca.js; en temas no-biopunk devuelve null. La
+                        entrada plegable de abajo queda INTACTA (fallback simple y
+                        contrato de reachability). */}
+                    <ArbolDeMundos
+                        onNavigate={onNavigate}
+                        mostrarAnimales={mostrarAnimales}
+                        plantsCount={plantsCount}
+                    />
                     {mundosAbiertos ? (
                         <MundosDeMiFinca
                             onNavigate={onNavigate}
