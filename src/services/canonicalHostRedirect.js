@@ -52,6 +52,14 @@ export function isAllowedHost(hostname) {
   return isCanonicalHost(hostname) || isLocalDevHost(hostname) || isPreviewHost(hostname);
 }
 
+/**
+ * Construye la URL canónica preservando path, search y hash de la ubicación
+ * dada. Solo consume `pathname`/`search`/`hash`, así que acepta cualquier
+ * objeto tipo-Location (incluido un mock parcial de tests).
+ *
+ * @param {{ pathname?: string, search?: string, hash?: string } | null} [location]
+ * @returns {string}
+ */
 export function buildCanonicalUrl(location = getDefaultLocation()) {
   const pathname = location?.pathname || '/';
   const search = location?.search || '';
