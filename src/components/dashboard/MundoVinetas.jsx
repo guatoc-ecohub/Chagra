@@ -89,6 +89,51 @@ function VinetaCafe() {
     );
 }
 
+/** 🥑 El aguacate — árbol cargado en la loma y un aguacate partido con su pepa. */
+function VinetaAguacate() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#e4efd0" />
+            {/* montaña fría-moderada al fondo (piso del Hass) */}
+            <path d="M-4 44 L40 18 L86 44 Z" fill="#a9c58f" opacity=".7" />
+            <path d="M60 46 L112 16 L168 46 Z" fill="#93b578" opacity=".75" />
+            {/* sol suave de montaña */}
+            <circle cx="150" cy="20" r="10" fill="#eef3c4" />
+            {/* laderas */}
+            <path d="M-4 46 Q60 34 120 46 T184 42 V90 H-4 Z" fill="#7a9e4a" />
+            <path d="M-4 62 Q70 50 184 60 V90 H-4 Z" fill="#5b7f2a" />
+            {/* árbol de aguacate cargado (copa redonda, tronco, frutos colgando) */}
+            <g transform="translate(58 24)">
+                <path d="M0 40 V18" stroke="#7a5230" strokeWidth="4" strokeLinecap="round" fill="none" />
+                <path d="M0 30 q-9 -2 -13 -8 M0 26 q9 -2 13 -9" stroke="#7a5230" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+                <circle cx="0" cy="6" r="17" fill="#2f6b3a" />
+                <circle cx="-9" cy="0" r="9" fill="#3f8f4e" />
+                <circle cx="9" cy="2" r="9" fill="#3f8f4e" />
+                <circle cx="0" cy="-6" r="8" fill="#4c8a44" />
+                {/* aguacates colgando (verde oscuro, forma de pera) */}
+                <g fill="#3a5a1f">
+                    <path d="M-8 12 q-3.4 0 -3.4 4 q0 4.6 3.4 5.6 q3.4 -1 3.4 -5.6 q0 -4 -3.4 -4 Z" />
+                    <path d="M7 10 q-3 0 -3 3.6 q0 4.2 3 5 q3 -0.8 3 -5 q0 -3.6 -3 -3.6 Z" />
+                    <path d="M0 16 q-2.6 0 -2.6 3.2 q0 3.6 2.6 4.4 q2.6 -0.8 2.6 -4.4 q0 -3.2 -2.6 -3.2 Z" />
+                </g>
+            </g>
+            {/* aguacate partido en primer plano: mitad con pepa grande */}
+            <g transform="translate(120 60)">
+                <ellipse cx="0" cy="16" rx="20" ry="5" fill="#3a5219" opacity=".45" />
+                {/* cáscara (forma de pera, verde-morado del Hass) */}
+                <path d="M0 -20 q-15 4 -15 20 q0 15 15 16 q15 -1 15 -16 q0 -16 -15 -20 Z" fill="#40662a" />
+                {/* pulpa */}
+                <path d="M0 -14 q-10 3 -10 14 q0 10 10 11 q10 -1 10 -11 q0 -11 -10 -14 Z" fill="#c7d96a" />
+                {/* aro más maduro junto a la pepa */}
+                <path d="M0 -9 q-6 2 -6 9 q0 6 6 6.6 q6 -0.6 6 -6.6 q0 -7 -6 -9 Z" fill="#e2d98f" />
+                {/* pepa grande */}
+                <ellipse cx="0" cy="1" rx="5.4" ry="6.4" fill="#8a5a2f" />
+                <ellipse cx="-1.4" cy="-1" rx="1.8" ry="2.4" fill="#a9702f" opacity=".8" />
+            </g>
+        </svg>
+    );
+}
+
 /** 🥮 La caña y la panela — cañaveral, trapiche y bloque de panela al sol. */
 function VinetaCana() {
     return (
@@ -439,6 +484,7 @@ function VinetaMango() {
 const VINETAS = {
     cultivos: VinetaCultivos,
     cafe: VinetaCafe,
+    aguacate: VinetaAguacate,
     cana: VinetaCana,
     mango: VinetaMango,
     suelo: VinetaSuelo,
