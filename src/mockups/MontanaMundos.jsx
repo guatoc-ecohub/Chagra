@@ -55,7 +55,7 @@ const PISO_FINCA = PISOS.findIndex((p) => p.finca);
 const MUNDOS = [
   { id: 'calendario', x: 316, y: 96, piso: 0, etiqueta: 'Calendario', abre: 'el calendario y el almanaque del campo' },
   { id: 'glaciar', x: 195, y: 228, piso: 0, etiqueta: 'Glaciar', abre: 'los glaciares y el agua de alta montaña' },
-  { id: 'restauracion', x: 132, y: 434, piso: 1, etiqueta: 'Restaurar', abre: 'la restauración del páramo y el bosque' },
+  { id: 'restauracion', x: 168, y: 420, piso: 1, etiqueta: 'Restaurar', abre: 'la restauración del páramo y el bosque' },
   { id: 'papa', x: 118, y: 662, piso: 2, etiqueta: 'La papa', abre: 'la papa y los tubérculos' },
   { id: 'animales', x: 272, y: 700, piso: 2, etiqueta: 'Mis animales', abre: 'sus animales: gallinas, vacas, cabras' },
   { id: 'agente', x: 207, y: 896, piso: 3, etiqueta: 'Hablar con Chagra', abre: 'el agente: pregunte con su voz' },
@@ -450,12 +450,23 @@ function MontanaSvg() {
         <ellipse className="mm-niebla" cx="290" cy="812" rx="130" ry="18" />
         <ellipse className="mm-niebla" cx="110" cy="1072" rx="120" ry="16" />
 
-        {/* ── PÁRAMO: frailejones + laguna ── */}
-        <ellipse className="mm-laguna" cx="248" cy="486" rx="44" ry="11" />
-        <path className="mm-laguna-brillo" d="M218 484 Q248 478 278 484" />
-        <Frailejon x={132} y={436} s={1.25} />
-        <Frailejon x={170} y={470} s={0.95} />
-        <Frailejon x={100} y={482} s={0.8} />
+        {/* ── PÁRAMO: frailejones, pajonal y laguna (el cono es angosto a esta
+            altura: todo vive entre x≈140 y x≈255 para no caer del recorte) ── */}
+        <ellipse className="mm-laguna" cx="222" cy="512" rx="34" ry="9" />
+        <path className="mm-laguna-brillo" d="M198 510 Q222 504 246 510" />
+        <g className="mm-pajonal">
+          <path d="M196 452 q-3 -10 -7 -13 M196 452 q0 -12 1 -15 M196 452 q4 -9 8 -12" />
+          <path d="M216 436 q-3 -9 -6 -11 M216 436 q0 -10 1 -13 M216 436 q3 -8 7 -10" />
+          <path d="M160 508 q-3 -9 -6 -11 M160 508 q0 -10 1 -13 M160 508 q3 -8 7 -10" />
+          <path d="M186 528 q-3 -8 -6 -10 M186 528 q0 -9 1 -12 M186 528 q3 -7 6 -9" />
+          <path d="M250 486 q-3 -9 -6 -11 M250 486 q0 -10 1 -13 M250 486 q3 -8 7 -10" />
+        </g>
+        <ellipse className="mm-piedra" cx="150" cy="532" rx="9" ry="5" />
+        <ellipse className="mm-piedra" cx="228" cy="456" rx="6" ry="3.6" />
+        <Frailejon x={168} y={438} s={1.25} />
+        <Frailejon x={204} y={472} s={0.95} />
+        <Frailejon x={150} y={488} s={0.8} />
+        <Frailejon x={240} y={530} s={0.7} />
 
         {/* ── FRÍO: surcos de papa + corral ── */}
         <g className="mm-surcos">
@@ -581,8 +592,8 @@ function MontanaSvg() {
 
       {/* Red viva (solo biopunk): el micelio conecta los pisos */}
       <g className="mm-micelio">
-        <path d="M316 120 Q260 200 195 300 Q140 400 132 440 Q120 520 150 600 Q170 660 195 700 Q220 760 195 880 Q180 940 230 1000 Q260 1060 240 1140 Q220 1240 195 1300 Q180 1340 190 1380" />
-        <path d="M132 440 Q180 520 272 700" opacity="0.55" />
+        <path d="M316 120 Q260 200 195 300 Q160 390 168 428 Q150 520 160 600 Q175 660 195 700 Q220 760 195 880 Q180 940 230 1000 Q260 1060 240 1140 Q220 1240 195 1300 Q180 1340 190 1380" />
+        <path d="M168 428 Q200 520 272 700" opacity="0.55" />
         <path d="M195 880 Q140 920 96 942" opacity="0.55" />
         <path d="M230 1000 Q270 1080 292 1168" opacity="0.55" />
         {MUNDOS.map((m) => (

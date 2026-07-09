@@ -632,6 +632,14 @@
   animation: mm-respira 4.6s ease-in-out infinite alternate;
 }
 
+.mm-pajonal path {
+  fill: none;
+  stroke: var(--mm-frailejon-hoja);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
 .mm-laguna { fill: var(--mm-laguna); }
 .mm-laguna-brillo { fill: none; stroke: var(--mm-flujo); stroke-width: 1.6; stroke-linecap: round; opacity: 0.7; }
 
