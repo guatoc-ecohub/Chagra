@@ -356,3 +356,75 @@ export function confianzaPorcentaje(confidence) {
   if (!Number.isFinite(n)) return null;
   return Math.round(Math.min(1, Math.max(0, n)) * 100);
 }
+
+function normalizeResponseMode(mode) {
+  if (!mode || typeof mode !== 'string') return '';
+  const normalized = mode.toLowerCase().trim();
+  if (['simple', 'campesino', 'campesina', 'rural'].includes(normalized)) return 'campesino';
+  if (['detallado', 'detallada', 'experto', 'experta', 'tecnico', 'técnico'].includes(normalized)) return 'experto';
+  if (['maestro', 'maestra', 'profesor', 'profesora', 'mentor'].includes(normalized)) return 'maestro';
+  return '';
+}
+
+function uniquePush(list, value) {
+  if (value && !list.includes(value)) list.push(value);
+}
+
+function buildSourceLineFromProvenance(provenance) {
+  const items = Array.isArray(provenance)
+    ? provenance.filter((p) => p && typeof p === 'object')
+    : [];
+  const sources = [];
+  for (const item of items) {
+    const { label } = describeFuente(item.source);
+    uniquePush(sources, label);
+  }
+  if (sources.length === 0) return '';
+  return `Fuentes: ${sources.join(' + ')}.`;
+}
+
+/**
+ * Construye el footer visible del modo científico desde la metadata ya
+ * persistida del turno. El modelo no tiene que citar nada: el código toma la
+ * procedencia y el semáforo y los pinta al final de la respuesta.
+ *
+ * @param {object} [opts]
+ * @param {object|null|undefined} [opts.metadata] metadata del turno.
+ * @returns {string}
+ */
+export function buildScientificFooter({ metadata } = {}) {
+  const semaforo = computeSemaforoTurno(metadata);
+  if (!semaforo) return '';
+
+  const provenance = Array.isArray(metadata?.grounding_provenance)
+    ? metadata.grounding_provenance.filter((p) => p && typeof p === 'object')
+    : [];
+  const sourceLine = buildSourceLineFromProvenance(provenance);
+  if (!sourceLine) return '';
+
+  const copy = SEMAFORO_COPY[semaforo.nivel] || SEMAFORO_COPY.ambar;
+  return `\n\n---\n\n${sourceLine}\nSemáforo: ${semaforo.nivel}, ${copy.label}.`;
+}
+
+/**
+ * Aplica el footer científico de forma determinística a una respuesta ya
+ * generada. En modo campesino deja el texto intacto. En modo experto o
+ * maestro agrega el pie visible con fuentes + semáforo.
+ *
+ * @param {string} response
+ * @param {object} [opts]
+ * @param {string} [opts.mode]
+ * @param {object|null|undefined} [opts.metadata]
+ * @returns {string}
+ */
+export function appendScientificFooter(response, opts = {}) {
+  const text = typeof response === 'string' ? response : '';
+  if (!text) return '';
+
+  const mode = normalizeResponseMode(opts.mode);
+  if (mode !== 'experto' && mode !== 'maestro') return text;
+
+  const footer = buildScientificFooter({ metadata: opts.metadata });
+  if (!footer) return text;
+  return `${text}${footer}`;
+}

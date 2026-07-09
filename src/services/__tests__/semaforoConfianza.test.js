@@ -20,6 +20,8 @@ import {
   confianzaPorcentaje,
   SEMAFORO_COPY,
   MOTIVO_COPY,
+  buildScientificFooter,
+  appendScientificFooter,
 } from '../semaforoConfianza';
 
 const item = (overrides = {}) => ({
@@ -231,5 +233,46 @@ describe('nivelValidacionInfo / humanizarEntidad / confianzaPorcentaje', () => {
     expect(confianzaPorcentaje(NaN)).toBeNull();
     expect(confianzaPorcentaje('x')).toBeNull();
     expect(confianzaPorcentaje(null)).toBeNull();
+  });
+});
+
+describe('footer cientifico deterministico', () => {
+  const metadata = {
+    grounding_semaphore: 'verde',
+    grounding_policy: 'answer',
+    grounding_provenance: [
+      {
+        entity_id: 'coffea-arabica',
+        confidence: 0.91,
+        source: 'https://doi.org/10.1016/j.cropro.2020.105123',
+        validation_level: 'published',
+      },
+      {
+        entity_id: 'coffea-arabica',
+        confidence: 0.88,
+        source: 'Agrosavia',
+        validation_level: 'expert_reviewed',
+      },
+    ],
+  };
+
+  it('buildScientificFooter arma fuentes + semaforo desde la metadata', () => {
+    const footer = buildScientificFooter({ metadata });
+    expect(footer).toContain('Fuentes: DOI 10.1016/j.cropro.2020.105123 + Agrosavia.');
+    expect(footer).toContain('Semáforo: verde, Dato respaldado.');
+  });
+
+  it('appendScientificFooter adjunta el footer aunque la respuesta base no cite nada', () => {
+    const base = 'La recomendacion es revisar el drenaje y evitar encharcamientos.';
+    const decorated = appendScientificFooter(base, { mode: 'detallado', metadata });
+    expect(decorated).toContain(base);
+    expect(decorated).toContain('Fuentes: DOI 10.1016/j.cropro.2020.105123 + Agrosavia.');
+    expect(decorated).toContain('Semáforo: verde, Dato respaldado.');
+    expect(decorated).not.toBe(base);
+  });
+
+  it('appendScientificFooter deja intacto el modo campesino', () => {
+    const base = 'Mire, revise el drenaje y no encharque el lote.';
+    expect(appendScientificFooter(base, { mode: 'simple', metadata })).toBe(base);
   });
 });
