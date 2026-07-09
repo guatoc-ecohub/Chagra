@@ -224,6 +224,63 @@ export const ENFERMEDADES_CACAO = [
 ];
 
 /**
+ * Otras plagas de la mazorca — grounding curado del DR
+ * grounding-cacao-plagas-colombia (gemini, 2026-06-19), verificado contra
+ * AGROSAVIA/Crossref. NO son hongos como la monilia: son INSECTOS que perforan
+ * o raspan el fruto. El manejo sigue siendo cultural y sanitario (recolección,
+ * embolsado/solarización, control biológico) — Chagra no da dosis de veneno.
+ *
+ * El barrenador (Carmenta foraseminis) tiene DOI real verificado; el trips
+ * (Selenothrips rubrocinctus) es de menor peso y su cifra fina queda como
+ * "dato en camino".
+ */
+export const OTRAS_PLAGAS_CACAO = [
+  {
+    id: 'barrenador',
+    nombre: 'Barrenador del fruto y la semilla',
+    cientifico: 'Carmenta foraseminis',
+    tambien: 'Perforador de la mazorca (Lepidoptera: Sesiidae).',
+    ataca: 'La larva barrena por dentro la mazorca y daña el grano.',
+    comoSeVe: [
+      'Perforaciones en la cáscara de la mazorca con excretas granuladas afuera (los campesinos le dicen la “peca”).',
+      'Por dentro, granos comidos y dañados: se cae el peso y la calidad del grano comercial.',
+    ],
+    umbral: 'En Antioquia llega a llevarse cerca del 30% del grano comercial, y en lotes descuidados hasta el 50%.',
+    manejo: [
+      'Recoja seguido las mazorcas picadas y sáquelas del cultivo; no deje cacota (residuo de cosecha) regada.',
+      'Embolse o solarice las mazorcas infestadas, o entiérrelas bien: se corta el ciclo de la plaga.',
+      'Trampas McPhail con proteína hidrolizada para monitorear.',
+      'Control biológico con la avispita Trichogramma (parasita los huevos).',
+    ],
+    fuente:
+      'AGROSAVIA — Carabalí Muñoz, Senejoa Lizcano y Montes Prado (2018), “Reconocimiento, daño y opciones de manejo de Carmenta foraseminis…”, DOI 10.21930/agrosavia.manual.7402599 (verificado Crossref).',
+  },
+  {
+    id: 'trips',
+    nombre: 'Trips del cacao',
+    cientifico: 'Selenothrips rubrocinctus',
+    tambien: 'Trips de banda roja.',
+    ataca: 'Raspa y chupa la mazorca y el follaje.',
+    comoSeVe: [
+      'Bronceado o plateado en la cáscara de la mazorca y en las hojas, con puntico oscuro (sus excretas).',
+      'En ataques fuertes la mazorca se mancha y el brote se reseca.',
+    ],
+    umbral: {
+      estado: 'dato en camino',
+      fuentePrevista: 'AGROSAVIA / ICA — umbral de acción del trips en cacao (grounded pendiente)',
+    },
+    manejo: [
+      'Elimine residuos de cosecha infestados; embolse o solarice las mazorcas afectadas.',
+      'Favorezca los enemigos naturales (parasitoides de huevos) manejando bien la sombra y sin venenos que los maten.',
+    ],
+    fuente: 'AGROSAVIA / ICA (manejo fitosanitario del cacao). Confianza media.',
+  },
+];
+
+export const OTRAS_PLAGAS_CACAO_FUENTE =
+  'AGROSAVIA, ICA — DR grounding-cacao-plagas-colombia (2026-06-19), DOIs verificados. El barrenador se maneja recogiendo y sacando lo picado; nada de recetas de veneno.';
+
+/**
  * No confundir — el guard visual del "anti_confusion" del nodo monilia:
  * monilia, escoba de bruja y mazorca negra se manejan distinto, así que primero
  * hay que distinguirlas bien.

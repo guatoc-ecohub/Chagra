@@ -16,6 +16,7 @@ import {
   SUELO_AGUA,
   ASOCIACION_AGUACATE,
   MALES_AGUACATE,
+  MALES_FUENTE,
   BIOPREPARADOS_AGUACATE,
   NOTA_SIN_QUIMICOS,
   FLORACION_POLINIZACION,
@@ -365,6 +366,7 @@ function EstacionSanidad({ onNavigate }) {
       <div className="space-y-2.5" data-testid="aguacate-males">
         {MALES_AGUACATE.map((mal) => <MalCard key={mal.id} mal={mal} />)}
       </div>
+      <p className="text-[10px] leading-snug text-slate-500" data-testid="aguacate-males-fuente">Fuente: {MALES_FUENTE}</p>
 
       {/* Biopreparados groundeados de la especie */}
       <div className="rounded-2xl border border-slate-700/60 bg-[#1a2413]/50 p-4" data-testid="aguacate-biopreparados">
