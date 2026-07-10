@@ -410,7 +410,7 @@ export const COSECHA_AGUACATE = {
  */
 export const CREDITOS_FOTOS_AGUACATE = [
   { slug: 'arbol', src: '/aguacate/arbol.jpg', autor: 'Ernani viana 28', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Abacateiro_com_frutos.jpg' },
-  { slug: 'raices', src: '/aguacate/raices.jpg', autor: 'Karlalhdz', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Aguacate_con_raices_dentro.jpg' },
+  { slug: 'raices', src: '/aguacate/raices.jpg', autor: 'Alif Arefur', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Shoot_%26_root_initiation_from_avocado_seed.jpg' },
   { slug: 'flor', src: '/aguacate/flor.jpg', autor: 'B.navez', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Persea_americana_flowers.jpg' },
   { slug: 'cosecha', src: '/aguacate/cosecha.jpg', autor: 'Leoadec', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Avocadoes_on_the_branch.jpeg' },
   // Reusadas del mundo Frutales (no suman al presupuesto de fotos nuevas):
