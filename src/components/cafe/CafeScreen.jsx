@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
 import PedagogicalBlock from '../common/PedagogicalBlock';
+import LaminaCafeto from './LaminaCafeto';
 import {
   ESTACIONES_CAFE,
   VARIEDADES_CAFE,
@@ -150,6 +151,15 @@ function EstacionSiembra() {
           </div>
         </FotoCafe>
       </div>
+
+      {/* Lámina propia (SVG de cuaderno de campo): la mata de café entera, con
+          sus partes rotuladas, antes de contar el ciclo. */}
+      <figure className="rounded-2xl border border-amber-900/40 bg-[#efe3c6] p-2 shadow-inner" data-testid="cafe-lamina">
+        <LaminaCafeto />
+        <figcaption className="mt-1 px-1 text-center text-[11px] font-semibold italic text-amber-900/80">
+          La mata de café por dentro y por fuera — conózcala antes de sembrarla.
+        </figcaption>
+      </figure>
 
       <PedagogicalBlock
         icon={Bean}
