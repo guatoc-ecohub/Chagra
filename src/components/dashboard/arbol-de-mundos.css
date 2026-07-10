@@ -56,6 +56,13 @@
 
 /* ── vainas (las entradas a los mundos) ─────────────────────────────────── */
 
+/* brote escalonado al montar: cada rama aparece un tris después de la
+   anterior (delay inline por rama). Solo opacity — compositable, y sin
+   tocar `transform` (el posicionamiento vive en el atributo del SVG). */
+.adm-rama {
+  animation: adm-brota 0.7s ease-out backwards;
+}
+
 .adm-nodo {
   cursor: pointer;
   outline: none;
@@ -226,6 +233,31 @@
   color: #2dffc4;
 }
 
+/* estado LEYENDO: el frailejón germina mientras llegan los registros —
+   semilla que late + anillos punteados girando despacio (solo transform). */
+.adm-reloj-espera {
+  cursor: default;
+}
+
+.adm-reloj-espera:hover {
+  border-color: rgba(157, 255, 63, 0.28);
+  box-shadow: none;
+}
+
+.adm-reloj-espera .adm-reloj-anios {
+  color: #bfffe9;
+}
+
+.adm-reloj-espera-anillo {
+  transform-origin: 60px 60px;
+  animation: adm-gira 16s linear infinite;
+}
+
+.adm-reloj-espera-r2 {
+  animation-direction: reverse;
+  animation-duration: 24s;
+}
+
 /* ── keyframes ──────────────────────────────────────────────────────────── */
 
 @keyframes adm-sap {
@@ -285,6 +317,15 @@
 @keyframes adm-aparece {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes adm-brota {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes adm-gira {
+  to { transform: rotate(360deg); }
 }
 
 /* ── reduced motion: quietud digna, nada desaparece ─────────────────────── */
