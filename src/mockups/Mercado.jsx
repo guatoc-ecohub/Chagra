@@ -4,14 +4,14 @@
  * src/config/messages.js — mismo criterio que los otros mockups de la galería.
  */
 import { useEffect, useState } from 'react';
-import { ArrowLeft, X, Mountain, MapPin, Sprout, ShieldCheck, ScrollText } from 'lucide-react';
+import { ArrowLeft, X, Mountain, MapPin, Sprout, Leaf, ShieldCheck, ScrollText, PenLine } from 'lucide-react';
 import { Colibri } from '../visual/creatures/Colibri.jsx';
 import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
 import { Mariposa } from '../visual/creatures/Mariposa.jsx';
 import { Rostro } from './mercado/Rostro.jsx';
 import { ProductoIlustracion } from './mercado/ProductoIlustracion.jsx';
 import { CintaAltitud } from './mercado/CintaAltitud.jsx';
-import { PRODUCTOS, pisoDeAltitud, pesos } from './mercado/datos.js';
+import { PRODUCTOS, pisoDeAltitud, pesos, fincasUnicas } from './mercado/datos.js';
 import '../visual/effects/effects.css';
 import '../visual/creatures/creatures.css';
 import './mercado.css';
@@ -36,29 +36,33 @@ import './mercado.css';
  */
 export default function Mercado({ onBack }) {
   const [piso, setPiso] = useState('todos');
+  const [orden, setOrden] = useState('montana');
   const [abierta, setAbierta] = useState(null);
 
-  // Fincas para la cinta de altitud (1 finca por producto en el muestreo).
-  const fincas = PRODUCTOS.map((p) => ({
-    id: p.id,
-    nombre: p.finca.nombre,
-    productor: p.finca.productor,
-    altitud: p.finca.altitud,
-    rostro: p.finca.rostro,
-  }));
+  // Fincas ÚNICAS para la cinta de altitud (una finca puede tener 2 productos;
+  // el pin abre el primero).
+  const fincas = fincasUnicas();
 
   // Pisos térmicos presentes, de más alto a más templado, para los filtros.
   const pisosPresentes = [];
-  for (const orden of ['paramo', 'frio', 'templado']) {
-    if (PRODUCTOS.some((p) => pisoDeAltitud(p.finca.altitud).slug === orden)) {
-      pisosPresentes.push(pisoDeAltitud(PRODUCTOS.find((p) => pisoDeAltitud(p.finca.altitud).slug === orden).finca.altitud));
+  for (const slug of ['paramo', 'frio', 'templado']) {
+    if (PRODUCTOS.some((p) => pisoDeAltitud(p.finca.altitud).slug === slug)) {
+      pisosPresentes.push(pisoDeAltitud(PRODUCTOS.find((p) => pisoDeAltitud(p.finca.altitud).slug === slug).finca.altitud));
     }
   }
 
-  const visibles =
+  const filtrados =
     piso === 'todos'
       ? PRODUCTOS
       : PRODUCTOS.filter((p) => pisoDeAltitud(p.finca.altitud).slug === piso);
+
+  // Orden: "de la montaña abajo" (altitud, como se lee la cinta) o "más cerca
+  // de usted primero" (km reales, la señal de cercanía).
+  const visibles = [...filtrados].sort((a, b) =>
+    orden === 'cerca'
+      ? a.finca.distanciaKm - b.finca.distanciaKm
+      : b.finca.altitud - a.finca.altitud,
+  );
 
   const productoAbierto = PRODUCTOS.find((p) => p.id === abierta) || null;
 
@@ -103,11 +107,16 @@ export default function Mercado({ onBack }) {
         </div>
         <div className="mrc-hero__monte">
           <Colibri size={44} className="mrc-colibri" title="Colibrí de la montaña" />
-          <CintaAltitud fincas={fincas} onSelect={setAbierta} />
+          <CintaAltitud
+            fincas={fincas}
+            onSelect={setAbierta}
+            pisoFiltro={piso === 'todos' ? null : piso}
+          />
         </div>
       </section>
 
-      {/* ── FILTRO por piso térmico ───────────────────────────────────────── */}
+      {/* ── FILTRO por piso térmico (la cinta de arriba reacciona: atenúa las
+             fincas de otros pisos) + ORDEN ─────────────────────────────────── */}
       <div className="mrc-filtros" role="group" aria-label="Filtrar por piso térmico">
         <button
           type="button"
@@ -115,7 +124,7 @@ export default function Mercado({ onBack }) {
           onClick={() => setPiso('todos')}
           aria-pressed={piso === 'todos'}
         >
-          Todos
+          Toda la montaña
         </button>
         {pisosPresentes.map((p) => (
           <button
@@ -128,8 +137,29 @@ export default function Mercado({ onBack }) {
           >
             <span className="mrc-chip__punto" aria-hidden="true" />
             {p.nombre}
+            <span className="mrc-chip__rango">{p.rango}</span>
           </button>
         ))}
+      </div>
+
+      <div className="mrc-orden" role="group" aria-label="Ordenar los productos">
+        <span className="mrc-orden__rotulo">Ordenar:</span>
+        <button
+          type="button"
+          className={`mrc-orden__opt${orden === 'montana' ? ' is-on' : ''}`}
+          onClick={() => setOrden('montana')}
+          aria-pressed={orden === 'montana'}
+        >
+          <Mountain size={13} aria-hidden="true" /> De la montaña abajo
+        </button>
+        <button
+          type="button"
+          className={`mrc-orden__opt${orden === 'cerca' ? ' is-on' : ''}`}
+          onClick={() => setOrden('cerca')}
+          aria-pressed={orden === 'cerca'}
+        >
+          <MapPin size={13} aria-hidden="true" /> Más cerca de usted
+        </button>
       </div>
 
       {/* ── GRILLA de productos ───────────────────────────────────────────── */}
@@ -144,7 +174,13 @@ export default function Mercado({ onBack }) {
       </footer>
 
       {productoAbierto && (
-        <Historia producto={productoAbierto} fincas={fincas} onCerrar={() => setAbierta(null)} onVerFinca={setAbierta} />
+        <Historia
+          key={productoAbierto.id}
+          producto={productoAbierto}
+          fincas={fincas}
+          onCerrar={() => setAbierta(null)}
+          onVerFinca={setAbierta}
+        />
       )}
     </div>
   );
@@ -187,10 +223,16 @@ function ProductoCard({ producto, onAbrir }) {
           </span>
         </button>
 
+        {/* Señales de confianza: estampa roja = lo DECLARA la finca; tinta con
+            alfiler = dato medible (los km hasta usted). No se mezclan. */}
         <ul className="mrc-sellos">
           {producto.sellos.map((s) => (
             <SelloEstampa key={s} texto={s} />
           ))}
+          <li className="mrc-km">
+            <MapPin size={12} aria-hidden="true" />
+            <span>a {finca.distanciaKm} km de usted</span>
+          </li>
         </ul>
       </div>
     </article>
@@ -211,6 +253,10 @@ function SelloEstampa({ texto, grande = false }) {
 function Historia({ producto, fincas, onCerrar, onVerFinca }) {
   const { finca } = producto;
   const piso = pisoDeAltitud(finca.altitud);
+  // Otros productos de ESTA misma finca (El Rocío y Los Helechos tienen dos).
+  const delMismoTecho = PRODUCTOS.filter(
+    (p) => p.finca.nombre === finca.nombre && p.id !== producto.id,
+  );
   return (
     <div className="mrc-modal" role="dialog" aria-modal="true" aria-label={`Historia de ${finca.nombre}`}>
       <button type="button" className="mrc-modal__fondo" aria-label="Cerrar" onClick={onCerrar} />
@@ -237,7 +283,7 @@ function Historia({ producto, fincas, onCerrar, onVerFinca }) {
               <p className="mrc-fincahead__quien">{finca.productor}</p>
               <h2 className="mrc-fincahead__finca">{finca.nombre}</h2>
               <p className="mrc-fincahead__ubi">
-                <MapPin size={13} aria-hidden="true" /> vereda {finca.vereda}
+                <MapPin size={13} aria-hidden="true" /> vereda {finca.vereda} · a {finca.distanciaKm} km de usted
               </p>
               <p className="mrc-fincahead__alt">
                 <Mountain size={13} aria-hidden="true" />
@@ -267,16 +313,33 @@ function Historia({ producto, fincas, onCerrar, onVerFinca }) {
             {producto.historia}
           </p>
 
-          {/* Sellos de confianza, grandes */}
+          {/* Sellos de confianza, grandes + los km (dato medible, en tinta) */}
           <ul className="mrc-sellos mrc-sellos--g">
             {producto.sellos.map((s) => (
               <SelloEstampa key={s} texto={s} grande />
             ))}
+            <li className="mrc-km mrc-km--g">
+              <MapPin size={14} aria-hidden="true" />
+              <span>a {finca.distanciaKm} km de usted</span>
+            </li>
           </ul>
+
+          {/* Cómo se cultivó: la versión estructurada de la historia, por frentes */}
+          <div className="mrc-como">
+            <p className="mrc-traza__tit"><Leaf size={15} aria-hidden="true" /> Cómo se cultivó</p>
+            <ul className="mrc-como__lista">
+              {producto.practicas.map((pr) => (
+                <li key={pr.que} className="mrc-como__item">
+                  <span className="mrc-como__que">{pr.que}</span>
+                  <span className="mrc-como__detalle">{pr.como}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* Trazabilidad: hitos de la cosecha, fechas en altímetro monoespaciado */}
           <div className="mrc-traza">
-            <p className="mrc-traza__tit"><Sprout size={15} aria-hidden="true" /> Cómo se dio esta cosecha</p>
+            <p className="mrc-traza__tit"><Sprout size={15} aria-hidden="true" /> De la mata a su mesa</p>
             <ol className="mrc-traza__linea">
               {producto.trazabilidad.map((t, i) => (
                 <li key={t.hito} className={`mrc-traza__hito${i === producto.trazabilidad.length - 1 ? ' is-fin' : ''}`}>
@@ -288,12 +351,43 @@ function Historia({ producto, fincas, onCerrar, onVerFinca }) {
                 </li>
               ))}
             </ol>
+            <p className="mrc-traza__mesa">{producto.mataAMesa}</p>
           </div>
+
+          {/* La palabra de la finca: honestidad sin postureo — aquí no hay
+              certificado de laboratorio, hay nombre, cara y fecha. */}
+          <p className="mrc-palabra">
+            <PenLine size={14} aria-hidden="true" className="mrc-palabra__ico" />
+            Aquí no hay sello de laboratorio. Lo que usted lee es la palabra de{' '}
+            {finca.productor}, con nombre, finca y fecha. Y la finca queda a{' '}
+            {finca.distanciaKm} km: si quiere, puede ir y verlo con sus propios ojos.
+          </p>
+
+          {/* Otros productos de la misma finca */}
+          {delMismoTecho.length > 0 && (
+            <div className="mrc-tambien">
+              <p className="mrc-traza__tit"><Sprout size={15} aria-hidden="true" /> También de {finca.nombre}</p>
+              <div className="mrc-tambien__fila">
+                {delMismoTecho.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className="mrc-tambien__card"
+                    onClick={() => onVerFinca(p.id)}
+                  >
+                    <ProductoIlustracion tipo={p.ilustracion} size={54} title={p.nombre} />
+                    <span className="mrc-tambien__nombre">{p.nombre}</span>
+                    <span className="mrc-tambien__precio">{pesos(p.precio)} / {p.unidad}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Dónde queda en la montaña: reusa la cinta, con esta finca resaltada */}
           <div className="mrc-donde">
             <p className="mrc-donde__tit"><Mountain size={15} aria-hidden="true" /> Dónde queda en la montaña</p>
-            <CintaAltitud fincas={fincas} activaId={producto.id} onSelect={onVerFinca} />
+            <CintaAltitud fincas={fincas} activaId={finca.nombre} onSelect={onVerFinca} />
           </div>
         </div>
       </div>

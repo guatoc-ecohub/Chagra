@@ -5,7 +5,8 @@
  * 0 0 120 120 y se centra solo.
  *
  * Props:
- *   tipo   'tomate' | 'mora' | 'papa' | 'cafe' | 'miel' | 'aguacate'
+ *   tipo   'tomate' | 'mora' | 'papa' | 'cafe' | 'miel' | 'aguacate' |
+ *          'cilantro' | 'haba'
  *   size   número (px). Defecto 120.
  *   className, title.
  */
@@ -117,6 +118,72 @@ const DIBUJOS = {
       <ellipse cx="60" cy="78" rx="13" ry="15" fill="#8a5a2c" />
       <ellipse cx="56" cy="74" rx="5" ry="6" fill="#a5723a" opacity="0.7" />
       <path d="M46,58 C50,54 54,52 58,52" stroke="#e6ee9a" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.7" />
+    </g>
+  ),
+  cilantro: (
+    <g>
+      <ellipse cx="60" cy="102" rx="26" ry="5" fill="#2c2418" opacity="0.12" />
+      {/* amarre del atado */}
+      <path d="M48,84 q12,6 24,0 l-2,8 q-10,5 -20,0 Z" fill="#c9a26a" />
+      <path d="M50,88 q10,5 20,0" stroke="#a8781f" strokeWidth="1.6" fill="none" opacity="0.7" />
+      {/* tallos */}
+      <g stroke="#4a8f3a" strokeWidth="3" strokeLinecap="round" fill="none">
+        <path d="M56,86 C54,70 50,56 42,44" />
+        <path d="M60,86 C60,68 60,52 60,38" />
+        <path d="M64,86 C66,70 70,56 78,44" />
+        <path d="M58,86 C55,72 50,62 46,56" opacity="0.7" />
+        <path d="M62,86 C65,72 70,62 74,56" opacity="0.7" />
+      </g>
+      {/* hojas: matas redondeadas de cilantro */}
+      <g fill="#3f7f3a">
+        <circle cx="40" cy="40" r="9" />
+        <circle cx="31" cy="46" r="7" />
+        <circle cx="48" cy="34" r="8" />
+        <circle cx="60" cy="30" r="9" />
+        <circle cx="52" cy="24" r="7" />
+        <circle cx="68" cy="24" r="7" />
+        <circle cx="72" cy="36" r="8" />
+        <circle cx="80" cy="40" r="9" />
+        <circle cx="88" cy="47" r="7" />
+        <circle cx="45" cy="52" r="7" />
+        <circle cx="75" cy="52" r="7" />
+      </g>
+      <g fill="#6fae4a" opacity="0.85">
+        <circle cx="44" cy="37" r="4" />
+        <circle cx="58" cy="27" r="4" />
+        <circle cx="70" cy="30" r="3.6" />
+        <circle cx="78" cy="43" r="4" />
+        <circle cx="36" cy="45" r="3.4" />
+      </g>
+      {/* raíces: cortado con raíz para que dure */}
+      <g stroke="#c9a26a" strokeWidth="2" strokeLinecap="round" fill="none">
+        <path d="M57,94 q-3,5 -6,7" />
+        <path d="M60,95 q0,5 1,8" />
+        <path d="M63,94 q3,5 6,6" />
+      </g>
+    </g>
+  ),
+  haba: (
+    <g>
+      <ellipse cx="60" cy="100" rx="32" ry="5" fill="#2c2418" opacity="0.12" />
+      {/* vaina de atrás */}
+      <path d="M30,42 C46,36 74,44 86,62 C90,68 88,74 82,74 C62,74 40,64 30,50 C27,46 27,43 30,42 Z" fill="#5a9a44" transform="rotate(9 58 58)" opacity="0.85" />
+      {/* vaina principal, gorda y en curva */}
+      <path d="M26,58 C42,50 74,56 88,76 C93,83 90,90 83,89 C60,88 38,80 27,66 C23,61 23,59 26,58 Z" fill="#6fae4a" />
+      {/* grano insinuado dentro de la vaina */}
+      <g fill="#8ec464" opacity="0.9">
+        <ellipse cx="43" cy="66" rx="8" ry="7" />
+        <ellipse cx="60" cy="71" rx="9" ry="7.5" />
+        <ellipse cx="77" cy="78" rx="8" ry="7" />
+      </g>
+      <path d="M28,60 C44,54 72,60 85,77" stroke="#4a8f3a" strokeWidth="2" fill="none" opacity="0.6" />
+      {/* pedúnculo */}
+      <path d="M26,58 C22,52 20,46 22,40" stroke="#3f7f3a" strokeWidth="3.4" strokeLinecap="round" fill="none" />
+      {/* dos granos sueltos, desgranados */}
+      <ellipse cx="88" cy="46" rx="10" ry="8" fill="#b9d47e" transform="rotate(-14 88 46)" />
+      <path d="M80,44 q3,-3 7,-3" stroke="#8aa653" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <ellipse cx="74" cy="32" rx="9" ry="7" fill="#c8dd90" transform="rotate(10 74 32)" />
+      <path d="M67,31 q3,-3 6,-3" stroke="#9ab264" strokeWidth="2" fill="none" strokeLinecap="round" />
     </g>
   ),
 };

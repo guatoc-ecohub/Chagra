@@ -13,10 +13,13 @@ import { ALTITUD_MIN, ALTITUD_MAX, pisoDeAltitud } from './datos.js';
  *   - Enfoque (historia): una finca resaltada, las demás de contexto tenue.
  *
  * Props:
- *   fincas    [{ id, nombre, productor, altitud, rostro }]
- *   activaId  id de la finca resaltada, o null (panorama).
- *   onSelect  (id) => void — al tocar un pin.
- *   ticks     metros a marcar en el eje. Defecto [3000,2500,2000,1500].
+ *   fincas      [{ id, nombre, productor, altitud, rostro, productoId? }]
+ *   activaId    id de la finca resaltada, o null (panorama).
+ *   onSelect    (id) => void — al tocar un pin. Recibe `productoId` si la finca
+ *               lo trae (fincas agrupadas), o `id` si no.
+ *   pisoFiltro  slug de piso térmico activo o null: los pines de otros pisos se
+ *               atenúan — la cinta ES la navegación del filtro.
+ *   ticks       metros a marcar en el eje. Defecto [3000,2500,2000,1500].
  */
 const BANDA_TOP = 7; // % desde arriba donde empieza la banda útil
 const BANDA_ALTO = 84; // % de alto útil
@@ -30,6 +33,7 @@ export function CintaAltitud({
   fincas,
   activaId = null,
   onSelect,
+  pisoFiltro = null,
   ticks = [3000, 2500, 2000, 1500],
 }) {
   // De más alto a más bajo, para asignar carriles alternos (izq/der) y que dos
@@ -62,15 +66,16 @@ export function CintaAltitud({
       {ordenadas.map((f, i) => {
         const lado = i % 2 === 0 ? 'izq' : 'der';
         const activa = activaId === f.id;
-        const atenua = activaId != null && !activa;
         const piso = pisoDeAltitud(f.altitud);
+        const fueraDePiso = pisoFiltro != null && piso.slug !== pisoFiltro;
+        const atenua = (activaId != null && !activa) || fueraDePiso;
         return (
           <button
             key={f.id}
             type="button"
             className={`mrc-pin mrc-pin--${lado}${activa ? ' is-activa' : ''}${atenua ? ' is-atenua' : ''}`}
             style={{ top: `${porcentajeAltitud(f.altitud)}%`, '--pin-piso': piso.hex }}
-            onClick={() => onSelect && onSelect(f.id)}
+            onClick={() => onSelect && onSelect(f.productoId ?? f.id)}
             aria-label={`${f.nombre}, a ${f.altitud.toLocaleString('es-CO')} metros, piso ${piso.nombre}`}
             aria-pressed={activa}
           >

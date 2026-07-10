@@ -281,6 +281,51 @@
   color: #f4ecd9;
 }
 .mrc-chip.is-on .mrc-chip__punto { box-shadow: 0 0 0 2px rgba(244, 236, 217, 0.35); }
+.mrc-chip__rango {
+  font-family: var(--mrc-mono);
+  font-size: 0.62rem;
+  color: var(--mrc-tinta-2);
+}
+.mrc-chip.is-on .mrc-chip__rango { color: rgba(244, 236, 217, 0.75); }
+
+/* ── ORDEN (de la montaña abajo / más cerca de usted) ────────────────────── */
+.mrc-orden {
+  max-width: 660px;
+  margin: 6px auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+.mrc-orden__rotulo {
+  font-family: var(--mrc-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mrc-tinta-2);
+}
+.mrc-orden__opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border: 1px solid var(--mrc-linea);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--mrc-tinta-2);
+  font-family: var(--mrc-sans);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.mrc-orden__opt svg { color: currentColor; }
+.mrc-orden__opt:hover { border-color: rgba(44, 36, 24, 0.32); color: var(--mrc-tinta); }
+.mrc-orden__opt.is-on {
+  background: rgba(47, 82, 51, 0.12);
+  border-color: var(--mrc-monte);
+  color: var(--mrc-monte);
+  font-weight: 600;
+}
 
 /* ── GRILLA de productos ─────────────────────────────────────────────────── */
 .mrc-grid {
@@ -427,6 +472,24 @@
 .mrc-sello:nth-child(even) { transform: rotate(1.1deg); }
 .mrc-sello svg { flex: 0 0 auto; }
 .mrc-sello--g { font-size: 0.72rem; padding: 5px 11px; }
+
+/* dato MEDIBLE (km hasta usted): tinta y derecho, sin la inclinación de la
+   estampa — lo declarado se estampa, lo medido se anota. */
+.mrc-km {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid rgba(44, 36, 24, 0.4);
+  border-radius: 7px;
+  color: var(--mrc-tinta);
+  font-family: var(--mrc-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.01em;
+  background: rgba(255, 255, 255, 0.35);
+}
+.mrc-km svg { flex: 0 0 auto; color: var(--mrc-monte); }
+.mrc-km--g { font-size: 0.72rem; padding: 5px 11px; }
 
 /* ── PIE ─────────────────────────────────────────────────────────────────── */
 .mrc-pie {
@@ -629,6 +692,27 @@
   color: var(--mrc-monte);
 }
 
+/* cómo se cultivó (prácticas por frentes) */
+.mrc-como {
+  padding: 14px 15px;
+  border: 1px solid var(--mrc-linea);
+  border-radius: 13px;
+  background: rgba(47, 82, 51, 0.06);
+}
+.mrc-como__lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+.mrc-como__item { display: flex; gap: 10px; align-items: baseline; }
+.mrc-como__que {
+  flex: 0 0 auto;
+  min-width: 86px;
+  font-family: var(--mrc-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mrc-monte);
+}
+.mrc-como__detalle { font-size: 0.88rem; line-height: 1.45; color: var(--mrc-tinta); }
+
 /* trazabilidad */
 .mrc-traza {
   padding: 14px 15px;
@@ -683,6 +767,54 @@
 .mrc-traza__hitotxt { display: flex; flex-direction: column; gap: 1px; }
 .mrc-traza__que { font-family: var(--mrc-serif); font-size: 0.92rem; color: var(--mrc-tinta); }
 .mrc-traza__cuando { font-family: var(--mrc-mono); font-size: 0.72rem; color: var(--mrc-tinta-2); }
+.mrc-traza__mesa {
+  margin: 4px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--mrc-linea);
+  font-family: var(--mrc-serif);
+  font-style: italic;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--mrc-tinta);
+}
+
+/* la palabra de la finca (nota de honestidad, manuscrita al margen) */
+.mrc-palabra {
+  position: relative;
+  margin: 0;
+  padding: 11px 13px 11px 34px;
+  border-left: 3px solid var(--mrc-sello);
+  border-radius: 0 10px 10px 0;
+  background: rgba(165, 67, 42, 0.06);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--mrc-tinta);
+}
+.mrc-palabra__ico { position: absolute; left: 11px; top: 13px; color: var(--mrc-sello); }
+
+/* también de esta finca */
+.mrc-tambien__fila { display: flex; flex-wrap: wrap; gap: 10px; }
+.mrc-tambien__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 118px;
+  padding: 10px 12px;
+  border: 1px solid var(--mrc-linea);
+  border-radius: 12px;
+  background: var(--mrc-tarjeta);
+  cursor: pointer;
+  text-align: center;
+}
+.mrc-tambien__card:hover { background: rgba(255, 255, 255, 0.7); }
+.mrc-tambien__nombre {
+  font-family: var(--mrc-serif);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--mrc-tinta);
+}
+.mrc-tambien__precio { font-family: var(--mrc-mono); font-size: 0.68rem; color: var(--mrc-tinta-2); }
 
 /* dónde queda en la montaña */
 .mrc-donde .mrc-cinta { height: clamp(320px, 78vw, 400px); }
@@ -693,6 +825,13 @@
 }
 
 /* ── responsive ──────────────────────────────────────────────────────────── */
+/* 320px: los chips de piso pierden el rango en metros (queda el punto de color
+   y el nombre) y el rótulo de orden pasa a su propia línea. */
+@media (max-width: 379px) {
+  .mrc-chip__rango { display: none; }
+  .mrc-orden__rotulo { flex-basis: 100%; }
+  .mrc-como__que { min-width: 72px; }
+}
 @media (min-width: 560px) {
   .mrc-grid { grid-template-columns: 1fr 1fr; }
 }
@@ -716,7 +855,8 @@
 @media (prefers-reduced-motion: reduce) {
   .mrc-modal { animation: none; }
   .mrc-pin__cara,
-  .mrc-chip { transition: none; }
+  .mrc-chip,
+  .mrc-orden__opt { transition: none; }
   .mrc-pin:hover .mrc-pin__cara,
   .mrc-pin:focus-visible .mrc-pin__cara { transform: none; }
 }
