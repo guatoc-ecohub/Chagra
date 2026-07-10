@@ -5,6 +5,7 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import { getGuardianEspecie, setGuardianEspecie } from '../../services/userProfileService';
+import { GlowFilter } from '../../visual/effects';
 import './guardian-espiritu.css';
 
 /**
@@ -82,13 +83,11 @@ const byId = (id) => ESPECIES.find((e) => e.id === id) || ESPECIES[0];
 /* filtros SVG compartidos (glow + blur), portados del mockup                  */
 /* ------------------------------------------------------------------------- */
 function GuardianDefs() {
+  // Glow + blur suelto compartidos (§13.16). Antes inline; ahora la versión
+  // canónica de src/visual/effects. Mismo markup (id/std/bounds) = cero regresión.
   return (
     <defs>
-      <filter id="ge-glow1" x="-80%" y="-80%" width="260%" height="260%">
-        <feGaussianBlur stdDeviation="2.2" result="b" />
-        <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-      </filter>
-      <filter id="ge-blur3"><feGaussianBlur stdDeviation="3" /></filter>
+      <GlowFilter id="ge-glow1" std={2.2} blurId="ge-blur3" blurStd={3} />
     </defs>
   );
 }
