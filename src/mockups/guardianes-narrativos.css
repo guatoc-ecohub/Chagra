@@ -1,6 +1,9 @@
 /* MOCKUP "Guardianes que aparecen" — SVG+CSS puros, solo transform/opacity.
    Familia visual GuardianEspiritu (glow neón orgánico). Acento por guardián
-   (--gn-acc / --gn-acc-rgb) re-tiñe la escena. reduced-motion = fotograma digno. */
+   (--gn-acc / --gn-acc-rgb) re-tiñe la escena. reduced-motion = fotograma digno.
+   NOTA: la VIDA PERPETUA de cada bicho (aleteo, alas, bola, patas) vive ahora
+   en `src/visual/creatures/creatures.css`. Aquí queda solo el ESCENARIO y la
+   coreografía de LLEGADA de los guardianes. */
 
 .gn-wrap {
   --gn-acc: #2dffc4;
@@ -173,7 +176,8 @@
 .gn-auto:focus-visible { outline: 2px solid var(--gn-acc); outline-offset: 2px; }
 .gn-auto.on { background: rgba(var(--gn-acc-rgb), 0.14); border-style: solid; }
 
-/* ═══ ENTRADAS ORGÁNICAS POR GUARDIÁN (posición en <g> externo, entrada aquí) ═══ */
+/* ═══ ENTRADAS ORGÁNICAS POR GUARDIÁN (posición en <g> externo, entrada aquí) ═══
+   La vida perpetua de cada bicho la trae la librería `src/visual/creatures`. */
 
 /* abeja / mariposa: flotan hacia su flor con un arco */
 .gn-anim-flota { animation: gn-in-flota 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
@@ -213,20 +217,13 @@
   50% { transform: rotate(4deg); }
 }
 
-/* mariposa: entra en camino ondulado + alas que abren/cierran */
+/* mariposa: entra en camino ondulado (sus alas las bate la propia criatura) */
 .gn-anim-mariposa { animation: gn-in-mariposa 1s cubic-bezier(0.3, 0.7, 0.3, 1) both; }
 @keyframes gn-in-mariposa {
   0% { opacity: 0; transform: translate(40px, -26px) rotate(-8deg); }
   40% { opacity: 1; transform: translate(14px, 6px) rotate(6deg); }
   70% { transform: translate(-6px, -4px) rotate(-3deg); }
   100% { transform: none; }
-}
-.gn-mari-ala { transform-box: fill-box; transform-origin: center; animation: gn-aletea 0.5s ease-in-out infinite; }
-.gn-mari-ala-izq { transform-origin: right center; }
-.gn-mari-ala-der { transform-origin: left center; }
-@keyframes gn-aletea {
-  0%, 100% { transform: scaleX(1); }
-  50% { transform: scaleX(0.4); }
 }
 
 /* escarabajo: RUEDA su bola de abono entrando desde la derecha */
@@ -236,20 +233,6 @@
   60% { opacity: 1; }
   100% { transform: none; }
 }
-.gn-bola { transform-box: fill-box; transform-origin: center; animation: gn-rueda 1.1s linear infinite; }
-@keyframes gn-rueda { 0% { transform: rotate(0); } 100% { transform: rotate(-360deg); } }
-.gn-patas { animation: gn-pasos 0.5s ease-in-out infinite; }
-@keyframes gn-pasos {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(-1.2px); }
-}
-
-/* alas genéricas (abeja/colibrí): batir rápido */
-.gn-ala { transform-box: fill-box; transform-origin: center bottom; animation: gn-batir 0.13s ease-in-out infinite alternate; }
-@keyframes gn-batir {
-  0% { transform: scaleY(1) scaleX(1); }
-  100% { transform: scaleY(0.6) scaleX(0.9); }
-}
 
 /* ═══ reduced-motion: los guardianes APARECEN sin volar (fotograma digno) ═══ */
 @media (prefers-reduced-motion: reduce) {
@@ -257,7 +240,7 @@
   .gn-stage.saliendo { transform: none; }
   .gn-anim-flota, .gn-anim-vuela, .gn-anim-sube, .gn-anim-mariposa, .gn-anim-rueda,
   .gn-anim-flota > g, .gn-anim-vuela > g, .gn-anim-sube > g,
-  .gn-mari-ala, .gn-bola, .gn-patas, .gn-ala, .gn-halo, .gn-agua-brillo {
+  .gn-halo, .gn-agua-brillo {
     animation: gn-solo-aparece 0.35s ease both !important;
   }
   @keyframes gn-solo-aparece { from { opacity: 0; } to { opacity: 1; } }
