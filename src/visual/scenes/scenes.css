@@ -1,0 +1,172 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   src/visual/scenes — hoja compartida de las ESCENAS BASE reutilizables.
+
+   Clases `scn-*` + custom properties `--scn-*`, cero dependencias nuevas. Es la
+   versión CANÓNICA de las recetas que antes se re-armaban en cada escena:
+     · animaciones del CIELO paramétrico (estrellas, lluvia, nubes, niebla,
+       estrella fugaz) — semilla `finca-viva-hero.css` (`.fvh-estrellas`…).
+     · PULSO cardíaco de la finca-organismo (corazón, ondas, red) — semilla
+       `scene-finca-organismo.css` (`--fvo-beat`).
+     · textura de PAPEL KRAFT — semilla `finca-viva-hero.css` (grano nature).
+     · base del motor PARALLAX multicapa — semilla `MontanaMundosCine`
+       (`.mm2-capa`).
+     · glow + flotación del GUARDIÁN-ESPÍRITU — semilla `guardian-espiritu.css`.
+
+   Reglas de la casa (iguales a creatures/effects): solo transform/opacity
+   animados; blur/filtros ESTÁTICOS; reduced-motion = fotograma final digno;
+   importe esta hoja UNA vez donde use las clases.
+
+   NOTA de dedupe (cuando `src/visual/effects` entre a main): el pulso de aquí
+   equivale a `--vfx-beat`, el glow a `<GlowFilter>` y las veladuras/grades a las
+   clases `.vfx-*`. Reusar effects donde aplique en vez de re-declarar.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── CIELO PARAMÉTRICO — animaciones del <CapaCielo> (rsvg-safe) ───────────── */
+/* estrellas que titilan (titileo escalonado) */
+.scn-estrellas circle { animation: scn-titila 3.4s ease-in-out infinite; }
+.scn-estrellas circle:nth-child(2n) { animation-delay: 1.2s; }
+.scn-estrellas circle:nth-child(3n) { animation-delay: 2.1s; }
+@keyframes scn-titila { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+/* lluvia: trazos que caen */
+.scn-lluvia line { animation: scn-cae 0.9s linear infinite; }
+.scn-lluvia line:nth-child(2n) { animation-delay: 0.3s; }
+.scn-lluvia line:nth-child(3n) { animation-delay: 0.6s; }
+@keyframes scn-cae { 0% { transform: translateY(-8px); opacity: 0; } 30% { opacity: 0.95; } 100% { transform: translateY(20px); opacity: 0; } }
+
+/* nubes densas (clima cubierto) — derivan en contrafase */
+.scn-nube-a { animation: scn-nube 24s ease-in-out infinite; }
+.scn-nube-b { animation: scn-nube 30s ease-in-out infinite reverse; }
+@keyframes scn-nube { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(18px); } }
+
+/* estrella fugaz — casi siempre invisible; cada ~9s cruza y se apaga */
+.scn-fugaz { opacity: 0; animation: scn-fugaz 9s ease-in 2s infinite; }
+@keyframes scn-fugaz {
+  0%, 86%  { opacity: 0; transform: translate(0, 0); }
+  88%      { opacity: 0.9; }
+  94%      { opacity: 0; transform: translate(-46px, 22px); }
+  100%     { opacity: 0; transform: translate(-46px, 22px); }
+}
+
+/* bancos de niebla — derivan en contrafase (condición niebla) */
+.scn-neblina-a { animation: scn-neblina 18s ease-in-out infinite; }
+.scn-neblina-b { animation: scn-neblina 24s ease-in-out infinite reverse; }
+@keyframes scn-neblina { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(30px); } }
+
+/* ── PULSO CARDÍACO de la finca-organismo ─────────────────────────────────────
+   Un solo ritmo `--scn-beat` sincroniza todo lo vivo (la finca es UN organismo).
+   Para acelerar/frenar TODO junto: `style={{ '--scn-beat': '4s' }}` en un ancestro. */
+.scn-heart {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scn-beat var(--scn-beat, 5.2s) ease-in-out infinite;
+}
+@keyframes scn-beat {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  6% { transform: scale(1.35); filter: brightness(2.2); }
+  12% { transform: scale(1); }
+  18% { transform: scale(1.22); filter: brightness(1.7); }
+  26% { transform: scale(1); filter: brightness(1); }
+}
+.scn-heart-wave {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scn-hwave var(--scn-beat, 5.2s) ease-out infinite;
+}
+@keyframes scn-hwave {
+  0% { transform: scale(0.2); opacity: 0.7; }
+  45% { transform: scale(2.6); opacity: 0; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+/* la red entera se enciende con cada latido */
+.scn-net { animation: scn-netglow var(--scn-beat, 5.2s) ease-in-out infinite; }
+@keyframes scn-netglow { 0%, 100% { opacity: 0.55; } 8% { opacity: 1; } 16% { opacity: 0.7; } 22% { opacity: 0.9; } 34% { opacity: 0.55; } }
+
+/* ── PAPEL KRAFT — textura de grano por líneas repetidas (sin imagen/noise) ───
+   Parametrizable: ángulo (0deg = grano horizontal kraft; 90deg = trama vertical
+   fina de papel), color y paso. Se monta sobre un contenedor `position:relative`
+   (o como capa que no captura toque). */
+.scn-kraft {
+  --scn-kraft-angle: 0deg;
+  --scn-kraft-color: rgba(122, 82, 48, 0.05);
+  --scn-kraft-grano: 2px;   /* grosor de la línea */
+  --scn-kraft-paso: 6px;    /* período de repetición */
+  background-image: repeating-linear-gradient(
+    var(--scn-kraft-angle),
+    var(--scn-kraft-color) 0 var(--scn-kraft-grano),
+    transparent var(--scn-kraft-grano) var(--scn-kraft-paso)
+  );
+  pointer-events: none;
+}
+/* trama vertical finísima de papel (piel minimalista) */
+.scn-kraft--fino {
+  --scn-kraft-angle: 90deg;
+  --scn-kraft-color: rgba(60, 70, 60, 0.035);
+  --scn-kraft-grano: 1px;
+  --scn-kraft-paso: 8px;
+}
+
+/* ── PARALLAX MULTICAPA — base del <Parallax> (motor de MontanaMundosCine) ─────
+   Cada capa viaja a su velocidad (transform inline desde React) por composición
+   GPU pura (solo transform). La INERCIA por capa (duraciones/curvas distintas)
+   la afina la escena con sus propias clases modificadoras. */
+.scn-parallax { position: relative; overflow: hidden; }
+.scn-capa {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform-origin: 0 0;
+  will-change: transform;
+  transition: transform 0.95s cubic-bezier(0.3, 0.86, 0.24, 1.02), opacity 0.7s ease;
+  pointer-events: none;
+}
+/* la capa principal (la que lleva los mundos tocables) sí recibe toque */
+.scn-capa--interactiva { pointer-events: auto; }
+
+/* ── GUARDIÁN-ESPÍRITU base — glow por acento + flotación perpetua ────────────
+   El acento (--scn-acc / --scn-acc-rgb) lo re-tiñe el espíritu elegido. */
+.scn-espiritu-halo {
+  --scn-acc: #ffb54f;
+  --scn-acc-rgb: 255, 181, 79;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 36%, rgba(var(--scn-acc-rgb), 0.28), rgba(var(--scn-acc-rgb), 0.02) 70%);
+}
+.scn-espiritu-halo svg { width: 100%; height: 100%; }
+
+.scn-av-vuela { animation: scn-vuela 3.4s ease-in-out infinite; transform-origin: center; }
+.scn-av-flota { animation: scn-flota 3.8s ease-in-out infinite; transform-origin: center; }
+.scn-ala { animation: scn-ala 0.28s ease-in-out infinite alternate; transform-origin: 4px 0; }
+.scn-aleteo { animation: scn-aleteo 0.16s ease-in-out infinite alternate; transform-origin: -1px -5px; }
+@keyframes scn-vuela { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-3px) rotate(1.5deg); } }
+@keyframes scn-flota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+@keyframes scn-ala { from { transform: scaleY(0.72) rotate(-6deg); } to { transform: scaleY(1) rotate(4deg); } }
+@keyframes scn-aleteo { from { transform: scaleX(0.55); opacity: 0.5; } to { transform: scaleX(1); opacity: 0.8; } }
+
+/* ── REDUCED-MOTION — fotograma final digno (nada se mueve) ───────────────────
+   El cielo queda quieto, el corazón encendido y en reposo (sin ondas), la red
+   ENCENDIDA, el parallax fijo y el espíritu flotando detenido. */
+@media (prefers-reduced-motion: reduce) {
+  .scn-estrellas circle,
+  .scn-lluvia line,
+  .scn-nube-a,
+  .scn-nube-b,
+  .scn-fugaz,
+  .scn-neblina-a,
+  .scn-neblina-b,
+  .scn-heart,
+  .scn-heart-wave,
+  .scn-net,
+  .scn-capa,
+  .scn-av-vuela,
+  .scn-av-flota,
+  .scn-ala,
+  .scn-aleteo {
+    animation: none !important;
+    transition: none !important;
+  }
+  .scn-heart-wave { opacity: 0; }     /* sin ondas expansivas */
+  .scn-net { opacity: 1; }            /* la red queda encendida */
+}
