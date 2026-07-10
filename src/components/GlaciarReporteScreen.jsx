@@ -435,7 +435,7 @@ export default function GlaciarReporteScreen({ onBack, onVerHistorial = null }) 
               placeholder="ej. RITACUBA-FRENTE-01"
               className="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-base text-white outline-none focus:border-sky-500"
             />
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-slate-400 mt-1">
               Repita el mismo id en cada visita: así se ve cuánto retrocede el frente del hielo.
             </p>
 
@@ -518,7 +518,7 @@ export default function GlaciarReporteScreen({ onBack, onVerHistorial = null }) 
               placeholder="ej. 135"
               icon={<Compass size={18} />}
             />
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-slate-400 mt-1">
               Anote hacia dónde apunta la cámara: clave para repetir el mismo encuadre con el tiempo.
             </p>
 
@@ -565,7 +565,7 @@ export default function GlaciarReporteScreen({ onBack, onVerHistorial = null }) 
               <Layers size={16} className="text-sky-300" />
               <Label className="mb-0">Perfil por capas (superficie → fondo)</Label>
             </div>
-            <p className="text-[11px] text-slate-500 mb-3">
+            <p className="text-[11px] text-slate-400 mb-3">
               La capa de arriba manda el tránsito. Agregue capas más profundas para contar la historia del hielo.
             </p>
             <div className="space-y-3">

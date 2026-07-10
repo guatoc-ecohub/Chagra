@@ -378,7 +378,7 @@ function ProactiveGreeting({ greeting }) {
       )}
 
       {isPending && restCount > 0 && (
-        <p className="text-[11px] text-slate-500 mb-3" data-testid="proactive-greeting-rest">
+        <p className="text-[11px] text-slate-400 mb-3" data-testid="proactive-greeting-rest">
           {restCount === 1
             ? 'Hay 1 pendiente más en la campana 🔔.'
             : `Hay ${restCount} pendientes más en la campana 🔔.`}
