@@ -107,6 +107,9 @@ const CompostScreen = lazy(() => import('./components/CompostScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const OnboardingCondensado = lazy(() => import('./components/OnboardingCondensado'));
+// Galería de mockups (diseño): rutas públicas `#/mockups/<slug>`, sin auth ni
+// gate, datos de muestra. No cuentan como módulo de piloto. Ver MOCKUP_HASH_ROUTES.
+const DiaEnFincaMockup = lazy(() => import('./mockups/DiaEnFinca'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const PlantaPorVozScreen = lazy(() => import('./components/PlantaPorVozScreen'));
@@ -416,6 +419,15 @@ const LoadingFallback = ({ view = null }) => {
 // viva (HERRAMIENTAS_TILES en DashboardLive). Las rutas `casos`/`caso_detail`/
 // `javier`/`usage_stats` siguen vivas en el router (más abajo) y por hash.
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
+
+// Rutas de MOCKUP de diseño (galería): PÚBLICAS — sin auth ni gate, datos de
+// muestra. Se resuelven ANTES del check de sesión (igual que el callback OAuth),
+// para que una lámina se pueda revisar sin cuenta. Patrón `#/mockups/<slug>` (el
+// hash se normaliza a `mockups/<slug>`). No entran en HASH_VIEW_ROUTES para dejar
+// explícito que NO pasan por los gates de sesión/rol.
+const MOCKUP_HASH_ROUTES = {
+  'mockups/dia-en-finca': 'mockup_dia_en_finca',
+};
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
@@ -915,6 +927,14 @@ export default function App() {
       return;
     }
 
+    // Mockups de diseño: públicos, sin auth. Se resuelven antes de
+    // isAuthenticated para que la galería (#/mockups/<slug>) abra sin cuenta.
+    const mockupView = MOCKUP_HASH_ROUTES[hash];
+    if (mockupView) {
+      Promise.resolve().then(() => navigate(mockupView));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -941,6 +961,12 @@ export default function App() {
   useEffect(() => {
     const handleHashRoute = () => {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+      // Mockups públicos: navegar directo, sin pasar por auth ni gates.
+      const mockupView = MOCKUP_HASH_ROUTES[hash];
+      if (mockupView) {
+        navigate(mockupView);
+        return;
+      }
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
@@ -2487,6 +2513,18 @@ export default function App() {
                 onNavigate={navigate}
                 initialContext={currentViewData}
               />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_dia_en_finca':
+        // Mockup de galería (público, datos de muestra): "El día en su finca" —
+        // la superficie completa del sí-o-sí #1 (qué hacer HOY y por qué): la
+        // acción prioritaria con su porqué, las secundarias y la franja de
+        // observación, bajo el cielo vivo de la hora. Ruta #/mockups/dia-en-finca.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El día en su finca">
+              <DiaEnFincaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
