@@ -2,7 +2,7 @@
   "generated_at": "2026-07-06T16:12:43+00:00",
   "source": "Wikimedia Commons (CC0/CC-BY/CC-BY-SA/Public domain only)",
   "note": "Fotos verificadas manualmente; solo licencias libres. Optimizadas a <=900px / <=200KB.",
-  "count": 20,
+  "count": 19,
   "images": [
     {
       "id": "phytophthora_infestans",
@@ -81,19 +81,6 @@
       "bytes": 96548,
       "width": 900,
       "height": 766
-    },
-    {
-      "id": "moniliophthora_roreri",
-      "file": "/plaga-images/moniliophthora_roreri.jpg",
-      "binomio": "Moniliophthora roreri",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
-      "attribution": "Ronnydv10",
-      "source": "Wikimedia Commons",
-      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mroreri.jpg",
-      "bytes": 31935,
-      "width": 744,
-      "height": 496
     },
     {
       "id": "moniliophthora_perniciosa",
