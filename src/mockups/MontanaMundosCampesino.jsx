@@ -2,7 +2,8 @@
  * MontanaMundosCampesino.jsx — MOCKUP DEV, PASADA 4 "CAMPESINA" de
  * "La Montaña de los Mundos" (#/mockups/montana-mundos-campesino, sin gate).
  *
- * 4ª dirección PARA COMPARAR con las pasadas 2 y 3 (no las reemplaza).
+ * Versión ELEGIDA por la auditoría visual 2026-07-10 (arrastra completo el
+ * motor de cine de la pasada 3 — p3 no se mergea aparte).
  * Norte del operador: CONCRETA Y LITERAL — el campesino RECONOCE su finca
  * (sus cultivos reales, su clima, su piso térmico) SIN perder el toque
  * cinematográfico de la pasada 3. Hereda de la pasada 3 (copia fiel de su
@@ -27,10 +28,12 @@
  *      cabecera es la cédula de la finca (nombre, vereda, clima de hoy).
  *
  * Una sola dirección de arte ("tarde lavada después del aguacero en tierra
- * fría"): tokens propios sobre la base naturalista de la pasada 3 — por eso
- * el root conserva data-dir='naturalista' (bandada, aves y colibrí gratis)
- * y la clase mm4 re-tiñe la luz. Se conservan pellizco/botón, deslizar/
- * rueda, atajos Ⓐ + anotar, reduced-motion digno. Español de Colombia.
+ * fría"): tokens propios sobre la base naturalista de la pasada 3 y la clase
+ * mm4 re-tiñe la luz. Al promover a prod se PODARON las direcciones alternas
+ * del mockup de cine (biopunk / verde vivo: estrellas, micelio, luciérnagas,
+ * mariposas, hojas que caen) — este archivo es la única fuente del motor.
+ * Se conservan pellizco/botón, deslizar/rueda, atajos Ⓐ + anotar,
+ * reduced-motion digno. Español de Colombia.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -80,6 +83,7 @@ const MUNDOS = [
   { id: 'papa', x: 118, y: 662, piso: 2, etiqueta: 'Su papa pastusa', dato: '3 surcos · 42 días de sembrada', abre: 'su papa pastusa: los 3 surcos que sembró hace 42 días' },
   { id: 'corral', x: 278, y: 700, piso: 2, etiqueta: 'Su corral', dato: '12 gallinas · la vaca Lucero', abre: 'sus animales: las 12 gallinas y la vaca Lucero' },
   { id: 'casa', x: 190, y: 752, piso: 2, etiqueta: 'Su finca por dentro', dato: 'véala respirar, un solo organismo', escena: 'organismo', abre: 'su finca viva por dentro, como un solo organismo' },
+  { id: 'cosecha', x: 296, y: 826, piso: 3, etiqueta: 'La cosecha', abre: 'el troje: la cosecha que tiene guardada' },
   { id: 'cafe', x: 96, y: 942, piso: 3, etiqueta: 'El café de la vereda', abre: 'el mundo del café' },
   { id: 'vender', x: 300, y: 986, piso: 3, etiqueta: 'El mercado', dato: 'papa a $2.400 la libra', abre: 'el mercado del pueblo: precios y ventas' },
   { id: 'mango', x: 92, y: 1136, piso: 4, etiqueta: 'El mango', abre: 'el mundo del mango' },
@@ -222,7 +226,7 @@ function Arbolito({ x, y, s = 1 }) {
   );
 }
 
-// ── Capa 1: CIELO (astro, estrellas, god-rays, nubes altas) — f 0.10 ────────
+// ── Capa 1: CIELO (astro, god-rays, nubes altas, bandada) — f 0.10 ──────────
 function CieloSvg() {
   return (
     <svg className="mm2-svg" viewBox={`0 0 ${VB_W} ${VB_H}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
@@ -244,16 +248,6 @@ function CieloSvg() {
 
       <rect x="0" y="0" width={VB_W} height={VB_H} fill="url(#mm2c-cielo)" />
 
-      {/* Estrellas (noche biopunk) */}
-      <g className="mm2-estrellas">
-        {[[24, 60, 1.6], [70, 130, 1.1], [120, 44, 1.4], [170, 96, 1], [250, 60, 1.5],
-          [292, 150, 1.1], [350, 40, 1.3], [366, 120, 1], [46, 210, 1.2], [340, 210, 1.4],
-          [96, 300, 1], [300, 300, 1.1], [150, 170, 1.2], [210, 40, 1], [30, 350, 1.1],
-          [360, 320, 1.2], [190, 260, 1], [260, 220, 1.3]].map(([cx, cy, r]) => (
-            <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} className="mm2-estrella" />
-          ))}
-      </g>
-
       {/* God-rays: abanico de luz volumétrica desde el astro, baña la ladera */}
       <g className="mm2-rayos">
         <path className="mm2-rayo mm2-rayo-1" d="M300 106 L96 620 L168 660 Z" fill="url(#mm2c-rayo)" />
@@ -261,13 +255,10 @@ function CieloSvg() {
         <path className="mm2-rayo mm2-rayo-3" d="M330 108 L420 560 L354 620 Z" fill="url(#mm2c-rayo)" />
       </g>
 
-      {/* El astro (sol de día, luna con cráteres de noche) → mundo Calendario */}
+      {/* El astro: el sol de la tarde lavada → mundo de las heladas */}
       <g className="mm2-astro">
         <circle cx="316" cy="96" r="60" fill="url(#mm2c-halo)" />
         <circle cx="316" cy="96" r="24" className="mm2-astro-disco" />
-        <circle cx="308" cy="88" r="4.6" className="mm2-astro-crater" />
-        <circle cx="324" cy="102" r="3.2" className="mm2-astro-crater" />
-        <circle cx="314" cy="108" r="2.4" className="mm2-astro-crater" />
       </g>
 
       {/* Cirros altos, casi quietos */}
@@ -281,8 +272,8 @@ function CieloSvg() {
         </g>
       </g>
 
-      {/* Bandada en V que CRUZA el cielo de lado a lado (naturalista y
-          verde vivo): pasa una vez, descansa fuera de cuadro y vuelve. */}
+      {/* Bandada en V que CRUZA el cielo de lado a lado: pasa una vez,
+          descansa fuera de cuadro y vuelve. */}
       <g transform="translate(0 218)" className="mm2-bandada">
         <g className="mm2-bandada-vuelo">
           <path d="M0 0 q6 -6 12 0 q6 -6 12 0" />
@@ -550,14 +541,6 @@ function MontanaPrincipalSvg() {
           <circle cx="308" cy="994" r="3.4" className="mm2-mercado-fruta-a" />
         </g>
 
-        {/* Luciérnagas (solo biopunk): parpadean y derivan por el aire
-            tibio de la finca y el cálido — la noche está viva */}
-        <g className="mm2-luciernagas">
-          {[[152, 912], [238, 932], [186, 962], [298, 1012], [122, 1002], [262, 882], [90, 1098]].map(([cx, cy]) => (
-            <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.8" className="mm2-luciernaga" />
-          ))}
-        </g>
-
         {/* ── CÁLIDO: mango con frutos colgando, platanera, cañaduzal ── */}
         <g className="mm2-arbol-mango">
           <path d="M90 1172 Q86 1152 82 1140 M90 1172 Q92 1150 98 1136" className="mm2-mango-tronco" />
@@ -587,13 +570,6 @@ function MontanaPrincipalSvg() {
             <ellipse cx="281" cy="1188" rx="2.6" ry="3.6" className="mm2-bellota" />
           </g>
         </g>
-        {/* Hojas que caen (solo verde vivo): del mango y del cafetal */}
-        <g className="mm2-hojas-caen">
-          <ellipse cx="112" cy="1102" rx="2.6" ry="1.4" className="mm2-hoja-cae mm2-hoja-cae-1" />
-          <ellipse cx="72" cy="1116" rx="2.4" ry="1.3" className="mm2-hoja-cae mm2-hoja-cae-2" />
-          <ellipse cx="132" cy="916" rx="2.4" ry="1.3" className="mm2-hoja-cae mm2-hoja-cae-3" />
-        </g>
-
         <g className="mm2-cana">
           {[176, 188, 200, 212].map((x, i) => (
             <g key={x}>
@@ -651,32 +627,6 @@ function MontanaPrincipalSvg() {
         <rect x="-2" y="120" width="394" height="1470" fill="url(#mm2p-ladera)" pointerEvents="none" />
       </g>
 
-      {/* Red viva (solo biopunk): el micelio conecta los pisos */}
-      <g className="mm2-micelio">
-        <path d="M316 120 Q260 200 195 300 Q160 390 168 428 Q150 520 160 600 Q175 660 195 700 Q220 760 195 880 Q180 940 230 1000 Q260 1060 240 1140 Q220 1240 195 1300 Q180 1340 190 1380" />
-        <path d="M168 428 Q200 520 272 700" opacity="0.55" />
-        <path d="M195 880 Q140 920 96 942" opacity="0.55" />
-        <path d="M230 1000 Q270 1080 292 1168" opacity="0.55" />
-        {MUNDOS.map((m) => (
-          <circle key={m.id} cx={m.x} cy={m.y} r="3" className="mm2-micelio-nodo" />
-        ))}
-      </g>
-
-      {/* Mariposas (solo verde vivo) */}
-      <g className="mm2-mariposas">
-        <g transform="translate(150 860)">
-          <g className="mm2-mariposa-1">
-            <ellipse cx="-3" cy="0" rx="3.4" ry="2.2" />
-            <ellipse cx="3" cy="0" rx="3.4" ry="2.2" />
-          </g>
-        </g>
-        <g transform="translate(260 1120)">
-          <g className="mm2-mariposa-2">
-            <ellipse cx="-3" cy="0" rx="3" ry="2" />
-            <ellipse cx="3" cy="0" rx="3" ry="2" />
-          </g>
-        </g>
-      </g>
     </svg>
   );
 }
@@ -796,7 +746,9 @@ export default function MontanaMundosCampesino({ onBack = null }) {
     setViaje(true);
     if (viajeTimer.current) clearTimeout(viajeTimer.current);
     // El zoom a la montaña completa viaja más lento que el paso de piso.
-    viajeTimer.current = setTimeout(() => setViaje(false), nuevoModo === 'montana' ? 1700 : 1050);
+    // 2000ms cubre la capa más lenta del zoom-out (cielo: 1.9s) — la niebla
+    // no se cierra antes de que la cámara asiente.
+    viajeTimer.current = setTimeout(() => setViaje(false), nuevoModo === 'montana' ? 2000 : 1050);
     if (nuevoModo === 'finca' && nuevoPiso === PISO_FINCA) {
       setLlegada(true);
       if (llegadaTimer.current) clearTimeout(llegadaTimer.current);
@@ -917,10 +869,12 @@ export default function MontanaMundosCampesino({ onBack = null }) {
   return (
     <div
       /* mm4 sobre la base mm2: hereda TODO el cine de la pasada 3 y la piel
-         campesina re-tiñe encima. data-dir fijo en naturalista (una sola
-         dirección de arte): bandada, aves y colibrí heredados gratis. */
+         campesina re-tiñe encima (una sola dirección de arte: bandada, aves
+         y colibrí viven en la base). --mm2-esc publica la escala de cámara:
+         los rótulos de piso la compensan (1/s) para leerse a tamaño real
+         también en la montaña completa. */
       className="mm2 mm4"
-      data-dir="naturalista"
+      style={{ '--mm2-esc': t.s }}
       data-modo={modo}
       data-piso={pisoActual.id}
       data-viaje={viaje ? 'true' : undefined}
@@ -1035,8 +989,11 @@ export default function MontanaMundosCampesino({ onBack = null }) {
                 : `Acercarse a ${p.nombre}, ${p.msnm}`}
               onClick={() => irAPiso(i)}
             >
+              {/* El mensaje-bandera va corto: a tamaño real (rotulo con 1/s)
+                  el texto largo no cabe en el ancho del teléfono; el piso y
+                  la altura completos viven en el aria-label. */}
               <span className="mm2-franja-rotulo">
-                {p.finca ? `⭐ SU FINCA ESTÁ AQUÍ · ${p.nombre} · ${p.msnm}` : `${p.nombre} · ${p.msnm}`}
+                {p.finca ? '⭐ SU FINCA ESTÁ AQUÍ' : `${p.nombre} · ${p.msnm}`}
               </span>
             </button>
           ))}
