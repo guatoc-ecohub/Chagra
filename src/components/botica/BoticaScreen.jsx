@@ -34,10 +34,13 @@ import './botica.css';
  *     ficha lleva su `catalogId` real.
  *   · Solo especies que existen en el catálogo/grafo. Complementa —no duplica—
  *     el mundo "Aromáticas y condimentarias" (la huerta de la cocina): aquí va
- *     la BOTICA medicinal; la hierbabuena y el poleo se quedan en la cocina.
+ *     la BOTICA medicinal; el poleo se queda en la cocina. La yerbabuena aparece
+ *     en ambos mundos SIN duplicar: en la cocina, su uso culinario; aquí, su lado
+ *     de botica, con un `cruce` que remite a la cocina y el aviso de no confundirla
+ *     con el poleo (abortivo).
  *
  * Cinco estaciones (pestañas):
- *   1. Barriga y nervios — digestivas y calmantes (manzanilla, cidrón, toronjil).
+ *   1. Barriga y nervios — digestivas y calmantes (manzanilla, cidrón, toronjil, yerbabuena).
  *   2. Piel y heridas     — uso externo (caléndula, llantén).
  *   3. Gripa y tónico     — pecho y sangre (saúco, ortiga).
  *   4. Cultivar la botica — piso térmico, cosecha de hoja/flor y secado.
@@ -163,6 +166,18 @@ function PlantaCard({ planta }) {
           </p>
         )}
 
+        {/* Cruce honesto: mata que también vive en la huerta de la cocina
+            (misma especie, otro uso). Remite sin duplicar el contenido. */}
+        {p.cruce && (
+          <p
+            className="flex items-start gap-1.5 rounded-lg border border-sky-800/40 bg-sky-950/20 p-2 text-[11px] leading-snug text-sky-100/90"
+            data-testid={`cruce-${p.slug}`}
+          >
+            <Sprout size={13} aria-hidden="true" className="shrink-0 mt-0.5 text-sky-300" />
+            <span><span className="font-bold text-sky-200">También vive en {p.cruce.mundo}:</span> {p.cruce.nota}</span>
+          </p>
+        )}
+
         {/* Para qué se usa TRADICIONALMENTE (parte usada + uso) */}
         <div>
           <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wide text-emerald-300 mb-1.5">
@@ -285,6 +300,7 @@ function EstacionCultivo() {
       {/* Cómo secar y guardar (común a toda la botica) */}
       <div className="rounded-2xl border border-amber-800/40 bg-[#141b12]/50 p-4 space-y-2" data-testid="botica-secado">
         <p className="flex items-center gap-2 text-sm font-black text-amber-200 uppercase tracking-wide">
+          {/* eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- título de contenido campesino, migración i18n pendiente para todo el mundo (ADR-050, ver header de boticaCampesina.js) */}
           <Scissors size={16} aria-hidden="true" /> Cosechar, secar y guardar
         </p>
         <ul className="space-y-2 text-xs leading-snug text-slate-300">
@@ -410,8 +426,8 @@ export default function BoticaScreen({ onBack, onNavigate = undefined }) {
           </p>
           <p className="mt-1.5 text-xs italic leading-snug text-slate-400">
             Las plantas medicinales de la casa —caléndula, manzanilla, toronjil, cidrón,
-            saúco, ortiga, llantén— contadas por su uso tradicional y por cómo se cultivan
-            y se cosechan. Complementa la huerta de aromáticas de la cocina: esto es la botica.
+            yerbabuena, saúco, ortiga, llantén— contadas por su uso tradicional y por cómo se
+            cultivan y se cosechan. Complementa la huerta de aromáticas de la cocina: esto es la botica.
           </p>
           <div className="mt-2.5 rounded-lg border border-amber-600/40 bg-amber-950/20 p-2.5">
             <p className="flex items-start gap-1.5 text-[11px] leading-snug text-amber-100">
@@ -453,7 +469,7 @@ export default function BoticaScreen({ onBack, onNavigate = undefined }) {
             grupo="barriga"
             icon={HeartPulse}
             tituloHero="Las aromáticas de la casa: se toman en agua de tiempo después de comer, para el estómago pesado y los gases, y en la noche para calmar los nervios y ayudar a dormir."
-            lead="La manzanilla, el cidrón y el toronjil son el trío de aguas aromáticas de toda cocina campesina."
+            lead="La manzanilla, el cidrón, el toronjil y la yerbabuena son las aguas aromáticas de toda cocina campesina."
             clave="Son aguas para acompañar una molestia pasajera, no un tratamiento. Se toman con medida y de vez en cuando."
           />
         )}

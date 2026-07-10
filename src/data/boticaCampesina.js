@@ -21,8 +21,13 @@
  *      (SlotPendiente), NO se inventa.
  *   4. Se COMPLEMENTA (no duplica) el mundo "Aromáticas y condimentarias" (la
  *      huerta de la cocina): allí van las hierbas del fogón (cilantro, orégano,
- *      hierbabuena, poleo…); AQUÍ va la BOTICA medicinal. Por eso NO se repiten
- *      la hierbabuena ni el poleo (ya viven en la huerta de la cocina).
+ *      poleo…) por su USO DE COCINA. AQUÍ va la BOTICA medicinal. El POLEO se
+ *      queda solo en la cocina (allá lleva su propio veto). La YERBABUENA es la
+ *      única mata que aparece en ambos mundos, pero SIN duplicar el contenido:
+ *      en la cocina va su uso culinario (agua de panela, jugos); aquí va SOLO su
+ *      lado de botica (digestiva/calmante) con un `cruce` que remite a la cocina,
+ *      más el aviso de NO confundirla con el poleo (abortivo). Ver la ficha
+ *      `yerbabuena` (campo `cruce`).
  *   5. Disclaimer visible: saber tradicional, no reemplaza al profesional de la
  *      salud; vetos honestos (ruda abortiva/fototóxica; embarazo, niños,
  *      medicamentos → consultar antes).
@@ -170,6 +175,38 @@ export const PLANTAS_BOTICA = [
     },
     cosecha: 'Se cortan las hojas jóvenes antes de que florezca, que es cuando tienen más aroma; se secan a la sombra, rápido, para que no se pongan negras.',
     veto: null,
+  },
+  {
+    slug: 'yerbabuena',
+    grupo: 'barriga',
+    nombre: 'Yerbabuena',
+    cientifico: 'Mentha spicata L.',
+    familia: 'Lamiaceae',
+    catalogId: 'mentha_spicata',
+    regionales: ['hierbabuena', 'menta verde', 'yerbabuena criolla'],
+    emoji: '🍃',
+    parteUsada: 'La hoja',
+    // Cruce honesto: es la MISMA mata de la huerta de la cocina, aquí vista por
+    // su lado de botica (digestiva y calmante). NO repetimos el uso de cocina
+    // (agua de panela, jugos, sancocho): para eso está el mundo de aromáticas.
+    cruce: {
+      mundo: 'la huerta de la cocina',
+      nota: 'Es la misma yerbabuena del agua de panela: allá está su uso de cocina; aquí la vemos por su lado de botica.',
+    },
+    usoTradicional:
+      'La menta criolla de toda casa, mirada por su lado de remedio. Tradicionalmente su agua se toma después de comer para el estómago pesado, los gases y el cólico, y tibia en la noche para calmar los nervios. En la huerta, además, ayuda a repeler plagas y cubre el suelo.',
+    comoSePrepara:
+      'Agua aromática: unas hojas frescas en agua caliente, tapada y en reposo un rato. Se toma sola o con un toque de miel. Con medida: es suave, pero no es para tomar en exceso.',
+    grounded: {
+      pisos: ['calido', 'templado', 'frio'],
+      altitudOpt: [500, 2600],
+      sol: 'sombra_parcial',
+      agua: 'alto',
+      propagacion: 'estolon',
+      propagacionNota: 'Se propaga sola por sus guías rastreras (estolones); es invasora, así que conténgala en una era o matera para que no se tome la huerta.',
+    },
+    cosecha: 'Se corta la hoja tierna antes de que florezca, que es cuando más huele; se usa fresca o se seca a la sombra, rápido, para que no se ponga negra.',
+    veto: 'No la confunda con el POLEO (Mentha pulegium), su parienta de olor parecido: el poleo es ABORTIVO y tóxico para el hígado, la yerbabuena no. Son matas distintas; use solo la que conoce bien. Y aun siendo suave, en mucha cantidad, con reflujo o hernia hiatal, la menta puede caer mal (relaja la boca del estómago): tómela con medida.',
   },
 
   /* ── Piel y heridas (uso externo) ───────────────────────────────────── */
@@ -357,6 +394,7 @@ export const CREDITOS_FOTOS_BOTICA = [
   { slug: 'calendula', autor: 'Ermell', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Ringelblume_(Calendula_officinalis)_Bl%C3%BCte_focus_stack-20220619-RM-165610.jpg' },
   { slug: 'manzanilla', autor: 'Javier martin', licencia: 'Public domain', licenciaUrl: 'https://en.wikipedia.org/wiki/Public_domain', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Matricaria_recutita_FlowerCloseup_2010-4-11_DehesaBoyalPuertollano.jpg' },
   { slug: 'toronjil', autor: 'Gideon Pisanty (Gidip)', licencia: 'CC BY 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Melissa_officinalis_1.jpg' },
+  { slug: 'yerbabuena', autor: 'Krzysztof Ziarnek, Kenraiz', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Mentha_spicata_var._viridis_kz01.jpg' },
   { slug: 'cidron', autor: 'Juan Carlos Fonseca Mata', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Aloysia_citrodora_(Verbenaceae),_hojas.jpg' },
   { slug: 'sauco', autor: 'Krzysztof Ziarnek, Kenraiz', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Sambucus_nigra_kz18.jpg' },
   { slug: 'ruda', autor: 'Krzysztof Ziarnek, Kenraiz', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Ruta_graveolens_kz03.jpg' },
