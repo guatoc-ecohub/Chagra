@@ -89,6 +89,13 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
+// Mockup dev "La Montaña de los Mundos", pasada 4 CAMPESINA: 4ª dirección
+// para comparar con las pasadas 2 y 3 (viven en sus ramas). Concreta y
+// literal —el campesino reconoce su finca, su clima y su piso térmico— sin
+// perder el cine de la pasada 3 (parallax de 6 capas, llegada, atmósfera).
+// Ruta #/mockups/montana-mundos-campesino — sin gate ni sesión (datos de
+// muestra).
+const MontanaMundosCampesinoMockup = lazy(() => import('./mockups/MontanaMundosCampesino'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -418,6 +425,7 @@ const LoadingFallback = ({ view = null }) => {
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 const HASH_VIEW_ROUTES = {
+  'mockups/montana-mundos-campesino': 'mockup_montana_mundos_campesino',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -915,6 +923,13 @@ export default function App() {
       return;
     }
 
+    // Mockups dev (#/mockups/*): vistas aisladas de decisión visual — se
+    // montan sin sesión (datos de muestra, no tocan datos reales).
+    if (hash === 'mockups/montana-mundos-campesino') {
+      Promise.resolve().then(() => navigate(HASH_VIEW_ROUTES[hash]));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -943,6 +958,11 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockups dev: sin gate ni sesión (datos de muestra).
+      if (routeView === 'mockup_montana_mundos_campesino') {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1265,6 +1285,19 @@ export default function App() {
               onConfirm={() => navigate(currentViewData?.next || 'dashboard')}
               onBack={() => navigate(currentViewData?.back || 'dashboard')}
             />
+          </ErrorBoundary>
+        );
+      case 'mockup_montana_mundos_campesino':
+        // Pasada 4 CAMPESINA del mockup "La Montaña de los Mundos": el
+        // campesino reconoce su finca (piso térmico resaltado, datos
+        // concretos, entrada por voz de muestra, escenas reales del home
+        // como nodos-mundo) sin perder el cine de la pasada 3. Full-screen,
+        // sin gate — solo para comparar direcciones visuales.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Montaña de los Mundos (campesina)">
+              <MontanaMundosCampesinoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'dashboard':
@@ -2563,7 +2596,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && !currentView.startsWith('mockup_') && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
