@@ -2360,7 +2360,10 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Glaciar">
-              <GlaciarReporteScreen onBack={() => navigate('dashboard')} />
+              <GlaciarReporteScreen
+                onBack={() => navigate('dashboard')}
+                onVerHistorial={() => navigate('glaciar_historial')}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );

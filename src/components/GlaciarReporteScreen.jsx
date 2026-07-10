@@ -3,7 +3,7 @@ import { MSG } from '../config/messages.js';
 import {
   ChevronLeft, MapPin, Loader2, AlertCircle, Mountain, Thermometer,
   Save, ListChecks, Trash2, CheckCircle2, Snowflake, Compass, Layers,
-  Plus, X, ShieldAlert, Info, Footprints,
+  Plus, X, ShieldAlert, Info, Footprints, History,
 } from 'lucide-react';
 import { useGeolocation } from '../hooks/useGeolocation';
 import PhotoCaptureField from './PhotoCaptureField';
@@ -95,7 +95,7 @@ function emptyForm() {
   };
 }
 
-export default function GlaciarReporteScreen({ onBack }) {
+export default function GlaciarReporteScreen({ onBack, onVerHistorial = null }) {
   const [tab, setTab] = useState('nuevo'); // 'nuevo' | 'lista'
   // U-3: el borrador autosalvado se restaura desde IndexedDB en un efecto al
   // montar (loadDraft es async). Arrancamos en vacío y, si hay borrador, lo
@@ -749,6 +749,7 @@ export default function GlaciarReporteScreen({ onBack }) {
           loading={loadingList}
           onEliminar={handleEliminar}
           onNuevo={() => setTab('nuevo')}
+          onVerHistorial={onVerHistorial}
         />
       )}
     </div>
@@ -1065,7 +1066,7 @@ function DisclaimerBox() {
   );
 }
 
-function ListaReportes({ reportes, loading, onEliminar, onNuevo }) {
+function ListaReportes({ reportes, loading, onEliminar, onNuevo, onVerHistorial = null }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-slate-500">
@@ -1102,6 +1103,18 @@ function ListaReportes({ reportes, loading, onEliminar, onNuevo }) {
       {reportes.map((r) => (
         <ReporteCard key={r.id} reporte={r} onEliminar={() => onEliminar(r.id)} />
       ))}
+      {/* Entrada al historial completo (#glaciar-historial): detalle read-only
+          de cada reporte + exportación GeoJSON. Antes esta pantalla existía
+          pero NINGÚN botón la enlazaba (hole de la auditoría de huérfanas). */}
+      {onVerHistorial && (
+        <button
+          type="button"
+          onClick={onVerHistorial}
+          className="w-full p-3 rounded-xl bg-slate-900 border border-sky-700/50 text-sky-300 font-bold flex items-center justify-center gap-2 hover:bg-slate-800 active:scale-95 transition"
+        >
+          <History size={18} /> Ver historial completo
+        </button>
+      )}
     </main>
   );
 }
