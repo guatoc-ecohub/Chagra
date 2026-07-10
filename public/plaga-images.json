@@ -2,7 +2,7 @@
   "generated_at": "2026-07-06T16:12:43+00:00",
   "source": "Wikimedia Commons (CC0/CC-BY/CC-BY-SA/Public domain only)",
   "note": "Fotos verificadas manualmente; solo licencias libres. Optimizadas a <=900px / <=200KB.",
-  "count": 19,
+  "count": 18,
   "images": [
     {
       "id": "phytophthora_infestans",
@@ -107,19 +107,6 @@
       "bytes": 54448,
       "width": 767,
       "height": 706
-    },
-    {
-      "id": "pseudocercospora_griseola",
-      "file": "/plaga-images/pseudocercospora_griseola.jpg",
-      "binomio": "Pseudocercospora griseola",
-      "license": "CC BY 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "attribution": "Meswaet Y, Mangelsdorff R, Yorou NS, Piepenbring M (2021) Unravelling unexplored diversity of cercosporoid fungi (Mycosphaerellaceae, Mycosphaerellales, Ascomycota) in tropical Africa. MycoKeys 81: 69-138. https://doi.org/10.3897/mycokeys.81.67850",
-      "source": "Wikimedia Commons",
-      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Leaf_spot_symptoms_(10.3897-mycokeys.81.67850)_Figure_14.jpg",
-      "bytes": 199030,
-      "width": 900,
-      "height": 872
     },
     {
       "id": "geminivirus_cuchara",
