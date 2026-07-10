@@ -89,6 +89,12 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
+// Mockup dev "El croquis de la finca como acuarela viva" (moonshot #5):
+// el mapa de la finca dibujado como acuarela de cuaderno de campo — lotes
+// que laten según su salud, tinta sepia, lindero cosido. Reemplaza la idea
+// de mapa "de ingeniero" por algo que el campesino sienta suyo. Ruta
+// #/mockups/mapa-acuarela — sin gate ni sesión (datos de muestra).
+const MapaAcuarelaMockup = lazy(() => import('./mockups/MapaAcuarela'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -418,6 +424,7 @@ const LoadingFallback = ({ view = null }) => {
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 const HASH_VIEW_ROUTES = {
+  'mockups/mapa-acuarela': 'mockup_mapa_acuarela',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -915,6 +922,13 @@ export default function App() {
       return;
     }
 
+    // Mockups dev (#/mockups/*): vistas aisladas de decisión visual — se
+    // montan sin sesión (datos de muestra, no tocan datos reales).
+    if (hash === 'mockups/mapa-acuarela') {
+      Promise.resolve().then(() => navigate(HASH_VIEW_ROUTES[hash]));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -943,6 +957,11 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockups dev: sin gate ni sesión (datos de muestra).
+      if (routeView === 'mockup_mapa_acuarela') {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1097,7 +1116,9 @@ export default function App() {
   // loading. Body className toggled según currentView. Estilos en
   // src/index.css clase .app-bg-biodiversidad (nombre histórico).
   useEffect(() => {
-    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback';
+    // Mockups dev (#/mockups/*): la lámina se evalúa aislada — sin la foto
+    // de fondo de la app encimándose al papel del croquis.
+    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_');
     if (showBg) {
       document.body.classList.add('app-bg-biodiversidad');
     } else {
@@ -1265,6 +1286,19 @@ export default function App() {
               onConfirm={() => navigate(currentViewData?.next || 'dashboard')}
               onBack={() => navigate(currentViewData?.back || 'dashboard')}
             />
+          </ErrorBoundary>
+        );
+      case 'mockup_mapa_acuarela':
+        // Mockup "El croquis de la finca como acuarela viva" (moonshot #5):
+        // croquis SVG con lavados de acuarela + tinta sepia; los lotes laten
+        // según su salud (verde=sana, ocre=estrés, punto rojo=alerta) y se
+        // tocan para leer la nota campesina. Full-screen, sin gate — solo
+        // para decidir dirección visual del futuro mapa.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Mapa acuarela">
+              <MapaAcuarelaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'dashboard':
@@ -2505,7 +2539,10 @@ export default function App() {
   const isPreAuthView =
     currentView === 'loading' ||
     currentView === 'login' ||
-    currentView === 'oauth-callback';
+    currentView === 'oauth-callback' ||
+    // Mockups dev (#/mockups/*): vistas de decisión visual sin sesión — los
+    // banners de instalación taparían la lámina que se está evaluando.
+    currentView.startsWith('mockup_');
 
   return (
     <>
@@ -2563,7 +2600,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && !currentView.startsWith('mockup_') && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
