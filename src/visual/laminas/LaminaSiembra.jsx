@@ -17,15 +17,19 @@ import React from 'react';
  *
  * Trazo: línea redondeada, formas simples, colores en clases Tailwind sobre
  * currentColor por grupo para respirar con los temas.
+ *
+ * @param {Object} props
+ * @param {'tuberculo'|'esqueje'|'colino'|null} [props.activo] forma resaltada.
+ * @param {string} [props.className] clases extra sobre el <svg> raíz.
  */
-export default function LaminaSiembra({ activo = null }) {
+export default function LaminaSiembra({ activo = null, className }) {
   const dim = (id) => (activo && activo !== id ? 'opacity-40' : 'opacity-100');
   return (
     <svg
       viewBox="0 0 360 120"
       role="img"
       aria-hidden="true"
-      className="w-full h-auto select-none"
+      className={['w-full h-auto select-none', className].filter(Boolean).join(' ')}
       data-testid="lamina-siembra"
     >
       {/* línea de tierra que une las tres formas */}

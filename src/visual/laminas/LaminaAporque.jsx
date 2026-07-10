@@ -14,14 +14,17 @@ import React from 'react';
  * Es DECORATIVA (aria-hidden): ilustra la sección "Aporque" de la ficha; el
  * texto explica el porqué. Trazo redondeado, colores Tailwind sobre
  * currentColor por grupo para respirar con los temas.
+ *
+ * @param {Object} props
+ * @param {string} [props.className] clases extra sobre el <svg> raíz.
  */
-export default function LaminaAporque() {
+export default function LaminaAporque({ className } = {}) {
   return (
     <svg
       viewBox="0 0 360 120"
       role="img"
       aria-hidden="true"
-      className="w-full h-auto select-none"
+      className={['w-full h-auto select-none', className].filter(Boolean).join(' ')}
       data-testid="lamina-aporque"
     >
       {/* línea del nivel del suelo original (de referencia) */}

@@ -9,8 +9,7 @@ import {
   Shovel, Camera, Utensils, ExternalLink,
 } from 'lucide-react';
 import { TUBERCULOS, getTuberculo, tieneDato, DATO_EN_CAMINO, FUENTES_INSTITUCIONALES } from '../services/tuberculosData';
-import LaminaSiembra from './tuberculos/LaminaSiembra';
-import LaminaAporque from './tuberculos/LaminaAporque';
+import { LaminaSiembra, LaminaAporque } from '../visual/laminas';
 
 /**
  * TuberculosScreen — mini-app "Tubérculos y raíces" (mundo Cultivos y semillas).
