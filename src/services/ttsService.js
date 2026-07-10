@@ -68,41 +68,42 @@ function applyVoseoGuard(text) {
  * específicamente colombiana en upstream, la agregamos acá.
  */
 /*
- * ACTUALIZACIÓN 2026-07-09 (voz de Chagra): el bloque de arriba quedó
- * DESACTUALIZADO. Se verificó el catálogo REAL contra el servidor (/health):
- * la lista servible es KOKORO_VOICES (abajo), curada por el oído del operador
- * — pm_santa (DEFAULT), if_sara, em_alex. Se retiró la vieja voz por defecto
- * del selector por decisión del operador.
+ * FIX 2026-07-10 (voz "robótica") — CAUSA RAÍZ: en Kokoro el PRIMER prefijo es el
+ * IDIOMA, no el "género inglés". `pm_` = Portugués, `if_` = Italiano, `e[mf]_` =
+ * ESPAÑOL. El bloque de arriba (2026-05) creyó por error que `ef_`/`em_` eran
+ * "English" → se descartaron las voces españolas reales y el default quedó en
+ * `pm_santa` (portugués brasileño) + `if_sara` (italiano). Se le metía texto en
+ * español a modelos de OTRO idioma → prosodia ajena = suena "robótica".
+ * Se corrige a voces `e*_` reales en español. Ref: ops/DR-VOZ-TTS-2026-07-10.md.
  *
- * GOTCHA IMPORTANTE: `ef_aoede`/`ef_kore` NO existen en el servidor (son
- * `af_aoede`/`af_kore`, inglesas). Ante una voz desconocida el servidor cae
- * SILENCIOSAMENTE a su DEFAULT_VOICE — por eso una preferencia vieja hacía
- * "sonar" la voz retirada. La guarda toServableVoice() coacciona cualquier voz
- * no servible a la default (santa) antes de ir al server: la voz retirada nunca
- * suena, ni por el fallback del servidor.
+ * GOTCHA: ante una voz no servible el server cae SILENCIOSO a la DEFAULT_VOICE.
+ * `em_santa` (Santa) es la voz elegida por el operador — es la Santa ESPAÑOLA
+ * de Kokoro (voz baked-in del modelo, prefijo `em_` = español masculino), NO la
+ * portuguesa `pm_santa` que sonaba robótica. `em_alex`/`ef_dora` quedan como
+ * alternativas, también en español.
  */
 export const KOKORO_VOICES = Object.freeze([
   {
-    id: 'pm_santa',
+    id: 'em_santa',
     label: 'Santa',
     description: 'Voz de hombre, cálida y tranquila.',
     gender: 'masculina',
   },
   {
-    id: 'if_sara',
-    label: 'Sara',
-    description: 'Voz de mujer, dulce y cercana.',
-    gender: 'femenina',
-  },
-  {
     id: 'em_alex',
     label: 'Álex',
-    description: 'Voz de hombre, natural y de tono medio.',
+    description: 'Voz de hombre, natural y clara.',
     gender: 'masculina',
+  },
+  {
+    id: 'ef_dora',
+    label: 'Dora',
+    description: 'Voz de mujer, suave y clara.',
+    gender: 'femenina',
   },
 ]);
 
-export const DEFAULT_KOKORO_VOICE = 'pm_santa';
+export const DEFAULT_KOKORO_VOICE = 'em_santa';
 export const DEFAULT_KOKORO_RATE = 1.0;
 export const KOKORO_RATE_MIN = 0.85;
 export const KOKORO_RATE_MAX = 1.1;

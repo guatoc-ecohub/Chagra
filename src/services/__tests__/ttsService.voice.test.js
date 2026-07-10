@@ -69,14 +69,14 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
   });
 
   describe('getPreferredVoice', () => {
-    it('devuelve el default (pm_santa) si localStorage está vacío', () => {
+    it('devuelve el default (em_santa) si localStorage está vacío', () => {
       expect(getPreferredVoice()).toBe(DEFAULT_KOKORO_VOICE);
-      expect(getPreferredVoice()).toBe('pm_santa');
+      expect(getPreferredVoice()).toBe('em_santa');
     });
 
     it('devuelve la voz persistida si está en KOKORO_VOICES', () => {
-      localStorage.setItem('chagra:tts:voice', 'pm_santa');
-      expect(getPreferredVoice()).toBe('pm_santa');
+      localStorage.setItem('chagra:tts:voice', 'em_alex');
+      expect(getPreferredVoice()).toBe('em_alex');
     });
 
     it('devuelve default si el valor persistido NO está en KOKORO_VOICES (defensa contra corrupción)', () => {
@@ -94,8 +94,8 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
 
   describe('setPreferredVoice', () => {
     it('persiste voces válidas y devuelve true', () => {
-      expect(setPreferredVoice('pm_santa')).toBe(true);
-      expect(localStorage.getItem('chagra:tts:voice')).toBe('pm_santa');
+      expect(setPreferredVoice('em_alex')).toBe(true);
+      expect(localStorage.getItem('chagra:tts:voice')).toBe('em_alex');
     });
 
     it('rechaza voces no listadas y devuelve false', () => {
@@ -103,8 +103,8 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
       expect(localStorage.getItem('chagra:tts:voice')).toBeNull();
     });
 
-    it('rechaza ef_dora: se quitó del catálogo (operador no la quiere)', () => {
-      expect(setPreferredVoice('ef_dora')).toBe(false);
+    it('rechaza pm_santa: era portuguesa, se quitó del catálogo', () => {
+      expect(setPreferredVoice('pm_santa')).toBe(false);
       expect(localStorage.getItem('chagra:tts:voice')).toBeNull();
     });
 
@@ -144,24 +144,24 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
   });
 
   describe('speakKokoro respeta preferencia persistida', () => {
-    it('sin voice explícito usa getPreferredVoice (default pm_santa cuando vacío)', async () => {
+    it('sin voice explícito usa getPreferredVoice (default em_santa cuando vacío)', async () => {
       await speakKokoro('Hola mundo');
       expect(fetchMock).toHaveBeenCalledTimes(1);
       const [, init] = fetchMock.mock.calls[0];
       const body = JSON.parse(init.body);
-      expect(body.voice).toBe('pm_santa');
+      expect(body.voice).toBe('em_santa');
     });
 
     it('sin voice explícito usa la voz preferida persistida', async () => {
-      setPreferredVoice('if_sara');
+      setPreferredVoice('ef_dora');
       await speakKokoro('Hola mundo');
       const [, init] = fetchMock.mock.calls[0];
       const body = JSON.parse(init.body);
-      expect(body.voice).toBe('if_sara');
+      expect(body.voice).toBe('ef_dora');
     });
 
     it('voice explícito en options gana sobre la voz preferida (backwards compat)', async () => {
-      setPreferredVoice('pm_santa');
+      setPreferredVoice('em_alex');
       await speakKokoro('Hola mundo', { voice: 'em_alex' });
       const [, init] = fetchMock.mock.calls[0];
       const body = JSON.parse(init.body);
@@ -169,18 +169,18 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
     });
 
     it('voice explícito gana aunque sea distinto del default (no se "promueve" preferencia)', async () => {
-      setPreferredVoice('pm_santa');
-      await speakKokoro('Hola', { voice: 'if_sara' });
+      setPreferredVoice('em_alex');
+      await speakKokoro('Hola', { voice: 'ef_dora' });
       const [, init] = fetchMock.mock.calls[0];
       const body = JSON.parse(init.body);
-      expect(body.voice).toBe('if_sara');
+      expect(body.voice).toBe('ef_dora');
     });
 
     it('coerciona ef_dora (no servible) a la default santa: dora NUNCA viaja al server', async () => {
       await speakKokoro('Hola', { voice: 'ef_dora' });
       const [, init] = fetchMock.mock.calls[0];
       const body = JSON.parse(init.body);
-      expect(body.voice).toBe('pm_santa');
+      expect(body.voice).toBe('em_alex');
     });
 
     it('coerciona voces inglesas inexistentes (ef_aoede/ef_kore) a santa, no a dora', async () => {
@@ -188,7 +188,7 @@ describe('ttsService — preferencias de voz Kokoro (task #124)', () => {
       await speakKokoro('Hola', { voice: 'ef_kore' });
       for (const call of fetchMock.mock.calls) {
         const body = JSON.parse(call[1].body);
-        expect(body.voice).toBe('pm_santa');
+        expect(body.voice).toBe('em_alex');
         expect(body.voice).not.toBe('ef_dora');
       }
     });
