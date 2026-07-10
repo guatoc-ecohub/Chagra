@@ -89,6 +89,11 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
+// Mockup dev "El valle de mi finca" (entrada definitiva #2, sin límites): un
+// diorama 3D isométrico de la finca (React-Three-Fiber sobre WebGL2, chunk
+// perezoso) donde los 4 sí-o-sí viven en el espacio. Ruta #/mockups/entrada-3d
+// — sin gate ni sesión (datos de muestra, degrada limpio a SVG sin WebGL).
+const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -418,6 +423,7 @@ const LoadingFallback = ({ view = null }) => {
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 const HASH_VIEW_ROUTES = {
+  'mockups/entrada-3d': 'mockup_entrada_3d',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -915,6 +921,14 @@ export default function App() {
       return;
     }
 
+    // Mockups dev (#/mockups/*): vistas aisladas de decisión visual — se montan
+    // SIN sesión (datos de muestra, no tocan datos reales).
+    if (hash.startsWith('mockups/') && HASH_VIEW_ROUTES[hash]) {
+      const vistaMockup = HASH_VIEW_ROUTES[hash];
+      Promise.resolve().then(() => navigate(vistaMockup));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -943,6 +957,11 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockups dev (#/mockups/*): sin gate de sesión.
+      if (routeView.startsWith('mockup_')) {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1265,6 +1284,18 @@ export default function App() {
               onConfirm={() => navigate(currentViewData?.next || 'dashboard')}
               onBack={() => navigate(currentViewData?.back || 'dashboard')}
             />
+          </ErrorBoundary>
+        );
+      case 'mockup_entrada_3d':
+        // Mockup "El valle de mi finca" (entrada definitiva #2): diorama 3D
+        // isométrico navegable (R3F/WebGL2, chunk perezoso) con los 4 sí-o-sí
+        // en el espacio. Full-screen, sin gate — decisión visual. Degrada a
+        // SVG sin WebGL. onBack vuelve al dashboard.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El valle de mi finca (3D)">
+              <EntradaValle3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'dashboard':
@@ -2563,7 +2594,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && !currentView.startsWith('mockup_') && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
