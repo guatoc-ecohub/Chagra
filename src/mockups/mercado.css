@@ -1,0 +1,722 @@
+/* ════════════════════════════════════════════════════════════════════════
+   mercado.css — mockup mercado.chagra.bio (mercado público de procedencia).
+
+   Identidad: "estraza de montaña". Papel kraft grisáceo (NO el cream saturado
+   de catálogo), tinta umbra, verde monte. El acento NO es un terracota fijo:
+   es FUNCIONAL, el espectro de PISO TÉRMICO (frío→templado). Los números —
+   altitud, precio, fechas de cosecha — van en monoespaciado, como la lectura
+   de un altímetro. Los sellos de confianza son estampas de tinta.
+
+   Firma: la "cinta de altitud" (.mrc-cinta) ubica la cara de cada productor a
+   su altura real en la montaña. Todo el prefijo `mrc-`. Mobile-first desde
+   320px. Movimiento mínimo y reduced-motion-safe.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.mrc-root {
+  --mrc-papel: #e7ddc6;
+  --mrc-papel-2: #ddd1b4;
+  --mrc-tarjeta: #f4ecd9;
+  --mrc-tinta: #2c2418;
+  --mrc-tinta-2: #6d5c40;
+  --mrc-monte: #2f5233;
+  --mrc-sello: #a5432a;
+  --mrc-linea: rgba(44, 36, 24, 0.16);
+  --mrc-serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  --mrc-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mrc-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace;
+
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 14px clamp(12px, 4vw, 26px) 48px;
+  color: var(--mrc-tinta);
+  font-family: var(--mrc-sans);
+  background:
+    repeating-linear-gradient(0deg, rgba(44, 36, 24, 0.022) 0 2px, transparent 2px 5px),
+    radial-gradient(130% 70% at 50% -6%, #f2ead4 0%, var(--mrc-papel) 52%, #ddceb0 100%);
+  -webkit-tap-highlight-color: transparent;
+}
+.mrc-root *,
+.mrc-root *::before,
+.mrc-root *::after {
+  box-sizing: border-box;
+}
+
+/* ── barra superior ──────────────────────────────────────────────────────── */
+.mrc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  max-width: 660px;
+  margin: 0 auto 6px;
+}
+.mrc-marca {
+  font-family: var(--mrc-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--mrc-tinta-2);
+}
+.mrc-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--mrc-linea);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  color: var(--mrc-tinta);
+  font-family: var(--mrc-sans);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.mrc-back:hover { background: rgba(255, 255, 255, 0.6); }
+
+/* ── HERO ────────────────────────────────────────────────────────────────── */
+.mrc-hero {
+  max-width: 660px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding: 10px 0 6px;
+}
+.mrc-kicker {
+  margin: 0 0 10px;
+  font-family: var(--mrc-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--mrc-monte);
+}
+.mrc-titulo {
+  margin: 0 0 12px;
+  font-family: var(--mrc-serif);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 8.5vw, 2.9rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: var(--mrc-tinta);
+}
+.mrc-lead {
+  margin: 0 0 14px;
+  max-width: 34ch;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--mrc-tinta-2);
+}
+.mrc-promesa {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.mrc-promesa li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--mrc-tinta);
+}
+.mrc-promesa svg { color: var(--mrc-monte); flex: 0 0 auto; }
+
+.mrc-hero__monte { position: relative; }
+.mrc-colibri {
+  position: absolute;
+  top: -6px;
+  right: 4px;
+  z-index: 4;
+  filter: drop-shadow(0 3px 5px rgba(44, 36, 24, 0.25));
+}
+
+/* ── CINTA DE ALTITUD (firma) ────────────────────────────────────────────── */
+.mrc-cinta {
+  position: relative;
+  width: 100%;
+  height: clamp(330px, 82vw, 430px);
+  border: 1px solid var(--mrc-linea);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #eceadd;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 6px 18px rgba(44, 36, 24, 0.1);
+}
+.mrc-cinta__cielo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(63, 127, 158, 0.34) 0%,
+    rgba(80, 138, 140, 0.24) 34%,
+    rgba(150, 150, 120, 0.12) 60%,
+    rgba(193, 144, 47, 0.18) 84%,
+    rgba(193, 144, 47, 0.28) 100%
+  );
+}
+.mrc-cinta__monte {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* eje de altímetro */
+.mrc-tick {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mrc-tick__num {
+  font-family: var(--mrc-mono);
+  font-size: 0.62rem;
+  color: var(--mrc-tinta-2);
+  background: rgba(236, 232, 220, 0.7);
+  padding: 0 3px;
+  border-radius: 3px;
+}
+.mrc-tick__linea {
+  flex: 1;
+  height: 0;
+  border-top: 1px dashed rgba(44, 36, 24, 0.2);
+}
+.mrc-cinta__unidad {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-family: var(--mrc-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  color: var(--mrc-tinta-2);
+}
+/* pines: la cara clavada a su altura */
+.mrc-pin {
+  position: absolute;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 56%;
+  padding: 3px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 3;
+}
+.mrc-pin--izq { left: 3%; }
+.mrc-pin--der { right: 3%; flex-direction: row-reverse; text-align: right; }
+.mrc-pin__cara {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2.5px var(--pin-piso, #2f5233), 0 3px 7px rgba(44, 36, 24, 0.3);
+  line-height: 0;
+  transition: transform 0.18s ease;
+}
+.mrc-pin__tag {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+.mrc-pin__finca {
+  font-family: var(--mrc-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--mrc-tinta);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 15ch;
+}
+.mrc-pin__alt {
+  font-family: var(--mrc-mono);
+  font-size: 0.64rem;
+  color: var(--mrc-tinta-2);
+}
+.mrc-pin:hover .mrc-pin__cara,
+.mrc-pin:focus-visible .mrc-pin__cara { transform: scale(1.08); }
+.mrc-pin.is-activa { z-index: 5; }
+.mrc-pin.is-activa .mrc-pin__cara {
+  box-shadow: 0 0 0 3px var(--pin-piso, #2f5233), 0 5px 12px rgba(44, 36, 24, 0.4);
+}
+.mrc-pin.is-activa .mrc-pin__finca { font-size: 0.8rem; }
+.mrc-pin.is-atenua { opacity: 0.5; }
+.mrc-pin.is-atenua .mrc-pin__tag { display: none; }
+
+/* ── FILTROS por piso térmico ────────────────────────────────────────────── */
+.mrc-filtros {
+  max-width: 660px;
+  margin: 22px auto 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+.mrc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1px solid var(--mrc-linea);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+  color: var(--mrc-tinta);
+  font-family: var(--mrc-sans);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.mrc-chip__punto {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--chip-piso, var(--mrc-monte));
+}
+.mrc-chip:hover { border-color: rgba(44, 36, 24, 0.32); }
+.mrc-chip.is-on {
+  background: var(--mrc-tinta);
+  border-color: var(--mrc-tinta);
+  color: #f4ecd9;
+}
+.mrc-chip.is-on .mrc-chip__punto { box-shadow: 0 0 0 2px rgba(244, 236, 217, 0.35); }
+
+/* ── GRILLA de productos ─────────────────────────────────────────────────── */
+.mrc-grid {
+  max-width: 660px;
+  margin: 14px auto 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.mrc-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--mrc-tarjeta);
+  border: 1px solid var(--mrc-linea);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(44, 36, 24, 0.08);
+}
+.mrc-card__foto {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  border: 0;
+  border-bottom: 1px dashed var(--mrc-linea);
+  background: var(--mrc-papel-2);
+  cursor: pointer;
+  overflow: hidden;
+}
+.mrc-card__foto::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--card-piso, #2f5233);
+  opacity: 0.13;
+}
+.mrc-card__foto > svg { position: relative; z-index: 1; }
+.mrc-card__bicho {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  filter: drop-shadow(0 2px 3px rgba(44, 36, 24, 0.25));
+}
+
+.mrc-card__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 13px 14px 15px;
+}
+.mrc-card__cabeza { display: flex; flex-direction: column; gap: 1px; }
+.mrc-card__nombre {
+  margin: 0;
+  font-family: var(--mrc-serif);
+  font-size: 1.14rem;
+  font-weight: 700;
+  color: var(--mrc-tinta);
+}
+.mrc-card__variedad {
+  margin: 0;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--mrc-tinta-2);
+}
+
+.mrc-precio {
+  margin: 0;
+  font-family: var(--mrc-mono);
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.mrc-precio__val { font-size: 1.16rem; font-weight: 700; color: var(--mrc-tinta); letter-spacing: -0.01em; }
+.mrc-precio__uni { font-size: 0.74rem; color: var(--mrc-tinta-2); }
+.mrc-precio--g .mrc-precio__val { font-size: 1.3rem; }
+
+/* bloque de procedencia */
+.mrc-proc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--mrc-linea);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.34);
+  cursor: pointer;
+  text-align: left;
+}
+.mrc-proc:hover { background: rgba(255, 255, 255, 0.6); }
+.mrc-proc > svg { flex: 0 0 auto; }
+.mrc-proc__texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mrc-proc__finca {
+  font-family: var(--mrc-serif);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--mrc-tinta);
+}
+.mrc-proc__ubi {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  color: var(--mrc-tinta-2);
+}
+.mrc-proc__ubi svg { color: var(--mrc-tinta-2); }
+.mrc-proc__alt {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mrc-mono);
+  font-size: 0.72rem;
+  color: var(--mrc-tinta-2);
+}
+.mrc-proc__punto { width: 8px; height: 8px; border-radius: 999px; flex: 0 0 auto; }
+
+/* sellos de confianza (estampas de tinta) */
+.mrc-sellos {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.mrc-sello {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1.5px dashed var(--mrc-sello);
+  border-radius: 7px;
+  color: var(--mrc-sello);
+  font-family: var(--mrc-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  transform: rotate(-1.4deg);
+  background: rgba(165, 67, 42, 0.05);
+}
+.mrc-sello:nth-child(even) { transform: rotate(1.1deg); }
+.mrc-sello svg { flex: 0 0 auto; }
+.mrc-sello--g { font-size: 0.72rem; padding: 5px 11px; }
+
+/* ── PIE ─────────────────────────────────────────────────────────────────── */
+.mrc-pie {
+  max-width: 660px;
+  margin: 30px auto 0;
+  padding-top: 16px;
+  border-top: 1px dashed var(--mrc-linea);
+  text-align: center;
+}
+.mrc-pie p { margin: 0; font-size: 0.78rem; color: var(--mrc-tinta-2); }
+
+/* ── HISTORIA (modal) ────────────────────────────────────────────────────── */
+.mrc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: mrc-modal-in 0.18s ease;
+}
+.mrc-modal__fondo {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: rgba(28, 22, 12, 0.5);
+  cursor: pointer;
+}
+.mrc-hoja {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background:
+    repeating-linear-gradient(0deg, rgba(44, 36, 24, 0.02) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg, #f5eedb 0%, var(--mrc-papel) 100%);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+.mrc-hoja__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--mrc-linea);
+  background: rgba(245, 238, 219, 0.9);
+}
+.mrc-back--modal { background: rgba(255, 255, 255, 0.5); }
+.mrc-cerrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--mrc-linea);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--mrc-tinta);
+  cursor: pointer;
+}
+.mrc-hoja__scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px clamp(13px, 4vw, 22px) 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* cabecera de finca */
+.mrc-fincahead {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px 15px;
+  border: 1px solid var(--mrc-linea);
+  border-radius: 14px;
+  background: var(--mrc-papel-2);
+  overflow: hidden;
+}
+.mrc-fincahead__luz {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+.mrc-mariposa { position: absolute; top: 8px; right: 10px; z-index: 2; }
+.mrc-fincahead__cara {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  box-shadow: 0 3px 9px rgba(44, 36, 24, 0.28);
+  line-height: 0;
+}
+.mrc-fincahead__id { position: relative; z-index: 1; min-width: 0; }
+.mrc-fincahead__quien {
+  margin: 0 0 1px;
+  font-family: var(--mrc-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mrc-tinta-2);
+}
+.mrc-fincahead__finca {
+  margin: 0 0 4px;
+  font-family: var(--mrc-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--mrc-tinta);
+}
+.mrc-fincahead__ubi {
+  margin: 0 0 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  color: var(--mrc-tinta);
+}
+.mrc-fincahead__alt {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.mrc-fincahead__alt svg { color: var(--mrc-monte); }
+.mrc-alt-num {
+  font-family: var(--mrc-mono);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--mrc-tinta);
+}
+.mrc-alt-piso {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  color: var(--mrc-tinta-2);
+}
+.mrc-alt-piso .mrc-chip__punto { width: 8px; height: 8px; background: var(--chip-piso, var(--mrc-monte)); }
+
+/* producto de la finca */
+.mrc-hoja__producto {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--mrc-linea);
+  border-radius: 13px;
+  background: var(--mrc-tarjeta);
+  overflow: hidden;
+}
+.mrc-hoja__producto::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--card-piso, #2f5233);
+  opacity: 0.08;
+}
+.mrc-hoja__producto > svg,
+.mrc-hoja__producto > div { position: relative; z-index: 1; }
+.mrc-hoja__prodnombre {
+  margin: 0;
+  font-family: var(--mrc-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--mrc-tinta);
+}
+.mrc-hoja__prodvar {
+  margin: 1px 0 6px;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--mrc-tinta-2);
+}
+
+/* relato */
+.mrc-relato {
+  position: relative;
+  margin: 0;
+  padding-left: 26px;
+  font-family: var(--mrc-serif);
+  font-size: 1rem;
+  line-height: 1.62;
+  color: var(--mrc-tinta);
+}
+.mrc-relato__ico {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  color: var(--mrc-monte);
+}
+
+/* trazabilidad */
+.mrc-traza {
+  padding: 14px 15px;
+  border: 1px solid var(--mrc-linea);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.28);
+}
+.mrc-traza__tit,
+.mrc-donde__tit {
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mrc-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--mrc-tinta);
+}
+.mrc-traza__tit svg,
+.mrc-donde__tit svg { color: var(--mrc-monte); }
+.mrc-traza__linea { list-style: none; margin: 0; padding: 0; }
+.mrc-traza__hito {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 0 0 14px 4px;
+}
+.mrc-traza__hito::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 13px;
+  bottom: -1px;
+  width: 2px;
+  background: var(--mrc-linea);
+}
+.mrc-traza__hito.is-fin::before { display: none; }
+.mrc-traza__punto {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  width: 11px;
+  height: 11px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: var(--mrc-papel);
+  border: 2.5px solid var(--mrc-monte);
+}
+.mrc-traza__hito.is-fin .mrc-traza__punto { background: var(--mrc-sello); border-color: var(--mrc-sello); }
+.mrc-traza__hitotxt { display: flex; flex-direction: column; gap: 1px; }
+.mrc-traza__que { font-family: var(--mrc-serif); font-size: 0.92rem; color: var(--mrc-tinta); }
+.mrc-traza__cuando { font-family: var(--mrc-mono); font-size: 0.72rem; color: var(--mrc-tinta-2); }
+
+/* dónde queda en la montaña */
+.mrc-donde .mrc-cinta { height: clamp(320px, 78vw, 400px); }
+
+@keyframes mrc-modal-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── responsive ──────────────────────────────────────────────────────────── */
+@media (min-width: 560px) {
+  .mrc-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 700px) {
+  .mrc-hero {
+    grid-template-columns: 1.05fr 0.95fr;
+    align-items: center;
+    gap: 26px;
+    padding: 22px 0 12px;
+  }
+  .mrc-modal { align-items: center; padding: 24px; }
+  .mrc-hoja { border-radius: 18px; max-height: 92vh; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4); }
+}
+
+/* ── accesibilidad ───────────────────────────────────────────────────────── */
+.mrc-root button:focus-visible,
+.mrc-modal button:focus-visible {
+  outline: 2.5px solid var(--mrc-monte);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mrc-modal { animation: none; }
+  .mrc-pin__cara,
+  .mrc-chip { transition: none; }
+  .mrc-pin:hover .mrc-pin__cara,
+  .mrc-pin:focus-visible .mrc-pin__cara { transform: none; }
+}

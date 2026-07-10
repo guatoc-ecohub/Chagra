@@ -1,0 +1,32 @@
+/*
+ * Librería visual de PERSONAJES DE FAUNA de la chagra (creatures).
+ * Fuente única y reutilizable. Antes de dibujar un bicho, búscalo aquí.
+ *
+ * Cada componente:
+ *   - Modo standalone (por defecto): renderiza su propio <svg> con viewBox,
+ *     dimensionado por `size` — ideal para avatares, catálogo, botones.
+ *   - Modo `inline`: renderiza solo el <g> para incrustarse en una escena SVG
+ *     que ya define su viewBox y su coreografía de entrada/posición.
+ *
+ * Props comunes: { size, className, inline, animated, title }.
+ */
+export { AbejaAngelita } from './AbejaAngelita.jsx';
+export { Colibri } from './Colibri.jsx';
+export { Lombriz } from './Lombriz.jsx';
+export { Mariposa } from './Mariposa.jsx';
+export { Escarabajo } from './Escarabajo.jsx';
+
+import AbejaAngelita from './AbejaAngelita.jsx';
+import Colibri from './Colibri.jsx';
+import Lombriz from './Lombriz.jsx';
+import Mariposa from './Mariposa.jsx';
+import Escarabajo from './Escarabajo.jsx';
+
+/* Registro consultable: slug → componente + binomio verificado. */
+export const CREATURES = {
+  'abeja-angelita': { Component: AbejaAngelita, nombre: 'Abeja angelita', cientifico: 'Tetragonisca angustula' },
+  colibri: { Component: Colibri, nombre: 'Colibrí chillón', cientifico: 'Colibri coruscans' },
+  lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },
+  mariposa: { Component: Mariposa, nombre: 'Mariposa pasionaria', cientifico: 'Dione juno' },
+  escarabajo: { Component: Escarabajo, nombre: 'Escarabajo estercolero', cientifico: 'Dichotomius belus' },
+};
