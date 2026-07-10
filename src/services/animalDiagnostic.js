@@ -10,6 +10,44 @@
 import ANIMAL_DATA from '../data/animal-diagnostics.json';
 
 /**
+ * Margen de tolerancia (m s.n.m.) al filtrar forrajeras por altitud de la
+ * finca. Especie con altitud_max=1200 no se descarta de golpe a 1250 msnm —
+ * la franja de transición entre pisos térmicos es difusa, no una pared.
+ */
+const ALTITUD_MARGIN_M = 200;
+
+/**
+ * ¿La altitud de la finca cae dentro de [altitud_min, altitud_max] de la
+ * forrajera (± ALTITUD_MARGIN_M)? Fix cross_thermal (bench-contaminacion.mjs
+ * midió 40% de contaminación, 6/15, 2026-07-10 — AUDIT-INJECTORS-GROUNDING-
+ * 2026-07-09.md: `animalDiagnostic` recomendaba forrajeras de CUALQUIER piso
+ * térmico sin cruzar contra la altitud de la finca; una finca de páramo
+ * podía recibir "Botón de oro (Tithonia diversifolia)", forrajera de
+ * 800–1800 msnm que no sobrevive a 3000+).
+ *
+ * GRACEFUL: si la forrajera no trae altitud_min/altitud_max (subproductos
+ * como plátano de rechazo, yuca cocida, suero, larva BSF — no se "siembran"
+ * en la finca, se consiguen igual sin importar el piso) o si no hay altitud
+ * de finca conocida (perfil sin ubicación), NO filtra — nunca rompe el caso
+ * sin ubicación.
+ * @param {object} forrajera
+ * @param {number|string|null} [altitud]
+ * @returns {boolean}
+ */
+export function forrajeraEnRangoAltitud(forrajera, altitud) {
+  const min = forrajera?.altitud_min;
+  const max = forrajera?.altitud_max;
+  const hasMin = typeof min === 'number' && Number.isFinite(min);
+  const hasMax = typeof max === 'number' && Number.isFinite(max);
+  if (!hasMin && !hasMax) return true; // sin dato de altitud → no se filtra.
+  const alt = altitud != null && altitud !== '' ? Number(altitud) : NaN;
+  if (!Number.isFinite(alt)) return true; // sin altitud de finca → no se filtra.
+  if (hasMin && alt < min - ALTITUD_MARGIN_M) return false;
+  if (hasMax && alt > max + ALTITUD_MARGIN_M) return false;
+  return true;
+}
+
+/**
  * Resuelve el % maximo de inclusion en dieta de una forrajera segun la
  * especie animal (monogastricos vs equinos vs rumiantes). UNICA fuente de
  * verdad de este mapeo — usada tanto por el filtro de recomendarForraje
@@ -48,19 +86,35 @@ export function detectarEspecie(descripcion) {
 }
 
 /**
- * Recomienda forrajeras segun la especie animal.
+ * Recomienda forrajeras segun la especie animal, recortadas a las que
+ * viven en el piso térmico de la finca (± margen, ver
+ * `forrajeraEnRangoAltitud`). `altitud` es opcional — sin ella, no filtra
+ * por piso (compatibilidad hacia atrás + grace para fincas sin ubicación).
  * @param {string} especieId
+ * @param {number|string|null} [altitud] — msnm de la finca activa.
  * @returns {Array<object>}
  */
-export function recomendarForraje(especieId) {
-  const forrajes = ANIMAL_DATA.forrajeras.filter((f) => maxPctParaEspecie(especieId, f) > 0);
+export function recomendarForraje(especieId, altitud = null) {
+  const forrajes = ANIMAL_DATA.forrajeras.filter(
+    (f) => maxPctParaEspecie(especieId, f) > 0 && forrajeraEnRangoAltitud(f, altitud),
+  );
   return forrajes;
 }
 
-export function recomendarAlimentosPecuarios(especieId) {
+/**
+ * @param {string} especieId
+ * @param {number|string|null} [altitud] — msnm de la finca activa, recorta
+ *   los complementos que SÍ son plantas vivas (azolla/morera/nacedero/botón
+ *   de oro) a su piso térmico. Los subproductos comprados/preparados
+ *   (plátano de rechazo, yuca cocida, suero, larva BSF) no tienen
+ *   altitud_min/altitud_max en el dato → `forrajeraEnRangoAltitud` los deja
+ *   pasar siempre (graceful).
+ * @returns {Array<object>}
+ */
+export function recomendarAlimentosPecuarios(especieId, altitud = null) {
   if (especieId !== 'porcino') return [];
   const ids = ['platano_rechazo', 'yuca_cocida', 'suero_leche', 'azolla', 'bsf', 'morera', 'nacedero', 'boton_oro'];
-  return ANIMAL_DATA.forrajeras.filter((f) => ids.includes(f.id));
+  return ANIMAL_DATA.forrajeras.filter((f) => ids.includes(f.id) && forrajeraEnRangoAltitud(f, altitud));
 }
 
 /**
@@ -87,9 +141,14 @@ export function getGuardas(especieId) {
  * Diagnostica una especie animal a partir de la descripcion del usuario
  * y retorna forrajes y guardas.
  * @param {string} descripcion
+ * @param {object} [opts]
+ * @param {number|string|null} [opts.altitud] — msnm de la finca activa
+ *   (perfil/finca georreferenciada). Recorta las forrajeras/complementos
+ *   candidatos a los de su piso térmico (± 200m). Sin este dato, no filtra
+ *   (graceful — no rompe el caso sin ubicación).
  * @returns {{especie: object|null, forrajes: Array, guardas: Array, sin_datos: boolean, fuente: string}}
  */
-export function diagnosticarAnimal(descripcion) {
+export function diagnosticarAnimal(descripcion, opts = {}) {
   if (!descripcion || descripcion.trim().length < 3) {
     return { especie: null, forrajes: [], guardas: [], sin_datos: true, fuente: ANIMAL_DATA.fuente };
   }
@@ -98,8 +157,9 @@ export function diagnosticarAnimal(descripcion) {
   if (!especie) {
     return { especie: null, forrajes: [], guardas: [ANIMAL_DATA.guardas.normativa_ica], sin_datos: true, fuente: ANIMAL_DATA.fuente };
   }
-  const forrajes = recomendarForraje(especie.id);
-  const alimentos = recomendarAlimentosPecuarios(especie.id);
+  const altitud = opts?.altitud ?? null;
+  const forrajes = recomendarForraje(especie.id, altitud);
+  const alimentos = recomendarAlimentosPecuarios(especie.id, altitud);
   const guardas = getGuardas(especie.id);
 
   // Detect Leucaena specifically mentioned

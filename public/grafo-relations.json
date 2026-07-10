@@ -23,7 +23,17 @@
     "pest_synonyms_added": "2026-06-25",
     "frutales_tuberculos_fable_enriched": "2026-07-06",
     "restauracion_grounding_fix_2026_07_09": "+21 especies (audit AUDIT-RESTAURACION-GROUNDING-2026-07-09.md); establishment_means corregido en cordia_alliodora, tabebuia_rosea, enterolobium_cyclocarpum",
-    "animal_forrajeras_grounding_fix": "2026-07-09"
+    "animal_forrajeras_grounding_fix": "2026-07-09",
+    "altitud_enriched_at": "2026-07-10T15:36:30.948Z",
+    "altitud_enriched_source": "chagra_kg (Apache AGE) vía scripts/enrich-grafo-relations-altitud.mjs",
+    "altitud_enriched_fields": [
+      "altitud_min",
+      "altitud_max",
+      "temp_min",
+      "temp_max",
+      "helada_letal"
+    ],
+    "altitud_enriched_count": 129
   },
   "_pest_synonyms": {
     "gota": "Tizon tardio / gota (papa y tomate)",
@@ -493,7 +503,12 @@
       "conservation_status": "cultivo_comun",
       "antagonist_of": [
         "solanum_lycopersicum_san_marzano"
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2800,
+      "temp_min": 10,
+      "temp_max": 18,
+      "helada_letal": -12
     },
     "calamagrostis_effusa": {
       "nombre_comun": "Paja de páramo",
@@ -506,7 +521,12 @@
       ],
       "antagonist_of": [
         "pennisetum_setaceum"
-      ]
+      ],
+      "altitud_min": 3200,
+      "altitud_max": 3800,
+      "temp_min": 4,
+      "temp_max": 10,
+      "helada_letal": -15
     },
     "foeniculum_vulgare": {
       "nombre_comun": "Hinojo",
@@ -519,7 +539,12 @@
         "phaseolus_vulgaris",
         "solanum_lycopersicum_san_marzano",
         "zea_mays"
-      ]
+      ],
+      "altitud_min": 1500,
+      "altitud_max": 2800,
+      "temp_min": 12,
+      "temp_max": 22,
+      "helada_letal": -5
     },
     "passiflora_edulis_flavicarpa": {
       "nombre_comun": "Maracuyá",
@@ -552,7 +577,12 @@
             "Hongo antagonista del suelo"
           ]
         }
-      ]
+      ],
+      "altitud_min": 0,
+      "altitud_max": 1300,
+      "temp_min": 24,
+      "temp_max": 28,
+      "helada_letal": 1
     },
     "lactuca_sativa_crispa_verde": {
       "nombre_comun": "Lechuga crespa verde",
@@ -583,7 +613,12 @@
           "id": "purin_ortiga",
           "nombre": "Purín de ortiga"
         }
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2800,
+      "temp_min": 10,
+      "temp_max": 20,
+      "helada_letal": -4
     },
     "pennisetum_setaceum": {
       "nombre_comun": "Pasto fuente",
@@ -592,7 +627,12 @@
       "conservation_status": "invasor",
       "antagonist_of": [
         "calamagrostis_effusa"
-      ]
+      ],
+      "altitud_min": 1000,
+      "altitud_max": 2400,
+      "temp_min": 16,
+      "temp_max": 26,
+      "helada_letal": -2
     },
     "quercus_humboldtii": {
       "nombre_comun": "Roble negro andino",
@@ -607,7 +647,12 @@
       ],
       "antagonist_of": [
         "pinus_patula"
-      ]
+      ],
+      "altitud_min": 2400,
+      "altitud_max": 2800,
+      "temp_min": 10,
+      "temp_max": 16,
+      "helada_letal": -8
     },
     "calendula_officinalis": {
       "nombre_comun": "Caléndula",
@@ -617,7 +662,12 @@
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "solanum_lycopersicum_san_marzano"
-      ]
+      ],
+      "altitud_min": 1200,
+      "altitud_max": 2500,
+      "temp_min": 15,
+      "temp_max": 22,
+      "helada_letal": -5
     },
     "solanum_lycopersicum_sungold": {
       "nombre_comun": "Tomate cherry amarillo / Sungold",
@@ -627,7 +677,12 @@
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "urtica_dioica"
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2500,
+      "temp_min": 16,
+      "temp_max": 22,
+      "helada_letal": 0
     },
     "weinmannia_tomentosa": {
       "nombre_comun": "Encenillo",
@@ -641,7 +696,12 @@
       ],
       "antagonist_of": [
         "eucalyptus_globulus"
-      ]
+      ],
+      "altitud_min": 2500,
+      "altitud_max": 3000,
+      "temp_min": 8,
+      "temp_max": 14,
+      "helada_letal": -10
     },
     "vaccinium_corymbosum_biloxi": {
       "nombre_comun": "Arándano Biloxi",
@@ -689,7 +749,12 @@
             "Avispa parasitoide de pulgones"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1700,
+      "altitud_max": 2400,
+      "temp_min": 12,
+      "temp_max": 22,
+      "helada_letal": -5
     },
     "spondias_mombin": {
       "nombre_comun": "Jobo / Hobo",
@@ -700,7 +765,12 @@
       ],
       "establishment_means": "introducido",
       "threat_status": "LEAST_CONCERN",
-      "conservation_status": "naturalizada"
+      "conservation_status": "naturalizada",
+      "altitud_min": 100,
+      "altitud_max": 600,
+      "temp_min": 24,
+      "temp_max": 30,
+      "helada_letal": 2
     },
     "cucurbita_maxima": {
       "nombre_comun": "Calabaza / Auyama",
@@ -717,7 +787,12 @@
         "phaseolus_vulgaris",
         "solanum_tuberosum_sabanera",
         "zea_mays"
-      ]
+      ],
+      "altitud_min": 1000,
+      "altitud_max": 2600,
+      "temp_min": 16,
+      "temp_max": 24,
+      "helada_letal": 0
     },
     "ipomoea_batatas": {
       "nombre_comun": "Batata / Camote",
@@ -741,7 +816,12 @@
             "Hongo entomopatógeno (beauveria)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1200,
+      "altitud_max": 2000,
+      "temp_min": 20,
+      "temp_max": 28,
+      "helada_letal": 0
     },
     "passiflora_edulis_morada": {
       "nombre_comun": "Gulupa",
@@ -804,7 +884,12 @@
             "Parasitoide de control biológico"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2300,
+      "temp_min": 15,
+      "temp_max": 20,
+      "helada_letal": -1
     },
     "passiflora_ligularis": {
       "nombre_comun": "Granadilla",
@@ -833,7 +918,12 @@
             "Parasitoide de control biológico"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2400,
+      "temp_min": 14,
+      "temp_max": 18,
+      "helada_letal": -1
     },
     "enterolobium_cyclocarpum": {
       "nombre_comun": "Orejero",
@@ -846,7 +936,12 @@
         "cordia_alliodora",
         "gliricidia_sepium",
         "samanea_saman"
-      ]
+      ],
+      "altitud_min": 0,
+      "altitud_max": 1000,
+      "temp_min": 24,
+      "temp_max": 32,
+      "helada_letal": 8
     },
     "samanea_saman": {
       "nombre_comun": "Samán",
@@ -860,7 +955,12 @@
         "enterolobium_cyclocarpum",
         "gliricidia_sepium",
         "tabebuia_rosea"
-      ]
+      ],
+      "altitud_min": 0,
+      "altitud_max": 1200,
+      "temp_min": 24,
+      "temp_max": 30,
+      "helada_letal": 8
     },
     "capsicum_chinense_aji_panca": {
       "nombre_comun": "Ají panca",
@@ -900,7 +1000,12 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 200,
+      "altitud_max": 1800,
+      "temp_min": 18,
+      "temp_max": 28,
+      "helada_letal": 2
     },
     "capsicum_annuum_aji_dulce_caribe": {
       "nombre_comun": "Ají dulce caribe",
@@ -910,7 +1015,12 @@
       ],
       "establishment_means": "introducido",
       "threat_status": "LEAST_CONCERN",
-      "conservation_status": "cultivo_comun"
+      "conservation_status": "cultivo_comun",
+      "altitud_min": 0,
+      "altitud_max": 1500,
+      "temp_min": 20,
+      "temp_max": 30,
+      "helada_letal": 4
     },
     "lactuca_sativa_capitata": {
       "nombre_comun": "Lechuga cogollo morada",
@@ -920,7 +1030,12 @@
         "phaseolus_vulgaris",
         "raphanus_sativus_niger",
         "solanum_lycopersicum_san_marzano"
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2700,
+      "temp_min": 14,
+      "temp_max": 18,
+      "helada_letal": -3
     },
     "helianthus_annuus": {
       "nombre_comun": "Girasol",
@@ -932,7 +1047,12 @@
         "cucurbita_maxima",
         "phaseolus_vulgaris",
         "zea_mays"
-      ]
+      ],
+      "altitud_min": 0,
+      "altitud_max": 2200,
+      "temp_min": 18,
+      "temp_max": 28,
+      "helada_letal": -2
     },
     "viola_tricolor": {
       "nombre_comun": "Pensamiento / Trinitaria",
@@ -943,7 +1063,12 @@
       "compatible_with": [
         "allium_schoenoprasum",
         "fragaria_vesca"
-      ]
+      ],
+      "altitud_min": 2000,
+      "altitud_max": 3000,
+      "temp_min": 10,
+      "temp_max": 20,
+      "helada_letal": -8
     },
     "ulex_europaeus": {
       "nombre_comun": "Retamo espinoso",
@@ -953,7 +1078,9 @@
       "conservation_status": "invasor",
       "antagonist_of": [
         "erythrina_edulis"
-      ]
+      ],
+      "altitud_min": 2300,
+      "altitud_max": 3200
     },
     "eucalyptus_globulus": {
       "nombre_comun": "Eucalipto blanco",
@@ -963,7 +1090,12 @@
       "conservation_status": "invasor",
       "antagonist_of": [
         "weinmannia_tomentosa"
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2600,
+      "temp_min": 14,
+      "temp_max": 22,
+      "helada_letal": -5
     },
     "solanum_lycopersicum_cerasiforme": {
       "nombre_comun": "Tomate cherry estándar",
@@ -973,7 +1105,12 @@
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "urtica_dioica"
-      ]
+      ],
+      "altitud_min": 1500,
+      "altitud_max": 2400,
+      "temp_min": 18,
+      "temp_max": 26,
+      "helada_letal": 0
     },
     "pouteria_sapota": {
       "nombre_comun": "Mamey colorado",
@@ -983,7 +1120,12 @@
       ],
       "establishment_means": "introducido",
       "threat_status": "LEAST_CONCERN",
-      "conservation_status": "cultivo_comun"
+      "conservation_status": "cultivo_comun",
+      "altitud_min": 50,
+      "altitud_max": 700,
+      "temp_min": 22,
+      "temp_max": 30,
+      "helada_letal": 6
     },
     "spondias_purpurea": {
       "nombre_comun": "Ciruela criolla",
@@ -994,7 +1136,12 @@
       ],
       "establishment_means": "introducido",
       "threat_status": "LEAST_CONCERN",
-      "conservation_status": "cultivo_comun"
+      "conservation_status": "cultivo_comun",
+      "altitud_min": 50,
+      "altitud_max": 1200,
+      "temp_min": 20,
+      "temp_max": 30,
+      "helada_letal": 3
     },
     "solanum_lycopersicum_san_marzano": {
       "nombre_comun": "Tomate San Marzano",
@@ -1056,7 +1203,12 @@
             "Avispita parasitoide de huevos"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1500,
+      "altitud_max": 2400,
+      "temp_min": 20,
+      "temp_max": 28,
+      "helada_letal": 0
     },
     "urtica_dioica": {
       "nombre_comun": "Ortiga",
@@ -1083,7 +1235,12 @@
           "id": "compost_maduro",
           "nombre": "Compost maduro"
         }
-      ]
+      ],
+      "altitud_min": 2000,
+      "altitud_max": 3000,
+      "temp_min": 12,
+      "temp_max": 20,
+      "helada_letal": -8
     },
     "citrus_sinensis": {
       "nombre_comun": "Naranja",
@@ -1330,7 +1487,9 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 400,
+      "altitud_max": 1800
     },
     "solanum_tuberosum_sabanera": {
       "nombre_comun": "Papa Sabanera",
@@ -1352,7 +1511,12 @@
         "passiflora_tarminiana",
         "solanum_melongena",
         "spinacia_oleracea"
-      ]
+      ],
+      "altitud_min": 2400,
+      "altitud_max": 3000,
+      "temp_min": 10,
+      "temp_max": 17,
+      "helada_letal": -3
     },
     "smallanthus_sonchifolius": {
       "nombre_comun": "Yacon / Llacon",
@@ -1364,7 +1528,12 @@
       ],
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "cultivo_comun"
+      "conservation_status": "cultivo_comun",
+      "altitud_min": 2000,
+      "altitud_max": 2800,
+      "temp_min": 13,
+      "temp_max": 20,
+      "helada_letal": -2
     },
     "rubus_glaucus": {
       "nombre_comun": "Mora andina / Mora de Castilla",
@@ -1435,7 +1604,12 @@
             "Hongo antagonista del suelo"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2600,
+      "temp_min": 13,
+      "temp_max": 18,
+      "helada_letal": -2
     },
     "solanum_quitoense": {
       "nombre_comun": "Lulo / Naranjilla / Chuva",
@@ -1515,7 +1689,12 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1600,
+      "altitud_max": 2400,
+      "temp_min": 16,
+      "temp_max": 22,
+      "helada_letal": -1
     },
     "passiflora_maliformis": {
       "nombre_comun": "Granadilla de fraile / Maracuyá silvestre",
@@ -1526,7 +1705,12 @@
       ],
       "establishment_means": "nativo",
       "threat_status": "LEAST_CONCERN",
-      "conservation_status": "naturalizada"
+      "conservation_status": "naturalizada",
+      "altitud_min": 500,
+      "altitud_max": 1500,
+      "temp_min": 22,
+      "temp_max": 35,
+      "helada_letal": 2
     },
     "passiflora_tarminiana": {
       "nombre_comun": "Granadilla común / Granadilla de China",
@@ -1542,7 +1726,12 @@
       ],
       "antagonist_of": [
         "solanum_tuberosum_sabanera"
-      ]
+      ],
+      "altitud_min": 2200,
+      "altitud_max": 2800,
+      "temp_min": 16,
+      "temp_max": 24,
+      "helada_letal": -2
     },
     "allium_fistulosum": {
       "nombre_comun": "Cebollín / Cebolla larga",
@@ -1569,7 +1758,12 @@
             "Bacteria antagonista (biofungicida)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2800,
+      "temp_min": 12,
+      "temp_max": 20,
+      "helada_letal": -5
     },
     "alnus_acuminata": {
       "nombre_comun": "Aliso andino",
@@ -1586,7 +1780,12 @@
         "solanum_phureja",
         "vicia_faba",
         "weinmannia_tomentosa"
-      ]
+      ],
+      "altitud_min": 2200,
+      "altitud_max": 3200,
+      "temp_min": 8,
+      "temp_max": 18,
+      "helada_letal": -6
     },
     "daucus_carota_subsp_sativus": {
       "nombre_comun": "Zanahoria",
@@ -1596,7 +1795,12 @@
       "compatible_with": [
         "allium_cepa",
         "raphanus_sativus_niger"
-      ]
+      ],
+      "altitud_min": 1500,
+      "altitud_max": 2700,
+      "temp_min": 15,
+      "temp_max": 20,
+      "helada_letal": -4
     },
     "allium_schoenoprasum": {
       "nombre_comun": "Cebollino",
@@ -1609,7 +1813,12 @@
       ],
       "antagonist_of": [
         "phaseolus_vulgaris"
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2800,
+      "temp_min": 12,
+      "temp_max": 20,
+      "helada_letal": -6
     },
     "manihot_esculenta": {
       "nombre_comun": "Yuca brava amazónica",
@@ -1813,7 +2022,12 @@
             "Hongo verde entomopatógeno"
           ]
         }
-      ]
+      ],
+      "altitud_min": 100,
+      "altitud_max": 800,
+      "temp_min": 22,
+      "temp_max": 30,
+      "helada_letal": 8
     },
     "coffea_arabica": {
       "nombre_comun": "Café caturra / Castillo / Cenicafé 1",
@@ -1973,7 +2187,12 @@
             "Hongo antagonista del suelo"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1500,
+      "altitud_max": 2000,
+      "temp_min": 18,
+      "temp_max": 22,
+      "helada_letal": 0
     },
     "solanum_phureja": {
       "nombre_comun": "Papa criolla",
@@ -2021,7 +2240,12 @@
             "Hongo antagonista (trichoderma)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 2500,
+      "altitud_max": 3200,
+      "temp_min": 10,
+      "temp_max": 16,
+      "helada_letal": -3
     },
     "solanum_tuberosum_pastusa_suprema": {
       "nombre_comun": "Papa Pastusa Suprema",
@@ -2052,7 +2276,12 @@
           "id": "trichoderma_harzianum_suelo",
           "nombre": "Trichoderma harzianum (aplicación al suelo)"
         }
-      ]
+      ],
+      "altitud_min": 2500,
+      "altitud_max": 3000,
+      "temp_min": 10,
+      "temp_max": 17,
+      "helada_letal": -2
     },
     "brassica_oleracea_capitata_alba": {
       "nombre_comun": "Repollo blanco",
@@ -2062,7 +2291,12 @@
       "antagonist_of": [
         "solanum_lycopersicum_san_marzano",
         "vaccinium_corymbosum_biloxi"
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2600,
+      "temp_min": 15,
+      "temp_max": 20,
+      "helada_letal": -5
     },
     "vaccinium_meridionale": {
       "nombre_comun": "Mortino / Agraz",
@@ -2073,7 +2307,12 @@
       ],
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 2600,
+      "altitud_max": 3400,
+      "temp_min": 8,
+      "temp_max": 16,
+      "helada_letal": -4
     },
     "allium_cepa": {
       "nombre_comun": "Cebolla cabezona",
@@ -2163,7 +2402,12 @@
             "Parasitoide de control biológico"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1500,
+      "altitud_max": 2800,
+      "temp_min": 13,
+      "temp_max": 24,
+      "helada_letal": -6
     },
     "melissa_officinalis": {
       "nombre_comun": "Toronjil",
@@ -2173,7 +2417,12 @@
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "solanum_lycopersicum_san_marzano"
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2700,
+      "temp_min": 10,
+      "temp_max": 20,
+      "helada_letal": -15
     },
     "passiflora_tripartita_mollissima": {
       "nombre_comun": "Curuba de Castilla",
@@ -2188,7 +2437,12 @@
       "compatible_with": [
         "alnus_acuminata",
         "urtica_dioica"
-      ]
+      ],
+      "altitud_min": 2200,
+      "altitud_max": 2800,
+      "temp_min": 12,
+      "temp_max": 16,
+      "helada_letal": -3
     },
     "erythrina_edulis": {
       "nombre_comun": "Chachafruto / Balú",
@@ -2220,7 +2474,12 @@
             "Hongo entomopatógeno (beauveria)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1600,
+      "altitud_max": 2400,
+      "temp_min": 14,
+      "temp_max": 22,
+      "helada_letal": -1
     },
     "pinus_patula": {
       "nombre_comun": "Pino pátula",
@@ -2230,7 +2489,12 @@
       "conservation_status": "invasor",
       "antagonist_of": [
         "quercus_humboldtii"
-      ]
+      ],
+      "altitud_min": 2200,
+      "altitud_max": 3000,
+      "temp_min": 10,
+      "temp_max": 18,
+      "helada_letal": -10
     },
     "cymbopogon_citratus": {
       "nombre_comun": "Limonaria",
@@ -2240,7 +2504,12 @@
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "solanum_lycopersicum_san_marzano"
-      ]
+      ],
+      "altitud_min": 0,
+      "altitud_max": 2400,
+      "temp_min": 18,
+      "temp_max": 30,
+      "helada_letal": -1
     },
     "solanum_betaceum": {
       "nombre_comun": "Tomate de árbol / Tamarillo",
@@ -2294,7 +2563,12 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2400,
+      "temp_min": 15,
+      "temp_max": 22,
+      "helada_letal": -2
     },
     "theobroma_cacao": {
       "nombre_comun": "Cacao",
@@ -2337,7 +2611,12 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 200,
+      "altitud_max": 900,
+      "temp_min": 22,
+      "temp_max": 28,
+      "helada_letal": 10
     },
     "solanum_tuberosum": {
       "nombre_comun": "Papa parda pastusa",
@@ -2955,7 +3234,12 @@
             "Hongo verde entomopatógeno"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1500,
+      "altitud_max": 2400,
+      "temp_min": 16,
+      "temp_max": 24,
+      "helada_letal": 0
     },
     "bixa_orellana": {
       "nombre_comun": "Achiote",
@@ -2967,7 +3251,9 @@
       ],
       "establishment_means": "introducido",
       "threat_status": "LEAST_CONCERN",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 200,
+      "altitud_max": 1200
     },
     "fragaria_ananassa_monterrey": {
       "nombre_comun": "Fresa Monterrey",
@@ -3040,7 +3326,12 @@
             "Parasitoide de control biológico"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2800,
+      "temp_min": 14,
+      "temp_max": 20,
+      "helada_letal": -5
     },
     "brassica_oleracea_italica": {
       "nombre_comun": "Brócoli",
@@ -3086,7 +3377,12 @@
             "Trichoderma spp"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2800,
+      "temp_min": 14,
+      "temp_max": 20,
+      "helada_letal": -4
     },
     "spinacia_oleracea": {
       "nombre_comun": "Espinaca",
@@ -3098,7 +3394,12 @@
       ],
       "antagonist_of": [
         "solanum_tuberosum_sabanera"
-      ]
+      ],
+      "altitud_min": 2000,
+      "altitud_max": 2800,
+      "temp_min": 10,
+      "temp_max": 26,
+      "helada_letal": -5
     },
     "lupinus_mutabilis": {
       "nombre_comun": "Chocho / Tarwi",
@@ -3108,7 +3409,12 @@
       "compatible_with": [
         "alnus_acuminata",
         "zea_mays"
-      ]
+      ],
+      "altitud_min": 2400,
+      "altitud_max": 3000,
+      "temp_min": 12,
+      "temp_max": 18,
+      "helada_letal": -4
     },
     "inga_edulis": {
       "nombre_comun": "Guamo",
@@ -3124,7 +3430,12 @@
         "coffea_arabica",
         "cordia_alliodora",
         "tabebuia_rosea"
-      ]
+      ],
+      "altitud_min": 500,
+      "altitud_max": 1500,
+      "temp_min": 20,
+      "temp_max": 28,
+      "helada_letal": 0
     },
     "cordia_alliodora": {
       "nombre_comun": "Nogal cafetero",
@@ -3140,7 +3451,12 @@
         "inga_edulis",
         "samanea_saman",
         "tabebuia_rosea"
-      ]
+      ],
+      "altitud_min": 400,
+      "altitud_max": 1600,
+      "temp_min": 18,
+      "temp_max": 26,
+      "helada_letal": 4
     },
     "tabebuia_rosea": {
       "nombre_comun": "Guayacán rosado",
@@ -3155,7 +3471,12 @@
         "erythrina_edulis",
         "inga_edulis",
         "samanea_saman"
-      ]
+      ],
+      "altitud_min": 100,
+      "altitud_max": 1600,
+      "temp_min": 18,
+      "temp_max": 28,
+      "helada_letal": 4
     },
     "allium_sativum": {
       "nombre_comun": "Ajo",
@@ -3218,7 +3539,12 @@
             "Hongo antagonista del suelo"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1500,
+      "altitud_max": 2800,
+      "temp_min": 12,
+      "temp_max": 20,
+      "helada_letal": -10
     },
     "brassica_oleracea_botrytis": {
       "nombre_comun": "Coliflor",
@@ -3256,7 +3582,12 @@
             "Trichoderma spp"
           ]
         }
-      ]
+      ],
+      "altitud_min": 2000,
+      "altitud_max": 2800,
+      "temp_min": 14,
+      "temp_max": 26,
+      "helada_letal": -2
     },
     "oxalis_tuberosa": {
       "nombre_comun": "Oca / Hibia",
@@ -3283,7 +3614,12 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 2400,
+      "altitud_max": 2800,
+      "temp_min": 12,
+      "temp_max": 18,
+      "helada_letal": -2
     },
     "tropaeolum_tuberosum": {
       "nombre_comun": "Mashua / Cubio",
@@ -3302,7 +3638,12 @@
         "oxalis_tuberosa",
         "solanum_tuberosum_sabanera",
         "zea_mays"
-      ]
+      ],
+      "altitud_min": 2500,
+      "altitud_max": 3200,
+      "temp_min": 10,
+      "temp_max": 16,
+      "helada_letal": -4
     },
     "pisum_sativum_andina": {
       "nombre_comun": "Arveja andina",
@@ -3318,7 +3659,12 @@
           "id": "inoculante_rhizobium_frijol",
           "nombre": "Inoculante de Rhizobium para fríjol (fijación de nitrógeno)"
         }
-      ]
+      ],
+      "altitud_min": 2200,
+      "altitud_max": 2800,
+      "temp_min": 10,
+      "temp_max": 18,
+      "helada_letal": -4
     },
     "citrus_latifolia": {
       "nombre_comun": "Limón Tahití",
@@ -3547,7 +3893,9 @@
             "Hongo verde entomopatógeno"
           ]
         }
-      ]
+      ],
+      "altitud_min": 400,
+      "altitud_max": 1600
     },
     "chenopodium_quinoa": {
       "nombre_comun": "Quinua",
@@ -3559,7 +3907,12 @@
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "zea_mays"
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2800,
+      "temp_min": 14,
+      "temp_max": 20,
+      "helada_letal": -5
     },
     "petroselinum_crispum": {
       "nombre_comun": "Perejil crespo",
@@ -3569,7 +3922,12 @@
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "solanum_lycopersicum_san_marzano"
-      ]
+      ],
+      "altitud_min": 1500,
+      "altitud_max": 2800,
+      "temp_min": 10,
+      "temp_max": 20,
+      "helada_letal": -5
     },
     "rosmarinus_officinalis": {
       "nombre_comun": "Romero",
@@ -3578,7 +3936,12 @@
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "urtica_dioica"
-      ]
+      ],
+      "altitud_min": 1000,
+      "altitud_max": 2800,
+      "temp_min": 12,
+      "temp_max": 24,
+      "helada_letal": -15
     },
     "physalis_peruviana": {
       "nombre_comun": "Uchuva",
@@ -3617,7 +3980,12 @@
             "Hongo antagonista (trichoderma)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2800,
+      "temp_min": 13,
+      "temp_max": 18,
+      "helada_letal": -1
     },
     "borojoa_patinoi": {
       "nombre_comun": "Borojó",
@@ -3625,7 +3993,12 @@
       "nombres_comunes": [
         "borojo"
       ],
-      "conservation_status": "endemica_colombia"
+      "conservation_status": "endemica_colombia",
+      "altitud_min": 100,
+      "altitud_max": 800,
+      "temp_min": 24,
+      "temp_max": 28,
+      "helada_letal": 5
     },
     "arracacia_xanthorrhiza": {
       "nombre_comun": "Arracacha / Zanahoria blanca",
@@ -3654,7 +4027,12 @@
             "Pochonia chlamydosporia"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2800,
+      "temp_min": 13,
+      "temp_max": 20,
+      "helada_letal": -2
     },
     "mucuna_pruriens": {
       "nombre_comun": "Frijol terciopelo",
@@ -3664,7 +4042,12 @@
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "zea_mays"
-      ]
+      ],
+      "altitud_min": 200,
+      "altitud_max": 1500,
+      "temp_min": 22,
+      "temp_max": 30,
+      "helada_letal": 0
     },
     "mangifera_indica": {
       "nombre_comun": "Mango",
@@ -3767,7 +4150,9 @@
             "Hongo entomopatógeno (beauveria)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 0,
+      "altitud_max": 1200
     },
     "gliricidia_sepium": {
       "nombre_comun": "Matarratón",
@@ -3780,14 +4165,21 @@
         "enterolobium_cyclocarpum",
         "samanea_saman",
         "trichanthera_gigantea"
-      ]
+      ],
+      "altitud_min": 0,
+      "altitud_max": 1200,
+      "temp_min": 20,
+      "temp_max": 30,
+      "helada_letal": 0
     },
     "leucaena_leucocephala": {
       "nombre_comun": "Leucaena",
       "nombre_cientifico": "Leucaena leucocephala (Lam.) de Wit",
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "naturalizada"
+      "conservation_status": "naturalizada",
+      "altitud_min": 0,
+      "altitud_max": 1200
     },
     "tithonia_diversifolia": {
       "nombre_comun": "Botón de oro",
@@ -3797,14 +4189,21 @@
       "nombre_cientifico": "Tithonia diversifolia (Hemsl.) A.Gray",
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "naturalizada"
+      "conservation_status": "naturalizada",
+      "altitud_min": 800,
+      "altitud_max": 1800
     },
     "morus_alba": {
       "nombre_comun": "Morera blanca",
       "nombre_cientifico": "Morus alba L.",
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "naturalizada"
+      "conservation_status": "naturalizada",
+      "altitud_min": 1000,
+      "altitud_max": 2200,
+      "temp_min": 14,
+      "temp_max": 32,
+      "helada_letal": -3
     },
     "cratylia_argentea": {
       "nombre_comun": "Cratylia",
@@ -3814,14 +4213,21 @@
       "nombre_cientifico": "Cratylia argentea (Desv.) Kuntze",
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "naturalizada"
+      "conservation_status": "naturalizada",
+      "altitud_min": 200,
+      "altitud_max": 1200
     },
     "azolla_filiculoides": {
       "nombre_comun": "Azolla",
       "nombre_cientifico": "Azolla filiculoides Lam.",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 500,
+      "altitud_max": 2600,
+      "temp_min": 15,
+      "temp_max": 28,
+      "helada_letal": -2
     },
     "ananas_comosus": {
       "nombre_comun": "Piña",
@@ -3837,7 +4243,9 @@
             "Mariquita destructora de cochinillas"
           ]
         }
-      ]
+      ],
+      "altitud_min": 100,
+      "altitud_max": 1000
     },
     "musa_paradisiaca": {
       "nombre_comun": "Plátano",
@@ -3926,7 +4334,9 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 0,
+      "altitud_max": 1800
     },
     "tropaeolum_majus": {
       "nombre_comun": "Capuchina / Taco de reina",
@@ -3936,7 +4346,12 @@
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "solanum_lycopersicum_san_marzano"
-      ]
+      ],
+      "altitud_min": 1000,
+      "altitud_max": 2400,
+      "temp_min": 15,
+      "temp_max": 24,
+      "helada_letal": -2
     },
     "ullucus_tuberosus": {
       "nombre_comun": "Ulluco / Chugua",
@@ -3958,7 +4373,12 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 2200,
+      "altitud_max": 3000,
+      "temp_min": 12,
+      "temp_max": 18,
+      "helada_letal": -5
     },
     "physalis_angulata": {
       "nombre_comun": "Uchuva silvestre / Topotopo",
@@ -3968,7 +4388,12 @@
       ],
       "establishment_means": "nativo",
       "threat_status": "LEAST_CONCERN",
-      "conservation_status": "naturalizada"
+      "conservation_status": "naturalizada",
+      "altitud_min": 800,
+      "altitud_max": 1800,
+      "temp_min": 18,
+      "temp_max": 35,
+      "helada_letal": 0
     },
     "solanum_melongena": {
       "nombre_comun": "Berenjena",
@@ -3981,7 +4406,12 @@
       "antagonist_of": [
         "solanum_phureja",
         "solanum_tuberosum_sabanera"
-      ]
+      ],
+      "altitud_min": 800,
+      "altitud_max": 1800,
+      "temp_min": 20,
+      "temp_max": 35,
+      "helada_letal": 2
     },
     "zea_mays": {
       "nombre_comun": "Maíz criollo",
@@ -4123,7 +4553,12 @@
             "Avispita parasitoide de huevos"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2800,
+      "temp_min": 15,
+      "temp_max": 24,
+      "helada_letal": -2
     },
     "amaranthus_caudatus": {
       "nombre_comun": "Amaranto",
@@ -4135,7 +4570,12 @@
       ],
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "cultivo_comun"
+      "conservation_status": "cultivo_comun",
+      "altitud_min": 2000,
+      "altitud_max": 3000,
+      "temp_min": 12,
+      "temp_max": 18,
+      "helada_letal": -3
     },
     "cucumis_melo": {
       "nombre_comun": "Melón",
@@ -4186,7 +4626,12 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 400,
+      "altitud_max": 1400,
+      "temp_min": 20,
+      "temp_max": 35,
+      "helada_letal": 2
     },
     "vicia_faba": {
       "nombre_comun": "Haba",
@@ -4203,7 +4648,12 @@
           "id": "inoculante_rhizobium_frijol",
           "nombre": "Inoculante de Rhizobium para fríjol (fijación de nitrógeno)"
         }
-      ]
+      ],
+      "altitud_min": 2200,
+      "altitud_max": 3000,
+      "temp_min": 10,
+      "temp_max": 18,
+      "helada_letal": -6
     },
     "fragaria_vesca": {
       "nombre_comun": "Fresa silvestre andina",
@@ -4230,7 +4680,12 @@
             "Parasitoide de control biológico"
           ]
         }
-      ]
+      ],
+      "altitud_min": 2500,
+      "altitud_max": 3300,
+      "temp_min": 8,
+      "temp_max": 18,
+      "helada_letal": -8
     },
     "avena_sativa": {
       "nombre_comun": "Avena forrajera",
@@ -4240,7 +4695,12 @@
       "conservation_status": "cultivo_comun",
       "compatible_with": [
         "vicia_faba"
-      ]
+      ],
+      "altitud_min": 2200,
+      "altitud_max": 3000,
+      "temp_min": 10,
+      "temp_max": 18,
+      "helada_letal": -6
     },
     "bactris_gasipaes": {
       "nombre_comun": "Chontaduro",
@@ -4252,7 +4712,12 @@
       ],
       "establishment_means": "introducido",
       "threat_status": "VULNERABLE",
-      "conservation_status": "cultivo_comun"
+      "conservation_status": "cultivo_comun",
+      "altitud_min": 100,
+      "altitud_max": 500,
+      "temp_min": 24,
+      "temp_max": 30,
+      "helada_letal": 8
     },
     "euterpe_oleracea": {
       "nombre_comun": "Asai",
@@ -4264,7 +4729,12 @@
       ],
       "establishment_means": "nativo",
       "threat_status": "LEAST_CONCERN",
-      "conservation_status": "cultivo_comun"
+      "conservation_status": "cultivo_comun",
+      "altitud_min": 0,
+      "altitud_max": 200,
+      "temp_min": 24,
+      "temp_max": 30,
+      "helada_letal": 10
     },
     "cucurbita_moschata": {
       "nombre_comun": "Ahuyama Amarilla",
@@ -4333,7 +4803,12 @@
             "Trichogramma spp"
           ]
         }
-      ]
+      ],
+      "altitud_min": 200,
+      "altitud_max": 1800,
+      "temp_min": 18,
+      "temp_max": 28,
+      "helada_letal": 0
     },
     "pouteria_caimito": {
       "nombre_comun": "Abiu",
@@ -4344,7 +4819,12 @@
       ],
       "establishment_means": "nativo",
       "threat_status": "LEAST_CONCERN",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 100,
+      "altitud_max": 600,
+      "temp_min": 22,
+      "temp_max": 30,
+      "helada_letal": 5
     },
     "theobroma_grandiflorum": {
       "nombre_comun": "Copoazú",
@@ -4356,7 +4836,12 @@
       ],
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "cultivo_comun"
+      "conservation_status": "cultivo_comun",
+      "altitud_min": 100,
+      "altitud_max": 400,
+      "temp_min": 22,
+      "temp_max": 28,
+      "helada_letal": 10
     },
     "eriobotrya_japonica": {
       "nombre_comun": "Níspero japonés",
@@ -4371,7 +4856,12 @@
             "Parasitoide de control biológico"
           ]
         }
-      ]
+      ],
+      "altitud_min": 1700,
+      "altitud_max": 2400,
+      "temp_min": 14,
+      "temp_max": 24,
+      "helada_letal": -3
     },
     "albizia_guachapele": {
       "nombre_comun": "Iguá hoja menuda",
@@ -4384,7 +4874,12 @@
         "cordia_alliodora",
         "gliricidia_sepium",
         "tabebuia_rosea"
-      ]
+      ],
+      "altitud_min": 100,
+      "altitud_max": 1500,
+      "temp_min": 22,
+      "temp_max": 30,
+      "helada_letal": 5
     },
     "persea_americana": {
       "nombre_comun": "Aguacate",
@@ -4551,7 +5046,9 @@
             "Hongo entomopatógeno (beauveria)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 800,
+      "altitud_max": 2200
     },
     "cucumis_sativus": {
       "nombre_comun": "Pepino cohombro",
@@ -4610,7 +5107,12 @@
             "Trichogramma spp"
           ]
         }
-      ]
+      ],
+      "altitud_min": 600,
+      "altitud_max": 1600,
+      "temp_min": 18,
+      "temp_max": 32,
+      "helada_letal": 2
     },
     "citrullus_lanatus": {
       "nombre_comun": "Patilla / Sandía",
@@ -4656,7 +5158,12 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 200,
+      "altitud_max": 1000,
+      "temp_min": 22,
+      "temp_max": 40,
+      "helada_letal": 5
     },
     "raphanus_sativus_niger": {
       "nombre_comun": "Rábano blanco / Rábano picante",
@@ -4666,7 +5173,12 @@
       "compatible_with": [
         "daucus_carota_subsp_sativus",
         "lactuca_sativa_capitata"
-      ]
+      ],
+      "altitud_min": 1800,
+      "altitud_max": 2800,
+      "temp_min": 12,
+      "temp_max": 26,
+      "helada_letal": -3
     },
     "psidium_guajava": {
       "nombre_comun": "Guayaba",
@@ -4942,7 +5454,12 @@
             "Hongo verde entomopatógeno"
           ]
         }
-      ]
+      ],
+      "altitud_min": 600,
+      "altitud_max": 1600,
+      "temp_min": 18,
+      "temp_max": 34,
+      "helada_letal": -2
     },
     "dioscorea_rotundata": {
       "nombre_comun": "Ñame blanco africano",
@@ -4962,7 +5479,12 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 0,
+      "altitud_max": 600,
+      "temp_min": 24,
+      "temp_max": 30,
+      "helada_letal": 8
     },
     "dioscorea_alata": {
       "nombre_comun": "Ñame blanco",
@@ -4983,7 +5505,12 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 0,
+      "altitud_max": 400,
+      "temp_min": 24,
+      "temp_max": 30,
+      "helada_letal": 5
     },
     "carica_papaya": {
       "nombre_comun": "Papaya",
@@ -5027,14 +5554,24 @@
             "Microorganismo de control biológico (DR-MIP-1)"
           ]
         }
-      ]
+      ],
+      "altitud_min": 0,
+      "altitud_max": 1000,
+      "temp_min": 21,
+      "temp_max": 38,
+      "helada_letal": 0
     },
     "ochroma_pyramidale": {
       "nombre_comun": "Balso",
       "nombre_cientifico": "Ochroma pyramidale (Cav. ex Lam.) Urb.",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 100,
+      "altitud_max": 1000,
+      "temp_min": 22,
+      "temp_max": 30,
+      "helada_letal": 8
     },
     "guazuma_ulmifolia": {
       "nombre_comun": "Guácimo",
@@ -5048,35 +5585,60 @@
       "nombre_cientifico": "Trichanthera gigantea (Bonpl.) Nees",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 500,
+      "altitud_max": 1800,
+      "temp_min": 18,
+      "temp_max": 24,
+      "helada_letal": -2
     },
     "guadua_angustifolia": {
       "nombre_comun": "Guadua",
       "nombre_cientifico": "Guadua angustifolia Kunth",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 400,
+      "altitud_max": 1500,
+      "temp_min": 18,
+      "temp_max": 28,
+      "helada_letal": -1
     },
     "cedrela_odorata": {
       "nombre_comun": "Cedro",
       "nombre_cientifico": "Cedrela odorata L.",
       "establishment_means": "nativo",
       "threat_status": "VULNERABLE",
-      "conservation_status": "nativo_protegido"
+      "conservation_status": "nativo_protegido",
+      "altitud_min": 200,
+      "altitud_max": 1500,
+      "temp_min": 18,
+      "temp_max": 28,
+      "helada_letal": 2
     },
     "anacardium_excelsum": {
       "nombre_comun": "Caracolí",
       "nombre_cientifico": "Anacardium excelsum (Bertero & Balb. ex Kunth) Skeels",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 0,
+      "altitud_max": 800,
+      "temp_min": 22,
+      "temp_max": 30,
+      "helada_letal": 12
     },
     "ceiba_pentandra": {
       "nombre_comun": "Ceiba",
       "nombre_cientifico": "Ceiba pentandra (L.) Gaertn.",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 0,
+      "altitud_max": 800,
+      "temp_min": 24,
+      "temp_max": 32,
+      "helada_letal": 10
     },
     "baccharis_latifolia": {
       "nombre_comun": "Chilco",
@@ -5090,42 +5652,69 @@
       "nombre_cientifico": "Myrcianthes leucoxyla (Ortega) McVaugh",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_protegido"
+      "conservation_status": "nativo_protegido",
+      "altitud_min": 2500,
+      "altitud_max": 3200
     },
     "morella_pubescens": {
       "nombre_comun": "Laurel de cera",
       "nombre_cientifico": "Morella pubescens (Humb. & Bonpl. ex Willd.) Wilbur",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 2200,
+      "altitud_max": 3000,
+      "temp_min": 8,
+      "temp_max": 15,
+      "helada_letal": -7
     },
     "cedrela_montana": {
       "nombre_comun": "Cedro andino",
       "nombre_cientifico": "Cedrela montana Moritz ex Turcz.",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_protegido"
+      "conservation_status": "nativo_protegido",
+      "altitud_min": 1800,
+      "altitud_max": 2400,
+      "temp_min": 12,
+      "temp_max": 20,
+      "helada_letal": -2
     },
     "juglans_neotropica": {
       "nombre_comun": "Nogal",
       "nombre_cientifico": "Juglans neotropica Diels",
       "establishment_means": "nativo",
       "threat_status": "ENDANGERED",
-      "conservation_status": "nativo_protegido"
+      "conservation_status": "nativo_protegido",
+      "altitud_min": 1800,
+      "altitud_max": 2600,
+      "temp_min": 12,
+      "temp_max": 20,
+      "helada_letal": -4
     },
     "hesperomeles_goudotiana": {
       "nombre_comun": "Mortiño",
       "nombre_cientifico": "Hesperomeles goudotiana (Decne.) Killip",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 2800,
+      "altitud_max": 3400,
+      "temp_min": 6,
+      "temp_max": 14,
+      "helada_letal": -8
     },
     "polylepis_quadrijuga": {
       "nombre_comun": "Polylepis / Colorado",
       "nombre_cientifico": "Polylepis quadrijuga Bitter",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_protegido"
+      "conservation_status": "nativo_protegido",
+      "altitud_min": 3000,
+      "altitud_max": 3500,
+      "temp_min": 3,
+      "temp_max": 10,
+      "helada_letal": -15
     },
     "ceroxylon_quindiuense": {
       "nombre_comun": "Palma de cera del Quindío",
@@ -5139,35 +5728,57 @@
       "nombre_cientifico": "Diplostephium rosmarinifolium (Benth.) Wedd.",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 3000,
+      "altitud_max": 3700,
+      "temp_min": 4,
+      "temp_max": 14,
+      "helada_letal": -8
     },
     "hypericum_juniperinum": {
       "nombre_comun": "Chite",
       "nombre_cientifico": "Hypericum juniperinum Kunth",
       "establishment_means": "nativo",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "nativo_silvestre"
+      "conservation_status": "nativo_silvestre",
+      "altitud_min": 3000,
+      "altitud_max": 3800,
+      "temp_min": 2,
+      "temp_max": 11,
+      "helada_letal": -12
     },
     "espeletia_grandiflora": {
       "nombre_comun": "Frailejón",
       "nombre_cientifico": "Espeletia grandiflora Humb. & Bonpl.",
       "establishment_means": "nativo",
       "threat_status": "LEAST_CONCERN",
-      "conservation_status": "nativo_protegido"
+      "conservation_status": "nativo_protegido",
+      "altitud_min": 3200,
+      "altitud_max": 3800,
+      "temp_min": 2,
+      "temp_max": 10,
+      "helada_letal": -15
     },
     "genista_monspessulana": {
       "nombre_comun": "Retamo liso",
       "nombre_cientifico": "Genista monspessulana (L.) L.A.S.Johnson",
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "invasor"
+      "conservation_status": "invasor",
+      "altitud_min": 2400,
+      "altitud_max": 3000,
+      "temp_min": 10,
+      "temp_max": 24,
+      "helada_letal": -8
     },
     "thunbergia_alata": {
       "nombre_comun": "Ojo de poeta",
       "nombre_cientifico": "Thunbergia alata Bojer ex Sims",
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "invasor"
+      "conservation_status": "invasor",
+      "altitud_min": 2000,
+      "altitud_max": 3000
     },
     "cenchrus_clandestinus": {
       "nombre_comun": "Kikuyo",
@@ -5177,7 +5788,9 @@
       ],
       "establishment_means": "introducido",
       "threat_status": "NOT_EVALUATED",
-      "conservation_status": "invasor"
+      "conservation_status": "invasor",
+      "altitud_min": 2200,
+      "altitud_max": 3200
     }
   }
 }

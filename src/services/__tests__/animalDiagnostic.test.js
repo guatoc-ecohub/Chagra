@@ -8,7 +8,15 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 // @ts-expect-error TS2591 — ver comentario arriba.
 import path from 'node:path';
-import { detectarEspecie, recomendarForraje, recomendarAlimentosPecuarios, getGuardas, diagnosticarAnimal, formatearGroundingAnimal } from '../animalDiagnostic';
+import {
+  detectarEspecie,
+  recomendarForraje,
+  recomendarAlimentosPecuarios,
+  getGuardas,
+  diagnosticarAnimal,
+  formatearGroundingAnimal,
+  forrajeraEnRangoAltitud,
+} from '../animalDiagnostic';
 import ANIMAL_DATA from '../../data/animal-diagnostics.json';
 
 describe('detectarEspecie', () => {
@@ -224,5 +232,109 @@ describe('animalDiagnostic — % de dieta seguros (anti-dosis-peligrosa)', () =>
         expect(f.guarda.length, `${f.id} guarda demasiado corta`).toBeGreaterThan(10);
       }
     }
+  });
+});
+
+// ── FIX cross_thermal (bench-contaminacion.mjs 40%, 6/15, 2026-07-10): las
+//    forrajeras recomendadas deben recortarse a las que viven en el piso
+//    térmico de la finca. Membership test determinístico, SIN LLM/red — ver
+//    AUDIT-INJECTORS-GROUNDING-2026-07-09.md + fix/cross-thermal-altitud-filter.
+describe('forrajeraEnRangoAltitud — membership test puro', () => {
+  const forrajera = { id: 'boton_oro', altitud_min: 800, altitud_max: 1800 };
+
+  it('altitud DENTRO del rango → true', () => {
+    expect(forrajeraEnRangoAltitud(forrajera, 1200)).toBe(true);
+  });
+  it('altitud en el borde exacto (altitud_min) → true', () => {
+    expect(forrajeraEnRangoAltitud(forrajera, 800)).toBe(true);
+  });
+  it('altitud FUERA del rango pero dentro del margen (±200m) → true (zona de transición)', () => {
+    expect(forrajeraEnRangoAltitud(forrajera, 1950)).toBe(true); // 1800+150
+    expect(forrajeraEnRangoAltitud(forrajera, 650)).toBe(true); // 800-150
+  });
+  it('altitud MUY por debajo del rango (más allá del margen) → false', () => {
+    expect(forrajeraEnRangoAltitud(forrajera, 300)).toBe(false); // 800-500, > 200 margen
+  });
+  it('altitud MUY por encima del rango (más allá del margen, ej. finca de páramo) → false', () => {
+    expect(forrajeraEnRangoAltitud(forrajera, 3200)).toBe(false); // 1800+1400
+  });
+  it('forrajera SIN altitud_min/altitud_max (subproducto: yuca cocida, suero) → siempre true (graceful)', () => {
+    const subproducto = { id: 'yuca_cocida' };
+    expect(forrajeraEnRangoAltitud(subproducto, 3200)).toBe(true);
+    expect(forrajeraEnRangoAltitud(subproducto, 0)).toBe(true);
+  });
+  it('SIN altitud de finca conocida (perfil sin ubicación) → siempre true (graceful, no rompe el caso sin ubicación)', () => {
+    expect(forrajeraEnRangoAltitud(forrajera, null)).toBe(true);
+    expect(forrajeraEnRangoAltitud(forrajera, undefined)).toBe(true);
+    expect(forrajeraEnRangoAltitud(forrajera, '')).toBe(true);
+  });
+  it('altitud como string numérico (perfil puede guardarla como texto) → se normaliza', () => {
+    expect(forrajeraEnRangoAltitud(forrajera, '1200')).toBe(true);
+    expect(forrajeraEnRangoAltitud(forrajera, '300')).toBe(false);
+  });
+});
+
+describe('recomendarForraje — recorta candidatos fuera de piso térmico', () => {
+  it('finca de PÁRAMO (3200 msnm): NINGUNA forrajera botánica de tierra caliente/templada sobrevive', () => {
+    // Sin altitud (comportamiento previo al fix): las 6 forrajeras botánicas de
+    // clima cálido/templado se ofrecían igual a una finca de páramo.
+    const sinFiltro = recomendarForraje('bovino');
+    expect(sinFiltro.some((f) => f.id === 'leucaena')).toBe(true);
+    expect(sinFiltro.some((f) => f.id === 'boton_oro')).toBe(true);
+
+    // Con la altitud real de la finca, el filtro las excluye (0-1200/500-1800/
+    // 800-1800/1000-2200/200-1200 msnm, todas muy por debajo de 3200±200).
+    const conFiltro = recomendarForraje('bovino', 3200);
+    for (const id of ['leucaena', 'nacedero', 'boton_oro', 'matarraton', 'morera', 'cratylia']) {
+      expect(conFiltro.some((f) => f.id === id), `${id} NO debería ofrecerse a 3200 msnm`).toBe(false);
+    }
+  });
+
+  it('finca de TIERRA CALIENTE (200 msnm): leucaena/matarraton SÍ, morera (1000-2200) NO', () => {
+    const f = recomendarForraje('bovino', 200);
+    expect(f.some((f) => f.id === 'leucaena')).toBe(true);
+    expect(f.some((f) => f.id === 'matarraton')).toBe(true);
+    expect(f.some((f) => f.id === 'morera')).toBe(false);
+  });
+
+  it('subproductos sin altitud (yuca/suero) se ofrecen en CUALQUIER piso', () => {
+    const paramo = recomendarForraje('bovino', 3200);
+    expect(paramo.some((f) => f.id === 'yuca_cocida')).toBe(true);
+    expect(paramo.some((f) => f.id === 'suero_leche')).toBe(true);
+  });
+
+  it('sin altitud de finca (perfil sin ubicación) → comportamiento idéntico al anterior (no filtra)', () => {
+    const sinAltitud = recomendarForraje('bovino');
+    const altitudNull = recomendarForraje('bovino', null);
+    expect(altitudNull.map((f) => f.id).sort()).toEqual(sinAltitud.map((f) => f.id).sort());
+  });
+});
+
+describe('diagnosticarAnimal(descripcion, {altitud}) — end to end', () => {
+  it('finca de páramo (3200 msnm) → NO recomienda botón de oro (altoandino pero NO de páramo)', () => {
+    const d = diagnosticarAnimal('tengo vacas lecheras', { altitud: 3200 });
+    expect(d.sin_datos).toBe(false);
+    expect(d.forrajes.some((f) => f.id === 'boton_oro')).toBe(false);
+    expect(d.forrajes.some((f) => f.id === 'leucaena')).toBe(false);
+  });
+
+  it('finca de tierra caliente (300 msnm) → SÍ recomienda leucaena/matarraton', () => {
+    const d = diagnosticarAnimal('tengo vacas lecheras', { altitud: 300 });
+    expect(d.forrajes.some((f) => f.id === 'leucaena')).toBe(true);
+    expect(d.forrajes.some((f) => f.id === 'matarraton')).toBe(true);
+  });
+
+  it('sin opts (compatibilidad hacia atrás) → NO filtra, igual que antes del fix', () => {
+    const d = diagnosticarAnimal('tengo vacas lecheras');
+    expect(d.forrajes.some((f) => f.id === 'leucaena')).toBe(true);
+  });
+
+  it('porcino de páramo (3000 msnm) → los complementos vivos (morera/nacedero/botón de oro) se recortan, yuca/suero se mantienen', () => {
+    const d = diagnosticarAnimal('tengo cerdos', { altitud: 3000 });
+    expect(d.alimentos.some((f) => f.id === 'morera')).toBe(false);
+    expect(d.alimentos.some((f) => f.id === 'nacedero')).toBe(false);
+    expect(d.alimentos.some((f) => f.id === 'boton_oro')).toBe(false);
+    expect(d.alimentos.some((f) => f.id === 'yuca_cocida')).toBe(true);
+    expect(d.alimentos.some((f) => f.id === 'suero_leche')).toBe(true);
   });
 });
