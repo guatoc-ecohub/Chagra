@@ -375,7 +375,7 @@ export const BAGAZO_ABONO = {
  */
 export const CREDITOS_FOTOS_CANA = [
   { slug: 'canaveral', autor: 'Akire gatuna', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Panelera_Corozal_El_Triangulo_10.jpg' },
-  { slug: 'cana-planta', autor: 'Akire gatuna', licencia: 'CC BY-SA 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Panelera_Corozal_El_Triangulo_22.jpg' },
+  { slug: 'cana-planta', autor: 'Raffi Kojian', licencia: 'CC BY-SA 3.0', licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Gardenology.org-IMG_7577_qsbg11mar.jpg' },
   { slug: 'barrenador', autor: 'Rebecca Graham, Dept. of Agriculture WA', licencia: 'CC BY 3.0 AU', licenciaUrl: 'https://creativecommons.org/licenses/by/3.0/au/deed.en', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Diatraea_saccharalis_female_dorsal.jpg' },
   { slug: 'cotesia', autor: 'Kaiser et al. (2017), ZooKeys 682', licencia: 'CC BY 4.0', licenciaUrl: 'https://creativecommons.org/licenses/by/4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Cotesia_flavipes_(10.3897-zookeys.682.13016)_Figure_7.jpg' },
   { slug: 'corte', autor: 'Cícero R. C. Omena', licencia: 'CC BY 2.0', licenciaUrl: 'https://creativecommons.org/licenses/by/2.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Corte_de_cana_(13899302714).jpg' },
