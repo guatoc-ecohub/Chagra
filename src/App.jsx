@@ -89,6 +89,14 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
+// Mockup dev "La Montaña de los Mundos" (navegación como paisaje vertical de
+// pisos térmicos, 3 direcciones artísticas para decidir dirección visual).
+// Ruta #/mockups/montana-mundos — sin gate ni sesión (datos de muestra).
+const MontanaMundosMockup = lazy(() => import('./mockups/MontanaMundos'));
+// Pasada 2 cinematográfica del mismo mockup (parallax de 6 capas, luz
+// atmosférica por piso, full-bleed). Ruta #/mockups/montana-mundos-cine —
+// la pasada 1 se conserva en su ruta para comparar lado a lado.
+const MontanaMundosCineMockup = lazy(() => import('./mockups/MontanaMundosCine'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -418,6 +426,8 @@ const LoadingFallback = ({ view = null }) => {
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 const HASH_VIEW_ROUTES = {
+  'mockups/montana-mundos': 'mockup_montana_mundos',
+  'mockups/montana-mundos-cine': 'mockup_montana_mundos_cine',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -915,6 +925,14 @@ export default function App() {
       return;
     }
 
+    // Mockups dev (#/mockups/*): vistas aisladas de decisión visual — se
+    // montan sin sesión (datos de muestra, no tocan datos reales).
+    if (hash === 'mockups/montana-mundos' || hash === 'mockups/montana-mundos-cine') {
+      const vistaMockup = HASH_VIEW_ROUTES[hash];
+      Promise.resolve().then(() => navigate(vistaMockup));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -943,6 +961,11 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockups dev: sin gate ni sesión (datos de muestra).
+      if (routeView === 'mockup_montana_mundos' || routeView === 'mockup_montana_mundos_cine') {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1265,6 +1288,27 @@ export default function App() {
               onConfirm={() => navigate(currentViewData?.next || 'dashboard')}
               onBack={() => navigate(currentViewData?.back || 'dashboard')}
             />
+          </ErrorBoundary>
+        );
+      case 'mockup_montana_mundos':
+        // Mockup dev "La Montaña de los Mundos": navegación como paisaje de
+        // pisos térmicos, 3 direcciones artísticas. Full-screen, sin gate —
+        // solo para decidir dirección visual.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Montaña de los Mundos">
+              <MontanaMundosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_montana_mundos_cine':
+        // Pasada 2 cinematográfica del mockup: parallax de 6 capas, luz
+        // atmosférica por piso, full-bleed. Sin gate, solo decisión visual.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Montaña de los Mundos (cine)">
+              <MontanaMundosCineMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'dashboard':
@@ -2563,7 +2607,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && !currentView.startsWith('mockup_') && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
