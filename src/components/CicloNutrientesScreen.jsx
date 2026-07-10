@@ -4,6 +4,7 @@ import {
   ArrowDown, FlaskConical, Droplets, Mountain, Info, Trees,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
+import { Lombriz } from '../visual/creatures';
 
 /**
  * CicloNutrientesScreen — el CICLO CERRADO de nutrientes de la finca, VISIBLE.
@@ -145,7 +146,7 @@ const PASOS_PLAN = [
     momento: 'Mientras crece (≈día 15–25)',
     insumo: 'Biol foliar o al pie',
     propio: true,
-    nota: 'Refuerzo de nitrógeno en vegetativo. Aquí entra la boñiga de las vacas y la porcinaza de los cerdos, fermentadas en biol.',
+    nota: 'Refuerzo de nitrógeno cuando la mata está echando hojas (crecimiento vegetativo). Aquí entra la boñiga de las vacas y la porcinaza de los cerdos, fermentadas en biol.',
   },
   {
     momento: 'En floración, cuaje y llenado (≈día 45–60)',
@@ -190,14 +191,17 @@ export default function CicloNutrientesScreen({ onBack, onHome, onNavigate }) {
   return (
     <ScreenShell title="Ciclo de nutrientes" icon={Recycle} onBack={onBack} onHome={onHome}>
       <div className="px-4 pt-4 pb-10 max-w-2xl mx-auto space-y-4">
-        {/* Intro — la idea en campesino. */}
-        <p className="text-sm text-slate-300 leading-relaxed">
-          En una finca agroecológica nada se bota. Lo que sale de sus animales
-          vuelve a la tierra como comida para las plantas. Aquí ve el camino
-          completo, eslabón por eslabón: el estiércol del animal se transforma en
-          biopreparado y ese abono entra en el plan de alimentación de sus
-          cultivos.
-        </p>
+        {/* Intro — la idea en campesino, con la lombriz (la que hace tierra). */}
+        <div className="flex items-start gap-3 rounded-2xl border border-emerald-800/40 bg-emerald-950/20 p-3.5">
+          <Lombriz size={56} className="shrink-0 mt-0.5" title="La lombriz, que convierte los desechos en tierra viva" />
+          <p className="text-sm text-slate-300 leading-relaxed">
+            En una finca agroecológica nada se bota. Lo que sale de sus animales
+            vuelve a la tierra como comida para las plantas. Aquí ve el camino
+            completo, eslabón por eslabón: el estiércol del animal se transforma en
+            biopreparado y ese abono entra en el plan de alimentación de sus
+            cultivos.
+          </p>
+        </div>
 
         {/* Resumen del flujo en una cinta. */}
         <div className="rounded-2xl border border-emerald-700/40 bg-emerald-900/20 p-3.5">
@@ -350,16 +354,22 @@ export default function CicloNutrientesScreen({ onBack, onHome, onNavigate }) {
         {/* Lo que el abono propio NO reemplaza — destacado, sin sobre-afirmar. */}
         <div className="rounded-2xl border border-stone-500/50 bg-stone-800/30 p-3.5 flex gap-3">
           <Mountain size={20} className="shrink-0 text-stone-300 mt-0.5" aria-hidden="true" />
-          <p className="text-sm text-stone-100/90 leading-relaxed">
-            <span className="font-bold text-stone-200">Ojo:</span> no todo sale de
-            los animales. La <span className="font-bold">cal dolomítica</span> y la
-            {' '}<span className="font-bold">roca fosfórica</span> del primer paso
-            (corregir acidez y aportar fósforo) son enmiendas MINERALES que toca
-            comprar — no se producen con estiércol. Y los sulfatos del supermagro
-            también son un insumo mineral aparte. El abono de la finca cubre el
-            grueso de la nutrición, pero estos minerales se aportan según el
-            análisis de suelo.
-          </p>
+          <div className="text-sm text-stone-100/90 leading-snug">
+            <p className="font-bold text-stone-200">Ojo: no todo sale de los animales.</p>
+            <ul className="mt-2 flex flex-col gap-1.5">
+              <li>
+                • La <span className="font-bold">cal dolomítica</span> y la
+                {' '}<span className="font-bold">roca fosfórica</span> del primer paso
+                (corrigen la acidez y aportan fósforo) son enmiendas MINERALES: toca
+                comprarlas, no se producen con estiércol.
+              </li>
+              <li>• Los sulfatos del supermagro también son un insumo mineral aparte.</li>
+              <li>
+                • El abono de la finca cubre el grueso de la nutrición; estos
+                minerales se aportan según el análisis de suelo.
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Cierre — invitar a registrar abono y enlazar a las pantallas. */}

@@ -100,8 +100,8 @@ function ToxInsumos() {
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex gap-2.5 text-sm text-slate-300">
         <ShieldAlert size={18} className="shrink-0 mt-0.5 text-amber-400" />
         <span>
-          Antes de preparar o aplicar un insumo, revisa su toxicidad y el equipo de protección
-          que necesitas. Los datos vienen del catálogo; donde no hay dato, manéjalo con precaución.
+          Antes de preparar o aplicar un insumo, revise su toxicidad y el equipo de protección
+          que necesita. Los datos vienen del catálogo; donde no hay dato, manéjelo con precaución.
         </span>
       </div>
 
@@ -156,7 +156,7 @@ function ToxInsumos() {
               ) : (
                 <div className="bg-slate-800/60 border border-slate-700 rounded-lg p-2.5 flex gap-2 text-xs text-slate-300">
                   <HelpCircle size={15} className="shrink-0 mt-0.5 text-slate-400" />
-                  <span>Sin advertencia toxicológica en el catálogo. Manéjalo con precaución y consulta a un técnico.</span>
+                  <span>Sin advertencia toxicológica en el catálogo. Manéjelo con precaución y consulte a un técnico.</span>
                 </div>
               )}
 
@@ -256,8 +256,8 @@ function ToxSuelo() {
         <div className="bg-emerald-950/40 border border-emerald-800/50 rounded-xl p-3 flex gap-2.5 text-sm text-emerald-100">
           <Sprout size={18} className="shrink-0 mt-0.5 text-emerald-400" />
           <span>
-            <span className="font-bold">Recuerda:</span> la cromatografía te muestra la VIDA de tu
-            suelo (microbiología, materia orgánica). Esta evaluación te alerta de los TÓXICOS.
+            <span className="font-bold">Recuerde:</span> la cromatografía le muestra la VIDA de su
+            suelo (microbiología, materia orgánica). Esta evaluación le alerta de los TÓXICOS.
             Son complementarias: una sana, la otra protege.
           </span>
         </div>
@@ -283,7 +283,7 @@ function ToxSuelo() {
         <Info size={18} className="shrink-0 mt-0.5 text-sky-400" />
         <span>
           Los tóxicos del suelo (metales pesados, plaguicidas) NO se miden sin laboratorio.
-          Responde estas preguntas y te diremos qué tan probable es que haya un problema, y qué hacer.
+          Responda estas preguntas y le diremos qué tan probable es que haya un problema, y qué hacer.
         </span>
       </div>
 

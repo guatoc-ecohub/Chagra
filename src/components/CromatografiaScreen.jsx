@@ -66,13 +66,13 @@ async function fileToBase64Thumb(file) {
 /* ──────────────── Contenido educativo: metodo Pfeiffer/Restrepo ──────────── */
 const PASOS_METODO = [
   {
-    titulo: 'Materiales que necesitas',
+    titulo: 'Materiales que necesita',
     icono: '📋',
     contenido: (
       <ul className="space-y-1.5">
         <li className="flex items-start gap-2">
           <span className="text-muzo-glow font-bold shrink-0">-</span>
-          <span>Papel filtro Whatman No. 1 (cortado en circulos de ~10 cm de diametro)</span>
+          <span>Papel filtro Whatman No. 1 (cortado en círculos de ~10 cm de diámetro)</span>
         </li>
         <li className="flex items-start gap-2">
           <span className="text-muzo-glow font-bold shrink-0">-</span>
@@ -80,11 +80,11 @@ const PASOS_METODO = [
         </li>
         <li className="flex items-start gap-2">
           <span className="text-muzo-glow font-bold shrink-0">-</span>
-          <span>Hidroxido de sodio (NaOH) al 1% (1 g en 100 ml de agua destilada)</span>
+          <span>Hidróxido de sodio (NaOH) al 1% (1 g en 100 ml de agua destilada)</span>
         </li>
         <li className="flex items-start gap-2">
           <span className="text-muzo-glow font-bold shrink-0">-</span>
-          <span>Muestra de suelo seco y cernido (sin piedras ni raices)</span>
+          <span>Muestra de suelo seco y cernido (sin piedras ni raíces)</span>
         </li>
         <li className="flex items-start gap-2">
           <span className="text-muzo-glow font-bold shrink-0">-</span>
@@ -103,12 +103,12 @@ const PASOS_METODO = [
     contenido: (
       <div className="space-y-2">
         <p>
-          En un lugar con poca luz (la luz descompone la plata), pon el circulo de
-          papel filtro sobre una caja petri limpia. Con el gotero, aplica el nitrato
+          En un lugar con poca luz (la luz descompone la plata), ponga el círculo de
+          papel filtro sobre una caja petri limpia. Con el gotero, aplique el nitrato
           de plata al 0.5% sobre el centro del papel: una sola gota basta para que se
-          expanda en circulos.
+          expanda en círculos.
         </p>
-        <p>Deja secar el papel en completa oscuridad. Puede tomar unos 15 a 20 minutos.</p>
+        <p>Deje secar el papel en completa oscuridad. Puede tomar unos 15 a 20 minutos.</p>
       </div>
     ),
   },
@@ -118,13 +118,13 @@ const PASOS_METODO = [
     contenido: (
       <div className="space-y-2">
         <p>
-          Mezcla una cucharadita de suelo seco y cernido con 5 ml de hidroxido de
-          sodio (NaOH) al <strong>1%</strong> en un frasco pequeno. Agita suavemente
+          Mezcle una cucharadita de suelo seco y cernido con 5 ml de hidróxido de
+          sodio (NaOH) al <strong>1%</strong> en un frasco pequeño. Agite suavemente
           durante un minuto.
         </p>
         <p>
-          Deja reposar la mezcla por 2 a 5 minutos para que las particulas gruesas se
-          asienten. El liquido que queda encima es el extracto que usaras.
+          Deje reposar la mezcla por 2 a 5 minutos para que las partículas gruesas se
+          asienten. El líquido que queda encima es el extracto que usará.
         </p>
       </div>
     ),
@@ -135,13 +135,13 @@ const PASOS_METODO = [
     contenido: (
       <div className="space-y-2">
         <p>
-          Con el papel ya seco e impregnado, pon una gota del extracto justo en el
-          centro. La gota debe ser pequena, no mas de 3 mm de diametro.
+          Con el papel ya seco e impregnado, ponga una gota del extracto justo en el
+          centro. La gota debe ser pequeña, no más de 3 mm de diámetro.
         </p>
         <p>
-          <strong>Deja el papel en oscuridad total</strong> para que la corrida
-          cromatografica avance. El liquido se expandira en circulos concentricos
-          arrastrando los componentes del suelo. Esto toma entre 1 y 3 horas segun
+          <strong>Deje el papel en oscuridad total</strong> para que la corrida
+          cromatográfica avance. El líquido se expandirá en círculos concéntricos
+          arrastrando los componentes del suelo. Esto toma entre 1 y 3 horas según
           la temperatura y la humedad.
         </p>
       </div>
@@ -153,13 +153,13 @@ const PASOS_METODO = [
     contenido: (
       <div className="space-y-2">
         <p>
-          Pasadas 1-3 horas en oscuridad, saca el papel a la luz natural (no directa
+          Pasadas 1-3 horas en oscuridad, saque el papel a la luz natural (no directa
           al sol fuerte). La plata reacciona con la luz y revela los anillos y colores
-          de la cromatografia.
+          de la cromatografía.
         </p>
         <p>
-          El revelado completo toma de 10 a 30 minutos. Veras aparecer zonas de
-          distintos colores: cafes, blancos, grises y a veces violetas o rosados.
+          El revelado completo toma de 10 a 30 minutos. Verá aparecer zonas de
+          distintos colores: cafés, blancos, grises y a veces violetas o rosados.
         </p>
       </div>
     ),
@@ -170,13 +170,13 @@ const PASOS_METODO = [
     contenido: (
       <div className="space-y-2">
         <p>
-          Una vez revelado, el cromatograma se seguira oscureciendo con el tiempo
-          porque la plata sigue reaccionando a la luz. Tomale una foto inmediatamente
-          para tu registro.
+          Una vez revelado, el cromatograma se seguirá oscureciendo con el tiempo
+          porque la plata sigue reaccionando a la luz. Tómele una foto de inmediato
+          para su registro.
         </p>
         <p>
-          Guarda el papel entre las paginas de un libro o en un sobre oscuro. Anota
-          la fecha, la zona de la finca de donde sacaste la muestra y tus
+          Guarde el papel entre las páginas de un libro o en un sobre oscuro. Anote
+          la fecha, la zona de la finca de donde sacó la muestra y sus
           observaciones.
         </p>
       </div>
@@ -188,66 +188,66 @@ const PRECAUCIONES = [
   {
     icono: '⚠️',
     texto:
-      'El nitrato de plata (AgNO₃) es toxico leve. Usa guantes al manipularlo y lava tus manos despues.',
+      'El nitrato de plata (AgNO₃) es tóxico leve. Use guantes al manipularlo y lávese las manos después.',
   },
   {
     icono: '👕',
     texto:
-      'El nitrato de plata mancha la piel y la ropa con manchas oscuras que no salen. Usa ropa vieja o un delantal.',
+      'El nitrato de plata mancha la piel y la ropa con manchas oscuras que no salen. Use ropa vieja o un delantal.',
   },
   {
     icono: '🧴',
     texto:
-      'El hidroxido de sodio (NaOH) al 1% es una base diluida. Aun asi, evita el contacto con ojos y piel. Si cae, lava con abundante agua.',
+      'El hidróxido de sodio (NaOH) al 1% es una base diluida. Aun así, evite el contacto con ojos y piel. Si cae, lave con abundante agua.',
   },
   {
     icono: '🌡️',
     texto:
-      'Trabaja en un lugar ventilado. No comas ni bebas durante la preparacion.',
+      'Trabaje en un lugar ventilado. No coma ni beba durante la preparación.',
   },
   {
     icono: '🗑️',
     texto:
-      'Los restos de la solucion de plata se deben guardar en frasco oscuro para desecho controlado. No los tires a la tierra o al agua.',
+      'Los restos de la solución de plata se deben guardar en frasco oscuro para desecho controlado. No los tire a la tierra ni al agua.',
   },
   {
     icono: '🧤',
     texto:
-      'Desecha los guantes y papeles usados en una bolsa aparte, no en la composta.',
+      'Deseche los guantes y papeles usados en una bolsa aparte, no en la compostera.',
   },
 ];
 
 /* ───────── Interpetacion por zonas (las 4 clasicas de Pfeiffer/Restrepo) ─── */
 const ZONAS = [
   {
-    nombre: 'Zona central o mineral',
+    nombre: 'Anillo del centro (los minerales)',
     posicion: 'Cerca del centro del cromatograma',
     color: 'border-amber-500',
     bg: 'bg-amber-950/30',
     texto: 'border-amber-800/60',
     icono: '🪨',
     queIndica:
-      'Muestra los minerales y las sales. Un centro claro o blanco indica buena reserva de minerales disponibles para las plantas. Un centro oscuro o manchado puede indicar exceso de sales o compactacion.',
+      'Muestra los minerales y las sales. Un centro claro o blanco indica buena reserva de minerales disponibles para las plantas. Un centro oscuro o manchado puede indicar exceso de sales o compactación.',
   },
   {
-    nombre: 'Zona media o proteica-humica',
+    nombre: 'Anillo del medio (la materia orgánica y el humus)',
     posicion: 'Anillo entre la zona central y la externa',
     color: 'border-amber-700',
     bg: 'bg-amber-900/20',
     texto: 'border-amber-700/60',
     icono: '🌱',
     queIndica:
-      'Representa la materia organica y el humus del suelo. Un anillo marron bien definido y ancho indica buena cantidad de humus estable. Si es muy delgado o ausente, hay poca materia organica o esta muy degradada.',
+      'Representa la materia orgánica y el humus del suelo. Un anillo marrón bien definido y ancho indica buena cantidad de humus estable. Si es muy delgado o ausente, hay poca materia orgánica o está muy degradada.',
   },
   {
-    nombre: 'Zona externa o enzimatica',
+    nombre: 'Anillo del borde (la vida y los microbios)',
     posicion: 'Anillo exterior antes de los picos del borde',
     color: 'border-violet-700',
     bg: 'bg-violet-950/20',
     texto: 'border-violet-700/60',
     icono: '🧬',
     queIndica:
-      'Refleja la actividad de los microorganismos y las enzimas. Un borde bien definido con tonalidades violetas o rosadas indica un suelo biologicamente activo, con buena vida microbiana. Si es difuso o palido, hay poca actividad.',
+      'Refleja la actividad de los microorganismos y las enzimas. Un borde bien definido con tonalidades violetas o rosadas indica un suelo biológicamente activo, con buena vida microbiana. Si es difuso o pálido, hay poca actividad.',
   },
   {
     nombre: 'Picos y radiaciones del borde',
@@ -257,7 +257,7 @@ const ZONAS = [
     texto: 'border-indigo-700/60',
     icono: '⚡',
     queIndica:
-      'Los picos o radiaciones que salen del borde indican vida y energia del suelo. Muchas radiaciones definidas y largas senalan un suelo vivo y equilibrado. Pocas o cortas pueden indicar un suelo cansado o con poca biodiversidad microbiana.',
+      'Los picos o radiaciones que salen del borde indican vida y energía del suelo. Muchas radiaciones definidas y largas señalan un suelo vivo y equilibrado. Pocas o cortas pueden indicar un suelo cansado o con poca biodiversidad microbiana.',
   },
 ];
 
@@ -265,37 +265,37 @@ const COLORES = [
   {
     color: 'Marrón oscuro / café',
     significado:
-      'Buena materia organica y humus estable. Es el color deseable en la zona media.',
+      'Buena materia orgánica y humus estable. Es el color deseable en la zona media.',
     clase: 'bg-amber-900 border-amber-700',
   },
   {
     color: 'Blanco o crema',
     significado:
-      'Sales minerales. En el centro indica minerales disponibles; en anillos externos puede indicar acumulacion de sales.',
+      'Sales minerales. En el centro indica minerales disponibles; en anillos externos puede indicar acumulación de sales.',
     clase: 'bg-stone-200 border-stone-400 text-slate-900',
   },
   {
     color: 'Gris / plomizo',
     significado:
-      'Suelo compactado, oxidado o con poca vida. Puede indicar exceso de humedad o anaerobiosis.',
+      'Suelo compactado, oxidado o con poca vida. Puede indicar exceso de humedad o falta de aire (anaerobiosis).',
     clase: 'bg-slate-500 border-slate-400',
   },
   {
     color: 'Violeta / lila',
     significado:
-      'Actividad enzimatica y microbiologica. Indica un suelo vivo y con buena mineralizacion.',
+      'Actividad enzimática y microbiológica. Indica un suelo vivo y con buena mineralización.',
     clase: 'bg-violet-800 border-violet-600',
   },
   {
     color: 'Rosado',
     significado:
-      'Actividad biologica de bacterias beneficiosas. Halos rosados son senal positiva.',
+      'Actividad biológica de bacterias beneficiosas. Los halos rosados son señal positiva.',
     clase: 'bg-pink-800 border-pink-600',
   },
   {
     color: 'Amarillo / dorado',
     significado:
-      'Puede indicar presencia de azufre o compuestos organicos especificos. Interpretar junto con las otras zonas.',
+      'Puede indicar presencia de azufre o compuestos orgánicos específicos. Interprete junto con las otras zonas.',
     clase: 'bg-yellow-700 border-yellow-500',
   },
 ];
@@ -476,13 +476,13 @@ export default function CromatografiaScreen({ onBack, onNavigate: _onNavigate })
               <FlaskConical size={24} className="text-emerald-300" />
             </div>
             <div className="text-sm text-emerald-200">
-              <p className="font-bold">Que es la cromatografia de suelo?</p>
+              <p className="font-bold">¿Qué es la cromatografía de suelo?</p>
               <p className="text-emerald-300/80 mt-1">
-                Es un metodo cualitativo creado por Ehrenfried Pfeiffer para ver
+                Es un método cualitativo creado por Ehrenfried Pfeiffer para ver
                 la salud del suelo. La mezcla de suelo reacciona con nitrato de
                 plata sobre papel filtro y revela con colores y anillos la vida,
-                los minerales y la materia organica de tu tierra. No da numeros
-                de laboratorio, pero te ayuda a entender y comparar tus suelos
+                los minerales y la materia orgánica de su tierra. No da números
+                de laboratorio, pero le ayuda a entender y comparar sus suelos
                 en el tiempo.
               </p>
             </div>
@@ -541,8 +541,8 @@ export default function CromatografiaScreen({ onBack, onNavigate: _onNavigate })
         {NavTabs({ activo: 'registro' })}
         <div className="px-4 pb-10 flex flex-col gap-4">
           <p className="text-sm text-slate-300">
-            Registra tus cromatografias con foto, fecha y la zona de la finca
-            de donde sacaste la muestra. Asi puedes comparar como mejora tu suelo
+            Registre sus cromatografías con foto, fecha y la zona de la finca
+            de donde sacó la muestra. Así puede comparar cómo mejora su suelo
             con el tiempo.
           </p>
 
@@ -937,8 +937,8 @@ export default function CromatografiaScreen({ onBack, onNavigate: _onNavigate })
             <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
               <Layers size={56} className="text-slate-600" />
               <p className="text-sm text-slate-400 max-w-xs">
-                No tienes cromatografias registradas. Cuando guardes al menos
-                una, podras compararlas entre si para ver como mejora tu suelo.
+                No tiene cromatografías registradas. Cuando guarde al menos
+                una, podrá compararlas entre sí para ver cómo mejora su suelo.
               </p>
               <button
                 type="button"

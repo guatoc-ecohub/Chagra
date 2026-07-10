@@ -18,10 +18,10 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
     expect(screen.getByRole('heading', { name: 'Asociaciones inteligentes' })).toBeInTheDocument();
 
     // Selector de cultivo
-    expect(screen.getByLabelText(/¿Qué cultivo quieres planear?/)).toHaveValue('maiz');
+    expect(screen.getByLabelText(/¿Qué cultivo quiere planear?/)).toHaveValue('maiz');
 
     // Verificar que el selector funcione
-    const selector = screen.getByLabelText(/¿Qué cultivo quieres planear?/);
+    const selector = screen.getByLabelText(/¿Qué cultivo quiere planear?/);
     expect(within(selector).getByRole('option', { name: 'maíz' })).toBeInTheDocument();
   });
 
@@ -70,7 +70,7 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
     render(<Asociaciones profile={{ rol: 'campesino' }} />);
 
     // Cambiar a café
-    fireEvent.change(screen.getByLabelText(/¿Qué cultivo quieres planear?/), {
+    fireEvent.change(screen.getByLabelText(/¿Qué cultivo quiere planear?/), {
       target: { value: 'cafe' },
     });
 
@@ -101,9 +101,9 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
     render(<Asociaciones profile={{ rol: 'campesino' }} />);
 
     // Verificar que se detecte el cultivo. "café" aparece también como opción
-    // del selector → acotamos al indicador "Detectado en tu finca".
-    expect(screen.getByLabelText(/¿Qué cultivo quieres planear?/)).toHaveValue('cafe');
-    const indicador = screen.getByText(/Detectado en tu finca/).closest('div').parentElement;
+    // del selector → acotamos al indicador "Detectado en su finca".
+    expect(screen.getByLabelText(/¿Qué cultivo quiere planear?/)).toHaveValue('cafe');
+    const indicador = screen.getByText(/Detectado en su finca/).closest('div').parentElement;
     expect(indicador).toBeInTheDocument();
     expect(within(indicador).getByText(/café/)).toBeInTheDocument();
   });
@@ -131,8 +131,8 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
     render(<Asociaciones profile={{ rol: 'campesino' }} />);
 
     // Debería detectar ambos cultivos. Los nombres aparecen también como
-    // opciones del selector → acotamos al indicador "Detectado en tu finca".
-    const indicador = screen.getByText(/Detectado en tu finca/).closest('div').parentElement;
+    // opciones del selector → acotamos al indicador "Detectado en su finca".
+    const indicador = screen.getByText(/Detectado en su finca/).closest('div').parentElement;
     expect(within(indicador).getByText(/maíz/)).toBeInTheDocument();
     expect(within(indicador).getByText(/fríjol/)).toBeInTheDocument();
   });
@@ -142,7 +142,7 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
     render(<Asociaciones profile={{ rol: 'campesino' }} />);
 
     // Cambiar a un cultivo sin asociaciones (si existe)
-    const selector = screen.getByLabelText(/¿Qué cultivo quieres planear?/);
+    const selector = screen.getByLabelText(/¿Qué cultivo quiere planear?/);
 
     // Verificar que si no hay recomendaciones se muestre el estado vacío
     // (Esto depende de los datos disponibles, pero verificamos la estructura)
@@ -153,7 +153,7 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
     render(<Asociaciones profile={{ rol: 'urbano' }} />);
 
     // Usuario urbano debería ver hortalizas
-    const selector = screen.getByLabelText(/¿Qué cultivo quieres planear?/);
+    const selector = screen.getByLabelText(/¿Qué cultivo quiere planear?/);
     expect(within(selector).getByRole('option', { name: 'zanahoria' })).toBeInTheDocument();
 
     // Pero no debería ver café como opción principal
@@ -163,7 +163,7 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
   test('el operador ve todos los cultivos sin filtrar por rol', () => {
     render(<Asociaciones profile={{ rol: 'urbano' }} esOperador />);
 
-    const selector = screen.getByLabelText(/¿Qué cultivo quieres planear?/);
+    const selector = screen.getByLabelText(/¿Qué cultivo quiere planear?/);
 
     // El operador debería ver más opciones
     expect(within(selector).getByRole('option', { name: 'maíz' })).toBeInTheDocument();
@@ -188,7 +188,7 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
     render(<Asociaciones profile={{ rol: 'campesino' }} />);
 
     // Cambiar a un cultivo que no tenga antagonistas (como frutal)
-    fireEvent.change(screen.getByLabelText(/¿Qué cultivo quieres planear?/), {
+    fireEvent.change(screen.getByLabelText(/¿Qué cultivo quiere planear?/), {
       target: { value: 'frutal' },
     });
 
@@ -244,9 +244,9 @@ describe('Asociaciones - Rediseño Útil y Accionable', () => {
     render(<Asociaciones profile={{ rol: 'campesino' }} />);
 
     // Debería seleccionar automáticamente el cultivo de la finca
-    expect(screen.getByLabelText(/¿Qué cultivo quieres planear?/)).toHaveValue('maiz');
+    expect(screen.getByLabelText(/¿Qué cultivo quiere planear?/)).toHaveValue('maiz');
 
     // Y mostrar el mensaje de que ya tiene el cultivo
-    expect(screen.getByText(/¡Ya tienes este cultivo!/)).toBeInTheDocument();
+    expect(screen.getByText(/¡Ya tiene este cultivo!/)).toBeInTheDocument();
   });
 });

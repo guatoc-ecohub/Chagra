@@ -3,6 +3,7 @@ import {
   Bird, Egg, HeartPulse, ShieldAlert, Sprout, Recycle, Info,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
+import FotoAnimal from './animales/FotoAnimal';
 import FuentesAnimal from './common/FuentesAnimal';
 import ChecklistManejo from './common/ChecklistManejo';
 
@@ -49,11 +50,15 @@ export default function GallinasScreen({ onBack, onHome }) {
   return (
     <ScreenShell title="Gallinas y aves" icon={Bird} onBack={onBack} onHome={onHome}>
       <div className="px-4 pt-4 pb-10 max-w-2xl mx-auto space-y-4">
-        <p className="text-sm text-slate-300 leading-relaxed">
-          Las gallinas te dan huevos, carne y un abono de primera (la gallinaza).
-          Bien manejadas, controlan plagas del suelo y cierran el ciclo de
-          nutrientes de tu finca.
-        </p>
+        {/* Hero photo-forward (mismo patrón que Conejos/Caprinos) */}
+        <FotoAnimal slug="gallinas" alt="Gallinas de campo picoteando en un patio" ratio="aspect-[16/9]" rounded="rounded-2xl" Fallback={Bird}>
+          <div className="absolute inset-x-0 bottom-0 p-4">
+            <h1 className="text-xl font-black text-white drop-shadow">Gallinas y aves</h1>
+            <p className="text-sm text-white/85 leading-snug drop-shadow">
+              Huevos, carne y gallinaza. Bien manejadas, controlan plagas y cierran el ciclo de nutrientes de la finca.
+            </p>
+          </div>
+        </FotoAnimal>
 
         {/* 1. Registro básico */}
         <SeccionCard
@@ -61,7 +66,7 @@ export default function GallinasScreen({ onBack, onHome }) {
           color={{ border: 'border-sky-700/40', bg: 'bg-sky-900/20', text: 'text-sky-200' }}
           titulo="Registro básico"
         >
-          <p>Anota lo esencial de tu lote para hacerle seguimiento:</p>
+          <p>Anote lo esencial de su lote para hacerle seguimiento:</p>
           <ul className="space-y-1">
             <li>• <span className="font-bold">Cantidad</span> de aves.</li>
             <li>• <span className="font-bold">Raza o línea</span> (ver abajo).</li>
@@ -97,9 +102,9 @@ export default function GallinasScreen({ onBack, onHome }) {
           titulo="Sanidad"
         >
           <p>
-            Las enfermedades más serias de las aves en Colombia. No te damos
-            dosis: cada caso es distinto y la vacuna depende del lote. Si ves
-            varias aves enfermas o muertas, <span className="font-bold">consulta al técnico o al ICA.</span>
+            Las enfermedades más serias de las aves en Colombia. No le damos
+            dosis: cada caso es distinto y la vacuna depende del lote. Si ve
+            varias aves enfermas o muertas, <span className="font-bold">consulte al técnico o al ICA.</span>
           </p>
           <ul className="space-y-2">
             <li>
@@ -112,8 +117,8 @@ export default function GallinasScreen({ onBack, onHome }) {
               <span className="font-bold text-rose-100">Coccidiosis:</span> parásito del
               intestino (diarrea con sangre, aves erizadas, bajo consumo), sobre
               todo en pollos jóvenes con cama húmeda. Manejo: <span className="font-bold">cama seca</span>,
-              densidad baja y agua limpia. El tratamiento (coccidiostato) lo
-              define el técnico.
+              densidad baja y agua limpia. El tratamiento (un coccidiostato, el
+              remedio contra la coccidiosis) lo define el técnico.
             </li>
             <li>
               <span className="font-bold text-rose-100">Parásitos:</span> internos
@@ -125,8 +130,8 @@ export default function GallinasScreen({ onBack, onHome }) {
           </ul>
           <p className="flex items-start gap-2 mt-2 text-amber-200 font-semibold">
             <ShieldAlert size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-            Bioseguridad: aves nuevas en cuarentena, no mezcles lotes de distinta
-            edad y desinfecta botas y manos al entrar al galpón.
+            Bioseguridad: aves nuevas en cuarentena, no mezcle lotes de distinta
+            edad y desinfecte botas y manos al entrar al galpón.
           </p>
         </SeccionCard>
 
@@ -141,16 +146,16 @@ export default function GallinasScreen({ onBack, onHome }) {
               <span className="font-bold text-emerald-100">Cama profunda:</span> capa
               gruesa de cascarilla, viruta o tamo seco en el piso. Absorbe el
               estiércol, se mantiene seca y al final se convierte en abono
-              (gallinaza compostada). Voltéala y agrega material seco si se humedece.
+              (gallinaza compostada). Voltéela y agregue material seco si se humedece.
             </li>
             <li>
-              <span className="font-bold text-emerald-100">Pastoreo rotacional / gallinas camperas:</span> mueve
+              <span className="font-bold text-emerald-100">Pastoreo rotacional / gallinas camperas:</span> mueva
               las aves por potreros o corrales rotativos. Comen pasto e insectos,
               abonan parejo y rompen el ciclo de plagas y parásitos del suelo.
             </li>
             <li>
               <span className="font-bold text-emerald-100">Sombra y agua fresca:</span> con
-              calor fuerte (&gt;32&nbsp;°C) las aves se asfixian. Dales sombra,
+              calor fuerte (&gt;32&nbsp;°C) las aves se asfixian. Deles sombra,
               ventilación y agua limpia siempre.
             </li>
           </ul>
@@ -165,13 +170,13 @@ export default function GallinasScreen({ onBack, onHome }) {
           <ul className="space-y-1.5">
             <li>
               <span className="font-bold text-amber-100">Huevos:</span> las ponedoras
-              arrancan alrededor de las 18–20 semanas. Recoge varias veces al día,
-              guarda en sitio fresco y limpio. Anota la postura para ver cómo va el lote.
+              arrancan alrededor de las 18–20 semanas. Recoja varias veces al día,
+              guarde en sitio fresco y limpio. Anote la postura para ver cómo va el lote.
             </li>
             <li>
               <span className="font-bold text-amber-100">Gallinaza:</span> es el abono
-              que producen. Recógela seca de la cama profunda. <span className="font-bold">Compóstala
-              o madúrala antes de usarla</span> (la gallinaza fresca quema las plantas
+              que producen. Recójala seca de la cama profunda. <span className="font-bold">Compóstela
+              o madúrela antes de usarla</span> (la gallinaza fresca quema las plantas
               y puede traer patógenos).
             </li>
           </ul>
@@ -181,12 +186,12 @@ export default function GallinasScreen({ onBack, onHome }) {
         <SeccionCard
           Icon={Recycle}
           color={{ border: 'border-lime-600/50', bg: 'bg-lime-900/25', text: 'text-lime-200' }}
-          titulo="Aporte a tu finca"
+          titulo="Aporte a su finca"
         >
           <p>
             La <span className="font-bold">gallinaza</span> es ingrediente del
             <span className="font-bold"> bocashi</span>, el abono fermentado base del
-            plan de nutrición de tus plantas. Así se cierra el ciclo:
+            plan de nutrición de sus plantas. Así se cierra el ciclo:
           </p>
           <div className="flex flex-wrap items-center gap-2 text-xs font-bold my-1">
             <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-200 border border-amber-500/40">Gallinas</span>
@@ -200,8 +205,8 @@ export default function GallinasScreen({ onBack, onHome }) {
             <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-500/40">Planta</span>
           </div>
           <p className="text-xs text-slate-300/80">
-            En campesino: la gallina come, abona la cama; esa gallinaza la mezclas
-            en el bocashi y ese abono alimenta el suelo y tus matas. Menos gasto en
+            En campesino: la gallina come, abona la cama; esa gallinaza la mezcla
+            en el bocashi y ese abono alimenta el suelo y sus matas. Menos gasto en
             abono comprado.
           </p>
         </SeccionCard>
@@ -225,7 +230,7 @@ export default function GallinasScreen({ onBack, onHome }) {
         {/* Fuentes / Saber más — enlaces públicos reales */}
         <FuentesAnimal
           claves={['fenavi', 'agrosavia', 'ica', 'cipav', 'sena']}
-          nota="Newcastle es enfermedad de notificación obligatoria al ICA. Ante dudas de tratamiento o dosis, consulta a un técnico o veterinario."
+          nota="Newcastle es enfermedad de notificación obligatoria al ICA. Ante dudas de tratamiento o dosis, consulte a un técnico o veterinario."
         />
       </div>
     </ScreenShell>

@@ -158,7 +158,7 @@ function CultivoCard({ item, maximos, animar }) {
       {/* Gancho folk de la estrella */}
       {estrellaNutri && (
         <p className="px-4 pb-2 text-[13px] text-slate-200 leading-snug">
-          <span className="font-semibold text-slate-100">Qué te da:</span> {estrellaNutri.folk}
+          <span className="font-semibold text-slate-100">Qué le da:</span> {estrellaNutri.folk}
         </p>
       )}
 
@@ -285,7 +285,7 @@ export default function NutricionHumanaScreen({ onBack }) {
           <h1 className="text-lg font-bold leading-tight text-white flex items-center gap-1.5">
             <Utensils size={18} aria-hidden="true" /> La comida que alimenta
           </h1>
-          <p className="text-xs text-slate-400 leading-tight">Qué te da comer cada cultivo de tu finca</p>
+          <p className="text-xs text-slate-400 leading-tight">Qué le da de comer cada cultivo de su finca</p>
         </div>
       </header>
 
@@ -305,7 +305,7 @@ export default function NutricionHumanaScreen({ onBack }) {
             <section className="rounded-2xl border border-slate-700 bg-slate-900 overflow-hidden">
               <div className="p-4 pb-2"><PlatoIlustracion /></div>
               <div className="px-4 pb-4">
-                <p className="text-[13px] uppercase tracking-wide font-bold text-slate-400">Cada bocado te da algo</p>
+                <p className="text-[13px] uppercase tracking-wide font-bold text-slate-400">Cada bocado le da algo</p>
                 <p className="mt-1 text-[15px] text-slate-100 leading-snug">
                   Lo que usted siembra no solo llena: <span className="font-bold">alimenta</span>. Aquí ve, por cada
                   100&nbsp;gramos, la <span className="font-semibold">fuerza</span> (energía), el

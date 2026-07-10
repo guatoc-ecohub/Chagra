@@ -470,7 +470,7 @@ export default function Asociaciones({ profile = {}, esOperador = false }) {
         </div>
 
         <p className="mt-4 max-w-3xl text-base leading-relaxed text-emerald-50 border-t border-emerald-700 pt-4">
-          <strong>Elige tu cultivo</strong> y descubre qué sembrar con él, qué evitar, por qué funciona y cuánto puedes ganar.
+          <strong>Elija su cultivo</strong> y descubra qué sembrar con él, qué evitar, por qué funciona y cuánto puede ganar.
           Todo basado en <strong>investigación real</strong>, no en promesas.
         </p>
       </div>
@@ -483,7 +483,7 @@ export default function Asociaciones({ profile = {}, esOperador = false }) {
               <div className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-100">
                 <Sprout className="h-5 w-5 text-emerald-700" />
               </div>
-              <span>¿Qué cultivo quieres planear?</span>
+              <span>¿Qué cultivo quiere planear?</span>
             </label>
             <select
               id="cultivo-asociaciones"
@@ -503,7 +503,7 @@ export default function Asociaciones({ profile = {}, esOperador = false }) {
           {tieneCultivosFinca && (
             <div className="rounded-lg border-2 border-emerald-200 bg-emerald-50 p-3 sm:text-right">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-bold uppercase text-emerald-700">Detectado en tu finca</span>
+                <span className="text-xs font-bold uppercase text-emerald-700">Detectado en su finca</span>
               </div>
               <div className="flex flex-wrap gap-1">
                 {cultivosFincaPrincipales.map((cultivo) => (
@@ -522,7 +522,7 @@ export default function Asociaciones({ profile = {}, esOperador = false }) {
                   // Resolver slug→cultivo igual que el resto del componente para que el match funcione.
                   const c = findCultivoInItems(arquetipos, slug);
                   return slug === selected || c?.id === selected || c?.nombre === selected;
-                }) ? '¡Ya tienes este cultivo!' : 'Selecciona uno para ver recomendaciones'}
+                }) ? '¡Ya tiene este cultivo!' : 'Seleccione uno para ver recomendaciones'}
               </p>
             </div>
           )}
@@ -541,7 +541,7 @@ export default function Asociaciones({ profile = {}, esOperador = false }) {
             Estamos trabajando en agregar más cultivos con bases científicas.
           </p>
           <div className="mt-4 rounded-lg bg-emerald-50 p-3 text-sm font-semibold text-emerald-900 border border-emerald-200">
-            💡 Prueba con maíz, café, cacao, frutales u hortalizas
+            💡 Pruebe con maíz, café, cacao, frutales u hortalizas
           </div>
         </div>
       ) : (

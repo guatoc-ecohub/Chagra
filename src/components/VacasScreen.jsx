@@ -3,6 +3,7 @@ import {
   Beef, Milk, HeartPulse, ShieldAlert, Sprout, Recycle, Info, Trees,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
+import FotoAnimal from './animales/FotoAnimal';
 import FuentesAnimal from './common/FuentesAnimal';
 import ChecklistManejo from './common/ChecklistManejo';
 
@@ -55,11 +56,15 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
   return (
     <ScreenShell title="Vacas y ganado" icon={Beef} onBack={onBack} onHome={onHome}>
       <div className="px-4 pt-4 pb-10 max-w-2xl mx-auto space-y-4">
-        <p className="text-sm text-slate-300 leading-relaxed">
-          Las vacas te dan leche y carne, y además la boñiga (bovinaza) es uno de
-          los mejores abonos de la finca. Bien manejadas, con árboles y pasto, el
-          ganado cuida el suelo en vez de dañarlo.
-        </p>
+        {/* Hero photo-forward (mismo patrón que Conejos/Caprinos) */}
+        <FotoAnimal slug="vacas" alt="Vacas pastando en un potrero con árboles" ratio="aspect-[16/9]" rounded="rounded-2xl" Fallback={Beef}>
+          <div className="absolute inset-x-0 bottom-0 p-4">
+            <h1 className="text-xl font-black text-white drop-shadow">Vacas y ganado</h1>
+            <p className="text-sm text-white/85 leading-snug drop-shadow">
+              Leche, carne y boñiga. Bien manejadas, con árboles y pasto, cuidan el suelo en vez de dañarlo.
+            </p>
+          </div>
+        </FotoAnimal>
 
         {/* 1. Registro básico */}
         <SeccionCard
@@ -67,7 +72,7 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
           color={{ border: 'border-sky-700/40', bg: 'bg-sky-900/20', text: 'text-sky-200' }}
           titulo="Registro básico"
         >
-          <p>Anota lo esencial de tu ganado para hacerle seguimiento:</p>
+          <p>Anote lo esencial de su ganado para hacerle seguimiento:</p>
           <ul className="space-y-1">
             <li>• <span className="font-bold">Cantidad</span> de animales.</li>
             <li>• <span className="font-bold">Raza o cruce</span> (ver abajo).</li>
@@ -103,25 +108,25 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
           titulo="Sanidad"
         >
           <p>
-            Los problemas de salud más serios del ganado en Colombia. No te damos
+            Los problemas de salud más serios del ganado en Colombia. No le damos
             dosis: la vacuna y el tratamiento dependen del animal y de la zona. Si
-            ves varios animales enfermos, <span className="font-bold">consulta al técnico, al veterinario o al ICA.</span>
+            ve varios animales enfermos, <span className="font-bold">consulte al técnico, al veterinario o al ICA.</span>
           </p>
           <ul className="space-y-2">
             <li>
               <span className="font-bold text-rose-100">Fiebre aftosa:</span> virus
               muy contagioso (babeo, ampollas en boca, lengua y patas, cojera, baja
-              de leche). Colombia es país libre <span className="font-bold">con vacunación</span>: cumple
+              de leche). Colombia es país libre <span className="font-bold">con vacunación</span>: cumpla
               los ciclos de vacunación de la zona. Ante cualquier sospecha,
               <span className="font-bold"> es de notificación OBLIGATORIA e inmediata al ICA</span> — no
-              muevas los animales y avisa de una vez.
+              mueva los animales y avise de una vez.
             </li>
             <li>
               <span className="font-bold text-rose-100">Mastitis:</span> inflamación
               de la ubre (leche con grumos o sangre, ubre caliente e hinchada, baja
               de producción). Se previene con <span className="font-bold">ordeño limpio</span>: manos
               y pezones limpios, sellado del pezón y cama seca. El tratamiento lo
-              define el veterinario; respeta el tiempo de retiro de la leche.
+              define el veterinario; respete el tiempo de retiro de la leche.
             </li>
             <li>
               <span className="font-bold text-rose-100">Parásitos gastrointestinales y garrapatas:</span> lombrices
@@ -129,13 +134,13 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
               que chupan sangre y transmiten enfermedades (fiebre de garrapata).
               Manejo: <span className="font-bold">pastoreo rotacional</span> para cortar el ciclo,
               revisión periódica y desparasitación según indique el técnico (no
-              abuses de los químicos: crean resistencia).
+              abuse de los químicos: crean resistencia).
             </li>
           </ul>
           <p className="flex items-start gap-2 mt-2 text-amber-200 font-semibold">
             <ShieldAlert size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
             Animales nuevos en cuarentena, al día con vacunación (aftosa, brucelosis)
-            y con guía de movilización (ICA) al comprar o vender. Así proteges todo el hato.
+            y con guía de movilización (ICA) al comprar o vender. Así protege todo el hato.
           </p>
         </SeccionCard>
 
@@ -147,8 +152,8 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
         >
           <ul className="space-y-2">
             <li>
-              <span className="font-bold text-emerald-100">Pastoreo rotacional:</span> divide
-              el potrero y mueve el ganado por franjas. El pasto descansa y rebrota,
+              <span className="font-bold text-emerald-100">Pastoreo rotacional:</span> divida
+              el potrero y mueva el ganado por franjas. El pasto descansa y rebrota,
               comen parejo, el suelo no se compacta y se rompe el ciclo de parásitos.
             </li>
             <li>
@@ -168,8 +173,8 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
           >
             <Trees size={20} className="shrink-0 text-emerald-300" aria-hidden="true" />
             <span className="text-sm text-emerald-100 flex-1">
-              <span className="font-bold">Lleva tu silvopastoreo.</span> Inicia y haz
-              seguimiento al sistema de árboles, pasto y ganado de tu finca.
+              <span className="font-bold">Lleve su silvopastoreo.</span> Inicie y haga
+              seguimiento al sistema de árboles, pasto y ganado de su finca.
             </span>
           </button>
         </SeccionCard>
@@ -182,16 +187,16 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
         >
           <ul className="space-y-1.5">
             <li>
-              <span className="font-bold text-amber-100">Leche:</span> ordeña limpio
-              (ubre y manos lavadas), filtra y enfría pronto para que no se corte.
-              Anota los litros por día para ver cómo va cada vaca y el hato.
+              <span className="font-bold text-amber-100">Leche:</span> ordeñe limpio
+              (ubre y manos lavadas), filtre y enfríe pronto para que no se corte.
+              Anote los litros por día para ver cómo va cada vaca y el hato.
             </li>
             <li>
               <span className="font-bold text-amber-100">Bovinaza / boñiga:</span> el
-              estiércol de la vaca es un abono de primera. Recógela de los corrales y
-              de las áreas de descanso. <span className="font-bold">Madúrala o compóstala antes
+              estiércol de la vaca es un abono de primera. Recójala de los corrales y
+              de las áreas de descanso. <span className="font-bold">Madúrela o compóstela antes
               de aplicarla</span> (la boñiga fresca puede quemar y traer parásitos), o
-              úsala en el biol y el bocashi.
+              úsela en el biol y el bocashi.
             </li>
           </ul>
         </SeccionCard>
@@ -200,7 +205,7 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
         <SeccionCard
           Icon={Recycle}
           color={{ border: 'border-lime-600/50', bg: 'bg-lime-900/25', text: 'text-lime-200' }}
-          titulo="Aporte a tu finca"
+          titulo="Aporte a su finca"
         >
           <p>
             La <span className="font-bold">boñiga (bovinaza)</span> es el estiércol clásico
@@ -221,8 +226,8 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
           </div>
           <p className="text-xs text-slate-300/80">
             En campesino: la vaca come pasto, suelta la boñiga; esa boñiga la
-            fermentas en el biol (y la metes al bocashi) y ese abono alimenta el
-            suelo y tus matas. Menos gasto en abono comprado y un suelo más vivo.
+            fermenta en el biol (y la mete al bocashi) y ese abono alimenta el
+            suelo y sus matas. Menos gasto en abono comprado y un suelo más vivo.
           </p>
         </SeccionCard>
 
@@ -245,7 +250,7 @@ export default function VacasScreen({ onBack, onHome, onNavigate }) {
         {/* Fuentes / Saber más — enlaces públicos reales */}
         <FuentesAnimal
           claves={['ica', 'agrosavia', 'fedegan', 'cipav', 'sena']}
-          nota="La fiebre aftosa es de notificación obligatoria e inmediata al ICA. Ante dudas de tratamiento o dosis, consulta a un técnico o veterinario."
+          nota="La fiebre aftosa es de notificación obligatoria e inmediata al ICA. Ante dudas de tratamiento o dosis, consulte a un técnico o veterinario."
         />
       </div>
     </ScreenShell>

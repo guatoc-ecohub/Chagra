@@ -133,10 +133,10 @@ export const NIVELES_RIESGO = [
     icono: '🟢',
     resumen:
       'No aparecen señales fuertes de contaminación. Aun así, ningún cuestionario '
-      + 'reemplaza un análisis de laboratorio si vas a producir alimento para vender.',
+      + 'reemplaza un análisis de laboratorio si va a producir alimento para vender.',
     recomendacion_lab:
-      'No es urgente un análisis de metales pesados. Si más adelante quieres certificar '
-      + 'o vender, un laboratorio te da tranquilidad.',
+      'No es urgente un análisis de metales pesados. Si más adelante quiere certificar '
+      + 'o vender, un laboratorio le da tranquilidad.',
   },
   {
     id: 'medio',
@@ -145,11 +145,11 @@ export const NIVELES_RIESGO = [
     color: 'amber',
     icono: '🟡',
     resumen:
-      'Hay uno o más factores de riesgo. No quiere decir que tu suelo esté contaminado, '
+      'Hay uno o más factores de riesgo. No quiere decir que su suelo esté contaminado, '
       + 'pero sí que vale la pena tomar precauciones y considerar un análisis.',
     recomendacion_lab:
-      'Considera un análisis de laboratorio de metales pesados y/o residuos de plaguicidas, '
-      + 'sobre todo si vas a sembrar comestibles. Pregunta en la UMATA, el SENA o AGROSAVIA.',
+      'Considere un análisis de laboratorio de metales pesados y/o residuos de plaguicidas, '
+      + 'sobre todo si va a sembrar comestibles. Pregunte en la UMATA, el SENA o AGROSAVIA.',
   },
   {
     id: 'alto',
@@ -306,5 +306,5 @@ export const FUENTES_TOX_SUELO = {
   ],
   nota_limites:
     'Los límites numéricos de metales en suelo (ej. Cd, Pb) varían por norma y cultivo. '
-    + 'No los fijamos aquí: consulta la norma vigente con el laboratorio o la autoridad ambiental.',
+    + 'No los fijamos aquí: consulte la norma vigente con el laboratorio o la autoridad ambiental.',
 };

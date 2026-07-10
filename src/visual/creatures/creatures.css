@@ -1,0 +1,51 @@
+/* ─── Vida perpetua de las CREATURES — SVG + CSS puros, solo transform/opacity
+   (GPU, Android gama baja). Reutilizable en cualquier escena o avatar.
+   La coreografía de LLEGADA (entrar volando, asomar del suelo) NO vive aquí:
+   es responsabilidad de la escena que consume la criatura.
+   reduced-motion = criatura quieta en un fotograma digno. ─── */
+
+/* aleteo rápido (abeja / colibrí) */
+.crt-wing {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: crt-wingbeat 0.13s ease-in-out infinite alternate;
+}
+@keyframes crt-wingbeat {
+  0% { transform: scaleY(1) scaleX(1); }
+  100% { transform: scaleY(0.6) scaleX(0.9); }
+}
+
+/* alas de mariposa que abren y cierran */
+.crt-fwing {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: crt-flutter 0.5s ease-in-out infinite;
+}
+.crt-fwing-l { transform-origin: right center; }
+.crt-fwing-r { transform-origin: left center; }
+@keyframes crt-flutter {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(0.4); }
+}
+
+/* bola de abono que rueda (escarabajo) */
+.crt-ball {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: crt-roll 1.1s linear infinite;
+}
+@keyframes crt-roll {
+  0% { transform: rotate(0); }
+  100% { transform: rotate(-360deg); }
+}
+
+/* patas que dan pasos (escarabajo) */
+.crt-legs { animation: crt-step 0.5s ease-in-out infinite; }
+@keyframes crt-step {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-1.2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-wing, .crt-fwing, .crt-ball, .crt-legs { animation: none !important; }
+}
