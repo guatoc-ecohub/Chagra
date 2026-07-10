@@ -93,6 +93,10 @@ const InventoryPage = lazy(() => import('./pages/InventoryPage'));
 // pisos térmicos, 3 direcciones artísticas para decidir dirección visual).
 // Ruta #/mockups/montana-mundos — sin gate ni sesión (datos de muestra).
 const MontanaMundosMockup = lazy(() => import('./mockups/MontanaMundos'));
+// Pasada 2 cinematográfica del mismo mockup (parallax de 6 capas, luz
+// atmosférica por piso, full-bleed). Ruta #/mockups/montana-mundos-cine —
+// la pasada 1 se conserva en su ruta para comparar lado a lado.
+const MontanaMundosCineMockup = lazy(() => import('./mockups/MontanaMundosCine'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -423,6 +427,7 @@ const LoadingFallback = ({ view = null }) => {
 
 const HASH_VIEW_ROUTES = {
   'mockups/montana-mundos': 'mockup_montana_mundos',
+  'mockups/montana-mundos-cine': 'mockup_montana_mundos_cine',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -922,8 +927,9 @@ export default function App() {
 
     // Mockups dev (#/mockups/*): vistas aisladas de decisión visual — se
     // montan sin sesión (datos de muestra, no tocan datos reales).
-    if (hash === 'mockups/montana-mundos') {
-      Promise.resolve().then(() => navigate('mockup_montana_mundos'));
+    if (hash === 'mockups/montana-mundos' || hash === 'mockups/montana-mundos-cine') {
+      const vistaMockup = HASH_VIEW_ROUTES[hash];
+      Promise.resolve().then(() => navigate(vistaMockup));
       return;
     }
 
@@ -956,7 +962,7 @@ export default function App() {
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
       // Mockups dev: sin gate ni sesión (datos de muestra).
-      if (routeView === 'mockup_montana_mundos') {
+      if (routeView === 'mockup_montana_mundos' || routeView === 'mockup_montana_mundos_cine') {
         navigate(routeView);
         return;
       }
@@ -1292,6 +1298,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Mockup Montaña de los Mundos">
               <MontanaMundosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_montana_mundos_cine':
+        // Pasada 2 cinematográfica del mockup: parallax de 6 capas, luz
+        // atmosférica por piso, full-bleed. Sin gate, solo decisión visual.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Montaña de los Mundos (cine)">
+              <MontanaMundosCineMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
