@@ -114,8 +114,11 @@ export const FICHA_META = {
     paraQueSirve: 'Nutre y, sobre todo, repele plagas chupadoras: en curativo se usa contra el pulgón.',
   },
   // uso (catálogo): «activo contra hongos y ácaros»; dosis: «escamas, chancros»
+  // SIN foto a propósito: la que había mostraba un ESPÉCIMEN MINERAL (barita +
+  // azufre), no el caldo sulfocálcico (líquido ámbar-rojizo de azufre + cal). Se
+  // retiró — mejor sin foto que con desinformación. Falta una foto CC del caldo
+  // real; cae con elegancia al ícono (patrón FotoAgua) mientras se consigue.
   caldo_sulfocalcico: {
-    foto: 'caldo_sulfocalcico',
     paraQueSirve: 'Fungicida y acaricida foliar: previene y ataca hongos y ácaros; en invierno trata escamas y chancros del tronco.',
   },
   // proposito: fitosanitario_preventivo; uso: aplicar ANTES, en alta humedad
@@ -185,7 +188,6 @@ export const CREDITOS_FOTOS_BIOPREPARADOS = [
   { slug: 'biol', autor: 'David Medcalf', lic: 'CC BY-SA 2.0', url: 'https://commons.wikimedia.org/wiki/File:A_massive_biodigester_at_Pengelly_Barton_Farm_-_geograph.org.uk_-_8234071.jpg' },
   { slug: 'bocashi', autor: 'Acabashi', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Compost_heap_Heyrons_High_Easter_Essex_01.jpg' },
   { slug: 'caldo_bordeles', autor: 'Crystal Titan', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystal.jpg' },
-  { slug: 'caldo_sulfocalcico', autor: 'Robert M. Lavinsky', lic: 'CC BY-SA 3.0', url: 'https://commons.wikimedia.org/wiki/File:Celestine-Sulfur-j08-12a.jpg' },
   { slug: 'compost_maduro', autor: 'Richard Webb', lic: 'CC BY-SA 2.0', url: 'https://commons.wikimedia.org/wiki/File:A_steaming_pile_-_geograph.org.uk_-_297127.jpg' },
   { slug: 'humus_liquido', autor: 'SuSanA Secretariat', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Composting_Unit_Ecodomeo_-_Local_de_compostage_Ecodomeo_(6126690435).jpg' },
   { slug: 'lixiviado_frutas', autor: 'PattayaPatrol', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:DFC_3928_A_vibrant_pile_of_fresh_oranges_with_mottled_green-and-orange_skins_ready_to_be_picked_or_enjoyed.jpg' },
