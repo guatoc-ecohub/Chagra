@@ -1,0 +1,432 @@
+/*
+ * VisualLib.css — piel de la vitrina de la librería visual. Estética de
+ * "cuaderno de laboratorio": papel cálido con pauta tenue, tinta sobria,
+ * fichas con margen rojo, monospace para código. Todo autocontenido y scopeado
+ * bajo `.vlib` para leerse igual sobre cualquier fondo/tema de la app.
+ * Mobile-first (320px); la grilla se abre en desktop.
+ */
+
+.vlib {
+  --vl-papel: #f4efe4;
+  --vl-papel-ficha: #fbf8f0;
+  --vl-tinta: #2b2a26;
+  --vl-tinta-2: #6a655a;
+  --vl-linea: #ddd5c2;
+  --vl-margen: #c65a4e;
+  --vl-acento: #3a6f52;
+  --vl-acento-2: #b28dff;
+  --vl-mono: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: clamp(1rem, 4vw, 2.5rem) clamp(0.75rem, 3vw, 2rem) 4rem;
+  color: var(--vl-tinta);
+  background-color: var(--vl-papel);
+  /* pauta tenue de cuaderno: líneas horizontales + margen finísimo vertical */
+  background-image:
+    linear-gradient(var(--vl-linea) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(198, 90, 78, 0.08) 1px, transparent 1px);
+  background-size: 100% 2rem, 2rem 100%;
+  font-family: "Georgia", "Iowan Old Style", "Times New Roman", serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.vlib *,
+.vlib *::before,
+.vlib *::after { box-sizing: border-box; }
+
+.vlib code { font-family: var(--vl-mono); font-size: 0.85em; }
+
+/* Enlace de salto para lector de teclado. */
+.vlib-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--vl-tinta);
+  color: var(--vl-papel);
+  padding: 0.5rem 0.9rem;
+  border-radius: 0 0 0.4rem 0;
+  z-index: 20;
+}
+.vlib-skip:focus { left: 0; }
+
+/* ── Encabezado ───────────────────────────────────────────────────────────── */
+.vlib-header {
+  max-width: 64rem;
+  margin: 0 auto 1.5rem;
+}
+.vlib-eyebrow {
+  margin: 0 0 0.25rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--vl-margen);
+  font-family: var(--vl-mono);
+  font-size: 0.72rem;
+}
+.vlib-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.9rem, 7vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+.vlib-tagline {
+  margin: 0 0 0.5rem;
+  max-width: 46rem;
+  font-size: clamp(1rem, 2.6vw, 1.12rem);
+  color: var(--vl-tinta);
+}
+.vlib-nota-fuente {
+  margin: 0;
+  max-width: 46rem;
+  font-size: 0.9rem;
+  color: var(--vl-tinta-2);
+}
+
+/* ── Navegación por anclas (sticky) ───────────────────────────────────────── */
+.vlib-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  max-width: 64rem;
+  margin: 0 auto 2rem;
+  padding: 0.55rem;
+  background: rgba(244, 239, 228, 0.92);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--vl-linea);
+  border-radius: 0.6rem;
+  box-shadow: 0 2px 10px rgba(43, 42, 38, 0.06);
+}
+.vlib-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.45rem;
+  text-decoration: none;
+  color: var(--vl-tinta);
+  font-family: var(--vl-mono);
+  font-size: 0.82rem;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.vlib-nav-link:hover,
+.vlib-nav-link:focus-visible {
+  background: #fff;
+  border-color: var(--vl-linea);
+}
+.vlib-nav-count {
+  display: inline-flex;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--vl-acento);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* ── Sección de categoría ─────────────────────────────────────────────────── */
+.vlib-cat {
+  max-width: 64rem;
+  margin: 0 auto 3rem;
+  scroll-margin-top: 4.5rem;
+}
+.vlib-cat-head { margin-bottom: 1.25rem; }
+.vlib-cat-title-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  border-bottom: 2px solid var(--vl-tinta);
+  padding-bottom: 0.4rem;
+}
+.vlib-cat-title {
+  margin: 0;
+  font-size: clamp(1.4rem, 4.5vw, 1.9rem);
+  font-weight: 700;
+}
+.vlib-cat-sub {
+  color: var(--vl-tinta-2);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+.vlib-cat-count {
+  margin-left: auto;
+  font-family: var(--vl-mono);
+  font-size: 0.85rem;
+  color: var(--vl-margen);
+  font-weight: 700;
+}
+.vlib-cat-desc {
+  margin: 0.75rem 0 0.6rem;
+  max-width: 46rem;
+  color: var(--vl-tinta);
+  font-size: 0.98rem;
+}
+.vlib-cat-import {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 0.5rem 0.7rem;
+  background: #2b2a26;
+  color: #f4efe4;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+}
+
+/* ── Grilla de fichas ─────────────────────────────────────────────────────── */
+.vlib-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 560px) {
+  .vlib-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 920px) {
+  .vlib-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── Ficha de un primitivo ────────────────────────────────────────────────── */
+.vlib-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0.9rem 0.9rem 0.9rem 1.15rem;
+  background: var(--vl-papel-ficha);
+  border: 1px solid var(--vl-linea);
+  border-radius: 0.55rem;
+  box-shadow: 0 1px 3px rgba(43, 42, 38, 0.06);
+  scroll-margin-top: 4.5rem;
+}
+/* margen rojo de cuaderno */
+.vlib-card::before {
+  content: "";
+  position: absolute;
+  left: 0.55rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(198, 90, 78, 0.4);
+}
+.vlib-card-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  margin-bottom: 0.3rem;
+}
+.vlib-card-name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.vlib-card-sci {
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--vl-tinta-2);
+}
+.vlib-card-desc {
+  margin: 0 0 0.7rem;
+  font-size: 0.86rem;
+  color: var(--vl-tinta-2);
+}
+
+/* ── Variantes ────────────────────────────────────────────────────────────── */
+.vlib-variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.7rem;
+}
+.vlib-variant {
+  flex: 1 1 6.5rem;
+  min-width: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+.vlib-variant-label {
+  font-family: var(--vl-mono);
+  font-size: 0.68rem;
+  color: var(--vl-tinta-2);
+  text-align: center;
+}
+
+/* Tablero donde se dibuja el primitivo: papel milimetrado tenue para que se
+   note el borde de los SVG transparentes. */
+.vlib-stage {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border: 1px solid var(--vl-linea);
+  border-radius: 0.4rem;
+  background-color: #fff;
+  background-image:
+    linear-gradient(rgba(58, 111, 82, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(58, 111, 82, 0.06) 1px, transparent 1px);
+  background-size: 0.75rem 0.75rem;
+  overflow: hidden;
+}
+.vlib-stage--creature { min-height: 6rem; }
+.vlib-stage--lamina { padding: 0.35rem; }
+.vlib-stage--lamina > :only-child,
+.vlib-stage--lamina svg { width: 100%; height: auto; display: block; }
+.vlib-stage--fx { min-height: 6rem; }
+.vlib-fx-svg { width: 100%; height: auto; max-width: 12rem; }
+.vlib-stage--cielo { padding: 0; min-height: 5rem; }
+.vlib-cielo-svg { width: 100%; height: auto; display: block; }
+.vlib-stage--guardian { min-height: 7rem; background-image: none; background: #10202c; }
+.vlib-stage--finca {
+  padding: 0;
+  min-height: 9rem;
+  max-height: 20rem;
+  background: #071018;
+}
+.vlib-stage--finca .fvo-svg { width: 100%; height: auto; display: block; }
+.vlib-stage--parallax { padding: 0; min-height: 8rem; }
+
+/* Escena parallax de demostración: tres planos de profundidad. */
+.vlib-parallax { width: 100%; height: 9rem; position: relative; overflow: hidden; border-radius: 0.4rem; }
+.vlib-plx { position: absolute; inset: 0; }
+.vlib-plx--cielo { background: linear-gradient(#173a4d, #2b6a63); }
+.vlib-plx--lejos {
+  background:
+    radial-gradient(120% 90% at 30% 120%, #2e5a4a 0 55%, transparent 56%),
+    radial-gradient(120% 90% at 80% 120%, #24493c 0 50%, transparent 51%);
+}
+.vlib-plx--pral {
+  background: linear-gradient(transparent 55%, #12332a 56%);
+}
+
+/* ── Tabla de props (dentro de <details>) ─────────────────────────────────── */
+.vlib-card-props { margin-top: auto; }
+.vlib-card-props summary {
+  cursor: pointer;
+  font-family: var(--vl-mono);
+  font-size: 0.78rem;
+  color: var(--vl-acento);
+  padding: 0.25rem 0;
+  user-select: none;
+}
+.vlib-card-props summary:hover { text-decoration: underline; }
+.vlib-props-wrap { overflow-x: auto; margin-top: 0.4rem; }
+.vlib-props {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.76rem;
+}
+.vlib-props th,
+.vlib-props td {
+  text-align: left;
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid var(--vl-linea);
+  vertical-align: top;
+}
+.vlib-props th {
+  font-family: var(--vl-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vl-tinta-2);
+}
+.vlib-props code { color: var(--vl-margen); }
+.vlib-props-tipo { font-family: var(--vl-mono); color: var(--vl-acento); }
+.vlib-props-def { font-family: var(--vl-mono); color: var(--vl-tinta-2); }
+.vlib-props-vacio { font-size: 0.8rem; color: var(--vl-tinta-2); font-style: italic; }
+
+/* ── Extras de categoría (pisos térmicos, constantes) ─────────────────────── */
+.vlib-extras {
+  margin-top: 1.25rem;
+  padding: 0.9rem 1rem;
+  background: var(--vl-papel-ficha);
+  border: 1px dashed var(--vl-linea);
+  border-radius: 0.55rem;
+}
+.vlib-extras-title { margin: 0 0 0.3rem; font-size: 1rem; }
+.vlib-extras-nota { margin: 0 0 0.7rem; font-size: 0.85rem; color: var(--vl-tinta-2); }
+.vlib-pisos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.vlib-piso {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+}
+.vlib-piso-chip {
+  width: 1.6rem;
+  height: 1.1rem;
+  border-radius: 0.25rem;
+  flex: none;
+  background-color: #2c3742;
+  background-repeat: no-repeat;
+}
+.vlib-piso-chip--glacial  { background-image: linear-gradient(var(--vfx-piso-glacial),  var(--vfx-piso-glacial)); }
+.vlib-piso-chip--paramo   { background-image: linear-gradient(var(--vfx-piso-paramo),   var(--vfx-piso-paramo)); }
+.vlib-piso-chip--frio     { background-image: linear-gradient(var(--vfx-piso-frio),     var(--vfx-piso-frio)); }
+.vlib-piso-chip--templado { background-image: linear-gradient(var(--vfx-piso-templado), var(--vfx-piso-templado)); }
+.vlib-piso-chip--calido   { background-image: linear-gradient(var(--vfx-piso-calido),   var(--vfx-piso-calido)); }
+.vlib-piso-chip--valle    { background-image: linear-gradient(var(--vfx-piso-valle),    var(--vfx-piso-valle)); }
+.vlib-piso-nombre { font-weight: 700; min-width: 5rem; }
+.vlib-piso-clase { color: var(--vl-margen); }
+.vlib-piso-luz { color: var(--vl-tinta-2); font-style: italic; }
+.vlib-consts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.4rem 0.9rem; }
+.vlib-consts li { display: flex; align-items: baseline; gap: 0.4rem; font-size: 0.82rem; }
+.vlib-consts code { color: var(--vl-margen); font-weight: 700; }
+.vlib-const-val { font-family: var(--vl-mono); color: var(--vl-tinta-2); font-size: 0.78rem; }
+.vlib-extras-beat { margin: 0.6rem 0 0; font-size: 0.82rem; color: var(--vl-tinta-2); }
+
+/* ── Pie ──────────────────────────────────────────────────────────────────── */
+.vlib-footer {
+  max-width: 64rem;
+  margin: 2rem auto 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--vl-linea);
+  font-size: 0.85rem;
+  color: var(--vl-tinta-2);
+}
+.vlib-footer code { color: var(--vl-margen); }
+
+/* ── Tema oscuro del sistema (la app puede pintar fondo oscuro alrededor) ──── */
+@media (prefers-color-scheme: dark) {
+  .vlib {
+    --vl-papel: #1c1b18;
+    --vl-papel-ficha: #24231f;
+    --vl-tinta: #ece7da;
+    --vl-tinta-2: #a49d8c;
+    --vl-linea: #3a382f;
+    --vl-margen: #e0806f;
+    --vl-acento: #6fca9a;
+    background-image:
+      linear-gradient(var(--vl-linea) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(224, 128, 111, 0.08) 1px, transparent 1px);
+  }
+  .vlib-nav { background: rgba(28, 27, 24, 0.92); }
+  .vlib-nav-link:hover,
+  .vlib-nav-link:focus-visible { background: #2f2d27; }
+  .vlib-cat-import { background: #0f0e0c; color: #ece7da; }
+  .vlib-stage {
+    background-color: #16151230;
+    background-color: #2a2823;
+    background-image:
+      linear-gradient(rgba(111, 202, 154, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(111, 202, 154, 0.08) 1px, transparent 1px);
+  }
+}
+
+/* ── Menos movimiento: la vitrina no impone animación extra ───────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .vlib-nav { backdrop-filter: none; }
+}
