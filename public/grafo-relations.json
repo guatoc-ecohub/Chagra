@@ -15,14 +15,15 @@
       "threat_status",
       "conservation_status"
     ],
-    "species_count": 129,
+    "species_count": 134,
     "relation_count": 1297,
     "note": "Datos derivados del grafo AGE. NO contiene infraestructura ni secretos.",
     "pest_synonyms_count": 162,
     "pest_labels_count": 78,
     "pest_synonyms_added": "2026-06-25",
     "frutales_tuberculos_fable_enriched": "2026-07-06",
-    "restauracion_grounding_fix_2026_07_09": "+21 especies (audit AUDIT-RESTAURACION-GROUNDING-2026-07-09.md); establishment_means corregido en cordia_alliodora, tabebuia_rosea, enterolobium_cyclocarpum"
+    "restauracion_grounding_fix_2026_07_09": "+21 especies (audit AUDIT-RESTAURACION-GROUNDING-2026-07-09.md); establishment_means corregido en cordia_alliodora, tabebuia_rosea, enterolobium_cyclocarpum",
+    "animal_forrajeras_grounding_fix": "2026-07-09"
   },
   "_pest_synonyms": {
     "gota": "Tizon tardio / gota (papa y tomate)",
@@ -3780,6 +3781,47 @@
         "samanea_saman",
         "trichanthera_gigantea"
       ]
+    },
+    "leucaena_leucocephala": {
+      "nombre_comun": "Leucaena",
+      "nombre_cientifico": "Leucaena leucocephala (Lam.) de Wit",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "naturalizada"
+    },
+    "tithonia_diversifolia": {
+      "nombre_comun": "Botón de oro",
+      "nombres_comunes": [
+        "suncho"
+      ],
+      "nombre_cientifico": "Tithonia diversifolia (Hemsl.) A.Gray",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "naturalizada"
+    },
+    "morus_alba": {
+      "nombre_comun": "Morera blanca",
+      "nombre_cientifico": "Morus alba L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "naturalizada"
+    },
+    "cratylia_argentea": {
+      "nombre_comun": "Cratylia",
+      "nombres_comunes": [
+        "rabo de iguana"
+      ],
+      "nombre_cientifico": "Cratylia argentea (Desv.) Kuntze",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "naturalizada"
+    },
+    "azolla_filiculoides": {
+      "nombre_comun": "Azolla",
+      "nombre_cientifico": "Azolla filiculoides Lam.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
     },
     "ananas_comosus": {
       "nombre_comun": "Piña",
