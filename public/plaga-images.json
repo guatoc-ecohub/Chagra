@@ -137,15 +137,15 @@
     {
       "id": "geminivirus_cuchara",
       "file": "/plaga-images/geminivirus_cuchara.jpg",
-      "binomio": "Bemisia tabaci",
-      "license": "CC BY 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
-      "attribution": "CSIRO",
+      "binomio": "Begomovirus (encrespamiento / hoja cuchara)",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "attribution": "Philarium",
       "source": "Wikimedia Commons",
-      "sourceUrl": "https://commons.wikimedia.org/wiki/File:CSIRO_ScienceImage_1357_An_adult_silverleaf_whitefly_Bemisia_tabaci_biotype_B.jpg",
-      "bytes": 73745,
-      "width": 755,
-      "height": 731
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:SequoiaBio_Leaf_Curl.jpg",
+      "bytes": 99479,
+      "width": 640,
+      "height": 480
     },
     {
       "id": "spodoptera_frugiperda",
@@ -218,12 +218,12 @@
       "binomio": "Capnodium",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-      "attribution": "Filo gèn'",
+      "attribution": "Wee Hong",
       "source": "Wikimedia Commons",
-      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sooty_mold_on_Persea_americana.jpg",
-      "bytes": 85469,
-      "width": 674,
-      "height": 900
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Sooty_mould_on_leaves_of_Morus_nigra.jpg",
+      "bytes": 129388,
+      "width": 645,
+      "height": 860
     },
     {
       "id": "meloidogyne",
