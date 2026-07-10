@@ -89,6 +89,12 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
+// Mockup dev "El onboarding es SEMBRAR su finca" (moonshot #7): el primer uso
+// como siembra animada — croquis que se dibuja solo → el clima tiñe la escena
+// → las maticas brotan → la finca viva saluda — en vez de formulario frío.
+// Ruta #/mockups/onboarding-siembra — sin gate ni sesión (datos de muestra,
+// no escribe nada).
+const OnboardingSiembraMockup = lazy(() => import('./mockups/OnboardingSiembra'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -418,6 +424,7 @@ const LoadingFallback = ({ view = null }) => {
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 const HASH_VIEW_ROUTES = {
+  'mockups/onboarding-siembra': 'mockup_onboarding_siembra',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -915,6 +922,13 @@ export default function App() {
       return;
     }
 
+    // Mockups dev (#/mockups/*): vistas aisladas de decisión visual — se
+    // montan sin sesión (datos de muestra, no tocan datos reales).
+    if (hash === 'mockups/onboarding-siembra') {
+      Promise.resolve().then(() => navigate(HASH_VIEW_ROUTES[hash]));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -943,6 +957,11 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockups dev: sin gate ni sesión (datos de muestra).
+      if (routeView === 'mockup_onboarding_siembra') {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1204,6 +1223,16 @@ export default function App() {
                 navigate('login');
               }}
             />
+          </ErrorBoundary>
+        );
+      case 'mockup_onboarding_siembra':
+        // Mockup "sembrar su finca" (moonshot #7): el onboarding como siembra
+        // animada en 4 momentos (tierra que se dibuja → clima que tiñe →
+        // maticas que brotan → finca viva que saluda). Full-screen, sin gate,
+        // datos de muestra — solo para decisión visual de galería.
+        return (
+          <ErrorBoundary>
+            <OnboardingSiembraMockup onBack={() => navigate('dashboard')} />
           </ErrorBoundary>
         );
       case 'onboarding-perfil':
