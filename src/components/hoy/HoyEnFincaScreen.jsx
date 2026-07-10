@@ -414,7 +414,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                                     )}
                                 </button>
                             ))}
-                            <p className="text-[10px] text-slate-500 leading-snug">
+                            <p className="text-[10px] text-slate-400 leading-snug">
                                 Labores sugeridas por la etapa del cultivo
                                 {ensoPhase !== 'neutral' ? ' y el estado del clima (NOAA/IDEAM)' : ''}.
                                 No reemplazan el ojo del campesino.

@@ -522,7 +522,9 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
           ) : !isUser && !isStreaming ? (
             <AgentMarkdown content={message.content} />
           ) : (
-            <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{message.content}</p>
+            /* break-words: sin esto una URL o palabra larga sin espacios
+               desborda la burbuja en horizontal a 320px. */
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words">{message.content}</p>
           )}
           {/* UX-1 (#284): badge "beta" permanente cerca de cualquier respuesta
               IA del agente. NO reemplaza a SourceBadge (que es la fuente

@@ -539,6 +539,10 @@
    * limpia para campesino/niña: negritas marcadas, viñetas reales con punto,
    * títulos legibles — CERO asteriscos a la vista. El HTML viene sanitizado por
    * renderAgentMarkdown (escape + DOMPurify allow-list). */
+  .agent-md {
+    /* 320px: una URL o palabra larga del modelo no debe desbordar la burbuja. */
+    overflow-wrap: break-word;
+  }
   .agent-md > :first-child {
     margin-top: 0;
   }

@@ -49,9 +49,15 @@ export default function ActionConfirmModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleReject} />
-      
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+      {/* Backdrop decorativo: el cierre accesible es el botón X (con teclado). */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleReject} aria-hidden="true" />
+
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Confirmar acción del agente"
+        className="relative w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden"
+      >
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/50">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-amber-500/20 rounded-lg">
@@ -65,10 +71,12 @@ export default function ActionConfirmModal({
             </div>
           </div>
           <button
+            type="button"
             onClick={handleReject}
+            aria-label="Cerrar y rechazar la acción"
             className="p-2 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200"
           >
-            <X size={20} />
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 

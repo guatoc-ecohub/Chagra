@@ -533,7 +533,9 @@ export default function ClimaStrip({ onNavigate, embedded = false }) {
                 exactamente lo que la consolidación recorta (los íconos ya se
                 explican solos con el title por día). */}
             {!embedded && (
-                <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                // 320px: con 3 columnas fijas "Helada ≤ 0 °C" se truncaba;
+                // a 2 columnas en pantallas angostas la leyenda respira.
+                <div className="mt-3 grid grid-cols-2 min-[400px]:grid-cols-3 gap-2 text-xs">
                     <div className="flex items-center gap-1.5 text-slate-300">
                         <Thermometer size={14} className="text-rose-400" />
                         <span className="truncate">Máx/Mín</span>

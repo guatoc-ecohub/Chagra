@@ -208,20 +208,23 @@ function BarrasPorCultivo({ byCrop }) {
       )}
       <details className="mc-table">
         <summary>Ver los números en tabla</summary>
-        <table>
-          <thead>
-            <tr><th scope="col">Cultivo</th><th scope="col">Cosechas</th><th scope="col">Total</th></tr>
-          </thead>
-          <tbody>
-            {byCrop.map((c) => (
-              <tr key={c.cropKey}>
-                <td>{c.crop}</td>
-                <td>{nf0.format(c.harvestCount)}</td>
-                <td>{c.totalKg > 0 ? `${fmtCant(c.totalKg)} kg` : `${nf0.format(c.totalCount)} und`}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {/* 320px: la tabla scrollea dentro de su propio contenedor, nunca la página. */}
+        <div className="overflow-x-auto">
+          <table>
+            <thead>
+              <tr><th scope="col">Cultivo</th><th scope="col">Cosechas</th><th scope="col">Total</th></tr>
+            </thead>
+            <tbody>
+              {byCrop.map((c) => (
+                <tr key={c.cropKey}>
+                  <td>{c.crop}</td>
+                  <td>{nf0.format(c.harvestCount)}</td>
+                  <td>{c.totalKg > 0 ? `${fmtCant(c.totalKg)} kg` : `${nf0.format(c.totalCount)} und`}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </details>
     </section>
   );
@@ -312,20 +315,23 @@ function Tendencia({ trend, season }) {
           )}
           <details className="mc-table">
             <summary>Ver los números en tabla</summary>
-            <table>
-              <thead>
-                <tr><th scope="col">Mes</th><th scope="col">Cosechas</th><th scope="col">Total</th></tr>
-              </thead>
-              <tbody>
-                {serie.map((s) => (
-                  <tr key={s.period}>
-                    <td>{mesLabel(s.period)}</td>
-                    <td>{nf0.format(s.harvestCount)}</td>
-                    <td>{`${fmtCant(valorDe(s, usesKg))} ${unidad}`}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* 320px: la tabla scrollea dentro de su propio contenedor. */}
+            <div className="overflow-x-auto">
+              <table>
+                <thead>
+                  <tr><th scope="col">Mes</th><th scope="col">Cosechas</th><th scope="col">Total</th></tr>
+                </thead>
+                <tbody>
+                  {serie.map((s) => (
+                    <tr key={s.period}>
+                      <td>{mesLabel(s.period)}</td>
+                      <td>{nf0.format(s.harvestCount)}</td>
+                      <td>{`${fmtCant(valorDe(s, usesKg))} ${unidad}`}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </details>
         </>
       ) : (

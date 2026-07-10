@@ -3946,6 +3946,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                       : activePlaceholder
               }
               disabled={queuePending.length >= 1}
+              aria-label="Escriba su mensaje para Chagra"
               data-testid="agent-input"
               className="w-full bg-transparent resize-none px-3 py-3 text-sm text-white placeholder-slate-500 focus:outline-none leading-snug"
               style={{ minHeight: '44px', maxHeight: '140px' }}

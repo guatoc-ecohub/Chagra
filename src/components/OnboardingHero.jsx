@@ -234,7 +234,7 @@ export default function OnboardingHero({ onNavigate, compact = false }) {
               {cta.emoji}
             </span>
             <span className="text-2xl font-black">{cta.label}</span>
-            <span className="text-xs text-slate-500">{cta.desc}</span>
+            <span className="text-xs text-slate-400">{cta.desc}</span>
           </button>
         ))}
       </div>
