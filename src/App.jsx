@@ -105,6 +105,10 @@ const HomeCampesinoMockup = lazy(() => import('./mockups/HomeCampesino'));
 // pisos térmicos, 3 direcciones artísticas para decidir dirección visual).
 // Ruta #/mockups/montana-mundos — sin gate ni sesión (datos de muestra).
 const MontanaMundosMockup = lazy(() => import('./mockups/MontanaMundos'));
+// Mockup dev "La entrada definitiva" (dirección campesina: el lucero de mi
+// finca — la entrada respira la hora real de la vereda, una sola cosa brilla).
+// Ruta #/mockups/entrada-campesina — sin gate ni sesión (datos de muestra).
+const EntradaCampesinaMockup = lazy(() => import('./mockups/EntradaCampesina'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -437,6 +441,7 @@ const HASH_VIEW_ROUTES = {
   'mockups/home-campesino': 'mockup_home_campesino',
   'mockups/boton-anarquia': 'mockup_boton_anarquia',
   'mockups/montana-mundos': 'mockup_montana_mundos',
+  'mockups/entrada-campesina': 'mockup_entrada_campesina',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -971,6 +976,12 @@ export default function App() {
       Promise.resolve().then(() => navigate('mockup_montana_mundos'));
       return;
     }
+    // Mockup dev (#/mockups/entrada-campesina): la entrada definitiva campesina
+    // — se monta sin sesión (datos de muestra, no toca datos reales).
+    if (hash === 'mockups/entrada-campesina') {
+      Promise.resolve().then(() => navigate('mockup_entrada_campesina'));
+      return;
+    }
 
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
@@ -1019,6 +1030,11 @@ export default function App() {
       }
       // Mockup dev: sin gate ni sesión (datos de muestra).
       if (routeView === 'mockup_montana_mundos') {
+        navigate(routeView);
+        return;
+      }
+      // Mockup dev: sin gate ni sesión (datos de muestra).
+      if (routeView === 'mockup_entrada_campesina') {
         navigate(routeView);
         return;
       }
@@ -1354,6 +1370,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Mockup Montaña de los Mundos">
               <MontanaMundosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_entrada_campesina':
+        // Mockup dev "La entrada definitiva" (dirección campesina): la entrada
+        // respira la hora real de la vereda, una sola cosa brilla (el lucero
+        // del día). Full-screen, sin gate — solo para decidir dirección visual.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mockup Entrada Campesina">
+              <EntradaCampesinaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );

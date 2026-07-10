@@ -1,0 +1,486 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   entrada-campesina.css — MOCKUP "El lucero de mi finca" (#/mockups/entrada-campesina).
+
+   Reglas de la casa respetadas: solo transform/opacity animados; blur/filtros
+   estáticos; `prefers-reduced-motion` = fotograma final digno; cero deps.
+   Tipografía: Baloo 2 (display) + Nunito (texto), ya self-host en el repo.
+   Español de Colombia (usted). El COLOR RESPIRA LA HORA vía [data-franja].
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.ec {
+  --ec-radio: 20px;
+  --ec-tap: 56px; /* objetivos táctiles cómodos (manos de trabajo) */
+  --ec-display: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  --ec-texto: 'Nunito', system-ui, sans-serif;
+
+  position: relative;
+  min-height: 100dvh;
+  margin: 0 auto;
+  max-width: 480px;
+  font-family: var(--ec-texto);
+  color: var(--ec-tinta);
+  background: var(--ec-fondo);
+  transition: background 0.6s ease, color 0.6s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Paletas por FRANJA de la hora — el norte es cálido/pintado (Sorolla/Alba),
+   nunca sci-fi frío. Cada franja re-tiñe cielo, monte, tierra y astro. ── */
+.ec[data-franja='dia'] {
+  --ec-fondo: #efe6d2;
+  --ec-tinta: #33291a;
+  --ec-tinta-suave: #6b5c44;
+  --ec-cielo-a: #a9d8ee; --ec-cielo-b: #d9ecdf;
+  --ec-monte-lejos: #9db98f; --ec-monte-a: #6f9a63; --ec-monte-b: #4f7d47;
+  --ec-suelo-a: #b98f57; --ec-suelo-b: #8a663a; --ec-surco: #6f4e28;
+  --ec-astro-core: #ffe08a; --ec-astro-a: rgba(255,230,150,0.9); --ec-astro-b: rgba(255,214,110,0.4);
+  --ec-corazon: #ffd76a; --ec-casa: #e9d7b6; --ec-casa-techo: #b5502e;
+  --ec-casa-puerta: #6f4e28; --ec-ventana: #ffe08a; --ec-tronco: #6f4a2b; --ec-copa: #5c8a48;
+  --ec-scrim: #4a3a1e;
+}
+.ec[data-franja='amanecer'] {
+  --ec-fondo: #f6e7cf;
+  --ec-tinta: #3a2a1a;
+  --ec-tinta-suave: #7a5f42;
+  --ec-cielo-a: #ffd9a8; --ec-cielo-b: #f7c9c0;
+  --ec-monte-lejos: #b79a86; --ec-monte-a: #8f7a5a; --ec-monte-b: #6a6042;
+  --ec-suelo-a: #c39a63; --ec-suelo-b: #916a3c; --ec-surco: #6f4e28;
+  --ec-astro-core: #ffd27a; --ec-astro-a: rgba(255,206,130,0.95); --ec-astro-b: rgba(255,170,110,0.45);
+  --ec-corazon: #ffcf6b; --ec-casa: #ecd8b6; --ec-casa-techo: #b5502e;
+  --ec-casa-puerta: #6f4e28; --ec-ventana: #ffe08a; --ec-tronco: #6f4a2b; --ec-copa: #6f8a4a;
+  --ec-scrim: #52351c;
+}
+.ec[data-franja='tarde'] {
+  --ec-fondo: #f3ddc0;
+  --ec-tinta: #3a2716;
+  --ec-tinta-suave: #7c5c3e;
+  --ec-cielo-a: #ffc078; --ec-cielo-b: #f0a06a;
+  --ec-monte-lejos: #a98468; --ec-monte-a: #7f5f45; --ec-monte-b: #5f4630;
+  --ec-suelo-a: #b5824c; --ec-suelo-b: #7f5a30; --ec-surco: #5f3f20;
+  --ec-astro-core: #ffb85c; --ec-astro-a: rgba(255,180,100,0.95); --ec-astro-b: rgba(240,130,80,0.5);
+  --ec-corazon: #ffb85c; --ec-casa: #e6ceac; --ec-casa-techo: #a8471f;
+  --ec-casa-puerta: #5f3f20; --ec-ventana: #ffdd8a; --ec-tronco: #5f3f20; --ec-copa: #6a7c40;
+  --ec-scrim: #4a2f16;
+}
+.ec[data-franja='noche'] {
+  --ec-fondo: #17201f;
+  --ec-tinta: #f2ead9;
+  --ec-tinta-suave: #bcae95;
+  --ec-cielo-a: #24384a; --ec-cielo-b: #16232f;
+  --ec-monte-lejos: #2b3b44; --ec-monte-a: #223138; --ec-monte-b: #182429;
+  --ec-suelo-a: #2e2a22; --ec-suelo-b: #201d18; --ec-surco: #4a4030;
+  --ec-astro-core: #e9eec8; --ec-astro-a: rgba(230,236,200,0.8); --ec-astro-b: rgba(180,200,170,0.3);
+  --ec-corazon: #8ef0c0; --ec-casa: #2a2620; --ec-casa-techo: #3a2b22;
+  --ec-casa-puerta: #14110d; --ec-ventana: #ffcf6b; --ec-tronco: #241d15; --ec-copa: #2c3a26;
+  --ec-scrim: #0a1210;
+}
+
+.ec-shell {
+  position: relative;
+  z-index: 1;
+  padding: 0 16px 28px;
+}
+
+/* ════ 0. HORIZONTE VIVO + saludo + pulso vital ════════════════════════════ */
+.ec-cielo {
+  position: relative;
+  margin: 0 -16px 18px;
+  padding-bottom: 6px;
+}
+.ec-escena {
+  position: relative;
+  width: 100%;
+  height: clamp(200px, 42vh, 320px);
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--ec-cielo-a), var(--ec-cielo-b));
+  transition: background 0.6s ease;
+}
+.ec-horizonte { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ec-ambiente { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+.ec-astro-halo { animation: ec-halo 6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes ec-halo { 0%,100% { opacity: 0.75; } 50% { opacity: 1; } }
+
+/* fauna real que vuela (SVG <g> incrustado; se posiciona en unidades de usuario
+   del viewBox 390×220). Solo transform/opacity. */
+.ec-vuela { transform-box: view-box; }
+.ec-vuela-colibri { animation: ec-fly-colibri 9s ease-in-out infinite; }
+.ec-vuela-abeja { animation: ec-fly-abeja 7s ease-in-out infinite; }
+.ec-vuela-mariposa { animation: ec-fly-mariposa 11s ease-in-out infinite; }
+@keyframes ec-fly-colibri {
+  0%   { transform: translate(250px, 60px) scale(0.85); }
+  35%  { transform: translate(300px, 44px) scale(0.85); }
+  70%  { transform: translate(210px, 70px) scale(0.8); }
+  100% { transform: translate(250px, 60px) scale(0.85); }
+}
+@keyframes ec-fly-abeja {
+  0%   { transform: translate(120px, 150px) scale(0.9); }
+  50%  { transform: translate(165px, 140px) scale(0.95); }
+  100% { transform: translate(120px, 150px) scale(0.9); }
+}
+@keyframes ec-fly-mariposa {
+  0%   { transform: translate(70px, 120px) scale(0.9) rotate(-4deg); }
+  50%  { transform: translate(96px, 108px) scale(0.95) rotate(4deg); }
+  100% { transform: translate(70px, 120px) scale(0.9) rotate(-4deg); }
+}
+
+.ec-cielo-txt {
+  position: relative;
+  margin: -34px 16px 0;
+  padding: 12px 16px 4px;
+}
+.ec-lugar {
+  margin: 0 0 2px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.55);
+}
+.ec-saludo {
+  margin: 0 0 10px;
+  font-family: var(--ec-display);
+  font-size: clamp(1.7rem, 7vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1.05;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.ec-pulso {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.ec-pulso li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--ec-tinta);
+  background: color-mix(in srgb, var(--ec-fondo) 82%, #fff);
+  box-shadow: 0 1px 5px rgba(0,0,0,0.18);
+}
+.ec-pulso-ico { font-size: 1rem; line-height: 1; }
+.ec-escuchar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 2px solid color-mix(in srgb, var(--ec-tinta) 22%, transparent);
+  border-radius: 999px;
+  font-family: var(--ec-texto);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--ec-tinta);
+  background: color-mix(in srgb, var(--ec-fondo) 88%, #fff);
+  cursor: pointer;
+}
+
+/* ════ 1. EL LUCERO DEL DÍA — LO ÚNICO QUE BRILLA ══════════════════════════ */
+.ec-lucero {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'astro txt' 'pie pie';
+  gap: 10px 14px;
+  margin: 0 0 16px;
+  padding: 18px 18px 16px;
+  border-radius: var(--ec-radio);
+  color: #2c2208;
+  background:
+    radial-gradient(120% 140% at 82% 0%, #fff2c4 0%, #ffe49a 42%, #ffd472 100%);
+  box-shadow:
+    0 0 0 1px rgba(184,138,47,0.4),
+    0 10px 30px -8px rgba(214,150,40,0.55),
+    0 2px 10px rgba(0,0,0,0.12);
+}
+/* el resplandor vivo del lucero (respiración lenta, solo opacity) */
+.ec-lucero::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(80% 60% at 82% 0%, rgba(255,214,90,0.55), transparent 70%);
+  animation: ec-brillo 5.2s ease-in-out infinite;
+}
+@keyframes ec-brillo { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+.ec-lucero-astro {
+  grid-area: astro;
+  position: relative;
+  width: 52px; height: 52px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffbe6, #ffdf8a);
+  box-shadow: 0 2px 10px rgba(214,150,40,0.5);
+}
+.ec-lucero-halo {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255,205,90,0.7);
+  animation: ec-lucero-onda 5.2s ease-out infinite;
+}
+.ec-lucero-halo2 { animation-delay: 2.6s; }
+@keyframes ec-lucero-onda {
+  0%   { transform: scale(0.7); opacity: 0.8; }
+  70%  { transform: scale(1.9); opacity: 0; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+.ec-lucero-txt { grid-area: txt; align-self: center; }
+.ec-lucero-tit {
+  margin: 0 0 3px;
+  font-family: var(--ec-display);
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8a5a12;
+}
+.ec-lucero-frase {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.32;
+}
+.ec-lucero-pie {
+  grid-area: pie;
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+.ec-lucero-btn {
+  flex: 1;
+  min-height: var(--ec-tap);
+  padding: 0 18px;
+  border: none;
+  border-radius: 14px;
+  font-family: var(--ec-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(180deg, #3f8f4e, #2e7440);
+  box-shadow: 0 4px 12px -2px rgba(46,116,64,0.6);
+  cursor: pointer;
+}
+.ec-lucero-oir {
+  width: var(--ec-tap);
+  min-height: var(--ec-tap);
+  border: 2px solid rgba(138,90,18,0.35);
+  border-radius: 14px;
+  font-size: 1.3rem;
+  background: #fff7df;
+  cursor: pointer;
+}
+
+/* ════ 2. EL AGENTE — puerta de voz grande ═════════════════════════════════ */
+.ec-acciones {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin: 0 0 20px;
+}
+.ec-preguntar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 74px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: var(--ec-radio);
+  text-align: left;
+  color: #0f2408;
+  background: linear-gradient(180deg, #bff0c6, #9fe0a8);
+  box-shadow: 0 4px 14px -4px rgba(47,125,62,0.5);
+  cursor: pointer;
+}
+.ec-corazon {
+  position: relative;
+  flex: 0 0 auto;
+  width: 52px; height: 52px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle, #eafff0, #b6f0c4);
+  animation: ec-latir 5.2s ease-in-out infinite;
+}
+@keyframes ec-latir {
+  0%,100% { transform: scale(1); }
+  6% { transform: scale(1.14); }
+  12% { transform: scale(1); }
+  18% { transform: scale(1.08); }
+  26% { transform: scale(1); }
+}
+.ec-corazon-onda {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(47,125,62,0.6);
+  animation: ec-lucero-onda 5.2s ease-out infinite;
+}
+.ec-preguntar-txt { display: flex; flex-direction: column; line-height: 1.2; }
+.ec-preguntar-txt b { font-family: var(--ec-display); font-size: 1.35rem; font-weight: 800; }
+.ec-preguntar-txt small { font-size: 0.92rem; font-weight: 600; opacity: 0.85; }
+
+.ec-anotar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--ec-tap);
+  padding: 10px 18px;
+  border: 2px solid color-mix(in srgb, var(--ec-tinta) 18%, transparent);
+  border-radius: var(--ec-radio);
+  text-align: left;
+  color: var(--ec-tinta);
+  background: color-mix(in srgb, var(--ec-fondo) 86%, #fff);
+  cursor: pointer;
+}
+.ec-anotar-ico { font-size: 1.4rem; }
+.ec-anotar-txt b { font-family: var(--ec-display); font-size: 1.1rem; font-weight: 800; }
+
+/* ════ 3. LOS MUNDOS — puertas ilustradas ══════════════════════════════════ */
+.ec-tit {
+  margin: 0 0 12px;
+  font-family: var(--ec-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--ec-tinta);
+}
+.ec-mundos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 0 0 22px;
+}
+.ec-mundo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 118px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--m-a) 30%, transparent);
+  border-radius: 18px;
+  text-align: left;
+  color: color-mix(in srgb, var(--m-a) 78%, #201810);
+  background: linear-gradient(155deg, color-mix(in srgb, var(--m-b) 92%, #fff), var(--m-b));
+  box-shadow: 0 3px 10px -4px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.ec-mundo:active { transform: translateY(1px) scale(0.99); }
+.ec-mundo-medalla {
+  display: grid; place-items: center;
+  width: 46px; height: 46px;
+  border-radius: 13px;
+  color: var(--m-a);
+  background: color-mix(in srgb, var(--m-b) 60%, #fff);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--m-a) 25%, transparent);
+}
+.ec-mundo-txt { display: flex; flex-direction: column; line-height: 1.18; }
+.ec-mundo-txt b { font-family: var(--ec-display); font-size: 1.12rem; font-weight: 800; }
+.ec-mundo-txt small { font-size: 0.82rem; font-weight: 600; color: color-mix(in srgb, var(--m-a) 60%, #4a3c2c); }
+.ec-mundo-todos {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  min-height: var(--ec-tap);
+  --m-a: #5a6b4a; --m-b: #e9e6d6;
+}
+
+/* ════ 4. Pie ══════════════════════════════════════════════════════════════ */
+.ec-pie { display: flex; gap: 10px; margin: 0 0 12px; }
+.ec-pie-btn {
+  flex: 1;
+  min-height: var(--ec-tap);
+  border: 2px solid color-mix(in srgb, var(--ec-tinta) 16%, transparent);
+  border-radius: 14px;
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--ec-tinta);
+  background: color-mix(in srgb, var(--ec-fondo) 90%, #fff);
+  cursor: pointer;
+}
+.ec-mocknota {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ec-tinta-suave);
+}
+
+/* ════ Barra del mockup (fuera del diseño) ═════════════════════════════════ */
+.ec-mockbar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.72);
+}
+.ec-mockfranjas { display: flex; gap: 6px; margin-left: auto; }
+.ec-mockchip {
+  min-height: 36px;
+  padding: 4px 11px;
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #f2ead9;
+  background: transparent;
+  cursor: pointer;
+}
+.ec-mockchip.on { color: #17201f; background: #ffd76a; border-color: #ffd76a; }
+
+/* ════ Aviso honesto del mockup ════════════════════════════════════════════ */
+.ec-aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 20;
+  max-width: min(92vw, 440px);
+  padding: 13px 18px;
+  border-radius: 14px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(28,24,18,0.94);
+  box-shadow: 0 8px 26px rgba(0,0,0,0.4);
+  animation: ec-aviso-in 0.2s ease;
+}
+@keyframes ec-aviso-in { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+/* ════ Responsive muy angosto (320px) ══════════════════════════════════════ */
+@media (max-width: 360px) {
+  .ec-shell { padding: 0 12px 24px; }
+  .ec-mundos { gap: 10px; }
+  .ec-mundo { min-height: 108px; padding: 12px; }
+  .ec-saludo { font-size: 1.55rem; }
+  .ec-lucero-frase { font-size: 1.04rem; }
+  .ec-preguntar-txt b { font-size: 1.2rem; }
+}
+
+/* ════ prefers-reduced-motion: fotograma final digno ═══════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .ec *,
+  .ec *::before,
+  .ec *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  /* la fauna queda quieta en su sitio (no en 0,0) */
+  .ec-vuela-colibri { transform: translate(290px, 46px) scale(0.85); }
+  .ec-vuela-abeja { transform: translate(150px, 142px) scale(0.92); }
+  .ec-vuela-mariposa { transform: translate(84px, 112px) scale(0.92); }
+  /* el resplandor del lucero se queda encendido, sin latir */
+  .ec-lucero::after { opacity: 0.85; }
+}
