@@ -175,9 +175,9 @@ export const ESTRATOS = [
     especies: [
       { id: 'samanea_saman', comun: 'Samán', cientifico: 'Samanea saman', nativo: true },
       { id: 'quercus_humboldtii', comun: 'Roble negro andino', cientifico: 'Quercus humboldtii', nativo: true },
-      { id: 'cordia_alliodora', comun: 'Nogal cafetero', cientifico: 'Cordia alliodora', nativo: false },
-      { id: 'tabebuia_rosea', comun: 'Guayacán rosado', cientifico: 'Tabebuia rosea', nativo: false },
-      { id: 'enterolobium_cyclocarpum', comun: 'Orejero', cientifico: 'Enterolobium cyclocarpum', nativo: false },
+      { id: 'cordia_alliodora', comun: 'Nogal cafetero', cientifico: 'Cordia alliodora', nativo: true },
+      { id: 'tabebuia_rosea', comun: 'Guayacán rosado', cientifico: 'Tabebuia rosea', nativo: true },
+      { id: 'enterolobium_cyclocarpum', comun: 'Orejero', cientifico: 'Enterolobium cyclocarpum', nativo: true },
       { id: 'euterpe_oleracea', comun: 'Asaí', cientifico: 'Euterpe oleracea', nativo: true },
     ],
   },
@@ -309,10 +309,10 @@ export const SUCESION_ETAPAS = [
     titulo: 'Bosque maduro (para el largo plazo)',
     detalle: 'Crecen despacio pero llegan lejos: se siembran bajo la sombra que hicieron las pioneras y son el bosque que queda — madera, dosel y refugio de fauna.',
     especies: [
-      { id: 'cordia_alliodora', comun: 'Nogal cafetero', cientifico: 'Cordia alliodora', nativo: false, rol: 'Madera fina · dosel' },
+      { id: 'cordia_alliodora', comun: 'Nogal cafetero', cientifico: 'Cordia alliodora', nativo: true, rol: 'Madera fina · dosel' },
       { id: 'quercus_humboldtii', comun: 'Roble negro andino', cientifico: 'Quercus humboldtii', nativo: true, rol: 'Clímax andino · protegido' },
       { id: 'weinmannia_tomentosa', comun: 'Encenillo', cientifico: 'Weinmannia tomentosa', nativo: true, rol: 'Bosque altoandino · borde de páramo' },
-      { id: 'tabebuia_rosea', comun: 'Guayacán rosado', cientifico: 'Tabebuia rosea', nativo: false, rol: 'Dosel · flor para polinizadores' },
+      { id: 'tabebuia_rosea', comun: 'Guayacán rosado', cientifico: 'Tabebuia rosea', nativo: true, rol: 'Dosel · flor para polinizadores' },
     ],
   },
 ];
@@ -368,9 +368,19 @@ export const ESPECIES_RESTAURACION = [
   { id: 'erythrina_edulis', comun: 'Chachafruto / Balú', cientifico: 'Erythrina edulis', nativo: false, papeles: ['Fija N', 'Comida', 'Cerca viva'], nota: 'Fija nitrógeno y da un fruto proteico; sirve de cerca viva y de sombra.' },
   { id: 'gliricidia_sepium', comun: 'Matarratón', cientifico: 'Gliricidia sepium', nativo: false, papeles: ['Fija N', 'Cerca viva', 'Poda-y-tira', 'Forraje'], nota: 'Prende de estaca: cerca viva que se poda seguido para tapar el suelo y alimentar animales.' },
   { id: 'samanea_saman', comun: 'Samán', cientifico: 'Samanea saman', nativo: true, papeles: ['Dosel amplio', 'Fija N', 'Sombra'], nota: 'Copa enorme para sombra de potrero; leguminosa que enriquece el suelo debajo.' },
+  // NOTA DE TRAZABILIDAD (audit AUDIT-RESTAURACION-GROUNDING-2026-07-09.md,
+  // hallazgo #6): el id `albizia_guachapele` es historico y ENGAÑA por nombre
+  // — guarda el binomio real *Albizia niopoides* (Iguá hoja menuda), NO
+  // *Pseudosamanea guachapele* (el guachapele verdadero, que vive aparte bajo
+  // el id `pseudosamanea_guachapele` en el catálogo). Ambas son especies
+  // nativas reales y el binomio mostrado aquí (Albizia niopoides) es
+  // correcto — el defecto es solo el NOMBRE del slug, no el dato. No se
+  // renombra en este PR (tocaría catalog/*.json + public/rag-embeddings.json
+  // + public/cycle-content/, generados por el pipeline AGE, fuera de
+  // alcance); queda documentado para quien lo traiga junto con esos exports.
   { id: 'albizia_guachapele', comun: 'Iguá', cientifico: 'Albizia niopoides', nativo: true, papeles: ['Fija N', 'Madera'], nota: 'Nativa maderable que fija nitrógeno: buena para enriquecer y dar sombra alta.' },
-  { id: 'cordia_alliodora', comun: 'Nogal cafetero', cientifico: 'Cordia alliodora', nativo: false, papeles: ['Madera fina', 'Dosel'], nota: 'Madera valiosa que convive con el café; se autopoda y deja pasar luz.' },
-  { id: 'tabebuia_rosea', comun: 'Guayacán rosado', cientifico: 'Tabebuia rosea', nativo: false, papeles: ['Dosel', 'Flor / néctar', 'Madera'], nota: 'Florece en rosado y alimenta polinizadores; madera y sombra alta.' },
+  { id: 'cordia_alliodora', comun: 'Nogal cafetero', cientifico: 'Cordia alliodora', nativo: true, papeles: ['Madera fina', 'Dosel'], nota: 'Madera valiosa que convive con el café; se autopoda y deja pasar luz.' },
+  { id: 'tabebuia_rosea', comun: 'Guayacán rosado', cientifico: 'Tabebuia rosea', nativo: true, papeles: ['Dosel', 'Flor / néctar', 'Madera'], nota: 'Florece en rosado y alimenta polinizadores; madera y sombra alta.' },
   { id: 'vaccinium_meridionale', comun: 'Mortino / Agraz', cientifico: 'Vaccinium meridionale', nativo: true, papeles: ['Arbusto nativo', 'Fruto silvestre'], nota: 'Arbusto altoandino nativo para restaurar y cosechar fruto silvestre.' },
   { id: 'mucuna_pruriens', comun: 'Fríjol terciopelo', cientifico: 'Mucuna pruriens', nativo: false, papeles: ['Abono verde', 'Fija N', 'Cobertura'], nota: 'Abono verde de choque: tapa el suelo rápido, ahoga la maleza y fija nitrógeno.' },
   { id: 'urtica_dioica', comun: 'Ortiga', cientifico: 'Urtica dioica', nativo: false, papeles: ['Dinamizadora', 'Biomasa', 'Purín'], nota: 'Acumula minerales en su hoja: se corta para mantillo o purín que dinamiza el suelo.' },
