@@ -347,7 +347,7 @@ function EstacionClima({ onNavigate }) {
             <p className="mt-1 text-xs leading-snug text-slate-300">{v.nota}</p>
           </div>
         ))}
-        <p className="text-[10px] leading-snug text-slate-500">Compañías compatibles del catálogo Chagra (mismo piso térmico) — grafo Chagra.</p>
+        <p className="text-[10px] leading-snug text-slate-500">Compañías compatibles del catálogo Chagra (mismo piso térmico).</p>
       </div>
 
       {typeof onNavigate === 'function' && (
@@ -529,7 +529,7 @@ function EstacionMales({ onNavigate }) {
             </div>
           </div>
         ))}
-        <p className="text-[10px] leading-snug text-slate-500">Plagas y controladores del grafo Chagra (mangifera_indica).</p>
+        <p className="text-[10px] leading-snug text-slate-500">Plagas y controladores del catálogo Chagra.</p>
       </div>
 
       {/* Biopreparados de apoyo */}

@@ -87,7 +87,7 @@ const VERTICALES = [
     emoji: '🐝',
     titulo: 'Abejas y apicultura',
     subtitulo: 'Colmenas, miel, cera y sanidad',
-    aporte: 'Polinización de tus cultivos',
+    aporte: 'Polinización de sus cultivos',
     bar: 'from-yellow-300 to-amber-300',
   },
 ];
@@ -143,9 +143,9 @@ export default function AnimalesScreen({ onBack, onHome, onNavigate }) {
       <div className="px-4 pt-4 pb-10 max-w-2xl mx-auto">
         {/* Intro corta — qué es este módulo y por qué importa el ciclo cerrado. */}
         <p className="text-sm text-slate-300 leading-relaxed mb-4">
-          La cría es parte de la finca integrada. Bien manejados, tus animales te
-          dan comida y, además, alimentan tus plantas: el estiércol se convierte en
-          abono y las abejas polinizan tus cultivos.
+          La cría es parte de la finca integrada. Bien manejados, sus animales le
+          dan comida y, además, alimentan sus plantas: el estiércol se convierte en
+          abono y las abejas polinizan sus cultivos.
         </p>
 
         {/* Sub-botones photo-forward de cada vertical animal. */}
@@ -160,11 +160,11 @@ export default function AnimalesScreen({ onBack, onHome, onNavigate }) {
         <section className="mt-6 rounded-2xl border border-emerald-700/40 bg-emerald-900/20 p-4">
           <h2 className="flex items-center gap-2 text-base font-bold text-emerald-200">
             <Recycle size={18} aria-hidden="true" />
-            El ciclo cerrado de tu finca
+            El ciclo cerrado de su finca
           </h2>
           <p className="mt-2 text-sm text-emerald-100/90 leading-relaxed">
             Nada se pierde: lo que sale de un animal entra como comida de la
-            tierra. Así cierras el círculo y gastas menos en abonos comprados.
+            tierra. Así cierra el círculo y gasta menos en abonos comprados.
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-bold">
             <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-200 border border-amber-500/40">Animal</span>
@@ -183,7 +183,7 @@ export default function AnimalesScreen({ onBack, onHome, onNavigate }) {
             <li>• <span className="font-bold text-orange-200">Cabras y ovejas</span> → la majada (pelotitas) se recoge seca y va directo al compost.</li>
             <li>• <span className="font-bold text-orange-200">Vacas</span> → la boñiga (bovinaza) es el estiércol clásico del <span className="font-bold">biol</span> y también entra al <span className="font-bold">bocashi</span>.</li>
             <li>• <span className="font-bold text-pink-200">Cerdos</span> → la porquinaza entra al <span className="font-bold">biol</span>, el <span className="font-bold">supermagro</span> y el <span className="font-bold">compost</span>.</li>
-            <li>• <span className="font-bold text-yellow-200">Abejas</span> → no dan abono, pero polinizan tus matas y mejoran el cuaje y la cosecha.</li>
+            <li>• <span className="font-bold text-yellow-200">Abejas</span> → no dan abono, pero polinizan sus matas y mejoran el cuaje y la cosecha.</li>
           </ul>
           <div className="mt-4 flex flex-col gap-2">
             <button

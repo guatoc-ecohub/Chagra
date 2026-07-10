@@ -63,7 +63,7 @@ export const CICLO_AGUACATE = {
   altitud: '1340–2420 msnm (óptimo 1800–2000 para Hass)',
   regionNota:
     'El calendario de floración y cosecha depende fuerte de la localidad, la altitud y el patrón; hay fincas de montaña que producen casi todo el año. No hay un mes fijo que sirva para todas.',
-  fuente: 'AGROSAVIA, Universidad Nacional de Colombia (grafo Chagra: perennialCycles.persea_americana, confianza media)',
+  fuente: 'AGROSAVIA, Universidad Nacional de Colombia (catálogo Chagra, confianza media)',
 };
 
 /**
@@ -217,14 +217,14 @@ export const ASOCIACION_AGUACATE = {
       nombre: 'Hobo / ciruela',
       cientifico: 'Spondias dulcis',
       papel: 'Frutal compatible',
-      detalle: 'Otro frutal que el grafo marca compatible con el aguacate: buena vecina para armar un huerto diverso.',
+      detalle: 'Otro frutal que el catálogo marca compatible con el aguacate: buena vecina para armar un huerto diverso.',
     },
   ],
   antagonista: {
     id: 'eucalipto',
     nombre: 'Eucalipto',
     cientifico: 'Eucalyptus globulus',
-    detalle: 'El grafo lo marca ANTAGONISTA del aguacate: seca y acapara el suelo, y su hojarasca no lo deja. No siembre aguacate a la sombra ni al pie de eucaliptos.',
+    detalle: 'El catálogo lo marca ANTAGONISTA del aguacate: seca y acapara el suelo, y su hojarasca no lo deja. No siembre aguacate a la sombra ni al pie de eucaliptos.',
   },
 };
 
@@ -305,7 +305,7 @@ export const MALES_AGUACATE = [
  * fuera del grafo: solo cita la fuente que respalda las que ya están.
  */
 export const MALES_FUENTE =
-  'Grafo Chagra (persea_americana) + AGROSAVIA — Carabalí Muñoz, Caicedo Vallejo y Holguín (2021), “Guía para el reconocimiento y manejo de las principales plagas de aguacate cv. Hass en Colombia”, DOI 10.21930/agrosavia.nbook.7404913 (verificado Crossref).';
+  'Catálogo Chagra + AGROSAVIA — Carabalí Muñoz, Caicedo Vallejo y Holguín (2021), “Guía para el reconocimiento y manejo de las principales plagas de aguacate cv. Hass en Colombia”, DOI 10.21930/agrosavia.nbook.7404913 (verificado Crossref).';
 
 /**
  * Biopreparados de apoyo — GROUNDED: la lista propia de persea_americana en el
