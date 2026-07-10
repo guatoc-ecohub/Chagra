@@ -95,7 +95,7 @@ function emptyForm() {
   };
 }
 
-export default function GlaciarReporteScreen({ onBack, onVerHistorial }) {
+export default function GlaciarReporteScreen({ onBack, onVerHistorial = null }) {
   const [tab, setTab] = useState('nuevo'); // 'nuevo' | 'lista'
   // U-3: el borrador autosalvado se restaura desde IndexedDB en un efecto al
   // montar (loadDraft es async). Arrancamos en vacío y, si hay borrador, lo
@@ -1066,7 +1066,7 @@ function DisclaimerBox() {
   );
 }
 
-function ListaReportes({ reportes, loading, onEliminar, onNuevo, onVerHistorial }) {
+function ListaReportes({ reportes, loading, onEliminar, onNuevo, onVerHistorial = null }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-slate-500">
