@@ -121,6 +121,11 @@ const AlmanaqueScreen = lazy(() => import('./components/almanaque/AlmanaqueScree
 const AnoFincaScreen = lazy(() => import('./components/anofinca/AnoFincaScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
+// MOCKUP de galería (datos de muestra, sin gate): "el agente dibuja el
+// diagnóstico SOBRE la foto" — marca en la misma hoja enferma dónde está el
+// síntoma (aro punteado + etiqueta), como un doctor señalando la radiografía.
+// Ruta directa: #/mockups/diagnostico-foto. No cablea modelo real.
+const DiagnosticoSobreFoto = lazy(() => import('./mockups/DiagnosticoSobreFoto'));
 // Módulo "Agua de la finca": cosecha de lluvia (calculadora determinista),
 // riego con medida (ETc; Kc/ETo = slots grounded-pendiente) y cuidar el agua
 // (calidad + nacimiento, caso "se me seca el nacimiento en verano").
@@ -419,6 +424,9 @@ const LoadingFallback = ({ view = null }) => {
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
+  // Mockup de galería sin gate — el hash conserva la barra interna porque la
+  // normalización solo recorta el "#/" inicial (#/mockups/diagnostico-foto).
+  'mockups/diagnostico-foto': 'mockup_diagnostico_foto',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
   inventario: 'activos',
@@ -1599,6 +1607,16 @@ export default function App() {
         return (
           <ErrorBoundary>
             <BiodiversidadView onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
+      case 'mockup_diagnostico_foto':
+        // Mockup de galería (datos de muestra): el agente marca el síntoma
+        // SOBRE la foto de la hoja enferma. Sin gate — ruta #/mockups/diagnostico-foto.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Diagnóstico sobre la foto">
+              <DiagnosticoSobreFoto onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'fermentos':
