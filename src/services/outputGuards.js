@@ -8574,6 +8574,13 @@ export function guardInventedBinomialOutOfGrounding(responseText, resolvedEntiti
     const genusNorm = _stripDiacritics(genusRaw).toLowerCase();
     if (BENEFICIAL_GENERA_ALLOWLIST.has(genusNorm)) return match;
     if (_isRealAgroInput(bin) || _isRealAgroInput(genusNorm)) return match;
+    // CONSERVAR: especie REAL y documentada de páramo (catálogo curado más abajo,
+    // `PARAMO_NATIVE_SPECIES`/`PARAMO_NATIVE_BINOMIALS`). Sin este check, una
+    // respuesta que cita CORRECTAMENTE "Frailejón mayor (Espeletia grandiflora)"
+    // perdía el binomio aquí solo porque el grounding del turno no trae esa especie
+    // (nunca la va a traer: el usuario preguntó por otro cultivo, no por el
+    // frailejón) — regresión detectada al integrar `guardFabricatedParamoNatives`.
+    if (PARAMO_NATIVE_BINOMIALS.has(bin)) return match;
     // NEUTRALIZAR: binomio inventado fuera del grounding → solo el nombre común.
     if (!removed.includes(bin)) removed.push(bin);
     return common.trimEnd();
@@ -8675,6 +8682,360 @@ export function guardParamoNormativa(responseText) {
   }
 
   return { text: responseText, modified: false, reason: null };
+}
+
+// ── GUARD: TRÍO DE NATIVAS DE PÁRAMO FABRICADO (bench contaminación 2026-07-09) ──
+
+/**
+ * PARAMO_NATIVE_SPECIES — catálogo curado de especies REALES nativas/propias del
+ * páramo colombiano, usado por `guardFabricatedParamoNatives`.
+ *
+ * BUG REAL (bench de contaminación, 2026-07-09): preguntando si un cultivo de piso
+ * cálido/templado (café, limonaria) se puede sembrar en PÁRAMO, `granite3.3:8b`
+ * acierta la respuesta ("no, el clima no sirve") pero luego INVENTA un trío fijo de
+ * "nativas del páramo" — "Romero blanco", "Árnica de páramo", "Hipérico de páramo" —
+ * con binomios latinos FABRICADOS e inconsistentes entre corridas: `Rosmarinus
+ * officinalis` (romero mediterráneo real, pero NO es la especie de páramo),
+ * `Leucasinaria scabra` (género que no existe) y confusión `Hypericum`/`Hieracium`.
+ * Es una plantilla memorizada que rellena binomios ad-hoc, no grounding real.
+ *
+ * Los TRES nombres comunes del bug SÍ son especies reales y documentadas del
+ * páramo — el modelo solo les cuelga el binomio equivocado:
+ *   - "Romero blanco"     → Diplostephium rosmarinifolium (NO Rosmarinus officinalis)
+ *   - "Árnica de páramo"  → Senecio formosus (NO "Leucasinaria scabra", inexistente)
+ *   - "Hipérico de páramo" → Hypericum juniperinum (NO Hieracium)
+ *
+ * Fuente: `catalog/chagra-catalog-oss-subset-v3.2.json`, especies con
+ * `thermal_zones` incluye `"paramo"` (62 especies, fuentes GBIF/POWO/IAvH; MISMO
+ * catálogo ya cargado en el grafo `chagra_kg` vía `catalog-to-age.mjs`), más un
+ * añadido de especies documentadas en `Chagra-strategy/ops/GROUNDING-PARAMO-
+ * 2026-07-09.md` (IAvH 2011/2015) que aún no estaban en el subset OSS — ver
+ * `scripts/load-age-paramo-species-2026-07-09.mjs` (32 especies recién ingestadas al
+ * grafo, `Species -[:HABITAT_OF]-> Ecosystem{id:'paramo'}`). Se copian los pares
+ * comun/binomio aquí (no se importa el catálogo/script) para no abultar el bundle
+ * del guard con datos de build-time.
+ *
+ * `binomio` es SOLO "Genus epíteto" (sin autoría) — se deriva el canónico con
+ * `_binomial()` igual que el resto de los binomios que razonan estos guards.
+ */
+const PARAMO_NATIVE_SPECIES = [
+  // ── catalog/chagra-catalog-oss-subset-v3.2.json (thermal_zones: paramo) ──────
+  { comun: 'Frailejón mayor', binomio: 'Espeletia grandiflora' },
+  { comun: 'Coloradito, queñoa de páramo Cruz Verde', binomio: 'Polylepis quadrijuga' },
+  { comun: 'Chilco', binomio: 'Baccharis latifolia' },
+  { comun: 'Paja de páramo', binomio: 'Calamagrostis effusa' },
+  { comun: 'Chusque', binomio: 'Chusquea scandens' },
+  { comun: 'Romero de páramo', binomio: 'Diplostephium revolutum' },
+  { comun: 'Cardón de páramo', binomio: 'Puya goudotiana' },
+  { comun: 'Papa parda pastusa', binomio: 'Solanum tuberosum' },
+  { comun: 'Mashua', binomio: 'Tropaeolum tuberosum' },
+  { comun: 'Agraz de páramo', binomio: 'Vaccinium floribundum' },
+  { comun: 'Frailejón plateado', binomio: 'Espeletia argentea' },
+  { comun: 'Esmeralda chiquita', binomio: 'Hesperomeles goudotiana' },
+  { comun: 'Polylepis / Colorado', binomio: 'Polylepis sericea' },
+  { comun: 'Valeriana criolla', binomio: 'Valeriana pavonii' },
+  // BUG del bench: "Romero blanco" real, NO "Rosmarinus officinalis".
+  { comun: 'Romero blanco', binomio: 'Diplostephium rosmarinifolium' },
+  { comun: 'Pajonal de páramo', binomio: 'Festuca spp' },
+  { comun: 'Pasto agrostis foliado', binomio: 'Agrostis foliata' },
+  { comun: 'Chacate', binomio: 'Escallonia paniculata' },
+  { comun: 'Siete cueros', binomio: 'Tibouchina lepidota' },
+  { comun: 'Chuquiragua', binomio: 'Chuquiraga jussieui' },
+  { comun: 'Cordoncillo de Bogotá', binomio: 'Piper bogotense' },
+  { comun: 'Vaquero', binomio: 'Tovaria pendula' },
+  { comun: 'Arrayán de Bogotá', binomio: 'Myrcianthes leucoxyla' },
+  { comun: 'Uva camarona', binomio: 'Macleania rupestris' },
+  { comun: 'Cucubo', binomio: 'Bomarea caldasii' },
+  { comun: 'Azulejito de páramo', binomio: 'Monnina aestuans' },
+  { comun: 'Asnao', binomio: 'Gaultheria anastomosans' },
+  { comun: 'Uvito de monte', binomio: 'Cavendishia bracteata' },
+  { comun: 'Maíz Negro de Páramo', binomio: 'Zea mays' },
+  { comun: 'Kañiwa', binomio: 'Chenopodium pallidicaule' },
+  { comun: 'Valeriana andina', binomio: 'Valeriana microphylla' },
+  { comun: 'Puya gigante de páramo', binomio: 'Puya clava-herculis' },
+  { comun: 'Frailejón de Uribe', binomio: 'Espeletia uribei' },
+  { comun: 'Frailejón Killip', binomio: 'Espeletia killipii' },
+  // BUG del bench: "Árnica de páramo" real, NO "Leucasinaria scabra" (género
+  // inexistente).
+  { comun: 'Árnica de páramo', binomio: 'Senecio formosus' },
+  { comun: 'Pernettya / Mortiño rastrero', binomio: 'Pernettya prostrata' },
+  // BUG del bench: "Hipérico de páramo" real, NO Hieracium (confusión de género).
+  { comun: 'Hipérico de páramo', binomio: 'Hypericum juniperinum' },
+  { comun: 'Santolina paramuna', binomio: 'Bartsia santolinifolia' },
+  { comun: 'Chocho de páramo', binomio: 'Lupinus alopecuroides' },
+  { comun: 'Escobilla paramuna', binomio: 'Loricaria complanata' },
+  { comun: 'Mortiño rastrero ericáceo', binomio: 'Disterigma empetrifolium' },
+  { comun: 'Paja paramuna', binomio: 'Paepalanthus columbiensis' },
+  { comun: 'Pino-papel andino', binomio: 'Polylepis incana' },
+  { comun: 'Pino-papel sub-andino', binomio: 'Polylepis pauta' },
+  { comun: 'Frailejón de Nariño', binomio: 'Espeletia pycnophylla' },
+  { comun: 'Frailejón de López', binomio: 'Espeletia lopezii' },
+  { comun: 'Paragyn de Uribe', binomio: 'Paragynoxys uribei' },
+  { comun: 'Mortiño falso', binomio: 'Vernonanthura patens' },
+  { comun: 'Ñacha', binomio: 'Oreocallis grandiflora' },
+  { comun: 'Laurel de páramo', binomio: 'Clethra kalbreyeri' },
+  { comun: 'Rodamonte', binomio: 'Escallonia myrtilloides' },
+  { comun: 'Molasco', binomio: 'Gynoxys baccharoides' },
+  { comun: 'Cucharo de altura', binomio: 'Myrsine dependens' },
+  { comun: 'Cucharo andino', binomio: 'Myrsine andina' },
+  { comun: 'Aragoa', binomio: 'Aragoa abietina' },
+  { comun: 'Valeriana arbórea', binomio: 'Valeriana arborea' },
+  { comun: 'Chocho de Carriker', binomio: 'Lupinus carrikeri' },
+  { comun: 'Quelite / Cenizo', binomio: 'Chenopodium album' },
+  { comun: 'Muña', binomio: 'Minthostachys mollis' },
+  // ── scripts/load-age-paramo-species-2026-07-09.mjs (IAvH 2011/2015), no
+  //    duplicadas del subset OSS de arriba ────────────────────────────────────
+  { comun: 'Frailejón Guerrero', binomio: 'Espeletia cayetana' },
+  { comun: 'Frailejón motoso', binomio: 'Espeletia barclayana' },
+  { comun: 'Frailejón', binomio: 'Espeletia hartwegiana' },
+  { comun: 'Frailejón negro', binomio: 'Espeletiopsis corymbosa' },
+  { comun: 'Frailejón/tache', binomio: 'Espeletiopsis santanderensis' },
+  { comun: 'Roble', binomio: 'Quercus humboldtii' },
+  { comun: 'Pegamosco', binomio: 'Bejaria resinosa' },
+  { comun: 'Mano de oso', binomio: 'Oreopanax mutisianus' },
+  { comun: 'Puya', binomio: 'Puya nitida' },
+  { comun: 'Puya', binomio: 'Puya trianae' },
+  { comun: 'Quina', binomio: 'Cinchona pubescens' },
+  { comun: 'Chusque', binomio: 'Chusquea tessellata' },
+];
+
+/** Binomios canónicos ("genero epiteto") de TODAS las especies REALES de páramo. */
+const PARAMO_NATIVE_BINOMIALS = new Set(
+  PARAMO_NATIVE_SPECIES.map((sp) => _binomial(sp.binomio)).filter(Boolean),
+);
+
+/**
+ * Índice comun→especie para sugerir la corrección REAL cuando el modelo fabrica un
+ * binomio para un nombre común que SÍ reconocemos. Cada entrada expone las variantes
+ * normalizadas de su nombre común (partido por "/" y ",", sin tildes/mayúsculas) para
+ * matchear contra el texto del modelo.
+ */
+const PARAMO_NATIVE_LOOKUP = PARAMO_NATIVE_SPECIES.map((sp) => ({
+  comun: sp.comun,
+  binomio: sp.binomio,
+  binomioCanonico: _binomial(sp.binomio),
+  variants: sp.comun
+    .split('/')
+    .flatMap((part) => part.split(','))
+    .map((v) => _stripDiacritics(v).replace(/\s+/g, ' ').trim())
+    .filter((v) => v.length >= 3),
+}));
+
+/**
+ * Recorta una frase a sus últimas `n` palabras (para limpiar el "nombre común" que
+ * `ATTRIBUTED_BINOMIAL_RE`/`ATTRIBUTED_GENUS_SP_RE` capturan, que a veces arrastran
+ * palabras de la prosa previa — "puedes encontrar Romero blanco" → "encontrar Romero
+ * blanco" con n=3).
+ */
+function _tailWords(s, n) {
+  const parts = (s || '').trim().split(/\s+/).filter(Boolean);
+  return parts.length <= n ? parts.join(' ') : parts.slice(-n).join(' ');
+}
+
+/**
+ * Busca, por nombre común normalizado, la especie REAL de páramo que mejor coincide
+ * (variante más larga que matchea, para preferir "hiperico de paramo" sobre un
+ * choque corto accidental). Devuelve `null` si no reconocemos el nombre.
+ *
+ * @param {string} commonNorm — nombre común, ya `_stripDiacritics()` + trim.
+ * @returns {{comun:string, binomio:string, binomioCanonico:string}|null}
+ */
+function _lookupParamoNative(commonNorm) {
+  if (!commonNorm) return null;
+  let best = null;
+  let bestLen = 0;
+  for (const entry of PARAMO_NATIVE_LOOKUP) {
+    for (const variant of entry.variants) {
+      if (commonNorm === variant || commonNorm.includes(variant) || variant.includes(commonNorm)) {
+        if (variant.length > bestLen) {
+          best = entry;
+          bestLen = variant.length;
+        }
+      }
+    }
+  }
+  return best;
+}
+
+/** Menciona páramo/subpáramo/frailejón — mismo universo que `guardParamoNormativa`. */
+const PARAMO_MENTION_RE = /\b(paramo|paramos|subparamo|subparamos|frailejon|frailejones)\b/;
+
+/**
+ * La respuesta ENCUADRA lo que sigue como especies nativas/propias/endémicas del
+ * páramo (o invita a "encontrar" especies ahí) — el contexto exacto donde aparece
+ * el trío fabricado del bench. Sobre texto normalizado.
+ */
+const PARAMO_NATIVE_CLAIM_RE =
+  /(especies?\s+(nativas?|paramunas?|endemicas?)|flora\s+(nativa|paramuna|del\s+paramo)|nativ[oa]s?\s+del\s+paramo|propias?\s+del\s+paramo|tipicas?\s+del\s+paramo|endemic[oa]s?\s+del\s+paramo|adaptad[oa]s?\s+al\s+paramo|(puedes?|se\s+puede[n]?)\s+(encontrar|hallar)\s+especies|hay\s+(especies|plantas)\s+(nativas?|como|del\s+paramo)|crecen\s+en\s+el\s+paramo|habitan\s+(el\s+)?paramo|alternativas?\s+nativas?)/;
+
+/**
+ * Copia LOCAL de `ATTRIBUTED_BINOMIAL_RE` con el arranque corregido: `\b` en JS solo
+ * conoce `\w` ASCII, así que NUNCA hay frontera de palabra ANTES de una mayúscula
+ * acentuada (Á/É/Í/Ó/Ú/Ñ) — "Árnica" perdía la "Á" (el match arrancaba en "rnica").
+ * Bug real de este guard: "Árnica de páramo" es uno de los 3 nombres comunes del
+ * bench. Se usa lookbehind negativo (ya usado en `BARE_ACRONYM_RE`/`voseoFilter.js`,
+ * soportado por el target del build) en vez de `\b` para el arranque. Copiada aquí
+ * (no se toca `ATTRIBUTED_BINOMIAL_RE` compartida) para no ampliar el radio de
+ * impacto sobre los demás guards que la usan.
+ *
+ * Tope de nombre común reducido a `{0,2}` (máx. 3 palabras) vs. las `{0,4}` de la
+ * compartida: en prosa con varias atribuciones seguidas ("...(X) y el Y (Z)"), un
+ * tope alto deja que el arranque leftmost-match retroceda hasta la conjunción "y"
+ * de la atribución ANTERIOR y se la coma. Los nombres comunes reales de páramo de
+ * este catálogo tienen ≤3 palabras, así que el tope más corto no pierde cobertura.
+ */
+const PARAMO_ATTRIBUTED_BINOMIAL_RE =
+  /(?<![\wÁÉÍÓÚÜÑáéíóúüñ])([A-Za-zÁÉÍÓÚÜÑáéíóúüñ][\wÁÉÍÓÚÜÑáéíóúüñ-]*(?:\s+[\wÁÉÍÓÚÜÑáéíóúüñ-]+){0,2}?)\s*\(\s*([A-Z][a-zé]+)\s+([a-zé][a-zé-]+)\b[^)]*\)/g;
+
+/**
+ * Variante de `PARAMO_ATTRIBUTED_BINOMIAL_RE` para la abreviatura taxonómica
+ * "Genero sp."/"Genero spp." — "Hipérico de páramo (Hieracium sp.)" no es un
+ * binomio completo (el epíteto "sp" es demasiado corto para
+ * `_looksLikeLatinBinomial`), pero SÍ es la forma exacta en la que el bench capturó
+ * la confusión de género Hypericum/Hieracium.
+ */
+const ATTRIBUTED_GENUS_SP_RE =
+  /(?<![\wÁÉÍÓÚÜÑáéíóúüñ])([A-Za-zÁÉÍÓÚÜÑáéíóúüñ][\wÁÉÍÓÚÜÑáéíóúüñ-]*(?:\s+[\wÁÉÍÓÚÜÑáéíóúüñ-]+){0,2}?)\s*\(\s*([A-Z][a-zé]+)\s+spp?\.?\s*\)/g;
+
+const PARAMO_NATIVES_MARKER = 'Corrección importante: los nombres científicos que te di para especies nativas del páramo no son correctos';
+
+/**
+ * guardFabricatedParamoNatives — GUARD de trío de "nativas de páramo" fabricado
+ * (bench de contaminación, 2026-07-09).
+ *
+ * PROBLEMA: preguntando por un cultivo de piso cálido/templado en PÁRAMO, el modelo
+ * acierta la inviabilidad pero INVENTA un trío fijo de especies "nativas" con
+ * binomios latinos fabricados o mal atribuidos (ver `PARAMO_NATIVE_SPECIES` arriba
+ * para los 3 casos documentados del bench). Es una plantilla memorizada, no
+ * grounding — y por venir en formato "nombre común (Binomio)" suena tan autoritativo
+ * como cualquier dato real del catálogo.
+ *
+ * QUÉ HACE (suprimir-y-reemplazar EN LÍNEA, NO caveat): a partir de la primera
+ * oración que ENCUADRA el texto como especies nativas/propias del páramo
+ * (`PARAMO_NATIVE_CLAIM_RE`) — todo lo ANTERIOR queda intacto, p.ej. la explicación
+ * correcta de por qué el cultivo preguntado no se da ahí — por cada atribución
+ * "<nombre común> (Genus species)" o "<nombre común> (Genus sp.)":
+ *   - Si el binomio coincide con el REAL del catálogo para ese nombre común →
+ *     se conserva (respuesta correcta, no se toca).
+ *   - Si el nombre común es DESCONOCIDO pero el binomio SÍ es una especie real de
+ *     páramo (`PARAMO_NATIVE_BINOMIALS`) → se conserva (conservador: no tachamos una
+ *     especie real solo porque no reconocimos su nombre común exacto).
+ *   - Si reconocemos el nombre común pero el binomio es fabricado o mal atribuido →
+ *     se REEMPLAZA en el sitio por el binomio REAL documentado (mantiene la
+ *     estructura de la lista/oración, corrige solo el dato falso).
+ *   - Si NO reconocemos el nombre común y el binomio tampoco es una especie real de
+ *     páramo → se elimina el paréntesis, dejando solo el nombre común (igual que
+ *     `guardInventedBinomialOutOfGrounding`, honesto ante la falta de evidencia).
+ *   Nunca deja un binomio fabricado sin corregir, ni dispara si el texto ya cita
+ *   especies reales. Se ANTEPONE un resumen de qué se corrigió/quitó.
+ *
+ * Anti-falsos-positivos:
+ *  - Requiere DOBLE gate: mención de páramo/frailejón Y encuadre de "especies
+ *    nativas/propias/endémicas" — no dispara por presencia de páramo a secas
+ *    (`guardParamoNormativa` cubre siembra/fumigación directa; este guard cubre la
+ *    fabricación de ALTERNATIVAS nativas, que puede aparecer incluso cuando la
+ *    respuesta niega correctamente la siembra del cultivo preguntado).
+ *  - Solo actúa DESDE la primera oración de encuadre en adelante (slice por índice,
+ *    no por oración): el binomio del cultivo preguntado, mencionado ANTES de ese
+ *    encuadre, nunca entra en juego. Evita depender de `_splitSentences` (que corta
+ *    mal en abreviaturas taxonómicas como "sp." — "Hieracium sp.)" partía la
+ *    atribución en dos oraciones y se perdía el paréntesis de cierre).
+ *  - Un binomio ya presente en el grounding del turno (`resolvedEntities` + sus
+ *    sub-arrays) se CONSERVA siempre — es el cultivo preguntado u otra especie que
+ *    el grounding sí respalda, no una "nativa" inventada.
+ *  - "Genero sp./spp." SOLO se cuestiona cuando reconocemos el nombre común Y su
+ *    género documentado NO coincide (Hypericum ≠ Hieracium). Sin nombre reconocido,
+ *    "sp." es honesto (no afirma especie) y no se toca.
+ *  - Determinístico, barato (regex + Set/Map lookups), idempotente (marcador propio).
+ *
+ * @param {string} responseText
+ * @param {Array<object>|null} resolvedEntities — grounding crudo del turno.
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardFabricatedParamoNatives(responseText, resolvedEntities = null) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(PARAMO_NATIVES_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const norm = _stripDiacritics(responseText);
+  if (!PARAMO_MENTION_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  // `_stripDiacritics` es 1:1 en longitud para acentos españoles (á→a, ñ→n), así que
+  // el índice del match en `norm` es el MISMO índice en `responseText` — patrón ya
+  // usado por otros guards de este archivo (guardSpeciesSubstitution) para cruzar
+  // posiciones entre el texto normalizado y el crudo.
+  const claimMatch = PARAMO_NATIVE_CLAIM_RE.exec(norm);
+  if (!claimMatch) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  PARAMO_ATTRIBUTED_BINOMIAL_RE.lastIndex = 0;
+  ATTRIBUTED_GENUS_SP_RE.lastIndex = 0;
+  if (!PARAMO_ATTRIBUTED_BINOMIAL_RE.test(responseText) && !ATTRIBUTED_GENUS_SP_RE.test(responseText)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const entities = Array.isArray(resolvedEntities) ? resolvedEntities : [];
+  const grounded = _groundedBinomials(entities);
+
+  const scopeStart = claimMatch.index;
+  const before = responseText.slice(0, scopeStart);
+  const after = responseText.slice(scopeStart);
+
+  const fixed = [];
+  const stripped = [];
+
+  let out = after.replace(PARAMO_ATTRIBUTED_BINOMIAL_RE, (match, commonRaw, genusRaw, epithetRaw) => {
+    if (!_looksLikeLatinBinomial(genusRaw, epithetRaw)) return match;
+    const bin = _binomial(`${genusRaw} ${epithetRaw}`);
+    if (!bin) return match;
+    if (grounded.has(bin)) return match; // especie preguntada / grounding del turno.
+
+    const common = _tailWords(commonRaw, 3);
+    const known = _lookupParamoNative(_stripDiacritics(common));
+    if (known) {
+      if (bin === known.binomioCanonico) return match; // correcto: nombre + binomio coinciden.
+      fixed.push(`${common} (${genusRaw} ${epithetRaw}) → ${common} (${_displayBinomial(known.binomioCanonico)})`);
+      return `${common} (${_displayBinomial(known.binomioCanonico)})`;
+    }
+    if (PARAMO_NATIVE_BINOMIALS.has(bin)) return match; // binomio real, nombre no reconocido → conservador.
+    stripped.push(`${common} (${genusRaw} ${epithetRaw})`);
+    return common;
+  });
+
+  out = out.replace(ATTRIBUTED_GENUS_SP_RE, (match, commonRaw, genusRaw) => {
+    const genusNorm = _stripDiacritics(genusRaw).toLowerCase();
+    if (GENUS_STOPWORDS.has(genusNorm)) return match;
+    const common = _tailWords(commonRaw, 3);
+    const known = _lookupParamoNative(_stripDiacritics(common));
+    if (!known) return match; // "sp." sobre nombre no reconocido es honesto, no se toca.
+    const knownGenus = _stripDiacritics(known.binomioCanonico.split(' ')[0]);
+    if (knownGenus === genusNorm) return match; // género correcto, solo falta epíteto.
+    fixed.push(`${common} (${genusRaw} sp.) → ${common} (${_displayBinomial(known.binomioCanonico)})`);
+    return `${common} (${_displayBinomial(known.binomioCanonico)})`;
+  });
+
+  if (fixed.length === 0 && stripped.length === 0) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('fabricated_paramo_natives');
+
+  const notes = [];
+  if (fixed.length > 0) notes.push(`Corregí estos binomios mal atribuidos: ${fixed.join('; ')}.`);
+  if (stripped.length > 0) {
+    notes.push(`No pude confirmar como reales estos nombres científicos, los quité: ${stripped.join(', ')}.`);
+  }
+  const correction = `${PARAMO_NATIVES_MARKER}. ${notes.join(' ')}`;
+
+  const text = `${correction}\n\n${(before + out).trim()}`;
+  return {
+    text,
+    modified: true,
+    reason: `especies_nativas_paramo_fabricadas: ${[...fixed, ...stripped].join('; ')}`,
+  };
 }
 
 /**
@@ -9960,6 +10321,20 @@ export function applyOutputGuards(
     text = benefRes.text;
     modified = true;
     if (benefRes.reason) reasons.push(benefRes.reason);
+  }
+  // Guard TRÍO DE NATIVAS DE PÁRAMO FABRICADO (bench contaminación 2026-07-09): firma
+  // propia (usa el grounding crudo del turno). Corre SIEMPRE (no es de siembra: puede
+  // aparecer incluso cuando la respuesta niega correctamente la siembra del cultivo
+  // preguntado). Va ANTES de `guardInventedBinomialOutOfGrounding` a propósito: ese
+  // guard genérico también neutraliza estos mismos paréntesis (binomio no-grounded),
+  // pero solo deja el nombre común pelado — este guard, con el catálogo curado de
+  // páramo, puede ofrecer la especie REAL en su lugar. Si corre primero el genérico,
+  // el paréntesis ya no existe y este guard no tiene nada que corregir.
+  const paramoNativesRes = guardFabricatedParamoNatives(text, resolvedEntities);
+  if (paramoNativesRes && paramoNativesRes.modified) {
+    text = paramoNativesRes.text;
+    modified = true;
+    if (paramoNativesRes.reason) reasons.push(paramoNativesRes.reason);
   }
   // Guard #95 ANTI-ALUCINACIÓN-DE-ESPECIE (binomio inventado fuera del grounding):
   // firma propia (usa el grounding crudo del turno). Corre SIEMPRE (no es de
