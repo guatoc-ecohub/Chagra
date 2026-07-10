@@ -602,7 +602,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         >
             <tile.icon size={large ? 30 : 24} strokeWidth={2} className={`${large ? 'mb-2' : 'mb-1.5'} ${tile.accent.split(' ')[0]}`} aria-hidden="true" />
             <span className={`${large ? 'text-base' : 'text-sm'} font-black block leading-tight fvh-tile-label ${tile.accent.split(' ')[0]}`}>{tileLabel(tile)}</span>
-            <span className={`${large ? 'text-xs mt-1 leading-snug' : 'text-2xs mt-0.5 leading-tight'} block fvh-tile-desc ${fincaVivaFlag ? '' : (large ? 'text-slate-400' : 'text-slate-500')}`}>{tileDesc(tile)}</span>
+            <span className={`${large ? 'text-xs mt-1 leading-snug' : 'text-2xs mt-0.5 leading-tight'} block fvh-tile-desc ${fincaVivaFlag ? '' : 'text-slate-400'}`}>{tileDesc(tile)}</span>
         </button>
     );
 
@@ -620,7 +620,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     <MERCADO_TILE.icon size={26} strokeWidth={2} className={`${MERCADO_TILE.accent.split(' ')[0]} shrink-0`} aria-hidden="true" />
                     <span className="flex-1 min-w-0">
                         <span className={`text-sm font-black block leading-tight fvh-tile-label ${MERCADO_TILE.accent.split(' ')[0]}`}>{MERCADO_TILE.label}</span>
-                        <span className={`text-2xs block mt-0.5 leading-tight fvh-tile-desc ${fincaVivaFlag ? '' : 'text-slate-500'}`}>{MERCADO_TILE.desc}</span>
+                        <span className={`text-2xs block mt-0.5 leading-tight fvh-tile-desc ${fincaVivaFlag ? '' : 'text-slate-400'}`}>{MERCADO_TILE.desc}</span>
                     </span>
                     <ChevronRight size={18} className={`shrink-0 ${MERCADO_TILE.accent.split(' ')[0]} opacity-70`} aria-hidden="true" />
                 </button>
