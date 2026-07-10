@@ -63,7 +63,7 @@ const FOTOS = {
   'mata-sistema-hijos': { autor: 'Otuo-Akyampong Boakye', licencia: 'CC BY-SA 4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Plantain_with_suckers.jpg', alt: 'Mata de plátano con sus hijos o colinos alrededor de la base: madre, hija y nieta.' },
   'cafe-sombra': { autor: 'Kateregga1', licencia: 'CC BY-SA 4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Coffee_and_banana_plantation_in_Uganda.jpg', alt: 'Plátano dando sombra a un cultivo de café, en sistema agroforestal.' },
   'sigatoka-hoja': { autor: 'Plant pests and diseases', licencia: 'CC0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Banana-_Black_leaf_streak_(Black_sigatoka).jpg', alt: 'Hoja de banano con manchas y rayas negras: síntoma de la sigatoka negra.' },
-  'picudo-cosmopolites': { autor: 'Plant pests and diseases', licencia: 'CC0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Banana-_Banana_corm_weevil_(Cosmopolites_sordidus).jpg', alt: 'Picudo negro del plátano (Cosmopolites sordidus) sobre el cormo de la mata.' },
+  'picudo-cosmopolites': { autor: 'Obsidian Soul', licencia: 'CC0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Cosmopolites_sordidus,_banana_weevil_(Mindanao,_Philippines)_03.jpg', alt: 'Picudo negro del plátano (Cosmopolites sordidus): el escarabajo adulto de trompa curva.' },
   'pseudotallo-hoja': { autor: 'Louiesemendez', licencia: 'CC BY-SA 4.0', fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Banana_leaf_wrapping_of_Suman_Balinghoy.jpg', alt: 'Hoja de plátano usada para envolver comida, como se hace en el campo.' },
 };
 
