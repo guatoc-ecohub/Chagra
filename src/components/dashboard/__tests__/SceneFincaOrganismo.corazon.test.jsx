@@ -3,7 +3,7 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, test, expect, vi, afterEach } from 'vitest';
 
-import SceneFincaOrganismo from '../SceneFincaOrganismo';
+import SceneFincaOrganismo from '../../../visual/scenes/SceneFincaOrganismo';
 
 /**
  * El CORAZÓN-SEMILLA de la Finca Organismo = botón "Pregunte" (usabilidad

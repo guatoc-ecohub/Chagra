@@ -42,7 +42,7 @@ import NotificationsBell from '../NotificationsBell';
 //   · verde-vivo  → "Huerto Exuberante" (verdes saturados, rocío que cae).
 //   · minimalista → "Un solo trazo" (line-art que se dibuja sobre papel).
 // Las escalas balcon/invernadero conservan sus escenas isométricas intactas.
-import SceneFincaOrganismo from './SceneFincaOrganismo';
+import SceneFincaOrganismo from '../../visual/scenes/SceneFincaOrganismo';
 // PANEL DE VITALIDAD DEL ESPÍRITU — la lectura de vida del organismo (mockup
 // aprobado #/mockups/avatar-biopunk), groundeada con los registros REALES de
 // la finca (ver vitalidadEspirituService). Solo se monta con la escena
@@ -51,7 +51,7 @@ import PanelVitalidadEspiritu from './PanelVitalidadEspiritu';
 import SceneFincaNature from './SceneFincaNature';
 import SceneHuertoVivo from './SceneHuertoVivo';
 import SceneTrazoMinimal from './SceneTrazoMinimal';
-import './scene-finca-organismo.css';
+import '../../visual/scenes/scene-finca-organismo.css';
 import './scene-finca-nature.css';
 import './scene-huerto-vivo.css';
 import './scene-trazo-minimal.css';

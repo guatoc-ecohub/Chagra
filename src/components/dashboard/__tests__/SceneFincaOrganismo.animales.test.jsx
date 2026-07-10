@@ -13,7 +13,7 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 //   · cableado en FincaVivaHero: tocar el potrero navega al MISMO destino que
 //     la tarjeta del mundo en el home → onNavigate('mundo', { mundo: 'animales' }).
 
-import SceneFincaOrganismo from '../SceneFincaOrganismo';
+import SceneFincaOrganismo from '../../../visual/scenes/SceneFincaOrganismo';
 
 afterEach(() => cleanup());
 
