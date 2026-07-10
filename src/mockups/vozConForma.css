@@ -1,0 +1,476 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   vozConForma.css — mockup "La voz con forma" (#/mockups/voz-con-forma).
+
+   La página es una COCINA DE NOCHE: tierra oscura y cálida (nada de navy
+   sci-fi), donde la única fuente de luz es la voz. El fondo se re-tiñe
+   apenas con el estado del iris (la luz de la brasa alcanza la mesa):
+   miel al escuchar, cobre al pensar, musgo al hablar.
+
+   Tipografía: serif de libro viejo para lo dicho (Georgia — cero deps),
+   sans del sistema para la interfaz. Responsive hasta 320 px; solo
+   transform/opacity animados; prefers-reduced-motion sin coreografías.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.vcf {
+  --vcf-tierra: #211712;
+  --vcf-tierra-2: #2b1f17;
+  --vcf-crema: #f2e7d3;
+  --vcf-ceniza: #b7a48c;
+  --vcf-miel: #e9a94e;
+  --vcf-cobre: #c57a45;
+  --vcf-musgo: #b7c98a;
+  --vcf-linea: rgba(233, 169, 78, 0.16);
+  --vcf-luz-ambiente: rgba(217, 133, 73, 0.05);
+
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--vcf-tierra);
+  color: var(--vcf-crema);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.55;
+  padding: clamp(20px, 4vw, 56px) clamp(16px, 5vw, 64px) 72px;
+  overflow-x: hidden;
+}
+
+.vcf[data-estado='escuchando'] { --vcf-luz-ambiente: rgba(233, 169, 78, 0.09); }
+.vcf[data-estado='pensando'] { --vcf-luz-ambiente: rgba(197, 122, 69, 0.08); }
+.vcf[data-estado='hablando'] { --vcf-luz-ambiente: rgba(183, 201, 138, 0.08); }
+
+/* la luz que la voz le presta al cuarto (solo opacity/background, barato) */
+.vcf-luz {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(90% 60% at 50% 24%, var(--vcf-luz-ambiente), transparent 70%),
+    radial-gradient(120% 90% at 50% 110%, rgba(0, 0, 0, 0.5), transparent 55%);
+  transition: background 1.1s ease;
+}
+
+.vcf > * { position: relative; }
+
+/* ── cabecera ──────────────────────────────────────────────────────────────── */
+.vcf-cabecera {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.vcf-eyebrow {
+  margin: 0 0 14px;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--vcf-ceniza);
+}
+
+.vcf-titulo {
+  margin: 0;
+  font-family: Georgia, 'Palatino Linotype', 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: clamp(2.1rem, 6.5vw, 3.6rem);
+  letter-spacing: 0.01em;
+  color: var(--vcf-crema);
+}
+
+.vcf-sub {
+  margin: 14px auto 0;
+  max-width: 56ch;
+  color: var(--vcf-ceniza);
+  font-size: clamp(0.95rem, 2.6vw, 1.08rem);
+}
+
+.vcf-sub b { color: var(--vcf-miel); font-weight: 600; }
+
+/* ── hero: escenario + mando ───────────────────────────────────────────────── */
+.vcf-hero {
+  max-width: 1000px;
+  margin: clamp(28px, 5vw, 56px) auto 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 48px);
+  align-items: start;
+}
+
+.vcf-escenario {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding-top: 8px;
+}
+
+.vcf-iris-hero {
+  width: clamp(200px, 62vw, 300px) !important;
+  height: auto !important;
+  aspect-ratio: 1;
+}
+
+/* «hola, Chagra»: el llamado flota sobre el iris mientras dura el ciclo */
+.vcf-wake {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 1.02rem;
+  color: var(--vcf-miel);
+  opacity: 0;
+  animation: vcf-wake 0.9s ease forwards;
+}
+
+@keyframes vcf-wake {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.vcf-estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 4px 0 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--vcf-crema);
+}
+
+.vcf-estado-punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vcf-miel);
+  transition: background 0.7s ease;
+}
+
+.vcf[data-estado='reposo'] .vcf-estado-punto { background: #8d6b4d; }
+.vcf[data-estado='pensando'] .vcf-estado-punto { background: var(--vcf-cobre); }
+.vcf[data-estado='hablando'] .vcf-estado-punto { background: var(--vcf-musgo); }
+
+.vcf-nota {
+  margin: 0;
+  max-width: 40ch;
+  min-height: 3.2em;
+  font-size: 0.88rem;
+  color: var(--vcf-ceniza);
+}
+
+/* ── mando: demo + estados + hilo ──────────────────────────────────────────── */
+.vcf-mando {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vcf-btn-demo {
+  align-self: stretch;
+  padding: 14px 18px;
+  border: 1px solid var(--vcf-linea);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(233, 169, 78, 0.16), rgba(233, 169, 78, 0.07));
+  color: var(--vcf-crema);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.3s ease;
+}
+
+.vcf-btn-demo:hover:not(:disabled) { transform: translateY(-1px); }
+.vcf-btn-demo:disabled { opacity: 0.75; cursor: default; }
+
+.vcf-estados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+  gap: 8px;
+}
+
+.vcf-btn-estado {
+  padding: 10px 8px;
+  border: 1px solid var(--vcf-linea);
+  border-radius: 11px;
+  background: rgba(242, 231, 211, 0.04);
+  color: var(--vcf-ceniza);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.vcf-btn-estado:hover { color: var(--vcf-crema); }
+
+.vcf-btn-estado[aria-pressed='true'] {
+  color: var(--vcf-tierra);
+  background: var(--vcf-miel);
+  border-color: var(--vcf-miel);
+}
+
+.vcf-btn-demo:focus-visible,
+.vcf-btn-estado:focus-visible {
+  outline: 2px solid var(--vcf-miel);
+  outline-offset: 2px;
+}
+
+/* el hilo de la conversación de muestra */
+.vcf-hilo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 148px;
+}
+
+.vcf-burbuja {
+  max-width: 92%;
+  padding: 12px 15px;
+  border-radius: 15px;
+  font-size: 0.92rem;
+  opacity: 0;
+  animation: vcf-burbuja 0.5s ease forwards;
+}
+
+@keyframes vcf-burbuja {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.vcf-burbuja p {
+  margin: 3px 0 0;
+  font-family: Georgia, serif;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.vcf-burbuja-quien {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.vcf-burbuja-campesino {
+  align-self: flex-end;
+  background: rgba(233, 169, 78, 0.13);
+  border: 1px solid rgba(233, 169, 78, 0.22);
+  border-bottom-right-radius: 5px;
+}
+
+.vcf-burbuja-chagra {
+  align-self: flex-start;
+  background: rgba(183, 201, 138, 0.1);
+  border: 1px solid rgba(183, 201, 138, 0.2);
+  border-bottom-left-radius: 5px;
+}
+
+/* ── secciones ─────────────────────────────────────────────────────────────── */
+.vcf-seccion {
+  max-width: 1000px;
+  margin: clamp(48px, 8vw, 88px) auto 0;
+}
+
+.vcf-seccion h2 {
+  margin: 0;
+  font-family: Georgia, 'Palatino Linotype', serif;
+  font-weight: 400;
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+}
+
+.vcf-seccion-sub {
+  margin: 8px 0 0;
+  max-width: 62ch;
+  color: var(--vcf-ceniza);
+  font-size: 0.94rem;
+}
+
+/* anatomía: 4 momentos */
+.vcf-momentos {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.vcf-momento {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 22px 16px 20px;
+  border: 1px solid var(--vcf-linea);
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--vcf-tierra-2), rgba(43, 31, 23, 0.4));
+}
+
+.vcf-momento h3 {
+  margin: 2px 0 0;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+}
+
+.vcf-momento p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--vcf-ceniza);
+}
+
+/* ── la identidad en pequeño: contextos falsos ─────────────────────────────── */
+.vcf-tamanos {
+  margin-top: 26px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.vcf-contexto {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vcf-contexto figcaption {
+  font-size: 0.8rem;
+  color: var(--vcf-ceniza);
+  text-align: center;
+}
+
+.vcf-falsa-barra,
+.vcf-falso-pie,
+.vcf-falsa-tarjeta {
+  border: 1px solid var(--vcf-linea);
+  border-radius: 16px;
+  background: var(--vcf-tierra-2);
+  min-height: 84px;
+}
+
+.vcf-falsa-barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.vcf-falsa-marca {
+  font-family: Georgia, serif;
+  font-size: 1.05rem;
+  color: var(--vcf-crema);
+}
+
+.vcf-falso-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 7px;
+  border: 1px solid var(--vcf-linea);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--vcf-ceniza);
+  background: rgba(233, 169, 78, 0.07);
+}
+
+.vcf-falso-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.vcf-falsa-pestana { font-size: 0.82rem; color: var(--vcf-ceniza); }
+
+.vcf-falso-fab {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  border: 1px solid var(--vcf-linea);
+  background: radial-gradient(circle at 50% 38%, rgba(233, 169, 78, 0.13), rgba(33, 23, 18, 0.9));
+  transform: translateY(-14px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+
+.vcf-falsa-tarjeta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+}
+
+.vcf-falsa-tarjeta b { font-size: 0.9rem; }
+
+.vcf-falsa-tarjeta p {
+  margin: 3px 0 0;
+  font-size: 0.8rem;
+  color: var(--vcf-ceniza);
+}
+
+/* ── nota de intención ─────────────────────────────────────────────────────── */
+.vcf-intencion {
+  max-width: 720px;
+}
+
+.vcf-intencion > p {
+  margin: 14px 0 0;
+  font-family: Georgia, serif;
+  font-size: clamp(1rem, 2.8vw, 1.12rem);
+  line-height: 1.7;
+  color: var(--vcf-crema);
+}
+
+.vcf-intencion em { color: var(--vcf-miel); }
+
+.vcf-fichas {
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vcf-fichas li {
+  padding: 12px 15px;
+  border: 1px solid var(--vcf-linea);
+  border-radius: 13px;
+  background: var(--vcf-tierra-2);
+  font-size: 0.88rem;
+  color: var(--vcf-ceniza);
+}
+
+.vcf-fichas b { color: var(--vcf-crema); }
+
+.vcf code {
+  font-family: ui-monospace, 'Cascadia Mono', Menlo, monospace;
+  font-size: 0.85em;
+  color: var(--vcf-miel);
+}
+
+.vcf-pie {
+  margin: 26px 0 0;
+  font-size: 0.8rem;
+  color: var(--vcf-ceniza);
+  text-align: center;
+}
+
+/* ── responsive ────────────────────────────────────────────────────────────── */
+@media (max-width: 780px) {
+  .vcf-hero { grid-template-columns: 1fr; }
+  .vcf-nota { min-height: 0; }
+  .vcf-hilo { min-height: 0; }
+}
+
+@media (max-width: 360px) {
+  .vcf { padding-left: 12px; padding-right: 12px; }
+  .vcf-estados { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── prefers-reduced-motion: sin coreografías ──────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .vcf-wake,
+  .vcf-burbuja {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .vcf-luz { transition: none; }
+  .vcf-btn-demo,
+  .vcf-btn-estado { transition: none; }
+  .vcf-btn-demo:hover:not(:disabled) { transform: none; }
+}

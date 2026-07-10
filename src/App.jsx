@@ -89,6 +89,13 @@ const InventoryDashboard = lazy(() => import('./components/InventoryDashboard').
 // 2026-06-30. Se alcanza desde 'bodega' vía el botón "Auditoría y
 // reconciliación", o directo por hash (#auditoria-inventario).
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
+// Mockup dev "La voz con forma": la identidad visual de la voz de Chagra —
+// cuando el campesino dice «hola, Chagra», en vez de un micrófono genérico
+// aparece un iris orgánico (anillos de agua/tronco + brasa) que respira,
+// reacciona al volumen y se aquieta al terminar. Ruta #/mockups/voz-con-forma
+// — sin gate ni sesión (datos de muestra, nivel simulado, no cablea el mic).
+// El primitivo reusable vive en src/visual/voz/IrisVoz.jsx.
+const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -418,6 +425,7 @@ const LoadingFallback = ({ view = null }) => {
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 const HASH_VIEW_ROUTES = {
+  'mockups/voz-con-forma': 'mockup_voz_con_forma',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -915,6 +923,13 @@ export default function App() {
       return;
     }
 
+    // Mockups dev (#/mockups/*): vistas aisladas de decisión visual — se
+    // montan sin sesión (datos de muestra, no tocan datos reales).
+    if (hash === 'mockups/voz-con-forma') {
+      Promise.resolve().then(() => navigate(HASH_VIEW_ROUTES[hash]));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -943,6 +958,11 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockups dev: sin gate ni sesión (datos de muestra).
+      if (routeView === 'mockup_voz_con_forma') {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1190,6 +1210,15 @@ export default function App() {
         return (
           <ErrorBoundary>
             <LoginScreen onLoginSuccess={() => navigate('dashboard')} onSave={showToast} />
+          </ErrorBoundary>
+        );
+      case 'mockup_voz_con_forma':
+        // Mockup "La voz con forma": el iris orgánico que es la identidad
+        // visual de la voz de Chagra (anillos de agua/tronco que respiran,
+        // reaccionan al volumen y se aquietan). Sin gate: datos de muestra.
+        return (
+          <ErrorBoundary>
+            <VozConFormaMockup />
           </ErrorBoundary>
         );
       case 'oauth-callback':
