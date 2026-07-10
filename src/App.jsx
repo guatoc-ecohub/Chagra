@@ -70,6 +70,9 @@ import { ErrorFallback } from './components/common/ErrorFallback';
 // Lazy-loaded route components
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
 const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
+// Vitrina pública de la librería visual reutilizable (`src/visual/`). Ruta
+// #/mockups/visual-lib, resuelta ANTES del check de sesión (no requiere auth).
+const VisualLib = lazy(() => import('./mockups/VisualLib'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -416,6 +419,13 @@ const LoadingFallback = ({ view = null }) => {
 // viva (HERRAMIENTAS_TILES en DashboardLive). Las rutas `casos`/`caso_detail`/
 // `javier`/`usage_stats` siguen vivas en el router (más abajo) y por hash.
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
+
+// Rutas PÚBLICAS de mockups (vitrinas de discovery). Se resuelven ANTES del
+// check de sesión — cualquiera con el enlace las abre sin cuenta, igual que
+// #onboarding-piloto. El hash llega ya normalizado (sin `#`/`#/`).
+const MOCKUP_HASH_ROUTES = {
+  'mockups/visual-lib': 'mockup_visual_lib',
+};
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
@@ -783,7 +793,7 @@ export default function App() {
       clearTimeout(bootSync);
     };
   }, []);
-  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' });
+  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' });
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
@@ -915,6 +925,14 @@ export default function App() {
       return;
     }
 
+    // Rutas públicas de mockups (#/mockups/visual-lib): van ANTES del check de
+    // sesión — son vitrinas de discovery sin datos de finca, se abren sin auth.
+    const mockupView = MOCKUP_HASH_ROUTES[hash];
+    if (mockupView) {
+      Promise.resolve().then(() => navigate(mockupView));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -941,6 +959,12 @@ export default function App() {
   useEffect(() => {
     const handleHashRoute = () => {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+      // Mockups públicos primero: sin gate de sesión ni de rol.
+      const mockupView = MOCKUP_HASH_ROUTES[hash];
+      if (mockupView) {
+        navigate(mockupView);
+        return;
+      }
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
@@ -1097,7 +1121,7 @@ export default function App() {
   // loading. Body className toggled según currentView. Estilos en
   // src/index.css clase .app-bg-biodiversidad (nombre histórico).
   useEffect(() => {
-    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback';
+    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib';
     if (showBg) {
       document.body.classList.add('app-bg-biodiversidad');
     } else {
@@ -1204,6 +1228,17 @@ export default function App() {
                 navigate('login');
               }}
             />
+          </ErrorBoundary>
+        );
+      case 'mockup_visual_lib':
+        // Vitrina pública de la librería visual (`src/visual/`). Ruta
+        // #/mockups/visual-lib, sin auth: recorre el registro consolidado y
+        // dibuja cada primitivo aislado con sus variantes y props.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Librería visual">
+              <VisualLib />
+            </ErrorFallback>
           </ErrorBoundary>
         );
       case 'onboarding-perfil':
@@ -2505,7 +2540,10 @@ export default function App() {
   const isPreAuthView =
     currentView === 'loading' ||
     currentView === 'login' ||
-    currentView === 'oauth-callback';
+    currentView === 'oauth-callback' ||
+    // La vitrina de la librería visual es una página pública autocontenida:
+    // sin banners de instalación/datos ni FABs encima.
+    currentView === 'mockup_visual_lib';
 
   return (
     <>
@@ -2531,10 +2569,10 @@ export default function App() {
           detectamos huella `chagra:had-data-once` en localStorage + IDB
           vacío. NO se muestra en loading/login para no asustar antes de
           que la app pueda confirmar estado. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <DataLossBanner />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <DataLossBanner />}
       {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
           crítico) sin abrir la campana. Imposible de ignorar. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <CriticalAlertBanner onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <CriticalAlertBanner onNavigate={navigate} />}
       {/* Entrada de pantalla: el swap de vista era SECO (desmonta/monta sin
           transición). El wrapper con key remonta en cada cambio de vista y
           dispara un fade corto (motion.css .anim-screen-enter — solo opacidad,
@@ -2563,7 +2601,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
@@ -2577,9 +2615,9 @@ export default function App() {
           Para re-habilitar el tap: descomentar el import de EscuchaFab (arriba)
           y la línea del render de abajo. */}
       {/* {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />} */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <EscuchaOverlay />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && <SyncProgressIndicator />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <SyncProgressIndicator />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}

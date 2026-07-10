@@ -1,0 +1,554 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   SCENE "FINCA ORGANISMO" (tema biopunk) — animaciones del port fiel del
+   mockup aprobado escena-home-biopunk-v2.html. Todo es CSS/SVG declarativo
+   (cero JS por frame). Prefijo `fvo-` en clases y keyframes para no chocar
+   con el resto del hero. prefers-reduced-motion = estado estático digno
+   (misma receta del mockup: red encendida, chispas plantadas, sin ondas).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.fvo-svg {
+  /* ritmo cardíaco compartido: corazón, red, savia, paneles y reactor laten
+     al MISMO pulso (la finca es UN organismo) */
+  --fvo-beat: 5.2s;
+}
+
+/* estrellas que titilan */
+.fvo-tw { animation: fvo-tw 3.4s ease-in-out infinite; }
+@keyframes fvo-tw { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+/* halo lunar que respira */
+.fvo-halo { transform-box: fill-box; transform-origin: center; animation: fvo-halo 8s ease-in-out infinite; }
+@keyframes fvo-halo { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.12); opacity: 0.9; } }
+
+/* aurora de páramo */
+.fvo-aurora { animation: fvo-aurora 14s ease-in-out infinite alternate; }
+@keyframes fvo-aurora { from { opacity: 0.10; transform: translateX(-8px); } to { opacity: 0.28; transform: translateX(10px); } }
+
+/* respiración de toda la finca */
+.fvo-breathe { transform-box: fill-box; transform-origin: 50% 100%; animation: fvo-breathe 7s ease-in-out infinite; }
+@keyframes fvo-breathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.012); } }
+
+/* latido del corazón micorrízico (doble pulso, como corazón real) */
+.fvo-heart { transform-box: fill-box; transform-origin: center; animation: fvo-beat var(--fvo-beat) ease-in-out infinite; }
+@keyframes fvo-beat {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  6% { transform: scale(1.35); filter: brightness(2.2); }
+  12% { transform: scale(1); }
+  18% { transform: scale(1.22); filter: brightness(1.7); }
+  26% { transform: scale(1); filter: brightness(1); }
+}
+.fvo-heart-wave { transform-box: fill-box; transform-origin: center; animation: fvo-hwave var(--fvo-beat) ease-out infinite; }
+@keyframes fvo-hwave {
+  0% { transform: scale(0.2); opacity: 0.7; }
+  45% { transform: scale(2.6); opacity: 0; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+/* la red entera se enciende con cada latido */
+.fvo-net { animation: fvo-netglow var(--fvo-beat) ease-in-out infinite; }
+@keyframes fvo-netglow { 0%, 100% { opacity: 0.55; } 8% { opacity: 1; } 16% { opacity: 0.7; } 22% { opacity: 0.9; } 34% { opacity: 0.55; } }
+
+/* flujo de savia por las hifas */
+.fvo-hypha { stroke-dasharray: 5 9; animation: fvo-flow 2.6s linear infinite; }
+.fvo-hypha.fvo-slow { animation-duration: 4.5s; stroke-dasharray: 3 11; }
+.fvo-hypha.fvo-rev { animation-direction: reverse; }
+@keyframes fvo-flow { to { stroke-dashoffset: -56; } }
+
+/* nutrientes viajando (motion path) */
+.fvo-spark {
+  offset-rotate: 0deg;
+  animation: fvo-travel 6s linear infinite;
+  filter: drop-shadow(0 0 4px #2dffc4);
+}
+.fvo-spark.fvo-p1 { offset-path: path('M195,405 C160,392 120,380 78,352'); animation-delay: 0s; }
+.fvo-spark.fvo-p2 { offset-path: path('M195,405 C230,388 268,375 300,350'); animation-delay: 1.6s; animation-duration: 5s; }
+.fvo-spark.fvo-p3 { offset-path: path('M195,405 C185,378 172,360 150,344'); animation-delay: 3.1s; animation-duration: 4.2s; }
+.fvo-spark.fvo-p4 { offset-path: path('M195,405 C240,420 300,432 368,424'); animation-delay: 2.2s; animation-duration: 7s; }
+.fvo-spark.fvo-p5 { offset-path: path('M195,405 C150,428 90,440 24,430'); animation-delay: 4.4s; animation-duration: 7s; }
+.fvo-spark.fvo-p6 { offset-path: path('M295,352 C295,320 295,300 295,278'); animation-delay: 0.8s; animation-duration: 3.6s; }
+@keyframes fvo-travel {
+  0% { offset-distance: 0%; opacity: 0; }
+  12% { opacity: 1; }
+  82% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+
+/* colibrí de luz (vuela por el cielo y se queda libando en el aire) */
+.fvo-colibri {
+  offset-path: path('M-30,118 C70,74 140,148 198,104 C246,70 268,138 342,112 C300,96 250,150 198,104');
+  offset-rotate: 0deg;
+  animation: fvo-vuelo 22s ease-in-out infinite;
+}
+@keyframes fvo-vuelo {
+  0% { offset-distance: 0%; }
+  30% { offset-distance: 38%; }
+  40% { offset-distance: 41%; }
+  68% { offset-distance: 62%; }
+  78% { offset-distance: 64%; }
+  100% { offset-distance: 100%; }
+}
+.fvo-ala { transform-box: fill-box; transform-origin: 20% 90%; animation: fvo-ala 0.12s ease-in-out infinite alternate; }
+@keyframes fvo-ala { from { transform: rotate(-26deg); } to { transform: rotate(34deg); } }
+.fvo-estela { transform-box: fill-box; transform-origin: center; animation: fvo-estela 1.1s ease-out infinite; }
+.fvo-estela.fvo-e2 { animation-delay: 0.35s; }
+.fvo-estela.fvo-e3 { animation-delay: 0.7s; }
+@keyframes fvo-estela { 0% { transform: scale(0.4); opacity: 0.9; } 100% { transform: scale(2.4); opacity: 0; } }
+
+/* cocuyos (luciérnagas) */
+.fvo-fly { animation: fvo-fly 9s ease-in-out infinite alternate, fvo-blink 2.3s ease-in-out infinite; }
+.fvo-fly.fvo-f2 { animation-duration: 11s, 3.1s; animation-delay: -3s, -1s; }
+.fvo-fly.fvo-f3 { animation-duration: 8s, 1.9s; animation-delay: -5s, -0.4s; }
+.fvo-fly.fvo-f4 { animation-duration: 13s, 2.7s; animation-delay: -8s, -1.7s; }
+.fvo-fly.fvo-f5 { animation-duration: 10s, 2.1s; animation-delay: -2s, -0.9s; }
+@keyframes fvo-fly {
+  from { transform: translate(0, 0); }
+  33% { transform: translate(14px, -10px); }
+  66% { transform: translate(-8px, 6px); }
+  to { transform: translate(10px, -14px); }
+}
+@keyframes fvo-blink { 0%, 100% { opacity: 0.1; } 45%, 55% { opacity: 1; } }
+
+/* niebla de páramo */
+.fvo-fog { animation: fvo-fog 36s ease-in-out infinite alternate; }
+.fvo-fog.fvo-g2 { animation-duration: 46s; animation-delay: -18s; }
+.fvo-fog.fvo-g3 { animation-duration: 28s; animation-delay: -9s; }
+@keyframes fvo-fog { from { transform: translateX(-26px); } to { transform: translateX(30px); } }
+
+/* cúpula-célula: respira */
+.fvo-dome { transform-box: fill-box; transform-origin: 50% 100%; animation: fvo-dome 6s ease-in-out infinite; }
+@keyframes fvo-dome { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035, 1.05); } }
+.fvo-organela { transform-box: fill-box; transform-origin: center; animation: fvo-orga 12s ease-in-out infinite alternate; }
+.fvo-organela.fvo-o2 { animation-duration: 15s; animation-delay: -6s; }
+.fvo-organela.fvo-o3 { animation-duration: 9s; animation-delay: -3s; }
+@keyframes fvo-orga {
+  from { transform: translate(0, 0); }
+  50% { transform: translate(-9px, 6px); }
+  to { transform: translate(7px, -8px); }
+}
+
+/* plantas: savia que late */
+.fvo-sap { animation: fvo-sap var(--fvo-beat) ease-in-out infinite; }
+.fvo-sap.fvo-s2 { animation-delay: 0.35s; }
+.fvo-sap.fvo-s3 { animation-delay: 0.7s; }
+.fvo-sap.fvo-s4 { animation-delay: 1.05s; }
+.fvo-sap.fvo-s5 { animation-delay: 1.4s; }
+@keyframes fvo-sap { 0%, 100% { opacity: 0.55; } 10% { opacity: 1; } 20% { opacity: 0.65; } 26% { opacity: 0.9; } 40% { opacity: 0.55; } }
+.fvo-berry { transform-box: fill-box; transform-origin: center; animation: fvo-berry 3.8s ease-in-out infinite; }
+.fvo-berry.fvo-b2 { animation-delay: -1.2s; }
+.fvo-berry.fvo-b3 { animation-delay: -2.4s; }
+.fvo-berry.fvo-b4 { animation-delay: -0.6s; }
+@keyframes fvo-berry { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.35); } }
+
+/* frailejón que exhala luz */
+.fvo-frailejon { animation: fvo-frail 6.5s ease-in-out infinite; }
+.fvo-frailejon.fvo-fr2 { animation-delay: -3s; }
+@keyframes fvo-frail { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+/* hongos + esporas */
+.fvo-cap { animation: fvo-cap 4.4s ease-in-out infinite; }
+.fvo-cap.fvo-c2 { animation-delay: -2.2s; }
+@keyframes fvo-cap { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+.fvo-spore { animation: fvo-spore 6s linear infinite; }
+.fvo-spore.fvo-sp2 { animation-delay: -2s; }
+.fvo-spore.fvo-sp3 { animation-delay: -4s; }
+@keyframes fvo-spore {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 0.9; }
+  100% { transform: translateY(-46px); opacity: 0; }
+}
+
+/* brasas del fogón */
+.fvo-brasa { animation: fvo-brasa 4.2s linear infinite; }
+.fvo-brasa.fvo-br2 { animation-delay: -1.4s; }
+.fvo-brasa.fvo-br3 { animation-delay: -2.8s; }
+@keyframes fvo-brasa {
+  0% { transform: translate(0, 0); opacity: 0; }
+  12% { opacity: 1; }
+  60% { transform: translate(5px, -30px); opacity: 0.7; }
+  100% { transform: translate(-3px, -52px); opacity: 0; }
+}
+.fvo-ventana { animation: fvo-ventana 3.2s ease-in-out infinite; }
+@keyframes fvo-ventana { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
+
+/* invernadero-célula: paneles + reactor que late */
+.fvo-panel { animation: fvo-panel var(--fvo-beat) ease-in-out infinite; }
+.fvo-panel.fvo-pa2 { animation-delay: 0.3s; }
+.fvo-panel.fvo-pa3 { animation-delay: 0.6s; }
+@keyframes fvo-panel { 0%, 100% { opacity: 0.45; } 9% { opacity: 0.85; } 18% { opacity: 0.55; } 26% { opacity: 0.7; } }
+.fvo-reactor { transform-box: fill-box; transform-origin: center; animation: fvo-reactor var(--fvo-beat) ease-in-out infinite; }
+@keyframes fvo-reactor {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  8% { transform: scale(1.2); filter: brightness(1.7); }
+  16% { transform: scale(1); }
+}
+.fvo-lamplight { animation: fvo-lamplight var(--fvo-beat) ease-in-out infinite; }
+@keyframes fvo-lamplight { 0%, 100% { opacity: 0.22; } 8% { opacity: 0.5; } 18% { opacity: 0.28; } }
+.fvo-vent { animation: fvo-ventpulse 3.4s ease-in-out infinite; }
+@keyframes fvo-ventpulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+/* campesino con alma */
+.fvo-campesino { transform-box: fill-box; transform-origin: 50% 100%; animation: fvo-campe 6.5s ease-in-out infinite; }
+@keyframes fvo-campe { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-0.7px) rotate(0.5deg); } }
+.fvo-head-c { transform-box: fill-box; transform-origin: 50% 88%; animation: fvo-headlook 11s ease-in-out infinite; }
+@keyframes fvo-headlook { 0%, 60%, 100% { transform: rotate(0); } 72%, 86% { transform: rotate(-7deg); } }
+.fvo-lantern { transform-box: fill-box; transform-origin: 50% 4%; animation: fvo-lantsway 4.6s ease-in-out infinite; }
+@keyframes fvo-lantsway { 0%, 100% { transform: rotate(-4.5deg); } 50% { transform: rotate(4.5deg); } }
+.fvo-lantorb { transform-box: fill-box; transform-origin: center; animation: fvo-lantorb 2.8s ease-in-out infinite; }
+@keyframes fvo-lantorb { 0%, 100% { opacity: 0.8; transform: scale(1); } 50% { opacity: 1; transform: scale(1.12); } }
+.fvo-lantpool { animation: fvo-lantpool 2.8s ease-in-out infinite; }
+@keyframes fvo-lantpool { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.62; } }
+
+/* perro criollo */
+.fvo-dog { transform-box: fill-box; transform-origin: 50% 100%; animation: fvo-dogbob 3.1s ease-in-out infinite; }
+@keyframes fvo-dogbob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-0.5px); } }
+.fvo-tail { transform-box: fill-box; transform-origin: 100% 100%; animation: fvo-tail 0.42s ease-in-out infinite alternate; }
+@keyframes fvo-tail { from { transform: rotate(-20deg); } to { transform: rotate(28deg); } }
+.fvo-earw { transform-box: fill-box; transform-origin: 50% 0; animation: fvo-earw 2.4s ease-in-out infinite; }
+@keyframes fvo-earw { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-9deg); } }
+
+/* estrella fugaz + aves lejanas */
+.fvo-shoot { animation: fvo-shoot 9s ease-in infinite; }
+@keyframes fvo-shoot {
+  0%, 66% { opacity: 0; transform: translate(0, 0); }
+  68% { opacity: 1; }
+  78% { opacity: 1; }
+  85% { opacity: 0; transform: translate(66px, 30px); }
+  100% { opacity: 0; transform: translate(66px, 30px); }
+}
+.fvo-vbird { animation: fvo-vbird 26s linear infinite; }
+@keyframes fvo-vbird {
+  from { transform: translate(0, 0); }
+  50% { transform: translate(-22px, 4px); }
+  to { transform: translate(-44px, 0); }
+}
+.fvo-flap { transform-box: fill-box; transform-origin: center; animation: fvo-flap 1.6s ease-in-out infinite; }
+@keyframes fvo-flap { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.55); } }
+
+/* ── SOL Y LUNA según la atmósfera real ────────────────────────────────────
+   FincaVivaHero estampa data-luz (amanecer|dia|atardecer|noche) y data-clima
+   (despejado|nublado|lluvia|niebla) en .fvh (atmosphereService, offline-first
+   por efemérides). La escena ya no es "siempre de noche": de día sale el sol
+   biopunk, al amanecer/atardecer el cielo se enciende cálido y de noche vuelve
+   la luna. Sin data-luz (sin señal) la escena conserva su identidad nocturna. */
+.fvo-cielo-dia,
+.fvo-cielo-crep { opacity: 0; transition: opacity 1.2s ease; }
+.fvo-sol-g { display: none; }
+
+.fvh[data-luz='dia'] .fvo-sol-g,
+.fvh[data-luz='amanecer'] .fvo-sol-g,
+.fvh[data-luz='atardecer'] .fvo-sol-g { display: inline; }
+
+.fvh[data-luz='dia'] .fvo-luna-g,
+.fvh[data-luz='amanecer'] .fvo-luna-g,
+.fvh[data-luz='atardecer'] .fvo-luna-g { display: none; }
+
+.fvh[data-luz='dia'] .fvo-cielo-dia { opacity: 0.68; }
+
+.fvh[data-luz='amanecer'] .fvo-cielo-crep,
+.fvh[data-luz='atardecer'] .fvo-cielo-crep { opacity: 0.5; }
+
+/* al amanecer/atardecer el sol anda BAJO, cerca del filo de la montaña */
+.fvh[data-luz='amanecer'] .fvo-sol-g,
+.fvh[data-luz='atardecer'] .fvo-sol-g { transform: translateY(26px); }
+
+/* de día las estrellas descansan; en el crepúsculo apenas se insinúan */
+.fvh[data-luz='dia'] .fvo-tw,
+.fvh[data-luz='dia'] .fvo-shoot { display: none; }
+
+.fvh[data-luz='amanecer'] .fvo-tw,
+.fvh[data-luz='atardecer'] .fvo-tw { animation: none; opacity: 0.3; }
+
+/* clima: nublado/lluvia/niebla traen nubes y velan el astro (honesto: el
+   cielo de la escena cuenta el clima que el piloto ve por la ventana) */
+.fvo-nubes { display: none; }
+
+.fvh[data-clima='nublado'] .fvo-nubes,
+.fvh[data-clima='lluvia'] .fvo-nubes,
+.fvh[data-clima='niebla'] .fvo-nubes { display: inline; }
+
+.fvh[data-clima='nublado'] .fvo-astro { opacity: 0.45; }
+.fvh[data-clima='lluvia'] .fvo-astro { opacity: 0.3; }
+.fvh[data-clima='niebla'] .fvo-astro { opacity: 0.55; }
+
+/* corona del sol: respira (transform+opacity, GPU) */
+.fvo-corona {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-corona 5s ease-in-out infinite;
+}
+
+@keyframes fvo-corona {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.06); opacity: 0.9; }
+}
+
+/* ── LA VIDA DEL SUELO: micelio fino, nodos, lombrices y bichitos ──────────
+   El micelio fino respira con el mismo latido de la red; los nodos
+   micorrízicos titilan (intercambio azúcar↔nutrientes); las lombrices se
+   estiran y encogen al avanzar; el colémbolo pega brinquitos. Todo
+   transform/opacity — cero blur/filtro animado. */
+.fvo-micelio {
+  animation: fvo-netglow var(--fvo-beat) ease-in-out infinite;
+  animation-delay: -0.4s;
+}
+
+.fvo-nodo { animation: fvo-tw 3.8s ease-in-out infinite; }
+.fvo-nodo.fvo-n2 { animation-delay: -1.3s; }
+.fvo-nodo.fvo-n3 { animation-delay: -2.4s; }
+
+.fvo-lombriz {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-lombriz 7s ease-in-out infinite;
+}
+
+.fvo-lombriz.fvo-l2 { animation-delay: -3.2s; animation-duration: 8.5s; }
+
+@keyframes fvo-lombriz {
+  0%, 100% { transform: translateX(0) scaleX(1); }
+  50% { transform: translateX(3px) scaleX(0.94); }
+}
+
+.fvo-bicho {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-bicho 9s ease-in-out infinite;
+}
+
+@keyframes fvo-bicho {
+  0%, 100% { transform: translateX(0); }
+  45%, 55% { transform: translateX(-6px); }
+}
+
+.fvo-bicho.fvo-bi2 { animation: fvo-brinco 4.6s ease-in-out infinite; }
+
+@keyframes fvo-brinco {
+  0%, 86%, 100% { transform: translate(0, 0); }
+  90% { transform: translate(-3px, -6px); }
+  94% { transform: translate(-5px, 0); }
+}
+
+/* ── QUEBRADA: el agua corre, cae en cascaditas y ondea en el pocito ───────
+   La corriente es el mismo truco de las hifas (dash que corre); los destellos
+   de cascada titilan; el remanso emite ondas concéntricas. Todo dash/opacity/
+   transform — nada de filtros animados. */
+.fvo-agua { stroke-dasharray: 8 5; animation: fvo-aguaflow 1.9s linear infinite; }
+.fvo-agua.fvo-a2 { stroke-dasharray: 4 8; animation-duration: 2.7s; animation-delay: -0.8s; }
+@keyframes fvo-aguaflow { to { stroke-dashoffset: -52; } }
+
+.fvo-destello { animation: fvo-tw 2.6s ease-in-out infinite; }
+
+.fvo-onda {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-onda 4.2s ease-out infinite;
+}
+
+.fvo-onda.fvo-on2 { animation-delay: -2.1s; }
+
+@keyframes fvo-onda {
+  0% { transform: scale(0.3); opacity: 0.8; }
+  70%, 100% { transform: scale(1.7); opacity: 0; }
+}
+
+.fvo-reflejo { animation: fvo-reflejo 5s ease-in-out infinite; }
+@keyframes fvo-reflejo { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.6; } }
+
+/* ── RAYO DEL ASTRO: la luz cae en diagonal y respira ── */
+.fvo-rayo { animation: fvo-rayo 9s ease-in-out infinite; }
+@keyframes fvo-rayo { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* ── POTRERO: LA VACA ──────────────────────────────────────────────────────
+   Respira con la panza (scaleY desde el vientre), pasta de a ratos (la
+   cabeza baja y vuelve), espanta con la cola y las manchas bioluminiscentes
+   laten con el MISMO pulso var(--fvo-beat) de la red — la vaca es parte del
+   organismo, no un sticker encima. */
+.fvo-vaca-cuerpo {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: fvo-vacabreathe 3.8s ease-in-out infinite;
+}
+
+@keyframes fvo-vacabreathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.04); }
+}
+
+.fvo-vaca-cabeza {
+  transform-box: fill-box;
+  transform-origin: 92% 42%;
+  animation: fvo-vacapasta 11s ease-in-out infinite;
+}
+
+@keyframes fvo-vacapasta {
+  0%, 36%, 100% { transform: rotate(0deg); }
+  44%, 66% { transform: rotate(13deg); }
+  52% { transform: rotate(11deg); }
+  76% { transform: rotate(-2deg); }
+  84% { transform: rotate(0deg); }
+}
+
+.fvo-vaca-cola {
+  transform-box: fill-box;
+  transform-origin: 20% 6%;
+  animation: fvo-vacacola 6.5s ease-in-out infinite;
+}
+
+@keyframes fvo-vacacola {
+  0%, 52%, 100% { transform: rotate(0deg); }
+  60% { transform: rotate(18deg); }
+  70% { transform: rotate(-12deg); }
+  80% { transform: rotate(9deg); }
+  88% { transform: rotate(0deg); }
+}
+
+.fvo-vaca-oreja {
+  transform-box: fill-box;
+  transform-origin: 10% 90%;
+  animation: fvo-vacaoreja 7s ease-in-out infinite;
+}
+
+@keyframes fvo-vacaoreja {
+  0%, 78%, 100% { transform: rotate(0deg); }
+  84% { transform: rotate(-16deg); }
+  90% { transform: rotate(4deg); }
+}
+
+/* manchas de la vaca: laten con el corazón de la finca */
+.fvo-mancha { animation: fvo-mancha var(--fvo-beat) ease-in-out infinite; }
+.fvo-mancha.fvo-m2 { animation-delay: 0.3s; }
+.fvo-mancha.fvo-m3 { animation-delay: 0.6s; }
+@keyframes fvo-mancha { 0%, 100% { opacity: 0.45; } 8% { opacity: 1; } 16% { opacity: 0.6; } 24% { opacity: 0.85; } 36% { opacity: 0.45; } }
+
+/* ── POTRERO: LAS GALLINAS pican el pasto (doble picoteo con pausa; cada
+   una a su ritmo). La espejada (mira a la izquierda) picotea al revés. */
+.fvo-gallina {
+  transform-box: fill-box;
+  transform-origin: 64% 100%;
+  animation: fvo-picoteo 3.6s ease-in-out infinite;
+}
+
+.fvo-gallina.fvo-ga2 { animation-duration: 4.4s; animation-delay: -1.3s; }
+.fvo-gallina.fvo-ga3 { animation-duration: 3.1s; animation-delay: -2.2s; }
+
+@keyframes fvo-picoteo {
+  0%, 34%, 100% { transform: rotate(0deg); }
+  40% { transform: rotate(24deg); }
+  46% { transform: rotate(5deg); }
+  52% { transform: rotate(26deg); }
+  58% { transform: rotate(0deg); }
+}
+
+.fvo-gallina.fvo-ga-esp {
+  transform-origin: 36% 100%;
+  animation-name: fvo-picoteo-esp;
+}
+
+@keyframes fvo-picoteo-esp {
+  0%, 34%, 100% { transform: rotate(0deg); }
+  40% { transform: rotate(-24deg); }
+  46% { transform: rotate(-5deg); }
+  52% { transform: rotate(-26deg); }
+  58% { transform: rotate(0deg); }
+}
+
+/* ── POTRERO como PUERTA al mundo de los animales ──────────────────────────
+   Con data-tap el grupo es un botón: cursor, halo-invitación que emana cada
+   6s, etiqueta que respira y anillo de foco accesible (:focus-visible). */
+.fvo-animales[data-tap='1'] { cursor: pointer; outline: none; }
+
+.fvo-cta-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-ctahalo 6s ease-out infinite;
+  opacity: 0;
+}
+
+@keyframes fvo-ctahalo {
+  0%, 55% { transform: scale(0.55); opacity: 0; }
+  62% { opacity: 0.7; }
+  100% { transform: scale(1.12); opacity: 0; }
+}
+
+.fvo-cta-tag { animation: fvo-ctatag 6s ease-in-out infinite; }
+@keyframes fvo-ctatag { 0%, 100% { opacity: 0.55; } 60% { opacity: 1; } }
+
+.fvo-animales[data-tap='1']:focus-visible .fvo-cta-anillo { opacity: 1; }
+.fvo-animales[data-tap='1']:hover .fvo-cta-tag { opacity: 1; animation: none; }
+
+/* ── polillas del farol (revolotean cortico y titilan) ── */
+.fvo-polilla {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-polilla 3.4s ease-in-out infinite alternate, fvo-blink 1.7s ease-in-out infinite;
+}
+
+.fvo-polilla.fvo-po2 { animation-duration: 2.6s, 2.3s; animation-delay: -1.3s, -0.6s; }
+
+@keyframes fvo-polilla {
+  from { transform: translate(0, 0); }
+  33% { transform: translate(-4px, -5px); }
+  66% { transform: translate(3px, -2px); }
+  to { transform: translate(-2px, 3px); }
+}
+
+/* ── reduced motion: estado estático DIGNO (como el mockup) ────────────────
+   El apagado global de animaciones ya lo hace finca-viva-hero.css
+   (`.fvh * { animation: none !important }`); aquí se compone la foto fija:
+   red encendida, chispas plantadas a mitad de camino, colibrí libando,
+   sin ondas de latido ni estelas ni estrella fugaz. */
+@media (prefers-reduced-motion: reduce) {
+  .fvo-svg * { animation: none !important; }
+  .fvo-hypha { stroke-dasharray: none; }
+  .fvo-spark { offset-distance: 55%; opacity: 0.9; }
+  .fvo-colibri { offset-distance: 40%; }
+  .fvo-heart-wave,
+  .fvo-estela { opacity: 0; }
+  .fvo-fly { opacity: 0.8; }
+  .fvo-net { opacity: 0.85; }
+  .fvo-shoot { opacity: 0; }
+  .fvo-panel { opacity: 0.7; }
+  .fvo-lamplight { opacity: 0.3; }
+  .fvo-lantpool { opacity: 0.5; }
+  /* la vida del suelo queda quieta pero visible (foto fija digna) */
+  .fvo-micelio { opacity: 0.38; }
+  .fvo-nodo { opacity: 0.85; }
+  /* la quebrada queda llena (sin dash), el remanso quieto y brillante */
+  .fvo-agua { stroke-dasharray: none; }
+  .fvo-onda { opacity: 0; }
+  .fvo-reflejo { opacity: 0.5; }
+  .fvo-destello { opacity: 0.7; }
+  .fvo-rayo { opacity: 0.7; }
+  /* el potrero posa: vaca erguida, manchas encendidas, gallinas de pie;
+     la invitación al mundo animales queda como etiqueta fija visible */
+  .fvo-mancha { opacity: 0.85; }
+  .fvo-cta-halo { opacity: 0; }
+  .fvo-cta-tag { opacity: 0.9; }
+  .fvo-polilla { opacity: 0.7; }
+}
+
+/* ── CORAZÓN TAPPABLE = "PREGUNTE" (usabilidad campesina #4) ───────────────
+   Cuando FincaVivaHero pasa onPregunte, el corazón-semilla es un botón que
+   abre el agente. Cursor, foco visible para teclado y un halo-invitación que
+   respira (se apaga con prefers-reduced-motion, quedando el halo fijo). */
+.fvo-corazon-tap {
+  cursor: pointer;
+  outline: none;
+}
+.fvo-corazon-tap:focus-visible ellipse:first-of-type {
+  stroke: #eafff6;
+  stroke-width: 2;
+  opacity: 0.9;
+}
+.fvo-corazon-tap:active .fvo-heart { opacity: 0.85; }
+.fvo-corazon-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fvo-corazon-invita 2.4s ease-out infinite;
+}
+@keyframes fvo-corazon-invita {
+  0% { transform: scale(0.8); opacity: 0.55; }
+  70%, 100% { transform: scale(1.35); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fvo-corazon-halo { animation: none !important; opacity: 0.4; }
+}
