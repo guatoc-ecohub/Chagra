@@ -48,6 +48,10 @@ chagra-anthropic-judge-key
 /data/bench-runs-test/
 /data/species-cleanup/
 /data/intelligence-history.jsonl
+# Dataset DPO derivado (scripts/build-dpo-dataset.mjs) para el experimento B7:
+# se regenera desde data/bench-runs/*.judged.jsonl (que también es local). No
+# se commitea el dataset, sólo el script + test que lo producen.
+/data/dpo/
 
 # Catálogo SQLite tracked desde 2026-04-25:
 # se genera con scripts/build-catalog-sqlite.mjs desde seeds en
