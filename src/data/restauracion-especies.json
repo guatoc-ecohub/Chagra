@@ -10,8 +10,7 @@
       ],
       "intermedias": [
         { "nombre": "Nacedero", "cientifico": "Trichanthera gigantea", "nota": "Forrajera, ripario" },
-        { "nombre": "Guadua", "cientifico": "Guadua angustifolia", "nota": "Bambu nativo, fija laderas" },
-        { "nombre": "Caniafistula", "cientifico": "Cassia fistula", "nota": "Ornamental, nitrogeno" }
+        { "nombre": "Guadua", "cientifico": "Guadua angustifolia", "nota": "Bambu nativo, fija laderas" }
       ],
       "climax": [
         { "nombre": "Cedro", "cientifico": "Cedrela odorata", "nota": "Madera noble, lento" },
@@ -56,16 +55,13 @@
       ],
       "intermedias": [
         { "nombre": "Frailejon", "cientifico": "Espeletia grandiflora", "nota": "1 cm/ano de crecimiento. 200-300 anos de vida. NO trasplantar adulto" }
-      ],
-      "climax": [
-        { "nombre": "Frailejonal maduro", "cientifico": "Complejo Espeletia spp.", "nota": "Ecosistema paramuno maduro. Captura niebla = agua" }
       ]
     }
   },
   "invasoras_manejo": [
     { "nombre": "Retamo espinoso", "cientifico": "Ulex europaeus", "manejo": "Control manual antes de floracion. NO quemar (rebrota). Minimo 3 anos de seguimiento." },
     { "nombre": "Retamo liso", "cientifico": "Genista monspessulana", "manejo": "Similar al retamo espinoso. Raiz profunda, arrancar completo." },
-    { "nombre": "Kikuyo", "cientifico": "Pennisetum clandestinum", "manejo": "Sombreado con pioneras de rapido crecimiento. Mulch denso." },
+    { "nombre": "Kikuyo", "cientifico": "Cenchrus clandestinus", "manejo": "Sombreado con pioneras de rapido crecimiento. Mulch denso." },
     { "nombre": "Ojo de poeta", "cientifico": "Thunbergia alata", "manejo": "Control manual. Trepadora invasora de bordes de bosque." }
   ]
 }

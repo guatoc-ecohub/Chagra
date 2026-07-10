@@ -15,13 +15,14 @@
       "threat_status",
       "conservation_status"
     ],
-    "species_count": 108,
+    "species_count": 129,
     "relation_count": 1297,
     "note": "Datos derivados del grafo AGE. NO contiene infraestructura ni secretos.",
     "pest_synonyms_count": 162,
     "pest_labels_count": 78,
     "pest_synonyms_added": "2026-06-25",
-    "frutales_tuberculos_fable_enriched": "2026-07-06"
+    "frutales_tuberculos_fable_enriched": "2026-07-06",
+    "restauracion_grounding_fix_2026_07_09": "+21 especies (audit AUDIT-RESTAURACION-GROUNDING-2026-07-09.md); establishment_means corregido en cordia_alliodora, tabebuia_rosea, enterolobium_cyclocarpum"
   },
   "_pest_synonyms": {
     "gota": "Tizon tardio / gota (papa y tomate)",
@@ -836,7 +837,7 @@
     "enterolobium_cyclocarpum": {
       "nombre_comun": "Orejero",
       "nombre_cientifico": "Enterolobium cyclocarpum (Jacq.) Griseb.",
-      "establishment_means": "introducido",
+      "establishment_means": "nativo",
       "threat_status": "LEAST_CONCERN",
       "conservation_status": "nativo_silvestre",
       "compatible_with": [
@@ -3127,7 +3128,7 @@
     "cordia_alliodora": {
       "nombre_comun": "Nogal cafetero",
       "nombre_cientifico": "Cordia alliodora (Ruiz & Pav.) Oken",
-      "establishment_means": "introducido",
+      "establishment_means": "nativo",
       "threat_status": "LEAST_CONCERN",
       "conservation_status": "nativo_silvestre",
       "compatible_with": [
@@ -3143,7 +3144,7 @@
     "tabebuia_rosea": {
       "nombre_comun": "Guayacán rosado",
       "nombre_cientifico": "Tabebuia rosea (Bertol.) DC.",
-      "establishment_means": "introducido",
+      "establishment_means": "nativo",
       "threat_status": "LEAST_CONCERN",
       "conservation_status": "nativo_silvestre",
       "compatible_with": [
@@ -4985,6 +4986,156 @@
           ]
         }
       ]
+    },
+    "ochroma_pyramidale": {
+      "nombre_comun": "Balso",
+      "nombre_cientifico": "Ochroma pyramidale (Cav. ex Lam.) Urb.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "guazuma_ulmifolia": {
+      "nombre_comun": "Guácimo",
+      "nombre_cientifico": "Guazuma ulmifolia Lam.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "trichanthera_gigantea": {
+      "nombre_comun": "Nacedero",
+      "nombre_cientifico": "Trichanthera gigantea (Bonpl.) Nees",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "guadua_angustifolia": {
+      "nombre_comun": "Guadua",
+      "nombre_cientifico": "Guadua angustifolia Kunth",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "cedrela_odorata": {
+      "nombre_comun": "Cedro",
+      "nombre_cientifico": "Cedrela odorata L.",
+      "establishment_means": "nativo",
+      "threat_status": "VULNERABLE",
+      "conservation_status": "nativo_protegido"
+    },
+    "anacardium_excelsum": {
+      "nombre_comun": "Caracolí",
+      "nombre_cientifico": "Anacardium excelsum (Bertero & Balb. ex Kunth) Skeels",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "ceiba_pentandra": {
+      "nombre_comun": "Ceiba",
+      "nombre_cientifico": "Ceiba pentandra (L.) Gaertn.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "baccharis_latifolia": {
+      "nombre_comun": "Chilco",
+      "nombre_cientifico": "Baccharis latifolia (Ruiz & Pav.) Pers.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "myrcianthes_leucoxyla": {
+      "nombre_comun": "Arrayán",
+      "nombre_cientifico": "Myrcianthes leucoxyla (Ortega) McVaugh",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_protegido"
+    },
+    "morella_pubescens": {
+      "nombre_comun": "Laurel de cera",
+      "nombre_cientifico": "Morella pubescens (Humb. & Bonpl. ex Willd.) Wilbur",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "cedrela_montana": {
+      "nombre_comun": "Cedro andino",
+      "nombre_cientifico": "Cedrela montana Moritz ex Turcz.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_protegido"
+    },
+    "juglans_neotropica": {
+      "nombre_comun": "Nogal",
+      "nombre_cientifico": "Juglans neotropica Diels",
+      "establishment_means": "nativo",
+      "threat_status": "ENDANGERED",
+      "conservation_status": "nativo_protegido"
+    },
+    "hesperomeles_goudotiana": {
+      "nombre_comun": "Mortiño",
+      "nombre_cientifico": "Hesperomeles goudotiana (Decne.) Killip",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "polylepis_quadrijuga": {
+      "nombre_comun": "Polylepis / Colorado",
+      "nombre_cientifico": "Polylepis quadrijuga Bitter",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_protegido"
+    },
+    "ceroxylon_quindiuense": {
+      "nombre_comun": "Palma de cera del Quindío",
+      "nombre_cientifico": "Ceroxylon quindiuense (H.Karst.) H.Wendl.",
+      "establishment_means": "nativo",
+      "threat_status": "ENDANGERED",
+      "conservation_status": "nativo_protegido"
+    },
+    "diplostephium_rosmarinifolium": {
+      "nombre_comun": "Romero de páramo",
+      "nombre_cientifico": "Diplostephium rosmarinifolium (Benth.) Wedd.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "hypericum_juniperinum": {
+      "nombre_comun": "Chite",
+      "nombre_cientifico": "Hypericum juniperinum Kunth",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "espeletia_grandiflora": {
+      "nombre_comun": "Frailejón",
+      "nombre_cientifico": "Espeletia grandiflora Humb. & Bonpl.",
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_protegido"
+    },
+    "genista_monspessulana": {
+      "nombre_comun": "Retamo liso",
+      "nombre_cientifico": "Genista monspessulana (L.) L.A.S.Johnson",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "invasor"
+    },
+    "thunbergia_alata": {
+      "nombre_comun": "Ojo de poeta",
+      "nombre_cientifico": "Thunbergia alata Bojer ex Sims",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "invasor"
+    },
+    "cenchrus_clandestinus": {
+      "nombre_comun": "Kikuyo",
+      "nombre_cientifico": "Cenchrus clandestinus (Hochst. ex Chiov.) Morrone",
+      "nombres_comunes": [
+        "pasto kikuyo"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "invasor"
     }
   }
 }
