@@ -1,0 +1,33 @@
+/*
+ * Estilos compartidos de la librería de LÁMINAS de cuaderno.
+ * Solo cubre lo que una lámina necesita como hoja de papel autónoma:
+ * el dimensionado responsivo y las (pocas) animaciones intrínsecas, todas
+ * reduced-motion-safe (sin animación → fotograma final digno). Trasplantado
+ * de `mockups/hoja-vida-mata.css` (clases `hvm-lamina-*`) al namespace propio
+ * `lam-*` para que la lámina no dependa de la CSS de ningún consumidor.
+ */
+
+/* LaminaMataEtapa — la hoja de papel: ancho completo, alto por aspecto. */
+.lam-mata-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 340px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+/* LaminaMataEtapa — el crecimiento al cambiar de etapa (la mata "brota"). */
+.lam-mata-brota {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: lam-brota 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes lam-brota {
+  from { opacity: 0; transform: scaleY(0.82) translateY(4px); }
+  to   { opacity: 1; transform: scaleY(1) translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lam-mata-brota { animation: none; }
+}
