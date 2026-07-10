@@ -56,7 +56,7 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
       }
     } catch (err) {
       if (mounted) {
-        setError(`No pude leer tus ciclos: ${err.message}`);
+        setError(`No pude leer sus ciclos: ${err.message}`);
       }
     } finally {
       if (mounted) {
@@ -121,7 +121,7 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
     return (
       <div className="min-h-[100dvh] text-white">
         {Header}
-        <div className="flex flex-col items-center gap-3 py-16"><ChagraGrowLoader size={56} /><p className="text-sm text-slate-400">Cargando tus ciclos…</p></div>
+        <div className="flex flex-col items-center gap-3 py-16"><ChagraGrowLoader size={56} /><p className="text-sm text-slate-400">Cargando sus ciclos…</p></div>
       </div>
     );
   }
@@ -156,7 +156,7 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
       {cycles.length === 0 ? (
         <div className="flex flex-col items-center gap-4 py-14 px-6 text-center">
           <Sprout size={48} className="text-lime-500/70" />
-          <p className="text-sm text-slate-300 max-w-xs">Aún no tienes ciclos de cultivo. Registra uno contándole a Chagra qué sembraste.</p>
+          <p className="text-sm text-slate-300 max-w-xs">Aún no tiene ciclos de cultivo. Registre uno contándole a Chagra qué sembró.</p>
           <button
             onClick={() => onNavigate?.('procesos')}
             className="px-6 py-3 min-h-[44px] bg-lime-700 hover:bg-lime-600 rounded-xl font-bold flex items-center gap-2"
@@ -169,7 +169,7 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
             onClick={() => onNavigate?.('germinacion')}
             className="px-5 py-2.5 min-h-[44px] bg-slate-800 hover:bg-slate-700 border border-sky-700/40 text-slate-200 rounded-xl font-bold text-sm flex items-center gap-2"
           >
-            <Beaker size={16} className="text-sky-300" /> Haz una prueba de germinación primero
+            <Beaker size={16} className="text-sky-300" /> Haga una prueba de germinación primero
           </button>
         </div>
       ) : (
@@ -183,7 +183,7 @@ export default function CicloCultivoScreen({ onBack, onNavigate }) {
               className="w-full text-left bg-sky-900/20 border border-sky-700/40 hover:border-sky-600/60 rounded-xl p-3 flex items-center gap-2.5 text-sm text-sky-100"
             >
               <Beaker size={16} className="text-sky-300 shrink-0" />
-              <span className="flex-1">¿Vas a sembrar otro lote? Hazle primero una prueba de germinación.</span>
+              <span className="flex-1">¿Va a sembrar otro lote? Hágale primero una prueba de germinación.</span>
               <ChevronLeft size={16} className="text-sky-400/70 rotate-180 shrink-0" />
             </button>
           ) : null}

@@ -433,8 +433,8 @@ function DetalleOferta({ oferta, onClose, onEliminar }) {
             <div className="rounded-lg border border-slate-700 bg-slate-800/60 p-3 flex gap-2 text-sm text-slate-300">
               <Info size={16} className="text-slate-400 shrink-0 mt-0.5" />
               {oferta.demo
-                ? 'Esta es una oferta de ejemplo: no tiene un contacto real. Publica la tuya para que te puedan escribir.'
-                : 'Este vendedor no dejó un contacto directo. Coordina con él en tu mercado campesino o agrofería.'}
+                ? 'Esta es una oferta de ejemplo: no tiene un contacto real. Publique la suya para que le puedan escribir.'
+                : 'Este vendedor no dejó un contacto directo. Coordine con él en su mercado campesino o agrofería.'}
             </div>
           )}
 
@@ -577,7 +577,7 @@ function PublicarPanel({ onPublicada, onCancelar }) {
       onPublicada();
     } catch (e) {
       console.warn('[Mercados] no se pudo publicar la oferta:', e?.message);
-      setErrors({ producto: 'No se pudo guardar. Intenta de nuevo.' });
+      setErrors({ producto: 'No se pudo guardar. Intente de nuevo.' });
     } finally {
       setGuardando(false);
     }
@@ -585,7 +585,7 @@ function PublicarPanel({ onPublicada, onCancelar }) {
 
   return (
     <div className="space-y-4">
-      <Field label="¿Qué vendes?" error={errors.producto} required>
+      <Field label="¿Qué vende?" error={errors.producto} required>
         <input
           type="text"
           value={form.producto}
@@ -624,7 +624,7 @@ function PublicarPanel({ onPublicada, onCancelar }) {
 
       {refPrecio && <PrecioReferenciaBloque referencia={refPrecio} contexto="publicar" />}
 
-      <Field label="Precio por unidad (opcional)" error={errors.precio} hint="Déjalo vacío si prefieres 'a convenir'. Chagra no sugiere precios.">
+      <Field label="Precio por unidad (opcional)" error={errors.precio} hint="Déjelo vacío si prefiere 'a convenir'. Chagra no sugiere precios.">
         <div className="relative">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
           <input
@@ -650,7 +650,7 @@ function PublicarPanel({ onPublicada, onCancelar }) {
 
       <div className="grid grid-cols-1 gap-3">
         <Field label="Finca (opcional)">
-          <input type="text" value={form.finca} onChange={(e) => set('finca', e.target.value)} placeholder="Nombre de tu finca" className="form-input" />
+          <input type="text" value={form.finca} onChange={(e) => set('finca', e.target.value)} placeholder="Nombre de su finca" className="form-input" />
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Vereda (opcional)">
@@ -662,7 +662,7 @@ function PublicarPanel({ onPublicada, onCancelar }) {
         </div>
       </div>
 
-      <Field label="Teléfono de contacto (opcional)" hint="Para que te escriban por WhatsApp. Si no lo pones, coordinas en el mercado.">
+      <Field label="Teléfono de contacto (opcional)" hint="Para que le escriban por WhatsApp. Si no lo pone, coordina en el mercado.">
         <div className="relative">
           <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={15} />
           <input
@@ -681,7 +681,7 @@ function PublicarPanel({ onPublicada, onCancelar }) {
           value={form.nota}
           onChange={(e) => set('nota', e.target.value)}
           rows={3}
-          placeholder="Cómo lo produces, cuándo entregas, calidad…"
+          placeholder="Cómo lo produce, cuándo entrega, calidad…"
           className="form-input resize-none"
         />
       </Field>
