@@ -196,6 +196,7 @@ function VeredaPicker({ vereda, opciones, onSelect, onFreeText }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={hasDataset ? 'Busque su vereda…' : 'Escriba su vereda'}
+          aria-label="Vereda de su finca"
           className="w-full pl-9 pr-3 py-2.5 text-base rounded-xl bg-slate-900 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/60"
           data-testid="onb2-vereda-input"
         />
@@ -678,6 +679,7 @@ export default function OnboardingCondensado({
                     <select
                       value={manualDpto}
                       onChange={(e) => setManualDpto(e.target.value)}
+                      aria-label="Departamento"
                       className="w-full px-3 py-3 rounded-xl bg-slate-900 border border-slate-700 text-base text-white"
                       data-testid="onb2-dpto"
                     >
@@ -695,6 +697,7 @@ export default function OnboardingCondensado({
                           const m = getMunicipios(manualDpto).find((x) => x.name === e.target.value);
                           if (m) escogerMunicipioManual(m, manualDpto);
                         }}
+                        aria-label="Municipio"
                         className="w-full px-3 py-3 rounded-xl bg-slate-900 border border-slate-700 text-base text-white"
                         data-testid="onb2-municipio"
                       >

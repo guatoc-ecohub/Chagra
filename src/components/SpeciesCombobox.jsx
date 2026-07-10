@@ -168,6 +168,21 @@ export const SpeciesCombobox = ({
       <div
         className="w-full flex items-center gap-2 p-4 rounded-xl bg-slate-900 border border-slate-700 cursor-pointer min-h-[64px]"
         onClick={() => setOpen(true)}
+        /* a11y (teclado): cerrado, la caja ES el botón que abre el combobox.
+           Abierto, el rol lo lleva el input interior (sin role duplicado). */
+        {...(!open ? {
+          role: 'button',
+          tabIndex: 0,
+          'aria-haspopup': 'listbox',
+          'aria-expanded': false,
+          'aria-label': `${label}: abrir buscador de especies`,
+          onKeyDown: (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setOpen(true);
+            }
+          },
+        } : {})}
       >
         <Search size={18} className="text-slate-500 shrink-0" aria-hidden="true" />
         {open ? (
@@ -179,6 +194,7 @@ export const SpeciesCombobox = ({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={placeholder}
+            aria-label={`Buscar especie para ${label}`}
             className="flex-1 bg-transparent text-white text-lg outline-none placeholder-slate-500"
             onClick={(e) => e.stopPropagation()}
             data-testid="species-combobox-input"

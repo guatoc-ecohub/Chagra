@@ -112,10 +112,11 @@ export const InputLogForm = ({ assetId, onComplete }) => {
       <div className="space-y-3">
         {/* Selector de Material */}
         <div className="flex flex-col gap-1">
-          <label className="text-[10px] text-slate-500 font-bold uppercase">
+          <label htmlFor="input-log-material" className="text-[10px] text-slate-400 font-bold uppercase">
             Biopreparado / Insumo
           </label>
           <select
+            id="input-log-material"
             value={formData.material}
             onChange={(e) => setFormData({ ...formData, material: e.target.value })}
             className="bg-slate-800 border border-slate-700 rounded-lg text-sm p-2.5 text-white focus:ring-1 focus:ring-blue-500 outline-none"
@@ -139,8 +140,9 @@ export const InputLogForm = ({ assetId, onComplete }) => {
         <div className="grid grid-cols-2 gap-3">
           {/* Cantidad */}
           <div className="flex flex-col gap-1">
-            <label className="text-[10px] text-slate-500 font-bold uppercase">Cantidad</label>
+            <label htmlFor="input-log-cantidad" className="text-[10px] text-slate-400 font-bold uppercase">Cantidad</label>
             <input
+              id="input-log-cantidad"
               type="number"
               step="0.01"
               min="0"
@@ -154,8 +156,9 @@ export const InputLogForm = ({ assetId, onComplete }) => {
 
           {/* Unidad */}
           <div className="flex flex-col gap-1">
-            <label className="text-[10px] text-slate-500 font-bold uppercase">Unidad</label>
+            <label htmlFor="input-log-unidad" className="text-[10px] text-slate-400 font-bold uppercase">Unidad</label>
             <select
+              id="input-log-unidad"
               value={formData.unit}
               onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
               className="bg-slate-800 border border-slate-700 rounded-lg text-sm p-2.5 text-white outline-none"
@@ -171,10 +174,11 @@ export const InputLogForm = ({ assetId, onComplete }) => {
 
         {/* Notas */}
         <div className="flex flex-col gap-1">
-          <label className="text-[10px] text-slate-500 font-bold uppercase">
+          <label htmlFor="input-log-notas" className="text-[10px] text-slate-400 font-bold uppercase">
             Observaciones Técnicas
           </label>
           <textarea
+            id="input-log-notas"
             rows="2"
             value={formData.notes}
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}

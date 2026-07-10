@@ -410,8 +410,23 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
       <div
         className="w-full flex items-center gap-2 p-3 rounded-xl bg-slate-800 border border-slate-700 cursor-pointer"
         onClick={() => setOpen(true)}
+        /* a11y (teclado): cerrado, la caja ES el botón que abre el buscador.
+           Abierto, el foco vive en el input interior. */
+        {...(!open ? {
+          role: 'button',
+          tabIndex: 0,
+          'aria-haspopup': 'listbox',
+          'aria-expanded': false,
+          'aria-label': 'Seleccionar especie: abrir buscador',
+          onKeyDown: (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setOpen(true);
+            }
+          },
+        } : {})}
       >
-        <Search size={16} className="text-slate-500 shrink-0" />
+        <Search size={16} className="text-slate-500 shrink-0" aria-hidden="true" />
         {open ? (
           <input
             ref={queryInputRef}
@@ -420,6 +435,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar especie… (ej: gulpa, café, mora)"
+            aria-label="Buscar especie"
             className="flex-1 bg-transparent text-white text-sm outline-none"
             onClick={(e) => e.stopPropagation()}
           />
@@ -432,9 +448,10 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); handleClear(); }}
+            aria-label="Quitar especie seleccionada"
             className="p-1 hover:bg-slate-700 rounded text-slate-400"
           >
-            <X size={14} />
+            <X size={14} aria-hidden="true" />
           </button>
         )}
         <ChevronDown size={16} className={`text-slate-500 transition-transform ${open ? 'rotate-180' : ''}`} />

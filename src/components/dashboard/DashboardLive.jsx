@@ -602,7 +602,9 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         >
             <tile.icon size={large ? 30 : 24} strokeWidth={2} className={`${large ? 'mb-2' : 'mb-1.5'} ${tile.accent.split(' ')[0]}`} aria-hidden="true" />
             <span className={`${large ? 'text-base' : 'text-sm'} font-black block leading-tight fvh-tile-label ${tile.accent.split(' ')[0]}`}>{tileLabel(tile)}</span>
-            <span className={`${large ? 'text-xs mt-1 leading-snug' : 'text-2xs mt-0.5 leading-tight'} block fvh-tile-desc ${fincaVivaFlag ? '' : (large ? 'text-slate-400' : 'text-slate-500')}`}>{tileDesc(tile)}</span>
+            {/* a11y AA: la desc era text-slate-500 sobre slate-900 (~3.4:1, falla
+                contraste en texto pequeño). slate-400 da ~7:1 sin cambiar jerarquía. */}
+            <span className={`${large ? 'text-xs mt-1 leading-snug' : 'text-2xs mt-0.5 leading-tight'} block fvh-tile-desc ${fincaVivaFlag ? '' : 'text-slate-400'}`}>{tileDesc(tile)}</span>
         </button>
     );
 
@@ -620,7 +622,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     <MERCADO_TILE.icon size={26} strokeWidth={2} className={`${MERCADO_TILE.accent.split(' ')[0]} shrink-0`} aria-hidden="true" />
                     <span className="flex-1 min-w-0">
                         <span className={`text-sm font-black block leading-tight fvh-tile-label ${MERCADO_TILE.accent.split(' ')[0]}`}>{MERCADO_TILE.label}</span>
-                        <span className={`text-2xs block mt-0.5 leading-tight fvh-tile-desc ${fincaVivaFlag ? '' : 'text-slate-500'}`}>{MERCADO_TILE.desc}</span>
+                        <span className={`text-2xs block mt-0.5 leading-tight fvh-tile-desc ${fincaVivaFlag ? '' : 'text-slate-400'}`}>{MERCADO_TILE.desc}</span>
                     </span>
                     <ChevronRight size={18} className={`shrink-0 ${MERCADO_TILE.accent.split(' ')[0]} opacity-70`} aria-hidden="true" />
                 </button>
@@ -879,12 +881,12 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                                 </span>
                                 <ChevronRight size={22} className="shrink-0 text-slate-500" aria-hidden="true" />
                             </button>
-                            <div className="grid grid-cols-3 gap-3 mt-3" data-testid="gestion-tiles">
+                            <div className="grid grid-cols-2 min-[400px]:grid-cols-3 gap-3 mt-3" data-testid="gestion-tiles">
                                 {GESTION_TILES.filter((t) => t.view === 'germinacion').map((tile, i) => renderTile(tile, { i }))}
                             </div>
                         </>
                     ) : (
-                        <div className="grid grid-cols-3 gap-3" data-testid="gestion-tiles">
+                        <div className="grid grid-cols-2 min-[400px]:grid-cols-3 gap-3" data-testid="gestion-tiles">
                             {GESTION_TILES.map((tile, i) => renderTile(tile, { i }))}
                         </div>
                     )}
@@ -1038,7 +1040,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             {/* APRENDER — hub único de contenido (con OFF SÍ incluye 'aprende'). */}
             <div className="px-4 pt-3">
                 {blockLabel('Aprender', 'from-emerald-400 to-teal-400')}
-                <div className="grid grid-cols-3 gap-3" data-testid="aprender-tiles">
+                <div className="grid grid-cols-2 min-[400px]:grid-cols-3 gap-3" data-testid="aprender-tiles">
                     {APRENDER_TILES.map((tile, i) => renderTile(tile, { i }))}
                 </div>
             </div>
@@ -1051,7 +1053,7 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                 className="px-4 pt-3"
             >
                 {blockLabel('Mi finca · gestión', 'from-sky-400 to-emerald-400')}
-                <div className="grid grid-cols-3 gap-3" data-testid="gestion-tiles">
+                <div className="grid grid-cols-2 min-[400px]:grid-cols-3 gap-3" data-testid="gestion-tiles">
                     {GESTION_TILES.map((tile, i) => renderTile(tile, { i }))}
                 </div>
             </div>
@@ -1099,8 +1101,10 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     </SortableContext>
                 </DndContext>
 
-                <p className="text-[10px] text-center mt-4 italic text-slate-600">
-                    Mantén presionado el ⋮⋮ para reorganizar a tu gusto
+                {/* a11y AA: slate-600 a 10px daba ~2.7:1 de contraste. slate-400
+                    + 11px mantiene el tono discreto pero legible. */}
+                <p className="text-[11px] text-center mt-4 italic text-slate-400">
+                    Mantenga presionado el ⋮⋮ para reorganizar a su gusto
                 </p>
 
                 {/* AIStatusFooter — barra inferior con status proactivo IA. */}
