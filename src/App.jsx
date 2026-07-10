@@ -107,6 +107,9 @@ const CompostScreen = lazy(() => import('./components/CompostScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
 const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const OnboardingCondensado = lazy(() => import('./components/OnboardingCondensado'));
+// Galería de mockups (diseño): rutas públicas `#/mockups/<slug>`, sin auth ni
+// gate, datos de muestra. No cuentan como módulo de piloto. Ver MOCKUP_HASH_ROUTES.
+const HojaVidaMataMockup = lazy(() => import('./components/mockups/HojaVidaMataMockup'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
 const PlantaPorVozScreen = lazy(() => import('./components/PlantaPorVozScreen'));
@@ -416,6 +419,15 @@ const LoadingFallback = ({ view = null }) => {
 // viva (HERRAMIENTAS_TILES en DashboardLive). Las rutas `casos`/`caso_detail`/
 // `javier`/`usage_stats` siguen vivas en el router (más abajo) y por hash.
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
+
+// Rutas de MOCKUP de diseño (galería): PÚBLICAS — sin auth ni gate, datos de
+// muestra. Se resuelven ANTES del check de sesión (igual que el callback OAuth),
+// para que una lámina/ficha se pueda revisar sin cuenta. Patrón `#/mockups/<slug>`
+// (el hash se normaliza a `mockups/<slug>`). No entran en HASH_VIEW_ROUTES para
+// dejar explícito que NO pasan por los gates de sesión/rol.
+const MOCKUP_HASH_ROUTES = {
+  'mockups/hoja-vida-mata': 'mockup_hoja_vida_mata',
+};
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
@@ -915,6 +927,14 @@ export default function App() {
       return;
     }
 
+    // Mockups de diseño: públicos, sin auth. Se resuelven antes de isAuthenticated
+    // para que la galería (#/mockups/<slug>) abra sin cuenta.
+    const mockupView = MOCKUP_HASH_ROUTES[hash];
+    if (mockupView) {
+      Promise.resolve().then(() => navigate(mockupView));
+      return;
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -941,6 +961,12 @@ export default function App() {
   useEffect(() => {
     const handleHashRoute = () => {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+      // Mockups públicos: navegar directo, sin pasar por auth ni gates.
+      const mockupView = MOCKUP_HASH_ROUTES[hash];
+      if (mockupView) {
+        navigate(mockupView);
+        return;
+      }
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
@@ -2490,6 +2516,17 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_hoja_vida_mata':
+        // Mockup de galería (público, datos de muestra): la hoja de vida VIVA de
+        // una mata individual — lámina que se redibuja por etapa + línea de
+        // tiempo de cuaderno de campo. Ruta #/mockups/hoja-vida-mata.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Hoja de vida de la mata">
+              <HojaVidaMataMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       default:
         return (
           <ErrorBoundary>
@@ -2563,7 +2600,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && currentView !== 'mockup_hoja_vida_mata' && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
