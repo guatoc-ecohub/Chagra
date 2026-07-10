@@ -35,33 +35,79 @@ import {
   CLIMAS,
   ORDEN_CLIMA,
   climaPorHora,
+  animoDeFinca,
   NARRACION,
 } from './valle/valleData';
 import Valle2DFallback from './valle/Valle2DFallback';
+import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
 
-/** ¿El equipo soporta WebGL? (línea base del render 3D). */
-function soportaWebGL() {
-  if (typeof window === 'undefined') return false;
+/**
+ * DEVICE-TIERING REAL. La 3D es ASPIRACIONAL (gama media+). No basta con
+ * preguntar "¿hay WebGL?": un teléfono humilde tiene WebGL pero sufre jank y
+ * calor. Entonces degradamos a la 2D DIGNA también por señales de equipo débil:
+ * poca RAM, pocos núcleos, ahorro de datos o preferencia de menos movimiento.
+ * Devuelve { modo: '2d' | '3d', motivo } — el motivo ajusta el aviso al usuario.
+ */
+function decidirRender() {
+  if (typeof window === 'undefined') return { modo: '2d', motivo: 'ssr' };
+  /* `deviceMemory` y `connection` son APIs experimentales que la lib de tipos
+     del DOM aún no declara; se tipan aquí como opcionales (sin `any`). */
+  const nav =
+    /** @type {Navigator & { deviceMemory?: number, connection?: { saveData?: boolean }, mozConnection?: { saveData?: boolean }, webkitConnection?: { saveData?: boolean } }} */ (
+      window.navigator
+    );
+
+  // 1) WebGL es requisito DURO del render 3D.
+  let webgl = false;
   try {
     const canvas = document.createElement('canvas');
-    return !!(
+    webgl = !!(
       window.WebGLRenderingContext &&
       (canvas.getContext('webgl2') || canvas.getContext('webgl'))
     );
   } catch {
-    return false;
+    webgl = false;
   }
+  if (!webgl) return { modo: '2d', motivo: 'sin-webgl' };
+
+  // 2) Equipos humildes → 2D (no los ponemos a sudar la GPU).
+  const mem = nav.deviceMemory; // GiB aprox. (Chrome/Android); undefined en otros
+  if (typeof mem === 'number' && mem > 0 && mem <= 3) return { modo: '2d', motivo: 'equipo' };
+
+  const nucleos = nav.hardwareConcurrency;
+  if (typeof nucleos === 'number' && nucleos > 0 && nucleos <= 4) {
+    return { modo: '2d', motivo: 'equipo' };
+  }
+
+  // 3) El usuario pidió ahorrar datos o menos movimiento → respetarlo.
+  const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
+  if (conn && conn.saveData) return { modo: '2d', motivo: 'ahorro' };
+
+  const menosMov =
+    window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (menosMov) return { modo: '2d', motivo: 'calma' };
+
+  return { modo: '3d', motivo: 'ok' };
 }
+
+/* Aviso sobrio de por qué se ve la versión dibujada (nunca "error"). */
+const MENSAJE_DEGRADADO = {
+  calma: 'Le mostramos el valle en calma, sin movimiento. La finca sigue completa.',
+  ahorro: 'Modo ahorro de datos: le mostramos el valle dibujado. La finca sigue completa.',
+  default: 'Su equipo ve la versión dibujada del valle. La finca sigue completa.',
+};
 
 export default function EntradaValle3D({ onBack }) {
   const [clima, setClima] = useState(() => climaPorHora());
   const [focoId, setFocoId] = useState(null);
   const [panel, setPanel] = useState(null); // null | 'alerta' | <mundoId>
   const [voz, setVoz] = useState(true);
-  const [webgl] = useState(() => soportaWebGL());
+  const [alertaVista, setAlertaVista] = useState(false); // ¿ya atendió lo del día?
+  const [render] = useState(decidirRender);
+  const usa3D = render.modo === '3d';
 
   const reducedMotion = useMemo(
     () =>
@@ -69,6 +115,14 @@ export default function EntradaValle3D({ onBack }) {
       window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     [],
+  );
+
+  // ── El compañero (Angelita): su ánimo/energía salen del estado REAL de la
+  //    finca + el clima + si lo del día sigue sin atender. Cuidar la alerta la
+  //    calma (bucle de cuidado, sin puntos ni medallas).
+  const companero = useMemo(
+    () => animoDeFinca(clima, { hayAlerta: !alertaVista }),
+    [clima, alertaVista],
   );
 
   // ── Voz (Web Speech API): el agente DICE. Se calla si el equipo no la trae
@@ -122,6 +176,7 @@ export default function EntradaValle3D({ onBack }) {
   const abrirAlerta = useCallback(() => {
     setFocoId(COSA_DEL_DIA.anclaMundo);
     setPanel('alerta');
+    setAlertaVista(true); // atender lo del día calma a la abeja
     hablar(COSA_DEL_DIA.vozTexto);
   }, [hablar]);
 
@@ -135,20 +190,30 @@ export default function EntradaValle3D({ onBack }) {
 
   return (
     <div className="valle-root" data-clima={clima}>
-      {/* fondo/atmósfera 3D o su degradación 2D */}
+      {/* fondo/atmósfera 3D o su degradación 2D (según el tiering del equipo) */}
       <div className="valle-escena">
-        {webgl ? (
+        {usa3D ? (
           <Suspense fallback={<CargandoValle clima={clima} />}>
             <Valle3D
               clima={clima}
               focoId={focoId}
+              animo={companero.animo}
+              energia={companero.energia}
               onEntrar={entrarMundo}
               onAlerta={abrirAlerta}
               reducedMotion={reducedMotion}
             />
           </Suspense>
         ) : (
-          <Valle2DFallback clima={clima} onEntrar={entrarMundo} onAlerta={abrirAlerta} />
+          <Valle2DFallback
+            clima={clima}
+            focoId={focoId}
+            animo={companero.animo}
+            energia={companero.energia}
+            reducedMotion={reducedMotion}
+            onEntrar={entrarMundo}
+            onAlerta={abrirAlerta}
+          />
         )}
       </div>
 
@@ -176,11 +241,23 @@ export default function EntradaValle3D({ onBack }) {
         </div>
       </header>
 
-      {/* ── Sin WebGL: aviso sobrio de que se ve la versión dibujada ── */}
-      {!webgl && (
+      {/* ── Modo dibujado (tiering): aviso sobrio, nunca "error" ── */}
+      {!usa3D && (
         <p className="valle-degradado" role="status">
-          Su equipo ve la versión dibujada del valle. La finca sigue completa.
+          {MENSAJE_DEGRADADO[render.motivo] || MENSAJE_DEGRADADO.default}
         </p>
+      )}
+
+      {/* ── El compañero: Angelita en una sola línea puntual (imagen-first).
+              Es el ser al que se cuida; su cara refleja el ánimo real. Se
+              esconde si hay un panel abierto — una cosa clara a la vez. ── */}
+      {!panel && (
+        <div className="valle-companero" role="status" aria-live="polite">
+          <span className="valle-companero__cara" aria-hidden="true">
+            <AbejaAngelita size={34} animo={companero.animo} energia={companero.energia} animated={!reducedMotion} />
+          </span>
+          <span className="valle-companero__txt">{companero.frase}</span>
+        </div>
       )}
 
       {/* ── Panel de la ALERTA (la cosa del día): UNA acción clara ── */}

@@ -13,7 +13,9 @@
  * Los 4 sí-o-sí viven en el espacio:
  *   · MUNDOS  → landmarks navegables (MundoLugar) con etiqueta accesible.
  *   · ALERTA  → Beacon pulsante anclado sobre el mundo 'suelo' (la cosa del día).
- *   · AGENTE  → el Colibrí (visual-lib) flota sobre el foco activo.
+ *   · COMPAÑERO → Angelita, la abeja (visual-lib) es el avatar-jugador: vuela
+ *                por el valle y ENTRA al mundo que se toca; su ánimo/energía
+ *                reflejan la salud real de la finca.
  *   · CLIMA   → luz/niebla/estrellas de la escena salen del estado `clima`.
  */
 /* Nota: las props de three (position, args, intensity, castShadow, etc.) son
@@ -23,7 +25,7 @@ import { Suspense, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, Float, Stars, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
-import { Colibri } from '../../visual/creatures/Colibri.jsx';
+import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 import { MUNDOS_VALLE, MUNDO_VALLE_BY_ID, COSA_DEL_DIA, CLIMAS } from './valleData';
 
 /* Altura del terreno por (x,z): un valle suave con ladera al fondo (+z) donde
@@ -82,7 +84,7 @@ function Cordillera({ color }) {
 
 /* ── La quebrada: una cinta de agua que serpentea por el cauce. ── */
 function Quebrada({ color, viva }) {
-  const ref = useRef();
+  const ref = useRef(null);
   useFrame((state) => {
     if (viva && ref.current) {
       ref.current.material.opacity = 0.72 + Math.sin(state.clock.elapsedTime * 2) * 0.06;
@@ -184,8 +186,8 @@ function LandmarkGeom({ tipo, tinte }) {
             <boxGeometry args={[0.9, 0.7, 0.8]} />
             <meshStandardMaterial color={suave} flatShading />
           </mesh>
-          <mesh position={[0, 0.85, 0]} castShadow>
-            <coneGeometry args={[0.72, 0.5, 4]} rotation={[0, Math.PI / 4, 0]} />
+          <mesh position={[0, 0.85, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
+            <coneGeometry args={[0.72, 0.5, 4]} />
             <meshStandardMaterial color={fuerte} flatShading />
           </mesh>
           {[-0.9, -0.5, 0.9, 1.3].map((dx, i) => (
@@ -246,8 +248,8 @@ function LandmarkGeom({ tipo, tinte }) {
   }
 }
 
-function Veleta({ color, reducedMotion }) {
-  const ref = useRef();
+function Veleta({ color, reducedMotion = false }) {
+  const ref = useRef(null);
   useFrame((state) => {
     if (ref.current && !reducedMotion) ref.current.rotation.y = state.clock.elapsedTime * 0.4;
   });
@@ -262,8 +264,8 @@ function Veleta({ color, reducedMotion }) {
           <boxGeometry args={[0.7, 0.06, 0.06]} />
           <meshStandardMaterial color={color} flatShading />
         </mesh>
-        <mesh position={[0.42, 0, 0]}>
-          <coneGeometry args={[0.14, 0.3, 4]} rotation={[0, 0, -Math.PI / 2]} />
+        <mesh position={[0.42, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
+          <coneGeometry args={[0.14, 0.3, 4]} />
           <meshStandardMaterial color={color} flatShading />
         </mesh>
       </group>
@@ -305,8 +307,8 @@ function MundoLugar({ mundo, activo, onEntrar, reducedMotion }) {
       Toca la señal → onAlerta() (el agente lo dice y ofrece LA acción). ── */
 function Beacon({ onAlerta, reducedMotion }) {
   const ancla = MUNDO_VALLE_BY_ID[COSA_DEL_DIA.anclaMundo];
-  const luz = useRef();
-  const halo = useRef();
+  const luz = useRef(null);
+  const halo = useRef(null);
   useFrame((state) => {
     if (reducedMotion) return;
     const p = (Math.sin(state.clock.elapsedTime * 1.6) + 1) / 2;
@@ -350,37 +352,74 @@ function Beacon({ onAlerta, reducedMotion }) {
   );
 }
 
-/* ── El compañero: el colibrí (visual-lib) flota sobre el foco activo y es la
-      cara del agente. Reusa el SVG canónico de creatures. ── */
-function CompaneroColibri({ foco, reducedMotion }) {
-  const ref = useRef();
+/* ── El COMPAÑERO-JUGADOR: Angelita, la abeja. Es el avatar que vuela por el
+      valle. Al reposo, ronda sobre el valle con vaivén vivo; cuando se toca un
+      mundo (`entrando`), BAJA y se acerca al lugar — "entra" al mundo, y la
+      cámara la acompaña. Su ánimo/energía (salud real de la finca) tiñen su
+      color, su aura y qué tan vivo es su vuelo. Mira hacia donde viaja. ── */
+function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion }) {
+  const ref = useRef(null);
+  const caraRef = useRef(null);
+  const prevX = useRef(foco.x);
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
-    const bob = reducedMotion ? 0 : Math.sin(t * 2) * 0.15;
-    ref.current.position.lerp(
-      new THREE.Vector3(foco.x + 0.9, foco.y + 2.2 + bob, foco.z + 0.6),
-      0.05,
+    const brio = 0.35 + 0.65 * energia; // la energía anima el vuelo
+    const bob = reducedMotion ? 0 : Math.sin(t * (1.6 + brio)) * (0.1 + 0.16 * brio);
+    // Al reposo deriva en un círculo calmo; al entrar se posa junto al lugar.
+    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.55) * 0.9;
+    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.55) * 0.6;
+    const dest = new THREE.Vector3(
+      foco.x + (entrando ? 0.55 : 0.4 + vagarX),
+      foco.y + (entrando ? 1.05 : 2.3) + bob,
+      foco.z + (entrando ? 0.7 : 0.6 + vagarZ),
     );
+    ref.current.position.lerp(dest, entrando ? 0.05 : 0.045);
+    if (caraRef.current) {
+      const vx = ref.current.position.x - prevX.current;
+      if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
+      prevX.current = ref.current.position.x;
+    }
   });
+  const size = 44 + Math.round(energia * 14);
   return (
-    <group ref={ref} position={[foco.x + 0.9, foco.y + 2.2, foco.z + 0.6]}>
+    <group ref={ref} position={[foco.x + 0.4, foco.y + 2.3, foco.z + 0.6]}>
       <Html center distanceFactor={9} zIndexRange={[40, 10]}>
-        <div className="valle-colibri" aria-hidden="true">
-          <Colibri size={54} animated={!reducedMotion} />
+        <div className="valle-abeja" aria-hidden="true">
+          <div ref={caraRef} className="valle-abeja__cara">
+            <AbejaAngelita size={size} animo={animo} energia={energia} animated={!reducedMotion} />
+          </div>
         </div>
       </Html>
     </group>
   );
 }
 
-/* ── Cámara: viaja suavemente hacia el foco (target) cuando cambia de mundo;
-      en reposo, deriva muy lento (auto-rotación calma). ── */
-function CamaraViajera({ foco, controls, autoOrbit }) {
+/* ── Cámara: viaja suavemente hacia el foco (target) cuando cambia de mundo Y
+      HACE ZOOM hacia el lugar — la sensación de ENTRAR con la abeja, no un modal
+      plano. El acercamiento solo se fuerza durante la transición (una vez llega,
+      suelta el control para que el usuario siga haciendo zoom a mano). ── */
+function CamaraViajera({ foco, focoKey, controls, autoOrbit }) {
+  const trans = useRef(0);
+  const prevKey = useRef(focoKey);
+  const entrando = focoKey !== 'valle';
   useFrame(() => {
     if (!controls.current) return;
-    controls.current.target.lerp(new THREE.Vector3(foco.x, foco.y + 0.6, foco.z), 0.06);
-    controls.current.update();
+    const c = controls.current;
+    if (focoKey !== prevKey.current) {
+      trans.current = 1; // arrancó una nueva "entrada": acompañar el zoom
+      prevKey.current = focoKey;
+    }
+    c.target.lerp(new THREE.Vector3(foco.x, foco.y + 0.6, foco.z), 0.06);
+    if (trans.current > 0) {
+      const cam = c.object;
+      const dir = cam.position.clone().sub(c.target);
+      const deseada = entrando ? 8.5 : 15; // acercarse al entrar, abrir al volver
+      dir.setLength(THREE.MathUtils.lerp(dir.length(), deseada, 0.06));
+      cam.position.copy(c.target.clone().add(dir));
+      trans.current = Math.max(0, trans.current - 0.012);
+    }
+    c.update();
   });
   return (
     <OrbitControls
@@ -392,7 +431,7 @@ function CamaraViajera({ foco, controls, autoOrbit }) {
       maxDistance={22}
       minPolarAngle={0.5}
       maxPolarAngle={1.15}
-      autoRotate={autoOrbit}
+      autoRotate={autoOrbit && !entrando}
       autoRotateSpeed={0.35}
       enableDamping
       dampingFactor={0.08}
@@ -401,8 +440,8 @@ function CamaraViajera({ foco, controls, autoOrbit }) {
 }
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, onEntrar, onAlerta, reducedMotion }) {
-  const controls = useRef();
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion }) {
+  const controls = useRef(null);
   const c = CLIMAS[clima];
   const foco = useMemo(() => {
     const m = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;
@@ -411,6 +450,7 @@ function Escena({ clima, focoId, onEntrar, onAlerta, reducedMotion }) {
     return new THREE.Vector3(m.pos[0], y, m.pos[2]);
   }, [focoId]);
   const autoOrbit = !reducedMotion && !focoId;
+  const entrando = !!focoId;
 
   return (
     <>
@@ -449,15 +489,34 @@ function Escena({ clima, focoId, onEntrar, onAlerta, reducedMotion }) {
       ))}
 
       <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} />
-      <CompaneroColibri foco={foco} reducedMotion={reducedMotion} />
+      <CompaneroAbeja
+        foco={foco}
+        entrando={entrando}
+        animo={animo}
+        energia={energia}
+        reducedMotion={reducedMotion}
+      />
 
-      <CamaraViajera foco={foco} controls={controls} autoOrbit={autoOrbit} />
+      <CamaraViajera
+        foco={foco}
+        focoKey={focoId || 'valle'}
+        controls={controls}
+        autoOrbit={autoOrbit}
+      />
       <AdaptiveDpr pixelated />
     </>
   );
 }
 
-export default function Valle3D({ clima, focoId, onEntrar, onAlerta, reducedMotion }) {
+export default function Valle3D({
+  clima,
+  focoId,
+  animo = 'sereno',
+  energia = 1,
+  onEntrar,
+  onAlerta,
+  reducedMotion,
+}) {
   const [listo, setListo] = useState(false);
   return (
     <Canvas
@@ -473,6 +532,8 @@ export default function Valle3D({ clima, focoId, onEntrar, onAlerta, reducedMoti
         <Escena
           clima={clima}
           focoId={focoId}
+          animo={animo}
+          energia={energia}
           onEntrar={onEntrar}
           onAlerta={onAlerta}
           reducedMotion={reducedMotion}

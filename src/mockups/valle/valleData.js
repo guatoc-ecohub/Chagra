@@ -40,6 +40,7 @@ const LUGARES = [
  * `titulo`, `emoji` y `tinte` verdaderos + la geometría de su lugar.
  */
 export const MUNDOS_VALLE = LUGARES.map((l) => {
+  /** @type {{ titulo?: string, emoji?: string, lema?: string, tinte?: string[] }} */
   const real = MUNDO_BY_ID[l.id] || {};
   return {
     ...l,
@@ -69,6 +70,64 @@ export const COSA_DEL_DIA = {
     'Ojo con la finca hoy: esta madrugada puede helar en la parte alta. Cúbrale el semillero antes de que caiga el sol, que el frío le quema la matica tierna.',
   accion: { etiqueta: 'Ver cómo proteger del frío', view: 'hoy_finca' },
 };
+
+/* ── EL COMPAÑERO: ANGELITA, LA ABEJA DE LA FINCA ────────────────────────────
+ * El avatar-jugador del valle. No es un widget: es un ser al que se cuida (ref
+ * Finch). Su ÁNIMO y su ENERGÍA salen del ESTADO REAL de la finca — cuántas
+ * matas están vivas, cómo está el agua, y qué clima hace. Datos de MUESTRA: si
+ * se productiza, `SALUD_FINCA` viene del backend (logs de matas + Open-Meteo).
+ */
+export const SALUD_FINCA = {
+  matasVivas: 34,
+  matasTotal: 41,
+  agua: 0.72, // 0..1 — humedad/reserva de la quebrada y el tanque
+};
+
+/**
+ * Ánimo de la abeja según cómo está la finca hoy. Devuelve el ánimo (piel de la
+ * creature), la energía (0..1, vivacidad del vuelo/aura) y una frase corta en
+ * usted — puntual, sin muros de texto. Prioridad: alerta > sed > clima > salud.
+ */
+export function animoDeFinca(clima, { hayAlerta = false, salud = SALUD_FINCA } = {}) {
+  const vivas = salud.matasTotal > 0 ? salud.matasVivas / salud.matasTotal : 1;
+  // Energía base: mezcla de matas vivas y agua, atenuada por el clima duro.
+  const climaFactor = clima === 'noche' ? 0.55 : clima === 'lluvia' ? 0.8 : 1;
+  const energia = Math.max(0.35, Math.min(1, (vivas * 0.65 + salud.agua * 0.35) * climaFactor));
+
+  if (hayAlerta) {
+    return {
+      animo: 'atento',
+      energia,
+      frase: 'Angelita anda pendiente: hay algo que atender hoy.',
+    };
+  }
+  if (salud.agua < 0.35) {
+    return {
+      animo: 'sediento',
+      energia,
+      frase: 'La abeja la ve con sed: a la finca le hace falta agua.',
+    };
+  }
+  if (clima === 'noche') {
+    return {
+      animo: 'descansa',
+      energia,
+      frase: 'Angelita descansa; la finca duerme tranquila esta noche.',
+    };
+  }
+  if (vivas >= 0.85 && salud.agua >= 0.55) {
+    return {
+      animo: 'pleno',
+      energia,
+      frase: 'Angelita anda contenta: sus matas están vivas y con agua.',
+    };
+  }
+  return {
+    animo: 'sereno',
+    energia,
+    frase: 'La abeja anda serena, echándole ojo a la finca.',
+  };
+}
 
 /* ── 4. EL CLIMA QUE TIÑE EL AMBIENTE ────────────────────────────────────────
  * Reusa las grades de luz de la librería de efectos (src/visual/effects):
