@@ -3,13 +3,15 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import MontanaMundosCine from '../MontanaMundosCine';
 
-// Smoke de la PASADA 2 CINEMATOGRÁFICA (#/mockups/montana-mundos-cine).
+// Smoke de la PASADA 3 CINEMATOGRÁFICA (#/mockups/montana-mundos-cine).
 // Cubre lo que el operador va a revisar en vivo: (1) las 3 direcciones
 // conmutan, (2) el zoom finca ↔ montaña funciona, (3) los mundos tocables
 // existen, (4) los atajos permanentes están, (5) el grade de luz sigue al
-// piso activo, (6) las 6 capas parallax montan, (7) la rueda camina pisos.
+// piso activo, (6) las 6 capas parallax montan, (7) la rueda camina pisos,
+// (8) el momento de llegada a la finca dispara, (9) el estado de viaje se
+// marca al mover la cámara, (10) la vida ambiental de la pasada 3 monta.
 
-describe('MontanaMundosCine (mockup pasada 2)', () => {
+describe('MontanaMundosCine (mockup pasada 3)', () => {
   it('abre centrado en la finca (piso templado) con los atajos permanentes visibles', () => {
     render(<MontanaMundosCine />);
     expect(screen.getByText('La Montaña de los Mundos')).toBeTruthy();
@@ -93,5 +95,42 @@ describe('MontanaMundosCine (mockup pasada 2)', () => {
     render(<MontanaMundosCine onBack={onBack} />);
     fireEvent.click(screen.getByText('← Volver'));
     expect(onBack).toHaveBeenCalled();
+  });
+
+  // ── Pasada 3 ──
+
+  it('dispara el momento de llegada a la finca al abrir (bloom + anillos + chispas)', () => {
+    const { container } = render(<MontanaMundosCine />);
+    // Abre en la finca: la app lo recibe en casa con el momento "wow".
+    expect(container.querySelector('.mm2').getAttribute('data-llegada')).toBe('true');
+    const llegada = screen.getByTestId('mm2-llegada');
+    expect(llegada.querySelector('.mm2-llegada-bloom')).toBeTruthy();
+    expect(llegada.querySelectorAll('.mm2-llegada-anillo').length).toBe(2);
+    expect(llegada.querySelectorAll('.mm2-chispa').length).toBe(6);
+  });
+
+  it('marca el estado de viaje cuando la cámara se mueve de piso', () => {
+    const { container } = render(<MontanaMundosCine />);
+    const raiz = container.querySelector('.mm2');
+    expect(raiz.getAttribute('data-viaje')).toBeNull();
+    fireEvent.click(screen.getByTestId('mm2-paso-arriba'));
+    expect(raiz.getAttribute('data-viaje')).toBe('true');
+  });
+
+  it('vuelve a disparar la llegada al regresar a la finca desde otro piso', () => {
+    const { container } = render(<MontanaMundosCine />);
+    const raiz = container.querySelector('.mm2');
+    fireEvent.click(screen.getByTestId('mm2-paso-arriba')); // sale de la finca
+    fireEvent.click(screen.getByTestId('mm2-paso-abajo')); // regresa
+    expect(raiz.getAttribute('data-llegada')).toBe('true');
+    expect(screen.getByTestId('mm2-llegada')).toBeTruthy();
+  });
+
+  it('monta la vida ambiental y la textura de la pasada 3', () => {
+    const { container } = render(<MontanaMundosCine />);
+    ['mm2-bandada', 'mm2-colibri', 'mm2-luciernagas', 'mm2-hojas-caen',
+      'mm2-rocas', 'mm2-pedrisco', 'mm2-destellos', 'mm2-jirones', 'mm2-pasta'].forEach((clase) => {
+      expect(container.querySelector(`.${clase}`), clase).toBeTruthy();
+    });
   });
 });

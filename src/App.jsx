@@ -93,9 +93,10 @@ const InventoryPage = lazy(() => import('./pages/InventoryPage'));
 // pisos térmicos, 3 direcciones artísticas para decidir dirección visual).
 // Ruta #/mockups/montana-mundos — sin gate ni sesión (datos de muestra).
 const MontanaMundosMockup = lazy(() => import('./mockups/MontanaMundos'));
-// Pasada 2 cinematográfica del mismo mockup (parallax de 6 capas, luz
-// atmosférica por piso, full-bleed). Ruta #/mockups/montana-mundos-cine —
-// la pasada 1 se conserva en su ruta para comparar lado a lado.
+// Pasada 3 cinematográfica del mismo mockup (parallax de 6 capas, luz
+// atmosférica por piso, full-bleed, profundidad de campo, momento de
+// llegada a la finca y vida ambiental). Ruta #/mockups/montana-mundos-cine
+// — la pasada 1 se conserva en su ruta para comparar lado a lado.
 const MontanaMundosCineMockup = lazy(() => import('./mockups/MontanaMundosCine'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));

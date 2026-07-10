@@ -1,34 +1,42 @@
 /**
- * MontanaMundosCine.jsx — MOCKUP DEV, PASADA 2 CINEMATOGRÁFICA de
+ * MontanaMundosCine.jsx — MOCKUP DEV, PASADA 3 CINEMATOGRÁFICA de
  * "La Montaña de los Mundos" (#/mockups/montana-mundos-cine, sin gate).
  *
- * La pasada 1 (MontanaMundos.jsx, se conserva en #/mockups/montana-mundos)
- * probó la estructura: pisos térmicos, mundos ubicados, zoom finca↔montaña.
- * Esta pasada le sube el CINE, según el plan acordado con el operador:
+ * La pasada 1 (MontanaMundos.jsx, #/mockups/montana-mundos) probó la
+ * estructura; la pasada 2 partió la escena en 6 capas de cámara con
+ * parallax, luz atmosférica por piso, full-bleed y elementos rediseñados.
+ * Esta pasada 3 lleva el cine al máximo (plan acordado con el operador):
  *
- *   1. PROFUNDIDAD REAL — la escena se parte en 6 capas de cámara:
- *      cielo (astro + god-rays) → cordillera lejana → cordillera media →
- *      montaña principal (pisos + mundos) → niebla volumétrica → primer
- *      plano botánico. Al caminar de piso, cada capa viaja a su velocidad
- *      (parallax) y con su propia inercia — cámara física, no scroll.
- *   2. LUZ ATMOSFÉRICA POR PISO — un grade cinematográfico cambia la
- *      temperatura de la luz al subir o bajar: azul glacial en el nevado,
- *      hora dorada en la finca, ámbar en el cálido, turquesa en el río.
- *   3. FULL-BLEED — la montaña ocupa el 100% del viewport; la UI flota
- *      sobre el paisaje con scrims de cine, sin cajas ni márgenes muertos.
- *   4. ELEMENTOS REDISEÑADOS — frailejón con roseta doble y vara de flor,
- *      casa campesina con corredor, tejas y geranios, cafetal con hojas y
- *      sombrío, mango con frutos colgando, río con orillas, reflejo del
- *      cielo y cascada entre pisos, nevado con cara de sombra y grietas.
+ *   1. PROFUNDIDAD DE CAMPO — en el plano cercano (modo finca) la cámara
+ *      enfoca la montaña principal: cielo, cordilleras y primer plano
+ *      quedan fuera de foco (blur ESTÁTICO por modo, nunca animado). En
+ *      el gran plano general todo vuelve a foco profundo.
+ *   2. TRANSICIÓN PULIDA — easing con leve asentamiento en las capas
+ *      cercanas (inercia física), zoom-out majestuoso con duraciones
+ *      escalonadas, y un estado de VIAJE: mientras la cámara se mueve la
+ *      niebla se abre y las etiquetas se retiran; todo vuelve al asentar.
+ *   3. TEXTURA — afloramientos de roca con vetas y pedrisco en el páramo,
+ *      cicatrices foliares en el tronco del frailejón, jirones finos de
+ *      niebla entre los bancos, destellos que titilan sobre la nieve.
+ *   4. MOMENTO DE LLEGADA A LA FINCA (el "wow") — al arribar al piso de
+ *      la finca (también al abrir: la app lo recibe en casa) florece un
+ *      bloom de hora dorada sobre la casa, dos anillos de luz se
+ *      expanden, unas chispas suben como pavesas, el pin ⭐ aterriza con
+ *      rebote y la ventana late — la montaña lo reconoce a usted.
+ *   5. VIDA AMBIENTAL — una bandada cruza el cielo (naturalista y verde),
+ *      un colibrí ronda los geranios del corredor (naturalista), las
+ *      luciérnagas parpadean en la noche biopunk, caen hojas en el verde
+ *      vivo y los animales del corral pastan. Micromovimiento sutil.
  *
- * Se conserva TODO lo validado de la pasada 1: abre centrado en la finca,
- * pellizco/botón para ver la montaña completa, deslizar (y ahora también la
- * rueda del mouse) para caminar entre pisos, atajos permanentes Ⓐ + anotar,
- * halo + etiqueta en cada mundo, 3 direcciones artísticas conmutables.
+ * Se conserva TODO lo validado: abre centrado en la finca, pellizco/botón
+ * para la montaña completa, deslizar/rueda para caminar pisos, atajos
+ * permanentes Ⓐ + anotar, 3 direcciones artísticas conmutables.
  *
  * Técnica: SVG + CSS puros (cero deps, cero fotos). Solo transform/opacity
- * se animan (GPU); los "volúmenes" de luz y niebla son degradados estáticos.
- * prefers-reduced-motion deja un plano final digno. Español de Colombia.
+ * se animan (GPU); luz y niebla son degradados estáticos y el blur de la
+ * profundidad de campo jamás se interpola (cambia escondido bajo el viaje
+ * de cámara). prefers-reduced-motion deja un plano final digno, sin vida
+ * animada ni momento de llegada. Español de Colombia.
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -74,6 +82,17 @@ const DIRECCIONES = [
 // < 1 = lejos (se mueve menos) · > 1 = más cerca que la montaña.
 const CAPAS_F = { cielo: 0.1, lejos: 0.22, medio: 0.45, principal: 1, niebla: 1.12, cerca: 1.3 };
 
+// Chispas del momento de llegada: hacia dónde vuela cada pavesa (px del
+// viewport) y con qué demora arranca. Suben desde la casa, como del fogón.
+const CHISPAS = [
+  { dx: -34, dy: -52, demora: 0.55 },
+  { dx: 20, dy: -64, demora: 0.7 },
+  { dx: 44, dy: -34, demora: 0.85 },
+  { dx: -50, dy: -24, demora: 1 },
+  { dx: 6, dy: -76, demora: 1.15 },
+  { dx: -14, dy: -42, demora: 1.3 },
+];
+
 // La escena SANGRA 150 unidades por debajo del río (dibujadas fuera del
 // viewBox con overflow visible): sin ese respiro, el piso del río quedaba
 // escondido detrás de la UI inferior en full-bleed.
@@ -101,12 +120,18 @@ function calcularTransform(vp, modo, piso) {
 
 // ── Piezas de la escena (SVG) ────────────────────────────────────────────────
 
-/** Frailejón pasada 2: faldón de hojas secas, roseta doble, varas de flor. */
+/** Frailejón pasada 3: faldón, roseta doble, varas de flor y — textura —
+ * cicatrices foliares en el tronco (los anillos de hojas viejas del
+ * frailejón real, lo que le da su cuerpo peludo a distancia). */
 function Frailejon({ x, y, s = 1 }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${s})`}>
       <path className="mm2-frailejon-faldon" d="M-4 4 Q-9 10 -8 18 M0 6 Q-1 12 0 20 M4 4 Q9 10 8 18" />
       <rect x="-3.6" y="-4" width="7.2" height="30" rx="3.2" className="mm2-frailejon-tronco" />
+      <path
+        className="mm2-frailejon-cicatriz"
+        d="M-3 1 Q0 2.4 3 1 M-3 6 Q0 7.4 3 6 M-3 11 Q0 12.4 3 11 M-3 16 Q0 17.4 3 16 M-3 21 Q0 22.4 3 21"
+      />
       <g className="mm2-frailejon-roseta">
         {[-84, -56, -28, 0, 28, 56, 84].map((a) => (
           <ellipse key={`e${a}`} cx="0" cy="-14" rx="3" ry="13" transform={`rotate(${a} 0 -1)`} className="mm2-frailejon-hoja" />
@@ -146,14 +171,17 @@ function MataCafe({ x, y, s = 1 }) {
   );
 }
 
-/** Animal del corral (silueta simple: cuerpo + cabeza + patas). */
+/** Animal del corral (silueta simple: cuerpo + cabeza + patas). El grupo
+ * interior pasta — se inclina apenas hacia el suelo y vuelve (vida). */
 function Animalito({ x, y, s = 1, clase = 'mm2-oveja' }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${s})`} className={clase}>
-      <ellipse cx="0" cy="0" rx="8.4" ry="5.4" />
-      <circle cx="8.2" cy="-3.2" r="3.1" />
-      <rect x="-6" y="3" width="2.2" height="6" rx="1" />
-      <rect x="3.6" y="3" width="2.2" height="6" rx="1" />
+      <g className="mm2-pasta">
+        <ellipse cx="0" cy="0" rx="8.4" ry="5.4" />
+        <circle cx="8.2" cy="-3.2" r="3.1" />
+        <rect x="-6" y="3" width="2.2" height="6" rx="1" />
+        <rect x="3.6" y="3" width="2.2" height="6" rx="1" />
+      </g>
     </g>
   );
 }
@@ -225,6 +253,17 @@ function CieloSvg() {
         </g>
         <g className="mm2-nube-alta mm2-nube-2">
           <ellipse cx="250" cy="190" rx="38" ry="6" />
+        </g>
+      </g>
+
+      {/* Bandada en V que CRUZA el cielo de lado a lado (naturalista y
+          verde vivo): pasa una vez, descansa fuera de cuadro y vuelve. */}
+      <g transform="translate(0 218)" className="mm2-bandada">
+        <g className="mm2-bandada-vuelo">
+          <path d="M0 0 q6 -6 12 0 q6 -6 12 0" />
+          <path d="M-26 12 q5 -5 10 0 q5 -5 10 0" />
+          <path d="M-14 24 q5 -5 10 0 q5 -5 10 0" />
+          <path d="M-44 30 q4 -4 8 0 q4 -4 8 0" />
         </g>
       </g>
     </svg>
@@ -331,6 +370,14 @@ function MontanaPrincipalSvg() {
         <path className="mm2-nieve" d="M196 330 Q192 358 184 382 Q178 360 182 336 Z" opacity="0.9" />
         <path className="mm2-grieta" d="M186 348 q4 3 8 2" opacity="0.7" />
 
+        {/* Destellos sobre la nieve: el hielo titila con la luz */}
+        <g className="mm2-destellos">
+          <path className="mm2-destello" d="M186 206 l1.8 3.4 -1.8 3.4 -1.8 -3.4 Z" />
+          <path className="mm2-destello" d="M208 252 l1.6 3 -1.6 3 -1.6 -3 Z" />
+          <path className="mm2-destello" d="M176 288 l1.5 2.8 -1.5 2.8 -1.5 -2.8 Z" />
+          <path className="mm2-destello" d="M222 296 l1.4 2.6 -1.4 2.6 -1.4 -2.6 Z" />
+        </g>
+
         {/* Bordes de piso: la rima de luz entre climas */}
         <path className="mm2-borde-piso" d="M-2 574 Q46 556 94 566 Q152 578 200 564 Q258 550 306 564 Q350 576 392 562" />
         <path className="mm2-borde-piso" d="M-2 816 Q50 798 104 808 Q160 820 212 806 Q266 792 316 806 Q356 816 392 804" />
@@ -351,6 +398,23 @@ function MontanaPrincipalSvg() {
         </g>
         <ellipse className="mm2-piedra" cx="150" cy="532" rx="9" ry="5" />
         <ellipse className="mm2-piedra" cx="228" cy="456" rx="6" ry="3.6" />
+
+        {/* Textura de roca: afloramientos con vetas al pie del nevado,
+            y el pedrisco que suelta el deshielo */}
+        <g className="mm2-rocas">
+          <path className="mm2-roca" d="M146 398 q9 -13 21 -9 q7 9 -1 17 q-14 6 -20 -8 Z" />
+          <path className="mm2-roca-veta" d="M150 398 q9 -6 15 -4 M152 405 q7 -4 11 -3" />
+          <path className="mm2-roca" d="M238 410 q11 -11 20 -5 q4 11 -5 16 q-12 3 -15 -11 Z" />
+          <path className="mm2-roca-veta" d="M242 410 q8 -5 13 -3 M244 417 q6 -3 9 -2" />
+          <path className="mm2-roca" d="M196 380 q7 -9 14 -6 q4 8 -2 13 q-9 3 -12 -7 Z" />
+          <path className="mm2-roca-veta" d="M199 380 q6 -4 10 -3" />
+        </g>
+        <g className="mm2-pedrisco">
+          {[[160, 416], [172, 424], [230, 430], [244, 434], [206, 396], [186, 410]].map(([cx, cy], i) => (
+            <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={i % 2 ? 1.6 : 2.2} />
+          ))}
+        </g>
+
         <Frailejon x={168} y={438} s={1.25} />
         <Frailejon x={204} y={472} s={0.95} />
         <Frailejon x={150} y={488} s={0.8} />
@@ -409,6 +473,18 @@ function MontanaPrincipalSvg() {
           <circle cx="229.8" cy="897" r="2.6" className="mm2-geranio" />
           <path d="M150 908 Q196 916 244 908" className="mm2-casa-camino" />
         </g>
+
+        {/* Colibrí (solo naturalista): ronda los geranios del corredor con
+            aleteo rápido — el visitante de toda casa campesina */}
+        <g transform="translate(243 886)" className="mm2-colibri">
+          <g className="mm2-colibri-ronda">
+            <path className="mm2-colibri-cola" d="M-3.6 0.6 L-8.6 3.6 L-7.2 -0.4 Z" />
+            <ellipse cx="0" cy="0" rx="4" ry="2.2" className="mm2-colibri-torso" />
+            <circle cx="4.4" cy="-1.6" r="1.8" className="mm2-colibri-torso" />
+            <path className="mm2-colibri-pico" d="M6 -1.9 L10.6 -3" />
+            <path className="mm2-colibri-ala" d="M-0.6 -1 Q-3.4 -8 -8.6 -9.4 Q-4 -4 -1.6 0.4 Z" />
+          </g>
+        </g>
         <g className="mm2-troje">
           <rect x="282" y="856" width="4" height="16" className="mm2-troje-pata" />
           <rect x="306" y="856" width="4" height="16" className="mm2-troje-pata" />
@@ -444,6 +520,14 @@ function MontanaPrincipalSvg() {
           <circle cx="308" cy="994" r="3.4" className="mm2-mercado-fruta-a" />
         </g>
 
+        {/* Luciérnagas (solo biopunk): parpadean y derivan por el aire
+            tibio de la finca y el cálido — la noche está viva */}
+        <g className="mm2-luciernagas">
+          {[[152, 912], [238, 932], [186, 962], [298, 1012], [122, 1002], [262, 882], [90, 1098]].map(([cx, cy]) => (
+            <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.8" className="mm2-luciernaga" />
+          ))}
+        </g>
+
         {/* ── CÁLIDO: mango con frutos colgando, platanera, cañaduzal ── */}
         <g className="mm2-arbol-mango">
           <path d="M90 1172 Q86 1152 82 1140 M90 1172 Q92 1150 98 1136" className="mm2-mango-tronco" />
@@ -473,6 +557,13 @@ function MontanaPrincipalSvg() {
             <ellipse cx="281" cy="1188" rx="2.6" ry="3.6" className="mm2-bellota" />
           </g>
         </g>
+        {/* Hojas que caen (solo verde vivo): del mango y del cafetal */}
+        <g className="mm2-hojas-caen">
+          <ellipse cx="112" cy="1102" rx="2.6" ry="1.4" className="mm2-hoja-cae mm2-hoja-cae-1" />
+          <ellipse cx="72" cy="1116" rx="2.4" ry="1.3" className="mm2-hoja-cae mm2-hoja-cae-2" />
+          <ellipse cx="132" cy="916" rx="2.4" ry="1.3" className="mm2-hoja-cae mm2-hoja-cae-3" />
+        </g>
+
         <g className="mm2-cana">
           {[176, 188, 200, 212].map((x, i) => (
             <g key={x}>
@@ -593,6 +684,16 @@ function NieblaSvg() {
       <g className="mm2-banco-valle-2">
         <ellipse cx="290" cy="1400" rx="150" ry="28" fill="url(#mm2n-nucleo)" />
       </g>
+      {/* Jirones: hilachas finas de niebla que derivan en contra de los
+          bancos grandes — la textura deshilachada de la niebla real */}
+      <g className="mm2-jirones">
+        <ellipse cx="60" cy="588" rx="52" ry="7" fill="url(#mm2n-nucleo)" />
+        <ellipse cx="248" cy="598" rx="38" ry="5" fill="url(#mm2n-nucleo)" />
+        <ellipse cx="330" cy="828" rx="58" ry="8" fill="url(#mm2n-nucleo)" />
+        <ellipse cx="70" cy="842" rx="42" ry="6" fill="url(#mm2n-nucleo)" />
+        <ellipse cx="186" cy="1094" rx="66" ry="9" fill="url(#mm2n-nucleo)" />
+        <ellipse cx="300" cy="1342" rx="54" ry="8" fill="url(#mm2n-nucleo)" />
+      </g>
     </svg>
   );
 }
@@ -646,6 +747,36 @@ export default function MontanaMundosCine({ onBack = null }) {
   const viewportRef = useRef(null);
   const [vp, setVp] = useState({ w: 390, h: 700 });
 
+  // ── Pasada 3: la cámara sabe cuándo VIAJA y cuándo LLEGA a la finca ──
+  // viaje: mientras el plano se mueve, la niebla se abre y las etiquetas
+  // se retiran. llegada: al arribar al piso de la finca se dispara el
+  // momento de bienvenida — bloom, anillos, chispas. Ambos se marcan en
+  // los manejadores de gesto (no en un efecto) y un timer los apaga.
+  // La app abre centrada en la finca: la llegada corre desde el arranque.
+  const [viaje, setViaje] = useState(false);
+  const [llegada, setLlegada] = useState(true);
+  const viajeTimer = useRef(null);
+  const llegadaTimer = useRef(null);
+  const marcarCine = (nuevoModo, nuevoPiso) => {
+    setViaje(true);
+    if (viajeTimer.current) clearTimeout(viajeTimer.current);
+    // El zoom a la montaña completa viaja más lento que el paso de piso.
+    viajeTimer.current = setTimeout(() => setViaje(false), nuevoModo === 'montana' ? 1700 : 1050);
+    if (nuevoModo === 'finca' && nuevoPiso === PISO_FINCA) {
+      setLlegada(true);
+      if (llegadaTimer.current) clearTimeout(llegadaTimer.current);
+      llegadaTimer.current = setTimeout(() => setLlegada(false), 3600);
+    }
+  };
+  useEffect(() => {
+    // Apaga el momento de llegada inicial y limpia los timers al salir.
+    llegadaTimer.current = setTimeout(() => setLlegada(false), 3600);
+    return () => {
+      if (viajeTimer.current) clearTimeout(viajeTimer.current);
+      if (llegadaTimer.current) clearTimeout(llegadaTimer.current);
+    };
+  }, []);
+
   useEffect(() => {
     const medir = () => {
       const el = viewportRef.current;
@@ -685,48 +816,63 @@ export default function MontanaMundosCine({ onBack = null }) {
       swipeRef.current = e.touches[0].clientY;
     }
   };
+  // Todo movimiento de cámara pasa por aquí: cambia el estado Y marca el
+  // viaje (y la llegada si el destino es la finca) para el pulido de cine.
+  const caminarA = (nuevoPiso) => { setPiso(nuevoPiso); marcarCine('finca', nuevoPiso); };
+  const cambiarModo = (nuevoModo) => {
+    if (nuevoModo === modo) return;
+    setModo(nuevoModo);
+    marcarCine(nuevoModo, piso);
+  };
   const onTouchMove = (e) => {
     if (e.touches.length === 2 && pinchRef.current != null) {
       const razon = distancia(e.touches) / pinchRef.current;
-      if (razon < 0.78) { setModo('montana'); pinchRef.current = null; }
-      if (razon > 1.28) { setModo('finca'); pinchRef.current = null; }
+      if (razon < 0.78) { cambiarModo('montana'); pinchRef.current = null; }
+      if (razon > 1.28) { cambiarModo('finca'); pinchRef.current = null; }
     }
   };
   const onTouchEnd = (e) => {
     if (pinchRef.current == null && swipeRef.current != null && modo === 'finca' && e.changedTouches.length === 1) {
       const delta = e.changedTouches[0].clientY - swipeRef.current;
-      if (delta < -72 && piso < PISOS.length - 1) setPiso(piso + 1); // desliza arriba → baja la montaña
-      if (delta > 72 && piso > 0) setPiso(piso - 1); // desliza abajo → sube la montaña
+      if (delta < -72 && piso < PISOS.length - 1) caminarA(piso + 1); // desliza arriba → baja la montaña
+      if (delta > 72 && piso > 0) caminarA(piso - 1); // desliza abajo → sube la montaña
     }
     if (e.touches.length < 2) pinchRef.current = null;
     if (e.touches.length === 0) swipeRef.current = null;
   };
   const onWheel = (e) => {
     if (modo !== 'finca') return;
-    const ahora = Date.now();
+    const ahora = e.timeStamp; // reloj del evento (ms): estable y sin impurezas en render
     const rueda = ruedaRef.current;
     if (ahora < rueda.bloqueadaHasta) return;
     rueda.acumulado += e.deltaY;
     if (rueda.acumulado > 140 && piso < PISOS.length - 1) {
-      setPiso(piso + 1); // rueda abajo → baja la montaña
+      caminarA(piso + 1); // rueda abajo → baja la montaña
       rueda.acumulado = 0;
       rueda.bloqueadaHasta = ahora + 700;
     } else if (rueda.acumulado < -140 && piso > 0) {
-      setPiso(piso - 1); // rueda arriba → sube la montaña
+      caminarA(piso - 1); // rueda arriba → sube la montaña
       rueda.acumulado = 0;
       rueda.bloqueadaHasta = ahora + 700;
     }
   };
 
-  const alternarZoom = () => setModo(modo === 'finca' ? 'montana' : 'finca');
-  const irAPiso = (i) => { setPiso(i); setModo('finca'); };
+  const alternarZoom = () => cambiarModo(modo === 'finca' ? 'montana' : 'finca');
+  const irAPiso = (i) => { setPiso(i); setModo('finca'); marcarCine('finca', i); };
   const pisoActual = PISOS[piso];
   const direccion = DIRECCIONES.find((d) => d.id === dir) || DIRECCIONES[0];
 
   const pct = (v, total) => `${(v / total) * 100}%`;
 
   return (
-    <div className="mm2" data-dir={dir} data-modo={modo} data-piso={pisoActual.id}>
+    <div
+      className="mm2"
+      data-dir={dir}
+      data-modo={modo}
+      data-piso={pisoActual.id}
+      data-viaje={viaje ? 'true' : undefined}
+      data-llegada={llegada ? 'true' : undefined}
+    >
       <div
         className="mm2-viewport"
         ref={viewportRef}
@@ -762,6 +908,30 @@ export default function MontanaMundosCine({ onBack = null }) {
           <div className="mm2-finca-pin" style={{ left: pct(195, VB_W), top: pct(838, VB_H) }} aria-hidden="true">
             ⭐ Su finca
           </div>
+
+          {/* Momento de LLEGADA a la finca: bloom de hora dorada sobre la
+              casa, anillos que se expanden y chispas que suben del fogón.
+              Se monta solo mientras dura (las animaciones one-shot corren
+              de cero en cada arribo) y no intercepta ningún toque. */}
+          {llegada && (
+            <div
+              className="mm2-llegada"
+              style={{ left: pct(196, VB_W), top: pct(874, VB_H) }}
+              data-testid="mm2-llegada"
+              aria-hidden="true"
+            >
+              <span className="mm2-llegada-bloom" />
+              <span className="mm2-llegada-anillo" />
+              <span className="mm2-llegada-anillo mm2-anillo-2" />
+              {CHISPAS.map((c) => (
+                <span
+                  key={`${c.dx}-${c.dy}`}
+                  className="mm2-chispa"
+                  style={{ '--mm2-cdx': `${c.dx}px`, '--mm2-cdy': `${c.dy}px`, '--mm2-cd': `${c.demora}s` }}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Mundos tocables: halo que pulsa + etiqueta */}
           {MUNDOS.map((m) => (
@@ -822,12 +992,12 @@ export default function MontanaMundosCine({ onBack = null }) {
           </span>
         </div>
         {modo === 'finca' && piso > 0 && (
-          <button type="button" className="mm2-paso mm2-paso-arriba" data-testid="mm2-paso-arriba" onClick={() => setPiso(piso - 1)}>
+          <button type="button" className="mm2-paso mm2-paso-arriba" data-testid="mm2-paso-arriba" onClick={() => caminarA(piso - 1)}>
             ▲ Subir a {PISOS[piso - 1].nombre}
           </button>
         )}
         {modo === 'finca' && piso < PISOS.length - 1 && (
-          <button type="button" className="mm2-paso mm2-paso-abajo" data-testid="mm2-paso-abajo" onClick={() => setPiso(piso + 1)}>
+          <button type="button" className="mm2-paso mm2-paso-abajo" data-testid="mm2-paso-abajo" onClick={() => caminarA(piso + 1)}>
             ▼ Bajar a {PISOS[piso + 1].nombre}
           </button>
         )}
@@ -841,7 +1011,7 @@ export default function MontanaMundosCine({ onBack = null }) {
         <header className="mm2-cabecera">
           <div className="mm2-mockbar">
             <button type="button" className="mm2-volver" onClick={() => onBack && onBack()}>← Volver</button>
-            <span className="mm2-mockbar-titulo">Mockup · pasada 2 · cine</span>
+            <span className="mm2-mockbar-titulo">Mockup · pasada 3 · cine</span>
           </div>
           <h1 className="mm2-titulo">La Montaña de los Mundos</h1>
           <div className="mm2-direcciones" role="tablist" aria-label="Dirección artística">

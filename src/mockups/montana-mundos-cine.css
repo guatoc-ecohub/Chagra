@@ -1,17 +1,27 @@
 /* montana-mundos-cine.css — MOCKUP DEV #/mockups/montana-mundos-cine
- * (prefijo mm2-). PASADA 2 CINEMATOGRÁFICA de "La Montaña de los Mundos".
+ * (prefijo mm2-). PASADA 3 CINEMATOGRÁFICA de "La Montaña de los Mundos".
  *
- * Qué cambia frente a la pasada 1 (montana-mundos.css):
- *   - La escena se parte en 6 CAPAS DE CÁMARA (cielo → cordillera lejana →
- *     cordillera media → montaña principal → niebla volumétrica → primer
- *     plano). Cada capa viaja a su propia velocidad y con su propia inercia
- *     (duración de transición distinta) — parallax de cine, no un scroll.
- *   - LUZ ATMOSFÉRICA POR PISO: al subir o bajar la montaña, un "grade"
- *     cinematográfico cambia la temperatura de la luz (azul frío del nevado,
- *     hora dorada del templado, ámbar del cálido, turquesa del río).
- *   - God-rays desde el astro + bancos de niebla de valle que suben.
- *   - FULL-BLEED: la montaña ocupa el 100% del viewport; la UI flota sobre
- *     el paisaje (scrims degradados), no hay cajas ni márgenes muertos.
+ * Hereda de la pasada 2: 6 capas de cámara con parallax e inercia propia,
+ * luz atmosférica por piso (grades), god-rays, niebla volumétrica de valle
+ * y full-bleed con la UI flotando sobre scrims.
+ *
+ * Qué SUMA la pasada 3:
+ *   - PROFUNDIDAD DE CAMPO: en modo finca el cielo, las cordilleras y el
+ *     primer plano quedan fuera de foco (blur ESTÁTICO por modo — jamás se
+ *     interpola; el cambio ocurre escondido bajo el viaje de cámara). En la
+ *     montaña completa, foco profundo.
+ *   - TRANSICIÓN PULIDA: easing con leve asentamiento en las capas cercanas
+ *     (inercia física), zoom-out majestuoso con duraciones escalonadas, y
+ *     el estado data-viaje — la niebla se ABRE mientras la cámara viaja y
+ *     las etiquetas se retiran hasta que el plano asienta.
+ *   - MOMENTO DE LLEGADA (data-llegada): bloom de hora dorada sobre la
+ *     casa, anillos expansivos, chispas que suben, el pin ⭐ aterriza con
+ *     rebote y la ventana late — one-shot en cada arribo a la finca.
+ *   - TEXTURA: rocas con vetas y pedrisco, cicatrices en el frailejón,
+ *     jirones de niebla a contracorriente, destellos sobre la nieve.
+ *   - VIDA AMBIENTAL por dirección: bandada que cruza (naturalista/verde),
+ *     colibrí (naturalista), luciérnagas (biopunk), hojas cayendo (verde),
+ *     animales que pastan.
  *
  * Todo GPU-friendly: SOLO transform y opacity se animan; los degradados
  * "volumétricos" son fills estáticos (radialGradient pre-suavizado, sin
@@ -281,7 +291,9 @@
 
 /* Cada capa viaja a su velocidad (transform inline desde React) y con su
  * propia INERCIA: las lejanas se asientan más lento — la cámara se siente
- * física, no un scroll. Solo transform: composición GPU pura. */
+ * física, no un scroll. Solo transform: composición GPU pura.
+ * Pasada 3: las capas CERCANAS asientan con un leve sobrepaso (la inercia
+ * de una cámara con peso); las lejanas llegan suaves, sin rebote. */
 .mm2-capa {
   position: absolute;
   top: 0;
@@ -289,19 +301,48 @@
   width: 100%;
   transform-origin: 0 0;
   will-change: transform;
-  transition: transform 0.9s cubic-bezier(0.22, 0.9, 0.3, 1), opacity 0.7s ease;
+  transition: transform 0.95s cubic-bezier(0.3, 0.86, 0.24, 1.02), opacity 0.7s ease;
   pointer-events: none;
 }
 
-.mm2-capa-cielo { transition-duration: 1.2s, 0.7s; }
-.mm2-capa-lejos { transition-duration: 1.08s, 0.7s; }
-.mm2-capa-medio { transition-duration: 0.99s, 0.7s; }
+.mm2-capa-cielo { transition-duration: 1.24s, 0.7s; transition-timing-function: cubic-bezier(0.26, 0.7, 0.32, 1), ease; }
+.mm2-capa-lejos { transition-duration: 1.12s, 0.7s; transition-timing-function: cubic-bezier(0.26, 0.72, 0.3, 1), ease; }
+.mm2-capa-medio { transition-duration: 1.02s, 0.7s; }
 .mm2-capa-principal { pointer-events: auto; }
-.mm2-capa-niebla { transition-duration: 0.84s, 0.7s; }
-.mm2-capa-cerca { transition-duration: 0.78s, 0.7s; }
+.mm2-capa-niebla { transition-duration: 0.88s, 0.7s; transition-timing-function: cubic-bezier(0.32, 1.08, 0.3, 1), ease; }
+.mm2-capa-cerca { transition-duration: 0.8s, 0.7s; transition-timing-function: cubic-bezier(0.34, 1.14, 0.3, 1), ease; }
+
+/* Zoom-out a la montaña completa: gran plano general MAJESTUOSO — todas
+ * las capas viajan más lento y escalonadas (el cielo tarda casi 2s en
+ * asentar), sin sobrepaso: la cámara se aleja con solemnidad. */
+.mm2[data-modo='montana'] .mm2-capa { transition-duration: 1.5s, 0.9s; transition-timing-function: cubic-bezier(0.3, 0.6, 0.22, 1), ease; }
+.mm2[data-modo='montana'] .mm2-capa-cielo { transition-duration: 1.9s, 0.9s; }
+.mm2[data-modo='montana'] .mm2-capa-lejos { transition-duration: 1.76s, 0.9s; }
+.mm2[data-modo='montana'] .mm2-capa-medio { transition-duration: 1.62s, 0.9s; }
+.mm2[data-modo='montana'] .mm2-capa-niebla { transition-duration: 1.4s, 0.9s; }
+.mm2[data-modo='montana'] .mm2-capa-cerca { transition-duration: 1.3s, 0.9s; }
 
 /* Al alejar la cámara (montaña completa) el primer plano sale de cuadro. */
 .mm2[data-modo='montana'] .mm2-capa-cerca { opacity: 0; }
+
+/* ── PROFUNDIDAD DE CAMPO (pasada 3) ──
+ * En el plano cercano la cámara enfoca la montaña principal: el cielo y
+ * las cordilleras quedan atrás del foco y el primer plano botánico delante
+ * (bokeh de lente). El blur es ESTÁTICO por modo — nunca se anima: el
+ * cambio se esconde bajo el movimiento del viaje de cámara, así no cuesta
+ * ni un frame en un Android de gama baja. En la montaña completa (gran
+ * plano general) el filtro desaparece: foco profundo de paisaje. */
+.mm2[data-modo='finca'] .mm2-capa-cielo { filter: blur(1.4px); }
+.mm2[data-modo='finca'] .mm2-capa-lejos { filter: blur(2.6px) saturate(0.93); }
+.mm2[data-modo='finca'] .mm2-capa-medio { filter: blur(1.3px); }
+.mm2[data-modo='finca'] .mm2-capa-cerca { filter: blur(2px); }
+
+/* ── LA CÁMARA VIAJA (data-viaje): la niebla se ABRE para dejar pasar el
+ * plano y las etiquetas se retiran — vuelven cuando el encuadre asienta.
+ * Solo opacity: el crossfade corre en el compositor. */
+.mm2[data-viaje] .mm2-capa-niebla { opacity: 0.3; }
+.mm2[data-viaje] .mm2-mundo-etiqueta,
+.mm2[data-viaje] .mm2-finca-pin { opacity: 0; }
 
 .mm2-svg {
   position: absolute;
@@ -618,7 +659,71 @@
   padding: 3px 7px;
   white-space: nowrap;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  transition: opacity 0.45s ease;
 }
+
+/* En la llegada el pin ATERRIZA: cae con rebote corto después de que la
+ * cámara asienta (la animación manda sobre la transición de data-viaje). */
+.mm2[data-llegada] .mm2-finca-pin {
+  animation: mm2-pin-llega 1.1s cubic-bezier(0.32, 1.4, 0.36, 1) 0.7s both;
+}
+
+/* ── MOMENTO DE LLEGADA A LA FINCA (el "wow" de la pasada 3) ──
+ * Anclado a la casa dentro de la capa principal (viaja y escala con la
+ * montaña). Todo one-shot con forwards: bloom de hora dorada que florece
+ * y se apaga, dos anillos que se expanden, chispas que suben como pavesas
+ * del fogón. Base opacity 0: con reduced-motion (animation: none) nada de
+ * esto aparece — el plano queda digno y quieto. */
+.mm2-llegada {
+  position: absolute;
+  width: 0;
+  height: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.mm2-llegada-bloom {
+  position: absolute;
+  left: -92px;
+  top: -92px;
+  width: 184px;
+  height: 184px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--mm2-halo-a), var(--mm2-halo-b) 70%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: mm2-bloom 3s ease-in-out 0.45s forwards;
+}
+
+.mm2-llegada-anillo {
+  position: absolute;
+  left: -30px;
+  top: -30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--mm2-halo-mundo);
+  opacity: 0;
+  animation: mm2-anillo 1.7s cubic-bezier(0.2, 0.7, 0.3, 1) 0.55s forwards;
+}
+
+.mm2-anillo-2 { animation-delay: 0.95s; }
+
+.mm2-chispa {
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  width: 4.5px;
+  height: 4.5px;
+  border-radius: 50%;
+  background: var(--mm2-halo-mundo);
+  box-shadow: 0 0 6px var(--mm2-halo-mundo);
+  opacity: 0;
+  animation: mm2-chispa 2.1s ease-out var(--mm2-cd, 0.6s) forwards;
+}
+
+/* La ventana de la casa late dos veces al llegar: hay alguien esperando. */
+.mm2[data-llegada] .mm2-casa-ventana { animation: mm2-ventana-late 1.3s ease-in-out 0.75s 2; }
 
 .mm2-mundo {
   position: absolute;
@@ -657,6 +762,7 @@
   border-radius: 999px;
   padding: 2.5px 6px;
   white-space: nowrap;
+  transition: opacity 0.45s ease;
 }
 
 .mm2-mundo.es-tenue { opacity: 0.24; pointer-events: none; }
@@ -756,6 +862,20 @@
 }
 .mm2-ave-1 { animation: mm2-deriva 30s ease-in-out infinite alternate; }
 
+/* Bandada en V (pasada 3): cruza el cielo de lado a lado, desaparece por
+ * el borde y descansa fuera de cuadro antes de volver a pasar. */
+.mm2-bandada { display: none; }
+.mm2[data-dir='naturalista'] .mm2-bandada,
+.mm2[data-dir='verde'] .mm2-bandada {
+  display: block;
+  fill: none;
+  stroke: #5c4a30;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+.mm2[data-dir='verde'] .mm2-bandada { stroke: #3f7a4a; }
+.mm2-bandada-vuelo { animation: mm2-cruza 46s linear infinite; }
+
 /* Capa principal: cuerpo de la montaña */
 .mm2-piso-paramo { fill: var(--mm2-paramo); }
 .mm2-piso-frio { fill: var(--mm2-frio); }
@@ -784,6 +904,16 @@
 
 .mm2-piedra { fill: var(--mm2-piedra); }
 
+/* Textura de roca (pasada 3): afloramientos con vetas y pedrisco */
+.mm2-roca { fill: var(--mm2-piedra); opacity: 0.85; }
+.mm2-roca-veta { fill: none; stroke: rgba(22, 22, 34, 0.24); stroke-width: 1.2; stroke-linecap: round; }
+.mm2-pedrisco circle { fill: var(--mm2-piedra); opacity: 0.7; }
+
+/* Destellos de hielo sobre la nieve: titilan desfasados */
+.mm2-destello { fill: #ffffff; opacity: 0.25; animation: mm2-titila 2.8s ease-in-out infinite alternate; }
+.mm2-destello:nth-of-type(2n) { animation-delay: 0.9s; }
+.mm2-destello:nth-of-type(3n) { animation-delay: 1.8s; }
+
 /* Páramo */
 .mm2-frailejon-tronco { fill: var(--mm2-tronco); }
 .mm2-frailejon-faldon { fill: none; stroke: var(--mm2-frailejon-seca); stroke-width: 2; stroke-linecap: round; }
@@ -791,6 +921,9 @@
 .mm2-hoja-int { fill: color-mix(in srgb, var(--mm2-frailejon-hoja) 80%, #ffffff); }
 .mm2-frailejon-tallo { fill: none; stroke: var(--mm2-frailejon-seca); stroke-width: 1.6; stroke-linecap: round; }
 .mm2-frailejon-flor { fill: var(--mm2-frailejon-flor); }
+/* Cicatrices foliares: los anillos de hojas viejas del tronco (textura) */
+.mm2-frailejon-cicatriz { fill: none; stroke: rgba(64, 48, 26, 0.35); stroke-width: 1; stroke-linecap: round; }
+.mm2[data-dir='biopunk'] .mm2-frailejon-cicatriz { stroke: rgba(103, 232, 249, 0.22); }
 .mm2-frailejon-roseta {
   transform-box: fill-box;
   transform-origin: 50% 92%;
@@ -818,6 +951,14 @@
 .mm2-cerca-poste, .mm2-cerca-riel { fill: var(--mm2-cerca-madera); }
 .mm2-oveja { fill: var(--mm2-oveja); }
 .mm2-vaca { fill: var(--mm2-vaca); }
+
+/* Los animales pastan: se inclinan apenas hacia el suelo y vuelven */
+.mm2-pasta {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: mm2-pasta 6.2s ease-in-out infinite;
+}
+.mm2-vaca .mm2-pasta { animation-duration: 7.6s; animation-delay: 1.8s; }
 
 /* Templado: la casa campesina */
 .mm2-casa-muro { fill: var(--mm2-casa-muro); }
@@ -921,6 +1062,34 @@
 .mm2-mariposa-1 { fill: #f2a541; animation: mm2-flota 3.6s ease-in-out infinite alternate; }
 .mm2-mariposa-2 { fill: #e05f8a; animation: mm2-flota 4.4s ease-in-out infinite alternate-reverse; }
 
+/* Colibrí (solo naturalista): aleteo rápido + ronda lenta por los geranios */
+.mm2-colibri { display: none; }
+.mm2[data-dir='naturalista'] .mm2-colibri { display: block; }
+.mm2-colibri-torso { fill: #2f8a72; }
+.mm2-colibri-cola { fill: #256b5a; }
+.mm2-colibri-pico { fill: none; stroke: #3c3020; stroke-width: 1.2; stroke-linecap: round; }
+.mm2-colibri-ala {
+  fill: #6cc9a4;
+  transform-box: fill-box;
+  transform-origin: 85% 92%;
+  animation: mm2-aleteo 0.24s ease-in-out infinite alternate;
+}
+.mm2-colibri-ronda { animation: mm2-ronda 5.4s ease-in-out infinite alternate; }
+
+/* Luciérnagas (solo biopunk): parpadean mientras derivan hacia arriba */
+.mm2-luciernagas { display: none; }
+.mm2[data-dir='biopunk'] .mm2-luciernagas { display: block; }
+.mm2-luciernaga { fill: #a3e635; opacity: 0; animation: mm2-luciernaga 6.6s ease-in-out infinite; }
+.mm2-luciernaga:nth-of-type(2n) { animation-delay: 2.2s; animation-duration: 7.8s; }
+.mm2-luciernaga:nth-of-type(3n) { animation-delay: 4.1s; animation-duration: 5.7s; }
+
+/* Hojas que caen (solo verde vivo): giran y planean hasta el suelo */
+.mm2-hojas-caen { display: none; }
+.mm2[data-dir='verde'] .mm2-hojas-caen { display: block; }
+.mm2-hoja-cae { fill: #7fae4f; opacity: 0; animation: mm2-hoja-cae 8.5s linear infinite; }
+.mm2-hoja-cae-2 { animation-delay: 3.1s; animation-duration: 9.6s; }
+.mm2-hoja-cae-3 { animation-delay: 5.7s; animation-duration: 7.4s; }
+
 /* Capa niebla volumétrica: bancos que derivan; el del valle SUBE y se
  * disipa en loop — la niebla de la Sierra Nevada de verdad. */
 .mm2-banco-1 { animation: mm2-niebla-deriva 26s ease-in-out infinite alternate; }
@@ -928,6 +1097,9 @@
 .mm2-banco-3 { animation: mm2-niebla-deriva 30s ease-in-out infinite alternate; }
 .mm2-banco-valle { animation: mm2-niebla-sube 22s ease-in-out infinite; }
 .mm2-banco-valle-2 { animation: mm2-niebla-sube 28s ease-in-out infinite 9s; }
+/* Jirones: hilachas finas que derivan A CONTRACORRIENTE de los bancos —
+ * dos velocidades de niebla = volumen (textura de la pasada 3). */
+.mm2-jirones { opacity: 0.7; animation: mm2-niebla-deriva 44s ease-in-out infinite alternate-reverse; }
 
 /* Capa primer plano: siluetas botánicas que enmarcan el plano */
 .mm2-cerca-forma { fill: var(--mm2-cerca); opacity: 0.88; }
@@ -996,11 +1168,86 @@
   100% { transform: translateY(-52px); opacity: 0; }
 }
 
+/* ── Pasada 3: vida ambiental ── */
+@keyframes mm2-cruza {
+  0% { transform: translate(-80px, 0); opacity: 0; }
+  4% { opacity: 1; }
+  40% { transform: translate(440px, -24px); opacity: 1; }
+  44% { transform: translate(468px, -26px); opacity: 0; }
+  100% { transform: translate(468px, -26px); opacity: 0; }
+}
+
+@keyframes mm2-aleteo {
+  from { transform: rotate(-22deg); }
+  to { transform: rotate(28deg); }
+}
+
+@keyframes mm2-ronda {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-8px, -5px); }
+}
+
+@keyframes mm2-luciernaga {
+  0%, 100% { opacity: 0; transform: translate(0, 0); }
+  22% { opacity: 0.95; }
+  50% { opacity: 0.25; transform: translate(7px, -9px); }
+  74% { opacity: 0.8; transform: translate(-4px, -16px); }
+}
+
+@keyframes mm2-hoja-cae {
+  0% { opacity: 0; transform: translate(0, -10px) rotate(0deg); }
+  10% { opacity: 0.9; }
+  78% { opacity: 0.85; }
+  100% { opacity: 0; transform: translate(-16px, 46px) rotate(200deg); }
+}
+
+@keyframes mm2-pasta {
+  0%, 52%, 100% { transform: rotate(0deg); }
+  68% { transform: rotate(-4deg) translateY(0.6px); }
+  84% { transform: rotate(-3.4deg) translateY(0.5px); }
+}
+
+/* ── Pasada 3: momento de llegada a la finca ── */
+@keyframes mm2-bloom {
+  0% { opacity: 0; transform: scale(0.55); }
+  35% { opacity: 0.9; }
+  100% { opacity: 0; transform: scale(1.28); }
+}
+
+@keyframes mm2-anillo {
+  0% { opacity: 0.9; transform: scale(0.25); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+
+@keyframes mm2-chispa {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  18% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--mm2-cdx, 0px), var(--mm2-cdy, -60px)) scale(1); }
+}
+
+@keyframes mm2-pin-llega {
+  0% { transform: translate(-50%, -100%) translateY(-14px) scale(0.7); opacity: 0; }
+  60% { transform: translate(-50%, -100%) translateY(2px) scale(1.06); opacity: 1; }
+  100% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+}
+
+@keyframes mm2-ventana-late {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
 /* La montaña se queda quieta si la persona lo pide: plano final digno,
- * sin parallax animado ni vida — pero con toda la luz y la composición. */
+ * sin parallax animado, sin vida ni momento de llegada (los elementos del
+ * "wow" tienen base opacity 0 y sin animación jamás aparecen) — pero con
+ * toda la luz, la profundidad de campo y la composición. Sin transición
+ * de cámara el estado de viaje no dura nada: las etiquetas ni parpadean. */
 @media (prefers-reduced-motion: reduce) {
   .mm2 *, .mm2 *::before, .mm2 *::after {
     animation: none !important;
     transition: none !important;
   }
+
+  .mm2[data-viaje] .mm2-capa-niebla { opacity: 1; }
+  .mm2[data-viaje] .mm2-mundo-etiqueta,
+  .mm2[data-viaje] .mm2-finca-pin { opacity: 1; }
 }
