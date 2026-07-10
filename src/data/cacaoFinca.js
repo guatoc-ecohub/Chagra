@@ -38,7 +38,7 @@ export const CREDITOS_FOTOS_CACAO = [
   { slug: 'injerto', autor: 'Irene Scott / AusAID', lic: 'CC BY 2.0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Cocoa_farmer_Jenny_Kebu_grafting_a_Cocoa_seedling_at_Kebu_farm,_east_of_Honiara._(10687161116).jpg' },
   { slug: 'monilia', autor: 'Jake Rehage (unclecactus)', lic: 'CC0', fuente: 'iNaturalist', url: 'https://www.inaturalist.org/observations/58102409' },
   { slug: 'escoba-bruja', autor: 'Denis Zabin (deniszabin)', lic: 'CC BY 4.0', fuente: 'iNaturalist', url: 'https://www.inaturalist.org/observations/333723904' },
-  { slug: 'mazorca-negra', autor: 'Scot Nelson', lic: 'CC0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Cacao_black_pod_rot_39572305384.jpg' },
+  { slug: 'mazorca-negra', autor: 'Scot Nelson', lic: 'CC0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Cacao_black_pod_rot_29064726523.jpg' },
   { slug: 'cosecha', autor: 'Lolay', lic: 'CC BY 2.0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Cocoa_Pods_and_Seeds.jpg' },
   { slug: 'fermentacion', autor: 'Scot Nelson', lic: 'CC0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Fermentation_of_cacao_seeds.jpg' },
   { slug: 'secado', autor: 'Francesco Veronesi', lic: 'CC BY-SA 2.0', fuente: 'Wikimedia Commons', url: 'https://commons.wikimedia.org/wiki/File:Cocoa_beans_drying_Mpenkro_2014_B002a.jpg' },

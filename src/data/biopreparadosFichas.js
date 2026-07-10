@@ -97,20 +97,27 @@ export const SAFETY_LABEL = {
  * catálogo en runtime — no se copia aquí.
  * @type {Record<string,{foto?:string,paraQueSirve:string}>}
  */
+// Auditoría de visión 2026-07-09 (ver Chagra-strategy/ops): 8 fotos NO mostraban
+// el biopreparado sino el INGREDIENTE crudo o algo ajeno (biol=planta industrial
+// de biogás; bocashi=compostera de jardín; caldo_bordeles=cristal de sulfato de
+// cobre; humus_liquido=cámara de desechos; lixiviado_frutas=naranjas enteras;
+// supermagro=montón de estiércol; purin_ortiga=jardín botánico con letreros en
+// inglés; compost_maduro=estiércol fresco en barro). Se retiró la `foto` de cada
+// una — mejor sin foto (cae al ícono, patrón FotoAgua) que con desinformación.
+// Solo conservan foto verificada por visión: te_compost (brewer aireado real) y
+// roca_fosforica (fosforita real, fuente Commons confirmada). Huecos documentados
+// para conseguir fotos CC del preparado artesanal real más adelante.
 export const FICHA_META = {
   // proposito: fertilizacion + estimulante_microbiano
   bocashi: {
-    foto: 'bocashi',
     paraQueSirve: 'Abono sólido fermentado que se mezcla con la tierra: nutre la mata y despierta la vida del suelo.',
   },
   // proposito: fertilizacion + estimulante_microbiano
   biol: {
-    foto: 'biol',
     paraQueSirve: 'Abono líquido foliar de estiércol fermentado sin aire: nutre la hoja y empuja el crecimiento.',
   },
   // dosis (catálogo): «curativo contra pulgón»; proposito: repelente_insectos
   purin_ortiga: {
-    foto: 'purin_ortiga',
     paraQueSirve: 'Nutre y, sobre todo, repele plagas chupadoras: en curativo se usa contra el pulgón.',
   },
   // uso (catálogo): «activo contra hongos y ácaros»; dosis: «escamas, chancros»
@@ -123,7 +130,6 @@ export const FICHA_META = {
   },
   // proposito: fitosanitario_preventivo; uso: aplicar ANTES, en alta humedad
   caldo_bordeles: {
-    foto: 'caldo_bordeles',
     paraQueSirve: 'Fungicida de cobre de uso preventivo: se asperja antes de que llegue la enfermedad, en épocas de mucha humedad.',
   },
   // proposito: fertilizacion + estimulante_microbiano + fitosanitario_preventivo
@@ -133,17 +139,14 @@ export const FICHA_META = {
   },
   // proposito: fertilizacion + estimulante_microbiano
   humus_liquido: {
-    foto: 'humus_liquido',
     paraQueSirve: 'Abono líquido de lombriz: nutre la planta y ayuda a que agarre raíz.',
   },
   // uso (catálogo): «aporte de potasio y micronutrientes» en fase reproductiva
   lixiviado_frutas: {
-    foto: 'lixiviado_frutas',
     paraQueSirve: 'Abono líquido rico en potasio para la floración y el llenado del fruto.',
   },
   // uso (catálogo): corrige deficiencias — «clorosis intervenal, brotes deformes»
   supermagro: {
-    foto: 'supermagro',
     paraQueSirve: 'Biofertilizante foliar de micronutrientes: corrige deficiencias (hojas amarillas entre las venas, brotes deformes).',
   },
   // uso (catálogo): «contra Rhizoctonia, Fusarium y Sclerotinia»
@@ -169,7 +172,6 @@ export const FICHA_META = {
   },
   // proposito: fertilizacion + estimulante_microbiano
   compost_maduro: {
-    foto: 'compost_maduro',
     paraQueSirve: 'Abono sólido maduro: enmienda orgánica que nutre el suelo y despierta su vida.',
   },
   // proceso (catálogo): estimulante de enraizamiento (citoquininas, auxinas)
@@ -185,15 +187,7 @@ export const FICHA_META = {
  * @type {Array<{slug:string,autor:string,lic:string,url:string}>}
  */
 export const CREDITOS_FOTOS_BIOPREPARADOS = [
-  { slug: 'biol', autor: 'David Medcalf', lic: 'CC BY-SA 2.0', url: 'https://commons.wikimedia.org/wiki/File:A_massive_biodigester_at_Pengelly_Barton_Farm_-_geograph.org.uk_-_8234071.jpg' },
-  { slug: 'bocashi', autor: 'Acabashi', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Compost_heap_Heyrons_High_Easter_Essex_01.jpg' },
-  { slug: 'caldo_bordeles', autor: 'Crystal Titan', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystal.jpg' },
-  { slug: 'compost_maduro', autor: 'Richard Webb', lic: 'CC BY-SA 2.0', url: 'https://commons.wikimedia.org/wiki/File:A_steaming_pile_-_geograph.org.uk_-_297127.jpg' },
-  { slug: 'humus_liquido', autor: 'SuSanA Secretariat', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Composting_Unit_Ecodomeo_-_Local_de_compostage_Ecodomeo_(6126690435).jpg' },
-  { slug: 'lixiviado_frutas', autor: 'PattayaPatrol', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:DFC_3928_A_vibrant_pile_of_fresh_oranges_with_mottled_green-and-orange_skins_ready_to_be_picked_or_enjoyed.jpg' },
-  { slug: 'purin_ortiga', autor: 'دانية دروبي', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:Gooseberry_and_Nettle_plant_in_botanical_garden.jpg' },
   { slug: 'roca_fosforica', autor: 'James St. John', lic: 'CC BY 2.0', url: 'https://commons.wikimedia.org/wiki/File:Black_concretionary_phosphorite_(Morris_Member,_Phosphoria_Formation,_mid-Permian;_Waterloo_Mine,_Bear_Lake_County,_Idaho,_USA)_(34327234316).jpg' },
-  { slug: 'supermagro', autor: 'Nadinviki', lic: 'CC BY-SA 4.0', url: 'https://commons.wikimedia.org/wiki/File:COW_DUNG_MANURE.jpg' },
   { slug: 'te_compost', autor: 'Pratiti Dutta', lic: 'CC0', url: 'https://commons.wikimedia.org/wiki/File:WORM_TEA_BREWER.jpg' },
 ];
 
