@@ -121,6 +121,10 @@ const AlmanaqueScreen = lazy(() => import('./components/almanaque/AlmanaqueScree
 const AnoFincaScreen = lazy(() => import('./components/anofinca/AnoFincaScreen'));
 const SeguimientoProcesoScreen = lazy(() => import('./components/SeguimientoProcesoScreen'));
 const SoilDiagnosticScreen = lazy(() => import('./components/SoilDiagnosticScreen'));
+// Mockup "Guardianes que aparecen" (#/mockups/guardianes-narrativos): pieza
+// visual sin gate ni auth, datos de muestra. Los guardianes de fauna nativa
+// LLEGAN contextualmente a la pantalla (floración→angelita, suelo→lombriz…).
+const MockupGuardianesNarrativos = lazy(() => import('./mockups/MockupGuardianesNarrativos'));
 // Módulo "Agua de la finca": cosecha de lluvia (calculadora determinista),
 // riego con medida (ETc; Kc/ETo = slots grounded-pendiente) y cuidar el agua
 // (calidad + nacimiento, caso "se me seca el nacimiento en verano").
@@ -418,6 +422,8 @@ const LoadingFallback = ({ view = null }) => {
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 const HASH_VIEW_ROUTES = {
+  // Mockups (sin gate, datos de muestra) — se resuelven ANTES del auth check.
+  'mockups/guardianes-narrativos': 'mockup_guardianes',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -915,6 +921,17 @@ export default function App() {
       return;
     }
 
+    // Rutas de MOCKUP (#/mockups/...): piezas visuales sin gate ni auth, con
+    // datos de muestra. Se resuelven antes del isAuthenticated() para que se
+    // puedan revisar sin sesión (igual espíritu que las rutas públicas).
+    if (hash.startsWith('mockups/')) {
+      const mockView = HASH_VIEW_ROUTES[hash];
+      if (mockView) {
+        navigate(mockView);
+        return;
+      }
+    }
+
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
         navigate('login');
@@ -943,6 +960,11 @@ export default function App() {
       const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
       const routeView = HASH_VIEW_ROUTES[hash];
       if (!routeView) return;
+      // Mockups sin gate: navegar directo sin pasar por isAuthenticated().
+      if (hash.startsWith('mockups/')) {
+        navigate(routeView);
+        return;
+      }
       // Gate extensionista (ADR-048): no montar el panel para quien no tiene rol.
       if (routeView === 'extensionista' && !esExtensionistaActual()) {
         navigate('dashboard');
@@ -1186,6 +1208,13 @@ export default function App() {
     switch (currentView) {
       case 'loading':
         return <LoadingFallback view="loading" />;
+      case 'mockup_guardianes':
+        // Mockup "Guardianes que aparecen" — sin gate, datos de muestra.
+        return (
+          <ErrorBoundary>
+            <MockupGuardianesNarrativos onBack={() => navigate('dashboard')} />
+          </ErrorBoundary>
+        );
       case 'login':
         return (
           <ErrorBoundary>
