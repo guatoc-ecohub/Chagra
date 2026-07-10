@@ -43,7 +43,7 @@ describe('feedbackService — edges (A-15 #248)', () => {
   });
 
   function sentBody() {
-    return JSON.parse(global.fetch.mock.calls[0][1].body);
+    return JSON.parse(/** @type {string} */ (vi.mocked(global.fetch).mock.calls[0][1].body));
   }
 
   it('incluye edges válidos en el payload', async () => {

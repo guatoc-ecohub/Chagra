@@ -32,6 +32,14 @@ const DAY = 86400000;
 // "Hoy" fijo para tests deterministas: 10 de junio de 2026, 12:00 COT.
 const NOW = new Date('2026-06-10T12:00:00-05:00').getTime();
 
+/** @typedef {import('../../types/farmProcess.js').FarmProcess} FarmProcess */
+/** @typedef {import('../../types/farmProcess.js').FarmProcessAttributes} FarmProcessAttributes */
+
+/**
+ * @param {Partial<FarmProcess>} [over]
+ * @param {Partial<FarmProcessAttributes>} [attrs]
+ * @returns {FarmProcess}
+ */
 const mkProcess = (over = {}, attrs = {}) => ({
   process_id: over.process_id || `proc_${Math.random().toString(36).slice(2)}`,
   type: 'farm_process',
@@ -283,8 +291,8 @@ describe('buildEpisodicMemoryContext — loader con degradación limpia', () => 
   });
 
   it('lee farmProcessCache y arma el bloque', async () => {
-    listFarmProcesses.mockResolvedValue([mkProcess({ process_id: 'p1' })]);
-    getFarmEvents.mockResolvedValue([]);
+    vi.mocked(listFarmProcesses).mockResolvedValue([mkProcess({ process_id: 'p1' })]);
+    vi.mocked(getFarmEvents).mockResolvedValue([]);
     const block = await buildEpisodicMemoryContext({
       query: 'mi maíz',
       resolvedEntities: [SPECIES_ENTITY_MAIZ],
@@ -295,7 +303,7 @@ describe('buildEpisodicMemoryContext — loader con degradación limpia', () => 
   });
 
   it('si IndexedDB falla → no-op silencioso (cadena vacía, sin throw)', async () => {
-    listFarmProcesses.mockRejectedValue(new Error('IDB not available'));
+    vi.mocked(listFarmProcesses).mockRejectedValue(new Error('IDB not available'));
     const block = await buildEpisodicMemoryContext({
       query: 'mi maíz',
       resolvedEntities: [SPECIES_ENTITY_MAIZ],
@@ -305,7 +313,7 @@ describe('buildEpisodicMemoryContext — loader con degradación limpia', () => 
   });
 
   it('sin procesos en la finca → no-op', async () => {
-    listFarmProcesses.mockResolvedValue([]);
+    vi.mocked(listFarmProcesses).mockResolvedValue([]);
     const block = await buildEpisodicMemoryContext({
       query: 'mi maíz',
       resolvedEntities: [SPECIES_ENTITY_MAIZ],

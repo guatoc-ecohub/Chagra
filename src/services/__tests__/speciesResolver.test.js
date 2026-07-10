@@ -37,8 +37,8 @@ const SPECIES_FIXTURE = [
 
 beforeEach(() => {
   __resetSpeciesResolverCache();
-  getAllSpecies.mockResolvedValue(SPECIES_FIXTURE);
-  retrieve.mockResolvedValue([]);
+  vi.mocked(getAllSpecies).mockResolvedValue(SPECIES_FIXTURE);
+  vi.mocked(retrieve).mockResolvedValue([]);
 });
 
 describe('resolveSpecies', () => {
@@ -74,13 +74,13 @@ describe('resolveSpecies', () => {
   });
 
   it('skip (null) cuando catálogo y RAG no tienen match', async () => {
-    retrieve.mockResolvedValue([]);
+    vi.mocked(retrieve).mockResolvedValue([]);
     const r = await resolveSpecies('chorcho');
     expect(r).toBeNull();
   });
 
   it('RAG fuzzy match cuando supera threshold', async () => {
-    retrieve.mockResolvedValue([
+    vi.mocked(retrieve).mockResolvedValue([
       { species: 'fragaria_ananassa_monterrey', text: '...', score: 3.5 },
       { species: 'fragaria_ananassa_monterrey', text: '...', score: 1.2 },
       { species: 'solanum_lycopersicum_cherry', text: '...', score: 0.4 },
@@ -93,7 +93,7 @@ describe('resolveSpecies', () => {
   });
 
   it('skip (null) si RAG retorna scores bajo threshold', async () => {
-    retrieve.mockResolvedValue([
+    vi.mocked(retrieve).mockResolvedValue([
       { species: 'fragaria_ananassa_monterrey', text: '...', score: 0.5 },
       { species: 'solanum_lycopersicum_cherry', text: '...', score: 0.3 },
     ]);
@@ -107,8 +107,8 @@ describe('resolveSpecies', () => {
   });
 
   it('NO falla si catalogDB throws — RAG-only fallback', async () => {
-    getAllSpecies.mockRejectedValue(new Error('catalog not ready'));
-    retrieve.mockResolvedValue([
+    vi.mocked(getAllSpecies).mockRejectedValue(new Error('catalog not ready'));
+    vi.mocked(retrieve).mockResolvedValue([
       { species: 'annona_muricata', text: '...', score: 5.0 },
     ]);
     const r = await resolveSpecies('guanabana sabrosa');
@@ -119,7 +119,7 @@ describe('resolveSpecies', () => {
 
 describe('resolveSpeciesBatch', () => {
   it('preserva resueltos y reporta skippeados', async () => {
-    retrieve.mockResolvedValue([]);
+    vi.mocked(retrieve).mockResolvedValue([]);
     const { resolved, skipped } = await resolveSpeciesBatch([
       'Tomate Cherry',
       'cosa-inexistente',

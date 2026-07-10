@@ -131,7 +131,7 @@ export function isBundleFetchFailure(input) {
  * NUNCA lanza.
  *
  * @param {object} [opts]
- * @param {typeof fetch} [opts.fetchImpl=globalThis.fetch]
+ * @param {(url: string, init?: object) => Promise<{ ok: boolean, status?: number, json: () => Promise<any> }>} [opts.fetchImpl=globalThis.fetch]
  * @param {number} [opts.timeoutMs=VERSION_FETCH_TIMEOUT_MS]
  * @returns {Promise<string|null>}
  */

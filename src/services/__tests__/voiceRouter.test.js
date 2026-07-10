@@ -19,7 +19,7 @@ import { INTENTS } from '../voiceFieldExtractor';
 const NOW = Date.UTC(2026, 5, 25, 12, 0, 0);
 
 beforeEach(() => {
-  streamOllama.mockReset();
+  vi.mocked(streamOllama).mockReset();
 });
 
 describe('preferLocal — no llama al LLM', () => {
@@ -39,7 +39,7 @@ describe('preferLocal — no llama al LLM', () => {
 describe('merge NLU — rellena huecos sin pisar la especie', () => {
   it('el LLM no puede reescribir la especie groundeada (gulupa≠guayaba)', async () => {
     // El LLM, alucinando, dice "guayaba". El catálogo ya groundeó gulupa.
-    streamOllama.mockResolvedValue(JSON.stringify({
+    vi.mocked(streamOllama).mockResolvedValue(JSON.stringify({
       intent: 'registrar_observacion', especie: 'guayaba', altura_m: null,
       ancho_m: null, cantidad: null, unidad: '', fenologia: '', sintomas: [],
       insumo: '', labores: [], lugar: '', tiempo: '',
@@ -56,7 +56,7 @@ describe('merge NLU — rellena huecos sin pisar la especie', () => {
 
   it('un campo que el on-device no sacó lo rellena el LLM', async () => {
     // Transcripción sin medida parseable; el LLM aporta altura.
-    streamOllama.mockResolvedValue(JSON.stringify({
+    vi.mocked(streamOllama).mockResolvedValue(JSON.stringify({
       intent: 'registrar_planta', especie: 'aguacate', altura_m: 4,
       ancho_m: null, cantidad: null, unidad: '', fenologia: '', sintomas: [],
       insumo: '', labores: [], lugar: '', tiempo: '',
@@ -70,7 +70,7 @@ describe('merge NLU — rellena huecos sin pisar la especie', () => {
 
 describe('LLM caído — degrada a on-device', () => {
   it('si streamOllama lanza, queda la base determinística', async () => {
-    streamOllama.mockRejectedValue(new Error('Ollama down'));
+    vi.mocked(streamOllama).mockRejectedValue(new Error('Ollama down'));
     const r = await classifyAndExtract('sembré veinte maticas de cebolla larga', { now: NOW });
     expect(r.intent).toBe(INTENTS.SIEMBRA);
     expect(r.species.map((s) => s.slug)).toContain('allium_fistulosum');

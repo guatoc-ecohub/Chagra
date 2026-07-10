@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import useCinemaMode from '../hooks/useCinemaMode';
 
+/** @param {{ src: string, alt?: string, className?: string, children?: import('react').ReactNode, calloutOverlay?: import('react').ReactNode }} props */
 export default function PhotoViewer({
   src,
   alt = '',

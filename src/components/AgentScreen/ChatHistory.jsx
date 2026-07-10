@@ -32,9 +32,10 @@ const FLOATING_BACK_IDLE_HIDE_MS = 2200;
  * @param {Array} [props.messages=[]] - Lista de mensajes del chat.
  * @param {string} [props.streamingContent=''] - Texto parcial del streaming actual.
  * @param {boolean} [props.isStreaming=false] - Indica si hay un streaming en curso.
- * @param {Function} props.onConsentNeeded - Callback cuando se requiere consentimiento del usuario.
- * @param {Function} props.onRetryOrphan - Callback para reintentar un mensaje huérfano (sin respuesta).
- * @param {Function} props.onCancelDeepResearch - Callback para cancelar una investigación profunda en curso.
+ * @param {Function} [props.onConsentNeeded] - Callback cuando se requiere consentimiento del usuario.
+ * @param {Function} [props.onRetryOrphan] - Callback para reintentar un mensaje huérfano (sin respuesta).
+ * @param {Function} [props.onDismissInsight] - Callback para descartar un insight proactivo.
+ * @param {Function} [props.onCancelDeepResearch] - Callback para cancelar una investigación profunda en curso.
  * @param {Function} [props.onAyudaAction] - Callback del deep-link «Abrir …» de la ayuda groundeada (AYUDA_FUNCIONES).
  * @param {Object|null} [props.proactiveGreeting=null] - Datos del saludo proactivo dinámico.
  * @param {string|null} [props.thinkingPhase=null] - Fase REAL del pipeline mientras
@@ -42,7 +43,7 @@ const FLOATING_BACK_IDLE_HIDE_MS = 2200;
  *   ThinkingSteps la traduce a pasos contextuales con ícono ("Consultando el
  *   catálogo…" → "Revisando el grafo…") y rota los de la fase larga. Si es
  *   null cae al "Pensando" genérico — perceived performance, la espera avanza.
- * @param {Function} props.onBack - Callback para volver a la pantalla anterior.
+ * @param {Function} [props.onBack] - Callback para volver a la pantalla anterior.
  */
 export default function ChatHistory({ messages = [], streamingContent = '', isStreaming = false, thinkingPhase = null, onConsentNeeded, onRetryOrphan, onCancelDeepResearch, onDismissInsight, onAyudaAction, proactiveGreeting = null, onBack }) {
   const bottomRef = useRef(null);

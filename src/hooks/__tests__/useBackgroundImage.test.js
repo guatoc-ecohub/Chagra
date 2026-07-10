@@ -61,7 +61,7 @@ describe('useBackgroundImage', function () {
     Object.defineProperty(nav, 'onLine', { writable: true, configurable: true, value: true });
     fetchFromFarmOSMock = vi.fn();
     getAccessTokenMock.mockResolvedValue('mock-token');
-    globalThis.fetch.mockResolvedValue({ ok: true, blob: function () { return Promise.resolve(new Blob(['x'], { type: 'image/jpeg' })); } });
+    vi.mocked(globalThis.fetch).mockResolvedValue(/** @type {Response} */ ({ ok: true, blob: function () { return Promise.resolve(new Blob(['x'], { type: 'image/jpeg' })); } }));
     mockStoreGet.mockImplementation(function () {
       var self = this;
       return {

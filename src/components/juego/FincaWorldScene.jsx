@@ -31,7 +31,7 @@ import { fvhSkinClass } from '../../config/fvhSkin';
  *
  * @param {Object} props
  * @param {Object} props.stage       WORLD_STAGES[nivel] (cielo, tierra, arboles, vida)
- * @param {Array}  props.criaturas   criaturas con {emoji, desbloqueada}
+ * @param {Array}  [props.criaturas]  criaturas con {emoji, desbloqueada}
  * @param {boolean} [props.vacia]    finca sin datos → mundo "esperando"
  * @param {Object} [props.variant]   { kind, escala, animales, cerdos, tinte,
  *                                      zonas, invernaderoForma, invernaderoTamano }

@@ -146,7 +146,7 @@ describe('addTurn', () => {
 
   test('falla graceful si IndexedDB falla (no-fatal)', async () => {
     const { openDB } = await import('../../db/dbCore');
-    openDB.mockRejectedValueOnce(new Error('IDB roto'));
+    vi.mocked(openDB).mockRejectedValueOnce(new Error('IDB roto'));
 
     const result = await addTurn('alice', {
       role: 'user',
@@ -231,7 +231,7 @@ describe('getRecentContext', () => {
 
   test('falla graceful si IndexedDB falla (devuelve [])', async () => {
     const { openDB } = await import('../../db/dbCore');
-    openDB.mockRejectedValueOnce(new Error('IDB error'));
+    vi.mocked(openDB).mockRejectedValueOnce(new Error('IDB error'));
 
     const ctx = await getRecentContext('alice');
     expect(ctx).toEqual([]);
@@ -359,7 +359,7 @@ describe('clearMemory', () => {
 
   test('falla si IndexedDB falla (lanza error)', async () => {
     const { openDB } = await import('../../db/dbCore');
-    openDB.mockRejectedValueOnce(new Error('IDB roto'));
+    vi.mocked(openDB).mockRejectedValueOnce(new Error('IDB roto'));
 
     await expect(clearMemory('alice')).rejects.toThrow('IDB roto');
   });

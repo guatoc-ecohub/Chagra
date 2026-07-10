@@ -113,8 +113,8 @@ export function buildLogName(event, process) {
  * Construye el payload JSON:API para enviar a FarmOS.
  *
  * @param {Object} event — farm_process_event
- * @param {Object} [process] — FarmProcess padre
- * @param {string} [assetId] — ID del asset--plant en FarmOS (si ya existe)
+ * @param {Object} [process] - FarmProcess padre
+ * @param {string} [assetId] - ID del asset--plant en FarmOS (si ya existe)
  * @returns {{ data: { type: string, attributes: object, relationships?: object } } | null}
  */
 export function buildFarmOSLogPayload(event, process, assetId) {
@@ -245,8 +245,8 @@ function buildNotes(event, process) {
  * evento NO se ve afectado.
  *
  * @param {Object} event — farm_process_event ya persistido
- * @param {Object} [process] — FarmProcess padre (si no, se busca en IDB)
- * @param {string} [assetId] — ID del asset--plant en FarmOS
+ * @param {Object} [process] - FarmProcess padre (si no, se busca en IDB)
+ * @param {string} [assetId] - ID del asset--plant en FarmOS
  * @returns {Promise<Object|null>} el registro de transacción pendiente, o null si no aplica
  */
 export async function enqueueFarmProcessEvent(event, process, assetId) {

@@ -229,11 +229,11 @@ function buildIdeaLead({ cultivos = [], altitud = null, ensoOutlook = null, date
  * lo clave) e 'idea' (idea contextual, sin inventar alarma).
  *
  * @param {Object} input
- * @param {Array} input.activeAlerts — alertas del alertEngine (#162).
- * @param {Array} input.pendingTasks — tareas log--task pending (#298).
- * @param {Array<{name:string,count:number}>} input.cultivos — inventario agrupado.
- * @param {number|null} input.altitud — altitud de la finca activa (msnm).
- * @param {Object|null} input.ensoOutlook — getEnsoOutlook (ensoContext).
+ * @param {Array} [input.activeAlerts] - alertas del alertEngine (#162).
+ * @param {Array} [input.pendingTasks] - tareas log--task pending (#298).
+ * @param {Array<{name:string,count:number}>} [input.cultivos] - inventario agrupado.
+ * @param {number|null} [input.altitud] - altitud de la finca activa (msnm).
+ * @param {Object|null} [input.ensoOutlook] - getEnsoOutlook (ensoContext).
  * @param {Date} [input.date] - inyectable para test.
  * @param {number} [input.maxItems=2] - cuántos pendientes destacar como máximo.
  * @returns {Greeting}

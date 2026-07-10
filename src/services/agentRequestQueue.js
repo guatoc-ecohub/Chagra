@@ -372,7 +372,7 @@ export async function processRequest({ sender, req, id }) {
  * NO procesa si navigator.onLine === false. Reintenta fallos individuales sin
  * abortar el resto.
  *
- * @param {Function} sender - función async(req) que procesa cada request
+ * @param {{ sender?: Function }} [options] - options.sender: función async(req) que procesa cada request
  * @returns {Promise<{processed: number, failed: number, skipped: number}>}
  */
 export async function drainPending({ sender } = {}) {

@@ -50,7 +50,7 @@ describe('OAuthCallback (PKCE bridge)', () => {
   });
 
   it('intercambia code→token y llama onSuccess al éxito', async () => {
-    authService.handleOAuthCallback.mockResolvedValue({ success: true });
+    vi.mocked(authService.handleOAuthCallback).mockResolvedValue({ success: true });
     const onSuccess = vi.fn();
     const onError = vi.fn();
 
@@ -60,7 +60,7 @@ describe('OAuthCallback (PKCE bridge)', () => {
     expect(onError).not.toHaveBeenCalled();
 
     // Se pasó un URLSearchParams con el code correcto al handler.
-    const passedParams = authService.handleOAuthCallback.mock.calls[0][0];
+    const passedParams = vi.mocked(authService.handleOAuthCallback).mock.calls[0][0];
     expect(passedParams.get('code')).toBe('abc123');
     expect(passedParams.get('state')).toBe('state_xyz');
 
@@ -73,7 +73,7 @@ describe('OAuthCallback (PKCE bridge)', () => {
   });
 
   it('llama onError con el mensaje cuando el intercambio falla', async () => {
-    authService.handleOAuthCallback.mockResolvedValue({
+    vi.mocked(authService.handleOAuthCallback).mockResolvedValue({
       success: false,
       error: 'State inválido. Posible ataque CSRF.',
     });
@@ -89,20 +89,20 @@ describe('OAuthCallback (PKCE bridge)', () => {
 
   it('lee code/state desde el hash si la PWA enruta por fragmento', async () => {
     setLocation('', '#callback?code=hashcode&state=hashstate');
-    authService.handleOAuthCallback.mockResolvedValue({ success: true });
+    vi.mocked(authService.handleOAuthCallback).mockResolvedValue({ success: true });
     const onSuccess = vi.fn();
     const onError = vi.fn();
 
     render(<OAuthCallback onSuccess={onSuccess} onError={onError} />);
 
     await waitFor(() => expect(onSuccess).toHaveBeenCalled());
-    const passedParams = authService.handleOAuthCallback.mock.calls[0][0];
+    const passedParams = vi.mocked(authService.handleOAuthCallback).mock.calls[0][0];
     expect(passedParams.get('code')).toBe('hashcode');
     expect(passedParams.get('state')).toBe('hashstate');
   });
 
   it('llama onError si handleOAuthCallback lanza una excepción', async () => {
-    authService.handleOAuthCallback.mockRejectedValue(new Error('boom'));
+    vi.mocked(authService.handleOAuthCallback).mockRejectedValue(new Error('boom'));
     const onSuccess = vi.fn();
     const onError = vi.fn();
 

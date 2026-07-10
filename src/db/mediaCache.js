@@ -17,6 +17,7 @@ function parsePositiveInt(raw, fallback) {
 }
 
 function getMediaCacheLimits() {
+  /** @type {Record<string, any>} */
   const env = import.meta.env ?? {};
   const maxEntries = parsePositiveInt(env.VITE_MEDIA_CACHE_MAX_ENTRIES, DEFAULT_MAX_MEDIA_ENTRIES);
   const maxBytes = parsePositiveInt(

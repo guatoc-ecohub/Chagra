@@ -96,6 +96,7 @@ const fmtDate = (ms) => {
   catch { return '—'; }
 };
 
+/** @param {{ procesoKey: string, onBack: () => void, onSave?: (msg: string) => void }} props */
 export default function SeguimientoProcesoScreen({ procesoKey, onBack, onSave }) {
   const def = useMemo(() => getSeguimientoDef(procesoKey), [procesoKey]);
   const lands = useAssetStore((s) => s.lands);

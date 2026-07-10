@@ -106,16 +106,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
   describe('GPS nativo con altitud válida', () => {
     it('devuelve altitud del GPS cuando está disponible y es válida', async () => {
       const mockAltitude = 2600;
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: mockAltitude,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
@@ -128,16 +128,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
     it('redondea altitud del GPS con Math.round', async () => {
       const mockAltitude = 2600.7;
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: mockAltitude,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
@@ -150,16 +150,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
     it('guarda en cache cuando obtiene altitud del GPS', async () => {
       const mockAltitude = 1500;
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: mockAltitude,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
@@ -172,26 +172,26 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
   describe('GPS sin altitud (fallback a API)', () => {
     it('llama a Open-Elevation API cuando GPS no tiene altitud pero sí lat/lng', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: null,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       
       const apiAltitude = 1800;
-      vi.mocked(window.fetch).mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue(/** @type {Response} */ ({
         ok: true,
         json: async () => ({
           results: [{ elevation: apiAltitude }],
         }),
-      });
+      }));
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       const result = await getDeviceAltitude();
@@ -205,25 +205,25 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     it('usa URL personalizada si VITE_ELEVATION_API_URL está definida', async () => {
       vi.stubEnv('VITE_ELEVATION_API_URL', 'https://custom-elevation.api/v1/lookup');
 
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: null,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       
-      vi.mocked(window.fetch).mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue(/** @type {Response} */ ({
         ok: true,
         json: async () => ({
           results: [{ elevation: 2000 }],
         }),
-      });
+      }));
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       await getDeviceAltitude();
@@ -234,26 +234,26 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     });
 
     it('guarda en cache cuando obtiene altitud de API', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: null,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       
       const apiAltitude = 2200;
-      vi.mocked(window.fetch).mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue(/** @type {Response} */ ({
         ok: true,
         json: async () => ({
           results: [{ elevation: apiAltitude }],
         }),
-      });
+      }));
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
       
       await getDeviceAltitude();
@@ -265,9 +265,9 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
   describe('fallback a cache cuando GPS y API fallan', () => {
     it('devuelve altitud cacheada si GPS falla y no hay lat/lng para API', async () => {
       const cachedAlt = 2500;
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (_success, error) => {
-          error({ code: 1, message: 'permission denied' });
+          error(/** @type {GeolocationPositionError} */ ({ code: 1, message: 'permission denied' }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB(cachedAlt));
@@ -279,23 +279,23 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
     it('devuelve altitud cacheada si GPS falla y API falla', async () => {
       const cachedAlt = 1700;
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: null,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       
-      vi.mocked(window.fetch).mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue(/** @type {Response} */ ({
         ok: false,
         status: 500,
-      });
+      }));
       vi.mocked(openDB).mockResolvedValue(makeFakeDB(cachedAlt));
       
       const result = await getDeviceAltitude();
@@ -305,9 +305,9 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
     it('ignora cache expirada (más de 24h)', async () => {
       const oldTimestamp = Date.now() - 25 * 60 * 60 * 1000; // 25 horas atrás
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (_success, error) => {
-          error({ code: 1, message: 'permission denied' });
+          error(/** @type {GeolocationPositionError} */ ({ code: 1, message: 'permission denied' }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB(2000, oldTimestamp));
@@ -319,9 +319,9 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
     it('usa cache válida (menos de 24h)', async () => {
       const recentTimestamp = Date.now() - 12 * 60 * 60 * 1000; // 12 horas atrás
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (_success, error) => {
-          error({ code: 1, message: 'permission denied' });
+          error(/** @type {GeolocationPositionError} */ ({ code: 1, message: 'permission denied' }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB(1900, recentTimestamp));
@@ -334,16 +334,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
   describe('casos borde - valores extremos de altitud', () => {
     it('acepta altitud 0 (nivel del mar)', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: 0,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
@@ -355,16 +355,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
     it('acepta altitudes negativas (depresiones geográficas)', async () => {
       // Ejemplo: Mar Muerto (-430m), Lago Assal (-155m)
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: -50,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
@@ -376,16 +376,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
     it('acepta altitudes extremas (>5000m)', async () => {
       // Ejemplo: Monte Everest (~8849m), picos andinos
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: 5200,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
@@ -398,22 +398,22 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
   describe('casos borde - null/undefined/NaN', () => {
     it('devuelve null si GPS altitude es null', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: null,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       
-      vi.mocked(window.fetch).mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue(/** @type {Response} */ ({
         ok: false,
-      });
+      }));
       vi.mocked(openDB).mockResolvedValue(makeFakeDB(null)); // sin cache
       
       const result = await getDeviceAltitude();
@@ -422,22 +422,22 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     });
 
     it('devuelve null si GPS altitude es undefined', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: undefined,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       
-      vi.mocked(window.fetch).mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue(/** @type {Response} */ ({
         ok: false,
-      });
+      }));
       vi.mocked(openDB).mockResolvedValue(makeFakeDB(null));
       
       const result = await getDeviceAltitude();
@@ -446,9 +446,9 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     });
 
     it('devuelve null si todo falla (sin cache)', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (_success, error) => {
-          error({ code: 2, message: 'unavailable' });
+          error(/** @type {GeolocationPositionError} */ ({ code: 2, message: 'unavailable' }));
         }
       );
       
@@ -462,7 +462,7 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
   describe('error handling', () => {
     it('maneja errores de geolocation sin crash', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         () => {
           throw new Error('Geolocation error');
         }
@@ -477,16 +477,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     });
 
     it('maneja errores de API sin crash', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: null,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       
@@ -500,16 +500,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     });
 
     it('maneja errores de IndexedDB en saveToCache sin crash', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: 2400,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       
@@ -522,9 +522,9 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     });
 
     it('maneja errores de IndexedDB en getFromCache sin crash', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (_success, error) => {
-          error({ code: 1, message: 'denied' });
+          error(/** @type {GeolocationPositionError} */ ({ code: 1, message: 'denied' }));
         }
       );
       
@@ -564,16 +564,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     it('no llama a API si navigator.onLine es false', async () => {
       globalThis.navigator.onLine = /** @type {any} */ (false);
       
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: null,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       
@@ -587,23 +587,23 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
   describe('respuesta inválida de API', () => {
     it('devuelve null si API responde sin results', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: null,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       
-      vi.mocked(window.fetch).mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue(/** @type {Response} */ ({
         ok: true,
         json: async () => ({ results: [] }),
-      });
+      }));
       vi.mocked(openDB).mockResolvedValue(makeFakeDB(null));
       
       const result = await getDeviceAltitude();
@@ -612,25 +612,25 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     });
 
     it('devuelve null si API responde con elevation null', async () => {
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: null,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       
-      vi.mocked(window.fetch).mockResolvedValue({
+      vi.mocked(window.fetch).mockResolvedValue(/** @type {Response} */ ({
         ok: true,
         json: async () => ({
           results: [{ elevation: null }],
         }),
-      });
+      }));
       vi.mocked(openDB).mockResolvedValue(makeFakeDB(null));
       
       const result = await getDeviceAltitude();
@@ -645,16 +645,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
     // locationService.getExternalAiPromptBuilder().deriveThermalZoneFromAltitud)
     it('altitud 0 corresponde a piso cálido (umbral < 1000m)', async () => {
       // Solo documenta el umbral, no valida conversión
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: 0,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
@@ -667,16 +667,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
     it('altitud 999 es cálido, 1000 es templado (umbral exacto)', async () => {
       // Documenta el umbral 1000m entre cálido y templado
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: 1000,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
@@ -689,16 +689,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
     it('altitud 1999 es templado, 2000 es frío (umbral exacto)', async () => {
       // Documenta el umbral 2000m entre templado y frío
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: 2000,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
@@ -711,16 +711,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
     it('altitud 2999 es frío, 3000 es páramo (umbral exacto)', async () => {
       // Documenta el umbral 3000m entre frío y páramo
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: 3000,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());
@@ -733,16 +733,16 @@ describe('altitudeService (#altitude) — obtención de altitud del dispositivo'
 
     it('altitud 3599 es páramo, 3600 es glacial (umbral exacto)', async () => {
       // Documenta el umbral 3600m entre páramo y glacial
-      globalThis.navigator.geolocation.getCurrentPosition.mockImplementation(
+      vi.mocked(globalThis.navigator.geolocation.getCurrentPosition).mockImplementation(
         (success) => {
-          success({
+          success(/** @type {GeolocationPosition} */ ({
             coords: {
               latitude: 4.5,
               longitude: -74.0,
               altitude: 3600,
               accuracy: 10,
             },
-          });
+          }));
         }
       );
       vi.mocked(openDB).mockResolvedValue(makeFakeDB());

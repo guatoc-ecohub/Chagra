@@ -82,8 +82,8 @@ import { enrichEntitiesWithRag, __TEST__ as ragTest } from '../../services/voice
 import VoiceConfirmation from '../VoiceConfirmation';
 
 beforeEach(() => {
-  streamOllama.mockReset();
-  retrieve.mockReset();
+  vi.mocked(streamOllama).mockReset();
+  vi.mocked(retrieve).mockReset();
   _resetSystemPromptCache();
   if (ragTest) ragTest._resetDocCache();
 });
@@ -92,7 +92,7 @@ beforeEach(() => {
 
 describe('Paso 1: Extracción de entidades', () => {
   it('extrae crop+quantity+location de transcripcion valida', async () => {
-    streamOllama.mockResolvedValue(
+    vi.mocked(streamOllama).mockResolvedValue(
       '[{"crop":"tomate","quantity":5,"location":"invernadero"}]',
     );
     const result = await extractEntities('Sembré cinco tomates en el invernadero');
@@ -105,7 +105,7 @@ describe('Paso 1: Extracción de entidades', () => {
   });
 
   it('extrae multiples especies separadas por "y"', async () => {
-    streamOllama.mockResolvedValue(
+    vi.mocked(streamOllama).mockResolvedValue(
       '[{"crop":"papa","quantity":3,"location":"lote norte"},{"crop":"maiz","quantity":2,"location":"lote norte"}]',
     );
     const result = await extractEntities('Sembré tres papas y dos maíces en el lote norte');
@@ -117,7 +117,7 @@ describe('Paso 1: Extracción de entidades', () => {
   });
 
   it('falla con error claro si el modelo no devuelve JSON parseable', async () => {
-    streamOllama.mockResolvedValue('lo siento, no entendí');
+    vi.mocked(streamOllama).mockResolvedValue('lo siento, no entendí');
     await expect(extractEntities('audio incomprensible')).rejects.toThrow(/no parseable/i);
   });
 });
@@ -140,7 +140,7 @@ describe('Paso 2: Enriquecimiento RAG', () => {
       ],
     };
 
-    globalThis.fetch = vi.fn((url) => {
+    globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
       if (String(url).includes('/cycle-content/fresa.json')) {
         return Promise.resolve({
           ok: true,
@@ -150,10 +150,10 @@ describe('Paso 2: Enriquecimiento RAG', () => {
         });
       }
       return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
-    });
+    })));
 
     // pickWinningSlug espera h.species (no h.slug) + h.score > 0
-    retrieve.mockResolvedValue([
+    vi.mocked(retrieve).mockResolvedValue([
       { species: 'fresa', score: 0.95, topScore: 0.95 },
     ]);
 
@@ -172,7 +172,7 @@ describe('Paso 2: Enriquecimiento RAG', () => {
   });
 
   it('degrada gracefulmente si RAG no tiene cobertura', async () => {
-    retrieve.mockResolvedValue([]);
+    vi.mocked(retrieve).mockResolvedValue([]);
 
     const result = await enrichEntitiesWithRag([
       { crop: 'cultivo_raro', quantity: 1, location: 'lote' },

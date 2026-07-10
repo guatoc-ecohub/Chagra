@@ -142,7 +142,10 @@ function sanitizeEdges(edges) {
   return out;
 }
 
-/** Construye el objeto de feedback canónico a partir de los params del UI. */
+/**
+ * Construye el objeto de feedback canónico a partir de los params del UI.
+ * @param {{ prompt: string, response: string, thumb: 'up'|'down', comment?: string, edges?: Array<{species_id: string, edge_type: string, target_id: string}> }} params
+ */
 function buildFeedback({ prompt, response, thumb, comment, edges }) {
   return {
     id: ulid(),
@@ -239,6 +242,7 @@ export async function flushFeedbackQueue() {
   return flushed;
 }
 
+/** @param {{ prompt: string, response: string, thumb: 'up'|'down', comment?: string, edges?: Array<{species_id: string, edge_type: string, target_id: string}> }} params */
 export async function sendFeedback({ prompt, response, thumb, comment, edges }) {
   const feedback = buildFeedback({ prompt, response, thumb, comment, edges });
 

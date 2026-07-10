@@ -9,7 +9,7 @@ import { captureExchange, isCaptureEnabled, shouldAnonymizePII } from '../conver
 import * as feedbackService from '../feedbackService';
 
 const waitForFetchCalls = async (count) => {
-  for (let i = 0; i < 20 && global.fetch.mock.calls.length < count; i++) {
+  for (let i = 0; i < 20 && vi.mocked(global.fetch).mock.calls.length < count; i++) {
     await new Promise((resolve) => setTimeout(resolve, 0));
   }
   expect(global.fetch).toHaveBeenCalledTimes(count);
@@ -107,13 +107,13 @@ describe('conversationCaptureService', () => {
       });
 
       await waitForFetchCalls(1);
-      const [url, opts] = global.fetch.mock.calls[0];
+      const [url, opts] = vi.mocked(global.fetch).mock.calls[0];
       expect(url).toBe('/api/mcp/agro/log-conversation');
       expect(opts.method).toBe('POST');
       expect(opts.headers['Content-Type']).toBe('application/json');
       expect(opts.headers['X-Chagra-Token']).toBe('test-token');
 
-      const body = JSON.parse(opts.body);
+      const body = JSON.parse(/** @type {string} */ (opts.body));
       expect(body.user_text).toBe('¿compañeros del café?');
       expect(body.agent_text).toBe('guamo, plátano');
       expect(body.user_id).toBe('op-3');
@@ -145,7 +145,7 @@ describe('conversationCaptureService', () => {
       });
 
       await waitForFetchCalls(1);
-      const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const body = JSON.parse(/** @type {string} */ (vi.mocked(global.fetch).mock.calls[0][1].body));
       expect(body.user_name).toBeNull();
       expect(body.finca_nombre).toBeNull();
       expect(body.user_id).toBe('op-3');
@@ -156,7 +156,7 @@ describe('conversationCaptureService', () => {
       vi.stubEnv('VITE_CAPTURE_CONVERSATIONS', 'true');
       captureExchange({ userText: 'hola', agentText: 'buenas' });
       await waitForFetchCalls(1);
-      const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+      const body = JSON.parse(/** @type {string} */ (vi.mocked(global.fetch).mock.calls[0][1].body));
       expect(body.user_id).toBeNull();
       expect(body.user_name).toBeNull();
       expect(body.entities_grounded).toEqual([]);

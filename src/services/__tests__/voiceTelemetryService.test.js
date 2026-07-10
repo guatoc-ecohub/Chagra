@@ -91,7 +91,7 @@ describe('voiceTelemetryService', () => {
     });
 
     it('retorna null si openDB falla', async () => {
-      openDB.mockRejectedValueOnce(new Error('DB error'));
+      vi.mocked(openDB).mockRejectedValueOnce(new Error('DB error'));
       const ev = await recordEvent({ event_type: 'test' });
       expect(ev).toBeNull();
     });
@@ -139,7 +139,7 @@ describe('voiceTelemetryService', () => {
     });
 
     it('maneja fallo de openDB', async () => {
-      openDB.mockRejectedValueOnce(new Error('DB error'));
+      vi.mocked(openDB).mockRejectedValueOnce(new Error('DB error'));
       await expect(clearSyncedEvents(30)).resolves.toBeUndefined();
     });
   });

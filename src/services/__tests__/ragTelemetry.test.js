@@ -372,7 +372,7 @@ describe('ragTelemetry — integración wrap con retrieve()', () => {
       valor_pedagogico:
         'La planta X es una hortaliza de hoja corta con ciclo de 60 dias en clima frio andino.',
     };
-    globalThis.fetch = vi.fn((url) => {
+    globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
       const u = String(url);
       if (u.endsWith('manifest.json')) {
         return Promise.resolve({
@@ -389,7 +389,7 @@ describe('ragTelemetry — integración wrap con retrieve()', () => {
         });
       }
       return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
-    });
+    })));
 
     // Mock estable del módulo ragTelemetry — esta es la forma robusta de
     // interceptar en ESM. El import de ragRetriever leerá esta versión.

@@ -21,8 +21,8 @@ const {
 } = __TEST__;
 
 beforeEach(() => {
-  streamOllama.mockReset();
-  retrieve.mockReset();
+  vi.mocked(streamOllama).mockReset();
+  vi.mocked(retrieve).mockReset();
 });
 
 describe('caseStudyLessonsSummarizer — buildCaseSummaryInput', () => {
@@ -148,20 +148,20 @@ describe('caseStudyLessonsSummarizer — summarizeLessons integración RAG', () 
   };
 
   it('hace retrieve con query construida desde el caso y prepende bloque RAG', async () => {
-    retrieve.mockResolvedValue([
+    vi.mocked(retrieve).mockResolvedValue([
       { species: 'solanum_lycopersicum_cherry', text: 'Bacillus thuringiensis es bioinsecticida específico para Lepidoptera.', score: 1.4, key: 'biopreparados[0].nombre' },
     ]);
-    streamOllama.mockResolvedValue('Funcionó BT 1g/L al primer signo. Próxima vez aplicar preventivo cada 7 días en cohorte joven.');
+    vi.mocked(streamOllama).mockResolvedValue('Funcionó BT 1g/L al primer signo. Próxima vez aplicar preventivo cada 7 días en cohorte joven.');
 
     const result = await summarizeLessons(caseObj);
 
     expect(retrieve).toHaveBeenCalledTimes(1);
-    const [calledQuery] = retrieve.mock.calls[0];
+    const [calledQuery] = vi.mocked(retrieve).mock.calls[0];
     expect(calledQuery).toContain('Trozador');
     expect(calledQuery).toContain('bacillus thuringiensis');
 
     // streamOllama recibió user content con el bloque RAG prependeado
-    const body = streamOllama.mock.calls[0][1];
+    const body = vi.mocked(streamOllama).mock.calls[0][1];
     const userMsg = body.messages.find((m) => m.role === 'user').content;
     expect(userMsg).toContain(RAG_CONTEXT_HEADER);
     expect(userMsg).toContain('Bacillus thuringiensis es bioinsecticida');
@@ -177,12 +177,12 @@ describe('caseStudyLessonsSummarizer — summarizeLessons integración RAG', () 
   });
 
   it('si retrieve falla → degrade gracefully, sigue llamando streamOllama sin bloque RAG', async () => {
-    retrieve.mockRejectedValue(new Error('corpus down'));
-    streamOllama.mockResolvedValue('Resumen sin contexto RAG pero suficientemente largo para no ser descartado.');
+    vi.mocked(retrieve).mockRejectedValue(new Error('corpus down'));
+    vi.mocked(streamOllama).mockResolvedValue('Resumen sin contexto RAG pero suficientemente largo para no ser descartado.');
 
     const result = await summarizeLessons(caseObj);
 
-    const body = streamOllama.mock.calls[0][1];
+    const body = vi.mocked(streamOllama).mock.calls[0][1];
     const userMsg = body.messages.find((m) => m.role === 'user').content;
     expect(userMsg).not.toContain(RAG_CONTEXT_HEADER);
     expect(userMsg).toContain('Trozador');
@@ -193,12 +193,12 @@ describe('caseStudyLessonsSummarizer — summarizeLessons integración RAG', () 
   });
 
   it('si retrieve devuelve [] → no agrega bloque RAG pero llama Ollama', async () => {
-    retrieve.mockResolvedValue([]);
-    streamOllama.mockResolvedValue('Resumen plano sin contexto agronómico de referencia adicional.');
+    vi.mocked(retrieve).mockResolvedValue([]);
+    vi.mocked(streamOllama).mockResolvedValue('Resumen plano sin contexto agronómico de referencia adicional.');
 
     const result = await summarizeLessons(caseObj);
 
-    const body = streamOllama.mock.calls[0][1];
+    const body = vi.mocked(streamOllama).mock.calls[0][1];
     const userMsg = body.messages.find((m) => m.role === 'user').content;
     expect(userMsg).not.toContain(RAG_CONTEXT_HEADER);
 
@@ -213,15 +213,15 @@ describe('caseStudyLessonsSummarizer — summarizeLessons integración RAG', () 
   });
 
   it('streamOllama devuelve texto muy corto → null', async () => {
-    retrieve.mockResolvedValue([]);
-    streamOllama.mockResolvedValue('corto');
+    vi.mocked(retrieve).mockResolvedValue([]);
+    vi.mocked(streamOllama).mockResolvedValue('corto');
     const result = await summarizeLessons(caseObj);
     expect(result).toBeNull();
   });
 
   it('streamOllama throw → null y graceful', async () => {
-    retrieve.mockResolvedValue([]);
-    streamOllama.mockRejectedValue(new Error('ollama down'));
+    vi.mocked(retrieve).mockResolvedValue([]);
+    vi.mocked(streamOllama).mockRejectedValue(new Error('ollama down'));
     const result = await summarizeLessons(caseObj);
     expect(result).toBeNull();
   });

@@ -62,7 +62,7 @@ const LECHUGA_DOC = {
 };
 
 function setupFetchMock() {
-  globalThis.fetch = vi.fn((url) => {
+  globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
     const u = String(url);
     if (u.endsWith('/cycle-content/manifest.json')) {
       return Promise.resolve({
@@ -92,7 +92,7 @@ function setupFetchMock() {
       });
     }
     return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
-  });
+  })));
 }
 
 // Catálogo OSS que cubre los slugs sintéticos del manifest de estos describes.
@@ -429,7 +429,7 @@ describe('ragRetriever — tier-gate del catalogo (SEC-002 / UXC-004)', () => {
 
   function setupGatedFetchMock(manifest = MANIFEST_GATED) {
     const tracker = { docFetches: new Set() };
-    globalThis.fetch = vi.fn((url) => {
+    globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
       const u = String(url);
       if (u.endsWith('/cycle-content/manifest.json')) {
         return Promise.resolve({
@@ -451,7 +451,7 @@ describe('ragRetriever — tier-gate del catalogo (SEC-002 / UXC-004)', () => {
         });
       }
       return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
-    });
+    })));
     return tracker;
   }
 
@@ -763,7 +763,7 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
     const manifest = makeManifest(N);
     const tracker = { docFetches: 0, successful: 0 };
 
-    globalThis.fetch = vi.fn((url) => {
+    globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
       const u = String(url);
       if (u.endsWith('/cycle-content/manifest.json')) {
         return Promise.resolve({
@@ -793,7 +793,7 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
         });
       }
       return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
-    });
+    })));
 
     const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
 
@@ -815,7 +815,7 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
     const manifest = makeManifest(N);
     const tracker = { docFetches: 0, successful: 0, failed: 0 };
 
-    globalThis.fetch = vi.fn((url) => {
+    globalThis.fetch = /** @type {typeof globalThis.fetch} */ (/** @type {unknown} */ (vi.fn((url) => {
       const u = String(url);
       if (u.endsWith('/cycle-content/manifest.json')) {
         return Promise.resolve({
@@ -846,7 +846,7 @@ describe('ragRetriever — anti-regresión fetch serial 491 slugs (PROD-DOWN #12
         });
       }
       return Promise.resolve({ ok: false, status: 404, headers: { get: () => '' } });
-    });
+    })));
 
     const { retrieve, getCorpusStats } = await import('../ragRetriever.js');
 

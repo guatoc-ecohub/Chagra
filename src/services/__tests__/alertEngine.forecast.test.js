@@ -33,9 +33,9 @@ describe('alertEngine — clima real (forecast)', () => {
     vi.stubGlobal('Notification', undefined);
     alertEngine.stop();
     alertEngine.activeAlerts.clear();
-    fetchClimaSnapshot.mockReset();
-    getProfile.mockReset();
-    getProfile.mockReturnValue(PROFILE_FRIO);
+    vi.mocked(fetchClimaSnapshot).mockReset();
+    vi.mocked(getProfile).mockReset();
+    vi.mocked(getProfile).mockReturnValue(PROFILE_FRIO);
   });
 
   afterEach(() => {
@@ -44,7 +44,7 @@ describe('alertEngine — clima real (forecast)', () => {
   });
 
   it('degrada limpio (sin alertas) cuando no hay coords en el perfil', async () => {
-    getProfile.mockReturnValue({ departamento: 'Boyacá' }); // sin lat/lng
+    vi.mocked(getProfile).mockReturnValue({ departamento: 'Boyacá' }); // sin lat/lng
     const data = await alertEngine.fetchClimaData();
     expect(data).toBeNull();
     expect(fetchClimaSnapshot).not.toHaveBeenCalled();
@@ -53,7 +53,7 @@ describe('alertEngine — clima real (forecast)', () => {
   });
 
   it('usa las coords del perfil para pedir el snapshot real', async () => {
-    fetchClimaSnapshot.mockResolvedValue(snapshot([]));
+    vi.mocked(fetchClimaSnapshot).mockResolvedValue(snapshot([]));
     await alertEngine.fetchClimaData();
     expect(fetchClimaSnapshot).toHaveBeenCalledWith({ lat: 5.6, lng: -73.05 });
   });
@@ -75,7 +75,7 @@ describe('alertEngine — clima real (forecast)', () => {
   });
 
   it('NO dispara helada en piso cálido para la misma mínima', async () => {
-    getProfile.mockReturnValue({ ...PROFILE_FRIO, piso_termico: 'calido', departamento: 'Cesar' });
+    vi.mocked(getProfile).mockReturnValue({ ...PROFILE_FRIO, piso_termico: 'calido', departamento: 'Cesar' });
     const forecast = [
       { date: '2026-06-01', temp_min_c: 3, temp_max_c: 30, precip_mm: 0, wind_max_kmh: 5 },
     ];

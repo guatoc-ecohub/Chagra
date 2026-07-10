@@ -25,7 +25,7 @@ describe('veredaService', () => {
   });
 
   it('lee vereda desde reverseGeocode normalizado', async () => {
-    reverseGeocode.mockResolvedValue({
+    vi.mocked(reverseGeocode).mockResolvedValue({
       vereda: 'Mundo Nuevo',
       municipio: 'La Calera',
       departamento: 'Cundinamarca',

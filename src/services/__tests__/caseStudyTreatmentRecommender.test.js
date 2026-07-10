@@ -17,7 +17,7 @@ import {
 } from '../caseStudyTreatmentRecommender';
 
 beforeEach(() => {
-  retrieve.mockReset();
+  vi.mocked(retrieve).mockReset();
 });
 
 describe('caseStudyTreatmentRecommender — recommendTreatments', () => {
@@ -199,7 +199,7 @@ describe('caseStudyTreatmentRecommender — buildRagContextBlock', () => {
 
 describe('caseStudyTreatmentRecommender — recommendTreatmentsWithRag', () => {
   it('combina recomendaciones deterministas + passages RAG', async () => {
-    retrieve.mockResolvedValue([
+    vi.mocked(retrieve).mockResolvedValue([
       { species: 'solanum_lycopersicum_cherry', text: 'Bacillus thuringiensis es bioinsecticida específico para Lepidoptera.', score: 1.5, key: 'biopreparados[0].nombre' },
       { species: 'solanum_lycopersicum_cherry', text: 'Aplicar BT al atardecer cuando las larvas salen a alimentarse.', score: 1.1, key: 'biopreparados[0].uso' },
     ]);
@@ -217,26 +217,26 @@ describe('caseStudyTreatmentRecommender — recommendTreatmentsWithRag', () => {
 
     // retrieve fue llamado con pest + species en la query
     expect(retrieve).toHaveBeenCalledTimes(1);
-    const [calledQuery, calledTopK] = retrieve.mock.calls[0];
+    const [calledQuery, calledTopK] = vi.mocked(retrieve).mock.calls[0];
     expect(calledQuery.toLowerCase()).toContain('trozador');
     expect(calledQuery.toLowerCase()).toContain('tomate cherry');
     expect(calledTopK).toBe(5);
   });
 
   it('respeta opts.topK', async () => {
-    retrieve.mockResolvedValue([]);
+    vi.mocked(retrieve).mockResolvedValue([]);
     await recommendTreatmentsWithRag('oídio', { topK: 3 });
-    expect(retrieve.mock.calls[0][1]).toBe(3);
+    expect(vi.mocked(retrieve).mock.calls[0][1]).toBe(3);
   });
 
   it('topK inválido → default 5', async () => {
-    retrieve.mockResolvedValue([]);
+    vi.mocked(retrieve).mockResolvedValue([]);
     await recommendTreatmentsWithRag('oídio', { topK: 0 });
-    expect(retrieve.mock.calls[0][1]).toBe(5);
+    expect(vi.mocked(retrieve).mock.calls[0][1]).toBe(5);
   });
 
   it('si retrieve falla → degrade gracefully, sin contexto pero con recomendaciones', async () => {
-    retrieve.mockRejectedValue(new Error('corpus down'));
+    vi.mocked(retrieve).mockRejectedValue(new Error('corpus down'));
     const result = await recommendTreatmentsWithRag('mildiu');
     expect(result.recommendations.map((x) => x.id)).toContain('caldo_bordeles');
     expect(result.ragPassages).toEqual([]);
@@ -244,7 +244,7 @@ describe('caseStudyTreatmentRecommender — recommendTreatmentsWithRag', () => {
   });
 
   it('si retrieve devuelve [] → ragContext vacío pero objeto bien formado', async () => {
-    retrieve.mockResolvedValue([]);
+    vi.mocked(retrieve).mockResolvedValue([]);
     const result = await recommendTreatmentsWithRag('cogollero');
     expect(result.recommendations.map((x) => x.id)).toContain('bacillus_thuringiensis');
     expect(result.ragPassages).toEqual([]);
@@ -252,7 +252,7 @@ describe('caseStudyTreatmentRecommender — recommendTreatmentsWithRag', () => {
   });
 
   it('si retrieve devuelve no-array (defensa) → ragPassages=[]', async () => {
-    retrieve.mockResolvedValue(null);
+    vi.mocked(retrieve).mockResolvedValue(null);
     const result = await recommendTreatmentsWithRag('cogollero');
     expect(result.ragPassages).toEqual([]);
     expect(result.ragContext).toBe('');
@@ -267,10 +267,10 @@ describe('caseStudyTreatmentRecommender — recommendTreatmentsWithRag', () => {
   });
 
   it('pestName vacío pero con speciesNames → sí consulta RAG (uso preventivo)', async () => {
-    retrieve.mockResolvedValue([{ species: 'lechuga', text: 'companions con caléndula', score: 0.8 }]);
+    vi.mocked(retrieve).mockResolvedValue([{ species: 'lechuga', text: 'companions con caléndula', score: 0.8 }]);
     const result = await recommendTreatmentsWithRag('', { speciesNames: ['lechuga'] });
     expect(retrieve).toHaveBeenCalledTimes(1);
-    expect(retrieve.mock.calls[0][0]).toContain('lechuga');
+    expect(vi.mocked(retrieve).mock.calls[0][0]).toContain('lechuga');
     expect(result.ragPassages).toHaveLength(1);
   });
 });

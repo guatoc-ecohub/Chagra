@@ -120,6 +120,7 @@ export function planForcedIntent(intent, text, opts = {}) {
   const prompt = text.trim();
   if (!prompt) return null;
 
+  /** @type {{ intent: string, tool: string|null, args: object|null, stub: boolean, stubResult: object|null, stubMessage: string|null, localGrounding: any, prompt: string, skipNlu: true }} */
   const base = {
     intent,
     tool: null,

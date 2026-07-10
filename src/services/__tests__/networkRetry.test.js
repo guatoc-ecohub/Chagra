@@ -21,7 +21,7 @@ afterEach(() => {
 
 describe('networkRetry.fetchWithRetry', () => {
   it('GET exitoso en primer intento: no reintenta', async () => {
-    globalThis.fetch.mockResolvedValue(
+    vi.mocked(globalThis.fetch).mockResolvedValue(
       new Response('{"ok": true}', { status: 200 })
     );
 
@@ -32,7 +32,7 @@ describe('networkRetry.fetchWithRetry', () => {
   });
 
   it('GET: reintenta hasta 3 veces en fallo de red', async () => {
-    globalThis.fetch
+    vi.mocked(globalThis.fetch)
       .mockRejectedValueOnce(new TypeError('Failed to fetch'))
       .mockRejectedValueOnce(new TypeError('Failed to fetch'))
       .mockResolvedValue(new Response('{"ok": true}', { status: 200 }));
@@ -49,7 +49,7 @@ describe('networkRetry.fetchWithRetry', () => {
   });
 
   it('GET: lanza tras agotar los 3 reintentos (4 intentos totales)', async () => {
-    globalThis.fetch.mockRejectedValue(new TypeError('Failed to fetch'));
+    vi.mocked(globalThis.fetch).mockRejectedValue(new TypeError('Failed to fetch'));
 
     const promise = fetchWithRetry('/api/test');
 
@@ -63,7 +63,7 @@ describe('networkRetry.fetchWithRetry', () => {
   });
 
   it('GET: reintenta en error 500 del servidor', async () => {
-    globalThis.fetch
+    vi.mocked(globalThis.fetch)
       .mockResolvedValueOnce(new Response('error', { status: 502 }))
       .mockResolvedValueOnce(new Response('error', { status: 503 }))
       .mockResolvedValue(new Response('{"ok": true}', { status: 200 }));
@@ -79,7 +79,7 @@ describe('networkRetry.fetchWithRetry', () => {
   });
 
   it('GET: NO reintenta en error 4xx (error del cliente)', async () => {
-    globalThis.fetch.mockResolvedValue(
+    vi.mocked(globalThis.fetch).mockResolvedValue(
       new Response('Not found', { status: 404 })
     );
 
@@ -89,7 +89,7 @@ describe('networkRetry.fetchWithRetry', () => {
   });
 
   it('POST: no reintenta, pasa directo a fetch', async () => {
-    globalThis.fetch.mockResolvedValue(
+    vi.mocked(globalThis.fetch).mockResolvedValue(
       new Response('{"ok": true}', { status: 201 })
     );
 
@@ -107,7 +107,7 @@ describe('networkRetry.fetchWithRetry', () => {
   });
 
   it('respeta el parametro retries del caller', async () => {
-    globalThis.fetch.mockRejectedValue(new TypeError('Failed to fetch'));
+    vi.mocked(globalThis.fetch).mockRejectedValue(new TypeError('Failed to fetch'));
 
     const promise = fetchWithRetry('/api/test', { retries: 1 });
 
@@ -118,7 +118,7 @@ describe('networkRetry.fetchWithRetry', () => {
   });
 
   it('backoff exponencial: respeta delays 1s, 2s, 4s', async () => {
-    globalThis.fetch
+    vi.mocked(globalThis.fetch)
       .mockRejectedValueOnce(new Error('e1'))
       .mockRejectedValueOnce(new Error('e2'))
       .mockRejectedValueOnce(new Error('e3'))

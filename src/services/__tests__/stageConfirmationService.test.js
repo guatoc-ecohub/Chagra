@@ -27,7 +27,7 @@ describe('confirmStage', () => {
   });
 
   it('lanza si proceso no existe', async () => {
-    getFarmProcess.mockResolvedValue(undefined);
+    vi.mocked(getFarmProcess).mockResolvedValue(undefined);
     await expect(confirmStage({ processId: 'p1', newStage: 'flowering' })).rejects.toThrow(/not found/);
   });
 
@@ -40,7 +40,7 @@ describe('confirmStage', () => {
         updated_at: 1000,
       },
     };
-    getFarmProcess.mockResolvedValue(mockProcess);
+    vi.mocked(getFarmProcess).mockResolvedValue(mockProcess);
 
     const result = await confirmStage({ processId: 'p1', newStage: 'flowering', reason: 'Flores visibles' });
 
@@ -56,11 +56,11 @@ describe('confirmStage', () => {
       type: 'farm_process',
       attributes: { current_stage: 'vegetative', updated_at: 1000 },
     };
-    getFarmProcess.mockResolvedValue(mockProcess);
+    vi.mocked(getFarmProcess).mockResolvedValue(mockProcess);
 
     await confirmStage({ processId: 'p1', newStage: 'flowering' });
 
-    const corrected = recordFarmEvent.mock.calls.find(c => c[0].event_type === 'stage_corrected');
+    const corrected = vi.mocked(recordFarmEvent).mock.calls.find(c => c[0].event_type === 'stage_corrected');
     expect(corrected).toBeDefined();
     expect(corrected[0].payload.previous_stage).toBe('vegetative');
     expect(corrected[0].payload.new_stage).toBe('flowering');

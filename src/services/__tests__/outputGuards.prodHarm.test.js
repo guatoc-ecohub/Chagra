@@ -9,7 +9,7 @@
  *   Chagra-strategy/ops/PROD-ERRORS-TRANSCRIPT-2026-06-03.md
  *
  * Cobertura:
- *   #350 — inverted-viability FALSO-NEGATIVO (papa/fresa @1923 → viable).
+ *   #350 — inverted-viability FALSO-NEGATIVO (papa/fresa a 1923 msnm → viable).
  *   #351 — agroquímico: fertilizantes de síntesis (NPK/urea/fosfato…).
  *   #352 — guard de dominio (off-domain física/química/matemáticas).
  *   #347 — fuga de inventario en precio (bulto/arroba/carga → price intent).

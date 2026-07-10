@@ -23,18 +23,18 @@ const mockLink = {
   click: vi.fn(),
 };
 
-global.URL = {
+global.URL = /** @type {any} */ ({ // stub mínimo del test (solo createObjectURL/revokeObjectURL)
   createObjectURL: vi.fn(() => 'blob:mock-url'),
   revokeObjectURL: vi.fn(),
-};
+});
 
-global.document = {
+global.document = /** @type {any} */ ({ // stub mínimo (createElement/body)
   createElement: vi.fn(() => mockLink),
   body: {
     appendChild: vi.fn(),
     removeChild: vi.fn(),
   },
-};
+});
 
 describe('glaciarCaaml — exportación CAAML v6', () => {
   beforeEach(() => {
@@ -573,7 +573,7 @@ describe('glaciarCaaml — exportación CAAML v6', () => {
         })
       );
       
-      const link = global.document.createElement();
+      const link = /** @type {any} */ (global.document).createElement();
       expect(link.href).toBe('blob:mock-url');
       expect(link.download).toMatch(/^chagra_glaciar_\d{4}-\d{2}-\d{2}\.xml$/);
       expect(link.click).toHaveBeenCalled();
@@ -585,7 +585,7 @@ describe('glaciarCaaml — exportación CAAML v6', () => {
       
       downloadCaaml(xml, customFilename);
       
-      const link = global.document.createElement();
+      const link = /** @type {any} */ (global.document).createElement();
       expect(link.download).toBe(customFilename);
     });
 

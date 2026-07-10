@@ -127,24 +127,24 @@ describe('authService — OAuth PKCE flow', () => {
             const mockState = 'state_123';
             const mockVerifier = 'verifier_abc';
 
-            localforage.getItem.mockImplementation((key) => {
+            /** @type {import('vitest').Mock} */ (localforage.getItem).mockImplementation((key) => {
                 if (key === 'oauth_state') return mockState;
                 if (key === 'oauth_code_verifier') return mockVerifier;
                 return null;
             });
 
-            global.fetch.mockResolvedValue({
+            vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
                 ok: true,
                 status: 200,
-                headers: {
+                headers: /** @type {Headers} */ (/** @type {unknown} */ ({
                     get: (name) => name === 'content-type' ? 'application/json' : null,
-                },
+                })),
                 json: async () => ({
                     access_token: 'token_xyz',
                     refresh_token: 'refresh_xyz',
                     expires_in: 3600,
                 }),
-            });
+            })));
 
             const result = await exchangeCodeForToken(mockCode, mockState);
 
@@ -160,7 +160,7 @@ describe('authService — OAuth PKCE flow', () => {
             const mockState = 'state_123';
             const differentState = 'state_different';
 
-            localforage.getItem.mockImplementation((key) => {
+            /** @type {import('vitest').Mock} */ (localforage.getItem).mockImplementation((key) => {
                 if (key === 'oauth_state') return differentState;
                 return null;
             });
@@ -175,7 +175,7 @@ describe('authService — OAuth PKCE flow', () => {
             const mockCode = 'auth_code_123';
             const mockState = 'state_123';
 
-            localforage.getItem.mockImplementation((key) => {
+            /** @type {import('vitest').Mock} */ (localforage.getItem).mockImplementation((key) => {
                 if (key === 'oauth_state') return mockState;
                 if (key === 'oauth_code_verifier') return null;
                 return null;
@@ -192,13 +192,13 @@ describe('authService — OAuth PKCE flow', () => {
             const mockState = 'state_123';
             const mockVerifier = 'verifier_abc';
 
-            localforage.getItem.mockImplementation((key) => {
+            /** @type {import('vitest').Mock} */ (localforage.getItem).mockImplementation((key) => {
                 if (key === 'oauth_state') return mockState;
                 if (key === 'oauth_code_verifier') return mockVerifier;
                 return null;
             });
 
-            global.fetch.mockRejectedValue(new Error('Network error'));
+            vi.mocked(global.fetch).mockRejectedValue(new Error('Network error'));
 
             const result = await exchangeCodeForToken(mockCode, mockState);
 
@@ -211,19 +211,19 @@ describe('authService — OAuth PKCE flow', () => {
             const mockState = 'state_123';
             const mockVerifier = 'verifier_abc';
 
-            localforage.getItem.mockImplementation((key) => {
+            /** @type {import('vitest').Mock} */ (localforage.getItem).mockImplementation((key) => {
                 if (key === 'oauth_state') return mockState;
                 if (key === 'oauth_code_verifier') return mockVerifier;
                 return null;
             });
 
-            global.fetch.mockResolvedValue({
+            vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
                 ok: true,
                 status: 200,
-                headers: {
+                headers: /** @type {Headers} */ (/** @type {unknown} */ ({
                     get: (name) => name === 'content-type' ? 'text/html' : null,
-                },
-            });
+                })),
+            })));
 
             const result = await exchangeCodeForToken(mockCode, mockState);
 
@@ -238,18 +238,18 @@ describe('authService — OAuth PKCE flow', () => {
         });
 
         it('autentica exitosamente con password grant (legacy)', async () => {
-            global.fetch.mockResolvedValue({
+            vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
                 ok: true,
                 status: 200,
-                headers: {
+                headers: /** @type {Headers} */ (/** @type {unknown} */ ({
                     get: (name) => name === 'content-type' ? 'application/json' : null,
-                },
+                })),
                 json: async () => ({
                     access_token: 'token_legacy',
                     refresh_token: 'refresh_legacy',
                     expires_in: 3600,
                 }),
-            });
+            })));
 
             const result = await authenticateUser('testuser', 'testpass');
 
@@ -259,10 +259,10 @@ describe('authService — OAuth PKCE flow', () => {
         });
 
         it('maneja credenciales inválidas', async () => {
-            global.fetch.mockResolvedValue({
+            vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
                 ok: false,
                 status: 401,
-            });
+            })));
 
             const result = await authenticateUser('testuser', 'wrongpass');
 
@@ -271,7 +271,7 @@ describe('authService — OAuth PKCE flow', () => {
         });
 
         it('maneja errores de red', async () => {
-            global.fetch.mockRejectedValue(new Error('Connection failed'));
+            vi.mocked(global.fetch).mockRejectedValue(new Error('Connection failed'));
 
             const result = await authenticateUser('testuser', 'testpass');
 
@@ -290,24 +290,24 @@ describe('authService — OAuth PKCE flow', () => {
             const mockState = 'state_123';
             const mockVerifier = 'verifier_abc';
 
-            localforage.getItem.mockImplementation((key) => {
+            /** @type {import('vitest').Mock} */ (localforage.getItem).mockImplementation((key) => {
                 if (key === 'oauth_state') return mockState;
                 if (key === 'oauth_code_verifier') return mockVerifier;
                 return null;
             });
 
-            global.fetch.mockResolvedValue({
+            vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
                 ok: true,
                 status: 200,
-                headers: {
+                headers: /** @type {Headers} */ (/** @type {unknown} */ ({
                     get: (name) => name === 'content-type' ? 'application/json' : null,
-                },
+                })),
                 json: async () => ({
                     access_token: 'token_callback',
                     refresh_token: 'refresh_callback',
                     expires_in: 3600,
                 }),
-            });
+            })));
 
             const params = new URLSearchParams({
                 code: mockCode,
@@ -371,12 +371,12 @@ describe('authService — OAuth PKCE flow', () => {
         it('password grant SIGUE vivo el 2026-07-01 (después del corte original 06-25)', async () => {
             vi.setSystemTime(new Date('2026-07-01T12:00:00Z'));
 
-            global.fetch.mockResolvedValue({
+            vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
                 ok: true,
                 status: 200,
-                headers: { get: (n) => (n === 'content-type' ? 'application/json' : null) },
+                headers: /** @type {Headers} */ (/** @type {unknown} */ ({ get: (n) => (n === 'content-type' ? 'application/json' : null) })),
                 json: async () => ({ access_token: 't', refresh_token: 'r', expires_in: 3600 }),
-            });
+            })));
 
             const result = await authenticateUser('u', 'p');
             // NO debe retornar el error "ha sido removido": el grant sigue activo.
@@ -398,26 +398,26 @@ describe('authService — OAuth PKCE flow', () => {
         });
 
         it('devuelve null si no hay refresh_token guardado (no llama al backend)', async () => {
-            localforage.getItem.mockResolvedValue(null); // sin refresh_token
+            vi.mocked(localforage.getItem).mockResolvedValue(null); // sin refresh_token
             const result = await refreshAccessToken();
             expect(result).toBeNull();
             expect(global.fetch).not.toHaveBeenCalled();
         });
 
         it('usa grant_type=refresh_token y persiste el access + refresh nuevos', async () => {
-            localforage.getItem.mockResolvedValue('refresh-viejo');
-            global.fetch.mockResolvedValue({
+            vi.mocked(localforage.getItem).mockResolvedValue('refresh-viejo');
+            vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
                 ok: true,
                 status: 200,
-                headers: { get: (n) => (n === 'content-type' ? 'application/json' : null) },
+                headers: /** @type {Headers} */ (/** @type {unknown} */ ({ get: (n) => (n === 'content-type' ? 'application/json' : null) })),
                 json: async () => ({ access_token: 'access-nuevo', refresh_token: 'refresh-nuevo', expires_in: 3600 }),
-            });
+            })));
 
             const result = await refreshAccessToken();
             expect(result).toBe('access-nuevo');
 
             // El body del fetch debe ser un refresh_token grant.
-            const body = global.fetch.mock.calls[0][1].body;
+            const body = vi.mocked(global.fetch).mock.calls[0][1].body;
             expect(body).toContain('grant_type=refresh_token');
             expect(body).toContain('refresh_token=refresh-viejo');
 
@@ -427,45 +427,45 @@ describe('authService — OAuth PKCE flow', () => {
         });
 
         it('devuelve null si el backend rechaza el refresh (400/401)', async () => {
-            localforage.getItem.mockResolvedValue('refresh-vencido');
-            global.fetch.mockResolvedValue({
+            vi.mocked(localforage.getItem).mockResolvedValue('refresh-vencido');
+            vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
                 ok: false,
                 status: 400,
-                headers: { get: () => null },
+                headers: /** @type {Headers} */ (/** @type {unknown} */ ({ get: () => null })),
                 text: async () => 'invalid_grant',
-            });
+            })));
             const result = await refreshAccessToken();
             expect(result).toBeNull();
             expect(getLastRefreshFailureReason()).toBe('rejected');
         });
 
         it('devuelve null y marca rejected si el backend rechaza el refresh con 403', async () => {
-            localforage.getItem.mockResolvedValue('refresh-vencido');
-            global.fetch.mockResolvedValue({
+            vi.mocked(localforage.getItem).mockResolvedValue('refresh-vencido');
+            vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
                 ok: false,
                 status: 403,
-                headers: { get: () => null },
+                headers: /** @type {Headers} */ (/** @type {unknown} */ ({ get: () => null })),
                 text: async () => 'forbidden',
-            });
+            })));
             const result = await refreshAccessToken();
             expect(result).toBeNull();
             expect(getLastRefreshFailureReason()).toBe('rejected');
         });
 
         it('devuelve null (sin lanzar) si la red falla', async () => {
-            localforage.getItem.mockResolvedValue('refresh-x');
-            global.fetch.mockRejectedValue(new Error('Network error'));
+            vi.mocked(localforage.getItem).mockResolvedValue('refresh-x');
+            vi.mocked(global.fetch).mockRejectedValue(new Error('Network error'));
             await expect(refreshAccessToken()).resolves.toBeNull();
             expect(getLastRefreshFailureReason()).toBe('network');
         });
 
         it('serializa refresh concurrente y comparte una sola llamada al backend', async () => {
-            localforage.getItem.mockResolvedValue('refresh-serial');
-            global.fetch.mockImplementation(() => new Promise((resolve) => {
+            vi.mocked(localforage.getItem).mockResolvedValue('refresh-serial');
+            vi.mocked(global.fetch).mockImplementation(() => new Promise((resolve) => {
                 setTimeout(() => resolve({
                     ok: true,
                     status: 200,
-                    headers: { get: (n) => (n === 'content-type' ? 'application/json' : null) },
+                    headers: /** @type {Headers} */ (/** @type {unknown} */ ({ get: (n) => (n === 'content-type' ? 'application/json' : null) })),
                     json: async () => ({
                         access_token: 'access-serial',
                         refresh_token: 'refresh-serial-2',
@@ -492,7 +492,7 @@ describe('authService — OAuth PKCE flow', () => {
         });
 
         it('si el token está vigente lo devuelve sin renovar', async () => {
-            localforage.getItem.mockImplementation((k) => {
+            vi.mocked(localforage.getItem).mockImplementation((k) => {
                 if (k === 'farmos_access_token') return Promise.resolve('vigente');
                 if (k === 'farmos_token_expiry') return Promise.resolve(Date.now() + 60_000);
                 return Promise.resolve(null);
@@ -503,18 +503,18 @@ describe('authService — OAuth PKCE flow', () => {
         });
 
         it('si el token venció PERO el refresh funciona, devuelve el token renovado (NO logout)', async () => {
-            localforage.getItem.mockImplementation((k) => {
+            vi.mocked(localforage.getItem).mockImplementation((k) => {
                 if (k === 'farmos_access_token') return Promise.resolve('vencido');
                 if (k === 'farmos_token_expiry') return Promise.resolve(Date.now() - 1000);
                 if (k === 'farmos_refresh_token') return Promise.resolve('refresh-ok');
                 return Promise.resolve(null);
             });
-            global.fetch.mockResolvedValue({
+            vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
                 ok: true,
                 status: 200,
-                headers: { get: (n) => (n === 'content-type' ? 'application/json' : null) },
+                headers: /** @type {Headers} */ (/** @type {unknown} */ ({ get: (n) => (n === 'content-type' ? 'application/json' : null) })),
                 json: async () => ({ access_token: 'renovado', refresh_token: 'r2', expires_in: 3600 }),
-            });
+            })));
 
             const t = await getAccessToken();
             expect(t).toBe('renovado'); // el operador NO ve "sesión expiró"
@@ -523,18 +523,18 @@ describe('authService — OAuth PKCE flow', () => {
         });
 
         it('si venció y el refresh está muerto (online), hace logout limpio y devuelve null', async () => {
-            localforage.getItem.mockImplementation((k) => {
+            vi.mocked(localforage.getItem).mockImplementation((k) => {
                 if (k === 'farmos_access_token') return Promise.resolve('vencido');
                 if (k === 'farmos_token_expiry') return Promise.resolve(Date.now() - 1000);
                 if (k === 'farmos_refresh_token') return Promise.resolve('refresh-muerto');
                 return Promise.resolve(null);
             });
-            global.fetch.mockResolvedValue({
+            vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
                 ok: false,
                 status: 400,
-                headers: { get: () => null },
+                headers: /** @type {Headers} */ (/** @type {unknown} */ ({ get: () => null })),
                 text: async () => 'invalid_grant',
-            });
+            })));
 
             const t = await getAccessToken();
             expect(t).toBeNull();
@@ -543,13 +543,13 @@ describe('authService — OAuth PKCE flow', () => {
         });
 
         it('si venció pero el refresh falla por red, no borra tokens', async () => {
-            localforage.getItem.mockImplementation((k) => {
+            vi.mocked(localforage.getItem).mockImplementation((k) => {
                 if (k === 'farmos_access_token') return Promise.resolve('vencido');
                 if (k === 'farmos_token_expiry') return Promise.resolve(Date.now() - 1000);
                 if (k === 'farmos_refresh_token') return Promise.resolve('refresh-ok');
                 return Promise.resolve(null);
             });
-            global.fetch.mockRejectedValue(new Error('Network error'));
+            vi.mocked(global.fetch).mockRejectedValue(new Error('Network error'));
 
             const t = await getAccessToken();
             expect(t).toBeNull();

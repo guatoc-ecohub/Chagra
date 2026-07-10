@@ -87,16 +87,16 @@ export function getGuardas(especieId) {
  * Diagnostica una especie animal a partir de la descripcion del usuario
  * y retorna forrajes y guardas.
  * @param {string} descripcion
- * @returns {{especie: object|null, forrajes: Array, guardas: Array, sin_datos: boolean, fuente: string}}
+ * @returns {{especie: object|null, forrajes: Array, alimentos: Array, guardas: Array, sin_datos: boolean, fuente: string}}
  */
 export function diagnosticarAnimal(descripcion) {
   if (!descripcion || descripcion.trim().length < 3) {
-    return { especie: null, forrajes: [], guardas: [], sin_datos: true, fuente: ANIMAL_DATA.fuente };
+    return { especie: null, forrajes: [], alimentos: [], guardas: [], sin_datos: true, fuente: ANIMAL_DATA.fuente };
   }
   const texto = descripcion.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const especie = detectarEspecie(descripcion);
   if (!especie) {
-    return { especie: null, forrajes: [], guardas: [ANIMAL_DATA.guardas.normativa_ica], sin_datos: true, fuente: ANIMAL_DATA.fuente };
+    return { especie: null, forrajes: [], alimentos: [], guardas: [ANIMAL_DATA.guardas.normativa_ica], sin_datos: true, fuente: ANIMAL_DATA.fuente };
   }
   const forrajes = recomendarForraje(especie.id);
   const alimentos = recomendarAlimentosPecuarios(especie.id);

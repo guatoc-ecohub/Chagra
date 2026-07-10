@@ -39,17 +39,17 @@ describe('feedbackService', () => {
 
   describe('hasConsent', () => {
     it('debe retornar true si localStorage tiene "true"', () => {
-      global.localStorage.getItem.mockReturnValue('true');
+      vi.mocked(global.localStorage.getItem).mockReturnValue('true');
       expect(hasConsent()).toBe(true);
     });
 
     it('debe retornar false si localStorage tiene "false"', () => {
-      global.localStorage.getItem.mockReturnValue('false');
+      vi.mocked(global.localStorage.getItem).mockReturnValue('false');
       expect(hasConsent()).toBe(false);
     });
 
     it('debe retornar false si localStorage está vacío', () => {
-      global.localStorage.getItem.mockReturnValue(null);
+      vi.mocked(global.localStorage.getItem).mockReturnValue(null);
       expect(hasConsent()).toBe(false);
     });
 
@@ -82,10 +82,10 @@ describe('feedbackService', () => {
 
   describe('sendFeedback', () => {
     it('debe enviar feedback con el schema correcto', async () => {
-      global.fetch.mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
         ok: true,
         json: async () => ({}),
-      });
+      })));
 
       const result = await sendFeedback({
         prompt: '¿Qué es el café?',
@@ -113,10 +113,10 @@ describe('feedbackService', () => {
     });
 
     it('debe incluir comentario si se proporciona', async () => {
-      global.fetch.mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
         ok: true,
         json: async () => ({}),
-      });
+      })));
 
       await sendFeedback({
         prompt: 'Test',
@@ -125,13 +125,13 @@ describe('feedbackService', () => {
         comment: 'Falta información',
       });
 
-      const fetchCall = global.fetch.mock.calls[0];
-      const body = JSON.parse(fetchCall[1].body);
+      const fetchCall = vi.mocked(global.fetch).mock.calls[0];
+      const body = JSON.parse(/** @type {string} */ (fetchCall[1].body));
       expect(body.comment).toBe('Falta información');
     });
 
     it('debe retornar false si fetch falla', async () => {
-      global.fetch.mockRejectedValue(new Error('Network error'));
+      vi.mocked(global.fetch).mockRejectedValue(new Error('Network error'));
 
       const result = await sendFeedback({
         prompt: 'Test',
@@ -143,11 +143,11 @@ describe('feedbackService', () => {
     });
 
     it('debe retornar false si la respuesta no es 200', async () => {
-      global.fetch.mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue(/** @type {Response} */ (/** @type {unknown} */ ({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
-      });
+      })));
 
       const result = await sendFeedback({
         prompt: 'Test',
@@ -162,7 +162,7 @@ describe('feedbackService', () => {
     // TODO: Implementar test de timeout con vi.useFakeTimers() correctamente
     it.skip('debe abortar después del timeout', async () => {
       // Mock fetch que nunca se resuelve (simula timeout)
-      global.fetch.mockImplementation(
+      vi.mocked(global.fetch).mockImplementation(
         () =>
           new Promise(() => {
             // Nunca se resuelve

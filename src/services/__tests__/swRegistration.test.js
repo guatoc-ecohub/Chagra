@@ -61,6 +61,7 @@ function makeRegistration({ waiting = null, active = null } = {}) {
 }
 
 // ── Fake navigator.serviceWorker: EventTarget-ish + ready + register.
+/** @param {{ controller?: object|null, registration?: object }} [opts] */
 function installFakeSW({ controller = null, registration } = {}) {
   const listeners = {};
   const sw = {
@@ -100,6 +101,7 @@ describe('swRegistration — AUTO-UPDATE seguro', () => {
   });
 
   afterEach(() => {
+    // @ts-expect-error — el test desmonta serviceWorker (read-only en lib.dom)
     delete navigator.serviceWorker;
     vi.useRealTimers();
   });
@@ -257,6 +259,7 @@ describe('swRegistration — AUTO-UPDATE seguro', () => {
 
   it('SIN serviceWorker en navigator → no-op (no lanza)', () => {
     // Asegurar que no existe.
+    // @ts-expect-error — el test desmonta serviceWorker (read-only en lib.dom)
     delete navigator.serviceWorker;
     expect(() => registerServiceWorker()).not.toThrow();
   });

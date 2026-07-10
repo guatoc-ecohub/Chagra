@@ -36,8 +36,8 @@ import {
 describe('VoiceSelector — rediseño mínima fricción', () => {
   beforeEach(() => {
     localStorage.clear();
-    speakKokoro.mockClear();
-    stopTTS.mockClear();
+    vi.mocked(speakKokoro).mockClear();
+    vi.mocked(stopTTS).mockClear();
   });
 
   test('renderiza una tarjeta por voz curada (sin dropdown)', () => {
@@ -68,7 +68,7 @@ describe('VoiceSelector — rediseño mínima fricción', () => {
     await waitFor(() => {
       expect(speakKokoro).toHaveBeenCalledTimes(1);
     });
-    const [text, opts] = speakKokoro.mock.calls[0];
+    const [text, opts] = vi.mocked(speakKokoro).mock.calls[0];
     expect(text).toMatch(/soy Chagra/i);
     expect(opts.voice).toBe('em_alex');
     // Persistió inmediatamente, sin botón Guardar.

@@ -86,6 +86,7 @@ const normalizeCatalogSpecies = (row) => {
 // Timeout duro para no congelar el form si OPFS/WASM se cuelga.
 const CATALOG_LOAD_TIMEOUT_MS = 2000;
 
+/** @param {{ value: any, speciesId: string|null, onChange: Function, label?: string, placeholder?: string, helpText?: string, inputName?: string, allowFreeText?: boolean }} props */
 export const SpeciesCombobox = ({
   value,
   speciesId,

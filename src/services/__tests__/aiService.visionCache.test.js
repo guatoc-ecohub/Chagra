@@ -38,7 +38,7 @@ describe('aiService — cache de visión por hash (V-11)', () => {
 
   describe('analyzeFoliage', () => {
     it('la 2da llamada con la misma imagen NO re-invoca el modelo (cache hit)', async () => {
-      ollamaStream.streamOllama.mockResolvedValue(
+      vi.mocked(ollamaStream.streamOllama).mockResolvedValue(
         JSON.stringify({ score: 80, issues: ['mancha'], treatment: 'caldo bordelés' }),
       );
       const blob = new Blob(['bytes-de-la-foto'], { type: 'image/jpeg' });
@@ -56,7 +56,7 @@ describe('aiService — cache de visión por hash (V-11)', () => {
     });
 
     it('imagen distinta SÍ re-invoca el modelo (cache miss)', async () => {
-      ollamaStream.streamOllama.mockResolvedValue(
+      vi.mocked(ollamaStream.streamOllama).mockResolvedValue(
         JSON.stringify({ score: 70, issues: [], treatment: '' }),
       );
       await analyzeFoliage(new Blob(['foto-1'], { type: 'image/jpeg' }));
@@ -66,13 +66,13 @@ describe('aiService — cache de visión por hash (V-11)', () => {
 
     it('NO cachea null: si el modelo falla, la siguiente llamada reintenta', async () => {
       // Primer intento: respuesta no parseable → analyzeFoliage devuelve null.
-      ollamaStream.streamOllama.mockResolvedValueOnce('no-es-json-valido <<<');
+      vi.mocked(ollamaStream.streamOllama).mockResolvedValueOnce('no-es-json-valido <<<');
       const blob = new Blob(['foto-error'], { type: 'image/jpeg' });
       const first = await analyzeFoliage(blob);
       expect(first).toBeNull();
 
       // Segundo intento mismos bytes: como null NO se cacheó, debe re-invocar.
-      ollamaStream.streamOllama.mockResolvedValueOnce(
+      vi.mocked(ollamaStream.streamOllama).mockResolvedValueOnce(
         JSON.stringify({ score: 90, issues: [], treatment: 'ok' }),
       );
       const second = await analyzeFoliage(new Blob(['foto-error'], { type: 'image/jpeg' }));
@@ -81,7 +81,7 @@ describe('aiService — cache de visión por hash (V-11)', () => {
     });
 
     it('el resultado cacheado preserva el shape (sin _cached en la 1ra llamada)', async () => {
-      ollamaStream.streamOllama.mockResolvedValue(
+      vi.mocked(ollamaStream.streamOllama).mockResolvedValue(
         JSON.stringify({ score: 60, issues: ['x'], treatment: 'y' }),
       );
       const first = await analyzeFoliage(new Blob(['z'], { type: 'image/jpeg' }));
@@ -91,7 +91,7 @@ describe('aiService — cache de visión por hash (V-11)', () => {
 
   describe('recognizeSpecies', () => {
     it('la 2da llamada con la misma imagen NO re-invoca el modelo (cache hit)', async () => {
-      ollamaStream.streamOllama.mockResolvedValue(
+      vi.mocked(ollamaStream.streamOllama).mockResolvedValue(
         JSON.stringify({
           common_name_es: 'café',
           scientific_name: 'Coffea arabica',
@@ -104,7 +104,7 @@ describe('aiService — cache de visión por hash (V-11)', () => {
       const first = await recognizeSpecies(blob);
       expect(first).toBeTruthy();
       expect(first.scientific_name).toBe('Coffea arabica');
-      const callsAfterFirst = ollamaStream.streamOllama.mock.calls.length;
+      const callsAfterFirst = vi.mocked(ollamaStream.streamOllama).mock.calls.length;
       expect(callsAfterFirst).toBeGreaterThanOrEqual(1);
 
       const second = await recognizeSpecies(new Blob(['foto-cafe'], { type: 'image/jpeg' }));
@@ -116,18 +116,18 @@ describe('aiService — cache de visión por hash (V-11)', () => {
 
     it('NO cachea null cuando todos los fallbacks fallan', async () => {
       // Los 3 modelos devuelven basura no parseable → recognizeSpecies = null.
-      ollamaStream.streamOllama.mockResolvedValue('basura <<<');
+      vi.mocked(ollamaStream.streamOllama).mockResolvedValue('basura <<<');
       const blob = new Blob(['foto-mala'], { type: 'image/jpeg' });
       const first = await recognizeSpecies(blob);
       expect(first).toBeNull();
-      const callsAfterFirst = ollamaStream.streamOllama.mock.calls.length;
+      const callsAfterFirst = vi.mocked(ollamaStream.streamOllama).mock.calls.length;
 
       // Segundo intento: null no se cacheó → re-invoca.
-      ollamaStream.streamOllama.mockResolvedValue(
+      vi.mocked(ollamaStream.streamOllama).mockResolvedValue(
         JSON.stringify({ common_name_es: 'mora', scientific_name: 'Rubus glaucus', confidence: 0.8, alternatives: [] }),
       );
       const second = await recognizeSpecies(new Blob(['foto-mala'], { type: 'image/jpeg' }));
-      expect(ollamaStream.streamOllama.mock.calls.length).toBeGreaterThan(callsAfterFirst);
+      expect(vi.mocked(ollamaStream.streamOllama).mock.calls.length).toBeGreaterThan(callsAfterFirst);
       expect(second.scientific_name).toBe('Rubus glaucus');
     });
   });

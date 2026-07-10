@@ -123,7 +123,7 @@ describe('recordPilotEvent', () => {
 
   it('falla silente si DB lanza', async () => {
     const { openDB } = await import('../../db/dbCore');
-    openDB.mockRejectedValueOnce(new Error('DB crashed'));
+    vi.mocked(openDB).mockRejectedValueOnce(new Error('DB crashed'));
     const result = await recordPilotEvent({ event_type: 'sync_resultado', metadata: { exitoso: true } });
     expect(result).toBeNull();
   });
@@ -155,7 +155,7 @@ describe('getPilotMetrics', () => {
 
   it('retorna {} si DB falla', async () => {
     const { openDB } = await import('../../db/dbCore');
-    openDB.mockRejectedValueOnce(new Error('DB down'));
+    vi.mocked(openDB).mockRejectedValueOnce(new Error('DB down'));
     const metrics = await getPilotMetrics();
     expect(metrics).toEqual({});
   });
@@ -169,7 +169,7 @@ describe('clearOldEvents', () => {
 
   it('retorna 0 si DB falla', async () => {
     const { openDB } = await import('../../db/dbCore');
-    openDB.mockRejectedValueOnce(new Error('DB down'));
+    vi.mocked(openDB).mockRejectedValueOnce(new Error('DB down'));
     const removed = await clearOldEvents(7);
     expect(removed).toBe(0);
   });

@@ -49,7 +49,7 @@ export const getCoords = (geometry) => {
 /**
  * Verifica la distancia entre la posición GPS del dispositivo y una geometría.
  *
- * @param {GeolocationPosition} gpsPosition - Resultado de navigator.geolocation.
+ * @param {{ coords: { latitude: number, longitude: number } }} gpsPosition - Resultado de navigator.geolocation (solo usa coords lat/lon).
  * @param {object} geometry - Geometría GeoJSON.
  * @param {number} [threshold=50] - Umbral en metros.
  * @returns {{ distance: number, isClose: boolean }} Distancia redondeada en metros y si está dentro del umbral.

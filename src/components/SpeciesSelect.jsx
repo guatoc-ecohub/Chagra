@@ -97,6 +97,7 @@ const computeRecentSpecies = (plants, allSpecies) => {
   return result;
 };
 
+/** @param {{ value: any, onChange: Function, onAutoFill?: Function, onPhoto?: (blob: Blob) => void }} props */
 export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);

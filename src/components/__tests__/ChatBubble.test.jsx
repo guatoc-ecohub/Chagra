@@ -42,7 +42,7 @@ describe('ChatBubble — badge de fuente (verificado vs generativo)', () => {
     storeState = {
       showSourceBadges: true,
     };
-    usePrefsStore.mockImplementation((selector) => selector(storeState));
+    vi.mocked(usePrefsStore).mockImplementation((selector) => selector(storeState));
   });
 
   test('Renderiza badge verde cuando metadata.grounded === true', () => {
@@ -348,7 +348,7 @@ describe('ChatBubble — badges anti-alucinación (#18 fuente · #19 auto-correg
 
   beforeEach(() => {
     storeState = { showSourceBadges: true };
-    usePrefsStore.mockImplementation((selector) => selector(storeState));
+    vi.mocked(usePrefsStore).mockImplementation((selector) => selector(storeState));
   });
 
   const base = (metadata) => ({
@@ -521,7 +521,7 @@ describe('ChatBubble — badges anti-alucinación (#18 fuente · #19 auto-correg
 
   test('con showSourceBadges OFF no se renderiza ninguno de los nuevos badges', () => {
     storeState = { showSourceBadges: false };
-    usePrefsStore.mockImplementation((selector) => selector(storeState));
+    vi.mocked(usePrefsStore).mockImplementation((selector) => selector(storeState));
     render(
       <ChatBubble
         message={base({ fuente_url: 'https://agrosavia.co/x', confianza: 'alta', auto_corrected: true })}

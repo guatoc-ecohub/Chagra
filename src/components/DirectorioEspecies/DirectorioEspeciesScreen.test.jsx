@@ -32,8 +32,8 @@ const FICHA = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  searchSpecies.mockResolvedValue([]);
-  buildSpeciesFicha.mockResolvedValue(FICHA);
+  vi.mocked(searchSpecies).mockResolvedValue([]);
+  vi.mocked(buildSpeciesFicha).mockResolvedValue(FICHA);
 });
 
 describe('DirectorioEspeciesScreen — superficie / contraste', () => {
@@ -48,7 +48,7 @@ describe('DirectorioEspeciesScreen — superficie / contraste', () => {
 
   it('la vista de ficha también tiene fondo oscuro opaco', async () => {
     // Forzamos selección: con un único resultado, Enter abre la ficha.
-    searchSpecies.mockResolvedValue([{ id: FICHA.id, comun: FICHA.comun, cientifico: FICHA.cientifico }]);
+    vi.mocked(searchSpecies).mockResolvedValue([{ id: FICHA.id, comun: FICHA.comun, cientifico: FICHA.cientifico }]);
     const { container } = render(<DirectorioEspeciesScreen initialQuery="tomate cherry silvestre" />);
     const form = container.querySelector('form');
     form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
