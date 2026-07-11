@@ -84,16 +84,21 @@ export const MUNDO = {
     fallback2d: { escena: 'mirror' },
   },
 
-  // 🐔 LOS ANIMALES — el ciclo cerrado (recinto). Gated por perfil (como hoy).
+  // 🐔 LOS ANIMALES — el corral y su CICLO CERRADO del abono (recinto): animal →
+  //    estiércol → compost → suelo → planta → animal, un anillo virtuoso. Gated
+  //    por perfil (como hoy). Animales reales de finca andina, DIFERENCIADOS por
+  //    `tipo` (gallina ponedora de clima frío, vaca de cuerpo capsular, oveja de
+  //    vellón): pocos y bien espaciados (más aire, no rebaño), poblado de verdad.
   animales: {
     escena: 'recinto',
     valle: { tipo: 'corral', pos: [-4.6, 0, -1.8], escala: 1 },
     gate: 'animales',
     params: {
       animales: [
-        { color: '#e7d9c2', pos: [-0.7, 0, 0.4] },
-        { color: '#c98a5a', pos: [0.6, 0, -0.3] },
-        { color: '#d8c49a', pos: [0.1, 0, 0.7] },
+        { tipo: 'vaca', color: '#c9a06a', pos: [-1.05, 0, -0.4] },
+        { tipo: 'gallina', color: '#e7d9c2', pos: [1.1, 0, 0.5] },
+        { tipo: 'gallina', color: '#d8b58a', pos: [0.7, 0, 1.05] },
+        { tipo: 'oveja', color: '#efe7d8', pos: [-0.35, 0, 1.15] },
       ],
     },
     hotspots: [
