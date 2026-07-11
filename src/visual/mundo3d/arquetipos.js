@@ -61,6 +61,17 @@ export const ARQUETIPOS = {
     nombre: 'La huerta-clínica', clave: 'el manejo agroecológico de plagas: trampas, biocontrol y enemigos naturales',
     ejemplo: 'sanidad', tambien: [],
   },
+  // El mercado campesino: la familia del `flujo` (una ruta que se recorre) hecha
+  // cadena corta del campo a la mesa. Su lección es la comercialización justa —
+  // puestos con toldo, canastos con la cosecha de la finca, la procedencia
+  // andina (terroir/sello de origen) y el precio justo del trato directo (sin la
+  // tajada del intermediario). En equipo humilde cae a su ficha 2D (la
+  // infografía del mercado y la despensa).
+  mercado: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'mercado', espejo: 'mirror',
+    nombre: 'El mercado campesino', clave: 'la cadena corta del campo a la mesa: puestos, procedencia y precio justo',
+    ejemplo: 'mercado', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {
