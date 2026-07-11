@@ -17,6 +17,11 @@ const STORAGE_KEY_SOURCE_BADGES = 'chagra:prefs:show-source-badges';
 // prefers-reduced-motion) | 'on' (siempre que haya soporte) | 'off' (nunca).
 const STORAGE_KEY_HAPTICS = 'chagra:prefs:haptics';
 const HAPTICS_MODES = ['auto', 'on', 'off'];
+// Spec S3 (2026-07-11): sonido ambiental 0-KB de los mundos (WebAudio
+// sintetizado, sin assets). Tri-estado: 'off' (default — el sonido es
+// opt-in) | 'suave' (ambiente muy tenue) | 'on' (ambiente presente).
+const STORAGE_KEY_SONIDO = 'chagra:prefs:sonido';
+const SONIDO_MODES = ['off', 'suave', 'on'];
 
 function load(key, fallback) {
   try {
@@ -37,6 +42,7 @@ const usePrefsStore = create((set, _get) => ({
   ttsEnabled: load(STORAGE_KEY_TTS_ENABLED, true),
   showSourceBadges: load(STORAGE_KEY_SOURCE_BADGES, true),
   haptics: load(STORAGE_KEY_HAPTICS, 'auto'),
+  sonido: load(STORAGE_KEY_SONIDO, 'off'),
 
   setVoiceRegion: (region) => {
     save(STORAGE_KEY_VOICE_REGION, region);
@@ -64,6 +70,12 @@ const usePrefsStore = create((set, _get) => ({
     const valid = HAPTICS_MODES.includes(mode) ? mode : 'auto';
     save(STORAGE_KEY_HAPTICS, valid);
     set({ haptics: valid });
+  },
+
+  setSonido: (mode) => {
+    const valid = SONIDO_MODES.includes(mode) ? mode : 'off';
+    save(STORAGE_KEY_SONIDO, valid);
+    set({ sonido: valid });
   },
 }));
 
