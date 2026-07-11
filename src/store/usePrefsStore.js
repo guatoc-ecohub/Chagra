@@ -48,7 +48,7 @@ const usePrefsStore = create((set, _get) => ({
   showSourceBadges: load(STORAGE_KEY_SOURCE_BADGES, true),
   haptics: load(STORAGE_KEY_HAPTICS, 'auto'),
   sonido: load(STORAGE_KEY_SONIDO, 'off'),
-  valle3d: load(STORAGE_KEY_VALLE3D, false),
+  valle3d: load(STORAGE_KEY_VALLE3D, true),
 
   setVoiceRegion: (region) => {
     save(STORAGE_KEY_VOICE_REGION, region);

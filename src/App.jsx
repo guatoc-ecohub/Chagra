@@ -146,6 +146,11 @@ const DiagnosticoSobreFoto = lazy(() => import('./mockups/DiagnosticoSobreFoto')
 const EvidenciaIlustrada = lazy(() => import('./mockups/EvidenciaIlustrada'));
 const MockupGuardianesNarrativos = lazy(() => import('./mockups/MockupGuardianesNarrativos'));
 const HojaVidaMataMockup = lazy(() => import('./components/mockups/HojaVidaMataMockup'));
+const VitrinaCriaturasMockup = lazy(() => import('./mockups/vitrina3d/VitrinaCriaturas'));
+// 3D: vitrina JUGABLE de las piezas de construcción (invernaderos, galpón,
+// establo, bodega, tanque, secadero…) con control de tamaño por pieza y el
+// mini demo del modo colocar (snapping sobre la ladera).
+const VitrinaInfraestructuraMockup = lazy(() => import('./mockups/vitrina3d/VitrinaInfraestructura'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -536,6 +541,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-semillero': 'mockup_mundo3d_semillero',
   'mockups/infraestructura-3d': 'mockup_infraestructura_3d',
   'mockups/colocar-infraestructura': 'mockup_colocar_infraestructura',
+  'mockups/vitrina-3d': 'mockup_vitrina_3d',
+  'mockups/vitrina-infra': 'mockup_vitrina_infra',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1701,6 +1708,32 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Colocar su infraestructura">
               <ColocarInfraestructuraMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_vitrina_3d':
+        // Vitrina/showcase de los componentes visuales nuevos que quedaron en
+        // src/visual/ sin cablear (criaturas rubber-hose, micro-fauna del suelo,
+        // ciclo de la mata, escarcha/valle, hilo de vida, onboarding descubrir).
+        // Galería navegable con controles de tier/movimiento/estado para que el
+        // operador los vea vivos y dé feedback. Ruta #/mockups/vitrina-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Vitrina de criaturas y mundos">
+              <VitrinaCriaturasMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_vitrina_infra':
+        // Vitrina JUGABLE de la librería de infraestructura: las piezas de
+        // construcción del catálogo agrupadas por familia en pestañas, cada una
+        // en su diorama 3D girable con control de tamaño, + el mini demo del
+        // modo colocar (tocar la ladera, snapping a la altura del terreno,
+        // girar 45° y fijar). Ruta #/mockups/vitrina-infra, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Vitrina de infraestructura">
+              <VitrinaInfraestructuraMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );

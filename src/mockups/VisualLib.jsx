@@ -12,25 +12,11 @@
  * Estética: cuaderno de laboratorio. Mobile-first (320px), aprovecha desktop.
  * Autocontenido: cero enlaces/imágenes externas, todo SVG propio de la librería.
  */
-import { lazy, Suspense, useId, useState } from 'react';
+import { useId } from 'react';
 import { VISUAL_REGISTRY, VISUAL_CATEGORIES, VISUAL_COUNTS } from '../visual/registry.js';
 import { Colibri } from '../visual/creatures/index.js';
 import { cieloEscena } from '../visual/scenes/index.js';
 import { CAPAS_PARALLAX } from '../visual/scenes/_parallax.js';
-// Arquetipos 2D (three-free) para la vista previa de los mundos 3D: se dibuja el
-// ESPEJO 2D como poster; el diorama 3D se monta a demanda (chunk perezoso).
-import LaminaMundo from '../visual/mundo3d/laminas2d/LaminaMundo.jsx';
-import MundoValle2D from '../visual/mundo3d/laminas2d/MundoValle2D.jsx';
-
-// Dioramas 3D declarados a nivel de MÓDULO (los componentes lazy no pueden
-// crearse en render). three/@react-three viven en `vendor-three` (perezoso).
-const ESCENAS_LAZY = {
-  cutaway: lazy(() => import('../visual/mundo3d/escenas/EscenaCutaway.jsx')),
-  flujo: lazy(() => import('../visual/mundo3d/escenas/EscenaFlujo.jsx')),
-  recinto: lazy(() => import('../visual/mundo3d/escenas/EscenaRecinto.jsx')),
-  estratos: lazy(() => import('../visual/mundo3d/escenas/EscenaEstratos.jsx')),
-  valle: lazy(() => import('../visual/mundo3d/escenas/EscenaValle.jsx')),
-};
 
 // La vitrina es el único consumidor que monta primitivos de las 4 categorías a
 // la vez, así que carga aquí los CSS que cada familia necesita (las creatures
@@ -40,8 +26,6 @@ import '../visual/effects/effects.css';
 import '../visual/laminas/laminas.css';
 import '../visual/scenes/scenes.css';
 import '../visual/scenes/scene-finca-organismo.css';
-import '../visual/voz/irisVoz.css';
-import '../visual/mundo3d/mundo.css';
 import './VisualLib.css';
 
 const TOTAL = VISUAL_CATEGORIES.reduce((n, k) => n + VISUAL_COUNTS[k], 0);
@@ -171,73 +155,7 @@ function PrimitiveDemo({ categoria, item, variante }) {
     );
   }
 
-  if (render === 'voz') {
-    // IrisVoz: SVG + rAF puro (reduced-motion pinta un fotograma). Un estado por variante.
-    return (
-      <div className="vlib-stage vlib-stage--voz">
-        <Component estado={props.estado || 'reposo'} size={props.size || 132} />
-      </div>
-    );
-  }
-
-  if (render === 'mundo') {
-    return <Mundo3DDemo item={item} />;
-  }
-
   return <div className="vlib-stage vlib-stage--vacio">Sin vista previa</div>;
-}
-
-/* ── Demo de un ARQUETIPO 3D: poster 2D (espejo) + "Ver en 3D" perezoso ─────
-   El storybook respeta el mismo principio del framework: el 2D es primera
-   clase (poster siempre visible) y el 3D es aspiracional (se monta a demanda,
-   trayendo el chunk `vendor-three` solo cuando el usuario lo pide). */
-function Mundo3DDemo({ item }) {
-  const [ver3d, setVer3d] = useState(false);
-  const Escena = ESCENAS_LAZY[item.slug] || null;
-  const noop = () => {};
-
-  const Poster =
-    item.espejo === 'valle2d' ? (
-      <MundoValle2D params={{ clima: 'soleado' }} entrada={item.entrada} onHotspot={noop} />
-    ) : (
-      <LaminaMundo
-        params={item.params}
-        hotspots={item.hotspots}
-        tinte={item.tinte}
-        motivo={item.motivo}
-        onHotspot={noop}
-        titulo={item.nombre}
-      />
-    );
-
-  return (
-    <div className="vlib-stage vlib-stage--mundo">
-      {ver3d && Escena ? (
-        <div className="vlib-mundo3d-canvas">
-          <Suspense fallback={<div className="vlib-mundo3d-cargando">Levantando el diorama 3D…</div>}>
-            <Escena
-              params={item.params}
-              hotspots={item.hotspots}
-              entrada={item.entrada}
-              tinte={item.tinte}
-              reducedMotion={false}
-              onHotspot={noop}
-            />
-          </Suspense>
-        </div>
-      ) : (
-        Poster
-      )}
-      <button
-        type="button"
-        className="vlib-mundo3d-toggle"
-        aria-pressed={ver3d}
-        onClick={() => setVer3d((v) => !v)}
-      >
-        {ver3d ? '‹ Ver el espejo 2D' : 'Ver en 3D ›'}
-      </button>
-    </div>
-  );
 }
 
 /* ── Tabla de props de un primitivo ───────────────────────────────────────── */
@@ -278,13 +196,6 @@ function PrimitiveCard({ categoria, item }) {
       <header className="vlib-card-head">
         <h3 className="vlib-card-name">{item.nombre}</h3>
         {item.cientifico && <span className="vlib-card-sci">{item.cientifico}</span>}
-        <span className="vlib-tags" aria-label="Etiquetas de la pieza">
-          {item.dim && (
-            <span className={`vlib-tag vlib-tag--dim-${item.dim}`}>{item.dim.toUpperCase()}</span>
-          )}
-          {item.role && <span className="vlib-tag vlib-tag--role">{item.role}</span>}
-          {item.capaz3d && <span className="vlib-tag vlib-tag--capaz">3D-capaz</span>}
-        </span>
       </header>
       {item.descripcion && <p className="vlib-card-desc">{item.descripcion}</p>}
 

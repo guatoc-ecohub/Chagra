@@ -17,6 +17,16 @@
  *
  * Todo `MeshLambert`/`Basic`, sin sombras (contrato de EscenaBase3D). Geometría
  * de primitivas: cero GLTF, offline y liviano.
+ *
+ * ESPEJO VIVO (auditoría §5b): las MATAS reflejan la SALUD REAL de la finca
+ * (`estadoFinca.saludFinca` = { matasVivas, matasTotal }, que arma useFincaViva
+ * de los conteos reales de matas). CONTRATO ANTI-FABRICACIÓN ESTRICTO: el manejo
+ * (trampas, biocontrol, borde push-pull, enemigos naturales) es la LECCIÓN del
+ * lugar y está SIEMPRE; NUNCA inventamos una plaga ni un bicho dañino. Sin dato
+ * de salud (finca vacía o aún cargando) → huerta SANA/neutra, todas las matas
+ * firmes. Con dato, si hay matas decaídas en la finca REAL, unas matas se ven
+ * decaídas (amarillean y se inclinan) en la misma proporción — el reflejo del
+ * conteo real, no una plaga fabricada.
  */
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -24,6 +34,42 @@ import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
 import { faunaDeMundo, coreografia } from '../faunaFuncional.js';
 import { CIELOS, PALETA } from '../atmosferaMadre.js';
+
+/* Umbrales del ESPEJO de salud: sobre este ratio de matas vivas la huerta se ve
+   plena; bajo el segundo, más de una mata decae. Deja SIEMPRE al menos una mata
+   firme (la clínica cuida lo que vive). */
+const SALUD_PLENA = 0.85;
+const SALUD_BAJA = 0.6;
+
+/**
+ * Ratio de matas vivas (0..1) o null si no hay dato de salud. null = huerta
+ * neutra/sana (no fingimos ni salud perfecta ni desastre): así lo omite
+ * useFincaViva cuando la finca está vacía o los procesos aún cargan.
+ *
+ * @param {object|undefined} saludFinca  { matasVivas, matasTotal }
+ * @returns {number|null}
+ */
+function ratioSalud(saludFinca) {
+  if (!saludFinca || !Number.isFinite(saludFinca.matasVivas)) return null;
+  const total = saludFinca.matasTotal > 0 ? saludFinca.matasTotal : 1;
+  return Math.max(0, Math.min(1, saludFinca.matasVivas / total));
+}
+
+/**
+ * Cuántas de las `total` matas se ven DECAÍDAS, espejo del ratio de salud real.
+ * null (sin dato) o salud plena → 0. Deja siempre ≥1 firme. NO es una plaga: es
+ * el reflejo honesto del conteo de matas que la finca reporta decaídas.
+ *
+ * @param {number|null} ratio
+ * @param {number} total  matas visibles en el diorama
+ * @returns {number}
+ */
+function matasDecaidas(ratio, total) {
+  const cap = Math.max(0, total - 1);
+  if (ratio == null || ratio >= SALUD_PLENA) return 0;
+  if (ratio >= SALUD_BAJA) return Math.min(1, cap);
+  return Math.min(2, cap);
+}
 
 /* La fauna BENÉFICA billboard de la huerta-clínica (el CONTROLADOR carábido que
    patrulla a ras + POLINIZADORES en la orla de flores) vive en faunaFuncional.js.
@@ -90,21 +136,28 @@ function Trampa({ pos, color = '#f2c531' }) {
   );
 }
 
-/* Una MATA sana: tallo + hojas redondeadas. El verde firme cuenta salud. */
-function Mata({ pos, color = '#4e8f3f' }) {
+/* Una MATA: tallo + hojas redondeadas. El verde firme cuenta salud; `decaida`
+   (espejo de la salud real, NO una plaga) la amarillea, achica y hace inclinar
+   las hojas — la mata que la finca reporta decaída, atendida por la clínica. */
+function Mata({ pos, color = '#4e8f3f', decaida = false }) {
   const hojas = [
     [0, 0.44, 0, 0.17], [0.13, 0.35, 0.05, 0.12], [-0.12, 0.37, -0.05, 0.12],
   ];
+  // Decaída: hoja amarillo-enfermiza, más pequeña y caída; tallo mustio.
+  const colorHoja = decaida ? '#b6a24a' : color;
+  const colorTallo = decaida ? '#6e6636' : '#5a6a2e';
+  const caida = decaida ? -0.06 : 0; // las hojas se hunden un poco
+  const merma = decaida ? 0.82 : 1; // y menguan
   return (
-    <group position={pos}>
+    <group position={pos} rotation={decaida ? [0.14, 0, 0.1] : [0, 0, 0]}>
       <mesh position={[0, 0.2, 0]}>
         <cylinderGeometry args={[0.03, 0.05, 0.42, 5]} />
-        <meshLambertMaterial color="#5a6a2e" flatShading />
+        <meshLambertMaterial color={colorTallo} flatShading />
       </mesh>
       {hojas.map(([x, y, z, r], i) => (
-        <mesh key={i} position={[x, y, z]}>
-          <sphereGeometry args={[r, 8, 7]} />
-          <meshLambertMaterial color={color} flatShading />
+        <mesh key={i} position={[x, y + caida, z]}>
+          <sphereGeometry args={[r * merma, 8, 7]} />
+          <meshLambertMaterial color={colorHoja} flatShading />
         </mesh>
       ))}
     </group>
@@ -151,12 +204,21 @@ function FlorBorde({ pos }) {
   );
 }
 
-function Diorama({ params, reducedMotion, fauna }) {
-  const matas = params?.matas || [
-    { color: '#4e8f3f', pos: [-0.5, 0, 0.35] },
-    { color: '#57993f', pos: [0.55, 0, 0.1] },
-    { color: '#468637', pos: [0.05, 0, -0.55] },
-  ];
+function Diorama({ params, reducedMotion, fauna, estadoFinca }) {
+  // ESPEJO VIVO de la salud real (§5b): cuántas matas se ven decaídas es el
+  // reflejo del ratio de matas vivas de la finca. Sin dato → 0 (huerta sana).
+  // Marcamos las ÚLTIMAS del arreglo (deja las del frente firmes). No es plaga.
+  const matas = useMemo(() => {
+    const base = params?.matas || [
+      { color: '#4e8f3f', pos: [-0.5, 0, 0.35] },
+      { color: '#57993f', pos: [0.55, 0, 0.1] },
+      { color: '#468637', pos: [0.05, 0, -0.55] },
+    ];
+    const ratio = ratioSalud(estadoFinca?.saludFinca);
+    const nDecaidas = matasDecaidas(ratio, base.length);
+    const desde = base.length - nDecaidas;
+    return base.map((m, i) => ({ ...m, decaida: i >= desde }));
+  }, [estadoFinca?.saludFinca, params?.matas]);
   const trampas = params?.trampas || [
     { color: '#f2c531', pos: [1.35, 0, 0.35] }, // amarilla: mosca blanca / minador
     { color: '#3f77c7', pos: [-1.25, 0, -0.5] }, // azul: trips
@@ -205,9 +267,9 @@ function Diorama({ params, reducedMotion, fauna }) {
         <meshBasicMaterial color={PALETA.follajeClaro} transparent opacity={0.7} />
       </mesh>
 
-      {/* las matas sanas que se protegen */}
+      {/* las matas que se protegen (decaída = espejo de la salud real, no plaga) */}
       {matas.map((m, i) => (
-        <Mata key={i} pos={m.pos} color={m.color} />
+        <Mata key={i} pos={m.pos} color={m.color} decaida={m.decaida} />
       ))}
       {/* las trampas cromáticas */}
       {trampas.map((t, i) => (
@@ -236,7 +298,12 @@ export default function EscenaSanidad(props) {
   const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.45, 0] }}>
-      <Diorama params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} />
+      <Diorama
+        params={props.params}
+        reducedMotion={props.reducedMotion}
+        fauna={fauna}
+        estadoFinca={props.estadoFinca}
+      />
     </EscenaBase3D>
   );
 }
