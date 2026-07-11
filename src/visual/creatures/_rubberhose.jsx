@@ -44,9 +44,15 @@ export function OjosRubber({ ojos = [], mirar = [0.32, 0.34], parpadea = true, i
         return (
           <g key={i}>
             <circle cx={o.cx} cy={o.cy} r={o.r} fill="#fffaf0" stroke={ink} strokeWidth={o.r * 0.42} />
-            <circle cx={px} cy={py} r={pr} fill="#20130a" />
-            {/* catchlight arriba-izquierda: la chispa de vida del ojo */}
-            <circle cx={px - pr * 0.4} cy={py - pr * 0.5} r={pr * 0.42} fill="#fffdf7" />
+            {/* pupila + catchlight en su grupo `rh-mirada`: cuando la criatura
+                está viva, las pupilas se van de reojo y miran arriba curiosas
+                (período co-primo con el parpadeo — nunca el mismo compás).
+                Ambos ojos comparten la clase → dardean sincronizados. */}
+            <g className={parpadea ? 'rh-mirada' : undefined}>
+              <circle cx={px} cy={py} r={pr} fill="#20130a" />
+              {/* catchlight arriba-izquierda: la chispa de vida del ojo */}
+              <circle cx={px - pr * 0.4} cy={py - pr * 0.5} r={pr * 0.42} fill="#fffdf7" />
+            </g>
           </g>
         );
       })}
@@ -58,10 +64,12 @@ export function OjosRubber({ ojos = [], mirar = [0.32, 0.34], parpadea = true, i
  * Chapetas / cachetes campesinos: el rubor coral que da ternura andina.
  * @param {Array<{cx:number,cy:number,r:number}>} puntos
  * @param {string} [color=RH_CHEEK]
+ * @param {boolean} [vivo=false]  activa `rh-rubor`: las chapetas se encienden
+ *   un instante en un ciclo largo (el CSS lo gatea por RM/tier).
  */
-export function Cachetes({ puntos = [], color = RH_CHEEK }) {
+export function Cachetes({ puntos = [], color = RH_CHEEK, vivo = false }) {
   return (
-    <g fill={color} opacity="0.72">
+    <g fill={color} opacity="0.72" className={vivo ? 'rh-rubor' : undefined}>
       {puntos.map((p, i) => (
         <ellipse key={i} cx={p.cx} cy={p.cy} rx={p.r} ry={p.r * 0.72} />
       ))}

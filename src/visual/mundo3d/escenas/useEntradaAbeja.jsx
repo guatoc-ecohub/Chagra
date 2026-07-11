@@ -21,6 +21,8 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
+import { CRUCE_ATRAPA_MS, CRUCE_SUELTA_MS } from '../../creatures/AbejaTransicion.jsx';
+import { useSalidaAbeja, resetSalidaAbeja } from '../../creatures/senalSalidaAbeja.js';
 import { SombraContacto } from './SombraContacto.jsx';
 import { reaccionDeFinca } from './reaccionFinca.js';
 import useHaptics from '../useHaptics.js';
@@ -29,11 +31,49 @@ import useHaptics from '../useHaptics.js';
    la coreografía se comporta EXACTO como antes (todos los multiplicadores en 1). */
 const VUELO_NEUTRO = { altura: 1, velocidad: 1, vagar: 1, tiembla: 0 };
 
+/* EL CRUCE 2D→3D (AbejaTransicion): el mesh nace OCULTO exactamente en el
+   PUNTO DE ATRAPE — el píxel de pantalla donde la Angelita 2D del overlay se
+   clava y desaparece (centro, 36% de alto: `.abeja-cruce__pos` en
+   creatures.css) — espera el instante del ATRAPE y entonces aparece y baja en
+   PICADA a su percha. Misma constante de tiempo que el overlay = una sola
+   abeja cruzando de capa. Al VOLVER, el reverso: `avisarSalidaAbeja()` (señal
+   del host) la manda de vuelta al mismo punto y se apaga en CRUCE_SUELTA_MS,
+   donde el overlay 'volver' la retoma. El punto NO se estima con offsets a
+   ojo: se DES-PROYECTA de la cámara real de la escena (NDC → mundo), así el
+   empalme cae en el mismo píxel en cualquier arquetipo/zoom. */
+const CRUCE_ATRAPA_S = CRUCE_ATRAPA_MS / 1000;
+const CRUCE_SUELTA_S = CRUCE_SUELTA_MS / 1000;
+const CRUCE_PICADA_S = 1.6; // ventana post-atrape con lerp reforzado (el clavado)
+const CRUCE_EMPUJE = 2.6; // refuerzo del lerp durante la picada
+const CRUCE_HUIDA = 0.24; // lerp de la salida (fuerte: la suelta es un suspiro)
+/* NDC-y del punto de atrape = el `top: 36%` del overlay: 1 − 2·0.36. Si el CSS
+   mueve el punto, mover ESTE número con él (una sola pareja de verdades). */
+const CRUCE_NDC_Y = 0.28;
+/* A qué profundidad (fracción de la distancia cámara→foco) vive el punto de
+   cruce sobre ese rayo de pantalla: cerca de la cámara para que el billboard
+   (que escala por distancia) nazca GRANDE como la 2D y encoja al clavarse. */
+const CRUCE_HONDO = 0.5;
+
+/* Temporales reutilizados por frame (cero alloc en el loop). */
+const _punto = new THREE.Vector3();
+const _dest = new THREE.Vector3();
+
+/* El punto de cruce en coordenadas de MUNDO: des-proyecta el píxel del overlay
+   (NDC x=0, y=CRUCE_NDC_Y) a un rayo de cámara y toma el punto del rayo a
+   CRUCE_HONDO de la distancia cámara→foco. */
+function puntoDeCruce(camera, foco, out) {
+  out.set(0, CRUCE_NDC_Y, 0.5).unproject(camera);
+  out.sub(camera.position).normalize();
+  return out.multiplyScalar(camera.position.distanceTo(foco) * CRUCE_HONDO)
+    .add(camera.position);
+}
+
 /**
- * Devuelve `{ ref, caraRef, sombraRef }` para colgar del `<group>` de la abeja,
- * de su cara (para el volteo) y de su sombra de contacto (el blob que la sigue
- * por el piso — auditoría 3D: la abeja no debe volar "a la deriva").
- * Corre `useFrame` (debe usarse DENTRO de un `<Canvas>`).
+ * Devuelve `{ ref, caraRef, sombraRef, visRef }` para colgar del `<group>` de
+ * la abeja, de su cara (para el volteo), de su sombra de contacto (el blob que
+ * la sigue por el piso — auditoría 3D: la abeja no debe volar "a la deriva") y
+ * del billboard DOM (la visibilidad del cruce). Corre `useFrame` (debe usarse
+ * DENTRO de un `<Canvas>`).
  *
  * @param {THREE.Vector3} foco  a dónde va la abeja (hotspot activo o centro).
  * @param {object} [opts]
@@ -44,14 +84,34 @@ const VUELO_NEUTRO = { altura: 1, velocidad: 1, vagar: 1, tiembla: 0 };
  * @param {object}  [opts.vuelo]  modificadores de reaccionDeFinca: mojada vuela
  *   más bajo/lento, sed baja a buscar agua, comiendo tiembla mordisqueando.
  *   `{ altura, velocidad, vagar, tiembla }` — multiplicadores (1 = vuelo normal).
+ * @param {boolean} [opts.cruce=false]  el CRUCE 2D→3D: nace oculta en el punto
+ *   de atrape (des-proyectado de la cámara), aparece en CRUCE_ATRAPA_MS
+ *   (cuando la 2D del overlay se apaga) y baja en picada a su percha. `visRef`
+ *   (devuelto) debe colgarse del billboard DOM para que la ocultación llegue
+ *   al <Html> (drei no hereda la visibilidad del group al portal DOM).
+ * @param {boolean} [opts.saliendo=false]  el reverso 3D→2D: vuela al punto de
+ *   suelta y se apaga en CRUCE_SUELTA_MS (el overlay 'volver' la retoma ahí).
  */
 export function useEntradaAbeja(foco, {
   entrando = true, energia = 1, reducedMotion = false, piso = 0, vuelo = VUELO_NEUTRO,
+  cruce = false, saliendo = false,
 } = {}) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const sombraRef = useRef(null);
+  const visRef = useRef(null);
+  const nacioEn = useRef(null); // reloj del primer frame (ancla del cruce)
+  // Fase del cruce de entrada: 'oculta' (pre-atrape) → 'picada' → 'no'.
+  // Se decide UNA vez al nacer: si el mesh ya vive, cambiar props no re-cruza.
+  const fase = useRef(cruce && !reducedMotion ? 'oculta' : 'no');
+  const salioEn = useRef(null); // reloj del inicio de la salida
   const prevX = useRef(foco.x);
+  // Visibilidad del billboard DOM + su sombra (el <Html> de drei es un portal:
+  // no hereda `group.visible`, así que se apaga a mano por estilo).
+  const ponVis = (visible) => {
+    if (visRef.current) visRef.current.style.visibility = visible ? '' : 'hidden';
+    if (sombraRef.current) sombraRef.current.visible = visible;
+  };
   // Háptica de "posarse" (DR-3D-HAPTICA): UNA sola vez por foco, al cruzar el
   // umbral de llegada. El foco solo cambia por tap del usuario (hotspot) o al
   // montar la escena (que nace de un tap para entrar al mundo) → gesto-derivado.
@@ -60,6 +120,39 @@ export function useEntradaAbeja(foco, {
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
+    if (nacioEn.current === null) nacioEn.current = t;
+    const vida = t - nacioEn.current;
+
+    // ── SALIDA (cruce 3D→2D): la señal del host la manda de vuelta al punto de
+    //    suelta (el mismo píxel del overlay, des-proyectado de la cámara VIVA —
+    //    si el usuario orbitó, igual cae donde el 2D brota) y se apaga en
+    //    CRUCE_SUELTA_S. Con reduced-motion no hay viaje: el host corta en seco
+    //    y este mesh muere con la escena, visible hasta el final.
+    if (saliendo && !reducedMotion) {
+      if (fase.current === 'oculta') { ponVis(false); return; } // salió antes de nacer
+      if (salioEn.current === null) salioEn.current = t;
+      if (t - salioEn.current >= CRUCE_SUELTA_S) { ponVis(false); return; }
+      puntoDeCruce(state.camera, foco, _punto);
+      ref.current.position.lerp(_punto, CRUCE_HUIDA);
+      return; // sin vagar ni sombra: es un suspiro de 180 ms hacia la cámara
+    }
+    salioEn.current = null;
+
+    // ── ENTRADA (cruce 2D→3D): oculta y CLAVADA en el punto de atrape hasta el
+    //    instante exacto en que la 2D del overlay se apaga (CRUCE_ATRAPA_S desde
+    //    el montaje de la escena — el mismo ancla del overlay, que el host monta
+    //    con AlMontarEscena); entonces aparece y cae en PICADA (lerp reforzado)
+    //    hacia su percha de siempre. Una sola abeja cruzando de capa.
+    if (fase.current === 'oculta') {
+      puntoDeCruce(state.camera, foco, _punto);
+      ref.current.position.copy(_punto);
+      if (vida < CRUCE_ATRAPA_S) { ponVis(false); return; }
+      fase.current = 'picada';
+      ponVis(true);
+    } else if (fase.current === 'picada' && vida >= CRUCE_ATRAPA_S + CRUCE_PICADA_S) {
+      fase.current = 'no';
+    }
+    const empuje = fase.current === 'picada' ? CRUCE_EMPUJE : 1;
     // El estado de la finca modula el vuelo: mojada pesa (baja/lenta), sed baja a
     // buscar agua, comiendo tiembla mordisqueando. Multiplicadores de reaccionDeFinca.
     const mAltura = vuelo?.altura ?? 1;
@@ -67,20 +160,34 @@ export function useEntradaAbeja(foco, {
     const mVagar = vuelo?.vagar ?? 1;
     const tiembla = reducedMotion ? 0 : (vuelo?.tiembla ?? 0);
     const brio = (0.35 + 0.65 * energia) * mVel; // la energía y el clima animan el vuelo
-    const bob = reducedMotion ? 0 : Math.sin(t * (1.6 + brio)) * (0.06 + 0.12 * brio);
+    // Bob IRREGULAR (Miss-Minutes): el vaivén base respira sobre otra onda más
+    // lenta — nunca el mismo compás, la flotada se siente decidida, no de reloj.
+    const bob = reducedMotion
+      ? 0
+      : Math.sin(t * (1.6 + brio)) * (0.06 + 0.12 * brio) * (1 + 0.3 * Math.sin(t * 0.73));
     // Temblor de sed/mordisco: sacudida rápida y corta (nervio, no vaivén).
     const tembleque = tiembla ? Math.sin(t * 13) * tiembla : 0;
-    // Al reposo deriva en un círculo calmo; al entrar se posa junto al lugar.
-    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.55) * 0.6 * mVagar;
-    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.55) * 0.4 * mVagar;
+    // ARREBATO curioso: casi siempre 0; cada ~26 s la ventana del seno abre ~2 s
+    // y Angelita se escora de lado a fisgonear (double-take de vuelo) y vuelve.
+    // Suave por construcción (es el pico de un seno) — chispa, no epilepsia.
+    const arrebato = reducedMotion ? 0 : Math.max(0, Math.sin(t * 0.24) - 0.94) * 6 * mVagar;
+    // Al reposo deriva VAGABUNDA: tres ondas co-primas (nunca repite el mismo
+    // óvalo — ronda viva, impredecible). Al entrar se posa junto al lugar, con
+    // apenas un resto de arrebato (fisgonea sin soltar su percha).
+    const vagarX = reducedMotion || entrando
+      ? 0
+      : (Math.sin(t * 0.55) * 0.42 + Math.sin(t * 1.37) * 0.13 + Math.sin(t * 0.19) * 0.22) * mVagar;
+    const vagarZ = reducedMotion || entrando
+      ? 0
+      : (Math.cos(t * 0.55) * 0.3 + Math.sin(t * 0.83 + 1.7) * 0.14) * mVagar;
     // La altura sobre el foco se atenúa con `mAltura` (mojada/sed vuelan más bajo).
     const alto = (entrando ? 0.85 : 1.6) * mAltura;
-    const dest = new THREE.Vector3(
-      foco.x + (entrando ? 0.45 : 0.35 + vagarX) + tembleque,
-      foco.y + alto + bob + tembleque * 0.5,
+    const dest = _dest.set(
+      foco.x + (entrando ? 0.45 : 0.35 + vagarX) + tembleque + arrebato * (entrando ? 0.3 : 1),
+      foco.y + alto + bob + tembleque * 0.5 + arrebato * 0.18,
       foco.z + (entrando ? 0.6 : 0.55 + vagarZ),
     );
-    ref.current.position.lerp(dest, (entrando ? 0.06 : 0.05) * mVel);
+    ref.current.position.lerp(dest, (entrando ? 0.06 : 0.05) * mVel * empuje);
     // Angelita se posa: al cruzar el umbral de llegada al foco, un roce háptico
     // (una vez por foco — el ref evita repetir por frame; el gate del hook
     // apaga todo con reduced-motion, pref 'off' o sin soporte).
@@ -103,7 +210,7 @@ export function useEntradaAbeja(foco, {
       sombraRef.current.material.opacity = Math.max(0.06, 0.3 - h * 0.06);
     }
   });
-  return { ref, caraRef, sombraRef };
+  return { ref, caraRef, sombraRef, visRef };
 }
 
 /**
@@ -123,6 +230,11 @@ export function AbejaEscena({
   // 'bajo' Angelita apaga el idle continuo (boil + follow-through) y conserva
   // el aleteo + los estados reactivos. La escena lo hereda del host <Mundo>.
   tier = 'alto',
+  // El CRUCE 2D→3D corre por defecto: toda escena-mundo nace con Angelita
+  // clavándose desde la capa 2D (y aun sin el overlay cableado, la entrada en
+  // picada se sostiene sola). `cruce={false}` para montajes sin viaje
+  // (storybook, catálogo). Reduced-motion lo apaga por dentro (aparece ya).
+  cruce = true,
   // ── EL ESTADO REAL DE LA FINCA (auditoría §5b) ─────────────────────────────
   //    Angelita SIEMPRE refleja tu realidad: llueve→mojada, Niño/sequía→sed,
   //    cosecha→come de eso, ánimo por salud. Interfaz LIMPIA; hoy MUESTRA, codex
@@ -130,6 +242,15 @@ export function AbejaEscena({
   //    `animo`/`energia` sueltos de siempre (contrato viejo intacto).
   estadoFinca = null, hayAlerta = false,
 }) {
+  // La señal de SALIDA del host (avisarSalidaAbeja): cruza el reconciler de r3f
+  // vía store externo. Al montar se limpia (la señal es de la escena ANTERIOR);
+  // al desmontar también, para no dejar el flag prendido entre mundos.
+  const saliendo = useSalidaAbeja();
+  useEffect(() => {
+    resetSalidaAbeja();
+    return resetSalidaAbeja;
+  }, []);
+  const cruceVivo = cruce && !reducedMotion;
   // La CAPA de reacción (pura, desacoplada de la especie): del estado real sale
   // el ánimo, la energía, y el repertorio (mojada/sed/comiendo) + modificadores
   // de vuelo. Con estadoFinca manda la reacción; sin él, el contrato viejo.
@@ -142,8 +263,9 @@ export function AbejaEscena({
   const mojada = reaccion?.mojada ?? false;
   const sed = reaccion?.sed ?? false;
   const comiendo = reaccion?.comiendo ?? false;
-  const { ref, caraRef, sombraRef } = useEntradaAbeja(foco, {
+  const { ref, caraRef, sombraRef, visRef } = useEntradaAbeja(foco, {
     entrando, energia: energiaReal, reducedMotion, piso, vuelo: reaccion?.vuelo,
+    cruce: cruceVivo, saliendo,
   });
   // Microrrebote: cada toque de hotspot sube `rebote`; reiniciamos la animación
   // CSS (quitar → reflow → poner) para que dispare aun en toques seguidos. El
@@ -165,9 +287,14 @@ export function AbejaEscena({
       <group ref={ref} position={[foco.x + 0.45, foco.y + 0.85, foco.z + 0.6]}>
         <Html center distanceFactor={7} zIndexRange={[40, 10]}>
           {/* Reacción al estado real, también en el wrapper (brillo mojado,
-              temblor sediento, bamboleo de mordisco — rubber-hose). Gate RM. */}
+              temblor sediento, bamboleo de mordisco — rubber-hose). Gate RM.
+              `visRef` + visibility inicial: con cruce, el billboard nace oculto
+              (el estilo inline evita el flash del portal antes del primer
+              useFrame; después el hook lo maneja imperativo). */}
           <div
+            ref={visRef}
             className="mundo-abeja"
+            style={cruceVivo ? { visibility: 'hidden' } : undefined}
             aria-hidden="true"
             data-hablando={hablando && vivo ? '1' : undefined}
             data-mojada={mojada && vivo ? '1' : undefined}

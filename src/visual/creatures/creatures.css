@@ -94,17 +94,103 @@
 
 /* PARPADEO — la chispa de vida de los ojos de goma: abiertos casi todo el ciclo,
    cierran SECO un par de fotogramas. Se aplica al grupo de ojos (los dos a la
-   vez). Snappy, no stepped (un parpadeo es 1-2 frames). */
+   vez). Snappy, no stepped (un parpadeo es 1-2 frames). IRREGULAR a propósito:
+   un parpadeo suelto y luego un parpadeo DOBLE (blink-blink) más adelante en el
+   ciclo — la cadencia pareja delataba al robot. */
 .rh-blink {
   transform-box: fill-box;
   transform-origin: center;
-  animation: rh-blink 4.2s linear infinite;
+  animation: rh-blink 5.6s linear infinite;
 }
 @keyframes rh-blink {
-  0%, 93%, 100% { transform: scaleY(1); }
-  96%           { transform: scaleY(0.12); }  /* cierra */
-  98%           { transform: scaleY(1); }      /* abre */
+  0%, 36%, 40%, 74%, 78%, 82%, 86%, 100% { transform: scaleY(1); }
+  38% { transform: scaleY(0.12); }  /* parpadeo suelto */
+  76% { transform: scaleY(0.1); }   /* blink-blink: dos golpes seguidos */
+  80% { transform: scaleY(0.14); }
 }
+
+/* MIRADA — pupilas que reaccionan: se van de reojo, miran arriba curiosas y
+   vuelven. Con DOUBLE-TAKE (Miss Minutes): tras el reojo, un vistazo SECO al
+   lado contrario y de vuelta — "¿ah? …¡AH!". Período co-primo con el parpadeo
+   y los antics para que el conjunto NUNCA caiga en el mismo compás (vida, no
+   loop). Amplitudes en unidades del viewBox (≈2px en un avatar de 64). */
+.rh-mirada {
+  animation: rh-mirada 7.9s ease-in-out infinite;
+}
+@keyframes rh-mirada {
+  0%, 20%, 47%, 58%, 76%, 100% { transform: translate(0, 0); }
+  23%, 34% { transform: translate(-0.55px, 0.12px); }   /* de reojo (sospecha algo) */
+  38% { transform: translate(0.5px, 0); }               /* double-take: ¡al otro lado! */
+  41%, 44% { transform: translate(-0.5px, 0.1px); }     /* …no, sí era allá */
+  61%, 71% { transform: translate(0.45px, -0.38px); }   /* arriba: ¿y eso qué era? */
+}
+
+/* ANTIC — el arrebato Miss-Minutes: casi todo el ciclo es identidad, y de
+   pronto ANTICIPA (se echa atrás con squash, agarra impulso) y da la VUELTA
+   DE CAMPANA completa con stretch, overshoot y asentada. El 360→0 del cierre
+   de loop es invisible (mismo ángulo). Wrapper propio: no pisa el boil. */
+.rh-antic {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rh-antic 9.7s ease-in-out infinite;
+}
+@keyframes rh-antic {
+  0%, 55% { transform: rotate(0deg) scale(1, 1); }
+  58%, 60% { transform: rotate(-11deg) scale(0.93, 1.09); }  /* anticipación + hold */
+  67% { transform: rotate(338deg) scale(1.08, 0.92); }       /* ¡la vuelta! (smear de squash) */
+  71% { transform: rotate(367deg) scale(0.97, 1.04); }       /* overshoot elástico */
+  75%, 100% { transform: rotate(360deg) scale(1, 1); }
+}
+
+/* TRAVIESO — micro-antics de otro período: un saltito de lado con wobble
+   (double-take de cuerpo), el WIGGLE Miss-Minutes (meneíto sabroso de caderas,
+   su firma) y un brinquito curioso al final. Chispa, no epilepsia: amplitudes
+   de ~1 unidad, ventanas cortas dentro de un ciclo largo, easing suave. */
+.rh-travieso {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rh-travieso 6.3s ease-in-out infinite;
+}
+@keyframes rh-travieso {
+  0%, 29%, 46%, 56%, 72%, 90%, 100% { transform: translate(0, 0) rotate(0deg); }
+  32% { transform: translate(-1.1px, -0.5px) rotate(-5deg); }  /* saltito de lado */
+  36% { transform: translate(-1.1px, -0.4px) rotate(4deg); }   /* wobble (double-take) */
+  41% { transform: translate(0.4px, 0.2px) rotate(-2deg); }    /* rebote de vuelta */
+  59% { transform: translate(0.25px, 0) rotate(3.5deg); }      /* wiggle: menea… */
+  63% { transform: translate(-0.25px, 0) rotate(-3.5deg); }    /* …para acá… */
+  67% { transform: translate(0.15px, 0) rotate(2deg); }        /* …y asienta contenta */
+  79% { transform: translate(0, -0.95px) rotate(4deg); }       /* brinquito curioso */
+  84% { transform: translate(0, 0.3px) rotate(-2deg); }
+}
+
+/* RUBOR — las chapetas se encienden un momento (calidez andina, período largo). */
+.rh-rubor {
+  animation: rh-rubor 12.7s ease-in-out infinite;
+}
+@keyframes rh-rubor {
+  0%, 62%, 78%, 100% { opacity: 0.72; }
+  68%, 72% { opacity: 0.95; }
+}
+
+/* El ánimo modula la locura: 'pleno' = más chispa (antics más seguidos);
+   'sediento'/'descansa' = sin arrebatos ni miradas traviesas (está bajita de
+   ánimo — el aleteo y los estados reactivos siguen contando la verdad). */
+[data-animo='pleno'] .rh-antic { animation-duration: 6.8s; }
+[data-animo='pleno'] .rh-travieso { animation-duration: 4.7s; }
+[data-animo='sediento'] .rh-antic,
+[data-animo='sediento'] .rh-travieso,
+[data-animo='sediento'] .rh-mirada,
+[data-animo='descansa'] .rh-antic,
+[data-animo='descansa'] .rh-travieso,
+[data-animo='descansa'] .rh-mirada { animation: none; }
+
+/* Los estados reactivos (mojada/sed/comiendo) y el reposo PISAN el arrebato:
+   una abeja empapada o libando no da vueltas de campana. */
+[data-mojada='1'] .rh-antic, [data-mojada='1'] .rh-travieso,
+[data-sed='1'] .rh-antic, [data-sed='1'] .rh-travieso,
+[data-comiendo='1'] .rh-antic, [data-comiendo='1'] .rh-travieso,
+[data-pose='reposo'] .rh-antic, [data-pose='reposo'] .rh-travieso,
+[data-pose='reposo'] .rh-mirada { animation: none; }
 
 /* FOLLOW-THROUGH (secondary motion) — antenas, bracitos y patitas de manguera
    se mecen con retardo: delatan que el cuerpo se movió. Cada miembro pone su
@@ -132,10 +218,15 @@
 /* device-tier 'bajo': corta lo continuo (ahorro gama baja). Los estados
    reactivos siguen (feedback importante) por su mayor especificidad. */
 [data-tier='bajo'] .rh-boil,
-[data-tier='bajo'] .rh-sway { animation: none; }
+[data-tier='bajo'] .rh-sway,
+[data-tier='bajo'] .rh-antic,
+[data-tier='bajo'] .rh-travieso,
+[data-tier='bajo'] .rh-mirada,
+[data-tier='bajo'] .rh-rubor { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .rh-boil, .rh-blink, .rh-sway, .rh-smear { animation: none !important; }
+  .rh-boil, .rh-blink, .rh-sway, .rh-smear,
+  .rh-antic, .rh-travieso, .rh-mirada, .rh-rubor { animation: none !important; }
 }
 
 /* ── REACCIÓN AL ESTADO REAL DE LA FINCA (auditoría §5b) ──────────────────────
@@ -219,4 +310,116 @@
   [data-creature='abeja-angelita'][data-sed='1'] .crt-body,
   [data-creature='abeja-angelita'][data-comiendo='1'] .crt-lengua,
   [data-creature='abeja-angelita'][data-comiendo='1'] .crt-body { animation: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EL CRUCE 2D → 3D (AbejaTransicion.jsx) — el handoff de capas.
+   Overlay DOM puro sobre el mundo recién montado: la Angelita 2D ANTICIPA
+   (se echa atrás, agarra impulso) y se CLAVA hacia el punto de atrape
+   (centro, ~36% de alto — donde el mesh de useEntradaAbeja nace y la
+   "atrapa" en el mismo instante: CRUCE_ATRAPA_MS). Al volver, el reverso:
+   brota chiquita del punto de atrape y crece hacia usted, empalmando con el
+   velo del viaje del host. Todo transform/opacity; pointer-events: none.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.abeja-cruce {
+  position: absolute;
+  inset: 0;
+  z-index: 45; /* sobre canvas y miga (5), bajo el velo del viaje del host */
+  overflow: hidden;
+  pointer-events: none;
+}
+/* El punto de ATRAPE: ancla de 0×0 donde la 2D se apaga y el mesh enciende.
+   El flex con caja 0×0 centra al hijo exactamente sobre el punto. */
+.abeja-cruce__pos {
+  position: absolute;
+  left: 50%;
+  top: 36%;
+  width: 0;
+  height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.abeja-cruce__vuelo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 6px 14px rgba(20, 30, 15, 0.35));
+}
+.abeja-cruce__giro { will-change: transform; }
+.abeja-cruce__giro > svg { display: block; }
+
+/* ENTRAR: retoma donde el velo del host soltó a la abeja (centro, escala ~.55),
+   anticipa y se clava hacia el punto de atrape encogiéndose — el zoom "hacia
+   adentro" de la escena. La opacidad muere SECA justo en el atrape. */
+.abeja-cruce--entrar .abeja-cruce__vuelo {
+  animation: abeja-cruce-entra 0.76s cubic-bezier(0.5, 0, 0.65, 1) both;
+}
+.abeja-cruce--entrar .abeja-cruce__giro {
+  animation: abeja-cruce-gira 0.76s cubic-bezier(0.55, 0, 0.6, 1) both;
+}
+@keyframes abeja-cruce-entra {
+  0%   { transform: translateY(24vh) scale(0.55); opacity: 0; }
+  14%  { transform: translateY(24vh) scale(0.55); opacity: 1; }   /* retoma el hilo */
+  38%  { transform: translateY(27vh) scale(0.62, 0.5); }          /* anticipación: coge impulso */
+  46%  { transform: translateY(25vh) scale(0.5, 0.66); }          /* estira al despegar */
+  92%  { opacity: 1; }
+  100% { transform: translateY(0) scale(0.1); opacity: 0; }        /* ¡atrapada por el mesh! */
+}
+@keyframes abeja-cruce-gira {
+  0%, 38% { transform: rotate(0deg); }
+  44%  { transform: rotate(-16deg); }    /* wind-up */
+  100% { transform: rotate(326deg); }    /* barrel roll del clavado */
+}
+/* El puff del atrape: un anillo que revienta donde la 2D desapareció (vende
+   el "pop" del cruce de capa). Nace con el atrape, muere solo. */
+.abeja-cruce__puff {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 214, 106, 0.9);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.2);
+  left: 0;
+  top: 0;
+  will-change: transform, opacity;
+  animation: abeja-cruce-puff 0.3s ease-out 0.68s both;
+}
+@keyframes abeja-cruce-puff {
+  0%   { transform: translate(-50%, -50%) scale(0.2); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+}
+
+/* VOLVER: el reverso — brota chiquita del punto de atrape (el mesh "la soltó"),
+   crece hacia usted con overshoot y se FUNDE al final: el velo del viaje del
+   host la recoge ahí con su propia abeja creciendo (empalme de capas). */
+.abeja-cruce--volver .abeja-cruce__vuelo {
+  animation: abeja-cruce-vuelve 0.62s cubic-bezier(0.3, 0.6, 0.45, 1) both;
+}
+.abeja-cruce--volver .abeja-cruce__giro {
+  animation: abeja-cruce-desgira 0.62s ease-out both;
+}
+@keyframes abeja-cruce-vuelve {
+  0%   { transform: translateY(0) scale(0.1); opacity: 0; }
+  16%  { transform: translateY(2vh) scale(0.2, 0.26); opacity: 1; }  /* brota estirada */
+  72%  { transform: translateY(18vh) scale(0.54, 0.48); }            /* overshoot squash */
+  88%  { transform: translateY(21vh) scale(0.5); opacity: 1; }
+  100% { transform: translateY(22vh) scale(0.52); opacity: 0; }      /* la recoge el velo */
+}
+@keyframes abeja-cruce-desgira {
+  0%   { transform: rotate(-300deg); }   /* deshace el barrel roll al salir */
+  100% { transform: rotate(0deg); }
+}
+
+/* Gama baja: el cruce queda (posición + timing son lo que empalma), pero sin
+   barrel roll ni puff (menos capas animando a la vez). */
+[data-tier='bajo'].abeja-cruce .abeja-cruce__giro { animation: none; }
+[data-tier='bajo'].abeja-cruce .abeja-cruce__puff { animation: none; opacity: 0; }
+
+/* RM defensivo: el que monta el overlay ya lo salta con reduced-motion; si
+   algún host se equivoca, aquí no se anima nada (y no se ve nada). */
+@media (prefers-reduced-motion: reduce) {
+  .abeja-cruce { display: none; }
 }
