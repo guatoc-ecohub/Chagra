@@ -12,6 +12,11 @@ const STORAGE_KEY_TTS_ENABLED = 'chagra:prefs:tts-enabled';
 // verificado". Operadores en modo "expert" pueden ocultarlos para reducir
 // ruido visual sin perder la información (queda en metadata del turn).
 const STORAGE_KEY_SOURCE_BADGES = 'chagra:prefs:show-source-badges';
+// DR-3D-HAPTICA (2026-07-11): vibración táctil del framework de mundos 3D.
+// Tri-estado: 'auto' (default — vibra si hay soporte y no hay
+// prefers-reduced-motion) | 'on' (siempre que haya soporte) | 'off' (nunca).
+const STORAGE_KEY_HAPTICS = 'chagra:prefs:haptics';
+const HAPTICS_MODES = ['auto', 'on', 'off'];
 
 function load(key, fallback) {
   try {
@@ -31,6 +36,7 @@ const usePrefsStore = create((set, _get) => ({
   voiceRegionIntensity: load(STORAGE_KEY_VOICE_INTENSITY, 1),
   ttsEnabled: load(STORAGE_KEY_TTS_ENABLED, true),
   showSourceBadges: load(STORAGE_KEY_SOURCE_BADGES, true),
+  haptics: load(STORAGE_KEY_HAPTICS, 'auto'),
 
   setVoiceRegion: (region) => {
     save(STORAGE_KEY_VOICE_REGION, region);
@@ -52,6 +58,12 @@ const usePrefsStore = create((set, _get) => ({
     const bool = Boolean(flag);
     save(STORAGE_KEY_SOURCE_BADGES, bool);
     set({ showSourceBadges: bool });
+  },
+
+  setHaptics: (mode) => {
+    const valid = HAPTICS_MODES.includes(mode) ? mode : 'auto';
+    save(STORAGE_KEY_HAPTICS, valid);
+    set({ haptics: valid });
   },
 }));
 

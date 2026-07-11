@@ -22,6 +22,7 @@ import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
+import useHaptics from '../useHaptics.js';
 
 /**
  * Devuelve `{ ref, caraRef, sombraRef }` para colgar del `<group>` de la abeja,
@@ -43,6 +44,11 @@ export function useEntradaAbeja(foco, {
   const caraRef = useRef(null);
   const sombraRef = useRef(null);
   const prevX = useRef(foco.x);
+  // Háptica de "posarse" (DR-3D-HAPTICA): UNA sola vez por foco, al cruzar el
+  // umbral de llegada. El foco solo cambia por tap del usuario (hotspot) o al
+  // montar la escena (que nace de un tap para entrar al mundo) → gesto-derivado.
+  const haptics = useHaptics({ reducedMotion });
+  const posadaEn = useRef(null); // el foco ya celebrado (no repetir por frame)
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
@@ -57,6 +63,13 @@ export function useEntradaAbeja(foco, {
       foco.z + (entrando ? 0.6 : 0.55 + vagarZ),
     );
     ref.current.position.lerp(dest, entrando ? 0.06 : 0.05);
+    // Angelita se posa: al cruzar el umbral de llegada al foco, un roce háptico
+    // (una vez por foco — el ref evita repetir por frame; el gate del hook
+    // apaga todo con reduced-motion, pref 'off' o sin soporte).
+    if (entrando && posadaEn.current !== foco && ref.current.position.distanceTo(dest) < 0.3) {
+      posadaEn.current = foco;
+      haptics.abeja();
+    }
     if (caraRef.current) {
       const vx = ref.current.position.x - prevX.current;
       if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;

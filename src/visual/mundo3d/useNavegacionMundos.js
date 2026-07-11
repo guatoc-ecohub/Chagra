@@ -23,6 +23,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { resolverMundo } from './resolverMundo.js';
+import useHaptics from './useHaptics.js';
 
 /** ¿Este mundo tiene una escena montable (3D o 2D) en el registro? */
 export function puedeEntrarAlMundo(mundoId) {
@@ -49,6 +50,15 @@ export function useNavegacionMundos({ reducedMotion = false } = {}) {
   // El mundo que aún no abre su puerta (para el aviso "pronto" del host).
   const [pronto, setPronto] = useState(null);
   const prontoTimer = useRef(null);
+  // Háptica del viaje (DR-3D-HAPTICA): entrar absorbe, volver aterriza,
+  // "pronto" marca el borde. Gate triple interno (soporte + pref + rm);
+  // el reducedMotion del host manda para que el gate sea coherente con
+  // el resto del árbol de mundos.
+  const haptics = useHaptics({ reducedMotion });
+  // Espejo de la fase actual para disparar hápticas FUERA del updater de
+  // estado (los updaters deben ser puros — StrictMode los corre dos veces).
+  const faseRef = useRef(estado.fase);
+  faseRef.current = estado.fase;
 
   useEffect(() => () => clearTimeout(prontoTimer.current), []);
 
@@ -58,31 +68,39 @@ export function useNavegacionMundos({ reducedMotion = false } = {}) {
         setPronto(mundoId);
         clearTimeout(prontoTimer.current);
         prontoTimer.current = setTimeout(() => setPronto(null), 3200);
+        haptics.error(); // "por aquí no" — dobla el aviso visual "pronto"
         return false;
       }
       setPronto(null);
       setEstado(reducedMotion ? { fase: 'mundo', mundoId } : { fase: 'viajando', mundoId });
+      haptics.viajeEntrar(); // absorción: nace del tap del usuario
       return true;
     },
-    [reducedMotion],
+    [reducedMotion, haptics],
   );
 
   const volverAlValle = useCallback(() => {
+    // Con reducedMotion el corte es directo a 'valle' (sin fase 'regresando'
+    // ni completarViaje), así que el aterrizaje suena aquí; sin reducedMotion
+    // suena al completar el viaje. Pulso solo si de verdad hay mundo abierto.
+    if (reducedMotion && faseRef.current !== 'valle') haptics.viajeVolver();
     setEstado((e) => {
       if (!e.mundoId) return e;
       return reducedMotion
         ? { fase: 'valle', mundoId: null }
         : { fase: 'regresando', mundoId: e.mundoId };
     });
-  }, [reducedMotion]);
+  }, [reducedMotion, haptics]);
 
   const completarViaje = useCallback(() => {
+    // Aterrizar en casa: solo la vuelta vibra aquí (la ida ya sonó al zarpar).
+    if (faseRef.current === 'regresando') haptics.viajeVolver();
     setEstado((e) => {
       if (e.fase === 'viajando') return { fase: 'mundo', mundoId: e.mundoId };
       if (e.fase === 'regresando') return { fase: 'valle', mundoId: null };
       return e;
     });
-  }, []);
+  }, [haptics]);
 
   return {
     fase: estado.fase,

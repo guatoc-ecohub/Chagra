@@ -32,3 +32,7 @@ export { decidirTier, permite3D } from './deviceTier.js';
 // Navegación valle ↔ mundos (three-free): la máquina de fases + el viaje DOM.
 export { useNavegacionMundos, puedeEntrarAlMundo } from './useNavegacionMundos.js';
 export { default as TransicionMundo, VIAJE_MS } from './TransicionMundo.jsx';
+
+// Háptica táctil (three-free, DR-3D-HAPTICA): pulsos semánticos por evento del
+// framework — no-op silencioso donde no hay Vibration API (iOS/Safari, FF129+).
+export { default as useHaptics, PATRONES_HAPTICOS } from './useHaptics.js';

@@ -26,6 +26,7 @@ import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaEscena } from './useEntradaAbeja.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
+import useHaptics from '../useHaptics.js';
 
 /* Cielo cálido "acuarela" por defecto (la estética heredada del valle). El
    arquetipo puede pasar su propio `cielo` para teñir su ambiente. */
@@ -54,6 +55,9 @@ function Contenido({
 }) {
   const controls = useRef(null);
   const [activo, setActivo] = useState(null);
+  // Háptica del tap (DR-3D-HAPTICA): un tick seco al tocar un hotspot —
+  // "toqué algo vivo, respondió". Gate triple interno; no-op en iOS.
+  const haptics = useHaptics({ reducedMotion });
   const zoom = entrada?.zoom ?? 6.5;
   const acento = (tinte && tinte[0]) || '#3f8f4e';
   const centro = entrada?.centro || [0, (params?.alto ?? 1.1) * 0.5, 0];
@@ -125,6 +129,7 @@ function Contenido({
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.stopPropagation();
+                haptics.tap();
                 setActivo(h.id);
                 onHotspot?.(h.view, h.data);
               }}
