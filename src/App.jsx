@@ -82,6 +82,7 @@ const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
 // 3D: "El mundo del agua" — monta <Mundo mundoId="agua"> del framework
 // (src/visual/mundo3d) con device-tiering real. El 3D va perezoso (vendor-three).
 const Mundo3DAguaMockup = lazy(() => import('./mockups/Mundo3DAgua'));
+const Mundo3DSueloMockup = lazy(() => import('./mockups/Mundo3DSuelo'));
 // Voz: superficies de voz con forma viva (iris que reacciona al volumen).
 const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
 const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
@@ -465,6 +466,7 @@ const MOCKUP_HASH_ROUTES = {
   // Galería aspiracional (3D + voz + superficies definitivas + piezas de diseño).
   'mockups/entrada-3d': 'mockup_entrada_3d',
   'mockups/mundo3d-agua': 'mockup_mundo3d_agua',
+  'mockups/mundo3d-suelo': 'mockup_mundo3d_suelo',
   'mockups/voz-con-forma': 'mockup_voz_con_forma',
   'mockups/conversacion-voz': 'mockup_conversacion_voz',
   'mockups/ensena-dibujando': 'mockup_ensena_dibujando',
@@ -1324,6 +1326,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo del agua">
               <Mundo3DAguaMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_suelo':
+        // Vitrina pública del MUNDO DEL SUELO: monta <Mundo mundoId="suelo"> del
+        // framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-suelo, sin auth. El corte del suelo vivo de la finca:
+        // hojarasca → suelo negro → subsuelo, con raíces, micorrizas y bichos.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del suelo">
+              <Mundo3DSueloMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

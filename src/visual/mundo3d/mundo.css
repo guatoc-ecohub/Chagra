@@ -71,6 +71,12 @@
   transform-origin: center;
 }
 
+/* ── Criaturas de la librería dentro de la escena (billboard SVG) ───────── */
+.mundo-fauna {
+  pointer-events: none;
+  filter: drop-shadow(0 3px 6px rgba(40, 30, 10, 0.3));
+}
+
 /* ── Cargando (mientras baja el chunk 3D) ──────────────────────────────── */
 .mundo-cargando {
   position: absolute;
