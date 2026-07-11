@@ -322,4 +322,6 @@ export const NARRACION = {
     'La huerta de la casa. Aquí es donde primero se ven las plagas, para atajarlas a tiempo.',
   disenio: 'El monte y los árboles que sembró. La finca también es el bosque que la abraza.',
   clima: 'Desde aquí se lee el cielo: lo que viene, y qué conviene hacer con la finca.',
+  pisos:
+    'Suba por la montaña: del cálido al páramo, cada piso con lo suyo. Arriba manda el frailejón, que le peina el agua a la niebla y la entrega despacio al suelo. Por eso el páramo se cuida, no se ara.',
 };
