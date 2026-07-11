@@ -18,29 +18,34 @@
  * Todo `MeshLambert`/`Basic`, sin sombras (contrato de EscenaBase3D). Geometría
  * de primitivas: cero GLTF, offline y liviano.
  */
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { faunaDeMundo, coreografia } from '../faunaFuncional.js';
 import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
-/* La fauna BENÉFICA que acompaña la huerta-clínica: la mariposa polinizadora en
-   la orla de flores, el colibrí que sobrevuela, y el escarabajo (carábido)
-   depredador que anda a ras cazando larvas en el suelo. Pocas y por criterio
-   ecológico (contrato del DR: vida, no enjambre). */
-const FAUNA_SANIDAD = [
-  { tipo: 'mariposa', base: [1.05, 0.66, 0.78], patron: 'revoloteo', size: 28, fase: 0.4 },
-  { tipo: 'colibri', base: [-0.85, 1.12, 0.42], patron: 'revoloteo', size: 30, fase: 1.6 },
-  { tipo: 'escarabajo', base: [0.28, 0.16, -0.52], patron: 'reptar', size: 28, fase: 2.4 },
-];
+/* La fauna BENÉFICA billboard de la huerta-clínica (el CONTROLADOR carábido que
+   patrulla a ras + POLINIZADORES en la orla de flores) vive en faunaFuncional.js.
+   La mariquita insignia va como malla low-poly, patrullando (abajo). */
 
 /* Una MARIQUITA low-poly (Coccinellidae) — el enemigo natural insignia: una sola
-   larva o adulto come cientos de pulgones. Media esfera roja + cabeza + puntos. */
-function Mariquita({ pos, escala = 1 }) {
+   larva o adulto come cientos de pulgones. Media esfera roja + cabeza + puntos.
+   Como CONTROLADORA, PATRULLA las matas en zigzag buscando pulgón (misma
+   coreografía de rol que la fauna billboard); se congela con reduced-motion. */
+function Mariquita({ pos, escala = 1, fase = 0, reducedMotion = false }) {
+  const ref = useRef(null);
+  useFrame((state) => {
+    if (reducedMotion || !ref.current) return;
+    const [dx, dy, dz] = coreografia('patrulla', state.clock.elapsedTime, fase);
+    // a ras de la hoja: el barrido lateral manda, el zumbido vertical se atenúa.
+    ref.current.position.set(pos[0] + dx, pos[1] + dy * 0.4, pos[2] + dz);
+  });
   const puntos = [
     [0.035, -0.02], [-0.035, -0.02], [0.03, 0.035], [-0.03, 0.035],
   ];
   return (
-    <group position={pos} scale={escala}>
+    <group ref={ref} position={pos} scale={escala}>
       {/* élitros: media esfera roja */}
       <mesh position={[0, 0.06, 0]}>
         <sphereGeometry args={[0.09, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
@@ -146,7 +151,7 @@ function FlorBorde({ pos }) {
   );
 }
 
-function Diorama({ params, reducedMotion }) {
+function Diorama({ params, reducedMotion, fauna }) {
   const matas = params?.matas || [
     { color: '#4e8f3f', pos: [-0.5, 0, 0.35] },
     { color: '#57993f', pos: [0.55, 0, 0.1] },
@@ -215,12 +220,12 @@ function Diorama({ params, reducedMotion }) {
         <FlorBorde key={i} pos={p} />
       ))}
 
-      {/* los enemigos naturales insignia: dos mariquitas sobre las matas */}
-      <Mariquita pos={[-0.42, 0.5, 0.42]} escala={1} />
-      <Mariquita pos={[0.6, 0.32, 0.12]} escala={0.85} />
+      {/* los enemigos naturales insignia: dos mariquitas patrullando las matas */}
+      <Mariquita pos={[-0.42, 0.5, 0.42]} escala={1} fase={0.8} reducedMotion={reducedMotion} />
+      <Mariquita pos={[0.6, 0.32, 0.12]} escala={0.85} fase={2.9} reducedMotion={reducedMotion} />
 
-      {/* la fauna benéfica que anima la escena (mariposa/colibrí/carábido) */}
-      <Fauna items={FAUNA_SANIDAD} reducedMotion={reducedMotion} />
+      {/* la fauna funcional billboard: carábido patrullando + polinizadores del borde */}
+      <Fauna items={fauna} reducedMotion={reducedMotion} />
     </group>
   );
 }
@@ -228,9 +233,10 @@ function Diorama({ params, reducedMotion }) {
 export default function EscenaSanidad(props) {
   // Cielo fresco y sano de huerta (se mezcla igual hacia la hora dorada del valle).
   const cielo = CIELOS.huerta;
+  const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.45, 0] }}>
-      <Diorama params={props.params} reducedMotion={props.reducedMotion} />
+      <Diorama params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} />
     </EscenaBase3D>
   );
 }

@@ -18,16 +18,12 @@
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { faunaDeMundo } from '../faunaFuncional.js';
 import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
-/* Fauna POR ESTRATO: la verticalidad manda. El colibrí arriba (dosel), la
-   mariposa a media altura (arbustos/herbáceas) y el escarabajo a ras (rastrero/
-   raíz) — cada bicho donde de veras vive en el bosque comestible. */
-const FAUNA_ESTRATOS = [
-  { tipo: 'colibri', base: [0.6, 3.0, 0.4], patron: 'revoloteo', size: 28, fase: 0.5 },
-  { tipo: 'mariposa', base: [-0.9, 1.35, 0.6], patron: 'revoloteo', size: 30, fase: 2.0 },
-  { tipo: 'escarabajo', base: [0.8, 0.14, 1.0], patron: 'reptar', size: 30, fase: 1.2 },
-];
+/* La fauna funcional por estrato (POLINIZADORES en dosel/sotobosque + un
+   DESCOMPONEDOR en la hojarasca, para `disenio`; POLINIZADORES del aire
+   templado/frío para `pisos`) vive en faunaFuncional.js, por mundo. */
 
 const ESTRATOS_DEF = [
   { nombre: 'emergente', alto: 3.4, color: '#2f5f34', r: 0.6 },
@@ -55,7 +51,7 @@ function Planta({ x, z, alto, color, r }) {
 }
 
 /* ── El bosque comestible (mundo `disenio`) — sin cambios ─────────────────── */
-function DioramaEstratos({ params, reducedMotion }) {
+function DioramaEstratos({ params, reducedMotion, fauna }) {
   const estratos = params?.estratos || ESTRATOS_DEF;
   const plantas = useMemo(() => {
     const out = [];
@@ -81,8 +77,8 @@ function DioramaEstratos({ params, reducedMotion }) {
       {plantas.map((p) => (
         <Planta key={p.key} x={p.x} z={p.z} alto={p.alto} color={p.color} r={p.r} />
       ))}
-      {/* la vida repartida por estratos: ave arriba, insectos abajo */}
-      <Fauna items={FAUNA_ESTRATOS} reducedMotion={reducedMotion} />
+      {/* la vida repartida por estratos: polinizadores arriba, descomponedor abajo */}
+      <Fauna items={fauna} reducedMotion={reducedMotion} />
     </group>
   );
 }
@@ -99,12 +95,6 @@ const PISO_SUBE = 1.15;
 const PISO_FONDO = 0.7;
 const pisoY = (i) => 0.2 + i * PISO_SUBE; // superficie de la terraza i
 const pisoZ = (i) => 0.6 - i * PISO_FONDO; // se recede al subir (profundidad)
-
-/* Fauna de la ladera: en el aire templado/frío; NADA en el páramo. */
-const FAUNA_PISOS = [
-  { tipo: 'mariposa', base: [-0.7, pisoY(1) + 0.55, pisoZ(1) + 0.5], patron: 'revoloteo', size: 30, fase: 1.4 },
-  { tipo: 'colibri', base: [0.7, pisoY(2) + 0.55, pisoZ(2) + 0.4], patron: 'revoloteo', size: 28, fase: 0.6 },
-];
 
 /* Plátano/frutal (piso cálido): pseudotallo verde + hojas grandes colgantes. */
 function Platano() {
@@ -258,7 +248,7 @@ function Niebla({ x, y, z, r = 0.5 }) {
   );
 }
 
-function DioramaPisos({ params, reducedMotion }) {
+function DioramaPisos({ params, reducedMotion, fauna }) {
   const pisos = useMemo(() => params?.pisos || [], [params?.pisos]);
   // Cultivos por terraza, con aire (2 por piso, jitter determinista).
   const siembra = useMemo(() => {
@@ -335,8 +325,8 @@ function DioramaPisos({ params, reducedMotion }) {
         </mesh>
       </group>
 
-      {/* vida sólo donde vive: mariposa (templado), colibrí (frío/templado) */}
-      <Fauna items={FAUNA_PISOS} reducedMotion={reducedMotion} />
+      {/* vida sólo donde vive: polinizadores del templado/frío; páramo sin fauna */}
+      <Fauna items={fauna} reducedMotion={reducedMotion} />
     </group>
   );
 }
@@ -346,6 +336,7 @@ export default function EscenaEstratos(props) {
   const cielo = esPisos ? CIELOS.ladera : CIELOS.sotobosque;
   const camara = esPisos ? { position: [4.4, 3.7, 6.4], fov: 46 } : { position: [3.5, 3, 6], fov: 44 };
   const centro = esPisos ? [0, 1.95, -0.4] : [0, 1.4, 0];
+  const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
     <EscenaBase3D
       {...props}
@@ -354,9 +345,9 @@ export default function EscenaEstratos(props) {
       entrada={{ ...props.entrada, centro }}
     >
       {esPisos ? (
-        <DioramaPisos params={props.params} reducedMotion={props.reducedMotion} />
+        <DioramaPisos params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} />
       ) : (
-        <DioramaEstratos params={props.params} reducedMotion={props.reducedMotion} />
+        <DioramaEstratos params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} />
       )}
     </EscenaBase3D>
   );

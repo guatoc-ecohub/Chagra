@@ -4,9 +4,14 @@
  * Los dioramas 3D se sentían vacíos. Aquí la vida de la finca (las creatures de
  * `src/visual/creatures`) entra a cualquier escena SIN redibujarse: reusamos el
  * MISMO componente SVG y lo colgamos como billboard `<Html>` de drei —idéntico
- * patrón que Angelita en `useEntradaAbeja.jsx`— con un micro-movimiento suave que
- * la escena posee (revoloteo para lo que vuela, reptar para lo que anda a ras).
- * La creature POSEE el cuerpo; la escena POSEE la coreografía (contrato del DR).
+ * patrón que Angelita en `useEntradaAbeja.jsx`— con un movimiento que la escena
+ * posee, DICTADO POR EL ROL ECOLÓGICO del bicho: el polinizador salta de flor en
+ * flor, el controlador patrulla en zigzag, el descomponedor repta a ras. La
+ * creature POSEE el cuerpo; la escena POSEE la coreografía (contrato del DR).
+ *
+ * El QUÉ (qué bicho, con qué rol, en qué mundo) vive en `faunaFuncional.js`; el
+ * CÓMO (la math del gesto por patrón) también, compartido con las mallas
+ * low-poly (mariquita de sanidad, avispa de la milpa). Aquí solo el andamiaje R3F.
  *
  * RENDIMIENTO: como son billboards DOM (SVG), no aplican `InstancedMesh` (eso es
  * para las MALLAS repetidas —árboles, hifas, postes— que cada arquetipo ya
@@ -24,45 +29,35 @@ import { Colibri } from '../../creatures/Colibri.jsx';
 import { Mariposa } from '../../creatures/Mariposa.jsx';
 import { Escarabajo } from '../../creatures/Escarabajo.jsx';
 import { Lombriz } from '../../creatures/Lombriz.jsx';
+import { coreografia, patronDeRol } from '../faunaFuncional.js';
 
 /* Sólo la fauna reutilizable en escena (Angelita la coloca `useEntradaAbeja`). */
 const COMPS = { colibri: Colibri, mariposa: Mariposa, escarabajo: Escarabajo, lombriz: Lombriz };
 
-/* Micro-movimiento por patrón, en unidades de escena (amplitudes chicas: vida,
-   no espectáculo). `fase` desincroniza varios bichos para que no latan a la par. */
-function deriva(patron, t, fase) {
-  if (patron === 'reptar') {
-    // anda a ras: avance lento en x, con un cabeceo mínimo (escarabajo / lombriz)
-    return [Math.sin(t * 0.4 + fase) * 0.09, Math.abs(Math.sin(t * 1.1 + fase)) * 0.02, 0];
-  }
-  // revoloteo: vuelo suspendido —sube/baja y deriva apenas (colibrí / mariposa)
-  return [
-    Math.sin(t * 0.9 + fase) * 0.12,
-    Math.sin(t * 1.7 + fase) * 0.1,
-    Math.cos(t * 0.8 + fase) * 0.09,
-  ];
-}
-
 /**
- * Un bicho de la librería, posado en la escena como billboard.
+ * Un bicho de la librería, posado en la escena como billboard. Su gesto lo dicta
+ * el ROL (o el `patron` explícito): polinizador salta de flor en flor, controlador
+ * patrulla en zigzag, descomponedor repta a ras.
  * @param {object} p
  * @param {'colibri'|'mariposa'|'escarabajo'|'lombriz'} p.tipo
  * @param {[number,number,number]} p.base  ancla en coordenadas de la escena.
  * @param {number}  [p.size=30]     tamaño en px del SVG (subordinado a Angelita).
- * @param {'revoloteo'|'reptar'} [p.patron='revoloteo']
+ * @param {'polinizador'|'controlador'|'descomponedor'} [p.rol]  rol ecológico.
+ * @param {'polinizar'|'patrulla'|'reptar'|'revoloteo'} [p.patron]  patrón directo (gana al rol).
  * @param {number}  [p.fase=0]      desfase del vaivén.
  * @param {number}  [p.df=7]        distanceFactor (misma escala que Angelita).
  * @param {string}  [p.title]       etiqueta (decorativa; el billboard es aria-hidden).
  * @param {boolean} [p.reducedMotion=false]
  */
 export function Bicho({
-  tipo, base, size = 30, patron = 'revoloteo', fase = 0, df = 7, title, reducedMotion = false,
+  tipo, base, size = 30, rol, patron, fase = 0, df = 7, title, reducedMotion = false,
 }) {
   const ref = useRef(null);
   const Comp = COMPS[tipo];
+  const gesto = patron || patronDeRol(rol);
   useFrame((state) => {
     if (reducedMotion || !ref.current) return;
-    const [dx, dy, dz] = deriva(patron, state.clock.elapsedTime, fase);
+    const [dx, dy, dz] = coreografia(gesto, state.clock.elapsedTime, fase);
     ref.current.position.set(base[0] + dx, base[1] + dy, base[2] + dz);
   });
   if (!Comp) return null;
