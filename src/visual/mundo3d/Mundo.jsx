@@ -97,7 +97,7 @@ function MigaVolver({ onSalir, mundoId }) {
 
 function MundoInterno({
   mundoId, tier = 'alto', reducedMotion = false, onHotspot, onSalir, animo = 'sereno', energia = 1,
-  hablando = false,
+  hablando = false, focoId = null, focoToken = 0,
 }) {
   /* CAÍDA DIGNA (BUG-UX-05 / SPEC-UX-05): si el chunk 3D no baja en
      CARGA_3D_TIMEOUT_MS, caemos al espejo 2D del mundo. `intento` fabrica un
@@ -161,6 +161,11 @@ function MundoInterno({
     return (
       <div className="mundo-root" data-dim="3d" data-mundo={mundoId}>
         <Suspense fallback={<MundoCargando tinte={tinte} onTimeout={alTimeout3D} />}>
+          {/* `Escena` es un `lazy` resuelto en useMemo (fresco al reintentar —
+              mecanismo de caída digna, ver cabecera). react-hooks/static-components
+              no distingue ese patrón deliberado del anti-patrón; se silencia con
+              criterio (deuda preexistente en dev, ajena a este cambio). */}
+          {/* eslint-disable-next-line react-hooks/static-components */}
           <Escena
             params={plan.entrada.params}
             hotspots={plan.entrada.hotspots}
@@ -173,6 +178,8 @@ function MundoInterno({
             animo={animo}
             energia={energia}
             hablando={hablando}
+            focoId={focoId}
+            focoToken={focoToken}
           />
         </Suspense>
         {/* Invitación de PRIMER USO del sonido ambiental (una sola vez): vive

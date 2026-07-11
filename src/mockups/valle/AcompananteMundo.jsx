@@ -31,8 +31,9 @@
    el hook (useAcompanante) y su marco (<AcompananteMundo>) son UNA pieza —
    la vitrina necesita ambos juntos; separarlos duplicaría el contexto (patrón
    useEntradaAbeja.jsx). Es un mockup: sin HMR-state que preservar. */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Children, cloneElement, isValidElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MUNDO, tituloDeMundo, tinteDeMundo } from '../../visual/mundo3d/index.js';
+import { parseComandoMundo, puertasDeMundo } from '../../visual/mundo3d/comandoMundo.js';
 import { NARRACION, MUNDO_VALLE_BY_ID } from './valleData';
 import './acompananteMundo.css';
 
@@ -167,7 +168,49 @@ export function useAcompanante(mundoId) {
     [mundoId, decir],
   );
 
-  return { dicho, hablando: !!dicho, decir, narrar, decirPuerta, voz, setVoz, vozDisponible };
+  // ── EL LAZO agente→escena (spec S1, la SEGUNDA vía): un pedido de voz/texto
+  //    ("muéstreme las trampas", "dónde está el agua") se resuelve contra los
+  //    hotspots del mundo (comandoMundo) y, si hay match, MUEVE el foco de la
+  //    escena a ese punto (el mismo que la abeja persigue) + lo resalta, y
+  //    Angelita lo nombra. Sin match: respuesta cordial que ofrece las puertas.
+  //    `focoCmd` fluye al `<Mundo>` como { focoId, focoToken }; el token sube por
+  //    comando para re-enfocar/re-pulsar aunque se repita el mismo punto.
+  const [focoCmd, setFocoCmd] = useState({ id: null, token: 0 });
+  const comando = useCallback(
+    (texto) => {
+      const t = (texto || '').trim();
+      if (!t) return false;
+      const m = parseComandoMundo(t, mundoId);
+      if (m) {
+        setFocoCmd((f) => ({ id: m.hotspot.id, token: f.token + 1 }));
+        decir(`¡Claro! Ahí lo tiene: «${m.hotspot.label}». Se lo resalto.`);
+        return true;
+      }
+      const puertas = puertasDeMundo(mundoId);
+      const sugerencias = puertas.slice(0, 2).map((p) => `«${p}»`).join(' o ');
+      decir(
+        sugerencias
+          ? `No veo eso por aquí. ¿Quiere que le muestre ${sugerencias}?`
+          : 'No veo eso por aquí. Toque un punto para ver a dónde lo lleva.',
+      );
+      return false;
+    },
+    [mundoId, decir],
+  );
+
+  return {
+    dicho,
+    hablando: !!dicho,
+    decir,
+    narrar,
+    decirPuerta,
+    comando,
+    focoId: focoCmd.id,
+    focoToken: focoCmd.token,
+    voz,
+    setVoz,
+    vozDisponible,
+  };
 }
 
 /**
@@ -180,22 +223,92 @@ export function useAcompanante(mundoId) {
  *   </AcompananteMundo>
  */
 export default function AcompananteMundo({ mundoId, acompanante, children }) {
-  const { dicho, narrar, voz, setVoz, vozDisponible } = acompanante;
+  const { dicho, narrar, comando, focoId, focoToken, voz, setVoz, vozDisponible } = acompanante;
   const tinte = tinteDeMundo(mundoId);
 
-  // "Pregúntele a su finca…" abre el flujo REAL del agente por el mismo
-  // camino desacoplado del shell (BUG-CAMP-01): el evento global
-  // `chagraNavigate` que App.jsx escucha desde cualquier pantalla.
+  // El texto del pedido (barra de dos vías) y el estado del dictado por voz.
+  const [texto, setTexto] = useState('');
+  const [oyendo, setOyendo] = useState(false);
+  const recRef = useRef(null);
+
+  // ¿Trae este equipo dictado por voz (Web Speech API — reconocimiento)? Es un
+  // PLUS: sin él, la barra de texto hace lo mismo (fallback sin voz = escrito).
+  const reconoceVoz = useMemo(
+    () =>
+      typeof window !== 'undefined' &&
+      !!(window.SpeechRecognition || window.webkitSpeechRecognition),
+    [],
+  );
+
+  // Al cambiar de mundo, cortá un dictado en curso (que no persiga al siguiente).
+  useEffect(
+    () => () => {
+      if (recRef.current) {
+        try { recRef.current.stop(); } catch { /* no-op */ }
+        recRef.current = null;
+      }
+    },
+    [mundoId],
+  );
+
+  // Enviar el pedido a Angelita (voz/texto → foco de la escena). Cierra el lazo.
+  const enviar = useCallback(
+    (e) => {
+      if (e) e.preventDefault();
+      const t = texto.trim();
+      if (!t) return;
+      comando?.(t);
+      setTexto('');
+    },
+    [texto, comando],
+  );
+
+  // 🎤 Dictado: llena la barra y ejecuta el comando con lo que se oyó. es-CO,
+  //    no bloqueante — si algo falla, la barra de texto siempre queda.
+  const escuchar = useCallback(() => {
+    const SR =
+      typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+    if (!SR) return;
+    try {
+      if (recRef.current) { try { recRef.current.stop(); } catch { /* no-op */ } }
+      const rec = new SR();
+      rec.lang = 'es-CO';
+      rec.interimResults = false;
+      rec.maxAlternatives = 1;
+      rec.onresult = (ev) => {
+        const dicho2 = ev.results?.[0]?.[0]?.transcript || '';
+        setTexto(dicho2);
+        if (dicho2.trim()) comando?.(dicho2);
+      };
+      rec.onend = () => setOyendo(false);
+      rec.onerror = () => setOyendo(false);
+      recRef.current = rec;
+      setOyendo(true);
+      rec.start();
+    } catch {
+      setOyendo(false);
+    }
+  }, [comando]);
+
+  // "Abrir el chat" salta al flujo REAL del agente por el mismo camino
+  // desacoplado del shell (BUG-CAMP-01): el evento global `chagraNavigate` que
+  // App.jsx escucha desde cualquier pantalla.
   const preguntarAlAgente = useCallback(() => {
     if (typeof window === 'undefined') return;
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'agente' } }));
   }, []);
 
+  // Inyecta el foco comandado al `<Mundo>` hijo (una sola pieza: la vitrina no
+  // tiene que recablear cada mockup — la capa acompañante cierra el lazo).
+  const escena = Children.map(children, (hijo) =>
+    isValidElement(hijo) ? cloneElement(hijo, { focoId, focoToken }) : hijo,
+  );
+
   return (
     <div className="acomp" style={{ '--acomp-tinte': (tinte && tinte[0]) || '#3f8f4e' }}>
       <div className="acomp__marco">
-        {children}
+        {escena}
         {/* La burbuja de Angelita: SU voz escrita (la abeja vive en la escena
             — una sola compañera, #2341). aria-live: también es la voz de los
             lectores de pantalla. */}
@@ -206,15 +319,33 @@ export default function AcompananteMundo({ mundoId, acompanante, children }) {
         )}
       </div>
       <footer className="acomp__agente">
-        <button
-          type="button"
-          className="acomp__pregunte"
-          aria-label="Pregúntele a Chagra"
-          onClick={preguntarAlAgente}
-        >
+        {/* LA BARRA DE DOS VÍAS: pídale por voz/texto y la escena enfoca. */}
+        <form className="acomp__cmd" onSubmit={enviar}>
           <span className="acomp__punto" aria-hidden="true" />
-          Pregúntele a su finca…
-        </button>
+          <input
+            type="text"
+            className="acomp__input"
+            value={texto}
+            onChange={(ev) => setTexto(ev.target.value)}
+            placeholder="Dígale a Angelita: «muéstreme el agua»"
+            aria-label="Pídale a Angelita que le muestre un punto del mundo"
+            enterKeyHint="search"
+          />
+          {reconoceVoz && (
+            <button
+              type="button"
+              className={`acomp__btn acomp__mic${oyendo ? ' on' : ''}`}
+              aria-label={oyendo ? 'Escuchando…' : 'Hablar'}
+              aria-pressed={oyendo}
+              onClick={escuchar}
+            >
+              🎤
+            </button>
+          )}
+          <button type="submit" className="acomp__btn acomp__ir" aria-label="Mostrar en la escena">
+            Ir
+          </button>
+        </form>
         <div className="acomp__ctrls">
           <button type="button" className="acomp__btn" onClick={narrar}>
             🔊 Escuchar
@@ -234,6 +365,9 @@ export default function AcompananteMundo({ mundoId, acompanante, children }) {
             }}
           >
             {!vozDisponible ? '💬 Texto' : voz ? '🔊 Voz' : '🔇 Voz'}
+          </button>
+          <button type="button" className="acomp__btn acomp__chat" onClick={preguntarAlAgente}>
+            💬 Abrir el chat
           </button>
         </div>
       </footer>
