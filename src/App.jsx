@@ -105,6 +105,11 @@ const Mundo3DMercadoMockup = lazy(() => import('./mockups/Mundo3DMercado'));
 // (guamo/nogal), el grano cereza→pergamino→oro (sin tostar en finca), roya/broca
 // con manejo agroecológico y el beneficio. El 3D va perezoso (vendor-three).
 const Mundo3DCafeMockup = lazy(() => import('./mockups/Mundo3DCafe'));
+// 3D: "La infraestructura de su finca" — vitrina de la LIBRERÍA de construcciones
+// (src/visual/mundo3d/infraestructura): invernaderos, galpón, establo, bodega,
+// compostera, tanque, secadero, media-sombra. Grilla data-driven con device-tier
+// real; el 3D va perezoso (vendor-three), 2D digno en equipo humilde.
+const Infraestructura3DMockup = lazy(() => import('./mockups/Infraestructura3D'));
 // Voz: superficies de voz con forma viva (iris que reacciona al volumen).
 const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
 const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
@@ -520,6 +525,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-sanidad': 'mockup_mundo3d_sanidad',
   'mockups/mundo3d-mercado': 'mockup_mundo3d_mercado',
   'mockups/mundo3d-cafe': 'mockup_mundo3d_cafe',
+  'mockups/infraestructura-3d': 'mockup_infraestructura_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1643,6 +1649,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo del café">
               <Mundo3DCafeMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_infraestructura_3d':
+        // Vitrina pública de la LIBRERÍA DE INFRAESTRUCTURA 3D: la grilla de todas
+        // las construcciones del catálogo (src/visual/mundo3d/infraestructura) con
+        // device-tiering real. Ruta #/mockups/infraestructura-3d, sin auth.
+        // Invernadero túnel/capilla, media-sombra, gallinero, galpón, establo,
+        // bodega, compostera, tanque y secadero — cada una con sus medidas típicas
+        // en metros, para agregar la infraestructura real de la finca a los mundos.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La infraestructura de su finca">
+              <Infraestructura3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
