@@ -1,0 +1,356 @@
+/*
+ * GemeloValle2D — la piel de la lámina del valle (gemelo 2D de primera clase).
+ *
+ * Reglas de rendimiento (gama baja):
+ *   · SOLO se animan transform y opacity (GPU; nada de layout/paint por frame).
+ *   · reducedMotion apaga TODO en bloque: [data-quieto='si'] y el media query.
+ *   · Los grupos SVG animados usan transform-box: fill-box y NUNCA llevan
+ *     atributo transform propio (el JSX los envuelve en un <g> posicionador).
+ */
+
+.gemelo-valle {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #10240f;
+  border-radius: inherit;
+}
+
+/* ── cámara-lámina: se acerca al lugar tocado ── */
+.gemelo-valle__cam {
+  position: absolute;
+  inset: 0;
+  transition: transform 1.4s cubic-bezier(0.22, 0.9, 0.3, 1), transform-origin 1.4s ease;
+  will-change: transform;
+}
+
+/* Lienzo con la razón exacta del viewBox (480×360): crece hasta CUBRIR el
+   contenedor sin deformarse, y los hijos posicionados en % quedan alineados
+   1:1 con el dibujo. */
+.gemelo-valle__lienzo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 480 / 360;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.gemelo-valle__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.gemelo-valle__capa {
+  position: absolute;
+  inset: 0;
+}
+
+/* De noche y con clima duro, las viñetas se apagan con la luz (estático). */
+[data-clima='noche'] .gemelo-valle__lugares { filter: brightness(0.66) saturate(0.72); }
+[data-clima='lluvia'] .gemelo-valle__lugares { filter: brightness(0.82) saturate(0.85); }
+[data-clima='niebla'] .gemelo-valle__lugares { filter: saturate(0.8); }
+
+/* ── letreros de vereda (los hotspots del 3D, dibujados) ── */
+.gv-poi {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gv-poi__medalla {
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 50%;
+  background: #fff9ec;
+  border: 3px solid var(--poi-tinte, #3f8f4e);
+  font-size: 1.15rem;
+  line-height: 1;
+  box-shadow: 0 3px 8px rgba(46, 30, 10, 0.28);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gv-poi__nombre {
+  font: inherit;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  max-width: 9.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #fff;
+  background: rgba(46, 32, 14, 0.62);
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+}
+
+.gv-poi:hover .gv-poi__medalla,
+.gv-poi:focus-visible .gv-poi__medalla {
+  transform: translateY(-3px) scale(1.12);
+}
+
+.gv-poi:focus-visible {
+  outline: 3px solid #ffd98a;
+  outline-offset: 2px;
+  border-radius: 14px;
+}
+
+.gv-poi--activo .gv-poi__medalla {
+  transform: scale(1.16);
+  box-shadow: 0 0 0 4px rgba(255, 217, 138, 0.55), 0 3px 8px rgba(46, 30, 10, 0.3);
+}
+
+/* ── la cosa del día: una sola, cálida, que late ── */
+.gv-alerta {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  border: 2px solid #b0762a;
+  background: linear-gradient(#ffdf9e, #ffc164);
+  color: #5a3a10;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(120, 70, 10, 0.35);
+}
+
+.gv-alerta::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: inherit;
+  border: 2px solid rgba(255, 180, 70, 0.85);
+  animation: gv-halo 2.1s ease-out infinite;
+  pointer-events: none;
+}
+
+.gv-alerta:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ── Angelita: vuela (transición de posición) y flota (bob) ── */
+.gv-abeja {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition: left 1.8s cubic-bezier(0.45, 0.1, 0.25, 1), top 1.8s cubic-bezier(0.45, 0.1, 0.25, 1);
+  pointer-events: none;
+}
+
+.gv-abeja__bob {
+  animation: gv-bob 2.8s ease-in-out infinite alternate;
+}
+
+[data-entrando='si'] .gv-abeja__bob {
+  animation-duration: 1.6s;
+}
+
+/* ── clima vivo ── */
+.gv-lluvia {
+  position: absolute;
+  inset: -60px 0 0 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    168deg,
+    transparent 0 9px,
+    rgba(214, 230, 240, 0.3) 9px 10.6px,
+    transparent 10.6px 23px
+  );
+  animation: gv-cae 0.85s linear infinite;
+  opacity: 0.8;
+}
+
+.gv-niebla {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.gv-niebla__banco {
+  position: absolute;
+  left: -12%;
+  top: 38%;
+  width: 78%;
+  height: 24%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(232, 240, 242, 0.6), rgba(232, 240, 242, 0));
+  animation: gv-banco 24s ease-in-out infinite alternate;
+}
+
+.gv-niebla__banco--b {
+  left: 34%;
+  top: 58%;
+  width: 86%;
+  height: 28%;
+  animation-duration: 31s;
+  animation-delay: -9s;
+}
+
+.gv-luciernaga {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ffe9a0;
+  box-shadow: 0 0 6px 2px rgba(255, 233, 160, 0.65);
+  pointer-events: none;
+  opacity: 0;
+  animation: gv-luci 4.6s ease-in-out infinite;
+  animation-delay: var(--gvd, 0s);
+}
+
+/* ── el velo: el clima tiñe la lámina entera (luz de la hora) ── */
+.gemelo-valle__velo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 64px rgba(40, 30, 10, 0.2);
+}
+
+[data-clima='dorada'] .gemelo-valle__velo {
+  background: radial-gradient(circle at 78% 18%, rgba(255, 196, 110, 0.4), rgba(150, 70, 20, 0.16) 70%);
+  mix-blend-mode: soft-light;
+}
+
+[data-clima='soleado'] .gemelo-valle__velo {
+  background: radial-gradient(circle at 76% 12%, rgba(255, 246, 214, 0.35), rgba(70, 110, 90, 0.08) 72%);
+  mix-blend-mode: soft-light;
+}
+
+[data-clima='niebla'] .gemelo-valle__velo {
+  background: rgba(214, 224, 226, 0.22);
+}
+
+[data-clima='lluvia'] .gemelo-valle__velo {
+  background: rgba(70, 90, 100, 0.2);
+}
+
+[data-clima='noche'] .gemelo-valle__velo {
+  background: radial-gradient(circle at 80% 14%, rgba(190, 214, 255, 0.14), rgba(6, 14, 34, 0.34) 76%);
+}
+
+/* ── coreografía SVG (grupos SIN atributo transform propio) ── */
+.gv-alza {
+  animation: gv-alza 0.9s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+  animation-delay: var(--gvd, 0s);
+}
+
+.gv-pop {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: gv-pop 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: var(--gvd, 0.4s);
+}
+
+.gv-mece {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: gv-mece var(--gvdur, 4.6s) ease-in-out infinite alternate;
+  animation-delay: var(--gvd, 0s);
+}
+
+.gv-gira {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gv-gira 3.4s ease-in-out infinite alternate;
+}
+
+.gv-nube {
+  animation: gv-deriva var(--gvdur, 26s) ease-in-out infinite alternate;
+}
+
+.gv-titila {
+  animation: gv-titila 2.6s ease-in-out infinite alternate;
+  animation-delay: var(--gvd, 0s);
+}
+
+@keyframes gv-alza {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes gv-pop {
+  from { opacity: 0; transform: translateY(6px) scale(0.55); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes gv-mece {
+  from { transform: rotate(-1.7deg); }
+  to { transform: rotate(1.9deg); }
+}
+
+@keyframes gv-gira {
+  from { transform: rotate(-17deg); }
+  to { transform: rotate(13deg); }
+}
+
+@keyframes gv-deriva {
+  from { transform: translateX(-15px); }
+  to { transform: translateX(15px); }
+}
+
+@keyframes gv-titila {
+  from { opacity: 0.15; }
+  to { opacity: 0.9; }
+}
+
+@keyframes gv-halo {
+  from { opacity: 0.7; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.75); }
+}
+
+@keyframes gv-bob {
+  from { transform: translateY(-5px); }
+  to { transform: translateY(5px); }
+}
+
+@keyframes gv-cae {
+  to { transform: translateY(23.5px); }
+}
+
+@keyframes gv-banco {
+  from { transform: translateX(-6%); }
+  to { transform: translateX(14%); }
+}
+
+@keyframes gv-luci {
+  0%, 100% { opacity: 0; transform: translate(0, 0); }
+  35% { opacity: 0.95; transform: translate(7px, -9px); }
+  70% { opacity: 0.5; transform: translate(-5px, -16px); }
+}
+
+/* ── un fotograma digno: sin movimiento cuando así se pide ── */
+.gemelo-valle[data-quieto='si'] *,
+.gemelo-valle[data-quieto='si'] *::before {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gemelo-valle *,
+  .gemelo-valle *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
