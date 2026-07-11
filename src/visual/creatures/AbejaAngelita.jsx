@@ -13,6 +13,11 @@ export function AbejaAngelita({
   inline = false,
   animated = true,
   title = 'Abeja angelita',
+  /* Pose de VIDA (idle-life): 'vuela' (default, aleteo normal) | 'celebra'
+     (aleteo rápido, la escena puede darle la vuelta de campana) | 'reposo'
+     (alitas plegadas que respiran despacio). Solo cambia CSS por data-pose:
+     los consumidores existentes no notan nada. */
+  pose = 'vuela',
   ...rest
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -42,7 +47,7 @@ export function AbejaAngelita({
 
   if (inline) {
     return (
-      <g className={className} data-creature="abeja-angelita">
+      <g className={className} data-creature="abeja-angelita" data-pose={pose}>
         {defs}
         {body}
       </g>
@@ -50,7 +55,7 @@ export function AbejaAngelita({
   }
   return (
     <svg viewBox={VIEWBOX} width={size} height={size} className={className}
-      role="img" aria-label={title} data-creature="abeja-angelita" {...rest}>
+      role="img" aria-label={title} data-creature="abeja-angelita" data-pose={pose} {...rest}>
       <title>{title}</title>
       {defs}
       {body}

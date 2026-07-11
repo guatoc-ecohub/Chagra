@@ -33,7 +33,6 @@ import {
   MUNDO_VALLE_BY_ID,
   COSA_DEL_DIA,
   CLIMAS,
-  ORDEN_CLIMA,
   climaPorHora,
   animoDeFinca,
   NARRACION,
@@ -112,6 +111,14 @@ const MENSAJE_DEGRADADO = {
 
 export default function EntradaValle3D({ onBack }) {
   const [clima, setClima] = useState(() => climaPorHora());
+
+  // ── El clima es ATMÓSFERA, no un selector (auditoría B8/S8): los chips de
+  //    debug se quitaron de la UI. El valle sigue la hora real de la vereda y
+  //    se re-evalúa solo — amanece, atardece y anochece sin botonera.
+  useEffect(() => {
+    const t = setInterval(() => setClima(climaPorHora()), 5 * 60 * 1000);
+    return () => clearInterval(t);
+  }, []);
   const [focoId, setFocoId] = useState(null);
   const [panel, setPanel] = useState(null); // null | 'alerta' | <mundoId>
   const [voz, setVoz] = useState(true);
@@ -142,6 +149,41 @@ export default function EntradaValle3D({ onBack }) {
     () => animoDeFinca(clima, { hayAlerta: !alertaVista }),
     [clima, alertaVista],
   );
+
+  // ── Angelita VIVA (auditoría S5): además del idle (respira/flota, en CSS),
+  //    la abeja tiene MICRO-REACCIONES: celebra al llegar a un mundo (una
+  //    vuelta de campana) y se acurruca cuando el valle queda en reposo.
+  //    Con reduced-motion el CSS congela todo en un fotograma digno.
+  const [gesto, setGesto] = useState(null); // null | 'celebra' | 'reposo'
+  const estuvoEnMundo = useRef(false);
+
+  // Celebración: solo en el flanco de ENTRADA al mundo; se apaga sola.
+  useEffect(() => {
+    if (nav.enMundo && !estuvoEnMundo.current) {
+      estuvoEnMundo.current = true;
+      setGesto('celebra');
+      const t = setTimeout(() => setGesto((g) => (g === 'celebra' ? null : g)), 2400);
+      return () => clearTimeout(t);
+    }
+    if (!nav.enMundo && estuvoEnMundo.current) {
+      estuvoEnMundo.current = false;
+      setGesto((g) => (g === 'celebra' ? null : g));
+    }
+    return undefined;
+  }, [nav.enMundo]);
+
+  // Reposo: un rato sin tocar nada en el valle → se acurruca. Cualquier
+  // interacción que cambie el foco/panel re-arma el temporizador; un toque
+  // en la escena la despierta (ver onPointerDown del root).
+  useEffect(() => {
+    if (panel || nav.enMundo || gesto === 'celebra') return undefined;
+    const t = setTimeout(() => setGesto('reposo'), 24000);
+    return () => clearTimeout(t);
+  }, [panel, nav.enMundo, focoId, clima, gesto]);
+
+  const despertarAngelita = useCallback(() => {
+    setGesto((g) => (g === 'reposo' ? null : g));
+  }, []);
 
   // ── Voz (Web Speech API): el agente DICE. Se calla si el equipo no la trae
   //    o si el usuario apaga la voz. Prefiere una voz en español.
@@ -204,6 +246,17 @@ export default function EntradaValle3D({ onBack }) {
     if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
   }, []);
 
+  // ── "Pregúntele a su finca…" ABRE el flujo real del agente (auditoría
+  //    BUG-CAMP-01: era un botón muerto). Mismo camino desacoplado que usan
+  //    AgentFab y EscuchaOverlay: el evento global `chagraNavigate`, que
+  //    App.jsx escucha para montar la conversación (vista 'agente') — funciona
+  //    desde cualquier pantalla, incluida esta vitrina, sin acoplar el mockup.
+  const preguntarAlAgente = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'agente' } }));
+  }, []);
+
   // ── ENTRAR a un mundo (tarea del viaje): cierra el panel, la abeja guía la
   //    transición y el framework monta la escena del mundo. Si el mundo aún no
   //    tiene escena montable, `viajarAlMundo` no viaja (el panel ya degradó a
@@ -241,7 +294,7 @@ export default function EntradaValle3D({ onBack }) {
   const mundoPanel = panel && panel !== 'alerta' ? MUNDO_VALLE_BY_ID[panel] : null;
 
   return (
-    <div className="valle-root" data-clima={clima}>
+    <div className="valle-root" data-clima={clima} onPointerDown={despertarAngelita}>
       {/* fondo/atmósfera 3D o su degradación 2D (según el tiering del equipo).
           Mientras se está DENTRO de un mundo, el valle descansa (se desmonta:
           nada de dos escenas sudando la GPU a la vez en un teléfono). */}
@@ -312,7 +365,8 @@ export default function EntradaValle3D({ onBack }) {
         />
       )}
 
-      {/* ── Encabezado: el nombre del lugar + el selector de clima (estado).
+      {/* ── Encabezado: el nombre del lugar. El clima NO tiene selector: es
+              la atmósfera real por la hora de la vereda (auditoría B8/S8).
               Dentro de un mundo se esconde: manda la miga del mundo. ── */}
       {!nav.enMundo && (
       <header className="valle-header">
@@ -322,19 +376,6 @@ export default function EntradaValle3D({ onBack }) {
         <div className="valle-titulo">
           <span className="valle-titulo__eyebrow">Su finca, hoy</span>
           <h1>El valle de mi finca</h1>
-        </div>
-        <div className="valle-clima" role="group" aria-label="Estado del clima de la vereda">
-          {ORDEN_CLIMA.map((k) => (
-            <button
-              key={k}
-              type="button"
-              className={`valle-clima__chip${clima === k ? ' valle-clima__chip--on' : ''}`}
-              aria-pressed={clima === k}
-              onClick={() => setClima(k)}
-            >
-              {CLIMAS[k].etiqueta}
-            </button>
-          ))}
         </div>
       </header>
       )}
@@ -348,13 +389,27 @@ export default function EntradaValle3D({ onBack }) {
 
       {/* ── El compañero: Angelita en una sola línea puntual (imagen-first).
               Es el ser al que se cuida; su cara refleja el ánimo real. Se
-              esconde si hay un panel abierto — una cosa clara a la vez. ── */}
-      {!panel && !nav.enMundo && (
-        <div className="valle-companero" role="status" aria-live="polite">
+              esconde si hay un panel abierto — una cosa clara a la vez.
+              DENTRO de un mundo sigue presente (compacta, sin frase): así se
+              ve su celebración al llegar y no abandona a quien la sigue. ── */}
+      {!panel && (
+        <div
+          className={`valle-companero${nav.enMundo ? ' valle-companero--mundo' : ''}`}
+          data-gesto={gesto || undefined}
+          role="status"
+          aria-live="polite"
+        >
           <span className="valle-companero__cara" aria-hidden="true">
-            <AbejaAngelita size={34} animo={companero.animo} energia={companero.energia} animated={!reducedMotion} />
+            <AbejaAngelita
+              size={34}
+              pose={gesto || 'vuela'}
+              animo={companero.animo}
+              energia={companero.energia}
+              animated={!reducedMotion}
+            />
+            <i className="valle-companero__sombra" />
           </span>
-          <span className="valle-companero__txt">{companero.frase}</span>
+          {!nav.enMundo && <span className="valle-companero__txt">{companero.frase}</span>}
         </div>
       )}
 
@@ -407,7 +462,12 @@ export default function EntradaValle3D({ onBack }) {
               volver; una cosa clara a la vez). ── */}
       {!nav.enMundo && (
       <footer className="valle-agente">
-        <button type="button" className="valle-agente__pregunte" aria-label="Pregúntele a Chagra">
+        <button
+          type="button"
+          className="valle-agente__pregunte"
+          aria-label="Pregúntele a Chagra"
+          onClick={preguntarAlAgente}
+        >
           <span className="valle-agente__punto" aria-hidden="true" />
           Pregúntele a su finca…
         </button>

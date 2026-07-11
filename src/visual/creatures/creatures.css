@@ -46,6 +46,20 @@
   50% { transform: translateX(-1.2px); }
 }
 
+/* ── Poses de VIDA de la abeja angelita (data-pose, opcional) ──
+   'celebra' → aleteo acelerado (la escena pone la vuelta de campana);
+   'reposo'  → alitas plegadas que respiran despacio (acurrucada). */
+[data-creature='abeja-angelita'][data-pose='celebra'] .crt-wing {
+  animation-duration: 0.09s;
+}
+[data-creature='abeja-angelita'][data-pose='reposo'] .crt-wing {
+  animation: crt-wing-reposo 3.6s ease-in-out infinite alternate;
+}
+@keyframes crt-wing-reposo {
+  0% { transform: scaleY(0.4) scaleX(0.86); }
+  100% { transform: scaleY(0.5) scaleX(0.9); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .crt-wing, .crt-fwing, .crt-ball, .crt-legs { animation: none !important; }
 }
