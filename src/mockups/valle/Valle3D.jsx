@@ -26,56 +26,120 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, Float, Stars, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
-import { MUNDOS_VALLE, MUNDO_VALLE_BY_ID, COSA_DEL_DIA, CLIMAS } from './valleData';
+import { Colibri } from '../../visual/creatures/Colibri.jsx';
+import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
+import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
+import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
+import AnimalesDeFinca from './animales.jsx';
+import {
+  MUNDOS_VALLE,
+  MUNDO_VALLE_BY_ID,
+  COSA_DEL_DIA,
+  CLIMAS,
+  PISOS_TERMICOS,
+  VEGETACION_PISOS,
+} from './valleData';
 
-/* Altura del terreno por (x,z): un valle suave con ladera al fondo (+z) donde
-   suben las terrazas del café. Determinista → los landmarks se posan encima. */
+/* Altura del terreno por (x,z): la LADERA ANDINA. El eje z es la montaña — al
+   fondo (z negativo) trepa al páramo alto, al frente (z positivo) baja a tierra
+   caliente. Así el gradiente de pisos térmicos se LEE como pendiente. La subida
+   usa smoothstep (curva suave, sin quiebres) + una ondulación menuda para que
+   las lomas se vean redondas, no planas. Determinista → los landmarks se posan
+   encima. */
 function alturaTerreno(x, z) {
-  const ladera = Math.max(0, (z + 2) * 0.16);
-  const ondul = Math.sin(x * 0.5) * 0.08 + Math.cos(z * 0.4) * 0.06;
-  const cauce = -0.28 * Math.exp(-((x - 0.6) ** 2) / 5) * Math.exp(-((z + 1) ** 2) / 40);
-  return ladera + ondul + cauce;
+  const subida = THREE.MathUtils.smoothstep(-z, -8, 11) * 5.4;
+  const ondul = Math.sin(x * 0.42) * 0.14 + Math.cos(z * 0.36 + x * 0.2) * 0.12;
+  const cauce = -0.32 * Math.exp(-((x - 1.2) ** 2) / 6) * Math.exp(-((z + 1) ** 2) / 55);
+  return subida + ondul + cauce;
 }
 
-/* ── El suelo del valle: malla ondulada de bajo poligonaje, color tierra-verde
-      que se aclara al fondo (perspectiva aérea). ── */
-function Terreno({ colorBase }) {
+/* Color del suelo a una altura z: interpola entre los colores de los pisos
+   térmicos por el centro de cada franja (perspectiva de altura + cambio de
+   vegetación por piso). `alto` mezcla hacia la cresta para dar relieve. De
+   noche todo se apaga hacia el azul. Layout por datos: sale de PISOS_TERMICOS. */
+const _centrosPiso = PISOS_TERMICOS.map((p) => ({
+  c: (p.z0 + p.z1) / 2,
+  color: new THREE.Color(p.color),
+  cresta: new THREE.Color(p.cresta),
+}));
+const _colNoche = new THREE.Color('#1f3a2c');
+
+function colorSueloEnZ(z, alto, nocturno, out) {
+  // Buscar los dos centros de piso que rodean a z e interpolar.
+  let lo = _centrosPiso[0];
+  let hi = _centrosPiso[_centrosPiso.length - 1];
+  for (let i = 0; i < _centrosPiso.length - 1; i++) {
+    const a = _centrosPiso[i];
+    const b = _centrosPiso[i + 1];
+    // Los centros bajan de z (cálido, +z) a páramo (-z); ordenados descendente.
+    if (z <= a.c && z >= b.c) {
+      lo = a;
+      hi = b;
+      break;
+    }
+  }
+  const span = lo.c - hi.c || 1;
+  const t = THREE.MathUtils.clamp((lo.c - z) / span, 0, 1);
+  out.copy(lo.color).lerp(hi.color, t);
+  // Relieve: las crestas más claras; los vallecitos, el color base.
+  out.lerp(lo.cresta.clone().lerp(hi.cresta, t), THREE.MathUtils.clamp(alto, 0, 1) * 0.35);
+  if (nocturno) out.lerp(_colNoche, 0.62);
+  return out;
+}
+
+/* ── El suelo del valle: malla ondulada de bajo poligonaje, PINTADA por vértice
+      según el piso térmico de cada franja (páramo frío arriba → tierra caliente
+      abajo). El color sale de PISOS_TERMICOS: franjas de altitud legibles, con
+      la cresta apenas más clara para dar relieve. ── */
+function Terreno({ nocturno }) {
   const geo = useMemo(() => {
-    const g = new THREE.PlaneGeometry(30, 30, 48, 48);
+    const g = new THREE.PlaneGeometry(34, 34, 56, 56);
     g.rotateX(-Math.PI / 2);
     const pos = g.attributes.position;
+    const colores = new Float32Array(pos.count * 3);
+    const col = new THREE.Color();
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const z = pos.getZ(i);
-      pos.setY(i, alturaTerreno(x, z));
+      const y = alturaTerreno(x, z);
+      pos.setY(i, y);
+      const subida = THREE.MathUtils.smoothstep(-z, -8, 11) * 5.4;
+      const alto = THREE.MathUtils.clamp((y - subida + 0.3) / 0.6, 0, 1);
+      colorSueloEnZ(z, alto, nocturno, col);
+      colores[i * 3] = col.r;
+      colores[i * 3 + 1] = col.g;
+      colores[i * 3 + 2] = col.b;
     }
+    g.setAttribute('color', new THREE.BufferAttribute(colores, 3));
     g.computeVertexNormals();
     return g;
-  }, []);
+  }, [nocturno]);
   return (
     <mesh geometry={geo} receiveShadow>
-      <meshStandardMaterial color={colorBase} flatShading roughness={1} metalness={0} />
+      <meshStandardMaterial vertexColors flatShading roughness={1} metalness={0} />
     </mesh>
   );
 }
 
-/* ── La cordillera de páramo al fondo: conos pálidos (perspectiva aérea). ── */
+/* ── La cordillera de páramo al fondo: conos pálidos que EMERGEN de la ladera
+      alta (perspectiva aérea). Su base se posa sobre el terreno del páramo
+      (que ya subió a ~5) y las cumbres coronan la escena. ── */
 function Cordillera({ color }) {
   const picos = useMemo(
     () => [
-      { x: -8, z: -12, h: 7, r: 5 },
-      { x: -2, z: -14, h: 9, r: 6 },
-      { x: 5, z: -12.5, h: 7.5, r: 5.2 },
-      { x: 11, z: -13, h: 6, r: 4.5 },
+      { x: -9, z: -15.5, h: 7, r: 5, base: 4.2 },
+      { x: -2, z: -17, h: 9.5, r: 6, base: 4.6 },
+      { x: 6, z: -16, h: 8, r: 5.2, base: 4.2 },
+      { x: 12, z: -15, h: 6, r: 4.5, base: 4.0 },
     ],
     [],
   );
   return (
     <group>
       {picos.map((p, i) => (
-        <mesh key={i} position={[p.x, p.h / 2 - 0.5, p.z]}>
-          <coneGeometry args={[p.r, p.h, 5]} />
-          <meshStandardMaterial color={color} flatShading roughness={1} opacity={0.9} transparent />
+        <mesh key={i} position={[p.x, p.base + p.h / 2, p.z]}>
+          <coneGeometry args={[p.r, p.h, 6]} />
+          <meshStandardMaterial color={color} flatShading roughness={1} opacity={0.92} transparent />
         </mesh>
       ))}
     </group>
@@ -86,23 +150,28 @@ function Cordillera({ color }) {
 function Quebrada({ color, viva }) {
   const ref = useRef(null);
   useFrame((state) => {
+    // `ref` apunta al material (no al mesh): animar su opacidad directamente.
     if (viva && ref.current) {
-      ref.current.material.opacity = 0.72 + Math.sin(state.clock.elapsedTime * 2) * 0.06;
+      ref.current.opacity = 0.72 + Math.sin(state.clock.elapsedTime * 2) * 0.06;
     }
   });
   const geo = useMemo(() => {
-    const curve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-6, 0, -6),
-      new THREE.Vector3(-2, 0, -3),
-      new THREE.Vector3(0.6, 0, -1.4),
-      new THREE.Vector3(1.4, 0, 2),
-      new THREE.Vector3(3, 0, 6),
-    ]);
-    const g = new THREE.TubeGeometry(curve, 60, 0.42, 6, false);
+    // Nace arriba (páramo) y BAJA por la ladera hasta la tierra caliente:
+    // cada punto se posa sobre el terreno (+un pelo) para leer la pendiente.
+    const pts = [
+      [-3.4, -7.2],
+      [-1.2, -4.2],
+      [0.8, -1.4],
+      [1.6, 1.8],
+      [2.6, 5.4],
+      [3.6, 8],
+    ].map(([x, z]) => new THREE.Vector3(x, alturaTerreno(x, z) + 0.06, z));
+    const curve = new THREE.CatmullRomCurve3(pts);
+    const g = new THREE.TubeGeometry(curve, 80, 0.34, 7, false);
     return g;
   }, []);
   return (
-    <mesh geometry={geo} position={[0, 0.02, 0]}>
+    <mesh geometry={geo}>
       <meshStandardMaterial
         ref={ref}
         color={color}
@@ -115,129 +184,148 @@ function Quebrada({ color, viva }) {
   );
 }
 
-/* ── Materiales/paletas de cada landmark de mundo, por `tipo`. ── */
-function LandmarkGeom({ tipo, tinte }) {
+/* ── Materiales/paletas de cada landmark de mundo, por `tipo`. Formas
+      redondeadas (cilindros, conos, esferas) — pocas piezas por lugar para
+      dejar aire. ── */
+function LandmarkGeom({ tipo, tinte, reducedMotion }) {
   const [fuerte, suave] = tinte;
   switch (tipo) {
-    case 'milpa': // maíz: cañas altas con penacho
+    case 'milpa': // maíz: cañas altas con penacho + hojas
       return (
         <group>
-          {[-0.5, 0, 0.5, -0.25, 0.25].map((dx, i) => (
-            <group key={i} position={[dx, 0, (i % 2) * 0.4 - 0.2]}>
+          {[-0.42, 0.05, 0.42].map((dx, i) => (
+            <group key={i} position={[dx, 0, (i % 2) * 0.36 - 0.18]}>
               <mesh position={[0, 0.7, 0]} castShadow>
-                <cylinderGeometry args={[0.05, 0.08, 1.4, 5]} />
-                <meshStandardMaterial color={fuerte} flatShading />
+                <cylinderGeometry args={[0.05, 0.08, 1.4, 6]} />
+                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
               </mesh>
-              <mesh position={[0, 1.45, 0]}>
-                <coneGeometry args={[0.12, 0.4, 5]} />
+              {/* hojas: conos aplanados que salen de la caña */}
+              <mesh position={[0.16, 0.9, 0]} rotation={[0, 0, -0.7]} scale={[1, 1, 0.3]}>
+                <coneGeometry args={[0.12, 0.5, 4]} />
+                <meshStandardMaterial color={suave} flatShading roughness={1} />
+              </mesh>
+              <mesh position={[-0.16, 0.62, 0]} rotation={[0, Math.PI, -0.7]} scale={[1, 1, 0.3]}>
+                <coneGeometry args={[0.12, 0.5, 4]} />
+                <meshStandardMaterial color={suave} flatShading roughness={1} />
+              </mesh>
+              <mesh position={[0, 1.5, 0]}>
+                <coneGeometry args={[0.08, 0.42, 6]} />
                 <meshStandardMaterial color="#e7c96b" flatShading />
               </mesh>
             </group>
           ))}
         </group>
       );
-    case 'cafetal': // arbustos redondos en hilera
+    case 'cafetal': // arbustos redondos con frutos, en la ladera
       return (
         <group>
-          {[-0.6, -0.2, 0.2, 0.6].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.32, (i % 2) * 0.4]} castShadow>
-              <icosahedronGeometry args={[0.34, 0]} />
-              <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-            </mesh>
-          ))}
-        </group>
-      );
-    case 'era': // eras aradas con surcos (semillero)
-      return (
-        <group>
-          {[-0.35, 0, 0.35].map((dz, i) => (
-            <mesh key={i} position={[0, 0.08, dz]} castShadow receiveShadow>
-              <boxGeometry args={[1.3, 0.16, 0.22]} />
-              <meshStandardMaterial color="#5a3d28" flatShading roughness={1} />
-            </mesh>
-          ))}
-          {[-0.35, 0, 0.35].map((dz, i) => (
-            <mesh key={`b${i}`} position={[0, 0.24, dz]}>
-              <boxGeometry args={[1.2, 0.06, 0.14]} />
-              <meshStandardMaterial color={suave} flatShading />
-            </mesh>
-          ))}
-        </group>
-      );
-    case 'quebrada': // nacimiento: charca + juncos
-      return (
-        <group>
-          <mesh position={[0, 0.06, 0]}>
-            <cylinderGeometry args={[0.55, 0.6, 0.12, 16]} />
-            <meshStandardMaterial color="#3a7fa0" transparent opacity={0.85} metalness={0.4} roughness={0.2} />
-          </mesh>
-          {[-0.3, 0.1, 0.4].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.4, 0.2]}>
-              <cylinderGeometry args={[0.03, 0.03, 0.7, 4]} />
-              <meshStandardMaterial color="#4e7d3f" flatShading />
-            </mesh>
-          ))}
-        </group>
-      );
-    case 'corral': // casita + cerca
-      return (
-        <group>
-          <mesh position={[0, 0.35, 0]} castShadow>
-            <boxGeometry args={[0.9, 0.7, 0.8]} />
-            <meshStandardMaterial color={suave} flatShading />
-          </mesh>
-          <mesh position={[0, 0.85, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
-            <coneGeometry args={[0.72, 0.5, 4]} />
-            <meshStandardMaterial color={fuerte} flatShading />
-          </mesh>
-          {[-0.9, -0.5, 0.9, 1.3].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.2, 0.9]}>
-              <boxGeometry args={[0.06, 0.4, 0.06]} />
-              <meshStandardMaterial color="#8a6a44" flatShading />
-            </mesh>
-          ))}
-        </group>
-      );
-    case 'huerta': // camas elevadas de la huerta
-      return (
-        <group>
-          {[-0.4, 0.4].map((dx, i) => (
-            <group key={i} position={[dx, 0, 0]}>
-              <mesh position={[0, 0.12, 0]} castShadow>
-                <boxGeometry args={[0.6, 0.24, 1]} />
-                <meshStandardMaterial color="#6b4a30" flatShading />
-              </mesh>
-              <mesh position={[0, 0.32, 0]}>
-                <boxGeometry args={[0.5, 0.18, 0.9]} />
-                <meshStandardMaterial color={fuerte} flatShading />
-              </mesh>
-            </group>
-          ))}
-        </group>
-      );
-    case 'bosque': // arboleda: troncos + copas
-      return (
-        <group>
-          {[
-            [-0.5, 0, 0.9],
-            [0.4, 0.2, 1.15],
-            [0, -0.4, 0.8],
-          ].map(([dx, dz, h], i) => (
-            <group key={i} position={[dx, 0, dz]}>
-              <mesh position={[0, h * 0.35, 0]} castShadow>
-                <cylinderGeometry args={[0.09, 0.12, h * 0.7, 6]} />
+          {[-0.5, 0.1, 0.55].map((dx, i) => (
+            <group key={i} position={[dx, 0, (i % 2) * 0.42]}>
+              <mesh position={[0, 0.16, 0]}>
+                <cylinderGeometry args={[0.05, 0.07, 0.32, 6]} />
                 <meshStandardMaterial color="#6b4a2e" flatShading />
               </mesh>
-              <mesh position={[0, h * 0.8, 0]} castShadow>
-                <coneGeometry args={[0.5, h * 0.9, 7]} />
+              <mesh position={[0, 0.44, 0]} castShadow>
+                <sphereGeometry args={[0.32, 10, 9]} />
                 <meshStandardMaterial color={fuerte} flatShading roughness={1} />
               </mesh>
             </group>
           ))}
         </group>
       );
+    case 'era': // eras del semillero: camellones redondeados (lomos de tierra)
+      return (
+        <group>
+          {[-0.42, 0, 0.42].map((dz, i) => (
+            <group key={i} position={[0, 0, dz]}>
+              {/* camellón: cilindro tumbado con puntas de esfera */}
+              <mesh position={[0, 0.1, 0]} rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow>
+                <capsuleGeometry args={[0.14, 1.1, 4, 8]} />
+                <meshStandardMaterial color="#6b4630" flatShading roughness={1} />
+              </mesh>
+              {/* brotes verdes del semillero */}
+              {[-0.35, 0, 0.35].map((bx, j) => (
+                <mesh key={j} position={[bx, 0.26, 0]}>
+                  <coneGeometry args={[0.07, 0.2, 5]} />
+                  <meshStandardMaterial color={suave} flatShading />
+                </mesh>
+              ))}
+            </group>
+          ))}
+        </group>
+      );
+    case 'quebrada': // nacimiento: charca redonda + juncos
+      return (
+        <group>
+          <mesh position={[0, 0.06, 0]}>
+            <cylinderGeometry args={[0.55, 0.62, 0.12, 20]} />
+            <meshStandardMaterial color="#3a7fa0" transparent opacity={0.85} metalness={0.4} roughness={0.2} />
+          </mesh>
+          {[-0.28, 0.12, 0.4].map((dx, i) => (
+            <mesh key={i} position={[dx, 0.4, 0.2]} rotation={[0.12, 0, 0.08]}>
+              <cylinderGeometry args={[0.025, 0.03, 0.7, 5]} />
+              <meshStandardMaterial color="#4e7d3f" flatShading />
+            </mesh>
+          ))}
+        </group>
+      );
+    case 'animales': // los animales de la finca (reemplaza la vieja casita)
+      return <AnimalesDeFinca reducedMotion={reducedMotion} />;
+    case 'huerta': // camas de la huerta: lomos redondeados con matas
+      return (
+        <group>
+          {[-0.42, 0.42].map((dx, i) => (
+            <group key={i} position={[dx, 0, 0]}>
+              <mesh position={[0, 0.12, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+                <capsuleGeometry args={[0.16, 0.7, 4, 8]} />
+                <meshStandardMaterial color="#6b4a30" flatShading roughness={1} />
+              </mesh>
+              {[-0.28, 0, 0.28].map((dz, j) => (
+                <mesh key={j} position={[0, 0.3, dz]} castShadow>
+                  <sphereGeometry args={[0.16, 9, 8]} />
+                  <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+                </mesh>
+              ))}
+            </group>
+          ))}
+        </group>
+      );
+    case 'bosque': // arboleda: troncos + copas cónicas Y esféricas mezcladas
+      return (
+        <group>
+          {[
+            [-0.5, 0, 0.95, 'cono'],
+            [0.45, 0.2, 1.2, 'esfera'],
+            [0.05, -0.45, 0.85, 'cono'],
+          ].map(([dx, dz, h, forma], i) => (
+            <group key={i} position={[Number(dx), 0, Number(dz)]}>
+              <mesh position={[0, Number(h) * 0.35, 0]} castShadow>
+                <cylinderGeometry args={[0.08, 0.12, Number(h) * 0.7, 6]} />
+                <meshStandardMaterial color="#6b4a2e" flatShading />
+              </mesh>
+              {forma === 'cono' ? (
+                <mesh position={[0, Number(h) * 0.85, 0]} castShadow>
+                  <coneGeometry args={[0.46, Number(h) * 0.95, 8]} />
+                  <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+                </mesh>
+              ) : (
+                <group position={[0, Number(h) * 0.85, 0]}>
+                  <mesh castShadow>
+                    <sphereGeometry args={[0.42, 10, 9]} />
+                    <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+                  </mesh>
+                  <mesh position={[0.22, 0.18, 0.1]} castShadow>
+                    <sphereGeometry args={[0.26, 9, 8]} />
+                    <meshStandardMaterial color={suave} flatShading roughness={1} />
+                  </mesh>
+                </group>
+              )}
+            </group>
+          ))}
+        </group>
+      );
     case 'veleta': // poste con veleta que gira con el viento
-      return <Veleta color={fuerte} />;
+      return <Veleta color={fuerte} reducedMotion={reducedMotion} />;
     default:
       return (
         <mesh position={[0, 0.3, 0]}>
@@ -246,6 +334,91 @@ function LandmarkGeom({ tipo, tinte }) {
         </mesh>
       );
   }
+}
+
+/* ── Matas de un piso térmico (frailejón, papa, café, plátano): pocas, a los
+      lados, para que se lea el cambio de vegetación por altura sin amontonar. ── */
+function MataDePiso({ tipo, nocturno }) {
+  switch (tipo) {
+    case 'frailejon': // roseta plateada sobre tronco (Espeletia del páramo)
+      return (
+        <group>
+          <mesh position={[0, 0.45, 0]} castShadow>
+            <cylinderGeometry args={[0.11, 0.14, 0.9, 7]} />
+            <meshStandardMaterial color={nocturno ? '#3a4038' : '#6e6a52'} flatShading roughness={1} />
+          </mesh>
+          {/* roseta: cono achatado plateado */}
+          <mesh position={[0, 0.98, 0]} scale={[1, 0.5, 1]} castShadow>
+            <coneGeometry args={[0.34, 0.5, 8]} />
+            <meshStandardMaterial color={nocturno ? '#4a5b52' : '#9fb59a'} flatShading roughness={1} />
+          </mesh>
+        </group>
+      );
+    case 'papa': // matas bajas y redondas (surco de papa del clima frío)
+      return (
+        <group>
+          {[-0.28, 0.06, 0.32].map((dx, i) => (
+            <mesh key={i} position={[dx, 0.14, (i % 2) * 0.22]} scale={[1, 0.7, 1]} castShadow>
+              <icosahedronGeometry args={[0.22, 0]} />
+              <meshStandardMaterial color={nocturno ? '#2f5240' : '#3f7d52'} flatShading roughness={1} />
+            </mesh>
+          ))}
+        </group>
+      );
+    case 'cafe': // arbusto de café suelto del clima medio
+      return (
+        <group>
+          <mesh position={[0, 0.14, 0]}>
+            <cylinderGeometry args={[0.05, 0.06, 0.28, 6]} />
+            <meshStandardMaterial color="#6b4a2e" flatShading />
+          </mesh>
+          <mesh position={[0, 0.4, 0]} castShadow>
+            <sphereGeometry args={[0.3, 10, 9]} />
+            <meshStandardMaterial color={nocturno ? '#254a30' : '#3f7d3a'} flatShading roughness={1} />
+          </mesh>
+        </group>
+      );
+    case 'platano': // mata de plátano: pseudotallo + hojas grandes colgantes
+    default:
+      return (
+        <group>
+          <mesh position={[0, 0.55, 0]} castShadow>
+            <cylinderGeometry args={[0.1, 0.14, 1.1, 7]} />
+            <meshStandardMaterial color={nocturno ? '#3a5030' : '#7a9a55'} flatShading roughness={1} />
+          </mesh>
+          {[0, 1, 2, 3, 4].map((k) => (
+            <mesh
+              key={k}
+              position={[0, 1.05, 0]}
+              rotation={[0, (k / 5) * Math.PI * 2, -0.9]}
+              scale={[1, 1, 0.28]}
+              castShadow
+            >
+              <coneGeometry args={[0.24, 1.0, 4]} />
+              <meshStandardMaterial color={nocturno ? '#2f5236' : '#4f9a44'} flatShading roughness={1} />
+            </mesh>
+          ))}
+        </group>
+      );
+  }
+}
+
+/* Siembra las matas de muestra de cada piso sobre el terreno (posadas en su y).
+   Layout por datos: recorre VEGETACION_PISOS. */
+function VegetacionPisos({ nocturno }) {
+  return (
+    <group>
+      {VEGETACION_PISOS.map((v, i) => {
+        const [x, z] = v.pos;
+        const y = alturaTerreno(x, z);
+        return (
+          <group key={i} position={[x, y, z]}>
+            <MataDePiso tipo={v.tipo} nocturno={nocturno} />
+          </group>
+        );
+      })}
+    </group>
+  );
 }
 
 function Veleta({ color, reducedMotion = false }) {
@@ -260,15 +433,60 @@ function Veleta({ color, reducedMotion = false }) {
         <meshStandardMaterial color="#7c6a4c" flatShading />
       </mesh>
       <group ref={ref} position={[0, 1.15, 0]}>
-        <mesh>
-          <boxGeometry args={[0.7, 0.06, 0.06]} />
+        <mesh rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.03, 0.03, 0.7, 6]} />
           <meshStandardMaterial color={color} flatShading />
         </mesh>
         <mesh position={[0.42, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
-          <coneGeometry args={[0.14, 0.3, 4]} />
+          <coneGeometry args={[0.1, 0.28, 6]} />
+          <meshStandardMaterial color={color} flatShading />
+        </mesh>
+        {/* contrapeso redondo en la cola */}
+        <mesh position={[-0.4, 0, 0]}>
+          <sphereGeometry args={[0.07, 8, 8]} />
           <meshStandardMaterial color={color} flatShading />
         </mesh>
       </group>
+    </group>
+  );
+}
+
+/* ── Vida del valle: criaturas REUSADAS de src/visual/creatures (SVG livianos
+      como billboards <Html>, igual que Angelita), sembradas con criterio
+      ecológico — el colibrí en las flores de la huerta, las mariposas sobre la
+      milpa, el escarabajo en la hojarasca del bosque, la lombriz asomada en las
+      eras. Pocas y bien puestas: el valle se siente vivo, no amontonado. Son
+      decorativas (aria-hidden) y no capturan toques. ── */
+const CRIATURAS_VALLE = [
+  { crt: 'mariposa', x: -4.0, z: 2.0, dy: 2.0, size: 30, factor: 8 },
+  { crt: 'mariposa', x: -4.8, z: 2.9, dy: 1.5, size: 24, factor: 8 },
+  { crt: 'colibri', x: 3.6, z: 4.4, dy: 1.9, size: 34, factor: 8 },
+  { crt: 'escarabajo', x: 4.7, z: -2.9, dy: 0.5, size: 28, factor: 7 },
+  { crt: 'lombriz', x: -1.0, z: 5.2, dy: 0.28, size: 26, factor: 6.5 },
+];
+
+function CriaturaSvg({ tipo, size, animated }) {
+  if (tipo === 'colibri') return <Colibri size={size} animated={animated} />;
+  if (tipo === 'mariposa') return <Mariposa size={size} animated={animated} />;
+  if (tipo === 'escarabajo') return <Escarabajo size={size} animated={animated} />;
+  return <Lombriz size={size} animated={animated} />;
+}
+
+function CriaturasValle({ reducedMotion }) {
+  return (
+    <group>
+      {CRIATURAS_VALLE.map((c, i) => {
+        const y = alturaTerreno(c.x, c.z) + c.dy;
+        return (
+          <group key={i} position={[c.x, y, c.z]}>
+            <Html center distanceFactor={c.factor} zIndexRange={[8, 0]} pointerEvents="none">
+              <div className="valle-critter" aria-hidden="true">
+                <CriaturaSvg tipo={c.crt} size={c.size} animated={!reducedMotion} />
+              </div>
+            </Html>
+          </group>
+        );
+      })}
     </group>
   );
 }
@@ -282,7 +500,7 @@ function MundoLugar({ mundo, activo, onEntrar, reducedMotion }) {
       {mundo.tipo === 'veleta' ? (
         <Veleta color={mundo.tinte[0]} reducedMotion={reducedMotion} />
       ) : (
-        <LandmarkGeom tipo={mundo.tipo} tinte={mundo.tinte} />
+        <LandmarkGeom tipo={mundo.tipo} tinte={mundo.tinte} reducedMotion={reducedMotion} />
       )}
       <Html center distanceFactor={11} position={[0, 1.7, 0]} zIndexRange={[20, 0]}>
         <button
@@ -414,7 +632,7 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit }) {
     if (trans.current > 0) {
       const cam = c.object;
       const dir = cam.position.clone().sub(c.target);
-      const deseada = entrando ? 8.5 : 15; // acercarse al entrar, abrir al volver
+      const deseada = entrando ? 9 : 18; // acercarse al entrar, abrir al volver (más aire)
       dir.setLength(THREE.MathUtils.lerp(dir.length(), deseada, 0.06));
       cam.position.copy(c.target.clone().add(dir));
       trans.current = Math.max(0, trans.current - 0.012);
@@ -427,10 +645,10 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit }) {
       makeDefault
       enablePan={false}
       enableZoom
-      minDistance={6}
-      maxDistance={22}
-      minPolarAngle={0.5}
-      maxPolarAngle={1.15}
+      minDistance={7}
+      maxDistance={28}
+      minPolarAngle={0.45}
+      maxPolarAngle={1.18}
       autoRotate={autoOrbit && !entrando}
       autoRotateSpeed={0.35}
       enableDamping
@@ -445,17 +663,20 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
   const c = CLIMAS[clima];
   const foco = useMemo(() => {
     const m = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;
-    if (!m) return new THREE.Vector3(0, 0.3, 0.5);
+    // Sin foco, la cámara encuadra el corazón del valle (algo hacia el frente,
+    // regla de tercios) para dar aire y leer la ladera que sube al fondo.
+    if (!m) return new THREE.Vector3(0, 1.0, 1.4);
     const y = alturaTerreno(m.pos[0], m.pos[2]);
     return new THREE.Vector3(m.pos[0], y, m.pos[2]);
   }, [focoId]);
   const autoOrbit = !reducedMotion && !focoId;
   const entrando = !!focoId;
+  const nocturno = clima === 'noche';
 
   return (
     <>
       <color attach="background" args={[c.cielo[1]]} />
-      <fog attach="fog" args={[c.niebla, 9, c.nieblaLejos]} />
+      <fog attach="fog" args={[c.niebla, 12, c.nieblaLejos + 8]} />
       <hemisphereLight intensity={c.intensidad * 0.55} color={c.cielo[0]} groundColor={c.ambiente} />
       <ambientLight intensity={c.intensidad * 0.35} color={c.luz} />
       <directionalLight
@@ -474,9 +695,10 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         <Stars radius={40} depth={20} count={900} factor={3} fade speed={reducedMotion ? 0 : 1} />
       )}
 
-      <Terreno colorBase={clima === 'noche' ? '#22432f' : '#5a8a4a'} />
-      <Cordillera color={clima === 'noche' ? '#3a4a63' : c.niebla} />
-      <Quebrada color={clima === 'noche' ? '#2a4a6a' : '#5fb2c9'} viva={c.lluviaViva} />
+      <Terreno nocturno={nocturno} />
+      <Cordillera color={nocturno ? '#3a4a63' : c.niebla} />
+      <Quebrada color={nocturno ? '#2a4a6a' : '#5fb2c9'} viva={c.lluviaViva} />
+      <VegetacionPisos nocturno={nocturno} />
 
       {MUNDOS_VALLE.map((m) => (
         <MundoLugar
@@ -488,6 +710,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         />
       ))}
 
+      <CriaturasValle reducedMotion={reducedMotion} />
       <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} />
       <CompaneroAbeja
         foco={foco}
@@ -524,7 +747,7 @@ export default function Valle3D({
       shadows
       dpr={[1, 1.8]}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
-      camera={{ position: [9, 8, 11], fov: 42 }}
+      camera={{ position: [10.5, 9, 13.5], fov: 40 }}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >

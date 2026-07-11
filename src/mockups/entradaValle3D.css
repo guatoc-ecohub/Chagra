@@ -204,6 +204,15 @@
   transform-origin: center;
 }
 
+/* ── Criaturas sembradas por el valle (colibrí, mariposas, escarabajo,
+      lombriz): billboards reusados de la librería de fauna. Decorativas: no
+      capturan toques ni tapan los POI. ── */
+.valle-critter {
+  pointer-events: none;
+  filter: drop-shadow(0 3px 7px rgba(0, 0, 0, 0.32));
+  will-change: transform;
+}
+
 /* ── El compañero como TARJETA puntual (imagen-first, una sola línea) ──
       El ser al que se cuida vive también en el DOM: su cara refleja el ánimo. */
 .valle-companero {
