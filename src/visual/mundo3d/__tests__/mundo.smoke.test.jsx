@@ -12,7 +12,7 @@ afterEach(() => cleanup());
 
 describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
   test('arquetipos: 5 dioramas 3D + arquetipos 2D de primera clase', () => {
-    expect(ARQUETIPOS_3D.sort()).toEqual(['boveda', 'cutaway', 'estratos', 'flujo', 'mercado', 'recinto', 'sanidad', 'valle']);
+    expect(ARQUETIPOS_3D.sort()).toEqual(['boveda', 'cafe', 'cutaway', 'estratos', 'flujo', 'mercado', 'recinto', 'sanidad', 'valle']);
     ['lamina', 'infografia', 'ficha', 'mirror', 'valle2d'].forEach((k) => {
       expect(ARQUETIPOS_2D).toContain(k);
       expect(ARQUETIPOS[k].dim).toBe('2d');
@@ -42,6 +42,16 @@ describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
     expect(alto.escena).toBe('mercado');
     // equipo humilde → cae a su fallback2d declarado (la infografía del mercado)
     const bajo = resolverMundo('mercado', 'bajo');
+    expect(bajo.modo).toBe('2d');
+    expect(bajo.escena).toBe('infografia');
+  });
+
+  test('el café sube al arquetipo 3D nuevo `cafe` (y degrada a su ficha 2D)', () => {
+    const alto = resolverMundo('cafe', 'alto');
+    expect(alto.modo).toBe('3d');
+    expect(alto.escena).toBe('cafe');
+    // equipo humilde → cae a su fallback2d declarado (la infografía del café)
+    const bajo = resolverMundo('cafe', 'bajo');
     expect(bajo.modo).toBe('2d');
     expect(bajo.escena).toBe('infografia');
   });

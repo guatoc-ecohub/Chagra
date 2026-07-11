@@ -167,15 +167,62 @@ export const MUNDO = {
     entrada: { narra: 'cultivos' },
   },
 
-  // ☕ EL CAFÉ — arquetipo `lamina`: la lámina del cafeto.
+  // ☕ EL CAFÉ — arquetipo SÍ-3D `cafe`: el CAFETAL BAJO SOMBRA, el cultivo
+  //    bandera hecho lugar. El diorama muestra lo que de verdad es una finca
+  //    cafetera andina: la SOMBRA de guamo/nogal que le hace techo al cultivo
+  //    (café de sombra = café con aves, no potrero de sol), los CAFETOS cargados
+  //    de CEREZA roja, el GRANO en sus tres estados SIN tostar en la finca
+  //    (cereza→pergamino→oro), la ROYA (Hemileia vastatrix) y la BROCA
+  //    (Hypothenemus hampei) señaladas para manejarlas con criterio (no recetas
+  //    de veneno), y el BENEFICIO en el rincón (despulpar, fermentar, secar).
+  //    Cada punto es una puerta a una pantalla REAL. En equipo humilde cae a su
+  //    ficha 2D digna (la infografía del café).
   cafe: {
-    escena: 'lamina',
+    escena: 'cafe',
     valle: { tipo: 'cafetal', pos: [3.4, 0, 2.2], escala: 1 },
-    params: { lamina: 'cafeto' },
+    params: {
+      // El diorama tiene defaults propios; aquí los hacemos explícitos y
+      // deterministas (mismos cafetos, sombra y estados del grano).
+      cafetos: [
+        { color: '#3f6f3a', pos: [-0.55, 0, 0.42], cerezas: 6 },
+        { color: '#468637', pos: [0.5, 0, 0.12], cerezas: 5 },
+        { color: '#3f6f3a', pos: [0.02, 0, -0.5], cerezas: 4, roya: true },
+        { color: '#457d38', pos: [-0.78, 0, -0.32], cerezas: 5 },
+      ],
+      sombra: [
+        { pos: [-1.65, 0, -0.95], color: '#4b7a3a', alto: 2.2 }, // guamo (Inga)
+        { pos: [1.7, 0, -0.8], color: '#3f6b39', alto: 2.0 },    // nogal cafetero
+      ],
+      granos: [
+        { estado: 'cereza', color: '#b8342a', pos: [-1.5, 0, 0.75] },
+        { estado: 'pergamino', color: '#d4c199', pos: [-1.15, 0, 1.05] },
+        { estado: 'oro', color: '#9fae5a', pos: [-0.72, 0, 1.2] },
+      ],
+    },
     hotspots: [
-      { id: 'cafe', pos: [], emoji: '☕', label: 'El café, paso a paso', view: 'cafe' },
+      { id: 'grano', pos: [-0.55, 0.9, 0.42], emoji: '☕', label: 'El grano, paso a paso', view: 'cafe' },
+      { id: 'sombra', pos: [-1.65, 2.5, -0.95], emoji: '🌳', label: 'El café bajo sombra', view: 'biodiversidad' },
+      { id: 'roya', pos: [0.02, 0.85, -0.5], emoji: '🍂', label: 'La roya y la broca', view: 'plagas' },
+      { id: 'manejo', pos: [0.5, 0.82, 0.12], emoji: '🐞', label: 'Manejo sin veneno', view: 'biopreparados' },
+      { id: 'beneficio', pos: [1.0, 0.7, 0.55], emoji: '💧', label: 'Despulpar, fermentar, secar', view: 'poscosecha' },
     ],
-    entrada: { narra: 'cafe' },
+    entrada: { zoom: 7.5, narra: 'cafe' },
+    // El gemelo 2D digno: la ficha del café (misma lección, en cifras y notas).
+    fallback2d: {
+      escena: 'infografia',
+      params: {
+        titulo: 'El café de la finca',
+        cifras: [
+          { valor: '1200–1800', unidad: 'm', label: 'la altura donde da mejor el café en la ladera andina' },
+          { valor: '3', unidad: 'estados', label: 'del grano SIN tostar en la finca: cereza → pergamino → oro' },
+        ],
+        notas: [
+          'Siémbrelo bajo sombra de guamo o nogal: cuida el suelo, guarda humedad y le vuelven las aves.',
+          'Roya (el polvillo naranja) y broca (el gorgojo de la cereza) se manejan con criterio: variedad resistente, recoja bien la cereza, trampas y hongos de biocontrol — no con recetas de veneno.',
+          'Beneficio: despulpe el mismo día, fermente en el tanque y seque despacio. El tueste es de otro lado, no del campo.',
+        ],
+      },
+    },
   },
 
   // 🍊 FRUTALES — arquetipo `ficha`: tarjeta de especie foto-secuencial.

@@ -72,6 +72,17 @@ export const ARQUETIPOS = {
     nombre: 'El mercado campesino', clave: 'la cadena corta del campo a la mesa: puestos, procedencia y precio justo',
     ejemplo: 'mercado', tambien: [],
   },
+  // El cafetal bajo sombra: la familia del `recinto` (un lugar que se camina)
+  // hecha CULTIVO BANDERA. Su lección es el café real del país — el arbusto que
+  // vive BAJO el techo de guamo/nogal, la cereza que se vuelve pergamino y oro
+  // (sin tostar en la finca), la roya y la broca manejadas con criterio, y el
+  // beneficio (despulpar, fermentar, secar). En equipo humilde cae a su ficha 2D
+  // (la infografía del café). (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  cafe: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'cafe', espejo: 'mirror',
+    nombre: 'El cafetal bajo sombra', clave: 'el cultivo bandera: café de sombra, el grano cereza→pergamino→oro, roya/broca y beneficio',
+    ejemplo: 'cafe', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {

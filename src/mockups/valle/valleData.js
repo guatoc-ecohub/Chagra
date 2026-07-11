@@ -319,7 +319,7 @@ export const NARRACION = {
     'Aquí está su milpa: maíz, fríjol y calabaza creciendo juntos como las tres hermanas.',
   milpa:
     'La milpa: maíz, fríjol y calabaza sembrados juntos — las tres hermanas que se cuidan entre ellas. El maíz presta el tutor, el fríjol abona y la calabaza tapa el suelo.',
-  cafe: 'El cafetal en la ladera. Estas maticas ya están cargando para la próxima cosecha.',
+  cafe: 'El cafetal bajo sombra. El café vive debajo del guamo, cargado de cereza roja. De ahí sale el grano: cereza, pergamino y oro. En la finca no se tuesta.',
   suelo: 'Las eras y el semillero. La tierra de aquí es la que pide cuidado esta noche.',
   agua: 'La quebrada que baja del monte. De aquí sale el agua para toda la finca.',
   animales: 'El corral. Las gallinas y el ganado que cierran el ciclo del abono.',
