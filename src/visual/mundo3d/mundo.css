@@ -105,6 +105,51 @@
   line-height: 1;
 }
 
+/* ── Placa del animal (corral-espejo): el toque abre nombre + raza + tamaño
+      (+ estado). Misma familia de papel que el hotspot; tocar de nuevo cierra.
+      Piso táctil ≥44px (WCAG 2.5.5) y señal de estado que no es solo color. */
+.mundo-placa {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15em;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.45em 0.9em;
+  font: inherit;
+  color: #2a2016;
+  background: rgba(255, 251, 242, 0.96);
+  border: 2px solid var(--placa-tinte, #a98a5c);
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(40, 30, 10, 0.24);
+}
+.mundo-placa__nombre {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.mundo-placa__meta {
+  font-size: 0.78rem;
+  color: #6a5a44;
+}
+.mundo-placa__estado {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1em 0.6em;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+}
+.mundo-placa__estado--prenada {
+  color: #8a4a5a;
+  background: #f6e3e8;
+}
+.mundo-placa__estado--vendido {
+  color: #5a5248;
+  background: #eee7da;
+}
+
 /* ── Angelita dentro de la escena (billboard) ──────────────────────────── */
 /* Tres capas para tres gestos que NO se pisan: la raíz PULSA al narrar, la capa
    media REBOTA al toque, la cara VOLTEA (scaleX imperativo por frame). */
