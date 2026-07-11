@@ -40,6 +40,7 @@ const LUGARES = [
  * `titulo`, `emoji` y `tinte` verdaderos + la geometría de su lugar.
  */
 export const MUNDOS_VALLE = LUGARES.map((l) => {
+  /** @type {{ titulo?: string, emoji?: string, lema?: string, tinte?: string[] }} */
   const real = MUNDO_BY_ID[l.id] || {};
   return {
     ...l,

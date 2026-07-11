@@ -1,0 +1,233 @@
+/*
+ * mundo3d.css — estilos del framework de mundos-3D (host + hotspots + lámina).
+ * Estética cálida, "menos colapso": una cosa clara a la vez, sin HUD saturado.
+ * Copy y colores de muestra; si se productiza, migra a tokens del design system.
+ */
+
+.mundo3d-root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #10221a;
+  color: #f4efe4;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --m-tinte: #8a5a38;
+  --m-tinte-suave: #f0e2c8;
+}
+
+.mundo3d-escena {
+  position: absolute;
+  inset: 0;
+}
+
+.mundo3d-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  touch-action: none;
+}
+
+/* ── Cargando ── */
+.mundo3d-cargando {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  background: linear-gradient(180deg, #bfe3f0, #6b4a2e);
+  color: #23160c;
+}
+.mundo3d-cargando__pulso {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--m-tinte, #8a5a38);
+  animation: mundo3d-latido 1.4s ease-in-out infinite;
+}
+@keyframes mundo3d-latido {
+  0%, 100% { transform: scale(0.82); opacity: 0.6; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+/* ── Encabezado ── */
+.mundo3d-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.9rem 1rem;
+  background: linear-gradient(180deg, rgba(10, 20, 15, 0.55), rgba(10, 20, 15, 0));
+  pointer-events: none;
+}
+.mundo3d-header > * {
+  pointer-events: auto;
+}
+.mundo3d-titulo {
+  text-align: center;
+  flex: 1;
+}
+.mundo3d-titulo__eyebrow {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.82;
+}
+.mundo3d-titulo h1 {
+  margin: 0.1rem 0 0;
+  font-size: 1.18rem;
+  font-weight: 700;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+.mundo3d-back,
+.mundo3d-voz {
+  border: none;
+  border-radius: 999px;
+  padding: 0.42rem 0.85rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+.mundo3d-voz.on {
+  background: rgba(255, 220, 150, 0.28);
+}
+
+/* ── Hotspot (billboard 3D o botón 2D): botón real, accesible ── */
+.mundo3d-hotspot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 2px solid color-mix(in srgb, var(--m-tinte, #8a5a38) 60%, #fff);
+  border-radius: 999px;
+  padding: 0.34rem 0.7rem 0.34rem 0.4rem;
+  background: rgba(255, 250, 240, 0.94);
+  color: #2a1c10;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+  transition: transform 0.12s ease;
+}
+.mundo3d-hotspot:hover,
+.mundo3d-hotspot:focus-visible {
+  transform: translateY(-2px);
+  outline: 3px solid rgba(255, 214, 128, 0.9);
+  outline-offset: 2px;
+}
+.mundo3d-hotspot__emoji {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--m-tinte, #8a5a38) 22%, #fff);
+  font-size: 1rem;
+}
+.mundo3d-hotspot--2d {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+.mundo3d-hotspot--2d:hover,
+.mundo3d-hotspot--2d:focus-visible {
+  transform: translate(-50%, -50%) translateY(-2px);
+}
+
+/* ── La abeja Angelita flotando en la escena ── */
+.mundo3d-abeja {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  pointer-events: none;
+}
+
+/* ── Lámina 2D (fallback) ── */
+.mundo3d-lamina {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.mundo3d-lamina__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.mundo3d-lamina__hotspots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.mundo3d-lamina__hotspots > * {
+  pointer-events: auto;
+}
+
+.mundo3d-degradado {
+  position: absolute;
+  top: 4.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.5);
+  font-size: 0.8rem;
+}
+
+/* ── Control de "vida del suelo" (puebla/despuebla el corte) ── */
+.mundo3d-control {
+  position: absolute;
+  left: 50%;
+  bottom: 1.1rem;
+  transform: translateX(-50%);
+  width: min(92vw, 420px);
+  padding: 0.8rem 1rem 0.95rem;
+  border-radius: 18px;
+  background: rgba(18, 30, 22, 0.82);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+}
+.mundo3d-control__cab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.mundo3d-control__lbl {
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+.mundo3d-control__etapa {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.16rem 0.6rem;
+  border-radius: 999px;
+  text-transform: capitalize;
+  background: #6b5330;
+  color: #ffe9c2;
+}
+.mundo3d-control__etapa[data-etapa='despertando'] { background: #7a6a25; }
+.mundo3d-control__etapa[data-etapa='vivo'] { background: #2f6a34; color: #d7f5cf; }
+.mundo3d-control__etapa[data-etapa='cansado'] { background: #6a3a2a; color: #ffd9c9; }
+.mundo3d-control input[type='range'] {
+  width: 100%;
+  accent-color: var(--m-tinte, #8a5a38);
+}
+.mundo3d-control__ayuda {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  opacity: 0.82;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mundo3d-cargando__pulso {
+    animation: none;
+  }
+}

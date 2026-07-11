@@ -24,6 +24,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, Float, Stars, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
 import { Colibri } from '../../visual/creatures/Colibri.jsx';
+import { LandmarkPorTipo } from './mundo3dLandmarks.jsx';
 import { MUNDOS_VALLE, MUNDO_VALLE_BY_ID, COSA_DEL_DIA, CLIMAS } from './valleData';
 
 /* Altura del terreno por (x,z): un valle suave con ladera al fondo (+z) donde
@@ -82,7 +83,7 @@ function Cordillera({ color }) {
 
 /* ── La quebrada: una cinta de agua que serpentea por el cauce. ── */
 function Quebrada({ color, viva }) {
-  const ref = useRef();
+  const ref = useRef(null);
   useFrame((state) => {
     if (viva && ref.current) {
       ref.current.material.opacity = 0.72 + Math.sin(state.clock.elapsedTime * 2) * 0.06;
@@ -113,163 +114,6 @@ function Quebrada({ color, viva }) {
   );
 }
 
-/* ── Materiales/paletas de cada landmark de mundo, por `tipo`. ── */
-function LandmarkGeom({ tipo, tinte }) {
-  const [fuerte, suave] = tinte;
-  switch (tipo) {
-    case 'milpa': // maíz: cañas altas con penacho
-      return (
-        <group>
-          {[-0.5, 0, 0.5, -0.25, 0.25].map((dx, i) => (
-            <group key={i} position={[dx, 0, (i % 2) * 0.4 - 0.2]}>
-              <mesh position={[0, 0.7, 0]} castShadow>
-                <cylinderGeometry args={[0.05, 0.08, 1.4, 5]} />
-                <meshStandardMaterial color={fuerte} flatShading />
-              </mesh>
-              <mesh position={[0, 1.45, 0]}>
-                <coneGeometry args={[0.12, 0.4, 5]} />
-                <meshStandardMaterial color="#e7c96b" flatShading />
-              </mesh>
-            </group>
-          ))}
-        </group>
-      );
-    case 'cafetal': // arbustos redondos en hilera
-      return (
-        <group>
-          {[-0.6, -0.2, 0.2, 0.6].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.32, (i % 2) * 0.4]} castShadow>
-              <icosahedronGeometry args={[0.34, 0]} />
-              <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-            </mesh>
-          ))}
-        </group>
-      );
-    case 'era': // eras aradas con surcos (semillero)
-      return (
-        <group>
-          {[-0.35, 0, 0.35].map((dz, i) => (
-            <mesh key={i} position={[0, 0.08, dz]} castShadow receiveShadow>
-              <boxGeometry args={[1.3, 0.16, 0.22]} />
-              <meshStandardMaterial color="#5a3d28" flatShading roughness={1} />
-            </mesh>
-          ))}
-          {[-0.35, 0, 0.35].map((dz, i) => (
-            <mesh key={`b${i}`} position={[0, 0.24, dz]}>
-              <boxGeometry args={[1.2, 0.06, 0.14]} />
-              <meshStandardMaterial color={suave} flatShading />
-            </mesh>
-          ))}
-        </group>
-      );
-    case 'quebrada': // nacimiento: charca + juncos
-      return (
-        <group>
-          <mesh position={[0, 0.06, 0]}>
-            <cylinderGeometry args={[0.55, 0.6, 0.12, 16]} />
-            <meshStandardMaterial color="#3a7fa0" transparent opacity={0.85} metalness={0.4} roughness={0.2} />
-          </mesh>
-          {[-0.3, 0.1, 0.4].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.4, 0.2]}>
-              <cylinderGeometry args={[0.03, 0.03, 0.7, 4]} />
-              <meshStandardMaterial color="#4e7d3f" flatShading />
-            </mesh>
-          ))}
-        </group>
-      );
-    case 'corral': // casita + cerca
-      return (
-        <group>
-          <mesh position={[0, 0.35, 0]} castShadow>
-            <boxGeometry args={[0.9, 0.7, 0.8]} />
-            <meshStandardMaterial color={suave} flatShading />
-          </mesh>
-          <mesh position={[0, 0.85, 0]} castShadow>
-            <coneGeometry args={[0.72, 0.5, 4]} rotation={[0, Math.PI / 4, 0]} />
-            <meshStandardMaterial color={fuerte} flatShading />
-          </mesh>
-          {[-0.9, -0.5, 0.9, 1.3].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.2, 0.9]}>
-              <boxGeometry args={[0.06, 0.4, 0.06]} />
-              <meshStandardMaterial color="#8a6a44" flatShading />
-            </mesh>
-          ))}
-        </group>
-      );
-    case 'huerta': // camas elevadas de la huerta
-      return (
-        <group>
-          {[-0.4, 0.4].map((dx, i) => (
-            <group key={i} position={[dx, 0, 0]}>
-              <mesh position={[0, 0.12, 0]} castShadow>
-                <boxGeometry args={[0.6, 0.24, 1]} />
-                <meshStandardMaterial color="#6b4a30" flatShading />
-              </mesh>
-              <mesh position={[0, 0.32, 0]}>
-                <boxGeometry args={[0.5, 0.18, 0.9]} />
-                <meshStandardMaterial color={fuerte} flatShading />
-              </mesh>
-            </group>
-          ))}
-        </group>
-      );
-    case 'bosque': // arboleda: troncos + copas
-      return (
-        <group>
-          {[
-            [-0.5, 0, 0.9],
-            [0.4, 0.2, 1.15],
-            [0, -0.4, 0.8],
-          ].map(([dx, dz, h], i) => (
-            <group key={i} position={[dx, 0, dz]}>
-              <mesh position={[0, h * 0.35, 0]} castShadow>
-                <cylinderGeometry args={[0.09, 0.12, h * 0.7, 6]} />
-                <meshStandardMaterial color="#6b4a2e" flatShading />
-              </mesh>
-              <mesh position={[0, h * 0.8, 0]} castShadow>
-                <coneGeometry args={[0.5, h * 0.9, 7]} />
-                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-              </mesh>
-            </group>
-          ))}
-        </group>
-      );
-    case 'veleta': // poste con veleta que gira con el viento
-      return <Veleta color={fuerte} />;
-    default:
-      return (
-        <mesh position={[0, 0.3, 0]}>
-          <icosahedronGeometry args={[0.4, 0]} />
-          <meshStandardMaterial color={fuerte} flatShading />
-        </mesh>
-      );
-  }
-}
-
-function Veleta({ color, reducedMotion }) {
-  const ref = useRef();
-  useFrame((state) => {
-    if (ref.current && !reducedMotion) ref.current.rotation.y = state.clock.elapsedTime * 0.4;
-  });
-  return (
-    <group>
-      <mesh position={[0, 0.55, 0]}>
-        <cylinderGeometry args={[0.05, 0.07, 1.1, 6]} />
-        <meshStandardMaterial color="#7c6a4c" flatShading />
-      </mesh>
-      <group ref={ref} position={[0, 1.15, 0]}>
-        <mesh>
-          <boxGeometry args={[0.7, 0.06, 0.06]} />
-          <meshStandardMaterial color={color} flatShading />
-        </mesh>
-        <mesh position={[0.42, 0, 0]}>
-          <coneGeometry args={[0.14, 0.3, 4]} rotation={[0, 0, -Math.PI / 2]} />
-          <meshStandardMaterial color={color} flatShading />
-        </mesh>
-      </group>
-    </group>
-  );
-}
 
 /* ── Un mundo como LUGAR navegable: su geometría + una etiqueta accesible que,
       al tocarse, viaja hasta él (la cámara) y lo selecciona. ── */
@@ -277,11 +121,9 @@ function MundoLugar({ mundo, activo, onEntrar, reducedMotion }) {
   const y = alturaTerreno(mundo.pos[0], mundo.pos[2]);
   return (
     <group position={[mundo.pos[0], y, mundo.pos[2]]} scale={mundo.escala}>
-      {mundo.tipo === 'veleta' ? (
-        <Veleta color={mundo.tinte[0]} reducedMotion={reducedMotion} />
-      ) : (
-        <LandmarkGeom tipo={mundo.tipo} tinte={mundo.tinte} />
-      )}
+      {/* La forma del landmark ya no es un switch inline: la resuelve el
+          registro LANDMARKS[tipo] del framework (mundo3dLandmarks). */}
+      <LandmarkPorTipo tipo={mundo.tipo} tinte={mundo.tinte} reducedMotion={reducedMotion} />
       <Html center distanceFactor={11} position={[0, 1.7, 0]} zIndexRange={[20, 0]}>
         <button
           type="button"
@@ -305,8 +147,8 @@ function MundoLugar({ mundo, activo, onEntrar, reducedMotion }) {
       Toca la señal → onAlerta() (el agente lo dice y ofrece LA acción). ── */
 function Beacon({ onAlerta, reducedMotion }) {
   const ancla = MUNDO_VALLE_BY_ID[COSA_DEL_DIA.anclaMundo];
-  const luz = useRef();
-  const halo = useRef();
+  const luz = useRef(null);
+  const halo = useRef(null);
   useFrame((state) => {
     if (reducedMotion) return;
     const p = (Math.sin(state.clock.elapsedTime * 1.6) + 1) / 2;
@@ -353,7 +195,7 @@ function Beacon({ onAlerta, reducedMotion }) {
 /* ── El compañero: el colibrí (visual-lib) flota sobre el foco activo y es la
       cara del agente. Reusa el SVG canónico de creatures. ── */
 function CompaneroColibri({ foco, reducedMotion }) {
-  const ref = useRef();
+  const ref = useRef(null);
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
@@ -367,7 +209,7 @@ function CompaneroColibri({ foco, reducedMotion }) {
     <group ref={ref} position={[foco.x + 0.9, foco.y + 2.2, foco.z + 0.6]}>
       <Html center distanceFactor={9} zIndexRange={[40, 10]}>
         <div className="valle-colibri" aria-hidden="true">
-          <Colibri size={54} animated={!reducedMotion} />
+          <Colibri size={54} animated={!reducedMotion} className="" />
         </div>
       </Html>
     </group>
@@ -402,7 +244,7 @@ function CamaraViajera({ foco, controls, autoOrbit }) {
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
 function Escena({ clima, focoId, onEntrar, onAlerta, reducedMotion }) {
-  const controls = useRef();
+  const controls = useRef(null);
   const c = CLIMAS[clima];
   const foco = useMemo(() => {
     const m = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;

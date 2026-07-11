@@ -94,6 +94,11 @@ const InventoryPage = lazy(() => import('./pages/InventoryPage'));
 // perezoso) donde los 4 sí-o-sí viven en el espacio. Ruta #/mockups/entrada-3d
 // — sin gate ni sesión (datos de muestra, degrada limpio a SVG sin WebGL).
 const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
+// Mockup dev "Mundo 3D — el suelo vivo": el PROTOTIPO del framework de mundos-3D
+// (DR-MUNDOS-3D-FRAMEWORK). La escena-mundo `cutaway` del suelo — un corte de
+// tierra que se puebla de vida con el score del motor existente. Ruta
+// #/mockups/mundo3d-suelo — sin gate, degrada a lámina SVG en gama baja/sin-WebGL.
+const EntradaMundo3DMockup = lazy(() => import('./mockups/EntradaMundo3D'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -424,6 +429,7 @@ const LoadingFallback = ({ view = null }) => {
 
 const HASH_VIEW_ROUTES = {
   'mockups/entrada-3d': 'mockup_entrada_3d',
+  'mockups/mundo3d-suelo': 'mockup_mundo3d_suelo',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -1295,6 +1301,22 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de mi finca (3D)">
               <EntradaValle3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_suelo':
+        // Mockup "Mundo 3D — el suelo vivo" (prototipo del framework de mundos-3D):
+        // la escena-mundo `cutaway` del suelo. Full-screen, sin gate — decisión
+        // visual. Degrada a lámina SVG sin WebGL/gama baja. Los hotspots re-rutean
+        // a vistas 2D REALES (subsuelo, salud_suelo, cromatografia) vía navigate.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mundo 3D — el suelo vivo">
+              <EntradaMundo3DMockup
+                mundoId="suelo"
+                onBack={() => navigate('dashboard')}
+                onNavigate={navigate}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
