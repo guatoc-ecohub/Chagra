@@ -248,6 +248,40 @@ export const MUNDO = {
     ruta2d: { view: 'hoy_finca' },
     entrada: { narra: 'clima' },
   },
+
+  // 🌽 LA MILPA — las TRES HERMANAS en corte (cutaway). Sobre la superficie, la
+  //    asociación viva (maíz=vara, fríjol que trepa y abona, calabaza que cubre);
+  //    bajo tierra, lo invisible hecho visible: los NÓDULOS de Rhizobium en las
+  //    raíces del fríjol fijando 50–80 kg N/ha (dato verificado). Reusa el
+  //    arquetipo `cutaway` (mismas capas + vida) y enciende el módulo `milpa`.
+  //    Policultivo, no monocultivo: juntas rinden más y se cuidan (push-pull).
+  milpa: {
+    escena: 'cutaway',
+    params: {
+      vida: 0.5,
+      capas: [
+        { nombre: 'superficie viva', color: '#6b4a2e', alto: 0.4, bichos: ['raiz'] },
+        { nombre: 'suelo negro', color: '#3a2a1a', alto: 1.05, bichos: ['raiz', 'hifa'] },
+        { nombre: 'subsuelo', color: '#8a6a44', alto: 0.85, bichos: ['raiz'] },
+      ],
+      // el módulo de las tres hermanas (arriba la asociación, abajo los nódulos)
+      milpa: {
+        maiz: { x: -0.25, alto: 1.7 },
+        frijol: { vueltas: 4 },
+        calabaza: { x: 0.7 },
+        nitrogeno: '50–80 kg N/ha',
+      },
+    },
+    hotspots: [
+      { id: 'milpa', pos: [-0.25, 1.9, 0.9], emoji: '🌽', label: 'La milpa paso a paso', view: 'milpa_cultivo' },
+      { id: 'frijol', pos: [-0.25, 0.1, 1.0], emoji: '🫘', label: 'El fríjol que abona', view: 'asociaciones' },
+      { id: 'asocio', pos: [1.4, 0.5, 0.4], emoji: '🌱', label: 'Qué asocio', view: 'directorio' },
+      { id: 'cuando', pos: [-1.4, 0.5, 0.4], emoji: '🗓️', label: 'Cuándo siembro', view: 'calendario_finca' },
+    ],
+    entrada: { zoom: 7, narra: 'milpa' },
+    // El gemelo 2D digno: el mismo corte con las tres hermanas y los nódulos.
+    fallback2d: { escena: 'mirror' },
+  },
 };
 
 /** Ids de todos los mundos registrados. */
