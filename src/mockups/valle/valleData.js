@@ -327,4 +327,6 @@ export const NARRACION = {
   clima: 'Desde aquí se lee el cielo: lo que viene, y qué conviene hacer con la finca.',
   mercado:
     'La plaza campesina. Aquí llega su cosecha derecho a la mesa: venda directo, con su sello y a precio justo.',
+  pisos:
+    'Suba por la montaña: del cálido al páramo, cada piso con lo suyo. Arriba manda el frailejón, que le peina el agua a la niebla y la entrega despacio al suelo. Por eso el páramo se cuida, no se ara.',
 };

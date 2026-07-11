@@ -180,29 +180,56 @@ function Papa() {
   );
 }
 
-/* Frailejón (páramo): tronco de hojas viejas + roseta plateada que sube. NO es
-   cultivo: es conservación (el páramo se cuida, no se ara). */
+/* Frailejón (Espeletia, Asteraceae — páramo): roseta CAULESCENTE, la forma que
+   lo define (Bitácora de flora, Inst. Humboldt): tronco de hojas viejas
+   marcescentes (columna gris-parda, no leña) + roseta de hojas gruesas y
+   velludas que suben, PLATEADAS por la pubescencia que las abriga del frío y la
+   radiación, coronadas por capítulos AMARILLOS (son girasoles de altura). Ref.
+   E. grandiflora (Chingaza/Sumapaz), E. hartwegiana (nevados). NO es cultivo: es
+   conservación (el páramo se cuida, no se ara). */
 function Frailejon() {
   return (
     <group>
+      {/* tronco: columna de hojas muertas persistentes (marcescencia), fibrosa */}
       <mesh position={[0, 0.32, 0]}>
         <cylinderGeometry args={[0.1, 0.13, 0.64, 7]} />
-        <meshLambertMaterial color="#7a6a52" flatShading />
+        <meshLambertMaterial color="#6f5e44" flatShading />
       </mesh>
-      {Array.from({ length: 8 }, (_, k) => (
+      {/* roseta: hojas apuntando arriba-afuera, plateadas por la pubescencia */}
+      {Array.from({ length: 10 }, (_, k) => (
         <mesh
           key={k}
-          position={[Math.cos((k / 8) * Math.PI * 2) * 0.11, 0.66, Math.sin((k / 8) * Math.PI * 2) * 0.11]}
-          rotation={[Math.PI * 0.28, (k / 8) * Math.PI * 2, 0]}
+          position={[Math.cos((k / 10) * Math.PI * 2) * 0.11, 0.66, Math.sin((k / 10) * Math.PI * 2) * 0.11]}
+          rotation={[Math.PI * 0.26, (k / 10) * Math.PI * 2, 0]}
         >
-          <coneGeometry args={[0.05, 0.34, 4]} />
-          <meshLambertMaterial color="#9fb090" flatShading />
+          <coneGeometry args={[0.05, 0.36, 4]} />
+          <meshLambertMaterial color="#b3bda0" flatShading />
         </mesh>
       ))}
+      {/* cogollo: las hojas nuevas, las más blancas (máxima pubescencia) */}
       <mesh position={[0, 0.78, 0]}>
         <coneGeometry args={[0.11, 0.2, 6]} />
-        <meshLambertMaterial color="#c7d2bd" flatShading />
+        <meshLambertMaterial color="#cdd4c2" flatShading />
       </mesh>
+      {/* capítulos amarillos (Asteraceae): flores sobre tallitos que asoman de la
+          roseta — el rasgo que faltaba, y el que pinta de amarillo el páramo */}
+      {[0, 1, 2, 3].map((k) => {
+        const a = (k / 4) * Math.PI * 2 + 0.6;
+        const fx = Math.cos(a) * 0.19;
+        const fz = Math.sin(a) * 0.19;
+        return (
+          <group key={`flor-${k}`} position={[fx, 0.74, fz]}>
+            <mesh position={[0, 0.07, 0]}>
+              <cylinderGeometry args={[0.008, 0.008, 0.14, 4]} />
+              <meshLambertMaterial color="#7f8a48" flatShading />
+            </mesh>
+            <mesh position={[0, 0.15, 0]} scale={[1, 0.5, 1]}>
+              <sphereGeometry args={[0.045, 7, 5]} />
+              <meshLambertMaterial color="#e6bf2e" flatShading />
+            </mesh>
+          </group>
+        );
+      })}
     </group>
   );
 }
@@ -231,7 +258,7 @@ function Niebla({ x, y, z, r = 0.5 }) {
 }
 
 function DioramaPisos({ params, reducedMotion }) {
-  const pisos = params?.pisos || [];
+  const pisos = useMemo(() => params?.pisos || [], [params?.pisos]);
   // Cultivos por terraza, con aire (2 por piso, jitter determinista).
   const siembra = useMemo(() => {
     const out = [];
