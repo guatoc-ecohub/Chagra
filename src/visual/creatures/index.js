@@ -11,6 +11,15 @@
  * Props comunes: { size, className, inline, animated, title }.
  */
 export { AbejaAngelita } from './AbejaAngelita.jsx';
+/* El CRUCE 2D→3D de Angelita (overlay DOM puro, cero three — seguro en el
+   bundle base). El host de mundos lo monta al entrar/volver; la señal
+   `avisarSalidaAbeja` avisa al mesh que la abeja sale (ver AbejaTransicion.jsx,
+   sección "CABLEADO EN EL HOST"). */
+export {
+  default as AbejaTransicion, AlMontarEscena,
+  CRUCE_ATRAPA_MS, CRUCE_ENTRAR_MS, CRUCE_VOLVER_MS, CRUCE_SUELTA_MS,
+} from './AbejaTransicion.jsx';
+export { avisarSalidaAbeja, resetSalidaAbeja, useSalidaAbeja } from './senalSalidaAbeja.js';
 export { Colibri } from './Colibri.jsx';
 export { Lombriz } from './Lombriz.jsx';
 export { Mariposa } from './Mariposa.jsx';
