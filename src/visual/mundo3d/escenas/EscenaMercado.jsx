@@ -23,6 +23,8 @@
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import AnimalMomento from './AnimalMomento.jsx';
+import { normalizarAnimales } from './CorralVivo.jsx';
 import { faunaDeMundo } from '../faunaFuncional.js';
 import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
@@ -181,11 +183,19 @@ function MataCampo({ pos, color = '#4e8f3f' }) {
   );
 }
 
-function Diorama({ params, reducedMotion, fauna }) {
+function Diorama({ params, reducedMotion, tier, fauna }) {
   const puestos = params?.puestos || [
     { color: '#c96a2f', pos: [-0.85, 0, 0.2] },
     { color: '#3f8f4e', pos: [0.9, 0, -0.1] },
   ];
+  // Los VENDIDOS del hato LLEGAN al mercado (audit §5a.4): el mismo dato del
+  // corral, ahora en cuerpo. Bajan caminando por la ruta campo→plaza (desde la
+  // parcela del fondo hasta el frente de los puestos). Normalizamos para heredar
+  // silueta/pelaje/tamaño reales; la posición aquí es la de la ruta, no el corral.
+  const llegando = useMemo(
+    () => normalizarAnimales((params?.animales || []).filter((a) => a.estado === 'vendido')),
+    [params?.animales],
+  );
   const canastos = params?.canastos || [
     { producto: 'tomate', color: '#d24b3a', pos: [-0.85, 0, 0.75] },
     { producto: 'papa', color: '#c9a15a', pos: [0.55, 0, 0.7] },
@@ -249,6 +259,23 @@ function Diorama({ params, reducedMotion, fauna }) {
           ~0.45 sobre el piso sin mesa que la sostuviera). */}
       <Balanza pos={[0.15, 0, 0.55]} />
 
+      {/* los VENDIDOS que llegan del corral: bajan por la ruta y se posan al
+          frente de los puestos, cada uno con su NOMBRE (el dato viajó con él). */}
+      {llegando.map((a, i) => {
+        const x = 0.1 + (i - (llegando.length - 1) / 2) * 0.6;
+        return (
+          <AnimalMomento
+            key={a.id}
+            animal={a}
+            modo="llega"
+            origen={[x, 0, -2.1]}
+            destino={[x, 0, 0.4]}
+            reducedMotion={reducedMotion}
+            tier={tier}
+          />
+        );
+      })}
+
       {/* la fauna que anima la feria (polinizadores de puesto y plaza) */}
       <Fauna items={fauna} reducedMotion={reducedMotion} />
     </group>
@@ -262,7 +289,12 @@ export default function EscenaMercado(props) {
   const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.5, 0] }}>
-      <Diorama params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} />
+      <Diorama
+        params={props.params}
+        reducedMotion={props.reducedMotion}
+        tier={props.tier}
+        fauna={fauna}
+      />
     </EscenaBase3D>
   );
 }

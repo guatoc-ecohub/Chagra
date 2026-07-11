@@ -23,6 +23,35 @@
  * (mundosFinca.js) en `resolverTinte`/`tituloMundo` (mundo host).
  */
 
+/*
+ * EL HATO DE MUESTRA — UNA sola fuente para DOS mundos (consistencia cross-mundo,
+ * audit §5a.4). El corral (`animales`) y el mercado lo leen igual: así un animal
+ * VENDIDO (Camilo) queda como huella-fantasma en el corral y a la vez llega
+ * caminando al mercado — el mismo dato, dos mundos. Aquí también viven los
+ * MOMENTOS de muestra: una cría que `nace` y una gallina que se despide con
+ * respeto (`muerte`). Interfaz lista para cablear el hato real de farmOS después
+ * (misma forma; el `estado` real manda el momento).
+ */
+const HATO_MUESTRA = [
+  { especie: 'cerdo', nombre: 'Petunia', raza: 'zungo', tamano: 'grande', estado: 'preñada' },
+  { especie: 'cerdo', nombre: 'Canelo', raza: 'duroc', tamano: 'mediano', estado: 'sano' },
+  { especie: 'cerdo', nombre: 'Rosita', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
+  { especie: 'cerdo', nombre: 'Manchas', raza: 'sanpedreño', tamano: 'pequeño', estado: 'sano' },
+  { especie: 'cerdo', nombre: 'Tocineta', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
+  { especie: 'vaca', nombre: 'Lola', raza: 'normando', tamano: 'grande', estado: 'sano' },
+  // Camilo: VENDIDO. En el corral queda su huella; en el mercado llega en cuerpo.
+  { especie: 'vaca', nombre: 'Camilo', raza: 'cebú', tamano: 'grande', estado: 'vendido' },
+  { especie: 'gallina', nombre: 'Turuleca', raza: 'campesina', tamano: 'pequeño', estado: 'sano' },
+  { especie: 'gallina', nombre: 'Canela', raza: 'campesina', tamano: 'mediano', estado: 'sano' },
+  { especie: 'gallina', nombre: 'Carlota', raza: 'ponedora', tamano: 'mediano', estado: 'sano' },
+  { especie: 'oveja', nombre: 'Nube', raza: 'criolla', tamano: 'mediano', estado: 'sano' },
+  { especie: 'oveja', nombre: 'Copito', raza: 'criolla', tamano: 'pequeño', estado: 'sano' },
+  // Lucero: NACE — una cría de oveja aparece junto a Nube y Copito (crece con brillo).
+  { especie: 'oveja', nombre: 'Lucero', raza: 'criolla', tamano: 'pequeño', estado: 'nace' },
+  // Aurelia: se despide con respeto — queda su nombre y una flor (MUERTE, sin drama).
+  { especie: 'gallina', nombre: 'Aurelia', raza: 'campesina', tamano: 'mediano', estado: 'muerte' },
+];
+
 export const MUNDO = {
   // ── SÍ-3D: el espacio mismo enseña ───────────────────────────────────────
 
@@ -89,28 +118,18 @@ export const MUNDO = {
   //    por perfil (como hoy). El corral es ESPEJO del dato (FASE 1 §5a+§5c):
   //    cada animal REAL con su nombre, raza, tamaño y estado — la especie da la
   //    silueta, el tamaño la escala, la raza el pelaje, el estado se ve (preñada
-  //    con señal, vendido como huella translúcida). Interfaz para cablear el
-  //    hato real de farmOS aquí mismo (misma forma; `pos` es opcional — sin él,
-  //    los sitios salen solos). MUESTRA de 12 mientras llega el dato vivo:
+  //    con señal, vendido como huella translúcida). Y el CAMBIO de estado es un
+  //    MOMENTO (audit §5a.4): la cría que `nace` crece con un brillo, el que
+  //    `muere` se retira con respeto (piedrita con flor), el `vendido` deja su
+  //    huella aquí y llega en cuerpo al mercado. Interfaz para cablear el hato
+  //    real de farmOS aquí mismo (misma forma; `pos` es opcional — sin él, los
+  //    sitios salen solos). MUESTRA compartida con el mercado (mismo dato):
   animales: {
     escena: 'recinto',
     valle: { tipo: 'corral', pos: [-4.6, 0, -1.8], escala: 1 },
     gate: 'animales',
     params: {
-      animales: [
-        { especie: 'cerdo', nombre: 'Petunia', raza: 'zungo', tamano: 'grande', estado: 'preñada' },
-        { especie: 'cerdo', nombre: 'Canelo', raza: 'duroc', tamano: 'mediano', estado: 'sano' },
-        { especie: 'cerdo', nombre: 'Rosita', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
-        { especie: 'cerdo', nombre: 'Manchas', raza: 'sanpedreño', tamano: 'pequeño', estado: 'sano' },
-        { especie: 'cerdo', nombre: 'Tocineta', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
-        { especie: 'vaca', nombre: 'Lola', raza: 'normando', tamano: 'grande', estado: 'sano' },
-        { especie: 'vaca', nombre: 'Camilo', raza: 'cebú', tamano: 'grande', estado: 'vendido' },
-        { especie: 'gallina', nombre: 'Turuleca', raza: 'campesina', tamano: 'pequeño', estado: 'sano' },
-        { especie: 'gallina', nombre: 'Canela', raza: 'campesina', tamano: 'mediano', estado: 'sano' },
-        { especie: 'gallina', nombre: 'Carlota', raza: 'ponedora', tamano: 'mediano', estado: 'sano' },
-        { especie: 'oveja', nombre: 'Nube', raza: 'criolla', tamano: 'mediano', estado: 'sano' },
-        { especie: 'oveja', nombre: 'Copito', raza: 'criolla', tamano: 'pequeño', estado: 'sano' },
-      ],
+      animales: HATO_MUESTRA,
     },
     hotspots: [
       { id: 'todos', pos: [0, 0.5, 1.2], emoji: '🐮', label: 'Todos los animales', view: 'animales' },
@@ -279,6 +298,9 @@ export const MUNDO = {
         { producto: 'maiz', color: '#e7c451', pos: [1.15, 0, 0.35] },
         { producto: 'cafe', color: '#7a4a24', pos: [-0.35, 0, 0.95] },
       ],
+      // EL MISMO HATO del corral (audit §5a.4): el mercado filtra los VENDIDOS y
+      // los hace LLEGAR caminando por la ruta campo→plaza. Un dato, dos mundos.
+      animales: HATO_MUESTRA,
     },
     hotspots: [
       { id: 'vender', pos: [-0.85, 1.25, 0.2], emoji: '🤝', label: 'Vender y comprar', view: 'mercado' },
