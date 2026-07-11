@@ -24,6 +24,7 @@ import EscenaBase3D from './EscenaBase3D.jsx';
 import { Lombriz } from '../../creatures/Lombriz.jsx';
 import { Escarabajo } from '../../creatures/Escarabajo.jsx';
 import { Mariposa } from '../../creatures/Mariposa.jsx';
+import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
 const ANCHO = 4.4;
 const PROF = 2.2;
@@ -201,7 +202,7 @@ function Calabaza({ base }) {
       {hojas.map((h) => (
         <mesh key={`${h.p[0]}-${h.p[2]}`} position={h.p} rotation={[-Math.PI / 2, 0, h.rot]}>
           <coneGeometry args={[h.r, 0.06, 5]} />
-          <meshLambertMaterial color="#5f8a3f" flatShading />
+          <meshLambertMaterial color={PALETA.follaje} flatShading />
         </mesh>
       ))}
       {/* el fruto: esfera achatada, color ahuyama */}
@@ -399,7 +400,7 @@ function Diorama({ params, reducedMotion }) {
 
 export default function EscenaCutaway(props) {
   const alto = (props.params?.capas || []).reduce((s, c) => s + (c.alto || 0.6), 0) || 1.5;
-  const cielo = { fondo: '#e7d7ba', cielo: '#f3e6cc', suelo: '#7a5a38', intensidad: 1.05 };
+  const cielo = CIELOS.tierra;
   return (
     <EscenaBase3D
       {...props}

@@ -27,27 +27,10 @@ import * as THREE from 'three';
 import { AbejaEscena } from './useEntradaAbeja.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
 import useHaptics from '../useHaptics.js';
-
-/* Cielo cálido "acuarela" por defecto (la estética heredada del valle). El
-   arquetipo puede pasar su propio `cielo` para teñir su ambiente. */
-const CIELO_DEFAULT = { fondo: '#ece0c7', cielo: '#f5e9d2', suelo: '#b49873', intensidad: 1 };
-
-/* La hora dorada del valle (CLIMAS.dorada de valleData): la atmósfera base que
-   TODOS los mundos heredan. El `cielo` propio del arquetipo solo la tiñe. */
-const ATMOSFERA = {
-  fondo: '#f2d9a8', // fondo cálido de tarde
-  cielo: '#f7c66b', // domo dorado (hemisferio, arriba)
-  suelo: '#8a6b4a', // rebote tierra (hemisferio, abajo)
-  luz: '#ffd79a', // el sol bajo, dorado (direccional principal)
-  relleno: '#9db8d9', // relleno frío de cielo abierto (direccional opuesta, tenue)
-  niebla: '#f0c98d', // la niebla dorada del valle
-  sombra: '#3a2a18', // tinte de las sombras de contacto
-};
-
-/* Mezcla dos hex hacia `t` (0 = a, 1 = b). Barato y memoizado por quien llama. */
-function mezclar(a, b, t) {
-  return `#${new THREE.Color(a).lerp(new THREE.Color(b), t).getHexString()}`;
-}
+/* La dirección de arte compartida (hora dorada + cielos por familia) vive en
+   un módulo propio: los arquetipos eligen su CIELOS.<familia>, esta base la
+   mezcla hacia ATMOSFERA. Una sola fuente, cero hexes sueltos. */
+import { ATMOSFERA, CIELOS, mezclar } from '../atmosferaMadre.js';
 
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
@@ -67,7 +50,7 @@ function Contenido({
   // del valle (B6 — hoy entrar a un mundo "aplana" porque cada escena fija un
   // cielo frío propio). Memoizado: THREE.Color solo cuando cambia el cielo.
   const c = useMemo(() => {
-    const propio = cielo || CIELO_DEFAULT;
+    const propio = { ...CIELOS.neutro, ...(cielo || {}) };
     return {
       fondo: mezclar(propio.fondo, ATMOSFERA.fondo, 0.6),
       cielo: mezclar(propio.cielo, ATMOSFERA.cielo, 0.6),
@@ -82,8 +65,8 @@ function Contenido({
   // B11: antes era un Vector3 nuevo POR RENDER — basura de GC en el hilo
   // caliente); la abeja lo persigue con `lerp` en useEntradaAbeja.
   const hAct = activo && hotspots ? hotspots.find((x) => x.id === activo) : null;
-  const p = hAct ? hAct.pos : centro;
-  const foco = useMemo(() => new THREE.Vector3(p[0], p[1], p[2]), [p[0], p[1], p[2]]);
+  const [px, py, pz] = hAct ? hAct.pos : centro;
+  const foco = useMemo(() => new THREE.Vector3(px, py, pz), [px, py, pz]);
 
   return (
     <>

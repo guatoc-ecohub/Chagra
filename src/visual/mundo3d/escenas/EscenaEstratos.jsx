@@ -18,6 +18,7 @@
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
 /* Fauna POR ESTRATO: la verticalidad manda. El colibrí arriba (dosel), la
    mariposa a media altura (arbustos/herbáceas) y el escarabajo a ras (rastrero/
@@ -43,7 +44,7 @@ function Planta({ x, z, alto, color, r }) {
     <group position={[x, 0, z]}>
       <mesh position={[0, alto * 0.35, 0]}>
         <cylinderGeometry args={[0.06, 0.09, alto * 0.7, 5]} />
-        <meshLambertMaterial color="#6b4a2e" flatShading />
+        <meshLambertMaterial color={PALETA.tierra} flatShading />
       </mesh>
       <mesh position={[0, alto * 0.78, 0]}>
         <coneGeometry args={[r, alto * 0.7, 7]} />
@@ -139,11 +140,11 @@ function Cafeto() {
     <group>
       <mesh position={[0, 0.13, 0]}>
         <cylinderGeometry args={[0.035, 0.05, 0.26, 5]} />
-        <meshLambertMaterial color="#6b4a2e" flatShading />
+        <meshLambertMaterial color={PALETA.tierra} flatShading />
       </mesh>
       <mesh position={[0, 0.42, 0]} scale={[1, 0.95, 1]}>
         <sphereGeometry args={[0.28, 7, 6]} />
-        <meshLambertMaterial color="#3f6f3a" flatShading />
+        <meshLambertMaterial color={PALETA.follajeOscuro} flatShading />
       </mesh>
       {[0, 1, 2, 3].map((k) => (
         <mesh
@@ -164,7 +165,7 @@ function Papa() {
     <group>
       <mesh position={[0, 0.14, 0]} scale={[1, 0.55, 1]}>
         <sphereGeometry args={[0.3, 7, 6]} />
-        <meshLambertMaterial color="#5f8a3f" flatShading />
+        <meshLambertMaterial color={PALETA.follaje} flatShading />
       </mesh>
       <mesh position={[0.22, 0.11, 0.14]} scale={[1, 0.5, 1]}>
         <sphereGeometry args={[0.18, 6, 5]} />
@@ -326,11 +327,11 @@ function DioramaPisos({ params, reducedMotion }) {
       <group position={[1.85, pisoY(2), pisoZ(2) + 0.2]}>
         <mesh position={[0, 0, 0]}>
           <cylinderGeometry args={[0.016, 0.016, 0.9, 5]} />
-          <meshBasicMaterial color="#d9a13b" transparent opacity={0.5} />
+          <meshBasicMaterial color={PALETA.ambar} transparent opacity={0.5} />
         </mesh>
         <mesh position={[0, 0.55, 0]}>
           <coneGeometry args={[0.08, 0.2, 5]} />
-          <meshBasicMaterial color="#d9a13b" transparent opacity={0.55} />
+          <meshBasicMaterial color={PALETA.ambar} transparent opacity={0.55} />
         </mesh>
       </group>
 
@@ -342,9 +343,7 @@ function DioramaPisos({ params, reducedMotion }) {
 
 export default function EscenaEstratos(props) {
   const esPisos = Array.isArray(props.params?.pisos);
-  const cielo = esPisos
-    ? { fondo: '#cfe0e6', cielo: '#e8f0ee', suelo: '#6b5236', intensidad: 1.12 }
-    : { fondo: '#d7e6c9', cielo: '#eaf2df', suelo: '#5f4a2e', intensidad: 1.1 };
+  const cielo = esPisos ? CIELOS.ladera : CIELOS.sotobosque;
   const camara = esPisos ? { position: [4.4, 3.7, 6.4], fov: 46 } : { position: [3.5, 3, 6], fov: 44 };
   const centro = esPisos ? [0, 1.95, -0.4] : [0, 1.4, 0];
   return (

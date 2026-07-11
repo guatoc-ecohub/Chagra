@@ -19,6 +19,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
 /* La vida del agua, por criterio ecológico: mariposas revoloteando sobre la
    quebrada, un colibrí en las flores de la ribera (junto a la ronda de monte),
@@ -86,11 +87,11 @@ function Arbolito({ pos, escala = 1 }) {
     <group position={pos} scale={escala}>
       <mesh position={[0, 0.18, 0]}>
         <cylinderGeometry args={[0.05, 0.07, 0.36, 6]} />
-        <meshLambertMaterial color="#7a5a38" flatShading />
+        <meshLambertMaterial color={PALETA.madera} flatShading />
       </mesh>
       <mesh position={[0, 0.5, 0]}>
         <coneGeometry args={[0.28, 0.5, 7]} />
-        <meshLambertMaterial color="#3f6f3a" flatShading />
+        <meshLambertMaterial color={PALETA.follajeOscuro} flatShading />
       </mesh>
       <mesh position={[0, 0.78, 0]}>
         <coneGeometry args={[0.18, 0.34, 7]} />
@@ -130,7 +131,7 @@ function Bocatoma({ curva3, t = 0.68, color }) {
     <group position={[p.x, p.y, p.z]}>
       <mesh position={[0, 0.1, 0]}>
         <boxGeometry args={[0.42, 0.3, 0.42]} />
-        <meshLambertMaterial color="#a8a094" flatShading />
+        <meshLambertMaterial color={PALETA.concreto} flatShading />
       </mesh>
       <mesh position={[0, 0.26, 0]}>
         <boxGeometry args={[0.34, 0.06, 0.34]} />
@@ -148,15 +149,15 @@ function PuntoCuidado({ curva3, t = 0.46, lado = 0.8 }) {
     <group position={[p.x + lado * 0.4, p.y - 0.02, p.z + lado]}>
       <mesh position={[0, 0.16, 0]}>
         <cylinderGeometry args={[0.14, 0.14, 0.32, 10]} />
-        <meshLambertMaterial color="#8b8b8b" flatShading />
+        <meshLambertMaterial color={PALETA.lamina} flatShading />
       </mesh>
       <mesh position={[0.28, 0.3, 0]}>
         <cylinderGeometry args={[0.02, 0.02, 0.6, 5]} />
-        <meshLambertMaterial color="#7a5a38" />
+        <meshLambertMaterial color={PALETA.madera} />
       </mesh>
       <mesh position={[0.28, 0.62, 0]}>
         <boxGeometry args={[0.3, 0.2, 0.04]} />
-        <meshLambertMaterial color="#d9a13b" flatShading />
+        <meshLambertMaterial color={PALETA.ambar} flatShading />
       </mesh>
     </group>
   );
@@ -186,12 +187,12 @@ function Cultivo({ pos = [2.3, -0.3, -0.55], surcos = 4, desde, color }) {
       <group position={[pos[0], pos[1], pos[2]]}>
         <mesh position={[0, 0.06, 0]}>
           <boxGeometry args={[1.5, 0.16, 1.1]} />
-          <meshLambertMaterial color="#6b4a2e" flatShading />
+          <meshLambertMaterial color={PALETA.tierra} flatShading />
         </mesh>
         {surcosArr.map((i) => (
           <mesh key={i} position={[0, 0.17, -0.42 + (0.84 * i) / Math.max(1, surcos - 1)]}>
             <boxGeometry args={[1.3, 0.1, 0.14]} />
-            <meshLambertMaterial color="#5f8a3f" flatShading />
+            <meshLambertMaterial color={PALETA.follaje} flatShading />
           </mesh>
         ))}
       </group>
@@ -225,7 +226,7 @@ function Diorama({ params, tinte, reducedMotion }) {
       {/* el tanque que recibe el agua (donde termina la curva) */}
       <mesh position={[fin.x + 0.1, fin.y + 0.05, fin.z]}>
         <cylinderGeometry args={[0.55, 0.6, 0.7, 18]} />
-        <meshLambertMaterial color="#9a8b74" flatShading />
+        <meshLambertMaterial color={PALETA.piedra} flatShading />
       </mesh>
       <mesh position={[fin.x + 0.1, fin.y + 0.25, fin.z]}>
         <cylinderGeometry args={[0.5, 0.5, 0.12, 18]} />
@@ -250,7 +251,7 @@ function Diorama({ params, tinte, reducedMotion }) {
 }
 
 export default function EscenaFlujo(props) {
-  const cielo = { fondo: '#d9e8ec', cielo: '#eaf3f5', suelo: '#7f9270', intensidad: 1.1 };
+  const cielo = CIELOS.agua;
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.9, 0.3] }}>
       <Diorama params={props.params} tinte={props.tinte} reducedMotion={props.reducedMotion} />

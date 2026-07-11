@@ -29,6 +29,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
 const R_BOVEDA = 9;
 
@@ -263,15 +264,19 @@ const PISOS_DEF = [
    llegaba el hielo (retroceso glaciar) — nota de conciencia, esperanza no colapso. */
 function Montana({ pisos = PISOS_DEF, glaciar = {} }) {
   const bandas = useMemo(() => {
+    // for-loop plano (sin closure que capture los acumuladores): la regla
+    // react-hooks/immutability prohíbe reasignar variables desde callbacks.
+    const out = [];
     let y = 0;
     let rAbajo = pisos[0]?.r0 ?? 2.4;
-    return pisos.map((p, i) => {
+    for (let i = 0; i < pisos.length; i += 1) {
+      const p = pisos[i];
       const rArriba = p.r1 ?? rAbajo * 0.7;
-      const b = { key: i, nombre: p.nombre, color: p.color, h: p.h, rAbajo, rArriba, y };
+      out.push({ key: i, nombre: p.nombre, color: p.color, h: p.h, rAbajo, rArriba, y });
       y += p.h;
       rAbajo = rArriba;
-      return b;
-    });
+    }
+    return out;
   }, [pisos]);
   const cima = bandas.reduce((acc, b) => acc + b.h, 0);
   const rCima = bandas[bandas.length - 1]?.rArriba ?? 0.42;
@@ -297,7 +302,7 @@ function Montana({ pisos = PISOS_DEF, glaciar = {} }) {
       {/* la línea ámbar: hasta aquí llegaba el hielo (cuidado, no alarma) */}
       <mesh position={[0, yAntes, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[rAntes, 0.028, 6, 24]} />
-        <meshBasicMaterial color="#d9a13b" transparent opacity={0.75} />
+        <meshBasicMaterial color={PALETA.ambar} transparent opacity={0.75} />
       </mesh>
     </group>
   );
@@ -352,12 +357,9 @@ function Diorama({ params, reducedMotion }) {
 export default function EscenaBoveda(props) {
   const hora = props.params?.hora ?? 0.62;
   const { horizonte } = paletaCielo(hora);
-  const cielo = {
-    fondo: `#${horizonte.getHexString()}`,
-    cielo: '#eef4f6',
-    suelo: '#6f7f52',
-    intensidad: 1.05,
-  };
+  // El fondo lo dicta la HORA real (veracidad); el hemisferio viene del preset
+  // alba de la atmósfera madre (marfil tibio, ya no blanco frío).
+  const cielo = { ...CIELOS.alba, fondo: `#${horizonte.getHexString()}` };
   return (
     <EscenaBase3D
       {...props}
