@@ -3,35 +3,49 @@
  *
  * El DR (§4.4, §6) pide que cada arquetipo sea SOLO su diorama; el resto (Canvas,
  * luz frugal, cámara, hotspots, la abeja) se hereda. Aquí vive ese resto: un
- * `<Canvas>` austero (DPR ≤ 1.5, SIN sombras, SIN post-proceso, `frameloop`
- * a demanda si hay reduced-motion), luz de ambiente + hemisferio (barata, para
- * `MeshLambert`/`MeshBasic`), `OrbitControls` acotado, los `hotspots` como
- * botones-billboard accesibles que re-rutean a vistas 2D reales, y Angelita con
- * su coreografía compartida. El arquetipo pasa su geometría como `children`.
+ * `<Canvas>` austero (DPR ≤ 1.5, SIN sombras, `frameloop` a demanda si hay
+ * reduced-motion), la ATMÓSFERA-MADRE compartida con el valle (misma paleta
+ * de clima, mismo sol direccional, misma niebla — `atmosferaMadre.js`, para
+ * que pasar del valle a un mundo no "aplane" el look), `OrbitControls`
+ * acotado, los `hotspots` como botones-billboard accesibles que re-rutean a
+ * vistas 2D reales, y Angelita con su coreografía compartida. El arquetipo
+ * pasa su geometría como `children`.
+ *
+ * Post-proceso: SOLO un bloom sutil en tier 'alto' (gate estricto: medio/bajo
+ * ni descargan el chunk; `reducedMotion` también lo apaga). El resto de tiers
+ * conserva el render directo de siempre.
  *
  * CONTRATO uniforme (idéntico para cutaway/flujo/recinto/estratos):
  *   { params, hotspots, entrada, tinte, reducedMotion, onHotspot, onSalir,
  *     animo, energia, cielo?, camara?, children }
  */
-import { Suspense, useRef, useState } from 'react';
+import { Suspense, lazy, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaEscena } from './useEntradaAbeja.jsx';
+import { decidirTier } from '../deviceTier.js';
+import {
+  armonizarCielo, nieblaDiorama, bloomMadre, SOL_POSICION,
+} from '../atmosferaMadre.js';
 
-/* Cielo cálido "acuarela" por defecto (la estética heredada del valle). El
-   arquetipo puede pasar su propio `cielo` para teñir su ambiente. */
-const CIELO_DEFAULT = { fondo: '#ece0c7', cielo: '#f5e9d2', suelo: '#b49873', intensidad: 1 };
+/* El bloom es perezoso: tier medio/bajo jamás pagan sus bytes. */
+const BloomSutil = lazy(() => import('./BloomSutil.jsx'));
 
 function Contenido({
-  params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, children,
+  params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, climaId, bloomOn,
+  animo, energia, children,
 }) {
   const controls = useRef(null);
   const [activo, setActivo] = useState(null);
-  const c = cielo || CIELO_DEFAULT;
   const zoom = entrada?.zoom ?? 6.5;
   const acento = (tinte && tinte[0]) || '#3f8f4e';
   const centro = entrada?.centro || [0, (params?.alto ?? 1.1) * 0.5, 0];
+
+  /* La atmósfera-madre: el cielo propio del arquetipo, armonizado con el
+     clima del valle (misma hora, misma temperatura de luz, misma niebla). */
+  const atm = useMemo(() => armonizarCielo(cielo, climaId), [cielo, climaId]);
+  const fog = useMemo(() => nieblaDiorama(zoom, atm), [zoom, atm]);
 
   // foco = el hotspot activo (o el centro del diorama). Barato: un Vector3 por
   // render; la abeja lo persigue con `lerp` en useEntradaAbeja.
@@ -41,11 +55,17 @@ function Contenido({
 
   return (
     <>
-      <color attach="background" args={[c.fondo]} />
-      <hemisphereLight intensity={0.95 * c.intensidad} color={c.cielo} groundColor={c.suelo} />
-      <ambientLight intensity={0.45 * c.intensidad} color={c.cielo} />
+      <color attach="background" args={[atm.fondo]} />
+      <fog attach="fog" args={[fog.color, fog.near, fog.far]} />
+      {/* Los mismos ratios de luz del valle (hemisferio/ambiente/sol) con el
+          sol en la MISMA dirección — sin sombras: modelado, no costo. */}
+      <hemisphereLight intensity={0.55 * atm.intensidad} color={atm.cieloLuz} groundColor={atm.suelo} />
+      <ambientLight intensity={0.35 * atm.intensidad} color={atm.luz} />
+      <directionalLight position={SOL_POSICION} intensity={0.6 * atm.intensidad} color={atm.luz} />
 
       {children}
+
+      {bloomOn && <BloomSutil {...bloomMadre(climaId)} />}
 
       {(hotspots || []).map((h) => (
         <group key={h.id} position={h.pos}>
@@ -95,6 +115,12 @@ export default function EscenaBase3D({
   onHotspot, cielo, animo = 'sereno', energia = 1, camara, children,
 }) {
   const [listo, setListo] = useState(false);
+  /* El tier se decide UNA vez por montaje (misma fuente que el host). Gate
+     estricto del bloom: solo 'alto' y sin reduced-motion. */
+  const [tier] = useState(() => decidirTier().tier);
+  const bloomOn = tier === 'alto' && !reducedMotion;
+  /* La MISMA cadena de clima que EscenaValle: coherencia valle ↔ mundo. */
+  const climaId = params?.clima || entrada?.clima || 'soleado';
   const zoom = entrada?.zoom ?? 6.5;
   const cam = camara || { position: [zoom * 0.55, zoom * 0.5, zoom], fov: 42 };
   return (
@@ -115,6 +141,8 @@ export default function EscenaBase3D({
           reducedMotion={reducedMotion}
           onHotspot={onHotspot}
           cielo={cielo}
+          climaId={climaId}
+          bloomOn={bloomOn}
           animo={animo}
           energia={energia}
         >
