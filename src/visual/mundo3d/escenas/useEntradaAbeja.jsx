@@ -119,6 +119,10 @@ export function useEntradaAbeja(foco, {
 export function AbejaEscena({
   foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
   hablando = false, rebote = 0,
+  // Device-tier (DR-3D-PERF-GAMABAJA): gradúa el rubber-hose del cuerpo — en
+  // 'bajo' Angelita apaga el idle continuo (boil + follow-through) y conserva
+  // el aleteo + los estados reactivos. La escena lo hereda del host <Mundo>.
+  tier = 'alto',
   // ── EL ESTADO REAL DE LA FINCA (auditoría §5b) ─────────────────────────────
   //    Angelita SIEMPRE refleja tu realidad: llueve→mojada, Niño/sequía→sed,
   //    cosecha→come de eso, ánimo por salud. Interfaz LIMPIA; hoy MUESTRA, codex
@@ -180,6 +184,7 @@ export function AbejaEscena({
                   sed={sed}
                   comiendo={comiendo}
                   animated={vivo}
+                  tier={tier}
                 />
               </div>
             </div>

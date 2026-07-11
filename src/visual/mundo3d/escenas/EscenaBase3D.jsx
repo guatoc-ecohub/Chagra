@@ -35,7 +35,7 @@ import { ATMOSFERA, CIELOS, mezclar } from '../atmosferaMadre.js';
 
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
-  frugal = false, hablando = false, focoId = null, focoToken = 0,
+  frugal = false, tier = 'alto', hablando = false, focoId = null, focoToken = 0,
   estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false,
   children,
 }) {
@@ -181,6 +181,7 @@ function Contenido({
         hayAlerta={hayAlerta}
         reducedMotion={reducedMotion}
         piso={piso}
+        tier={tier}
       />
 
       <OrbitControls
@@ -241,6 +242,7 @@ export default function EscenaBase3D({
           energia={energia}
           piso={piso}
           frugal={frugal}
+          tier={tier}
           hablando={hablando}
           focoId={focoId}
           focoToken={focoToken}
