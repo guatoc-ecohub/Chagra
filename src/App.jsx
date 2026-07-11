@@ -1798,6 +1798,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El camino del agua 3D">
               <MundoAguaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_valle_noche_3d':
         // El valle de noche: variante nocturna mágica del valle — luna plata,
         // cielo estrellado andino que titila, luciérnagas del framework,
@@ -1822,6 +1825,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Juego La milpa">
               <JuegoLaMilpaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_mundo_paramo_3d':
         // El páramo altoandino: el ecosistema de la niebla en hora dorada —
         // frailejones (Espeletia), cojines de musgo, pajonal, quenuas con la
