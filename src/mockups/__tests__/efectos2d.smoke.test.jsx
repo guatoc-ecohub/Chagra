@@ -35,7 +35,10 @@ describe('Efectos2D — vitrina de los gemelos 2D', () => {
           motivo={mundo}
           entrada={{ ...d, params: d.params, hotspots: d.hotspots }}
           tinte={['#3f8f4e', '#dcedc9']}
+          reducedMotion={false}
           onHotspot={() => {}}
+          animo="sereno"
+          energia={1}
         />,
       );
       // dibuja el poster SVG del gemelo

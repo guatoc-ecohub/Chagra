@@ -123,7 +123,7 @@ export default function Corte2D({
             const ly = band.top + band.h * 0.5 + (i % 2 ? 6 : -4);
             return (
               <g key={`l${i}`} transform={`translate(${lx},${ly}) scale(0.7) rotate(${i % 2 ? 18 : -12})`}>
-                <Lombriz inline title="Lombriz de tierra" />
+                <Lombriz inline title="Lombriz de tierra" className="" />
               </g>
             );
           })}
