@@ -75,7 +75,16 @@ const MENSAJE_DEGRADADO = {
   default: 'Su equipo ve la versión dibujada del valle. La finca sigue completa.',
 };
 
-export default function EntradaValle3D({ onBack }) {
+/**
+ * @param {Object} props
+ * @param {() => void} [props.onBack]  volver (en la app, al home).
+ * @param {(view: string, data?: any) => void} [props.onNavigate]  MODO APP
+ *   (FASE 0 game-dev, vista 'valle3d'): cuando viene, las puertas de los
+ *   mundos y la acción del día NAVEGAN de verdad a las pantallas reales.
+ *   Sin ella (vitrina #/mockups/entrada-3d, sin sesión) Angelita solo las
+ *   nombra — el comportamiento de siempre.
+ */
+export default function EntradaValle3D({ onBack, onNavigate }) {
   const [clima, setClima] = useState(() => climaPorHora());
 
   // ── El clima es ATMÓSFERA, no un selector (auditoría B8/S8): los chips de
@@ -297,6 +306,18 @@ export default function EntradaValle3D({ onBack }) {
     if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
   }, []);
 
+  // El CTA de la alerta: en la APP navega a la pantalla real de la acción
+  // (COSA_DEL_DIA.accion.view); en la vitrina repite la indicación por voz
+  // (antes era un botón mudo — auditoría FASE 0).
+  const accionDelDia = useCallback(() => {
+    if (onNavigate && COSA_DEL_DIA.accion?.view) {
+      if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+      onNavigate(COSA_DEL_DIA.accion.view);
+      return;
+    }
+    decir(COSA_DEL_DIA.vozTexto);
+  }, [onNavigate, decir]);
+
   // ── "Pregúntele a su finca…" ABRE el flujo real del agente (auditoría
   //    BUG-CAMP-01: era un botón muerto). Mismo camino desacoplado que usan
   //    AgentFab y EscuchaOverlay: el evento global `chagraNavigate`, que
@@ -352,6 +373,13 @@ export default function EntradaValle3D({ onBack }) {
   //    cuenta a qué pantalla real de la app lleva).
   const onPuertaMundo = useCallback(
     (view, data) => {
+      // MODO APP (FASE 0 game-dev): la puerta ES real — se corta la voz y se
+      // navega a la pantalla de verdad. El valle cumple su promesa.
+      if (onNavigate) {
+        if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+        onNavigate(view, data);
+        return;
+      }
       const puertas = MUNDO[nav.mundoId]?.hotspots || [];
       const hs =
         puertas.find((h) => h.view === view && (h.data === data || (!h.data && !data))) ||
@@ -361,7 +389,7 @@ export default function EntradaValle3D({ onBack }) {
         `«${hs?.label || view}» es una puerta real: dentro de la app abre la pantalla «${view}».`,
       );
     },
-    [nav.mundoId, decir, asentir],
+    [nav.mundoId, decir, asentir, onNavigate],
   );
 
   const mundoPanel = panel && panel !== 'alerta' ? MUNDO_VALLE_BY_ID[panel] : null;
@@ -503,7 +531,7 @@ export default function EntradaValle3D({ onBack }) {
           <h2>{COSA_DEL_DIA.titulo}</h2>
           <p>{COSA_DEL_DIA.detalle}</p>
           <div className="valle-panel__acciones">
-            <button type="button" className="valle-cta">{COSA_DEL_DIA.accion.etiqueta}</button>
+            <button type="button" className="valle-cta" onClick={accionDelDia}>{COSA_DEL_DIA.accion.etiqueta}</button>
             <button type="button" className="valle-ghost" onClick={() => decir(COSA_DEL_DIA.vozTexto)}>
               🔊 Escuchar
             </button>

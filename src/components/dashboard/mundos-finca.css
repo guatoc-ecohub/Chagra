@@ -578,6 +578,33 @@ html[data-theme="biopunk"] .mf-espiritu {
   border-color: color-mix(in srgb, #5eeab2 30%, rgb(var(--c-surface-border, 51 65 85)));
 }
 
+/* ── Entrada al VALLE 3D (FASE 0 game-dev): misma banda, acento AMANECER ────
+   Reusa toda la estructura .mf-espiritu; solo cambia la clave de color: el
+   valle es un lugar de DÍA (dorado sobre verde-monte), no la ventana de noche
+   del espíritu. El gate (flag de prefs + device-tier) vive en el JSX. */
+.mf-valle3d {
+  border-color: rgba(250, 204, 21, 0.32);
+  background:
+    radial-gradient(120% 160% at 12% 20%, rgba(250, 204, 21, 0.14), transparent 55%),
+    linear-gradient(120deg, #14231a, #2b3a1e);
+  color: #f2f7dd;
+}
+.mf-valle3d .mf-espiritu-glifo {
+  color: #facc15;
+  background: rgba(250, 204, 21, 0.12);
+}
+.mf-valle3d .mf-espiritu-txt b { color: #fdf6d8; }
+.mf-valle3d .mf-espiritu-txt small { color: rgba(242, 247, 221, 0.78); }
+.mf-valle3d .mf-espiritu-sello {
+  border-color: rgba(250, 204, 21, 0.5);
+  color: #facc15;
+}
+.mf-valle3d:focus-visible { outline-color: #facc15; }
+html:not([data-theme]) .mf-valle3d,
+html[data-theme="biopunk"] .mf-valle3d {
+  border-color: color-mix(in srgb, #facc15 30%, rgb(var(--c-surface-border, 51 65 85)));
+}
+
 /* ── Accesibilidad de movimiento ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .mf-card {
