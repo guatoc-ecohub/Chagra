@@ -23,6 +23,24 @@
  * montado igual, llama `onFin` de inmediato y el CSS no dibuja nada.
  * Device-tier 'bajo': queda el cruce simple (posición + timing) sin barrel
  * roll ni puff — el CSS gatea por [data-tier].
+ *
+ * ── CABLEADO EN EL HOST (Mundo.jsx / quien navega) — para Opus ──────────────
+ * El lado MESH ya es AUTÓNOMO: al montar una escena, `useEntradaAbeja` corre el
+ * cruce de ENTRADA solo (nace oculta y aparece en CRUCE_ATRAPA_MS). Falta solo
+ * el overlay 2D y la señal de vuelta, dos puntos:
+ *
+ *   1. ENTRAR — dentro del `<Suspense>` de Mundo.jsx, HERMANO de la escena
+ *      perezosa: `<AlMontarEscena onMonta={() => setCruce('entrar')} />`. Con
+ *      `cruce === 'entrar'` el host monta `<AbejaTransicion sentido="entrar"
+ *      tier={tier} reducedMotion={rm} onFin={() => setCruce(null)} />` como
+ *      overlay del contenedor del mundo (posición absoluta sobre el canvas).
+ *      Con `reducedMotion` NO montar nada (el mesh ya aparece al instante).
+ *   2. VOLVER — cuando la navegación pasa a 'regresando' (volverAlValle, SIN
+ *      reducedMotion): llamar `avisarSalidaAbeja()` (el mesh vuela al punto de
+ *      suelta y se apaga en CRUCE_SUELTA_MS) y montar `<AbejaTransicion
+ *      sentido="volver" …/>` en el mismo instante — el overlay brota de ese
+ *      mismo punto ~100 ms después: empalme de capas. La señal se auto-resetea
+ *      al montar la siguiente escena (no hay que limpiarla a mano).
  */
 import { useEffect, useRef } from 'react';
 import { AbejaAngelita } from './AbejaAngelita.jsx';
@@ -35,6 +53,14 @@ export const CRUCE_ATRAPA_MS = 760;
 export const CRUCE_ENTRAR_MS = 980;
 /** Vida del reverso al volver (corto: la vuelta no debe sentirse lenta). */
 export const CRUCE_VOLVER_MS = 620;
+/** Instante de la SUELTA al volver (ms desde `avisarSalidaAbeja()`): el mesh
+    vuela hacia el punto de suelta y se APAGA aquí, cuando el overlay 'volver'
+    (que el host monta en el mismo instante) ya brotó (~100 ms). El pequeño
+    solape es a propósito: cubre el relevo de capas sin hueco. */
+export const CRUCE_SUELTA_MS = 180;
+/* La SEÑAL de salida (avisarSalidaAbeja / useSalidaAbeja) vive en
+   `senalSalidaAbeja.js` — módulo propio para que este archivo de componentes
+   quede fast-refresh-limpio. */
 
 /**
  * Centinela de montaje: se coloca DENTRO del `<Suspense>` junto a la escena
