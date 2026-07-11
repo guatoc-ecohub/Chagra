@@ -763,7 +763,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'plagas', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
-  'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
+  'usage_stats', 'mercado', 'auditoria_inventario', 'mundo', 'valle3d',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -2664,6 +2664,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El clima que viene">
               <ClimaBoletinScreen onBack={() => navigate('mundo', { mundo: 'clima' })} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'valle3d':
+        // EL VALLE 3D DESDE EL HOME (FASE 0 del plan game-dev): la MISMA
+        // EntradaValle3D de la vitrina (#/mockups/entrada-3d) montada como
+        // vista REAL de la app, con `onNavigate`: las puertas de los mundos
+        // abren las pantallas de verdad (regla de oro: re-rutear, nunca
+        // reimplementar). Se llega por la banda de MundosDeMiFinca, gated por
+        // el flag de prefs `valle3d` (default OFF, Perfil) + device-tier;
+        // adentro el tiering decide 3D pleno/frugal o el valle 2D digno.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El valle de su finca (3D)">
+              <EntradaValle3DMockup onBack={() => navigate('dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
