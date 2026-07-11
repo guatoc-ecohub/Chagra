@@ -18,6 +18,13 @@
  *                         llegaba (retroceso). NOTA DE CONCIENCIA, jamás alarma:
  *                         se pinta ÁMBAR de "cuídelo", nunca rojo de catástrofe.
  *                         El páramo es la fábrica de agua; ahí está la esperanza.
+ *   · enso        {...} → la OSCILACIÓN interanual (El Niño–Oscilación del Sur):
+ *                         la rueda LENTA que manda SOBRE el compás bimodal y que
+ *                         más le mueve la cosecha al andino de un año a otro. Tres
+ *                         estados que se LEEN como ciclo (Niña↔Neutro↔Niño), no
+ *                         como amenaza: el cielo se pone seco/duro (Niño → seca +
+ *                         helada) o nublado/aguado (Niña → exceso de agua +
+ *                         deslizamiento). Ámbar de "prepárese", nunca rojo.
  *
  * Todo primitivas low-poly (`MeshLambert`/`MeshBasic`), sin sombras, sin GLTF,
  * sin post. Reduced-motion = escena digna, no muerta: el sol, las nubes, la
@@ -387,7 +394,183 @@ const FAUNA_DIA = [
   { tipo: 'mariposa', base: [-1.7, 0.9, 1.6], patron: 'revoloteo', size: 30, fase: 2.2 },
 ];
 
-function Diorama({ params, reducedMotion }) {
+/* ── CAPA ENSO: la OSCILACIÓN interanual (El Niño–Oscilación del Sur) ────────
+ *
+ * Sobre el compás BIMODAL (dos lluvias / dos secas) manda otra rueda más lenta:
+ * la que de verdad le mueve la cosecha al andino de un año a otro. Se lee por el
+ * índice ONI (anomalía del mar en la región Niño 3.4, media móvil de 3 meses):
+ *   · La Niña  (ONI ≤ −0,5 °C): en los Andes = MÁS lluvia y nube → suelo saturado,
+ *              DESLIZAMIENTOS y exceso de agua.
+ *   · Neutral  (−0,5 < ONI < +0,5): el año corre por su compás bimodal normal.
+ *   · El Niño  (ONI ≥ +0,5 °C): MENOS lluvia, cielo duro, noches despejadas →
+ *              SEQUÍA y más HELADA en lo alto.
+ *
+ * NO es amenaza: es un CICLO que se LEE. El rótulo es una ruedita que se toca y
+ * gira Niña→Neutro→Niño (la "oscilación"), con la voz de Angelita diciendo qué
+ * hacer. Ámbar de "prepárese", jamás rojo de catástrofe (menos colapso, más
+ * contemplación). DIDÁCTICO: hoy los tres estados se muestran a mano; el día que
+ * exista un `get_enso_status` real se cablea la fase viva en `params.enso.fase`. */
+const FASES_ENSO = [
+  {
+    id: 'nina', nombre: 'La Niña', oni: 'ONI ≤ −0,5 °C',
+    lee: 'Más lluvia y más nube: el suelo se llena y la ladera se afloja.',
+    consejo: 'Abra el desagüe y cuide la ladera: no siembre en lo muy parado y sáquele el agua a los surcos.',
+    velo: { color: '#93a6b8', opacidad: 0.17, aditivo: false },
+  },
+  {
+    id: 'neutral', nombre: 'Año neutro', oni: '−0,5 a +0,5 °C',
+    lee: 'El año corre por su compás: dos lluvias y dos secas, sin cargar la mano.',
+    consejo: 'Siembre con el almanaque de siempre; el cielo no está jalando ni pa\' seco ni pa\' aguado.',
+    velo: null,
+  },
+  {
+    id: 'nino', nombre: 'El Niño', oni: 'ONI ≥ +0,5 °C',
+    lee: 'Menos lluvia, sol fuerte y noches despejadas: viene la seca y la helada en lo alto.',
+    consejo: 'Guarde agua y prepárese pa\' la helada: riegue tempranito y tápele el semillero de noche.',
+    velo: { color: '#f2c987', opacidad: 0.12, aditivo: true },
+  },
+];
+
+/* El VELO del año: media esfera translúcida que tiñe TODO el cielo hacia la fase
+   (seco/duro en Niño con mezcla aditiva; nublado/húmedo en Niña). RESPETA la
+   atmósfera madre: no la reemplaza, la MODULA con opacidad baja. Neutral no pinta
+   velo (el compás normal). Memoiza la geometría; cero costo por frame. */
+function VeloEnso({ velo }) {
+  const geo = useMemo(
+    () => new THREE.SphereGeometry(R_BOVEDA * 0.965, 20, 10, 0, Math.PI * 2, 0, Math.PI * 0.52),
+    [],
+  );
+  if (!velo) return null;
+  return (
+    <mesh geometry={geo} renderOrder={-9}>
+      <meshBasicMaterial
+        color={velo.color}
+        transparent
+        opacity={velo.opacidad}
+        side={THREE.BackSide}
+        depthWrite={false}
+        blending={velo.aditivo ? THREE.AdditiveBlending : THREE.NormalBlending}
+      />
+    </mesh>
+  );
+}
+
+/* SEÑAL DE HELADA (solo Niño): escarcha en el suelo de la finca. Cristalitos
+   blanco-azules, bajos y quietos (la escarcha no se mueve); con movimiento
+   permitido titilan apenas. Densidad por device-tier. Determinista (mismo
+   dato → misma escarcha). Cuidado, no alarma: es "prepárese", no catástrofe. */
+function SenalHelada({ densidad = 1, reducedMotion }) {
+  const cristales = useMemo(() => {
+    const r = prng(1703);
+    const n = Math.max(4, Math.round(9 * densidad));
+    return Array.from({ length: n }, (_, i) => {
+      const ang = r() * Math.PI * 2;
+      const rad = 1.6 + r() * 3.2;
+      return {
+        key: i,
+        pos: [Math.cos(ang) * rad, 0.05, Math.sin(ang) * rad + 0.4],
+        s: 0.05 + r() * 0.05,
+        fase: r() * 6,
+      };
+    });
+  }, [densidad]);
+  const refs = useRef([]);
+  useFrame((state) => {
+    if (reducedMotion) return;
+    for (let i = 0; i < cristales.length; i += 1) {
+      const m = refs.current[i];
+      if (!m) continue;
+      m.material.opacity = 0.7 + Math.sin(state.clock.elapsedTime * 1.2 + cristales[i].fase) * 0.2;
+    }
+  });
+  return (
+    <group>
+      {cristales.map((c, i) => (
+        <mesh
+          key={c.key}
+          position={c.pos}
+          rotation={[0, c.fase, 0]}
+          ref={(el) => { refs.current[i] = el; }}
+        >
+          <octahedronGeometry args={[c.s, 0]} />
+          <meshBasicMaterial color="#e2eef6" transparent opacity={0.82} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* SEÑAL DE EXCESO DE AGUA (solo Niña): la ladera se afloja. Una veta ÁMBAR
+   translúcida sobre el flanco delantero de la montaña ("ojo con lo parado" —
+   remoción en masa), más una nube cargada y aguacero EXTRA que cae SOBRE la
+   temporada. Ámbar de "prepárese", nunca rojo. */
+function SenalLadera({ cima = 3.5, reducedMotion }) {
+  return (
+    <group>
+      <mesh position={[-0.85, cima * 0.42, 1.15]} rotation={[0, 0.5, -0.85]}>
+        <boxGeometry args={[0.16, cima * 0.6, 0.05]} />
+        <meshBasicMaterial color={PALETA.ambar} transparent opacity={0.5} depthWrite={false} />
+      </mesh>
+      <Nube base={[1.5, 3.8, 0.9]} escala={1.15} gris reducedMotion={reducedMotion} />
+      <Lluvia base={[1.5, 3.5, 0.9]} reducedMotion={reducedMotion} />
+    </group>
+  );
+}
+
+/* EL RÓTULO DEL CICLO: la ruedita que se LEE. Un toque la gira Niña→Neutro→Niño
+   (la "oscilación"), muestra en qué fase va (tres puntos), qué significa pa' la
+   finca (voz de Angelita) y el ONI real por si el técnico mira. Discreto y
+   contemplativo: ámbar cálido de "prepárese", jamás rojo de alarma. */
+function RotuloEnso({ idx, fase, onGirar }) {
+  return (
+    <group position={[-3.25, 5.05, 0.6]}>
+      <Html center distanceFactor={9} zIndexRange={[18, 0]}>
+        <button
+          type="button"
+          className={`mundo-rotulo mundo-enso mundo-enso--${fase.id}`}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); onGirar(); }}
+          aria-label={`El ciclo del cielo, hoy ${fase.nombre}. ${fase.lee} ${fase.consejo} Toque para leer la siguiente fase.`}
+        >
+          <span className="mundo-enso__rueda" aria-hidden="true">
+            {FASES_ENSO.map((f, i) => (
+              <span key={f.id} className={`mundo-enso__diente${i === idx ? ' es-activo' : ''}`} />
+            ))}
+          </span>
+          <span className="mundo-enso__txt">
+            <span className="mundo-enso__titulo">{fase.nombre}</span>
+            <span className="mundo-enso__lee">{fase.lee}</span>
+            <span className="mundo-enso__consejo">{fase.consejo}</span>
+            <span className="mundo-enso__oni">{fase.oni} · gire el ciclo</span>
+          </span>
+        </button>
+      </Html>
+    </group>
+  );
+}
+
+/* Reúne la capa: guarda la fase (arranca en la del dato) y monta velo + señal +
+   rótulo. El estado vive AQUÍ para que el velo del cielo y el rótulo giren juntos
+   con un solo toque. La densidad de la escarcha baja en gama media (device-tier). */
+function CapaEnso({ params, tier = 'alto', cima = 3.5, reducedMotion }) {
+  const inicio = Math.max(
+    0,
+    FASES_ENSO.findIndex((f) => f.id === (params?.enso?.fase ?? 'neutral')),
+  );
+  const [idx, setIdx] = useState(inicio);
+  const fase = FASES_ENSO[idx];
+  const densidad = tier === 'medio' ? 0.55 : 1;
+  return (
+    <group>
+      <VeloEnso velo={fase.velo} />
+      {fase.id === 'nino' && <SenalHelada densidad={densidad} reducedMotion={reducedMotion} />}
+      {fase.id === 'nina' && <SenalLadera cima={cima} reducedMotion={reducedMotion} />}
+      <RotuloEnso idx={idx} fase={fase} onGirar={() => setIdx((v) => (v + 1) % FASES_ENSO.length)} />
+    </group>
+  );
+}
+
+function Diorama({ params, reducedMotion, tier }) {
   const hora = params?.hora ?? 0.62;
   const temporada = params?.temporada ?? 'lluvia';
   const niebla = params?.niebla ?? 0.6;
@@ -412,6 +595,10 @@ function Diorama({ params, reducedMotion }) {
 
       <Montana pisos={pisos} glaciar={glaciar} />
       <NieblaParamo niebla={niebla} cima={cima} reducedMotion={reducedMotion} />
+
+      {/* la OSCILACIÓN del año (ENSO) sobre el compás bimodal: velo del cielo +
+          señal de la fase + rótulo-ciclo tocable con la voz de Angelita */}
+      <CapaEnso params={params} tier={tier} cima={cima} reducedMotion={reducedMotion} />
 
       {/* el cielo con su temporada: nubes siempre; aguacero solo en lluvia */}
       <Nube base={[-2.6, 3.5, 0.2]} escala={1.15} gris={temporada === 'lluvia'} reducedMotion={reducedMotion} />
@@ -441,7 +628,7 @@ export default function EscenaBoveda(props) {
       camara={{ position: [4.6, 3.1, 8.6], fov: 46 }}
       entrada={{ ...props.entrada, zoom: props.entrada?.zoom ?? 7.5, centro: [0, 2.2, 0] }}
     >
-      <Diorama params={props.params} reducedMotion={props.reducedMotion} />
+      <Diorama params={props.params} reducedMotion={props.reducedMotion} tier={props.tier} />
     </EscenaBase3D>
   );
 }

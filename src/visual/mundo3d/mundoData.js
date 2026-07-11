@@ -321,6 +321,12 @@ export const MUNDO = {
       // El hielo de hoy + la línea de hasta dónde llegaba (retroceso). Ámbar de
       // "cuídelo", jamás rojo de catástrofe.
       glaciar: { nieve: 0.32, retroceso: 0.7 },
+      // La OSCILACIÓN interanual (ENSO): la rueda LENTA que manda sobre el compás
+      // bimodal y que más le mueve la cosecha al andino de un año a otro. Se LEE
+      // como ciclo (Niña→Neutro→Niño), no como amenaza. DIDÁCTICO: arranca en una
+      // fase visible; el día que exista un `get_enso_status` real (índice ONI de
+      // la región Niño 3.4) se cablea aquí la fase viva. Estados: 'nina'|'neutral'|'nino'.
+      enso: { fase: 'nino' },
     },
     hotspots: [
       { id: 'hoy', pos: [2.7, 3.4, 0.6], emoji: '⛅', label: 'El tiempo hoy', view: 'hoy_finca' },

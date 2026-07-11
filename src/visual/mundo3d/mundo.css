@@ -157,6 +157,47 @@
   opacity: 0.9;
 }
 
+/* ── El rótulo del CICLO ENSO (bóveda): la ruedita Niña→Neutro→Niño ───────── */
+/* La OSCILACIÓN interanual que manda sobre el compás bimodal. Se LEE, no alarma:
+   un toque gira la fase; el velo del cielo cambia con ella. Ámbar de "prepárese",
+   jamás rojo. Acento por fase (frío en Niña, tibio neutro, cálido en Niño). */
+.mundo-enso {
+  max-width: 13.5rem;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.34rem 0.6rem 0.34rem 0.42rem;
+}
+.mundo-enso__rueda {
+  flex: 0 0 auto;
+  display: inline-flex;
+  flex-direction: row;
+  gap: 3px;
+  margin-top: 0.22rem;
+}
+.mundo-enso__diente {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(244, 226, 191, 0.28);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.mundo-enso__diente.es-activo {
+  background: #d9a13b;
+  box-shadow: 0 0 6px rgba(217, 161, 59, 0.85);
+}
+.mundo-enso__txt {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.14rem;
+}
+.mundo-enso__titulo { font-size: 0.8rem; font-weight: 700; }
+.mundo-enso__lee { font-weight: 500; opacity: 0.92; }
+.mundo-enso__consejo { font-weight: 600; color: #ffe0a6; }
+.mundo-enso__oni { font-size: 0.62rem; font-weight: 500; opacity: 0.7; }
+.mundo-enso--nina { border-color: rgba(140, 170, 200, 0.6); }
+.mundo-enso--neutral { border-color: rgba(217, 161, 59, 0.4); }
+.mundo-enso--nino { border-color: rgba(230, 175, 90, 0.68); }
+
 /* ── Fauna de la librería sembrada en la escena (billboard decorativo) ───── */
 .mundo-fauna {
   pointer-events: none;
