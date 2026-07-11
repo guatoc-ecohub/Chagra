@@ -125,7 +125,47 @@ function FondoRecinto({ acento }) {
   );
 }
 
+/* La LADERA ANDINA en 2D (mundo `pisos`): las mismas 4 bandas térmicas del
+   diorama 3D, del páramo (arriba) al cálido (abajo), con su rótulo de altura,
+   la niebla del páramo y la flecha ámbar de que los pisos suben (termofilización,
+   señal sutil — nunca alarma). Mismo dato del registro; piso digno garantizado. */
+function FondoPisos({ pisos }) {
+  const n = pisos.length || 1;
+  const bandH = 200 / n;
+  // arriba = el piso más alto (páramo); el array viene de bajo (cálido) a alto.
+  const orden = [...pisos].reverse();
+  return (
+    <g>
+      <rect x="0" y="0" width="300" height="200" fill="#e7f0ee" />
+      {orden.map((p, i) => {
+        const y = i * bandH;
+        return (
+          <g key={p.id || i}>
+            <rect x="0" y={y} width="300" height={bandH} fill={p.color} opacity="0.94" />
+            <text x="12" y={y + bandH / 2 - 2} fontSize="12" fontWeight="700" fill="#1f2a24">{p.nombre}</text>
+            <text x="12" y={y + bandH / 2 + 13} fontSize="10" fill="#33413a">{p.rango}</text>
+          </g>
+        );
+      })}
+      {/* niebla del páramo (banda de arriba): capta agua */}
+      {orden[0]?.niebla && (
+        <g fill="#f4f9f8" opacity="0.75">
+          <ellipse cx="210" cy={bandH * 0.4} rx="34" ry="10" />
+          <ellipse cx="255" cy={bandH * 0.62} rx="26" ry="8" />
+          <ellipse cx="180" cy={bandH * 0.66} rx="22" ry="7" />
+        </g>
+      )}
+      {/* los pisos suben: flecha ámbar tenue al costado (cuidado, no catástrofe) */}
+      <g stroke="#d9a13b" strokeWidth="3" fill="none" opacity="0.6" strokeLinecap="round">
+        <line x1="284" y1="176" x2="284" y2="34" />
+        <path d="M278,44 L284,30 L290,44" strokeLinejoin="round" />
+      </g>
+    </g>
+  );
+}
+
 function FondoEstratos({ params, acento }) {
+  if (Array.isArray(params?.pisos)) return <FondoPisos pisos={params.pisos} />;
   const estratos = params?.estratos || [
     { color: '#2f5f34' }, { color: '#3a6f3f' }, { color: '#4a7d45' }, { color: '#5f8a3f' },
     { color: '#7aa24a' }, { color: '#8fae55' }, { color: '#8a6a44' },
