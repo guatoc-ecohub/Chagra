@@ -9,18 +9,26 @@
  * plástico y la malla son el único material translúcido (opacidad baja).
  *
  * CONTRATO uniforme (idéntico para las 10 piezas):
- *   { dims: { largo, ancho, alto } (metros), params, frugal, reducedMotion }
+ *   { dims: { largo, ancho, alto } (metros), params, frugal, reducedMotion, vida }
  *
  *   · `largo` corre por X, `ancho` por Z, `alto` por Y. Footprint centrado.
- *   · `frugal` (device-tier medio/bajo) baja segmentos y suelta detalle fino.
- *   · las piezas son ESTÁTICAS (sin useFrame) → reduced-motion seguro por
- *     construcción; el flag viaja por si una pieza futura quiere latir.
+ *   · `frugal` (device-tier medio/bajo) baja segmentos y suelta detalle fino;
+ *     también apaga la neblina y adelgaza los efectos de vida.
+ *   · `reducedMotion` → sin animación de llenado (estado final directo). Las
+ *     piezas neutras siguen siendo estáticas por construcción.
+ *   · `vida` — el estado FUNCIONAL derivado del dato real (derivarVidaInfra en
+ *     infraestructuraData.js). null → pieza NEUTRA idéntica al catálogo de
+ *     siempre (anti-fabricación). Con vida: el invernadero enseña su microclima
+ *     (aire cálido, neblina, matas adelantadas, refugio en El Niño), el almacén
+ *     se llena tras la cosecha (costales y huacales) y galpón/establo/gallinero
+ *     se ocupan según los animales reales (foco encendido, paja, siluetas).
  *
  * El mapeo id→componente (PIEZAS_INFRA) lo consume `Infraestructura.jsx`; el
  * catálogo de datos (infraestructuraData.js) es three-free y solo guarda la
  * CLAVE de render, no el componente — misma disciplina que arquetipos/mundoData.
  */
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { PALETA } from '../atmosferaMadre.js';
 
@@ -70,18 +78,217 @@ function Placa({ largo, ancho, color = OBRA.concreto, alto = 0.08 }) {
   );
 }
 
+/* ── LOS LADRILLOS DE VIDA (efectos funcionales, low-poly) ───────────────────
+   Piecitas que las formas montan SOLO cuando `vida` trae dato real. Colores
+   locales del mismo espíritu de OBRA: cálidos, jamás neutros. */
+const VIDA_COLOR = {
+  aireCalido: '#f2b46a', // el tinte del microclima del invernadero
+  neblina: '#f7f3e8', // condensación/neblina interior (blanco cálido)
+  foco: '#ffd98a', // el bombillo campesino prendido (material unlit)
+  paja: '#cbb26a', // cama de paja del corral ocupado
+  costal: '#d8c9a5', // el costal de fique de la cosecha
+  costalOscuro: '#c9b487', // su hermano más curtido
+  pastoSeco: '#b8a35f', // el pasto resecado de afuera cuando aprieta El Niño
+  plumaCafe: '#c98d4f', // gallina colorada (la clara usa PALETA.cal)
+};
+
+/* Un foco encendido: esfera unlit (meshBasicMaterial = siempre brilla) + halo
+   translúcido. La señal campesina de "aquí hay alguien": luz en el corral. */
+function FocoCalido({ pos, r = 0.09 }) {
+  return (
+    <group position={pos}>
+      <mesh>
+        <sphereGeometry args={[r, 8, 6]} />
+        <meshBasicMaterial color={VIDA_COLOR.foco} />
+      </mesh>
+      <mesh>
+        <sphereGeometry args={[r * 2.6, 8, 6]} />
+        <meshBasicMaterial color={VIDA_COLOR.foco} transparent opacity={0.22} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/* Un montoncito de paja (esfera achatada): cama del animal presente. */
+function Paja({ pos, s = 1 }) {
+  return (
+    <mesh position={pos} scale={[s, s * 0.35, s * 0.8]}>
+      <sphereGeometry args={[0.35, 7, 5]} />
+      <meshLambertMaterial color={VIDA_COLOR.paja} flatShading />
+    </mesh>
+  );
+}
+
+/* Silueta de gallina: cuerpo achatado + cabecita. Presencia, no retrato. */
+function SiluetaGallina({ pos, rot = 0, color = PALETA.cal }) {
+  return (
+    <group position={pos} rotation={[0, rot, 0]}>
+      <mesh position={[0, 0.12, 0]} scale={[1, 0.85, 0.8]}>
+        <sphereGeometry args={[0.14, 7, 5]} />
+        <meshLambertMaterial color={color} flatShading />
+      </mesh>
+      <mesh position={[0.12, 0.24, 0]}>
+        <sphereGeometry args={[0.06, 6, 5]} />
+        <meshLambertMaterial color={color} flatShading />
+      </mesh>
+    </group>
+  );
+}
+
+/* Silueta de res: bloque de cuerpo + cabeza al comedero + patas insinuadas. */
+function SiluetaRes({ pos, rot = 0, color = PALETA.tierraClara }) {
+  return (
+    <group position={pos} rotation={[0, rot, 0]}>
+      <mesh position={[0, 0.72, 0]}>
+        <boxGeometry args={[1.15, 0.62, 0.5]} />
+        <meshLambertMaterial color={color} flatShading />
+      </mesh>
+      <mesh position={[0, 0.52, 0.42]}>
+        <boxGeometry args={[0.3, 0.34, 0.3]} />
+        <meshLambertMaterial color={color} flatShading />
+      </mesh>
+      {[-0.35, 0.35].map((dx) => (
+        <mesh key={dx} position={[dx, 0.21, 0]}>
+          <boxGeometry args={[0.16, 0.42, 0.4]} />
+          <meshLambertMaterial color={color} flatShading />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* Un costal de cosecha amarrado: panza + ñudo. */
+function Saco({ pos, color = VIDA_COLOR.costal }) {
+  return (
+    <group position={pos}>
+      <mesh position={[0, 0.3, 0]} scale={[1, 1.15, 1]}>
+        <sphereGeometry args={[0.26, 7, 6]} />
+        <meshLambertMaterial color={color} flatShading />
+      </mesh>
+      <mesh position={[0, 0.62, 0]}>
+        <sphereGeometry args={[0.08, 6, 5]} />
+        <meshLambertMaterial color={PALETA.maderaClara} flatShading />
+      </mesh>
+    </group>
+  );
+}
+
+/* Un huacal (guacal) de madera con lo cosechado asomando. */
+function Huacal({ pos, rot = 0 }) {
+  return (
+    <group position={pos} rotation={[0, rot, 0]}>
+      <mesh position={[0, 0.18, 0]}>
+        <boxGeometry args={[0.55, 0.36, 0.38]} />
+        <meshLambertMaterial color={PALETA.maderaClara} flatShading />
+      </mesh>
+      <mesh position={[0, 0.38, 0]}>
+        <boxGeometry args={[0.45, 0.08, 0.3]} />
+        <meshLambertMaterial color={PALETA.follajeClaro} flatShading />
+      </mesh>
+    </group>
+  );
+}
+
+/* Las matas ADELANTADAS del microclima: conitos más crecidos que las plántulas
+   del vivero, en fila sobre las camas. Solo se montan con saludFinca REAL. */
+function MatasAdelantadas({ L, zs, frugal }) {
+  const cols = frugal ? 4 : Math.max(4, Math.round(L / 1.6));
+  const xs = Array.from({ length: cols }, (_, i) => (-L / 2 + (i + 0.5) * (L / cols)) * 0.92);
+  return zs.map((z, zi) =>
+    xs.map((x, i) => (
+      <mesh key={`${zi}:${i}`} position={[x, 0.41, z]}>
+        <coneGeometry args={[0.1, 0.34, 5]} />
+        <meshLambertMaterial
+          color={(i + zi) % 2 ? PALETA.follajeClaro : PALETA.follaje}
+          flatShading
+        />
+      </mesh>
+    )),
+  );
+}
+
+/* La COSECHA GUARDADA del almacén: costales arrumados y huacales junto al
+   portón. Cantidad FIJA y modesta (la cosecha reciente trae cultivo, no
+   kilos: presencia honesta, no volumen inventado). `fx` re-escala el arrume
+   para bodegas más cortas que el default. */
+function CosechaGuardada({ L, W, frugal, reducedMotion }) {
+  const fx = Math.min(1, L / 8);
+  const puestos = frugal
+    ? [
+        [-1.35, 0, 0.5],
+        [-1.9, 0, 0.62],
+        [-1.6, 0, 1.02],
+      ]
+    : [
+        [-1.35, 0, 0.5],
+        [-1.9, 0, 0.62],
+        [-1.6, 0, 1.02],
+        [-1.62, 0.52, 0.72],
+        [1.7, 0, 0.55],
+      ];
+  const contenido = (
+    <group position={[0, 0, W / 2]}>
+      {puestos.map(([x, y, z], i) => (
+        <Saco
+          key={i}
+          pos={[x * fx, y, z]}
+          color={i % 2 ? VIDA_COLOR.costalOscuro : VIDA_COLOR.costal}
+        />
+      ))}
+      {!frugal && (
+        <>
+          <Huacal pos={[1.15 * fx, 0, 1.0]} rot={0.3} />
+          <Huacal pos={[1.35 * fx, 0, 0.45]} rot={-0.15} />
+        </>
+      )}
+    </group>
+  );
+  // reducedMotion (o tier frugal): estado final directo, sin animación de llenado.
+  if (reducedMotion || frugal) return contenido;
+  return <GrupoBrota>{contenido}</GrupoBrota>;
+}
+
+/* Brote de llenado (rubber-hose): escala con overshoot al montar. Se usa SOLO
+   cuando hay motion permitido; con reducedMotion el contenido va directo. */
+function GrupoBrota({ children }) {
+  const ref = useRef();
+  const inicio = useRef(null);
+  useFrame(({ clock }) => {
+    const g = ref.current;
+    if (!g) return;
+    if (inicio.current == null) inicio.current = clock.elapsedTime;
+    const t = Math.min(1, (clock.elapsedTime - inicio.current) / 0.9);
+    // ease-out-back: llega, se pasa tantico y asienta (squash & settle).
+    const c1 = 1.70158;
+    const c3 = c1 + 1;
+    const s = t >= 1 ? 1 : Math.max(0.001, 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2));
+    g.scale.setScalar(s);
+  });
+  return (
+    <group ref={ref} scale={[0.001, 0.001, 0.001]}>
+      {children}
+    </group>
+  );
+}
+
 // ─── 1. INVERNADERO TÚNEL (macrotúnel) ──────────────────────────────────────
 // Media caña de plástico sobre la cama de siembra. La cubierta es un medio
 // cilindro (dome arriba, base en y=0), estirado en Y para respetar `alto` cuando
 // no es exactamente el radio. Arcos de guadua/tubo cada tanto + tapas de plástico
 // en los extremos + camas de tierra adentro.
-export function InvernaderoTunel({ dims, params = {}, frugal = false }) {
+export function InvernaderoTunel({ dims, params = {}, frugal = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const r = W / 2;
   const escY = H / r; // estira la media caña para llegar a `alto`
   const segArco = frugal ? 10 : 18;
   const nArcos = frugal ? Math.max(2, Math.round((params.arcos ?? 6) / 2)) : (params.arcos ?? 6);
   const plastico = params.plastico || OBRA.plastico;
+
+  // El microclima REAL (vida): aire cálido adentro, condensación y matas
+  // adelantadas. Sin vida → invernadero neutro del catálogo (anti-fabricación).
+  const vivo = !!vida?.microclima?.activo;
+  const matas = !!vida?.microclima?.matas;
+  const refugio = !!vida?.microclima?.refugio;
 
   const arcosX = useMemo(
     () => Array.from({ length: nArcos }, (_, i) => -L / 2 + (i + 0.5) * (L / nArcos)),
@@ -91,12 +298,30 @@ export function InvernaderoTunel({ dims, params = {}, frugal = false }) {
 
   return (
     <group>
-      {/* camas de siembra adentro (dos lomos de tierra) */}
-      {!frugal &&
+      {/* camas de siembra adentro (dos lomos de tierra); en frugal solo
+          aparecen si hay matas reales que sostener */}
+      {(!frugal || matas) &&
         camasZ.map((z, i) => (
           <mesh key={i} position={[0, 0.12, z]}>
             <boxGeometry args={[L * 0.92, 0.24, W * 0.3]} />
             <meshLambertMaterial color={PALETA.tierra} flatShading />
+          </mesh>
+        ))}
+
+      {/* matas adelantadas por el microclima (solo con saludFinca real) */}
+      {matas && <MatasAdelantadas L={L} zs={camasZ} frugal={frugal} />}
+
+      {/* neblina/condensación interior (tier alto): el aire húmedo que se ve */}
+      {vivo &&
+        !frugal &&
+        [-L / 4, 0, L / 4].map((x, i) => (
+          <mesh
+            key={`nb${i}`}
+            position={[x, H * 0.55, (i - 1) * W * 0.12]}
+            scale={[1.3, 0.4, 0.9]}
+          >
+            <sphereGeometry args={[W * 0.16, 7, 5]} />
+            {matTranslucido(VIDA_COLOR.neblina, 0.16)}
           </mesh>
         ))}
 
@@ -107,6 +332,14 @@ export function InvernaderoTunel({ dims, params = {}, frugal = false }) {
           <cylinderGeometry args={[r, r, L, segArco, 1, true, 0, Math.PI]} />
           {matTranslucido(plastico, 0.3)}
         </mesh>
+        {/* el aire CÁLIDO del microclima: media caña interior tibia. En El
+            Niño se acentúa: el invernadero se lee como refugio */}
+        {vivo && (
+          <mesh rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[r * 0.9, r * 0.9, L * 0.96, segArco, 1, true, 0, Math.PI]} />
+            {matTranslucido(VIDA_COLOR.aireCalido, refugio ? 0.16 : 0.1)}
+          </mesh>
+        )}
         {/* arcos estructurales (medio toro que sube de z=-r a z=+r) */}
         {arcosX.map((x, i) => (
           <mesh key={i} position={[x, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
@@ -130,6 +363,16 @@ export function InvernaderoTunel({ dims, params = {}, frugal = false }) {
           <meshLambertMaterial color={PALETA.maderaOscura} flatShading />
         </mesh>
       )}
+
+      {/* refugio en El Niño: afuera de la puerta el pasto está resecado —
+          el contraste hace legible el microclima fresco de adentro */}
+      {refugio &&
+        [-0.6, 0.55].map((dz, i) => (
+          <mesh key={`rs${i}`} position={[L / 2 + 0.9 + i * 0.35, 0.03, dz]}>
+            <boxGeometry args={[1.0, 0.05, 0.55]} />
+            <meshLambertMaterial color={VIDA_COLOR.pastoSeco} flatShading />
+          </mesh>
+        ))}
     </group>
   );
 }
@@ -138,7 +381,7 @@ export function InvernaderoTunel({ dims, params = {}, frugal = false }) {
 // Paredes rectas hasta `pared` y techo a dos aguas hasta `alto` (cumbrera).
 // Postes en las esquinas y a media luz, paños de plástico en las paredes, dos
 // faldones de techo y la viga de cumbrera.
-export function InvernaderoCapilla({ dims, params = {}, frugal = false }) {
+export function InvernaderoCapilla({ dims, params = {}, frugal = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const p = Math.min(params.pared ?? 2.5, H - 0.4); // altura de pared (alero)
   const plastico = params.plastico || OBRA.plastico;
@@ -148,6 +391,12 @@ export function InvernaderoCapilla({ dims, params = {}, frugal = false }) {
 
   const postesX = frugal ? [-L / 2, L / 2] : [-L / 2, 0, L / 2];
 
+  // Microclima real (vida): mismo repertorio del túnel (ver InvernaderoTunel).
+  const vivo = !!vida?.microclima?.activo;
+  const matas = !!vida?.microclima?.matas;
+  const refugio = !!vida?.microclima?.refugio;
+  const camasZ = [-W * 0.22, W * 0.22];
+
   return (
     <group>
       {/* postes de esquina y de media luz */}
@@ -156,6 +405,47 @@ export function InvernaderoCapilla({ dims, params = {}, frugal = false }) {
           <Poste key={`${x}:${z}`} pos={[x, 0, z]} alto={p} r={0.07} color={OBRA.guadua} />
         )),
       )}
+
+      {/* con matas REALES, la capilla enseña sus camas y las matas adelantadas */}
+      {matas &&
+        camasZ.map((z, i) => (
+          <mesh key={`ca${i}`} position={[0, 0.12, z]}>
+            <boxGeometry args={[L * 0.9, 0.24, W * 0.28]} />
+            <meshLambertMaterial color={PALETA.tierra} flatShading />
+          </mesh>
+        ))}
+      {matas && <MatasAdelantadas L={L} zs={camasZ} frugal={frugal} />}
+
+      {/* el aire cálido del microclima (volumen tibio interior) */}
+      {vivo && (
+        <mesh position={[0, p / 2, 0]}>
+          <boxGeometry args={[L * 0.96, p * 0.96, W * 0.96]} />
+          {matTranslucido(VIDA_COLOR.aireCalido, refugio ? 0.14 : 0.09)}
+        </mesh>
+      )}
+
+      {/* condensación bajo el alero (tier alto) */}
+      {vivo &&
+        !frugal &&
+        [-L / 4, 0, L / 4].map((x, i) => (
+          <mesh
+            key={`nb${i}`}
+            position={[x, p * 0.85, (i - 1) * W * 0.1]}
+            scale={[1.3, 0.4, 0.9]}
+          >
+            <sphereGeometry args={[W * 0.14, 7, 5]} />
+            {matTranslucido(VIDA_COLOR.neblina, 0.15)}
+          </mesh>
+        ))}
+
+      {/* refugio en El Niño: pasto resecado afuera del frente */}
+      {refugio &&
+        [-0.7, 0.6].map((dz, i) => (
+          <mesh key={`rs${i}`} position={[L / 2 + 0.9 + i * 0.35, 0.03, dz]}>
+            <boxGeometry args={[1.0, 0.05, 0.55]} />
+            <meshLambertMaterial color={VIDA_COLOR.pastoSeco} flatShading />
+          </mesh>
+        ))}
 
       {/* paños de plástico de las cuatro paredes (hasta el alero) */}
       {/* laterales largos */}
@@ -278,11 +568,25 @@ export function MediaSombra({ dims, params = {}, frugal = false }) {
 // ─── 4. GALLINERO A CAMPO ABIERTO ───────────────────────────────────────────
 // Un corral de malla (postes + paños translúcidos) con un refugio techado en una
 // esquina: casita de tablas + techo a un agua + pop-hole y palo de dormir.
-export function GallineroCampo({ dims, params = {}, frugal = false }) {
+export function GallineroCampo({ dims, params = {}, frugal = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const malla = params.malla || OBRA.malla;
   const rf = Math.min(params.refugio ?? 3, Math.min(L, W) - 0.5); // lado del refugio
   const hR = Math.min(2, H); // alto del refugio
+
+  // Ocupación REAL: solo hay gallinas si el inventario trae aves (vida).
+  const aves = vida?.ocupacion?.aves ?? 0;
+  const ocupado = aves > 0;
+  const nGallinas = Math.min(aves, frugal ? 3 : 6);
+  // Puntos deterministas del picoteo (fracciones del corral, lejos del refugio).
+  const PICOTEO = [
+    [0.15, 0.1],
+    [0.3, -0.25],
+    [0.05, 0.32],
+    [0.35, 0.05],
+    [0.2, -0.12],
+    [0.42, 0.28],
+  ];
 
   // postes del perímetro del corral
   const postes = [];
@@ -348,6 +652,27 @@ export function GallineroCampo({ dims, params = {}, frugal = false }) {
           </mesh>
         </>
       )}
+
+      {/* OCUPACIÓN real (vida): gallinas picoteando, ventana cálida y paja.
+          Sin aves en el inventario → corral quieto, tal cual el catálogo. */}
+      {ocupado && (
+        <mesh position={[refX + rf * 0.28, hR * 0.5, refZ + rf / 2 + 0.02]}>
+          <boxGeometry args={[rf * 0.18, rf * 0.14, 0.03]} />
+          <meshBasicMaterial color={VIDA_COLOR.foco} />
+        </mesh>
+      )}
+      {ocupado && !frugal && <Paja pos={[refX, 0.05, refZ + rf / 2 + 0.7]} s={0.7} />}
+      {Array.from({ length: nGallinas }, (_, i) => {
+        const [fx, fz] = PICOTEO[i % PICOTEO.length];
+        return (
+          <SiluetaGallina
+            key={`ga${i}`}
+            pos={[fx * L, 0, fz * W]}
+            rot={i * 0.9}
+            color={i % 2 ? PALETA.cal : VIDA_COLOR.plumaCafe}
+          />
+        );
+      })}
     </group>
   );
 }
@@ -355,11 +680,16 @@ export function GallineroCampo({ dims, params = {}, frugal = false }) {
 // ─── 5. GALPÓN AVÍCOLA (cerrado) ────────────────────────────────────────────
 // Nave larga y baja: zócalo bajo, cortinas laterales enrollables (bandas de
 // color), techo a dos aguas de zinc con alero, y muros de frente/fondo.
-export function Galpon({ dims, params = {}, frugal = false }) {
+export function Galpon({ dims, params = {}, frugal = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const cortina = params.cortina || '#c9b487';
   const techo = params.techo || OBRA.zinc;
   const zocalo = Math.min(0.6, H * 0.2);
+
+  // Ocupación REAL del lote (vida): aves del inventario. Sin aves → apagado.
+  const aves = vida?.ocupacion?.aves ?? 0;
+  const ocupado = aves > 0;
+  const nAfuera = Math.min(aves, frugal ? 3 : 6);
   const cumbrera = H + Math.min(1.2, W * 0.18);
   const subeTecho = cumbrera - H;
   const faldon = Math.hypot(W / 2 + 0.3, subeTecho);
@@ -410,6 +740,34 @@ export function Galpon({ dims, params = {}, frugal = false }) {
           <meshLambertMaterial color={techo} flatShading />
         </mesh>
       ))}
+
+      {/* OCUPACIÓN real (vida): el galpón trabajando — foco prendido en el
+          frente, luz que se cuela sobre las cortinas, paja y algunas aves
+          estirando la pata afuera. Sin aves → nave apagada y quieta. */}
+      {ocupado && <FocoCalido pos={[L / 2 + 0.15, H * 0.75, 0]} />}
+      {ocupado &&
+        [-W / 2, W / 2].map((z, i) => (
+          <mesh
+            key={`lz${i}`}
+            position={[0, zocalo + (H - zocalo) * 0.86, z + (i === 0 ? -0.05 : 0.05)]}
+          >
+            <boxGeometry args={[L * 0.92, 0.14, 0.03]} />
+            <meshBasicMaterial color={VIDA_COLOR.foco} />
+          </mesh>
+        ))}
+      {ocupado && !frugal && <Paja pos={[L / 2 + 0.9, 0.06, W * 0.18]} s={0.9} />}
+      {Array.from({ length: nAfuera }, (_, i) => (
+        <SiluetaGallina
+          key={`av${i}`}
+          pos={[
+            L / 2 + 0.8 + (i % 3) * 0.55,
+            0,
+            -W * 0.22 + Math.floor(i / 3) * 0.5 + (i % 2) * 0.18,
+          ]}
+          rot={i * 1.3}
+          color={i % 2 ? VIDA_COLOR.plumaCafe : PALETA.cal}
+        />
+      ))}
     </group>
   );
 }
@@ -417,11 +775,17 @@ export function Galpon({ dims, params = {}, frugal = false }) {
 // ─── 6. ESTABLO DE BOVINOS ──────────────────────────────────────────────────
 // Cobertizo de lados abiertos: piso firme, postes, pared de tablas atrás, techo
 // a un agua de zinc y comedero corrido al frente.
-export function Establo({ dims, params = {}, frugal = false }) {
+export function Establo({ dims, params = {}, frugal = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const techo = params.techo || OBRA.zinc;
   const hFrente = H;
   const hFondo = H - Math.min(0.8, W * 0.14); // techo a un agua (cae hacia el fondo)
+
+  // Ocupación REAL (vida): bovinos + otros animales de establo del inventario.
+  const oc = vida?.ocupacion;
+  const reses = (oc?.bovinos ?? 0) + (oc?.otros ?? 0);
+  const ocupado = reses > 0;
+  const nReses = Math.min(reses, frugal ? 2 : 4);
   const faldon = Math.hypot(W, hFrente - hFondo);
   const ang = Math.atan2(hFrente - hFondo, W);
 
@@ -474,6 +838,24 @@ export function Establo({ dims, params = {}, frugal = false }) {
           const x = -L / 2 + (i + 1) * (L / params.plazas);
           return <Poste key={i} pos={[x, 0, 0]} alto={1.1} r={0.05} color={PALETA.maderaOscura} seg={4} />;
         })}
+
+      {/* OCUPACIÓN real (vida): reses en sus plazas mirando al comedero, foco
+          prendido bajo el techo y camas de paja. Sin animales → vacío. */}
+      {ocupado && <FocoCalido pos={[0, hFondo * 0.9, 0]} r={0.08} />}
+      {ocupado && !frugal && (
+        <>
+          <Paja pos={[-L * 0.28, 0.12, -W * 0.15]} />
+          <Paja pos={[L * 0.3, 0.12, -W * 0.05]} s={0.8} />
+        </>
+      )}
+      {Array.from({ length: nReses }, (_, i) => (
+        <SiluetaRes
+          key={`re${i}`}
+          pos={[-L / 2 + (i + 0.5) * (L / Math.max(1, nReses)), 0.1, W * 0.08]}
+          rot={(i % 2 ? -1 : 1) * 0.12}
+          color={[PALETA.tierraClara, PALETA.cal, PALETA.maderaOscura, PALETA.tierraClara][i % 4]}
+        />
+      ))}
     </group>
   );
 }
@@ -481,7 +863,7 @@ export function Establo({ dims, params = {}, frugal = false }) {
 // ─── 7. ALMACÉN / BODEGA ────────────────────────────────────────────────────
 // Construcción cerrada: placa, cuatro muros, techo a dos aguas de zinc, portón
 // grande y una ventanita.
-export function AlmacenBodega({ dims, params = {}, frugal = false }) {
+export function AlmacenBodega({ dims, params = {}, frugal = false, reducedMotion = false, vida = null }) {
   const { largo: L, ancho: W, alto: H } = dims;
   const pared = params.pared || '#e3d7bf';
   const techo = params.techo || OBRA.zinc;
@@ -489,6 +871,12 @@ export function AlmacenBodega({ dims, params = {}, frugal = false }) {
   const subeTecho = H - muro;
   const faldon = Math.hypot(W / 2 + 0.25, subeTecho);
   const ang = Math.atan2(subeTecho, W / 2 + 0.25);
+
+  // COSECHA real (vida): con cosecha reciente el almacén se LLENA — portón
+  // entreabierto y arrume de costales/huacales. Sin cosecha → bodega cerrada
+  // y vacía (anti-fabricación: no hay banquete que no ocurrió).
+  const cosecha = vida?.cosecha || null;
+  const pw = Math.min(2.4, L * 0.4); // ancho del portón (para correrlo)
 
   return (
     <group>
@@ -528,11 +916,18 @@ export function AlmacenBodega({ dims, params = {}, frugal = false }) {
           <meshLambertMaterial color={techo} flatShading />
         </mesh>
       ))}
-      {/* portón grande al frente */}
+      {/* portón grande al frente (con cosecha se corre: quedó entreabierto) */}
       {params.porton !== false && (
-        <mesh position={[0, muro * 0.42, W / 2 + 0.02]}>
-          <boxGeometry args={[Math.min(2.4, L * 0.4), muro * 0.82, 0.06]} />
+        <mesh position={[cosecha ? pw * 0.58 : 0, muro * 0.42, W / 2 + 0.02]}>
+          <boxGeometry args={[pw, muro * 0.82, 0.06]} />
           <meshLambertMaterial color={PALETA.maderaOscura} flatShading />
+        </mesh>
+      )}
+      {/* el vano en penumbra que deja ver que adentro hay movimiento */}
+      {cosecha && params.porton !== false && (
+        <mesh position={[0, muro * 0.42, W / 2 + 0.01]}>
+          <boxGeometry args={[pw * 0.9, muro * 0.8, 0.02]} />
+          <meshLambertMaterial color="#2e2216" flatShading />
         </mesh>
       )}
       {/* ventanita */}
@@ -541,6 +936,11 @@ export function AlmacenBodega({ dims, params = {}, frugal = false }) {
           <boxGeometry args={[0.7, 0.6, 0.05]} />
           <meshLambertMaterial color={PALETA.agua} flatShading />
         </mesh>
+      )}
+
+      {/* la COSECHA guardándose: arrume de costales y huacales junto al portón */}
+      {cosecha && (
+        <CosechaGuardada L={L} W={W} frugal={frugal} reducedMotion={reducedMotion} />
       )}
     </group>
   );
