@@ -1,0 +1,30 @@
+/*
+ * src/visual/mundo3d — EL FRAMEWORK DE MUNDOS (2D + 3D data-driven).
+ *
+ * Un solo host `<Mundo>` monta CUALQUIER mundo de la finca eligiendo un ARQUETIPO
+ * por datos y cruzándolo con el device-tier: dioramas 3D (cutaway/flujo/recinto/
+ * estratos/valle) o arquetipos 2D de primera clase (mirror/lamina/infografia/
+ * ficha/valle2d). Sumar un mundo = una entrada en `mundoData.js` + assets de la
+ * librería visual; NUNCA código de escena nuevo.
+ *
+ *   import Mundo, { MUNDO, ARQUETIPOS, resolverMundo, decidirTier } from '.../visual/mundo3d';
+ *
+ * IMPORTANTE (code-split): este barrel NO importa `three`/`@react-three`. Los
+ * dioramas 3D (carpeta `escenas/`) y su hook `useEntradaAbeja` se cargan PEREZOSO
+ * desde `<Mundo>` (chunk `vendor-three`), así que importar el barrel NO infla el
+ * bundle base. Para montar un arquetipo 3D suelto (p. ej. el storybook), impórtelo
+ * con `React.lazy(() => import('.../mundo3d/escenas/EscenaCutaway.jsx'))`.
+ */
+
+// El host (2D estático + 3D perezoso adentro).
+export { default } from './Mundo.jsx';
+export { default as Mundo } from './Mundo.jsx';
+export { default as Mundo2D } from './Mundo2D.jsx';
+
+// Datos + arquetipos + resolución (three-free, seguros en el bundle base).
+export { MUNDO, MUNDO_IDS } from './mundoData.js';
+export {
+  ARQUETIPOS, ARQUETIPOS_KEYS, ARQUETIPOS_3D, ARQUETIPOS_2D, esArquetipo3D,
+} from './arquetipos.js';
+export { resolverMundo, tinteDeMundo, tituloDeMundo } from './resolverMundo.js';
+export { decidirTier, permite3D } from './deviceTier.js';

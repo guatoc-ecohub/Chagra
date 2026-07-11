@@ -23,7 +23,11 @@
  * Resto de props (`d`, `stroke`, `strokeWidth`, `fill`, `cx`…) se pasan tal cual.
  */
 export function AutoDibujo({ as = 'path', stage, fade = false, className, ...rest }) {
-  const El = /** @type {import('react').ElementType} */ (as);
+  /* `any` irreducible: la augmentación GLOBAL de JSX de @react-three/fiber (que
+     entra al programa vía las escenas 3D de src/visual/mundo3d) rompe el tipado
+     de un elemento DINÁMICO (className→never en un ElementType genérico). El
+     runtime es idéntico; solo se relaja el chequeo de tipos de este `<El>`. */
+  const El = /** @type {any} */ (as);
   const base = fade ? 'vfx-fade' : 'vfx-draw';
   const stageClass = stage ? ` vfx-t${stage}` : '';
   const cls = `${base}${stageClass}${className ? ` ${className}` : ''}`;

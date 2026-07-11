@@ -1,0 +1,231 @@
+/*
+ * mundo.css — estilos del framework de mundos (host 3D/2D, hotspots, abeja,
+ * arquetipos 2D). Autocontenido: cero imágenes/fuentes externas. Solo
+ * transform/opacity animados; reduced-motion las apaga.
+ */
+
+.mundo-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  display: flex;
+  overflow: hidden;
+  background: #ece0c7;
+  border-radius: 14px;
+}
+.mundo-root[data-dim='2d'] {
+  background: transparent;
+}
+
+.mundo-canvas {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.mundo-canvas--listo {
+  opacity: 1;
+}
+
+/* ── Hotspot 3D: botón-billboard accesible sobre el diorama ─────────────── */
+.mundo-hotspot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.34em 0.7em 0.34em 0.4em;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #2a2016;
+  background: rgba(255, 251, 242, 0.94);
+  border: 2px solid var(--hs-tinte, #3f8f4e);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(40, 30, 10, 0.22);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.mundo-hotspot:hover,
+.mundo-hotspot:focus-visible {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 16px rgba(40, 30, 10, 0.28);
+  outline: none;
+}
+.mundo-hotspot--activo {
+  background: var(--hs-tinte, #3f8f4e);
+  color: #fff;
+}
+.mundo-hotspot__emoji {
+  font-size: 1.15em;
+  line-height: 1;
+}
+
+/* ── Angelita dentro de la escena (billboard) ──────────────────────────── */
+.mundo-abeja {
+  pointer-events: none;
+  filter: drop-shadow(0 4px 8px rgba(40, 30, 10, 0.28));
+}
+.mundo-abeja__cara {
+  transition: transform 0.2s ease;
+  transform-origin: center;
+}
+
+/* ── Cargando (mientras baja el chunk 3D) ──────────────────────────────── */
+.mundo-cargando {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  color: #4a3a22;
+  background: color-mix(in srgb, var(--m-tinte, #3f8f4e) 16%, #f2e8d6);
+}
+.mundo-cargando__pulso {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--m-tinte, #3f8f4e);
+  animation: mundo-pulso 1.4s ease-in-out infinite;
+}
+@keyframes mundo-pulso {
+  0%, 100% { transform: scale(0.7); opacity: 0.55; }
+  50% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Botón salir ───────────────────────────────────────────────────────── */
+.mundo-salir {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
+  padding: 0.4em 0.9em;
+  font: inherit;
+  font-weight: 600;
+  color: #2a2016;
+  background: rgba(255, 251, 242, 0.92);
+  border: 1px solid rgba(60, 46, 24, 0.25);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mundo-salir:focus-visible {
+  outline: 2px solid #3f8f4e;
+  outline-offset: 2px;
+}
+
+/* ── Arquetipos 2D (mirror / infografia / ficha / lamina) ──────────────── */
+.mundo2d {
+  width: 100%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  color: #2a2016;
+}
+.mundo2d__lienzo {
+  position: relative;
+}
+.mundo2d__svg {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+}
+.mundo2d__titulo {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+.mundo2d__sci {
+  margin: 0.1rem 0 0;
+  font-style: italic;
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.mundo2d__hotspots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.mundo2d__hotspots--info {
+  margin-top: 0.2rem;
+}
+.mundo2d__hotspot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.5em 0.9em;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #2a2016;
+  background: #fffdf7;
+  border: 2px solid var(--hs-tinte, #3f8f4e);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.mundo2d__hotspot:hover,
+.mundo2d__hotspot:focus-visible {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--hs-tinte, #3f8f4e) 12%, #fffdf7);
+  outline: none;
+}
+.mundo2d__emoji { font-size: 1.15em; line-height: 1; }
+
+/* infografía */
+.mundo2d__cifras {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.7rem;
+}
+.mundo2d__cifra {
+  padding: 0.8rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--m2d-tinte, #b98a2f) 12%, #fffaf0);
+  border: 1px solid color-mix(in srgb, var(--m2d-tinte, #b98a2f) 30%, transparent);
+}
+.mundo2d__valor {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--m2d-tinte, #b98a2f);
+}
+.mundo2d__unidad { font-size: 0.9rem; font-weight: 600; margin-left: 0.2em; }
+.mundo2d__cifra-label { display: block; margin-top: 0.35rem; font-size: 0.82rem; opacity: 0.85; }
+.mundo2d__notas {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+/* ficha */
+.mundo2d__ficha-head { display: flex; align-items: center; gap: 0.8rem; }
+.mundo2d__ficha-emoji { font-size: 2.6rem; line-height: 1; }
+.mundo2d__retrato { width: 64px; height: 64px; }
+.mundo2d__hechos { margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.mundo2d__hecho { display: flex; flex-direction: column; }
+.mundo2d__hecho dt { font-weight: 700; font-size: 0.8rem; opacity: 0.7; }
+.mundo2d__hecho dd { margin: 0.1rem 0 0; font-size: 0.95rem; }
+
+/* lamina */
+.mundo2d__lamina-stage { width: 100%; max-width: 420px; margin: 0 auto; }
+.mundo2d__vacio { text-align: center; opacity: 0.7; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mundo-canvas { transition: none; }
+  .mundo-cargando__pulso { animation: none; }
+  .mundo-hotspot,
+  .mundo2d__hotspot { transition: none; }
+}

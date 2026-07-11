@@ -87,6 +87,12 @@ export default defineConfig({
           if (id.includes('node_modules/lucide-react')) {
             return 'vendor-icons';
           }
+          // three / @react-three (fiber + drei): SOLO lo usa el mockup 3D
+          // (#/mockups/entrada-3d), cargado perezoso. Agruparlo en un chunk
+          // aparte lo mantiene fuera del bundle base y cacheable por sí solo.
+          if (id.includes('node_modules/three') || id.includes('node_modules/@react-three')) {
+            return 'vendor-three';
+          }
         },
       },
     },
