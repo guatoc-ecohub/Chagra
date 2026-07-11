@@ -24,12 +24,13 @@
  * lluvia y la niebla se CONGELAN en su fotograma (nunca desaparecen). PRNG
  * determinista: mismo dato → mismo cielo.
  */
-import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useMemo, useRef, useState } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
-import { CIELOS, PALETA } from '../atmosferaMadre.js';
+import { ATMOSFERA, CIELOS, PALETA } from '../atmosferaMadre.js';
 
 const R_BOVEDA = 9;
 
@@ -130,6 +131,45 @@ function Sol({ hora, reducedMotion }) {
       </mesh>
     </group>
   );
+}
+
+/* CIELO VIVO: el color de FONDO y del HEMISFERIO siguen la p VIVA del sol (la
+   misma que anima su arco), no la hora fija. El gradiente de la BÓVEDA (malla)
+   se queda memoizado —regenerarlo por frame sería caro—; esto es barato: solo
+   muta el <color> de fondo y el color de la luz de cielo. Así "el color del
+   cielo ES la hora": al avanzar el sol, el fondo y la luz atardecen con él.
+   Con reduced-motion no toca nada (la base ya fijó el fotograma digno). */
+function CieloVivo({ hora, reducedMotion }) {
+  const { scene } = useThree();
+  const hemiRef = useRef(null);
+  // colores de trabajo precomputados: cero asignaciones por frame.
+  const fondoMadre = useRef(new THREE.Color(ATMOSFERA.fondo));
+  // el hemisferio parte de la MISMA mezcla que EscenaBase3D (alba 40% + madre
+  // 60%) y solo se tiñe un poco hacia el cenit de la hora viva.
+  const baseCielo = useRef(
+    new THREE.Color(CIELOS.alba.cielo).lerp(new THREE.Color(ATMOSFERA.cielo), 0.6),
+  );
+  const tmpCielo = useRef(new THREE.Color());
+  useFrame((state) => {
+    if (reducedMotion) return;
+    const p = (hora + state.clock.elapsedTime * 0.012) % 1;
+    const { horizonte, zenit } = paletaCielo(p);
+    // fondo vivo = horizonte de la hora, mezclado 60% hacia la hora dorada madre
+    // (misma receta que la base, pero con la p viva del sol).
+    if (scene.background && scene.background.isColor) {
+      scene.background.copy(horizonte).lerp(fondoMadre.current, 0.6);
+    }
+    // hemisferio: cachea la luz una vez y tiñe su color de cielo un tercio hacia
+    // el cenit vivo (sin tocar intensidad ni groundColor: los fija la base).
+    if (!hemiRef.current) {
+      hemiRef.current = scene.getObjectByProperty('isHemisphereLight', true) || null;
+    }
+    if (hemiRef.current) {
+      tmpCielo.current.copy(baseCielo.current).lerp(zenit, 0.3);
+      hemiRef.current.color.copy(tmpCielo.current);
+    }
+  });
+  return null;
 }
 
 /* La luna: un disco pálido, quieto en su rincón. El cielo también tiene noche. */
@@ -259,6 +299,36 @@ const PISOS_DEF = [
   { nombre: 'páramo', color: '#9fb6bf', h: 0.8, r1: 0.42 },
 ];
 
+/* MICRO-RÓTULO tocable de la línea ámbar: le pone PALABRAS al retroceso glaciar
+   (un campesino no decodifica "aro ámbar = el hielo bajó"). Discreto —un punto
+   ámbar con su nota— y al tocarlo abre la consecuencia: con el calor los pisos
+   térmicos suben. Se ancla al frente del aro (hacia la cámara). Cuidado, no
+   alarma: el texto habla de "hasta aquí llegaba", nunca de catástrofe. */
+function RotuloHielo({ yAntes, rAntes }) {
+  const [abierto, setAbierto] = useState(false);
+  return (
+    <group position={[0, yAntes + 0.04, rAntes]}>
+      <Html center distanceFactor={9} zIndexRange={[16, 0]}>
+        <button
+          type="button"
+          className={`mundo-rotulo${abierto ? ' mundo-rotulo--abierto' : ''}`}
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); setAbierto((v) => !v); }}
+          aria-expanded={abierto}
+        >
+          <span className="mundo-rotulo__marca" aria-hidden="true" />
+          <span className="mundo-rotulo__txt">
+            Hasta aquí llegaba el hielo
+            {abierto && (
+              <em className="mundo-rotulo__mas"> — con el calor, los pisos térmicos suben.</em>
+            )}
+          </span>
+        </button>
+      </Html>
+    </group>
+  );
+}
+
 /* LA MONTAÑA: los cuatro pisos térmicos apilados como troncos de cono (paleta
    del mundo #4). Corona: el casquete de hielo + la LÍNEA ÁMBAR de hasta dónde
    llegaba el hielo (retroceso glaciar) — nota de conciencia, esperanza no colapso. */
@@ -304,6 +374,8 @@ function Montana({ pisos = PISOS_DEF, glaciar = {} }) {
         <torusGeometry args={[rAntes, 0.028, 6, 24]} />
         <meshBasicMaterial color={PALETA.ambar} transparent opacity={0.75} />
       </mesh>
+      {/* su rótulo tocable: le pone palabras a la línea ámbar */}
+      <RotuloHielo yAntes={yAntes} rAntes={rAntes} />
     </group>
   );
 }
@@ -333,6 +405,8 @@ function Diorama({ params, reducedMotion }) {
       </mesh>
 
       <Sol hora={hora} reducedMotion={reducedMotion} />
+      {/* el fondo y la luz de cielo atardecen con el sol (no en hora fija) */}
+      <CieloVivo hora={hora} reducedMotion={reducedMotion} />
       {!esDia && <Luna />}
       {esDia && hora < 0.55 && <Luna />}
 

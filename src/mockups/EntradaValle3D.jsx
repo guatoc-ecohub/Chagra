@@ -388,6 +388,7 @@ export default function EntradaValle3D({ onBack }) {
             onSalir={salirDelMundo}
             animo={companero.animo}
             energia={companero.energia}
+            hablando={!!dicho}
           />
         </section>
       )}
@@ -435,23 +436,28 @@ export default function EntradaValle3D({ onBack }) {
               nombra las puertas. Lo que dice (`dicho`) va SIEMPRE en su
               burbuja de texto (aria-live) — si la voz falta o está apagada,
               la burbuja es la voz. ── */}
-      {!panel && (
+      {!panel && (!nav.enMundo || dicho) && (
         <div
           className={`valle-companero${nav.enMundo ? ' valle-companero--mundo' : ''}`}
           data-gesto={gesto || undefined}
           role="status"
           aria-live="polite"
         >
-          <span className="valle-companero__cara" aria-hidden="true">
-            <AbejaAngelita
-              size={34}
-              pose={gesto || 'vuela'}
-              animo={companero.animo}
-              energia={companero.energia}
-              animated={!reducedMotion}
-            />
-            <i className="valle-companero__sombra" />
-          </span>
+          {/* DENTRO de un mundo Angelita vive en la ESCENA (una sola compañera,
+              no dos abejas): aquí el chip queda solo como su burbuja de voz. En
+              el valle sí lleva su cara (la tarjeta puntual imagen-first). */}
+          {!nav.enMundo && (
+            <span className="valle-companero__cara" aria-hidden="true">
+              <AbejaAngelita
+                size={34}
+                pose={gesto || 'vuela'}
+                animo={companero.animo}
+                energia={companero.energia}
+                animated={!reducedMotion}
+              />
+              <i className="valle-companero__sombra" />
+            </span>
+          )}
           {(dicho || !nav.enMundo) && (
             <span className="valle-companero__txt">{dicho || companero.frase}</span>
           )}

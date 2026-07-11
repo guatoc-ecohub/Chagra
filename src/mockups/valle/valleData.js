@@ -309,7 +309,7 @@ export function climaPorHora(fecha = new Date()) {
 }
 
 /* ── 3. LO QUE EL AGENTE DICE AL PASAR ───────────────────────────────────────
- * El compañero (colibrí) narra el mundo cuando la cámara viaja hacia él. Texto
+ * El compañero (abeja) narra el mundo cuando la cámara viaja hacia él. Texto
  * corto, cálido, en usted; se lee por voz (Web Speech API) si el equipo la trae.
  */
 export const NARRACION = {

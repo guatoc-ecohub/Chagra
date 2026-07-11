@@ -94,6 +94,7 @@ function MigaVolver({ onSalir, mundoId }) {
 
 function MundoInterno({
   mundoId, tier = 'alto', reducedMotion = false, onHotspot, onSalir, animo = 'sereno', energia = 1,
+  hablando = false,
 }) {
   /* CAÍDA DIGNA (BUG-UX-05 / SPEC-UX-05): si el chunk 3D no baja en
      CARGA_3D_TIMEOUT_MS, caemos al espejo 2D del mundo. `intento` fabrica un
@@ -166,6 +167,7 @@ function MundoInterno({
             onSalir={onSalir}
             animo={animo}
             energia={energia}
+            hablando={hablando}
           />
         </Suspense>
         <MigaVolver onSalir={onSalir} mundoId={mundoId} />

@@ -248,8 +248,9 @@ function Diorama({ params, reducedMotion }) {
       {/* la tarima del sello de procedencia (el terroir andino) */}
       <TarimaProcedencia pos={[-1.4, 0, -0.35]} />
 
-      {/* la balanza del precio justo */}
-      <Balanza pos={[0.15, 0.45, 0.55]} />
+      {/* la balanza del precio justo — posada en el empedrado (antes flotaba
+          ~0.45 sobre el piso sin mesa que la sostuviera). */}
+      <Balanza pos={[0.15, 0, 0.55]} />
 
       {/* la fauna que anima la feria (mariposa/colibrí) */}
       <Fauna items={FAUNA_MERCADO} reducedMotion={reducedMotion} />
