@@ -1669,6 +1669,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo del semillero">
               <Mundo3DSemilleroMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_infraestructura_3d':
         // Vitrina pública de la LIBRERÍA DE INFRAESTRUCTURA 3D: la grilla de todas
         // las construcciones del catálogo (src/visual/mundo3d/infraestructura) con
