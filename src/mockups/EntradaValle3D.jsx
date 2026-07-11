@@ -49,6 +49,8 @@ import Mundo, {
   useNavegacionMundos,
   TransicionMundo,
 } from '../visual/mundo3d/index.js';
+/* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
+import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
@@ -324,6 +326,9 @@ export default function EntradaValle3D({ onBack }) {
             />
           ))}
       </div>
+
+      {/* ── Onboarding de 3 s SIN voz: pista táctil del primer ingreso. ── */}
+      {!nav.enMundo && <CoachMarkToque reducedMotion={reducedMotion} />}
 
       {/* ── El MUNDO abierto: el framework monta la escena (3D perezoso o su
               2D digno) con su miga "‹ El valle" siempre visible. ── */}
