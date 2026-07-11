@@ -40,4 +40,10 @@ export { default as useHaptics, PATRONES_HAPTICOS } from './useHaptics.js';
 // Sonido ambiental 0-KB (three-free, spec S3): paletas sonoras por mundo
 // sintetizadas con WebAudio — sin assets. Opt-in (default OFF), solo tras
 // gesto del usuario; bajo reduced-motion queda el lecho estático, sin eventos.
-export { default as useAudioMundo, PALETAS_SONORAS } from './useAudioMundo.js';
+export {
+  default as useAudioMundo, PALETAS_SONORAS, activarAudioPorGesto, soportaAudio,
+} from './useAudioMundo.js';
+
+// Invitación de PRIMER USO del sonido (three-free): ya vive dentro del host
+// <Mundo> (app y vitrinas por igual); se exporta por si un mockup la monta suelta.
+export { default as InvitacionAudioMundo } from './InvitacionAudioMundo.jsx';

@@ -17,6 +17,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react
 import { resolverMundo, tinteDeMundo, tituloDeMundo, emojiDeMundo } from './resolverMundo.js';
 import Mundo2D from './Mundo2D.jsx';
 import useAudioMundo from './useAudioMundo.js';
+import InvitacionAudioMundo from './InvitacionAudioMundo.jsx';
 import './mundo.css';
 
 /* Los dioramas 3D se cargan PEREZOSO: three/@react-three viven en su propio
@@ -145,6 +146,8 @@ function MundoInterno({
             energia={energia}
           />
         )}
+        {/* Sin invitación de audio acá: el aviso de caída ya ocupa ese lugar
+            (señal mala ≠ momento de invitar); queda para la próxima entrada. */}
         <AvisoCaida3D tinte={tinte} onReintentar={reintentar3D} />
         <MigaVolver onSalir={onSalir} mundoId={mundoId} />
       </div>
@@ -170,6 +173,9 @@ function MundoInterno({
             hablando={hablando}
           />
         </Suspense>
+        {/* Invitación de PRIMER USO del sonido ambiental (una sola vez): vive
+            en el host para cubrir app y vitrinas por igual (allá no hay Perfil). */}
+        <InvitacionAudioMundo reducedMotion={reducedMotion} tinte={tinte} />
         <MigaVolver onSalir={onSalir} mundoId={mundoId} />
       </div>
     );
@@ -188,6 +194,7 @@ function MundoInterno({
         animo={animo}
         energia={energia}
       />
+      <InvitacionAudioMundo reducedMotion={reducedMotion} tinte={tinte} />
       <MigaVolver onSalir={onSalir} mundoId={mundoId} />
     </div>
   );

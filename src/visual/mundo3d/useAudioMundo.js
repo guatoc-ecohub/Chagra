@@ -522,6 +522,23 @@ function escucharGesto() {
   window.addEventListener('keydown', alGesto, { passive: true, capture: true });
 }
 
+/* ¿Hay WebAudio en este equipo? (para que la invitación de primer uso no
+   pregunte donde la respuesta "Sí" no podría sonar). SSR-safe: false. */
+export const soportaAudio = SOPORTA;
+
+/* Gesto EXPLÍCITO de opt-in (el "Sí" de la invitación de primer uso): el MISMO
+   toque que prende la preferencia debe satisfacer la política de autoplay.
+   Llamar SÍNCRONO dentro del handler del gesto: crea/reanuda el AudioContext
+   ahí mismo y marca `gestoOk`; el cambio de pref (setSonido) dispara después
+   sincronizar() vía el hook y el ambiente arranca de una, sin segundo toque. */
+export function activarAudioPorGesto() {
+  if (!SOPORTA) return;
+  motor.gestoOk = true;
+  asegurarCtx();
+  if (motor.ctx?.state === 'suspended') motor.ctx.resume().catch(() => {});
+  sincronizar();
+}
+
 /* ── Suscripción viva a prefers-reduced-motion (mismo patrón de useHaptics) ── */
 function subRM(cb) {
   if (typeof window === 'undefined' || !window.matchMedia) return () => {};
