@@ -115,6 +115,9 @@ const Mundo3DSemilleroMockup = lazy(() => import('./mockups/Mundo3DSemillero'));
 // compostera, tanque, secadero, media-sombra. Grilla data-driven con device-tier
 // real; el 3D va perezoso (vendor-three), 2D digno en equipo humilde.
 const Infraestructura3DMockup = lazy(() => import('./mockups/Infraestructura3D'));
+// Modo COLOCAR: el usuario elige una construcción del catálogo y la ubica en el
+// terreno (snapping a la ladera, girar en pasos, confirmar); persiste local.
+const ColocarInfraestructuraMockup = lazy(() => import('./mockups/ColocarInfraestructura'));
 // Voz: superficies de voz con forma viva (iris que reacciona al volumen).
 const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
 const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
@@ -532,6 +535,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-cafe': 'mockup_mundo3d_cafe',
   'mockups/mundo3d-semillero': 'mockup_mundo3d_semillero',
   'mockups/infraestructura-3d': 'mockup_infraestructura_3d',
+  'mockups/colocar-infraestructura': 'mockup_colocar_infraestructura',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1683,6 +1687,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La infraestructura de su finca">
               <Infraestructura3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_colocar_infraestructura':
+        // Modo COLOCAR infraestructura: el paso que le sigue a la vitrina — el
+        // usuario elige una construcción del catálogo, toca el terreno donde va
+        // (snapping a la altura de la ladera), la gira en pasos de 45° y la
+        // confirma; la lista {tipo, pos, rot} persiste en el equipo. En gama
+        // baja cae a un plano 2D cenital con el mismo flujo. Ruta
+        // #/mockups/colocar-infraestructura, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Colocar su infraestructura">
+              <ColocarInfraestructuraMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
