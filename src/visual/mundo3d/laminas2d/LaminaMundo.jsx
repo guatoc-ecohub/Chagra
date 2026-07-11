@@ -51,15 +51,63 @@ function FondoCutaway({ params, acento }) {
   );
 }
 
-function FondoFlujo({ acento }) {
+/* Un arbolito SVG (la ronda hídrica del gemelo 2D). */
+function Arbolito2D({ x, y, s = 1 }) {
+  return (
+    <g transform={`translate(${x},${y}) scale(${s})`}>
+      <rect x="-1.6" y="0" width="3.2" height="7" fill="#7a5a38" />
+      <path d="M0,-16 L9,2 L-9,2 Z" fill="#3f6f3a" />
+      <path d="M0,-22 L6,-8 L-6,-8 Z" fill="#4d7f42" />
+    </g>
+  );
+}
+
+function FondoFlujo({ params, acento }) {
+  const hitos = params?.hitos;
   return (
     <g>
       <rect x="0" y="0" width="300" height="200" fill="#eaf3f5" />
       <path d="M0,150 L120,150 L300,70 L300,200 L0,200 Z" fill="#8ba56a" />
+      {/* la ronda que protege el nacimiento (misma data que el diorama 3D) */}
+      {hitos?.ronda && (
+        <g>
+          <ellipse cx="52" cy="52" rx="46" ry="30" fill="#4d7f42" opacity="0.18" />
+          {Array.from({ length: hitos.ronda.arboles || 5 }, (_, i) => (
+            <Arbolito2D key={i} x={22 + i * 16} y={38 + (i % 2) * 18} s={0.8 + (i % 3) * 0.2} />
+          ))}
+        </g>
+      )}
+      {/* el nacimiento y la quebrada que baja */}
       <circle cx="40" cy="40" r="16" fill={acento} opacity="0.85" />
       <path d="M40,52 C80,90 140,110 200,150 C230,168 250,175 270,178" stroke={acento} strokeWidth="7" fill="none" strokeLinecap="round" opacity="0.8" />
+      {/* el punto de CUIDADO: barril y señal ámbar, didáctico — no catástrofe */}
+      {hitos?.riesgo && (
+        <g>
+          <rect x="128" y="88" width="12" height="14" rx="2" fill="#8b8b8b" />
+          <line x1="148" y1="102" x2="148" y2="80" stroke="#7a5a38" strokeWidth="2" />
+          <rect x="148" y="78" width="16" height="10" rx="1.5" fill="#d9a13b" />
+        </g>
+      )}
+      {/* la bocatoma sobre la quebrada */}
+      {hitos?.bocatoma && (
+        <g>
+          <rect x="188" y="134" width="18" height="14" rx="2" fill="#a8a094" />
+          <rect x="190" y="134" width="14" height="4" fill={acento} opacity="0.8" />
+        </g>
+      )}
+      {/* el tanque que recibe el agua */}
       <rect x="245" y="150" width="44" height="34" rx="4" fill="#9a8b74" />
       <rect x="249" y="150" width="36" height="8" fill={acento} opacity="0.8" />
+      {/* la huerta regada: surcos + canalito desde el tanque (el final feliz) */}
+      {hitos?.cultivo && (
+        <g>
+          <line x1="245" y1="172" x2="212" y2="182" stroke={acento} strokeWidth="3" opacity="0.75" strokeLinecap="round" />
+          <rect x="160" y="172" width="54" height="24" rx="3" fill="#6b4a2e" />
+          {Array.from({ length: hitos.cultivo.surcos || 4 }, (_, i) => (
+            <rect key={i} x="164" y={175 + i * 5.4} width="46" height="3" rx="1.5" fill="#5f8a3f" />
+          ))}
+        </g>
+      )}
     </g>
   );
 }

@@ -48,16 +48,40 @@ export const MUNDO = {
     entrada: { zoom: 6.5, narra: 'suelo' },
   },
 
-  // 💧 EL AGUA — el camino de la gravedad (flujo).
+  // 💧 EL AGUA — el RECORRIDO completo del agua por la pendiente (flujo).
+  //    El campesino ve de dónde nace, por dónde baja, dónde se toma, qué riega,
+  //    dónde se cuida (ronda) y dónde toca tener cuidado de no contaminarla.
+  //    Didáctico y esperanzador: cada punto es una puerta a una pantalla REAL.
+  //    Todo es DATOS: la curva de la quebrada + los hitos del recorrido los
+  //    leen por igual el diorama 3D (EscenaFlujo) y su gemelo 2D (FondoFlujo).
   agua: {
     escena: 'flujo',
     valle: { tipo: 'quebrada', pos: [0.6, 0, -1.4], escala: 1 },
-    params: {},
+    params: {
+      // La quebrada baja del nacimiento (arriba-izquierda) al tanque (abajo).
+      curva: [
+        [-2.1, 2.3, 0.3], [-1.1, 1.5, 0], [-0.1, 0.8, -0.25], [0.7, 0.25, 0], [1.5, -0.15, 0.5],
+      ],
+      // Los hitos del recorrido, anclados a la curva por su fracción t (0..1)
+      // o por posición propia. El arquetipo los dibuja; el gemelo 2D también.
+      hitos: {
+        ronda: { tramo: [0.02, 0.34], arboles: 5 },   // franja de monte que protege el nacimiento
+        riesgo: { t: 0.46, lado: 0.8 },               // donde se cuida: ni lavar bombas ni echar sobras
+        bocatoma: { t: 0.68 },                        // la cajilla que toma el agua para la casa
+        cultivo: { pos: [2.3, -0.3, -0.55], surcos: 4 }, // la huerta que se riega con medida
+      },
+    },
     hotspots: [
-      { id: 'agua', pos: [1.5, 0.3, 0.5], emoji: '💧', label: 'El agua de mi finca', view: 'agua' },
-      { id: 'hoy', pos: [-1.8, 2.5, 0.4], emoji: '🌤️', label: 'Lluvia de hoy', view: 'hoy_finca' },
+      { id: 'nacimiento', pos: [-2.1, 2.95, 0.3], emoji: '💧', label: 'Donde nace el agua', view: 'agua', data: { tema: 'nacimiento' } },
+      { id: 'ronda', pos: [-1.15, 2.45, -0.65], emoji: '🌳', label: 'La ronda que lo protege', view: 'restauracion' },
+      { id: 'quebrada', pos: [-0.1, 1.4, -0.3], emoji: '🐟', label: 'La quebrada viva', view: 'biodiversidad' },
+      { id: 'riesgo', pos: [0.3, 1.1, 0.9], emoji: '⚠️', label: 'Aquí se cuida el agua', view: 'toxicologia' },
+      { id: 'bocatoma', pos: [0.75, 0.9, 0.05], emoji: '🚰', label: 'La toma y el tanque', view: 'agua', data: { tema: 'riego' } },
+      { id: 'cultivo', pos: [2.3, 0.45, -0.55], emoji: '🥕', label: 'La huerta regada', view: 'hortalizas' },
     ],
     entrada: { zoom: 7, narra: 'agua' },
+    // El gemelo 2D digno (flujo-2D): mismo motivo, MISMOS params e hitos.
+    fallback2d: { escena: 'mirror' },
   },
 
   // 🐔 LOS ANIMALES — el ciclo cerrado (recinto). Gated por perfil (como hoy).

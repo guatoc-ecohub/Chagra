@@ -73,6 +73,9 @@ const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
 // Vitrina pública de la librería visual reutilizable (`src/visual/`). Ruta
 // #/mockups/visual-lib, resuelta ANTES del check de sesión (no requiere auth).
 const VisualLib = lazy(() => import('./mockups/VisualLib'));
+// Vitrina pública del MUNDO DEL AGUA (framework src/visual/mundo3d). Ruta
+// #/mockups/mundo3d-agua, también pre-auth. El 3D va perezoso (vendor-three).
+const Mundo3DAgua = lazy(() => import('./mockups/Mundo3DAgua'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -425,7 +428,14 @@ const LoadingFallback = ({ view = null }) => {
 // #onboarding-piloto. El hash llega ya normalizado (sin `#`/`#/`).
 const MOCKUP_HASH_ROUTES = {
   'mockups/visual-lib': 'mockup_visual_lib',
+  'mockups/mundo3d-agua': 'mockup_mundo3d_agua',
 };
+
+// ¿La vista actual es una vitrina pública de mockups? Son páginas
+// autocontenidas: sin fondo de app, banners de instalación/datos, FABs ni
+// atajos globales encima. Helper de módulo (no reactivo) para que los guards
+// de render/efectos lo usen sin pelear con exhaustive-deps.
+const esVistaMockup = (v) => Object.values(MOCKUP_HASH_ROUTES).includes(v);
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
@@ -793,7 +803,7 @@ export default function App() {
       clearTimeout(bootSync);
     };
   }, []);
-  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' });
+  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !esVistaMockup(currentView) });
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
@@ -1121,7 +1131,7 @@ export default function App() {
   // loading. Body className toggled según currentView. Estilos en
   // src/index.css clase .app-bg-biodiversidad (nombre histórico).
   useEffect(() => {
-    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib';
+    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !esVistaMockup(currentView);
     if (showBg) {
       document.body.classList.add('app-bg-biodiversidad');
     } else {
@@ -1238,6 +1248,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Librería visual">
               <VisualLib />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_agua':
+        // Vitrina pública del MUNDO DEL AGUA: monta <Mundo mundoId="agua"> del
+        // framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-agua, sin auth. El recorrido del agua de la finca:
+        // nacimiento → ronda → quebrada → cuidado → toma → huerta regada.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del agua">
+              <Mundo3DAgua />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2541,9 +2563,9 @@ export default function App() {
     currentView === 'loading' ||
     currentView === 'login' ||
     currentView === 'oauth-callback' ||
-    // La vitrina de la librería visual es una página pública autocontenida:
+    // Las vitrinas de mockups son páginas públicas autocontenidas:
     // sin banners de instalación/datos ni FABs encima.
-    currentView === 'mockup_visual_lib';
+    esVistaMockup(currentView);
 
   return (
     <>
@@ -2569,10 +2591,10 @@ export default function App() {
           detectamos huella `chagra:had-data-once` en localStorage + IDB
           vacío. NO se muestra en loading/login para no asustar antes de
           que la app pueda confirmar estado. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <DataLossBanner />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !esVistaMockup(currentView) && <DataLossBanner />}
       {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
           crítico) sin abrir la campana. Imposible de ignorar. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <CriticalAlertBanner onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !esVistaMockup(currentView) && <CriticalAlertBanner onNavigate={navigate} />}
       {/* Entrada de pantalla: el swap de vista era SECO (desmonta/monta sin
           transición). El wrapper con key remonta en cada cambio de vista y
           dispara un fade corto (motion.css .anim-screen-enter — solo opacidad,
@@ -2601,7 +2623,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !esVistaMockup(currentView) && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
@@ -2615,9 +2637,9 @@ export default function App() {
           Para re-habilitar el tap: descomentar el import de EscuchaFab (arriba)
           y la línea del render de abajo. */}
       {/* {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />} */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <EscuchaOverlay />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !esVistaMockup(currentView) && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <SyncProgressIndicator />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !esVistaMockup(currentView) && <SyncProgressIndicator />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}
