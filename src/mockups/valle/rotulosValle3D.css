@@ -1,0 +1,88 @@
+/*
+ * rotulosValle3D.css — los MODOS de las etiquetas espaciales del valle 3D
+ * (Valle3D.jsx · RotulosLugares). Compone SOBRE .valle-poi/.valle-alerta sin
+ * redefinirlos (ese archivo es de la entrada; este viaja con el componente):
+ *
+ *   · piso táctil en píxeles: ≥44px reales (WCAG 2.5.5) — al quitar el
+ *     distanceFactor del <Html>, la cámara ya NO encoge estos tamaños;
+ *   · data-modo='plena'  → nombre completo (la apuntada o la del mundo activo);
+ *   · data-modo='punto'  → chip calmo de 44px con emoji + anillo del tinte;
+ *   · data-modo='oculto' → cedió su espacio (anti-colisión en pantalla);
+ *   · data-tapado='1'    → detrás del terreno (occlude): no atraviesa la loma.
+ *
+ * Autocontenido: cero imágenes/fuentes externas. Solo se transiciona
+ * opacity/visibility; prefers-reduced-motion las apaga. El texto plena hereda
+ * blanco sobre fondo oscuro translúcido (≥4.5:1 aun sobre cielo claro → AA).
+ */
+
+.v3d-poi {
+  position: relative;
+  min-width: 44px;
+  min-height: 44px;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+
+/* Hit-slop: el área de toque es más generosa que lo visual (dedo de campo). */
+.v3d-poi::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+}
+
+/* Punto-chip: menos-pero-legible. Emoji grande + anillo del tinte del mundo;
+   mismo botón, misma navegación — solo se calma lo visual. */
+.v3d-poi[data-modo='punto'] {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  gap: 0;
+  justify-content: center;
+  border: 2px solid var(--poi-tinte, #7fd08a);
+}
+.v3d-poi[data-modo='punto']::before,
+.v3d-poi[data-modo='punto'] .valle-poi__txt {
+  display: none;
+}
+.v3d-poi[data-modo='punto'] .valle-poi__emoji {
+  font-size: 1.35rem;
+}
+
+/* Cedió el espacio a un rótulo más cercano (anti-colisión), o quedó detrás
+   del terreno (occlude). visibility saca al botón del tab-order y del árbol
+   de accesibilidad mientras no se ve. */
+.v3d-poi[data-modo='oculto'],
+.v3d-poi[data-tapado='1'] {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Teclado: el rótulo enfocado SIEMPRE se muestra completo y visible
+   (estas reglas van de últimas para ganar a los modos de arriba). */
+.v3d-poi:focus-visible {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  width: auto;
+  height: auto;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem 0.35rem 0.55rem;
+  outline: 3px solid #ffd68a;
+  outline-offset: 2px;
+}
+.v3d-poi:focus-visible .valle-poi__txt {
+  display: inline;
+}
+
+/* La alerta del día también con piso táctil real (sin distanceFactor). */
+.v3d-alerta {
+  min-width: 44px;
+  min-height: 48px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3d-poi {
+    transition: none;
+  }
+}

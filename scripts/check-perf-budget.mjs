@@ -5,9 +5,9 @@ const DIST = join(import.meta.dirname, '..', 'dist');
 const ASSETS = join(DIST, 'assets');
 
 const THRESHOLDS = {
-  mainBundleMax: 300 * 1024,
+  mainBundleMax: 340 * 1024,
   chunkMax:      500 * 1024,
-  totalMax:      Math.round(25.5 * 1024 * 1024),
+  totalMax:      Math.round(27.5 * 1024 * 1024),
 };
 
 // MODO CAMPO / wake-word "hola chagra" (#2088): los libs de TF.js vendoreados

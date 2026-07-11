@@ -28,14 +28,20 @@
   opacity: 1;
 }
 
-/* ── Hotspot 3D: botón-billboard accesible sobre el diorama ─────────────── */
+/* ── Hotspot 3D: botón-billboard accesible sobre el diorama ───────────────
+      Piso táctil ≥44px en AMBOS ejes (WCAG 2.5.5: dedo de campo, con guante)
+      + hit-slop invisible que agranda el toque sin engordar lo visual. */
 .mundo-hotspot {
+  position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4em;
-  padding: 0.34em 0.7em 0.34em 0.4em;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.4em 0.85em 0.4em 0.5em;
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #2a2016;
   background: rgba(255, 251, 242, 0.94);
@@ -46,29 +52,237 @@
   box-shadow: 0 3px 10px rgba(40, 30, 10, 0.22);
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
+/* hit-slop: área de toque más generosa que la píldora visible */
+.mundo-hotspot::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+}
 .mundo-hotspot:hover,
 .mundo-hotspot:focus-visible {
   transform: translateY(-2px) scale(1.04);
   box-shadow: 0 6px 16px rgba(40, 30, 10, 0.28);
   outline: none;
 }
+/* Activo: texto oscuro sobre tinte CLARO (≥4.5:1, AA) + doble anillo — la
+   señal no es solo color (BUG-UX-02). */
 .mundo-hotspot--activo {
-  background: var(--hs-tinte, #3f8f4e);
-  color: #fff;
+  background: color-mix(in srgb, var(--hs-tinte, #3f8f4e) 18%, #fffdf7);
+  color: #2a2016;
+  box-shadow:
+    0 3px 10px rgba(40, 30, 10, 0.22),
+    0 0 0 3px color-mix(in srgb, var(--hs-tinte, #3f8f4e) 45%, #2a2016);
 }
+/* Comandado por VOZ/TEXTO (lazo dos-vías, spec S1): además del anillo de
+   `--activo`, el punto que Angelita acaba de enfocar late un momento — la señal
+   de "la escena te oyó". */
+.mundo-hotspot--comando {
+  box-shadow:
+    0 3px 10px rgba(40, 30, 10, 0.22),
+    0 0 0 3px color-mix(in srgb, var(--hs-tinte, #3f8f4e) 65%, #2a2016);
+}
+/* El HALO: un anillo que se expande y se desvanece. Vive dentro del botón
+   (position: relative); se re-monta por `key={focoToken}` → repite el pulso en
+   cada comando. pointer-events off: nunca estorba el toque. */
+.mundo-hotspot__halo {
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  border: 2px solid var(--hs-tinte, #3f8f4e);
+  pointer-events: none;
+  opacity: 0;
+  animation: mundo-hotspot-halo 1.15s ease-out 2;
+}
+@keyframes mundo-hotspot-halo {
+  0% { opacity: 0.85; transform: scale(1); }
+  70% { opacity: 0; transform: scale(1.75); }
+  100% { opacity: 0; transform: scale(1.75); }
+}
+
 .mundo-hotspot__emoji {
   font-size: 1.15em;
   line-height: 1;
 }
 
+/* ── Placa del animal (corral-espejo): el toque abre nombre + raza + tamaño
+      (+ estado). Misma familia de papel que el hotspot; tocar de nuevo cierra.
+      Piso táctil ≥44px (WCAG 2.5.5) y señal de estado que no es solo color. */
+.mundo-placa {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15em;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.45em 0.9em;
+  font: inherit;
+  color: #2a2016;
+  background: rgba(255, 251, 242, 0.96);
+  border: 2px solid var(--placa-tinte, #a98a5c);
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(40, 30, 10, 0.24);
+}
+.mundo-placa__nombre {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.mundo-placa__meta {
+  font-size: 0.78rem;
+  color: #6a5a44;
+}
+.mundo-placa__estado {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1em 0.6em;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+}
+.mundo-placa__estado--prenada {
+  color: #8a4a5a;
+  background: #f6e3e8;
+}
+.mundo-placa__estado--vendido {
+  color: #5a5248;
+  background: #eee7da;
+}
+/* Recién nacida: verde tierno, celebración serena (un ser nuevo en el corral). */
+.mundo-placa__estado--nace {
+  color: #3f7a4a;
+  background: #e4f1e0;
+}
+/* En memoria: gris cálido, respeto sin luto (se recuerda, no se dramatiza). */
+.mundo-placa__estado--muerte {
+  color: #6a6152;
+  background: #efeae0;
+}
+
 /* ── Angelita dentro de la escena (billboard) ──────────────────────────── */
+/* Tres capas para tres gestos que NO se pisan: la raíz PULSA al narrar, la capa
+   media REBOTA al toque, la cara VOLTEA (scaleX imperativo por frame). */
 .mundo-abeja {
   pointer-events: none;
   filter: drop-shadow(0 4px 8px rgba(40, 30, 10, 0.28));
+  transform-origin: center bottom;
+}
+.mundo-abeja__rebote {
+  transform-origin: center bottom;
 }
 .mundo-abeja__cara {
   transition: transform 0.2s ease;
   transform-origin: center;
+}
+/* Habla: mientras el agente narra, la única abeja del mundo PULSA suave —refleja
+   la voz en la escena, ya no una abeja muda de adorno (una compañera = una voz). */
+.mundo-abeja[data-hablando='1'] {
+  animation: mundo-abeja-habla 0.62s ease-in-out infinite;
+}
+@keyframes mundo-abeja-habla {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.09); }
+}
+/* Microrrebote: brinquito con squash al tocar un hotspot (carácter de compañera:
+   acusa el toque, ref. el zorro de Ori / el ganso de Untitled Goose). */
+.mundo-abeja__rebote[data-rebote='1'] {
+  animation: mundo-abeja-rebote 0.64s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes mundo-abeja-rebote {
+  0% { transform: translateY(0) scale(1, 1); }
+  30% { transform: translateY(-8px) scale(1.12, 0.9); }
+  55% { transform: translateY(0) scale(0.94, 1.08); }
+  78% { transform: translateY(-2px) scale(1.02, 0.98); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mundo-abeja[data-hablando='1'],
+  .mundo-abeja__rebote[data-rebote='1'] { animation: none; }
+}
+
+/* ── Micro-rótulo tocable del retroceso glaciar (bóveda) ────────────────── */
+/* Le pone PALABRAS a la línea ámbar del hielo: discreto (un punto ámbar + nota),
+   y al tocarlo abre la consecuencia (los pisos térmicos suben). Cuidado, no
+   alarma: ámbar cálido, jamás rojo. */
+.mundo-rotulo {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 12rem;
+  padding: 0.18rem 0.5rem 0.18rem 0.34rem;
+  border: 1px solid rgba(217, 161, 59, 0.55);
+  border-radius: 999px;
+  background: rgba(28, 22, 12, 0.66);
+  color: #f4e2bf;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: left;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.32);
+}
+.mundo-rotulo__marca {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d9a13b;
+  box-shadow: 0 0 6px rgba(217, 161, 59, 0.8);
+}
+.mundo-rotulo__mas {
+  font-style: normal;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* ── El rótulo del CICLO ENSO (bóveda): la ruedita Niña→Neutro→Niño ───────── */
+/* La OSCILACIÓN interanual que manda sobre el compás bimodal. Se LEE, no alarma:
+   un toque gira la fase; el velo del cielo cambia con ella. Ámbar de "prepárese",
+   jamás rojo. Acento por fase (frío en Niña, tibio neutro, cálido en Niño). */
+.mundo-enso {
+  max-width: 13.5rem;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.34rem 0.6rem 0.34rem 0.42rem;
+}
+.mundo-enso__rueda {
+  flex: 0 0 auto;
+  display: inline-flex;
+  flex-direction: row;
+  gap: 3px;
+  margin-top: 0.22rem;
+}
+.mundo-enso__diente {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(244, 226, 191, 0.28);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.mundo-enso__diente.es-activo {
+  background: #d9a13b;
+  box-shadow: 0 0 6px rgba(217, 161, 59, 0.85);
+}
+.mundo-enso__txt {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.14rem;
+}
+.mundo-enso__titulo { font-size: 0.8rem; font-weight: 700; }
+.mundo-enso__lee { font-weight: 500; opacity: 0.92; }
+.mundo-enso__consejo { font-weight: 600; color: #ffe0a6; }
+.mundo-enso__oni { font-size: 0.62rem; font-weight: 500; opacity: 0.7; }
+.mundo-enso--nina { border-color: rgba(140, 170, 200, 0.6); }
+.mundo-enso--neutral { border-color: rgba(217, 161, 59, 0.4); }
+.mundo-enso--nino { border-color: rgba(230, 175, 90, 0.68); }
+
+/* ── Fauna de la librería sembrada en la escena (billboard decorativo) ───── */
+.mundo-fauna {
+  pointer-events: none;
+  filter: drop-shadow(0 2px 5px rgba(40, 30, 10, 0.24));
 }
 
 /* ── Cargando (mientras baja el chunk 3D) ──────────────────────────────── */
@@ -95,13 +309,90 @@
   50% { transform: scale(1); opacity: 1; }
 }
 
-/* ── Botón salir ───────────────────────────────────────────────────────── */
-.mundo-salir {
+/* ── Caída digna: el chunk 3D no bajó (señal intermitente) → espejo 2D ──── */
+.mundo-caida {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.8rem;
+  padding: 0.6rem 0.8rem;
+  color: #2a2016;
+  background: rgba(255, 251, 242, 0.95);
+  border: 1px solid color-mix(in srgb, var(--m-tinte, #3f8f4e) 45%, transparent);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(40, 30, 10, 0.18);
+}
+.mundo-caida__txt {
+  margin: 0;
+  flex: 1 1 14ch;
+  min-width: 0;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+.mundo-caida__btn {
+  flex: none;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.45em 1.1em;
+  font: inherit;
+  font-weight: 700;
+  color: #fffdf7;
+  background: var(--m-tinte, #3f8f4e);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mundo-caida__btn:focus-visible {
+  outline: 2px solid #2a2016;
+  outline-offset: 2px;
+}
+/* que el aviso no tape el final del espejo 2D en pantallas de 320px */
+.mundo-root[data-caida3d='1'] .mundo2d {
+  padding-bottom: 7.5rem;
+}
+
+/* ── La miga: volver al valle + dónde-estoy (consistente en todo mundo) ── */
+.mundo-miga {
   position: absolute;
   top: 12px;
   left: 12px;
+  right: 12px;
   z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+.mundo-miga > * {
+  pointer-events: auto;
+}
+.mundo-miga__aqui {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   padding: 0.4em 0.9em;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fffdf7;
+  background: rgba(42, 32, 22, 0.72);
+  border-radius: 999px;
+}
+.mundo-salir {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.4em 1em;
   font: inherit;
   font-weight: 600;
   color: #2a2016;
@@ -158,6 +449,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.5em 0.9em;
   font: inherit;
   font-weight: 600;
@@ -223,9 +516,76 @@
 .mundo2d__lamina-stage { width: 100%; max-width: 420px; margin: 0 auto; }
 .mundo2d__vacio { text-align: center; opacity: 0.7; }
 
+/* ── El viaje valle ↔ mundo (overlay DOM: la abeja guía; cero three) ────── */
+.mundo-viaje {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  overflow: hidden;
+}
+.mundo-viaje__velo {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 60%,
+    var(--mv-b, #dcedc9) 0%,
+    var(--mv-a, #3f8f4e) 62%,
+    color-mix(in srgb, var(--mv-a, #3f8f4e) 70%, #0a141d) 100%
+  );
+}
+.mundo-viaje--entrar .mundo-viaje__velo { animation: mundo-velo-entra 1.05s ease-in-out both; }
+.mundo-viaje--volver .mundo-viaje__velo { animation: mundo-velo-vuelve 1.05s ease-in-out both; }
+.mundo-viaje__abeja {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 6px 14px rgba(20, 30, 15, 0.4));
+}
+.mundo-viaje--entrar .mundo-viaje__abeja { animation: mundo-abeja-entra 1.05s ease-in both; }
+.mundo-viaje--volver .mundo-viaje__abeja { animation: mundo-abeja-vuelve 1.05s ease-out both; }
+.mundo-viaje__txt {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0 1rem;
+  font-weight: 700;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(10, 20, 10, 0.5);
+}
+/* Profundidad sin post-proceso: el velo escala (acercarse/alejarse) y la abeja
+   viaja del frente hacia el fondo (entrar) o del fondo hacia usted (volver). */
+@keyframes mundo-velo-entra {
+  from { opacity: 0; transform: scale(1.3); }
+  35% { opacity: 1; }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes mundo-velo-vuelve {
+  from { opacity: 0; transform: scale(1); }
+  35% { opacity: 1; }
+  to { opacity: 1; transform: scale(1.22); }
+}
+@keyframes mundo-abeja-entra {
+  from { transform: translateY(42vh) scale(1.9); opacity: 0; }
+  30% { opacity: 1; }
+  to { transform: translateY(-1vh) scale(0.55); opacity: 0.95; }
+}
+@keyframes mundo-abeja-vuelve {
+  from { transform: translateY(-1vh) scale(0.55); opacity: 0.6; }
+  to { transform: translateY(5vh) scale(1.7); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mundo-canvas { transition: none; }
   .mundo-cargando__pulso { animation: none; }
   .mundo-hotspot,
   .mundo2d__hotspot { transition: none; }
+  .mundo-viaje__velo,
+  .mundo-viaje__abeja { animation: none; }
+  /* Sin pulso, pero SÍ señal: el halo queda como anillo fijo (no se mueve). */
+  .mundo-hotspot__halo { animation: none; opacity: 0.9; }
 }

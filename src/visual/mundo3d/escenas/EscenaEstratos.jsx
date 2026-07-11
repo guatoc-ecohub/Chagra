@@ -1,15 +1,29 @@
 /*
- * EscenaEstratos — ARQUETIPO `estratos`: la VERTICALIDAD del bosque comestible.
+ * EscenaEstratos — ARQUETIPO `estratos`: la VERTICALIDAD como lección.
  *
- * Los 7 estratos (emergente → dosel → sub-dosel → arbusto → herbáceo → rastrero
- * → raíz) son verticales POR DEFINICIÓN: la verticalidad ES la lección, y una
- * lista plana la mata. Aquí cada estrato es una banda de altura con su vegetación
- * low-poly repetida (troncos + copas / matas). Con muchos árboles el DR pide
- * `InstancedMesh`; este arquetipo usa un conteo acotado por estrato y `MeshLambert`
- * sin sombras (DR §6) — el que "estresa" el framework más allá del cutaway.
+ * Sirve DOS mundos con la MISMA geometría, elegidos por datos (DR §4.2, "una
+ * entrada = un mundo; cero código de escena nuevo"):
+ *
+ *   · `disenio`  → params.estratos: los 7 estratos del BOSQUE COMESTIBLE (dosel
+ *                  → raíz). La verticalidad ES el diseño de la finca.
+ *   · `pisos`    → params.pisos: la LADERA ANDINA en corte, el gradiente
+ *                  ALTITUDINAL (cálido → templado → frío → páramo). La altura
+ *                  manda: en cada piso crece lo suyo. Señal SUTIL de cambio
+ *                  climático (termofilización: los pisos suben), sin catástrofe.
+ *
+ * Bandas/terrazas con vegetación low-poly repetida y `MeshLambert` sin sombras
+ * (DR §6). Con `params.pisos` presente se dibuja la ladera; si no, el bosque
+ * comestible de siempre (retro-compatible byte a byte para `disenio`).
  */
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
+import { Fauna } from './FaunaEscena.jsx';
+import { faunaDeMundo } from '../faunaFuncional.js';
+import { CIELOS, PALETA } from '../atmosferaMadre.js';
+
+/* La fauna funcional por estrato (POLINIZADORES en dosel/sotobosque + un
+   DESCOMPONEDOR en la hojarasca, para `disenio`; POLINIZADORES del aire
+   templado/frío para `pisos`) vive en faunaFuncional.js, por mundo. */
 
 const ESTRATOS_DEF = [
   { nombre: 'emergente', alto: 3.4, color: '#2f5f34', r: 0.6 },
@@ -26,7 +40,7 @@ function Planta({ x, z, alto, color, r }) {
     <group position={[x, 0, z]}>
       <mesh position={[0, alto * 0.35, 0]}>
         <cylinderGeometry args={[0.06, 0.09, alto * 0.7, 5]} />
-        <meshLambertMaterial color="#6b4a2e" flatShading />
+        <meshLambertMaterial color={PALETA.tierra} flatShading />
       </mesh>
       <mesh position={[0, alto * 0.78, 0]}>
         <coneGeometry args={[r, alto * 0.7, 7]} />
@@ -36,7 +50,8 @@ function Planta({ x, z, alto, color, r }) {
   );
 }
 
-function Diorama({ params }) {
+/* ── El bosque comestible (mundo `disenio`) — sin cambios ─────────────────── */
+function DioramaEstratos({ params, reducedMotion, fauna }) {
   const estratos = params?.estratos || ESTRATOS_DEF;
   const plantas = useMemo(() => {
     const out = [];
@@ -62,20 +77,278 @@ function Diorama({ params }) {
       {plantas.map((p) => (
         <Planta key={p.key} x={p.x} z={p.z} alto={p.alto} color={p.color} r={p.r} />
       ))}
+      {/* la vida repartida por estratos: polinizadores arriba, descomponedor abajo */}
+      <Fauna items={fauna} reducedMotion={reducedMotion} />
+    </group>
+  );
+}
+
+/* ═══ LA LADERA ANDINA (mundo `pisos`) ════════════════════════════════════════
+ * Cuatro terrazas que suben del cálido al páramo, cada una con su cultivo
+ * emblemático low-poly y su color térmico (dorado abajo → azul-frío/blanco
+ * arriba). Vida sólo donde de veras vive: colibrí y mariposa en templado/frío;
+ * el páramo va sin bichos (honestidad ecológica) y con niebla que capta agua.
+ */
+
+/* Cuánto sube y cuánto se mete al fondo cada piso (staircase de ladera). */
+const PISO_SUBE = 1.15;
+const PISO_FONDO = 0.7;
+const pisoY = (i) => 0.2 + i * PISO_SUBE; // superficie de la terraza i
+const pisoZ = (i) => 0.6 - i * PISO_FONDO; // se recede al subir (profundidad)
+
+/* Plátano/frutal (piso cálido): pseudotallo verde + hojas grandes colgantes. */
+function Platano() {
+  return (
+    <group>
+      <mesh position={[0, 0.38, 0]}>
+        <cylinderGeometry args={[0.05, 0.08, 0.76, 6]} />
+        <meshLambertMaterial color="#7d8a3e" flatShading />
+      </mesh>
+      {[0, 1, 2, 3, 4].map((k) => (
+        <mesh
+          key={k}
+          position={[Math.cos((k / 5) * Math.PI * 2) * 0.16, 0.74, Math.sin((k / 5) * Math.PI * 2) * 0.16]}
+          rotation={[Math.PI * 0.42, (k / 5) * Math.PI * 2, 0]}
+          scale={[0.5, 1, 1]}
+        >
+          <coneGeometry args={[0.1, 0.62, 4]} />
+          <meshLambertMaterial color="#4f7a34" flatShading />
+        </mesh>
+      ))}
+      {/* racimo (fruto) */}
+      <mesh position={[0.1, 0.5, 0.08]} scale={[0.6, 1, 0.6]}>
+        <sphereGeometry args={[0.12, 6, 5]} />
+        <meshLambertMaterial color="#b9c24a" flatShading />
+      </mesh>
+    </group>
+  );
+}
+
+/* Cafeto de sombra (piso templado): arbusto redondo + cerezas rojas. */
+function Cafeto() {
+  return (
+    <group>
+      <mesh position={[0, 0.13, 0]}>
+        <cylinderGeometry args={[0.035, 0.05, 0.26, 5]} />
+        <meshLambertMaterial color={PALETA.tierra} flatShading />
+      </mesh>
+      <mesh position={[0, 0.42, 0]} scale={[1, 0.95, 1]}>
+        <sphereGeometry args={[0.28, 7, 6]} />
+        <meshLambertMaterial color={PALETA.follajeOscuro} flatShading />
+      </mesh>
+      {[0, 1, 2, 3].map((k) => (
+        <mesh
+          key={k}
+          position={[Math.cos((k / 4) * Math.PI * 2) * 0.24, 0.42 + (k % 2) * 0.08, Math.sin((k / 4) * Math.PI * 2) * 0.24]}
+        >
+          <sphereGeometry args={[0.04, 5, 4]} />
+          <meshLambertMaterial color="#c0392b" flatShading />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* Papa (piso frío): mata baja y matoja + flores lilas. */
+function Papa() {
+  return (
+    <group>
+      <mesh position={[0, 0.14, 0]} scale={[1, 0.55, 1]}>
+        <sphereGeometry args={[0.3, 7, 6]} />
+        <meshLambertMaterial color={PALETA.follaje} flatShading />
+      </mesh>
+      <mesh position={[0.22, 0.11, 0.14]} scale={[1, 0.5, 1]}>
+        <sphereGeometry args={[0.18, 6, 5]} />
+        <meshLambertMaterial color="#6d9748" flatShading />
+      </mesh>
+      {[[-0.1, 0.3, 0.08], [0.14, 0.28, -0.05]].map((p, k) => (
+        <mesh key={k} position={p}>
+          <sphereGeometry args={[0.035, 5, 4]} />
+          <meshLambertMaterial color="#d3c2e6" flatShading />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* Frailejón (Espeletia, Asteraceae — páramo): roseta CAULESCENTE, la forma que
+   lo define (Bitácora de flora, Inst. Humboldt): tronco de hojas viejas
+   marcescentes (columna gris-parda, no leña) + roseta de hojas gruesas y
+   velludas que suben, PLATEADAS por la pubescencia que las abriga del frío y la
+   radiación, coronadas por capítulos AMARILLOS (son girasoles de altura). Ref.
+   E. grandiflora (Chingaza/Sumapaz), E. hartwegiana (nevados). NO es cultivo: es
+   conservación (el páramo se cuida, no se ara). */
+function Frailejon() {
+  return (
+    <group>
+      {/* tronco: columna de hojas muertas persistentes (marcescencia), fibrosa */}
+      <mesh position={[0, 0.32, 0]}>
+        <cylinderGeometry args={[0.1, 0.13, 0.64, 7]} />
+        <meshLambertMaterial color="#6f5e44" flatShading />
+      </mesh>
+      {/* roseta: hojas apuntando arriba-afuera, plateadas por la pubescencia */}
+      {Array.from({ length: 10 }, (_, k) => (
+        <mesh
+          key={k}
+          position={[Math.cos((k / 10) * Math.PI * 2) * 0.11, 0.66, Math.sin((k / 10) * Math.PI * 2) * 0.11]}
+          rotation={[Math.PI * 0.26, (k / 10) * Math.PI * 2, 0]}
+        >
+          <coneGeometry args={[0.05, 0.36, 4]} />
+          <meshLambertMaterial color="#b3bda0" flatShading />
+        </mesh>
+      ))}
+      {/* cogollo: las hojas nuevas, las más blancas (máxima pubescencia) */}
+      <mesh position={[0, 0.78, 0]}>
+        <coneGeometry args={[0.11, 0.2, 6]} />
+        <meshLambertMaterial color="#cdd4c2" flatShading />
+      </mesh>
+      {/* capítulos amarillos (Asteraceae): flores sobre tallitos que asoman de la
+          roseta — el rasgo que faltaba, y el que pinta de amarillo el páramo */}
+      {[0, 1, 2, 3].map((k) => {
+        const a = (k / 4) * Math.PI * 2 + 0.6;
+        const fx = Math.cos(a) * 0.19;
+        const fz = Math.sin(a) * 0.19;
+        return (
+          <group key={`flor-${k}`} position={[fx, 0.74, fz]}>
+            <mesh position={[0, 0.07, 0]}>
+              <cylinderGeometry args={[0.008, 0.008, 0.14, 4]} />
+              <meshLambertMaterial color="#7f8a48" flatShading />
+            </mesh>
+            <mesh position={[0, 0.15, 0]} scale={[1, 0.5, 1]}>
+              <sphereGeometry args={[0.045, 7, 5]} />
+              <meshLambertMaterial color="#e6bf2e" flatShading />
+            </mesh>
+          </group>
+        );
+      })}
+    </group>
+  );
+}
+
+const CULTIVOS = { platano: Platano, cafe: Cafeto, papa: Papa, frailejon: Frailejon };
+
+function SiluetaCultivo({ tipo, x, y, z }) {
+  const Comp = CULTIVOS[tipo];
+  if (!Comp) return null;
+  return (
+    <group position={[x, y, z]}>
+      <Comp />
+    </group>
+  );
+}
+
+/* Puf de niebla del páramo (capta agua): esfera achatada, translúcida, quieta
+   (digna con reduced-motion: no se mueve, no desaparece). */
+function Niebla({ x, y, z, r = 0.5 }) {
+  return (
+    <mesh position={[x, y, z]} scale={[1, 0.34, 1]}>
+      <sphereGeometry args={[r, 8, 6]} />
+      <meshBasicMaterial color="#eef4f4" transparent opacity={0.5} />
+    </mesh>
+  );
+}
+
+function DioramaPisos({ params, reducedMotion, fauna }) {
+  const pisos = useMemo(() => params?.pisos || [], [params?.pisos]);
+  // Cultivos por terraza, con aire (2 por piso, jitter determinista).
+  const siembra = useMemo(() => {
+    const out = [];
+    let s = 11;
+    pisos.forEach((p, i) => {
+      const cuenta = p.cultivo === 'frailejon' ? 2 : 2;
+      for (let j = 0; j < cuenta; j++) {
+        s = (s * 1103515245 + 12345) >>> 0;
+        const x = ((s % 1000) / 1000 - 0.5) * 1.5 + (j === 0 ? -0.45 : 0.5);
+        s = (s * 1103515245 + 12345) >>> 0;
+        const z = pisoZ(i) + ((s % 1000) / 1000 - 0.5) * 0.5;
+        out.push({ key: `${i}-${j}`, tipo: p.cultivo, x, y: pisoY(i) + 0.07, z });
+      }
+    });
+    return out;
+  }, [pisos]);
+
+  return (
+    <group position={[0, 0, 0]}>
+      {/* la ladera al fondo: silueta de montaña por capas (profundidad) */}
+      <mesh position={[-0.6, 1.3, -3.4]}>
+        <coneGeometry args={[3.3, 4.6, 5]} />
+        <meshLambertMaterial color="#9fb4bc" flatShading />
+      </mesh>
+      <mesh position={[1.4, 1.0, -3.0]}>
+        <coneGeometry args={[2.6, 3.7, 5]} />
+        <meshLambertMaterial color="#adc0c6" flatShading />
+      </mesh>
+
+      {/* las cuatro terrazas que suben, cada una con su color térmico */}
+      {pisos.map((p, i) => (
+        <group key={p.id}>
+          <mesh position={[0, pisoY(i), pisoZ(i)]}>
+            <cylinderGeometry args={[1.28 - i * 0.13, 1.34 - i * 0.13, 0.16, 24]} />
+            <meshLambertMaterial color={p.color} flatShading />
+          </mesh>
+          {/* faldón sombreado del escalón: da la sensación de pendiente */}
+          {i > 0 && (
+            <mesh position={[0, pisoY(i) - 0.5, pisoZ(i) + 0.28]}>
+              <cylinderGeometry args={[0.14, 0.14, 0.86, 6]} />
+              <meshLambertMaterial color="#6b5a3e" flatShading />
+            </mesh>
+          )}
+        </group>
+      ))}
+
+      {/* la vegetación emblemática de cada piso */}
+      {siembra.map((c) => (
+        <SiluetaCultivo key={c.key} tipo={c.tipo} x={c.x} y={c.y} z={c.z} />
+      ))}
+
+      {/* niebla del páramo (piso más alto): capta agua, quieta y digna */}
+      {pisos.map((p, i) =>
+        p.niebla ? (
+          <group key={`n-${p.id}`}>
+            <Niebla x={-0.4} y={pisoY(i) + 0.7} z={pisoZ(i) + 0.2} r={0.55} />
+            <Niebla x={0.55} y={pisoY(i) + 0.55} z={pisoZ(i) - 0.15} r={0.45} />
+            <Niebla x={0.1} y={pisoY(i) + 0.9} z={pisoZ(i) + 0.35} r={0.4} />
+          </group>
+        ) : null,
+      )}
+
+      {/* señal SUTIL de que los pisos suben (termofilización): flecha ámbar
+          tenue al costado — cuidado, nunca alarma (norte "finca viva"). */}
+      <group position={[1.85, pisoY(2), pisoZ(2) + 0.2]}>
+        <mesh position={[0, 0, 0]}>
+          <cylinderGeometry args={[0.016, 0.016, 0.9, 5]} />
+          <meshBasicMaterial color={PALETA.ambar} transparent opacity={0.5} />
+        </mesh>
+        <mesh position={[0, 0.55, 0]}>
+          <coneGeometry args={[0.08, 0.2, 5]} />
+          <meshBasicMaterial color={PALETA.ambar} transparent opacity={0.55} />
+        </mesh>
+      </group>
+
+      {/* vida sólo donde vive: polinizadores del templado/frío; páramo sin fauna */}
+      <Fauna items={fauna} reducedMotion={reducedMotion} />
     </group>
   );
 }
 
 export default function EscenaEstratos(props) {
-  const cielo = { fondo: '#d7e6c9', cielo: '#eaf2df', suelo: '#5f4a2e', intensidad: 1.1 };
+  const esPisos = Array.isArray(props.params?.pisos);
+  const cielo = esPisos ? CIELOS.ladera : CIELOS.sotobosque;
+  const camara = esPisos ? { position: [4.4, 3.7, 6.4], fov: 46 } : { position: [3.5, 3, 6], fov: 44 };
+  const centro = esPisos ? [0, 1.95, -0.4] : [0, 1.4, 0];
+  const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
     <EscenaBase3D
       {...props}
       cielo={cielo}
-      camara={{ position: [3.5, 3, 6], fov: 44 }}
-      entrada={{ ...props.entrada, centro: [0, 1.4, 0] }}
+      camara={camara}
+      entrada={{ ...props.entrada, centro }}
     >
-      <Diorama params={props.params} />
+      {esPisos ? (
+        <DioramaPisos params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} />
+      ) : (
+        <DioramaEstratos params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} />
+      )}
     </EscenaBase3D>
   );
 }

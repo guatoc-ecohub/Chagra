@@ -26,5 +26,30 @@ export { MUNDO, MUNDO_IDS } from './mundoData.js';
 export {
   ARQUETIPOS, ARQUETIPOS_KEYS, ARQUETIPOS_3D, ARQUETIPOS_2D, esArquetipo3D,
 } from './arquetipos.js';
-export { resolverMundo, tinteDeMundo, tituloDeMundo } from './resolverMundo.js';
-export { decidirTier, permite3D } from './deviceTier.js';
+export { resolverMundo, tinteDeMundo, tituloDeMundo, emojiDeMundo } from './resolverMundo.js';
+export { decidirTier, permite3D, perfilDeTier } from './deviceTier.js';
+
+// Navegación valle ↔ mundos (three-free): la máquina de fases + el viaje DOM.
+export { useNavegacionMundos, puedeEntrarAlMundo } from './useNavegacionMundos.js';
+export { default as TransicionMundo, VIAJE_MS } from './TransicionMundo.jsx';
+
+// Háptica táctil (three-free, DR-3D-HAPTICA): pulsos semánticos por evento del
+// framework — no-op silencioso donde no hay Vibration API (iOS/Safari, FF129+).
+export { default as useHaptics, PATRONES_HAPTICOS } from './useHaptics.js';
+
+// Sonido ambiental 0-KB (three-free, spec S3): paletas sonoras por mundo
+// sintetizadas con WebAudio — sin assets. Opt-in (default OFF), solo tras
+// gesto del usuario; bajo reduced-motion queda el lecho estático, sin eventos.
+export {
+  default as useAudioMundo, PALETAS_SONORAS, activarAudioPorGesto, soportaAudio,
+} from './useAudioMundo.js';
+
+// Espejo vivo del dato real (three-free, auditoría §5b): arma el `estadoFinca`
+// REAL (salud, clima, ENSO, cosecha reciente, hato) desde los servicios
+// anti-fabricación que ya existen. El host <Mundo> lo cose solo; se exporta para
+// quien quiera pasar `estadoFinca` a mano.
+export { default as useFincaViva } from './useFincaViva.js';
+
+// Invitación de PRIMER USO del sonido (three-free): ya vive dentro del host
+// <Mundo> (app y vitrinas por igual); se exporta por si un mockup la monta suelta.
+export { default as InvitacionAudioMundo } from './InvitacionAudioMundo.jsx';

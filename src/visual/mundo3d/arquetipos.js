@@ -45,6 +45,54 @@ export const ARQUETIPOS = {
     nombre: 'El valle (mapa)', clave: 'la finca como mapa navegable; cada mundo es un lugar',
     ejemplo: 'valle', tambien: [],
   },
+  // La ÚNICA metáfora espacial nueva del batch (README §case-3): la bóveda de
+  // cielo. Su espejo 2D es una lámina de cielo (motivo `boveda` en LaminaMundo).
+  boveda: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'boveda', espejo: 'mirror',
+    nombre: 'La bóveda del cielo', clave: 'el cielo de la finca: hora del día + temporada bimodal andina',
+    ejemplo: 'clima', tambien: [],
+  },
+  // La huerta-clínica: la familia del `recinto` (un lugar cercado que se
+  // camina), pero su lección es el manejo SIN veneno — trampas cromáticas,
+  // biocontrol (Beauveria/Metarhizium), borde push-pull y enemigos naturales.
+  // En equipo humilde cae a su ficha 2D (infografía de la sanidad).
+  sanidad: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'sanidad', espejo: 'mirror',
+    nombre: 'La huerta-clínica', clave: 'el manejo agroecológico de plagas: trampas, biocontrol y enemigos naturales',
+    ejemplo: 'sanidad', tambien: [],
+  },
+  // El mercado campesino: la familia del `flujo` (una ruta que se recorre) hecha
+  // cadena corta del campo a la mesa. Su lección es la comercialización justa —
+  // puestos con toldo, canastos con la cosecha de la finca, la procedencia
+  // andina (terroir/sello de origen) y el precio justo del trato directo (sin la
+  // tajada del intermediario). En equipo humilde cae a su ficha 2D (la
+  // infografía del mercado y la despensa).
+  mercado: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'mercado', espejo: 'mirror',
+    nombre: 'El mercado campesino', clave: 'la cadena corta del campo a la mesa: puestos, procedencia y precio justo',
+    ejemplo: 'mercado', tambien: [],
+  },
+  // El cafetal bajo sombra: la familia del `recinto` (un lugar que se camina)
+  // hecha CULTIVO BANDERA. Su lección es el café real del país — el arbusto que
+  // vive BAJO el techo de guamo/nogal, la cereza que se vuelve pergamino y oro
+  // (sin tostar en la finca), la roya y la broca manejadas con criterio, y el
+  // beneficio (despulpar, fermentar, secar). En equipo humilde cae a su ficha 2D
+  // (la infografía del café). (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  cafe: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'cafe', espejo: 'mirror',
+    nombre: 'El cafetal bajo sombra', clave: 'el cultivo bandera: café de sombra, el grano cereza→pergamino→oro, roya/broca y beneficio',
+    ejemplo: 'cafe', tambien: [],
+  },
+  // El semillero/vivero: la familia del `recinto` (un lugar cercado y PROTEGIDO
+  // que se camina), pero su lección es la PROPAGACIÓN — germinar en bandeja,
+  // repicar a bolsa/era y endurecer la plántula bajo el túnel de media-sombra
+  // antes de llevarla al campo. En equipo humilde cae a su ficha 2D (infografía
+  // del semillero). (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  semillero: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'semillero', espejo: 'mirror',
+    nombre: 'El semillero/vivero', clave: 'la propagación: germinar, repicar y endurecer bajo el túnel protegido',
+    ejemplo: 'semillero', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {

@@ -1,0 +1,87 @@
+/*
+ * HiloVidaVista.css — estilos del hilo textual de la "vida vista".
+ * Autocontenido: cero imágenes/fuentes externas; misma paleta cálida del
+ * framework de mundos (mundo.css). Solo transform/opacity animados;
+ * reduced-motion (media query O data-reduced) apaga el pulso.
+ */
+
+.hilo-vida {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5em 0.65em;
+  padding: 0.7em 0.9em;
+  background: #ece0c7;
+  color: #2a2016;
+  border-radius: 14px;
+  border: 1px solid rgba(42, 32, 22, 0.14);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 100%;
+}
+
+/* El pulso: un punto dorado que "respira" — decorativo (aria-hidden). */
+.hilo-vida__pulso {
+  flex: none;
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background: #e6a637;
+  box-shadow: 0 0 0 3px rgba(230, 166, 55, 0.25);
+  transform: translateY(-0.05em);
+  animation: hilo-vida-respira 3.2s ease-in-out infinite;
+}
+
+@keyframes hilo-vida-respira {
+  0%, 100% { transform: translateY(-0.05em) scale(1); opacity: 1; }
+  50% { transform: translateY(-0.05em) scale(0.78); opacity: 0.75; }
+}
+
+.hilo-vida__texto {
+  flex: 1 1 14em;
+  margin: 0;
+}
+
+.hilo-vida__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+}
+
+.hilo-vida__accion {
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #2a2016;
+  background: rgba(255, 251, 240, 0.85);
+  border: 1px solid rgba(122, 74, 18, 0.45);
+  border-radius: 999px;
+  padding: 0.3em 0.85em;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+.hilo-vida__accion:hover {
+  background: #fffbf0;
+  transform: translateY(-1px);
+}
+.hilo-vida__accion:focus-visible {
+  outline: 2px solid #7a4a12;
+  outline-offset: 2px;
+}
+.hilo-vida__accion:active {
+  transform: translateY(0);
+}
+
+/* Reduced motion: por preferencia del sistema O por prop del host. */
+@media (prefers-reduced-motion: reduce) {
+  .hilo-vida__pulso { animation: none; }
+  .hilo-vida__accion { transition: none; }
+  .hilo-vida__accion:hover { transform: none; }
+}
+.hilo-vida[data-reduced='true'] .hilo-vida__pulso { animation: none; }
+.hilo-vida[data-reduced='true'] .hilo-vida__accion { transition: none; }
+.hilo-vida[data-reduced='true'] .hilo-vida__accion:hover { transform: none; }

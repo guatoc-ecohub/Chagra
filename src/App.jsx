@@ -73,6 +73,79 @@ const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
 // Vitrina pública de la librería visual reutilizable (`src/visual/`). Ruta
 // #/mockups/visual-lib, resuelta ANTES del check de sesión (no requiere auth).
 const VisualLib = lazy(() => import('./mockups/VisualLib'));
+// ── Galería de mockups aspiracionales (diseño) ──────────────────────────────
+// Rutas públicas `#/mockups/<slug>`: vitrinas de discovery sin gate ni sesión
+// (datos de muestra, no tocan datos reales). Todas resuelven vía
+// MOCKUP_HASH_ROUTES ANTES del check de auth. Chunks perezosos.
+// 3D: "El valle de mi finca" (R3F/WebGL2, degrada a SVG sin WebGL).
+const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
+// 3D: "El mundo del agua" — monta <Mundo mundoId="agua"> del framework
+// (src/visual/mundo3d) con device-tiering real. El 3D va perezoso (vendor-three).
+const Mundo3DAguaMockup = lazy(() => import('./mockups/Mundo3DAgua'));
+const Mundo3DSueloMockup = lazy(() => import('./mockups/Mundo3DSuelo'));
+// 3D: "El mundo de los animales" — monta <Mundo mundoId="animales"> del framework
+// (recinto: el corral y su ciclo cerrado del abono). 3D perezoso (vendor-three).
+const Mundo3DAnimalesMockup = lazy(() => import('./mockups/Mundo3DAnimales'));
+const Mundo3DMilpaMockup = lazy(() => import('./mockups/Mundo3DMilpa'));
+const Mundo3DBosqueMockup = lazy(() => import('./mockups/Mundo3DBosque'));
+// 3D: "El mundo del clima" — monta <Mundo mundoId="clima"> del framework: la
+// bóveda del cielo (arquetipo nuevo `boveda`). El 3D va perezoso (vendor-three).
+const Mundo3DClimaMockup = lazy(() => import('./mockups/Mundo3DClima'));
+// 3D: "El mundo de la sanidad" — monta <Mundo mundoId="sanidad"> del framework:
+// la huerta-clínica (arquetipo nuevo `sanidad`, familia recinto): trampas,
+// biocontrol y enemigos naturales. El 3D va perezoso (vendor-three).
+const Mundo3DSanidadMockup = lazy(() => import('./mockups/Mundo3DSanidad'));
+// 3D: "El mundo del mercado" — monta <Mundo mundoId="mercado"> del framework:
+// el mercado campesino (arquetipo nuevo `mercado`, familia flujo): la ruta corta
+// campo→mesa, puestos, canastos, procedencia y precio justo. El 3D va perezoso
+// (vendor-three).
+const Mundo3DMercadoMockup = lazy(() => import('./mockups/Mundo3DMercado'));
+// 3D: "El mundo del café" — monta <Mundo mundoId="cafe"> del framework: el
+// cafetal bajo sombra (arquetipo nuevo `cafe`, familia recinto): café de sombra
+// (guamo/nogal), el grano cereza→pergamino→oro (sin tostar en finca), roya/broca
+// con manejo agroecológico y el beneficio. El 3D va perezoso (vendor-three).
+const Mundo3DCafeMockup = lazy(() => import('./mockups/Mundo3DCafe'));
+// 3D: "El mundo del semillero" — monta <Mundo mundoId="semillero"> del
+// framework: el semillero/vivero (arquetipo nuevo `semillero`, familia recinto):
+// germinación en bandeja, repique a bolsa, endurecimiento, semilla propia vs
+// comprada y el túnel de media-sombra. El 3D va perezoso (vendor-three).
+const Mundo3DSemilleroMockup = lazy(() => import('./mockups/Mundo3DSemillero'));
+// 3D: "La infraestructura de su finca" — vitrina de la LIBRERÍA de construcciones
+// (src/visual/mundo3d/infraestructura): invernaderos, galpón, establo, bodega,
+// compostera, tanque, secadero, media-sombra. Grilla data-driven con device-tier
+// real; el 3D va perezoso (vendor-three), 2D digno en equipo humilde.
+const Infraestructura3DMockup = lazy(() => import('./mockups/Infraestructura3D'));
+// Modo COLOCAR: el usuario elige una construcción del catálogo y la ubica en el
+// terreno (snapping a la ladera, girar en pasos, confirmar); persiste local.
+const ColocarInfraestructuraMockup = lazy(() => import('./mockups/ColocarInfraestructura'));
+// Voz: superficies de voz con forma viva (iris que reacciona al volumen).
+const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
+const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
+const EnsenaDibujandoMockup = lazy(() => import('./mockups/EnsenaDibujando'));
+// Superficies definitivas y flujos ilustrados.
+const DiaEnFincaMockup = lazy(() => import('./mockups/DiaEnFinca'));
+const SaludFincaMockup = lazy(() => import('./mockups/SaludFinca'));
+const PrimerCultivoMockup = lazy(() => import('./mockups/PrimerCultivo'));
+const MercadoMockup = lazy(() => import('./mockups/Mercado'));
+const OnboardingSiembraMockup = lazy(() => import('./mockups/OnboardingSiembra'));
+// Navegación como paisaje (montaña de los mundos) + variantes.
+const MontanaMundosMockup = lazy(() => import('./mockups/MontanaMundos'));
+const MontanaMundosCineMockup = lazy(() => import('./mockups/MontanaMundosCine'));
+const MontanaMundosCampesinoMockup = lazy(() => import('./mockups/MontanaMundosCampesino'));
+// Entrada campesina definitiva + home + avatares del espíritu de la finca.
+const EntradaCampesinaMockup = lazy(() => import('./mockups/EntradaCampesina'));
+const HomeCampesinoMockup = lazy(() => import('./mockups/HomeCampesino'));
+const BotonAnarquiaMockup = lazy(() => import('./mockups/BotonAnarquia'));
+const AvatarGameBiopunk = lazy(() => import('./mockups/AvatarGameBiopunk'));
+const AvatarGameVerdeVivo = lazy(() => import('./mockups/AvatarGameVerdeVivo'));
+const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
+// Piezas de decisión visual (acuarela, clima, diagnóstico, evidencia, guardianes).
+const MapaAcuarelaMockup = lazy(() => import('./mockups/MapaAcuarela'));
+const ClimaAtmosferaMockup = lazy(() => import('./mockups/ClimaAtmosfera'));
+const DiagnosticoSobreFoto = lazy(() => import('./mockups/DiagnosticoSobreFoto'));
+const EvidenciaIlustrada = lazy(() => import('./mockups/EvidenciaIlustrada'));
+const MockupGuardianesNarrativos = lazy(() => import('./mockups/MockupGuardianesNarrativos'));
+const HojaVidaMataMockup = lazy(() => import('./components/mockups/HojaVidaMataMockup'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -425,6 +498,44 @@ const LoadingFallback = ({ view = null }) => {
 // #onboarding-piloto. El hash llega ya normalizado (sin `#`/`#/`).
 const MOCKUP_HASH_ROUTES = {
   'mockups/visual-lib': 'mockup_visual_lib',
+  // Galería aspiracional (3D + voz + superficies definitivas + piezas de diseño).
+  'mockups/entrada-3d': 'mockup_entrada_3d',
+  'mockups/mundo3d-agua': 'mockup_mundo3d_agua',
+  'mockups/mundo3d-suelo': 'mockup_mundo3d_suelo',
+  'mockups/mundo3d-animales': 'mockup_mundo3d_animales',
+  'mockups/mundo3d-milpa': 'mockup_mundo3d_milpa',
+  'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
+  'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
+  'mockups/voz-con-forma': 'mockup_voz_con_forma',
+  'mockups/conversacion-voz': 'mockup_conversacion_voz',
+  'mockups/ensena-dibujando': 'mockup_ensena_dibujando',
+  'mockups/dia-en-finca': 'mockup_dia_en_finca',
+  'mockups/salud-finca': 'mockup_salud_finca',
+  'mockups/primer-cultivo': 'mockup_primer_cultivo',
+  'mockups/mercado': 'mockup_mercado',
+  'mockups/onboarding-siembra': 'mockup_onboarding_siembra',
+  'mockups/montana-mundos': 'mockup_montana_mundos',
+  'mockups/montana-mundos-cine': 'mockup_montana_mundos_cine',
+  'mockups/montana-mundos-campesino': 'mockup_montana_mundos_campesino',
+  'mockups/entrada-campesina': 'mockup_entrada_campesina',
+  'mockups/home-campesino': 'mockup_home_campesino',
+  'mockups/boton-anarquia': 'mockup_boton_anarquia',
+  'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
+  'mockups/avatar-verde-vivo': 'mockup_avatar_verde_vivo',
+  'mockups/avatar-libre': 'mockup_avatar_libre',
+  'mockups/mapa-acuarela': 'mockup_mapa_acuarela',
+  'mockups/clima-atmosfera': 'mockup_clima_atmosfera',
+  'mockups/diagnostico-foto': 'mockup_diagnostico_foto',
+  'mockups/evidencia-ilustrada': 'mockup_evidencia_ilustrada',
+  'mockups/guardianes-narrativos': 'mockup_guardianes',
+  'mockups/hoja-vida-mata': 'mockup_hoja_vida_mata',
+  // (anti-conflicto de merge) rutas nuevas SIEMPRE al final del bloque:
+  'mockups/mundo3d-sanidad': 'mockup_mundo3d_sanidad',
+  'mockups/mundo3d-mercado': 'mockup_mundo3d_mercado',
+  'mockups/mundo3d-cafe': 'mockup_mundo3d_cafe',
+  'mockups/mundo3d-semillero': 'mockup_mundo3d_semillero',
+  'mockups/infraestructura-3d': 'mockup_infraestructura_3d',
+  'mockups/colocar-infraestructura': 'mockup_colocar_infraestructura',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -656,7 +767,7 @@ const MODULE_VIEWS = new Set([
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'plagas', 'mercados',
   'glaciar', 'glaciar_historial', 'extensionista', 'plant_asset',
   'casos', 'caso_detail', 'bitacora_detail', 'edit_task', 'cromatografia', 'ciclo_vivo',
-  'usage_stats', 'mercado', 'auditoria_inventario', 'mundo',
+  'usage_stats', 'mercado', 'auditoria_inventario', 'mundo', 'valle3d',
 ]);
 
 // T2: Dashboard como componente propio con suscripción reactiva al store.
@@ -793,7 +904,7 @@ export default function App() {
       clearTimeout(bootSync);
     };
   }, []);
-  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' });
+  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') });
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
@@ -1121,7 +1232,7 @@ export default function App() {
   // loading. Body className toggled según currentView. Estilos en
   // src/index.css clase .app-bg-biodiversidad (nombre histórico).
   useEffect(() => {
-    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib';
+    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_');
     if (showBg) {
       document.body.classList.add('app-bg-biodiversidad');
     } else {
@@ -1238,6 +1349,358 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Librería visual">
               <VisualLib />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      // ── Galería de mockups aspiracionales (#/mockups/*) ────────────────────
+      // Vistas full-screen de decisión visual, sin gate ni datos reales. onBack
+      // devuelve al dashboard. Cada una degrada limpio dentro de su ErrorFallback.
+      case 'mockup_entrada_3d':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El valle de mi finca (3D)">
+              <EntradaValle3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_agua':
+        // Vitrina pública del MUNDO DEL AGUA: monta <Mundo mundoId="agua"> del
+        // framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-agua, sin auth. El recorrido del agua de la finca:
+        // nacimiento → ronda → quebrada → cuidado → toma → huerta regada.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del agua">
+              <Mundo3DAguaMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_suelo':
+        // Vitrina pública del MUNDO DEL SUELO: monta <Mundo mundoId="suelo"> del
+        // framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-suelo, sin auth. El corte del suelo vivo de la finca:
+        // hojarasca → suelo negro → subsuelo, con raíces, micorrizas y bichos.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del suelo">
+              <Mundo3DSueloMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_animales':
+        // Vitrina pública del MUNDO DE LOS ANIMALES: monta <Mundo mundoId="animales">
+        // del framework (src/visual/mundo3d, arquetipo recinto) con device-tiering
+        // real. Ruta #/mockups/mundo3d-animales, sin auth. El corral y su ciclo
+        // cerrado del abono: animal → estiércol → compost → suelo → planta → animal.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de los animales">
+              <Mundo3DAnimalesMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_milpa':
+        // Vitrina pública del MUNDO DE LA MILPA: monta <Mundo mundoId="milpa"> del
+        // framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-milpa, sin auth. Las tres hermanas en corte: arriba la
+        // asociación (maíz-fríjol-calabaza), abajo los nódulos de N del fríjol.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de la milpa">
+              <Mundo3DMilpaMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_bosque':
+        // Vitrina pública de la LADERA / PISOS TÉRMICOS: monta <Mundo mundoId="pisos">
+        // del framework (src/visual/mundo3d) sobre el arquetipo `estratos`
+        // reparametrizado, con device-tiering real. Ruta #/mockups/mundo3d-bosque,
+        // sin auth. La ladera andina en corte: cálido → templado → frío → páramo,
+        // con la señal sutil de que los pisos suben (termofilización), sin catástrofe.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La ladera y sus pisos">
+              <Mundo3DBosqueMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_clima':
+        // Vitrina pública del MUNDO DEL CLIMA: monta <Mundo mundoId="clima"> del
+        // framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-clima, sin auth. La bóveda del cielo de la finca:
+        // hora del día + temporada bimodal andina + niebla del páramo + la
+        // montaña de pisos con el hielo que se va (conciencia, no alarma).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del clima">
+              <Mundo3DClimaMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_voz_con_forma':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La voz con forma">
+              <VozConFormaMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_conversacion_voz':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La conversación con la finca">
+              <ConversacionVozMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_ensena_dibujando':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El agente enseña dibujando">
+              <EnsenaDibujandoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_dia_en_finca':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El día en su finca">
+              <DiaEnFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_salud_finca':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La salud de mi finca">
+              <SaludFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_primer_cultivo':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El camino del primer cultivo">
+              <PrimerCultivoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mercado':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mercado de procedencia">
+              <MercadoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_onboarding_siembra':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Onboarding de siembra">
+              <OnboardingSiembraMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_montana_mundos':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Montaña de los mundos">
+              <MontanaMundosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_montana_mundos_cine':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Montaña de los mundos (cine)">
+              <MontanaMundosCineMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_montana_mundos_campesino':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Montaña de los mundos (campesina)">
+              <MontanaMundosCampesinoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_entrada_campesina':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Entrada campesina">
+              <EntradaCampesinaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_home_campesino':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Home campesino">
+              <HomeCampesinoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_boton_anarquia':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Botón anarquía">
+              <BotonAnarquiaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_biopunk':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Avatar biopunk">
+              <AvatarGameBiopunk onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_verde_vivo':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Avatar verde vivo">
+              <AvatarGameVerdeVivo onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_libre':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Avatar libre">
+              <AvatarGameLibre onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mapa_acuarela':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mapa acuarela">
+              <MapaAcuarelaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_clima_atmosfera':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Clima y atmósfera">
+              <ClimaAtmosferaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_diagnostico_foto':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Diagnóstico sobre la foto">
+              <DiagnosticoSobreFoto onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_evidencia_ilustrada':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Tarjetas de evidencia ilustradas">
+              <EvidenciaIlustrada onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_guardianes':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Guardianes narrativos">
+              <MockupGuardianesNarrativos onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_hoja_vida_mata':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Hoja de vida de la mata">
+              <HojaVidaMataMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      // (anti-conflicto de merge) cases de mockup nuevos SIEMPRE al final del grupo:
+      case 'mockup_mundo3d_sanidad':
+        // Vitrina pública del MUNDO DE LA SANIDAD: monta <Mundo mundoId="sanidad">
+        // del framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-sanidad, sin auth. La huerta-clínica: manejo de plagas
+        // sin veneno — trampas cromáticas, biocontrol (Beauveria/Metarhizium),
+        // borde push-pull y enemigos naturales (mariquita, carábido).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de la sanidad">
+              <Mundo3DSanidadMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_mercado':
+        // Vitrina pública del MUNDO DEL MERCADO: monta <Mundo mundoId="mercado">
+        // del framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-mercado, sin auth. El mercado campesino: la cadena
+        // corta campo→mesa — puestos con toldo, canastos de la finca, el sello de
+        // procedencia (terroir andino) y la balanza del precio justo.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del mercado">
+              <Mundo3DMercadoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_cafe':
+        // Vitrina pública del MUNDO DEL CAFÉ: monta <Mundo mundoId="cafe"> del
+        // framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-cafe, sin auth. El cafetal bajo sombra: café de
+        // sombra (guamo/nogal), el grano cereza→pergamino→oro (sin tostar en la
+        // finca), roya (Hemileia vastatrix) y broca (Hypothenemus hampei) con
+        // manejo agroecológico, y el beneficio (despulpar, fermentar, secar).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del café">
+              <Mundo3DCafeMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_semillero':
+        // Vitrina pública del MUNDO DEL SEMILLERO: monta <Mundo mundoId="semillero">
+        // del framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-semillero, sin auth. El semillero/vivero: germinación
+        // en bandeja (sustrato + humedad), repique a bolsa/era, endurecimiento al
+        // sol, semilla propia vs comprada y el túnel de media-sombra que protege
+        // del frío y la lluvia.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del semillero">
+              <Mundo3DSemilleroMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_infraestructura_3d':
+        // Vitrina pública de la LIBRERÍA DE INFRAESTRUCTURA 3D: la grilla de todas
+        // las construcciones del catálogo (src/visual/mundo3d/infraestructura) con
+        // device-tiering real. Ruta #/mockups/infraestructura-3d, sin auth.
+        // Invernadero túnel/capilla, media-sombra, gallinero, galpón, establo,
+        // bodega, compostera, tanque y secadero — cada una con sus medidas típicas
+        // en metros, para agregar la infraestructura real de la finca a los mundos.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La infraestructura de su finca">
+              <Infraestructura3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_colocar_infraestructura':
+        // Modo COLOCAR infraestructura: el paso que le sigue a la vitrina — el
+        // usuario elige una construcción del catálogo, toca el terreno donde va
+        // (snapping a la altura de la ladera), la gira en pasos de 45° y la
+        // confirma; la lista {tipo, pos, rot} persiste en el equipo. En gama
+        // baja cae a un plano 2D cenital con el mismo flujo. Ruta
+        // #/mockups/colocar-infraestructura, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Colocar su infraestructura">
+              <ColocarInfraestructuraMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2222,6 +2685,21 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'valle3d':
+        // EL VALLE 3D DESDE EL HOME (FASE 0 del plan game-dev): la MISMA
+        // EntradaValle3D de la vitrina (#/mockups/entrada-3d) montada como
+        // vista REAL de la app, con `onNavigate`: las puertas de los mundos
+        // abren las pantallas de verdad (regla de oro: re-rutear, nunca
+        // reimplementar). Se llega por la banda de MundosDeMiFinca, gated por
+        // el flag de prefs `valle3d` (default OFF, Perfil) + device-tier;
+        // adentro el tiering decide 3D pleno/frugal o el valle 2D digno.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El valle de su finca (3D)">
+              <EntradaValle3DMockup onBack={() => navigate('dashboard')} onNavigate={navigate} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mundo':
         // LOS MUNDOS DE MI FINCA (reestructuración 2.0 del home, V4): la
         // pantalla de un mundo agrupa sus funciones y RE-RUTEA a las vistas
@@ -2543,7 +3021,7 @@ export default function App() {
     currentView === 'oauth-callback' ||
     // La vitrina de la librería visual es una página pública autocontenida:
     // sin banners de instalación/datos ni FABs encima.
-    currentView === 'mockup_visual_lib';
+    currentView.startsWith('mockup_');
 
   return (
     <>
@@ -2569,10 +3047,10 @@ export default function App() {
           detectamos huella `chagra:had-data-once` en localStorage + IDB
           vacío. NO se muestra en loading/login para no asustar antes de
           que la app pueda confirmar estado. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <DataLossBanner />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <DataLossBanner />}
       {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
           crítico) sin abrir la campana. Imposible de ignorar. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <CriticalAlertBanner onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <CriticalAlertBanner onNavigate={navigate} />}
       {/* Entrada de pantalla: el swap de vista era SECO (desmonta/monta sin
           transición). El wrapper con key remonta en cada cambio de vista y
           dispara un fade corto (motion.css .anim-screen-enter — solo opacidad,
@@ -2601,7 +3079,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
@@ -2615,9 +3093,9 @@ export default function App() {
           Para re-habilitar el tap: descomentar el import de EscuchaFab (arriba)
           y la línea del render de abajo. */}
       {/* {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />} */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <EscuchaOverlay />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <SyncProgressIndicator />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}

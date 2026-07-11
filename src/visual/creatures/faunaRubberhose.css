@@ -1,0 +1,129 @@
+/* ─── Vida perpetua de la FAUNA BENÉFICA en estilo rubber-hose (Cuphead /
+   Miss Minutes). SVG + CSS puros: SOLO transform/opacity (compositor GPU,
+   Android gama baja). Namespace propio `frh-*` para NO chocar con `crt-*`.
+
+   La línea gruesa "respira" (boil) y el cuerpo hace squash&stretch; los ojos
+   de goma parpadean. La coreografía de LLEGADA (entrar volando, asomar del
+   suelo) la pone la ESCENA que consume la criatura, no vive aquí.
+
+   reduced-motion = criatura quieta en un fotograma digno (sin boil ni antics).
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* boil: la línea dibujada a mano que "hierve" — jitter discreto en fotogramas
+   (steps) para que se lea a mano, no interpolado. Se aplica al grupo entero. */
+.frh-boil {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: frh-boil 0.34s steps(1) infinite;
+}
+@keyframes frh-boil {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  33%  { transform: translate(0.28px, -0.22px) rotate(0.4deg); }
+  66%  { transform: translate(-0.24px, 0.24px) rotate(-0.34deg); }
+  100% { transform: translate(0.16px, 0.12px) rotate(0.16deg); }
+}
+
+/* respiración con squash & stretch — el gesto vivo del rubber-hose */
+.frh-breathe {
+  transform-box: fill-box;
+  transform-origin: 50% 92%;
+  animation: frh-breathe 2.6s ease-in-out infinite;
+}
+@keyframes frh-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  45%      { transform: scale(1.05, 0.95); } /* squash */
+  72%      { transform: scale(0.98, 1.03); } /* stretch */
+}
+
+/* parpadeo de los ojos de goma (scaleY sobre el bbox del ojo) */
+.frh-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: frh-blink 4.6s ease-in-out infinite;
+}
+@keyframes frh-blink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  96.5%         { transform: scaleY(0.12); }
+}
+
+/* aleteo veloz (abejorro) — ala izquierda/derecha con su propio pivote */
+.frh-wing {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: frh-wing 0.11s ease-in-out infinite alternate;
+}
+.frh-wing-l { transform-origin: right bottom; }
+.frh-wing-r { transform-origin: left bottom; }
+@keyframes frh-wing {
+  0%   { transform: rotate(0) scaleY(1); }
+  100% { transform: rotate(-9deg) scaleY(0.7); }
+}
+
+/* flotar suave (abejorro suspendido sobre la flor) */
+.frh-hover {
+  transform-box: fill-box;
+  animation: frh-hover 2.3s ease-in-out infinite;
+}
+@keyframes frh-hover {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-1.8px); }
+}
+
+/* rodar la bola de humus (escarabajo) */
+.frh-roll {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: frh-roll 1.25s linear infinite;
+}
+@keyframes frh-roll { to { transform: rotate(-360deg); } }
+
+/* patas que dan pasos (escarabajo / mariquita) */
+.frh-step {
+  transform-box: fill-box;
+  animation: frh-step 0.5s ease-in-out infinite;
+}
+@keyframes frh-step {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(-1px); }
+}
+
+/* reptar de la lombriz (peristalsis: se comprime y avanza) */
+.frh-crawl {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: frh-crawl 1.7s ease-in-out infinite;
+}
+@keyframes frh-crawl {
+  0%, 100% { transform: scaleX(1) translateX(0); }
+  50%      { transform: scaleX(0.9) translateY(0.7px); }
+}
+
+/* motas que suben: polen que poliniza / aire que la lombriz mete al suelo.
+   Se escalonan con animation-delay inline desde el JSX. */
+.frh-mote {
+  transform-box: fill-box;
+  animation: frh-mote 2.6s ease-in-out infinite;
+}
+@keyframes frh-mote {
+  0%   { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  25%  { opacity: 0.9; }
+  100% { transform: translate(2px, -7px) scale(1); opacity: 0; }
+}
+
+/* brote que asoma en la bola de humus (la vida que nace de lo descompuesto) */
+.frh-sprout {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: frh-sprout 3.2s ease-in-out infinite;
+}
+@keyframes frh-sprout {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(4deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frh-boil, .frh-breathe, .frh-blink, .frh-wing, .frh-hover,
+  .frh-roll, .frh-step, .frh-crawl, .frh-mote, .frh-sprout {
+    animation: none !important;
+  }
+}

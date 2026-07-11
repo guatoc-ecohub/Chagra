@@ -1,0 +1,89 @@
+/*
+ * invitacionAudio.css — la invitación de primer uso del sonido ambiental.
+ * Tarjeta discreta abajo del mundo (misma familia visual de .mundo-caida):
+ * no bloquea la escena, entra con un fade corto y reduced-motion la apaga.
+ */
+.mundo-invita {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 7;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.8rem;
+  padding: 0.6rem 0.8rem;
+  color: #2a2016;
+  background: rgba(255, 251, 242, 0.95);
+  border: 1px solid rgba(60, 46, 24, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(40, 30, 10, 0.18);
+  animation: mundo-invita-entra 0.4s ease-out both;
+}
+.mundo-invita__txt {
+  margin: 0;
+  flex: 1 1 14ch;
+  min-width: 0;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+.mundo-invita__pregunta {
+  font-weight: 700;
+}
+.mundo-invita__nota {
+  opacity: 0.8;
+}
+.mundo-invita__botones {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.mundo-invita__si {
+  flex: none;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.45em 1.3em;
+  font: inherit;
+  font-weight: 700;
+  color: #fffdf7;
+  background: var(--m-tinte, #3f8f4e);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mundo-invita__luego {
+  flex: none;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.45em 1em;
+  font: inherit;
+  font-weight: 600;
+  color: #2a2016;
+  background: transparent;
+  border: 1px solid rgba(60, 46, 24, 0.3);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mundo-invita__si:focus-visible,
+.mundo-invita__luego:focus-visible {
+  outline: 2px solid #2a2016;
+  outline-offset: 2px;
+}
+
+@keyframes mundo-invita-entra {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Sin animación intrusiva: ni para quien lo pide el sistema, ni para quien
+   lo pide el host (prop reducedMotion → .mundo-invita--calma). */
+.mundo-invita--calma {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mundo-invita {
+    animation: none;
+  }
+}

@@ -1,109 +1,186 @@
 import { useId } from 'react';
 import './creatures.css';
 import { CreatureFilters } from './_filters.jsx';
+import { OjosRubber, Cachetes, Sonrisa, Miembro, AntenaRubber, RH_INK } from './_rubberhose.jsx';
 
-/* Abeja angelita — Tetragonisca angustula, la abeja NATIVA sin aguijón de los
-   Andes (mansa, dorada, guardiana de la finca). Es el COMPAÑERO-JUGADOR del
-   valle: vuela por el mundo y "entra" a cada lugar. No es un mascota infantil —
-   es un ser al que se cuida (ref Finch): su ÁNIMO y su ENERGÍA cambian el color,
-   el aura y la vivacidad según cómo está la finca de verdad.
+/* Abeja angelita — Tetragonisca angustula (meliponino nativo SIN aguijón, NO
+   Apis). Cuerpo ámbar rayado (chumbe andino), cabeza clara, alitas de tul.
+   Elevada al lenguaje RUBBER-HOSE PLENO (Cuphead + Miss Minutes de Loki):
+   contorno grueso que respira, ojos de goma con pupila grande y brillo, cachetes
+   campesinos, bracitos/patitas de manguera con mitones, antenas con bombillo que
+   hacen follow-through, y squash-&-stretch en el idle (boil ~12fps). El DIBUJO
+   compone el KIT reutilizable `_rubberhose.jsx` (que el oso andino y el colibrí
+   heredan); la CADENCIA vive en `creatures.css` (clases `rh-*`, gate RM + tier). */
+const VIEWBOX = '-15 -15 32 30';
 
-   Coreografía de vuelo/llegada = de la ESCENA que la consume (Valle3D / 2D).
-   Aquí solo vive el cuerpo: SVG + CSS puros, solo transform/opacity (GPU,
-   Android gama baja), aleteo reutilizando .crt-wing de creatures.css. */
-const VIEWBOX = '-16 -15 34 30';
-
-/* Paletas por ánimo (estado real de la finca leído en el valle). Maduras,
-   cálidas — nunca chillonas. `aura` es el halo; `cuerpo`/`banda` el insecto. */
-const ANIMOS = {
-  pleno: { cuerpo: '#f3b229', banda: '#7a4a12', aura: '#ffd772', vida: 1 },
-  sereno: { cuerpo: '#e6a637', banda: '#7a4a12', aura: '#f4c66a', vida: 0.82 },
-  atento: { cuerpo: '#f0a233', banda: '#6f3d10', aura: '#ffb352', vida: 0.9 },
-  sediento: { cuerpo: '#cdae6e', banda: '#6b5330', aura: '#cfe0d6', vida: 0.6 },
-  descansa: { cuerpo: '#c9a24a', banda: '#5a4526', aura: '#9fb6d6', vida: 0.45 },
-};
+/* Rayas del cuerpo tejidas como CHUMBE andino: banda de tinta con hilo tierra. */
+const BANDAS = [
+  { x: -3.6, y0: -4.7, y1: 4.7 },
+  { x: 0.4, y0: -5.0, y1: 5.0 },
+  { x: 4.0, y0: -4.0, y1: 4.0 },
+];
 
 export function AbejaAngelita({
   size = 64,
   className = '',
   inline = false,
   animated = true,
+  title = 'Abeja angelita',
+  /* Pose de VIDA (idle-life): 'vuela' (default, aleteo normal) | 'celebra'
+     (aleteo rápido, la escena puede darle la vuelta de campana) | 'reposo'
+     (alitas plegadas que respiran despacio). Solo cambia CSS por data-pose:
+     los consumidores existentes no notan nada. */
+  pose = 'vuela',
+  /* ── REACTIVIDAD AL ESTADO REAL DE LA FINCA (auditoría §5b) ────────────────
+     El repertorio de reacción que la escena deriva de la finca (reaccionFinca).
+     La creature lo interpreta con SU cuerpo (gotas, probóscide, brillo) — estética
+     rubber-hose (Miss Minutes / Cuphead): squash-and-stretch, elástico, expresivo.
+     Todo opcional: sin estos props la abeja se ve EXACTO como antes.
+       animo    → piel/aura: 'pleno'|'sereno'|'atento'|'sediento'|'descansa'
+       energia  → 0..1 viveza (aura y tamaño del brillo)
+       mojada   → llueve: gotas que escurren + brillo húmedo
+       sed      → Niño/sequía: saca la lengüita y jadea
+       comiendo → hay cosecha: baja la probóscide y liba (mordisquea) */
   animo = 'sereno',
   energia = 1,
-  title = 'Angelita, la abeja de su finca',
+  mojada = false,
+  sed = false,
+  comiendo = false,
+  /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
+     pleno; 'bajo' apaga el idle continuo (boil + follow-through) y deja el
+     aleteo + estados reactivos. Sin prop (standalone: avatares, catálogo) =
+     pleno. El CSS gatea por [data-tier='bajo']; RM lo congela por encima. */
+  tier,
   ...rest
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const glow = `crt-glow-${uid}`;
   const blur = `crt-blur-${uid}`;
-  const clip = `crt-clip-${uid}`;
   const wing = animated ? 'crt-wing' : undefined;
-
-  const a = ANIMOS[animo] || ANIMOS.sereno;
-  const e = Math.max(0.35, Math.min(1, energia));
-  // El aura respira con la energía; la vitalidad del ánimo la matiza.
-  const auraOp = 0.16 + 0.34 * e * a.vida;
+  const vivo = animated;
+  // El aura respira con la energía real de la finca (matas vivas + agua).
+  const auraOp = Math.max(0.16, Math.min(0.5, 0.2 + 0.3 * (energia ?? 1)));
+  const auraR = 5.4 + 1.2 * (energia ?? 1);
 
   const defs = (
     <defs>
       <CreatureFilters glow={glow} blur={blur} />
-      <clipPath id={clip}>
-        {/* abdomen: la elipse que recorta las bandas para que no se desborden */}
-        <ellipse cx="-1.5" cy="1.5" rx="8.5" ry="6" />
-      </clipPath>
     </defs>
   );
-
-  const body = (
-    <g className="crt-body" filter={`url(#${glow})`}>
-      {/* aura viva: el halo que refleja el ánimo/energía de la finca */}
-      <circle r="12" cx="-1" cy="1" fill={a.aura} opacity={auraOp} filter={`url(#${blur})`} />
-
-      {/* alas translúcidas que baten (arriba del tórax) */}
-      <ellipse className={wing} cx="1.5" cy="-6.5" rx="5.5" ry="3.4" fill="#dff3ff" opacity="0.72"
-        transform="rotate(-24 1.5 -6.5)" />
-      <ellipse className={wing} style={{ animationDelay: '-0.05s' }} cx="4.5" cy="-6" rx="4.6" ry="3"
-        fill="#c8e8ff" opacity="0.5" transform="rotate(-6 4.5 -6)" />
-
-      {/* patas finas bajo el cuerpo (quietas, dan peso) */}
-      <path d="M-3,6 L-4.5,9 M0,6.5 L0.5,9.6 M3,6 L4.8,8.8" stroke={a.banda} strokeWidth="0.8"
-        fill="none" strokeLinecap="round" opacity="0.85" />
-
-      {/* abdomen dorado con bandas (recortadas al contorno) */}
-      <ellipse cx="-1.5" cy="1.5" rx="8.5" ry="6" fill={a.cuerpo} />
-      <g clipPath={`url(#${clip})`}>
-        <rect x="-6.5" y="-5" width="2.6" height="14" rx="1.3" fill={a.banda} opacity="0.9"
-          transform="rotate(12 -5 1.5)" />
-        <rect x="-1.6" y="-5" width="2.8" height="14" rx="1.4" fill={a.banda} opacity="0.92"
-          transform="rotate(12 -0.2 1.5)" />
+  // Probóscide (lengüita): sale con SED (jadeo) o al COMER (libar). Cuelga de la
+  // cabeza (cx≈9.6). CSS la anima según data-sed/data-comiendo; RM la deja quieta.
+  // El <g> EXTERNO posiciona (attr transform); el INTERNO (.crt-lengua) anima —
+  // si el CSS animara el mismo nodo del translate, lo pisaría (CSS transform
+  // gana sobre el atributo) y la lengüita saltaría al centro del cuerpo.
+  const lengua = (sed || comiendo) ? (
+    <g transform="translate(9.6 2.4)">
+      <g className="crt-lengua">
+        <path d="M0,0 C-0.4,2.6 0.4,4.4 0,6.2" stroke="#c9524e" strokeWidth="1.1"
+          fill="none" strokeLinecap="round" />
+        <circle cx="0" cy="6.4" r="1.05" fill="#c9524e" />
       </g>
-      {/* brillo suave del lomo */}
-      <ellipse cx="-2.5" cy="-1.2" rx="4.2" ry="2" fill="#fff2c8" opacity="0.5" />
+    </g>
+  ) : null;
+  // Gotas de lluvia que escurren del cuerpo/alas cuando está MOJADA. Rubber-hose:
+  // caen con un rebotico. CSS (crt-gota) las anima; RM las deja colgando.
+  const gotas = mojada ? (
+    <g className="crt-gotas" fill="#bfe6ff" opacity="0.9">
+      <path className="crt-gota" d="M-6,4 q-1.1,1.8 0,3.2 q1.1,-1.4 0,-3.2 Z" />
+      <path className="crt-gota" style={{ animationDelay: '-0.5s' }} d="M2,5.2 q-1,1.7 0,3 q1,-1.3 0,-3 Z" />
+      <path className="crt-gota" style={{ animationDelay: '-1.1s' }} d="M8,3.4 q-0.9,1.5 0,2.7 q0.9,-1.2 0,-2.7 Z" />
+    </g>
+  ) : null;
 
-      {/* cabeza (a la derecha = hacia donde vuela) + ojo */}
-      <circle cx="7.6" cy="-0.6" r="3.6" fill={a.banda} />
-      <circle cx="8.9" cy="-1.4" r="1.15" fill="#1b1205" />
-      <circle cx="9.3" cy="-1.8" r="0.4" fill="#fff6e2" />
-      {/* antenas */}
-      <path d="M9.4,-3.2 C11.4,-5 12.6,-5.4 13.6,-6.6 M8.4,-3.6 C9.6,-6 10.4,-6.8 10.9,-8.4"
-        stroke={a.banda} strokeWidth="0.85" fill="none" strokeLinecap="round" />
+  // ── CUERPO rubber-hose. Orden de atrás→adelante: aura, alas, patitas, tronco
+  //    (ámbar con contorno + chumbe), bracitos, cabeza (ojos/cachetes/sonrisa/
+  //    antenas), probóscide, gotas. `.crt-body` es el nodo que squashea (boil
+  //    idle + estados reactivos, que lo pisan por especificidad).
+  //    ENCIMA van DOS wrappers de VIDA con períodos co-primos (6.3s / 9.7s):
+  //    `rh-travieso` (saltitos de lado, wobble, double-take) y `rh-antic` (la
+  //    vuelta de campana Miss-Minutes con anticipación y overshoot). Tres capas
+  //    de transform que nunca caen en el mismo compás = idle impredecible, vivo.
+  //    El CSS los apaga con RM, tier bajo, estados reactivos y ánimo bajito.
+  const body = (
+    <g className={`crt-body${vivo ? ' rh-boil' : ''}`} filter={`url(#${glow})`}>
+      {/* aura viva */}
+      <circle r={auraR} fill="#ffb54f" opacity={auraOp} filter={`url(#${blur})`} />
+
+      {/* alitas de tul con contorno + smear (crt-wingbeat ya lleva el estirón) */}
+      <ellipse className={wing} cx="-1.8" cy="-7" rx="6" ry="3.6" fill="#bfeaff"
+        opacity="0.62" stroke="rgba(42,26,12,0.4)" strokeWidth="0.5" />
+      <ellipse className={wing} style={{ animationDelay: '-0.07s' }} cx="2.2" cy="-6.4"
+        rx="4.6" ry="2.8" fill="#eafff6" opacity="0.5" stroke="rgba(42,26,12,0.35)" strokeWidth="0.5" />
+
+      {/* patitas manguera con pie crema (detrás del tronco, se mecen suave) */}
+      <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sway={vivo} delay={-0.6} />
+      <Miembro d="M1.8,4.7 C1.4,6.8 1.3,8.2 1.8,9.4" ancho={1.9} punta={[1.8, 9.6]} puntaR={1.3} pie sway={vivo} delay={-0.95} />
+
+      {/* tronco ámbar con contorno grueso (la línea que respira con el boil) */}
+      <ellipse cx="0" cy="0" rx="8.6" ry="5.4" fill="#ffb54f" stroke={RH_INK} strokeWidth="1.3"
+        style={{ filter: 'drop-shadow(0 0 6px rgba(255,181,79,0.9))' }} />
+      {/* rayas = chumbe: banda de tinta + hilo tierra */}
+      {BANDAS.map((b, i) => (
+        <g key={i}>
+          <path d={`M${b.x},${b.y0} L${b.x},${b.y1}`} stroke={RH_INK} strokeWidth="1.9" strokeLinecap="round" />
+          <path d={`M${b.x},${b.y0 + 0.6} L${b.x},${b.y1 - 0.6}`} stroke="#9c3b1e" strokeWidth="0.7" strokeLinecap="round" />
+        </g>
+      ))}
+
+      {/* bracitos manguera con mitón crema (delante del tronco, follow-through) */}
+      <Miembro d="M-6.2,1.4 C-8.2,2.4 -9.0,4.1 -8.4,5.9" ancho={2.1} punta={[-8.5, 6.2]} puntaR={1.55} sway={vivo} delay={-0.15} />
+      <Miembro d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sway={vivo} delay={-0.45} />
+
+      {/* cabeza clara con contorno */}
+      <circle cx="8.6" cy="-1.0" r="4.4" fill="#ffd76a" stroke={RH_INK} strokeWidth="1.2" />
+      {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos) */}
+      <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.15 }, { cx: 6.9, cy: 0.3, r: 0.85 }]} vivo={vivo} />
+      <Sonrisa cx={8.9} cy={1.4} w={2.8} prof={1.1} />
+      <OjosRubber
+        ojos={[{ cx: 10.1, cy: -1.9, r: 1.95 }, { cx: 7.4, cy: -2.2, r: 1.45 }]}
+        mirar={[0.3, 0.34]}
+        parpadea={vivo}
+      />
+      {/* antenas con bombillo que se mecen (secondary motion) */}
+      <AntenaRubber d="M7.7,-4.7 C6.7,-7.3 7.0,-9.3 8.3,-10.1" bulbo={[8.3, -10.3]} sway={vivo} delay={0} />
+      <AntenaRubber d="M9.7,-4.6 C11.0,-6.7 11.3,-8.7 10.5,-10.3" bulbo={[10.5, -10.5]} sway={vivo} delay={-0.3} />
+
+      {lengua}
+      {gotas}
     </g>
   );
+  // Las capas de antics envuelven al cuerpo SOLO cuando está vivo (animated):
+  // nodos aparte para que sus transforms no pisen el boil de `.crt-body`.
+  const cuerpoVivo = vivo ? (
+    <g className="rh-antic">
+      <g className="rh-travieso">{body}</g>
+    </g>
+  ) : body;
+
+  // data-estado agrupa la reacción para el CSS (brillo mojado, jadeo, mordisco).
+  const estadoAttrs = {
+    'data-creature': 'abeja-angelita',
+    'data-pose': pose,
+    'data-animo': animo,
+    'data-tier': tier || undefined,
+    'data-mojada': mojada ? '1' : undefined,
+    'data-sed': sed ? '1' : undefined,
+    'data-comiendo': comiendo ? '1' : undefined,
+  };
 
   if (inline) {
     return (
-      <g className={className} data-creature="abeja-angelita">
+      <g className={className} {...estadoAttrs}>
         {defs}
-        {body}
+        {cuerpoVivo}
       </g>
     );
   }
   return (
     <svg viewBox={VIEWBOX} width={size} height={size} className={className}
-      role="img" aria-label={title} data-creature="abeja-angelita" {...rest}>
+      role="img" aria-label={title} {...estadoAttrs} {...rest}>
       <title>{title}</title>
       {defs}
-      {body}
+      {cuerpoVivo}
     </svg>
   );
 }

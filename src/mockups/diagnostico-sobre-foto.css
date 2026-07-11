@@ -1,0 +1,522 @@
+/* ===================================================================
+   MOCKUP · "El agente dibuja el diagnóstico SOBRE la foto"
+   Piel 100% desde los tokens del tema (--c-* / --t-accent-rgb), así
+   respira con biopunk / nature / verde-vivo / minimalista. Los elementos
+   que van ENCIMA de la foto llevan su propio vidrio oscuro (son
+   theme-agnósticos: la foto manda).
+   =================================================================== */
+
+.dx-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 14px 12px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    color: rgb(var(--c-slate-100));
+    font-family: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ── Sello de honestidad: es una demo ─────────────────────────────── */
+.dx-demo-badge {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: rgb(var(--t-accent-rgb));
+    background: rgb(var(--t-accent-rgb) / 0.12);
+    border: 1px solid rgb(var(--t-accent-rgb) / 0.35);
+}
+
+/* ── La "pregunta" del campesino (mensaje que subió la foto) ───────── */
+.dx-ask {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    border-radius: 16px 16px 16px 4px;
+    background: rgb(var(--c-surface-raised) / 0.72);
+    border: 1px solid rgb(var(--c-surface-border));
+}
+.dx-ask-photo {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    color: rgb(var(--t-accent-rgb));
+    background: rgb(var(--t-accent-rgb) / 0.14);
+    border: 1px solid rgb(var(--t-accent-rgb) / 0.3);
+}
+.dx-ask p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.4;
+    color: rgb(var(--c-slate-100));
+}
+
+/* ── Rejilla foto | dictamen ───────────────────────────────────────── */
+.dx-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    align-items: start;
+}
+@media (min-width: 820px) {
+    .dx-grid {
+        grid-template-columns: minmax(0, 1.22fr) minmax(0, 1fr);
+    }
+}
+
+/* ===================================================================
+   LA RADIOGRAFÍA — foto + capa del agente
+   =================================================================== */
+.dx-stage {
+    position: relative;
+    margin: 0;
+    aspect-ratio: 900 / 675;          /* == proporción de la foto → cero recorte */
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgb(var(--c-slate-950));
+    border: 1px solid rgb(var(--c-surface-border));
+    box-shadow: 0 18px 40px -22px rgb(0 0 0 / 0.7),
+                0 0 0 1px rgb(var(--t-accent-rgb) / 0.12) inset;
+    isolation: isolate;
+}
+.dx-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    /* levísimo desaturado inicial → "mirando"; vuelve al color al revelar */
+    filter: saturate(0.78) contrast(1.02);
+    transition: filter 0.7s ease;
+}
+.dx-stage[data-phase='done'] .dx-photo { filter: saturate(1.04) contrast(1.03); }
+
+.dx-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+    overflow: visible;
+}
+
+/* barrido de escáner: una sola pasada de arriba a abajo al abrir */
+.dx-scanline {
+    position: absolute;
+    left: -2%;
+    right: -2%;
+    top: 0;
+    height: 18%;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(
+        180deg,
+        transparent,
+        rgb(var(--t-accent-rgb) / 0.10),
+        rgb(var(--t-accent-rgb) / 0.42),
+        rgb(var(--t-accent-rgb) / 0.10),
+        transparent
+    );
+    box-shadow: 0 0 22px 2px rgb(var(--t-accent-rgb) / 0.35);
+    animation: dx-scan 1.75s cubic-bezier(0.45, 0, 0.25, 1) 0.1s both;
+}
+@keyframes dx-scan {
+    0%   { transform: translateY(-120%); opacity: 0; }
+    12%  { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { transform: translateY(560%); opacity: 0; }
+}
+
+/* ── Marcadores (los aros que dibuja el agente) ───────────────────── */
+.dx-marker {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: dx-appear 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.25) forwards;
+    animation-delay: var(--d, 1.4s);
+}
+.dx-marker[data-sev='alta']     { --mk: var(--t-accent-rgb); }
+.dx-marker[data-sev='temprana'] { --mk: 245 183 78; }        /* ámbar-ocre (familia nature) */
+
+@keyframes dx-appear {
+    0%   { opacity: 0; transform: scale(0.55); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.dx-halo {
+    fill: none;
+    stroke: rgb(4 10 14 / 0.55);
+    stroke-width: 10;
+}
+.dx-ring {
+    fill: none;
+    stroke: rgb(var(--mk));
+    stroke-width: 5.5;
+    stroke-linecap: round;
+    stroke-dasharray: 15 13;
+    filter: drop-shadow(0 0 5px rgb(var(--mk) / 0.65));
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: dx-rot 16s linear infinite;
+}
+@keyframes dx-rot { to { transform: rotate(360deg); } }
+
+.dx-pulse {
+    fill: none;
+    stroke: rgb(var(--mk) / 0.9);
+    stroke-width: 4;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: dx-pulse 2.8s ease-out infinite;
+    animation-delay: var(--d, 1.4s);
+}
+@keyframes dx-pulse {
+    0%   { transform: scale(0.7);  opacity: 0.6; }
+    70%  { opacity: 0; }
+    100% { transform: scale(1.28); opacity: 0; }
+}
+
+.dx-ticks line {
+    stroke: rgb(var(--mk));
+    stroke-width: 5;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 3px rgb(var(--mk) / 0.7));
+}
+
+.dx-badge {
+    fill: rgb(var(--mk));
+    stroke: rgb(255 255 255 / 0.92);
+    stroke-width: 3;
+    filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.5));
+}
+.dx-badge-num {
+    fill: #08201a;
+    font-family: 'Baloo 2', ui-sans-serif, system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+/* ── Etiqueta flotante del hallazgo principal ─────────────────────── */
+.dx-chip {
+    position: absolute;
+    z-index: 5;
+    transform: translate(-50%, calc(-100% - 15px));
+    max-width: min(62vw, 230px);
+    padding: 7px 11px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #f3f8f6;
+    background: rgb(6 14 12 / 0.86);
+    border: 1.5px solid rgb(var(--t-accent-rgb) / 0.85);
+    box-shadow: 0 8px 22px -8px rgb(0 0 0 / 0.8);
+    backdrop-filter: blur(3px);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    opacity: 0;
+    animation: dx-chip-in 0.5s ease forwards;
+    animation-delay: 1.7s;
+}
+.dx-chip::after {   /* colita que apunta al aro */
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -8px;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: rgb(var(--t-accent-rgb) / 0.85);
+    border-bottom: 0;
+}
+.dx-chip-num {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 800;
+    color: #08201a;
+    background: rgb(var(--t-accent-rgb));
+}
+@keyframes dx-chip-in {
+    from { opacity: 0; transform: translate(-50%, calc(-100% - 4px)); }
+    to   { opacity: 1; transform: translate(-50%, calc(-100% - 15px)); }
+}
+
+/* ── Estado del agente (sobre la foto, abajo-izquierda) ───────────── */
+.dx-status {
+    position: absolute;
+    z-index: 4;
+    left: 10px;
+    bottom: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #eefaf6;
+    background: rgb(6 14 12 / 0.78);
+    border: 1px solid rgb(var(--t-accent-rgb) / 0.5);
+}
+.dx-stage[data-phase='scan'] .dx-status { animation: dx-blink 1s ease-in-out infinite; }
+@keyframes dx-blink { 50% { opacity: 0.55; } }
+
+.dx-credit {
+    position: absolute;
+    z-index: 4;
+    right: 8px;
+    bottom: 8px;
+    font-size: 9px;
+    letter-spacing: 0.01em;
+    color: rgb(255 255 255 / 0.72);
+    text-shadow: 0 1px 3px rgb(0 0 0 / 0.9);
+    max-width: 44%;
+    text-align: right;
+    line-height: 1.2;
+}
+
+/* ===================================================================
+   EL DICTAMEN — tarjeta lateral
+   =================================================================== */
+.dx-report {
+    background: rgb(var(--c-surface-card));
+    border: 1px solid rgb(var(--c-surface-border));
+    border-radius: 18px;
+    padding: 16px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 12px 32px -20px rgb(0 0 0 / 0.55);
+}
+.dx-report-head {
+    display: flex;
+    gap: 11px;
+    align-items: flex-start;
+}
+.dx-avatar {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    color: rgb(var(--t-accent-rgb));
+    background: rgb(var(--t-accent-rgb) / 0.14);
+    border: 1px solid rgb(var(--t-accent-rgb) / 0.32);
+}
+.dx-kicker {
+    margin: 0 0 2px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgb(var(--t-accent-rgb));
+}
+.dx-title {
+    margin: 0;
+    font-family: 'Baloo 2', ui-sans-serif, system-ui, sans-serif;
+    font-size: clamp(20px, 5.4vw, 25px);
+    font-weight: 700;
+    line-height: 1.12;
+    color: rgb(var(--c-slate-100));
+}
+.dx-title strong { color: rgb(var(--t-accent-rgb)); }
+.dx-latin {
+    margin: 3px 0 0;
+    font-size: 12.5px;
+    font-style: italic;
+    color: rgb(var(--c-slate-300));
+}
+
+/* confianza */
+.dx-conf { display: flex; flex-direction: column; gap: 6px; }
+.dx-conf-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13px;
+    color: rgb(var(--c-slate-300));
+}
+.dx-conf-top strong { color: rgb(var(--t-accent-rgb)); font-size: 14px; }
+.dx-conf-bar {
+    height: 9px;
+    border-radius: 999px;
+    background: rgb(var(--c-surface-raised));
+    border: 1px solid rgb(var(--c-surface-border));
+    overflow: hidden;
+}
+.dx-conf-bar span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg,
+        rgb(var(--t-accent-rgb) / 0.55),
+        rgb(var(--t-accent-rgb)));
+    transform-origin: left;
+    animation: dx-fill 0.9s cubic-bezier(0.3, 0.9, 0.3, 1) 0.4s both;
+}
+@keyframes dx-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* hallazgos numerados */
+.dx-finds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.dx-find {
+    display: flex;
+    gap: 10px;
+    padding: 10px 11px;
+    border-radius: 13px;
+    background: rgb(var(--c-surface-raised) / 0.6);
+    border: 1px solid rgb(var(--c-surface-border));
+    border-left: 3px solid rgb(var(--fk));
+}
+.dx-find[data-sev='alta']     { --fk: var(--t-accent-rgb); }
+.dx-find[data-sev='temprana'] { --fk: 245 183 78; }
+.dx-find-num {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-family: 'Baloo 2', ui-sans-serif, system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: #08201a;
+    background: rgb(var(--fk));
+}
+.dx-find-title {
+    margin: 0 0 2px;
+    font-size: 14px;
+    font-weight: 800;
+    color: rgb(var(--c-slate-100));
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.dx-find-title em {
+    font-style: normal;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    color: rgb(var(--fk));
+    background: rgb(var(--fk) / 0.14);
+    border: 1px solid rgb(var(--fk) / 0.35);
+}
+.dx-find-detail {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.42;
+    color: rgb(var(--c-slate-300));
+}
+
+/* severidad */
+.dx-sev {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: rgb(var(--c-slate-100));
+    background: rgb(245 183 78 / 0.12);
+    border: 1px solid rgb(245 183 78 / 0.4);
+}
+.dx-sev svg { flex: none; margin-top: 1px; color: rgb(217 138 79); }
+.dx-sev span { flex: 1; min-width: 0; }
+.dx-sev strong { color: rgb(191 120 60); }
+
+/* recomendación */
+.dx-reco {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.dx-reco-head {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 800;
+    color: rgb(var(--c-slate-100));
+}
+.dx-reco ul {
+    margin: 0;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.dx-reco li {
+    font-size: 13px;
+    line-height: 1.4;
+    color: rgb(var(--c-slate-300));
+}
+.dx-cta {
+    align-self: flex-start;
+    margin-top: 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 15px;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13.5px;
+    font-weight: 800;
+    cursor: default;
+    color: #08201a;
+    background: rgb(var(--t-accent-rgb));
+    border: none;
+    opacity: 0.92;
+}
+.dx-cta:disabled { cursor: default; }
+
+/* fuente / grounding */
+.dx-source {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    margin: 0;
+    padding-top: 4px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: rgb(var(--c-slate-300));
+    border-top: 1px dashed rgb(var(--c-surface-border));
+}
+.dx-source svg { flex: none; margin-top: 1px; opacity: 0.75; }
+.dx-source span { flex: 1; min-width: 0; }
+
+/* ── Accesibilidad: sin movimiento ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .dx-scanline { display: none; }
+    .dx-marker { opacity: 1; animation: none; }
+    .dx-ring { animation: none; }
+    .dx-pulse { display: none; }
+    .dx-chip { opacity: 1; animation: none; }
+    .dx-status { animation: none; }
+    .dx-conf-bar span { animation: none; transform: scaleX(1); }
+    .dx-photo { transition: none; }
+}

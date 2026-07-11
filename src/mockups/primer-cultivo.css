@@ -1,0 +1,502 @@
+/*
+ * primer-cultivo.css — MOCKUP DEV · "El camino del primer cultivo"
+ * (#/mockups/primer-cultivo)
+ *
+ * El cuaderno de campo de quien siembra por primera vez. Paleta de TINTA sobre
+ * papel crema, tomada de la familia de las láminas (sepia, verde tallo, ocre
+ * surco, rojo fruto SOLO para la señal de "ponerle ojo"). El cielo y las lomas
+ * cambian con el clima elegido ([data-clima]); el resto es papel quieto.
+ * Tipografía: serifa de cuaderno para lo que se lee despacio (títulos, leads),
+ * sans del sistema para lo que se opera (chips, botones). Sin fuentes externas.
+ * Mobile-first 320px. Reduced-motion: la librería ya cae a fotograma digno; las
+ * animaciones propias de esta hoja se apagan al final.
+ */
+
+.pc {
+  --pc-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+  --pc-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+
+  --pc-papel: #ece1c4;         /* la página kraft */
+  --pc-carta: #fbf6e6;         /* cada carta de papel */
+  --pc-carta-borde: rgba(70, 56, 31, 0.16);
+  --pc-tinta: #46381f;         /* tinta sepia */
+  --pc-tinta2: #7d6b47;        /* tinta aguada */
+  --pc-verde: #3f8f4e;         /* tallo (láminas) */
+  --pc-verde-suave: #cfe6c4;
+  --pc-verde-hondo: #2f6b3a;
+  --pc-ocre: #b98a2f;          /* surco (láminas) */
+  --pc-alerta: #b6432f;        /* fruto maduro: SOLO "ponerle ojo" */
+  --pc-sendero-c: #efe4c6;
+
+  min-height: 100dvh;
+  background: var(--pc-papel);
+  color: var(--pc-tinta);
+  font-family: var(--pc-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── Loma/pasto por clima (acompañan el cielo de la librería) ── */
+.pc[data-clima='frio'] {
+  --pc-loma-lejos: #8ea3a0; --pc-loma: #6f8a6a; --pc-pasto: #59794f;
+}
+.pc[data-clima='templado'] {
+  --pc-loma-lejos: #8fb98a; --pc-loma: #689a5a; --pc-pasto: #4d7f43;
+}
+.pc[data-clima='calido'] {
+  --pc-loma-lejos: #b0a663; --pc-loma: #8f9a4e; --pc-pasto: #6f8a3f;
+}
+
+/* ── Barra del mockup (no es parte del diseño propuesto) ── */
+.pc-mockbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  pointer-events: none;
+}
+.pc-mockbar > * { pointer-events: auto; }
+.pc-mockchip {
+  min-height: 34px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(70, 56, 31, 0.35);
+  background: rgba(251, 246, 230, 0.86);
+  color: var(--pc-tinta);
+  font: 700 0.8rem/1 var(--pc-sans);
+  cursor: pointer;
+}
+.pc-mocknota {
+  font: 600 0.62rem/1 var(--pc-sans);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(70, 56, 31, 0.62);
+  background: rgba(251, 246, 230, 0.7);
+  padding: 5px 9px;
+  border-radius: 999px;
+}
+
+.pc-shell {
+  max-width: 430px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── El cielo de la vereda ── */
+.pc-cielo { position: relative; overflow: hidden; }
+.pc-escena-wrap { position: relative; height: 200px; }
+.pc-escena { display: block; width: 100%; height: 200px; }
+.pc-grade { position: absolute; inset: 0; pointer-events: none; }
+.pc-scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 74%; pointer-events: none; }
+.pc-sendero { opacity: 0.9; }
+
+.pc-cielo-txt {
+  position: absolute;
+  left: 16px; right: 16px; bottom: 12px;
+  color: #fbf6e6;
+  text-shadow: 0 1px 8px rgba(20, 14, 4, 0.55);
+}
+.pc-kicker {
+  margin: 0 0 2px;
+  font: 700 0.72rem/1.1 var(--pc-sans);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+.pc-titulo {
+  margin: 0;
+  font: 700 1.62rem/1.08 var(--pc-serif);
+}
+.pc-lugar {
+  margin: 3px 0 0;
+  font: 500 0.82rem/1.2 var(--pc-sans);
+  opacity: 0.9;
+}
+
+/* ── El mapa de cinco pasos (NO barra de progreso) ── */
+.pc-mapa {
+  padding: 12px 10px 4px;
+}
+.pc-mojones {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  position: relative;
+}
+/* el sendero de fondo que une los mojones (hilo del cuaderno) */
+.pc-mojones::before {
+  content: '';
+  position: absolute;
+  top: 9px; left: 12%; right: 12%;
+  height: 0;
+  border-top: 2px dashed rgba(70, 56, 31, 0.28);
+}
+.pc-mojon-li { flex: 1 1 0; display: flex; justify-content: center; }
+.pc-mojon {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 0;
+  padding: 2px 2px 4px;
+  cursor: pointer;
+  color: var(--pc-tinta2);
+  font: 600 0.62rem/1.1 var(--pc-sans);
+  min-width: 44px;
+}
+.pc-mojon-punto {
+  width: 14px; height: 14px;
+  border-radius: 999px;
+  background: var(--pc-papel);
+  border: 2px solid rgba(70, 56, 31, 0.4);
+  box-shadow: 0 0 0 3px var(--pc-papel);
+}
+.pc-mojon-txt { text-align: center; }
+.pc-mojon.on {
+  color: var(--pc-tinta);
+  font-weight: 800;
+}
+.pc-mojon.on .pc-mojon-punto {
+  background: var(--pc-verde-hondo);
+  border-color: var(--pc-verde-hondo);
+  transform: scale(1.18);
+}
+.pc-mapa-nota {
+  margin: 6px 2px 0;
+  text-align: center;
+  font: italic 500 0.76rem/1.3 var(--pc-serif);
+  color: var(--pc-tinta2);
+}
+
+/* ── El cuerpo del paso, sobre el papel ── */
+.pc-pagina {
+  position: relative;
+  flex: 1;
+  margin: 8px 10px 0;
+  padding: 16px 14px 18px;
+  border-radius: 14px 14px 0 0;
+  background-color: var(--pc-carta);
+  --scn-kraft-color: rgba(122, 82, 48, 0.05);
+  box-shadow: 0 -1px 0 rgba(70, 56, 31, 0.08) inset;
+}
+.pc-paso { position: relative; z-index: 1; }
+
+.pc-lead {
+  margin: 0 0 14px;
+  font: 500 1.02rem/1.5 var(--pc-serif);
+  color: var(--pc-tinta);
+}
+.pc-lead-hondo { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+
+.pc-ceja {
+  margin: 16px 0 8px;
+  font: 700 0.72rem/1.1 var(--pc-sans);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--pc-tinta2);
+}
+
+/* ── Paso 1: escoger clima ── */
+.pc-climas { display: flex; flex-direction: column; gap: 8px; }
+.pc-clima {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--pc-carta-borde);
+  background: rgba(255, 253, 246, 0.6);
+  cursor: pointer;
+  color: var(--pc-tinta);
+}
+.pc-clima.on {
+  border-color: var(--pc-verde-hondo);
+  background: rgba(63, 143, 78, 0.1);
+  box-shadow: 0 1px 0 rgba(47, 107, 58, 0.15);
+}
+.pc-clima-nombre { font: 700 1rem/1.2 var(--pc-serif); }
+.pc-clima-rango { font: 600 0.76rem/1.2 var(--pc-sans); color: var(--pc-tinta2); }
+.pc-clima-sena { font: italic 500 0.82rem/1.3 var(--pc-serif); color: var(--pc-tinta2); }
+
+/* ── Cartas de papel ── */
+.pc-carta {
+  margin: 14px 0 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: #fffdf6;
+  border: 1px solid var(--pc-carta-borde);
+  box-shadow: 0 1px 3px rgba(70, 56, 31, 0.06);
+}
+.pc-carta-ceja {
+  margin: 0 0 2px;
+  font: 700 0.7rem/1.1 var(--pc-sans);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--pc-tinta2);
+}
+.pc-carta-tit {
+  margin: 0 0 6px;
+  font: 700 1.35rem/1.12 var(--pc-serif);
+  color: var(--pc-tinta);
+}
+.pc-binomio {
+  display: inline-block;
+  font: italic 500 0.86rem/1 var(--pc-serif);
+  color: var(--pc-tinta2);
+}
+.pc-carta-txt { margin: 0; font: 500 0.96rem/1.45 var(--pc-serif); }
+
+.pc-carta-lamina {
+  margin: 12px auto 4px;
+  max-width: 230px;
+}
+.pc-lamina { display: block; width: 100%; height: auto; }
+
+.pc-tambien {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(122, 82, 48, 0.06);
+}
+.pc-tambien-lbl {
+  font: 700 0.72rem/1.1 var(--pc-sans);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--pc-tinta2);
+  margin-bottom: 5px;
+}
+.pc-tambien-it { font: 500 0.9rem/1.5 var(--pc-serif); }
+.pc-tambien-n { font-weight: 700; }
+.pc-tambien-nota { color: var(--pc-tinta2); }
+
+.pc-espera {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--pc-carta-borde);
+}
+.pc-espera p { margin: 0 0 6px; font: 500 0.92rem/1.4 var(--pc-serif); }
+.pc-espera p:last-child { margin-bottom: 0; }
+.pc-espera-lbl { font-weight: 800; color: var(--pc-verde-hondo); }
+
+/* ── Cartas menores (paso 2) ── */
+.pc-carta-menor { display: flex; gap: 12px; align-items: flex-start; }
+.pc-menor-icono { font-size: 1.7rem; line-height: 1; flex: 0 0 auto; }
+.pc-menor-cuerpo { flex: 1; }
+.pc-menor-tit { margin: 0 0 3px; font: 700 1.02rem/1.2 var(--pc-serif); }
+.pc-menor-txt { margin: 0; font: 500 0.92rem/1.45 var(--pc-serif); color: var(--pc-tinta); }
+
+.pc-carta-suelo { display: flex; flex-direction: column; gap: 12px; }
+.pc-suelo-lamina { max-width: 260px; margin: 0 auto; }
+.pc-suelo-lombriz {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--pc-carta-borde);
+  font: 500 0.9rem/1.4 var(--pc-serif);
+}
+.pc-lombriz-icono { flex: 0 0 auto; line-height: 0; }
+
+/* ── Paso 3: sembrar ── */
+.pc-siembra-lamina {
+  margin: 4px auto 14px;
+  max-width: 300px;
+  text-align: center;
+}
+.pc-lamina-pie {
+  margin: 6px 0 0;
+  font: italic 500 0.82rem/1.3 var(--pc-serif);
+  color: var(--pc-tinta2);
+}
+.pc-gestos { display: flex; flex-direction: column; gap: 10px; }
+.pc-gesto {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fffdf6;
+  border: 1px solid var(--pc-carta-borde);
+  border-left: 4px solid var(--pc-ocre);
+}
+.pc-gesto-lbl {
+  display: block;
+  font: 700 0.72rem/1.1 var(--pc-sans);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--pc-tinta2);
+  margin-bottom: 4px;
+}
+.pc-gesto-txt { margin: 0; font: 500 0.98rem/1.4 var(--pc-serif); }
+
+.pc-consejo {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(63, 143, 78, 0.09);
+  font: 500 0.94rem/1.45 var(--pc-serif);
+}
+.pc-consejo-lbl { font-weight: 800; color: var(--pc-verde-hondo); }
+.pc-nota-epoca {
+  margin: 12px 2px 0;
+  font: italic 500 0.88rem/1.4 var(--pc-serif);
+  color: var(--pc-tinta2);
+}
+
+/* ── Paso 4: observar ── */
+.pc-observar-brote {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fffdf6;
+  border: 1px solid var(--pc-carta-borde);
+}
+.pc-brote { flex: 0 0 84px; width: 84px; height: 84px; }
+.pc-asoma { margin: 0; font: 600 0.98rem/1.4 var(--pc-serif); }
+
+.pc-dos { display: flex; flex-direction: column; gap: 10px; }
+.pc-dos-tit { margin: 0 0 4px; font: 700 0.96rem/1.2 var(--pc-serif); }
+.pc-carta-normal { border-left: 4px solid var(--pc-verde); }
+.pc-carta-ojo { border-left: 4px solid var(--pc-alerta); }
+.pc-carta-ojo .pc-dos-tit { color: var(--pc-alerta); }
+
+/* ── Paso 5: esperar ── */
+.pc-paso-esperar { text-align: center; }
+.pc-esperar-fauna {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 24px;
+  margin: 2px 0 10px;
+  min-height: 52px;
+}
+.pc-fauna-a { animation: pc-flota 6s ease-in-out infinite; }
+.pc-fauna-b { animation: pc-flota 5.2s ease-in-out infinite reverse; }
+.pc-esperar-txt {
+  margin: 0 auto 12px;
+  max-width: 34ch;
+  font: 500 1.02rem/1.5 var(--pc-serif);
+}
+.pc-esperar-txt strong { color: var(--pc-verde-hondo); }
+.pc-remate {
+  margin: 0 auto 16px;
+  max-width: 32ch;
+  font: italic 600 1.06rem/1.45 var(--pc-serif);
+  color: var(--pc-tinta);
+}
+.pc-anotar {
+  min-height: 46px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  border: 1.5px solid var(--pc-verde-hondo);
+  background: rgba(63, 143, 78, 0.1);
+  color: var(--pc-verde-hondo);
+  font: 700 0.94rem/1 var(--pc-sans);
+  cursor: pointer;
+}
+.pc-cierre {
+  margin: 18px auto 10px;
+  max-width: 32ch;
+  font: 500 0.9rem/1.45 var(--pc-serif);
+  color: var(--pc-tinta2);
+}
+.pc-reinicio {
+  background: none;
+  border: 0;
+  color: var(--pc-tinta2);
+  font: 600 0.86rem/1.2 var(--pc-sans);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  padding: 6px;
+}
+
+/* ── Pie: atrás / oír / siguiente ── */
+.pc-pies {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 10px;
+  background: linear-gradient(to top, var(--pc-papel) 72%, rgba(236, 225, 196, 0));
+}
+.pc-pie {
+  min-height: 46px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--pc-carta-borde);
+  background: var(--pc-carta);
+  color: var(--pc-tinta);
+  font: 700 0.94rem/1 var(--pc-sans);
+  cursor: pointer;
+}
+.pc-atras { flex: 0 0 auto; }
+.pc-atras:disabled { opacity: 0.4; cursor: default; }
+.pc-oir {
+  flex: 0 0 auto;
+  min-height: 46px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--pc-carta-borde);
+  background: rgba(251, 246, 230, 0.9);
+  color: var(--pc-tinta);
+  font: 700 0.9rem/1 var(--pc-sans);
+  cursor: pointer;
+}
+.pc-siguiente {
+  flex: 1;
+  background: var(--pc-verde-hondo);
+  border-color: var(--pc-verde-hondo);
+  color: #fbf6e6;
+}
+.pc-fin { background: var(--pc-tinta); border-color: var(--pc-tinta); }
+
+/* ── Aviso efímero (memoria del cuaderno, no premio) ── */
+.pc-aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 76px;
+  transform: translateX(-50%);
+  z-index: 40;
+  max-width: 300px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: var(--pc-tinta);
+  color: var(--pc-carta);
+  font: 500 0.88rem/1.35 var(--pc-serif);
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(20, 14, 4, 0.3);
+}
+
+@keyframes pc-flota {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-7px) rotate(2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-fauna-a, .pc-fauna-b { animation: none; }
+  .pc-mojon.on .pc-mojon-punto { transform: none; }
+}
+
+/* Pantallitas muy angostas (320px): que nada se salga ni se apriete de más. */
+@media (max-width: 340px) {
+  .pc-titulo { font-size: 1.42rem; }
+  .pc-mojon { font-size: 0.56rem; min-width: 40px; }
+  .pc-oir { padding: 10px 10px; }
+  .pc-pie { padding: 10px 12px; }
+}

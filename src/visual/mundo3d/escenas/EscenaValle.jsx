@@ -14,7 +14,10 @@
  */
 import Valle3D from '../../../mockups/valle/Valle3D.jsx';
 
-export default function EscenaValle({ params, entrada, reducedMotion = false, onHotspot, animo = 'sereno', energia = 1 }) {
+export default function EscenaValle({
+  params, entrada, reducedMotion = false, onHotspot, animo = 'sereno', energia = 1, tier = 'alto',
+  estadoFinca = undefined, hayAlerta = false, // §5b: Angelita refleja el estado real también en el mapa
+}) {
   const clima = params?.clima || entrada?.clima || 'soleado';
   return (
     <Valle3D
@@ -22,6 +25,9 @@ export default function EscenaValle({ params, entrada, reducedMotion = false, on
       focoId={null}
       animo={animo}
       energia={energia}
+      estadoFinca={estadoFinca}
+      hayAlerta={hayAlerta}
+      tier={tier}
       reducedMotion={reducedMotion}
       onEntrar={(id) => onHotspot?.('mundo', { mundoId: id })}
       onAlerta={() => onHotspot?.(entrada?.alertaView || 'hoy_finca')}
