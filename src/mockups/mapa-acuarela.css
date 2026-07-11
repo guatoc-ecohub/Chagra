@@ -1,0 +1,519 @@
+/* Mockup "El croquis de la finca como acuarela viva" (#/mockups/mapa-acuarela)
+ *
+ * Paleta de cuaderno de campo:
+ *   papel kraft #efe5cf / hoja #f7f0de · tinta sepia #5b4a36
+ *   aguadas: verde vivo (sana) · ocre (estrés) · siena/teja · azul quebrada
+ *
+ * Reglas de la casa: solo transform/opacity animados; los filtros de
+ * acuarela (feTurbulence/feDisplacementMap) son ESTÁTICOS — el latido anima
+ * el <g> PADRE de la forma filtrada, así el navegador cachea el raster del
+ * filtro y solo composita. prefers-reduced-motion = fotograma digno.
+ */
+
+.acq {
+  /* Tokens del cuaderno. */
+  --acq-papel: #efe5cf;
+  --acq-hoja: #f7f0de;
+  --acq-tinta: #5b4a36;
+  --acq-tinta-suave: rgba(91, 74, 54, 0.62);
+  --acq-verde-claro: #a9cf86;
+  --acq-verde-hondo: #4e7d46;
+  --acq-pasto-claro: #c3d795;
+  --acq-pasto-hondo: #71904c;
+  --acq-ocre-claro: #e3b56e;
+  --acq-ocre-hondo: #9c6a38;
+  --acq-cafe-claro: #96bd74;
+  --acq-cafe-hondo: #47703c;
+  --acq-agua-claro: #b8d9e4;
+  --acq-agua-hondo: #5f97ad;
+  --acq-patio-claro: #ecd6ae;
+  --acq-patio-hondo: #b99a68;
+  --acq-alerta: #b3402e;
+  /* EL latido de la casa: misma duración que --fvo-beat (la finca-organismo). */
+  --acq-beat: 5.2s;
+
+  min-height: 100dvh;
+  padding: 14px 14px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 560px;
+  margin: 0 auto;
+  color: var(--acq-tinta);
+  font-family: 'Nunito', system-ui, sans-serif;
+  /* Kraft: papel con fibra fina (receta FincaVivaHero). */
+  background:
+    repeating-linear-gradient(0deg, rgba(120, 96, 60, 0.045) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(120, 96, 60, 0.03) 0 1px, transparent 1px 4px),
+    var(--acq-papel);
+}
+
+/* ---------- Cabecera ---------- */
+
+.acq-cabecera {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.acq-volver {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1.6px solid var(--acq-tinta-suave);
+  background: var(--acq-hoja);
+  color: var(--acq-tinta);
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.acq-volver:active { transform: scale(0.94); }
+
+.acq-ceja {
+  margin: 2px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--acq-tinta-suave);
+}
+
+.acq-titulo {
+  margin: 2px 0 0;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: clamp(1.35rem, 6vw, 1.7rem);
+  line-height: 1.12;
+  color: #46372a;
+}
+
+.acq-sub {
+  margin: 3px 0 0;
+  font-size: 12.5px;
+  color: var(--acq-tinta-suave);
+}
+
+/* ---------- La hoja ---------- */
+
+.acq-hoja {
+  position: relative;
+  border-radius: 16px;
+  background: var(--acq-hoja);
+  box-shadow:
+    0 1px 0 rgba(91, 74, 54, 0.14),
+    0 10px 26px -14px rgba(70, 55, 42, 0.45);
+  overflow: hidden;
+}
+
+.acq-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Velo de hora dorada + viñeta de cine (catálogo §13.2 y §13.5):
+   la luz cálida entra por arriba-izquierda, las esquinas se hunden apenas. */
+.acq-velo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 90% at 22% 8%, rgba(255, 205, 120, 0.14), transparent 55%),
+    radial-gradient(135% 120% at 50% 50%, transparent 62%, rgba(70, 52, 34, 0.1) 100%);
+  mix-blend-mode: multiply;
+}
+
+.acq-grano { fill: #fff; opacity: 0.05; pointer-events: none; }
+
+/* ---------- Tinta sepia ---------- */
+
+.acq-tinta,
+.acq-tinta path {
+  fill: none;
+  stroke: var(--acq-tinta);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.82;
+  pointer-events: none;
+}
+
+/* Lindero: puntada de hilo (LA COSTURA — firma de marca, HelpIllustrations). */
+.acq-lindero {
+  fill: none;
+  stroke: var(--acq-tinta);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 7 8;
+  opacity: 0.55;
+}
+
+.acq-norte { opacity: 0.6; }
+
+/* ---------- Lavados de acuarela ---------- */
+
+.acq-lote { cursor: pointer; }
+.acq-lote:focus { outline: none; }
+
+.acq-sangrado {
+  fill: none;
+  stroke-width: 10;
+  stroke-linejoin: round;
+  opacity: 0.3;
+}
+
+.acq-cuerpo { opacity: 0.68; }
+
+.acq-charco {
+  fill: none;
+  stroke-width: 2.4;
+  opacity: 0.4;
+}
+
+/* El velo de vida: blanco cálido que respira SOBRE el lavado. */
+.acq-vida {
+  fill: #fff8e8;
+  pointer-events: none;
+}
+
+.acq-vida-late {
+  opacity: 0.12;
+  transform-box: fill-box;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+/* Latido por salud. Sana: hondo y tranquilo (el pulso de la casa). */
+.acq-lote[data-salud='sana'] .acq-vida-late {
+  animation: acq-late var(--acq-beat) ease-in-out infinite;
+}
+/* Estrés: corto y superficial — respira con esfuerzo. */
+.acq-lote[data-salud='estres'] .acq-vida-late {
+  animation: acq-late-corto 3.4s ease-in-out infinite;
+}
+/* Alerta: el lote respira poco; el que grita es el punto rojo. */
+.acq-lote[data-salud='alerta'] .acq-vida-late {
+  animation: acq-late-corto 4.6s ease-in-out infinite;
+}
+
+@keyframes acq-late {
+  0%, 100% { opacity: 0.08; transform: scale(1); }
+  50% { opacity: 0.34; transform: scale(1.012); }
+}
+@keyframes acq-late-corto {
+  0%, 100% { opacity: 0.06; transform: scale(1); }
+  42%, 58% { opacity: 0.16; transform: scale(1.005); }
+}
+
+/* Tocado / foco de teclado: el lavado se aviva y el charco se marca. */
+.acq-lote.es-sel .acq-cuerpo,
+.acq-lote:focus-visible .acq-cuerpo { opacity: 0.88; }
+.acq-lote.es-sel .acq-charco,
+.acq-lote:focus-visible .acq-charco { opacity: 0.85; stroke-width: 3; }
+.acq-lote.es-sel .acq-rotulo-aro { fill: var(--acq-hoja); }
+
+.acq-hit { fill: transparent; stroke: none; }
+
+/* ---------- Rótulos ---------- */
+
+.acq-rotulo { pointer-events: none; }
+.acq-rotulo-aro {
+  fill: rgba(247, 240, 222, 0.85);
+  stroke: var(--acq-tinta);
+  stroke-width: 1.4;
+}
+.acq-rotulo-n {
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  fill: var(--acq-tinta);
+}
+.acq-rotulo-txt {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  fill: var(--acq-tinta);
+  paint-order: stroke;
+  stroke: rgba(247, 240, 222, 0.75);
+  stroke-width: 3;
+}
+.acq-rotulo-centro { pointer-events: none; }
+
+/* ---------- Agua, camino, casa ---------- */
+
+.acq-quebrada-agua {
+  fill: none;
+  stroke: url(#acq-g-agua);
+  stroke-width: 9;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+/* Flujo por dash (receta savia/micelio): la corriente baja. */
+.acq-quebrada-flujo {
+  fill: none;
+  stroke: #eaf6fa;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 7 12;
+  opacity: 0.65;
+  animation: acq-flujo 4.5s linear infinite;
+}
+@keyframes acq-flujo { to { stroke-dashoffset: -76; } }
+
+.acq-camino {
+  fill: none;
+  stroke: #d9bd8d;
+  stroke-width: 11;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+.acq-camino-huella {
+  fill: none;
+  stroke: var(--acq-tinta);
+  stroke-width: 1.4;
+  stroke-dasharray: 2 9;
+  opacity: 0.4;
+}
+
+.acq-copa { opacity: 0.7; }
+
+.acq-teja { fill: #c9805a; opacity: 0.7; }
+.acq-ventana { fill: #f3c76a; opacity: 0.95; }
+
+/* Humo del fogón: sube y se deshace (transform/opacity, nada más). */
+.acq-humo path {
+  fill: none;
+  stroke: rgba(91, 74, 54, 0.5);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.acq-humo {
+  animation: acq-humo 5s ease-in-out infinite;
+}
+.acq-humo.h2 { animation-delay: 2.4s; }
+@keyframes acq-humo {
+  0% { opacity: 0; transform: translateY(2px); }
+  25% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(-13px); }
+}
+
+/* ---------- Alerta (punto rojo) ---------- */
+
+.acq-alerta-punto {
+  fill: var(--acq-alerta);
+  stroke: #f7f0de;
+  stroke-width: 1.4;
+  animation: acq-alerta-late 2.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.acq-alerta-anillo {
+  fill: none;
+  stroke: var(--acq-alerta);
+  stroke-width: 1.6;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: acq-anillo 2.2s ease-out infinite;
+}
+.acq-alerta-anillo.a2 { animation-delay: 1.1s; }
+@keyframes acq-alerta-late {
+  0%, 100% { transform: scale(1); }
+  12% { transform: scale(1.35); }
+  24% { transform: scale(1); }
+}
+@keyframes acq-anillo {
+  0% { opacity: 0.7; transform: scale(1); }
+  100% { opacity: 0; transform: scale(3.1); }
+}
+
+/* ---------- Mariposa (vida ambiental) ---------- */
+
+.acq-ala {
+  fill: #d98a4f;
+  opacity: 0.75;
+  transform-box: fill-box;
+}
+.acq-mariposa .acq-ala { transform-origin: right center; animation: acq-aleteo 0.5s ease-in-out infinite alternate; }
+.acq-mariposa .acq-ala.a2 { transform-origin: left center; }
+@keyframes acq-aleteo {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.45); }
+}
+.acq-mariposa-vuelo {
+  animation: acq-cruza 26s ease-in-out infinite;
+  opacity: 0;
+}
+@keyframes acq-cruza {
+  0%, 55% { opacity: 0; transform: translate(60px, 330px); }
+  60% { opacity: 1; }
+  70% { transform: translate(150px, 200px); }
+  80% { transform: translate(255px, 235px); }
+  92% { opacity: 1; }
+  100% { opacity: 0; transform: translate(340px, 130px); }
+}
+
+/* ---------- Ficha (nota al margen) ---------- */
+
+.acq-ficha { min-height: 108px; }
+
+.acq-ficha-pista {
+  margin: 10px 4px 0;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--acq-tinta-suave);
+  text-align: center;
+}
+
+.acq-ficha-nota {
+  background: var(--acq-hoja);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border-left: 5px solid var(--acq-verde-hondo);
+  box-shadow: 0 6px 18px -12px rgba(70, 55, 42, 0.5);
+  animation: acq-nota-entra 0.28s cubic-bezier(0.32, 1.3, 0.4, 1);
+}
+.acq-ficha-nota[data-salud='estres'] { border-left-color: var(--acq-ocre-hondo); }
+.acq-ficha-nota[data-salud='alerta'] { border-left-color: var(--acq-alerta); }
+
+@keyframes acq-nota-entra {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.acq-ficha-linea {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.acq-ficha-titulo {
+  margin: 0;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: 17px;
+  color: #46372a;
+}
+
+.acq-ficha-cerrar {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(91, 74, 54, 0.08);
+  color: var(--acq-tinta);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.acq-ficha-meta {
+  margin: 3px 0 0;
+  font-size: 13.5px;
+  color: var(--acq-tinta-suave);
+}
+.acq-ficha-nota[data-salud='sana'] .acq-ficha-estado { color: var(--acq-verde-hondo); }
+.acq-ficha-nota[data-salud='estres'] .acq-ficha-estado { color: var(--acq-ocre-hondo); }
+.acq-ficha-nota[data-salud='alerta'] .acq-ficha-estado { color: var(--acq-alerta); }
+
+.acq-ficha-nota-txt {
+  margin: 7px 0 0;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+/* ---------- Leyenda ---------- */
+
+.acq-leyenda {
+  border-top: 1.5px dashed rgba(91, 74, 54, 0.3);
+  padding-top: 12px;
+}
+
+.acq-leyenda-titulo {
+  margin: 0 0 8px;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: 14.5px;
+  color: #46372a;
+}
+
+.acq-leyenda-lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13.5px;
+}
+.acq-leyenda-lista li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+/* Muestras de pigmento: gotitas irregulares (border-radius orgánico). */
+.acq-muestra {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 16px;
+  border-radius: 58% 42% 55% 45% / 52% 55% 45% 48%;
+  box-shadow: inset 0 0 0 1px rgba(91, 74, 54, 0.18);
+}
+.acq-muestra.sana {
+  background: radial-gradient(circle at 40% 35%, var(--acq-verde-claro), var(--acq-verde-hondo));
+  animation: acq-muestra-late var(--acq-beat) ease-in-out infinite;
+}
+.acq-muestra.estres {
+  background: radial-gradient(circle at 40% 35%, var(--acq-ocre-claro), var(--acq-ocre-hondo));
+  animation: acq-muestra-late-corto 3.4s ease-in-out infinite;
+}
+.acq-muestra.alerta {
+  background:
+    radial-gradient(circle at 50% 50%, var(--acq-alerta) 0 34%, transparent 38%),
+    radial-gradient(circle at 40% 35%, var(--acq-cafe-claro), var(--acq-cafe-hondo));
+}
+/* Las muestras de la leyenda laten SOLO en escala (a plena opacidad: son
+   chiquitas — los keyframes del velo del mapa las dejarían invisibles). */
+@keyframes acq-muestra-late {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+@keyframes acq-muestra-late-corto {
+  0%, 100% { transform: scale(1); }
+  42%, 58% { transform: scale(1.07); }
+}
+
+/* ---------- Responsive 320px ---------- */
+
+@media (max-width: 360px) {
+  .acq { padding: 10px 10px 22px; }
+  .acq-ficha-titulo { font-size: 15.5px; }
+  .acq-ficha-nota-txt { font-size: 13.5px; }
+  .acq-leyenda-lista { font-size: 12.5px; }
+}
+
+/* ---------- Reduced motion: fotograma final digno ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .acq-vida-late,
+  .acq-quebrada-flujo,
+  .acq-humo,
+  .acq-alerta-punto,
+  .acq-alerta-anillo,
+  .acq-mariposa .acq-ala,
+  .acq-mariposa-vuelo,
+  .acq-muestra.sana,
+  .acq-muestra.estres,
+  .acq-ficha-nota {
+    animation: none;
+  }
+  /* La acuarela queda como lámina terminada: velos a media luz,
+     el punto de alerta firme y visible, la mariposa posada en el potrero. */
+  .acq-vida-late { opacity: 0.18; }
+  .acq-alerta-anillo { opacity: 0.45; transform: scale(1.8); }
+  .acq-alerta-anillo.a2 { opacity: 0; }
+  .acq-mariposa-vuelo { opacity: 1; transform: translate(255px, 235px); }
+  .acq-humo { opacity: 0; }
+}

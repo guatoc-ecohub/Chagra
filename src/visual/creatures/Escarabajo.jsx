@@ -9,7 +9,7 @@ const VIEWBOX = '-23 -12 42 30';
 
 export function Escarabajo({
   size = 64,
-  className,
+  className = '',
   inline = false,
   animated = true,
   title = 'Escarabajo estercolero',

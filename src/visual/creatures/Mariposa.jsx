@@ -9,7 +9,7 @@ const VIEWBOX = '-27 -18 54 40';
 
 export function Mariposa({
   size = 64,
-  className,
+  className = '',
   inline = false,
   animated = true,
   title = 'Mariposa',

@@ -1,0 +1,514 @@
+/*
+ * Estilos del mockup "El valle de mi finca" (#/mockups/entrada-3d).
+ * UI que FLOTA sobre el diorama (sin cajas duras): scrims de cine para que el
+ * texto siempre lea, targets táctiles > 48px (manos de trabajo), copy en usted.
+ * La escena vive detrás; el chrome DOM la conduce (accesible por teclado/voz).
+ */
+
+.valle-root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  color: #fff;
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  background: #0d1e2a;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.valle-escena {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.valle-canvas {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+.valle-canvas--listo { opacity: 1; }
+
+/* ── Placeholder de carga del chunk 3D ── */
+.valle-cargando {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+.valle-cargando__pulso {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe0a3, #ff9d4d);
+  animation: valle-pulso 1.6s ease-in-out infinite;
+  box-shadow: 0 0 40px 8px rgba(255, 180, 90, 0.5);
+}
+.valle-cargando p { font-size: 0.95rem; letter-spacing: 0.02em; }
+@keyframes valle-pulso {
+  0%, 100% { transform: scale(0.85); opacity: 0.7; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+/* ── Encabezado ── */
+.valle-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem 2.4rem;
+  background: linear-gradient(180deg, rgba(6, 16, 26, 0.72) 0%, rgba(6, 16, 26, 0) 100%);
+  pointer-events: none;
+}
+.valle-header > * { pointer-events: auto; }
+
+.valle-back {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0.4rem 0.7rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.valle-back:hover { background: rgba(0, 0, 0, 0.5); }
+
+.valle-titulo { flex: 1 1 auto; min-width: 0; }
+.valle-titulo__eyebrow {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+.valle-titulo h1 {
+  margin: 0.1rem 0 0;
+  font-size: clamp(1.35rem, 5vw, 1.9rem);
+  font-weight: 800;
+  line-height: 1.05;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55);
+}
+
+.valle-clima {
+  position: absolute;
+  top: 4.4rem;
+  right: 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+  max-width: 62vw;
+}
+.valle-clima__chip {
+  min-height: 40px;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.32);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+.valle-clima__chip:hover { background: rgba(0, 0, 0, 0.5); }
+.valle-clima__chip--on {
+  background: rgba(255, 214, 138, 0.92);
+  border-color: #ffd68a;
+  color: #3a2510;
+  box-shadow: 0 4px 14px rgba(255, 180, 90, 0.4);
+}
+
+/* ── Etiquetas espaciales dentro del 3D (drei <Html>) ── */
+.valle-poi {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.35rem 0.7rem 0.35rem 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(12, 22, 28, 0.72);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  backdrop-filter: blur(3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+  transform-origin: bottom center;
+}
+.valle-poi::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--poi-tinte, #7fd08a);
+  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--poi-tinte, #7fd08a) 70%, transparent);
+  flex: 0 0 auto;
+}
+.valle-poi__emoji { font-size: 1.05rem; }
+.valle-poi:hover { transform: scale(1.06); background: rgba(12, 22, 28, 0.9); }
+.valle-poi--activo {
+  background: rgba(255, 255, 255, 0.94);
+  color: #1c2b1c;
+  border-color: #fff;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+}
+
+/* ── La cosa del día: el faro que grita (con mesura) ── */
+.valle-alerta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 46px;
+  padding: 0.4rem 0.85rem;
+  border: 2px solid #ffcf87;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 173, 71, 0.96), rgba(230, 130, 50, 0.96));
+  color: #3a2205;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 6px 22px rgba(255, 150, 60, 0.55);
+  animation: valle-alerta-late 2.4s ease-in-out infinite;
+}
+.valle-alerta:hover { filter: brightness(1.06); }
+@keyframes valle-alerta-late {
+  0%, 100% { transform: scale(1); box-shadow: 0 6px 22px rgba(255, 150, 60, 0.5); }
+  50% { transform: scale(1.06); box-shadow: 0 8px 30px rgba(255, 170, 80, 0.75); }
+}
+
+/* ── Angelita, la abeja: el avatar-jugador dentro del 3D (drei <Html>) ── */
+.valle-abeja {
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+  will-change: transform;
+}
+.valle-abeja__cara {
+  transition: transform 0.25s ease; /* voltea hacia donde vuela */
+  transform-origin: center;
+}
+
+/* ── El compañero como TARJETA puntual (imagen-first, una sola línea) ──
+      El ser al que se cuida vive también en el DOM: su cara refleja el ánimo. */
+.valle-companero {
+  position: absolute;
+  left: 1.1rem;
+  bottom: 5.1rem;
+  z-index: 14;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: min(74vw, 22rem);
+  padding: 0.35rem 0.8rem 0.35rem 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(15, 24, 30, 0.7);
+  color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+  animation: valle-companero-in 0.5s ease both;
+}
+.valle-companero__cara {
+  flex: 0 0 auto;
+  display: inline-flex;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.35));
+}
+.valle-companero__txt {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+@keyframes valle-companero-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Paneles (alerta / mundo): flotan abajo, una acción clara ── */
+.valle-panel {
+  position: absolute;
+  left: 50%;
+  bottom: 5.4rem;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: min(92vw, 30rem);
+  padding: 1.1rem 1.2rem 1.2rem;
+  border-radius: 1.2rem;
+  background: rgba(15, 24, 30, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  animation: valle-panel-in 0.32s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+@keyframes valle-panel-in {
+  from { opacity: 0; transform: translate(-50%, 14px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+.valle-panel__x {
+  position: absolute;
+  top: 0.5rem; right: 0.6rem;
+  width: 40px; height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.valle-panel__x:hover { background: rgba(255, 255, 255, 0.2); }
+.valle-panel__tag {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.valle-panel--alerta .valle-panel__tag { background: rgba(255, 173, 71, 0.28); color: #ffd7a0; }
+.valle-panel--mundo .valle-panel__tag { background: color-mix(in srgb, var(--m-tinte, #7fd08a) 35%, transparent); }
+.valle-panel h2 {
+  margin: 0.55rem 0 0.35rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.valle-panel p {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.9);
+}
+.valle-panel__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.valle-cta {
+  flex: 1 1 auto;
+  min-height: 52px;
+  padding: 0.7rem 1.1rem;
+  border: none;
+  border-radius: 0.9rem;
+  background: linear-gradient(180deg, #ffd88f, #ff9d4d);
+  color: #3a2205;
+  font-family: inherit;
+  font-size: 1.02rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(255, 150, 60, 0.45);
+}
+.valle-panel--mundo .valle-cta {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--m-tinte, #7fd08a) 78%, #fff),
+    var(--m-tinte, #4b8a52));
+  color: #10210f;
+}
+.valle-cta:hover { filter: brightness(1.05); }
+.valle-ghost {
+  min-height: 52px;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 0.9rem;
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.valle-ghost:hover { background: rgba(255, 255, 255, 0.1); }
+
+/* ── Barra del agente (abajo, fija) ── */
+.valle-agente {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(0deg, rgba(6, 16, 26, 0.85) 0%, rgba(6, 16, 26, 0) 100%);
+  pointer-events: none;
+}
+.valle-agente > * { pointer-events: auto; }
+.valle-agente__pregunte {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 52px;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+.valle-agente__pregunte:hover { background: rgba(255, 255, 255, 0.16); }
+.valle-agente__punto {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #7dffbe;
+  box-shadow: 0 0 10px 2px rgba(125, 255, 190, 0.7);
+  animation: valle-punto 2.2s ease-in-out infinite;
+}
+@keyframes valle-punto { 0%,100%{opacity:.6;transform:scale(.85);} 50%{opacity:1;transform:scale(1.1);} }
+.valle-agente__ctrls { display: flex; gap: 0.5rem; }
+.valle-agente__btn {
+  min-height: 52px;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+}
+.valle-agente__btn:hover { background: rgba(0, 0, 0, 0.5); }
+.valle-agente__voz.on { border-color: #7dffbe; }
+
+.valle-degradado {
+  position: absolute;
+  top: 8.2rem; left: 1.1rem; right: 1.1rem;
+  z-index: 8;
+  margin: 0;
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.7rem;
+  background: rgba(0, 0, 0, 0.4);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* ── Fallback 2D (equipos humildes) ── */
+.valle2d { position: absolute; inset: 0; overflow: hidden; }
+/* cámara-lámina: se acerca hacia el lugar tocado (mismo "entrar" del 3D) */
+.valle2d__cam {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.7s cubic-bezier(0.22, 0.9, 0.3, 1);
+  will-change: transform;
+}
+.valle2d__svg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.valle2d__mundos { position: absolute; inset: 0; }
+
+/* Angelita en el 2D: el avatar que vuela hacia el lugar al entrar */
+.valle2d__abeja {
+  position: absolute;
+  transform: translate(-50%, -60%);
+  pointer-events: none;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.4));
+  transition: left 0.8s cubic-bezier(0.3, 0.7, 0.3, 1), top 0.8s cubic-bezier(0.3, 0.7, 0.3, 1);
+  will-change: left, top;
+  animation: valle2d-abeja-flota 3.4s ease-in-out infinite;
+}
+.valle2d__abeja--entrando { animation: none; }
+@keyframes valle2d-abeja-flota {
+  0%, 100% { transform: translate(-50%, -60%); }
+  50% { transform: translate(-50%, -68%); }
+}
+.valle2d__poi--activo {
+  background: rgba(255, 255, 255, 0.94);
+  color: #1c2b1c;
+  border-color: #fff;
+}
+.valle2d__poi {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 0.8rem;
+  background: rgba(12, 22, 28, 0.7);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+.valle2d__poi:hover { transform: translate(-50%, -54%); }
+.valle2d__emoji { font-size: 1.3rem; }
+.valle2d__nombre {
+  border-top: 2px solid var(--poi-tinte, #7fd08a);
+  padding-top: 0.1rem;
+}
+.valle2d__alerta {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.8rem;
+  border: 2px solid #ffcf87;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 173, 71, 0.96), rgba(230, 130, 50, 0.96));
+  color: #3a2205;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(255, 150, 60, 0.5);
+  animation: valle-alerta-late 2.4s ease-in-out infinite;
+}
+.valle2d__grade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .valle-cargando__pulso,
+  .valle-alerta,
+  .valle2d__alerta,
+  .valle2d__abeja,
+  .valle-agente__punto,
+  .valle-companero,
+  .valle-panel { animation: none; }
+  .valle2d__cam,
+  .valle2d__abeja,
+  .valle-abeja__cara { transition: none; }
+}
+
+@media (max-width: 560px) {
+  .valle-clima { position: static; max-width: none; margin-top: 0.4rem; justify-content: flex-start; width: 100%; }
+  .valle-header { flex-wrap: wrap; }
+  .valle-titulo h1 { font-size: 1.3rem; }
+}

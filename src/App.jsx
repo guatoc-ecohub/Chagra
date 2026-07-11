@@ -73,6 +73,40 @@ const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
 // Vitrina pública de la librería visual reutilizable (`src/visual/`). Ruta
 // #/mockups/visual-lib, resuelta ANTES del check de sesión (no requiere auth).
 const VisualLib = lazy(() => import('./mockups/VisualLib'));
+// ── Galería de mockups aspiracionales (diseño) ──────────────────────────────
+// Rutas públicas `#/mockups/<slug>`: vitrinas de discovery sin gate ni sesión
+// (datos de muestra, no tocan datos reales). Todas resuelven vía
+// MOCKUP_HASH_ROUTES ANTES del check de auth. Chunks perezosos.
+// 3D: "El valle de mi finca" (R3F/WebGL2, degrada a SVG sin WebGL).
+const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
+// Voz: superficies de voz con forma viva (iris que reacciona al volumen).
+const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
+const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
+const EnsenaDibujandoMockup = lazy(() => import('./mockups/EnsenaDibujando'));
+// Superficies definitivas y flujos ilustrados.
+const DiaEnFincaMockup = lazy(() => import('./mockups/DiaEnFinca'));
+const SaludFincaMockup = lazy(() => import('./mockups/SaludFinca'));
+const PrimerCultivoMockup = lazy(() => import('./mockups/PrimerCultivo'));
+const MercadoMockup = lazy(() => import('./mockups/Mercado'));
+const OnboardingSiembraMockup = lazy(() => import('./mockups/OnboardingSiembra'));
+// Navegación como paisaje (montaña de los mundos) + variantes.
+const MontanaMundosMockup = lazy(() => import('./mockups/MontanaMundos'));
+const MontanaMundosCineMockup = lazy(() => import('./mockups/MontanaMundosCine'));
+const MontanaMundosCampesinoMockup = lazy(() => import('./mockups/MontanaMundosCampesino'));
+// Entrada campesina definitiva + home + avatares del espíritu de la finca.
+const EntradaCampesinaMockup = lazy(() => import('./mockups/EntradaCampesina'));
+const HomeCampesinoMockup = lazy(() => import('./mockups/HomeCampesino'));
+const BotonAnarquiaMockup = lazy(() => import('./mockups/BotonAnarquia'));
+const AvatarGameBiopunk = lazy(() => import('./mockups/AvatarGameBiopunk'));
+const AvatarGameVerdeVivo = lazy(() => import('./mockups/AvatarGameVerdeVivo'));
+const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
+// Piezas de decisión visual (acuarela, clima, diagnóstico, evidencia, guardianes).
+const MapaAcuarelaMockup = lazy(() => import('./mockups/MapaAcuarela'));
+const ClimaAtmosferaMockup = lazy(() => import('./mockups/ClimaAtmosfera'));
+const DiagnosticoSobreFoto = lazy(() => import('./mockups/DiagnosticoSobreFoto'));
+const EvidenciaIlustrada = lazy(() => import('./mockups/EvidenciaIlustrada'));
+const MockupGuardianesNarrativos = lazy(() => import('./mockups/MockupGuardianesNarrativos'));
+const HojaVidaMataMockup = lazy(() => import('./components/mockups/HojaVidaMataMockup'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -425,6 +459,31 @@ const LoadingFallback = ({ view = null }) => {
 // #onboarding-piloto. El hash llega ya normalizado (sin `#`/`#/`).
 const MOCKUP_HASH_ROUTES = {
   'mockups/visual-lib': 'mockup_visual_lib',
+  // Galería aspiracional (3D + voz + superficies definitivas + piezas de diseño).
+  'mockups/entrada-3d': 'mockup_entrada_3d',
+  'mockups/voz-con-forma': 'mockup_voz_con_forma',
+  'mockups/conversacion-voz': 'mockup_conversacion_voz',
+  'mockups/ensena-dibujando': 'mockup_ensena_dibujando',
+  'mockups/dia-en-finca': 'mockup_dia_en_finca',
+  'mockups/salud-finca': 'mockup_salud_finca',
+  'mockups/primer-cultivo': 'mockup_primer_cultivo',
+  'mockups/mercado': 'mockup_mercado',
+  'mockups/onboarding-siembra': 'mockup_onboarding_siembra',
+  'mockups/montana-mundos': 'mockup_montana_mundos',
+  'mockups/montana-mundos-cine': 'mockup_montana_mundos_cine',
+  'mockups/montana-mundos-campesino': 'mockup_montana_mundos_campesino',
+  'mockups/entrada-campesina': 'mockup_entrada_campesina',
+  'mockups/home-campesino': 'mockup_home_campesino',
+  'mockups/boton-anarquia': 'mockup_boton_anarquia',
+  'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
+  'mockups/avatar-verde-vivo': 'mockup_avatar_verde_vivo',
+  'mockups/avatar-libre': 'mockup_avatar_libre',
+  'mockups/mapa-acuarela': 'mockup_mapa_acuarela',
+  'mockups/clima-atmosfera': 'mockup_clima_atmosfera',
+  'mockups/diagnostico-foto': 'mockup_diagnostico_foto',
+  'mockups/evidencia-ilustrada': 'mockup_evidencia_ilustrada',
+  'mockups/guardianes-narrativos': 'mockup_guardianes',
+  'mockups/hoja-vida-mata': 'mockup_hoja_vida_mata',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -793,7 +852,7 @@ export default function App() {
       clearTimeout(bootSync);
     };
   }, []);
-  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' });
+  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') });
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
@@ -1121,7 +1180,7 @@ export default function App() {
   // loading. Body className toggled según currentView. Estilos en
   // src/index.css clase .app-bg-biodiversidad (nombre histórico).
   useEffect(() => {
-    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib';
+    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_');
     if (showBg) {
       document.body.classList.add('app-bg-biodiversidad');
     } else {
@@ -1238,6 +1297,201 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Librería visual">
               <VisualLib />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      // ── Galería de mockups aspiracionales (#/mockups/*) ────────────────────
+      // Vistas full-screen de decisión visual, sin gate ni datos reales. onBack
+      // devuelve al dashboard. Cada una degrada limpio dentro de su ErrorFallback.
+      case 'mockup_entrada_3d':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El valle de mi finca (3D)">
+              <EntradaValle3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_voz_con_forma':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La voz con forma">
+              <VozConFormaMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_conversacion_voz':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La conversación con la finca">
+              <ConversacionVozMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_ensena_dibujando':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El agente enseña dibujando">
+              <EnsenaDibujandoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_dia_en_finca':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El día en su finca">
+              <DiaEnFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_salud_finca':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La salud de mi finca">
+              <SaludFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_primer_cultivo':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El camino del primer cultivo">
+              <PrimerCultivoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mercado':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mercado de procedencia">
+              <MercadoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_onboarding_siembra':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Onboarding de siembra">
+              <OnboardingSiembraMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_montana_mundos':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Montaña de los mundos">
+              <MontanaMundosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_montana_mundos_cine':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Montaña de los mundos (cine)">
+              <MontanaMundosCineMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_montana_mundos_campesino':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Montaña de los mundos (campesina)">
+              <MontanaMundosCampesinoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_entrada_campesina':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Entrada campesina">
+              <EntradaCampesinaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_home_campesino':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Home campesino">
+              <HomeCampesinoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_boton_anarquia':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Botón anarquía">
+              <BotonAnarquiaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_biopunk':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Avatar biopunk">
+              <AvatarGameBiopunk onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_verde_vivo':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Avatar verde vivo">
+              <AvatarGameVerdeVivo onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_avatar_libre':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Avatar libre">
+              <AvatarGameLibre onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mapa_acuarela':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Mapa acuarela">
+              <MapaAcuarelaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_clima_atmosfera':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Clima y atmósfera">
+              <ClimaAtmosferaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_diagnostico_foto':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Diagnóstico sobre la foto">
+              <DiagnosticoSobreFoto onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_evidencia_ilustrada':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Tarjetas de evidencia ilustradas">
+              <EvidenciaIlustrada onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_guardianes':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Guardianes narrativos">
+              <MockupGuardianesNarrativos onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_hoja_vida_mata':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Hoja de vida de la mata">
+              <HojaVidaMataMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2543,7 +2797,7 @@ export default function App() {
     currentView === 'oauth-callback' ||
     // La vitrina de la librería visual es una página pública autocontenida:
     // sin banners de instalación/datos ni FABs encima.
-    currentView === 'mockup_visual_lib';
+    currentView.startsWith('mockup_');
 
   return (
     <>
@@ -2569,10 +2823,10 @@ export default function App() {
           detectamos huella `chagra:had-data-once` en localStorage + IDB
           vacío. NO se muestra en loading/login para no asustar antes de
           que la app pueda confirmar estado. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <DataLossBanner />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <DataLossBanner />}
       {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
           crítico) sin abrir la campana. Imposible de ignorar. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <CriticalAlertBanner onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <CriticalAlertBanner onNavigate={navigate} />}
       {/* Entrada de pantalla: el swap de vista era SECO (desmonta/monta sin
           transición). El wrapper con key remonta en cada cambio de vista y
           dispara un fade corto (motion.css .anim-screen-enter — solo opacidad,
@@ -2601,7 +2855,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
@@ -2615,9 +2869,9 @@ export default function App() {
           Para re-habilitar el tap: descomentar el import de EscuchaFab (arriba)
           y la línea del render de abajo. */}
       {/* {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />} */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <EscuchaOverlay />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <SyncProgressIndicator />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}

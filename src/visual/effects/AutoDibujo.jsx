@@ -22,8 +22,12 @@
  * @param {string}  [props.className]  clases extra.
  * Resto de props (`d`, `stroke`, `strokeWidth`, `fill`, `cx`…) se pasan tal cual.
  */
-export function AutoDibujo({ as = 'path', stage, fade = false, className, ...rest }) {
-  const El = /** @type {import('react').ElementType} */ (as);
+export function AutoDibujo({ as = 'path', stage = 0, fade = false, className = '', ...rest }) {
+  // Tag dinámico: `as` puede ser cualquier elemento SVG/HTML. Con `ElementType`,
+  // tsc intersecta los props de TODOS los elementos posibles y colapsa
+  // `className` a `never` en el spread de abajo. El tag se valida en runtime, no
+  // en el tipo, así que casteamos a `any` (caso irreducible de elemento dinámico).
+  const El = /** @type {any} */ (as);
   const base = fade ? 'vfx-fade' : 'vfx-draw';
   const stageClass = stage ? ` vfx-t${stage}` : '';
   const cls = `${base}${stageClass}${className ? ` ${className}` : ''}`;

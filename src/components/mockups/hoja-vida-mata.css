@@ -1,0 +1,320 @@
+/* ============================================================================
+   hoja-vida-mata.css — la HOJA DE VIDA VIVA de una mata (mockup de galería).
+
+   Identidad: CUADERNO DE CAMPO, la misma que el mundo Cultivos (papel crema,
+   tinta verde, Baloo 2 en títulos / Nunito en cuerpo). Es "papel pegado
+   encima": NO depende de las variables --c-* del tema, así se lee igual sobre
+   los cuatro temas y al sol. Namespace propio `.hvm-`.
+
+   Anti-gamificación: nada de puntos, medallas ni barras de progreso premiando.
+   El eje es la OBSERVACIÓN y la PACIENCIA — la línea de tiempo cuenta lo que
+   pasó, no lo que se "ganó". prefers-reduced-motion: fotograma final digno.
+   ========================================================================== */
+
+.hvm {
+  --hvm-papel: #fffdf6;
+  --hvm-papel-2: #f4f6ea;
+  --hvm-crema: #eaf3da;
+  --hvm-tinta: #26331f;
+  --hvm-tinta-suave: #4e5c42;
+  --hvm-verde: #3f8f4e;
+  --hvm-verde-hondo: #2f6b3a;
+  --hvm-ocre: #b98a2f;
+  --hvm-borde: rgba(38, 51, 31, 0.14);
+  --hvm-display: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --hvm-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 10px 14px 40px;
+  font-family: var(--hvm-body);
+  color: var(--hvm-tinta);
+}
+
+/* ── Barra superior (volver + sello de mockup) ──────────────────────────────── */
+.hvm-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.hvm-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--hvm-borde);
+  background: var(--hvm-papel);
+  color: var(--hvm-tinta);
+  font-family: var(--hvm-body);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.hvm-volver:hover { background: var(--hvm-papel-2); }
+.hvm-sello {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--hvm-ocre);
+  border: 1px dashed var(--hvm-ocre);
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+
+/* ── Encabezado de la ficha ─────────────────────────────────────────────────── */
+.hvm-cabecera {
+  border: 1px solid var(--hvm-borde);
+  border-bottom: 4px solid var(--hvm-verde);
+  border-radius: 18px;
+  background: var(--hvm-papel);
+  padding: 14px 16px;
+  box-shadow: 0 3px 14px rgba(38, 51, 31, 0.1);
+}
+.hvm-titulo {
+  margin: 0;
+  font-family: var(--hvm-display);
+  font-weight: 800;
+  font-size: clamp(21px, 6vw, 27px);
+  line-height: 1.1;
+}
+.hvm-sub {
+  margin: 5px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--hvm-tinta-suave);
+}
+.hvm-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin-top: 11px;
+}
+.hvm-chip {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--hvm-verde-hondo);
+  background: var(--hvm-crema);
+  border: 1px solid var(--hvm-borde);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+/* ── Lámina + selector de etapa ─────────────────────────────────────────────── */
+.hvm-lamina-card {
+  margin-top: 16px;
+  border: 1px solid var(--hvm-borde);
+  border-radius: 18px;
+  background: var(--hvm-papel);
+  overflow: hidden;
+  box-shadow: 0 3px 14px rgba(38, 51, 31, 0.1);
+}
+.hvm-lamina-marco {
+  background: linear-gradient(180deg, var(--hvm-papel-2), var(--hvm-crema));
+  border-bottom: 1px solid var(--hvm-borde);
+}
+.hvm-lamina-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 340px;
+  margin: 0 auto;
+  user-select: none;
+}
+.hvm-lamina-pie {
+  padding: 11px 14px 13px;
+}
+.hvm-estado-hoy {
+  font-family: var(--hvm-display);
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--hvm-verde-hondo);
+  margin: 0;
+}
+.hvm-estado-desc {
+  margin: 3px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--hvm-tinta-suave);
+}
+
+/* El selector: escala de etapas semilla→cosecha, como una regla del cuaderno. */
+.hvm-etapas {
+  display: flex;
+  gap: 6px;
+  padding: 12px 12px 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.hvm-etapa-btn {
+  flex: 1 0 auto;
+  min-width: 92px;
+  border: 1px solid var(--hvm-borde);
+  background: var(--hvm-papel);
+  border-radius: 12px;
+  padding: 7px 8px 8px;
+  cursor: pointer;
+  text-align: center;
+  font-family: var(--hvm-body);
+  color: var(--hvm-tinta-suave);
+  transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+}
+.hvm-etapa-btn:hover { background: var(--hvm-papel-2); }
+.hvm-etapa-btn[aria-pressed='true'] {
+  background: var(--hvm-crema);
+  border-color: var(--hvm-verde);
+  color: var(--hvm-verde-hondo);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 0 var(--hvm-verde);
+}
+.hvm-etapa-orden {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  opacity: 0.65;
+}
+.hvm-etapa-nom {
+  display: block;
+  font-family: var(--hvm-display);
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.1;
+  margin-top: 1px;
+}
+.hvm-etapa-dia {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 700;
+  opacity: 0.7;
+  margin-top: 1px;
+}
+
+/* ── Línea de tiempo del cuaderno ───────────────────────────────────────────── */
+.hvm-seccion-tit {
+  font-family: var(--hvm-display);
+  font-weight: 800;
+  font-size: 18px;
+  margin: 22px 0 4px;
+}
+.hvm-seccion-lema {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--hvm-tinta-suave);
+}
+.hvm-linea {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+/* el hilo vertical del cuaderno */
+.hvm-linea::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 6px;
+  bottom: 10px;
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--hvm-ocre) 0 5px,
+    transparent 5px 10px
+  );
+  opacity: 0.5;
+}
+.hvm-evento {
+  position: relative;
+  padding: 0 4px 16px 32px;
+}
+.hvm-evento-punto {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--hvm-papel);
+  border: 3px solid var(--hvm-verde);
+  box-sizing: border-box;
+}
+.hvm-evento.is-hito .hvm-evento-punto {
+  background: var(--hvm-verde);
+  border-color: var(--hvm-verde-hondo);
+}
+.hvm-evento.is-cuidado .hvm-evento-punto { border-color: var(--hvm-ocre); }
+.hvm-evento.is-actual .hvm-evento-punto {
+  border-color: var(--hvm-verde-hondo);
+  box-shadow: 0 0 0 4px rgba(63, 143, 78, 0.18);
+}
+.hvm-evento-fecha {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--hvm-ocre);
+}
+.hvm-evento-tit {
+  font-family: var(--hvm-display);
+  font-weight: 800;
+  font-size: 15px;
+  margin: 1px 0 2px;
+}
+.hvm-evento-nota {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--hvm-tinta-suave);
+  margin: 0;
+}
+.hvm-evento-ahora {
+  display: inline-block;
+  margin-top: 5px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--hvm-verde-hondo);
+  background: var(--hvm-crema);
+  border: 1px solid var(--hvm-verde);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+/* ── Nota de cierre (dimensión educativa, anti-gamificación) ─────────────────── */
+.hvm-cierre {
+  margin-top: 20px;
+  border-left: 4px solid var(--hvm-ocre);
+  background: var(--hvm-papel);
+  border-radius: 0 12px 12px 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--hvm-tinta-suave);
+}
+.hvm-cierre strong { color: var(--hvm-tinta); }
+
+/* ── Animación de crecimiento al cambiar de etapa ───────────────────────────── */
+.hvm-lamina-mata {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: hvm-brota 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes hvm-brota {
+  from { opacity: 0; transform: scaleY(0.82) translateY(4px); }
+  to   { opacity: 1; transform: scaleY(1) translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hvm-lamina-mata { animation: none; }
+  .hvm-etapa-btn { transition: none; }
+  .hvm-etapa-btn[aria-pressed='true'] { transform: none; }
+}
+
+/* ── 320px: la ficha respira en pantalla angosta ────────────────────────────── */
+@media (max-width: 360px) {
+  .hvm { padding: 8px 10px 36px; }
+  .hvm-etapa-btn { min-width: 82px; }
+}

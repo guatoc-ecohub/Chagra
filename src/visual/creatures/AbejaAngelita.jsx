@@ -9,7 +9,7 @@ const VIEWBOX = '-15 -15 32 30';
 
 export function AbejaAngelita({
   size = 64,
-  className,
+  className = '',
   inline = false,
   animated = true,
   title = 'Abeja angelita',

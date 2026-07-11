@@ -1,0 +1,365 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   conversacionVoz.css — mockup "La conversación con la finca"
+   (#/mockups/conversacion-voz).
+
+   Misma cocina de noche que "La voz con forma" (vozConForma.css): tierra
+   oscura y cálida donde la única fuente de luz es la voz. Aquí la cocina se
+   vuelve PANTALLA DE USO: cabecera de finca, hilo de burbujas que van
+   quedando, y abajo el fogón — el IrisVoz como único control de micrófono.
+
+   El cuarto se re-tiñe apenas con el estado del iris (miel al escuchar,
+   cobre al pensar, musgo al hablar). Tipografía: serif de libro viejo para
+   LO DICHO (Georgia — cero deps), sans del sistema para la interfaz.
+
+   Reglas de la casa: solo transform/opacity animados; la respiración usa
+   --vfx-beat (effects.css); prefers-reduced-motion = fotograma legible por
+   estado (el iris pinta el suyo; aquí se apagan coreografías y el texto
+   llega completo). Mobile-first, digno desde 320 px.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.cvz {
+  --cvz-tierra: #211712;
+  --cvz-tierra-2: #2b1f17;
+  --cvz-crema: #f2e7d3;
+  --cvz-ceniza: #b7a48c;
+  --cvz-miel: #e9a94e;
+  --cvz-cobre: #c57a45;
+  --cvz-musgo: #b7c98a;
+  --cvz-linea: rgba(233, 169, 78, 0.16);
+  --cvz-luz-ambiente: rgba(217, 133, 73, 0.05);
+  --cvz-punto: #8d6b4d;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--cvz-tierra);
+  color: var(--cvz-crema);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.55;
+}
+
+.cvz[data-estado='escuchando'] { --cvz-luz-ambiente: rgba(233, 169, 78, 0.1); --cvz-punto: #e9a94e; }
+.cvz[data-estado='pensando'] { --cvz-luz-ambiente: rgba(197, 122, 69, 0.09); --cvz-punto: #c57a45; }
+.cvz[data-estado='hablando'] { --cvz-luz-ambiente: rgba(183, 201, 138, 0.09); --cvz-punto: #b7c98a; }
+
+/* la luz que la voz le presta al cuarto (solo background/opacity, barato) */
+.cvz-luz {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(110% 55% at 50% 100%, var(--cvz-luz-ambiente), transparent 70%),
+    radial-gradient(120% 60% at 50% -12%, rgba(0, 0, 0, 0.45), transparent 60%);
+  transition: background 1.1s ease;
+  z-index: 0;
+}
+
+.cvz > * { position: relative; z-index: 1; }
+
+/* ── cabecera: con quién habla usted ───────────────────────────────────────── */
+.cvz-cab {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: max(14px, env(safe-area-inset-top)) clamp(16px, 5vw, 28px) 10px;
+  border-bottom: 1px solid var(--cvz-linea);
+}
+
+.cvz-cab-nombre {
+  margin: 0;
+  font-family: Georgia, 'Palatino Linotype', 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: clamp(1.15rem, 4.5vw, 1.5rem);
+  letter-spacing: 0.01em;
+}
+
+.cvz-cab-detalle {
+  margin: 2px 0 0;
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  color: var(--cvz-ceniza);
+}
+
+.cvz-cab-estado {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cvz-ceniza);
+}
+
+.cvz-cab-punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cvz-punto);
+  transition: background 0.6s ease;
+  /* respira con la casa (--vfx-beat, effects.css) */
+  animation: vfx-beat var(--vfx-beat, 5.2s) ease-in-out infinite;
+}
+
+.cvz-eyebrow {
+  margin: 6px auto 0;
+  padding: 0 16px;
+  text-align: center;
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(183, 164, 140, 0.55);
+}
+
+/* ── el hilo: lo dicho va quedando ─────────────────────────────────────────── */
+.cvz-hilo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 18px clamp(14px, 4.5vw, 24px) 24px;
+  overscroll-behavior: contain;
+}
+
+/* invitación (antes de la primera palabra) */
+.cvz-vacio {
+  margin: auto;
+  text-align: center;
+  padding: 12px;
+}
+
+.cvz-vacio-verso {
+  margin: 0;
+  font-family: Georgia, 'Palatino Linotype', 'Times New Roman', serif;
+  font-size: clamp(1.15rem, 4.6vw, 1.5rem);
+  line-height: 1.6;
+  color: var(--cvz-ceniza);
+}
+
+.cvz-vacio-wake {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 8px 18px;
+  border: 1px solid var(--cvz-linea);
+  border-radius: 999px;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 1.02rem;
+  color: var(--cvz-miel);
+  animation: vfx-beat var(--vfx-beat, 5.2s) ease-in-out infinite;
+}
+
+/* burbujas — grandes y legibles: esto es lo que se dijo */
+.cvz-burbuja {
+  max-width: 88%;
+  padding: 11px 16px 13px;
+  border-radius: 18px;
+  animation: cvz-aparece 0.45s ease both;
+}
+
+.cvz-burbuja--campesino {
+  align-self: flex-end;
+  background: rgba(233, 169, 78, 0.13);
+  border: 1px solid rgba(233, 169, 78, 0.28);
+  border-bottom-right-radius: 6px;
+}
+
+.cvz-burbuja--chagra {
+  align-self: flex-start;
+  background: rgba(183, 201, 138, 0.09);
+  border: 1px solid rgba(183, 201, 138, 0.22);
+  border-bottom-left-radius: 6px;
+}
+
+.cvz-burbuja-quien {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cvz-ceniza);
+}
+
+.cvz-burbuja--chagra .cvz-burbuja-quien { color: var(--cvz-musgo); }
+.cvz-burbuja--campesino .cvz-burbuja-quien { color: var(--cvz-miel); }
+
+.cvz-burbuja-texto {
+  margin: 0;
+  font-size: clamp(1.04rem, 3.4vw, 1.14rem);
+  line-height: 1.6;
+}
+
+/* lo que dice la finca es palabra de libro viejo */
+.cvz-burbuja--chagra .cvz-burbuja-texto {
+  font-family: Georgia, 'Palatino Linotype', 'Times New Roman', serif;
+}
+
+/* la transcripción viva: cada palabra ya está montada (cero reflow), solo
+   pasa de humo a tinta con opacity */
+.cvz-palabra { opacity: 0; transition: opacity 0.35s ease; }
+.cvz-palabra--dicha { opacity: 1; }
+
+/* pensando: tres brasitas que se turnan (solo opacity) */
+.cvz-pensando {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  color: var(--cvz-ceniza);
+  font-style: italic;
+  font-size: 0.92rem;
+  animation: cvz-aparece 0.45s ease both;
+}
+
+.cvz-pensando p { margin: 0; }
+
+.cvz-pensando-puntos { display: inline-flex; gap: 5px; flex: none; }
+
+.cvz-pensando-puntos i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cvz-cobre);
+  animation: cvz-brasita 1.4s ease-in-out infinite;
+}
+
+.cvz-pensando-puntos i:nth-child(2) { animation-delay: 0.22s; }
+.cvz-pensando-puntos i:nth-child(3) { animation-delay: 0.44s; }
+
+/* la tarea que quedó apuntada: el valor de haber hablado */
+.cvz-accion {
+  align-self: center;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 92%;
+  padding: 10px 16px;
+  border: 1px dashed rgba(183, 201, 138, 0.4);
+  border-radius: 14px;
+  background: rgba(183, 201, 138, 0.06);
+  color: var(--cvz-musgo);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  animation: cvz-aparece 0.6s ease both;
+}
+
+.cvz-accion p { margin: 0; }
+
+.cvz-accion-sello { flex: none; margin-top: 2px; }
+
+/* ── el fogón: el iris ES el micrófono ─────────────────────────────────────── */
+.cvz-fogon {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 16px max(14px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--cvz-linea);
+  background: linear-gradient(rgba(43, 31, 23, 0), var(--cvz-tierra-2));
+}
+
+.cvz-wake {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: var(--cvz-tierra-2);
+  border: 1px solid var(--cvz-linea);
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--cvz-miel);
+  white-space: nowrap;
+  animation: cvz-sube 0.6s ease both;
+}
+
+.cvz-iris-btn {
+  margin: -6px 0;
+  padding: 6px;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cvz-iris-btn:focus-visible {
+  outline: 2px solid var(--cvz-miel);
+  outline-offset: 4px;
+}
+
+.cvz-iris-btn:active .cvz-iris { transform: scale(0.96); }
+
+.cvz-iris { transition: transform 0.25s ease; }
+
+.cvz-voz-dice {
+  margin: 0;
+  min-height: 1.5em;
+  font-size: 0.95rem;
+  color: var(--cvz-crema);
+  text-align: center;
+}
+
+.cvz-pista {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--cvz-ceniza);
+  text-align: center;
+}
+
+/* ── coreografías (solo transform/opacity) ─────────────────────────────────── */
+@keyframes cvz-aparece {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cvz-sube {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes cvz-brasita {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+/* ── pantallas más anchas: la misma cocina, con más mesa ───────────────────── */
+@media (min-width: 720px) {
+  .cvz-hilo { gap: 16px; padding-top: 26px; }
+  .cvz-burbuja { max-width: 76%; }
+}
+
+/* ── quietud pedida: fotograma legible por estado ──────────────────────────
+   El iris pinta su propio fotograma (irisVoz.css). Aquí: nada respira, las
+   burbujas y la tarea llegan puestas (el texto completo lo garantiza el JS),
+   las brasitas de "pensando" quedan encendidas fijas. */
+@media (prefers-reduced-motion: reduce) {
+  .cvz-luz { transition: none; }
+  .cvz-cab-punto,
+  .cvz-vacio-wake,
+  .cvz-burbuja,
+  .cvz-pensando,
+  .cvz-accion,
+  .cvz-wake,
+  .cvz-pensando-puntos i {
+    animation: none;
+  }
+
+  .cvz-pensando-puntos i { opacity: 0.8; }
+  .cvz-palabra { opacity: 1; transition: none; }
+  .cvz-iris { transition: none; }
+}
