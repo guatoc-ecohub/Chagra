@@ -21,20 +21,27 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
+import { SombraContacto } from './SombraContacto.jsx';
 
 /**
- * Devuelve `{ ref, caraRef }` para colgar del `<group>` de la abeja y de su cara
- * (para el volteo). Corre `useFrame` (debe usarse DENTRO de un `<Canvas>`).
+ * Devuelve `{ ref, caraRef, sombraRef }` para colgar del `<group>` de la abeja,
+ * de su cara (para el volteo) y de su sombra de contacto (el blob que la sigue
+ * por el piso — auditoría 3D: la abeja no debe volar "a la deriva").
+ * Corre `useFrame` (debe usarse DENTRO de un `<Canvas>`).
  *
  * @param {THREE.Vector3} foco  a dónde va la abeja (hotspot activo o centro).
  * @param {object} [opts]
  * @param {boolean} [opts.entrando=true]  entrando = se posa junto al foco; si no, ronda.
  * @param {number}  [opts.energia=1]      0..1 — vivacidad del vuelo (de la salud real).
  * @param {boolean} [opts.reducedMotion=false]  congela el vaivén a un fotograma.
+ * @param {number}  [opts.piso=0]  y del suelo donde se proyecta la sombra.
  */
-export function useEntradaAbeja(foco, { entrando = true, energia = 1, reducedMotion = false } = {}) {
+export function useEntradaAbeja(foco, {
+  entrando = true, energia = 1, reducedMotion = false, piso = 0,
+} = {}) {
   const ref = useRef(null);
   const caraRef = useRef(null);
+  const sombraRef = useRef(null);
   const prevX = useRef(foco.x);
   useFrame((state) => {
     if (!ref.current) return;
@@ -55,8 +62,17 @@ export function useEntradaAbeja(foco, { entrando = true, energia = 1, reducedMot
       if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
       prevX.current = ref.current.position.x;
     }
+    // La sombra de contacto la sigue por el piso: más alto vuela, más ancha y
+    // más tenue (peso visual sin shadow-maps). Mismo frame, cero loops extra.
+    if (sombraRef.current) {
+      const pos = ref.current.position;
+      const h = Math.max(0, pos.y - piso);
+      sombraRef.current.position.set(pos.x, piso + 0.03, pos.z);
+      sombraRef.current.scale.setScalar(1 + h * 0.15);
+      sombraRef.current.material.opacity = Math.max(0.06, 0.3 - h * 0.06);
+    }
   });
-  return { ref, caraRef };
+  return { ref, caraRef, sombraRef };
 }
 
 /**
@@ -64,18 +80,32 @@ export function useEntradaAbeja(foco, { entrando = true, energia = 1, reducedMot
  * dibuja el cuerpo (`AbejaAngelita`) como billboard `<Html>`. Cualquier arquetipo
  * la coloca con `<AbejaEscena foco=… animo=… energia=… reducedMotion=… />`.
  */
-export function AbejaEscena({ foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false }) {
-  const { ref, caraRef } = useEntradaAbeja(foco, { entrando, energia, reducedMotion });
+export function AbejaEscena({
+  foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
+}) {
+  const { ref, caraRef, sombraRef } = useEntradaAbeja(foco, {
+    entrando, energia, reducedMotion, piso,
+  });
   const size = 40 + Math.round(energia * 12);
   return (
-    <group ref={ref} position={[foco.x + 0.45, foco.y + 0.85, foco.z + 0.6]}>
-      <Html center distanceFactor={7} zIndexRange={[40, 10]}>
-        <div className="mundo-abeja" aria-hidden="true">
-          <div ref={caraRef} className="mundo-abeja__cara">
-            <AbejaAngelita size={size} animo={animo} energia={energia} animated={!reducedMotion} />
+    <>
+      <group ref={ref} position={[foco.x + 0.45, foco.y + 0.85, foco.z + 0.6]}>
+        <Html center distanceFactor={7} zIndexRange={[40, 10]}>
+          <div className="mundo-abeja" aria-hidden="true">
+            <div ref={caraRef} className="mundo-abeja__cara">
+              <AbejaAngelita size={size} animo={animo} energia={energia} animated={!reducedMotion} />
+            </div>
           </div>
-        </div>
-      </Html>
-    </group>
+        </Html>
+      </group>
+      {/* Su sombra: hermana (NO hija) del group — vive en el piso, no vuela. */}
+      <SombraContacto
+        refExt={sombraRef}
+        pos={[foco.x + 0.45, piso + 0.03, foco.z + 0.6]}
+        radio={0.3}
+        opacidad={0.24}
+        orden={3}
+      />
+    </>
   );
 }

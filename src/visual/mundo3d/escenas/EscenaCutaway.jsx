@@ -233,6 +233,7 @@ export default function EscenaCutaway(props) {
       {...props}
       cielo={cielo}
       entrada={{ ...props.entrada, centro: [0, alto * 0.2, 0.6] }}
+      piso={-alto / 2}
     >
       <Diorama params={props.params} reducedMotion={props.reducedMotion} />
     </EscenaBase3D>
