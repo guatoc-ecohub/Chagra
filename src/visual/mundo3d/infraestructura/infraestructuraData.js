@@ -204,3 +204,97 @@ export const INFRAESTRUCTURA_CATEGORIAS = INFRAESTRUCTURA_IDS.reduce((acc, id) =
 
 /** Resuelve una entrada del catálogo por id (o `null` si no existe). */
 export const infraPorId = (id) => INFRAESTRUCTURA[id] || null;
+
+/* ── VIDA — el estado FUNCIONAL de la infraestructura (three-free) ───────────
+ *
+ * La infraestructura no es utilería: REFLEJA el estado real de la finca. Esta
+ * capa (pura, sin three) traduce el `estadoFinca` de useFincaViva a un
+ * descriptor `vida` que las piezas 3D saben dibujar:
+ *
+ *   vida = {
+ *     microclima: { activo, matas, refugio }, // invernaderos: aire cálido /
+ *                                             // matas adelantadas / refugio en Niño
+ *     cosecha,    // null | { cultivo } — el almacén se llena tras la cosecha
+ *     ocupacion,  // { aves, bovinos, otros, total } — galpón/establo/gallinero
+ *     noche,      // clima 'noche' (acentúa la lectura del foco encendido)
+ *   }
+ *
+ * CONTRATO ANTI-FABRICACIÓN (el mismo de useFincaViva):
+ *   · sin `estadoFinca` (null/undefined) → `vida` = null → la pieza se dibuja
+ *     EXACTAMENTE como el catálogo neutro de hoy (nada inventado).
+ *   · `matas` solo si `saludFinca` trae matas vivas REALES (procesos cargados y
+ *     finca no vacía); si el dato está "en camino", no se fingen cultivos.
+ *   · `cosecha` solo si hay `cosechaReciente` real; null → almacén vacío.
+ *   · `ocupacion` sale de `animales` reales; [] → todo apagado y sin siluetas.
+ */
+
+/* Palabras clave de especie → familia (comparación en minúsculas, contains). */
+const ESPECIES_AVES = [
+  'gallina', 'gallo', 'pollo', 'polla', 'pato', 'pata', 'pavo', 'pava',
+  'codorniz', 'ave',
+];
+const ESPECIES_BOVINOS = [
+  'vaca', 'toro', 'ternero', 'ternera', 'novillo', 'novilla', 'buey', 'res',
+  'bovino',
+];
+
+/** ¿La especie (texto libre del asset) cae en la lista de palabras clave? */
+function esEspecie(especie, lista) {
+  if (typeof especie !== 'string') return false;
+  const e = especie.toLowerCase();
+  return lista.some((clave) => e.includes(clave));
+}
+
+/**
+ * Clasifica el inventario real de animales por familia de infraestructura:
+ * aves → gallinero/galpón; bovinos → establo; otros (cerdo, oveja, cuy…) →
+ * establo genérico. Un animal sin especie legible cuenta como `otros` (hay
+ * presencia real aunque no sepamos la familia).
+ *
+ * @param {Array<{especie?: string}>|null|undefined} animales  estadoFinca.animales
+ * @returns {{ aves: number, bovinos: number, otros: number, total: number }}
+ */
+export function clasificarAnimales(animales) {
+  const lista = Array.isArray(animales) ? animales : [];
+  let aves = 0;
+  let bovinos = 0;
+  let otros = 0;
+  for (const animal of lista) {
+    if (esEspecie(animal?.especie, ESPECIES_AVES)) aves += 1;
+    else if (esEspecie(animal?.especie, ESPECIES_BOVINOS)) bovinos += 1;
+    else otros += 1;
+  }
+  return { aves, bovinos, otros, total: lista.length };
+}
+
+/**
+ * Deriva el descriptor `vida` de las piezas desde el `estadoFinca` real
+ * (useFincaViva). Pura y three-free: la consume el dispatcher
+ * (`Infraestructura.jsx`) y cualquier test sin montar un Canvas.
+ *
+ * `refugio` usa el MISMO criterio de "clima que reseca" de reaccionFinca.js:
+ * El Niño empujando calor en un día soleado/dorado (no bajo lluvia ni de noche).
+ *
+ * @param {object|null|undefined} estadoFinca  forma de useFincaViva/reaccionFinca
+ * @returns {null | { microclima: object, cosecha: (null|object), ocupacion: object, noche: boolean }}
+ */
+export function derivarVidaInfra(estadoFinca) {
+  if (!estadoFinca || typeof estadoFinca !== 'object') return null;
+  const {
+    clima = null,
+    enso = 'neutro',
+    cosechaReciente = null,
+    saludFinca,
+    animales,
+  } = estadoFinca;
+  return {
+    microclima: {
+      activo: true, // el microclima es físico: existe siempre que hay finca viva
+      matas: !!(saludFinca && Number(saludFinca.matasVivas) > 0),
+      refugio: enso === 'nino' && (clima === 'soleado' || clima === 'dorada'),
+    },
+    cosecha: cosechaReciente?.cultivo ? { cultivo: cosechaReciente.cultivo } : null,
+    ocupacion: clasificarAnimales(animales),
+    noche: clima === 'noche',
+  };
+}

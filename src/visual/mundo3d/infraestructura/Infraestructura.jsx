@@ -16,14 +16,22 @@
  *   · `params`— override de parámetros de la pieza (colores, módulos…).
  *   · `tier`  — device-tier del framework: 'bajo'/'medio' → `frugal` (menos
  *               segmentos, sin detalle fino). Respeta el contrato de perf.
- *   · `reducedMotion` — viaja a la pieza (hoy todas son estáticas; futuro-safe).
+ *   · `reducedMotion` — sin animación de llenado: estado final directo.
+ *   · `estadoFinca` — el estado REAL de la finca (forma de useFincaViva /
+ *               reaccionFinca). Con él las piezas dejan de ser utilería: el
+ *               invernadero enseña su microclima, el almacén se llena tras la
+ *               cosecha y el galpón/establo se ocupan según los animales.
+ *               Sin él (default null) → pieza NEUTRA, idéntica al catálogo
+ *               (contrato anti-fabricación: nada de fingir finca). Para el
+ *               drop-in que se alimenta solo, ver <InfraestructuraViva>.
  *
  * Devuelve un `<group>` de mallas (sin Canvas/luces): quien lo monta pone el
  * escenario. Agregar la infraestructura real a un mundo = una entrada de datos +
  * este componente; ver la infraestructura del catálogo junta = la vitrina
  * (#/mockups/infraestructura-3d).
  */
-import { INFRAESTRUCTURA } from './infraestructuraData.js';
+import { useMemo } from 'react';
+import { INFRAESTRUCTURA, derivarVidaInfra } from './infraestructuraData.js';
 import { PIEZAS_INFRA } from './piezasInfra.jsx';
 
 /* Helper puro de tier (no es un componente): se comparte con el barrel/vitrina.
@@ -39,7 +47,12 @@ export default function Infraestructura({
   params: paramsOverride,
   tier = 'alto',
   reducedMotion = false,
+  estadoFinca = null,
 }) {
+  // El estado FUNCIONAL de la pieza (three-free, puro). null → pieza neutra.
+  // Antes de los early-return: los hooks no pueden ser condicionales.
+  const vida = useMemo(() => derivarVidaInfra(estadoFinca), [estadoFinca]);
+
   const entrada = INFRAESTRUCTURA[tipo];
   if (!entrada) return null; // tipo desconocido: no dibuja (nunca una caja huérfana)
 
@@ -53,7 +66,13 @@ export default function Infraestructura({
 
   return (
     <group position={pos} rotation={[0, rot, 0]}>
-      <Pieza dims={dims} params={params} frugal={frugal} reducedMotion={reducedMotion} />
+      <Pieza
+        dims={dims}
+        params={params}
+        frugal={frugal}
+        reducedMotion={reducedMotion}
+        vida={vida}
+      />
     </group>
   );
 }
