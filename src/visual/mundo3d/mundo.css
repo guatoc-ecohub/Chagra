@@ -28,14 +28,20 @@
   opacity: 1;
 }
 
-/* ── Hotspot 3D: botón-billboard accesible sobre el diorama ─────────────── */
+/* ── Hotspot 3D: botón-billboard accesible sobre el diorama ───────────────
+      Piso táctil ≥44px en AMBOS ejes (WCAG 2.5.5: dedo de campo, con guante)
+      + hit-slop invisible que agranda el toque sin engordar lo visual. */
 .mundo-hotspot {
+  position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4em;
-  padding: 0.34em 0.7em 0.34em 0.4em;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.4em 0.85em 0.4em 0.5em;
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #2a2016;
   background: rgba(255, 251, 242, 0.94);
@@ -46,15 +52,27 @@
   box-shadow: 0 3px 10px rgba(40, 30, 10, 0.22);
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
+/* hit-slop: área de toque más generosa que la píldora visible */
+.mundo-hotspot::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+}
 .mundo-hotspot:hover,
 .mundo-hotspot:focus-visible {
   transform: translateY(-2px) scale(1.04);
   box-shadow: 0 6px 16px rgba(40, 30, 10, 0.28);
   outline: none;
 }
+/* Activo: texto oscuro sobre tinte CLARO (≥4.5:1, AA) + doble anillo — la
+   señal no es solo color (BUG-UX-02). */
 .mundo-hotspot--activo {
-  background: var(--hs-tinte, #3f8f4e);
-  color: #fff;
+  background: color-mix(in srgb, var(--hs-tinte, #3f8f4e) 18%, #fffdf7);
+  color: #2a2016;
+  box-shadow:
+    0 3px 10px rgba(40, 30, 10, 0.22),
+    0 0 0 3px color-mix(in srgb, var(--hs-tinte, #3f8f4e) 45%, #2a2016);
 }
 .mundo-hotspot__emoji {
   font-size: 1.15em;
@@ -118,6 +136,9 @@
 }
 .mundo-miga__aqui {
   min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -130,7 +151,11 @@
 }
 .mundo-salir {
   flex: none;
-  padding: 0.4em 0.9em;
+  display: inline-flex;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0.4em 1em;
   font: inherit;
   font-weight: 600;
   color: #2a2016;
@@ -187,6 +212,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.5em 0.9em;
   font: inherit;
   font-weight: 600;

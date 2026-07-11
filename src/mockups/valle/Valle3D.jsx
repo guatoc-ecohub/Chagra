@@ -11,7 +11,9 @@
  * useFrame; `reducedMotion` congela el vaivén a un fotograma digno.
  *
  * Los 4 sí-o-sí viven en el espacio:
- *   · MUNDOS  → landmarks navegables (MundoLugar) con etiqueta accesible.
+ *   · MUNDOS  → landmarks navegables (MundoLugar, geometría) con etiquetas
+ *               accesibles de tamaño táctil FIJO en píxeles (RotulosLugares):
+ *               por foco/proximidad, con occlude y anti-colisión en pantalla.
  *   · ALERTA  → Beacon pulsante anclado sobre el mundo 'suelo' (la cosa del día).
  *   · COMPAÑERO → Angelita, la abeja (visual-lib) es el avatar-jugador: vuela
  *                por el valle y ENTRA al mundo que se toca; su ánimo/energía
@@ -31,6 +33,7 @@ import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
 import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
 import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
 import AnimalesDeFinca from './animales.jsx';
+import './rotulosValle3D.css';
 import {
   MUNDOS_VALLE,
   MUNDO_VALLE_BY_ID,
@@ -91,7 +94,7 @@ function colorSueloEnZ(z, alto, nocturno, out) {
       según el piso térmico de cada franja (páramo frío arriba → tierra caliente
       abajo). El color sale de PISOS_TERMICOS: franjas de altitud legibles, con
       la cresta apenas más clara para dar relieve. ── */
-function Terreno({ nocturno }) {
+function Terreno({ nocturno, innerRef }) {
   const geo = useMemo(() => {
     const g = new THREE.PlaneGeometry(34, 34, 56, 56);
     g.rotateX(-Math.PI / 2);
@@ -115,7 +118,7 @@ function Terreno({ nocturno }) {
     return g;
   }, [nocturno]);
   return (
-    <mesh geometry={geo} receiveShadow>
+    <mesh ref={innerRef} geometry={geo} receiveShadow>
       <meshStandardMaterial vertexColors flatShading roughness={1} metalness={0} />
     </mesh>
   );
@@ -124,7 +127,7 @@ function Terreno({ nocturno }) {
 /* ── La cordillera de páramo al fondo: conos pálidos que EMERGEN de la ladera
       alta (perspectiva aérea). Su base se posa sobre el terreno del páramo
       (que ya subió a ~5) y las cumbres coronan la escena. ── */
-function Cordillera({ color }) {
+function Cordillera({ color, innerRef }) {
   const picos = useMemo(
     () => [
       { x: -9, z: -15.5, h: 7, r: 5, base: 4.2 },
@@ -135,7 +138,7 @@ function Cordillera({ color }) {
     [],
   );
   return (
-    <group>
+    <group ref={innerRef}>
       {picos.map((p, i) => (
         <mesh key={i} position={[p.x, p.base + p.h / 2, p.z]}>
           <coneGeometry args={[p.r, p.h, 6]} />
@@ -491,9 +494,9 @@ function CriaturasValle({ reducedMotion }) {
   );
 }
 
-/* ── Un mundo como LUGAR navegable: su geometría + una etiqueta accesible que,
-      al tocarse, viaja hasta él (la cámara) y lo selecciona. ── */
-function MundoLugar({ mundo, activo, onEntrar, reducedMotion }) {
+/* ── Un mundo como LUGAR navegable: SOLO su geometría. Su etiqueta táctil vive
+      en <RotulosLugares/> (piso en píxeles + foco/proximidad + anti-colisión). ── */
+function MundoLugar({ mundo, reducedMotion }) {
   const y = alturaTerreno(mundo.pos[0], mundo.pos[2]);
   return (
     <group position={[mundo.pos[0], y, mundo.pos[2]]} scale={mundo.escala}>
@@ -502,23 +505,158 @@ function MundoLugar({ mundo, activo, onEntrar, reducedMotion }) {
       ) : (
         <LandmarkGeom tipo={mundo.tipo} tinte={mundo.tinte} reducedMotion={reducedMotion} />
       )}
-      <Html center distanceFactor={11} position={[0, 1.7, 0]} zIndexRange={[20, 0]}>
+    </group>
+  );
+}
+
+/* ── Las etiquetas de los lugares, con juicio (SPEC-UX-01 + S6/B4 de los DRs):
+ *   · SIN `distanceFactor` → tamaño en píxeles CONSTANTE: el piso táctil ≥44px
+ *     NO depende de la distancia de la cámara (WCAG 2.5.5/2.5.8);
+ *   · por FOCO/PROXIMIDAD: solo la etiqueta apuntada (la más cercana al centro
+ *     del encuadre) o la del mundo activo muestra su nombre completo; las demás
+ *     se calman a un punto-chip con su emoji y tinte — menos-pero-legible;
+ *   · ANTI-COLISIÓN en pantalla: si dos rótulos se pisan, cede el más lejano
+ *     del centro (data-modo='oculto'); la alerta del día siempre gana su lugar;
+ *   · `occlude` contra el terreno y la cordillera: un rótulo detrás de la loma
+ *     no la atraviesa (data-tapado='1').
+ * Todo se escribe imperativo sobre `dataset` (cero re-render por frame); el CSS
+ * de los modos vive en rotulosValle3D.css. Los botones siguen entrando a los
+ * mundos en cualquiera de los dos modos visibles — la navegación no cambia. ── */
+const _proj = new THREE.Vector3();
+
+function RotulosLugares({ mundos, focoId, onEntrar, occluders }) {
+  const botones = useRef({});
+  const tapados = useRef({});
+  const plena = useRef(null);
+  const tick = useRef(0);
+
+  // Anclas en el mundo: misma altura que tenía la etiqueta original (1.7 dentro
+  // del group escalado del landmark → 1.7 × escala en coordenadas del valle).
+  const anclas = useMemo(
+    () =>
+      mundos.map((m) => ({
+        m,
+        pos: new THREE.Vector3(
+          m.pos[0],
+          alturaTerreno(m.pos[0], m.pos[2]) + 1.7 * (m.escala || 1),
+          m.pos[2],
+        ),
+      })),
+    [mundos],
+  );
+
+  // La alerta del día (el faro) siempre se reserva su espacio en pantalla.
+  const anclaAlerta = useMemo(() => {
+    const a = MUNDO_VALLE_BY_ID[COSA_DEL_DIA.anclaMundo];
+    if (!a) return null;
+    return new THREE.Vector3(a.pos[0], alturaTerreno(a.pos[0], a.pos[2]) + 2.7, a.pos[2]);
+  }, []);
+
+  useFrame(({ camera, size }) => {
+    // ~12 pasadas/s alcanzan para rótulos; corre en el PRIMER frame (importa
+    // con frameloop='demand' de reduced-motion, que renderiza pocos frames).
+    if (tick.current++ % 5 !== 0) return;
+
+    const enPantalla = (v) => {
+      _proj.copy(v).project(camera);
+      return {
+        x: (_proj.x * 0.5 + 0.5) * size.width,
+        y: (0.5 - _proj.y * 0.5) * size.height,
+        detras: _proj.z > 1,
+      };
+    };
+
+    const pts = anclas.map(({ m, pos }) => {
+      const p = enPantalla(pos);
+      return {
+        id: m.id,
+        titulo: m.titulo || '',
+        ...p,
+        dc: Math.hypot(p.x - size.width / 2, p.y - size.height / 2),
+        elegible: !p.detras && !tapados.current[m.id],
+      };
+    });
+
+    // Foco/proximidad: manda el mundo activo; si no, la etiqueta más apuntada,
+    // con histéresis (solo cambia si otra queda 20% más centrada) anti-parpadeo.
+    let candidata = null;
+    if (focoId && pts.some((p) => p.id === focoId)) {
+      candidata = focoId;
+    } else {
+      const previa = pts.find((p) => p.id === plena.current && p.elegible);
+      const cercana = pts.filter((p) => p.elegible).sort((a, b) => a.dc - b.dc)[0];
+      candidata = previa && cercana && cercana.dc > previa.dc * 0.8 ? previa.id : (cercana?.id ?? null);
+    }
+    plena.current = candidata;
+
+    // Anti-colisión: la alerta primero, la plena después, los puntos por
+    // cercanía al centro; quien pisa un espacio ya tomado, cede.
+    const MARGEN = 8;
+    const tomados = [];
+    const rectoDe = (x, y, w, h) => ({
+      x0: x - w / 2 - MARGEN,
+      x1: x + w / 2 + MARGEN,
+      y0: y - h / 2 - MARGEN,
+      y1: y + h / 2 + MARGEN,
+    });
+    const pisa = (r) => tomados.some((o) => r.x0 < o.x1 && r.x1 > o.x0 && r.y0 < o.y1 && r.y1 > o.y0);
+    if (anclaAlerta) {
+      const a = enPantalla(anclaAlerta);
+      if (!a.detras) tomados.push(rectoDe(a.x, a.y, 64 + COSA_DEL_DIA.titulo.length * 9, 52));
+    }
+    const orden = [...pts].sort((a, b) =>
+      a.id === candidata ? -1 : b.id === candidata ? 1 : a.dc - b.dc,
+    );
+    for (const p of orden) {
+      let modo = 'oculto';
+      if (p.elegible) {
+        const esPlena = p.id === candidata;
+        const r = esPlena
+          ? rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48)
+          : rectoDe(p.x, p.y, 44, 44);
+        if (!pisa(r)) {
+          tomados.push(r);
+          modo = esPlena ? 'plena' : 'punto';
+        }
+      }
+      const btn = botones.current[p.id];
+      if (btn && btn.dataset.modo !== modo) btn.dataset.modo = modo;
+    }
+  });
+
+  return anclas.map(({ m, pos }) => (
+    <group key={m.id} position={pos.toArray()}>
+      <Html
+        center
+        zIndexRange={[20, 0]}
+        occlude={occluders}
+        onOcclude={(tapado) => {
+          tapados.current[m.id] = tapado;
+          const btn = botones.current[m.id];
+          if (btn) btn.dataset.tapado = tapado ? '1' : '0';
+          return null;
+        }}
+      >
         <button
+          ref={(el) => {
+            botones.current[m.id] = el;
+          }}
           type="button"
-          className={`valle-poi${activo ? ' valle-poi--activo' : ''}`}
-          style={{ '--poi-tinte': mundo.tinte[0] }}
+          data-modo={m.id === focoId ? 'plena' : 'punto'}
+          className={`valle-poi v3d-poi${focoId === m.id ? ' valle-poi--activo' : ''}`}
+          style={{ '--poi-tinte': m.tinte[0] }}
           onClick={(e) => {
             e.stopPropagation();
-            onEntrar(mundo.id);
+            onEntrar(m.id);
           }}
-          aria-label={`Viajar al mundo ${mundo.titulo}. ${mundo.lema}`}
+          aria-label={`Viajar al mundo ${m.titulo}. ${m.lema}`}
         >
-          <span className="valle-poi__emoji" aria-hidden="true">{mundo.emoji}</span>
-          <span className="valle-poi__txt">{mundo.titulo}</span>
+          <span className="valle-poi__emoji" aria-hidden="true">{m.emoji}</span>
+          <span className="valle-poi__txt">{m.titulo}</span>
         </button>
       </Html>
     </group>
-  );
+  ));
 }
 
 /* ── La cosa del día: un faro pulsante anclado sobre su mundo. Un SOLO destello.
@@ -552,10 +690,11 @@ function Beacon({ onAlerta, reducedMotion }) {
           <meshBasicMaterial color="#ffcf87" transparent opacity={0.4} />
         </mesh>
       </Float>
-      <Html center distanceFactor={10} position={[0, 2.7, 0]} zIndexRange={[30, 0]}>
+      {/* Sin distanceFactor: la alerta mantiene su tamaño táctil en píxeles. */}
+      <Html center position={[0, 2.7, 0]} zIndexRange={[30, 0]}>
         <button
           type="button"
-          className="valle-alerta"
+          className="valle-alerta v3d-alerta"
           onClick={(e) => {
             e.stopPropagation();
             onAlerta();
@@ -660,6 +799,11 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit }) {
 /* ── Contenido de la escena (dentro del Canvas). ── */
 function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion }) {
   const controls = useRef(null);
+  // Occluders de los rótulos: solo terreno + cordillera (raycast barato y es
+  // exactamente lo que las etiquetas no deben atravesar).
+  const terrenoRef = useRef(null);
+  const cordilleraRef = useRef(null);
+  const occluders = useMemo(() => [terrenoRef, cordilleraRef], []);
   const c = CLIMAS[clima];
   const foco = useMemo(() => {
     const m = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;
@@ -695,20 +839,20 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         <Stars radius={40} depth={20} count={900} factor={3} fade speed={reducedMotion ? 0 : 1} />
       )}
 
-      <Terreno nocturno={nocturno} />
-      <Cordillera color={nocturno ? '#3a4a63' : c.niebla} />
+      <Terreno nocturno={nocturno} innerRef={terrenoRef} />
+      <Cordillera color={nocturno ? '#3a4a63' : c.niebla} innerRef={cordilleraRef} />
       <Quebrada color={nocturno ? '#2a4a6a' : '#5fb2c9'} viva={c.lluviaViva} />
       <VegetacionPisos nocturno={nocturno} />
 
       {MUNDOS_VALLE.map((m) => (
-        <MundoLugar
-          key={m.id}
-          mundo={m}
-          activo={focoId === m.id}
-          onEntrar={onEntrar}
-          reducedMotion={reducedMotion}
-        />
+        <MundoLugar key={m.id} mundo={m} reducedMotion={reducedMotion} />
       ))}
+      <RotulosLugares
+        mundos={MUNDOS_VALLE}
+        focoId={focoId}
+        onEntrar={onEntrar}
+        occluders={occluders}
+      />
 
       <CriaturasValle reducedMotion={reducedMotion} />
       <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} />
