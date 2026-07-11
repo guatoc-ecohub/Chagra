@@ -25,8 +25,11 @@
    repo no activa react/no-unknown-property, así que no requieren disable. */
 import { Suspense, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Html, Float, Stars, OrbitControls, AdaptiveDpr } from '@react-three/drei';
+import {
+  Html, Float, Stars, OrbitControls, AdaptiveDpr, Detailed, Instances, Instance,
+} from '@react-three/drei';
 import * as THREE from 'three';
+import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 import { Colibri } from '../../visual/creatures/Colibri.jsx';
 import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
@@ -94,9 +97,10 @@ function colorSueloEnZ(z, alto, nocturno, out) {
       según el piso térmico de cada franja (páramo frío arriba → tierra caliente
       abajo). El color sale de PISOS_TERMICOS: franjas de altitud legibles, con
       la cresta apenas más clara para dar relieve. ── */
-function Terreno({ nocturno, innerRef }) {
+function Terreno({ nocturno, innerRef, perfil }) {
+  const seg = perfil.segmentosTerreno;
   const geo = useMemo(() => {
-    const g = new THREE.PlaneGeometry(34, 34, 56, 56);
+    const g = new THREE.PlaneGeometry(34, 34, seg, seg);
     g.rotateX(-Math.PI / 2);
     const pos = g.attributes.position;
     const colores = new Float32Array(pos.count * 3);
@@ -116,10 +120,16 @@ function Terreno({ nocturno, innerRef }) {
     g.setAttribute('color', new THREE.BufferAttribute(colores, 3));
     g.computeVertexNormals();
     return g;
-  }, [nocturno]);
+  }, [nocturno, seg]);
   return (
-    <mesh ref={innerRef} geometry={geo} receiveShadow>
-      <meshStandardMaterial vertexColors flatShading roughness={1} metalness={0} />
+    <mesh ref={innerRef} geometry={geo} receiveShadow={perfil.sombras}>
+      {perfil.materialRico ? (
+        <meshStandardMaterial vertexColors flatShading roughness={1} metalness={0} />
+      ) : (
+        /* Frugal: Lambert indexado — el terreno es LA superficie que llena la
+           pantalla; abaratar su fragmento es el mayor ahorro por línea. */
+        <meshLambertMaterial vertexColors />
+      )}
     </mesh>
   );
 }
@@ -127,19 +137,32 @@ function Terreno({ nocturno, innerRef }) {
 /* ── La cordillera de páramo al fondo: conos pálidos que EMERGEN de la ladera
       alta (perspectiva aérea). Su base se posa sobre el terreno del páramo
       (que ya subió a ~5) y las cumbres coronan la escena. ── */
-function Cordillera({ color, innerRef }) {
-  const picos = useMemo(
-    () => [
-      { x: -9, z: -15.5, h: 7, r: 5, base: 4.2 },
-      { x: -2, z: -17, h: 9.5, r: 6, base: 4.6 },
-      { x: 6, z: -16, h: 8, r: 5.2, base: 4.2 },
-      { x: 12, z: -15, h: 6, r: 4.5, base: 4.0 },
-    ],
-    [],
-  );
+const PICOS_CORDILLERA = [
+  { x: -9, z: -15.5, h: 7, r: 5, base: 4.2 },
+  { x: -2, z: -17, h: 9.5, r: 6, base: 4.6 },
+  { x: 6, z: -16, h: 8, r: 5.2, base: 4.2 },
+  { x: 12, z: -15, h: 6, r: 4.5, base: 4.0 },
+];
+
+function Cordillera({ color, innerRef, perfil }) {
+  if (!perfil.materialRico) {
+    // Frugal: los 4 picos en UNA InstancedMesh (1 draw call) — un cono unidad
+    // escalado por instancia. El raycast de occlude funciona igual.
+    return (
+      <group ref={innerRef}>
+        <Instances limit={PICOS_CORDILLERA.length}>
+          <coneGeometry args={[1, 1, 6]} />
+          <meshLambertMaterial color={color} opacity={0.92} transparent />
+          {PICOS_CORDILLERA.map((p, i) => (
+            <Instance key={i} position={[p.x, p.base + p.h / 2, p.z]} scale={[p.r, p.h, p.r]} />
+          ))}
+        </Instances>
+      </group>
+    );
+  }
   return (
     <group ref={innerRef}>
-      {picos.map((p, i) => (
+      {PICOS_CORDILLERA.map((p, i) => (
         <mesh key={i} position={[p.x, p.base + p.h / 2, p.z]}>
           <coneGeometry args={[p.r, p.h, 6]} />
           <meshStandardMaterial color={color} flatShading roughness={1} opacity={0.92} transparent />
@@ -150,7 +173,7 @@ function Cordillera({ color, innerRef }) {
 }
 
 /* ── La quebrada: una cinta de agua que serpentea por el cauce. ── */
-function Quebrada({ color, viva }) {
+function Quebrada({ color, viva, perfil }) {
   const ref = useRef(null);
   useFrame((state) => {
     // `ref` apunta al material (no al mesh): animar su opacidad directamente.
@@ -158,6 +181,7 @@ function Quebrada({ color, viva }) {
       ref.current.opacity = 0.72 + Math.sin(state.clock.elapsedTime * 2) * 0.06;
     }
   });
+  const rico = perfil.materialRico;
   const geo = useMemo(() => {
     // Nace arriba (páramo) y BAJA por la ladera hasta la tierra caliente:
     // cada punto se posa sobre el terreno (+un pelo) para leer la pendiente.
@@ -170,19 +194,24 @@ function Quebrada({ color, viva }) {
       [3.6, 8],
     ].map(([x, z]) => new THREE.Vector3(x, alturaTerreno(x, z) + 0.06, z));
     const curve = new THREE.CatmullRomCurve3(pts);
-    const g = new THREE.TubeGeometry(curve, 80, 0.34, 7, false);
+    // Frugal: menos anillos/segmentos — la cinta se lee igual desde lejos.
+    const g = new THREE.TubeGeometry(curve, rico ? 80 : 48, 0.34, rico ? 7 : 5, false);
     return g;
-  }, []);
+  }, [rico]);
   return (
     <mesh geometry={geo}>
-      <meshStandardMaterial
-        ref={ref}
-        color={color}
-        transparent
-        opacity={0.78}
-        roughness={0.25}
-        metalness={0.35}
-      />
+      {rico ? (
+        <meshStandardMaterial
+          ref={ref}
+          color={color}
+          transparent
+          opacity={0.78}
+          roughness={0.25}
+          metalness={0.35}
+        />
+      ) : (
+        <meshLambertMaterial ref={ref} color={color} transparent opacity={0.78} />
+      )}
     </mesh>
   );
 }
@@ -406,9 +435,96 @@ function MataDePiso({ tipo, nocturno }) {
   }
 }
 
+/* ── SILUETAS instanciadas de las matas (perfil frugal, DR FIX 2): cada mata
+      se reduce a tronco (cilindro unidad) + copa (cono o bola unidad), TODAS
+      dibujadas en 3 InstancedMesh (3 draw calls en vez de ~28 mallas). El
+      color va por instancia (material blanco multiplicado). ── */
+const SILUETAS_MATA = {
+  frailejon: {
+    tronco: { s: [0.13, 0.9, 0.13], y: 0.45, dia: '#6e6a52', noche: '#3a4038' },
+    copa: { forma: 'cono', s: [0.34, 0.25, 0.34], y: 0.98, dia: '#9fb59a', noche: '#4a5b52' },
+  },
+  papa: {
+    copa: { forma: 'bola', s: [0.32, 0.2, 0.32], y: 0.16, dia: '#3f7d52', noche: '#2f5240' },
+  },
+  cafe: {
+    tronco: { s: [0.055, 0.28, 0.055], y: 0.14, dia: '#6b4a2e', noche: '#6b4a2e' },
+    copa: { forma: 'bola', s: [0.3, 0.3, 0.3], y: 0.4, dia: '#3f7d3a', noche: '#254a30' },
+  },
+  platano: {
+    tronco: { s: [0.12, 1.1, 0.12], y: 0.55, dia: '#7a9a55', noche: '#3a5030' },
+    copa: { forma: 'cono', s: [0.55, 0.8, 0.55], y: 1.25, dia: '#4f9a44', noche: '#2f5236' },
+  },
+};
+
+function VegetacionInstanciada({ nocturno, cada }) {
+  const matas = useMemo(
+    () =>
+      VEGETACION_PISOS.filter((_, i) => i % cada === 0).map((v) => {
+        const [x, z] = v.pos;
+        return { x, y: alturaTerreno(x, z), z, sil: SILUETAS_MATA[v.tipo] || SILUETAS_MATA.platano };
+      }),
+    [cada],
+  );
+  const troncos = matas.filter((m) => m.sil.tronco);
+  const conos = matas.filter((m) => m.sil.copa.forma === 'cono');
+  const bolas = matas.filter((m) => m.sil.copa.forma === 'bola');
+  const tinte = (parte) => (nocturno ? parte.noche : parte.dia);
+  return (
+    <group>
+      {troncos.length > 0 && (
+        <Instances limit={troncos.length}>
+          <cylinderGeometry args={[0.85, 1, 1, 6]} />
+          <meshLambertMaterial />
+          {troncos.map((m, i) => (
+            <Instance
+              key={i}
+              position={[m.x, m.y + m.sil.tronco.y, m.z]}
+              scale={m.sil.tronco.s}
+              color={tinte(m.sil.tronco)}
+            />
+          ))}
+        </Instances>
+      )}
+      {conos.length > 0 && (
+        <Instances limit={conos.length}>
+          <coneGeometry args={[1, 1, 7]} />
+          <meshLambertMaterial />
+          {conos.map((m, i) => (
+            <Instance
+              key={i}
+              position={[m.x, m.y + m.sil.copa.y, m.z]}
+              scale={m.sil.copa.s}
+              color={tinte(m.sil.copa)}
+            />
+          ))}
+        </Instances>
+      )}
+      {bolas.length > 0 && (
+        <Instances limit={bolas.length}>
+          <sphereGeometry args={[1, 9, 8]} />
+          <meshLambertMaterial />
+          {bolas.map((m, i) => (
+            <Instance
+              key={i}
+              position={[m.x, m.y + m.sil.copa.y, m.z]}
+              scale={m.sil.copa.s}
+              color={tinte(m.sil.copa)}
+            />
+          ))}
+        </Instances>
+      )}
+    </group>
+  );
+}
+
 /* Siembra las matas de muestra de cada piso sobre el terreno (posadas en su y).
-   Layout por datos: recorre VEGETACION_PISOS. */
-function VegetacionPisos({ nocturno }) {
+   Layout por datos: recorre VEGETACION_PISOS. En perfil frugal las matas se
+   dibujan INSTANCIADAS (3 draw calls); en 'alto' conservan su detalle pleno. */
+function VegetacionPisos({ nocturno, perfil }) {
+  if (perfil.matasInstanciadas) {
+    return <VegetacionInstanciada nocturno={nocturno} cada={perfil.matasCada} />;
+  }
   return (
     <group>
       {VEGETACION_PISOS.map((v, i) => {
@@ -475,10 +591,13 @@ function CriaturaSvg({ tipo, size, animated }) {
   return <Lombriz size={size} animated={animated} />;
 }
 
-function CriaturasValle({ reducedMotion }) {
+function CriaturasValle({ reducedMotion, cupo }) {
+  // Cada criatura es un <Html> (nodo DOM con matriz CSS por frame): en frugal
+  // se siembran menos; en 'bajo' ninguna (el valle vive igual con los mundos).
+  if (!cupo) return null;
   return (
     <group>
-      {CRIATURAS_VALLE.map((c, i) => {
+      {CRIATURAS_VALLE.slice(0, cupo).map((c, i) => {
         const y = alturaTerreno(c.x, c.z) + c.dy;
         return (
           <group key={i} position={[c.x, y, c.z]}>
@@ -494,16 +613,41 @@ function CriaturasValle({ reducedMotion }) {
   );
 }
 
+/* ── Proxy LOD de un landmark (perfil frugal): a distancia, el lugar es una
+      silueta de UNA malla con su tinte — el rótulo con emoji ya lo nombra.
+      Los tipos que suben (milpa, bosque, veleta) son cono; el resto, domo. ── */
+const PROXY_CONO = new Set(['milpa', 'bosque', 'veleta']);
+
+function ProxyLandmark({ tipo, tinte }) {
+  const cono = PROXY_CONO.has(tipo);
+  return (
+    <mesh position={[0, cono ? 0.7 : 0.35, 0]} scale={cono ? 1 : [1, 0.55, 1]}>
+      {cono ? <coneGeometry args={[0.5, 1.4, 6]} /> : <sphereGeometry args={[0.62, 8, 7]} />}
+      <meshLambertMaterial color={tinte[0]} />
+    </mesh>
+  );
+}
+
 /* ── Un mundo como LUGAR navegable: SOLO su geometría. Su etiqueta táctil vive
-      en <RotulosLugares/> (piso en píxeles + foco/proximidad + anti-colisión). ── */
-function MundoLugar({ mundo, reducedMotion }) {
+      en <RotulosLugares/> (piso en píxeles + foco/proximidad + anti-colisión).
+      En perfil frugal el detalle completo SOLO se dibuja de cerca (<Detailed>):
+      la panorámica de arranque —el peor momento— queda en siluetas baratas. ── */
+function MundoLugar({ mundo, reducedMotion, perfil }) {
   const y = alturaTerreno(mundo.pos[0], mundo.pos[2]);
+  const detalle = mundo.tipo === 'veleta' ? (
+    <Veleta color={mundo.tinte[0]} reducedMotion={reducedMotion} />
+  ) : (
+    <LandmarkGeom tipo={mundo.tipo} tinte={mundo.tinte} reducedMotion={reducedMotion} />
+  );
   return (
     <group position={[mundo.pos[0], y, mundo.pos[2]]} scale={mundo.escala}>
-      {mundo.tipo === 'veleta' ? (
-        <Veleta color={mundo.tinte[0]} reducedMotion={reducedMotion} />
+      {perfil.lod ? (
+        <Detailed distances={[0, perfil.lodDistancia]}>
+          <group>{detalle}</group>
+          <ProxyLandmark tipo={mundo.tipo} tinte={mundo.tinte} />
+        </Detailed>
       ) : (
-        <LandmarkGeom tipo={mundo.tipo} tinte={mundo.tinte} reducedMotion={reducedMotion} />
+        detalle
       )}
     </group>
   );
@@ -661,7 +805,7 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders }) {
 
 /* ── La cosa del día: un faro pulsante anclado sobre su mundo. Un SOLO destello.
       Toca la señal → onAlerta() (el agente lo dice y ofrece LA acción). ── */
-function Beacon({ onAlerta, reducedMotion }) {
+function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
   const ancla = MUNDO_VALLE_BY_ID[COSA_DEL_DIA.anclaMundo];
   const luz = useRef(null);
   const halo = useRef(null);
@@ -679,7 +823,11 @@ function Beacon({ onAlerta, reducedMotion }) {
   const y = alturaTerreno(ancla.pos[0], ancla.pos[2]);
   return (
     <group position={[ancla.pos[0], y, ancla.pos[2]]}>
-      <pointLight ref={luz} position={[0, 1.6, 0]} color="#ffd28a" intensity={2.2} distance={7} />
+      {/* La pointLight extra solo donde sobra GPU: el pulso emissive+halo ya
+          hace de faro sin sumar una luz por-fragmento a toda la escena. */}
+      {conLuz && (
+        <pointLight ref={luz} position={[0, 1.6, 0]} color="#ffd28a" intensity={2.2} distance={7} />
+      )}
       <Float speed={reducedMotion ? 0 : 2} floatIntensity={reducedMotion ? 0 : 0.6} rotationIntensity={0}>
         <mesh position={[0, 1.7, 0]}>
           <octahedronGeometry args={[0.26, 0]} />
@@ -797,7 +945,7 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit }) {
 }
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion }) {
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil }) {
   const controls = useRef(null);
   // Occluders de los rótulos: solo terreno + cordillera (raycast barato y es
   // exactamente lo que las etiquetas no deben atravesar).
@@ -820,14 +968,17 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
   return (
     <>
       <color attach="background" args={[c.cielo[1]]} />
-      <fog attach="fog" args={[c.niebla, 12, c.nieblaLejos + 8]} />
+      {/* La niebla se paga por fragmento: en perfil 'bajo' se apaga. */}
+      {perfil.fog && <fog attach="fog" args={[c.niebla, 12, c.nieblaLejos + 8]} />}
       <hemisphereLight intensity={c.intensidad * 0.55} color={c.cielo[0]} groundColor={c.ambiente} />
       <ambientLight intensity={c.intensidad * 0.35} color={c.luz} />
+      {/* castShadow SOLO en 'alto': sin shadow-map la escena se dibuja UNA vez
+          por frame, no dos (DR FIX 1 — el mayor ahorro de GPU de un golpe). */}
       <directionalLight
         position={[6, 9, 4]}
         intensity={c.intensidad}
         color={c.luz}
-        castShadow
+        castShadow={perfil.sombras}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-far={30}
         shadow-camera-left={-12}
@@ -835,17 +986,24 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         shadow-camera-top={12}
         shadow-camera-bottom={-12}
       />
-      {c.estrellas && (
-        <Stars radius={40} depth={20} count={900} factor={3} fade speed={reducedMotion ? 0 : 1} />
+      {c.estrellas && perfil.estrellas > 0 && (
+        <Stars
+          radius={40}
+          depth={20}
+          count={perfil.estrellas}
+          factor={3}
+          fade
+          speed={reducedMotion ? 0 : 1}
+        />
       )}
 
-      <Terreno nocturno={nocturno} innerRef={terrenoRef} />
-      <Cordillera color={nocturno ? '#3a4a63' : c.niebla} innerRef={cordilleraRef} />
-      <Quebrada color={nocturno ? '#2a4a6a' : '#5fb2c9'} viva={c.lluviaViva} />
-      <VegetacionPisos nocturno={nocturno} />
+      <Terreno nocturno={nocturno} innerRef={terrenoRef} perfil={perfil} />
+      <Cordillera color={nocturno ? '#3a4a63' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
+      <Quebrada color={nocturno ? '#2a4a6a' : '#5fb2c9'} viva={c.lluviaViva} perfil={perfil} />
+      <VegetacionPisos nocturno={nocturno} perfil={perfil} />
 
       {MUNDOS_VALLE.map((m) => (
-        <MundoLugar key={m.id} mundo={m} reducedMotion={reducedMotion} />
+        <MundoLugar key={m.id} mundo={m} reducedMotion={reducedMotion} perfil={perfil} />
       ))}
       <RotulosLugares
         mundos={MUNDOS_VALLE}
@@ -854,8 +1012,8 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         occluders={occluders}
       />
 
-      <CriaturasValle reducedMotion={reducedMotion} />
-      <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} />
+      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} />
+      <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
       <CompaneroAbeja
         foco={foco}
         entrando={entrando}
@@ -883,14 +1041,19 @@ export default function Valle3D({
   onEntrar,
   onAlerta,
   reducedMotion,
+  tier = 'alto',
 }) {
   const [listo, setListo] = useState(false);
+  /* El PERFIL DE RENDER del tier (DR-3D-PERF-GAMABAJA): 'alto' conserva este
+     look intacto; 'medio'/'bajo' degradan sombras, DPR, antialias, densidad e
+     instancian lo repetido. El default 'alto' preserva a los hosts viejos. */
+  const perfil = useMemo(() => perfilDeTier(tier), [tier]);
   return (
     <Canvas
       className={`valle-canvas${listo ? ' valle-canvas--listo' : ''}`}
-      shadows
-      dpr={[1, 1.8]}
-      gl={{ antialias: true, powerPreference: 'high-performance' }}
+      shadows={perfil.sombras}
+      dpr={perfil.dpr}
+      gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
       camera={{ position: [10.5, 9, 13.5], fov: 40 }}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
@@ -904,6 +1067,7 @@ export default function Valle3D({
           onEntrar={onEntrar}
           onAlerta={onAlerta}
           reducedMotion={reducedMotion}
+          perfil={perfil}
         />
       </Suspense>
     </Canvas>

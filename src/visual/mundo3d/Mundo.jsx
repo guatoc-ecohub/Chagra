@@ -152,6 +152,7 @@ function MundoInterno({
             hotspots={plan.entrada.hotspots}
             entrada={plan.entrada.entrada}
             tinte={tinte}
+            tier={tier}
             reducedMotion={reducedMotion}
             onHotspot={onHotspot}
             onSalir={onSalir}
