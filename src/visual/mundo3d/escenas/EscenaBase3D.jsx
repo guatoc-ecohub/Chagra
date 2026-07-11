@@ -20,7 +20,7 @@
  * no como abrir otra app). `piso` (y del suelo, default 0) posa la alfombra y
  * las sombras de contacto; solo cutaway lo necesita (su bloque centra en 0).
  */
-import { Suspense, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
@@ -32,7 +32,12 @@ import useHaptics from '../useHaptics.js';
 /* La dirección de arte compartida (hora dorada + cielos por familia) vive en
    un módulo propio: los arquetipos eligen su CIELOS.<familia>, esta base la
    mezcla hacia ATMOSFERA. Una sola fuente, cero hexes sueltos. */
-import { ATMOSFERA, CIELOS, mezclar } from '../atmosferaMadre.js';
+import { ATMOSFERA, mezclarCielo } from '../atmosferaMadre.js';
+
+/* El bloom sutil de la hora dorada: chunk LAZY con gate ESTRICTO
+   `tier === 'alto' && !reducedMotion` — medio y bajo NI LO DESCARGAN
+   (el import dinámico solo dispara cuando el elemento llega a renderizarse). */
+const BloomSutil = lazy(() => import('./BloomSutil.jsx'));
 
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
@@ -54,18 +59,10 @@ function Contenido({
 
   // La atmósfera del mundo: su `cielo` propio MEZCLADO 60% hacia la hora dorada
   // del valle (B6 — hoy entrar a un mundo "aplana" porque cada escena fija un
-  // cielo frío propio). Memoizado: THREE.Color solo cuando cambia el cielo.
-  const c = useMemo(() => {
-    const propio = { ...CIELOS.neutro, ...(cielo || {}) };
-    return {
-      fondo: mezclar(propio.fondo, ATMOSFERA.fondo, 0.6),
-      cielo: mezclar(propio.cielo, ATMOSFERA.cielo, 0.6),
-      suelo: mezclar(propio.suelo, ATMOSFERA.suelo, 0.6),
-      niebla: mezclar(propio.fondo, ATMOSFERA.niebla, 0.7),
-      alfombra: mezclar(propio.suelo, ATMOSFERA.suelo, 0.5),
-      intensidad: propio.intensidad ?? 1,
-    };
-  }, [cielo]);
+  // cielo frío propio). La receta vive AHORA en atmosferaMadre (mezclarCielo):
+  // ley exportada, mismo resultado aquí y en cualquier consumidor futuro.
+  // Memoizado: THREE.Color solo cuando cambia el cielo.
+  const c = useMemo(() => mezclarCielo(cielo), [cielo]);
 
   // foco = el hotspot activo (o el centro del diorama). Memoizado (auditoría
   // B11: antes era un Vector3 nuevo POR RENDER — basura de GC en el hilo
@@ -214,6 +211,15 @@ function Contenido({
         activa={!reducedMotion && !frugal}
       />
       <AdaptiveDpr pixelated />
+      {/* Bloom SUTIL solo donde sobra GPU: tier alto sin reduced-motion. El
+          gate es estricto a propósito (contrato de costo del DR de gama baja):
+          medio/bajo no montan el pase NI descargan su chunk, y reduced-motion
+          tampoco (su frameloop 'demand' no le debe un composer a nadie). */}
+      {tier === 'alto' && !reducedMotion && (
+        <Suspense fallback={null}>
+          <BloomSutil />
+        </Suspense>
+      )}
     </>
   );
 }

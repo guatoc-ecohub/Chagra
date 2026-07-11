@@ -22,6 +22,12 @@
  *                 puros no existen aquí a propósito: bajo un sol dorado hasta
  *                 el concreto se tiñe (concreto/lamina son grises CÁLIDOS).
  *
+ * Y dos piezas de coherencia derivadas (mismo contrato, cero costo por frame):
+ *   - mezclarCielo : la receta 60%-hacia-la-madre que usa EscenaBase3D, como
+ *                    ley exportada — cualquier consumidor nuevo pinta IGUAL.
+ *   - BLOOM        : los parámetros del bloom sutil del tier alto. Dirección
+ *                    de arte central, no un número suelto por escena.
+ *
  * Rendimiento: solo constantes y una mezcla de Color memoizable — nada de esto
  * cuesta por frame ni rompe el device-tier (la base decide qué enciende).
  */
@@ -43,6 +49,34 @@ export const ATMOSFERA = {
 export function mezclar(a, b, t) {
   return `#${new THREE.Color(a).lerp(new THREE.Color(b), t).getHexString()}`;
 }
+
+/* La RECETA de coherencia valle↔mundo, como ley única: el cielo propio del
+   arquetipo mezclado 60% hacia la hora dorada (B6). Antes vivía inline en
+   EscenaBase3D; aquí es parte de la dirección de arte — si un consumidor nuevo
+   (minimapa, preview, thumbnail) necesita "cómo se ve la familia X bajo la
+   madre", llama esto y sale IGUAL que la escena. Barato (7 lerps); memoizar
+   en quien llama por `cielo`. */
+export function mezclarCielo(cielo) {
+  const propio = { ...CIELOS.neutro, ...(cielo || {}) };
+  return {
+    fondo: mezclar(propio.fondo, ATMOSFERA.fondo, 0.6),
+    cielo: mezclar(propio.cielo, ATMOSFERA.cielo, 0.6),
+    suelo: mezclar(propio.suelo, ATMOSFERA.suelo, 0.6),
+    niebla: mezclar(propio.fondo, ATMOSFERA.niebla, 0.7),
+    alfombra: mezclar(propio.suelo, ATMOSFERA.suelo, 0.5),
+    intensidad: propio.intensidad ?? 1,
+  };
+}
+
+/* El bloom de la hora dorada (tier alto): parámetros de dirección de arte, no
+   de cada escena. `umbral` alto = solo los brillos francos (sol en el agua,
+   ámbar de señal, cal al sol) florecen; `fuerza` baja = un velo tibio, jamás
+   neón. Un solo bloom en todo el juego = la luz se siente del mismo atardecer. */
+export const BLOOM = {
+  fuerza: 0.18, // sutil: abraza los brillos, no los revienta
+  radio: 0.55, // difusión corta — halo pegado a la fuente
+  umbral: 0.85, // solo lo francamente luminoso entra al pase
+};
 
 /* El cielo propio de cada familia de mundo. EscenaBase3D lo MEZCLA 60% hacia
    ATMOSFERA, así que estos valores son el acento, no el resultado final.
