@@ -11,7 +11,6 @@
  * Se activa cuando: el equipo no aguanta 3D o el mundo se pide en 2D. Lo elige
  * `resolverMundo` vía `recinto.espejo`.
  */
-import { AutoDibujo } from '../../effects/index.js';
 import { CORRAL, TINTA, PAPEL, acentoDe } from '../../palette/chagra.js';
 import HotspotsGemelo from './HotspotsGemelo.jsx';
 import './gemelos2d.css';
@@ -74,8 +73,8 @@ export default function Recinto2D({
               <circle key={p.key} cx={p.x} cy={p.y} r="2.6" />
             ))}
           </g>
-          <AutoDibujo as="ellipse" stage={1} cx={CX} cy={CY} rx={RX} ry={RY}
-            fill="none" stroke={TINTA} strokeWidth="2" strokeDasharray="1 1" />
+          <ellipse className="vfx-draw vfx-t1" pathLength={1} cx={CX} cy={CY} rx={RX} ry={RY}
+            fill="none" stroke={TINTA} strokeWidth="2" />
 
           {/* la compostera al centro-bajo + el CICLO que vuelve al pasto */}
           <g transform={`translate(${CX},${CY + 46})`}>
@@ -84,8 +83,8 @@ export default function Recinto2D({
           </g>
           {/* flecha del ciclo: de la compostera al pasto y de vuelta (auto-dibujada) */}
           <g fill="none" stroke={CORRAL.aro} strokeWidth="2.4" strokeLinecap="round">
-            <AutoDibujo as="path" stage={3} d={`M${CX - 8},${CY + 40} C${CX - 90},${CY + 30} ${CX - 96},${CY - 40} ${CX - 40},${CY - 44}`} />
-            <AutoDibujo as="path" stage={4} d={`M${CX - 40},${CY - 44} l-9,-3 m9,3 l-3,9`} />
+            <path className="vfx-draw vfx-t3" pathLength={1} d={`M${CX - 8},${CY + 40} C${CX - 90},${CY + 30} ${CX - 96},${CY - 40} ${CX - 40},${CY - 44}`} />
+            <path className="vfx-draw vfx-t4" pathLength={1} d={`M${CX - 40},${CY - 44} l-9,-3 m9,3 l-3,9`} />
           </g>
 
           {/* los animales, en planta, con su tono del diorama */}

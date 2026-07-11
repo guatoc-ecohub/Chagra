@@ -12,7 +12,6 @@
  * `resolverMundo` vía `estratos.espejo`.
  */
 import { useId } from 'react';
-import { AutoDibujo } from '../../effects/index.js';
 import { ESTRATOS, TINTA, PAPEL, acentoDe } from '../../palette/chagra.js';
 import HotspotsGemelo from './HotspotsGemelo.jsx';
 import './gemelos2d.css';
@@ -118,8 +117,10 @@ export default function Estratos2D({
             );
           })}
 
-          {/* línea del suelo (separa lo aéreo de la raíz), dibujada al entrar */}
-          <AutoDibujo as="line" stage={1} x1="0" y1={Y0 + (n - 1) * bandH} x2="320" y2={Y0 + (n - 1) * bandH}
+          {/* línea del suelo (separa lo aéreo de la raíz), se dibuja al entrar
+              con vfx-draw + pathLength (auto-dibujado §13.11 de effects.css) */}
+          <line className="vfx-draw vfx-t1" pathLength={1}
+            x1="0" y1={Y0 + (n - 1) * bandH} x2="320" y2={Y0 + (n - 1) * bandH}
             stroke={TINTA} strokeWidth="2" />
 
           {/* grade de luz por altura (encima de las franjas, bajo las etiquetas) */}
@@ -127,8 +128,8 @@ export default function Estratos2D({
 
           {/* eje de altura + flecha "más alto" (auto-dibujado) */}
           <g fill="none" stroke={TINTA} strokeWidth="1.6" strokeLinecap="round" opacity="0.7">
-            <AutoDibujo as="path" stage={2} d={`M14,${Y1 - 6} L14,${Y0 + 6}`} />
-            <AutoDibujo as="path" stage={3} d={`M14,${Y0 + 6} l-4,7 m4,-7 l4,7`} />
+            <path className="vfx-draw vfx-t2" pathLength={1} d={`M14,${Y1 - 6} L14,${Y0 + 6}`} />
+            <path className="vfx-draw vfx-t3" pathLength={1} d={`M14,${Y0 + 6} l-4,7 m4,-7 l4,7`} />
           </g>
 
           {/* etiquetas de cada estrato (papel + texto oscuro AA) */}

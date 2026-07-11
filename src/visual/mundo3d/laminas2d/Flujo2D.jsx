@@ -10,7 +10,6 @@
  * Se activa cuando: el equipo no aguanta 3D o el mundo se pide en 2D. Lo elige
  * `resolverMundo` vía `flujo.espejo`.
  */
-import { AutoDibujo } from '../../effects/index.js';
 import { AGUA, TINTA, PAPEL, acentoDe } from '../../palette/chagra.js';
 import HotspotsGemelo from './HotspotsGemelo.jsx';
 import './gemelos2d.css';
@@ -44,7 +43,7 @@ export default function Flujo2D({
 
           {/* cauce: base ancha translúcida + trazo que se DIBUJA al entrar */}
           <path d={CAUCE_D} fill="none" stroke={AGUA.aguaClara} strokeWidth="12" strokeLinecap="round" opacity="0.55" />
-          <AutoDibujo as="path" stage={2} d={CAUCE_D} fill="none" stroke={AGUA.agua} strokeWidth="5" strokeLinecap="round" />
+          <path className="vfx-draw vfx-t2" pathLength={1} d={CAUCE_D} fill="none" stroke={AGUA.agua} strokeWidth="5" strokeLinecap="round" />
           {/* el agua CORRE: dash animado sobre el cauce (vfx-flow) */}
           <path className="vfx-flow" d={CAUCE_D} fill="none" stroke={PAPEL} strokeWidth="2.4" strokeLinecap="round" opacity="0.8" />
 
@@ -60,7 +59,7 @@ export default function Flujo2D({
           ))}
 
           {/* contorno del cauce sobre la ladera, para el volumen (auto-dibujado) */}
-          <AutoDibujo as="path" stage={3} d="M196,120 L320,152" fill="none" stroke={TINTA} strokeWidth="1.4" opacity="0.5" />
+          <path className="vfx-draw vfx-t3" pathLength={1} d="M196,120 L320,152" fill="none" stroke={TINTA} strokeWidth="1.4" opacity="0.5" />
 
           {/* etiquetas: nacimiento · pendiente · toma (papel + texto oscuro AA) */}
           <g className="gemelo2d__etq">

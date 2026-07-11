@@ -204,7 +204,10 @@ function Mundo3DDemo({ item }) {
       motivo={item.motivo}
       entrada={{ ...item.entrada, params: item.params, hotspots: item.hotspots, titulo: item.nombre }}
       tinte={item.tinte}
+      reducedMotion={false}
       onHotspot={noop}
+      animo="sereno"
+      energia={1}
     />
   );
 

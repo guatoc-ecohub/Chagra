@@ -60,7 +60,10 @@ function GemeloCard({ twin, mundo, activa, onVista }) {
           motivo={arq.motivo}
           entrada={entrada}
           tinte={tinte}
+          reducedMotion={false}
           onHotspot={(view) => onVista(view)}
+          animo="sereno"
+          energia={1}
         />
       </div>
 

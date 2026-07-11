@@ -4,15 +4,15 @@
  * NO es un fallback pobre: es el MISMO mundo dibujado en otro lenguaje. Un CORTE
  * isométrico (2.5D) del subsuelo, con las capas ETIQUETADAS y la vida del suelo
  * (lombriz de la librería + raíces + micorriza) que aparece TANTA como diga
- * `params.vida`. El corte se auto-dibuja al entrar (`AutoDibujo`/`vfx-draw`), en
- * alto contraste. Lee los MISMOS `params.capas`/`params.vida` que el diorama 3D,
+ * `params.vida`. El corte se auto-dibuja al entrar (`vfx-draw`/`pathLength` de
+ * effects.css), en alto contraste. Lee los MISMOS `params.capas`/`params.vida`
+ * que el diorama 3D,
  * así que sumar el gemelo de un mundo no cuesta datos nuevos.
  *
  * Se activa cuando: el equipo no aguanta 3D (tier bajo/sin-WebGL/ahorro/calma) o
  * el mundo se pide en 2D. Lo elige `resolverMundo` vía `cutaway.espejo`.
  */
 import { Lombriz } from '../../creatures/index.js';
-import { AutoDibujo } from '../../effects/index.js';
 import { SUELO, TINTA, PAPEL, acentoDe } from '../../palette/chagra.js';
 import HotspotsGemelo from './HotspotsGemelo.jsx';
 import './gemelos2d.css';
@@ -102,7 +102,7 @@ export default function Corte2D({
                 const hx = X0 + 30 + i * 26;
                 const hy = bandas[1].top + 10 + (i % 2) * 14;
                 return (
-                  <AutoDibujo key={`h${i}`} as="path" stage={4 + (i % 3)}
+                  <path key={`h${i}`} className={`vfx-draw vfx-t${4 + (i % 3)}`} pathLength={1}
                     d={`M${hx},${hy} l10,8 m-10,-8 l-8,10 m8,-10 l2,14`} />
                 );
               })}
@@ -112,7 +112,7 @@ export default function Corte2D({
           {/* raíces que descienden desde la superficie (auto-dibujadas) */}
           <g stroke={SUELO.raiz} strokeWidth="2.4" fill="none" strokeLinecap="round">
             {raices.map((r) => (
-              <AutoDibujo key={r.key} as="path" stage={r.stage} d={r.d} />
+              <path key={r.key} className={`vfx-draw vfx-t${r.stage}`} pathLength={1} d={r.d} />
             ))}
           </g>
 
@@ -128,11 +128,12 @@ export default function Corte2D({
             );
           })}
 
-          {/* contorno del corte: se DIBUJA solo al entrar (alto contraste) */}
+          {/* contorno del corte: se DIBUJA solo al entrar (vfx-draw + pathLength,
+              auto-dibujado §13.11 de effects.css), en alto contraste */}
           <g fill="none" stroke={TINTA} strokeWidth="2" strokeLinejoin="round">
-            <AutoDibujo as="path" stage={1} d={`M${X0},${T} L${X1},${T} L${X1},${B} L${X0},${B} Z`} />
-            <AutoDibujo as="path" stage={1} d={`M${X0},${T} L${X0 + DX},${T + DY} L${X1 + DX},${T + DY} L${X1},${T}`} />
-            <AutoDibujo as="path" stage={2} d={`M${X1},${T} L${X1 + DX},${T + DY} L${X1 + DX},${B + DY} L${X1},${B}`} />
+            <path className="vfx-draw vfx-t1" pathLength={1} d={`M${X0},${T} L${X1},${T} L${X1},${B} L${X0},${B} Z`} />
+            <path className="vfx-draw vfx-t1" pathLength={1} d={`M${X0},${T} L${X0 + DX},${T + DY} L${X1 + DX},${T + DY} L${X1},${T}`} />
+            <path className="vfx-draw vfx-t2" pathLength={1} d={`M${X1},${T} L${X1 + DX},${T + DY} L${X1 + DX},${B + DY} L${X1},${B}`} />
           </g>
 
           {/* etiquetas de cada capa — pastilla de papel, texto oscuro (AA) */}
