@@ -44,3 +44,6 @@ export const tinteDeMundo = (id) => MUNDO_BY_ID[id]?.tinte || ['#3f8f4e', '#dced
 
 /** Título del mundo, resuelto del manifiesto real. */
 export const tituloDeMundo = (id) => MUNDO_BY_ID[id]?.titulo || id;
+
+/** Emoji del mundo, resuelto del manifiesto real. */
+export const emojiDeMundo = (id) => MUNDO_BY_ID[id]?.emoji || '🌱';
