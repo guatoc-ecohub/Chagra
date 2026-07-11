@@ -50,6 +50,7 @@ function mezclar(a, b, t) {
 
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
+  frugal = false,
   children,
 }) {
   const controls = useRef(null);
@@ -84,8 +85,9 @@ function Contenido({
     <>
       <color attach="background" args={[c.fondo]} />
       {/* Niebla sutil: profundidad atmosférica sin lavar el diorama (arranca
-          detrás de él y se funde con la niebla dorada del valle). */}
-      <fog attach="fog" args={[c.niebla, zoom * 1.4, zoom * 4.6]} />
+          detrás de él y se funde con la niebla dorada del valle). Se paga por
+          fragmento → en el perfil mínimo (tier bajo forzado a 3D) se apaga. */}
+      {!frugal && <fog attach="fog" args={[c.niebla, zoom * 1.4, zoom * 4.6]} />}
       <hemisphereLight intensity={0.55 * c.intensidad} color={c.cielo} groundColor={c.suelo} />
       <ambientLight intensity={0.28 * c.intensidad} color={ATMOSFERA.luz} />
       {/* El sol de la hora dorada — MISMA dirección que el valle ([6,9,4]) para
@@ -97,21 +99,26 @@ function Contenido({
       <directionalLight position={[-5, 4, -6]} intensity={0.22} color={ATMOSFERA.relleno} />
 
       {/* La alfombra de suelo + el anillo de contacto: posan el diorama en un
-          piso en vez de dejarlo a la deriva sobre el color de fondo. */}
-      <SombraContacto
-        pos={[0, piso + 0.008, 0]}
-        radio={zoom * 0.68}
-        color={c.alfombra}
-        opacidad={0.5}
-        orden={1}
-      />
-      <SombraContacto
-        pos={[0, piso + 0.02, 0]}
-        radio={zoom * 0.4}
-        color={ATMOSFERA.sombra}
-        opacidad={0.3}
-        orden={2}
-      />
+          piso en vez de dejarlo a la deriva sobre el color de fondo. Son dos
+          planos transparentes grandes (overdraw) → fuera en el perfil mínimo. */}
+      {!frugal && (
+        <>
+          <SombraContacto
+            pos={[0, piso + 0.008, 0]}
+            radio={zoom * 0.68}
+            color={c.alfombra}
+            opacidad={0.5}
+            orden={1}
+          />
+          <SombraContacto
+            pos={[0, piso + 0.02, 0]}
+            radio={zoom * 0.4}
+            color={ATMOSFERA.sombra}
+            opacidad={0.3}
+            orden={2}
+          />
+        </>
+      )}
 
       {children}
 
@@ -160,16 +167,21 @@ function Contenido({
 
 export default function EscenaBase3D({
   params, hotspots, entrada, tinte, reducedMotion,
-  onHotspot, cielo, animo = 'sereno', energia = 1, camara, piso = 0, children,
+  onHotspot, cielo, animo = 'sereno', energia = 1, camara, piso = 0, tier = 'alto', children,
 }) {
   const [listo, setListo] = useState(false);
   const zoom = entrada?.zoom ?? 6.5;
   const cam = camara || { position: [zoom * 0.55, zoom * 0.5, zoom], fov: 42 };
+  /* Device-tiering (DR-3D-PERF-GAMABAJA §2): el andamiaje ya es frugal por
+     contrato (sin sombras, Lambert); lo que gradúa el tier son los píxeles
+     (DPR/antialias) y, en el perfil mínimo, la niebla y las alfombras. */
+  const frugal = tier === 'bajo';
+  const dpr = tier === 'alto' ? [1, 1.5] : tier === 'medio' ? [1, 1.3] : 1;
   return (
     <Canvas
       className={`mundo-canvas${listo ? ' mundo-canvas--listo' : ''}`}
-      dpr={[1, 1.5]}
-      gl={{ antialias: true, powerPreference: 'high-performance' }}
+      dpr={dpr}
+      gl={{ antialias: tier === 'alto', powerPreference: 'high-performance' }}
       camera={cam}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
@@ -186,6 +198,7 @@ export default function EscenaBase3D({
           animo={animo}
           energia={energia}
           piso={piso}
+          frugal={frugal}
         >
           {children}
         </Contenido>

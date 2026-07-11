@@ -44,6 +44,7 @@ import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
 import Mundo, {
   MUNDO,
   decidirTier,
+  permite3D,
   tinteDeMundo,
   tituloDeMundo,
   useNavegacionMundos,
@@ -55,54 +56,14 @@ import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
 
-/**
- * DEVICE-TIERING REAL. La 3D es ASPIRACIONAL (gama media+). No basta con
- * preguntar "¿hay WebGL?": un teléfono humilde tiene WebGL pero sufre jank y
- * calor. Entonces degradamos a la 2D DIGNA también por señales de equipo débil:
- * poca RAM, pocos núcleos, ahorro de datos o preferencia de menos movimiento.
- * Devuelve { modo: '2d' | '3d', motivo } — el motivo ajusta el aviso al usuario.
+/*
+ * DEVICE-TIERING REAL — UNA sola fuente de verdad: `decidirTier()` del
+ * framework (DR-3D-PERF-GAMABAJA FIX 1.1: antes había aquí un `decidirRender`
+ * binario que duplicaba la lógica y difería del tier — un equipo de gama media
+ * recibía la entrada 3D COMPLETA). Ahora el mismo tier decide 3D-vs-2D Y el
+ * perfil de render frugal de la entrada y de los mundos:
+ *   'alto' → 3D plena · 'medio' → 3D frugal · 'bajo' → 2D digna.
  */
-function decidirRender() {
-  if (typeof window === 'undefined') return { modo: '2d', motivo: 'ssr' };
-  /* `deviceMemory` y `connection` son APIs experimentales que la lib de tipos
-     del DOM aún no declara; se tipan aquí como opcionales (sin `any`). */
-  const nav =
-    /** @type {Navigator & { deviceMemory?: number, connection?: { saveData?: boolean }, mozConnection?: { saveData?: boolean }, webkitConnection?: { saveData?: boolean } }} */ (
-      window.navigator
-    );
-
-  // 1) WebGL es requisito DURO del render 3D.
-  let webgl = false;
-  try {
-    const canvas = document.createElement('canvas');
-    webgl = !!(
-      window.WebGLRenderingContext &&
-      (canvas.getContext('webgl2') || canvas.getContext('webgl'))
-    );
-  } catch {
-    webgl = false;
-  }
-  if (!webgl) return { modo: '2d', motivo: 'sin-webgl' };
-
-  // 2) Equipos humildes → 2D (no los ponemos a sudar la GPU).
-  const mem = nav.deviceMemory; // GiB aprox. (Chrome/Android); undefined en otros
-  if (typeof mem === 'number' && mem > 0 && mem <= 3) return { modo: '2d', motivo: 'equipo' };
-
-  const nucleos = nav.hardwareConcurrency;
-  if (typeof nucleos === 'number' && nucleos > 0 && nucleos <= 4) {
-    return { modo: '2d', motivo: 'equipo' };
-  }
-
-  // 3) El usuario pidió ahorrar datos o menos movimiento → respetarlo.
-  const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
-  if (conn && conn.saveData) return { modo: '2d', motivo: 'ahorro' };
-
-  const menosMov =
-    window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (menosMov) return { modo: '2d', motivo: 'calma' };
-
-  return { modo: '3d', motivo: 'ok' };
-}
 
 /* Aviso sobrio de por qué se ve la versión dibujada (nunca "error"). */
 const MENSAJE_DEGRADADO = {
@@ -125,8 +86,9 @@ export default function EntradaValle3D({ onBack }) {
   const [panel, setPanel] = useState(null); // null | 'alerta' | <mundoId>
   const [voz, setVoz] = useState(true);
   const [alertaVista, setAlertaVista] = useState(false); // ¿ya atendió lo del día?
-  const [render] = useState(decidirRender);
-  const usa3D = render.modo === '3d';
+  // El tier del equipo, decidido UNA vez: gobierna la entrada Y los mundos.
+  const [equipo] = useState(decidirTier);
+  const usa3D = permite3D(equipo.tier);
 
   // ── NAVEGACIÓN valle ↔ mundos: la máquina de fases vive en el framework.
   //    (reduced-motion la vuelve corte simple, sin overlay de viaje).
@@ -141,8 +103,6 @@ export default function EntradaValle3D({ onBack }) {
   );
 
   const nav = useNavegacionMundos({ reducedMotion });
-  // El tier del framework decide 3D-vs-2D DENTRO de cada mundo (una vez).
-  const tierMundo = useMemo(() => decidirTier().tier, []);
 
   // ── El compañero (Angelita): su ánimo/energía salen del estado REAL de la
   //    finca + el clima + si lo del día sigue sin atender. Cuidar la alerta la
@@ -312,6 +272,7 @@ export default function EntradaValle3D({ onBack }) {
                 onEntrar={entrarMundo}
                 onAlerta={abrirAlerta}
                 reducedMotion={reducedMotion}
+                tier={equipo.tier}
               />
             </Suspense>
           ) : (
@@ -341,7 +302,7 @@ export default function EntradaValle3D({ onBack }) {
         >
           <Mundo
             mundoId={nav.mundoId}
-            tier={tierMundo}
+            tier={equipo.tier}
             reducedMotion={reducedMotion}
             onHotspot={onPuertaMundo}
             onSalir={salirDelMundo}
@@ -388,7 +349,7 @@ export default function EntradaValle3D({ onBack }) {
       {/* ── Modo dibujado (tiering): aviso sobrio, nunca "error" ── */}
       {!usa3D && !nav.enMundo && (
         <p className="valle-degradado" role="status">
-          {MENSAJE_DEGRADADO[render.motivo] || MENSAJE_DEGRADADO.default}
+          {MENSAJE_DEGRADADO[equipo.motivo] || MENSAJE_DEGRADADO.default}
         </p>
       )}
 

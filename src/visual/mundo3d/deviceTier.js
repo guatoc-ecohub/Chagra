@@ -64,3 +64,72 @@ export function decidirTier() {
 
 /** ¿Este tier puede montar una escena 3D? (bajo y '2d' forzado → no). */
 export const permite3D = (tier) => tier === 'alto' || tier === 'medio';
+
+/*
+ * PERFIL DE RENDER por tier (DR-3D-PERF-GAMABAJA §2): el presupuesto que las
+ * escenas 3D consultan para degradarse SIN duplicar condicionales por archivo.
+ *
+ *   'alto'  → el look actual INTACTO (sombras reales, DPR 1.8, detalle pleno).
+ *   'medio' → 3D frugal: sin shadow-map (el repaso de sombras es ~40% de la
+ *             GPU), DPR≤1.3, sin antialias, vegetación instanciada, LOD por
+ *             distancia en los landmarks, menos fauna DOM y menos estrellas.
+ *   'bajo'  → perfil MÍNIMO de seguridad. Por defecto gama baja ni monta 3D
+ *             (cae al 2D digno); si algo la fuerza, esto la mantiene ~30 fps:
+ *             DPR 1 fijo, sin niebla, sin sombras de contacto, densidad mínima.
+ */
+const PERFIL_RENDER = {
+  alto: {
+    dpr: [1, 1.8],
+    antialias: true,
+    sombras: true, // shadow-map real: SOLO aquí
+    materialRico: true, // meshStandardMaterial (PBR); frugal usa Lambert
+    segmentosTerreno: 56,
+    flatShading: true, // des-indexa la malla: solo donde sobra GPU
+    estrellas: 900,
+    criaturas: 5, // billboards DOM de fauna decorativa
+    matasInstanciadas: false,
+    matasCada: 1, // siembra todas las matas
+    lod: false, // landmarks siempre a detalle completo
+    lodDistancia: Infinity,
+    fog: true,
+    sombrasContacto: true,
+    luzBeacon: true,
+  },
+  medio: {
+    dpr: [1, 1.3],
+    antialias: false,
+    sombras: false,
+    materialRico: false,
+    segmentosTerreno: 32,
+    flatShading: false, // geometría indexada (~1k vértices, no ~19k)
+    estrellas: 300,
+    criaturas: 3,
+    matasInstanciadas: true,
+    matasCada: 1,
+    lod: true,
+    lodDistancia: 12,
+    fog: true,
+    sombrasContacto: true,
+    luzBeacon: true,
+  },
+  bajo: {
+    dpr: 1,
+    antialias: false,
+    sombras: false,
+    materialRico: false,
+    segmentosTerreno: 20,
+    flatShading: false,
+    estrellas: 0,
+    criaturas: 0,
+    matasInstanciadas: true,
+    matasCada: 2, // una mata de cada dos
+    lod: true,
+    lodDistancia: 10,
+    fog: false, // niebla fuera: fill-rate al mínimo
+    sombrasContacto: false,
+    luzBeacon: false,
+  },
+};
+
+/** El perfil de render del tier (desconocido → frugal, nunca el caro). */
+export const perfilDeTier = (tier) => PERFIL_RENDER[tier] || PERFIL_RENDER.medio;

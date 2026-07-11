@@ -27,7 +27,7 @@ export {
   ARQUETIPOS, ARQUETIPOS_KEYS, ARQUETIPOS_3D, ARQUETIPOS_2D, esArquetipo3D,
 } from './arquetipos.js';
 export { resolverMundo, tinteDeMundo, tituloDeMundo, emojiDeMundo } from './resolverMundo.js';
-export { decidirTier, permite3D } from './deviceTier.js';
+export { decidirTier, permite3D, perfilDeTier } from './deviceTier.js';
 
 // Navegación valle ↔ mundos (three-free): la máquina de fases + el viaje DOM.
 export { useNavegacionMundos, puedeEntrarAlMundo } from './useNavegacionMundos.js';
