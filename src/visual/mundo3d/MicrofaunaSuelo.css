@@ -1,0 +1,73 @@
+/*
+ * MicrofaunaSuelo.css — chrome DOM del diorama "el suelo está vivo".
+ * Solo estilos de las etiquetas educativas (drei <Html>) y el pie de foto.
+ * Paleta cálida andina; legibilidad sobre el canvas ocre. Sin dependencias.
+ */
+
+.microfauna {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+}
+
+.microfauna__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+}
+
+/* píldora con el nombre del bicho (billboard, anclada en 3D) */
+.microfauna-nombre {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em;
+  white-space: nowrap;
+  padding: 0.16em 0.55em;
+  border-radius: 999px;
+  font: 600 13px/1.1 system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #4a2f1a;
+  background: rgba(255, 249, 234, 0.92);
+  border: 1.5px solid rgba(122, 84, 46, 0.35);
+  box-shadow: 0 2px 6px rgba(74, 47, 26, 0.18);
+  user-select: none;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+.microfauna-nombre__emoji {
+  font-size: 1.05em;
+  line-height: 1;
+}
+
+/* pie de foto: la lección en una frase */
+.microfauna-caption {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  padding: 0.35em 0.95em;
+  border-radius: 999px;
+  font: 700 15px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif;
+  letter-spacing: 0.01em;
+  color: #3a2412;
+  background: rgba(255, 246, 226, 0.9);
+  border: 1.5px solid rgba(122, 84, 46, 0.3);
+  box-shadow: 0 3px 10px rgba(74, 47, 26, 0.22);
+  backdrop-filter: blur(3px);
+  pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .microfauna-nombre {
+    color: #f4e6cf;
+    background: rgba(58, 40, 24, 0.9);
+    border-color: rgba(255, 214, 138, 0.35);
+  }
+  .microfauna-caption {
+    color: #ffe9c2;
+    background: rgba(48, 32, 18, 0.88);
+    border-color: rgba(255, 214, 138, 0.3);
+  }
+}
