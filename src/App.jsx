@@ -156,6 +156,9 @@ const VitrinaInfraestructuraMockup = lazy(() => import('./mockups/vitrina3d/Vitr
 // con su encuadre de cámara curado (camaraDioramas) + botón «Entrar» al host real.
 const VitrinaMundosMockup = lazy(() => import('./mockups/vitrina3d/VitrinaMundos'));
 const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra'));
+// El camino del agua en la finca: nacimiento → canal → reservorio → riego →
+// suelo, con el ciclo (vapor/nube/lluvia) cerrándose. Didáctico, hora dorada.
+const MundoAguaMockup = lazy(() => import('./mockups/MundoAgua3D'));
 // 3D: el valle DE NOCHE — luna, cielo estrellado andino, luciérnagas, grillos
 // sintetizados (0 KB, opt-in) y Angelita dormida. La finca en reposo.
 const ValleNoche3DMockup = lazy(() => import('./mockups/ValleNoche3D'));
@@ -164,6 +167,9 @@ const ValleNoche3DMockup = lazy(() => import('./mockups/ValleNoche3D'));
 // policultivo. Estetica Cuphead andina (linea que respira, squash & stretch),
 // SVG puro, offline, sin gamificacion toxica.
 const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
+// 3D: el PÁRAMO altoandino — el ecosistema de la niebla (frailejones, musgo,
+// quenuas, aves) y el NACIMIENTO del agua. Didáctico: la fábrica de agua.
+const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -558,8 +564,10 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/vitrina-infra': 'mockup_vitrina_infra',
   'mockups/vitrina-mundos': 'mockup_vitrina_mundos',
   'mockups/sierra-global': 'mockup_sierra_global',
+  'mockups/mundo-agua-3d': 'mockup_mundo_agua_3d',
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
+  'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1780,6 +1788,16 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_mundo_agua_3d':
+        // El camino del agua 3D: recorre el agua de la finca — nacimiento
+        // protegido, quebrada viva (caudal ecológico + aviso de residuos),
+        // bocatoma y canal, reservorio + cosecha de lluvia, riego por goteo,
+        // filtración al suelo (corte de perfil) y el ciclo cerrándose en la
+        // nube. Ruta #/mockups/mundo-agua-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El camino del agua 3D">
+              <MundoAguaMockup onBack={() => navigate('dashboard')} />
       case 'mockup_valle_noche_3d':
         // El valle de noche: variante nocturna mágica del valle — luna plata,
         // cielo estrellado andino que titila, luciérnagas del framework,
@@ -1804,6 +1822,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Juego La milpa">
               <JuegoLaMilpaMockup onBack={() => navigate('dashboard')} />
+      case 'mockup_mundo_paramo_3d':
+        // El páramo altoandino: el ecosistema de la niebla en hora dorada —
+        // frailejones (Espeletia), cojines de musgo, pajonal, quenuas con la
+        // niebla enganchada, aves de páramo y el NACIMIENTO del agua. Didáctico
+        // sobre conservación: el páramo como fábrica de agua (botón «cómo nace
+        // el agua»). Ruta #/mockups/mundo-paramo-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El páramo altoandino">
+              <MundoParamo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
