@@ -21,6 +21,7 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
+import { CRUCE_ATRAPA_MS } from '../../creatures/AbejaTransicion.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
 import { reaccionDeFinca } from './reaccionFinca.js';
 import useHaptics from '../useHaptics.js';
@@ -28,6 +29,17 @@ import useHaptics from '../useHaptics.js';
 /* Vuelo neutro: cuando la escena aún no pasa `estadoFinca` (contrato viejo),
    la coreografía se comporta EXACTO como antes (todos los multiplicadores en 1). */
 const VUELO_NEUTRO = { altura: 1, velocidad: 1, vagar: 1, tiembla: 0 };
+
+/* EL CRUCE 2D→3D (AbejaTransicion): el mesh nace OCULTO, alto sobre el foco y
+   corrido hacia la cámara (arriba-centro de la pantalla — donde la Angelita 2D
+   del overlay se clava y desaparece), espera el instante del ATRAPE y entonces
+   aparece y baja en PICADA a su percha. Misma constante de tiempo que el
+   overlay = una sola abeja cruzando de capa. */
+const CRUCE_ATRAPA_S = CRUCE_ATRAPA_MS / 1000;
+const CRUCE_PICADA_S = 1.6; // ventana post-atrape con lerp reforzado (el clavado)
+const CRUCE_EMPUJE = 2.6; // refuerzo del lerp durante la picada
+const CRUCE_ALTO = 2.6; // cuánto más alto nace sobre su percha
+const CRUCE_CERCA = 2.2; // cuánto más cerca de la cámara (z) nace
 
 /**
  * Devuelve `{ ref, caraRef, sombraRef }` para colgar del `<group>` de la abeja,
@@ -44,13 +56,21 @@ const VUELO_NEUTRO = { altura: 1, velocidad: 1, vagar: 1, tiembla: 0 };
  * @param {object}  [opts.vuelo]  modificadores de reaccionDeFinca: mojada vuela
  *   más bajo/lento, sed baja a buscar agua, comiendo tiembla mordisqueando.
  *   `{ altura, velocidad, vagar, tiembla }` — multiplicadores (1 = vuelo normal).
+ * @param {boolean} [opts.cruce=false]  el CRUCE 2D→3D: nace oculta, alta y
+ *   cerca de la cámara, aparece en CRUCE_ATRAPA_MS (cuando la 2D del overlay
+ *   se apaga) y baja en picada a su percha. `visRef` (devuelto) debe colgarse
+ *   del billboard DOM para que la ocultación llegue al <Html> (drei no hereda
+ *   la visibilidad del group al portal DOM).
  */
 export function useEntradaAbeja(foco, {
   entrando = true, energia = 1, reducedMotion = false, piso = 0, vuelo = VUELO_NEUTRO,
+  cruce = false,
 } = {}) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const sombraRef = useRef(null);
+  const visRef = useRef(null);
+  const nacioEn = useRef(null); // reloj del primer frame (ancla del cruce)
   const prevX = useRef(foco.x);
   // Háptica de "posarse" (DR-3D-HAPTICA): UNA sola vez por foco, al cruzar el
   // umbral de llegada. El foco solo cambia por tap del usuario (hotspot) o al
