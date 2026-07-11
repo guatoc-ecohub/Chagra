@@ -12,6 +12,7 @@
  */
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
+import { Fauna } from './FaunaEscena.jsx';
 
 const ANCHO = 4.4;
 const PROF = 2.2;
@@ -59,7 +60,7 @@ function Hifa({ pos, giro }) {
   );
 }
 
-function Diorama({ params }) {
+function Diorama({ params, reducedMotion }) {
   const vida = clamp01(params?.vida);
 
   const { bloques, bichos, total } = useMemo(() => {
@@ -108,6 +109,15 @@ function Diorama({ params }) {
         if (v.tipo === 'hifa') return <Hifa key={v.key} pos={v.pos} giro={v.giro} />;
         return <Raiz key={v.key} pos={[v.pos[0], v.pos[1], v.pos[2]]} largo={v.largo} />;
       })}
+      {/* la fauna de la librería, contra la cara cortada: el escarabajo en la
+          hojarasca (superficie) y una lombriz asomando en el subsuelo */}
+      <Fauna
+        reducedMotion={reducedMotion}
+        items={[
+          { tipo: 'escarabajo', base: [0.9, total + 0.16, PROF / 2 - 0.05], patron: 'reptar', size: 30, fase: 0.6 },
+          { tipo: 'lombriz', base: [-0.7, total * 0.5, PROF / 2 + 0.02], patron: 'reptar', size: 26, fase: 2.2 },
+        ]}
+      />
     </group>
   );
 }
@@ -121,7 +131,7 @@ export default function EscenaCutaway(props) {
       cielo={cielo}
       entrada={{ ...props.entrada, centro: [0, alto * 0.2, 0.6] }}
     >
-      <Diorama params={props.params} />
+      <Diorama params={props.params} reducedMotion={props.reducedMotion} />
     </EscenaBase3D>
   );
 }

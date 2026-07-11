@@ -18,6 +18,16 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import EscenaBase3D from './EscenaBase3D.jsx';
+import { Fauna } from './FaunaEscena.jsx';
+
+/* La vida del agua, por criterio ecológico: mariposas revoloteando sobre la
+   quebrada, un colibrí en las flores de la ribera (junto a la ronda de monte),
+   y otra mariposa polinizando la huerta regada. Anclada a la curva del agua. */
+const FAUNA_FLUJO = [
+  { tipo: 'colibri', base: [-1.35, 1.75, 0.7], patron: 'revoloteo', size: 30, fase: 0.4 },
+  { tipo: 'mariposa', base: [-0.15, 0.98, 0.72], patron: 'revoloteo', size: 30, fase: 1.6 },
+  { tipo: 'mariposa', base: [2.1, 0.1, -0.15], patron: 'revoloteo', size: 28, fase: 3.0 },
+];
 
 const CURVA_DEFAULT = [
   [-1.8, 2.2, 0.4], [-0.9, 1.4, 0.1], [0, 0.7, -0.2], [0.7, 0.1, 0.1], [1.4, -0.2, 0.5],
@@ -233,6 +243,8 @@ function Diorama({ params, tinte, reducedMotion }) {
           color={color}
         />
       )}
+      {/* la vida que vive del agua: mariposas y un colibrí de ribera */}
+      <Fauna items={FAUNA_FLUJO} reducedMotion={reducedMotion} />
     </group>
   );
 }
