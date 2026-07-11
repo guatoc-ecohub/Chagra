@@ -232,16 +232,43 @@ export const MUNDO = {
     entrada: {},
   },
 
-  // ── NULL: sin escena propia → la tarjeta navega directo al 2D real ───────
+  // ── SÍ-3D nuevo: la ÚNICA metáfora de escena nueva del batch ─────────────
 
-  // ⛅ EL CLIMA — YA es 3D ambiental (el cielo del valle); su diorama sería
-  //    redundante (DR §3.2). escena:null → va directo al boletín 2D.
+  // ⛅ EL CLIMA — la BÓVEDA del cielo bajo el que vive la finca (arquetipo nuevo
+  //    `boveda`, README §case-3). Verdad andina, por DATOS: la HORA del día (el
+  //    sol que arquea) + la temporada BIMODAL (dos lluvias / dos secas, NO cuatro
+  //    estaciones europeas) + la niebla del páramo que el frailejón vuelve agua +
+  //    la montaña de pisos térmicos con su casquete de hielo y la línea ÁMBAR de
+  //    hasta dónde llegaba (Colombia perdió ~90% del hielo; los nevados se apagan
+  //    hacia 2040–2050). NOTA DE CONCIENCIA, esperanza no colapso: el páramo es la
+  //    fábrica de agua. En equipo humilde cae al gemelo 2D (mirror → cielo).
   clima: {
-    escena: null,
+    escena: 'boveda',
     valle: { tipo: 'veleta', pos: [-3.8, 0, -4.8], escala: 1 },
     ambiental: true,
-    ruta2d: { view: 'hoy_finca' },
-    entrada: { narra: 'clima' },
+    params: {
+      hora: 0.62,           // media tarde andina (0 amanece · 0.5 mediodía · 1 anochece)
+      temporada: 'lluvia',  // régimen BIMODAL andino: dos lluvias / dos secas
+      niebla: 0.6,          // niebla del páramo: el frailejón peina el agua de la nube
+      // La montaña en cuatro pisos térmicos (misma paleta del mundo #4).
+      pisos: [
+        { nombre: 'cálido', color: '#c7a24b', h: 0.95, r0: 2.4, r1: 1.95 },
+        { nombre: 'templado', color: '#8fae55', h: 0.9, r1: 1.42 },
+        { nombre: 'frío', color: '#6f9a72', h: 0.85, r1: 0.9 },
+        { nombre: 'páramo', color: '#9fb6bf', h: 0.8, r1: 0.42 },
+      ],
+      // El hielo de hoy + la línea de hasta dónde llegaba (retroceso). Ámbar de
+      // "cuídelo", jamás rojo de catástrofe.
+      glaciar: { nieve: 0.32, retroceso: 0.7 },
+    },
+    hotspots: [
+      { id: 'hoy', pos: [2.7, 3.4, 0.6], emoji: '⛅', label: 'El tiempo hoy', view: 'hoy_finca' },
+      { id: 'almanaque', pos: [0, 1.7, 1.9], emoji: '🗓️', label: 'Almanaque de la finca', view: 'almanaque' },
+      { id: 'lluvia', pos: [-2.7, 3.1, 0.5], emoji: '🌧️', label: 'Cuándo llueve', view: 'calendario_finca' },
+    ],
+    entrada: { zoom: 7.5, narra: 'clima' },
+    // Gemelo 2D digno (mirror → motivo `boveda`): mismo cielo, mismos hotspots.
+    fallback2d: { escena: 'mirror' },
   },
 };
 

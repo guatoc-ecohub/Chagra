@@ -8,7 +8,7 @@
  *   · el viaje (Angelita guía) → la escena del mundo con su miga "‹ El valle";
  *   · una puerta DENTRO del mundo cuenta a qué pantalla real lleva;
  *   · "Volver al valle" → viaje en reversa → el valle otra vez;
- *   · un mundo sin escena montable (clima) degrada elegante a "pronto".
+ *   · el clima ya es un mundo montable (bóveda): se entra y se vuelve igual.
  */
 import React from 'react';
 import { render, screen, fireEvent, cleanup, act } from '@testing-library/react';
@@ -74,11 +74,19 @@ describe('entrada-3d — navegable de punta a punta (valle ↔ mundos)', () => {
     expect(container.querySelector('.valle-mundo')).not.toBeInTheDocument();
   });
 
-  test('mundo sin escena montable (el clima) degrada elegante a "pronto"', () => {
-    render(<EntradaValle3D onBack={() => {}} />);
+  test('el clima ya es un mundo montable (bóveda): se entra y se vuelve', () => {
+    vi.useFakeTimers();
+    const { container } = render(<EntradaValle3D onBack={() => {}} />);
+
     fireEvent.click(screen.getByRole('button', { name: /Viajar al mundo El clima/ }));
-    // sin puerta de entrada: aviso sobrio, nunca un botón muerto
-    expect(screen.queryByRole('button', { name: 'Entrar a este mundo' })).not.toBeInTheDocument();
-    expect(screen.getByText(/abre pronto su propia puerta/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Entrar a este mundo' }));
+    cumplirViaje();
+    // en jsdom cae a su gemelo 2D digno (three-free): el cielo dibujado
+    expect(container.querySelector('.valle-mundo[data-mundo="clima"]')).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: 'Usted está aquí' })).toHaveTextContent('El clima');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Volver al valle' }));
+    cumplirViaje();
+    expect(container.querySelector('.valle-mundo')).not.toBeInTheDocument();
   });
 });

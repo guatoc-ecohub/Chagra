@@ -12,7 +12,7 @@ afterEach(() => cleanup());
 
 describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
   test('arquetipos: 5 dioramas 3D + arquetipos 2D de primera clase', () => {
-    expect(ARQUETIPOS_3D.sort()).toEqual(['cutaway', 'estratos', 'flujo', 'recinto', 'valle']);
+    expect(ARQUETIPOS_3D.sort()).toEqual(['boveda', 'cutaway', 'estratos', 'flujo', 'recinto', 'valle']);
     ['lamina', 'infografia', 'ficha', 'mirror', 'valle2d'].forEach((k) => {
       expect(ARQUETIPOS_2D).toContain(k);
       expect(ARQUETIPOS[k].dim).toBe('2d');
@@ -36,10 +36,15 @@ describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
     expect(r.escena).toBe('infografia');
   });
 
-  test('escena:null salta directo a la vista 2D real (clima → hoy_finca)', () => {
-    const r = resolverMundo('clima', 'alto');
-    expect(r.modo).toBe('ruta');
-    expect(r.ruta.view).toBe('hoy_finca');
+  test('el clima sube al arquetipo 3D nuevo `boveda` (y degrada a su espejo 2D)', () => {
+    const alto = resolverMundo('clima', 'alto');
+    expect(alto.modo).toBe('3d');
+    expect(alto.escena).toBe('boveda');
+    // equipo humilde → cae al espejo 2D (mirror con motivo `boveda`)
+    const bajo = resolverMundo('clima', 'bajo');
+    expect(bajo.modo).toBe('2d');
+    expect(bajo.escena).toBe('mirror');
+    expect(bajo.motivo).toBe('boveda');
   });
 
   test('todo hotspot.view existe (reachability básica del registro)', () => {

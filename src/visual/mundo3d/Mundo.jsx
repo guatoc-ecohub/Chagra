@@ -26,6 +26,7 @@ const ESCENAS_3D = {
   recinto: lazy(() => import('./escenas/EscenaRecinto.jsx')),
   estratos: lazy(() => import('./escenas/EscenaEstratos.jsx')),
   valle: lazy(() => import('./escenas/EscenaValle.jsx')),
+  boveda: lazy(() => import('./escenas/EscenaBoveda.jsx')),
 };
 
 function MundoCargando({ tinte }) {

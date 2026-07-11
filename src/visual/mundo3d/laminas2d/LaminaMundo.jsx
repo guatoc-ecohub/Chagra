@@ -144,7 +144,71 @@ function FondoEstratos({ params, acento }) {
   );
 }
 
-const FONDOS = { cutaway: FondoCutaway, flujo: FondoFlujo, recinto: FondoRecinto, estratos: FondoEstratos };
+/* El espejo 2D de la BÓVEDA: el cielo de la finca con su sol, una nube (y
+   lluvia en temporada), y la montaña de pisos térmicos con su casquete y la
+   línea ámbar del hielo que fue (cuidado, no alarma). Lee los mismos `params`
+   que el diorama 3D. */
+function FondoBoveda({ params, acento }) {
+  const temporada = params?.temporada ?? 'lluvia';
+  const niebla = Math.max(0, Math.min(1, params?.niebla ?? 0.6));
+  const pisos = params?.pisos || [
+    { color: '#c7a24b' }, { color: '#8fae55' }, { color: '#6f9a72' }, { color: '#9fb6bf' },
+  ];
+  // pico central: bandas de piso apiladas como un triángulo escalonado
+  const bandas = pisos.map((p, i) => {
+    const n = pisos.length;
+    const yTop = 176 - ((i + 1) / n) * 120;
+    const yBot = 176 - (i / n) * 120;
+    const half = 96 * (1 - i / n) + 10;
+    return { key: i, color: p.color, yTop, yBot, half };
+  });
+  return (
+    <g>
+      {/* cielo con gradiente sencillo día andino */}
+      <defs>
+        <linearGradient id="mb-cielo" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#6f9cc9" />
+          <stop offset="100%" stopColor="#dcecf5" />
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="300" height="200" fill="url(#mb-cielo)" />
+      {/* el sol con su resplandor */}
+      <circle cx="228" cy="48" r="26" fill="#ffd27a" opacity="0.35" />
+      <circle cx="228" cy="48" r="15" fill="#ffe6a3" />
+      {/* la luna, quieta en su rincón */}
+      <circle cx="58" cy="40" r="9" fill="#eef1f6" opacity="0.85" />
+      {/* la montaña de pisos térmicos */}
+      {bandas.map((b) => (
+        <polygon
+          key={b.key}
+          points={`${150 - b.half},${b.yBot} ${150 + b.half},${b.yBot} ${150 + b.half * 0.72},${b.yTop} ${150 - b.half * 0.72},${b.yTop}`}
+          fill={b.color}
+        />
+      ))}
+      {/* casquete de hielo + línea ámbar de hasta dónde llegaba (retroceso) */}
+      <polygon points="140,60 160,60 150,44" fill="#eef4f7" />
+      <path d="M126,64 Q150,58 174,64" stroke="#d9a13b" strokeWidth="2" fill="none" strokeDasharray="4 3" opacity="0.8" />
+      {/* niebla del páramo (el frailejón peina el agua de la nube) */}
+      {niebla > 0.2 && (
+        <ellipse cx="150" cy="74" rx={26 + niebla * 16} ry="7" fill="#eef4f6" opacity="0.5" />
+      )}
+      {/* una nube; en lluvia, aguacero suave debajo */}
+      <g>
+        <ellipse cx="86" cy="70" rx="26" ry="13" fill={temporada === 'lluvia' ? '#cfd6dd' : '#f7fbff'} />
+        <ellipse cx="104" cy="66" rx="18" ry="12" fill={temporada === 'lluvia' ? '#cfd6dd' : '#f7fbff'} />
+        {temporada === 'lluvia' &&
+          [0, 1, 2, 3].map((i) => (
+            <line key={i} x1={72 + i * 12} y1="84" x2={69 + i * 12} y2="98" stroke="#bcd6e6" strokeWidth="2" opacity="0.75" strokeLinecap="round" />
+          ))}
+      </g>
+      <rect x="0" y="0" width="300" height="200" fill="none" stroke={acento} strokeWidth="2" opacity="0.35" />
+    </g>
+  );
+}
+
+const FONDOS = {
+  cutaway: FondoCutaway, flujo: FondoFlujo, recinto: FondoRecinto, estratos: FondoEstratos, boveda: FondoBoveda,
+};
 
 export default function LaminaMundo({ params, hotspots = [], tinte, onHotspot, motivo = 'cutaway', titulo }) {
   const acento = (tinte && tinte[0]) || '#3f8f4e';

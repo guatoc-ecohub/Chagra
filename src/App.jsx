@@ -83,6 +83,9 @@ const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
 // (src/visual/mundo3d) con device-tiering real. El 3D va perezoso (vendor-three).
 const Mundo3DAguaMockup = lazy(() => import('./mockups/Mundo3DAgua'));
 const Mundo3DSueloMockup = lazy(() => import('./mockups/Mundo3DSuelo'));
+// 3D: "El mundo del clima" — monta <Mundo mundoId="clima"> del framework: la
+// bóveda del cielo (arquetipo nuevo `boveda`). El 3D va perezoso (vendor-three).
+const Mundo3DClimaMockup = lazy(() => import('./mockups/Mundo3DClima'));
 // Voz: superficies de voz con forma viva (iris que reacciona al volumen).
 const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
 const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
@@ -467,6 +470,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/entrada-3d': 'mockup_entrada_3d',
   'mockups/mundo3d-agua': 'mockup_mundo3d_agua',
   'mockups/mundo3d-suelo': 'mockup_mundo3d_suelo',
+  'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
   'mockups/voz-con-forma': 'mockup_voz_con_forma',
   'mockups/conversacion-voz': 'mockup_conversacion_voz',
   'mockups/ensena-dibujando': 'mockup_ensena_dibujando',
@@ -1338,6 +1342,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo del suelo">
               <Mundo3DSueloMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_clima':
+        // Vitrina pública del MUNDO DEL CLIMA: monta <Mundo mundoId="clima"> del
+        // framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-clima, sin auth. La bóveda del cielo de la finca:
+        // hora del día + temporada bimodal andina + niebla del páramo + la
+        // montaña de pisos con el hielo que se va (conciencia, no alarma).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del clima">
+              <Mundo3DClimaMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
