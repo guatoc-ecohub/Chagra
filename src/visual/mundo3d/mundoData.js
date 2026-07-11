@@ -86,19 +86,30 @@ export const MUNDO = {
 
   // 🐔 LOS ANIMALES — el corral y su CICLO CERRADO del abono (recinto): animal →
   //    estiércol → compost → suelo → planta → animal, un anillo virtuoso. Gated
-  //    por perfil (como hoy). Animales reales de finca andina, DIFERENCIADOS por
-  //    `tipo` (gallina ponedora de clima frío, vaca de cuerpo capsular, oveja de
-  //    vellón): pocos y bien espaciados (más aire, no rebaño), poblado de verdad.
+  //    por perfil (como hoy). El corral es ESPEJO del dato (FASE 1 §5a+§5c):
+  //    cada animal REAL con su nombre, raza, tamaño y estado — la especie da la
+  //    silueta, el tamaño la escala, la raza el pelaje, el estado se ve (preñada
+  //    con señal, vendido como huella translúcida). Interfaz para cablear el
+  //    hato real de farmOS aquí mismo (misma forma; `pos` es opcional — sin él,
+  //    los sitios salen solos). MUESTRA de 12 mientras llega el dato vivo:
   animales: {
     escena: 'recinto',
     valle: { tipo: 'corral', pos: [-4.6, 0, -1.8], escala: 1 },
     gate: 'animales',
     params: {
       animales: [
-        { tipo: 'vaca', color: '#c9a06a', pos: [-1.05, 0, -0.4] },
-        { tipo: 'gallina', color: '#e7d9c2', pos: [1.1, 0, 0.5] },
-        { tipo: 'gallina', color: '#d8b58a', pos: [0.7, 0, 1.05] },
-        { tipo: 'oveja', color: '#efe7d8', pos: [-0.35, 0, 1.15] },
+        { especie: 'cerdo', nombre: 'Petunia', raza: 'zungo', tamano: 'grande', estado: 'preñada' },
+        { especie: 'cerdo', nombre: 'Canelo', raza: 'duroc', tamano: 'mediano', estado: 'sano' },
+        { especie: 'cerdo', nombre: 'Rosita', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
+        { especie: 'cerdo', nombre: 'Manchas', raza: 'sanpedreño', tamano: 'pequeño', estado: 'sano' },
+        { especie: 'cerdo', nombre: 'Tocineta', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
+        { especie: 'vaca', nombre: 'Lola', raza: 'normando', tamano: 'grande', estado: 'sano' },
+        { especie: 'vaca', nombre: 'Camilo', raza: 'cebú', tamano: 'grande', estado: 'vendido' },
+        { especie: 'gallina', nombre: 'Turuleca', raza: 'campesina', tamano: 'pequeño', estado: 'sano' },
+        { especie: 'gallina', nombre: 'Canela', raza: 'campesina', tamano: 'mediano', estado: 'sano' },
+        { especie: 'gallina', nombre: 'Carlota', raza: 'ponedora', tamano: 'mediano', estado: 'sano' },
+        { especie: 'oveja', nombre: 'Nube', raza: 'criolla', tamano: 'mediano', estado: 'sano' },
+        { especie: 'oveja', nombre: 'Copito', raza: 'criolla', tamano: 'pequeño', estado: 'sano' },
       ],
     },
     hotspots: [
