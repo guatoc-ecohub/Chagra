@@ -20,7 +20,8 @@
  * español de Colombia, en "usted".
  */
 import { useMemo, useState } from 'react';
-import Mundo, { MUNDO, decidirTier, permite3D } from '../visual/mundo3d/index.js';
+import Mundo, { decidirTier, permite3D } from '../visual/mundo3d/index.js';
+import AcompananteMundo, { useAcompanante } from './valle/AcompananteMundo.jsx';
 import './Mundo3DSuelo.css';
 
 const TINTE = ['#8a5a38', '#f0e2c8'];
@@ -49,15 +50,10 @@ export default function Mundo3DSuelo() {
   const [ver2d, setVer2d] = useState(false);
   const tier = ver2d ? 'bajo' : decision.tier;
 
-  // En la vitrina (sin sesión) un punto del corte no navega: cuenta a qué
-  // pantalla real de la app lleva esa puerta.
-  const [puerta, setPuerta] = useState(null);
-  const onHotspot = (view, data) => {
-    const hs = (MUNDO.suelo.hotspots || []).find(
-      (h) => h.view === view && (h.data === data || (!h.data && !data)),
-    ) || (MUNDO.suelo.hotspots || []).find((h) => h.view === view);
-    setPuerta({ label: hs?.label || view, view });
-  };
+  // La capa acompañante (BUG P1 "vitrinas mudas"): Angelita narra el mundo al
+  // entrar y acusa las puertas tocadas — voz + burbuja de texto; si el equipo
+  // no trae voz o está apagada, la burbuja ES la voz. Nunca mudo.
+  const acompanante = useAcompanante('suelo');
 
   return (
     <main
@@ -75,15 +71,18 @@ export default function Mundo3DSuelo() {
       </header>
 
       <section className="m3ds__escena" aria-label="El corte del suelo vivo de la finca">
-        <Mundo
-          mundoId="suelo"
-          tier={tier}
-          reducedMotion={reducedMotion}
-          onHotspot={onHotspot}
-          onSalir={null}
-          animo="sereno"
-          energia={0.85}
-        />
+        <AcompananteMundo mundoId="suelo" acompanante={acompanante}>
+          <Mundo
+            mundoId="suelo"
+            tier={tier}
+            reducedMotion={reducedMotion}
+            onHotspot={acompanante.decirPuerta}
+            onSalir={null}
+            animo="sereno"
+            energia={0.85}
+            hablando={acompanante.hablando}
+          />
+        </AcompananteMundo>
         <div className="m3ds__barra">
           <p className="m3ds__tier">
             {tier === 'bajo'
@@ -100,11 +99,7 @@ export default function Mundo3DSuelo() {
             </button>
           )}
         </div>
-        <p className="m3ds__nota" role="status" aria-live="polite">
-          {puerta
-            ? `«${puerta.label}» es una puerta real: dentro de la app abre la pantalla «${puerta.view}».`
-            : 'Toque un punto del corte para ver a dónde lo lleva.'}
-        </p>
+        <p className="m3ds__nota">Toque un punto del corte para ver a dónde lo lleva.</p>
       </section>
 
       <section className="m3ds__leyenda" aria-label="El suelo, capa por capa">

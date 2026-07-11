@@ -1,0 +1,141 @@
+/*
+ * acompananteMundo.css — la capa acompañante de las vitrinas 3D (BUG P1
+ * "vitrinas mudas"): la burbuja de voz de Angelita sobre la escena + la
+ * barra del agente debajo del marco. Autocontenida (sin fuentes/imágenes
+ * externas), móvil-first desde 320px. Solo opacity/transform animables;
+ * reduced-motion las apaga.
+ */
+
+.acomp {
+  --acomp-tinte: #3f8f4e;
+}
+
+/* El marco: ancla la burbuja sobre el <Mundo> que envuelve. */
+.acomp__marco {
+  position: relative;
+}
+
+/* ── La burbuja de Angelita (su voz escrita; la abeja vive en la escena) ── */
+.acomp__burbuja {
+  position: absolute;
+  left: 0.6rem;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  z-index: 6;
+  margin: 0 auto;
+  max-width: 30rem;
+  width: fit-content;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.9rem;
+  /* fallback primero: si el navegador no trae color-mix, queda el borde suave */
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-color: color-mix(in srgb, var(--acomp-tinte) 45%, transparent);
+  background: rgba(20, 28, 24, 0.82);
+  color: #f4efe2;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  pointer-events: none; /* nunca estorba el gesto de girar el diorama */
+  animation: acomp-burbuja-in 0.4s ease both;
+}
+
+@keyframes acomp-burbuja-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── La barra del agente: presente bajo el marco, como en el shell ── */
+.acomp__agente {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.9rem;
+  background: rgba(20, 28, 24, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-color: color-mix(in srgb, var(--acomp-tinte) 40%, transparent);
+}
+
+.acomp__pregunte {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f4efe2;
+  font-size: 0.9rem;
+  text-align: left;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.acomp__pregunte:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.acomp__punto {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--acomp-tinte);
+  box-shadow: 0 0 8px var(--acomp-tinte);
+  animation: acomp-punto 2.4s ease-in-out infinite;
+}
+
+@keyframes acomp-punto {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+.acomp__ctrls {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.acomp__btn {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.35);
+  color: #f4efe2;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.acomp__btn:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+.acomp__btn:disabled {
+  opacity: 0.8;
+  cursor: default;
+}
+.acomp__voz.on {
+  border-color: #7dffbe;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acomp__burbuja,
+  .acomp__punto {
+    animation: none !important;
+  }
+}

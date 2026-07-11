@@ -20,7 +20,8 @@
  * español de Colombia, en "usted".
  */
 import { useMemo, useState } from 'react';
-import Mundo, { MUNDO, decidirTier, permite3D } from '../visual/mundo3d/index.js';
+import Mundo, { decidirTier, permite3D } from '../visual/mundo3d/index.js';
+import AcompananteMundo, { useAcompanante } from './valle/AcompananteMundo.jsx';
 import './Mundo3DClima.css';
 
 const TINTE = ['#4c7fa0', '#dce9f2'];
@@ -50,16 +51,10 @@ export default function Mundo3DClima() {
   const [ver2d, setVer2d] = useState(false);
   const tier = ver2d ? 'bajo' : decision.tier;
 
-  // En la vitrina (sin sesión) un punto del cielo no navega: cuenta a qué
-  // pantalla real de la app lleva esa puerta.
-  const [puerta, setPuerta] = useState(null);
-  const onHotspot = (view, data) => {
-    const hs =
-      (MUNDO.clima.hotspots || []).find(
-        (h) => h.view === view && (h.data === data || (!h.data && !data)),
-      ) || (MUNDO.clima.hotspots || []).find((h) => h.view === view);
-    setPuerta({ label: hs?.label || view, view });
-  };
+  // La capa acompañante (BUG P1 "vitrinas mudas"): Angelita narra el mundo al
+  // entrar y acusa las puertas tocadas — voz + burbuja de texto; si el equipo
+  // no trae voz o está apagada, la burbuja ES la voz. Nunca mudo.
+  const acompanante = useAcompanante('clima');
 
   return (
     <main className="m3dc" style={{ '--m3dc-a': TINTE[0], '--m3dc-b': TINTE[1] }}>
@@ -74,15 +69,18 @@ export default function Mundo3DClima() {
       </header>
 
       <section className="m3dc__escena" aria-label="El cielo de la finca">
-        <Mundo
-          mundoId="clima"
-          tier={tier}
-          reducedMotion={reducedMotion}
-          onHotspot={onHotspot}
-          onSalir={null}
-          animo="sereno"
-          energia={0.85}
-        />
+        <AcompananteMundo mundoId="clima" acompanante={acompanante}>
+          <Mundo
+            mundoId="clima"
+            tier={tier}
+            reducedMotion={reducedMotion}
+            onHotspot={acompanante.decirPuerta}
+            onSalir={null}
+            animo="sereno"
+            energia={0.85}
+            hablando={acompanante.hablando}
+          />
+        </AcompananteMundo>
         <div className="m3dc__barra">
           <p className="m3dc__tier">
             {tier === 'bajo'
@@ -99,11 +97,7 @@ export default function Mundo3DClima() {
             </button>
           )}
         </div>
-        <p className="m3dc__nota" role="status" aria-live="polite">
-          {puerta
-            ? `«${puerta.label}» es una puerta real: dentro de la app abre la pantalla «${puerta.view}».`
-            : 'Toque un punto del cielo para ver a dónde lo lleva.'}
-        </p>
+        <p className="m3dc__nota">Toque un punto del cielo para ver a dónde lo lleva.</p>
       </section>
 
       <section className="m3dc__leyenda" aria-label="El cielo, punto por punto">
