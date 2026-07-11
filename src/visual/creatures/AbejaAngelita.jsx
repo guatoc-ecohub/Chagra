@@ -95,6 +95,11 @@ export function AbejaAngelita({
   //    (ámbar con contorno + chumbe), bracitos, cabeza (ojos/cachetes/sonrisa/
   //    antenas), probóscide, gotas. `.crt-body` es el nodo que squashea (boil
   //    idle + estados reactivos, que lo pisan por especificidad).
+  //    ENCIMA van DOS wrappers de VIDA con períodos co-primos (6.3s / 9.7s):
+  //    `rh-travieso` (saltitos de lado, wobble, double-take) y `rh-antic` (la
+  //    vuelta de campana Miss-Minutes con anticipación y overshoot). Tres capas
+  //    de transform que nunca caen en el mismo compás = idle impredecible, vivo.
+  //    El CSS los apaga con RM, tier bajo, estados reactivos y ánimo bajito.
   const body = (
     <g className={`crt-body${vivo ? ' rh-boil' : ''}`} filter={`url(#${glow})`}>
       {/* aura viva */}
@@ -128,7 +133,7 @@ export function AbejaAngelita({
       {/* cabeza clara con contorno */}
       <circle cx="8.6" cy="-1.0" r="4.4" fill="#ffd76a" stroke={RH_INK} strokeWidth="1.2" />
       {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos) */}
-      <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.15 }, { cx: 6.9, cy: 0.3, r: 0.85 }]} />
+      <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.15 }, { cx: 6.9, cy: 0.3, r: 0.85 }]} vivo={vivo} />
       <Sonrisa cx={8.9} cy={1.4} w={2.8} prof={1.1} />
       <OjosRubber
         ojos={[{ cx: 10.1, cy: -1.9, r: 1.95 }, { cx: 7.4, cy: -2.2, r: 1.45 }]}
@@ -143,6 +148,13 @@ export function AbejaAngelita({
       {gotas}
     </g>
   );
+  // Las capas de antics envuelven al cuerpo SOLO cuando está vivo (animated):
+  // nodos aparte para que sus transforms no pisen el boil de `.crt-body`.
+  const cuerpoVivo = vivo ? (
+    <g className="rh-antic">
+      <g className="rh-travieso">{body}</g>
+    </g>
+  ) : body;
 
   // data-estado agrupa la reacción para el CSS (brillo mojado, jadeo, mordisco).
   const estadoAttrs = {
@@ -159,7 +171,7 @@ export function AbejaAngelita({
     return (
       <g className={className} {...estadoAttrs}>
         {defs}
-        {body}
+        {cuerpoVivo}
       </g>
     );
   }
@@ -168,7 +180,7 @@ export function AbejaAngelita({
       role="img" aria-label={title} {...estadoAttrs} {...rest}>
       <title>{title}</title>
       {defs}
-      {body}
+      {cuerpoVivo}
     </svg>
   );
 }
