@@ -73,6 +73,8 @@ const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
 // Vitrina pública de la librería visual reutilizable (`src/visual/`). Ruta
 // #/mockups/visual-lib, resuelta ANTES del check de sesión (no requiere auth).
 const VisualLib = lazy(() => import('./mockups/VisualLib'));
+// #/mockups/efectos-2d — vitrina de los gemelos 2D (reemplazo de los dioramas 3D).
+const Efectos2D = lazy(() => import('./mockups/Efectos2D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -425,6 +427,7 @@ const LoadingFallback = ({ view = null }) => {
 // #onboarding-piloto. El hash llega ya normalizado (sin `#`/`#/`).
 const MOCKUP_HASH_ROUTES = {
   'mockups/visual-lib': 'mockup_visual_lib',
+  'mockups/efectos-2d': 'mockup_efectos_2d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -793,7 +796,7 @@ export default function App() {
       clearTimeout(bootSync);
     };
   }, []);
-  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' });
+  useGlobalKeyboardShortcuts({ enabled: currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'mockup_efectos_2d' });
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
@@ -1121,7 +1124,7 @@ export default function App() {
   // loading. Body className toggled según currentView. Estilos en
   // src/index.css clase .app-bg-biodiversidad (nombre histórico).
   useEffect(() => {
-    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib';
+    const showBg = currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'mockup_efectos_2d';
     if (showBg) {
       document.body.classList.add('app-bg-biodiversidad');
     } else {
@@ -1238,6 +1241,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Librería visual">
               <VisualLib />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_efectos_2d':
+        // Vitrina pública de los GEMELOS 2D del framework de mundos. Ruta
+        // #/mockups/efectos-2d, sin auth: los cuatro reemplazos 2D de los
+        // dioramas 3D, con datos reales y su regla de activación.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Efectos 2D">
+              <Efectos2D />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2541,9 +2555,10 @@ export default function App() {
     currentView === 'loading' ||
     currentView === 'login' ||
     currentView === 'oauth-callback' ||
-    // La vitrina de la librería visual es una página pública autocontenida:
-    // sin banners de instalación/datos ni FABs encima.
-    currentView === 'mockup_visual_lib';
+    // Las vitrinas públicas (librería visual, gemelos 2D) son páginas
+    // autocontenidas: sin banners de instalación/datos ni FABs encima.
+    currentView === 'mockup_visual_lib' ||
+    currentView === 'mockup_efectos_2d';
 
   return (
     <>
@@ -2569,10 +2584,10 @@ export default function App() {
           detectamos huella `chagra:had-data-once` en localStorage + IDB
           vacío. NO se muestra en loading/login para no asustar antes de
           que la app pueda confirmar estado. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <DataLossBanner />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'mockup_efectos_2d' && <DataLossBanner />}
       {/* #315 — banner crítico global: surfacea alertas graves (helada, sensor
           crítico) sin abrir la campana. Imposible de ignorar. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <CriticalAlertBanner onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'mockup_efectos_2d' && <CriticalAlertBanner onNavigate={navigate} />}
       {/* Entrada de pantalla: el swap de vista era SECO (desmonta/monta sin
           transición). El wrapper con key remonta en cada cambio de vista y
           dispara un fade corto (motion.css .anim-screen-enter — solo opacidad,
@@ -2601,7 +2616,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'mockup_efectos_2d' && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
@@ -2615,9 +2630,9 @@ export default function App() {
           Para re-habilitar el tap: descomentar el import de EscuchaFab (arriba)
           y la línea del render de abajo. */}
       {/* {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />} */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <EscuchaOverlay />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'mockup_efectos_2d' && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && <SyncProgressIndicator />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && currentView !== 'mockup_visual_lib' && currentView !== 'mockup_efectos_2d' && <SyncProgressIndicator />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}

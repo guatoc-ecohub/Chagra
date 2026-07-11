@@ -17,10 +17,10 @@ import { VISUAL_REGISTRY, VISUAL_CATEGORIES, VISUAL_COUNTS } from '../visual/reg
 import { Colibri } from '../visual/creatures/index.js';
 import { cieloEscena } from '../visual/scenes/index.js';
 import { CAPAS_PARALLAX } from '../visual/scenes/_parallax.js';
-// Arquetipos 2D (three-free) para la vista previa de los mundos 3D: se dibuja el
-// ESPEJO 2D como poster; el diorama 3D se monta a demanda (chunk perezoso).
-import LaminaMundo from '../visual/mundo3d/laminas2d/LaminaMundo.jsx';
-import MundoValle2D from '../visual/mundo3d/laminas2d/MundoValle2D.jsx';
+// Host 2D (three-free) para la vista previa de los mundos 3D: dibuja el GEMELO
+// 2D de primera clase como poster (el mismo que monta el framework en equipos
+// humildes); el diorama 3D se monta a demanda (chunk perezoso).
+import Mundo2D from '../visual/mundo3d/Mundo2D.jsx';
 
 // Dioramas 3D declarados a nivel de MÓDULO (los componentes lazy no pueden
 // crearse en render). three/@react-three viven en `vendor-three` (perezoso).
@@ -196,19 +196,17 @@ function Mundo3DDemo({ item }) {
   const Escena = ESCENAS_LAZY[item.slug] || null;
   const noop = () => {};
 
-  const Poster =
-    item.espejo === 'valle2d' ? (
-      <MundoValle2D params={{ clima: 'soleado' }} entrada={item.entrada} onHotspot={noop} />
-    ) : (
-      <LaminaMundo
-        params={item.params}
-        hotspots={item.hotspots}
-        tinte={item.tinte}
-        motivo={item.motivo}
-        onHotspot={noop}
-        titulo={item.nombre}
-      />
-    );
+  // El poster es el GEMELO 2D real del arquetipo (`item.espejo`): corte2d/flujo2d/
+  // recinto2d/estratos2d o valle2d. Mundo2D mapea la clave → su componente.
+  const Poster = (
+    <Mundo2D
+      escena={item.espejo}
+      motivo={item.motivo}
+      entrada={{ ...item.entrada, params: item.params, hotspots: item.hotspots, titulo: item.nombre }}
+      tinte={item.tinte}
+      onHotspot={noop}
+    />
+  );
 
   return (
     <div className="vlib-stage vlib-stage--mundo">

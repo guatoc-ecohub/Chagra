@@ -20,23 +20,25 @@
 
 export const ARQUETIPOS = {
   // ── Arquetipos 3D (dioramas) ─────────────────────────────────────────────
+  // Cada uno declara su GEMELO 2D (`espejo`): el reemplazo de primera clase que
+  // `resolverMundo` monta cuando el equipo no aguanta 3D o el mundo se pide en 2D.
   cutaway: {
-    dim: '3d', role: 'mundo3d-archetype', motivo: 'cutaway', espejo: 'mirror',
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'cutaway', espejo: 'corte2d',
     nombre: 'Corte de suelo', clave: 'lo invisible del subsuelo, hecho visible',
     ejemplo: 'suelo', tambien: ['abono'],
   },
   flujo: {
-    dim: '3d', role: 'mundo3d-archetype', motivo: 'flujo', espejo: 'mirror',
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'flujo', espejo: 'flujo2d',
     nombre: 'Camino del agua', clave: 'gravedad y pendiente: por dónde baja el agua',
     ejemplo: 'agua', tambien: [],
   },
   recinto: {
-    dim: '3d', role: 'mundo3d-archetype', motivo: 'recinto', espejo: 'mirror',
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'recinto', espejo: 'recinto2d',
     nombre: 'El corral', clave: 'el ciclo cerrado del abono como anillo espacial',
     ejemplo: 'animales', tambien: [],
   },
   estratos: {
-    dim: '3d', role: 'mundo3d-archetype', motivo: 'estratos', espejo: 'mirror',
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'estratos', espejo: 'estratos2d',
     nombre: 'Estratos del bosque', clave: 'la verticalidad de los 7 estratos comestibles',
     ejemplo: 'disenio', tambien: [],
   },
@@ -46,10 +48,31 @@ export const ARQUETIPOS = {
     ejemplo: 'valle', tambien: [],
   },
 
+  // ── Gemelos 2D de los dioramas (reemplazo de primera clase) ──────────────
+  // NO son "el fallback tonto": enseñan LO MISMO que su diorama con otro lenguaje
+  // visual (SVG isométrico/planta/corte), mismos `params` + hotspots, misma
+  // paleta (`palette/chagra.js`). Los elige el `espejo` del arquetipo 3D.
+  corte2d: {
+    dim: '2d', role: 'mundo2d-gemelo', motivo: 'cutaway', de: 'cutaway',
+    nombre: 'Corte-lámina 2.5D', clave: 'el subsuelo en corte isométrico: capas etiquetadas + vida del suelo',
+  },
+  flujo2d: {
+    dim: '2d', role: 'mundo2d-gemelo', motivo: 'flujo', de: 'flujo',
+    nombre: 'Flujo 2D', clave: 'la ladera de perfil: el agua baja por la pendiente (motion-path + gotas)',
+  },
+  recinto2d: {
+    dim: '2d', role: 'mundo2d-gemelo', motivo: 'recinto', de: 'recinto',
+    nombre: 'Recinto 2D', clave: 'el corral visto en planta: zonas etiquetadas + íconos-animal + ciclo del abono',
+  },
+  estratos2d: {
+    dim: '2d', role: 'mundo2d-gemelo', motivo: 'estratos', de: 'estratos',
+    nombre: 'Estratos 2D', clave: 'corte vertical de los 7 pisos: siluetas de cultivo + grade por altura',
+  },
+
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {
     dim: '2d', role: 'mundo2d-archetype',
-    nombre: 'Lámina espejo', clave: 'el dibujo 2D digno de un diorama 3D (mismos datos + hotspots)',
+    nombre: 'Lámina espejo', clave: 'el dibujo 2D genérico de un diorama (respaldo de los gemelos por-motivo)',
   },
   lamina: {
     dim: '2d', role: 'mundo2d-archetype',

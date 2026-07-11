@@ -11,23 +11,45 @@ import { ARQUETIPOS, ARQUETIPOS_3D, ARQUETIPOS_2D } from '../arquetipos.js';
 afterEach(() => cleanup());
 
 describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
-  test('arquetipos: 5 dioramas 3D + arquetipos 2D de primera clase', () => {
+  test('arquetipos: 5 dioramas 3D + arquetipos 2D de primera clase (con gemelos)', () => {
     expect(ARQUETIPOS_3D.sort()).toEqual(['cutaway', 'estratos', 'flujo', 'recinto', 'valle']);
-    ['lamina', 'infografia', 'ficha', 'mirror', 'valle2d'].forEach((k) => {
+    // arquetipos 2D nativos + el espejo genérico + los 4 gemelos por-motivo
+    ['lamina', 'infografia', 'ficha', 'mirror', 'valle2d',
+      'corte2d', 'flujo2d', 'recinto2d', 'estratos2d'].forEach((k) => {
       expect(ARQUETIPOS_2D).toContain(k);
       expect(ARQUETIPOS[k].dim).toBe('2d');
     });
   });
 
-  test('tier decide 3D vs 2D para un mundo SÍ-3D (suelo → cutaway)', () => {
+  test('cada diorama 3D declara su GEMELO 2D por-motivo (espejo)', () => {
+    expect(ARQUETIPOS.cutaway.espejo).toBe('corte2d');
+    expect(ARQUETIPOS.flujo.espejo).toBe('flujo2d');
+    expect(ARQUETIPOS.recinto.espejo).toBe('recinto2d');
+    expect(ARQUETIPOS.estratos.espejo).toBe('estratos2d');
+    // el gemelo apunta de vuelta a su diorama (contrato bidireccional)
+    ['corte2d', 'flujo2d', 'recinto2d', 'estratos2d'].forEach((k) => {
+      expect(ARQUETIPOS[k].role).toBe('mundo2d-gemelo');
+      expect(ARQUETIPOS_3D).toContain(ARQUETIPOS[k].de);
+    });
+  });
+
+  test('tier decide 3D vs 2D para un mundo SÍ-3D (suelo → cutaway → corte2d)', () => {
     const alto = resolverMundo('suelo', 'alto');
     expect(alto.modo).toBe('3d');
     expect(alto.escena).toBe('cutaway');
-    // equipo humilde → cae al espejo 2D del arquetipo, con su motivo
+    // equipo humilde → cae al GEMELO 2D del arquetipo, con su motivo
     const bajo = resolverMundo('suelo', 'bajo');
     expect(bajo.modo).toBe('2d');
-    expect(bajo.escena).toBe('mirror');
+    expect(bajo.escena).toBe('corte2d');
     expect(bajo.motivo).toBe('cutaway');
+  });
+
+  test('en tier bajo, cada mundo 3D cae a su gemelo 2D correcto', () => {
+    expect(resolverMundo('agua', 'bajo').escena).toBe('flujo2d');
+    expect(resolverMundo('animales', 'bajo').escena).toBe('recinto2d');
+    expect(resolverMundo('disenio', 'bajo').escena).toBe('estratos2d');
+    // el abono reusa cutaway → su gemelo es corte2d
+    expect(resolverMundo('abono', 'bajo').escena).toBe('corte2d');
   });
 
   test('un mundo 2D-dato declara su arquetipo DIRECTO (mercado → infografia)', () => {

@@ -1,0 +1,194 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   Efectos2D.css — vitrina pública de los gemelos 2D (#/mockups/efectos-2d).
+   Cuaderno de laboratorio. Mobile-first (320px). Autocontenido: cero externos.
+   Alto contraste (AA) en claro y oscuro; targets táctiles ≥44px.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.ef2d {
+  --ef2d-papel: #f7f1e3;
+  --ef2d-tarjeta: #fffdf7;
+  --ef2d-tinta: #2a2016;
+  --ef2d-tinta-suave: #5a4a34;
+  --ef2d-linea: rgba(42, 32, 22, 0.16);
+  --ef2d-acento: #3f8f4e;
+
+  box-sizing: border-box;
+  min-height: 100%;
+  margin: 0;
+  padding: 1rem 1rem 3rem;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(42, 32, 22, 0.05) 28px),
+    var(--ef2d-papel);
+  color: var(--ef2d-tinta);
+  font-family: inherit;
+}
+.ef2d *,
+.ef2d *::before,
+.ef2d *::after { box-sizing: border-box; }
+
+/* ── Encabezado ──────────────────────────────────────────────────────────── */
+.ef2d-hero {
+  max-width: 900px;
+  margin: 0 auto 1.4rem;
+}
+.ef2d-hero__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ef2d-acento);
+}
+.ef2d-hero__titulo {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  line-height: 1.15;
+}
+.ef2d-hero__par {
+  margin: 0 0 0.9rem;
+  max-width: 62ch;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: var(--ef2d-tinta-suave);
+}
+.ef2d-hero__reglas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+.ef2d-hero__reglas li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--ef2d-tarjeta);
+  border: 1px solid var(--ef2d-linea);
+  border-radius: 12px;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+.ef2d-hero__num {
+  flex: 0 0 auto;
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ef2d-acento);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+/* ── Rejilla de gemelos ──────────────────────────────────────────────────── */
+.ef2d-grid {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 720px) {
+  .ef2d-grid { grid-template-columns: 1fr 1fr; }
+}
+
+.ef2d-card {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--ef2d-tarjeta);
+  border: 1px solid var(--ef2d-linea);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(40, 30, 10, 0.08);
+  overflow: hidden;
+}
+.ef2d-card__head {
+  padding: 0.9rem 1rem 0.4rem;
+}
+.ef2d-card__titulo {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+.ef2d-card__par {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ef2d-tinta-suave);
+}
+.ef2d-card__escena {
+  padding: 0.2rem 0.5rem 0;
+}
+.ef2d-card__activa {
+  margin: 0.4rem 0 0;
+  padding: 0.8rem 1rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--ef2d-tinta-suave);
+}
+.ef2d-card__activa-tag {
+  display: inline-block;
+  margin-right: 0.45em;
+  padding: 0.12em 0.55em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ef2d-acento) 16%, transparent);
+  color: var(--ef2d-tinta);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  vertical-align: 1px;
+}
+
+/* ── Estado + pie ────────────────────────────────────────────────────────── */
+.ef2d-estado {
+  max-width: 900px;
+  margin: 1rem auto 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px dashed var(--ef2d-linea);
+  border-radius: 12px;
+  font-size: 0.88rem;
+  color: var(--ef2d-tinta-suave);
+}
+.ef2d-pie {
+  max-width: 900px;
+  margin: 0.8rem auto 0;
+  font-size: 0.85rem;
+  color: var(--ef2d-tinta-suave);
+}
+.ef2d-pie p { margin: 0; }
+
+/* ── Tema oscuro (respeta el toggle del visor y el sistema) ──────────────── */
+@media (prefers-color-scheme: dark) {
+  .ef2d {
+    --ef2d-papel: #1a1712;
+    --ef2d-tarjeta: #241f18;
+    --ef2d-tinta: #f3ece0;
+    --ef2d-tinta-suave: #c8bca8;
+    --ef2d-linea: rgba(243, 236, 224, 0.16);
+    --ef2d-acento: #7bc98a;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(243, 236, 224, 0.05) 28px),
+      var(--ef2d-papel);
+  }
+}
+:root[data-theme='dark'] .ef2d {
+  --ef2d-papel: #1a1712;
+  --ef2d-tarjeta: #241f18;
+  --ef2d-tinta: #f3ece0;
+  --ef2d-tinta-suave: #c8bca8;
+  --ef2d-linea: rgba(243, 236, 224, 0.16);
+  --ef2d-acento: #7bc98a;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(243, 236, 224, 0.05) 28px),
+    var(--ef2d-papel);
+}
+:root[data-theme='light'] .ef2d {
+  --ef2d-papel: #f7f1e3;
+  --ef2d-tarjeta: #fffdf7;
+  --ef2d-tinta: #2a2016;
+  --ef2d-tinta-suave: #5a4a34;
+  --ef2d-linea: rgba(42, 32, 22, 0.16);
+  --ef2d-acento: #3f8f4e;
+}
