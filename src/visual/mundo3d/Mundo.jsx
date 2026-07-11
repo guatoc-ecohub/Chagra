@@ -14,7 +14,7 @@
  * mundo = una entrada en `mundoData.js`, sin tocar este archivo.
  */
 import { lazy, Suspense } from 'react';
-import { resolverMundo, tinteDeMundo } from './resolverMundo.js';
+import { resolverMundo, tinteDeMundo, tituloDeMundo, emojiDeMundo } from './resolverMundo.js';
 import Mundo2D from './Mundo2D.jsx';
 import './mundo.css';
 
@@ -37,12 +37,19 @@ function MundoCargando({ tinte }) {
   );
 }
 
-function SalirBtn({ onSalir }) {
+/* La MIGA: dónde-estoy + volver al valle, SIEMPRE visible y consistente en
+   todo mundo (el host solo pasa `onSalir`; el framework pinta lo mismo). */
+function MigaVolver({ onSalir, mundoId }) {
   if (!onSalir) return null;
   return (
-    <button type="button" className="mundo-salir" onClick={() => onSalir()} aria-label="Volver al valle">
-      ‹ Volver
-    </button>
+    <nav className="mundo-miga" aria-label="Usted está aquí">
+      <button type="button" className="mundo-salir" onClick={() => onSalir()} aria-label="Volver al valle">
+        ‹ El valle
+      </button>
+      <span className="mundo-miga__aqui">
+        <span aria-hidden="true">{emojiDeMundo(mundoId)}</span> {tituloDeMundo(mundoId)}
+      </span>
+    </nav>
   );
 }
 
@@ -73,7 +80,7 @@ export default function Mundo({
             energia={energia}
           />
         </Suspense>
-        <SalirBtn onSalir={onSalir} />
+        <MigaVolver onSalir={onSalir} mundoId={mundoId} />
       </div>
     );
   }
@@ -91,7 +98,7 @@ export default function Mundo({
         animo={animo}
         energia={energia}
       />
-      <SalirBtn onSalir={onSalir} />
+      <MigaVolver onSalir={onSalir} mundoId={mundoId} />
     </div>
   );
 }

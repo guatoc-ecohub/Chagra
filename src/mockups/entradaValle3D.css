@@ -204,6 +204,15 @@
   transform-origin: center;
 }
 
+/* ── Criaturas sembradas por el valle (colibrí, mariposas, escarabajo,
+      lombriz): billboards reusados de la librería de fauna. Decorativas: no
+      capturan toques ni tapan los POI. ── */
+.valle-critter {
+  pointer-events: none;
+  filter: drop-shadow(0 3px 7px rgba(0, 0, 0, 0.32));
+  will-change: transform;
+}
+
 /* ── El compañero como TARJETA puntual (imagen-first, una sola línea) ──
       El ser al que se cuida vive también en el DOM: su cara refleja el ánimo. */
 .valle-companero {
@@ -511,4 +520,45 @@
   .valle-clima { position: static; max-width: none; margin-top: 0.4rem; justify-content: flex-start; width: 100%; }
   .valle-header { flex-wrap: wrap; }
   .valle-titulo h1 { font-size: 1.3rem; }
+}
+
+/* ── NAVEGACIÓN valle ↔ mundos: un MUNDO abierto dentro de la entrada ──────
+ * El framework (`src/visual/mundo3d`) pinta la escena y su miga "‹ El valle";
+ * aquí solo vive el marco del host: fondo legible para los arquetipos 2D,
+ * scroll propio en 320px y la nota de la puerta tocada. */
+.valle-mundo {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: color-mix(in srgb, var(--vm-tinte, #3f8f4e) 14%, #f2e8d6);
+  color: #2a2016;
+}
+.valle-mundo .mundo-root {
+  flex: 1 1 auto;
+  min-height: min(72vh, 520px);
+  border-radius: 0;
+}
+.valle-mundo__puerta {
+  margin: 0;
+  padding: 0.7rem 1rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #4a3a22;
+  background: rgba(255, 251, 242, 0.92);
+  border-top: 1px solid rgba(60, 46, 24, 0.15);
+}
+
+/* La degradación elegante del panel: mundo sin escena montable aún. */
+.valle-panel__pronto {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.9rem;
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.92rem;
+  line-height: 1.35;
 }

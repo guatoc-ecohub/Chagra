@@ -9,6 +9,16 @@
  */
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
+import { Fauna } from './FaunaEscena.jsx';
+
+/* La fauna que acompaña el corral: el escarabajo estercolero junto a la pila de
+   estiércol (cierra el ciclo del abono, literal), un colibrí que sobrevuela y
+   una mariposa por la cerca. Las aves/insectos suman a los animales de granja. */
+const FAUNA_RECINTO = [
+  { tipo: 'escarabajo', base: [0.36, 0.18, 0.42], patron: 'reptar', size: 30, fase: 0.5 },
+  { tipo: 'colibri', base: [-0.7, 1.15, 0.5], patron: 'revoloteo', size: 30, fase: 1.2 },
+  { tipo: 'mariposa', base: [1.0, 0.62, 0.85], patron: 'revoloteo', size: 28, fase: 2.6 },
+];
 
 /* Un animal esquemático: cuerpo + cabeza, tono propio. */
 function Animalito({ pos, color }) {
@@ -26,7 +36,7 @@ function Animalito({ pos, color }) {
   );
 }
 
-function Diorama({ params }) {
+function Diorama({ params, reducedMotion }) {
   const animales = params?.animales || [
     { color: '#e7d9c2', pos: [-0.7, 0, 0.4] },
     { color: '#c98a5a', pos: [0.6, 0, -0.3] },
@@ -66,6 +76,8 @@ function Diorama({ params }) {
       {animales.map((a, i) => (
         <Animalito key={i} pos={a.pos} color={a.color} />
       ))}
+      {/* aves e insectos que animan el corral (escarabajo en el abono) */}
+      <Fauna items={FAUNA_RECINTO} reducedMotion={reducedMotion} />
     </group>
   );
 }
@@ -74,7 +86,7 @@ export default function EscenaRecinto(props) {
   const cielo = { fondo: '#ecdcc2', cielo: '#f6ead2', suelo: '#8a6a44', intensidad: 1.05 };
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.4, 0] }}>
-      <Diorama params={props.params} />
+      <Diorama params={props.params} reducedMotion={props.reducedMotion} />
     </EscenaBase3D>
   );
 }

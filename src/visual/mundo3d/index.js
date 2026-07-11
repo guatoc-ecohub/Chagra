@@ -26,5 +26,9 @@ export { MUNDO, MUNDO_IDS } from './mundoData.js';
 export {
   ARQUETIPOS, ARQUETIPOS_KEYS, ARQUETIPOS_3D, ARQUETIPOS_2D, esArquetipo3D,
 } from './arquetipos.js';
-export { resolverMundo, tinteDeMundo, tituloDeMundo } from './resolverMundo.js';
+export { resolverMundo, tinteDeMundo, tituloDeMundo, emojiDeMundo } from './resolverMundo.js';
 export { decidirTier, permite3D } from './deviceTier.js';
+
+// Navegación valle ↔ mundos (three-free): la máquina de fases + el viaje DOM.
+export { useNavegacionMundos, puedeEntrarAlMundo } from './useNavegacionMundos.js';
+export { default as TransicionMundo, VIAJE_MS } from './TransicionMundo.jsx';
