@@ -30,6 +30,7 @@ const IMPORTA_ESCENA = {
   valle: () => import('./escenas/EscenaValle.jsx'),
   boveda: () => import('./escenas/EscenaBoveda.jsx'),
   sanidad: () => import('./escenas/EscenaSanidad.jsx'),
+  mercado: () => import('./escenas/EscenaMercado.jsx'),
 };
 const ESCENAS_3D = Object.fromEntries(
   Object.entries(IMPORTA_ESCENA).map(([k, importa]) => [k, lazy(importa)]),

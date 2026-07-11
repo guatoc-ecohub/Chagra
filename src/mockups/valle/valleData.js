@@ -129,6 +129,9 @@ const LUGARES = [
   { id: 'animales', pos: [-5.0, 0, 5.4], escala: 1, tipo: 'animales' },
   { id: 'disenio', pos: [5.2, 0, -3.4], escala: 1.1, tipo: 'bosque' },
   { id: 'clima', pos: [-3.2, 0, -6.0], escala: 1, tipo: 'veleta' },
+  // El mercado, abajo en la tierra caliente, cerca de la salida a la plaza: el
+  // puesto con su toldo donde la cosecha de la finca sale a venderse.
+  { id: 'mercado', pos: [1.2, 0, 6.6], escala: 1, tipo: 'mercado' },
 ];
 
 /**
@@ -322,4 +325,6 @@ export const NARRACION = {
     'La huerta de la casa. Aquí es donde primero se ven las plagas, para atajarlas a tiempo.',
   disenio: 'El monte y los árboles que sembró. La finca también es el bosque que la abraza.',
   clima: 'Desde aquí se lee el cielo: lo que viene, y qué conviene hacer con la finca.',
+  mercado:
+    'La plaza campesina. Aquí llega su cosecha derecho a la mesa: venda directo, con su sello y a precio justo.',
 };

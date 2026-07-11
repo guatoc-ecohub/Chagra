@@ -196,26 +196,55 @@ export const MUNDO = {
     entrada: {},
   },
 
-  // 🧺 MERCADO Y DESPENSA — arquetipo `infografia`: dato/precio/reporte (NO-3D).
+  // 🧺 MERCADO Y DESPENSA — arquetipo SÍ-3D `mercado`: el MERCADO CAMPESINO, la
+  //    comercialización justa hecha lugar. El diorama muestra la CADENA CORTA del
+  //    campo a la mesa: la RUTA que baja de la parcela a la plaza (del productor
+  //    al comprador, directo), los PUESTOS con su toldo, los CANASTOS con la
+  //    cosecha de la finca (tomate, papa, maíz, café), la TARIMA de PROCEDENCIA
+  //    (el terroir andino: de qué vereda y qué piso viene, el sello de origen) y
+  //    la BALANZA del PRECIO JUSTO (el trato parejo, sin la tajada del
+  //    intermediario). Cada punto es una puerta a una pantalla REAL. En equipo
+  //    humilde cae a su ficha 2D digna (la infografía del mercado y la despensa).
   mercado: {
-    escena: 'infografia',
+    escena: 'mercado',
+    valle: { tipo: 'mercado', pos: [1.2, 0, 6.6], escala: 1 },
     params: {
-      titulo: 'Mercado y despensa',
-      cifras: [
-        { valor: 'Directo', unidad: '', label: 'venta entre fincas, sin intermediario' },
-        { valor: '7', unidad: 'días', label: 'guardar sin que se dañe (poscosecha)' },
+      // El diorama tiene defaults propios; aquí solo los hacemos explícitos y
+      // deterministas (mismos puestos y canastos 2D↔3D).
+      puestos: [
+        { color: '#c96a2f', pos: [-0.85, 0, 0.2] },   // toldo del vecino
+        { color: '#3f8f4e', pos: [0.9, 0, -0.1] },     // toldo de la huerta
       ],
-      notas: [
-        'Precios de referencia y cuentas para el banco o la cooperativa.',
-        'Almacene sin micotoxinas: troja/silo, secar/salar/fermentar con seguridad.',
+      canastos: [
+        { producto: 'tomate', color: '#d24b3a', pos: [-0.85, 0, 0.75] },
+        { producto: 'papa', color: '#c9a15a', pos: [0.55, 0, 0.7] },
+        { producto: 'maiz', color: '#e7c451', pos: [1.15, 0, 0.35] },
+        { producto: 'cafe', color: '#7a4a24', pos: [-0.35, 0, 0.95] },
       ],
     },
     hotspots: [
-      { id: 'vender', pos: [], emoji: '🤝', label: 'Vender y comprar', view: 'mercado' },
-      { id: 'posc', pos: [], emoji: '🥕', label: 'Poscosecha y despensa', view: 'poscosecha' },
-      { id: 'inf', pos: [], emoji: '🖨️', label: 'Sacar reportes', view: 'informes' },
+      { id: 'vender', pos: [-0.85, 1.25, 0.2], emoji: '🤝', label: 'Vender y comprar', view: 'mercado' },
+      { id: 'posc', pos: [0.9, 1.25, -0.1], emoji: '🥕', label: 'Poscosecha y despensa', view: 'poscosecha' },
+      { id: 'precio', pos: [0.15, 0.85, 0.55], emoji: '⚖️', label: 'Precio de referencia', view: 'mercado', data: { tema: 'precio' } },
+      { id: 'inf', pos: [-1.4, 1.1, -0.35], emoji: '🖨️', label: 'Sacar reportes', view: 'informes' },
     ],
-    entrada: {},
+    entrada: { zoom: 7, narra: 'mercado' },
+    // El gemelo 2D digno: la ficha del mercado y la despensa (la misma copia
+    // didáctica de antes, con sus MISMOS accesos como puertas).
+    fallback2d: {
+      escena: 'infografia',
+      params: {
+        titulo: 'Mercado y despensa',
+        cifras: [
+          { valor: 'Directo', unidad: '', label: 'venta entre fincas, sin intermediario' },
+          { valor: '7', unidad: 'días', label: 'guardar sin que se dañe (poscosecha)' },
+        ],
+        notas: [
+          'Precios de referencia y cuentas para el banco o la cooperativa.',
+          'Almacene sin micotoxinas: troja/silo, secar/salar/fermentar con seguridad.',
+        ],
+      },
+    },
   },
 
   // 🐞 SANIDAD — arquetipo SÍ-3D `sanidad`: la HUERTA-CLÍNICA, el manejo de

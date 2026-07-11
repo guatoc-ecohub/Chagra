@@ -356,6 +356,38 @@ function LandmarkGeom({ tipo, tinte, reducedMotion }) {
           ))}
         </group>
       );
+    case 'mercado': // puesto de mercado campesino: toldo a dos aguas + mesa + canasto
+      return (
+        <group>
+          {/* las patas y la mesa del puesto */}
+          {[[-0.32, 0.22], [0.32, 0.22], [-0.32, -0.22], [0.32, -0.22]].map(([x, z], i) => (
+            <mesh key={i} position={[x, 0.24, z]} castShadow>
+              <cylinderGeometry args={[0.03, 0.035, 0.48, 5]} />
+              <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
+            </mesh>
+          ))}
+          <mesh position={[0, 0.49, 0]} castShadow>
+            <boxGeometry args={[0.82, 0.06, 0.56]} />
+            <meshStandardMaterial color="#a9814f" flatShading roughness={1} />
+          </mesh>
+          {/* el toldo a dos aguas (cono de 4 lados) */}
+          <mesh position={[0, 0.92, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
+            <coneGeometry args={[0.66, 0.34, 4]} />
+            <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+          </mesh>
+          {/* un canasto con producto sobre la mesa */}
+          <mesh position={[0.12, 0.6, 0.08]}>
+            <cylinderGeometry args={[0.13, 0.1, 0.14, 9]} />
+            <meshStandardMaterial color="#a9773f" flatShading roughness={1} />
+          </mesh>
+          {[[0, 0.7, 0.08], [0.08, 0.68, 0.13], [-0.05, 0.68, 0.04]].map(([x, y, z], i) => (
+            <mesh key={i} position={[x, y, z]}>
+              <sphereGeometry args={[0.055, 7, 6]} />
+              <meshStandardMaterial color={suave} flatShading roughness={1} />
+            </mesh>
+          ))}
+        </group>
+      );
     case 'veleta': // poste con veleta que gira con el viento
       return <Veleta color={fuerte} reducedMotion={reducedMotion} />;
     default:

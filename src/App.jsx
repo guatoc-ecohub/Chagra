@@ -95,6 +95,11 @@ const Mundo3DClimaMockup = lazy(() => import('./mockups/Mundo3DClima'));
 // la huerta-clínica (arquetipo nuevo `sanidad`, familia recinto): trampas,
 // biocontrol y enemigos naturales. El 3D va perezoso (vendor-three).
 const Mundo3DSanidadMockup = lazy(() => import('./mockups/Mundo3DSanidad'));
+// 3D: "El mundo del mercado" — monta <Mundo mundoId="mercado"> del framework:
+// el mercado campesino (arquetipo nuevo `mercado`, familia flujo): la ruta corta
+// campo→mesa, puestos, canastos, procedencia y precio justo. El 3D va perezoso
+// (vendor-three).
+const Mundo3DMercadoMockup = lazy(() => import('./mockups/Mundo3DMercado'));
 // Voz: superficies de voz con forma viva (iris que reacciona al volumen).
 const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
 const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
@@ -508,6 +513,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/hoja-vida-mata': 'mockup_hoja_vida_mata',
   // (anti-conflicto de merge) rutas nuevas SIEMPRE al final del bloque:
   'mockups/mundo3d-sanidad': 'mockup_mundo3d_sanidad',
+  'mockups/mundo3d-mercado': 'mockup_mundo3d_mercado',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1604,6 +1610,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo de la sanidad">
               <Mundo3DSanidadMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_mercado':
+        // Vitrina pública del MUNDO DEL MERCADO: monta <Mundo mundoId="mercado">
+        // del framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-mercado, sin auth. El mercado campesino: la cadena
+        // corta campo→mesa — puestos con toldo, canastos de la finca, el sello de
+        // procedencia (terroir andino) y la balanza del precio justo.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del mercado">
+              <Mundo3DMercadoMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

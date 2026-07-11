@@ -12,7 +12,7 @@ afterEach(() => cleanup());
 
 describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
   test('arquetipos: 5 dioramas 3D + arquetipos 2D de primera clase', () => {
-    expect(ARQUETIPOS_3D.sort()).toEqual(['boveda', 'cutaway', 'estratos', 'flujo', 'recinto', 'sanidad', 'valle']);
+    expect(ARQUETIPOS_3D.sort()).toEqual(['boveda', 'cutaway', 'estratos', 'flujo', 'mercado', 'recinto', 'sanidad', 'valle']);
     ['lamina', 'infografia', 'ficha', 'mirror', 'valle2d'].forEach((k) => {
       expect(ARQUETIPOS_2D).toContain(k);
       expect(ARQUETIPOS[k].dim).toBe('2d');
@@ -30,10 +30,20 @@ describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
     expect(bajo.motivo).toBe('cutaway');
   });
 
-  test('un mundo 2D-dato declara su arquetipo DIRECTO (mercado → infografia)', () => {
-    const r = resolverMundo('mercado', 'alto'); // aun en tier alto sigue 2D
+  test('un mundo 2D-dato declara su arquetipo DIRECTO (frutales → ficha)', () => {
+    const r = resolverMundo('frutales', 'alto'); // aun en tier alto sigue 2D
     expect(r.modo).toBe('2d');
-    expect(r.escena).toBe('infografia');
+    expect(r.escena).toBe('ficha');
+  });
+
+  test('el mercado sube al arquetipo 3D nuevo `mercado` (y degrada a su ficha 2D)', () => {
+    const alto = resolverMundo('mercado', 'alto');
+    expect(alto.modo).toBe('3d');
+    expect(alto.escena).toBe('mercado');
+    // equipo humilde → cae a su fallback2d declarado (la infografía del mercado)
+    const bajo = resolverMundo('mercado', 'bajo');
+    expect(bajo.modo).toBe('2d');
+    expect(bajo.escena).toBe('infografia');
   });
 
   test('el clima sube al arquetipo 3D nuevo `boveda` (y degrada a su espejo 2D)', () => {
@@ -57,9 +67,9 @@ describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
   });
 
   test('<Mundo> monta un mundo 2D sin lanzar (sin three, three-free)', () => {
-    // mercado es 2D nativo; no monta Canvas → seguro en jsdom.
+    // frutales es 2D nativo (ficha); no monta Canvas → seguro en jsdom.
     const { container } = render(
-      <Mundo mundoId="mercado" tier="alto" onHotspot={() => {}} onSalir={() => {}} />,
+      <Mundo mundoId="frutales" tier="alto" onHotspot={() => {}} onSalir={() => {}} />,
     );
     expect(container.querySelector('.mundo-root[data-dim="2d"]')).toBeInTheDocument();
     // el espejo 2D de un 3D degradado también es three-free:
