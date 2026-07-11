@@ -15,6 +15,10 @@
  * Cada item expone además `variantes`: 1-3 juegos de props etiquetados para que
  * la vitrina dibuje el primitivo en varios estados sin adivinar su contrato.
  */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- este archivo es el CATÁLOGO
+   de la librería: sus descripciones/props/estados (incluye 'pensando' de la voz)
+   son metadata dev-facing de la vitrina, no copy de UI de producto; no van a
+   src/config/messages.js (ADR-050). Mismo patrón que src/visual/scenes/index.js. */
 import { CREATURES } from './creatures/index.js';
 import { GlowFilter, FiltroAcuarela, AutoDibujo, VFX_PISOS, VFX_BEAT_MS } from './effects/index.js';
 import { LAMINAS } from './laminas/index.js';
@@ -23,6 +27,12 @@ import Parallax from './scenes/Parallax.jsx';
 import GuardianEspirituBase from './scenes/GuardianEspirituBase.jsx';
 import SceneFincaOrganismo from './scenes/SceneFincaOrganismo.jsx';
 import { SCENES, CAPAS_PARALLAX, SCN_BEAT_MS } from './scenes/index.js';
+import IrisVoz, { ESTADOS_VOZ } from './voz/index.js';
+// Framework de mundos: metadatos three-free (arquetipos + registro + tinte). Los
+// dioramas 3D (carpeta escenas/) NO se importan aquí — se cargan perezoso.
+import { ARQUETIPOS, ARQUETIPOS_3D } from './mundo3d/arquetipos.js';
+import { MUNDO } from './mundo3d/mundoData.js';
+import { tinteDeMundo } from './mundo3d/resolverMundo.js';
 
 /* ── Props comunes de las creatures (contrato del barrel de creatures) ────── */
 const PROPS_CREATURE = [
@@ -227,6 +237,11 @@ const ITEMS_CREATURES = Object.entries(CREATURES).map(([slug, meta]) => ({
   cientifico: meta.cientifico,
   Component: meta.Component,
   render: 'component',
+  dim: '2d',
+  role: 'creature',
+  // Angelita es 2D (SVG) pero es el AVATAR del framework 3D: la abeja que "entra"
+  // a cada mundo. `capaz3d` la marca como pieza 3D-capaz sin cambiar su `dim`.
+  capaz3d: slug === 'abeja-angelita',
   descripcion: NOTAS_CREATURE[slug] || '',
   props: PROPS_CREATURE,
   variantes: VARIANTES_CREATURE,
@@ -238,6 +253,8 @@ const ITEMS_LAMINAS = Object.entries(LAMINAS).map(([slug, meta]) => ({
   cientifico: meta.especie,
   Component: meta.Component,
   render: 'component',
+  dim: '2d',
+  role: 'lamina',
   descripcion:
     meta.accesible === 'enseña'
       ? `Lámina que enseña con rótulos (role=img) — ${meta.especie}.`
@@ -252,10 +269,82 @@ const ITEMS_SCENES = Object.entries(SCENES).map(([slug, meta]) => ({
   cientifico: meta.origen,
   Component: SCENE_COMPONENTS[slug],
   render: SCENE_RENDER[slug] || 'component',
+  dim: '2d',
+  role: 'scene',
   descripcion: NOTAS_SCENE[slug] || meta.clave || '',
   props: PROPS_SCENE[slug] || [],
   variantes: VARIANTES_SCENE[slug] || [{ label: 'base', props: {} }],
 }));
+
+/* ── Effects: se etiquetan 2D/effect sobre los literales de arriba ─────────── */
+const ITEMS_EFFECTS_TAG = ITEMS_EFFECTS.map((it) => ({ dim: '2d', role: 'effect', ...it }));
+
+/* ── Voz: IrisVoz, la identidad "la voz con forma" ────────────────────────── */
+const PROPS_VOZ = [
+  { nombre: 'estado', tipo: "'reposo'|'escuchando'|'pensando'|'hablando'", defecto: "'reposo'", que: 'dirección semántica del movimiento (ondas entran/salen/se trenzan)' },
+  { nombre: 'size', tipo: 'number', defecto: '180', que: 'lado en px (la firma sobrevive desde ~22px)' },
+  { nombre: 'getNivel', tipo: '() => number', defecto: '—', que: 'RMS real del micrófono (0..1) leído cada frame; sin él usa pseudo-habla determinista' },
+  { nombre: 'className', tipo: 'string', defecto: '—', que: 'clases extra sobre el nodo raíz' },
+];
+const ITEMS_VOZ = [
+  {
+    slug: 'iris-voz',
+    nombre: 'IrisVoz',
+    cientifico: 'la voz con forma',
+    Component: IrisVoz,
+    render: 'voz',
+    dim: '2d',
+    role: 'voz',
+    capaz3d: true, // la identidad de la voz que acompaña a los mundos (2D+3D)
+    descripcion:
+      'La IDENTIDAD de la voz de Chagra: un iris de anillos concéntricos (ondas de agua + anillos de tronco) con una brasa. El movimiento tiene dirección semántica: escuchando entra, hablando sale, pensando se trenza.',
+    props: PROPS_VOZ,
+    variantes: ESTADOS_VOZ.map((estado) => ({ label: estado, props: { estado, size: 132 } })),
+  },
+];
+
+/* ── Mundos 3D: los ARQUETIPOS de escena del framework `src/visual/mundo3d` ─── */
+const PROPS_MUNDO3D = [
+  { nombre: 'mundoId', tipo: 'string', defecto: '(requerida)', que: 'clave del registro MUNDO[] que este arquetipo dibuja' },
+  { nombre: 'tier', tipo: "'alto'|'medio'|'bajo'|'2d'", defecto: "'alto'", que: 'device-tier: bajo/2d cae al espejo 2D del arquetipo' },
+  { nombre: 'reducedMotion', tipo: 'boolean', defecto: 'false', que: 'congela el useFrame a un fotograma digno' },
+  { nombre: 'onHotspot', tipo: '(view, data) => void', defecto: '—', que: 're-rutea a una vista 2D real de App.jsx (regla de oro: nunca reimplementa)' },
+  { nombre: 'onSalir', tipo: '() => void', defecto: '—', que: 'volver al valle' },
+];
+/* Cargadores PEREZOSOS de cada diorama 3D (three vive en `vendor-three`, fuera del
+   bundle base; el storybook los monta a demanda con el botón "Ver en 3D"). */
+const CARGAR_ESCENA_3D = {
+  cutaway: () => import('./mundo3d/escenas/EscenaCutaway.jsx'),
+  flujo: () => import('./mundo3d/escenas/EscenaFlujo.jsx'),
+  recinto: () => import('./mundo3d/escenas/EscenaRecinto.jsx'),
+  estratos: () => import('./mundo3d/escenas/EscenaEstratos.jsx'),
+  valle: () => import('./mundo3d/escenas/EscenaValle.jsx'),
+};
+const ITEMS_MUNDO3D = ARQUETIPOS_3D.map((slug) => {
+  const a = ARQUETIPOS[slug];
+  const ejemplo = a.ejemplo;
+  const m = MUNDO[ejemplo] || {};
+  return {
+    slug,
+    nombre: a.nombre,
+    cientifico: `espejo 2D: ${a.espejo}`,
+    render: 'mundo',
+    dim: '3d',
+    role: 'mundo3d-archetype',
+    descripcion: a.clave,
+    motivo: a.motivo,
+    ejemplo,
+    espejo: a.espejo,
+    tambien: a.tambien || [],
+    cargar3d: CARGAR_ESCENA_3D[slug],
+    params: m.params || {},
+    hotspots: m.hotspots || [],
+    entrada: m.entrada || {},
+    tinte: tinteDeMundo(ejemplo),
+    props: PROPS_MUNDO3D,
+    variantes: [{ label: `espejo 2D (${a.espejo})`, props: {} }],
+  };
+});
 
 /* ── El índice único que consume la vitrina ───────────────────────────────── */
 export const VISUAL_REGISTRY = {
@@ -277,7 +366,7 @@ export const VISUAL_REGISTRY = {
     importa: "import { GlowFilter } from 'src/visual/effects';",
     descripcion:
       'Las técnicas reutilizables del catálogo: glow, acuarela y auto-dibujado como helpers SVG; velos/viñetas/grades/pulso como clases vfx-* en effects.css. Solo transform/opacity animados; filtros estáticos.',
-    items: ITEMS_EFFECTS,
+    items: ITEMS_EFFECTS_TAG,
     extras: {
       titulo: 'Pisos térmicos (vfx-grade)',
       nota: 'Grade de luz por piso térmico, de nevado a río (clases modificadoras de .vfx-grade).',
@@ -311,15 +400,64 @@ export const VISUAL_REGISTRY = {
       capasParallax: CAPAS_PARALLAX,
     },
   },
+  voz: {
+    titulo: 'Voz',
+    subtitulo: 'La voz con forma',
+    ancla: 'voz',
+    barrel: 'src/visual/voz',
+    importa: "import IrisVoz from 'src/visual/voz';",
+    descripcion:
+      'La identidad visual de la voz de Chagra: un solo primitivo (IrisVoz), cuatro estados con dirección semántica. Es el gesto de la voz que acompaña a los mundos (2D y 3D).',
+    items: ITEMS_VOZ,
+  },
+  mundo3d: {
+    titulo: 'Mundos 3D',
+    subtitulo: 'Arquetipos de escena (framework)',
+    ancla: 'mundo3d',
+    barrel: 'src/visual/mundo3d',
+    importa: "import Mundo, { MUNDO } from 'src/visual/mundo3d';",
+    descripcion:
+      'Los ARQUETIPOS de escena del framework de mundos: dioramas 3D low-poly (cutaway/flujo/recinto/estratos/valle) que un mundo elige POR DATOS. Cada uno cae a su espejo 2D digno en equipos humildes. Se previsualiza el espejo 2D; toque "Ver en 3D" para montar el diorama (chunk perezoso). Sus compañeros: la abeja Angelita (Creatures, avatar 3D-capaz) e IrisVoz (Voz).',
+    items: ITEMS_MUNDO3D,
+  },
 };
 
 /* Orden canónico de las categorías en la vitrina y la navegación por anclas. */
-export const VISUAL_CATEGORIES = ['creatures', 'effects', 'laminas', 'scenes'];
+export const VISUAL_CATEGORIES = ['creatures', 'effects', 'laminas', 'scenes', 'voz', 'mundo3d'];
 
 /* Conteo de primitivos por categoría (para el encabezado de la vitrina y el PR). */
 export const VISUAL_COUNTS = VISUAL_CATEGORIES.reduce((acc, key) => {
   acc[key] = VISUAL_REGISTRY[key].items.length;
   return acc;
 }, /** @type {Record<string, number>} */ ({}));
+
+/* ── Filtros por TAG ──────────────────────────────────────────────────────
+   Los metadatos filtrables (`dim: '2d'|'3d'`, `role`, `capaz3d`) dejan que el
+   framework y el storybook listen "lo 3D-capaz" sin adivinar. */
+
+/** Todos los items del registro, aplanados con su categoría. */
+export function piezas(filtro) {
+  const out = [];
+  VISUAL_CATEGORIES.forEach((categoria) => {
+    VISUAL_REGISTRY[categoria].items.forEach((item) => {
+      if (!filtro || filtro(item, categoria)) out.push({ categoria, ...item });
+    });
+  });
+  return out;
+}
+
+/** Piezas de dimensión 3D (los arquetipos de escena del framework de mundos). */
+export function piezas3D() {
+  return piezas((item) => item.dim === '3d');
+}
+
+/** Piezas que PARTICIPAN del framework 3D: los arquetipos + los 3D-capaces
+    (la abeja avatar, la voz). Útil para la sección "3D" del storybook. */
+export function piezasCapaces3D() {
+  return piezas((item) => item.dim === '3d' || item.capaz3d === true);
+}
+
+/** Piezas por `role` (creature|effect|lamina|scene|voz|mundo3d-archetype). */
+export const piezasPorRole = (role) => piezas((item) => item.role === role);
 
 export default VISUAL_REGISTRY;

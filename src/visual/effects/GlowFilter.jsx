@@ -20,7 +20,7 @@
  * @param {string} [props.bounds='-80%']  origen del box del filtro (x/y); el
  *                                        ancho/alto se calculan como 100%-2*bounds.
  */
-export function GlowFilter({ id, std = 2.1, blurId, blurStd = 3, bounds = '-80%' }) {
+export function GlowFilter({ id, std = 2.1, blurId = '', blurStd = 3, bounds = '-80%' }) {
   const off = parseFloat(bounds); // -80  → box de 260%
   const size = `${100 - 2 * off}%`;
   return (
