@@ -37,6 +37,7 @@ import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { faunaDeMundo } from '../faunaFuncional.js';
 import { ATMOSFERA, CIELOS, PALETA } from '../atmosferaMadre.js';
 
 const R_BOVEDA = 9;
@@ -387,12 +388,9 @@ function Montana({ pisos = PISOS_DEF, glaciar = {} }) {
   );
 }
 
-/* La vida del cielo de día: un colibrí y una mariposa cerca de la ladera. De
-   noche no se siembra fauna (honestidad ecológica). */
-const FAUNA_DIA = [
-  { tipo: 'colibri', base: [2.2, 1.5, 1.4], patron: 'revoloteo', size: 28, fase: 0.6 },
-  { tipo: 'mariposa', base: [-1.7, 0.9, 1.6], patron: 'revoloteo', size: 30, fase: 2.2 },
-];
+/* La vida del cielo de día son POLINIZADORES cerca de la ladera (colibrí y
+   mariposa); su definición vive en faunaFuncional.js. De noche no se siembra
+   fauna (la escena lo gatea con `esDia` — honestidad ecológica). */
 
 /* ── CAPA ENSO: la OSCILACIÓN interanual (El Niño–Oscilación del Sur) ────────
  *
@@ -570,7 +568,7 @@ function CapaEnso({ params, tier = 'alto', cima = 3.5, reducedMotion }) {
   );
 }
 
-function Diorama({ params, reducedMotion, tier }) {
+function Diorama({ params, reducedMotion, tier, fauna }) {
   const hora = params?.hora ?? 0.62;
   const temporada = params?.temporada ?? 'lluvia';
   const niebla = params?.niebla ?? 0.6;
@@ -610,7 +608,7 @@ function Diorama({ params, reducedMotion, tier }) {
         </>
       )}
 
-      {esDia && <Fauna items={FAUNA_DIA} reducedMotion={reducedMotion} />}
+      {esDia && <Fauna items={fauna} reducedMotion={reducedMotion} />}
     </group>
   );
 }
@@ -628,7 +626,7 @@ export default function EscenaBoveda(props) {
       camara={{ position: [4.6, 3.1, 8.6], fov: 46 }}
       entrada={{ ...props.entrada, zoom: props.entrada?.zoom ?? 7.5, centro: [0, 2.2, 0] }}
     >
-      <Diorama params={props.params} reducedMotion={props.reducedMotion} tier={props.tier} />
+      <Diorama params={props.params} reducedMotion={props.reducedMotion} tier={props.tier} fauna={faunaDeMundo(props.mundoId, { tier: props.tier })} />
     </EscenaBase3D>
   );
 }

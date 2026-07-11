@@ -24,6 +24,7 @@ import EscenaBase3D from './EscenaBase3D.jsx';
 import { Lombriz } from '../../creatures/Lombriz.jsx';
 import { Escarabajo } from '../../creatures/Escarabajo.jsx';
 import { Mariposa } from '../../creatures/Mariposa.jsx';
+import { coreografia } from '../faunaFuncional.js';
 import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
 const ANCHO = 4.4;
@@ -261,6 +262,65 @@ function RaizNodulos({ base, largo = 1.4 }) {
   );
 }
 
+/* Avispa parasitoide (Trichogramma / Cotesia — CONTROLADOR biológico de la
+   milpa): PATRULLA sobre el maíz cazando los huevos y larvas del cogollero
+   (Spodoptera frugiperda), la plaga #1 del maíz andino. Cuerpo ámbar con bandas
+   oscuras, cintura fina (pecíolo) y alas translúcidas; low-poly, sin cajas. Su
+   zigzag es la misma coreografía de rol 'patrulla'; se congela con reduced-motion. */
+function AvispaParasitoide({ base, fase = 0, reducedMotion = false }) {
+  const ref = useRef(null);
+  useFrame((state) => {
+    if (reducedMotion || !ref.current) return;
+    const [dx, dy, dz] = coreografia('patrulla', state.clock.elapsedTime, fase);
+    ref.current.position.set(base[0] + dx, base[1] + dy, base[2] + dz);
+  });
+  return (
+    <group ref={ref} position={base} scale={0.62}>
+      {/* cabeza oscura (mira hacia +x) */}
+      <mesh position={[0.15, 0.01, 0]}>
+        <sphereGeometry args={[0.05, 7, 6]} />
+        <meshLambertMaterial color="#2a2018" flatShading />
+      </mesh>
+      {/* antenas */}
+      {[0.03, -0.03].map((z) => (
+        <mesh key={z} position={[0.2, 0.06, z]} rotation={[0, 0, 0.5]}>
+          <cylinderGeometry args={[0.006, 0.006, 0.12, 4]} />
+          <meshLambertMaterial color="#2a2018" />
+        </mesh>
+      ))}
+      {/* tórax ámbar */}
+      <mesh position={[0.04, 0, 0]}>
+        <sphereGeometry args={[0.08, 8, 6]} />
+        <meshLambertMaterial color="#caa23a" flatShading />
+      </mesh>
+      {/* cintura fina (pecíolo) que une tórax y abdomen */}
+      <mesh position={[-0.06, -0.005, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.018, 0.018, 0.05, 5]} />
+        <meshLambertMaterial color="#caa23a" flatShading />
+      </mesh>
+      {/* abdomen ámbar alargado */}
+      <mesh position={[-0.17, -0.01, 0]} rotation={[0, 0, Math.PI / 2]} scale={[1, 1.5, 1]}>
+        <capsuleGeometry args={[0.06, 0.1, 3, 7]} />
+        <meshLambertMaterial color="#d9a531" flatShading />
+      </mesh>
+      {/* las bandas oscuras (la señal "avispa") */}
+      {[-0.12, -0.19, -0.26].map((x) => (
+        <mesh key={x} position={[x, -0.01, 0]} rotation={[0, Math.PI / 2, 0]}>
+          <torusGeometry args={[0.06, 0.012, 5, 10]} />
+          <meshLambertMaterial color="#2a2018" flatShading />
+        </mesh>
+      ))}
+      {/* alas translúcidas */}
+      {[0.09, -0.09].map((z) => (
+        <mesh key={z} position={[0.02, 0.08, z]} rotation={[z > 0 ? -0.5 : 0.5, 0, 0.2]} scale={[1.7, 1, 0.7]}>
+          <sphereGeometry args={[0.07, 6, 4]} />
+          <meshBasicMaterial color="#eef4f4" transparent opacity={0.42} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 /* El módulo de las tres hermanas, compuesto sobre la cara del corte. */
 function Milpa({ total, config, reducedMotion }) {
   const cfg = config === true ? {} : (config || {});
@@ -276,10 +336,12 @@ function Milpa({ total, config, reducedMotion }) {
       <GuiaFrijol base={[maizX, total, zF]} alto={maizAlto * 0.9} vueltas={vueltas} />
       <RaizNodulos base={[maizX, total, zRaiz]} largo={total * 0.62} />
       <Calabaza base={[calX, total, zF - 0.05]} />
-      {/* la mariposa que visita la flor de la calabaza (vida, no relleno) */}
+      {/* POLINIZADOR: la mariposa que visita la flor de la calabaza (vida, no relleno) */}
       <Fauna base={[calX - 0.15, total + 0.5, zF + 0.12]} phase={1.7} deriva={0.5} asomo={0.05} reducedMotion={reducedMotion}>
         <Mariposa size={38} animated={!reducedMotion} />
       </Fauna>
+      {/* CONTROLADOR: la avispa parasitoide patrullando sobre el maíz (caza el cogollero) */}
+      <AvispaParasitoide base={[maizX + 0.2, total + maizAlto * 0.82, zF + 0.12]} fase={0.7} reducedMotion={reducedMotion} />
     </group>
   );
 }

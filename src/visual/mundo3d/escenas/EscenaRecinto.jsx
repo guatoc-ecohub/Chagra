@@ -13,6 +13,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { faunaDeMundo } from '../faunaFuncional.js';
 import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
 /* Idle sutil de los animales del corral —el SUJETO del mundo—: reusa el mismo
@@ -42,14 +43,9 @@ function useIdlePecuario(kind, fase, reducedMotion) {
   return ref;
 }
 
-/* La fauna que acompaña el corral: el escarabajo estercolero junto a la pila de
-   estiércol (cierra el ciclo del abono, literal), un colibrí que sobrevuela y
-   una mariposa por la cerca. Las aves/insectos suman a los animales de granja. */
-const FAUNA_RECINTO = [
-  { tipo: 'escarabajo', base: [0.36, 0.18, 0.42], patron: 'reptar', size: 30, fase: 0.5 },
-  { tipo: 'colibri', base: [-0.7, 1.15, 0.5], patron: 'revoloteo', size: 30, fase: 1.2 },
-  { tipo: 'mariposa', base: [1.0, 0.62, 0.85], patron: 'revoloteo', size: 28, fase: 2.6 },
-];
+/* La fauna funcional del corral (un DESCOMPONEDOR insignia —el escarabajo
+   estercolero que procesa el estiércol y cierra el ciclo del abono— más
+   POLINIZADORES por la cerca) vive en faunaFuncional.js, poblada por mundo. */
 
 /* Un animal esquemático: cuerpo + cabeza, tono propio. Es el FALLBACK
    retrocompatible: si un dato viejo trae solo {color, pos} sin `tipo`, se dibuja
@@ -208,7 +204,7 @@ function AnimalDeCorral({ tipo, pos, color, reducedMotion, fase }) {
     : <Animalito pos={pos} color={color} />;
 }
 
-function Diorama({ params, reducedMotion }) {
+function Diorama({ params, reducedMotion, fauna }) {
   const animales = params?.animales || [
     { tipo: 'vaca', color: '#c9a06a', pos: [-1.05, 0, -0.4] },
     { tipo: 'gallina', color: '#e7d9c2', pos: [1.1, 0, 0.5] },
@@ -256,17 +252,18 @@ function Diorama({ params, reducedMotion }) {
           fase={i * 1.7}
         />
       ))}
-      {/* aves e insectos que animan el corral (escarabajo en el abono) */}
-      <Fauna items={FAUNA_RECINTO} reducedMotion={reducedMotion} />
+      {/* la fauna funcional: descomponedor en el abono + polinizadores por la cerca */}
+      <Fauna items={fauna} reducedMotion={reducedMotion} />
     </group>
   );
 }
 
 export default function EscenaRecinto(props) {
   const cielo = CIELOS.corral;
+  const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.4, 0] }}>
-      <Diorama params={props.params} reducedMotion={props.reducedMotion} />
+      <Diorama params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} />
     </EscenaBase3D>
   );
 }

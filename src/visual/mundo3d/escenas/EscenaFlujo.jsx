@@ -19,16 +19,11 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { faunaDeMundo } from '../faunaFuncional.js';
 import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
-/* La vida del agua, por criterio ecológico: mariposas revoloteando sobre la
-   quebrada, un colibrí en las flores de la ribera (junto a la ronda de monte),
-   y otra mariposa polinizando la huerta regada. Anclada a la curva del agua. */
-const FAUNA_FLUJO = [
-  { tipo: 'colibri', base: [-1.35, 1.75, 0.7], patron: 'revoloteo', size: 30, fase: 0.4 },
-  { tipo: 'mariposa', base: [-0.15, 0.98, 0.72], patron: 'revoloteo', size: 30, fase: 1.6 },
-  { tipo: 'mariposa', base: [2.1, 0.1, -0.15], patron: 'revoloteo', size: 28, fase: 3.0 },
-];
+/* La fauna funcional del agua (POLINIZADORES de ribera y huerta regada) vive en
+   faunaFuncional.js; aquí solo se siembra según el mundo y el device-tier. */
 
 const CURVA_DEFAULT = [
   [-1.8, 2.2, 0.4], [-0.9, 1.4, 0.1], [0, 0.7, -0.2], [0.7, 0.1, 0.1], [1.4, -0.2, 0.5],
@@ -200,7 +195,7 @@ function Cultivo({ pos = [2.3, -0.3, -0.55], surcos = 4, desde, color }) {
   );
 }
 
-function Diorama({ params, tinte, reducedMotion }) {
+function Diorama({ params, tinte, reducedMotion, fauna }) {
   const color = params?.agua || (tinte && tinte[0]) || '#3f8fb0';
   const hitos = params?.hitos;
   const curva3 = useMemo(() => {
@@ -244,17 +239,18 @@ function Diorama({ params, tinte, reducedMotion }) {
           color={color}
         />
       )}
-      {/* la vida que vive del agua: mariposas y un colibrí de ribera */}
-      <Fauna items={FAUNA_FLUJO} reducedMotion={reducedMotion} />
+      {/* la vida que vive del agua: polinizadores de ribera y huerta regada */}
+      <Fauna items={fauna} reducedMotion={reducedMotion} />
     </group>
   );
 }
 
 export default function EscenaFlujo(props) {
   const cielo = CIELOS.agua;
+  const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.9, 0.3] }}>
-      <Diorama params={props.params} tinte={props.tinte} reducedMotion={props.reducedMotion} />
+      <Diorama params={props.params} tinte={props.tinte} reducedMotion={props.reducedMotion} fauna={fauna} />
     </EscenaBase3D>
   );
 }

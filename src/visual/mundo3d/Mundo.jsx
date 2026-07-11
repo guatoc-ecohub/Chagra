@@ -160,6 +160,7 @@ function MundoInterno({
       <div className="mundo-root" data-dim="3d" data-mundo={mundoId}>
         <Suspense fallback={<MundoCargando tinte={tinte} onTimeout={alTimeout3D} />}>
           <Escena
+            mundoId={mundoId}
             params={plan.entrada.params}
             hotspots={plan.entrada.hotspots}
             entrada={plan.entrada.entrada}

@@ -23,14 +23,11 @@
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { faunaDeMundo } from '../faunaFuncional.js';
 import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
-/* La fauna que anima la feria: la mariposa entre las flores del puesto, el
-   colibrí que sobrevuela la plaza. Pocas y por criterio (vida, no enjambre). */
-const FAUNA_MERCADO = [
-  { tipo: 'mariposa', base: [-1.15, 0.7, 0.55], patron: 'revoloteo', size: 28, fase: 0.5 },
-  { tipo: 'colibri', base: [1.2, 1.15, 0.3], patron: 'revoloteo', size: 30, fase: 1.8 },
-];
+/* La fauna funcional de la feria (POLINIZADORES entre las flores del puesto y la
+   cosecha: sin polinizador no hay cosecha que vender) vive en faunaFuncional.js. */
 
 /* Un CANASTO de mimbre con su montón de producto. El canasto es un tronco de
    cono facetado (el tejido); encima, una loma de esferitas del color de lo que
@@ -184,7 +181,7 @@ function MataCampo({ pos, color = '#4e8f3f' }) {
   );
 }
 
-function Diorama({ params, reducedMotion }) {
+function Diorama({ params, reducedMotion, fauna }) {
   const puestos = params?.puestos || [
     { color: '#c96a2f', pos: [-0.85, 0, 0.2] },
     { color: '#3f8f4e', pos: [0.9, 0, -0.1] },
@@ -252,8 +249,8 @@ function Diorama({ params, reducedMotion }) {
           ~0.45 sobre el piso sin mesa que la sostuviera). */}
       <Balanza pos={[0.15, 0, 0.55]} />
 
-      {/* la fauna que anima la feria (mariposa/colibrí) */}
-      <Fauna items={FAUNA_MERCADO} reducedMotion={reducedMotion} />
+      {/* la fauna que anima la feria (polinizadores de puesto y plaza) */}
+      <Fauna items={fauna} reducedMotion={reducedMotion} />
     </group>
   );
 }
@@ -262,9 +259,10 @@ export default function EscenaMercado(props) {
   // Cielo cálido de plaza de mercado a media mañana (se mezcla igual hacia la
   // hora dorada del valle: entrar debe sentirse como acercarse, no otra app).
   const cielo = CIELOS.plaza;
+  const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.5, 0] }}>
-      <Diorama params={props.params} reducedMotion={props.reducedMotion} />
+      <Diorama params={props.params} reducedMotion={props.reducedMotion} fauna={fauna} />
     </EscenaBase3D>
   );
 }
