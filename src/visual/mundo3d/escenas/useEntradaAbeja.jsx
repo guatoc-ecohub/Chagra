@@ -16,13 +16,18 @@
    coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
    un <Canvas> vía EscenaBase3D; no es hot-reload-sensible. Van juntos a propósito:
    la creature posee el cuerpo, la escena posee la coreografía (contrato del DR). */
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
+import { reaccionDeFinca } from './reaccionFinca.js';
 import useHaptics from '../useHaptics.js';
+
+/* Vuelo neutro: cuando la escena aún no pasa `estadoFinca` (contrato viejo),
+   la coreografía se comporta EXACTO como antes (todos los multiplicadores en 1). */
+const VUELO_NEUTRO = { altura: 1, velocidad: 1, vagar: 1, tiembla: 0 };
 
 /**
  * Devuelve `{ ref, caraRef, sombraRef }` para colgar del `<group>` de la abeja,
@@ -36,9 +41,12 @@ import useHaptics from '../useHaptics.js';
  * @param {number}  [opts.energia=1]      0..1 — vivacidad del vuelo (de la salud real).
  * @param {boolean} [opts.reducedMotion=false]  congela el vaivén a un fotograma.
  * @param {number}  [opts.piso=0]  y del suelo donde se proyecta la sombra.
+ * @param {object}  [opts.vuelo]  modificadores de reaccionDeFinca: mojada vuela
+ *   más bajo/lento, sed baja a buscar agua, comiendo tiembla mordisqueando.
+ *   `{ altura, velocidad, vagar, tiembla }` — multiplicadores (1 = vuelo normal).
  */
 export function useEntradaAbeja(foco, {
-  entrando = true, energia = 1, reducedMotion = false, piso = 0,
+  entrando = true, energia = 1, reducedMotion = false, piso = 0, vuelo = VUELO_NEUTRO,
 } = {}) {
   const ref = useRef(null);
   const caraRef = useRef(null);
@@ -52,17 +60,27 @@ export function useEntradaAbeja(foco, {
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
-    const brio = 0.35 + 0.65 * energia; // la energía anima el vuelo
+    // El estado de la finca modula el vuelo: mojada pesa (baja/lenta), sed baja a
+    // buscar agua, comiendo tiembla mordisqueando. Multiplicadores de reaccionDeFinca.
+    const mAltura = vuelo?.altura ?? 1;
+    const mVel = vuelo?.velocidad ?? 1;
+    const mVagar = vuelo?.vagar ?? 1;
+    const tiembla = reducedMotion ? 0 : (vuelo?.tiembla ?? 0);
+    const brio = (0.35 + 0.65 * energia) * mVel; // la energía y el clima animan el vuelo
     const bob = reducedMotion ? 0 : Math.sin(t * (1.6 + brio)) * (0.06 + 0.12 * brio);
+    // Temblor de sed/mordisco: sacudida rápida y corta (nervio, no vaivén).
+    const tembleque = tiembla ? Math.sin(t * 13) * tiembla : 0;
     // Al reposo deriva en un círculo calmo; al entrar se posa junto al lugar.
-    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.55) * 0.6;
-    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.55) * 0.4;
+    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.55) * 0.6 * mVagar;
+    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.55) * 0.4 * mVagar;
+    // La altura sobre el foco se atenúa con `mAltura` (mojada/sed vuelan más bajo).
+    const alto = (entrando ? 0.85 : 1.6) * mAltura;
     const dest = new THREE.Vector3(
-      foco.x + (entrando ? 0.45 : 0.35 + vagarX),
-      foco.y + (entrando ? 0.85 : 1.6) + bob,
+      foco.x + (entrando ? 0.45 : 0.35 + vagarX) + tembleque,
+      foco.y + alto + bob + tembleque * 0.5,
       foco.z + (entrando ? 0.6 : 0.55 + vagarZ),
     );
-    ref.current.position.lerp(dest, entrando ? 0.06 : 0.05);
+    ref.current.position.lerp(dest, (entrando ? 0.06 : 0.05) * mVel);
     // Angelita se posa: al cruzar el umbral de llegada al foco, un roce háptico
     // (una vez por foco — el ref evita repetir por frame; el gate del hook
     // apaga todo con reduced-motion, pref 'off' o sin soporte).
@@ -101,9 +119,27 @@ export function useEntradaAbeja(foco, {
 export function AbejaEscena({
   foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
   hablando = false, rebote = 0,
+  // ── EL ESTADO REAL DE LA FINCA (auditoría §5b) ─────────────────────────────
+  //    Angelita SIEMPRE refleja tu realidad: llueve→mojada, Niño/sequía→sed,
+  //    cosecha→come de eso, ánimo por salud. Interfaz LIMPIA; hoy MUESTRA, codex
+  //    cabla el dato real con useFincaViva. Si NO se pasa, la abeja usa el
+  //    `animo`/`energia` sueltos de siempre (contrato viejo intacto).
+  estadoFinca = null, hayAlerta = false,
 }) {
+  // La CAPA de reacción (pura, desacoplada de la especie): del estado real sale
+  // el ánimo, la energía, y el repertorio (mojada/sed/comiendo) + modificadores
+  // de vuelo. Con estadoFinca manda la reacción; sin él, el contrato viejo.
+  const reaccion = useMemo(
+    () => (estadoFinca ? reaccionDeFinca(estadoFinca, { hayAlerta }) : null),
+    [estadoFinca, hayAlerta],
+  );
+  const animoReal = reaccion?.animo ?? animo;
+  const energiaReal = reaccion?.energia ?? energia;
+  const mojada = reaccion?.mojada ?? false;
+  const sed = reaccion?.sed ?? false;
+  const comiendo = reaccion?.comiendo ?? false;
   const { ref, caraRef, sombraRef } = useEntradaAbeja(foco, {
-    entrando, energia, reducedMotion, piso,
+    entrando, energia: energiaReal, reducedMotion, piso, vuelo: reaccion?.vuelo,
   });
   // Microrrebote: cada toque de hotspot sube `rebote`; reiniciamos la animación
   // CSS (quitar → reflow → poner) para que dispare aun en toques seguidos. El
@@ -118,19 +154,33 @@ export function AbejaEscena({
     const t = setTimeout(() => el.removeAttribute('data-rebote'), 640);
     return () => clearTimeout(t);
   }, [rebote, reducedMotion]);
-  const size = 40 + Math.round(energia * 12);
+  const size = 40 + Math.round(energiaReal * 12);
+  const vivo = !reducedMotion;
   return (
     <>
       <group ref={ref} position={[foco.x + 0.45, foco.y + 0.85, foco.z + 0.6]}>
         <Html center distanceFactor={7} zIndexRange={[40, 10]}>
+          {/* Reacción al estado real, también en el wrapper (brillo mojado,
+              temblor sediento, bamboleo de mordisco — rubber-hose). Gate RM. */}
           <div
             className="mundo-abeja"
             aria-hidden="true"
-            data-hablando={hablando && !reducedMotion ? '1' : undefined}
+            data-hablando={hablando && vivo ? '1' : undefined}
+            data-mojada={mojada && vivo ? '1' : undefined}
+            data-sed={sed && vivo ? '1' : undefined}
+            data-comiendo={comiendo && vivo ? '1' : undefined}
           >
             <div ref={reboteRef} className="mundo-abeja__rebote">
               <div ref={caraRef} className="mundo-abeja__cara">
-                <AbejaAngelita size={size} animo={animo} energia={energia} animated={!reducedMotion} />
+                <AbejaAngelita
+                  size={size}
+                  animo={animoReal}
+                  energia={energiaReal}
+                  mojada={mojada}
+                  sed={sed}
+                  comiendo={comiendo}
+                  animated={vivo}
+                />
               </div>
             </div>
           </div>

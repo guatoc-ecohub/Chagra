@@ -31,6 +31,9 @@ import {
 import * as THREE from 'three';
 import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
+/* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
+   mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
+import { reaccionDeFinca, ESTADO_FINCA_MUESTRA } from '../../visual/mundo3d/escenas/reaccionFinca.js';
 import { Colibri } from '../../visual/creatures/Colibri.jsx';
 import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
 import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
@@ -922,37 +925,62 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
       mundo (`entrando`), BAJA y se acerca al lugar — "entra" al mundo, y la
       cámara la acompaña. Su ánimo/energía (salud real de la finca) tiñen su
       color, su aura y qué tan vivo es su vuelo. Mira hacia donde viaja. ── */
-function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion }) {
+function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false }) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const prevX = useRef(foco.x);
+  // Reacción al estado REAL de la finca (§5b): mismo repertorio que los mundos.
+  // Con estadoFinca manda la reacción; sin él, el contrato viejo (animo/energia).
+  const reaccion = useMemo(
+    () => (estadoFinca ? reaccionDeFinca(estadoFinca, { hayAlerta }) : null),
+    [estadoFinca, hayAlerta],
+  );
+  const animoReal = reaccion?.animo ?? animo;
+  const energiaReal = reaccion?.energia ?? energia;
+  const vuelo = reaccion?.vuelo;
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
-    const brio = 0.35 + 0.65 * energia; // la energía anima el vuelo
+    // Modificadores de reaccionDeFinca: mojada pesa (baja/lenta), sed baja a
+    // buscar agua, comiendo tiembla mordisqueando. Sin estado, todo queda en 1.
+    const mAltura = vuelo?.altura ?? 1;
+    const mVel = vuelo?.velocidad ?? 1;
+    const mVagar = vuelo?.vagar ?? 1;
+    const tiembla = reducedMotion ? 0 : (vuelo?.tiembla ?? 0);
+    const brio = (0.35 + 0.65 * energiaReal) * mVel; // energía y clima animan el vuelo
     const bob = reducedMotion ? 0 : Math.sin(t * (1.6 + brio)) * (0.1 + 0.16 * brio);
+    const tembleque = tiembla ? Math.sin(t * 13) * tiembla : 0;
     // Al reposo deriva en un círculo calmo; al entrar se posa junto al lugar.
-    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.55) * 0.9;
-    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.55) * 0.6;
+    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.55) * 0.9 * mVagar;
+    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.55) * 0.6 * mVagar;
+    const alto = (entrando ? 1.05 : 2.3) * mAltura;
     const dest = new THREE.Vector3(
-      foco.x + (entrando ? 0.55 : 0.4 + vagarX),
-      foco.y + (entrando ? 1.05 : 2.3) + bob,
+      foco.x + (entrando ? 0.55 : 0.4 + vagarX) + tembleque,
+      foco.y + alto + bob + tembleque * 0.5,
       foco.z + (entrando ? 0.7 : 0.6 + vagarZ),
     );
-    ref.current.position.lerp(dest, entrando ? 0.05 : 0.045);
+    ref.current.position.lerp(dest, (entrando ? 0.05 : 0.045) * mVel);
     if (caraRef.current) {
       const vx = ref.current.position.x - prevX.current;
       if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
       prevX.current = ref.current.position.x;
     }
   });
-  const size = 44 + Math.round(energia * 14);
+  const size = 44 + Math.round(energiaReal * 14);
   return (
     <group ref={ref} position={[foco.x + 0.4, foco.y + 2.3, foco.z + 0.6]}>
       <Html center distanceFactor={9} zIndexRange={[40, 10]}>
         <div className="valle-abeja" aria-hidden="true">
           <div ref={caraRef} className="valle-abeja__cara">
-            <AbejaAngelita size={size} animo={animo} energia={energia} animated={!reducedMotion} />
+            <AbejaAngelita
+              size={size}
+              animo={animoReal}
+              energia={energiaReal}
+              mojada={reaccion?.mojada ?? false}
+              sed={reaccion?.sed ?? false}
+              comiendo={reaccion?.comiendo ?? false}
+              animated={!reducedMotion}
+            />
           </div>
         </div>
       </Html>
@@ -1005,7 +1033,7 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit }) {
 }
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil }) {
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, estadoFinca = null, hayAlerta = false }) {
   const controls = useRef(null);
   // Occluders de los rótulos: solo terreno + cordillera (raycast barato y es
   // exactamente lo que las etiquetas no deben atravesar).
@@ -1079,6 +1107,8 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         entrando={entrando}
         animo={animo}
         energia={energia}
+        estadoFinca={estadoFinca}
+        hayAlerta={hayAlerta}
         reducedMotion={reducedMotion}
       />
 
@@ -1102,6 +1132,10 @@ export default function Valle3D({
   onAlerta,
   reducedMotion,
   tier = 'alto',
+  /* El estado REAL de la finca (auditoría §5b): Angelita SIEMPRE lo refleja,
+     también en el mapa. Hoy MUESTRA; codex lo cabla con useFincaViva. */
+  estadoFinca = ESTADO_FINCA_MUESTRA,
+  hayAlerta = false,
 }) {
   const [listo, setListo] = useState(false);
   /* El PERFIL DE RENDER del tier (DR-3D-PERF-GAMABAJA): 'alto' conserva este
@@ -1124,6 +1158,8 @@ export default function Valle3D({
           focoId={focoId}
           animo={animo}
           energia={energia}
+          estadoFinca={estadoFinca}
+          hayAlerta={hayAlerta}
           onEntrar={onEntrar}
           onAlerta={onAlerta}
           reducedMotion={reducedMotion}

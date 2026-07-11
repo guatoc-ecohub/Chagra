@@ -60,6 +60,85 @@
   100% { transform: scaleY(0.5) scaleX(0.9); }
 }
 
+/* ── REACCIÓN AL ESTADO REAL DE LA FINCA (auditoría §5b) ──────────────────────
+   Estética rubber-hose (Miss Minutes de Loki / Cuphead): squash-and-stretch,
+   rebote elástico, gestos exagerados y con carácter — nada tímido.
+   Todo transform/opacity (GPU, Android gama baja). RM lo congela abajo. */
+
+/* MOJADA — gotas que escurren del cuerpo con un rebotico al caer. */
+.crt-gota {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: crt-gota-cae 1.7s cubic-bezier(0.5, 0, 0.7, 1) infinite;
+}
+@keyframes crt-gota-cae {
+  0%   { transform: translateY(0) scaleY(0.7); opacity: 0; }
+  15%  { transform: translateY(0) scaleY(1.15); opacity: 0.95; }
+  70%  { transform: translateY(6px) scaleY(1); opacity: 0.85; }
+  85%  { transform: translateY(8px) scaleY(0.5) scaleX(1.4); opacity: 0.4; } /* splash */
+  100% { transform: translateY(9px) scaleY(0.2); opacity: 0; }
+}
+/* El cuerpo mojado pesa: un vaivén lento y cargado (vuela con esfuerzo). */
+[data-creature='abeja-angelita'][data-mojada='1'] .crt-body {
+  animation: crt-mojada-peso 2.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes crt-mojada-peso {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(0.6px) scaleY(0.97); }
+}
+
+/* SED — la lengüita jadea: sale y entra rápido, con rebote (Niño/sequía). */
+.crt-lengua {
+  transform-box: fill-box;
+  transform-origin: center top;
+}
+[data-creature='abeja-angelita'][data-sed='1'] .crt-lengua {
+  animation: crt-jadeo 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes crt-jadeo {
+  0%, 100% { transform: scaleY(0.55); }
+  50%      { transform: scaleY(1.1); }
+}
+/* El cuerpo sediento jadea también: pecho que sube y baja rapidito. */
+[data-creature='abeja-angelita'][data-sed='1'] .crt-body {
+  animation: crt-jadeo-pecho 0.5s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes crt-jadeo-pecho {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(1.08) scaleX(0.97); }
+}
+
+/* COMIENDO — liba de la cosecha: la probóscide bucea (mordisqueo) y el cuerpo
+   da el squash-and-stretch de cada picotazo. Rubber-hose puro. */
+[data-creature='abeja-angelita'][data-comiendo='1'] .crt-lengua {
+  animation: crt-liba 0.62s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes crt-liba {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  45%      { transform: translateY(2px) scaleY(1.25); }
+  60%      { transform: translateY(2px) scaleY(1.25); }
+}
+[data-creature='abeja-angelita'][data-comiendo='1'] .crt-body {
+  animation: crt-mordisco 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes crt-mordisco {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  45%      { transform: translateY(1.5px) scale(1.06, 0.9); } /* squash al picar */
+  70%      { transform: translateY(-1px) scale(0.96, 1.06); } /* stretch al subir */
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .crt-wing, .crt-fwing, .crt-ball, .crt-legs { animation: none !important; }
+  .crt-wing, .crt-fwing, .crt-ball, .crt-legs,
+  .crt-gota, .crt-lengua,
+  [data-creature='abeja-angelita'][data-mojada='1'] .crt-body,
+  [data-creature='abeja-angelita'][data-sed='1'] .crt-lengua,
+  [data-creature='abeja-angelita'][data-sed='1'] .crt-body,
+  [data-creature='abeja-angelita'][data-comiendo='1'] .crt-lengua,
+  [data-creature='abeja-angelita'][data-comiendo='1'] .crt-body { animation: none !important; }
 }
