@@ -162,48 +162,15 @@ export const MUNDO = {
     entrada: { narra: 'cultivos' },
   },
 
-  // ☕ EL CAFÉ — REUSA el arquetipo `flujo` del mundo del agua: el beneficio
-  //    húmedo ES un proceso de gravedad + agua que BAJA — de la cereza a la
-  //    taza (cereza → despulpado → fermento → lavado → secado → taza). Verdad
-  //    agronómica (Coffea arabica 1500–2000 msnm, piso templado, café de
-  //    SOMBRA con guamo/nogal/aliso; broca sin veneno con Beauveria bassiana) +
-  //    máximo reúso del gold-standard. Todo son DATOS: la curva del beneficio +
-  //    sus hitos los leen igual el diorama 3D (EscenaFlujo) y su gemelo 2D.
+  // ☕ EL CAFÉ — arquetipo `lamina`: la lámina del cafeto.
   cafe: {
-    escena: 'flujo',
+    escena: 'lamina',
     valle: { tipo: 'cafetal', pos: [3.4, 0, 2.2], escala: 1 },
-    params: {
-      // El ambiente cálido/verde de montaña templada y el color miel-café de lo
-      // que baja (el mucílago con agua), en vez del azul del agua.
-      cielo: { fondo: '#e9ead0', cielo: '#f1f0d8', suelo: '#6d7c48', intensidad: 1.05 },
-      flujo: '#b07a44',
-      // El beneficio baja por gravedad, igual que la quebrada.
-      curva: [
-        [-2.1, 2.3, 0.3], [-1.1, 1.5, 0], [-0.1, 0.8, -0.25], [0.7, 0.25, 0], [1.5, -0.15, 0.5],
-      ],
-      hitos: {
-        ronda: { tramo: [0.02, 0.32], arboles: 5 },       // los árboles de sombra sobre el cafetal
-        cerezas: { tramo: [0.06, 0.5], n: 10 },            // las cerezas maduras en los cafetos
-        riesgo: { t: 0.44, lado: 0.85 },                   // la broca se maneja SIN veneno (Beauveria)
-        bocatoma: { t: 0.64 },                             // la despulpadora del beneficio
-        cultivo: { pos: [2.25, -0.28, -0.55], surcos: 4 }, // el cafetal en surcos / el secadero
-        taza: { pos: [1.75, -0.12, 0.55] },                // de la cereza a la taza
-        fauna: [
-          { tipo: 'colibri', pos: [-1.25, 1.95, 0.6], escala: 1 },   // poliniza la flor del café
-          { tipo: 'mariposa', pos: [0.35, 1.15, 0.7], escala: 0.9 }, // visita el cafetal
-        ],
-      },
-    },
+    params: { lamina: 'cafeto' },
     hotspots: [
-      { id: 'cafe', pos: [-1.1, 1.55, 0.05], emoji: '☕', label: 'El café, paso a paso', view: 'cafe' },
-      { id: 'cereza', pos: [-0.35, 1.3, 0.7], emoji: '🍒', label: 'La cereza por dentro', view: 'cafe', data: { tema: 'cereza' } },
-      { id: 'sombra', pos: [-1.7, 2.5, -0.55], emoji: '🌳', label: 'Sombra y guamos', view: 'asociaciones' },
-      { id: 'broca', pos: [0.35, 1.15, 1], emoji: '🐛', label: 'Broca sin veneno', view: 'biopreparados' },
+      { id: 'cafe', pos: [], emoji: '☕', label: 'El café, paso a paso', view: 'cafe' },
     ],
-    entrada: { zoom: 7, narra: 'cafe' },
-    // El gemelo 2D digno: el mismo motivo de flujo (mirror), con los MISMOS
-    // hitos, teñido con el café del mundo.
-    fallback2d: { escena: 'mirror' },
+    entrada: { narra: 'cafe' },
   },
 
   // 🍊 FRUTALES — arquetipo `ficha`: tarjeta de especie foto-secuencial.
