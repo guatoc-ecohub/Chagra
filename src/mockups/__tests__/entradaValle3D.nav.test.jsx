@@ -23,6 +23,9 @@ import EntradaValle3D from '../EntradaValle3D.jsx';
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
+  delete window.speechSynthesis;
+  delete window.SpeechSynthesisUtterance;
+  delete globalThis.SpeechSynthesisUtterance;
 });
 
 /* El viaje dura ~1.05s; con timers falsos lo cumplimos determinista. */
@@ -102,5 +105,49 @@ describe('entrada-3d — navegable de punta a punta (valle ↔ mundos)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Volver al valle' }));
     cumplirViaje();
     expect(container.querySelector('.valle-mundo')).not.toBeInTheDocument();
+  });
+});
+
+describe('entrada-3d — voz con respaldo visible', () => {
+  test('saluda solo después del primer gesto y escribe la bienvenida', () => {
+    vi.useFakeTimers();
+    const { container } = render(<EntradaValle3D onBack={() => {}} />);
+
+    act(() => vi.advanceTimersByTime(1000));
+    expect(container.querySelector('.valle-companero')).not.toHaveTextContent(/Bienvenido/i);
+
+    fireEvent.pointerDown(container.querySelector('.valle-root'));
+    expect(container.querySelector('.valle-companero')).toHaveTextContent(/Bienvenido/i);
+  });
+
+  test('espera voiceschanged y usa la voz en español en la primera lectura', () => {
+    let voces = [];
+    const eventos = new EventTarget();
+    const synth = {
+      cancel: vi.fn(),
+      speak: vi.fn(),
+      getVoices: vi.fn(() => voces),
+      addEventListener: eventos.addEventListener.bind(eventos),
+      removeEventListener: eventos.removeEventListener.bind(eventos),
+    };
+    class Utterance {
+      constructor(text) { this.text = text; }
+    }
+    window.speechSynthesis = synth;
+    window.SpeechSynthesisUtterance = Utterance;
+    globalThis.SpeechSynthesisUtterance = Utterance;
+
+    const { container } = render(<EntradaValle3D onBack={() => {}} />);
+    fireEvent.pointerDown(container.querySelector('.valle-root'));
+    expect(synth.speak).not.toHaveBeenCalled();
+
+    const vozEspanol = { lang: 'es-CO', name: 'Angelita' };
+    voces = [vozEspanol];
+    act(() => eventos.dispatchEvent(new Event('voiceschanged')));
+    fireEvent.click(screen.getByRole('button', { name: /Viajar al mundo El agua/ }));
+
+    expect(synth.speak).toHaveBeenCalledTimes(1);
+    expect(synth.speak.mock.calls[0][0].voice).toBe(vozEspanol);
+    expect(container.querySelector('.valle-companero')).toHaveTextContent(/sale el agua/i);
   });
 });
