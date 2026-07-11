@@ -16,6 +16,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { resolverMundo, tinteDeMundo, tituloDeMundo, emojiDeMundo } from './resolverMundo.js';
 import Mundo2D from './Mundo2D.jsx';
+import useAudioMundo from './useAudioMundo.js';
 import './mundo.css';
 
 /* Los dioramas 3D se cargan PEREZOSO: three/@react-three viven en su propio
@@ -102,6 +103,11 @@ function MundoInterno({
 
   const plan = resolverMundo(mundoId, tier);
   const tinte = tinteDeMundo(mundoId);
+
+  /* Sonido ambiental 0-KB (spec S3): la paleta sonora del mundo suena mientras
+     el host esté montado — 3D, 2D o caída digna por igual — con fade-in/out en
+     la transición. Gate interno: toggle opt-in + gesto previo + reduced-motion. */
+  useAudioMundo({ mundoId, reducedMotion });
 
   const alTimeout3D = useCallback(() => setCaido3d(true), []);
   const reintentar3D = useCallback(() => {

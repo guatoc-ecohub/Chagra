@@ -51,6 +51,7 @@ import Mundo, {
   tituloDeMundo,
   useNavegacionMundos,
   TransicionMundo,
+  useAudioMundo,
 } from '../visual/mundo3d/index.js';
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
@@ -103,6 +104,12 @@ export default function EntradaValle3D({ onBack }) {
   );
 
   const nav = useNavegacionMundos({ reducedMotion });
+
+  // ── Sonido ambiental 0-KB (spec S3): el valle reclama su paleta (brisa
+  //    dorada) mientras la entrada viva; al entrar a un mundo, <Mundo> reclama
+  //    la suya ENCIMA (crossfade) y al volver el valle retoma solo. Opt-in
+  //    (default OFF), solo tras gesto, respeta reduced-motion.
+  useAudioMundo({ mundoId: 'valle', reducedMotion });
 
   // ── El compañero (Angelita): su ánimo/energía salen del estado REAL de la
   //    finca + el clima + si lo del día sigue sin atender. Cuidar la alerta la

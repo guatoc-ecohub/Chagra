@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench,
   Sprout, ChevronRight, ChevronLeft, Bell, Users, Camera, Trash2, Shield,
-  Archive, LifeBuoy, LayoutGrid, GraduationCap, Vibrate,
+  Archive, LifeBuoy, LayoutGrid, GraduationCap, Vibrate, Waves,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
@@ -698,6 +698,9 @@ export default function ProfileScreen({ onBack, onHome }) {
 
             {/* DR-3D-HAPTICA: vibración táctil de los mundos 3D (tri-estado). */}
             <HapticsSection />
+
+            {/* Spec S3: sonido ambiental 0-KB de los mundos (tri-estado). */}
+            <SonidoSection />
           </div>
         )}
 
@@ -1160,6 +1163,72 @@ function HapticsSection() {
           Este equipo no admite vibración desde el navegador (por ejemplo,
           iPhone o iPad). No se pierde información: cada pulso solo acompaña
           algo que ya se ve en pantalla.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * SonidoSection — spec S3 (2026-07-11).
+ *
+ * Toggle tri-estado "Sonido de la finca" persistido en usePrefsStore (key
+ * `chagra:prefs:sonido`). Controla el ambiente sonoro 0-KB de los mundos
+ * (sintetizado con WebAudio, sin descargar un solo archivo):
+ *   - Apagado (default): silencio total — el sonido es opt-in.
+ *   - Suave: ambiente muy tenue (la brisa apenas se insinúa).
+ *   - Presente: ambiente audible, igual bajo y cálido (fondo, no pista).
+ * Arranca solo tras un toque (política de autoplay) y respeta la preferencia
+ * de movimiento reducido del sistema (fondo estático, sin eventos rítmicos).
+ */
+const SONIDO_OPTIONS = [
+  { id: 'off', label: 'Apagado' },
+  { id: 'suave', label: 'Suave' },
+  { id: 'on', label: 'Presente' },
+];
+
+function SonidoSection() {
+  const sonido = usePrefsStore((s) => s.sonido ?? 'off');
+  const setSonido = usePrefsStore((s) => s.setSonido);
+  const soportado = typeof window !== 'undefined'
+    && Boolean(window.AudioContext || window.webkitAudioContext);
+
+  return (
+    <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+      <div className="flex items-center gap-2 px-1">
+        <Waves size={18} className="text-emerald-400" />
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Sonido de la finca</h3>
+      </div>
+
+      <p className="text-xs text-slate-400 leading-snug px-1">
+        Un ambiente sutil al recorrer los mundos: la quebrada y sus gotas, el
+        viento del páramo, las aves del monte, el murmullo del mercado. Se
+        genera en su equipo, sin gastar datos.
+      </p>
+
+      <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Sonido ambiental de los mundos">
+        {SONIDO_OPTIONS.map((opt) => (
+          <button
+            key={opt.id}
+            type="button"
+            role="radio"
+            aria-checked={sonido === opt.id}
+            onClick={() => setSonido(opt.id)}
+            className={`tap-target px-3 py-2 rounded-xl text-xs font-bold transition-colors ${
+              sonido === opt.id
+                ? 'bg-emerald-600/80 text-white'
+                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800'
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {!soportado && (
+        <p className="text-[11px] text-slate-500 leading-snug px-1">
+          Este navegador no admite audio generado. No se pierde información:
+          el sonido solo acompaña lo que ya se ve en pantalla.
         </p>
       )}
     </div>
