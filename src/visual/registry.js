@@ -82,6 +82,11 @@ const VARIANTES_LAMINA = {
     { label: 'juvenil', props: { etapa: 'juvenil' } },
     { label: 'cosecha', props: { etapa: 'cosecha' } },
   ],
+  // Promovidas del mockup ensena-dibujando (proposición-locked, sin prop de
+  // dominio): una sola vista, se dibujan solas al montar.
+  milpa: [{ label: 'las tres hermanas', props: {} }],
+  rotacion: [{ label: 'la rueda de 4 eras', props: {} }],
+  'piso-termico': [{ label: 'en corte', props: {} }],
 };
 
 /* ── Effects: los tres helpers SVG del barrel, declarados a mano ──────────── */

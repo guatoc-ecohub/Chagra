@@ -73,6 +73,9 @@ const OAuthCallback = lazy(() => import('./components/OAuthCallback'));
 // Vitrina pública de la librería visual reutilizable (`src/visual/`). Ruta
 // #/mockups/visual-lib, resuelta ANTES del check de sesión (no requiere auth).
 const VisualLib = lazy(() => import('./mockups/VisualLib'));
+// #/mockups/agente-dibuja — vitrina "el agente dibuja en sus respuestas de
+// forma fiable" (DR 2026-07-11), también pública/sin auth.
+const AgenteDibuja = lazy(() => import('./mockups/AgenteDibuja'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -425,6 +428,7 @@ const LoadingFallback = ({ view = null }) => {
 // #onboarding-piloto. El hash llega ya normalizado (sin `#`/`#/`).
 const MOCKUP_HASH_ROUTES = {
   'mockups/visual-lib': 'mockup_visual_lib',
+  'mockups/agente-dibuja': 'mockup_agente_dibuja',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1238,6 +1242,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Librería visual">
               <VisualLib />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_agente_dibuja':
+        // Vitrina pública "el agente dibuja en sus respuestas de forma fiable".
+        // Ruta #/mockups/agente-dibuja, sin auth: muestra respuestas del agente
+        // con su lámina (del conjunto cerrado LAMINAS_FIABLES) dibujándose sola.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El agente dibuja">
+              <AgenteDibuja onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );

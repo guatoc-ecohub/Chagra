@@ -11,6 +11,7 @@ import FeedbackButtons from '../FeedbackButtons';
 import AIBetaBadge from '../AIBetaBadge';
 import SemaforoConfianza from './SemaforoConfianza';
 import AgentMarkdown from './AgentMarkdown';
+import AgentLamina from '../../visual/laminas/AgentLamina';
 
 function formatTime(timestamp) {
   if (!timestamp) return '';
@@ -525,6 +526,26 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
             /* break-words: sin esto una URL o palabra larga sin espacios
                desborda la burbuja en horizontal a 320px. */
             <p className="text-[15px] leading-relaxed whitespace-pre-wrap break-words">{message.content}</p>
+          )}
+          {/* ═══ LÁMINA QUE SE DIBUJA SOLA (DR "el agente dibuja fiable") ═══
+              HOOK DEL BACKEND: el agente inyecta en el turno assistant un
+              `metadata.lamina = { slug, props }` — slug de un conjunto CERRADO
+              (LAMINAS_FIABLES) + prop de enum cerrado. AgentLamina lo lee y
+              monta la lámina LOCAL con su auto-dibujado; si el slug no es fiable
+              o la prop no calza, AgentLamina degrada a NULL → solo texto. El
+              modelo NUNCA emite SVG. El GATE DE GROUNDING (regla #3: que la
+              especie/proposición esté aterrizada en la evidencia del turno) lo
+              cablea el agente aguas arriba, NO este componente — aquí solo se
+              renderiza lo que ya venga validado en metadata.lamina.
+              TODO(agente): poblar message.metadata.lamina desde el handler de
+              `dibujar_lamina` tras revalidar el gate contra resolvedEntities. */}
+          {!isUser && !isStreaming && !message._orphan_recovery && message.metadata?.lamina?.slug && (
+            <div className="mt-2" data-chat-dark="true">
+              <AgentLamina
+                slug={message.metadata.lamina.slug}
+                props={message.metadata.lamina.props}
+              />
+            </div>
           )}
           {/* UX-1 (#284): badge "beta" permanente cerca de cualquier respuesta
               IA del agente. NO reemplaza a SourceBadge (que es la fuente
