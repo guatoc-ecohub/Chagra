@@ -25,6 +25,7 @@ import { Canvas } from '@react-three/fiber';
 import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaEscena } from './useEntradaAbeja.jsx';
+import CamaraDirector from './CamaraDirector.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
 import { ESTADO_FINCA_MUESTRA } from './reaccionFinca.js';
 import useHaptics from '../useHaptics.js';
@@ -36,7 +37,7 @@ import { ATMOSFERA, CIELOS, mezclar } from '../atmosferaMadre.js';
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
   frugal = false, hablando = false, focoId = null, focoToken = 0,
-  estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false,
+  estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false, camaraInicial,
   children,
 }) {
   const controls = useRef(null);
@@ -197,6 +198,20 @@ function Contenido({
         autoRotate={!reducedMotion && !activo}
         autoRotateSpeed={0.25}
       />
+      {/* La CÁMARA DE DIRECTOR (FASE 4): establishing shot al entrar (dolly con
+          arco + FOV que se asienta, coreografiado con el velo del viaje) y un
+          encuadre que respira apenas. La `mirada` arranca un pelín sobre el
+          corazón del diorama y baja al target de siempre (tilt-down de revelado);
+          la pose final es EXACTA a la de hoy. Inerte con reduced-motion o en el
+          perfil mínimo (gama baja forzada a 3D): ahí la cámara queda simple. */}
+      <CamaraDirector
+        controls={controls}
+        reposo={camaraInicial.position}
+        mirada={[centro[0], centro[1] + zoom * 0.12, centro[2]]}
+        duracion={2.1}
+        respiro={zoom * 0.005}
+        activa={!reducedMotion && !frugal}
+      />
       <AdaptiveDpr pixelated />
     </>
   );
@@ -246,6 +261,7 @@ export default function EscenaBase3D({
           focoToken={focoToken}
           estadoFinca={estadoFinca}
           hayAlerta={hayAlerta}
+          camaraInicial={cam}
         >
           {children}
         </Contenido>

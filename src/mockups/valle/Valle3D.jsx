@@ -30,6 +30,7 @@ import {
 } from '@react-three/drei';
 import * as THREE from 'three';
 import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
+import CamaraDirector from '../../visual/mundo3d/escenas/CamaraDirector.jsx';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 /* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
    mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
@@ -1032,8 +1033,12 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit }) {
   );
 }
 
+/* La pose de cámara del valle: UNA fuente para el Canvas y para el establishing
+   shot de la CámaraDirector (así el dolly aterriza EXACTO donde siempre). */
+const CAMARA_VALLE = { position: [10.5, 9, 13.5], fov: 40 };
+
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, estadoFinca = null, hayAlerta = false }) {
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false }) {
   const controls = useRef(null);
   // Occluders de los rótulos: solo terreno + cordillera (raycast barato y es
   // exactamente lo que las etiquetas no deben atravesar).
@@ -1118,6 +1123,21 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         controls={controls}
         autoOrbit={autoOrbit}
       />
+      {/* La CÁMARA DE DIRECTOR (FASE 4): el establishing shot del mapa — dolly
+          con arco desde más alto/lejos hasta la pose de siempre, UNA vez por
+          sesión (volver de un mundo no lo repite). Sin `mirada`: el target ya
+          lo lleva CamaraViajera; aquí solo posición + FOV. La respiración del
+          encuadre es aditiva y convive con su lerp. Gama baja o reduced-motion:
+          cámara simple (inerte). */}
+      <CamaraDirector
+        controls={controls}
+        reposo={CAMARA_VALLE.position}
+        duracion={2.4}
+        amplio={1.3}
+        respiro={0.05}
+        activa={!reducedMotion && tier !== 'bajo'}
+        unaVezClave="valle"
+      />
       <AdaptiveDpr pixelated />
     </>
   );
@@ -1148,7 +1168,7 @@ export default function Valle3D({
       shadows={perfil.sombras}
       dpr={perfil.dpr}
       gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-      camera={{ position: [10.5, 9, 13.5], fov: 40 }}
+      camera={CAMARA_VALLE}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >
@@ -1164,6 +1184,7 @@ export default function Valle3D({
           onAlerta={onAlerta}
           reducedMotion={reducedMotion}
           perfil={perfil}
+          tier={tier}
         />
       </Suspense>
     </Canvas>
