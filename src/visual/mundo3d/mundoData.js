@@ -282,6 +282,35 @@ export const MUNDO = {
     // El gemelo 2D digno: el mismo corte con las tres hermanas y los nódulos.
     fallback2d: { escena: 'mirror' },
   },
+  // 🌡️ PISOS TÉRMICOS / LADERA ANDINA — la altura manda (arquetipo `estratos`
+  //    reparametrizado). Se sube del cálido al páramo y en cada piso crece lo
+  //    suyo. Señal SUTIL de cambio climático: los pisos suben (termofilización),
+  //    sin catástrofe (norte "menos colapso, finca viva"). NO duplica `disenio`
+  //    (ese usa `estratos` para los 7 estratos del bosque comestible); aquí es el
+  //    gradiente ALTITUDINAL, que vive en `params.pisos` (de bajo a alto) y lo
+  //    leen por igual el diorama 3D y su gemelo 2D. Vitrina: #/mockups/mundo3d-bosque.
+  pisos: {
+    escena: 'estratos',
+    params: {
+      // Pisos de bajo (cálido) a alto (páramo). Verificado (catálogo thermal_zones
+      // + clasificación de Caldas). Color térmico: dorado abajo → azul-frío/blanco
+      // páramo arriba. El páramo se PROTEGE (frailejón, niebla que capta agua),
+      // no se ara.
+      pisos: [
+        { id: 'calido', nombre: 'Cálido', rango: '0–1000 m', color: '#cba04a', cultivo: 'platano' },
+        { id: 'templado', nombre: 'Templado', rango: '1000–2000 m', color: '#6f9e4a', cultivo: 'cafe' },
+        { id: 'frio', nombre: 'Frío', rango: '2000–3000 m', color: '#4f8f7d', cultivo: 'papa' },
+        { id: 'paramo', nombre: 'Páramo', rango: '3000–4200 m', color: '#aec7cf', cultivo: 'frailejon', niebla: true, protege: true },
+      ],
+    },
+    hotspots: [
+      { id: 'directorio', pos: [-1.4, 1.7, 0.7], emoji: '🌡️', label: 'Qué siembro según mi altura', view: 'directorio' },
+      { id: 'cafe', pos: [1.0, 1.75, 0.15], emoji: '☕', label: 'El piso del café', view: 'cafe' },
+      { id: 'papa', pos: [-1.0, 2.9, -0.35], emoji: '🥔', label: 'El piso de la papa', view: 'tuberculos' },
+      { id: 'paramo', pos: [0.7, 4.0, -0.9], emoji: '🏔️', label: 'El páramo se cuida', view: 'restauracion' },
+    ],
+    entrada: { zoom: 8, narra: 'pisos' },
+  },
 };
 
 /** Ids de todos los mundos registrados. */
