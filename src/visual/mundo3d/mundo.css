@@ -149,6 +149,16 @@
   color: #5a5248;
   background: #eee7da;
 }
+/* Recién nacida: verde tierno, celebración serena (un ser nuevo en el corral). */
+.mundo-placa__estado--nace {
+  color: #3f7a4a;
+  background: #e4f1e0;
+}
+/* En memoria: gris cálido, respeto sin luto (se recuerda, no se dramatiza). */
+.mundo-placa__estado--muerte {
+  color: #6a6152;
+  background: #efeae0;
+}
 
 /* ── Angelita dentro de la escena (billboard) ──────────────────────────── */
 /* Tres capas para tres gestos que NO se pisan: la raíz PULSA al narrar, la capa

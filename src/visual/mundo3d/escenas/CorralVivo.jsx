@@ -4,7 +4,14 @@
  * El hato REAL de la finca se dibuja desde `params.animales`:
  *
  *   [{ especie, nombre, raza, tamano: 'pequeño'|'mediano'|'grande',
- *      estado: 'sano'|'preñada'|'vendido' }]
+ *      estado: 'sano'|'preñada'|'vendido'|'nace'|'muerte' }]
+ *
+ * Un cambio de estado es un MOMENTO (audit §5a.4), no un salto: `nace` hace
+ * APARECER una cría (crece con un brillo cálido), `muerte` la RETIRA con respeto
+ * (se apaga suave y deja una piedrita con flor — sin dramatizar) y `vendido`
+ * la manda al MERCADO (el mismo dato vive en dos mundos: aquí queda su huella,
+ * allá llega caminando). Esos tres los dibuja AnimalMomento; el resto, el hato
+ * instanciado. Todo gateado por reduced-motion + device-tier.
  *
  * y cada animal se ve como ES: la especie da la silueta, el TAMAÑO da la
  * escala (3 cerdos pequeños + 4 medianos + 5 grandes se distinguen a golpe de
@@ -39,6 +46,7 @@ import { useFrame } from '@react-three/fiber';
 import { Html, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { PALETA } from '../atmosferaMadre.js';
+import AnimalMomento from './AnimalMomento.jsx';
 
 /* ── La escala del TAMAÑO declarado: clases discretas, no continuo (el dato
       del cuaderno dice "pequeño/mediano/grande", el corral lo espeja). ── */
@@ -69,7 +77,7 @@ const PELAJES = ['#c9a06a', '#e7d9c2', '#8a6a55', '#d8b58a', '#efe7d8', '#a55636
  * Las siluetas vienen de los animales low-poly ya validados del recinto
  * (gallina que picotea, vaca capsular, oveja de vellón) + el cerdo criollo.
  */
-const ESPECIES = {
+export const ESPECIES = {
   gallina: {
     gesto: 'picotea',
     alto: 0.5,
@@ -143,7 +151,7 @@ const ESPECIES = {
   },
 };
 
-function GeometriaParte({ geo }) {
+export function GeometriaParte({ geo }) {
   const [tipo, args] = geo;
   if (tipo === 'esfera') return <sphereGeometry args={args} />;
   if (tipo === 'capsula') return <capsuleGeometry args={args} />;
@@ -196,6 +204,12 @@ export function normalizarAnimales(lista) {
     // rumbo pseudo-aleatorio pero DETERMINISTA (mismo hato, mismo corral)
     const rumbo = a.pos ? 0 : (Math.sin((i + 1) * 12.9898) * 43758.5453) % (Math.PI * 2);
     const estado = (a.estado || 'sano').toLowerCase();
+    // El MOMENTO (audit §5a.4): un cambio de estado no es un salto brusco sino un
+    // instante memorable que se ANIMA. `nace` (aparece una cría), `muerte` (se
+    // retira con respeto) y `vendido` (viaja al mercado — mismo dato, dos mundos)
+    // se sacan del hato instanciado y los dibuja AnimalMomento uno por uno.
+    const momento =
+      estado === 'nace' ? 'nace' : estado === 'muerte' ? 'muerte' : estado === 'vendido' ? 'vendido' : null;
     const color = new THREE.Color(colorDe(a, i));
     return {
       id: `${i}-${a.nombre || especie}`,
@@ -204,6 +218,7 @@ export function normalizarAnimales(lista) {
       raza: a.raza || '',
       tamano: a.tamano || 'mediano',
       estado,
+      momento,
       escala,
       pos,
       fase: i * 1.7,
@@ -522,12 +537,22 @@ function PlacaAnimal({ animal, onCerrar }) {
   const alto = ESPECIES[animal.especie].alto * animal.escala + 0.5;
   const meta = [animal.raza, animal.tamano].filter(Boolean).join(' · ');
   const especial = animal.estado !== 'sano';
-  const claseEstado = animal.estado.startsWith('pre') ? 'prenada' : 'vendido';
+  const claseEstado = animal.estado.startsWith('pre')
+    ? 'prenada'
+    : animal.estado === 'nace'
+      ? 'nace'
+      : animal.estado === 'muerte'
+        ? 'muerte'
+        : 'vendido';
   const textoEstado = animal.estado.startsWith('pre')
     ? 'Preñada'
-    : animal.estado === 'vendido'
-      ? 'Vendido'
-      : animal.estado;
+    : animal.estado === 'nace'
+      ? 'Recién nacida'
+      : animal.estado === 'muerte'
+        ? 'En memoria'
+        : animal.estado === 'vendido'
+          ? 'Vendido'
+          : animal.estado;
   return (
     <group position={[animal.pos[0], alto, animal.pos[2]]}>
       <Html center distanceFactor={8.5} zIndexRange={[25, 0]}>
@@ -566,14 +591,23 @@ export default function CorralVivo({ animales: lista, reducedMotion, tier = 'alt
   const animar = !reducedMotion && tier !== 'bajo';
   // LOD gama baja: sin tablas con Text (queda estaca+perilla; la placa nombra)
   const conTabla = tier !== 'bajo';
-  const grupos = useMemo(() => {
+  // El hato instanciado NO incluye los que están viviendo su momento (nace/
+  // muerte): esos los dibuja AnimalMomento, uno por uno, para animarles el
+  // instante (escala/opacidad/gesto propios que la instancia compartida no da).
+  // `vendido` SÍ se queda aquí, como huella-fantasma (su vida está en el mercado).
+  const { grupos, momentos } = useMemo(() => {
     const g = new Map();
+    const mm = [];
     for (const a of animales) {
+      if (a.momento === 'nace' || a.momento === 'muerte') {
+        mm.push(a);
+        continue;
+      }
       const k = `${a.especie}${a.estado === 'vendido' ? '|fantasma' : ''}`;
       if (!g.has(k)) g.set(k, { clave: k, especie: a.especie, fantasma: a.estado === 'vendido', lista: [] });
       g.get(k).lista.push(a);
     }
-    return [...g.values()];
+    return { grupos: [...g.values()], momentos: mm };
   }, [animales]);
   const alPicar = (a) => setSeleccion((s) => (s?.id === a.id ? null : a));
 
@@ -594,6 +628,19 @@ export default function CorralVivo({ animales: lista, reducedMotion, tier = 'alt
               />
             ))}
         </Fragment>
+      ))}
+      {/* Los MOMENTOS del corral: la cría que nace, el que se despide con respeto.
+          Cada uno vive su instante; tocarlo abre su placa igual que a los demás. */}
+      {momentos.map((a) => (
+        <AnimalMomento
+          key={a.id}
+          animal={a}
+          modo={a.momento}
+          destino={a.pos}
+          reducedMotion={reducedMotion}
+          tier={tier}
+          onPick={alPicar}
+        />
       ))}
       <MarcadoresPrenada animales={animales} animar={animar} />
       <CartelesNombres
