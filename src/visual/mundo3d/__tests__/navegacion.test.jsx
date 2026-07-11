@@ -4,7 +4,8 @@
  * Congela el contrato del framework:
  *   · el ciclo completo: valle → viajando → mundo → regresando → valle;
  *   · reduced-motion = corte simple (sin fases de viaje, sin overlay);
- *   · un mundo sin escena montable (clima, escena:null) NO viaja → `pronto`;
+ *   · un mundo sin escena montable (id no registrado) NO viaja → `pronto`;
+ *     (el clima YA es montable: arquetipo `boveda`, así que sí viaja);
  *   · TransicionMundo llama `onFin` UNA vez al cumplirse el viaje.
  */
 import React from 'react';
@@ -30,6 +31,7 @@ function Sonda({ reducedMotion = false }) {
       <output data-testid="pronto">{nav.pronto || '-'}</output>
       <button type="button" onClick={() => nav.viajarAlMundo('agua')}>ir-agua</button>
       <button type="button" onClick={() => nav.viajarAlMundo('clima')}>ir-clima</button>
+      <button type="button" onClick={() => nav.viajarAlMundo('__fantasma__')}>ir-fantasma</button>
       <button type="button" onClick={() => nav.volverAlValle()}>volver</button>
       <button type="button" onClick={() => nav.completarViaje()}>completar</button>
     </div>
@@ -68,11 +70,18 @@ describe('useNavegacionMundos — la máquina valle ↔ mundo', () => {
     expect(fase()).toBe('valle'); // directo, sin 'regresando'
   });
 
-  test('mundo sin escena montable (clima) degrada: no viaja y marca `pronto`', () => {
+  test('el clima YA es montable (arquetipo boveda): sí viaja', () => {
     render(<Sonda />);
     fireEvent.click(screen.getByText('ir-clima'));
+    expect(fase()).toBe('viajando'); // viajó como cualquier mundo con escena
+    expect(screen.getByTestId('mundo')).toHaveTextContent('clima');
+  });
+
+  test('mundo sin escena montable (id no registrado) degrada: no viaja y marca `pronto`', () => {
+    render(<Sonda />);
+    fireEvent.click(screen.getByText('ir-fantasma'));
     expect(fase()).toBe('valle'); // no viajó
-    expect(screen.getByTestId('pronto')).toHaveTextContent('clima');
+    expect(screen.getByTestId('pronto')).toHaveTextContent('__fantasma__');
   });
 
   test('volverAlValle en el valle es inofensivo (no cambia de fase)', () => {

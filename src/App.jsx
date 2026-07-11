@@ -88,6 +88,9 @@ const Mundo3DSueloMockup = lazy(() => import('./mockups/Mundo3DSuelo'));
 const Mundo3DAnimalesMockup = lazy(() => import('./mockups/Mundo3DAnimales'));
 const Mundo3DMilpaMockup = lazy(() => import('./mockups/Mundo3DMilpa'));
 const Mundo3DBosqueMockup = lazy(() => import('./mockups/Mundo3DBosque'));
+// 3D: "El mundo del clima" — monta <Mundo mundoId="clima"> del framework: la
+// bóveda del cielo (arquetipo nuevo `boveda`). El 3D va perezoso (vendor-three).
+const Mundo3DClimaMockup = lazy(() => import('./mockups/Mundo3DClima'));
 // Voz: superficies de voz con forma viva (iris que reacciona al volumen).
 const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
 const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
@@ -475,6 +478,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-animales': 'mockup_mundo3d_animales',
   'mockups/mundo3d-milpa': 'mockup_mundo3d_milpa',
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
+  'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
   'mockups/voz-con-forma': 'mockup_voz_con_forma',
   'mockups/conversacion-voz': 'mockup_conversacion_voz',
   'mockups/ensena-dibujando': 'mockup_ensena_dibujando',
@@ -1377,6 +1381,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La ladera y sus pisos">
               <Mundo3DBosqueMockup />
+      case 'mockup_mundo3d_clima':
+        // Vitrina pública del MUNDO DEL CLIMA: monta <Mundo mundoId="clima"> del
+        // framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-clima, sin auth. La bóveda del cielo de la finca:
+        // hora del día + temporada bimodal andina + niebla del páramo + la
+        // montaña de pisos con el hielo que se va (conciencia, no alarma).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del clima">
+              <Mundo3DClimaMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

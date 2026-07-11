@@ -45,6 +45,13 @@ export const ARQUETIPOS = {
     nombre: 'El valle (mapa)', clave: 'la finca como mapa navegable; cada mundo es un lugar',
     ejemplo: 'valle', tambien: [],
   },
+  // La ÚNICA metáfora espacial nueva del batch (README §case-3): la bóveda de
+  // cielo. Su espejo 2D es una lámina de cielo (motivo `boveda` en LaminaMundo).
+  boveda: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'boveda', espejo: 'mirror',
+    nombre: 'La bóveda del cielo', clave: 'el cielo de la finca: hora del día + temporada bimodal andina',
+    ejemplo: 'clima', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {
