@@ -6,7 +6,10 @@
  * humilde. Se congela el ciclo entero:
  *   · tocar un lugar del valle → panel del mundo → "Entrar a este mundo";
  *   · el viaje (Angelita guía) → la escena del mundo con su miga "‹ El valle";
- *   · una puerta DENTRO del mundo cuenta a qué pantalla real lleva;
+ *   · DENTRO del mundo el agente PERSISTE (BUG-AG-02, el "cuarto mudo"):
+ *     la barra "Pregúntele…" + estado de voz siguen, y Angelita narra el
+ *     lugar en su burbuja (sin speechSynthesis en jsdom = el texto ES la voz);
+ *   · una puerta DENTRO del mundo: Angelita cuenta a qué pantalla real lleva;
  *   · "Volver al valle" → viaje en reversa → el valle otra vez;
  *   · el clima ya es un mundo montable (bóveda): se entra y se vuelve igual.
  */
@@ -46,9 +49,20 @@ describe('entrada-3d — navegable de punta a punta (valle ↔ mundos)', () => {
     // el chrome del valle descansa mientras se está dentro
     expect(screen.queryByRole('heading', { level: 1, name: 'El valle de mi finca' })).not.toBeInTheDocument();
 
-    // 4) UNA PUERTA del mundo: en la vitrina cuenta a qué pantalla real lleva.
+    // 3b) EL MUNDO NO ES MUDO (BUG-AG-02): la barra del agente PERSISTE
+    //     (preguntar + estado de voz) y Angelita narra el lugar en su burbuja
+    //     (jsdom no trae speechSynthesis → el texto ES la voz, nunca mudo).
+    expect(screen.getByRole('button', { name: 'Pregúntele a Chagra' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Texto|Voz/ })).toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(800)); // la narración entra con una pausita
+    expect(container.querySelector('.valle-companero')).toHaveTextContent(
+      /sale el agua para toda la finca/,
+    );
+
+    // 4) UNA PUERTA del mundo: ANGELITA la nombra — en la vitrina cuenta a
+    //    qué pantalla real lleva.
     fireEvent.click(screen.getByRole('button', { name: 'La quebrada viva' }));
-    expect(container.querySelector('.valle-mundo__puerta')).toHaveTextContent('«biodiversidad»');
+    expect(container.querySelector('.valle-companero')).toHaveTextContent('«biodiversidad»');
 
     // 5) VOLVER: viaje en reversa → el valle completo otra vez.
     fireEvent.click(screen.getByRole('button', { name: 'Volver al valle' }));

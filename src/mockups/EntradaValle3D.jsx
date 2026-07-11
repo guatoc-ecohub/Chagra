@@ -12,8 +12,10 @@
  *      toca (el semillero). Tocarlo: el agente lo dice en voz y ofrece LA acción.
  *   2. LOS MUNDOS → cada mundo (fuente real mundosFinca.js) es un LUGAR del
  *      valle al que se VIAJA: la cámara vuela hasta él y se abre su panel.
- *   3. AGENTE / VOZ → el colibrí (visual-lib) es un compañero presente que
- *      flota sobre el foco y NARRA por voz (Web Speech API) al pasar.
+ *   3. AGENTE / VOZ → Angelita es un compañero presente que flota sobre el
+ *      foco y NARRA por voz (Web Speech API) al pasar. PERSISTE dentro de los
+ *      mundos (auditoría BUG-AG-02: antes el mundo era un "cuarto mudo") y si
+ *      la voz falta o está apagada, ESCRIBE (burbuja de texto) — nunca mudo.
  *   4. ESTADO / CLIMA → el estado real (por la hora de la vereda) tiñe todo:
  *      luz, niebla, cielo y estrellas de la escena 3D + grade DOM de effects.
  *
@@ -92,8 +94,6 @@ export default function EntradaValle3D({ onBack }) {
 
   // ── NAVEGACIÓN valle ↔ mundos: la máquina de fases vive en el framework.
   //    (reduced-motion la vuelve corte simple, sin overlay de viaje).
-  const [puerta, setPuerta] = useState(null); // puerta tocada DENTRO de un mundo
-
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&
@@ -147,27 +147,78 @@ export default function EntradaValle3D({ onBack }) {
     setGesto((g) => (g === 'reposo' ? null : g));
   }, []);
 
+  // Asentir: micro-reacción corta de Angelita cuando el usuario toca una
+  // puerta dentro del mundo — el agente ACUSA el toque (no decoración muda).
+  const gestoTimer = useRef(null);
+  const asentir = useCallback(() => {
+    setGesto('asiente');
+    if (gestoTimer.current) clearTimeout(gestoTimer.current);
+    gestoTimer.current = setTimeout(() => setGesto((g) => (g === 'asiente' ? null : g)), 1600);
+  }, []);
+  useEffect(
+    () => () => {
+      if (gestoTimer.current) clearTimeout(gestoTimer.current);
+    },
+    [],
+  );
+
   // ── Voz (Web Speech API): el agente DICE. Se calla si el equipo no la trae
   //    o si el usuario apaga la voz. Prefiere una voz en español.
-  const hablar = useCallback(
+  //    (Si esto se productiza, la voz real es Kokoro vía ttsService — default
+  //    `em_santa`; aquí la vitrina usa la del navegador.)
+  const vozDisponible = useMemo(
+    () => typeof window !== 'undefined' && 'speechSynthesis' in window,
+    [],
+  );
+
+  // El toggle vive en un ref para que `hablar`/`decir` sean ESTABLES: prender
+  // o apagar la voz no debe re-disparar los efectos que narran.
+  const vozRef = useRef(voz);
+  useEffect(() => {
+    vozRef.current = voz;
+  }, [voz]);
+
+  const hablar = useCallback((texto) => {
+    if (!vozRef.current || typeof window === 'undefined' || !window.speechSynthesis) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(texto);
+      u.lang = 'es-CO';
+      u.rate = 0.98;
+      u.pitch = 1;
+      const esVoz = window.speechSynthesis
+        .getVoices()
+        .find((v) => v.lang && v.lang.toLowerCase().startsWith('es'));
+      if (esVoz) u.voice = esVoz;
+      window.speechSynthesis.speak(u);
+    } catch {
+      /* la voz es un plus, nunca bloquea */
+    }
+  }, []);
+
+  // ── Angelita DICE (voz + burbuja): el texto SIEMPRE acompaña a la voz en la
+  //    burbuja del compañero (aria-live). Si el equipo no trae voz o el
+  //    usuario la apagó, la burbuja ES la voz — la pantalla nunca queda muda.
+  const [dicho, setDicho] = useState(null);
+  const dichoTimer = useRef(null);
+  const decir = useCallback(
     (texto) => {
-      if (!voz || typeof window === 'undefined' || !window.speechSynthesis) return;
-      try {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(texto);
-        u.lang = 'es-CO';
-        u.rate = 0.98;
-        u.pitch = 1;
-        const esVoz = window.speechSynthesis
-          .getVoices()
-          .find((v) => v.lang && v.lang.toLowerCase().startsWith('es'));
-        if (esVoz) u.voice = esVoz;
-        window.speechSynthesis.speak(u);
-      } catch {
-        /* la voz es un plus, nunca bloquea */
-      }
+      if (!texto) return;
+      setDicho(texto);
+      if (dichoTimer.current) clearTimeout(dichoTimer.current);
+      dichoTimer.current = setTimeout(
+        () => setDicho(null),
+        Math.min(14000, 4000 + texto.length * 55),
+      );
+      hablar(texto);
     },
-    [voz],
+    [hablar],
+  );
+  useEffect(
+    () => () => {
+      if (dichoTimer.current) clearTimeout(dichoTimer.current);
+    },
+    [],
   );
 
   useEffect(
@@ -177,14 +228,14 @@ export default function EntradaValle3D({ onBack }) {
     [],
   );
 
-  // Saludo del compañero al entrar (una sola vez).
+  // Saludo del compañero al entrar (una sola vez): voz + burbuja.
   const saludado = useRef(false);
   useEffect(() => {
     if (saludado.current) return;
     saludado.current = true;
-    const t = setTimeout(() => hablar(NARRACION.bienvenida), 900);
+    const t = setTimeout(() => decir(NARRACION.bienvenida), 900);
     return () => clearTimeout(t);
-  }, [hablar]);
+  }, [decir]);
 
   const entrarMundo = useCallback(
     (id) => {
@@ -227,7 +278,6 @@ export default function EntradaValle3D({ onBack }) {
     (id) => {
       if (!nav.viajarAlMundo(id)) return;
       setPanel(null);
-      setPuerta(null);
       hablar(`Angelita lo lleva a ${tituloDeMundo(id)}.`);
     },
     [nav, hablar],
@@ -235,22 +285,45 @@ export default function EntradaValle3D({ onBack }) {
 
   // ── VOLVER del mundo al valle (misma transición, en reversa).
   const salirDelMundo = useCallback(() => {
-    setPuerta(null);
     nav.volverAlValle();
-    hablar('De vuelta al valle de su finca.');
-  }, [nav, hablar]);
+    decir('De vuelta al valle de su finca.');
+  }, [nav, decir]);
+
+  // ── EL MUNDO HABLA (BUG-AG-02, el "cuarto mudo"): al llegar a un mundo,
+  //    Angelita lo narra consumiendo `entrada.narra` del registro (BUG-AG-01:
+  //    el dato existía y nadie lo leía) y deja la pista de las puertas.
+  //    Voz si hay y está prendida; burbuja de texto siempre.
+  useEffect(() => {
+    if (!nav.enMundo || !nav.mundoId) return undefined;
+    const clave = MUNDO[nav.mundoId]?.entrada?.narra;
+    const texto =
+      (clave && NARRACION[clave]) ||
+      NARRACION[nav.mundoId] ||
+      MUNDO_VALLE_BY_ID[nav.mundoId]?.lema ||
+      `Está en ${tituloDeMundo(nav.mundoId)}.`;
+    const t = setTimeout(
+      () => decir(`${texto} Toque un punto para ver a dónde lo lleva.`),
+      700,
+    );
+    return () => clearTimeout(t);
+  }, [nav.enMundo, nav.mundoId, decir]);
 
   // ── Una puerta tocada DENTRO del mundo: en la vitrina (sin sesión) no
-  //    navega — cuenta a qué pantalla real de la app lleva (regla de oro).
+  //    navega — ANGELITA la nombra (voz + burbuja) y asiente: el agente
+  //    reacciona al hotspot en vez de dejar un letrero suelto (regla de oro:
+  //    cuenta a qué pantalla real de la app lleva).
   const onPuertaMundo = useCallback(
     (view, data) => {
       const puertas = MUNDO[nav.mundoId]?.hotspots || [];
       const hs =
         puertas.find((h) => h.view === view && (h.data === data || (!h.data && !data))) ||
         puertas.find((h) => h.view === view);
-      setPuerta({ label: hs?.label || view, view });
+      asentir();
+      decir(
+        `«${hs?.label || view}» es una puerta real: dentro de la app abre la pantalla «${view}».`,
+      );
     },
-    [nav.mundoId],
+    [nav.mundoId, decir, asentir],
   );
 
   const mundoPanel = panel && panel !== 'alerta' ? MUNDO_VALLE_BY_ID[panel] : null;
@@ -309,11 +382,6 @@ export default function EntradaValle3D({ onBack }) {
             animo={companero.animo}
             energia={companero.energia}
           />
-          <p className="valle-mundo__puerta" role="status" aria-live="polite">
-            {puerta
-              ? `«${puerta.label}» es una puerta real: dentro de la app abre la pantalla «${puerta.view}».`
-              : 'Toque un punto del mundo para ver a dónde lo lleva, o vuelva al valle cuando quiera.'}
-          </p>
         </section>
       )}
 
@@ -356,8 +424,10 @@ export default function EntradaValle3D({ onBack }) {
       {/* ── El compañero: Angelita en una sola línea puntual (imagen-first).
               Es el ser al que se cuida; su cara refleja el ánimo real. Se
               esconde si hay un panel abierto — una cosa clara a la vez.
-              DENTRO de un mundo sigue presente (compacta, sin frase): así se
-              ve su celebración al llegar y no abandona a quien la sigue. ── */}
+              DENTRO de un mundo sigue presente y HABLA: narra el lugar y
+              nombra las puertas. Lo que dice (`dicho`) va SIEMPRE en su
+              burbuja de texto (aria-live) — si la voz falta o está apagada,
+              la burbuja es la voz. ── */}
       {!panel && (
         <div
           className={`valle-companero${nav.enMundo ? ' valle-companero--mundo' : ''}`}
@@ -375,7 +445,9 @@ export default function EntradaValle3D({ onBack }) {
             />
             <i className="valle-companero__sombra" />
           </span>
-          {!nav.enMundo && <span className="valle-companero__txt">{companero.frase}</span>}
+          {(dicho || !nav.enMundo) && (
+            <span className="valle-companero__txt">{dicho || companero.frase}</span>
+          )}
         </div>
       )}
 
@@ -423,11 +495,13 @@ export default function EntradaValle3D({ onBack }) {
         </aside>
       )}
 
-      {/* ── Barra del AGENTE: el compañero presente + voz + volver al valle.
-              Dentro de un mundo se esconde (la miga del mundo ya trae el
-              volver; una cosa clara a la vez). ── */}
-      {!nav.enMundo && (
-      <footer className="valle-agente">
+      {/* ── Barra del AGENTE: el compañero presente + voz. PERSISTE dentro
+              del mundo (BUG-AG-02: antes se ocultaba y el diorama quedaba
+              mudo, sin cómo preguntar ni prender/apagar la voz). Adentro va
+              compacta, flotando sobre la escena; la miga del mundo ya trae
+              el volver. Sin voz en el equipo, el estado lo dice claro:
+              Angelita le escribe. ── */}
+      <footer className={`valle-agente${nav.enMundo ? ' valle-agente--mundo' : ''}`}>
         <button
           type="button"
           className="valle-agente__pregunte"
@@ -438,26 +512,29 @@ export default function EntradaValle3D({ onBack }) {
           Pregúntele a su finca…
         </button>
         <div className="valle-agente__ctrls">
-          {focoId && (
+          {!nav.enMundo && focoId && (
             <button type="button" className="valle-agente__btn" onClick={volverAlValle}>
               Ver todo el valle
             </button>
           )}
           <button
             type="button"
-            className={`valle-agente__btn valle-agente__voz${voz ? ' on' : ''}`}
-            aria-pressed={voz}
+            className={`valle-agente__btn valle-agente__voz${voz && vozDisponible ? ' on' : ''}`}
+            aria-pressed={voz && vozDisponible}
+            disabled={!vozDisponible}
+            title={
+              vozDisponible ? undefined : 'Este equipo no trae voz: Angelita le escribe.'
+            }
             onClick={() => {
               const n = !voz;
               setVoz(n);
               if (!n && typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
             }}
           >
-            {voz ? '🔊 Voz' : '🔇 Voz'}
+            {!vozDisponible ? '💬 Texto' : voz ? '🔊 Voz' : '🔇 Voz'}
           </button>
         </div>
       </footer>
-      )}
     </div>
   );
 }
