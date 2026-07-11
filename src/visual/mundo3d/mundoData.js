@@ -14,6 +14,7 @@
  *     valle,      // (opcional) landmark en el mapa del valle: { tipo, pos, escala }
  *     gate,       // (opcional) perfil requerido (p.ej. 'animales')
  *     ambiental,  // (opcional) el clima ya vive en el ambiente del valle
+ *     pisoTermico,// piso de anclaje en la Sierra (la compatibilidad se deriva)
  *   }
  *
  * Sumar un mundo = UNA de estas entradas + assets de la librería (lámina/creature/
@@ -58,6 +59,7 @@ export const MUNDO = {
   // 🌱 EL SUELO VIVO — el PROTOTIPO del DR (cutaway). Reusa mundoSubsueloEngine
   //    para la densidad de vida (`params.vida` 0..1; aquí, valor de muestra).
   suelo: {
+    pisoTermico: 'templado',
     escena: 'cutaway',
     valle: { tipo: 'era', pos: [-1.1, 0, 3.6], escala: 1 },
     params: {
@@ -84,6 +86,7 @@ export const MUNDO = {
   //    Todo es DATOS: la curva de la quebrada + los hitos del recorrido los
   //    leen por igual el diorama 3D (EscenaFlujo) y su gemelo 2D (FondoFlujo).
   agua: {
+    pisoTermico: 'paramo',
     escena: 'flujo',
     valle: { tipo: 'quebrada', pos: [0.6, 0, -1.4], escala: 1 },
     params: {
@@ -125,6 +128,7 @@ export const MUNDO = {
   //    real de farmOS aquí mismo (misma forma; `pos` es opcional — sin él, los
   //    sitios salen solos). MUESTRA compartida con el mercado (mismo dato):
   animales: {
+    pisoTermico: 'calido',
     escena: 'recinto',
     valle: { tipo: 'corral', pos: [-4.6, 0, -1.8], escala: 1 },
     gate: 'animales',
@@ -141,6 +145,7 @@ export const MUNDO = {
 
   // 🌳 DISEÑO DE LA FINCA — la verticalidad del bosque comestible (estratos).
   disenio: {
+    pisoTermico: 'templado',
     escena: 'estratos',
     valle: { tipo: 'bosque', pos: [4.8, 0, -2.6], escala: 1.1 },
     params: {},
@@ -155,6 +160,7 @@ export const MUNDO = {
   // 🗺️ EL VALLE — el mapa navegable (valle). Es "un mundo más" del registro: su
   //    escena ES el mapa entero; sus hotspots son los demás mundos.
   valle: {
+    pisoTermico: 'calido',
     escena: 'valle',
     params: { clima: 'soleado' },
     entrada: { narra: 'bienvenida', clima: 'soleado', alertaView: 'hoy_finca' },
@@ -165,6 +171,7 @@ export const MUNDO = {
   // 🐄 ESTIÉRCOL Y COMPOST — REUSA `cutaway` para el corte de la pila (capas
   //    café/verde, calor). Prueba viva de "sumar un SÍ-3D = datos, sin código".
   abono: {
+    pisoTermico: 'templado',
     escena: 'cutaway',
     valle: { tipo: 'huerta', pos: [1.8, 0, 4.4], escala: 0.95 },
     params: {
@@ -186,6 +193,7 @@ export const MUNDO = {
 
   // 🌾 CULTIVOS — arquetipo `lamina`: reusa la lámina de maíz de la librería.
   cultivos: {
+    pisoTermico: 'calido',
     escena: 'lamina',
     valle: { tipo: 'milpa', pos: [-3.2, 0, 1.6], escala: 1.15 },
     params: { lamina: 'maiz' },
@@ -208,6 +216,7 @@ export const MUNDO = {
   //    Cada punto es una puerta a una pantalla REAL. En equipo humilde cae a su
   //    ficha 2D digna (la infografía del café).
   cafe: {
+    pisoTermico: 'templado',
     escena: 'cafe',
     valle: { tipo: 'cafetal', pos: [3.4, 0, 2.2], escala: 1 },
     params: {
@@ -257,6 +266,7 @@ export const MUNDO = {
 
   // 🍊 FRUTALES — arquetipo `ficha`: tarjeta de especie foto-secuencial.
   frutales: {
+    pisoTermico: 'calido',
     escena: 'ficha',
     params: {
       nombre: 'Frutales de la finca',
@@ -283,6 +293,7 @@ export const MUNDO = {
   //    intermediario). Cada punto es una puerta a una pantalla REAL. En equipo
   //    humilde cae a su ficha 2D digna (la infografía del mercado y la despensa).
   mercado: {
+    pisoTermico: 'calido',
     escena: 'mercado',
     valle: { tipo: 'mercado', pos: [1.2, 0, 6.6], escala: 1 },
     params: {
@@ -334,6 +345,7 @@ export const MUNDO = {
   //    (mariquita, carábido). Cada punto es una puerta a una pantalla REAL. En
   //    equipo humilde cae a su ficha 2D digna (la infografía de la sanidad).
   sanidad: {
+    pisoTermico: 'templado',
     escena: 'sanidad',
     valle: { tipo: 'huerta', pos: [3.8, 0, 4.9], escala: 0.95 },
     params: {
@@ -388,6 +400,7 @@ export const MUNDO = {
   //    hacia 2040–2050). NOTA DE CONCIENCIA, esperanza no colapso: el páramo es la
   //    fábrica de agua. En equipo humilde cae al gemelo 2D (mirror → cielo).
   clima: {
+    pisoTermico: 'paramo',
     escena: 'boveda',
     valle: { tipo: 'veleta', pos: [-3.8, 0, -4.8], escala: 1 },
     ambiental: true,
@@ -430,6 +443,7 @@ export const MUNDO = {
   //    arquetipo `cutaway` (mismas capas + vida) y enciende el módulo `milpa`.
   //    Policultivo, no monocultivo: juntas rinden más y se cuidan (push-pull).
   milpa: {
+    pisoTermico: 'calido',
     escena: 'cutaway',
     params: {
       vida: 0.5,
@@ -464,6 +478,7 @@ export const MUNDO = {
   //    gradiente ALTITUDINAL, que vive en `params.pisos` (de bajo a alto) y lo
   //    leen por igual el diorama 3D y su gemelo 2D. Vitrina: #/mockups/mundo3d-bosque.
   pisos: {
+    pisoTermico: 'frio',
     escena: 'estratos',
     params: {
       // Pisos de bajo (cálido) a alto (páramo). Verificado (catálogo thermal_zones
@@ -498,6 +513,7 @@ export const MUNDO = {
   //    ficha 2D digna (la infografía del semillero).
   //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
   semillero: {
+    pisoTermico: 'templado',
     escena: 'semillero',
     valle: { tipo: 'semillero', pos: [-2.6, 0, 6.2], escala: 1 },
     params: {
