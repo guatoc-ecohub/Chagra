@@ -265,13 +265,24 @@
   transform: translateX(-50%) scaleX(1.08);
 }
 
-/* Dentro de un mundo: presencia compacta (solo la abeja, sin frase), por
-   ENCIMA de la escena del mundo (z 30) sin tapar la miga ni los hotspots. */
+/* Dentro de un mundo: presencia compacta por ENCIMA de la escena del mundo
+   (z 30) sin tapar la miga ni los hotspots. Cuando Angelita DICE algo, la
+   burbuja de texto se abre a su lado (voz y texto son la misma frase). */
 .valle-companero--mundo {
   z-index: 35;
-  bottom: 4.8rem;
-  padding: 0.3rem 0.4rem;
-  background: rgba(15, 24, 30, 0.55);
+  bottom: 4.9rem;
+  padding: 0.3rem 0.75rem 0.3rem 0.4rem;
+  background: rgba(15, 24, 30, 0.62);
+}
+
+/* Asiente: brinquito corto al tocar una puerta — el agente acusa el toque. */
+.valle-companero[data-gesto='asiente'] .valle-companero__cara [data-creature='abeja-angelita'] {
+  animation: valle-angelita-asiente 0.75s ease-in-out 2;
+}
+@keyframes valle-angelita-asiente {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  40% { transform: translateY(-6px) rotate(-8deg); }
+  70% { transform: translateY(-1px) rotate(5deg); }
 }
 .valle-companero__txt {
   font-size: 0.85rem;
@@ -441,7 +452,25 @@
   white-space: nowrap;
 }
 .valle-agente__btn:hover { background: rgba(0, 0, 0, 0.5); }
+.valle-agente__btn:disabled { opacity: 0.8; cursor: default; }
 .valle-agente__voz.on { border-color: #7dffbe; }
+
+/* DENTRO de un mundo la barra del agente PERSISTE (BUG-AG-02), compacta y
+   flotando sobre el diorama (el mundo es z 30). Táctil se mantiene ≥44px. */
+.valle-agente--mundo {
+  z-index: 40;
+  padding: 0.45rem 0.8rem calc(0.45rem + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(0deg, rgba(26, 20, 12, 0.8) 0%, rgba(26, 20, 12, 0) 100%);
+}
+.valle-agente--mundo .valle-agente__pregunte {
+  min-height: 44px;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.92rem;
+}
+.valle-agente--mundo .valle-agente__btn {
+  min-height: 44px;
+  font-size: 0.85rem;
+}
 
 .valle-degradado {
   position: absolute;
@@ -571,6 +600,8 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  /* aire abajo para la barra del agente persistente (valle-agente--mundo) */
+  padding-bottom: calc(3.9rem + env(safe-area-inset-bottom, 0px));
   background: color-mix(in srgb, var(--vm-tinte, #3f8f4e) 14%, #f2e8d6);
   color: #2a2016;
 }
@@ -578,15 +609,6 @@
   flex: 1 1 auto;
   min-height: min(72vh, 520px);
   border-radius: 0;
-}
-.valle-mundo__puerta {
-  margin: 0;
-  padding: 0.7rem 1rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: #4a3a22;
-  background: rgba(255, 251, 242, 0.92);
-  border-top: 1px solid rgba(60, 46, 24, 0.15);
 }
 
 /* La degradación elegante del panel: mundo sin escena montable aún. */
