@@ -19,6 +19,14 @@
  *
  * Todo `MeshLambert`/`Basic`, sin sombras (contrato de EscenaBase3D). Geometría
  * de primitivas: cero GLTF, offline y liviano.
+ *
+ * ESPEJO VIVO (auditoría §5b): los CANASTOS de producto son el reflejo de la
+ * COSECHA RECIENTE REAL de la finca (`estadoFinca.cosechaReciente`, que arma
+ * useFincaViva). CONTRATO ANTI-FABRICACIÓN ESTRICTO: sin cosecha reciente, la
+ * plaza queda TRANQUILA (canastos vacíos, sin producto) — jamás fingimos una
+ * venta ni surtimos productos que nadie cosechó. Cuando hay cosecha, la plaza se
+ * llena del cultivo REAL que salió de la finca (un lote creíble del mismo
+ * producto, no cuatro surtidos de muestra).
  */
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
@@ -31,10 +39,70 @@ import { CIELOS, PALETA } from '../atmosferaMadre.js';
 /* La fauna funcional de la feria (POLINIZADORES entre las flores del puesto y la
    cosecha: sin polinizador no hay cosecha que vender) vive en faunaFuncional.js. */
 
+/* Color del PRODUCTO por cultivo real (los que de verdad salen de una finca
+   andina). Es solo el tono del montón en el canasto; un cultivo no listado cae a
+   un tono producto neutro (ámbar de mimbre), NUNCA a un producto inventado. */
+const COLOR_PRODUCTO = {
+  tomate: '#d24b3a', papa: '#c9a15a', maiz: '#e7c451', cafe: '#7a4a24',
+  frijol: '#8a5a34', arveja: '#7a9a3f', mora: '#5a2a44', aguacate: '#4e6a2e',
+  platano: '#d9c24b', banano: '#e0c34a', yuca: '#cbb98a', cebolla: '#c8b6d6',
+  zanahoria: '#d07a34', lulo: '#d99a2f', uchuva: '#e0b23a', cilantro: '#5f8a3f',
+  repollo: '#8aa84a', curuba: '#c8b23a', naranja: '#e0902f', limon: '#c9d24a',
+  arracacha: '#e0cf9a', habichuela: '#6f9a3f', pepino: '#7fa83f', ahuyama: '#d98a2f',
+};
+/** Tono producto neutro para un cultivo sin color propio (mimbre ámbar). */
+const PRODUCTO_NEUTRO = '#c98a3f';
+
+/** Minúsculas y sin tildes, para casar el nombre del cultivo con el mapa. */
+function normalizaCultivo(nombre) {
+  return String(nombre || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '') // combina y quita tildes
+    .trim();
+}
+
+/**
+ * Color del producto de un cultivo REAL. Casa por palabra clave contenida
+ * ("tomate chonto" → tomate); si no reconoce el cultivo, tono producto neutro
+ * (nunca inventa que es tomate ni café).
+ */
+function colorDeProducto(cultivo) {
+  const clave = normalizaCultivo(cultivo);
+  if (!clave) return PRODUCTO_NEUTRO;
+  for (const k of Object.keys(COLOR_PRODUCTO)) {
+    if (clave.includes(k)) return COLOR_PRODUCTO[k];
+  }
+  return PRODUCTO_NEUTRO;
+}
+
+/**
+ * Los CANASTOS que van a la plaza, ESPEJO de la cosecha reciente real.
+ * Anti-fabricación: sin cosecha → [] (plaza tranquila, sin producto). Con
+ * cosecha → un par de canastos del MISMO cultivo real (un lote creíble), no un
+ * surtido de muestra. Un `params.canastos` explícito (vitrina) manda por encima.
+ *
+ * @param {object|null} cosechaReciente  { cultivo, mundoId } | null
+ * @param {Array|undefined} override  params.canastos explícito (vitrina)
+ * @returns {Array<{producto:string, color:string, pos:number[]}>}
+ */
+function canastosDeCosecha(cosechaReciente, override) {
+  if (Array.isArray(override)) return override;
+  const cultivo = cosechaReciente?.cultivo;
+  if (!cultivo) return [];
+  const color = colorDeProducto(cultivo);
+  return [
+    { producto: cultivo, color, pos: [-0.85, 0, 0.75] },
+    { producto: cultivo, color, pos: [0.55, 0, 0.7] },
+  ];
+}
+
 /* Un CANASTO de mimbre con su montón de producto. El canasto es un tronco de
    cono facetado (el tejido); encima, una loma de esferitas del color de lo que
-   trae (tomate rojo, papa tierra, maíz dorado, café tostado). */
-function Canasto({ pos, color = '#d24b3a' }) {
+   trae (tomate rojo, papa tierra, maíz dorado, café tostado). `vacio` deja el
+   mimbre SOLO, sin montón: la señal HONESTA de plaza sin cosecha reciente (no
+   fingimos un producto que nadie trajo). */
+function Canasto({ pos, color = '#d24b3a', vacio = false }) {
   // el montoncito: unas esferas apiladas, determinista (misma forma siempre)
   const frutos = useMemo(() => {
     const base = [
@@ -55,8 +123,8 @@ function Canasto({ pos, color = '#d24b3a' }) {
         <torusGeometry args={[0.145, 0.02, 6, 12]} />
         <meshLambertMaterial color="#8a5f30" flatShading />
       </mesh>
-      {/* el producto de la finca */}
-      {frutos.map(([x, y, z], i) => (
+      {/* el producto de la finca (solo si hay cosecha: canasto vacío no lo pone) */}
+      {!vacio && frutos.map(([x, y, z], i) => (
         <mesh key={i} position={[x, y, z]}>
           <sphereGeometry args={[0.055, 7, 6]} />
           <meshLambertMaterial color={color} flatShading />
@@ -183,7 +251,7 @@ function MataCampo({ pos, color = '#4e8f3f' }) {
   );
 }
 
-function Diorama({ params, reducedMotion, tier, fauna }) {
+function Diorama({ params, reducedMotion, tier, fauna, estadoFinca }) {
   const puestos = params?.puestos || [
     { color: '#c96a2f', pos: [-0.85, 0, 0.2] },
     { color: '#3f8f4e', pos: [0.9, 0, -0.1] },
@@ -196,12 +264,18 @@ function Diorama({ params, reducedMotion, tier, fauna }) {
     () => normalizarAnimales((params?.animales || []).filter((a) => a.estado === 'vendido')),
     [params?.animales],
   );
-  const canastos = params?.canastos || [
-    { producto: 'tomate', color: '#d24b3a', pos: [-0.85, 0, 0.75] },
-    { producto: 'papa', color: '#c9a15a', pos: [0.55, 0, 0.7] },
-    { producto: 'maiz', color: '#e7c451', pos: [1.15, 0, 0.35] },
-    { producto: 'cafe', color: '#7a4a24', pos: [-0.35, 0, 0.95] },
-  ];
+  // ESPEJO VIVO de la cosecha reciente REAL (§5b): los canastos son el cultivo
+  // que de verdad salió de la finca. Sin cosecha reciente → [] (plaza tranquila);
+  // jamás surtimos productos de muestra. `params.canastos` explícito (vitrina)
+  // manda por encima del dato real.
+  const canastos = useMemo(
+    () => canastosDeCosecha(estadoFinca?.cosechaReciente, params?.canastos),
+    [estadoFinca?.cosechaReciente, params?.canastos],
+  );
+  // Plaza tranquila: no hay cosecha reciente que traer. La feria queda armada
+  // (puestos, tarima, balanza) con UN canasto VACÍO al frente — señal honesta de
+  // "lista, esperando la cosecha", no un puesto roto ni surtido inventado.
+  const plazaTranquila = canastos.length === 0;
 
   // La parcela del fondo: unas matas de donde sale la cosecha (el origen de la
   // ruta campo→mercado). Repartidas con aire al fondo del diorama.
@@ -247,10 +321,12 @@ function Diorama({ params, reducedMotion, tier, fauna }) {
         <Puesto key={i} pos={p.pos} color={p.color} />
       ))}
 
-      {/* los canastos con la cosecha de la finca (sobre las mesas y el piso) */}
+      {/* los canastos con la cosecha REAL de la finca (sobre las mesas y el piso) */}
       {canastos.map((c, i) => (
         <Canasto key={i} pos={c.pos} color={c.color} />
       ))}
+      {/* plaza tranquila (sin cosecha reciente): un canasto VACÍO que espera */}
+      {plazaTranquila && <Canasto pos={[-0.85, 0, 0.75]} vacio />}
 
       {/* la tarima del sello de procedencia (el terroir andino) */}
       <TarimaProcedencia pos={[-1.4, 0, -0.35]} />
@@ -294,6 +370,7 @@ export default function EscenaMercado(props) {
         reducedMotion={props.reducedMotion}
         tier={props.tier}
         fauna={fauna}
+        estadoFinca={props.estadoFinca}
       />
     </EscenaBase3D>
   );

@@ -286,20 +286,19 @@ export const MUNDO = {
     escena: 'mercado',
     valle: { tipo: 'mercado', pos: [1.2, 0, 6.6], escala: 1 },
     params: {
-      // El diorama tiene defaults propios; aquí solo los hacemos explícitos y
-      // deterministas (mismos puestos y canastos 2D↔3D).
+      // Los PUESTOS son el LUGAR (infraestructura de la feria), deterministas.
       puestos: [
         { color: '#c96a2f', pos: [-0.85, 0, 0.2] },   // toldo del vecino
         { color: '#3f8f4e', pos: [0.9, 0, -0.1] },     // toldo de la huerta
       ],
-      canastos: [
-        { producto: 'tomate', color: '#d24b3a', pos: [-0.85, 0, 0.75] },
-        { producto: 'papa', color: '#c9a15a', pos: [0.55, 0, 0.7] },
-        { producto: 'maiz', color: '#e7c451', pos: [1.15, 0, 0.35] },
-        { producto: 'cafe', color: '#7a4a24', pos: [-0.35, 0, 0.95] },
-      ],
+      // Los CANASTOS de producto NO se fijan aquí: son ESPEJO VIVO de la cosecha
+      // reciente REAL (audit §5b). EscenaMercado los deriva de
+      // `estadoFinca.cosechaReciente` (useFincaViva); sin cosecha, la plaza queda
+      // tranquila. Anti-fabricación: jamás surtir un producto que nadie cosechó.
       // EL MISMO HATO del corral (audit §5a.4): el mercado filtra los VENDIDOS y
       // los hace LLEGAR caminando por la ruta campo→plaza. Un dato, dos mundos.
+      // Es la MUESTRA del hato (aún sin inventario real); cuando exista, el host
+      // pisa este arreglo con el hato REAL (misma forma).
       animales: HATO_MUESTRA,
     },
     hotspots: [
@@ -338,13 +337,18 @@ export const MUNDO = {
     escena: 'sanidad',
     valle: { tipo: 'huerta', pos: [3.8, 0, 4.9], escala: 0.95 },
     params: {
-      // El diorama tiene defaults propios; aquí solo los hacemos explícitos y
-      // deterministas (mismas matas y trampas 2D↔3D).
+      // Las MATAS y su SITIO son deterministas; su ESTADO (firme/decaída) NO se
+      // fija aquí: es ESPEJO VIVO de la salud real (audit §5b). EscenaSanidad lo
+      // deriva de `estadoFinca.saludFinca` (useFincaViva); sin dato, todas
+      // firmes. Anti-fabricación: nunca se inventa una plaga ni un bicho dañino.
       matas: [
         { color: '#4e8f3f', pos: [-0.5, 0, 0.35] },
         { color: '#57993f', pos: [0.55, 0, 0.1] },
         { color: '#468637', pos: [0.05, 0, -0.55] },
       ],
+      // Las TRAMPAS (y el biocontrol, el borde push-pull y los enemigos
+      // naturales) son la LECCIÓN del lugar: el manejo SIN veneno está SIEMPRE,
+      // no dependen de que haya plaga (monitoreo permanente, no alarma).
       trampas: [
         { color: '#f2c531', pos: [1.35, 0, 0.35] }, // amarilla: mosca blanca / minador
         { color: '#3f77c7', pos: [-1.25, 0, -0.5] }, // azul: trips
