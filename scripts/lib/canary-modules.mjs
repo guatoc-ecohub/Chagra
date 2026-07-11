@@ -380,17 +380,33 @@ async function runPlantaFoto(ctx) {
   if (!created.ok && rels.location) { delete rels.location; created = await farmosWrite(base, token, '/api/asset/plant', { data: { type: 'asset--plant', attributes: { name: `CANARIO planta ${target} ${stamp}`, status: 'active' }, relationships: rels } }); }
   const plantId = created.ok ? created.json?.data?.id : null;
 
-  // Subir la foto al campo image de la planta (JSON:API binario, ruta correcta).
+  // Subir la foto al campo `image` de la planta por el flujo NATIVO de farmOS 4.x /
+  // Drupal 10 — el MISMO que usa el cliente real (uploadBinaryToFarmOS en
+  // src/services/apiService.js). Es en DOS pasos:
+  //   A) POST /api/{entity}/{bundle}/{field} (octet-stream) crea un file--file NUEVO
+  //      y devuelve su UUID. OJO: la forma con el UUID en la ruta
+  //      (/api/asset/plant/{id}/image) NO EXISTE en este farmOS (404 sin auth → 500
+  //      con token; verificado 2026-07-11) y ningún código de producción la usa.
+  //   B) PATCH del plant relacionando el file, para que persista (un file--file sin
+  //      referencia queda temporal y el cron de Drupal lo borra ~6 h).
   let fileId = null; let uploadStatus = null;
   if (plantId) {
     const bytes = Buffer.from(CANARY_JPEG_B64, 'base64');
-    const up = await httpFetch(`${base}/api/asset/plant/${plantId}/image`, {
+    const up = await httpFetch(`${base}/api/asset/plant/image`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/octet-stream', 'Content-Disposition': `file; filename="CANARIO-${target}-${dateStr}.jpg"`, Accept: 'application/vnd.api+json' },
       body: bytes, timeoutMs: 45000,
     });
     uploadStatus = up.status;
-    if (up.ok && up.json?.data?.id) fileId = up.json.data.id;
+    if (up.ok && up.json?.data?.id) {
+      fileId = up.json.data.id;
+      // Paso B: adjuntar el file al plant (lo vuelve permanente). El campo `image`
+      // de asset--plant es multivaluado en farmOS; si esta build lo tuviera como
+      // single, reintentar con forma de objeto.
+      let rel = await farmosWrite(base, token, `/api/asset/plant/${plantId}`, { data: { type: 'asset--plant', id: plantId, relationships: { image: { data: [{ type: 'file--file', id: fileId }] } } } }, 'PATCH');
+      if (!rel.ok) rel = await farmosWrite(base, token, `/api/asset/plant/${plantId}`, { data: { type: 'asset--plant', id: plantId, relationships: { image: { data: { type: 'file--file', id: fileId } } } } }, 'PATCH');
+      if (!rel.ok) uploadStatus = rel.status;
+    }
   }
 
   // Verificar persistencia: releer la planta y confirmar la relación image.
