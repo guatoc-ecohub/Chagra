@@ -10,6 +10,16 @@
  */
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
+import { Fauna } from './FaunaEscena.jsx';
+
+/* Fauna POR ESTRATO: la verticalidad manda. El colibrí arriba (dosel), la
+   mariposa a media altura (arbustos/herbáceas) y el escarabajo a ras (rastrero/
+   raíz) — cada bicho donde de veras vive en el bosque comestible. */
+const FAUNA_ESTRATOS = [
+  { tipo: 'colibri', base: [0.6, 3.0, 0.4], patron: 'revoloteo', size: 28, fase: 0.5 },
+  { tipo: 'mariposa', base: [-0.9, 1.35, 0.6], patron: 'revoloteo', size: 30, fase: 2.0 },
+  { tipo: 'escarabajo', base: [0.8, 0.14, 1.0], patron: 'reptar', size: 30, fase: 1.2 },
+];
 
 const ESTRATOS_DEF = [
   { nombre: 'emergente', alto: 3.4, color: '#2f5f34', r: 0.6 },
@@ -36,7 +46,7 @@ function Planta({ x, z, alto, color, r }) {
   );
 }
 
-function Diorama({ params }) {
+function Diorama({ params, reducedMotion }) {
   const estratos = params?.estratos || ESTRATOS_DEF;
   const plantas = useMemo(() => {
     const out = [];
@@ -62,6 +72,8 @@ function Diorama({ params }) {
       {plantas.map((p) => (
         <Planta key={p.key} x={p.x} z={p.z} alto={p.alto} color={p.color} r={p.r} />
       ))}
+      {/* la vida repartida por estratos: ave arriba, insectos abajo */}
+      <Fauna items={FAUNA_ESTRATOS} reducedMotion={reducedMotion} />
     </group>
   );
 }
@@ -75,7 +87,7 @@ export default function EscenaEstratos(props) {
       camara={{ position: [3.5, 3, 6], fov: 44 }}
       entrada={{ ...props.entrada, centro: [0, 1.4, 0] }}
     >
-      <Diorama params={props.params} />
+      <Diorama params={props.params} reducedMotion={props.reducedMotion} />
     </EscenaBase3D>
   );
 }
