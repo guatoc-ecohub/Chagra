@@ -14,7 +14,7 @@
  */
 import Valle3D from '../../../mockups/valle/Valle3D.jsx';
 
-export default function EscenaValle({ params, entrada, reducedMotion = false, onHotspot, animo = 'sereno', energia = 1 }) {
+export default function EscenaValle({ params, entrada, reducedMotion = false, onHotspot, animo = 'sereno', energia = 1, tier = 'alto' }) {
   const clima = params?.clima || entrada?.clima || 'soleado';
   return (
     <Valle3D
@@ -22,6 +22,7 @@ export default function EscenaValle({ params, entrada, reducedMotion = false, on
       focoId={null}
       animo={animo}
       energia={energia}
+      tier={tier}
       reducedMotion={reducedMotion}
       onEntrar={(id) => onHotspot?.('mundo', { mundoId: id })}
       onAlerta={() => onHotspot?.(entrada?.alertaView || 'hoy_finca')}

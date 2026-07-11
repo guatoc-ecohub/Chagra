@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench,
   Sprout, ChevronRight, ChevronLeft, Bell, Users, Camera, Trash2, Shield,
-  Archive, LifeBuoy, LayoutGrid, GraduationCap,
+  Archive, LifeBuoy, LayoutGrid, GraduationCap, Vibrate, Waves,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
@@ -695,6 +695,12 @@ export default function ProfileScreen({ onBack, onHome }) {
                 aparece con VITE_MODO_CAMPO=true (dev/piloto), ver
                 src/config/modoCampoFlag.js. Vive junto a los ajustes de voz. */}
             {modoCampoDisponible() && <ModoCampoPanel />}
+
+            {/* DR-3D-HAPTICA: vibración táctil de los mundos 3D (tri-estado). */}
+            <HapticsSection />
+
+            {/* Spec S3: sonido ambiental 0-KB de los mundos (tri-estado). */}
+            <SonidoSection />
           </div>
         )}
 
@@ -1092,6 +1098,139 @@ function AgentVoiceSection() {
           />
         </button>
       </label>
+    </div>
+  );
+}
+
+/**
+ * HapticsSection — DR-3D-HAPTICA (2026-07-11).
+ *
+ * Toggle tri-estado "Vibración" persistido en usePrefsStore (key
+ * `chagra:prefs:haptics`). Controla los pulsos táctiles del framework de
+ * mundos 3D (tap en hotspot, la abeja posándose, viajes valle↔mundo):
+ *   - Automática (default): vibra si el equipo lo soporta y no hay
+ *     preferencia de movimiento reducido en el sistema.
+ *   - Siempre: vibra aunque haya movimiento reducido (respeta al usuario
+ *     que SÍ quiere el feedback táctil).
+ *   - Nunca: apagado total.
+ * En equipos sin API de vibración (iPhone/iPad, Firefox) no hay pérdida:
+ * cada pulso solo acompaña un momento que ya es visible en pantalla.
+ */
+const HAPTICS_OPTIONS = [
+  { id: 'auto', label: 'Automática' },
+  { id: 'on', label: 'Siempre' },
+  { id: 'off', label: 'Nunca' },
+];
+
+function HapticsSection() {
+  const haptics = usePrefsStore((s) => s.haptics ?? 'auto');
+  const setHaptics = usePrefsStore((s) => s.setHaptics);
+  const soportada = typeof navigator !== 'undefined' && 'vibrate' in navigator;
+
+  return (
+    <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+      <div className="flex items-center gap-2 px-1">
+        <Vibrate size={18} className="text-amber-400" />
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Vibración</h3>
+      </div>
+
+      <p className="text-xs text-slate-400 leading-snug px-1">
+        Pulsos táctiles sutiles al explorar los mundos 3D de la finca: tocar un
+        punto de interés, la abeja posándose, entrar y volver de un mundo.
+      </p>
+
+      <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Vibración de los mundos 3D">
+        {HAPTICS_OPTIONS.map((opt) => (
+          <button
+            key={opt.id}
+            type="button"
+            role="radio"
+            aria-checked={haptics === opt.id}
+            onClick={() => setHaptics(opt.id)}
+            className={`tap-target px-3 py-2 rounded-xl text-xs font-bold transition-colors ${
+              haptics === opt.id
+                ? 'bg-amber-600/80 text-white'
+                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800'
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {!soportada && (
+        <p className="text-[11px] text-slate-500 leading-snug px-1">
+          Este equipo no admite vibración desde el navegador (por ejemplo,
+          iPhone o iPad). No se pierde información: cada pulso solo acompaña
+          algo que ya se ve en pantalla.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * SonidoSection — spec S3 (2026-07-11).
+ *
+ * Toggle tri-estado "Sonido de la finca" persistido en usePrefsStore (key
+ * `chagra:prefs:sonido`). Controla el ambiente sonoro 0-KB de los mundos
+ * (sintetizado con WebAudio, sin descargar un solo archivo):
+ *   - Apagado (default): silencio total — el sonido es opt-in.
+ *   - Suave: ambiente muy tenue (la brisa apenas se insinúa).
+ *   - Presente: ambiente audible, igual bajo y cálido (fondo, no pista).
+ * Arranca solo tras un toque (política de autoplay) y respeta la preferencia
+ * de movimiento reducido del sistema (fondo estático, sin eventos rítmicos).
+ */
+const SONIDO_OPTIONS = [
+  { id: 'off', label: 'Apagado' },
+  { id: 'suave', label: 'Suave' },
+  { id: 'on', label: 'Presente' },
+];
+
+function SonidoSection() {
+  const sonido = usePrefsStore((s) => s.sonido ?? 'off');
+  const setSonido = usePrefsStore((s) => s.setSonido);
+  const soportado = typeof window !== 'undefined'
+    && Boolean(window.AudioContext || window.webkitAudioContext);
+
+  return (
+    <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+      <div className="flex items-center gap-2 px-1">
+        <Waves size={18} className="text-emerald-400" />
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Sonido de la finca</h3>
+      </div>
+
+      <p className="text-xs text-slate-400 leading-snug px-1">
+        Un ambiente sutil al recorrer los mundos: la quebrada y sus gotas, el
+        viento del páramo, las aves del monte, el murmullo del mercado. Se
+        genera en su equipo, sin gastar datos.
+      </p>
+
+      <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Sonido ambiental de los mundos">
+        {SONIDO_OPTIONS.map((opt) => (
+          <button
+            key={opt.id}
+            type="button"
+            role="radio"
+            aria-checked={sonido === opt.id}
+            onClick={() => setSonido(opt.id)}
+            className={`tap-target px-3 py-2 rounded-xl text-xs font-bold transition-colors ${
+              sonido === opt.id
+                ? 'bg-emerald-600/80 text-white'
+                : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800'
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {!soportado && (
+        <p className="text-[11px] text-slate-500 leading-snug px-1">
+          Este navegador no admite audio generado. No se pierde información:
+          el sonido solo acompaña lo que ya se ve en pantalla.
+        </p>
+      )}
     </div>
   );
 }

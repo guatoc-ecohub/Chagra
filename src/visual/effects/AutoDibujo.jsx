@@ -22,11 +22,11 @@
  * @param {string}  [props.className]  clases extra.
  * Resto de props (`d`, `stroke`, `strokeWidth`, `fill`, `cx`…) se pasan tal cual.
  */
-export function AutoDibujo({ as = 'path', stage, fade = false, className, ...rest }) {
-  /* `any` irreducible: la augmentación GLOBAL de JSX de @react-three/fiber (que
-     entra al programa vía las escenas 3D de src/visual/mundo3d) rompe el tipado
-     de un elemento DINÁMICO (className→never en un ElementType genérico). El
-     runtime es idéntico; solo se relaja el chequeo de tipos de este `<El>`. */
+export function AutoDibujo({ as = 'path', stage = 0, fade = false, className = '', ...rest }) {
+  // Tag dinámico: `as` puede ser cualquier elemento SVG/HTML. Con `ElementType`,
+  // tsc intersecta los props de TODOS los elementos posibles y colapsa
+  // `className` a `never` en el spread de abajo. El tag se valida en runtime, no
+  // en el tipo, así que casteamos a `any` (caso irreducible de elemento dinámico).
   const El = /** @type {any} */ (as);
   const base = fade ? 'vfx-fade' : 'vfx-draw';
   const stageClass = stage ? ` vfx-t${stage}` : '';

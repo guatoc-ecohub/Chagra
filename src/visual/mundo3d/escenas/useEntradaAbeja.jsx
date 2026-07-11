@@ -16,26 +16,39 @@
    coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
    un <Canvas> vía EscenaBase3D; no es hot-reload-sensible. Van juntos a propósito:
    la creature posee el cuerpo, la escena posee la coreografía (contrato del DR). */
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
+import { SombraContacto } from './SombraContacto.jsx';
+import useHaptics from '../useHaptics.js';
 
 /**
- * Devuelve `{ ref, caraRef }` para colgar del `<group>` de la abeja y de su cara
- * (para el volteo). Corre `useFrame` (debe usarse DENTRO de un `<Canvas>`).
+ * Devuelve `{ ref, caraRef, sombraRef }` para colgar del `<group>` de la abeja,
+ * de su cara (para el volteo) y de su sombra de contacto (el blob que la sigue
+ * por el piso — auditoría 3D: la abeja no debe volar "a la deriva").
+ * Corre `useFrame` (debe usarse DENTRO de un `<Canvas>`).
  *
  * @param {THREE.Vector3} foco  a dónde va la abeja (hotspot activo o centro).
  * @param {object} [opts]
  * @param {boolean} [opts.entrando=true]  entrando = se posa junto al foco; si no, ronda.
  * @param {number}  [opts.energia=1]      0..1 — vivacidad del vuelo (de la salud real).
  * @param {boolean} [opts.reducedMotion=false]  congela el vaivén a un fotograma.
+ * @param {number}  [opts.piso=0]  y del suelo donde se proyecta la sombra.
  */
-export function useEntradaAbeja(foco, { entrando = true, energia = 1, reducedMotion = false } = {}) {
+export function useEntradaAbeja(foco, {
+  entrando = true, energia = 1, reducedMotion = false, piso = 0,
+} = {}) {
   const ref = useRef(null);
   const caraRef = useRef(null);
+  const sombraRef = useRef(null);
   const prevX = useRef(foco.x);
+  // Háptica de "posarse" (DR-3D-HAPTICA): UNA sola vez por foco, al cruzar el
+  // umbral de llegada. El foco solo cambia por tap del usuario (hotspot) o al
+  // montar la escena (que nace de un tap para entrar al mundo) → gesto-derivado.
+  const haptics = useHaptics({ reducedMotion });
+  const posadaEn = useRef(null); // el foco ya celebrado (no repetir por frame)
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
@@ -50,32 +63,87 @@ export function useEntradaAbeja(foco, { entrando = true, energia = 1, reducedMot
       foco.z + (entrando ? 0.6 : 0.55 + vagarZ),
     );
     ref.current.position.lerp(dest, entrando ? 0.06 : 0.05);
+    // Angelita se posa: al cruzar el umbral de llegada al foco, un roce háptico
+    // (una vez por foco — el ref evita repetir por frame; el gate del hook
+    // apaga todo con reduced-motion, pref 'off' o sin soporte).
+    if (entrando && posadaEn.current !== foco && ref.current.position.distanceTo(dest) < 0.3) {
+      posadaEn.current = foco;
+      haptics.abeja();
+    }
     if (caraRef.current) {
       const vx = ref.current.position.x - prevX.current;
       if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
       prevX.current = ref.current.position.x;
     }
+    // La sombra de contacto la sigue por el piso: más alto vuela, más ancha y
+    // más tenue (peso visual sin shadow-maps). Mismo frame, cero loops extra.
+    if (sombraRef.current) {
+      const pos = ref.current.position;
+      const h = Math.max(0, pos.y - piso);
+      sombraRef.current.position.set(pos.x, piso + 0.03, pos.z);
+      sombraRef.current.scale.setScalar(1 + h * 0.15);
+      sombraRef.current.material.opacity = Math.max(0.06, 0.3 - h * 0.06);
+    }
   });
-  return { ref, caraRef };
+  return { ref, caraRef, sombraRef };
 }
 
 /**
  * Angelita ya montada en una escena: usa `useEntradaAbeja` para la coreografía y
- * dibuja el cuerpo (`AbejaAngelita`) como billboard `<Html>`. Cualquier arquetipo
- * la coloca con `<AbejaEscena foco=… animo=… energia=… reducedMotion=… />`.
+ * dibuja el cuerpo (`AbejaAngelita`) como billboard `<Html>`. Es la ÚNICA abeja
+ * dentro de un mundo (la del footer se oculta): por eso REFLEJA EL HABLA —pulsa
+ * cuando el agente narra (`hablando`)— y da un microrrebote al tocar un hotspot
+ * (`rebote`, un contador que sube por toque). Tres transformaciones en tres capas
+ * DOM que no se pisan: pulso (raíz), rebote (medio), volteo scaleX (cara, que el
+ * useFrame maneja imperativo). Cualquier arquetipo la coloca con
+ * `<AbejaEscena foco=… animo=… energia=… hablando=… rebote=… reducedMotion=… />`.
  */
-export function AbejaEscena({ foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false }) {
-  const { ref, caraRef } = useEntradaAbeja(foco, { entrando, energia, reducedMotion });
+export function AbejaEscena({
+  foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
+  hablando = false, rebote = 0,
+}) {
+  const { ref, caraRef, sombraRef } = useEntradaAbeja(foco, {
+    entrando, energia, reducedMotion, piso,
+  });
+  // Microrrebote: cada toque de hotspot sube `rebote`; reiniciamos la animación
+  // CSS (quitar → reflow → poner) para que dispare aun en toques seguidos. El
+  // gate reduced-motion la deja quieta.
+  const reboteRef = useRef(null);
+  useEffect(() => {
+    if (reducedMotion || rebote === 0 || !reboteRef.current) return undefined;
+    const el = reboteRef.current;
+    el.removeAttribute('data-rebote');
+    void el.offsetWidth; // fuerza reflow → reinicia el keyframe
+    el.setAttribute('data-rebote', '1');
+    const t = setTimeout(() => el.removeAttribute('data-rebote'), 640);
+    return () => clearTimeout(t);
+  }, [rebote, reducedMotion]);
   const size = 40 + Math.round(energia * 12);
   return (
-    <group ref={ref} position={[foco.x + 0.45, foco.y + 0.85, foco.z + 0.6]}>
-      <Html center distanceFactor={7} zIndexRange={[40, 10]}>
-        <div className="mundo-abeja" aria-hidden="true">
-          <div ref={caraRef} className="mundo-abeja__cara">
-            <AbejaAngelita size={size} animo={animo} energia={energia} animated={!reducedMotion} />
+    <>
+      <group ref={ref} position={[foco.x + 0.45, foco.y + 0.85, foco.z + 0.6]}>
+        <Html center distanceFactor={7} zIndexRange={[40, 10]}>
+          <div
+            className="mundo-abeja"
+            aria-hidden="true"
+            data-hablando={hablando && !reducedMotion ? '1' : undefined}
+          >
+            <div ref={reboteRef} className="mundo-abeja__rebote">
+              <div ref={caraRef} className="mundo-abeja__cara">
+                <AbejaAngelita size={size} animo={animo} energia={energia} animated={!reducedMotion} />
+              </div>
+            </div>
           </div>
-        </div>
-      </Html>
-    </group>
+        </Html>
+      </group>
+      {/* Su sombra: hermana (NO hija) del group — vive en el piso, no vuela. */}
+      <SombraContacto
+        refExt={sombraRef}
+        pos={[foco.x + 0.45, piso + 0.03, foco.z + 0.6]}
+        radio={0.3}
+        opacidad={0.24}
+        orden={3}
+      />
+    </>
   );
 }

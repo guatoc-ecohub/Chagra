@@ -9,7 +9,7 @@ const VIEWBOX = '-22 -28 58 52';
 
 export function Colibri({
   size = 64,
-  className,
+  className = '',
   inline = false,
   animated = true,
   title = 'Colibrí',

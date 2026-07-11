@@ -26,5 +26,18 @@ export { MUNDO, MUNDO_IDS } from './mundoData.js';
 export {
   ARQUETIPOS, ARQUETIPOS_KEYS, ARQUETIPOS_3D, ARQUETIPOS_2D, esArquetipo3D,
 } from './arquetipos.js';
-export { resolverMundo, tinteDeMundo, tituloDeMundo } from './resolverMundo.js';
-export { decidirTier, permite3D } from './deviceTier.js';
+export { resolverMundo, tinteDeMundo, tituloDeMundo, emojiDeMundo } from './resolverMundo.js';
+export { decidirTier, permite3D, perfilDeTier } from './deviceTier.js';
+
+// Navegación valle ↔ mundos (three-free): la máquina de fases + el viaje DOM.
+export { useNavegacionMundos, puedeEntrarAlMundo } from './useNavegacionMundos.js';
+export { default as TransicionMundo, VIAJE_MS } from './TransicionMundo.jsx';
+
+// Háptica táctil (three-free, DR-3D-HAPTICA): pulsos semánticos por evento del
+// framework — no-op silencioso donde no hay Vibration API (iOS/Safari, FF129+).
+export { default as useHaptics, PATRONES_HAPTICOS } from './useHaptics.js';
+
+// Sonido ambiental 0-KB (three-free, spec S3): paletas sonoras por mundo
+// sintetizadas con WebAudio — sin assets. Opt-in (default OFF), solo tras
+// gesto del usuario; bajo reduced-motion queda el lecho estático, sin eventos.
+export { default as useAudioMundo, PALETAS_SONORAS } from './useAudioMundo.js';

@@ -1,0 +1,614 @@
+/* Mockup "El onboarding es SEMBRAR su finca" — datos de muestra.
+ *
+ * Arco visual: la finca nace a TINTA sobre papel (paso 1, croquis que se
+ * dibuja solo) y el COLOR llega cuando el campesino elige su clima (paso 2,
+ * grade de luz por piso térmico — paleta heredada del mockup Montaña).
+ * Reglas de la casa: solo transform/opacity animados, blur cero,
+ * prefers-reduced-motion = fotograma final digno, hit-areas >= 48px.
+ */
+
+.os-root {
+  /* Tintas del cuaderno (SceneTrazoMinimal: ink / sage / gold) */
+  --os-tinta: #414b42;
+  --os-sage: #6f9a85;
+  --os-oro: #cbb96a;
+  --os-papel: #f6f1e4;
+  --os-papel-2: #efe7d3;
+
+  /* El color de la escena: neutro papel hasta que llega el clima */
+  --os-cielo-a: #f2ecdd;
+  --os-cielo-b: #ece3cd;
+  --os-loma: #e7dfc9;
+  --os-loma-fondo: #eee7d4;
+  --os-techo: #ddd2b8;
+  --os-pared: #f0e9d6;
+  --os-copa: #e2dcc4;
+  --os-era: #e5d9bd;
+  --os-verde: #6f9a85;
+  --os-verde-oscuro: #4d7a63;
+  --os-sol-opacidad: 0;
+  --os-niebla-opacidad: 0;
+  --os-frailejon-opacidad: 0;
+  --os-color-opacidad: 0;
+
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(120% 90% at 50% 0%, var(--os-papel) 0%, var(--os-papel-2) 100%);
+  color: var(--os-tinta);
+  font-family: 'Nunito', system-ui, sans-serif;
+  overflow: hidden;
+  z-index: 60;
+}
+
+/* ── Grades de luz por piso térmico (el color LLEGA con la elección) ── */
+.os-root[data-piso='paramo'] {
+  --os-cielo-a: #b8d2dc;
+  --os-cielo-b: #e3edea;
+  --os-loma: #9db8a6;
+  --os-loma-fondo: #c3d5c8;
+  --os-techo: #b07760;
+  --os-pared: #f2ead9;
+  --os-copa: #7fa18c;
+  --os-era: #8a7355;
+  --os-verde: #5f8d75;
+  --os-verde-oscuro: #40685a;
+  --os-sol-opacidad: 0.3;
+  --os-niebla-opacidad: 1;
+  --os-frailejon-opacidad: 1;
+  --os-color-opacidad: 1;
+}
+.os-root[data-piso='frio'] {
+  --os-cielo-a: #a9d6e6;
+  --os-cielo-b: #ecf5da;
+  --os-loma: #8db177;
+  --os-loma-fondo: #b9d0a6;
+  --os-techo: #b06650;
+  --os-pared: #f7efdc;
+  --os-copa: #6f9a58;
+  --os-era: #8a6a48;
+  --os-verde: #4f8a49;
+  --os-verde-oscuro: #38663a;
+  --os-sol-opacidad: 0.8;
+  --os-color-opacidad: 1;
+}
+.os-root[data-piso='templado'] {
+  --os-cielo-a: #ffd9a0;
+  --os-cielo-b: #fff3d6;
+  --os-loma: #a3b06a;
+  --os-loma-fondo: #c9cf9a;
+  --os-techo: #b85f3f;
+  --os-pared: #fbf2dc;
+  --os-copa: #7d9a54;
+  --os-era: #96703f;
+  --os-verde: #5c8a3e;
+  --os-verde-oscuro: #446636;
+  --os-sol-opacidad: 1;
+  --os-color-opacidad: 1;
+}
+.os-root[data-piso='calido'] {
+  --os-cielo-a: #ffc97a;
+  --os-cielo-b: #ffe9bd;
+  --os-loma: #b5b45e;
+  --os-loma-fondo: #d6cf8e;
+  --os-techo: #a85434;
+  --os-pared: #fdf3d9;
+  --os-copa: #8a9a48;
+  --os-era: #9c6a36;
+  --os-verde: #6a9438;
+  --os-verde-oscuro: #4d7030;
+  --os-sol-opacidad: 1;
+  --os-color-opacidad: 1;
+}
+
+/* ── Topbar ── */
+.os-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 6px;
+  z-index: 3;
+}
+.os-atras {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid rgba(65, 75, 66, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 253, 246, 0.72);
+  color: var(--os-tinta);
+  cursor: pointer;
+}
+.os-atras:focus-visible,
+.os-boton:focus-visible,
+.os-piso-btn:focus-visible,
+.os-cultivo-chip:focus-visible,
+.os-trato-btn:focus-visible,
+.os-input:focus-visible {
+  outline: 3px solid var(--os-verde);
+  outline-offset: 2px;
+}
+.os-progreso {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.os-prog-semilla {
+  width: 26px;
+  height: 26px;
+  overflow: visible;
+}
+.os-prog-grano {
+  fill: none;
+  stroke: var(--os-tinta);
+  stroke-width: 1.8;
+  opacity: 0.35;
+}
+.os-prog-brote {
+  fill: none;
+  stroke: var(--os-verde-oscuro);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.os-prog-actual .os-prog-grano {
+  opacity: 0.9;
+  fill: rgba(203, 185, 106, 0.35);
+}
+.os-prog-actual .os-prog-brote {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: os-dibuja 0.9s ease-out 0.2s forwards;
+}
+.os-prog-hecha .os-prog-grano {
+  opacity: 0.9;
+  fill: rgba(111, 154, 133, 0.4);
+}
+.os-badge {
+  margin-left: auto;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(65, 75, 66, 0.6);
+  border: 1px dashed rgba(65, 75, 66, 0.35);
+  border-radius: 999px;
+  padding: 4px 9px;
+  white-space: nowrap;
+}
+
+/* ── El escenario ── */
+.os-escenario {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.os-escena {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Capa de color: crossfade suave cuando el clima llega o cambia */
+.os-color {
+  opacity: var(--os-color-opacidad);
+  transition: opacity 1.1s ease;
+}
+.os-cielo { fill: var(--os-cielo-a); transition: fill 1.1s ease; }
+.os-loma { fill: var(--os-loma); transition: fill 1.1s ease; }
+.os-loma-fondo { fill: var(--os-loma-fondo); transition: fill 1.1s ease; }
+.os-techo { fill: var(--os-techo); transition: fill 1.1s ease; }
+.os-pared { fill: var(--os-pared); transition: fill 1.1s ease; }
+.os-copa { fill: var(--os-copa); transition: fill 1.1s ease; }
+.os-tierra-era { fill: var(--os-era); opacity: 0.75; transition: fill 1.1s ease; }
+
+/* El cielo real es un gradiente: lo simulamos con un segundo plano por
+ * pseudo-gradiente vertical del contenedor (barato y transiciona limpio). */
+.os-escenario::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--os-cielo-a) 0%, var(--os-cielo-b) 62%, transparent 62%);
+  opacity: var(--os-color-opacidad);
+  transition: opacity 1.1s ease, background 1.1s ease;
+  pointer-events: none;
+}
+
+/* Sol: respira despacio cuando la finca ya vive */
+.os-sol { opacity: var(--os-sol-opacidad); transition: opacity 1.1s ease; }
+.os-sol-disco { fill: #f2c24d; }
+.os-sol-halo { fill: rgba(242, 194, 77, 0.28); }
+.os-root[data-paso='viva'] .os-sol {
+  animation: os-respira 5.2s ease-in-out infinite;
+}
+
+/* Niebla de páramo: bancos que derivan en contra */
+.os-niebla { opacity: var(--os-niebla-opacidad); transition: opacity 1.1s ease; }
+.os-niebla-banco {
+  fill: rgba(240, 247, 245, 0.55);
+  animation: os-deriva 14s ease-in-out infinite alternate;
+}
+.os-niebla-2 { animation-duration: 18s; animation-direction: alternate-reverse; }
+.os-frailejones {
+  opacity: var(--os-frailejon-opacidad);
+  transition: opacity 1.1s ease;
+}
+.os-frailejon-tronco,
+.os-frailejon-hojas {
+  fill: none;
+  stroke: #7a8a5f;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+/* ── La tinta: el croquis que se dibuja solo ── */
+.os-trazo {
+  fill: none;
+  stroke: var(--os-tinta);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.os-trazo-fino {
+  fill: none;
+  stroke: var(--os-tinta);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+/* Etapas del auto-dibujado (receta SceneTrazoMinimal: pathLength="1") */
+.os-t1, .os-t2, .os-t3, .os-t3b, .os-t4, .os-t5, .os-t6, .os-t7 {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: os-dibuja 1s ease-out forwards;
+}
+.os-t1 { animation-delay: 0.2s; }
+.os-t2 { animation-delay: 0.7s; }
+.os-t3 { animation-delay: 1.3s; }
+.os-t3b { animation-delay: 1.9s; animation-duration: 0.8s; }
+.os-t4 { animation-delay: 2.3s; animation-duration: 1.2s; }
+.os-t5 { animation-delay: 3s; }
+.os-t6 { animation-delay: 3.5s; animation-duration: 0.8s; }
+.os-t7 { animation-delay: 4s; animation-duration: 1.1s; }
+
+/* El letrero se clava con un rebote cortico cuando hay nombre */
+.os-letrero {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.9);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.32, 1.4, 0.36, 1);
+}
+.os-letrero-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.os-letrero-tabla {
+  fill: #f7efdc;
+  stroke: var(--os-tinta);
+  stroke-width: 2;
+}
+.os-letrero-texto {
+  fill: var(--os-tinta);
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ── Las maticas: semilla que cae y mata que brota ── */
+.os-semilla {
+  fill: var(--os-tinta);
+  opacity: 0;
+  animation: os-cae 0.55s ease-in forwards;
+}
+.os-mata {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scale(0);
+  animation: os-brota 0.9s cubic-bezier(0.34, 1.3, 0.4, 1) 0.5s forwards;
+}
+/* En la finca viva, las maticas se estiran un poquito más: ya agarraron */
+.os-root[data-paso='viva'] .os-mata {
+  animation: none;
+  transform: scale(1.12);
+  transition: transform 1.4s ease;
+}
+.os-hoja, .os-espiga, .os-vara, .os-tronco, .os-brote-tinta {
+  fill: none;
+  stroke: var(--os-verde-oscuro);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.os-vara { stroke: var(--os-tinta); opacity: 0.7; }
+.os-follaje {
+  fill: var(--os-verde);
+  opacity: 0.9;
+}
+.os-follaje-oscuro { fill: var(--os-verde-oscuro); }
+.os-hoja-grande {
+  fill: var(--os-verde);
+  stroke: var(--os-verde-oscuro);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+.os-flor { fill: #f4ecd4; stroke: var(--os-verde-oscuro); stroke-width: 1; }
+.os-fruto { fill: #d95d4a; stroke: none; }
+.os-vaina {
+  fill: none;
+  stroke: var(--os-verde);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+}
+.os-mazorca { fill: var(--os-oro); stroke: var(--os-verde-oscuro); stroke-width: 1.2; }
+
+/* ── Vida ambiental (paso 4) ── */
+.os-humo {
+  fill: rgba(120, 120, 118, 0.4);
+  opacity: 0;
+  animation: os-humo 4.5s ease-out infinite;
+}
+.os-humo-2 { animation-delay: 1.5s; }
+.os-humo-3 { animation-delay: 3s; }
+.os-colibri { animation: os-ronda 7s ease-in-out infinite; }
+.os-colibri-cuerpo {
+  fill: none;
+  stroke: var(--os-tinta);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.os-colibri-ala {
+  fill: rgba(111, 154, 133, 0.5);
+  stroke: var(--os-tinta);
+  stroke-width: 1.6;
+  transform-box: fill-box;
+  transform-origin: 30% 90%;
+  animation: os-aleteo 0.24s ease-in-out infinite alternate;
+}
+.os-colibri-garganta { fill: var(--os-oro); }
+.os-mariposa { animation: os-flota 6s ease-in-out infinite alternate; }
+.os-mariposa-2 { animation-duration: 8s; animation-delay: 1.2s; }
+.os-mariposa-alas {
+  fill: rgba(203, 185, 106, 0.6);
+  stroke: var(--os-tinta);
+  stroke-width: 1.4;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: os-mariposa-bate 0.5s ease-in-out infinite alternate;
+}
+.os-vida { animation: os-aparece 1.2s ease-out both; }
+
+/* ── La tarjeta de cuaderno (una pregunta a la vez) ── */
+.os-tarjeta {
+  position: relative;
+  z-index: 2;
+  margin: 0 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  padding: 18px 18px 16px;
+  background: rgba(255, 253, 246, 0.94);
+  border: 1.5px solid rgba(65, 75, 66, 0.25);
+  border-radius: 22px;
+  box-shadow: 0 10px 28px rgba(65, 75, 66, 0.16);
+  animation: os-tarjeta-entra 0.5s cubic-bezier(0.3, 1.2, 0.4, 1) both;
+  max-height: 62dvh;
+  overflow-y: auto;
+}
+.os-kicker {
+  margin: 0 0 6px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--os-verde-oscuro);
+}
+.os-pregunta {
+  margin: 0 0 14px;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--os-tinta);
+}
+.os-saludo { font-size: 1.5rem; }
+.os-nota {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  color: rgba(65, 75, 66, 0.75);
+}
+.os-nota-final { margin: 0 0 14px; font-size: 0.95rem; }
+
+.os-trato {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.os-trato-btn {
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(65, 75, 66, 0.35);
+  background: transparent;
+  color: var(--os-tinta);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.os-trato-btn.os-activo,
+.os-cultivo-chip.os-activo,
+.os-piso-btn.os-activo {
+  border-color: var(--os-verde-oscuro);
+  background: rgba(111, 154, 133, 0.18);
+}
+.os-input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(65, 75, 66, 0.35);
+  background: #fffdf6;
+  color: var(--os-tinta);
+  font-family: inherit;
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+}
+.os-input::placeholder { color: rgba(65, 75, 66, 0.45); }
+
+.os-pisos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.os-piso-btn {
+  min-height: 74px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(65, 75, 66, 0.3);
+  background: #fffdf6;
+  color: var(--os-tinta);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: transform 0.15s ease;
+}
+.os-piso-btn:active { transform: scale(0.98); }
+.os-piso-nombre { font-weight: 800; font-size: 0.92rem; }
+.os-piso-detalle { font-size: 0.74rem; color: rgba(65, 75, 66, 0.7); line-height: 1.3; }
+
+.os-cultivos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.os-cultivo-chip {
+  min-height: 52px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(65, 75, 66, 0.35);
+  background: #fffdf6;
+  color: var(--os-tinta);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.15s ease;
+}
+.os-cultivo-chip:active { transform: scale(0.97); }
+.os-cultivo-chip:disabled { opacity: 0.45; cursor: default; }
+.os-cultivo-emoji { font-size: 1.2rem; }
+
+.os-boton {
+  display: block;
+  width: 100%;
+  min-height: 54px;
+  margin-top: 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--os-verde-oscuro);
+  color: #fffdf6;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+.os-boton:active { transform: scale(0.98); }
+.os-boton:disabled { opacity: 0.4; cursor: default; }
+
+/* ── Keyframes (solo transform / opacity / dashoffset) ── */
+@keyframes os-dibuja {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes os-cae {
+  0% { opacity: 0; transform: translateY(-46px); }
+  25% { opacity: 1; }
+  80% { opacity: 1; transform: translateY(-2px); }
+  100% { opacity: 0; transform: translateY(0); }
+}
+@keyframes os-brota {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+@keyframes os-respira {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+@keyframes os-deriva {
+  from { transform: translateX(-14px); }
+  to { transform: translateX(16px); }
+}
+@keyframes os-humo {
+  0% { opacity: 0; transform: translateY(0) translateX(0); }
+  20% { opacity: 0.7; }
+  100% { opacity: 0; transform: translateY(-44px) translateX(8px); }
+}
+@keyframes os-ronda {
+  0%, 100% { transform: translate(0, 0); }
+  30% { transform: translate(26px, -14px); }
+  60% { transform: translate(52px, 4px); }
+  80% { transform: translate(20px, 12px); }
+}
+@keyframes os-aleteo {
+  from { transform: rotate(-18deg); }
+  to { transform: rotate(24deg); }
+}
+@keyframes os-flota {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-22px, -30px); }
+}
+@keyframes os-mariposa-bate {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.35); }
+}
+@keyframes os-aparece {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes os-tarjeta-entra {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Pantallas angostas (320px digno) ── */
+@media (max-width: 360px) {
+  .os-tarjeta { padding: 14px 14px 12px; margin: 0 8px calc(8px + env(safe-area-inset-bottom, 0px)); }
+  .os-pregunta { font-size: 1.1rem; }
+  .os-saludo { font-size: 1.3rem; }
+  .os-pisos { grid-template-columns: 1fr; }
+  .os-piso-btn { min-height: 58px; }
+  .os-badge { display: none; }
+}
+
+/* ── Reduced motion: fotograma final digno, cero movimiento ── */
+@media (prefers-reduced-motion: reduce) {
+  .os-t1, .os-t2, .os-t3, .os-t3b, .os-t4, .os-t5, .os-t6, .os-t7,
+  .os-prog-actual .os-prog-brote {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .os-semilla { animation: none; opacity: 0; }
+  .os-mata { animation: none; transform: scale(1); }
+  .os-root[data-paso='viva'] .os-mata { transform: scale(1.12); transition: none; }
+  .os-sol,
+  .os-root[data-paso='viva'] .os-sol,
+  .os-niebla-banco,
+  .os-colibri,
+  .os-colibri-ala,
+  .os-mariposa,
+  .os-mariposa-alas,
+  .os-vida,
+  .os-tarjeta {
+    animation: none;
+  }
+  .os-humo { animation: none; opacity: 0.4; transform: translateY(-18px); }
+  .os-letrero { transition: none; }
+  .os-color, .os-escenario::before, .os-niebla, .os-frailejones, .os-sol { transition: none; }
+}

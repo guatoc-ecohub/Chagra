@@ -1,0 +1,473 @@
+/* ════════════════════════════════════════════════════════════════════════
+   salud-finca.css — mockup "La salud de mi finca" (superficie de estado/salud).
+
+   NO es el tablero clínico de defecto (fondo cream + serif + terracota): es la
+   NIEBLA DEL AMANECER en el páramo. Fondo de neblina fría verde-grisácea, tinta
+   de corteza, y un ACENTO FUNCIONAL que NO es decorativo — es el ESTADO de lo
+   vivo: savia (sana), miel (en observación) y arcilla (pide una mirada). Nunca
+   rojo de alarma: la observación es calma.
+
+   Firma: "el cantero vivo" (.slf-cantero) — la finca vista como una cama de
+   siembra desde arriba, cada mata un brote teñido por su bienestar, que respira
+   al mismo pulso que el organismo del héroe. Los números —matas, milímetros,
+   humedad— van en monoespaciado, como la lectura de un instrumento de campo.
+
+   Todo el prefijo `slf-`. Mobile-first desde 320px. Movimiento mínimo y
+   reduced-motion-safe. Cero dependencias, cero enlaces externos.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.slf-root {
+  --slf-mist: #e9efe7;
+  --slf-mist-2: #dde5d9;
+  --slf-card: #f5f8f2;
+  --slf-ink: #22301f;
+  --slf-ink-2: #5d6c53;
+  --slf-savia: #2f7d54;
+  --slf-savia-soft: #6ba379;
+  --slf-agua: #3a8698;
+  --slf-honey: #b8892f;
+  --slf-clay: #ab6543;
+  --slf-line: rgba(34, 48, 31, 0.13);
+  --slf-line-2: rgba(34, 48, 31, 0.07);
+  --slf-night: #0c1830;
+  --slf-beat: 5.2s;
+
+  --slf-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --slf-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --slf-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace;
+
+  min-height: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: 520px;
+  padding: 0 0 46px;
+  color: var(--slf-ink);
+  font-family: var(--slf-sans);
+  /* niebla del páramo: veladura fría verde-grisácea, sin cream */
+  background:
+    radial-gradient(120% 60% at 50% -8%, #f1f5ee 0%, var(--slf-mist) 46%, var(--slf-mist-2) 100%);
+  -webkit-tap-highlight-color: transparent;
+}
+.slf-root *,
+.slf-root *::before,
+.slf-root *::after { box-sizing: border-box; }
+
+/* ── Encabezado ─────────────────────────────────────────────────────────── */
+.slf-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px clamp(14px, 4.5vw, 22px) 8px;
+}
+.slf-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border: 1px solid var(--slf-line);
+  border-radius: 50%;
+  background: var(--slf-card);
+  color: var(--slf-ink);
+  cursor: pointer;
+}
+.slf-back:active { transform: scale(0.94); }
+.slf-titulo { min-width: 0; }
+.slf-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--slf-savia);
+}
+.slf-h1 {
+  margin: 1px 0 0;
+  font-family: var(--slf-serif);
+  font-size: clamp(21px, 6.4vw, 27px);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.slf-lugar {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--slf-ink-2);
+}
+.slf-lugar b { font-weight: 600; color: var(--slf-ink); }
+
+.slf-wrap { padding: 0 clamp(14px, 4.5vw, 22px); }
+
+/* ── Héroe: el organismo que respira ────────────────────────────────────── */
+.slf-hero {
+  position: relative;
+  margin-top: 6px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--slf-night);
+  box-shadow: 0 14px 34px -20px rgba(6, 14, 26, 0.7);
+  isolation: isolate;
+}
+.slf-hero-escena {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 390 / 300;
+  overflow: hidden;
+}
+.slf-hero-escena .fvo-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* velo para que el texto lea sobre el organismo, sin apagarlo */
+.slf-hero-velo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, rgba(6, 12, 24, 0.92) 4%, rgba(6, 12, 24, 0.34) 34%, rgba(6, 12, 24, 0) 62%);
+}
+.slf-hero-texto {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 16px clamp(15px, 5vw, 22px) 15px;
+  color: #eaf4ee;
+}
+.slf-hero-linea {
+  margin: 0;
+  font-family: var(--slf-serif);
+  font-size: clamp(18px, 5.4vw, 23px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 10px rgba(4, 10, 20, 0.55);
+}
+.slf-hero-sub {
+  margin: 5px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(224, 240, 231, 0.82);
+  max-width: 32ch;
+}
+.slf-hero-pulso {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 5px 11px 5px 9px;
+  border-radius: 999px;
+  background: rgba(9, 26, 22, 0.5);
+  border: 1px solid rgba(120, 210, 170, 0.28);
+  font-size: 12px;
+  font-weight: 600;
+  color: #b9ecd2;
+}
+.slf-hero-punto {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #46e0a2;
+  box-shadow: 0 0 0 0 rgba(70, 224, 162, 0.55);
+  animation: slf-late var(--slf-beat) ease-in-out infinite;
+}
+@keyframes slf-late {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(70, 224, 162, 0.5); }
+  18% { box-shadow: 0 0 0 6px rgba(70, 224, 162, 0); }
+  40% { box-shadow: 0 0 0 0 rgba(70, 224, 162, 0); }
+}
+
+/* ── Secciones ──────────────────────────────────────────────────────────── */
+.slf-sec { margin-top: 26px; }
+.slf-sec-cab { margin-bottom: 11px; }
+.slf-kicker {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--slf-savia);
+}
+.slf-sec-tit {
+  margin: 3px 0 0;
+  font-family: var(--slf-serif);
+  font-size: clamp(18px, 5.2vw, 21px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.slf-sec-nota {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--slf-ink-2);
+}
+
+.slf-card {
+  background: var(--slf-card);
+  border: 1px solid var(--slf-line);
+  border-radius: 16px;
+  padding: 15px;
+}
+
+/* ── El cantero vivo (firma) ────────────────────────────────────────────── */
+.slf-cantero-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 11px;
+  overflow: hidden;
+  background:
+    linear-gradient(to bottom, #efe7d5 0%, #e7dcc4 100%);
+}
+.slf-brote { transform-box: fill-box; transform-origin: 50% 100%; }
+.slf-brote--sana { color: var(--slf-savia); }
+.slf-brote--obs { color: var(--slf-honey); }
+.slf-brote--mirada { color: var(--slf-clay); }
+.slf-cantero-aliento { transform-box: fill-box; transform-origin: 50% 100%; }
+
+/* leyenda + conteos */
+.slf-conteos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  margin-top: 13px;
+}
+.slf-conteo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 10px;
+  border-radius: 11px;
+  background: var(--slf-mist);
+  border: 1px solid var(--slf-line-2);
+}
+.slf-conteo-num {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--slf-mono);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--slf-ink);
+}
+.slf-punto {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  align-self: center;
+}
+.slf-punto--sana { background: var(--slf-savia); }
+.slf-punto--obs { background: var(--slf-honey); }
+.slf-punto--mirada { background: var(--slf-clay); }
+.slf-conteo-lbl {
+  font-size: 11.5px;
+  line-height: 1.25;
+  color: var(--slf-ink-2);
+}
+
+/* ── El cielo y el agua ─────────────────────────────────────────────────── */
+.slf-cielo-fila {
+  display: flex;
+  gap: 13px;
+  align-items: stretch;
+}
+.slf-cielo-caja {
+  flex: 0 0 108px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0f1e34;
+  align-self: stretch;
+  min-height: 92px;
+}
+.slf-cielo-svg { display: block; width: 100%; height: 100%; }
+.slf-senales {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+.slf-senal {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.slf-senal-lbl {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--slf-ink-2);
+  min-width: 74px;
+}
+.slf-senal-val {
+  font-family: var(--slf-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--slf-ink);
+}
+.slf-senal-val small {
+  font-family: var(--slf-sans);
+  font-weight: 500;
+  color: var(--slf-ink-2);
+}
+
+/* barra de humedad del suelo */
+.slf-suelo-barra {
+  position: relative;
+  height: 12px;
+  margin-top: 4px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: linear-gradient(to right, #d9c39a 0%, #b98f5c 48%, #6f8a55 100%);
+  border: 1px solid var(--slf-line);
+}
+.slf-suelo-marca {
+  position: absolute;
+  top: -3px;
+  width: 3px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--slf-ink);
+  transform: translateX(-50%);
+  box-shadow: 0 0 0 2px var(--slf-card);
+}
+.slf-suelo-escala {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 10.5px;
+  color: var(--slf-ink-2);
+}
+
+/* ── Para mirar esta semana (focos) ─────────────────────────────────────── */
+.slf-focos { display: flex; flex-direction: column; gap: 11px; }
+.slf-foco {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 13px;
+  border-radius: 15px;
+  background: var(--slf-card);
+  border: 1px solid var(--slf-line);
+  border-left: 4px solid var(--slf-savia-soft);
+}
+.slf-foco--obs { border-left-color: var(--slf-honey); }
+.slf-foco--mirada { border-left-color: var(--slf-clay); }
+.slf-foco-lam {
+  flex: 0 0 52px;
+  width: 52px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--slf-mist);
+  border: 1px solid var(--slf-line-2);
+}
+.slf-foco-lam svg { display: block; width: 100%; height: auto; }
+.slf-foco-cuerpo { min-width: 0; flex: 1 1 auto; }
+.slf-foco-tit {
+  margin: 0;
+  font-family: var(--slf-serif);
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+.slf-foco-txt {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--slf-ink-2);
+}
+.slf-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+.slf-chip--obs {
+  color: #7a5a15;
+  background: rgba(184, 137, 47, 0.14);
+  border-color: rgba(184, 137, 47, 0.3);
+}
+.slf-chip--mirada {
+  color: #7e451f;
+  background: rgba(171, 101, 67, 0.14);
+  border-color: rgba(171, 101, 67, 0.3);
+}
+.slf-chip .slf-punto { width: 7px; height: 7px; }
+
+/* ── El suelo y la vida ─────────────────────────────────────────────────── */
+.slf-vida { display: flex; flex-direction: column; gap: 3px; }
+.slf-bicho {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  padding: 11px 2px;
+}
+.slf-bicho + .slf-bicho { border-top: 1px solid var(--slf-line-2); }
+.slf-bicho-fig {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slf-bicho-svg { display: block; }
+.slf-bicho-cuerpo { min-width: 0; }
+.slf-bicho-nom {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.slf-bicho-nom i { font-weight: 400; color: var(--slf-ink-2); font-size: 11.5px; }
+.slf-bicho-txt {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 1.42;
+  color: var(--slf-ink-2);
+}
+
+/* ── Cierre ─────────────────────────────────────────────────────────────── */
+.slf-cierre {
+  margin-top: 24px;
+  padding: 15px 16px;
+  border-radius: 15px;
+  border: 1px dashed var(--slf-line);
+  background: transparent;
+}
+.slf-cierre p {
+  margin: 0;
+  font-family: var(--slf-serif);
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--slf-ink);
+}
+.slf-cierre p + p {
+  margin-top: 7px;
+  font-family: var(--slf-sans);
+  font-size: 12.5px;
+  color: var(--slf-ink-2);
+}
+
+/* ── Movimiento: respiro solo si el sistema lo permite ──────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .slf-cantero-aliento { animation: slf-respira var(--slf-beat) ease-in-out infinite; }
+  @keyframes slf-respira {
+    0%, 100% { transform: scaleY(1) translateY(0); }
+    50% { transform: scaleY(1.012) translateY(-0.6px); }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slf-hero-punto { animation: none; }
+}

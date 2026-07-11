@@ -45,6 +45,33 @@ export const ARQUETIPOS = {
     nombre: 'El valle (mapa)', clave: 'la finca como mapa navegable; cada mundo es un lugar',
     ejemplo: 'valle', tambien: [],
   },
+  // La ÚNICA metáfora espacial nueva del batch (README §case-3): la bóveda de
+  // cielo. Su espejo 2D es una lámina de cielo (motivo `boveda` en LaminaMundo).
+  boveda: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'boveda', espejo: 'mirror',
+    nombre: 'La bóveda del cielo', clave: 'el cielo de la finca: hora del día + temporada bimodal andina',
+    ejemplo: 'clima', tambien: [],
+  },
+  // La huerta-clínica: la familia del `recinto` (un lugar cercado que se
+  // camina), pero su lección es el manejo SIN veneno — trampas cromáticas,
+  // biocontrol (Beauveria/Metarhizium), borde push-pull y enemigos naturales.
+  // En equipo humilde cae a su ficha 2D (infografía de la sanidad).
+  sanidad: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'sanidad', espejo: 'mirror',
+    nombre: 'La huerta-clínica', clave: 'el manejo agroecológico de plagas: trampas, biocontrol y enemigos naturales',
+    ejemplo: 'sanidad', tambien: [],
+  },
+  // El mercado campesino: la familia del `flujo` (una ruta que se recorre) hecha
+  // cadena corta del campo a la mesa. Su lección es la comercialización justa —
+  // puestos con toldo, canastos con la cosecha de la finca, la procedencia
+  // andina (terroir/sello de origen) y el precio justo del trato directo (sin la
+  // tajada del intermediario). En equipo humilde cae a su ficha 2D (la
+  // infografía del mercado y la despensa).
+  mercado: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'mercado', espejo: 'mirror',
+    nombre: 'El mercado campesino', clave: 'la cadena corta del campo a la mesa: puestos, procedencia y precio justo',
+    ejemplo: 'mercado', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {

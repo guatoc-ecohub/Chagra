@@ -10,7 +10,7 @@ const VIEWBOX = '-8 -16 30 48';
 
 export function Lombriz({
   size = 64,
-  className,
+  className = '',
   inline = false,
   // eslint-disable-next-line no-unused-vars
   animated = true,
