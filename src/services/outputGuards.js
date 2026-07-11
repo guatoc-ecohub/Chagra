@@ -2485,6 +2485,44 @@ export function guardInventedContact(responseText, _resolvedEntities = null, _fi
   return { text: responseText, modified: false, reason: null };
 }
 
+// ── GUARD: norma numerada afirmada como obligacion ──────────────────────────
+
+const FABRICATED_LEGAL_NORM_MARKER = 'no puedo verificar el numero de esa norma';
+const NUMBERED_LEGAL_NORM_RE =
+  /\b(ley|decreto|resolucion)\s+(?:ica\s+)?(?:no\.?\s*)?\d{2,6}(?:\s+de\s+(?:19|20)\d{2})?\b/;
+const LEGAL_OBLIGATION_ASSERTION_RE =
+  /\b(si\s*,?\s+)?(?:la\s+|el\s+)?(?:ley|decreto|resolucion)\b[^.!?]{0,90}\b(obliga\w*|exige\w*|ordena\w*|establece\s+como\s+obligatori\w*|debes?|tienes\s+que|es\s+obligatori\w*)\b/;
+
+/**
+ * Evita confirmar como hecho una obligacion atribuida a una norma numerada que
+ * no se puede contrastar localmente. No actua ante preguntas, citas neutrales ni
+ * recomendaciones de verificar la fuente oficial.
+ */
+export function guardUnverifiedLegalNormAssertion(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  const norm = _stripDiacritics(responseText);
+  if (norm.includes(FABRICATED_LEGAL_NORM_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  if (!NUMBERED_LEGAL_NORM_RE.test(norm) || !LEGAL_OBLIGATION_ASSERTION_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  if (/\b(no\s+(puedo|se\s+puede)\s+verificar|verifica\w*|consulta\w*)\b[^.!?]{0,80}\b(fuente|sitio|portal|ica)\b/.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('unverified_legal_norm_assertion');
+  return {
+    text:
+      `No puedo verificar el numero de esa norma ni confirmar que imponga esa obligacion. ` +
+      'Verifica el texto y la vigencia en la fuente oficial del ICA antes de actuar.',
+    modified: true,
+    reason: 'norma_numerada_no_verificada',
+  };
+}
+
 // ── GUARD: INSTITUCIÓN / FUENTE DE APOYO FABRICADA (#2133) ───────────────────
 
 /**
@@ -8148,6 +8186,41 @@ const KNOWN_PATHOGEN_BINOMIALS = new Set([
   'mycosphaerella musicola',
 ]);
 
+// Casos fantasma observados y confirmados por el canario. Una lista cerrada evita
+// inferir que un patogeno real es falso solo porque no aparece en el grounding.
+const KNOWN_FABRICATED_PATHOGEN_BINOMIALS = new Set([
+  'xanthomonas paramuna',
+]);
+const PATHOGEN_MANAGEMENT_ASSERTION_RE =
+  /\b(se\s+controla|se\s+maneja|controla\w*|maneja\w*|aplica\w*|elimina\w*|fumiga\w*|trata\w*)\b/;
+const FABRICATED_PATHOGEN_MARKER = 'no puedo confirmar que ese binomio corresponda a un patogeno real';
+
+/**
+ * Expresa duda cuando una respuesta da manejo accionable para un binomio que el
+ * canario ya identifico como fabricado. La lista cerrada es intencional: no se
+ * cuestionan binomios reales o simplemente ausentes del catalogo local.
+ */
+export function guardFabricatedPathogenBinomial(responseText) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  const norm = _stripDiacritics(responseText);
+  if (norm.includes(FABRICATED_PATHOGEN_MARKER) || !PATHOGEN_MANAGEMENT_ASSERTION_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  const hit = [...KNOWN_FABRICATED_PATHOGEN_BINOMIALS].find((binomial) => norm.includes(binomial));
+  if (!hit) return { text: responseText, modified: false, reason: null };
+
+  bumpGuardTelemetry('fabricated_pathogen_binomial');
+  return {
+    text:
+      'No puedo confirmar que ese binomio corresponda a un patogeno real. Antes de aplicar un manejo o eliminar ' +
+      'plantas, verifica la identificacion con una foto, un tecnico local o un laboratorio del ICA.',
+    modified: true,
+    reason: `binomio_patogeno_fabricado: ${hit}`,
+  };
+}
+
 /**
  * Si el texto original nombra un patógeno/enfermedad conocido, devuelve la línea de
  * contexto que lo identifica (para PRESERVAR esa info al suprimir la receta). null si
@@ -10255,6 +10328,14 @@ export function applyOutputGuards(
     modified = true;
     if (contactRes.reason) reasons.push(contactRes.reason);
   }
+  // Una institucion real no vuelve verificable cualquier numero de norma que el
+  // modelo le atribuya. Solo reemplaza afirmaciones de obligacion, no menciones.
+  const legalNormRes = guardUnverifiedLegalNormAssertion(text);
+  if (legalNormRes.modified) {
+    text = legalNormRes.text;
+    modified = true;
+    if (legalNormRes.reason) reasons.push(legalNormRes.reason);
+  }
   // Guard SAFETY de INSTITUCIÓN / FUENTE FABRICADA (#2133): firma propia (solo el
   // texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE quirúrgico por
   // oración: si el cuerpo cita una institución/entidad de apoyo que NO está en la
@@ -10305,6 +10386,14 @@ export function applyOutputGuards(
     text = extractRes.text;
     modified = true;
     if (extractRes.reason) reasons.push(extractRes.reason);
+  }
+  // Lista cerrada de binomios de patogeno confirmados como fabricados. Corre
+  // antes de los caveats genericos y solo si la respuesta ofrece manejo.
+  const pathogenBinomialRes = guardFabricatedPathogenBinomial(text);
+  if (pathogenBinomialRes.modified) {
+    text = pathogenBinomialRes.text;
+    modified = true;
+    if (pathogenBinomialRes.reason) reasons.push(pathogenBinomialRes.reason);
   }
   // Guard CAVEAT de BINOMIO de ORGANISMO BENÉFICO FABRICADO (2026-06-06): firma
   // propia (usa el grounding crudo para no cuestionar binomios respaldados por

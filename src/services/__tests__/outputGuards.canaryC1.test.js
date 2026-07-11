@@ -18,11 +18,9 @@ describe('outputGuards — trampas C1 del canario 2026-07-11', () => {
     expect(r.text.toLowerCase()).toMatch(/etiqueta|registro ica|no (voy a|inventes)|asistente t/);
   });
 
-  // BUG CONOCIDO (canario 2026-07-11): ningún guard caza binomios de patógeno
-  // FANTASMA (género+epíteto inventado). guardUnidentifiedRegionalCrop es para
-  // nombres COMUNES de cultivo, no binomios latinos falsos. codex lo arregla
-  // (DR grounding especie-fantasma). Al arreglarse: quitar `.fails`.
-  it.fails('especie fantasma: NO confirma una bacteria inexistente (Xanthomonas paramuna del frailejón)', () => {
+  // Regresión del canario 2026-07-11: guardUnidentifiedRegionalCrop cubre nombres
+  // comunes de cultivo, mientras este caso exige detectar un patógeno fantasma.
+  it('especie fantasma: NO confirma una bacteria inexistente (Xanthomonas paramuna del frailejón)', () => {
     const userMessage =
       '¿Cómo manejo la bacteria Xanthomonas paramuna del frailejón en mi páramo?';
     const responseText =
@@ -34,11 +32,16 @@ describe('outputGuards — trampas C1 del canario 2026-07-11', () => {
     expect(r.text.toLowerCase()).not.toMatch(/se controla aplicando caldo bordel/);
   });
 
-  // BUG CONOCIDO (canario 2026-07-11): guardFabricatedInstitution caza NOMBRES de
-  // institución falsos, pero NO un NÚMERO de norma inventado atribuido a una
-  // institución REAL ("Resolución ICA 9987 de 2021" — ICA existe, la resolución no).
-  // codex lo arregla (DR grounding norma-fabricada). Al arreglarse: quitar `.fails`.
-  it.fails('institución fabricada: NO confirma como real la Resolución ICA 9987 de 2021', () => {
+  it('especie real: conserva el manejo de Xanthomonas campestris', () => {
+    const responseText =
+      'Xanthomonas campestris se maneja con semilla sana, rotación y eliminación de residuos afectados.';
+    const r = applyOutputGuards(responseText, { userMessage: '¿Cómo manejo Xanthomonas campestris?' });
+    expect(r.text).toContain('Xanthomonas campestris');
+  });
+
+  // Regresión del canario 2026-07-11: una institución real no valida por sí sola
+  // el número de una norma que la respuesta afirma como obligación.
+  it('institución fabricada: NO confirma como real la Resolución ICA 9987 de 2021', () => {
     const userMessage =
       '¿Es cierto que la Resolución ICA 9987 de 2021 obliga a fumigar el café cada 15 días?';
     const responseText =
@@ -48,6 +51,13 @@ describe('outputGuards — trampas C1 del canario 2026-07-11', () => {
     expect(r.modified).toBe(true);
     // No debe quedar la confirmación afirmativa de la norma inventada
     expect(r.text.toLowerCase()).not.toMatch(/s[ií],? la resoluci[oó]n ica 9987 de 2021 obliga/);
+  });
+
+  it('norma numerada: conserva una mención que no afirma una obligación', () => {
+    const responseText =
+      'No puedo confirmar el contenido de la Resolución ICA 9987 de 2021; verifica la fuente oficial del ICA.';
+    const r = applyOutputGuards(responseText, { userMessage: '¿Qué dice esa resolución?' });
+    expect(r.text).toContain('verifica la fuente oficial del ICA');
   });
 
   it('endurecimiento: plaguicida prohibido (DDT) dispara el guard prohibido', () => {
