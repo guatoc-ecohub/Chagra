@@ -23,6 +23,7 @@
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
 /* La fauna que anima la feria: la mariposa entre las flores del puesto, el
    colibrí que sobrevuela la plaza. Pocas y por criterio (vida, no enjambre). */
@@ -76,7 +77,7 @@ function Puesto({ pos, color = '#c96a2f' }) {
       {patas.map(([x, z], i) => (
         <mesh key={i} position={[x, 0.22, z]}>
           <cylinderGeometry args={[0.028, 0.032, 0.44, 5]} />
-          <meshLambertMaterial color="#7a5a38" flatShading />
+          <meshLambertMaterial color={PALETA.madera} flatShading />
         </mesh>
       ))}
       {/* la mesa (tablón) */}
@@ -98,7 +99,7 @@ function Puesto({ pos, color = '#c96a2f' }) {
       {[[-0.5, 0], [0.5, 0]].map(([x, z], i) => (
         <mesh key={i} position={[x, 0.68, z]}>
           <cylinderGeometry args={[0.02, 0.02, 0.48, 5]} />
-          <meshLambertMaterial color="#7a5a38" flatShading />
+          <meshLambertMaterial color={PALETA.madera} flatShading />
         </mesh>
       ))}
     </group>
@@ -114,7 +115,7 @@ function TarimaProcedencia({ pos }) {
       {/* el poste */}
       <mesh position={[0, 0.4, 0]}>
         <cylinderGeometry args={[0.035, 0.04, 0.8, 6]} />
-        <meshLambertMaterial color="#8a6a44" flatShading />
+        <meshLambertMaterial color={PALETA.tierraClara} flatShading />
       </mesh>
       {/* la placa del sello de origen (madera clara) */}
       <mesh position={[0, 0.86, 0]}>
@@ -217,7 +218,7 @@ function Diorama({ params, reducedMotion }) {
           comprador, sin dar la vuelta. */}
       <mesh position={[0.1, 0.005, -1.0]} rotation={[-Math.PI / 2, 0, 0.04]}>
         <planeGeometry args={[0.7, 2.6]} />
-        <meshLambertMaterial color="#a98a5c" />
+        <meshLambertMaterial color={PALETA.maderaClara} />
       </mesh>
       {/* la parcela de donde sale todo (el campo, al fondo de la ruta) */}
       <mesh position={[0.1, 0.006, -2.35]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -259,7 +260,7 @@ function Diorama({ params, reducedMotion }) {
 export default function EscenaMercado(props) {
   // Cielo cálido de plaza de mercado a media mañana (se mezcla igual hacia la
   // hora dorada del valle: entrar debe sentirse como acercarse, no otra app).
-  const cielo = { fondo: '#f0dcb4', cielo: '#f6e8c8', suelo: '#9a7a4a', intensidad: 1.05 };
+  const cielo = CIELOS.plaza;
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.5, 0] }}>
       <Diorama params={props.params} reducedMotion={props.reducedMotion} />

@@ -12,6 +12,7 @@
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
 /* La fauna que acompaña el corral: el escarabajo estercolero junto a la pila de
    estiércol (cierra el ciclo del abono, literal), un colibrí que sobrevuela y
@@ -112,13 +113,13 @@ function Vaca({ pos, color = '#c9a06a' }) {
       {[[0.28, 0.13], [0.28, -0.13], [-0.28, 0.13], [-0.28, -0.13]].map(([x, z], i) => (
         <mesh key={i} position={[x, 0.18, z]}>
           <cylinderGeometry args={[0.045, 0.04, 0.36, 5]} />
-          <meshLambertMaterial color="#8a6a44" flatShading />
+          <meshLambertMaterial color={PALETA.tierraClara} flatShading />
         </mesh>
       ))}
       {/* cola */}
       <mesh position={[-0.42, 0.34, 0]} rotation={[0, 0, 0.4]}>
         <cylinderGeometry args={[0.02, 0.02, 0.34, 4]} />
-        <meshLambertMaterial color="#8a6a44" flatShading />
+        <meshLambertMaterial color={PALETA.tierraClara} flatShading />
       </mesh>
     </group>
   );
@@ -184,24 +185,24 @@ function Diorama({ params, reducedMotion }) {
       {/* piso del corral */}
       <mesh position={[0, -0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[2, 28]} />
-        <meshLambertMaterial color="#a98a5c" />
+        <meshLambertMaterial color={PALETA.maderaClara} />
       </mesh>
       {/* la cerca: postes en anillo */}
       {postes.map((p, i) => (
         <mesh key={i} position={p}>
           <cylinderGeometry args={[0.05, 0.06, 0.5, 5]} />
-          <meshLambertMaterial color="#8a6a44" flatShading />
+          <meshLambertMaterial color={PALETA.tierraClara} flatShading />
         </mesh>
       ))}
       {/* el aro del CICLO cerrado (abono que vuelve) */}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <torusGeometry args={[1.25, 0.05, 8, 40]} />
-        <meshBasicMaterial color="#7a9a3f" transparent opacity={0.7} />
+        <meshBasicMaterial color={PALETA.follajeClaro} transparent opacity={0.7} />
       </mesh>
       {/* pila de estiércol/abono al centro (cierre del ciclo) */}
       <mesh position={[0, 0.14, 0]}>
         <coneGeometry args={[0.4, 0.28, 10]} />
-        <meshLambertMaterial color="#5a4326" flatShading />
+        <meshLambertMaterial color={PALETA.maderaOscura} flatShading />
       </mesh>
       {animales.map((a, i) => (
         <AnimalDeCorral key={i} tipo={a.tipo} pos={a.pos} color={a.color} />
@@ -213,7 +214,7 @@ function Diorama({ params, reducedMotion }) {
 }
 
 export default function EscenaRecinto(props) {
-  const cielo = { fondo: '#ecdcc2', cielo: '#f6ead2', suelo: '#8a6a44', intensidad: 1.05 };
+  const cielo = CIELOS.corral;
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.4, 0] }}>
       <Diorama params={props.params} reducedMotion={props.reducedMotion} />

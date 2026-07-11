@@ -21,6 +21,7 @@
 import { useMemo } from 'react';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Fauna } from './FaunaEscena.jsx';
+import { CIELOS, PALETA } from '../atmosferaMadre.js';
 
 /* La fauna BENÉFICA que acompaña la huerta-clínica: la mariposa polinizadora en
    la orla de flores, el colibrí que sobrevuela, y el escarabajo (carábido)
@@ -74,7 +75,7 @@ function Trampa({ pos, color = '#f2c531' }) {
     <group position={pos}>
       <mesh position={[0, 0.34, 0]}>
         <cylinderGeometry args={[0.02, 0.026, 0.68, 5]} />
-        <meshLambertMaterial color="#7a5a38" flatShading />
+        <meshLambertMaterial color={PALETA.madera} flatShading />
       </mesh>
       <mesh position={[0, 0.62, 0]}>
         <boxGeometry args={[0.22, 0.28, 0.02]} />
@@ -112,7 +113,7 @@ function EstacionBio({ pos }) {
     <group position={pos}>
       <mesh position={[0, 0.22, 0]}>
         <cylinderGeometry args={[0.04, 0.05, 0.44, 6]} />
-        <meshLambertMaterial color="#8a6a44" flatShading />
+        <meshLambertMaterial color={PALETA.tierraClara} flatShading />
       </mesh>
       {/* el recipiente */}
       <mesh position={[0, 0.49, 0]}>
@@ -190,13 +191,13 @@ function Diorama({ params, reducedMotion }) {
       {postes.map((p, i) => (
         <mesh key={i} position={p}>
           <cylinderGeometry args={[0.05, 0.06, 0.5, 5]} />
-          <meshLambertMaterial color="#8a6a44" flatShading />
+          <meshLambertMaterial color={PALETA.tierraClara} flatShading />
         </mesh>
       ))}
       {/* el anillo verde del manejo: el borde vivo que rodea y defiende */}
       <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <torusGeometry args={[1.55, 0.045, 8, 44]} />
-        <meshBasicMaterial color="#7a9a3f" transparent opacity={0.7} />
+        <meshBasicMaterial color={PALETA.follajeClaro} transparent opacity={0.7} />
       </mesh>
 
       {/* las matas sanas que se protegen */}
@@ -226,7 +227,7 @@ function Diorama({ params, reducedMotion }) {
 
 export default function EscenaSanidad(props) {
   // Cielo fresco y sano de huerta (se mezcla igual hacia la hora dorada del valle).
-  const cielo = { fondo: '#dbe7c4', cielo: '#eef4dc', suelo: '#7e8a4a', intensidad: 1.05 };
+  const cielo = CIELOS.huerta;
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.45, 0] }}>
       <Diorama params={props.params} reducedMotion={props.reducedMotion} />
