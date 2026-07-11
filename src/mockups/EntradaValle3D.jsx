@@ -40,6 +40,16 @@ import {
 } from './valle/valleData';
 import Valle2DFallback from './valle/Valle2DFallback';
 import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
+/* El framework de MUNDOS (three-free en el barrel; los dioramas 3D bajan
+   perezosos en `vendor-three`): tocar un lugar del valle ENTRA de verdad. */
+import Mundo, {
+  MUNDO,
+  decidirTier,
+  tinteDeMundo,
+  tituloDeMundo,
+  useNavegacionMundos,
+  TransicionMundo,
+} from '../visual/mundo3d/index.js';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
@@ -109,6 +119,10 @@ export default function EntradaValle3D({ onBack }) {
   const [render] = useState(decidirRender);
   const usa3D = render.modo === '3d';
 
+  // ── NAVEGACIÓN valle ↔ mundos: la máquina de fases vive en el framework.
+  //    (reduced-motion la vuelve corte simple, sin overlay de viaje).
+  const [puerta, setPuerta] = useState(null); // puerta tocada DENTRO de un mundo
+
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&
@@ -116,6 +130,10 @@ export default function EntradaValle3D({ onBack }) {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     [],
   );
+
+  const nav = useNavegacionMundos({ reducedMotion });
+  // El tier del framework decide 3D-vs-2D DENTRO de cada mundo (una vez).
+  const tierMundo = useMemo(() => decidirTier().tier, []);
 
   // ── El compañero (Angelita): su ánimo/energía salen del estado REAL de la
   //    finca + el clima + si lo del día sigue sin atender. Cuidar la alerta la
@@ -186,38 +204,117 @@ export default function EntradaValle3D({ onBack }) {
     if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
   }, []);
 
+  // ── ENTRAR a un mundo (tarea del viaje): cierra el panel, la abeja guía la
+  //    transición y el framework monta la escena del mundo. Si el mundo aún no
+  //    tiene escena montable, `viajarAlMundo` no viaja (el panel ya degradó a
+  //    "pronto", así que aquí solo se guarda la coherencia).
+  const entrarAlMundo = useCallback(
+    (id) => {
+      if (!nav.viajarAlMundo(id)) return;
+      setPanel(null);
+      setPuerta(null);
+      hablar(`Angelita lo lleva a ${tituloDeMundo(id)}.`);
+    },
+    [nav, hablar],
+  );
+
+  // ── VOLVER del mundo al valle (misma transición, en reversa).
+  const salirDelMundo = useCallback(() => {
+    setPuerta(null);
+    nav.volverAlValle();
+    hablar('De vuelta al valle de su finca.');
+  }, [nav, hablar]);
+
+  // ── Una puerta tocada DENTRO del mundo: en la vitrina (sin sesión) no
+  //    navega — cuenta a qué pantalla real de la app lleva (regla de oro).
+  const onPuertaMundo = useCallback(
+    (view, data) => {
+      const puertas = MUNDO[nav.mundoId]?.hotspots || [];
+      const hs =
+        puertas.find((h) => h.view === view && (h.data === data || (!h.data && !data))) ||
+        puertas.find((h) => h.view === view);
+      setPuerta({ label: hs?.label || view, view });
+    },
+    [nav.mundoId],
+  );
+
   const mundoPanel = panel && panel !== 'alerta' ? MUNDO_VALLE_BY_ID[panel] : null;
 
   return (
     <div className="valle-root" data-clima={clima}>
-      {/* fondo/atmósfera 3D o su degradación 2D (según el tiering del equipo) */}
+      {/* fondo/atmósfera 3D o su degradación 2D (según el tiering del equipo).
+          Mientras se está DENTRO de un mundo, el valle descansa (se desmonta:
+          nada de dos escenas sudando la GPU a la vez en un teléfono). */}
       <div className="valle-escena">
-        {usa3D ? (
-          <Suspense fallback={<CargandoValle clima={clima} />}>
-            <Valle3D
+        {!nav.enMundo &&
+          (usa3D ? (
+            <Suspense fallback={<CargandoValle clima={clima} />}>
+              <Valle3D
+                clima={clima}
+                focoId={focoId}
+                animo={companero.animo}
+                energia={companero.energia}
+                onEntrar={entrarMundo}
+                onAlerta={abrirAlerta}
+                reducedMotion={reducedMotion}
+              />
+            </Suspense>
+          ) : (
+            <Valle2DFallback
               clima={clima}
               focoId={focoId}
               animo={companero.animo}
               energia={companero.energia}
+              reducedMotion={reducedMotion}
               onEntrar={entrarMundo}
               onAlerta={abrirAlerta}
-              reducedMotion={reducedMotion}
             />
-          </Suspense>
-        ) : (
-          <Valle2DFallback
-            clima={clima}
-            focoId={focoId}
-            animo={companero.animo}
-            energia={companero.energia}
-            reducedMotion={reducedMotion}
-            onEntrar={entrarMundo}
-            onAlerta={abrirAlerta}
-          />
-        )}
+          ))}
       </div>
 
-      {/* ── Encabezado: el nombre del lugar + el selector de clima (estado) ── */}
+      {/* ── El MUNDO abierto: el framework monta la escena (3D perezoso o su
+              2D digno) con su miga "‹ El valle" siempre visible. ── */}
+      {nav.enMundo && nav.mundoId && (
+        <section
+          className="valle-mundo"
+          data-mundo={nav.mundoId}
+          style={{ '--vm-tinte': tinteDeMundo(nav.mundoId)[0] }}
+          aria-label={`Mundo ${tituloDeMundo(nav.mundoId)}`}
+        >
+          <Mundo
+            mundoId={nav.mundoId}
+            tier={tierMundo}
+            reducedMotion={reducedMotion}
+            onHotspot={onPuertaMundo}
+            onSalir={salirDelMundo}
+            animo={companero.animo}
+            energia={companero.energia}
+          />
+          <p className="valle-mundo__puerta" role="status" aria-live="polite">
+            {puerta
+              ? `«${puerta.label}» es una puerta real: dentro de la app abre la pantalla «${puerta.view}».`
+              : 'Toque un punto del mundo para ver a dónde lo lleva, o vuelva al valle cuando quiera.'}
+          </p>
+        </section>
+      )}
+
+      {/* ── El VIAJE (ida o vuelta): la abeja guía; al terminar, el intercambio
+              de escena ocurre debajo del velo. Con reduced-motion ni se monta
+              (el hook corta directo). ── */}
+      {nav.enViaje && nav.mundoId && (
+        <TransicionMundo
+          mundoId={nav.mundoId}
+          sentido={nav.fase === 'viajando' ? 'entrar' : 'volver'}
+          animo={companero.animo}
+          energia={companero.energia}
+          reducedMotion={reducedMotion}
+          onFin={nav.completarViaje}
+        />
+      )}
+
+      {/* ── Encabezado: el nombre del lugar + el selector de clima (estado).
+              Dentro de un mundo se esconde: manda la miga del mundo. ── */}
+      {!nav.enMundo && (
       <header className="valle-header">
         <button type="button" className="valle-back" onClick={() => onBack?.()} aria-label="Volver">
           ‹ Volver
@@ -240,9 +337,10 @@ export default function EntradaValle3D({ onBack }) {
           ))}
         </div>
       </header>
+      )}
 
       {/* ── Modo dibujado (tiering): aviso sobrio, nunca "error" ── */}
-      {!usa3D && (
+      {!usa3D && !nav.enMundo && (
         <p className="valle-degradado" role="status">
           {MENSAJE_DEGRADADO[render.motivo] || MENSAJE_DEGRADADO.default}
         </p>
@@ -251,7 +349,7 @@ export default function EntradaValle3D({ onBack }) {
       {/* ── El compañero: Angelita en una sola línea puntual (imagen-first).
               Es el ser al que se cuida; su cara refleja el ánimo real. Se
               esconde si hay un panel abierto — una cosa clara a la vez. ── */}
-      {!panel && (
+      {!panel && !nav.enMundo && (
         <div className="valle-companero" role="status" aria-live="polite">
           <span className="valle-companero__cara" aria-hidden="true">
             <AbejaAngelita size={34} animo={companero.animo} energia={companero.energia} animated={!reducedMotion} />
@@ -286,7 +384,17 @@ export default function EntradaValle3D({ onBack }) {
           <h2>{mundoPanel.titulo}</h2>
           <p>{mundoPanel.lema}</p>
           <div className="valle-panel__acciones">
-            <button type="button" className="valle-cta">Entrar a este mundo</button>
+            {nav.puedeEntrar(mundoPanel.id) ? (
+              <button type="button" className="valle-cta" onClick={() => entrarAlMundo(mundoPanel.id)}>
+                Entrar a este mundo
+              </button>
+            ) : (
+              /* Degradación elegante: este mundo aún no tiene escena montable
+                 (p. ej. el clima, que YA es el cielo del valle). */
+              <p className="valle-panel__pronto" role="status">
+                Este mundo abre pronto su propia puerta. Por ahora se vive desde el valle.
+              </p>
+            )}
             <button type="button" className="valle-ghost" onClick={() => hablar(NARRACION[mundoPanel.id] || mundoPanel.lema)}>
               🔊 Escuchar
             </button>
@@ -294,7 +402,10 @@ export default function EntradaValle3D({ onBack }) {
         </aside>
       )}
 
-      {/* ── Barra del AGENTE: el compañero presente + voz + volver al valle ── */}
+      {/* ── Barra del AGENTE: el compañero presente + voz + volver al valle.
+              Dentro de un mundo se esconde (la miga del mundo ya trae el
+              volver; una cosa clara a la vez). ── */}
+      {!nav.enMundo && (
       <footer className="valle-agente">
         <button type="button" className="valle-agente__pregunte" aria-label="Pregúntele a Chagra">
           <span className="valle-agente__punto" aria-hidden="true" />
@@ -320,6 +431,7 @@ export default function EntradaValle3D({ onBack }) {
           </button>
         </div>
       </footer>
+      )}
     </div>
   );
 }

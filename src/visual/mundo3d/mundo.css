@@ -71,11 +71,10 @@
   transform-origin: center;
 }
 
-/* Fauna de la librería posada en un diorama (colibrí, mariposa): no intercepta
-   el puntero (los hotspots quedan tocables) y lleva su sombrita suave. */
+/* ── Fauna de la librería sembrada en la escena (billboard decorativo) ───── */
 .mundo-fauna {
   pointer-events: none;
-  filter: drop-shadow(0 3px 6px rgba(40, 30, 10, 0.24));
+  filter: drop-shadow(0 2px 5px rgba(40, 30, 10, 0.24));
 }
 
 /* ── Cargando (mientras baja el chunk 3D) ──────────────────────────────── */
@@ -102,12 +101,35 @@
   50% { transform: scale(1); opacity: 1; }
 }
 
-/* ── Botón salir ───────────────────────────────────────────────────────── */
-.mundo-salir {
+/* ── La miga: volver al valle + dónde-estoy (consistente en todo mundo) ── */
+.mundo-miga {
   position: absolute;
   top: 12px;
   left: 12px;
+  right: 12px;
   z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+.mundo-miga > * {
+  pointer-events: auto;
+}
+.mundo-miga__aqui {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0.4em 0.9em;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fffdf7;
+  background: rgba(42, 32, 22, 0.72);
+  border-radius: 999px;
+}
+.mundo-salir {
+  flex: none;
   padding: 0.4em 0.9em;
   font: inherit;
   font-weight: 600;
@@ -230,9 +252,74 @@
 .mundo2d__lamina-stage { width: 100%; max-width: 420px; margin: 0 auto; }
 .mundo2d__vacio { text-align: center; opacity: 0.7; }
 
+/* ── El viaje valle ↔ mundo (overlay DOM: la abeja guía; cero three) ────── */
+.mundo-viaje {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  overflow: hidden;
+}
+.mundo-viaje__velo {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 60%,
+    var(--mv-b, #dcedc9) 0%,
+    var(--mv-a, #3f8f4e) 62%,
+    color-mix(in srgb, var(--mv-a, #3f8f4e) 70%, #0a141d) 100%
+  );
+}
+.mundo-viaje--entrar .mundo-viaje__velo { animation: mundo-velo-entra 1.05s ease-in-out both; }
+.mundo-viaje--volver .mundo-viaje__velo { animation: mundo-velo-vuelve 1.05s ease-in-out both; }
+.mundo-viaje__abeja {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 6px 14px rgba(20, 30, 15, 0.4));
+}
+.mundo-viaje--entrar .mundo-viaje__abeja { animation: mundo-abeja-entra 1.05s ease-in both; }
+.mundo-viaje--volver .mundo-viaje__abeja { animation: mundo-abeja-vuelve 1.05s ease-out both; }
+.mundo-viaje__txt {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0 1rem;
+  font-weight: 700;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(10, 20, 10, 0.5);
+}
+/* Profundidad sin post-proceso: el velo escala (acercarse/alejarse) y la abeja
+   viaja del frente hacia el fondo (entrar) o del fondo hacia usted (volver). */
+@keyframes mundo-velo-entra {
+  from { opacity: 0; transform: scale(1.3); }
+  35% { opacity: 1; }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes mundo-velo-vuelve {
+  from { opacity: 0; transform: scale(1); }
+  35% { opacity: 1; }
+  to { opacity: 1; transform: scale(1.22); }
+}
+@keyframes mundo-abeja-entra {
+  from { transform: translateY(42vh) scale(1.9); opacity: 0; }
+  30% { opacity: 1; }
+  to { transform: translateY(-1vh) scale(0.55); opacity: 0.95; }
+}
+@keyframes mundo-abeja-vuelve {
+  from { transform: translateY(-1vh) scale(0.55); opacity: 0.6; }
+  to { transform: translateY(5vh) scale(1.7); opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mundo-canvas { transition: none; }
   .mundo-cargando__pulso { animation: none; }
   .mundo-hotspot,
   .mundo2d__hotspot { transition: none; }
+  .mundo-viaje__velo,
+  .mundo-viaje__abeja { animation: none; }
 }

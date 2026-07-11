@@ -18,21 +18,117 @@
 
 import { MUNDO_BY_ID } from '../../components/dashboard/mundosFinca';
 
+/* ── 0. LOS PISOS TÉRMICOS: EL GRADIENTE DE ALTITUD DE LA FINCA ANDINA ───────
+ * Una finca de ladera TREPA la montaña: del plátano en tierra caliente abajo
+ * al frailejón del páramo arriba. Aquí ese gradiente es la ESTRUCTURA del
+ * terreno — franjas por altura, cada una con su color (perspectiva de altura)
+ * y su vegetación típica. El eje z ES la ladera: al fondo (z negativo) sube al
+ * páramo; al frente (z positivo) baja a tierra caliente.
+ *
+ * Los rangos de altura (msnm) y temperatura salen de la tabla oficial
+ * IDEAM/IGAC (src/data/piso-termico.json); aquí se ANCLAN al espacio del valle.
+ * Todo lo visual (color del suelo, dónde brota cada mata, la pendiente) se LEE
+ * de esta tabla — layout por datos, no a mano. Ordenados de abajo (frente,
+ * cálido) hacia arriba (fondo, páramo).
+ */
+export const PISOS_TERMICOS = [
+  {
+    id: 'calido',
+    nombre: 'Tierra caliente',
+    msnm: '0–1000 m',
+    tempC: '> 24 °C',
+    z0: 3.4, // borde frontal de la franja (bajo, cerca de la cámara)
+    z1: 8.5, // borde trasero
+    color: '#84a83f', // verde cálido amarillento
+    cresta: '#afc85a',
+    vegetacion: 'platano',
+    cultivos: 'Plátano y frutales',
+  },
+  {
+    id: 'templado',
+    nombre: 'Clima medio',
+    msnm: '1000–2000 m',
+    tempC: '18–24 °C',
+    z0: -0.6,
+    z1: 3.4,
+    color: '#4e9143', // verde vivo
+    cresta: '#77b256',
+    vegetacion: 'cafe',
+    cultivos: 'Café y maíz',
+  },
+  {
+    id: 'frio',
+    nombre: 'Clima frío',
+    msnm: '2000–3000 m',
+    tempC: '12–18 °C',
+    z0: -5.2,
+    z1: -0.6,
+    color: '#3c7f64', // verde-azulado
+    cresta: '#5fa07f',
+    vegetacion: 'papa',
+    cultivos: 'Papa y tubérculos',
+  },
+  {
+    id: 'paramo',
+    nombre: 'Páramo',
+    msnm: '> 3000 m',
+    tempC: '< 12 °C',
+    z0: -11,
+    z1: -5.2,
+    color: '#63807a', // frío grisáceo del alto andino
+    cresta: '#8ba597',
+    vegetacion: 'frailejon',
+    cultivos: 'Frailejones',
+  },
+];
+
+/** Piso térmico al que pertenece una coordenada z del valle. */
+export function pisoEnZ(z) {
+  for (const p of PISOS_TERMICOS) {
+    if (z >= p.z0 && z < p.z1) return p;
+  }
+  // Fuera de rango: el frente cae a cálido, el fondo a páramo.
+  return z >= PISOS_TERMICOS[0].z1 ? PISOS_TERMICOS[0] : PISOS_TERMICOS[PISOS_TERMICOS.length - 1];
+}
+
+/* Matas de MUESTRA sembradas por su piso (pocas y a los lados: dejan aire en
+ * el centro y hacen legible el cambio de vegetación por altura). Cada una trae
+ * el `tipo` que su piso siembra — la geometría la resuelve la escena. */
+export const VEGETACION_PISOS = [
+  { piso: 'paramo', pos: [-5.6, -7.8] },
+  { piso: 'paramo', pos: [1.4, -8.4] },
+  { piso: 'paramo', pos: [4.8, -6.6] },
+  { piso: 'frio', pos: [-6.0, -3.6] },
+  { piso: 'frio', pos: [3.0, -4.4] },
+  { piso: 'templado', pos: [-2.4, 1.0] },
+  { piso: 'templado', pos: [6.2, 2.6] },
+  { piso: 'calido', pos: [-6.4, 6.4] },
+  { piso: 'calido', pos: [5.8, 6.0] },
+].map((v) => {
+  const piso = PISOS_TERMICOS.find((p) => p.id === v.piso);
+  return { ...v, tipo: piso ? piso.vegetacion : 'platano' };
+});
+
 /* ── 2. LOS MUNDOS COMO LUGARES ─────────────────────────────────────────────
  * Un subconjunto curado de los mundos reales (mundosFinca.js) colocados en el
  * valle. `pos` = [x, y, z] en el terreno; `escala` y `tipo` deciden qué forma
  * procedural los representa (sin GLTF: todo es geometría de three, offline y
  * liviana). El título/emoji/tinte se LEEN del manifiesto real — no se duplican.
+ *
+ * Se reparten con AIRE por toda la ladera y por sus pisos: la milpa y el café
+ * en el clima medio, el bosque trepando al frío, la veleta arriba en el filo
+ * del páramo (desde donde se lee el cielo), y el corral, la huerta y el
+ * semillero abajo en la tierra caliente. Pocos y separados > muchos amontonados.
  */
 const LUGARES = [
-  { id: 'cultivos', pos: [-3.2, 0, 1.6], escala: 1.15, tipo: 'milpa' },
-  { id: 'cafe', pos: [3.4, 0, 2.2], escala: 1, tipo: 'cafetal' },
-  { id: 'suelo', pos: [-1.1, 0, 3.6], escala: 1, tipo: 'era' },
-  { id: 'agua', pos: [0.6, 0, -1.4], escala: 1, tipo: 'quebrada' },
-  { id: 'animales', pos: [-4.6, 0, -1.8], escala: 1, tipo: 'corral' },
-  { id: 'sanidad', pos: [1.8, 0, 4.4], escala: 0.95, tipo: 'huerta' },
-  { id: 'disenio', pos: [4.8, 0, -2.6], escala: 1.1, tipo: 'bosque' },
-  { id: 'clima', pos: [-3.8, 0, -4.8], escala: 1, tipo: 'veleta' },
+  { id: 'agua', pos: [1.4, 0, -0.2], escala: 1, tipo: 'quebrada' },
+  { id: 'cafe', pos: [4.4, 0, 1.0], escala: 1, tipo: 'cafetal' },
+  { id: 'cultivos', pos: [-4.4, 0, 2.4], escala: 1.15, tipo: 'milpa' },
+  { id: 'suelo', pos: [-1.4, 0, 4.8], escala: 1, tipo: 'era' },
+  { id: 'sanidad', pos: [3.8, 0, 4.9], escala: 0.95, tipo: 'huerta' },
+  { id: 'animales', pos: [-5.0, 0, 5.4], escala: 1, tipo: 'animales' },
+  { id: 'disenio', pos: [5.2, 0, -3.4], escala: 1.1, tipo: 'bosque' },
+  { id: 'clima', pos: [-3.2, 0, -6.0], escala: 1, tipo: 'veleta' },
 ];
 
 /**
