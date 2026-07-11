@@ -34,11 +34,14 @@ import { ATMOSFERA, CIELOS, mezclar } from '../atmosferaMadre.js';
 
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
-  frugal = false,
+  frugal = false, hablando = false,
   children,
 }) {
   const controls = useRef(null);
   const [activo, setActivo] = useState(null);
+  // `rebote`: cada toque de hotspot lo incrementa → Angelita da un microrrebote
+  // (carácter de compañera, ref. el zorro de Ori / el ganso de Untitled Goose).
+  const [rebote, setRebote] = useState(0);
   // Háptica del tap (DR-3D-HAPTICA): un tick seco al tocar un hotspot —
   // "toqué algo vivo, respondió". Gate triple interno; no-op en iOS.
   const haptics = useHaptics({ reducedMotion });
@@ -121,6 +124,7 @@ function Contenido({
                 e.stopPropagation();
                 haptics.tap();
                 setActivo(h.id);
+                setRebote((n) => n + 1);
                 onHotspot?.(h.view, h.data);
               }}
               aria-label={h.label}
@@ -132,7 +136,20 @@ function Contenido({
         </group>
       ))}
 
-      <AbejaEscena foco={foco} entrando animo={animo} energia={energia} reducedMotion={reducedMotion} piso={piso} />
+      {/* Angelita: una sola por mundo (la del footer se oculta dentro). `entrando`
+          vive AHORA en si hay hotspot activo — con foco se posa junto a la puerta,
+          sin foco RONDA (idle propio, ya no un fotograma clavado). `hablando` la
+          hace pulsar cuando el agente narra; `rebote` es el microrrebote del toque. */}
+      <AbejaEscena
+        foco={foco}
+        entrando={!!activo}
+        hablando={hablando}
+        rebote={rebote}
+        animo={animo}
+        energia={energia}
+        reducedMotion={reducedMotion}
+        piso={piso}
+      />
 
       <OrbitControls
         ref={controls}
@@ -155,7 +172,8 @@ function Contenido({
 
 export default function EscenaBase3D({
   params, hotspots, entrada, tinte, reducedMotion,
-  onHotspot, cielo, animo = 'sereno', energia = 1, camara, piso = 0, tier = 'alto', children,
+  onHotspot, cielo, animo = 'sereno', energia = 1, camara, piso = 0, tier = 'alto',
+  hablando = false, children,
 }) {
   const [listo, setListo] = useState(false);
   const zoom = entrada?.zoom ?? 6.5;
@@ -187,6 +205,7 @@ export default function EscenaBase3D({
           energia={energia}
           piso={piso}
           frugal={frugal}
+          hablando={hablando}
         >
           {children}
         </Contenido>

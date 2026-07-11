@@ -16,7 +16,7 @@
    coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
    un <Canvas> vía EscenaBase3D; no es hot-reload-sensible. Van juntos a propósito:
    la creature posee el cuerpo, la escena posee la coreografía (contrato del DR). */
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -90,23 +90,48 @@ export function useEntradaAbeja(foco, {
 
 /**
  * Angelita ya montada en una escena: usa `useEntradaAbeja` para la coreografía y
- * dibuja el cuerpo (`AbejaAngelita`) como billboard `<Html>`. Cualquier arquetipo
- * la coloca con `<AbejaEscena foco=… animo=… energia=… reducedMotion=… />`.
+ * dibuja el cuerpo (`AbejaAngelita`) como billboard `<Html>`. Es la ÚNICA abeja
+ * dentro de un mundo (la del footer se oculta): por eso REFLEJA EL HABLA —pulsa
+ * cuando el agente narra (`hablando`)— y da un microrrebote al tocar un hotspot
+ * (`rebote`, un contador que sube por toque). Tres transformaciones en tres capas
+ * DOM que no se pisan: pulso (raíz), rebote (medio), volteo scaleX (cara, que el
+ * useFrame maneja imperativo). Cualquier arquetipo la coloca con
+ * `<AbejaEscena foco=… animo=… energia=… hablando=… rebote=… reducedMotion=… />`.
  */
 export function AbejaEscena({
   foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
+  hablando = false, rebote = 0,
 }) {
   const { ref, caraRef, sombraRef } = useEntradaAbeja(foco, {
     entrando, energia, reducedMotion, piso,
   });
+  // Microrrebote: cada toque de hotspot sube `rebote`; reiniciamos la animación
+  // CSS (quitar → reflow → poner) para que dispare aun en toques seguidos. El
+  // gate reduced-motion la deja quieta.
+  const reboteRef = useRef(null);
+  useEffect(() => {
+    if (reducedMotion || rebote === 0 || !reboteRef.current) return undefined;
+    const el = reboteRef.current;
+    el.removeAttribute('data-rebote');
+    void el.offsetWidth; // fuerza reflow → reinicia el keyframe
+    el.setAttribute('data-rebote', '1');
+    const t = setTimeout(() => el.removeAttribute('data-rebote'), 640);
+    return () => clearTimeout(t);
+  }, [rebote, reducedMotion]);
   const size = 40 + Math.round(energia * 12);
   return (
     <>
       <group ref={ref} position={[foco.x + 0.45, foco.y + 0.85, foco.z + 0.6]}>
         <Html center distanceFactor={7} zIndexRange={[40, 10]}>
-          <div className="mundo-abeja" aria-hidden="true">
-            <div ref={caraRef} className="mundo-abeja__cara">
-              <AbejaAngelita size={size} animo={animo} energia={energia} animated={!reducedMotion} />
+          <div
+            className="mundo-abeja"
+            aria-hidden="true"
+            data-hablando={hablando && !reducedMotion ? '1' : undefined}
+          >
+            <div ref={reboteRef} className="mundo-abeja__rebote">
+              <div ref={caraRef} className="mundo-abeja__cara">
+                <AbejaAngelita size={size} animo={animo} energia={energia} animated={!reducedMotion} />
+              </div>
             </div>
           </div>
         </Html>
