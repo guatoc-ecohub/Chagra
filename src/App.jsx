@@ -159,6 +159,11 @@ const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra
 // 3D: el valle DE NOCHE — luna, cielo estrellado andino, luciérnagas, grillos
 // sintetizados (0 KB, opt-in) y Angelita dormida. La finca en reposo.
 const ValleNoche3DMockup = lazy(() => import('./mockups/ValleNoche3D'));
+// 2D: mini-juego educativo "La milpa" — las tres hermanas (maiz + frijol +
+// ahuyama). El jugador siembra en cada monticulo y ve la sinergia del
+// policultivo. Estetica Cuphead andina (linea que respira, squash & stretch),
+// SVG puro, offline, sin gamificacion toxica.
+const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -554,6 +559,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/vitrina-mundos': 'mockup_vitrina_mundos',
   'mockups/sierra-global': 'mockup_sierra_global',
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
+  'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1784,6 +1790,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de noche">
               <ValleNoche3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_juego_la_milpa':
+        // Mini-juego 2D "La milpa": las tres hermanas (maiz + frijol + ahuyama)
+        // sembradas en el mismo monticulo. El jugador siembra/riega y ve la
+        // sinergia del policultivo (el maiz da el palo, el frijol nutre la
+        // tierra, la ahuyama guarda la humedad). Estetica Cuphead andina, SVG
+        // puro, offline, curva amable sin gamificacion toxica. Ruta
+        // #/mockups/juego-la-milpa, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Juego La milpa">
+              <JuegoLaMilpaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
