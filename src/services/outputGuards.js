@@ -9570,7 +9570,7 @@ const CROP_AGNOSTIC_SAFETY_MARKER = 'Seguridad:';
 const CROP_AGNOSTIC_DISEASE_NO_CURE_RE =
   /\b(hlb|greening|liberibacter|monilia|moniliopsis|sigatoka\s+negra|moko|marchitez\s+bacteriana|ralstonia|virus|cuchara|tylcv|peste\s+negra|tswv|mosaico)\b/i;
 const PROHIBITED_PESTICIDE_RE =
-  /\b(metamidofos|parathion|paration|monocrotofos|endosulfan|lannate|metomil)\b/i;
+  /\b(metamidofos|parathion|paration|monocrotofos|endosulfan|lannate|metomil|ddt|aldrin|dieldrin|endrin|clordano|heptacloro|lindano|hexaclorociclohexano|aldicarb|temik|carbofurano|furadan|mirex|toxafeno|canfecloro|dinoseb|forato|terbufos|dicrotofos)\b/i;
 const PESTICIDE_DOSE_REQUEST_RE =
   /\b(dosis|cuant[oa]s?\s+(ml|cc|gramos?|gr|g)|\d+\s*(ml|cc|g|gr|gramos?))\b/i;
 const PESTICIDE_CONTEXT_RE = /\b(plaguicida|insecticida|fungicida|herbicida|agroquimic|veneno|glifosato|sistematico)\b/i;
@@ -9587,7 +9587,7 @@ function _cropAgnosticSafetyReplacement(kind) {
     sin_cura:
       `${intro} Estas enfermedades no tienen cura química comprobada en planta: HLB (cítricos), monilia (cacao), Sigatoka negra (plátano), moko/marchitez bacteriana/Ralstonia, virus (varios cultivos). Manejo: erradicar/roguing, variedades resistentes, control de vector, desinfección. NUNCA prometas cura ni producto milagroso.`,
     prohibido:
-      `${intro} Productos altamente tóxicos sin registro ICA vigente (metamidofós, paratión, monocrotofós, endosulfán, metomil/Lannate). Consulta etiqueta actual y asistente técnico. Prefiere opciones agroecológicas.`,
+      `${intro} Productos altamente tóxicos, prohibidos o sin registro ICA vigente en Colombia: organofosforados/carbamatos (metamidofós, paratión, monocrotofós, metomil/Lannate, aldicarb/Temik, carbofurano/Furadan) y organoclorados prohibidos (DDT, lindano, clordano, aldrín, endosulfán). No se recomiendan ni se dan dosis. Consulta etiqueta vigente y asistente técnico. Prefiere opciones agroecológicas.`,
     dosis:
       `${intro} NUNCA inventes una dosis numérica de plaguicida. La dosis sale de la etiqueta registrada ICA y del asistente técnico. Herbicidas no selectivos (glifosato, paraquat) NO se aplican sobre el cultivo.`,
     export_mrl:
