@@ -237,7 +237,7 @@ export const MUNDO = {
         titulo: 'Mercado y despensa',
         cifras: [
           { valor: 'Directo', unidad: '', label: 'venta entre fincas, sin intermediario' },
-          { valor: '7', unidad: 'días', label: 'guardar sin que se dañe (poscosecha)' },
+          { valor: '—', unidad: '', label: 'la despensa dura según el producto: hoja pocos días, tomate 1–2 semanas, papa y grano seco meses' },
         ],
         notas: [
           'Precios de referencia y cuentas para el banco o la cooperativa.',
@@ -335,7 +335,8 @@ export const MUNDO = {
   // 🌽 LA MILPA — las TRES HERMANAS en corte (cutaway). Sobre la superficie, la
   //    asociación viva (maíz=vara, fríjol que trepa y abona, calabaza que cubre);
   //    bajo tierra, lo invisible hecho visible: los NÓDULOS de Rhizobium en las
-  //    raíces del fríjol fijando 50–80 kg N/ha (dato verificado). Reusa el
+  //    raíces del fríjol fijando 30–60 kg N/ha (el fríjol fija menos que otras
+  //    leguminosas como haba o arveja; rango realista, no optimista). Reusa el
   //    arquetipo `cutaway` (mismas capas + vida) y enciende el módulo `milpa`.
   //    Policultivo, no monocultivo: juntas rinden más y se cuidan (push-pull).
   milpa: {
@@ -352,7 +353,7 @@ export const MUNDO = {
         maiz: { x: -0.25, alto: 1.7 },
         frijol: { vueltas: 4 },
         calabaza: { x: 0.7 },
-        nitrogeno: '50–80 kg N/ha',
+        nitrogeno: '30–60 kg N/ha',
       },
     },
     hotspots: [

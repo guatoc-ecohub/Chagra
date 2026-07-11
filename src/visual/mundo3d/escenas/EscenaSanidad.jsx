@@ -11,7 +11,7 @@
  *   · la ESTACIÓN DE BIOCONTROL — el recipiente con hongos entomopatógenos
  *     (Beauveria bassiana clara, Metarhizium verdosa) que enferman al insecto;
  *   · el BORDE "empuja-jala" (push-pull) — la orla de flores aromáticas
- *     (caléndula) que repele y aloja enemigos naturales;
+ *     (caléndula que jala/aloja enemigos naturales; flor de muerto/Tagetes que empuja la plaga);
  *   · los ENEMIGOS NATURALES — la mariquita que come pulgón, el carábido del
  *     suelo, la mariposa y el colibrí que polinizan y suman vida.
  *

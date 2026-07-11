@@ -44,12 +44,12 @@ const LEYENDA = [
   {
     emoji: '🧫',
     titulo: 'El biocontrol con hongos',
-    texto: 'La estación con hongos entomopatógenos (Beauveria bassiana y Metarhizium): esporas que se pegan al insecto y lo enferman. Un aliado vivo que no le hace daño a usted ni a los polinizadores.',
+    texto: 'La estación con hongos entomopatógenos (Beauveria bassiana y Metarhizium): esporas que se pegan al insecto y lo enferman. Es un aliado vivo y de bajo riesgo para usted; como también puede afectar insectos benéficos, aplíquelo dirigido a la plaga y evite asperjar sobre flores abiertas donde están las abejas.',
   },
   {
     emoji: '🌼',
     titulo: 'El borde que empuja y jala (push-pull)',
-    texto: 'La orla de flores aromáticas como la caléndula: repele a la plaga (la empuja) y aloja a sus enemigos naturales (los jala). Sembrar compañía es defender la huerta con plantas.',
+    texto: 'La orla de flores aromáticas trabaja de dos maneras: unas como la caléndula jalan y alojan a los enemigos naturales (los atraen), y otras como la flor de muerto (Tagetes) ayudan a empujar la plaga lejos. Sembrar compañía es defender la huerta con plantas.',
   },
   {
     emoji: '🐞',
