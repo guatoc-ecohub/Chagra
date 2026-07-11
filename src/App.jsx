@@ -159,6 +159,12 @@ const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra
 // El camino del agua en la finca: nacimiento → canal → reservorio → riego →
 // suelo, con el ciclo (vapor/nube/lluvia) cerrándose. Didáctico, hora dorada.
 const MundoAguaMockup = lazy(() => import('./mockups/MundoAgua3D'));
+// 3D: el valle DE NOCHE — luna, cielo estrellado andino, luciérnagas, grillos
+// sintetizados (0 KB, opt-in) y Angelita dormida. La finca en reposo.
+const ValleNoche3DMockup = lazy(() => import('./mockups/ValleNoche3D'));
+// 3D: el PÁRAMO altoandino — el ecosistema de la niebla (frailejones, musgo,
+// quenuas, aves) y el NACIMIENTO del agua. Didáctico: la fábrica de agua.
+const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -554,6 +560,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/vitrina-mundos': 'mockup_vitrina_mundos',
   'mockups/sierra-global': 'mockup_sierra_global',
   'mockups/mundo-agua-3d': 'mockup_mundo_agua_3d',
+  'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
+  'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1784,6 +1792,29 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El camino del agua 3D">
               <MundoAguaMockup onBack={() => navigate('dashboard')} />
+      case 'mockup_valle_noche_3d':
+        // El valle de noche: variante nocturna mágica del valle — luna plata,
+        // cielo estrellado andino que titila, luciérnagas del framework,
+        // grillos sintetizados con WebAudio (0 KB, opt-in con botón) y
+        // Angelita dormida en su flor. La finca en reposo, cálida y serena.
+        // Ruta #/mockups/valle-noche-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El valle de noche">
+              <ValleNoche3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_paramo_3d':
+        // El páramo altoandino: el ecosistema de la niebla en hora dorada —
+        // frailejones (Espeletia), cojines de musgo, pajonal, quenuas con la
+        // niebla enganchada, aves de páramo y el NACIMIENTO del agua. Didáctico
+        // sobre conservación: el páramo como fábrica de agua (botón «cómo nace
+        // el agua»). Ruta #/mockups/mundo-paramo-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El páramo altoandino">
+              <MundoParamo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
