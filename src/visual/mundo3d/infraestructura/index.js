@@ -18,6 +18,10 @@
 export { default } from './Infraestructura.jsx';
 export { default as Infraestructura, esFrugal } from './Infraestructura.jsx';
 
+// La variante VIVA: se alimenta sola del estado real (useFincaViva) y refleja
+// microclima/cosecha/ocupación. Importa three: perezosa como el dispatcher.
+export { default as InfraestructuraViva } from './InfraestructuraViva.jsx';
+
 // El registro render→componente (three) por si alguien quiere una pieza suelta.
 export { PIEZAS_INFRA } from './piezasInfra.jsx';
 
@@ -27,4 +31,6 @@ export {
   INFRAESTRUCTURA_IDS,
   INFRAESTRUCTURA_CATEGORIAS,
   infraPorId,
+  clasificarAnimales,
+  derivarVidaInfra,
 } from './infraestructuraData.js';
