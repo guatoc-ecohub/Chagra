@@ -181,9 +181,29 @@ export default function EntradaValle3D({ onBack }) {
   // El toggle vive en un ref para que `hablar`/`decir` sean ESTABLES: prender
   // o apagar la voz no debe re-disparar los efectos que narran.
   const vozRef = useRef(voz);
+  const vocesRef = useRef([]);
   useEffect(() => {
     vozRef.current = voz;
   }, [voz]);
+
+  useEffect(() => {
+    if (!vozDisponible) return undefined;
+    const synth = window.speechSynthesis;
+    const actualizarVoces = () => {
+      const voces = synth.getVoices();
+      if (voces.length) vocesRef.current = voces;
+    };
+    actualizarVoces();
+    if (synth.addEventListener) {
+      synth.addEventListener('voiceschanged', actualizarVoces);
+      return () => synth.removeEventListener('voiceschanged', actualizarVoces);
+    }
+    const anterior = synth.onvoiceschanged;
+    synth.onvoiceschanged = actualizarVoces;
+    return () => {
+      if (synth.onvoiceschanged === actualizarVoces) synth.onvoiceschanged = anterior;
+    };
+  }, [vozDisponible]);
 
   const hablar = useCallback((texto) => {
     if (!vozRef.current || typeof window === 'undefined' || !window.speechSynthesis) return;
@@ -193,10 +213,13 @@ export default function EntradaValle3D({ onBack }) {
       u.lang = 'es-CO';
       u.rate = 0.98;
       u.pitch = 1;
-      const esVoz = window.speechSynthesis
-        .getVoices()
-        .find((v) => v.lang && v.lang.toLowerCase().startsWith('es'));
-      if (esVoz) u.voice = esVoz;
+      const esVoz = vocesRef.current.find(
+        (v) => v.lang && v.lang.toLowerCase().startsWith('es'),
+      );
+      // Si el navegador todavía no publicó sus voces, conservamos la
+      // burbuja y evitamos que el saludo salga con la voz inglesa por defecto.
+      if (!esVoz) return;
+      u.voice = esVoz;
       window.speechSynthesis.speak(u);
     } catch {
       /* la voz es un plus, nunca bloquea */
@@ -235,30 +258,38 @@ export default function EntradaValle3D({ onBack }) {
     [],
   );
 
-  // Saludo del compañero al entrar (una sola vez): voz + burbuja.
+  // Saludo del compañero al primer gesto (una sola vez): voz + burbuja. Así
+  // iOS permite la síntesis y la entrada nunca depende de autoplay.
   const saludado = useRef(false);
   useEffect(() => {
-    if (saludado.current) return;
-    saludado.current = true;
-    const t = setTimeout(() => decir(NARRACION.bienvenida), 900);
-    return () => clearTimeout(t);
+    const saludar = () => {
+      if (saludado.current) return;
+      saludado.current = true;
+      decir(NARRACION.bienvenida);
+    };
+    window.addEventListener('pointerdown', saludar, { once: true, capture: true });
+    window.addEventListener('keydown', saludar, { once: true, capture: true });
+    return () => {
+      window.removeEventListener('pointerdown', saludar, { capture: true });
+      window.removeEventListener('keydown', saludar, { capture: true });
+    };
   }, [decir]);
 
   const entrarMundo = useCallback(
     (id) => {
       setFocoId(id);
       setPanel(id);
-      hablar(NARRACION[id] || MUNDO_VALLE_BY_ID[id]?.lema || '');
+      decir(NARRACION[id] || MUNDO_VALLE_BY_ID[id]?.lema || '');
     },
-    [hablar],
+    [decir],
   );
 
   const abrirAlerta = useCallback(() => {
     setFocoId(COSA_DEL_DIA.anclaMundo);
     setPanel('alerta');
     setAlertaVista(true); // atender lo del día calma a la abeja
-    hablar(COSA_DEL_DIA.vozTexto);
-  }, [hablar]);
+    decir(COSA_DEL_DIA.vozTexto);
+  }, [decir]);
 
   const volverAlValle = useCallback(() => {
     setFocoId(null);
@@ -285,9 +316,9 @@ export default function EntradaValle3D({ onBack }) {
     (id) => {
       if (!nav.viajarAlMundo(id)) return;
       setPanel(null);
-      hablar(`Angelita lo lleva a ${tituloDeMundo(id)}.`);
+      decir(`Angelita lo lleva a ${tituloDeMundo(id)}.`);
     },
-    [nav, hablar],
+    [nav, decir],
   );
 
   // ── VOLVER del mundo al valle (misma transición, en reversa).
@@ -435,7 +466,7 @@ export default function EntradaValle3D({ onBack }) {
               nombra las puertas. Lo que dice (`dicho`) va SIEMPRE en su
               burbuja de texto (aria-live) — si la voz falta o está apagada,
               la burbuja es la voz. ── */}
-      {!panel && (
+      {(!panel || dicho) && (
         <div
           className={`valle-companero${nav.enMundo ? ' valle-companero--mundo' : ''}`}
           data-gesto={gesto || undefined}
@@ -467,7 +498,7 @@ export default function EntradaValle3D({ onBack }) {
           <p>{COSA_DEL_DIA.detalle}</p>
           <div className="valle-panel__acciones">
             <button type="button" className="valle-cta">{COSA_DEL_DIA.accion.etiqueta}</button>
-            <button type="button" className="valle-ghost" onClick={() => hablar(COSA_DEL_DIA.vozTexto)}>
+            <button type="button" className="valle-ghost" onClick={() => decir(COSA_DEL_DIA.vozTexto)}>
               🔊 Escuchar
             </button>
           </div>
@@ -495,7 +526,7 @@ export default function EntradaValle3D({ onBack }) {
                 Este mundo abre pronto su propia puerta. Por ahora se vive desde el valle.
               </p>
             )}
-            <button type="button" className="valle-ghost" onClick={() => hablar(NARRACION[mundoPanel.id] || mundoPanel.lema)}>
+            <button type="button" className="valle-ghost" onClick={() => decir(NARRACION[mundoPanel.id] || mundoPanel.lema)}>
               🔊 Escuchar
             </button>
           </div>
