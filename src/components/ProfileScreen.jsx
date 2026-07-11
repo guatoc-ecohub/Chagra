@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench,
   Sprout, ChevronRight, ChevronLeft, Bell, Users, Camera, Trash2, Shield,
-  Archive, LifeBuoy, LayoutGrid, GraduationCap, Vibrate, Waves,
+  Archive, LifeBuoy, LayoutGrid, GraduationCap, Vibrate, Waves, Mountain,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
@@ -19,6 +19,9 @@ import HytaPanel from './HytaPanel';
 import { PRIMARY_WORKER_NAME } from '../config/workerConfig';
 import useFincaActiveStore from '../services/fincaActiveStore';
 import usePrefsStore from '../store/usePrefsStore';
+/* FASE 0 game-dev: tiering del equipo para el aviso honesto del toggle 3D
+   (import directo, three-free — no arrastra el framework de mundos). */
+import { decidirTier, permite3D } from '../visual/mundo3d/deviceTier';
 import { stop as stopTTS } from '../services/ttsService';
 import {
   getNotificationStyle, setNotificationStyle, getTelemetryConsent,
@@ -701,6 +704,9 @@ export default function ProfileScreen({ onBack, onHome }) {
 
             {/* Spec S3: sonido ambiental 0-KB de los mundos (tri-estado). */}
             <SonidoSection />
+
+            {/* FASE 0 game-dev: la entrada 3D del valle desde el home (flag). */}
+            <Valle3DSection />
           </div>
         )}
 
@@ -1229,6 +1235,72 @@ function SonidoSection() {
         <p className="text-[11px] text-slate-500 leading-snug px-1">
           Este navegador no admite audio generado. No se pierde información:
           el sonido solo acompaña lo que ya se ve en pantalla.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Valle3DSection — FASE 0 del plan game-dev 3D (2026-07-11).
+ *
+ * Toggle "El valle en 3D" persistido en usePrefsStore (key
+ * `chagra:prefs:valle3d`, default OFF — conservador). Al prenderlo aparece en
+ * el home ("Los mundos de su finca") la banda que abre el VALLE 3D real: el
+ * mapa navegable de la finca donde cada mundo es un lugar al que se viaja.
+ * Doble gate: además del flag, el device-tier (deviceTier.js) decide — en
+ * equipos humildes la banda no aparece y el home 2D sigue idéntico. Acá se
+ * le dice honesto al usuario qué verá su equipo.
+ */
+function Valle3DSection() {
+  const valle3d = usePrefsStore((s) => s.valle3d ?? false);
+  const setValle3d = usePrefsStore((s) => s.setValle3d);
+  // El tiering se evalúa una vez al montar la pantalla (crea un canvas WebGL
+  // de prueba; barato acá, no en cada home).
+  const [equipo] = useState(() => decidirTier());
+  const equipoAguanta = permite3D(equipo.tier);
+
+  return (
+    <div className="space-y-4 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+      <div className="flex items-center gap-2 px-1">
+        <Mountain size={18} className="text-yellow-400" />
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">El valle en 3D</h3>
+      </div>
+
+      <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+        <div className="flex flex-col gap-0.5 flex-1">
+          <span className="text-sm font-bold text-slate-200">Entrada al valle 3D en el home</span>
+          <span className="text-xs text-slate-400 leading-snug">
+            Recorra su finca como un valle en tres dimensiones: cada mundo es
+            un lugar al que se viaja. Al activarla, la entrada aparece en
+            &quot;Los mundos de su finca&quot;. Es una experiencia nueva: si
+            algo no le funciona, apáguela y el home queda como siempre.
+          </span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={valle3d}
+          aria-label="Activar o desactivar la entrada al valle 3D"
+          data-testid="valle3d-toggle"
+          onClick={() => setValle3d(!valle3d)}
+          className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+            valle3d ? 'bg-yellow-600' : 'bg-slate-700'
+          }`}
+        >
+          <span
+            className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+              valle3d ? 'translate-x-5' : 'translate-x-0'
+            }`}
+          />
+        </button>
+      </label>
+
+      {!equipoAguanta && (
+        <p className="text-[11px] text-slate-500 leading-snug px-1">
+          Este equipo no alcanza para el 3D con fluidez, así que la entrada no
+          se mostrará en el home aunque active la opción. No se pierde nada:
+          todos los mundos siguen completos en su versión de siempre.
         </p>
       )}
     </div>

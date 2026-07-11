@@ -22,6 +22,11 @@ const HAPTICS_MODES = ['auto', 'on', 'off'];
 // opt-in) | 'suave' (ambiente muy tenue) | 'on' (ambiente presente).
 const STORAGE_KEY_SONIDO = 'chagra:prefs:sonido';
 const SONIDO_MODES = ['off', 'suave', 'on'];
+// FASE 0 del plan game-dev 3D (2026-07-11): la entrada al VALLE 3D desde el
+// home real. Default false (conservador): el home 2D queda idéntico; quien
+// prende el flag en Perfil ve la banda de entrada en "Los mundos de su finca"
+// — y solo si su equipo aguanta 3D (device-tier alto/medio, deviceTier.js).
+const STORAGE_KEY_VALLE3D = 'chagra:prefs:valle3d';
 
 function load(key, fallback) {
   try {
@@ -43,6 +48,7 @@ const usePrefsStore = create((set, _get) => ({
   showSourceBadges: load(STORAGE_KEY_SOURCE_BADGES, true),
   haptics: load(STORAGE_KEY_HAPTICS, 'auto'),
   sonido: load(STORAGE_KEY_SONIDO, 'off'),
+  valle3d: load(STORAGE_KEY_VALLE3D, false),
 
   setVoiceRegion: (region) => {
     save(STORAGE_KEY_VOICE_REGION, region);
@@ -76,6 +82,12 @@ const usePrefsStore = create((set, _get) => ({
     const valid = SONIDO_MODES.includes(mode) ? mode : 'off';
     save(STORAGE_KEY_SONIDO, valid);
     set({ sonido: valid });
+  },
+
+  setValle3d: (flag) => {
+    const bool = Boolean(flag);
+    save(STORAGE_KEY_VALLE3D, bool);
+    set({ valle3d: bool });
   },
 }));
 
