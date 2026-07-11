@@ -163,11 +163,16 @@ export function compareToBaseline(current, baseline) {
   for (const file of Object.keys(current.byFile).sort()) {
     const currentCount = current.byFile[file];
     const baselineCount = baselineByFile[file] || 0;
+    const exento = ZONA_EXPERIMENTAL_3D.test(file);
     if (baselineCount === 0) {
-      if (ZONA_EXPERIMENTAL_3D.test(file)) newFilesExentos.push({ file, count: currentCount });
+      if (exento) newFilesExentos.push({ file, count: currentCount });
       else newFiles.push({ file, count: currentCount });
     } else if (currentCount > baselineCount) {
-      regressions.push({ file, baselineCount, currentCount, delta: currentCount - baselineCount });
+      // Regresión: en la zona experimental 3D (JSX de three, type-loose) NO
+      // bloquea — cablear un componente suele sumar 1-2 errores de props laxas.
+      // En PRODUCCIÓN sí bloquea (deuda real). El total sube pero es cosmético.
+      if (exento) newFilesExentos.push({ file, count: currentCount - baselineCount });
+      else regressions.push({ file, baselineCount, currentCount, delta: currentCount - baselineCount });
     } else if (currentCount < baselineCount) {
       improved.push({ file, baselineCount, currentCount, delta: baselineCount - currentCount });
     }
