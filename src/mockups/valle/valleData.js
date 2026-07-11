@@ -317,6 +317,8 @@ export const NARRACION = {
     'Bienvenido a su finca. Toque un lugar del valle para viajar hasta él, o toque la señal que brilla para saber qué toca hacer hoy.',
   cultivos:
     'Aquí está su milpa: maíz, fríjol y calabaza creciendo juntos como las tres hermanas.',
+  milpa:
+    'La milpa: maíz, fríjol y calabaza sembrados juntos — las tres hermanas que se cuidan entre ellas. El maíz presta el tutor, el fríjol abona y la calabaza tapa el suelo.',
   cafe: 'El cafetal en la ladera. Estas maticas ya están cargando para la próxima cosecha.',
   suelo: 'Las eras y el semillero. La tierra de aquí es la que pide cuidado esta noche.',
   agua: 'La quebrada que baja del monte. De aquí sale el agua para toda la finca.',

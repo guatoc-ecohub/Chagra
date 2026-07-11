@@ -21,7 +21,8 @@
  * español de Colombia, en "usted".
  */
 import { useMemo, useState } from 'react';
-import Mundo, { MUNDO, decidirTier, permite3D } from '../visual/mundo3d/index.js';
+import Mundo, { decidirTier, permite3D } from '../visual/mundo3d/index.js';
+import AcompananteMundo, { useAcompanante } from './valle/AcompananteMundo.jsx';
 import './Mundo3DAnimales.css';
 
 const TINTE = ['#a86a3a', '#f3e3cf'];
@@ -51,15 +52,10 @@ export default function Mundo3DAnimales() {
   const [ver2d, setVer2d] = useState(false);
   const tier = ver2d ? 'bajo' : decision.tier;
 
-  // En la vitrina (sin sesión) un punto del corral no navega: cuenta a qué
-  // pantalla real de la app lleva esa puerta.
-  const [puerta, setPuerta] = useState(null);
-  const onHotspot = (view, data) => {
-    const hs = (MUNDO.animales.hotspots || []).find(
-      (h) => h.view === view && (h.data === data || (!h.data && !data)),
-    ) || (MUNDO.animales.hotspots || []).find((h) => h.view === view);
-    setPuerta({ label: hs?.label || view, view });
-  };
+  // La capa acompañante (BUG P1 "vitrinas mudas"): Angelita narra el mundo al
+  // entrar y acusa las puertas tocadas — voz + burbuja de texto; si el equipo
+  // no trae voz o está apagada, la burbuja ES la voz. Nunca mudo.
+  const acompanante = useAcompanante('animales');
 
   return (
     <main
@@ -77,15 +73,18 @@ export default function Mundo3DAnimales() {
       </header>
 
       <section className="m3dan__escena" aria-label="El corral y el ciclo del abono de la finca">
-        <Mundo
-          mundoId="animales"
-          tier={tier}
-          reducedMotion={reducedMotion}
-          onHotspot={onHotspot}
-          onSalir={null}
-          animo="sereno"
-          energia={0.85}
-        />
+        <AcompananteMundo mundoId="animales" acompanante={acompanante}>
+          <Mundo
+            mundoId="animales"
+            tier={tier}
+            reducedMotion={reducedMotion}
+            onHotspot={acompanante.decirPuerta}
+            onSalir={null}
+            animo="sereno"
+            energia={0.85}
+            hablando={acompanante.hablando}
+          />
+        </AcompananteMundo>
         <div className="m3dan__barra">
           <p className="m3dan__tier">
             {tier === 'bajo'
@@ -102,11 +101,7 @@ export default function Mundo3DAnimales() {
             </button>
           )}
         </div>
-        <p className="m3dan__nota" role="status" aria-live="polite">
-          {puerta
-            ? `«${puerta.label}» es una puerta real: dentro de la app abre la pantalla «${puerta.view}».`
-            : 'Toque un punto del corral para ver a dónde lo lleva.'}
-        </p>
+        <p className="m3dan__nota">Toque un punto del corral para ver a dónde lo lleva.</p>
       </section>
 
       <section className="m3dan__leyenda" aria-label="El ciclo del abono, eslabón por eslabón">

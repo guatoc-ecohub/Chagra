@@ -22,7 +22,8 @@
  * español de Colombia, en "usted".
  */
 import { useMemo, useState } from 'react';
-import Mundo, { MUNDO, decidirTier, permite3D } from '../visual/mundo3d/index.js';
+import Mundo, { decidirTier, permite3D } from '../visual/mundo3d/index.js';
+import AcompananteMundo, { useAcompanante } from './valle/AcompananteMundo.jsx';
 import './Mundo3DBosque.css';
 
 const TINTE = ['#4f8f7d', '#e6efe9'];
@@ -51,15 +52,10 @@ export default function Mundo3DBosque() {
   const [ver2d, setVer2d] = useState(false);
   const tier = ver2d ? 'bajo' : decision.tier;
 
-  // En la vitrina (sin sesión) un punto de la ladera no navega: cuenta a qué
-  // pantalla real de la app lleva esa puerta.
-  const [puerta, setPuerta] = useState(null);
-  const onHotspot = (view, data) => {
-    const hs = (MUNDO.pisos.hotspots || []).find(
-      (h) => h.view === view && (h.data === data || (!h.data && !data)),
-    ) || (MUNDO.pisos.hotspots || []).find((h) => h.view === view);
-    setPuerta({ label: hs?.label || view, view });
-  };
+  // La capa acompañante (BUG P1 "vitrinas mudas"): Angelita narra el mundo al
+  // entrar y acusa las puertas tocadas — voz + burbuja de texto; si el equipo
+  // no trae voz o está apagada, la burbuja ES la voz. Nunca mudo.
+  const acompanante = useAcompanante('pisos');
 
   return (
     <main
@@ -76,15 +72,18 @@ export default function Mundo3DBosque() {
       </header>
 
       <section className="m3db__escena" aria-label="La ladera andina y sus pisos térmicos">
-        <Mundo
-          mundoId="pisos"
-          tier={tier}
-          reducedMotion={reducedMotion}
-          onHotspot={onHotspot}
-          onSalir={null}
-          animo="sereno"
-          energia={0.85}
-        />
+        <AcompananteMundo mundoId="pisos" acompanante={acompanante}>
+          <Mundo
+            mundoId="pisos"
+            tier={tier}
+            reducedMotion={reducedMotion}
+            onHotspot={acompanante.decirPuerta}
+            onSalir={null}
+            animo="sereno"
+            energia={0.85}
+            hablando={acompanante.hablando}
+          />
+        </AcompananteMundo>
         <div className="m3db__barra">
           <p className="m3db__tier">
             {tier === 'bajo'
@@ -101,11 +100,7 @@ export default function Mundo3DBosque() {
             </button>
           )}
         </div>
-        <p className="m3db__nota" role="status" aria-live="polite">
-          {puerta
-            ? `«${puerta.label}» es una puerta real: dentro de la app abre la pantalla «${puerta.view}».`
-            : 'Toque un piso de la ladera para ver a dónde lo lleva.'}
-        </p>
+        <p className="m3db__nota">Toque un piso de la ladera para ver a dónde lo lleva.</p>
       </section>
 
       <section className="m3db__leyenda" aria-label="La ladera, piso por piso">
