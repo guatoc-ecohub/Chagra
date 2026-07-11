@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-07-11T21:13:46.779Z",
-  "totalErrors": 1076,
+  "totalErrors": 1083,
   "byFile": {
     "node_modules/fake-indexeddb/auto/index.mjs": 1,
     "node_modules/fake-indexeddb/build/esm/FDBFactory.js": 4,
@@ -352,6 +352,8 @@
     "src/visual/creatures/_rubberhose.jsx": 42,
     "src/visual/mundo3d/ArtesaniaAndina.jsx": 6,
     "src/visual/mundo3d/CamaraDioramas.jsx": 6,
+    "src/visual/mundo3d/CapaVivaMundo.jsx": 3,
+    "src/visual/mundo3d/CielosHora.jsx": 1,
     "src/visual/mundo3d/GemeloValle2D.jsx": 1,
     "src/visual/mundo3d/HotspotFeedback.jsx": 1,
     "src/visual/mundo3d/MicrofaunaSuelo.jsx": 6,
@@ -359,6 +361,7 @@
     "src/visual/mundo3d/TransicionMundo.jsx": 1,
     "src/visual/mundo3d/TransicionMundoKit.jsx": 2,
     "src/visual/mundo3d/ValleEnCalma.jsx": 1,
+    "src/visual/mundo3d/VistaGlobalSierra.jsx": 2,
     "src/visual/mundo3d/__tests__/artesania.smoke.test.jsx": 1,
     "src/visual/mundo3d/__tests__/gemeloValle2D.smoke.test.jsx": 8,
     "src/visual/mundo3d/__tests__/hiloVidaVista.test.jsx": 4,
