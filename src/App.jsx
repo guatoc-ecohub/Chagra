@@ -156,6 +156,9 @@ const VitrinaInfraestructuraMockup = lazy(() => import('./mockups/vitrina3d/Vitr
 // con su encuadre de cámara curado (camaraDioramas) + botón «Entrar» al host real.
 const VitrinaMundosMockup = lazy(() => import('./mockups/vitrina3d/VitrinaMundos'));
 const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra'));
+// 3D: el valle DE NOCHE — luna, cielo estrellado andino, luciérnagas, grillos
+// sintetizados (0 KB, opt-in) y Angelita dormida. La finca en reposo.
+const ValleNoche3DMockup = lazy(() => import('./mockups/ValleNoche3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -550,6 +553,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/vitrina-infra': 'mockup_vitrina_infra',
   'mockups/vitrina-mundos': 'mockup_vitrina_mundos',
   'mockups/sierra-global': 'mockup_sierra_global',
+  'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1767,6 +1771,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Vista global Sierra Nevada">
               <SierraGlobalMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_valle_noche_3d':
+        // El valle de noche: variante nocturna mágica del valle — luna plata,
+        // cielo estrellado andino que titila, luciérnagas del framework,
+        // grillos sintetizados con WebAudio (0 KB, opt-in con botón) y
+        // Angelita dormida en su flor. La finca en reposo, cálida y serena.
+        // Ruta #/mockups/valle-noche-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El valle de noche">
+              <ValleNoche3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
