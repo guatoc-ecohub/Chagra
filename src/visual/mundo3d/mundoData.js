@@ -448,6 +448,57 @@ export const MUNDO = {
     ],
     entrada: { zoom: 8, narra: 'pisos' },
   },
+
+  // 🌱 EL SEMILLERO / VIVERO — arquetipo SÍ-3D `semillero`: la PROPAGACIÓN hecha
+  //    lugar. El diorama muestra cómo se cría la matica desde el grano hasta que
+  //    aguanta el campo, con lo que de verdad se hace en finca: las BANDEJAS
+  //    germinadoras con su sustrato y su humedad (la semilla que despierta), el
+  //    REPIQUE de la bandeja a la BOLSA cuando la plántula tiene fuerza, la ERA de
+  //    ENDURECIMIENTO al borde soleado (aclimatar antes de llevar al lote), la
+  //    ESTACIÓN de SEMILLA (la propia/criolla al lado de la comprada) y el TÚNEL
+  //    de media-sombra que la resguarda del frío de la madrugada y de la lluvia.
+  //    Cada punto es una puerta a una pantalla REAL. En equipo humilde cae a su
+  //    ficha 2D digna (la infografía del semillero).
+  //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
+  semillero: {
+    escena: 'semillero',
+    valle: { tipo: 'semillero', pos: [-2.6, 0, 6.2], escala: 1 },
+    params: {
+      // El diorama tiene defaults propios; aquí los hacemos explícitos y
+      // deterministas (mismas bandejas y bolsas 2D↔3D).
+      bandejas: [
+        { pos: [-0.35, 0, 0.35], rot: 0.1 },
+        { pos: [0.32, 0, 0.3], rot: -0.08 },
+      ],
+      bolsas: [
+        { pos: [-1.2, 0, -0.15], alto: 0.34, color: '#4e8f3f' },
+        { pos: [-1.15, 0, 0.3], alto: 0.3, color: '#57993f' },
+        { pos: [-0.85, 0, -0.55], alto: 0.38, color: '#468637' },
+      ],
+    },
+    hotspots: [
+      { id: 'germinar', pos: [0, 0.62, 0.35], emoji: '🫘', label: 'Semilleros: qué nace', view: 'germinacion' },
+      { id: 'repique', pos: [-1.15, 0.7, -0.1], emoji: '🌱', label: 'Repicar y llevar al campo', view: 'sembrar' },
+      { id: 'endurecer', pos: [0.95, 0.72, 0.95], emoji: '☀️', label: 'Endurecer la matica', view: 'ciclo' },
+      { id: 'semilla', pos: [1.1, 0.72, -0.55], emoji: '🌾', label: 'Semilla propia', view: 'semilla' },
+      { id: 'frio', pos: [0, 1.5, -0.7], emoji: '⛺', label: 'Cuídelo del frío', view: 'hoy_finca' },
+    ],
+    entrada: { zoom: 7, narra: 'semillero' },
+    // El gemelo 2D digno: la ficha del semillero (misma lección, en notas).
+    fallback2d: {
+      escena: 'infografia',
+      params: {
+        titulo: 'El semillero de la finca',
+        notas: [
+          'Germine en bandeja con sustrato suelto y húmedo: riegue fino y seguido, sin encharcar (la semilla se ahoga en agua).',
+          'Repique a bolsa o era cuando la plántula tenga hojas verdaderas y raíz firme: tómela por la hoja, nunca por el tallo.',
+          'Endurézcala unos días al sol y al viento antes de llevarla al lote, o el campo la quema.',
+          'Guarde su semilla criolla de las mejores matas; de híbridos comprados no guarde semilla (los hijos salen disparejos).',
+          'Tape el semillero: el túnel de media-sombra corta la lluvia y guarda el calor de la helada de madrugada.',
+        ],
+      },
+    },
+  },
 };
 
 /** Ids de todos los mundos registrados. */

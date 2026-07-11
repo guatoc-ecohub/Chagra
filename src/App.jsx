@@ -105,6 +105,11 @@ const Mundo3DMercadoMockup = lazy(() => import('./mockups/Mundo3DMercado'));
 // (guamo/nogal), el grano cereza→pergamino→oro (sin tostar en finca), roya/broca
 // con manejo agroecológico y el beneficio. El 3D va perezoso (vendor-three).
 const Mundo3DCafeMockup = lazy(() => import('./mockups/Mundo3DCafe'));
+// 3D: "El mundo del semillero" — monta <Mundo mundoId="semillero"> del
+// framework: el semillero/vivero (arquetipo nuevo `semillero`, familia recinto):
+// germinación en bandeja, repique a bolsa, endurecimiento, semilla propia vs
+// comprada y el túnel de media-sombra. El 3D va perezoso (vendor-three).
+const Mundo3DSemilleroMockup = lazy(() => import('./mockups/Mundo3DSemillero'));
 // Voz: superficies de voz con forma viva (iris que reacciona al volumen).
 const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
 const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
@@ -520,6 +525,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-sanidad': 'mockup_mundo3d_sanidad',
   'mockups/mundo3d-mercado': 'mockup_mundo3d_mercado',
   'mockups/mundo3d-cafe': 'mockup_mundo3d_cafe',
+  'mockups/mundo3d-semillero': 'mockup_mundo3d_semillero',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1643,6 +1649,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo del café">
               <Mundo3DCafeMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_semillero':
+        // Vitrina pública del MUNDO DEL SEMILLERO: monta <Mundo mundoId="semillero">
+        // del framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-semillero, sin auth. El semillero/vivero: germinación
+        // en bandeja (sustrato + humedad), repique a bolsa/era, endurecimiento al
+        // sol, semilla propia vs comprada y el túnel de media-sombra que protege
+        // del frío y la lluvia.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del semillero">
+              <Mundo3DSemilleroMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

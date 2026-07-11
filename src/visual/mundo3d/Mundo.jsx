@@ -35,6 +35,7 @@ const IMPORTA_ESCENA = {
   mercado: () => import('./escenas/EscenaMercado.jsx'),
   // (anti-conflicto de merge) importadores de escena nuevos SIEMPRE al final:
   cafe: () => import('./escenas/EscenaCafe.jsx'),
+  semillero: () => import('./escenas/EscenaSemillero.jsx'),
 };
 const ESCENAS_3D = Object.fromEntries(
   Object.entries(IMPORTA_ESCENA).map(([k, importa]) => [k, lazy(importa)]),

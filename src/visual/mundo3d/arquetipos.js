@@ -83,6 +83,16 @@ export const ARQUETIPOS = {
     nombre: 'El cafetal bajo sombra', clave: 'el cultivo bandera: café de sombra, el grano cereza→pergamino→oro, roya/broca y beneficio',
     ejemplo: 'cafe', tambien: [],
   },
+  // El semillero/vivero: la familia del `recinto` (un lugar cercado y PROTEGIDO
+  // que se camina), pero su lección es la PROPAGACIÓN — germinar en bandeja,
+  // repicar a bolsa/era y endurecer la plántula bajo el túnel de media-sombra
+  // antes de llevarla al campo. En equipo humilde cae a su ficha 2D (infografía
+  // del semillero). (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  semillero: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'semillero', espejo: 'mirror',
+    nombre: 'El semillero/vivero', clave: 'la propagación: germinar, repicar y endurecer bajo el túnel protegido',
+    ejemplo: 'semillero', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {

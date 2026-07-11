@@ -12,7 +12,7 @@ afterEach(() => cleanup());
 
 describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
   test('arquetipos: 5 dioramas 3D + arquetipos 2D de primera clase', () => {
-    expect(ARQUETIPOS_3D.sort()).toEqual(['boveda', 'cafe', 'cutaway', 'estratos', 'flujo', 'mercado', 'recinto', 'sanidad', 'valle']);
+    expect(ARQUETIPOS_3D.sort()).toEqual(['boveda', 'cafe', 'cutaway', 'estratos', 'flujo', 'mercado', 'recinto', 'sanidad', 'semillero', 'valle']);
     ['lamina', 'infografia', 'ficha', 'mirror', 'valle2d'].forEach((k) => {
       expect(ARQUETIPOS_2D).toContain(k);
       expect(ARQUETIPOS[k].dim).toBe('2d');

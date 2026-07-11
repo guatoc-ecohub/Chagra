@@ -585,6 +585,42 @@ function VinetaMango() {
     );
 }
 
+/** 🌱 Semillero y vivero — túnel de media-sombra, bandeja germinadora y plántulas. */
+function VinetaSemillero() {
+    return (
+        <svg {...SVG_PROPS}>
+            <rect width="180" height="90" fill="#e6f0cf" />
+            {/* sol tibio de mañana */}
+            <circle cx="152" cy="20" r="10" fill="#ffe8a6" />
+            <circle cx="152" cy="20" r="6" fill="#fff4cf" />
+            {/* piso del vivero */}
+            <path d="M-4 60 Q60 52 120 58 T184 54 V90 H-4 Z" fill="#b7c98a" />
+            <path d="M-4 72 Q70 64 184 70 V90 H-4 Z" fill="#8ea85e" />
+            {/* el túnel de media-sombra: arco traslúcido + costillas */}
+            <path d="M22 74 A46 40 0 0 1 114 74 Z" fill="#c7e0a0" opacity=".55" />
+            <g stroke="#8a6a44" strokeWidth="3" fill="none" strokeLinecap="round">
+                <path d="M22 74 A46 40 0 0 1 114 74" />
+                <path d="M40 74 A28 34 0 0 1 96 74" opacity=".8" />
+                <path d="M56 74 A12 30 0 0 1 80 74" opacity=".6" />
+            </g>
+            {/* la bandeja germinadora con brotes por etapa */}
+            <rect x="42" y="66" width="52" height="10" rx="2" fill="#5a4326" />
+            <rect x="44" y="64" width="48" height="4" fill="#3a2c1c" />
+            <g stroke="#3f8f4e" strokeWidth="2.4" strokeLinecap="round" fill="none">
+                <path d="M50 64 v-4" /><path d="M58 64 v-6" /><path d="M66 64 v-8" />
+                <path d="M74 64 v-9 M74 61 q4 -1 5 -4" /><path d="M84 64 v-10 M84 60 q-4 -1 -5 -4 M84 58 q4 -1 5 -4" />
+            </g>
+            {/* la bolsa del repique en primer plano (plántula ya crecida) */}
+            <g transform="translate(140 62)">
+                <path d="M-9 16 L-7 2 L7 2 L9 16 Z" fill="#2a2622" />
+                <path d="M0 2 v-14" stroke="#5a6a2e" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+                <path d="M0 -6 q-6 -2 -8 -8" stroke="#3f8f4e" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+                <path d="M0 -9 q6 -2 8 -8" stroke="#3f8f4e" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+            </g>
+        </svg>
+    );
+}
+
 /** Viñeta por id de mundo (fuente única para tarjeta + pantalla de mundo). */
 const VINETAS = {
     cultivos: VinetaCultivos,
@@ -602,6 +638,7 @@ const VINETAS = {
     animales: VinetaAnimales,
     mercado: VinetaMercado,
     disenio: VinetaDisenio,
+    semillero: VinetaSemillero,
 };
 
 /**
