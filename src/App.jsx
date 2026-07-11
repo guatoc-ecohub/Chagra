@@ -100,6 +100,11 @@ const Mundo3DSanidadMockup = lazy(() => import('./mockups/Mundo3DSanidad'));
 // campo→mesa, puestos, canastos, procedencia y precio justo. El 3D va perezoso
 // (vendor-three).
 const Mundo3DMercadoMockup = lazy(() => import('./mockups/Mundo3DMercado'));
+// 3D: "El mundo del café" — monta <Mundo mundoId="cafe"> del framework: el
+// cafetal bajo sombra (arquetipo nuevo `cafe`, familia recinto): café de sombra
+// (guamo/nogal), el grano cereza→pergamino→oro (sin tostar en finca), roya/broca
+// con manejo agroecológico y el beneficio. El 3D va perezoso (vendor-three).
+const Mundo3DCafeMockup = lazy(() => import('./mockups/Mundo3DCafe'));
 // Voz: superficies de voz con forma viva (iris que reacciona al volumen).
 const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
 const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
@@ -514,6 +519,7 @@ const MOCKUP_HASH_ROUTES = {
   // (anti-conflicto de merge) rutas nuevas SIEMPRE al final del bloque:
   'mockups/mundo3d-sanidad': 'mockup_mundo3d_sanidad',
   'mockups/mundo3d-mercado': 'mockup_mundo3d_mercado',
+  'mockups/mundo3d-cafe': 'mockup_mundo3d_cafe',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1623,6 +1629,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo del mercado">
               <Mundo3DMercadoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_cafe':
+        // Vitrina pública del MUNDO DEL CAFÉ: monta <Mundo mundoId="cafe"> del
+        // framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-cafe, sin auth. El cafetal bajo sombra: café de
+        // sombra (guamo/nogal), el grano cereza→pergamino→oro (sin tostar en la
+        // finca), roya (Hemileia vastatrix) y broca (Hypothenemus hampei) con
+        // manejo agroecológico, y el beneficio (despulpar, fermentar, secar).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del café">
+              <Mundo3DCafeMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
