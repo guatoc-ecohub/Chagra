@@ -65,23 +65,40 @@
   border-color: color-mix(in srgb, var(--acomp-tinte) 40%, transparent);
 }
 
-.acomp__pregunte {
-  display: inline-flex;
+/* ── La BARRA DE DOS VÍAS: pídale por voz/texto y la escena enfoca ── */
+.acomp__cmd {
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  flex: 1 1 auto;
+  gap: 0.4rem;
+  flex: 1 1 16rem;
   min-width: 0;
+  padding: 0.25rem 0.4rem 0.25rem 0.6rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
   background: rgba(255, 255, 255, 0.08);
-  color: #f4efe2;
-  font-size: 0.9rem;
-  text-align: left;
-  padding: 0.5rem 0.8rem;
   border-radius: 999px;
-  cursor: pointer;
 }
-.acomp__pregunte:hover {
-  background: rgba(255, 255, 255, 0.16);
+.acomp__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #f4efe2;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.3rem 0.1rem;
+}
+.acomp__input::placeholder {
+  color: rgba(244, 239, 226, 0.6);
+}
+.acomp__input:focus {
+  outline: none;
+}
+.acomp__mic.on {
+  border-color: #7dffbe;
+  background: rgba(125, 255, 190, 0.18);
+}
+.acomp__ir {
+  flex: 0 0 auto;
 }
 
 .acomp__punto {

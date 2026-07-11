@@ -34,7 +34,7 @@ import { ATMOSFERA, CIELOS, mezclar } from '../atmosferaMadre.js';
 
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
-  frugal = false, hablando = false,
+  frugal = false, hablando = false, focoId = null, focoToken = 0,
   children,
 }) {
   const controls = useRef(null);
@@ -70,6 +70,24 @@ function Contenido({
   const hAct = activo && hotspots ? hotspots.find((x) => x.id === activo) : null;
   const [px, py, pz] = hAct ? hAct.pos : centro;
   const foco = useMemo(() => new THREE.Vector3(px, py, pz), [px, py, pz]);
+
+  // ── EL LAZO agente→escena (spec S1): un `focoId` externo (un pedido de voz/
+  //    texto ya resuelto contra los hotspots) MUEVE el foco y RESALTA ese punto,
+  //    igual que un toque —el foco es el mismo que la abeja persigue. `focoToken`
+  //    sube por cada comando, así "muéstreme las trampas" dicho dos veces vuelve
+  //    a enfocar y re-dispara el pulso (halo). `resaltado` marca el punto pulsante.
+  //    Patrón "ajustar estado en el render" (React docs: derivar de un cambio de
+  //    prop SIN efecto — nada de synchronizar sistemas externos aquí).
+  const [resaltado, setResaltado] = useState({ id: null, token: 0 });
+  const [tokenPrev, setTokenPrev] = useState(focoToken);
+  if (focoToken !== tokenPrev) {
+    setTokenPrev(focoToken);
+    if (focoId) {
+      setActivo(focoId);
+      setRebote((n) => n + 1); // microrrebote de Angelita, como en el toque
+      setResaltado({ id: focoId, token: focoToken });
+    }
+  }
 
   return (
     <>
@@ -112,29 +130,39 @@ function Contenido({
 
       {children}
 
-      {(hotspots || []).map((h) => (
-        <group key={h.id} position={h.pos}>
-          <Html center distanceFactor={zoom + 2} zIndexRange={[30, 0]}>
-            <button
-              type="button"
-              className={`mundo-hotspot${activo === h.id ? ' mundo-hotspot--activo' : ''}`}
-              style={{ '--hs-tinte': acento }}
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={(e) => {
-                e.stopPropagation();
-                haptics.tap();
-                setActivo(h.id);
-                setRebote((n) => n + 1);
-                onHotspot?.(h.view, h.data);
-              }}
-              aria-label={h.label}
-            >
-              <span className="mundo-hotspot__emoji" aria-hidden="true">{h.emoji}</span>
-              <span className="mundo-hotspot__txt">{h.label}</span>
-            </button>
-          </Html>
-        </group>
-      ))}
+      {(hotspots || []).map((h) => {
+        const esComando = resaltado.id === h.id;
+        return (
+          <group key={h.id} position={h.pos}>
+            <Html center distanceFactor={zoom + 2} zIndexRange={[30, 0]}>
+              <button
+                type="button"
+                className={`mundo-hotspot${activo === h.id ? ' mundo-hotspot--activo' : ''}${esComando ? ' mundo-hotspot--comando' : ''}`}
+                style={{ '--hs-tinte': acento }}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  haptics.tap();
+                  setActivo(h.id);
+                  setRebote((n) => n + 1);
+                  setResaltado({ id: null, token: 0 }); // el toque toma el mando: sin halo de voz
+                  onHotspot?.(h.view, h.data);
+                }}
+                aria-label={h.label}
+              >
+                {/* Halo de VOZ: el pulso que confirma "la escena te oyó". Se
+                    RE-MONTA por `focoToken` (key) → re-dispara la animación cada
+                    comando; reduced-motion lo deja quieto (CSS). */}
+                {esComando && !frugal && (
+                  <span key={resaltado.token} className="mundo-hotspot__halo" aria-hidden="true" />
+                )}
+                <span className="mundo-hotspot__emoji" aria-hidden="true">{h.emoji}</span>
+                <span className="mundo-hotspot__txt">{h.label}</span>
+              </button>
+            </Html>
+          </group>
+        );
+      })}
 
       {/* Angelita: una sola por mundo (la del footer se oculta dentro). `entrando`
           vive AHORA en si hay hotspot activo — con foco se posa junto a la puerta,
@@ -173,7 +201,7 @@ function Contenido({
 export default function EscenaBase3D({
   params, hotspots, entrada, tinte, reducedMotion,
   onHotspot, cielo, animo = 'sereno', energia = 1, camara, piso = 0, tier = 'alto',
-  hablando = false, children,
+  hablando = false, focoId = null, focoToken = 0, children,
 }) {
   const [listo, setListo] = useState(false);
   const zoom = entrada?.zoom ?? 6.5;
@@ -206,6 +234,8 @@ export default function EscenaBase3D({
           piso={piso}
           frugal={frugal}
           hablando={hablando}
+          focoId={focoId}
+          focoToken={focoToken}
         >
           {children}
         </Contenido>

@@ -319,7 +319,7 @@ export const MUNDO = {
     },
     hotspots: [
       { id: 'sintoma', pos: [0, 0.7, 0.5], emoji: '🩺', label: 'Mi mata está enferma', view: 'sanidad_sintoma' },
-      { id: 'plagas', pos: [1.35, 0.92, 0.35], emoji: '🐛', label: 'Directorio de plagas', view: 'plagas' },
+      { id: 'plagas', pos: [1.35, 0.92, 0.35], emoji: '🐛', label: 'Directorio de plagas', view: 'plagas', claves: ['trampa', 'trampas', 'amarilla', 'cromatica', 'mosca', 'minador'] },
       { id: 'defensores', pos: [-0.55, 0.78, 0.5], emoji: '🐞', label: 'Defensores de la finca', view: 'defensores' },
       { id: 'bio', pos: [1.05, 0.78, -0.75], emoji: '🧪', label: 'Biopreparados', view: 'biopreparados' },
       { id: 'tox', pos: [-1.25, 0.92, -0.5], emoji: '⚠️', label: 'Seguridad con insumos', view: 'toxicologia' },

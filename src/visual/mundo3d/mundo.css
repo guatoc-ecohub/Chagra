@@ -74,6 +74,32 @@
     0 3px 10px rgba(40, 30, 10, 0.22),
     0 0 0 3px color-mix(in srgb, var(--hs-tinte, #3f8f4e) 45%, #2a2016);
 }
+/* Comandado por VOZ/TEXTO (lazo dos-vías, spec S1): además del anillo de
+   `--activo`, el punto que Angelita acaba de enfocar late un momento — la señal
+   de "la escena te oyó". */
+.mundo-hotspot--comando {
+  box-shadow:
+    0 3px 10px rgba(40, 30, 10, 0.22),
+    0 0 0 3px color-mix(in srgb, var(--hs-tinte, #3f8f4e) 65%, #2a2016);
+}
+/* El HALO: un anillo que se expande y se desvanece. Vive dentro del botón
+   (position: relative); se re-monta por `key={focoToken}` → repite el pulso en
+   cada comando. pointer-events off: nunca estorba el toque. */
+.mundo-hotspot__halo {
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  border: 2px solid var(--hs-tinte, #3f8f4e);
+  pointer-events: none;
+  opacity: 0;
+  animation: mundo-hotspot-halo 1.15s ease-out 2;
+}
+@keyframes mundo-hotspot-halo {
+  0% { opacity: 0.85; transform: scale(1); }
+  70% { opacity: 0; transform: scale(1.75); }
+  100% { opacity: 0; transform: scale(1.75); }
+}
+
 .mundo-hotspot__emoji {
   font-size: 1.15em;
   line-height: 1;
@@ -505,4 +531,6 @@
   .mundo2d__hotspot { transition: none; }
   .mundo-viaje__velo,
   .mundo-viaje__abeja { animation: none; }
+  /* Sin pulso, pero SÍ señal: el halo queda como anillo fijo (no se mueve). */
+  .mundo-hotspot__halo { animation: none; opacity: 0.9; }
 }
