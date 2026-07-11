@@ -1362,6 +1362,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo de los animales">
               <Mundo3DAnimalesMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_mundo3d_milpa':
         // Vitrina pública del MUNDO DE LA MILPA: monta <Mundo mundoId="milpa"> del
         // framework (src/visual/mundo3d) con device-tiering real. Ruta
@@ -1371,6 +1374,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo de la milpa">
               <Mundo3DMilpaMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_mundo3d_bosque':
         // Vitrina pública de la LADERA / PISOS TÉRMICOS: monta <Mundo mundoId="pisos">
         // del framework (src/visual/mundo3d) sobre el arquetipo `estratos`
@@ -1381,6 +1387,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La ladera y sus pisos">
               <Mundo3DBosqueMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_mundo3d_clima':
         // Vitrina pública del MUNDO DEL CLIMA: monta <Mundo mundoId="clima"> del
         // framework (src/visual/mundo3d) con device-tiering real. Ruta
