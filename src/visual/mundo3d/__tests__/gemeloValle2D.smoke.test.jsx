@@ -1,0 +1,88 @@
+/*
+ * Smoke test del GEMELO 2D del valle (spec 20): la lámina rubber-hose andina
+ * que reemplaza al fallback plano en gama baja / reduced-motion / sin WebGL.
+ * Verifica el contrato (mismos hotspots navegables que el 3D, alerta, clima,
+ * reduced motion) y el adaptador al framework de mundos.
+ */
+import React from 'react';
+import { render, cleanup, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { describe, test, expect, afterEach, vi } from 'vitest';
+
+import GemeloValle2D, { GemeloValleEscena } from '../GemeloValle2D.jsx';
+import { MUNDOS_VALLE, COSA_DEL_DIA } from '../../../mockups/valle/valleData';
+
+afterEach(() => cleanup());
+
+describe('GemeloValle2D — el gemelo 2D de primera clase del valle', () => {
+  test('renderiza los MISMOS mundos navegables que la escena 3D', () => {
+    const { container, getByRole } = render(
+      <GemeloValle2D clima="soleado" onEntrar={() => {}} onAlerta={() => {}} />,
+    );
+    // un botón por mundo del valle, con su título real del manifiesto
+    MUNDOS_VALLE.forEach((m) => {
+      expect(
+        getByRole('button', { name: new RegExp(`Viajar al mundo ${m.titulo}`) }),
+      ).toBeInTheDocument();
+    });
+    // la lámina SVG existe y es accesible
+    expect(container.querySelector('.gemelo-valle__svg')).toBeInTheDocument();
+  });
+
+  test('tocar un lugar dispara onEntrar con el id del mundo', () => {
+    const onEntrar = vi.fn();
+    const { getByRole } = render(<GemeloValle2D clima="soleado" onEntrar={onEntrar} />);
+    const cafe = MUNDOS_VALLE.find((m) => m.id === 'cafe');
+    fireEvent.click(getByRole('button', { name: new RegExp(`Viajar al mundo ${cafe.titulo}`) }));
+    expect(onEntrar).toHaveBeenCalledWith('cafe');
+  });
+
+  test('la cosa del día se ancla a su mundo y dispara onAlerta', () => {
+    const onAlerta = vi.fn();
+    const { getByRole } = render(<GemeloValle2D clima="soleado" onAlerta={onAlerta} />);
+    const alerta = getByRole('button', { name: new RegExp(`Alerta del día: ${COSA_DEL_DIA.titulo}`) });
+    fireEvent.click(alerta);
+    expect(onAlerta).toHaveBeenCalledTimes(1);
+  });
+
+  test('el clima tiñe la lámina (data-clima) y la noche trae estrellas', () => {
+    const { container, rerender } = render(<GemeloValle2D clima="noche" />);
+    const raiz = container.querySelector('.gemelo-valle');
+    expect(raiz).toHaveAttribute('data-clima', 'noche');
+    expect(container.querySelectorAll('.gv-titila').length).toBeGreaterThan(5);
+    rerender(<GemeloValle2D clima="lluvia" />);
+    expect(container.querySelector('.gv-lluvia')).toBeInTheDocument();
+    rerender(<GemeloValle2D clima="niebla" />);
+    expect(container.querySelector('.gv-niebla')).toBeInTheDocument();
+  });
+
+  test('reducedMotion congela la lámina a un fotograma digno (data-quieto)', () => {
+    const { container } = render(<GemeloValle2D clima="noche" reducedMotion />);
+    expect(container.querySelector('.gemelo-valle')).toHaveAttribute('data-quieto', 'si');
+    // sin movimiento no hay luciérnagas (decoración solo-animada)
+    expect(container.querySelector('.gv-luciernaga')).not.toBeInTheDocument();
+  });
+
+  test('focoId acerca la cámara-lámina hacia el lugar (entrar al mundo)', () => {
+    const { container } = render(<GemeloValle2D clima="soleado" focoId="suelo" />);
+    expect(container.querySelector('.gemelo-valle')).toHaveAttribute('data-entrando', 'si');
+    const cam = container.querySelector('.gemelo-valle__cam');
+    expect(cam.style.transform).toContain('scale(1.45)');
+  });
+
+  test('adaptador GemeloValleEscena habla el contrato del framework (onHotspot)', () => {
+    const onHotspot = vi.fn();
+    const { getByRole } = render(
+      <GemeloValleEscena
+        params={{ clima: 'dorada' }}
+        entrada={{ alertaView: 'hoy_finca' }}
+        onHotspot={onHotspot}
+      />,
+    );
+    const suelo = MUNDOS_VALLE.find((m) => m.id === 'suelo');
+    fireEvent.click(getByRole('button', { name: new RegExp(`Viajar al mundo ${suelo.titulo}`) }));
+    expect(onHotspot).toHaveBeenCalledWith('mundo', { mundoId: 'suelo' });
+    fireEvent.click(getByRole('button', { name: /Alerta del día/ }));
+    expect(onHotspot).toHaveBeenCalledWith('hoy_finca');
+  });
+});
