@@ -1,11 +1,24 @@
 import { useId } from 'react';
 import './creatures.css';
 import { CreatureFilters } from './_filters.jsx';
+import { OjosRubber, Cachetes, Sonrisa, Miembro, AntenaRubber, RH_INK } from './_rubberhose.jsx';
 
 /* Abeja angelita — Tetragonisca angustula (meliponino nativo SIN aguijón, NO
-   Apis). Cuerpo ámbar rayado, cabeza clara, alitas de tul. Versión canónica
-   deducida del mockup "Guardianes que aparecen". */
+   Apis). Cuerpo ámbar rayado (chumbe andino), cabeza clara, alitas de tul.
+   Elevada al lenguaje RUBBER-HOSE PLENO (Cuphead + Miss Minutes de Loki):
+   contorno grueso que respira, ojos de goma con pupila grande y brillo, cachetes
+   campesinos, bracitos/patitas de manguera con mitones, antenas con bombillo que
+   hacen follow-through, y squash-&-stretch en el idle (boil ~12fps). El DIBUJO
+   compone el KIT reutilizable `_rubberhose.jsx` (que el oso andino y el colibrí
+   heredan); la CADENCIA vive en `creatures.css` (clases `rh-*`, gate RM + tier). */
 const VIEWBOX = '-15 -15 32 30';
+
+/* Rayas del cuerpo tejidas como CHUMBE andino: banda de tinta con hilo tierra. */
+const BANDAS = [
+  { x: -3.6, y0: -4.7, y1: 4.7 },
+  { x: 0.4, y0: -5.0, y1: 5.0 },
+  { x: 4.0, y0: -4.0, y1: 4.0 },
+];
 
 export function AbejaAngelita({
   size = 64,
@@ -33,12 +46,18 @@ export function AbejaAngelita({
   mojada = false,
   sed = false,
   comiendo = false,
+  /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
+     pleno; 'bajo' apaga el idle continuo (boil + follow-through) y deja el
+     aleteo + estados reactivos. Sin prop (standalone: avatares, catálogo) =
+     pleno. El CSS gatea por [data-tier='bajo']; RM lo congela por encima. */
+  tier,
   ...rest
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const glow = `crt-glow-${uid}`;
   const blur = `crt-blur-${uid}`;
   const wing = animated ? 'crt-wing' : undefined;
+  const vivo = animated;
   // El aura respira con la energía real de la finca (matas vivas + agua).
   const auraOp = Math.max(0.16, Math.min(0.5, 0.2 + 0.3 * (energia ?? 1)));
   const auraR = 5.4 + 1.2 * (energia ?? 1);
@@ -49,12 +68,12 @@ export function AbejaAngelita({
     </defs>
   );
   // Probóscide (lengüita): sale con SED (jadeo) o al COMER (libar). Cuelga de la
-  // cabeza (cx≈9). CSS la anima según data-sed/data-comiendo; RM la deja quieta.
+  // cabeza (cx≈9.6). CSS la anima según data-sed/data-comiendo; RM la deja quieta.
   // El <g> EXTERNO posiciona (attr transform); el INTERNO (.crt-lengua) anima —
   // si el CSS animara el mismo nodo del translate, lo pisaría (CSS transform
   // gana sobre el atributo) y la lengüita saltaría al centro del cuerpo.
   const lengua = (sed || comiendo) ? (
-    <g transform="translate(9.6 2)">
+    <g transform="translate(9.6 2.4)">
       <g className="crt-lengua">
         <path d="M0,0 C-0.4,2.6 0.4,4.4 0,6.2" stroke="#c9524e" strokeWidth="1.1"
           fill="none" strokeLinecap="round" />
@@ -72,19 +91,55 @@ export function AbejaAngelita({
     </g>
   ) : null;
 
+  // ── CUERPO rubber-hose. Orden de atrás→adelante: aura, alas, patitas, tronco
+  //    (ámbar con contorno + chumbe), bracitos, cabeza (ojos/cachetes/sonrisa/
+  //    antenas), probóscide, gotas. `.crt-body` es el nodo que squashea (boil
+  //    idle + estados reactivos, que lo pisan por especificidad).
   const body = (
-    <g className="crt-body" filter={`url(#${glow})`}>
+    <g className={`crt-body${vivo ? ' rh-boil' : ''}`} filter={`url(#${glow})`}>
+      {/* aura viva */}
       <circle r={auraR} fill="#ffb54f" opacity={auraOp} filter={`url(#${blur})`} />
-      <ellipse cx="0" cy="0" rx="8.5" ry="5.4" fill="#ffb54f"
+
+      {/* alitas de tul con contorno + smear (crt-wingbeat ya lleva el estirón) */}
+      <ellipse className={wing} cx="-1.8" cy="-7" rx="6" ry="3.6" fill="#bfeaff"
+        opacity="0.62" stroke="rgba(42,26,12,0.4)" strokeWidth="0.5" />
+      <ellipse className={wing} style={{ animationDelay: '-0.07s' }} cx="2.2" cy="-6.4"
+        rx="4.6" ry="2.8" fill="#eafff6" opacity="0.5" stroke="rgba(42,26,12,0.35)" strokeWidth="0.5" />
+
+      {/* patitas manguera con pie crema (detrás del tronco, se mecen suave) */}
+      <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sway={vivo} delay={-0.6} />
+      <Miembro d="M1.8,4.7 C1.4,6.8 1.3,8.2 1.8,9.4" ancho={1.9} punta={[1.8, 9.6]} puntaR={1.3} pie sway={vivo} delay={-0.95} />
+
+      {/* tronco ámbar con contorno grueso (la línea que respira con el boil) */}
+      <ellipse cx="0" cy="0" rx="8.6" ry="5.4" fill="#ffb54f" stroke={RH_INK} strokeWidth="1.3"
         style={{ filter: 'drop-shadow(0 0 6px rgba(255,181,79,0.9))' }} />
-      <path d="M-3.2,-4.9 L-3.2,4.9 M0.8,-5.2 L0.8,5.2 M4.4,-4.2 L4.4,4.2"
-        stroke="#3a2410" strokeWidth="1.6" strokeLinecap="round" />
-      <circle cx="8.2" cy="-0.8" r="3.4" fill="#ffd76a" />
-      <circle cx="9.3" cy="-1.6" r="0.9" fill="#04160f" />
-      <path d="M11,-2.4 C12.4,-3.4 13.7,-3.4 14.7,-2.6" stroke="#3a2410" strokeWidth="0.7" fill="none" strokeLinecap="round" />
+      {/* rayas = chumbe: banda de tinta + hilo tierra */}
+      {BANDAS.map((b, i) => (
+        <g key={i}>
+          <path d={`M${b.x},${b.y0} L${b.x},${b.y1}`} stroke={RH_INK} strokeWidth="1.9" strokeLinecap="round" />
+          <path d={`M${b.x},${b.y0 + 0.6} L${b.x},${b.y1 - 0.6}`} stroke="#9c3b1e" strokeWidth="0.7" strokeLinecap="round" />
+        </g>
+      ))}
+
+      {/* bracitos manguera con mitón crema (delante del tronco, follow-through) */}
+      <Miembro d="M-6.2,1.4 C-8.2,2.4 -9.0,4.1 -8.4,5.9" ancho={2.1} punta={[-8.5, 6.2]} puntaR={1.55} sway={vivo} delay={-0.15} />
+      <Miembro d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sway={vivo} delay={-0.45} />
+
+      {/* cabeza clara con contorno */}
+      <circle cx="8.6" cy="-1.0" r="4.4" fill="#ffd76a" stroke={RH_INK} strokeWidth="1.2" />
+      {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos) */}
+      <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.15 }, { cx: 6.9, cy: 0.3, r: 0.85 }]} />
+      <Sonrisa cx={8.9} cy={1.4} w={2.8} prof={1.1} />
+      <OjosRubber
+        ojos={[{ cx: 10.1, cy: -1.9, r: 1.95 }, { cx: 7.4, cy: -2.2, r: 1.45 }]}
+        mirar={[0.3, 0.34]}
+        parpadea={vivo}
+      />
+      {/* antenas con bombillo que se mecen (secondary motion) */}
+      <AntenaRubber d="M7.7,-4.7 C6.7,-7.3 7.0,-9.3 8.3,-10.1" bulbo={[8.3, -10.3]} sway={vivo} delay={0} />
+      <AntenaRubber d="M9.7,-4.6 C11.0,-6.7 11.3,-8.7 10.5,-10.3" bulbo={[10.5, -10.5]} sway={vivo} delay={-0.3} />
+
       {lengua}
-      <ellipse className={wing} cx="-1.8" cy="-7" rx="6" ry="3.6" fill="#bfeaff" opacity="0.6" />
-      <ellipse className={wing} style={{ animationDelay: '-0.07s' }} cx="2.2" cy="-6.4" rx="4.6" ry="2.8" fill="#eafff6" opacity="0.5" />
       {gotas}
     </g>
   );
@@ -94,6 +149,7 @@ export function AbejaAngelita({
     'data-creature': 'abeja-angelita',
     'data-pose': pose,
     'data-animo': animo,
+    'data-tier': tier || undefined,
     'data-mojada': mojada ? '1' : undefined,
     'data-sed': sed ? '1' : undefined,
     'data-comiendo': comiendo ? '1' : undefined,

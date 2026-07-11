@@ -4,15 +4,20 @@
    es responsabilidad de la escena que consume la criatura.
    reduced-motion = criatura quieta en un fotograma digno. ─── */
 
-/* aleteo rápido (abeja / colibrí) */
+/* aleteo rápido (abeja / colibrí) — con SMEAR rubber-hose: en el golpe hacia
+   abajo el ala se ESTIRA (scaleX) para sugerir la velocidad (motion blur
+   dibujado), y sale con un pequeño overshoot al volver. Ambas especies heredan
+   el estirón sin tocar su dibujo. */
 .crt-wing {
   transform-box: fill-box;
   transform-origin: center bottom;
-  animation: crt-wingbeat 0.13s ease-in-out infinite alternate;
+  animation: crt-wingbeat 0.15s ease-in-out infinite;
 }
 @keyframes crt-wingbeat {
-  0% { transform: scaleY(1) scaleX(1); }
-  100% { transform: scaleY(0.6) scaleX(0.9); }
+  0%   { transform: scaleY(1) scaleX(1); }
+  38%  { transform: scaleY(0.52) scaleX(1.18); }  /* smear: estirón al bajar rápido */
+  55%  { transform: scaleY(0.66) scaleX(0.9); }   /* overshoot al frenar */
+  100% { transform: scaleY(1) scaleX(1); }
 }
 
 /* alas de mariposa que abren y cierran */
@@ -58,6 +63,79 @@
 @keyframes crt-wing-reposo {
   0% { transform: scaleY(0.4) scaleX(0.86); }
   100% { transform: scaleY(0.5) scaleX(0.9); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   KIT RUBBER-HOSE (Cuphead + Miss Minutes de Loki) — SPECIES-AGNOSTIC
+   Cadencia de goma REUTILIZABLE por cualquier creature. Angelita la estrena;
+   el OSO ANDINO y el COLIBRÍ la heredan poniendo estas mismas clases `rh-*`
+   sobre las piezas del KIT `_rubberhose.jsx` — cero animación redibujada.
+   Todo transform/opacity (GPU, Android gama baja).
+   GATE: reduced-motion la congela (fotograma digno); device-tier 'bajo' apaga
+   lo CONTINUO (boil + follow-through) y conserva aleteo + estados reactivos.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL — el idle vivo: squash-&-stretch que RESPIRA en cadencia dibujada
+   (~12fps vía steps) con anticipación y overshoot. Rubber-hose nunca queda
+   clavado; el contorno "respira" con el cuerpo. Se aplica al nodo-cuerpo; los
+   estados reactivos (mojada/sed/comiendo) lo PISAN por especificidad. */
+.rh-boil {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: rh-boil 1.5s steps(18, end) infinite;
+}
+@keyframes rh-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  22%  { transform: translateY(-0.3px) scale(0.975, 1.05); }  /* stretch (anticipa) */
+  50%  { transform: translateY(0.4px) scale(1.05, 0.95); }    /* squash */
+  72%  { transform: translateY(-0.15px) scale(0.99, 1.02); }  /* overshoot */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* PARPADEO — la chispa de vida de los ojos de goma: abiertos casi todo el ciclo,
+   cierran SECO un par de fotogramas. Se aplica al grupo de ojos (los dos a la
+   vez). Snappy, no stepped (un parpadeo es 1-2 frames). */
+.rh-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rh-blink 4.2s linear infinite;
+}
+@keyframes rh-blink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  96%           { transform: scaleY(0.12); }  /* cierra */
+  98%           { transform: scaleY(1); }      /* abre */
+}
+
+/* FOLLOW-THROUGH (secondary motion) — antenas, bracitos y patitas de manguera
+   se mecen con retardo: delatan que el cuerpo se movió. Cada miembro pone su
+   transform-origin (hombro/base) y su animation-delay inline para no ir a la par. */
+.rh-sway {
+  animation: rh-sway 2.4s ease-in-out infinite;
+}
+@keyframes rh-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(3.6deg); }
+}
+
+/* SMEAR de miembro — para golpes rápidos (p.ej. el zarpazo del oso andino): el
+   miembro se estira y sesga en el frame veloz. Artefacto del KIT listo para
+   reutilizar; la abeja no lo usa (su smear vive en el aleteo). */
+.rh-smear {
+  transform-box: fill-box;
+  animation: rh-smear 0.42s ease-in-out infinite;
+}
+@keyframes rh-smear {
+  0%, 100% { transform: scaleX(1) skewX(0); }
+  50%      { transform: scaleX(1.3) skewX(-6deg); }
+}
+
+/* device-tier 'bajo': corta lo continuo (ahorro gama baja). Los estados
+   reactivos siguen (feedback importante) por su mayor especificidad. */
+[data-tier='bajo'] .rh-boil,
+[data-tier='bajo'] .rh-sway { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rh-boil, .rh-blink, .rh-sway, .rh-smear { animation: none !important; }
 }
 
 /* ── REACCIÓN AL ESTADO REAL DE LA FINCA (auditoría §5b) ──────────────────────

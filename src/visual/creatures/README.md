@@ -61,6 +61,37 @@ import { Colibri, AbejaAngelita } from '@/visual/creatures';
 Consumidor de referencia: **`src/mockups/MockupGuardianesNarrativos.jsx`**
 (usa las 5 criaturas en modo `inline`).
 
+## KIT rubber-hose (Cuphead + Miss Minutes) — reutilizable
+
+El lenguaje de animación **"de goma"** (Cuphead + Miss Minutes de Loki) fusionado
+con la calidez campesina andina vive en **dos artefactos species-agnostic**, para
+que **el oso andino y el colibrí lo hereden sin redibujar**:
+
+- **`_rubberhose.jsx`** — RASGOS SVG de goma parametrizables:
+  - `OjosRubber({ ojos, mirar, parpadea })` — ojos grandes con pupila de goma +
+    brillo (catchlight); uno (perfil) o dos (3/4). Parpadean juntos (`rh-blink`).
+  - `Cachetes({ puntos })` — chapetas coral (rubor campesino).
+  - `Sonrisa({ cx, cy, w, prof })` — el arco amable de todo rubber-hose.
+  - `Miembro({ d, punta, pie, sway, delay })` — brazo/pata de **manguera** con
+    mitón/pie crema (la firma de Cuphead); `sway` = follow-through.
+  - `AntenaRubber({ d, bulbo, sway })` — antena con bombillo que se mece.
+  - Constantes: `RH_INK` (tinta cálida andina), `RH_GLOVE`, `RH_CHEEK`.
+- **`creatures.css` → sección KIT** — la CADENCIA como clases `rh-*`:
+  - `.rh-boil` — idle vivo: squash-&-stretch que respira (~12fps stepped, con
+    anticipación + overshoot). Va al nodo-cuerpo.
+  - `.rh-blink` — parpadeo seco de los ojos.
+  - `.rh-sway` — follow-through (secondary motion) de antenas/brazos/patas.
+  - `.rh-smear` — smear de miembro para golpes rápidos (p.ej. zarpazo del oso).
+  - Aleteo (`.crt-wing`) ya lleva **smear** incorporado (estirón en el golpe).
+
+**Gate obligatorio**: `prefers-reduced-motion` congela todo el KIT; `data-tier='bajo'`
+(device-tier) apaga lo continuo (boil + follow-through) y conserva aleteo +
+estados reactivos. Standalone (avatares/catálogo) sin `tier` = rubber-hose pleno.
+
+**Estrenado por**: `AbejaAngelita` (referencia de composición del KIT).
+**Pendientes de adoptar**: `OsoAndino` (nuevo) y `Colibri` — componen las mismas
+piezas + clases `rh-*` con SUS proporciones. No hay que reinventar la cadencia.
+
 ## Técnica
 
 - SVG + CSS puros, **cero dependencias nuevas**; solo `transform`/`opacity`
