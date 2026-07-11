@@ -79,6 +79,9 @@ const VisualLib = lazy(() => import('./mockups/VisualLib'));
 // MOCKUP_HASH_ROUTES ANTES del check de auth. Chunks perezosos.
 // 3D: "El valle de mi finca" (R3F/WebGL2, degrada a SVG sin WebGL).
 const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
+// 3D: "El mundo del agua" — monta <Mundo mundoId="agua"> del framework
+// (src/visual/mundo3d) con device-tiering real. El 3D va perezoso (vendor-three).
+const Mundo3DAguaMockup = lazy(() => import('./mockups/Mundo3DAgua'));
 // Voz: superficies de voz con forma viva (iris que reacciona al volumen).
 const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
 const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
@@ -461,6 +464,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/visual-lib': 'mockup_visual_lib',
   // Galería aspiracional (3D + voz + superficies definitivas + piezas de diseño).
   'mockups/entrada-3d': 'mockup_entrada_3d',
+  'mockups/mundo3d-agua': 'mockup_mundo3d_agua',
   'mockups/voz-con-forma': 'mockup_voz_con_forma',
   'mockups/conversacion-voz': 'mockup_conversacion_voz',
   'mockups/ensena-dibujando': 'mockup_ensena_dibujando',
@@ -1308,6 +1312,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de mi finca (3D)">
               <EntradaValle3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_agua':
+        // Vitrina pública del MUNDO DEL AGUA: monta <Mundo mundoId="agua"> del
+        // framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-agua, sin auth. El recorrido del agua de la finca:
+        // nacimiento → ronda → quebrada → cuidado → toma → huerta regada.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del agua">
+              <Mundo3DAguaMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
