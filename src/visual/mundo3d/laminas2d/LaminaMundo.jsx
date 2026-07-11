@@ -46,7 +46,44 @@ function FondoCutaway({ params, acento }) {
           <path key={v.key} d={`M${v.bx},${v.by} l3,14 l-2,10`} stroke="#c9a86a" strokeWidth="2" fill="none" strokeLinecap="round" />
         ),
       )}
+      {/* las TRES HERMANAS (opt-in): maíz-fríjol-calabaza arriba y, abajo, los
+          nódulos rosados del fríjol = el nitrógeno que se ve. Misma lección 2D. */}
+      {params?.milpa && <MilpaCutaway acento={acento} sueloY={tops[0]} />}
       <rect x="0" y="0" width="300" height="200" fill="none" stroke={acento} strokeWidth="2" opacity="0.4" />
+    </g>
+  );
+}
+
+/* El módulo de la milpa dibujado sobre el corte (gemelo 2D del diorama 3D). */
+function MilpaCutaway({ sueloY = 26 }) {
+  const gx = 132; // eje del maíz
+  const nod = [
+    [gx - 3, sueloY + 12], [gx + 4, sueloY + 20], [gx - 2, sueloY + 29],
+    [gx + 3, sueloY + 38], [gx - 4, sueloY + 46],
+  ];
+  return (
+    <g>
+      {/* el maíz: la vara viva (tutor) */}
+      <line x1={gx} y1={sueloY} x2={gx} y2="6" stroke="#6f9a45" strokeWidth="3.2" strokeLinecap="round" />
+      <path d={`M${gx},18 l12,-6`} stroke="#6f9a45" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+      <path d={`M${gx},12 l-11,-5`} stroke="#6f9a45" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+      <ellipse cx={gx + 4} cy="16" rx="3.2" ry="5.5" fill="#ecd98f" />
+      {/* el fríjol: se enreda subiendo por la caña */}
+      <path
+        d={`M${gx},${sueloY} C${gx - 9},${sueloY - 8} ${gx + 9},${sueloY - 16} ${gx},${sueloY - 24} C${gx - 8},${sueloY - 30} ${gx + 8},${sueloY - 38} ${gx},${sueloY - 44}`}
+        stroke="#4f8a34" strokeWidth="2" fill="none" strokeLinecap="round"
+      />
+      {/* la calabaza: hojas rastreras + fruto ocre + flor amarilla */}
+      <ellipse cx={gx + 34} cy={sueloY - 3} rx="12" ry="6" fill="#5f8a3f" />
+      <ellipse cx={gx + 52} cy={sueloY - 2} rx="9" ry="5" fill="#5f8a3f" />
+      <ellipse cx={gx + 44} cy={sueloY - 5} rx="7" ry="5.4" fill="#cf8f3c" />
+      <circle cx={gx + 60} cy={sueloY - 6} r="3" fill="#e8c34a" />
+      {/* la raíz del fríjol con sus NÓDULOS rosados (el nitrógeno visible) */}
+      <path d={`M${gx},${sueloY} l0,52`} stroke="#c9a86a" strokeWidth="2.4" fill="none" strokeLinecap="round" />
+      <path d={`M${gx},${sueloY + 22} l10,10`} stroke="#c9a86a" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+      {nod.map((n) => (
+        <circle key={`${n[0]}-${n[1]}`} cx={n[0]} cy={n[1]} r="2.6" fill="#e0a3ad" stroke="#c98494" strokeWidth="0.6" />
+      ))}
     </g>
   );
 }

@@ -23,6 +23,7 @@ import { Html } from '@react-three/drei';
 import EscenaBase3D from './EscenaBase3D.jsx';
 import { Lombriz } from '../../creatures/Lombriz.jsx';
 import { Escarabajo } from '../../creatures/Escarabajo.jsx';
+import { Mariposa } from '../../creatures/Mariposa.jsx';
 
 const ANCHO = 4.4;
 const PROF = 2.2;
@@ -109,6 +110,175 @@ function Fauna({ base, phase, deriva = 0, asomo = 0.05, reducedMotion, children 
       <Html center distanceFactor={5.4} zIndexRange={[24, 6]}>
         <div className="mundo-fauna" aria-hidden="true">{children}</div>
       </Html>
+    </group>
+  );
+}
+
+/* ── LA MILPA (las tres hermanas) — primitivas de planta menores ────────────
+   Cuando el corte declara `params.milpa`, sobre la superficie crece el módulo de
+   las tres hermanas y, en la cara del corte, se ven las RAÍCES DEL FRÍJOL con sus
+   nódulos rosados: el nitrógeno que se fija bajo tierra, hecho visible (50–80 kg
+   N/ha vía Rhizobium — dato verificado). El maíz da la vara, el fríjol sube por
+   ella y abona, la calabaza cubre el suelo. Todas low-poly (cono/cilindro/esfera),
+   sin cajas; no toca el corte de suelo/abono (va detrás de `params.milpa`). */
+
+/* MataMaiz: la caña = el tutor vivo. Cilindro + hojas cono + mazorca cápsula. */
+function MataMaiz({ base, alto = 1.7 }) {
+  const [x, y, z] = base;
+  const hojas = [0.34, 0.52, 0.7, 0.86];
+  return (
+    <group position={[x, y, z]}>
+      <mesh position={[0, alto / 2, 0]}>
+        <cylinderGeometry args={[0.045, 0.075, alto, 7]} />
+        <meshLambertMaterial color="#88a24a" flatShading />
+      </mesh>
+      {hojas.map((f, i) => {
+        const lado = i % 2 === 0 ? 1 : -1;
+        return (
+          <mesh key={f} position={[lado * 0.11, alto * f, 0]} rotation={[0, i * 1.4, lado * -0.95]}>
+            <coneGeometry args={[0.05, 0.62, 4]} />
+            <meshLambertMaterial color="#6f9a45" flatShading />
+          </mesh>
+        );
+      })}
+      {/* la mazorca: cápsula crema arrimada a la caña */}
+      <mesh position={[0.12, alto * 0.5, 0.05]} rotation={[0, 0, 0.5]}>
+        <capsuleGeometry args={[0.075, 0.2, 3, 7]} />
+        <meshLambertMaterial color="#ecd98f" flatShading />
+      </mesh>
+      {/* el penacho de arriba (la flor del maíz) */}
+      <mesh position={[0, alto + 0.14, 0]}>
+        <coneGeometry args={[0.06, 0.28, 5]} />
+        <meshLambertMaterial color="#d8c98a" flatShading />
+      </mesh>
+    </group>
+  );
+}
+
+/* GuiaFrijol: espiral fino que sube ciñéndose a la caña del maíz. */
+function GuiaFrijol({ base, alto = 1.5, vueltas = 4 }) {
+  const [x, y, z] = base;
+  const N = 20;
+  const cuentas = Array.from({ length: N }, (_, i) => {
+    const f = i / (N - 1);
+    const ang = f * vueltas * Math.PI * 2;
+    const r = 0.1 + 0.02 * (1 - f);
+    return { key: i, pos: [Math.cos(ang) * r, alto * f + 0.06, Math.sin(ang) * r], hoja: i % 5 === 2, ang };
+  });
+  return (
+    <group position={[x, y, z]}>
+      {cuentas.map((c) => (
+        <group key={c.key}>
+          <mesh position={c.pos}>
+            <sphereGeometry args={[0.026, 5, 4]} />
+            <meshLambertMaterial color="#4f8a34" flatShading />
+          </mesh>
+          {c.hoja && (
+            <mesh position={c.pos} rotation={[0, -c.ang, 0.6]}>
+              <coneGeometry args={[0.04, 0.15, 4]} />
+              <meshLambertMaterial color="#5f9a3f" flatShading />
+            </mesh>
+          )}
+        </group>
+      ))}
+    </group>
+  );
+}
+
+/* Calabaza: hojas rastreras (conos aplanados sobre el suelo) + fruto ocre + flor
+   amarilla (donde poliniza la abeja). Cobertura viva que sombrea el suelo. */
+function Calabaza({ base }) {
+  const [x, y, z] = base;
+  const hojas = [
+    { p: [0, 0.03, 0], r: 0.3, rot: 0.2 },
+    { p: [0.36, 0.03, 0.12], r: 0.24, rot: -0.5 },
+    { p: [0.62, 0.03, -0.1], r: 0.26, rot: 0.9 },
+    { p: [0.28, 0.03, -0.3], r: 0.22, rot: 1.6 },
+    { p: [-0.3, 0.03, 0.2], r: 0.2, rot: 2.3 },
+  ];
+  return (
+    <group position={[x, y, z]}>
+      {hojas.map((h) => (
+        <mesh key={`${h.p[0]}-${h.p[2]}`} position={h.p} rotation={[-Math.PI / 2, 0, h.rot]}>
+          <coneGeometry args={[h.r, 0.06, 5]} />
+          <meshLambertMaterial color="#5f8a3f" flatShading />
+        </mesh>
+      ))}
+      {/* el fruto: esfera achatada, color ahuyama */}
+      <mesh position={[0.5, 0.16, 0.05]} scale={[1, 0.72, 1]}>
+        <sphereGeometry args={[0.2, 8, 6]} />
+        <meshLambertMaterial color="#cf8f3c" flatShading />
+      </mesh>
+      {/* la flor amarilla que llama a la abeja */}
+      <group position={[-0.12, 0.12, 0.28]}>
+        <mesh rotation={[0.5, 0, 0]}>
+          <coneGeometry args={[0.09, 0.16, 6]} />
+          <meshLambertMaterial color="#e8c34a" flatShading />
+        </mesh>
+        <mesh position={[0, 0.03, 0.03]}>
+          <sphereGeometry args={[0.032, 5, 4]} />
+          <meshBasicMaterial color="#f0d878" />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/* RaizNodulos: la raíz pivotante del fríjol que baja por la cara del corte, con
+   sus NÓDULOS = esferitas rosadas (Rhizobium fijando nitrógeno del aire). Lo
+   invisible del subsuelo, hecho visible: aquí se ve el abono que el fríjol regala. */
+function RaizNodulos({ base, largo = 1.4 }) {
+  const [x, y, z] = base;
+  const M = 7;
+  const nodulos = Array.from({ length: M }, (_, i) => {
+    const f = 0.18 + (i / M) * 0.78;
+    const lado = i % 2 === 0 ? 1 : -1;
+    return { key: i, pos: [lado * (0.04 + (i % 3) * 0.05), -largo * f, 0.02 * lado], r: 0.038 + (i % 2) * 0.014 };
+  });
+  return (
+    <group position={[x, y, z]}>
+      {/* raíz pivotante: cono que se afina hacia abajo */}
+      <mesh position={[0, -largo / 2, 0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.06, largo, 6]} />
+        <meshLambertMaterial color="#c9a86a" flatShading />
+      </mesh>
+      <mesh position={[0.12, -largo * 0.36, 0]} rotation={[0, 0, -0.9]}>
+        <coneGeometry args={[0.025, largo * 0.5, 5]} />
+        <meshLambertMaterial color="#bd9a5a" flatShading />
+      </mesh>
+      <mesh position={[-0.12, -largo * 0.56, 0]} rotation={[0, 0, 0.9]}>
+        <coneGeometry args={[0.022, largo * 0.44, 5]} />
+        <meshLambertMaterial color="#bd9a5a" flatShading />
+      </mesh>
+      {nodulos.map((nd) => (
+        <mesh key={nd.key} position={nd.pos}>
+          <sphereGeometry args={[nd.r, 6, 5]} />
+          <meshLambertMaterial color="#e0a3ad" flatShading />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* El módulo de las tres hermanas, compuesto sobre la cara del corte. */
+function Milpa({ total, config, reducedMotion }) {
+  const cfg = config === true ? {} : (config || {});
+  const zF = CARA - 0.16; // el frente del corte, donde crecen las plantas
+  const zRaiz = CARA - 0.05; // pegado a la cara: las raíces se ven en el corte
+  const maizX = cfg.maiz?.x ?? -0.25;
+  const maizAlto = cfg.maiz?.alto ?? 1.7;
+  const calX = cfg.calabaza?.x ?? 0.7;
+  const vueltas = cfg.frijol?.vueltas ?? 4;
+  return (
+    <group>
+      <MataMaiz base={[maizX, total, zF]} alto={maizAlto} />
+      <GuiaFrijol base={[maizX, total, zF]} alto={maizAlto * 0.9} vueltas={vueltas} />
+      <RaizNodulos base={[maizX, total, zRaiz]} largo={total * 0.62} />
+      <Calabaza base={[calX, total, zF - 0.05]} />
+      {/* la mariposa que visita la flor de la calabaza (vida, no relleno) */}
+      <Fauna base={[calX - 0.15, total + 0.5, zF + 0.12]} phase={1.7} deriva={0.5} asomo={0.05} reducedMotion={reducedMotion}>
+        <Mariposa size={38} animated={!reducedMotion} />
+      </Fauna>
     </group>
   );
 }
@@ -221,6 +391,8 @@ function Diorama({ params, reducedMotion }) {
           <Escarabajo size={42} animated={!reducedMotion} />
         </Fauna>
       )}
+      {/* la milpa: las tres hermanas arriba y los nódulos de N abajo (opt-in) */}
+      {params?.milpa && <Milpa total={total} config={params.milpa} reducedMotion={reducedMotion} />}
     </group>
   );
 }
