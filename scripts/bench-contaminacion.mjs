@@ -753,6 +753,7 @@ async function callOllama(model, systemPrompt, userPrompt, { ollamaUrl = OLLAMA_
       body: JSON.stringify({
         model,
         stream: false,
+        think: false,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
