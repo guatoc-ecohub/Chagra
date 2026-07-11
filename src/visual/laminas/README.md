@@ -31,6 +31,16 @@ la misma firma de props**: una lámina no tiene `size`/`inline` — se dibuja a
 | `LaminaMaiz` | La mata de maíz | *Zea mays* | enseña (`role=img` + rótulos) | — |
 | `LaminaCafeto` | El cafeto | *Coffea arabica* | enseña (`role=img` + rótulos) | — |
 | `LaminaMataEtapa` | La mata por etapa (viva) | *Solanum lycopersicum* | decorativa (`aria-hidden`) | `etapa` |
+| `LaminaMilpa` | La milpa (las tres hermanas) | Asociación: maíz + frijol + calabaza | enseña (`role=img` + rótulos) | — |
+| `LaminaRotacion` | La rotación por eras | Rueda: hoja → fruto → raíz → leguminosa | enseña (`role=img` + rótulos) | — |
+| `LaminaPisoTermico` | El piso térmico (en corte) | Gradiente de altura: cálido → páramo | enseña (`role=img` + rótulos) | — |
+
+Las tres últimas se promovieron desde el mockup `ensena-dibujando` (usan el
+auto-dibujado de [`src/visual/effects`](../effects/README.md): se **dibujan
+solas** al montarse) y comparten paleta + el rótulo de cuaderno en `_kit.jsx`.
+Son **proposición-locked**: dibujan UNA proposición concreta (la milpa =
+maíz+frijol+calabaza, la rueda de 4 eras, el gradiente cálido→páramo) y **no se
+generalizan** a otra.
 
 ## Props
 
@@ -57,6 +67,47 @@ import { LaminaSiembra, LaminaMaiz } from '@/visual/laminas';
 
 Consumidor de referencia: **`src/components/TuberculosScreen.jsx`** (importa
 `LaminaSiembra` y `LaminaAporque` desde aquí).
+
+## El conjunto CERRADO que el agente puede dibujar (`LAMINAS_FIABLES`)
+
+Extensión para el DR **"el agente dibuja en sus respuestas de forma fiable"**
+(2026-07-11). El agente productivo **NO genera SVG**: **SELECCIONA** un `slug` de
+un registro cerrado y, a lo sumo, una **prop de enum cerrado**. Todo lo demás es
+arte fijo, ya verificado a mano. La superficie de alucinación pasa de "un
+espacio infinito de SVG" a "un `enum` de N slugs × M props".
+
+- **`LAMINAS_FIABLES`** (en `index.js`) — el registro cerrado: `slug →
+  { Component, nombre, dim:'2d', lock, aplica_a, props, accesible }`. Cada
+  plantilla está **locked** a su especie (`Maiz`→*Zea mays*) o a su proposición
+  (`milpa`→maíz+frijol+calabaza). `props` declara los **enums permitidos**
+  (p.ej. `siembra` → `activo`, `mata-etapa` → `etapa`).
+- **`resolveLaminaFiable(slug, props)`** — el validador del frontend. Aplica
+  **solo las reglas #1 y #2** del gate: *slug ∈ registro* y *prop ∈ enum*. Si
+  algo no calza → `null`. La **regla #3** (que la especie/proposición esté
+  **aterrizada** en la evidencia del turno) la revalida el **handler del
+  agente**, no el arte.
+- **`<AgentLamina slug props />`** — el adjunto de chat: monta la lámina por
+  slug+prop con el auto-dibujado, pensado para incrustarse en una `ChatBubble`.
+  Si `resolveLaminaFiable` devuelve `null` → **no renderiza nada** (la respuesta
+  degrada a solo texto). Móvil-first (320px), self-contained, AA,
+  reduced-motion-safe.
+
+```jsx
+import { AgentLamina } from '@/visual/laminas';
+
+// El backend inyecta metadata.lamina = { slug, props }; el chat solo lo lee:
+<AgentLamina slug="milpa" props={{}} />                 // proposición-locked
+<AgentLamina slug="mata-etapa" props={{ etapa: 'cosecha' }} /> // especie + prop
+<AgentLamina slug="papaya" props={{}} />                // no fiable → null (texto)
+```
+
+**Cómo se incrusta en el chat:** `ChatBubble` lee `message.metadata?.lamina`
+(`{ slug, props }`) y monta `<AgentLamina>` como un adjunto más (igual que
+`imageUrl` o el semáforo de confianza). El **gate de grounding** que decide
+*si* se dibuja lo cablea el agente aguas arriba (tool `dibujar_lamina` +
+revalidación contra `resolvedEntities`/`toolEvidence`) — el frontend solo
+renderiza lo que ya venga validado. Vitrina pública:
+**`#/mockups/agente-dibuja`** (`src/mockups/AgenteDibuja.jsx`).
 
 ## Técnica
 

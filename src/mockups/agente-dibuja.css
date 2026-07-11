@@ -1,0 +1,236 @@
+/* ════════════════════════════════════════════════════════════════════════
+   agente-dibuja.css — vitrina "el agente dibuja en sus respuestas".
+
+   A diferencia del mockup ensena-dibujando (burbuja crema), aquí la burbuja del
+   AGENTE es OSCURA como el chat real (v3-card): así el operador ve cómo el
+   papel-crema de la lámina se incrusta dentro de la burbuja de producción. El
+   escritorio sigue siendo de papel (cálido). Todo el prefijo `ad-`.
+   Responsive desde 320px; el auto-dibujado vive en effects.css (ya respeta
+   prefers-reduced-motion). Contraste AA en ambas burbujas.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.ad-root {
+  --ad-papel: #f3ead4;
+  --ad-tinta: #5c4326;
+  --ad-tinta-2: #8a6b40;
+  --ad-linea: rgba(92, 67, 38, 0.18);
+  --ad-verde: #55702c;
+  /* burbuja del agente = chat real (slate verdoso oscuro) */
+  --ad-agent-bg: #1f2a25;
+  --ad-agent-borde: rgba(120, 170, 140, 0.28);
+  --ad-agent-txt: #e8ece6;
+  --ad-agent-txt-2: #b9c6bd;
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 16px clamp(12px, 4vw, 28px) 40px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, #fbf5e6 0%, #f3ead4 60%, #ecdfc1 100%);
+  color: var(--ad-tinta);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ── cabecera ─────────────────────────────────────────────────────────── */
+.ad-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 640px;
+  margin: 0 auto 14px;
+}
+.ad-back {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1.5px solid var(--ad-linea);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.4);
+  color: var(--ad-tinta);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 40px;
+}
+.ad-back:hover { background: rgba(255, 255, 255, 0.7); }
+.ad-title-wrap { min-width: 0; }
+.ad-title {
+  margin: 2px 0 4px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(1.15rem, 5vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+.ad-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ad-tinta-2);
+  line-height: 1.4;
+}
+
+/* ── conversación (feed de turnos) ────────────────────────────────────── */
+.ad-chat {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.ad-turno {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ad-msg { display: flex; gap: 8px; }
+.ad-msg--user { justify-content: flex-end; }
+.ad-msg--agent { justify-content: flex-start; }
+
+.ad-avatar {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  margin-top: 2px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ad-verde);
+  color: #f3ead4;
+}
+
+.ad-bubble {
+  border-radius: 16px;
+  line-height: 1.4;
+  box-shadow: 0 1px 3px rgba(60, 42, 20, 0.1);
+}
+.ad-bubble--user {
+  max-width: 82%;
+  padding: 10px 14px;
+  background: var(--ad-tinta);
+  color: var(--ad-papel);
+  border-bottom-right-radius: 5px;
+  font-size: 0.94rem;
+}
+.ad-bubble--agent {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 14px;
+  background: var(--ad-agent-bg);
+  border: 1.5px solid var(--ad-agent-borde);
+  border-bottom-left-radius: 5px;
+  color: var(--ad-agent-txt);
+}
+
+/* la lámina adjunta (el envoltorio lam-agente pinta su propio papel crema) */
+.ad-lamina { margin: 0 0 12px; }
+
+.ad-frases {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ad-frases li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--ad-agent-txt);
+}
+.ad-frases li::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0.6em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7fae86;
+}
+
+.ad-observa {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-left: 3px solid #7fae86;
+  border-radius: 6px;
+  background: rgba(127, 174, 134, 0.12);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  font-style: italic;
+  color: #d6e2d5;
+}
+.ad-observa-tag {
+  display: block;
+  margin-bottom: 2px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #9ecb9f;
+}
+
+/* el contrato metadata.lamina, a la vista (hook del backend) */
+.ad-meta {
+  margin: 0 0 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+.ad-meta-tag {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ad-agent-txt-2);
+}
+.ad-meta code {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace;
+  font-size: 0.76rem;
+  color: #cfe3d2;
+  white-space: nowrap;
+}
+
+.ad-redraw {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1.5px solid var(--ad-agent-borde);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ad-agent-txt);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 40px;
+}
+.ad-redraw:hover { background: rgba(255, 255, 255, 0.12); }
+
+/* ── pie ──────────────────────────────────────────────────────────────── */
+.ad-foot {
+  max-width: 640px;
+  margin: 24px auto 0;
+  padding-top: 14px;
+  border-top: 1px dashed var(--ad-linea);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ad-tinta-2);
+  text-align: center;
+}
+.ad-foot strong { color: var(--ad-verde); }
+
+@media (max-width: 380px) {
+  .ad-bubble--user { max-width: 90%; font-size: 0.9rem; }
+  .ad-avatar { width: 28px; height: 28px; }
+}
