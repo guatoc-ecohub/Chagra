@@ -132,6 +132,9 @@ const LUGARES = [
   // El mercado, abajo en la tierra caliente, cerca de la salida a la plaza: el
   // puesto con su toldo donde la cosecha de la finca sale a venderse.
   { id: 'mercado', pos: [1.2, 0, 6.6], escala: 1, tipo: 'mercado' },
+  // El semillero, abajo cerca de la casa: el túnel de media-sombra donde nace y
+  // se cría la matica antes de salir al lote. (anti-conflicto: lugar nuevo al final.)
+  { id: 'semillero', pos: [-2.6, 0, 6.2], escala: 1, tipo: 'semillero' },
 ];
 
 /**
@@ -331,4 +334,6 @@ export const NARRACION = {
     'La plaza campesina. Aquí llega su cosecha derecho a la mesa: venda directo, con su sello y a precio justo.',
   pisos:
     'Suba por la montaña: del cálido al páramo, cada piso con lo suyo. Arriba manda el frailejón, que le peina el agua a la niebla y la entrega despacio al suelo. Por eso el páramo se cuida, no se ara.',
+  semillero:
+    'El semillero, bajo su túnel de media-sombra. Aquí nace la matica: la semilla despierta en la bandeja, se repica a la bolsa y se endurece al sol antes de irse al campo. Del grano fuerte sale la finca fuerte.',
 };

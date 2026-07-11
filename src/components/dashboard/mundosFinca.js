@@ -261,6 +261,21 @@ export const MUNDOS_FINCA = [
             { view: 'seguimiento_paramo', label: 'Páramo', desc: 'Conservación del páramo y su agua', emoji: '🏔️' },
         ],
     },
+    {
+        id: 'semillero',
+        titulo: 'Semillero y vivero',
+        emoji: '🌱',
+        lema: 'Del grano a la plántula: germine, repique y endurezca antes de llevar al campo',
+        // Verde tierno de vivero (distinto del verde de trabajo de Cultivos).
+        tinte: ['#4f9d5b', '#e6f0cf'],
+        entradas: [
+            { view: 'germinacion', label: 'Semilleros: qué nace', desc: 'Ponga a germinar en bandeja, con sustrato suelto y humedad, y vea cuáles semillas prenden', emoji: '🫘' },
+            { view: 'semilla', label: 'Semilla propia', desc: 'Seleccione, guarde y pruebe su semilla criolla — cuándo le sale mejor que la comprada', emoji: '🌾' },
+            { view: 'sembrar', label: 'Repicar y llevar al campo', desc: 'Anote el trasplante de la bandeja a la bolsa o la era, y de ahí al lote', emoji: '🌱' },
+            { view: 'ciclo', label: 'Cómo va la matica', desc: 'La vida de la plántula etapa por etapa, del brote al endurecimiento', emoji: '🔄' },
+            { view: 'calendario_finca', label: 'Cuándo sembrar', desc: 'Las fechas de semillero y trasplante para su clima', emoji: '🗓️' },
+        ],
+    },
 ];
 
 /** Mapa id → mundo, para resolver desde la ruta 'mundo'. */

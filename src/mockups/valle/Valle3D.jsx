@@ -390,6 +390,34 @@ function LandmarkGeom({ tipo, tinte, reducedMotion }) {
       );
     case 'veleta': // poste con veleta que gira con el viento
       return <Veleta color={fuerte} reducedMotion={reducedMotion} />;
+    case 'semillero': // túnel de media-sombra del vivero: arcos + techo traslúcido + bandeja
+      return (
+        <group>
+          {/* los arcos del túnel (medio-toroide de pie), en tono madera */}
+          {[-0.42, 0, 0.42].map((dz, i) => (
+            <mesh key={i} position={[0, 0, dz]}>
+              <torusGeometry args={[0.5, 0.028, 6, 18, Math.PI]} />
+              <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+            </mesh>
+          ))}
+          {/* el techo de media-sombra (traslúcido) que cubre los arcos */}
+          <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.5, 0.5, 1.0, 16, 1, true, Math.PI, Math.PI]} />
+            <meshStandardMaterial color={suave} transparent opacity={0.4} side={2} roughness={1} />
+          </mesh>
+          {/* la bandeja germinadora adentro, con sus brotecitos */}
+          <mesh position={[0, 0.12, 0]}>
+            <boxGeometry args={[0.5, 0.08, 0.6]} />
+            <meshStandardMaterial color="#5a4326" flatShading roughness={1} />
+          </mesh>
+          {[[-0.14, -0.18], [0.02, 0], [0.16, 0.2], [-0.06, 0.22], [0.1, -0.2]].map(([bx, bz], i) => (
+            <mesh key={i} position={[bx, 0.24, bz]}>
+              <coneGeometry args={[0.045, 0.16, 5]} />
+              <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            </mesh>
+          ))}
+        </group>
+      );
     default:
       return (
         <mesh position={[0, 0.3, 0]}>
