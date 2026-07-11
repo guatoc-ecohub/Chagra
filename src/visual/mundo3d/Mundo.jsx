@@ -4,9 +4,10 @@
  *   <Mundo mundoId tier reducedMotion onHotspot onSalir animo energia
  *          estadoFinca hayAlerta />
  *
- * `estadoFinca` = { clima, enso, cosechaReciente, saludFinca } — el estado REAL
- * de la finca que Angelita SIEMPRE refleja (auditoría §5b). Sin pasar nada, las
- * escenas usan la MUESTRA de reaccionFinca.js; codex lo cabla con useFincaViva.
+ * `estadoFinca` = { clima, enso, cosechaReciente, saludFinca, animales } — el
+ * estado REAL de la finca que Angelita SIEMPRE refleja (auditoría §5b). Si el
+ * host no lo pasa, se cose aquí con `useFincaViva()` (el espejo vivo del dato
+ * real, offline-first y anti-fabricación); un `estadoFinca` explícito lo pisa.
  *
  * Lee el registro `MUNDO[mundoId]`, resuelve el PLAN con `resolverMundo` (que
  * cruza el arquetipo con el device-tier) y monta lo que toca:
@@ -22,6 +23,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react
 import { resolverMundo, tinteDeMundo, tituloDeMundo, emojiDeMundo } from './resolverMundo.js';
 import Mundo2D from './Mundo2D.jsx';
 import useAudioMundo from './useAudioMundo.js';
+import useFincaViva from './useFincaViva.js';
 import InvitacionAudioMundo from './InvitacionAudioMundo.jsx';
 import './mundo.css';
 
@@ -120,6 +122,14 @@ function MundoInterno({
      la transición. Gate interno: toggle opt-in + gesto previo + reduced-motion. */
   useAudioMundo({ mundoId, reducedMotion });
 
+  /* El ESPEJO VIVO del dato real (auditoría §5b): si el host no pasó un
+     `estadoFinca` explícito, lo cosemos aquí desde la finca real (salud, clima,
+     ENSO, cosecha reciente, hato). Three-free y anti-fabricación; un
+     `estadoFinca` pasado por el host manda (p. ej. una vitrina que fije su
+     muestra). Se llama SIEMPRE (antes de cualquier return) por regla de hooks. */
+  const fincaViva = useFincaViva();
+  const estadoReal = estadoFinca ?? fincaViva;
+
   const alTimeout3D = useCallback(() => setCaido3d(true), []);
   const reintentar3D = useCallback(() => {
     setIntento((n) => n + 1);
@@ -165,6 +175,12 @@ function MundoInterno({
 
   if (plan.modo === '3d') {
     if (!Escena) return null;
+    /* El hato REAL cosido al corral: si el espejo vivo trae animales, pisan la
+       muestra de `params.animales` (recinto); si no (hoy: sin fuente de hato),
+       el corral conserva su hato de muestra — no fabricamos animales. */
+    const paramsEscena = estadoReal?.animales?.length
+      ? { ...plan.entrada.params, animales: estadoReal.animales }
+      : plan.entrada.params;
     return (
       <div className="mundo-root" data-dim="3d" data-mundo={mundoId}>
         <Suspense fallback={<MundoCargando tinte={tinte} onTimeout={alTimeout3D} />}>
@@ -175,7 +191,7 @@ function MundoInterno({
           {/* eslint-disable-next-line react-hooks/static-components */}
           <Escena
             mundoId={mundoId}
-            params={plan.entrada.params}
+            params={paramsEscena}
             hotspots={plan.entrada.hotspots}
             entrada={plan.entrada.entrada}
             tinte={tinte}
@@ -185,7 +201,7 @@ function MundoInterno({
             onSalir={onSalir}
             animo={animo}
             energia={energia}
-            estadoFinca={estadoFinca}
+            estadoFinca={estadoReal}
             hayAlerta={hayAlerta}
             hablando={hablando}
             focoId={focoId}
