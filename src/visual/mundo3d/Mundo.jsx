@@ -1,7 +1,12 @@
 /*
  * <Mundo> — EL HOST ÚNICO del framework de mundos (2D + 3D en una sola pieza).
  *
- *   <Mundo mundoId tier reducedMotion onHotspot onSalir animo energia />
+ *   <Mundo mundoId tier reducedMotion onHotspot onSalir animo energia
+ *          estadoFinca hayAlerta />
+ *
+ * `estadoFinca` = { clima, enso, cosechaReciente, saludFinca } — el estado REAL
+ * de la finca que Angelita SIEMPRE refleja (auditoría §5b). Sin pasar nada, las
+ * escenas usan la MUESTRA de reaccionFinca.js; codex lo cabla con useFincaViva.
  *
  * Lee el registro `MUNDO[mundoId]`, resuelve el PLAN con `resolverMundo` (que
  * cruza el arquetipo con el device-tier) y monta lo que toca:
@@ -99,6 +104,7 @@ function MigaVolver({ onSalir, mundoId }) {
 function MundoInterno({
   mundoId, tier = 'alto', reducedMotion = false, onHotspot, onSalir, animo = 'sereno', energia = 1,
   hablando = false, focoId = null, focoToken = 0,
+  estadoFinca = undefined, hayAlerta = false, // undefined → la escena usa su MUESTRA
 }) {
   /* CAÍDA DIGNA (BUG-UX-05 / SPEC-UX-05): si el chunk 3D no baja en
      CARGA_3D_TIMEOUT_MS, caemos al espejo 2D del mundo. `intento` fabrica un
@@ -179,6 +185,8 @@ function MundoInterno({
             onSalir={onSalir}
             animo={animo}
             energia={energia}
+            estadoFinca={estadoFinca}
+            hayAlerta={hayAlerta}
             hablando={hablando}
             focoId={focoId}
             focoToken={focoToken}

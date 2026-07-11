@@ -26,6 +26,7 @@ import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaEscena } from './useEntradaAbeja.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
+import { ESTADO_FINCA_MUESTRA } from './reaccionFinca.js';
 import useHaptics from '../useHaptics.js';
 /* La dirección de arte compartida (hora dorada + cielos por familia) vive en
    un módulo propio: los arquetipos eligen su CIELOS.<familia>, esta base la
@@ -35,6 +36,7 @@ import { ATMOSFERA, CIELOS, mezclar } from '../atmosferaMadre.js';
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
   frugal = false, hablando = false, focoId = null, focoToken = 0,
+  estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false,
   children,
 }) {
   const controls = useRef(null);
@@ -175,6 +177,8 @@ function Contenido({
         rebote={rebote}
         animo={animo}
         energia={energia}
+        estadoFinca={estadoFinca}
+        hayAlerta={hayAlerta}
         reducedMotion={reducedMotion}
         piso={piso}
       />
@@ -201,7 +205,11 @@ function Contenido({
 export default function EscenaBase3D({
   params, hotspots, entrada, tinte, reducedMotion,
   onHotspot, cielo, animo = 'sereno', energia = 1, camara, piso = 0, tier = 'alto',
-  hablando = false, focoId = null, focoToken = 0, children,
+  hablando = false, focoId = null, focoToken = 0,
+  /* El estado REAL de la finca (auditoría §5b): Angelita SIEMPRE lo refleja.
+     Hoy MUESTRA (reaccionFinca); codex lo cabla con useFincaViva sin tocar
+     esta interfaz. `hayAlerta` la pone atenta si hay algo del día pendiente. */
+  estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false, children,
 }) {
   const [listo, setListo] = useState(false);
   const zoom = entrada?.zoom ?? 6.5;
@@ -236,6 +244,8 @@ export default function EscenaBase3D({
           hablando={hablando}
           focoId={focoId}
           focoToken={focoToken}
+          estadoFinca={estadoFinca}
+          hayAlerta={hayAlerta}
         >
           {children}
         </Contenido>
