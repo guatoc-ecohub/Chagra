@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-11T19:46:48.553Z",
-  "totalErrors": 1023,
+  "generatedAt": "2026-07-11T20:03:25.863Z",
+  "totalErrors": 1029,
   "byFile": {
     "node_modules/fake-indexeddb/auto/index.mjs": 1,
     "node_modules/fake-indexeddb/build/esm/FDBFactory.js": 4,
@@ -346,6 +346,7 @@
     "src/utils/plantMeta.test.js": 3,
     "src/utils/speciesResolver.test.js": 3,
     "src/visual/creatures/AbejaAngelita.jsx": 9,
+    "src/visual/creatures/FaunaRubberhose.jsx": 6,
     "src/visual/creatures/_rubberhose.jsx": 42,
     "src/visual/mundo3d/MicrofaunaSuelo.jsx": 6,
     "src/visual/mundo3d/TransicionMundo.jsx": 1,
