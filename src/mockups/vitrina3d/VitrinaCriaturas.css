@@ -1,0 +1,436 @@
+/*
+ * VitrinaCriaturas.css — cuaderno de laboratorio andino.
+ * Crema tibia, tinta profunda, verde páramo. Mobile-first (320px), aprovecha
+ * el escritorio con una grilla fluida. Solo transform/opacity animados.
+ */
+
+.vitrina {
+  --v-crema: #fbf5e9;
+  --v-crema-2: #f4ead4;
+  --v-tinta: #2a2016;
+  --v-tinta-suave: #6b5c46;
+  --v-verde: #3f8f4e;
+  --v-verde-hondo: #2f6d43;
+  --v-borde: #e3d5b8;
+  --v-sombra: rgba(58, 44, 22, 0.14);
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 80% at 50% -10%, #fffaf0 0%, var(--v-crema) 55%, var(--v-crema-2) 100%);
+  color: var(--v-tinta);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Cabecera ─────────────────────────────────────────────────────────────── */
+.vitrina__head {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 14px clamp(12px, 4vw, 28px) 10px;
+  background: rgba(251, 245, 233, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--v-borde);
+}
+
+.vitrina__headMain {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.vitrina__back {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  padding: 7px 13px;
+  border: 1px solid var(--v-borde);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--v-tinta);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.vitrina__back:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--v-sombra);
+}
+
+.vitrina__title {
+  margin: 0;
+  font-size: clamp(1.15rem, 4.2vw, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.vitrina__sub {
+  margin: 3px 0 0;
+  max-width: 62ch;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--v-tinta-suave);
+}
+
+/* Controles globales */
+.vitrina__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  max-width: 1180px;
+  margin: 12px auto 0;
+}
+
+.vitrina__ctl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vitrina__ctlLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--v-tinta-suave);
+}
+
+.vitrina__segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--v-crema-2);
+  border: 1px solid var(--v-borde);
+}
+
+.vitrina__seg {
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--v-tinta-suave);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.vitrina__seg.is-on {
+  background: var(--v-verde);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(47, 109, 67, 0.35);
+}
+
+.vitrina__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--v-tinta);
+  cursor: pointer;
+}
+.vitrina__toggle input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--v-verde);
+  cursor: pointer;
+}
+
+/* Navegación por secciones */
+.vitrina__tabs {
+  display: flex;
+  gap: 8px;
+  max-width: 1180px;
+  margin: 12px auto 0;
+  padding-bottom: 2px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vitrina__tab {
+  flex: 0 0 auto;
+  padding: 7px 14px;
+  border: 1px solid var(--v-borde);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--v-tinta-suave);
+  font-size: 0.83rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.vitrina__tab:hover {
+  transform: translateY(-1px);
+}
+.vitrina__tab.is-on {
+  background: var(--v-tinta);
+  color: var(--v-crema);
+  border-color: var(--v-tinta);
+}
+
+/* ── Cuerpo ───────────────────────────────────────────────────────────────── */
+.vitrina__body {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(14px, 3vw, 26px) clamp(12px, 4vw, 28px) 60px;
+}
+
+.vitrina__sectionCtl,
+.vitrina__section .vitrina__sectionCtl {
+  margin-bottom: 14px;
+}
+
+.vitrina__grid {
+  display: grid;
+  gap: clamp(14px, 2.5vw, 22px);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+}
+.vitrina__grid--wide {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+}
+
+/* ── Tarjeta de demo ──────────────────────────────────────────────────────── */
+.vitrina__card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--v-borde);
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 6px 20px var(--v-sombra);
+}
+
+.vitrina__stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  min-height: 180px;
+  background:
+    linear-gradient(180deg, #fffdf8 0%, #f7efdd 100%);
+  border-bottom: 1px solid var(--v-borde);
+}
+.vitrina__card--creature .vitrina__stage {
+  background:
+    radial-gradient(70% 70% at 50% 40%, #fffef9 0%, #f3ead6 100%);
+}
+.vitrina__card--canvas .vitrina__stage,
+.vitrina__card--dom .vitrina__stage {
+  padding: 0;
+  min-height: unset;
+}
+
+.vitrina__creatureWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+}
+
+/* Anfitrión de canvas / lienzos 3D */
+.vitrina__lienzoWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 260px;
+  background: #eef2e6;
+}
+.vitrina__lienzoWrap--tall {
+  aspect-ratio: 3 / 4;
+  min-height: 380px;
+}
+.vitrina__lienzo {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+/* los mundos 3D con canvas propio llenan su contenedor */
+.vitrina__lienzoWrap > .microfauna,
+.vitrina__lienzoWrap > .ciclo-mata,
+.vitrina__lienzoWrap > .vcalma {
+  width: 100%;
+  height: 100%;
+}
+
+.vitrina__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--v-tinta-suave);
+  background: #eef2e6;
+}
+
+/* Estados DOM */
+.vitrina__domStage {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(180deg, #f0f6ec 0%, #e6efdd 100%);
+}
+
+.vitrina__onbStage {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  overflow: hidden;
+}
+.vitrina__onbFondo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #cfe6f2 0%, #f4ecd2 68%, #d9e6c2 100%);
+}
+.vitrina__onbSol {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  width: 74px;
+  height: 74px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff3c9 0%, #ffd980 60%, rgba(255, 217, 128, 0) 72%);
+}
+.vitrina__onbCerro {
+  position: absolute;
+  bottom: 0;
+  left: -8%;
+  width: 70%;
+  height: 55%;
+  background: #7ba05b;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  opacity: 0.9;
+}
+.vitrina__onbCerro--2 {
+  left: auto;
+  right: -10%;
+  width: 66%;
+  height: 46%;
+  background: #6a9350;
+  opacity: 0.85;
+}
+
+/* ── Meta de la tarjeta ───────────────────────────────────────────────────── */
+.vitrina__meta {
+  padding: 13px 15px 15px;
+}
+.vitrina__cardTitle {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+.vitrina__cardDesc {
+  margin: 5px 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--v-tinta-suave);
+}
+
+.vitrina__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 11px;
+}
+.vitrina__chip {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--v-crema-2);
+  border: 1px solid var(--v-borde);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--v-tinta-suave);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+/* ── Controles locales dentro de una tarjeta / sección ────────────────────── */
+.vitrina__localCtl {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  padding: 12px 15px;
+  border-top: 1px dashed var(--v-borde);
+  background: #fffdf7;
+}
+
+.vitrina__field {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--v-tinta);
+}
+.vitrina__field select {
+  padding: 5px 9px;
+  border: 1px solid var(--v-borde);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--v-tinta);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.vitrina__field--range {
+  gap: 9px;
+}
+.vitrina__field--range input[type='range'] {
+  width: 140px;
+  accent-color: var(--v-verde);
+  cursor: pointer;
+}
+
+.vitrina__mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--v-tinta);
+  cursor: pointer;
+}
+.vitrina__mini input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--v-verde);
+  cursor: pointer;
+}
+
+.vitrina__relaunch {
+  padding: 7px 14px;
+  border: 1px solid var(--v-verde);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--v-verde-hondo);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.vitrina__relaunch:hover {
+  background: var(--v-verde);
+  color: #fff;
+}
+
+.vitrina__sectionCtl .vitrina__field select {
+  min-width: 130px;
+}
+
+@media (max-width: 480px) {
+  .vitrina__headMain {
+    flex-wrap: wrap;
+  }
+  .vitrina__field--range input[type='range'] {
+    width: 108px;
+  }
+}
