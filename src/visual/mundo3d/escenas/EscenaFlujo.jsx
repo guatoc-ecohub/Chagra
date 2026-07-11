@@ -1,33 +1,35 @@
 /*
- * EscenaFlujo — ARQUETIPO `flujo`: el CAMINO del agua (gravedad y pendiente).
+ * EscenaFlujo — ARQUETIPO `flujo`: un PROCESO que baja por gravedad y agua.
  *
- * El agua se entiende por dónde BAJA: nacimiento → quebrada → toma → riego.
- * Una cinta-tubo que desciende por una curva (la pendiente ES la lección), un
- * tanque que la recibe, y — si el mundo los declara en `params.hitos` — los
- * HITOS del recorrido, todos por DATOS y anclados a la curva por su fracción t:
+ * El arquetipo gold-standard del mundo del agua (nacimiento → quebrada → toma →
+ * riego). Una cinta-tubo que desciende por una curva (la pendiente ES la
+ * lección), un tanque que la recibe, y — si el mundo los declara en
+ * `params.hitos` — los HITOS del recorrido, todos por DATOS y anclados a la
+ * curva por su fracción t:
  *
- *   · ronda    { tramo:[t0,t1], arboles }  franja de monte que protege el nacimiento
+ *   · ronda    { tramo:[t0,t1], arboles }  franja de monte / árboles de sombra
  *   · riesgo   { t, lado }                 punto de CUIDADO (ámbar, didáctico — no alarma)
- *   · bocatoma { t }                       la cajilla que toma el agua
- *   · cultivo  { pos:[x,y,z], surcos }     la huerta regada, con su canalito desde el tanque
+ *   · bocatoma { t }                       la cajilla que toma / la despulpadora
+ *   · cultivo  { pos:[x,y,z], surcos }     la huerta o el cafetal en surcos
+ *   · cerezas  { tramo:[t0,t1], n }        (café) las cerezas maduras en los cafetos
+ *   · taza     { pos:[x,y,z] }             (café) el final feliz: de la cereza a la taza
+ *   · fauna    [{ tipo, pos, escala }]     criaturas de la librería (colibrí, mariposa)
  *
- * Sin `hitos` el diorama clásico sigue idéntico (nacimiento + cinta + tanque).
+ * El MISMO arquetipo sirve al agua (el recorrido de la quebrada) y al café (el
+ * beneficio húmedo: cereza → despulpado → fermento → lavado → secado → taza,
+ * verdad agronómica de gravedad + agua). Un mundo lo reparametriza con datos:
+ * `params.cielo` tiñe el ambiente y `params.flujo` el color de lo que baja
+ * (agua azul o miel-café). Sin esos datos, el mundo del agua queda idéntico.
+ *
  * Todo primitivas low-poly (`MeshLambert`/`MeshBasic`), sin sombras, sin GLTF.
  */
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import EscenaBase3D from './EscenaBase3D.jsx';
-import { Fauna } from './FaunaEscena.jsx';
-
-/* La vida del agua, por criterio ecológico: mariposas revoloteando sobre la
-   quebrada, un colibrí en las flores de la ribera (junto a la ronda de monte),
-   y otra mariposa polinizando la huerta regada. Anclada a la curva del agua. */
-const FAUNA_FLUJO = [
-  { tipo: 'colibri', base: [-1.35, 1.75, 0.7], patron: 'revoloteo', size: 30, fase: 0.4 },
-  { tipo: 'mariposa', base: [-0.15, 0.98, 0.72], patron: 'revoloteo', size: 30, fase: 1.6 },
-  { tipo: 'mariposa', base: [2.1, 0.1, -0.15], patron: 'revoloteo', size: 28, fase: 3.0 },
-];
+import { Colibri } from '../../creatures/Colibri.jsx';
+import { Mariposa } from '../../creatures/Mariposa.jsx';
 
 const CURVA_DEFAULT = [
   [-1.8, 2.2, 0.4], [-0.9, 1.4, 0.1], [0, 0.7, -0.2], [0.7, 0.1, 0.1], [1.4, -0.2, 0.5],
@@ -199,8 +201,96 @@ function Cultivo({ pos = [2.3, -0.3, -0.55], surcos = 4, desde, color }) {
   );
 }
 
+/* CEREZAS de café sembradas sobre los cafetos del tramo alto (donde va la
+   sombra). Determinista: mismo dato, misma cosecha. Unas verdes (biches), casi
+   todas maduras (rojas) — la señal de que ya se pueden coger. */
+function Cerezas({ curva3, tramo = [0.06, 0.5], n = 10 }) {
+  const puestas = useMemo(() => {
+    const [t0, t1] = tramo;
+    return Array.from({ length: n }, (_, i) => {
+      const t = t0 + ((t1 - t0) * i) / Math.max(1, n - 1);
+      const p = curva3.getPoint(t);
+      const lado = i % 2 === 0 ? 1 : -1;
+      return {
+        key: i,
+        pos: [
+          p.x + lado * (0.5 + (i % 3) * 0.12),
+          p.y + 0.02 + (i % 2) * 0.14,
+          p.z + lado * (0.55 + (i % 2) * 0.1),
+        ],
+        verde: i % 4 === 0,
+        r: 0.07 + (i % 3) * 0.012,
+      };
+    });
+  }, [curva3, tramo, n]);
+  return (
+    <group>
+      {puestas.map((c) => (
+        <mesh key={c.key} position={c.pos}>
+          <sphereGeometry args={[c.r, 8, 6]} />
+          <meshLambertMaterial color={c.verde ? '#8fae4e' : '#c0402c'} flatShading />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* La TAZA al final del recorrido: el beneficio termina volviéndose café. Un
+   pocillo de cerámica (cono truncado) con su asa (torus), el café adentro y su
+   platico — "de la cereza a la taza". Primitivas blandas, cero cajas. */
+function Taza({ pos = [1.75, -0.12, 0.55] }) {
+  return (
+    <group position={pos}>
+      {/* el platico */}
+      <mesh position={[0, 0.02, 0]}>
+        <cylinderGeometry args={[0.3, 0.32, 0.05, 20]} />
+        <meshLambertMaterial color="#f3ece0" flatShading />
+      </mesh>
+      {/* el pocillo (cono truncado) */}
+      <mesh position={[0, 0.19, 0]}>
+        <cylinderGeometry args={[0.22, 0.17, 0.28, 20]} />
+        <meshLambertMaterial color="#f6efe4" flatShading />
+      </mesh>
+      {/* el café adentro */}
+      <mesh position={[0, 0.32, 0]}>
+        <cylinderGeometry args={[0.2, 0.2, 0.02, 20]} />
+        <meshLambertMaterial color="#3f2412" />
+      </mesh>
+      {/* el asa */}
+      <mesh position={[0.24, 0.19, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.09, 0.025, 8, 16]} />
+        <meshLambertMaterial color="#f0e6d6" flatShading />
+      </mesh>
+    </group>
+  );
+}
+
+/* FAUNA de la librería posada en la escena (colibrí que poliniza la flor del
+   café, mariposa que visita). Billboards `<Html>` con las creatures reales; con
+   reduced-motion se congelan (`animated=false`), escena digna, no muerta. */
+function FaunaFlujo({ fauna = [], reducedMotion }) {
+  return (
+    <group>
+      {fauna.map((f, i) => {
+        const Bicho = f.tipo === 'mariposa' ? Mariposa : Colibri;
+        const base = f.tipo === 'mariposa' ? 44 : 52;
+        const size = Math.round(base * (f.escala || 1));
+        return (
+          <group key={i} position={f.pos}>
+            <Html center distanceFactor={7} zIndexRange={[22, 6]}>
+              <div className="mundo-fauna" aria-hidden="true" style={{ pointerEvents: 'none' }}>
+                <Bicho size={size} animated={!reducedMotion} />
+              </div>
+            </Html>
+          </group>
+        );
+      })}
+    </group>
+  );
+}
+
 function Diorama({ params, tinte, reducedMotion }) {
-  const color = params?.agua || (tinte && tinte[0]) || '#3f8fb0';
+  const color = params?.flujo || params?.agua || (tinte && tinte[0]) || '#3f8fb0';
   const hitos = params?.hitos;
   const curva3 = useMemo(() => {
     const pts = (params?.curva || CURVA_DEFAULT).map((p) => new THREE.Vector3(p[0], p[1], p[2]));
@@ -243,14 +333,20 @@ function Diorama({ params, tinte, reducedMotion }) {
           color={color}
         />
       )}
-      {/* la vida que vive del agua: mariposas y un colibrí de ribera */}
-      <Fauna items={FAUNA_FLUJO} reducedMotion={reducedMotion} />
+      {/* enriquecimientos por datos (café): cerezas, la taza y la fauna */}
+      {hitos?.cerezas && <Cerezas curva3={curva3} tramo={hitos.cerezas.tramo} n={hitos.cerezas.n} />}
+      {hitos?.taza && <Taza pos={hitos.taza.pos} />}
+      {hitos?.fauna && <FaunaFlujo fauna={hitos.fauna} reducedMotion={reducedMotion} />}
     </group>
   );
 }
 
 export default function EscenaFlujo(props) {
-  const cielo = { fondo: '#d9e8ec', cielo: '#eaf3f5', suelo: '#7f9270', intensidad: 1.1 };
+  // El agua trae su cielo azulado por defecto; un mundo (p. ej. el café) puede
+  // teñir el ambiente cálido/verde de montaña con `params.cielo`.
+  const cielo = props.params?.cielo || {
+    fondo: '#d9e8ec', cielo: '#eaf3f5', suelo: '#7f9270', intensidad: 1.1,
+  };
   return (
     <EscenaBase3D {...props} cielo={cielo} entrada={{ ...props.entrada, centro: [0, 0.9, 0.3] }}>
       <Diorama params={props.params} tinte={props.tinte} reducedMotion={props.reducedMotion} />
