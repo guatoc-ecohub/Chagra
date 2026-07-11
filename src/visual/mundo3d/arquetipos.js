@@ -52,6 +52,15 @@ export const ARQUETIPOS = {
     nombre: 'La bóveda del cielo', clave: 'el cielo de la finca: hora del día + temporada bimodal andina',
     ejemplo: 'clima', tambien: [],
   },
+  // La huerta-clínica: la familia del `recinto` (un lugar cercado que se
+  // camina), pero su lección es el manejo SIN veneno — trampas cromáticas,
+  // biocontrol (Beauveria/Metarhizium), borde push-pull y enemigos naturales.
+  // En equipo humilde cae a su ficha 2D (infografía de la sanidad).
+  sanidad: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'sanidad', espejo: 'mirror',
+    nombre: 'La huerta-clínica', clave: 'el manejo agroecológico de plagas: trampas, biocontrol y enemigos naturales',
+    ejemplo: 'sanidad', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {
