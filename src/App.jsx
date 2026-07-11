@@ -155,6 +155,7 @@ const VitrinaInfraestructuraMockup = lazy(() => import('./mockups/vitrina3d/Vitr
 // animales, semillero, clima). Cada tarjeta previsualiza el mundo en su diorama
 // con su encuadre de cámara curado (camaraDioramas) + botón «Entrar» al host real.
 const VitrinaMundosMockup = lazy(() => import('./mockups/vitrina3d/VitrinaMundos'));
+const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -548,6 +549,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/vitrina-3d': 'mockup_vitrina_3d',
   'mockups/vitrina-infra': 'mockup_vitrina_infra',
   'mockups/vitrina-mundos': 'mockup_vitrina_mundos',
+  'mockups/sierra-global': 'mockup_sierra_global',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1753,6 +1755,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Vitrina de mundos 3D">
               <VitrinaMundosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_sierra_global':
+        // Vista global 3D de la Sierra Nevada de Santa Marta: el macizo maestro
+        // (Simmonds + Palomino, bandas de piso térmico, hora dorada). Territorio
+        // sagrado tratado con dignidad — crédito a Kogui/Arhuaco/Wiwa/Kankuamo.
+        // Ruta #/mockups/sierra-global, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Vista global Sierra Nevada">
+              <SierraGlobalMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
