@@ -24,20 +24,16 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, Float, Stars, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
 import { Colibri } from '../../visual/creatures/Colibri.jsx';
-import { MUNDOS_VALLE, MUNDO_VALLE_BY_ID, COSA_DEL_DIA, CLIMAS } from './valleData';
+import { MUNDOS_VALLE, MUNDO_VALLE_BY_ID, COSA_DEL_DIA, CLIMAS, alturaTerreno } from './valleData';
 
-/* Altura del terreno por (x,z): un valle suave con ladera al fondo (+z) donde
-   suben las terrazas del café. Determinista → los landmarks se posan encima. */
-function alturaTerreno(x, z) {
-  const ladera = Math.max(0, (z + 2) * 0.16);
-  const ondul = Math.sin(x * 0.5) * 0.08 + Math.cos(z * 0.4) * 0.06;
-  const cauce = -0.28 * Math.exp(-((x - 0.6) ** 2) / 5) * Math.exp(-((z + 1) ** 2) / 40);
-  return ladera + ondul + cauce;
-}
+/* alturaTerreno vive en valleData.js (compartida con HolaChagraEscena3D sin
+   romper react-refresh). Los componentes del mundo (Terreno, Cordillera,
+   Quebrada, LandmarkGeom, Veleta) se exportan para que otras escenas del
+   valle COMPONGAN el mismo mundo sin redibujarlo. */
 
 /* ── El suelo del valle: malla ondulada de bajo poligonaje, color tierra-verde
       que se aclara al fondo (perspectiva aérea). ── */
-function Terreno({ colorBase }) {
+export function Terreno({ colorBase }) {
   const geo = useMemo(() => {
     const g = new THREE.PlaneGeometry(30, 30, 48, 48);
     g.rotateX(-Math.PI / 2);
@@ -58,7 +54,7 @@ function Terreno({ colorBase }) {
 }
 
 /* ── La cordillera de páramo al fondo: conos pálidos (perspectiva aérea). ── */
-function Cordillera({ color }) {
+export function Cordillera({ color }) {
   const picos = useMemo(
     () => [
       { x: -8, z: -12, h: 7, r: 5 },
@@ -81,8 +77,8 @@ function Cordillera({ color }) {
 }
 
 /* ── La quebrada: una cinta de agua que serpentea por el cauce. ── */
-function Quebrada({ color, viva }) {
-  const ref = useRef();
+export function Quebrada({ color, viva }) {
+  const ref = useRef(/** @type {any} */ (null));
   useFrame((state) => {
     if (viva && ref.current) {
       ref.current.material.opacity = 0.72 + Math.sin(state.clock.elapsedTime * 2) * 0.06;
@@ -114,7 +110,7 @@ function Quebrada({ color, viva }) {
 }
 
 /* ── Materiales/paletas de cada landmark de mundo, por `tipo`. ── */
-function LandmarkGeom({ tipo, tinte }) {
+export function LandmarkGeom({ tipo, tinte }) {
   const [fuerte, suave] = tinte;
   switch (tipo) {
     case 'milpa': // maíz: cañas altas con penacho
@@ -184,8 +180,8 @@ function LandmarkGeom({ tipo, tinte }) {
             <boxGeometry args={[0.9, 0.7, 0.8]} />
             <meshStandardMaterial color={suave} flatShading />
           </mesh>
-          <mesh position={[0, 0.85, 0]} castShadow>
-            <coneGeometry args={[0.72, 0.5, 4]} rotation={[0, Math.PI / 4, 0]} />
+          <mesh position={[0, 0.85, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
+            <coneGeometry args={[0.72, 0.5, 4]} />
             <meshStandardMaterial color={fuerte} flatShading />
           </mesh>
           {[-0.9, -0.5, 0.9, 1.3].map((dx, i) => (
@@ -235,7 +231,7 @@ function LandmarkGeom({ tipo, tinte }) {
         </group>
       );
     case 'veleta': // poste con veleta que gira con el viento
-      return <Veleta color={fuerte} />;
+      return <Veleta color={fuerte} reducedMotion={false} />;
     default:
       return (
         <mesh position={[0, 0.3, 0]}>
@@ -246,8 +242,8 @@ function LandmarkGeom({ tipo, tinte }) {
   }
 }
 
-function Veleta({ color, reducedMotion }) {
-  const ref = useRef();
+export function Veleta({ color, reducedMotion = false }) {
+  const ref = useRef(/** @type {any} */ (null));
   useFrame((state) => {
     if (ref.current && !reducedMotion) ref.current.rotation.y = state.clock.elapsedTime * 0.4;
   });
@@ -262,8 +258,8 @@ function Veleta({ color, reducedMotion }) {
           <boxGeometry args={[0.7, 0.06, 0.06]} />
           <meshStandardMaterial color={color} flatShading />
         </mesh>
-        <mesh position={[0.42, 0, 0]}>
-          <coneGeometry args={[0.14, 0.3, 4]} rotation={[0, 0, -Math.PI / 2]} />
+        <mesh position={[0.42, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
+          <coneGeometry args={[0.14, 0.3, 4]} />
           <meshStandardMaterial color={color} flatShading />
         </mesh>
       </group>
@@ -305,8 +301,8 @@ function MundoLugar({ mundo, activo, onEntrar, reducedMotion }) {
       Toca la señal → onAlerta() (el agente lo dice y ofrece LA acción). ── */
 function Beacon({ onAlerta, reducedMotion }) {
   const ancla = MUNDO_VALLE_BY_ID[COSA_DEL_DIA.anclaMundo];
-  const luz = useRef();
-  const halo = useRef();
+  const luz = useRef(/** @type {any} */ (null));
+  const halo = useRef(/** @type {any} */ (null));
   useFrame((state) => {
     if (reducedMotion) return;
     const p = (Math.sin(state.clock.elapsedTime * 1.6) + 1) / 2;
@@ -353,7 +349,7 @@ function Beacon({ onAlerta, reducedMotion }) {
 /* ── El compañero: el colibrí (visual-lib) flota sobre el foco activo y es la
       cara del agente. Reusa el SVG canónico de creatures. ── */
 function CompaneroColibri({ foco, reducedMotion }) {
-  const ref = useRef();
+  const ref = useRef(/** @type {any} */ (null));
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
@@ -367,7 +363,7 @@ function CompaneroColibri({ foco, reducedMotion }) {
     <group ref={ref} position={[foco.x + 0.9, foco.y + 2.2, foco.z + 0.6]}>
       <Html center distanceFactor={9} zIndexRange={[40, 10]}>
         <div className="valle-colibri" aria-hidden="true">
-          <Colibri size={54} animated={!reducedMotion} />
+          <Colibri size={54} animated={!reducedMotion} className="" />
         </div>
       </Html>
     </group>
@@ -402,7 +398,7 @@ function CamaraViajera({ foco, controls, autoOrbit }) {
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
 function Escena({ clima, focoId, onEntrar, onAlerta, reducedMotion }) {
-  const controls = useRef();
+  const controls = useRef(/** @type {any} */ (null));
   const c = CLIMAS[clima];
   const foco = useMemo(() => {
     const m = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;

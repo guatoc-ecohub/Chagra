@@ -94,6 +94,12 @@ const InventoryPage = lazy(() => import('./pages/InventoryPage'));
 // perezoso) donde los 4 sí-o-sí viven en el espacio. Ruta #/mockups/entrada-3d
 // — sin gate ni sesión (datos de muestra, degrada limpio a SVG sin WebGL).
 const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
+// Mockup dev "Hola, Chagra" (el mundo 3D del wake-word): el valle 3D en reposo
+// despierta cuando el campesino dice «hola, Chagra» — la abeja vuela al centro,
+// la voz toma forma (IrisVoz) y el agente responde en voz. Ruta
+// #/mockups/hola-chagra-3d — sin gate ni sesión (demo guionada, sin micrófono;
+// device-tiering real: gama baja ve la misma coreografía sobre el valle SVG).
+const HolaChagra3DMockup = lazy(() => import('./mockups/HolaChagra3D'));
 const BiopreparadosScreen = lazy(() => import('./components/biopreparados/BiopreparadosScreen'));
 const FarmMap = lazy(() => import('./components/FarmMap'));
 const WorkerDashboard = lazy(() => import('./components/WorkerDashboard').then(m => ({ default: m.WorkerDashboard })));
@@ -424,6 +430,7 @@ const LoadingFallback = ({ view = null }) => {
 
 const HASH_VIEW_ROUTES = {
   'mockups/entrada-3d': 'mockup_entrada_3d',
+  'mockups/hola-chagra-3d': 'mockup_hola_chagra_3d',
   agente: 'agente',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
@@ -1295,6 +1302,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de mi finca (3D)">
               <EntradaValle3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_hola_chagra_3d':
+        // Mockup "Hola, Chagra": el momento del wake-word como escena 3D viva
+        // — valle en reposo → la abeja despierta y vuela al centro → la voz
+        // toma forma (IrisVoz) → el agente responde en voz → la respuesta cae
+        // como una acción concreta. Full-screen, sin gate. Degrada a SVG (la
+        // misma coreografía) en gama baja o sin WebGL.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Hola, Chagra (mundo 3D)">
+              <HolaChagra3DMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );

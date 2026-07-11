@@ -1,0 +1,263 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   holaChagra3D.css — la piel del momento «hola, Chagra» (#/mockups/hola-chagra-3d).
+
+   Hereda la base del valle (entradaValle3D.css: .valle-root, .valle-header,
+   .valle-panel, .valle2d, .valle-cargando) y solo agrega la coreografía del
+   despertar: el velo de escucha, el hint del wake-word, el iris con su
+   conversación, y el vuelo de la abeja del tier 2D.
+
+   Reglas de la casa: solo transform/opacity animados; prefers-reduced-motion
+   apaga vuelos/tipeo/latidos y deja fotogramas dignos.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.hc3d {
+  overflow: hidden;
+}
+
+.hc3d__escena {
+  position: absolute;
+  inset: 0;
+}
+
+.hc3d__escena2d {
+  position: absolute;
+  inset: 0;
+}
+
+/* Durante el rito el mundo no se navega: los lugares del valle dibujado son
+   paisaje, no botones (el wrapper además va inert + aria-hidden). */
+.hc3d__escena2d .valle2d__poi,
+.hc3d__escena2d .valle2d__alerta {
+  pointer-events: none;
+}
+
+.hc3d__grade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ── El velo de escucha: al despertar, el mundo se recoge hacia el centro
+      (una sola cosa a la vez — el borde se aquieta, el centro queda vivo). ── */
+.hc3d__velo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  background: radial-gradient(
+    ellipse at 50% 44%,
+    transparent 32%,
+    rgba(10, 16, 13, 0.52) 100%
+  );
+}
+
+.hc3d:not([data-fase='reposo']) .hc3d__velo {
+  opacity: 1;
+}
+
+/* ── Texto solo para lectores de pantalla (estado del rito) ── */
+.hc3d-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── El hint del wake-word: UNA cosa clara en reposo ── */
+.hc3d__hint {
+  position: absolute;
+  left: 50%;
+  bottom: max(9vh, 3.5rem);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: min(92vw, 30rem);
+  text-align: center;
+}
+
+.hc3d__hint-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 1rem 2.2rem 1.15rem;
+  border-radius: 1.6rem;
+  border: 1px solid rgba(255, 224, 176, 0.4);
+  background: rgba(14, 22, 18, 0.62);
+  color: #fff6e6;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  animation: hc3d-hint-late var(--vfx-beat, 5.2s) ease-in-out infinite;
+  transition: transform 0.25s ease;
+}
+
+.hc3d__hint-btn:hover,
+.hc3d__hint-btn:focus-visible {
+  transform: scale(1.04);
+}
+
+.hc3d__hint-di {
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.hc3d__hint-frase {
+  font-size: clamp(1.35rem, 5.4vw, 1.8rem);
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.hc3d__hint-nota {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 246, 230, 0.72);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes hc3d-hint-late {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.018); }
+}
+
+/* ── El momento: iris + lo dicho, centrados donde el mundo mira ── */
+.hc3d__momento {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  padding: 0 1.25rem;
+  pointer-events: none;
+  text-align: center;
+}
+
+.hc3d__iris {
+  transition: transform 0.7s ease;
+  animation: hc3d-iris-entra 0.9s ease both;
+}
+
+/* Cuando la respuesta cae como acción, el iris se hace a un lado (rescoldo). */
+.hc3d[data-fase='accion'] .hc3d__iris {
+  transform: scale(0.55) translateY(-38%);
+}
+
+@keyframes hc3d-iris-entra {
+  from { opacity: 0; transform: scale(0.86); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.hc3d__dicho,
+.hc3d__transcripcion,
+.hc3d__estado-txt,
+.hc3d__respuesta {
+  margin: 0;
+  max-width: min(92vw, 34rem);
+  color: #fff6e6;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
+}
+
+.hc3d__dicho {
+  font-size: clamp(1.25rem, 5vw, 1.6rem);
+  font-weight: 650;
+  animation: hc3d-sube 0.6s ease both;
+}
+
+.hc3d__transcripcion {
+  font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+  font-weight: 550;
+  min-height: 2.6em;
+}
+
+.hc3d__cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 3px;
+  vertical-align: -0.12em;
+  background: #ffd9a0;
+  animation: hc3d-cursor 0.9s steps(1) infinite;
+}
+
+@keyframes hc3d-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.hc3d__estado-txt {
+  font-size: 1rem;
+  color: rgba(255, 232, 200, 0.85);
+  animation: hc3d-sube 0.5s ease both;
+}
+
+.hc3d__respuesta {
+  font-size: clamp(1.02rem, 4vw, 1.25rem);
+  line-height: 1.5;
+  animation: hc3d-sube 0.7s ease both;
+}
+
+@keyframes hc3d-sube {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── La acción concreta: reusa .valle-panel; aquí solo la posamos abajo ── */
+.hc3d__accion {
+  bottom: max(4.5vh, 1.5rem);
+}
+
+/* ── La abeja (Html del canvas 3D): transición de ánimo suave ── */
+.hc3d-abeja {
+  transition: transform 0.8s ease;
+  transform: scale(0.82);
+}
+
+.hc3d-abeja--despierta {
+  transform: scale(1);
+}
+
+/* ── La abeja del tier 2D: mismo ser, vuelo en DOM (solo transform).
+      Duerme abajo a la derecha (cerca de la huerta del valle dibujado) y al
+      despertar vuela al centro, un poco por encima del iris. ── */
+.hc3d-abeja2d {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(calc(-50% + 26vw), calc(-50% + 27vh)) scale(0.8);
+  transition: transform 1.9s cubic-bezier(0.22, 0.8, 0.3, 1);
+  will-change: transform;
+}
+
+.hc3d-abeja2d--centro {
+  transform: translate(-50%, calc(-50% - 8.5rem)) scale(1.1);
+}
+
+/* ── reduced-motion: fotogramas dignos, sin vuelos ni latidos ── */
+@media (prefers-reduced-motion: reduce) {
+  .hc3d__velo,
+  .hc3d__iris,
+  .hc3d-abeja,
+  .hc3d-abeja2d {
+    transition: none;
+  }
+
+  .hc3d__hint-btn,
+  .hc3d__cursor,
+  .hc3d__dicho,
+  .hc3d__estado-txt,
+  .hc3d__respuesta,
+  .hc3d__iris {
+    animation: none;
+  }
+}

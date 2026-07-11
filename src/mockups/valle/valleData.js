@@ -18,6 +18,19 @@
 
 import { MUNDO_BY_ID } from '../../components/dashboard/mundosFinca';
 
+/* ── EL TERRENO DEL VALLE (compartido por las escenas 3D) ────────────────────
+ * Altura del terreno por (x,z): un valle suave con ladera al fondo (+z) donde
+ * suben las terrazas del café. Determinista → los landmarks se posan encima.
+ * Vive aquí (módulo sin componentes) para que Valle3D y HolaChagraEscena3D la
+ * compartan sin romper react-refresh (only-export-components).
+ */
+export function alturaTerreno(x, z) {
+  const ladera = Math.max(0, (z + 2) * 0.16);
+  const ondul = Math.sin(x * 0.5) * 0.08 + Math.cos(z * 0.4) * 0.06;
+  const cauce = -0.28 * Math.exp(-((x - 0.6) ** 2) / 5) * Math.exp(-((z + 1) ** 2) / 40);
+  return ladera + ondul + cauce;
+}
+
 /* ── 2. LOS MUNDOS COMO LUGARES ─────────────────────────────────────────────
  * Un subconjunto curado de los mundos reales (mundosFinca.js) colocados en el
  * valle. `pos` = [x, y, z] en el terreno; `escala` y `tipo` deciden qué forma
@@ -40,7 +53,9 @@ const LUGARES = [
  * `titulo`, `emoji` y `tinte` verdaderos + la geometría de su lugar.
  */
 export const MUNDOS_VALLE = LUGARES.map((l) => {
-  const real = MUNDO_BY_ID[l.id] || {};
+  const real =
+    MUNDO_BY_ID[l.id] ||
+    /** @type {{ titulo?: string, emoji?: string, lema?: string, tinte?: string[] }} */ ({});
   return {
     ...l,
     titulo: real.titulo || l.id,
