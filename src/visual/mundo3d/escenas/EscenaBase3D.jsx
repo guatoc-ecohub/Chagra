@@ -33,6 +33,7 @@ import useHaptics from '../useHaptics.js';
    un módulo propio: los arquetipos eligen su CIELOS.<familia>, esta base la
    mezcla hacia ATMOSFERA. Una sola fuente, cero hexes sueltos. */
 import { ATMOSFERA, mezclarCielo } from '../atmosferaMadre.js';
+import CapaVivaMundo from '../CapaVivaMundo.jsx';
 
 /* El bloom sutil de la hora dorada: chunk LAZY con gate ESTRICTO
    `tier === 'alto' && !reducedMotion` — medio y bajo NI LO DESCARGAN
@@ -129,6 +130,19 @@ function Contenido({
       )}
 
       {children}
+
+      {/* CAPA VIVA: partículas de ambiente + momentos del dato real (nace/cosecha/
+          vende) + feedback del hotspot activo. Compone lo construido en la ola 3D;
+          manejada por estadoFinca (useFincaViva). Anti-fabricación: sin dato, capa
+          tranquila. Gates internos por tier/reducedMotion. */}
+      <CapaVivaMundo
+        estadoFinca={estadoFinca}
+        hotspots={hotspots}
+        hotspotActivoId={activo}
+        mundoId={params?.id || params?.tipo || 'valle'}
+        tier={tier}
+        reducedMotion={reducedMotion}
+      />
 
       {(hotspots || []).map((h) => {
         const esComando = resaltado.id === h.id;

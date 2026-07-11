@@ -2,14 +2,15 @@
  * i18n (ADR-050): copy de navegación del home en español Colombia, pendiente de
  * migrar a src/config/messages.js — mismo criterio que DashboardLive.jsx.
  */
-import { useMemo } from 'react';
 import { MUNDOS_FINCA } from './mundosFinca';
 import MundoVineta from './MundoVinetas';
 import { useProCapability } from '../../hooks/useProCapability';
 import usePrefsStore from '../../store/usePrefsStore';
 /* Import DIRECTO de deviceTier (no el barrel de mundo3d): este archivo vive en
    el bundle base del home y solo necesita el tiering (three-free, 0 deps). */
-import { decidirTier, permite3D } from '../../visual/mundo3d/deviceTier';
+// El tiering 3D-vs-2D lo decide el propio view EntradaValle3D; el home solo
+// muestra la puerta cuando el usuario prendió el flag. (Se quitó `permite3D`:
+// antes ocultaba la entrada en tier 'bajo' → prender el toggle no hacía nada.)
 import './mundos-finca.css';
 
 /**
@@ -99,9 +100,12 @@ export default function MundosDeMiFinca({ onNavigate, mostrarAnimales = true, pl
     // idéntico (es el fallback, no se toca). El tier se decide solo con el
     // flag prendido (decidirTier crea un canvas WebGL de prueba: no se paga
     // en cada render del home de todo el mundo).
+    // Si el usuario PRENDIÓ el toggle, la entrada SIEMPRE se muestra — antes un
+    // segundo gate `permite3D(tier)` la ocultaba en equipos tier 'bajo' (reduce-
+    // motion, poca RAM, saveData), así que prender el toggle "no hacía nada".
+    // El view (EntradaValle3D) ya cae a 2D digno en equipos humildes.
     const valle3dFlag = usePrefsStore((s) => s.valle3d);
-    const equipo3d = useMemo(() => (valle3dFlag ? decidirTier() : null), [valle3dFlag]);
-    const mostrarValle3d = Boolean(valle3dFlag && equipo3d && permite3D(equipo3d.tier));
+    const mostrarValle3d = Boolean(valle3dFlag);
 
     const abrir = (m) => {
         if (m.portada) onNavigate?.(m.portada);

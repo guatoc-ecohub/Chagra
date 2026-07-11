@@ -1,0 +1,343 @@
+/*
+ * VitrinaMundos — estilos de la galería de mundos 3D del valle
+ * (#/mockups/vitrina-mundos). Cuaderno de laboratorio andino: crema tibia,
+ * tinta profunda, verde páramo y el dorado de la hora dorada. Móvil-first
+ * (320px), táctil (controles >= 44px), autocontenido (cero CDN/imágenes).
+ * Solo transform/opacity animados; reduced-motion los apaga.
+ */
+
+.vmun {
+  --vmun-crema: #f7f1e2;
+  --vmun-papel: #fffaf0;
+  --vmun-tinta: #2c3324;
+  --vmun-tinta-suave: #5c6350;
+  --vmun-verde: #3f6f4e;
+  --vmun-verde-oscuro: #2d5039;
+  --vmun-dorado: #f2b134;
+  --vmun-borde: #d9cfb4;
+  --vmun-sombra: 0 2px 10px rgba(60, 52, 31, 0.12);
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  background:
+    radial-gradient(1200px 500px at 80% -10%, #fdf6e4 0%, transparent 60%),
+    var(--vmun-crema);
+  color: var(--vmun-tinta);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  padding-bottom: 3rem;
+}
+
+/* ── Cabecera ─────────────────────────────────────────────────────────────── */
+.vmun__head {
+  padding: 0.9rem 1rem 0.85rem;
+  border-bottom: 2px solid var(--vmun-borde);
+  background: linear-gradient(180deg, var(--vmun-papel) 0%, var(--vmun-crema) 100%);
+}
+
+.vmun__headMain {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.vmun__back {
+  flex: none;
+  min-height: 44px;
+  padding: 0.45rem 0.85rem;
+  border: 1.5px solid var(--vmun-borde);
+  border-radius: 999px;
+  background: var(--vmun-papel);
+  color: var(--vmun-tinta);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.vmun__back:active { transform: translateY(1px); }
+.vmun__back:focus-visible { outline: 3px solid var(--vmun-verde); outline-offset: 2px; }
+
+.vmun__kicker {
+  margin: 0 0 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--vmun-verde);
+}
+
+.vmun__title {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.2;
+  color: var(--vmun-verde-oscuro);
+  letter-spacing: 0.01em;
+}
+
+.vmun__sub {
+  margin: 0.3rem 0 0;
+  font-size: 0.87rem;
+  line-height: 1.45;
+  color: var(--vmun-tinta-suave);
+  max-width: 46rem;
+}
+
+/* ── Controles globales ───────────────────────────────────────────────────── */
+.vmun__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.1rem;
+  max-width: 72rem;
+  margin: 0.85rem auto 0;
+}
+
+.vmun__ctl { display: flex; align-items: center; gap: 0.5rem; }
+
+.vmun__ctlLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vmun-tinta-suave);
+}
+
+.vmun__segmented {
+  display: inline-flex;
+  border: 1.5px solid var(--vmun-borde);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--vmun-papel);
+}
+.vmun__seg {
+  min-height: 40px;
+  padding: 0.35rem 0.85rem;
+  border: 0;
+  background: transparent;
+  color: var(--vmun-tinta-suave);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.vmun__seg + .vmun__seg { border-left: 1.5px solid var(--vmun-borde); }
+.vmun__seg.is-on { background: var(--vmun-verde); color: #fff; }
+.vmun__seg:focus-visible { outline: 3px solid var(--vmun-verde-oscuro); outline-offset: -3px; }
+
+.vmun__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--vmun-tinta-suave);
+  cursor: pointer;
+}
+.vmun__toggle input { width: 18px; height: 18px; accent-color: var(--vmun-verde); }
+
+/* ── Cuerpo / grilla ──────────────────────────────────────────────────────── */
+.vmun__body { max-width: 72rem; margin: 0 auto; padding: 1rem; }
+
+.vmun__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 640px) {
+  .vmun__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1000px) {
+  .vmun__grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.vmun__card {
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid var(--vmun-borde);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--vmun-papel);
+  box-shadow: var(--vmun-sombra);
+}
+
+/* El escenario: caja de proporción fija; el diorama/afiche la llena. */
+.vmun__stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 220px;
+  background: #ece0c7;
+}
+
+.vmun__lienzo,
+.vmun__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* El diorama vive dentro (el <Canvas> del framework llena el 100%). */
+.vmun__lienzo { display: block; }
+.vmun__lienzo--2d { overflow: auto; background: var(--vmun-crema); }
+
+.vmun__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--vmun-tinta-suave);
+  background: #ece0c7;
+}
+
+/* El afiche de la tarjeta dormida: tinte del mundo + emoji grande. */
+.vmun__poster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 0;
+  cursor: pointer;
+  color: #fff;
+  background:
+    radial-gradient(120% 90% at 50% 12%, color-mix(in srgb, var(--a) 65%, #fff 0%) 0%, var(--a) 55%, var(--b) 130%);
+  -webkit-tap-highlight-color: transparent;
+}
+.vmun__posterEmoji {
+  font-size: clamp(2.6rem, 12vw, 3.6rem);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+  transition: transform 0.25s ease;
+}
+.vmun__poster:hover .vmun__posterEmoji { transform: scale(1.08) rotate(-3deg); }
+.vmun__posterTxt {
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+.vmun__posterHint {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  background: rgba(0, 0, 0, 0.22);
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+}
+.vmun__poster:focus-visible { outline: 4px solid #fff; outline-offset: -6px; }
+
+/* ── Metadatos de la tarjeta ──────────────────────────────────────────────── */
+.vmun__meta { padding: 0.75rem 0.85rem 0.85rem; display: flex; flex-direction: column; gap: 0.4rem; }
+
+.vmun__cardTitle {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.2;
+  color: var(--vmun-verde-oscuro);
+}
+.vmun__cardDesc {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--vmun-tinta-suave);
+}
+
+.vmun__acciones { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.2rem; }
+
+.vmun__prev,
+.vmun__entrar {
+  min-height: 44px;
+  padding: 0.5rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.vmun__prev {
+  border: 1.5px solid var(--vmun-borde);
+  background: var(--vmun-papel);
+  color: var(--vmun-tinta);
+}
+.vmun__entrar {
+  flex: 1 1 auto;
+  border: 0;
+  background: var(--vmun-verde);
+  color: #fff;
+}
+.vmun__entrar:active,
+.vmun__prev:active { transform: translateY(1px); }
+.vmun__entrar:focus-visible,
+.vmun__prev:focus-visible { outline: 3px solid var(--vmun-verde-oscuro); outline-offset: 2px; }
+
+.vmun__pie {
+  max-width: 46rem;
+  margin: 1.25rem auto 0;
+  padding: 0 0.25rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--vmun-tinta-suave);
+  text-align: center;
+}
+
+/* ── Pantalla completa: el mundo real ─────────────────────────────────────── */
+.vmun__full {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: #ece0c7;
+}
+
+.vmun__fullStage { position: relative; flex: 1 1 auto; min-height: 0; }
+.vmun__fullStage .mundo-root { border-radius: 0; height: 100%; }
+
+.vmun__salir {
+  position: absolute;
+  top: max(0.6rem, env(safe-area-inset-top));
+  right: 0.6rem;
+  z-index: 62;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(20, 30, 20, 0.55);
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+.vmun__salir:active { transform: translateY(1px); }
+.vmun__salir:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+.vmun__pista {
+  flex: none;
+  margin: 0;
+  padding: 0.6rem 1rem calc(0.6rem + env(safe-area-inset-bottom));
+  font-size: 0.85rem;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--vmun-tinta);
+  background: var(--vmun-papel);
+  border-top: 1.5px solid var(--vmun-borde);
+}
+
+/* Rótulo solo-lectores (accesibilidad). */
+.vmun__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vmun__posterEmoji,
+  .vmun__poster:hover .vmun__posterEmoji { transition: none; transform: none; }
+}

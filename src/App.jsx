@@ -151,6 +151,14 @@ const VitrinaCriaturasMockup = lazy(() => import('./mockups/vitrina3d/VitrinaCri
 // establo, bodega, tanque, secadero…) con control de tamaño por pieza y el
 // mini demo del modo colocar (snapping sobre la ladera).
 const VitrinaInfraestructuraMockup = lazy(() => import('./mockups/vitrina3d/VitrinaInfraestructura'));
+// 3D: vitrina/galería de los MUNDOS del valle (valle, café, sanidad, mercado,
+// animales, semillero, clima). Cada tarjeta previsualiza el mundo en su diorama
+// con su encuadre de cámara curado (camaraDioramas) + botón «Entrar» al host real.
+const VitrinaMundosMockup = lazy(() => import('./mockups/vitrina3d/VitrinaMundos'));
+const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra'));
+// 3D: el valle DE NOCHE — luna, cielo estrellado andino, luciérnagas, grillos
+// sintetizados (0 KB, opt-in) y Angelita dormida. La finca en reposo.
+const ValleNoche3DMockup = lazy(() => import('./mockups/ValleNoche3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -543,6 +551,9 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/colocar-infraestructura': 'mockup_colocar_infraestructura',
   'mockups/vitrina-3d': 'mockup_vitrina_3d',
   'mockups/vitrina-infra': 'mockup_vitrina_infra',
+  'mockups/vitrina-mundos': 'mockup_vitrina_mundos',
+  'mockups/sierra-global': 'mockup_sierra_global',
+  'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1734,6 +1745,45 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Vitrina de infraestructura">
               <VitrinaInfraestructuraMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_vitrina_mundos':
+        // Vitrina/galería de los MUNDOS 3D del valle: valle, café, sanidad,
+        // mercado, animales, semillero y clima. Cada tarjeta previsualiza el
+        // mundo en su diorama con el encuadre de cámara curado (camaraDioramas)
+        // y un botón «Entrar» que lo abre a pantalla completa con el host real
+        // <Mundo> (hotspots + abeja Angelita, caída digna a 2D). A lo sumo un
+        // Canvas WebGL vivo a la vez. Ruta #/mockups/vitrina-mundos, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Vitrina de mundos 3D">
+              <VitrinaMundosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_sierra_global':
+        // Vista global 3D de la Sierra Nevada de Santa Marta: el macizo maestro
+        // (Simmonds + Palomino, bandas de piso térmico, hora dorada). Territorio
+        // sagrado tratado con dignidad — crédito a Kogui/Arhuaco/Wiwa/Kankuamo.
+        // Ruta #/mockups/sierra-global, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Vista global Sierra Nevada">
+              <SierraGlobalMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_valle_noche_3d':
+        // El valle de noche: variante nocturna mágica del valle — luna plata,
+        // cielo estrellado andino que titila, luciérnagas del framework,
+        // grillos sintetizados con WebAudio (0 KB, opt-in con botón) y
+        // Angelita dormida en su flor. La finca en reposo, cálida y serena.
+        // Ruta #/mockups/valle-noche-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El valle de noche">
+              <ValleNoche3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
