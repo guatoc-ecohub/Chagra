@@ -71,6 +71,13 @@
   transform-origin: center;
 }
 
+/* Fauna de la librería posada en un diorama (colibrí, mariposa): no intercepta
+   el puntero (los hotspots quedan tocables) y lleva su sombrita suave. */
+.mundo-fauna {
+  pointer-events: none;
+  filter: drop-shadow(0 3px 6px rgba(40, 30, 10, 0.24));
+}
+
 /* ── Cargando (mientras baja el chunk 3D) ──────────────────────────────── */
 .mundo-cargando {
   position: absolute;
