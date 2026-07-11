@@ -156,6 +156,9 @@ const VitrinaInfraestructuraMockup = lazy(() => import('./mockups/vitrina3d/Vitr
 // con su encuadre de cámara curado (camaraDioramas) + botón «Entrar» al host real.
 const VitrinaMundosMockup = lazy(() => import('./mockups/vitrina3d/VitrinaMundos'));
 const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra'));
+// El camino del agua en la finca: nacimiento → canal → reservorio → riego →
+// suelo, con el ciclo (vapor/nube/lluvia) cerrándose. Didáctico, hora dorada.
+const MundoAguaMockup = lazy(() => import('./mockups/MundoAgua3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -550,6 +553,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/vitrina-infra': 'mockup_vitrina_infra',
   'mockups/vitrina-mundos': 'mockup_vitrina_mundos',
   'mockups/sierra-global': 'mockup_sierra_global',
+  'mockups/mundo-agua-3d': 'mockup_mundo_agua_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1767,6 +1771,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Vista global Sierra Nevada">
               <SierraGlobalMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_agua_3d':
+        // El camino del agua 3D: recorre el agua de la finca — nacimiento
+        // protegido, quebrada viva (caudal ecológico + aviso de residuos),
+        // bocatoma y canal, reservorio + cosecha de lluvia, riego por goteo,
+        // filtración al suelo (corte de perfil) y el ciclo cerrándose en la
+        // nube. Ruta #/mockups/mundo-agua-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El camino del agua 3D">
+              <MundoAguaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
