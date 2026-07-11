@@ -44,6 +44,12 @@ export {
   default as useAudioMundo, PALETAS_SONORAS, activarAudioPorGesto, soportaAudio,
 } from './useAudioMundo.js';
 
+// Espejo vivo del dato real (three-free, auditoría §5b): arma el `estadoFinca`
+// REAL (salud, clima, ENSO, cosecha reciente, hato) desde los servicios
+// anti-fabricación que ya existen. El host <Mundo> lo cose solo; se exporta para
+// quien quiera pasar `estadoFinca` a mano.
+export { default as useFincaViva } from './useFincaViva.js';
+
 // Invitación de PRIMER USO del sonido (three-free): ya vive dentro del host
 // <Mundo> (app y vitrinas por igual); se exporta por si un mockup la monta suelta.
 export { default as InvitacionAudioMundo } from './InvitacionAudioMundo.jsx';
