@@ -218,23 +218,50 @@ export const MUNDO = {
     entrada: {},
   },
 
-  // 🐞 SANIDAD — arquetipo `infografia`: diagnóstico por síntoma/foto (NO-3D).
+  // 🐞 SANIDAD — arquetipo SÍ-3D `sanidad`: la HUERTA-CLÍNICA, el manejo de
+  //    plagas SIN veneno hecho lugar. El recinto muestra lo que de verdad cuida
+  //    la mata en finca andina: las TRAMPAS CROMÁTICAS (amarilla → mosca blanca/
+  //    minador, azul → trips), la ESTACIÓN DE BIOCONTROL (Beauveria/Metarhizium),
+  //    el BORDE push-pull de flores aromáticas y los ENEMIGOS NATURALES
+  //    (mariquita, carábido). Cada punto es una puerta a una pantalla REAL. En
+  //    equipo humilde cae a su ficha 2D digna (la infografía de la sanidad).
   sanidad: {
-    escena: 'infografia',
-    valle: { tipo: 'huerta', pos: [1.8, 0, 4.4], escala: 0.95 },
+    escena: 'sanidad',
+    valle: { tipo: 'huerta', pos: [3.8, 0, 4.9], escala: 0.95 },
     params: {
-      titulo: 'Sanidad de la mata',
-      notas: [
-        'Diga qué le ve ("gota", "polvillo", "amarilla") y sepa qué es y cómo manejarla sin veneno.',
-        'Reconozca el bicho por foto: a qué le pega, cómo se ve y su manejo.',
+      // El diorama tiene defaults propios; aquí solo los hacemos explícitos y
+      // deterministas (mismas matas y trampas 2D↔3D).
+      matas: [
+        { color: '#4e8f3f', pos: [-0.5, 0, 0.35] },
+        { color: '#57993f', pos: [0.55, 0, 0.1] },
+        { color: '#468637', pos: [0.05, 0, -0.55] },
+      ],
+      trampas: [
+        { color: '#f2c531', pos: [1.35, 0, 0.35] }, // amarilla: mosca blanca / minador
+        { color: '#3f77c7', pos: [-1.25, 0, -0.5] }, // azul: trips
       ],
     },
     hotspots: [
-      { id: 'sintoma', pos: [], emoji: '🩺', label: 'Mi mata está enferma', view: 'sanidad_sintoma' },
-      { id: 'plagas', pos: [], emoji: '🐛', label: 'Directorio de plagas', view: 'plagas' },
-      { id: 'bio', pos: [], emoji: '🧪', label: 'Biopreparados', view: 'biopreparados' },
+      { id: 'sintoma', pos: [0, 0.7, 0.5], emoji: '🩺', label: 'Mi mata está enferma', view: 'sanidad_sintoma' },
+      { id: 'plagas', pos: [1.35, 0.92, 0.35], emoji: '🐛', label: 'Directorio de plagas', view: 'plagas' },
+      { id: 'defensores', pos: [-0.55, 0.78, 0.5], emoji: '🐞', label: 'Defensores de la finca', view: 'defensores' },
+      { id: 'bio', pos: [1.05, 0.78, -0.75], emoji: '🧪', label: 'Biopreparados', view: 'biopreparados' },
+      { id: 'tox', pos: [-1.25, 0.92, -0.5], emoji: '⚠️', label: 'Seguridad con insumos', view: 'toxicologia' },
     ],
-    entrada: {},
+    entrada: { zoom: 7, narra: 'sanidad' },
+    // El gemelo 2D digno: la ficha de la sanidad (misma copia didáctica de
+    // antes, con sus MISMOS hotspots como accesos).
+    fallback2d: {
+      escena: 'infografia',
+      params: {
+        titulo: 'Sanidad de la mata',
+        notas: [
+          'Diga qué le ve ("gota", "polvillo", "amarilla") y sepa qué es y cómo manejarla sin veneno.',
+          'Reconozca el bicho por foto: a qué le pega, cómo se ve y su manejo.',
+          'Cuide sus aliados: trampas de color, hongos de biocontrol y enemigos naturales como la mariquita.',
+        ],
+      },
+    },
   },
 
   // ── SÍ-3D nuevo: la ÚNICA metáfora de escena nueva del batch ─────────────

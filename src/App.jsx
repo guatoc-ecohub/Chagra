@@ -91,6 +91,10 @@ const Mundo3DBosqueMockup = lazy(() => import('./mockups/Mundo3DBosque'));
 // 3D: "El mundo del clima" — monta <Mundo mundoId="clima"> del framework: la
 // bóveda del cielo (arquetipo nuevo `boveda`). El 3D va perezoso (vendor-three).
 const Mundo3DClimaMockup = lazy(() => import('./mockups/Mundo3DClima'));
+// 3D: "El mundo de la sanidad" — monta <Mundo mundoId="sanidad"> del framework:
+// la huerta-clínica (arquetipo nuevo `sanidad`, familia recinto): trampas,
+// biocontrol y enemigos naturales. El 3D va perezoso (vendor-three).
+const Mundo3DSanidadMockup = lazy(() => import('./mockups/Mundo3DSanidad'));
 // Voz: superficies de voz con forma viva (iris que reacciona al volumen).
 const VozConFormaMockup = lazy(() => import('./mockups/VozConForma'));
 const ConversacionVozMockup = lazy(() => import('./mockups/ConversacionVoz'));
@@ -502,6 +506,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/evidencia-ilustrada': 'mockup_evidencia_ilustrada',
   'mockups/guardianes-narrativos': 'mockup_guardianes',
   'mockups/hoja-vida-mata': 'mockup_hoja_vida_mata',
+  // (anti-conflicto de merge) rutas nuevas SIEMPRE al final del bloque:
+  'mockups/mundo3d-sanidad': 'mockup_mundo3d_sanidad',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1584,6 +1590,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Hoja de vida de la mata">
               <HojaVidaMataMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      // (anti-conflicto de merge) cases de mockup nuevos SIEMPRE al final del grupo:
+      case 'mockup_mundo3d_sanidad':
+        // Vitrina pública del MUNDO DE LA SANIDAD: monta <Mundo mundoId="sanidad">
+        // del framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-sanidad, sin auth. La huerta-clínica: manejo de plagas
+        // sin veneno — trampas cromáticas, biocontrol (Beauveria/Metarhizium),
+        // borde push-pull y enemigos naturales (mariquita, carábido).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de la sanidad">
+              <Mundo3DSanidadMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
