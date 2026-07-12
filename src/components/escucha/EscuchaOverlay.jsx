@@ -372,7 +372,7 @@ export default function EscuchaOverlay() {
       setDestino(ruta);
       setFase(FASE_RUMBO);
       rumboTimerRef.current = setTimeout(() => {
-        navegar(ruta.view);
+        navegar(ruta.view, ruta.initialData);
         cerrar();
       }, PAUSA_RUMBO_MS);
       return;
