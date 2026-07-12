@@ -20,6 +20,8 @@ vi.mock('../../hooks/useVoiceRecorder', () => ({
 }));
 vi.mock('../../services/voiceService', () => ({ transcribe: vi.fn() }));
 
+const defaultProps = { onBack: () => {}, onNavigate: vi.fn() };
+
 import SoilDiagnosticScreen from '../SoilDiagnosticScreen';
 
 afterEach(() => cleanup());
@@ -28,7 +30,7 @@ const verTierra = () => fireEvent.click(screen.getByRole('button', { name: /Mira
 
 describe('SoilDiagnosticScreen — pantalla inicial', () => {
   it('muestra los chips de síntomas con íconos y la entrada de texto', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     expect(screen.getByText(/Dura como piedra/i)).toBeTruthy();
     expect(screen.getByText(/Se empoza el agua/i)).toBeTruthy();
     expect(screen.getByLabelText(/Describe tu tierra/i)).toBeTruthy();
@@ -37,7 +39,7 @@ describe('SoilDiagnosticScreen — pantalla inicial', () => {
 
   it('botón volver llama onBack', () => {
     const onBack = vi.fn();
-    render(<SoilDiagnosticScreen onBack={onBack} />);
+    render(<SoilDiagnosticScreen onBack={onBack} onNavigate={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: /Volver/i }));
     expect(onBack).toHaveBeenCalled();
   });
@@ -45,7 +47,7 @@ describe('SoilDiagnosticScreen — pantalla inicial', () => {
 
 describe('SoilDiagnosticScreen — degradación amable', () => {
   it('texto sin match → mensaje amable, sin crash', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     fireEvent.change(screen.getByLabelText(/Describe tu tierra/i), { target: { value: 'qwerty zzz' } });
     verTierra();
     expect(screen.getByText(/cuéntame más de tu tierra/i)).toBeTruthy();
@@ -54,7 +56,7 @@ describe('SoilDiagnosticScreen — degradación amable', () => {
   });
 
   it('sin descripción ni chips el botón no avanza', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     verTierra();
     expect(screen.queryByText(/Esto veo en tu tierra/i)).toBeNull();
   });
@@ -62,7 +64,7 @@ describe('SoilDiagnosticScreen — degradación amable', () => {
 
 describe('SoilDiagnosticScreen — flujo guiado completo', () => {
   it('síntoma → prueba con confiabilidad → pasos numerados → confirmar → enmienda con dosis y precaución', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     // 1. Elegir síntoma con ícono
     fireEvent.click(screen.getByRole('button', { name: /Dura como piedra/i }));
     verTierra();
@@ -84,7 +86,7 @@ describe('SoilDiagnosticScreen — flujo guiado completo', () => {
   });
 
   it('señal buena (tierra negra) → mensaje positivo sin enmiendas', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /Negra y sueltica/i }));
     verTierra();
     expect(screen.getByText(/se ve sana/i)).toBeTruthy();
@@ -92,7 +94,7 @@ describe('SoilDiagnosticScreen — flujo guiado completo', () => {
   });
 
   it('aguacate + encharcamiento → alerta crítica visible', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /Se empoza el agua/i }));
     fireEvent.click(screen.getByRole('button', { name: /Aguacate/i }));
     verTierra();
@@ -103,7 +105,7 @@ describe('SoilDiagnosticScreen — flujo guiado completo', () => {
 
 describe('SoilDiagnosticScreen — anti-pseudociencia (mitos)', () => {
   it('la prueba de vinagre/bicarbonato aparece como MITO con aviso "NO sirve"', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /Sale helecho marranero/i }));
     verTierra();
     // Sección fija de mitos en el diagnóstico
@@ -113,7 +115,7 @@ describe('SoilDiagnosticScreen — anti-pseudociencia (mitos)', () => {
   });
 
   it('si el campesino menciona vinagre, la advertencia MITO del servicio se muestra', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     fireEvent.change(screen.getByLabelText(/Describe tu tierra/i), {
       target: { value: 'le eché vinagre a la tierra y sale helecho' },
     });
@@ -123,7 +125,7 @@ describe('SoilDiagnosticScreen — anti-pseudociencia (mitos)', () => {
   });
 
   it('al abrir la prueba mito NO hay botón de confirmar resultado', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /Sale helecho marranero/i }));
     verTierra();
     fireEvent.click(screen.getByRole('button', { name: /Vinagre y bicarbonato/i }));
@@ -134,7 +136,7 @@ describe('SoilDiagnosticScreen — anti-pseudociencia (mitos)', () => {
 
 describe('SoilDiagnosticScreen — guardas de enmienda', () => {
   it('sin confirmar el pH, la cal queda bloqueada con la guarda visible', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /Sale helecho marranero/i }));
     verTierra();
     // Saltar la prueba → recomendaciones con enmiendas pH bloqueadas
@@ -145,7 +147,7 @@ describe('SoilDiagnosticScreen — guardas de enmienda', () => {
   });
 
   it('con la prueba confirmada, la enmienda se muestra con dosis y precaución', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /Sale helecho marranero/i }));
     verTierra();
     fireEvent.click(screen.getByRole('button', { name: /pH con tiras/i }));
@@ -157,7 +159,7 @@ describe('SoilDiagnosticScreen — guardas de enmienda', () => {
   });
 
   it('si la prueba descartó el problema → no recomendar enmiendas', () => {
-    render(<SoilDiagnosticScreen onBack={() => {}} />);
+    render(<SoilDiagnosticScreen {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /Sale helecho marranero/i }));
     verTierra();
     fireEvent.click(screen.getByRole('button', { name: /pH con tiras/i }));
