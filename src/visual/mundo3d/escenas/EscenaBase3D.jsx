@@ -22,7 +22,8 @@
  */
 import { Suspense, lazy, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
+import { Html, OrbitControls } from '@react-three/drei';
+import { MonitorRendimiento } from '../usePerformanceMonitor.jsx';
 import * as THREE from 'three';
 import { AbejaEscena } from './useEntradaAbeja.jsx';
 import CamaraDirector from './CamaraDirector.jsx';
@@ -224,7 +225,10 @@ function Contenido({
         respiro={zoom * 0.005}
         activa={!reducedMotion && !frugal}
       />
-      <AdaptiveDpr pixelated />
+      {/* Calidad ADAPTATIVA en vivo (huérfano cableado): gradúa DPR/partículas en
+          caliente según fps, complementa el device-tier estático. Reemplaza al
+          <AdaptiveDpr> de drei con la política Chagra (usePerformanceMonitor). */}
+      <MonitorRendimiento tier={tier} />
       {/* Bloom SUTIL solo donde sobra GPU: tier alto sin reduced-motion. El
           gate es estricto a propósito (contrato de costo del DR de gama baja):
           medio/bajo no montan el pase NI descargan su chunk, y reduced-motion
