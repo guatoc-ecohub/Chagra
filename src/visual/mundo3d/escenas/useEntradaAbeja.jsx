@@ -21,6 +21,7 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
+import { cuerpoDeClima, PERFIL_ABEJA } from '../../creatures/creatureClimaCuerpo.js';
 import { ABEJA_PRESENCIA, ABEJA_TINTA } from '../../creatures/abejaIdentidad.js';
 import { CRUCE_ATRAPA_MS, CRUCE_SUELTA_MS } from '../../creatures/AbejaTransicion.jsx';
 import { useSalidaAbeja, resetSalidaAbeja } from '../../creatures/senalSalidaAbeja.js';
@@ -271,8 +272,23 @@ export function AbejaEscena({
   const mojada = reaccion?.mojada ?? false;
   const sed = reaccion?.sed ?? false;
   const comiendo = reaccion?.comiendo ?? false;
+  // ── EL CLIMA REAL en el CUERPO (creatureClimaCuerpo): del mismo estadoFinca
+  //    salen clima/enso que la creature pinta (tinte, opacidad, aleteo). Aquí solo
+  //    tomamos su `altura` para COMPLEMENTAR la coreografía (niebla vuela corto,
+  //    dorada un poco más alto); se MULTIPLICA con la de reaccionFinca (lluvia/sed
+  //    ya bajan el vuelo) para no doble-contar. El resto lo aplica el dibujo.
+  const climaReal = estadoFinca?.clima ?? null;
+  const ensoReal = estadoFinca?.enso ?? 'neutro';
+  const cuerpoClima = useMemo(
+    () => cuerpoDeClima(climaReal, { enso: ensoReal, tier, perfil: PERFIL_ABEJA }),
+    [climaReal, ensoReal, tier],
+  );
+  const vueloClima = useMemo(() => {
+    const base = reaccion?.vuelo ?? VUELO_NEUTRO;
+    return cuerpoClima.altura === 1 ? base : { ...base, altura: base.altura * cuerpoClima.altura };
+  }, [reaccion, cuerpoClima]);
   const { ref, caraRef, sombraRef, visRef } = useEntradaAbeja(foco, {
-    entrando, energia: energiaReal, reducedMotion, piso, vuelo: reaccion?.vuelo,
+    entrando, energia: energiaReal, reducedMotion, piso, vuelo: vueloClima,
     cruce: cruceVivo, saliendo,
   });
   // Microrrebote: cada toque de hotspot sube `rebote`; reiniciamos la animación
@@ -320,6 +336,8 @@ export function AbejaEscena({
                   mojada={mojada}
                   sed={sed}
                   comiendo={comiendo}
+                  clima={climaReal}
+                  enso={ensoReal}
                   animated={vivo}
                   tier={tier}
                 />

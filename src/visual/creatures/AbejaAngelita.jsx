@@ -3,6 +3,7 @@ import './creatures.css';
 import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, Miembro, AntenaRubber, RH_INK } from './_rubberhose.jsx';
 import { ABEJA_PALETA, ABEJA_PROPORCION } from './abejaIdentidad.js';
+import { cuerpoDeClima, PERFIL_ABEJA } from './creatureClimaCuerpo.js';
 
 /* Abeja angelita — Tetragonisca angustula (meliponino nativo SIN aguijón, NO
    Apis). Cuerpo ámbar rayado (chumbe andino), cabeza clara, alitas de tul.
@@ -49,6 +50,13 @@ export function AbejaAngelita({
   mojada = false,
   sed = false,
   comiendo = false,
+  /* ── EL CLIMA REAL escrito en el CUERPO (angelitaClimaCuerpo.js) ───────────
+     clima/enso del estadoFinca REAL (useFincaViva): lluvia→brillo mojado y
+     alas pesadas, Niño+día claro→tono deshidratado y alas lentas, niebla→
+     silueta difusa, dorada→vibrante y alas rápidas. Sin clima (avatares,
+     catálogo) = neutro digno: la abeja se ve EXACTO como siempre. */
+  clima = null,
+  enso = 'neutro',
   /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + follow-through) y deja el
      aleteo + estados reactivos. Sin prop (standalone: avatares, catálogo) =
@@ -64,6 +72,22 @@ export function AbejaAngelita({
   // El aura respira con la energía real de la finca (matas vivas + agua).
   const auraOp = Math.max(0.16, Math.min(0.5, 0.2 + 0.3 * (energia ?? 1)));
   const auraR = 5.4 + 1.2 * (energia ?? 1);
+
+  // ── EL CLIMA REAL en el cuerpo (creatureClimaCuerpo, perfil abeja). Determinista,
+  //    una vez por render: tinte + opacidad al contorno; el aleteo se acelera
+  //    (dorada) o pesa (lluvia) escalando la duración base de `.crt-wing` (0.15s).
+  //    Sin clima → neutro: filtro/opacidad nulos, aleteo base. RM: como `wing` va
+  //    solo con `animated`, la duración cuelga de nodos ya quietos (inocua).
+  const cuerpoClima = cuerpoDeClima(clima, { enso, tier, perfil: PERFIL_ABEJA });
+  // Solo estampamos duración inline cuando el clima REALMENTE cambia el aleteo
+  // (≠1): así un clima neutro NO pisa los overrides de pose ('celebra'/'reposo').
+  const wingDur = (wing && cuerpoClima.velocidadAlas !== 1)
+    ? { animationDuration: `${(0.15 / cuerpoClima.velocidadAlas).toFixed(3)}s` }
+    : undefined;
+  // Filtro/opacidad de clima para el nodo raíz (svg autónomo o <g> inline).
+  const estiloClima = (cuerpoClima.tinte || cuerpoClima.opacidad < 1)
+    ? { filter: cuerpoClima.tinte || undefined, opacity: cuerpoClima.opacidad < 1 ? cuerpoClima.opacidad : undefined }
+    : undefined;
 
   const defs = (
     <defs>
@@ -108,10 +132,12 @@ export function AbejaAngelita({
       {/* aura viva */}
       <circle r={auraR} fill={ABEJA_PALETA.cuerpo} opacity={auraOp} filter={`url(#${blur})`} />
 
-      {/* alitas de tul con contorno + smear (crt-wingbeat ya lleva el estirón) */}
-      <ellipse className={wing} cx="-1.8" cy="-7" rx="6" ry="3.6" fill={ABEJA_PALETA.alaTul}
+      {/* alitas de tul con contorno + smear (crt-wingbeat ya lleva el estirón).
+          La duración del aleteo la modula el clima real (wingDur): dorada rápida,
+          lluvia pesada. celebra/reposo (data-pose) mandan por especificidad CSS. */}
+      <ellipse className={wing} style={wingDur} cx="-1.8" cy="-7" rx="6" ry="3.6" fill={ABEJA_PALETA.alaTul}
         opacity="0.62" stroke="rgba(42,26,12,0.4)" strokeWidth="0.5" />
-      <ellipse className={wing} style={{ animationDelay: '-0.07s' }} cx="2.2" cy="-6.4"
+      <ellipse className={wing} style={{ animationDelay: '-0.07s', ...wingDur }} cx="2.2" cy="-6.4"
         rx="4.6" ry="2.8" fill={ABEJA_PALETA.alaTulClara} opacity="0.5" stroke="rgba(42,26,12,0.35)" strokeWidth="0.5" />
 
       {/* patitas manguera con pie crema (detrás del tronco, se mecen suave) */}
@@ -173,14 +199,14 @@ export function AbejaAngelita({
 
   if (inline) {
     return (
-      <g className={className} {...estadoAttrs}>
+      <g className={className} style={estiloClima} {...estadoAttrs}>
         {defs}
         {cuerpoVivo}
       </g>
     );
   }
   return (
-    <svg viewBox={VIEWBOX} width={size} height={size} className={className}
+    <svg viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloClima}
       role="img" aria-label={title} {...estadoAttrs} {...rest}>
       <title>{title}</title>
       {defs}
