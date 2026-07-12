@@ -487,6 +487,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
                   reducedMotion={reducedMotion}
                   onEntrar={entrarMundo}
                   onAlerta={abrirAlerta}
+                  webglBloqueado={valle3dError || equipo.motivo === 'sin-webgl'}
                 />
               )}
             >
