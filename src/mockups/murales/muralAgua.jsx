@@ -140,9 +140,9 @@ export const MURAL_AGUA = {
       height: '13%',
       bottom: '15%',
       fondo:
-        'repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.38) 0 14px, rgba(0,0,0,0) 14px 64px), '
+        'repeating-linear-gradient(100deg, rgba(255, 255, 255, 0.28) 0 7px, rgba(0,0,0,0) 7px 46px, rgba(234, 255, 251, 0.18) 46px 52px, rgba(0,0,0,0) 52px 92px), '
         + 'linear-gradient(#8fd8d0, #5fb8b4 60%, #4aa3a3)',
-      tam: '320px 100%, 100% 100%',
+      tam: '368px 100%, 100% 100%',
       dur: 4.5,
       ancho: '-320px',
       bordeArriba: '2px solid rgba(234, 255, 251, 0.75)',
