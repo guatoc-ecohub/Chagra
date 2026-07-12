@@ -163,6 +163,10 @@ const ValleLluviaMockup = lazy(() => import('./mockups/ValleLluvia3D'));
 const MundoSemilleroMockup = lazy(() => import('./mockups/MundoSemillero3D'));
 const MundoCompostMockup = lazy(() => import('./mockups/MundoCompost3D'));
 const JuegoMiFincaMockup = lazy(() => import('./mockups/JuegoMiFincaOdyssey'));
+const VitrinaMaestraMockup = lazy(() => import('./mockups/VitrinaMaestraMundos'));
+const MundoFermentosMockup = lazy(() => import('./mockups/MundoFermentos3D'));
+const GemelosMundosMockup = lazy(() => import('./mockups/GemelosMundos2D'));
+const MundoMicrofaunaMockup = lazy(() => import('./mockups/MundoMicrofauna3D'));
 // El camino del agua en la finca: nacimiento → canal → reservorio → riego →
 // suelo, con el ciclo (vapor/nube/lluvia) cerrándose. Didáctico, hora dorada.
 const MundoAguaMockup = lazy(() => import('./mockups/MundoAgua3D'));
@@ -578,6 +582,10 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-semillero-3d': 'mockup_mundo_semillero_3d',
   'mockups/mundo-compost-3d': 'mockup_mundo_compost_3d',
   'mockups/juego-mi-finca': 'mockup_juego_mi_finca',
+  'mockups/vitrina-maestra': 'mockup_vitrina_maestra',
+  'mockups/mundo-fermentos-3d': 'mockup_mundo_fermentos_3d',
+  'mockups/gemelos-2d': 'mockup_gemelos_2d',
+  'mockups/mundo-microfauna-3d': 'mockup_mundo_microfauna_3d',
   'mockups/mundo-agua-3d': 'mockup_mundo_agua_3d',
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
@@ -1870,6 +1878,46 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Juego Mi finca (túnel Odyssey)">
               <JuegoMiFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_vitrina_maestra':
+        // VITRINA MAESTRA: 12 portales de piedra (uno por mundo) con el cruce
+        // túnel Odyssey (dolly k² + iris) para entrar a cada uno. Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Vitrina maestra de mundos">
+              <VitrinaMaestraMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_fermentos_3d':
+        // Mundo de FERMENTOS/biopreparados: bocashi, biol, caldos minerales,
+        // microorganismos de montaña. Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El taller de fermentos 3D">
+              <MundoFermentosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_gemelos_2d':
+        // Gemelos 2D de primera clase (café/sanidad/agua) — láminas rubber-hose
+        // andinas para gama baja / reduced-motion. Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Gemelos 2D de los mundos">
+              <GemelosMundosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_microfauna_3d':
+        // Mundo tocable de la MICRO-FAUNA del suelo (lombriz, colémbolo,
+        // micorrizas, bacterias) — explorar la vida del suelo con el dedo. Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La micro-fauna del suelo 3D">
+              <MundoMicrofaunaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
