@@ -165,6 +165,8 @@ const MundoCompostMockup = lazy(() => import('./mockups/MundoCompost3D'));
 const JuegoMiFincaMockup = lazy(() => import('./mockups/JuegoMiFincaOdyssey'));
 // La "ventana-puerta" al valle: viewport 3D vivo enmarcado para el home 2D.
 const VentanaValleMockup = lazy(() => import('./components/VentanaValle3D'));
+// New Donk: un plano 2D lado-a-lado embebido DENTRO del valle 3D (Mario Odyssey).
+const NewDonkMockup = lazy(() => import('./mockups/NewDonk2Den3D'));
 const VitrinaMaestraMockup = lazy(() => import('./mockups/VitrinaMaestraMundos'));
 const MundoFermentosMockup = lazy(() => import('./mockups/MundoFermentos3D'));
 const GemelosMundosMockup = lazy(() => import('./mockups/GemelosMundos2D'));
@@ -593,6 +595,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-compost-3d': 'mockup_mundo_compost_3d',
   'mockups/juego-mi-finca': 'mockup_juego_mi_finca',
   'mockups/ventana-valle': 'mockup_ventana_valle',
+  'mockups/new-donk': 'mockup_new_donk',
   'mockups/vitrina-maestra': 'mockup_vitrina_maestra',
   'mockups/mundo-fermentos-3d': 'mockup_mundo_fermentos_3d',
   'mockups/gemelos-2d': 'mockup_gemelos_2d',
@@ -1904,6 +1907,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Juego Mi finca (túnel Odyssey)">
               <JuegoMiFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_new_donk':
+        // New Donk: un plano 2D lado-a-lado (side-scroller con Angelita 2D) vive
+        // DENTRO del valle 3D; la cámara se aplana ortográficamente contra él y
+        // regresa SIN desmontar el Canvas (el valle asoma en los bordes). Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="New Donk 2D en 3D">
+              <NewDonkMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
