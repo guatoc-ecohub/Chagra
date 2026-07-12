@@ -25,6 +25,7 @@ import Mundo2D from './Mundo2D.jsx';
 import useAudioMundo from './useAudioMundo.js';
 import useFincaViva from './useFincaViva.js';
 import InvitacionAudioMundo from './InvitacionAudioMundo.jsx';
+import AbejaTransicion, { AlMontarEscena } from '../creatures/AbejaTransicion.jsx';
 import './mundo.css';
 
 /* Los dioramas 3D se cargan PEREZOSO: three/@react-three viven en su propio
@@ -113,6 +114,9 @@ function MundoInterno({
      `lazy` nuevo al reintentar (import() fresco, no la promesa colgada). */
   const [caido3d, setCaido3d] = useState(false);
   const [intento, setIntento] = useState(0);
+  // El CRUCE 2D→3D de Angelita (overlay DOM): se enciende cuando el chunk 3D
+  // resuelve (AlMontarEscena, hermano de <Escena> dentro del Suspense).
+  const [cruce, setCruce] = useState(null);
 
   const plan = resolverMundo(mundoId, tier);
   const tinte = tinteDeMundo(mundoId);
@@ -207,7 +211,23 @@ function MundoInterno({
             focoId={focoId}
             focoToken={focoToken}
           />
+          {/* CRUCE 2D→3D: hermano de <Escena> — su useEffect dispara cuando el
+              chunk 3D resolvió y la escena montó (Suspense revela a los hijos
+              juntos). Enciende el overlay de Angelita cruzando de 2D a 3D. */}
+          <AlMontarEscena onMonta={() => { if (!reducedMotion) setCruce('entrar'); }} />
         </Suspense>
+        {/* El overlay del cruce 2D→3D (Angelita "entra" a la escena). Se
+            desmonta solo al terminar (onFin); reducedMotion → no monta nada. */}
+        {cruce === 'entrar' && !reducedMotion && (
+          <AbejaTransicion
+            sentido="entrar"
+            tier={tier}
+            animo={animo}
+            energia={energia}
+            reducedMotion={reducedMotion}
+            onFin={() => setCruce(null)}
+          />
+        )}
         {/* Invitación de PRIMER USO del sonido ambiental (una sola vez): vive
             en el host para cubrir app y vitrinas por igual (allá no hay Perfil). */}
         <InvitacionAudioMundo reducedMotion={reducedMotion} tinte={tinte} />
