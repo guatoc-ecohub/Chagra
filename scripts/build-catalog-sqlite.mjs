@@ -1,10 +1,28 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import Database from 'better-sqlite3';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = path.join(__dirname, '../public/catalog.sqlite');
+
+// better-sqlite3 es un módulo NATIVO. En la máquina de deploy (NixOS) node-gyp
+// puede fallar al compilarlo (prebuild-install no detecta libc → sin binario) y
+// eso ROMPÍA todo el deploy en `npm ci`. Import dinámico con FAIL-SOFT: si no
+// carga y ya existe el catálogo commiteado (public/catalog.sqlite está trackeado),
+// se usa ese y se salta la regeneración — el build/deploy NO se cae. Combinar con
+// better-sqlite3 en optionalDependencies (package.json) para que npm ci tampoco
+// falle. Regenerar el catálogo requiere better-sqlite3 (dev/CI con build tools).
+let Database;
+try {
+  ({ default: Database } = await import('better-sqlite3'));
+} catch (err) {
+  if (fs.existsSync(DB_PATH)) {
+    console.warn('[build-catalog] better-sqlite3 no disponible; uso el catálogo YA commiteado (skip regen):', DB_PATH);
+    process.exit(0);
+  }
+  console.error('[build-catalog] better-sqlite3 no disponible y NO hay catálogo commiteado:', String(err).slice(0, 120));
+  process.exit(1);
+}
 // REVERT 2026-05-23: el subset 50 species (PR #1011) cortó species críticas
 // (aguacate, tomate, lechuga, acelga, tomate árbol) y rompió casos de uso
 // reales del agente en producción. Vuelve al corpus full 496 mientras

@@ -11,6 +11,10 @@
  * Props comunes: { size, className, inline, animated, title }.
  */
 export { AbejaAngelita } from './AbejaAngelita.jsx';
+/* La IDENTIDAD de Angelita como datos (paleta chumbe, proporciones, presencia
+   3D): la fuente única que comparten su dibujo 2D y su presencia en los mundos
+   (useEntradaAbeja). Solo datos — jamás arrastra three al bundle base. */
+export { ABEJA_PALETA, ABEJA_PROPORCION, ABEJA_PRESENCIA, ABEJA_TINTA } from './abejaIdentidad.js';
 /* El CRUCE 2D→3D de Angelita (overlay DOM puro, cero three — seguro en el
    bundle base). El host de mundos lo monta al entrar/volver; la señal
    `avisarSalidaAbeja` avisa al mesh que la abeja sale (ver AbejaTransicion.jsx,

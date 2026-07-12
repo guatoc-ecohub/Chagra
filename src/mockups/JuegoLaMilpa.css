@@ -1,0 +1,296 @@
+/* =========================================================================
+   Juego 2D "La milpa — las tres hermanas".
+   Estetica Cuphead andina: linea gruesa que respira, squash & stretch,
+   colores terrosos calidos. Todo vector SVG + CSS, cero dependencias,
+   offline-first, amable con gama baja. Ver JuegoLaMilpa.jsx.
+   ========================================================================= */
+
+.milpa-root {
+  --milpa-ink: #2a1a10;
+  --milpa-crema: #f7ecd3;
+  --milpa-crema2: #efd9ad;
+  --milpa-teja: #d9662f;
+  --milpa-teja-hi: #f08a4b;
+  --milpa-verde: #3f7d3a;
+  --milpa-verde-hi: #62a84a;
+  --milpa-tierra: #6e4a2c;
+  --milpa-panel: #fff6e6;
+  --milpa-panel-line: #2a1a10;
+
+  min-height: 100dvh;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 2vw, 18px);
+  padding: clamp(10px, 2.4vw, 22px);
+  background:
+    radial-gradient(120% 90% at 50% 0%, #ffe9c2 0%, #f6d59a 46%, #eec585 100%);
+  color: var(--milpa-ink);
+  font-family: 'Baloo 2', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  .milpa-root {
+    background:
+      radial-gradient(120% 90% at 50% 0%, #3a2c1a 0%, #241a10 55%, #1a130b 100%);
+  }
+}
+:root[data-theme='light'] .milpa-root {
+  background: radial-gradient(120% 90% at 50% 0%, #ffe9c2 0%, #f6d59a 46%, #eec585 100%);
+}
+:root[data-theme='dark'] .milpa-root {
+  background: radial-gradient(120% 90% at 50% 0%, #3a2c1a 0%, #241a10 55%, #1a130b 100%);
+}
+
+/* ---- barra superior ---------------------------------------------------- */
+.milpa-topbar {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.milpa-title {
+  font-size: clamp(1.15rem, 3.6vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  margin: 0;
+  text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.55);
+}
+.milpa-topright { display: flex; align-items: center; gap: 8px; }
+.milpa-day {
+  background: var(--milpa-panel);
+  border: 3px solid var(--milpa-ink);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-weight: 800;
+  box-shadow: 3px 3px 0 rgba(42, 26, 16, 0.35);
+  white-space: nowrap;
+}
+.milpa-back {
+  background: var(--milpa-panel);
+  border: 3px solid var(--milpa-ink);
+  border-radius: 14px;
+  padding: 6px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 rgba(42, 26, 16, 0.35);
+  transition: transform 0.08s ease;
+}
+.milpa-back:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(42, 26, 16, 0.35); }
+
+/* ---- escenario --------------------------------------------------------- */
+.milpa-stage {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  border: 5px solid var(--milpa-ink);
+  border-radius: 26px;
+  overflow: hidden;
+  box-shadow: 6px 8px 0 rgba(42, 26, 16, 0.35);
+  background: #ffe6b8;
+}
+.milpa-svg { display: block; width: 100%; height: auto; }
+.milpa-hit { cursor: pointer; outline: none; }
+.milpa-hit:focus-visible + .milpa-hit-ring,
+.milpa-hit-ring.on { opacity: 1; }
+
+/* ---- guia / tip -------------------------------------------------------- */
+.milpa-tip {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--milpa-panel);
+  border: 4px solid var(--milpa-ink);
+  border-radius: 18px;
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: clamp(0.9rem, 2.4vw, 1.05rem);
+  box-shadow: 4px 5px 0 rgba(42, 26, 16, 0.3);
+  min-height: 44px;
+}
+.milpa-tip-bee {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  animation: milpa-bee-idle 2.6s ease-in-out infinite;
+}
+
+/* ---- controles --------------------------------------------------------- */
+.milpa-controls {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 10px;
+  justify-content: center;
+}
+.milpa-seedrow { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.milpa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 3px solid var(--milpa-ink);
+  border-radius: 16px;
+  padding: 9px 14px;
+  font-weight: 800;
+  font-size: clamp(0.85rem, 2.3vw, 1rem);
+  cursor: pointer;
+  background: var(--milpa-panel);
+  box-shadow: 3px 4px 0 rgba(42, 26, 16, 0.32);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease;
+  user-select: none;
+}
+.milpa-btn:active { transform: translate(2px, 3px); box-shadow: 1px 1px 0 rgba(42, 26, 16, 0.3); }
+.milpa-btn .milpa-swatch {
+  width: 18px; height: 18px; border-radius: 6px; border: 2px solid var(--milpa-ink);
+}
+.milpa-btn.active {
+  background: var(--milpa-teja);
+  color: #fff;
+  box-shadow: inset 0 0 0 2px #fff5, 3px 4px 0 rgba(42, 26, 16, 0.4);
+  transform: translateY(-1px);
+}
+.milpa-btn.sun { background: #ffca4a; }
+.milpa-btn.sun:hover { background: #ffd86e; }
+.milpa-btn.ghost { background: #fff; }
+.milpa-btn[disabled] { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.milpa-toggle {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 3px solid var(--milpa-ink); border-radius: 16px;
+  padding: 8px 12px; font-weight: 800; cursor: pointer; background: var(--milpa-panel);
+  box-shadow: 3px 4px 0 rgba(42, 26, 16, 0.32);
+}
+.milpa-toggle input { width: 18px; height: 18px; accent-color: var(--milpa-teja); }
+
+/* ---- leyenda tres hermanas -------------------------------------------- */
+.milpa-legend {
+  width: 100%;
+  max-width: 960px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+.milpa-chip {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: var(--milpa-panel);
+  border: 3px solid var(--milpa-ink);
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: 3px 4px 0 rgba(42, 26, 16, 0.28);
+}
+.milpa-chip svg { flex: 0 0 auto; }
+.milpa-chip b { display: block; font-size: 1rem; }
+.milpa-chip span { font-size: 0.86rem; line-height: 1.25; font-weight: 600; }
+
+/* ---- overlays (intro / final) ----------------------------------------- */
+.milpa-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(42, 26, 16, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 40;
+}
+.milpa-card {
+  width: min(560px, 96vw);
+  max-height: 92dvh;
+  overflow-y: auto;
+  background: var(--milpa-panel);
+  border: 5px solid var(--milpa-ink);
+  border-radius: 26px;
+  padding: clamp(18px, 4vw, 30px);
+  box-shadow: 8px 10px 0 rgba(0, 0, 0, 0.4);
+  text-align: center;
+}
+.milpa-card h2 { margin: 6px 0 12px; font-size: clamp(1.3rem, 4.6vw, 2rem); font-weight: 900; }
+.milpa-card .milpa-lead { font-weight: 700; margin-bottom: 14px; }
+.milpa-card ul { list-style: none; padding: 0; margin: 0 0 16px; text-align: left; display: grid; gap: 10px; }
+.milpa-card li { display: flex; gap: 10px; align-items: flex-start; font-weight: 600; font-size: 0.95rem; }
+.milpa-card li b { white-space: nowrap; }
+.milpa-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--milpa-teja); color: #fff;
+  border: 4px solid var(--milpa-ink); border-radius: 18px;
+  padding: 12px 22px; font-weight: 900; font-size: 1.05rem; cursor: pointer;
+  box-shadow: 4px 5px 0 rgba(42, 26, 16, 0.5);
+  transition: transform 0.08s ease;
+}
+.milpa-cta:active { transform: translate(2px, 3px); }
+
+/* ==== animaciones (respiro rubber-hose) ================================= */
+@keyframes milpa-pop {
+  0%   { transform: scaleY(0.35) scaleX(1.28); }
+  55%  { transform: scaleY(1.1)  scaleX(0.92); }
+  78%  { transform: scaleY(0.97) scaleX(1.03); }
+  100% { transform: scaleY(1)    scaleX(1); }
+}
+.milpa-pop {
+  animation: milpa-pop 0.55s cubic-bezier(0.2, 0.9, 0.25, 1.25) both;
+  transform-origin: bottom center;
+  transform-box: fill-box;
+}
+@keyframes milpa-sway {
+  0%, 100% { transform: rotate(-1.4deg); }
+  50%      { transform: rotate(1.4deg); }
+}
+.milpa-sway {
+  animation: milpa-sway 3.6s ease-in-out infinite;
+  transform-origin: bottom center;
+  transform-box: fill-box;
+}
+@keyframes milpa-sway-soft {
+  0%, 100% { transform: rotate(-0.7deg); }
+  50%      { transform: rotate(0.7deg); }
+}
+.milpa-sway-soft {
+  animation: milpa-sway-soft 4.4s ease-in-out infinite;
+  transform-origin: bottom center;
+  transform-box: fill-box;
+}
+@keyframes milpa-spin { to { transform: rotate(360deg); } }
+.milpa-sun-rays {
+  animation: milpa-spin 44s linear infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+@keyframes milpa-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+.milpa-sun-core { animation: milpa-bob 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes milpa-bee-fly {
+  0%   { transform: translate(0, 0) rotate(-4deg); }
+  25%  { transform: translate(150px, -34px) rotate(6deg); }
+  50%  { transform: translate(320px, 8px) rotate(-3deg); }
+  75%  { transform: translate(150px, 44px) rotate(5deg); }
+  100% { transform: translate(0, 0) rotate(-4deg); }
+}
+.milpa-bee { animation: milpa-bee-fly 13s ease-in-out infinite; }
+@keyframes milpa-wing { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.45); } }
+.milpa-wing { animation: milpa-wing 0.14s linear infinite; transform-origin: bottom center; transform-box: fill-box; }
+@keyframes milpa-bee-idle { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-4px) rotate(4deg); } }
+
+@keyframes milpa-fall {
+  0%   { transform: translateY(-60px) rotate(0deg); opacity: 0; }
+  8%   { opacity: 1; }
+  100% { transform: translateY(700px) rotate(560deg); opacity: 1; }
+}
+.milpa-confetti { animation: milpa-fall linear infinite; transform-box: fill-box; transform-origin: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .milpa-pop, .milpa-sway, .milpa-sway-soft, .milpa-sun-rays,
+  .milpa-sun-core, .milpa-bee, .milpa-wing, .milpa-confetti,
+  .milpa-tip-bee { animation: none !important; }
+}

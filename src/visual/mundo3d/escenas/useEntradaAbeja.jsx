@@ -21,6 +21,7 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
+import { ABEJA_PRESENCIA, ABEJA_TINTA } from '../../creatures/abejaIdentidad.js';
 import { CRUCE_ATRAPA_MS, CRUCE_SUELTA_MS } from '../../creatures/AbejaTransicion.jsx';
 import { useSalidaAbeja, resetSalidaAbeja } from '../../creatures/senalSalidaAbeja.js';
 import { SombraContacto } from './SombraContacto.jsx';
@@ -30,6 +31,12 @@ import useHaptics from '../useHaptics.js';
 /* Vuelo neutro: cuando la escena aún no pasa `estadoFinca` (contrato viejo),
    la coreografía se comporta EXACTO como antes (todos los multiplicadores en 1). */
 const VUELO_NEUTRO = { altura: 1, velocidad: 1, vagar: 1, tiembla: 0 };
+
+/* LA IDENTIDAD COMPARTIDA (abejaIdentidad.js): percha, tamaño de billboard y
+   sombra salen de la MISMA fuente que pinta la Angelita 2D del home — una sola
+   abeja, no dos. La escena posee la coreografía; la creature, cuerpo e identidad. */
+const PERCHA = ABEJA_PRESENCIA.percha;
+const SOMBRA = ABEJA_PRESENCIA.sombra;
 
 /* EL CRUCE 2D→3D (AbejaTransicion): el mesh nace OCULTO exactamente en el
    PUNTO DE ATRAPE — el píxel de pantalla donde la Angelita 2D del overlay se
@@ -181,11 +188,12 @@ export function useEntradaAbeja(foco, {
       ? 0
       : (Math.cos(t * 0.55) * 0.3 + Math.sin(t * 0.83 + 1.7) * 0.14) * mVagar;
     // La altura sobre el foco se atenúa con `mAltura` (mojada/sed vuelan más bajo).
-    const alto = (entrando ? 0.85 : 1.6) * mAltura;
+    // La percha y la altura de ronda son de la IDENTIDAD compartida (abejaIdentidad).
+    const alto = (entrando ? PERCHA.y : ABEJA_PRESENCIA.rondaAltura) * mAltura;
     const dest = _dest.set(
-      foco.x + (entrando ? 0.45 : 0.35 + vagarX) + tembleque + arrebato * (entrando ? 0.3 : 1),
+      foco.x + (entrando ? PERCHA.x : 0.35 + vagarX) + tembleque + arrebato * (entrando ? 0.3 : 1),
       foco.y + alto + bob + tembleque * 0.5 + arrebato * 0.18,
-      foco.z + (entrando ? 0.6 : 0.55 + vagarZ),
+      foco.z + (entrando ? PERCHA.z : 0.55 + vagarZ),
     );
     ref.current.position.lerp(dest, (entrando ? 0.06 : 0.05) * mVel * empuje);
     // Angelita se posa: al cruzar el umbral de llegada al foco, un roce háptico
@@ -206,8 +214,8 @@ export function useEntradaAbeja(foco, {
       const pos = ref.current.position;
       const h = Math.max(0, pos.y - piso);
       sombraRef.current.position.set(pos.x, piso + 0.03, pos.z);
-      sombraRef.current.scale.setScalar(1 + h * 0.15);
-      sombraRef.current.material.opacity = Math.max(0.06, 0.3 - h * 0.06);
+      sombraRef.current.scale.setScalar(1 + h * SOMBRA.ensanchaPorAltura);
+      sombraRef.current.material.opacity = Math.max(SOMBRA.opacidadMin, SOMBRA.opacidadBase - h * SOMBRA.atenuaPorAltura);
     }
   });
   return { ref, caraRef, sombraRef, visRef };
@@ -280,12 +288,14 @@ export function AbejaEscena({
     const t = setTimeout(() => el.removeAttribute('data-rebote'), 640);
     return () => clearTimeout(t);
   }, [rebote, reducedMotion]);
-  const size = 40 + Math.round(energiaReal * 12);
+  // El tamaño con el que Angelita ocupa el mundo sale de su IDENTIDAD (la misma
+  // fuente que la 2D del home): base + ganancia por energía real de la finca.
+  const size = ABEJA_PRESENCIA.billboardBase + Math.round(energiaReal * ABEJA_PRESENCIA.billboardPorEnergia);
   const vivo = !reducedMotion;
   return (
     <>
-      <group ref={ref} position={[foco.x + 0.45, foco.y + 0.85, foco.z + 0.6]}>
-        <Html center distanceFactor={7} zIndexRange={[40, 10]}>
+      <group ref={ref} position={[foco.x + PERCHA.x, foco.y + PERCHA.y, foco.z + PERCHA.z]}>
+        <Html center distanceFactor={ABEJA_PRESENCIA.distancia} zIndexRange={[40, 10]}>
           {/* Reacción al estado real, también en el wrapper (brillo mojado,
               temblor sediento, bamboleo de mordisco — rubber-hose). Gate RM.
               `visRef` + visibility inicial: con cruce, el billboard nace oculto
@@ -318,12 +328,15 @@ export function AbejaEscena({
           </div>
         </Html>
       </group>
-      {/* Su sombra: hermana (NO hija) del group — vive en el piso, no vuela. */}
+      {/* Su sombra: hermana (NO hija) del group — vive en el piso, no vuela.
+          Tintada con la MISMA tinta cálida del contorno rubber-hose (identidad):
+          hasta la sombra de Angelita está dibujada con su propia línea. */}
       <SombraContacto
         refExt={sombraRef}
-        pos={[foco.x + 0.45, piso + 0.03, foco.z + 0.6]}
-        radio={0.3}
-        opacidad={0.24}
+        pos={[foco.x + PERCHA.x, piso + 0.03, foco.z + PERCHA.z]}
+        radio={SOMBRA.radio}
+        color={ABEJA_TINTA}
+        opacidad={SOMBRA.opacidad}
         orden={3}
       />
     </>
