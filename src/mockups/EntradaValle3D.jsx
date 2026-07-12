@@ -61,12 +61,6 @@ import Mundo, {
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
 import { buildSpatialAgentInitialContext } from '../services/spatialAgentContext';
-import { speak, speakKokoro, stop as stopSpeak } from '../services/ttsService.js';
-import { navegarDesde3D, rutaDesdeMundo3D } from '../prodApp/wire3DNav.js';
-/* El VELO ODYSSEY (lenguaje de transición aprobado por el operador): cubrir →
-   swap en la meseta → revelar, con la identidad del DESTINO y variación por
-   tier. Barrel DOM-safe: cero three en el bundle base. */
-import { TunelLamina, rectDeOrigen, VeloOdyssey } from '../visual/mundo3d/transiciones/index.js';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
@@ -399,7 +393,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
   //    desde cualquier pantalla, incluida esta vitrina, sin acoplar el mockup.
   const preguntarAlAgente = useCallback(() => {
     if (typeof window === 'undefined') return;
-    stopSpeak();
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
     window.dispatchEvent(new CustomEvent('chagraNavigate', {
       detail: {
         view: 'agente',
