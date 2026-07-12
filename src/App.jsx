@@ -926,6 +926,10 @@ export default function App() {
   // Solo activos post-login (no en loading ni login para no atrapar shift+?
   // accidental al escribir password).
   const [currentView, setCurrentView] = useState('loading');
+  // Landing 3D público: la raíz sin sesión monta el valle 3D como "tema" de
+  // entrada. `sinSesion` recuerda que no hay auth para que el botón volver del
+  // valle mande a login (y no al dashboard vacío).
+  const [sinSesion, setSinSesion] = useState(false);
   // Estado online reactivo: usado para mostrar el aviso offline del agente
   // ANTES de intentar el dynamic import de AgentScreen (ver `case 'agente'`).
   // Sin esto, abrir el agente offline con su chunk no cacheado caía en el
@@ -1100,7 +1104,10 @@ export default function App() {
 
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
-        navigate('login');
+        setSinSesion(true);
+        // La raíz sin sesión aterriza en el valle 3D (tema de entrada). El
+        // login sigue accesible con #login o el botón volver del valle.
+        navigate(hash === 'login' ? 'login' : 'valle3d');
         return;
       }
       const targetView = HASH_VIEW_ROUTES[hash] || 'dashboard';
@@ -1378,7 +1385,7 @@ export default function App() {
       case 'login':
         return (
           <ErrorBoundary>
-            <LoginScreen onLoginSuccess={() => navigate('dashboard')} onSave={showToast} />
+            <LoginScreen onLoginSuccess={() => { setSinSesion(false); navigate('dashboard'); }} onSave={showToast} />
           </ErrorBoundary>
         );
       case 'oauth-callback':
@@ -2966,7 +2973,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de su finca (3D)">
-              <EntradaValle3DMockup onBack={() => navigate('dashboard')} onNavigate={navigate} />
+              <EntradaValle3DMockup onBack={() => navigate(sinSesion ? 'login' : 'dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
