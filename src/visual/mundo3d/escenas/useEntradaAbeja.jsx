@@ -322,24 +322,13 @@ export function AbejaEscena({
   const mojada = reaccion?.mojada ?? false;
   const sed = reaccion?.sed ?? false;
   const comiendo = reaccion?.comiendo ?? false;
-  // ── EL CLIMA REAL en el CUERPO (creatureClimaCuerpo): del mismo estadoFinca
-  //    salen clima/enso que la creature pinta (tinte, opacidad, aleteo). Aquí solo
-  //    tomamos su `altura` para COMPLEMENTAR la coreografía (niebla vuela corto,
-  //    dorada un poco más alto); se MULTIPLICA con la de reaccionFinca (lluvia/sed
-  //    ya bajan el vuelo) para no doble-contar. El resto lo aplica el dibujo.
-  const climaReal = estadoFinca?.clima ?? null;
-  const ensoReal = estadoFinca?.enso ?? 'neutro';
-  const cuerpoClima = useMemo(
-    () => cuerpoDeClima(climaReal, { enso: ensoReal, tier, perfil: PERFIL_ABEJA }),
-    [climaReal, ensoReal, tier],
-  );
-  const vueloClima = useMemo(() => {
-    const base = reaccion?.vuelo ?? VUELO_NEUTRO;
-    return cuerpoClima.altura === 1 ? base : { ...base, altura: base.altura * cuerpoClima.altura };
-  }, [reaccion, cuerpoClima]);
-  const { ref, caraRef, sombraRef, visRef } = useEntradaAbeja(foco, {
-    entrando, energia: energiaReal, reducedMotion, piso, vuelo: vueloClima,
-    cruce: cruceVivo, saliendo,
+  // La hora del valle (cielosHoraData, franja andina estable): de noche el
+  // idle la ACURRUCA. Se lee UNA vez al montar — la escena vive minutos, y el
+  // idle es determinista respecto de sus entradas (nada de reloj en render).
+  const hora = useMemo(() => horaDeReloj(), []);
+  const { ref, caraRef, sombraRef, visRef, idleRef } = useEntradaAbeja(foco, {
+    entrando, energia: energiaReal, reducedMotion, piso, vuelo: reaccion?.vuelo,
+    cruce: cruceVivo, saliendo, hora, tier,
   });
   // Microrrebote: cada toque de hotspot sube `rebote`; reiniciamos la animación
   // CSS (quitar → reflow → poner) para que dispare aun en toques seguidos. El
@@ -383,19 +372,26 @@ export function AbejaEscena({
             data-comiendo={comiendo && vivo ? '1' : undefined}
           >
             <div ref={reboteRef} className="mundo-abeja__rebote">
-              <div ref={caraRef} className="mundo-abeja__cara">
-                <AbejaAngelita
-                  size={size}
-                  animo={animoReal}
-                  energia={energiaReal}
-                  mojada={mojada}
-                  sed={sed}
-                  comiendo={comiendo}
-                  clima={climaReal}
-                  enso={ensoReal}
-                  animated={vivo}
-                  tier={tier}
-                />
+              {/* Cuarta capa de gesto: el IDLE (squash&stretch, vueltas de
+                  campana, celebración) — imperativa por frame desde el hook.
+                  Propia para no pisar la transition del volteo de la cara;
+                  transform-origin default (center) = gira sobre sí misma.
+                  Lleva data-creature para que el hook le cuelgue data-pose
+                  ('celebra'/'reposo', CSS de creatures.css por descendencia)
+                  SIN tocar el svg, que React re-renderiza a su aire. */}
+              <div ref={idleRef} className="mundo-abeja__idle" data-creature="abeja-angelita">
+                <div ref={caraRef} className="mundo-abeja__cara">
+                  <AbejaAngelita
+                    size={size}
+                    animo={animoReal}
+                    energia={energiaReal}
+                    mojada={mojada}
+                    sed={sed}
+                    comiendo={comiendo}
+                    animated={vivo}
+                    tier={tier}
+                  />
+                </div>
               </div>
             </div>
           </div>
