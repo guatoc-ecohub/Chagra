@@ -31,9 +31,13 @@ export function AbejaAngelita({
   animated = true,
   title = 'Abeja angelita',
   /* Pose de VIDA (idle-life): 'vuela' (default, aleteo normal) | 'celebra'
-     (aleteo rápido, la escena puede darle la vuelta de campana) | 'reposo'
-     (alitas plegadas que respiran despacio). Solo cambia CSS por data-pose:
-     los consumidores existentes no notan nada. */
+     (SALTO con anticipación + brazos en V que rebasan y asientan) | 'reposo'
+     (alitas plegadas + respiración lenta) | 'señala' (se inclina hacia el POI
+     y extiende el bracito apuntando, con overshoot). Los gestos viven en
+     `creatures.css` (keyframes rh-celebra / rh-reposo / rh-senala) y solo se
+     activan cuando la creature está viva (animated); con animated=false o
+     reduced-motion la abeja queda en fotograma digno (bracitos colgando,
+     sonriendo). Solo cambia CSS por data-pose: consumidores viejos no notan nada. */
   pose = 'vuela',
   /* ── REACTIVIDAD AL ESTADO REAL DE LA FINCA (auditoría §5b) ────────────────
      El repertorio de reacción que la escena deriva de la finca (reaccionFinca).
@@ -156,9 +160,15 @@ export function AbejaAngelita({
         </g>
       ))}
 
-      {/* bracitos manguera con mitón crema (delante del tronco, follow-through) */}
-      <Miembro d="M-6.2,1.4 C-8.2,2.4 -9.0,4.1 -8.4,5.9" ancho={2.1} punta={[-8.5, 6.2]} puntaR={1.55} sway={vivo} delay={-0.15} />
-      <Miembro d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sway={vivo} delay={-0.45} />
+      {/* bracitos manguera con mitón crema (delante del tronco, follow-through).
+          Marcados (crt-brazo-l/r) y con pivote en el HOMBRO para que los gestos
+          celebra/señala los alcen desde el hombro, no desde el centro del bbox:
+          el hombro izquierdo cae arriba-derecha de su bbox ('right top'); el
+          derecho, arriba-izquierda ('left top'). */}
+      <Miembro clase="crt-brazo-l" origen="right top"
+        d="M-6.2,1.4 C-8.2,2.4 -9.0,4.1 -8.4,5.9" ancho={2.1} punta={[-8.5, 6.2]} puntaR={1.55} sway={vivo} delay={-0.15} />
+      <Miembro clase="crt-brazo-r" origen="left top"
+        d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sway={vivo} delay={-0.45} />
 
       {/* cabeza clara con contorno */}
       <circle cx="8.6" cy="-1.0" r={ABEJA_PROPORCION.cabezaR} fill={ABEJA_PALETA.cabeza} stroke={RH_INK} strokeWidth="1.2" />
@@ -187,9 +197,12 @@ export function AbejaAngelita({
   ) : body;
 
   // data-estado agrupa la reacción para el CSS (brillo mojado, jadeo, mordisco).
+  // data-pose SOLO cuando está viva: así los gestos (celebra/reposo/señala) no
+  // corren con animated=false — la abeja queda en fotograma digno (bracitos
+  // colgando, sonriendo). RM lo apaga además por dentro del CSS.
   const estadoAttrs = {
     'data-creature': 'abeja-angelita',
-    'data-pose': pose,
+    'data-pose': vivo ? pose : undefined,
     'data-animo': animo,
     'data-tier': tier || undefined,
     'data-mojada': mojada ? '1' : undefined,
