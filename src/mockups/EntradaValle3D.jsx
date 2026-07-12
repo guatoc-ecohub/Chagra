@@ -55,6 +55,7 @@ import Mundo, {
 } from '../visual/mundo3d/index.js';
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
+import { buildSpatialAgentInitialContext } from '../services/spatialAgentContext';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
@@ -139,6 +140,10 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   const companero = useMemo(
     () => animoDeFinca(clima, { hayAlerta: !alertaVista }),
     [clima, alertaVista],
+  );
+  const estadoFinca = useMemo(
+    () => ({ clima, animo: companero.animo, energia: companero.energia }),
+    [clima, companero.animo, companero.energia],
   );
 
   // ── Angelita VIVA (auditoría S5): además del idle (respira/flota, en CSS),
@@ -339,8 +344,18 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   const preguntarAlAgente = useCallback(() => {
     if (typeof window === 'undefined') return;
     if (window.speechSynthesis) window.speechSynthesis.cancel();
-    window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'agente' } }));
-  }, []);
+    window.dispatchEvent(new CustomEvent('chagraNavigate', {
+      detail: {
+        view: 'agente',
+        initialData: buildSpatialAgentInitialContext({
+          mundoId: nav.mundoId,
+          hotspotActivo: focoId,
+          clima,
+          estadoFinca,
+        }),
+      },
+    }));
+  }, [nav.mundoId, focoId, clima, estadoFinca]);
 
   // ── ENTRAR a un mundo (tarea del viaje): cierra el panel, la abeja guía la
   //    transición y el framework monta la escena del mundo. Si el mundo aún no

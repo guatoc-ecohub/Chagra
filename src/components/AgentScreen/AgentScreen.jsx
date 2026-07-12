@@ -106,6 +106,7 @@ import { appendScientificFooter } from '../../services/semaforoConfianza';
 // Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
 import { summarizeSkyForGrounding } from '../../services/skyConditionService';
 import { assembleSystemContent, TOP_N_RAG } from '../../services/promptAssembler';
+import { buildSpatialContextPin } from '../../services/spatialAgentContext';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { createStreamGuard } from '../../services/streamGuards';
 import { getProfile, getModuleVisibility } from '../../services/userProfileService';
@@ -235,6 +236,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // Contexto ambiental de la finca (#202 mejora inteligencia): alertas activas
   // del alertEngine para que el agente las tenga en cuenta sin pedir fetch.
   const activeAlerts = useAlertStore((s) => s.activeAlerts);
+  // El valle 3D entrega un pin de turno 0 al abrir el chat. No se mezcla con
+  // el texto del usuario ni se persiste en memoria conversacional: permanece
+  // como sistema durante esta sesión y el flujo del chat sigue intacto.
+  const spatialContextPin = useMemo(
+    () => buildSpatialContextPin(initialContext?.spatialContext),
+    [initialContext],
+  );
 
   const [messages, setMessages] = useState([]);
   // Agente guiado: ids de insights ya ofrecidos/vistos en esta sesión de chat,
@@ -1174,6 +1182,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
 
     const messages = [
       { role: 'system', content: assembled.content },
+      ...(spatialContextPin ? [{ role: 'system', content: spatialContextPin }] : []),
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
