@@ -215,7 +215,7 @@ function nextSequenceNumber() {
  * @param {object} payload - payload tipado según eventType
  * @param {object} opts - { operator_id_hash (req), idempotency_key (opt — si no, se calcula),
  *                          prev_hash (opt), notes (opt) }
- * @returns {object} log entry validado, listo para persistir
+ * @returns {Promise<object>} log entry validado, listo para persistir
  */
 export async function createInventoryEvent(eventType, payload, opts = {}) {
   if (!VALID_EVENT_TYPES.has(eventType)) {

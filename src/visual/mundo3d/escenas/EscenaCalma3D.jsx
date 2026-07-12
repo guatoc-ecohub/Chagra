@@ -88,7 +88,7 @@ function Motas({ cuantas, reducedMotion }) {
     const r = rng(41);
     return Array.from({ length: cuantas }, (_, i) => ({
       key: `m${i}`,
-      pos: [(r() - 0.5) * 4.6, 0.7 + r() * 1.6, (r() - 0.5) * 3.4],
+      pos: /** @type {[number, number, number]} */ ([(r() - 0.5) * 4.6, 0.7 + r() * 1.6, (r() - 0.5) * 3.4]),
       fase: r() * Math.PI * 2,
       radio: 0.014 + r() * 0.014,
     }));

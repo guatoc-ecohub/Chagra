@@ -17,7 +17,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 const { fetchWithAuthRetry } = vi.hoisted(() => ({
-  fetchWithAuthRetry: vi.fn((...args) => global.fetch(...args)),
+  fetchWithAuthRetry: vi.fn(),
 }));
 
 vi.mock('../apiService.js', () => ({
@@ -31,7 +31,7 @@ describe('feedbackService — edges (A-15 #248)', () => {
   const originalFetch = global.fetch;
 
   beforeEach(() => {
-    global.localStorage = { getItem: vi.fn(), setItem: vi.fn() };
+    global.localStorage = { getItem: vi.fn(), setItem: vi.fn(), removeItem: vi.fn(), clear: vi.fn(), key: vi.fn(), length: 0 };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
     fetchWithAuthRetry.mockClear();
     fetchWithAuthRetry.mockImplementation((...args) => global.fetch(...args));
@@ -70,14 +70,14 @@ describe('feedbackService — edges (A-15 #248)', () => {
       prompt: 'x',
       response: 'y',
       thumb: 'down',
-      edges: [
-        { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' }, // válido
-        { species_id: 'a', edge_type: 'COMPATIBLE_WITH' },                  // falta target_id
-        { species_id: '', edge_type: 'CONTROLS', target_id: 'p' },          // species vacío
-        { species_id: 'c', edge_type: 'CONTROLS', target_id: 5 },           // target no string
-        null,                                                              // no objeto
-        'nope',                                                            // no objeto
-      ],
+      edges: /** @type {any} */ ([
+        { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' },
+        { species_id: 'a', edge_type: 'COMPATIBLE_WITH' },
+        { species_id: '', edge_type: 'CONTROLS', target_id: 'p' },
+        { species_id: 'c', edge_type: 'CONTROLS', target_id: 5 },
+        null,
+        'nope',
+      ]),
     });
     expect(sentBody().edges).toEqual([
       { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' },
@@ -102,7 +102,7 @@ describe('feedbackService — edges (A-15 #248)', () => {
   });
 
   it('edges no-array → [] (defensivo)', async () => {
-    await sendFeedback({ prompt: 'x', response: 'y', thumb: 'up', edges: 'oops' });
+    await sendFeedback({ prompt: 'x', response: 'y', thumb: 'up', edges: /** @type {any} */ ('oops') });
     expect(sentBody().edges).toEqual([]);
   });
 
@@ -111,9 +111,9 @@ describe('feedbackService — edges (A-15 #248)', () => {
       prompt: 'x',
       response: 'y',
       thumb: 'up',
-      edges: [
+      edges: /** @type {any} */ ([
         { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b', confidence: 0.9, extra: 'x' },
-      ],
+      ]),
     });
     expect(sentBody().edges).toEqual([
       { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' },

@@ -168,16 +168,16 @@ describe('formatWindow', () => {
       confidence: 0.7,
       sources: [],
     };
-    const s = formatWindow(w);
+    const s = formatWindow(/** @type {any} */ (w));
     expect(s).toContain('–'); // contiene rango
   });
 
   it('devuelve mensaje para template_missing', () => {
-    expect(formatWindow({ status: 'template_missing' })).toBe('No hay plantilla para esta especie');
+    expect(formatWindow(/** @type {any} */ ({ status: 'template_missing' }))).toBe('No hay plantilla para esta especie');
   });
 
   it('devuelve mensaje para insufficient_data', () => {
-    expect(formatWindow({ status: 'insufficient_data' })).toBe('Fecha no disponible');
+    expect(formatWindow(/** @type {any} */ ({ status: 'insufficient_data' }))).toBe('Fecha no disponible');
   });
 });
 
@@ -224,8 +224,8 @@ describe('deriveCurrentStage — etapa por fecha (anti-congelamiento)', () => {
   });
 
   it('nunca lanza ante entrada basura', () => {
-    expect(() => deriveCurrentStage({})).not.toThrow();
-    expect(deriveCurrentStage({})).toBe('sowing_confirmed');
+    expect(() => deriveCurrentStage(/** @type {any} */ ({}))).not.toThrow();
+    expect(deriveCurrentStage(/** @type {any} */ ({}))).toBe('sowing_confirmed');
   });
 });
 
@@ -244,7 +244,7 @@ describe('resolveTemplate — cascada de preferencia', () => {
   });
 
   it('retorna null con input vacio', () => {
-    expect(resolveTemplate({})).toBeNull();
+    expect(resolveTemplate(/** @type {any} */ ({}))).toBeNull();
   });
 
   it('retorna null con undefined', () => {
@@ -326,9 +326,9 @@ describe('resolveTemplate — cascada de preferencia', () => {
   });
 
   it('getCurrentStage con especie generica retorna etapas marcadas isGeneric', () => {
-    const r = getCurrentStage({ speciesSlug: 'allium_fistulosum', sowingDate: SOWING, now: SOWING + 20 * 86400000, category: 'hortalizas_hoja' });
+    const r = getCurrentStage(/** @type {any} */ ({ speciesSlug: 'allium_fistulosum', sowingDate: SOWING, now: SOWING + 20 * 86400000, category: 'hortalizas_hoja' }));
     expect(r).not.toBeNull();
-    expect(r.stage.isGeneric).toBe(true);
+    expect(/** @type {any} */ (r.stage).isGeneric).toBe(true);
     expect(r.stage.confidence).toBeLessThanOrEqual(0.3);
   });
 });

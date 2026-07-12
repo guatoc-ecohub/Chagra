@@ -56,7 +56,7 @@ function Contenido({
   const haptics = useHaptics({ reducedMotion });
   const zoom = entrada?.zoom ?? 6.5;
   const acento = (tinte && tinte[0]) || '#3f8f4e';
-  const centro = entrada?.centro || [0, (params?.alto ?? 1.1) * 0.5, 0];
+  const centro = entrada?.centro || /** @type {[number, number, number]} */ ([0, (params?.alto ?? 1.1) * 0.5, 0]);
 
   // La atmósfera del mundo: su `cielo` propio MEZCLADO 60% hacia la hora dorada
   // del valle (B6 — hoy entrar a un mundo "aplana" porque cada escena fija un
@@ -254,7 +254,7 @@ export default function EscenaBase3D({
      contrato (sin sombras, Lambert); lo que gradúa el tier son los píxeles
      (DPR/antialias) y, en el perfil mínimo, la niebla y las alfombras. */
   const frugal = tier === 'bajo';
-  const dpr = tier === 'alto' ? [1, 1.5] : tier === 'medio' ? [1, 1.3] : 1;
+  const dpr = tier === 'alto' ? /** @type {[number, number]} */ ([1, 1.5]) : tier === 'medio' ? /** @type {[number, number]} */ ([1, 1.3]) : 1;
   return (
     <Canvas
       className={`mundo-canvas${listo ? ' mundo-canvas--listo' : ''}`}

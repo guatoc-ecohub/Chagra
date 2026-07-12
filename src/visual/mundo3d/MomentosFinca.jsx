@@ -116,11 +116,11 @@ function useBeat({ activo, animar, dur, claveBeat, aplicar, onFin }) {
 
 /* Motas tenues que suben y se desvanecen (el mismo gesto tibio del corral).
    El dueño las mueve por ref con `subirMotas`; aquí solo se dibujan. */
-function MotasBeat({ refGrupo, color, position = [0, 0, 0] }) {
+function MotasBeat({ refGrupo, color, position = /** @type {const} */([0, 0, 0]) }) {
   return (
     <group ref={refGrupo} position={position} visible={false}>
       {[0, 1, 2].map((k) => (
-        <mesh key={k} position={[(k - 1) * 0.09, 0, (k - 1) * 0.05]}>
+        <mesh key={k} position={/** @type {[number, number, number]} */([(k - 1) * 0.09, 0, (k - 1) * 0.05])}>
           <octahedronGeometry args={[0.032, 0]} />
           <meshBasicMaterial color={color} transparent opacity={0} depthWrite={false} />
         </mesh>
@@ -151,7 +151,7 @@ export function MomentoNace({
   reducedMotion = false,
   onFin,
   claveBeat,
-  position = [0, 0, 0],
+  position = /** @type {const} */([0, 0, 0]),
   colorBrote = PALETA.follajeClaro,
 }) {
   const monticulo = useRef(null);
@@ -224,34 +224,34 @@ export function MomentoNace({
   return (
     <group position={position}>
       {/* el montículo de tierra removida */}
-      <mesh ref={monticulo} position={[0, 0.02, 0]}>
+      <mesh ref={monticulo} position={/** @type {const} */([0, 0.02, 0])}>
         <sphereGeometry args={[0.2, 10, 8]} />
         <meshLambertMaterial color={PALETA.tierra} flatShading />
       </mesh>
 
       {/* la cascarita de la semilla, que se ladea al brotar */}
-      <mesh ref={cascara} position={[0, 0.1, 0]}>
+      <mesh ref={cascara} position={/** @type {const} */([0, 0.1, 0])}>
         <sphereGeometry args={[0.055, 8, 6]} />
         <meshLambertMaterial color={PALETA.maderaOscura} flatShading />
       </mesh>
 
       {/* el brote: tallo que crece desde la base + hojas en la punta */}
-      <group ref={brote} position={[0, 0.08, 0]}>
+      <group ref={brote} position={/** @type {const} */([0, 0.08, 0])}>
         <group ref={tallo}>
-          <mesh position={[0, altoTallo / 2, 0]}>
+          <mesh position={/** @type {[number, number, number]} */([0, altoTallo / 2, 0])}>
             <cylinderGeometry args={[0.018, 0.028, altoTallo, 5]} />
             <meshLambertMaterial color={colorBrote} flatShading />
           </mesh>
         </group>
         <group ref={hojasG}>
           <group ref={hojaIzq}>
-            <mesh position={[-0.1, 0.01, 0]} rotation={[0, 0, 0.3]} scale={[1, 0.35, 0.6]}>
+            <mesh position={/** @type {const} */([-0.1, 0.01, 0])} rotation={[0, 0, 0.3]} scale={[1, 0.35, 0.6]}>
               <sphereGeometry args={[0.09, 8, 6]} />
               <meshLambertMaterial color={colorBrote} flatShading />
             </mesh>
           </group>
           <group ref={hojaDer}>
-            <mesh position={[0.1, 0.01, 0]} rotation={[0, 0, -0.3]} scale={[1, 0.35, 0.6]}>
+            <mesh position={/** @type {const} */([0.1, 0.01, 0])} rotation={[0, 0, -0.3]} scale={[1, 0.35, 0.6]}>
               <sphereGeometry args={[0.09, 8, 6]} />
               <meshLambertMaterial color={colorBrote} flatShading />
             </mesh>
@@ -260,7 +260,7 @@ export function MomentoNace({
       </group>
 
       {/* el brillo del nacimiento */}
-      <mesh ref={halo} position={[0, 0.3, 0]}>
+      <mesh ref={halo} position={/** @type {const} */([0, 0.3, 0])}>
         <sphereGeometry args={[0.32, 10, 8]} />
         <meshBasicMaterial color={LUZ_MOMENTO.halo} transparent opacity={0} depthWrite={false} />
       </mesh>
@@ -283,7 +283,7 @@ export function MomentoCrece({
   reducedMotion = false,
   onFin,
   claveBeat,
-  position = [0, 0, 0],
+  position = /** @type {const} */([0, 0, 0]),
   escalaDe = 1,
   escalaA = 1.35,
   colorCopa = PALETA.follaje,
@@ -341,33 +341,33 @@ export function MomentoCrece({
       <group ref={cuerpo}>
         {children || (
           <group>
-            <mesh position={[0, 0.16, 0]}>
+            <mesh position={/** @type {const} */([0, 0.16, 0])}>
               <cylinderGeometry args={[0.03, 0.045, 0.32, 5]} />
               <meshLambertMaterial color={PALETA.madera} flatShading />
             </mesh>
-            <mesh position={[0, 0.4, 0]}>
+            <mesh position={/** @type {const} */([0, 0.4, 0])}>
               <sphereGeometry args={[0.19, 9, 7]} />
               <meshLambertMaterial color={colorCopa} flatShading />
             </mesh>
-            <mesh position={[0.12, 0.32, 0.06]}>
+            <mesh position={/** @type {const} */([0.12, 0.32, 0.06])}>
               <sphereGeometry args={[0.12, 8, 6]} />
               <meshLambertMaterial color={PALETA.follajeOscuro} flatShading />
             </mesh>
-            <mesh position={[-0.11, 0.34, -0.05]}>
+            <mesh position={/** @type {const} */([-0.11, 0.34, -0.05])}>
               <sphereGeometry args={[0.11, 8, 6]} />
               <meshLambertMaterial color={PALETA.follajeClaro} flatShading />
             </mesh>
           </group>
         )}
         {/* la hoja nueva del escalón: brota en la copa al asentar */}
-        <mesh ref={hojaNueva} position={[0.02, 0.58, 0.04]} scale={0.001}>
+        <mesh ref={hojaNueva} position={/** @type {const} */([0.02, 0.58, 0.04])} scale={0.001}>
           <sphereGeometry args={[0.055, 7, 6]} />
           <meshLambertMaterial color={PALETA.follajeClaro} flatShading />
         </mesh>
       </group>
 
       {/* la onda que emana de la base */}
-      <mesh ref={anillo} position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh ref={anillo} position={/** @type {const} */([0, 0.02, 0])} rotation={[-Math.PI / 2, 0, 0]}>
         <torusGeometry args={[radioAnillo, 0.02, 6, 24]} />
         <meshBasicMaterial
           color={LUZ_MOMENTO.anillo}
@@ -394,9 +394,9 @@ export function MomentoCosecha({
   reducedMotion = false,
   onFin,
   claveBeat,
-  position = [0, 0, 0],
-  origen = [0, 1.05, 0],
-  destino = [0.85, 0, 0.5],
+  position = /** @type {const} */([0, 0, 0]),
+  origen = /** @type {const} */([0, 1.05, 0]),
+  destino = /** @type {const} */([0.85, 0, 0.5]),
   colorFruto = LUZ_MOMENTO.fruto,
 }) {
   const pivoteRama = useRef(null); // rama + fruto colgando (el vaivén)
@@ -458,8 +458,8 @@ export function MomentoCosecha({
   return (
     <group position={position}>
       {/* la ramita de la que cuelga el fruto */}
-      <group ref={pivoteRama} position={[origen[0], origen[1] + 0.12, origen[2]]}>
-        <mesh rotation={[0, 0, 1.15]} position={[-0.1, 0.04, 0]}>
+      <group ref={pivoteRama} position={/** @type {[number, number, number]} */([origen[0], origen[1] + 0.12, origen[2]])}>
+        <mesh rotation={[0, 0, 1.15]} position={/** @type {const} */([-0.1, 0.04, 0])}>
           <cylinderGeometry args={[0.014, 0.02, 0.3, 5]} />
           <meshLambertMaterial color={PALETA.follajeOscuro} flatShading />
         </mesh>
@@ -473,18 +473,18 @@ export function MomentoCosecha({
 
       {/* el canasto que recibe */}
       <group ref={canasto} position={destino}>
-        <mesh position={[0, 0.11, 0]}>
+        <mesh position={/** @type {const} */([0, 0.11, 0])}>
           <cylinderGeometry args={[0.21, 0.15, 0.22, 9]} />
           <meshLambertMaterial color={PALETA.maderaClara} flatShading />
         </mesh>
-        <mesh position={[0, 0.22, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh position={/** @type {const} */([0, 0.22, 0])} rotation={[-Math.PI / 2, 0, 0]}>
           <torusGeometry args={[0.21, 0.022, 6, 14]} />
           <meshLambertMaterial color={PALETA.madera} flatShading />
         </mesh>
       </group>
 
       {/* las chispas nacen donde POSA el fruto, no en la rama */}
-      <MotasBeat refGrupo={motas} color={LUZ_MOMENTO.chispa} position={[posada[0], 0, posada[2]]} />
+      <MotasBeat refGrupo={motas} color={LUZ_MOMENTO.chispa} position={/** @type {[number, number, number]} */([posada[0], 0, posada[2]])} />
     </group>
   );
 }
@@ -503,9 +503,9 @@ export function MomentoVende({
   reducedMotion = false,
   onFin,
   claveBeat,
-  position = [0, 0, 0],
-  origen = [0, 0, 0],
-  destino = [2.2, 0, -1.4],
+  position = /** @type {const} */([0, 0, 0]),
+  origen = /** @type {const} */([0, 0, 0]),
+  destino = /** @type {const} */([2.2, 0, -1.4]),
   colorBulto = PALETA.ambar,
   children,
 }) {
@@ -565,15 +565,15 @@ export function MomentoVende({
           {children || (
             <group>
               {/* el costalito de cosecha: panza, boca amarrada y su nudito */}
-              <mesh position={[0, 0.16, 0]} scale={[1, 1.15, 0.92]}>
+              <mesh position={/** @type {const} */([0, 0.16, 0])} scale={[1, 1.15, 0.92]}>
                 <sphereGeometry args={[0.16, 9, 7]} />
                 <meshLambertMaterial color={colorBulto} flatShading />
               </mesh>
-              <mesh position={[0, 0.33, 0]}>
+              <mesh position={/** @type {const} */([0, 0.33, 0])}>
                 <cylinderGeometry args={[0.045, 0.075, 0.09, 6]} />
                 <meshLambertMaterial color={colorBulto} flatShading />
               </mesh>
-              <mesh position={[0, 0.39, 0]}>
+              <mesh position={/** @type {const} */([0, 0.39, 0])}>
                 <sphereGeometry args={[0.035, 7, 6]} />
                 <meshLambertMaterial color={PALETA.maderaOscura} flatShading />
               </mesh>

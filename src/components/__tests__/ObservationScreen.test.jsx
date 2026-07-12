@@ -40,10 +40,10 @@ vi.mock('../../services/syncManager', () => ({
 
 // Mock crypto.randomUUID si jsdom no lo trae estable. Solo override mínimo.
 if (typeof globalThis.crypto?.randomUUID !== 'function') {
-  globalThis.crypto = {
+  globalThis.crypto = /** @type {any} */ ({
     ...(globalThis.crypto || {}),
     randomUUID: () => 'uuid-test-stub',
-  };
+  });
 }
 
 // L1.5 — mock ragRetriever.retrieve para no tocar el corpus real durante los
@@ -113,15 +113,15 @@ describe('ObservationScreen — audit 070.5 selector plant', () => {
     fireEvent.change(screen.getByDisplayValue(/Selecciona una zona/i), {
       target: { value: 'land-1' },
     });
-    const plantSel = screen.getByTestId('plant-selector');
+    const plantSel = /** @type {HTMLSelectElement} */ (screen.getByTestId('plant-selector'));
     fireEvent.change(plantSel, { target: { value: 'plant-1' } });
     expect(plantSel.value).toBe('plant-1');
 
     // Cambio a land-2 → selector apunta a plant-2 dropdown, plantId resetea.
-    fireEvent.change(screen.getAllByRole('combobox').find((s) => s.name === 'locationId'), {
+    fireEvent.change(screen.getAllByRole('combobox').find((s) => s.getAttribute('name') === 'locationId'), {
       target: { value: 'land-2' },
     });
-    const plantSel2 = screen.getByTestId('plant-selector');
+    const plantSel2 = /** @type {HTMLSelectElement} */ (screen.getByTestId('plant-selector'));
     expect(plantSel2.value).toBe('');
   });
 });
@@ -144,7 +144,7 @@ describe('ObservationScreen — audit 070.6 bridge case_study', () => {
       target: { value: 'land-1' },
     });
     // Severity por defecto es 'info' — explícitamente verificamos low también.
-    const severitySelect = screen.getAllByRole('combobox').find((s) => s.name === 'severity');
+    const severitySelect = screen.getAllByRole('combobox').find((s) => s.getAttribute('name') === 'severity');
     fireEvent.change(severitySelect, { target: { value: 'low' } });
 
     await act(async () => {
@@ -167,7 +167,7 @@ describe('ObservationScreen — audit 070.6 bridge case_study', () => {
     fireEvent.change(screen.getByDisplayValue(/Selecciona una zona/i), {
       target: { value: 'land-1' },
     });
-    const severitySelect = screen.getAllByRole('combobox').find((s) => s.name === 'severity');
+    const severitySelect = screen.getAllByRole('combobox').find((s) => s.getAttribute('name') === 'severity');
     fireEvent.change(severitySelect, { target: { value: 'high' } });
 
     await act(async () => {
@@ -193,7 +193,7 @@ describe('ObservationScreen — audit 070.6 bridge case_study', () => {
     const plantSel = screen.getByTestId('plant-selector');
     fireEvent.change(plantSel, { target: { value: 'plant-1' } });
 
-    const severitySelect = screen.getAllByRole('combobox').find((s) => s.name === 'severity');
+    const severitySelect = screen.getAllByRole('combobox').find((s) => s.getAttribute('name') === 'severity');
     fireEvent.change(severitySelect, { target: { value: 'critical' } });
 
     await act(async () => {
@@ -287,7 +287,7 @@ describe('ObservationScreen — L1.5 sugerencias RAG de tratamientos', () => {
     fireEvent.change(screen.getByPlaceholderText(/Describe la observacion/i), {
       target: { value: description },
     });
-    const severitySelect = screen.getAllByRole('combobox').find((s) => s.name === 'severity');
+    const severitySelect = screen.getAllByRole('combobox').find((s) => s.getAttribute('name') === 'severity');
     fireEvent.change(severitySelect, { target: { value: severity } });
   };
 
