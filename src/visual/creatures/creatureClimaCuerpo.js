@@ -81,19 +81,22 @@ const CLIMA_BASE = {
     velocidadAlas: 0.9,
     altura: 0.85, // vuela corto y cerca — no se pierde en la bruma
   },
-  // La hora dorada: vibrante, dorándose al sol bajo, alas rápidas.
+  // La hora dorada: cálida al sol bajo, alas ágiles. ATENUADA a propósito: el
+  // dorado saturaba y cansaba la vista (la Angelita 3D se veía "solo dorada,
+  // demasiado brillante"). Bajamos saturación/brillo — sigue dorándose, sin
+  // quemar. La des-saturación fina del billboard 3D la remata en mundo.css.
   dorada: {
     humedad: 0,
     opacidad: 1,
-    tinte: 'saturate(1.18) brightness(1.06)',
-    velocidadAlas: 1.3,
-    altura: 1.05, // se luce un poquito más alto
+    tinte: 'saturate(1.05) brightness(1.02)',
+    velocidadAlas: 1.18,
+    altura: 1.04, // se luce un pelín más alto
   },
   // Día claro y honesto: viva, apenas más ágil que el neutro.
   soleado: {
     humedad: 0,
     opacidad: 1,
-    tinte: 'saturate(1.06)',
+    tinte: 'saturate(1.03)',
     velocidadAlas: 1.1,
     altura: 1,
   },
