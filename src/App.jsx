@@ -163,6 +163,7 @@ const ValleLluviaMockup = lazy(() => import('./mockups/ValleLluvia3D'));
 const MundoSemilleroMockup = lazy(() => import('./mockups/MundoSemillero3D'));
 const MundoCompostMockup = lazy(() => import('./mockups/MundoCompost3D'));
 const JuegoMiFincaMockup = lazy(() => import('./mockups/JuegoMiFincaOdyssey'));
+const NewDonkMockup = lazy(() => import('./mockups/NewDonk2Den3D'));
 const VitrinaMaestraMockup = lazy(() => import('./mockups/VitrinaMaestraMundos'));
 const MundoFermentosMockup = lazy(() => import('./mockups/MundoFermentos3D'));
 const GemelosMundosMockup = lazy(() => import('./mockups/GemelosMundos2D'));
@@ -590,6 +591,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-semillero-3d': 'mockup_mundo_semillero_3d',
   'mockups/mundo-compost-3d': 'mockup_mundo_compost_3d',
   'mockups/juego-mi-finca': 'mockup_juego_mi_finca',
+  'mockups/new-donk': 'mockup_new_donk',
   'mockups/vitrina-maestra': 'mockup_vitrina_maestra',
   'mockups/mundo-fermentos-3d': 'mockup_mundo_fermentos_3d',
   'mockups/gemelos-2d': 'mockup_gemelos_2d',
@@ -1901,6 +1903,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Juego Mi finca (túnel Odyssey)">
               <JuegoMiFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_new_donk':
+        // Plano 2D side-scroller EMBEBIDO en la escena 3D (efecto New Donk):
+        // el mural 2D vive como plano dentro del valle y la cámara se aplana
+        // ortográficamente contra él (y regresa) sin desmontar el Canvas. Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="New Donk 2D en 3D">
+              <NewDonkMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
