@@ -160,6 +160,8 @@ const MundoSueloVivoMockup = lazy(() => import('./mockups/MundoSueloVivo3D'));
 const AliadosFincaMockup = lazy(() => import('./mockups/AliadosFinca3D'));
 const MundoCafe3DMockup = lazy(() => import('./mockups/MundoCafe3D'));
 const ValleLluviaMockup = lazy(() => import('./mockups/ValleLluvia3D'));
+const MundoSemilleroMockup = lazy(() => import('./mockups/MundoSemillero3D'));
+const MundoCompostMockup = lazy(() => import('./mockups/MundoCompost3D'));
 // El camino del agua en la finca: nacimiento → canal → reservorio → riego →
 // suelo, con el ciclo (vapor/nube/lluvia) cerrándose. Didáctico, hora dorada.
 const MundoAguaMockup = lazy(() => import('./mockups/MundoAgua3D'));
@@ -572,6 +574,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/aliados-finca-3d': 'mockup_aliados_finca_3d',
   'mockups/mundo-cafe-3d': 'mockup_mundo_cafe_3d',
   'mockups/valle-lluvia-3d': 'mockup_valle_lluvia_3d',
+  'mockups/mundo-semillero-3d': 'mockup_mundo_semillero_3d',
+  'mockups/mundo-compost-3d': 'mockup_mundo_compost_3d',
   'mockups/mundo-agua-3d': 'mockup_mundo_agua_3d',
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
@@ -1833,6 +1837,26 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle bajo la lluvia">
               <ValleLluviaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_semillero_3d':
+        // Mundo del SEMILLERO/VIVERO 3D: siembra→germinación→repique→
+        // endurecimiento (time-lapse tocable). Sustrato vivo. Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El semillero 3D">
+              <MundoSemilleroMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_compost_3d':
+        // Mundo del COMPOST 3D: residuos→pila caliente→lombricultura→suelo
+        // vivo (el anillo del abono que se cierra). Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El compost 3D">
+              <MundoCompostMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
