@@ -60,7 +60,7 @@ import Mundo, {
 } from '../visual/mundo3d/index.js';
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
-import { buildSpatialAgentInitialContext } from '../services/spatialAgentContext';
+import { speak, speakKokoro, stop as stopSpeak } from '../services/ttsService.js';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
@@ -116,8 +116,16 @@ class Valle3DGuard extends Component {
  *   Sin ella (vitrina #/mockups/entrada-3d, sin sesión) Angelita solo las
  *   nombra — el comportamiento de siempre.
  */
-/** @param {{ onBack?: () => void; onNavigate?: (view: string, data?: any) => void; initialMundoId?: any }} props */
 export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = null }) {
+  const [clima, setClima] = useState(() => climaPorHora());
+
+  // ── El clima es ATMÓSFERA, no un selector (auditoría B8/S8): los chips de
+  //    debug se quitaron de la UI. El valle sigue la hora real de la vereda y
+  //    se re-evalúa solo — amanece, atardece y anochece sin botonera.
+  useEffect(() => {
+    const t = setInterval(() => setClima(climaPorHora()), 5 * 60 * 1000);
+    return () => clearInterval(t);
+  }, []);
   const [focoId, setFocoId] = useState(null);
   const [panel, setPanel] = useState(null); // null | 'alerta' | <mundoId>
   const [voz, setVoz] = useState(true);
@@ -145,32 +153,6 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
 
   const nav = useNavegacionMundos({ reducedMotion });
   const viajarAlMundoInicial = nav.viajarAlMundo;
-
-  // ── ENTRAR como MURAL New Donk (flujo vivo): mientras la navegación viaja a
-  //    un mundo (fase 'viajando'), la cámara del valle 3D se APLANA hacia el
-  //    lugar (Valle3D `aplanando`) y este overlay corre el destello. El overlay
-  //    SOBREVIVE al swap de escena: se apaga en su propio `onFin` (no al cambiar
-  //    de fase) para poder REVELAR el mundo ya montado bajo el destello. Se
-  //    ENCIENDE en el handler que zarpa el viaje (`entrarAlMundo`), no en un
-  //    effect (react-hooks/set-state-in-effect). Volver al valle conserva el
-  //    velo clásico; el deep-link inicial también (cae al velo por el fallback
-  //    de más abajo). Reduced-motion no llega aquí: el hook salta 'viajando'.
-  const usarNewDonk = ENTRADA_NEWDONK && !reducedMotion;
-  const [newDonk, setNewDonk] = useState(null);
-
-  // ── El VELO ODYSSEY en los viajes de mundos 3D:
-  //    · ENTRAR a un mundo 3D sin New Donk: velo del destino (identidad andina).
-  //    · VOLVER al valle: velo `luz` ("de vuelta a casa") — exhala, no repite
-  //      la ceremonia de entrada.
-  //    Se arma en el handler que zarpa (nunca en un effect) y se apaga solo en
-  //    su `onFin`. Reduced-motion no lo arma: corte directo digno.
-  //    null | { fase: 'entrando'|'saliendo', destino }.
-  const [velo, setVelo] = useState(null);
-  // ── TÚNEL LÁMINA 3D→2D: cuando el CTA de un lugar abre su pantalla plana,
-  //    la lámina nace en el botón tocado y recibe el cambio de hash bajo el
-  //    destello cubierto. Es un cruce concreto de la entrada 3D, separado del
-  //    velo que sigue sirviendo para los viajes valle ↔ mundo.
-  const [tunelLamina, setTunelLamina] = useState(null);
 
   // La escucha puede llegar con un mundo ya resuelto por el NLU. Se consume
   // una vez al montar para que volver al valle siga siendo una decisión de la
@@ -393,19 +375,9 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
   //    desde cualquier pantalla, incluida esta vitrina, sin acoplar el mockup.
   const preguntarAlAgente = useCallback(() => {
     if (typeof window === 'undefined') return;
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-    window.dispatchEvent(new CustomEvent('chagraNavigate', {
-      detail: {
-        view: 'agente',
-        initialData: buildSpatialAgentInitialContext({
-          mundoId: nav.mundoId,
-          hotspotActivo: focoId,
-          clima,
-          estadoFinca,
-        }),
-      },
-    }));
-  }, [nav.mundoId, focoId, clima, estadoFinca]);
+    stopSpeak();
+    window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'agente' } }));
+  }, []);
 
   // ── ENTRAR a un mundo (tarea del viaje): cierra el panel, la abeja guía la
   //    transición y el framework monta la escena del mundo. Si el mundo aún no

@@ -57,6 +57,7 @@ export function useNavegacionMundos({ reducedMotion = false, pisoUsuario = null 
   // el reducedMotion del host manda para que el gate sea coherente con
   // el resto del árbol de mundos.
   const haptics = useHaptics({ reducedMotion });
+  const catalogoPisos = useMemo(() => mundosPorPisoTermico(pisoUsuario), [pisoUsuario]);
   // Espejo de la fase actual para disparar hápticas FUERA del updater de
   // estado (los updaters deben ser puros — StrictMode los corre dos veces).
   const faseRef = useRef(estado.fase);
@@ -118,5 +119,6 @@ export function useNavegacionMundos({ reducedMotion = false, pisoUsuario = null 
     volverAlValle,
     completarViaje,
     puedeEntrar: puedeEntrarAlMundo,
+    catalogoPisos,
   };
 }

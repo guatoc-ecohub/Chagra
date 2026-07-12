@@ -3540,6 +3540,9 @@ export default function App() {
                 initialMundoId={currentViewData?.mundo}
               />
               <EntradaValle3DMockup onBack={() => navigate(sinSesion ? 'login' : 'dashboard')} onNavigate={navigate} />
+                onNavigate={navigate}
+                initialMundoId={currentViewData?.mundo}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );

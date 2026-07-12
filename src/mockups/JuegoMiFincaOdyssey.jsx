@@ -37,7 +37,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import {
   ATMOSFERA,
   CIELOS,
@@ -49,6 +49,8 @@ import { decidirTier } from '../visual/mundo3d/deviceTier.js';
 import { crearRng } from '../visual/mundo3d/particulasData.js';
 import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
 import { MariquitaRubber, LombrizRubber } from '../visual/creatures/FaunaRubberhose.jsx';
+import { CamaraOdyssey, IrisOdyssey } from '../visual/mundo3d/TunelOdyssey.jsx';
+import { useTunelOdyssey } from '../visual/mundo3d/useTunelOdyssey.js';
 
 /* ══════════════════════════════════════════════════════════════════════════
    CONSTANTES DE DIRECCIÓN — la hora de la finca y el viaje de cámara
@@ -68,21 +70,6 @@ const POSE_BOCA = {
   mira: new THREE.Vector3(-2.2, 1.02, -1.6),
   fov: 15,
 };
-const TMP_MIRA = new THREE.Vector3();
-
-const VIAJE_S = 1.25; // dolly perspectiva↔casi-orto (s)
-const IRIS_MS = 640; // iris circular DOM (ms)
-
-/* easeInOutCubic — el dolly acelera suave y "cae" dentro del túnel. */
-const suavizar = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-
-/* Fija el FOV por MÉTODO (setFocalLength recalcula la proyección solo): el
-   mismo patrón de CamaraDirector — nada de asignar propiedades de la cámara. */
-function aplicarFov(camera, fov) {
-  if (Math.abs(camera.fov - fov) < 0.01) return;
-  const focal = (0.5 * camera.getFilmHeight()) / Math.tan(THREE.MathUtils.degToRad(fov) / 2);
-  camera.setFocalLength(focal);
-}
 
 /* ══════════════════════════════════════════════════════════════════════════
    LAYOUT DETERMINISTA (crearRng sembrado; jamás Math.random en render)
@@ -190,63 +177,6 @@ const VEL_SALTO = -700;
 /* ══════════════════════════════════════════════════════════════════════════
    3D — el diorama de la finca con el túnel en la loma
    ══════════════════════════════════════════════════════════════════════════ */
-
-/* La cámara del viaje: órbita viva → dolly con FOV que se estrecha (el truco
-   Odyssey: una perspectiva de FOV mínimo LEE como ortográfica) → y de vuelta.
-   Todo en useFrame: ni un ref leído en render. */
-function CamaraOdyssey({ fase, reducedMotion, onLlegada }) {
-  const { camera } = useThree();
-  const anim = useRef({ fasePrev: null, t: 0, avisado: false });
-  const llegadaRef = useRef(onLlegada);
-  useEffect(() => {
-    llegadaRef.current = onLlegada;
-  });
-
-  useFrame((state, dt) => {
-    const a = anim.current;
-    if (a.fasePrev !== fase) {
-      a.fasePrev = fase;
-      a.t = 0;
-      a.avisado = false;
-    }
-    const entra = fase === 'acercando';
-    const sale = fase === 'saliendo';
-    if (entra || sale) {
-      a.t = Math.min(1, a.t + (reducedMotion ? 1 : Math.min(dt, 0.05) / VIAJE_S));
-      const k = suavizar(a.t);
-      const desde = entra ? POSE_ORBITA : POSE_BOCA;
-      const hasta = entra ? POSE_BOCA : POSE_ORBITA;
-      camera.position.lerpVectors(desde.pos, hasta.pos, k);
-      TMP_MIRA.lerpVectors(desde.mira, hasta.mira, k);
-      camera.lookAt(TMP_MIRA);
-      /* El FOV cambia con curva k² al entrar (se estrecha tarde: succión de
-         túnel) y √k al salir (se abre pronto: bocanada de aire). */
-      const kFov = entra ? k * k : Math.sqrt(k);
-      aplicarFov(camera, desde.fov + (hasta.fov - desde.fov) * kFov);
-      if (a.t >= 1 && !a.avisado) {
-        a.avisado = true;
-        llegadaRef.current?.(fase);
-      }
-    } else if (fase === 'valle3d') {
-      /* Órbita viva: un vaivén determinista de brisa (sin controles: la
-         cámara es del director, como en los dioramas). */
-      const t = reducedMotion ? 0 : state.clock.elapsedTime;
-      camera.position.set(
-        POSE_ORBITA.pos.x + Math.sin(t * 0.16) * 0.4,
-        POSE_ORBITA.pos.y + Math.sin(t * 0.11) * 0.16,
-        POSE_ORBITA.pos.z + Math.cos(t * 0.13) * 0.32,
-      );
-      camera.lookAt(POSE_ORBITA.mira);
-      aplicarFov(camera, POSE_ORBITA.fov);
-    } else {
-      /* Fases de iris: la cámara sostiene la boca del túnel, quieta. */
-      camera.position.copy(POSE_BOCA.pos);
-      camera.lookAt(POSE_BOCA.mira);
-      aplicarFov(camera, POSE_BOCA.fov);
-    }
-  });
-  return null;
-}
 
 /* El túnel: aro de piedra en la loma + garganta oscura + disco que RESPIRA
    ámbar y se enciende cuando la cámara se acerca (la promesa del portal). */
@@ -1070,16 +1000,6 @@ const CSS_ODY = `
   inset: 0;
   background: ${CIELO.fondo};
 }
-.ody-capa2d[data-iris='abre'] { animation: odyIrisAbre ${IRIS_MS}ms cubic-bezier(0.3, 0.7, 0.4, 1) forwards; }
-.ody-capa2d[data-iris='cierra'] { animation: odyIrisCierra ${IRIS_MS}ms cubic-bezier(0.6, 0, 0.7, 0.4) forwards; }
-@keyframes odyIrisAbre {
-  from { clip-path: circle(2.5% at 50% 52%); }
-  to { clip-path: circle(142% at 50% 52%); }
-}
-@keyframes odyIrisCierra {
-  from { clip-path: circle(142% at 50% 52%); }
-  to { clip-path: circle(0% at 50% 52%); }
-}
 
 /* ── plano 2D ── */
 .ody-2d-vista { position: absolute; inset: 0; overflow: hidden; }
@@ -1324,47 +1244,22 @@ const CSS_ODY = `
  */
 export default function JuegoMiFincaOdyssey({ onBack }) {
   const [{ tier, reducedMotion }] = useState(() => decidirTier());
-  const [fase, setFase] = useState('valle3d');
   const [listo, setListo] = useState(false);
   const [cuidados, setCuidados] = useState(0);
-
   const sinCanvas = tier === 'bajo';
-
-  const entrar = useCallback(() => {
-    if (reducedMotion) setFase('juego2d');
-    else if (sinCanvas) setFase('iris-abre');
-    else setFase('acercando');
-  }, [reducedMotion, sinCanvas]);
-
-  const salir = useCallback(() => {
-    if (reducedMotion) setFase('valle3d');
-    else setFase('iris-cierra');
-  }, [reducedMotion]);
-
-  const alLlegarCamara = useCallback((faseViaje) => {
-    if (faseViaje === 'acercando') setFase('iris-abre');
-    else if (faseViaje === 'saliendo') setFase('valle3d');
-  }, []);
-
-  /* los timers del iris: al abrirse cede al juego; al cerrarse cede al dolly */
-  useEffect(() => {
-    if (fase === 'iris-abre') {
-      const t = setTimeout(() => setFase('juego2d'), IRIS_MS + 40);
-      return () => clearTimeout(t);
-    }
-    if (fase === 'iris-cierra') {
-      const t = setTimeout(() => setFase(sinCanvas ? 'valle3d' : 'saliendo'), IRIS_MS + 40);
-      return () => clearTimeout(t);
-    }
-    return undefined;
-  }, [fase, sinCanvas]);
+  const {
+    fase,
+    entrar,
+    salir,
+    alLlegarCamara,
+    mostrar3d: con3D,
+    mostrarPortada: conPortada,
+    mostrar2d: con2D,
+    enValle,
+  } = useTunelOdyssey({ reducedMotion, sinCanvas });
 
   const onProgreso = useCallback((n) => setCuidados(n), []);
 
-  const con3D = !sinCanvas && fase !== 'juego2d';
-  const conPortada = sinCanvas && fase !== 'juego2d' && fase !== 'iris-abre';
-  const con2D = fase === 'juego2d' || fase === 'iris-abre' || fase === 'iris-cierra';
-  const enValle = fase === 'valle3d';
   const completo = cuidados >= ESTACIONES.length;
 
   return (
@@ -1385,7 +1280,13 @@ export default function JuegoMiFincaOdyssey({ onBack }) {
           frameloop={reducedMotion && enValle ? 'demand' : 'always'}
           onCreated={() => setListo(true)}
         >
-          <CamaraOdyssey fase={fase} reducedMotion={reducedMotion} onLlegada={alLlegarCamara} />
+          <CamaraOdyssey
+            fase={fase}
+            poseValle={POSE_ORBITA}
+            poseBoca={POSE_BOCA}
+            reducedMotion={reducedMotion}
+            onLlegada={alLlegarCamara}
+          />
           <DioramaFinca fase={fase} onEntrar={entrar} cuidados={cuidados} />
         </Canvas>
       )}
@@ -1431,17 +1332,14 @@ export default function JuegoMiFincaOdyssey({ onBack }) {
       <div className="ody-vineta" aria-hidden="true" />
 
       {con2D && (
-        <div
-          className="ody-capa2d"
-          data-iris={fase === 'iris-abre' ? 'abre' : fase === 'iris-cierra' ? 'cierra' : 'no'}
-        >
+        <IrisOdyssey fase={fase} className="ody-capa2d">
           <JuegoFinca2D
             tier={tier}
             reducedMotion={reducedMotion}
             onSalir={salir}
             onProgreso={onProgreso}
           />
-        </div>
+        </IrisOdyssey>
       )}
     </section>
   );
