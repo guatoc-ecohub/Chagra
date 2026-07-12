@@ -241,6 +241,8 @@ const VentanaValleMockup = lazy(() => import('./components/VentanaValle3D'));
 const NewDonkMockup = lazy(() => import('./mockups/NewDonk2Den3D'));
 // Murales New Donk POR MUNDO: café, agua y semillero — cada uno su plano 2D propio.
 const MuralesNewDonkMockup = lazy(() => import('./mockups/MuralesNewDonk'));
+// La "ventana-puerta" al valle: viewport 3D vivo enmarcado para el home 2D.
+const VentanaValleMockup = lazy(() => import('./components/VentanaValle3D'));
 const VitrinaMaestraMockup = lazy(() => import('./mockups/VitrinaMaestraMundos'));
 const MundoFermentosMockup = lazy(() => import('./mockups/MundoFermentos3D'));
 const GemelosMundosMockup = lazy(() => import('./mockups/GemelosMundos2D'));
@@ -711,6 +713,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/ventana-valle': 'mockup_ventana_valle',
   'mockups/new-donk': 'mockup_new_donk',
   'mockups/murales-new-donk': 'mockup_murales_new_donk',
+  'mockups/ventana-valle': 'mockup_ventana_valle',
   'mockups/vitrina-maestra': 'mockup_vitrina_maestra',
   'mockups/mundo-fermentos-3d': 'mockup_mundo_fermentos_3d',
   'mockups/gemelos-2d': 'mockup_gemelos_2d',

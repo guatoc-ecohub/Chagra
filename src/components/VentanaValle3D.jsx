@@ -86,7 +86,7 @@ function Valle2D({ reducedMotion, tier }) {
 
       {/* la Angelita 2D volando en el espejo (misma creature del home) */}
       <div className={`vv-abeja vv-abeja--2d${reducedMotion ? ' vv-abeja--quieta' : ''}`}>
-        <AbejaAngelita size={44} animo="pleno" energia={0.9} animated={!reducedMotion} tier={tier} tempC={0} />
+        <AbejaAngelita size={44} animo="pleno" energia={0.9} animated={!reducedMotion} tier={tier} />
       </div>
     </div>
   );
@@ -137,9 +137,7 @@ function EnredaderaMarco() {
  * @param {string}  [props.className]  clases extra del botón-ventana.
  */
 export function VentanaValle3D({
-  // Sin host que decida (ruta `ventana_valle` de prod, montada sin props), la
-  // puerta lleva a su destino natural: el valle. Antes era un tap muerto.
-  onEntrar = () => { window.location.hash = ''; },
+  onEntrar,
   tier: tierProp,
   reducedMotion: rmProp,
   titulo = 'Entrar al valle',
