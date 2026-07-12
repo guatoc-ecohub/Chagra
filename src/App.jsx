@@ -156,6 +156,17 @@ const VitrinaInfraestructuraMockup = lazy(() => import('./mockups/vitrina3d/Vitr
 // con su encuadre de cámara curado (camaraDioramas) + botón «Entrar» al host real.
 const VitrinaMundosMockup = lazy(() => import('./mockups/vitrina3d/VitrinaMundos'));
 const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra'));
+const MundoSueloVivoMockup = lazy(() => import('./mockups/MundoSueloVivo3D'));
+const AliadosFincaMockup = lazy(() => import('./mockups/AliadosFinca3D'));
+const MundoCafe3DMockup = lazy(() => import('./mockups/MundoCafe3D'));
+const ValleLluviaMockup = lazy(() => import('./mockups/ValleLluvia3D'));
+const MundoSemilleroMockup = lazy(() => import('./mockups/MundoSemillero3D'));
+const MundoCompostMockup = lazy(() => import('./mockups/MundoCompost3D'));
+const JuegoMiFincaMockup = lazy(() => import('./mockups/JuegoMiFincaOdyssey'));
+const VitrinaMaestraMockup = lazy(() => import('./mockups/VitrinaMaestraMundos'));
+const MundoFermentosMockup = lazy(() => import('./mockups/MundoFermentos3D'));
+const GemelosMundosMockup = lazy(() => import('./mockups/GemelosMundos2D'));
+const MundoMicrofaunaMockup = lazy(() => import('./mockups/MundoMicrofauna3D'));
 // El camino del agua en la finca: nacimiento → canal → reservorio → riego →
 // suelo, con el ciclo (vapor/nube/lluvia) cerrándose. Didáctico, hora dorada.
 const MundoAguaMockup = lazy(() => import('./mockups/MundoAgua3D'));
@@ -170,6 +181,8 @@ const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 // 3D: el PÁRAMO altoandino — el ecosistema de la niebla (frailejones, musgo,
 // quenuas, aves) y el NACIMIENTO del agua. Didáctico: la fábrica de agua.
 const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
+const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
+const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -564,10 +577,23 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/vitrina-infra': 'mockup_vitrina_infra',
   'mockups/vitrina-mundos': 'mockup_vitrina_mundos',
   'mockups/sierra-global': 'mockup_sierra_global',
+  'mockups/mundo-suelo-vivo-3d': 'mockup_mundo_suelo_vivo_3d',
+  'mockups/aliados-finca-3d': 'mockup_aliados_finca_3d',
+  'mockups/mundo-cafe-3d': 'mockup_mundo_cafe_3d',
+  'mockups/valle-lluvia-3d': 'mockup_valle_lluvia_3d',
+  'mockups/mundo-semillero-3d': 'mockup_mundo_semillero_3d',
+  'mockups/mundo-compost-3d': 'mockup_mundo_compost_3d',
+  'mockups/juego-mi-finca': 'mockup_juego_mi_finca',
+  'mockups/vitrina-maestra': 'mockup_vitrina_maestra',
+  'mockups/mundo-fermentos-3d': 'mockup_mundo_fermentos_3d',
+  'mockups/gemelos-2d': 'mockup_gemelos_2d',
+  'mockups/mundo-microfauna-3d': 'mockup_mundo_microfauna_3d',
   'mockups/mundo-agua-3d': 'mockup_mundo_agua_3d',
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
   'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
+  'mockups/camara-director': 'mockup_camara_director',
+  'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -904,6 +930,10 @@ export default function App() {
   // Solo activos post-login (no en loading ni login para no atrapar shift+?
   // accidental al escribir password).
   const [currentView, setCurrentView] = useState('loading');
+  // Landing 3D público: la raíz sin sesión monta el valle 3D como "tema" de
+  // entrada. `sinSesion` recuerda que no hay auth para que el botón volver del
+  // valle mande a login (y no al dashboard vacío).
+  const [sinSesion, setSinSesion] = useState(false);
   // Estado online reactivo: usado para mostrar el aviso offline del agente
   // ANTES de intentar el dynamic import de AgentScreen (ver `case 'agente'`).
   // Sin esto, abrir el agente offline con su chunk no cacheado caía en el
@@ -1078,7 +1108,10 @@ export default function App() {
 
     isAuthenticated().then((isAuth) => {
       if (!isAuth) {
-        navigate('login');
+        setSinSesion(true);
+        // La raíz sin sesión aterriza en el valle 3D (tema de entrada). El
+        // login sigue accesible con #login o el botón volver del valle.
+        navigate(hash === 'login' ? 'login' : 'valle3d');
         return;
       }
       const targetView = HASH_VIEW_ROUTES[hash] || 'dashboard';
@@ -1356,7 +1389,7 @@ export default function App() {
       case 'login':
         return (
           <ErrorBoundary>
-            <LoginScreen onLoginSuccess={() => navigate('dashboard')} onSave={showToast} />
+            <LoginScreen onLoginSuccess={() => { setSinSesion(false); navigate('dashboard'); }} onSave={showToast} />
           </ErrorBoundary>
         );
       case 'oauth-callback':
@@ -1788,6 +1821,117 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_mundo_suelo_vivo_3d':
+        // Mundo del SUELO VIVO 3D (cutaway de perfil): horizontes O→A→B→C→R,
+        // raíces + micorrizas, agua infiltrándose, lombrices. Ruta sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El suelo vivo 3D">
+              <MundoSueloVivoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_aliados_finca_3d':
+        // Escena "aliados de la finca": fauna funcional benéfica trabajando
+        // (mariquita/abejorro/lombriz/escarabajo, control biológico). Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Aliados de la finca">
+              <AliadosFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_cafe_3d':
+        // Mundo del CAFÉ bajo sombra + beneficio (despulpado→lavado→secado).
+        // Ruta #/mockups/mundo-cafe-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El café bajo sombra">
+              <MundoCafe3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_valle_lluvia_3d':
+        // Valle bajo la LLUVIA: ciclo de tormenta reactivo (nubes→aguacero→
+        // escampa), crecida del río, cosecha de agua. Ruta sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El valle bajo la lluvia">
+              <ValleLluviaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_semillero_3d':
+        // Mundo del SEMILLERO/VIVERO 3D: siembra→germinación→repique→
+        // endurecimiento (time-lapse tocable). Sustrato vivo. Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El semillero 3D">
+              <MundoSemilleroMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_compost_3d':
+        // Mundo del COMPOST 3D: residuos→pila caliente→lombricultura→suelo
+        // vivo (el anillo del abono que se cierra). Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El compost 3D">
+              <MundoCompostMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_juego_mi_finca':
+        // Juego "Mi finca" con cruce túnel Odyssey 3D↔2D: la cámara entra por
+        // un túnel (dolly-zoom + iris) y aterriza en un side-scroll 2D jugable
+        // (4 cuidados agroecológicos, sin gamificación tóxica). Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Juego Mi finca (túnel Odyssey)">
+              <JuegoMiFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_vitrina_maestra':
+        // VITRINA MAESTRA: 12 portales de piedra (uno por mundo) con el cruce
+        // túnel Odyssey (dolly k² + iris) para entrar a cada uno. Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Vitrina maestra de mundos">
+              <VitrinaMaestraMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_fermentos_3d':
+        // Mundo de FERMENTOS/biopreparados: bocashi, biol, caldos minerales,
+        // microorganismos de montaña. Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El taller de fermentos 3D">
+              <MundoFermentosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_gemelos_2d':
+        // Gemelos 2D de primera clase (café/sanidad/agua) — láminas rubber-hose
+        // andinas para gama baja / reduced-motion. Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Gemelos 2D de los mundos">
+              <GemelosMundosMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_microfauna_3d':
+        // Mundo tocable de la MICRO-FAUNA del suelo (lombriz, colémbolo,
+        // micorrizas, bacterias) — explorar la vida del suelo con el dedo. Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La micro-fauna del suelo 3D">
+              <MundoMicrofaunaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_mundo_agua_3d':
         // El camino del agua 3D: recorre el agua de la finca — nacimiento
         // protegido, quebrada viva (caudal ecológico + aviso de residuos),
@@ -1825,6 +1969,26 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Juego La milpa">
               <JuegoLaMilpaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_momento_venta_mercado_3d':
+        // Momento 3D (FASE 2 audit 3D): venta / nacimiento / partida como
+        // momentos coreografiados con cámara dirigida. Sin gore, digno.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Un momento en la finca">
+              <MomentoVentaMercado3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_camara_director':
+        // Cámara de director (FASE 4 audit 3D): demo del secuenciador
+        // useCamaraDirector — 4 tomas coreografiadas sobre valle low-poly.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Cámara de director">
+              <CamaraDirectorDemoMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2833,7 +2997,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de su finca (3D)">
-              <EntradaValle3DMockup onBack={() => navigate('dashboard')} onNavigate={navigate} />
+              <EntradaValle3DMockup onBack={() => navigate(sinSesion ? 'login' : 'dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

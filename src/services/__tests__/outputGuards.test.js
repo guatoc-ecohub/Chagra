@@ -1613,15 +1613,30 @@ describe('applyOutputGuards (cadena)', () => {
       expect(out.text).toBe(ok);
     });
 
-    it('recorta respuestas >250 palabras a primeras 3 oraciones + oferta', () => {
-      const long = Array.from({ length: 55 }, (_, i) =>
-        `Recomendación ${i + 1} para tu cultivo de tomate en clima frío.`
+    it('recorta respuestas verborrea (>700 palabras) conservando ~10 oraciones + oferta', () => {
+      // 2026-07-12: umbral subido a 700 (antes 250 mutilaba respuestas técnicas).
+      const long = Array.from({ length: 120 }, (_, i) =>
+        `Recomendacion ${i + 1} para tu cultivo de tomate en clima frio de montaña.`
       ).join(' ');
-      expect(long.split(/\s+/).filter(Boolean).length).toBeGreaterThan(250);
+      expect(long.split(/\s+/).filter(Boolean).length).toBeGreaterThan(700);
       const out = guardConciseResponse(long);
       expect(out.modified).toBe(true);
-      expect(out.reason).toMatch(/verbose|concise/i);
+      expect(out.reason).toMatch(/verbose|concise|hard/i);
       expect(out.text).toMatch(/¿Quieres que profundice/i);
+    });
+
+    it('NO recorta respuestas técnicas de 250-700 palabras (intelligence-first)', () => {
+      // Regresión del bug reportado 2026-07-12: respuestas técnicas se cortaban
+      // a 1/3. Una respuesta detallada de ~450 palabras debe quedar INTACTA.
+      const tecnica = Array.from({ length: 55 }, (_, i) =>
+        `Detalle tecnico ${i + 1} sobre el manejo de la fresa en clima frio.`
+      ).join(' ');
+      const w = tecnica.split(/\s+/).filter(Boolean).length;
+      expect(w).toBeGreaterThan(250);
+      expect(w).toBeLessThan(700);
+      const out = guardConciseResponse(tecnica);
+      expect(out.modified).toBe(false);
+      expect(out.text).toBe(tecnica);
     });
 
     it('fuerza recorte duro si >400 palabras', () => {
@@ -1670,8 +1685,8 @@ describe('applyOutputGuards (cadena)', () => {
     });
 
     it('se integra en la cadena applyOutputGuards: recorta respuesta larga', () => {
-      const veryLong = Array.from({ length: 35 }, (_, i) =>
-        `Paso importante número ${i + 1} que debes seguir en tu cultivo de tomate.`
+      const veryLong = Array.from({ length: 110 }, (_, i) =>
+        `Paso importante número ${i + 1} que debes seguir en tu cultivo de tomate en clima frío.`
       ).join(' ');
       const out = applyOutputGuards(veryLong, {});
       expect(out.modified).toBe(true);
