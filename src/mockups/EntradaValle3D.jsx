@@ -97,7 +97,7 @@ class Valle3DGuard extends Component {
  *   Sin ella (vitrina #/mockups/entrada-3d, sin sesión) Angelita solo las
  *   nombra — el comportamiento de siempre.
  */
-export default function EntradaValle3D({ onBack, onNavigate }) {
+export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = null }) {
   const [clima, setClima] = useState(() => climaPorHora());
 
   // ── El clima es ATMÓSFERA, no un selector (auditoría B8/S8): los chips de
@@ -126,6 +126,17 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   );
 
   const nav = useNavegacionMundos({ reducedMotion });
+  const viajarAlMundoInicial = nav.viajarAlMundo;
+
+  // La escucha puede llegar con un mundo ya resuelto por el NLU. Se consume
+  // una vez al montar para que volver al valle siga siendo una decisión de la
+  // persona, no un bucle que la devuelva al mismo lugar.
+  const mundoInicialAbierto = useRef(false);
+  useEffect(() => {
+    if (mundoInicialAbierto.current || !initialMundoId) return;
+    mundoInicialAbierto.current = true;
+    viajarAlMundoInicial(initialMundoId);
+  }, [initialMundoId, viajarAlMundoInicial]);
 
   // ── Sonido ambiental 0-KB (spec S3): el valle reclama su paleta (brisa
   //    dorada) mientras la entrada viva; al entrar a un mundo, <Mundo> reclama

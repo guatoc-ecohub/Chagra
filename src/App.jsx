@@ -3033,7 +3033,11 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de su finca (3D)">
-              <EntradaValle3DMockup onBack={() => navigate(sinSesion ? 'login' : 'dashboard')} onNavigate={navigate} />
+              <EntradaValle3DMockup
+                onBack={() => navigate(sinSesion ? 'login' : 'dashboard')}
+                onNavigate={navigate}
+                initialMundoId={currentViewData?.mundo}
+              />
             </ErrorFallback>
           </ErrorBoundary>
         );
