@@ -1,0 +1,79 @@
+{
+  "catalogo": "biopreparados",
+  "destino": "public/biopreparados",
+  "_nota": "12 biopreparados que quedaron SIN foto tras la auditoria de vision 2026-07-09 (8 fotos mostraban lo que NO era -> se retiraron). descripcion_visual es el criterio DURO de la compuerta de vision: si la candidata no muestra ESO, se descarta y el biopreparado se queda con icono.",
+  "sujetos": [
+    {
+      "slug": "bocashi",
+      "nombre": "Bocashi",
+      "descripcion_visual": "una pila o monton de abono organico fermentado, seco y grumoso, de color marron/tierra, tipo compost (NO un liquido, NO una compostera de cocina, NO un producto empacado)",
+      "busquedas": ["bocashi abono organico", "abono bocashi pila", "fermented organic fertilizer pile farm"]
+    },
+    {
+      "slug": "biol",
+      "nombre": "Biol",
+      "descripcion_visual": "un biofertilizante liquido oscuro en una caneca o barril plastico con manguera/valvula de gas (fermentacion anaerobica). NO una pagina de documento/paper, NO un mineral, NO un polvo",
+      "busquedas": ["biodigestor casero biofertilizante", "biol biofertilizante caneca", "liquid biofertilizer barrel digester"]
+    },
+    {
+      "slug": "purin_ortiga",
+      "nombre": "Purin de ortiga",
+      "descripcion_visual": "un balde o recipiente con liquido verdoso-marron y hojas de ortiga fermentando en agua (purin/macerado de ortiga)",
+      "busquedas": ["purin d'ortie", "nettle slurry fertilizer", "nettle liquid manure"]
+    },
+    {
+      "slug": "caldo_sulfocalcico",
+      "nombre": "Caldo sulfocalcico",
+      "descripcion_visual": "un liquido de color rojizo-anaranjado o ambar (azufre + cal hervidos) en una olla o recipiente. NO un mineral solido, NO un cristal de barita, NO un polvo",
+      "busquedas": ["lime sulfur solution", "polissulfeto de calcio", "calcium polysulfide liquid"]
+    },
+    {
+      "slug": "humus_liquido",
+      "nombre": "Humus liquido (lixiviado de lombriz)",
+      "descripcion_visual": "liquido oscuro escurrido de una lombricompostera / vermicompost (lixiviado de lombriz), goteando o recogido en un recipiente",
+      "busquedas": ["vermicompost leachate", "worm tea liquid", "vermiwash"]
+    },
+    {
+      "slug": "lixiviado_frutas",
+      "nombre": "Lixiviado de frutas",
+      "descripcion_visual": "frascos o recipiente con frutas troceadas + panela/azucar fermentando, produciendo un liquido marron (jugo de frutas fermentado, FPJ)",
+      "busquedas": ["fermented fruit juice FPJ", "fruit enzyme ferment jar", "lixiviado de frutas"]
+    },
+    {
+      "slug": "supermagro",
+      "nombre": "Supermagro",
+      "descripcion_visual": "una caneca o barril con un fermento liquido oscuro (estiercol + melaza + sales minerales, biofertilizante anaerobico), NO un mineral ni un polvo",
+      "busquedas": ["supermagro biofertilizante", "anaerobic biofertilizer drum", "biofertilizante liquido caneca"]
+    },
+    {
+      "slug": "trichoderma_harzianum_suelo",
+      "nombre": "Trichoderma harzianum",
+      "descripcion_visual": "el hongo Trichoderma de color verde intenso creciendo sobre sustrato (arroz/grano) o en placa de cultivo; puede ser microscopia del hongo. Verde caracteristico",
+      "busquedas": ["Trichoderma harzianum culture", "Trichoderma green mold rice", "Trichoderma petri dish"]
+    },
+    {
+      "slug": "bacillus_subtilis_foliar",
+      "nombre": "Bacillus subtilis",
+      "descripcion_visual": "cultivo de la bacteria Bacillus subtilis: colonias en una placa de agar (petri) o microscopia de la bacteria. NO una planta, NO un liquido generico",
+      "busquedas": ["Bacillus subtilis colony agar", "Bacillus subtilis culture plate", "Bacillus subtilis microscopy"]
+    },
+    {
+      "slug": "cal_dolomita",
+      "nombre": "Cal dolomitica",
+      "descripcion_visual": "polvo fino de color blanco a gris claro (cal dolomitica / dolomita molida agricola), en un monton o saco. NO un cristal mineral grande, NO otra roca",
+      "busquedas": ["dolomite powder agricultural", "dolomitic lime powder", "cal dolomita agricola"]
+    },
+    {
+      "slug": "ceniza_madera",
+      "nombre": "Ceniza de madera",
+      "descripcion_visual": "ceniza gris fina de madera quemada, en un monton, balde o fogon (wood ash). Color gris claro, textura de polvo",
+      "busquedas": ["wood ash", "wood ashes bucket", "ceniza de madera"]
+    },
+    {
+      "slug": "biofertilizante_algas",
+      "nombre": "Biofertilizante de algas marinas",
+      "descripcion_visual": "algas marinas pardas (kelp/sargazo) o un extracto liquido oscuro de algas usado como fertilizante. NO algas de agua dulce verdes en un lago",
+      "busquedas": ["seaweed fertilizer kelp", "kelp extract fertilizer", "brown seaweed agriculture"]
+    }
+  ]
+}
