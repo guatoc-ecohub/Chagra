@@ -79,6 +79,15 @@ const LUGARES_MINIMAPA = componerMundos(MUNDOS_VALLE).map((m) => ({
    directo, sin dolly ni overlay (ni este ni el velo se montan). */
 const ENTRADA_NEWDONK = true;
 
+/* ENTRAR a un mundo como MURAL New Donk (flujo vivo): en vez del velo plano, la
+   cámara del valle 3D hace dolly + aplane ortográfico hacia el lugar del mundo
+   (el 3D asoma en los bordes) y solo al caer dentro un destello con la luz del
+   destino cubre el intercambio de escena. Flag de módulo para revertir al velo
+   de un toque. VOLVER al valle conserva el velo (el New Donk es de ENTRADA).
+   Reduced-motion: el hook de navegación salta la fase 'viajando' → corte
+   directo, sin dolly ni overlay (ni este ni el velo se montan). */
+const ENTRADA_NEWDONK = true;
+
 /*
  * DEVICE-TIERING REAL — UNA sola fuente de verdad: `decidirTier()` del
  * framework (DR-3D-PERF-GAMABAJA FIX 1.1: antes había aquí un `decidirRender`
@@ -164,6 +173,18 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
 
   const nav = useNavegacionMundos({ reducedMotion });
   const viajarAlMundoInicial = nav.viajarAlMundo;
+
+  // ── ENTRAR como MURAL New Donk (flujo vivo): mientras la navegación viaja a
+  //    un mundo (fase 'viajando'), la cámara del valle 3D se APLANA hacia el
+  //    lugar (Valle3D `aplanando`) y este overlay corre el destello. El overlay
+  //    SOBREVIVE al swap de escena: se apaga en su propio `onFin` (no al cambiar
+  //    de fase) para poder REVELAR el mundo ya montado bajo el destello. Se
+  //    ENCIENDE en el handler que zarpa el viaje (`entrarAlMundo`), no en un
+  //    effect (react-hooks/set-state-in-effect). Volver al valle conserva el
+  //    velo clásico; el deep-link inicial también (cae al velo por el fallback
+  //    de más abajo). Reduced-motion no llega aquí: el hook salta 'viajando'.
+  const usarNewDonk = ENTRADA_NEWDONK && !reducedMotion;
+  const [newDonk, setNewDonk] = useState(null);
 
   // La escucha puede llegar con un mundo ya resuelto por el NLU. Se consume
   // una vez al montar para que volver al valle siga siendo una decisión de la
@@ -400,14 +421,11 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
       // Enciende el mural New Donk en el MISMO tick que zarpa el viaje (mismo
       // render que la fase 'viajando') → el velo queda suprimido y el aplane
       // del valle corre bajo este overlay. Se apaga solo en su `onFin`.
-      // Con el flag New Donk apagado, el velo Odyssey del destino cubre la
-      // entrada (identidad andina) en vez del velo genérico.
       if (usarNewDonk) setNewDonk(id);
-      else if (!reducedMotion) setVelo({ fase: 'entrando', destino: id });
       setPanel(null);
       decir(`Angelita lo lleva a ${tituloDeMundo(id)}.`);
     },
-    [nav, decir, usarNewDonk, reducedMotion],
+    [nav, decir, usarNewDonk],
   );
 
   // ── VOLVER del mundo al valle: el velo Odyssey `luz` — regresar a casa
@@ -504,11 +522,6 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
                 reducedMotion={reducedMotion}
                 tier={equipo.tier}
                 aplanando={!!newDonk && nav.fase === 'viajando'}
-                /* La CÁMARA DE DIRECTOR también en la entrada real (antes solo
-                   la tenía la escena del framework): el barrido establishing
-                   que presenta el valle vivo. Gateada por tier/reduced-motion
-                   adentro; una sola vez por sesión. */
-                camaraDirector
               />
               {/* Dispara el cruce 2D→3D cuando el chunk 3D del valle resolvió
                   (hermano de <Valle3D> en el Suspense). DOM puro, sin three. */}
@@ -591,38 +604,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
           onFin={() => setNewDonk(null)}
         />
       )}
-      {/* El VELO ODYSSEY del viaje: cubre → swap en la meseta (`onCubierto`) →
-          revela. El swap es el del framework de mundos. */}
-      {velo && (
-        <VeloOdyssey
-          fase={velo.fase}
-          destino={velo.destino}
-          tier={equipo.tier}
-          reducedMotion={reducedMotion}
-          onCubierto={() => {
-            nav.completarViaje();
-          }}
-          onFin={() => setVelo(null)}
-        />
-      )}
-      {/* Salida viva valle 3D → pantalla 2D: el túnel termina de cubrir antes
-          de que el shell cambie de ruta, así el intercambio nunca queda a la
-          vista. La lámina usa el rect del CTA tocado o un origen centrado para
-          entradas desde un hotspot 3D sin elemento DOM. */}
-      {tunelLamina && (
-        <TunelLamina
-          fase="saliendo"
-          destino={tunelLamina.destino}
-          rect={tunelLamina.rect}
-          tier={equipo.tier}
-          reducedMotion={reducedMotion}
-          onCubierto={() => navegarDesde3D(tunelLamina.destino)}
-          onFin={() => setTunelLamina(null)}
-        />
-      )}
-      {/* Respaldo (viajes que nadie armó, p. ej. el deep-link inicial): el
-          velo clásico de siempre, con su swap al final. */}
-      {nav.enViaje && nav.mundoId && !(newDonk && nav.fase === 'viajando') && !velo && (
+      {nav.enViaje && nav.mundoId && !(newDonk && nav.fase === 'viajando') && (
         <TransicionMundo
           mundoId={nav.mundoId}
           sentido={nav.fase === 'viajando' ? 'entrar' : 'volver'}

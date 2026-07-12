@@ -23,7 +23,7 @@
 /* Nota: las props de three (position, args, intensity, castShadow, etc.) son
    válidas en el reconciliador de R3F, no en el DOM — el config de ESLint del
    repo no activa react/no-unknown-property, así que no requieren disable. */
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Html, Float, Stars, OrbitControls, Detailed, Instances, Instance,
@@ -1861,156 +1861,17 @@ function AplaneNewDonk({ foco, aplanando }) {
   return null;
 }
 
-/* ── PANEO GLOBAL "Age of Empires" (backlog AoE #2) + ZOOM SEMÁNTICO ──
-   El valle entero se puede RECORRER (pan) sin perderse:
-   · LÍMITES del paseo: la mira vive dentro de PAN_LIMITES — la finca completa
-     (lugares en x∈[-5.7,6.4], z∈[-7.6,8.1]) más un poco de aire; nunca el
-     vacío del plano de 34×34. Hay una sobra elástica de PAN_SOBRA unidades:
-     llegar al borde no es un muro seco — el resorte PAN_RESORTE devuelve la
-     mira al área con la misma calma del damping 0.08 aprobado. La corrección
-     mueve mira Y cámara juntas (translación): el borde empuja de vuelta sin
-     torcer el encuadre.
-   · La mira se PEGA AL SUELO mientras se pasea (alturaTerreno + 0.8): pasear
-     hacia el páramo encuadra el páramo, no el aire sobre la tierra baja.
-   · Se eligió OrbitControls con pan habilitado (NO MapControls): MapControls
-     cambia el gesto primario a PAN — rompería "un dedo orbita" (el gesto
-     aprobado) y la coreografía existente que comparte este ref (CamaraViajera
-     + DirectorValle + AplaneNewDonk). El pan clampeado da el mapa AoE sin
-     re-cablear ninguna cámara.
-   · VOLVER AL ENCUADRE DE AUTOR: doble-toque/doble-clic sobre el valle
-     regresa suave (VOLVER_S) a la pose de reposo aprobada (posición + mira).
-     Con reduced-motion el regreso es un corte directo, sin animación. */
-const PAN_LIMITES = { x0: -9, x1: 9, z0: -9.5, z1: 9.5 };
-const PAN_SOBRA = 2.5; // sobra elástica más allá del límite antes del muro duro
-const PAN_RESORTE = 0.12; // resorte de regreso al área (fracción por frame)
-const PAN_PEGA_SUELO = 0.1; // qué tan rápido la mira se pega al terreno al pasear
-const VOLVER_S = 1.15; // duración del regreso al encuadre de autor
-const _volverPos = new THREE.Vector3();
-const _volverMira = new THREE.Vector3();
-
-/* Bandas del ZOOM SEMÁNTICO (por distancia cámara→mira) con HISTÉRESIS: el
-   umbral de entrada y el de salida difieren ~1.5 u — cruzar despacio no hace
-   parpadear los rótulos. Los umbrales de 'lejos' escalan con kReposo: en un
-   teléfono parado la pose de reposo vive más lejos y debe seguir cayendo en
-   banda 'media' (el comportamiento aprobado).
-   · 'cerca' (entra d<11 / sale d>12.5): DETALLE — mandan texturas, bichos y
-     matas; los rótulos se calman (solo el apuntado, como punto-chip).
-   · 'media': el comportamiento aprobado tal cual (apuntado plena, resto punto).
-   · 'lejos' (entra d>21·k / sale d<19.5·k): vista ESTRATÉGICA — el mapa AoE:
-     cada rótulo que quepa en pantalla muestra su nombre completo. */
-const BANDA_CERCA_ENTRA = 11;
-const BANDA_CERCA_SALE = 12.5;
-const BANDA_LEJOS_ENTRA = 21;
-const BANDA_LEJOS_SALE = 19.5;
-
-function bandaSemantica(previa, d, k = 1) {
-  const lejosEntra = BANDA_LEJOS_ENTRA * k;
-  const lejosSale = BANDA_LEJOS_SALE * k;
-  if (previa === 'lejos') return d < lejosSale ? (d < BANDA_CERCA_ENTRA ? 'cerca' : 'media') : 'lejos';
-  if (previa === 'cerca') return d > BANDA_CERCA_SALE ? (d > lejosEntra ? 'lejos' : 'media') : 'cerca';
-  return d > lejosEntra ? 'lejos' : d < BANDA_CERCA_ENTRA ? 'cerca' : 'media';
-}
-
 /* ── Cámara: viaja suavemente hacia el foco (target) cuando cambia de mundo Y
       HACE ZOOM hacia el lugar — la sensación de ENTRAR con la abeja, no un modal
       plano. El acercamiento solo se fuerza durante la transición (una vez llega,
       suelta el control para que el usuario siga haciendo zoom a mano). Durante
       el APLANE New Donk cede TODO el control a AplaneNewDonk (early-return): no
-      mueve target ni zoom para no pelear con la caída.
-      Además conduce el PANEO ACOTADO (clamp elástico del target), el paseo
-      libre (apaga el recentrado cuando el usuario panea) y el regreso al
-      encuadre de autor por doble-toque — ver el bloque AoE de arriba. ── */
-function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, kReposo = 1, miraInicial = null, reposo = null, reducedMotion = false }) {
+      mueve target ni zoom para no pelear con la caída. ── */
+function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false }) {
   const trans = useRef(0);
   const prevKey = useRef(focoKey);
   const entrando = focoKey !== 'valle';
-  /* LA CÁMARA ES DEL USUARIO DESDE QUE LA TOCA: la deriva de reposo
-     (autoRotate) es bienvenida mientras nadie maneja, pero girar el valle
-     BAJO el dedo que está apuntando a un lugar era el "difícil de manejar a
-     ratos" — el chip se corría del toque. El primer gesto de órbita apaga la
-     deriva por el resto de la sesión del valle. */
-  const [tomada, setTomada] = useState(false);
-  /* PASEO LIBRE (pan AoE): true desde que el usuario panea o pellizca (2
-     punteros, o arrastre con botón derecho). Mientras dura, el lerp de
-     recentrado al reposo se apaga — si no, el resorte se tragaba el paseo.
-     Se detecta por GESTO (no por movimiento del target): el DirectorValle
-     también mueve el target con offsets aditivos y dispararía falsos. */
-  const panLibre = useRef(false);
-  /* El regreso al encuadre de autor (doble-toque): animación propia. */
-  const volver = useRef({ activo: false, p: 0, desde: new THREE.Vector3(), desdeMira: new THREE.Vector3() });
-  /* Espejo vivo de props para los listeners DOM (se refresca en useFrame):
-     el efecto de listeners se registra UNA vez y no persigue re-renders. */
-  const vivo = useRef({ entrando, aplanando, reducedMotion, reposo, mira: miraInicial });
-  const { gl } = useThree();
-
-  useEffect(() => {
-    const el = gl.domElement;
-    let activos = 0; // punteros abajo ahora mismo (2+ = pan/pellizco táctil)
-    let bajada = null; // dónde bajó el puntero (distinguir TAP de arrastre)
-    let tapPrevio = null; // el tap anterior (detectar el doble-toque)
-    const onDown = (e) => {
-      activos += 1;
-      if (activos >= 2 || e.button === 2) panLibre.current = true;
-      bajada = { x: e.clientX, y: e.clientY };
-    };
-    const onUp = (e) => {
-      activos = Math.max(0, activos - 1);
-      const v = vivo.current;
-      if (!bajada || v.entrando || v.aplanando) {
-        tapPrevio = null;
-        return;
-      }
-      const movio = Math.hypot(e.clientX - bajada.x, e.clientY - bajada.y) > 9;
-      bajada = null;
-      if (movio) {
-        tapPrevio = null; // fue un arrastre (órbita/pan), no un toque
-        return;
-      }
-      const ahora = performance.now();
-      const esDoble =
-        tapPrevio &&
-        ahora - tapPrevio.t < 350 &&
-        Math.hypot(e.clientX - tapPrevio.x, e.clientY - tapPrevio.y) < 28;
-      if (!esDoble) {
-        tapPrevio = { x: e.clientX, y: e.clientY, t: ahora };
-        return;
-      }
-      tapPrevio = null;
-      /* DOBLE-TOQUE sobre el valle (el canvas — los rótulos DOM no llegan
-         aquí; tocar un mundo entra a él y `entrando` bloquea): VOLVER AL
-         ENCUADRE DE AUTOR. Nadie se queda perdido en el paseo. */
-      panLibre.current = false;
-      const c = controls.current;
-      if (!c || !v.reposo || !v.mira) return;
-      if (v.reducedMotion) {
-        // Calma pedida: corte directo a la pose aprobada, sin viaje.
-        c.object.position.set(v.reposo[0], v.reposo[1], v.reposo[2]);
-        c.target.set(v.mira[0], v.mira[1], v.mira[2]);
-        c.update();
-        return;
-      }
-      const va = volver.current;
-      va.activo = true;
-      va.p = 0;
-      va.desde.copy(c.object.position);
-      va.desdeMira.copy(c.target);
-    };
-    const onCancel = () => {
-      activos = Math.max(0, activos - 1);
-      bajada = null;
-      tapPrevio = null;
-    };
-    el.addEventListener('pointerdown', onDown);
-    el.addEventListener('pointerup', onUp);
-    el.addEventListener('pointercancel', onCancel);
-    return () => {
-      el.removeEventListener('pointerdown', onDown);
-      el.removeEventListener('pointerup', onUp);
-      el.removeEventListener('pointercancel', onCancel);
-    };
-  }, [gl, controls]);
-
-  useFrame((_, delta) => {
+  useFrame(() => {
     if (!controls.current || aplanando) return;
     const c = controls.current;
     const v = vivo.current;
@@ -2151,79 +2012,26 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, 
       pide la preferencia), la franja igual avanza con el reloj. ── */
 const SOL_DEFECTO = [6, 9, 4];
 
-function estadoAtmosfera(c) {
-  return {
-    fondo: new THREE.Color(c.cielo[1]),
-    domo: new THREE.Color(c.cielo[0]),
-    suelo: new THREE.Color(c.ambiente),
-    luz: new THREE.Color(c.luz),
-    niebla: new THREE.Color(c.niebla),
-    solPos: new THREE.Vector3(...(c.sol || SOL_DEFECTO)),
-    intensidad: c.intensidad,
-    nieblaLejos: c.nieblaLejos + 8,
-  };
-}
-
-function amortiguarAtmosfera(actual, objetivo, k) {
-  actual.fondo.lerp(objetivo.fondo, k);
-  actual.domo.lerp(objetivo.domo, k);
-  actual.suelo.lerp(objetivo.suelo, k);
-  actual.luz.lerp(objetivo.luz, k);
-  actual.niebla.lerp(objetivo.niebla, k);
-  actual.solPos.lerp(objetivo.solPos, k);
-  actual.intensidad += (objetivo.intensidad - actual.intensidad) * k;
-  actual.nieblaLejos += (objetivo.nieblaLejos - actual.nieblaLejos) * k;
-}
-
-function AtmosferaValle({ c, perfil, reducedMotion }) {
-  const objetivo = useMemo(() => estadoAtmosfera(c), [c]);
-  // La piel del primer montaje: alimenta los valores declarativos del JSX (que
-  // nunca deben cambiar tras montar) — un re-render no pisa la animación.
-  const [ini] = useState(() => c);
-  const [actual] = useState(() => estadoAtmosfera(ini));
-
-  const fondoRef = useRef(null);
-  const fogRef = useRef(null);
-  const hemiRef = useRef(null);
-  const ambRef = useRef(null);
-  const solRef = useRef(null);
-
-  const pintar = (e) => {
-    if (fondoRef.current) fondoRef.current.copy(e.fondo);
-    if (fogRef.current) {
-      fogRef.current.color.copy(e.niebla);
-      fogRef.current.far = e.nieblaLejos;
-    }
-    if (hemiRef.current) {
-      hemiRef.current.intensity = e.intensidad * 0.55;
-      hemiRef.current.color.copy(e.domo);
-      hemiRef.current.groundColor.copy(e.suelo);
-    }
-    if (ambRef.current) {
-      ambRef.current.intensity = e.intensidad * 0.35;
-      ambRef.current.color.copy(e.luz);
-    }
-    if (solRef.current) {
-      solRef.current.intensity = e.intensidad;
-      solRef.current.color.copy(e.luz);
-      solRef.current.position.copy(e.solPos);
-    }
-  };
-
-  // Calma pedida → snap: la piel nueva entra completa, sin animar.
-  useEffect(() => {
-    if (!reducedMotion) return;
-    amortiguarAtmosfera(actual, objetivo, 1);
-    pintar(actual);
-  });
-
-  // Transición viva: amortiguación exponencial estable en dt variable.
-  useFrame((_, dt) => {
-    if (reducedMotion) return;
-    const k = 1 - Math.exp((-3 / TRANSICION.duracion) * Math.min(dt, 0.1));
-    amortiguarAtmosfera(actual, objetivo, k);
-    pintar(actual);
-  });
+/* ── Contenido de la escena (dentro del Canvas). ── */
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false }) {
+  const controls = useRef(null);
+  // Occluders de los rótulos: solo terreno + cordillera (raycast barato y es
+  // exactamente lo que las etiquetas no deben atravesar).
+  const terrenoRef = useRef(null);
+  const cordilleraRef = useRef(null);
+  const occluders = useMemo(() => [terrenoRef, cordilleraRef], []);
+  const c = CLIMAS[clima];
+  const foco = useMemo(() => {
+    const m = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;
+    // Sin foco, la cámara encuadra el corazón del valle (algo hacia el frente,
+    // regla de tercios) para dar aire y leer la ladera que sube al fondo.
+    if (!m) return new THREE.Vector3(0, 1.0, 1.4);
+    const y = alturaTerreno(m.pos[0], m.pos[2]);
+    return new THREE.Vector3(m.pos[0], y, m.pos[2]);
+  }, [focoId]);
+  const autoOrbit = !reducedMotion && !focoId;
+  const entrando = !!focoId;
+  const nocturno = clima === 'noche';
 
   return (
     <>
@@ -2613,50 +2421,27 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
         controls={controls}
         autoOrbit={autoOrbit}
         aplanando={aplanando}
-        kReposo={poseReposo.k}
-        miraInicial={miraReposo}
-        reposo={poseReposo.position}
-        reducedMotion={reducedMotion}
       />
-      {/* La CÁMARA DE DIRECTOR (FASE 4). Con el flag `camaraDirector`:
-          DirectorValle (establishing + follow + beats), montado DESPUÉS de
-          CamaraViajera para ganar por orden de frame durante el barrido. Sin
-          flag: la CamaraDirector clásica intacta (establishing + respiro). Gama
-          baja o reduced-motion: ambas caen a cámara simple (inerte). */}
-      {camaraDirector ? (
-        <DirectorValle
-          controls={controls}
-          reposo={poseReposo.position}
-          mira={miraReposo}
-          fov={poseReposo.fov}
-          foco={foco}
-          avatarRef={avatarRef}
-          beatsRef={beatsRef}
-          entrando={entrando}
-          aplanando={aplanando}
-          activa
-          tier={tier}
-          reducedMotion={reducedMotion}
-          unaVezClave="valle"
-        />
-      ) : (
-        <CamaraDirector
-          controls={controls}
-          reposo={poseReposo.position}
-          /* En portada la llegada es más lenta y amplia (contemplar, no operar)
-             y NO consume la clave 'valle': al cruzar la tranquera, el home aún
-             estrena su propio establishing — llegar dos veces se siente bien. */
-          duracion={portada ? 3.6 : 2.4}
-          amplio={portada ? 1.42 : 1.3}
-          respiro={0.05}
-          activa={!reducedMotion && tier !== 'bajo'}
-          unaVezClave={portada ? 'portada' : 'valle'}
-        />
-      )}
+      {/* La CÁMARA DE DIRECTOR (FASE 4): el establishing shot del mapa — dolly
+          con arco desde más alto/lejos hasta la pose de siempre, UNA vez por
+          sesión (volver de un mundo no lo repite). Sin `mirada`: el target ya
+          lo lleva CamaraViajera; aquí solo posición + FOV. La respiración del
+          encuadre es aditiva y convive con su lerp. Gama baja o reduced-motion:
+          cámara simple (inerte). */}
+      <CamaraDirector
+        controls={controls}
+        reposo={CAMARA_VALLE.position}
+        duracion={2.4}
+        amplio={1.3}
+        respiro={0.05}
+        activa={!reducedMotion && tier !== 'bajo'}
+        unaVezClave="valle"
+      />
       {/* El aplane New Donk del flujo vivo — montado de ÚLTIMO para tener la
           última palabra sobre la cámara mientras cae dentro del mundo. Solo
           hace algo cuando `aplanando` (fase 'viajando'); inerte el resto. */}
       <AplaneNewDonk foco={foco} aplanando={aplanando} />
+      <AdaptiveDpr pixelated />
     </>
   );
 }
@@ -2684,17 +2469,6 @@ export default function Valle3D({
      cámara del valle hace dolly + aplane hacia el landmark en vez de cortar con
      velo. El host lo enciende en la fase 'viajando'. */
   aplanando = false,
-  /* FASE 4 — cámara de director (establishing + follow + beats). Detrás de un
-     flag para no tocar la cámara actual: off = comportamiento clásico. Va
-     gateada por tier/reduced-motion adentro (tier bajo o calma = cámara fija). */
-  camaraDirector = false,
-  /* Buzón de beats coreografiados (fauna/Ent/alerta): el host (EscenaValle)
-     empuja aquí `{ tipo, lado, slug, magico }` y el director lo consume. */
-  beatsRef = null,
-  /* MODO PORTADA (entrada/login 3D-first de prod.chagra.app): el mismo valle
-     vivo pero como paisaje que ESPERA — sin rótulos de mundos ni faro del día,
-     con una llegada de cámara más lenta. La UI de la entrada vive en el host. */
-  portada = false,
 }) {
   const [listo, setListo] = useState(false);
   /* GUARD DEL NEGRO INTERMITENTE (auditoría 2026-07-16): sin oyente de
@@ -2766,12 +2540,8 @@ export default function Valle3D({
           onAngelita={onAngelita}
           reducedMotion={reducedMotion}
           perfil={perfil}
-          tier={tierInicial}
+          tier={tier}
           aplanando={aplanando}
-          camaraDirector={camaraDirector}
-          beatsRef={beatsRef}
-          portada={portada}
-          pose={pose}
         />
       </Suspense>
     </Canvas>
