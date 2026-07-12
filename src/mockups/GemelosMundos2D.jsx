@@ -452,7 +452,7 @@ function EscenaSanidad() {
   );
 }
 
-export function EscenaAgua() {
+function EscenaAgua() {
   const raw = useId();
   const uid = raw.replace(/:/g, '');
   return (
@@ -620,9 +620,9 @@ export default function GaleriaGemelos2D() {
           diorama 3D. Toque una chapa para ver a dónde lo lleva.
         </p>
       </div>
-      <GemeloCafe2D onHotspot={() => {}} />
-      <GemeloSanidad2D onHotspot={() => {}} />
-      <GemeloAgua2D onHotspot={() => {}} />
+      <GemeloCafe2D />
+      <GemeloSanidad2D />
+      <GemeloAgua2D />
     </div>
   );
 }

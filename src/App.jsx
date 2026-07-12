@@ -1272,6 +1272,9 @@ export default function App() {
         // (onboarding-piloto, mockups, callback OAuth) ya se resolvieron
         // ANTES de este check.
         navigate('login');
+        // La raíz sin sesión aterriza en el valle 3D (tema de entrada). El
+        // login sigue accesible con #login o el botón volver del valle.
+        navigate(hash === 'login' ? 'login' : 'valle3d');
         return;
       }
       const targetView = HASH_VIEW_ROUTES[hash] || 'dashboard';
@@ -3536,6 +3539,7 @@ export default function App() {
                 // @ts-ignore initialMundoId not in strict type
                 initialMundoId={currentViewData?.mundo}
               />
+              <EntradaValle3DMockup onBack={() => navigate(sinSesion ? 'login' : 'dashboard')} onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );

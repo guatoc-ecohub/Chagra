@@ -130,16 +130,6 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
   const [alertaVista, setAlertaVista] = useState(false); // ¿ya atendió lo del día?
   // El tier del equipo, decidido UNA vez: gobierna la entrada Y los mundos.
   const [equipo] = useState(decidirTier);
-  // Cruce 2D→3D de Angelita cuando el valle 3D monta: la abeja (sprite 2D del
-  // home) vuela y se CLAVA como mesh 3D. Una vez por apertura del valle
-  // (ref-guard), saltable; el gate reduced-motion lo aplica el overlay.
-  const [cruceValle, setCruceValle] = useState(null);
-  const cruceValleHecho = useRef(false);
-  const dispararCruceValle = useCallback(() => {
-    if (cruceValleHecho.current) return;
-    cruceValleHecho.current = true;
-    setCruceValle('entrar');
-  }, []);
   const [valle3dError, setValle3dError] = useState(false);
 
   // ── NAVEGACIÓN valle ↔ mundos: la máquina de fases vive en el framework.
@@ -520,7 +510,6 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
                   reducedMotion={reducedMotion}
                   onEntrar={entrarMundo}
                   onAlerta={abrirAlerta}
-                  webglBloqueado={valle3dError || equipo.motivo === 'sin-webgl'}
                 />
               )}
             >
@@ -549,29 +538,6 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
             </Suspense>
             </Valle3DGuard>
           )}
-        {/* AoE: el minimapa RTS del valle (planta, blips, salto-a-lugar) — solo con el valle a la vista */}
-        {!nav.enMundo && (
-          <MinimapaValle
-            lugares={LUGARES_MINIMAPA}
-            foco={focoId}
-            onSaltar={entrarMundo}
-            tier={equipo.tier}
-            reducedMotion={reducedMotion}
-          />
-        )}
-        {/* El OVERLAY del cruce: la abeja 2D vuela y se clava como mesh 3D — así
-            el usuario SÍ ve el 2D→3D. Se desmonta solo al terminar (onFin);
-            reducedMotion → AbejaTransicion no monta nada. */}
-        {cruceValle === 'entrar' && !reducedMotion && (
-          <AbejaTransicion
-            sentido="entrar"
-            tier={equipo.tier}
-            animo={companero.animo}
-            energia={companero.energia}
-            reducedMotion={reducedMotion}
-            onFin={() => setCruceValle(null)}
-          />
-        )}
       </div>
 
       {/* ── Onboarding de 3 s SIN voz: pista táctil del primer ingreso. ── */}
