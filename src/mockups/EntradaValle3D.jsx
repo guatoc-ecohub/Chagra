@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- mockup dev con copy de muestra (ADR-050) */
 /*
  * MOCKUP "El valle de mi finca" — ruta #/mockups/entrada-3d.
  *
@@ -28,7 +29,7 @@
  * Copy de muestra en español Colombia (usted); si se productiza, migra a
  * messages.js (ADR-050).
  */
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import '../visual/effects/effects.css';
 import './entradaValle3D.css';
 import {
@@ -46,7 +47,6 @@ import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
 import Mundo, {
   MUNDO,
   decidirTier,
-  permite3D,
   tinteDeMundo,
   tituloDeMundo,
   useNavegacionMundos,
@@ -68,12 +68,25 @@ const Valle3D = lazy(() => import('./valle/Valle3D'));
  *   'alto' → 3D plena · 'medio' → 3D frugal · 'bajo' → 2D digna.
  */
 
-/* Aviso sobrio de por qué se ve la versión dibujada (nunca "error"). */
-const MENSAJE_DEGRADADO = {
-  calma: 'Le mostramos el valle en calma, sin movimiento. La finca sigue completa.',
-  ahorro: 'Modo ahorro de datos: le mostramos el valle dibujado. La finca sigue completa.',
-  default: 'Su equipo ve la versión dibujada del valle. La finca sigue completa.',
-};
+class Valle3DGuard extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error) {
+    this.props.onError?.(error);
+  }
+
+  render() {
+    if (this.state.hasError) return this.props.fallback;
+    return this.props.children;
+  }
+}
 
 /**
  * @param {Object} props
@@ -100,7 +113,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   const [alertaVista, setAlertaVista] = useState(false); // ¿ya atendió lo del día?
   // El tier del equipo, decidido UNA vez: gobierna la entrada Y los mundos.
   const [equipo] = useState(decidirTier);
-  const usa3D = permite3D(equipo.tier);
+  const [valle3dError, setValle3dError] = useState(false);
 
   // ── NAVEGACIÓN valle ↔ mundos: la máquina de fases vive en el framework.
   //    (reduced-motion la vuelve corte simple, sin overlay de viaje).
@@ -401,7 +414,21 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
           nada de dos escenas sudando la GPU a la vez en un teléfono). */}
       <div className="valle-escena">
         {!nav.enMundo &&
-          (usa3D ? (
+          (
+            <Valle3DGuard
+              onError={() => setValle3dError(true)}
+              fallback={(
+                <Valle2DFallback
+                  clima={clima}
+                  focoId={focoId}
+                  animo={companero.animo}
+                  energia={companero.energia}
+                  reducedMotion={reducedMotion}
+                  onEntrar={entrarMundo}
+                  onAlerta={abrirAlerta}
+                />
+              )}
+            >
             <Suspense fallback={<CargandoValle clima={clima} />}>
               <Valle3D
                 clima={clima}
@@ -414,17 +441,8 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
                 tier={equipo.tier}
               />
             </Suspense>
-          ) : (
-            <Valle2DFallback
-              clima={clima}
-              focoId={focoId}
-              animo={companero.animo}
-              energia={companero.energia}
-              reducedMotion={reducedMotion}
-              onEntrar={entrarMundo}
-              onAlerta={abrirAlerta}
-            />
-          ))}
+            </Valle3DGuard>
+          )}
       </div>
 
       {/* ── Onboarding de 3 s SIN voz: pista táctil del primer ingreso. ── */}
@@ -481,10 +499,10 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
       </header>
       )}
 
-      {/* ── Modo dibujado (tiering): aviso sobrio, nunca "error" ── */}
-      {!usa3D && !nav.enMundo && (
+      {/* ── Modo dibujado: solo si el 3D no pudo levantarse ── */}
+      {valle3dError && !nav.enMundo && (
         <p className="valle-degradado" role="status">
-          {MENSAJE_DEGRADADO[equipo.motivo] || MENSAJE_DEGRADADO.default}
+          No se pudo levantar el 3D en este navegador. Le mostramos la versión dibujada para no bloquearle el acceso.
         </p>
       )}
 

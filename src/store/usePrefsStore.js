@@ -27,6 +27,11 @@ const SONIDO_MODES = ['off', 'suave', 'on'];
 // prende el flag en Perfil ve la banda de entrada en "Los mundos de su finca"
 // — y solo si su equipo aguanta 3D (device-tier alto/medio, deviceTier.js).
 const STORAGE_KEY_VALLE3D = 'chagra:prefs:valle3d';
+// Migración de salida: versiones anteriores podían dejar este flag apagado en
+// localStorage. Para destrabar la experiencia 3D en el build actual, la primera
+// carga posterior a esta migración lo vuelve a encender una sola vez y después
+// respeta el valor elegido por el usuario.
+const STORAGE_KEY_VALLE3D_MIGRATED = 'chagra:prefs:valle3d:migrated-v1';
 
 function load(key, fallback) {
   try {
@@ -41,6 +46,20 @@ function save(key, val) {
   try { localStorage.setItem(key, JSON.stringify(val)); } catch (_) { /* noop */ }
 }
 
+function loadValle3d() {
+  try {
+    const migrated = localStorage.getItem(STORAGE_KEY_VALLE3D_MIGRATED) === '1';
+    if (!migrated) {
+      localStorage.setItem(STORAGE_KEY_VALLE3D_MIGRATED, '1');
+      localStorage.setItem(STORAGE_KEY_VALLE3D, JSON.stringify(true));
+      return true;
+    }
+  } catch (_) {
+    return true;
+  }
+  return load(STORAGE_KEY_VALLE3D, true);
+}
+
 const usePrefsStore = create((set, _get) => ({
   voiceRegion: load(STORAGE_KEY_VOICE_REGION, 'auto'),
   voiceRegionIntensity: load(STORAGE_KEY_VOICE_INTENSITY, 1),
@@ -48,7 +67,7 @@ const usePrefsStore = create((set, _get) => ({
   showSourceBadges: load(STORAGE_KEY_SOURCE_BADGES, true),
   haptics: load(STORAGE_KEY_HAPTICS, 'auto'),
   sonido: load(STORAGE_KEY_SONIDO, 'off'),
-  valle3d: load(STORAGE_KEY_VALLE3D, true),
+  valle3d: loadValle3d(),
 
   setVoiceRegion: (region) => {
     save(STORAGE_KEY_VOICE_REGION, region);
