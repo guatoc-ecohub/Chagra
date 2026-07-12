@@ -52,6 +52,7 @@ import Mundo, {
   tituloDeMundo,
   useNavegacionMundos,
   TransicionMundo,
+  TransicionNewDonk,
   useAudioMundo,
 } from '../visual/mundo3d/index.js';
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
@@ -61,6 +62,15 @@ import { speak, speakKokoro, stop as stopSpeak } from '../services/ttsService.js
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
+
+/* ENTRAR a un mundo como MURAL New Donk (flujo vivo): en vez del velo plano, la
+   cámara del valle 3D hace dolly + aplane ortográfico hacia el lugar del mundo
+   (el 3D asoma en los bordes) y solo al caer dentro un destello con la luz del
+   destino cubre el intercambio de escena. Flag de módulo para revertir al velo
+   de un toque. VOLVER al valle conserva el velo (el New Donk es de ENTRADA).
+   Reduced-motion: el hook de navegación salta la fase 'viajando' → corte
+   directo, sin dolly ni overlay (ni este ni el velo se montan). */
+const ENTRADA_NEWDONK = true;
 
 /*
  * DEVICE-TIERING REAL — UNA sola fuente de verdad: `decidirTier()` del
@@ -140,6 +150,18 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
 
   const nav = useNavegacionMundos({ reducedMotion });
   const viajarAlMundoInicial = nav.viajarAlMundo;
+
+  // ── ENTRAR como MURAL New Donk (flujo vivo): mientras la navegación viaja a
+  //    un mundo (fase 'viajando'), la cámara del valle 3D se APLANA hacia el
+  //    lugar (Valle3D `aplanando`) y este overlay corre el destello. El overlay
+  //    SOBREVIVE al swap de escena: se apaga en su propio `onFin` (no al cambiar
+  //    de fase) para poder REVELAR el mundo ya montado bajo el destello. Se
+  //    ENCIENDE en el handler que zarpa el viaje (`entrarAlMundo`), no en un
+  //    effect (react-hooks/set-state-in-effect). Volver al valle conserva el
+  //    velo clásico; el deep-link inicial también (cae al velo por el fallback
+  //    de más abajo). Reduced-motion no llega aquí: el hook salta 'viajando'.
+  const usarNewDonk = ENTRADA_NEWDONK && !reducedMotion;
+  const [newDonk, setNewDonk] = useState(null);
 
   // La escucha puede llegar con un mundo ya resuelto por el NLU. Se consume
   // una vez al montar para que volver al valle siga siendo una decisión de la
@@ -355,10 +377,14 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
   const entrarAlMundo = useCallback(
     (id) => {
       if (!nav.viajarAlMundo(id)) return;
+      // Enciende el mural New Donk en el MISMO tick que zarpa el viaje (mismo
+      // render que la fase 'viajando') → el velo queda suprimido y el aplane
+      // del valle corre bajo este overlay. Se apaga solo en su `onFin`.
+      if (usarNewDonk) setNewDonk(id);
       setPanel(null);
       decir(`Angelita lo lleva a ${tituloDeMundo(id)}.`);
     },
-    [nav, decir],
+    [nav, decir, usarNewDonk],
   );
 
   // ── VOLVER del mundo al valle (misma transición, en reversa).
@@ -446,6 +472,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
                 onAlerta={abrirAlerta}
                 reducedMotion={reducedMotion}
                 tier={equipo.tier}
+                aplanando={!!newDonk && nav.fase === 'viajando'}
               />
               {/* Dispara el cruce 2D→3D cuando el chunk 3D del valle resolvió
                   (hermano de <Valle3D> en el Suspense). DOM puro, sin three. */}
@@ -493,10 +520,23 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
         </section>
       )}
 
-      {/* ── El VIAJE (ida o vuelta): la abeja guía; al terminar, el intercambio
-              de escena ocurre debajo del velo. Con reduced-motion ni se monta
-              (el hook corta directo). ── */}
-      {nav.enViaje && nav.mundoId && (
+      {/* ── El VIAJE. ENTRAR (con New Donk): el aplane del valle 3D ocurre en la
+              escena y ESTE overlay corre el destello — el swap va en su punto
+              medio (`onMitad`) y se apaga solo al revelar (`onFin`). VOLVER (o
+              con el flag apagado): el velo clásico, cuyo swap va al final
+              (`onFin`). Con reduced-motion el hook corta directo: nada se
+              monta. ── */}
+      {newDonk && (
+        <TransicionNewDonk
+          mundoId={newDonk}
+          animo={companero.animo}
+          energia={companero.energia}
+          reducedMotion={reducedMotion}
+          onMitad={nav.completarViaje}
+          onFin={() => setNewDonk(null)}
+        />
+      )}
+      {nav.enViaje && nav.mundoId && !(newDonk && nav.fase === 'viajando') && (
         <TransicionMundo
           mundoId={nav.mundoId}
           sentido={nav.fase === 'viajando' ? 'entrar' : 'volver'}
