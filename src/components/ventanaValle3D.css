@@ -111,7 +111,7 @@
   inset: 0;
   background:
     radial-gradient(80% 60% at 62% 24%, rgba(246, 215, 138, 0.22) 0%, rgba(246, 215, 138, 0) 60%),
-    radial-gradient(140% 90% at 50% 108%, rgba(34, 48, 28, 0.22) 0%, rgba(34, 48, 28, 0) 46%);
+    radial-gradient(140% 90% at 50% 108%, rgba(34, 48, 28, 0.14) 0%, rgba(34, 48, 28, 0) 46%);
 }
 
 /* ── la enredadera del marco (hojas + zarcillos + esporas que laten) ─────── */

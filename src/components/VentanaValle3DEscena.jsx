@@ -23,8 +23,9 @@ import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
 
 /* Luz de media mañana en el valle: cielo cálido, verdes VIVOS (biopunk suave). */
 const CIELO = { fondo: '#eaf0d3', cielo: '#f6ecd2', suelo: '#8fae6a', niebla: '#e6eecb' };
-/* El punto del valle que la ventana enmarca (la cámara siempre lo mira). */
-const FOCO = [0, 0.72, 0];
+/* El punto del valle que la ventana enmarca (la cámara siempre lo mira):
+   alto, para que el cuadro reparta cielo/lomas y no lo coma el piso. */
+const FOCO = [0, 1.12, 0];
 
 /* PRNG determinista: la ventana muestra SIEMPRE el mismo valle (cero azar). */
 function rng(seed) {
@@ -42,8 +43,8 @@ function CamaraRespira({ reducedMotion }) {
   useFrame((state) => {
     if (reducedMotion) return;
     const t = state.clock.elapsedTime;
-    state.camera.position.z = 5.1 + Math.sin(t * 0.32) * 0.16;
-    state.camera.position.y = 1.62 + Math.sin(t * 0.21 + 1.4) * 0.06;
+    state.camera.position.z = 4.7 + Math.sin(t * 0.32) * 0.16;
+    state.camera.position.y = 1.35 + Math.sin(t * 0.21 + 1.4) * 0.06;
     state.camera.lookAt(FOCO[0], FOCO[1], FOCO[2]);
   });
   return null;
@@ -159,7 +160,7 @@ function Vineta({ frugal, reducedMotion, tier }) {
       {/* el piso del valle: disco verde-vivo */}
       <mesh position={[0, 0.26, 0]} scale={[1, 0.16, 1]}>
         <sphereGeometry args={[3.6, 18, 12]} />
-        <meshLambertMaterial color="#6c9a5b" />
+        <meshLambertMaterial color="#78a862" />
       </mesh>
 
       {/* lomas al fondo, tonos que se alejan hacia la niebla */}
@@ -167,10 +168,12 @@ function Vineta({ frugal, reducedMotion, tier }) {
       <Loma pos={[2.6, 0.44, -2.5]} radio={2.0} color="#557e4c" />
       <Loma pos={[0.2, 0.4, -3.3]} radio={2.4} color="#4c7147" />
 
-      {/* las matas sembradas (deterministas) */}
+      {/* las matas sembradas (deterministas) + una en primer plano que ancla
+          la composición (sin ella el frente queda vacío y el piso domina) */}
       {matas.map((m) => (
         <Mata key={m.key} pos={m.pos} alto={m.alto} hoja={m.hoja} />
       ))}
+      <Mata pos={[-1.05, 0.42, 1.15]} alto={0.95} hoja="#5f9c50" />
 
       <AngelitaVuela reducedMotion={reducedMotion} tier={tier} />
       <Esporas cuantas={frugal ? 5 : 9} reducedMotion={reducedMotion} />
@@ -194,7 +197,7 @@ export default function VentanaValle3DEscena({ tier = 'alto', reducedMotion = fa
       className={`vv-canvas${listo ? ' vv-canvas--lista' : ''}`}
       dpr={frugal ? [1, 1.2] : [1, 1.5]}
       gl={{ antialias: !frugal, powerPreference: 'low-power' }}
-      camera={{ position: [0, 1.62, 5.1], fov: 38 }}
+      camera={{ position: [0, 1.35, 4.7], fov: 38 }}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={({ camera }) => {
         // El fotograma inicial (y el ÚNICO con reduced-motion) ya mira al foco.
