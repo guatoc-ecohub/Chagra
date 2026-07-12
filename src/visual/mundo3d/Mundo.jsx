@@ -52,7 +52,7 @@ const ESCENAS_3D = Object.fromEntries(
 /* Cuánto esperamos el chunk 3D antes de la CAÍDA DIGNA al 2D. Con señal
    intermitente (el caso normal del campo) un fetch colgado NO lanza error —
    el ErrorBoundary nunca lo ve; este timeout sí. */
-export const CARGA_3D_TIMEOUT_MS = 9000;
+export const CARGA_3D_TIMEOUT_MS = 15000;
 
 function MundoCargando({ tinte, onTimeout }) {
   /* El fallback vive SOLO mientras Suspense espera el chunk: si el chunk llega,
@@ -157,18 +157,20 @@ function MundoInterno({
     const espejo = resolverMundo(mundoId, 'bajo');
     return (
       <div className="mundo-root" data-dim="2d" data-mundo={mundoId} data-caida3d="1">
-        {espejo.modo === '2d' && (
-          <Mundo2D
-            escena={espejo.escena}
-            motivo={espejo.motivo}
-            entrada={espejo.entrada}
-            tinte={tinte}
-            reducedMotion={reducedMotion}
-            onHotspot={onHotspot}
-            animo={animo}
-            energia={energia}
-          />
-        )}
+        <div className="mundo-caida__contenido">
+          {espejo.modo === '2d' && (
+            <Mundo2D
+              escena={espejo.escena}
+              motivo={espejo.motivo}
+              entrada={espejo.entrada}
+              tinte={tinte}
+              reducedMotion={reducedMotion}
+              onHotspot={onHotspot}
+              animo={animo}
+              energia={energia}
+            />
+          )}
+        </div>
         {/* Sin invitación de audio acá: el aviso de caída ya ocupa ese lugar
             (señal mala ≠ momento de invitar); queda para la próxima entrada. */}
         <AvisoCaida3D tinte={tinte} onReintentar={reintentar3D} />
