@@ -1,14 +1,19 @@
 import React from 'react';
-import { render, cleanup } from '@testing-library/react';
+import { act, render, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { describe, test, expect, afterEach } from 'vitest';
+import {
+  describe, test, expect, afterEach, vi,
+} from 'vitest';
 
-import Mundo from '../Mundo.jsx';
+import Mundo, { CARGA_3D_TIMEOUT_MS } from '../Mundo.jsx';
 import { resolverMundo } from '../resolverMundo.js';
 import { MUNDO } from '../mundoData.js';
 import { ARQUETIPOS, ARQUETIPOS_3D, ARQUETIPOS_2D } from '../arquetipos.js';
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+});
 
 describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
   test('arquetipos: 5 dioramas 3D + arquetipos 2D de primera clase', () => {
@@ -88,5 +93,21 @@ describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
       <Mundo mundoId="suelo" tier="bajo" onHotspot={() => {}} onSalir={() => {}} />,
     );
     expect(c2.querySelector('.mundo-root[data-dim="2d"]')).toBeInTheDocument();
+  });
+
+  test('espera 15 segundos y reserva una fila propia para el aviso de caída 3D', () => {
+    vi.useFakeTimers();
+    const { container } = render(<Mundo mundoId="cafe" tier="alto" />);
+
+    act(() => vi.advanceTimersByTime(CARGA_3D_TIMEOUT_MS - 1));
+    expect(container.querySelector('[data-caida3d="1"]')).not.toBeInTheDocument();
+
+    act(() => vi.advanceTimersByTime(1));
+    const raiz = container.querySelector('[data-caida3d="1"]');
+    expect(raiz).toBeInTheDocument();
+    expect(raiz.querySelector('.mundo-caida__contenido')).toContainElement(
+      raiz.querySelector('.mundo2d'),
+    );
+    expect(raiz.querySelector('.mundo-caida')).toBeInTheDocument();
   });
 });
