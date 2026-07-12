@@ -181,6 +181,8 @@ const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 // 3D: el PÁRAMO altoandino — el ecosistema de la niebla (frailejones, musgo,
 // quenuas, aves) y el NACIMIENTO del agua. Didáctico: la fábrica de agua.
 const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
+const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
+const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -590,6 +592,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
   'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
+  'mockups/camara-director': 'mockup_camara_director',
+  'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1965,6 +1969,26 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Juego La milpa">
               <JuegoLaMilpaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_momento_venta_mercado_3d':
+        // Momento 3D (FASE 2 audit 3D): venta / nacimiento / partida como
+        // momentos coreografiados con cámara dirigida. Sin gore, digno.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Un momento en la finca">
+              <MomentoVentaMercado3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_camara_director':
+        // Cámara de director (FASE 4 audit 3D): demo del secuenciador
+        // useCamaraDirector — 4 tomas coreografiadas sobre valle low-poly.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Cámara de director">
+              <CamaraDirectorDemoMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
