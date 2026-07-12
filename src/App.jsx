@@ -186,6 +186,9 @@ const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMer
 const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
 const EfectosFuncionalesDemoMockup = lazy(() => import('./mockups/EfectosFuncionalesDemo'));
 const CatalogoInfraDemoMockup = lazy(() => import('./mockups/CatalogoInfraDemo'));
+const MundoAbejas3DMockup = lazy(() => import('./mockups/MundoAbejas3D'));
+const MundoGallinero3DMockup = lazy(() => import('./mockups/MundoGallinero3D'));
+const MundoMercado3DMockup = lazy(() => import('./mockups/MundoMercado3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -600,6 +603,9 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/artesania-andina': 'mockup_artesania_andina',
   'mockups/efectos-funcionales': 'mockup_efectos_funcionales',
   'mockups/catalogo-infra': 'mockup_catalogo_infra',
+  'mockups/mundo-abejas-3d': 'mockup_mundo_abejas_3d',
+  'mockups/mundo-gallinero-3d': 'mockup_mundo_gallinero_3d',
+  'mockups/mundo-mercado-3d': 'mockup_mundo_mercado_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1988,6 +1994,12 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_mundo_abejas_3d':
+        return (<ErrorBoundary><ErrorFallback moduleName="El mundo de las abejas"><MundoAbejas3DMockup /></ErrorFallback></ErrorBoundary>);
+      case 'mockup_mundo_gallinero_3d':
+        return (<ErrorBoundary><ErrorFallback moduleName="El gallinero con pastoreo"><MundoGallinero3DMockup onBack={() => navigate('dashboard')} /></ErrorFallback></ErrorBoundary>);
+      case 'mockup_mundo_mercado_3d':
+        return (<ErrorBoundary><ErrorFallback moduleName="El mercado campesino"><MundoMercado3DMockup /></ErrorFallback></ErrorBoundary>);
       case 'mockup_catalogo_infra':
         // Catálogo de infraestructura procedural (AG/Gemini): 8 piezas
         // paramétricas low-poly (invernadero/gallinero/galpón/…) + demo.
