@@ -36,7 +36,7 @@ const EscenaVentana = lazy(() => import('./VentanaValle3DEscena.jsx'));
  * remotos). Es el piso para tier bajo / sin-WebGL Y el fallback de Suspense
  * mientras baja el chunk 3D — la ventana nunca queda en blanco ni rota.
  */
-function Valle2D({ reducedMotion }) {
+function Valle2D({ reducedMotion, tier }) {
   return (
     <div className="vv-2d">
       <svg
@@ -86,7 +86,7 @@ function Valle2D({ reducedMotion }) {
 
       {/* la Angelita 2D volando en el espejo (misma creature del home) */}
       <div className={`vv-abeja vv-abeja--2d${reducedMotion ? ' vv-abeja--quieta' : ''}`}>
-        <AbejaAngelita size={44} animo="pleno" energia={0.9} animated={!reducedMotion} />
+        <AbejaAngelita size={44} animo="pleno" energia={0.9} animated={!reducedMotion} tier={tier} />
       </div>
     </div>
   );
@@ -187,11 +187,11 @@ export function VentanaValle3D({
       <span className="vv-marco" aria-hidden="true">
         <span className="vv-vidrio">
           {con3D && aLaVista ? (
-            <Suspense fallback={<Valle2D reducedMotion={reducedMotion} />}>
+            <Suspense fallback={<Valle2D reducedMotion={reducedMotion} tier={tier} />}>
               <EscenaVentana tier={tier === 'alto' ? 'alto' : 'medio'} reducedMotion={reducedMotion} />
             </Suspense>
           ) : (
-            <Valle2D reducedMotion={reducedMotion} />
+            <Valle2D reducedMotion={reducedMotion} tier={tier} />
           )}
           {/* la luz que se cuela por la ventana (vidrio con brillo cálido) */}
           <span className="vv-luz" />
