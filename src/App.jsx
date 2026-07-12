@@ -163,6 +163,8 @@ const ValleLluviaMockup = lazy(() => import('./mockups/ValleLluvia3D'));
 const MundoSemilleroMockup = lazy(() => import('./mockups/MundoSemillero3D'));
 const MundoCompostMockup = lazy(() => import('./mockups/MundoCompost3D'));
 const JuegoMiFincaMockup = lazy(() => import('./mockups/JuegoMiFincaOdyssey'));
+// La "ventana-puerta" al valle: viewport 3D vivo enmarcado para el home 2D.
+const VentanaValleMockup = lazy(() => import('./components/VentanaValle3D'));
 const VitrinaMaestraMockup = lazy(() => import('./mockups/VitrinaMaestraMundos'));
 const MundoFermentosMockup = lazy(() => import('./mockups/MundoFermentos3D'));
 const GemelosMundosMockup = lazy(() => import('./mockups/GemelosMundos2D'));
@@ -590,6 +592,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-semillero-3d': 'mockup_mundo_semillero_3d',
   'mockups/mundo-compost-3d': 'mockup_mundo_compost_3d',
   'mockups/juego-mi-finca': 'mockup_juego_mi_finca',
+  'mockups/ventana-valle': 'mockup_ventana_valle',
   'mockups/vitrina-maestra': 'mockup_vitrina_maestra',
   'mockups/mundo-fermentos-3d': 'mockup_mundo_fermentos_3d',
   'mockups/gemelos-2d': 'mockup_gemelos_2d',
@@ -1901,6 +1904,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Juego Mi finca (túnel Odyssey)">
               <JuegoMiFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_ventana_valle':
+        // La "ventana-puerta" al valle 3D: el widget del home con un viewport
+        // 3D vivo enmarcado (marco orgánico que respira + Angelita) que al
+        // tocarlo entra a la experiencia 3D completa. Sin auth (vitrina).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Ventana al valle (puerta 3D)">
+              <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#f2ecdb' }}>
+                <VentanaValleMockup onEntrar={() => navigate('valle3d')} />
+              </div>
             </ErrorFallback>
           </ErrorBoundary>
         );
