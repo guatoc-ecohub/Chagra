@@ -5,12 +5,7 @@ import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, BocaVisema, Miembro, AntenaRubber, RH_INK } from './_rubberhose.jsx';
 import { GafasSol, CejasRubber } from './AngelitaGafas.jsx';
 import { ABEJA_PALETA, ABEJA_PROPORCION } from './abejaIdentidad.js';
-import { cuerpoDeClima, PERFIL_ABEJA, ropaDeClimaBicho } from './creatureClimaCuerpo.js';
-import { AccesoriosClima } from './AccesoriosClima.jsx';
-import { LineBoilFilter } from './LineBoilFilter.jsx';
-import { PropEnMano } from './PropEnMano.jsx';
-import { AuraPoder } from './AuraPoder.jsx';
-import { auraDeBicho } from './transformacion.js';
+import { cuerpoDeClima, PERFIL_ABEJA } from './creatureClimaCuerpo.js';
 
 /* Abeja angelita — Tetragonisca angustula (meliponino nativo SIN aguijón, NO
    Apis). Cabeza y tórax OSCUROS (casi negros) + abdomen ámbar PÁLIDO y LISO,
@@ -65,19 +60,6 @@ export function AbejaAngelita({
      catálogo) = neutro digno: la abeja se ve EXACTO como siempre. */
   clima = null,
   enso = 'neutro',
-  /* ── LIP-SYNC (sistema transversal, useLipSync) ────────────────────────────
-     visema opcional ('V1'..'V4') que produce useLipSync desde el RMS del TTS:
-     la boquita cambia de forma al hablar. Sin visema (o 'V1') = la sonrisa de
-     siempre → los avatares/catálogo no cambian. El HOOK vive aparte para no
-     colgar un AnalyserNode en cada instancia; acá solo se consume el estado. */
-  visema = null,
-  /* ── VESTUARIO por clima+hora (ropaDeClima) ───────────────────────────────
-     OPT-IN: con vestuario=true la abeja se abriga según el clima real (ruana de
-     noche/frío — mata el bug de sudar de noche —, sombrero+sudor al sol cálido).
-     Default false → los consumidores de `clima` existentes NO ven accesorios
-     nuevos (solo el tinte de piel de cuerpoDeClima). tempC afina frío/calor. */
-  vestuario = false,
-  tempC = undefined,
   /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + follow-through) y deja el
      aleteo + estados reactivos. Sin prop (standalone: avatares, catálogo) =
@@ -136,33 +118,16 @@ export function AbejaAngelita({
   //    (dorada) o pesa (lluvia) escalando la duración base de `.crt-wing` (0.15s).
   //    Sin clima → neutro: filtro/opacidad nulos, aleteo base. RM: como `wing` va
   //    solo con `animated`, la duración cuelga de nodos ya quietos (inocua).
-  const cuerpoClima = cuerpoDeClima(clima, { enso: /** @type {any} */ (enso), tier, perfil: PERFIL_ABEJA });
+  const cuerpoClima = cuerpoDeClima(clima, { enso, tier, perfil: PERFIL_ABEJA });
   // Solo estampamos duración inline cuando el clima REALMENTE cambia el aleteo
   // (≠1): así un clima neutro NO pisa los overrides de pose ('celebra'/'reposo').
   const wingDur = (wing && cuerpoClima.velocidadAlas !== 1)
     ? { animationDuration: `${(0.15 / cuerpoClima.velocidadAlas).toFixed(3)}s` }
     : undefined;
-  // Alitas de TUL que se DIFUMINAN al ACELERAR (motion-blur real): cuando el
-  // clima acelera el aleteo (dorada/soleado, velocidadAlas alta) el tul se ve
-  // borroso — la firma de las alas rápidas del meliponino. Determinista: cuelga
-  // del clima, no del reloj. Tier bajo o sin aleteo → nítido (blur es raster
-  // caro). RM: las alas ya están quietas, el blur queda estático (inocuo).
-  const alasRapidas = wing && tier !== 'bajo' && cuerpoClima.velocidadAlas >= 1.12;
-  const alaBlur = alasRapidas
-    ? { filter: `blur(${(0.35 * cuerpoClima.velocidadAlas).toFixed(2)}px)` }
-    : undefined;
-  const alaStyle = (wingDur || alaBlur) ? { ...wingDur, ...alaBlur } : undefined;
-  const alaStyle2 = (wingDur || alaBlur)
-    ? { animationDelay: '-0.07s', ...wingDur, ...alaBlur }
-    : { animationDelay: '-0.07s' };
   // Filtro/opacidad de clima para el nodo raíz (svg autónomo o <g> inline).
   const estiloClima = (cuerpoClima.tinte || cuerpoClima.opacidad < 1)
     ? { filter: cuerpoClima.tinte || undefined, opacity: cuerpoClima.opacidad < 1 ? cuerpoClima.opacidad : undefined }
     : undefined;
-
-  // Vestuario por clima+hora (opt-in). Perfil abeja: neutro, suda al sol de día,
-  // ruana de noche. Sin vestuario o sin clima → nada (comportamiento histórico).
-  const ropa = (vestuario && clima) ? ropaDeClimaBicho('abeja-angelita', clima, { tempC }) : null;
 
   const defs = (
     <defs>
@@ -231,10 +196,10 @@ export function AbejaAngelita({
       {/* alitas de tul con contorno + smear (crt-wingbeat ya lleva el estirón).
           La duración del aleteo la modula el clima real (wingDur): dorada rápida,
           lluvia pesada. celebra/reposo (data-pose) mandan por especificidad CSS. */}
-      <ellipse className={wing} style={alaStyle} cx="-3.4" cy="-6" rx="8.8" ry="3.3" fill={ABEJA_PALETA.alaTul}
-        opacity="0.55" stroke="rgba(42,26,12,0.32)" strokeWidth="0.45" />
-      <ellipse className={wing} style={alaStyle2} cx="-0.4" cy="-5.2"
-        rx="6.6" ry="2.7" fill={ABEJA_PALETA.alaTulClara} opacity="0.44" stroke="rgba(42,26,12,0.28)" strokeWidth="0.45" />
+      <ellipse className={wing} style={wingDur} cx="-1.8" cy="-7" rx="6" ry="3.6" fill={ABEJA_PALETA.alaTul}
+        opacity="0.62" stroke="rgba(42,26,12,0.4)" strokeWidth="0.5" />
+      <ellipse className={wing} style={{ animationDelay: '-0.07s', ...wingDur }} cx="2.2" cy="-6.4"
+        rx="4.6" ry="2.8" fill={ABEJA_PALETA.alaTulClara} opacity="0.5" stroke="rgba(42,26,12,0.35)" strokeWidth="0.5" />
 
       {/* patitas manguera con pie crema (detrás del tronco, se mecen suave) */}
       <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sway={vivo} delay={-0.6} />
@@ -352,13 +317,13 @@ export function AbejaAngelita({
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
     // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
     return (
-      <g className={className} style={estiloClima} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
+      <g className={className} style={estiloClima} {...estadoAttrs}>
         {defs}
         {cuerpoVivo}
       </g>
     );
   }
-  const svg = (
+  return (
     <svg viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloClima}
       role="img" aria-label={title} {...estadoAttrs} {...rest}>
       <title>{title}</title>

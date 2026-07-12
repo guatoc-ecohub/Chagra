@@ -22,7 +22,6 @@ import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
 import { cuerpoDeClima, PERFIL_ABEJA } from '../../creatures/creatureClimaCuerpo.js';
-import { useLipSync } from '../../creatures/useLipSync.js';
 import { ABEJA_PRESENCIA, ABEJA_TINTA } from '../../creatures/abejaIdentidad.js';
 import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
 import { horaDeReloj } from '../cielosHoraData.js';
@@ -323,29 +322,24 @@ export function AbejaEscena({
   const mojada = reaccion?.mojada ?? false;
   const sed = reaccion?.sed ?? false;
   const comiendo = reaccion?.comiendo ?? false;
-  // ── EL CLIMA REAL en el CUERPO (creatureClimaCuerpo): del estadoFinca salen
-  //    clima/enso que la creature pinta (tinte, opacidad, aleteo). Aquí tomamos
-  //    su `altura` para COMPLEMENTAR la coreografía; se MULTIPLICA con la de
-  //    reaccionFinca (lluvia/sed ya bajan el vuelo) para no doble-contar.
+  // ── EL CLIMA REAL en el CUERPO (creatureClimaCuerpo): del mismo estadoFinca
+  //    salen clima/enso que la creature pinta (tinte, opacidad, aleteo). Aquí solo
+  //    tomamos su `altura` para COMPLEMENTAR la coreografía (niebla vuela corto,
+  //    dorada un poco más alto); se MULTIPLICA con la de reaccionFinca (lluvia/sed
+  //    ya bajan el vuelo) para no doble-contar. El resto lo aplica el dibujo.
   const climaReal = estadoFinca?.clima ?? null;
   const ensoReal = estadoFinca?.enso ?? 'neutro';
-  // La °C real (si el estado la trae): afina la ruana por frío. Sin ella, el
-  // vestuario se infiere del clima+hora (de noche = ruana; sol de día = sudor).
-  const tempCReal = Number.isFinite(estadoFinca?.tempC) ? estadoFinca.tempC : undefined;
   const cuerpoClima = useMemo(
-    () => cuerpoDeClima(climaReal, { enso: ensoReal, tier: /** @type {'alto'|'medio'|'bajo'} */ (tier), perfil: PERFIL_ABEJA }),
+    () => cuerpoDeClima(climaReal, { enso: ensoReal, tier, perfil: PERFIL_ABEJA }),
     [climaReal, ensoReal, tier],
   );
   const vueloClima = useMemo(() => {
     const base = reaccion?.vuelo ?? VUELO_NEUTRO;
     return cuerpoClima.altura === 1 ? base : { ...base, altura: base.altura * cuerpoClima.altura };
   }, [reaccion, cuerpoClima]);
-  // La hora del valle (cielosHoraData): de noche el idle la ACURRUCA. Se lee UNA
-  // vez al montar — determinista, nada de reloj en render.
-  const hora = useMemo(() => horaDeReloj(), []);
-  const { ref, caraRef, sombraRef, visRef, idleRef } = useEntradaAbeja(foco, {
+  const { ref, caraRef, sombraRef, visRef } = useEntradaAbeja(foco, {
     entrando, energia: energiaReal, reducedMotion, piso, vuelo: vueloClima,
-    cruce: cruceVivo, saliendo, hora, tier,
+    cruce: cruceVivo, saliendo,
   });
   // Microrrebote: cada toque de hotspot sube `rebote`; reiniciamos la animación
   // CSS (quitar → reflow → poner) para que dispare aun en toques seguidos. El
@@ -389,32 +383,19 @@ export function AbejaEscena({
             data-comiendo={comiendo && vivo ? '1' : undefined}
           >
             <div ref={reboteRef} className="mundo-abeja__rebote">
-              {/* Cuarta capa de gesto: el IDLE (squash&stretch, vueltas de
-                  campana, celebración) — imperativa por frame desde el hook.
-                  Propia para no pisar la transition del volteo de la cara.
-                  data-creature → el hook le cuelga data-pose (CSS de creatures). */}
-              <div ref={idleRef} className="mundo-abeja__idle" data-creature="abeja-angelita">
-                <div ref={caraRef} className="mundo-abeja__cara">
-                  <AbejaAngelita
-                    size={size}
-                    animo={animoReal}
-                    energia={energiaReal}
-                    mojada={mojada}
-                    sed={sed}
-                    comiendo={comiendo}
-                    clima={climaReal}
-                    enso={ensoReal}
-                    /* Lip-sync: la boquita sigue el RMS del TTS al narrar. */
-                    visema={vivo ? visema : null}
-                    /* Vestuario por clima+hora: de noche la RUANA (no suda). */
-                    vestuario={vestuario}
-                    tempC={tempCReal}
-                    /* Herramienta del mundo en la manita al entrar. */
-                    mundoId={mundoId}
-                    animated={vivo}
-                    tier={tier}
-                  />
-                </div>
+              <div ref={caraRef} className="mundo-abeja__cara">
+                <AbejaAngelita
+                  size={size}
+                  animo={animoReal}
+                  energia={energiaReal}
+                  mojada={mojada}
+                  sed={sed}
+                  comiendo={comiendo}
+                  clima={climaReal}
+                  enso={ensoReal}
+                  animated={vivo}
+                  tier={tier}
+                />
               </div>
             </div>
           </div>
