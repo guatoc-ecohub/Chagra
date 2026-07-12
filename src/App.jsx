@@ -162,6 +162,7 @@ const MundoCafe3DMockup = lazy(() => import('./mockups/MundoCafe3D'));
 const ValleLluviaMockup = lazy(() => import('./mockups/ValleLluvia3D'));
 const MundoSemilleroMockup = lazy(() => import('./mockups/MundoSemillero3D'));
 const MundoCompostMockup = lazy(() => import('./mockups/MundoCompost3D'));
+const JuegoMiFincaMockup = lazy(() => import('./mockups/JuegoMiFincaOdyssey'));
 // El camino del agua en la finca: nacimiento → canal → reservorio → riego →
 // suelo, con el ciclo (vapor/nube/lluvia) cerrándose. Didáctico, hora dorada.
 const MundoAguaMockup = lazy(() => import('./mockups/MundoAgua3D'));
@@ -576,6 +577,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/valle-lluvia-3d': 'mockup_valle_lluvia_3d',
   'mockups/mundo-semillero-3d': 'mockup_mundo_semillero_3d',
   'mockups/mundo-compost-3d': 'mockup_mundo_compost_3d',
+  'mockups/juego-mi-finca': 'mockup_juego_mi_finca',
   'mockups/mundo-agua-3d': 'mockup_mundo_agua_3d',
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
@@ -1857,6 +1859,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El compost 3D">
               <MundoCompostMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_juego_mi_finca':
+        // Juego "Mi finca" con cruce túnel Odyssey 3D↔2D: la cámara entra por
+        // un túnel (dolly-zoom + iris) y aterriza en un side-scroll 2D jugable
+        // (4 cuidados agroecológicos, sin gamificación tóxica). Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Juego Mi finca (túnel Odyssey)">
+              <JuegoMiFincaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
