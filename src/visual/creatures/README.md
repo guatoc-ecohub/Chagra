@@ -20,8 +20,10 @@ calidad dispar. Aquí vive la **versión canónica** de cada uno.
 
 | Componente | Especie (binomio verificado) | Notas |
 |---|---|---|
-| `AbejaAngelita` | *Tetragonisca angustula* | Meliponino nativo **SIN aguijón** — NO *Apis*. Alitas de tul que baten. |
-| `Colibri` | *Colibri coruscans* | Colibrí chillón andino. Pico largo, garganta violeta, alas que baten. |
+| `AbejaAngelita` | *Tetragonisca angustula* | Meliponino nativo **SIN aguijón** — NO *Apis*. Alitas de tul que baten. Rubber-hose. |
+| `Colibri` | *Colibri coruscans* | Colibrí chillón andino. Pico largo, garganta violeta, alas que baten. **Rubber-hose** (adoptado). |
+| `OsoAndino` | *Tremarctos ornatus* | Oso de anteojos, guardián del páramo. Mole parda con **anteojos crema** (su firma). De suelo, se sienta. Rubber-hose. |
+| `RanaAndina` | *Atelopus* spp. | Rana arlequín del páramo. Verde húmedo con manchas ocre, vientre dorado, ojos saltones y bocota. Rubber-hose. |
 | `Lombriz` | *Martiodrilus crassus* | Lombriz gigante nativa. Cuerpo segmentado con clitelo. Sin animación propia (su movimiento lo da la escena). |
 | `Mariposa` | *Dione juno* | Pasionaria de alas largas. Cuatro alas que abren y cierran. |
 | `Escarabajo` | *Dichotomius belus* | Estercolero colombiano. Élitros brillantes, cuerno, y bola de abono que rueda. |
@@ -89,8 +91,10 @@ que **el oso andino y el colibrí lo hereden sin redibujar**:
 estados reactivos. Standalone (avatares/catálogo) sin `tier` = rubber-hose pleno.
 
 **Estrenado por**: `AbejaAngelita` (referencia de composición del KIT).
-**Pendientes de adoptar**: `OsoAndino` (nuevo) y `Colibri` — componen las mismas
-piezas + clases `rh-*` con SUS proporciones. No hay que reinventar la cadencia.
+**Ya adoptado por**: `OsoAndino`, `Colibri` y `RanaAndina` — componen las mismas
+piezas + clases `rh-*` con SUS proporciones (identidad en `faunaAndina.js`), y
+heredan los gestos species-agnostic (`rh-g-celebra` / `rh-g-reposo` /
+`rh-g-senala`) solo con `data-pose`. No se reinventa la cadencia.
 
 ## Técnica
 

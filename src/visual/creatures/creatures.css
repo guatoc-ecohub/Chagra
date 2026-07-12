@@ -154,6 +154,98 @@
   86%  { transform: rotate(-6deg); }    /* recoge con follow-through */
 }
 
+/* ═══ GESTOS con carácter — VERSIÓN SPECIES-AGNOSTIC (rh-g-*) ════════════════
+   La MISMA gramática de gestos (celebra / reposo / señala) para el resto de la
+   familia rubber-hose: el OSO ANDINO, el COLIBRÍ y la RANA la heredan solo con
+   data-pose, sin CSS propio. Angelita NO se toca: sus reglas
+   [data-creature='abeja-angelita'][data-pose=…] tienen MAYOR especificidad (dos
+   atributos) y PISAN estas genéricas (un atributo) — su gesto afinado (3/4,
+   asimétrico) manda sobre el suyo. Aquí los cuerpos frontales/simétricos (oso,
+   rana) alzan una V simétrica; el colibrí celebra a cuerpo + aleteo acelerado.
+   El gate ya está resuelto arriba y abajo con selectores [data-pose] genéricos:
+   la desactivación de antics durante el gesto y el freeze de reduced-motion YA
+   cubren estas clases (mismos selectores). ─────────────────────────────────── */
+
+/* CELEBRA — brinca: anticipa (squash), SALTA con stretch y aterriza con
+   overshoot elástico; los bracitos (si los hay) suben en V simétrica. */
+[data-pose='celebra'] .crt-body {
+  animation: rh-g-celebra 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-g-celebra {
+  0%   { transform: translateY(0) scale(1, 1); }
+  16%  { transform: translateY(1.6px) scale(1.08, 0.9); }   /* anticipa: se agacha */
+  42%  { transform: translateY(-5px) scale(0.9, 1.14); }    /* ¡SALTA! (stretch) */
+  62%  { transform: translateY(0.8px) scale(1.1, 0.9); }    /* aterriza (overshoot) */
+  80%  { transform: translateY(-0.8px) scale(0.98, 1.04); } /* rebote elástico */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+[data-pose='celebra'] .crt-brazo-l {
+  animation: rh-g-brazo-l 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+[data-pose='celebra'] .crt-brazo-r {
+  animation: rh-g-brazo-r 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+/* Brazos de manguera que pivotan del hombro (crt-brazo-* traen su origen): suben
+   en V simétrica rebasando el pico y asentando un pelo (follow-through). */
+@keyframes rh-g-brazo-l {
+  0%, 12% { transform: rotate(0deg); }
+  42%  { transform: rotate(122deg); }   /* alza arriba-izquierda (rebasa) */
+  62%  { transform: rotate(108deg); }   /* asienta */
+  80%  { transform: rotate(114deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes rh-g-brazo-r {
+  0%, 12% { transform: rotate(0deg); }
+  42%  { transform: rotate(-122deg); }  /* alza arriba-derecha (rebasa) */
+  62%  { transform: rotate(-108deg); }  /* asienta */
+  80%  { transform: rotate(-114deg); }
+  100% { transform: rotate(0deg); }
+}
+/* Alados (colibrí): la celebración acelera el aleteo. */
+[data-pose='celebra'] .crt-wing { animation-duration: 0.09s; }
+
+/* REPOSO — respira despacio (el pecho sube y baja). Los alados pliegan las alas
+   (reusa crt-wing-reposo). */
+[data-pose='reposo'] .crt-body {
+  animation: rh-g-reposo 4.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-g-reposo {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(-0.4px) scale(0.985, 1.03); }  /* inhala */
+}
+[data-pose='reposo'] .crt-wing {
+  animation: crt-wing-reposo 3.6s ease-in-out infinite alternate;
+}
+
+/* SEÑALA — se inclina hacia el POI (a su derecha) rebasando y asentándose,
+   sostiene el gesto y vuelve; el bracito derecho apunta. */
+[data-pose='señala'] .crt-body {
+  animation: rh-g-senala 2.9s cubic-bezier(0.5, 0, 0.25, 1.4) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-g-senala {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  20%  { transform: rotate(8deg) translateX(0.6px); }   /* se inclina rebasando */
+  30%  { transform: rotate(6deg) translateX(0.4px); }   /* asienta apuntando */
+  72%  { transform: rotate(6deg) translateX(0.4px); }   /* sostiene */
+  86%  { transform: rotate(-1.5deg) translateX(0); }    /* rebote al enderezarse */
+}
+[data-pose='señala'] .crt-brazo-r {
+  animation: rh-g-brazo-senala 2.9s cubic-bezier(0.5, 0, 0.25, 1.4) infinite;
+}
+@keyframes rh-g-brazo-senala {
+  0%, 100% { transform: rotate(0deg); }
+  20%  { transform: rotate(-48deg); }   /* extiende apuntando (rebasa) */
+  30%  { transform: rotate(-40deg); }   /* asienta señalando */
+  72%  { transform: rotate(-40deg); }
+  86%  { transform: rotate(-6deg); }    /* recoge (follow-through) */
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    KIT RUBBER-HOSE (Cuphead + Miss Minutes de Loki) — SPECIES-AGNOSTIC
    Cadencia de goma REUTILIZABLE por cualquier creature. Angelita la estrena;
