@@ -9284,8 +9284,15 @@ const GUARD_CHAIN = [
  * @returns {{text:string, modified:boolean, reasons:string[]}}
  */
 
-const MAX_CONCISE_WORDS = 250;
-const MAX_CONCISE_WORDS_HARD = 400;
+// 2026-07-12 (operador: "se cortó a menos de la tercera parte"): los umbrales
+// viejos (250/400) MUTILABAN respuestas técnicas legítimas a 2-3 oraciones —
+// una respuesta agroecológica detallada (plagas de la fresa, plan de manejo) es
+// naturalmente 300-600 palabras y ES el valor del agente. Cortarla degrada
+// inteligencia (regla dura del operador). Subidos MUCHO: solo recorta verborrea
+// genuinamente desbocada, y aun así conserva bastantes oraciones (ver kept).
+// La rama de DEDUP (redundancia) se conserva — esa sí es útil sin degradar.
+const MAX_CONCISE_WORDS = 700;
+const MAX_CONCISE_WORDS_HARD = 1300;
 
 /**
  * guardConciseResponse — guard de CONCISIÓN (Item 7).
@@ -9307,7 +9314,11 @@ export function guardConciseResponse(responseText) {
   }
 
   const words = responseText.split(/\s+/).filter(Boolean);
-  if (words.length < MAX_CONCISE_WORDS) {
+  // Gate BAJO solo para poder correr el DEDUP (redundancia) en respuestas
+  // medianas; la truncación por LARGO usa umbrales altos (700/1300) más abajo,
+  // así una respuesta técnica de 200-700 palabras NO-redundante queda intacta.
+  const DEDUP_MIN_WORDS = 200;
+  if (words.length < DEDUP_MIN_WORDS) {
     return { text: responseText, modified: false, reason: null };
   }
 
@@ -9355,8 +9366,9 @@ export function guardConciseResponse(responseText) {
   let reason = '';
 
   if (words.length >= MAX_CONCISE_WORDS_HARD) {
-    // Hard limit: preámbulo de seguridad (si lo hay) + 2 oraciones del cuerpo.
-    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 2)];
+    // Hard limit (>1300 palabras, verborrea real): preámbulo de seguridad + 6
+    // oraciones del cuerpo (antes 2 = stub que mutilaba el plan).
+    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 6)];
     conciseText = `${kept.join(' ').trim()}\n\n¿Quieres que profundice en algo específico?`;
     reason = `guardConciseResponse:hard_limit (${words.length} palabras, max ${MAX_CONCISE_WORDS_HARD})`;
   } else if (hasRedundancy) {
@@ -9371,11 +9383,15 @@ export function guardConciseResponse(responseText) {
     conciseText = deduped.join(' ').trim();
     if (conciseText.length < 30) conciseText = responseText.slice(0, 500) + '...';
     reason = `guardConciseResponse:redundant_recommendation (${sentences.length} -> ${deduped.length} oraciones)`;
-  } else {
-    // Soft limit: preámbulo de seguridad (si lo hay) + 3 oraciones del cuerpo.
-    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 3)];
+  } else if (words.length >= MAX_CONCISE_WORDS) {
+    // Soft limit (700-1300 palabras): preámbulo de seguridad + 10 oraciones del
+    // cuerpo (antes 3 = mutilaba respuestas técnicas legítimas).
+    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 10)];
     conciseText = `${kept.join(' ').trim()}\n\n¿Quieres que profundice en algo específico?`;
     reason = `guardConciseResponse:verbose (${words.length} palabras, recomendado <${MAX_CONCISE_WORDS})`;
+  } else {
+    // 200-700 palabras, no-redundante: respuesta técnica legítima → NO tocar.
+    return { text: responseText, modified: false, reason: null };
   }
 
   bumpGuardTelemetry('concise');

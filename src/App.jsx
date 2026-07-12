@@ -156,6 +156,10 @@ const VitrinaInfraestructuraMockup = lazy(() => import('./mockups/vitrina3d/Vitr
 // con su encuadre de cámara curado (camaraDioramas) + botón «Entrar» al host real.
 const VitrinaMundosMockup = lazy(() => import('./mockups/vitrina3d/VitrinaMundos'));
 const SierraGlobalMockup = lazy(() => import('./visual/mundo3d/VistaGlobalSierra'));
+const MundoSueloVivoMockup = lazy(() => import('./mockups/MundoSueloVivo3D'));
+const AliadosFincaMockup = lazy(() => import('./mockups/AliadosFinca3D'));
+const MundoCafe3DMockup = lazy(() => import('./mockups/MundoCafe3D'));
+const ValleLluviaMockup = lazy(() => import('./mockups/ValleLluvia3D'));
 // El camino del agua en la finca: nacimiento → canal → reservorio → riego →
 // suelo, con el ciclo (vapor/nube/lluvia) cerrándose. Didáctico, hora dorada.
 const MundoAguaMockup = lazy(() => import('./mockups/MundoAgua3D'));
@@ -564,6 +568,10 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/vitrina-infra': 'mockup_vitrina_infra',
   'mockups/vitrina-mundos': 'mockup_vitrina_mundos',
   'mockups/sierra-global': 'mockup_sierra_global',
+  'mockups/mundo-suelo-vivo-3d': 'mockup_mundo_suelo_vivo_3d',
+  'mockups/aliados-finca-3d': 'mockup_aliados_finca_3d',
+  'mockups/mundo-cafe-3d': 'mockup_mundo_cafe_3d',
+  'mockups/valle-lluvia-3d': 'mockup_valle_lluvia_3d',
   'mockups/mundo-agua-3d': 'mockup_mundo_agua_3d',
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
@@ -1785,6 +1793,46 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Vista global Sierra Nevada">
               <SierraGlobalMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_suelo_vivo_3d':
+        // Mundo del SUELO VIVO 3D (cutaway de perfil): horizontes O→A→B→C→R,
+        // raíces + micorrizas, agua infiltrándose, lombrices. Ruta sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El suelo vivo 3D">
+              <MundoSueloVivoMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_aliados_finca_3d':
+        // Escena "aliados de la finca": fauna funcional benéfica trabajando
+        // (mariquita/abejorro/lombriz/escarabajo, control biológico). Sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Aliados de la finca">
+              <AliadosFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_cafe_3d':
+        // Mundo del CAFÉ bajo sombra + beneficio (despulpado→lavado→secado).
+        // Ruta #/mockups/mundo-cafe-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El café bajo sombra">
+              <MundoCafe3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_valle_lluvia_3d':
+        // Valle bajo la LLUVIA: ciclo de tormenta reactivo (nubes→aguacero→
+        // escampa), crecida del río, cosecha de agua. Ruta sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El valle bajo la lluvia">
+              <ValleLluviaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
