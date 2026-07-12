@@ -22,18 +22,18 @@ const mockResolveCrop = vi.fn((crop) => {
 describe('buildDraftsFromVoice', () => {
   it('retorna array vacio para entities vacio', async () => {
     const { buildDraftsFromVoice } = await import('../voiceToDraft');
-    expect(buildDraftsFromVoice({ transcription: '', entities: [] })).toEqual([]);
-    expect(buildDraftsFromVoice({ transcription: '', entities: null })).toEqual([]);
+    expect(buildDraftsFromVoice(/** @type {any} */ ({ transcription: '', entities: [] }))).toEqual([]);
+    expect(buildDraftsFromVoice(/** @type {any} */ ({ transcription: '', entities: null }))).toEqual([]);
   });
 
   it('convierte entidad basica en draft con campos minimos', async () => {
     const { buildDraftsFromVoice } = await import('../voiceToDraft');
-    const drafts = buildDraftsFromVoice({
+    const drafts = buildDraftsFromVoice(/** @type {any} */ ({
       transcription: 'Sembré cinco cafés en el invernadero',
       entities: [{ crop: 'café', quantity: 5, location: 'invernadero' }],
       resolveLocation: mockResolveLocation,
       resolveCrop: mockResolveCrop,
-    });
+    }));
 
     expect(drafts).toHaveLength(1);
     const d = drafts[0];
@@ -55,12 +55,12 @@ describe('buildDraftsFromVoice', () => {
       invasive: true,
       warnings: ['Especie invasora'],
     };
-    const drafts = buildDraftsFromVoice({
+    const drafts = buildDraftsFromVoice(/** @type {any} */ ({
       transcription: 'Cinco tomates en lote norte',
       entities: [{ crop: 'tomate', quantity: 5, location: 'lote norte', _ragInsights: rag }],
       resolveLocation: mockResolveLocation,
       resolveCrop: mockResolveCrop,
-    });
+    }));
 
     expect(drafts).toHaveLength(1);
     const d = drafts[0];
@@ -71,12 +71,12 @@ describe('buildDraftsFromVoice', () => {
 
   it('usa unit=plantas para individual y semillas para aggregate', async () => {
     const { buildDraftsFromVoice } = await import('../voiceToDraft');
-    const drafts = buildDraftsFromVoice({
+    const drafts = buildDraftsFromVoice(/** @type {any} */ ({
       transcription: 'Arveja en lote norte',
       entities: [{ crop: 'arveja', quantity: 20, location: 'lote norte' }],
       resolveLocation: mockResolveLocation,
       resolveCrop: mockResolveCrop,
-    });
+    }));
     // arveja = pisum_sativum = leguminosas_granos → aggregate → semillas
     expect(drafts[0].subject_kind).toBe('aggregate');
     expect(drafts[0].unit).toBe('semillas');
@@ -84,7 +84,7 @@ describe('buildDraftsFromVoice', () => {
 
   it('resuelve multi-entidad correctamente', async () => {
     const { buildDraftsFromVoice } = await import('../voiceToDraft');
-    const drafts = buildDraftsFromVoice({
+    const drafts = buildDraftsFromVoice(/** @type {any} */ ({
       transcription: 'Dos cafés y tres tomates en invernadero',
       entities: [
         { crop: 'café', quantity: 2, location: 'invernadero' },
@@ -92,7 +92,7 @@ describe('buildDraftsFromVoice', () => {
       ],
       resolveLocation: mockResolveLocation,
       resolveCrop: mockResolveCrop,
-    });
+    }));
 
     expect(drafts).toHaveLength(2);
     expect(drafts[0].subject_slug).toBe('coffea_arabica');
@@ -103,12 +103,12 @@ describe('buildDraftsFromVoice', () => {
   it('fallback a nombre crudo si resolveCrop no resuelve', async () => {
     const resolveCropUnknown = vi.fn(() => ({ slug: '', label: '', variety: null }));
     const { buildDraftsFromVoice } = await import('../voiceToDraft');
-    const drafts = buildDraftsFromVoice({
+    const drafts = buildDraftsFromVoice(/** @type {any} */ ({
       transcription: 'Algo raro en invernadero',
       entities: [{ crop: 'planta_misteriosa', quantity: 1, location: 'invernadero' }],
       resolveLocation: mockResolveLocation,
       resolveCrop: resolveCropUnknown,
-    });
+    }));
 
     expect(drafts[0].subject_slug).toBe('');
     expect(drafts[0].subject_label).toBe('planta_misteriosa');

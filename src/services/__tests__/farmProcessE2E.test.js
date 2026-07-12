@@ -55,7 +55,7 @@ describe('Integración: siembra → ciclo → observación → etapa → tarea',
   });
 
   it('2. Sugerir etapa desde observación', async () => {
-    const { suggestStageFromText } = await vi.importActual('../stageSuggestionService');
+    const { suggestStageFromText } = /** @type {any} */ (await vi.importActual('../stageSuggestionService'));
     const suggestion = suggestStageFromText(
       'las hojas están grandes y el tallo principal ya mide 30cm'
     );
@@ -66,7 +66,7 @@ describe('Integración: siembra → ciclo → observación → etapa → tarea',
   });
 
   it('3. Generar tareas desde etapa vegetativa', async () => {
-    const { getTasksForCycle } = await vi.importActual('../cycleTaskService');
+    const { getTasksForCycle } = /** @type {any} */ (await vi.importActual('../cycleTaskService'));
     const stageOrder = [
       { code: 'sowing', label: 'Siembra' },
       { code: 'emergence', label: 'Emergencia' },
@@ -85,7 +85,7 @@ describe('Integración: siembra → ciclo → observación → etapa → tarea',
   });
 
   it('4. Calcular ventanas fenológicas con datos completos', async () => {
-    const { calculateWindows } = await vi.importActual('../phenologyCalculator');
+    const { calculateWindows } = /** @type {any} */ (await vi.importActual('../phenologyCalculator'));
     const windows = calculateWindows({
       speciesSlug: 'coffea_arabica',
       sowingDate: Date.now(),
@@ -98,7 +98,7 @@ describe('Integración: siembra → ciclo → observación → etapa → tarea',
   });
 
   it('5. Degradación honesta: plantilla faltante', async () => {
-    const { calculateWindows } = await vi.importActual('../phenologyCalculator');
+    const { calculateWindows } = /** @type {any} */ (await vi.importActual('../phenologyCalculator'));
     const windows = calculateWindows({
       speciesSlug: 'nonexistent_species_xyz',
       sowingDate: Date.now(),
@@ -108,9 +108,9 @@ describe('Integración: siembra → ciclo → observación → etapa → tarea',
 
   it('6. Flujo funcional completo (sin IDB)', async () => {
     const { validateFarmProcess } = await import('../../types/farmProcess');
-    const { suggestStageFromText } = await vi.importActual('../stageSuggestionService');
-    const { getTasksForCycle } = await vi.importActual('../cycleTaskService');
-    const { calculateWindows } = await vi.importActual('../phenologyCalculator');
+    const { suggestStageFromText } = /** @type {any} */ (await vi.importActual('../stageSuggestionService'));
+    const { getTasksForCycle } = /** @type {any} */ (await vi.importActual('../cycleTaskService'));
+    const { calculateWindows } = /** @type {any} */ (await vi.importActual('../phenologyCalculator'));
 
     const process = {
       process_id: 'flow-001',

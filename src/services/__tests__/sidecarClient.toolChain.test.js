@@ -366,7 +366,7 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
       { tool: 'get_companions', args: { species_id: 'rubus_glaucus' } },
     ];
 
-    const result = await executeToolChain(chain);
+    const result = await executeToolChain(/** @type {any} */ (chain));
 
     // Comportamiento real del código:
     // chain.slice(0, 3) → [get_species, null, undefined]
@@ -398,7 +398,7 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
       { tool: 'get_companions', args: { species_id: 'rubus_glaucus' } },
     ];
 
-    const result = await executeToolChain(chain);
+    const result = await executeToolChain(/** @type {any} */ (chain));
 
     // Comportamiento real:
     // chain.slice(0, 3) → [get_species, null, undefined]
@@ -442,9 +442,9 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
     expect(await executeToolChain([])).toEqual([]);
     expect(await executeToolChain(null)).toEqual([]);
     expect(await executeToolChain(undefined)).toEqual([]);
-    expect(await executeToolChain({})).toEqual([]);
-    expect(await executeToolChain('not an array')).toEqual([]);
-    expect(await executeToolChain(42)).toEqual([]);
+    expect(await executeToolChain(/** @type {any} */ ({}))).toEqual([]);
+    expect(await executeToolChain(/** @type {any} */ ('not an array'))).toEqual([]);
+    expect(await executeToolChain(/** @type {any} */ (42))).toEqual([]);
 
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -507,8 +507,8 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
       'get_biopreparados',
     ]);
     // El orden de las requests se preserva (se inician en orden del chain).
-    expect(delayedFetch.mock.calls[0][0]).toBe('/api/mcp/agro/tools/get_species');
-    expect(delayedFetch.mock.calls[2][0]).toBe('/api/mcp/agro/tools/get_biopreparados');
+    expect(/** @type {any} */ (delayedFetch).mock.calls[0][0]).toBe('/api/mcp/agro/tools/get_species');
+    expect(/** @type {any} */ (delayedFetch).mock.calls[2][0]).toBe('/api/mcp/agro/tools/get_biopreparados');
   });
 
   it('ejecuta exactamente 3 steps cuando chain tiene 3', async () => {

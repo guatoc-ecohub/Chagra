@@ -538,7 +538,7 @@ export function DioramaMicrofaunaSuelo({
       <Hifas seed={17} dirsN={P.hifaDirs} maxDepth={P.hifaProf} reducedMotion={reducedMotion} />
       <Bacterias
         cantidad={P.bacterias}
-        hub={[0, -0.35, FRENTE - 0.55]}
+        hub={/** @type {const} */ ([0, -0.35, FRENTE - 0.55])}
         reducedMotion={reducedMotion}
       />
       {lombrices.map((l) => (
@@ -586,6 +586,7 @@ export default function MicrofaunaSuelo({
   subtitulo = 'El suelo está vivo',
   className = '',
 }) {
+  /** @type {[number, number]} */
   const dpr = tier === 'bajo' ? [1, 1] : [1, 1.5];
   return (
     <div className={`microfauna ${className}`.trim()}>
