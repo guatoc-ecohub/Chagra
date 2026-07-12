@@ -185,6 +185,7 @@ const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo
 const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
 const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
 const EfectosFuncionalesDemoMockup = lazy(() => import('./mockups/EfectosFuncionalesDemo'));
+const CatalogoInfraDemoMockup = lazy(() => import('./mockups/CatalogoInfraDemo'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -598,6 +599,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
   'mockups/artesania-andina': 'mockup_artesania_andina',
   'mockups/efectos-funcionales': 'mockup_efectos_funcionales',
+  'mockups/catalogo-infra': 'mockup_catalogo_infra',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1983,6 +1985,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Artesanía andina">
               <ArtesaniaAndinaDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_catalogo_infra':
+        // Catálogo de infraestructura procedural (AG/Gemini): 8 piezas
+        // paramétricas low-poly (invernadero/gallinero/galpón/…) + demo.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Catálogo de infraestructura">
+              <CatalogoInfraDemoMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
