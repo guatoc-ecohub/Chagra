@@ -288,8 +288,8 @@ export default function EscenaBase3D({
   /* Device-tiering (DR-3D-PERF-GAMABAJA §2): el andamiaje ya es frugal por
      contrato (sin sombras, Lambert); lo que gradúa el tier son los píxeles
      (DPR/antialias) y, en el perfil mínimo, la niebla y las alfombras. */
-  const frugal = tierInicial === 'bajo';
-  const dpr = presupuestoInicial.dpr;
+  const frugal = tier === 'bajo';
+  const dpr = tier === 'alto' ? /** @type {[number, number]} */ ([1, 1.5]) : tier === 'medio' ? /** @type {[number, number]} */ ([1, 1.3]) : 1;
   return (
     <Canvas
       className={`mundo-canvas${listo ? ' mundo-canvas--listo' : ''}`}

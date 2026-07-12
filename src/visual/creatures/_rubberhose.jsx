@@ -99,13 +99,6 @@ export function Sonrisa({ cx = 0, cy = 0, w = 3, prof = 1.4, ink = RH_INK }) {
  * mitón/pie crema en la punta — la firma de Cuphead. Con `rh-sway` cuelga y
  * hace follow-through (secondary motion) en el idle.
  *
- * `clase` da nombre al miembro (p.ej. 'crt-brazo-r') para que los GESTOS de la
- * criatura (celebra/señala) lo agarren por CSS; `origen` es su transform-origin
- * — el HOMBRO/CADERA real dentro del fill-box (para brazos que se alzan, 'top
- * center' quedaba lejos del hombro y la rotación descolgaba el miembro). El
- * estilo de pivote se estampa SIEMPRE (haya o no sway): así los gestos ESTÁTICOS
- * (fotograma digno con animated=false / reduced-motion) también pivotan bien.
- *
  * @param {Object} props
  * @param {string} props.d
  * @param {number} [props.ancho=2.3]
@@ -114,10 +107,6 @@ export function Sonrisa({ cx = 0, cy = 0, w = 3, prof = 1.4, ink = RH_INK }) {
  * @param {boolean} [props.pie=false]
  * @param {boolean} [props.sway=false]
  * @param {number} [props.delay=0]
- * @param {string} [props.clase]  clase extra del gesto (p.ej. 'crt-brazo-l')
- * @param {string} [props.origen='top center']  transform-origen (el hombro)
- * @param {string} [props.ink]
- * @param {string} [props.glove]
  */
 export function Miembro({
   d, ancho = 2.3, punta = null, puntaR = 1.6, pie = false, sway = false, delay = 0,
