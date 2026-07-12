@@ -32,6 +32,7 @@ export default function Valle2DFallback({
   reducedMotion = false,
   onEntrar,
   onAlerta,
+  webglBloqueado = false,
 }) {
   const c = CLIMAS[clima];
   const ancla = MUNDOS_VALLE.find((m) => m.id === COSA_DEL_DIA.anclaMundo);
@@ -46,6 +47,23 @@ export default function Valle2DFallback({
 
   return (
     <div className="valle2d" data-clima={clima} data-entrando={foco ? 'si' : 'no'}>
+      {/* Aviso cuando el 3D está BLOQUEADO por el navegador (WebGL off — Brave
+          shield, aceleración por hardware apagada): explica el porqué y da la
+          salida, en vez de dejar al usuario sin saber por qué no ve el 3D. */}
+      {webglBloqueado && (
+        <p
+          role="status"
+          style={{
+            position: 'absolute', top: 8, left: 8, right: 8, zIndex: 20, margin: 0,
+            padding: '8px 12px', borderRadius: 12, background: 'rgba(22,32,26,0.86)',
+            color: '#f0ead8', fontSize: 13, lineHeight: 1.35, textAlign: 'center',
+          }}
+        >
+          Su navegador tiene el 3D bloqueado (WebGL). Active la aceleración por
+          hardware o el escudo del navegador (Brave y otros lo apagan) para verlo.
+          Mientras, aquí tiene el valle dibujado.
+        </p>
+      )}
       {/* cámara-lámina: se acerca al lugar tocado (transform-origin en el POI) */}
       <div
         className="valle2d__cam"
