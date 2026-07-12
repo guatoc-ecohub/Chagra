@@ -52,21 +52,41 @@ const VARIANTES_ABEJA = [
   { label: 'sin animación', props: { size: 80, animated: false } },
 ];
 
+/* El trío andino rubber-hose (oso / colibrí / rana) estrena los MISMOS gestos
+   species-agnostic que Angelita: celebra (brinco + V con overshoot), reposo
+   (respira) y señala (se inclina al POI y apunta). Base 'vuela' para el colibrí
+   (alado) y 'anda' para el oso y la rana (de suelo). */
+const VARIANTES_TRIO_AIRE = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'vuela', props: { size: 80 } },
+  { label: 'celebra', props: { size: 80, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 80, pose: 'reposo' } },
+  { label: 'señala', props: { size: 80, pose: 'señala' } },
+  { label: 'sin animación', props: { size: 80, animated: false } },
+];
+const VARIANTES_TRIO_SUELO = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 80 } },
+  { label: 'celebra', props: { size: 80, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 80, pose: 'reposo' } },
+  { label: 'señala', props: { size: 80, pose: 'señala' } },
+  { label: 'sin animación', props: { size: 80, animated: false } },
+];
+/* Variantes de vitrina por slug (las que difieren del set genérico). */
+const VARIANTES_POR_SLUG = {
+  'abeja-angelita': VARIANTES_ABEJA,
+  colibri: VARIANTES_TRIO_AIRE,
+  'oso-andino': VARIANTES_TRIO_SUELO,
+  'rana-andina': VARIANTES_TRIO_SUELO,
+};
+
 /* Nota de campo por creature (el registro de la categoría trae nombre + binomio;
    la descripción de una línea va aquí). */
 const NOTAS_CREATURE = {
   'abeja-angelita': 'Meliponino sin aguijón, polinizadora de la chagra; alas que baten y antenas vivas.',
   colibri: 'Pico recto y garganta violeta iridiscente; el ave-agente de Chagra, ya en rubber-hose.',
-  'oso-guardian': 'Oso de anteojos, guardián del páramo; mole azabache de hombros altos con la luna creciente en el pecho (su firma) y rim-light lunar.',
+  'oso-andino': 'Oso de anteojos, guardián del páramo; mole parda entrañable con los anteojos crema (su firma).',
   'rana-andina': 'Rana arlequín del páramo, guardiana del agua; verde húmedo con manchas ocre y ojos saltones.',
-  perezoso: 'Perezoso de tres dedos, la calma total; cuelga de la rama por sus garras largas, antifaz y tinte verdoso de algas. Todo en cámara lenta.',
-  ardilla: 'Ardilla de cola roja del templado; rufa con la línea dorsal oscura (su firma), cola tupida y su inspección invertida.',
-  jaguar: 'Felino de tierra cálida, majestuoso y acechador; leonado con rosetas de centro ocre (su firma), aura púrpura.',
-  morrocoy: 'Galápago de patas rojas, el anciano ancestral y paciente; caparazón de domo hexagonal (su firma) y patas rojizas, aura bronce. Se retrae elástico a la concha.',
-  borugo: 'La paca de montaña andina, roedor nocturno tierno; pardo con hileras de motas crema (su firma), olfateo tímido y aura plata lunar. El animal de cierre — vivo, a salvo y digno.',
-  danta: 'El tapir andino, la mole lanuda y mansa del bosque altoandino; trompa corta que husmea en periscopio y borde blanco de orejas y labios (su firma doble). La jardinera del bosque: siembra semillas al andar, aura verde semilla.',
-  condor: 'El ave voladora más grande del mundo, el emblema del páramo; alas enormes de plumas-dedo, collar blanco de plumón y cabeza pelada con carúncula (su firma triple). El señor del viento: casi no aletea — planea las térmicas y verlo es saber que la montaña está sana. Aura celeste de altura.',
-  'ent-frailejon': 'El árbol-guardián que enseña: frailejón gigante del páramo, tronco con rostro sabio y faldita de hojas muertas, corona en roseta plateada y flores amarillas. Guardián del agua; anciano sereno y lento. Modo-guardián verde-plateado cuando el páramo peligra.',
   lombriz: 'La ingeniera del suelo; ondula por segmentos con clitelo marcado.',
   mariposa: 'Alas naranjas con venación; poliniza y anuncia buen suelo.',
   escarabajo: 'Estercolero que entierra el abono; élitros con brillo metálico.',
@@ -251,7 +271,7 @@ const ITEMS_CREATURES = Object.entries(CREATURES).map(([slug, meta]) => ({
   render: 'component',
   descripcion: NOTAS_CREATURE[slug] || '',
   props: PROPS_CREATURE,
-  variantes: slug === 'abeja-angelita' ? VARIANTES_ABEJA : VARIANTES_CREATURE,
+  variantes: VARIANTES_POR_SLUG[slug] || VARIANTES_CREATURE,
 }));
 
 const ITEMS_LAMINAS = Object.entries(LAMINAS).map(([slug, meta]) => ({

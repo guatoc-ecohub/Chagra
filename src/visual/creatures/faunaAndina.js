@@ -24,11 +24,8 @@ export const OSO_PALETA = {
   cuerpo: '#3b2a1e',       // pelaje pardo oscuro
   cuerpoGlow: 'rgba(90,64,44,0.7)',
   panza: '#5a4130',        // vientre un tono más cálido
-  crema: '#f0dcb4',        // pecho/bib claro
+  crema: '#f0dcb4',        // hocico, pecho y ANTEOJOS (el rasgo de la especie)
   cremaClara: '#fbeed0',   // realce del pecho
-  anteojo: '#f6e7c4',      // los ANTEOJOS crema alrededor de los ojos (la firma)
-  anteojoBorde: '#8a6a44', // borde tenue del anteojo (lo define contra el pelaje)
-  hocicoClaro: '#cdaa78',  // el MORRO tan claro del oso (distinto del anteojo)
   hocico: '#241812',       // nariz/trufa
   oreja: '#2e2016',        // pabellón de la oreja
 };
@@ -52,11 +49,6 @@ export const COLIBRI_PALETA = {
   alaClara: '#bff4ff',
   pico: '#241812',         // pico recto (tinta cálida)
   cola: '#26b894',         // timoneras
-  /* Iridiscencia CIAN↔MAGENTA (su color de poder y el de sus estelas de
-     movimiento — afterimages). El tornasol real del plumaje: según el ángulo
-     el mismo colibrí destella frío o rosado. */
-  irisCian: '#4fd1ff',
-  irisMagenta: '#ff4fd1',
 };
 export const COLIBRI_PROPORCION = {
   troncoRx: 6.0,
@@ -82,31 +74,4 @@ export const RANA_PROPORCION = {
   troncoRx: 9.2,
   troncoRy: 6.2,
   ojoR: 2.9,
-};
-
-/* ── ARDILLA — Notosciurus granatensis (ardilla de cola roja andina, clima
-   TEMPLADO). Hermana rubber-hose del trío: mismo kit `_rubberhose.jsx`, misma
-   cadencia `rh-*`, otro animal. Pelaje RUFO cálido con la LÍNEA DORSAL oscura
-   marcada (su firma), vientre crema, COLA TUPIDA que se sacude, orejitas y los
-   DIENTES de roedor. Su CARÁCTER: ágil, curiosa, rápida e inquieta — su gesto-
-   firma es la INSPECCIÓN INVERTIDA (se cuelga de cabeza a mirar). Su color de
-   poder es el ÁMBAR (auraDeBicho('ardilla')). */
-export const ARDILLA_PALETA = {
-  cuerpo: '#b5652f',        // pelaje rufo cálido (templado)
-  cuerpoGlow: 'rgba(200,120,60,0.7)',
-  dorsal: '#5f3115',        // LÍNEA DORSAL oscura — la firma de la especie
-  panza: '#e8c48a',         // vientre crema-canela
-  vientre: '#f6e4bd',       // realce claro del pecho
-  cola: '#c4762f',          // cola tupida (rufo un tono más vivo)
-  colaClara: '#e6b06a',     // escarcha/borde de la cola tupida
-  oreja: '#894622',         // pabellón interno de la oreja
-  diente: '#fff6e2',        // incisivos de roedor (crema)
-  hocico: '#2f1c10',        // nariz/trufa
-  bellota: '#8a5a2b',       // la semilla que roe
-};
-export const ARDILLA_PROPORCION = {
-  troncoRx: 7.0,
-  troncoRy: 8.0,
-  cabezaR: 5.6,
-  orejaR: 1.9,
 };

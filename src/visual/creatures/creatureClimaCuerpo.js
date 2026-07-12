@@ -155,6 +155,7 @@ export const PERFILES = Object.freeze({
   colibri: PERFIL_COLIBRI,
   'oso-andino': PERFIL_OSO,
   rana: PERFIL_RANA,
+  'rana-andina': PERFIL_RANA, // alias del slug de la creature 2D (RanaAndina)
 });
 
 function clamp01(n) {
