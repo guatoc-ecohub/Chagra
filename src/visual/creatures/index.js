@@ -25,12 +25,23 @@ export {
 } from './AbejaTransicion.jsx';
 export { avisarSalidaAbeja, resetSalidaAbeja, useSalidaAbeja } from './senalSalidaAbeja.js';
 export { Colibri } from './Colibri.jsx';
+export { OsoAndino } from './OsoAndino.jsx';
+export { RanaAndina } from './RanaAndina.jsx';
+/* La IDENTIDAD del trío andino como datos (paletas + proporciones). Solo datos:
+   jamás arrastra three al bundle base — igual que abejaIdentidad. */
+export {
+  OSO_PALETA, OSO_PROPORCION,
+  COLIBRI_PALETA, COLIBRI_PROPORCION,
+  RANA_PALETA, RANA_PROPORCION, FAUNA_TINTA,
+} from './faunaAndina.js';
 export { Lombriz } from './Lombriz.jsx';
 export { Mariposa } from './Mariposa.jsx';
 export { Escarabajo } from './Escarabajo.jsx';
 
 import AbejaAngelita from './AbejaAngelita.jsx';
 import Colibri from './Colibri.jsx';
+import OsoAndino from './OsoAndino.jsx';
+import RanaAndina from './RanaAndina.jsx';
 import Lombriz from './Lombriz.jsx';
 import Mariposa from './Mariposa.jsx';
 import Escarabajo from './Escarabajo.jsx';
@@ -39,6 +50,8 @@ import Escarabajo from './Escarabajo.jsx';
 export const CREATURES = {
   'abeja-angelita': { Component: AbejaAngelita, nombre: 'Abeja angelita', cientifico: 'Tetragonisca angustula' },
   colibri: { Component: Colibri, nombre: 'Colibrí chillón', cientifico: 'Colibri coruscans' },
+  'oso-andino': { Component: OsoAndino, nombre: 'Oso andino', cientifico: 'Tremarctos ornatus' },
+  'rana-andina': { Component: RanaAndina, nombre: 'Rana arlequín andina', cientifico: 'Atelopus spp.' },
   lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },
   mariposa: { Component: Mariposa, nombre: 'Mariposa pasionaria', cientifico: 'Dione juno' },
   escarabajo: { Component: Escarabajo, nombre: 'Escarabajo estercolero', cientifico: 'Dichotomius belus' },

@@ -52,11 +52,41 @@ const VARIANTES_ABEJA = [
   { label: 'sin animación', props: { size: 80, animated: false } },
 ];
 
+/* El trío andino rubber-hose (oso / colibrí / rana) estrena los MISMOS gestos
+   species-agnostic que Angelita: celebra (brinco + V con overshoot), reposo
+   (respira) y señala (se inclina al POI y apunta). Base 'vuela' para el colibrí
+   (alado) y 'anda' para el oso y la rana (de suelo). */
+const VARIANTES_TRIO_AIRE = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'vuela', props: { size: 80 } },
+  { label: 'celebra', props: { size: 80, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 80, pose: 'reposo' } },
+  { label: 'señala', props: { size: 80, pose: 'señala' } },
+  { label: 'sin animación', props: { size: 80, animated: false } },
+];
+const VARIANTES_TRIO_SUELO = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 80 } },
+  { label: 'celebra', props: { size: 80, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 80, pose: 'reposo' } },
+  { label: 'señala', props: { size: 80, pose: 'señala' } },
+  { label: 'sin animación', props: { size: 80, animated: false } },
+];
+/* Variantes de vitrina por slug (las que difieren del set genérico). */
+const VARIANTES_POR_SLUG = {
+  'abeja-angelita': VARIANTES_ABEJA,
+  colibri: VARIANTES_TRIO_AIRE,
+  'oso-andino': VARIANTES_TRIO_SUELO,
+  'rana-andina': VARIANTES_TRIO_SUELO,
+};
+
 /* Nota de campo por creature (el registro de la categoría trae nombre + binomio;
    la descripción de una línea va aquí). */
 const NOTAS_CREATURE = {
   'abeja-angelita': 'Meliponino sin aguijón, polinizadora de la chagra; alas que baten y antenas vivas.',
-  colibri: 'Pico recto y garganta violeta iridiscente; el ave-agente de Chagra.',
+  colibri: 'Pico recto y garganta violeta iridiscente; el ave-agente de Chagra, ya en rubber-hose.',
+  'oso-andino': 'Oso de anteojos, guardián del páramo; mole parda entrañable con los anteojos crema (su firma).',
+  'rana-andina': 'Rana arlequín del páramo, guardiana del agua; verde húmedo con manchas ocre y ojos saltones.',
   lombriz: 'La ingeniera del suelo; ondula por segmentos con clitelo marcado.',
   mariposa: 'Alas naranjas con venación; poliniza y anuncia buen suelo.',
   escarabajo: 'Estercolero que entierra el abono; élitros con brillo metálico.',
@@ -241,7 +271,7 @@ const ITEMS_CREATURES = Object.entries(CREATURES).map(([slug, meta]) => ({
   render: 'component',
   descripcion: NOTAS_CREATURE[slug] || '',
   props: PROPS_CREATURE,
-  variantes: slug === 'abeja-angelita' ? VARIANTES_ABEJA : VARIANTES_CREATURE,
+  variantes: VARIANTES_POR_SLUG[slug] || VARIANTES_CREATURE,
 }));
 
 const ITEMS_LAMINAS = Object.entries(LAMINAS).map(([slug, meta]) => ({
