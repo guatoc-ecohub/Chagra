@@ -132,7 +132,7 @@ export function getActivePresetId(profile) {
  *   IndexedDB para que cada persona tenga su propia finca demo rica y coherente.
  *
  * @param {string} presetId — id de PROFILE_PRESETS.
- * @returns {object|null} perfil resultante, o null si el id es inválido.
+ * @returns {Promise<object|null>} perfil resultante, o null si el id es inválido.
  */
 export async function applyProfilePreset(presetId) {
   const preset = getPresetById(presetId);

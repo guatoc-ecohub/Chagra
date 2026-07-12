@@ -26,12 +26,11 @@ export const RH_CHEEK = '#f2907a';
  * contorno grueso, pupila GRANDE y brillo (catchlight). Un mismo grupo parpadea
  * (`rh-blink`) para que los dos ojos cierren sincronizados.
  *
- * @param {Array<{cx:number,cy:number,r:number}>} ojos  uno (perfil, colibrí) o
- *   dos (3/4, abeja/oso). El primero es el "cercano" (puede ser más grande).
- * @param {[number,number]} [mirar=[0.32,0.34]]  a dónde apunta la pupila, como
- *   fracción del radio (x,y). Al voltear la criatura el scaleX lo refleja solo.
- * @param {boolean} [parpadea=true]  activa `rh-blink` (el CSS lo gatea por RM/tier).
- * @param {string}  [ink=RH_INK]  color del contorno.
+ * @param {Object} props
+ * @param {Array<{cx:number,cy:number,r:number}>} [props.ojos]
+ * @param {[number,number]} [props.mirar=[0.32,0.34]]
+ * @param {boolean} [props.parpadea=true]
+ * @param {string} [props.ink=RH_INK]
  */
 export function OjosRubber({ ojos = [], mirar = [0.32, 0.34], parpadea = true, ink = RH_INK }) {
   const [mx, my] = mirar;
@@ -62,10 +61,10 @@ export function OjosRubber({ ojos = [], mirar = [0.32, 0.34], parpadea = true, i
 
 /**
  * Chapetas / cachetes campesinos: el rubor coral que da ternura andina.
- * @param {Array<{cx:number,cy:number,r:number}>} puntos
- * @param {string} [color=RH_CHEEK]
- * @param {boolean} [vivo=false]  activa `rh-rubor`: las chapetas se encienden
- *   un instante en un ciclo largo (el CSS lo gatea por RM/tier).
+ * @param {Object} props
+ * @param {Array<{cx:number,cy:number,r:number}>} [props.puntos]
+ * @param {string} [props.color=RH_CHEEK]
+ * @param {boolean} [props.vivo=false]
  */
 export function Cachetes({ puntos = [], color = RH_CHEEK, vivo = false }) {
   return (
@@ -79,8 +78,12 @@ export function Cachetes({ puntos = [], color = RH_CHEEK, vivo = false }) {
 
 /**
  * Sonrisa de goma: el arco que hace que TODA criatura rubber-hose se vea amable.
- * @param {number} cx @param {number} cy centro de la boca
- * @param {number} [w=3] ancho @param {number} [prof=1.4] profundidad del arco
+ * @param {Object} props
+ * @param {number} [props.cx=0]
+ * @param {number} [props.cy=0]
+ * @param {number} [props.w=3]
+ * @param {number} [props.prof=1.4]
+ * @param {string} [props.ink=RH_INK]
  */
 export function Sonrisa({ cx = 0, cy = 0, w = 3, prof = 1.4, ink = RH_INK }) {
   const x0 = cx - w / 2;
@@ -96,13 +99,14 @@ export function Sonrisa({ cx = 0, cy = 0, w = 3, prof = 1.4, ink = RH_INK }) {
  * mitón/pie crema en la punta — la firma de Cuphead. Con `rh-sway` cuelga y
  * hace follow-through (secondary motion) en el idle.
  *
- * @param {string}  d  el path del tubo (usar curvas suaves; los caps redondos lo cierran).
- * @param {number}  [ancho=2.3]  grosor del tubo.
- * @param {[number,number]|null} [punta=null]  centro del mitón/pie; null = tubo pelado.
- * @param {number}  [puntaR=1.6]  radio del mitón/pie.
- * @param {boolean} [pie=false]  la punta es un pie (elipse) en vez de mano (círculo).
- * @param {boolean} [sway=false]  activa el follow-through `rh-sway`.
- * @param {number}  [delay=0]  desfase del sway (para que brazos/patas no vayan a la par).
+ * @param {Object} props
+ * @param {string} props.d
+ * @param {number} [props.ancho=2.3]
+ * @param {[number,number]|null} [props.punta=null]
+ * @param {number} [props.puntaR=1.6]
+ * @param {boolean} [props.pie=false]
+ * @param {boolean} [props.sway=false]
+ * @param {number} [props.delay=0]
  */
 export function Miembro({
   d, ancho = 2.3, punta = null, puntaR = 1.6, pie = false, sway = false, delay = 0,
@@ -126,7 +130,13 @@ export function Miembro({
 /**
  * Antena de goma con bombillo (punta redonda). Con `rh-sway` se mece con
  * follow-through — la secondary motion que delata que el cuerpo se movió.
- * @param {string} d  el tallo (curva). @param {[number,number]} bulbo  centro de la bolita.
+ * @param {Object} props
+ * @param {string} props.d
+ * @param {[number,number]} props.bulbo
+ * @param {number} [props.bulboR=1.15]
+ * @param {boolean} [props.sway=false]
+ * @param {number} [props.delay=0]
+ * @param {string} [props.ink=RH_INK]
  */
 export function AntenaRubber({ d, bulbo, bulboR = 1.15, sway = false, delay = 0, ink = RH_INK }) {
   const style = sway
