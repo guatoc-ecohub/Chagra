@@ -183,6 +183,8 @@ const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
 const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
 const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
+const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
+const EfectosFuncionalesDemoMockup = lazy(() => import('./mockups/EfectosFuncionalesDemo'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -594,6 +596,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
   'mockups/camara-director': 'mockup_camara_director',
   'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
+  'mockups/artesania-andina': 'mockup_artesania_andina',
+  'mockups/efectos-funcionales': 'mockup_efectos_funcionales',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1969,6 +1973,26 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Juego La milpa">
               <JuegoLaMilpaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_artesania_andina':
+        // Artesanía andina (FASE 4 audit 3D): lenguaje de forma — 5 siluetas
+        // revolucionadas (vasija/mojón/telar/terraza/tótem) + antes/después.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Artesanía andina">
+              <ArtesaniaAndinaDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_efectos_funcionales':
+        // Efectos funcionales (FASE 3 audit 3D): invernadero→microclima,
+        // almacén se llena tras cosecha, reservorio con lluvia/sequía.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Efectos de la infraestructura">
+              <EfectosFuncionalesDemoMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
