@@ -35,6 +35,7 @@ import { Children, cloneElement, isValidElement, useCallback, useEffect, useMemo
 import { MUNDO, tituloDeMundo, tinteDeMundo } from '../../visual/mundo3d/index.js';
 import { parseComandoMundo, puertasDeMundo } from '../../visual/mundo3d/comandoMundo.js';
 import { NARRACION, MUNDO_VALLE_BY_ID } from './valleData';
+import { speak, speakKokoro, stop as stopSpeak } from '../../services/ttsService.js';
 import './acompananteMundo.css';
 
 /* La narración de un mundo, con la MISMA cadena de fallbacks del shell:
@@ -59,56 +60,26 @@ export function useAcompanante(mundoId) {
   const [voz, setVoz] = useState(true);
 
   const vozDisponible = useMemo(
-    () => typeof window !== 'undefined' && 'speechSynthesis' in window,
+    () => typeof window !== 'undefined',
     [],
   );
 
   // El toggle vive en un ref para que `hablar`/`decir` sean ESTABLES (mismo
   // patrón del shell): prender/apagar la voz no re-dispara la narración.
   const vozRef = useRef(voz);
-  const vocesRef = useRef([]);
   useEffect(() => {
     vozRef.current = voz;
   }, [voz]);
 
-  useEffect(() => {
-    if (!vozDisponible) return undefined;
-    const synth = window.speechSynthesis;
-    const actualizarVoces = () => {
-      const voces = synth.getVoices();
-      if (voces.length) vocesRef.current = voces;
-    };
-    actualizarVoces();
-    if (synth.addEventListener) {
-      synth.addEventListener('voiceschanged', actualizarVoces);
-      return () => synth.removeEventListener('voiceschanged', actualizarVoces);
-    }
-    const anterior = synth.onvoiceschanged;
-    synth.onvoiceschanged = actualizarVoces;
-    return () => {
-      if (synth.onvoiceschanged === actualizarVoces) synth.onvoiceschanged = anterior;
-    };
-  }, [vozDisponible]);
-
   const hablar = useCallback((texto) => {
-    if (!vozRef.current || typeof window === 'undefined' || !window.speechSynthesis) return;
-    try {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(texto);
-      u.lang = 'es-CO';
-      u.rate = 0.98;
-      u.pitch = 1;
-      const esVoz = vocesRef.current.find(
-        (v) => v.lang && v.lang.toLowerCase().startsWith('es'),
-      );
-      // Sin voz en español publicada aún: queda la burbuja (mejor callada la
-      // voz que un saludo con acento inglés por defecto).
-      if (!esVoz) return;
-      u.voice = esVoz;
-      window.speechSynthesis.speak(u);
-    } catch {
-      /* la voz es un plus, nunca bloquea */
-    }
+    if (!vozRef.current || !texto) return;
+    speakKokoro(texto, { lang: 'es', rate: 0.98 })
+      .then((audio) => {
+        if (!audio && vozRef.current) speak(texto, { rate: 0.98, pitch: 1 });
+      })
+      .catch(() => {
+        if (vozRef.current) speak(texto, { rate: 0.98, pitch: 1 });
+      });
   }, []);
 
   // ── Angelita DICE (voz + burbuja): el texto SIEMPRE va a la burbuja
@@ -131,7 +102,7 @@ export function useAcompanante(mundoId) {
   useEffect(
     () => () => {
       if (dichoTimer.current) clearTimeout(dichoTimer.current);
-      if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+      stopSpeak();
     },
     [],
   );
@@ -295,7 +266,7 @@ export default function AcompananteMundo({ mundoId, acompanante, children }) {
   // App.jsx escucha desde cualquier pantalla.
   const preguntarAlAgente = useCallback(() => {
     if (typeof window === 'undefined') return;
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    stopSpeak();
     window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'agente' } }));
   }, []);
 
@@ -359,9 +330,7 @@ export default function AcompananteMundo({ mundoId, acompanante, children }) {
             onClick={() => {
               const n = !voz;
               setVoz(n);
-              if (!n && typeof window !== 'undefined' && window.speechSynthesis) {
-                window.speechSynthesis.cancel();
-              }
+              if (!n) stopSpeak();
             }}
           >
             {!vozDisponible ? '💬 Texto' : voz ? '🔊 Voz' : '🔇 Voz'}

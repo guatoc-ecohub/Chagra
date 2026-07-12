@@ -55,6 +55,7 @@ import Mundo, {
 } from '../visual/mundo3d/index.js';
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
+import { speak, speakKokoro, stop as stopSpeak } from '../services/ttsService.js';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
@@ -191,61 +192,29 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
     [],
   );
 
-  // ── Voz (Web Speech API): el agente DICE. Se calla si el equipo no la trae
-  //    o si el usuario apaga la voz. Prefiere una voz en español.
-  //    (Si esto se productiza, la voz real es Kokoro vía ttsService — default
-  //    `em_santa`; aquí la vitrina usa la del navegador.)
+  // ── Voz: Angelita usa Kokoro en el equipo. Si no puede reproducirlo, el
+  //    respaldo es la voz del navegador.
   const vozDisponible = useMemo(
-    () => typeof window !== 'undefined' && 'speechSynthesis' in window,
+    () => typeof window !== 'undefined',
     [],
   );
 
   // El toggle vive en un ref para que `hablar`/`decir` sean ESTABLES: prender
   // o apagar la voz no debe re-disparar los efectos que narran.
   const vozRef = useRef(voz);
-  const vocesRef = useRef([]);
   useEffect(() => {
     vozRef.current = voz;
   }, [voz]);
 
-  useEffect(() => {
-    if (!vozDisponible) return undefined;
-    const synth = window.speechSynthesis;
-    const actualizarVoces = () => {
-      const voces = synth.getVoices();
-      if (voces.length) vocesRef.current = voces;
-    };
-    actualizarVoces();
-    if (synth.addEventListener) {
-      synth.addEventListener('voiceschanged', actualizarVoces);
-      return () => synth.removeEventListener('voiceschanged', actualizarVoces);
-    }
-    const anterior = synth.onvoiceschanged;
-    synth.onvoiceschanged = actualizarVoces;
-    return () => {
-      if (synth.onvoiceschanged === actualizarVoces) synth.onvoiceschanged = anterior;
-    };
-  }, [vozDisponible]);
-
   const hablar = useCallback((texto) => {
-    if (!vozRef.current || typeof window === 'undefined' || !window.speechSynthesis) return;
-    try {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(texto);
-      u.lang = 'es-CO';
-      u.rate = 0.98;
-      u.pitch = 1;
-      const esVoz = vocesRef.current.find(
-        (v) => v.lang && v.lang.toLowerCase().startsWith('es'),
-      );
-      // Si el navegador todavía no publicó sus voces, conservamos la
-      // burbuja y evitamos que el saludo salga con la voz inglesa por defecto.
-      if (!esVoz) return;
-      u.voice = esVoz;
-      window.speechSynthesis.speak(u);
-    } catch {
-      /* la voz es un plus, nunca bloquea */
-    }
+    if (!vozRef.current || !texto) return;
+    speakKokoro(texto, { lang: 'es', rate: 0.98 })
+      .then((audio) => {
+        if (!audio && vozRef.current) speak(texto, { rate: 0.98, pitch: 1 });
+      })
+      .catch(() => {
+        if (vozRef.current) speak(texto, { rate: 0.98, pitch: 1 });
+      });
   }, []);
 
   // ── Angelita DICE (voz + burbuja): el texto SIEMPRE acompaña a la voz en la
@@ -275,7 +244,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
 
   useEffect(
     () => () => {
-      if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+      stopSpeak();
     },
     [],
   );
@@ -316,7 +285,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   const volverAlValle = useCallback(() => {
     setFocoId(null);
     setPanel(null);
-    if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+    stopSpeak();
   }, []);
 
   // El CTA de la alerta: en la APP navega a la pantalla real de la acción
@@ -324,7 +293,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   // (antes era un botón mudo — auditoría FASE 0).
   const accionDelDia = useCallback(() => {
     if (onNavigate && COSA_DEL_DIA.accion?.view) {
-      if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+      stopSpeak();
       onNavigate(COSA_DEL_DIA.accion.view);
       return;
     }
@@ -338,7 +307,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   //    desde cualquier pantalla, incluida esta vitrina, sin acoplar el mockup.
   const preguntarAlAgente = useCallback(() => {
     if (typeof window === 'undefined') return;
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    stopSpeak();
     window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'agente' } }));
   }, []);
 
@@ -389,7 +358,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
       // MODO APP (FASE 0 game-dev): la puerta ES real — se corta la voz y se
       // navega a la pantalla de verdad. El valle cumple su promesa.
       if (onNavigate) {
-        if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+        stopSpeak();
         onNavigate(view, data);
         return;
       }
@@ -618,7 +587,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
             onClick={() => {
               const n = !voz;
               setVoz(n);
-              if (!n && typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+              if (!n) stopSpeak();
             }}
           >
             {!vozDisponible ? '💬 Texto' : voz ? '🔊 Voz' : '🔇 Voz'}
