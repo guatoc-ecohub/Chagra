@@ -1,0 +1,269 @@
+/*
+ * MundoSemillero3D.css — los controles TÁCTILES del semillero/vivero (el lienzo
+ * 3D vive en el Canvas). Cálido, sobrio, colombiano: sin gamificación ni brillos
+ * de premio. La barra del tiempo es grande y fácil de agarrar con el dedo; las
+ * fichas de momento y especie se envuelven en pantallas angostas.
+ */
+
+.semillero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 22rem;
+  background: #efe2c6;
+  color: #3a2f22;
+  font-family: inherit;
+}
+
+.semillero__lienzo {
+  flex: 1 1 auto;
+  min-height: 12rem;
+  touch-action: none; /* el gesto controla la órbita, no el scroll */
+}
+
+/* ── el panel de controles ── */
+.semillero-panel {
+  flex: 0 0 auto;
+  padding: 0.85rem 1rem 1.1rem;
+  background: linear-gradient(180deg, rgba(243, 231, 204, 0) 0%, #f3e7cc 20%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.semillero-panel__cab {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.semillero-panel__titulo {
+  font-weight: 700;
+  font-size: 1.02rem;
+  letter-spacing: 0.01em;
+  color: #4a3a24;
+}
+
+.semillero-panel__dia {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.86rem;
+  color: #7a6a4c;
+  background: #e7d6b4;
+  border-radius: 999px;
+  padding: 0.12rem 0.6rem;
+}
+
+.semillero-panel__nota {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6a5a3c;
+  background: #e9dcbd;
+  border-left: 3px solid #7fa04b;
+  border-radius: 0.4rem;
+  padding: 0.3rem 0.55rem;
+}
+
+/* ── el momento actual ── */
+.semillero-etapa__titulo {
+  margin: 0 0 0.2rem;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #4a3a24;
+}
+
+.semillero-etapa__texto {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #5b4c36;
+  max-width: 42rem;
+}
+
+/* ── selector de especie ── */
+.semillero-especies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+/* ── la barra del tiempo ── */
+.semillero-tiempo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.semillero-tiempo__ayuda {
+  font-size: 0.8rem;
+  color: #7a6a4c;
+}
+
+.semillero-tiempo__barra {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 1.5rem; /* pista de agarre generosa para el dedo */
+  background: transparent;
+  cursor: pointer;
+}
+
+.semillero-tiempo__barra::-webkit-slider-runnable-track {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8a6a44 0%, #7fa04b 55%, #d9a13b 100%);
+}
+.semillero-tiempo__barra::-moz-range-track {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8a6a44 0%, #7fa04b 55%, #d9a13b 100%);
+}
+
+.semillero-tiempo__barra::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: -0.5rem;
+  border-radius: 50%;
+  background: #fff8ec;
+  border: 3px solid #6f9a45;
+  box-shadow: 0 1px 4px rgba(60, 45, 20, 0.35);
+}
+.semillero-tiempo__barra::-moz-range-thumb {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: #fff8ec;
+  border: 3px solid #6f9a45;
+  box-shadow: 0 1px 4px rgba(60, 45, 20, 0.35);
+}
+.semillero-tiempo__barra:focus-visible {
+  outline: none;
+}
+.semillero-tiempo__barra:focus-visible::-webkit-slider-thumb {
+  border-color: #3a2f22;
+  box-shadow: 0 0 0 3px rgba(111, 154, 69, 0.5);
+}
+.semillero-tiempo__barra:focus-visible::-moz-range-thumb {
+  border-color: #3a2f22;
+  box-shadow: 0 0 0 3px rgba(111, 154, 69, 0.5);
+}
+
+/* ── las fichas de momento + especie + reproducir ── */
+.semillero-fichas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.semillero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  min-height: 2.4rem; /* objetivo táctil cómodo */
+  border: 1.5px solid #d8c39a;
+  border-radius: 0.7rem;
+  background: #fbf3e2;
+  color: #5b4c36;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+}
+
+.semillero-chip--sp {
+  padding: 0.3rem 0.6rem;
+  min-height: 2.1rem;
+  font-size: 0.8rem;
+}
+
+.semillero-chip:hover,
+.semillero-chip:focus-visible {
+  background: #f2e6cb;
+  border-color: #b9a375;
+  outline: none;
+}
+
+.semillero-chip--activa {
+  background: #6f9a45;
+  border-color: #567c33;
+  color: #fff8ec;
+}
+
+.semillero-chip--play {
+  background: #b5764f;
+  border-color: #98603c;
+  color: #fff8ec;
+}
+.semillero-chip--play:hover,
+.semillero-chip--play:focus-visible {
+  background: #a86a45;
+}
+
+.semillero-chip__emoji {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* En pantallas muy angostas, las fichas de momento solo muestran el emoji. */
+@media (max-width: 26rem) {
+  .semillero-fichas .semillero-chip__txt {
+    display: none;
+  }
+  .semillero-chip--play .semillero-chip__txt {
+    display: inline; /* el botón de reproducir sí conserva su texto */
+  }
+}
+
+/* ── modo calma (reduced-motion): sin transiciones de UI ── */
+.semillero--calma .semillero-chip {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .semillero-chip {
+    transition: none;
+  }
+}
+
+/* ── tema oscuro ── */
+@media (prefers-color-scheme: dark) {
+  .semillero {
+    background: #2a2418;
+    color: #ece0c7;
+  }
+  .semillero-panel {
+    background: linear-gradient(180deg, rgba(42, 36, 24, 0) 0%, #322a1c 20%);
+  }
+  .semillero-panel__titulo { color: #f0e4c8; }
+  .semillero-panel__dia {
+    background: #43381f;
+    color: #d8c39a;
+  }
+  .semillero-panel__nota {
+    background: #37301f;
+    color: #c7b78e;
+    border-left-color: #7fa04b;
+  }
+  .semillero-etapa__titulo { color: #f0e4c8; }
+  .semillero-etapa__texto { color: #cdbd9a; }
+  .semillero-tiempo__ayuda { color: #b9a67e; }
+  .semillero-chip {
+    background: #3a3120;
+    border-color: #55492e;
+    color: #d8c39a;
+  }
+  .semillero-chip:hover,
+  .semillero-chip:focus-visible {
+    background: #443a25;
+    border-color: #6f5f3a;
+  }
+  .semillero-chip--activa {
+    background: #6f9a45;
+    border-color: #83b356;
+    color: #1f1a10;
+  }
+}
