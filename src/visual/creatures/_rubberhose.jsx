@@ -99,6 +99,13 @@ export function Sonrisa({ cx = 0, cy = 0, w = 3, prof = 1.4, ink = RH_INK }) {
  * mitón/pie crema en la punta — la firma de Cuphead. Con `rh-sway` cuelga y
  * hace follow-through (secondary motion) en el idle.
  *
+ * `clase` da nombre al miembro (p.ej. 'crt-brazo-r') para que los GESTOS de la
+ * criatura (celebra/señala) lo agarren por CSS; `origen` es su transform-origin
+ * — el HOMBRO/CADERA real dentro del fill-box (para brazos que se alzan, 'top
+ * center' quedaba lejos del hombro y la rotación descolgaba el miembro). El
+ * estilo de pivote se estampa SIEMPRE (haya o no sway): así los gestos ESTÁTICOS
+ * (fotograma digno con animated=false / reduced-motion) también pivotan bien.
+ *
  * @param {Object} props
  * @param {string} props.d
  * @param {number} [props.ancho=2.3]
@@ -107,16 +114,21 @@ export function Sonrisa({ cx = 0, cy = 0, w = 3, prof = 1.4, ink = RH_INK }) {
  * @param {boolean} [props.pie=false]
  * @param {boolean} [props.sway=false]
  * @param {number} [props.delay=0]
+ * @param {string} [props.clase]  clase extra del gesto (p.ej. 'crt-brazo-l')
+ * @param {string} [props.origen='top center']  transform-origin (el hombro)
  */
 export function Miembro({
   d, ancho = 2.3, punta = null, puntaR = 1.6, pie = false, sway = false, delay = 0,
-  ink = RH_INK, glove = RH_GLOVE,
+  clase, origen = 'top center', ink = RH_INK, glove = RH_GLOVE,
 }) {
-  const style = sway
-    ? { transformBox: 'fill-box', transformOrigin: 'top center', animationDelay: `${delay}s` }
-    : undefined;
+  const style = {
+    transformBox: 'fill-box',
+    transformOrigin: origen,
+    ...(sway ? { animationDelay: `${delay}s` } : null),
+  };
+  const clases = [sway ? 'rh-sway' : null, clase].filter(Boolean).join(' ') || undefined;
   return (
-    <g className={sway ? 'rh-sway' : undefined} style={style}>
+    <g className={clases} style={style}>
       <path d={d} stroke={ink} strokeWidth={ancho} fill="none" strokeLinecap="round" strokeLinejoin="round" />
       {punta && (pie ? (
         <ellipse cx={punta[0]} cy={punta[1]} rx={puntaR * 1.15} ry={puntaR * 0.72} fill={glove} stroke={ink} strokeWidth="0.7" />

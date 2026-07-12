@@ -40,6 +40,18 @@ const VARIANTES_CREATURE = [
   { label: 'sin animación', props: { size: 80, animated: false } },
 ];
 
+/* La Angelita estrena los GESTOS con carácter (rubber-hose Cuphead/Miss-Minutes):
+   celebra (salto + brazos en V con overshoot), reposo (respira lento) y señala
+   (se inclina al POI y apunta). La vitrina los muestra como variantes propias. */
+const VARIANTES_ABEJA = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'vuela', props: { size: 80 } },
+  { label: 'celebra', props: { size: 80, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 80, pose: 'reposo' } },
+  { label: 'señala', props: { size: 80, pose: 'señala' } },
+  { label: 'sin animación', props: { size: 80, animated: false } },
+];
+
 /* Nota de campo por creature (el registro de la categoría trae nombre + binomio;
    la descripción de una línea va aquí). */
 const NOTAS_CREATURE = {
@@ -229,7 +241,7 @@ const ITEMS_CREATURES = Object.entries(CREATURES).map(([slug, meta]) => ({
   render: 'component',
   descripcion: NOTAS_CREATURE[slug] || '',
   props: PROPS_CREATURE,
-  variantes: VARIANTES_CREATURE,
+  variantes: slug === 'abeja-angelita' ? VARIANTES_ABEJA : VARIANTES_CREATURE,
 }));
 
 const ITEMS_LAMINAS = Object.entries(LAMINAS).map(([slug, meta]) => ({

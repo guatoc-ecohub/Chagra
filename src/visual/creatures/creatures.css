@@ -65,6 +65,95 @@
   100% { transform: scaleY(0.5) scaleX(0.9); }
 }
 
+/* ═══ GESTOS con CARÁCTER (Cuphead / Miss-Minutes) ══════════════════════════
+   Overshoot + follow-through de verdad: el cuerpo ANTICIPA (squash), rebasa y
+   REGRESA elástico; los bracitos de manguera pivotan desde el HOMBRO (crt-brazo-*
+   traen su transform-origin) rebasando la pose y asentándose un pelo después que
+   el cuerpo (secondary motion). Nada lineal. Los gestos PISAN el boil/sway por
+   especificidad (el data-pose suma un selector). Gate RM/tier al final. ─────── */
+
+/* CELEBRA — brinca: se agacha para coger impulso, SALTA con stretch y aterriza
+   con overshoot elástico; los bracitos se alzan en V rebasando y asentando. */
+[data-creature='abeja-angelita'][data-pose='celebra'] .crt-body {
+  animation: rh-celebra-cuerpo 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-celebra-cuerpo {
+  0%   { transform: translateY(0) scale(1, 1); }
+  16%  { transform: translateY(1.3px) scale(1.09, 0.9); }   /* anticipa: se agacha (squash) */
+  40%  { transform: translateY(-4.2px) scale(0.9, 1.13); }  /* ¡SALTA! (stretch) */
+  60%  { transform: translateY(0.7px) scale(1.11, 0.9); }   /* aterriza (squash, overshoot) */
+  78%  { transform: translateY(-0.7px) scale(0.98, 1.04); } /* rebote elástico */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+[data-creature='abeja-angelita'][data-pose='celebra'] .crt-brazo-l {
+  animation: rh-celebra-brazo-l 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+[data-creature='abeja-angelita'][data-pose='celebra'] .crt-brazo-r {
+  animation: rh-celebra-brazo-r 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+/* La abeja es 3/4 (cabeza a la derecha): una V simétrica metería el brazo
+   derecho DENTRO de la cara. Así que el IZQUIERDO (lado libre) se alza bien
+   arriba y el DERECHO se abre a la derecha sin taparse — celebración dinámica,
+   asimétrica, legible. +θ sube el izq (colgante SW → arriba); −θ abre el der.
+   Rebasan el pico y asientan un pelo (follow-through). */
+@keyframes rh-celebra-brazo-l {
+  0%, 12% { transform: rotate(0deg); }
+  40%  { transform: rotate(150deg); }   /* alza arriba-izquierda, rebasa */
+  62%  { transform: rotate(134deg); }   /* asienta (follow-through) */
+  80%  { transform: rotate(141deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes rh-celebra-brazo-r {
+  0%, 12% { transform: rotate(0deg); }
+  40%  { transform: rotate(-112deg); }  /* abre a la derecha (bajo la carita) */
+  62%  { transform: rotate(-98deg); }
+  80%  { transform: rotate(-105deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* REPOSO — respira: el cuerpo infla y desinfla despacio (inhala suave). Las
+   alitas ya van plegadas (crt-wing-reposo); esto le da el pecho que sube. */
+[data-creature='abeja-angelita'][data-pose='reposo'] .crt-body {
+  animation: rh-reposo-respira 4.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-reposo-respira {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(-0.4px) scale(0.985, 1.03); }  /* inhala */
+}
+
+/* SEÑALA — se inclina hacia el POI (a su derecha, donde mira) rebasando la
+   inclinación y asentándose, y extiende el bracito derecho apuntando. Sostiene
+   el gesto un momento (no es un tic) y vuelve. Overshoot en ambos. */
+[data-creature='abeja-angelita'][data-pose='señala'] .crt-body {
+  animation: rh-senala-cuerpo 2.9s cubic-bezier(0.5, 0, 0.25, 1.4) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-senala-cuerpo {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  20%  { transform: rotate(9deg) translateX(0.7px); }   /* se inclina rebasando */
+  30%  { transform: rotate(6.5deg) translateX(0.5px); } /* asienta apuntando */
+  72%  { transform: rotate(6.5deg) translateX(0.5px); } /* sostiene el gesto */
+  86%  { transform: rotate(-1.5deg) translateX(0); }    /* rebote al enderezarse */
+}
+[data-creature='abeja-angelita'][data-pose='señala'] .crt-brazo-r {
+  animation: rh-senala-brazo 2.9s cubic-bezier(0.5, 0, 0.25, 1.4) infinite;
+}
+/* El bracito derecho apunta abajo-derecha (a una mata/POI en el suelo): así SALE
+   de detrás de la carita (que vive a la derecha) y el gesto se LEE. Rebasa (−52°)
+   y asienta (−44°) sosteniendo, luego recoge (follow-through). */
+@keyframes rh-senala-brazo {
+  0%, 100% { transform: rotate(0deg); }
+  20%  { transform: rotate(-52deg); }   /* extiende apuntando (rebasa) */
+  30%  { transform: rotate(-44deg); }   /* asienta señalando la mata */
+  72%  { transform: rotate(-44deg); }
+  86%  { transform: rotate(-6deg); }    /* recoge con follow-through */
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    KIT RUBBER-HOSE (Cuphead + Miss Minutes de Loki) — SPECIES-AGNOSTIC
    Cadencia de goma REUTILIZABLE por cualquier creature. Angelita la estrena;
@@ -184,13 +273,16 @@
 [data-animo='descansa'] .rh-travieso,
 [data-animo='descansa'] .rh-mirada { animation: none; }
 
-/* Los estados reactivos (mojada/sed/comiendo) y el reposo PISAN el arrebato:
-   una abeja empapada o libando no da vueltas de campana. */
+/* Los estados reactivos (mojada/sed/comiendo) y los gestos con carácter
+   (reposo/celebra/señala) PISAN el arrebato: una abeja empapada, libando,
+   celebrando o señalando no da además vueltas de campana — el gesto lee limpio. */
 [data-mojada='1'] .rh-antic, [data-mojada='1'] .rh-travieso,
 [data-sed='1'] .rh-antic, [data-sed='1'] .rh-travieso,
 [data-comiendo='1'] .rh-antic, [data-comiendo='1'] .rh-travieso,
 [data-pose='reposo'] .rh-antic, [data-pose='reposo'] .rh-travieso,
-[data-pose='reposo'] .rh-mirada { animation: none; }
+[data-pose='reposo'] .rh-mirada,
+[data-pose='celebra'] .rh-antic, [data-pose='celebra'] .rh-travieso,
+[data-pose='señala'] .rh-antic, [data-pose='señala'] .rh-travieso { animation: none; }
 
 /* FOLLOW-THROUGH (secondary motion) — antenas, bracitos y patitas de manguera
    se mecen con retardo: delatan que el cuerpo se movió. Cada miembro pone su
@@ -226,7 +318,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .rh-boil, .rh-blink, .rh-sway, .rh-smear,
-  .rh-antic, .rh-travieso, .rh-mirada, .rh-rubor { animation: none !important; }
+  .rh-antic, .rh-travieso, .rh-mirada, .rh-rubor,
+  /* Los gestos (celebra/reposo/señala) también se congelan: fotograma digno
+     (bracitos colgando, cuerpo neutro, sonriendo). */
+  [data-pose='celebra'] .crt-body, [data-pose='celebra'] .crt-brazo-l, [data-pose='celebra'] .crt-brazo-r,
+  [data-pose='reposo'] .crt-body,
+  [data-pose='señala'] .crt-body, [data-pose='señala'] .crt-brazo-r { animation: none !important; }
 }
 
 /* ── REACCIÓN AL ESTADO REAL DE LA FINCA (auditoría §5b) ──────────────────────

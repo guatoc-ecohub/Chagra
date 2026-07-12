@@ -165,7 +165,12 @@
    media REBOTA al toque, la cara VOLTEA (scaleX imperativo por frame). */
 .mundo-abeja {
   pointer-events: none;
-  filter: drop-shadow(0 4px 8px rgba(40, 30, 10, 0.28));
+  /* ATENUADA en los mundos 3D a propósito: la Angelita del billboard cansaba
+     la vista — "demasiado brillante, solo dorada". Bajamos saturación y brillo
+     del billboard y suavizamos su sombra. NO toca la Angelita 2D del home ni los
+     avatares: ellos NO montan `.mundo-abeja` (se ven exactamente igual). Esto se
+     compone sobre el tinte de clima del SVG (ya rebajado en creatureClimaCuerpo). */
+  filter: saturate(0.85) brightness(0.95) drop-shadow(0 4px 8px rgba(40, 30, 10, 0.22));
   transform-origin: center bottom;
 }
 .mundo-abeja__rebote {
