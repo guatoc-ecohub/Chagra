@@ -23,6 +23,7 @@ export { default as Mundo2D } from './Mundo2D.jsx';
 
 // Datos + arquetipos + resolución (three-free, seguros en el bundle base).
 export { MUNDO, MUNDO_IDS } from './mundoData.js';
+export { mundosPorPisoTermico } from './mundosPorPisoTermico.js';
 export {
   ARQUETIPOS, ARQUETIPOS_KEYS, ARQUETIPOS_3D, ARQUETIPOS_2D, esArquetipo3D,
 } from './arquetipos.js';
