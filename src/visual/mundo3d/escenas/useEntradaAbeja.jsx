@@ -23,6 +23,8 @@ import * as THREE from 'three';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
 import { cuerpoDeClima, PERFIL_ABEJA } from '../../creatures/creatureClimaCuerpo.js';
 import { ABEJA_PRESENCIA, ABEJA_TINTA } from '../../creatures/abejaIdentidad.js';
+import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
+import { horaDeReloj } from '../cielosHoraData.js';
 import { CRUCE_ATRAPA_MS, CRUCE_SUELTA_MS } from '../../creatures/AbejaTransicion.jsx';
 import { useSalidaAbeja, resetSalidaAbeja } from '../../creatures/senalSalidaAbeja.js';
 import { SombraContacto } from './SombraContacto.jsx';
@@ -99,15 +101,27 @@ function puntoDeCruce(camera, foco, out) {
  *   al <Html> (drei no hereda la visibilidad del group al portal DOM).
  * @param {boolean} [opts.saliendo=false]  el reverso 3D→2D: vuela al punto de
  *   suelta y se apaga en CRUCE_SUELTA_MS (el overlay 'volver' la retoma ahí).
+ * @param {string}  [opts.hora='dorada']  hora de cielosHoraData: de 'noche'
+ *   Angelita se ACURRUCA (idle nocturno de creatureIdle).
+ * @param {string}  [opts.tier='alto']  'bajo' → idle frugal (solo respiración).
  */
 export function useEntradaAbeja(foco, {
   entrando = true, energia = 1, reducedMotion = false, piso = 0, vuelo = VUELO_NEUTRO,
-  cruce = false, saliendo = false,
+  cruce = false, saliendo = false, hora = 'dorada', tier = 'alto',
 } = {}) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const sombraRef = useRef(null);
   const visRef = useRef(null);
+  // ── PERSONALIDAD IDLE (creatureIdle.js): la capa DOM que recibe el squash &
+  //    stretch/giros (idleRef, hermana del volteo para no pelear con su
+  //    transition CSS), el reloj de llegada (dispara la CELEBRACIÓN), y cachés
+  //    imperativos (string del transform + pose discreta + nodo del svg) para
+  //    escribir al DOM SOLO cuando algo cambió.
+  const idleRef = useRef(null);
+  const llegoEn = useRef(null);
+  const ultimoTf = useRef('');
+  const ultimaPose = useRef('vuela');
   const nacioEn = useRef(null); // reloj del primer frame (ancla del cruce)
   // Fase del cruce de entrada: 'oculta' (pre-atrape) → 'picada' → 'no'.
   // Se decide UNA vez al nacer: si el mesh ya vive, cambiar props no re-cruza.
@@ -161,6 +175,16 @@ export function useEntradaAbeja(foco, {
       fase.current = 'no';
     }
     const empuje = fase.current === 'picada' ? CRUCE_EMPUJE : 1;
+    // ── PERSONALIDAD IDLE (creatureIdle): respira, se rasca/sacude, vuelta de
+    //    campana ~18-22 s, se posa en una flor y despega, celebra al llegar,
+    //    se acurruca de noche. PURA y determinista (t + semilla + hora); en
+    //    pleno cruce va NEUTRA (nadie da piruetas en picada). reducedMotion
+    //    devuelve la pose calma estática (activo=false → cero invalidate).
+    const idle = fase.current !== 'no' ? IDLE_NEUTRO : idleDeCreature(t, {
+      especie: 'abeja-angelita', hora, reducedMotion, tier,
+      llegadaHace: llegoEn.current === null ? null : t - llegoEn.current,
+    });
+    const quieta = Math.max(0, idle.posada);
     // El estado de la finca modula el vuelo: mojada pesa (baja/lenta), sed baja a
     // buscar agua, comiendo tiembla mordisqueando. Multiplicadores de reaccionDeFinca.
     const mAltura = vuelo?.altura ?? 1;
@@ -190,11 +214,14 @@ export function useEntradaAbeja(foco, {
       : (Math.cos(t * 0.55) * 0.3 + Math.sin(t * 0.83 + 1.7) * 0.14) * mVagar;
     // La altura sobre el foco se atenúa con `mAltura` (mojada/sed vuelan más bajo).
     // La percha y la altura de ronda son de la IDENTIDAD compartida (abejaIdentidad).
-    const alto = (entrando ? PERCHA.y : ABEJA_PRESENCIA.rondaAltura) * mAltura;
+    //    `idle.posada` la baja a su percha idle (flor/hoja: la altura se recoge
+    //    a ~28%) y aquieta el vagar y el bob (posada no ronda ni flota); su
+    //    asomo negativo al despegar es el brinquito de overshoot.
+    const alto = (entrando ? PERCHA.y : ABEJA_PRESENCIA.rondaAltura) * mAltura * (1 - 0.72 * idle.posada);
     const dest = _dest.set(
-      foco.x + (entrando ? PERCHA.x : 0.35 + vagarX) + tembleque + arrebato * (entrando ? 0.3 : 1),
-      foco.y + alto + bob + tembleque * 0.5 + arrebato * 0.18,
-      foco.z + (entrando ? PERCHA.z : 0.55 + vagarZ),
+      foco.x + (entrando ? PERCHA.x : 0.35 + vagarX * (1 - quieta)) + tembleque + arrebato * (entrando ? 0.3 : 1),
+      foco.y + alto + bob * (1 - 0.85 * quieta) + idle.dy + tembleque * 0.5 + arrebato * 0.18,
+      foco.z + (entrando ? PERCHA.z : 0.55 + vagarZ * (1 - quieta)),
     );
     ref.current.position.lerp(dest, (entrando ? 0.06 : 0.05) * mVel * empuje);
     // Angelita se posa: al cruzar el umbral de llegada al foco, un roce háptico
@@ -202,6 +229,7 @@ export function useEntradaAbeja(foco, {
     // apaga todo con reduced-motion, pref 'off' o sin soporte).
     if (entrando && posadaEn.current !== foco && ref.current.position.distanceTo(dest) < 0.3) {
       posadaEn.current = foco;
+      llegoEn.current = t; // arranca la CELEBRACIÓN idle (giro alegre + overshoot)
       haptics.abeja();
     }
     if (caraRef.current) {
@@ -209,6 +237,21 @@ export function useEntradaAbeja(foco, {
       if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
       prevX.current = ref.current.position.x;
     }
+    // El idle se ESCRIBE al DOM en su propia capa (no pisa el volteo ni su
+    // transition): un solo style-write, cacheado por string — sin animación
+    // activa la cadena no cambia y el DOM no se toca. La pose discreta viaja
+    // como data-pose al svg del cuerpo ('celebra'/'reposo' tienen CSS propio).
+    if (idleRef.current) {
+      const tf = `rotate(${idle.rot.toFixed(1)}deg) scale(${idle.sx.toFixed(3)},${idle.sy.toFixed(3)})`;
+      if (tf !== ultimoTf.current) { ultimoTf.current = tf; idleRef.current.style.transform = tf; }
+      if (idle.pose !== ultimaPose.current) {
+        ultimaPose.current = idle.pose;
+        idleRef.current.setAttribute('data-pose', idle.pose);
+      }
+    }
+    // frameloop='demand' respetado: pedir el próximo frame SOLO mientras el
+    // idle anima (con reduced-motion activo=false → nadie pide nada).
+    if (idle.activo) state.invalidate();
     // La sombra de contacto la sigue por el piso: más alto vuela, más ancha y
     // más tenue (peso visual sin shadow-maps). Mismo frame, cero loops extra.
     if (sombraRef.current) {
@@ -219,7 +262,7 @@ export function useEntradaAbeja(foco, {
       sombraRef.current.material.opacity = Math.max(SOMBRA.opacidadMin, SOMBRA.opacidadBase - h * SOMBRA.atenuaPorAltura);
     }
   });
-  return { ref, caraRef, sombraRef, visRef };
+  return { ref, caraRef, sombraRef, visRef, idleRef };
 }
 
 /**
@@ -272,11 +315,10 @@ export function AbejaEscena({
   const mojada = reaccion?.mojada ?? false;
   const sed = reaccion?.sed ?? false;
   const comiendo = reaccion?.comiendo ?? false;
-  // ── EL CLIMA REAL en el CUERPO (creatureClimaCuerpo): del mismo estadoFinca
-  //    salen clima/enso que la creature pinta (tinte, opacidad, aleteo). Aquí solo
-  //    tomamos su `altura` para COMPLEMENTAR la coreografía (niebla vuela corto,
-  //    dorada un poco más alto); se MULTIPLICA con la de reaccionFinca (lluvia/sed
-  //    ya bajan el vuelo) para no doble-contar. El resto lo aplica el dibujo.
+  // ── EL CLIMA REAL en el CUERPO (creatureClimaCuerpo): del estadoFinca salen
+  //    clima/enso que la creature pinta (tinte, opacidad, aleteo). Aquí tomamos
+  //    su `altura` para COMPLEMENTAR la coreografía; se MULTIPLICA con la de
+  //    reaccionFinca (lluvia/sed ya bajan el vuelo) para no doble-contar.
   const climaReal = estadoFinca?.clima ?? null;
   const ensoReal = estadoFinca?.enso ?? 'neutro';
   const cuerpoClima = useMemo(
@@ -287,9 +329,12 @@ export function AbejaEscena({
     const base = reaccion?.vuelo ?? VUELO_NEUTRO;
     return cuerpoClima.altura === 1 ? base : { ...base, altura: base.altura * cuerpoClima.altura };
   }, [reaccion, cuerpoClima]);
-  const { ref, caraRef, sombraRef, visRef } = useEntradaAbeja(foco, {
+  // La hora del valle (cielosHoraData): de noche el idle la ACURRUCA. Se lee UNA
+  // vez al montar — determinista, nada de reloj en render.
+  const hora = useMemo(() => horaDeReloj(), []);
+  const { ref, caraRef, sombraRef, visRef, idleRef } = useEntradaAbeja(foco, {
     entrando, energia: energiaReal, reducedMotion, piso, vuelo: vueloClima,
-    cruce: cruceVivo, saliendo,
+    cruce: cruceVivo, saliendo, hora, tier,
   });
   // Microrrebote: cada toque de hotspot sube `rebote`; reiniciamos la animación
   // CSS (quitar → reflow → poner) para que dispare aun en toques seguidos. El
@@ -328,19 +373,25 @@ export function AbejaEscena({
             data-comiendo={comiendo && vivo ? '1' : undefined}
           >
             <div ref={reboteRef} className="mundo-abeja__rebote">
-              <div ref={caraRef} className="mundo-abeja__cara">
-                <AbejaAngelita
-                  size={size}
-                  animo={animoReal}
-                  energia={energiaReal}
-                  mojada={mojada}
-                  sed={sed}
-                  comiendo={comiendo}
-                  clima={climaReal}
-                  enso={ensoReal}
-                  animated={vivo}
-                  tier={tier}
-                />
+              {/* Cuarta capa de gesto: el IDLE (squash&stretch, vueltas de
+                  campana, celebración) — imperativa por frame desde el hook.
+                  Propia para no pisar la transition del volteo de la cara.
+                  data-creature → el hook le cuelga data-pose (CSS de creatures). */}
+              <div ref={idleRef} className="mundo-abeja__idle" data-creature="abeja-angelita">
+                <div ref={caraRef} className="mundo-abeja__cara">
+                  <AbejaAngelita
+                    size={size}
+                    animo={animoReal}
+                    energia={energiaReal}
+                    mojada={mojada}
+                    sed={sed}
+                    comiendo={comiendo}
+                    clima={climaReal}
+                    enso={ensoReal}
+                    animated={vivo}
+                    tier={tier}
+                  />
+                </div>
               </div>
             </div>
           </div>
