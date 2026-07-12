@@ -22,13 +22,14 @@ afterEach(() => {
 });
 
 /* Sonda mínima: expone la máquina del hook como DOM para poder conducirla. */
-function Sonda({ reducedMotion = false }) {
-  const nav = useNavegacionMundos({ reducedMotion });
+function Sonda({ reducedMotion = false, pisoUsuario = null }) {
+  const nav = useNavegacionMundos({ reducedMotion, pisoUsuario });
   return (
     <div>
       <output data-testid="fase">{nav.fase}</output>
       <output data-testid="mundo">{nav.mundoId || '-'}</output>
       <output data-testid="pronto">{nav.pronto || '-'}</output>
+      <output data-testid="piso">{nav.catalogoPisos.pisoUsuarioId || '-'}</output>
       <button type="button" onClick={() => nav.viajarAlMundo('agua')}>ir-agua</button>
       <button type="button" onClick={() => nav.viajarAlMundo('clima')}>ir-clima</button>
       <button type="button" onClick={() => nav.viajarAlMundo('__fantasma__')}>ir-fantasma</button>
@@ -88,6 +89,11 @@ describe('useNavegacionMundos — la máquina valle ↔ mundo', () => {
     render(<Sonda />);
     fireEvent.click(screen.getByText('volver'));
     expect(fase()).toBe('valle');
+  });
+
+  test('expone el catalogo termico para el host de la Sierra', () => {
+    render(<Sonda pisoUsuario="templado" />);
+    expect(screen.getByTestId('piso')).toHaveTextContent('templado');
   });
 });
 
