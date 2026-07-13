@@ -36,6 +36,7 @@ export const AURA_POR_BICHO = Object.freeze({
   perezoso: '#1ec9b7',         // turquesa/teal zen irónico (distinto del verde de la rana)
   morrocoy: '#ff7a3c',         // caparazón que brilla (ámbar-rojizo)
   borugo: '#dbe8ff',           // PLATA LUNAR / blanco luminoso (nocturno sagrado, el animal de cierre)
+  'ent-frailejon': '#8fdcae',  // VERDE-PLATEADO del guardián del páramo (modo-guardián: el frailejón se yergue a intervenir)
 });
 
 /* Aura por defecto si el slug no está mapeado (la dorada de la guía). */

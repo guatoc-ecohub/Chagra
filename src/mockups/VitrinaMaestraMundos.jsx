@@ -59,6 +59,7 @@ import {
 import { decidirTier, permite3D } from '../visual/mundo3d/deviceTier.js';
 import TransicionMundoKit from '../visual/mundo3d/TransicionMundoKit.jsx';
 import { FaunaAmbiental } from '../visual/creatures/FaunaAmbiental.jsx';
+import { EntFrailejon } from '../visual/creatures/EntFrailejon.jsx';
 import useAvatarCreature from '../hooks/useAvatarCreature.js';
 
 /* EL VALLE VIVO en la galería: los personajes asoman ENTRE los mundos, desde
@@ -273,7 +274,9 @@ function FondoVineta({ cielo, suelo, loma }) {
 /* Gancho común: un useFrame que corre el loop SOLO si la viñeta está viva. */
 function usePulso(animada, alPulsar) {
   const fn = useRef(alPulsar);
-  fn.current = alPulsar;
+  // El ref sigue al último callback en un efecto (no durante el render): el
+  // loop de useFrame corre fuera del render y lee fn.current sin problema.
+  useEffect(() => { fn.current = alPulsar; }, [alPulsar]);
   useFrame((state) => {
     if (animada) fn.current(state.clock.elapsedTime);
   });
@@ -1713,6 +1716,32 @@ const CSS_VMX = `
   .vmx-chip, .vmx-tarjeta { transition: none; }
   .vmx-tarjeta__aro span { animation: none; }
 }
+
+/* EL ENT DEL PÁRAMO — arraigado al borde inferior izquierdo, imponente y alto,
+   presidiendo el valle de los mundos. Decorativo: jamás intercepta el toque de
+   los portales. Se asoma desde abajo (no tapa el cielo ni los aros). */
+.vmx-ent {
+  position: absolute;
+  left: clamp(-40px, -2vw, 0px);
+  bottom: -6px;
+  width: min(38vw, 340px);
+  max-height: 78vh;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 10px 22px rgba(20, 32, 26, 0.4));
+  animation: vmx-ent-entra 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.vmx-ent svg { width: 100%; height: auto; display: block; }
+@keyframes vmx-ent-entra {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+@media (max-width: 640px) {
+  .vmx-ent { width: min(52vw, 220px); opacity: 0.85; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vmx-ent { animation: none; }
+}
 `;
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -1932,6 +1961,23 @@ export default function VitrinaMaestraMundos({ onBack }) {
           activo={enGaleria}
           puntos={PUNTOS_FAUNA_VITRINA}
         />
+      )}
+
+      {/* EL ENT DEL PÁRAMO — el árbol-guardián que vela el valle de los mundos.
+          Presencia GRANDE e imponente, arraigado al borde: no compite con los
+          portales (decorativo, no intercepta el toque), pero preside la escena
+          como el corazón del Bosque Vivo. Enseña sereno; en tier bajo / RM queda
+          en su fotograma digno. */}
+      {enGaleria && (
+        <div className="vmx-ent" aria-hidden="true">
+          <EntFrailejon
+            size={340}
+            animated={!reducedMotion}
+            ensena={!reducedMotion}
+            lineBoil={!reducedMotion && tier === 'alto'}
+            tier={tier}
+          />
+        </div>
       )}
 
       <div className="vmx-vineta" aria-hidden="true" />

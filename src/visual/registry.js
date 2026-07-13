@@ -186,6 +186,24 @@ const VARIANTES_BORUGO = [
   { label: 'sin animación', props: { size: 88, animated: false } },
 ];
 
+/* EL ENT DEL PÁRAMO — el árbol-maestro del Bosque Vivo (NO un bicho). Presencia
+   GRANDE e imponente. Luce sus 5 frentes: expresividad de árbol vivo (line-boil
+   lento, roseta que se mece, rostro sabio), lip-sync (boca en las grietas),
+   modo-GUARDIÁN (aura verde-plateada, la roseta se abre), clima de páramo
+   (ESCARCHA de noche/frío, NEBLINA) y la postura de enseñanza (señala/enseña). */
+const VARIANTES_ENT = [
+  { label: '64 px', props: { size: 64 } },
+  { label: 'arraigado', props: { size: 132 } },
+  { label: 'enseña', props: { size: 132, ensena: true } },
+  { label: 'reposo (el páramo duerme)', props: { size: 132, pose: 'reposo' } },
+  { label: 'habla (lip-sync)', props: { size: 132, visema: 'V3' } },
+  { label: 'escarcha (noche fría)', props: { size: 132, vestuario: true, clima: 'noche' } },
+  { label: 'neblina', props: { size: 132, vestuario: true, clima: 'niebla' } },
+  { label: 'modo-GUARDIÁN', props: { size: 132, poder: true } },
+  { label: 'línea que hierve', props: { size: 132, lineBoil: true } },
+  { label: 'sin animación', props: { size: 132, animated: false } },
+];
+
 const VARIANTES_POR_SLUG = {
   'abeja-angelita': VARIANTES_ABEJA,
   colibri: VARIANTES_TRIO_AIRE,
@@ -196,6 +214,7 @@ const VARIANTES_POR_SLUG = {
   jaguar: VARIANTES_JAGUAR,
   morrocoy: VARIANTES_MORROCOY,
   borugo: VARIANTES_BORUGO,
+  'ent-frailejon': VARIANTES_ENT,
 };
 
 /* Nota de campo por creature (el registro de la categoría trae nombre + binomio;
@@ -210,6 +229,7 @@ const NOTAS_CREATURE = {
   jaguar: 'Felino de tierra cálida, majestuoso y acechador; leonado con rosetas de centro ocre (su firma), aura púrpura.',
   morrocoy: 'Galápago de patas rojas, el anciano ancestral y paciente; caparazón de domo hexagonal (su firma) y patas rojizas, aura bronce. Se retrae elástico a la concha.',
   borugo: 'La paca de montaña andina, roedor nocturno tierno; pardo con hileras de motas crema (su firma), olfateo tímido y aura plata lunar. El animal de cierre — vivo, a salvo y digno.',
+  'ent-frailejon': 'El árbol-guardián que enseña: frailejón gigante del páramo, tronco con rostro sabio y faldita de hojas muertas, corona en roseta plateada y flores amarillas. Guardián del agua; anciano sereno y lento. Modo-guardián verde-plateado cuando el páramo peligra.',
   lombriz: 'La ingeniera del suelo; ondula por segmentos con clitelo marcado.',
   mariposa: 'Alas naranjas con venación; poliniza y anuncia buen suelo.',
   escarabajo: 'Estercolero que entierra el abono; élitros con brillo metálico.',

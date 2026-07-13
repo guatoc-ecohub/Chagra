@@ -55,15 +55,6 @@ export { Perezoso, PEREZOSO_PALETA, PEREZOSO_PROPORCION } from './Perezoso.jsx';
 export { Lombriz } from './Lombriz.jsx';
 export { Mariposa } from './Mariposa.jsx';
 export { Escarabajo } from './Escarabajo.jsx';
-/* EL TRÍO DE CONTROL BIOLÓGICO — los aliados reales de la agroecología que los
-   juegos Defensores y Milpa necesitaban como protagonistas: la crisopa (alas
-   verdes translúcidas, ojos dorados), la avispita Trichogramma (diminuta pero
-   brava, ojos rojos, alas con flecos) y el sírfido (mosca que imita abeja: un
-   par de alas, ojos enormes, antenitas mínimas). Fauna benéfica REAL con
-   binomio verificado — misma fundación rubber-hose que Mariposa/Escarabajo. */
-export { Crisopa } from './Crisopa.jsx';
-export { Trichogramma } from './Trichogramma.jsx';
-export { Sirfido } from './Sirfido.jsx';
 /* EL ENT DEL PÁRAMO — el árbol-guardián que enseña (frailejón gigante). NO es un
    bicho: es el corazón del "Bosque Vivo". Hereda la MISMA fundación transversal
    (line-boil, lip-sync, modo-poder=guardián, clima) adaptada a su escala y su
@@ -73,43 +64,6 @@ export { EntFrailejon } from './EntFrailejon.jsx';
 export {
   useEntGuion, resolverGuionEnt, ENT_GUION_PLACEHOLDER, ENT_TEMAS,
 } from './useEntGuion.js';
-
-/* ── SISTEMA DE PERSONAJES (transversal, species-agnostic) ───────────────────
-   La FUNDACIÓN que heredan los 9 bichos: lip-sync, modo poder, prop-por-mundo,
-   ropa por clima+hora y el line-boil. Cada bicho = parámetros (aura, perfil,
-   props), no código duplicado. Estrenado por Angelita; fable engancha el resto. */
-// Lip-sync 2D por RMS del TTS.
-export { useLipSync } from './useLipSync.js';
-export {
-  VISEMA, UMBRAL_RMS, DEBOUNCE_MS,
-  visemaDesdeRMS, rmsDeMuestras, crearDebounceVisema, visemaFallback,
-} from './lipSyncCore.js';
-export { BocaVisema, RH_BOCA } from './_rubberhose.jsx';
-// Transformación "modo poder".
-export { AuraPoder } from './AuraPoder.jsx';
-export {
-  AURA_POR_BICHO, AURA_DEFECTO, CLASE_PODER, PODER_MS,
-  auraDeBicho, usePoderTemporal,
-} from './transformacion.js';
-// Prop-por-mundo (herramienta en la mano al entrar a cada mundo).
-export { PROP_POR_MUNDO, PROPS_CONOCIDOS, propDeMundo, mundoTieneProp } from './propsPorMundo.js';
-export { PropEnMano, DIBUJO_PROP } from './PropEnMano.jsx';
-// Ropa/cuerpo por clima+hora (ruana/sombrero/sudor) + su dibujo.
-export {
-  ROPA_PERFIL_POR_BICHO, ROPA_PERFIL_DEFECTO, ROPA_NEUTRA,
-  ropaDeClima, ropaDeClimaBicho, ropaPerfilDeBicho,
-} from './creatureClimaCuerpo.js';
-export { AccesoriosClima } from './AccesoriosClima.jsx';
-// Line-boil (contorno que vibra, años 30).
-export { LineBoilFilter, BOIL_SEEDS } from './LineBoilFilter.jsx';
-// VIDA v2 (la vara de Angelita en los 8): idle-cerebro species-agnostic +
-// ritmo propio de parpadeo + la mirada que reconoce. Los bichos ya la traen
-// por dentro (default ON); se exporta para hosts que quieran dirigirla.
-export {
-  VIDA_REPERTORIO, MOMENTO_POSE,
-  elegirMomentoVida, duracionDeMomentoVida, duracionDeDescanso, crearRitmoPropio,
-} from './vidaEstados.js';
-export { useVidaIdle, useRitmoPropio, useMiradaUsted, prefiereQuietud } from './useVidaIdle.js';
 
 /* ── SISTEMA DE PERSONAJES (transversal, species-agnostic) ───────────────────
    La FUNDACIÓN que heredan los 9 bichos: lip-sync, modo poder, prop-por-mundo,
@@ -152,9 +106,6 @@ import Borugo from './Borugo.jsx';
 import Lombriz from './Lombriz.jsx';
 import Mariposa from './Mariposa.jsx';
 import Escarabajo from './Escarabajo.jsx';
-import Crisopa from './Crisopa.jsx';
-import Trichogramma from './Trichogramma.jsx';
-import Sirfido from './Sirfido.jsx';
 import EntFrailejon from './EntFrailejon.jsx';
 
 /* Registro consultable: slug → componente + binomio verificado. */
@@ -171,10 +122,6 @@ export const CREATURES = {
   lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },
   mariposa: { Component: Mariposa, nombre: 'Mariposa pasionaria', cientifico: 'Dione juno' },
   escarabajo: { Component: Escarabajo, nombre: 'Escarabajo estercolero', cientifico: 'Dichotomius belus' },
-  // El trío de control biológico (aliados reales de Defensores y Milpa).
-  crisopa: { Component: Crisopa, nombre: 'Crisopa', cientifico: 'Chrysoperla externa' },
-  trichogramma: { Component: Trichogramma, nombre: 'Avispita Trichogramma', cientifico: 'Trichogramma' },
-  sirfido: { Component: Sirfido, nombre: 'Mosca de las flores (sírfido)', cientifico: 'Syrphidae' },
   // El árbol-maestro del Bosque Vivo (flora, no fauna): el frailejón guardián.
   'ent-frailejon': { Component: EntFrailejon, nombre: 'El Ent del páramo', cientifico: 'Espeletia sp.' },
 };
