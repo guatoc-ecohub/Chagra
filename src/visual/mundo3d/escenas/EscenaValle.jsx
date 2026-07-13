@@ -94,8 +94,17 @@ const CSS_CIELO = `
 export default function EscenaValle({
   params, entrada, reducedMotion = false, onHotspot, animo = 'sereno', energia = 1, tier = 'alto',
   estadoFinca = undefined, hayAlerta = false, // §5b: Angelita refleja el estado real también en el mapa
+  /* FASE 4 — cámara de director (establishing + follow + beats). ON por defecto
+     en la escena del framework (el "wow" de bienvenida); tier/reduced-motion la
+     gatean adentro (tier bajo o calma = cámara fija). Un solo prop la apaga. */
+  camaraDirector = true,
 }) {
   const climaReal = params?.clima || entrada?.clima || 'soleado';
+  /* Buzón de beats para el director: el coro ambiental (FaunaAmbiental) marca
+     sus slots con `data-fase='gesto'` al hacer su giño; un MutationObserver
+     (abajo) traduce ESO en un beat de cámara — sin tocar el arte ni la capa. */
+  const beatsRef = useRef(null);
+  const raizRef = useRef(null);
   /* El avatar elegido por la persona: se reserva para el protagonismo (el
      coro ambiental lo excluye — el central manda, nadie lo duplica de extra). */
   const avatar = useAvatarCreature();
@@ -117,6 +126,42 @@ export default function EscenaValle({
     if (timerRef.current) clearTimeout(timerRef.current);
   }, []);
 
+  /* Beats de cámara desde el coro ambiental: cuando un slot de FaunaAmbiental
+     entra en su gesto (`data-fase='gesto'`), lo traducimos a un beat para el
+     director — lado por dónde asomó (`data-entrada`), quién (`data-slug`: el
+     Ent 'ent-frailejon' pide su plano largo) y si fue mágico (`data-magico`).
+     Cero acoplamiento al arte: solo se LEEN atributos que la capa ya publica.
+     Solo en tier alto y con movimiento (el director solo hace beats en 'cine';
+     en calma la fauna ni se monta). */
+  useEffect(() => {
+    if (!camaraDirector || reducedMotion || tier !== 'alto') return undefined;
+    const raiz = raizRef.current;
+    if (!raiz || typeof MutationObserver === 'undefined') return undefined;
+    const obs = new MutationObserver((mutaciones) => {
+      for (const m of mutaciones) {
+        const el = /** @type {HTMLElement} */ (m.target);
+        if (
+          el.nodeType === 1 &&
+          el.classList &&
+          el.classList.contains('fauna-amb__slot') &&
+          el.getAttribute('data-fase') === 'gesto'
+        ) {
+          // `n` incremental: el director lo drena por contador (lee, no escribe
+          // este ref — así no se muta un prop-ref del lado del director).
+          beatsRef.current = {
+            n: (beatsRef.current?.n ?? 0) + 1,
+            tipo: 'fauna',
+            lado: el.getAttribute('data-entrada') || undefined,
+            slug: el.getAttribute('data-slug') || undefined,
+            magico: el.getAttribute('data-magico') === '1',
+          };
+        }
+      }
+    });
+    obs.observe(raiz, { attributes: true, attributeFilter: ['data-fase'], subtree: true });
+    return () => obs.disconnect();
+  }, [camaraDirector, reducedMotion, tier]);
+
   /* Gotas deterministas: posición/tempo por hash de índice, presupuesto por tier. */
   const gotas = useMemo(() => {
     const n = GOTAS_POR_TIER[tier] ?? GOTAS_POR_TIER.alto;
@@ -133,6 +178,7 @@ export default function EscenaValle({
 
   return (
     <div
+      ref={raizRef}
       className={`cielotoque${toque ? ` cielotoque--${toque}` : ''}${reducedMotion ? ' cielotoque--rm' : ''}`}
       data-clima-real={climaReal}
     >
@@ -146,6 +192,8 @@ export default function EscenaValle({
         hayAlerta={hayAlerta}
         tier={tier}
         reducedMotion={reducedMotion}
+        camaraDirector={camaraDirector}
+        beatsRef={beatsRef}
         onEntrar={(id) => onHotspot?.('mundo', { mundoId: id })}
         onAlerta={() => onHotspot?.(entrada?.alertaView || 'hoy_finca')}
       />
