@@ -75,3 +75,30 @@ export const RANA_PROPORCION = {
   troncoRy: 6.2,
   ojoR: 2.9,
 };
+
+/* ── ARDILLA — Notosciurus granatensis (ardilla de cola roja andina, clima
+   TEMPLADO). Hermana rubber-hose del trío: mismo kit `_rubberhose.jsx`, misma
+   cadencia `rh-*`, otro animal. Pelaje RUFO cálido con la LÍNEA DORSAL oscura
+   marcada (su firma), vientre crema, COLA TUPIDA que se sacude, orejitas y los
+   DIENTES de roedor. Su CARÁCTER: ágil, curiosa, rápida e inquieta — su gesto-
+   firma es la INSPECCIÓN INVERTIDA (se cuelga de cabeza a mirar). Su color de
+   poder es el ÁMBAR (auraDeBicho('ardilla')). */
+export const ARDILLA_PALETA = {
+  cuerpo: '#b5652f',        // pelaje rufo cálido (templado)
+  cuerpoGlow: 'rgba(200,120,60,0.7)',
+  dorsal: '#5f3115',        // LÍNEA DORSAL oscura — la firma de la especie
+  panza: '#e8c48a',         // vientre crema-canela
+  vientre: '#f6e4bd',       // realce claro del pecho
+  cola: '#c4762f',          // cola tupida (rufo un tono más vivo)
+  colaClara: '#e6b06a',     // escarcha/borde de la cola tupida
+  oreja: '#894622',         // pabellón interno de la oreja
+  diente: '#fff6e2',        // incisivos de roedor (crema)
+  hocico: '#2f1c10',        // nariz/trufa
+  bellota: '#8a5a2b',       // la semilla que roe
+};
+export const ARDILLA_PROPORCION = {
+  troncoRx: 7.0,
+  troncoRy: 8.0,
+  cabezaR: 5.6,
+  orejaR: 1.9,
+};
