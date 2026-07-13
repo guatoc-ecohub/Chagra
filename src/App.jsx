@@ -51,6 +51,7 @@ const EscuchaOverlay = lazy(() => import('./components/escucha/EscuchaOverlay'))
 // muestra justamente CUANDO no hay red. Si fuera lazy, el import() fallaría
 // offline sin cache → el usuario nunca vería la pantalla de offline.
 import AgentOfflineGuard from './components/AgentScreen/AgentOfflineGuard';
+const AgentOfflineGuard = lazy(() => import('./components/AgentScreen/AgentOfflineGuard'));
 // Transición home→conversación: el colibrí en video (~2s). Eager (debe
 // aparecer al instante al enviar desde el hero).
 import ColibriTransition from './components/agent/ColibriTransition';
@@ -3939,6 +3940,7 @@ export default function App() {
           no conoce al agente — ruido en su primer flujo. */}
       <Suspense fallback={null}>
         {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
+        {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
       </Suspense>
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
