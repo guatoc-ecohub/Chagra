@@ -24,6 +24,7 @@ calidad dispar. Aquí vive la **versión canónica** de cada uno.
 | `Colibri` | *Colibri coruscans* | Colibrí chillón andino. Pico largo, garganta violeta, alas que baten. **Rubber-hose** (adoptado). |
 | `OsoAndino` | *Tremarctos ornatus* | Oso de anteojos, guardián del páramo. Mole parda con **anteojos crema** (su firma). De suelo, se sienta. Rubber-hose. |
 | `RanaAndina` | *Atelopus* spp. | Rana arlequín del páramo. Verde húmedo con manchas ocre, vientre dorado, ojos saltones y bocota. Rubber-hose. |
+| `Ardilla` | *Notosciurus granatensis* | Ardilla de cola roja del templado. Rufa con **línea dorsal** oscura (su firma), **cola tupida** y dientes de roedor. Ágil e inquieta: su firma es la **inspección invertida** (se cuelga de cabeza). De suelo, se sienta. Rubber-hose. |
 | `Lombriz` | *Martiodrilus crassus* | Lombriz gigante nativa. Cuerpo segmentado con clitelo. Sin animación propia (su movimiento lo da la escena). |
 | `Mariposa` | *Dione juno* | Pasionaria de alas largas. Cuatro alas que abren y cierran. |
 | `Escarabajo` | *Dichotomius belus* | Estercolero colombiano. Élitros brillantes, cuerno, y bola de abono que rueda. |
@@ -105,6 +106,14 @@ dorada la abeja, **roja** el oso), la **ropa por clima+hora** (`vestuario` →
 CARÁCTER de mole seria: boil más lento y pesado, cejas de ceño, gruñido
 (`resopla` → vaho) y rascado (`rasca`) — todo aditivo en `creatures.css`, RM +
 tier-safe. Los demás bichos heredan la misma fundación pasando sus parámetros.
+
+La **`Ardilla`** cierra la misma fundación completa con su CARÁCTER opuesto —
+pizpireta, ÁGIL, curiosa e INQUIETA: aura **ÁMBAR** en poder, boil VELOZ (no
+pesado), **cola tupida** que se sacude, hocico que olfatea, dientes de roedor y
+su gesto-FIRMA la **inspección invertida** (`inspecciona` → se cuelga de cabeza a
+espiar) más el **roer** una semilla (`roe`). Templada, pero del contrato
+compartido: **nunca suda** (se abriga de noche/frío, jamás gotea). Todo aditivo
+en `creatures.css`, RM + tier-safe.
 
 ## Técnica
 

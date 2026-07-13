@@ -749,3 +749,129 @@
   /* Fotograma digno: un rastro de vaho visible y quieto si se pidió resoplido. */
   .crt-vaho-mota { opacity: 0.55; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ARDILLA — el CARÁCTER de la pizpireta: ÁGIL, curiosa, rápida e INQUIETA.
+   Aditivo sobre el KIT species-agnostic (no toca a los demás bichos): la ardilla
+   reescribe SU boil (más VELOZ y nervioso que la abeja), suma la cola tupida que
+   se sacude, el hocico que olfatea, los dientes que castañetean al roer y su
+   gesto-FIRMA: la INSPECCIÓN INVERTIDA (se cuelga de cabeza a espiar). Todo
+   transform/opacity (GPU, gama baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL VELOZ — no respira lento como el oso: vibra RÁPIDO y nervioso (la ardilla
+   nunca está quieta). Reescribe SOLO el boil de la ardilla (misma clase .rh-boil,
+   mayor especificidad por el data-creature) con longhands. */
+[data-creature='ardilla'] .rh-boil {
+  animation-name: ardilla-boil;
+  animation-duration: 1.05s;
+  animation-timing-function: steps(20, end);
+}
+@keyframes ardilla-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  20%  { transform: translateY(-0.35px) scale(0.97, 1.05); }  /* stretch ágil */
+  48%  { transform: translateY(0.3px) scale(1.05, 0.95); }    /* squash veloz */
+  70%  { transform: translateY(-0.12px) scale(0.99, 1.02); }  /* overshoot */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* COLA TUPIDA — se sacude nerviosa (flick de ardilla), pivote en la base. Idle
+   continuo: su secondary-motion firma. Se acelera cuando husmea o roe. */
+.ardilla-cola {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: ardilla-cola 2.1s ease-in-out infinite;
+}
+@keyframes ardilla-cola {
+  0%, 100% { transform: rotate(0deg) scaleY(1); }
+  22% { transform: rotate(-4.5deg); }                    /* latigazo a un lado */
+  46% { transform: rotate(3.6deg) scaleY(1.03); }        /* sacudida nerviosa */
+  66% { transform: rotate(-2.2deg); }
+  82% { transform: rotate(1.4deg); }
+}
+[data-creature='ardilla'][data-inspecciona='1'] .ardilla-cola,
+[data-creature='ardilla'][data-roe='1'] .ardilla-cola { animation-duration: 0.95s; }
+
+/* OLFATEA — el hocico tiembla en olfateos rápidos (inquieta). Idle continuo,
+   sutil. Más veloz aún cuando roe. */
+.ardilla-nariz {
+  animation: ardilla-olfatea 1.35s ease-in-out infinite;
+}
+@keyframes ardilla-olfatea {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  18% { transform: translateY(-0.22px) scale(1.14, 0.92); }  /* olfateo rápido */
+  32% { transform: translateY(0) scale(1, 1); }
+  48% { transform: translateY(-0.16px) scale(1.1, 0.94); }
+  62% { transform: translateY(0) scale(1, 1); }
+}
+[data-creature='ardilla'][data-roe='1'] .ardilla-nariz { animation-duration: 0.5s; }
+
+/* INSPECCIÓN INVERTIDA — el gesto-FIRMA: se voltea de cabeza (overshoot), asienta
+   invertida y espía curiosa a un lado y al otro, luego se endereza. Pisa el boil
+   por especificidad (dos atributos). */
+[data-creature='ardilla'][data-inspecciona='1'] .crt-body {
+  animation: ardilla-invierte 3.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ardilla-invierte {
+  0%   { transform: rotate(0deg); }
+  16%  { transform: rotate(185deg) scale(0.97, 1.03); }             /* se cuelga (overshoot) */
+  24%  { transform: rotate(178deg); }                               /* asienta invertida */
+  40%  { transform: rotate(180deg) translateX(1.1px); }             /* espía a un lado (curiosa) */
+  56%  { transform: rotate(180deg) translateX(-1.1px); }            /* …y al otro */
+  72%  { transform: rotate(179deg); }
+  86%  { transform: rotate(7deg) scale(1.02, 0.98); }               /* se endereza (rebasa) */
+  100% { transform: rotate(0deg); }
+}
+
+/* ROE — mordisqueo rápido: el cuerpo da un bob veloz y menudo (roer). Pisa el
+   boil por especificidad. */
+[data-creature='ardilla'][data-roe='1'] .crt-body {
+  animation: ardilla-roe 0.34s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes ardilla-roe {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(0.4px) scale(1.03, 0.96); }  /* mordisco veloz */
+}
+/* Los DIENTES castañetean rapidísimo al roer (los incisivos de roedor). */
+.ardilla-dientes { transform-box: fill-box; transform-origin: center top; }
+[data-creature='ardilla'][data-roe='1'] .ardilla-dientes {
+  animation: ardilla-castaneteo 0.16s steps(2, end) infinite;
+}
+@keyframes ardilla-castaneteo {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(0.4px); }
+}
+/* La bellota tiembla un poco mientras la roe. */
+.ardilla-bellota { transform-box: fill-box; transform-origin: center; }
+[data-creature='ardilla'][data-roe='1'] .ardilla-bellota {
+  animation: ardilla-bellota-tiembla 0.16s steps(2, end) infinite;
+}
+@keyframes ardilla-bellota-tiembla {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-0.35px); }
+}
+
+/* Los estados de la ardilla (inspecciona/roe) PISAN el arrebato (antic/travieso):
+   una ardilla colgada de cabeza o royendo no da además vueltas de campana. */
+[data-creature='ardilla'][data-inspecciona='1'] .rh-antic,
+[data-creature='ardilla'][data-inspecciona='1'] .rh-travieso,
+[data-creature='ardilla'][data-roe='1'] .rh-antic,
+[data-creature='ardilla'][data-roe='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito de la ardilla lo reactivaría (misma
+   clase) → re-apagarlo aquí (mayor especificidad + orden posterior). La cola y el
+   olfateo continuos también se cortan; los estados reactivos (inspecciona/roe)
+   siguen contando la verdad. */
+[data-tier='bajo'][data-creature='ardilla'] .rh-boil,
+[data-tier='bajo'][data-creature='ardilla'] .ardilla-cola,
+[data-tier='bajo'][data-creature='ardilla'] .ardilla-nariz { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ardilla-cola, .ardilla-nariz, .ardilla-dientes, .ardilla-bellota,
+  [data-creature='ardilla'][data-inspecciona='1'] .crt-body,
+  [data-creature='ardilla'][data-roe='1'] .crt-body { animation: none !important; }
+}
