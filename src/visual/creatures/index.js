@@ -28,6 +28,11 @@ export { Colibri } from './Colibri.jsx';
 export { OsoAndino } from './OsoAndino.jsx';
 export { RanaAndina } from './RanaAndina.jsx';
 export { Ardilla } from './Ardilla.jsx';
+export { Jaguar } from './Jaguar.jsx';
+/* La IDENTIDAD del jaguar como datos (paleta leonada + rosetas, proporciones y
+   su perfil de clima). Solo datos: jamás arrastra three al bundle base — igual
+   que abejaIdentidad/faunaAndina. */
+export { JAGUAR_PALETA, JAGUAR_PROPORCION, JAGUAR_SLUG, PERFIL_JAGUAR } from './jaguarIdentidad.js';
 /* La IDENTIDAD del trío andino como datos (paletas + proporciones). Solo datos:
    jamás arrastra three al bundle base — igual que abejaIdentidad. */
 export {
@@ -74,6 +79,7 @@ import Colibri from './Colibri.jsx';
 import OsoAndino from './OsoAndino.jsx';
 import RanaAndina from './RanaAndina.jsx';
 import Ardilla from './Ardilla.jsx';
+import Jaguar from './Jaguar.jsx';
 import Lombriz from './Lombriz.jsx';
 import Mariposa from './Mariposa.jsx';
 import Escarabajo from './Escarabajo.jsx';
@@ -85,6 +91,7 @@ export const CREATURES = {
   'oso-andino': { Component: OsoAndino, nombre: 'Oso andino', cientifico: 'Tremarctos ornatus' },
   'rana-andina': { Component: RanaAndina, nombre: 'Rana arlequín andina', cientifico: 'Atelopus spp.' },
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },
+  jaguar: { Component: Jaguar, nombre: 'Jaguar', cientifico: 'Panthera onca' },
   lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },
   mariposa: { Component: Mariposa, nombre: 'Mariposa pasionaria', cientifico: 'Dione juno' },
   escarabajo: { Component: Escarabajo, nombre: 'Escarabajo estercolero', cientifico: 'Dichotomius belus' },
