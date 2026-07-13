@@ -83,7 +83,7 @@ export default function AvatarSelector({ compact = false, className = '' }) {
                                     <Check size={12} strokeWidth={3} />
                                 </span>
                             )}
-                            <Creature tier="bajo" 
+                            <Creature
                                 size={compact ? 44 : 56}
                                 animated={selected && !reduceMotion}
                                 title=""
