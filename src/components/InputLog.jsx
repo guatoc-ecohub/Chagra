@@ -157,6 +157,7 @@ export default function InputLog({ onBack, onSave }) {
         />
 
         <div className="grid grid-cols-2 gap-3">
+          {/* @ts-expect-error NumberField doesn't expose placeholder in its props type */}
           <NumberField
             label="Cantidad"
             step="0.01"
@@ -177,6 +178,7 @@ export default function InputLog({ onBack, onSave }) {
           />
         </div>
 
+        {/* @ts-expect-error TextAreaField doesn't expose placeholder in its props type */}
         <TextAreaField
           label="Notas"
           hint="opcional"

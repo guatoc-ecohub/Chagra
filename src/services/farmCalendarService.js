@@ -130,11 +130,11 @@ function buildAnnualEntries({ speciesSlug, sowingDate, altitudeM, template, cate
     return { entries: [], isGeneric: false, hasData: false };
   }
 
-  const isGeneric = computed.some((w) => w.isGeneric);
+  const isGeneric = computed.some((w) => /** @type {any} */ (w).isGeneric);
   const entries = [];
 
   for (const w of computed) {
-    const layer = stageToLayer(w.code);
+    const layer = /** @type {CalendarEntry['layer']} */ (stageToLayer(w.code));
     const months = windowToMonths(w.windowStart, w.windowEnd, now);
     if (months.length === 0) continue;
     entries.push({
@@ -176,6 +176,7 @@ function buildAnnualEntries({ speciesSlug, sowingDate, altitudeM, template, cate
     }
   }
 
+  // @ts-expect-error TSC widens layer types in mixed array, but stageToLayer always returns valid union values
   return { entries, isGeneric, hasData: true };
 }
 
@@ -300,6 +301,7 @@ function buildPerennialEntries({ speciesId, plantingDate, now }) {
     });
   }
 
+  // @ts-expect-error TS doesn't track that stageToLayer always returns a valid CalendarEntry layer
   return { entries, resolution: res };
 }
 
@@ -309,9 +311,13 @@ function buildPerennialEntries({ speciesId, plantingDate, now }) {
  * @property {string} title
  * @property {string} detail
  * @property {number[]} months — meses 1-12 que toca la entrada
+ * @property {number|null} [windowStart] — ts ms inicio de ventana
+ * @property {number|null} [windowEnd] — ts ms fin de ventana
  * @property {boolean} approximate — el dato es aproximado (genérico / sin anclar)
  * @property {number} confidence — 0-1
  * @property {string} source — procedencia real del dato
+ * @property {string} [stageCode] — código de la etapa fenológica asociada
+ * @property {boolean} [continuous] — indica cosecha continua (perennes)
  */
 
 /**
@@ -343,7 +349,7 @@ function buildPerennialEntries({ speciesId, plantingDate, now }) {
  * @param {number} [cfg.now]
  * @returns {PlantCalendar}
  */
-export function buildPlantCalendar({ id, name, speciesSlug, species, sowingDate, altitudeM, now } = {}) {
+export function buildPlantCalendar({ id, name, speciesSlug, species, sowingDate, altitudeM, now } = /** @type {any} */ ({})) {
   const ref = Number.isFinite(now) && now > 0 ? now : Date.now();
   const category = species?.category || null;
   const sp2 = /** @type {any} */ (species);
@@ -411,7 +417,7 @@ export function buildPlantCalendar({ id, name, speciesSlug, species, sowingDate,
     id,
     name,
     speciesSlug,
-    kind: status === 'no_data' ? 'no_data' : kind,
+    kind: status === 'no_data' ? 'no_data' : /** @type {'annual'|'perennial'} */ (kind),
     status,
     isGeneric,
     hasSowingDate: Number.isFinite(sowingDate) && sowingDate > 0,

@@ -189,13 +189,13 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
       if (!preCompressed.ok) {
         setPhotoState('error');
         setPhotoMsg(
-          preCompressed.reason === 'too_large'
+          /** @type {any} */ (preCompressed).reason === 'too_large'
             ? IMAGE_TOO_LARGE_MESSAGE
             : 'No se pudo procesar la foto',
         );
         return;
       }
-      const { blob } = await captureAndCompress(preCompressed.blob);
+      const { blob } = await captureAndCompress(/** @type {Blob} */ (/** @type {any} */ (preCompressed).blob));
       const result = await attachPhotoToLog(entry.id, blob);
       if (result?.success === false) {
         setPhotoState('error');
@@ -311,7 +311,7 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
       <div className="flex-1 p-5 flex flex-col gap-4 max-w-2xl mx-auto w-full pb-24">
         {/* Status + tipo */}
         <section className="flex flex-wrap items-center gap-2">
-          <StatusBadge status={status} type={badgeType} />
+          <StatusBadge status={status} type={badgeType} onChange={() => {}} />
           <span className="text-xs font-mono text-slate-500 px-2 py-1 rounded-full bg-slate-900 border border-slate-800">
             {type.replace('log--', '').replace('--', ' ')}
           </span>

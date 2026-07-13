@@ -196,8 +196,8 @@ export async function extractEntities(text, { onToken } = {}) {
     }
 
     if (!Array.isArray(parsed)) {
-      if (Array.isArray(/** @type {any} */ (parsed)?.entities)) parsed = parsed.entities;
-      else if (Array.isArray(/** @type {any} */ (parsed)?.data)) parsed = parsed.data;
+      if (Array.isArray(/** @type {any} */ (parsed)?.entities)) parsed = /** @type {any} */ (parsed).entities;
+      else if (Array.isArray(/** @type {any} */ (parsed)?.data)) parsed = /** @type {any} */ (parsed).data;
       // Fallback: un único objeto {crop, quantity, location} → wrap en array.
       // Algunos modelos chicos (sin format:json en edge cases)
       // emiten una sola entidad como objeto plano.
@@ -205,7 +205,7 @@ export async function extractEntities(text, { onToken } = {}) {
       else parsed = [];
     }
 
-    return parsed
+    return /** @type {any[]} */ (parsed)
       .filter(isValidEntity)
       .map((e) => ({
         crop: e.crop.toLowerCase().trim(),

@@ -124,6 +124,7 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
   // Bug 069.10 — validación inline (no bloquea submit existente, pero deshabilita el botón
   // y muestra errores para que el operador corrija antes de guardar).
   const errors = useMemo(() => {
+    /** @type {Record<string,string>} */
     const e = {};
     const today = new Date().toISOString().split('T')[0];
     if (!formData.crop.trim()) e.crop = 'Indica el cultivo';

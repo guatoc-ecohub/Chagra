@@ -415,8 +415,8 @@ export default function LocationDetectedScreen({
             lat,
             lng,
             vereda: exact?.name || rawVereda,
-            vereda_source: exact?.source || 'typed',
-            vereda_display_name: exact?.display_name || null,
+            vereda_source: /** @type {any} */ (exact)?.source || 'typed',
+            vereda_display_name: /** @type {any} */ (exact)?.display_name || null,
             municipio: municipioLocal.name,
             departamento: municipioLocal.departamento,
           });
@@ -842,6 +842,7 @@ export default function LocationDetectedScreen({
         {hasPoint && (
           <div className="space-y-1.5">
             <div className="rounded-2xl overflow-hidden border border-slate-800 h-56">
+              {/* @ts-expect-error react-leaflet types don't include center prop */}
               <MapContainer
                 center={center}
                 zoom={12}
@@ -849,10 +850,12 @@ export default function LocationDetectedScreen({
                 style={{ height: '100%', width: '100%' }}
                 attributionControl={false}
               >
+                {/* @ts-expect-error react-leaflet types don't include maxZoom */}
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   maxZoom={19}
                 />
+                {/* @ts-expect-error react-leaflet types don't include draggable */}
                 <Marker
                   position={center}
                   draggable

@@ -35,7 +35,6 @@ const RAG_SUGGEST_SHOW_LIMIT = 3;
 const RAG_PASSAGE_EXCERPT_LEN = 220;
 
 function ObservationScreen({ onBack, onSave }) {
-  /** @type {{ date: string, observationType: string, description: string, locationId: string, plantId: string, severity: string, notes?: string }} */
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     observationType: 'general',
@@ -47,8 +46,7 @@ function ObservationScreen({ onBack, onSave }) {
   const [photo, setPhoto] = useState(null);
   const [photoUrl, setPhotoUrl] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  /** @type {{ description?: boolean, date?: boolean }} */
-  const [touched, setTouched] = useState({});
+  const [touched, setTouched] = useState(/** @type {Record<string,boolean>} */ ({}));
   // Audit 070.6 — modal payload tras éxito en severity high/critical.
   // Shape: { logId, severity, description, speciesSlug, plantId, landId }.
   const [caseBridgePayload, setCaseBridgePayload] = useState(null);
