@@ -151,6 +151,11 @@ const VitrinaCriaturasMockup = lazy(() => import('./mockups/vitrina3d/VitrinaCri
 // Polylepis) — mallas three reales (tronco retorcido con rostro tallado, copa
 // instanciada), device-tiering real. Ruta #/mockups/bosque-vivo-3d, sin auth.
 const BosqueVivo3DMockup = lazy(() => import('./mockups/BosqueVivo3D'));
+// 3D: el MUNDO SUELO VIVO — la RED MICORRÍZICA bajo tierra (el wood-wide web):
+// la red de hongos bioluminiscente que enlaza las raíces y reparte nutrientes,
+// con pulsos corriendo por los hilos y el Ent asomando. Device-tiering real.
+// Ruta #/mockups/micorrizas-3d y entrada del home (mundo3d_micorrizas), sin auth.
+const Micorrizas3DMockup = lazy(() => import('./mockups/Micorrizas3D'));
 // 3D: vitrina JUGABLE de las piezas de construcción (invernaderos, galpón,
 // establo, bodega, tanque, secadero…) con control de tamaño por pieza y el
 // mini demo del modo colocar (snapping sobre la ladera).
@@ -591,6 +596,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-mercado': 'mockup_mundo3d_mercado',
   'mockups/mundo3d-cafe': 'mockup_mundo3d_cafe',
   'mockups/mundo3d-semillero': 'mockup_mundo3d_semillero',
+  'mockups/micorrizas-3d': 'mockup_micorrizas_3d',
   'mockups/infraestructura-3d': 'mockup_infraestructura_3d',
   'mockups/colocar-infraestructura': 'mockup_colocar_infraestructura',
   'mockups/vitrina-3d': 'mockup_vitrina_3d',
@@ -1539,6 +1545,22 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El bosque vivo">
               <BosqueVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_micorrizas_3d':
+      case 'mundo3d_micorrizas':
+        // El MUNDO SUELO VIVO: la RED MICORRÍZICA bajo tierra (el wood-wide web)
+        // en 3D REAL — la cámara baja bajo el suelo y se ve la red de hongos
+        // bioluminiscente enlazando las raíces del maíz, el fríjol y la ahuyama y
+        // del árbol madre, con PULSOS de nutrientes (fósforo/agua ↔ azúcar)
+        // corriendo por los hilos y los PUENTES entre plantas (el reparto). El Ent
+        // asoma enseñando. Device-tiering real; en equipo humilde muestra la ficha
+        // del suelo vivo. Ruta #/mockups/micorrizas-3d (vitrina) y entrada del home.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El suelo vivo">
+              <Micorrizas3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
