@@ -53,7 +53,7 @@ describe('glm/6121 — contraste WCAG AA temas no-biopunk', () => {
 
     for (const [name, fg, bg, minRatio] of CRITICAL_PAIRS) {
       const ratio = contrastRatio(fg, bg);
-      if (ratio >= minRatio) {
+      if (ratio >= /** @type {number} */ (minRatio)) {
         passed++;
       } else {
         fails.push(`${name}: ratio ${ratio.toFixed(2)} < ${minRatio} (fg=${fg} bg=${bg})`);

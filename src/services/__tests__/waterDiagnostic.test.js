@@ -144,7 +144,7 @@ describe('diagnosticarAgua — MITOS y guardas', () => {
 
 describe('formatearGroundingAgua', () => {
   it('retorna vacio si sin_datos', () => {
-    expect(formatearGroundingAgua({ sin_datos: true })).toBe('');
+    expect(formatearGroundingAgua(/** @type {any} */ ({ sin_datos: true }))).toBe('');
     expect(formatearGroundingAgua(null)).toBe('');
   });
 

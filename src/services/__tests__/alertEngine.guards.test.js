@@ -87,7 +87,7 @@ describe('alertEngine — dispatch no lanza', () => {
 
   it('dispatch survive si dispatchEvent no existe', () => {
     const origWindow = globalThis.window;
-    globalThis.window = {};
+    globalThis.window = /** @type {any} */ ({});
     expect(() => {
       alertEngine.dispatch('test_event', { ok: true });
     }).not.toThrow();
@@ -107,7 +107,7 @@ describe('alertEngine — showSystemNotification no lanza', () => {
 
   it('survive con Notification.permission denegado', async () => {
     const origNotification = globalThis.Notification;
-    globalThis.Notification = { permission: 'denied' };
+    globalThis.Notification = /** @type {any} */ ({ permission: 'denied' });
     await expect(
       alertEngine.showSystemNotification({ title: 'Test', message: 'msg', type: 'TEST' })
     ).resolves.toBeUndefined();

@@ -44,7 +44,7 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
   // default param `= {}` NO aplica con null (solo con undefined) → línea 18
   // intentaba leer `null.crop` y crasheaba el ErrorBoundary del componente.
   // Coalesce explícito null/undefined → {}.
-  const initialData = initialDataRaw || {};
+  const initialData = /** @type {any} */ (initialDataRaw || {});
   const [formData, setFormData] = useState(/** @type {{date: string, crop: string, crop_species_id: (string|null), plant_type?: ({type: string, id: string}|null), variety: string, quantity: string}} */({
     date: new Date().toISOString().split('T')[0],
     crop: initialData.crop || '', // Nombre común limpio de la especie (ej. "Fresa")

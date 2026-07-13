@@ -17,7 +17,7 @@ describe('splitService', () => {
 
     describe('previewSplit', () => {
         it('creates aggregate preview from individual asset', () => {
-            const { childrenToCreate, splitLogPreview } = previewSplit(mockAsset, 'individual_to_aggregate');
+            const { childrenToCreate, splitLogPreview } = previewSplit(/** @type {any} */ (mockAsset), 'individual_to_aggregate');
 
             expect(childrenToCreate).toHaveLength(1);
             expect(childrenToCreate[0].attributes.tracking_mode).toBe('aggregate');
@@ -27,7 +27,7 @@ describe('splitService', () => {
 
         it('creates multiple individual previews from aggregate asset', () => {
             const aggAsset = { ...mockAsset, attributes: { ...mockAsset.attributes, tracking_mode: 'aggregate' } };
-            const { childrenToCreate } = previewSplit(aggAsset, 'aggregate_to_individual', { qty: 3 });
+            const { childrenToCreate } = previewSplit(/** @type {any} */ (aggAsset), 'aggregate_to_individual', { qty: 3 });
 
             expect(childrenToCreate).toHaveLength(3);
             expect(childrenToCreate[0].attributes.tracking_mode).toBe('individual');
@@ -40,7 +40,7 @@ describe('splitService', () => {
             const addLog = vi.fn();
             const addAssetsBulk = vi.fn();
 
-            await executeSplit(mockAsset, 'individual_to_aggregate', {}, { addLog, addAssetsBulk });
+            await executeSplit(/** @type {any} */ (mockAsset), 'individual_to_aggregate', {}, { addLog, addAssetsBulk });
 
             expect(addAssetsBulk).toHaveBeenCalledWith(expect.any(Array));
             expect(addLog).toHaveBeenCalledWith(expect.objectContaining({

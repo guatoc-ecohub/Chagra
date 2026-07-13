@@ -92,7 +92,7 @@ describe('normalizeForMatch', () => {
   it('retorna string vacío para input inválido', () => {
     expect(normalizeForMatch(null)).toBe('');
     expect(normalizeForMatch(undefined)).toBe('');
-    expect(normalizeForMatch(42)).toBe('');
+    expect(normalizeForMatch(/** @type {any} */ (42))).toBe('');
   });
 });
 

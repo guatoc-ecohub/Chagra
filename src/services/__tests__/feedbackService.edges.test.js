@@ -34,7 +34,7 @@ describe('feedbackService — edges (A-15 #248)', () => {
     global.localStorage = { getItem: vi.fn(), setItem: vi.fn(), removeItem: vi.fn(), clear: vi.fn(), key: vi.fn(), length: 0 };
     global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
     fetchWithAuthRetry.mockClear();
-    fetchWithAuthRetry.mockImplementation((...args) => global.fetch(...args));
+    fetchWithAuthRetry.mockImplementation((...args) => global.fetch(/** @type {[RequestInfo | URL, RequestInit?]} */ (args)[0], /** @type {RequestInit} */ (/** @type {[RequestInfo | URL, RequestInit?]} */ (args)[1])));
   });
 
   afterEach(() => {

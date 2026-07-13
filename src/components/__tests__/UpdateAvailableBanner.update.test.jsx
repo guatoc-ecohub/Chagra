@@ -49,6 +49,7 @@ describe('UpdateAvailableBanner — flujo Actualizar', () => {
   });
 
   afterEach(() => {
+    // @ts-ignore
     delete navigator.serviceWorker;
   });
 

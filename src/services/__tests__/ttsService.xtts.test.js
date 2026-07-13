@@ -43,7 +43,7 @@ describe('ttsService — XTTS-v2 voz colombiana (task #124)', () => {
     fetchMock = vi.fn();
     globalThis.fetch = fetchMock;
     originalAudio = globalThis.Audio;
-    globalThis.Audio = MockAudio;
+    globalThis.Audio = /** @type {any} */ (MockAudio);
     originalCreateObjectURL = URL.createObjectURL;
     originalRevokeObjectURL = URL.revokeObjectURL;
     URL.createObjectURL = vi.fn(() => 'blob:fake-url');
@@ -146,7 +146,7 @@ describe('ttsService — XTTS-v2 voz colombiana (task #124)', () => {
 
       const audio = await speakXTTS('Test');
       expect(audio).toBeInstanceOf(MockAudio);
-      expect(audio.paused).toBe(false);
+      expect(/** @type {any} */ (audio).paused).toBe(false);
     });
 
     it('crea ObjectURL para el audio blob', async () => {

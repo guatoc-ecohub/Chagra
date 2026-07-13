@@ -26,7 +26,7 @@ export const PROXIMIDAD_LABEL = Object.freeze({
 });
 
 /** Niveles de reputación que cuentan como "competente" (demostró algo). */
-const NIVELES_COMPETENTES = new Set([NIVEL_REPUTACION.VERDE, NIVEL_REPUTACION.AMBAR]);
+const NIVELES_COMPETENTES = new Set(/** @type {string[]} */ ([NIVEL_REPUTACION.VERDE, NIVEL_REPUTACION.AMBAR]));
 
 /**
  * Tier de cercanía entre el que pregunta y un par. 3 misma vereda · 2 mismo
@@ -54,10 +54,10 @@ export function proximidadTier(query, peer) {
  * @param {string} problema.producto — cultivo en cuestión.
  * @param {string} [problema.vereda]
  * @param {string} [problema.municipio]
- * @param {string} [problema.excludeHash] — no sugerirse a uno mismo.
+ * @param {string} [problema.excludeHash] - no sugerirse a uno mismo.
  * @param {Object} contexto
  * @param {Array<import('./types.js').Reputacion>} contexto.reputaciones
- * @param {boolean} [contexto.allowNuevo=false] — incluir productores sin historial.
+ * @param {boolean} [contexto.allowNuevo=false] - incluir productores sin historial.
  * @returns {Array<import('./types.js').PeerMatch>}
  */
 export function findCompetentPeers(problema, contexto) {
@@ -105,7 +105,7 @@ export function findCompetentPeers(problema, contexto) {
  * @param {{producto:string, vereda?:string, sintoma?:string}} params
  * @returns {string}
  */
-export function buildMensajeVecino({ producto, vereda = '', sintoma = '' } = {}) {
+export function buildMensajeVecino({ producto = '', vereda = '', sintoma = '' } = {}) {
   const cultivo = String(producto || 'este cultivo').trim();
   const lugar = String(vereda || '').trim();
   const problema = String(sintoma || '').trim();
@@ -134,7 +134,7 @@ export function buildMensajeVecino({ producto, vereda = '', sintoma = '' } = {})
  * @param {string} [problema.vereda]
  * @param {string} [problema.municipio]
  * @param {string} [problema.sintoma]
- * @param {boolean} [problema.agentConfident=true] — ¿el agente cree tener respuesta?
+ * @param {boolean} [problema.agentConfident=true] - el agente cree tener respuesta?
  * @param {string} [problema.excludeHash]
  * @param {Object} contexto — { reputaciones, allowNuevo }
  * @returns {{ shouldRoute:boolean, peer:(import('./types.js').PeerMatch|null),
@@ -153,7 +153,7 @@ export function routeQuestion(problema, contexto) {
 
   const candidatos = findCompetentPeers(
     { producto, vereda, municipio, excludeHash },
-    contexto,
+    /** @type {any} */ (contexto),
   );
 
   if (candidatos.length === 0) {

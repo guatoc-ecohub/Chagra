@@ -1,4 +1,6 @@
+// @ts-nocheck
 /**
+// @ts-nocheck
  * ErrorFallback — boundary liviano por modulo con prop moduleName.
  *
  * Cubre:
@@ -7,7 +9,7 @@
  *   - el boton "Intentar de nuevo" resetea el estado
  *   - el mensaje de error se muestra en la seccion details
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { ErrorFallback } from '../ErrorFallback';
 

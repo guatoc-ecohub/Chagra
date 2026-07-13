@@ -55,6 +55,8 @@ const TRANSACTION_TYPE_ICONS = {
 // Mapa de tipo de log (crudo o `log--x`) → categoría canónica de la bitácora.
 // Cubre tanto los `type` de transacción pendiente (harvest/input/...) como los
 // `type` JSON:API de los logs sincronizados (`log--harvest`, ...).
+/** @param {string} rawType
+ * @returns {string} */
 function canonicalType(rawType) {
   if (!rawType) return 'activity';
   const t = String(rawType).replace('log--', '').replace('--', '_');
@@ -82,6 +84,7 @@ const ADD_ACTIONS = [
   { view: 'sembrar', label: 'Siembra', Icon: Sprout },
 ];
 
+/** @param {string} view */
 function goTo(view) {
   window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view } }));
 }
@@ -94,7 +97,8 @@ function goTo(view) {
  * (`Date.now()`). Mezclarlos sin normalizar hacía que (1) los sincronizados se
  * vieran fechados en 1970 y (2) el orden cronológico quedara roto. Heurística:
  * si el valor es menor a ~1e12 lo tratamos como segundos.
- */
+ * @param {number|string} ts
+ * @returns {number} */
 function toMs(ts) {
   const n = Number(ts);
   if (!Number.isFinite(n) || n <= 0) return 0;
@@ -182,6 +186,8 @@ export default function WorkerHistory({ onBack, onEntryClick }) {
     };
   }, [loadData, loadPendingTransactions, loadAllLogs]);
 
+  /** @param {number} ts
+   * @returns {string} */
   const formatTimestamp = (ts) => {
     const ms = toMs(ts);
     if (!ms) return '';
@@ -198,6 +204,8 @@ export default function WorkerHistory({ onBack, onEntryClick }) {
     return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' });
   };
 
+  /** @param {Object} tx
+   * @returns {string} */
   const getTransactionName = (tx) => {
     const name = tx.payload?.data?.attributes?.name;
     if (!name) return TRANSACTION_TYPE_LABELS[tx.type] || tx.type || 'Registro';

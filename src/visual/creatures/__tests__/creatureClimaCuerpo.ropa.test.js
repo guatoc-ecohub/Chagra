@@ -73,7 +73,7 @@ describe('ropaDeClima — gates de clima/hora', () => {
   it('ruana y sombrero son mutuamente excluyentes', () => {
     for (const clima of ['noche', 'soleado', 'dorada', 'lluvia', 'niebla']) {
       for (const tempC of [undefined, 0, 15, 35]) {
-        const r = ropaDeClima(clima, { tempC });
+        const r = ropaDeClima(/** @type {any} */ (clima), { tempC });
         expect(r.ruana && r.sombrero).toBe(false);
       }
     }

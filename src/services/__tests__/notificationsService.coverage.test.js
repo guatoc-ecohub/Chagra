@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * notificationsService.coverage.test.js — cobertura completa de aggregateNotifications.
  *
@@ -28,7 +29,7 @@ describe('notificationsService — aggregateNotifications cobertura', () => {
             localStorage.clear();
             // Limpiar URL params mockeados
             delete window.location;
-            window.location = new URL('http://localhost:3000');
+          window.location = /** @type {any} */ (new URL('http://localhost:3000'));
         } catch (_) { /* noop */ }
     });
 

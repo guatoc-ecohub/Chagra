@@ -72,7 +72,7 @@ describe('feedingPlanGeneric — cada categoría devuelve pasos', () => {
     expect(getGenericFeedingTemplate(null)).toBeNull();
     expect(getGenericFeedingTemplate(undefined)).toBeNull();
     expect(getGenericFeedingTemplate('')).toBeNull();
-    expect(getGenericFeedingTemplate(42)).toBeNull();
+    expect(getGenericFeedingTemplate(/** @type {any} */ (42))).toBeNull();
   });
 });
 

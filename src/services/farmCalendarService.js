@@ -74,7 +74,7 @@ function stageToLayer(code) {
  */
 function tsToMonth(ts) {
   if (!Number.isFinite(ts) || ts <= 0) return null;
-  return new Date(ts).getMonth() + 1;
+  return new Date(/** @type {number} */ (ts)).getMonth() + 1;
 }
 
 /**
@@ -90,10 +90,12 @@ function tsToMonth(ts) {
 function windowToMonths(start, end, now) {
   const startMonth = tsToMonth(start);
   if (startMonth === null) return [];
-  if (!Number.isFinite(end) || end <= start) return [startMonth];
+  const endNum = /** @type {number} */ (end);
+  const startNum = /** @type {number} */ (start);
+  if (!Number.isFinite(endNum) || endNum <= startNum) return [startMonth];
 
   const horizon = now + 365 * MS_PER_DAY;
-  const cappedEnd = Math.min(end, horizon);
+  const cappedEnd = Math.min(endNum, horizon);
   const months = new Set();
   // Itera mes a mes desde el inicio hasta el fin (máx 13 iteraciones por el cap).
   const cursor = new Date(start);
@@ -196,9 +198,10 @@ function buildAnnualEntries({ speciesSlug, sowingDate, altitudeM, template, cate
 function buildNutritionEntries({ species, sowingDate, now }) {
   if (!species) return [];
 
-  const hasExplicitPlan = Array.isArray(species.feeding_plan_template?.primary_steps)
-    && species.feeding_plan_template.primary_steps.length > 0;
-  const template = resolveFeedingPlanTemplateForSpecies(species);
+  const sp = /** @type {any} */ (species);
+  const hasExplicitPlan = Array.isArray(sp.feeding_plan_template?.primary_steps)
+    && sp.feeding_plan_template.primary_steps.length > 0;
+  const template = resolveFeedingPlanTemplateForSpecies(sp);
   if (!template || !Array.isArray(template.primary_steps) || template.primary_steps.length === 0) {
     return [];
   }
@@ -343,7 +346,8 @@ function buildPerennialEntries({ speciesId, plantingDate, now }) {
 export function buildPlantCalendar({ id, name, speciesSlug, species, sowingDate, altitudeM, now } = {}) {
   const ref = Number.isFinite(now) && now > 0 ? now : Date.now();
   const category = species?.category || null;
-  const rawTemplate = species?.phenology_template || species?.phenology || species?.fenologia || species?.phenology_stages || null;
+  const sp2 = /** @type {any} */ (species);
+  const rawTemplate = sp2?.phenology_template || sp2?.phenology || sp2?.fenologia || sp2?.phenology_stages || null;
   const catalogTemplate = normalizePhenologyTemplate(rawTemplate, speciesSlug);
 
   const perennialFlag = isPerennialSpecies(speciesSlug)

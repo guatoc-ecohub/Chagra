@@ -116,6 +116,7 @@ export function _resetSystemPromptCache() {
 
 // location puede venir vacia cuando el operador no menciona el lugar;
 // la UI resuelve al DEFAULT_LOCATION_ID en ese caso (ver VoiceConfirmation).
+/** @param {Object} e */
 const isValidEntity = (e) =>
   e &&
   typeof e.crop === 'string' && e.crop.trim().length > 0 &&
@@ -195,8 +196,8 @@ export async function extractEntities(text, { onToken } = {}) {
     }
 
     if (!Array.isArray(parsed)) {
-      if (Array.isArray(parsed?.entities)) parsed = parsed.entities;
-      else if (Array.isArray(parsed?.data)) parsed = parsed.data;
+      if (Array.isArray(/** @type {any} */ (parsed)?.entities)) parsed = parsed.entities;
+      else if (Array.isArray(/** @type {any} */ (parsed)?.data)) parsed = parsed.data;
       // Fallback: un único objeto {crop, quantity, location} → wrap en array.
       // Algunos modelos chicos (sin format:json en edge cases)
       // emiten una sola entidad como objeto plano.
@@ -212,7 +213,7 @@ export async function extractEntities(text, { onToken } = {}) {
         location: (e.location || '').trim(),
       }));
   } catch (err) {
-    if (err.name === 'AbortError') {
+    if (/** @type {Error} */ (err).name === 'AbortError') {
       throw new Error('Tiempo agotado al extraer entidades');
     }
     throw err;
