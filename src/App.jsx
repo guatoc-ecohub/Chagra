@@ -47,7 +47,10 @@ const AgentFab = lazy(() => import('./components/AgentFab'));
 // tap, descomentar el import y el render de <EscuchaFab /> más abajo.
 // import EscuchaFab from './components/escucha/EscuchaFab';
 const EscuchaOverlay = lazy(() => import('./components/escucha/EscuchaOverlay'));
-const AgentOfflineGuard = lazy(() => import('./components/AgentScreen/AgentOfflineGuard'));
+// AgentOfflineGuard DEBE ser eager (static import): es la pantalla que se
+// muestra justamente CUANDO no hay red. Si fuera lazy, el import() fallaría
+// offline sin cache → el usuario nunca vería la pantalla de offline.
+import AgentOfflineGuard from './components/AgentScreen/AgentOfflineGuard';
 // Transición home→conversación: el colibrí en video (~2s). Eager (debe
 // aparecer al instante al enviar desde el hero).
 import ColibriTransition from './components/agent/ColibriTransition';
