@@ -432,7 +432,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       return new Map(CAPABILITY_MANIFEST.map((cap) => [
         cap.id,
         getCapabilityHealth(cap.id, {
-          manifest: CAPABILITY_MANIFEST,
+          manifest: /** @type {any} */ (CAPABILITY_MANIFEST),
           isSidecarEnabled: sidecarOn,
           sidecarToolNames: SIDECAR_TOOL_NAMES,
         }),
@@ -800,7 +800,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
           setDash(g.pCore, L, ve); setDash(g.pGlow, L, ve);
         } else { clearDash(g.pCore); clearDash(g.pGlow); }
         const bo = (f == null || f === i) ? 1 : 0.3;
-        g.pCore.style.opacity = bo; g.pGlow.style.opacity = bo;
+        g.pCore.style.opacity = String(bo); g.pGlow.style.opacity = String(bo);
 
         /* Ramitas decorativas (twigD) ELIMINADAS (operador 2026-06-18): brotaban
            de la rama madre y MORIAN en el vacio, sin nodo al final — se leian
@@ -962,9 +962,9 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
     if (disabled) return;
     const item = RING[i];
     if (item?.kind === 'cap') {
-      // Destacada = ACCIÓN DIRECTA (no despliega): misma semántica que una hoja.
+      const capItem = /** @type {any} */ (item);
       if (ev?.currentTarget) bounce(ev.currentTarget);
-      const cap = item.cap;
+      const cap = capItem.cap;
       const health = capabilityHealth.get(cap.id) || 'live';
       if (health === 'soon') {
         showToast(`${cap.icon} ${cap.label} — por lanzar`);
@@ -1062,7 +1062,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
           <i
             key={k}
             className="arm-sp"
-            style={{ '--lx': s.lx, '--dur': s.dur, '--del': s.del, '--dx': s.dx, '--rise': s.rise }}
+            style={/** @type {any} */ ({ '--lx': s.lx, '--dur': s.dur, '--del': s.del, '--dx': s.dx, '--rise': s.rise })}
           />
         ))}
       </div>
@@ -1070,7 +1070,7 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
       <div className="arm-nodes">
         {RING.map((item, i) => {
           const isCap = item.kind === 'cap';
-          const health = isCap ? (capabilityHealth.get(item.cap.id) || 'live') : 'live';
+          const health = isCap ? (capabilityHealth.get(/** @type {any} */ (item).cap.id) || 'live') : 'live';
           const isDown = health === 'down';
           const isSoon = health === 'soon';
           return (
@@ -1083,17 +1083,17 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
               aria-expanded={isCap ? undefined : focusedIdx === i}
               aria-disabled={isDown || undefined}
               data-arm-group={i}
-              style={{ opacity: 0, '--pd': `${i * 0.5}s` }}
+              style={/** @type {any} */ ({ opacity: 0, '--pd': `${i * 0.5}s` })}
               onClick={(ev) => handleGroupTap(i, ev)}
               onKeyDown={(ev) => pressKey(ev, () => handleGroupTap(i, ev))}
             >
               <div className="arm-orb">
                 <i
                   className="arm-ic"
-                  style={{
+                  style={/** @type {any} */ ({
                     '--swD': `${(4.2 + rand(i + 2) * 2.4).toFixed(1)}s`,
                     '--swDel': `${(-rand(i + 11) * 4).toFixed(1)}s`,
-                  }}
+                  })}
                 >
                   {item.icon}
                 </i>
@@ -1133,10 +1133,10 @@ export default function AgentRedMenu({ onPick, disabled = false, anchorRef = nul
                 <div className="arm-orb">
                   <i
                     className="arm-ic"
-                    style={{
+                    style={/** @type {any} */ ({
                       '--swD': `${(3.8 + rand(i * 9 + j) * 2.5).toFixed(1)}s`,
                       '--swDel': `${(-rand(i + j + 19) * 4).toFixed(1)}s`,
-                    }}
+                    })}
                   >
                     {cap.icon}
                   </i>

@@ -985,10 +985,10 @@ export async function speakKokoro(text, options = {}) {
  *   3. Si Kokoro también falla → fallback a speak() Web Speech API
  *
  * @param {string} text - Texto a sintetizar (puede tener markdown)
- * @param {Object} options - Opciones adicionales
- * @param {string} options.voiceUrl - URL del audio sample colombiano (10s)
- * @param {string} options.format - Formato de audio output (mp3, wav)
- * @param {string} options.lang - Idioma (default 'es')
+ * @param {Object} [options] - Opciones adicionales
+ * @param {string} [options.voiceUrl] - URL del audio sample colombiano (10s)
+ * @param {string} [options.format] - Formato de audio output (mp3, wav)
+ * @param {string} [options.lang] - Idioma (default 'es')
  * @returns {Promise<Audio|null>} - Audio element o null si todos fallan
  */
 export async function speakXTTS(text, options = {}) {
@@ -1045,12 +1045,12 @@ export async function speakXTTS(text, options = {}) {
 
     await audio.play();
     notifySpeaking(true);
-    return audio;
+    return /** @type {any} */ (audio);
   } catch (e) {
     // Fallback a Kokoro si XTTS falla (timeout, error HTTP, XTTS not available)
     console.warn('[TTS] XTTS failed, fallback to Kokoro:', e.message);
     notifySpeaking(false);
-    return await speakKokoro(text, options);
+    return /** @type {any} */ (await speakKokoro(text, options));
   }
 }
 

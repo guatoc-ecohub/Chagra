@@ -120,7 +120,7 @@ export const buildDraftsFromVoice = ({
  * Resolución por defecto de ubicación — devuelve siempre null.
  * La resolución real se inyecta desde VoiceConfirmation (que usa el store).
  */
-function defaultResolveLocation() {
+function defaultResolveLocation(/** @type {any} */ _loc) {
   return null;
 }
 
