@@ -1,7 +1,7 @@
 /**
  * redMatchmaking.test.js — "pregúntele al vecino" + ruteo de dudas. Verifica
  * cercanía, competencia ganada (no declarada) y la decisión de enrutar.
- */
+  $$*/
 import { describe, it, expect } from 'vitest';
 import {
   proximidadTier,
@@ -50,13 +50,13 @@ describe('proximidadTier', () => {
 
 describe('findCompetentPeers', () => {
   it('filtra por cultivo, excluye rojo y nuevo, y a uno mismo', () => {
-    const reputaciones = [
+    const reputaciones = /** @type {any[]}  $$*/ ([
       rep({ productorHash: 'p1', nivel: NIVEL_REPUTACION.VERDE }),
       rep({ productorHash: 'p2', nivel: NIVEL_REPUTACION.ROJO }),
       rep({ productorHash: 'p3', nivel: NIVEL_REPUTACION.NUEVO }),
       rep({ productorHash: 'yo', nivel: NIVEL_REPUTACION.VERDE }),
       rep({ productorHash: 'p4', producto: 'Mora', productoNorm: 'mora' }),
-    ];
+    ]);
     const peers = findCompetentPeers(
       { producto: 'Tomate', vereda: 'El Curí', excludeHash: 'yo' },
       { reputaciones },
@@ -65,7 +65,7 @@ describe('findCompetentPeers', () => {
   });
 
   it('incluye nuevos si allowNuevo', () => {
-    const reputaciones = [rep({ productorHash: 'p3', nivel: NIVEL_REPUTACION.NUEVO })];
+    const reputaciones = /** @type {any[]} */ ([rep({ productorHash: 'p3', nivel: NIVEL_REPUTACION.NUEVO })]);
     const peers = findCompetentPeers(
       { producto: 'Tomate' },
       { reputaciones, allowNuevo: true },
@@ -74,11 +74,11 @@ describe('findCompetentPeers', () => {
   });
 
   it('ordena por cercanía y luego por score', () => {
-    const reputaciones = [
+    const reputaciones = /** @type {any[]}  $$*/ ([
       rep({ productorHash: 'lejano', vereda: 'X', municipio: 'Otro', score: 0.95 }),
       rep({ productorHash: 'vecino', vereda: 'El Curí', municipio: 'Choachí', score: 0.5 }),
       rep({ productorHash: 'municipio', vereda: 'Y', municipio: 'Choachí', score: 0.9 }),
-    ];
+    ]);
     const peers = findCompetentPeers(
       { producto: 'Tomate', vereda: 'El Curí', municipio: 'Choachí' },
       { reputaciones },
@@ -88,7 +88,7 @@ describe('findCompetentPeers', () => {
   });
 
   it('sin producto no devuelve nada', () => {
-    expect(findCompetentPeers({ producto: '' }, { reputaciones: [rep()] })).toEqual([]);
+    expect(findCompetentPeers({ producto: '' }, { reputaciones: /** @type {any} */ ([rep()]) })).toEqual([]);
   });
 });
 

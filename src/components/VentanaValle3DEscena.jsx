@@ -130,7 +130,7 @@ function AngelitaVuela({ reducedMotion, tier }) {
     <group ref={g} position={[0.45, 1.02, 0.9]}>
       <Html center distanceFactor={6} zIndexRange={[30, 10]} wrapperClass="vv-abeja-html">
         <div className="vv-abeja" aria-hidden="true">
-          <AbejaAngelita size={46} animo="pleno" energia={0.9} animated={!reducedMotion} tier={tier} />
+          <AbejaAngelita size={46} animo="pleno" energia={0.9} animated={!reducedMotion} tier={tier} tempC={0} />
         </div>
       </Html>
     </group>

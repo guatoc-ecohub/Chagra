@@ -87,7 +87,7 @@ describe('routeUtterance', () => {
         etiqueta: expect.any(String),
       });
       if (esperado.mundo) {
-        expect(r.initialData).toEqual({ mundo: esperado.mundo });
+        expect(/** @type {any} */ (r).initialData).toEqual({ mundo: esperado.mundo });
       }
     } else {
       expect(r).toMatchObject({ tipo: 'agente' });

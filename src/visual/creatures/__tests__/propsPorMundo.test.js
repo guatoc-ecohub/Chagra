@@ -27,7 +27,7 @@ describe('propDeMundo — mapa del spec', () => {
 
   it('entrada no-string → null (defensivo)', () => {
     expect(propDeMundo(undefined)).toBeNull();
-    expect(propDeMundo(42)).toBeNull();
+    expect(propDeMundo(/** @type {any} */ (42))).toBeNull();
     expect(propDeMundo(null)).toBeNull();
   });
 

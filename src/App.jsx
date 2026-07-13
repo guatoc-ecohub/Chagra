@@ -3550,6 +3550,7 @@ export default function App() {
               />
               <EntradaValle3DMockup onBack={() => navigate(sinSesion ? 'login' : 'dashboard')} onNavigate={navigate} />
                 onNavigate={navigate}
+                // @ts-ignore initialMundoId not in strict type
                 initialMundoId={currentViewData?.mundo}
               />
             </ErrorFallback>

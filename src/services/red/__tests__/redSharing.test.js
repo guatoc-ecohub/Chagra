@@ -51,7 +51,7 @@ describe('normalizeShareLevel', () => {
 describe('withDefaultShareLevel', () => {
   it('estampa PRIVADO por default y no muta el original', () => {
     const original = { producto: 'Mora' };
-    const out = withDefaultShareLevel(original);
+    const out = withDefaultShareLevel(/** @type {any} */(original));
     expect(out.shareLevel).toBe(1);
     expect(original.shareLevel).toBeUndefined();
   });

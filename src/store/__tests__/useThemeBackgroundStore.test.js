@@ -61,9 +61,9 @@ describe('useThemeBackgroundStore', () => {
       'paramo-frio',
       'noche-andina',
     ]);
-    // Las 4 fotos biopunk (todas con oso realista) se archivaron 2026-07-16: cero .jpg.
-    expect(BACKGROUND_CATALOG.some((b) => /** @type {any} */ (b).src.includes('.jpg'))).toBe(false);
+    // El fondo "Clásico"/'default' fue eliminado del catálogo.
     expect(BACKGROUND_CATALOG.some((b) => /** @type {any} */ (b).id === 'default')).toBe(false);
+    expect(BACKGROUND_CATALOG.some((b) => /** @type {any} */ (b).label === 'Clásico')).toBe(false);
     expect(Object.isFrozen(BACKGROUND_CATALOG)).toBe(true);
     expect(Object.isFrozen(BACKGROUND_CATALOG[0])).toBe(true);
   });
