@@ -26,7 +26,17 @@ import { auraDeBicho } from './transformacion.js';
    del oso). La IDENTIDAD (paleta + proporciones + perfil de clima) vive en
    `jaguarIdentidad.js`; el CLIMA→cuerpo, en `creatureClimaCuerpo.js` con
    PERFIL_JAGUAR (pelaje lustroso que escurre agua, robusto ante la seca) — y de
-   tierra cálida: NUNCA suda (aguanta el calor sin sudar ni sombrero). */
+   tierra cálida: NUNCA suda (aguanta el calor sin sudar ni sombrero).
+
+   MÍSTICO (cosmología andino-amazónica: el jaguar es el ANIMAL-ESPÍRITU DEL
+   CHAMÁN — transformación, mundo espiritual, visión nocturna, poder sagrado).
+   Tejido con gusto, permanente y sutil: OJOS LUMINOSOS que respiran
+   (fosforescencia, visión nocturna del espíritu), un AURA ESPECTRAL etérea que
+   lo envuelve (no solo en poder), CONSTELACIONES de geometría sagrada sobre las
+   rosetas (estrellas que titilan, patrón andino) y un SHIMMER espectral en el
+   contorno. En modo poder el aura, los ojos y las estrellas se vuelven
+   CHAMÁNICOS (el jaguar-espíritu se revela). Todo se PODA en tier bajo /
+   reduced-motion (queda un fotograma digno y quieto). */
 const VIEWBOX = '-16 -20 32 40';
 
 /* Roseta del jaguar: anillo oscuro con centro ocre (la firma de la especie —
@@ -40,6 +50,35 @@ function Roseta({ cx, cy, r = 1.5, ink, centro, opacity = 0.9 }) {
     </g>
   );
 }
+
+/* Estrella de constelación — el titileo "de geometría sagrada" sobre las
+   rosetas (el jaguar-espíritu lleva el cielo nocturno en la piel). Sparkle de 4
+   puntas; titila (.jaguar-estrella) solo viva — con animated=false / RM queda
+   quieta y digna. */
+function Estrella({ cx, cy, r = 0.9, color, delay = 0, vivo = false }) {
+  const p = r * 0.26;
+  return (
+    <g
+      className={vivo ? 'jaguar-estrella' : undefined}
+      style={{ transformBox: 'fill-box', transformOrigin: 'center', ...(vivo ? { animationDelay: `${delay}s` } : null) }}
+    >
+      <path
+        d={`M${cx},${cy - r} L${cx + p},${cy - p} L${cx + r},${cy} L${cx + p},${cy + p} L${cx},${cy + r} L${cx - p},${cy + p} L${cx - r},${cy} L${cx - p},${cy - p} Z`}
+        fill={color}
+      />
+    </g>
+  );
+}
+
+/* Vértices de la constelación: coinciden con centros de rosetas (frente + lomo)
+   para que el "cielo" viva SOBRE las manchas. */
+const ESTRELLAS = [
+  { cx: -3.4, cy: -10.6, r: 0.85, d: 0 },
+  { cx: 3.4, cy: -10.6, r: 0.85, d: -0.5 },
+  { cx: -5.4, cy: 2.6, r: 0.95, d: -1.1 },
+  { cx: 2.4, cy: -0.6, r: 0.8, d: -0.7 },
+  { cx: 5.6, cy: 1.4, r: 0.95, d: -1.5 },
+];
 
 export function Jaguar({
   size = 64,
@@ -173,6 +212,13 @@ export function Jaguar({
   //    controlado y elegante — poder contenido).
   const body = (
     <g className={`crt-body${vivo ? ' rh-boil' : ''}`} filter={`url(#${glow})`}>
+      {/* AURA ESPECTRAL etérea (PERMANENTE, sutil): la presencia sagrada del
+          jaguar-espíritu del chamán envuelve al felino aun en reposo. Late lento
+          y se vuelve CHAMÁNICA en modo poder (CSS). */}
+      <circle className={vivo ? 'jaguar-aura-espectral' : undefined}
+        cx="0" cy="1.4" r={auraR + 2.6} fill={P.espectral} opacity="0.13"
+        filter={`url(#${blur})`}
+        style={{ transformBox: 'fill-box', transformOrigin: 'center' }} aria-hidden="true" />
       {/* aura viva */}
       <circle cx="0" cy="2" r={auraR} fill={P.cuerpo} opacity={auraOp} filter={`url(#${blur})`} />
 
@@ -212,6 +258,12 @@ export function Jaguar({
       <ellipse cx="0" cy="2" rx={PR.troncoRx} ry={PR.troncoRy}
         fill={P.cuerpo} stroke={RH_INK} strokeWidth="1.4"
         style={{ filter: `drop-shadow(0 0 6px ${P.cuerpoGlow})` }} />
+      {/* SHIMMER MÍSTICO — destello espectral sutil en el contorno (se apoya en
+          el glow del cuerpo; el line-boil lo remata en su entrada heroica).
+          Pulsa lento; se intensifica en modo poder (CSS). */}
+      <ellipse className={vivo ? 'jaguar-shimmer' : undefined}
+        cx="0" cy="2" rx={PR.troncoRx} ry={PR.troncoRy}
+        fill="none" stroke={P.espectral} strokeWidth="0.8" opacity="0.16" aria-hidden="true" />
       {/* vientre/pecho crema */}
       <path d="M0,-4.2 C4.2,-3.2 5.4,2 4.0,6.2 C2.4,9.0 -2.4,9.0 -4.0,6.2 C-5.4,2 -4.2,-3.2 0,-4.2 Z"
         fill={P.vientre} opacity="0.9" />
@@ -224,6 +276,19 @@ export function Jaguar({
         <Roseta cx={6.6} cy={4.6} r={1.15} ink={P.roseta} centro={P.rosetaCentro} opacity={0.8} />
         <Roseta cx={2.4} cy={-0.6} r={1.2} ink={P.roseta} centro={P.rosetaCentro} opacity={0.85} />
         <Roseta cx={-6.6} cy={-0.8} r={1.2} ink={P.roseta} centro={P.rosetaCentro} opacity={0.8} />
+      </g>
+
+      {/* CONSTELACIÓN — geometría sagrada sobre las rosetas: líneas etéreas
+          punteadas (el patrón andino) + estrellas que TITILAN en los centros de
+          mancha. El cielo nocturno del jaguar-espíritu. Decorativa. */}
+      <g className="jaguar-constelacion" aria-hidden="true">
+        <path d="M-3.4,-10.6 L3.4,-10.6" fill="none" stroke={P.espectral}
+          strokeWidth="0.3" strokeLinecap="round" strokeDasharray="0.5 1.1" opacity="0.28" />
+        <path d="M-5.4,2.6 L2.4,-0.6 L5.6,1.4" fill="none" stroke={P.espectral}
+          strokeWidth="0.3" strokeLinecap="round" strokeDasharray="0.5 1.1" opacity="0.28" />
+        {ESTRELLAS.map((e, i) => (
+          <Estrella key={i} cx={e.cx} cy={e.cy} r={e.r} delay={e.d} color={P.estrella} vivo={vivo} />
+        ))}
       </g>
 
       {/* OMÓPLATOS del ACECHO (la firma del jaguar): dos picos musculosos sobre el
@@ -277,6 +342,14 @@ export function Jaguar({
         <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.55" opacity="0.85">
           <circle cx="-2.5" cy="-9.2" r="1.32" />
           <circle cx="2.5" cy="-9.2" r="1.32" />
+        </g>
+        {/* OJOS LUMINOSOS — fosforescencia del espíritu (visión nocturna del
+            chamán): un halo suave que respira sobre cada ojo. Sutil siempre;
+            CHAMÁNICO (más brillante) en modo poder (CSS). */}
+        <g className={vivo ? 'jaguar-ojo-brillo' : undefined} filter={`url(#${blur})`} aria-hidden="true"
+          style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+          <circle cx="-2.5" cy="-9.2" r="1.15" fill={P.ojoBrillo} opacity="0.55" />
+          <circle cx="2.5" cy="-9.2" r="1.15" fill={P.ojoBrillo} opacity="0.55" />
         </g>
       </g>
 

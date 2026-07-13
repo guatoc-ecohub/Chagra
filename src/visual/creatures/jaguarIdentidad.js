@@ -42,6 +42,10 @@ export const JAGUAR_PALETA = {
   oreja: '#7a4718',         // dorso oscuro de la oreja
   iris: '#e8a53a',          // ojo felino ámbar (mirada intensa)
   colmillo: '#fff8ec',      // colmillos del rugido
+  /* ── Místico (el jaguar-espíritu del chamán, cosmología andino-amazónica) ── */
+  espectral: '#b98cff',     // aura etérea / presencia sagrada (violeta espectral)
+  estrella: '#efe6ff',      // el titileo de las constelaciones en las rosetas
+  ojoBrillo: '#ffe6a0',     // fosforescencia del ojo-espíritu (visión nocturna)
 };
 
 export const JAGUAR_PROPORCION = {

@@ -895,3 +895,104 @@
   [data-creature='jaguar'][data-acecha='1'] .crt-body,
   [data-creature='jaguar'][data-acecha='1'] .jaguar-cejas { animation: none !important; }
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   JAGUAR MÍSTICO — el animal-espíritu del chamán (cosmología andino-amazónica).
+   Capas PERMANENTES y sutiles (elegante, no recargado): aura espectral etérea,
+   ojos luminosos (fosforescencia), estrellas de constelación en las rosetas y
+   un shimmer espectral. En modo poder se vuelven CHAMÁNICAS (se revela el
+   espíritu). Todo transform/opacity. Se PODA en tier bajo / reduced-motion.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* AURA ESPECTRAL — la presencia sagrada envuelve al felino; respira lento. */
+.jaguar-aura-espectral {
+  animation: jaguar-aura-espectral 5.2s ease-in-out infinite;
+}
+@keyframes jaguar-aura-espectral {
+  0%, 100% { opacity: 0.11; transform: scale(1); }
+  50%      { opacity: 0.2;  transform: scale(1.05); }
+}
+
+/* OJOS LUMINOSOS — fosforescencia del espíritu (visión nocturna): late suave. */
+.jaguar-ojo-brillo {
+  animation: jaguar-ojo-latido 3.3s ease-in-out infinite;
+}
+@keyframes jaguar-ojo-latido {
+  0%, 100% { opacity: 0.55; transform: scale(0.96); }
+  50%      { opacity: 1;    transform: scale(1.06); }
+}
+
+/* ESTRELLAS de la constelación — titilan como el cielo nocturno andino
+   (staggered por el delay inline de cada estrella). */
+.jaguar-estrella {
+  animation: jaguar-titilar 2.3s ease-in-out infinite;
+}
+@keyframes jaguar-titilar {
+  0%, 100% { opacity: 0.35; transform: scale(0.82); }
+  50%      { opacity: 1;    transform: scale(1.15); }
+}
+
+/* SHIMMER — destello espectral que recorre el contorno (pulso lento). */
+.jaguar-shimmer {
+  animation: jaguar-shimmer 4.6s ease-in-out infinite;
+}
+@keyframes jaguar-shimmer {
+  0%, 100% { opacity: 0.12; }
+  50%      { opacity: 0.32; }
+}
+
+/* MODO PODER CHAMÁNICO — el jaguar-espíritu se revela: el aura, los ojos y las
+   estrellas se intensifican y aceleran. Vale tanto en standalone (wrapper
+   .jaguar-poder) como en inline (data-poder en el <g>). */
+.jaguar-poder .jaguar-aura-espectral,
+[data-creature='jaguar'][data-poder='1'] .jaguar-aura-espectral {
+  animation-name: jaguar-aura-chaman;
+  animation-duration: 3.0s;
+}
+@keyframes jaguar-aura-chaman {
+  0%, 100% { opacity: 0.22; transform: scale(1.02); }
+  50%      { opacity: 0.4;  transform: scale(1.1); }
+}
+.jaguar-poder .jaguar-ojo-brillo,
+[data-creature='jaguar'][data-poder='1'] .jaguar-ojo-brillo {
+  animation-name: jaguar-ojo-chaman;
+  animation-duration: 2.1s;
+}
+@keyframes jaguar-ojo-chaman {
+  0%, 100% { opacity: 0.85; transform: scale(1.02); }
+  50%      { opacity: 1;    transform: scale(1.22); }
+}
+.jaguar-poder .jaguar-estrella,
+[data-creature='jaguar'][data-poder='1'] .jaguar-estrella {
+  animation-name: jaguar-titilar-chaman;
+  animation-duration: 1.5s;
+}
+@keyframes jaguar-titilar-chaman {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.4); }
+}
+.jaguar-poder .jaguar-shimmer,
+[data-creature='jaguar'][data-poder='1'] .jaguar-shimmer {
+  animation-duration: 2.4s;
+}
+
+/* device-tier 'bajo': PODA el brillo/estrellas místicas (raster caro en gama
+   baja) — se detiene la animación y queda un rastro estático y digno. */
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-aura-espectral,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-ojo-brillo,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-shimmer { animation: none; }
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-estrella { animation: none; opacity: 0.4; }
+
+@media (prefers-reduced-motion: reduce) {
+  .jaguar-aura-espectral, .jaguar-ojo-brillo, .jaguar-shimmer,
+  .jaguar-poder .jaguar-aura-espectral,
+  .jaguar-poder .jaguar-ojo-brillo,
+  .jaguar-poder .jaguar-shimmer,
+  [data-creature='jaguar'][data-poder='1'] .jaguar-aura-espectral,
+  [data-creature='jaguar'][data-poder='1'] .jaguar-ojo-brillo,
+  [data-creature='jaguar'][data-poder='1'] .jaguar-shimmer { animation: none !important; }
+  /* Estrellas: sin titileo, quietas y tenues (fotograma digno). */
+  .jaguar-estrella,
+  .jaguar-poder .jaguar-estrella,
+  [data-creature='jaguar'][data-poder='1'] .jaguar-estrella { animation: none !important; opacity: 0.5; }
+}

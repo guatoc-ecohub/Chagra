@@ -155,6 +155,45 @@ describe('5. Prop por mundo — herramienta en la zarpa', () => {
   });
 });
 
+describe('6. Toque místico — el animal-espíritu del chamán (permanente y sutil)', () => {
+  it('trae SIEMPRE aura espectral, ojos luminosos, constelación y shimmer', () => {
+    const { container } = render(<Jaguar />);
+    expect(container.querySelector('.jaguar-aura-espectral')).toBeTruthy();  // aura etérea permanente
+    expect(container.querySelector('.jaguar-ojo-brillo')).toBeTruthy();      // ojos luminosos
+    expect(container.querySelector('.jaguar-constelacion')).toBeTruthy();    // geometría sagrada
+    expect(container.querySelector('.jaguar-shimmer')).toBeTruthy();         // shimmer espectral
+    // las estrellas titilan (varias, sobre las rosetas)
+    expect(container.querySelectorAll('.jaguar-estrella').length).toBeGreaterThan(1);
+  });
+
+  it('el aura espectral es PERMANENTE (existe sin pedir modo poder)', () => {
+    const { container } = render(<Jaguar />);
+    // no hay power-up, pero el aura sagrada igual envuelve al jaguar
+    expect(container.querySelector('.is-powered-up')).toBeNull();
+    expect(container.querySelector('.jaguar-aura-espectral')).toBeTruthy();
+  });
+
+  it('reduced-motion-safe / tier-safe: con animated=false NO se anima el titileo (fotograma digno)', () => {
+    const { container } = render(<Jaguar animated={false} />);
+    // sin vida: no se cuelgan las clases que animan (aura/ojos/estrellas/shimmer)…
+    expect(container.querySelector('.jaguar-estrella')).toBeNull();
+    expect(container.querySelector('.jaguar-aura-espectral')).toBeNull();
+    expect(container.querySelector('.jaguar-ojo-brillo')).toBeNull();
+    expect(container.querySelector('.jaguar-shimmer')).toBeNull();
+    // …pero la constelación (geometría sagrada) sigue dibujada, quieta y digna.
+    expect(container.querySelector('.jaguar-constelacion')).toBeTruthy();
+  });
+
+  it('modo poder CHAMÁNICO: las estrellas y el aura siguen dentro del power-up', () => {
+    const { container } = render(<Jaguar poder />);
+    const wrap = container.querySelector('.is-powered-up.jaguar-poder');
+    expect(wrap).toBeTruthy();
+    // el jaguar-espíritu se revela: aura + estrellas viven dentro del wrapper
+    expect(wrap.querySelector('.jaguar-aura-espectral')).toBeTruthy();
+    expect(wrap.querySelectorAll('.jaguar-estrella').length).toBeGreaterThan(1);
+  });
+});
+
 describe('Anti-regresión — modo inline no rompe la escena', () => {
   it('inline devuelve un <g> con el data-creature y marca data-poder', () => {
     const { container } = render(
