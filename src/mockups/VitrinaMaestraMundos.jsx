@@ -1151,7 +1151,10 @@ function Cordilleras() {
   );
 }
 
-/* Las terrazas de cultivo detrás de la fila de atrás — el valle SE SIEMBRA. */
+/* Las terrazas de cultivo detrás de la fila de atrás — el valle SE SIEMBRA.
+   ARCOS ABIERTOS solo del lado del fondo (θ ∈ [π/2, 3π/2] ⇒ z<0): un cilindro
+   cerrado a estos radios pasaría por la POSE de la cámara (z=+12.8) y su
+   pared taparía todo el encuadre (bug cazado por screenshot en la 1ª pasada). */
 function Terrazas() {
   return (
     <group>
@@ -1161,8 +1164,8 @@ function Terrazas() {
         { r: 17.5, y: 3.8, color: mezclar(PALETA.follajeOscuro, CIELO.alfombra, 0.35) },
       ].map((t, i) => (
         <mesh key={i} position={[0, t.y - 0.9, -6]}>
-          <cylinderGeometry args={[t.r, t.r + 1.6, 1.8, 26, 1]} />
-          <meshLambertMaterial color={t.color} flatShading />
+          <cylinderGeometry args={[t.r, t.r + 1.6, 1.8, 26, 1, true, Math.PI / 2, Math.PI]} />
+          <meshLambertMaterial color={t.color} flatShading side={THREE.DoubleSide} />
         </mesh>
       ))}
     </group>
@@ -1539,7 +1542,32 @@ const CSS_VMX = `
   justify-content: space-between;
   gap: 12px;
 }
-.vmx-abeja { flex: 0 0 auto; filter: drop-shadow(0 3px 4px rgba(58,42,24,0.25)); }
+.vmx-abeja { flex: 0 0 auto; filter: drop-shadow(0 3px 4px rgba(58,42,24,0.25)); transition: opacity 150ms ease; }
+/* mientras Angelita cruza, su puesto del chrome queda vacío al instante */
+.vmx-raiz[data-fase='acercando'] .vmx-abeja,
+.vmx-raiz[data-viaje='1'] .vmx-abeja { opacity: 0; }
+
+/* ── Angelita ENTRA al mundo: la picada hacia la boca del portal ──
+   El dolly centra el portal elegido en pantalla; la abeja sale de su puesto
+   (arriba a la derecha), traza un arco y se clava en el centro encogiéndose
+   hasta desaparecer — mismo pulso del viaje (1.25 s), ease-in de succión. */
+.vmx-abeja-cruce {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  z-index: 30;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 4px rgba(58, 42, 24, 0.3));
+  animation: vmx-picada 1250ms cubic-bezier(0.55, -0.15, 0.8, 0.5) forwards;
+}
+@keyframes vmx-picada {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+  45% { transform: translate(calc(-25vw + 20px), calc(18dvh)) scale(0.85) rotate(-24deg); opacity: 1; }
+  100% { transform: translate(calc(-50vw + 52px), calc(50dvh - 48px)) scale(0.04) rotate(-80deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vmx-abeja-cruce { display: none; }
+}
 
 .vmx-pie { display: flex; flex-direction: column; gap: 10px; }
 .vmx-senal {
@@ -1855,6 +1883,15 @@ export default function VitrinaMaestraMundos({ onBack }) {
         <button type="button" className="vmx-volver" onClick={onBack}>
           Volver
         </button>
+      )}
+
+      {/* Angelita entra al mundo: el clon que hace la picada al centro del
+          portal durante el cruce (el dolly deja la boca justo ahí). En tier
+          bajo también vuela — el iris la alcanza a mitad de picada. */}
+      {!reducedMotion && fase !== 'mundo' && (fase === 'acercando' || viaje === 'entrar') && (
+        <div className="vmx-abeja-cruce" aria-hidden="true">
+          <AbejaAngelita size={60} animo="atento" energia={1} animated tier={tier} />
+        </div>
       )}
 
       <div className="vmx-vineta" aria-hidden="true" />
