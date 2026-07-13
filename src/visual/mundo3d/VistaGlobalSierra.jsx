@@ -47,9 +47,10 @@
  *     pisoUsuario="frio"          // opcional: resalta el piso de la finca
  *   />                            // 'calido'|'templado'|'frio'|'paramo'|'superparamo'|'nival'
  *
- *   // O componer el grupo dentro de un Canvas propio:
+ *   // O componer el grupo dentro de un Canvas propio (encuadre inmersivo:
+ *   // desde el mar mirando al sur; target ≈ [0, 2.3, 2.5]):
  *   import { SierraDiorama } from './visual/mundo3d/VistaGlobalSierra.jsx';
- *   <Canvas camera={{ position: [-3.6, 5.6, -15], fov: 40 }}>
+ *   <Canvas camera={{ position: [-1.5, 5.2, -11], fov: 48 }}>
  *     <SierraDiorama tier={tier} reducedMotion={reducedMotion} />
  *   </Canvas>
  *
@@ -289,13 +290,26 @@ function LucesDoradas() {
   );
 }
 
-/* Etiqueta sobria de un lugar (sin ornamento, tipografía discreta). */
-function Rotulo({ pos, texto, sub, distancia = 20 }) {
+/* Etiqueta sobria de un lugar, con LEADER LINE: el grupo se ancla en el punto
+   geográfico (cima, desembocadura) y una línea fina sube hasta el rótulo. El
+   `alto` se ESCALONA entre rótulos vecinos para que nunca colisionen en
+   pantalla (Cristóbal Colón·Bolívar arriba, Simmonds a media asta, Palomino a
+   ras de costa), sin importar el barrido de la órbita. */
+function Rotulo({ pos, texto, sub, distancia = 12, alto = 0.6 }) {
   return (
     <group position={pos}>
-      <Html center distanceFactor={distancia} zIndexRange={[30, 10]} style={{ pointerEvents: 'none' }}>
+      {/* punto de anclaje sobre el lugar */}
+      <mesh position={[0, 0.04, 0]}>
+        <sphereGeometry args={[0.055, 10, 8]} />
+        <meshBasicMaterial color="#fff3cf" depthWrite={false} />
+      </mesh>
+      {/* la línea guía hasta el rótulo */}
+      <mesh position={[0, alto / 2, 0]}>
+        <cylinderGeometry args={[0.014, 0.014, alto, 6]} />
+        <meshBasicMaterial color="#5a4326" transparent opacity={0.65} depthWrite={false} />
+      </mesh>
+      <Html center position={[0, alto + 0.12, 0]} distanceFactor={distancia} zIndexRange={[30, 10]} style={{ pointerEvents: 'none' }}>
         <div className="vsierra-rotulo" aria-hidden="true">
-          <span className="vsierra-rotulo__punto" />
           <span className="vsierra-rotulo__txt">
             {texto}
             {sub ? <em className="vsierra-rotulo__sub">{sub}</em> : null}
@@ -400,10 +414,12 @@ export function SierraDiorama({
       <Mar reducedMotion={reducedMotion} conNiebla={perfil.fog} />
       <NubesDeNiebla cuantas={nubes} reducedMotion={reducedMotion} />
 
-      {/* Rótulos sobrios de los lugares exigidos por el encargo. */}
-      <Rotulo pos={[CUMBRE.x, CUMBRE.y + 0.5, CUMBRE.z]} texto="Cristóbal Colón · Simón Bolívar" sub="5.775 m" distancia={26} />
-      <Rotulo pos={[SIMMONDS.x, SIMMONDS.y + 0.45, SIMMONDS.z]} texto="Pico Simmonds" sub="5.560 m" distancia={22} />
-      <Rotulo pos={[PALOMINO.x, PALOMINO.y + 0.35, PALOMINO.z]} texto="Palomino" sub="Caribe · 0 m" distancia={18} />
+      {/* Rótulos sobrios de los lugares exigidos por el encargo. Los `alto`
+          escalonados (1.25 / 0.6 / 0.45) separan los rótulos verticalmente en
+          pantalla — antes se encimaban ilegibles sobre las cumbres. */}
+      <Rotulo pos={[CUMBRE.x, CUMBRE.y, CUMBRE.z]} texto="Cristóbal Colón · Simón Bolívar" sub="5.775 m" distancia={13} alto={1.25} />
+      <Rotulo pos={[SIMMONDS.x, SIMMONDS.y, SIMMONDS.z]} texto="Pico Simmonds" sub="5.560 m" distancia={12} alto={0.6} />
+      <Rotulo pos={[PALOMINO.x, PALOMINO.y, PALOMINO.z]} texto="Palomino" sub="Caribe · 0 m" distancia={11} alto={0.45} />
 
       {pisoUsuario && <MarcadorPiso piso={pisoUsuario} />}
       {credito && <CreditoPueblos />}
@@ -413,11 +429,10 @@ export function SierraDiorama({
 
 /* Estilos de los rótulos y pie de crédito (viven aquí: son de ESTA escena). */
 const CSS_SIERRA = `
-.vsierra-root { position: relative; width: 100%; height: 100%; min-height: 320px; overflow: hidden; background: ${ATMOSFERA.fondo}; }
+.vsierra-root { position: relative; width: 100%; height: 100dvh; min-height: 320px; overflow: hidden; background: ${ATMOSFERA.fondo}; }
 .vsierra-canvas { position: absolute; inset: 0; opacity: 0; transition: opacity 0.7s ease; }
 .vsierra-canvas--lista { opacity: 1; }
-.vsierra-rotulo { display: flex; align-items: center; gap: 0.34rem; white-space: nowrap; transform: translateY(-0.2rem); font: 600 0.74rem/1.1 system-ui, sans-serif; color: #402c16; text-shadow: 0 1px 3px rgba(255,246,224,0.9); }
-.vsierra-rotulo__punto { width: 7px; height: 7px; border-radius: 50%; background: #fff3cf; box-shadow: 0 0 0 2px rgba(64,44,22,0.55); flex: 0 0 auto; }
+.vsierra-rotulo { white-space: nowrap; font: 600 0.78rem/1.15 system-ui, sans-serif; color: #402c16; padding: 0.16rem 0.5rem; border-radius: 999px; background: rgba(255,248,233,0.82); box-shadow: 0 1px 5px rgba(60,42,24,0.22); }
 .vsierra-rotulo__txt { display: inline-flex; align-items: baseline; gap: 0.3rem; }
 .vsierra-rotulo__sub { font-weight: 500; font-style: normal; opacity: 0.72; font-size: 0.9em; }
 .vsierra-aqui { padding: 0.2rem 0.55rem; border-radius: 999px; background: rgba(64,44,22,0.82); color: #fff3d6; font: 600 0.72rem/1.1 system-ui, sans-serif; white-space: nowrap; box-shadow: 0 2px 8px rgba(30,18,6,0.3); }
@@ -426,10 +441,11 @@ const CSS_SIERRA = `
 .vsierra-chrome { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
 .vsierra-titulo { margin: 0; padding: 0.9rem 1rem 0; color: #3a2a18; text-shadow: 0 1px 4px rgba(255,246,224,0.85); font: 700 1.15rem/1.2 system-ui, sans-serif; letter-spacing: 0.01em; }
 .vsierra-titulo small { display: block; font: 500 0.8rem/1.3 system-ui, sans-serif; opacity: 0.78; margin-top: 0.15rem; }
-.vsierra-clave { align-self: flex-end; margin: 0 0.8rem; display: flex; flex-direction: column; gap: 0.24rem; padding: 0.5rem 0.65rem; border-radius: 0.7rem; background: rgba(255,248,233,0.72); backdrop-filter: blur(3px); box-shadow: 0 4px 14px rgba(60,42,24,0.16); }
+.vsierra-clave { align-self: flex-end; margin: 0 0.8rem 0.55rem; display: flex; flex-direction: column; gap: 0.24rem; padding: 0.5rem 0.65rem; border-radius: 0.7rem; background: rgba(255,248,233,0.72); backdrop-filter: blur(3px); box-shadow: 0 4px 14px rgba(60,42,24,0.16); }
 .vsierra-clave li { display: flex; align-items: center; gap: 0.42rem; list-style: none; font: 500 0.72rem/1.1 system-ui, sans-serif; color: #3a2a18; }
 .vsierra-clave b { width: 12px; height: 12px; border-radius: 3px; flex: 0 0 auto; box-shadow: inset 0 0 0 1px rgba(60,42,24,0.18); }
 .vsierra-clave ul { margin: 0; padding: 0; }
+.vsierra-abajo { display: flex; flex-direction: column; align-items: stretch; }
 .vsierra-pie { pointer-events: none; padding: 0 1rem 0.85rem; display: flex; justify-content: center; }
 .vsierra-pie p { margin: 0; max-width: 42rem; text-align: center; padding: 0.42rem 0.85rem; border-radius: 0.7rem; background: rgba(24,16,7,0.5); backdrop-filter: blur(3px); color: #f4ecdd; font: 500 0.76rem/1.4 system-ui, sans-serif; }
 @media (prefers-reduced-motion: reduce) { .vsierra-canvas { transition: none; } }
@@ -466,10 +482,17 @@ export default function VistaGlobalSierra({
         className={`vsierra-canvas${listo ? ' vsierra-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [-3.6, 5.6, -15], fov: 40 }}
+        camera={{ position: [-1.5, 5.2, -11], fov: 48 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
+        {/* Cámara PARADA sobre el mar Caribe (−Z, norte), mirando al SUR (+Z) y
+            un poco hacia arriba: el mar llena el primer plano y las cumbres
+            nevadas suben en el tercio superior. El encuadre roto anterior venía
+            de clamps de azimuth centrados en 0 (lado equivocado) con la cámara
+            en −Z (azimuth ≈ ±π): OrbitControls la teletransportaba fuera del
+            macizo. Aquí los clamps abrazan el azimuth natural (≈ −3.0 rad). El
+            `fov` vertical (48°) encuadra igual en portrait y en landscape. */}
         <SierraDiorama
           tier={tier}
           reducedMotion={reducedMotion}
@@ -480,13 +503,13 @@ export default function VistaGlobalSierra({
           makeDefault
           enablePan={false}
           enableZoom
-          minDistance={11}
-          maxDistance={24}
-          target={[-0.2, 2.4, 2.4]}
-          minPolarAngle={0.55}
-          maxPolarAngle={1.32}
-          minAzimuthAngle={-0.85}
-          maxAzimuthAngle={0.5}
+          minDistance={9}
+          maxDistance={16}
+          target={[0, 2.3, 2.5]}
+          minPolarAngle={1.05}
+          maxPolarAngle={1.45}
+          minAzimuthAngle={-Math.PI}
+          maxAzimuthAngle={-2.75}
           enableDamping
           dampingFactor={0.08}
           autoRotate={!reducedMotion}
@@ -495,28 +518,32 @@ export default function VistaGlobalSierra({
         <AdaptiveDpr pixelated />
       </Canvas>
 
-      {/* Chrome DOM: título, clave de pisos (accesible) y pie de crédito. */}
+      {/* Chrome DOM anclado a la composición: título arriba; abajo la clave de
+          pisos (accesible) y el pie de crédito, apoyados sobre la playa/mar del
+          encuadre — nada flota fuera de la escena. */}
       <div className="vsierra-chrome">
         <h2 className="vsierra-titulo">
           Sierra Nevada de Santa Marta
           <small>Del Caribe a la nieve: todos los pisos térmicos en un solo macizo</small>
         </h2>
-        <ul className="vsierra-clave" aria-label="Pisos térmicos, de la nieve al mar">
-          {CLAVE_PISOS.map((b) => (
-            <li key={b.t}>
-              <b style={{ background: b.c }} aria-hidden="true" />
-              {b.t}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="vsierra-pie">
-        <p role="contentinfo">
-          Territorio ancestral y sagrado de los pueblos Kogui, Arhuaco (Iku),
-          Wiwa y Kankuamo — el Corazón del Mundo, dentro de la Línea Negra.
-          Representado con respeto; su uso público requiere consulta con las
-          comunidades.
-        </p>
+        <div className="vsierra-abajo">
+          <ul className="vsierra-clave" aria-label="Pisos térmicos, de la nieve al mar">
+            {CLAVE_PISOS.map((b) => (
+              <li key={b.t}>
+                <b style={{ background: b.c }} aria-hidden="true" />
+                {b.t}
+              </li>
+            ))}
+          </ul>
+          <div className="vsierra-pie">
+            <p role="contentinfo">
+              Territorio ancestral y sagrado de los pueblos Kogui, Arhuaco (Iku),
+              Wiwa y Kankuamo — el Corazón del Mundo, dentro de la Línea Negra.
+              Representado con respeto; su uso público requiere consulta con las
+              comunidades.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );
