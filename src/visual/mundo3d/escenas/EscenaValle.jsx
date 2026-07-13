@@ -26,6 +26,22 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Valle3D from '../../../mockups/valle/Valle3D.jsx';
+import { FaunaAmbiental } from '../../creatures/FaunaAmbiental.jsx';
+import useAvatarCreature from '../../../hooks/useAvatarCreature.js';
+
+/* EL VALLE VIVO: los personajes asoman A LO LEJOS (banda del horizonte y
+   bordes), hacen su giño y se van — nunca más de lo que el tier aguanta.
+   EL CENTRAL MANDA: el avatar elegido (useAvatarCreature) se RESERVA para el
+   protagonismo — jamás sale de extra en el coro. Angelita también queda fuera
+   SIEMPRE: ella ya vuela en primer plano DENTRO de Valle3D (CompaneroAbeja);
+   cuando ese acompañante se cable al avatar, esta exclusión sigue valiendo. */
+const PUNTOS_FAUNA_VALLE = [
+  { estilo: { left: '5%', top: '42%' }, tam: 44, lado: 'izq' },
+  { estilo: { right: '6%', top: '36%' }, tam: 38, voltear: true, lado: 'der' },
+  { estilo: { left: '32%', top: '28%' }, tam: 32, lado: 'bosque' },
+];
+/* Constante de módulo: identidad estable para el memo del elenco. */
+const EXCLUIR_FAUNA_VALLE = ['abeja-angelita'];
 
 /* Cuánto dura el clima "prestado" antes de volver solo al real. */
 const DURACION_TOQUE_MS = 9000;
@@ -80,6 +96,9 @@ export default function EscenaValle({
   estadoFinca = undefined, hayAlerta = false, // §5b: Angelita refleja el estado real también en el mapa
 }) {
   const climaReal = params?.clima || entrada?.clima || 'soleado';
+  /* El avatar elegido por la persona: se reserva para el protagonismo (el
+     coro ambiental lo excluye — el central manda, nadie lo duplica de extra). */
+  const avatar = useAvatarCreature();
   /* El clima "prestado" por el toque: null | 'lluvia' | 'dorada'. Mientras vive,
      pisa al real; el temporizador SIEMPRE lo devuelve (honestidad estructural). */
   const [toque, setToque] = useState(null);
@@ -131,6 +150,17 @@ export default function EscenaValle({
         onAlerta={() => onHotspot?.(entrada?.alertaView || 'hoy_finca')}
       />
       <div className="cielotoque__capa">
+        {/* El coro ambiental: personajes que vienen del bosque o los costados,
+            hacen UN gesto de llamar la atención y se van (pool rotativo,
+            tier-safe, pausa fuera de pantalla). Solo el jaguar aparece mágico.
+            Va primero: los botones del cielo quedan encima. */}
+        <FaunaAmbiental
+          central={avatar.id}
+          excluir={EXCLUIR_FAUNA_VALLE}
+          tier={tier}
+          reducedMotion={reducedMotion}
+          puntos={PUNTOS_FAUNA_VALLE}
+        />
         <div className="cielotoque__brillo" aria-hidden="true" />
         {conGotas && gotas.map((g, i) => (
           <span
