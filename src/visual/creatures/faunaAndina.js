@@ -49,6 +49,11 @@ export const COLIBRI_PALETA = {
   alaClara: '#bff4ff',
   pico: '#241812',         // pico recto (tinta cálida)
   cola: '#26b894',         // timoneras
+  /* Iridiscencia CIAN↔MAGENTA (su color de poder y el de sus estelas de
+     movimiento — afterimages). El tornasol real del plumaje: según el ángulo
+     el mismo colibrí destella frío o rosado. */
+  irisCian: '#4fd1ff',
+  irisMagenta: '#ff4fd1',
 };
 export const COLIBRI_PROPORCION = {
   troncoRx: 6.0,
