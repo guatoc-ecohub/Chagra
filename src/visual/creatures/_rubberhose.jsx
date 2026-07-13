@@ -161,3 +161,56 @@ export function AntenaRubber({ d, bulbo, bulboR = 1.15, sway = false, delay = 0,
     </g>
   );
 }
+
+/* Boca interior (garganta) para las bocas abiertas — un rojo cálido tenue. */
+export const RH_BOCA = '#8a3b34';
+
+/**
+ * BocaVisema — la BOCA de goma en sus 4 formas de LIP-SYNC
+ * (ficha DR animación rubber-hose §2). Consume el `visema` que produce
+ * `useLipSync` ('V1'..'V4') y dibuja:
+ *   V1 CERRADA     → el arco amable de siempre (Sonrisa) — silencio / M,B,P.
+ *   V2 ENTREABIERTA→ boca apenas abierta (S,Z,T,D,F,V).
+ *   V4 FRUNCIDA    → labios en "O" (O,U,W).
+ *   V3 ABIERTA     → apertura amplia con garganta y lengüita (A,E).
+ *
+ * Species-agnostic: cualquier bicho la coloca en su cara (cx,cy,w). Sin visema
+ * (o 'V1') se ve EXACTO como la sonrisa neutra → no rompe caras existentes.
+ *
+ * @param {Object} props
+ * @param {number} [props.cx=0] @param {number} [props.cy=0] centro de la boca.
+ * @param {number} [props.w=3]  ancho de referencia (el de la sonrisa del bicho).
+ * @param {number} [props.prof=1.1]  profundidad del arco cerrado.
+ * @param {string} [props.visema='V1']
+ * @param {string} [props.ink=RH_INK] @param {string} [props.boca=RH_BOCA]
+ */
+export function BocaVisema({ cx = 0, cy = 0, w = 3, prof = 1.1, visema = 'V1', ink = RH_INK, boca = RH_BOCA }) {
+  if (visema === 'V2') {
+    // Entreabierta: elipse chata, apenas separa los labios.
+    return (
+      <g>
+        <ellipse cx={cx} cy={cy + prof * 0.3} rx={w * 0.32} ry={prof * 0.55} fill={boca} stroke={ink} strokeWidth="0.7" />
+      </g>
+    );
+  }
+  if (visema === 'V4') {
+    // Fruncida en "O": labios redondeados hacia adentro.
+    return (
+      <g>
+        <circle cx={cx} cy={cy + prof * 0.4} r={w * 0.26} fill={boca} stroke={ink} strokeWidth="0.9" />
+        <circle cx={cx} cy={cy + prof * 0.4} r={w * 0.13} fill="#5c231f" />
+      </g>
+    );
+  }
+  if (visema === 'V3') {
+    // Abierta amplia: garganta + lengüita (los picos A,E).
+    return (
+      <g>
+        <ellipse cx={cx} cy={cy + prof * 0.55} rx={w * 0.42} ry={prof * 1.05} fill={boca} stroke={ink} strokeWidth="0.9" />
+        <path d={`M${cx - w * 0.3},${cy + prof * 1.1} Q${cx},${cy + prof * 1.7} ${cx + w * 0.3},${cy + prof * 1.1} Z`} fill="#d1615a" />
+      </g>
+    );
+  }
+  // V1 (o desconocido): la sonrisa cerrada de siempre.
+  return <Sonrisa cx={cx} cy={cy} w={w} prof={prof} ink={ink} />;
+}

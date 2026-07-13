@@ -1,9 +1,10 @@
 import { useId } from 'react';
 import './creatures.css';
 import { CreatureFilters } from './_filters.jsx';
-import { OjosRubber, Cachetes, Sonrisa, Miembro, AntenaRubber, RH_INK } from './_rubberhose.jsx';
+import { OjosRubber, Cachetes, Sonrisa, BocaVisema, Miembro, AntenaRubber, RH_INK } from './_rubberhose.jsx';
 import { ABEJA_PALETA, ABEJA_PROPORCION } from './abejaIdentidad.js';
-import { cuerpoDeClima, PERFIL_ABEJA } from './creatureClimaCuerpo.js';
+import { cuerpoDeClima, PERFIL_ABEJA, ropaDeClimaBicho } from './creatureClimaCuerpo.js';
+import { AccesoriosClima } from './AccesoriosClima.jsx';
 
 /* Abeja angelita — Tetragonisca angustula (meliponino nativo SIN aguijón, NO
    Apis). Cuerpo ámbar rayado (chumbe andino), cabeza clara, alitas de tul.
@@ -61,6 +62,19 @@ export function AbejaAngelita({
      catálogo) = neutro digno: la abeja se ve EXACTO como siempre. */
   clima = null,
   enso = 'neutro',
+  /* ── LIP-SYNC (sistema transversal, useLipSync) ────────────────────────────
+     visema opcional ('V1'..'V4') que produce useLipSync desde el RMS del TTS:
+     la boquita cambia de forma al hablar. Sin visema (o 'V1') = la sonrisa de
+     siempre → los avatares/catálogo no cambian. El HOOK vive aparte para no
+     colgar un AnalyserNode en cada instancia; acá solo se consume el estado. */
+  visema = null,
+  /* ── VESTUARIO por clima+hora (ropaDeClima) ───────────────────────────────
+     OPT-IN: con vestuario=true la abeja se abriga según el clima real (ruana de
+     noche/frío — mata el bug de sudar de noche —, sombrero+sudor al sol cálido).
+     Default false → los consumidores de `clima` existentes NO ven accesorios
+     nuevos (solo el tinte de piel de cuerpoDeClima). tempC afina frío/calor. */
+  vestuario = false,
+  tempC,
   /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + follow-through) y deja el
      aleteo + estados reactivos. Sin prop (standalone: avatares, catálogo) =
@@ -92,6 +106,10 @@ export function AbejaAngelita({
   const estiloClima = (cuerpoClima.tinte || cuerpoClima.opacidad < 1)
     ? { filter: cuerpoClima.tinte || undefined, opacity: cuerpoClima.opacidad < 1 ? cuerpoClima.opacidad : undefined }
     : undefined;
+
+  // Vestuario por clima+hora (opt-in). Perfil abeja: neutro, suda al sol de día,
+  // ruana de noche. Sin vestuario o sin clima → nada (comportamiento histórico).
+  const ropa = (vestuario && clima) ? ropaDeClimaBicho('abeja-angelita', clima, { tempC }) : null;
 
   const defs = (
     <defs>
@@ -174,7 +192,10 @@ export function AbejaAngelita({
       <circle cx="8.6" cy="-1.0" r={ABEJA_PROPORCION.cabezaR} fill={ABEJA_PALETA.cabeza} stroke={RH_INK} strokeWidth="1.2" />
       {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos) */}
       <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.15 }, { cx: 6.9, cy: 0.3, r: 0.85 }]} vivo={vivo} />
-      <Sonrisa cx={8.9} cy={1.4} w={2.8} prof={1.1} />
+      {/* Boca: lip-sync si hay visema; si no, la sonrisa de goma de siempre. */}
+      {visema
+        ? <BocaVisema cx={8.9} cy={1.4} w={2.8} prof={1.1} visema={visema} />
+        : <Sonrisa cx={8.9} cy={1.4} w={2.8} prof={1.1} />}
       <OjosRubber
         ojos={[{ cx: 10.1, cy: -1.9, r: 1.95 }, { cx: 7.4, cy: -2.2, r: 1.45 }]}
         mirar={[0.3, 0.34]}
@@ -183,6 +204,16 @@ export function AbejaAngelita({
       {/* antenas con bombillo que se mecen (secondary motion) */}
       <AntenaRubber d="M7.7,-4.7 C6.7,-7.3 7.0,-9.3 8.3,-10.1" bulbo={[8.3, -10.3]} sway={vivo} delay={0} />
       <AntenaRubber d="M9.7,-4.6 C11.0,-6.7 11.3,-8.7 10.5,-10.3" bulbo={[10.5, -10.5]} sway={vivo} delay={-0.3} />
+
+      {/* Vestuario por clima+hora (ruana/sombrero/sudor) — solo con vestuario=true. */}
+      {ropa && (
+        <AccesoriosClima
+          estado={ropa}
+          tronco={{ cx: 0, cy: 0, rx: ABEJA_PROPORCION.troncoRx, ry: ABEJA_PROPORCION.troncoRy }}
+          cabeza={{ cx: 8.6, cy: -1.0, r: ABEJA_PROPORCION.cabezaR }}
+          animated={vivo}
+        />
+      )}
 
       {lengua}
       {gotas}
@@ -208,6 +239,10 @@ export function AbejaAngelita({
     'data-mojada': mojada ? '1' : undefined,
     'data-sed': sed ? '1' : undefined,
     'data-comiendo': comiendo ? '1' : undefined,
+    'data-visema': visema || undefined,
+    'data-ruana': ropa?.ruana ? '1' : undefined,
+    'data-sombrero': ropa?.sombrero ? '1' : undefined,
+    'data-sudor': ropa?.sudor ? '1' : undefined,
   };
 
   if (inline) {
