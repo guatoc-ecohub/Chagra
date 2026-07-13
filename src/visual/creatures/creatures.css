@@ -749,3 +749,149 @@
   /* Fotograma digno: un rastro de vaho visible y quieto si se pidió resoplido. */
   .crt-vaho-mota { opacity: 0.55; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   JAGUAR — el CARÁCTER del felino: majestuoso, poderoso, ACECHADOR. Poder
+   CONTENIDO (no hiperactivo): squash&stretch controlado y elegante. Aditivo
+   sobre el KIT species-agnostic (no toca a la abeja/oso): el jaguar reescribe SU
+   boil (lento y controlado), suma el ACECHO DE HOMBROS (los omóplatos suben al
+   moverse — su firma), la COLA que ondea con PESO, el RUGIDO corporal y el modo
+   ACECHO (cabeza baja + avance agazapado). Todo transform/opacity (GPU, gama
+   baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL CONTROLADO — el felino no vibra ligero: respira LENTO y con squash
+   ELEGANTE (poder contenido, masa musculosa que asienta suave). Reescribe SOLO
+   el boil del jaguar (misma clase .rh-boil, mayor especificidad por el
+   data-creature) con longhands para no pisar el resto de props de animación. */
+[data-creature='jaguar'] .rh-boil {
+  animation-name: jaguar-boil;
+  animation-duration: 2.9s;
+  animation-timing-function: steps(12, end);
+}
+@keyframes jaguar-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  28%  { transform: translateY(-0.15px) scale(0.99, 1.02); }  /* leve estiramiento elegante */
+  54%  { transform: translateY(0.5px) scale(1.035, 0.965); }  /* squash controlado (músculo) */
+  76%  { transform: translateY(0.1px) scale(1.0, 1.0); }      /* asienta sereno */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* ACECHO DE HOMBROS — los omóplatos SUBEN y bajan al moverse (la seña del
+   depredador). Sube más y más lento en modo acecho. Nodo propio dentro del
+   cuerpo (.jaguar-hombros). */
+.jaguar-hombros {
+  animation: jaguar-hombros 2.9s ease-in-out infinite;
+}
+@keyframes jaguar-hombros {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  40%      { transform: translateY(-0.9px) scaleY(1.08); }  /* el omóplato se alza */
+  70%      { transform: translateY(-0.2px) scaleY(1.0); }
+}
+
+/* COLA que ONDEA con PESO — vaivén lento en S, pivota desde la base del lomo
+   (transform-origin lo pone el componente en fill-box). Poderosa, no nerviosa. */
+.jaguar-cola {
+  animation: jaguar-cola 3.6s ease-in-out infinite;
+}
+@keyframes jaguar-cola {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(6deg); }   /* barrido pesado y elegante */
+}
+
+/* CEJAS FIERAS — la mirada intensa respira apenas; se frunce MÁS al rugir o
+   acechar (el depredador se concentra). */
+.jaguar-cejas {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: jaguar-cejas 7.1s ease-in-out infinite;
+}
+@keyframes jaguar-cejas {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-0.2px); }
+}
+[data-creature='jaguar'][data-ruge='1'] .jaguar-cejas,
+[data-creature='jaguar'][data-acecha='1'] .jaguar-cejas {
+  animation: jaguar-cejas-frunce 1.1s ease-in-out infinite;
+}
+@keyframes jaguar-cejas-frunce {
+  0%, 100% { transform: translateY(0) scaleX(1); }
+  50%      { transform: translateY(0.5px) scaleX(1.05); }  /* baja y aprieta la mirada */
+}
+
+/* RUGE — rugido corporal: el pecho hincha y SUELTA con peso (huff imponente,
+   squash&stretch marcado). Pisa el boil por especificidad (dos atributos). */
+[data-creature='jaguar'][data-ruge='1'] .crt-body {
+  animation: jaguar-rugido 1.6s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes jaguar-rugido {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  30%      { transform: translateY(-0.7px) scale(0.96, 1.07); }  /* inhala hondo (stretch) */
+  52%      { transform: translateY(0.7px) scale(1.08, 0.92); }   /* SUELTA el rugido (squash) */
+  74%      { transform: translateY(0.1px) scale(1.01, 1.0); }
+}
+/* Las fauces del rugido palpitan (la garganta que ruge). */
+[data-creature='jaguar'][data-ruge='1'] .jaguar-rugido-boca {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: jaguar-fauces 1.6s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+}
+@keyframes jaguar-fauces {
+  0%, 100% { transform: scale(0.85); }
+  52%      { transform: scale(1.12); }
+}
+
+/* ACECHA — modo acecho: la cabeza BAJA y avanza, los omóplatos suben MÁS (el
+   depredador se agazapa). El cuerpo hace un creep lento y controlado. */
+[data-creature='jaguar'][data-acecha='1'] .jaguar-cabeza {
+  animation: jaguar-acecho-cabeza 3.2s ease-in-out infinite;
+}
+@keyframes jaguar-acecho-cabeza {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(0.4px, 1.1px); }  /* baja y adelanta la testa */
+}
+[data-creature='jaguar'][data-acecha='1'] .jaguar-hombros {
+  animation: jaguar-hombros-acecho 3.2s ease-in-out infinite;
+}
+@keyframes jaguar-hombros-acecho {
+  0%, 100% { transform: translateY(-0.4px) scaleY(1.05); }
+  50%      { transform: translateY(-1.6px) scaleY(1.16); }  /* el lomo del acecho, MÁS alto */
+}
+[data-creature='jaguar'][data-acecha='1'] .crt-body {
+  animation: jaguar-acecho-cuerpo 3.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes jaguar-acecho-cuerpo {
+  0%, 100% { transform: translateX(0) scaleY(0.99); }
+  50%      { transform: translateX(0.5px) scaleY(0.97); }  /* creep agazapado, lento */
+}
+
+/* Los estados del jaguar (ruge/acecha) PISAN el arrebato (antic/travieso): una
+   fiera que ruge o acecha no da vueltas de campana — el gesto lee majestuoso. */
+[data-creature='jaguar'][data-ruge='1'] .rh-antic,
+[data-creature='jaguar'][data-ruge='1'] .rh-travieso,
+[data-creature='jaguar'][data-acecha='1'] .rh-antic,
+[data-creature='jaguar'][data-acecha='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito del jaguar lo reactivaría (misma clase)
+   → re-apagarlo aquí (mayor especificidad + orden posterior). El acecho de
+   hombros, la cola y las cejas continuas también se cortan; los estados
+   reactivos (ruge/acecha) siguen contando la verdad. */
+[data-tier='bajo'][data-creature='jaguar'] .rh-boil,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-hombros,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-cola,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-cejas { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .jaguar-hombros, .jaguar-cola, .jaguar-cejas,
+  [data-creature='jaguar'][data-ruge='1'] .crt-body,
+  [data-creature='jaguar'][data-ruge='1'] .jaguar-rugido-boca,
+  [data-creature='jaguar'][data-ruge='1'] .jaguar-cejas,
+  [data-creature='jaguar'][data-acecha='1'] .jaguar-cabeza,
+  [data-creature='jaguar'][data-acecha='1'] .jaguar-hombros,
+  [data-creature='jaguar'][data-acecha='1'] .crt-body,
+  [data-creature='jaguar'][data-acecha='1'] .jaguar-cejas { animation: none !important; }
+}
