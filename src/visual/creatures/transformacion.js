@@ -35,6 +35,7 @@ export const AURA_POR_BICHO = Object.freeze({
   ardilla: '#ff9f1c',          // chispas ámbar
   perezoso: '#1ec9b7',         // turquesa/teal zen irónico (distinto del verde de la rana)
   morrocoy: '#ff7a3c',         // caparazón que brilla (ámbar-rojizo)
+  borugo: '#dbe8ff',           // PLATA LUNAR / blanco luminoso (nocturno sagrado, el animal de cierre)
 });
 
 /* Aura por defecto si el slug no está mapeado (la dorada de la guía). */

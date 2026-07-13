@@ -28,6 +28,7 @@ calidad dispar. Aquí vive la **versión canónica** de cada uno.
 | `Ardilla` | *Notosciurus granatensis* | Ardilla de cola roja del templado. Rufa con **línea dorsal** oscura (su firma), **cola tupida** y dientes de roedor. Ágil e inquieta: su firma es la **inspección invertida** (se cuelga de cabeza). De suelo, se sienta. Rubber-hose. |
 | `Jaguar` | *Panthera onca* | Felino de tierra cálida. Leonado con **rosetas** (manchas de centro ocre — su firma), musculoso, mirada felina ámbar. Majestuoso y **acechador**: acecho de hombros, cola pesada, rugido. Aura **púrpura**. Rubber-hose. |
 | `Morrocoy` | *Chelonoidis carbonarius* | Galápago de patas rojas de tierra cálida. Caparazón de **domo geométrico** (escudos **hexagonales** con anillos de edad — su firma), patas y cabeza **rojizas** con escamas naranja-fuego. **Ancestral, lento, sabio**: caparazón que respira, **retracción elástica** (cabeza y patas entran a la concha), asentimiento sabio. Aura **bronce**. Rubber-hose. |
+| `Borugo` | *Cuniculus taczanowskii* | La paca/lapa de montaña andina, roedor **nocturno**. Pardo con **hileras de motas crema** en los flancos (su firma), hocico con bigotes, ojos grandes que reflejan la luna. **Tierno, tímido, sereno**: olfateo (`olfatea`) y acurrucarse a salvo (`acurruca`). Aura **plata lunar**. El **animal de cierre** — honrado vivo, a salvo y digno. Rubber-hose. |
 | `Lombriz` | *Martiodrilus crassus* | Lombriz gigante nativa. Cuerpo segmentado con clitelo. Sin animación propia (su movimiento lo da la escena). |
 | `Mariposa` | *Dione juno* | Pasionaria de alas largas. Cuatro alas que abren y cierran. |
 | `Escarabajo` | *Dichotomius belus* | Estercolero colombiano. Élitros brillantes, cuerno, y bola de abono que rueda. |
@@ -132,6 +133,17 @@ elástica** (`seRetrae` → cabeza y patas entran a la concha con squash&stretch
 más el **asentimiento sabio** (`asiente`). De tierra cálida y del contrato
 compartido: **nunca suda**. Suma su capa ANCESTRAL permanente (resplandor cobrizo
 + shimmer de brasa). Todo aditivo en `creatures.css`, RM + tier-safe.
+
+El **`Borugo`** cierra la familia (9º y ÚLTIMO bicho, el **animal de cierre**) con
+su CARÁCTER de **ternura nocturna** — la paca de montaña, tímida y serena: aura
+**PLATA LUNAR** en poder, boil SUAVE (nada de comedia bruta), **hileras de motas
+crema** en los flancos (su firma) que brillan tenue con luz lunar, **ojos grandes**
+que reflejan la luna, **bigotes** que se abren y **orejitas** atentas; su gesto-
+FIRMA es el **olfateo** (`olfatea` → la nariz que tiembla + bigotes + orejas) y el
+**acurrucarse a salvo** (`acurruca` → se ovilla digno, el corazón emotivo del
+cierre). Nocturno de montaña: **nunca suda** (ruana de noche/frío). En la vereda
+lo cazan; aquí lo honramos **vivo, a salvo y querido**. Todo aditivo en
+`creatures.css`, RM + tier-safe.
 
 ## Técnica
 

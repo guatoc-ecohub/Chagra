@@ -244,6 +244,9 @@ export const ROPA_PERFIL_POR_BICHO = Object.freeze({
   ardilla: { frioC: 11, calorC: 26, sudaAlSol: true },
   perezoso: { frioC: 12, calorC: 27, sudaAlSol: true },
   morrocoy: { frioC: 16, calorC: 32, sudaAlSol: true },
+  // Borugo: roedor NOCTURNO de montaña húmeda — siente el frío pronto y de páramo
+  // NUNCA suda (como el oso/la rana).
+  borugo: { frioC: 8, calorC: 22, sudaAlSol: false },
 });
 
 /* Perfil neutro (slug desconocido / standalone). */
