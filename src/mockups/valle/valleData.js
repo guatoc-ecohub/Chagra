@@ -155,49 +155,13 @@ const LUGARES = [
   // El mercado (portal VENDER), abajo en la tierra caliente, cerca de la salida
   // a la plaza: el puesto con su toldo donde la cosecha sale a venderse.
   { id: 'mercado', pos: [1.2, 0, 6.6], escala: 1, tipo: 'mercado' },
-  // El INVERNADERO (micro-mundo del semillero): arcos, plástico lechoso y sus
-  // mesas de germinación — donde nace y se cría la matica antes del lote.
-  { id: 'semillero', pos: [-2.6, 0, 6.2], escala: 0.9, tipo: 'invernadero' },
+  // El semillero, abajo cerca de la casa: el túnel de media-sombra donde nace y
+  // se cría la matica antes de salir al lote. (anti-conflicto: lugar nuevo al final.)
+  { id: 'semillero', pos: [-2.6, 0, 6.2], escala: 1, tipo: 'semillero' },
   // El suelo vivo / red micorrízica, en el corazón cultivado (entre el suelo y
   // los cultivos): unos hongos que asoman = el fruto de la red bajo tierra. Toque
   // ahí para BAJAR al mundo subterráneo. (anti-conflicto: lugar nuevo al final.)
   { id: 'micorrizas', pos: [-2.7, 0, 3.3], escala: 1, tipo: 'hongos' },
-  // La BIOFÁBRICA (mundo real 'abono'): la pila de compost cerca del potrero
-  // pero diferenciada — el ciclo estiércol→abono legible en el mapa.
-  { id: 'abono', pos: [-3.3, 0, 8.1], escala: 0.85, tipo: 'compost' },
-  // El KIOSCO DEL SABER (portal APRENDER): el tablero bajo techito de paja a
-  // la vera del camino de la plaza. Aún sin mundo propio en el manifiesto:
-  // trae su identidad de respaldo (fallbackMundo) mientras el hub de juegos
-  // abre su puerta (otro frente lo construye).
-  {
-    id: 'aprender',
-    pos: [6.4, 0, 4.6],
-    escala: 0.9,
-    tipo: 'saber',
-    fallbackMundo: {
-      titulo: 'Aprender',
-      emoji: '📖',
-      lema: 'Los juegos y saberes de la finca, reunidos en un solo patio.',
-      tinte: ['#b3771d', '#f2dfae'],
-    },
-  },
-  // EL PÁRAMO (la puerta de arriba): el frailejonal con su niebla fría en la
-  // zona alta de la cordillera. Antes el páramo se veía (el Ent en el filo)
-  // pero no tenía ENTRADA propia en el valle; este lugar la abre — tocarla
-  // sube al mundo del páramo (MundoParamo3D, vía diorama_paramo). Sin mundo
-  // propio en el manifiesto: trae su identidad de respaldo.
-  {
-    id: 'paramo',
-    pos: [-0.9, 0, -7.6],
-    escala: 0.95,
-    tipo: 'frailejonal',
-    fallbackMundo: {
-      titulo: 'El páramo',
-      emoji: '🏔️',
-      lema: 'El frailejonal que le peina el agua a la niebla y se la guarda a la finca.',
-      tinte: ['#63807a', '#c9d8d2'],
-    },
-  },
 ];
 
 /**

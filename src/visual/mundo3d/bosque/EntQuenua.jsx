@@ -78,24 +78,68 @@ function ClusterHojas({ cluster, geo, mat, reducedMotion, fase }) {
   );
 }
 
-/* El rostro tallado: ojos hundidos + brillo, cejas de corteza, boca-grieta. */
-function Rostro({ matOjo, matBrillo, matCorteza, matGrieta, reducedMotion, blinkRefs }) {
+/* El rostro tallado: ojos hundidos con MIRADA viva (iris + pupila que se mueven),
+   cejas de corteza que fruncen el ceño (ánimo legible) y boca-grieta que murmura
+   (habla despacio con la tierra). Los gestos son sutiles y ancestrales, nunca de
+   caricatura; con reducedMotion el rostro queda quieto y sereno. */
+function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, reducedMotion, blinkRefs }) {
   const { centro, radio } = useMemo(() => anclaRostro(7), []);
   // Superficie frontal del tronco a la altura de la mirada (mira al +Z).
   const frente = radio * 0.9;
 
+  // Refs de los gestos: la mirada (iris de cada ojo), las cejas y la boca.
+  const gazeIzq = useRef(null);
+  const gazeDer = useRef(null);
+  const cejaIzq = useRef(null);
+  const cejaDer = useRef(null);
+  const bocaRef = useRef(null);
+
   const bocaGeo = useMemo(() => {
     // Boca larga y grave, con una comisura que baja apenas (gesto ancestral).
+    // Se centra en el origen (translate) para que ABRA en su sitio al escalar.
     const curve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(-0.26, -0.30, 0.0),
       new THREE.Vector3(-0.09, -0.37, 0.03),
       new THREE.Vector3(0.09, -0.375, 0.03),
       new THREE.Vector3(0.26, -0.29, 0.0),
     ], false, 'catmullrom', 0.5);
-    return new THREE.TubeGeometry(curve, 24, 0.03, 7, false);
+    const geo = new THREE.TubeGeometry(curve, 24, 0.032, 7, false);
+    geo.translate(0, 0.335, 0); // pivote de la boca en su propio centro
+    return geo;
   }, []);
+  useLayoutEffect(() => () => bocaGeo.dispose(), [bocaGeo]);
 
-  const Ojo = ({ x, refKey }) => (
+  // Los GESTOS: la vida del rostro. Capas lentas y desfasadas para que nunca se
+  // sienta mecánico — mira alrededor, piensa (frunce), murmura.
+  useFrame((state) => {
+    if (reducedMotion) return;
+    const t = state.clock.elapsedTime;
+    // MIRADA: deriva lenta (recorre, se detiene, vuelve). Ambos ojos juntos.
+    const gx = Math.sin(t * 0.24) * 0.03 + Math.sin(t * 0.09 + 1.1) * 0.015;
+    const gy = Math.sin(t * 0.17 + 0.6) * 0.018;
+    if (gazeIzq.current) gazeIzq.current.position.set(gx, gy, 0.12);
+    if (gazeDer.current) gazeDer.current.position.set(gx, gy, 0.12);
+    // CEJAS: ceño pensativo que sube (asombro suave) y baja (frunce sabio).
+    const ceno = (Math.sin(t * 0.35) + Math.sin(t * 0.12 + 2)) * 0.5; // ~-1..1 lento
+    const frunce = Math.max(0, ceno);
+    const alza = Math.max(0, -ceno);
+    if (cejaIzq.current) {
+      cejaIzq.current.position.y = 0.24 + alza * 0.03 - frunce * 0.015;
+      cejaIzq.current.rotation.z = -0.34 - frunce * 0.18;
+    }
+    if (cejaDer.current) {
+      cejaDer.current.position.y = 0.24 + alza * 0.03 - frunce * 0.015;
+      cejaDer.current.rotation.z = 0.34 + frunce * 0.18;
+    }
+    // BOCA: murmura despacio (respira / conversa con la tierra bajo sus raíces).
+    if (bocaRef.current) {
+      const murmur = (Math.sin(t * 1.1) + Math.sin(t * 0.5 + 1)) * 0.25 + 0.5; // 0..1
+      bocaRef.current.scale.y = 1 + murmur * 0.9;
+      bocaRef.current.scale.x = 1 + murmur * 0.06;
+    }
+  });
+
+  const Ojo = ({ x, refKey, gazeRef }) => (
     <group position={[x, 0.06, frente - 0.05]} ref={blinkRefs[refKey]}>
       {/* cuenca hundida: gran cavidad oscura empotrada en la corteza */}
       <mesh position={[0, 0, -0.03]} scale={[1.3, 1.5, 0.55]}>
@@ -107,25 +151,39 @@ function Rostro({ matOjo, matBrillo, matCorteza, matGrieta, reducedMotion, blink
         <sphereGeometry args={[0.115, 18, 16]} />
         <primitive object={matOjo} attach="material" />
       </mesh>
-      {/* la chispa de vida (grande y clara) */}
-      <mesh position={[x > 0 ? 0.038 : 0.03, 0.045, 0.15]}>
-        <sphereGeometry args={[0.026, 10, 10]} />
-        <primitive object={matBrillo} attach="material" />
-      </mesh>
+      {/* LA MIRADA: iris cálido + pupila + chispa, en un grupo que deriva lento
+          (el ojo "mira" alrededor). Es el mayor salto de personalidad del rostro. */}
+      <group ref={gazeRef} position={[0, 0, 0.12]}>
+        <mesh>
+          <sphereGeometry args={[0.052, 14, 12]} />
+          <primitive object={matIris} attach="material" />
+        </mesh>
+        {/* pupila: pozo oscuro en el centro del iris */}
+        <mesh position={[0, 0, 0.032]}>
+          <sphereGeometry args={[0.03, 12, 10]} />
+          <primitive object={matGrieta} attach="material" />
+        </mesh>
+        {/* la chispa de vida (catchlight): arriba a un lado */}
+        <mesh position={[0.022, 0.03, 0.05]}>
+          <sphereGeometry args={[0.02, 10, 10]} />
+          <primitive object={matBrillo} attach="material" />
+        </mesh>
+      </group>
     </group>
   );
 
   return (
     <group position={[centro.x, centro.y, centro.z]} scale={[1.5, 1.55, 1.15]}>
-      <Ojo x={-0.24} refKey="izq" />
-      <Ojo x={0.24} refKey="der" />
+      <Ojo x={-0.24} refKey="izq" gazeRef={gazeIzq} />
+      <Ojo x={0.24} refKey="der" gazeRef={gazeDer} />
 
-      {/* cejas de corteza: crestas gruesas e inclinadas, ceño sabio/severo */}
-      <mesh position={[-0.24, 0.24, frente + 0.01]} rotation={[0, 0, -0.34]}>
+      {/* cejas de corteza: crestas gruesas e inclinadas, ceño sabio/severo que
+          se mueve (fruncir/alzar) = el ánimo del guardián, legible a distancia */}
+      <mesh ref={cejaIzq} position={[-0.24, 0.24, frente + 0.01]} rotation={[0, 0, -0.34]}>
         <boxGeometry args={[0.34, 0.085, 0.13]} />
         <primitive object={matCorteza} attach="material" />
       </mesh>
-      <mesh position={[0.24, 0.24, frente + 0.01]} rotation={[0, 0, 0.34]}>
+      <mesh ref={cejaDer} position={[0.24, 0.24, frente + 0.01]} rotation={[0, 0, 0.34]}>
         <boxGeometry args={[0.34, 0.085, 0.13]} />
         <primitive object={matCorteza} attach="material" />
       </mesh>
@@ -145,10 +203,20 @@ function Rostro({ matOjo, matBrillo, matCorteza, matGrieta, reducedMotion, blink
         <primitive object={matCorteza} attach="material" />
       </mesh>
 
-      {/* la boca-grieta */}
-      <mesh position={[0, 0, frente]} geometry={bocaGeo}>
-        <primitive object={matGrieta} attach="material" />
-      </mesh>
+      {/* la boca-grieta, con cavidad oscura detrás: al murmurar se abre y se ve
+          el fondo (habla). El grupo `bocaRef` se escala en su propio centro. */}
+      <group position={[0, -0.335, frente]}>
+        <group ref={bocaRef}>
+          {/* cavidad: pozo oscuro que asoma cuando la boca se abre */}
+          <mesh position={[0, 0, -0.03]} scale={[1, 0.55, 0.4]}>
+            <sphereGeometry args={[0.2, 12, 10]} />
+            <primitive object={matGrieta} attach="material" />
+          </mesh>
+          <mesh geometry={bocaGeo}>
+            <primitive object={matGrieta} attach="material" />
+          </mesh>
+        </group>
+      </group>
     </group>
   );
 }
@@ -222,6 +290,15 @@ export default function EntQuenua({ tier = 'alto', reducedMotion = false }) {
     [P.materialRico],
   );
   const matBrillo = useMemo(() => new THREE.MeshBasicMaterial({ color: '#eef4e8' }), []);
+  // Iris cálido y VIVO: el glow ámbar que hace que el rostro MIRE (antes el ojo
+  // era una bola oscura con una chispa; con iris + pupila la mirada se lee y se
+  // le puede seguir el gesto). Rico = emisivo real; frugal = básico constante.
+  const matIris = useMemo(
+    () => (P.materialRico
+      ? new THREE.MeshStandardMaterial({ color: '#c98a3a', emissive: '#7a4616', emissiveIntensity: 0.7, roughness: 0.35, metalness: 0.05 })
+      : new THREE.MeshBasicMaterial({ color: '#d69a48' })),
+    [P.materialRico],
+  );
   const matHoja = useMemo(
     () => (P.materialRico
       ? new THREE.MeshStandardMaterial({ roughness: 0.7, metalness: 0.0, flatShading: true })
@@ -236,8 +313,8 @@ export default function EntQuenua({ tier = 'alto', reducedMotion = false }) {
     ramasGeo.forEach((g) => g.dispose());
     raicesGeo.forEach((g) => g.dispose());
     hojaGeo.dispose();
-    [matCorteza, matCortezaLisa, matGrieta, matOjo, matBrillo, matHoja].forEach((m) => m.dispose());
-  }, [troncoGeo, ramasGeo, raicesGeo, hojaGeo, matCorteza, matCortezaLisa, matGrieta, matOjo, matBrillo, matHoja]);
+    [matCorteza, matCortezaLisa, matGrieta, matOjo, matBrillo, matIris, matHoja].forEach((m) => m.dispose());
+  }, [troncoGeo, ramasGeo, raicesGeo, hojaGeo, matCorteza, matCortezaLisa, matGrieta, matOjo, matBrillo, matIris, matHoja]);
 
   // --- Vida: balanceo pesado + parpadeo lento ---
   useFrame((state) => {
@@ -269,6 +346,7 @@ export default function EntQuenua({ tier = 'alto', reducedMotion = false }) {
         <Rostro
           matOjo={matOjo}
           matBrillo={matBrillo}
+          matIris={matIris}
           matCorteza={matCortezaLisa}
           matGrieta={matGrieta}
           reducedMotion={reducedMotion}
