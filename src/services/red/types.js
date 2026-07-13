@@ -118,9 +118,9 @@ export const NIVEL_REPUTACION = Object.freeze({
  * @property {string} municipio              Municipio/departamento.
  * @property {number} cantidad               Cantidad transada (> 0).
  * @property {string} unidad                 Unidad (kg, arroba, bulto…).
- * @property {ENTREGA[keyof ENTREGA]} entrega       Resultado de la entrega.
+ * @property {string} entrega       Resultado de la entrega.
  * @property {number|null} calidad           Calificación de calidad 1..5 (o null).
- * @property {CONFIRMADO_POR[keyof CONFIRMADO_POR]} confirmadoPor  Procedencia.
+ * @property {string} confirmadoPor  Procedencia.
  * @property {number} shareLevel             Nivel de compartición opt-in (1..3).
  */
 
@@ -143,7 +143,7 @@ export const NIVEL_REPUTACION = Object.freeze({
  * @property {number|null} calidadNorm      Calidad normalizada 0..1 (o null).
  * @property {number} reciente              Timestamp del trato más reciente.
  * @property {number} score                 0..1 compuesto para ranking.
- * @property {NIVEL_REPUTACION[keyof NIVEL_REPUTACION]} nivel  Semáforo humano.
+ * @property {string} nivel  Semáforo humano.
  * @property {string} motivo                Motivo legible del nivel.
  */
 
@@ -163,7 +163,7 @@ export const NIVEL_REPUTACION = Object.freeze({
  * Un vecino competente encontrado por el matchmaking.
  * @property {string} productorHash
  * @property {string} producto
- * @property {NIVEL_REPUTACION[keyof NIVEL_REPUTACION]} nivel
+ * @property {string} nivel
  * @property {number} score
  * @property {number} proximidad            3 misma vereda · 2 mismo municipio · 1 más lejos.
  * @property {string} proximidadLabel

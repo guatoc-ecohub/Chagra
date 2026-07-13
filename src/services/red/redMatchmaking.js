@@ -26,7 +26,9 @@ export const PROXIMIDAD_LABEL = Object.freeze({
 });
 
 /** Niveles de reputación que cuentan como "competente" (demostró algo). */
-const NIVELES_COMPETENTES = new Set([NIVEL_REPUTACION.VERDE, NIVEL_REPUTACION.AMBAR]);
+const NIVELES_COMPETENTES = /** @type {Set<string>} */ (
+  new Set([NIVEL_REPUTACION.VERDE, NIVEL_REPUTACION.AMBAR])
+);
 
 /**
  * Tier de cercanía entre el que pregunta y un par. 3 misma vereda · 2 mismo
@@ -51,13 +53,13 @@ export function proximidadTier(query, peer) {
  * luego por score de reputación (y recencia como desempate). Función pura.
  *
  * @param {Object} problema
- * @param {string} problema.producto — cultivo en cuestión.
+ * @param {string} problema.producto - cultivo en cuestión.
  * @param {string} [problema.vereda]
  * @param {string} [problema.municipio]
- * @param {string} [problema.excludeHash] — no sugerirse a uno mismo.
+ * @param {string} [problema.excludeHash] - no sugerirse a uno mismo.
  * @param {Object} contexto
  * @param {Array<import('./types.js').Reputacion>} contexto.reputaciones
- * @param {boolean} [contexto.allowNuevo=false] — incluir productores sin historial.
+ * @param {boolean} [contexto.allowNuevo=false] - incluir productores sin historial.
  * @returns {Array<import('./types.js').PeerMatch>}
  */
 export function findCompetentPeers(problema, contexto) {
@@ -102,7 +104,7 @@ export function findCompetentPeers(problema, contexto) {
  * en usted, cálido y directo, SIN revelar la identidad del par a quien
  * pregunta y sin datos sensibles. Best-effort con el síntoma si viene.
  *
- * @param {{producto:string, vereda?:string, sintoma?:string}} params
+ * @param {{producto?:string, vereda?:string, sintoma?:string}} [params]
  * @returns {string}
  */
 export function buildMensajeVecino({ producto, vereda = '', sintoma = '' } = {}) {
@@ -134,9 +136,9 @@ export function buildMensajeVecino({ producto, vereda = '', sintoma = '' } = {})
  * @param {string} [problema.vereda]
  * @param {string} [problema.municipio]
  * @param {string} [problema.sintoma]
- * @param {boolean} [problema.agentConfident=true] — ¿el agente cree tener respuesta?
+ * @param {boolean} [problema.agentConfident=true] - el agente cree tener respuesta?
  * @param {string} [problema.excludeHash]
- * @param {Object} contexto — { reputaciones, allowNuevo }
+ * @param {Object} contexto - { reputaciones, allowNuevo }
  * @returns {{ shouldRoute:boolean, peer:(import('./types.js').PeerMatch|null),
  *   motivo:string, mensajeSugerido:(string|null),
  *   candidatos:Array<import('./types.js').PeerMatch> }}
