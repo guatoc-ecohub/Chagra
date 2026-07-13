@@ -428,6 +428,36 @@ function LandmarkGeom({ tipo, tinte, reducedMotion }) {
           ))}
         </group>
       );
+    case 'hongos': // el suelo vivo: hongos que asoman (el fruto del micelio), con
+      // un halo de red bajo la tierra. Toque para BAJAR al mundo subterráneo.
+      return (
+        <group>
+          {[[-0.3, 0.1, 0.44], [0.16, -0.22, 0.54], [0.42, 0.26, 0.36], [-0.04, 0.42, 0.3]].map(([x, z, h], i) => (
+            <group key={i} position={[x, 0, z]}>
+              {/* pie del hongo, pálido */}
+              <mesh position={[0, h * 0.5, 0]} castShadow>
+                <cylinderGeometry args={[0.05, 0.075, h, 7]} />
+                <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
+              </mesh>
+              {/* sombrero que brilla apenas (bioluminiscencia del suelo) */}
+              <mesh position={[0, h + 0.02, 0]} castShadow>
+                <sphereGeometry args={[0.17, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+                <meshStandardMaterial color={fuerte} emissive={fuerte} emissiveIntensity={0.35} flatShading roughness={0.8} />
+              </mesh>
+              {/* laminillas claras bajo el sombrero */}
+              <mesh position={[0, h - 0.015, 0]}>
+                <cylinderGeometry args={[0.16, 0.06, 0.03, 10]} />
+                <meshStandardMaterial color={suave} emissive={suave} emissiveIntensity={0.4} />
+              </mesh>
+            </group>
+          ))}
+          {/* el anillo de micelio asomando en la tierra (la red que baja) */}
+          <mesh position={[0, 0.02, 0.1]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.5, 0.64, 22]} />
+            <meshStandardMaterial color={fuerte} emissive={fuerte} emissiveIntensity={0.3} transparent opacity={0.45} side={2} roughness={1} />
+          </mesh>
+        </group>
+      );
     default:
       return (
         <mesh position={[0, 0.3, 0]}>

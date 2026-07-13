@@ -552,6 +552,32 @@ export const MUNDO = {
       },
     },
   },
+
+  // 🍄 EL SUELO VIVO — la RED MICORRÍZICA bajo tierra (arquetipo SÍ-3D nuevo
+  //    `micorrizas`, el "wood-wide web"). La cámara baja BAJO EL SUELO y se ve lo
+  //    invisible: la red de hongos bioluminiscente que enlaza las raíces del maíz,
+  //    el fríjol y la ahuyama (las tres hermanas) y del árbol madre, con PULSOS de
+  //    nutrientes corriendo por los hilos —fósforo/agua que SUBEN a la mata, azúcar
+  //    que BAJA al hongo— y los PUENTES entre plantas distintas (el reparto). El
+  //    Ent de la queñua asoma enseñando. Se ancla en TEMPLADO (el corazón de la
+  //    chagra), pero el suelo vivo aplica a todos los pisos. Cada punto es una
+  //    puerta real; en equipo humilde cae a su espejo 2D.
+  //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
+  micorrizas: {
+    pisoTermico: 'templado',
+    escena: 'micorrizas',
+    valle: { tipo: 'hongos', pos: [-2.7, 0, 3.3], escala: 1 },
+    params: {},
+    hotspots: [
+      { id: 'reparto', pos: [-1.4, -1.3, 0.3], emoji: '🤝', label: 'Se ayudan bajo tierra', view: 'asociaciones' },
+      { id: 'intercambio', pos: [0.5, -2.1, 0.2], emoji: '💛', label: 'Fósforo por azúcar', view: 'salud_suelo' },
+      { id: 'cuidar', pos: [-2.4, -0.35, 0.4], emoji: '🛡️', label: 'Cuide la red: compost, no queme', view: 'compost' },
+      { id: 'arbol', pos: [2.6, 0.4, -0.3], emoji: '🌳', label: 'El árbol madre alimenta', view: 'restauracion' },
+    ],
+    entrada: { zoom: 6.5, narra: 'micorrizas' },
+    // El gemelo 2D digno (mirror → motivo `micorrizas`): la misma red, dibujada.
+    fallback2d: { escena: 'mirror' },
+  },
 };
 
 /** Ids de todos los mundos registrados. */

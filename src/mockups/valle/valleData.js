@@ -138,6 +138,10 @@ const LUGARES = [
   // El semillero, abajo cerca de la casa: el túnel de media-sombra donde nace y
   // se cría la matica antes de salir al lote. (anti-conflicto: lugar nuevo al final.)
   { id: 'semillero', pos: [-2.6, 0, 6.2], escala: 1, tipo: 'semillero' },
+  // El suelo vivo / red micorrízica, en el corazón cultivado (entre el suelo y
+  // los cultivos): unos hongos que asoman = el fruto de la red bajo tierra. Toque
+  // ahí para BAJAR al mundo subterráneo. (anti-conflicto: lugar nuevo al final.)
+  { id: 'micorrizas', pos: [-2.7, 0, 3.3], escala: 1, tipo: 'hongos' },
 ];
 
 /**
