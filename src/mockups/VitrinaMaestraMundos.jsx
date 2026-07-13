@@ -1849,7 +1849,18 @@ export default function VitrinaMaestraMundos({ onBack }) {
               <small>Toque un portal: el túnel lo lleva y lo trae</small>
             </h2>
             <div className="vmx-abeja">
-              <AbejaAngelita size={100} animo="sereno" energia={1} animated={!reducedMotion} tier={tier} />
+              {/* Entrada HEROICA: Angelita en su expresividad plena — el contorno
+                  hierve (line-boil), suelta polen y bate sus alitas de tul. Es la
+                  insignia de Chagra: acá se luce con todo el rubber-hose. */}
+              <AbejaAngelita
+                size={100}
+                animo="pleno"
+                energia={1}
+                animated={!reducedMotion}
+                lineBoil={!reducedMotion}
+                polen={!reducedMotion}
+                tier={tier}
+              />
             </div>
           </div>
           <div className="vmx-pie">

@@ -6,6 +6,10 @@ import { OjosRubber, Cachetes, Sonrisa, BocaVisema, Miembro, AntenaRubber, RH_IN
 import { ABEJA_PALETA, ABEJA_PROPORCION } from './abejaIdentidad.js';
 import { cuerpoDeClima, PERFIL_ABEJA, ropaDeClimaBicho } from './creatureClimaCuerpo.js';
 import { AccesoriosClima } from './AccesoriosClima.jsx';
+import { LineBoilFilter } from './LineBoilFilter.jsx';
+import { PropEnMano } from './PropEnMano.jsx';
+import { AuraPoder } from './AuraPoder.jsx';
+import { auraDeBicho } from './transformacion.js';
 
 /* Abeja angelita — Tetragonisca angustula (meliponino nativo SIN aguijón, NO
    Apis). Cabeza y tórax OSCUROS (casi negros) + abdomen ámbar PÁLIDO y LISO,
@@ -72,7 +76,7 @@ export function AbejaAngelita({
      Default false → los consumidores de `clima` existentes NO ven accesorios
      nuevos (solo el tinte de piel de cuerpoDeClima). tempC afina frío/calor. */
   vestuario = false,
-  tempC,
+  tempC = undefined,
   /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + follow-through) y deja el
      aleteo + estados reactivos. Sin prop (standalone: avatares, catálogo) =
@@ -103,17 +107,6 @@ export function AbejaAngelita({
      mundoId (o mundo sin prop) entra con las manos libres. Va en su manita
      izquierda (el lado libre; la carita vive a la derecha). */
   mundoId = null,
-  /* ── GAFAS DE SOL (AngelitaGafas) ──────────────────────────────────────────
-     OPT-IN: false (default, nada cambia) | true (puestas sobre los ojitos) |
-     'poniendose' (reproduce UNA vez la caída teatral: baja girada, rebasa,
-     rebota y asienta — su entrada de día soleado). La cadencia vive en
-     angelita-missminutes.css gateada por data-gafas; RM = puestas quietas. */
-  gafas = /** @type {boolean|'poniendose'} */ (false),
-  /* ── CEJAS EXPRESIVAS (AngelitaGafas.CejasRubber) ──────────────────────────
-     OPT-IN: null (default: la carita de siempre) | 'alegres' | 'altas' |
-     'vivas' (con eyebrow-flash al hablar) | 'fruncidas' (concentrada). El
-     agente las deriva por estado; cualquier host puede pedirlas directo. */
-  cejas = null,
   ...rest
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -137,6 +130,19 @@ export function AbejaAngelita({
   const wingDur = (wing && cuerpoClima.velocidadAlas !== 1)
     ? { animationDuration: `${(0.15 / cuerpoClima.velocidadAlas).toFixed(3)}s` }
     : undefined;
+  // Alitas de TUL que se DIFUMINAN al ACELERAR (motion-blur real): cuando el
+  // clima acelera el aleteo (dorada/soleado, velocidadAlas alta) el tul se ve
+  // borroso — la firma de las alas rápidas del meliponino. Determinista: cuelga
+  // del clima, no del reloj. Tier bajo o sin aleteo → nítido (blur es raster
+  // caro). RM: las alas ya están quietas, el blur queda estático (inocuo).
+  const alasRapidas = wing && tier !== 'bajo' && cuerpoClima.velocidadAlas >= 1.12;
+  const alaBlur = alasRapidas
+    ? { filter: `blur(${(0.35 * cuerpoClima.velocidadAlas).toFixed(2)}px)` }
+    : undefined;
+  const alaStyle = (wingDur || alaBlur) ? { ...wingDur, ...alaBlur } : undefined;
+  const alaStyle2 = (wingDur || alaBlur)
+    ? { animationDelay: '-0.07s', ...wingDur, ...alaBlur }
+    : { animationDelay: '-0.07s' };
   // Filtro/opacidad de clima para el nodo raíz (svg autónomo o <g> inline).
   const estiloClima = (cuerpoClima.tinte || cuerpoClima.opacidad < 1)
     ? { filter: cuerpoClima.tinte || undefined, opacity: cuerpoClima.opacidad < 1 ? cuerpoClima.opacidad : undefined }
@@ -213,9 +219,9 @@ export function AbejaAngelita({
       {/* alitas de tul con contorno + smear (crt-wingbeat ya lleva el estirón).
           La duración del aleteo la modula el clima real (wingDur): dorada rápida,
           lluvia pesada. celebra/reposo (data-pose) mandan por especificidad CSS. */}
-      <ellipse className={wing} style={wingDur} cx="-1.8" cy="-7" rx="6" ry="3.6" fill={ABEJA_PALETA.alaTul}
+      <ellipse className={wing} style={alaStyle} cx="-1.8" cy="-7" rx="6" ry="3.6" fill={ABEJA_PALETA.alaTul}
         opacity="0.62" stroke="rgba(42,26,12,0.4)" strokeWidth="0.5" />
-      <ellipse className={wing} style={{ animationDelay: '-0.07s', ...wingDur }} cx="2.2" cy="-6.4"
+      <ellipse className={wing} style={alaStyle2} cx="2.2" cy="-6.4"
         rx="4.6" ry="2.8" fill={ABEJA_PALETA.alaTulClara} opacity="0.5" stroke="rgba(42,26,12,0.35)" strokeWidth="0.5" />
 
       {/* patitas manguera con pie crema (detrás del tronco, se mecen suave) */}
@@ -300,6 +306,9 @@ export function AbejaAngelita({
         />
       )}
 
+      {/* Prop del mundo en la manita (entra heroica con su herramienta). */}
+      {propMundo}
+
       {lengua}
       {gotas}
       {polenEl}
@@ -333,19 +342,22 @@ export function AbejaAngelita({
     'data-ruana': ropa?.ruana ? '1' : undefined,
     'data-sombrero': ropa?.sombrero ? '1' : undefined,
     'data-sudor': ropa?.sudor ? '1' : undefined,
+    'data-lineboil': lineBoil ? '1' : undefined,
+    'data-polen': polen ? '1' : undefined,
+    'data-prop': mundoId || undefined,
   };
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
     // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
     return (
-      <g className={className} style={estiloClima} {...estadoAttrs}>
+      <g className={className} style={estiloClima} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}
         {cuerpoVivo}
       </g>
     );
   }
-  return (
+  const svg = (
     <svg viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloClima}
       role="img" aria-label={title} {...estadoAttrs} {...rest}>
       <title>{title}</title>
