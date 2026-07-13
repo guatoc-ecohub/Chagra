@@ -27,6 +27,7 @@ const mockState = {
 };
 
 vi.mock('../../store/useAssetStore', () => ({
+  // @ts-ignore
   default: (selector) => selector(mockState),
 }));
 
@@ -34,6 +35,7 @@ vi.mock('../../store/useAssetStore', () => ({
 const saveTransactionMock = vi.fn().mockResolvedValue({ id: 'tx-stub' });
 vi.mock('../../services/syncManager', () => ({
   syncManager: {
+    // @ts-ignore
     saveTransaction: (...args) => saveTransactionMock(...args),
   },
 }));
@@ -42,7 +44,7 @@ vi.mock('../../services/syncManager', () => ({
 if (typeof globalThis.crypto?.randomUUID !== 'function') {
   globalThis.crypto = {
     ...(globalThis.crypto || {}),
-    randomUUID: () => 'uuid-test-stub',
+    randomUUID: /** @type {any} */ (() => 'uuid-test-stub'),
   };
 }
 
@@ -50,6 +52,7 @@ if (typeof globalThis.crypto?.randomUUID !== 'function') {
 // tests unitarios. Default empty; se sobrescribe per-test cuando hace falta.
 const ragRetrieveMock = vi.fn().mockResolvedValue([]);
 vi.mock('../../services/ragRetriever', () => ({
+  // @ts-ignore
   retrieve: (...args) => ragRetrieveMock(...args),
 }));
 
@@ -115,14 +118,14 @@ describe('ObservationScreen — audit 070.5 selector plant', () => {
     });
     const plantSel = screen.getByTestId('plant-selector');
     fireEvent.change(plantSel, { target: { value: 'plant-1' } });
-    expect(plantSel.value).toBe('plant-1');
+    expect((/** @type {any} */ (plantSel)).value).toBe('plant-1');
 
     // Cambio a land-2 → selector apunta a plant-2 dropdown, plantId resetea.
-    fireEvent.change(screen.getAllByRole('combobox').find((s) => s.name === 'locationId'), {
+    fireEvent.change(/** @type {any} */ (screen.getAllByRole('combobox').find((s) => (/** @type {any} */ (s)).name === 'locationId')), {
       target: { value: 'land-2' },
     });
     const plantSel2 = screen.getByTestId('plant-selector');
-    expect(plantSel2.value).toBe('');
+    expect((/** @type {any} */ (plantSel2)).value).toBe('');
   });
 });
 
@@ -144,8 +147,8 @@ describe('ObservationScreen — audit 070.6 bridge case_study', () => {
       target: { value: 'land-1' },
     });
     // Severity por defecto es 'info' — explícitamente verificamos low también.
-    const severitySelect = screen.getAllByRole('combobox').find((s) => s.name === 'severity');
-    fireEvent.change(severitySelect, { target: { value: 'low' } });
+    const severitySelect = screen.getAllByRole('combobox').find((s) => (/** @type {any} */ (s)).name === 'severity');
+    fireEvent.change(/** @type {any} */ (severitySelect), { target: { value: 'low' } });
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /Guardar Observacion/i }));
@@ -167,8 +170,8 @@ describe('ObservationScreen — audit 070.6 bridge case_study', () => {
     fireEvent.change(screen.getByDisplayValue(/Selecciona una zona/i), {
       target: { value: 'land-1' },
     });
-    const severitySelect = screen.getAllByRole('combobox').find((s) => s.name === 'severity');
-    fireEvent.change(severitySelect, { target: { value: 'high' } });
+    const severitySelect = screen.getAllByRole('combobox').find((s) => (/** @type {any} */ (s)).name === 'severity');
+    fireEvent.change(/** @type {any} */ (severitySelect), { target: { value: 'high' } });
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /Guardar Observacion/i }));
@@ -193,8 +196,8 @@ describe('ObservationScreen — audit 070.6 bridge case_study', () => {
     const plantSel = screen.getByTestId('plant-selector');
     fireEvent.change(plantSel, { target: { value: 'plant-1' } });
 
-    const severitySelect = screen.getAllByRole('combobox').find((s) => s.name === 'severity');
-    fireEvent.change(severitySelect, { target: { value: 'critical' } });
+    const severitySelect = screen.getAllByRole('combobox').find((s) => (/** @type {any} */ (s)).name === 'severity');
+    fireEvent.change(/** @type {any} */ (severitySelect), { target: { value: 'critical' } });
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /Guardar Observacion/i }));
@@ -283,12 +286,12 @@ describe('ObservationScreen — L1.5 sugerencias RAG de tratamientos', () => {
 
   // Usamos act+advanceTimersByTimeAsync para el debounce de 3s.
 
-  const seedDescriptionAndSeverity = (description, severity) => {
+  const seedDescriptionAndSeverity = (/** @type {any} */ description, /** @type {any} */ severity) => {
     fireEvent.change(screen.getByPlaceholderText(/Describe la observacion/i), {
       target: { value: description },
     });
-    const severitySelect = screen.getAllByRole('combobox').find((s) => s.name === 'severity');
-    fireEvent.change(severitySelect, { target: { value: severity } });
+    const severitySelect = screen.getAllByRole('combobox').find((s) => (/** @type {any} */ (s)).name === 'severity');
+    fireEvent.change(/** @type {any} */ (severitySelect), { target: { value: severity } });
   };
 
   it('NO llama retrieve antes de los 3s de debounce', async () => {

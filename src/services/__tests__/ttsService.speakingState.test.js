@@ -27,9 +27,10 @@ import {
 
 // Mock Audio: play() resuelve y dispara onended en el próximo tick para
 // simular un audio corto. Guardamos las instancias para control manual.
+/** @type {any[]} */
 const audioInstances = [];
 class MockAudio {
-  constructor(url) {
+  constructor(/** @type {any} */ url) {
     this.url = url;
     this.paused = true;
     this.onended = null;
@@ -46,7 +47,7 @@ class MockAudio {
 }
 
 class MockUtterance {
-  constructor(text) {
+  constructor(/** @type {any} */ text) {
     this.text = text;
     this.onstart = null;
     this.onend = null;
@@ -56,10 +57,10 @@ class MockUtterance {
 
 describe('ttsService — estado observable de reproducción (voz punta-a-punta)', () => {
   let fetchMock;
-  let originalAudio;
-  let originalCreateObjectURL;
-  let originalRevokeObjectURL;
-  let originalUtterance;
+  /** @type {any} */ let originalAudio;
+  /** @type {any} */ let originalCreateObjectURL;
+  /** @type {any} */ let originalRevokeObjectURL;
+  /** @type {any} */ let originalUtterance;
   let speechSynthesisMock;
 
   beforeEach(() => {
@@ -71,13 +72,13 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
     });
     globalThis.fetch = fetchMock;
     originalAudio = globalThis.Audio;
-    globalThis.Audio = MockAudio;
+    globalThis.Audio = /** @type {any} */ (MockAudio);
     originalCreateObjectURL = URL.createObjectURL;
     originalRevokeObjectURL = URL.revokeObjectURL;
     URL.createObjectURL = vi.fn(() => `blob:fake-${Math.random()}`);
     URL.revokeObjectURL = vi.fn();
     originalUtterance = globalThis.SpeechSynthesisUtterance;
-    globalThis.SpeechSynthesisUtterance = MockUtterance;
+    globalThis.SpeechSynthesisUtterance = /** @type {any} */ (MockUtterance);
     speechSynthesisMock = {
       speak: vi.fn(),
       cancel: vi.fn(),
@@ -85,7 +86,7 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
       speaking: false,
       paused: false,
     };
-    window.speechSynthesis = speechSynthesisMock;
+    window.speechSynthesis = /** @type {any} */ (speechSynthesisMock);
   });
 
   afterEach(() => {
@@ -94,12 +95,12 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
     URL.createObjectURL = originalCreateObjectURL;
     URL.revokeObjectURL = originalRevokeObjectURL;
     globalThis.SpeechSynthesisUtterance = originalUtterance;
-    delete window.speechSynthesis;
+    delete (/** @type {any} */ (window)).speechSynthesis;
     vi.restoreAllMocks();
   });
 
   it('speakKokoro notifica true al arrancar y false al onended', async () => {
-    const events = [];
+    /** @type {any[]} */ const events = [];
     const unsub = onSpeakingChange((v) => events.push(v));
 
     const audio = await speakKokoro('Hola, soy Chagra.');
@@ -107,14 +108,14 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
     expect(events).toContain(true);
     expect(isAudioPlaying()).toBe(true);
 
-    audio.onended();
+    (/** @type {any} */ (audio)).onended();
     expect(events[events.length - 1]).toBe(false);
     expect(isAudioPlaying()).toBe(false);
     unsub();
   });
 
   it('stop() notifica false y resetea isAudioPlaying', async () => {
-    const events = [];
+    /** @type {any[]} */ const events = [];
     const unsub = onSpeakingChange((v) => events.push(v));
 
     await speakKokoro('Texto de prueba para detener.');
@@ -127,7 +128,7 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
   });
 
   it('unsubscribe deja de notificar', async () => {
-    const events = [];
+    /** @type {any[]} */ const events = [];
     const unsub = onSpeakingChange((v) => events.push(v));
     unsub();
 
@@ -136,24 +137,24 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
   });
 
   it('speak() Web Speech notifica vía utterance.onstart/onend', () => {
-    const events = [];
+    /** @type {any[]} */ const events = [];
     const unsub = onSpeakingChange((v) => events.push(v));
 
     const utterance = speak('Hola desde Web Speech.');
     expect(utterance).not.toBeNull();
 
-    utterance.onstart();
+    (/** @type {any} */ (utterance)).onstart();
     expect(isAudioPlaying()).toBe(true);
     expect(events).toContain(true);
 
-    utterance.onend();
+    (/** @type {any} */ (utterance)).onend();
     expect(isAudioPlaying()).toBe(false);
     expect(events[events.length - 1]).toBe(false);
     unsub();
   });
 
   it('speakSentences notifica true al primer audio y false al terminar la cadena', async () => {
-    const events = [];
+    /** @type {any[]} */ const events = [];
     const unsub = onSpeakingChange((v) => events.push(v));
 
     // Dos frases largas (>40 chars) para activar el pipeline frase-por-frase.
@@ -182,11 +183,11 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
   });
 
   it('no notifica duplicados — solo cambios de estado', async () => {
-    const events = [];
+    /** @type {any[]} */ const events = [];
     const unsub = onSpeakingChange((v) => events.push(v));
 
     const audio = await speakKokoro('Frase para verificar deduplicación.');
-    audio.onended();
+    (/** @type {any} */ (audio)).onended();
     stop(); // ya está en false — no debe re-notificar
 
     const trues = events.filter((v) => v === true).length;

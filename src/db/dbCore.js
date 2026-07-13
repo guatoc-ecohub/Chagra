@@ -122,7 +122,8 @@ export const openDB = async () => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onupgradeneeded = (event) => {
-      const db = event.target.result;
+      const req = /** @type {IDBOpenDBRequest} */ (event.target);
+      const db = req.result;
       console.info(`[DB] Upgrading schema to v${DB_VERSION}…`);
 
       // pending_transactions (cola de salida — autoincrement + string uuids)
@@ -210,7 +211,7 @@ export const openDB = async () => {
       // timeline ordenadas sin sort en memoria (Issue #244).
       // Migration transparente v8→v9: preserva indexes existentes.
       if (event.oldVersion < 9) {
-        const logsStore = event.target.transaction.objectStore(STORES.LOGS);
+        const logsStore = req.transaction.objectStore(STORES.LOGS);
         if (!logsStore.indexNames.contains('asset_id_timestamp')) {
           logsStore.createIndex('asset_id_timestamp', ['asset_id', 'timestamp'], { unique: false });
         }
@@ -230,7 +231,7 @@ export const openDB = async () => {
       // v11: LRU eviction para media_cache (056.4).
       // Agregar lastAccessedAt a media_cache existente.
       if (event.oldVersion < 11 && db.objectStoreNames.contains(STORES.MEDIA_CACHE)) {
-        const mediaStore = event.target.transaction.objectStore(STORES.MEDIA_CACHE);
+        const mediaStore = req.transaction.objectStore(STORES.MEDIA_CACHE);
         if (!mediaStore.indexNames.contains('lastAccessedAt')) {
           mediaStore.createIndex('lastAccessedAt', 'lastAccessedAt', { unique: false });
         }
@@ -352,7 +353,7 @@ export const openDB = async () => {
       // La migración es segura e idempotente: los datos existentes ya tienen
       // attributes.process_id, el nuevo índice los indexa automáticamente.
       if (event.oldVersion < 19) {
-        const fpeStore = event.target.transaction.objectStore(STORES.FARM_PROCESS_EVENTS);
+        const fpeStore = req.transaction.objectStore(STORES.FARM_PROCESS_EVENTS);
         if (fpeStore && fpeStore.indexNames.contains('process_id')) {
           fpeStore.deleteIndex('process_id');
         }
@@ -409,7 +410,7 @@ export const openDB = async () => {
       // Migración aditiva (no toca registros existentes): solo agrega el índice.
       if (event.oldVersion < 23) {
         if (db.objectStoreNames.contains(STORES.GLACIAR_REPORTES)) {
-          const store = event.target.transaction.objectStore(STORES.GLACIAR_REPORTES);
+          const store = req.transaction.objectStore(STORES.GLACIAR_REPORTES);
           if (!store.indexNames.contains('puntoId')) {
             store.createIndex('puntoId', 'puntoId', { unique: false });
           }
@@ -458,7 +459,8 @@ export const openDB = async () => {
     };
 
     request.onsuccess = (event) => {
-      dbInstance = event.target.result;
+      const successReq = /** @type {IDBOpenDBRequest} */ (event.target);
+      dbInstance = successReq.result;
       connectionPromise = null;
 
       // Cerrar la conexión si otra pestaña solicita un upgrade futuro,
@@ -474,7 +476,8 @@ export const openDB = async () => {
 
     request.onerror = (event) => {
       connectionPromise = null;
-      reject(event.target.error);
+      const errorReq = /** @type {IDBOpenDBRequest} */ (event.target);
+      reject(errorReq.error);
     };
 
     request.onblocked = () => {

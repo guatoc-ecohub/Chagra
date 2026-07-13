@@ -7585,7 +7585,7 @@ const BINOMIAL_FALSE_POSITIVES = new Set([
 
 /**
  * ¿El texto contiene al menos un binomio latino?
- * @param {string} normText  texto sin diacríticos y en minúsculas
+ * @param {string} text  texto sin diacríticos y en minúsculas
  * @returns {string|null} el primer binomio encontrado, o null
  */
 function _extractLatinBinomial(text) {

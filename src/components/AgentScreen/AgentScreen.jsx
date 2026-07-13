@@ -259,7 +259,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const [thinkingPhase, setThinkingPhase] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
-  const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '' });
+  const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '', toolName: null, description: null, parameters: null });
   // Task #194: Modal de consentimiento para feedback
   const [feedbackConsentModal, setFeedbackConsentModal] = useState({ isOpen: false, pendingAction: null });
   const ttsSupported = isSupported();
@@ -803,7 +803,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     const wasEdited = JSON.stringify(params) !== JSON.stringify(actionModal.parameters);
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '' });
+    setActionModal({ isOpen: false, intent: null, llmResponse: '', toolName: null, description: null, parameters: null });
     if (resolver) {
       resolver({
         status: wasEdited ? 'edited' : 'approved',
@@ -815,7 +815,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const handleActionReject = () => {
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '' });
+    setActionModal({ isOpen: false, intent: null, llmResponse: '', toolName: null, description: null, parameters: null });
     if (resolver) {
       resolver({ status: 'rejected' });
     }
@@ -945,8 +945,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         const { getActiveDiseaseForCycle } = await import('../../services/diseaseObservationService');
         const STAGE_LBL = { sowing: 'Siembra', emergence: 'Brotó', vegetative: 'Creciendo', flowering: 'Floración', fruiting: 'Frutos', harvest_window: 'Cosecha', closed: 'Terminado' };
         const cycles = (await listFarmProcesses({ status: 'active' })) || [];
-        return await Promise.all(cycles.slice(0, 5).map(async (c) => {
-          const at = c.attributes || {};
+          return await Promise.all(cycles.slice(0, 5).map(async (rawCycle) => {
+            const c = /** @type {any} */ (rawCycle);
+            const at = c.attributes || {};
           const id = c.process_id || c.id;
           const base = String(at.current_stage || '').replace(/_confirmed$/, '');
           const days = at.created_at ? Math.max(0, Math.round((Date.now() - at.created_at) / 86400000)) : null;
@@ -1348,7 +1349,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         // que runAgentPipeline corra el merge del estado final y preserve el
         // texto streamed si lo hubo. cancelReasonRef lo setea handleCancelLLM
         // (cancel) o el timer/watchdog (timeout); por defecto 'abort' genérico.
-        const interruptErr = new Error('Inferencia interrumpida');
+        const interruptErr = /** @type {Error & {interrupted?: boolean, interruptReason?: string}} */ (new Error('Inferencia interrumpida'));
         interruptErr.interrupted = true;
         interruptErr.interruptReason = cancelReasonRef.current || 'abort';
         throw interruptErr;
@@ -1778,12 +1779,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             // es cliente-side, usa datos del DR consolidado, y sus guardas
             // anti-mito afloran en la respuesta del agente.
             if (!toolEvidence) {
+              /** @type {any} */
               const modules = [
                 [hasSoilDiagnosticIntent, () => import('../../services/soilDiagnostic'), 'soil_diagnostic', 'suelo'],
               ];
               // Agua, animal, restauracion, riesgo-incendio si el intent matcher existe
               try {
-                const { hasWaterDiagnosticIntent, hasAnimalDiagnosticIntent, hasRestauracionDiagnosticIntent, hasIncendioRiskIntent } = await import('../../services/knowledgeIntentRouter');
+                const { hasWaterDiagnosticIntent, hasAnimalDiagnosticIntent, hasRestauracionDiagnosticIntent, hasIncendioRiskIntent } = /** @type {any} */ (await import('../../services/knowledgeIntentRouter'));
                 if (hasWaterDiagnosticIntent) modules.push([hasWaterDiagnosticIntent, async () => { const m = await import('../../services/waterDiagnostic'); return { diagnosticar: m.diagnosticarAgua, formatear: m.formatearGroundingAgua }; }, 'water_diagnostic', 'agua']);
                 if (hasAnimalDiagnosticIntent) modules.push([hasAnimalDiagnosticIntent, async () => { const m = await import('../../services/animalDiagnostic'); return { diagnosticar: m.diagnosticarAnimal, formatear: m.formatearGroundingAnimal }; }, 'animal_diagnostic', 'animal']);
                 if (hasRestauracionDiagnosticIntent) modules.push([hasRestauracionDiagnosticIntent, async () => { const m = await import('../../services/restauracionDiagnostic'); return { diagnosticar: m.diagnosticarRestauracion, formatear: m.formatearGroundingRestauracion }; }, 'restauracion_diagnostic', 'restauracion']);
@@ -1858,7 +1860,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             if (forcedPlan && forcedPlan.localGrounding === 'precio_referencia') {
               const priceMsg = buildPriceReferenceAnswer(forcedPlan.args?.producto || textForLLM);
               if (priceMsg) {
-                const userMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+                const userMessage = { role: 'user', content: text.trim(), timestamp: Date.now() };
                 const assistantMessage = {
                   role: 'assistant',
                   content: priceMsg,
@@ -1866,7 +1868,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                 };
                 setMessages((prev) => [...prev, userMessage, assistantMessage]);
                 try {
-                  await addTurn(operatorId, { role: 'user', content: trimmed });
+                  await addTurn(operatorId, { role: 'user', content: text.trim() });
                   await addTurn(operatorId, { role: 'assistant', content: priceMsg });
                 } catch (e) {
                   console.warn('[Agent] precio addTurn failed (continuo):', e?.message);
@@ -2318,13 +2320,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       }
       agentSounds.chime();
 
-      const { intent } = parseIntent(text);
+      const { intent } = parseIntent(/** @type {string} */ (text));
 
       // 2026-05-23: badge de "fuente" — persistimos en metadata si el turno
       // del assistant fue grounded contra el catálogo (tool MCP devolvió
       // match) o fue solo generativo del LLM. ChatBubble lee este metadata
       // para renderizar el badge verde/amber/gris (ver computeSourceMetadata).
-      let sourceMetadata = computeSourceMetadata(toolEvidence);
+      let sourceMetadata = computeSourceMetadata(/** @type {any} */ (toolEvidence));
 
       // #18 + #20: surfacéa en metadata las señales del grounding curado que la
       // UX muestra como badges — `fuente_url`/`fuente` (fuente verificable
@@ -2371,13 +2373,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               : [],
           }
         : {};
-      sourceMetadata = {
+      sourceMetadata = /** @type {any} */ ({
         ...sourceMetadata,
         ...evidenceSourceLink,
         ...groundingBadges,
         ...groundingSemaphoreMeta,
         auto_corrected: responseAutoCorrected,
-      };
+      });
       const profileMode = (() => {
         try {
           return getProfile()?.nivel_respuestas || '';
@@ -2459,10 +2461,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           if (expected.length > 0) {
             const pv = await postValidate(responseBody, expected);
             sourceMetadata = mergePostValidateMetadata(sourceMetadata, pv);
-            if (sourceMetadata.hallucinated_names || sourceMetadata.suspect_names) {
+            const sm = /** @type {any} */ (sourceMetadata);
+            if (sm.hallucinated_names || sm.suspect_names) {
               console.debug('[sidecar] post-validate flags', {
-                hallucinated: sourceMetadata.hallucinated_names,
-                suspect: sourceMetadata.suspect_names,
+                hallucinated: sm.hallucinated_names,
+                suspect: sm.suspect_names,
               });
             }
           }
@@ -2532,10 +2535,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           session_id: `${operatorId}:${activeFincaSlug || 'sin-finca'}`,
           nlu_route: nluRoute,
           entities_grounded: Array.isArray(resolvedEntities)
-            ? resolvedEntities.map((e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
+            ? resolvedEntities.map((rawE) => { const e = /** @type {any} */ (rawE); return e?.canonical_id || e?.id || e?.mentioned; }).filter(Boolean)
             : [],
           guards_fired: guarded.modified ? guarded.reasons || [] : [],
-          grounded_status: sourceMetadata?.source || sourceMetadata?.grounded_status || null,
+          grounded_status: /** @type {any} */ (sourceMetadata)?.source || /** @type {any} */ (sourceMetadata)?.grounded_status || null,
           latency_ms: Math.round(performance.now() - pipelineStartedAt),
           model: selectChatRoute(textForLLM),
           eval_rate: currentLlmStats?.eval_rate ?? null,
@@ -2559,14 +2562,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             latency: { t_first_token_ms: currentLlmStats?.first_token_ms ?? null },
             grounding: {
               entities: Array.isArray(resolvedEntities)
-                ? resolvedEntities.map((e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
+                ? resolvedEntities.map((rawE) => { const e = /** @type {any} */ (rawE); return e?.canonical_id || e?.id || e?.mentioned; }).filter(Boolean)
                 : [],
               tools: Array.isArray(toolEvidence)
-                ? toolEvidence.map((t) => t?.tool || t?.name).filter(Boolean)
+                ? toolEvidence.map((rawT) => { const t = /** @type {any} */ (rawT); return t?.tool || t?.name; }).filter(Boolean)
                 : [],
               rag_chunks: Array.isArray(contextCorpus) ? contextCorpus.length : 0,
               nlu_route: nluRoute || durableRoute,
-              grounded_status: sourceMetadata?.source || sourceMetadata?.grounded_status || 'none',
+              grounded_status: /** @type {any} */ (sourceMetadata)?.source || /** @type {any} */ (sourceMetadata)?.grounded_status || 'none',
             },
             tokens_out: currentLlmStats?.response_len
               ? Math.max(1, Math.round(currentLlmStats.response_len / 4))

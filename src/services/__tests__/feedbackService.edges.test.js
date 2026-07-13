@@ -17,7 +17,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 const { fetchWithAuthRetry } = vi.hoisted(() => ({
-  fetchWithAuthRetry: vi.fn((...args) => global.fetch(...args)),
+  fetchWithAuthRetry: vi.fn((...args) => (/** @type {any} */ (globalThis)).fetch(...args)),
 }));
 
 vi.mock('../apiService.js', () => ({
@@ -27,23 +27,23 @@ vi.mock('../apiService.js', () => ({
 import { sendFeedback } from '../feedbackService';
 
 describe('feedbackService — edges (A-15 #248)', () => {
-  const originalLocalStorage = global.localStorage;
-  const originalFetch = global.fetch;
+  const originalLocalStorage = /** @type {any} */ (globalThis).localStorage;
+  const originalFetch = /** @type {any} */ (globalThis).fetch;
 
   beforeEach(() => {
-    global.localStorage = { getItem: vi.fn(), setItem: vi.fn() };
-    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
+    /** @type {any} */ (globalThis).localStorage = { getItem: vi.fn(), setItem: vi.fn() };
+    /** @type {any} */ (globalThis).fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
     fetchWithAuthRetry.mockClear();
-    fetchWithAuthRetry.mockImplementation((...args) => global.fetch(...args));
+    fetchWithAuthRetry.mockImplementation((...args) => (/** @type {any} */ (globalThis)).fetch(...args));
   });
 
   afterEach(() => {
-    global.localStorage = originalLocalStorage;
-    global.fetch = originalFetch;
+    /** @type {any} */ (globalThis).localStorage = originalLocalStorage;
+    /** @type {any} */ (globalThis).fetch = originalFetch;
   });
 
   function sentBody() {
-    return JSON.parse(/** @type {string} */ (vi.mocked(global.fetch).mock.calls[0][1].body));
+    return JSON.parse(/** @type {string} */ (vi.mocked(/** @type {any} */ (globalThis).fetch).mock.calls[0][1].body));
   }
 
   it('incluye edges válidos en el payload', async () => {
@@ -70,14 +70,14 @@ describe('feedbackService — edges (A-15 #248)', () => {
       prompt: 'x',
       response: 'y',
       thumb: 'down',
-      edges: [
+      edges: /** @type {any} */ ([
         { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' }, // válido
         { species_id: 'a', edge_type: 'COMPATIBLE_WITH' },                  // falta target_id
         { species_id: '', edge_type: 'CONTROLS', target_id: 'p' },          // species vacío
         { species_id: 'c', edge_type: 'CONTROLS', target_id: 5 },           // target no string
         null,                                                              // no objeto
         'nope',                                                            // no objeto
-      ],
+      ]),
     });
     expect(sentBody().edges).toEqual([
       { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' },
@@ -102,7 +102,7 @@ describe('feedbackService — edges (A-15 #248)', () => {
   });
 
   it('edges no-array → [] (defensivo)', async () => {
-    await sendFeedback({ prompt: 'x', response: 'y', thumb: 'up', edges: 'oops' });
+    await sendFeedback({ prompt: 'x', response: 'y', thumb: 'up', edges: /** @type {any} */ ('oops') });
     expect(sentBody().edges).toEqual([]);
   });
 
@@ -111,9 +111,9 @@ describe('feedbackService — edges (A-15 #248)', () => {
       prompt: 'x',
       response: 'y',
       thumb: 'up',
-      edges: [
+      edges: /** @type {any} */ ([
         { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b', confidence: 0.9, extra: 'x' },
-      ],
+      ]),
     });
     expect(sentBody().edges).toEqual([
       { species_id: 'a', edge_type: 'COMPATIBLE_WITH', target_id: 'b' },

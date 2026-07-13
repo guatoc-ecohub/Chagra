@@ -47,6 +47,16 @@ import {
   ordenDureza,
 } from '../data/glaciar-schema.js';
 
+/** @typedef {Object} EstadoSeguridad
+ * @property {string} nivel
+ * @property {string} emoji
+ * @property {string} label
+ * @property {string} desc
+ * @property {string} color
+ */
+/** @type {{estable: EstadoSeguridad, peligro: EstadoSeguridad, precaucion: EstadoSeguridad, observacion: EstadoSeguridad}} */
+const EST = ESTADOS_SEGURIDAD;
+
 /** Tipos de superficie que, por sí solos (en cualquier capa), fuerzan 🔴. */
 export const SUPERFICIES_CRITICAS = Object.freeze(['hielo_podrido']);
 
@@ -127,7 +137,7 @@ function horaDelReporte(reporte) {
  * @param {boolean} [reporte.nieveReciente24h] - nieve fresca en 24h.
  * @param {number} [reporte.horaLocal] - hora local (0–23.999) del reporte.
  * @param {string} [reporte.fechaISO] - alternativa para derivar la hora.
- * @returns {{nivel: 'estable'|'precaucion'|'peligro'|'observacion',
+ * @returns {{nivel: string,
  *   emoji: string, label: string, desc: string, color: string,
  *   razones: string[]}}
  */
@@ -142,7 +152,7 @@ export function evaluarSeguridadGlaciar(reporte = {}) {
   // ── 🔵 OBSERVACIÓN: no se pisó el hielo (modo borde) ──
   if (reporte.pisoGlaciar === false) {
     return {
-      ...ESTADOS_SEGURIDAD.observacion,
+      ...EST.observacion,
       razones: ['No se pisó el hielo: registro de borde para trazabilidad, sin juicio de tránsito.'],
     };
   }
@@ -189,7 +199,7 @@ export function evaluarSeguridadGlaciar(reporte = {}) {
   }
 
   if (razonesPeligro.length > 0) {
-    return { ...ESTADOS_SEGURIDAD.peligro, razones: razonesPeligro };
+    return { ...EST.peligro, razones: razonesPeligro };
   }
 
   // A partir de acá NO hay disparadores 🔴.
@@ -238,7 +248,7 @@ export function evaluarSeguridadGlaciar(reporte = {}) {
   if (razonesPrecaucion.length > 0) {
     // De-duplicar conservando orden.
     const razones = [...new Set(razonesPrecaucion)];
-    return { ...ESTADOS_SEGURIDAD.precaucion, razones };
+    return { ...EST.precaucion, razones };
   }
 
   // ── 🟢 ESTABLE: condiciones limpias ──
@@ -252,7 +262,7 @@ export function evaluarSeguridadGlaciar(reporte = {}) {
     ordenSup <= ordenDureza('P');
   if (firnFirme && mananaFria) {
     return {
-      ...ESTADOS_SEGURIDAD.estable,
+      ...EST.estable,
       razones: ['Firn firme en mañana fría, sin peligros: buen agarre.'],
     };
   }
@@ -260,7 +270,7 @@ export function evaluarSeguridadGlaciar(reporte = {}) {
   // hielo de glaciar azul con H1 sin grietas/séracs/agua.
   if (tipoSuperficie === 'hielo_glaciar_azul' && dureza === 'H1') {
     return {
-      ...ESTADOS_SEGURIDAD.estable,
+      ...EST.estable,
       razones: ['Hielo trabajable (H1) sin peligros: clava bien el crampón.'],
     };
   }
@@ -268,14 +278,14 @@ export function evaluarSeguridadGlaciar(reporte = {}) {
   // Sin dureza registrada → no podemos afirmar estabilidad.
   if (!dureza) {
     return {
-      ...ESTADOS_SEGURIDAD.precaucion,
+      ...EST.precaucion,
       razones: ['Falta medir la dureza del hielo para confirmar el estado.'],
     };
   }
 
   // Caso limpio genérico (con dureza, sin peligros ni disparadores).
   return {
-    ...ESTADOS_SEGURIDAD.estable,
+    ...EST.estable,
     razones: ['Superficie medida y sin peligros observados.'],
   };
 }

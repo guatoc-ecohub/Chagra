@@ -24,7 +24,7 @@ describe('computeSourceMetadata', () => {
   });
 
   test('toolEvidence sin tool field → no tool, no grounded', () => {
-    expect(computeSourceMetadata({ tool: null, args: {}, result: {} })).toEqual({
+    expect(computeSourceMetadata(/** @type {any} */ ({ tool: null, args: {}, result: {} }))).toEqual({
       tool_used: null,
       grounded: false,
     });
@@ -113,18 +113,18 @@ describe('computeSourceMetadata', () => {
 
   describe('chain #246: array de evidences', () => {
     test('array vacío → no tool, no grounded', () => {
-      expect(computeSourceMetadata([])).toEqual({ tool_used: null, grounded: false });
+      expect(computeSourceMetadata(/** @type {any} */ ([]))).toEqual({ tool_used: null, grounded: false });
     });
 
     test('array con todos null → no tool, no grounded', () => {
-      expect(computeSourceMetadata([null, null, null])).toEqual({
+      expect(computeSourceMetadata(/** @type {any} */ ([null, null, null]))).toEqual({
         tool_used: null,
         grounded: false,
       });
     });
 
     test('array con mix de null y evidences válidas → ignora nulls, grounded si alguno útil', () => {
-      const md = computeSourceMetadata([
+      const md = computeSourceMetadata(/** @type {any} */ ([
         null,
         {
           tool: 'get_species',
@@ -132,12 +132,12 @@ describe('computeSourceMetadata', () => {
           result: { found: true, species: { name: 'Persea americana' } },
         },
         undefined,
-      ]);
+      ]));
       expect(md).toEqual({ tool_used: 'get_species', grounded: true });
     });
 
     test('array con múltiples tools → tool_used concatenados con +', () => {
-      const md = computeSourceMetadata([
+      const md = computeSourceMetadata(/** @type {any} */ ([
         {
           tool: 'get_species',
           args: { name: 'maíz' },
@@ -148,7 +148,7 @@ describe('computeSourceMetadata', () => {
           args: { species: 'maíz' },
           result: { companions: [{ name: 'frijol' }] },
         },
-      ]);
+      ]));
       expect(md).toEqual({
         tool_used: 'get_species+get_companions',
         grounded: true,
@@ -156,7 +156,7 @@ describe('computeSourceMetadata', () => {
     });
 
     test('array chain: grounded=true si CUALQUIERA tool devuelve payload útil', () => {
-      const md = computeSourceMetadata([
+      const md = computeSourceMetadata(/** @type {any} */ ([
         {
           tool: 'get_species',
           args: { name: 'inexistente' },
@@ -167,13 +167,13 @@ describe('computeSourceMetadata', () => {
           args: { species: 'maíz' },
           result: { companions: [{ name: 'frijol' }] },
         },
-      ]);
+      ]));
       expect(md.grounded).toBe(true);
       expect(md.tool_used).toBe('get_species+get_companions');
     });
 
     test('array chain: grounded=false si NINGUNO tool devuelve payload útil', () => {
-      const md = computeSourceMetadata([
+      const md = computeSourceMetadata(/** @type {any} */ ([
         {
           tool: 'get_species',
           args: { name: 'inexistente' },
@@ -184,13 +184,13 @@ describe('computeSourceMetadata', () => {
           args: { species: 'inexistente' },
           result: { matches_count: 0 },
         },
-      ]);
+      ]));
       expect(md.grounded).toBe(false);
       expect(md.tool_used).toBe('get_species+get_companions');
     });
 
     test('array chain: un tool con matches_count >0 hace grounded=true', () => {
-      const md = computeSourceMetadata([
+      const md = computeSourceMetadata(/** @type {any} */ ([
         {
           tool: 'get_species',
           args: { name: 'inexistente' },
@@ -201,12 +201,12 @@ describe('computeSourceMetadata', () => {
           args: { species: 'maíz' },
           result: { matches_count: 3, matches: [{ name: 'frijol' }] },
         },
-      ]);
+      ]));
       expect(md.grounded).toBe(true);
     });
 
     test('array chain: un tool con available:true hace grounded=true', () => {
-      const md = computeSourceMetadata([
+      const md = computeSourceMetadata(/** @type {any} */ ([
         {
           tool: 'get_biopreparados',
           args: { species: 'inexistente' },
@@ -217,7 +217,7 @@ describe('computeSourceMetadata', () => {
           args: { name: 'aguacate' },
           result: { available: true, species: { name: 'Persea americana' } },
         },
-      ]);
+      ]));
       expect(md.grounded).toBe(true);
     });
   });
@@ -234,7 +234,7 @@ describe('mergePostValidateMetadata (FIX 2 — surfacea hallucinated)', () => {
 
   test('pv null → devuelve base sin tocar (no advierte si no se pudo verificar)', () => {
     expect(mergePostValidateMetadata(base, null)).toEqual(base);
-    expect(mergePostValidateMetadata(base, undefined)).toEqual(base);
+    expect(mergePostValidateMetadata(base, /** @type {any} */ (undefined))).toEqual(base);
   });
 
   test('age_available !== true → no confía en el veredicto, devuelve base intacto', () => {
@@ -250,7 +250,7 @@ describe('mergePostValidateMetadata (FIX 2 — surfacea hallucinated)', () => {
       age_available: true,
       detected_count: 1,
     };
-    const md = mergePostValidateMetadata(base, pv);
+    const md = /** @type {any} */ (mergePostValidateMetadata(base, /** @type {any} */ (pv)));
     expect(md.hallucinated_names).toEqual(['Neolepidopteron daquila']);
     // No pierde el metadata de fuente original.
     expect(md.tool_used).toBe('get_pest_controllers');
@@ -259,7 +259,7 @@ describe('mergePostValidateMetadata (FIX 2 — surfacea hallucinated)', () => {
 
   test('suspect[] sigue surfaceándose (no regresión del badge previo)', () => {
     const pv = { hallucinated: [], suspect: ['Solanum lycopersicum'], age_available: true };
-    const md = mergePostValidateMetadata(base, pv);
+    const md = /** @type {any} */ (mergePostValidateMetadata(base, pv));
     expect(md.suspect_names).toEqual(['Solanum lycopersicum']);
     expect(md.hallucinated_names).toBeUndefined();
   });
@@ -270,14 +270,14 @@ describe('mergePostValidateMetadata (FIX 2 — surfacea hallucinated)', () => {
       suspect: ['Solanum lycopersicum'],
       age_available: true,
     };
-    const md = mergePostValidateMetadata(base, pv);
+    const md = /** @type {any} */ (mergePostValidateMetadata(base, pv));
     expect(md.hallucinated_names).toEqual(['Neolepidopteron daquila']);
     expect(md.suspect_names).toEqual(['Solanum lycopersicum']);
   });
 
   test('arrays vacíos → no añade campos (sin badge espurio)', () => {
     const pv = { hallucinated: [], suspect: [], age_available: true };
-    const md = mergePostValidateMetadata(base, pv);
+    const md = /** @type {any} */ (mergePostValidateMetadata(base, pv));
     expect(md.hallucinated_names).toBeUndefined();
     expect(md.suspect_names).toBeUndefined();
     expect(md).toEqual(base);
@@ -289,7 +289,7 @@ describe('mergePostValidateMetadata (FIX 2 — surfacea hallucinated)', () => {
       suspect: [],
       age_available: true,
     };
-    const md = mergePostValidateMetadata(base, pv);
+    const md = /** @type {any} */ (mergePostValidateMetadata(base, /** @type {any} */ (pv)));
     expect(md.hallucinated_names).toEqual(['Neolepidopteron daquila']);
   });
 
@@ -311,7 +311,7 @@ describe('extractGroundingBadges (#18 fuente_url + #20 confianza)', () => {
     expect(extractGroundingBadges(null)).toEqual({});
     expect(extractGroundingBadges(undefined)).toEqual({});
     expect(extractGroundingBadges([])).toEqual({});
-    expect(extractGroundingBadges('x')).toEqual({});
+    expect(extractGroundingBadges(/** @type {any} */ ('x'))).toEqual({});
   });
 
   test('biopreparado con fuente_url + fuente + confianza → surfacéa los tres', () => {
