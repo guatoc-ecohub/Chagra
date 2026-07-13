@@ -6,7 +6,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Store en memoria que captura los ciclos sintéticos persistidos (BUG A: antes
 // no se persistían → recordFarmEvent no los encontraba). Compartido por el mock.
-let persistedStore;
+let /** @type {any} */ persistedStore;
 
 // Mock de dependencias
 vi.mock('../assetCache.js', () => ({
@@ -28,13 +28,13 @@ vi.mock('../dbCore', () => {
   const STORES = { FARM_PROCESSES: 'farm_processes', FARM_PROCESS_EVENTS: 'farm_process_events' };
   const makeTx = () => {
     const tx = { oncomplete: null, onerror: null };
-    tx.objectStore = () => ({
+    tx.objectStore = () => /** @type {any} */ ({
       put(record) { persistedStore.set(record.process_id, record); },
     });
     Promise.resolve().then(() => tx.oncomplete?.());
     return tx;
   };
-  return { STORES, openDB: vi.fn(() => Promise.resolve({ transaction: () => makeTx() })) };
+  return { STORES, openDB: vi.fn(() => Promise.resolve(/** @type {any} */ ({ transaction: () => makeTx() }))) };
 });
 
 import { hydrateCyclesFromFarmOS } from '../farmProcessCache';
@@ -48,6 +48,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
   });
 
   it('retorna procesos locales cuando no hay plantas', async () => {
+    /** @type {any[]} */
     const localProcesses = [
       {
         process_id: 'p1',
@@ -69,7 +70,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
   });
 
   it('crea ciclo sintético para planta activa sin ciclo local', async () => {
-    const localProcesses = [];
+    const localProcesses = /** @type {any[]} */ ([]);
 
     const plants = [
       {
@@ -105,6 +106,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
   });
 
   it('no duplica planta que ya tiene ciclo local (dedupe por nombre+lote)', async () => {
+    /** @type {any[]} */
     const localProcesses = [
       {
         process_id: 'p1',
@@ -145,7 +147,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
   });
 
   it('excluye plantas archivadas', async () => {
-    const localProcesses = [];
+    const localProcesses = /** @type {any[]} */ ([]);
 
     const plants = [
       {
@@ -174,6 +176,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
   });
 
   it('hidrata múltiples plantas con distintas ubicaciones', async () => {
+    /** @type {any[]} */
     const localProcesses = [
       {
         process_id: 'p1',
@@ -233,7 +236,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
   });
 
   it('tolera errores de catálogo y continua sin slug', async () => {
-    const localProcesses = [];
+    const localProcesses = /** @type {any[]} */ ([]);
 
     const plants = [
       {
@@ -265,7 +268,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
   });
 
   it('usa quantity del asset si existe', async () => {
-    const localProcesses = [];
+    const localProcesses = /** @type {any[]} */ ([]);
 
     const plants = [
       {
@@ -301,6 +304,7 @@ describe('hydrateCyclesFromFarmOS — backfill de plantas sin ciclo local', () =
   });
 
   it('fallback a procesos locales si assetCache falla', async () => {
+    /** @type {any[]} */
     const localProcesses = [
       {
         process_id: 'p1',
