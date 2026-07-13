@@ -144,6 +144,10 @@ const EvidenciaIlustrada = lazy(() => import('./mockups/EvidenciaIlustrada'));
 const MockupGuardianesNarrativos = lazy(() => import('./mockups/MockupGuardianesNarrativos'));
 const HojaVidaMataMockup = lazy(() => import('./components/mockups/HojaVidaMataMockup'));
 const VitrinaCriaturasMockup = lazy(() => import('./mockups/vitrina3d/VitrinaCriaturas'));
+// 3D: el MUNDO BOSQUE VIVO y su guardián, el Ent de la queñua (colorado,
+// Polylepis) — mallas three reales (tronco retorcido con rostro tallado, copa
+// instanciada), device-tiering real. Ruta #/mockups/bosque-vivo-3d, sin auth.
+const BosqueVivo3DMockup = lazy(() => import('./mockups/BosqueVivo3D'));
 // 3D: vitrina JUGABLE de las piezas de construcción (invernaderos, galpón,
 // establo, bodega, tanque, secadero…) con control de tamaño por pieza y el
 // mini demo del modo colocar (snapping sobre la ladera).
@@ -554,6 +558,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-animales': 'mockup_mundo3d_animales',
   'mockups/mundo3d-milpa': 'mockup_mundo3d_milpa',
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
+  'mockups/bosque-vivo-3d': 'mockup_bosque_vivo_3d',
   'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
   'mockups/voz-con-forma': 'mockup_voz_con_forma',
   'mockups/conversacion-voz': 'mockup_conversacion_voz',
@@ -1518,6 +1523,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La ladera y sus pisos">
               <Mundo3DBosqueMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_bosque_vivo_3d':
+        // Vitrina pública del MUNDO BOSQUE VIVO: el Ent de la queñua (colorado,
+        // Polylepis) en 3D REAL — tronco retorcido con corteza rojiza y rostro
+        // tallado, copa de hojitas instanciadas, meciéndose en la niebla del
+        // páramo. Device-tiering real; en equipo humilde muestra la ficha del
+        // guardián. Ruta #/mockups/bosque-vivo-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El bosque vivo">
+              <BosqueVivo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
