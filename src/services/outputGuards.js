@@ -6899,8 +6899,8 @@ export function guardInventedBrand(responseText) {
  * ENCIMA de `max` es INVIABLE (no zona-gris). `range` es el texto del rango viable
  * que devolvemos al campesino en la corrección.
  *
- * Solo cultivos de clima inequívoco/acotado: los de banda ancha (maíz, fríjol, yuca)
- * NO entran — su tolerancia amplia haría falsos positivos. La altitud sale de la
+ * Solo cultivos de clima inequívoco/acotado: los de banda ancha (maíz, fríjol)
+ * NO entran. La altitud sale de la
  * PREGUNTA del usuario (o de la respuesta): el caso del bench es "café a 3600 m",
  * "Hass a 2800 m", "mora a 450 m" — datos que el operador da en su mensaje.
  */
@@ -6971,6 +6971,94 @@ const HARD_ALTITUDE_BANDS = [
     max: 3800,
     range: '2200–3600 msnm (clima frío/de altura)',
   },
+  {
+    names: ['platano', 'plátano'],
+    binomial: 'musa x paradisiaca',
+    display: 'plátano',
+    min: 0,
+    max: 2200,
+    range: '0–2200 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['banano', 'guineo'],
+    binomial: 'musa acuminata',
+    display: 'banano / guineo',
+    min: 0,
+    max: 1300,
+    range: '0–1300 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['yuca', 'yuca dulce', 'yuca de comer'],
+    binomial: 'manihot esculenta',
+    display: 'yuca dulce',
+    min: 0,
+    max: 2000,
+    range: '0–2000 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['piña', 'pina'],
+    binomial: 'ananas comosus',
+    display: 'piña',
+    min: 0,
+    max: 1500,
+    range: '0–1500 msnm (tierra cálida)',
+  },
+  {
+    names: ['papaya'],
+    binomial: 'carica papaya',
+    display: 'papaya',
+    min: 0,
+    max: 1600,
+    range: '0–1600 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['mango'],
+    binomial: 'mangifera indica',
+    display: 'mango',
+    min: 0,
+    max: 1800,
+    range: '0–1800 msnm (tierra cálida)',
+  },
+  {
+    names: ['arroz'],
+    binomial: 'oryza sativa',
+    display: 'arroz',
+    min: 0,
+    max: 1300,
+    range: '0–1300 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['papa', 'papa parda pastusa', 'papa comun', 'pastusa'],
+    binomial: 'solanum tuberosum',
+    display: 'papa',
+    min: 2400,
+    max: 3400,
+    range: '2400–3400 msnm (clima frío)',
+  },
+  {
+    names: ['lulo', 'naranjilla', 'chuva'],
+    binomial: 'solanum quitoense',
+    display: 'lulo / naranjilla / chuva',
+    min: 1200,
+    max: 2800,
+    range: '1200–2800 msnm (clima templado/frío)',
+  },
+  {
+    names: ['tomate de arbol', 'tomate de árbol', 'tamarillo', 'tomate de palo', 'tomate de monte', 'tomate cimarron', 'tomate cimarrón'],
+    binomial: 'solanum betaceum',
+    display: 'tomate de árbol',
+    min: 1200,
+    max: 3000,
+    range: '1200–3000 msnm (clima templado/frío)',
+  },
+  {
+    names: ['gulupa'],
+    binomial: 'passiflora edulis f. edulis',
+    display: 'gulupa',
+    min: 1600,
+    max: 2600,
+    range: '1600–2600 msnm (clima templado/frío)',
+  },
 ];
 
 /**
@@ -6987,7 +7075,7 @@ const HARD_PROMOTES_CROP_RE =
  * promoviendo → no hay nada que suprimir. Sobre texto normalizado.
  */
 const HARD_ALREADY_INVIABLE_RE =
-  /(no\s+es\s+viable|inviable|no\s+se\s+da\b|no\s+prosper|demasiad[oa]\s+(frio|fria|alt|caliente|calid[oa])|no\s+(la?\s+)?siembres|no\s+(es\s+)?recomendable\s+(sembrar|cultivar))/;
+  /(\bno\s+es\s+viable\b|inviable|\bno\s+se\s+da\b|\bno\s+prosper|\bdemasiad[oa]\s+(frio|fria|alt|caliente|calid[oa])\b|\bno\s+(la?\s+)?siembres\b|\bno\s+(es\s+)?recomendable\s+(sembrar|cultivar)\b)/;
 
 /** Marca idempotente del reemplazo de inviabilidad dura. */
 const HARD_ALTITUDE_MARKER = 'no es viable a esa altura';
@@ -7035,6 +7123,15 @@ function _hardAltitudeReplacement(band, alt, demasiadoAlto) {
     `Si quieres sembrar a ${alt} msnm, mejor escoge un cultivo que sí corresponda a esa altura, y con gusto te ` +
     'oriento cuáles se dan bien ahí.'
   );
+}
+
+function _bandNameHit(norm, name) {
+  const needle = _stripDiacritics(name);
+  if (!needle) return false;
+  if (/^[a-z0-9]+$/.test(needle) && needle.length <= 5) {
+    return new RegExp(`\\b${_escapeRegExpLiteral(needle)}\\b`).test(norm);
+  }
+  return norm.includes(needle);
 }
 
 /**
@@ -7099,7 +7196,7 @@ export function guardHardAltitudeViability(responseText, { userMessage = null } 
   }
 
   for (const band of HARD_ALTITUDE_BANDS) {
-    const nameHit = band.names.some((n) => norm.includes(_stripDiacritics(n)));
+    const nameHit = band.names.some((n) => _bandNameHit(norm, n));
     if (!nameHit && !norm.includes(band.binomial)) continue;
     for (const alt of altitudes) {
       const demasiadoAlto = alt > band.max;
@@ -7386,7 +7483,7 @@ const WARM_COLD_PROMOTES_RE =
  * calor", "inviable" → no re-suprimimos. Anti-FP central. Sobre normalizado.
  */
 const WARM_COLD_ALREADY_FLAGS_RE =
-  /(no\s+se\s+da\b|no\s+prosper|inviable|no\s+es\s+viable|necesita\s+(un\s+)?clima\s+(frio|de\s+altura|fresco)|es\s+de\s+(clima\s+)?(frio|tierra\s+fria|altura)|no\s+(aguanta|resiste|soporta)\s+(el\s+)?calor|demasiado\s+(calor|calid)|no\s+es\s+(el\s+)?clima\s+(adecuad|para))/;
+  /(\bno\s+se\s+da\b|\bno\s+prosper|inviable|\bno\s+es\s+viable\b|necesita\s+(un\s+)?clima\s+(frio|de\s+altura|fresco)|es\s+de\s+(clima\s+)?(frio|tierra\s+fria|altura)|\bno\s+(aguanta|resiste|soporta)\s+(el\s+)?calor\b|demasiado\s+(calor|calid)|\bno\s+es\s+(el\s+)?clima\s+(adecuad|para)\b)/;
 
 /**
  * Construye la corrección de inviabilidad por clima para un cultivo de frío en
@@ -7464,6 +7561,183 @@ export function guardWarmLowlandColdCrop(responseText, { userMessage = null } = 
     text: _warmColdCropReplacement(coldCrop, climaUsuario),
     modified: true,
     reason: `cultivo_frio_en_tierra_caliente: ${coldCrop.names[0]}${warmToponym ? ` (${warmToponym})` : ''}`,
+  };
+}
+
+// ── GUARD: cultivo cálido/templado promovido en páramo/frío textual ─────────
+
+const COLD_HIGHLAND_USER_RE =
+  /\b(paramo[s]?|subparamo[s]?|tierra\s+fria|clima\s+frio|zona\s+fria|frio\s+de\s+altura)\b/;
+
+const COLD_HIGHLAND_TOPONYMS = [
+  'bogota',
+  'tunja',
+  'zipaquira',
+  'sumapaz',
+  'duitama',
+  'sogamoso',
+  'fomeque',
+  'ventaquemada',
+];
+
+const COLD_HIGHLAND_WARM_CROP_MARKER = 'no va en ese piso';
+
+const COLD_HIGHLAND_PROMOTES_RE =
+  /(se\s+da\b|es\s+viable|opcion\s+viable|se\s+puede\s+(cultivar|sembrar|dar)|siembr\w*|sembr\w*|cultiv\w*|manej\w*|aguanta\b|resiste\b|adaptad[oa]\b|se\s+cultiva|produce\b|para\s+(la\s+)?mejor\s+cosecha|distancia\s+de\s+siembra|metros\s+entre\s+plantas)/;
+
+const COLD_HIGHLAND_ALREADY_FLAGS_RE =
+  /(\bno\s+se\s+da\b|\bno\s+prosper|inviable|\bno\s+es\s+viable\b|\bno\s+(aguanta|resiste|soporta)\s+(el\s+)?frio\b|\bno\s+es\s+(el\s+)?(clima|piso|la\s+altura|altura)\s+(adecuad|correct|apropiad|ideal)\b|\bno\s+corresponde\s+a\s+ese\s+(clima|piso|altura)\b|\bdemasiad[oa]\s+frio\b|\bdemasiado\s+fria\b)/;
+
+const COLD_HIGHLAND_CROP_MARKERS = [
+  {
+    names: ['cacao'],
+    display: 'cacao',
+    climate: 'tierra cálida',
+    binomial: 'theobroma cacao',
+  },
+  {
+    names: ['platano', 'plátano'],
+    display: 'plátano',
+    climate: 'tierra cálida o templada',
+    binomial: 'musa x paradisiaca',
+  },
+  {
+    names: ['banano', 'guineo'],
+    display: 'banano / guineo',
+    climate: 'tierra cálida o templada',
+    binomial: 'musa acuminata',
+  },
+  {
+    names: ['yuca', 'yuca dulce', 'yuca de comer'],
+    display: 'yuca dulce',
+    climate: 'tierra cálida o templada',
+    binomial: 'manihot esculenta',
+  },
+  {
+    names: ['mango'],
+    display: 'mango',
+    climate: 'tierra cálida',
+    binomial: 'mangifera indica',
+  },
+  {
+    names: ['papaya'],
+    display: 'papaya',
+    climate: 'tierra cálida o templada',
+    binomial: 'carica papaya',
+  },
+  {
+    names: ['arroz'],
+    display: 'arroz',
+    climate: 'tierra cálida o templada',
+    binomial: 'oryza sativa',
+  },
+  {
+    names: ['piña', 'pina'],
+    display: 'piña',
+    climate: 'tierra cálida',
+    binomial: 'ananas comosus',
+  },
+  {
+    names: ['chontaduro'],
+    display: 'chontaduro',
+    climate: 'tierra cálida',
+    binomial: 'bactris gasipaes',
+  },
+  {
+    names: ['palma'],
+    display: 'palma',
+    climate: 'tierra cálida',
+    binomial: 'bactris gasipaes',
+  },
+  {
+    names: ['maranon', 'marañón', 'merey'],
+    display: 'marañón',
+    climate: 'tierra cálida',
+    binomial: 'anacardium occidentale',
+  },
+  {
+    names: ['copoazu', 'copoazú', 'cupuacu', 'cupuaçu'],
+    display: 'copoazú',
+    climate: 'tierra cálida',
+    binomial: 'theobroma grandiflorum',
+  },
+  {
+    names: ['cafe', 'cafe arabica', 'cafe de altura', 'cafeto'],
+    display: 'café',
+    climate: 'tierra templada o fría, no de páramo',
+    binomial: 'coffea arabica',
+  },
+];
+
+function _coldHighlandContextFromText(userNorm) {
+  if (typeof userNorm !== 'string' || !userNorm) return null;
+  if (COLD_HIGHLAND_USER_RE.test(userNorm)) {
+    if (/\bparamo[s]?\b/.test(userNorm)) {
+      return { label: 'en el páramo', reasonSuffix: 'páramo', kind: 'paramo' };
+    }
+    return { label: 'en clima frío', reasonSuffix: 'clima frio', kind: 'frio' };
+  }
+  const toponym = COLD_HIGHLAND_TOPONYMS.find((t) => userNorm.includes(t)) || null;
+  if (!toponym) return null;
+  return { label: 'en clima frío', reasonSuffix: toponym, kind: 'toponym' };
+}
+
+function _coldHighlandWarmCropReplacement(entry, pisoLabel) {
+  const binom = entry.binomial ? ` (${_displayBinomial(entry.binomial)})` : '';
+  return (
+    `Ojo: ${entry.display}${binom} no va ${pisoLabel}; es un cultivo de ${entry.climate}. ` +
+    'Sembrarlo ahi es inviable.'
+  );
+}
+
+/**
+ * guardColdHighlandWarmCrop - espejo de guardWarmLowlandColdCrop. Detecta un
+ * cultivo cálido o templado promovido en un piso de páramo o frío descrito por
+ * palabra o toponimo, y reemplaza por una advertencia determinista.
+ *
+ * Firma propia (necesita userMessage) - se invoca aparte en applyOutputGuards.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardColdHighlandWarmCrop(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(COLD_HIGHLAND_WARM_CROP_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage) : '';
+  const coldContext = _coldHighlandContextFromText(userNorm);
+  if (!coldContext) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+  if (COLD_HIGHLAND_ALREADY_FLAGS_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  if (!COLD_HIGHLAND_PROMOTES_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const crop = COLD_HIGHLAND_CROP_MARKERS.find((entry) =>
+    entry.names.some((name) => _bandNameHit(userNorm, name)),
+  ) || COLD_HIGHLAND_CROP_MARKERS.find((entry) => entry.names.some((name) => _bandNameHit(norm, name)));
+  if (!crop) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  if (crop.display === 'café' && coldContext.kind === 'frio') {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('cold_highland_warm_crop');
+  return {
+    text: _coldHighlandWarmCropReplacement(crop, coldContext.label),
+    modified: true,
+    reason: `cultivo_calido_en_piso_frio: ${crop.display} (${coldContext.reasonSuffix})`,
   };
 }
 
@@ -10090,6 +10364,19 @@ export function applyOutputGuards(
     const wcc = guardWarmLowlandColdCrop(text, { userMessage });
     if (wcc && wcc.modified) {
       return { text: wcc.text, modified: true, reasons: wcc.reason ? [wcc.reason] : [] };
+    }
+  }
+
+  // GUARD CULTIVO CÁLIDO/TEMPLADO en PÁRAMO/FRÍO textual: cuando el usuario
+  // describe un piso frío o un topónimo altoandino y la respuesta promueve cacao,
+  // plátano, banano, yuca, mango, papaya, arroz, piña, chontaduro, palma, marañón,
+  // copoazú o café como si fueran viables ahí, SUPRIME el cuerpo y lo REEMPLAZA por
+  // una advertencia determinista. Complementa a guardHardAltitudeViability, que
+  // exige altitud numérica.
+  if (runPlantingGuards && !(vis && vis.modified)) {
+    const chw = guardColdHighlandWarmCrop(text, { userMessage });
+    if (chw && chw.modified) {
+      return { text: chw.text, modified: true, reasons: chw.reason ? [chw.reason] : [] };
     }
   }
 
