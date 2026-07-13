@@ -160,6 +160,9 @@ const ValleLluviaMockup = lazy(() => import('./mockups/ValleLluvia3D'));
 const MundoSemilleroMockup = lazy(() => import('./mockups/MundoSemillero3D'));
 const MundoCompostMockup = lazy(() => import('./mockups/MundoCompost3D'));
 const JuegoMiFincaMockup = lazy(() => import('./mockups/JuegoMiFincaOdyssey'));
+// Metal Slug del campo: run-and-gun agroecológico (nivel 1). Angelita "combate"
+// plagas reales con control biológico y libera al oso andino cazado. Sin auth.
+const MetalSlugCampoMockup = lazy(() => import('./mockups/MetalSlugCampo'));
 // La "ventana-puerta" al valle: viewport 3D vivo enmarcado para el home 2D.
 const VentanaValleMockup = lazy(() => import('./components/VentanaValle3D'));
 // New Donk: un plano 2D lado-a-lado embebido DENTRO del valle 3D (Mario Odyssey).
@@ -593,6 +596,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-semillero-3d': 'mockup_mundo_semillero_3d',
   'mockups/mundo-compost-3d': 'mockup_mundo_compost_3d',
   'mockups/juego-mi-finca': 'mockup_juego_mi_finca',
+  'mockups/metal-slug-campo': 'mockup_metal_slug_campo',
   'mockups/ventana-valle': 'mockup_ventana_valle',
   'mockups/new-donk': 'mockup_new_donk',
   'mockups/murales-new-donk': 'mockup_murales_new_donk',
@@ -1922,6 +1926,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Juego Mi finca (túnel Odyssey)">
               <JuegoMiFincaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_metal_slug_campo':
+        // Metal Slug del campo (nivel 1): side-scroller run-and-gun agroecológico.
+        // Angelita recorre la huerta templada, controla plagas reales con el
+        // aliado biológico correcto (ficha didáctica al vencerlas), libera al oso
+        // andino cazado (mensaje de conservación) y aprende el par plaga↔control.
+        // Reusa defensoresGameEngine + metalSlugCampoData. Sin auth (vitrina).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Metal Slug del campo (nivel 1)">
+              <MetalSlugCampoMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
