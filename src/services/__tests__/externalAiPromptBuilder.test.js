@@ -25,12 +25,12 @@ describe('deriveThermalZoneFromAltitud — casos borde', () => {
   });
 
   it('retorna null para string numerico', () => {
-    expect(deriveThermalZoneFromAltitud('2550')).toBeNull();
+    expect(deriveThermalZoneFromAltitud(/** @type {any} */ ('2550'))).toBeNull();
   });
 
   it('retorna null para boolean', () => {
-    expect(deriveThermalZoneFromAltitud(true)).toBeNull();
-    expect(deriveThermalZoneFromAltitud(false)).toBeNull();
+    expect(deriveThermalZoneFromAltitud(/** @type {any} */ (true))).toBeNull();
+    expect(deriveThermalZoneFromAltitud(/** @type {any} */ (false))).toBeNull();
   });
 
   it('retorna null para NaN', () => {
@@ -78,7 +78,7 @@ describe('buildGuildExternalPrompt — casos borde', () => {
   });
 
   it('maneja prompt sin especie (vacio total)', () => {
-    const p = buildGuildExternalPrompt({});
+    const p = buildGuildExternalPrompt(/** @type {any} */ ({}));
     expect(p).toContain('especie desconocida');
     expect(typeof p).toBe('string');
     expect(p.length).toBeGreaterThan(50);
@@ -130,7 +130,7 @@ describe('buildDiagnosticExternalPrompt — casos borde', () => {
   });
 
   it('usa "cultivo" cuando speciesName no se da', () => {
-    const p = buildDiagnosticExternalPrompt({});
+    const p = buildDiagnosticExternalPrompt(/** @type {any} */ ({}));
     expect(p).toContain('cultivo');
   });
 
@@ -227,7 +227,7 @@ describe('buildDiagnosticExternalPrompt — FIX P0 (a)+(b): sanitización + guar
     const largoSintoma = 'amarillas '.repeat(100); // 1000 chars
     const p = buildDiagnosticExternalPrompt({ speciesName: 'café', sintomas: largoSintoma });
     // El campo en el prompt no puede exceder 500 chars del input del usuario.
-    const match = p.match(/SÍNTOMAS OBSERVADOS: (.+)/s);
+    const match = /** @type {RegExpExecArray} */ (p.match(/SÍNTOMAS OBSERVADOS: (.+)/s);
     expect(match).not.toBeNull();
     const sintomasEnPrompt = match[1].split('\n')[0];
     expect(sintomasEnPrompt.length).toBeLessThanOrEqual(510); // 500 + separadores mínimos

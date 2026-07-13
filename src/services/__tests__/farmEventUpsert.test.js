@@ -20,8 +20,8 @@ import { buildUpsertPlaceholder } from '../farmEventService';
 import { newUlid } from '../../utils/id';
 
 // Stores en memoria compartidos por el mock de openDB.
-let procStore; // Map<process_id, FarmProcess>
-let eventStore; // Array<FarmProcessEvent>
+let /** @type {any} */ procStore; // Map<process_id, FarmProcess>
+let /** @type {any} */ eventStore; // Array<FarmProcessEvent>
 
 vi.mock('../../db/dbCore', () => {
   const STORES = {
@@ -30,12 +30,12 @@ vi.mock('../../db/dbCore', () => {
   };
 
   // Construye un objectStore IDB-like sobre las estructuras en memoria.
-  const makeProcObjectStore = () => ({
+  const makeProcObjectStore = () => /** @type {any} */ ({
     get(key) {
       const req = { onsuccess: null, onerror: null, result: undefined };
       Promise.resolve().then(() => {
         req.result = procStore.get(key);
-        req.onsuccess?.({ target: req });
+        (/** @type {any} */ (req.onsuccess))?.({ target: req });
       });
       return req;
     },
@@ -45,7 +45,7 @@ vi.mock('../../db/dbCore', () => {
     },
   });
 
-  const makeEventObjectStore = () => ({
+  const makeEventObjectStore = () => /** @type {any} */ ({
     index(name) {
       // Solo se usa el índice idempotency_key (dedup).
       return {
@@ -55,7 +55,7 @@ vi.mock('../../db/dbCore', () => {
             if (name === 'idempotency_key') {
               req.result = eventStore.find((e) => e.attributes?.idempotency_key === key);
             }
-            req.onsuccess?.({ target: req });
+            (/** @type {any} */ (req.onsuccess))?.({ target: req });
           });
           return req;
         },
@@ -68,10 +68,10 @@ vi.mock('../../db/dbCore', () => {
   });
 
   const makeTx = () => {
-    const tx = { oncomplete: null, onerror: null };
+    const tx = /** @type {any} */ ( { oncomplete: null, onerror: null };
     const proc = makeProcObjectStore();
     const ev = makeEventObjectStore();
-    tx.objectStore = (storeName) => (storeName === STORES.FARM_PROCESSES ? proc : ev);
+    tx.objectStore = /** @type {any} */ ((storeName) => (storeName === STORES.FARM_PROCESSES ? proc : ev));
     // La transacción "completa" en el siguiente microtask, tras resolver get/add.
     Promise.resolve().then(() => Promise.resolve().then(() => tx.oncomplete?.()));
     return tx;
@@ -79,7 +79,7 @@ vi.mock('../../db/dbCore', () => {
 
   return {
     STORES,
-    openDB: vi.fn(() => Promise.resolve({ transaction: () => makeTx() })),
+    openDB: vi.fn(() => Promise.resolve(/** @type {any} */ ({ transaction: () => makeTx() }))),
   };
 });
 

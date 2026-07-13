@@ -13,16 +13,16 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-let compressImage;
-let IMAGE_TOO_LARGE_MESSAGE;
-let __test;
+let /** @type {any} */ compressImage;
+let /** @type {any} */ IMAGE_TOO_LARGE_MESSAGE;
+let /** @type {any} */ __test;
 
 // State global para el mock de canvasToBlob — cada test ajusta los tamaños
 // que devolverán los toBlob calls en orden.
-let blobSizesQueue = [];
+let /** @type {any[]} */ blobSizesQueue = /** @type {any[]} */ ([]);
 
 beforeEach(async () => {
-  blobSizesQueue = [];
+  blobSizesQueue = /** @type {any[]} */ ([]);
 
   // 1) Mock createImageBitmap — devuelve un "bitmap" con dims conocidas.
   globalThis.createImageBitmap = vi.fn().mockImplementation(async () => ({
@@ -49,7 +49,7 @@ beforeEach(async () => {
       return new Blob([buf], { type });
     }
   }
-  globalThis.OffscreenCanvas = MockOffscreenCanvas;
+  globalThis.OffscreenCanvas = /** @type {any} */ (MockOffscreenCanvas);
 
   // Reset del module registry para que el `typeof OffscreenCanvas === 'function'`
   // chequeado dentro de imageCompress.js refleje el mock recién instalado.
@@ -152,7 +152,7 @@ describe('compressImage', () => {
         queueMicrotask(() => this.onerror && this.onerror());
       }
     }
-    globalThis.Image = BrokenImage;
+    globalThis.Image = /** @type {any} */ (BrokenImage);
 
     const input = new Blob([new Uint8Array(1024)], { type: 'image/jpeg' });
     const result = await compressImage(input);

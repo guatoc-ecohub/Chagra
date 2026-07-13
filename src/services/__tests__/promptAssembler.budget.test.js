@@ -249,6 +249,17 @@ REGLA: usa SOLO estas relaciones verificadas para razonar la cadena cultivo→pl
 
 // ── Réplica del ensamblado de callLLM (mismos builders, mismos gates) ──────
 
+/**
+ * @param {Object} p
+ * @param {any} p.query
+ * @param {any} p.resolvedEntities
+ * @param {any} [p.suggestedEntities]
+ * @param {any} p.toolEvidence
+ * @param {string} [p.subgrafoBloque]
+ * @param {any} [p.corpus]
+ * @param {string} [p.contextMemory]
+ * @param {any} [p.nivelRespuestas]
+ */
 function assembleForQuery({ query, resolvedEntities, suggestedEntities = null, toolEvidence, subgrafoBloque = '', corpus = CORPUS, contextMemory = MEMORY, nivelRespuestas }) {
   const analysis = analyzeQuery(query);
   const systemPrompt = buildBasePrompt({
@@ -315,21 +326,24 @@ const QUERIES = {
     resolvedEntities: [ENT_CAFE, ENT_BROCA, ENT_BEAUVERIA],
     toolEvidence: EVIDENCE_Q1,
     subgrafoBloque: SUBGRAFO_Q1,
+    nivelRespuestas: undefined,
   },
   q2_viabilidad: {
     query: '¿puedo sembrar mango a 3200 metros en mi finca?',
     resolvedEntities: [ENT_MANGO],
     toolEvidence: EVIDENCE_Q2,
+    nivelRespuestas: undefined,
   },
   q3_precio: {
     query: '¿a cómo está la papa?',
     resolvedEntities: [ENT_PAPA],
     toolEvidence: EVIDENCE_Q3,
+    nivelRespuestas: undefined,
   },
 };
 
 beforeAll(() => {
-  window.localStorage.setItem('chagra:profile:v1', JSON.stringify(PROFILE));
+  /** @type {any} */ (globalThis).localStorage.setItem('chagra:profile:v1', JSON.stringify(PROFILE));
 });
 
 // Bloques de grounding y guardas que JAMÁS pueden degradarse por presupuesto
@@ -358,8 +372,8 @@ describe('presupuesto del prompt ensamblado (regresión GR-10)', () => {
 
         // Desglose tokens-por-bloque (entregable de la medición).
         const rows = assembled.breakdown
-          .filter((b) => b.tokens > 0)
-          .map((b) => `${b.name.padEnd(18)} ${String(b.tokens).padStart(6)}${b.degraded ? '  (degradado)' : ''}`)
+          .filter(/** @type {any} */ ((b) => b.tokens > 0))
+          .map(/** @type {any} */ ((b) => `${b.name.padEnd(18)} ${String(b.tokens).padStart(6)}${b.degraded ? '  (degradado)' : ''}`)
           .join('\n');
         console.log(`\n── ${name} — tokens por bloque ──\n${rows}\nTOTAL system: ${assembled.totalTokens}`);
 
@@ -448,7 +462,7 @@ describe('presupuesto del prompt ensamblado (regresión GR-10)', () => {
         query: '¿qué es la permacultura?',
         resolvedEntities: null,
         toolEvidence: null,
-        corpus: null,
+        corpus: /** @type {any} */ (null),
         contextMemory: '',
         nivelRespuestas: 'detallado',
       });
