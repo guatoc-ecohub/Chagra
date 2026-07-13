@@ -86,13 +86,13 @@ describe('Skeleton — role="status" con aria-busy', () => {
   test('role="status" anuncia carga al lector de pantalla', () => {
     const { container } = render(<Skeleton />);
     const el = container.firstChild;
-    expect(el.getAttribute('role')).toBe('status');
+    expect(/** @type {HTMLElement} */ (el).getAttribute('role')).toBe('status');
   });
 
   test('aria-busy="true" indica actividad en curso', () => {
     const { container } = render(<Skeleton />);
     const el = container.firstChild;
-    expect(el.getAttribute('aria-busy')).toBe('true');
+    expect(/** @type {HTMLElement} */ (el).getAttribute('aria-busy')).toBe('true');
   });
 
   test('aria-label descriptivo para el skeleton', () => {

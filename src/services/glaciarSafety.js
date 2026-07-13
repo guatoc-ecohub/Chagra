@@ -56,7 +56,10 @@ import {
   ordenDureza,
 } from '../data/glaciar-schema.js';
 
-/** @type {Readonly<{estable: EstadoSeguridad, precaucion: EstadoSeguridad, peligro: EstadoSeguridad, observacion: EstadoSeguridad}>} */
+/**
+ * @typedef {{estable: any, peligro: any, precaucion: any, observacion: any}} EstadoSeguridadContainer
+ */
+/** @type {EstadoSeguridadContainer} */
 const EST = ESTADOS_SEGURIDAD;
 
 /** Tipos de superficie que, por sí solos (en cualquier capa), fuerzan 🔴. */

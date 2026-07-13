@@ -33,6 +33,7 @@ export async function completeTaskByVoice({ processId, taskName, actor }) {
  * @param {string} input.processId
  * @param {string} input.taskName
  * @param {number} input.newDate — timestamp ms
+ * @param {string} [input.actor]
  */
 export async function rescheduleTaskByVoice({ processId, taskName, newDate, actor }) {
   if (!processId) throw new Error('rescheduleTaskByVoice: process_id required');

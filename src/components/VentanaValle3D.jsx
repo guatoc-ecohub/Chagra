@@ -86,7 +86,7 @@ function Valle2D({ reducedMotion, tier }) {
 
       {/* la Angelita 2D volando en el espejo (misma creature del home) */}
       <div className={`vv-abeja vv-abeja--2d${reducedMotion ? ' vv-abeja--quieta' : ''}`}>
-        <AbejaAngelita size={44} animo="pleno" energia={0.9} animated={!reducedMotion} tier={tier} />
+        <AbejaAngelita size={44} animo="pleno" energia={0.9} animated={!reducedMotion} tier={tier} tempC={0} />
       </div>
     </div>
   );

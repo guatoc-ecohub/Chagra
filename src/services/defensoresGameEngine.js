@@ -273,13 +273,14 @@ export function intentarSalto(estado) {
  *   todoListo: boolean,
  * }}
  */
-export function resumenObjetivos({
-  cultivosRecogidos = 0,
-  metaCultivos = 0,
-  plagasVivas = 0,
-  hayJefe = false,
-  jefeVivo = false,
-} = {}) {
+export function resumenObjetivos(opts = /** @type {any} */ ({})) {
+  const {
+    cultivosRecogidos = 0,
+    metaCultivos = 0,
+    plagasVivas = 0,
+    hayJefe = false,
+    jefeVivo = false,
+  } = opts;
   const hechos = clamp(cultivosRecogidos, 0, metaCultivos);
   const cultivosListo = cultivosRecogidos >= metaCultivos;
   const plagasListo = plagasVivas <= 0;

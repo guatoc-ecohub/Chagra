@@ -113,7 +113,7 @@ describe('fetchDeployedSha', () => {
   });
   it('respuesta !ok → null', async () => {
     await expect(
-      fetchDeployedSha({ fetchImpl: async () => ({ ok: false }) }),
+      fetchDeployedSha({ fetchImpl: /** @type {any} */ (async () => ({ ok: false })) }),
     ).resolves.toBeNull();
   });
   it('fetch lanza (offline) → null, no throw', async () => {

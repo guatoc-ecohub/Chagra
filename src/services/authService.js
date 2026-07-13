@@ -176,7 +176,7 @@ export const authenticateUser = async (username, password) => {
 
     // Aviso de deprecation
     const daysUntilDeprecation = Math.max(0, Math.ceil(
-        (PASSWORD_GRANT_DEPRECATION_DATE - Date.now()) / (1000 * 60 * 60 * 24)
+        (Number(PASSWORD_GRANT_DEPRECATION_DATE) - Date.now()) / (1000 * 60 * 60 * 24)
     ));
 
     if (PASSWORD_GRANT_DEPRECATED) {

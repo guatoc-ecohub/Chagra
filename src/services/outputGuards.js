@@ -2204,8 +2204,8 @@ export function guardThermalViability(
     return { text: responseText, modified: false, reason: null };
   }
 
-  const fMin = forecastTempMin != null && forecastTempMin !== '' ? Number(forecastTempMin) : NaN;
-  const fMax = forecastTempMax != null && forecastTempMax !== '' ? Number(forecastTempMax) : NaN;
+  const fMin = forecastTempMin != null && /** @type {any} */ (forecastTempMin) !== '' ? Number(forecastTempMin) : NaN;
+  const fMax = forecastTempMax != null && /** @type {any} */ (forecastTempMax) !== '' ? Number(forecastTempMax) : NaN;
   const haveMin = Number.isFinite(fMin);
   const haveMax = Number.isFinite(fMax);
   // Sin NINGÚN dato de pronóstico → no-op graceful (gap documentado).
@@ -5247,7 +5247,7 @@ function _findInventedClimateVariety(norm) {
         if (opuestoRe.test(s)) {
           return {
             name,
-            clima: entry.clima,
+            clima: /** @type {'frio'|'calido'} */ (entry.clima),
             opuesto: entry.clima === 'calido' ? 'frio' : 'calido',
             // GAP 1 (#1303): el binomio canónico de la especie. Va al texto de
             // neutralización para cubrir el must_include del bench ("Bactris
@@ -9649,7 +9649,7 @@ export function guardConciseResponse(responseText) {
     // Deduplicar: mantener primera mención de cada recomendación
     const seen = new Set();
     const deduped = sentences.filter(s => {
-      const key = s.trim().toLowerCase().slice(0, 60);
+      const key = /** @type {string} */ (/** @type {any} */ (s).trim().toLowerCase().slice(0, 60));
       if (seen.has(key)) return false;
       seen.add(key);
       return true;

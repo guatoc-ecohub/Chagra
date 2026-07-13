@@ -60,7 +60,7 @@ describe('TransicionMundoKit — contrato temporal', () => {
   });
 
   test('activa=false no monta nada', () => {
-    render(<TransicionMundoKit variante="iris" activa={false} />);
+    render(<TransicionMundoKit variante="iris" activa={false} onMitad={() => {}} onFin={() => {}} />);
     expect(screen.queryByTestId('tmk')).not.toBeInTheDocument();
   });
 
@@ -116,7 +116,7 @@ describe('TransicionMundoKit — contrato temporal', () => {
 
   test('tier bajo acorta el viaje y quita decoraciones', () => {
     const { container } = render(
-      <TransicionMundoKit variante="wipe" activa tier="bajo" />,
+      <TransicionMundoKit variante="wipe" activa tier="bajo" onMitad={() => {}} onFin={() => {}} />,
     );
     expect(container.querySelector('.tmk__ola')).toBeNull();
     expect(container.querySelector('.tmk__wipe-cuerpo')).not.toBeNull();
@@ -126,7 +126,7 @@ describe('TransicionMundoKit — contrato temporal', () => {
   });
 
   test('variante desconocida cae a fade y direccion invalida a entrar', () => {
-    render(<TransicionMundoKit variante="explosion" activa direccion="teleport" />);
+    render(<TransicionMundoKit variante="explosion" activa direccion="teleport" onMitad={() => {}} onFin={() => {}} />);
     const raiz = screen.getByTestId('tmk');
     expect(raiz).toHaveAttribute('data-variante', 'fade');
     expect(raiz).toHaveAttribute('data-direccion', 'entrar');

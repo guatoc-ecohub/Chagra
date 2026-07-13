@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { setOnline } from '../../test-utils/index.js';
 
@@ -62,7 +63,7 @@ describe('visionWarmService offline-first', () => {
     const r2 = await warmVisionModel();
 
     // Cleanup: resolve the fetch so p1 can complete
-    resolveFetch({ ok: true, status: 200 });
+    resolveFetch?.(/** @type {any} */ ({ ok: true, status: 200 }));
     const r1 = await p1;
 
     expect(r1).toBe(true);

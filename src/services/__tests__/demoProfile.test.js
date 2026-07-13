@@ -115,8 +115,8 @@ describe('demoProfile service', () => {
       applyDemoProfile('tecnico');
       window.removeEventListener('chagra:profile:demo-switched', handler);
       expect(eventDetail).not.toBeNull();
-      expect(eventDetail.id).toBe('tecnico');
-      expect(eventDetail.profile.rol).toBe('tecnico');
+      expect(/** @type {any} */ (eventDetail).id).toBe('tecnico');
+      expect(/** @type {any} */ (eventDetail).profile.rol).toBe('tecnico');
     });
 
     it('returns true on success', () => {

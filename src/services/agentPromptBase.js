@@ -514,19 +514,20 @@ export function buildResponseModeBlock(mode, hasGrounding = false) {
  * @param {boolean} [args.hasCorpus] - si hay corpus RAG (para pie de fuente).
  * @returns {string}
  */
-export function buildBasePrompt({
-  plantContext,
-  fincaContext = '',
-  indoorContext = '',
-  finca = null,
-  query = '',
-  contextMemory = '',
-  isEnum = false,
-  nivelRespuestas = '',
-  toolEvidence = null,
-  resolvedEntities = null,
-  hasCorpus = false,
-} = {}) {
+export function buildBasePrompt(opts = /** @type {any} */ ({})) {
+  const {
+    plantContext,
+    fincaContext = '',
+    indoorContext = '',
+    finca = null,
+    query = '',
+    contextMemory = '',
+    isEnum = false,
+    nivelRespuestas = '',
+    toolEvidence = null,
+    resolvedEntities = null,
+    hasCorpus = false,
+  } = opts;
   const mention = _strip(`${query}\n${contextMemory}`);
   const profileMode = normalizeMode(nivelRespuestas || getProfile()?.nivel_respuestas || '');
   const sections = [];
@@ -635,11 +636,11 @@ ANTI-INVENCIÓN-DE-SÍNTOMAS: NUNCA describas síntomas/problemas/observaciones 
 
   // Reglas crop-agnostic (aplican a cualquier cultivo)
   const cropAgnosticSafety = CROP_AGNOSTIC_SAFETY_RULES.filter(([groups]) =>
-    groups.every((keys) => _mentionsAny(mention, keys))
+    /** @type {string[][]} */ (groups).every((keys) => _mentionsAny(mention, keys))
   ).map(([, line]) => line);
 
   // Reglas específicas de tomate (se suman a las crop-agnostic)
-  const tomateSafety = TOMATE_SAFETY_RULES.filter(([groups]) => groups.every((keys) => _mentionsAny(mention, keys))).map(([, line]) => line);
+  const tomateSafety = TOMATE_SAFETY_RULES.filter(([groups]) => /** @type {string[][]} */ (groups).every((keys) => _mentionsAny(mention, keys))).map(([, line]) => line);
 
   const allSafetyRules = [...cropAgnosticSafety, ...tomateSafety];
   if (allSafetyRules.length > 0) {

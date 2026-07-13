@@ -373,6 +373,7 @@ export function selectHomeModules(profile, opts = {}) {
 export function selectHomeModuleVisibilityMap(profile, opts = {}) {
   const { visibles } = selectHomeModules(profile, opts);
   const visibleSet = new Set(visibles);
+  /** @type {Record<string,boolean>} */
   const map = {};
   for (const id of ALL_HOME_MODULES) {
     map[id] = visibleSet.has(id);

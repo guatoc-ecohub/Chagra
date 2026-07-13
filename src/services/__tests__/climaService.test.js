@@ -305,11 +305,11 @@ describe('climaService — cache + fetch', () => {
     const p1 = mod.fetchClimaSnapshot();
     const p2 = mod.fetchClimaSnapshot();
     expect(sidecarMock).toHaveBeenCalledTimes(1);
-    resolveFn({
+    if (resolveFn) /** @type {Function} */ (resolveFn)(/** @type {any} */ ({
       fetched_at: new Date().toISOString(),
       enso_status: { phase: 'neutral', severity: 'neutral', sources: [] },
       alertas_locales: [],
-    });
+    }));
     const [r1, r2] = await Promise.all([p1, p2]);
     expect(r1).toBe(r2);
   });

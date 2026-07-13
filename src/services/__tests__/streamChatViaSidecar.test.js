@@ -142,9 +142,9 @@ describe('streamChatViaSidecar — happy path', () => {
     expect(tokens[0]).toEqual({ chunk: 'Hola ', full: 'Hola ' });
     expect(tokens[1]).toEqual({ chunk: 'mijo', full: 'Hola mijo' });
     expect(doneStats).toBeDefined();
-    expect(doneStats.eval_count).toBe(3);
-    expect(doneStats.eval_rate).toBe(6.5);
-    expect(doneStats.prompt_eval_count).toBe(8);
+    expect(/** @type {any} */ (doneStats).eval_count).toBe(3);
+    expect(/** @type {any} */ (doneStats).eval_rate).toBe(6.5);
+    expect(/** @type {any} */ (doneStats).prompt_eval_count).toBe(8);
     expect(stats.fullText).toBe('Hola mijo');
     expect(stats.sidecar_first_token_ms).toBe(420);
   });

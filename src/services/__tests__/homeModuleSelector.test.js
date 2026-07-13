@@ -294,7 +294,7 @@ describe('homeModuleSelector — invariantes', () => {
     for (const p of perfiles) {
       const { visibles, seguimiento } = selectHomeModules(p);
       for (const id of visibles) expect(validModules.has(id)).toBe(true);
-      for (const k of seguimiento) expect(ALL_SEGUIMIENTO.has(k)).toBe(true);
+      for (const k of seguimiento) expect(ALL_SEGUIMIENTO.has(/** @type {any} */ (k))).toBe(true);
       expect(new Set(visibles).size).toBe(visibles.length);
       expect(new Set(seguimiento).size).toBe(seguimiento.length);
     }

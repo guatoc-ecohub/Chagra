@@ -50,7 +50,7 @@ import * as outputGuards from '../outputGuards.js';
 
 describe('applyTaxonomyGuard (A24) — guard muerto removido', () => {
   it('ya NO se exporta desde outputGuards (rama res.valid era no-op en prod)', () => {
-    expect(outputGuards.applyTaxonomyGuard).toBeUndefined();
+    expect(/** @type {any} */ (outputGuards).applyTaxonomyGuard).toBeUndefined();
     expect('applyTaxonomyGuard' in outputGuards).toBe(false);
   });
 

@@ -42,7 +42,7 @@ describe('ROUTES y getModelFor', () => {
   });
 
   it('getModelFor lanza error claro para tarea desconocida', () => {
-    expect(() => getModelFor('inexistente')).toThrow(/Tarea desconocida/);
+    expect(() => getModelFor(/** @type {any} */ ('inexistente'))).toThrow(/Tarea desconocida/);
   });
 
   it('DEFAULT_MODEL coincide con el modelo de chat', () => {
@@ -57,7 +57,7 @@ describe('buildLLMRequest', () => {
   ];
 
   it('construye url + body con los valores de la ruta', () => {
-    const { url, body } = buildLLMRequest('chat', messages);
+    const { url, body } = /** @type {any} */ (buildLLMRequest('chat', messages));
     expect(url).toBe(ROUTES.chat.url);
     expect(body.model).toBe(ROUTES.chat.model);
     expect(body.messages).toEqual(messages);
@@ -66,18 +66,18 @@ describe('buildLLMRequest', () => {
   });
 
   it('formatea keep_alive como "<min>m"', () => {
-    const { body } = buildLLMRequest('chat', messages);
+    const { body } = /** @type {any} */ (buildLLMRequest('chat', messages));
     expect(body.keep_alive).toBe(`${ROUTES.chat.keep_alive_min}m`);
   });
 
   it('los overrides ganan sobre la config de la ruta', () => {
-    const { body } = buildLLMRequest('chat', messages, { temperature: 0.9, max_tokens: 42 });
+    const { body } = /** @type {any} */ (buildLLMRequest('chat', messages, { temperature: 0.9, max_tokens: 42 }));
     expect(body.temperature).toBe(0.9);
     expect(body.max_tokens).toBe(42);
   });
 
   it('lanza para tarea desconocida (vía getModelFor)', () => {
-    expect(() => buildLLMRequest('nope', messages)).toThrow(/Tarea desconocida/);
+    expect(() => buildLLMRequest(/** @type {any} */ ('nope'), messages)).toThrow(/Tarea desconocida/);
   });
 
   // BUG A (fuga de roles, 2026-05-30): el modelo generaba turnos falsos
@@ -88,7 +88,7 @@ describe('buildLLMRequest', () => {
   describe('BUG A — stop sequences anti fuga-de-roles', () => {
     it('las rutas de chat incluyen body.stop con las etiquetas de rol', () => {
       for (const task of ['chat', 'chat_complex']) {
-        const { body } = buildLLMRequest(task, messages);
+        const { body } = /** @type {any} */ (buildLLMRequest(/** @type {any} */ (task), messages));
         expect(Array.isArray(body.stop), task).toBe(true);
         // Debe cortar tanto al inicio de línea como tras newline, ES y EN,
         // y el marcador de chat-template de Ollama.
@@ -104,17 +104,18 @@ describe('buildLLMRequest', () => {
     });
 
     it('ROUTES.chat.stop está definido y es no vacío', () => {
-      expect(Array.isArray(ROUTES.chat.stop)).toBe(true);
-      expect(ROUTES.chat.stop.length).toBeGreaterThan(0);
+      const chatRoute = /** @type {any} */ (ROUTES.chat);
+      expect(Array.isArray(chatRoute.stop)).toBe(true);
+      expect(chatRoute.stop.length).toBeGreaterThan(0);
     });
 
     it('un override de stop reemplaza el de la ruta', () => {
-      const { body } = buildLLMRequest('chat', messages, { stop: ['###'] });
+      const { body } = /** @type {any} */ (buildLLMRequest('chat', messages, { stop: ['###'] }));
       expect(body.stop).toEqual(['###']);
     });
 
     it('las rutas no-chat (nlu) no rompen si no definen stop', () => {
-      const { body } = buildLLMRequest('nlu', messages);
+      const { body } = /** @type {any} */ (buildLLMRequest('nlu', messages));
       // nlu puede no traer stop; si lo trae, debe ser array.
       if (body.stop !== undefined) expect(Array.isArray(body.stop)).toBe(true);
     });

@@ -162,7 +162,7 @@ export default function PlantCemeteryModal({ plantName, onClose, onConfirm }) {
               <textarea
                 value={freeText}
                 onChange={(e) => setFreeText(e.target.value)}
-                rows="2"
+                rows={2}
                 className="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-sm text-slate-200 outline-none focus:border-amber-700"
                 placeholder="Síntomas observados, momento del ciclo, contexto climático..."
               />

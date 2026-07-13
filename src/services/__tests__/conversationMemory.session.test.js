@@ -157,9 +157,9 @@ vi.mock('../../db/dbCore', () => ({
 // `IDBKeyRange.only(operatorId)`. Devolvemos un objeto plano con `_only`
 // que nuestro fake DB sabe leer (también soporta `.lower` para compat).
 if (typeof globalThis.IDBKeyRange === 'undefined') {
-  globalThis.IDBKeyRange = {
+  globalThis.IDBKeyRange = /** @type {any} */ ({
     only: (value) => ({ _only: value, lower: value, upper: value }),
-  };
+  });
 }
 
 import {

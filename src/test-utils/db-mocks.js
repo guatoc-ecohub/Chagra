@@ -9,7 +9,7 @@
  */
 import { vi } from 'vitest';
 
-/** @type {string[]} STORES usados en los tests del repo. */
+/** @type {Record<string,string>} STORES usados en los tests del repo. */
 const DEFAULT_STORES = {
   ASSETS: 'assets',
   LOGS: 'logs',

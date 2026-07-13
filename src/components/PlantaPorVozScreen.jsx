@@ -142,7 +142,7 @@ function PlantDossierCard({ dossier, altitudeM, onReloadCycles }) {
           )}
           {antagonists.length > 0 && (
             <div>
-              <SectionTitle icon={Ban}>Evita sembrarla junto a</SectionTitle>
+              <SectionTitle icon={Ban} hint={null}>Evita sembrarla junto a</SectionTitle>
               <SpeciesChips list={antagonists} tone="bad" />
             </div>
           )}

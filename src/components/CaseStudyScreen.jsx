@@ -134,8 +134,7 @@ const NewCaseForm = ({ onCreate, onCancel, defaultFincaSlug }) => {
   const [extracting, setExtracting] = useState(false);
   const [extractError, setExtractError] = useState(null);
   const [transcribing, setTranscribing] = useState(false);
-  /** @type {{title?: boolean, problem_name?: boolean, count_total?: boolean, count_affected?: boolean}} */
-  const [touched, setTouched] = useState({});
+  const [touched, setTouched] = useState(/** @type {Record<string,boolean>} */ ({}));
   const recorder = useVoiceRecorder();
 
   // Bug 069.10 — validación inline: títulos/problemas mínimos para no crear

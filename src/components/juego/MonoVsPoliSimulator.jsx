@@ -198,18 +198,21 @@ function AssociationPanel({ item }) {
           label="Nitrogeno fijado"
           mono="Depende del manejo"
           poli={nitrogenText(item)}
+          emphasis=""
         />
         <MetricCard
           icon={FlaskConical}
           label="Ahorro de insumos"
           mono="Compra completa"
           poli={inputSavingsText(item.policultivo.ahorro_insumos)}
+          emphasis=""
         />
         <MetricCard
           icon={ShieldCheck}
           label="Control de plaga"
           mono="Mayor presion"
           poli={pestControlText(item.policultivo.control_plaga_pct)}
+          emphasis=""
         />
       </div>
 

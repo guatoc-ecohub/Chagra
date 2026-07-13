@@ -208,21 +208,21 @@ export default function VoiceCapture({ onSave, onPlantsSaved, hideDoneScreen = f
           total: summary.total,
           slugs: summary.slugs,
         });
-        recordEvent({
+        recordEvent(/** @type {any} */ ({
           event_type: 'voice_extraction_success',
           flujo: 'voice_capture',
           accepted: true,
           connectivity: navigator.onLine ? 'online' : 'offline',
-        }).catch(() => {});
+        })).catch(() => {});
         setView(STATE_REVIEW);
       } catch (err) {
         logVoiceEvent('voice:extraction_failed', { error: err.message }, 'warn');
-        recordEvent({
+        recordEvent(/** @type {any} */ ({
           event_type: 'voice_extraction_fail',
           flujo: 'voice_capture',
           accepted: false,
           connectivity: navigator.onLine ? 'online' : 'offline',
-        }).catch(() => {});
+        })).catch(() => {});
         setErrorMsg(`No se pudieron extraer entidades: ${err.message}. Revisa la transcripción manualmente.`);
         setEntities([]);
         setView(STATE_REVIEW);
@@ -578,6 +578,7 @@ export default function VoiceCapture({ onSave, onPlantsSaved, hideDoneScreen = f
 
       {view === STATE_RECORDING && (
         <div className="flex flex-col items-center gap-4 py-8">
+          {/* @ts-expect-error Sparkline component uses values for raw array data */}
           <Sparkline values={amplitudeHistory} color="#f87171" width={240} height={48} showLastValue={false} />
           <div className="tabular-nums text-3xl font-mono text-red-400">
             {formatDuration(durationMs)} <span className="text-slate-500 text-sm">/ {formatDuration(hardLimitMs)}</span>

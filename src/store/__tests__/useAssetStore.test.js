@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import useAssetStore from '../useAssetStore';
 
 function resetStore() {
@@ -103,7 +103,7 @@ describe('useAssetStore — syncFromServer error mapping (bug demo 2026-06-19)',
   });
 
   it('un 401 crudo se mapea a "sesión" (no expone el código HTTP al operador)', async function () {
-    const fetchFn = async () => { const e = new Error('FarmOS API Error: 401'); e.status = 401; throw e; };
+    const fetchFn = async () => { const e = /** @type {Error & {status?: number}} */ (new Error('FarmOS API Error: 401')); e.status = 401; throw e; };
     await useAssetStore.getState().syncFromServer(fetchFn);
     const s = useAssetStore.getState();
     expect(s.error).toBeTruthy();

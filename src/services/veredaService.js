@@ -28,7 +28,7 @@ const NOMINATIM_TIMEOUT_MS = 8000;
  *
  * @param {number} lat - Latitud
  * @param {number} lng - Longitud
- * @returns {Promise<{vereda:string|null, municipio:string|null, departamento:string|null, source:string, display_name:string|null}>}
+ * @returns {Promise<{vereda:string|null, municipio:string|null, departamento:string|null, source:string, display_name?:string|null}>}
  */
 export async function getVeredaFromGPS(lat, lng) {
   if (typeof lat !== 'number' || typeof lng !== 'number') return null;
@@ -77,7 +77,7 @@ export function normalizeVeredaName(name) {
 }
 
 function getMunicipioCode(municipio) {
-  const hit = findMunicipio(municipio);
+  const hit = /** @type {any} */ (findMunicipio(municipio));
   return hit?.codigo || hit?.cod_mpio || hit?.id || null;
 }
 
