@@ -90,12 +90,31 @@ const VARIANTES_OSO = [
   { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
   { label: 'sin animación', props: { size: 88, animated: false } },
 ];
+/* El JAGUAR completo estrena TODA la fundación transversal (espejo de la abeja/
+   oso, con su carácter): acecho de hombros + cola pesada + line-boil, rugido
+   corporal (ruge), modo acecho (acecha), ruana de noche, modo poder PÚRPURA y
+   prop por mundo. La vitrina lo luce con todo. */
+const VARIANTES_JAGUAR = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'ruge', props: { size: 88, ruge: true } },
+  { label: 'acecha', props: { size: 88, acecha: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder PÚRPURA', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
 
 const VARIANTES_POR_SLUG = {
   'abeja-angelita': VARIANTES_ABEJA,
   colibri: VARIANTES_TRIO_AIRE,
   'oso-andino': VARIANTES_OSO,
   'rana-andina': VARIANTES_TRIO_SUELO,
+  jaguar: VARIANTES_JAGUAR,
 };
 
 /* Nota de campo por creature (el registro de la categoría trae nombre + binomio;
@@ -105,6 +124,7 @@ const NOTAS_CREATURE = {
   colibri: 'Pico recto y garganta violeta iridiscente; el ave-agente de Chagra, ya en rubber-hose.',
   'oso-andino': 'Oso de anteojos, guardián del páramo; mole parda entrañable con los anteojos crema (su firma).',
   'rana-andina': 'Rana arlequín del páramo, guardiana del agua; verde húmedo con manchas ocre y ojos saltones.',
+  jaguar: 'Felino de tierra cálida, majestuoso y acechador; leonado con rosetas de centro ocre (su firma), aura púrpura.',
   lombriz: 'La ingeniera del suelo; ondula por segmentos con clitelo marcado.',
   mariposa: 'Alas naranjas con venación; poliniza y anuncia buen suelo.',
   escarabajo: 'Estercolero que entierra el abono; élitros con brillo metálico.',
