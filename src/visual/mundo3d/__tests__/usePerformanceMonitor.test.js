@@ -6,6 +6,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   TECHO_DPR,
+  presupuestoDeTier,
+  detectarTierInicial,
   factorInicialPorTier,
   nivelPorFactor,
   dprPorFactor,
@@ -48,6 +50,38 @@ describe('derivaciones puras', () => {
     expect(escalaParticulasPorFactor(1)).toBe(1);
     expect(escalaParticulasPorFactor(0)).toBe(0.4);
     expect(escalaParticulasPorFactor(0.5)).toBe(0.7);
+  });
+
+  it('presupuestoDeTier: alto pleno, medio frugal, bajo minimo', () => {
+    expect(presupuestoDeTier('alto')).toEqual({
+      maxCriaturasAmbientales: 5,
+      maxFlora: 100,
+      bloom: true,
+      sombras: true,
+      dpr: 1.5,
+      postfx: true,
+    });
+    expect(presupuestoDeTier('medio')).toEqual({
+      maxCriaturasAmbientales: 3,
+      maxFlora: 56,
+      bloom: false,
+      sombras: false,
+      dpr: 1.25,
+      postfx: false,
+    });
+    expect(presupuestoDeTier('bajo')).toEqual({
+      maxCriaturasAmbientales: 1,
+      maxFlora: 24,
+      bloom: false,
+      sombras: false,
+      dpr: 1,
+      postfx: false,
+    });
+  });
+
+  it('detectarTierInicial baja el techo con UA viejo o valle3d apagado', () => {
+    expect(detectarTierInicial({ tier: 'alto', ua: 'Mozilla/5.0 (Linux; Android 7.0; Pixel)' })).toBe('bajo');
+    expect(detectarTierInicial({ tier: 'alto', valle3d: false })).toBe('bajo');
   });
 });
 
@@ -93,6 +127,29 @@ describe('store de calidad', () => {
     __internos.acusarCambio({ factor: 0.2, fps: 25 }); // bajar si se puede
     expect(leerCalidad().factor).toBe(0.2);
     expect(leerCalidad().nivel).toBe('bajo');
+  });
+
+  it('baja el tier cuando el FPS se mantiene por debajo de 30', () => {
+    sembrarCalidad('alto');
+    for (let i = 0; i < 4; i += 1) {
+      __internos.acusarCambio({ factor: 0.95, fps: 28 });
+    }
+    const c = leerCalidad();
+    expect(c.tier).toBe('medio');
+    expect(c.presupuesto).toEqual(presupuestoDeTier('medio'));
+    expect(c.dpr).toBeLessThanOrEqual(TECHO_DPR.medio);
+  });
+
+  it('sube el tier con histeresis cuando el FPS se mantiene alto', () => {
+    sembrarCalidad('alto');
+    for (let i = 0; i < 4; i += 1) {
+      __internos.acusarCambio({ factor: 0.95, fps: 28 });
+    }
+    for (let i = 0; i < 5; i += 1) {
+      __internos.acusarCambio({ factor: 0.95, fps: 60 });
+    }
+    expect(leerCalidad().tier).toBe('alto');
+    expect(leerCalidad().presupuesto).toEqual(presupuestoDeTier('alto'));
   });
 
   it('reiniciarCalidad limpia fallback y fps', () => {

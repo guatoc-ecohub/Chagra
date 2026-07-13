@@ -299,6 +299,8 @@ function Mariposas({ cfg, n, zona, semilla }) {
  * @param {'alto'|'medio'|'bajo'} [p.tier='medio']  de `decidirTier()`.
  * @param {boolean} [p.reducedMotion=false]  quieto (polen/polvo/luciérnagas) o
  *                                           apagado (mariposas).
+ * @param {number}  [p.maxParticulas=Infinity] tope adicional del presupuesto
+ *                                           vivo, útil para `useTierPerformance`.
  * @param {[number,number,number]} [p.area]  caja [ancho, alto, fondo]; default
  *                                           por tipo. Pase referencia ESTABLE.
  * @param {[number,number,number]} [p.position=[0,0,0]]  ancla en la escena
@@ -312,6 +314,7 @@ export function ParticulasAmbientales({
   densidad = 1,
   tier = 'medio',
   reducedMotion = false,
+  maxParticulas = Infinity,
   area = null,
   position = [0, 0, 0],
   rotation = null,
@@ -319,7 +322,9 @@ export function ParticulasAmbientales({
 }) {
   const cfg = PARTICULAS[tipo];
   if (!cfg) return null;
-  const n = conteoParticulas(cfg, tier, densidad);
+  const nBase = conteoParticulas(cfg, tier, densidad);
+  const limite = Number.isFinite(maxParticulas) ? Math.max(0, Math.floor(maxParticulas)) : Infinity;
+  const n = Math.min(nBase, limite);
   if (n <= 0) return null;
   if (cfg.mariposa && reducedMotion) return null;
   const zona = area || cfg.area;
