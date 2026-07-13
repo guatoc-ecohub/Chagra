@@ -400,6 +400,21 @@ export function isAudioPlaying() {
   return audioPlaying;
 }
 
+/**
+ * Elemento <audio> que está sonando ahora (Kokoro/XTTS/streaming), o null.
+ *
+ * Getter puro y aditivo (no cambia el playback) para que el LIP-SYNC 2D
+ * ([[reference_animacion_rubber_hose_spec]] §2) pueda colgar un AnalyserNode
+ * sobre el audio activo y derivar visemas del RMS. Web Speech no tiene elemento
+ * (devuelve null) → el hook cae a su boca de relleno. El blob URL de Kokoro es
+ * same-origin, así que `createMediaElementSource` no lo contamina.
+ *
+ * @returns {HTMLAudioElement|null}
+ */
+export function getActiveAudio() {
+  return currentKokoroAudio;
+}
+
 // ──────────────────────────────────────────────────────────────────────────
 // Streaming sentence-by-sentence (Free 7→10 fix-pack)
 // ──────────────────────────────────────────────────────────────────────────
@@ -1126,6 +1141,8 @@ export default {
   // TIER 2 #5: estado observable de reproducción para la UI "hablando".
   onSpeakingChange,
   isAudioPlaying,
+  // Lip-sync 2D: el <audio> activo para colgar un AnalyserNode encima.
+  getActiveAudio,
   getVoices,
   getSpanishVoice,
   replayLast,

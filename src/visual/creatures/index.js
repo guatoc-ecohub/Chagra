@@ -38,6 +38,35 @@ export { Lombriz } from './Lombriz.jsx';
 export { Mariposa } from './Mariposa.jsx';
 export { Escarabajo } from './Escarabajo.jsx';
 
+/* ── SISTEMA DE PERSONAJES (transversal, species-agnostic) ───────────────────
+   La FUNDACIÓN que heredan los 8 bichos: lip-sync, modo poder, prop-por-mundo,
+   ropa por clima+hora y el line-boil. Cada bicho = parámetros (aura, perfil,
+   props), no código duplicado. Estrenado por Angelita; fable engancha el resto. */
+// Lip-sync 2D por RMS del TTS.
+export { useLipSync } from './useLipSync.js';
+export {
+  VISEMA, UMBRAL_RMS, DEBOUNCE_MS,
+  visemaDesdeRMS, rmsDeMuestras, crearDebounceVisema, visemaFallback,
+} from './lipSyncCore.js';
+export { BocaVisema, RH_BOCA } from './_rubberhose.jsx';
+// Transformación "modo poder".
+export { AuraPoder } from './AuraPoder.jsx';
+export {
+  AURA_POR_BICHO, AURA_DEFECTO, CLASE_PODER, PODER_MS,
+  auraDeBicho, usePoderTemporal,
+} from './transformacion.js';
+// Prop-por-mundo (herramienta en la mano al entrar a cada mundo).
+export { PROP_POR_MUNDO, PROPS_CONOCIDOS, propDeMundo, mundoTieneProp } from './propsPorMundo.js';
+export { PropEnMano, DIBUJO_PROP } from './PropEnMano.jsx';
+// Ropa/cuerpo por clima+hora (ruana/sombrero/sudor) + su dibujo.
+export {
+  ROPA_PERFIL_POR_BICHO, ROPA_PERFIL_DEFECTO, ROPA_NEUTRA,
+  ropaDeClima, ropaDeClimaBicho, ropaPerfilDeBicho,
+} from './creatureClimaCuerpo.js';
+export { AccesoriosClima } from './AccesoriosClima.jsx';
+// Line-boil (contorno que vibra, años 30).
+export { LineBoilFilter, BOIL_SEEDS } from './LineBoilFilter.jsx';
+
 import AbejaAngelita from './AbejaAngelita.jsx';
 import Colibri from './Colibri.jsx';
 import OsoAndino from './OsoAndino.jsx';
