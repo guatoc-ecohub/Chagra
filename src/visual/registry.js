@@ -147,6 +147,25 @@ const VARIANTES_PEREZOSO = [
   { label: 'sin animación', props: { size: 88, animated: false } },
 ];
 
+/* El MORROCOY completo estrena TODA la fundación transversal (espejo de la abeja/
+   oso/jaguar, con su carácter ANCESTRAL): caparazón que respira + line-boil,
+   retracción elástica (seRetrae), asentimiento sabio (asiente), ruana de noche,
+   modo poder BRONCE y prop por mundo. La vitrina lo luce con todo. */
+const VARIANTES_MORROCOY = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'se retrae', props: { size: 88, seRetrae: true } },
+  { label: 'asiente', props: { size: 88, asiente: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder BRONCE', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+
 const VARIANTES_POR_SLUG = {
   'abeja-angelita': VARIANTES_ABEJA,
   colibri: VARIANTES_TRIO_AIRE,
@@ -155,6 +174,7 @@ const VARIANTES_POR_SLUG = {
   perezoso: VARIANTES_PEREZOSO,
   ardilla: VARIANTES_ARDILLA,
   jaguar: VARIANTES_JAGUAR,
+  morrocoy: VARIANTES_MORROCOY,
 };
 
 /* Nota de campo por creature (el registro de la categoría trae nombre + binomio;
@@ -167,6 +187,7 @@ const NOTAS_CREATURE = {
   perezoso: 'Perezoso de tres dedos, la calma total; cuelga de la rama por sus garras largas, antifaz y tinte verdoso de algas. Todo en cámara lenta.',
   ardilla: 'Ardilla de cola roja del templado; rufa con la línea dorsal oscura (su firma), cola tupida y su inspección invertida.',
   jaguar: 'Felino de tierra cálida, majestuoso y acechador; leonado con rosetas de centro ocre (su firma), aura púrpura.',
+  morrocoy: 'Galápago de patas rojas, el anciano ancestral y paciente; caparazón de domo hexagonal (su firma) y patas rojizas, aura bronce. Se retrae elástico a la concha.',
   lombriz: 'La ingeniera del suelo; ondula por segmentos con clitelo marcado.',
   mariposa: 'Alas naranjas con venación; poliniza y anuncia buen suelo.',
   escarabajo: 'Estercolero que entierra el abono; élitros con brillo metálico.',

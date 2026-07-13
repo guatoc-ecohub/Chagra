@@ -33,6 +33,11 @@ export { Jaguar } from './Jaguar.jsx';
    su perfil de clima). Solo datos: jamás arrastra three al bundle base — igual
    que abejaIdentidad/faunaAndina. */
 export { JAGUAR_PALETA, JAGUAR_PROPORCION, JAGUAR_SLUG, PERFIL_JAGUAR } from './jaguarIdentidad.js';
+export { Morrocoy } from './Morrocoy.jsx';
+/* La IDENTIDAD del morrocoy como datos (paleta bronce + escudos hexagonales,
+   proporciones y su perfil de clima). Solo datos: jamás arrastra three al bundle
+   base — igual que jaguarIdentidad/faunaAndina. */
+export { MORROCOY_PALETA, MORROCOY_PROPORCION, MORROCOY_SLUG, PERFIL_MORROCOY } from './morrocoyIdentidad.js';
 /* La IDENTIDAD del trío andino como datos (paletas + proporciones). Solo datos:
    jamás arrastra three al bundle base — igual que abejaIdentidad. */
 export {
@@ -82,6 +87,7 @@ import RanaAndina from './RanaAndina.jsx';
 import Perezoso from './Perezoso.jsx';
 import Ardilla from './Ardilla.jsx';
 import Jaguar from './Jaguar.jsx';
+import Morrocoy from './Morrocoy.jsx';
 import Lombriz from './Lombriz.jsx';
 import Mariposa from './Mariposa.jsx';
 import Escarabajo from './Escarabajo.jsx';
@@ -95,6 +101,7 @@ export const CREATURES = {
   perezoso: { Component: Perezoso, nombre: 'Perezoso de tres dedos', cientifico: 'Bradypus variegatus' },
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },
   jaguar: { Component: Jaguar, nombre: 'Jaguar', cientifico: 'Panthera onca' },
+  morrocoy: { Component: Morrocoy, nombre: 'Morrocoy de patas rojas', cientifico: 'Chelonoidis carbonarius' },
   lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },
   mariposa: { Component: Mariposa, nombre: 'Mariposa pasionaria', cientifico: 'Dione juno' },
   escarabajo: { Component: Escarabajo, nombre: 'Escarabajo estercolero', cientifico: 'Dichotomius belus' },

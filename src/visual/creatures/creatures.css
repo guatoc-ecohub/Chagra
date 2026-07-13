@@ -701,6 +701,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .rana-salto, .crt-garganta { animation: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    OSO ANDINO — el CARÁCTER del guardián: mole PESADA, seria y gruñona.
    Aditivo sobre el KIT species-agnostic (no toca a la abeja): el oso reescribe
    SU boil (más lento y con más masa), suma un resoplido/gruñido corporal, el
@@ -926,6 +929,9 @@
   /* El tornasol del poder también queda quieto (re-gate: la doble clase de
      arriba le ganaba al gate genérico de transformacion.css). */
   .is-powered-up.colibri-poder::before { animation: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    PEREZOSO (Bradypus variegatus) — el CARÁCTER de la QUIETUD EXTREMA
    ───────────────────────────────────────────────────────────────────────────
    Todo en CÁMARA LENTA: se mece pausado desde la rama, parpadeo larguísimo,
@@ -1010,6 +1016,9 @@
   [data-creature='perezoso'][data-estira='1'] .crt-body { animation: none !important; }
   /* Fotograma digno: una "Z" visible y quieta si se pidió dormita. */
   .perezoso-zzz-mota { opacity: 0.55; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    ARDILLA — el CARÁCTER de la pizpireta: ÁGIL, curiosa, rápida e INQUIETA.
    Aditivo sobre el KIT species-agnostic (no toca a los demás bichos): la ardilla
    reescribe SU boil (más VELOZ y nervioso que la abeja), suma la cola tupida que
@@ -1133,6 +1142,9 @@
   .ardilla-cola, .ardilla-nariz, .ardilla-dientes, .ardilla-bellota,
   [data-creature='ardilla'][data-inspecciona='1'] .crt-body,
   [data-creature='ardilla'][data-roe='1'] .crt-body { animation: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    JAGUAR — el CARÁCTER del felino: majestuoso, poderoso, ACECHADOR. Poder
    CONTENIDO (no hiperactivo): squash&stretch controlado y elegante. Aditivo
    sobre el KIT species-agnostic (no toca a la abeja/oso): el jaguar reescribe SU
@@ -1377,4 +1389,162 @@
   .jaguar-estrella,
   .jaguar-poder .jaguar-estrella,
   [data-creature='jaguar'][data-poder='1'] .jaguar-estrella { animation: none !important; opacity: 0.5; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MORROCOY — el CARÁCTER del galápago: ANCESTRAL, LENTO, SABIO y PACIENTE (el
+   anciano tranquilo de la chagra). La sabiduría NO corre: squash&stretch LENTO y
+   firme. Aditivo sobre el KIT species-agnostic (no toca a la abeja/oso/jaguar):
+   el morrocoy reescribe SU boil (lento, paso pesado), suma el CAPARAZÓN de domo
+   que RESPIRA apacible, la RETRACCIÓN ELÁSTICA (cabeza y patas entran a la concha
+   con squash&stretch de goma — su firma) y el ASENTIMIENTO sabio (la testa
+   cabecea lento). Todo transform/opacity (GPU, gama baja). Gates RM + tier al
+   final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL LENTO — el anciano no vibra ligero: respira LENTO y con squash de PASO
+   PESADO que asienta suave (masa robusta, paciencia). Reescribe SOLO el boil del
+   morrocoy (misma clase .rh-boil, mayor especificidad por el data-creature) con
+   longhands para no pisar el resto de props de animación. */
+[data-creature='morrocoy'] .rh-boil {
+  animation-name: morrocoy-boil;
+  animation-duration: 3.4s;
+  animation-timing-function: steps(10, end);
+}
+@keyframes morrocoy-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  30%  { transform: translateY(-0.12px) scale(0.995, 1.01); } /* leve estiramiento sereno */
+  60%  { transform: translateY(0.4px) scale(1.02, 0.98); }    /* paso pesado que asienta */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* CAPARAZÓN que RESPIRA — el domo geométrico se abomba apacible (el anciano
+   respira hondo). Nodo propio dentro del cuerpo (.morrocoy-caparazon). */
+.morrocoy-caparazon {
+  animation: morrocoy-respira 4.6s ease-in-out infinite;
+}
+@keyframes morrocoy-respira {
+  0%, 100% { transform: scale(1, 1); }
+  50%      { transform: scale(1.012, 1.02); } /* respiración serena del domo */
+}
+
+/* SE RETRAE — retracción elástica (la firma del morrocoy): cabeza y patas ENTRAN
+   a la concha con squash&stretch de goma, se guardan pacientes y ASOMAN de nuevo.
+   Lazo lento (la tortuga se toma su tiempo). */
+[data-creature='morrocoy'][data-retrae='1'] .morrocoy-cabeza {
+  animation: morrocoy-retrae-cabeza 4.6s ease-in-out infinite;
+}
+@keyframes morrocoy-retrae-cabeza {
+  0%   { transform: translateY(0) scale(1, 1); }
+  20%  { transform: translateY(-0.6px) scale(1.05, 1.03); }  /* estira curioso (anticipación) */
+  50%  { transform: translateY(5.2px) scale(0.5, 0.42); }    /* se mete (squash, escondida) */
+  80%  { transform: translateY(5.2px) scale(0.5, 0.42); }    /* aguanta dentro (paciencia) */
+  100% { transform: translateY(0) scale(1, 1); }             /* asoma de nuevo */
+}
+[data-creature='morrocoy'][data-retrae='1'] .morrocoy-pata {
+  animation: morrocoy-retrae-pata 4.6s ease-in-out infinite;
+}
+@keyframes morrocoy-retrae-pata {
+  0%, 100%  { transform: translateY(0) scaleY(1); }
+  50%, 80%  { transform: translateY(-2.2px) scaleY(0.35); }  /* recoge las patas al caparazón */
+}
+/* el domo se ABOMBA un pelín mientras recoge (pisa la respiración por
+   especificidad: dos atributos + clase). */
+[data-creature='morrocoy'][data-retrae='1'] .morrocoy-caparazon {
+  animation: morrocoy-retrae-domo 4.6s ease-in-out infinite;
+}
+@keyframes morrocoy-retrae-domo {
+  0%, 100%  { transform: scale(1, 1); }
+  50%, 80%  { transform: scale(1.05, 1.08); } /* el domo abomba al guardarse */
+}
+
+/* ASIENTE — el asentimiento sabio: la testa cabecea lento y firme ("sí, mijo,
+   con paciencia"). */
+[data-creature='morrocoy'][data-asiente='1'] .morrocoy-cabeza {
+  animation: morrocoy-asiente 2.8s ease-in-out infinite;
+}
+@keyframes morrocoy-asiente {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30%      { transform: translateY(0.9px) rotate(2.2deg); }  /* baja la testa (sí) */
+  60%      { transform: translateY(0) rotate(-1.2deg); }
+}
+
+/* Los estados del morrocoy (seRetrae/asiente) PISAN el arrebato (antic/travieso):
+   una tortuga que se guarda o asiente no da vueltas de campana — el gesto lee
+   sereno. */
+[data-creature='morrocoy'][data-retrae='1'] .rh-antic,
+[data-creature='morrocoy'][data-retrae='1'] .rh-travieso,
+[data-creature='morrocoy'][data-asiente='1'] .rh-antic,
+[data-creature='morrocoy'][data-asiente='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito del morrocoy lo reactivaría (misma clase)
+   → re-apagarlo aquí (mayor especificidad + orden posterior). La respiración del
+   domo también se corta; los estados reactivos (seRetrae/asiente) siguen contando
+   la verdad. (Las patas usan .rh-sway, ya gateado globalmente.) */
+[data-tier='bajo'][data-creature='morrocoy'] .rh-boil,
+[data-tier='bajo'][data-creature='morrocoy'] .morrocoy-caparazon { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .morrocoy-caparazon,
+  [data-creature='morrocoy'][data-retrae='1'] .morrocoy-cabeza,
+  [data-creature='morrocoy'][data-retrae='1'] .morrocoy-pata,
+  [data-creature='morrocoy'][data-retrae='1'] .morrocoy-caparazon,
+  [data-creature='morrocoy'][data-asiente='1'] .morrocoy-cabeza { animation: none !important; }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   MORROCOY ANCESTRAL — el anciano de piedra viva (calor de brasa apacible).
+   Capas PERMANENTES y sutiles (elegante, no recargado): un RESPLANDOR cobrizo
+   que envuelve el caparazón y un SHIMMER tibio recorriendo su reborde. En modo
+   poder se avivan (el anciano guarda fuego dentro). Todo transform/opacity. Se
+   PODA en tier bajo / reduced-motion.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* RESPLANDOR — el calor ancestral envuelve al galápago; respira lento. */
+.morrocoy-resplandor {
+  animation: morrocoy-resplandor 5.4s ease-in-out infinite;
+}
+@keyframes morrocoy-resplandor {
+  0%, 100% { opacity: 0.1;  transform: scale(1); }
+  50%      { opacity: 0.18; transform: scale(1.04); }
+}
+
+/* SHIMMER — destello cobrizo tibio que recorre el reborde del caparazón. */
+.morrocoy-shimmer {
+  animation: morrocoy-shimmer 4.8s ease-in-out infinite;
+}
+@keyframes morrocoy-shimmer {
+  0%, 100% { opacity: 0.12; }
+  50%      { opacity: 0.3; }
+}
+
+/* MODO PODER BRONCE — el anciano aviva la brasa: resplandor y shimmer se
+   intensifican y aceleran. Vale en standalone (wrapper .morrocoy-poder) e inline
+   (data-poder en el <g>). */
+.morrocoy-poder .morrocoy-resplandor,
+[data-creature='morrocoy'][data-poder='1'] .morrocoy-resplandor {
+  animation-name: morrocoy-resplandor-brasa;
+  animation-duration: 3.0s;
+}
+@keyframes morrocoy-resplandor-brasa {
+  0%, 100% { opacity: 0.2; transform: scale(1.02); }
+  50%      { opacity: 0.4; transform: scale(1.1); }
+}
+.morrocoy-poder .morrocoy-shimmer,
+[data-creature='morrocoy'][data-poder='1'] .morrocoy-shimmer {
+  animation-duration: 2.4s;
+}
+
+/* device-tier 'bajo': PODA el resplandor/shimmer ancestral (raster caro en gama
+   baja) — se detiene la animación y queda un rastro estático y digno. */
+[data-tier='bajo'][data-creature='morrocoy'] .morrocoy-resplandor,
+[data-tier='bajo'][data-creature='morrocoy'] .morrocoy-shimmer { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .morrocoy-resplandor, .morrocoy-shimmer,
+  .morrocoy-poder .morrocoy-resplandor,
+  .morrocoy-poder .morrocoy-shimmer,
+  [data-creature='morrocoy'][data-poder='1'] .morrocoy-resplandor,
+  [data-creature='morrocoy'][data-poder='1'] .morrocoy-shimmer { animation: none !important; }
 }
