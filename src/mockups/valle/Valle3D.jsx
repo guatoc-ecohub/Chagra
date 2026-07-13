@@ -32,11 +32,6 @@ import * as THREE from 'three';
 import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
 import CamaraDirector from '../../visual/mundo3d/escenas/CamaraDirector.jsx';
 import DirectorValle from './DirectorValle.jsx';
-import MonitorRendimiento, {
-  detectarTierInicial,
-  presupuestoDeTier,
-  useTierPerformance,
-} from '../../visual/mundo3d/usePerformanceMonitor.jsx';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 /* EL CEREBRO DE ANGELITA (auditoría 2026-07-18: estaba construido y
    DESCONECTADO — ningún componente vivo lo consumía). La abeja del valle
@@ -1506,21 +1501,12 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
   );
 }
 
-/* ── El COMPAÑERO-JUGADOR: Angelita, la abeja — UNA SOLA, la del valle.
-      POSICIÓN DE CALMA (feedback del operador): al reposo ya no husmea
-      errática por el valle — flota SERENA sobre el patio de la casa (el
-      corazón del cuadro), con un vaivén mínimo de respiración, y BRILLA:
-      tocarla es hablarle a la finca (`onTocar`). Cuando se toca un mundo
-      (`entrando`), vuela y se acerca al lugar, y la cámara la acompaña. Su
-      ánimo/energía (salud real de la finca) tiñen su color y su vuelo. ── */
-const CALMA_ABEJA = {
-  // Al frente-derecha del corredor, sobre el patio de la casa (no encima del
-  // techo): Angelita ES la anfitriona de la casa-puerta.
-  x: CASA_VALLE.pos[0] + 1.3,
-  z: CASA_VALLE.pos[1] + 1.5,
-};
-
-function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false, onTocar = null }) {
+/* ── El COMPAÑERO-JUGADOR: Angelita, la abeja. Es el avatar que vuela por el
+      valle. Al reposo, ronda sobre el valle con vaivén vivo; cuando se toca un
+      mundo (`entrando`), BAJA y se acerca al lugar — "entra" al mundo, y la
+      cámara la acompaña. Su ánimo/energía (salud real de la finca) tiñen su
+      color, su aura y qué tan vivo es su vuelo. Mira hacia donde viaja. ── */
+function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null }) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const prevX = useRef(foco.x);
@@ -1626,40 +1612,16 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
     const brio = (0.35 + 0.65 * energiaReal) * mVel; // energía y clima animan el vuelo
     const bob = reducedMotion ? 0 : Math.sin(t * (1.6 + brio)) * (0.1 + 0.16 * brio);
     const tembleque = tiembla ? Math.sin(t * 13) * tiembla : 0;
-    // HUSMEO AUTÓNOMO: mientras no hay viaje real, el lugar que el store
-    // aceptó (husmeoLugarRef) manda un TERCER destino — un solo lugar a la
-    // vez, temporal, nunca un círculo errático.
-    const lugarHusmeo = !entrando ? husmeoLugarRef.current : null;
-    const anclaHusmeo = lugarHusmeo ? MUNDO_DIR_BY_ID[lugarHusmeo] : null;
-    // POSICIÓN DE CALMA: al reposo (sin viaje real NI husmeo activo) Angelita
-    // ya no ronda el valle en un círculo errático — flota serena sobre el
-    // patio de la casa con una deriva mínima y lenta (respiración). Al
-    // entrar a un mundo (real o husmeado) sí vuela y se posa junto al lugar.
-    const vagarX = reducedMotion || entrando || anclaHusmeo ? 0 : Math.sin(t * 0.28) * 0.26 * mVagar;
-    const vagarZ = reducedMotion || entrando || anclaHusmeo ? 0 : Math.cos(t * 0.22) * 0.18 * mVagar;
-    const alto = (entrando ? 1.05 : anclaHusmeo ? 1.4 : 2.2) * mAltura;
-    const dest = entrando
-      ? new THREE.Vector3(
-          foco.x + 0.55 + tembleque,
-          foco.y + alto + bob + tembleque * 0.5,
-          foco.z + 0.7,
-        )
-      : anclaHusmeo
-        ? new THREE.Vector3(
-            anclaHusmeo.pos[0] + 0.5 + tembleque,
-            alturaTerreno(anclaHusmeo.pos[0], anclaHusmeo.pos[2]) + alto + bob + tembleque * 0.5,
-            anclaHusmeo.pos[2] + 0.6,
-          )
-        : new THREE.Vector3(
-            CALMA_ABEJA.x + vagarX + tembleque,
-            yCalma + alto + bob + tembleque * 0.5,
-            CALMA_ABEJA.z + vagarZ,
-          );
-    // 0.045 al salir de foco: el valor de la v2 aprobada (0.035 hacía la
-    // salida pegajosa — regresión detectada en la auditoría 2026-07-16). El
-    // husmeo autónomo vuela más SUAVE que una entrada real decidida (0.03).
-    const kVuelo = entrando ? 0.05 : anclaHusmeo ? 0.03 : 0.045;
-    ref.current.position.lerp(dest, kVuelo * mVel);
+    // Al reposo deriva en un círculo calmo; al entrar se posa junto al lugar.
+    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.55) * 0.9 * mVagar;
+    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.55) * 0.6 * mVagar;
+    const alto = (entrando ? 1.05 : 2.3) * mAltura;
+    const dest = new THREE.Vector3(
+      foco.x + (entrando ? 0.55 : 0.4 + vagarX) + tembleque,
+      foco.y + alto + bob + tembleque * 0.5,
+      foco.z + (entrando ? 0.7 : 0.6 + vagarZ),
+    );
+    ref.current.position.lerp(dest, (entrando ? 0.05 : 0.045) * mVel);
     // Comparte su posición viva para que la cámara de director la SIGA (follow
     // con lead): copia dentro del Vector3 compartido (mutación por método sobre
     // un local — no reasigna el prop, como CamaraViajera con controls.current).
@@ -2081,10 +2043,18 @@ const AREA_LUCIERNAGAS = [18, 2.4, 7];
 /* La pose de cámara del valle: UNA fuente para el Canvas y para el establishing
    shot de la CámaraDirector (así el dolly aterriza EXACTO donde siempre). */
 const CAMARA_VALLE = { position: [10.5, 9, 13.5], fov: 40 };
+/* El target de reposo del valle: el corazón del mapa, al que CamaraViajera
+   lleva el target sin foco ((0,1.0,1.4) + 0.6 en y). El establishing del
+   DirectorValle aterriza EXACTO aquí para no dar ningún salto al soltar. */
+const MIRA_VALLE = [0, 1.6, 1.4];
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false }) {
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null }) {
   const controls = useRef(null);
+  /* La cámara de director (FASE 4, flag `camaraDirector`) se monta DESPUÉS de
+     CamaraViajera y gana por orden de frame durante su barrido. `avatarRef`
+     recibe la posición viva de Angelita (Vector3 estable) para el follow. */
+  const avatarRef = useRef(new THREE.Vector3());
   // Occluders de los rótulos: solo terreno + cordillera (raycast barato y es
   // exactamente lo que las etiquetas no deben atravesar).
   const terrenoRef = useRef(null);
@@ -2297,8 +2267,6 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         hayAlerta={hayAlerta}
         reducedMotion={reducedMotion}
         posRef={camaraDirector ? avatarRef : null}
-        conLuz={perfil.luzBeacon}
-        onTocar={portada ? null : onAngelita}
       />
 
       <CamaraViajera
@@ -2308,21 +2276,38 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         autoOrbit={autoOrbit}
         aplanando={aplanando}
       />
-      {/* La CÁMARA DE DIRECTOR (FASE 4): el establishing shot del mapa — dolly
-          con arco desde más alto/lejos hasta la pose de siempre, UNA vez por
-          sesión (volver de un mundo no lo repite). Sin `mirada`: el target ya
-          lo lleva CamaraViajera; aquí solo posición + FOV. La respiración del
-          encuadre es aditiva y convive con su lerp. Gama baja o reduced-motion:
-          cámara simple (inerte). */}
-      <CamaraDirector
-        controls={controls}
-        reposo={CAMARA_VALLE.position}
-        duracion={2.4}
-        amplio={1.3}
-        respiro={0.05}
-        activa={!reducedMotion && tier !== 'bajo'}
-        unaVezClave="valle"
-      />
+      {/* La CÁMARA DE DIRECTOR (FASE 4). Con el flag `camaraDirector`:
+          DirectorValle (establishing + follow + beats), montado DESPUÉS de
+          CamaraViajera para ganar por orden de frame durante el barrido. Sin
+          flag: la CamaraDirector clásica intacta (establishing + respiro). Gama
+          baja o reduced-motion: ambas caen a cámara simple (inerte). */}
+      {camaraDirector ? (
+        <DirectorValle
+          controls={controls}
+          reposo={CAMARA_VALLE.position}
+          mira={MIRA_VALLE}
+          fov={CAMARA_VALLE.fov}
+          foco={foco}
+          avatarRef={avatarRef}
+          beatsRef={beatsRef}
+          entrando={entrando}
+          aplanando={aplanando}
+          activa
+          tier={tier}
+          reducedMotion={reducedMotion}
+          unaVezClave="valle"
+        />
+      ) : (
+        <CamaraDirector
+          controls={controls}
+          reposo={CAMARA_VALLE.position}
+          duracion={2.4}
+          amplio={1.3}
+          respiro={0.05}
+          activa={!reducedMotion && tier !== 'bajo'}
+          unaVezClave="valle"
+        />
+      )}
       {/* El aplane New Donk del flujo vivo — montado de ÚLTIMO para tener la
           última palabra sobre la cámara mientras cae dentro del mundo. Solo
           hace algo cuando `aplanando` (fase 'viajando'); inerte el resto. */}
@@ -2355,6 +2340,13 @@ export default function Valle3D({
      cámara del valle hace dolly + aplane hacia el landmark en vez de cortar con
      velo. El host lo enciende en la fase 'viajando'. */
   aplanando = false,
+  /* FASE 4 — cámara de director (establishing + follow + beats). Detrás de un
+     flag para no tocar la cámara actual: off = comportamiento clásico. Va
+     gateada por tier/reduced-motion adentro (tier bajo o calma = cámara fija). */
+  camaraDirector = false,
+  /* Buzón de beats coreografiados (fauna/Ent/alerta): el host (EscenaValle)
+     empuja aquí `{ tipo, lado, slug, magico }` y el director lo consume. */
+  beatsRef = null,
 }) {
   const [listo, setListo] = useState(false);
   /* GUARD DEL NEGRO INTERMITENTE (auditoría 2026-07-16): sin oyente de
@@ -2428,6 +2420,8 @@ export default function Valle3D({
           perfil={perfil}
           tier={tier}
           aplanando={aplanando}
+          camaraDirector={camaraDirector}
+          beatsRef={beatsRef}
         />
       </Suspense>
     </Canvas>

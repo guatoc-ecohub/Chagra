@@ -103,6 +103,11 @@ export default function EscenaValle({
   camaraDirector = true,
 }) {
   const climaReal = params?.clima || entrada?.clima || 'soleado';
+  /* Buzón de beats para el director: el coro ambiental (FaunaAmbiental) marca
+     sus slots con `data-fase='gesto'` al hacer su giño; un MutationObserver
+     (abajo) traduce ESO en un beat de cámara — sin tocar el arte ni la capa. */
+  const beatsRef = useRef(null);
+  const raizRef = useRef(null);
   /* El avatar elegido por la persona: se reserva para el protagonismo (el
      coro ambiental lo excluye — el central manda, nadie lo duplica de extra). */
   const avatar = useAvatarCreature();
