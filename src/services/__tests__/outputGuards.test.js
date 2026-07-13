@@ -17,6 +17,7 @@ import {
   guardInvertedViability,
   guardDoseWithoutSource,
   guardInventedContact,
+  guardHallucinatedContact,
   guardSpeciesSubstitution,
   guardCompanionBinomial,
   guardVisionWithoutPhoto,
@@ -874,6 +875,45 @@ describe('guardInventedContact', () => {
     const out = guardInventedContact(txt);
     expect(out.modified).toBe(true);
     expect(out.text).toMatch(/VERIFICAR CONTACTO OFICIAL/);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// GUARD 5B - contacto institucional con número, correo o dirección inventados
+// ──────────────────────────────────────────────────────────────────────────
+describe('guardHallucinatedContact', () => {
+  it('suprime un telefono institucional del ICA y remite al canal oficial genérico', () => {
+    const txt = 'El ICA atiende al 601-3323700 para reportes fitosanitarios.';
+    const out = guardHallucinatedContact(txt, { userMessage: 'cual es el telefono del ICA?' });
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/contacto_institucional_hallucinado/);
+    expect(out.text).toMatch(/canal oficial de la entidad/i);
+    expect(out.text).toMatch(/ica\.gov\.co/i);
+    expect(out.text).not.toMatch(/601-3323700/);
+  });
+
+  it('no toca una mención legitima sin dato de contacto', () => {
+    const txt = 'Puede consultar al ICA si necesita orientacion tecnica.';
+    const out = guardHallucinatedContact(txt, { userMessage: 'cual es el contacto del ICA?' });
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(txt);
+  });
+
+  it('suprime un correo institucional afirmado como contacto', () => {
+    const txt = 'Escriba a contacto@ica.gov.co para validar el tramite.';
+    const out = guardHallucinatedContact(txt, { userMessage: 'cual es el correo del ICA?' });
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/canal oficial de la entidad/i);
+    expect(out.text).not.toMatch(/contacto@ica\.gov\.co/);
+  });
+
+  it('cableado en applyOutputGuards', () => {
+    const txt = 'La UMATA atiende en 320 987 6543 para orientar el cultivo.';
+    const out = applyOutputGuards(txt, { userMessage: 'cual es el contacto de la UMATA?' });
+    expect(out.modified).toBe(true);
+    expect(out.reasons.join(' ')).toMatch(/contacto_institucional_hallucinado/);
+    expect(out.text).toMatch(/canal oficial de la entidad/i);
+    expect(out.text).not.toMatch(/320 987 6543/);
   });
 });
 
