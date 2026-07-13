@@ -1159,11 +1159,11 @@ function Terrazas() {
   return (
     <group>
       {[
-        { r: 13.5, y: 1.4, color: mezclar(PALETA.follaje, CIELO.alfombra, 0.3) },
-        { r: 15.5, y: 2.6, color: mezclar(PALETA.follajeClaro, CIELO.alfombra, 0.4) },
-        { r: 17.5, y: 3.8, color: mezclar(PALETA.follajeOscuro, CIELO.alfombra, 0.35) },
+        { r: 11.5, y: 1.4, color: mezclar(PALETA.follaje, CIELO.alfombra, 0.3) },
+        { r: 13.2, y: 2.6, color: mezclar(PALETA.follajeClaro, CIELO.alfombra, 0.4) },
+        { r: 14.9, y: 3.8, color: mezclar(PALETA.follajeOscuro, CIELO.alfombra, 0.35) },
       ].map((t, i) => (
-        <mesh key={i} position={[0, t.y - 0.9, -6]}>
+        <mesh key={i} position={[0, t.y - 0.9, -8]}>
           <cylinderGeometry args={[t.r, t.r + 1.6, 1.8, 26, 1, true, Math.PI / 2, Math.PI]} />
           <meshLambertMaterial color={t.color} flatShading side={THREE.DoubleSide} />
         </mesh>
@@ -1218,6 +1218,13 @@ function Quebrada({ animada }) {
       {tramos.map((tr, i) => (
         <mesh key={i} position={tr.medio} rotation={[-Math.PI / 2, 0, -tr.rotY]}>
           <planeGeometry args={[0.9, tr.largo]} />
+          <meshLambertMaterial color={PALETA.agua} emissive={PALETA.agua} emissiveIntensity={0.3} />
+        </mesh>
+      ))}
+      {/* pozos en cada codo: cosen los tramos rectos para que el cauce sea UNO */}
+      {CAUCE.map((p, i) => (
+        <mesh key={`codo-${i}`} position={[p.x, p.y + 0.002, p.z]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.48, 10]} />
           <meshLambertMaterial color={PALETA.agua} emissive={PALETA.agua} emissiveIntensity={0.3} />
         </mesh>
       ))}
@@ -1346,21 +1353,23 @@ function Vegetacion({ tier }) {
   );
 }
 
-/* Luciérnagas doradas + esporas: el pulso biopunk amable del valle (1 draw
-   call; el group entero ondula, jamás se reescribe el buffer). */
+/* Luciérnagas doradas: el pulso biopunk amable del valle (1 draw call de
+   esferitas instanciadas — redondas de verdad, nada de puntos cuadrados; el
+   group entero ondula, jamás se reescriben matrices por frame). */
 function Luciernagas({ tier, animada }) {
   const grupo = useRef(null);
-  const n = tier === 'alto' ? 56 : 28;
-  const posiciones = useMemo(() => {
-    const arr = new Float32Array(n * 3);
-    for (let i = 0; i < n; i += 1) {
+  const cuerpos = useRef(null);
+  const n = tier === 'alto' ? 20 : 10;
+
+  useLayoutEffect(() => {
+    sembrarInstancias(cuerpos.current, n, (d, i) => {
       const a = azar(i * 3 + 0.7) * Math.PI * 2;
-      const r = 3 + azar(i * 5 + 1.3) * 8.5;
-      arr[i * 3] = Math.sin(a) * r;
-      arr[i * 3 + 1] = 0.4 + azar(i * 7 + 2.1) * 3.2;
-      arr[i * 3 + 2] = -Math.cos(a) * r * 0.9 + 1;
-    }
-    return arr;
+      const r = 4 + azar(i * 5 + 1.3) * 7.5;
+      const s = 0.55 + azar(i * 11 + 4.2) * 0.7;
+      d.position.set(Math.sin(a) * r, 0.6 + azar(i * 7 + 2.1) * 2.6, -Math.cos(a) * r * 0.9 + 1);
+      d.scale.setScalar(s);
+      d.rotation.set(0, 0, 0);
+    });
   }, [n]);
 
   useFrame((state) => {
@@ -1372,12 +1381,10 @@ function Luciernagas({ tier, animada }) {
 
   return (
     <group ref={grupo}>
-      <points>
-        <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[posiciones, 3]} />
-        </bufferGeometry>
-        <pointsMaterial color="#ffe49a" size={0.11} sizeAttenuation transparent opacity={0.85} depthWrite={false} />
-      </points>
+      <instancedMesh ref={cuerpos} args={[undefined, undefined, n]}>
+        <sphereGeometry args={[0.05, 6, 5]} />
+        <meshBasicMaterial color="#ffd27a" transparent opacity={0.9} depthWrite={false} />
+      </instancedMesh>
     </group>
   );
 }
@@ -1547,10 +1554,13 @@ const CSS_VMX = `
 .vmx-raiz[data-fase='acercando'] .vmx-abeja,
 .vmx-raiz[data-viaje='1'] .vmx-abeja { opacity: 0; }
 
-/* ── Angelita ENTRA al mundo: la picada hacia la boca del portal ──
-   El dolly centra el portal elegido en pantalla; la abeja sale de su puesto
-   (arriba a la derecha), traza un arco y se clava en el centro encogiéndose
-   hasta desaparecer — mismo pulso del viaje (1.25 s), ease-in de succión. */
+/* ── Angelita ENTRA al mundo COMO SUPERHÉROE (pedido del operador) ──
+   Tres actos en el pulso del viaje (1.25 s), puro CSS rubber-hose:
+   1. ANTICIPACIÓN: toma vuelo — se eleva y se infla un instante (overshoot).
+   2. DASH: se lanza al centro (donde el dolly deja la boca del portal)
+      ESTIRADA en la dirección del vuelo (squash&stretch) con estela dorada.
+   3. IMPACTO: se clava y desaparece; la onda .vmx-pum hace el ping de
+      superhéroe justo cuando toca la boca. */
 .vmx-abeja-cruce {
   position: absolute;
   top: 18px;
@@ -1558,15 +1568,58 @@ const CSS_VMX = `
   z-index: 30;
   pointer-events: none;
   filter: drop-shadow(0 3px 4px rgba(58, 42, 24, 0.3));
-  animation: vmx-picada 1250ms cubic-bezier(0.55, -0.15, 0.8, 0.5) forwards;
+  animation: vmx-vuelo-heroe 1250ms cubic-bezier(0.6, -0.1, 0.75, 0.45) forwards;
 }
-@keyframes vmx-picada {
+@keyframes vmx-vuelo-heroe {
   0% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
-  45% { transform: translate(calc(-25vw + 20px), calc(18dvh)) scale(0.85) rotate(-24deg); opacity: 1; }
-  100% { transform: translate(calc(-50vw + 52px), calc(50dvh - 48px)) scale(0.04) rotate(-80deg); opacity: 0; }
+  14% { transform: translate(8px, -30px) scale(1.28) rotate(16deg); opacity: 1; }
+  28% { transform: translate(12px, -34px) scale(1.15, 0.88) rotate(-32deg); opacity: 1; }
+  82% { transform: translate(calc(-50vw + 64px), calc(50dvh - 60px)) scale(1.55, 0.5) rotate(-38deg); opacity: 1; }
+  100% { transform: translate(calc(-50vw + 52px), calc(50dvh - 48px)) scale(0.04) rotate(-46deg); opacity: 0; }
+}
+/* la estela del dash: ráfaga dorada que nace detrás de la abeja */
+.vmx-abeja-cruce::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 55%;
+  width: 120px;
+  height: 12px;
+  border-radius: 999px;
+  transform-origin: left center;
+  transform: translateY(-50%) rotate(-6deg);
+  background: linear-gradient(90deg, rgba(255, 210, 122, 0.95), rgba(255, 210, 122, 0));
+  opacity: 0;
+  animation: vmx-estela 1250ms linear forwards;
+}
+@keyframes vmx-estela {
+  0%, 30% { opacity: 0; }
+  45% { opacity: 0.95; }
+  80% { opacity: 0.7; }
+  100% { opacity: 0; }
+}
+/* la onda de impacto: el PING en la boca del portal cuando Angelita se clava */
+.vmx-pum {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 90px;
+  height: 90px;
+  margin: -45px 0 0 -45px;
+  z-index: 29;
+  pointer-events: none;
+  border: 4px solid rgba(255, 210, 122, 0.95);
+  border-radius: 50%;
+  box-shadow: 0 0 22px rgba(255, 210, 122, 0.8), inset 0 0 14px rgba(255, 210, 122, 0.5);
+  opacity: 0;
+  animation: vmx-pum 480ms 1020ms cubic-bezier(0.2, 0.7, 0.4, 1) both;
+}
+@keyframes vmx-pum {
+  0% { transform: scale(0.15); opacity: 1; }
+  100% { transform: scale(2.6); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .vmx-abeja-cruce { display: none; }
+  .vmx-abeja-cruce, .vmx-pum { display: none; }
 }
 
 .vmx-pie { display: flex; flex-direction: column; gap: 10px; }
@@ -1885,13 +1938,16 @@ export default function VitrinaMaestraMundos({ onBack }) {
         </button>
       )}
 
-      {/* Angelita entra al mundo: el clon que hace la picada al centro del
-          portal durante el cruce (el dolly deja la boca justo ahí). En tier
-          bajo también vuela — el iris la alcanza a mitad de picada. */}
+      {/* Angelita entra al mundo como superhéroe: anticipación + dash con
+          estela + onda de impacto en la boca del portal (el dolly la deja
+          justo ahí). En tier bajo también vuela — el iris la alcanza. */}
       {!reducedMotion && fase !== 'mundo' && (fase === 'acercando' || viaje === 'entrar') && (
-        <div className="vmx-abeja-cruce" aria-hidden="true">
-          <AbejaAngelita size={60} animo="atento" energia={1} animated tier={tier} />
-        </div>
+        <>
+          <div className="vmx-abeja-cruce" aria-hidden="true">
+            <AbejaAngelita size={60} animo="atento" energia={1} animated tier={tier} />
+          </div>
+          <div className="vmx-pum" aria-hidden="true" />
+        </>
       )}
 
       <div className="vmx-vineta" aria-hidden="true" />
