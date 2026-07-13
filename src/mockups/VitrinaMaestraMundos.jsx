@@ -58,7 +58,17 @@ import {
 } from '../visual/mundo3d/atmosferaMadre.js';
 import { decidirTier, permite3D } from '../visual/mundo3d/deviceTier.js';
 import TransicionMundoKit from '../visual/mundo3d/TransicionMundoKit.jsx';
-import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
+import { FaunaAmbiental } from '../visual/creatures/FaunaAmbiental.jsx';
+import useAvatarCreature from '../hooks/useAvatarCreature.js';
+
+/* EL VALLE VIVO en la galería: los personajes asoman ENTRE los mundos, desde
+   los bordes (nunca sobre los portales ni el chrome), hacen su giño lejano y
+   se van. Pool rotativo tier-safe; se pausa durante el viaje de túnel. */
+const PUNTOS_FAUNA_VITRINA = [
+  { estilo: { left: '2.5%', bottom: '30%' }, tam: 44, lado: 'izq' },
+  { estilo: { right: '3%', bottom: '36%' }, tam: 40, voltear: true, lado: 'der' },
+  { estilo: { left: '14%', top: '24%' }, tam: 30, lado: 'bosque' },
+];
 
 /* ══════════════════════════════════════════════════════════════════════════
    LOS DOCE MUNDOS — datos de la vitrina + importadores perezosos
@@ -1722,6 +1732,11 @@ const CSS_VMX = `
  */
 export default function VitrinaMaestraMundos({ onBack }) {
   const [{ tier, reducedMotion }] = useState(() => decidirTier());
+  /* EL CENTRAL MANDA: el avatar que la persona eligió (perfil/onboarding) es
+     el protagonista de la vitrina — grande, pleno, al frente. Sin elección el
+     hook cae a Angelita. El coro ambiental lo excluye del elenco. */
+  const central = useAvatarCreature();
+  const CuerpoCentral = central.Component;
   const [fase, setFase] = useState('galeria');
   const [viaje, setViaje] = useState(null); // null | 'entrar' | 'salir'
   const [mundoId, setMundoId] = useState(null);
@@ -1849,10 +1864,11 @@ export default function VitrinaMaestraMundos({ onBack }) {
               <small>Toque un portal: el túnel lo lleva y lo trae</small>
             </h2>
             <div className="vmx-abeja">
-              {/* Entrada HEROICA: Angelita en su expresividad plena — el contorno
-                  hierve (line-boil), suelta polen y bate sus alitas de tul. Es la
-                  insignia de Chagra: acá se luce con todo el rubber-hose. */}
-              <AbejaAngelita
+              {/* Entrada HEROICA del CENTRAL (el avatar elegido; hoy Angelita):
+                  expresividad plena — line-boil, polen y alitas de tul. El
+                  protagonista se luce con todo el rubber-hose; el coro
+                  ambiental, a lo lejos, jamás compite con él. */}
+              <CuerpoCentral
                 size={100}
                 animo="pleno"
                 energia={1}
@@ -1896,13 +1912,26 @@ export default function VitrinaMaestraMundos({ onBack }) {
         </button>
       )}
 
-      {/* Angelita entra al mundo: el clon que hace la picada al centro del
+      {/* El CENTRAL entra al mundo: el clon que hace la picada al centro del
           portal durante el cruce (el dolly deja la boca justo ahí). En tier
-          bajo también vuela — el iris la alcanza a mitad de picada. */}
+          bajo también vuela — el iris lo alcanza a mitad de picada. */}
       {!reducedMotion && fase !== 'mundo' && (fase === 'acercando' || viaje === 'entrar') && (
         <div className="vmx-abeja-cruce" aria-hidden="true">
-          <AbejaAngelita size={100} animo="atento" energia={1} animated tier={tier} />
+          <CuerpoCentral size={100} animo="atento" energia={1} animated tier={tier} />
         </div>
+      )}
+
+      {/* El coro ambiental entre los mundos: personajes que vienen del bosque
+          o de los costados, hacen su giño lejano y se van (solo el jaguar
+          aparece mágico). Pausado durante el viaje — la GPU va en el dolly. */}
+      {fase !== 'mundo' && (
+        <FaunaAmbiental
+          central={central.id}
+          tier={tier}
+          reducedMotion={reducedMotion}
+          activo={enGaleria}
+          puntos={PUNTOS_FAUNA_VITRINA}
+        />
       )}
 
       <div className="vmx-vineta" aria-hidden="true" />
