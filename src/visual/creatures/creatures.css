@@ -633,6 +633,74 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   RANA ARLEQUÍN — cadencia ZEN (ADITIVO — no toca abeja/oso/colibrí)
+   ───────────────────────────────────────────────────────────────────────────
+   La rana es la PENSADORA SERENA del grupo: su idle NO son los arrebatos de la
+   abeja (rh-antic/rh-travieso: vuelta de campana, meneo de caderas), sino
+   QUIETUD contemplativa. Solo tres cosas se mueven, y despacio:
+     · el BOIL y el parpadeo, RALENTIZADOS (respira zen, no palpita nervioso),
+     · la GARGANTA (papada) que late/infla — la respiración visible,
+     · un SALTO ocasional muy elástico (aterriza y asienta) — su única "locura".
+   Todo transform/opacity (GPU, Android gama baja). Gate RM/tier al final.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* La rana respira MÁS DESPACIO que el resto (zen): su boil, parpadeo y mirada
+   van lentos y pausados — contemplativa, no hiperactiva. Solo re-tempo (misma
+   cadencia heredada); scope por [data-creature] → abeja/oso intactos. */
+[data-creature='rana-andina'] .rh-boil { animation-duration: 3.6s; }
+[data-creature='rana-andina'] .rh-blink { animation-duration: 8.2s; }
+[data-creature='rana-andina'] .rh-mirada { animation-duration: 11.3s; }
+
+/* GARGANTA que late (papada): infla y desinfla despacio, el pulso sereno de la
+   rana respirando en la hoja. Continuo; RM/tier lo congelan abajo. */
+.crt-garganta {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: crt-garganta-late 3.6s ease-in-out infinite;
+}
+@keyframes crt-garganta-late {
+  0%, 100% { transform: scaleY(0.92) scaleX(0.99); }
+  45%      { transform: scaleY(1.16) scaleX(1.04); }  /* infla la papada */
+  62%      { transform: scaleY(1.08) scaleX(1.02); }  /* suelta el aire */
+}
+
+/* SALTO OCASIONAL — el único arrebato de la rana zen: casi todo el ciclo quieta
+   y de pronto un brinco MUY elástico (anticipa agachándose con squash, despega
+   estirada, aterriza con squash fuerte y asienta con rebote). Período largo:
+   es ocasional, no un loop nervioso. transform-origin abajo = salta del piso. */
+.rana-salto {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: rana-salto 11s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes rana-salto {
+  0%, 70% { transform: translateY(0) scale(1, 1); }
+  74%     { transform: translateY(1.2px) scale(1.12, 0.82); }   /* anticipa: se agacha (squash) */
+  80%     { transform: translateY(-7px) scale(0.82, 1.22); }    /* despega estirada (stretch) */
+  86%     { transform: translateY(0.6px) scale(1.16, 0.8); }    /* aterriza (squash fuerte) */
+  90%     { transform: translateY(-0.5px) scale(0.95, 1.06); }  /* rebote elástico */
+  94%     { transform: translateY(0.15px) scale(1.03, 0.98); }  /* …asienta */
+  100%    { transform: translateY(0) scale(1, 1); }
+}
+
+/* Los gestos con carácter (celebra/reposo/señala) y el ánimo bajo detienen el
+   salto y aquietan aún más la garganta: la rana lee limpia (no salta además de
+   celebrar/señalar, ni brinca cuando está sedienta o descansando). */
+[data-creature='rana-andina'][data-pose='celebra'] .rana-salto,
+[data-creature='rana-andina'][data-pose='reposo'] .rana-salto,
+[data-creature='rana-andina'][data-pose='señala'] .rana-salto,
+[data-creature='rana-andina'][data-animo='sediento'] .rana-salto,
+[data-creature='rana-andina'][data-animo='descansa'] .rana-salto { animation: none; }
+[data-creature='rana-andina'][data-pose='reposo'] .crt-garganta,
+[data-creature='rana-andina'][data-animo='descansa'] .crt-garganta { animation-duration: 5.4s; }
+
+/* device-tier 'bajo': corta lo continuo de la rana (salto + garganta). Los
+   estados reactivos/gestos quedan (feedback importante). */
+[data-tier='bajo'] .rana-salto,
+[data-tier='bajo'] .crt-garganta { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rana-salto, .crt-garganta { animation: none !important; }
    OSO ANDINO — el CARÁCTER del guardián: mole PESADA, seria y gruñona.
    Aditivo sobre el KIT species-agnostic (no toca a la abeja): el oso reescribe
    SU boil (más lento y con más masa), suma un resoplido/gruñido corporal, el
