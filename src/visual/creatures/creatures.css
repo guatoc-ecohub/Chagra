@@ -1723,3 +1723,142 @@
   .borugo-poder .borugo-motas-luz,
   [data-creature='borugo'][data-poder='1'] .borugo-motas-luz { animation: none !important; opacity: 0.5; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EL ENT DEL PÁRAMO — el frailejón guardián (árbol-maestro, NO un bicho).
+   Todo ADITIVO: quietud imponente y LENTA (nada hiperactivo). Reusa la
+   fundación (.crt-body + rh-boil, OjosRubber → rh-blink) pero ralentizada, y
+   suma sus capas propias (roseta que se mece, balanceo ancestral, escarcha,
+   neblina, modo-guardián). RM + tier-safe al final.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* El boil de la corteza y el parpadeo del anciano van MUCHO más lentos (peso,
+   edad): mayor especificidad por el data-creature (como rana/oso). */
+[data-creature='ent-frailejon'] .rh-boil { animation-duration: 4.6s; }
+[data-creature='ent-frailejon'] .rh-blink { animation-duration: 9.2s; }
+[data-creature='ent-frailejon'] .rh-mirada { animation-duration: 13.5s; }
+
+/* BALANCEO ANCESTRAL — todo el árbol se mece lentísimo, con peso (no gira: se
+   inclina un pelo y vuelve). Envuelve al cuerpo, aparte del boil. */
+.ent-balanceo {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: ent-balanceo 13s ease-in-out infinite;
+}
+@keyframes ent-balanceo {
+  0%, 100% { transform: rotate(-1.1deg); }
+  50%      { transform: rotate(1.1deg); }
+}
+
+/* LA ROSETA (cabellera plateada) respira despacio y sus hojas se mecen
+   escalonadas — la brisa del páramo peinando la corona. */
+.ent-roseta-viva {
+  animation: ent-roseta-respira 7.5s ease-in-out infinite;
+}
+@keyframes ent-roseta-respira {
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  50%      { transform: scaleY(1.035) scaleX(0.99); }
+}
+.ent-hoja {
+  animation: ent-hoja-mece 5.2s ease-in-out infinite;
+}
+@keyframes ent-hoja-mece {
+  0%, 100% { transform: rotate(-2.2deg); }
+  50%      { transform: rotate(2.2deg); }
+}
+
+/* Flores amarillas: latido tenue de vida. */
+.ent-flor { animation: ent-flor-late 6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes ent-flor-late {
+  0%, 100% { opacity: 0.92; }
+  50%      { opacity: 1; }
+}
+
+/* ESCARCHA en las hojas (clima frío/noche): cristalitos que titilan lento. */
+.ent-escarcha-cristal {
+  animation: ent-escarcha-brilla 4.4s ease-in-out infinite;
+}
+@keyframes ent-escarcha-brilla {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.95; }
+}
+
+/* NEBLINA que cruza el tronco (clima de niebla): bandas que derivan de lado. */
+.ent-neblina-banda {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ent-neblina-deriva 9s ease-in-out infinite;
+}
+@keyframes ent-neblina-deriva {
+  0%, 100% { transform: translateX(-1.6px); opacity: 0.32; }
+  50%      { transform: translateX(1.6px); opacity: 0.5; }
+}
+
+/* ENSEÑA — postura de maestro: se inclina un pelín hacia adelante (atento a
+   quien aprende). Pisa el balanceo (mayor especificidad) mientras enseña. */
+[data-creature='ent-frailejon'][data-ensena='1'] .ent-balanceo {
+  animation: ent-ensena 5s ease-in-out infinite;
+}
+@keyframes ent-ensena {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(2.4deg) translateY(-0.4px); }
+}
+
+/* MODO-GUARDIÁN — el páramo peligra: el Ent se YERGUE. La roseta se ABRE (se
+   agranda y brilla), las flores encienden y todo cobra un halo verde-plateado.
+   Vale en standalone (wrapper .ent-poder) y en inline (data-poder en el <g>). */
+.ent-poder .ent-roseta,
+[data-creature='ent-frailejon'][data-poder='1'] .ent-roseta {
+  animation: ent-guardian-roseta 3.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes ent-guardian-roseta {
+  0%, 100% { transform: scale(1.04); filter: brightness(1.06); }
+  50%      { transform: scale(1.12); filter: brightness(1.2); }
+}
+.ent-poder .ent-flor,
+[data-creature='ent-frailejon'][data-poder='1'] .ent-flor {
+  animation-name: ent-guardian-flor;
+  animation-duration: 2.4s;
+}
+@keyframes ent-guardian-flor {
+  0%, 100% { opacity: 1; filter: brightness(1.1); }
+  50%      { opacity: 1; filter: brightness(1.45); }
+}
+/* ojos que brillan: la cresta-nariz y las cejas de corteza cobran vida glacial */
+.ent-poder .ent-cejas,
+[data-creature='ent-frailejon'][data-poder='1'] .ent-cejas {
+  animation: ent-guardian-cejas 3s ease-in-out infinite;
+}
+@keyframes ent-guardian-cejas {
+  0%, 100% { filter: drop-shadow(0 0 0.6px var(--aura-color, #8fdcae)); }
+  50%      { filter: drop-shadow(0 0 2.4px var(--aura-color, #8fdcae)); }
+}
+
+/* device-tier 'bajo': el idle continuo del Ent se apaga (frugal) — igual que
+   los .rh-* globales. Los estados de clima/guardián quedan en fotograma digno. */
+[data-tier='bajo'][data-creature='ent-frailejon'] .ent-balanceo,
+[data-tier='bajo'][data-creature='ent-frailejon'] .ent-roseta-viva,
+[data-tier='bajo'][data-creature='ent-frailejon'] .ent-hoja,
+[data-tier='bajo'][data-creature='ent-frailejon'] .ent-flor,
+[data-tier='bajo'][data-creature='ent-frailejon'] .ent-escarcha-cristal,
+[data-tier='bajo'][data-creature='ent-frailejon'] .ent-neblina-banda { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='ent-frailejon'] .rh-boil,
+  [data-creature='ent-frailejon'] .rh-blink,
+  [data-creature='ent-frailejon'] .rh-mirada,
+  .ent-balanceo, .ent-roseta-viva, .ent-hoja, .ent-flor,
+  .ent-escarcha-cristal, .ent-neblina-banda,
+  .ent-poder .ent-roseta,
+  [data-creature='ent-frailejon'][data-poder='1'] .ent-roseta,
+  .ent-poder .ent-flor,
+  [data-creature='ent-frailejon'][data-poder='1'] .ent-flor,
+  .ent-poder .ent-cejas,
+  [data-creature='ent-frailejon'][data-poder='1'] .ent-cejas,
+  [data-creature='ent-frailejon'][data-ensena='1'] .ent-balanceo { animation: none !important; }
+  /* la roseta-guardián queda abierta y digna, sin latir */
+  .ent-poder .ent-roseta,
+  [data-creature='ent-frailejon'][data-poder='1'] .ent-roseta { transform: scale(1.06); }
+}

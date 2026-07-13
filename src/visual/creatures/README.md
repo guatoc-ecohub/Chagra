@@ -145,6 +145,36 @@ cierre). Nocturno de montaña: **nunca suda** (ruana de noche/frío). En la vere
 lo cazan; aquí lo honramos **vivo, a salvo y querido**. Todo aditivo en
 `creatures.css`, RM + tier-safe.
 
+## El Ent del páramo — el árbol-maestro (no un bicho)
+
+El **`EntFrailejon`** es el **corazón del "Bosque Vivo"**: un **frailejón gigante**
+(*Espeletia* sp.), el árbol-guardián **vivo, ancestral y sabio** que ENSEÑA. NO es
+fauna: es el **árbol central**, con **presencia GRANDE** e imponente. Traduce a los
+Andes el alma de un árbol-guardián de la fantasía clásica: un **rostro sabio en la
+corteza** (ojos hundidos entre las grietas, **cejas de corteza** serenas, boca en
+la hendidura), tronco alto vestido con la **faldita** de hojas muertas, **corona en
+roseta** de hojas plateadas y pubescentes (su cabellera) con **flores amarillas**, y
+**raíces** que se asientan. Se mueve **LENTO y con peso** — quietud imponente, nada
+hiperactivo.
+
+Hereda la MISMA fundación transversal, **adaptada a su escala y su lentitud**:
+- **Expresividad de árbol vivo** — `lineBoil` MUY lento (corteza ancestral),
+  **balanceo** de todo el árbol, roseta que **respira y se mece** (`.ent-hoja`),
+  parpadeo lento y raíces asentadas.
+- **Lip-sync** — la boca entre las **grietas del tronco** (`visema` → `BocaVisema`)
+  para cuando enseña/habla.
+- **Modo-GUARDIÁN** (su "modo poder", `poder`) — cuando el páramo peligra el Ent se
+  **yergue**: aura **verde-plateada** de 4 capas, la **roseta se abre** y brilla, las
+  flores encienden; sobrio y épico.
+- **Clima de páramo** (`vestuario`) — **ESCARCHA** en las hojas de noche/frío y
+  **NEBLINA** que cruza el tronco; del contrato compartido pero **JAMÁS suda** (vive
+  en el frío).
+- **Enseñanza** — `useEntGuion()` trae el guion de botánica/clima/conservación/caza
+  en **usted** colombiano; **fallback digno** de 4 snippets hasta que aterrice
+  `src/data/entGuion.js` (punto de integración listo: `useEntGuion({ guion })`).
+
+Todo aditivo en `creatures.css`, RM + tier-safe.
+
 ## Técnica
 
 - SVG + CSS puros, **cero dependencias nuevas**; solo `transform`/`opacity`

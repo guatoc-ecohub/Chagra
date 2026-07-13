@@ -55,6 +55,15 @@ export { Perezoso, PEREZOSO_PALETA, PEREZOSO_PROPORCION } from './Perezoso.jsx';
 export { Lombriz } from './Lombriz.jsx';
 export { Mariposa } from './Mariposa.jsx';
 export { Escarabajo } from './Escarabajo.jsx';
+/* EL ENT DEL PÁRAMO — el árbol-guardián que enseña (frailejón gigante). NO es un
+   bicho: es el corazón del "Bosque Vivo". Hereda la MISMA fundación transversal
+   (line-boil, lip-sync, modo-poder=guardián, clima) adaptada a su escala y su
+   lentitud. Su voz-maestra (el guion de botánica/clima/conservación/caza) vive
+   en useEntGuion (fallback digno hasta que aterrice src/data/entGuion.js). */
+export { EntFrailejon } from './EntFrailejon.jsx';
+export {
+  useEntGuion, resolverGuionEnt, ENT_GUION_PLACEHOLDER, ENT_TEMAS,
+} from './useEntGuion.js';
 
 /* ── SISTEMA DE PERSONAJES (transversal, species-agnostic) ───────────────────
    La FUNDACIÓN que heredan los 9 bichos: lip-sync, modo poder, prop-por-mundo,
@@ -97,6 +106,7 @@ import Borugo from './Borugo.jsx';
 import Lombriz from './Lombriz.jsx';
 import Mariposa from './Mariposa.jsx';
 import Escarabajo from './Escarabajo.jsx';
+import EntFrailejon from './EntFrailejon.jsx';
 
 /* Registro consultable: slug → componente + binomio verificado. */
 export const CREATURES = {
@@ -112,4 +122,6 @@ export const CREATURES = {
   lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },
   mariposa: { Component: Mariposa, nombre: 'Mariposa pasionaria', cientifico: 'Dione juno' },
   escarabajo: { Component: Escarabajo, nombre: 'Escarabajo estercolero', cientifico: 'Dichotomius belus' },
+  // El árbol-maestro del Bosque Vivo (flora, no fauna): el frailejón guardián.
+  'ent-frailejon': { Component: EntFrailejon, nombre: 'El Ent del páramo', cientifico: 'Espeletia sp.' },
 };
