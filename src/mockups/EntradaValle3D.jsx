@@ -127,15 +127,6 @@ class Valle3DGuard extends Component {
  *   nombra — el comportamiento de siempre.
  */
 export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = null }) {
-  const [clima, setClima] = useState(() => climaPorHora());
-
-  // ── El clima es ATMÓSFERA, no un selector (auditoría B8/S8): los chips de
-  //    debug se quitaron de la UI. El valle sigue la hora real de la vereda y
-  //    se re-evalúa solo — amanece, atardece y anochece sin botonera.
-  useEffect(() => {
-    const t = setInterval(() => setClima(climaPorHora()), 5 * 60 * 1000);
-    return () => clearInterval(t);
-  }, []);
   const [focoId, setFocoId] = useState(null);
   const [panel, setPanel] = useState(null); // null | 'alerta' | <mundoId>
   const [voz, setVoz] = useState(true);

@@ -23,7 +23,7 @@
 /* Nota: las props de three (position, args, intensity, castShadow, etc.) son
    válidas en el reconciliador de R3F, no en el DOM — el config de ESLint del
    repo no activa react/no-unknown-property, así que no requieren disable. */
-import { Suspense, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Html, Float, Stars, OrbitControls, Detailed, Instances, Instance,
@@ -51,57 +51,12 @@ import { Colibri } from '../../visual/creatures/Colibri.jsx';
 import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
 import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
 import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
-import AnimalesDeFinca, { MATERIAL_FINCA } from './animales.jsx';
-/* AoE ("Age of Empires del campo"): componentes NUEVOS que densifican y dan
-   vida al valle (cada uno instanciado, draw calls acotados). */
-import LluviaValle from '../../visual/mundo3d/atmosfera/clima/LluviaValle.jsx';
-import NieblaLadera from '../../visual/mundo3d/atmosfera/clima/NieblaLadera.jsx';
-import HeladaValle from '../../visual/mundo3d/atmosfera/clima/HeladaValle.jsx';
-import BosqueDensoValle from './BosqueDensoValle.jsx';
-import CafetalDensoValle from './CafetalDensoValle.jsx';
-import ParamoDensoValle from './ParamoDensoValle.jsx';
-import LaderaAltaValle from './LaderaAltaValle.jsx';
-import ArrieriaValle from './ArrieriaValle.jsx';
-import AguaVivaValle from './AguaVivaValle.jsx';
-import DetalleSueloValle from './DetalleSueloValle.jsx';
-import { CampesinosValle } from './CampesinosValle.jsx';
-import HatoMovil from './HatoMovil.jsx';
-/* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
-   (roble, aliso, gaque) que ya viven en floraParamo — cada árbol se distingue. */
-import { geomRoble, geomAliso, geomGaque } from '../../visual/mundo3d/bosque/floraParamo.geom.js';
+import AnimalesDeFinca from './animales.jsx';
 /* Luciérnagas de la noche: el kit instanciado que ya existe (1-3 draw calls),
    sembrado sobre la tierra baja del valle cuando la franja las trae. */
 import { ParticulasAmbientales } from '../../visual/mundo3d/ParticulasAmbientales.jsx';
 /* Duración canónica de la transición entre franjas (misma que CielosHora). */
 import { TRANSICION } from '../../visual/mundo3d/cielosHoraData.js';
-/* LA DIRECCIÓN del valle (capa de composición sobre valleData): la casa-ancla,
-   los senderos del trajín, los patios de tierra pisada, los vecinos (los
-   personajes en su casa) y la disposición COMPUESTA de los lugares. La ley
-   vive como datos en visual/mundo3d/direccion; las piezas r3f, al lado. */
-import {
-  componerMundos,
-  CASA_VALLE,
-  JERARQUIA_PERSONAJES,
-} from '../../visual/mundo3d/direccion/composicionValle.js';
-import {
-  CasaCampesina,
-  VentanasVivas,
-  PorticosSecundarios,
-  SenderosValle,
-  PatiosLugares,
-  VecinosDelValle,
-  OsoNegroDelMonte,
-} from './composicionValle3D.jsx';
-/* El cóndor de los Andes planeando su térmica sobre el páramo: el vecino de
-   AIRE del valle (billboard SVG, un solo <Html>, matemática O(1)/frame). */
-import CondorBillboard from '../../visual/mundo3d/CondorBillboard.jsx';
-/* La silueta biopunk del cóndor (pase de criaturas): la usa el rato en que
-   se POSA en el pico de la cordillera — el vigía alterna vuelo y percha. */
-import { CriaturaNocturnaAvatar } from '../../components/dashboard/CriaturasNocturnas.jsx';
-/* El ANCLAJE: la sombra de contacto bajo cada landmark (casa, lugares,
-   árboles, matas, vecinos) — sin ella los objetos flotan sobre la loma.
-   2 draw calls instanciados, textura radial pre-horneada, cero costo/frame. */
-import SombrasContacto from './SombrasContacto.jsx';
 import './rotulosValle3D.css';
 import {
   MUNDOS_VALLE,
@@ -2012,26 +1967,79 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false }
       pide la preferencia), la franja igual avanza con el reloj. ── */
 const SOL_DEFECTO = [6, 9, 4];
 
-/* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false }) {
-  const controls = useRef(null);
-  // Occluders de los rótulos: solo terreno + cordillera (raycast barato y es
-  // exactamente lo que las etiquetas no deben atravesar).
-  const terrenoRef = useRef(null);
-  const cordilleraRef = useRef(null);
-  const occluders = useMemo(() => [terrenoRef, cordilleraRef], []);
-  const c = CLIMAS[clima];
-  const foco = useMemo(() => {
-    const m = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;
-    // Sin foco, la cámara encuadra el corazón del valle (algo hacia el frente,
-    // regla de tercios) para dar aire y leer la ladera que sube al fondo.
-    if (!m) return new THREE.Vector3(0, 1.0, 1.4);
-    const y = alturaTerreno(m.pos[0], m.pos[2]);
-    return new THREE.Vector3(m.pos[0], y, m.pos[2]);
-  }, [focoId]);
-  const autoOrbit = !reducedMotion && !focoId;
-  const entrando = !!focoId;
-  const nocturno = clima === 'noche';
+function estadoAtmosfera(c) {
+  return {
+    fondo: new THREE.Color(c.cielo[1]),
+    domo: new THREE.Color(c.cielo[0]),
+    suelo: new THREE.Color(c.ambiente),
+    luz: new THREE.Color(c.luz),
+    niebla: new THREE.Color(c.niebla),
+    solPos: new THREE.Vector3(...(c.sol || SOL_DEFECTO)),
+    intensidad: c.intensidad,
+    nieblaLejos: c.nieblaLejos + 8,
+  };
+}
+
+function amortiguarAtmosfera(actual, objetivo, k) {
+  actual.fondo.lerp(objetivo.fondo, k);
+  actual.domo.lerp(objetivo.domo, k);
+  actual.suelo.lerp(objetivo.suelo, k);
+  actual.luz.lerp(objetivo.luz, k);
+  actual.niebla.lerp(objetivo.niebla, k);
+  actual.solPos.lerp(objetivo.solPos, k);
+  actual.intensidad += (objetivo.intensidad - actual.intensidad) * k;
+  actual.nieblaLejos += (objetivo.nieblaLejos - actual.nieblaLejos) * k;
+}
+
+function AtmosferaValle({ c, perfil, reducedMotion }) {
+  const objetivo = useMemo(() => estadoAtmosfera(c), [c]);
+  // La piel del primer montaje: alimenta los valores declarativos del JSX (que
+  // nunca deben cambiar tras montar) — un re-render no pisa la animación.
+  const [ini] = useState(() => c);
+  const [actual] = useState(() => estadoAtmosfera(ini));
+
+  const fondoRef = useRef(null);
+  const fogRef = useRef(null);
+  const hemiRef = useRef(null);
+  const ambRef = useRef(null);
+  const solRef = useRef(null);
+
+  const pintar = (e) => {
+    if (fondoRef.current) fondoRef.current.copy(e.fondo);
+    if (fogRef.current) {
+      fogRef.current.color.copy(e.niebla);
+      fogRef.current.far = e.nieblaLejos;
+    }
+    if (hemiRef.current) {
+      hemiRef.current.intensity = e.intensidad * 0.55;
+      hemiRef.current.color.copy(e.domo);
+      hemiRef.current.groundColor.copy(e.suelo);
+    }
+    if (ambRef.current) {
+      ambRef.current.intensity = e.intensidad * 0.35;
+      ambRef.current.color.copy(e.luz);
+    }
+    if (solRef.current) {
+      solRef.current.intensity = e.intensidad;
+      solRef.current.color.copy(e.luz);
+      solRef.current.position.copy(e.solPos);
+    }
+  };
+
+  // Calma pedida → snap: la piel nueva entra completa, sin animar.
+  useEffect(() => {
+    if (!reducedMotion) return;
+    amortiguarAtmosfera(actual, objetivo, 1);
+    pintar(actual);
+  });
+
+  // Transición viva: amortiguación exponencial estable en dt variable.
+  useFrame((_, dt) => {
+    if (reducedMotion) return;
+    const k = 1 - Math.exp((-3 / TRANSICION.duracion) * Math.min(dt, 0.1));
+    amortiguarAtmosfera(actual, objetivo, k);
+    pintar(actual);
+  });
 
   return (
     <>
@@ -2066,131 +2074,17 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
   );
 }
 
-/* ── LA LUNA DEL VALLE: el disco de plata que AUTORIZA la luz nocturna ──────
-      La noche del cine tiene autora: la direccional fría sale de aquí
-      (CLIMAS.noche.sol apunta desde -x,-z) y verla en el cielo hace legible
-      el contraluz. Discos meshBasic (5 planos transparentes, cero luces
-      extra): corre en TODOS los tiers. Se orienta a la cámara con lookAt
-      (~2 veces/s alcanza — la luna está lejos y el orbit es lento). ── */
-/* La LUNA PONIÉNDOSE tras el filo del páramo (izquierda-fondo, baja sobre el
-   horizonte — en este valle el oriente es +x, por donde sale el sol de
-   CLIMAS.amanecer; una luna en -x va de bajada, como la ve el que madruga):
-   la pose de reposo pica 23° hacia abajo, así que el único cielo del cuadro
-   es la franja rasante sobre la silueta de la ladera — ahí vive la luna.
-   LUZ MOTIVADA: la direccional nocturna (CLIMAS.noche.sol [-13,4.6,-5.2])
-   apunta DESDE este disco — mover la luna es mover también esa luz, o la
-   noche vuelve a mentir. Verificado contra el terreno: el rayo cámara→luna
-   libra la loma (y=6.9 sobre 1.5 en x=-10; 6.2 sobre 3.1 en el borde x=-17)
-   y las cordilleras quedan lejos (z≤-15 la cercana, z≤-22 la lejana). */
-const POS_LUNA = /** @type {[number, number, number]} */ ([-21, 3.4, -8]);
-
-function LunaValle({ reducedMotion }) {
-  const ref = useRef(null);
-  const tick = useRef(0);
-  useFrame(({ camera }) => {
-    if (!ref.current) return;
-    if (tick.current++ % 30 !== 0 && !reducedMotion) return;
-    ref.current.lookAt(camera.position);
-  });
-  return (
-    <group ref={ref} position={POS_LUNA} scale={1.1}>
-      <mesh>
-        <circleGeometry args={[1.15, 36]} />
-        <meshBasicMaterial color="#f2f0e2" transparent opacity={0.98} depthWrite={false} fog={false} />
-      </mesh>
-      {/* mares: sombras suaves que hacen luna, no plato */}
-      <mesh position={[-0.3, 0.26, 0.01]}>
-        <circleGeometry args={[0.3, 18]} />
-        <meshBasicMaterial color="#d4d2c2" transparent opacity={0.5} depthWrite={false} fog={false} />
-      </mesh>
-      <mesh position={[0.34, -0.28, 0.01]}>
-        <circleGeometry args={[0.19, 16]} />
-        <meshBasicMaterial color="#d9d7c6" transparent opacity={0.45} depthWrite={false} fog={false} />
-      </mesh>
-      {/* halo doble: el velo húmedo del páramo alrededor de la luna */}
-      <mesh position={[0, 0, -0.05]}>
-        <circleGeometry args={[2.1, 36]} />
-        <meshBasicMaterial color="#b3cdf0" transparent opacity={0.18} depthWrite={false} fog={false} />
-      </mesh>
-      <mesh position={[0, 0, -0.1]}>
-        <circleGeometry args={[3.6, 36]} />
-        <meshBasicMaterial color="#3d5178" transparent opacity={0.12} depthWrite={false} fog={false} />
-      </mesh>
-    </group>
-  );
-}
-
 /* Caja de las luciérnagas: la tierra baja del frente del valle (referencia
    ESTABLE — ParticulasAmbientales re-siembra si la caja cambia). */
-const AREA_LUCIERNAGAS = /** @type {[number, number, number]} */ ([18, 2.4, 7]);
-
-/* EL MAR DE NUBES DEL AMANECER (la imagen imposible-pero-verdadera del valle):
-   la niebla de RADIACIÓN se forma de madrugada en el fondo del valle — el
-   suelo bajo irradia su calor al cielo despejado y la humedad condensa
-   abajo, no arriba (DR luz real de los Andes). Desde la finca, a media
-   ladera, se ve EL MAR: la tierra caliente del frente tapada por un colchón
-   blanco y la casa flotando encima, con las cumbres al fondo. Solo existe
-   en la franja del amanecer (el sol se lo bebe en una hora, como en la
-   vereda) — quien madruga lo ve; quien no, no. Banda ESTABLE de módulo:
-   NieblaLadera re-siembra si la referencia cambia. +1 draw call (Points). */
-const BANDA_MAR_NUBES = { x: /** @type {[number, number]} */ ([-11, 11]), z: /** @type {[number, number]} */ ([4.6, 9.6]) };
+const AREA_LUCIERNAGAS = [18, 2.4, 7];
 
 /* La pose de cámara del valle: UNA fuente para el Canvas y para el establishing
    shot de la CámaraDirector (así el dolly aterriza EXACTO donde siempre). */
-const CAMARA_VALLE = { position: /** @type {[number, number, number]} */ ([10.5, 9, 13.5]), fov: 40 };
-/* El target de reposo del valle: el corazón del mapa, al que CamaraViajera
-   lleva el target sin foco ((0,1.0,1.4) + 0.6 en y). El establishing del
-   DirectorValle aterriza EXACTO aquí para no dar ningún salto al soltar. */
-const MIRA_VALLE = [0, 1.6, 1.4];
-
-/* El REPOSO CONSCIENTE DEL ASPECTO (dirección de cámara): el fov de three es
-   VERTICAL — en un teléfono parado (aspecto ~0.46) los 40° dejan un fov
-   horizontal de ~19° y la composición entera (lugares en x ∈ [-7.5, 7.5], el
-   oso en el borde del monte) queda FUERA del cuadro: medio valle existía y
-   nadie lo veía (la misma clase de fallo que los árboles tras el macizo de la
-   sierra).
-
-   EL PLANO VERTICAL ES OTRO PLANO (no el mismo, más lejos): retroceder a lo
-   ancho regalaba el 40% del cuadro al cielo vacío y apeñuscaba la finca abajo
-   — los rótulos colisionaban todos y la anti-colisión escondía la mayoría (el
-   "difícil de manejar" del operador). En vertical la cámara SUBE y PICA: la
-   ladera entera (tierra caliente → páramo, 16 u de fondo) corre a lo LARGO de
-   la pantalla, los lugares se separan en vertical y cada rótulo respira. La
-   mira baja y avanza (la finca al centro, el cielo de remate arriba).
-   En landscape (aspecto ≥ 0.9) la pose aprobada queda EXACTA. */
-function poseValleParaAspecto(aspect) {
-  if (!aspect || aspect >= 0.9) {
-    return { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
-  }
-  const cuanVertical = Math.min(1, (0.9 - aspect) / 0.44); // 0 en 0.9 → 1 en ~0.46
-  // El PLANO PICADO del teléfono parado (misma acimut de la pose aprobada,
-  // polar ~40°): la cámara sube a 18.7 y la mira avanza a la finca (z 3.2).
-  const PICADO = { position: [9.3, 18.7, 15.1], fov: 58, mira: [-0.5, 0.6, 2.7] };
-  const lerp = (a, b) => a + (b - a) * cuanVertical;
-  const position = /** @type {[number, number, number]} */ (
-    CAMARA_VALLE.position.map((v, i) => lerp(v, PICADO.position[i]))
-  );
-  const mira = /** @type {[number, number, number]} */ (
-    MIRA_VALLE.map((v, i) => lerp(v, PICADO.mira[i]))
-  );
-  const fov = Math.round(lerp(CAMARA_VALLE.fov, PICADO.fov));
-  // k = razón de distancia (cámara→mira) contra la pose landscape: gobierna
-  // el zoom de reposo de CamaraViajera y el techo de los controles.
-  const dist = (p, m) => Math.hypot(p[0] - m[0], p[1] - m[1], p[2] - m[2]);
-  const k = dist(position, mira) / dist(CAMARA_VALLE.position, MIRA_VALLE);
-  return { position, fov, k, mira };
-}
+const CAMARA_VALLE = { position: [10.5, 9, 13.5], fov: 40 };
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = null, onAngelita = null, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null }) {
-  /* La pose de reposo (aspecto-consciente, viene del host del Canvas). */
-  const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
-  const miraReposo = poseReposo.mira || MIRA_VALLE;
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false }) {
   const controls = useRef(null);
-  /* La cámara de director (FASE 4, flag `camaraDirector`) se monta DESPUÉS de
-     CamaraViajera y gana por orden de frame durante su barrido. `avatarRef`
-     recibe la posición viva de Angelita (Vector3 estable) para el follow. */
-  const avatarRef = useRef(new THREE.Vector3());
   // Occluders de los rótulos: solo terreno + cordillera (raycast barato y es
   // exactamente lo que las etiquetas no deben atravesar).
   const terrenoRef = useRef(null);
@@ -2198,14 +2092,13 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
   const occluders = useMemo(() => [terrenoRef, cordilleraRef], []);
   const c = CLIMAS[clima];
   const foco = useMemo(() => {
-    const m = focoId ? MUNDO_DIR_BY_ID[focoId] : null;
+    const m = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;
     // Sin foco, la cámara encuadra el corazón del valle (algo hacia el frente,
-    // regla de tercios) — la mira de reposo es ASPECTO-CONSCIENTE: en vertical
-    // baja y avanza hacia la finca (CamaraViajera le suma 0.6 en y).
-    if (!m) return new THREE.Vector3(miraReposo[0], miraReposo[1] - 0.6, miraReposo[2]);
+    // regla de tercios) para dar aire y leer la ladera que sube al fondo.
+    if (!m) return new THREE.Vector3(0, 1.0, 1.4);
     const y = alturaTerreno(m.pos[0], m.pos[2]);
     return new THREE.Vector3(m.pos[0], y, m.pos[2]);
-  }, [focoId, miraReposo]);
+  }, [focoId]);
   const autoOrbit = !reducedMotion && !focoId;
   const entrando = !!focoId;
   const nocturno = clima === 'noche';
@@ -2214,13 +2107,9 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
   // pocas se asoman al atardecer, todas de noche) y luciérnagas por densidad.
   const fracEstrellas = c.estrellas === true ? 1 : Number(c.estrellas) || 0;
   const luciernagas = Number(c.luciernagas) || 0;
-  /* Luces prácticas de la finca (0..1): las ventanas se encienden CON el ocaso,
-     no en un switch binario noche/día (ciclo día↔noche, fable 2026-07-18). */
-  const practicas = Number(c.practicas) || 0;
 
   return (
     <>
-      {!reducedMotion && <MonitorRendimiento key={tier} tier={tier} />}
       {/* Fondo + niebla + luces, amortiguadas hacia la franja del día. */}
       <AtmosferaValle c={c} perfil={perfil} reducedMotion={reducedMotion} />
       {fracEstrellas > 0 && perfil.estrellas > 0 && (
@@ -2240,16 +2129,13 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
         <ParticulasAmbientales
           tipo="luciernagas"
           densidad={luciernagas}
-          tier={/** @type {"bajo"|"alto"|"medio"} */ (tier)}
+          tier={tier}
           reducedMotion={reducedMotion}
           area={AREA_LUCIERNAGAS}
           position={[0, 0.35, 3.6]}
           semilla={11}
         />
       )}
-
-      {/* La LUNA: la autora de la luz nocturna. Verla ancla el contraluz. */}
-      {nocturno && <LunaValle reducedMotion={reducedMotion} />}
 
       <Terreno nocturno={nocturno} innerRef={terrenoRef} perfil={perfil} />
       {/* AoE: detalle de suelo (pasto corto/flores/piedras) + surcos de cultivo — mata el verde vacío */}

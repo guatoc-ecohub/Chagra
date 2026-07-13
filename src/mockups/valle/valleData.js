@@ -314,13 +314,8 @@ export function animoDeFinca(clima, { hayAlerta = false, salud = SALUD_FINCA } =
  *               sombras giran y se acortan al mediodía;
  *   estrellas   0..1 — fracción del presupuesto de estrellas del tier (true
  *               histórico = 1);
- *   luciernagas 0..2 — multiplicador de densidad de luciérnagas (asoman al
- *               atardecer, plenas de noche; ParticulasAmbientales acota [0,2]);
- *   practicas   0..1 — cuánto encienden las LUCES PRÁCTICAS de la finca (la
- *               ventana y la puerta de la casa, los halos de las ventanas
- *               vivas): la casa prende foco cuando la luz del cielo baja —
- *               al atardecer y en la niebla cerrada, no solo de noche. Campo
- *               opcional (ausente = 0); el cableo vive en Valle3D.
+ *   luciernagas 0..1 — densidad de luciérnagas (asoman al atardecer, plenas
+ *               de noche).
  */
 export const CLIMAS = {
   amanecer: {
@@ -334,8 +329,7 @@ export const CLIMAS = {
     intensidad: 0.95,
     estrellas: 0.15,
     sol: [9, 2.5, 5],
-    luciernagas: 0.22, // las últimas se apagan con el alba
-    practicas: 0.35, // la cocina ya está prendida antes de que aclare
+    luciernagas: 0.15,
   },
   manana: {
     etiqueta: 'Mañana dorada',
@@ -360,10 +354,7 @@ export const CLIMAS = {
     nieblaLejos: 44,
     intensidad: 1.35,
     estrellas: 0,
-    /* Sol CASI CENITAL (DR luz real: a 4-5° N el mediodía es vertical) —
-       sombras cortas y duras pegadas al pie de cada cosa: la seña del
-       mediodía ecuatorial que cualquier campesino reconoce sin leer nada. */
-    sol: [0.8, 14, 1.4],
+    sol: [2, 12, 3],
     luciernagas: 0,
   },
   tarde: {
@@ -388,10 +379,9 @@ export const CLIMAS = {
     niebla: '#e8a97f',
     nieblaLejos: 24,
     intensidad: 0.9,
-    estrellas: 0.22, // los primeros luceros se asoman con el sol aún rasante
+    estrellas: 0.12,
     sol: [-8, 2.5, 4.5],
-    luciernagas: 0.55, // el prado empieza a chispear ANTES de que oscurezca
-    practicas: 0.75, // la hora de prender la luz: las ventanas se encienden con el ocaso
+    luciernagas: 0.35,
   },
   dorada: {
     etiqueta: 'Hora dorada',
@@ -416,7 +406,7 @@ export const CLIMAS = {
     nieblaLejos: 38,
     intensidad: 1.35,
     estrellas: false,
-    sol: [2.5, 13, 2], // alto y duro: el sol ecuatorial de día claro
+    sol: [4, 11, 3],
     luciernagas: 0,
   },
   niebla: {
@@ -431,7 +421,6 @@ export const CLIMAS = {
     estrellas: false,
     sol: [6, 9, 4],
     luciernagas: 0,
-    practicas: 0.4, // en la niebla cerrada la ventana de la casa es el faro
   },
   lluvia: {
     etiqueta: 'Lluvia',
@@ -445,25 +434,6 @@ export const CLIMAS = {
     lluviaViva: true,
     estrellas: false,
     sol: [6, 9, 4],
-    luciernagas: 0,
-    practicas: 0.35, // el aguacero oscurece: adentro se prende la luz
-  },
-  helada: {
-    /* La MADRUGADA DE HELADA (agroclimático honesto): noche/pre-alba
-       DESPEJADA — el suelo irradia su calor al cielo abierto y escarcha.
-       Por eso aquí hay MÁS estrellas y la niebla se abre (aire limpio y
-       quieto), con la luz azul-acero del frío. La escarcha 3D la pone
-       HeladaValle (atmosfera/clima); este preset viste luz y cielo. */
-    etiqueta: 'Helada',
-    grade: 'vfx-grade--glacial',
-    cielo: ['#16294e', '#3d5b8a'],
-    luz: '#c3d8f2',
-    ambiente: '#3a4f74',
-    niebla: '#243a5e',
-    nieblaLejos: 40,
-    intensidad: 0.8,
-    estrellas: 0.7,
-    sol: [8, 2, 4],
     luciernagas: 0,
   },
   noche: {
@@ -480,17 +450,8 @@ export const CLIMAS = {
     nieblaLejos: 30,
     intensidad: 0.72,
     estrellas: true,
-    /* LUZ MOTIVADA (regla Nolan/Hoytema: toda luz tiene autora visible): la
-       direccional nocturna sale DE la luna que se ve en el cielo — el disco
-       vive en Valle3D.POS_LUNA [-21, 3.4, -8], bajo sobre el filo del
-       páramo. Antes la luz caía desde [-6,7,-4] (una luna alta que no
-       existía en el cuadro); ahora la dirección coincide en acimut y en
-       altura rasante: CONTRALUZ de plata — las lomas que miran a la cámara
-       caen a la penumbra azul del día-por-noche y la quebrada emisiva se
-       vuelve el sendero que más brilla. */
-    sol: [-13, 4.6, -5.2],
-    luciernagas: 1.5, // plenas: la constelación baja del valle (sigue siendo 1 draw call)
-    practicas: 1,
+    sol: [-6, 7, -4],
+    luciernagas: 1,
   },
 };
 

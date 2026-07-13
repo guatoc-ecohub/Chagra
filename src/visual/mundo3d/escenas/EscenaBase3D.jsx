@@ -22,7 +22,7 @@
  */
 import { Suspense, lazy, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Html, OrbitControls } from '@react-three/drei';
+import { Html, OrbitControls, Stars } from '@react-three/drei';
 import { MonitorRendimiento } from '../usePerformanceMonitor.jsx';
 import * as THREE from 'three';
 import { AbejaEscena } from './useEntradaAbeja.jsx';
@@ -30,10 +30,6 @@ import CamaraDirector from './CamaraDirector.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
 import { ESTADO_FINCA_MUESTRA } from './reaccionFinca.js';
 import useHaptics from '../useHaptics.js';
-import MonitorRendimiento, {
-  detectarTierInicial,
-  presupuestoDeTier,
-} from '../usePerformanceMonitor.jsx';
 /* La dirección de arte compartida (cielos por familia + receta de mezcla) vive
    en un módulo propio: los arquetipos eligen su CIELOS.<familia>, esta base la
    mezcla hacia la MADRE de la franja. Una sola fuente, cero hexes sueltos. */
