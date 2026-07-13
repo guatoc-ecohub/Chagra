@@ -60,122 +60,11 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
-  // ── Vista global (Sierra Nevada) — la MONTAÑA 3D que se orbita ────────
-  // Macizo con relieve real: los pisos como terreno (color por altura + veg
-  // instanciada), la cámara la recorre girando, y tocar una zona entra a su
-  // mundo. Reemplaza el corte vertical (que se lee como lámina; se GUARDA en
-  // `sierra_corte` como vista-mapa por si se quiere comparar).
+  // ── Vista global (Sierra Nevada) ───────────────────────────────
   {
     path: 'sierra_global',
-    alias: ['sierra', 'vista_sierra'],
-    componente: 'SierraMonte3D',
-    importLazy: 'src/visual/mundo3d/sierra/SierraMonte3D.jsx',
-    categoria: '3D',
-  },
-  // El corte vertical, GUARDADO y accesible: la vista-mapa estática de la
-  // geografía (SierraMonte3D enlaza aquí con "Ver el corte de geografía").
-  {
-    path: 'sierra_corte',
-    alias: ['sierra_lamina', 'vista_sierra_corte'],
-    componente: 'SierraCorteVertical',
-    importLazy: 'src/visual/mundo3d/sierra/SierraCorteVertical.jsx',
-    categoria: '3D',
-  },
-  // Los mundos de cultivo por piso térmico — navegables y PÚBLICOS en prod
-  // (el arte estaba solo cableado en App.jsx / shell clásico).
-  {
-    path: 'cafetal_vivo',
-    alias: ['cafetal', 'mundo_cafe', 'cafetal-vivo-3d'],
-    componente: 'CafetalVivo3D',
-    importLazy: 'src/mockups/CafetalVivo3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'invernadero_vivo',
-    alias: ['invernadero', 'mundo_invernadero', 'invernadero-vivo-3d'],
-    componente: 'InvernaderoVivo3D',
-    importLazy: 'src/mockups/InvernaderoVivo3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'cacao_vivo',
-    alias: ['cacao', 'mundo_cacao', 'cacao-vivo-3d'],
-    componente: 'CacaoVivo3D',
-    importLazy: 'src/mockups/CacaoVivo3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'papa_vivo',
-    alias: ['papa', 'mundo_papa', 'papa-viva-3d'],
-    componente: 'PapaVivo3D',
-    importLazy: 'src/mockups/PapaVivo3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'mundo_piscicultura',
-    alias: ['piscicultura', 'mundo_peces', 'mundo-piscicultura-3d'],
-    componente: 'MundoPiscicultura3D',
-    importLazy: 'src/mockups/MundoPiscicultura3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'lecheria_viva',
-    alias: ['lecheria', 'mundo_lecheria', 'lecheria-viva-3d'],
-    componente: 'LecheriaViva3D',
-    importLazy: 'src/mockups/LecheriaViva3D.jsx',
-    categoria: '3D',
-  },
-  // El MUNDO DE LOS POLINIZADORES — la finca completa (rincón de monte,
-  // meliponario, cerca viva florida, maracuyá, ahuyama, cafetal y maizal) con
-  // la red de polen tejiéndose entre las ocho especies. El arte estaba
-  // completo en `visual/mundo3d/polinizadores/` pero nada lo montaba (hallazgo
-  // #1 del audit de biodiversidad 3D, 2026-07-16: cero rutas, cero
-  // componentMap).
-  {
-    path: 'mundo_polinizadores',
-    alias: ['polinizadores', 'mundo_polinizadores_3d', 'polinizadores-vivo-3d'],
-    componente: 'MundoPolinizadores3D',
-    importLazy: 'src/mockups/MundoPolinizadores3D.jsx',
-    categoria: '3D',
-  },
-
-
-  // ── Arte nuevo — en revisión del operador (2026-07-14) ─────────
-  {
-    path: 'grafo_navegador',
-    alias: ['grafo', 'constelacion'],
-    componente: 'NavegadorGrafoDemo',
-    importLazy: 'src/mockups/NavegadorGrafoDemo.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'restauracion',
-    alias: ['restaurar', 'monte_vuelve'],
-    componente: 'RestauracionEnElTiempo',
-    importLazy: 'src/visual/mundo3d/restauracion/RestauracionEnElTiempo.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'atmosfera',
-    alias: ['dia_vivo', 'hora'],
-    componente: 'DemoAtmosferaViva',
-    importLazy: 'src/visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'transiciones',
-    alias: ['odyssey', 'velo'],
-    componente: 'TransicionesOdysseyDemo',
-    importLazy: 'src/mockups/TransicionesOdysseyDemo.jsx',
-    categoria: '3D',
-  },
-
-  // ── El Bosque Vivo — Ent queñua landmark + microsuelo (capas) ──
-  {
-    path: 'bosque_vivo',
-    alias: ['bosque', 'bosque_vivo_3d', 'ent', 'quenua'],
-    componente: 'MundoEntBosque',
-    importLazy: 'src/visual/mundo3d/bosque/MundoEntBosque.jsx',
+    componente: 'VistaGlobalSierra',
+    importLazy: 'src/visual/mundo3d/VistaGlobalSierra.jsx',
     categoria: '3D',
   },
 
@@ -187,13 +76,9 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
-  // ── Puerta maestra a los mundos (15, por piso térmico) ─────────
+  // ── Puerta maestra a los 12 mundos ─────────────────────────────
   {
     path: 'vitrina_maestra',
-    // alias mockup_vitrina_maestra: MundosDeMiFinca (dashboard) navega con el
-    // nombre viejo — sin el alias esa tile era un tap muerto en prod
-    // (barrido de controles 2026-07-15).
-    alias: ['mockup_vitrina_maestra'],
     componente: 'VitrinaMaestraMundos',
     importLazy: 'src/mockups/VitrinaMaestraMundos.jsx',
     categoria: '3D',
@@ -224,54 +109,6 @@ export const NUCLEO_3D = [
     path: 'diorama_paramo',
     componente: 'MundoParamo3D',
     importLazy: 'src/mockups/MundoParamo3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'diorama_botica_cana',
-    componente: 'MundoBoticaCana3D',
-    importLazy: 'src/mockups/MundoBoticaCana3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'diorama_frutales',
-    componente: 'MundoFrutales3D',
-    importLazy: 'src/mockups/MundoFrutales3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'diorama_leguminosas',
-    componente: 'MundoLeguminosas3D',
-    importLazy: 'src/mockups/MundoLeguminosas3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'diorama_piscicultura',
-    componente: 'MundoPiscicultura3D',
-    importLazy: 'src/mockups/MundoPiscicultura3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'diorama_semillero',
-    componente: 'MundoSemillero3D',
-    importLazy: 'src/mockups/MundoSemillero3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'diorama_sanidad',
-    componente: 'MundoSanidad3D',
-    importLazy: 'src/mockups/MundoSanidad3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'diorama_lecheria',
-    componente: 'MundoLecheria3D',
-    importLazy: 'src/mockups/MundoLecheria3D.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'diorama_vergel_frutal',
-    componente: 'MundoVergelFrutal3D',
-    importLazy: 'src/mockups/MundoVergelFrutal3D.jsx',
     categoria: '3D',
   },
   {
@@ -306,10 +143,6 @@ export const NUCLEO_3D = [
   },
   {
     path: 'subsuelo',
-    // alias mundo3d_micorrizas: la tile "suelo vivo 3D" de mundosFinca.js usa
-    // el nombre del shell viejo; en prod el mundo micorrízico es el subsuelo
-    // (misma decisión que wire3DNav, PR #2479).
-    alias: ['mundo3d_micorrizas'],
     componente: 'MundoSubsuelo',
     importLazy: 'src/components/juego/MundoSubsuelo.jsx',
     categoria: '3D',
@@ -688,17 +521,6 @@ export const NUCLEO_APP = [
     importLazy: 'src/components/milpa/MilpaScreen.jsx',
     categoria: '2D-app',
   },
-  {
-    // Mundo "Quinua y granos andinos" — estaba en el shell viejo (case
-    // 'quinua' + tile en mundosFinca.js) y NO estaba en EXCLUIDO: omisión del
-    // manifiesto, no decisión. Sin esta entrada la tile del hub de cultivos
-    // era un tap muerto en prod (barrido de controles 2026-07-15).
-    path: 'quinua',
-    alias: ['granos-andinos', 'quinoa'],
-    componente: 'QuinuaScreen',
-    importLazy: 'src/components/quinua/QuinuaScreen.jsx',
-    categoria: '2D-app',
-  },
 
   // ── Sanidad ────────────────────────────────────────────────────
   {
@@ -960,75 +782,6 @@ export const NUCLEO_APP = [
     categoria: '2D-app',
   },
 
-  // ── Juegos (promovidos de PENDIENTE, smoke-test OK 2026-07-14) ─
-  {
-    // LA SALA DE JUEGOS — el hub que hace VISIBLES los 9 juegos (feedback del
-    // operador 2026-07-16: "no veo los juegos"). Enlazado desde Aprender
-    // (SalaJuegosBanner) y con deep-link directo #juegos.
-    path: 'juegos',
-    alias: ['sala_juegos', 'hub_juegos'],
-    componente: 'HubJuegos',
-    importLazy: 'src/components/juego/HubJuegos.jsx',
-    categoria: '2D-app',
-  },
-  {
-    path: 'juego',
-    componente: 'MiFincaVivaScreen',
-    importLazy: 'src/components/juego/MiFincaVivaScreen.jsx',
-    categoria: '2D-app',
-  },
-  {
-    path: 'defensores',
-    componente: 'DefensoresFincaScreen',
-    importLazy: 'src/components/juego/DefensoresFincaScreen.jsx',
-    categoria: '2D-app',
-  },
-  {
-    path: 'milpa',
-    componente: 'MilpaSimulator',
-    importLazy: 'src/components/juego/MilpaSimulator.jsx',
-    categoria: '2D-app',
-  },
-  {
-    path: 'doom_finca',
-    componente: 'DoomFincaScreen',
-    importLazy: 'src/components/juego/DoomFincaScreen.jsx',
-    categoria: '2D-app',
-  },
-  {
-    path: 'metal_slug_campo',
-    alias: ['mockup_metal_slug_campo'],
-    componente: 'MetalSlugCampo',
-    importLazy: 'src/mockups/MetalSlugCampo.jsx',
-    categoria: '2D-app',
-  },
-  {
-    // Fusionado DENTRO de MilpaSimulator como "modo ilustrado" (audit juegos
-    // 2026-07-16). Se mantiene la ruta/alias para el deep-link directo, pero el
-    // hub MiFincaViva ya no lo lista como entrada aparte (una sola Milpa).
-    path: 'juego_la_milpa',
-    alias: ['mockup_juego_la_milpa'],
-    componente: 'JuegoLaMilpa',
-    importLazy: 'src/mockups/JuegoLaMilpa.jsx',
-    categoria: '2D-app',
-  },
-  {
-    // Promovido de URL-only (#/mockups/juego-mi-finca) a ruta de primera clase
-    // + enlace desde el hub (audit juegos 2026-07-16). La joya 2D↔3D Odyssey.
-    path: 'finca_odyssey',
-    alias: ['mockup_juego_mi_finca'],
-    componente: 'JuegoMiFincaOdyssey',
-    importLazy: 'src/mockups/JuegoMiFincaOdyssey.jsx',
-    categoria: '2D-app',
-  },
-  {
-    // Rescatado de huérfano total sin ruta (audit juegos 2026-07-16). AGR 9.
-    path: 'mono_vs_poli',
-    componente: 'MonoVsPoliSimulator',
-    importLazy: 'src/components/juego/MonoVsPoliSimulator.jsx',
-    categoria: '2D-app',
-  },
-
   // ── Mercado / Red humana ──────────────────────────────────────
   // (ver PENDIENTE_DECISION abajo)
 ];
@@ -1203,7 +956,7 @@ export const EXCLUIDO = [
  * @property {string}  motivo
  */
 
-/** @type {Array<{path:string, alias?:string[], componente:string, importLazy:string|null, decision:null, motivo:string}>} */
+/** @type {Array<{path:string, componente:string, importLazy:string, decision:null, motivo:string}>} */
 export const PENDIENTE_DECISION = [
   // ── Onboarding: ¿Profile o Siembra (mockup)? ──────────────────
   {
@@ -1221,9 +974,49 @@ export const PENDIENTE_DECISION = [
     motivo: 'Onboarding como ritual de siembra (SVG animado). ¿Reemplaza o complementa OnboardingProfile?',
   },
 
-  // ── Juegos PROMOVIDOS a NUCLEO_APP (smoke-test OK, 2026-07-14) ─
-  // Los 6 juegos + Metal Slug mockup pasaron smoke test sin crash.
-  // Movidos a NUCLEO_APP abajo. Este bloque queda vacío como marcador.
+  // ── Juegos ──────────────────────────────────────────────────────
+  {
+    path: 'juego',
+    componente: 'MiFincaVivaScreen',
+    importLazy: 'src/components/juego/MiFincaVivaScreen.jsx',
+    decision: null,
+    motivo: 'Juego "Mi finca viva". ¿Va en prod como sección de juegos o se excluye?',
+  },
+  {
+    path: 'defensores',
+    componente: 'DefensoresFincaScreen',
+    importLazy: 'src/components/juego/DefensoresFincaScreen.jsx',
+    decision: null,
+    motivo: 'Juego Defensores de la Finca. Ídem.',
+  },
+  {
+    path: 'milpa',
+    componente: 'MilpaSimulator',
+    importLazy: 'src/components/juego/MilpaSimulator.jsx',
+    decision: null,
+    motivo: 'Simulador de milpa. Ídem.',
+  },
+  {
+    path: 'doom_finca',
+    componente: 'DoomFincaScreen',
+    importLazy: 'src/components/juego/DoomFincaScreen.jsx',
+    decision: null,
+    motivo: 'Metal Slug del campo. Ídem.',
+  },
+  {
+    path: 'mockup_metal_slug_campo',
+    componente: 'MetalSlugCampo',
+    importLazy: 'src/mockups/MetalSlugCampo.jsx',
+    decision: null,
+    motivo: 'Prototipo jugable nivel 1. Si Metal Slug va, este mockup se promueve a ruta real.',
+  },
+  {
+    path: 'mockup_juego_la_milpa',
+    componente: 'JuegoLaMilpa',
+    importLazy: 'src/mockups/JuegoLaMilpa.jsx',
+    decision: null,
+    motivo: 'Mini-juego las tres hermanas. ¿Ruta real o solo vitrina?',
+  },
 
   // ── Mercado / Red humana ───────────────────────────────────────
   {
@@ -1235,13 +1028,6 @@ export const PENDIENTE_DECISION = [
   },
   {
     path: 'mercados',
-    // alias 'mercado': SIETE superficies de prod (DashboardLive, FiqueScreen,
-    // mundosFinca, pisosTermicos, mundoData, cicloVivoData, FincaVivaHero)
-    // navegan a 'mercado' — y MercadosScreen YA está montada en prod como
-    // #mercados. El alias hace que esos CTAs aterricen en la pantalla que ya
-    // se embarca en vez de morir en el guard. Si el operador decide sacar el
-    // mercado de prod, quitar el alias JUNTO CON la entrada entera.
-    alias: ['mercado'],
     componente: 'MercadosScreen',
     importLazy: 'src/components/MercadosScreen.jsx',
     decision: null,
