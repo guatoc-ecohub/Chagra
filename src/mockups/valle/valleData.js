@@ -17,6 +17,9 @@
    (ADR-050). */
 
 import { MUNDO_BY_ID } from '../../components/dashboard/mundosFinca';
+/* La franja del día sale de UNA fuente (cielosHoraData): el mismo mapa de
+   bandas que usan los mundos 3D — el valle y los dioramas giran juntos. */
+import { horaDeReloj } from '../../visual/mundo3d/cielosHoraData.js';
 
 /* ── 0. LOS PISOS TÉRMICOS: EL GRADIENTE DE ALTITUD DE LA FINCA ANDINA ───────
  * Una finca de ladera TREPA la montaña: del plátano en tierra caliente abajo
@@ -193,7 +196,12 @@ export const SALUD_FINCA = {
 export function animoDeFinca(clima, { hayAlerta = false, salud = SALUD_FINCA } = {}) {
   const vivas = salud.matasTotal > 0 ? salud.matasVivas / salud.matasTotal : 1;
   // Energía base: mezcla de matas vivas y agua, atenuada por el clima duro.
-  const climaFactor = clima === 'noche' ? 0.55 : clima === 'lluvia' ? 0.8 : 1;
+  // En los filos del día (amanecer/atardecer) la abeja ya baja el ritmo.
+  const climaFactor =
+    clima === 'noche' ? 0.55
+      : clima === 'lluvia' ? 0.8
+        : clima === 'amanecer' || clima === 'atardecer' ? 0.85
+          : 1;
   const energia = Math.max(0.35, Math.min(1, (vivas * 0.65 + salud.agua * 0.35) * climaFactor));
 
   if (hayAlerta) {
@@ -236,8 +244,84 @@ export function animoDeFinca(clima, { hayAlerta = false, salud = SALUD_FINCA } =
  * `grade` = clase modificadora .vfx-grade--* aplicada a un velo DOM sobre el
  * canvas; `cielo`/`luz`/`niebla` alimentan la iluminación de la escena 3D.
  * Una sola geometría, varias "pieles" según el estado real de la vereda.
+ *
+ * CICLO DIURNO VIVO: además de las pieles de CONDICIÓN (soleado/niebla/lluvia,
+ * que vienen del clima real), están las pieles de FRANJA del día (amanecer →
+ * mañana → mediodía → tarde → atardecer → noche) que `climaPorHora` recorre
+ * con el reloj del dispositivo. Campos del ciclo:
+ *   sol         [x,y,z] — posición del sol (o la luna): el ARCO del día, las
+ *               sombras giran y se acortan al mediodía;
+ *   estrellas   0..1 — fracción del presupuesto de estrellas del tier (true
+ *               histórico = 1);
+ *   luciernagas 0..1 — densidad de luciérnagas (asoman al atardecer, plenas
+ *               de noche).
  */
 export const CLIMAS = {
+  amanecer: {
+    etiqueta: 'Amanecer',
+    grade: 'vfx-grade--templado',
+    cielo: ['#a9b4d8', '#f6c9a0'],
+    luz: '#ffc994',
+    ambiente: '#6e5a44',
+    niebla: '#ecc7a2',
+    nieblaLejos: 26,
+    intensidad: 0.95,
+    estrellas: 0.15,
+    sol: [9, 2.5, 5],
+    luciernagas: 0.15,
+  },
+  manana: {
+    etiqueta: 'Mañana dorada',
+    grade: 'vfx-grade--calido',
+    cielo: ['#a5d3e0', '#f4e3b2'],
+    luz: '#ffe9b8',
+    ambiente: '#8a7a52',
+    niebla: '#eeddb4',
+    nieblaLejos: 36,
+    intensidad: 1.2,
+    estrellas: 0,
+    sol: [8, 6, 4.5],
+    luciernagas: 0,
+  },
+  mediodia: {
+    etiqueta: 'Mediodía',
+    grade: 'vfx-grade--calido',
+    cielo: ['#8fd0e8', '#e9f3ea'],
+    luz: '#fff2d2',
+    ambiente: '#9fb6a0',
+    niebla: '#ddeee6',
+    nieblaLejos: 44,
+    intensidad: 1.35,
+    estrellas: 0,
+    sol: [2, 12, 3],
+    luciernagas: 0,
+  },
+  tarde: {
+    etiqueta: 'Tarde',
+    grade: 'vfx-grade--templado',
+    cielo: ['#9fc4dc', '#f2d9a2'],
+    luz: '#ffdf9f',
+    ambiente: '#8f7247',
+    niebla: '#eccf9d',
+    nieblaLejos: 36,
+    intensidad: 1.1,
+    estrellas: 0,
+    sol: [-5, 7, 4],
+    luciernagas: 0,
+  },
+  atardecer: {
+    etiqueta: 'Atardecer',
+    grade: 'vfx-grade--templado',
+    cielo: ['#c98ba0', '#f0955e'],
+    luz: '#ffb37a',
+    ambiente: '#6e4a3a',
+    niebla: '#e8a97f',
+    nieblaLejos: 24,
+    intensidad: 0.9,
+    estrellas: 0.12,
+    sol: [-8, 2.5, 4.5],
+    luciernagas: 0.35,
+  },
   dorada: {
     etiqueta: 'Hora dorada',
     grade: 'vfx-grade--templado',
@@ -248,6 +332,8 @@ export const CLIMAS = {
     nieblaLejos: 30,
     intensidad: 1.15,
     estrellas: false,
+    sol: [6, 9, 4],
+    luciernagas: 0,
   },
   soleado: {
     etiqueta: 'Soleado',
@@ -259,6 +345,8 @@ export const CLIMAS = {
     nieblaLejos: 38,
     intensidad: 1.35,
     estrellas: false,
+    sol: [4, 11, 3],
+    luciernagas: 0,
   },
   niebla: {
     etiqueta: 'Niebla',
@@ -270,6 +358,8 @@ export const CLIMAS = {
     nieblaLejos: 15,
     intensidad: 0.85,
     estrellas: false,
+    sol: [6, 9, 4],
+    luciernagas: 0,
   },
   lluvia: {
     etiqueta: 'Lluvia',
@@ -282,6 +372,8 @@ export const CLIMAS = {
     intensidad: 0.7,
     lluviaViva: true,
     estrellas: false,
+    sol: [6, 9, 4],
+    luciernagas: 0,
   },
   noche: {
     etiqueta: 'Noche',
@@ -293,22 +385,23 @@ export const CLIMAS = {
     nieblaLejos: 22,
     intensidad: 0.5,
     estrellas: true,
+    sol: [-6, 7, -4],
+    luciernagas: 1,
   },
 };
 
 export const ORDEN_CLIMA = ['dorada', 'soleado', 'niebla', 'lluvia', 'noche'];
 
 /**
- * Estado por defecto según la hora REAL del dispositivo (ancla de veracidad,
- * como Apple Weather): madrugada/noche → noche; media mañana → soleado; tarde
- * → hora dorada. Un dato verdadero, no decoración inventada.
+ * Franja del día según la hora REAL del dispositivo (ancla de veracidad, como
+ * Apple Weather): el valle recorre el ciclo completo — amanecer → mañana →
+ * mediodía → tarde → atardecer → noche. Un dato verdadero, no decoración
+ * inventada. Delegado en cielosHoraData.horaDeReloj: LA fuente de franjas,
+ * compartida con los mundos 3D.
+ * @returns {'amanecer'|'manana'|'mediodia'|'tarde'|'atardecer'|'noche'}
  */
 export function climaPorHora(fecha = new Date()) {
-  const h = fecha.getHours();
-  if (h >= 19 || h < 5) return 'noche';
-  if (h >= 16) return 'dorada';
-  if (h >= 11) return 'soleado';
-  return 'dorada';
+  return horaDeReloj(fecha);
 }
 
 /* ── 3. LO QUE EL AGENTE DICE AL PASAR ───────────────────────────────────────

@@ -23,7 +23,7 @@
 /* Nota: las props de three (position, args, intensity, castShadow, etc.) son
    válidas en el reconciliador de R3F, no en el DOM — el config de ESLint del
    repo no activa react/no-unknown-property, así que no requieren disable. */
-import { Suspense, useMemo, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Html, Float, Stars, OrbitControls, AdaptiveDpr, Detailed, Instances, Instance,
@@ -40,6 +40,11 @@ import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
 import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
 import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
 import AnimalesDeFinca from './animales.jsx';
+/* Luciérnagas de la noche: el kit instanciado que ya existe (1-3 draw calls),
+   sembrado sobre la tierra baja del valle cuando la franja las trae. */
+import { ParticulasAmbientales } from '../../visual/mundo3d/ParticulasAmbientales.jsx';
+/* Duración canónica de la transición entre franjas (misma que CielosHora). */
+import { TRANSICION } from '../../visual/mundo3d/cielosHoraData.js';
 import './rotulosValle3D.css';
 import {
   MUNDOS_VALLE,
@@ -1109,6 +1114,131 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false }
   );
 }
 
+/* ── EL CICLO DIURNO VIVO: la atmósfera del valle GIRA con la franja del día ──
+      Antes el fondo/niebla/luces se fijaban declarativos por `clima` y cambiar
+      de piel era un CORTE. Este driver (mismo patrón que CielosHora.jsx) las
+      escribe imperativamente en useFrame y AMORTIGUA cada valor hacia la piel
+      nueva (~2.5 s): amanece, atardece y anochece como un giro del día, no un
+      teletransporte. El sol además LLEVA su posición (`c.sol`): rasante al
+      amanecer, cenital al mediodía (sombras cortas), luna desde el otro lado
+      de noche — las sombras del tier alto giran gratis con él.
+      Cero setState y cero alocación por frame (Color/Vector3 mutados in-place);
+      los props declarativos usan la piel del PRIMER montaje, que no cambia.
+      reducedMotion: snap directo al preset (frameloop 'demand' — la calma que
+      pide la preferencia), la franja igual avanza con el reloj. ── */
+const SOL_DEFECTO = [6, 9, 4];
+
+function estadoAtmosfera(c) {
+  return {
+    fondo: new THREE.Color(c.cielo[1]),
+    domo: new THREE.Color(c.cielo[0]),
+    suelo: new THREE.Color(c.ambiente),
+    luz: new THREE.Color(c.luz),
+    niebla: new THREE.Color(c.niebla),
+    solPos: new THREE.Vector3(...(c.sol || SOL_DEFECTO)),
+    intensidad: c.intensidad,
+    nieblaLejos: c.nieblaLejos + 8,
+  };
+}
+
+function amortiguarAtmosfera(actual, objetivo, k) {
+  actual.fondo.lerp(objetivo.fondo, k);
+  actual.domo.lerp(objetivo.domo, k);
+  actual.suelo.lerp(objetivo.suelo, k);
+  actual.luz.lerp(objetivo.luz, k);
+  actual.niebla.lerp(objetivo.niebla, k);
+  actual.solPos.lerp(objetivo.solPos, k);
+  actual.intensidad += (objetivo.intensidad - actual.intensidad) * k;
+  actual.nieblaLejos += (objetivo.nieblaLejos - actual.nieblaLejos) * k;
+}
+
+function AtmosferaValle({ c, perfil, reducedMotion }) {
+  const objetivo = useMemo(() => estadoAtmosfera(c), [c]);
+  // La piel del primer montaje: alimenta los valores declarativos del JSX (que
+  // nunca deben cambiar tras montar) — un re-render no pisa la animación.
+  const [ini] = useState(() => c);
+  const [actual] = useState(() => estadoAtmosfera(ini));
+
+  const fondoRef = useRef(null);
+  const fogRef = useRef(null);
+  const hemiRef = useRef(null);
+  const ambRef = useRef(null);
+  const solRef = useRef(null);
+
+  const pintar = (e) => {
+    if (fondoRef.current) fondoRef.current.copy(e.fondo);
+    if (fogRef.current) {
+      fogRef.current.color.copy(e.niebla);
+      fogRef.current.far = e.nieblaLejos;
+    }
+    if (hemiRef.current) {
+      hemiRef.current.intensity = e.intensidad * 0.55;
+      hemiRef.current.color.copy(e.domo);
+      hemiRef.current.groundColor.copy(e.suelo);
+    }
+    if (ambRef.current) {
+      ambRef.current.intensity = e.intensidad * 0.35;
+      ambRef.current.color.copy(e.luz);
+    }
+    if (solRef.current) {
+      solRef.current.intensity = e.intensidad;
+      solRef.current.color.copy(e.luz);
+      solRef.current.position.copy(e.solPos);
+    }
+  };
+
+  // Calma pedida → snap: la piel nueva entra completa, sin animar.
+  useEffect(() => {
+    if (!reducedMotion) return;
+    amortiguarAtmosfera(actual, objetivo, 1);
+    pintar(actual);
+  });
+
+  // Transición viva: amortiguación exponencial estable en dt variable.
+  useFrame((_, dt) => {
+    if (reducedMotion) return;
+    const k = 1 - Math.exp((-3 / TRANSICION.duracion) * Math.min(dt, 0.1));
+    amortiguarAtmosfera(actual, objetivo, k);
+    pintar(actual);
+  });
+
+  return (
+    <>
+      <color ref={fondoRef} attach="background" args={[ini.cielo[1]]} />
+      {/* La niebla se paga por fragmento: en perfil 'bajo' se apaga. */}
+      {perfil.fog && (
+        <fog ref={fogRef} attach="fog" args={[ini.niebla, 12, ini.nieblaLejos + 8]} />
+      )}
+      <hemisphereLight
+        ref={hemiRef}
+        intensity={ini.intensidad * 0.55}
+        color={ini.cielo[0]}
+        groundColor={ini.ambiente}
+      />
+      <ambientLight ref={ambRef} intensity={ini.intensidad * 0.35} color={ini.luz} />
+      {/* castShadow SOLO en 'alto': sin shadow-map la escena se dibuja UNA vez
+          por frame, no dos (DR FIX 1 — el mayor ahorro de GPU de un golpe). */}
+      <directionalLight
+        ref={solRef}
+        position={ini.sol || SOL_DEFECTO}
+        intensity={ini.intensidad}
+        color={ini.luz}
+        castShadow={perfil.sombras}
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-far={30}
+        shadow-camera-left={-12}
+        shadow-camera-right={12}
+        shadow-camera-top={12}
+        shadow-camera-bottom={-12}
+      />
+    </>
+  );
+}
+
+/* Caja de las luciérnagas: la tierra baja del frente del valle (referencia
+   ESTABLE — ParticulasAmbientales re-siembra si la caja cambia). */
+const AREA_LUCIERNAGAS = [18, 2.4, 7];
+
 /* La pose de cámara del valle: UNA fuente para el Canvas y para el establishing
    shot de la CámaraDirector (así el dolly aterriza EXACTO donde siempre). */
 const CAMARA_VALLE = { position: [10.5, 9, 13.5], fov: 40 };
@@ -1134,35 +1264,37 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
   const entrando = !!focoId;
   const nocturno = clima === 'noche';
 
+  // El ciclo trae estrellas GRADUALES (0..1 del presupuesto del tier: unas
+  // pocas se asoman al atardecer, todas de noche) y luciérnagas por densidad.
+  const fracEstrellas = c.estrellas === true ? 1 : Number(c.estrellas) || 0;
+  const luciernagas = Number(c.luciernagas) || 0;
+
   return (
     <>
-      <color attach="background" args={[c.cielo[1]]} />
-      {/* La niebla se paga por fragmento: en perfil 'bajo' se apaga. */}
-      {perfil.fog && <fog attach="fog" args={[c.niebla, 12, c.nieblaLejos + 8]} />}
-      <hemisphereLight intensity={c.intensidad * 0.55} color={c.cielo[0]} groundColor={c.ambiente} />
-      <ambientLight intensity={c.intensidad * 0.35} color={c.luz} />
-      {/* castShadow SOLO en 'alto': sin shadow-map la escena se dibuja UNA vez
-          por frame, no dos (DR FIX 1 — el mayor ahorro de GPU de un golpe). */}
-      <directionalLight
-        position={[6, 9, 4]}
-        intensity={c.intensidad}
-        color={c.luz}
-        castShadow={perfil.sombras}
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-far={30}
-        shadow-camera-left={-12}
-        shadow-camera-right={12}
-        shadow-camera-top={12}
-        shadow-camera-bottom={-12}
-      />
-      {c.estrellas && perfil.estrellas > 0 && (
+      {/* Fondo + niebla + luces, amortiguadas hacia la franja del día. */}
+      <AtmosferaValle c={c} perfil={perfil} reducedMotion={reducedMotion} />
+      {fracEstrellas > 0 && perfil.estrellas > 0 && (
         <Stars
           radius={40}
           depth={20}
-          count={perfil.estrellas}
+          count={Math.max(24, Math.round(perfil.estrellas * fracEstrellas))}
           factor={3}
           fade
           speed={reducedMotion ? 0 : 1}
+        />
+      )}
+      {/* Luciérnagas: asoman al atardecer y llenan la noche. Kit instanciado
+          (1 draw call), presupuesto por tier adentro; con reduced-motion
+          quedan quietas a brillo medio — presencia sin parpadeo. */}
+      {luciernagas > 0 && (
+        <ParticulasAmbientales
+          tipo="luciernagas"
+          densidad={luciernagas}
+          tier={tier}
+          reducedMotion={reducedMotion}
+          area={AREA_LUCIERNAGAS}
+          position={[0, 0.35, 3.6]}
+          semilla={11}
         />
       )}
 

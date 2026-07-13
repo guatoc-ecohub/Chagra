@@ -36,10 +36,11 @@ import {
   MUNDO_VALLE_BY_ID,
   COSA_DEL_DIA,
   CLIMAS,
-  climaPorHora,
   animoDeFinca,
   NARRACION,
 } from './valle/valleData';
+/* El reloj del ciclo diurno vivo (franja real del día + override ?ciclo=). */
+import useCicloDia from '../visual/mundo3d/useCicloDia.js';
 import Valle2DFallback from './valle/Valle2DFallback';
 import AbejaTransicion, { AlMontarEscena } from '../visual/creatures/AbejaTransicion.jsx';
 import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
@@ -111,15 +112,6 @@ class Valle3DGuard extends Component {
  *   nombra — el comportamiento de siempre.
  */
 export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = null }) {
-  const [clima, setClima] = useState(() => climaPorHora());
-
-  // ── El clima es ATMÓSFERA, no un selector (auditoría B8/S8): los chips de
-  //    debug se quitaron de la UI. El valle sigue la hora real de la vereda y
-  //    se re-evalúa solo — amanece, atardece y anochece sin botonera.
-  useEffect(() => {
-    const t = setInterval(() => setClima(climaPorHora()), 5 * 60 * 1000);
-    return () => clearInterval(t);
-  }, []);
   const [focoId, setFocoId] = useState(null);
   const [panel, setPanel] = useState(null); // null | 'alerta' | <mundoId>
   const [voz, setVoz] = useState(true);
@@ -147,6 +139,13 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
       window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     [],
   );
+
+  // ── El clima es ATMÓSFERA, no un selector (auditoría B8/S8): el valle sigue
+  //    el CICLO DIURNO VIVO por la hora real de la vereda (useCicloDia) y se
+  //    re-evalúa solo — amanece, atardece y anochece sin botonera. La franja
+  //    (amanecer→mañana→mediodía→tarde→atardecer→noche) es una piel de CLIMAS;
+  //    `?ciclo=demo` acelera el día para verlo girar y `?ciclo=17.5` lo clava.
+  const { franja: clima } = useCicloDia({ reducedMotion });
 
   const nav = useNavegacionMundos({ reducedMotion });
   const viajarAlMundoInicial = nav.viajarAlMundo;

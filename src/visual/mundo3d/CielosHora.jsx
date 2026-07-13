@@ -110,7 +110,7 @@ function amortiguar(actual, objetivo, k) {
  * El cielo por hora del día. Montar DENTRO de un <Canvas>.
  *
  * @param {object} props
- * @param {'amanecer'|'mediodia'|'dorada'|'noche'|'auto'} [props.hora='dorada']
+ * @param {'amanecer'|'manana'|'mediodia'|'tarde'|'dorada'|'atardecer'|'noche'|'auto'} [props.hora='dorada']
  *        Momento del día; 'auto' lo deriva del reloj real (horaDeReloj).
  * @param {'alto'|'medio'|'bajo'} [props.tier='medio']
  *        Tier del equipo (decidirTier); gobierna niebla y estrellas.
