@@ -30,15 +30,15 @@ import { routeQuestion } from './redMatchmaking.js';
  * invariante "privado por default" vía withDefaultShareLevel.
  *
  * @param {Object} params
- * @param {Object} [params.oferta] — registro de marketplace_ofertas.
- * @param {string} params.productorHash — id pseudonimizado del vendedor.
+ * @param {Object} [params.oferta] - registro de marketplace_ofertas.
+ * @param {string} params.productorHash - id pseudonimizado del vendedor.
  * @param {string|null} [params.compradorHash]
- * @param {string} [params.entrega] — ENTREGA.* (default PENDIENTE).
- * @param {number|null} [params.calidad] — 1..5 (default null).
- * @param {string} [params.confirmadoPor] — CONFIRMADO_POR.* (default PRODUCTOR).
- * @param {number} [params.shareLevel] — nivel opt-in (default PRIVADO).
+ * @param {string} [params.entrega] - ENTREGA.* (default PENDIENTE).
+ * @param {number|null} [params.calidad] - 1..5 (default null).
+ * @param {string} [params.confirmadoPor] - CONFIRMADO_POR.* (default PRODUCTOR).
+ * @param {number} [params.shareLevel] - nivel opt-in (default PRIVADO).
  * @param {string|null} [params.cultivoId]
- * @returns {import('./types.js').RedTransaction}
+ * @returns {object} 
  */
 export function buildTrato({
   oferta = {},
@@ -96,7 +96,7 @@ export async function registrarTrato(input) {
 
 /**
  * Carga todas las reputaciones derivadas (productor×producto) desde los tratos.
- * @param {Object} [opts] — { now, halfLifeDias, minLevel }
+ * @param {Object} [opts] - { now, halfLifeDias, minLevel }
  * @returns {Promise<Array<import('./types.js').Reputacion>>}
  */
 export async function cargarReputaciones(opts = {}) {
@@ -106,7 +106,7 @@ export async function cargarReputaciones(opts = {}) {
 
 /**
  * Carga el grafo social derivado desde los tratos compartibles.
- * @param {Object} [opts] — { minLevel }
+ * @param {Object} [opts] - { minLevel }
  * @returns {Promise<import('./types.js').SocialGraph>}
  */
 export async function cargarGrafoSocial(opts = {}) {
@@ -120,7 +120,7 @@ export async function cargarGrafoSocial(opts = {}) {
  * la decisión (mostrar el mensaje sugerido, abrir canal si hay consentimiento).
  *
  * @param {Object} problema — { producto, vereda, municipio, sintoma, agentConfident }
- * @param {Object} [opts] — { now, halfLifeDias, minLevel, allowNuevo }
+ * @param {Object} [opts] - { now, halfLifeDias, minLevel, allowNuevo }
  * @returns {Promise<ReturnType<typeof routeQuestion>>}
  */
 export async function preguntarAlVecino(problema, opts = {}) {

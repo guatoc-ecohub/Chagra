@@ -3,9 +3,18 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+/**
+ * @param {any} state
+ */
 function createStoreHook(state) {
+  /**
+   * @param {any} selector
+   */
   const hook = (selector) => (typeof selector === 'function' ? selector(state) : state);
   hook.getState = () => state;
+  /**
+   * @param {any} patch
+   */
   hook.setState = (patch) => Object.assign(state, patch);
   return hook;
 }

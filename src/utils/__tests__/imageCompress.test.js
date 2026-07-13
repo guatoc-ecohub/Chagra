@@ -13,12 +13,14 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
+/** @type {any} */
 let compressImage;
+/** @type {any} */
 let IMAGE_TOO_LARGE_MESSAGE;
+/** @type {any} */
 let __test;
 
-// State global para el mock de canvasToBlob — cada test ajusta los tamaños
-// que devolverán los toBlob calls en orden.
+/** @type {number[]} */
 let blobSizesQueue = [];
 
 beforeEach(async () => {
@@ -33,6 +35,10 @@ beforeEach(async () => {
 
   // 2) Mock OffscreenCanvas para que sea predictible (presente y funcional).
   class MockOffscreenCanvas {
+    /**
+     * @param {any} w
+     * @param {any} h
+     */
     constructor(w, h) {
       this.width = w;
       this.height = h;
@@ -49,7 +55,7 @@ beforeEach(async () => {
       return new Blob([buf], { type });
     }
   }
-  globalThis.OffscreenCanvas = MockOffscreenCanvas;
+  globalThis.OffscreenCanvas = /** @type {any} */ (MockOffscreenCanvas);
 
   // Reset del module registry para que el `typeof OffscreenCanvas === 'function'`
   // chequeado dentro de imageCompress.js refleje el mock recién instalado.
@@ -147,12 +153,14 @@ describe('compressImage', () => {
     // El fallback decodeViaImg también va a fallar en jsdom porque <img> no
     // dispara onload sobre data URLs sintéticas — preempt eso mockeando Image.
     class BrokenImage {
+      /**
+       * @param {any} _v
+       */
       set src(_v) {
-        // dispara onerror async
-        queueMicrotask(() => this.onerror && this.onerror());
+        queueMicrotask(() => /** @type {any} */ (this).onerror && /** @type {any} */ (this).onerror());
       }
     }
-    globalThis.Image = BrokenImage;
+    globalThis.Image = /** @type {any} */ (BrokenImage);
 
     const input = new Blob([new Uint8Array(1024)], { type: 'image/jpeg' });
     const result = await compressImage(input);

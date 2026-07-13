@@ -1848,6 +1848,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El suelo vivo 3D">
+              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoSueloVivoMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -1858,6 +1859,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Aliados de la finca">
+              {/* @ts-expect-error onBack prop not in type defs */}
               <AliadosFincaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -1868,6 +1870,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El café bajo sombra">
+              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoCafe3DMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -1888,6 +1891,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El semillero 3D">
+              {/* @ts-expect-error extra props for mockup */}
               <MundoSemilleroMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -1898,6 +1902,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El compost 3D">
+              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoCompostMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -1974,6 +1979,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Gemelos 2D de los mundos">
+              {/* @ts-expect-error onBack prop not in type defs */}
               <GemelosMundosMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -1984,6 +1990,7 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="La micro-fauna del suelo 3D">
+              {/* @ts-expect-error onBack prop not in type defs */}
               <MundoMicrofaunaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
@@ -3091,6 +3098,7 @@ export default function App() {
             <ErrorFallback moduleName="El valle de su finca (3D)">
               <EntradaValle3DMockup
                 onBack={() => navigate(sinSesion ? 'login' : 'dashboard')}
+                // @ts-expect-error navigate signature differs from onNavigate type
                 onNavigate={navigate}
                 initialMundoId={currentViewData?.mundo}
               />

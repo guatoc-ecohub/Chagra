@@ -1,8 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import HelpHomeScreen from '../HelpHomeScreen';
+import HelpHomeScreen from '../HelpHomeScreen.jsx';
 import { describe, test, expect, vi } from 'vitest';
+
+const H = /** @type {any} */ (HelpHomeScreen);
 
 /**
  * Smoke test de HelpHomeScreen — home del Manual con buscador simple.
@@ -15,12 +17,12 @@ import { describe, test, expect, vi } from 'vitest';
  */
 describe('HelpHomeScreen smoke', () => {
   test('Muestra el tema nuevo "¿Dónde se guardan mis datos?"', () => {
-    render(<HelpHomeScreen onSelect={() => {}} />);
+    render(/** @type {any} */ (<H onSelect={() => {}} />));
     expect(screen.getByText(/¿Dónde se guardan mis datos\?/i)).toBeInTheDocument();
   });
 
   test('El buscador filtra por palabra e ignora tildes', () => {
-    render(<HelpHomeScreen onSelect={() => {}} />);
+    render(/** @type {any} */ (<H onSelect={() => {}} />));
     const input = screen.getByLabelText(/Buscar en la ayuda/i);
 
     // "camara" (sin tilde) debe encontrar "Cómo usar Chagra" (keyword cámara).
@@ -34,7 +36,7 @@ describe('HelpHomeScreen smoke', () => {
   });
 
   test('Sin coincidencias muestra mensaje, no pantalla vacía', () => {
-    render(<HelpHomeScreen onSelect={() => {}} />);
+    render(/** @type {any} */ (<H onSelect={() => {}} />));
     const input = screen.getByLabelText(/Buscar en la ayuda/i);
     fireEvent.change(input, { target: { value: 'zzzzxxxx' } });
     expect(screen.getByText(/No encontramos un tema con esa palabra/i)).toBeInTheDocument();
@@ -42,14 +44,14 @@ describe('HelpHomeScreen smoke', () => {
 
   test('Tocar la tarjeta de datos invoca onSelect("datos")', () => {
     const onSelect = vi.fn();
-    render(<HelpHomeScreen onSelect={onSelect} />);
+    render(/** @type {any} */ (<H onSelect={onSelect} />));
     const card = screen.getByText(/¿Dónde se guardan mis datos\?/i).closest('button');
-    fireEvent.click(card);
+    fireEvent.click(/** @type {any} */ (card));
     expect(onSelect).toHaveBeenCalledWith('datos');
   });
 
   test('El copy del home no contiene voseo argentino', () => {
-    const { container } = render(<HelpHomeScreen onSelect={() => {}} />);
+    const { container } = render(/** @type {any} */ (<H onSelect={() => {}} />));
     const text = container.textContent || '';
     expect(text).not.toMatch(/\btenés\b/i);
     expect(text).not.toMatch(/\bpodés\b/i);
