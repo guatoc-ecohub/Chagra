@@ -90,12 +90,71 @@ const VARIANTES_OSO = [
   { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
   { label: 'sin animación', props: { size: 88, animated: false } },
 ];
+/* El JAGUAR completo estrena TODA la fundación transversal (espejo de la abeja/
+   oso, con su carácter): acecho de hombros + cola pesada + line-boil, rugido
+   corporal (ruge), modo acecho (acecha), ruana de noche, modo poder PÚRPURA y
+   prop por mundo. La vitrina lo luce con todo. */
+const VARIANTES_JAGUAR = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'ruge', props: { size: 88, ruge: true } },
+  { label: 'acecha', props: { size: 88, acecha: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder PÚRPURA', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+
+/* La ARDILLA completa estrena TODA la fundación transversal (espejo de la abeja
+   y del oso, con su CARÁCTER pizpireta): boil veloz + line-boil, INSPECCIÓN
+   INVERTIDA (su firma), roer, ruana, modo poder ÁMBAR y prop por mundo. La
+   vitrina la luce con todo. */
+const VARIANTES_ARDILLA = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'inspección invertida', props: { size: 88, inspecciona: true } },
+  { label: 'roe una semilla', props: { size: 88, roe: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder ÁMBAR', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+
+/* El PEREZOSO completo estrena TODA la fundación transversal con su carácter de
+   QUIETUD ZEN: mecerse lentísimo colgado de la rama, line-boil en cámara lenta,
+   dormita (las "Z" del sueño), estiramiento sostenido, ruana de noche, modo poder
+   TURQUESA y prop por mundo. La vitrina lo luce con todo. */
+const VARIANTES_PEREZOSO = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'cuelga', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'dormita (Zzz)', props: { size: 88, dormita: true } },
+  { label: 'estira (lento)', props: { size: 88, estira: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder TURQUESA', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
 
 const VARIANTES_POR_SLUG = {
   'abeja-angelita': VARIANTES_ABEJA,
   colibri: VARIANTES_TRIO_AIRE,
   'oso-andino': VARIANTES_OSO,
   'rana-andina': VARIANTES_TRIO_SUELO,
+  perezoso: VARIANTES_PEREZOSO,
+  ardilla: VARIANTES_ARDILLA,
+  jaguar: VARIANTES_JAGUAR,
 };
 
 /* Nota de campo por creature (el registro de la categoría trae nombre + binomio;
@@ -105,6 +164,9 @@ const NOTAS_CREATURE = {
   colibri: 'Pico recto y garganta violeta iridiscente; el ave-agente de Chagra, ya en rubber-hose.',
   'oso-andino': 'Oso de anteojos, guardián del páramo; mole parda entrañable con los anteojos crema (su firma).',
   'rana-andina': 'Rana arlequín del páramo, guardiana del agua; verde húmedo con manchas ocre y ojos saltones.',
+  perezoso: 'Perezoso de tres dedos, la calma total; cuelga de la rama por sus garras largas, antifaz y tinte verdoso de algas. Todo en cámara lenta.',
+  ardilla: 'Ardilla de cola roja del templado; rufa con la línea dorsal oscura (su firma), cola tupida y su inspección invertida.',
+  jaguar: 'Felino de tierra cálida, majestuoso y acechador; leonado con rosetas de centro ocre (su firma), aura púrpura.',
   lombriz: 'La ingeniera del suelo; ondula por segmentos con clitelo marcado.',
   mariposa: 'Alas naranjas con venación; poliniza y anuncia buen suelo.',
   escarabajo: 'Estercolero que entierra el abono; élitros con brillo metálico.',
