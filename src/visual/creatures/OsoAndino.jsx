@@ -168,10 +168,12 @@ export function OsoAndino({
       <ellipse cx="0" cy="2" rx={OSO_PROPORCION.troncoRx} ry={OSO_PROPORCION.troncoRy}
         fill={OSO_PALETA.cuerpo} stroke={RH_INK} strokeWidth="1.4"
         style={{ filter: `drop-shadow(0 0 6px ${OSO_PALETA.cuerpoGlow})` }} />
-      {/* pecho/panza crema (el pelaje claro del pecho) */}
-      <path d="M0,-4.4 C4.4,-3.4 5.6,2 4.2,6.4 C2.6,9.4 -2.6,9.4 -4.2,6.4 C-5.6,2 -4.4,-3.4 0,-4.4 Z"
-        fill={OSO_PALETA.panza} opacity="0.9" />
-      <ellipse cx="0" cy="3.4" rx="3.2" ry="4.2" fill={OSO_PALETA.crema} opacity="0.85" />
+      {/* pecho: el BIB crema — la marca clara del pecho del oso de anteojos (su
+          "collar"), como media luna que sube hacia la garganta. Más nítida que
+          la panza oscura del oso viejo. */}
+      <path d="M0,-4.6 C3.8,-3.6 5.0,1.4 3.7,5.8 C2.4,8.8 -2.4,8.8 -3.7,5.8 C-5.0,1.4 -3.8,-3.6 0,-4.6 Z"
+        fill={OSO_PALETA.crema} opacity="0.9" stroke={OSO_PALETA.cremaClara} strokeWidth="0.4" />
+      <ellipse cx="0" cy="2.8" rx="2.4" ry="3.4" fill={OSO_PALETA.cremaClara} opacity="0.55" />
 
       {/* bracitos manguera (zarpas) con planta crema, pivote en el HOMBRO para
           que celebra/señala/rasca los alcen desde el hombro (no del centro del
@@ -181,36 +183,53 @@ export function OsoAndino({
       <Miembro clase="crt-brazo-r" origen="left top"
         d="M7.2,-1.4 C10.2,0.2 11.2,3.2 10.2,6.0" ancho={3.2} punta={[10.2, 6.4]} puntaR={2.1} pie sway={vivo} delay={-0.45} />
 
-      {/* cabeza parda con contorno */}
-      <circle cx="0" cy="-8.2" r={OSO_PROPORCION.cabezaR} fill={OSO_PALETA.cuerpo} stroke={RH_INK} strokeWidth="1.3" />
-      {/* ANTEOJOS crema: los anillos claros alrededor de los ojos (la firma de la
-          especie), dibujados DETRÁS de los ojos de goma. */}
-      <g fill={OSO_PALETA.crema} opacity="0.95">
-        <ellipse cx="-2.5" cy="-9.0" rx="2.6" ry="3.0" />
-        <ellipse cx="2.5" cy="-9.0" rx="2.6" ry="3.0" />
-        {/* puente + hocico crema que baja al morro */}
-        <path d="M-2.2,-6.6 C-1,-5.4 1,-5.4 2.2,-6.6 C2.4,-4 1.6,-2.4 0,-2.2 C-1.6,-2.4 -2.4,-4 -2.2,-6.6 Z" />
+      {/* cabeza parda con contorno grueso */}
+      <circle cx="0" cy="-8.2" r={OSO_PROPORCION.cabezaR} fill={OSO_PALETA.cuerpo} stroke={RH_INK} strokeWidth="1.4" />
+
+      {/* MORRO tan claro del oso (rompe la silueta hacia abajo, como el hocico
+          real): se dibuja primero para que la trufa/boca se apoyen encima. Es de
+          un tan MÁS OSCURO que los anteojos → la cara no se vuelve una mancha
+          pálida única. */}
+      <path d="M-3.3,-4.6 C-3.6,-2.2 -2.0,-1.0 0,-1.0 C2.0,-1.0 3.6,-2.2 3.3,-4.6 C2.5,-6.2 -2.5,-6.2 -3.3,-4.6 Z"
+        fill={OSO_PALETA.hocicoClaro} stroke={RH_INK} strokeWidth="1.0" strokeLinejoin="round" />
+
+      {/* ANTEOJOS crema — LA FIRMA de la especie (oso de anteojos). DOS anillos
+          claros SEPARADOS por un puente de pelaje oscuro en el centro: NUNCA se
+          fusionan en antifaz (ése era el error del oso viejo). Cada anteojo lleva
+          un borde tenue que lo define como "lente" contra el pelaje oscuro, y va
+          ligeramente inclinado (marca orgánica, no simétrica de máquina). */}
+      <g stroke={OSO_PALETA.anteojoBorde} strokeWidth="0.7">
+        <ellipse cx="-3.0" cy="-9.9" rx="2.2" ry="2.7" fill={OSO_PALETA.anteojo} transform="rotate(-13 -3.0 -9.9)" />
+        <ellipse cx="3.0" cy="-9.9" rx="2.2" ry="2.7" fill={OSO_PALETA.anteojo} transform="rotate(13 3.0 -9.9)" />
       </g>
-      {/* CEJAS del sabio gruñón (ceño serio): trazos gruesos sobre los anteojos,
-          con el extremo INTERNO más bajo (mirada brava pero noble). Dan la
-          EXPRESIVIDAD de los anteojos — la cara del guardián serio. En un grupo
-          propio (.oso-cejas) que se frunce más cuando resopla (gruñe). */}
-      <g className="oso-cejas" stroke={RH_INK} strokeWidth="1.4" strokeLinecap="round" fill="none">
-        <path d="M-4.7,-12.0 C-3.4,-12.5 -2.1,-12.2 -1.3,-11.4" />
-        <path d="M4.7,-12.0 C3.4,-12.5 2.1,-12.2 1.3,-11.4" />
+
+      {/* CEJAS nobles (.oso-cejas): dos arcos suaves sobre los anteojos — mirada
+          serena y sabia del guardián, NO el ceño de susto del oso viejo. El grupo
+          es identidad (lo pide el test) y se frunce un poco al resoplar (gruñe). */}
+      <g className="oso-cejas" stroke={RH_INK} strokeWidth="1.3" strokeLinecap="round" fill="none">
+        <path d="M-5.0,-12.1 C-3.8,-12.7 -2.4,-12.6 -1.5,-12.0" />
+        <path d="M5.0,-12.1 C3.8,-12.7 2.4,-12.6 1.5,-12.0" />
       </g>
-      {/* chapetas + boca + trufa + ojos de goma dentro de los anteojos */}
-      <Cachetes puntos={[{ cx: -4.4, cy: -6.6, r: 1.25 }, { cx: 4.4, cy: -6.6, r: 1.25 }]} vivo={vivo} />
-      {/* Boca AMPLIA (voz grave de papá-noel): lip-sync si hay visema; si no, la
-          sonrisa de goma de siempre. Más ancha que la de la abeja (w=3.6). */}
+
+      {/* chapetas suaves a los lados del morro */}
+      <Cachetes puntos={[{ cx: -4.9, cy: -5.8, r: 1.2 }, { cx: 4.9, cy: -5.8, r: 1.2 }]} vivo={vivo} />
+
+      {/* trufa (nariz) sobre el morro, con brillito, y el surco del morro */}
+      <ellipse cx="0" cy="-5.3" rx="1.7" ry="1.25" fill={OSO_PALETA.hocico} />
+      <ellipse cx="-0.55" cy="-5.75" rx="0.5" ry="0.34" fill={OSO_PALETA.cremaClara} opacity="0.7" />
+      <path d="M0,-4.1 L0,-3.3" stroke={RH_INK} strokeWidth="0.7" strokeLinecap="round" />
+
+      {/* Boca AMPLIA cálida (voz grave de papá-noel): lip-sync si hay visema; si
+          no, la sonrisa de goma de siempre. */}
       {visema
-        ? <BocaVisema cx={0} cy={-3.4} w={3.6} prof={1.35} visema={visema} />
-        : <Sonrisa cx={0} cy={-3.6} w={3.4} prof={1.3} />}
-      {/* trufa (nariz) */}
-      <ellipse cx="0" cy="-4.6" rx="1.5" ry="1.15" fill={OSO_PALETA.hocico} />
+        ? <BocaVisema cx={0} cy={-3.2} w={3.4} prof={1.3} visema={visema} />
+        : <Sonrisa cx={0} cy={-3.3} w={3.2} prof={1.2} />}
+
+      {/* ojos de goma cálidos y serenos DENTRO de los anteojos (más chicos que
+          el oso viejo: mirada noble, no de susto) */}
       <OjosRubber
-        ojos={[{ cx: -2.5, cy: -9.2, r: 1.7 }, { cx: 2.5, cy: -9.2, r: 1.7 }]}
-        mirar={[0, 0.28]}
+        ojos={[{ cx: -3.0, cy: -9.7, r: 1.45 }, { cx: 3.0, cy: -9.7, r: 1.45 }]}
+        mirar={[0, 0.14]}
         parpadea={vivo}
       />
 
