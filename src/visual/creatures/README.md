@@ -27,6 +27,7 @@ calidad dispar. Aquí vive la **versión canónica** de cada uno.
 | `Perezoso` | *Bradypus variegatus* | Perezoso de tres dedos, templado. **Cuelga de una rama** por sus **garras largas** curvas, con **antifaz** y **tinte verdoso** de algas. La quietud extrema: todo en **cámara lenta** (mecerse zen, parpadeo larguísimo). Poder **turquesa**. Rubber-hose, showcase completo. |
 | `Ardilla` | *Notosciurus granatensis* | Ardilla de cola roja del templado. Rufa con **línea dorsal** oscura (su firma), **cola tupida** y dientes de roedor. Ágil e inquieta: su firma es la **inspección invertida** (se cuelga de cabeza). De suelo, se sienta. Rubber-hose. |
 | `Jaguar` | *Panthera onca* | Felino de tierra cálida. Leonado con **rosetas** (manchas de centro ocre — su firma), musculoso, mirada felina ámbar. Majestuoso y **acechador**: acecho de hombros, cola pesada, rugido. Aura **púrpura**. Rubber-hose. |
+| `Morrocoy` | *Chelonoidis carbonarius* | Galápago de patas rojas de tierra cálida. Caparazón de **domo geométrico** (escudos **hexagonales** con anillos de edad — su firma), patas y cabeza **rojizas** con escamas naranja-fuego. **Ancestral, lento, sabio**: caparazón que respira, **retracción elástica** (cabeza y patas entran a la concha), asentimiento sabio. Aura **bronce**. Rubber-hose. |
 | `Lombriz` | *Martiodrilus crassus* | Lombriz gigante nativa. Cuerpo segmentado con clitelo. Sin animación propia (su movimiento lo da la escena). |
 | `Mariposa` | *Dione juno* | Pasionaria de alas largas. Cuatro alas que abren y cierran. |
 | `Escarabajo` | *Dichotomius belus* | Estercolero colombiano. Élitros brillantes, cuerno, y bola de abono que rueda. |
@@ -121,6 +122,16 @@ su gesto-FIRMA la **inspección invertida** (`inspecciona` → se cuelga de cabe
 espiar) más el **roer** una semilla (`roe`). Templada, pero del contrato
 compartido: **nunca suda** (se abriga de noche/frío, jamás gotea). Todo aditivo
 en `creatures.css`, RM + tier-safe.
+
+El **`Morrocoy`** cierra los OCHO con su carácter de galápago ANCESTRAL, LENTO,
+SABIO y PACIENTE (el anciano de la chagra): aura **BRONCE** en poder, boil LENTO
+de **paso pesado** (la sabiduría no corre), **caparazón de domo hexagonal** que
+**respira** (`.morrocoy-caparazon`, escudos con anillos de edad — su firma),
+**patas rojizas** con escamas naranja-fuego, y su gesto-FIRMA la **retracción
+elástica** (`seRetrae` → cabeza y patas entran a la concha con squash&stretch)
+más el **asentimiento sabio** (`asiente`). De tierra cálida y del contrato
+compartido: **nunca suda**. Suma su capa ANCESTRAL permanente (resplandor cobrizo
++ shimmer de brasa). Todo aditivo en `creatures.css`, RM + tier-safe.
 
 ## Técnica
 
