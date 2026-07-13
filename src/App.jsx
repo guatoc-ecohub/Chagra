@@ -13,7 +13,7 @@ import { useTheme } from './hooks/useTheme';
 import { useClimaAtmosphere } from './hooks/useClimaAtmosphere';
 import useIdleDetection from './hooks/useIdleDetection';
 import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
-import BiopunkBackground from './components/dashboard/BiopunkBackground';
+const BiopunkBackground = lazy(() => import('./components/dashboard/BiopunkBackground'));
 
 import { isAuthenticated, logoutUser } from './services/authService';
 import useAssetStore from './store/useAssetStore';
@@ -26,13 +26,10 @@ import NetworkStatusBar from './components/NetworkStatusBar';
 import PendingTasksWidget from './components/PendingTasksWidget';
 import SyncProgressIndicator from './components/common/SyncProgressIndicator';
 import useOllamaWarmStore from './store/useOllamaWarmStore';
-import { prewarmCorpus } from './services/ragRetriever';
 import { syncAgentTelemetry } from './services/agentTelemetrySync';
 import { syncUsageTelemetry } from './services/usageTelemetrySync';
-import { recordScreenView } from './services/usageTelemetryService';
 import useThemeBackgroundStore, { getBackgroundSrc } from './store/useThemeBackgroundStore';
 import useAlertStore from './store/useAlertStore';
-import { alertEngine } from './services/alertEngine';
 // PERF-1 (medido 2026-07): `cropAlertEngine.js` → `farmProcessCache.js` →
 // `catalogDB.js` (~217KB + WASM sqlite). Un import ESTÁTICO aquí lo metía en
 // el grafo crítico de arranque (App.jsx es el entry-point) aunque
@@ -42,24 +39,24 @@ import { alertEngine } from './services/alertEngine';
 // HelpUsoScreen como sección de Ayuda (decisión 2026-05-21, ver
 // comentario abajo donde se removió el render).
 // import FieldFeedback from './components/FieldFeedback';
-import AgentFab from './components/AgentFab';
+const AgentFab = lazy(() => import('./components/AgentFab'));
 // EscuchaFab (el FAB de tap "barbudito de páramo") DESHABILITADO por decisión
 // del operador 2026-07-07: modo campo = WAKE-WORD SOLO ("hola chagra"). El
 // único FAB visible es el colibrí (AgentFab). El overlay SÍ se importa: lo abre
 // el wake-word vía activarEscucha() (useModoCampo/onWake). Para re-habilitar el
 // tap, descomentar el import y el render de <EscuchaFab /> más abajo.
 // import EscuchaFab from './components/escucha/EscuchaFab';
-import EscuchaOverlay from './components/escucha/EscuchaOverlay';
-import AgentOfflineGuard from './components/AgentScreen/AgentOfflineGuard';
+const EscuchaOverlay = lazy(() => import('./components/escucha/EscuchaOverlay'));
+const AgentOfflineGuard = lazy(() => import('./components/AgentScreen/AgentOfflineGuard'));
 // Transición home→conversación: el colibrí en video (~2s). Eager (debe
 // aparecer al instante al enviar desde el hero).
 import ColibriTransition from './components/agent/ColibriTransition';
 import { ScreenShell } from './components/common/ScreenShell';
 import ChagraGrowLoader from './components/ChagraGrowLoader';
 import Confetti from './components/common/Confetti';
-import IosInstallBanner from './components/IosInstallBanner';
-import AndroidInstallBanner from './components/AndroidInstallBanner';
-import UpdateAvailableBanner from './components/UpdateAvailableBanner';
+const IosInstallBanner = lazy(() => import('./components/IosInstallBanner'));
+const AndroidInstallBanner = lazy(() => import('./components/AndroidInstallBanner'));
+const UpdateAvailableBanner = lazy(() => import('./components/UpdateAvailableBanner'));
 import GpsFincaBanner from './components/GpsFincaBanner';
 import DataLossBanner from './components/DataLossBanner';
 import DemoModeBanner from './components/DemoModeBanner';
@@ -904,7 +901,9 @@ function DashboardLiveView({ onNavigate, onLogout }) {
     <div className="relative h-[100dvh] w-full text-white flex flex-col overflow-hidden">
       {/* Fondo visible: body tiene la imagen/gradiente, este div es transparente */}
       {/* Capa biopunk viva — sutil siempre, salvaje en idle */}
-      <BiopunkBackground intense={idle} />
+      <Suspense fallback={null}>
+        <BiopunkBackground intense={idle} />
+      </Suspense>
       {/* Contenido del dashboard, fade-out cuando idle para resaltar fondo.
           PORTADA INMERSIVA 2026-06-06: el AgentHero ocupa la PRIMERA pantalla
           completa (≈100dvh). Para no romper esa inmersión, el TopBar pasa de
@@ -1014,7 +1013,9 @@ export default function App() {
         // Evento screen_view directo para la agregación de pantallas del sidecar
         // (el wrapper es no-throw y anónimo). Mantenemos también `modulo_abierto`
         // por back-compat: el sidecar lo trata como alias de screen_view.
-        recordScreenView(view);
+        import('./services/usageTelemetryService.js').then(({ recordScreenView }) => {
+          recordScreenView(view);
+        }).catch(() => {});
         import('./services/pilotTelemetryService.js').then(({ recordPilotEvent }) => {
           recordPilotEvent({
             event_type: 'modulo_abierto',
@@ -1236,8 +1237,12 @@ export default function App() {
   useEffect(() => {
     try {
       useAlertStore.getState().initializeListeners();
-      alertEngine.start().catch((err) => {
-        console.warn('[App] alertEngine no pudo arrancar:', err?.message);
+      import('./services/alertEngine').then(({ alertEngine }) => {
+        alertEngine.start().catch((err) => {
+          console.warn('[App] alertEngine no pudo arrancar:', err?.message);
+        });
+      }).catch((err) => {
+        console.warn('[App] alertEngine no pudo cargar:', err?.message);
       });
       // Alertas del cultivo (plaga/etapa) desde los ciclos activos (FarmProcess)
       // hacia el mismo chip de alertas. Degrada limpio si no hay ciclos.
@@ -1277,7 +1282,9 @@ export default function App() {
     // refresh-con-sesión-persistida que arranca directo al dashboard sin
     // re-login). prewarmCorpus es idempotente: si el corpus ya está cacheado o
     // cargándose, no dispara trabajo extra. Fire-and-forget, no bloqueante.
-    prewarmCorpus();
+    import('./services/ragRetriever.js').then(({ prewarmCorpus }) => {
+      prewarmCorpus();
+    }).catch(() => {});
 
     // U-2 (crítico glaciar): PREFETCH del chunk lazy del módulo glaciar para
     // los usuarios de La Cordada, mientras hay señal en el dashboard. Sin esto,
@@ -3442,9 +3449,11 @@ export default function App() {
           Usuario/Contraseña/Ingresar bajo el fold—. La instalación se
           ofrece una vez dentro de la app, igual que DataLossBanner y
           los demás flotantes (mismo guard de vista). */}
-      {!isPreAuthView && <IosInstallBanner />}
-      {!isPreAuthView && <AndroidInstallBanner />}
-      <UpdateAvailableBanner />
+      <Suspense fallback={null}>
+        {!isPreAuthView && <IosInstallBanner />}
+        {!isPreAuthView && <AndroidInstallBanner />}
+        <UpdateAvailableBanner />
+      </Suspense>
       <Confetti />
       <GpsFincaBanner />
       {/* Detector de vaciado IDB (post clear-cache).
@@ -3485,7 +3494,9 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      <Suspense fallback={null}>
+        {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      </Suspense>
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
