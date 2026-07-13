@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   deriveThermalZoneFromAltitud,
+  buildThermalMismatchBlock,
   buildGuildExternalPrompt,
   buildDiagnosticExternalPrompt,
   buildOpenExternalPrompt,
@@ -25,16 +26,41 @@ describe('deriveThermalZoneFromAltitud — casos borde', () => {
   });
 
   it('retorna null para string numerico', () => {
-    expect(deriveThermalZoneFromAltitud('2550')).toBeNull();
+    expect(deriveThermalZoneFromAltitud(/** @type {any} */ ('2550'))).toBeNull();
   });
 
   it('retorna null para boolean', () => {
-    expect(deriveThermalZoneFromAltitud(true)).toBeNull();
-    expect(deriveThermalZoneFromAltitud(false)).toBeNull();
+    expect(deriveThermalZoneFromAltitud(/** @type {any} */ (true))).toBeNull();
+    expect(deriveThermalZoneFromAltitud(/** @type {any} */ (false))).toBeNull();
   });
 
   it('retorna null para NaN', () => {
     expect(deriveThermalZoneFromAltitud(NaN)).toBeNull();
+  });
+});
+
+describe('buildThermalMismatchBlock', () => {
+  it('devuelve restriccion para cafe en paramo', () => {
+    const block = buildThermalMismatchBlock('páramo', ['templado', 'frio']);
+    expect(block).toContain('RESTRICCION DE PISO TERMICO');
+    expect(block).toContain('páramo');
+    expect(block).toContain('templado, frio');
+    expect(block).toContain('INVIABLE');
+  });
+
+  it('devuelve cadena vacia cuando el piso es valido', () => {
+    expect(buildThermalMismatchBlock('frio', ['frio', 'templado'])).toBe('');
+  });
+
+  it('devuelve cadena vacia cuando faltan datos', () => {
+    expect(buildThermalMismatchBlock('', ['frio'])).toBe('');
+    expect(buildThermalMismatchBlock('frio', [])).toBe('');
+    expect(buildThermalMismatchBlock(null, null)).toBe('');
+  });
+
+  it('normaliza tildes en ambos lados', () => {
+    expect(buildThermalMismatchBlock('páramo', ['paramo'])).toBe('');
+    expect(buildThermalMismatchBlock('paramo', ['páramo'])).toBe('');
   });
 });
 
@@ -78,7 +104,7 @@ describe('buildGuildExternalPrompt — casos borde', () => {
   });
 
   it('maneja prompt sin especie (vacio total)', () => {
-    const p = buildGuildExternalPrompt({});
+    const p = buildGuildExternalPrompt(/** @type {any} */ ({}));
     expect(p).toContain('especie desconocida');
     expect(typeof p).toBe('string');
     expect(p.length).toBeGreaterThan(50);
@@ -130,7 +156,7 @@ describe('buildDiagnosticExternalPrompt — casos borde', () => {
   });
 
   it('usa "cultivo" cuando speciesName no se da', () => {
-    const p = buildDiagnosticExternalPrompt({});
+    const p = buildDiagnosticExternalPrompt(/** @type {any} */ ({}));
     expect(p).toContain('cultivo');
   });
 
@@ -229,7 +255,7 @@ describe('buildDiagnosticExternalPrompt — FIX P0 (a)+(b): sanitización + guar
     // El campo en el prompt no puede exceder 500 chars del input del usuario.
     const match = p.match(/SÍNTOMAS OBSERVADOS: (.+)/s);
     expect(match).not.toBeNull();
-    const sintomasEnPrompt = match[1].split('\n')[0];
+    const sintomasEnPrompt = (/** @type {any} */ (match))[1].split('\n')[0];
     expect(sintomasEnPrompt.length).toBeLessThanOrEqual(510); // 500 + separadores mínimos
   });
 

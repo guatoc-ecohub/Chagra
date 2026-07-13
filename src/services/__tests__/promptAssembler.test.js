@@ -29,7 +29,7 @@ describe('estimateTokens', () => {
     expect(estimateTokens('')).toBe(0);
     expect(estimateTokens(null)).toBe(0);
     expect(estimateTokens(undefined)).toBe(0);
-    expect(estimateTokens(42)).toBe(0);
+    expect(estimateTokens(/** @type {any} */ (42))).toBe(0);
   });
 
   it('estima ~1 token por cada ~2.65 chars (calibrado contra granite, conservador)', () => {

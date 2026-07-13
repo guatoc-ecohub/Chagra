@@ -60,7 +60,7 @@ vi.mock('../../../db/farmProcessCache', () => ({ listFarmProcesses: vi.fn(async 
 
 let mockProfile = { rol: 'campesino', piso_confirmado: '1', finca_altitud: '1800' };
 vi.mock('../../../services/userProfileService', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = /** @type {any} */ (await importOriginal());
   return {
     ...actual,
     getProfile: vi.fn(() => mockProfile),

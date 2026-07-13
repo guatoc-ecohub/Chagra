@@ -11,10 +11,7 @@ function isFullscreenApiAvailable() {
  * Sincroniza el estado con eventos nativos de fullscreen (F11, toolbar) y
  * permite salir con la tecla Escape. Funciona incluso si la API no está disponible.
  *
- * @returns {Object} Estado y control del modo cine.
- * @returns {boolean} returns.isCinema - Indica si el modo cine está activo.
- * @returns {Function} returns.toggleCinema - Función que alterna el modo cine.
- * @returns {boolean} returns.isFullscreenApi - Indica si la API Fullscreen está disponible en el navegador.
+ * @returns {{isCinema: boolean, toggleCinema: Function, isFullscreenApi: boolean}} Estado y control del modo cine.
  */
 export function useCinemaMode() {
   const [isCinema, setIsCinema] = useState(false);

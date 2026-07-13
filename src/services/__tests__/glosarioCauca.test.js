@@ -86,7 +86,7 @@ describe('glosarioCaucaService — normalizeUserInput (forward)', () => {
     expect(normalizeUserInput('', { force: true })).toBe('');
     expect(normalizeUserInput(null, { force: true })).toBe(null);
     expect(normalizeUserInput(undefined, { force: true })).toBe(undefined);
-    expect(normalizeUserInput(42, { force: true })).toBe(42);
+    expect(normalizeUserInput(/** @type {any} */ (42), { force: true })).toBe(42);
   });
 
   it('force=true bypassea el gate de región', () => {

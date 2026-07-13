@@ -85,7 +85,7 @@ describe('normalizarProducto', () => {
   it('devuelve string vacío para entradas inválidas', () => {
     expect(normalizarProducto(null)).toBe('');
     expect(normalizarProducto(undefined)).toBe('');
-    expect(normalizarProducto(42)).toBe('');
+    expect(normalizarProducto(/** @type {any} */ (42))).toBe('');
   });
 });
 

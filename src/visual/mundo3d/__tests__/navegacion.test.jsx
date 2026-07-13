@@ -29,7 +29,7 @@ function Sonda({ reducedMotion = false, pisoUsuario = null }) {
       <output data-testid="fase">{nav.fase}</output>
       <output data-testid="mundo">{nav.mundoId || '-'}</output>
       <output data-testid="pronto">{nav.pronto || '-'}</output>
-      <output data-testid="piso">{nav.catalogoPisos.pisoUsuarioId || '-'}</output>
+      <output data-testid="piso">{/** @type {any} */ (nav).catalogoPisos?.pisoUsuarioId || '-'}</output>
       <button type="button" onClick={() => nav.viajarAlMundo('agua')}>ir-agua</button>
       <button type="button" onClick={() => nav.viajarAlMundo('clima')}>ir-clima</button>
       <button type="button" onClick={() => nav.viajarAlMundo('__fantasma__')}>ir-fantasma</button>

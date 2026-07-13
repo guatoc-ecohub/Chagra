@@ -154,7 +154,7 @@ export default function InventoryPage() {
                 (react-virtuoso) con `height: 100%` internamente — sin un
                 ancestro con altura definida, el virtualizador colapsa a 0px. */}
             <div style={{ height: '55vh' }}>
-              <InventoryEventTimeline />
+              <InventoryEventTimeline itemId={selectedItemId} />
             </div>
           </section>
         </div>

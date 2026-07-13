@@ -21,7 +21,10 @@
  * @property {string} [subject_label]
  * @property {string} [current_stage]
  * @property {string} status
- * @property {Array} [events] - eventos del proceso (si disponibles)
+ * @property {Array<*>} [events] - eventos del proceso (si disponibles)
+ * @property {Object} [attributes]
+ * @property {Object} [payload]
+ * @property {Array<*>} [companions]
  */
 
 /**
@@ -95,7 +98,7 @@ function scaleToScore(count, max) {
 /**
  * Extrae eventos de cosecha de los procesos.
  * @param {FarmProcessInput[]} processes
- * @returns {Array} eventos de cosecha
+ * @returns {Array<*>} eventos de cosecha
  */
 function extractHarvestEvents(processes) {
   const harvestEvents = [];
@@ -114,7 +117,7 @@ function extractHarvestEvents(processes) {
 /**
  * Extrae eventos de manejo de plagas de los procesos.
  * @param {FarmProcessInput[]} processes
- * @returns {Array} eventos de manejo de plagas
+ * @returns {Array<*>} eventos de manejo de plagas
  */
 function extractPestManagementEvents(processes) {
   const pestEvents = [];
@@ -133,7 +136,7 @@ function extractPestManagementEvents(processes) {
 /**
  * Extrae eventos de transición de etapa.
  * @param {FarmProcessInput[]} processes
- * @returns {Array} eventos de transición
+ * @returns {Array<*>} eventos de transición
  */
 function extractStageTransitionEvents(processes) {
   const transitionEvents = [];
@@ -179,7 +182,7 @@ function calcularProductividadMESMIS(processes) {
  * @returns {number|null} 0-4 o null si no hay datos
  */
 function calcularEstabilidadResilienciaMESMIS(processes) {
-  const activeProcesses = processes.filter(p => (p.status ?? p.attributes?.status) === 'active');
+  const activeProcesses = processes.filter(p => (p.status ?? /** @type {any} */ (p.attributes)?.status) === 'active');
   if (activeProcesses.length === 0) return null;
   
   // Contar etapas distintas
@@ -296,7 +299,7 @@ function calcularDiversidadTAPE(processes) {
 function calcularSinergiasTAPE(processes) {
   // Verificar si hay procesos con companions
   const processesWithCompanions = processes.filter(p => {
-    const companions = p.companions || p.payload?.companions;
+    const companions = p.companions || /** @type {any} */ (p.payload)?.companions;
     return companions && Array.isArray(companions) && companions.length > 0;
   });
   
@@ -329,7 +332,7 @@ function calcularEficienciaTAPE() {
  * @returns {number|null} 0-4 o null si no hay datos
  */
 function calcularResilienciaTAPE(processes) {
-  const activeProcesses = processes.filter(p => (p.status ?? p.attributes?.status) === 'active');
+  const activeProcesses = processes.filter(p => (p.status ?? /** @type {any} */ (p.attributes)?.status) === 'active');
   if (activeProcesses.length === 0) return null;
   
   // Contar tipos de proceso distintos
@@ -370,7 +373,7 @@ function calcularCocreacionConocimientoTAPE(observations) {
 
   // Contar observaciones con texto sustancial
   const substantialObs = observations.filter(obs => {
-    const text = obs.text || obs.payload?.text || '';
+    const text = obs.text || (/** @type {any} */ (obs.payload))?.text || '';
     return text.length > 50;
   });
 
@@ -554,5 +557,5 @@ export function getGliessmanLabel(nivel) {
     3: '3. Rediseño del sistema',
     4: '4. Conexión social y económica',
   };
-  return labels[nivel] || 'Desconocido';
+  return /** @type {Record<number,string>} */ (labels)[nivel] || 'Desconocido';
 }

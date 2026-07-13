@@ -25,7 +25,7 @@ const sp = (id, mentioned = null) => ({
 describe('planKnowledgeIntent — guardas', () => {
   it('mensaje vacío / no-string → null', () => {
     for (const bad of [null, undefined, '', '   ', 42, {}]) {
-      expect(planKnowledgeIntent(bad, [sp('ruta_graveolens')])).toBeNull();
+      expect(planKnowledgeIntent(/** @type {any} */ (bad), [sp('ruta_graveolens')])).toBeNull();
     }
   });
 

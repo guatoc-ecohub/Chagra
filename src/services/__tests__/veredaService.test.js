@@ -25,12 +25,12 @@ describe('veredaService', () => {
   });
 
   it('lee vereda desde reverseGeocode normalizado', async () => {
-    vi.mocked(reverseGeocode).mockResolvedValue({
+    vi.mocked(reverseGeocode).mockResolvedValue(/** @type {any} */ ({
       vereda: 'Mundo Nuevo',
       municipio: 'La Calera',
       departamento: 'Cundinamarca',
       display: 'Mundo Nuevo, La Calera',
-    });
+    }));
 
     await expect(getVeredaFromGPS(4.67, -73.84)).resolves.toMatchObject({
       vereda: 'Mundo Nuevo',

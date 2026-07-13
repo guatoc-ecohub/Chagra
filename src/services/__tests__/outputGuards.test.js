@@ -1276,7 +1276,7 @@ describe('filterNoiseEntities', () => {
   it('maneja entrada no-array sin romper', () => {
     expect(filterNoiseEntities(null)).toEqual([]);
     expect(filterNoiseEntities(undefined)).toEqual([]);
-    expect(filterNoiseEntities('x')).toEqual([]);
+    expect(filterNoiseEntities(/** @type {any} */ ('x'))).toEqual([]);
   });
 
   it('en la cadena: "aquí"→Pteridium NO dispara guard de invasora', () => {

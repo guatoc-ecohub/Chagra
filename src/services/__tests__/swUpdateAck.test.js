@@ -126,7 +126,7 @@ describe('readAckedVersion', () => {
   it('debería retornar null si localStorage no está disponible', () => {
     // Mock localStorage como null
     const originalLocalStorage = globalThis.localStorage;
-    delete globalThis.localStorage;
+    delete /** @type {any} */ (globalThis).localStorage;
     
     expect(readAckedVersion()).toBeNull();
     
@@ -134,7 +134,7 @@ describe('readAckedVersion', () => {
   });
 
   it('debería manejar storage null explícitamente', () => {
-    expect(readAckedVersion(null)).toBeNull();
+    expect(readAckedVersion(/** @type {any} */ (null))).toBeNull();
   });
 
   it('debería retornar null si getItem lanza error (quota/private mode)', () => {
@@ -144,7 +144,7 @@ describe('readAckedVersion', () => {
       }),
     };
 
-    expect(readAckedVersion(storage)).toBeNull();
+    expect(readAckedVersion(/** @type {any} */ (storage))).toBeNull();
   });
 
   it('debería usar storage custom si se proporciona', () => {
@@ -155,7 +155,7 @@ describe('readAckedVersion', () => {
       }),
     };
 
-    expect(readAckedVersion(customStorage)).toBe('custom-v1.0');
+    expect(readAckedVersion(/** @type {any} */ (customStorage))).toBe('custom-v1.0');
     expect(customStorage.getItem).toHaveBeenCalledWith(ACK_STORAGE_KEY);
   });
 
@@ -179,13 +179,13 @@ describe('writeAckedVersion', () => {
 
   it('debería no hacer nada si version es null', () => {
     localStorage.setItem(ACK_STORAGE_KEY, 'v1.0');
-    writeAckedVersion(null);
+    writeAckedVersion(/** @type {any} */ (null));
     expect(localStorage.getItem(ACK_STORAGE_KEY)).toBe('v1.0');
   });
 
   it('debería no hacer nada si version es undefined', () => {
     localStorage.setItem(ACK_STORAGE_KEY, 'v1.0');
-    writeAckedVersion(undefined);
+    writeAckedVersion(/** @type {any} */ (undefined));
     expect(localStorage.getItem(ACK_STORAGE_KEY)).toBe('v1.0');
   });
 
@@ -196,7 +196,7 @@ describe('writeAckedVersion', () => {
   });
 
   it('debería no hacer nada si storage es null', () => {
-    writeAckedVersion('v1.0', null);
+    writeAckedVersion('v1.0', /** @type {any} */ (null));
     // No debería escribir nada en localStorage global
     expect(localStorage.getItem(ACK_STORAGE_KEY)).toBeNull();
   });
@@ -208,7 +208,7 @@ describe('writeAckedVersion', () => {
       }),
     };
 
-    expect(() => writeAckedVersion('v1.0', storage)).not.toThrow();
+    expect(() => writeAckedVersion('v1.0', /** @type {any} */ (storage))).not.toThrow();
     expect(storage.setItem).toHaveBeenCalledWith(ACK_STORAGE_KEY, 'v1.0');
   });
 
@@ -218,7 +218,7 @@ describe('writeAckedVersion', () => {
       getItem: vi.fn(),
     };
 
-    writeAckedVersion('custom-v1.0', customStorage);
+    writeAckedVersion('custom-v1.0', /** @type {any} */ (customStorage));
     expect(customStorage.setItem).toHaveBeenCalledWith(ACK_STORAGE_KEY, 'custom-v1.0');
   });
 
@@ -245,13 +245,13 @@ describe('seedFirstInstallAck', () => {
   });
 
   it('debería retornar false si currentVersion es null', () => {
-    const result = seedFirstInstallAck(null);
+    const result = seedFirstInstallAck(/** @type {any} */ (null));
     expect(result).toBe(false);
     expect(localStorage.getItem(ACK_STORAGE_KEY)).toBeNull();
   });
 
   it('debería retornar false si currentVersion es undefined', () => {
-    const result = seedFirstInstallAck(undefined);
+    const result = seedFirstInstallAck(/** @type {any} */ (undefined));
     expect(result).toBe(false);
     expect(localStorage.getItem(ACK_STORAGE_KEY)).toBeNull();
   });
@@ -268,7 +268,7 @@ describe('seedFirstInstallAck', () => {
     // entonces seedFirstInstallAck asume first install y retorna true,
     // pero writeAckedVersion no escribe nada porque storage es null.
     // Esto puede ser un bug sutil en el código fuente.
-    const result = seedFirstInstallAck('v1.0', null);
+    const result = seedFirstInstallAck('v1.0', /** @type {any} */ (null));
     expect(result).toBe(true); // Comportamiento actual
     expect(localStorage.getItem(ACK_STORAGE_KEY)).toBeNull(); // No escribe en localStorage global
   });
@@ -299,7 +299,7 @@ describe('seedFirstInstallAck', () => {
       setItem: vi.fn(),
     };
 
-    const result = seedFirstInstallAck('custom-v1.0', customStorage);
+    const result = seedFirstInstallAck('custom-v1.0', /** @type {any} */ (customStorage));
     expect(result).toBe(true);
     expect(customStorage.setItem).toHaveBeenCalledWith(ACK_STORAGE_KEY, 'custom-v1.0');
   });
@@ -310,7 +310,7 @@ describe('seedFirstInstallAck', () => {
       setItem: vi.fn(),
     };
 
-    const result = seedFirstInstallAck('new-v1.0', customStorage);
+    const result = seedFirstInstallAck('new-v1.0', /** @type {any} */ (customStorage));
     expect(result).toBe(false);
     expect(customStorage.setItem).not.toHaveBeenCalled();
   });

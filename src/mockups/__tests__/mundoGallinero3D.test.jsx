@@ -26,7 +26,7 @@ afterEach(cleanup);
 
 describe('MundoGallinero3D', () => {
   test('presenta el ciclo completo y monta su propio Canvas', () => {
-    render(<MundoGallinero3D />);
+    render(<MundoGallinero3D onBack={() => {}} />);
     expect(screen.getByRole('heading', { name: 'El gallinero que camina' })).toBeInTheDocument();
     expect(screen.getByTestId('canvas')).toHaveAttribute('data-lista', 'true');
     expect(screen.getByRole('list', { name: 'Ciclo del pastoreo rotativo' })).toBeInTheDocument();

@@ -130,7 +130,7 @@ describe('UX-14 — speciesVariety', () => {
     it('retorna null para [] o no-array', () => {
       expect(varietyHelpText([])).toBeNull();
       expect(varietyHelpText(null)).toBeNull();
-      expect(varietyHelpText('not-array')).toBeNull();
+      expect(varietyHelpText(/** @type {any} */ ('not-array'))).toBeNull();
     });
     it('menciona "Otra" para que el usuario sepa que puede escribir', () => {
       const text = varietyHelpText([{ value: 'X', label: 'X' }]);

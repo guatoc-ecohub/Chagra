@@ -203,6 +203,7 @@ const TIPO_POR_SLUG = Object.freeze({
  * sin señal clara: lo dudoso cae a 'otro'.
  * @type {Array<{ re: RegExp, tipo: string }>}
  */
+/** @type {ReadonlyArray<{ re: RegExp, tipo: string }>} */
 const FALLBACK_SUBSTR = Object.freeze([
   // Frutales por género/término inequívoco
   { re: /(citrus|mango|mangifera|mangostan|aguacate|persea|guayab|psidium|guanaban|annona|chirimoy|maracuy|passiflora|granadill|gulupa|curuba|mora\b|rubus|frambues|aranadan|vaccinium|fresa|fragaria|uchuva|physalis|tomate.?de.?arbol|tamarillo|lulo|naranjill|durazno|prunus|manzan|malus|pera\b|pyrus|higo|ficus|uva\b|vitis|banano|platano|musa|cacao|theobroma|cafe\b|coffea|cereza|pitahaya|pitaya|coco\b|cocos|chontaduro|bactris|feijoa|borojo|papayuel|vasconcellea|breva)/i, tipo: 'frutal' },
@@ -242,19 +243,19 @@ export function tipoDeSubject(slug, { nombre = '', categoria = '' } = {}) {
 
   // 1. Mapa estático por slug exacto.
   if (s && Object.prototype.hasOwnProperty.call(TIPO_POR_SLUG, s)) {
-    return TIPO_POR_SLUG[s];
+    return /** @type {('frutal'|'hortaliza'|'aromatica'|'otro')} */ (TIPO_POR_SLUG[s]);
   }
 
   // 2. Categoría explícita del caller (catálogo dinámico v3.1+).
   const cat = norm(categoria);
   if (cat && Object.prototype.hasOwnProperty.call(CATEGORIA_A_TIPO, cat)) {
-    return CATEGORIA_A_TIPO[cat];
+    return /** @type {('frutal'|'hortaliza'|'aromatica'|'otro')} */ (CATEGORIA_A_TIPO[cat]);
   }
 
   // 3. Respaldo por substring (slug + nombre).
   const texto = `${s} ${norm(nombre)}`;
   for (const { re, tipo } of FALLBACK_SUBSTR) {
-    if (re.test(texto)) return tipo;
+    if (re.test(texto)) return /** @type {('frutal'|'hortaliza'|'aromatica'|'otro')} */ (tipo);
   }
 
   // 4. Default seguro.

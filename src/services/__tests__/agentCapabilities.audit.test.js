@@ -318,7 +318,7 @@ describe('agentCapabilities — Deep Research (B14: stub honesto)', () => {
     const plan = planForcedIntent('deep', 'abonos verdes');
     expect(plan.intent).toBe('deep');
     expect(plan.stub).toBe(true);
-    expect(plan.deep).toBeUndefined();
+    expect(/** @type {any} */ (plan).deep).toBeUndefined();
     expect(plan.tool).toBeNull();
     expect(typeof plan.stubMessage).toBe('string');
     expect(plan.stubMessage.toLowerCase()).toContain('no está disponible');

@@ -75,6 +75,7 @@ export const CHAT_STOP_SEQUENCES = Object.freeze([
  * @property {number} max_tokens      - Default per task.
  * @property {string} url             - Endpoint OpenAI-compat (`/api/ollama/v1/chat/completions`).
  * @property {string} rationale       - Por qué este modelo para esta tarea.
+ * @property {string[]|readonly string[]} [stop]        - Stop sequences (opcional).
  */
 
 /** @type {Record<LLMTask, ModelRoute>} */

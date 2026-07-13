@@ -26,6 +26,7 @@ import { runCanonicalHostRedirectGuard } from './services/canonicalHostRedirect'
 // (tests/e2e-real/sw-self-heal.smoke.mjs compara window.__CHAGRA_BUILD_SHA__
 // contra /version.json para cazar el desfase SW/bundle viejo). Solo lectura.
 if (typeof window !== 'undefined') {
+  // @ts-ignore custom property for build SHA
   window.__CHAGRA_BUILD_SHA__ = RUNNING_BUILD_SHA;
 }
 

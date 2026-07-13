@@ -93,7 +93,8 @@ function regimeNote(cycle) {
  * @param {number} [input.now] - timestamp ms de referencia (default Date.now())
  * @returns {PerennialResolution|null}
  */
-export function resolvePerennialCycle({ speciesId, plantingDate, now } = {}) {
+export function resolvePerennialCycle(opts = /** @type {any} */ ({})) {
+  const { speciesId, plantingDate, now } = opts;
   const cycle = getPerennialCycle(speciesId);
   if (!cycle) return null;
 
@@ -105,7 +106,7 @@ export function resolvePerennialCycle({ speciesId, plantingDate, now } = {}) {
   let yearsElapsed = null;
   let progress = null;
   let firstHarvestYear = null;
-  let phase = 'productive';
+  let phase = /** @type {'productive'|'establishment'} */ ('productive');
 
   const hasPlanting = Number.isFinite(plantingDate) && plantingDate > 0;
   if (hasPlanting) {
@@ -115,7 +116,7 @@ export function resolvePerennialCycle({ speciesId, plantingDate, now } = {}) {
     progress = clamp01(yearsElapsed / maxYears);
     firstHarvestYear = new Date(plantingDate).getFullYear() + maxYears;
     // Entra en producción cuando supera el mínimo del rango.
-    phase = yearsElapsed >= minYears ? 'productive' : 'establishment';
+    phase = /** @type {'productive'|'establishment'} */ (yearsElapsed >= minYears ? 'productive' : 'establishment');
   }
 
   // ── Calendario anual ──

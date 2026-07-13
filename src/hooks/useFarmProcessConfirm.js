@@ -57,7 +57,7 @@ export function useFarmProcessConfirm() {
         },
       };
 
-      const outcome = await createFarmProcess(process);
+      const outcome = await createFarmProcess(/** @type {import('../types/farmProcess').FarmProcess} */ (/** @type {any} */ (process)));
       setResult(outcome);
       setStatus('recorded_local_pending_sync');
       return outcome;

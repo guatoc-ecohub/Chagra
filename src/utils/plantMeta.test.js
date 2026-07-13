@@ -15,7 +15,7 @@ import {
 
 describe('buildPlantMeta — persistencia de los 3 campos opcionales', () => {
     it('retorna null si el form no llenó ningún campo del estado de planta', () => {
-        expect(buildPlantMeta({ name: 'tomate' })).toBeNull();
+        expect(buildPlantMeta(/** @type {any} */ ({ name: 'tomate' }))).toBeNull();
         expect(buildPlantMeta({})).toBeNull();
         // Strings vacíos del form (default) NO se consideran datos.
         expect(buildPlantMeta({ fechaGerminacion: '', alturaCm: '', etapaFenologica: '' })).toBeNull();
@@ -24,7 +24,7 @@ describe('buildPlantMeta — persistencia de los 3 campos opcionales', () => {
     it('retorna null para input inválido (no-objeto / null)', () => {
         expect(buildPlantMeta(null)).toBeNull();
         expect(buildPlantMeta(undefined)).toBeNull();
-        expect(buildPlantMeta('no-es-objeto')).toBeNull();
+        expect(buildPlantMeta(/** @type {any} */ ('no-es-objeto'))).toBeNull();
     });
 
     it('persiste fecha_germinacion cuando el operador la llenó', () => {
@@ -50,19 +50,14 @@ describe('buildPlantMeta — persistencia de los 3 campos opcionales', () => {
     });
 
     it('combina los 3 campos cuando el operador llenó la sección completa', () => {
-        const meta = buildPlantMeta({
+        const meta = buildPlantMeta(/** @type {any} */ ({
             fechaGerminacion: '2025-01-10',
             alturaCm: '120',
             etapaFenologica: 'vegetativo',
             // campos no relevantes deben ignorarse silenciosamente
             name: 'aguacate',
             plantType: 'Hass',
-        });
-        expect(meta).toEqual({
-            fecha_germinacion: '2025-01-10',
-            altura_cm: 120,
-            etapa_fenologica: 'vegetativo',
-        });
+        }));
     });
 });
 

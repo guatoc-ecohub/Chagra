@@ -58,7 +58,8 @@ function reqAsPromise(req) {
  *                               (speciesSlug, assetId, createdAt opcional…)
  * @returns {Promise<number>} id del registro encolado
  */
-export async function enqueuePhoto({ imageBlob, kind, meta = {} } = {}) {
+export async function enqueuePhoto(opts = /** @type {any} */ ({})) {
+  const { imageBlob, kind, meta = {} } = opts;
   if (!imageBlob || typeof imageBlob !== 'object') {
     throw new Error('[visionQueue] enqueuePhoto requiere imageBlob');
   }

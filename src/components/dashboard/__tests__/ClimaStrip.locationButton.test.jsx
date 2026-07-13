@@ -60,7 +60,7 @@ vi.mock('../../../services/userProfileService', () => {
     // tests solo necesiten fijar getProfile() y no acoplarse a dos mocks; los
     // tests que quieran probar el fallback de región pueden sobrescribirlo con
     // mockReturnValue/Once.
-    const getProfileMunicipio = vi.fn(() => getProfile()?.municipio ?? null);
+    const getProfileMunicipio = vi.fn(() => /** @type {any} */ (getProfile())?.municipio ?? null);
     return { getProfile, getProfileMunicipio, isModuleVisible: vi.fn(() => true) };
 });
 import { getProfile, getProfileMunicipio } from '../../../services/userProfileService';
@@ -110,7 +110,7 @@ describe('ClimaStrip — botón "Configurar ubicación" (bug fix Brave 2026-05-2
     test('si no hay onNavigate, despacha evento global "chagra:nav"', async () => {
         const eventSpy = vi.fn();
         window.addEventListener('chagra:nav', eventSpy);
-        render(<ClimaStrip />);
+        render(<ClimaStrip onNavigate={() => {}} />);
         const cta = await screen.findByText('Configurar ubicación');
         fireEvent.click(cta);
         await waitFor(() => expect(eventSpy).toHaveBeenCalledTimes(1));
@@ -214,7 +214,7 @@ describe('ClimaStrip — pronóstico real Open-Meteo (fix fuente de datos 2026-0
             ubicacion_lng: -73.92,
         });
         vi.mocked(findMunicipio).mockClear();
-        vi.mocked(findMunicipio).mockReturnValueOnce({ name: 'Choachí', lat: 4.52, lng: -73.92, altitud: 1923 });
+        vi.mocked(findMunicipio).mockReturnValueOnce(/** @type {any} */ ({ name: 'Choachí', lat: 4.52, lng: -73.92, altitud: 1923 }));
         vi.mocked(fetchClimaSnapshot).mockResolvedValueOnce(snapshotConForecast);
         render(<ClimaStrip onNavigate={vi.fn()} />);
         await waitFor(() =>
@@ -244,7 +244,7 @@ describe('ClimaStrip — pronóstico real Open-Meteo (fix fuente de datos 2026-0
     test('geocodifica el municipio si el perfil no tiene coords (con altitud curada)', async () => {
         vi.mocked(getProfile).mockReturnValue({ municipio: 'Une' });
         // Une, Cundinamarca ≈ 1875 msnm en el dataset DANE curado.
-        vi.mocked(findMunicipio).mockReturnValueOnce({ name: 'Une', lat: 4.40, lng: -73.99, altitud: 1875 });
+        vi.mocked(findMunicipio).mockReturnValueOnce(/** @type {any} */ ({ name: 'Une', lat: 4.40, lng: -73.99, altitud: 1875 }));
         vi.mocked(fetchClimaSnapshot).mockResolvedValueOnce(snapshotConForecast);
         render(<ClimaStrip onNavigate={vi.fn()} />);
         await waitFor(() =>

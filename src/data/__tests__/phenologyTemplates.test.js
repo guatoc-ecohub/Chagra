@@ -74,7 +74,7 @@ describe('phenologyTemplates', () => {
       for (const src of t.sources) {
         expect(src.name).toBeTruthy();
         expect(src.reference).toBeTruthy();
-        expect(src.url || src.nota).toBeTruthy();
+        expect(src.url || /** @type {any} */ (src).nota).toBeTruthy();
       }
     }
   });

@@ -15,7 +15,7 @@ describe('auraDeBicho', () => {
     expect(auraDeBicho('bicho-fantasma')).toBe(AURA_DEFECTO);
     expect(auraDeBicho(null)).toBe(AURA_DEFECTO);
     expect(auraDeBicho(undefined)).toBe(AURA_DEFECTO);
-    expect(auraDeBicho(123)).toBe(AURA_DEFECTO);
+    expect(auraDeBicho(/** @type {any} */ (123))).toBe(AURA_DEFECTO);
   });
 
   it('todo valor del mapa es un color hex válido', () => {

@@ -16,7 +16,7 @@ export function useAutosave(storageKey, initialState = {}) {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       if (submitted.current) return;
-      try { const p = { ...latest.current }; delete p.__submitted__; localStorage.setItem(key, JSON.stringify(p)); } catch {}
+      try { const p = { ...latest.current }; delete /** @type {any} */ (p).__submitted__; localStorage.setItem(key, JSON.stringify(p)); } catch {}
     }, 2000);
   }, [key]);
   const clear = useCallback(() => {

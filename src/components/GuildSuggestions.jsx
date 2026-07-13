@@ -2,7 +2,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Sprout, AlertTriangle, Sparkles, Loader2, Check } from 'lucide-react';
 import { getSuggestedCompanions, buildGuildPrompt } from '../services/guildService';
+import { getAllSpecies } from '../db/catalogDB';
 import { SPECIES_DEFAULTS } from '../config/speciesDefaults';
+import { FARM_CONFIG } from '../config/defaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
 import { registry } from '../core/moduleRegistry';
 import useAssetStore from '../store/useAssetStore';
@@ -58,6 +60,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState(null);
   const [EnrichedComp, setEnrichedComp] = useState(null);
+  const [speciesThermalZones, setSpeciesThermalZones] = useState([]);
 
   // Plantas existentes en finca para re-ranking de companions (Autopilot #8).
   const userPlants = useAssetStore((s) => s.plants);
@@ -85,6 +88,24 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
   useEffect(() => {
     setAiSuggestions([]);
     setAiError(null);
+  }, [speciesId]);
+
+  useEffect(() => {
+    if (!speciesId) {
+      setSpeciesThermalZones([]);
+      return undefined;
+    }
+    let alive = true;
+    getAllSpecies()
+      .then((list) => {
+        if (!alive) return;
+        const match = (list || []).find((sp) => sp?.id === speciesId || sp?.slug === speciesId);
+        setSpeciesThermalZones(Array.isArray(match?.pisoTermico?.thermalZones) ? match.pisoTermico.thermalZones : []);
+      })
+      .catch(() => {
+        if (alive) setSpeciesThermalZones([]);
+      });
+    return () => { alive = false; };
   }, [speciesId]);
 
   // Capa 3 enriquecida por módulo Pro si está registrado (ADR-002/011).
@@ -249,7 +270,8 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
               estrato: defaults.estrato,
               companions: companions.map((c) => c.name),
               antagonists: antagonists.map((a) => a.name),
-              thermalZones: defaults.thermalZones || [],
+              thermalZones: FARM_CONFIG.THERMAL_ZONES || [],
+              speciesThermalZones,
               altitudMsnm: defaults.altitud_msnm?.optimo_min,
             }}
           />

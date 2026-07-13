@@ -62,7 +62,8 @@ export function deriveInitialStage({ processes = [] } = {}) {
 }
 
 /** Estado actual: el guardado, o el derivado (que se persiste la primera vez). */
-export function resolveJourneyState({ fincaSlug, processes = [] } = {}) {
+export function resolveJourneyState(opts = /** @type {any} */ ({})) {
+  const { fincaSlug, processes = [] } = opts;
   const stored = getStoredJourneyState(fincaSlug);
   if (stored) return stored;
   const stageId = deriveInitialStage({ processes });

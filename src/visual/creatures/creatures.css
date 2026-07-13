@@ -701,4 +701,119 @@
 
 @media (prefers-reduced-motion: reduce) {
   .rana-salto, .crt-garganta { animation: none !important; }
+   OSO ANDINO — el CARÁCTER del guardián: mole PESADA, seria y gruñona.
+   Aditivo sobre el KIT species-agnostic (no toca a la abeja): el oso reescribe
+   SU boil (más lento y con más masa), suma un resoplido/gruñido corporal, el
+   rascado con la zarpa, el ceño de las cejas y el vaho de la trufa. Todo
+   transform/opacity (GPU, gama baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL PESADO — la mole no vibra ligera como la abeja: respira LENTO y asienta
+   con MÁS squash (masa que cae). Reescribe SOLO el boil del oso (misma clase
+   .rh-boil, mayor especificidad por el data-creature) con longhands para no
+   pisar el resto de props de animación. */
+[data-creature='oso-andino'] .rh-boil {
+  animation-name: oso-boil;
+  animation-duration: 2.6s;
+  animation-timing-function: steps(14, end);
+}
+@keyframes oso-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  26%  { transform: translateY(-0.2px) scale(0.985, 1.03); }  /* leve stretch (pesa) */
+  52%  { transform: translateY(0.8px) scale(1.06, 0.93); }    /* squash pesado (masa) */
+  74%  { transform: translateY(0.15px) scale(1.0, 1.0); }     /* asienta despacio */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* CEJAS — el ceño serio respira apenas (vida sin perder la gravedad). Al
+   RESOPLAR (gruñir) se frunce MÁS fuerte: el sabio refunfuña. */
+.oso-cejas {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: oso-cejas 6.7s ease-in-out infinite;
+}
+@keyframes oso-cejas {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-0.25px); }
+}
+[data-creature='oso-andino'][data-resopla='1'] .oso-cejas {
+  animation: oso-cejas-frunce 0.9s ease-in-out infinite;
+}
+@keyframes oso-cejas-frunce {
+  0%, 100% { transform: translateY(0) scaleX(1); }
+  50%      { transform: translateY(0.55px) scaleX(1.06); }  /* baja y aprieta el ceño */
+}
+
+/* RESOPLA — gruñido corporal: el pecho hincha y suelta con PESO (huff lento,
+   squash&stretch marcado). Pisa el boil por especificidad (dos atributos). */
+[data-creature='oso-andino'][data-resopla='1'] .crt-body {
+  animation: oso-resoplido 1.5s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes oso-resoplido {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  35%      { transform: translateY(-0.6px) scale(0.97, 1.06); }  /* inhala hondo (stretch) */
+  55%      { transform: translateY(0.7px) scale(1.07, 0.92); }   /* SUELTA el gruñido (squash) */
+  75%      { transform: translateY(0.1px) scale(1.01, 1.0); }
+}
+
+/* VAHO — las motas del resoplido salen de la trufa (adelante-abajo) y se
+   disuelven; los delays inline las desparejan. Solo con animated (rh gating). */
+.crt-vaho-mota {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: oso-vaho 1.6s ease-out infinite;
+}
+@keyframes oso-vaho {
+  0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  22%  { opacity: 0.75; }
+  100% { transform: translate(3.4px, 2.2px) scale(1.5); opacity: 0; }
+}
+
+/* RASCA — se rasca la panza con la zarpa derecha: vaivén corto y pausado
+   (gesto de oso, entrañable). El brazo pivota del hombro (crt-brazo-r trae su
+   origen). Pisa el sway/gestos por especificidad de dos atributos. */
+[data-creature='oso-andino'][data-rasca='1'] .crt-brazo-r {
+  animation: oso-rasca 0.5s ease-in-out infinite;
+}
+@keyframes oso-rasca {
+  0%, 100% { transform: rotate(-18deg); }
+  50%      { transform: rotate(-30deg); }
+}
+/* Y el cuerpo acompaña el rascado con un meneíto pesado de gusto. */
+[data-creature='oso-andino'][data-rasca='1'] .crt-body {
+  animation: oso-rasca-cuerpo 1.0s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes oso-rasca-cuerpo {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(1.4deg); }
+}
+
+/* Los estados del oso (resopla/rasca) PISAN el arrebato (antic/travieso): un oso
+   que gruñe o se rasca no da además vueltas de campana — el gesto lee limpio. */
+[data-creature='oso-andino'][data-resopla='1'] .rh-antic,
+[data-creature='oso-andino'][data-resopla='1'] .rh-travieso,
+[data-creature='oso-andino'][data-rasca='1'] .rh-antic,
+[data-creature='oso-andino'][data-rasca='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito del oso lo reactivaría (misma clase) →
+   re-apagarlo aquí (mayor especificidad + orden posterior). Las cejas continuas
+   y el vaho decorativo también se cortan; los estados reactivos (resopla/rasca)
+   siguen contando la verdad. */
+[data-tier='bajo'][data-creature='oso-andino'] .rh-boil,
+[data-tier='bajo'][data-creature='oso-andino'] .oso-cejas { animation: none; }
+[data-tier='bajo'] .crt-vaho-mota { animation: none; opacity: 0.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .oso-cejas, .crt-vaho-mota,
+  [data-creature='oso-andino'][data-resopla='1'] .crt-body,
+  [data-creature='oso-andino'][data-resopla='1'] .oso-cejas,
+  [data-creature='oso-andino'][data-rasca='1'] .crt-brazo-r,
+  [data-creature='oso-andino'][data-rasca='1'] .crt-body { animation: none !important; }
+  /* Fotograma digno: un rastro de vaho visible y quieto si se pidió resoplido. */
+  .crt-vaho-mota { opacity: 0.55; }
 }

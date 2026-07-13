@@ -47,7 +47,7 @@ export default function LevelUpCelebration({ mundo, onClose, onSound, onNarrate 
       aria-modal="true"
       aria-label={`Tu finca subió de nivel: ${mundo.nombreNino}`}
       data-testid="level-up-celebration"
-      onClick={onClose}
+      onClick={/** @type {React.MouseEventHandler<HTMLDivElement>} */ (onClose)}
     >
       {confetti.map((c) => (
         <span
@@ -79,7 +79,7 @@ export default function LevelUpCelebration({ mundo, onClose, onSound, onNarrate 
 
         <button
           type="button"
-          onClick={onClose}
+          onClick={/** @type {React.MouseEventHandler<HTMLButtonElement>} */ (onClose)}
           className="mt-6 w-full min-h-[56px] rounded-2xl bg-yellow-400 hover:bg-yellow-300 active:scale-95 transition text-emerald-950 font-black text-lg shadow-lg"
         >
           ¡Seguir jugando! 🎉

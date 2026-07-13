@@ -853,7 +853,7 @@ const useAssetStore = create((set, get) => ({
           capturedAt: new Date().toISOString(),
         },
       });
-      photoRefId = saved?.id || saved?._photoRefId || null;
+      photoRefId = /** @type {any} */ (saved)?.id || /** @type {any} */ (saved)?._photoRefId || null;
     } catch (err) {
       console.error('[Store] Error guardando foto attachment:', err);
       return { success: false, message: 'Error guardando foto local' };
@@ -1004,7 +1004,7 @@ if (typeof window !== 'undefined') {
   };
 
   window.addEventListener('syncCompleted', async (event) => {
-    const { type, id } = event.detail || {};
+    const { type, id } = /** @type {CustomEvent} */ (event).detail || {};
     if (!type) return;
 
     const isAssetOp = type.startsWith('asset_') || type.startsWith('delete_');
@@ -1042,8 +1042,8 @@ if (typeof window !== 'undefined') {
 
 // ADR-030 Regla 4: Stress test de virtualización (056.1).
 // Expuesto globalmente solo en modo DEV para inyectar datos masivos desde consola.
-if (import.meta.env.DEV) {
-  window._mockGenerateAssets = async (count = 1000) => {
+if (/** @type {any} */ (import.meta).env.DEV) {
+  /** @type {any} */ (window)._mockGenerateAssets = async (count = 1000) => {
     console.info(`[Dev] Generando ${count} activos de prueba...`);
     const newPlants = Array.from({ length: count }, (_, i) => ({
       id: crypto.randomUUID(),

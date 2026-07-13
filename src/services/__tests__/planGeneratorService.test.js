@@ -58,7 +58,7 @@ describe('tryGeneratePlanFromSeeding — helper compartido (audit finding #2)', 
         // catalogDB stub: una especie 'tomate' con 2 steps simples.
         vi.doMock('../../db/catalogDB.js', () => ({
             initCatalog: vi.fn().mockResolvedValue({
-                exec: ({ bind } = {}) => {
+                exec: ({ bind } = /** @type {any} */ ({})) => {
                     const rows = {
                         tomate: {
                             id: 'tomate',

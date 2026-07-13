@@ -106,7 +106,7 @@ describe('ChagraAgentAvatar — task #122 glow + double-click', () => {
 
 describe('ChagraAgentAvatarMaiz — prefers-reduced-motion (task #6240)', () => {
   test('maíz tiene media query prefers-reduced-motion en CSS inline', () => {
-    const { container } = render(<ChagraAgentAvatarMaiz state="idle" />);
+    const { container } = render(<ChagraAgentAvatarMaiz state="idle" onClick={() => {}} onDoubleClick={() => {}} ariaLabel="test" />);
     const styleTag = container.querySelector('style');
     expect(styleTag).toBeInTheDocument();
 
@@ -129,7 +129,7 @@ describe('ChagraAgentAvatarMaiz — prefers-reduced-motion (task #6240)', () => 
     const originalMatchMedia = window.matchMedia;
     window.matchMedia = mockMatchMedia;
 
-    const { container } = render(<ChagraAgentAvatarMaiz state="thinking" glow />);
+    const { container } = render(<ChagraAgentAvatarMaiz state="thinking" glow onClick={() => {}} onDoubleClick={() => {}} ariaLabel="test" />);
     const styleTag = container.querySelector('style');
     const cssContent = styleTag.textContent;
 
@@ -148,7 +148,7 @@ describe('ChagraAgentAvatarMaiz — prefers-reduced-motion (task #6240)', () => 
   });
 
   test('maíz con glow + prefers-reduced-motion usa filtro estático', () => {
-    const { container } = render(<ChagraAgentAvatarMaiz state="idle" glow />);
+    const { container } = render(<ChagraAgentAvatarMaiz state="idle" glow onClick={() => {}} onDoubleClick={() => {}} ariaLabel="test" />);
     const styleTag = container.querySelector('style');
     const cssContent = styleTag.textContent;
 
@@ -161,7 +161,7 @@ describe('ChagraAgentAvatarMaiz — prefers-reduced-motion (task #6240)', () => 
   });
 
   test('maíz: todos los keyframes tienen nombres descriptivos', () => {
-    const { container } = render(<ChagraAgentAvatarMaiz state="idle" />);
+    const { container } = render(<ChagraAgentAvatarMaiz state="idle" onClick={() => {}} onDoubleClick={() => {}} ariaLabel="test" />);
     const styleTag = container.querySelector('style');
     const cssContent = styleTag.textContent;
 

@@ -13,20 +13,20 @@ vi.mock('../farmEventService', () => ({
 
 describe('attachClimateToCycle', () => {
   it('rechaza sin processId', async () => {
-    await expect(attachClimateToCycle({})).rejects.toThrow(/process_id/);
+    await expect(attachClimateToCycle(/** @type {any} */ ({}))).rejects.toThrow(/process_id/);
   });
 });
 
 describe('recalculateWithClimate', () => {
   it('retorna ventanas incluso sin clima (usa defaults)', () => {
-    const r = recalculateWithClimate({ speciesSlug: 'solanum_lycopersicum', sowingDate: 1700000000000 });
+    const r = recalculateWithClimate(/** @type {any} */ ({ speciesSlug: 'solanum_lycopersicum', sowingDate: 1700000000000 }));
     expect(r.length).toBeGreaterThan(0);
     expect(r[0].status).toBe('computed');
   });
 
   it('temperatura alta acorta ventanas (menor altitud efectiva)', () => {
-    const normal = recalculateWithClimate({ speciesSlug: 'solanum_lycopersicum', sowingDate: 1700000000000, altitudeM: 1000 });
-    const hot = recalculateWithClimate({ speciesSlug: 'solanum_lycopersicum', sowingDate: 1700000000000, altitudeM: 1000, avgTempC: 30 });
+    const normal = recalculateWithClimate(/** @type {any} */ ({ speciesSlug: 'solanum_lycopersicum', sowingDate: 1700000000000, altitudeM: 1000 }));
+    const hot = recalculateWithClimate(/** @type {any} */ ({ speciesSlug: 'solanum_lycopersicum', sowingDate: 1700000000000, altitudeM: 1000, avgTempC: 30 }));
     // Altitud corregida menor → ventanas más tempranas
     expect(hot[4].windowStart).toBeLessThanOrEqual(normal[4].windowStart);
   });

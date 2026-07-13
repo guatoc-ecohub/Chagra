@@ -143,7 +143,7 @@ function deriveEscala(p, urbano) {
  */
 function deriveTinte(p) {
   const pisoDeclarado = norm(p.piso_termico);
-  if (pisoDeclarado && Object.values(SCENE_TINTES).includes(pisoDeclarado)) {
+  if (pisoDeclarado && Object.values(SCENE_TINTES).includes(/** @type {'frio'|'paramo'|'calido'|'templado'} */ (pisoDeclarado))) {
     return pisoDeclarado;
   }
   const altitud = Number(p.finca_altitud);

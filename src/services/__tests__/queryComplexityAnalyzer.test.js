@@ -16,11 +16,11 @@ describe('queryComplexityAnalyzer — analyzeQueryComplexity', () => {
     });
 
     test('número → simple', () => {
-      expect(analyzeQueryComplexity(42)).toBe('simple');
+      expect(analyzeQueryComplexity(/** @type {any} */ (42))).toBe('simple');
     });
 
     test('objeto → simple', () => {
-      expect(analyzeQueryComplexity({ q: 'hola' })).toBe('simple');
+      expect(analyzeQueryComplexity(/** @type {any} */ ({ q: 'hola' }))).toBe('simple');
     });
 
     test('string vacío → simple', () => {

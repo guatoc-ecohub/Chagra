@@ -63,7 +63,7 @@ const blobToDataUrl = (blob) =>
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
+    reader.onload = () => resolve(/** @type {string} */ (reader.result));
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(blob);
   });

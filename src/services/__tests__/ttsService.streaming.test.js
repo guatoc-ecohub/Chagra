@@ -14,7 +14,7 @@ describe('splitIntoSentences (Free 7→10 fix-pack #4)', () => {
     expect(splitIntoSentences('')).toEqual([]);
     expect(splitIntoSentences(null)).toEqual([]);
     expect(splitIntoSentences(undefined)).toEqual([]);
-    expect(splitIntoSentences(123)).toEqual([]);
+    expect(splitIntoSentences(/** @type {any} */ (123))).toEqual([]);
   });
 
   it('devuelve una sola frase si no hay boundaries', () => {
