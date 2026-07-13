@@ -749,3 +749,113 @@
   /* Fotograma digno: un rastro de vaho visible y quieto si se pidió resoplido. */
   .crt-vaho-mota { opacity: 0.55; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COLIBRÍ — el CARÁCTER del HIPERACTIVO: veloz, nervioso, zumbón, NUNCA quieto.
+   Aditivo sobre el KIT species-agnostic (no toca abeja/oso/rana): el colibrí
+   acelera SU boil (cernido que vibra), sus ojitos y su aleteo, y suma su firma:
+   el DARDO (cambio de dirección brusco con overshoot) perseguido por ESTELAS
+   iridiscentes cian↔magenta (afterimages con delay). Todo transform/opacity
+   (GPU, gama baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* CERNIDO NERVIOSO — el boil del colibrí vibra RAPIDITO (misma forma del
+   rh-boil, período corto): un colibrí cerniéndose nunca está quieto de verdad.
+   Solo duration (longhand): el gate genérico de tier bajo (animation: none, que
+   resetea el nombre) sigue mandando. */
+[data-creature='colibri'] .rh-boil { animation-duration: 0.9s; }
+
+/* ALETEO HIPERVELOZ — más rápido que el de la abeja (0.15s): borrón de verdad.
+   El smear/overshoot ya vienen del keyframe compartido crt-wingbeat. */
+[data-creature='colibri'] .crt-wing { animation-duration: 0.11s; }
+/* Celebrando, a TOPE (pisa el 0.09s genérico: este bloque va después y con la
+   misma especificidad ganaría el 0.11 base — se re-declara explícito). */
+[data-creature='colibri'][data-pose='celebra'] .crt-wing { animation-duration: 0.07s; }
+
+/* OJITOS RÁPIDOS — la mirada dardea y el parpadeo es más seguido (períodos
+   co-primos con el dardo de 3.8s y los antics: nunca el mismo compás). */
+[data-creature='colibri'] .rh-mirada { animation-duration: 4.1s; }
+[data-creature='colibri'] .rh-blink { animation-duration: 3.7s; }
+
+/* DARDO — la firma de movimiento: se cierne, ANTICIPA un pelo y ¡ZAS! cambia de
+   posición de golpe con inclinación al vector y overshoot elástico al frenar;
+   se cierne allá y vuelve con otro dardo (y uno vertical corto de propina).
+   Las ESTELAS corren el MISMO keyframe con delay → quedan visiblemente atrás
+   durante cada dardo (afterimage) y casi coinciden cerniéndose (solo un fleco
+   tornasol en el contorno: el shimmer del plumaje). */
+[data-creature='colibri'] .colibri-dardo,
+[data-creature='colibri'] .colibri-estela {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: colibri-dardo 3.8s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+[data-creature='colibri'] .colibri-estela--1 { animation-delay: 0.07s; }
+[data-creature='colibri'] .colibri-estela--2 { animation-delay: 0.15s; }
+@keyframes colibri-dardo {
+  0%, 18% { transform: translate(0, 0) rotate(0deg); }            /* se cierne */
+  21%  { transform: translate(-0.9px, 0.4px) rotate(-7deg); }     /* anticipa (coge impulso) */
+  26%  { transform: translate(3.4px, -1.6px) rotate(10deg); }     /* ¡DARDO! arriba-derecha */
+  30%  { transform: translate(2.8px, -1.3px) rotate(3deg); }      /* frena con overshoot */
+  46%  { transform: translate(3px, -1.4px) rotate(4deg); }        /* se cierne allá */
+  49%  { transform: translate(3.9px, -1.1px) rotate(11deg); }     /* anticipa al revés */
+  54%  { transform: translate(-2.7px, 1.2px) rotate(-11deg); }    /* dardo de vuelta */
+  58%  { transform: translate(-2.1px, 0.9px) rotate(-3deg); }     /* asienta elástico */
+  71%  { transform: translate(-2.2px, 1px) rotate(-4deg); }       /* se cierne acá */
+  75%  { transform: translate(-1.9px, -2.5px) rotate(4deg); }     /* dardo vertical corto */
+  79%  { transform: translate(-1.7px, -2.1px) rotate(0deg); }
+  91%, 100% { transform: translate(0, 0) rotate(0deg); }          /* vuelve al centro */
+}
+
+/* Ánimo pleno = TODAVÍA más loco (dardea más seguido; las estelas lo siguen). */
+[data-creature='colibri'][data-animo='pleno'] .colibri-dardo,
+[data-creature='colibri'][data-animo='pleno'] .colibri-estela { animation-duration: 2.7s; }
+
+/* Los gestos con carácter y los ánimos bajos PISAN el dardo: un colibrí posado
+   (reposo), señalando o bajito de ánimo no dardea — el gesto lee limpio. Y las
+   estelas SOLO existen volando: fuera de 'vuela' (o sin pose) se esconden
+   (posado no hay afterimage que valga). */
+[data-creature='colibri'][data-pose='reposo'] .colibri-dardo,
+[data-creature='colibri'][data-pose='señala'] .colibri-dardo,
+[data-creature='colibri'][data-pose='celebra'] .colibri-dardo,
+[data-creature='colibri'][data-animo='sediento'] .colibri-dardo,
+[data-creature='colibri'][data-animo='sediento'] .colibri-estela,
+[data-creature='colibri'][data-animo='descansa'] .colibri-dardo,
+[data-creature='colibri'][data-animo='descansa'] .colibri-estela { animation: none; }
+[data-creature='colibri']:not([data-pose='vuela']) .colibri-estela {
+  animation: none;
+  opacity: 0;
+}
+
+/* MODO PODER IRIDISCENTE — el aura del colibrí no es de un color: es TORNASOL.
+   Sobre la capa 1 species-agnostic (.is-powered-up::before) se pinta el glow
+   radial cian→magenta y se le suma una rotación de tono lenta (el shimmer del
+   plumaje subido a poder). Las corrientes ascendentes alternan cian/magenta.
+   Doble clase (.is-powered-up.colibri-poder) para ganarle a transformacion.css
+   sin depender del orden de import de los bundles CSS. */
+.is-powered-up.colibri-poder::before {
+  background: radial-gradient(circle, #4fd1ff 0%, rgba(255, 79, 209, 0.8) 48%, transparent 72%);
+  animation: poder-aura 1.1s ease-in-out infinite, colibri-tornasol 3.3s linear infinite;
+}
+@keyframes colibri-tornasol {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50%      { filter: hue-rotate(-55deg); }
+}
+.colibri-poder .poder-corriente:nth-child(even) { stroke: #ff4fd1; }
+
+/* device-tier 'bajo': el dardo y las estelas son lo continuo más caro del
+   colibrí → apagados (el aleteo y los estados reactivos siguen contando la
+   verdad). Las estelas quietas taparían el dibujo → ocultas. */
+[data-tier='bajo'][data-creature='colibri'] .colibri-dardo { animation: none; }
+[data-tier='bajo'][data-creature='colibri'] .colibri-estela { animation: none; opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='colibri'] .colibri-dardo,
+  [data-creature='colibri'] .colibri-estela { animation: none !important; }
+  /* Sin movimiento no hay afterimage: las estelas desaparecen (fotograma digno
+     = el colibrí quieto y legible, sin fantasmas superpuestos). */
+  [data-creature='colibri'] .colibri-estela { opacity: 0; }
+  /* El tornasol del poder también queda quieto (re-gate: la doble clase de
+     arriba le ganaba al gate genérico de transformacion.css). */
+  .is-powered-up.colibri-poder::before { animation: none; }
+}
