@@ -33,7 +33,7 @@ export const AURA_POR_BICHO = Object.freeze({
   colibri: '#4fd1ff',          // iridiscente (aprox. celeste)
   jaguar: '#a855f7',           // púrpura depredador
   ardilla: '#ff9f1c',          // chispas ámbar
-  perezoso: '#9acd32',         // verde-musgo zen irónico
+  perezoso: '#1ec9b7',         // turquesa/teal zen irónico (distinto del verde de la rana)
   morrocoy: '#ff7a3c',         // caparazón que brilla (ámbar-rojizo)
 });
 

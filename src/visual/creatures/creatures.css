@@ -749,3 +749,90 @@
   /* Fotograma digno: un rastro de vaho visible y quieto si se pidió resoplido. */
   .crt-vaho-mota { opacity: 0.55; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PEREZOSO (Bradypus variegatus) — el CARÁCTER de la QUIETUD EXTREMA
+   ───────────────────────────────────────────────────────────────────────────
+   Todo en CÁMARA LENTA: se mece pausado desde la rama, parpadeo larguísimo,
+   pupilas que apenas derivan, bostezo/dormita con "Z" que flotan lento y un
+   estiramiento sostenido. Species-tuning ADITIVO (mayor especificidad por el
+   data-creature): jamás pisa a la abeja/oso/rana/colibrí. Solo transform/opacity
+   (GPU, gama baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* MECERSE ZEN — el perezoso NO vibra ligero: se COLUMPIA lentísimo desde la rama
+   (pivote arriba, donde las garras agarran) mientras respira hondo. El MÁS LENTO
+   del grupo. Reescribe SOLO el boil del perezoso (misma clase .rh-boil, mayor
+   especificidad) con longhands para no pisar el resto de props de animación. */
+[data-creature='perezoso'] .rh-boil {
+  animation-name: perezoso-boil;
+  animation-duration: 6.5s;
+  animation-timing-function: ease-in-out;
+  transform-origin: center top; /* cuelga: se mece desde la rama */
+}
+@keyframes perezoso-boil {
+  0%, 100% { transform: rotate(-1.1deg) scale(1, 1); }
+  50%      { transform: rotate(1.1deg) scale(1.006, 0.994); } /* columpio + respira */
+}
+
+/* PARPADEO LARGUÍSIMO — cierra LENTO y se queda cerrado un buen rato (soñoliento);
+   abre despacio. Reescribe el rh-blink solo del perezoso. */
+[data-creature='perezoso'] .rh-blink {
+  animation: perezoso-blink 11s ease-in-out infinite;
+}
+@keyframes perezoso-blink {
+  0%, 30% { transform: scaleY(1); }
+  40%     { transform: scaleY(0.08); } /* cierra lentísimo */
+  54%     { transform: scaleY(0.08); } /* …y se queda cerrado */
+  64%, 100% { transform: scaleY(1); }  /* abre despacio */
+}
+
+/* MIRADA — las pupilas del perezoso apenas derivan: mucho más lenta que la base
+   (nada de dardear). */
+[data-creature='perezoso'] .rh-mirada { animation-duration: 16s; }
+
+/* DORMITA — las "Z" del sueño suben LENTO desde la cabeza y se disuelven; los
+   delays inline las desparejan. Solo con animated (rh gating). */
+.perezoso-zzz-mota {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: perezoso-zzz 4.2s ease-out infinite;
+}
+@keyframes perezoso-zzz {
+  0%   { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  25%  { opacity: 0.8; }
+  100% { transform: translate(2.6px, -4.2px) scale(1.25); opacity: 0; }
+}
+
+/* ESTIRA — estiramiento en cámara lenta: el cuerpo se ALARGA y SOSTIENE el
+   estirón (el bostezo-estiramiento del perezoso). Pisa el boil por especificidad
+   (dos atributos). Pivote arriba (sigue colgado de la rama). */
+[data-creature='perezoso'][data-estira='1'] .crt-body {
+  animation: perezoso-estira 5.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center top;
+}
+@keyframes perezoso-estira {
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  42%      { transform: scaleY(1.08) scaleX(0.95) translateY(0.5px); } /* se estira */
+  58%      { transform: scaleY(1.08) scaleX(0.95) translateY(0.5px); } /* sostiene */
+}
+
+/* device-tier 'bajo': el boil reescrito del perezoso lo reactivaría (misma clase)
+   → re-apagarlo aquí (mayor especificidad + orden posterior). El parpadeo lento y
+   las "Z" decorativas también se cortan; el estiramiento reactivo sigue contando
+   la verdad. */
+[data-tier='bajo'][data-creature='perezoso'] .rh-boil,
+[data-tier='bajo'][data-creature='perezoso'] .rh-blink { animation: none; }
+[data-tier='bajo'] .perezoso-zzz-mota { animation: none; opacity: 0.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='perezoso'] .rh-boil,
+  [data-creature='perezoso'] .rh-blink,
+  [data-creature='perezoso'] .rh-mirada,
+  .perezoso-zzz-mota,
+  [data-creature='perezoso'][data-estira='1'] .crt-body { animation: none !important; }
+  /* Fotograma digno: una "Z" visible y quieta si se pidió dormita. */
+  .perezoso-zzz-mota { opacity: 0.55; }
+}

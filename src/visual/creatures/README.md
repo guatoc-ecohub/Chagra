@@ -24,6 +24,7 @@ calidad dispar. Aquí vive la **versión canónica** de cada uno.
 | `Colibri` | *Colibri coruscans* | Colibrí chillón andino. Pico largo, garganta violeta, alas que baten. **Rubber-hose** (adoptado). |
 | `OsoAndino` | *Tremarctos ornatus* | Oso de anteojos, guardián del páramo. Mole parda con **anteojos crema** (su firma). De suelo, se sienta. Rubber-hose. |
 | `RanaAndina` | *Atelopus* spp. | Rana arlequín del páramo. Verde húmedo con manchas ocre, vientre dorado, ojos saltones y bocota. Rubber-hose. |
+| `Perezoso` | *Bradypus variegatus* | Perezoso de tres dedos, templado. **Cuelga de una rama** por sus **garras largas** curvas, con **antifaz** y **tinte verdoso** de algas. La quietud extrema: todo en **cámara lenta** (mecerse zen, parpadeo larguísimo). Poder **turquesa**. Rubber-hose, showcase completo. |
 | `Lombriz` | *Martiodrilus crassus* | Lombriz gigante nativa. Cuerpo segmentado con clitelo. Sin animación propia (su movimiento lo da la escena). |
 | `Mariposa` | *Dione juno* | Pasionaria de alas largas. Cuatro alas que abren y cierran. |
 | `Escarabajo` | *Dichotomius belus* | Estercolero colombiano. Élitros brillantes, cuerno, y bola de abono que rueda. |
