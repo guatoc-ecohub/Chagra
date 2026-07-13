@@ -1849,7 +1849,7 @@ export default function VitrinaMaestraMundos({ onBack }) {
               <small>Toque un portal: el túnel lo lleva y lo trae</small>
             </h2>
             <div className="vmx-abeja">
-              <AbejaAngelita size={60} animo="sereno" energia={1} animated={!reducedMotion} tier={tier} />
+              <AbejaAngelita size={100} animo="sereno" energia={1} animated={!reducedMotion} tier={tier} />
             </div>
           </div>
           <div className="vmx-pie">
@@ -1890,7 +1890,7 @@ export default function VitrinaMaestraMundos({ onBack }) {
           bajo también vuela — el iris la alcanza a mitad de picada. */}
       {!reducedMotion && fase !== 'mundo' && (fase === 'acercando' || viaje === 'entrar') && (
         <div className="vmx-abeja-cruce" aria-hidden="true">
-          <AbejaAngelita size={60} animo="atento" energia={1} animated tier={tier} />
+          <AbejaAngelita size={100} animo="atento" energia={1} animated tier={tier} />
         </div>
       )}
 
