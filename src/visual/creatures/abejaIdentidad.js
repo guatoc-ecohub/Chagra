@@ -55,8 +55,8 @@ export const ABEJA_PROPORCION = {
 export const ABEJA_PRESENCIA = {
   /* Billboard <Html>: px base + ganancia por energía (0..1) y el
      distanceFactor con el que la cámara la escala. */
-  billboardBase: 40,
-  billboardPorEnergia: 12,
+  billboardBase: 48,
+  billboardPorEnergia: 14,
   distancia: 7,
   /* Su percha junto al foco (hotspot activo o centro del diorama) y la altura
      a la que ronda cuando no está entrando. */
