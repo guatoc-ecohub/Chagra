@@ -28,21 +28,13 @@ export const CLASE_PODER = 'is-powered-up';
 export const AURA_POR_BICHO = Object.freeze({
   'abeja-angelita': '#ffd54a', // dorada clásica
   'oso-andino': '#ff3b30',     // roja berserker
-  'oso-anteojos': '#2dffc4',   // MENTA bioluminiscente (archivado 2026-07-18; ver oso-guardian)
-  'oso-guardian': '#2dffc4',   // MENTA lunar (el guardián negro de la luna — la dirección vigente)
   'rana-andina': '#39d98a',    // verde-zen (slug real de la creature)
   'rana-arlequin': '#39d98a',  // alias biblia
   colibri: '#4fd1ff',          // iridiscente (aprox. celeste)
   jaguar: '#a855f7',           // púrpura depredador
   ardilla: '#ff9f1c',          // chispas ámbar
-  perezoso: '#1ec9b7',         // turquesa/teal zen irónico (distinto del verde de la rana)
+  perezoso: '#9acd32',         // verde-musgo zen irónico
   morrocoy: '#ff7a3c',         // caparazón que brilla (ámbar-rojizo)
-  borugo: '#dbe8ff',           // PLATA LUNAR / blanco luminoso (nocturno sagrado, el animal de cierre)
-  danta: '#a8e05f',            // VERDE SEMILLA (la jardinera del bosque: todo lo que pisa, germina)
-  condor: '#9fd8ff',           // CELESTE DE ALTURA (el señor del viento: el cielo a 5000 msnm)
-  'ent-frailejon': '#8fdcae',  // VERDE-PLATEADO del guardián del páramo (modo-guardián: el frailejón se yergue a intervenir)
-  dalmata: '#3b7dff',          // AZUL COBALTO leal (el perro atlético de la casa)
-  beagle: '#c9772e',           // CANELA DE RASTRO (la nariz de oro del sabueso)
 });
 
 /* Aura por defecto si el slug no está mapeado (la dorada de la guía). */
@@ -73,7 +65,7 @@ export const PODER_MS = 2600;
  */
 export function usePoderTemporal({ ms = PODER_MS } = {}) {
   const [poderoso, setPoderoso] = useState(false);
-  const timerRef = useRef(/** @type {number|ReturnType<typeof setTimeout>} */ (0));
+  const timerRef = useRef(0);
 
   const apagar = useCallback(() => {
     clearTimeout(timerRef.current);

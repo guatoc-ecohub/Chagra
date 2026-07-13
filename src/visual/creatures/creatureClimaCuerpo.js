@@ -214,3 +214,96 @@ export function cuerpoDeClima(clima, { enso = 'neutro', tier, perfil = PERFIL_AB
 }
 
 export default cuerpoDeClima;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ROPA / CUERPO por CLIMA + HORA  (extensión — biblia de personajes)
+ * ───────────────────────────────────────────────────────────────────────────
+ * `cuerpoDeClima` (arriba) modula PIEL: mojado / niebla / tinte / aleteo. Esto
+ * es la capa de VESTUARIO: ruana, sombrero y sudor. Mismo vocabulario de clima
+ * de escena ('dorada'|'soleado'|'niebla'|'lluvia'|'noche') — la HORA ya viaja
+ * ahí ('noche' = de noche; 'dorada'/'soleado' = día con sol).
+ *
+ * El BUG que mata: la abeja SUDANDO de noche. Regla dura → de noche se pone la
+ * RUANA (nunca suda); el sudor SOLO sale de día, con sol y calor. Species-
+ * agnostic: cada bicho trae su umbral térmico (según su piso); la lógica es una.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Perfil de VESTUARIO por bicho (derivado del piso térmico de la biblia):
+ *   frioC     °C por debajo de la cual siente frío → ruana (además de la noche).
+ *   calorC    °C a la cual (o más), de día y con sol, suda → sombrero+sudor.
+ *   sudaAlSol cuando NO hay temperatura, ¿suda igual con sol de día? Los de
+ *             páramo/frío (oso, rana) NO; los templados/cálidos SÍ (default).
+ */
+export const ROPA_PERFIL_POR_BICHO = Object.freeze({
+  'abeja-angelita': { frioC: 12, calorC: 26, sudaAlSol: true },
+  'oso-andino': { frioC: 4, calorC: 18, sudaAlSol: false },
+  'rana-andina': { frioC: 8, calorC: 22, sudaAlSol: false }, // slug real de la creature
+  'rana-arlequin': { frioC: 8, calorC: 22, sudaAlSol: false }, // alias biblia
+  colibri: { frioC: 11, calorC: 26, sudaAlSol: true },
+  jaguar: { frioC: 16, calorC: 32, sudaAlSol: true },
+  ardilla: { frioC: 11, calorC: 26, sudaAlSol: true },
+  perezoso: { frioC: 12, calorC: 27, sudaAlSol: true },
+  morrocoy: { frioC: 16, calorC: 32, sudaAlSol: true },
+});
+
+/* Perfil neutro (slug desconocido / standalone). */
+export const ROPA_PERFIL_DEFECTO = Object.freeze({ frioC: 12, calorC: 26, sudaAlSol: true });
+
+/**
+ * Perfil de vestuario de un bicho por slug. Desconocido → neutro.
+ * @param {string} slug
+ * @returns {{frioC:number, calorC:number, sudaAlSol:boolean}}
+ */
+export function ropaPerfilDeBicho(slug) {
+  return (typeof slug === 'string' && ROPA_PERFIL_POR_BICHO[slug]) || ROPA_PERFIL_DEFECTO;
+}
+
+/** Vestuario NEUTRO (sin clima): sin abrigo ni sudor. */
+export const ROPA_NEUTRA = Object.freeze({
+  ruana: false, sombrero: false, sudor: false, mojado: false, niebla: false,
+});
+
+/**
+ * Resuelve el VESTUARIO del bicho para un clima de escena + (opcional) la °C real.
+ *
+ * @param {('dorada'|'soleado'|'niebla'|'lluvia'|'noche'|null|undefined)} clima
+ *   clima de escena (mismo vocabulario que cuerpoDeClima). Desconocido → neutro.
+ * @param {object} [opts]
+ * @param {{frioC:number, calorC:number, sudaAlSol:boolean}} [opts.perfil=ROPA_PERFIL_DEFECTO]
+ * @param {number} [opts.tempC]  °C real si se conoce (afina frío/calor). Sin ella,
+ *   se infiere del clima + piso (sol de día = calor salvo bichos de páramo).
+ * @returns {{ruana:boolean, sombrero:boolean, sudor:boolean, mojado:boolean, niebla:boolean}}
+ */
+export function ropaDeClima(clima, { perfil = ROPA_PERFIL_DEFECTO, tempC } = {}) {
+  const p = perfil || ROPA_PERFIL_DEFECTO;
+  if (clima == null) return ROPA_NEUTRA;
+
+  const esNoche = clima === 'noche';
+  const soleadoDia = clima === 'soleado' || clima === 'dorada';
+  const lluvia = clima === 'lluvia';
+  const niebla = clima === 'niebla';
+
+  const tieneTemp = Number.isFinite(tempC);
+  const frioPorTemp = tieneTemp ? tempC <= p.frioC : false;
+  // Calor: por °C si la hay; si no, sol de día basta salvo bichos que no sudan.
+  const calorEfectivo = tieneTemp ? tempC >= p.calorC : (soleadoDia && p.sudaAlSol !== false);
+
+  // RUANA: de noche o con frío. (Bug muerto: de noche → ruana, jamás sudor.)
+  const ruana = esNoche || frioPorTemp;
+  // SOMBRERO + SUDOR: solo de día, con sol, con calor y sin ruana.
+  const sombrero = !esNoche && soleadoDia && calorEfectivo && !ruana;
+  const sudor = sombrero;
+
+  return { ruana, sombrero, sudor, mojado: lluvia, niebla };
+}
+
+/**
+ * Azúcar: vestuario directo desde el slug del bicho.
+ * @param {string} slug
+ * @param {('dorada'|'soleado'|'niebla'|'lluvia'|'noche'|null|undefined)} clima
+ * @param {object} [opts]  { tempC }
+ * @returns {{ruana:boolean, sombrero:boolean, sudor:boolean, mojado:boolean, niebla:boolean}}
+ */
+export function ropaDeClimaBicho(slug, clima, { tempC } = {}) {
+  return ropaDeClima(clima, { perfil: ropaPerfilDeBicho(slug), tempC });
+}

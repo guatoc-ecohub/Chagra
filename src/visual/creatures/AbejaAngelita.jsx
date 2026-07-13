@@ -3,9 +3,9 @@ import './creatures.css';
 import './angelita-missminutes.css';
 import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, BocaVisema, Miembro, AntenaRubber, RH_INK } from './_rubberhose.jsx';
-import { GafasSol, CejasRubber } from './AngelitaGafas.jsx';
 import { ABEJA_PALETA, ABEJA_PROPORCION } from './abejaIdentidad.js';
-import { cuerpoDeClima, PERFIL_ABEJA } from './creatureClimaCuerpo.js';
+import { cuerpoDeClima, PERFIL_ABEJA, ropaDeClimaBicho } from './creatureClimaCuerpo.js';
+import { AccesoriosClima } from './AccesoriosClima.jsx';
 
 /* Abeja angelita — Tetragonisca angustula (meliponino nativo SIN aguijón, NO
    Apis). Cabeza y tórax OSCUROS (casi negros) + abdomen ámbar PÁLIDO y LISO,
@@ -60,6 +60,19 @@ export function AbejaAngelita({
      catálogo) = neutro digno: la abeja se ve EXACTO como siempre. */
   clima = null,
   enso = 'neutro',
+  /* ── LIP-SYNC (sistema transversal, useLipSync) ────────────────────────────
+     visema opcional ('V1'..'V4') que produce useLipSync desde el RMS del TTS:
+     la boquita cambia de forma al hablar. Sin visema (o 'V1') = la sonrisa de
+     siempre → los avatares/catálogo no cambian. El HOOK vive aparte para no
+     colgar un AnalyserNode en cada instancia; acá solo se consume el estado. */
+  visema = null,
+  /* ── VESTUARIO por clima+hora (ropaDeClima) ───────────────────────────────
+     OPT-IN: con vestuario=true la abeja se abriga según el clima real (ruana de
+     noche/frío — mata el bug de sudar de noche —, sombrero+sudor al sol cálido).
+     Default false → los consumidores de `clima` existentes NO ven accesorios
+     nuevos (solo el tinte de piel de cuerpoDeClima). tempC afina frío/calor. */
+  vestuario = false,
+  tempC,
   /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + follow-through) y deja el
      aleteo + estados reactivos. Sin prop (standalone: avatares, catálogo) =
@@ -128,6 +141,10 @@ export function AbejaAngelita({
   const estiloClima = (cuerpoClima.tinte || cuerpoClima.opacidad < 1)
     ? { filter: cuerpoClima.tinte || undefined, opacity: cuerpoClima.opacidad < 1 ? cuerpoClima.opacidad : undefined }
     : undefined;
+
+  // Vestuario por clima+hora (opt-in). Perfil abeja: neutro, suda al sol de día,
+  // ruana de noche. Sin vestuario o sin clima → nada (comportamiento histórico).
+  const ropa = (vestuario && clima) ? ropaDeClimaBicho('abeja-angelita', clima, { tempC }) : null;
 
   const defs = (
     <defs>
@@ -273,6 +290,16 @@ export function AbejaAngelita({
       {/* Prop del mundo en la manita (entra heroica con su herramienta). */}
       {propMundo}
 
+      {/* Vestuario por clima+hora (ruana/sombrero/sudor) — solo con vestuario=true. */}
+      {ropa && (
+        <AccesoriosClima
+          estado={ropa}
+          tronco={{ cx: 0, cy: 0, rx: ABEJA_PROPORCION.troncoRx, ry: ABEJA_PROPORCION.troncoRy }}
+          cabeza={{ cx: 8.6, cy: -1.0, r: ABEJA_PROPORCION.cabezaR }}
+          animated={vivo}
+        />
+      )}
+
       {lengua}
       {gotas}
       {polenEl}
@@ -306,11 +333,6 @@ export function AbejaAngelita({
     'data-ruana': ropa?.ruana ? '1' : undefined,
     'data-sombrero': ropa?.sombrero ? '1' : undefined,
     'data-sudor': ropa?.sudor ? '1' : undefined,
-    'data-lineboil': lineBoil ? '1' : undefined,
-    'data-polen': polen ? '1' : undefined,
-    'data-prop': mundoId || undefined,
-    'data-gafas': gafas ? (gafas === 'poniendose' && vivo ? 'poniendose' : '1') : undefined,
-    'data-cejas': cejas || undefined,
   };
 
   if (inline) {
