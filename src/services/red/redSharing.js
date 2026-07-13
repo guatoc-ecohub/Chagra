@@ -34,9 +34,8 @@ export function normalizeShareLevel(value) {
  * muta: devuelve una copia. Úselo al construir un trato para garantizar el
  * invariante "privado por default".
  *
- * @template {{shareLevel?: *}} T
- * @param {T} trato
- * @returns {T & {shareLevel:number}}
+ * @param {*} trato
+ * @returns {*}
  */
 export function withDefaultShareLevel(trato) {
   const t = trato && typeof trato === 'object' ? trato : /** @type {any} */ ({});
