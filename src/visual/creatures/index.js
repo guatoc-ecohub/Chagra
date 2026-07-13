@@ -38,6 +38,11 @@ export { Morrocoy } from './Morrocoy.jsx';
    proporciones y su perfil de clima). Solo datos: jamás arrastra three al bundle
    base — igual que jaguarIdentidad/faunaAndina. */
 export { MORROCOY_PALETA, MORROCOY_PROPORCION, MORROCOY_SLUG, PERFIL_MORROCOY } from './morrocoyIdentidad.js';
+export { Borugo } from './Borugo.jsx';
+/* La IDENTIDAD del borugo como datos (paleta parda + motas crema, proporciones y
+   su perfil de clima). El 9º y ÚLTIMO bicho — el ANIMAL DE CIERRE. Solo datos:
+   jamás arrastra three al bundle base — igual que jaguarIdentidad/abejaIdentidad. */
+export { BORUGO_PALETA, BORUGO_PROPORCION, BORUGO_SLUG, PERFIL_BORUGO } from './borugoIdentidad.js';
 /* La IDENTIDAD del trío andino como datos (paletas + proporciones). Solo datos:
    jamás arrastra three al bundle base — igual que abejaIdentidad. */
 export {
@@ -107,7 +112,7 @@ export {
 export { useVidaIdle, useRitmoPropio, useMiradaUsted, prefiereQuietud } from './useVidaIdle.js';
 
 /* ── SISTEMA DE PERSONAJES (transversal, species-agnostic) ───────────────────
-   La FUNDACIÓN que heredan los 8 bichos: lip-sync, modo poder, prop-por-mundo,
+   La FUNDACIÓN que heredan los 9 bichos: lip-sync, modo poder, prop-por-mundo,
    ropa por clima+hora y el line-boil. Cada bicho = parámetros (aura, perfil,
    props), no código duplicado. Estrenado por Angelita; fable engancha el resto. */
 // Lip-sync 2D por RMS del TTS.
@@ -143,6 +148,7 @@ import Perezoso from './Perezoso.jsx';
 import Ardilla from './Ardilla.jsx';
 import Jaguar from './Jaguar.jsx';
 import Morrocoy from './Morrocoy.jsx';
+import Borugo from './Borugo.jsx';
 import Lombriz from './Lombriz.jsx';
 import Mariposa from './Mariposa.jsx';
 import Escarabajo from './Escarabajo.jsx';
@@ -161,6 +167,7 @@ export const CREATURES = {
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },
   jaguar: { Component: Jaguar, nombre: 'Jaguar', cientifico: 'Panthera onca' },
   morrocoy: { Component: Morrocoy, nombre: 'Morrocoy de patas rojas', cientifico: 'Chelonoidis carbonarius' },
+  borugo: { Component: Borugo, nombre: 'Borugo', cientifico: 'Cuniculus taczanowskii' },
   lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },
   mariposa: { Component: Mariposa, nombre: 'Mariposa pasionaria', cientifico: 'Dione juno' },
   escarabajo: { Component: Escarabajo, nombre: 'Escarabajo estercolero', cientifico: 'Dichotomius belus' },

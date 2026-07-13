@@ -1548,3 +1548,178 @@
   [data-creature='morrocoy'][data-poder='1'] .morrocoy-resplandor,
   [data-creature='morrocoy'][data-poder='1'] .morrocoy-shimmer { animation: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BORUGO (Cuniculus taczanowskii) — el 9º y ÚLTIMO bicho, el ANIMAL DE CIERRE.
+   ───────────────────────────────────────────────────────────────────────────
+   El CARÁCTER de la TERNURA NOCTURNA: la paca de montaña, tímida, serena, dulce.
+   Movimientos SUAVES (nada de comedia bruta): olfateo con la nariz que tiembla,
+   bigotes que se abren, orejitas atentas, ojos grandes que reflejan la luna y
+   las MOTAS crema de los flancos que brillan tenue (nocturno). Aditivo sobre el
+   KIT species-agnostic (no toca a ningún otro bicho): el borugo reescribe SU
+   boil (suave y tímido), suma el olfateo (nariz + bigotes + orejas), el
+   acurrucarse a salvo (el corazón emotivo del cierre) y el brillo lunar
+   permanente (motas + ojos). En modo poder ese brillo se vuelve PLATA LUNAR
+   pleno (el ser protegido que se revela seguro). Todo transform/opacity (GPU,
+   gama baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL SUAVE — el borugo NO vibra ligero ni salta: respira TÍMIDO, con squash
+   pequeño y dulce (ternura, poder contenido de un animalito manso). Reescribe
+   SOLO el boil del borugo (misma clase .rh-boil, mayor especificidad por el
+   data-creature) con longhands para no pisar el resto de props de animación. */
+[data-creature='borugo'] .rh-boil {
+  animation-name: borugo-boil;
+  animation-duration: 3.4s;
+  animation-timing-function: ease-in-out;
+}
+@keyframes borugo-boil {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(0.35px) scale(1.012, 0.988); } /* respiración suave y tímida */
+}
+
+/* NARIZ que TIEMBLA — el olfateo idle del roedor nocturno (permanente, tenue). */
+.borugo-nariz {
+  animation: borugo-olfateo 1.9s ease-in-out infinite;
+}
+@keyframes borugo-olfateo {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(0.25px) scale(1.06); }  /* husmea el aire */
+}
+
+/* BIGOTES — se mecen apenas (permanente, delicado). */
+.borugo-bigotes {
+  animation: borugo-bigotes 3.7s ease-in-out infinite;
+}
+@keyframes borugo-bigotes {
+  0%, 100% { transform: scaleX(1) rotate(0deg); }
+  50%      { transform: scaleX(1.02) rotate(0.4deg); }
+}
+
+/* OREJITAS — atentas, se enderezan apenas (permanente, tímido). */
+.borugo-orejas {
+  animation: borugo-orejas 4.3s ease-in-out infinite;
+}
+@keyframes borugo-orejas {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(-0.3px) scaleY(1.05); }  /* se enderezan atentas */
+}
+
+/* OLFATEA — la reacción-firma tierna: la nariz tiembla MÁS rápido, los bigotes
+   se ABREN y las orejitas se ENDEREZAN (husmea el aire con dulzura). Pisan el
+   idle por especificidad (dos atributos). */
+[data-creature='borugo'][data-olfatea='1'] .borugo-nariz {
+  animation: borugo-olfateo-vivo 0.55s ease-in-out infinite;
+}
+@keyframes borugo-olfateo-vivo {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(0.4px) scale(1.12); }
+}
+[data-creature='borugo'][data-olfatea='1'] .borugo-bigotes {
+  animation: borugo-bigotes-abre 0.55s ease-in-out infinite;
+}
+@keyframes borugo-bigotes-abre {
+  0%, 100% { transform: scaleX(1) rotate(0deg); }
+  50%      { transform: scaleX(1.14) rotate(1.2deg); }  /* los bigotes se abren */
+}
+[data-creature='borugo'][data-olfatea='1'] .borugo-orejas {
+  animation: borugo-orejas-perk 0.9s ease-in-out infinite;
+}
+@keyframes borugo-orejas-perk {
+  0%, 100% { transform: translateY(-0.3px) scaleY(1.06); }
+  50%      { transform: translateY(-0.9px) scaleY(1.14); }  /* atentas, alerta dulce */
+}
+
+/* ACURRUCA — se ovilla a SALVO: el cuerpo se REDONDEA y encoge suave y la
+   cabecita se recoge (el ser protegido, digno y tranquilo). El corazón emotivo
+   del cierre — lento y tierno, nunca brusco. Pisa el boil por especificidad. */
+[data-creature='borugo'][data-acurruca='1'] .crt-body {
+  animation: borugo-acurruca 4.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes borugo-acurruca {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(1px) scale(1.04, 0.94); }  /* se ovilla, hondo y calmo */
+}
+[data-creature='borugo'][data-acurruca='1'] .borugo-cabeza {
+  animation: borugo-cabeza-recoge 4.6s ease-in-out infinite;
+}
+@keyframes borugo-cabeza-recoge {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(1.1px) scale(0.97); }  /* recoge la cabecita, a salvo */
+}
+
+/* Los estados del borugo (olfatea/acurruca) PISAN el arrebato (antic/travieso):
+   un animalito que husmea tímido o se ovilla a salvo no da vueltas de campana. */
+[data-creature='borugo'][data-olfatea='1'] .rh-antic,
+[data-creature='borugo'][data-olfatea='1'] .rh-travieso,
+[data-creature='borugo'][data-acurruca='1'] .rh-antic,
+[data-creature='borugo'][data-acurruca='1'] .rh-travieso { animation: none; }
+
+/* ── NOCTURNO SAGRADO — el brillo lunar (permanente y sutil) ─────────────────
+   Las MOTAS crema de los flancos brillan tenue y los OJOS grandes reflejan la
+   luna; en modo poder se vuelve PLATA LUNAR pleno (el ser protegido se revela). */
+.borugo-motas-luz {
+  animation: borugo-motas-luz 5.4s ease-in-out infinite;
+}
+@keyframes borugo-motas-luz {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.62; }
+}
+.borugo-ojo-luna {
+  animation: borugo-ojo-luna 3.6s ease-in-out infinite;
+}
+@keyframes borugo-ojo-luna {
+  0%, 100% { opacity: 0.55; transform: scale(0.96); }
+  50%      { opacity: 0.95; transform: scale(1.08); }
+}
+
+/* MODO PODER PLATA LUNAR — el brillo se intensifica y acelera (el ser protegido
+   por fin se revela seguro bajo la luna). Vale en standalone (wrapper
+   .borugo-poder) y en inline (data-poder en el <g>). */
+.borugo-poder .borugo-motas-luz,
+[data-creature='borugo'][data-poder='1'] .borugo-motas-luz {
+  animation-name: borugo-motas-lunar;
+  animation-duration: 3.0s;
+}
+@keyframes borugo-motas-lunar {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+.borugo-poder .borugo-ojo-luna,
+[data-creature='borugo'][data-poder='1'] .borugo-ojo-luna {
+  animation-name: borugo-ojo-lunar;
+  animation-duration: 2.2s;
+}
+@keyframes borugo-ojo-lunar {
+  0%, 100% { opacity: 0.85; transform: scale(1.02); }
+  50%      { opacity: 1;    transform: scale(1.2); }
+}
+
+/* device-tier 'bajo': el boil reescrito del borugo lo reactivaría (misma clase)
+   → re-apagarlo aquí (mayor especificidad + orden posterior). El olfateo, los
+   bigotes, las orejas y el brillo lunar continuos también se cortan; los estados
+   reactivos (olfatea/acurruca) siguen contando la verdad. */
+[data-tier='bajo'][data-creature='borugo'] .rh-boil,
+[data-tier='bajo'][data-creature='borugo'] .borugo-nariz,
+[data-tier='bajo'][data-creature='borugo'] .borugo-bigotes,
+[data-tier='bajo'][data-creature='borugo'] .borugo-orejas,
+[data-tier='bajo'][data-creature='borugo'] .borugo-ojo-luna { animation: none; }
+[data-tier='bajo'][data-creature='borugo'] .borugo-motas-luz { animation: none; opacity: 0.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='borugo'] .rh-boil,
+  .borugo-nariz, .borugo-bigotes, .borugo-orejas, .borugo-ojo-luna,
+  .borugo-poder .borugo-ojo-luna,
+  [data-creature='borugo'][data-poder='1'] .borugo-ojo-luna,
+  [data-creature='borugo'][data-olfatea='1'] .borugo-nariz,
+  [data-creature='borugo'][data-olfatea='1'] .borugo-bigotes,
+  [data-creature='borugo'][data-olfatea='1'] .borugo-orejas,
+  [data-creature='borugo'][data-acurruca='1'] .crt-body,
+  [data-creature='borugo'][data-acurruca='1'] .borugo-cabeza { animation: none !important; }
+  /* Motas: sin titileo, quietas y tenues (fotograma digno). */
+  .borugo-motas-luz,
+  .borugo-poder .borugo-motas-luz,
+  [data-creature='borugo'][data-poder='1'] .borugo-motas-luz { animation: none !important; opacity: 0.5; }
+}
