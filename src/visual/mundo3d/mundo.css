@@ -395,6 +395,32 @@
   background: rgba(42, 32, 22, 0.72);
   border-radius: 999px;
 }
+.mundo-fuente {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.35em 0.85em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fffdf7;
+  background: rgba(42, 32, 22, 0.84);
+  border: 1px solid rgba(255, 251, 242, 0.16);
+  border-radius: 999px;
+  pointer-events: none;
+}
+.mundo-fuente[data-fuente='real'] {
+  background: rgba(47, 96, 52, 0.9);
+}
+.mundo-fuente[data-fuente='muestra'] {
+  background: rgba(122, 94, 42, 0.9);
+}
+.mundo-fuente[data-fuente='faltante'] {
+  background: rgba(102, 76, 32, 0.9);
+}
 .mundo-salir {
   flex: none;
   display: inline-flex;

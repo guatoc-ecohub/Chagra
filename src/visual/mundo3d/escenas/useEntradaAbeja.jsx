@@ -319,7 +319,7 @@ export function AbejaEscena({
   //    clima/enso que la creature pinta (tinte, opacidad, aleteo). Aquí tomamos
   //    su `altura` para COMPLEMENTAR la coreografía; se MULTIPLICA con la de
   //    reaccionFinca (lluvia/sed ya bajan el vuelo) para no doble-contar.
-  const climaReal = estadoFinca?.clima ?? null;
+  const climaReal = estadoFinca?.climaEscena ?? estadoFinca?.clima ?? null;
   const ensoReal = estadoFinca?.enso ?? 'neutro';
   const cuerpoClima = useMemo(
     () => cuerpoDeClima(climaReal, { enso: ensoReal, tier, perfil: PERFIL_ABEJA }),
