@@ -219,6 +219,7 @@ function Contenido({
         reducedMotion={reducedMotion}
         piso={piso}
         tier={tier}
+        mundoId={params?.id || params?.tipo || null}
       />
 
       <OrbitControls
