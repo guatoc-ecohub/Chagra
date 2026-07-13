@@ -26,7 +26,9 @@ export const PROXIMIDAD_LABEL = Object.freeze({
 });
 
 /** Niveles de reputación que cuentan como "competente" (demostró algo). */
-const NIVELES_COMPETENTES = new Set(/** @type {string[]} */ ([NIVEL_REPUTACION.VERDE, NIVEL_REPUTACION.AMBAR]));
+const NIVELES_COMPETENTES = /** @type {Set<string>} */ (
+  new Set([NIVEL_REPUTACION.VERDE, NIVEL_REPUTACION.AMBAR])
+);
 
 /**
  * Tier de cercanía entre el que pregunta y un par. 3 misma vereda · 2 mismo
@@ -51,7 +53,7 @@ export function proximidadTier(query, peer) {
  * luego por score de reputación (y recencia como desempate). Función pura.
  *
  * @param {Object} problema
- * @param {string} problema.producto — cultivo en cuestión.
+ * @param {string} problema.producto - cultivo en cuestión.
  * @param {string} [problema.vereda]
  * @param {string} [problema.municipio]
  * @param {string} [problema.excludeHash] - no sugerirse a uno mismo.
@@ -72,7 +74,7 @@ export function findCompetentPeers(problema, contexto) {
     if (!rep || typeof rep !== 'object') continue;
     if (rep.productoNorm !== productoNorm) continue;
     if (excludeHash && rep.productorHash === excludeHash) continue;
-    const competente = NIVELES_COMPETENTES.has(/** @type {string} */ (String(rep.nivel)))
+    const competente = NIVELES_COMPETENTES.has(rep.nivel)
       || (allowNuevo && rep.nivel === NIVEL_REPUTACION.NUEVO);
     if (!competente) continue;
 
@@ -102,11 +104,10 @@ export function findCompetentPeers(problema, contexto) {
  * en usted, cálido y directo, SIN revelar la identidad del par a quien
  * pregunta y sin datos sensibles. Best-effort con el síntoma si viene.
  *
- * @param {object} opts
+ * @param {{producto?:string, vereda?:string, sintoma?:string}} [params]
  * @returns {string}
  */
-export function buildMensajeVecino(opts = /** @type {any} */ ({})) {
-  const { producto = '', vereda = '', sintoma = '' } = opts;
+export function buildMensajeVecino({ producto, vereda = '', sintoma = '' } = {}) {
   const cultivo = String(producto || 'este cultivo').trim();
   const lugar = String(vereda || '').trim();
   const problema = String(sintoma || '').trim();
@@ -137,7 +138,7 @@ export function buildMensajeVecino(opts = /** @type {any} */ ({})) {
  * @param {string} [problema.sintoma]
  * @param {boolean} [problema.agentConfident=true] - el agente cree tener respuesta?
  * @param {string} [problema.excludeHash]
- * @param {Object} contexto — { reputaciones, allowNuevo }
+ * @param {Object} contexto - { reputaciones, allowNuevo }
  * @returns {{ shouldRoute:boolean, peer:(import('./types.js').PeerMatch|null),
  *   motivo:string, mensajeSugerido:(string|null),
  *   candidatos:Array<import('./types.js').PeerMatch> }}
@@ -154,7 +155,7 @@ export function routeQuestion(problema, contexto) {
 
   const candidatos = findCompetentPeers(
     { producto, vereda, municipio, excludeHash },
-    /** @type {any} */ (contexto),
+    contexto,
   );
 
   if (candidatos.length === 0) {

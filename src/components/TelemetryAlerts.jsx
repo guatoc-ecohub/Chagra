@@ -239,6 +239,8 @@ export default function TelemetryAlerts() {
           data: {
             type: "log--input",
             attributes: {
+              // Legacy copy retained until the i18n refactor touches this flow.
+              // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
               name: "Aplicación Fitosanitaria (Alerta IA)",
               timestamp: new Date().toISOString().split('.')[0] + '+00:00',
               status: "pending",
@@ -629,7 +631,7 @@ export default function TelemetryAlerts() {
 
   useEffect(() => {
     const ctrl = new AbortController();
-    fetchTelemetryAndAnalyze(ctrl.signal);
+    void Promise.resolve().then(() => fetchTelemetryAndAnalyze(ctrl.signal));
     return () => ctrl.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -824,6 +826,7 @@ export default function TelemetryAlerts() {
                   altitudMsnm: FARM_CONFIG.ALTITUD_MSNM,
                   municipio: FARM_CONFIG.MUNICIPIO,
                   thermalZones: FARM_CONFIG.THERMAL_ZONES || [],
+                  speciesThermalZones: [],
                   sintomas: aiAlert || '',
                 }}
               />

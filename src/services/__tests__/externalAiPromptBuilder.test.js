@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   deriveThermalZoneFromAltitud,
+  buildThermalMismatchBlock,
   buildGuildExternalPrompt,
   buildDiagnosticExternalPrompt,
   buildOpenExternalPrompt,
@@ -35,6 +36,31 @@ describe('deriveThermalZoneFromAltitud — casos borde', () => {
 
   it('retorna null para NaN', () => {
     expect(deriveThermalZoneFromAltitud(NaN)).toBeNull();
+  });
+});
+
+describe('buildThermalMismatchBlock', () => {
+  it('devuelve restriccion para cafe en paramo', () => {
+    const block = buildThermalMismatchBlock('páramo', ['templado', 'frio']);
+    expect(block).toContain('RESTRICCION DE PISO TERMICO');
+    expect(block).toContain('páramo');
+    expect(block).toContain('templado, frio');
+    expect(block).toContain('INVIABLE');
+  });
+
+  it('devuelve cadena vacia cuando el piso es valido', () => {
+    expect(buildThermalMismatchBlock('frio', ['frio', 'templado'])).toBe('');
+  });
+
+  it('devuelve cadena vacia cuando faltan datos', () => {
+    expect(buildThermalMismatchBlock('', ['frio'])).toBe('');
+    expect(buildThermalMismatchBlock('frio', [])).toBe('');
+    expect(buildThermalMismatchBlock(null, null)).toBe('');
+  });
+
+  it('normaliza tildes en ambos lados', () => {
+    expect(buildThermalMismatchBlock('páramo', ['paramo'])).toBe('');
+    expect(buildThermalMismatchBlock('paramo', ['páramo'])).toBe('');
   });
 });
 

@@ -1,5 +1,5 @@
 /**
- * red/redReputation.js  --  el corazón "mercado → grafo + reputación".
+ * red/redReputation.js — el corazón "mercado → grafo + reputación".
  *
  * Lógica PURA (cero red, cero I/O, cero React) que convierte una lista de
  * TRATOS del mercado en (a) el grafo social productor–cultivo–vereda y (b) la
@@ -20,7 +20,7 @@
  * ── Supuesto de Markov ────────────────────────────────────────────────────
  * La fiabilidad reciente de un productor se toma como predictor de su fiabilidad
  * próxima (cadena de Markov de orden 1 sobre su conducta de entrega). VIOLACIÓN
- * conocida: la conducta NO es estacionaria  --  cambia de tierra, de práctica o
+ * conocida: la conducta NO es estacionaria — cambia de tierra, de práctica o
  * enfrenta una mala cosecha climática. MITIGACIÓN: (1) decaimiento por recencia
  * (media vida configurable) para que un acierto viejo pese menos; (2) suavizado
  * + factor de confianza para que un solo dato no domine. Sin esta sección el
@@ -132,9 +132,9 @@ function derivarNivel({ nConfirmadas, fiabilidad, calidadNorm }) {
  * tratos (ya filtrados por productor+producto, o se filtra aquí por los campos
  * dados). Función pura y total: input basura → reputación "nueva" honesta.
  *
- * @param {Array<Object>} tratos  --  tratos del grupo (mismos productorHash+producto).
+ * @param {Array<Object>} tratos - tratos del grupo (mismos productorHash+producto).
  * @param {Object} [opts]
- * @param {number} [opts.now]  --  epoch ms para el factor de recencia (opcional).
+ * @param {number} [opts.now] - epoch ms para el factor de recencia (opcional).
  * @param {number} [opts.halfLifeDias]
  * @returns {import('./types.js').Reputacion}
  */
@@ -225,7 +225,7 @@ export function groupTratos(tratos, opts = {}) {
  * cruda de tratos. Aplica la compuerta anti-extractiva internamente.
  *
  * @param {Array<Object>} tratos
- * @param {Object} [opts]  --  { now, halfLifeDias, minLevel }
+ * @param {Object} [opts] - { now, halfLifeDias, minLevel }
  * @returns {Array<import('./types.js').Reputacion>}
  */
 export function computeAllReputaciones(tratos, opts = {}) {

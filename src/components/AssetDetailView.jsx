@@ -687,6 +687,7 @@ export const AssetDetailView = () => {
   const [commonName, setCommonName] = useState(null);
   const [speciesCategory, setSpeciesCategory] = useState(null);
   const [catalogImage, setCatalogImage] = useState(null);
+  const [speciesThermalZones, setSpeciesThermalZones] = useState([]);
 
   const asset = useMemo(() => {
     if (!selectedAssetId) return null;
@@ -717,10 +718,12 @@ export const AssetDetailView = () => {
         setCommonName(match?.nombre_comun || deriveCommonName(assetName) || null);
         setSpeciesCategory(match?.category || null);
         setCatalogImage(match?.imagen || match?.image || match?.media?.image || match?.media || null);
+        setSpeciesThermalZones(Array.isArray(match?.pisoTermico?.thermalZones) ? match.pisoTermico.thermalZones : []);
       })
       .catch((err) => {
         console.warn('[AssetDetailView] getAllSpecies falló:', err);
         if (!cancelled) setCommonName(deriveCommonName(assetName) || null);
+        if (!cancelled) setSpeciesThermalZones([]);
       });
     return () => { cancelled = true; };
   }, [asset, isPlantType]);
@@ -866,7 +869,7 @@ export const AssetDetailView = () => {
                     </>
                   )}
                   <ExternalAiButton
-                    context={{ speciesName: name, thermalZones: FARM_CONFIG.THERMAL_ZONES, altitudMsnm: FARM_CONFIG.ALTITUD_MSNM, municipio: FARM_CONFIG.MUNICIPIO }}
+                    context={{ speciesName: name, thermalZones: FARM_CONFIG.THERMAL_ZONES, speciesThermalZones, altitudMsnm: FARM_CONFIG.ALTITUD_MSNM, municipio: FARM_CONFIG.MUNICIPIO }}
                     buildPrompt={buildOpenExternalPrompt}
                     label="Ayuda IA"
                   />

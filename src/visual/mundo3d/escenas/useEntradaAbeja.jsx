@@ -22,6 +22,7 @@ import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaAngelita } from '../../creatures/AbejaAngelita.jsx';
 import { cuerpoDeClima, PERFIL_ABEJA } from '../../creatures/creatureClimaCuerpo.js';
+import { useLipSync } from '../../creatures/useLipSync.js';
 import { ABEJA_PRESENCIA, ABEJA_TINTA } from '../../creatures/abejaIdentidad.js';
 import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
 import { horaDeReloj } from '../cielosHoraData.js';
@@ -278,6 +279,13 @@ export function useEntradaAbeja(foco, {
 export function AbejaEscena({
   foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
   hablando = false, rebote = 0,
+  // El MUNDO donde está: Angelita entra con su herramienta en la mano
+  // (agua→manguerita, suelo→lupa…). Sin mundoId → manos libres.
+  mundoId = null,
+  // VESTUARIO por clima+hora (ruana/sombrero): ON por defecto dentro de un
+  // mundo, para que de NOCHE se abrigue con la ruana andina (y JAMÁS se vea
+  // sudando/sobrecalentada). El clima real llega por `estadoFinca`.
+  vestuario = true,
   // Device-tier (DR-3D-PERF-GAMABAJA): gradúa el rubber-hose del cuerpo — en
   // 'bajo' Angelita apaga el idle continuo (boil + follow-through) y conserva
   // el aleteo + los estados reactivos. La escena lo hereda del host <Mundo>.
@@ -321,6 +329,9 @@ export function AbejaEscena({
   //    reaccionFinca (lluvia/sed ya bajan el vuelo) para no doble-contar.
   const climaReal = estadoFinca?.clima ?? null;
   const ensoReal = estadoFinca?.enso ?? 'neutro';
+  // La °C real (si el estado la trae): afina la ruana por frío. Sin ella, el
+  // vestuario se infiere del clima+hora (de noche = ruana; sol de día = sudor).
+  const tempCReal = Number.isFinite(estadoFinca?.tempC) ? estadoFinca.tempC : undefined;
   const cuerpoClima = useMemo(
     () => cuerpoDeClima(climaReal, { enso: ensoReal, tier, perfil: PERFIL_ABEJA }),
     [climaReal, ensoReal, tier],
@@ -353,6 +364,11 @@ export function AbejaEscena({
   // fuente que la 2D del home): base + ganancia por energía real de la finca.
   const size = ABEJA_PRESENCIA.billboardBase + Math.round(energiaReal * ABEJA_PRESENCIA.billboardPorEnergia);
   const vivo = !reducedMotion;
+  // LIP-SYNC: Angelita "habla" cuando el agente narra. useLipSync engancha el
+  // <audio> del TTS y deriva el visema del RMS (boca de 4 formas). Es la ÚNICA
+  // abeja del mundo (la del footer se oculta) → un solo AnalyserNode. Gate RM
+  // dentro del hook (boca cerrada). Sin voz → V1 (la sonrisa de siempre).
+  const { visema } = useLipSync({ activo: vivo });
   return (
     <>
       <group ref={ref} position={[foco.x + PERCHA.x, foco.y + PERCHA.y, foco.z + PERCHA.z]}>
@@ -388,6 +404,13 @@ export function AbejaEscena({
                     comiendo={comiendo}
                     clima={climaReal}
                     enso={ensoReal}
+                    /* Lip-sync: la boquita sigue el RMS del TTS al narrar. */
+                    visema={vivo ? visema : null}
+                    /* Vestuario por clima+hora: de noche la RUANA (no suda). */
+                    vestuario={vestuario}
+                    tempC={tempCReal}
+                    /* Herramienta del mundo en la manita al entrar. */
+                    mundoId={mundoId}
                     animated={vivo}
                     tier={tier}
                   />

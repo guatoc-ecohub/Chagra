@@ -38,7 +38,7 @@ import { routeQuestion } from './redMatchmaking.js';
  * @param {string} [params.confirmadoPor] - CONFIRMADO_POR.* (default PRODUCTOR).
  * @param {number} [params.shareLevel] - nivel opt-in (default PRIVADO).
  * @param {string|null} [params.cultivoId]
- * @returns {object} 
+ * @returns {import('./types.js').RedTransaction}
  */
 export function buildTrato({
   oferta = {},
@@ -85,7 +85,7 @@ async function resolveProductorHash(input) {
 
 /**
  * Registra un TRATO: resuelve la identidad, lo construye y lo persiste.
- * @param {Object} input — ver buildTrato + { productorId? }.
+ * @param {Object} input - ver buildTrato + { productorId? }.
  * @returns {Promise<import('./types.js').RedTransaction>}
  */
 export async function registrarTrato(input) {
@@ -119,7 +119,7 @@ export async function cargarGrafoSocial(opts = {}) {
  * al propio operador (no se sugiere a uno mismo). El caller decide qué hacer con
  * la decisión (mostrar el mensaje sugerido, abrir canal si hay consentimiento).
  *
- * @param {Object} problema — { producto, vereda, municipio, sintoma, agentConfident }
+ * @param {Object} problema - { producto, vereda, municipio, sintoma, agentConfident }
  * @param {Object} [opts] - { now, halfLifeDias, minLevel, allowNuevo }
  * @returns {Promise<ReturnType<typeof routeQuestion>>}
  */
