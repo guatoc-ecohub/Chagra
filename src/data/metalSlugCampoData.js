@@ -59,6 +59,7 @@
  * @property {string} fuente              Origen de la relación ('grafo' | 'cenicafe' | 'ica-ciat' | 'ecologia' | 'biopreparado').
  */
 
+/** @type {Arma[]} */
 export const ARMAS = Object.freeze([
   {
     id: 'bt',
@@ -231,6 +232,7 @@ export const ARMAS = Object.freeze([
  * Su `controladores` son SIEMPRE un subconjunto de ARMAS (validado por tests).
  * ──────────────────────────────────────────────────────────────────────── */
 
+/** @typedef {Object} Enemigo */
 /**
  * @typedef {Object} Enemigo
  * @property {string} id
@@ -244,6 +246,7 @@ export const ARMAS = Object.freeze([
  * @property {'grafo'|'cenicafe'|'ica-ciat'|'ecologia'} fuente Origen del par.
  */
 
+/** @type {Enemigo[]} */
 export const ENEMIGOS = Object.freeze([
   {
     id: 'cogollero',
@@ -410,6 +413,7 @@ export const ENEMIGOS = Object.freeze([
  * @property {string} amenaza           Categoría IUCN/sintética (referencia).
  */
 
+/** @type {Rehen[]} */
 export const REHENES = Object.freeze([
   {
     id: 'borugo',
@@ -474,6 +478,7 @@ export const REHENES = Object.freeze([
  * @property {string} fuente            Referencia documental (sin DOI inventado).
  */
 
+/** @type {Jefe[]} */
 export const JEFES = Object.freeze([
   {
     id: 'jefe_sequia',
@@ -528,6 +533,7 @@ export const JEFES = Object.freeze([
  * @property {string} intro        Línea de contexto para la pantalla de inicio.
  */
 
+/** @type {Nivel[]} */
 export const NIVELES = Object.freeze([
   {
     id: 'nivel_1',
