@@ -22,13 +22,17 @@
  */
 import { Suspense, lazy, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
+import { Html, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaEscena } from './useEntradaAbeja.jsx';
 import CamaraDirector from './CamaraDirector.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
 import { ESTADO_FINCA_MUESTRA } from './reaccionFinca.js';
 import useHaptics from '../useHaptics.js';
+import MonitorRendimiento, {
+  detectarTierInicial,
+  presupuestoDeTier,
+} from '../usePerformanceMonitor.jsx';
 /* La dirección de arte compartida (hora dorada + cielos por familia) vive en
    un módulo propio: los arquetipos eligen su CIELOS.<familia>, esta base la
    mezcla hacia ATMOSFERA. Una sola fuente, cero hexes sueltos. */
@@ -44,6 +48,8 @@ function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
   frugal = false, tier = 'alto', hablando = false, focoId = null, focoToken = 0,
   estadoFinca = ESTADO_FINCA_MUESTRA, hayAlerta = false, camaraInicial,
+  tierInicial = 'medio',
+  presupuestoInicial,
   children,
 }) {
   const controls = useRef(null);
@@ -92,6 +98,7 @@ function Contenido({
 
   return (
     <>
+      {!reducedMotion && <MonitorRendimiento key={tierInicial} tier={tierInicial} />}
       <color attach="background" args={[c.fondo]} />
       {/* Niebla sutil: profundidad atmosférica sin lavar el diorama (arranca
           detrás de él y se funde con la niebla dorada del valle). Se paga por
@@ -224,12 +231,11 @@ function Contenido({
         respiro={zoom * 0.005}
         activa={!reducedMotion && !frugal}
       />
-      <AdaptiveDpr pixelated />
       {/* Bloom SUTIL solo donde sobra GPU: tier alto sin reduced-motion. El
           gate es estricto a propósito (contrato de costo del DR de gama baja):
           medio/bajo no montan el pase NI descargan su chunk, y reduced-motion
           tampoco (su frameloop 'demand' no le debe un composer a nadie). */}
-      {tier === 'alto' && !reducedMotion && (
+      {presupuestoInicial.bloom && !reducedMotion && (
         <Suspense fallback={null}>
           <BloomSutil />
         </Suspense>
@@ -250,16 +256,18 @@ export default function EscenaBase3D({
   const [listo, setListo] = useState(false);
   const zoom = entrada?.zoom ?? 6.5;
   const cam = camara || { position: [zoom * 0.55, zoom * 0.5, zoom], fov: 42 };
+  const tierInicial = useMemo(() => detectarTierInicial({ tier, reducedMotion }), [tier, reducedMotion]);
+  const presupuestoInicial = useMemo(() => presupuestoDeTier(tierInicial), [tierInicial]);
   /* Device-tiering (DR-3D-PERF-GAMABAJA §2): el andamiaje ya es frugal por
      contrato (sin sombras, Lambert); lo que gradúa el tier son los píxeles
      (DPR/antialias) y, en el perfil mínimo, la niebla y las alfombras. */
-  const frugal = tier === 'bajo';
-  const dpr = tier === 'alto' ? [1, 1.5] : tier === 'medio' ? [1, 1.3] : 1;
+  const frugal = tierInicial === 'bajo';
+  const dpr = presupuestoInicial.dpr;
   return (
     <Canvas
       className={`mundo-canvas${listo ? ' mundo-canvas--listo' : ''}`}
       dpr={dpr}
-      gl={{ antialias: tier === 'alto', powerPreference: 'high-performance' }}
+      gl={{ antialias: tierInicial === 'alto', powerPreference: 'high-performance' }}
       camera={cam}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
@@ -284,6 +292,8 @@ export default function EscenaBase3D({
           estadoFinca={estadoFinca}
           hayAlerta={hayAlerta}
           camaraInicial={cam}
+          tierInicial={tierInicial}
+          presupuestoInicial={presupuestoInicial}
         >
           {children}
         </Contenido>

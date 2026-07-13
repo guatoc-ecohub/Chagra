@@ -26,11 +26,16 @@
 import { Suspense, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import {
-  Html, Float, Stars, OrbitControls, AdaptiveDpr, Detailed, Instances, Instance,
+  Html, Float, Stars, OrbitControls, Detailed, Instances, Instance,
 } from '@react-three/drei';
 import * as THREE from 'three';
 import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
 import CamaraDirector from '../../visual/mundo3d/escenas/CamaraDirector.jsx';
+import MonitorRendimiento, {
+  detectarTierInicial,
+  presupuestoDeTier,
+  useTierPerformance,
+} from '../../visual/mundo3d/usePerformanceMonitor.jsx';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 /* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
    mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
@@ -655,13 +660,18 @@ function CriaturaSvg({ tipo, size, animated }) {
   return <Lombriz size={size} animated={animated} />;
 }
 
-function CriaturasValle({ reducedMotion, cupo }) {
+function CriaturasValle({ reducedMotion, cupo, tier }) {
+  const rendimiento = useTierPerformance({ tier, reducedMotion });
+  const cupoVivo = Math.min(
+    cupo ?? rendimiento.presupuesto.maxCriaturasAmbientales,
+    rendimiento.presupuesto.maxCriaturasAmbientales,
+  );
   // Cada criatura es un <Html> (nodo DOM con matriz CSS por frame): en frugal
   // se siembran menos; en 'bajo' ninguna (el valle vive igual con los mundos).
-  if (!cupo) return null;
+  if (!cupoVivo) return null;
   return (
     <group>
-      {CRIATURAS_VALLE.slice(0, cupo).map((c, i) => {
+      {CRIATURAS_VALLE.slice(0, cupoVivo).map((c, i) => {
         const y = alturaTerreno(c.x, c.z) + c.dy;
         return (
           <group key={i} position={[c.x, y, c.z]}>
@@ -1060,6 +1070,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
 
   return (
     <>
+      {!reducedMotion && <MonitorRendimiento key={tier} tier={tier} />}
       <color attach="background" args={[c.cielo[1]]} />
       {/* La niebla se paga por fragmento: en perfil 'bajo' se apaga. */}
       {perfil.fog && <fog attach="fog" args={[c.niebla, 12, c.nieblaLejos + 8]} />}
@@ -1105,7 +1116,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         occluders={occluders}
       />
 
-      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} />
+      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} tier={tier} />
       <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
       <CompaneroAbeja
         foco={foco}
@@ -1138,7 +1149,6 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         activa={!reducedMotion && tier !== 'bajo'}
         unaVezClave="valle"
       />
-      <AdaptiveDpr pixelated />
     </>
   );
 }
@@ -1158,16 +1168,18 @@ export default function Valle3D({
   hayAlerta = false,
 }) {
   const [listo, setListo] = useState(false);
+  const tierInicial = useMemo(() => detectarTierInicial({ tier, reducedMotion }), [tier, reducedMotion]);
   /* El PERFIL DE RENDER del tier (DR-3D-PERF-GAMABAJA): 'alto' conserva este
      look intacto; 'medio'/'bajo' degradan sombras, DPR, antialias, densidad e
      instancian lo repetido. El default 'alto' preserva a los hosts viejos. */
-  const perfil = useMemo(() => perfilDeTier(tier), [tier]);
+  const perfil = useMemo(() => perfilDeTier(tierInicial), [tierInicial]);
+  const presupuesto = useMemo(() => presupuestoDeTier(tierInicial), [tierInicial]);
   return (
     <Canvas
       className={`valle-canvas${listo ? ' valle-canvas--listo' : ''}`}
       shadows={perfil.sombras}
-      dpr={perfil.dpr}
-      gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
+      dpr={presupuesto.dpr}
+      gl={{ antialias: tierInicial === 'alto', powerPreference: 'high-performance' }}
       camera={CAMARA_VALLE}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
@@ -1184,7 +1196,7 @@ export default function Valle3D({
           onAlerta={onAlerta}
           reducedMotion={reducedMotion}
           perfil={perfil}
-          tier={tier}
+          tier={tierInicial}
         />
       </Suspense>
     </Canvas>
