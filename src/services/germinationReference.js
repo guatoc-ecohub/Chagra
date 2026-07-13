@@ -95,7 +95,7 @@ export function getGerminationReference(slug) {
   const t = getTemplate(slug);
   if (!t) return null;
   // Resolver al slug base para validar contra la lista de semilla verdadera.
-  const baseSlug = t.derived_from || t.species_slug;
+  const baseSlug = /** @type {any} */ (t).derived_from || t.species_slug;
   if (!SEED_SOWN_SLUGS.has(baseSlug)) return null;
   const range = emergenceRange(t);
   if (!range) return null;

@@ -80,7 +80,7 @@ export function construirContacto(oferta) {
  * banda de precios, la plaza, y la cita resuelta a deep-link (SIPSA/DANE).
  *
  * @param {string} producto — nombre del producto.
- * @returns {{ disponible:boolean, banda?:string, mercado?:string,
+ * @returns {{ disponible:boolean, producto?:string, banda?:string, mercado?:string,
  *   fuente?:string, fuenteUrl?:string, boletinFecha?:string }}
  */
 export function resolverPrecioReferencia(producto) {
@@ -165,7 +165,7 @@ export function validarOferta(form) {
       errors.precio = 'El precio debe ser un número válido';
     }
   }
-  return { ok: Object.keys(errors).length === 0, errors };
+  return { ok: Object.keys(errors).length === 0, errors: /** @type {Record<string,string>} */ (/** @type {unknown} */ (errors)) };
 }
 
 /**

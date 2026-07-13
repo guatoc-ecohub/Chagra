@@ -218,7 +218,7 @@ function nextSequenceNumber() {
  * @returns {Promise<object>} log entry validado, listo para persistir
  */
 export async function createInventoryEvent(eventType, payload, opts = {}) {
-  if (!VALID_EVENT_TYPES.has(eventType)) {
+  if (!VALID_EVENT_TYPES.has(/** @type {'inventory_received'|'inventory_consumed'|'inventory_transformed'|'inventory_counted'|'inventory_adjusted'|'inventory_transferred'|'inventory_lost'|'inventory_produced'} */ (eventType))) {
     throw new ValidationError('eventType', 'one of EVENT_TYPES', eventType);
   }
   if (!opts.operator_id_hash) {

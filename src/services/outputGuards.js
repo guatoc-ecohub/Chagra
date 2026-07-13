@@ -9375,7 +9375,7 @@ export function guardConciseResponse(responseText) {
     // Deduplicar: mantener primera mención de cada recomendación
     const seen = new Set();
     const deduped = sentences.filter(s => {
-      const key = /** @type {string} */ (s.trim().toLowerCase().slice(0, 60));
+      const key = /** @type {string} */ (/** @type {any} */ (s).trim().toLowerCase().slice(0, 60));
       if (seen.has(key)) return false;
       seen.add(key);
       return true;

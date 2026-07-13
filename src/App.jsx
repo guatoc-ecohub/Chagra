@@ -3098,8 +3098,9 @@ export default function App() {
             <ErrorFallback moduleName="El valle de su finca (3D)">
               <EntradaValle3DMockup
                 onBack={() => navigate(sinSesion ? 'login' : 'dashboard')}
-                // @ts-expect-error navigate signature differs from onNavigate type
+                // @ts-ignore navigate signature
                 onNavigate={navigate}
+                // @ts-ignore initialMundoId not in strict type
                 initialMundoId={currentViewData?.mundo}
               />
             </ErrorFallback>

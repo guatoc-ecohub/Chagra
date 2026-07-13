@@ -308,7 +308,8 @@ export function nextStageId(stageId) {
  *   siguienteEtapaId: string|null,
  * }}
  */
-export function siguientePaso({ stageId, accionesHechas = [] } = {}, contexto = 'finca_diversificada') {
+export function siguientePaso(opts = /** @type {any} */ ({}), contexto = 'finca_diversificada') {
+  const { stageId, accionesHechas = [] } = opts;
   const etapa = getStage(stageId);
   if (!etapa) {
     return { etapa: null, variacion: null, siguientesAcciones: [], listoParaAvanzar: false, siguienteEtapaId: null };

@@ -138,7 +138,7 @@ export const EvidenceCapture = ({
       // que excedan su bodyLimit.
       const preCompressed = await compressImage(file);
       if (!preCompressed.ok) {
-        if (preCompressed.reason === 'too_large') {
+        if (/** @type {any} */ (preCompressed).reason === 'too_large') {
           window.dispatchEvent(new CustomEvent('chagraToast', {
             detail: { message: IMAGE_TOO_LARGE_MESSAGE },
           }));

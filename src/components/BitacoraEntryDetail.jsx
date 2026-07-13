@@ -195,7 +195,7 @@ export default function BitacoraEntryDetail({ entry, onBack, onEdit }) {
         );
         return;
       }
-      const { blob } = await captureAndCompress(/** @type {Blob} */ (/** @type {any} */ (preCompressed).blob));
+      const { blob } = await captureAndCompress(/** @type {File} */ (/** @type {any} */ (preCompressed).blob));
       const result = await attachPhotoToLog(entry.id, blob);
       if (result?.success === false) {
         setPhotoState('error');

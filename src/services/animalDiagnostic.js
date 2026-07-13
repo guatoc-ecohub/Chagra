@@ -40,8 +40,8 @@ export function detectarEspecie(descripcion) {
   for (const [clave, senal] of senales) {
     const palabras = clave.split('_');
     if (palabras.every((p) => texto.includes(p))) {
-      const especie = ANIMAL_DATA.especies.find((e) => e.id === senal.especie);
-      return especie ? { ...especie, funcion_detectada: senal.funcion || especie.funcion } : null;
+      const especie = ANIMAL_DATA.especies.find((e) => e.id === /** @type {any} */ (senal).especie);
+      return especie ? { ...especie, funcion_detectada: /** @type {any} */ (senal).funcion || especie.funcion } : null;
     }
   }
   return null;

@@ -155,12 +155,12 @@ function buscarMundo3D(tokens, permiteDestinoDirecto) {
 }
 
 function rutaMundo3D(mundo) {
-  return {
+  return /** @type {{tipo:'navegar', view:string, initialData?:any, etiqueta:string}} */ ({
     tipo: 'navegar',
     view: 'valle3d',
     initialData: { mundo: mundo.id },
     etiqueta: mundo.etiqueta,
-  };
+  });
 }
 
 /**

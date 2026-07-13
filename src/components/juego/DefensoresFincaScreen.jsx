@@ -1156,7 +1156,7 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
   useEffect(() => { recordGameStart('defensores'); }, []);
   const [superados, setSuperados] = useState(() => leerSuperados());
   const [nivelNum, setNivelNum] = useState(1);
-  const nivel = useMemo(() => getNivel(nivelNum), [nivelNum]);
+  const nivel = /** @type {any} */ (useMemo(() => getNivel(nivelNum), [nivelNum]));
 
   const handleGanar = useCallback((numero) => {
     setSuperados(guardarSuperado(numero));

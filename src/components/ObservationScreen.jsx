@@ -41,7 +41,8 @@ function ObservationScreen({ onBack, onSave }) {
     description: '',
     locationId: '',
     plantId: '',
-    severity: 'info'
+    severity: 'info',
+    notes: '',
   });
   const [photo, setPhoto] = useState(null);
   const [photoUrl, setPhotoUrl] = useState(null);
@@ -262,6 +263,7 @@ function ObservationScreen({ onBack, onSave }) {
           locationId: '',
           plantId: '',
           severity: 'info',
+          notes: '',
         });
         setPhoto(null);
         if (photoUrl) URL.revokeObjectURL(photoUrl);
@@ -276,7 +278,8 @@ function ObservationScreen({ onBack, onSave }) {
         description: '',
         locationId: '',
         plantId: '',
-        severity: 'info'
+        severity: 'info',
+        notes: '',
       });
       setPhoto(null);
       setPhotoUrl(null);

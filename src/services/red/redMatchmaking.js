@@ -72,7 +72,7 @@ export function findCompetentPeers(problema, contexto) {
     if (!rep || typeof rep !== 'object') continue;
     if (rep.productoNorm !== productoNorm) continue;
     if (excludeHash && rep.productorHash === excludeHash) continue;
-    const competente = NIVELES_COMPETENTES.has(rep.nivel)
+    const competente = NIVELES_COMPETENTES.has(/** @type {string} */ (String(rep.nivel)))
       || (allowNuevo && rep.nivel === NIVEL_REPUTACION.NUEVO);
     if (!competente) continue;
 
@@ -102,10 +102,11 @@ export function findCompetentPeers(problema, contexto) {
  * en usted, cálido y directo, SIN revelar la identidad del par a quien
  * pregunta y sin datos sensibles. Best-effort con el síntoma si viene.
  *
- * @param {{producto:string, vereda?:string, sintoma?:string}} params
+ * @param {object} opts
  * @returns {string}
  */
-export function buildMensajeVecino({ producto = '', vereda = '', sintoma = '' } = {}) {
+export function buildMensajeVecino(opts = /** @type {any} */ ({})) {
+  const { producto = '', vereda = '', sintoma = '' } = opts;
   const cultivo = String(producto || 'este cultivo').trim();
   const lugar = String(vereda || '').trim();
   const problema = String(sintoma || '').trim();

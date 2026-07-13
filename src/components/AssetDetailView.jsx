@@ -667,7 +667,7 @@ const CategoryBreakdown = ({ byCategory }) => {
  * Expone el modal de "cementerio" para marcar assets como inactivos y un
  * botón de cierre que limpia la selección activa vía `clearSelectedAsset`.
  *
- * @returns {JSX.Element|null} Retorna null si no hay `selectedAssetId` en el store.
+ * @returns {React.ReactNode|null} Retorna null si no hay `selectedAssetId` en el store.
  */
 export const AssetDetailView = () => {
   const selectedAssetId = useAssetStore((s) => s.selectedAssetId);

@@ -68,7 +68,7 @@ export default function AgentAvatarSelector() {
                                     <Check size={12} strokeWidth={3} aria-hidden="true" />
                                 </span>
                             )}
-                            <opt.Component state={selected ? 'thinking' : 'idle'} size={60} />
+                            <opt.Component state={selected ? 'thinking' : 'idle'} size={60} onDoubleClick={() => {}} ariaLabel={opt.label} />
                             <div className="text-center">
                                 <p className="text-xs sm:text-sm font-bold text-slate-100 leading-tight">{opt.label}</p>
                                 <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">{opt.sub}</p>

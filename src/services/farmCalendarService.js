@@ -1,5 +1,5 @@
 /**
- * farmCalendarService — agrega en UN SOLO calendario, por planta de la finca (o
+ * farmCalendarService  --  agrega en UN SOLO calendario, por planta de la finca (o
  * por especie del catálogo si no hay finca), las tareas y fases que ya viven
  * dispersas en el repo:
  *
@@ -116,9 +116,9 @@ function windowToMonths(start, end, now) {
  *
  * @param {Object} cfg
  * @param {string} cfg.speciesSlug
- * @param {number} cfg.sowingDate — ts ms (día 0)
+ * @param {number} cfg.sowingDate  --  ts ms (día 0)
  * @param {number|null} cfg.altitudeM
- * @param {Object|null} cfg.template — plantilla explícita (catálogo) ya normalizada o cruda
+ * @param {Object|null} cfg.template  --  plantilla explícita (catálogo) ya normalizada o cruda
  * @param {string|null} cfg.category
  * @param {number} cfg.now
  * @returns {{ entries: CalendarEntry[], isGeneric: boolean, hasData: boolean }}
@@ -191,8 +191,8 @@ function buildAnnualEntries({ speciesSlug, sowingDate, altitudeM, template, cate
  * reescriben recetas ni dosis aquí: se muestra lo que el template ya trae.
  *
  * @param {Object} cfg
- * @param {Object|null} cfg.species — entrada del catálogo
- * @param {number|null} cfg.sowingDate — ts ms (null si no hay ciclo)
+ * @param {Object|null} cfg.species  --  entrada del catálogo
+ * @param {number|null} cfg.sowingDate  --  ts ms (null si no hay ciclo)
  * @param {number} cfg.now
  * @returns {CalendarEntry[]}
  */
@@ -310,27 +310,27 @@ function buildPerennialEntries({ speciesId, plantingDate, now }) {
  * @property {'siembra'|'fenologia'|'nutricion'|'sanidad'|'cosecha'} layer
  * @property {string} title
  * @property {string} detail
- * @property {number[]} months — meses 1-12 que toca la entrada
- * @property {number|null} [windowStart] — ts ms inicio de ventana
- * @property {number|null} [windowEnd] — ts ms fin de ventana
- * @property {boolean} approximate — el dato es aproximado (genérico / sin anclar)
- * @property {number} confidence — 0-1
- * @property {string} source — procedencia real del dato
- * @property {string} [stageCode] — código de la etapa fenológica asociada
- * @property {boolean} [continuous] — indica cosecha continua (perennes)
+ * @property {number[]} months  --  meses 1-12 que toca la entrada
+ * @property {number|null} [windowStart]  --  ts ms inicio de ventana
+ * @property {number|null} [windowEnd]  --  ts ms fin de ventana
+ * @property {boolean} approximate  --  el dato es aproximado (genérico / sin anclar)
+ * @property {number} confidence  --  0-1
+ * @property {string} source  --  procedencia real del dato
+ * @property {string} [stageCode]  --  código de la etapa fenológica asociada
+ * @property {boolean} [continuous]  --  indica cosecha continua (perennes)
  */
 
 /**
  * @typedef {Object} PlantCalendar
- * @property {string} id — id estable de la planta/ciclo
- * @property {string} name — nombre legible (común)
- * @property {string} speciesSlug — slug canónico de la especie
+ * @property {string} id  --  id estable de la planta/ciclo
+ * @property {string} name  --  nombre legible (común)
+ * @property {string} speciesSlug  --  slug canónico de la especie
  * @property {'annual'|'perennial'|'no_data'} kind
  * @property {'ok'|'no_data'} status
- * @property {boolean} isGeneric — el calendario usa plantilla genérica por tipo
+ * @property {boolean} isGeneric  --  el calendario usa plantilla genérica por tipo
  * @property {boolean} hasSowingDate
  * @property {CalendarEntry[]} entries
- * @property {Object|null} perennial — resolución perenne (si aplica)
+ * @property {Object|null} perennial  --  resolución perenne (si aplica)
  * @property {number} [count] - cuántas matas equivalentes representa esta fila
  *   (agrupación de entradas repetidas; badge "×N"). Se asigna después de construir
  *   el calendario, no es parte del cálculo fenológico.
@@ -342,9 +342,9 @@ function buildPerennialEntries({ speciesId, plantingDate, now }) {
  * @param {Object} cfg
  * @param {string} cfg.id
  * @param {string} cfg.name
- * @param {string} cfg.speciesSlug — slug canónico (id de catálogo)
- * @param {Object|null} cfg.species — entrada del catálogo (para categoría/familia/plan)
- * @param {number|null} cfg.sowingDate — ts ms de la siembra (null si no hay ciclo)
+ * @param {string} cfg.speciesSlug  --  slug canónico (id de catálogo)
+ * @param {Object|null} cfg.species  --  entrada del catálogo (para categoría/familia/plan)
+ * @param {number|null} cfg.sowingDate  --  ts ms de la siembra (null si no hay ciclo)
  * @param {number|null} cfg.altitudeM
  * @param {number} [cfg.now]
  * @returns {PlantCalendar}
@@ -458,7 +458,7 @@ export function aggregateMonthlyMatrix(plants, activeLayers = null) {
  * ordenadas por la prioridad de capa (CALENDAR_LAYERS).
  *
  * @param {PlantCalendar} plant
- * @param {number} month — 1-12
+ * @param {number} month  --  1-12
  * @param {Set<string>|null} [activeLayers]
  * @returns {CalendarEntry[]}
  */

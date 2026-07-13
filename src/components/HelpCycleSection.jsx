@@ -162,7 +162,7 @@ export default function HelpCycleSection() {
                         </div>
                       )}
                       <div className="rounded-lg bg-slate-950/60 border border-emerald-900/30 overflow-hidden">
-                        <CycleContentRenderer slug={c.slug} />
+                        <CycleContentRenderer slug={c.slug} onClose={() => {}} />
                       </div>
                       <HelpVoiceQuestion speciesSlug={c.slug} />
                     </>

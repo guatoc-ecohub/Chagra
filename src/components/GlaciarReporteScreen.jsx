@@ -536,6 +536,7 @@ export default function GlaciarReporteScreen({ onBack, onVerHistorial = null }) 
               value={form.distanciaBordeHieloM}
               onChange={(v) => setField('distanciaBordeHieloM', v)}
               placeholder="ej. 12 (desde un hito fijo)"
+              icon={null}
             />
           </Section>
 

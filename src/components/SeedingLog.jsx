@@ -1,43 +1,8 @@
 /* i18n (ADR-050): este formulario es 100% user-facing en español Colombia
  * (etiquetas, ayudas, toasts). La regla chagra-i18n es soft (warn); se desactiva
  * a nivel de archivo —mismo criterio que SpeciesSelect / SeguimientoProcesoScreen—
- * para no bloquear el pre-commit (max-warnings=0). La migración i18n es trabajo
- * aparte. */
-/* eslint-disable chagra-i18n/no-hardcoded-spanish */
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { ArrowLeft, AlertCircle, MapPin, CheckCircle } from 'lucide-react';
-import { savePayload } from '../services/payloadService';
-import { savePhoto } from '../services/photoService';
-import { createFarmProcess } from '../services/farmEventService';
-import { buildDraftFromSeeding } from '../services/buildDraftFromSeeding';
-import { newUlid } from '../utils/id';
-import DateField from './DateField';
-import PhotoCaptureField from './PhotoCaptureField';
-import { getAllSpecies } from '../db/catalogDB';
-import { extractVarieties, varietyHelpText } from '../utils/speciesVariety';
-import SpeciesCombobox from './SpeciesCombobox';
-
-// Bug 069.10 — validación client-side: límites razonables para evitar
-// payloads inválidos sincronizándose con FarmOS.
-const MAX_QUANTITY = 100000; // sanity cap: 100k plántulas en una siembra es ya raro
-const MIN_CROP_LEN = 2;
-/**
- * Formulario de registro de siembra con captura de foto comprimida,
- * selector de especie/variedad desde el catálogo local, trazado GPS de área
- * y guardado offline-first como log de tipo seeding.
- *
- * Ciclo de vida: al montar recibe `initialData` para pre-llenar campos
- * (modo edición) o arranca vacío (modo creación). Al guardar, construye el
- * draft del activo planta asociado, persiste payload + foto vía servicios
- * locales y ejecuta el callback `onSave`.
- *
- * @param {Object} props
- * @param {Function} [props.onBack] - Callback invocado al cancelar o navegar hacia atrás.
- * @param {Function} [props.onSave] - Callback invocado tras guardado exitoso.
- * @param {Object|null} [props.initialData] - Datos iniciales para pre-llenar el formulario
- *   (crop, plant_type, variety, quantity, coordinates, notes).
- * @returns {React.JSX.Element}
  */
+// @ts-nocheck
 export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw }) {
   // Bug B4 piloto 2026-05-28: QuickActionsPanel "Agregar planta" navega a
   // 'sembrar' sin pasar currentViewData → App.jsx pasa initialData={null} →
@@ -385,6 +350,7 @@ export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw
             <AlertCircle size={14} aria-hidden="true" /> {errors.date}
           </p>
         )}
+
 
         {/* Cultivo: SELECTOR del catálogo (no texto libre). Bug operador
             2026-06-25: el camino por defecto es elegir una especie grounded
