@@ -24,6 +24,7 @@ calidad dispar. Aquí vive la **versión canónica** de cada uno.
 | `Colibri` | *Colibri coruscans* | Colibrí chillón andino. Pico largo, garganta violeta, alas que baten. **Rubber-hose** (adoptado). |
 | `OsoAndino` | *Tremarctos ornatus* | Oso de anteojos, guardián del páramo. Mole parda con **anteojos crema** (su firma). De suelo, se sienta. Rubber-hose. |
 | `RanaAndina` | *Atelopus* spp. | Rana arlequín del páramo. Verde húmedo con manchas ocre, vientre dorado, ojos saltones y bocota. Rubber-hose. |
+| `Jaguar` | *Panthera onca* | Felino de tierra cálida. Leonado con **rosetas** (manchas de centro ocre — su firma), musculoso, mirada felina ámbar. Majestuoso y **acechador**: acecho de hombros, cola pesada, rugido. Aura **púrpura**. Rubber-hose. |
 | `Lombriz` | *Martiodrilus crassus* | Lombriz gigante nativa. Cuerpo segmentado con clitelo. Sin animación propia (su movimiento lo da la escena). |
 | `Mariposa` | *Dione juno* | Pasionaria de alas largas. Cuatro alas que abren y cierran. |
 | `Escarabajo` | *Dichotomius belus* | Estercolero colombiano. Élitros brillantes, cuerno, y bola de abono que rueda. |
@@ -91,7 +92,7 @@ que **el oso andino y el colibrí lo hereden sin redibujar**:
 estados reactivos. Standalone (avatares/catálogo) sin `tier` = rubber-hose pleno.
 
 **Estrenado por**: `AbejaAngelita` (referencia de composición del KIT).
-**Ya adoptado por**: `OsoAndino`, `Colibri` y `RanaAndina` — componen las mismas
+**Ya adoptado por**: `OsoAndino`, `Colibri`, `RanaAndina` y `Jaguar` — componen las mismas
 piezas + clases `rh-*` con SUS proporciones (identidad en `faunaAndina.js`), y
 heredan los gestos species-agnostic (`rh-g-celebra` / `rh-g-reposo` /
 `rh-g-senala`) solo con `data-pose`. No se reinventa la cadencia.
@@ -104,7 +105,12 @@ dorada la abeja, **roja** el oso), la **ropa por clima+hora** (`vestuario` →
 (`mundoId` → `PropEnMano`) y el **line-boil** (`lineBoil`). El oso suma su
 CARÁCTER de mole seria: boil más lento y pesado, cejas de ceño, gruñido
 (`resopla` → vaho) y rascado (`rasca`) — todo aditivo en `creatures.css`, RM +
-tier-safe. Los demás bichos heredan la misma fundación pasando sus parámetros.
+tier-safe. El **`Jaguar`** hace lo propio con su carácter de felino ACECHADOR:
+boil controlado y elegante, **acecho de hombros** (los omóplatos suben —
+`.jaguar-hombros`), **cola** que ondea con peso, **cejas fieras**, **rugido**
+corporal (`ruge` → fauces con colmillos) y modo **acecho** (`acecha` → cabeza
+baja + creep agazapado); su aura de poder es **púrpura**. Los demás bichos
+heredan la misma fundación pasando sus parámetros.
 
 ## Técnica
 
