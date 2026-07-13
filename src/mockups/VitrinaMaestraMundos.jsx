@@ -1159,9 +1159,9 @@ function Terrazas() {
   return (
     <group>
       {[
-        { r: 11.5, y: 1.4, color: mezclar(PALETA.follaje, CIELO.alfombra, 0.3) },
-        { r: 13.2, y: 2.6, color: mezclar(PALETA.follajeClaro, CIELO.alfombra, 0.4) },
-        { r: 14.9, y: 3.8, color: mezclar(PALETA.follajeOscuro, CIELO.alfombra, 0.35) },
+        { r: 11.5, y: 0.9, color: mezclar(mezclar(PALETA.follaje, CIELO.alfombra, 0.3), CIELO.fondo, 0.3) },
+        { r: 13.2, y: 1.7, color: mezclar(mezclar(PALETA.follajeClaro, CIELO.alfombra, 0.4), CIELO.fondo, 0.4) },
+        { r: 14.9, y: 2.5, color: mezclar(mezclar(PALETA.follajeOscuro, CIELO.alfombra, 0.35), CIELO.fondo, 0.5) },
       ].map((t, i) => (
         <mesh key={i} position={[0, t.y - 0.9, -8]}>
           <cylinderGeometry args={[t.r, t.r + 1.6, 1.8, 26, 1, true, Math.PI / 2, Math.PI]} />
@@ -1438,7 +1438,9 @@ function GaleriaVitrina({ elegidoId, interactivo, tier, reducedMotion, onElegir,
       <fog attach="fog" args={[CIELO.niebla, 17, 46]} />
       <hemisphereLight args={[CIELO.cielo, CIELO.suelo, 0.95 * CIELO.intensidad]} />
       <directionalLight position={[7, 8, -6]} intensity={1.15} color={ATMOSFERA.luz} />
-      <directionalLight position={[-5, 4, 6]} intensity={0.24} color={ATMOSFERA.relleno} />
+      {/* relleno frontal generoso: las caras que miran a la cámara (terrazas,
+          gargantas) no pueden caer a negro bajo el sol de atrás */}
+      <directionalLight position={[-5, 4, 10]} intensity={0.5} color={ATMOSFERA.relleno} />
 
       {/* el cielo de la tarde: sol bajo + nubes lentas */}
       <CieloDorado />
