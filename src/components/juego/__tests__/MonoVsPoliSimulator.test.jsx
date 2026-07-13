@@ -63,7 +63,7 @@ describe('MonoVsPoliSimulator', () => {
       },
     ];
 
-    render(<MonoVsPoliSimulator data={data} />);
+    render(<MonoVsPoliSimulator data={/** @type {any} */ (data)} />);
 
     const card = screen.getByTestId('asociacion-prueba');
     expect(within(card).getByText('1,25 LER')).toBeInTheDocument();

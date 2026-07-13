@@ -142,6 +142,7 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
     setView(ST.SAVING);
     try {
       const { saveType, payload } = buildVoicePayload(edited, ctx);
+      // @ts-ignore saveType is string union from buildVoicePayload
       const result = await savePayload(saveType, payload);
       const offline = !result.success || (result.message || '').toLowerCase().includes('local');
       if (result.success || offline) {
@@ -239,7 +240,7 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
 
         {view === ST.RECORDING && (
           <div className="flex flex-col items-center gap-4 py-10 px-4">
-            <Sparkline values={amplitudeHistory} color="#f87171" width={240} height={48} showLastValue={false} />
+            <Sparkline values={amplitudeHistory} data={null} color="#f87171" width={240} height={48} showLastValue={false} />
             <div className="tabular-nums text-3xl font-mono text-red-400">
               {fmt(durationMs)} <span className="text-slate-500 text-sm">/ {fmt(hardLimitMs || 30000)}</span>
             </div>

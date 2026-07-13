@@ -235,3 +235,132 @@ export function pathVasija(tipo = 'olla', { cx = 0, cy = 0, alto = 60 } = {}) {
 
 /** Claves de perfil disponibles, en orden canónico. */
 export const VASIJA_TIPOS = Object.keys(PERFILES_VASIJA);
+
+// ── PROPORCIÓN ÁUREA ANDINA (el porqué de que una silueta "se sienta" andina) ─
+// No basta con revolucionar cualquier curva: la identidad está en las RAZONES.
+// La cerámica y el tejido andinos comparten un ritmo — base ANCHA y asentada,
+// hombro MARCADO alto (el punto más ancho no está al medio, está arriba del
+// tercio áureo), cintura que ENTRA, y remate corto. Estas razones (fracciones
+// de la altura total y del radio máximo) son las que separan una vasija con
+// carácter de un cilindro genérico. Úselas para curar perfiles a mano o para
+// leer un perfil ("¿su hombro cae en el tercio áureo?").
+export const PHI = 1.618033988749895; // razón áurea — el hombro vive cerca de 1/phi
+export const PROPORCION_ANDINA = {
+  phi: PHI,
+  hombroY: 0.62, // altura del hombro (punto más ancho): tercio áureo alto, no el medio
+  cinturaY: 0.4, // altura del estrechamiento (la cintura que respira)
+  cuelloY: 0.82, // altura del cuello/remate
+  baseR: 0.62, // radio de la base respecto al hombro: ancha y asentada (nunca puntuda)
+  cinturaR: 0.58, // cuánto entra la cintura respecto al hombro (< 1 = sí entra)
+  cuelloR: 0.5, // radio del cuello respecto al hombro (el remate cierra)
+};
+
+// ── SILUETAS ANDINAS (una fuente de forma para 2D y 3D) ────────────────────
+// Pares [radio, y] normalizados (y ∈ 0..1 de base a remate; radio relativo al
+// alto). MISMA convención que PERFILES_VASIJA: pocos puntos A PROPÓSITO (el
+// facetado ES el low-poly), y la misma tabla alimenta `LatheGeometry` en 3D y
+// `pathSilueta` en 2D — la silueta jamás diverge entre dimensiones. Cinco formas
+// del oficio andino, TODAS geometría abstracta (sin iconografía sagrada):
+//   · vasija  : la cerámica canónica — base ancha, hombro marcado, cuello, labio.
+//   · mojon   : el mojón de lindero / apilado de piedras — troncocónico achatado,
+//               asentado, con su piedra de remate redonda.
+//   · telar   : el huso/bobina del telar — doble cono simétrico, vientre lleno.
+//   · terraza : el andén agrícola — plataformas escalonadas que suben angostando.
+//   · totem   : el poste tallado por segmentos — hombros y cinturas apilados.
+export const SILUETAS_ANDINAS = {
+  vasija: [
+    [0, 0], [0.3, 0], [0.44, 0.06], [0.52, 0.2], [0.55, 0.4],
+    [0.47, 0.58], [0.32, 0.7], [0.25, 0.78], [0.29, 0.88], [0.35, 0.96], [0.31, 1],
+  ],
+  mojon: [
+    [0, 0], [0.48, 0], [0.5, 0.08], [0.45, 0.3], [0.39, 0.52], [0.33, 0.7],
+    [0.37, 0.8], [0.41, 0.88], [0.34, 0.96], [0.2, 1], [0, 1.02],
+  ],
+  telar: [
+    [0, 0], [0.1, 0.02], [0.17, 0.12], [0.35, 0.34], [0.41, 0.5],
+    [0.35, 0.66], [0.17, 0.88], [0.1, 0.98], [0, 1],
+  ],
+  terraza: [
+    [0, 0], [0.56, 0], [0.56, 0.1], [0.48, 0.12], [0.48, 0.3], [0.4, 0.32],
+    [0.4, 0.52], [0.32, 0.54], [0.32, 0.74], [0.24, 0.76], [0.24, 0.94], [0.15, 0.96], [0, 1],
+  ],
+  totem: [
+    [0, 0], [0.34, 0], [0.39, 0.08], [0.3, 0.16], [0.41, 0.28], [0.32, 0.38],
+    [0.43, 0.52], [0.31, 0.62], [0.38, 0.74], [0.28, 0.82], [0.34, 0.92], [0.3, 0.98], [0.18, 1], [0, 1.02],
+  ],
+};
+
+/** Claves de silueta en orden canónico (para UIs de selección y tests). */
+export const SILUETA_NOMBRES = Object.keys(SILUETAS_ANDINAS);
+
+// Metadatos de cada silueta: etiqueta y nota EN USTED (para botones/tooltips) y
+// el tinte sugerido (clave de PALETA_ANDINA). Contenido de identidad, aquí para
+// que 2D y 3D nombren la pieza IGUAL.
+export const SILUETA_INFO = {
+  vasija: { etiqueta: 'la vasija', nota: 'Base ancha, hombro marcado y cuello: la cerámica que carga sin volcarse.', tinte: 'terracota' },
+  mojon: { etiqueta: 'el mojón', nota: 'Piedra de lindero apilada y asentada, con su remate redondo.', tinte: 'roca' },
+  telar: { etiqueta: 'el telar', nota: 'El huso del tejido: doble cono de vientre lleno que gira parejo.', tinte: 'maiz' },
+  terraza: { etiqueta: 'la terraza', nota: 'El andén que sube escalonado, angostando hacia la cima.', tinte: 'paramo' },
+  totem: { etiqueta: 'el tótem', nota: 'Poste de segmentos: hombros y cinturas apilados con ritmo.', tinte: 'cochinilla' },
+};
+
+/* Roca no vive en PALETA_ANDINA (es tinte de piedra, no de fibra); se resuelve
+   aquí para que SILUETA_INFO.mojon no quede colgado. Gris pardo cálido. */
+const TINTE_SILUETA = { ...PALETA_ANDINA, roca: '#9a8b74' };
+
+/** El color de una silueta por su clave de tinte (fallback: terracota). */
+export function tinteDeSilueta(nombre) {
+  const info = SILUETA_INFO[nombre] || SILUETA_INFO.vasija;
+  return TINTE_SILUETA[info.tinte] || PALETA_ANDINA.terracota;
+}
+
+/** Segmentos radiales del lathe de silueta: pocos = facetado cálido (el look). */
+export const SEGMENTOS_SILUETA = 12;
+
+/**
+ * El PERFIL GENÉRICO equivalente a una silueta: el cilindro crudo que apenas
+ * envuelve la misma pieza (mismo radio máximo, misma altura), SIN hombro, sin
+ * cintura, sin remate. Es el "ANTES" honesto del antes/después — no un objeto
+ * distinto, sino la misma forma despojada de carácter. Determinista y puro.
+ * @param {Array<[number, number]>} perfil pares [radio, y] normalizados
+ * @returns {Array<[number, number]>} cilindro [[0,0],[rmax,0],[rmax,1],[0,1]]
+ */
+export function perfilGenericoDe(perfil) {
+  const rmax = perfil.reduce((m, [r]) => Math.max(m, r), 0);
+  return [[0, 0], [rmax, 0], [rmax, 1], [0, 1]];
+}
+
+/**
+ * Escala un perfil normalizado a puntos de mundo LISTOS para revolucionar:
+ * devuelve pares `[r, y]` (r = distancia al eje, y = altura) que el consumidor
+ * mapea a `THREE.Vector2` para `<latheGeometry args={[pts, SEGMENTOS_SILUETA]}/>`.
+ * Se queda three-free A PROPÓSITO (contrato del módulo): el chunk de three solo
+ * lo paga la escena 3D, no las láminas 2D que importan la paleta.
+ * @param {keyof typeof SILUETAS_ANDINAS} nombre clave de silueta
+ * @param {{ alto?: number, radio?: number, generico?: boolean }} [opts]
+ *   `alto` escala vertical (default 1); `radio` escala radial (default = alto);
+ *   `generico` true → usa el cilindro despojado (para el antes/después).
+ * @returns {Array<[number, number]>} puntos [r, y] escalados
+ */
+export function puntosSilueta(nombre, { alto = 1, radio, generico = false } = {}) {
+  const base = SILUETAS_ANDINAS[nombre] || SILUETAS_ANDINAS.vasija;
+  const perfil = generico ? perfilGenericoDe(base) : base;
+  const rr = radio ?? alto;
+  return perfil.map(([r, y]) => [r * rr, y * alto]);
+}
+
+/**
+ * Silueta 2D de cualquier forma andina desde el MISMO perfil del lathe: path
+ * cerrado facetado (lado derecho + espejo izquierdo), gemelo de `pathVasija`
+ * para las siluetas grandes. `base` es el apoyo (cx, cy en SVG, y hacia abajo).
+ * @param {keyof typeof SILUETAS_ANDINAS} nombre
+ * @param {{ cx?: number, cy?: number, alto?: number, generico?: boolean }} [opts]
+ * @returns {string} `d` de path SVG cerrado
+ */
+export function pathSilueta(nombre, { cx = 0, cy = 0, alto = 80, generico = false } = {}) {
+  const pts = puntosSilueta(nombre, { alto, generico });
+  const derecha = pts.map(([r, y]) => [cx + r, cy - y]);
+  const izquierda = [...pts].reverse().map(([r, y]) => [cx - r, cy - y]);
+  const todos = [...derecha, ...izquierda];
+  return `M ${todos.map(([px, py]) => `${px.toFixed(2)} ${py.toFixed(2)}`).join(' L ')} Z`;
+}

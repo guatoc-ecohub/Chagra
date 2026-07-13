@@ -64,11 +64,11 @@ describe('BackgroundSelector smoke', () => {
     // La imagen principal de la vista ampliada tiene alt = opt.label
     const previewImg = dialog.querySelector('img[alt="Colibrí tech"]');
     expect(previewImg).toBeInTheDocument();
-    expect(previewImg.src).toBeTruthy();
-    expect(previewImg.src).not.toBe('');
+    expect(/** @type {HTMLImageElement} */ (previewImg).src).toBeTruthy();
+    expect(/** @type {HTMLImageElement} */ (previewImg).src).not.toBe('');
     // imagen COMPLETA, sin recorte: object-fit:contain (rediseño aprobado,
     // reemplaza el borde eléctrico cónico que la tapaba — #1261).
-    expect(previewImg.style.objectFit).toBe('contain');
+    expect(/** @type {HTMLElement} */ (previewImg).style.objectFit).toBe('contain');
   });
 
   it('la vista ampliada dibuja el micelio en el borde (no el borde eléctrico viejo)', () => {

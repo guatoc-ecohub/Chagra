@@ -23,6 +23,7 @@ export { default as Mundo2D } from './Mundo2D.jsx';
 
 // Datos + arquetipos + resolución (three-free, seguros en el bundle base).
 export { MUNDO, MUNDO_IDS } from './mundoData.js';
+export { mundosPorPisoTermico } from './mundosPorPisoTermico.js';
 export {
   ARQUETIPOS, ARQUETIPOS_KEYS, ARQUETIPOS_3D, ARQUETIPOS_2D, esArquetipo3D,
 } from './arquetipos.js';
@@ -32,6 +33,14 @@ export { decidirTier, permite3D, perfilDeTier } from './deviceTier.js';
 // Navegación valle ↔ mundos (three-free): la máquina de fases + el viaje DOM.
 export { useNavegacionMundos, puedeEntrarAlMundo } from './useNavegacionMundos.js';
 export { default as TransicionMundo, VIAJE_MS } from './TransicionMundo.jsx';
+// Entrada a un mundo como MURAL New Donk (dolly + aplane ortográfico) para el
+// flujo vivo valle→mundo — alternativa al velo, mismo contrato de timers JS.
+export {
+  default as TransicionNewDonk,
+  ND_VIAJE_MS,
+  ND_MITAD_MS,
+  ND_APLANE_MS,
+} from './TransicionNewDonk.jsx';
 
 // Háptica táctil (three-free, DR-3D-HAPTICA): pulsos semánticos por evento del
 // framework — no-op silencioso donde no hay Vibration API (iOS/Safari, FF129+).

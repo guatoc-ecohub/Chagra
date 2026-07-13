@@ -321,7 +321,7 @@ export function buildFincaScene({
   const totalCultivos = Math.max(plantas.length, plantasAssetCount);
   const cultivosActivos = Math.max(cultivosActivosProc, plantasAssetCount);
 
-  return {
+  return /** @type {any} */ ({
     vacia,
     lotes: lotesDibujados,
     animales: animales.slice(0, 4),
@@ -333,7 +333,7 @@ export function buildFincaScene({
     plantAssetsCount: plantasAssetCount,
     clima: derivarClima(clima),
     resumen: construirResumen({ vacia, cultivosActivos, enCosecha, animales }),
-  };
+  });
 }
 
 /**

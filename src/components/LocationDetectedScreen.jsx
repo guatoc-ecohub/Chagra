@@ -1,8 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+// @ts-ignore - leaflet CSS import for Vite
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+// @ts-ignore - leaflet marker assets
 import icon from 'leaflet/dist/images/marker-icon.png';
+// @ts-ignore - leaflet marker assets
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import {
   MapPin,
@@ -51,6 +54,7 @@ const PISO_CLASSES = {
 /**
  * PisoTermicoBadge — badge visual del piso térmico con color por estrato.
  * Reusa la clasificación de AltitudeBadge pero con etiqueta + rango.
+ * @param {{info:Object}} props
  */
 function PisoTermicoBadge({ info }) {
   if (!info) return null;
@@ -80,6 +84,8 @@ const ALTITUDE_BAR_MAX = 5000;
 
 // Geometría de la montaña (viewBox 240×160). Base ancha cálida, pico glacial.
 const MTN = { baseY: 148, peakY: 14, apexX: 120, leftX: 16, rightX: 224 };
+/** @param {number} alt
+ * @returns {number} */
 const altToY = (alt) => {
   const clamped = Math.max(0, Math.min(ALTITUDE_BAR_MAX, alt));
   return MTN.baseY - (clamped / ALTITUDE_BAR_MAX) * (MTN.baseY - MTN.peakY);
@@ -98,6 +104,7 @@ const altToY = (alt) => {
  *
  * Conserva data-testid="altitude-gradient-bar" por compatibilidad con los
  * tests #201 existentes, y agrega data-testid="thermal-mountain".
+ * @param {{altitud:number, pisoSlug:string}} props
  */
 function ThermalMountain({ altitud, pisoSlug }) {
   const hasAlt = typeof altitud === 'number' && !Number.isNaN(altitud);
@@ -241,6 +248,14 @@ function ThermalMountain({ altitud, pisoSlug }) {
  *   - altitud:       msnm opcional ya conocido (evita red de elevación).
  *   - onConfirm(loc): callback con la ubicación enriquecida confirmada.
  *   - onBack():       cierre/atrás.
+ */
+/**
+ * @param {Object} props
+ * @param {{lat:number,lng:number}|null} [props.coords]
+ * @param {string} [props.initialMunicipio]
+ * @param {number|null} [props.altitud]
+ * @param {function(Object):void} [props.onConfirm]
+ * @param {function():void} [props.onBack]
  */
 export default function LocationDetectedScreen({
   coords = null,
@@ -400,8 +415,8 @@ export default function LocationDetectedScreen({
             lat,
             lng,
             vereda: exact?.name || rawVereda,
-            vereda_source: exact?.source || 'typed',
-            vereda_display_name: exact?.display_name || null,
+            vereda_source: /** @type {any} */ (exact)?.source || 'typed',
+            vereda_display_name: /** @type {any} */ (exact)?.display_name || null,
             municipio: municipioLocal.name,
             departamento: municipioLocal.departamento,
           });

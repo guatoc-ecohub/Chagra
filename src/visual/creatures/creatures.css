@@ -65,6 +65,187 @@
   100% { transform: scaleY(0.5) scaleX(0.9); }
 }
 
+/* ═══ GESTOS con CARÁCTER (Cuphead / Miss-Minutes) ══════════════════════════
+   Overshoot + follow-through de verdad: el cuerpo ANTICIPA (squash), rebasa y
+   REGRESA elástico; los bracitos de manguera pivotan desde el HOMBRO (crt-brazo-*
+   traen su transform-origin) rebasando la pose y asentándose un pelo después que
+   el cuerpo (secondary motion). Nada lineal. Los gestos PISAN el boil/sway por
+   especificidad (el data-pose suma un selector). Gate RM/tier al final. ─────── */
+
+/* CELEBRA — brinca: se agacha para coger impulso, SALTA con stretch y aterriza
+   con overshoot elástico; los bracitos se alzan en V rebasando y asentando. */
+[data-creature='abeja-angelita'][data-pose='celebra'] .crt-body {
+  animation: rh-celebra-cuerpo 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-celebra-cuerpo {
+  0%   { transform: translateY(0) scale(1, 1); }
+  16%  { transform: translateY(1.3px) scale(1.09, 0.9); }   /* anticipa: se agacha (squash) */
+  40%  { transform: translateY(-4.2px) scale(0.9, 1.13); }  /* ¡SALTA! (stretch) */
+  60%  { transform: translateY(0.7px) scale(1.11, 0.9); }   /* aterriza (squash, overshoot) */
+  78%  { transform: translateY(-0.7px) scale(0.98, 1.04); } /* rebote elástico */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+[data-creature='abeja-angelita'][data-pose='celebra'] .crt-brazo-l {
+  animation: rh-celebra-brazo-l 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+[data-creature='abeja-angelita'][data-pose='celebra'] .crt-brazo-r {
+  animation: rh-celebra-brazo-r 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+/* La abeja es 3/4 (cabeza a la derecha): una V simétrica metería el brazo
+   derecho DENTRO de la cara. Así que el IZQUIERDO (lado libre) se alza bien
+   arriba y el DERECHO se abre a la derecha sin taparse — celebración dinámica,
+   asimétrica, legible. +θ sube el izq (colgante SW → arriba); −θ abre el der.
+   Rebasan el pico y asientan un pelo (follow-through). */
+@keyframes rh-celebra-brazo-l {
+  0%, 12% { transform: rotate(0deg); }
+  40%  { transform: rotate(150deg); }   /* alza arriba-izquierda, rebasa */
+  62%  { transform: rotate(134deg); }   /* asienta (follow-through) */
+  80%  { transform: rotate(141deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes rh-celebra-brazo-r {
+  0%, 12% { transform: rotate(0deg); }
+  40%  { transform: rotate(-112deg); }  /* abre a la derecha (bajo la carita) */
+  62%  { transform: rotate(-98deg); }
+  80%  { transform: rotate(-105deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* REPOSO — respira: el cuerpo infla y desinfla despacio (inhala suave). Las
+   alitas ya van plegadas (crt-wing-reposo); esto le da el pecho que sube. */
+[data-creature='abeja-angelita'][data-pose='reposo'] .crt-body {
+  animation: rh-reposo-respira 4.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-reposo-respira {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(-0.4px) scale(0.985, 1.03); }  /* inhala */
+}
+
+/* SEÑALA — se inclina hacia el POI (a su derecha, donde mira) rebasando la
+   inclinación y asentándose, y extiende el bracito derecho apuntando. Sostiene
+   el gesto un momento (no es un tic) y vuelve. Overshoot en ambos. */
+[data-creature='abeja-angelita'][data-pose='señala'] .crt-body {
+  animation: rh-senala-cuerpo 2.9s cubic-bezier(0.5, 0, 0.25, 1.4) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-senala-cuerpo {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  20%  { transform: rotate(9deg) translateX(0.7px); }   /* se inclina rebasando */
+  30%  { transform: rotate(6.5deg) translateX(0.5px); } /* asienta apuntando */
+  72%  { transform: rotate(6.5deg) translateX(0.5px); } /* sostiene el gesto */
+  86%  { transform: rotate(-1.5deg) translateX(0); }    /* rebote al enderezarse */
+}
+[data-creature='abeja-angelita'][data-pose='señala'] .crt-brazo-r {
+  animation: rh-senala-brazo 2.9s cubic-bezier(0.5, 0, 0.25, 1.4) infinite;
+}
+/* El bracito derecho apunta abajo-derecha (a una mata/POI en el suelo): así SALE
+   de detrás de la carita (que vive a la derecha) y el gesto se LEE. Rebasa (−52°)
+   y asienta (−44°) sosteniendo, luego recoge (follow-through). */
+@keyframes rh-senala-brazo {
+  0%, 100% { transform: rotate(0deg); }
+  20%  { transform: rotate(-52deg); }   /* extiende apuntando (rebasa) */
+  30%  { transform: rotate(-44deg); }   /* asienta señalando la mata */
+  72%  { transform: rotate(-44deg); }
+  86%  { transform: rotate(-6deg); }    /* recoge con follow-through */
+}
+
+/* ═══ GESTOS con carácter — VERSIÓN SPECIES-AGNOSTIC (rh-g-*) ════════════════
+   La MISMA gramática de gestos (celebra / reposo / señala) para el resto de la
+   familia rubber-hose: el OSO ANDINO, el COLIBRÍ y la RANA la heredan solo con
+   data-pose, sin CSS propio. Angelita NO se toca: sus reglas
+   [data-creature='abeja-angelita'][data-pose=…] tienen MAYOR especificidad (dos
+   atributos) y PISAN estas genéricas (un atributo) — su gesto afinado (3/4,
+   asimétrico) manda sobre el suyo. Aquí los cuerpos frontales/simétricos (oso,
+   rana) alzan una V simétrica; el colibrí celebra a cuerpo + aleteo acelerado.
+   El gate ya está resuelto arriba y abajo con selectores [data-pose] genéricos:
+   la desactivación de antics durante el gesto y el freeze de reduced-motion YA
+   cubren estas clases (mismos selectores). ─────────────────────────────────── */
+
+/* CELEBRA — brinca: anticipa (squash), SALTA con stretch y aterriza con
+   overshoot elástico; los bracitos (si los hay) suben en V simétrica. */
+[data-pose='celebra'] .crt-body {
+  animation: rh-g-celebra 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-g-celebra {
+  0%   { transform: translateY(0) scale(1, 1); }
+  16%  { transform: translateY(1.6px) scale(1.08, 0.9); }   /* anticipa: se agacha */
+  42%  { transform: translateY(-5px) scale(0.9, 1.14); }    /* ¡SALTA! (stretch) */
+  62%  { transform: translateY(0.8px) scale(1.1, 0.9); }    /* aterriza (overshoot) */
+  80%  { transform: translateY(-0.8px) scale(0.98, 1.04); } /* rebote elástico */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+[data-pose='celebra'] .crt-brazo-l {
+  animation: rh-g-brazo-l 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+[data-pose='celebra'] .crt-brazo-r {
+  animation: rh-g-brazo-r 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+/* Brazos de manguera que pivotan del hombro (crt-brazo-* traen su origen): suben
+   en V simétrica rebasando el pico y asentando un pelo (follow-through). */
+@keyframes rh-g-brazo-l {
+  0%, 12% { transform: rotate(0deg); }
+  42%  { transform: rotate(122deg); }   /* alza arriba-izquierda (rebasa) */
+  62%  { transform: rotate(108deg); }   /* asienta */
+  80%  { transform: rotate(114deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes rh-g-brazo-r {
+  0%, 12% { transform: rotate(0deg); }
+  42%  { transform: rotate(-122deg); }  /* alza arriba-derecha (rebasa) */
+  62%  { transform: rotate(-108deg); }  /* asienta */
+  80%  { transform: rotate(-114deg); }
+  100% { transform: rotate(0deg); }
+}
+/* Alados (colibrí): la celebración acelera el aleteo. */
+[data-pose='celebra'] .crt-wing { animation-duration: 0.09s; }
+
+/* REPOSO — respira despacio (el pecho sube y baja). Los alados pliegan las alas
+   (reusa crt-wing-reposo). */
+[data-pose='reposo'] .crt-body {
+  animation: rh-g-reposo 4.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-g-reposo {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(-0.4px) scale(0.985, 1.03); }  /* inhala */
+}
+[data-pose='reposo'] .crt-wing {
+  animation: crt-wing-reposo 3.6s ease-in-out infinite alternate;
+}
+
+/* SEÑALA — se inclina hacia el POI (a su derecha) rebasando y asentándose,
+   sostiene el gesto y vuelve; el bracito derecho apunta. */
+[data-pose='señala'] .crt-body {
+  animation: rh-g-senala 2.9s cubic-bezier(0.5, 0, 0.25, 1.4) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes rh-g-senala {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  20%  { transform: rotate(8deg) translateX(0.6px); }   /* se inclina rebasando */
+  30%  { transform: rotate(6deg) translateX(0.4px); }   /* asienta apuntando */
+  72%  { transform: rotate(6deg) translateX(0.4px); }   /* sostiene */
+  86%  { transform: rotate(-1.5deg) translateX(0); }    /* rebote al enderezarse */
+}
+[data-pose='señala'] .crt-brazo-r {
+  animation: rh-g-brazo-senala 2.9s cubic-bezier(0.5, 0, 0.25, 1.4) infinite;
+}
+@keyframes rh-g-brazo-senala {
+  0%, 100% { transform: rotate(0deg); }
+  20%  { transform: rotate(-48deg); }   /* extiende apuntando (rebasa) */
+  30%  { transform: rotate(-40deg); }   /* asienta señalando */
+  72%  { transform: rotate(-40deg); }
+  86%  { transform: rotate(-6deg); }    /* recoge (follow-through) */
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    KIT RUBBER-HOSE (Cuphead + Miss Minutes de Loki) — SPECIES-AGNOSTIC
    Cadencia de goma REUTILIZABLE por cualquier creature. Angelita la estrena;
@@ -184,13 +365,16 @@
 [data-animo='descansa'] .rh-travieso,
 [data-animo='descansa'] .rh-mirada { animation: none; }
 
-/* Los estados reactivos (mojada/sed/comiendo) y el reposo PISAN el arrebato:
-   una abeja empapada o libando no da vueltas de campana. */
+/* Los estados reactivos (mojada/sed/comiendo) y los gestos con carácter
+   (reposo/celebra/señala) PISAN el arrebato: una abeja empapada, libando,
+   celebrando o señalando no da además vueltas de campana — el gesto lee limpio. */
 [data-mojada='1'] .rh-antic, [data-mojada='1'] .rh-travieso,
 [data-sed='1'] .rh-antic, [data-sed='1'] .rh-travieso,
 [data-comiendo='1'] .rh-antic, [data-comiendo='1'] .rh-travieso,
 [data-pose='reposo'] .rh-antic, [data-pose='reposo'] .rh-travieso,
-[data-pose='reposo'] .rh-mirada { animation: none; }
+[data-pose='reposo'] .rh-mirada,
+[data-pose='celebra'] .rh-antic, [data-pose='celebra'] .rh-travieso,
+[data-pose='señala'] .rh-antic, [data-pose='señala'] .rh-travieso { animation: none; }
 
 /* FOLLOW-THROUGH (secondary motion) — antenas, bracitos y patitas de manguera
    se mecen con retardo: delatan que el cuerpo se movió. Cada miembro pone su
@@ -226,7 +410,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .rh-boil, .rh-blink, .rh-sway, .rh-smear,
-  .rh-antic, .rh-travieso, .rh-mirada, .rh-rubor { animation: none !important; }
+  .rh-antic, .rh-travieso, .rh-mirada, .rh-rubor,
+  /* Los gestos (celebra/reposo/señala) también se congelan: fotograma digno
+     (bracitos colgando, cuerpo neutro, sonriendo). */
+  [data-pose='celebra'] .crt-body, [data-pose='celebra'] .crt-brazo-l, [data-pose='celebra'] .crt-brazo-r,
+  [data-pose='reposo'] .crt-body,
+  [data-pose='señala'] .crt-body, [data-pose='señala'] .crt-brazo-r { animation: none !important; }
 }
 
 /* ── REACCIÓN AL ESTADO REAL DE LA FINCA (auditoría §5b) ──────────────────────
@@ -302,15 +491,34 @@
   70%      { transform: translateY(-1px) scale(0.96, 1.06); } /* stretch al subir */
 }
 
+/* PUFF DE POLEN — motas ámbar que FLOTAN y se disuelven (Angelita cargada de
+   polen, la LOCA que va de flor en flor). Cada mota sube con una leve deriva y
+   se desvanece; los delays inline las despareja para que sea un rocío continuo,
+   no un pulso. Solo transform/opacity (GPU). Opt-in (data-polen). */
+.crt-polen-mota {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: crt-polen-flota 2.6s ease-in-out infinite;
+}
+@keyframes crt-polen-flota {
+  0%   { transform: translate(0, 0) scale(0.4); opacity: 0; }
+  18%  { opacity: 0.85; }
+  55%  { transform: translate(-1.4px, -4px) scale(1); opacity: 0.7; }
+  100% { transform: translate(-2.6px, -8px) scale(0.5); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .crt-wing, .crt-fwing, .crt-ball, .crt-legs,
-  .crt-gota, .crt-lengua,
+  .crt-gota, .crt-lengua, .crt-polen-mota,
   [data-creature='abeja-angelita'][data-mojada='1'] .crt-body,
   [data-creature='abeja-angelita'][data-sed='1'] .crt-lengua,
   [data-creature='abeja-angelita'][data-sed='1'] .crt-body,
   [data-creature='abeja-angelita'][data-comiendo='1'] .crt-lengua,
   [data-creature='abeja-angelita'][data-comiendo='1'] .crt-body { animation: none !important; }
 }
+/* Tier bajo: el polen es puramente decorativo → apagado (ahorro gama baja). */
+[data-tier='bajo'] .crt-polen-mota { animation: none; opacity: 0.5; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    EL CRUCE 2D → 3D (AbejaTransicion.jsx) — el handoff de capas.
@@ -422,4 +630,1096 @@
    algún host se equivoca, aquí no se anima nada (y no se ve nada). */
 @media (prefers-reduced-motion: reduce) {
   .abeja-cruce { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RANA ARLEQUÍN — cadencia ZEN (ADITIVO — no toca abeja/oso/colibrí)
+   ───────────────────────────────────────────────────────────────────────────
+   La rana es la PENSADORA SERENA del grupo: su idle NO son los arrebatos de la
+   abeja (rh-antic/rh-travieso: vuelta de campana, meneo de caderas), sino
+   QUIETUD contemplativa. Solo tres cosas se mueven, y despacio:
+     · el BOIL y el parpadeo, RALENTIZADOS (respira zen, no palpita nervioso),
+     · la GARGANTA (papada) que late/infla — la respiración visible,
+     · un SALTO ocasional muy elástico (aterriza y asienta) — su única "locura".
+   Todo transform/opacity (GPU, Android gama baja). Gate RM/tier al final.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* La rana respira MÁS DESPACIO que el resto (zen): su boil, parpadeo y mirada
+   van lentos y pausados — contemplativa, no hiperactiva. Solo re-tempo (misma
+   cadencia heredada); scope por [data-creature] → abeja/oso intactos. */
+[data-creature='rana-andina'] .rh-boil { animation-duration: 3.6s; }
+[data-creature='rana-andina'] .rh-blink { animation-duration: 8.2s; }
+[data-creature='rana-andina'] .rh-mirada { animation-duration: 11.3s; }
+
+/* GARGANTA que late (papada): infla y desinfla despacio, el pulso sereno de la
+   rana respirando en la hoja. Continuo; RM/tier lo congelan abajo. */
+.crt-garganta {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: crt-garganta-late 3.6s ease-in-out infinite;
+}
+@keyframes crt-garganta-late {
+  0%, 100% { transform: scaleY(0.92) scaleX(0.99); }
+  45%      { transform: scaleY(1.16) scaleX(1.04); }  /* infla la papada */
+  62%      { transform: scaleY(1.08) scaleX(1.02); }  /* suelta el aire */
+}
+
+/* SALTO OCASIONAL — el único arrebato de la rana zen: casi todo el ciclo quieta
+   y de pronto un brinco MUY elástico (anticipa agachándose con squash, despega
+   estirada, aterriza con squash fuerte y asienta con rebote). Período largo:
+   es ocasional, no un loop nervioso. transform-origin abajo = salta del piso. */
+.rana-salto {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: rana-salto 11s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes rana-salto {
+  0%, 70% { transform: translateY(0) scale(1, 1); }
+  74%     { transform: translateY(1.2px) scale(1.12, 0.82); }   /* anticipa: se agacha (squash) */
+  80%     { transform: translateY(-7px) scale(0.82, 1.22); }    /* despega estirada (stretch) */
+  86%     { transform: translateY(0.6px) scale(1.16, 0.8); }    /* aterriza (squash fuerte) */
+  90%     { transform: translateY(-0.5px) scale(0.95, 1.06); }  /* rebote elástico */
+  94%     { transform: translateY(0.15px) scale(1.03, 0.98); }  /* …asienta */
+  100%    { transform: translateY(0) scale(1, 1); }
+}
+
+/* Los gestos con carácter (celebra/reposo/señala) y el ánimo bajo detienen el
+   salto y aquietan aún más la garganta: la rana lee limpia (no salta además de
+   celebrar/señalar, ni brinca cuando está sedienta o descansando). */
+[data-creature='rana-andina'][data-pose='celebra'] .rana-salto,
+[data-creature='rana-andina'][data-pose='reposo'] .rana-salto,
+[data-creature='rana-andina'][data-pose='señala'] .rana-salto,
+[data-creature='rana-andina'][data-animo='sediento'] .rana-salto,
+[data-creature='rana-andina'][data-animo='descansa'] .rana-salto { animation: none; }
+[data-creature='rana-andina'][data-pose='reposo'] .crt-garganta,
+[data-creature='rana-andina'][data-animo='descansa'] .crt-garganta { animation-duration: 5.4s; }
+
+/* device-tier 'bajo': corta lo continuo de la rana (salto + garganta). Los
+   estados reactivos/gestos quedan (feedback importante). */
+[data-tier='bajo'] .rana-salto,
+[data-tier='bajo'] .crt-garganta { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rana-salto, .crt-garganta { animation: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OSO ANDINO — el CARÁCTER del guardián: mole PESADA, seria y gruñona.
+   Aditivo sobre el KIT species-agnostic (no toca a la abeja): el oso reescribe
+   SU boil (más lento y con más masa), suma un resoplido/gruñido corporal, el
+   rascado con la zarpa, el ceño de las cejas y el vaho de la trufa. Todo
+   transform/opacity (GPU, gama baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL PESADO — la mole no vibra ligera como la abeja: respira LENTO y asienta
+   con MÁS squash (masa que cae). Reescribe SOLO el boil del oso (misma clase
+   .rh-boil, mayor especificidad por el data-creature) con longhands para no
+   pisar el resto de props de animación. */
+[data-creature='oso-andino'] .rh-boil {
+  animation-name: oso-boil;
+  animation-duration: 2.6s;
+  animation-timing-function: steps(14, end);
+}
+@keyframes oso-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  26%  { transform: translateY(-0.2px) scale(0.985, 1.03); }  /* leve stretch (pesa) */
+  52%  { transform: translateY(0.8px) scale(1.06, 0.93); }    /* squash pesado (masa) */
+  74%  { transform: translateY(0.15px) scale(1.0, 1.0); }     /* asienta despacio */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* CEJAS — el ceño serio respira apenas (vida sin perder la gravedad). Al
+   RESOPLAR (gruñir) se frunce MÁS fuerte: el sabio refunfuña. */
+.oso-cejas {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: oso-cejas 6.7s ease-in-out infinite;
+}
+@keyframes oso-cejas {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-0.25px); }
+}
+[data-creature='oso-andino'][data-resopla='1'] .oso-cejas {
+  animation: oso-cejas-frunce 0.9s ease-in-out infinite;
+}
+@keyframes oso-cejas-frunce {
+  0%, 100% { transform: translateY(0) scaleX(1); }
+  50%      { transform: translateY(0.55px) scaleX(1.06); }  /* baja y aprieta el ceño */
+}
+
+/* RESOPLA — gruñido corporal: el pecho hincha y suelta con PESO (huff lento,
+   squash&stretch marcado). Pisa el boil por especificidad (dos atributos). */
+[data-creature='oso-andino'][data-resopla='1'] .crt-body {
+  animation: oso-resoplido 1.5s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes oso-resoplido {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  35%      { transform: translateY(-0.6px) scale(0.97, 1.06); }  /* inhala hondo (stretch) */
+  55%      { transform: translateY(0.7px) scale(1.07, 0.92); }   /* SUELTA el gruñido (squash) */
+  75%      { transform: translateY(0.1px) scale(1.01, 1.0); }
+}
+
+/* VAHO — las motas del resoplido salen de la trufa (adelante-abajo) y se
+   disuelven; los delays inline las desparejan. Solo con animated (rh gating). */
+.crt-vaho-mota {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: oso-vaho 1.6s ease-out infinite;
+}
+@keyframes oso-vaho {
+  0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  22%  { opacity: 0.75; }
+  100% { transform: translate(3.4px, 2.2px) scale(1.5); opacity: 0; }
+}
+
+/* RASCA — se rasca la panza con la zarpa derecha: vaivén corto y pausado
+   (gesto de oso, entrañable). El brazo pivota del hombro (crt-brazo-r trae su
+   origen). Pisa el sway/gestos por especificidad de dos atributos. */
+[data-creature='oso-andino'][data-rasca='1'] .crt-brazo-r {
+  animation: oso-rasca 0.5s ease-in-out infinite;
+}
+@keyframes oso-rasca {
+  0%, 100% { transform: rotate(-18deg); }
+  50%      { transform: rotate(-30deg); }
+}
+/* Y el cuerpo acompaña el rascado con un meneíto pesado de gusto. */
+[data-creature='oso-andino'][data-rasca='1'] .crt-body {
+  animation: oso-rasca-cuerpo 1.0s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes oso-rasca-cuerpo {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(1.4deg); }
+}
+
+/* Los estados del oso (resopla/rasca) PISAN el arrebato (antic/travieso): un oso
+   que gruñe o se rasca no da además vueltas de campana — el gesto lee limpio. */
+[data-creature='oso-andino'][data-resopla='1'] .rh-antic,
+[data-creature='oso-andino'][data-resopla='1'] .rh-travieso,
+[data-creature='oso-andino'][data-rasca='1'] .rh-antic,
+[data-creature='oso-andino'][data-rasca='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito del oso lo reactivaría (misma clase) →
+   re-apagarlo aquí (mayor especificidad + orden posterior). Las cejas continuas
+   y el vaho decorativo también se cortan; los estados reactivos (resopla/rasca)
+   siguen contando la verdad. */
+[data-tier='bajo'][data-creature='oso-andino'] .rh-boil,
+[data-tier='bajo'][data-creature='oso-andino'] .oso-cejas { animation: none; }
+[data-tier='bajo'] .crt-vaho-mota { animation: none; opacity: 0.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .oso-cejas, .crt-vaho-mota,
+  [data-creature='oso-andino'][data-resopla='1'] .crt-body,
+  [data-creature='oso-andino'][data-resopla='1'] .oso-cejas,
+  [data-creature='oso-andino'][data-rasca='1'] .crt-brazo-r,
+  [data-creature='oso-andino'][data-rasca='1'] .crt-body { animation: none !important; }
+  /* Fotograma digno: un rastro de vaho visible y quieto si se pidió resoplido. */
+  .crt-vaho-mota { opacity: 0.55; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COLIBRÍ — el CARÁCTER del HIPERACTIVO: veloz, nervioso, zumbón, NUNCA quieto.
+   Aditivo sobre el KIT species-agnostic (no toca abeja/oso/rana): el colibrí
+   acelera SU boil (cernido que vibra), sus ojitos y su aleteo, y suma su firma:
+   el DARDO (cambio de dirección brusco con overshoot) perseguido por ESTELAS
+   iridiscentes cian↔magenta (afterimages con delay). Todo transform/opacity
+   (GPU, gama baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* CERNIDO NERVIOSO — el boil del colibrí vibra RAPIDITO (misma forma del
+   rh-boil, período corto): un colibrí cerniéndose nunca está quieto de verdad.
+   Solo duration (longhand): el gate genérico de tier bajo (animation: none, que
+   resetea el nombre) sigue mandando. */
+[data-creature='colibri'] .rh-boil { animation-duration: 0.9s; }
+
+/* ALETEO HIPERVELOZ — más rápido que el de la abeja (0.15s): borrón de verdad.
+   El smear/overshoot ya vienen del keyframe compartido crt-wingbeat. */
+[data-creature='colibri'] .crt-wing { animation-duration: 0.11s; }
+/* Celebrando, a TOPE (pisa el 0.09s genérico: este bloque va después y con la
+   misma especificidad ganaría el 0.11 base — se re-declara explícito). */
+[data-creature='colibri'][data-pose='celebra'] .crt-wing { animation-duration: 0.07s; }
+
+/* OJITOS RÁPIDOS — la mirada dardea y el parpadeo es más seguido (períodos
+   co-primos con el dardo de 3.8s y los antics: nunca el mismo compás). */
+[data-creature='colibri'] .rh-mirada { animation-duration: 4.1s; }
+[data-creature='colibri'] .rh-blink { animation-duration: 3.7s; }
+
+/* DARDO — la firma de movimiento: se cierne, ANTICIPA un pelo y ¡ZAS! cambia de
+   posición de golpe con inclinación al vector y overshoot elástico al frenar;
+   se cierne allá y vuelve con otro dardo (y uno vertical corto de propina).
+   Las ESTELAS corren el MISMO keyframe con delay → quedan visiblemente atrás
+   durante cada dardo (afterimage) y casi coinciden cerniéndose (solo un fleco
+   tornasol en el contorno: el shimmer del plumaje). */
+[data-creature='colibri'] .colibri-dardo,
+[data-creature='colibri'] .colibri-estela {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: colibri-dardo 3.8s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+[data-creature='colibri'] .colibri-estela--1 { animation-delay: 0.07s; }
+[data-creature='colibri'] .colibri-estela--2 { animation-delay: 0.15s; }
+@keyframes colibri-dardo {
+  0%, 18% { transform: translate(0, 0) rotate(0deg); }            /* se cierne */
+  21%  { transform: translate(-0.9px, 0.4px) rotate(-7deg); }     /* anticipa (coge impulso) */
+  26%  { transform: translate(3.4px, -1.6px) rotate(10deg); }     /* ¡DARDO! arriba-derecha */
+  30%  { transform: translate(2.8px, -1.3px) rotate(3deg); }      /* frena con overshoot */
+  46%  { transform: translate(3px, -1.4px) rotate(4deg); }        /* se cierne allá */
+  49%  { transform: translate(3.9px, -1.1px) rotate(11deg); }     /* anticipa al revés */
+  54%  { transform: translate(-2.7px, 1.2px) rotate(-11deg); }    /* dardo de vuelta */
+  58%  { transform: translate(-2.1px, 0.9px) rotate(-3deg); }     /* asienta elástico */
+  71%  { transform: translate(-2.2px, 1px) rotate(-4deg); }       /* se cierne acá */
+  75%  { transform: translate(-1.9px, -2.5px) rotate(4deg); }     /* dardo vertical corto */
+  79%  { transform: translate(-1.7px, -2.1px) rotate(0deg); }
+  91%, 100% { transform: translate(0, 0) rotate(0deg); }          /* vuelve al centro */
+}
+
+/* Ánimo pleno = TODAVÍA más loco (dardea más seguido; las estelas lo siguen). */
+[data-creature='colibri'][data-animo='pleno'] .colibri-dardo,
+[data-creature='colibri'][data-animo='pleno'] .colibri-estela { animation-duration: 2.7s; }
+
+/* Los gestos con carácter y los ánimos bajos PISAN el dardo: un colibrí posado
+   (reposo), señalando o bajito de ánimo no dardea — el gesto lee limpio. Y las
+   estelas SOLO existen volando: fuera de 'vuela' (o sin pose) se esconden
+   (posado no hay afterimage que valga). */
+[data-creature='colibri'][data-pose='reposo'] .colibri-dardo,
+[data-creature='colibri'][data-pose='señala'] .colibri-dardo,
+[data-creature='colibri'][data-pose='celebra'] .colibri-dardo,
+[data-creature='colibri'][data-animo='sediento'] .colibri-dardo,
+[data-creature='colibri'][data-animo='sediento'] .colibri-estela,
+[data-creature='colibri'][data-animo='descansa'] .colibri-dardo,
+[data-creature='colibri'][data-animo='descansa'] .colibri-estela { animation: none; }
+[data-creature='colibri']:not([data-pose='vuela']) .colibri-estela {
+  animation: none;
+  opacity: 0;
+}
+
+/* MODO PODER IRIDISCENTE — el aura del colibrí no es de un color: es TORNASOL.
+   Sobre la capa 1 species-agnostic (.is-powered-up::before) se pinta el glow
+   radial cian→magenta y se le suma una rotación de tono lenta (el shimmer del
+   plumaje subido a poder). Las corrientes ascendentes alternan cian/magenta.
+   Doble clase (.is-powered-up.colibri-poder) para ganarle a transformacion.css
+   sin depender del orden de import de los bundles CSS. */
+.is-powered-up.colibri-poder::before {
+  background: radial-gradient(circle, #4fd1ff 0%, rgba(255, 79, 209, 0.8) 48%, transparent 72%);
+  animation: poder-aura 1.1s ease-in-out infinite, colibri-tornasol 3.3s linear infinite;
+}
+@keyframes colibri-tornasol {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50%      { filter: hue-rotate(-55deg); }
+}
+.colibri-poder .poder-corriente:nth-child(even) { stroke: #ff4fd1; }
+
+/* device-tier 'bajo': el dardo y las estelas son lo continuo más caro del
+   colibrí → apagados (el aleteo y los estados reactivos siguen contando la
+   verdad). Las estelas quietas taparían el dibujo → ocultas. */
+[data-tier='bajo'][data-creature='colibri'] .colibri-dardo { animation: none; }
+[data-tier='bajo'][data-creature='colibri'] .colibri-estela { animation: none; opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='colibri'] .colibri-dardo,
+  [data-creature='colibri'] .colibri-estela { animation: none !important; }
+  /* Sin movimiento no hay afterimage: las estelas desaparecen (fotograma digno
+     = el colibrí quieto y legible, sin fantasmas superpuestos). */
+  [data-creature='colibri'] .colibri-estela { opacity: 0; }
+  /* El tornasol del poder también queda quieto (re-gate: la doble clase de
+     arriba le ganaba al gate genérico de transformacion.css). */
+  .is-powered-up.colibri-poder::before { animation: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PEREZOSO (Bradypus variegatus) — el CARÁCTER de la QUIETUD EXTREMA
+   ───────────────────────────────────────────────────────────────────────────
+   Todo en CÁMARA LENTA: se mece pausado desde la rama, parpadeo larguísimo,
+   pupilas que apenas derivan, bostezo/dormita con "Z" que flotan lento y un
+   estiramiento sostenido. Species-tuning ADITIVO (mayor especificidad por el
+   data-creature): jamás pisa a la abeja/oso/rana/colibrí. Solo transform/opacity
+   (GPU, gama baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* MECERSE ZEN — el perezoso NO vibra ligero: se COLUMPIA lentísimo desde la rama
+   (pivote arriba, donde las garras agarran) mientras respira hondo. El MÁS LENTO
+   del grupo. Reescribe SOLO el boil del perezoso (misma clase .rh-boil, mayor
+   especificidad) con longhands para no pisar el resto de props de animación. */
+[data-creature='perezoso'] .rh-boil {
+  animation-name: perezoso-boil;
+  animation-duration: 6.5s;
+  animation-timing-function: ease-in-out;
+  transform-origin: center top; /* cuelga: se mece desde la rama */
+}
+@keyframes perezoso-boil {
+  0%, 100% { transform: rotate(-1.1deg) scale(1, 1); }
+  50%      { transform: rotate(1.1deg) scale(1.006, 0.994); } /* columpio + respira */
+}
+
+/* PARPADEO LARGUÍSIMO — cierra LENTO y se queda cerrado un buen rato (soñoliento);
+   abre despacio. Reescribe el rh-blink solo del perezoso. */
+[data-creature='perezoso'] .rh-blink {
+  animation: perezoso-blink 11s ease-in-out infinite;
+}
+@keyframes perezoso-blink {
+  0%, 30% { transform: scaleY(1); }
+  40%     { transform: scaleY(0.08); } /* cierra lentísimo */
+  54%     { transform: scaleY(0.08); } /* …y se queda cerrado */
+  64%, 100% { transform: scaleY(1); }  /* abre despacio */
+}
+
+/* MIRADA — las pupilas del perezoso apenas derivan: mucho más lenta que la base
+   (nada de dardear). */
+[data-creature='perezoso'] .rh-mirada { animation-duration: 16s; }
+
+/* DORMITA — las "Z" del sueño suben LENTO desde la cabeza y se disuelven; los
+   delays inline las desparejan. Solo con animated (rh gating). */
+.perezoso-zzz-mota {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: perezoso-zzz 4.2s ease-out infinite;
+}
+@keyframes perezoso-zzz {
+  0%   { transform: translate(0, 0) scale(0.6); opacity: 0; }
+  25%  { opacity: 0.8; }
+  100% { transform: translate(2.6px, -4.2px) scale(1.25); opacity: 0; }
+}
+
+/* ESTIRA — estiramiento en cámara lenta: el cuerpo se ALARGA y SOSTIENE el
+   estirón (el bostezo-estiramiento del perezoso). Pisa el boil por especificidad
+   (dos atributos). Pivote arriba (sigue colgado de la rama). */
+[data-creature='perezoso'][data-estira='1'] .crt-body {
+  animation: perezoso-estira 5.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center top;
+}
+@keyframes perezoso-estira {
+  0%, 100% { transform: scaleY(1) scaleX(1); }
+  42%      { transform: scaleY(1.08) scaleX(0.95) translateY(0.5px); } /* se estira */
+  58%      { transform: scaleY(1.08) scaleX(0.95) translateY(0.5px); } /* sostiene */
+}
+
+/* device-tier 'bajo': el boil reescrito del perezoso lo reactivaría (misma clase)
+   → re-apagarlo aquí (mayor especificidad + orden posterior). El parpadeo lento y
+   las "Z" decorativas también se cortan; el estiramiento reactivo sigue contando
+   la verdad. */
+[data-tier='bajo'][data-creature='perezoso'] .rh-boil,
+[data-tier='bajo'][data-creature='perezoso'] .rh-blink { animation: none; }
+[data-tier='bajo'] .perezoso-zzz-mota { animation: none; opacity: 0.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='perezoso'] .rh-boil,
+  [data-creature='perezoso'] .rh-blink,
+  [data-creature='perezoso'] .rh-mirada,
+  .perezoso-zzz-mota,
+  [data-creature='perezoso'][data-estira='1'] .crt-body { animation: none !important; }
+  /* Fotograma digno: una "Z" visible y quieta si se pidió dormita. */
+  .perezoso-zzz-mota { opacity: 0.55; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ARDILLA — el CARÁCTER de la pizpireta: ÁGIL, curiosa, rápida e INQUIETA.
+   Aditivo sobre el KIT species-agnostic (no toca a los demás bichos): la ardilla
+   reescribe SU boil (más VELOZ y nervioso que la abeja), suma la cola tupida que
+   se sacude, el hocico que olfatea, los dientes que castañetean al roer y su
+   gesto-FIRMA: la INSPECCIÓN INVERTIDA (se cuelga de cabeza a espiar). Todo
+   transform/opacity (GPU, gama baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL VELOZ — no respira lento como el oso: vibra RÁPIDO y nervioso (la ardilla
+   nunca está quieta). Reescribe SOLO el boil de la ardilla (misma clase .rh-boil,
+   mayor especificidad por el data-creature) con longhands. */
+[data-creature='ardilla'] .rh-boil {
+  animation-name: ardilla-boil;
+  animation-duration: 1.05s;
+  animation-timing-function: steps(20, end);
+}
+@keyframes ardilla-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  20%  { transform: translateY(-0.35px) scale(0.97, 1.05); }  /* stretch ágil */
+  48%  { transform: translateY(0.3px) scale(1.05, 0.95); }    /* squash veloz */
+  70%  { transform: translateY(-0.12px) scale(0.99, 1.02); }  /* overshoot */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* COLA TUPIDA — se sacude nerviosa (flick de ardilla), pivote en la base. Idle
+   continuo: su secondary-motion firma. Se acelera cuando husmea o roe. */
+.ardilla-cola {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: ardilla-cola 2.1s ease-in-out infinite;
+}
+@keyframes ardilla-cola {
+  0%, 100% { transform: rotate(0deg) scaleY(1); }
+  22% { transform: rotate(-4.5deg); }                    /* latigazo a un lado */
+  46% { transform: rotate(3.6deg) scaleY(1.03); }        /* sacudida nerviosa */
+  66% { transform: rotate(-2.2deg); }
+  82% { transform: rotate(1.4deg); }
+}
+[data-creature='ardilla'][data-inspecciona='1'] .ardilla-cola,
+[data-creature='ardilla'][data-roe='1'] .ardilla-cola { animation-duration: 0.95s; }
+
+/* OLFATEA — el hocico tiembla en olfateos rápidos (inquieta). Idle continuo,
+   sutil. Más veloz aún cuando roe. */
+.ardilla-nariz {
+  animation: ardilla-olfatea 1.35s ease-in-out infinite;
+}
+@keyframes ardilla-olfatea {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  18% { transform: translateY(-0.22px) scale(1.14, 0.92); }  /* olfateo rápido */
+  32% { transform: translateY(0) scale(1, 1); }
+  48% { transform: translateY(-0.16px) scale(1.1, 0.94); }
+  62% { transform: translateY(0) scale(1, 1); }
+}
+[data-creature='ardilla'][data-roe='1'] .ardilla-nariz { animation-duration: 0.5s; }
+
+/* INSPECCIÓN INVERTIDA — el gesto-FIRMA: se voltea de cabeza (overshoot), asienta
+   invertida y espía curiosa a un lado y al otro, luego se endereza. Pisa el boil
+   por especificidad (dos atributos). */
+[data-creature='ardilla'][data-inspecciona='1'] .crt-body {
+  animation: ardilla-invierte 3.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ardilla-invierte {
+  0%   { transform: rotate(0deg); }
+  16%  { transform: rotate(185deg) scale(0.97, 1.03); }             /* se cuelga (overshoot) */
+  24%  { transform: rotate(178deg); }                               /* asienta invertida */
+  40%  { transform: rotate(180deg) translateX(1.1px); }             /* espía a un lado (curiosa) */
+  56%  { transform: rotate(180deg) translateX(-1.1px); }            /* …y al otro */
+  72%  { transform: rotate(179deg); }
+  86%  { transform: rotate(7deg) scale(1.02, 0.98); }               /* se endereza (rebasa) */
+  100% { transform: rotate(0deg); }
+}
+
+/* ROE — mordisqueo rápido: el cuerpo da un bob veloz y menudo (roer). Pisa el
+   boil por especificidad. */
+[data-creature='ardilla'][data-roe='1'] .crt-body {
+  animation: ardilla-roe 0.34s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes ardilla-roe {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(0.4px) scale(1.03, 0.96); }  /* mordisco veloz */
+}
+/* Los DIENTES castañetean rapidísimo al roer (los incisivos de roedor). */
+.ardilla-dientes { transform-box: fill-box; transform-origin: center top; }
+[data-creature='ardilla'][data-roe='1'] .ardilla-dientes {
+  animation: ardilla-castaneteo 0.16s steps(2, end) infinite;
+}
+@keyframes ardilla-castaneteo {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(0.4px); }
+}
+/* La bellota tiembla un poco mientras la roe. */
+.ardilla-bellota { transform-box: fill-box; transform-origin: center; }
+[data-creature='ardilla'][data-roe='1'] .ardilla-bellota {
+  animation: ardilla-bellota-tiembla 0.16s steps(2, end) infinite;
+}
+@keyframes ardilla-bellota-tiembla {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-0.35px); }
+}
+
+/* Los estados de la ardilla (inspecciona/roe) PISAN el arrebato (antic/travieso):
+   una ardilla colgada de cabeza o royendo no da además vueltas de campana. */
+[data-creature='ardilla'][data-inspecciona='1'] .rh-antic,
+[data-creature='ardilla'][data-inspecciona='1'] .rh-travieso,
+[data-creature='ardilla'][data-roe='1'] .rh-antic,
+[data-creature='ardilla'][data-roe='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito de la ardilla lo reactivaría (misma
+   clase) → re-apagarlo aquí (mayor especificidad + orden posterior). La cola y el
+   olfateo continuos también se cortan; los estados reactivos (inspecciona/roe)
+   siguen contando la verdad. */
+[data-tier='bajo'][data-creature='ardilla'] .rh-boil,
+[data-tier='bajo'][data-creature='ardilla'] .ardilla-cola,
+[data-tier='bajo'][data-creature='ardilla'] .ardilla-nariz { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ardilla-cola, .ardilla-nariz, .ardilla-dientes, .ardilla-bellota,
+  [data-creature='ardilla'][data-inspecciona='1'] .crt-body,
+  [data-creature='ardilla'][data-roe='1'] .crt-body { animation: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   JAGUAR — el CARÁCTER del felino: majestuoso, poderoso, ACECHADOR. Poder
+   CONTENIDO (no hiperactivo): squash&stretch controlado y elegante. Aditivo
+   sobre el KIT species-agnostic (no toca a la abeja/oso): el jaguar reescribe SU
+   boil (lento y controlado), suma el ACECHO DE HOMBROS (los omóplatos suben al
+   moverse — su firma), la COLA que ondea con PESO, el RUGIDO corporal y el modo
+   ACECHO (cabeza baja + avance agazapado). Todo transform/opacity (GPU, gama
+   baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL CONTROLADO — el felino no vibra ligero: respira LENTO y con squash
+   ELEGANTE (poder contenido, masa musculosa que asienta suave). Reescribe SOLO
+   el boil del jaguar (misma clase .rh-boil, mayor especificidad por el
+   data-creature) con longhands para no pisar el resto de props de animación. */
+[data-creature='jaguar'] .rh-boil {
+  animation-name: jaguar-boil;
+  animation-duration: 2.9s;
+  animation-timing-function: steps(12, end);
+}
+@keyframes jaguar-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  28%  { transform: translateY(-0.15px) scale(0.99, 1.02); }  /* leve estiramiento elegante */
+  54%  { transform: translateY(0.5px) scale(1.035, 0.965); }  /* squash controlado (músculo) */
+  76%  { transform: translateY(0.1px) scale(1.0, 1.0); }      /* asienta sereno */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* ACECHO DE HOMBROS — los omóplatos SUBEN y bajan al moverse (la seña del
+   depredador). Sube más y más lento en modo acecho. Nodo propio dentro del
+   cuerpo (.jaguar-hombros). */
+.jaguar-hombros {
+  animation: jaguar-hombros 2.9s ease-in-out infinite;
+}
+@keyframes jaguar-hombros {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  40%      { transform: translateY(-0.9px) scaleY(1.08); }  /* el omóplato se alza */
+  70%      { transform: translateY(-0.2px) scaleY(1.0); }
+}
+
+/* COLA que ONDEA con PESO — vaivén lento en S, pivota desde la base del lomo
+   (transform-origin lo pone el componente en fill-box). Poderosa, no nerviosa. */
+.jaguar-cola {
+  animation: jaguar-cola 3.6s ease-in-out infinite;
+}
+@keyframes jaguar-cola {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(6deg); }   /* barrido pesado y elegante */
+}
+
+/* CEJAS FIERAS — la mirada intensa respira apenas; se frunce MÁS al rugir o
+   acechar (el depredador se concentra). */
+.jaguar-cejas {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: jaguar-cejas 7.1s ease-in-out infinite;
+}
+@keyframes jaguar-cejas {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-0.2px); }
+}
+[data-creature='jaguar'][data-ruge='1'] .jaguar-cejas,
+[data-creature='jaguar'][data-acecha='1'] .jaguar-cejas {
+  animation: jaguar-cejas-frunce 1.1s ease-in-out infinite;
+}
+@keyframes jaguar-cejas-frunce {
+  0%, 100% { transform: translateY(0) scaleX(1); }
+  50%      { transform: translateY(0.5px) scaleX(1.05); }  /* baja y aprieta la mirada */
+}
+
+/* RUGE — rugido corporal: el pecho hincha y SUELTA con peso (huff imponente,
+   squash&stretch marcado). Pisa el boil por especificidad (dos atributos). */
+[data-creature='jaguar'][data-ruge='1'] .crt-body {
+  animation: jaguar-rugido 1.6s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes jaguar-rugido {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  30%      { transform: translateY(-0.7px) scale(0.96, 1.07); }  /* inhala hondo (stretch) */
+  52%      { transform: translateY(0.7px) scale(1.08, 0.92); }   /* SUELTA el rugido (squash) */
+  74%      { transform: translateY(0.1px) scale(1.01, 1.0); }
+}
+/* Las fauces del rugido palpitan (la garganta que ruge). */
+[data-creature='jaguar'][data-ruge='1'] .jaguar-rugido-boca {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: jaguar-fauces 1.6s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+}
+@keyframes jaguar-fauces {
+  0%, 100% { transform: scale(0.85); }
+  52%      { transform: scale(1.12); }
+}
+
+/* ACECHA — modo acecho: la cabeza BAJA y avanza, los omóplatos suben MÁS (el
+   depredador se agazapa). El cuerpo hace un creep lento y controlado. */
+[data-creature='jaguar'][data-acecha='1'] .jaguar-cabeza {
+  animation: jaguar-acecho-cabeza 3.2s ease-in-out infinite;
+}
+@keyframes jaguar-acecho-cabeza {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(0.4px, 1.1px); }  /* baja y adelanta la testa */
+}
+[data-creature='jaguar'][data-acecha='1'] .jaguar-hombros {
+  animation: jaguar-hombros-acecho 3.2s ease-in-out infinite;
+}
+@keyframes jaguar-hombros-acecho {
+  0%, 100% { transform: translateY(-0.4px) scaleY(1.05); }
+  50%      { transform: translateY(-1.6px) scaleY(1.16); }  /* el lomo del acecho, MÁS alto */
+}
+[data-creature='jaguar'][data-acecha='1'] .crt-body {
+  animation: jaguar-acecho-cuerpo 3.2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes jaguar-acecho-cuerpo {
+  0%, 100% { transform: translateX(0) scaleY(0.99); }
+  50%      { transform: translateX(0.5px) scaleY(0.97); }  /* creep agazapado, lento */
+}
+
+/* Los estados del jaguar (ruge/acecha) PISAN el arrebato (antic/travieso): una
+   fiera que ruge o acecha no da vueltas de campana — el gesto lee majestuoso. */
+[data-creature='jaguar'][data-ruge='1'] .rh-antic,
+[data-creature='jaguar'][data-ruge='1'] .rh-travieso,
+[data-creature='jaguar'][data-acecha='1'] .rh-antic,
+[data-creature='jaguar'][data-acecha='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito del jaguar lo reactivaría (misma clase)
+   → re-apagarlo aquí (mayor especificidad + orden posterior). El acecho de
+   hombros, la cola y las cejas continuas también se cortan; los estados
+   reactivos (ruge/acecha) siguen contando la verdad. */
+[data-tier='bajo'][data-creature='jaguar'] .rh-boil,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-hombros,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-cola,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-cejas { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .jaguar-hombros, .jaguar-cola, .jaguar-cejas,
+  [data-creature='jaguar'][data-ruge='1'] .crt-body,
+  [data-creature='jaguar'][data-ruge='1'] .jaguar-rugido-boca,
+  [data-creature='jaguar'][data-ruge='1'] .jaguar-cejas,
+  [data-creature='jaguar'][data-acecha='1'] .jaguar-cabeza,
+  [data-creature='jaguar'][data-acecha='1'] .jaguar-hombros,
+  [data-creature='jaguar'][data-acecha='1'] .crt-body,
+  [data-creature='jaguar'][data-acecha='1'] .jaguar-cejas { animation: none !important; }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   JAGUAR MÍSTICO — el animal-espíritu del chamán (cosmología andino-amazónica).
+   Capas PERMANENTES y sutiles (elegante, no recargado): aura espectral etérea,
+   ojos luminosos (fosforescencia), estrellas de constelación en las rosetas y
+   un shimmer espectral. En modo poder se vuelven CHAMÁNICAS (se revela el
+   espíritu). Todo transform/opacity. Se PODA en tier bajo / reduced-motion.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* AURA ESPECTRAL — la presencia sagrada envuelve al felino; respira lento. */
+.jaguar-aura-espectral {
+  animation: jaguar-aura-espectral 5.2s ease-in-out infinite;
+}
+@keyframes jaguar-aura-espectral {
+  0%, 100% { opacity: 0.11; transform: scale(1); }
+  50%      { opacity: 0.2;  transform: scale(1.05); }
+}
+
+/* OJOS LUMINOSOS — fosforescencia del espíritu (visión nocturna): late suave. */
+.jaguar-ojo-brillo {
+  animation: jaguar-ojo-latido 3.3s ease-in-out infinite;
+}
+@keyframes jaguar-ojo-latido {
+  0%, 100% { opacity: 0.55; transform: scale(0.96); }
+  50%      { opacity: 1;    transform: scale(1.06); }
+}
+
+/* ESTRELLAS de la constelación — titilan como el cielo nocturno andino
+   (staggered por el delay inline de cada estrella). */
+.jaguar-estrella {
+  animation: jaguar-titilar 2.3s ease-in-out infinite;
+}
+@keyframes jaguar-titilar {
+  0%, 100% { opacity: 0.35; transform: scale(0.82); }
+  50%      { opacity: 1;    transform: scale(1.15); }
+}
+
+/* SHIMMER — destello espectral que recorre el contorno (pulso lento). */
+.jaguar-shimmer {
+  animation: jaguar-shimmer 4.6s ease-in-out infinite;
+}
+@keyframes jaguar-shimmer {
+  0%, 100% { opacity: 0.12; }
+  50%      { opacity: 0.32; }
+}
+
+/* MODO PODER CHAMÁNICO — el jaguar-espíritu se revela: el aura, los ojos y las
+   estrellas se intensifican y aceleran. Vale tanto en standalone (wrapper
+   .jaguar-poder) como en inline (data-poder en el <g>). */
+.jaguar-poder .jaguar-aura-espectral,
+[data-creature='jaguar'][data-poder='1'] .jaguar-aura-espectral {
+  animation-name: jaguar-aura-chaman;
+  animation-duration: 3.0s;
+}
+@keyframes jaguar-aura-chaman {
+  0%, 100% { opacity: 0.22; transform: scale(1.02); }
+  50%      { opacity: 0.4;  transform: scale(1.1); }
+}
+.jaguar-poder .jaguar-ojo-brillo,
+[data-creature='jaguar'][data-poder='1'] .jaguar-ojo-brillo {
+  animation-name: jaguar-ojo-chaman;
+  animation-duration: 2.1s;
+}
+@keyframes jaguar-ojo-chaman {
+  0%, 100% { opacity: 0.85; transform: scale(1.02); }
+  50%      { opacity: 1;    transform: scale(1.22); }
+}
+.jaguar-poder .jaguar-estrella,
+[data-creature='jaguar'][data-poder='1'] .jaguar-estrella {
+  animation-name: jaguar-titilar-chaman;
+  animation-duration: 1.5s;
+}
+@keyframes jaguar-titilar-chaman {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.4); }
+}
+.jaguar-poder .jaguar-shimmer,
+[data-creature='jaguar'][data-poder='1'] .jaguar-shimmer {
+  animation-duration: 2.4s;
+}
+
+/* device-tier 'bajo': PODA el brillo/estrellas místicas (raster caro en gama
+   baja) — se detiene la animación y queda un rastro estático y digno. */
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-aura-espectral,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-ojo-brillo,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-shimmer { animation: none; }
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-estrella { animation: none; opacity: 0.4; }
+
+@media (prefers-reduced-motion: reduce) {
+  .jaguar-aura-espectral, .jaguar-ojo-brillo, .jaguar-shimmer,
+  .jaguar-poder .jaguar-aura-espectral,
+  .jaguar-poder .jaguar-ojo-brillo,
+  .jaguar-poder .jaguar-shimmer,
+  [data-creature='jaguar'][data-poder='1'] .jaguar-aura-espectral,
+  [data-creature='jaguar'][data-poder='1'] .jaguar-ojo-brillo,
+  [data-creature='jaguar'][data-poder='1'] .jaguar-shimmer { animation: none !important; }
+  /* Estrellas: sin titileo, quietas y tenues (fotograma digno). */
+  .jaguar-estrella,
+  .jaguar-poder .jaguar-estrella,
+  [data-creature='jaguar'][data-poder='1'] .jaguar-estrella { animation: none !important; opacity: 0.5; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MORROCOY — el CARÁCTER del galápago: ANCESTRAL, LENTO, SABIO y PACIENTE (el
+   anciano tranquilo de la chagra). La sabiduría NO corre: squash&stretch LENTO y
+   firme. Aditivo sobre el KIT species-agnostic (no toca a la abeja/oso/jaguar):
+   el morrocoy reescribe SU boil (lento, paso pesado), suma el CAPARAZÓN de domo
+   que RESPIRA apacible, la RETRACCIÓN ELÁSTICA (cabeza y patas entran a la concha
+   con squash&stretch de goma — su firma) y el ASENTIMIENTO sabio (la testa
+   cabecea lento). Todo transform/opacity (GPU, gama baja). Gates RM + tier al
+   final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL LENTO — el anciano no vibra ligero: respira LENTO y con squash de PASO
+   PESADO que asienta suave (masa robusta, paciencia). Reescribe SOLO el boil del
+   morrocoy (misma clase .rh-boil, mayor especificidad por el data-creature) con
+   longhands para no pisar el resto de props de animación. */
+[data-creature='morrocoy'] .rh-boil {
+  animation-name: morrocoy-boil;
+  animation-duration: 3.4s;
+  animation-timing-function: steps(10, end);
+}
+@keyframes morrocoy-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  30%  { transform: translateY(-0.12px) scale(0.995, 1.01); } /* leve estiramiento sereno */
+  60%  { transform: translateY(0.4px) scale(1.02, 0.98); }    /* paso pesado que asienta */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* CAPARAZÓN que RESPIRA — el domo geométrico se abomba apacible (el anciano
+   respira hondo). Nodo propio dentro del cuerpo (.morrocoy-caparazon). */
+.morrocoy-caparazon {
+  animation: morrocoy-respira 4.6s ease-in-out infinite;
+}
+@keyframes morrocoy-respira {
+  0%, 100% { transform: scale(1, 1); }
+  50%      { transform: scale(1.012, 1.02); } /* respiración serena del domo */
+}
+
+/* SE RETRAE — retracción elástica (la firma del morrocoy): cabeza y patas ENTRAN
+   a la concha con squash&stretch de goma, se guardan pacientes y ASOMAN de nuevo.
+   Lazo lento (la tortuga se toma su tiempo). */
+[data-creature='morrocoy'][data-retrae='1'] .morrocoy-cabeza {
+  animation: morrocoy-retrae-cabeza 4.6s ease-in-out infinite;
+}
+@keyframes morrocoy-retrae-cabeza {
+  0%   { transform: translateY(0) scale(1, 1); }
+  20%  { transform: translateY(-0.6px) scale(1.05, 1.03); }  /* estira curioso (anticipación) */
+  50%  { transform: translateY(5.2px) scale(0.5, 0.42); }    /* se mete (squash, escondida) */
+  80%  { transform: translateY(5.2px) scale(0.5, 0.42); }    /* aguanta dentro (paciencia) */
+  100% { transform: translateY(0) scale(1, 1); }             /* asoma de nuevo */
+}
+[data-creature='morrocoy'][data-retrae='1'] .morrocoy-pata {
+  animation: morrocoy-retrae-pata 4.6s ease-in-out infinite;
+}
+@keyframes morrocoy-retrae-pata {
+  0%, 100%  { transform: translateY(0) scaleY(1); }
+  50%, 80%  { transform: translateY(-2.2px) scaleY(0.35); }  /* recoge las patas al caparazón */
+}
+/* el domo se ABOMBA un pelín mientras recoge (pisa la respiración por
+   especificidad: dos atributos + clase). */
+[data-creature='morrocoy'][data-retrae='1'] .morrocoy-caparazon {
+  animation: morrocoy-retrae-domo 4.6s ease-in-out infinite;
+}
+@keyframes morrocoy-retrae-domo {
+  0%, 100%  { transform: scale(1, 1); }
+  50%, 80%  { transform: scale(1.05, 1.08); } /* el domo abomba al guardarse */
+}
+
+/* ASIENTE — el asentimiento sabio: la testa cabecea lento y firme ("sí, mijo,
+   con paciencia"). */
+[data-creature='morrocoy'][data-asiente='1'] .morrocoy-cabeza {
+  animation: morrocoy-asiente 2.8s ease-in-out infinite;
+}
+@keyframes morrocoy-asiente {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30%      { transform: translateY(0.9px) rotate(2.2deg); }  /* baja la testa (sí) */
+  60%      { transform: translateY(0) rotate(-1.2deg); }
+}
+
+/* Los estados del morrocoy (seRetrae/asiente) PISAN el arrebato (antic/travieso):
+   una tortuga que se guarda o asiente no da vueltas de campana — el gesto lee
+   sereno. */
+[data-creature='morrocoy'][data-retrae='1'] .rh-antic,
+[data-creature='morrocoy'][data-retrae='1'] .rh-travieso,
+[data-creature='morrocoy'][data-asiente='1'] .rh-antic,
+[data-creature='morrocoy'][data-asiente='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito del morrocoy lo reactivaría (misma clase)
+   → re-apagarlo aquí (mayor especificidad + orden posterior). La respiración del
+   domo también se corta; los estados reactivos (seRetrae/asiente) siguen contando
+   la verdad. (Las patas usan .rh-sway, ya gateado globalmente.) */
+[data-tier='bajo'][data-creature='morrocoy'] .rh-boil,
+[data-tier='bajo'][data-creature='morrocoy'] .morrocoy-caparazon { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .morrocoy-caparazon,
+  [data-creature='morrocoy'][data-retrae='1'] .morrocoy-cabeza,
+  [data-creature='morrocoy'][data-retrae='1'] .morrocoy-pata,
+  [data-creature='morrocoy'][data-retrae='1'] .morrocoy-caparazon,
+  [data-creature='morrocoy'][data-asiente='1'] .morrocoy-cabeza { animation: none !important; }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   MORROCOY ANCESTRAL — el anciano de piedra viva (calor de brasa apacible).
+   Capas PERMANENTES y sutiles (elegante, no recargado): un RESPLANDOR cobrizo
+   que envuelve el caparazón y un SHIMMER tibio recorriendo su reborde. En modo
+   poder se avivan (el anciano guarda fuego dentro). Todo transform/opacity. Se
+   PODA en tier bajo / reduced-motion.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* RESPLANDOR — el calor ancestral envuelve al galápago; respira lento. */
+.morrocoy-resplandor {
+  animation: morrocoy-resplandor 5.4s ease-in-out infinite;
+}
+@keyframes morrocoy-resplandor {
+  0%, 100% { opacity: 0.1;  transform: scale(1); }
+  50%      { opacity: 0.18; transform: scale(1.04); }
+}
+
+/* SHIMMER — destello cobrizo tibio que recorre el reborde del caparazón. */
+.morrocoy-shimmer {
+  animation: morrocoy-shimmer 4.8s ease-in-out infinite;
+}
+@keyframes morrocoy-shimmer {
+  0%, 100% { opacity: 0.12; }
+  50%      { opacity: 0.3; }
+}
+
+/* MODO PODER BRONCE — el anciano aviva la brasa: resplandor y shimmer se
+   intensifican y aceleran. Vale en standalone (wrapper .morrocoy-poder) e inline
+   (data-poder en el <g>). */
+.morrocoy-poder .morrocoy-resplandor,
+[data-creature='morrocoy'][data-poder='1'] .morrocoy-resplandor {
+  animation-name: morrocoy-resplandor-brasa;
+  animation-duration: 3.0s;
+}
+@keyframes morrocoy-resplandor-brasa {
+  0%, 100% { opacity: 0.2; transform: scale(1.02); }
+  50%      { opacity: 0.4; transform: scale(1.1); }
+}
+.morrocoy-poder .morrocoy-shimmer,
+[data-creature='morrocoy'][data-poder='1'] .morrocoy-shimmer {
+  animation-duration: 2.4s;
+}
+
+/* device-tier 'bajo': PODA el resplandor/shimmer ancestral (raster caro en gama
+   baja) — se detiene la animación y queda un rastro estático y digno. */
+[data-tier='bajo'][data-creature='morrocoy'] .morrocoy-resplandor,
+[data-tier='bajo'][data-creature='morrocoy'] .morrocoy-shimmer { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .morrocoy-resplandor, .morrocoy-shimmer,
+  .morrocoy-poder .morrocoy-resplandor,
+  .morrocoy-poder .morrocoy-shimmer,
+  [data-creature='morrocoy'][data-poder='1'] .morrocoy-resplandor,
+  [data-creature='morrocoy'][data-poder='1'] .morrocoy-shimmer { animation: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BORUGO (Cuniculus taczanowskii) — el 9º y ÚLTIMO bicho, el ANIMAL DE CIERRE.
+   ───────────────────────────────────────────────────────────────────────────
+   El CARÁCTER de la TERNURA NOCTURNA: la paca de montaña, tímida, serena, dulce.
+   Movimientos SUAVES (nada de comedia bruta): olfateo con la nariz que tiembla,
+   bigotes que se abren, orejitas atentas, ojos grandes que reflejan la luna y
+   las MOTAS crema de los flancos que brillan tenue (nocturno). Aditivo sobre el
+   KIT species-agnostic (no toca a ningún otro bicho): el borugo reescribe SU
+   boil (suave y tímido), suma el olfateo (nariz + bigotes + orejas), el
+   acurrucarse a salvo (el corazón emotivo del cierre) y el brillo lunar
+   permanente (motas + ojos). En modo poder ese brillo se vuelve PLATA LUNAR
+   pleno (el ser protegido que se revela seguro). Todo transform/opacity (GPU,
+   gama baja). Gates RM + tier al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL SUAVE — el borugo NO vibra ligero ni salta: respira TÍMIDO, con squash
+   pequeño y dulce (ternura, poder contenido de un animalito manso). Reescribe
+   SOLO el boil del borugo (misma clase .rh-boil, mayor especificidad por el
+   data-creature) con longhands para no pisar el resto de props de animación. */
+[data-creature='borugo'] .rh-boil {
+  animation-name: borugo-boil;
+  animation-duration: 3.4s;
+  animation-timing-function: ease-in-out;
+}
+@keyframes borugo-boil {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(0.35px) scale(1.012, 0.988); } /* respiración suave y tímida */
+}
+
+/* NARIZ que TIEMBLA — el olfateo idle del roedor nocturno (permanente, tenue). */
+.borugo-nariz {
+  animation: borugo-olfateo 1.9s ease-in-out infinite;
+}
+@keyframes borugo-olfateo {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(0.25px) scale(1.06); }  /* husmea el aire */
+}
+
+/* BIGOTES — se mecen apenas (permanente, delicado). */
+.borugo-bigotes {
+  animation: borugo-bigotes 3.7s ease-in-out infinite;
+}
+@keyframes borugo-bigotes {
+  0%, 100% { transform: scaleX(1) rotate(0deg); }
+  50%      { transform: scaleX(1.02) rotate(0.4deg); }
+}
+
+/* OREJITAS — atentas, se enderezan apenas (permanente, tímido). */
+.borugo-orejas {
+  animation: borugo-orejas 4.3s ease-in-out infinite;
+}
+@keyframes borugo-orejas {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(-0.3px) scaleY(1.05); }  /* se enderezan atentas */
+}
+
+/* OLFATEA — la reacción-firma tierna: la nariz tiembla MÁS rápido, los bigotes
+   se ABREN y las orejitas se ENDEREZAN (husmea el aire con dulzura). Pisan el
+   idle por especificidad (dos atributos). */
+[data-creature='borugo'][data-olfatea='1'] .borugo-nariz {
+  animation: borugo-olfateo-vivo 0.55s ease-in-out infinite;
+}
+@keyframes borugo-olfateo-vivo {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(0.4px) scale(1.12); }
+}
+[data-creature='borugo'][data-olfatea='1'] .borugo-bigotes {
+  animation: borugo-bigotes-abre 0.55s ease-in-out infinite;
+}
+@keyframes borugo-bigotes-abre {
+  0%, 100% { transform: scaleX(1) rotate(0deg); }
+  50%      { transform: scaleX(1.14) rotate(1.2deg); }  /* los bigotes se abren */
+}
+[data-creature='borugo'][data-olfatea='1'] .borugo-orejas {
+  animation: borugo-orejas-perk 0.9s ease-in-out infinite;
+}
+@keyframes borugo-orejas-perk {
+  0%, 100% { transform: translateY(-0.3px) scaleY(1.06); }
+  50%      { transform: translateY(-0.9px) scaleY(1.14); }  /* atentas, alerta dulce */
+}
+
+/* ACURRUCA — se ovilla a SALVO: el cuerpo se REDONDEA y encoge suave y la
+   cabecita se recoge (el ser protegido, digno y tranquilo). El corazón emotivo
+   del cierre — lento y tierno, nunca brusco. Pisa el boil por especificidad. */
+[data-creature='borugo'][data-acurruca='1'] .crt-body {
+  animation: borugo-acurruca 4.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes borugo-acurruca {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(1px) scale(1.04, 0.94); }  /* se ovilla, hondo y calmo */
+}
+[data-creature='borugo'][data-acurruca='1'] .borugo-cabeza {
+  animation: borugo-cabeza-recoge 4.6s ease-in-out infinite;
+}
+@keyframes borugo-cabeza-recoge {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(1.1px) scale(0.97); }  /* recoge la cabecita, a salvo */
+}
+
+/* Los estados del borugo (olfatea/acurruca) PISAN el arrebato (antic/travieso):
+   un animalito que husmea tímido o se ovilla a salvo no da vueltas de campana. */
+[data-creature='borugo'][data-olfatea='1'] .rh-antic,
+[data-creature='borugo'][data-olfatea='1'] .rh-travieso,
+[data-creature='borugo'][data-acurruca='1'] .rh-antic,
+[data-creature='borugo'][data-acurruca='1'] .rh-travieso { animation: none; }
+
+/* ── NOCTURNO SAGRADO — el brillo lunar (permanente y sutil) ─────────────────
+   Las MOTAS crema de los flancos brillan tenue y los OJOS grandes reflejan la
+   luna; en modo poder se vuelve PLATA LUNAR pleno (el ser protegido se revela). */
+.borugo-motas-luz {
+  animation: borugo-motas-luz 5.4s ease-in-out infinite;
+}
+@keyframes borugo-motas-luz {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.62; }
+}
+.borugo-ojo-luna {
+  animation: borugo-ojo-luna 3.6s ease-in-out infinite;
+}
+@keyframes borugo-ojo-luna {
+  0%, 100% { opacity: 0.55; transform: scale(0.96); }
+  50%      { opacity: 0.95; transform: scale(1.08); }
+}
+
+/* MODO PODER PLATA LUNAR — el brillo se intensifica y acelera (el ser protegido
+   por fin se revela seguro bajo la luna). Vale en standalone (wrapper
+   .borugo-poder) y en inline (data-poder en el <g>). */
+.borugo-poder .borugo-motas-luz,
+[data-creature='borugo'][data-poder='1'] .borugo-motas-luz {
+  animation-name: borugo-motas-lunar;
+  animation-duration: 3.0s;
+}
+@keyframes borugo-motas-lunar {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+.borugo-poder .borugo-ojo-luna,
+[data-creature='borugo'][data-poder='1'] .borugo-ojo-luna {
+  animation-name: borugo-ojo-lunar;
+  animation-duration: 2.2s;
+}
+@keyframes borugo-ojo-lunar {
+  0%, 100% { opacity: 0.85; transform: scale(1.02); }
+  50%      { opacity: 1;    transform: scale(1.2); }
+}
+
+/* device-tier 'bajo': el boil reescrito del borugo lo reactivaría (misma clase)
+   → re-apagarlo aquí (mayor especificidad + orden posterior). El olfateo, los
+   bigotes, las orejas y el brillo lunar continuos también se cortan; los estados
+   reactivos (olfatea/acurruca) siguen contando la verdad. */
+[data-tier='bajo'][data-creature='borugo'] .rh-boil,
+[data-tier='bajo'][data-creature='borugo'] .borugo-nariz,
+[data-tier='bajo'][data-creature='borugo'] .borugo-bigotes,
+[data-tier='bajo'][data-creature='borugo'] .borugo-orejas,
+[data-tier='bajo'][data-creature='borugo'] .borugo-ojo-luna { animation: none; }
+[data-tier='bajo'][data-creature='borugo'] .borugo-motas-luz { animation: none; opacity: 0.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='borugo'] .rh-boil,
+  .borugo-nariz, .borugo-bigotes, .borugo-orejas, .borugo-ojo-luna,
+  .borugo-poder .borugo-ojo-luna,
+  [data-creature='borugo'][data-poder='1'] .borugo-ojo-luna,
+  [data-creature='borugo'][data-olfatea='1'] .borugo-nariz,
+  [data-creature='borugo'][data-olfatea='1'] .borugo-bigotes,
+  [data-creature='borugo'][data-olfatea='1'] .borugo-orejas,
+  [data-creature='borugo'][data-acurruca='1'] .crt-body,
+  [data-creature='borugo'][data-acurruca='1'] .borugo-cabeza { animation: none !important; }
+  /* Motas: sin titileo, quietas y tenues (fotograma digno). */
+  .borugo-motas-luz,
+  .borugo-poder .borugo-motas-luz,
+  [data-creature='borugo'][data-poder='1'] .borugo-motas-luz { animation: none !important; opacity: 0.5; }
 }

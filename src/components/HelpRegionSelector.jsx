@@ -28,6 +28,11 @@ export default function HelpRegionSelector({ onNavigateToDemo }) {
   const selectedRegion = regions.find((r) => r.slug === voiceRegion) || null;
   const showApropiacionNote = voiceRegion === 'amazonica';
 
+  /** @type {any} */
+  const regionData = selectedRegion;
+  const regionSaludos = /** @type {string[]|undefined} */ (regionData?.saludos);
+  const regionCierres = /** @type {string[]|undefined} */ (regionData?.cierres);
+
   return (
     <div className="rounded-2xl bg-slate-900/60 border border-slate-700/50 overflow-hidden">
       <button
@@ -108,12 +113,12 @@ export default function HelpRegionSelector({ onNavigateToDemo }) {
             <div className="rounded-xl bg-slate-800/60 border border-slate-700 p-3">
               <p className="text-[10px] text-slate-500 font-bold uppercase mb-1">Preview</p>
               <p className="text-xs text-slate-300 leading-relaxed">
-                {voiceRegionIntensity === 2 && selectedRegion.saludos?.[0]
-                  ? `${selectedRegion.saludos[0]}\n\n`
+                {voiceRegionIntensity === 2 && regionSaludos?.[0]
+                  ? `${regionSaludos[0]}\n\n`
                   : ''}
                 Tu respuesta técnica de la IA aparece aquí.
-                {voiceRegionIntensity >= 1 && selectedRegion.cierres?.[0]
-                  ? `\n\n${selectedRegion.cierres[0]}`
+                {voiceRegionIntensity >= 1 && regionCierres?.[0]
+                  ? `\n\n${regionCierres[0]}`
                   : ''}
               </p>
             </div>

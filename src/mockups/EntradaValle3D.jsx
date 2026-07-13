@@ -36,11 +36,13 @@ import {
   MUNDO_VALLE_BY_ID,
   COSA_DEL_DIA,
   CLIMAS,
-  climaPorHora,
   animoDeFinca,
   NARRACION,
 } from './valle/valleData';
+/* El reloj del ciclo diurno vivo (franja real del día + override ?ciclo=). */
+import useCicloDia from '../visual/mundo3d/useCicloDia.js';
 import Valle2DFallback from './valle/Valle2DFallback';
+import AbejaTransicion, { AlMontarEscena } from '../visual/creatures/AbejaTransicion.jsx';
 import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
 /* El framework de MUNDOS (three-free en el barrel; los dioramas 3D bajan
    perezosos en `vendor-three`): tocar un lugar del valle ENTRA de verdad. */
@@ -51,13 +53,25 @@ import Mundo, {
   tituloDeMundo,
   useNavegacionMundos,
   TransicionMundo,
+  TransicionNewDonk,
   useAudioMundo,
 } from '../visual/mundo3d/index.js';
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
+import { buildSpatialAgentInitialContext } from '../services/spatialAgentContext';
+import { speak, speakKokoro, stop as stopSpeak } from '../services/ttsService.js';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
+
+/* ENTRAR a un mundo como MURAL New Donk (flujo vivo): en vez del velo plano, la
+   cámara del valle 3D hace dolly + aplane ortográfico hacia el lugar del mundo
+   (el 3D asoma en los bordes) y solo al caer dentro un destello con la luz del
+   destino cubre el intercambio de escena. Flag de módulo para revertir al velo
+   de un toque. VOLVER al valle conserva el velo (el New Donk es de ENTRADA).
+   Reduced-motion: el hook de navegación salta la fase 'viajando' → corte
+   directo, sin dolly ni overlay (ni este ni el velo se montan). */
+const ENTRADA_NEWDONK = true;
 
 /*
  * DEVICE-TIERING REAL — UNA sola fuente de verdad: `decidirTier()` del
@@ -97,22 +111,23 @@ class Valle3DGuard extends Component {
  *   Sin ella (vitrina #/mockups/entrada-3d, sin sesión) Angelita solo las
  *   nombra — el comportamiento de siempre.
  */
-export default function EntradaValle3D({ onBack, onNavigate }) {
-  const [clima, setClima] = useState(() => climaPorHora());
-
-  // ── El clima es ATMÓSFERA, no un selector (auditoría B8/S8): los chips de
-  //    debug se quitaron de la UI. El valle sigue la hora real de la vereda y
-  //    se re-evalúa solo — amanece, atardece y anochece sin botonera.
-  useEffect(() => {
-    const t = setInterval(() => setClima(climaPorHora()), 5 * 60 * 1000);
-    return () => clearInterval(t);
-  }, []);
+export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = null }) {
   const [focoId, setFocoId] = useState(null);
   const [panel, setPanel] = useState(null); // null | 'alerta' | <mundoId>
   const [voz, setVoz] = useState(true);
   const [alertaVista, setAlertaVista] = useState(false); // ¿ya atendió lo del día?
   // El tier del equipo, decidido UNA vez: gobierna la entrada Y los mundos.
   const [equipo] = useState(decidirTier);
+  // Cruce 2D→3D de Angelita cuando el valle 3D monta: la abeja (sprite 2D del
+  // home) vuela y se CLAVA como mesh 3D. Una vez por apertura del valle
+  // (ref-guard), saltable; el gate reduced-motion lo aplica el overlay.
+  const [cruceValle, setCruceValle] = useState(null);
+  const cruceValleHecho = useRef(false);
+  const dispararCruceValle = useCallback(() => {
+    if (cruceValleHecho.current) return;
+    cruceValleHecho.current = true;
+    setCruceValle('entrar');
+  }, []);
   const [valle3dError, setValle3dError] = useState(false);
 
   // ── NAVEGACIÓN valle ↔ mundos: la máquina de fases vive en el framework.
@@ -125,7 +140,37 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
     [],
   );
 
+  // ── El clima es ATMÓSFERA, no un selector (auditoría B8/S8): el valle sigue
+  //    el CICLO DIURNO VIVO por la hora real de la vereda (useCicloDia) y se
+  //    re-evalúa solo — amanece, atardece y anochece sin botonera. La franja
+  //    (amanecer→mañana→mediodía→tarde→atardecer→noche) es una piel de CLIMAS;
+  //    `?ciclo=demo` acelera el día para verlo girar y `?ciclo=17.5` lo clava.
+  const { franja: clima } = useCicloDia({ reducedMotion });
+
   const nav = useNavegacionMundos({ reducedMotion });
+  const viajarAlMundoInicial = nav.viajarAlMundo;
+
+  // ── ENTRAR como MURAL New Donk (flujo vivo): mientras la navegación viaja a
+  //    un mundo (fase 'viajando'), la cámara del valle 3D se APLANA hacia el
+  //    lugar (Valle3D `aplanando`) y este overlay corre el destello. El overlay
+  //    SOBREVIVE al swap de escena: se apaga en su propio `onFin` (no al cambiar
+  //    de fase) para poder REVELAR el mundo ya montado bajo el destello. Se
+  //    ENCIENDE en el handler que zarpa el viaje (`entrarAlMundo`), no en un
+  //    effect (react-hooks/set-state-in-effect). Volver al valle conserva el
+  //    velo clásico; el deep-link inicial también (cae al velo por el fallback
+  //    de más abajo). Reduced-motion no llega aquí: el hook salta 'viajando'.
+  const usarNewDonk = ENTRADA_NEWDONK && !reducedMotion;
+  const [newDonk, setNewDonk] = useState(null);
+
+  // La escucha puede llegar con un mundo ya resuelto por el NLU. Se consume
+  // una vez al montar para que volver al valle siga siendo una decisión de la
+  // persona, no un bucle que la devuelva al mismo lugar.
+  const mundoInicialAbierto = useRef(false);
+  useEffect(() => {
+    if (mundoInicialAbierto.current || !initialMundoId) return;
+    mundoInicialAbierto.current = true;
+    viajarAlMundoInicial(initialMundoId);
+  }, [initialMundoId, viajarAlMundoInicial]);
 
   // ── Sonido ambiental 0-KB (spec S3): el valle reclama su paleta (brisa
   //    dorada) mientras la entrada viva; al entrar a un mundo, <Mundo> reclama
@@ -139,6 +184,10 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   const companero = useMemo(
     () => animoDeFinca(clima, { hayAlerta: !alertaVista }),
     [clima, alertaVista],
+  );
+  const estadoFinca = useMemo(
+    () => ({ clima, animo: companero.animo, energia: companero.energia }),
+    [clima, companero.animo, companero.energia],
   );
 
   // ── Angelita VIVA (auditoría S5): además del idle (respira/flota, en CSS),
@@ -191,61 +240,29 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
     [],
   );
 
-  // ── Voz (Web Speech API): el agente DICE. Se calla si el equipo no la trae
-  //    o si el usuario apaga la voz. Prefiere una voz en español.
-  //    (Si esto se productiza, la voz real es Kokoro vía ttsService — default
-  //    `em_santa`; aquí la vitrina usa la del navegador.)
+  // ── Voz: Angelita usa Kokoro en el equipo. Si no puede reproducirlo, el
+  //    respaldo es la voz del navegador.
   const vozDisponible = useMemo(
-    () => typeof window !== 'undefined' && 'speechSynthesis' in window,
+    () => typeof window !== 'undefined',
     [],
   );
 
   // El toggle vive en un ref para que `hablar`/`decir` sean ESTABLES: prender
   // o apagar la voz no debe re-disparar los efectos que narran.
   const vozRef = useRef(voz);
-  const vocesRef = useRef([]);
   useEffect(() => {
     vozRef.current = voz;
   }, [voz]);
 
-  useEffect(() => {
-    if (!vozDisponible) return undefined;
-    const synth = window.speechSynthesis;
-    const actualizarVoces = () => {
-      const voces = synth.getVoices();
-      if (voces.length) vocesRef.current = voces;
-    };
-    actualizarVoces();
-    if (synth.addEventListener) {
-      synth.addEventListener('voiceschanged', actualizarVoces);
-      return () => synth.removeEventListener('voiceschanged', actualizarVoces);
-    }
-    const anterior = synth.onvoiceschanged;
-    synth.onvoiceschanged = actualizarVoces;
-    return () => {
-      if (synth.onvoiceschanged === actualizarVoces) synth.onvoiceschanged = anterior;
-    };
-  }, [vozDisponible]);
-
   const hablar = useCallback((texto) => {
-    if (!vozRef.current || typeof window === 'undefined' || !window.speechSynthesis) return;
-    try {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(texto);
-      u.lang = 'es-CO';
-      u.rate = 0.98;
-      u.pitch = 1;
-      const esVoz = vocesRef.current.find(
-        (v) => v.lang && v.lang.toLowerCase().startsWith('es'),
-      );
-      // Si el navegador todavía no publicó sus voces, conservamos la
-      // burbuja y evitamos que el saludo salga con la voz inglesa por defecto.
-      if (!esVoz) return;
-      u.voice = esVoz;
-      window.speechSynthesis.speak(u);
-    } catch {
-      /* la voz es un plus, nunca bloquea */
-    }
+    if (!vozRef.current || !texto) return;
+    speakKokoro(texto, { lang: 'es', rate: 0.98 })
+      .then((audio) => {
+        if (!audio && vozRef.current) speak(texto, { rate: 0.98, pitch: 1 });
+      })
+      .catch(() => {
+        if (vozRef.current) speak(texto, { rate: 0.98, pitch: 1 });
+      });
   }, []);
 
   // ── Angelita DICE (voz + burbuja): el texto SIEMPRE acompaña a la voz en la
@@ -275,7 +292,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
 
   useEffect(
     () => () => {
-      if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+      stopSpeak();
     },
     [],
   );
@@ -316,7 +333,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   const volverAlValle = useCallback(() => {
     setFocoId(null);
     setPanel(null);
-    if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+    stopSpeak();
   }, []);
 
   // El CTA de la alerta: en la APP navega a la pantalla real de la acción
@@ -324,7 +341,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   // (antes era un botón mudo — auditoría FASE 0).
   const accionDelDia = useCallback(() => {
     if (onNavigate && COSA_DEL_DIA.accion?.view) {
-      if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+      stopSpeak();
       onNavigate(COSA_DEL_DIA.accion.view);
       return;
     }
@@ -338,9 +355,19 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   //    desde cualquier pantalla, incluida esta vitrina, sin acoplar el mockup.
   const preguntarAlAgente = useCallback(() => {
     if (typeof window === 'undefined') return;
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-    window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'agente' } }));
-  }, []);
+    stopSpeak();
+    window.dispatchEvent(new CustomEvent('chagraNavigate', {
+      detail: {
+        view: 'agente',
+        initialData: buildSpatialAgentInitialContext({
+          mundoId: nav.mundoId,
+          hotspotActivo: focoId,
+          clima,
+          estadoFinca,
+        }),
+      },
+    }));
+  }, [nav.mundoId, focoId, clima, estadoFinca]);
 
   // ── ENTRAR a un mundo (tarea del viaje): cierra el panel, la abeja guía la
   //    transición y el framework monta la escena del mundo. Si el mundo aún no
@@ -349,10 +376,14 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
   const entrarAlMundo = useCallback(
     (id) => {
       if (!nav.viajarAlMundo(id)) return;
+      // Enciende el mural New Donk en el MISMO tick que zarpa el viaje (mismo
+      // render que la fase 'viajando') → el velo queda suprimido y el aplane
+      // del valle corre bajo este overlay. Se apaga solo en su `onFin`.
+      if (usarNewDonk) setNewDonk(id);
       setPanel(null);
       decir(`Angelita lo lleva a ${tituloDeMundo(id)}.`);
     },
-    [nav, decir],
+    [nav, decir, usarNewDonk],
   );
 
   // ── VOLVER del mundo al valle (misma transición, en reversa).
@@ -389,7 +420,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
       // MODO APP (FASE 0 game-dev): la puerta ES real — se corta la voz y se
       // navega a la pantalla de verdad. El valle cumple su promesa.
       if (onNavigate) {
-        if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+        stopSpeak();
         onNavigate(view, data);
         return;
       }
@@ -426,6 +457,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
                   reducedMotion={reducedMotion}
                   onEntrar={entrarMundo}
                   onAlerta={abrirAlerta}
+                  webglBloqueado={valle3dError || equipo.motivo === 'sin-webgl'}
                 />
               )}
             >
@@ -439,10 +471,27 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
                 onAlerta={abrirAlerta}
                 reducedMotion={reducedMotion}
                 tier={equipo.tier}
+                aplanando={!!newDonk && nav.fase === 'viajando'}
               />
+              {/* Dispara el cruce 2D→3D cuando el chunk 3D del valle resolvió
+                  (hermano de <Valle3D> en el Suspense). DOM puro, sin three. */}
+              <AlMontarEscena onMonta={dispararCruceValle} />
             </Suspense>
             </Valle3DGuard>
           )}
+        {/* El OVERLAY del cruce: la abeja 2D vuela y se clava como mesh 3D — así
+            el usuario SÍ ve el 2D→3D. Se desmonta solo al terminar (onFin);
+            reducedMotion → AbejaTransicion no monta nada. */}
+        {cruceValle === 'entrar' && !reducedMotion && (
+          <AbejaTransicion
+            sentido="entrar"
+            tier={equipo.tier}
+            animo={companero.animo}
+            energia={companero.energia}
+            reducedMotion={reducedMotion}
+            onFin={() => setCruceValle(null)}
+          />
+        )}
       </div>
 
       {/* ── Onboarding de 3 s SIN voz: pista táctil del primer ingreso. ── */}
@@ -470,10 +519,23 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
         </section>
       )}
 
-      {/* ── El VIAJE (ida o vuelta): la abeja guía; al terminar, el intercambio
-              de escena ocurre debajo del velo. Con reduced-motion ni se monta
-              (el hook corta directo). ── */}
-      {nav.enViaje && nav.mundoId && (
+      {/* ── El VIAJE. ENTRAR (con New Donk): el aplane del valle 3D ocurre en la
+              escena y ESTE overlay corre el destello — el swap va en su punto
+              medio (`onMitad`) y se apaga solo al revelar (`onFin`). VOLVER (o
+              con el flag apagado): el velo clásico, cuyo swap va al final
+              (`onFin`). Con reduced-motion el hook corta directo: nada se
+              monta. ── */}
+      {newDonk && (
+        <TransicionNewDonk
+          mundoId={newDonk}
+          animo={companero.animo}
+          energia={companero.energia}
+          reducedMotion={reducedMotion}
+          onMitad={nav.completarViaje}
+          onFin={() => setNewDonk(null)}
+        />
+      )}
+      {nav.enViaje && nav.mundoId && !(newDonk && nav.fase === 'viajando') && (
         <TransicionMundo
           mundoId={nav.mundoId}
           sentido={nav.fase === 'viajando' ? 'entrar' : 'volver'}
@@ -618,7 +680,7 @@ export default function EntradaValle3D({ onBack, onNavigate }) {
             onClick={() => {
               const n = !voz;
               setVoz(n);
-              if (!n && typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+              if (!n) stopSpeak();
             }}
           >
             {!vozDisponible ? '💬 Texto' : voz ? '🔊 Voz' : '🔇 Voz'}

@@ -63,7 +63,7 @@ describe('HiloVidaVista — composición de la prosa (puras)', () => {
 
 describe('HiloVidaVista — accesibilidad y acciones', () => {
   test('la narración vive en una región aria-live cortés y atómica', () => {
-    const { container } = render(<HiloVidaVista />);
+    const { container } = render(<HiloVidaVista cielo="" lugar="" pendientes={[]} onIrA={() => {}} />);
     const texto = container.querySelector('[aria-live="polite"]');
     expect(texto).toBeInTheDocument();
     expect(texto).toHaveAttribute('aria-atomic', 'true');
@@ -75,6 +75,8 @@ describe('HiloVidaVista — accesibilidad y acciones', () => {
     const onIrA = vi.fn();
     const { getByRole } = render(
       <HiloVidaVista
+        cielo=""
+        lugar=""
         pendientes={[{ id: 'a1', tema: 'sanidad', view: 'sanidad' }]}
         onIrA={onIrA}
       />,
@@ -86,13 +88,13 @@ describe('HiloVidaVista — accesibilidad y acciones', () => {
 
   test('sin onIrA no hay botones (la capa es solo narrativa)', () => {
     const { queryByRole } = render(
-      <HiloVidaVista pendientes={[{ tema: 'riego', view: 'agua' }]} />,
+      <HiloVidaVista cielo="" lugar="" pendientes={[{ tema: 'riego', view: 'agua' }]} onIrA={() => {}} />,
     );
     expect(queryByRole('button')).toBeNull();
   });
 
   test('reducedMotion marca el data-attr que apaga el pulso', () => {
-    const { container } = render(<HiloVidaVista reducedMotion />);
+    const { container } = render(<HiloVidaVista cielo="" lugar="" pendientes={[]} onIrA={() => {}} reducedMotion />);
     expect(container.querySelector('.hilo-vida')).toHaveAttribute('data-reduced', 'true');
   });
 });

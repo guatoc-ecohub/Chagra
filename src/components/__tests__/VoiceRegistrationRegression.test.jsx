@@ -254,7 +254,7 @@ describe('Paso 3: Confirmacion visual', () => {
 
     const qtyInput = screen.getByDisplayValue('5');
     fireEvent.change(qtyInput, { target: { value: '20' } });
-    expect(qtyInput.value).toBe('20');
+    expect(/** @type {HTMLInputElement} */ (qtyInput).value).toBe('20');
   });
 
   it('NO permite confirmar con entidades vacias', () => {

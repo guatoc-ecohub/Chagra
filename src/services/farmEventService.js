@@ -18,13 +18,13 @@ import { validateFarmProcess, validateFarmProcessEvent } from '../types/farmProc
  *
  * @param {string} processId
  * @param {import('../types/farmProcess').FarmProcess} [hint]
- * @param {number} occurredAt — timestamp del evento que disparó el upsert
+ * @param {number} [occurredAt] - timestamp del evento que disparo el upsert
  * @returns {import('../types/farmProcess').FarmProcess}
  */
 export const buildUpsertPlaceholder = (processId, hint, occurredAt) => {
   /** @type {Partial<import('../types/farmProcess').FarmProcessAttributes>} */
   const ha = (hint && hint.attributes) || {};
-  const createdAt = Number.isInteger(ha.created_at) && ha.created_at > 0 ? ha.created_at : occurredAt;
+  const createdAt = Number.isInteger(ha.created_at) && ha.created_at > 0 ? ha.created_at : (occurredAt || Date.now());
   return {
     process_id: processId,
     type: 'farm_process',
@@ -39,7 +39,8 @@ export const buildUpsertPlaceholder = (processId, hint, occurredAt) => {
       status: ha.status || 'active',
       current_stage: ha.current_stage || 'sowing_confirmed',
       created_at: createdAt,
-      updated_at: occurredAt,
+      updated_at: occurredAt || Date.now(),
+      /** @ts-ignore */
       _synthetic: true,
     },
   };
@@ -135,7 +136,7 @@ export const recordFarmEvent = async (input) => {
     dedupReq.onerror = () => reject(dedupReq.error);
 
     tx.oncomplete = () => {
-      resolve(event);
+      resolve(/** @type {any} */ (event));
       // Fire-and-forget: encolar para sync a FarmOS (NO bloquea el registro local).
       // Si falla, el evento ya está seguro en IDB. Cap #9 — antes dormido.
       import('./farmProcessSync').then(({ enqueueFarmProcessEvent }) =>
@@ -194,10 +195,10 @@ export const createFarmProcess = async (process) => {
           window.dispatchEvent(new CustomEvent('farmProcessChanged', { detail: { process_id: process.process_id } }));
         }
       } catch { /* noop */ }
-      resolve({ process, event });
+      resolve({ process, event: /** @type {any} */ (event) });
       // Fire-and-forget: encolar para sync a FarmOS (NO bloquea).
       import('./farmProcessSync').then(({ enqueueFarmProcessEvent }) =>
-        enqueueFarmProcessEvent(event, process).catch(() => {}),
+        enqueueFarmProcessEvent(/** @type {any} */ (event), process).catch(() => {}),
       );
     };
     tx.onerror = () => reject(tx.error);

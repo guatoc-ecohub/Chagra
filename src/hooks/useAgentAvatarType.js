@@ -30,9 +30,7 @@ function readPref() {
  * localStorage y permite actualizarla con sincronización entre pestañas
  * mediante eventos 'storage' y 'chagra:agent-avatar-changed'.
  *
- * @returns {[string, Function]} Tupla con el tipo de avatar actual y la función para actualizarlo.
- * @returns {'colibri'|'colibri_svg'|'maiz'} returns.0 - Tipo de avatar actual.
- * @returns {Function} returns.1 - Función updateType(next) que persiste y propaga el nuevo tipo.
+ * @returns {[string, Function]} Tupla con [0] tipo de avatar actual, [1] función para actualizarlo (updateType).
  */
 export default function useAgentAvatarType() {
     const [type, setType] = useState(readPref);

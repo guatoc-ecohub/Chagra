@@ -67,7 +67,7 @@ function reqAsPromise(req) {
  * @param {string} [args.model] - modelo a usar (opcional, default 'default')
  * @returns {Promise<number>} id del registro encolado (o null si falla persistencia)
  */
-export async function enqueueRequest({ prompt, route = 'unknown', model = 'default' } = {}) {
+export async function enqueueRequest({ prompt, route = 'unknown', model = 'default' } = /** @type {any} */ ({})) {
   try {
     if (!prompt || typeof prompt !== 'string') {
       console.warn('[agentRequestQueue] enqueueRequest requiere prompt válido');
@@ -255,7 +255,7 @@ function applyResultToItem(item, result, attempt = 0) {
  * @param {Object} args.result - telemetría del turno (response, latency, grounding, tokens)
  * @returns {Promise<Object|null>} item actualizado o null si falla/no existe
  */
-export async function finalizeRequest({ id, result } = {}) {
+export async function finalizeRequest({ id, result } = /** @type {any} */ ({})) {
   try {
     const item = await getRequest(id);
     if (!item) return null;
@@ -280,13 +280,13 @@ export async function finalizeRequest({ id, result } = {}) {
  * @param {string|Error} [args.error]
  * @returns {Promise<Object|null>}
  */
-export async function failRequest({ id, error } = {}) {
+export async function failRequest({ id, error } = /** @type {any} */ ({})) {
   try {
     const item = await getRequest(id);
     if (!item) return null;
     item.status = 'failed';
     item.ts_done = Date.now();
-    item.error = error ? (error.message || String(error)) : 'fallo en el pipeline';
+    item.error = error ? (/** @type {Error} */ (error).message || String(error)) : 'fallo en el pipeline';
     await persistItem(item);
     return item;
   } catch (e) {

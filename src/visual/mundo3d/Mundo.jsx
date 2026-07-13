@@ -25,6 +25,7 @@ import Mundo2D from './Mundo2D.jsx';
 import useAudioMundo from './useAudioMundo.js';
 import useFincaViva from './useFincaViva.js';
 import InvitacionAudioMundo from './InvitacionAudioMundo.jsx';
+import AbejaTransicion, { AlMontarEscena } from '../creatures/AbejaTransicion.jsx';
 import './mundo.css';
 
 /* Los dioramas 3D se cargan PEREZOSO: three/@react-three viven en su propio
@@ -51,7 +52,7 @@ const ESCENAS_3D = Object.fromEntries(
 /* Cuánto esperamos el chunk 3D antes de la CAÍDA DIGNA al 2D. Con señal
    intermitente (el caso normal del campo) un fetch colgado NO lanza error —
    el ErrorBoundary nunca lo ve; este timeout sí. */
-export const CARGA_3D_TIMEOUT_MS = 9000;
+export const CARGA_3D_TIMEOUT_MS = 15000;
 
 function MundoCargando({ tinte, onTimeout }) {
   /* El fallback vive SOLO mientras Suspense espera el chunk: si el chunk llega,
@@ -113,6 +114,9 @@ function MundoInterno({
      `lazy` nuevo al reintentar (import() fresco, no la promesa colgada). */
   const [caido3d, setCaido3d] = useState(false);
   const [intento, setIntento] = useState(0);
+  // El CRUCE 2D→3D de Angelita (overlay DOM): se enciende cuando el chunk 3D
+  // resuelve (AlMontarEscena, hermano de <Escena> dentro del Suspense).
+  const [cruce, setCruce] = useState(null);
 
   const plan = resolverMundo(mundoId, tier);
   const tinte = tinteDeMundo(mundoId);
@@ -153,18 +157,20 @@ function MundoInterno({
     const espejo = resolverMundo(mundoId, 'bajo');
     return (
       <div className="mundo-root" data-dim="2d" data-mundo={mundoId} data-caida3d="1">
-        {espejo.modo === '2d' && (
-          <Mundo2D
-            escena={espejo.escena}
-            motivo={espejo.motivo}
-            entrada={espejo.entrada}
-            tinte={tinte}
-            reducedMotion={reducedMotion}
-            onHotspot={onHotspot}
-            animo={animo}
-            energia={energia}
-          />
-        )}
+        <div className="mundo-caida__contenido">
+          {espejo.modo === '2d' && (
+            <Mundo2D
+              escena={espejo.escena}
+              motivo={espejo.motivo}
+              entrada={espejo.entrada}
+              tinte={tinte}
+              reducedMotion={reducedMotion}
+              onHotspot={onHotspot}
+              animo={animo}
+              energia={energia}
+            />
+          )}
+        </div>
         {/* Sin invitación de audio acá: el aviso de caída ya ocupa ese lugar
             (señal mala ≠ momento de invitar); queda para la próxima entrada. */}
         <AvisoCaida3D tinte={tinte} onReintentar={reintentar3D} />
@@ -207,7 +213,23 @@ function MundoInterno({
             focoId={focoId}
             focoToken={focoToken}
           />
+          {/* CRUCE 2D→3D: hermano de <Escena> — su useEffect dispara cuando el
+              chunk 3D resolvió y la escena montó (Suspense revela a los hijos
+              juntos). Enciende el overlay de Angelita cruzando de 2D a 3D. */}
+          <AlMontarEscena onMonta={() => { if (!reducedMotion) setCruce('entrar'); }} />
         </Suspense>
+        {/* El overlay del cruce 2D→3D (Angelita "entra" a la escena). Se
+            desmonta solo al terminar (onFin); reducedMotion → no monta nada. */}
+        {cruce === 'entrar' && !reducedMotion && (
+          <AbejaTransicion
+            sentido="entrar"
+            tier={tier}
+            animo={animo}
+            energia={energia}
+            reducedMotion={reducedMotion}
+            onFin={() => setCruce(null)}
+          />
+        )}
         {/* Invitación de PRIMER USO del sonido ambiental (una sola vez): vive
             en el host para cubrir app y vitrinas por igual (allá no hay Perfil). */}
         <InvitacionAudioMundo reducedMotion={reducedMotion} tinte={tinte} />

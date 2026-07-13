@@ -63,8 +63,8 @@ describe('useThemeBackgroundStore', () => {
       'biopunk-4',
     ]);
     // El fondo "Clásico"/'default' fue eliminado del catálogo.
-    expect(BACKGROUND_CATALOG.some((b) => b.id === 'default')).toBe(false);
-    expect(BACKGROUND_CATALOG.some((b) => b.label === 'Clásico')).toBe(false);
+    expect(BACKGROUND_CATALOG.some((b) => /** @type {any} */ (b).id === 'default')).toBe(false);
+    expect(BACKGROUND_CATALOG.some((b) => /** @type {any} */ (b).label === 'Clásico')).toBe(false);
     expect(Object.isFrozen(BACKGROUND_CATALOG)).toBe(true);
     expect(Object.isFrozen(BACKGROUND_CATALOG[0])).toBe(true);
   });

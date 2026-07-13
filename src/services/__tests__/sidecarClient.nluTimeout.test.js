@@ -77,15 +77,16 @@ describe('sidecarClient — NLU timeout raíz #349', () => {
     await vi.advanceTimersByTimeAsync(10500);
     expect(captured).not.toBeNull();
     // Con el fix a 18000 el signal sigue vivo a los 10.5s.
-    expect(captured.aborted).toBe(false);
+    expect(/** @type {any} */ (captured).aborted).toBe(false);
 
     // El sidecar responde a los 17s → llega ANTES del nuevo abort (18s).
     await vi.advanceTimersByTimeAsync(7000);
     const res = await promise;
     expect(res).not.toBeNull();
-    expect(res.useTool).toBe(false);
+    if (res) expect(res.useTool).toBe(false);
     // Nunca se abortó: el grounding alcanzó a llegar.
-    expect(captured.aborted).toBe(false);
+    const aborted = /** @type {any} */ (captured).aborted;
+    expect(aborted).toBe(false);
   });
 
   it('sigue abortando si el sidecar excede el nuevo límite (degrada a null, no throw)', async () => {

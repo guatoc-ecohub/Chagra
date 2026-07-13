@@ -40,6 +40,7 @@ const mockSuccess = (lat, lng) => ({
 
 beforeEach(() => {
   attempts = [];
+  // @ts-ignore
   navigator.geolocation = {
     getCurrentPosition: vi.fn((success, error, config) => {
       attempts.push({ ...config });

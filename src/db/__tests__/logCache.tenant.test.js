@@ -98,10 +98,10 @@ vi.mock('../../db/dbCore', () => ({
 }));
 
 beforeEach(() => {
-  globalThis.IDBKeyRange = {
+  globalThis.IDBKeyRange = /** @type {any} */ ({
     only: (val) => ({ lower: val, upper: val }),
     bound: (lower, upper) => ({ lower, upper }),
-  };
+  });
   store = new Map();
   _resetForTests();
 });

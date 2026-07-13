@@ -407,7 +407,7 @@ function Diorama({ params, reducedMotion }) {
     const nB = 1 + Math.round(vida * 3);
     const briz = Array.from({ length: nB }, (_, i) => ({
       key: `b${i}`,
-      pos: [(r() - 0.5) * (ANCHO - 1), alturaTotal + 0.12, (r() - 0.5) * (PROF - 0.6)],
+      pos: /** @type {[number, number, number]} */ ([(r() - 0.5) * (ANCHO - 1), alturaTotal + 0.12, (r() - 0.5) * (PROF - 0.6)]),
       alto: 0.16 + r() * 0.12,
       giro: r() * Math.PI,
     }));

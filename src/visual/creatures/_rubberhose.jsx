@@ -26,12 +26,11 @@ export const RH_CHEEK = '#f2907a';
  * contorno grueso, pupila GRANDE y brillo (catchlight). Un mismo grupo parpadea
  * (`rh-blink`) para que los dos ojos cierren sincronizados.
  *
- * @param {Array<{cx:number,cy:number,r:number}>} ojos  uno (perfil, colibrí) o
- *   dos (3/4, abeja/oso). El primero es el "cercano" (puede ser más grande).
- * @param {[number,number]} [mirar=[0.32,0.34]]  a dónde apunta la pupila, como
- *   fracción del radio (x,y). Al voltear la criatura el scaleX lo refleja solo.
- * @param {boolean} [parpadea=true]  activa `rh-blink` (el CSS lo gatea por RM/tier).
- * @param {string}  [ink=RH_INK]  color del contorno.
+ * @param {Object} props
+ * @param {Array<{cx:number,cy:number,r:number}>} [props.ojos]
+ * @param {[number,number]} [props.mirar=[0.32,0.34]]
+ * @param {boolean} [props.parpadea=true]
+ * @param {string} [props.ink=RH_INK]
  */
 export function OjosRubber({ ojos = [], mirar = [0.32, 0.34], parpadea = true, ink = RH_INK }) {
   const [mx, my] = mirar;
@@ -62,10 +61,10 @@ export function OjosRubber({ ojos = [], mirar = [0.32, 0.34], parpadea = true, i
 
 /**
  * Chapetas / cachetes campesinos: el rubor coral que da ternura andina.
- * @param {Array<{cx:number,cy:number,r:number}>} puntos
- * @param {string} [color=RH_CHEEK]
- * @param {boolean} [vivo=false]  activa `rh-rubor`: las chapetas se encienden
- *   un instante en un ciclo largo (el CSS lo gatea por RM/tier).
+ * @param {Object} props
+ * @param {Array<{cx:number,cy:number,r:number}>} [props.puntos]
+ * @param {string} [props.color=RH_CHEEK]
+ * @param {boolean} [props.vivo=false]
  */
 export function Cachetes({ puntos = [], color = RH_CHEEK, vivo = false }) {
   return (
@@ -79,8 +78,12 @@ export function Cachetes({ puntos = [], color = RH_CHEEK, vivo = false }) {
 
 /**
  * Sonrisa de goma: el arco que hace que TODA criatura rubber-hose se vea amable.
- * @param {number} cx @param {number} cy centro de la boca
- * @param {number} [w=3] ancho @param {number} [prof=1.4] profundidad del arco
+ * @param {Object} props
+ * @param {number} [props.cx=0]
+ * @param {number} [props.cy=0]
+ * @param {number} [props.w=3]
+ * @param {number} [props.prof=1.4]
+ * @param {string} [props.ink=RH_INK]
  */
 export function Sonrisa({ cx = 0, cy = 0, w = 3, prof = 1.4, ink = RH_INK }) {
   const x0 = cx - w / 2;
@@ -96,23 +99,36 @@ export function Sonrisa({ cx = 0, cy = 0, w = 3, prof = 1.4, ink = RH_INK }) {
  * mitón/pie crema en la punta — la firma de Cuphead. Con `rh-sway` cuelga y
  * hace follow-through (secondary motion) en el idle.
  *
- * @param {string}  d  el path del tubo (usar curvas suaves; los caps redondos lo cierran).
- * @param {number}  [ancho=2.3]  grosor del tubo.
- * @param {[number,number]|null} [punta=null]  centro del mitón/pie; null = tubo pelado.
- * @param {number}  [puntaR=1.6]  radio del mitón/pie.
- * @param {boolean} [pie=false]  la punta es un pie (elipse) en vez de mano (círculo).
- * @param {boolean} [sway=false]  activa el follow-through `rh-sway`.
- * @param {number}  [delay=0]  desfase del sway (para que brazos/patas no vayan a la par).
+ * `clase` da nombre al miembro (p.ej. 'crt-brazo-r') para que los GESTOS de la
+ * criatura (celebra/señala) lo agarren por CSS; `origen` es su transform-origin
+ * — el HOMBRO/CADERA real dentro del fill-box (para brazos que se alzan, 'top
+ * center' quedaba lejos del hombro y la rotación descolgaba el miembro). El
+ * estilo de pivote se estampa SIEMPRE (haya o no sway): así los gestos ESTÁTICOS
+ * (fotograma digno con animated=false / reduced-motion) también pivotan bien.
+ *
+ * @param {Object} props
+ * @param {string} props.d
+ * @param {number} [props.ancho=2.3]
+ * @param {[number,number]|null} [props.punta=null]
+ * @param {number} [props.puntaR=1.6]
+ * @param {boolean} [props.pie=false]
+ * @param {boolean} [props.sway=false]
+ * @param {number} [props.delay=0]
+ * @param {string} [props.clase]  clase extra del gesto (p.ej. 'crt-brazo-l')
+ * @param {string} [props.origen='top center']  transform-origin (el hombro)
  */
 export function Miembro({
   d, ancho = 2.3, punta = null, puntaR = 1.6, pie = false, sway = false, delay = 0,
-  ink = RH_INK, glove = RH_GLOVE,
+  clase, origen = 'top center', ink = RH_INK, glove = RH_GLOVE,
 }) {
-  const style = sway
-    ? { transformBox: 'fill-box', transformOrigin: 'top center', animationDelay: `${delay}s` }
-    : undefined;
+  const style = {
+    transformBox: 'fill-box',
+    transformOrigin: origen,
+    ...(sway ? { animationDelay: `${delay}s` } : null),
+  };
+  const clases = [sway ? 'rh-sway' : null, clase].filter(Boolean).join(' ') || undefined;
   return (
-    <g className={sway ? 'rh-sway' : undefined} style={style}>
+    <g className={clases} style={style}>
       <path d={d} stroke={ink} strokeWidth={ancho} fill="none" strokeLinecap="round" strokeLinejoin="round" />
       {punta && (pie ? (
         <ellipse cx={punta[0]} cy={punta[1]} rx={puntaR * 1.15} ry={puntaR * 0.72} fill={glove} stroke={ink} strokeWidth="0.7" />
@@ -126,7 +142,13 @@ export function Miembro({
 /**
  * Antena de goma con bombillo (punta redonda). Con `rh-sway` se mece con
  * follow-through — la secondary motion que delata que el cuerpo se movió.
- * @param {string} d  el tallo (curva). @param {[number,number]} bulbo  centro de la bolita.
+ * @param {Object} props
+ * @param {string} props.d
+ * @param {[number,number]} props.bulbo
+ * @param {number} [props.bulboR=1.15]
+ * @param {boolean} [props.sway=false]
+ * @param {number} [props.delay=0]
+ * @param {string} [props.ink=RH_INK]
  */
 export function AntenaRubber({ d, bulbo, bulboR = 1.15, sway = false, delay = 0, ink = RH_INK }) {
   const style = sway
@@ -138,4 +160,57 @@ export function AntenaRubber({ d, bulbo, bulboR = 1.15, sway = false, delay = 0,
       <circle cx={bulbo[0]} cy={bulbo[1]} r={bulboR} fill={ink} />
     </g>
   );
+}
+
+/* Boca interior (garganta) para las bocas abiertas — un rojo cálido tenue. */
+export const RH_BOCA = '#8a3b34';
+
+/**
+ * BocaVisema — la BOCA de goma en sus 4 formas de LIP-SYNC
+ * (ficha DR animación rubber-hose §2). Consume el `visema` que produce
+ * `useLipSync` ('V1'..'V4') y dibuja:
+ *   V1 CERRADA     → el arco amable de siempre (Sonrisa) — silencio / M,B,P.
+ *   V2 ENTREABIERTA→ boca apenas abierta (S,Z,T,D,F,V).
+ *   V4 FRUNCIDA    → labios en "O" (O,U,W).
+ *   V3 ABIERTA     → apertura amplia con garganta y lengüita (A,E).
+ *
+ * Species-agnostic: cualquier bicho la coloca en su cara (cx,cy,w). Sin visema
+ * (o 'V1') se ve EXACTO como la sonrisa neutra → no rompe caras existentes.
+ *
+ * @param {Object} props
+ * @param {number} [props.cx=0] @param {number} [props.cy=0] centro de la boca.
+ * @param {number} [props.w=3]  ancho de referencia (el de la sonrisa del bicho).
+ * @param {number} [props.prof=1.1]  profundidad del arco cerrado.
+ * @param {string} [props.visema='V1']
+ * @param {string} [props.ink=RH_INK] @param {string} [props.boca=RH_BOCA]
+ */
+export function BocaVisema({ cx = 0, cy = 0, w = 3, prof = 1.1, visema = 'V1', ink = RH_INK, boca = RH_BOCA }) {
+  if (visema === 'V2') {
+    // Entreabierta: elipse chata, apenas separa los labios.
+    return (
+      <g>
+        <ellipse cx={cx} cy={cy + prof * 0.3} rx={w * 0.32} ry={prof * 0.55} fill={boca} stroke={ink} strokeWidth="0.7" />
+      </g>
+    );
+  }
+  if (visema === 'V4') {
+    // Fruncida en "O": labios redondeados hacia adentro.
+    return (
+      <g>
+        <circle cx={cx} cy={cy + prof * 0.4} r={w * 0.26} fill={boca} stroke={ink} strokeWidth="0.9" />
+        <circle cx={cx} cy={cy + prof * 0.4} r={w * 0.13} fill="#5c231f" />
+      </g>
+    );
+  }
+  if (visema === 'V3') {
+    // Abierta amplia: garganta + lengüita (los picos A,E).
+    return (
+      <g>
+        <ellipse cx={cx} cy={cy + prof * 0.55} rx={w * 0.42} ry={prof * 1.05} fill={boca} stroke={ink} strokeWidth="0.9" />
+        <path d={`M${cx - w * 0.3},${cy + prof * 1.1} Q${cx},${cy + prof * 1.7} ${cx + w * 0.3},${cy + prof * 1.1} Z`} fill="#d1615a" />
+      </g>
+    );
+  }
+  // V1 (o desconocido): la sonrisa cerrada de siempre.
+  return <Sonrisa cx={cx} cy={cy} w={w} prof={prof} ink={ink} />;
 }

@@ -17,6 +17,7 @@ import {
   guardInvertedViability,
   guardDoseWithoutSource,
   guardInventedContact,
+  guardHallucinatedContact,
   guardSpeciesSubstitution,
   guardCompanionBinomial,
   guardVisionWithoutPhoto,
@@ -878,6 +879,45 @@ describe('guardInventedContact', () => {
 });
 
 // ──────────────────────────────────────────────────────────────────────────
+// GUARD 5B - contacto institucional con número, correo o dirección inventados
+// ──────────────────────────────────────────────────────────────────────────
+describe('guardHallucinatedContact', () => {
+  it('suprime un telefono institucional del ICA y remite al canal oficial genérico', () => {
+    const txt = 'El ICA atiende al 601-3323700 para reportes fitosanitarios.';
+    const out = guardHallucinatedContact(txt, { userMessage: 'cual es el telefono del ICA?' });
+    expect(out.modified).toBe(true);
+    expect(out.reason).toMatch(/contacto_institucional_hallucinado/);
+    expect(out.text).toMatch(/canal oficial de la entidad/i);
+    expect(out.text).toMatch(/ica\.gov\.co/i);
+    expect(out.text).not.toMatch(/601-3323700/);
+  });
+
+  it('no toca una mención legitima sin dato de contacto', () => {
+    const txt = 'Puede consultar al ICA si necesita orientacion tecnica.';
+    const out = guardHallucinatedContact(txt, { userMessage: 'cual es el contacto del ICA?' });
+    expect(out.modified).toBe(false);
+    expect(out.text).toBe(txt);
+  });
+
+  it('suprime un correo institucional afirmado como contacto', () => {
+    const txt = 'Escriba a contacto@ica.gov.co para validar el tramite.';
+    const out = guardHallucinatedContact(txt, { userMessage: 'cual es el correo del ICA?' });
+    expect(out.modified).toBe(true);
+    expect(out.text).toMatch(/canal oficial de la entidad/i);
+    expect(out.text).not.toMatch(/contacto@ica\.gov\.co/);
+  });
+
+  it('cableado en applyOutputGuards', () => {
+    const txt = 'La UMATA atiende en 320 987 6543 para orientar el cultivo.';
+    const out = applyOutputGuards(txt, { userMessage: 'cual es el contacto de la UMATA?' });
+    expect(out.modified).toBe(true);
+    expect(out.reasons.join(' ')).toMatch(/contacto_institucional_hallucinado/);
+    expect(out.text).toMatch(/canal oficial de la entidad/i);
+    expect(out.text).not.toMatch(/320 987 6543/);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
 // GUARD 5 — sustitución de especie (binomio del cultivo principal contradice
 // su resolución del grounding). Caso real prod (2026-05-30): el usuario pidió
 // "sembrar lulo", el grounding resolvió lulo=Solanum quitoense CORRECTO, pero
@@ -1276,7 +1316,7 @@ describe('filterNoiseEntities', () => {
   it('maneja entrada no-array sin romper', () => {
     expect(filterNoiseEntities(null)).toEqual([]);
     expect(filterNoiseEntities(undefined)).toEqual([]);
-    expect(filterNoiseEntities('x')).toEqual([]);
+    expect(filterNoiseEntities(/** @type {any} */ ('x'))).toEqual([]);
   });
 
   it('en la cadena: "aquí"→Pteridium NO dispara guard de invasora', () => {
@@ -1613,15 +1653,30 @@ describe('applyOutputGuards (cadena)', () => {
       expect(out.text).toBe(ok);
     });
 
-    it('recorta respuestas >250 palabras a primeras 3 oraciones + oferta', () => {
-      const long = Array.from({ length: 55 }, (_, i) =>
-        `Recomendación ${i + 1} para tu cultivo de tomate en clima frío.`
+    it('recorta respuestas verborrea (>700 palabras) conservando ~10 oraciones + oferta', () => {
+      // 2026-07-12: umbral subido a 700 (antes 250 mutilaba respuestas técnicas).
+      const long = Array.from({ length: 120 }, (_, i) =>
+        `Recomendacion ${i + 1} para tu cultivo de tomate en clima frio de montaña.`
       ).join(' ');
-      expect(long.split(/\s+/).filter(Boolean).length).toBeGreaterThan(250);
+      expect(long.split(/\s+/).filter(Boolean).length).toBeGreaterThan(700);
       const out = guardConciseResponse(long);
       expect(out.modified).toBe(true);
-      expect(out.reason).toMatch(/verbose|concise/i);
+      expect(out.reason).toMatch(/verbose|concise|hard/i);
       expect(out.text).toMatch(/¿Quieres que profundice/i);
+    });
+
+    it('NO recorta respuestas técnicas de 250-700 palabras (intelligence-first)', () => {
+      // Regresión del bug reportado 2026-07-12: respuestas técnicas se cortaban
+      // a 1/3. Una respuesta detallada de ~450 palabras debe quedar INTACTA.
+      const tecnica = Array.from({ length: 55 }, (_, i) =>
+        `Detalle tecnico ${i + 1} sobre el manejo de la fresa en clima frio.`
+      ).join(' ');
+      const w = tecnica.split(/\s+/).filter(Boolean).length;
+      expect(w).toBeGreaterThan(250);
+      expect(w).toBeLessThan(700);
+      const out = guardConciseResponse(tecnica);
+      expect(out.modified).toBe(false);
+      expect(out.text).toBe(tecnica);
     });
 
     it('fuerza recorte duro si >400 palabras', () => {
@@ -1670,8 +1725,8 @@ describe('applyOutputGuards (cadena)', () => {
     });
 
     it('se integra en la cadena applyOutputGuards: recorta respuesta larga', () => {
-      const veryLong = Array.from({ length: 35 }, (_, i) =>
-        `Paso importante número ${i + 1} que debes seguir en tu cultivo de tomate.`
+      const veryLong = Array.from({ length: 110 }, (_, i) =>
+        `Paso importante número ${i + 1} que debes seguir en tu cultivo de tomate en clima frío.`
       ).join(' ');
       const out = applyOutputGuards(veryLong, {});
       expect(out.modified).toBe(true);

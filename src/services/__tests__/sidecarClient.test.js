@@ -408,7 +408,7 @@ describe('sidecarClient — feature flag on', () => {
       expect(await getNormativaIca('delete_database', {})).toBeNull();
       expect(await getNormativaIca('', {})).toBeNull();
       expect(await getNormativaIca(null, {})).toBeNull();
-      expect(await getNormativaIca(42, {})).toBeNull();
+      expect(await getNormativaIca(/** @type {any} */ (42), {})).toBeNull();
       expect(fetchMock).not.toHaveBeenCalled();
     });
 

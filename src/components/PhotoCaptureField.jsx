@@ -70,14 +70,14 @@ const PhotoCaptureField = ({ onPhoto, onRemove, label = "Capturar Foto", value =
             // venga del path full-size de la cámara.
             const preCompressed = await compressImage(file);
             if (!preCompressed.ok) {
-                if (preCompressed.reason === 'too_large') {
+                if (/** @type {any} */ (preCompressed).reason === 'too_large') {
                     setError(IMAGE_TOO_LARGE_MESSAGE);
                 } else {
                     setError('No se pudo procesar la foto. Reintenta.');
                 }
                 return;
             }
-            const { blob } = await captureAndCompress(preCompressed.blob);
+            const { blob } = await captureAndCompress(/** @type {File} */ (/** @type {any} */ (preCompressed.blob)));
             onPhoto(blob);
         } catch (err) {
             console.error('[PhotoField] Error procesando foto:', err);

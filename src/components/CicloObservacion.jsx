@@ -63,7 +63,7 @@ export default function CicloObservacion({ processId, processHint, currentStage,
     setSaving(true);
     setErrorMsg('');
     try {
-      await registerObservation({ processId, processHint, text: t, actor: 'operator', source: 'text' });
+      await registerObservation({ processId, processHint, text: t, actor: 'operator', source: 'text', evidence: null, extraPayload: null });
       maybeSuggestStage(t);
       flashSaved('Observación guardada.');
     } catch (err) {

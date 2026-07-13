@@ -407,7 +407,7 @@ describe('chipIntentRouter — Deep Research (B14: stub honesto, backend no serv
     const plan = planForcedIntent('deep', 'sistema agroforestal cacao');
     expect(plan.intent).toBe('deep');
     expect(plan.stub).toBe(true);
-    expect(plan.deep).toBeUndefined();
+    expect(/** @type {any} */ (plan).deep).toBeUndefined();
     expect(plan.tool).toBeNull();
     expect(typeof plan.stubMessage).toBe('string');
     expect(plan.stubMessage.toLowerCase()).toContain('no está disponible');
@@ -471,7 +471,7 @@ describe('chipIntentRouter — opts ruidosos no contaminan los args', () => {
   });
 
   it('plaga ignora opts no relacionados', () => {
-    const plan = planForcedIntent('plaga', 'broca', { foo: 'bar' });
+    const plan = planForcedIntent('plaga', 'broca', /** @type {any} */ ({ foo: 'bar' }));
     expect(plan.tool).toBe('get_pest_controllers');
     expect(plan.args).toEqual({ pest_id_or_name: 'broca' });
   });
@@ -488,7 +488,7 @@ describe('chipIntentRouter — opts ruidosos no contaminan los args', () => {
     const plan = planForcedIntent('deep', 'abonos verdes', { municipio: 'Choachí' });
     expect(plan.stub).toBe(true);
     expect(plan.tool).toBeNull();
-    expect(plan.deep).toBeUndefined();
+    expect(/** @type {any} */ (plan).deep).toBeUndefined();
   });
 });
 

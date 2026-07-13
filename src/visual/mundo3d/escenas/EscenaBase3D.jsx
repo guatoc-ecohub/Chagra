@@ -4,10 +4,10 @@
  * El DR (§4.4, §6) pide que cada arquetipo sea SOLO su diorama; el resto (Canvas,
  * luz, atmósfera, cámara, hotspots, la abeja) se hereda. Aquí vive ese resto: un
  * `<Canvas>` austero (DPR ≤ 1.5, SIN shadow-maps, SIN post-proceso, `frameloop`
- * a demanda si hay reduced-motion), la ATMÓSFERA DE HORA DORADA compartida con
- * el valle (auditoría 3D B5/B6: sol direccional cálido + relleno frío tenue +
- * niebla sutil + sombras de contacto falsas — forma y peso sin pagar sombras
- * reales), `OrbitControls` acotado, los `hotspots` como botones-billboard
+ * a demanda si hay reduced-motion), la ATMÓSFERA DE LA FRANJA DEL DÍA compartida
+ * con el valle (ciclo diurno vivo: la madre de la mezcla es el preset de la hora
+ * real — auditoría 3D B5/B6: sol direccional + relleno frío tenue + niebla sutil
+ * + sombras de contacto falsas), `OrbitControls` acotado, los `hotspots` como botones-billboard
  * accesibles que re-rutean a vistas 2D reales, y Angelita con su coreografía
  * compartida. El arquetipo pasa su geometría como `children`.
  *
@@ -22,17 +22,24 @@
  */
 import { Suspense, lazy, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
+import { Html, OrbitControls, Stars } from '@react-three/drei';
+import { MonitorRendimiento } from '../usePerformanceMonitor.jsx';
 import * as THREE from 'three';
 import { AbejaEscena } from './useEntradaAbeja.jsx';
 import CamaraDirector from './CamaraDirector.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
 import { ESTADO_FINCA_MUESTRA } from './reaccionFinca.js';
 import useHaptics from '../useHaptics.js';
-/* La dirección de arte compartida (hora dorada + cielos por familia) vive en
-   un módulo propio: los arquetipos eligen su CIELOS.<familia>, esta base la
-   mezcla hacia ATMOSFERA. Una sola fuente, cero hexes sueltos. */
-import { ATMOSFERA, mezclarCielo } from '../atmosferaMadre.js';
+/* La dirección de arte compartida (cielos por familia + receta de mezcla) vive
+   en un módulo propio: los arquetipos eligen su CIELOS.<familia>, esta base la
+   mezcla hacia la MADRE de la franja. Una sola fuente, cero hexes sueltos. */
+import { mezclarCielo } from '../atmosferaMadre.js';
+/* CICLO DIURNO VIVO: la madre ya no es la hora dorada clavada — es el preset
+   de la FRANJA REAL del día (cielosHoraData, vía el reloj de useCicloDia). El
+   mundo amanece, atardece y anochece CON el valle; el arquetipo no se entera. */
+import useCicloDia from '../useCicloDia.js';
+import { presetDeHora } from '../cielosHoraData.js';
+import { perfilDeTier } from '../deviceTier.js';
 import CapaVivaMundo from '../CapaVivaMundo.jsx';
 
 /* El bloom sutil de la hora dorada: chunk LAZY con gate ESTRICTO
@@ -56,14 +63,17 @@ function Contenido({
   const haptics = useHaptics({ reducedMotion });
   const zoom = entrada?.zoom ?? 6.5;
   const acento = (tinte && tinte[0]) || '#3f8f4e';
-  const centro = entrada?.centro || [0, (params?.alto ?? 1.1) * 0.5, 0];
+  const centro = entrada?.centro || /** @type {[number, number, number]} */ ([0, (params?.alto ?? 1.1) * 0.5, 0]);
 
-  // La atmósfera del mundo: su `cielo` propio MEZCLADO 60% hacia la hora dorada
-  // del valle (B6 — hoy entrar a un mundo "aplana" porque cada escena fija un
-  // cielo frío propio). La receta vive AHORA en atmosferaMadre (mezclarCielo):
-  // ley exportada, mismo resultado aquí y en cualquier consumidor futuro.
-  // Memoizado: THREE.Color solo cuando cambia el cielo.
-  const c = useMemo(() => mezclarCielo(cielo), [cielo]);
+  // La atmósfera del mundo: su `cielo` propio MEZCLADO 60% hacia la MADRE de
+  // la franja REAL del día (ciclo diurno vivo — antes la madre era la hora
+  // dorada clavada y entrar a un mundo a medianoche se sentía de otra app).
+  // La receta vive en atmosferaMadre (mezclarCielo): ley exportada, mismo
+  // resultado aquí y en cualquier consumidor. Memoizado por cielo + franja
+  // (la franja cambia unas pocas veces al día; en demo, cada tantos segundos).
+  const { franja } = useCicloDia({ reducedMotion });
+  const madre = useMemo(() => presetDeHora(franja), [franja]);
+  const c = useMemo(() => mezclarCielo(cielo, madre), [cielo, madre]);
 
   // foco = el hotspot activo (o el centro del diorama). Memoizado (auditoría
   // B11: antes era un Vector3 nuevo POR RENDER — basura de GC en el hilo
@@ -98,14 +108,29 @@ function Contenido({
           fragmento → en el perfil mínimo (tier bajo forzado a 3D) se apaga. */}
       {!frugal && <fog attach="fog" args={[c.niebla, zoom * 1.4, zoom * 4.6]} />}
       <hemisphereLight intensity={0.55 * c.intensidad} color={c.cielo} groundColor={c.suelo} />
-      <ambientLight intensity={0.28 * c.intensidad} color={ATMOSFERA.luz} />
-      {/* El sol de la hora dorada — MISMA dirección que el valle ([6,9,4]) para
-          que el lenguaje de sombreado no cambie al entrar. Sin castShadow:
-          Lambert + sombras de contacto falsas dan la forma, gratis. */}
-      <directionalLight position={[6, 9, 4]} intensity={0.9 * c.intensidad} color={ATMOSFERA.luz} />
+      <ambientLight intensity={0.28 * c.intensidad} color={madre.luz} />
+      {/* El sol de la franja — MISMO arco que el valle (solPos del preset:
+          rasante al amanecer, cenital al mediodía, luna de noche) para que el
+          lenguaje de sombreado no cambie al entrar. Sin castShadow: Lambert +
+          sombras de contacto falsas dan la forma, gratis. */}
+      <directionalLight position={madre.solPos} intensity={0.9 * c.intensidad} color={madre.luz} />
       {/* Relleno frío tenue desde el lado opuesto: despega los volúmenes del
           fondo cálido sin matar el contraste (clave del look claymation). */}
-      <directionalLight position={[-5, 4, -6]} intensity={0.22} color={ATMOSFERA.relleno} />
+      <directionalLight position={[-5, 4, -6]} intensity={0.22} color={madre.relleno} />
+      {/* De noche (o en el filo del atardecer/amanecer), las estrellas del
+          presupuesto del tier asoman también DENTRO del mundo: el diorama no
+          se queda con cielo de día mientras el valle duerme. */}
+      {madre.estrellas > 0 && !frugal && (
+        <Stars
+          radius={zoom * 8}
+          depth={30}
+          count={Math.round(perfilDeTier(tier).estrellas * madre.estrellas)}
+          factor={3}
+          saturation={0}
+          fade
+          speed={reducedMotion ? 0 : 0.5}
+        />
+      )}
 
       {/* La alfombra de suelo + el anillo de contacto: posan el diorama en un
           piso en vez de dejarlo a la deriva sobre el color de fondo. Son dos
@@ -122,7 +147,7 @@ function Contenido({
           <SombraContacto
             pos={[0, piso + 0.02, 0]}
             radio={zoom * 0.4}
-            color={ATMOSFERA.sombra}
+            color={madre.sombra}
             opacidad={0.3}
             orden={2}
           />
@@ -194,6 +219,7 @@ function Contenido({
         reducedMotion={reducedMotion}
         piso={piso}
         tier={tier}
+        mundoId={params?.id || params?.tipo || null}
       />
 
       <OrbitControls
@@ -224,7 +250,10 @@ function Contenido({
         respiro={zoom * 0.005}
         activa={!reducedMotion && !frugal}
       />
-      <AdaptiveDpr pixelated />
+      {/* Calidad ADAPTATIVA en vivo (huérfano cableado): gradúa DPR/partículas en
+          caliente según fps, complementa el device-tier estático. Reemplaza al
+          <AdaptiveDpr> de drei con la política Chagra (usePerformanceMonitor). */}
+      <MonitorRendimiento tier={tier} />
       {/* Bloom SUTIL solo donde sobra GPU: tier alto sin reduced-motion. El
           gate es estricto a propósito (contrato de costo del DR de gama baja):
           medio/bajo no montan el pase NI descargan su chunk, y reduced-motion
@@ -254,7 +283,7 @@ export default function EscenaBase3D({
      contrato (sin sombras, Lambert); lo que gradúa el tier son los píxeles
      (DPR/antialias) y, en el perfil mínimo, la niebla y las alfombras. */
   const frugal = tier === 'bajo';
-  const dpr = tier === 'alto' ? [1, 1.5] : tier === 'medio' ? [1, 1.3] : 1;
+  const dpr = tier === 'alto' ? /** @type {[number, number]} */ ([1, 1.5]) : tier === 'medio' ? /** @type {[number, number]} */ ([1, 1.3]) : 1;
   return (
     <Canvas
       className={`mundo-canvas${listo ? ' mundo-canvas--listo' : ''}`}

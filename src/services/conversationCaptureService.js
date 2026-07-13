@@ -122,7 +122,7 @@ function anonymizeIdentity(identity) {
  * @param {Object} [p.meta]        { session_id, turn_index, nlu_route, entities_grounded,
  *                                   guards_fired, grounded_status, latency_ms, model }
  */
-export function captureExchange({ userText, agentText, identity = {}, meta = {} } = {}) {
+export function captureExchange({ userText = '', agentText = '', identity = {}, meta = {} } = /** @type {any} */ ({})) {
   if (!isCaptureEnabled()) return;
   if (!hasConsent()) return;
   // No capturamos turnos vacíos (p. ej. abortados sin respuesta).

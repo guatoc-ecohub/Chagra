@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * guardasSeguridad.integrator.test.js — SUITE INTEGRADORA de guardas de
  * seguridad campesina (DR-SUELOS-1, DR-AGUA-1, DR-ANIMAL-1, DR-RESTAURACION-1).

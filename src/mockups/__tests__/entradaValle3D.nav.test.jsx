@@ -133,9 +133,9 @@ describe('entrada-3d — voz con respaldo visible', () => {
     class Utterance {
       constructor(text) { this.text = text; }
     }
-    window.speechSynthesis = synth;
-    window.SpeechSynthesisUtterance = Utterance;
-    globalThis.SpeechSynthesisUtterance = Utterance;
+    window.speechSynthesis = /** @type {any} */ (synth);
+    window.SpeechSynthesisUtterance = /** @type {any} */ (Utterance);
+    globalThis.SpeechSynthesisUtterance = /** @type {any} */ (Utterance);
 
     const { container } = render(<EntradaValle3D onBack={() => {}} />);
     fireEvent.pointerDown(container.querySelector('.valle-root'));

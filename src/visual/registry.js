@@ -40,11 +40,176 @@ const VARIANTES_CREATURE = [
   { label: 'sin animación', props: { size: 80, animated: false } },
 ];
 
+/* La Angelita estrena los GESTOS con carácter (rubber-hose Cuphead/Miss-Minutes):
+   celebra (salto + brazos en V con overshoot), reposo (respira lento) y señala
+   (se inclina al POI y apunta). La vitrina los muestra como variantes propias. */
+const VARIANTES_ABEJA = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'vuela', props: { size: 80 } },
+  { label: 'celebra', props: { size: 80, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 80, pose: 'reposo' } },
+  { label: 'señala', props: { size: 80, pose: 'señala' } },
+  { label: 'sin animación', props: { size: 80, animated: false } },
+];
+
+/* El trío andino rubber-hose (oso / colibrí / rana) estrena los MISMOS gestos
+   species-agnostic que Angelita: celebra (brinco + V con overshoot), reposo
+   (respira) y señala (se inclina al POI y apunta). Base 'vuela' para el colibrí
+   (alado) y 'anda' para el oso y la rana (de suelo). */
+const VARIANTES_TRIO_AIRE = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'vuela', props: { size: 80 } },
+  { label: 'celebra', props: { size: 80, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 80, pose: 'reposo' } },
+  { label: 'señala', props: { size: 80, pose: 'señala' } },
+  { label: 'sin animación', props: { size: 80, animated: false } },
+];
+const VARIANTES_TRIO_SUELO = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 80 } },
+  { label: 'celebra', props: { size: 80, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 80, pose: 'reposo' } },
+  { label: 'señala', props: { size: 80, pose: 'señala' } },
+  { label: 'sin animación', props: { size: 80, animated: false } },
+];
+/* Variantes de vitrina por slug (las que difieren del set genérico). */
+/* El OSO ANDINO completo estrena TODA la fundación transversal (espejo de la
+   abeja, con su carácter): peso y line-boil, gruñido (resopla), rascado, ruana
+   del páramo, modo poder ROJO y prop por mundo. La vitrina lo luce con todo. */
+const VARIANTES_OSO = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'gruñe (resopla)', props: { size: 88, resopla: true } },
+  { label: 'se rasca', props: { size: 88, rasca: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder ROJO', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+/* El JAGUAR completo estrena TODA la fundación transversal (espejo de la abeja/
+   oso, con su carácter): acecho de hombros + cola pesada + line-boil, rugido
+   corporal (ruge), modo acecho (acecha), ruana de noche, modo poder PÚRPURA y
+   prop por mundo. La vitrina lo luce con todo. */
+const VARIANTES_JAGUAR = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'ruge', props: { size: 88, ruge: true } },
+  { label: 'acecha', props: { size: 88, acecha: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder PÚRPURA', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+
+/* La ARDILLA completa estrena TODA la fundación transversal (espejo de la abeja
+   y del oso, con su CARÁCTER pizpireta): boil veloz + line-boil, INSPECCIÓN
+   INVERTIDA (su firma), roer, ruana, modo poder ÁMBAR y prop por mundo. La
+   vitrina la luce con todo. */
+const VARIANTES_ARDILLA = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'inspección invertida', props: { size: 88, inspecciona: true } },
+  { label: 'roe una semilla', props: { size: 88, roe: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder ÁMBAR', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+
+/* El PEREZOSO completo estrena TODA la fundación transversal con su carácter de
+   QUIETUD ZEN: mecerse lentísimo colgado de la rama, line-boil en cámara lenta,
+   dormita (las "Z" del sueño), estiramiento sostenido, ruana de noche, modo poder
+   TURQUESA y prop por mundo. La vitrina lo luce con todo. */
+const VARIANTES_PEREZOSO = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'cuelga', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'dormita (Zzz)', props: { size: 88, dormita: true } },
+  { label: 'estira (lento)', props: { size: 88, estira: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder TURQUESA', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+
+/* El MORROCOY completo estrena TODA la fundación transversal (espejo de la abeja/
+   oso/jaguar, con su carácter ANCESTRAL): caparazón que respira + line-boil,
+   retracción elástica (seRetrae), asentimiento sabio (asiente), ruana de noche,
+   modo poder BRONCE y prop por mundo. La vitrina lo luce con todo. */
+const VARIANTES_MORROCOY = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'se retrae', props: { size: 88, seRetrae: true } },
+  { label: 'asiente', props: { size: 88, asiente: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder BRONCE', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+
+/* El BORUGO completo — el 9º y ÚLTIMO bicho, el ANIMAL DE CIERRE — estrena TODA
+   la fundación transversal con su CARÁCTER TIERNO y NOCTURNO: olfateo tímido
+   (`olfatea`), acurrucarse a salvo (`acurruca`), boil suave, motas crema que
+   brillan con luz lunar, ruana de noche, modo poder PLATA LUNAR y prop por mundo.
+   La vitrina lo luce con todo. */
+const VARIANTES_BORUGO = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'olfatea', props: { size: 88, olfatea: true } },
+  { label: 'se acurruca', props: { size: 88, acurruca: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder PLATA LUNAR', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+
+const VARIANTES_POR_SLUG = {
+  'abeja-angelita': VARIANTES_ABEJA,
+  colibri: VARIANTES_TRIO_AIRE,
+  'oso-andino': VARIANTES_OSO,
+  'rana-andina': VARIANTES_TRIO_SUELO,
+  perezoso: VARIANTES_PEREZOSO,
+  ardilla: VARIANTES_ARDILLA,
+  jaguar: VARIANTES_JAGUAR,
+  morrocoy: VARIANTES_MORROCOY,
+  borugo: VARIANTES_BORUGO,
+};
+
 /* Nota de campo por creature (el registro de la categoría trae nombre + binomio;
    la descripción de una línea va aquí). */
 const NOTAS_CREATURE = {
   'abeja-angelita': 'Meliponino sin aguijón, polinizadora de la chagra; alas que baten y antenas vivas.',
-  colibri: 'Pico recto y garganta violeta iridiscente; el ave-agente de Chagra.',
+  colibri: 'Pico recto y garganta violeta iridiscente; el ave-agente de Chagra, ya en rubber-hose.',
+  'oso-andino': 'Oso de anteojos, guardián del páramo; mole parda entrañable con los anteojos crema (su firma).',
+  'rana-andina': 'Rana arlequín del páramo, guardiana del agua; verde húmedo con manchas ocre y ojos saltones.',
+  perezoso: 'Perezoso de tres dedos, la calma total; cuelga de la rama por sus garras largas, antifaz y tinte verdoso de algas. Todo en cámara lenta.',
+  ardilla: 'Ardilla de cola roja del templado; rufa con la línea dorsal oscura (su firma), cola tupida y su inspección invertida.',
+  jaguar: 'Felino de tierra cálida, majestuoso y acechador; leonado con rosetas de centro ocre (su firma), aura púrpura.',
+  morrocoy: 'Galápago de patas rojas, el anciano ancestral y paciente; caparazón de domo hexagonal (su firma) y patas rojizas, aura bronce. Se retrae elástico a la concha.',
+  borugo: 'La paca de montaña andina, roedor nocturno tierno; pardo con hileras de motas crema (su firma), olfateo tímido y aura plata lunar. El animal de cierre — vivo, a salvo y digno.',
   lombriz: 'La ingeniera del suelo; ondula por segmentos con clitelo marcado.',
   mariposa: 'Alas naranjas con venación; poliniza y anuncia buen suelo.',
   escarabajo: 'Estercolero que entierra el abono; élitros con brillo metálico.',
@@ -229,7 +394,7 @@ const ITEMS_CREATURES = Object.entries(CREATURES).map(([slug, meta]) => ({
   render: 'component',
   descripcion: NOTAS_CREATURE[slug] || '',
   props: PROPS_CREATURE,
-  variantes: VARIANTES_CREATURE,
+  variantes: VARIANTES_POR_SLUG[slug] || VARIANTES_CREATURE,
 }));
 
 const ITEMS_LAMINAS = Object.entries(LAMINAS).map(([slug, meta]) => ({

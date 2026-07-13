@@ -79,7 +79,7 @@ export function buildSenderMessages(req) {
  * @returns {Promise<{fullText: string, stats: Object}>}
  */
 async function defaultLlmCall({ messages, route, onToken, signal }) {
-  const { url, body } = buildLLMRequest(route, messages);
+  const { url, body } = buildLLMRequest(/** @type {import('./llmRouter').LLMTask} */ (route), messages);
   const { streamOpenAI } = await import('./openaiStream.js');
   let firstTokenMs = null;
   const t0 = Date.now();
@@ -117,7 +117,7 @@ export function createAgentRequestSender({ llmCall = defaultLlmCall } = {}) {
     }
     // Si el req no trae route persistido, lo recalculamos de la query.
     const route = req.route && req.route !== 'unknown' ? req.route : selectChatRoute(prompt);
-    const messages = buildSenderMessages(req);
+    const messages = buildSenderMessages(/** @type {{prompt:string}} */ (/** @type {any} */ (req)));
 
     let firstTokenMs = null;
     const t0 = Date.now();

@@ -78,7 +78,7 @@ vi.mock('../../../store/useAssetStore', () => ({
   }),
 }));
 vi.mock('../../../services/userProfileService', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = /** @type {any} */ (await importOriginal());
   return {
     ...actual,
     getProfile: () => ({ rol: 'campesino' }),
