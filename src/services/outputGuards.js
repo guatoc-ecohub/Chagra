@@ -2405,6 +2405,26 @@ const DECREE_RE =
   /\b(?:Decreto|Resolución|Res|Dec\.|Decreto\s+No\.?)\s*(?:\d+|[IVXLCDM]+)(?:\s+de\s+\d{4})?\b/gi;
 
 /**
+ * Instituciones y canales oficiales colombianos que suelen aparecer en
+ * consultas de contacto agro/rural. La lista es conservadora y solo cubre
+ * entidades que el usuario puede nombrar como canal oficial genérico.
+ */
+const OFFICIAL_CONTACT_INSTITUTION_RE =
+  /\b(?:ica|agrosavia|umata|alcald[ií]a|secretar[ií]a(?:\s+de)?\s+agricultura|secretar[ií]a(?:\s+de)?\s+desarrollo\s+rural|secretar[ií]a(?:\s+de)?\s+ambiente|gobernaci[oó]n|ministerio\s+de\s+agricultura|corporaci[oó]n\s+aut[oó]noma\s+regional|car\b|invima|ins|sena)\b/;
+
+/**
+ * Textos que suenan a afirmación de contacto específico.
+ */
+const CONTACT_ASSERTION_RE =
+  /\b(?:llama(?:r)?|marc[aá]|contacta(?:r)?|comun[ií]cate|escrib(?:e|a)|consulta(?:r)?|tel[eé]fono|celular|linea|línea|correo|email|whatsapp|direccion|dirección|sede|oficina|atenci[oó]n)\b/;
+
+/**
+ * Patrones de direcciones postales comunes en Colombia.
+ */
+const ADDRESS_RE =
+  /\b(?:calle|cl\.?|cra\.?|carrera|avenida|av\.?|diagonal|transversal|km|kil[oó]metro)\s*[0-9][0-9A-Za-z#\-\s.,]*/i;
+
+/**
  * Guard 5 — contacto inventado. Si el texto incluye teléfonos, correos,
  * URLs o números de decreto/resolución que NO estén en la allowlist
  * verificada, los MARCA/REEMPLAZA por un texto seguro que indica al
@@ -2483,6 +2503,94 @@ export function guardInventedContact(responseText, _resolvedEntities = null, _fi
   }
 
   return { text: responseText, modified: false, reason: null };
+}
+
+/**
+ * Guard de contacto institucional inventado.
+ *
+ * Si el texto afirma un teléfono, celular, línea, correo o dirección concreta
+ * de una entidad como ICA, Agrosavia, UMATA, alcaldía o secretaría, lo
+ * sustituye por una remisión al canal oficial genérico. No toca menciones
+ * legítimas de la entidad sin dato de contacto.
+ *
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardHallucinatedContact(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+
+  if (responseText.includes('Consulte el canal oficial de la entidad')) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const userAskedForContact =
+    typeof userMessage === 'string' && CONTACT_ASSERTION_RE.test(_stripDiacritics(userMessage));
+
+  const protectedText = responseText.replace(EMAIL_RE, (email) => email.replace(/\./g, '__DOT__'));
+  const sentences = _splitSentences(protectedText);
+  const hits = [];
+  let changed = false;
+  let lastWasReplacement = false;
+
+  const replacement =
+    'Consulte el canal oficial de la entidad, por ejemplo la página del ICA (ica.gov.co) o la UMATA de su municipio. ' +
+    'No me es posible confirmar un número telefónico específico sin riesgo de darle uno equivocado.';
+
+  const out = sentences
+    .map((sentence) => {
+      const originalSentence = sentence.replace(/__DOT__/g, '.');
+      const norm = _stripDiacritics(originalSentence);
+      const hasInstitution = OFFICIAL_CONTACT_INSTITUTION_RE.test(norm);
+      if (!hasInstitution) {
+        lastWasReplacement = false;
+        return sentence;
+      }
+
+      const phoneRe = new RegExp(PHONE_RE.source, 'g');
+      const emailRe = new RegExp(EMAIL_RE.source, 'g');
+      const addressRe = new RegExp(ADDRESS_RE.source, ADDRESS_RE.flags);
+      const hasPhone = phoneRe.test(originalSentence);
+      const hasEmail = emailRe.test(originalSentence);
+      const hasAddress = addressRe.test(originalSentence);
+      const hasContactCue = CONTACT_ASSERTION_RE.test(norm);
+
+      if (!(hasPhone || hasEmail || hasAddress || hasContactCue || userAskedForContact)) {
+        lastWasReplacement = false;
+        return sentence;
+      }
+
+      const specificContacts = [];
+      const phones = originalSentence.match(phoneRe) || [];
+      for (const phone of phones) specificContacts.push(phone);
+      const emails = originalSentence.match(emailRe) || [];
+      for (const email of emails) specificContacts.push(email);
+      if (addressRe.test(originalSentence)) specificContacts.push(originalSentence.match(addressRe)?.[0] || 'direccion');
+
+      if (specificContacts.length === 0) {
+        lastWasReplacement = false;
+        return sentence;
+      }
+
+      changed = true;
+      for (const item of specificContacts) if (!hits.includes(item)) hits.push(item);
+      if (lastWasReplacement) return '';
+      lastWasReplacement = true;
+      const trailing = originalSentence.match(/\s*$/)?.[0] || ' ';
+      return `${replacement}${trailing}`;
+    })
+    .join('');
+
+  if (!changed) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('hallucinated_contact');
+  return {
+    text: out.trim() || replacement,
+    modified: true,
+    reason: `contacto_institucional_hallucinado: ${[...new Set(hits)].slice(0, 5).join(', ')}`,
+  };
 }
 
 // ── GUARD: norma numerada afirmada como obligacion ──────────────────────────
@@ -10618,6 +10726,17 @@ export function applyOutputGuards(
     text = brandRes.text;
     modified = true;
     if (brandRes.reason) reasons.push(brandRes.reason);
+  }
+  // Guard SAFETY de CONTACTO INSTITUCIONAL HALLUCINADO: si el texto afirma un
+  // teléfono, correo o dirección concreta de una entidad como ICA, Agrosavia,
+  // UMATA, alcaldía o secretaría, lo cambia por una remisión al canal oficial
+  // genérico. Va antes del guard de contacto inventado para capturar el caso
+  // específico con una respuesta más útil. Idempotente.
+  const hallucinatedContactRes = guardHallucinatedContact(text, { userMessage });
+  if (hallucinatedContactRes && hallucinatedContactRes.modified) {
+    text = hallucinatedContactRes.text;
+    modified = true;
+    if (hallucinatedContactRes.reason) reasons.push(hallucinatedContactRes.reason);
   }
   // Guard SAFETY de CONTACTO INVENTADO (teléfonos, correos, URLs, decretos):
   // firma propia (solo el texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE:
