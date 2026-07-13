@@ -96,6 +96,16 @@ piezas + clases `rh-*` con SUS proporciones (identidad en `faunaAndina.js`), y
 heredan los gestos species-agnostic (`rh-g-celebra` / `rh-g-reposo` /
 `rh-g-senala`) solo con `data-pose`. No se reinventa la cadencia.
 
+**Showcase COMPLETO (toda la fundación transversal)**: `AbejaAngelita` y
+`OsoAndino` cablean además — sin duplicar código — el **lip-sync** (`visema` →
+`BocaVisema`), el **modo poder** (`poder` → aura de 4 capas con su color:
+dorada la abeja, **roja** el oso), la **ropa por clima+hora** (`vestuario` →
+`AccesoriosClima`; el oso de páramo **nunca suda**), el **prop por mundo**
+(`mundoId` → `PropEnMano`) y el **line-boil** (`lineBoil`). El oso suma su
+CARÁCTER de mole seria: boil más lento y pesado, cejas de ceño, gruñido
+(`resopla` → vaho) y rascado (`rasca`) — todo aditivo en `creatures.css`, RM +
+tier-safe. Los demás bichos heredan la misma fundación pasando sus parámetros.
+
 ## Técnica
 
 - SVG + CSS puros, **cero dependencias nuevas**; solo `transform`/`opacity`

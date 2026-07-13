@@ -73,10 +73,28 @@ const VARIANTES_TRIO_SUELO = [
   { label: 'sin animación', props: { size: 80, animated: false } },
 ];
 /* Variantes de vitrina por slug (las que difieren del set genérico). */
+/* El OSO ANDINO completo estrena TODA la fundación transversal (espejo de la
+   abeja, con su carácter): peso y line-boil, gruñido (resopla), rascado, ruana
+   del páramo, modo poder ROJO y prop por mundo. La vitrina lo luce con todo. */
+const VARIANTES_OSO = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'gruñe (resopla)', props: { size: 88, resopla: true } },
+  { label: 'se rasca', props: { size: 88, rasca: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder ROJO', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+
 const VARIANTES_POR_SLUG = {
   'abeja-angelita': VARIANTES_ABEJA,
   colibri: VARIANTES_TRIO_AIRE,
-  'oso-andino': VARIANTES_TRIO_SUELO,
+  'oso-andino': VARIANTES_OSO,
   'rana-andina': VARIANTES_TRIO_SUELO,
 };
 
