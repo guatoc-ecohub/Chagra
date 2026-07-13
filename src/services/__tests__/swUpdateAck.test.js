@@ -126,11 +126,11 @@ describe('readAckedVersion', () => {
   it('debería retornar null si localStorage no está disponible', () => {
     // Mock localStorage como null
     const originalLocalStorage = globalThis.localStorage;
-    delete globalThis.localStorage;
+    delete /** @type {any} */ (globalThis).localStorage;
     
     expect(readAckedVersion()).toBeNull();
     
-    globalThis.localStorage = originalLocalStorage;
+    /** @type {any} */ (globalThis).localStorage = originalLocalStorage;
   });
 
   it('debería manejar storage null explícitamente', () => {
@@ -138,22 +138,22 @@ describe('readAckedVersion', () => {
   });
 
   it('debería retornar null si getItem lanza error (quota/private mode)', () => {
-    const storage = {
+    const storage = /** @type {any} */ ({
       getItem: vi.fn(() => {
         throw new Error('SecurityError');
       }),
-    };
+    });
 
     expect(readAckedVersion(storage)).toBeNull();
   });
 
   it('debería usar storage custom si se proporciona', () => {
-    const customStorage = {
+    const customStorage = /** @type {any} */ ({
       getItem: vi.fn((key) => {
         if (key === ACK_STORAGE_KEY) return 'custom-v1.0';
         return null;
       }),
-    };
+    });
 
     expect(readAckedVersion(customStorage)).toBe('custom-v1.0');
     expect(customStorage.getItem).toHaveBeenCalledWith(ACK_STORAGE_KEY);
@@ -196,27 +196,27 @@ describe('writeAckedVersion', () => {
   });
 
   it('debería no hacer nada si storage es null', () => {
-    writeAckedVersion('v1.0', null);
+    writeAckedVersion('v1.0', /** @type {any} */ (null));
     // No debería escribir nada en localStorage global
     expect(localStorage.getItem(ACK_STORAGE_KEY)).toBeNull();
   });
 
   it('debería no crash si setItem lanza error (quota/private mode)', () => {
-    const storage = {
+    const storage = /** @type {any} */ ({
       setItem: vi.fn(() => {
         throw new Error('QuotaExceededError');
       }),
-    };
+    });
 
     expect(() => writeAckedVersion('v1.0', storage)).not.toThrow();
     expect(storage.setItem).toHaveBeenCalledWith(ACK_STORAGE_KEY, 'v1.0');
   });
 
   it('debería usar storage custom si se proporciona', () => {
-    const customStorage = {
+    const customStorage = /** @type {any} */ ({
       setItem: vi.fn(),
       getItem: vi.fn(),
-    };
+    });
 
     writeAckedVersion('custom-v1.0', customStorage);
     expect(customStorage.setItem).toHaveBeenCalledWith(ACK_STORAGE_KEY, 'custom-v1.0');

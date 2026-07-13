@@ -10,7 +10,11 @@
 import REST_DATA from '../data/restauracion.json';
 import ESPECIES_DATA from '../data/restauracion-especies.json';
 
-/** Deriva el piso térmico desde la altitud (m s.n.m.) del perfil de la finca. */
+/**
+ * Deriva el piso térmico desde la altitud (m s.n.m.) del perfil de la finca.
+ * @param {number|null} alt
+ * @returns {string|null}
+ */
 function pisoDesdeAltitud(alt) {
   const a = Number(alt);
   if (alt == null || Number.isNaN(a)) return null;
@@ -20,6 +24,11 @@ function pisoDesdeAltitud(alt) {
   return 'calido_0_1000';
 }
 
+/**
+ * @param {string} descripcion
+ * @param {{ piso?: string, altitud?: number }} [opts]
+ * @returns {Object}
+ */
 export function diagnosticarRestauracion(descripcion, opts = {}) {
   if (!descripcion || descripcion.trim().length < 3) {
     return { arreglo: null, roles: null, especies: null, alertas: [], guardas: [REST_DATA.guardas.pino_eucalipto], sin_datos: true, fuente: REST_DATA.fuente };
@@ -68,6 +77,10 @@ export function diagnosticarRestauracion(descripcion, opts = {}) {
   return { arreglo, roles, especies, alertas, guardas, sin_datos: false, fuente: REST_DATA.fuente };
 }
 
+/**
+ * @param {Object|null} d
+ * @returns {string}
+ */
 export function formatearGroundingRestauracion(d) {
   if (!d || d.sin_datos) return '';
   const partes = [];

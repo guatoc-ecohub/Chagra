@@ -12,7 +12,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock de useAssetStore para evitar side effects en handlers
-vi.mock('../../store/useAssetStore.js', () => ({
+vi.mock('../../store/useAssetStore.js', () => /** @type {any} */ ({
   default: {
     getState: vi.fn(() => ({
       addLog: vi.fn().mockResolvedValue(undefined),
@@ -22,7 +22,7 @@ vi.mock('../../store/useAssetStore.js', () => ({
 }));
 
 // Mock de fetch para query_corpus_dr034
-globalThis.fetch = vi.fn();
+/** @type {any} */ (globalThis).fetch = vi.fn();
 
 import { registerTool, getTool, listTools, getToolsForLLM } from '../llmTools.js';
 
@@ -40,7 +40,7 @@ describe('llmTools — funciones de registry', () => {
         requiresGate: false,
       };
       
-      expect(() => registerTool(toolWithoutName)).toThrow('Tool must have name and handler');
+      expect(() => registerTool(/** @type {any} */ (toolWithoutName))).toThrow('Tool must have name and handler');
     });
 
     it('lanza error si la tool no tiene handler', () => {
@@ -50,7 +50,7 @@ describe('llmTools — funciones de registry', () => {
         requiresGate: false,
       };
       
-      expect(() => registerTool(toolWithoutHandler)).toThrow('Tool must have name and handler');
+      expect(() => registerTool(/** @type {any} */ (toolWithoutHandler))).toThrow('Tool must have name and handler');
     });
 
     it('registra una tool válida correctamente', () => {
@@ -189,9 +189,9 @@ describe('llmTools — funciones de registry', () => {
       const crearLogTool = tools.find((t) => t.function.name === 'crear_log');
       
       expect(crearLogTool).toBeDefined();
-      expect(crearLogTool.function.parameters.type).toBe('object');
-      expect(crearLogTool.function.parameters.properties).toBeDefined();
-      expect(crearLogTool.function.parameters.required).toBeDefined();
+      expect(/** @type {any} */ (crearLogTool).function.parameters.type).toBe('object');
+      expect(/** @type {any} */ (crearLogTool).function.parameters.properties).toBeDefined();
+      expect(/** @type {any} */ (crearLogTool).function.parameters.required).toBeDefined();
     });
 
     it('incluye las herramientas pre-registradas del módulo', () => {
@@ -216,9 +216,9 @@ describe('llmTools — funciones de registry', () => {
       const tools = getToolsForLLM();
       const toolNoParams = tools.find((t) => t.function.name === 'tool_no_params');
       
-      expect(toolNoParams.function.parameters.type).toBe('object');
-      expect(toolNoParams.function.parameters.properties).toEqual({});
-      expect(toolNoParams.function.parameters.required).toEqual([]);
+      expect(/** @type {any} */ (toolNoParams).function.parameters.type).toBe('object');
+      expect(/** @type {any} */ (toolNoParams).function.parameters.properties).toEqual({});
+      expect(/** @type {any} */ (toolNoParams).function.parameters.required).toEqual([]);
     });
   });
 

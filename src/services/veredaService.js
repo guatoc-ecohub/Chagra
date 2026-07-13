@@ -28,7 +28,7 @@ const NOMINATIM_TIMEOUT_MS = 8000;
  *
  * @param {number} lat - Latitud
  * @param {number} lng - Longitud
- * @returns {Promise<{vereda:string|null, municipio:string|null, departamento:string|null, source:string, display_name:string|null}>}
+ * @returns {Promise<{vereda:string|null, municipio:string|null, departamento:string|null, source:string, display_name?:string|null}|null>}
  */
 export async function getVeredaFromGPS(lat, lng) {
   if (typeof lat !== 'number' || typeof lng !== 'number') return null;
@@ -96,7 +96,7 @@ function dedupeVeredas(items) {
  *
  * @param {string} municipio
  * @param {string} query
- * @returns {Array<{name:string, lat:number|null, lng:number|null, source:string, municipio:string|null, departamento:string|null}>}
+ * @returns {Array<{name:string, lat:number|null, lng:number|null, source:string, municipio:string|null, departamento:string|null, display_name:string|null, conteo:number}>}
  */
 export function searchVeredasLocales(municipio, query = '') {
   const code = getMunicipioCode(municipio);
@@ -128,7 +128,7 @@ export function searchVeredasLocales(municipio, query = '') {
  *
  * @param {string} municipio - Nombre del municipio
  * @param {string} query - Nombre o prefijo de vereda a buscar
- * @returns {Promise<Array<{name:string, lat:number, lng:number}>>}
+ * @returns {Promise<Array<{name:string, lat:number|null, lng:number|null, source:string, municipio:string|null, departamento:string|null, display_name?:string|null, conteo?:number}>>}
  */
 export async function searchVeredasEnMunicipio(municipio, query) {
   if (!municipio || !query) return [];
@@ -210,7 +210,7 @@ export async function searchVeredasEnMunicipio(municipio, query) {
  * @param {number} lat - Latitud central
  * @param {number} lng - Longitud central
  * @param {string} query - Nombre o prefijo de vereda
- * @returns {Promise<Array<{name:string, lat:number, lng:number}>>}
+ * @returns {Promise<Array<{name:string, lat:number|null, lng:number|null, source?:string}>>}
  */
 export async function searchVeredasCercanas(lat, lng, query) {
   if (!lat || !lng || !query) return [];

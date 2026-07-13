@@ -88,6 +88,7 @@ Output: [{"crop":"guayabo","quantity":2,"location":"entrada"},{"crop":"mango","q
  *
  * @returns {Promise<string>}
  */
+/** @type {string|null} */
 let _cachedPrompt = null;
 export async function resolveSystemPrompt() {
   if (_cachedPrompt !== null) return _cachedPrompt;
@@ -108,14 +109,20 @@ export async function resolveSystemPrompt() {
   return _cachedPrompt;
 }
 
-// Permite invalidar el cache en tests unitarios que registren módulos Pro
-// mock después del primer uso.
+/**
+ * Permite invalidar el cache en tests unitarios que registren módulos Pro
+ * mock después del primer uso.
+ * @returns {void}
+ */
 export function _resetSystemPromptCache() {
   _cachedPrompt = null;
 }
 
-// location puede venir vacia cuando el operador no menciona el lugar;
-// la UI resuelve al DEFAULT_LOCATION_ID en ese caso (ver VoiceConfirmation).
+/**
+ * Valida que una entidad tenga los campos requeridos con tipos correctos.
+ * @param {*} e
+ * @returns {boolean}
+ */
 const isValidEntity = (e) =>
   e &&
   typeof e.crop === 'string' && e.crop.trim().length > 0 &&
@@ -138,7 +145,7 @@ const isValidEntity = (e) =>
  * descarta cualquier entidad reparada a la que le falten campos requeridos.
  *
  * @param {string} raw
- * @returns {unknown|null}
+ * @returns {any|null}
  */
 const parseJsonTolerant = (raw) => {
   if (typeof raw !== 'string') return null;
@@ -212,7 +219,7 @@ export async function extractEntities(text, { onToken } = {}) {
         location: (e.location || '').trim(),
       }));
   } catch (err) {
-    if (err.name === 'AbortError') {
+    if (/** @type {Error} */ (err).name === 'AbortError') {
       throw new Error('Tiempo agotado al extraer entidades');
     }
     throw err;

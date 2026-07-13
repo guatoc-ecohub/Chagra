@@ -282,8 +282,8 @@ describe('planNlu — toolChain parsing', () => {
     const { planNlu } = await importFresh();
     
     expect(await planNlu('')).toBeNull();
-    expect(await planNlu(null)).toBeNull();
-    expect(await planNlu(undefined)).toBeNull();
+    expect(await planNlu(/** @type {any} */(null))).toBeNull();
+    expect(await planNlu(/** @type {any} */(undefined))).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
@@ -318,8 +318,9 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
 
     // Verifica que se llamó a fetch 2 veces (una por cada tool)
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(fetchMock.mock.calls[0][0]).toBe('/api/mcp/agro/tools/get_species');
-    expect(fetchMock.mock.calls[1][0]).toBe('/api/mcp/agro/tools/get_companions');
+    const calls = /** @type {any[]} */(fetchMock.mock.calls);
+    expect(calls[0][0]).toBe('/api/mcp/agro/tools/get_species');
+    expect(calls[1][0]).toBe('/api/mcp/agro/tools/get_companions');
   });
 
   it('MAX_STEPS=3: slice chain de 5 steps a 3', async () => {
@@ -346,9 +347,10 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
     expect(fetchMock).toHaveBeenCalledTimes(3);
 
     // Verifica que solo se llamaron los primeros 3
-    expect(fetchMock.mock.calls[0][0]).toBe('/api/mcp/agro/tools/get_species');
-    expect(fetchMock.mock.calls[1][0]).toBe('/api/mcp/agro/tools/get_companions');
-    expect(fetchMock.mock.calls[2][0]).toBe('/api/mcp/agro/tools/get_biopreparados');
+    const calls = /** @type {any[]} */(fetchMock.mock.calls);
+    expect(calls[0][0]).toBe('/api/mcp/agro/tools/get_species');
+    expect(calls[1][0]).toBe('/api/mcp/agro/tools/get_companions');
+    expect(calls[2][0]).toBe('/api/mcp/agro/tools/get_biopreparados');
   });
 
   it('skip steps sin tool string (tool null/undefined/no-string)', async () => {
@@ -378,8 +380,9 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
 
     // Resultado: solo 1 step ejecutado
     expect(result).toHaveLength(1);
-    expect(result[0].tool).toBe('get_species');
-    expect(result[0].result).toEqual({ tool: 'get_species' });
+    const r0 = /** @type {any} */(result[0]);
+    expect(r0.tool).toBe('get_species');
+    expect(r0.result).toEqual({ tool: 'get_species' });
 
     // fetch solo llamado para get_species
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -431,20 +434,21 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
     expect(result).toHaveLength(3);
 
     // Verifica que args normalizados se pasaron en el body
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({});
-    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({});
-    expect(JSON.parse(fetchMock.mock.calls[2][1].body)).toEqual({ species_id_or_pest: 'maracuya' });
+    const calls = /** @type {any[]} */(fetchMock.mock.calls);
+    expect(JSON.parse(calls[0][1].body)).toEqual({});
+    expect(JSON.parse(calls[1][1].body)).toEqual({});
+    expect(JSON.parse(calls[2][1].body)).toEqual({ species_id_or_pest: 'maracuya' });
   });
 
   it('caso borde: chain vacío/null/no-array → array vacío', async () => {
     const { executeToolChain } = await importFresh();
 
     expect(await executeToolChain([])).toEqual([]);
-    expect(await executeToolChain(null)).toEqual([]);
-    expect(await executeToolChain(undefined)).toEqual([]);
-    expect(await executeToolChain({})).toEqual([]);
-    expect(await executeToolChain('not an array')).toEqual([]);
-    expect(await executeToolChain(42)).toEqual([]);
+    expect(await executeToolChain(/** @type {any} */(null))).toEqual([]);
+    expect(await executeToolChain(/** @type {any} */(undefined))).toEqual([]);
+    expect(await executeToolChain(/** @type {any} */({}))).toEqual([]);
+    expect(await executeToolChain(/** @type {any} */('not an array'))).toEqual([]);
+    expect(await executeToolChain(/** @type {any} */(42))).toEqual([]);
 
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -501,14 +505,15 @@ describe('executeToolChain — ejecución secuencial con MAX_STEPS=3', () => {
     // Los 3 estuvieron en vuelo a la vez → paralelo, no secuencial.
     expect(maxConcurrent).toBe(3);
     expect(result).toHaveLength(3);
-    expect(result.map((e) => e.tool)).toEqual([
+    expect(result.map((e) => /** @type {any} */(e).tool)).toEqual([
       'get_species',
       'get_companions',
       'get_biopreparados',
     ]);
     // El orden de las requests se preserva (se inician en orden del chain).
-    expect(delayedFetch.mock.calls[0][0]).toBe('/api/mcp/agro/tools/get_species');
-    expect(delayedFetch.mock.calls[2][0]).toBe('/api/mcp/agro/tools/get_biopreparados');
+    const calls = /** @type {any[]} */(delayedFetch.mock.calls);
+    expect(calls[0][0]).toBe('/api/mcp/agro/tools/get_species');
+    expect(calls[2][0]).toBe('/api/mcp/agro/tools/get_biopreparados');
   });
 
   it('ejecuta exactamente 3 steps cuando chain tiene 3', async () => {
@@ -622,11 +627,11 @@ describe('ALLOWED_TOOLS whitelist — callTool rechaza no permitidos', () => {
   it('caso borde: toolName vacío/null/undefined/no-string → null sin fetch', async () => {
     const { callTool } = await importFresh();
     
-    expect(await callTool('', {})).toBeNull();
-    expect(await callTool(null, {})).toBeNull();
-    expect(await callTool(undefined, {})).toBeNull();
-    expect(await callTool(42, {})).toBeNull();
-    expect(await callTool({}, {})).toBeNull();
+    expect(await callTool(/** @type {any} */(''), {})).toBeNull();
+    expect(await callTool(/** @type {any} */(null), {})).toBeNull();
+    expect(await callTool(/** @type {any} */(undefined), {})).toBeNull();
+    expect(await callTool(/** @type {any} */(42), {})).toBeNull();
+    expect(await callTool(/** @type {any} */({}), {})).toBeNull();
     
     expect(fetchMock).not.toHaveBeenCalled();
   });

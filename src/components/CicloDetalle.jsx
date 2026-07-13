@@ -35,6 +35,10 @@ const STAGE_LABELS = {
 const STAGE_ORDER = ['sowing', 'emergence', 'vegetative', 'flowering', 'fruiting', 'harvest_window', 'closed'];
 const baseStage = (code) => String(code || '').replace(/_confirmed$/, '');
 
+/**
+ * @param {{ cycle: any, altitudeM: number|null, onReload?: () => void }} props
+ * @returns {import('react').JSX.Element}
+ */
 export default function CicloDetalle({ cycle, altitudeM, onReload }) {
   const a = useMemo(() => cycle.attributes || {}, [cycle]);
   const processId = cycle.process_id || cycle.id;
@@ -121,7 +125,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
     if (a.last_stage_change_reason) return a.current_stage;
     return deriveCurrentStage({
       speciesSlug: canonicalSlug,
-      sowingDate: a.created_at,
+      sowingDate: /** @type {number} */ (/** @type {any} */ (a.created_at)),
       altitudeM,
       template: resolvedPhenologyTemplate,
       category: speciesCategory,
@@ -160,7 +164,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
   }, [resolvedPhenologyTemplate]);
 
   const pestRisks = useMemo(() => { try { return getPestRisksByStage(displayStage, a.subject_slug) || []; } catch { return []; } }, [displayStage, a.subject_slug]);
-  const bios = useMemo(() => { try { return getBiopreparadosForStage(baseStage(displayStage)) || []; } catch { return []; } }, [displayStage]);
+  const bios = useMemo(() => { try { return getBiopreparadosForStage(baseStage(displayStage), /** @type {any} */ (undefined)) || []; } catch { return []; } }, [displayStage]);
   const ensoLabel = getEnsoLabel();
   const ensoTasks = useMemo(() => { try { return getEnsemblePreventiveTasks(getEnsoServicePhase(), baseStage(displayStage)) || []; } catch { return []; } }, [displayStage]);
   const tasks = useMemo(() => { try { return getTasksForCycle(effectiveCycle) || []; } catch { return []; } }, [effectiveCycle]);
@@ -173,7 +177,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
       await confirmStage({ processId, newStage, actor: 'operator', reason: 'observado en campo' });
       setPickStage(false);
       onReload?.();
-    } catch (e) { console.warn('[CicloDetalle] confirmStage:', e.message); }
+    } catch (e) { console.warn('[CicloDetalle] confirmStage:', /** @type {Error} */ (e).message); }
     finally { setBusy(false); }
   }, [busy, processId, onReload]);
 
@@ -182,7 +186,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
     try {
       await completeTaskByVoice({ processId, taskName, actor: 'operator' });
       setDoneTasks((d) => ({ ...d, [taskName]: true }));
-    } catch (e) { console.warn('[CicloDetalle] completeTask:', e.message); }
+    } catch (e) { console.warn('[CicloDetalle] completeTask:', /** @type {Error} */ (e).message); }
   }, [processId, doneTasks]);
 
   return (
@@ -236,7 +240,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
       {isPerennial && (
         <PerennialCycleView
           speciesId={canonicalSlug}
-          plantingDate={a.created_at}
+          plantingDate={/** @type {number} */ (/** @type {any} */ (a.created_at))}
           commonName={species?.nombre_comun || a.subject_label || null}
         />
       )}
@@ -248,7 +252,7 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
           <h2 className="text-2xs uppercase font-bold text-slate-500 mb-2">Línea de tiempo</h2>
           <PhenologyTimeline
             speciesSlug={canonicalSlug}
-            sowingDate={a.created_at}
+            sowingDate={/** @type {number} */ (/** @type {any} */ (a.created_at))}
             altitudeM={altitudeM}
             phenologyTemplate={resolvedPhenologyTemplate}
             category={speciesCategory}

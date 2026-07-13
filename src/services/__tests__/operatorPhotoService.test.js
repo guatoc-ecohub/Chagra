@@ -15,10 +15,10 @@ const fetchFromFarmOS = vi.fn();
 const fetchWithAuthRetry = vi.fn();
 const uploadBinaryToFarmOS = vi.fn();
 vi.mock('../apiService.js', () => ({
-  sendToFarmOS: (...a) => sendToFarmOS(...a),
-  fetchFromFarmOS: (...a) => fetchFromFarmOS(...a),
-  fetchWithAuthRetry: (...a) => fetchWithAuthRetry(...a),
-  uploadBinaryToFarmOS: (...a) => uploadBinaryToFarmOS(...a),
+  sendToFarmOS: (/** @type {any} */ ...a) => sendToFarmOS(...a),
+  fetchFromFarmOS: (/** @type {any} */ ...a) => fetchFromFarmOS(...a),
+  fetchWithAuthRetry: (/** @type {any} */ ...a) => fetchWithAuthRetry(...a),
+  uploadBinaryToFarmOS: (/** @type {any} */ ...a) => uploadBinaryToFarmOS(...a),
 }));
 
 import {
@@ -39,25 +39,25 @@ import { setActiveTenantId, _resetForTests } from '../tenantContext.js';
 
 const SAMPLE_DATA_URL = 'data:image/jpeg;base64,/9j/AAAQ'; // bytes irrelevantes
 
-// Instala mocks de Image + FileReader + canvas.toDataURL para que
-// resizePhotoToDataUrl corra bajo jsdom devolviendo un data-URL controlado.
 function installCanvasMocks({ width = 1024, height = 768 } = {}) {
-  globalThis.FileReader = class {
+  globalThis.FileReader = /** @type {any} */ (class {
     readAsDataURL() {
       queueMicrotask(() => {
         this.result = SAMPLE_DATA_URL;
-        this.onload && this.onload();
+        const self = /** @type {any} */ (this);
+        self.onload && self.onload();
       });
     }
-  };
-  globalThis.Image = class {
-    set src(_v) {
+  });
+  globalThis.Image = /** @type {any} */ (class {
+    set src(/** @type {any} */ _v) {
       this.width = width;
       this.height = height;
-      queueMicrotask(() => this.onload && this.onload());
+      const self = /** @type {any} */ (this);
+      queueMicrotask(() => self.onload && self.onload());
     }
-  };
-  vi.spyOn(document, 'createElement').mockImplementation((tag) => {
+  });
+  vi.spyOn(document, 'createElement').mockImplementation((/** @type {any} */ tag) => {
     if (tag === 'canvas') {
       return {
         width: 0,
@@ -109,7 +109,7 @@ describe('operatorPhotoService', () => {
       window.addEventListener('chagra:operator-update', handler);
       setOperatorPhotoLocal(SAMPLE_DATA_URL);
       expect(handler).toHaveBeenCalledTimes(1);
-      expect(handler.mock.calls[0][0].detail).toEqual({
+      expect(/** @type {any} */(handler.mock.calls[0])[0].detail).toEqual({
         key: PHOTO_STORAGE_KEY,
         value: SAMPLE_DATA_URL,
       });
@@ -126,7 +126,7 @@ describe('operatorPhotoService', () => {
 
       expect(getOperatorPhoto()).toBe('');
       expect(localStorage.getItem(PHOTO_SYNC_META_KEY)).toBeNull();
-      expect(handler.mock.calls.at(-1)[0].detail).toEqual({ key: PHOTO_STORAGE_KEY, value: '' });
+      expect(/** @type {any} */(handler.mock.calls.at(-1))[0].detail).toEqual({ key: PHOTO_STORAGE_KEY, value: '' });
       window.removeEventListener('chagra:operator-update', handler);
     });
   });
@@ -173,7 +173,7 @@ describe('operatorPhotoService', () => {
       await hydrateOperatorPhoto();
 
       expect(handler).toHaveBeenCalled();
-      expect(handler.mock.calls.at(-1)[0].detail).toEqual({
+      expect(/** @type {any} */(handler.mock.calls.at(-1))[0].detail).toEqual({
         key: PHOTO_STORAGE_KEY, value: SAMPLE_DATA_URL,
       });
       window.removeEventListener('chagra:operator-update', handler);
@@ -258,13 +258,13 @@ describe('operatorPhotoService', () => {
       // Paso A: binario por upload-por-campo (la ruta /api/file/upload NO
       // existe en farmOS 4.x — bug 2026-07-08).
       expect(uploadBinaryToFarmOS).toHaveBeenCalledTimes(1);
-      const [blob, filename, target] = uploadBinaryToFarmOS.mock.calls[0];
+      const [blob, filename, target] = /** @type {any[]} */(uploadBinaryToFarmOS.mock.calls[0]);
       expect(blob).toBeInstanceOf(Blob);
       expect(filename).toMatch(/^chagra-operator-photo-alice-\d+\.jpg$/);
       expect(target).toEqual({ entity: 'log', bundle: 'observation', field: 'file' });
       // Paso B: se adjunta a un log--observation para volver el file permanente.
       expect(sendToFarmOS).toHaveBeenCalledTimes(1);
-      const [logEndpoint, logPayload, logMethod] = sendToFarmOS.mock.calls[0];
+      const [logEndpoint, logPayload, logMethod] = /** @type {any[]} */(sendToFarmOS.mock.calls[0]);
       expect(logEndpoint).toBe('/api/log/observation');
       expect(logMethod).toBe('POST');
       expect(logPayload.data.attributes.name).toBe('chagra-operator-photo-alice');
@@ -285,7 +285,7 @@ describe('operatorPhotoService', () => {
       const r = await uploadToFarmOS(SAMPLE_DATA_URL);
 
       expect(r.ok).toBe(true);
-      const [logEndpoint, logPayload, logMethod] = sendToFarmOS.mock.calls[0];
+      const [logEndpoint, logPayload, logMethod] = /** @type {any[]} */(sendToFarmOS.mock.calls[0]);
       expect(logEndpoint).toBe('/api/log/observation/log-uuid-1');
       expect(logMethod).toBe('PATCH');
       expect(logPayload.data.id).toBe('log-uuid-1');
@@ -354,7 +354,7 @@ describe('operatorPhotoService', () => {
       expect(r.ok).toBe(true);
       expect(r.updated).toBe(true);
       // El endpoint filtra por el prefijo scopeado a 'bob'.
-      const endpoint = fetchFromFarmOS.mock.calls[0][0];
+      const endpoint = /** @type {any[]} */(fetchFromFarmOS.mock.calls[0])[0];
       expect(endpoint).toContain('/api/file/file');
       expect(endpoint).toContain('CONTAINS');
       expect(endpoint).toContain(encodeURIComponent('chagra-operator-photo-bob-'));

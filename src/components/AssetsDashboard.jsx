@@ -325,7 +325,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
 
   const { request: requestGeo } = useGeolocation();
 
-  /** @type {[string|boolean, import('react').Dispatch<import('react').SetStateAction<string|boolean>>]} */
+  /** @type {[any, any]} */
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [showFincaModal, setShowFincaModal] = useState(false);
   // Sugerencias post-create. Miguel UX 2026-05-03: cuando user agrega
@@ -625,7 +625,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
 
     // Construcción del template de attributes (compartido por todos los assets
     // en individual mode; en aggregate solo hay 1)
-    /** @type {{status: string, notes?: string|{value: string}, intrinsic_geometry?: {value: string}, land_type?: string, _speciesSlug?: string, _chagra_plant_meta?: object}} */
+    /** @type {{status: string, notes?: string|{value: string}, intrinsic_geometry?: {value: string}, land_type?: string, _speciesSlug?: string, _chagra_plant_meta?: object|null}} */
     const baseAttributes = {
       status: formData.status || 'active',
       ...(notesValue ? { notes: notesValue } : {}),
@@ -908,7 +908,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
   // Tarjeta individual de un activo (mata/zona/infra/…). Reutilizable tanto para
   // una fila suelta como para cada mata dentro de un grupo expandido, así no se
   // pierde ninguna funcionalidad por-mata (ver ficha, cosechar, eliminar).
-  const renderAssetCard = (asset, { nested = false } = {}) => {
+  const renderAssetCard = (/** @type {any} */ asset, { nested = false } = {}) => {
     // Bug pre-demo-institucional 2026-05-19: en tab 'structure' conviven lands +
     // structures. Diferenciamos icono y label fallback según el `type`.
     const rawName = (asset.attributes?.name || asset.name || '').trim();
@@ -1035,7 +1035,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
 
   // Tarjeta AGREGADA de un grupo de matas iguales: "🌱 Fresa ×20 · sembradas
   // 4 mar · Cama 1", expandible a las matas individuales.
-  const renderGroupCard = (grupo) => {
+  const renderGroupCard = (/** @type {any} */ grupo) => {
     const rep = grupo.representative;
     const nombre = stripInstanceSuffix(rep.attributes?.name || rep.name) || '(sin nombre)';
     const fecha = formatFechaSiembra(plantSowDate(rep));
@@ -1076,7 +1076,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     );
   };
 
-  const renderRow = (grupo) => (
+  const renderRow = (/** @type {any} */ grupo) => (
     <div className="pb-2 px-1">
       {grupo.grouped ? renderGroupCard(grupo) : renderAssetCard(grupo.representative)}
     </div>

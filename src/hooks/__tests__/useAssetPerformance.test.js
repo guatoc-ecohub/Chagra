@@ -34,6 +34,12 @@ vi.mock('../../config/materials', function () {
 var mod = await import('../useAssetPerformance');
 var useAssetPerformance = mod.useAssetPerformance;
 
+/**
+ * @param {any} name
+ * @param {any} qtyValue
+ * @param {any} [qtyUnit]
+ * @param {any} [ts]
+ */
 function mkInput(name, qtyValue, qtyUnit, ts) {
   return {
     id: crypto.randomUUID(),
@@ -49,6 +55,11 @@ function mkInput(name, qtyValue, qtyUnit, ts) {
   };
 }
 
+/**
+ * @param {any} qtyValue
+ * @param {any} qtyUnit
+ * @param {any} [ts]
+ */
 function mkHarvest(qtyValue, qtyUnit, ts) {
   return {
     id: crypto.randomUUID(),
@@ -126,10 +137,11 @@ describe('useAssetPerformance', function () {
       ],
     };
     var r = renderHook(function () { return useAssetPerformance('asset-5'); }).result;
-    expect(r.current.byCategory.fertilization.total).toBe(20);
-    expect(r.current.byCategory.fertilization.count).toBe(1);
-    expect(r.current.byCategory.protection.total).toBe(0.5);
-    expect(r.current.byCategory.protection.count).toBe(1);
+    var byCat = /** @type {any} */ (r.current.byCategory);
+    expect(byCat.fertilization.total).toBe(20);
+    expect(byCat.fertilization.count).toBe(1);
+    expect(byCat.protection.total).toBe(0.5);
+    expect(byCat.protection.count).toBe(1);
   });
 
   it('calcula ratio por categoria', function () {
@@ -137,7 +149,8 @@ describe('useAssetPerformance', function () {
       'asset-6': [mkHarvest(60, 'kg'), mkInput('Bokashi', 30, 'kg', 1718500000)],
     };
     var r = renderHook(function () { return useAssetPerformance('asset-6'); }).result;
-    expect(r.current.byCategory.fertilization.ratio).toBe('2.00');
+    var byCatR = /** @type {any} */ (r.current.byCategory);
+    expect(byCatR.fertilization.ratio).toBe('2.00');
   });
 
   it('maneja cantidades nulas sin explotar', function () {
@@ -168,8 +181,9 @@ describe('useAssetPerformance', function () {
       'asset-dc': [mkHarvest(20, 'kg'), mkInput('Material Desconocido', 10, 'kg')],
     };
     var r = renderHook(function () { return useAssetPerformance('asset-dc'); }).result;
-    expect(r.current.byCategory.fertilization.count).toBe(1);
-    expect(r.current.byCategory.fertilization.total).toBe(10);
+    var byCatDc = /** @type {any} */ (r.current.byCategory);
+    expect(byCatDc.fertilization.count).toBe(1);
+    expect(byCatDc.fertilization.total).toBe(10);
   });
 
   it('sin assetId no explota y retorna vacio', function () {

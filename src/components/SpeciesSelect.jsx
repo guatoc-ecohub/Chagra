@@ -47,6 +47,10 @@ const LEGACY_SPECIES = Object.entries(CROP_TAXONOMY).flatMap(([groupId, group]) 
 // Normaliza un row del catálogo SQLite ({id, nombre_comun, nombre_cientifico,
 // categoria}) al shape interno {id, name, groupId, groupLabel} consumido por
 // el resto del componente (fuzzy + recent + auto-select por nombre).
+/**
+ * @param {Object|null} row
+ * @returns {Object|null}
+ */
 const normalizeCatalogSpecies = (row) => {
   if (!row || !row.id) return null;
   const nombre = (row.nombre_comun || row.id || '').trim();
@@ -71,6 +75,11 @@ const CATALOG_LOAD_TIMEOUT_MS = 2000;
 // devuelve las últimas 3 únicas como { id, name, groupId, groupLabel } match
 // del catálogo activo. Si una planta tiene name libre que NO matchea, la
 // incluye igual con id=null para que el chip funcione como atajo de nombre.
+/**
+ * @param {Array} plants
+ * @param {Array} allSpecies
+ * @returns {Array<{id: (string|null), name: string, groupId: (string|null), groupLabel: string}>}
+ */
 const computeRecentSpecies = (plants, allSpecies) => {
   if (!Array.isArray(plants) || plants.length === 0) return [];
   const pool = Array.isArray(allSpecies) ? allSpecies : [];
@@ -97,7 +106,7 @@ const computeRecentSpecies = (plants, allSpecies) => {
   return result;
 };
 
-/** @param {{ value: any, onChange: Function, onAutoFill?: Function, onPhoto?: (blob: Blob) => void }} props */
+/** @param {{ value: any, onChange: Function, onAutoFill?: Function, onPhoto?: Function }} props */
 export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -111,8 +120,9 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
   // Catálogo dinámico (v3.1 ≈480 species) con fallback legacy (~77).
   // Se carga async desde catalogDB al mount; si tarda >2s o falla, queda
   // el legacy para no romper offline-first ni la UX del form.
-  /** @type {Array<{id:string,name:string,groupId:string,groupLabel:string,nombre_comun?:string,nombre_cientifico?:string}>} */
-  const [allSpecies, setAllSpecies] = useState(LEGACY_SPECIES);
+  const [allSpecies, setAllSpecies] = useState(
+    /** @type {Array<{id:string,name:string,groupId:string,groupLabel:string,nombre_comun?:string,nombre_cientifico?:string}>} */ (LEGACY_SPECIES)
+  );
   useEffect(() => {
     let cancelled = false;
     const timeoutId = setTimeout(() => {
@@ -182,6 +192,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
     return () => window.removeEventListener('beforeunload', handler);
   }, [aiState]);
 
+  /** @param {Event} e */
   const handleAiCapture = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -261,6 +272,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
     }
   };
 
+  /** @param {string} altName */
   const handleAiPickAlternative = (altName) => {
     const match = allSpecies.find((sp) => {
       const display = (sp.name || '').toLowerCase();
@@ -343,6 +355,7 @@ export const SpeciesSelect = ({ value, onChange, onAutoFill, onPhoto }) => {
     [query, allSpecies]
   );
 
+  /** @param {{ id: string, name: string, groupId: string, groupLabel: string }} species */
   const handleSelect = (species) => {
     setSelectedSpeciesId(species.id);
     onChange(species.name, species.id);

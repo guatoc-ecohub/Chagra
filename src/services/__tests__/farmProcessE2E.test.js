@@ -11,9 +11,14 @@ vi.mock('../../db/farmProcessCache', () => ({
   getFarmProcess: vi.fn(),
   putFarmProcess: vi.fn(),
   listFarmProcesses: vi.fn(() => Promise.resolve([])),
+  addFarmEvent: vi.fn(),
+  getFarmEvents: vi.fn(() => Promise.resolve([])),
+  hydrateCyclesFromFarmOS: vi.fn(() => Promise.resolve([])),
 }));
 
 vi.mock('../../db/dbCore', () => ({
+  DB_NAME: 'ChagraDB',
+  DB_VERSION: 26,
   openDB: vi.fn(() => Promise.resolve({ transaction: vi.fn(), close: vi.fn() })),
   STORES: {
     FARM_PROCESSES: 'farm_processes',
@@ -22,10 +27,10 @@ vi.mock('../../db/dbCore', () => ({
   },
 }));
 
-vi.mock('../../types/farmProcess', async () => {
+vi.mock('../../types/farmProcess', /** @type {any} */(async () => {
   const actual = await vi.importActual('../../types/farmProcess');
   return actual;
-});
+}));
 
 describe('Integración: siembra → ciclo → observación → etapa → tarea', () => {
   beforeEach(() => {
@@ -55,7 +60,7 @@ describe('Integración: siembra → ciclo → observación → etapa → tarea',
   });
 
   it('2. Sugerir etapa desde observación', async () => {
-    const { suggestStageFromText } = await vi.importActual('../stageSuggestionService');
+    const { suggestStageFromText } = /** @type {any} */ (await vi.importActual('../stageSuggestionService'));
     const suggestion = suggestStageFromText(
       'las hojas están grandes y el tallo principal ya mide 30cm'
     );
@@ -66,7 +71,7 @@ describe('Integración: siembra → ciclo → observación → etapa → tarea',
   });
 
   it('3. Generar tareas desde etapa vegetativa', async () => {
-    const { getTasksForCycle } = await vi.importActual('../cycleTaskService');
+    const { getTasksForCycle } = /** @type {any} */ (await vi.importActual('../cycleTaskService'));
     const stageOrder = [
       { code: 'sowing', label: 'Siembra' },
       { code: 'emergence', label: 'Emergencia' },
@@ -81,24 +86,24 @@ describe('Integración: siembra → ciclo → observación → etapa → tarea',
       stageOrder
     );
     expect(tasks.length).toBeGreaterThan(0);
-    expect(tasks.some((t) => t.task.includes('Riego'))).toBe(true);
+    expect(tasks.some((/** @type {any} */ t) => t.task.includes('Riego'))).toBe(true);
   });
 
   it('4. Calcular ventanas fenológicas con datos completos', async () => {
-    const { calculateWindows } = await vi.importActual('../phenologyCalculator');
+    const { calculateWindows } = /** @type {any} */ (await vi.importActual('../phenologyCalculator'));
     const windows = calculateWindows({
       speciesSlug: 'coffea_arabica',
       sowingDate: Date.now(),
       altitudeM: 1500,
     });
     expect(windows.length).toBeGreaterThan(0);
-    windows.forEach((w) => {
+    windows.forEach((/** @type {any} */ w) => {
       expect(['computed', 'insufficient_data', 'template_missing']).toContain(w.status);
     });
   });
 
   it('5. Degradación honesta: plantilla faltante', async () => {
-    const { calculateWindows } = await vi.importActual('../phenologyCalculator');
+    const { calculateWindows } = /** @type {any} */ (await vi.importActual('../phenologyCalculator'));
     const windows = calculateWindows({
       speciesSlug: 'nonexistent_species_xyz',
       sowingDate: Date.now(),
@@ -108,9 +113,9 @@ describe('Integración: siembra → ciclo → observación → etapa → tarea',
 
   it('6. Flujo funcional completo (sin IDB)', async () => {
     const { validateFarmProcess } = await import('../../types/farmProcess');
-    const { suggestStageFromText } = await vi.importActual('../stageSuggestionService');
-    const { getTasksForCycle } = await vi.importActual('../cycleTaskService');
-    const { calculateWindows } = await vi.importActual('../phenologyCalculator');
+    const { suggestStageFromText } = /** @type {any} */ (await vi.importActual('../stageSuggestionService'));
+    const { getTasksForCycle } = /** @type {any} */ (await vi.importActual('../cycleTaskService'));
+    const { calculateWindows } = /** @type {any} */ (await vi.importActual('../phenologyCalculator'));
 
     const process = {
       process_id: 'flow-001',

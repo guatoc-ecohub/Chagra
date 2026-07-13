@@ -22,6 +22,9 @@
  * @property {string} [current_stage]
  * @property {string} status
  * @property {Array} [events] - eventos del proceso (si disponibles)
+ * @property {Object} [attributes] - atributos JSON:API del asset (si disponibles)
+ * @property {Array} [companions] - especies asociadas (si disponibles)
+ * @property {Object} [payload] - metadata adicional (si disponible)
  */
 
 /**
@@ -30,7 +33,7 @@
  * @property {string} text
  * @property {number} [created_at]
  * @property {string} [event_type]
- * @property {Object} [payload]
+ * @property {object} [payload]
  */
 
 /**
@@ -67,7 +70,7 @@
  * @property {MESMISScore} mesmis
  * @property {TAPEScore} tape
  * @property {number} nivelGliessman - 0-5 estimado
- * @property {Object} metadata - información sobre qué datos se usaron
+ * @property {{ processes_count: number, active_processes_count: number, observations_count: number, mesmis_non_null_count: number, tape_non_null_count: number, calculated_at: number }} metadata - información sobre qué datos se usaron
  */
 
 // ─── Helpers para cálculo de scores ───────────────────────────────────────

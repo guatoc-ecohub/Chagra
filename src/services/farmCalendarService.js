@@ -128,7 +128,7 @@ function buildAnnualEntries({ speciesSlug, sowingDate, altitudeM, template, cate
     return { entries: [], isGeneric: false, hasData: false };
   }
 
-  const isGeneric = computed.some((w) => w.isGeneric);
+  const isGeneric = computed.some((w) => /** @type {any} */ (w).isGeneric);
   const entries = [];
 
   for (const w of computed) {
@@ -191,7 +191,7 @@ function buildAnnualEntries({ speciesSlug, sowingDate, altitudeM, template, cate
  * @param {Object|null} cfg.species — entrada del catálogo
  * @param {number|null} cfg.sowingDate — ts ms (null si no hay ciclo)
  * @param {number} cfg.now
- * @returns {CalendarEntry[]}
+ * @returns {Array<{layer: string, title: string, detail: string, months: number[], windowStart: number|null, windowEnd: number|null, approximate: boolean, confidence: number, source: string, biofertilizer: string|null, offsetDays: number, anchored: boolean}>}
  */
 function buildNutritionEntries({ species, sowingDate, now }) {
   if (!species) return [];
@@ -240,7 +240,7 @@ function buildNutritionEntries({ species, sowingDate, now }) {
  * @param {string} cfg.speciesId
  * @param {number|null} cfg.plantingDate
  * @param {number} cfg.now
- * @returns {{ entries: CalendarEntry[], resolution: Object|null }}
+ * @returns {{ entries: Array<{layer: string, title: string, detail: string, months: number[], windowStart: number|null, windowEnd: number|null, approximate: boolean, confidence: number, source: string, stageCode: string, continuous?: boolean}>, resolution: Object|null }}
  */
 function buildPerennialEntries({ speciesId, plantingDate, now }) {
   const res = resolvePerennialCycle({ speciesId, plantingDate, now });
@@ -350,7 +350,7 @@ export function buildPlantCalendar({ id, name, speciesSlug, species, sowingDate,
     || category === 'frutales_perennes'
     || category === 'arboles_sombra';
 
-  /** @type {CalendarEntry[]} */
+  /** @type {any[]} */
   let entries = [];
   let kind = 'no_data';
   let isGeneric = false;

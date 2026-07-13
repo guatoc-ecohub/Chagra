@@ -133,7 +133,7 @@ describe('haversineMeters', () => {
   });
 
   it('retorna 0 con argumentos faltantes', () => {
-    expect(haversineMeters(null, { lat: 1, lng: 1 })).toBe(0);
+    expect(haversineMeters(/** @type {any} */ (null), { lat: 1, lng: 1 })).toBe(0);
   });
 });
 
@@ -325,11 +325,11 @@ describe('acceptGpsFix — síntoma (a) línea loca', () => {
 
   // --- Fix inválido -------------------------------------------------------------
   it('descarta coordenadas no finitas', () => {
-    expect(acceptGpsFix({ lat: NaN, lng: -73.92 }, null).accepted).toBe(false);
-    expect(acceptGpsFix({ lat: NaN, lng: -73.92 }, null).reason).toBe('invalid');
-    expect(acceptGpsFix(null, null).accepted).toBe(false);
-    expect(acceptGpsFix(null, null).reason).toBe('invalid');
-    expect(acceptGpsFix(undefined, null).accepted).toBe(false);
+    expect(acceptGpsFix(/** @type {any} */ ({ lat: NaN, lng: -73.92 }), null).accepted).toBe(false);
+    expect(acceptGpsFix(/** @type {any} */ ({ lat: NaN, lng: -73.92 }), null).reason).toBe('invalid');
+    expect(acceptGpsFix(/** @type {any} */ (null), null).accepted).toBe(false);
+    expect(acceptGpsFix(/** @type {any} */ (null), null).reason).toBe('invalid');
+    expect(acceptGpsFix(/** @type {any} */ (undefined), null).accepted).toBe(false);
   });
 
   it('descarta fix sin lat o lng pero con otros campos', () => {
@@ -396,7 +396,7 @@ describe('warmupDecision — síntoma (c) precisión 1ª corrida', () => {
   it('NO ancla con accuracy undefined/NaN explícitos', () => {
     expect(warmupDecision({ accuracy: undefined }).warmedUp).toBe(false);
     expect(warmupDecision({ accuracy: NaN }).warmedUp).toBe(false);
-    expect(warmupDecision(null).warmedUp).toBe(false);
+    expect(warmupDecision(/** @type {any} */ (null)).warmedUp).toBe(false);
   });
 
   it('cae a fallback tras el límite de fixes sin accuracy (no cuelga el warm-up)', () => {
@@ -448,7 +448,7 @@ describe('warmupDecision — síntoma (c) precisión 1ª corrida', () => {
       }
     }
     expect(warmedUp).toBe(true);
-    expect(anchor.accuracy).toBe(12); // ancló en el fix preciso, no en el ciego
+    expect(/** @type {any} */ (anchor).accuracy).toBe(12); // ancló en el fix preciso, no en el ciego
   });
 });
 
@@ -479,7 +479,7 @@ describe('dedupeByMinDistance — síntoma (b) jitter casi-duplicado', () => {
     expect(dedupeByMinDistance([])).toEqual([]);
     expect(dedupeByMinDistance(null)).toEqual([]);
     expect(dedupeByMinDistance(undefined)).toEqual([]);
-    expect(dedupeByMinDistance('no-array')).toEqual([]);
+    expect(dedupeByMinDistance(/** @type {any} */ ('no-array'))).toEqual([]);
   });
 
   it('retorna el único punto para array de 1 elemento', () => {
@@ -743,7 +743,7 @@ describe('buildWalkPolygon — recorrido caminado → anillo estable', () => {
     const ring = buildWalkPolygon(square);
     const wkt = geoJsonToWkt(latLngsToPolygon(ring));
     expect(wkt).toContain('POLYGON');
-    const coords = wkt.match(/POLYGON\(\((.+)\)\)/)[1].split(',').map((s) => s.trim());
+    const coords = (/** @type {string} */ (wkt)).match(/POLYGON\(\((.+)\)\)/)[1].split(',').map((s) => s.trim());
     expect(coords[0]).toBe(coords[coords.length - 1]);
   });
 

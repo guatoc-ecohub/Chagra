@@ -1,0 +1,418 @@
+{
+  "catalogo": "biopreparados",
+  "sujetos": [
+    {
+      "slug": "bocashi",
+      "nombre": "Bocashi",
+      "descripcion_visual": "una pila o monton de abono organico fermentado, seco y grumoso, de color marron/tierra, tipo compost (NO un liquido, NO estiercol fresco)",
+      "candidatas": [
+        {
+          "titulo": "File:Bokashi Organko Essential.jpg",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Bokashi_Organko_Essential.jpg/960px-Bokashi_Organko_Essential.jpg",
+          "descripcion_commons": "Bokashi Organko Essential from Slovenian company Skaza",
+          "autor": "Teru Menclová",
+          "licencia": "CC BY-SA 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Bokashi_Organko_Essential.jpg",
+          "busqueda": "bokashi fertilizer",
+          "archivo": "work/staging/bocashi__0.jpg"
+        },
+        {
+          "titulo": "File:Bokashi bin set.JPG",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Bokashi_bin_set.JPG",
+          "descripcion_commons": "A w:Bokashi composting bin with a bag of bokashi bran.",
+          "autor": "Pfctdayelise",
+          "licencia": "CC BY-SA 3.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Bokashi_bin_set.JPG",
+          "busqueda": "bokashi compost",
+          "archivo": "work/staging/bocashi__1.jpg"
+        },
+        {
+          "titulo": "File:Bokashi composting bucket content.jpg",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Bokashi_composting_bucket_content.jpg/960px-Bokashi_composting_bucket_content.jpg",
+          "descripcion_commons": "Composting bokashi style, inside content bucket.",
+          "autor": "Zenyrgarden",
+          "licencia": "CC BY-SA 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Bokashi_composting_bucket_content.jpg",
+          "busqueda": "bokashi compost",
+          "archivo": "work/staging/bocashi__2.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "biol",
+      "nombre": "Biol",
+      "descripcion_visual": "un biofertilizante liquido oscuro en una caneca o barril plastico con manguera/valvula de gas (fermentacion anaerobica), NO un mineral ni un polvo",
+      "candidatas": [
+        {
+          "titulo": "File:Diversity of arthropods on Acacia mangium (Fabaceae) and production of this plant with dehydrated sewage sludge in degraded area.pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Diversity_of_arthropods_on_Acacia_mangium_%28Fabaceae%29_and_production_of_this_plant_with_dehydrated_sewage_sludge_in_degraded_area.pdf/page1-960px-Diversity_of_arthropods_on_Acacia_mangium_%28Fabaceae%29_and_production_of_this_plant_with_dehydrated_sewage_sludge_in_degraded_area.pdf.jpg",
+          "descripcion_commons": "Silva, Júlia Leticia; Demolin Leite, Germano Leão; de Souza Tavares, Wagner; Souza Silva, Farley William; Sampaio, Regynaldo Arruda; Azevedo, Alcinei Mistico; Serrão, José Eduardo; Zanuncio, José Cola",
+          "autor": "Silva, Júlia Leticia; Demolin Leite, Germano Leão; de Souza Tavares, Wagner; Souza Silva, Farley William; Sampaio, Regynaldo Arruda; Azevedo, Alcinei Mistico; Serrão, José Eduardo; Zanuncio, José Cola",
+          "licencia": "CC BY 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Diversity_of_arthropods_on_Acacia_mangium_(Fabaceae)_and_production_of_this_plant_with_dehydrated_sewage_sludge_in_degraded_area.pdf",
+          "busqueda": "biol biofertilizer",
+          "archivo": "work/staging/biol__0.jpg"
+        },
+        {
+          "titulo": "File:FEDLINK - United States Federal Collection (IA CAT10856644).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/FEDLINK_-_United_States_Federal_Collection_%28IA_CAT10856644%29.pdf/page1-960px-FEDLINK_-_United_States_Federal_Collection_%28IA_CAT10856644%29.pdf.jpg",
+          "descripcion_commons": "47 leaves ; 28 cm\nCover title\nSubjects: Soil microbiology Research United States; Sustainable agriculture Research United States; Agriculturists United States; Soil Microbial Systems Laboratory (U.S.)",
+          "autor": "Soil Microbial Systems Laboratory (U.S.)",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:FEDLINK_-_United_States_Federal_Collection_(IA_CAT10856644).pdf",
+          "busqueda": "biol biofertilizer",
+          "archivo": "work/staging/biol__1.jpg"
+        },
+        {
+          "titulo": "File:Nanobiofertilization as a novel technology for highly efficient foliar application of Fe and B in almond trees.pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Nanobiofertilization_as_a_novel_technology_for_highly_efficient_foliar_application_of_Fe_and_B_in_almond_trees.pdf/page1-960px-Nanobiofertilization_as_a_novel_technology_for_highly_efficient_foliar_application_of_Fe_and_B_in_almond_trees.pdf.jpg",
+          "descripcion_commons": "Rios, J. J.; Yepes-Molina, L.; Martinez-Alonso, A.; Carvajal, M. (2020). \"Nanobiofertilization as a novel technology for highly efficient foliar application of Fe and B in almond trees\". Royal Society",
+          "autor": "Rios, J. J.; Yepes-Molina, L.; Martinez-Alonso, A.; Carvajal, M.",
+          "licencia": "CC BY 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Nanobiofertilization_as_a_novel_technology_for_highly_efficient_foliar_application_of_Fe_and_B_in_almond_trees.pdf",
+          "busqueda": "biol biofertilizer",
+          "archivo": "work/staging/biol__2.jpg"
+        }
+      ]
+    },
+    {
+      "slug": "purin_ortiga",
+      "nombre": "Purin de ortiga",
+      "descripcion_visual": "un balde o recipiente con liquido verdoso-marron y hojas de ortiga fermentando en agua (purin/macerado de ortiga)",
+      "candidatas": [
+        {
+          "titulo": "File:Seau de purin d’ortie.jpg",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Seau_de_purin_d%E2%80%99ortie.jpg/960px-Seau_de_purin_d%E2%80%99ortie.jpg",
+          "descripcion_commons": "the old way of making nettle manure",
+          "autor": "Didier Flipo",
+          "licencia": "CC BY 3.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Seau_de_purin_d%E2%80%99ortie.jpg",
+          "busqueda": "purin d'ortie",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Vraie purin d'ortie 1.jpg",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/2/23/Vraie_purin_d%27ortie_1.jpg",
+          "descripcion_commons": "Preparation of nettle water according to Éric Petiot, step 1: fill the tank with plant material.",
+          "autor": "Didier Flipo",
+          "licencia": "CC BY 3.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Vraie_purin_d%27ortie_1.jpg",
+          "busqueda": "purin d'ortie",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Vraie purin d'ortie 2.jpg",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/8/88/Vraie_purin_d%27ortie_2.jpg",
+          "descripcion_commons": "Preparation of nettle water according to Éric Petiot, step 2: add (rain) water.",
+          "autor": "Didier Flipo",
+          "licencia": "CC BY 3.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Vraie_purin_d%27ortie_2.jpg",
+          "busqueda": "purin d'ortie",
+          "archivo": null
+        }
+      ]
+    },
+    {
+      "slug": "caldo_sulfocalcico",
+      "nombre": "Caldo sulfocalcico",
+      "descripcion_visual": "un liquido de color rojizo-anaranjado o ambar (azufre + cal hervidos) en una olla o recipiente. NO un mineral solido, NO un cristal de barita, NO un polvo",
+      "candidatas": [
+        {
+          "titulo": "File:Batch adsorption from solution (IA jresv66An6p503).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Batch_adsorption_from_solution_%28IA_jresv66An6p503%29.pdf/page1-960px-Batch_adsorption_from_solution_%28IA_jresv66An6p503%29.pdf.jpg",
+          "descripcion_commons": "Journal of Research of the National Bureau of Standards\n\nSubjects: adsorption; batch; column; equation; Langmuir",
+          "autor": "Loebenstein, Willism V.",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:Batch_adsorption_from_solution_(IA_jresv66An6p503).pdf",
+          "busqueda": "lime sulfur solution",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Heterogeneous equilibria at the glass electrode-solution interface (IA jresv48n6p428).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Heterogeneous_equilibria_at_the_glass_electrode-solution_interface_%28IA_jresv48n6p428%29.pdf/page1-960px-Heterogeneous_equilibria_at_the_glass_electrode-solution_interface_%28IA_jresv48n6p428%29.pdf.jpg",
+          "descripcion_commons": "Journal of Research of the National Bureau of Standards\n\nSubjects:",
+          "autor": "Hubbard, D.\nGoldman, R.G.",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:Heterogeneous_equilibria_at_the_glass_electrode-solution_interface_(IA_jresv48n6p428).pdf",
+          "busqueda": "lime sulfur solution",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Preparation of sulfur of high purity (IA jresv64An4p355).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Preparation_of_sulfur_of_high_purity_%28IA_jresv64An4p355%29.pdf/page1-960px-Preparation_of_sulfur_of_high_purity_%28IA_jresv64An4p355%29.pdf.jpg",
+          "descripcion_commons": "Journal of Research of the National Bureau of Standards\n\nSubjects: liquid-soluble; nitric acid; solid-insoluble; sulfur; sulfuric acid",
+          "autor": "Murphy, Thomas J.\nClabaugh, W. Stanley\nGilchrist, Raleigh",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:Preparation_of_sulfur_of_high_purity_(IA_jresv64An4p355).pdf",
+          "busqueda": "lime sulfur solution",
+          "archivo": null
+        }
+      ]
+    },
+    {
+      "slug": "humus_liquido",
+      "nombre": "Humus liquido (lixiviado de lombriz)",
+      "descripcion_visual": "liquido oscuro escurrido de una lombricompostera / vermicompost (lixiviado de lombriz), goteando o recogido en un recipiente",
+      "candidatas": [
+        {
+          "titulo": "File:Challenges and opportunities associated with waste management in India.pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Challenges_and_opportunities_associated_with_waste_management_in_India.pdf/page1-960px-Challenges_and_opportunities_associated_with_waste_management_in_India.pdf.jpg",
+          "descripcion_commons": "Kumar, Sunil; Smith, Stephen R.; Fowler, Geoff; Velis, Costas; Kumar, S. Jyoti; Arya, Shashi; Rena; Kumar, Rakesh; Cheeseman, Christopher (2017). \"Challenges and opportunities associated with waste ma",
+          "autor": "Kumar, Sunil; Smith, Stephen R.; Fowler, Geoff; Velis, Costas; Kumar, S. Jyoti; Arya, Shashi; Rena, ; Kumar, Rakesh; Cheeseman, Christopher",
+          "licencia": "CC BY 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Challenges_and_opportunities_associated_with_waste_management_in_India.pdf",
+          "busqueda": "vermicompost leachate",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Composting assessment for organic solid waste at Fork Polk, Louisiana - USACE-p266001coll1-3872.pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Composting_assessment_for_organic_solid_waste_at_Fork_Polk%2C_Louisiana_-_USACE-p266001coll1-3872.pdf/page1-960px-Composting_assessment_for_organic_solid_waste_at_Fork_Polk%2C_Louisiana_-_USACE-p266001coll1-3872.pdf.jpg",
+          "descripcion_commons": "",
+          "autor": "United States. Army. Corps of Engineers; Engineer Research and Development Center (U.S.); Environmental Laboratory (U.S.); Construction Engineering Research Laboratory (U.S.); Army Net Zero Program (U.S.)",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:Composting_assessment_for_organic_solid_waste_at_Fork_Polk,_Louisiana_-_USACE-p266001coll1-3872.pdf",
+          "busqueda": "vermicompost leachate",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Development of production package for vegetables grown in indoor rooftop of Bangladesh.pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Development_of_production_package_for_vegetables_grown_in_indoor_rooftop_of_Bangladesh.pdf/page1-960px-Development_of_production_package_for_vegetables_grown_in_indoor_rooftop_of_Bangladesh.pdf.jpg",
+          "descripcion_commons": "Urban and Rooftop gardening has huge impacts on reducing urban heat island effect to 3-5 degree celcius and also can reduce energy consumption. It is already proved that it is a prospective place to e",
+          "autor": "Abul Hasnat Solaiman",
+          "licencia": "CC BY-SA 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Development_of_production_package_for_vegetables_grown_in_indoor_rooftop_of_Bangladesh.pdf",
+          "busqueda": "vermicompost leachate",
+          "archivo": null
+        }
+      ]
+    },
+    {
+      "slug": "lixiviado_frutas",
+      "nombre": "Lixiviado de frutas",
+      "descripcion_visual": "frascos o recipiente con frutas troceadas + panela/azucar fermentando, produciendo un liquido marron (jugo de frutas fermentado, FPJ)",
+      "candidatas": [
+        {
+          "titulo": "File:An inaugural dissertation, on the chemical and medical properties of the persimmon tree, and the analysis of astringent vegetables (IA 2578010R.nlm.nih.gov).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/An_inaugural_dissertation%2C_on_the_chemical_and_medical_properties_of_the_persimmon_tree%2C_and_the_analysis_of_astringent_vegetables_%28IA_2578010R.nlm.nih.gov%29.pdf/page1-500px-An_inaugural_dissertation%2C_on_the_chemical_and_medical_properties_of_the_persimmon_tree%2C_and_the_analysis_of_astringent_vegetables_%28IA_2578010R.nlm.nih.gov%29.pdf.jpg",
+          "descripcion_commons": "Dedicated to Benjamin Rush\nLetter of commendation, p. [4], signed: Benjamin Rush. May 3rd. 1792\nSignatures: [A]⁴ B-D⁴ [E]1\nNot in Blake\nFilm 633 reel 105 is part of Research Publications Early America",
+          "autor": "Woodhouse, James, 1770-1809\nRush, Benjamin, 1746-1813, dedicatee\nWoodhouse, William, 1740?-1795, printer\nUniversity of Pennsylvania",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:An_inaugural_dissertation,_on_the_chemical_and_medical_properties_of_the_persimmon_tree,_and_the_analysis_of_astringent_vegetables_(IA_2578010R.nlm.nih.gov).pdf",
+          "busqueda": "fermented fruit juice FPJ",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Clean liquid organic fertilizer and field trial results.pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Clean_liquid_organic_fertilizer_and_field_trial_results.pdf/page1-960px-Clean_liquid_organic_fertilizer_and_field_trial_results.pdf.jpg",
+          "descripcion_commons": "ENGLISH",
+          "autor": "clean liquid organic fertilizers and field trial test resuls",
+          "licencia": "CC BY-SA 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Clean_liquid_organic_fertilizer_and_field_trial_results.pdf",
+          "busqueda": "fermented fruit juice FPJ",
+          "archivo": null
+        },
+        {
+          "titulo": "File:PREPARATION AND FIELD TRIAL TEST RESULTS OF CLEAN LIQUID ORGANIC FERTILIZERS.pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/PREPARATION_AND_FIELD_TRIAL_TEST_RESULTS_OF_CLEAN_LIQUID_ORGANIC_FERTILIZERS.pdf/page1-960px-PREPARATION_AND_FIELD_TRIAL_TEST_RESULTS_OF_CLEAN_LIQUID_ORGANIC_FERTILIZERS.pdf.jpg",
+          "descripcion_commons": "ENGLISH",
+          "autor": "LIQUID ORGANIC FERTILIZER FIELD TRIAL TEST",
+          "licencia": "CC BY-SA 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:PREPARATION_AND_FIELD_TRIAL_TEST_RESULTS_OF_CLEAN_LIQUID_ORGANIC_FERTILIZERS.pdf",
+          "busqueda": "fermented fruit juice FPJ",
+          "archivo": null
+        }
+      ]
+    },
+    {
+      "slug": "supermagro",
+      "nombre": "Supermagro",
+      "descripcion_visual": "una caneca o barril con un fermento liquido oscuro (estiercol + melaza + sales minerales, biofertilizante anaerobico), NO un mineral ni un polvo",
+      "candidatas": []
+    },
+    {
+      "slug": "trichoderma_harzianum_suelo",
+      "nombre": "Trichoderma harzianum",
+      "descripcion_visual": "el hongo Trichoderma de color verde intenso creciendo sobre sustrato (arroz/grano) o en placa de cultivo; puede ser microscopia del hongo. Verde caracteristico",
+      "candidatas": [
+        {
+          "titulo": "File:In vitro colony interactions among species of Trichoderma with inference toward biological control (IA CAT31291731).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/In_vitro_colony_interactions_among_species_of_Trichoderma_with_inference_toward_biological_control_%28IA_CAT31291731%29.pdf/page1-960px-In_vitro_colony_interactions_among_species_of_Trichoderma_with_inference_toward_biological_control_%28IA_CAT31291731%29.pdf.jpg",
+          "descripcion_commons": "Distributed to depository libraries in microfiche\n\"July 1994.\"\nIncludes bibliographical references (p. 7-8)\nSubjects: Trichoderma; Pathogenic microorganisms, Biological control",
+          "autor": "Reaves, Jimmy L\nCrawford, Ralph H\nPacific Northwest Research Station (Portland, Or.)",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:In_vitro_colony_interactions_among_species_of_Trichoderma_with_inference_toward_biological_control_(IA_CAT31291731).pdf",
+          "busqueda": "Trichoderma harzianum culture",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Recognition of endophytic Trichoderma species by leaf-cutting ants and their potential in a Trojan-horse management strategy.pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Recognition_of_endophytic_Trichoderma_species_by_leaf-cutting_ants_and_their_potential_in_a_Trojan-horse_management_strategy.pdf/page1-960px-Recognition_of_endophytic_Trichoderma_species_by_leaf-cutting_ants_and_their_potential_in_a_Trojan-horse_management_strategy.pdf.jpg",
+          "descripcion_commons": "Rocha, Silma L.; Evans, Harry C.; Jorge, Vanessa L.; Cardoso, Lucimar A. O.; Pereira, Fernanda S. T.; Rocha, Fabiano B.; Barreto, Robert W.; Hart, Adam G.; Elliot, Simon L. (2017). \"Recognition of end",
+          "autor": "Rocha, Silma L.; Evans, Harry C.; Jorge, Vanessa L.; Cardoso, Lucimar A. O.; Pereira, Fernanda S. T.; Rocha, Fabiano B.; Barreto, Robert W.; Hart, Adam G.; Elliot, Simon L.",
+          "licencia": "CC BY 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Recognition_of_endophytic_Trichoderma_species_by_leaf-cutting_ants_and_their_potential_in_a_Trojan-horse_management_strategy.pdf",
+          "busqueda": "Trichoderma harzianum culture",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Trichoderma lentinulae (10.3897-mycokeys.73.51424) Figure 2.jpg",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Trichoderma_lentinulae_%2810.3897-mycokeys.73.51424%29_Figure_2.jpg/960px-Trichoderma_lentinulae_%2810.3897-mycokeys.73.51424%29_Figure_2.jpg",
+          "descripcion_commons": "Figure 2; Trichoderma lentinulae (CGMCC 3.19847). Cultures at 25 °C after 3 days (A on PDA B on CMD C on SNA) D conidiation pustules on CMD after 10 days E conidiation pustules on CMD after 10 d F con",
+          "autor": "Gu X, Wang R, Sun Q, Wu B, Sun J-Z (2020) Four new species of Trichoderma in the Harzianum clade from northern China. MycoKeys 73: 109-132. https://doi.org/10.3897/mycokeys.73.51424",
+          "licencia": "CC BY 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Trichoderma_lentinulae_(10.3897-mycokeys.73.51424)_Figure_2.jpg",
+          "busqueda": "Trichoderma harzianum culture",
+          "archivo": null
+        }
+      ]
+    },
+    {
+      "slug": "bacillus_subtilis_foliar",
+      "nombre": "Bacillus subtilis",
+      "descripcion_visual": "cultivo de la bacteria Bacillus subtilis: colonias en una placa de agar (petri) o microscopia de la bacteria. NO una planta, NO un liquido generico",
+      "candidatas": [
+        {
+          "titulo": "File:Aerobic mesophilic sporeforming bacteria (IA aerobicmesophili559smit).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Aerobic_mesophilic_sporeforming_bacteria_%28IA_aerobicmesophili559smit%29.pdf/page1-500px-Aerobic_mesophilic_sporeforming_bacteria_%28IA_aerobicmesophili559smit%29.pdf.jpg",
+          "descripcion_commons": "Caption title\nContribution from Bureau of Plant Industry, Soils and Agricultural Engineering\nIncludes index\nBibliography: p. 102-108\nSubjects: Sporeforming bacteria; Aerobic bacteria; Bacillus (Bacter",
+          "autor": "Smith, Nathan R. (Nathan Raymond), b. 1888\nGordon, Ruth E. (Ruth Evelyn), 1910-\nClark, F. E. (Francis Eugene), 1910-",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:Aerobic_mesophilic_sporeforming_bacteria_(IA_aerobicmesophili559smit).pdf",
+          "busqueda": "Bacillus subtilis colony agar",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Bacterial response to graphene oxide and reduced graphene oxide integrated in agar plates.pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Bacterial_response_to_graphene_oxide_and_reduced_graphene_oxide_integrated_in_agar_plates.pdf/page1-960px-Bacterial_response_to_graphene_oxide_and_reduced_graphene_oxide_integrated_in_agar_plates.pdf.jpg",
+          "descripcion_commons": "Mokkapati, V. R. S. S.; Pandit, Santosh; Kim, Jinho; Martensson, Anders; Lovmar, Martin; Westerlund, Fredrik; Mijakovic, Ivan (2018). \"Bacterial response to graphene oxide and reduced graphene oxide i",
+          "autor": "Mokkapati, V. R. S. S.; Pandit, Santosh; Kim, Jinho; Martensson, Anders; Lovmar, Martin; Westerlund, Fredrik; Mijakovic, Ivan",
+          "licencia": "CC BY 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Bacterial_response_to_graphene_oxide_and_reduced_graphene_oxide_integrated_in_agar_plates.pdf",
+          "busqueda": "Bacillus subtilis colony agar",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Deciphering a survival strategy during the interspecific competition between Bacillus cereus MSM-S1 and Pseudomonas sp. MSM-M1.pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Deciphering_a_survival_strategy_during_the_interspecific_competition_between_Bacillus_cereus_MSM-S1_and_Pseudomonas_sp._MSM-M1.pdf/page1-960px-Deciphering_a_survival_strategy_during_the_interspecific_competition_between_Bacillus_cereus_MSM-S1_and_Pseudomonas_sp._MSM-M1.pdf.jpg",
+          "descripcion_commons": "Chakraborty, Brinta; Mallick, Anish; Annagiri, Sumana; Sengupta, Supratim; Sengupta, Tapas K. (2016). \"Deciphering a survival strategy during the interspecific competition between Bacillus cereus MSM-",
+          "autor": "Chakraborty, Brinta; Mallick, Anish; Annagiri, Sumana; Sengupta, Supratim; Sengupta, Tapas K.",
+          "licencia": "CC BY 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Deciphering_a_survival_strategy_during_the_interspecific_competition_between_Bacillus_cereus_MSM-S1_and_Pseudomonas_sp._MSM-M1.pdf",
+          "busqueda": "Bacillus subtilis colony agar",
+          "archivo": null
+        }
+      ]
+    },
+    {
+      "slug": "cal_dolomita",
+      "nombre": "Cal dolomitica",
+      "descripcion_visual": "polvo fino de color blanco a gris claro (cal dolomitica / dolomita molida agricola), en un monton o saco. NO un cristal mineral grande, NO otra roca",
+      "candidatas": [
+        {
+          "titulo": "File:Canada, a geographical, agricultural and mineralogical sketch (microform) (IA cihm 23216).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Canada%2C_a_geographical%2C_agricultural_and_mineralogical_sketch_%28microform%29_%28IA_cihm_23216%29.pdf/page1-960px-Canada%2C_a_geographical%2C_agricultural_and_mineralogical_sketch_%28microform%29_%28IA_cihm_23216%29.pdf.jpg",
+          "descripcion_commons": "Signed: T. Sterry Hunt\n\"Published by authority of the Bureau of Agriculture.\"\nFilmed from a copy of the original publication held by the Library of the Public Archives of Canada\n43\nSubjects: Natural r",
+          "autor": "Hunt, Thomas Sterry, 1826-1892",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:Canada,_a_geographical,_agricultural_and_mineralogical_sketch_(microform)_(IA_cihm_23216).pdf",
+          "busqueda": "dolomite powder agricultural",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Canada. A geographical, agricultural, and mineralogical sketch (IA canadageographic00canarich).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Canada._A_geographical%2C_agricultural%2C_and_mineralogical_sketch_%28IA_canadageographic00canarich%29.pdf/page1-500px-Canada._A_geographical%2C_agricultural%2C_and_mineralogical_sketch_%28IA_canadageographic00canarich%29.pdf.jpg",
+          "descripcion_commons": "Subjects: Geology -- Canada; Agriculture -- Canada",
+          "autor": "Canada. Dept. of Agriculture\nHunt, Thomas Sterry, 1826-1892",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:Canada._A_geographical,_agricultural,_and_mineralogical_sketch_(IA_canadageographic00canarich).pdf",
+          "busqueda": "dolomite powder agricultural",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Journal of agricultural research (IA journalofagricul06unit).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Journal_of_agricultural_research_%28IA_journalofagricul06unit%29.pdf/page1-500px-Journal_of_agricultural_research_%28IA_journalofagricul06unit%29.pdf.jpg",
+          "descripcion_commons": "Publication suspended Dec. 1921-Dec. 1922\nIssued by authority of the Secretary of Agriculture with the cooperation of the Association of Land-Grant Colleges and Universities (called Oct. 1914-Jan. 2, ",
+          "autor": "United States. Dept. of Agriculture\nAssociation of American Agricultural Colleges and Experiment Stations\nAssociation of Land-Grant Colleges and Universities\nAssociation of Land-Grant Colleges",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:Journal_of_agricultural_research_(IA_journalofagricul06unit).pdf",
+          "busqueda": "dolomite powder agricultural",
+          "archivo": null
+        }
+      ]
+    },
+    {
+      "slug": "ceniza_madera",
+      "nombre": "Ceniza de madera",
+      "descripcion_visual": "ceniza gris fina de madera quemada, en un monton, balde o fogon (wood ash). Color gris claro, textura de polvo",
+      "candidatas": [
+        {
+          "titulo": "File:Ash wood cross-section.jpg",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Ash_wood_cross-section.jpg/960px-Ash_wood_cross-section.jpg",
+          "descripcion_commons": "Cross-section through a piece of ash wood. The difference between the porous early wood and the tighter late wood is clearly visible.\nCut only with a Ryoba (Japanese saw), therefore some tool traces a",
+          "autor": "Simon A. Eugster",
+          "licencia": "CC BY-SA 3.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Ash_wood_cross-section.jpg",
+          "busqueda": "wood ash",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Campfire scar 08319.JPG",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Campfire_scar_08319.JPG/960px-Campfire_scar_08319.JPG",
+          "descripcion_commons": "Campfire scar on Abies concolor, Pinus benthamiana, Pinus lambertiana, etc., forest floor.\nViewpoint location: Snow Creek Trail, Yosemite National Park\nViewpoint elevation: 2100 meter (6880 ft)\nView d",
+          "autor": "Walter Siegmund (talk)",
+          "licencia": "CC BY 2.5",
+          "url": "https://commons.wikimedia.org/wiki/File:Campfire_scar_08319.JPG",
+          "busqueda": "wood ash",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Flamed Quartersawn Ash Guitar Top.jpg",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Flamed_Quartersawn_Ash_Guitar_Top.jpg/960px-Flamed_Quartersawn_Ash_Guitar_Top.jpg",
+          "descripcion_commons": "This is one side of a two piece bookmatched electric guitar top made from flame figured quartersawn Ash lumber.",
+          "autor": "Stephen Ondich",
+          "licencia": "CC BY-SA 4.0",
+          "url": "https://commons.wikimedia.org/wiki/File:Flamed_Quartersawn_Ash_Guitar_Top.jpg",
+          "busqueda": "wood ash",
+          "archivo": null
+        }
+      ]
+    },
+    {
+      "slug": "biofertilizante_algas",
+      "nombre": "Biofertilizante de algas marinas",
+      "descripcion_visual": "algas marinas pardas (kelp/sargazo) o un extracto liquido oscuro de algas usado como fertilizante. NO algas de agua dulce verdes en un lago",
+      "candidatas": [
+        {
+          "titulo": "File:Alunite and kelp as potash fertilizers (IA alunitekelpaspot00skinrich).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Alunite_and_kelp_as_potash_fertilizers_%28IA_alunitekelpaspot00skinrich%29.pdf/page1-500px-Alunite_and_kelp_as_potash_fertilizers_%28IA_alunitekelpaspot00skinrich%29.pdf.jpg",
+          "descripcion_commons": "Subjects: Alunite; Kelps; Potash",
+          "autor": "Skinner, J. J. (Joshua John), 1882-1969\nJackson, Albert M.",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:Alunite_and_kelp_as_potash_fertilizers_(IA_alunitekelpaspot00skinrich).pdf",
+          "busqueda": "seaweed fertilizer kelp",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Alunite and kelp as potash fertilizers (IA alunitekelpaspot76skin).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Alunite_and_kelp_as_potash_fertilizers_%28IA_alunitekelpaspot76skin%29.pdf/page1-500px-Alunite_and_kelp_as_potash_fertilizers_%28IA_alunitekelpaspot76skin%29.pdf.jpg",
+          "descripcion_commons": "Subjects: Alunite; Kelps; Potash",
+          "autor": "Skinner, J. J. (Joshua John), 1882-1969\nJackson, Albert M., joint author",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:Alunite_and_kelp_as_potash_fertilizers_(IA_alunitekelpaspot76skin).pdf",
+          "busqueda": "seaweed fertilizer kelp",
+          "archivo": null
+        },
+        {
+          "titulo": "File:Fertilizer resources of the United States (IA fertilizerresour00unit).pdf",
+          "thumb": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Fertilizer_resources_of_the_United_States_%28IA_fertilizerresour00unit%29.pdf/page1-500px-Fertilizer_resources_of_the_United_States_%28IA_fertilizerresour00unit%29.pdf.jpg",
+          "descripcion_commons": "Referred to the Committee on agriculture and forestery and ordered printed December 18, 1911\nJames Wilson, secretary of agriculture\nMilton Whitney, chief of Bureau of soils\nThe preliminary report, by ",
+          "autor": "United States. Dept. of Agriculture\nUnited States. Bureau of Soils\nCameron, Frank K. (Frank Kenneth), 1869-1958",
+          "licencia": "Public domain",
+          "url": "https://commons.wikimedia.org/wiki/File:Fertilizer_resources_of_the_United_States_(IA_fertilizerresour00unit).pdf",
+          "busqueda": "seaweed fertilizer kelp",
+          "archivo": null
+        }
+      ]
+    }
+  ]
+}
