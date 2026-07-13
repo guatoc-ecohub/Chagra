@@ -553,6 +553,21 @@ async function synthesizeSentence(sentence, voice, format, lang, signal) {
  */
 function playSentenceBlob(url, rate) {
   return new Promise((resolve, reject) => {
+    // Garantía de UNA sola voz: cortar cualquier audio Kokoro previo que siga
+    // sonando antes de arrancar el nuevo. Sin esto, dos llamadas (bienvenida +
+    // mundo, o un efecto que re-dispara) apilan voces "papá noel" que se pisan
+    // y se quedan en loop. speak()/speakSentences() ya cortan; este path no lo
+    // hacía y era la raíz del solape/loop de la voz em_santa.
+    if (currentKokoroAudio && currentKokoroAudio !== null) {
+      try {
+        currentKokoroAudio.pause();
+        currentKokoroAudio.onended = null;
+        currentKokoroAudio.onerror = null;
+      } catch { /* noop */ }
+    }
+    if (currentKokoroUrl && currentKokoroUrl !== url) {
+      try { URL.revokeObjectURL(currentKokoroUrl); } catch { /* noop */ }
+    }
     const audio = new Audio(url);
     audio.playbackRate = clampRate(rate);
     currentKokoroAudio = audio;
