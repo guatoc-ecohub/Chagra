@@ -79,6 +79,7 @@ const VisualLib = lazy(() => import('./mockups/VisualLib'));
 // MOCKUP_HASH_ROUTES ANTES del check de auth. Chunks perezosos.
 // 3D: "El valle de mi finca" (R3F/WebGL2, degrada a SVG sin WebGL).
 const EntradaValle3DMockup = lazy(() => import('./mockups/EntradaValle3D'));
+const ShellApp3D = lazy(() => import('./components/ShellApp3D'));
 // 3D: "El mundo del agua" — monta <Mundo mundoId="agua"> del framework
 // (src/visual/mundo3d) con device-tiering real. El 3D va perezoso (vendor-three).
 const Mundo3DAguaMockup = lazy(() => import('./mockups/Mundo3DAgua'));
@@ -572,6 +573,7 @@ const MOCKUP_HASH_ROUTES = {
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
+  'app-3d': 'app_3d',
   'ciclo-vivo': 'ciclo_vivo',
   faq: 'faq',
   inventario: 'activos',
@@ -1908,6 +1910,17 @@ export default function App() {
             <DashboardLiveView onNavigate={navigate} onLogout={handleLogout} lastLogMessage={lastLogMessage} />
           </ErrorBoundary>
         );
+      case 'app_3d':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Shell 3D-first">
+              <ShellApp3D
+                onNavigate={navigate}
+                onBack={() => navigate('dashboard')}
+              />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'hoy_finca':
         return (
           <ErrorBoundary>
@@ -3159,6 +3172,7 @@ export default function App() {
     // La vitrina de la librería visual es una página pública autocontenida:
     // sin banners de instalación/datos ni FABs encima.
     currentView.startsWith('mockup_');
+  const isImmersiveShellView = currentView === 'app_3d';
 
   return (
     <>
@@ -3216,7 +3230,7 @@ export default function App() {
           Tampoco en onboarding-perfil (tarea #16): el FAB se encimaba sobre el
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && !isImmersiveShellView && <AgentFab onNavigate={navigate} />}
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o
           pregunta al agente punta a punta por voz.
@@ -3230,9 +3244,9 @@ export default function App() {
           Para re-habilitar el tap: descomentar el import de EscuchaFab (arriba)
           y la línea del render de abajo. */}
       {/* {!['loading', 'login', 'oauth-callback', 'onboarding-perfil', 'ubicacion-detectada', 'dashboard', 'agente', 'voz', 'voz_planta', 'registro_voz'].includes(currentView) && <EscuchaFab />} */}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <EscuchaOverlay />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && !isImmersiveShellView && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
-      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && !isImmersiveShellView && <SyncProgressIndicator />}
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}

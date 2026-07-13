@@ -1,0 +1,301 @@
+.shell-app-3d {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 20% 12%, rgba(255, 214, 140, 0.15), transparent 26%),
+    radial-gradient(circle at 82% 18%, rgba(110, 231, 183, 0.13), transparent 28%),
+    linear-gradient(180deg, #07111a 0%, #0a1720 42%, #071016 100%);
+  color: #f8fafc;
+}
+
+.shell-app-3d__scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.shell-app-3d__scene > * {
+  width: 100%;
+  height: 100%;
+}
+
+.shell-app-3d__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(2, 6, 23, 0.18) 0%, rgba(2, 6, 23, 0.42) 42%, rgba(2, 6, 23, 0.72) 100%),
+    radial-gradient(circle at 50% 16%, rgba(255, 255, 255, 0.07), transparent 34%);
+}
+
+.shell-app-3d__chrome {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  pointer-events: none;
+}
+
+.shell-app-3d__bar {
+  pointer-events: auto;
+  margin: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.5rem;
+  background: rgba(7, 12, 22, 0.72);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow:
+    0 24px 70px rgba(1, 5, 12, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.shell-app-3d__topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+}
+
+.shell-app-3d__brand {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.shell-app-3d__eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f5d18a;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.shell-app-3d__title {
+  margin: 0;
+  font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #fffdf7;
+}
+
+.shell-app-3d__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  color: rgba(226, 232, 240, 0.84);
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.shell-app-3d__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.34rem 0.62rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f8fafc;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.shell-app-3d__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.shell-app-3d__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 44px;
+  padding: 0.7rem 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: transform 120ms ease, background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.shell-app-3d__pill:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.shell-app-3d__pill:focus-visible,
+.shell-app-3d__chip:focus-visible {
+  outline: 3px solid rgba(251, 191, 36, 0.9);
+  outline-offset: 3px;
+}
+
+.shell-app-3d__pill--emphasis {
+  border-color: rgba(251, 191, 36, 0.3);
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.18), rgba(255, 255, 255, 0.06));
+}
+
+.shell-app-3d__pill--voice {
+  padding-left: 0.7rem;
+  padding-right: 1rem;
+}
+
+.shell-app-3d__voice-orb {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+}
+
+.shell-app-3d__voice-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  text-align: left;
+}
+
+.shell-app-3d__voice-label small {
+  color: rgba(226, 232, 240, 0.72);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.shell-app-3d__dock {
+  pointer-events: auto;
+  display: grid;
+  gap: 0.6rem;
+  margin: 0.75rem;
+}
+
+.shell-app-3d__rail {
+  display: flex;
+  gap: 0.55rem;
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+  scrollbar-width: none;
+}
+
+.shell-app-3d__rail::-webkit-scrollbar {
+  display: none;
+}
+
+.shell-app-3d__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.65rem 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(6, 10, 17, 0.66);
+  color: #eef2ff;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  transition: transform 120ms ease, background-color 120ms ease, border-color 120ms ease;
+}
+
+.shell-app-3d__chip:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.shell-app-3d__chip[data-active='true'] {
+  border-color: rgba(110, 231, 183, 0.38);
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.18), rgba(255, 255, 255, 0.07));
+  color: #ecfff6;
+}
+
+.shell-app-3d__chip--soft {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.shell-app-3d__primary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shell-app-3d__primary-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.shell-app-3d__hint {
+  color: rgba(226, 232, 240, 0.72);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.shell-app-3d--compact .shell-app-3d__rail {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .shell-app-3d__bar {
+    margin: 0.55rem;
+    border-radius: 1.2rem;
+  }
+
+  .shell-app-3d__topbar,
+  .shell-app-3d__dock {
+    padding-left: 0.82rem;
+    padding-right: 0.82rem;
+  }
+
+  .shell-app-3d__actions {
+    width: 100%;
+  }
+
+  .shell-app-3d__pill--voice {
+    flex: 1 1 100%;
+  }
+
+  .shell-app-3d__primary {
+    align-items: stretch;
+  }
+
+  .shell-app-3d__primary-group {
+    width: 100%;
+  }
+
+  .shell-app-3d__chip {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell-app-3d__pill,
+  .shell-app-3d__chip {
+    transition: none;
+  }
+}
