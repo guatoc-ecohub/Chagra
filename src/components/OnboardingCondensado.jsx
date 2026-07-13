@@ -14,6 +14,7 @@ import {
   SkipForward,
 } from 'lucide-react';
 import ChagraAgentAvatarColibri from './ChagraAgentAvatarColibri';
+import AvatarSelector from './Settings/AvatarSelector';
 import { useGeolocation } from '../hooks/useGeolocation';
 import {
   resolveUbicacion,
@@ -615,6 +616,16 @@ export default function OnboardingCondensado({
                   );
                 })}
               </div>
+            </div>
+
+            {/* Elija su animal (saltable): el avatar del usuario. Persiste al
+                toque en usePrefsStore (avatarCreatureId); si no toca nada,
+                queda la abeja Angelita. Mismo selector del Perfil. */}
+            <div data-testid="onb2-avatar">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-400/90 mb-2">
+                Elija su animal (si quiere)
+              </p>
+              <AvatarSelector compact />
             </div>
           </>
         )}
