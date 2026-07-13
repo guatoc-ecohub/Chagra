@@ -38,7 +38,7 @@
  */
 
 export const DB_NAME = 'ChagraDB';
-export const DB_VERSION = 26;
+export const DB_VERSION = 27;
 
 export const STORES = {
   ASSETS: 'assets',
@@ -109,6 +109,16 @@ export const STORES = {
   // dentro de la app. keyPath 'id' (string generado en cliente). Índices:
   // createdAt (timeline), categoria (filtro), municipio (filtro por ubicación).
   MARKETPLACE_OFERTAS: 'marketplace_ofertas',
+  // v27: red_transactions — TRATOS cerrados de la RED humana (campesino ↔
+  // campesino). Cada trato es el HECHO verificable del que se derivan el grafo
+  // social (productor–cultivo–vereda) y la reputación ganada — subproducto de
+  // transacciones del mercado que ya ocurren (ver services/red/). Append-only
+  // (fuente de verdad; grafo/reputación son cache reconstruible, ADR-019).
+  // Local-first: el dato crudo se queda en el dispositivo; solo cruza a la red
+  // lo marcado opt-in (shareLevel ≥ 2). keyPath 'id' (string cliente). Índices:
+  // createdAt (timeline), productorHash (reputación por productor), producto
+  // (matchmaking por cultivo), vereda (cercanía), shareLevel (compuerta).
+  RED_TRANSACTIONS: 'red_transactions',
 };
 
 let dbInstance = null;
@@ -454,6 +464,22 @@ export const openDB = async () => {
           store.createIndex('createdAt', 'createdAt', { unique: false });
           store.createIndex('categoria', 'categoria', { unique: false });
           store.createIndex('municipio', 'municipio', { unique: false });
+        }
+      }
+
+      // v27: red_transactions — tratos cerrados de la red humana. Cada registro
+      // es un HECHO append-only (quién entregó qué, en qué vereda, con qué
+      // fiabilidad/calidad) del que se derivan el grafo social y la reputación
+      // (services/red/). Local-first + opt-in: solo cruza a la red lo marcado
+      // shareLevel ≥ 2. keyPath 'id'. Índices para reputación/matchmaking.
+      if (event.oldVersion < 27) {
+        if (!db.objectStoreNames.contains(STORES.RED_TRANSACTIONS)) {
+          const store = db.createObjectStore(STORES.RED_TRANSACTIONS, { keyPath: 'id' });
+          store.createIndex('createdAt', 'createdAt', { unique: false });
+          store.createIndex('productorHash', 'productorHash', { unique: false });
+          store.createIndex('producto', 'producto', { unique: false });
+          store.createIndex('vereda', 'vereda', { unique: false });
+          store.createIndex('shareLevel', 'shareLevel', { unique: false });
         }
       }
     };
