@@ -3,7 +3,26 @@
  * a nivel de archivo —mismo criterio que SpeciesSelect / SeguimientoProcesoScreen—
  */
 // @ts-nocheck
+import { ENV } from '../config/env.js';
+
 export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw }) {
+  // Fallback graceful: sin conexión a farmOS (env vars no definidas), mostrar
+  // estado vacío digno en vez de romper el ErrorBoundary.
+  if (!ENV.FARMOS_CLIENT_ID) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center text-slate-300">
+        <div className="text-5xl mb-4" aria-hidden="true">🌱</div>
+        <h2 className="text-lg font-semibold text-slate-200 mb-2">Configuración de siembra no disponible</h2>
+        <p className="text-sm text-slate-400 max-w-sm">Conéctese a su finca para registrar siembras. Sin conexión a farmOS, esta sección no puede cargarse.</p>
+        {onBack && (
+          <button onClick={onBack} className="mt-6 px-5 py-2 rounded-xl bg-slate-700 text-slate-200 text-sm hover:bg-slate-600 transition-colors">
+            Volver
+          </button>
+        )}
+      </div>
+    );
+  }
+
   // Bug B4 piloto 2026-05-28: QuickActionsPanel "Agregar planta" navega a
   // 'sembrar' sin pasar currentViewData → App.jsx pasa initialData={null} →
   // default param `= {}` NO aplica con null (solo con undefined) → línea 18
