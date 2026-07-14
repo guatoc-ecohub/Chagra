@@ -5410,9 +5410,10 @@
         "tipo": "book"
       },
       {
-        "cite": "Berrío, J.R. et al. (2017). «Micorrizas arbusculares en cultivos andinos colombianos». Revista Corpoica Ciencia y Tecnología Agropecuaria 18(2):269-286. DOI:10.21930/rcta.vol18_num2_art:564",
-        "doi": "10.21930/rcta.vol18_num2_art:564",
-        "tipo": "paper"
+        "cite": "Berrío, J.R. et al. (2017). «Micorrizas arbusculares en cultivos andinos colombianos». Revista Corpoica Ciencia y Tecnología Agropecuaria 18(2):269-286. DOI:",
+        "tipo": "paper",
+        "fuente_verificada": false,
+        "nota_verificacion": "DOI retirado: no resuelve en doi.org (verificado 2026-07-14)."
       },
       {
         "cite": "Cenicafé (2015). «Hongos micorrícicos arbusculares en café». Avances Técnicos Cenicafé 451.",
@@ -5948,9 +5949,10 @@
         "tipo": "book"
       },
       {
-        "cite": "Macías, F.A. et al. (2007). «Allelopathy — A natural alternative for weed control». Communicative & Integrative Biology 1(1):39-41. DOI:10.4161/cib.1.1.6840",
-        "doi": "10.4161/cib.1.1.6840",
-        "tipo": "paper"
+        "cite": "Macías, F.A. et al. (2007). «Allelopathy — A natural alternative for weed control». Communicative & Integrative Biology 1(1):39-41. DOI:",
+        "tipo": "paper",
+        "fuente_verificada": false,
+        "nota_verificacion": "DOI retirado: no resuelve en doi.org (verificado 2026-07-14)."
       },
       {
         "cite": "Ferreira, M.I. & Reinhardt, C.F. (2010). «Allelopathy in agroecosystems: a panacea for weed management?». South African Journal of Plant and Soil 27(2):79-89.",
