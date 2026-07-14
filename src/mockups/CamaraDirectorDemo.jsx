@@ -178,7 +178,7 @@ function Colinas() {
   return (
     <group>
       {COLINAS.map((c, i) => (
-        <mesh key={i} position={c.pos} rotation-y={c.giro}>
+        <mesh key={i} position={/** @type {[number, number, number]} */ (c.pos)} rotation-y={c.giro}>
           <coneGeometry args={[c.ancho, c.alto, 5]} />
           <meshLambertMaterial color={TONOS_COLINA[c.tono]} flatShading />
         </mesh>
@@ -283,7 +283,7 @@ function Piedras() {
   return (
     <group>
       {PIEDRAS.map((p, i) => (
-        <mesh key={i} position={p.pos} rotation-y={p.giro} scale={p.s}>
+        <mesh key={i} position={/** @type {[number, number, number]} */ (p.pos)} rotation-y={p.giro} scale={p.s}>
           <dodecahedronGeometry args={[1, 0]} />
           <meshLambertMaterial color={PALETA.piedra} flatShading />
         </mesh>
@@ -300,7 +300,7 @@ function ValleMuestra({ perfil }) {
       {perfil.fog && <fog attach="fog" args={[P.niebla, P.nieblaCerca, P.nieblaLejos]} />}
       <hemisphereLight args={[P.cielo, P.suelo, P.hemisferio]} />
       <ambientLight color={P.luz} intensity={P.ambiente} />
-      <directionalLight color={P.luz} position={P.solPos} intensity={P.sol} />
+      <directionalLight color={P.luz} position={/** @type {[number, number, number]} */ (P.solPos)} intensity={P.sol} />
       <directionalLight color={P.relleno} position={[-6, 5, -4]} intensity={P.rellenoInt} />
       <Terreno segmentos={Math.min(perfil.segmentosTerreno, 36)} />
       <Rio />

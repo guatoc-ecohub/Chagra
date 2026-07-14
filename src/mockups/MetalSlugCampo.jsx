@@ -269,7 +269,7 @@ function simularTick(w, ahora, teclas, reducedMotion) {
  * Traslada a React los eventos discretos que el tick marcó en `w`.
  * @param {Object} w
  * @param {boolean} reducedMotion
- * @param {{setFicha:Function,setToast:Function,setAvisoRehen:Function,setFin:Function,finRef:Object}} d
+ * @param {{setFicha:Function,setToast:Function,setAvisoRehen:Function,setFin:Function,setFlashDano:Function,finRef:Object}} d
  */
 function despacharEventos(w, reducedMotion, d) {
   if (w._shake && !reducedMotion) {
@@ -420,6 +420,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
       y: j.y + 22,
       dir: j.mira,
       armaId: arsenal[w.armaIdx % arsenal.length],
+      id: `p${w._fxId || 0}`,
     });
     w.proyectiles.push(proy);
     sembrarEfecto(w, 'muzzle', px + j.mira * 6, j.y + 26); // fogonazo del lanzamiento
@@ -562,6 +563,8 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
         <StyleJuice />
 
         {/* fondo por piso térmico (cielo + lomas + ambiente) */}
+        {/* eslint-disable-next-line react/no-unknown-property */}
+        {/* @ts-ignore IntrinsicAttributes & object - component defined in metalslug/ */}
         <EscenarioFondo piso={NIVEL.piso_termico} cam={w.cam} reducedMotion={reducedMotion} />
 
         {/* jefe SEQUÍA acechando desde el cielo (solo niveles de sequía) */}
@@ -571,6 +574,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
             aria-hidden="true"
             style={{ transform: `translate3d(${-w.cam * 0.12}px,0,0)` }}
           >
+            {/* @ts-ignore IntrinsicAttributes & object - component defined in metalslug/ */}
             <JefeSequia size={220} reducedMotion={reducedMotion} />
           </div>
         )}
@@ -601,6 +605,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
                   data-dir={e.dir}
                   style={{ left: e.x, top: e.y, width: e.w, height: e.h }}
                 >
+                  {/* @ts-ignore IntrinsicAttributes & object - component defined in metalslug/ */}
                   <PlagaSprite enemigoId={e.enemigoId} reducedMotion={reducedMotion} />
                 </div>
               ) : null,
@@ -616,6 +621,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
                   className="msc-proyectil"
                   style={{ left: p.x + p.w / 2 - sz / 2, top: p.y + p.h / 2 - sz / 2, width: sz, height: sz }}
                 >
+                  {/* @ts-ignore IntrinsicAttributes & object - component defined in metalslug/ */}
                   <ProyectilBio
                     color={COLOR_POR_TIPO[a?.tipo] || '#fff'}
                     tipo={a?.tipo}
@@ -631,6 +637,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
                 <div key={f.id} className="msc-fx-muzzle" style={{ left: f.x, top: f.y }} />
               ) : (
                 <div key={f.id} className="msc-fx-hold" style={{ left: f.x, top: f.y }}>
+                  {/* @ts-ignore IntrinsicAttributes & object - component defined in metalslug/ */}
                   <EfectoImpacto tipo={f.tipo} reducedMotion={reducedMotion} />
                 </div>
               ),
@@ -642,6 +649,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
               style={{ left: w.rehen.x, top: w.rehen.y, width: w.rehen.w, height: w.rehen.h }}
             >
               {!w.rehen.liberado && <div className="msc-jaula" aria-hidden="true" />}
+              {/* @ts-ignore IntrinsicAttributes & object - memo-wrapped component */}
               <SpriteOso tier={tier} reducedMotion={reducedMotion} />
               {!w.rehen.liberado && <div className="msc-sos" aria-hidden="true">¡SOS!</div>}
             </div>
@@ -654,6 +662,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
               data-inv={invuln ? '1' : '0'}
               style={{ left: w.jugador.x, top: w.jugador.y, width: w.jugador.w, height: w.jugador.h }}
             >
+              {/* @ts-ignore IntrinsicAttributes & object - memo-wrapped component */}
               <SpriteHeroe tier={tier} reducedMotion={reducedMotion} />
             </div>
           </div>
@@ -665,6 +674,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
         {/* HUD */}
         <div className="msc-hud">
           <div className="msc-hud-izq">
+            {/* @ts-ignore IntrinsicAttributes & object - component defined in metalslug/ */}
             <BarraVida energia={w.jugador.energia} max={ENERGIA_INICIAL} />
             <span className="msc-puntaje">{w.puntaje} pts</span>
           </div>
@@ -673,6 +683,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
             <span className="msc-rehen-cnt">{w.rehen.liberado ? 'Oso a salvo ✓' : 'Oso: rescátelo'}</span>
           </div>
           <div className="msc-hud-muni">
+            {/* @ts-ignore IntrinsicAttributes & object - component defined in metalslug/ */}
             <IndicadorMunicion
               nombre={armaActual?.nombre}
               color={COLOR_POR_TIPO[armaActual?.tipo] || '#fff'}
@@ -786,11 +797,11 @@ const DECOR = [
 ];
 
 /* ── Sprites (memoizados: no re-renderizan por frame). ──────────────────────── */
-const SpriteHeroe = memo(function SpriteHeroe({ tier, reducedMotion }) {
+const SpriteHeroe = memo(function SpriteHeroe(/** @type {{ tier: any; reducedMotion: any }} */ { tier, reducedMotion }) {
   return <AbejaAngelita size={JUGADOR_H + 20} inline={false} animated={!reducedMotion} tier={tier} title="Angelita" />;
 });
 
-const SpriteOso = memo(function SpriteOso({ tier, reducedMotion }) {
+const SpriteOso = memo(function SpriteOso(/** @type {{ tier: any; reducedMotion: any }} */ { tier, reducedMotion }) {
   return <OsoAndino size={92} inline={false} animated={!reducedMotion} tier={tier} title="Oso andino" />;
 });
 

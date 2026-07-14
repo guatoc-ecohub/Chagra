@@ -31,7 +31,7 @@ const SUDOR = '#bfe6ff';
  * @param {{cx:number, cy:number, rx:number, ry:number}} props.tronco  ancla del tronco.
  * @param {string} [props.ink=RH_INK]
  * @param {boolean} [props.animated=true]  mece la ruana / salta el sudor.
- * @returns {JSX.Element|null}
+ * @returns {import('react').JSX.Element|null}
  */
 export function AccesoriosClima({ estado, cabeza, tronco, ink = RH_INK, animated = true }) {
   if (!estado) return null;

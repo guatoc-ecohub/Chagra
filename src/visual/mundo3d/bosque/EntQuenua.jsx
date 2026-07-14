@@ -287,7 +287,7 @@ function Barba({ ancla, matMusgo, matMusgoClaro, matRaiz, matLiquen, matLiquenAz
         ))}
         {/* matas de liquen prendidas a los lados de la boca */}
         {liquenes.map((l, i) => (
-          <mesh key={`lq-${i}`} position={l.pos} scale={[l.esc * 1.5, l.esc * 0.55, l.esc]}>
+          <mesh key={`lq-${i}`} position={/** @type {[number, number, number]} */ (l.pos)} scale={[l.esc * 1.5, l.esc * 0.55, l.esc]}>
             <icosahedronGeometry args={[1, 0]} />
             <primitive object={l.azul ? matLiquenAzul : matLiquen} attach="material" />
           </mesh>

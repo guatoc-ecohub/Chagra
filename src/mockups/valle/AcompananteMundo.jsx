@@ -207,7 +207,7 @@ export default function AcompananteMundo({ mundoId, acompanante, children }) {
   const reconoceVoz = useMemo(
     () =>
       typeof window !== 'undefined' &&
-      !!(window.SpeechRecognition || window.webkitSpeechRecognition),
+      !!(/** @type {any} */ (window).SpeechRecognition || /** @type {any} */ (window).webkitSpeechRecognition),
     [],
   );
 
@@ -238,7 +238,7 @@ export default function AcompananteMundo({ mundoId, acompanante, children }) {
   //    no bloqueante — si algo falla, la barra de texto siempre queda.
   const escuchar = useCallback(() => {
     const SR =
-      typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+      typeof window !== 'undefined' && (/** @type {any} */ (window).SpeechRecognition || /** @type {any} */ (window).webkitSpeechRecognition);
     if (!SR) return;
     try {
       if (recRef.current) { try { recRef.current.stop(); } catch { /* no-op */ } }

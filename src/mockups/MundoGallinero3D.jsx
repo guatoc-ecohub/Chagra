@@ -231,7 +231,7 @@ function Escena({ tier, reducedMotion }) {
       <fog attach="fog" args={[CIELO.niebla, 13, 31]} />
       <hemisphereLight args={[DORADA.cielo, DORADA.suelo, 1.05]} />
       <ambientLight color={DORADA.luz} intensity={0.28} />
-      <directionalLight color={ATMOSFERA.luz} intensity={1.15} position={DORADA.solPos} />
+      <directionalLight color={ATMOSFERA.luz} intensity={1.15} position={/** @type {[number, number, number]} */ (DORADA.solPos)} />
       <directionalLight color={ATMOSFERA.relleno} intensity={0.22} position={[-6, 5, -3]} />
       <Terreno />
       <Cerca />

@@ -504,7 +504,7 @@ function BordesCanal({ curva }) {
   return (
     <group>
       {bordes.map((b, i) => (
-        <mesh key={i} position={b.pos} rotation={[0, b.rot, 0]}>
+        <mesh key={i} position={/** @type {[number, number, number]} */ (b.pos)} rotation={[0, b.rot, 0]}>
           <boxGeometry args={[0.09, 0.09, 0.34]} />
           <meshLambertMaterial color={PALETA.concreto} />
         </mesh>

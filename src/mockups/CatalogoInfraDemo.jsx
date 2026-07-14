@@ -53,7 +53,7 @@ function EscenaDemo({ tipo, dims, tinte, seed, frugal }) {
       />
       <ambientLight intensity={DORADA.ambiente} color={DORADA.luz} />
       <directionalLight
-        position={DORADA.solPos}
+        position={/** @type {[number, number, number]} */ (DORADA.solPos)}
         intensity={DORADA.sol}
         color={DORADA.luz}
       />

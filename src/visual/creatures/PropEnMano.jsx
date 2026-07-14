@@ -144,7 +144,7 @@ export const DIBUJO_PROP = Object.freeze({
  * @param {boolean} [props.flip=false]  espejar (personaje mirando a la izquierda).
  * @param {string} [props.ink=RH_INK]  tinta del contorno (heredá la de la familia).
  * @param {boolean} [props.animated=true]  si mece el prop (follow-through `rh-sway`).
- * @returns {JSX.Element|null}
+ * @returns {import('react').JSX.Element|null}
  */
 export function PropEnMano({ mundoId, x = 0, y = 0, escala = 1, flip = false, ink = RH_INK, animated = true }) {
   const propId = propDeMundo(mundoId);

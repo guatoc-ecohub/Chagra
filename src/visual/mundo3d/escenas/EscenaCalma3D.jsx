@@ -139,7 +139,7 @@ function Nubes({ cuantas, reducedMotion }) {
   return (
     <group ref={grupo}>
       {nubes.map((n) => (
-        <group key={n.key} position={n.pos} scale={[n.esc * 1.7, n.esc * 0.55, n.esc]}>
+        <group key={n.key} position={/** @type {[number, number, number]} */ (n.pos)} scale={[n.esc * 1.7, n.esc * 0.55, n.esc]}>
           <mesh>
             <sphereGeometry args={[0.55, 9, 7]} />
             <meshBasicMaterial color="#fbf6ea" transparent opacity={0.8} />

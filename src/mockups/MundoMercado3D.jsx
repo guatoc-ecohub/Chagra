@@ -37,8 +37,8 @@ const ESTACIONES = [
   },
 ];
 
-const AREA_PARTICULAS = [13, 4, 10];
-const POS_PARTICULAS = [0, 0.2, 0];
+const AREA_PARTICULAS = /** @type {[number, number, number]} */ ([13, 4, 10]);
+const POS_PARTICULAS = /** @type {[number, number, number]} */ ([0, 0.2, 0]);
 const RUTA_CORTA = ['Fin' + 'ca', 'cosecha', 'plaza', 'mesa'].join(', ');
 
 function rngSemillado(semilla) {
@@ -183,7 +183,7 @@ function Balanza() {
 function Personas({ tier }) {
   const posiciones = tier === 'alto' ? [[-1.3, 0, 1.8], [1.9, 0, 1.4], [4.2, 0, -0.5], [-2.7, 0, -1.1]] : [[-1.3, 0, 1.8], [2.2, 0, 1.1]];
   return posiciones.map((posicion, indice) => (
-    <group key={posicion.join(':')} position={posicion} rotation={[0, indice * 1.4, 0]}>
+    <group key={posicion.join(':')} position={/** @type {[number, number, number]} */ (posicion)} rotation={[0, indice * 1.4, 0]}>
       <mesh position={[0, 0.95, 0]}><coneGeometry args={[0.3, 0.95, 7]} /><Material color={indice % 2 ? '#3f6f5d' : '#b85338'} /></mesh>
       <mesh position={[0, 1.58, 0]}><sphereGeometry args={[0.2, 8, 6]} /><Material color="#a96f45" /></mesh>
       <mesh position={[0, 1.8, 0]}><cylinderGeometry args={[0.34, 0.23, 0.08, 12]} /><Material color="#d2a345" /></mesh>

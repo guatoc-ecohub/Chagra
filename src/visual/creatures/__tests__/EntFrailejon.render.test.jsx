@@ -23,7 +23,7 @@ afterEach(cleanup);
 
 describe('EntFrailejon — contrato base intacto', () => {
   it('render por defecto = svg accesible, sin capas opt-in', () => {
-    const { container } = render(<EntFrailejon />);
+    const { container } = render(<EntFrailejon tier="medio" />);
     const svg = container.querySelector('svg[data-creature="ent-frailejon"]');
     expect(svg).toBeTruthy();
     expect(svg.getAttribute('role')).toBe('img');
@@ -38,7 +38,7 @@ describe('EntFrailejon — contrato base intacto', () => {
   });
 
   it('siempre trae su rostro sabio y su anatomía de frailejón (identidad)', () => {
-    const { container } = render(<EntFrailejon />);
+    const { container } = render(<EntFrailejon tier="medio" />);
     expect(container.querySelector('.ent-cejas')).toBeTruthy();   // cejas de corteza
     expect(container.querySelector('.ent-roseta')).toBeTruthy();  // corona plateada
     expect(container.querySelector('.ent-faldita')).toBeTruthy(); // hojas muertas
@@ -48,23 +48,23 @@ describe('EntFrailejon — contrato base intacto', () => {
 
 describe('1. Expresividad de árbol vivo con PESO', () => {
   it('lineBoil instancia el filtro de displacement (corteza que hierve, lento)', () => {
-    const { container } = render(<EntFrailejon lineBoil animated />);
+    const { container } = render(<EntFrailejon tier="medio" lineBoil animated />);
     expect(container.querySelector('svg').getAttribute('data-lineboil')).toBe('1');
     expect(container.querySelector('feDisplacementMap')).toBeTruthy();
     expect(container.querySelector('feTurbulence')).toBeTruthy();
   });
 
   it('sin lineBoil NO se paga el filtro (frugal)', () => {
-    const { container } = render(<EntFrailejon animated />);
+    const { container } = render(<EntFrailejon tier="medio" animated />);
     expect(container.querySelector('feDisplacementMap')).toBeNull();
   });
 
   it('vivo → balanceo ancestral y la corona viva; quieto → fotograma digno', () => {
-    const { container: vivo } = render(<EntFrailejon animated />);
+    const { container: vivo } = render(<EntFrailejon tier="medio" animated />);
     expect(vivo.querySelector('.ent-balanceo')).toBeTruthy();
     expect(vivo.querySelector('.ent-roseta-viva')).toBeTruthy();
     cleanup();
-    const { container: quieto } = render(<EntFrailejon animated={false} />);
+    const { container: quieto } = render(<EntFrailejon tier="medio" animated={false} />);
     expect(quieto.querySelector('.ent-balanceo')).toBeNull();
     // la roseta sigue dibujada (digna), solo sin la clase de vida
     expect(quieto.querySelector('.ent-roseta')).toBeTruthy();
@@ -74,19 +74,19 @@ describe('1. Expresividad de árbol vivo con PESO', () => {
 
 describe('2. Lip-sync — la boca entre las grietas', () => {
   it('con visema V3 la boca abierta viaja a la cara (data-visema)', () => {
-    const { container } = render(<EntFrailejon visema="V3" />);
+    const { container } = render(<EntFrailejon tier="medio" visema="V3" />);
     expect(container.querySelector('svg').getAttribute('data-visema')).toBe('V3');
   });
 
   it('sin visema no marca data-visema (la hendidura serena de siempre)', () => {
-    const { container } = render(<EntFrailejon />);
+    const { container } = render(<EntFrailejon tier="medio" />);
     expect(container.querySelector('svg').getAttribute('data-visema')).toBeNull();
   });
 });
 
 describe('3. Modo-GUARDIÁN — aura VERDE-PLATEADA de 4 capas', () => {
   it('poder envuelve en .is-powered-up + corrientes, con aura verde-plateada (no dorada)', () => {
-    const { container } = render(<EntFrailejon poder />);
+    const { container } = render(<EntFrailejon tier="medio" poder />);
     const wrap = container.querySelector('.is-powered-up');
     expect(wrap).toBeTruthy();
     expect(wrap.getAttribute('data-creature-poder')).toBe('ent-frailejon');
@@ -100,7 +100,7 @@ describe('3. Modo-GUARDIÁN — aura VERDE-PLATEADA de 4 capas', () => {
   });
 
   it('sin poder no hay wrapper (svg desnudo)', () => {
-    const { container } = render(<EntFrailejon />);
+    const { container } = render(<EntFrailejon tier="medio" />);
     expect(container.querySelector('.is-powered-up')).toBeNull();
     expect(container.querySelector(':scope > svg[data-creature="ent-frailejon"]')).toBeTruthy();
   });
@@ -108,7 +108,7 @@ describe('3. Modo-GUARDIÁN — aura VERDE-PLATEADA de 4 capas', () => {
 
 describe('4. Clima de páramo — escarcha, neblina y JAMÁS suda', () => {
   it('de noche/frío con vestuario → ESCARCHA en las hojas, nunca sudor', () => {
-    const { container } = render(<EntFrailejon vestuario clima="noche" />);
+    const { container } = render(<EntFrailejon tier="medio" vestuario clima="noche" />);
     const svg = container.querySelector('svg');
     expect(svg.getAttribute('data-escarcha')).toBe('1');
     expect(container.querySelector('.ent-escarcha-cristal')).toBeTruthy();
@@ -117,20 +117,20 @@ describe('4. Clima de páramo — escarcha, neblina y JAMÁS suda', () => {
   });
 
   it('con niebla → NEBLINA que cruza el tronco', () => {
-    const { container } = render(<EntFrailejon vestuario clima="niebla" />);
+    const { container } = render(<EntFrailejon tier="medio" vestuario clima="niebla" />);
     expect(container.querySelector('svg').getAttribute('data-neblina')).toBe('1');
     expect(container.querySelector('.ent-neblina-banda')).toBeTruthy();
   });
 
   it('de día caluroso (tempC alta) el Ent NO suda (páramo, identidad)', () => {
-    const { container } = render(<EntFrailejon vestuario clima="soleado" tempC={30} />);
+    const { container } = render(<EntFrailejon tier="medio" vestuario clima="soleado" tempC={30} />);
     expect(container.querySelector('.crt-sudor')).toBeNull();
     expect(container.querySelector('.crt-gota-sudor')).toBeNull();
     expect(container.querySelector('svg').getAttribute('data-escarcha')).toBeNull();
   });
 
   it('sin vestuario (avatar/catálogo) → nada de clima aunque haya dato', () => {
-    const { container } = render(<EntFrailejon clima="noche" />);
+    const { container } = render(<EntFrailejon tier="medio" clima="noche" />);
     const svg = container.querySelector('svg');
     expect(svg.getAttribute('data-escarcha')).toBeNull();
     expect(container.querySelector('.ent-escarcha-cristal')).toBeNull();
@@ -192,14 +192,14 @@ describe('5. Enseñanza — el guion del Ent-maestro (fallback digno)', () => {
 
 describe('Postura de enseñanza + anti-regresión inline', () => {
   it('ensena marca la postura de maestro (data-ensena)', () => {
-    const { container } = render(<EntFrailejon ensena />);
+    const { container } = render(<EntFrailejon tier="medio" ensena />);
     expect(container.querySelector('svg').getAttribute('data-ensena')).toBe('1');
   });
 
   it('inline devuelve un <g> con data-creature y marca data-poder', () => {
     const { container } = render(
       <svg>
-        <EntFrailejon inline poder ensena />
+        <EntFrailejon tier="medio" inline poder ensena />
       </svg>,
     );
     const g = container.querySelector('g[data-creature="ent-frailejon"]');

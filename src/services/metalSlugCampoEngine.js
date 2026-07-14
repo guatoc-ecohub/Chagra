@@ -72,7 +72,7 @@ export function armasDeNivel(numero) {
  */
 let _proyectilSeq = 0;
 export function crearProyectil({ x, y, dir, armaId, id }) {
-  const d = dir >= 0 ? 1 : -1;
+  const d = /** @type {1 | -1} */ (dir >= 0 ? 1 : -1);
   return {
     id: id ?? (_proyectilSeq += 1),
     armaId,
@@ -158,7 +158,7 @@ export function alcanzaRehen(jugador, rehen) {
  * @returns {{ x:number, dir:1|-1 }}
  */
 export function patrullarPlaga(plaga, dt, xMin, xMax) {
-  let dir = plaga.dir >= 0 ? 1 : -1;
+  let dir = /** @type {1 | -1} */ (plaga.dir >= 0 ? 1 : -1);
   let x = plaga.x + dir * plaga.vel * dt;
   if (x <= xMin) {
     x = xMin;

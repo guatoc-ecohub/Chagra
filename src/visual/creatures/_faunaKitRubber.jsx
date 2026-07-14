@@ -71,7 +71,7 @@ export function RubberEye({
  * Miembro tipo manguera (rubber-hose): trazo de ancho constante con cabos
  * redondos y un pie/bolita al final. `d` = el path del tubo.
  */
-export function HoseLimb({ d, ink = INK, w = 2.4, foot, footR }) {
+export function HoseLimb({ d, ink = INK, w = 2.4, foot, footR = undefined }) {
   const fr = footR ?? w * 0.72;
   return (
     <g>

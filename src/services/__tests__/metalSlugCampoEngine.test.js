@@ -42,13 +42,13 @@ describe('armasDeNivel — arsenal derivado del data (sin invento)', () => {
 
 describe('crearProyectil — cápsula de benéficos', () => {
   it('sale hacia la derecha con velocidad positiva', () => {
-    const p = crearProyectil({ x: 100, y: 50, dir: 1, armaId: 'bt' });
+    const p = crearProyectil({ x: 100, y: 50, dir: 1, armaId: 'bt', id: 'test-bala' });
     expect(p.vx).toBe(PROYECTIL_VEL);
     expect(p.armaId).toBe('bt');
     expect(p.w).toBeGreaterThan(0);
   });
   it('sale hacia la izquierda con velocidad negativa', () => {
-    const p = crearProyectil({ x: 100, y: 50, dir: -1, armaId: 'catarina' });
+    const p = crearProyectil({ x: 100, y: 50, dir: -1, armaId: 'catarina', id: 'test-bala' });
     expect(p.vx).toBe(-PROYECTIL_VEL);
     expect(p.dir).toBe(-1);
   });

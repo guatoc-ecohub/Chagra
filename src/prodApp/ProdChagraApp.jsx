@@ -199,7 +199,7 @@ for (const e of NUCLEO_APP) {
 }
 for (const e of PENDIENTE_DECISION) {
   if (!EXCLUIDO.some((x) => x.path === e.path)) {
-    registrarComponente(e.path, e.componente, e.alias);
+    registrarComponente(/** @type {any} */ (e).path, /** @type {any} */ (e).componente, /** @type {any} */ (e).alias);
   }
 }
 

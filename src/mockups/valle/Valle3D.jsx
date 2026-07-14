@@ -1273,11 +1273,11 @@ function AtmosferaValle({ c, perfil, reducedMotion }) {
 
 /* Caja de las luciérnagas: la tierra baja del frente del valle (referencia
    ESTABLE — ParticulasAmbientales re-siembra si la caja cambia). */
-const AREA_LUCIERNAGAS = [18, 2.4, 7];
+const AREA_LUCIERNAGAS = /** @type {[number, number, number]} */ ([18, 2.4, 7]);
 
 /* La pose de cámara del valle: UNA fuente para el Canvas y para el establishing
    shot de la CámaraDirector (así el dolly aterriza EXACTO donde siempre). */
-const CAMARA_VALLE = { position: [10.5, 9, 13.5], fov: 40 };
+const CAMARA_VALLE = { position: /** @type {[number, number, number]} */ ([10.5, 9, 13.5]), fov: 40 };
 /* El target de reposo del valle: el corazón del mapa, al que CamaraViajera
    lleva el target sin foco ((0,1.0,1.4) + 0.6 en y). El establishing del
    DirectorValle aterriza EXACTO aquí para no dar ningún salto al soltar. */
@@ -1334,7 +1334,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         <ParticulasAmbientales
           tipo="luciernagas"
           densidad={luciernagas}
-          tier={tier}
+          tier={/** @type {"bajo"|"alto"|"medio"} */ (tier)}
           reducedMotion={reducedMotion}
           area={AREA_LUCIERNAGAS}
           position={[0, 0.35, 3.6]}
@@ -1469,7 +1469,7 @@ export default function Valle3D({
       shadows={perfil.sombras}
       dpr={perfil.dpr}
       gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-      camera={CAMARA_VALLE}
+      camera={/** @type {any} */ (CAMARA_VALLE)}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >

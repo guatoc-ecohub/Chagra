@@ -163,7 +163,7 @@ function LucesDoradas() {
     <>
       <hemisphereLight intensity={DORADA.hemisferio} color={DORADA.cielo} groundColor={DORADA.suelo} />
       <ambientLight intensity={DORADA.ambiente} color={DORADA.luz} />
-      <directionalLight position={DORADA.solPos} intensity={DORADA.sol} color={DORADA.luz} />
+      <directionalLight position={/** @type {[number, number, number]} */ (DORADA.solPos)} intensity={DORADA.sol} color={DORADA.luz} />
       <directionalLight position={[-6, 4, -7]} intensity={DORADA.rellenoInt} color={DORADA.relleno} />
     </>
   );
@@ -247,7 +247,7 @@ function FrailejonHeroe({ pos, reducedMotion }) {
             [0.1, 0.46, -0.02],
             [-0.05, 0.44, 0.04],
           ].map((f, i) => (
-            <mesh key={i} position={f}>
+            <mesh key={i} position={/** @type {[number, number, number]} */ (f)}>
               <sphereGeometry args={[0.06, 7, 5]} />
               <meshLambertMaterial color={P.frailejonFlor} flatShading />
             </mesh>

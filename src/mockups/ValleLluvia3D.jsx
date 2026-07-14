@@ -549,7 +549,7 @@ function Nubario({ climaRef, reducedMotion }) {
   return (
     <group ref={grupo}>
       {NUBES.map((d, i) => (
-        <group key={i} position={d.fuera}>
+        <group key={i} position={/** @type {[number, number, number]} */ (d.fuera)}>
           <mesh scale={[1.9, 0.62, 1.15]} userData={{ op: 0.88 }}>
             <sphereGeometry args={[0.7, 9, 7]} />
             <meshBasicMaterial color="#fbf4e6" transparent opacity={0} depthWrite={false} />

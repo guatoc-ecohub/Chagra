@@ -792,7 +792,7 @@ function DioramaFermentos({ perfil, tier, reducedMotion, estacion, onSoltar, con
   /* áreas ESTABLES para las nubes de partículas del kit (se re-siembran si
      cambian; por eso viven en useMemo). */
   const areas = useMemo(
-    () => ({ polen: [ANCHO, 4, FONDO], luces: [10, 2.5, 6] }),
+    () => ({ polen: /** @type {[number, number, number]} */ ([ANCHO, 4, FONDO]), luces: /** @type {[number, number, number]} */ ([10, 2.5, 6]) }),
     [],
   );
 

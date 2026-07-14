@@ -168,7 +168,7 @@ function CieloVivo({ hora, reducedMotion }) {
     const { horizonte, zenit } = paletaCielo(p);
     // fondo vivo = horizonte de la hora, mezclado 60% hacia la hora dorada madre
     // (misma receta que la base, pero con la p viva del sol).
-    const bg = scene.background;
+    const bg = /** @type {THREE.Color|null} */ (scene.background);
     if (bg && bg.isColor) {
       const c = /** @type {THREE.Color} */ (bg);
       c.copy(horizonte).lerp(fondoMadre.current, 0.6);
@@ -347,7 +347,11 @@ function RotuloHielo({ yAntes, rAntes }) {
 /* LA MONTAÑA: los cuatro pisos térmicos apilados como troncos de cono (paleta
    del mundo #4). Corona: el casquete de hielo + la LÍNEA ÁMBAR de hasta dónde
    llegaba el hielo (retroceso glaciar) — nota de conciencia, esperanza no colapso. */
-/** @param {{nieve?:number, retroceso?:number}} glaciar */
+/**
+ * @param {Object} props
+ * @param {Array<{nombre?:string, color?:string, h?:number, r0?:number, r1?:number}>} [props.pisos]
+ * @param {{nieve?:number, retroceso?:number}} [props.glaciar]
+ */
 function Montana({ pisos = PISOS_DEF, glaciar = {} }) {
   const bandas = useMemo(() => {
     // for-loop plano (sin closure que capture los acumuladores): la regla
@@ -494,7 +498,7 @@ function SenalHelada({ densidad = 1, reducedMotion }) {
       {cristales.map((c, i) => (
         <mesh
           key={c.key}
-          position={c.pos}
+          position={/** @type {[number, number, number]} */ (c.pos)}
           rotation={[0, c.fase, 0]}
           ref={(el) => { refs.current[i] = el; }}
         >

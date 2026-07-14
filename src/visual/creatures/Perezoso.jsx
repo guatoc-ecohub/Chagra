@@ -135,7 +135,7 @@ export function Perezoso({
 
   // CLIMA → cuerpo (determinista, una vez por render): tinte + opacidad al
   // contorno. El perezoso no tiene alas (velocidadAlas siempre 1: no se usa).
-  const cuerpoClima = cuerpoDeClima(clima, { enso, tier, perfil: PERFIL_PEREZOSO });
+  const cuerpoClima = cuerpoDeClima(clima, { enso: /** @type {any} */ (enso), tier, perfil: PERFIL_PEREZOSO });
   const estiloClima = (cuerpoClima.tinte || cuerpoClima.opacidad < 1)
     ? { filter: cuerpoClima.tinte || undefined, opacity: cuerpoClima.opacidad < 1 ? cuerpoClima.opacidad : undefined }
     : undefined;

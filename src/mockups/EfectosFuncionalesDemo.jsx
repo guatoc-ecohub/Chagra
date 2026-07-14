@@ -72,7 +72,7 @@ function reboteSuave(t) {
 /* ── Constantes de cada diorama ────────────────────────────────────────────── */
 
 const INV_DIMS = { largo: 6.4, ancho: 3.6, alto: 2.1 };
-const AREA_VAHO = [4.6, 1.3, 2.2]; // caja estable del vaho interior (polvo dorado)
+const AREA_VAHO = /** @type {[number, number, number]} */ ([4.6, 1.3, 2.2]);
 const DUR_CRECIDA = 0.9; // segundos del brote de las matas
 
 const BODEGA_DIMS = { largo: 6, ancho: 4, alto: 2.6 };
@@ -82,11 +82,11 @@ const ESCALON_SACO = 0.22;
 const DUR_VUELO = DUR_SACO + 2 * ESCALON_SACO;
 const ALTURA_ARCO = 2.1;
 /* De dónde salen los sacos (la huertica al pie de la bodega). */
-const ORIGENES_SACO = [
+const ORIGENES_SACO = /** @type {[number, number, number][]} */ ([
   [-4.0, 0, 2.2],
   [-4.5, 0, 2.7],
   [-3.7, 0, 2.95],
-];
+]);
 /* La capa 1 aterriza donde AlmacenBodega (frugal) pinta su propio arrume:
    puestos [-1.35,-1.9,-1.6]×fx (fx = largo/8 = 0.75) corridos W/2 = 2 en z. */
 const FX_ARRUME = Math.min(1, BODEGA_DIMS.largo / 8);
@@ -391,7 +391,7 @@ function EscenaAlmacen({ guardadas, volando, alAterrizar, reducedMotion }) {
       {/* las capas YA guardadas (la 1ª la pinta la pieza vía `vida`) */}
       {CAPAS_PROPIAS.slice(0, Math.max(0, guardadas - 1)).map((capa, c) =>
         capa.map((p, i) => (
-          <group key={`${c}:${i}`} position={p}>
+          <group key={`${c}:${i}`} position={/** @type {[number, number, number]} */ (p)}>
             <CuerpoSaco tono={c + i} />
           </group>
         )),
@@ -402,7 +402,7 @@ function EscenaAlmacen({ guardadas, volando, alAterrizar, reducedMotion }) {
         [0, 1, 2].map((i) => (
           <group
             key={i}
-            position={ORIGENES_SACO[i]}
+          position={/** @type {[number, number, number]} */ (ORIGENES_SACO[i])}
             ref={(el) => {
               sacosVuelo.current[i] = el;
             }}
@@ -501,7 +501,7 @@ function EscenaReservorio({ objetivoNivel, evento, alTerminar, tier, reducedMoti
   useEffect(
     () => () => {
       const bg = escena.background;
-      if (bg && bg.isColor) bg.copy(CIELO_BASE);
+      if (bg instanceof THREE.Color) bg.copy(CIELO_BASE);
     },
     [escena],
   );
@@ -526,7 +526,7 @@ function EscenaReservorio({ objetivoNivel, evento, alTerminar, tier, reducedMoti
 
     /* El cielo se entinta según el evento (y vuelve solo al asentarse). */
     const bg = estado.scene.background;
-    if (bg && bg.isColor) {
+    if (bg instanceof THREE.Color) {
       const objetivoCielo =
         evento === 'lluvia' ? CIELO_LLUVIA : evento === 'sequia' ? CIELO_SEQUIA : CIELO_BASE;
       if (!bg.equals(objetivoCielo)) {

@@ -44,8 +44,8 @@ const GRAFO = { nodos: { productores: ['h1'], cultivos: ['tomate'], veredas: [] 
 beforeEach(() => {
   vi.clearAllMocks();
   useRedStore.getState().reset();
-  cargarReputaciones.mockResolvedValue(REPUTACIONES);
-  cargarGrafoSocial.mockResolvedValue(GRAFO);
+  /** @type {any} */ (cargarReputaciones).mockResolvedValue(REPUTACIONES);
+  /** @type {any} */ (cargarGrafoSocial).mockResolvedValue(GRAFO);
 });
 
 describe('useRedStore — hidratación', () => {
@@ -60,7 +60,7 @@ describe('useRedStore — hidratación', () => {
   });
 
   it('un fallo de carga degrada a error honesto, no a crash', async () => {
-    cargarReputaciones.mockRejectedValue(new Error('IndexedDB caída'));
+    /** @type {any} */ (cargarReputaciones).mockRejectedValue(new Error('IndexedDB caída'));
     const out = await useRedStore.getState().cargar();
     expect(out).toBeNull();
     const s = useRedStore.getState();
@@ -72,7 +72,7 @@ describe('useRedStore — hidratación', () => {
 describe('useRedStore — registrarTrato', () => {
   it('delega al servicio y rehidrata las derivadas', async () => {
     const trato = { id: 'trato-1', producto: 'Tomate', shareLevel: SHARE_LEVEL.PARES };
-    registrarTrato.mockResolvedValue(trato);
+    /** @type {any} */ (registrarTrato).mockResolvedValue(trato);
 
     const out = await useRedStore.getState().registrarTrato({ oferta: { producto: 'Tomate' } });
 
@@ -84,7 +84,7 @@ describe('useRedStore — registrarTrato', () => {
   });
 
   it('si el registro falla, devuelve null y deja error legible', async () => {
-    registrarTrato.mockRejectedValue(new Error('sin identidad de productor'));
+    /** @type {any} */ (registrarTrato).mockRejectedValue(new Error('sin identidad de productor'));
     const out = await useRedStore.getState().registrarTrato({});
     expect(out).toBeNull();
     expect(useRedStore.getState().error).toBe('sin identidad de productor');
@@ -93,8 +93,8 @@ describe('useRedStore — registrarTrato', () => {
 
 describe('useRedStore — setNivelCompartir (la compuerta)', () => {
   it('persiste el nivel nuevo y rehidrata', async () => {
-    redTransactions.get.mockResolvedValue({ id: 'trato-1', shareLevel: SHARE_LEVEL.PRIVADO });
-    redTransactions.save.mockImplementation(async (t) => t);
+    /** @type {any} */ (redTransactions.get).mockResolvedValue({ id: 'trato-1', shareLevel: SHARE_LEVEL.PRIVADO });
+    /** @type {any} */ (redTransactions.save).mockImplementation(async (t) => t);
 
     const out = await useRedStore.getState().setNivelCompartir('trato-1', SHARE_LEVEL.PARES);
 
@@ -106,8 +106,8 @@ describe('useRedStore — setNivelCompartir (la compuerta)', () => {
   });
 
   it('un nivel inválido cae a PRIVADO — nunca se comparte de más', async () => {
-    redTransactions.get.mockResolvedValue({ id: 'trato-1', shareLevel: SHARE_LEVEL.PARES });
-    redTransactions.save.mockImplementation(async (t) => t);
+    /** @type {any} */ (redTransactions.get).mockResolvedValue({ id: 'trato-1', shareLevel: SHARE_LEVEL.PARES });
+    /** @type {any} */ (redTransactions.save).mockImplementation(async (t) => t);
 
     const out = await useRedStore.getState().setNivelCompartir('trato-1', 99);
 
@@ -115,7 +115,7 @@ describe('useRedStore — setNivelCompartir (la compuerta)', () => {
   });
 
   it('trato inexistente devuelve null sin tocar la persistencia', async () => {
-    redTransactions.get.mockResolvedValue(null);
+    /** @type {any} */ (redTransactions.get).mockResolvedValue(null);
     const out = await useRedStore.getState().setNivelCompartir('nope', SHARE_LEVEL.PARES);
     expect(out).toBeNull();
     expect(redTransactions.save).not.toHaveBeenCalled();

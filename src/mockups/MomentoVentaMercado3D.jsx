@@ -188,26 +188,26 @@ const T_NAC = { aparece: 2.0, brinco: 4.6, fin: 8 };
 const T_PART = { velo: 3.5, veloFin: 9, fin: 12 };
 
 /* Marcas de cámara (posición / punto de mirada) de cada momento. */
-const CAM_VALLE = [0.5, 9.2, 14.8];
-const MIRA_VALLE = [-0.5, 0.8, -1.5];
-const CAM_LLEGADA = [3.2, 2.3, 8.8];
-const MIRA_LLEGADA = [6.7, 1.0, 4.3];
+const CAM_VALLE = /** @type {[number, number, number]} */ ([0.5, 9.2, 14.8]);
+const MIRA_VALLE = /** @type {[number, number, number]} */ ([-0.5, 0.8, -1.5]);
+const CAM_LLEGADA = /** @type {[number, number, number]} */ ([3.2, 2.3, 8.8]);
+const MIRA_LLEGADA = /** @type {[number, number, number]} */ ([6.7, 1.0, 4.3]);
 
-const POS_MADRE = [-6.3, altura(-6.3, -0.9), -0.9];
-const POS_CRIA = [-4.9, altura(-4.9, 0.3), 0.3];
+const POS_MADRE = /** @type {[number, number, number]} */ ([-6.3, altura(-6.3, -0.9), -0.9]);
+const POS_CRIA = /** @type {[number, number, number]} */ ([-4.9, altura(-4.9, 0.3), 0.3]);
 const ESC_CRIA = 0.55;
-const CAM_NAC_INI = [-0.6, 3.8, 6.6];
-const CAM_NAC_FIN = [-2.5, 1.6, 3.5];
-const MIRA_NAC = [POS_CRIA[0], POS_CRIA[1] + 0.5, POS_CRIA[2]];
-const AREA_NIDO = [2.2, 1.6, 2.2];
+const CAM_NAC_INI = /** @type {[number, number, number]} */ ([-0.6, 3.8, 6.6]);
+const CAM_NAC_FIN = /** @type {[number, number, number]} */ ([-2.5, 1.6, 3.5]);
+const MIRA_NAC = /** @type {[number, number, number]} */ ([POS_CRIA[0], POS_CRIA[1] + 0.5, POS_CRIA[2]]);
+const AREA_NIDO = /** @type {[number, number, number]} */ ([2.2, 1.6, 2.2]);
 
-const POS_DESPEDIDA = [3.0, altura(3.0, -2.6), -2.6];
-const CAM_PART_INI = [7.2, 3.4, 2.6];
-const CAM_PART_FIN = [5.0, 1.9, 0.5];
-const CAM_PART_CIERRE = [6.6, 3.8, 3.4];
-const MIRA_PART = [POS_DESPEDIDA[0], POS_DESPEDIDA[1] + 0.8, POS_DESPEDIDA[2]];
-const MIRA_CIERRE = [POS_DESPEDIDA[0], POS_DESPEDIDA[1] + 0.25, POS_DESPEDIDA[2]];
-const AREA_VELO = [2.4, 2.6, 2.4];
+const POS_DESPEDIDA = /** @type {[number, number, number]} */ ([3.0, altura(3.0, -2.6), -2.6]);
+const CAM_PART_INI = /** @type {[number, number, number]} */ ([7.2, 3.4, 2.6]);
+const CAM_PART_FIN = /** @type {[number, number, number]} */ ([5.0, 1.9, 0.5]);
+const CAM_PART_CIERRE = /** @type {[number, number, number]} */ ([6.6, 3.8, 3.4]);
+const MIRA_PART = /** @type {[number, number, number]} */ ([POS_DESPEDIDA[0], POS_DESPEDIDA[1] + 0.8, POS_DESPEDIDA[2]]);
+const MIRA_CIERRE = /** @type {[number, number, number]} */ ([POS_DESPEDIDA[0], POS_DESPEDIDA[1] + 0.25, POS_DESPEDIDA[2]]);
+const AREA_VELO = /** @type {[number, number, number]} */ ([2.4, 2.6, 2.4]);
 
 /* Chispas de ámbar de la llegada al puesto (XZ alrededor del mostrador). */
 const CHISPAS = [
@@ -275,7 +275,7 @@ function LucesDoradas() {
     <>
       <hemisphereLight intensity={DORADA.hemisferio} color={DORADA.cielo} groundColor={DORADA.suelo} />
       <ambientLight intensity={DORADA.ambiente} color={DORADA.luz} />
-      <directionalLight position={DORADA.solPos} intensity={DORADA.sol} color={DORADA.luz} />
+      <directionalLight position={/** @type {[number, number, number]} */ (DORADA.solPos)} intensity={DORADA.sol} color={DORADA.luz} />
       <directionalLight position={[-6, 4, -7]} intensity={DORADA.rellenoInt} color={DORADA.relleno} />
     </>
   );
@@ -330,6 +330,7 @@ function resolverPartes(raiz) {
   };
 }
 
+/** @param {{ position?: [number, number, number]; giro?: number; escala?: number; cria?: boolean; semilla?: number }} props */
 function Vaca({ position = [0, 0, 0], giro = 0, escala = 1, cria = false, semilla = 3 }) {
   const manchas = useMemo(() => {
     const rng = crearRng(semilla);
@@ -905,8 +906,8 @@ function MomentoNacimiento({ tier, reducedMotion, alTerminar }) {
         densidad={0.5}
         tier={tier}
         reducedMotion={reducedMotion}
-        position={[POS_CRIA[0], POS_CRIA[1] + 0.2, POS_CRIA[2]]}
-        area={AREA_NIDO}
+        position={/** @type {[number, number, number]} */ ([POS_CRIA[0], POS_CRIA[1] + 0.2, POS_CRIA[2]])}
+        area={/** @type {[number, number, number]} */ (AREA_NIDO)}
         semilla={29}
       />
     </group>
@@ -1028,8 +1029,8 @@ function MomentoPartida({ tier, reducedMotion, alTerminar }) {
         densidad={0.6}
         tier={tier}
         reducedMotion={reducedMotion}
-        position={[POS_DESPEDIDA[0], POS_DESPEDIDA[1] + 0.4, POS_DESPEDIDA[2]]}
-        area={AREA_VELO}
+        position={/** @type {[number, number, number]} */ ([POS_DESPEDIDA[0], POS_DESPEDIDA[1] + 0.4, POS_DESPEDIDA[2]])}
+        area={/** @type {[number, number, number]} */ (AREA_VELO)}
         semilla={41}
       />
     </group>
@@ -1161,7 +1162,7 @@ function MomentoVentaMercado3D() {
         className={`momento3d-canvas${listo ? ' momento3d-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: CAM_VALLE, fov: 44 }}
+        camera={{ position: /** @type {[number, number, number]} */ (CAM_VALLE), fov: 44 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >

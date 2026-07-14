@@ -108,9 +108,9 @@ export default function ArbolMayor({
   const alturaCopa = alto * (forma.tipo === 'emergente' ? 0.98 : 0.82);
 
   return (
-    <group position={position} scale={escala}>
+    <group position={/** @type {[number, number, number]} */ (position)} scale={escala}>
       {/* pivote al pie: el mecido gira el árbol entero desde la base */}
-      <group ref={pivote} rotation={rotation}>
+      <group ref={pivote} rotation={/** @type {[number, number, number]} */ (rotation)}>
         {/* RAÍCES TABLARES (ceiba): aletas verticales que agarran la tierra */}
         {armado.raices.map((r, i) => (
           <mesh

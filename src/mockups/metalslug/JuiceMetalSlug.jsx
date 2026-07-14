@@ -20,7 +20,7 @@ import { memo } from 'react';
 const TINTA = '#2c1e12';
 
 /* ── Proyectil: biopreparado que gira con estela. ───────────────────────────── */
-const ProyectilBio = memo(function ProyectilBio({ color = '#2bb3a3', tipo = 'microbiano', reducedMotion = false }) {
+const ProyectilBio = memo(function ProyectilBio(/** @type {any} */ { color = '#2bb3a3', tipo = 'microbiano', reducedMotion = false }) {
   const spin = reducedMotion ? '' : 'msc-fx-spin';
   return (
     <div className={`msc-fx-proy ${spin}`} style={{ '--fx-c': color }}>
@@ -39,7 +39,7 @@ const ProyectilBio = memo(function ProyectilBio({ color = '#2bb3a3', tipo = 'mic
 });
 
 /* ── Estallido de impacto efímero. ──────────────────────────────────────────── */
-const EfectoImpacto = memo(function EfectoImpacto({ tipo = 'bio', reducedMotion = false }) {
+const EfectoImpacto = memo(function EfectoImpacto(/** @type {any} */ { tipo = 'bio', reducedMotion = false }) {
   const rm = reducedMotion;
   const cls = rm ? 'msc-fx-burst msc-fx-burst--rm' : 'msc-fx-burst';
 
@@ -106,7 +106,7 @@ const EfectoImpacto = memo(function EfectoImpacto({ tipo = 'bio', reducedMotion 
 });
 
 /* ── Barra de vida en corazones-hoja. ───────────────────────────────────────── */
-const BarraVida = memo(function BarraVida({ energia = 3, max = 3 }) {
+const BarraVida = memo(function BarraVida(/** @type {any} */ { energia = 3, max = 3 }) {
   return (
     <div className="msc-fx-vida" aria-label={`Vida ${energia} de ${max}`}>
       {Array.from({ length: max }).map((_, i) => {
@@ -123,7 +123,7 @@ const BarraVida = memo(function BarraVida({ energia = 3, max = 3 }) {
 });
 
 /* ── Indicador de munición (biopreparado activo). ───────────────────────────── */
-const IndicadorMunicion = memo(function IndicadorMunicion({ nombre = '', color = '#2bb3a3', tipo = 'microbiano', onClick }) {
+const IndicadorMunicion = memo(function IndicadorMunicion(/** @type {any} */ { nombre = '', color = '#2bb3a3', tipo = 'microbiano', onClick }) {
   const rol = { microbiano: 'hongo/bacteria', depredador: 'depredador', parasitoide: 'avispita', botanico: 'botánico' }[tipo] || '';
   return (
     <button type="button" className="msc-fx-muni" onClick={onClick}>

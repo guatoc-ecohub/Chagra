@@ -40,6 +40,7 @@ import { perfilDeTier } from './deviceTier.js';
 
 /* La direccional de relleno vive fija al lado opuesto del valle (como en
    EscenaBase3D); solo su color e intensidad cambian con la hora. */
+/** @type {[number, number, number]} */
 const RELLENO_POS = [-5, 4, -6];
 
 /* Convierte un preset (hex + números) a objetos three mutables in-place. */

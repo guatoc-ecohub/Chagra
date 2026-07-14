@@ -241,7 +241,7 @@ function NubesDeNiebla({ cuantas, reducedMotion }) {
   return (
     <group ref={grupo}>
       {nubes.map((n) => (
-        <group key={n.key} position={n.base} scale={[n.esc * 1.9, n.esc * 0.5, n.esc * 1.2]}>
+        <group key={n.key} position={/** @type {[number, number, number]} */ (n.base)} scale={[n.esc * 1.9, n.esc * 0.5, n.esc * 1.2]}>
           <mesh>
             <sphereGeometry args={[0.6, 9, 7]} />
             <meshBasicMaterial color="#fbf4e6" transparent opacity={0.82} depthWrite={false} />
@@ -336,7 +336,7 @@ function MarcadorPiso({ piso }) {
   }, [piso]);
   if (!punto) return null;
   return (
-    <group position={punto}>
+    <group position={/** @type {[number, number, number]} */ (punto)}>
       <mesh position={[0, 1.4, 0]}>
         <cylinderGeometry args={[0.04, 0.32, 2.8, 10, 1, true]} />
         <meshBasicMaterial color="#fff0c2" transparent opacity={0.34} side={THREE.DoubleSide} depthWrite={false} />

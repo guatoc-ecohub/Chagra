@@ -20,7 +20,7 @@ afterEach(cleanup);
 
 describe('OsoAndino — contrato base intacto', () => {
   it('render por defecto = svg accesible, sin capas nuevas', () => {
-    const { container } = render(<OsoAndino />);
+    const { container } = render(<OsoAndino tier="medio" />);
     const svg = container.querySelector('svg[data-creature="oso-andino"]');
     expect(svg).toBeTruthy();
     expect(svg.getAttribute('role')).toBe('img');
@@ -34,7 +34,7 @@ describe('OsoAndino — contrato base intacto', () => {
   });
 
   it('siempre trae sus ANTEOJOS y su ceño serio (identidad de la especie)', () => {
-    const { container } = render(<OsoAndino />);
+    const { container } = render(<OsoAndino tier="medio" />);
     // Las cejas del sabio gruñón son parte de la identidad (no opt-in).
     expect(container.querySelector('.oso-cejas')).toBeTruthy();
   });
@@ -42,49 +42,49 @@ describe('OsoAndino — contrato base intacto', () => {
 
 describe('1. Expresividad con PESO — line-boil, gruñido y rascado', () => {
   it('lineBoil instancia el filtro de displacement (contorno que hierve)', () => {
-    const { container } = render(<OsoAndino lineBoil animated />);
+    const { container } = render(<OsoAndino tier="medio" lineBoil animated />);
     expect(container.querySelector('svg').getAttribute('data-lineboil')).toBe('1');
     expect(container.querySelector('feDisplacementMap')).toBeTruthy();
     expect(container.querySelector('feTurbulence')).toBeTruthy();
   });
 
   it('sin lineBoil NO se paga el filtro (frugal)', () => {
-    const { container } = render(<OsoAndino animated />);
+    const { container } = render(<OsoAndino tier="medio" animated />);
     expect(container.querySelector('feDisplacementMap')).toBeNull();
   });
 
   it('resopla (gruñido) marca el estado y saca el vaho por la trufa', () => {
-    const { container } = render(<OsoAndino resopla animated />);
+    const { container } = render(<OsoAndino tier="medio" resopla animated />);
     expect(container.querySelector('svg').getAttribute('data-resopla')).toBe('1');
     expect(container.querySelectorAll('.crt-vaho-mota').length).toBeGreaterThan(1);
   });
 
   it('rasca marca el estado (se rasca con la zarpa)', () => {
-    const { container } = render(<OsoAndino rasca animated />);
+    const { container } = render(<OsoAndino tier="medio" rasca animated />);
     expect(container.querySelector('svg').getAttribute('data-rasca')).toBe('1');
   });
 
   it('sin resopla no hay vaho (frugal, avatar sereno)', () => {
-    const { container } = render(<OsoAndino animated />);
+    const { container } = render(<OsoAndino tier="medio" animated />);
     expect(container.querySelector('.crt-vaho-mota')).toBeNull();
   });
 });
 
 describe('2. Lip-sync — el visema llega a la bocota', () => {
   it('con visema V3 la boca abierta viaja a la cara (data-visema)', () => {
-    const { container } = render(<OsoAndino visema="V3" />);
+    const { container } = render(<OsoAndino tier="medio" visema="V3" />);
     expect(container.querySelector('svg').getAttribute('data-visema')).toBe('V3');
   });
 
   it('sin visema no marca data-visema (la sonrisa grave de siempre)', () => {
-    const { container } = render(<OsoAndino />);
+    const { container } = render(<OsoAndino tier="medio" />);
     expect(container.querySelector('svg').getAttribute('data-visema')).toBeNull();
   });
 });
 
 describe('3. Modo poder — aura ROJA de 4 capas (standalone)', () => {
   it('poder envuelve en .is-powered-up + corrientes, con aura ROJA (no dorada)', () => {
-    const { container } = render(<OsoAndino poder />);
+    const { container } = render(<OsoAndino tier="medio" poder />);
     const wrap = container.querySelector('.is-powered-up');
     expect(wrap).toBeTruthy();
     expect(wrap.getAttribute('data-creature-poder')).toBe('oso-andino');
@@ -97,7 +97,7 @@ describe('3. Modo poder — aura ROJA de 4 capas (standalone)', () => {
   });
 
   it('sin poder no hay wrapper (svg desnudo)', () => {
-    const { container } = render(<OsoAndino />);
+    const { container } = render(<OsoAndino tier="medio" />);
     expect(container.querySelector('.is-powered-up')).toBeNull();
     expect(container.querySelector(':scope > svg[data-creature="oso-andino"]')).toBeTruthy();
   });
@@ -105,7 +105,7 @@ describe('3. Modo poder — aura ROJA de 4 capas (standalone)', () => {
 
 describe('4. Ruana del páramo — el oso se abriga y NUNCA suda', () => {
   it('de noche con vestuario → RUANA y JAMÁS sudor/sombrero', () => {
-    const { container } = render(<OsoAndino vestuario clima="noche" />);
+    const { container } = render(<OsoAndino tier="medio" vestuario clima="noche" />);
     const svg = container.querySelector('svg');
     expect(svg.getAttribute('data-ruana')).toBe('1');
     // el oso de páramo no se acalora en ningún caso
@@ -113,14 +113,14 @@ describe('4. Ruana del páramo — el oso se abriga y NUNCA suda', () => {
   });
 
   it('de día caluroso (tempC alta) el oso NO suda (páramo, identidad)', () => {
-    const { container } = render(<OsoAndino vestuario clima="soleado" tempC={26} />);
+    const { container } = render(<OsoAndino tier="medio" vestuario clima="soleado" tempC={26} />);
     // aunque el termómetro dispararía sudor en un bicho templado, el oso no.
     expect(container.querySelector('.crt-sudor')).toBeNull();
     expect(container.querySelector('.crt-gota-sudor')).toBeNull();
   });
 
   it('sin vestuario (avatar/catálogo) → nada de ropa aunque haya clima', () => {
-    const { container } = render(<OsoAndino clima="noche" />);
+    const { container } = render(<OsoAndino tier="medio" clima="noche" />);
     const svg = container.querySelector('svg');
     expect(svg.getAttribute('data-ruana')).toBeNull();
   });
@@ -128,18 +128,18 @@ describe('4. Ruana del páramo — el oso se abriga y NUNCA suda', () => {
 
 describe('5. Prop por mundo — herramienta en la zarpa', () => {
   it('mundoId=suelo → carga la lupa', () => {
-    const { container } = render(<OsoAndino mundoId="suelo" />);
+    const { container } = render(<OsoAndino tier="medio" mundoId="suelo" />);
     expect(container.querySelector('svg').getAttribute('data-prop')).toBe('suelo');
     expect(container.querySelector('[data-prop="lupa"]')).toBeTruthy();
   });
 
   it('mundoId=agua → carga la manguerita', () => {
-    const { container } = render(<OsoAndino mundoId="agua" />);
+    const { container } = render(<OsoAndino tier="medio" mundoId="agua" />);
     expect(container.querySelector('[data-prop="manguera"]')).toBeTruthy();
   });
 
   it('mundo sin prop mapeado → zarpas libres (no rompe)', () => {
-    const { container } = render(<OsoAndino mundoId="mundo-fantasma" />);
+    const { container } = render(<OsoAndino tier="medio" mundoId="mundo-fantasma" />);
     expect(container.querySelector('[data-prop="lupa"]')).toBeNull();
     expect(container.querySelector('svg[data-creature="oso-andino"]')).toBeTruthy();
   });
@@ -149,7 +149,7 @@ describe('Anti-regresión — modo inline no rompe la escena', () => {
   it('inline devuelve un <g> con el data-creature y marca data-poder', () => {
     const { container } = render(
       <svg>
-        <OsoAndino inline poder mundoId="suelo" />
+        <OsoAndino tier="medio" inline poder mundoId="suelo" />
       </svg>,
     );
     const g = container.querySelector('g[data-creature="oso-andino"]');

@@ -101,7 +101,7 @@ export function Ardilla({
   // CLIMA → cuerpo (determinista). La ardilla no tiene alas (velocidadAlas 1: no
   // se usa). Sin perfil propio → usa el de referencia (defecto); su piso térmico
   // templado ya vive en el perfil de ROPA (ROPA_PERFIL_POR_BICHO.ardilla).
-  const cuerpoClima = cuerpoDeClima(clima, { enso, tier });
+  const cuerpoClima = cuerpoDeClima(clima, { enso: /** @type {any} */ (enso), tier });
   const estiloClima = (cuerpoClima.tinte || cuerpoClima.opacidad < 1)
     ? { filter: cuerpoClima.tinte || undefined, opacity: cuerpoClima.opacidad < 1 ? cuerpoClima.opacidad : undefined }
     : undefined;

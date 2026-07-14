@@ -68,7 +68,7 @@ export function frasePendientes(pendientes) {
 }
 
 /** El hilo completo, en orden fijo: cielo → Angelita → pendientes. */
-export function componerHilo({ cielo, animo, energia, lugar, pendientes } = {}) {
+export function componerHilo(/** @type {{cielo?: any, animo?: any, energia?: any, lugar?: any, pendientes?: any}} */ { cielo, animo, energia, lugar, pendientes } = {}) {
   return [
     fraseCielo(cielo),
     fraseAngelita(animo, energia, lugar),

@@ -333,7 +333,7 @@ export function AbejaEscena({
   // vestuario se infiere del clima+hora (de noche = ruana; sol de día = sudor).
   const tempCReal = Number.isFinite(estadoFinca?.tempC) ? estadoFinca.tempC : undefined;
   const cuerpoClima = useMemo(
-    () => cuerpoDeClima(climaReal, { enso: ensoReal, tier, perfil: PERFIL_ABEJA }),
+    () => cuerpoDeClima(climaReal, { enso: ensoReal, tier: /** @type {'alto'|'medio'|'bajo'} */ (tier), perfil: PERFIL_ABEJA }),
     [climaReal, ensoReal, tier],
   );
   const vueloClima = useMemo(() => {
