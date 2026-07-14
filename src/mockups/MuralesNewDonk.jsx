@@ -459,7 +459,7 @@ export default function MuralesNewDonk({ onBack }) {
   const enJuego = fase === 'juego2d';
   const viajando = fase === 'acercando' || fase === 'saliendo';
 
-  const dpr = useMemo(() => [1, 1.5], []);
+  const dpr = /** @type {[number, number]} */ ([1, 1.5]);
 
   return (
     <section

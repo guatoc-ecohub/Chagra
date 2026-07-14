@@ -26,7 +26,7 @@ export const BOIL_SEEDS = [2, 11, 23];
  * @param {boolean} [props.animated=true]  rota la seed (line-boil). false = fijo.
  * @param {number[]} [props.seeds=BOIL_SEEDS]  los 3 estados de seed.
  * @param {string} [props.dur='0.4s']  duración del ciclo escalonado.
- * @returns {JSX.Element}
+ * @returns {import('react').JSX.Element}
  */
 export function LineBoilFilter({
   id,

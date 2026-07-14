@@ -22,7 +22,7 @@ describe('NivelCompartirSwitch', () => {
     expect(radios).toHaveLength(3);
     expect(screen.getByTestId(`nivel-compartir-${SHARE_LEVEL.PRIVADO}`).getAttribute('aria-checked')).toBe('true');
     // Nivel 3: se modela pero no se ejecuta — lo canoniza un sabedor.
-    expect(screen.getByTestId(`nivel-compartir-${SHARE_LEVEL.CANONIZADO}`).disabled).toBe(true);
+    expect(/** @type {HTMLButtonElement} */ (screen.getByTestId(`nivel-compartir-${SHARE_LEVEL.CANONIZADO}`)).disabled).toBe(true);
   });
 
   it('cambiar a "Con los vecinos" dispara onChange(PARES)', () => {

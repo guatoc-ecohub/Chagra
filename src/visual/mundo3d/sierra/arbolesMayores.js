@@ -146,6 +146,7 @@ export function copaBlobs(forma, alto, semilla = 1) {
   const n = Math.max(3, forma.blobs);
   const rx = alto * forma.copaAncho;
   const ry = alto * forma.copaAlto;
+  /** @type {Array<{pos: [number, number, number], escala: [number, number, number], tono: number}>} */
   const out = [];
   for (let i = 0; i < n; i++) {
     const s = semilla * 13.3 + i * 7.7;
@@ -176,6 +177,7 @@ export function tallosArbol(forma, alto, semilla = 1) {
   if (n === 1) {
     return [{ base: [0, 0], curva: 0, giro: 0, alto, grosor: 1 }];
   }
+  /** @type {Array<{base: [number, number], curva: number, giro: number, alto: number, grosor: number}>} */
   const out = [];
   for (let i = 0; i < n; i++) {
     const s = semilla * 5.1 + i * 3.3;
@@ -221,6 +223,7 @@ export function raicesTablares(forma, alto, semilla = 1) {
  * @returns {Array<{ pos:[number,number,number], alto:number, giro:number }>}
  */
 export function frailejonar(n, radio, semilla = 1) {
+  /** @type {Array<{pos: [number, number, number], alto: number, giro: number}>} */
   const out = [];
   for (let i = 0; i < n; i++) {
     const s = semilla * 17.7 + i * 2.9;

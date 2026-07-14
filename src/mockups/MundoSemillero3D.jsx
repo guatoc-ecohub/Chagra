@@ -703,8 +703,8 @@ function Escena({ g, especie, presupuesto, tier, reducedMotion }) {
 
 /* Cajas de aire ESTABLES (constantes de módulo): la nube se re-siembra si cambia
    la referencia, así que nunca deben crearse por render. */
-const AIRE_POLEN = [4.4, 2.6, 3.0];
-const AIRE_MARIPOSAS = [4.6, 1.4, 3.2];
+const AIRE_POLEN = /** @type {[number, number, number]} */ ([4.4, 2.6, 3.0]);
+const AIRE_MARIPOSAS = /** @type {[number, number, number]} */ ([4.6, 1.4, 3.2]);
 
 /* Fuerza un repintado cuando cambia `t` en `frameloop='demand'` (reduced-motion):
    sin bucle continuo, hay que invalidar a mano al deslizar. */

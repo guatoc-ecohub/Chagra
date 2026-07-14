@@ -273,7 +273,7 @@ export const ROPA_NEUTRA = Object.freeze({
  *   clima de escena (mismo vocabulario que cuerpoDeClima). Desconocido → neutro.
  * @param {object} [opts]
  * @param {{frioC:number, calorC:number, sudaAlSol:boolean}} [opts.perfil=ROPA_PERFIL_DEFECTO]
- * @param {number} [opts.tempC]  °C real si se conoce (afina frío/calor). Sin ella,
+ * @param {number} [opts.tempC]  tempC real si se conoce (afina frio/calor). Sin ella,
  *   se infiere del clima + piso (sol de día = calor salvo bichos de páramo).
  * @returns {{ruana:boolean, sombrero:boolean, sudor:boolean, mojado:boolean, niebla:boolean}}
  */

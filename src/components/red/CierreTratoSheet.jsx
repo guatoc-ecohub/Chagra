@@ -36,7 +36,7 @@ const ENTREGA_OPCIONES = [
 
 export default function CierreTratoSheet({ oferta, onClose, onRegistrado }) {
   const registrarTrato = useRedStore((s) => s.registrarTrato);
-  const [entrega, setEntrega] = useState(ENTREGA.ENTREGADO);
+  const [entrega, setEntrega] = useState(/** @type {'pendiente'|'parcial'|'entregado'|'no_entregado'} */ (ENTREGA.ENTREGADO));
   const [calidad, setCalidad] = useState(/** @type {number|null} */ (null));
   const [shareLevel, setShareLevel] = useState(SHARE_LEVEL.PRIVADO);
   const [guardando, setGuardando] = useState(false);
@@ -172,7 +172,7 @@ export default function CierreTratoSheet({ oferta, onClose, onRegistrado }) {
             {/* 3. La compuerta: con quién comparte este trato. */}
             <fieldset>
               <legend className="text-sm font-semibold text-slate-200 mb-2">¿Con quién comparte este trato?</legend>
-              <NivelCompartirSwitch value={shareLevel} onChange={setShareLevel} />
+              <NivelCompartirSwitch value={shareLevel} onChange={/** @type {any} */ (setShareLevel)} />
             </fieldset>
 
             {error && (

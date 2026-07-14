@@ -364,7 +364,7 @@ function GotaTizon({ anim }) {
 }
 
 /* ── Selector data-driven. ──────────────────────────────────────────────────── */
-const PlagaSprite = memo(function PlagaSprite({ enemigoId, reducedMotion }) {
+const PlagaSprite = memo(function PlagaSprite(/** @type {any} */ { enemigoId, reducedMotion }) {
   const anim = reducedMotion ? undefined : 'msc-alive';
   switch (enemigoId) {
     case 'cogollero':

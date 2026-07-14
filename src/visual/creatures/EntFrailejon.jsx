@@ -179,7 +179,7 @@ export function EntFrailejon({
   const auraOp = Math.max(0.12, Math.min(0.34, 0.14 + 0.2 * (energia ?? 1)));
 
   // CLIMA → cuerpo (determinista): tinte + opacidad. Perfil de gigante de páramo.
-  const cuerpoClima = cuerpoDeClima(clima, { enso, tier, perfil: ENT_PERFIL_CUERPO });
+  const cuerpoClima = cuerpoDeClima(clima, { enso: /** @type {any} */ (enso), tier, perfil: ENT_PERFIL_CUERPO });
   const estiloClima = (cuerpoClima.tinte || cuerpoClima.opacidad < 1)
     ? { filter: cuerpoClima.tinte || undefined, opacity: cuerpoClima.opacidad < 1 ? cuerpoClima.opacidad : undefined }
     : undefined;

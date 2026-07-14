@@ -289,7 +289,7 @@ describe('helpers de lookup (data-driven, puros)', () => {
       expect(p.tema).toBe('botanica');
     }
     // Tema desconocido: arreglo vacío.
-    expect(getPiezasPorTema('xxx')).toEqual([]);
+    expect(getPiezasPorTema(/** @type {any} */ ('xxx'))).toEqual([]);
     // Es una copia: mutarla no afecta el origen.
     botanica.push(null);
     expect(getPiezasPorTema('botanica').length).not.toBe(botanica.length);

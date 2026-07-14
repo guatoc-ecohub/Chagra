@@ -133,7 +133,7 @@ const ORGANISMOS = [
 ];
 
 /* La vista general: el encuadre de reposo (el mismo aire cálido del diorama). */
-const VISTA_GENERAL = { pos: [3.6, 2.4, 5.6], target: [0, 0.1, 0.5] };
+const VISTA_GENERAL = { pos: /** @type {[number, number, number]} */ ([3.6, 2.4, 5.6]), target: [0, 0.1, 0.5] };
 
 /* El encuadre para acercarse a un ser vivo: la cámara se sitúa al frente y un
    poco arriba de su ancla, mirándolo de cerca. */
@@ -254,7 +254,7 @@ function Marcador({ org, seleccionado, resaltado, reducedMotion, onSeleccion, on
  * update() es estable (no pelea con el rig). En reducedMotion salta de una;
  * `invalidate()` mantiene vivo el frameloop-a-demanda mientras dura el viaje. */
 function CameraRig({ vista, reducedMotion }) {
-  const controls = useThree((s) => s.controls);
+  const controls = /** @type {import('three/examples/jsm/controls/OrbitControls.js').OrbitControls|null} */ (useThree((s) => s.controls));
   const camera = useThree((s) => s.camera);
   const invalidate = useThree((s) => s.invalidate);
   const destino = useMemo(

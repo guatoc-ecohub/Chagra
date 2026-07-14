@@ -305,7 +305,7 @@ function ZonaCompost({ pos }) {
         [-0.3, 0.42, -0.15],
         [0.1, 0.5, -0.32],
       ].map((c, i) => (
-        <mesh key={i} position={c} scale={0.7}>
+        <mesh key={i} position={/** @type {[number, number, number]} */ (c)} scale={0.7}>
           <dodecahedronGeometry args={[0.12]} />
           <meshLambertMaterial color={P.compostSeco} flatShading />
         </mesh>
@@ -676,7 +676,7 @@ export default function AliadosFinca3D() {
                   aria-label={`${nombre}: ${verbo}`}
                   onClick={() => setFoco((v) => (v === slug ? null : slug))}
                 >
-                  <Comp size={76} mostrarRol={false} tier={tier === 'bajo' ? 'bajo' : 'alto'} />
+                  <Comp size={76} mostrarRol={false} tier={tier === 'bajo' ? 'bajo' : 'alto'} className="" />
                   <span className="alf-nombre">{nombre}</span>
                   <span className="alf-cinta" style={{ background: color }}>
                     {verbo}
