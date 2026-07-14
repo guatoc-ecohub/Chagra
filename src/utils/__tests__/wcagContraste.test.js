@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { luminanciaRelativa, ratioContraste, auditarContraste } from '../utils/wcagContraste.js';
+import { luminanciaRelativa, ratioContraste, auditarContraste } from '../wcagContraste.js';
 
 describe('WCAG Contraste', () => {
   it('calcula luminancia relativa del negro', () => {
