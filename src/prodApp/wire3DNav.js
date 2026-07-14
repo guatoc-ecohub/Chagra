@@ -22,7 +22,7 @@ export const RUTA_2D_DESDE_3D = {
   sanidad: 'sanidad_sintoma',
   animales: 'animales',
   clima: 'clima_boletin',
-  mercado: 'mercado',
+  mercado: 'mercados',
   semillero: 'semilla',
   disenio: 'biodiversidad',
   micorrizas: null, // todavía no hay ruta 2D equivalente
@@ -64,7 +64,7 @@ export const RUTA_2D_DESDE_3D = {
   guardian: 'espiritu_pro',
   corral: 'animales',
   cosecha: 'mi_cosecha',
-  vender: 'mercado',
+  vender: 'mercados',
   papa: 'tuberculos',
   rio: 'agua',
   platano: 'platano',
