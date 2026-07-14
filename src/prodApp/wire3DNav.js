@@ -82,10 +82,35 @@ export function rutaDesdeMundo3D(mundoId) {
 
 /**
  * Navega del 3D a la ruta 2D después de un retardo (para la animación de cámara).
+ * Si el usuario no está autenticado, guarda la ruta destino en sessionStorage
+ * y redirige al login. Después del login exitoso, ProdChagraApp redirige a la
+ * ruta guardada.
  * @param {string} mundoId
  */
 export function navegarDesde3D(mundoId) {
   const ruta = rutaDesdeMundo3D(mundoId);
   if (!ruta) return;
-  window.location.hash = '#' + ruta;
+
+  // Verificar auth. isAuthenticated es async (lee de localforage/IndexedDB).
+  // Si no está autenticado, guardar la intención y redirigir al login.
+  try {
+    import('../services/authService.js').then(({ isAuthenticated }) => {
+      isAuthenticated().then((autenticado) => {
+        if (autenticado) {
+          window.location.hash = '#' + ruta;
+        } else {
+          // Guardar la ruta destino para redirigir después del login
+          try { sessionStorage.setItem('chagra:redirect-after-login', ruta); } catch {}
+          window.location.hash = '#login';
+        }
+      }).catch(() => {
+        // Si falla el check de auth, navegar igual (mejor experiencia que nada)
+        window.location.hash = '#' + ruta;
+      });
+    }).catch(() => {
+      window.location.hash = '#' + ruta;
+    });
+  } catch {
+    window.location.hash = '#' + ruta;
+  }
 }

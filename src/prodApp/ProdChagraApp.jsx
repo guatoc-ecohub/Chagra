@@ -268,25 +268,39 @@ export default function ProdChagraApp() {
       } else if (view === 'oauth-callback') {
         setCurrentView('oauth-callback');
       } else {
-        setCurrentView('login');
+        // Permitir exploración pública del valle 3D y Sierra global sin login.
+        // Al tocar un mundo, navegarDesde3D() redirige al login con redirect.
+        setCurrentView(view || 'valle3d');
       }
     }).catch(() => {
       setAuth(false);
-      setCurrentView('login');
+      setCurrentView('valle3d');
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLoginSuccess = useCallback(() => {
     setAuth(true);
-    setCurrentView('valle3d');
-    window.location.hash = '';
+    // Redirigir a la ruta que el usuario intentó abrir antes del login
+    const redirect = sessionStorage.getItem('chagra:redirect-after-login');
+    if (redirect) {
+      sessionStorage.removeItem('chagra:redirect-after-login');
+      setCurrentView(redirect);
+      window.location.hash = '#' + redirect;
+    } else {
+      setCurrentView('valle3d');
+      window.location.hash = '';
+    }
   }, []);
 
   // ── Loading (auth state aún no determinado) ───────────────────
   if (auth === null || currentView === 'loading') return <ChagraGrowLoader />;
 
-  // ── Auth gate ───────────────────────────────────────────────
-  if (!auth && currentView !== 'login' && currentView !== 'oauth-callback') {
+  // ── Auth gate: login requerido para rutas protegidas ──────────
+  // valle3d y sierra_global son públicas (exploración sin login).
+  // Las demás rutas requieren autenticación.
+  const esRutaPublica = currentView === 'valle3d' || currentView === 'valle3d_noche'
+    || currentView === 'valle3d_lluvia' || currentView === 'sierra_global';
+  if (!auth && !esRutaPublica && currentView !== 'login' && currentView !== 'oauth-callback') {
     return <Suspense fallback={<ChagraGrowLoader />}><LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} /></Suspense>;
   }
   if (currentView === 'login') {
