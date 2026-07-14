@@ -339,3 +339,105 @@ export function factorParpadeo(t, periodo = 6.2) {
   }
   return 1;
 }
+
+/*
+ * ── LA BOCA que HABLA (feedback: los gestos deben LEERSE y NO chocar con la
+ *    nariz). Envolvente de "maestro que enseña": articula sílabas claras (la
+ *    mandíbula baja y sube con pausas entre frases), no un temblor mecánico.
+ *    Devuelve 0..1 = cuánto se ABRE la boca (0 cerrada, 1 bien abierta). ──
+ */
+export function factorHabla(t) {
+  // Frases con pausa: cada ciclo ~4.2 s tiene una tanda de sílabas y un silencio
+  // (respira / deja pensar). Dentro de la tanda, sílabas nítidas y separadas.
+  const frase = 4.2;
+  const f = (t % frase) / frase; // 0..1 dentro de la frase
+  if (f > 0.72) return 0; // silencio: boca cerrada, cara serena
+  const dentro = f / 0.72; // 0..1 en la parte hablada
+  // sílabas: 3 aperturas claras, con cierre entre cada una (se lee "ha-bla-ndo")
+  const silaba = Math.sin(dentro * Math.PI * 3);
+  const abre = Math.max(0, silaba); // solo aperturas (nunca "hacia arriba")
+  // una apertura base sostenida para que aun entre sílabas la boca "diga"
+  return Math.min(1, abre * 0.85 + 0.12);
+}
+
+/*
+ * SONRISA lenta de sabio: sube apenas las comisuras cada tanto (calidez, no
+ * caricatura). 0..1. Independiente del habla → capas legibles y no mecánicas.
+ */
+export function factorSonrisa(t) {
+  const s = Math.sin(t * 0.19 + 0.5) * 0.5 + Math.sin(t * 0.07) * 0.5; // ~-1..1 lento
+  return Math.max(0, s); // solo sonríe (nunca "amarga" la boca)
+}
+
+/* ── BARBA de árbol-anciano (referente: Bárbol / Treebeard). Cortinas de MUSGO
+      que cuelgan de la mandíbula, RAICILLAS leñosas más largas en el mentón y
+      matas de LIQUEN prendidas a los lados. Todo procedural, cuelga y se mece. ── */
+export const BARBA = {
+  musgo: new THREE.Color('#5f6f42'), // musgo del páramo, verde apagado
+  musgoClaro: new THREE.Color('#879463'), // mechón más claro (variedad)
+  raicilla: new THREE.Color('#5a3b2b'), // raicilla leñosa colgante (marrón)
+  liquen: new THREE.Color('#aeb890'), // liquen foliáceo pálido (sage)
+  liquenAzul: new THREE.Color('#93a89a'), // liquen azul-grisáceo
+};
+
+/*
+ * Mechones de la barba en coords del rostro (0,0,0 = ancla del mentón; -y cuelga,
+ * +z al frente). Forma de barba: larga en el centro (mentón), corta en las
+ * mejillas; enmarca la boca SIN taparla (arranca por debajo del labio).
+ */
+export function specsBarba(seed = 91) {
+  const r = rng(seed);
+  const mechones = [];
+  const N = 15;
+  for (let i = 0; i < N; i++) {
+    const f = i / (N - 1); // 0..1 de mejilla izq a der
+    const x = (f - 0.5) * 0.94; // a lo ancho de la mandíbula
+    const centro = Math.max(0, 1 - Math.abs(f - 0.5) * 1.7); // largo hacia el mentón
+    const len = 0.44 + centro * 0.78 + r() * 0.16;
+    mechones.push({
+      x,
+      yTop: -0.56 - Math.abs(f - 0.5) * 0.1, // bajo la boca, sube por las mejillas
+      z: 0.02 + r() * 0.05,
+      len,
+      tilt: (f - 0.5) * 0.7 + (r() - 0.5) * 0.2, // se abren hacia afuera
+      grosor: 0.05 + r() * 0.03,
+      claro: r() > 0.62,
+      fase: i * 1.3,
+    });
+  }
+  // raicillas leñosas: más largas, en el centro (el mentón de Bárbol)
+  const raicillas = [];
+  const M = 4;
+  for (let i = 0; i < M; i++) {
+    raicillas.push({
+      x: (r() - 0.5) * 0.34,
+      yTop: -0.62,
+      z: 0.0 + r() * 0.04,
+      len: 0.98 + r() * 0.6,
+      tilt: (r() - 0.5) * 0.28,
+      grosor: 0.036 + r() * 0.02,
+      fase: i * 2.1,
+    });
+  }
+  // matas de liquen prendidas a lo alto de la barba, a los lados de la boca
+  const liquenes = [];
+  const L = 9;
+  for (let i = 0; i < L; i++) {
+    const f = i / (L - 1);
+    liquenes.push({
+      pos: [(f - 0.5) * 0.9, -0.5 - r() * 0.28, 0.05 + r() * 0.05],
+      esc: 0.06 + r() * 0.055,
+      azul: r() > 0.6,
+    });
+  }
+  return { mechones, raicillas, liquenes };
+}
+
+/*
+ * Ancla del HOMBRO sobre el fuste (para el BRAZO que señala el suelo). Se toma
+ * un punto de la curva del tronco por encima del rostro, de donde nace el brazo.
+ */
+export function anclaBrazo(t = 0.47, seed = 7) {
+  const curva = curvaTronco(seed);
+  return curva.getPointAt(Math.max(0, Math.min(1, t)));
+}
