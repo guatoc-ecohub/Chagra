@@ -18,7 +18,7 @@ import { lazy, Suspense, useMemo, useState } from 'react';
 import { decidirTier, permite3D } from '../visual/mundo3d/deviceTier.js';
 import './BosqueVivo3D.css';
 
-const EscenaBosqueVivo = lazy(() => import('../visual/mundo3d/bosque/EscenaBosqueVivo.jsx'));
+const MundoEntBosque = lazy(() => import('../visual/mundo3d/bosque/MundoEntBosque.jsx'));
 
 /* Lo que enseña el guardián (verificado, en "usted"). */
 const SABERES = [
@@ -79,7 +79,7 @@ export default function BosqueVivo3D() {
                 </div>
               }
             >
-              <EscenaBosqueVivo tier={tier} reducedMotion={reducedMotion} />
+              <MundoEntBosque tier={tier} reducedMotion={reducedMotion} />
             </Suspense>
           ) : (
             <FichaGuardian />
