@@ -1,12 +1,16 @@
 /**
  * AdminPanel.jsx — Panel de administración para el operador de Chagra.
  *
- * Ruta oculta (#admin), solo accesible con código de acceso.
- * Muestra: estado del deploy, métricas del agente, últimos crashes, feature toggles.
+ * Ruta oculta (#admin). Expone SOLO feature toggles en localStorage
+ * (juegos, modo demo, debug console) + build info público de /version.json.
+ *
+ * NO expone datos sensibles, métricas reales, ni credenciales.
+ * El panel es abierto porque lo que expone no es sensible.
+ * Si en el futuro se agregan métricas del flywheel o estado de Ollama,
+ * el gate DEBE ser server-side (Nginx basic auth o token en header).
  */
 import { useState, useEffect } from 'react';
 
-const CODIGO = 'chagra-admin-2026';
 const FEATURES_KEY = 'chagra:admin-features';
 
 /** @type {Record<string, {label: string, default: boolean}>} */
@@ -17,27 +21,28 @@ const FEATURES = {
 };
 
 export default function AdminPanel() {
-  const [autenticado, setAutenticado] = useState(false);
-  const [codigo, setCodigo] = useState('');
   const [features, setFeatures] = useState(/** @type {Record<string, boolean>} */ ({}));
   const [buildInfo, setBuildInfo] = useState(/** @type {{sha: string, ts: string}|null} */ (null));
   const [logs, setLogs] = useState(/** @type {string[]} */ ([]));
 
   useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem(FEATURES_KEY) || '{}');
-      const merged = { ...FEATURES };
-      for (const [k, v] of Object.entries(FEATURES)) {
-        merged[k] = { ...v, default: saved[k] ?? v.default };
+      const saved = localStorage.getItem(FEATURES_KEY);
+      const parsed = saved ? JSON.parse(saved) : {};
+      const merged = {};
+      for (const k of Object.keys(FEATURES)) {
+        merged[k] = parsed[k] ?? FEATURES[k].default;
       }
-      setFeatures(Object.fromEntries(Object.entries(merged).map(([k, v]) => [k, v.default])));
+      setFeatures(merged);
     } catch {}
   }, []);
 
-  const login = () => {
-    if (codigo === CODIGO) setAutenticado(true);
-    else setCodigo('');
-  };
+  useEffect(() => {
+    fetch('/version.json', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(setBuildInfo)
+      .catch(() => {});
+  }, []);
 
   const toggleFeature = (key) => {
     const next = { ...features, [key]: !features[key] };
@@ -45,33 +50,19 @@ export default function AdminPanel() {
     try { localStorage.setItem(FEATURES_KEY, JSON.stringify(next)); } catch {}
   };
 
-  const refresh = async () => {
-    try {
-      const res = await fetch('/version.json', { cache: 'no-store' });
-      if (res.ok) setBuildInfo(await res.json());
-    } catch {}
-    setLogs([`[${new Date().toLocaleTimeString()}] Panel refrescado`, ...logs.slice(0, 9)]);
+  const refresh = () => {
+    setLogs(l => [`[${new Date().toLocaleTimeString()}] Panel refrescado`, ...l.slice(0, 9)]);
   };
-
-  useEffect(() => { if (autenticado) refresh(); }, [autenticado]);
-
-  if (!autenticado) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6">
-        <input type="password" value={codigo} onChange={(e) => setCodigo(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && login()}
-          placeholder="Código de acceso" autoFocus
-          className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-slate-200 text-sm w-64 mb-3 focus:outline-none focus:border-emerald-600" />
-        <button onClick={login} className="px-4 py-2 rounded-xl bg-slate-700 text-slate-200 text-sm">Acceder</button>
-      </div>
-    );
-  }
 
   return (
     <div className="p-4 space-y-5 text-slate-200 text-sm max-w-lg">
       <div className="flex justify-between items-center">
-        <h2 className="text-base font-semibold">⚙️ Panel de Administración</h2>
+        <h2 className="text-base font-semibold">Panel de Administración</h2>
         <button onClick={refresh} className="text-xs px-2 py-1 rounded bg-slate-700 text-slate-400 hover:text-slate-200">Refrescar</button>
+      </div>
+
+      <div className="text-xs text-slate-500 bg-slate-800/50 rounded-lg p-2">
+        Este panel controla ajustes locales. Nada de lo que ve aquí contiene datos personales de campesinos ni credenciales. Los cambios se guardan en este dispositivo.
       </div>
 
       {buildInfo && (
@@ -83,7 +74,7 @@ export default function AdminPanel() {
       )}
 
       <div className="space-y-2">
-        <div className="text-xs text-slate-500">Feature Toggles</div>
+        <div className="text-xs text-slate-500">Ajustes de la app</div>
         {Object.entries(FEATURES).map(([key, f]) => (
           <label key={key} className="flex items-center gap-3 bg-slate-800 rounded-lg p-3 cursor-pointer">
             <input type="checkbox" checked={features[key] || false} onChange={() => toggleFeature(key)}
@@ -94,7 +85,7 @@ export default function AdminPanel() {
       </div>
 
       <div className="bg-slate-800 rounded-lg p-3">
-        <div className="text-xs text-slate-500 mb-2">Logs</div>
+        <div className="text-xs text-slate-500 mb-2">Registro de actividad</div>
         <div className="font-mono text-xs text-slate-600 space-y-0.5 max-h-32 overflow-y-auto">
           {logs.length === 0 && <div className="text-slate-700">Sin eventos</div>}
           {logs.map((l, i) => <div key={i}>{l}</div>)}
