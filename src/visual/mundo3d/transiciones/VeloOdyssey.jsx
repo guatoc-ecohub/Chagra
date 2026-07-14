@@ -74,12 +74,12 @@ const PATH_HORIZONTE =
 export default function VeloOdyssey({
   fase = null,
   destino = 'valle',
-  velo = undefined,
+  velo,
   tier = 'medio',
   reducedMotion = false,
-  letrero = undefined,
-  onCubierto = undefined,
-  onFin = undefined,
+  letrero,
+  onCubierto,
+  onFin,
 }) {
   const cubiertoRef = useRef(onCubierto);
   const finRef = useRef(onFin);
