@@ -2049,7 +2049,7 @@ const CAMARA_VALLE = { position: [10.5, 9, 13.5], fov: 40 };
 const MIRA_VALLE = [0, 1.6, 1.4];
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null }) {
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false }) {
   const controls = useRef(null);
   /* La cámara de director (FASE 4, flag `camaraDirector`) se monta DESPUÉS de
      CamaraViajera y gana por orden de frame durante su barrido. `avatarRef`
@@ -2108,152 +2108,27 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
       )}
 
       <Terreno nocturno={nocturno} innerRef={terrenoRef} perfil={perfil} />
-      {/* AoE: detalle de suelo (pasto corto/flores/piedras) + surcos de cultivo — mata el verde vacío */}
-      <DetalleSueloValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
-      <Cordillera color={nocturno ? '#48598a' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
-      {/* AGUA VIVA: el hilo que baja del páramo + las acequias que se ramifican
-          a las eras, el semillero y la huerta, con sus compuertas y pozas. */}
-      <AguaVivaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} caudal={c.lluviaViva ? 1 : 0.85} />
-      <Quebrada
-        color={nocturno ? '#7fb3d9' : '#5fb2c9'}
-        viva={c.lluviaViva}
-        perfil={perfil}
-        nocturno={nocturno}
-      />
+      <Cordillera color={nocturno ? '#3a4a63' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
+      <Quebrada color={nocturno ? '#2a4a6a' : '#5fb2c9'} viva={c.lluviaViva} perfil={perfil} />
       <VegetacionPisos nocturno={nocturno} perfil={perfil} />
-      {/* AoE: bosque denso 3x + detalle de suelo/surcos + campesinos en faena + hato en movimiento */}
-      <BosqueDensoValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
-      {/* CLIMA VIVO: la lluvia que cae de verdad, la niebla que rueda por la
-          ladera y la ESCARCHA de la helada — el clima real escrito en el suelo. */}
-      {c.lluviaViva && (
-        <LluviaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
-      )}
-      {clima === 'niebla' && (
-        <NieblaLadera alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
-      )}
-      {clima === 'amanecer' && (
-        <NieblaLadera modo="amanecer" intensidad={0.55} alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
-      )}
-      {/* EL MAR DE NUBES: el colchón de niebla de radiación posado en la
-          tierra baja del frente — la finca amanece FLOTANDO sobre él. Deriva
-          lentísima (el aire quieto de la madrugada); solo bancos, sin
-          jirones (los del cauce ya los pone la NieblaLadera de arriba). */}
-      {clima === 'amanecer' && (
-        <NieblaLadera
-          intensidad={0.5}
-          velocidad={0.45}
-          banda={BANDA_MAR_NUBES}
-          alturaDe={alturaTerreno}
-          tier={tier}
-          reducedMotion={reducedMotion}
-          semilla={43}
-        />
-      )}
-      {hayAlerta && COSA_DEL_DIA.tono === 'helada' && (clima === 'noche' || clima === 'amanecer' || clima === 'helada') && (
-        <HeladaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
-      )}
-      <CafetalDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} zona={[{ cx: 5.2, cz: 1.6, rx: 2.6, rz: 2.2 }]} />
-      <ParamoDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} />
-      {/* La LADERA ALTA poblada: terrazas de clima frío en policultivo (papa,
-          haba, cubio, arracacha + barbecho), cerca de piedra, camino y abrigo. */}
-      <LaderaAltaValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} reducedMotion={reducedMotion} />
-      {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
-      {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 10 : tier === 'bajo' ? 4 : 7} radio={4.8} reducedMotion={reducedMotion} />}
-      {/* LOGÍSTICA VISIBLE (alma Settlers): la mula acarrea estiércol→pila,
-          compost→eras y cosecha→casa por los senderos, y las pilas crecen. */}
-      {!portada && <ArrieriaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
 
-      {/* LA DIRECCIÓN DEL CUADRO: la casa donde descansa el ojo (su puerta
-          iluminada es la vía SECUNDARIA a la ventana de los mundos), los
-          senderos de tierra pisada que nacen de ella, las VENTANAS VIVAS de
-          los portales principales (la entrada PRINCIPAL: paisajes en
-          miniatura, no espejos), los pórticos humildes de lo secundario, la
-          vista del páramo con su Ent, y los patios bajo cada lugar. */}
-      <CasaCampesina
-        alturaDe={alturaTerreno}
-        perfil={perfil}
-        nocturno={nocturno}
-        practicas={practicas}
-        reducedMotion={reducedMotion}
-        onPuerta={portada ? null : onCasa}
-      />
-      <SenderosValle alturaDe={alturaTerreno} perfil={perfil} />
-      {/* JERARQUÍA DE PORTALES (regla del operador): los 6 grandes son
-          PAISAJES vivos — cada arco enmarca la viñeta 3D de su mundo (cero
-          discos-espejo); los toris de madera quedan SOLO para los lugares
-          secundarios de menos uso. */}
-      <VentanasVivas
-        mundos={MUNDOS_DIR}
-        alturaDe={alturaTerreno}
-        nocturno={nocturno}
-        practicas={practicas}
-        reducedMotion={reducedMotion}
-        perfil={perfil}
-        onEntrar={portada ? null : onEntrar}
-      />
-      <PorticosSecundarios mundos={MUNDOS_DIR} alturaDe={alturaTerreno} />
-      {/* EL ACCESO AL PÁRAMO — el Ent-queñua+frailejones del filo (VistaParamoEnt)
-          se ARCHIVÓ 2026-07-18 (pedido del operador): se veía amontonado en la
-          vista del valle. Ver src/mockups/valle/_archivo/vistaParamo.archivado.jsx.
-          El portal REAL al páramo NO estaba aquí y sigue intacto: el lugar
-          'paramo' de valleData.js (su propio rótulo tocable en el valle) sigue
-          llevando a MundoParamo3D vía wire3DNav.js `paramo: 'diorama_paramo'`. */}
-      {/* El cóndor: planea su térmica sobre el filo del páramo y a ratos se
-          POSA en el pico de la cordillera, de día (de noche duerme en la
-          peña). Un billboard: vive en todos los tiers. */}
-      {!nocturno && <CondorDelValle reducedMotion={reducedMotion} tier={tier} />}
-      {/* EL PESO DE LAS COSAS: la sombra de contacto que planta cada objeto
-          en su loma. Separa la profundidad sin mover nada — la casa, los
-          hitos y las matas dejan de flotar. De noche se atenúa, no se va. */}
-      <SombrasContacto
-        mundos={MUNDOS_DIR}
-        alturaDe={alturaTerreno}
-        nocturno={nocturno}
-        franja={clima}
-      />
-      {!portada && (
-        <PatiosLugares mundos={MUNDOS_DIR} alturaDe={alturaTerreno} nocturno={nocturno} />
-      )}
-
-      {MUNDOS_DIR.map((m) => (
-        <MundoLugar
-          key={m.id}
-          mundo={m}
-          reducedMotion={reducedMotion}
-          perfil={perfil}
-          onEntrar={portada ? null : onEntrar}
-        />
+      {MUNDOS_VALLE.map((m) => (
+        <MundoLugar key={m.id} mundo={m} reducedMotion={reducedMotion} perfil={perfil} />
       ))}
-
-      {/* Los VECINOS del valle (el oso, el borugo, el jaguar…): los personajes
-          en su casa, con presencia digna — acompañan a Angelita sin pelearle
-          el primer plano. Billboards DOM baratos: viven en TODOS los tiers
-          (el operador no debería necesitar GPU rica para conocer al oso);
-          la franja horaria decide quién está afuera. */}
-      <VecinosDelValle
-        alturaDe={alturaTerreno}
-        reducedMotion={reducedMotion}
-        franja={clima}
-      />
-      {/* EL OSO NEGRO del monte (biopunk, decisión del operador): el mayor
-          de los vecinos de tierra, visible en el borde del bosque. */}
-      <OsoNegroDelMonte alturaDe={alturaTerreno} />
       {/* MODO PORTADA (la cara de prod.chagra.app): el valle es ATMÓSFERA de
           la entrada — sin rótulos que compitan con el formulario ni faro que
           pida un toque que aún no puede darse. La vida (criaturas, Angelita,
           ciclo del día) se queda: la finca espera, no está muerta. */}
       {!portada && (
         <RotulosLugares
-          mundos={MUNDOS_DIR}
+          mundos={MUNDOS_VALLE}
           focoId={focoId}
           onEntrar={onEntrar}
           occluders={occluders}
-          controls={controls}
-          kReposo={poseReposo.k}
         />
       )}
 
-      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} tier={tier} />
+      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} />
       {!portada && (
         <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
       )}
@@ -2301,11 +2176,14 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         <CamaraDirector
           controls={controls}
           reposo={CAMARA_VALLE.position}
-          duracion={2.4}
-          amplio={1.3}
+          /* En portada la llegada es más lenta y amplia (contemplar, no operar)
+             y NO consume la clave 'valle': al cruzar la tranquera, el home aún
+             estrena su propio establishing — llegar dos veces se siente bien. */
+          duracion={portada ? 3.6 : 2.4}
+          amplio={portada ? 1.42 : 1.3}
           respiro={0.05}
           activa={!reducedMotion && tier !== 'bajo'}
-          unaVezClave="valle"
+          unaVezClave={portada ? 'portada' : 'valle'}
         />
       )}
       {/* El aplane New Donk del flujo vivo — montado de ÚLTIMO para tener la
@@ -2347,6 +2225,10 @@ export default function Valle3D({
   /* Buzón de beats coreografiados (fauna/Ent/alerta): el host (EscenaValle)
      empuja aquí `{ tipo, lado, slug, magico }` y el director lo consume. */
   beatsRef = null,
+  /* MODO PORTADA (entrada/login 3D-first de prod.chagra.app): el mismo valle
+     vivo pero como paisaje que ESPERA — sin rótulos de mundos ni faro del día,
+     con una llegada de cámara más lenta. La UI de la entrada vive en el host. */
+  portada = false,
 }) {
   const [listo, setListo] = useState(false);
   /* GUARD DEL NEGRO INTERMITENTE (auditoría 2026-07-16): sin oyente de
@@ -2422,6 +2304,7 @@ export default function Valle3D({
           aplanando={aplanando}
           camaraDirector={camaraDirector}
           beatsRef={beatsRef}
+          portada={portada}
         />
       </Suspense>
     </Canvas>
