@@ -146,6 +146,11 @@ def train(args: argparse.Namespace) -> None:
     from datasets import Dataset
     from peft import LoraConfig, prepare_model_for_kbit_training
     from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+    from transformers.models.auto import modeling_auto
+
+    if not hasattr(modeling_auto, "MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES"):
+        modeling_auto.MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES = {}
+
     from trl import DPOConfig, DPOTrainer
 
     if not torch.cuda.is_available():
