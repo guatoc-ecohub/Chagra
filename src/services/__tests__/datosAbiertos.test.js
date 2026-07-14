@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizarPrecioSIPSA } from '../services/datosAbiertos.js';
+import { normalizarPrecioSIPSA } from '../datosAbiertos.js';
 
 describe('datosAbiertos — SIPSA', () => {
   it('normaliza precio de kg a libra', () => {
