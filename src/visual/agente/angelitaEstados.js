@@ -14,10 +14,6 @@
  *                        (usted, colombiano — nunca "tú").
  *   nivelDeConfianza   → normaliza la confianza del modo científico
  *                        (número 0..1 o etiqueta) a 'alta'|'media'|'baja'.
- *   MOMENTOS_IDLE      → el repertorio del idle VIVO (acompana): los micro-
- *                        gestos de criatura que existe aunque nadie le hable.
- *   elegirMomentoIdle  → el azar ponderado (sin repetir) con el que Angelita
- *                        decide qué hacer en el próximo rato de vuelo.
  *
  * REGLA DE ORO (la misma de abejaIdentidad.js): SOLO datos. La CADENCIA vive
  * en `angelita-agente.css`; el DIBUJO en `Angelita.jsx`.
@@ -35,7 +31,6 @@ export const ESTADOS_ANGELITA = [
   'no-se',        // honesta: se encoge de hombros — no sabe y LO DICE
   'senala',       // guía: se inclina y apunta al POI, con destello donde señala
   'invita',       // guía: hace "venga" con la manita, acercándose
-  'husmea',       // fisgona: se inclina a olfatear el rastro (revisa la finca)
 ];
 
 /* Sinónimos amables → canónico. El host escribe como piensa; el cuerpo entiende. */
@@ -57,10 +52,6 @@ const ALIAS = {
   guia: 'senala',
   'guía': 'senala',
   ven: 'invita',
-  calma: 'acompana',
-  aviso: 'preocupada',
-  husmeando: 'husmea',
-  fisgonea: 'husmea',
 };
 
 /**
@@ -89,24 +80,6 @@ export const POSE_DE_ESTADO = {
   'no-se': 'vuela',
   senala: 'señala',       // el gesto afinado que ya vive en creatures.css
   invita: 'vuela',
-  husmea: 'vuela',        // la inclinación fisgona la pone el CSS del estado
-};
-
-/* Cada estado ACTÚA también con las CEJAS (CejasRubber, opt-in del cuerpo):
-   el que habla hace eyebrow-flash, la contenta las arquea, la que escucha las
-   levanta, la fisgona las frunce de concentración. null = la carita de siempre
-   (preocupada y no-se conservan SUS cejas dibujadas por el agente). */
-export const CEJAS_DE_ESTADO = {
-  acompana: null,
-  escuchando: 'altas',
-  pensando: null,
-  respondiendo: 'vivas',
-  contenta: 'alegres',
-  preocupada: null,
-  'no-se': null,
-  senala: 'fruncidas',
-  invita: 'altas',
-  husmea: 'fruncidas',
 };
 
 /* Narración para lectores de pantalla — usted, cercano, sin tecnicismos. */
@@ -120,69 +93,7 @@ export const ARIA_DE_ESTADO = {
   'no-se': 'Angelita no sabe la respuesta, y se lo dice con honestidad',
   senala: 'Angelita le está señalando algo',
   invita: 'Angelita lo invita a acercarse',
-  husmea: 'Angelita está husmeando: revisa la finca con cuidado',
 };
-
-/* ── EL REPERTORIO DEL IDLE VIVO (estado acompana) ───────────────────────────
-   Una vecina de verdad EXISTE aunque nadie le hable: entre ratos de vuelo
-   sereno ('flota') se distrae con una mota que pasa, mira alrededor, se
-   acicala las antenas con la manita, se rasca la barriguita, sacude las alas
-   y — de vez en cuando — SE POSA a descansar (aterriza con peso, respira
-   plegadita y vuelve a despegar). Angelita.jsx hojea este repertorio con un
-   reloj de jitter (nunca metrónomo); la CADENCIA de cada momento vive en
-   angelita-agente.css bajo [data-agt-idle=…].
-
-   REGLA DURA: `dur` (ms) debe COINCIDIR con la duración del keyframe one-shot
-   del CSS de ese momento — el scheduler suelta el atributo exactamente cuando
-   el gesto termina en identidad, y así el empalme no salta.
-   `peso` = probabilidad relativa al elegir (0 = no se elige por azar: son los
-   momentos de secuencia — flota es el "entre-gestos"; posada/despega los
-   encadena el propio scheduler después de posa). */
-export const MOMENTOS_IDLE = {
-  flota: { dur: [3200, 8600], peso: 0 },  // vuelo sereno entre gestos (dur al azar)
-  mira: { dur: 2600, peso: 3 },       // mira alrededor, curiosa (ojos primero, cabeza después)
-  distraida: { dur: 3600, peso: 2 },  // pasa una mota de vilano y la sigue con los ojos
-  acicala: { dur: 3000, peso: 2 },    // se acicala la antena con la manita (aseo de abeja)
-  rasca: { dur: 2400, peso: 1.5 },    // se rasca la barriguita, satisfecha
-  sacude: { dur: 1500, peso: 1.5 },   // sacudón de alas: escalofrío alegre que la esponja
-  posa: { dur: 1150, peso: 2 },       // aterriza con peso (→ posada → despega)
-  posada: { dur: [3400, 5200], peso: 0 }, // descansa posada: alitas plegadas, respira hondo
-  despega: { dur: 950, peso: 0 },     // se agacha, coge impulso y vuelve al aire
-};
-
-/* Los momentos elegibles por azar (peso > 0), congelados una vez. */
-const GESTOS_IDLE = Object.keys(MOMENTOS_IDLE).filter((m) => MOMENTOS_IDLE[m].peso > 0);
-
-/**
- * Elige el próximo micro-gesto del idle: azar ponderado que NUNCA repite el
- * anterior (una criatura viva no se rasca dos veces seguidas como un GIF).
- * Pura y testeable: el azar se inyecta.
- * @param {string|null} [previo]  el último gesto hecho (se excluye).
- * @param {() => number} [rand]  fuente de azar 0..1 (default Math.random).
- * @returns {string} nombre del momento elegido.
- */
-export function elegirMomentoIdle(previo = null, rand = Math.random) {
-  const candidatos = GESTOS_IDLE.filter((m) => m !== previo);
-  const total = candidatos.reduce((s, m) => s + MOMENTOS_IDLE[m].peso, 0);
-  let bola = rand() * total;
-  for (const m of candidatos) {
-    bola -= MOMENTOS_IDLE[m].peso;
-    if (bola <= 0) return m;
-  }
-  return candidatos[candidatos.length - 1];
-}
-
-/**
- * Duración en ms de un momento del idle; los rangos [min,max] salen con
- * jitter (el reloj de una criatura viva no es de cuarzo).
- * @param {string} momento
- * @param {() => number} [rand]
- * @returns {number}
- */
-export function duracionDeMomento(momento, rand = Math.random) {
-  const m = MOMENTOS_IDLE[momento] || MOMENTOS_IDLE.flota;
-  return Array.isArray(m.dur) ? Math.round(m.dur[0] + rand() * (m.dur[1] - m.dur[0])) : m.dur;
-}
 
 /* ── CONFIANZA (modo científico) ─────────────────────────────────────────────
    Chagra valora la honestidad sobre la alucinación: cuando el agente responde
