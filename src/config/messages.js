@@ -312,7 +312,27 @@ const messages = {
 export const MSG = new Proxy(messages, {
   get(target, prop) {
     if (prop === 'format') return target.format;
-    return target[prop];
+  // ── Shell prod.chagra.app (2026-07-14) ──────────────────────
+  shell: {
+    valleTitulo: 'El valle de su finca',
+    valleLema: 'Toque un mundo para entrar. Su finca es un lugar, no un menú.',
+    explorarSinLogin: 'Explore el valle. Para entrar a los mundos, inicie sesión.',
+    iniciarSesion: 'Iniciar sesión',
+    cerrarSesion: 'Cerrar sesión',
+    volverAlValle: 'Volver al valle',
+    menu: 'Menú',
+    perfil: 'Perfil',
+    agente: 'Agente',
+    mundos: 'Mundos',
+    sierraGlobal: 'Sierra Nevada',
+    galeriaPisos: 'Galería por piso térmico',
+    offlineTitulo: 'Sin conexión',
+    offlineMensaje: 'No hay conexión a internet. Puede explorar el valle y ver lo que ya tiene guardado.',
+    actualizando: 'Actualizando Chagra...',
+    actualizacionLista: 'Nueva versión disponible. Recargue para actualizar.',
+  },
+
+  return target[prop];
   },
 });
 
