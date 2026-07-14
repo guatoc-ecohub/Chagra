@@ -22,6 +22,10 @@ import {
 // DESPUES de que el componente se desmontó → el audio se reproduce sin dueño.
 import { stop as stopAllAudio } from '../services/ttsService.js';
 
+// Indicador de sincronización offline (modo campo).
+// Muestra un badge con operaciones pendientes cuando no hay red.
+import SyncIndicator from '../components/SyncIndicator.jsx';
+
 import ChagraGrowLoader from '../components/ChagraGrowLoader';
 const LoginScreen = lazy(() => import('../components/LoginScreen.jsx'));
 const OAuthCallback = lazy(() => import('../components/OAuthCallback.jsx'));
@@ -317,8 +321,11 @@ export default function ProdChagraApp() {
   if (!Componente) return <ChagraGrowLoader />;
 
   return (
-    <Suspense fallback={<ChagraGrowLoader />}>
-      <Componente />
-    </Suspense>
+    <>
+      <SyncIndicator />
+      <Suspense fallback={<ChagraGrowLoader />}>
+        <Componente />
+      </Suspense>
+    </>
   );
 }
