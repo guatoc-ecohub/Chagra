@@ -792,6 +792,46 @@ export const NUCLEO_APP = [
     categoria: '2D-app',
   },
 
+  // ── Juegos (promovidos de PENDIENTE, smoke-test OK 2026-07-14) ─
+  {
+    path: 'juego',
+    componente: 'MiFincaVivaScreen',
+    importLazy: 'src/components/juego/MiFincaVivaScreen.jsx',
+    categoria: '2D-app',
+  },
+  {
+    path: 'defensores',
+    componente: 'DefensoresFincaScreen',
+    importLazy: 'src/components/juego/DefensoresFincaScreen.jsx',
+    categoria: '2D-app',
+  },
+  {
+    path: 'milpa',
+    componente: 'MilpaSimulator',
+    importLazy: 'src/components/juego/MilpaSimulator.jsx',
+    categoria: '2D-app',
+  },
+  {
+    path: 'doom_finca',
+    componente: 'DoomFincaScreen',
+    importLazy: 'src/components/juego/DoomFincaScreen.jsx',
+    categoria: '2D-app',
+  },
+  {
+    path: 'metal_slug_campo',
+    alias: ['mockup_metal_slug_campo'],
+    componente: 'MetalSlugCampo',
+    importLazy: 'src/mockups/MetalSlugCampo.jsx',
+    categoria: '2D-app',
+  },
+  {
+    path: 'juego_la_milpa',
+    alias: ['mockup_juego_la_milpa'],
+    componente: 'JuegoLaMilpa',
+    importLazy: 'src/mockups/JuegoLaMilpa.jsx',
+    categoria: '2D-app',
+  },
+
   // ── Mercado / Red humana ──────────────────────────────────────
   // (ver PENDIENTE_DECISION abajo)
 ];
@@ -984,49 +1024,9 @@ export const PENDIENTE_DECISION = [
     motivo: 'Onboarding como ritual de siembra (SVG animado). ¿Reemplaza o complementa OnboardingProfile?',
   },
 
-  // ── Juegos ──────────────────────────────────────────────────────
-  {
-    path: 'juego',
-    componente: 'MiFincaVivaScreen',
-    importLazy: 'src/components/juego/MiFincaVivaScreen.jsx',
-    decision: null,
-    motivo: 'Juego "Mi finca viva". ¿Va en prod como sección de juegos o se excluye?',
-  },
-  {
-    path: 'defensores',
-    componente: 'DefensoresFincaScreen',
-    importLazy: 'src/components/juego/DefensoresFincaScreen.jsx',
-    decision: null,
-    motivo: 'Juego Defensores de la Finca. Ídem.',
-  },
-  {
-    path: 'milpa',
-    componente: 'MilpaSimulator',
-    importLazy: 'src/components/juego/MilpaSimulator.jsx',
-    decision: null,
-    motivo: 'Simulador de milpa. Ídem.',
-  },
-  {
-    path: 'doom_finca',
-    componente: 'DoomFincaScreen',
-    importLazy: 'src/components/juego/DoomFincaScreen.jsx',
-    decision: null,
-    motivo: 'Metal Slug del campo. Ídem.',
-  },
-  {
-    path: 'mockup_metal_slug_campo',
-    componente: 'MetalSlugCampo',
-    importLazy: 'src/mockups/MetalSlugCampo.jsx',
-    decision: null,
-    motivo: 'Prototipo jugable nivel 1. Si Metal Slug va, este mockup se promueve a ruta real.',
-  },
-  {
-    path: 'mockup_juego_la_milpa',
-    componente: 'JuegoLaMilpa',
-    importLazy: 'src/mockups/JuegoLaMilpa.jsx',
-    decision: null,
-    motivo: 'Mini-juego las tres hermanas. ¿Ruta real o solo vitrina?',
-  },
+  // ── Juegos PROMOVIDOS a NUCLEO_APP (smoke-test OK, 2026-07-14) ─
+  // Los 6 juegos + Metal Slug mockup pasaron smoke test sin crash.
+  // Movidos a NUCLEO_APP abajo. Este bloque queda vacío como marcador.
 
   // ── Mercado / Red humana ───────────────────────────────────────
   {

@@ -14,35 +14,18 @@
 
 /** @type {Record<string, string>} */
 export const RUTA_2D_DESDE_3D = {
-  // ── La casa del valle (vía SECUNDARIA, fix del operador 2026-07-16,
-  //    recableada 2026-07-18): tocar la puerta iluminada lleva al MIRADOR
-  //    DE LOS MUNDOS — VitrinaMaestraMundos, la puerta maestra a los 15
-  //    mundos 3D por piso térmico (con su viaje Odyssey), no la ventana
-  //    plana de antes. La entrada principal a cada mundo sigue siendo su
-  //    portal-paisaje directo en el valle. ──
-  // La casa mete ADENTRO en 3D (fogón, fermentos y la ventana de los mundos);
-  // antes saltaba directo a la vitrina 2D. Bug reportado por el operador.
-  casa: 'casa_adentro',
-
   // ── Mundos principales del valle (valleData.js LUGARES) ─────────
   agua: 'agua',
-  // El portal del café lleva al MUNDO 3D (cafetal con sombrío y cereza roja),
-  // no a la pantalla 2D de precios. Bug reportado por el operador.
-  cafe: 'cafetal_vivo',
+  cafe: 'cafe',
   cultivos: 'mundo_cultivos',
   suelo: 'suelo',
   sanidad: 'sanidad_sintoma',
   animales: 'animales',
   clima: 'clima_boletin',
-  mercado: 'mercados',
+  mercado: 'mercado',
   semillero: 'semilla',
   disenio: 'biodiversidad',
-  // Los hongos no tienen pantalla propia todavía: el mundo subterráneo
-  // (subsuelo) es su casa 2D hasta entonces (fix del director, DIRECCION #3).
-  micorrizas: 'subsuelo',
-  // La puerta del páramo en el valle (el frailejonal de la zona fría):
-  // abre el mundo del páramo entero.
-  paramo: 'diorama_paramo',
+  micorrizas: null, // todavía no hay ruta 2D equivalente
   bosque_vivo: 'bosque_vivo',
 
   // ── Sub-hotspots de cada escena 3D (mundoData.js hotspots con view:) ─
@@ -81,7 +64,7 @@ export const RUTA_2D_DESDE_3D = {
   guardian: 'espiritu_pro',
   corral: 'animales',
   cosecha: 'mi_cosecha',
-  vender: 'mercados',
+  vender: 'mercado',
   papa: 'tuberculos',
   rio: 'agua',
   platano: 'platano',

@@ -62,6 +62,7 @@ import Mundo, {
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
 import { speak, speakKokoro, stop as stopSpeak } from '../services/ttsService.js';
+import { navegarDesde3D } from '../prodApp/wire3DNav.js';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
@@ -339,6 +340,9 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
       setFocoId(id);
       setPanel(id);
       decir(NARRACION[id] || MUNDO_VALLE_BY_ID[id]?.lema || '');
+      // Navegar al 2D correspondiente (wire nav 3D→2D).
+      // Retardo para que la cámara enfoque antes de cambiar de pantalla.
+      setTimeout(() => navegarDesde3D(id), 700);
     },
     [decir],
   );
