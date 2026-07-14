@@ -8,6 +8,7 @@
     "test": "vitest run && node scripts/validate-catalog-consistency.mjs --report-only",
     "prebuild": "node scripts/build-catalog-sqlite.mjs && node scripts/generate-cycle-content-manifest.mjs && node scripts/gen-chagra-stats.mjs",
     "build": "vite build",
+    "build:prod": "node scripts/build-prod.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test:e2e": "playwright test",
