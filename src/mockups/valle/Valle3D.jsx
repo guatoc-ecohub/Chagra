@@ -40,7 +40,13 @@ import { Colibri } from '../../visual/creatures/Colibri.jsx';
 import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
 import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
 import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
-import AnimalesDeFinca from './animales.jsx';
+import AnimalesDeFinca, { MATERIAL_FINCA } from './animales.jsx';
+/* Cultivos REALISTAS de la finca (feedback del operador: "el maíz que parezca
+   maíz"): milpa y cafetal fusionados con color horneado — 1 draw-call cada uno. */
+import { geomMilpa, geomCafetal } from '../../visual/mundo3d/finca/fincaRealista.geom.js';
+/* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
+   (roble, aliso, gaque) que ya viven en floraParamo. */
+import { geomRoble, geomAliso, geomGaque } from '../../visual/mundo3d/bosque/floraParamo.geom.js';
 /* Luciérnagas de la noche: el kit instanciado que ya existe (1-3 draw calls),
    sembrado sobre la tierra baja del valle cuando la franja las trae. */
 import { ParticulasAmbientales } from '../../visual/mundo3d/ParticulasAmbientales.jsx';
@@ -226,54 +232,52 @@ function Quebrada({ color, viva, perfil }) {
   );
 }
 
-/* ── Materiales/paletas de cada landmark de mundo, por `tipo`. Formas
-      redondeadas (cilindros, conos, esferas) — pocas piezas por lugar para
-      dejar aire. ── */
-function LandmarkGeom({ tipo, tinte, reducedMotion }) {
+/* ── La arboleda POR ESPECIE del landmark 'bosque': roble andino (copa ancha
+      oscura con bellotas), aliso (cónico de tronco claro) y gaque (domo bajo
+      lustroso) — cada árbol se distingue, nada de conos genéricos. Las mallas
+      son las de floraParamo (color horneado); escala ~0.5 para el diorama. ── */
+const SITIOS_ARBOLEDA = [
+  { geom: geomRoble, args: [-0.55, 0, 0.15], esc: 0.52, rot: 0.8, seed: 91 },
+  { geom: geomAliso, args: [0.45, 0, -0.35], esc: 0.5, rot: 2.1, seed: 92 },
+  { geom: geomGaque, args: [0.2, 0, 0.55], esc: 0.55, rot: 4.4, seed: 93 },
+];
+
+function ArboledaEspecies({ q }) {
+  const arboles = useMemo(
+    () => SITIOS_ARBOLEDA.map((s) => ({ ...s, geo: s.geom({ q }, s.seed) })),
+    [q],
+  );
+  return (
+    <group>
+      {arboles.map((a, i) => (
+        <mesh
+          key={i}
+          geometry={a.geo}
+          material={MATERIAL_FINCA}
+          position={a.args}
+          rotation={[0, a.rot, 0]}
+          scale={a.esc}
+          castShadow
+        />
+      ))}
+    </group>
+  );
+}
+
+/* ── Materiales/paletas de cada landmark de mundo, por `tipo`. Los cultivos y
+      animales de la finca van REALISTAS (fincaRealista.geom: mallas fusionadas
+      con color horneado); el resto sigue en primitivas redondeadas. `q` baja
+      el detalle geométrico en perfil frugal. ── */
+function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
   const [fuerte, suave] = tinte;
   switch (tipo) {
-    case 'milpa': // maíz: cañas altas con penacho + hojas
+    case 'milpa': // el maíz REAL: caña con nudos, hojas arqueadas, mazorca y penacho
       return (
-        <group>
-          {[-0.42, 0.05, 0.42].map((dx, i) => (
-            <group key={i} position={[dx, 0, (i % 2) * 0.36 - 0.18]}>
-              <mesh position={[0, 0.7, 0]} castShadow>
-                <cylinderGeometry args={[0.05, 0.08, 1.4, 6]} />
-                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-              </mesh>
-              {/* hojas: conos aplanados que salen de la caña */}
-              <mesh position={[0.16, 0.9, 0]} rotation={[0, 0, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.12, 0.5, 4]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              <mesh position={[-0.16, 0.62, 0]} rotation={[0, Math.PI, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.12, 0.5, 4]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              <mesh position={[0, 1.5, 0]}>
-                <coneGeometry args={[0.08, 0.42, 6]} />
-                <meshStandardMaterial color="#e7c96b" flatShading />
-              </mesh>
-            </group>
-          ))}
-        </group>
+        <mesh geometry={geomMilpa({ q, matas: q > 0.6 ? 6 : 4 })} material={MATERIAL_FINCA} castShadow />
       );
-    case 'cafetal': // arbustos redondos con frutos, en la ladera
+    case 'cafetal': // cafetos de verdad: pisos de ramas, hoja oscura y cereza roja
       return (
-        <group>
-          {[-0.5, 0.1, 0.55].map((dx, i) => (
-            <group key={i} position={[dx, 0, (i % 2) * 0.42]}>
-              <mesh position={[0, 0.16, 0]}>
-                <cylinderGeometry args={[0.05, 0.07, 0.32, 6]} />
-                <meshStandardMaterial color="#6b4a2e" flatShading />
-              </mesh>
-              <mesh position={[0, 0.44, 0]} castShadow>
-                <sphereGeometry args={[0.32, 10, 9]} />
-                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-              </mesh>
-            </group>
-          ))}
-        </group>
+        <mesh geometry={geomCafetal({ q })} material={MATERIAL_FINCA} castShadow />
       );
     case 'era': // eras del semillero: camellones redondeados (lomos de tierra)
       return (
@@ -311,8 +315,8 @@ function LandmarkGeom({ tipo, tinte, reducedMotion }) {
           ))}
         </group>
       );
-    case 'animales': // los animales de la finca (reemplaza la vieja casita)
-      return <AnimalesDeFinca reducedMotion={reducedMotion} />;
+    case 'animales': // el hato realista por raza (vaca, cerdos, gallinas, perro)
+      return <AnimalesDeFinca reducedMotion={reducedMotion} q={q} />;
     case 'huerta': // camas de la huerta: lomos redondeados con matas
       return (
         <group>
@@ -332,40 +336,8 @@ function LandmarkGeom({ tipo, tinte, reducedMotion }) {
           ))}
         </group>
       );
-    case 'bosque': // arboleda: troncos + copas cónicas Y esféricas mezcladas
-      return (
-        <group>
-          {[
-            [-0.5, 0, 0.95, 'cono'],
-            [0.45, 0.2, 1.2, 'esfera'],
-            [0.05, -0.45, 0.85, 'cono'],
-          ].map(([dx, dz, h, forma], i) => (
-            <group key={i} position={[Number(dx), 0, Number(dz)]}>
-              <mesh position={[0, Number(h) * 0.35, 0]} castShadow>
-                <cylinderGeometry args={[0.08, 0.12, Number(h) * 0.7, 6]} />
-                <meshStandardMaterial color="#6b4a2e" flatShading />
-              </mesh>
-              {forma === 'cono' ? (
-                <mesh position={[0, Number(h) * 0.85, 0]} castShadow>
-                  <coneGeometry args={[0.46, Number(h) * 0.95, 8]} />
-                  <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-                </mesh>
-              ) : (
-                <group position={[0, Number(h) * 0.85, 0]}>
-                  <mesh castShadow>
-                    <sphereGeometry args={[0.42, 10, 9]} />
-                    <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-                  </mesh>
-                  <mesh position={[0.22, 0.18, 0.1]} castShadow>
-                    <sphereGeometry args={[0.26, 9, 8]} />
-                    <meshStandardMaterial color={suave} flatShading roughness={1} />
-                  </mesh>
-                </group>
-              )}
-            </group>
-          ))}
-        </group>
-      );
+    case 'bosque': // arboleda POR ESPECIE: roble andino + aliso + gaque
+      return <ArboledaEspecies q={q} />;
     case 'mercado': // puesto de mercado campesino: toldo a dos aguas + mesa + canasto
       return (
         <group>
@@ -737,7 +709,12 @@ function MundoLugar({ mundo, reducedMotion, perfil }) {
   const detalle = mundo.tipo === 'veleta' ? (
     <Veleta color={mundo.tinte[0]} reducedMotion={reducedMotion} />
   ) : (
-    <LandmarkGeom tipo={mundo.tipo} tinte={mundo.tinte} reducedMotion={reducedMotion} />
+    <LandmarkGeom
+      tipo={mundo.tipo}
+      tinte={mundo.tinte}
+      reducedMotion={reducedMotion}
+      q={perfil.materialRico ? 1 : 0.55}
+    />
   );
   return (
     <group position={[mundo.pos[0], y, mundo.pos[2]]} scale={mundo.escala}>
