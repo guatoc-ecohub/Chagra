@@ -218,7 +218,7 @@ export default function HotspotFeedback({
   const blending = perfil.aditivo ? THREE.AdditiveBlending : THREE.NormalBlending;
 
   return (
-    <group ref={grupoRef} position={pos} visible={false}>
+    <group ref={grupoRef} position={/** @type {[number, number, number]} */ (pos)} visible={false}>
       {/* disco suave de asiento (el "charco" de luz bajo el hotspot) */}
       <mesh ref={discoRef} rotation-x={-Math.PI / 2} position-y={0.015}>
         <circleGeometry args={[0.92, perfil.segmentos]} />

@@ -620,9 +620,9 @@ export default function GaleriaGemelos2D() {
           diorama 3D. Toque una chapa para ver a dónde lo lleva.
         </p>
       </div>
-      <GemeloCafe2D />
-      <GemeloSanidad2D />
-      <GemeloAgua2D />
+      <GemeloCafe2D onHotspot={() => {}} />
+      <GemeloSanidad2D onHotspot={() => {}} />
+      <GemeloAgua2D onHotspot={() => {}} />
     </div>
   );
 }

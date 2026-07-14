@@ -93,7 +93,7 @@ const IMPORTADORES = {
 };
 
 const COMPONENTES = Object.fromEntries(
-  Object.entries(IMPORTADORES).map(([id, imp]) => [id, lazy(imp)]),
+  Object.entries(IMPORTADORES).map(([id, imp]) => [id, lazy(() => imp().then(m => (/** @type {any} */ (m)).default || m))]),
 );
 
 /* La fila de ADELANTE (los mundos del diario) y la de ATRÁS en su terraza.
@@ -250,7 +250,7 @@ function CamaraVitrina({ fase, boca, reducedMotion, onLlegada }) {
 
 /* El lienzo del círculo: cielo de fondo + media luna de suelo + loma lejana.
    Esto es lo que garantiza que la ventana se vea LLENA, no un ícono flotando. */
-function FondoVineta({ cielo, suelo, loma }) {
+function FondoVineta({ cielo, suelo, loma = null }) {
   return (
     <group>
       <mesh position={[0, 0, -0.34]}>
@@ -562,7 +562,7 @@ function VinetaMercado({ animada }) {
         <meshLambertMaterial color={PALETA.maderaClara} flatShading />
       </mesh>
       {[['#b8352f', -0.2], [PALETA.ambar, 0], ['#7a9a3f', 0.2]].map(([c, x], i) => (
-        <mesh key={i} ref={(m) => (frutas.current[i] = m)} position={[x, -0.16, -0.18]}>
+        <mesh key={i} ref={(m) => (frutas.current[i] = m)} position={[/** @type {number} */ (x), -0.16, -0.18]}>
           <sphereGeometry args={[0.065, 7, 6]} />
           <meshLambertMaterial color={c} flatShading />
         </mesh>
@@ -1779,7 +1779,7 @@ export default function VitrinaMaestraMundos({ onBack }) {
     (id) => {
       setMundoId(id);
       setSenalado(null);
-      IMPORTADORES[id]?.(); // precalentar el chunk: el dolly esconde la carga
+      IMPORTADORES[/** @type {any} */ (id)]?.(); // precalentar el chunk: el dolly esconde la carga
       if (sinCanvas || reducedMotion) setViaje('entrar');
       else setFase('acercando');
     },

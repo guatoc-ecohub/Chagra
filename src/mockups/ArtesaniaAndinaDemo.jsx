@@ -71,7 +71,7 @@ function LucesDoradas() {
     <>
       <hemisphereLight intensity={DORADA.hemisferio} color={DORADA.cielo} groundColor={DORADA.suelo} />
       <ambientLight intensity={DORADA.ambiente} color={DORADA.luz} />
-      <directionalLight position={DORADA.solPos} intensity={DORADA.sol} color={DORADA.luz} />
+      <directionalLight position={/** @type {[number, number, number]} */ (DORADA.solPos)} intensity={DORADA.sol} color={DORADA.luz} />
       <directionalLight position={[-6, 4, -7]} intensity={DORADA.rellenoInt} color={DORADA.relleno} />
     </>
   );

@@ -126,7 +126,7 @@ function LienzoPieza({ tipo, dims, tier, reducedMotion }) {
         <meshLambertMaterial color="#b49873" />
       </mesh>
       <Suspense fallback={null}>
-        <Infraestructura tipo={tipo} dims={dims} tier={tier} reducedMotion={reducedMotion} />
+        <Infraestructura tipo={tipo} dims={dims} params={{}} tier={tier} reducedMotion={reducedMotion} />
       </Suspense>
       <OrbitControls
         target={[0, dims.alto * 0.42, 0]}
@@ -415,6 +415,8 @@ function DemoColocar({ modo3D, tier, reducedMotion }) {
                 tipo={c.tipo}
                 pos={c.pos}
                 rot={c.rot}
+                dims={/** @type {any} */ (undefined)}
+                params={/** @type {any} */ (undefined)}
                 tier={tier}
                 reducedMotion={reducedMotion}
               />
@@ -426,6 +428,8 @@ function DemoColocar({ modo3D, tier, reducedMotion }) {
                   tipo={borrador.tipo}
                   pos={borrador.pos}
                   rot={borrador.rot}
+                  dims={/** @type {any} */ (undefined)}
+                  params={/** @type {any} */ (undefined)}
                   tier={tier}
                   reducedMotion={reducedMotion}
                 />
@@ -462,7 +466,7 @@ function DemoColocar({ modo3D, tier, reducedMotion }) {
 export default function VitrinaInfraestructura({ onBack }) {
   const tierInicial = useMemo(() => decidirTier(), []);
   const [pestana, setPestana] = useState(PESTANAS[0].id);
-  const [tier, setTier] = useState(tierInicial === 'bajo' ? 'bajo' : tierInicial);
+  const [tier, setTier] = useState(/** @type {any} */ (tierInicial));
   const [soloFichas, setSoloFichas] = useState(() => !permite3D(tierInicial));
   const [reducedMotion, setReducedMotion] = useState(
     () =>

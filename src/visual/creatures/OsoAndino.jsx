@@ -102,7 +102,7 @@ export function OsoAndino({
 
   // CLIMA → cuerpo (determinista, una vez por render): tinte + opacidad al
   // contorno. El oso no tiene alas (velocidadAlas siempre 1: no se usa).
-  const cuerpoClima = cuerpoDeClima(clima, { enso, tier, perfil: PERFIL_OSO });
+  const cuerpoClima = cuerpoDeClima(clima, { enso: /** @type {any} */ (enso), tier, perfil: PERFIL_OSO });
   const estiloClima = (cuerpoClima.tinte || cuerpoClima.opacidad < 1)
     ? { filter: cuerpoClima.tinte || undefined, opacity: cuerpoClima.opacidad < 1 ? cuerpoClima.opacidad : undefined }
     : undefined;

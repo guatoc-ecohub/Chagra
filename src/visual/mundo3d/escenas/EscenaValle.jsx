@@ -205,7 +205,7 @@ export default function EscenaValle({
         <FaunaAmbiental
           central={avatar.id}
           excluir={EXCLUIR_FAUNA_VALLE}
-          tier={tier}
+          tier={/** @type {'alto'|'medio'|'bajo'} */ (tier)}
           reducedMotion={reducedMotion}
           puntos={PUNTOS_FAUNA_VALLE}
         />

@@ -348,7 +348,7 @@ function Mundo({ tier, reducedMotion, hotspots, onHotspot }) {
  */
 export default function EscenaMicorrizas({ tier = 'alto', reducedMotion = false, hotspots, onHotspot }) {
   const [listo, setListo] = useState(false);
-  const dpr = tier === 'alto' ? [1, 1.8] : tier === 'medio' ? [1, 1.3] : 1;
+  const dpr = /** @type {import('@react-three/fiber').Dpr} */ (tier === 'alto' ? [1, 1.8] : tier === 'medio' ? [1, 1.3] : 1);
   return (
     <>
       <style>{CSS}</style>

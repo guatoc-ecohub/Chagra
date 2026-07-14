@@ -67,7 +67,7 @@ export const PODER_MS = 2600;
  */
 export function usePoderTemporal({ ms = PODER_MS } = {}) {
   const [poderoso, setPoderoso] = useState(false);
-  const timerRef = useRef(0);
+  const timerRef = useRef(/** @type {number|ReturnType<typeof setTimeout>} */ (0));
 
   const apagar = useCallback(() => {
     clearTimeout(timerRef.current);

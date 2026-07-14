@@ -152,7 +152,7 @@ function Escena({ tier, reducedMotion }) {
       {perfil.fog ? <fog attach="fog" args={[DORADA.niebla, DORADA.nieblaCerca, DORADA.nieblaLejos]} /> : null}
       <hemisphereLight intensity={DORADA.hemisferio} color={DORADA.cielo} groundColor={DORADA.suelo} />
       <ambientLight intensity={ATMOSFERA.ambiente} color={DORADA.luz} />
-      <directionalLight position={DORADA.solPos} intensity={DORADA.sol} color={DORADA.luz} />
+      <directionalLight position={/** @type {[number, number, number]} */ (DORADA.solPos)} intensity={DORADA.sol} color={DORADA.luz} />
       <mesh position={[0, -0.12, 0]}><cylinderGeometry args={[7.2, 6.7, 0.55, 32]} /><meshLambertMaterial color={COLORES.pasto} /></mesh>
       <mesh position={[0, 0.17, 2.9]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[11, 1.45]} /><meshLambertMaterial color={COLORES.tierra} /></mesh>
       <ColmenaLangstroth posicion={[-4.15, 0.2, -1.2]} />

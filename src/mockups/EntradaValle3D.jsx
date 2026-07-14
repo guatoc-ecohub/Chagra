@@ -112,6 +112,7 @@ class Valle3DGuard extends Component {
  *   Sin ella (vitrina #/mockups/entrada-3d, sin sesión) Angelita solo las
  *   nombra — el comportamiento de siempre.
  */
+/** @param {{ onBack?: () => void; onNavigate?: (view: string, data?: any) => void; initialMundoId?: any }} props */
 export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = null }) {
   const [focoId, setFocoId] = useState(null);
   const [panel, setPanel] = useState(null); // null | 'alerta' | <mundoId>

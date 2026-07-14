@@ -640,6 +640,7 @@ export default function CorralVivo({ animales: lista, reducedMotion, tier = 'alt
           animal={a}
           modo={a.momento}
           destino={a.pos}
+          origen={a.pos}
           reducedMotion={reducedMotion}
           tier={tier}
           onPick={alPicar}

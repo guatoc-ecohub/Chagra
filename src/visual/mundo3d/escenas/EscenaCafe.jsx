@@ -163,7 +163,7 @@ function Beneficio({ pos }) {
       {/* el secadero (paseo/parabólico): cama elevada con la capa de grano al sol */}
       <group position={[0.3, 0, 0.72]}>
         {[[-0.28, 0.16, -0.16], [0.28, 0.16, -0.16], [-0.28, 0.16, 0.16], [0.28, 0.16, 0.16]].map((p, i) => (
-          <mesh key={i} position={p}>
+          <mesh key={i} position={/** @type {[number, number, number]} */ (p)}>
             <cylinderGeometry args={[0.02, 0.02, 0.32, 5]} />
             <meshLambertMaterial color={PALETA.madera} flatShading />
           </mesh>

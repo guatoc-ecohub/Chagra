@@ -39,7 +39,7 @@ import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
    de mundo (drei Html transform: mundo = px · distanceFactor / 400). */
 const MURAL_PX = { w: 640, h: 360 };
 const MURAL_DF = 2.5;
-const MURAL_POS = [0, 2.0, -1.5];
+const MURAL_POS = /** @type {[number, number, number]} */ ([0, 2.0, -1.5]);
 
 /* Órbita 3D: la finca en tres cuartos, el mural se lee como valla en la loma. */
 const POSE_VALLE = {
@@ -560,7 +560,7 @@ export default function NewDonk2Den3D({ onBack }) {
   const enJuego = fase === 'juego2d';
   const viajando = fase === 'acercando' || fase === 'saliendo';
 
-  const dpr = useMemo(() => [1, 1.5], []);
+  const dpr = /** @type {[number, number]} */ ([1, 1.5]);
 
   return (
     <section

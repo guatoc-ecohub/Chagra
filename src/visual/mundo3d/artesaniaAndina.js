@@ -344,9 +344,9 @@ export function perfilGenericoDe(perfil) {
  */
 export function puntosSilueta(nombre, { alto = 1, radio, generico = false } = {}) {
   const base = SILUETAS_ANDINAS[nombre] || SILUETAS_ANDINAS.vasija;
-  const perfil = generico ? perfilGenericoDe(base) : base;
+  const perfil = generico ? perfilGenericoDe(/** @type {[number,number][]} */ (base)) : /** @type {[number,number][]} */ (base);
   const rr = radio ?? alto;
-  return perfil.map(([r, y]) => [r * rr, y * alto]);
+  return /** @type {Array<[number, number]>} */ (/** @type {[number,number][]} */ (perfil).map(([r, y]) => [r * rr, y * alto]));
 }
 
 /**

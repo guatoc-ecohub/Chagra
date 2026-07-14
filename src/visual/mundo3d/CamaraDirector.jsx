@@ -170,7 +170,7 @@ export function useCamaraDirector({
   controls = null,
   alAsentar = null,
 }) {
-  const camera = useThree((s) => s.camera);
+  const camera = /** @type {import('three').PerspectiveCamera} */ (useThree((s) => s.camera));
   const invalidate = useThree((s) => s.invalidate);
 
   /* Callback en ref: cambiarlo no re-corre la toma en curso. */

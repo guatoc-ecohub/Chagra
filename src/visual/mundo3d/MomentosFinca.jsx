@@ -116,7 +116,7 @@ function useBeat({ activo, animar, dur, claveBeat, aplicar, onFin }) {
 
 /* Motas tenues que suben y se desvanecen (el mismo gesto tibio del corral).
    El dueño las mueve por ref con `subirMotas`; aquí solo se dibujan. */
-function MotasBeat({ refGrupo, color, position = /** @type {const} */([0, 0, 0]) }) {
+function MotasBeat({ refGrupo, color, position = /** @type {[number, number, number]} */([0, 0, 0]) }) {
   return (
     <group ref={refGrupo} position={position} visible={false}>
       {[0, 1, 2].map((k) => (
@@ -151,7 +151,7 @@ export function MomentoNace({
   reducedMotion = false,
   onFin,
   claveBeat,
-  position = /** @type {const} */([0, 0, 0]),
+  position = /** @type {[number, number, number]} */([0, 0, 0]),
   colorBrote = PALETA.follajeClaro,
 }) {
   const monticulo = useRef(null);
@@ -394,7 +394,7 @@ export function MomentoCosecha({
   reducedMotion = false,
   onFin,
   claveBeat,
-  position = /** @type {const} */([0, 0, 0]),
+  position = /** @type {[number, number, number]} */([0, 0, 0]),
   origen = /** @type {const} */([0, 1.05, 0]),
   destino = /** @type {const} */([0.85, 0, 0.5]),
   colorFruto = LUZ_MOMENTO.fruto,
@@ -503,11 +503,11 @@ export function MomentoVende({
   reducedMotion = false,
   onFin,
   claveBeat,
-  position = /** @type {const} */([0, 0, 0]),
+  position = /** @type {[number, number, number]} */([0, 0, 0]),
   origen = /** @type {const} */([0, 0, 0]),
   destino = /** @type {const} */([2.2, 0, -1.4]),
   colorBulto = PALETA.ambar,
-  children,
+  children = null,
 }) {
   const raiz = useRef(null); // posición en el mundo
   const cuerpo = useRef(null); // squash/stretch, giro y venia

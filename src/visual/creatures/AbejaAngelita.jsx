@@ -126,7 +126,7 @@ export function AbejaAngelita({
   //    (dorada) o pesa (lluvia) escalando la duración base de `.crt-wing` (0.15s).
   //    Sin clima → neutro: filtro/opacidad nulos, aleteo base. RM: como `wing` va
   //    solo con `animated`, la duración cuelga de nodos ya quietos (inocua).
-  const cuerpoClima = cuerpoDeClima(clima, { enso, tier, perfil: PERFIL_ABEJA });
+  const cuerpoClima = cuerpoDeClima(clima, { enso: /** @type {any} */ (enso), tier, perfil: PERFIL_ABEJA });
   // Solo estampamos duración inline cuando el clima REALMENTE cambia el aleteo
   // (≠1): así un clima neutro NO pisa los overrides de pose ('celebra'/'reposo').
   const wingDur = (wing && cuerpoClima.velocidadAlas !== 1)

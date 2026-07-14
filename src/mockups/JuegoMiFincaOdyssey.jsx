@@ -764,10 +764,10 @@ function JuegoFinca2D({ tier, reducedMotion, onSalir, onProgreso }) {
                 {e.tipo === 'aliada' && (
                   <>
                     <div className="ody-fauna ody-fauna--mariquita">
-                      <MariquitaRubber size={46} inline animated={!reducedMotion} tier={tier} />
+                      <MariquitaRubber size={46} inline animated={!reducedMotion} tier={tier} className="" />
                     </div>
                     <div className="ody-fauna ody-fauna--lombriz">
-                      <LombrizRubber size={52} inline animated={!reducedMotion} tier={tier} />
+                      <LombrizRubber size={52} inline animated={!reducedMotion} tier={tier} className="" />
                     </div>
                   </>
                 )}

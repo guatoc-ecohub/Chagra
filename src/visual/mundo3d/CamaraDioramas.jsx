@@ -73,7 +73,7 @@ export default function CamaraDioramas({
   const beatRef = useRef(null);
 
   useEffect(() => {
-    const enc = resolverEncuadre(mundoId, tier);
+    const enc = resolverEncuadre(mundoId, /** @type {'alto'|'medio'|'bajo'} */ (tier));
     const hasta = new THREE.Vector3(...enc.posicion);
     const tHasta = new THREE.Vector3(...enc.target);
     const fFinal = focalDeFov(camera, enc.fov);
