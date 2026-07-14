@@ -207,6 +207,9 @@ const CatalogoInfraDemoMockup = lazy(() => import('./mockups/CatalogoInfraDemo')
 const MundoAbejas3DMockup = lazy(() => import('./mockups/MundoAbejas3D'));
 const MundoGallinero3DMockup = lazy(() => import('./mockups/MundoGallinero3D'));
 const MundoMercado3DMockup = lazy(() => import('./mockups/MundoMercado3D'));
+// La CARA 3D-first de prod.chagra.app: entrada-tranquera con el valle vivo de
+// fondo → velo dorado del cruce → el valle como HOME (EntradaValle3D).
+const CaraProd3DMockup = lazy(() => import('./mockups/CaraProd3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -630,6 +633,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-abejas-3d': 'mockup_mundo_abejas_3d',
   'mockups/mundo-gallinero-3d': 'mockup_mundo_gallinero_3d',
   'mockups/mundo-mercado-3d': 'mockup_mundo_mercado_3d',
+  'mockups/cara-prod': 'mockup_cara_prod',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2118,6 +2122,18 @@ export default function App() {
         return (<ErrorBoundary><ErrorFallback moduleName="El gallinero con pastoreo"><MundoGallinero3DMockup onBack={() => navigate('dashboard')} /></ErrorFallback></ErrorBoundary>);
       case 'mockup_mundo_mercado_3d':
         return (<ErrorBoundary><ErrorFallback moduleName="El mercado campesino"><MundoMercado3DMockup /></ErrorFallback></ErrorBoundary>);
+      case 'mockup_cara_prod':
+        // La CARA 3D-first de prod.chagra.app (#/mockups/cara-prod): la
+        // entrada-tranquera (login con el valle 3D vivo de fondo), el cruce
+        // con velo dorado y el valle como home. Sin auth (vitrina de diseño);
+        // codex cabla `onIngresar` al flujo real de LoginScreen.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La cara de Chagra (prod 3D)">
+              <CaraProd3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_catalogo_infra':
         // Catálogo de infraestructura procedural (AG/Gemini): 8 piezas
         // paramétricas low-poly (invernadero/gallinero/galpón/…) + demo.

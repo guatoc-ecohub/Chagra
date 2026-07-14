@@ -1284,7 +1284,7 @@ const CAMARA_VALLE = { position: [10.5, 9, 13.5], fov: 40 };
 const MIRA_VALLE = [0, 1.6, 1.4];
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null }) {
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false }) {
   const controls = useRef(null);
   /* La cámara de director (FASE 4, flag `camaraDirector`) se monta DESPUÉS de
      CamaraViajera y gana por orden de frame durante su barrido. `avatarRef`
@@ -1350,15 +1350,23 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
       {MUNDOS_VALLE.map((m) => (
         <MundoLugar key={m.id} mundo={m} reducedMotion={reducedMotion} perfil={perfil} />
       ))}
-      <RotulosLugares
-        mundos={MUNDOS_VALLE}
-        focoId={focoId}
-        onEntrar={onEntrar}
-        occluders={occluders}
-      />
+      {/* MODO PORTADA (la cara de prod.chagra.app): el valle es ATMÓSFERA de
+          la entrada — sin rótulos que compitan con el formulario ni faro que
+          pida un toque que aún no puede darse. La vida (criaturas, Angelita,
+          ciclo del día) se queda: la finca espera, no está muerta. */}
+      {!portada && (
+        <RotulosLugares
+          mundos={MUNDOS_VALLE}
+          focoId={focoId}
+          onEntrar={onEntrar}
+          occluders={occluders}
+        />
+      )}
 
       <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} />
-      <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
+      {!portada && (
+        <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
+      )}
       <CompaneroAbeja
         foco={foco}
         entrando={entrando}
@@ -1402,11 +1410,14 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         <CamaraDirector
           controls={controls}
           reposo={CAMARA_VALLE.position}
-          duracion={2.4}
-          amplio={1.3}
+          /* En portada la llegada es más lenta y amplia (contemplar, no operar)
+             y NO consume la clave 'valle': al cruzar la tranquera, el home aún
+             estrena su propio establishing — llegar dos veces se siente bien. */
+          duracion={portada ? 3.6 : 2.4}
+          amplio={portada ? 1.42 : 1.3}
           respiro={0.05}
           activa={!reducedMotion && tier !== 'bajo'}
-          unaVezClave="valle"
+          unaVezClave={portada ? 'portada' : 'valle'}
         />
       )}
       {/* El aplane New Donk del flujo vivo — montado de ÚLTIMO para tener la
@@ -1442,6 +1453,10 @@ export default function Valle3D({
   /* Buzón de beats coreografiados (fauna/Ent/alerta): el host (EscenaValle)
      empuja aquí `{ tipo, lado, slug, magico }` y el director lo consume. */
   beatsRef = null,
+  /* MODO PORTADA (entrada/login 3D-first de prod.chagra.app): el mismo valle
+     vivo pero como paisaje que ESPERA — sin rótulos de mundos ni faro del día,
+     con una llegada de cámara más lenta. La UI de la entrada vive en el host. */
+  portada = false,
 }) {
   const [listo, setListo] = useState(false);
   /* El PERFIL DE RENDER del tier (DR-3D-PERF-GAMABAJA): 'alto' conserva este
@@ -1474,6 +1489,7 @@ export default function Valle3D({
           aplanando={aplanando}
           camaraDirector={camaraDirector}
           beatsRef={beatsRef}
+          portada={portada}
         />
       </Suspense>
     </Canvas>
