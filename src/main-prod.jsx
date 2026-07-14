@@ -25,7 +25,7 @@ import { bootstrapOssModules } from './core/bootstrap-oss';
 import { loadProModules } from './core/loadProModules';
 
 if (typeof window !== 'undefined') {
-  window.__CHAGRA_BUILD_SHA__ = RUNNING_BUILD_SHA;
+  /** @type {any} */ (window).__CHAGRA_BUILD_SHA__ = RUNNING_BUILD_SHA;
 }
 
 const canonicalRedirect = runCanonicalHostRedirectGuard();

@@ -79,7 +79,7 @@ describe('ARMAS — shape y tipo biológico', () => {
   it('hay al menos un arma de cada tipo (las 4 categorías)', () => {
     const tipos = new Set(ARMAS.map((a) => a.tipo));
     for (const t of TIPOS_VALIDOS) {
-      expect(tipos.has(t)).toBe(true);
+      expect(tipos.has(/** @type {any} */ (t))).toBe(true);
     }
   });
 });
@@ -231,7 +231,7 @@ describe('JEFES — 3 amenazas estructurales', () => {
     const temas = new Set(JEFES.map((j) => j.tema));
     expect(temas.size).toBe(3);
     for (const t of TEMAS_VALIDOS) {
-      expect(temas.has(t)).toBe(true);
+      expect(temas.has(/** @type {any} */ (t))).toBe(true);
     }
   });
 
