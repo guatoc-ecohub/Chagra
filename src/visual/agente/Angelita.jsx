@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
 import './angelita-agente.css';
 import { AbejaAngelita } from '../creatures/AbejaAngelita.jsx';
 import { RH_INK, RH_CHEEK } from '../creatures/_rubberhose.jsx';
@@ -7,10 +6,7 @@ import {
   estadoCanonico,
   POSE_DE_ESTADO,
   ARIA_DE_ESTADO,
-  CEJAS_DE_ESTADO,
   nivelDeConfianza,
-  elegirMomentoIdle,
-  duracionDeMomento,
 } from './angelitaEstados.js';
 
 /*
@@ -63,65 +59,6 @@ import {
  * los gates de la casa: reduced-motion congela en fotograma digno; tier 'bajo'
  * corta lo continuo decorativo y conserva el feedback de estado.
  *
- * ═══ V2 — LA VIDA (lo que separa una vecina de un logo) ═════════════════════
- *
- * 1. IDLE-CEREBRO (solo en acompana): un reloj con jitter hojea el repertorio
- *    de MOMENTOS_IDLE — mira alrededor, sigue una mota de vilano que pasa, se
- *    acicala la antena, se rasca, sacude las alas, y de vez en cuando SE POSA
- *    (aterriza con peso, respira plegadita, despega con impulso). Nunca repite
- *    el mismo gesto dos veces; entre gesto y gesto vuelve al vuelo sereno.
- *    Los micro-gestos son la vida: existe aunque nadie le hable.
- *
- * 2. FÍSICA DE VUELO: el wrapper `.agt-vuelo` deriva en figura-8 con banqueo
- *    (la abeja se ladea hacia donde va y el cuerpo la sigue con retraso —
- *    inercia, no flotador); el aterrizaje ANTICIPA, cae con peso y amortigua
- *    con squash; el despegue se agacha para coger impulso. Las alas llevan un
- *    velo de motion-blur (solo tier alto/medio).
- *
- * 3. LA MIRADA: las pupilas SIGUEN el puntero/dedo de usted cuando anda cerca
- *    (data-agt-mira='usted', vars --agt-mx/--agt-my puestas por rAF) y lo
- *    sueltan a los ~2s para volver a sus dardeos naturales. El parpadeo lleva
- *    ritmo PROPIO por instancia (duración y fase con azar al montar: dos
- *    Angelitas jamás parpadean al tiempo — el metrónomo delataba al robot).
- *    Además cada estado ACTÚA con los ojos: contacto visual franco en no-sé,
- *    ojos clavados en el POI (con chequeo a usted) en senala, buscar la
- *    palabra arriba al responder, achinaditos de dicha en contenta.
- *
- * 4. TRANSICIONES: al cambiar de estado el wrapper se remonta (key=estado) y
- *    reproduce UNA anticipación (se recoge con squash, rebasa, asienta) antes
- *    del loop del estado — los cambios fluyen, no saltan. La burbuja del
- *    pensar nace elástica desde su colita y el "?" del no-sé se dibuja a mano.
- *
- * Todos los sistemas nuevos respetan los gates: animated=false los apaga,
- * prefers-reduced-motion los apaga (JS incluido), tier 'bajo' apaga scheduler,
- * seguimiento de mirada, deriva y blur — el feedback de estado permanece.
- *
- * ═══ V3 — LA CARA VIVA (C14+C15: la cara ES el personaje) ═══════════════════
- *
- * La expresividad Miss-Minutes de la carita, SIN tocar el dibujo base: todo va
- * por CSS sobre las clases internas de los ojos (.rh-blink / .rh-mirada), que
- * viven DENTRO del cuerpo de la abeja — así la cara sigue cada squash, antic y
- * pose sin desprenderse jamás. Scoped a [data-agente='angelita']: la abeja del
- * valle y los demás bichos del kit no cambian.
- *
- * 1. OJOS ÁMBAR VIVOS (todos los estados): iris ámbar (anillo del mismo dorado
- *    del cuerpo alrededor de la pupila de tinta), ojos un pelo más grandes y
- *    la chispa del ojo (catchlight) que TITILA de vez en cuando — período
- *    co-primo con parpadeo y dardeo, nunca el mismo compás.
- * 2. PÁRPADOS POR ESTADO: pensando entrecierra (media asta, repasa memoria);
- *    escuchando parpadea MENOS (quien escucha de verdad casi no pestañea);
- *    preocupada abre los ojos y ENCOGE la pupila (la alarma se ve en el ojo
- *    antes que en el gesto) con blink doble nervioso; contenta ya achinaba.
- * 3. LA CEJITA DEL PENSAR: ceja asimétrica (una arqueada alto, la otra baja)
- *    dibujada aquí como las de preocupada/no-sé, con un tironcito sincronizado
- *    a los golpecitos de barbilla ("¿será?…"). Pensando apaga el boil interno
- *    (mismo criterio que preocupada/no-sé: nada se despega de la cara).
- * 4. LA VOZ ACOPLADA A LA BOCA: el root estampa data-agt-visema (el mismo
- *    'V1'..'V4' que ya mueve la boquita vía BocaVisema del kit); cuando el
- *    host manda visemas, las ondas de miel fluyen SOLO mientras la boca se
- *    mueve (V1 = silencio = ondas en calma). Host sin TTS: nada cambia.
- *    Y mientras conversa, las chapetas quedan encendidas — calor de vecina.
- *
  * Tier-safe: SVG + CSS transform/opacity, cero deps nuevas, cero three.
  */
 
@@ -168,42 +105,6 @@ function RecuerdoFlor() {
 }
 const RECUERDOS = [RecuerdoHoja, RecuerdoGota, RecuerdoFlor];
 
-/* ── La VIDA: helpers del idle-cerebro y de la mirada ───────────────────────── */
-
-/* ¿El usuario pidió quietud? Los sistemas JS (scheduler, seguimiento) se apagan
-   igual que las animaciones CSS — la dignidad de la calma es de TODO el cuerpo. */
-function prefiereQuietud() {
-  return typeof window !== 'undefined'
-    && typeof window.matchMedia === 'function'
-    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-/* Estados en los que Angelita LO MIRA a usted si su puntero/dedo anda cerca.
-   En pensando manda su mirada pensativa; en preocupada/no-se/senala, la
-   actuación del estado (el problema, sus ojos francos, el POI). */
-const ESTADOS_QUE_LO_MIRAN = new Set(['acompana', 'escuchando', 'respondiendo', 'invita']);
-
-/* Hasta dónde "se da cuenta" del puntero (px) y cuánto sostiene la mirada
-   después del último movimiento antes de soltarlo (ms). */
-const RADIO_DE_ATENCION = 340;
-const SUELTA_MIRADA_MS = 1900;
-
-/* Mota de vilano (semillita voladora) — lo que la distrae en el momento
-   'distraida': una pelusa que cruza el aire y ella despide con los ojos.
-   El viaje lo pone el CSS (.agt-mota); aquí solo el dibujo, en el trazo de
-   la casa: tinta cálida, tres pelitos y su semilla. */
-function MotaDeVilano() {
-  return (
-    <g className="agt-mota" aria-hidden="true">
-      <path
-        d="M0,0 L-1.15,-1.7 M0,0 L0.1,-2 M0,0 L1.2,-1.55"
-        stroke={RH_INK} strokeWidth="0.28" strokeLinecap="round" opacity="0.7"
-      />
-      <circle r="0.5" fill={RH_INK} opacity="0.62" />
-    </g>
-  );
-}
-
 /**
  * Angelita — el cuerpo visible del agente de Chagra. Solo arte: el host cablea
  * la inteligencia y este componente la ENCARNA por estados.
@@ -224,8 +125,6 @@ function MotaDeVilano() {
  * @param {number} [props.energia]
  * @param {string|null} [props.mundoId]  su herramienta por mundo (PropEnMano).
  * @param {boolean} [props.lineBoil]  contorno que hierve (momentos heroicos).
- * @param {boolean|'poniendose'} [props.gafas]  gafas para la entrada teatral.
- * @param {string} [props.cejas]  expresión de cejas opcional.
  * @param {string} [props.title]  pisa la narración aria derivada del estado.
  */
 export function Angelita({
@@ -243,12 +142,6 @@ export function Angelita({
   energia = 1,
   mundoId = null,
   lineBoil = false,
-  /* Gafas de sol (día soleado / entrada teatral): passthrough al cuerpo.
-     false | true | 'poniendose' (la caída one-shot). */
-  gafas = false,
-  /* Cejas: si el host no manda, cada estado actúa con las SUYAS
-     (CEJAS_DE_ESTADO — el que habla hace eyebrow-flash, la contenta arquea). */
-  cejas = undefined,
   title = undefined,
   ...rest
 }) {
@@ -256,99 +149,9 @@ export function Angelita({
   const vivo = animated;
   const nivel = nivelDeConfianza(confianza);
   const pose = POSE_DE_ESTADO[e];
-  const svgRef = useRef(null);
-
-  /* ═══ RITMO PROPIO DE PARPADEO — una vez al montar: duración y fase con azar
-     para que cada instancia parpadee a SU aire (CSS las consume como vars). */
-  const [ritmoPropio] = useState(() => ({
-    '--agt-blink-dur': `${(4.9 + Math.random() * 1.7).toFixed(2)}s`,
-    '--agt-blink-delay': `${(-Math.random() * 5).toFixed(2)}s`,
-  }));
-
-  /* ═══ IDLE-CEREBRO (solo acompana) — el reloj con jitter que hojea el
-     repertorio de micro-gestos. flota → gesto → flota…; posa encadena
-     posada → despega. Gates: animated, estado, tier bajo, reduced-motion. */
-  const idleActivo = vivo && e === 'acompana' && tier !== 'bajo';
-  const [momento, setMomento] = useState('flota');
-  useEffect(() => {
-    if (!idleActivo || prefiereQuietud()) return undefined;
-    let timer = 0;
-    let ultimoGesto = null;
-    const programar = (nombre) => {
-      setMomento(nombre);
-      timer = window.setTimeout(() => {
-        if (nombre === 'posa') { programar('posada'); return; }
-        if (nombre === 'posada') { programar('despega'); return; }
-        if (nombre === 'flota') {
-          ultimoGesto = elegirMomentoIdle(ultimoGesto);
-          programar(ultimoGesto);
-          return;
-        }
-        programar('flota'); // todo gesto vuelve al vuelo sereno
-      }, duracionDeMomento(nombre));
-    };
-    // Arranca al próximo tick (nunca setState síncrono dentro del effect);
-    // siempre desde el vuelo sereno, por si quedó un momento viejo colgado.
-    timer = window.setTimeout(() => programar('flota'), 0);
-    return () => window.clearTimeout(timer);
-  }, [idleActivo]);
-
-  /* ═══ LA MIRADA QUE LO RECONOCE — si su puntero/dedo anda cerca, las pupilas
-     lo siguen (data-agt-mira='usted' + vars --agt-mx/--agt-my); al quedarse
-     quieto ~2s lo suelta y vuelve a sus dardeos naturales. DOM directo vía ref
-     (React no administra estos attrs): cero re-renders por mover el mouse. */
-  const sigueUsted = vivo && tier !== 'bajo' && ESTADOS_QUE_LO_MIRAN.has(e);
-  useEffect(() => {
-    const svg = svgRef.current;
-    if (!sigueUsted || !svg || prefiereQuietud()) return undefined;
-    let raf = 0;
-    let soltar = 0;
-    let px = 0;
-    let py = 0;
-    const signo = direccion === 'izquierda' ? -1 : 1; // el espejo voltea la x
-    const liberar = () => svg.removeAttribute('data-agt-mira');
-    const mirar = () => {
-      raf = 0;
-      const r = svg.getBoundingClientRect();
-      if (!r.width) return;
-      // Sus ojos viven arriba del centro del lienzo (la cabeza, no el tronco).
-      const dx = px - (r.left + r.width / 2);
-      const dy = py - (r.top + r.height * 0.4);
-      if (Math.hypot(dx, dy) > RADIO_DE_ATENCION) { liberar(); return; }
-      // Deflexión de pupila en unidades del viewBox (misma amplitud ~0.55 del
-      // dardeo natural); saturada a ~150px — más lejos ya es "mirar hacia allá".
-      const mx = Math.max(-1, Math.min(1, dx / 150)) * 0.55 * signo;
-      const my = Math.max(-1, Math.min(1, dy / 150)) * 0.42;
-      svg.style.setProperty('--agt-mx', `${mx.toFixed(3)}px`);
-      svg.style.setProperty('--agt-my', `${my.toFixed(3)}px`);
-      svg.setAttribute('data-agt-mira', 'usted');
-      window.clearTimeout(soltar);
-      soltar = window.setTimeout(liberar, SUELTA_MIRADA_MS);
-    };
-    const onMove = (ev) => {
-      px = ev.clientX;
-      py = ev.clientY;
-      if (!raf) raf = window.requestAnimationFrame(mirar);
-    };
-    window.addEventListener('pointermove', onMove, { passive: true });
-    window.addEventListener('pointerdown', onMove, { passive: true });
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerdown', onMove);
-      if (raf) window.cancelAnimationFrame(raf);
-      window.clearTimeout(soltar);
-      liberar();
-      svg.style.removeProperty('--agt-mx');
-      svg.style.removeProperty('--agt-my');
-    };
-  }, [sigueUsted, direccion]);
-
   // El estado tiñe el ánimo del cuerpo base (aura/antics) salvo que el host
   // mande el suyo: contenta brilla 'pleno', preocupada se pone 'atento'.
   const animoDelEstado = animo ?? (e === 'contenta' ? 'pleno' : e === 'preocupada' ? 'atento' : 'sereno');
-  // Y actúa con las CEJAS (salvo que el host mande las suyas): eyebrow-flash
-  // al hablar, arqueadas de dicha, fruncidas de concentración fisgona.
-  const cejasDelEstado = cejas !== undefined ? cejas : CEJAS_DE_ESTADO[e] ?? null;
   const aria = title ?? (ARIA_DE_ESTADO[e] + (nivel === 'baja' ? ' (con dudas)' : ''));
   // Clase de animación solo cuando está viva; quieta = opacidad digna inline.
   const cls = (c) => (vivo ? c : undefined);
@@ -416,19 +219,6 @@ export function Angelita({
       {/* una ceja arqueada y la otra tranquila: honestidad curiosa, sin pena */}
       <path d="M5.9,-5.2 Q7.3,-6.1 8.6,-5.3" />
       <path d="M9.5,-4.8 L11.3,-4.7" />
-    </g>
-  ) : null;
-  // PENSANDO — la cejita del "mmm": la cercana se arquea ALTO (persigue la
-  // idea) y la otra baja, concentrada. El CSS le da un tironcito sincronizado
-  // con los golpecitos de barbilla; con RM/quieta, la asimetría sola ya lee.
-  const caraPensando = e === 'pensando' ? (
-    <g
-      className={cls('agt-ceja-piensa')}
-      stroke={RH_INK} strokeWidth="0.8" strokeLinecap="round" fill="none"
-      aria-hidden="true"
-    >
-      <path d="M9.1,-5.4 Q10.35,-6.35 11.55,-5.45" />
-      <path d="M6.45,-4.35 L8.25,-4.6" />
     </g>
   ) : null;
 
@@ -502,23 +292,15 @@ export function Angelita({
     </g>
   ) : null;
   // NO-SÉ — el "?" dibujado a mano, con wobble de line-boil (steps, no péndulo).
-  // Al entrar al estado se DIBUJA de un trazo (pathLength=1 + dashoffset en el
-  // CSS) y el puntico cae al final — honestidad que se escribe delante de usted.
   const signoNoSe = e === 'no-se' ? (
     <g className={cls('agt-nose-signo')} aria-hidden="true">
       <path
-        pathLength="1"
         d="M11.8,-19.2 Q11.7,-22 14.3,-21.8 Q16.6,-21.5 15.9,-19.3 Q15.5,-18 14.2,-17.4 Q13.5,-17 13.5,-15.9"
         stroke={RH_INK} strokeWidth="1.25" fill="none" strokeLinecap="round"
       />
       <circle cx="13.5" cy="-13.8" r="0.85" fill={RH_INK} />
     </g>
   ) : null;
-  // La MOTA DE VILANO que la distrae (momento 'distraida' del idle): cruza el
-  // aire una sola vez y Angelita la despide con los ojos y la cabeza (CSS).
-  const mota = (vivo && e === 'acompana' && momento === 'distraida')
-    ? <MotaDeVilano />
-    : null;
   // SEÑALA — el destello donde apunta (abajo-derecha, donde cae su bracito).
   const destelloPoi = e === 'senala' ? (
     <g
@@ -529,22 +311,6 @@ export function Angelita({
     >
       <circle r="2.9" fill="none" stroke={COLOR_CERTEZA} strokeWidth="0.7" opacity="0.7" />
       <path d={CHISPA_D} fill={COLOR_CERTEZA} stroke={RH_INK} strokeWidth="0.35" />
-    </g>
-  ) : null;
-  // HUSMEA — las virutas de olor que entran hacia su nariz (la carita vive a
-  // la derecha, x≈13): tres hilitos serpenteantes desfasados que ella persigue
-  // inclinada (el cuerpo lo pone el CSS agm-husmea-cuerpo).
-  const virutasOlor = e === 'husmea' ? (
-    <g stroke={RH_INK} strokeWidth="0.6" strokeLinecap="round" fill="none" aria-hidden="true">
-      {[[15.2, 0.6, 0], [17.1, -1.4, -0.7], [15.9, 2.8, -1.4]].map(([x, y, d], i) => (
-        <path
-          key={i}
-          className={cls('agm-olor')}
-          style={vivo ? { animationDelay: `${d}s` } : undefined}
-          opacity={vivo ? undefined : 0.55}
-          d={`M${x},${y} q1.1,-0.7 2.2,0 q1.1,0.7 2.2,0`}
-        />
-      ))}
     </g>
   ) : null;
   // INVITA — estelas del "venga": arcos que viajan HACIA ella.
@@ -563,34 +329,22 @@ export function Angelita({
   ) : null;
 
   /* ═══ MONTAJE ═════════════════════════════════════════════════════════════
-     fondo (halo/alerta) → vuelo (la física: deriva, aterrizaje, entrada de
-     estado) → cuerpo (abeja + señales de cara, UN wrapper que los estados
-     mueven junto) → aire (burbuja, ondas, chispas, signos, la mota).
-     `.agt-vuelo` va con key=estado: al cambiar de estado se REMONTA y su
-     animación de entrada (anticipación → overshoot → asienta) vuelve a correr
-     — la transición fluye en vez de saltar. direccion 'izquierda' espeja TODO
-     el dibujo (señala/invita hacia el otro lado); el ritmo propio de parpadeo
-     viaja como CSS vars. */
-  const espejo = direccion === 'izquierda' ? { transform: 'scaleX(-1)' } : null;
-  const estilo = { ...ritmoPropio, ...espejo };
+     fondo (halo/alerta) → cuerpo (abeja + señales de cara, UN wrapper que los
+     estados mueven junto) → aire (burbuja, ondas, chispas, signos). direccion
+     'izquierda' espeja TODO el dibujo (señala/invita hacia el otro lado). */
+  const espejo = direccion === 'izquierda' ? { transform: 'scaleX(-1)' } : undefined;
   return (
     <svg
-      ref={svgRef}
       viewBox={VIEWBOX}
       width={size}
       height={size}
       className={className ? `agt-angelita ${className}` : 'agt-angelita'}
-      style={estilo}
+      style={espejo}
       role="img"
       aria-label={aria}
       data-agente="angelita"
       data-agt-estado={e}
       data-agt-vivo={vivo ? '1' : undefined}
-      /* El visema del TTS también en el root: el CSS acopla las ondas de miel
-         al movimiento real de la boquita (V1 = silencio). Solo se estampa si
-         el host manda visemas — sin TTS, nada cambia. */
-      data-agt-visema={visema || undefined}
-      data-agt-idle={idleActivo ? momento : undefined}
       data-agt-confianza={nivel || undefined}
       data-tier={tier || undefined}
       {...rest}
@@ -598,27 +352,22 @@ export function Angelita({
       <title>{aria}</title>
       {halo}
       {aroAlerta}
-      <g className="agt-vuelo" key={e}>
-        <g className="agt-cuerpo">
-          <AbejaAngelita
-            inline
-            animated={vivo}
-            pose={pose}
-            visema={visema}
-            tier={tier}
-            clima={clima}
-            enso={enso}
-            animo={animoDelEstado}
-            energia={energia}
-            mundoId={mundoId}
-            lineBoil={lineBoil}
-            gafas={gafas}
-            cejas={cejasDelEstado}
-          />
-          {caraPreocupada}
-          {caraNoSe}
-          {caraPensando}
-        </g>
+      <g className="agt-cuerpo">
+        <AbejaAngelita
+          inline
+          animated={vivo}
+          pose={pose}
+          visema={visema}
+          tier={tier}
+          clima={clima}
+          enso={enso}
+          animo={animoDelEstado}
+          energia={energia}
+          mundoId={mundoId}
+          lineBoil={lineBoil}
+        />
+        {caraPreocupada}
+        {caraNoSe}
       </g>
       {burbuja}
       {ondasIn}
@@ -627,8 +376,6 @@ export function Angelita({
       {signoNoSe}
       {destelloPoi}
       {estelasInvita}
-      {virutasOlor}
-      {mota}
     </svg>
   );
 }
