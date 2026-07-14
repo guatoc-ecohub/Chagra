@@ -1,0 +1,1888 @@
+[
+  {
+    "path": "valle3d",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/valle3d.png"
+  },
+  {
+    "path": "valle3d_noche",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/valle3d_noche.png"
+  },
+  {
+    "path": "valle3d_lluvia",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/valle3d_lluvia.png"
+  },
+  {
+    "path": "ventana_valle",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/ventana_valle.png"
+  },
+  {
+    "path": "sierra_global",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/sierra_global.png"
+  },
+  {
+    "path": "montana_mundos",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/montana_mundos.png"
+  },
+  {
+    "path": "vitrina_maestra",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/vitrina_maestra.png"
+  },
+  {
+    "path": "mundo",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mundo.png"
+  },
+  {
+    "path": "diorama_abejas",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/diorama_abejas.png"
+  },
+  {
+    "path": "diorama_gallinero",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/diorama_gallinero.png"
+  },
+  {
+    "path": "diorama_paramo",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/diorama_paramo.png"
+  },
+  {
+    "path": "diorama_agua",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/diorama_agua.png"
+  },
+  {
+    "path": "diorama_suelo",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/diorama_suelo.png"
+  },
+  {
+    "path": "diorama_compost",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/diorama_compost.png"
+  },
+  {
+    "path": "diorama_fermentos",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/diorama_fermentos.png"
+  },
+  {
+    "path": "diorama_microfauna",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/diorama_microfauna.png"
+  },
+  {
+    "path": "subsuelo",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/subsuelo.png"
+  },
+  {
+    "path": "camara_director",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/camara_director.png"
+  },
+  {
+    "path": "artesania_andina",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/artesania_andina.png"
+  },
+  {
+    "path": "efectos_funcionales",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/efectos_funcionales.png"
+  },
+  {
+    "path": "catalogo_infra",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "PAGE ERROR: Cannot read properties of null (reading 'addEventListener')",
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/catalogo_infra.png"
+  },
+  {
+    "path": "colocar_infra",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/colocar_infra.png"
+  },
+  {
+    "path": "gemelos_2d",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/gemelos_2d.png"
+  },
+  {
+    "path": "aliados_finca",
+    "status": "TIMEOUT",
+    "errors": [
+      "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n"
+    ],
+    "screenshot": ""
+  },
+  {
+    "path": "momento_venta",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/momento_venta.png"
+  },
+  {
+    "path": "new_donk",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/new_donk.png"
+  },
+  {
+    "path": "murales_new_donk",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/murales_new_donk.png"
+  },
+  {
+    "path": "loading",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/loading.png"
+  },
+  {
+    "path": "login",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/login.png"
+  },
+  {
+    "path": "oauth-callback",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/oauth-callback.png"
+  },
+  {
+    "path": "dashboard",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/dashboard.png"
+  },
+  {
+    "path": "ubicacion-detectada",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/ubicacion-detectada.png"
+  },
+  {
+    "path": "agente",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 501 (Unsupported method ('POST'))"
+    ],
+    "screenshot": "smoke-prod/agente.png"
+  },
+  {
+    "path": "perfil",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/perfil.png"
+  },
+  {
+    "path": "espiritu_pro",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/espiritu_pro.png"
+  },
+  {
+    "path": "onboarding-perfil",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/onboarding-perfil.png"
+  },
+  {
+    "path": "hoy_finca",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/hoy_finca.png"
+  },
+  {
+    "path": "evolucion",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/evolucion.png"
+  },
+  {
+    "path": "directorio",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/directorio.png"
+  },
+  {
+    "path": "sembrar",
+    "status": "CRASH",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "ReferenceError: useState is not defined\n    at r (http://127.0.0.1:4500/assets/SeedingLog-CqZFgoW0.js:1:173)\n    at ko (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:47537)\n    at bc (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:69959)\n    at Lc (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:80002)\n    at Nu (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:115507)\n    at Au (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:114590)\n    at ku (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:114429)\n    at _u (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:111298)\n    at ld (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:122794)\n    at MessagePort.ae (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:1:1642)",
+      "[ErrorBoundary] Error capturado: ReferenceError: useState is not defined\n    at r (http://127.0.0.1:4500/assets/SeedingLog-CqZFgoW0.js:1:173)\n    at ko (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:47537)\n    at bc (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:69959)\n    at Lc (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:80002)\n    at Nu (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:115507)\n    at Au (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:114590)\n    at ku (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:114429)\n    at _u (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:111298)\n    at ld (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:8:122794)\n    at MessagePort.ae (http://127.0.0.1:4500/assets/vendor-react-Bl3EXeX9.js:1:1642)",
+      "[ErrorBoundary] Stack de componentes: \n    at r (http://127.0.0.1:4500/assets/SeedingLog-CqZFgoW0.js:1:128)\n    at Suspense (<anonymous>)\n    at Ce (http://127.0.0.1:4500/assets/index-8jOk_1yl.js:224:34718)\n    at dt (http://127.0.0.1:4500/assets/index-8jOk_1yl.js:224:53800)\n    at we (http://127.0.0.1:4500/assets/index-8jOk_1yl.js:224:35856)",
+      "ErrorBoundary detectado: \"Algo falló\""
+    ],
+    "screenshot": "smoke-prod/sembrar.png"
+  },
+  {
+    "path": "cosechar",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/cosechar.png"
+  },
+  {
+    "path": "insumos",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/insumos.png"
+  },
+  {
+    "path": "observacion",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/observacion.png"
+  },
+  {
+    "path": "registro_unificado",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/registro_unificado.png"
+  },
+  {
+    "path": "voz",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/voz.png"
+  },
+  {
+    "path": "procesos",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/procesos.png"
+  },
+  {
+    "path": "activos",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Error sincronizando activos: Error: FarmOS API Error 404: File not found\n    at I (http://127.0.0.1:4500/assets/apiService-Cy75Hbfe.js:2:8582)\n    at async syncFromServer (http://127.0.0.1:4500/assets/useAssetStore-6wnds7hM.js:2:2172)"
+    ],
+    "screenshot": "smoke-prod/activos.png"
+  },
+  {
+    "path": "bodega",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/bodega.png"
+  },
+  {
+    "path": "plant_asset",
+    "status": "TIMEOUT",
+    "errors": [
+      "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\u001b[2m  - fonts loaded\u001b[22m\n"
+    ],
+    "screenshot": ""
+  },
+  {
+    "path": "new_task",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/new_task.png"
+  },
+  {
+    "path": "seguimiento",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/seguimiento.png"
+  },
+  {
+    "path": "bitacora",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/bitacora.png"
+  },
+  {
+    "path": "clima_boletin",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/clima_boletin.png"
+  },
+  {
+    "path": "agua",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/agua.png"
+  },
+  {
+    "path": "suelo",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/suelo.png"
+  },
+  {
+    "path": "salud_suelo",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/salud_suelo.png"
+  },
+  {
+    "path": "cromatografia",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/cromatografia.png"
+  },
+  {
+    "path": "mundo_cultivos",
+    "status": "TIMEOUT",
+    "errors": [
+      "page.goto: Timeout 20000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:4500/#mundo_cultivos\", waiting until \"domcontentloaded\"\u001b[22m\n"
+    ],
+    "screenshot": ""
+  },
+  {
+    "path": "cafe",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/cafe.png"
+  },
+  {
+    "path": "cacao",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/cacao.png"
+  },
+  {
+    "path": "platano",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/platano.png"
+  },
+  {
+    "path": "aguacate",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/aguacate.png"
+  },
+  {
+    "path": "citricos",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/citricos.png"
+  },
+  {
+    "path": "cana",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/cana.png"
+  },
+  {
+    "path": "mango",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mango.png"
+  },
+  {
+    "path": "uchuva",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/uchuva.png"
+  },
+  {
+    "path": "frutales",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/frutales.png"
+  },
+  {
+    "path": "hortalizas",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/hortalizas.png"
+  },
+  {
+    "path": "tuberculos",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/tuberculos.png"
+  },
+  {
+    "path": "aromaticas",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/aromaticas.png"
+  },
+  {
+    "path": "botica",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/botica.png"
+  },
+  {
+    "path": "fique",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/fique.png"
+  },
+  {
+    "path": "milpa_cultivo",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/milpa_cultivo.png"
+  },
+  {
+    "path": "sanidad_sintoma",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/sanidad_sintoma.png"
+  },
+  {
+    "path": "reportar_invasora",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/reportar_invasora.png"
+  },
+  {
+    "path": "toxicologia",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/toxicologia.png"
+  },
+  {
+    "path": "mantenimiento",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mantenimiento.png"
+  },
+  {
+    "path": "ciclo",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/ciclo.png"
+  },
+  {
+    "path": "germinacion",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/germinacion.png"
+  },
+  {
+    "path": "ciclo_nutrientes",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/ciclo_nutrientes.png"
+  },
+  {
+    "path": "ciclo_vivo",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/ciclo_vivo.png"
+  },
+  {
+    "path": "calendario_finca",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/calendario_finca.png"
+  },
+  {
+    "path": "ano_finca",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/ano_finca.png"
+  },
+  {
+    "path": "semilla",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/semilla.png"
+  },
+  {
+    "path": "poscosecha",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/poscosecha.png"
+  },
+  {
+    "path": "almacenamiento",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "PAGE ERROR: Cannot read properties of null (reading 'addEventListener')",
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/almacenamiento.png"
+  },
+  {
+    "path": "mi_cosecha",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mi_cosecha.png"
+  },
+  {
+    "path": "nutricion",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/nutricion.png"
+  },
+  {
+    "path": "animales",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/animales.png"
+  },
+  {
+    "path": "animales_gallinas",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/animales_gallinas.png"
+  },
+  {
+    "path": "animales_abejas",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/animales_abejas.png"
+  },
+  {
+    "path": "animales_vacas",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/animales_vacas.png"
+  },
+  {
+    "path": "animales_conejos",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/animales_conejos.png"
+  },
+  {
+    "path": "animales_caprinos",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/animales_caprinos.png"
+  },
+  {
+    "path": "estiercol",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/estiercol.png"
+  },
+  {
+    "path": "compost",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/compost.png"
+  },
+  {
+    "path": "biopreparados",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/biopreparados.png"
+  },
+  {
+    "path": "fermentos",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/fermentos.png"
+  },
+  {
+    "path": "biodiversidad",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/biodiversidad.png"
+  },
+  {
+    "path": "asociaciones",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/asociaciones.png"
+  },
+  {
+    "path": "restauracion",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/restauracion.png"
+  },
+  {
+    "path": "mapa",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mapa.png"
+  },
+  {
+    "path": "informes",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/informes.png"
+  },
+  {
+    "path": "glaciar",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/glaciar.png"
+  },
+  {
+    "path": "glaciar_historial",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/glaciar_historial.png"
+  },
+  {
+    "path": "extensionista",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/extensionista.png"
+  },
+  {
+    "path": "casos",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/casos.png"
+  },
+  {
+    "path": "caso_detail",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/caso_detail.png"
+  },
+  {
+    "path": "faq",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/faq.png"
+  },
+  {
+    "path": "aprende",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/aprende.png"
+  },
+  {
+    "path": "curso",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/curso.png"
+  },
+  {
+    "path": "onboarding-perfil-clasico",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/onboarding-perfil-clasico.png"
+  },
+  {
+    "path": "mockup_onboarding_siembra",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mockup_onboarding_siembra.png"
+  },
+  {
+    "path": "juego",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/juego.png"
+  },
+  {
+    "path": "defensores",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/defensores.png"
+  },
+  {
+    "path": "milpa",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/milpa.png"
+  },
+  {
+    "path": "doom_finca",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/doom_finca.png"
+  },
+  {
+    "path": "mockup_metal_slug_campo",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mockup_metal_slug_campo.png"
+  },
+  {
+    "path": "mockup_juego_la_milpa",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mockup_juego_la_milpa.png"
+  },
+  {
+    "path": "mercado",
+    "status": "TIMEOUT",
+    "errors": [
+      "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\u001b[2m  - fonts loaded\u001b[22m\n"
+    ],
+    "screenshot": ""
+  },
+  {
+    "path": "mercados",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mercados.png"
+  },
+  {
+    "path": "mockup_mercado",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mockup_mercado.png"
+  },
+  {
+    "path": "mockup_voz_con_forma",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mockup_voz_con_forma.png"
+  },
+  {
+    "path": "mockup_conversacion_voz",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mockup_conversacion_voz.png"
+  },
+  {
+    "path": "mockup_ensena_dibujando",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/mockup_ensena_dibujando.png"
+  },
+  {
+    "path": "almanaque",
+    "status": "OK",
+    "errors": [
+      "[Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)",
+      "Failed to load resource: the server responded with a status of 404 (File not found)"
+    ],
+    "screenshot": "smoke-prod/almanaque.png"
+  }
+]
