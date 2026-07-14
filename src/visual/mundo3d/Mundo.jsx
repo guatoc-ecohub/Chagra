@@ -49,7 +49,7 @@ const IMPORTA_ESCENA = {
   micorrizas: () => import('./micorrizas/EscenaMicorrizas.jsx'),
 };
 const ESCENAS_3D = Object.fromEntries(
-  Object.entries(IMPORTA_ESCENA).map(([k, importa]) => [k, lazy(importa)]),
+  Object.entries(IMPORTA_ESCENA).map(([k, importa]) => [k, lazy(() => importa().then(m => (/** @type {any} */ (m)).default || m))]),
 );
 
 /* Cuánto esperamos el chunk 3D antes de la CAÍDA DIGNA al 2D. Con señal
@@ -204,7 +204,7 @@ function MundoInterno({
             hotspots={plan.entrada.hotspots}
             entrada={plan.entrada.entrada}
             tinte={tinte}
-            tier={tier}
+            tier={/** @type {"bajo"|"alto"|"medio"} */ (tier)}
             reducedMotion={reducedMotion}
             onHotspot={onHotspot}
             onSalir={onSalir}
