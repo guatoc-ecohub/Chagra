@@ -231,9 +231,12 @@ jobs:
           VERSION_FILE=/mnt/fast/appdata/farmos-pwa/version.json
           COMMIT_SHORT=$(git rev-parse --short HEAD)
           if [ -f "$SW_FILE" ]; then
-            # 0,/regex/ limita el reemplazo a la PRIMERA línea que matchea
-            # (CACHE_NAME), sin corromper chagra-rag-grounding-/chagra-map-tiles-.
-            sed -i -E "0,/chagra-[0-9a-z]+/s//chagra-${COMMIT_SHORT}/" "$SW_FILE"
+            # Reemplazo ACOTADO al primer match de la línea `const CACHE_NAME`
+            # (línea 1-2 de sw.js). El patrón `chagra-[0-9a-z]+` matchea tanto
+            # 'chagra-v<N>' (inicial) como 'chagra-<sha>' (tras deploys previos).
+            # 0,/regex/ limita al PRIMER match del archivo entero; el resto de
+            # cachés (RAG_GROUNDING_PREFIX, MAP_TILES_PREFIX) no se tocan.
+            sed -i -E "0,/const CACHE_NAME = .chagra-[0-9a-z]+/s/chagra-[0-9a-z]+/chagra-${COMMIT_SHORT}/" "$SW_FILE"
             echo "SW cache bumped to chagra-${COMMIT_SHORT}"
           fi
           # version.json: alinear el SHA SERVIDO con el CACHE_NAME recién bumpeado

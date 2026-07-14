@@ -112,7 +112,11 @@ jobs:
           BRANCH: ${{ steps.parse.outputs.branch }}
           ISSUE_NUM: ${{ steps.parse.outputs.issue_num }}
         run: |
-          BODY="Closes #${ISSUE_NUM}
+           # SECURITY: IS$ISSUE_TITLE viene de env (no evaluable por bash).
+           # El printf evita que backticks o $() dentro del título sean
+           # interpretados como command substitution por el shell.
+           TITLE=$(printf '%s' "[WIP] $ISSUE_TITLE")
+           BODY="Closes #${ISSUE_NUM}
 
           **Draft PR generado automáticamente** por \`claude-code-request.yml\`. Pendiente de code-generation.
 
@@ -125,11 +129,11 @@ jobs:
           - Este PR **NO se mergea automáticamente** bajo ninguna condición.
           - El operador revisa diff manualmente tras CI verde.
           - Si quiere auto-merge por nominación explícita, añadir label \`squash-on-merge\`."
-          PR_URL=$(gh pr create \
-            --base main \
-            --head "$BRANCH" \
-            --title "[WIP] $ISSUE_TITLE" \
-            --body "$BODY" \
+           PR_URL=$(gh pr create \
+             --base main \
+             --head "$BRANCH" \
+             --title "$TITLE" \
+             --body "$BODY" \
             --draft)
           echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
 
