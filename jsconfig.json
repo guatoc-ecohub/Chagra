@@ -11,6 +11,7 @@
     "noImplicitThis": false,
     "ignoreDeprecations": "6.0",
     "skipLibCheck": true,
+    "maxNodeModuleJsDepth": 0,
     "types": ["node", "vitest/globals"],
     "jsx": "react-jsx",
     "paths": {
