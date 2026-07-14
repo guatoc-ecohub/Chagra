@@ -16,6 +16,12 @@ import {
   EXCLUIDO,
 } from '../config/rutasProdChagraApp.js';
 
+// Audio cleanup: al cambiar de ruta, detener cualquier voz (Kokoro/Web Speech)
+// que haya quedado sonando de la vista anterior. El loop eterno reportado
+// por el operador ocurre cuando el fetch asíncrono de speakKokoro resuelve
+// DESPUES de que el componente se desmontó → el audio se reproduce sin dueño.
+import { stop as stopAllAudio } from '../services/ttsService.js';
+
 import ChagraGrowLoader from '../components/ChagraGrowLoader';
 const LoginScreen = lazy(() => import('../components/LoginScreen.jsx'));
 const OAuthCallback = lazy(() => import('../components/OAuthCallback.jsx'));
@@ -227,6 +233,10 @@ export default function ProdChagraApp() {
 
   const navigate = useCallback((view) => {
     if (!view || view === 'loading') return;
+    // Detener cualquier audio de la vista anterior antes de montar la nueva.
+    // El loop eterno reportado ocurre cuando el audio asíncrono resuelve
+    // después del desmontaje del componente 3D.
+    try { stopAllAudio(); } catch { /* ttsService puede no estar inicializado */ }
     setCurrentView(view);
     window.location.hash = view === 'valle3d' ? '' : '#' + view;
   }, []);

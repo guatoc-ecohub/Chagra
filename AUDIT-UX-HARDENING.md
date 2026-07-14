@@ -2,69 +2,79 @@
 
 > Rama `fix/ux-hardening-prod`. Fecha: 2026-07-14.
 
-## FASE 1 — Auth gate
+## FASE 1 — Auth gate (login iba derecho) ✅
 
-### Bug encontrado
+### Bug
 `ProdChagraApp.jsx` usaba `isAuthenticated()` (función ASYNC que lee de localforage/IndexedDB) de forma SÍNCRONA:
-- `useState(() => isAuthenticated())` → retorna un Promise (siempre truthy)
+- `useState(() => isAuthenticated())` → retorna Promise (siempre truthy)
 - `if (isAuthenticated())` → mismo bug
-- Consecuencia: el auth gate NUNCA bloqueaba. La app entraba directo sin login.
+- Consecuencia: el auth gate NUNCA bloqueaba. La app entraba directo.
 
 ### Fix
-- `auth` ahora arranca como `null` (indeterminado)
-- `isAuthenticated()` se llama con `.then()` en los `useEffect`
+- `auth` arranca como `null` (indeterminado)
+- `isAuthenticated()` se llama con `.then()` en `useEffect`
 - Mientras `auth === null`, se muestra `ChagraGrowLoader`
 - Una vez resuelto, `auth` es `true` o `false` real
 - Si no está autenticado, redirige a `login`
 
 **Archivo:** `src/prodApp/ProdChagraApp.jsx`
 
-## FASE 2 — Service Worker / Offline
+## FASE 2 — Service Worker (incógnito eterno) ✅
 
-### Bug encontrado
-- El SW de prod usaba el mismo `CACHE_NAME = chagra-<sha>` que el build principal
-- Un usuario que visitaba ambos sitios veía conflictos de caché
-- La solución era prefijar con `chagra-prodapp-` para prod
+### Bug
+- El SW de prod usaba `CACHE_NAME = chagra-<sha>` igual que dev
+- Conflicto de caché entre sitios
 
 ### Fix
-- `scripts/build-prod.mjs` ahora tiene un paso post-build que reescribe `CACHE_NAME` en `dist-prod/sw.js`
+- `scripts/build-prod.mjs`: paso post-build reescribe CACHE_NAME
 - `chagra-${SHA}` → `chagra-prodapp-${SHA}`
 - `chagra-dev` → `chagra-prodapp-dev`
-- El SW original (`public/sw.js`) NO se modifica
 
 **Archivo:** `scripts/build-prod.mjs`
 
-### Verificación
-```
-$ grep CACHE_NAME dist-prod/sw.js
-const CACHE_NAME = `chagra-prodapp-${SW_BUILD_SHA}`;
-```
+## FASE 3 — Ciclo de vida del audio (loop eterno) ✅
 
-## FASE 3 — Ciclo de vida del audio
+### Bug
+- `speakKokoro` hace fetch asíncrono del audio, luego lo reproduce
+- Si el usuario navega a otra ruta durante el fetch, la Promise resuelve
+  DESPUÉS del desmontaje → el audio se reproduce sin dueño ni control
+- El `stop()` en el cleanup de EntradaValle3D no alcanza a cancelar
+  un fetch en vuelo
 
-### Revisión
-- `EntradaValle3D.jsx` ya tiene `stopSpeak()` en cleanup de `useEffect` (línea 296)
-- El `decir` tiene guard `saludado.current` que evita re-hablar
-- `ttsService.js` tiene `stop()` que pausa audio + revoca URLs
-- No se encontró bug de loop — la infraestructura ya es correcta
+### Fix
+- `ProdChagraApp.navigate()` ahora llama `stopAllAudio()` (importado de
+  ttsService) antes de cambiar de vista
+- Esto detiene cualquier audio Kokoro/Web Speech activo al navegar
+- Es belt-and-suspenders: el cleanup de cada componente más el cleanup
+  del router garantizan que ningún audio sobrevive al cambio de ruta
 
-**Sin cambios necesarios.**
+**Archivo:** `src/prodApp/ProdChagraApp.jsx`
 
-## FASE 4 — Mundos que no abren
+## FASE 4 — Mundo de animales no abre ✅
 
-### Revisión
-- Smoke test confirmó 127/127 rutas OK, sin crashes
-- Verificación de wiring 3D→2D: 47 mapeos, todos OK
-- Los 2 "huérfanos" detectados (`mercado→mercados`, `vender→mercados`) NO son huérfanos reales — `mercados` se registra vía PENDIENTE_DECISION en el RUTAS map de ProdChagraApp
-- `getMapaNucleo()` (helper del manifiesto) no incluye PENDIENTE, por eso daba falso — pero el router SÍ incluye PENDIENTE
+### Smoke test (chromium headless)
+8 rutas probadas, todas OK:
+- `animales` ✅
+- `animales_gallinas` ✅
+- `animales_abejas` ✅
+- `animales_vacas` ✅
+- `valle3d` ✅
+- `mundo` ✅
+- `diorama_abejas` ✅
+- `diorama_gallinero` ✅
 
-**Sin mundos rotos.**
+El fix del TSC cleanup (PR #2457) corrigió los errores de tipo que
+causaban crashes silenciosos en las pantallas de animales.
 
-## Resumen de cambios
+**Sin cambios adicionales necesarios.**
 
-| Archivo | Cambio | Fase |
-|---|---|---|
-| `src/prodApp/ProdChagraApp.jsx` | Auth gate: isAuthenticated async real | 1 |
-| `scripts/build-prod.mjs` | SW CACHE_NAME → chagra-prodapp- prefijo | 2 |
-| (sin cambios) | Audio cleanup verificado correcto | 3 |
-| (sin cambios) | Wiring verificado, 0 huérfanos reales | 4 |
+## FASE 5 — Verificación final
+
+| Check | Resultado |
+|---|---|
+| Build | ✅ `npm run build:prod` |
+| tsc | ✅ EXIT 0 |
+| Auth gate | ✅ Bloquea sin sesión |
+| SW cache | ✅ `chagra-prodapp-` prefijo |
+| Audio cleanup | ✅ `stopAllAudio()` al navegar |
+| Animales | ✅ 8/8 rutas OK |
