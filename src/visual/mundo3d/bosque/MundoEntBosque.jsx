@@ -18,9 +18,10 @@
  *
  * Importa three/@react-three (vía las escenas) → montar SOLO perezoso (lazy).
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import EscenaBosqueVivo from './EscenaBosqueVivo.jsx';
 import EscenaEntMaestro from './EscenaEntMaestro.jsx';
+import { decidirTier, permite3D } from '../deviceTier.js';
 
 /* La invitación aparece cuando la cámara ya llegó al claro (~5.2s de caminata). */
 const CSS = `
@@ -71,7 +72,13 @@ const CSS = `
  * Montar SOLO perezoso (lazy); llena a su contenedor.
  * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean}} props
  */
-export default function MundoEntBosque({ tier = 'alto', reducedMotion = false }) {
+export default function MundoEntBosque({ tier: tierProp, reducedMotion: rmProp } = {}) {
+  // Contrato de mundos: si el host pasa {tier, reducedMotion} se respeta; si se
+  // monta suelto (p.ej. el router de prod.chagra.app monta <Componente /> sin
+  // props), auto-detecta el equipo con decidirTier() para no matar la gama baja.
+  const auto = useMemo(() => decidirTier(), []);
+  const tier = tierProp ?? (permite3D(auto.tier) ? auto.tier : 'bajo');
+  const reducedMotion = rmProp ?? auto.reducedMotion;
   const [modo, setModo] = useState('entrada'); // 'entrada' | 'microsuelo'
 
   return (
