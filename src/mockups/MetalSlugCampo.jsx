@@ -48,6 +48,15 @@ import {
   JUMP_VELOCITY,
   MOVE_SPEED,
 } from '../services/defensoresGameEngine';
+import PlagaSprite from './metalslug/PlagasSprites.jsx';
+import EscenarioFondo, { paletaPiso } from './metalslug/EscenarioFondo.jsx';
+import JefeSequia from './metalslug/JefeSequia.jsx';
+import StyleJuice, {
+  ProyectilBio,
+  EfectoImpacto,
+  BarraVida,
+  IndicadorMunicion,
+} from './metalslug/JuiceMetalSlug.jsx';
 
 /* ── Geometría del mundo (coords diseño; x→derecha, y→abajo). ───────────────── */
 const ALTO_2D = 520; // alto de diseño de la vista
@@ -63,17 +72,9 @@ const DISPARO_COOLDOWN_MS = 260;
 const FICHA_MS = 3200; // pausa breve de la ficha didáctica
 const NIVEL = NIVELES[0];
 
-/* Paleta cálida de la ladera templada (misma familia térmica del repo). */
-const PAL = Object.freeze({
-  cielo: '#bfe3ef',
-  cieloBajo: '#eaf3d9',
-  lomaLejos: '#a9c69b',
-  lomaCerca: '#7fae74',
-  suelo: '#8a6a44',
-  sueloClaro: '#a8814f',
-  pasto: '#6fa650',
-  tinta: '#3a2a1a',
-});
+/* Paleta del piso térmico del nivel (data-driven: templado/frío/cálido/páramo).
+   El fondo lo pinta EscenarioFondo; aquí se usa para suelo, cultivos y tinta. */
+const PAL = paletaPiso(NIVEL.piso_termico);
 
 /* Color del proyectil según el ROL biológico real del arma (data-driven). */
 const COLOR_POR_TIPO = Object.freeze({
@@ -141,8 +142,17 @@ function crearMundo() {
     shakeHasta: 0,
     shakeMag: 0,
     reloj: 0,
+    efectos: [], // estallidos visuales efímeros (SOLO ARTE, no afectan la sim)
+    _fxId: 0,
   };
 }
+
+/* Empuja un estallido visual efímero (se autolimpia por edad en el tick). */
+function sembrarEfecto(w, tipo, x, y) {
+  w._fxId = (w._fxId || 0) + 1;
+  w.efectos.push({ id: `fx${w._fxId}`, tipo, x, y, nace: w.reloj });
+}
+const FX_VIDA_S = 0.6; // duración visible del estallido (s)
 
 /* ── SIMULACIÓN (scope de módulo: sin estado React, muta el mundo `w`). ──────── */
 
@@ -196,13 +206,17 @@ function simularTick(w, ahora, teclas, reducedMotion) {
     const { plagas, impacto } = resolverImpactoArma(movido, w.enemigos);
     if (impacto) {
       w.enemigos = plagas;
+      const ix = movido.x + (movido.w || 6) / 2;
+      const iy = movido.y + (movido.h || 6) / 2;
       if (impacto.correcto) {
         w.puntaje += PUNTOS_PLAGA;
         w._eventoFicha = impacto.enemigoId;
         w._shake = Math.max(w._shake || 0, reducedMotion ? 0 : 5);
+        sembrarEfecto(w, 'bio', ix, iy);
       } else {
         w._eventoErrado = impacto.enemigoId;
         w._shake = Math.max(w._shake || 0, reducedMotion ? 0 : 3);
+        sembrarEfecto(w, 'errado', ix, iy);
       }
       // proyectil consumido: no se reencola
     } else {
@@ -219,6 +233,7 @@ function simularTick(w, ahora, teclas, reducedMotion) {
         j.invulnHasta = ahora + INVULN_MS;
         w._shake = Math.max(w._shake || 0, reducedMotion ? 0 : 8);
         w._eventoGolpe = true;
+        sembrarEfecto(w, 'dano', j.x + j.w / 2, j.y + j.h / 2);
         break;
       }
     }
@@ -230,6 +245,12 @@ function simularTick(w, ahora, teclas, reducedMotion) {
     w.puntaje += PUNTOS_REHEN;
     w._eventoRehen = true;
     w._shake = Math.max(w._shake || 0, reducedMotion ? 0 : 6);
+    sembrarEfecto(w, 'rescate', w.rehen.x + w.rehen.w / 2, w.rehen.y + w.rehen.h / 2);
+  }
+
+  /* envejecer estallidos visuales (solo arte) */
+  if (w.efectos.length) {
+    w.efectos = w.efectos.filter((f) => w.reloj - f.nace < FX_VIDA_S);
   }
 
   /* fin de nivel */
@@ -266,6 +287,7 @@ function despacharEventos(w, reducedMotion, d) {
     w._eventoErrado = null;
   }
   if (w._eventoGolpe) {
+    d.setFlashDano((n) => n + 1);
     w._eventoGolpe = null;
   }
   if (w._eventoRehen) {
@@ -367,6 +389,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
   const [avisoRehen, setAvisoRehen] = useState(null); // mensaje de conservación
   const [toast, setToast] = useState(null); // feedback transitorio (arma equivocada)
   const [fin, setFin] = useState(null); // { estado, razon }
+  const [flashDano, setFlashDano] = useState(0); // llave para reproducir la viñeta de golpe
 
   /* medir ancho visible en unidades de diseño (para la cámara) */
   useEffect(() => {
@@ -399,6 +422,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
       armaId: arsenal[w.armaIdx % arsenal.length],
     });
     w.proyectiles.push(proy);
+    sembrarEfecto(w, 'muzzle', px + j.mira * 6, j.y + 26); // fogonazo del lanzamiento
   }, [arsenal]);
 
   /* cambiar de arma (control biológico) */
@@ -480,7 +504,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
 
   /* ── EL LATIDO: un solo rAF, paso fijo, todo por el motor puro. ───────────── */
   useEffect(() => {
-    const dispatch = { setFicha, setToast, setAvisoRehen, setFin, finRef };
+    const dispatch = { setFicha, setToast, setAvisoRehen, setFin, setFlashDano, finRef };
     let raf = 0;
     let prev = performance.now();
     let acc = 0;
@@ -535,17 +559,21 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
   return (
     <div className="msc-juego">
       <div ref={vistaRef} className="msc-vista">
-        <div className="msc-cielo" aria-hidden="true" />
-        <div
-          className="msc-loma msc-loma--lejos"
-          aria-hidden="true"
-          style={{ transform: `translate3d(${-w.cam * 0.28}px,0,0)` }}
-        />
-        <div
-          className="msc-loma msc-loma--cerca"
-          aria-hidden="true"
-          style={{ transform: `translate3d(${-w.cam * 0.52}px,0,0)` }}
-        />
+        <StyleJuice />
+
+        {/* fondo por piso térmico (cielo + lomas + ambiente) */}
+        <EscenarioFondo piso={NIVEL.piso_termico} cam={w.cam} reducedMotion={reducedMotion} />
+
+        {/* jefe SEQUÍA acechando desde el cielo (solo niveles de sequía) */}
+        {NIVEL.jefe === 'jefe_sequia' && (
+          <div
+            className="msc-jefe-cielo"
+            aria-hidden="true"
+            style={{ transform: `translate3d(${-w.cam * 0.12}px,0,0)` }}
+          >
+            <JefeSequia size={220} reducedMotion={reducedMotion} />
+          </div>
+        )}
 
         <div
           className="msc-marco"
@@ -578,23 +606,35 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
               ) : null,
             )}
 
-            {/* proyectiles */}
+            {/* proyectiles (biopreparados temáticos) */}
             {w.proyectiles.map((p) => {
               const a = getArma(p.armaId);
+              const sz = Math.max(p.w, p.h) + 8;
               return (
                 <div
                   key={p.id}
                   className="msc-proyectil"
-                  style={{
-                    left: p.x,
-                    top: p.y,
-                    width: p.w,
-                    height: p.h,
-                    background: COLOR_POR_TIPO[a?.tipo] || '#fff',
-                  }}
-                />
+                  style={{ left: p.x + p.w / 2 - sz / 2, top: p.y + p.h / 2 - sz / 2, width: sz, height: sz }}
+                >
+                  <ProyectilBio
+                    color={COLOR_POR_TIPO[a?.tipo] || '#fff'}
+                    tipo={a?.tipo}
+                    reducedMotion={reducedMotion}
+                  />
+                </div>
               );
             })}
+
+            {/* estallidos de impacto / fogonazos / rescate (SOLO ARTE) */}
+            {w.efectos.map((f) =>
+              f.tipo === 'muzzle' ? (
+                <div key={f.id} className="msc-fx-muzzle" style={{ left: f.x, top: f.y }} />
+              ) : (
+                <div key={f.id} className="msc-fx-hold" style={{ left: f.x, top: f.y }}>
+                  <EfectoImpacto tipo={f.tipo} reducedMotion={reducedMotion} />
+                </div>
+              ),
+            )}
 
             {/* rehén (oso andino) */}
             <div
@@ -619,25 +659,27 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
           </div>
         </div>
 
+        {/* destello de daño (viñeta roja al recibir golpe) */}
+        {flashDano > 0 && <div key={flashDano} className="msc-fx-dano-flash" aria-hidden="true" />}
+
         {/* HUD */}
         <div className="msc-hud">
           <div className="msc-hud-izq">
-            <span className="msc-energia" aria-label={`Energía ${w.jugador.energia}`}>
-              {Array.from({ length: ENERGIA_INICIAL }).map((_, i) => (
-                <b key={i} className={i < w.jugador.energia ? 'on' : 'off'}>♥</b>
-              ))}
-            </span>
+            <BarraVida energia={w.jugador.energia} max={ENERGIA_INICIAL} />
             <span className="msc-puntaje">{w.puntaje} pts</span>
           </div>
           <div className="msc-hud-der">
             <span className="msc-plagas-cnt">Plagas: {plagasVivas}</span>
             <span className="msc-rehen-cnt">{w.rehen.liberado ? 'Oso a salvo ✓' : 'Oso: rescátelo'}</span>
           </div>
-          <button type="button" className="msc-arma-actual" onClick={cambiarArma}>
-            <b style={{ color: COLOR_POR_TIPO[armaActual?.tipo] || '#fff' }}>■</b>
-            <span>{armaActual?.nombre}</span>
-            <em>cambiar (K)</em>
-          </button>
+          <div className="msc-hud-muni">
+            <IndicadorMunicion
+              nombre={armaActual?.nombre}
+              color={COLOR_POR_TIPO[armaActual?.tipo] || '#fff'}
+              tipo={armaActual?.tipo}
+              onClick={cambiarArma}
+            />
+          </div>
         </div>
 
         {/* ficha didáctica al controlar una plaga (pausa breve) */}
@@ -752,55 +794,7 @@ const SpriteOso = memo(function SpriteOso({ tier, reducedMotion }) {
   return <OsoAndino size={92} inline={false} animated={!reducedMotion} tier={tier} title="Oso andino" />;
 });
 
-/* Plaga: sprite chunky rubber-hose-ish con ojos saltones (humor). Data-driven por
-   enemigoId; sin dependencias de creatures (las plagas no son fauna canónica). */
-const PlagaSprite = memo(function PlagaSprite({ enemigoId, reducedMotion }) {
-  const anim = reducedMotion ? undefined : 'msc-wobble';
-  if (enemigoId === 'moscablanca') {
-    return (
-      <svg viewBox="0 0 60 52" className={anim} width="100%" height="100%">
-        <g>
-          <ellipse cx="20" cy="20" rx="16" ry="10" fill="#f4f4ee" stroke={PAL.tinta} strokeWidth="2.2" opacity="0.9" />
-          <ellipse cx="40" cy="20" rx="16" ry="10" fill="#eef0e6" stroke={PAL.tinta} strokeWidth="2.2" opacity="0.9" />
-          <ellipse cx="30" cy="34" rx="14" ry="12" fill="#e9e4cf" stroke={PAL.tinta} strokeWidth="2.4" />
-          <circle cx="25" cy="32" r="4.4" fill="#fff" stroke={PAL.tinta} strokeWidth="1.6" />
-          <circle cx="35" cy="32" r="4.4" fill="#fff" stroke={PAL.tinta} strokeWidth="1.6" />
-          <circle cx="25.6" cy="33" r="1.9" fill={PAL.tinta} />
-          <circle cx="35.6" cy="33" r="1.9" fill={PAL.tinta} />
-        </g>
-      </svg>
-    );
-  }
-  if (enemigoId === 'pulgon' || enemigoId === 'afido') {
-    const c = enemigoId === 'afido' ? '#7bbf4f' : '#9ccf5e';
-    return (
-      <svg viewBox="0 0 56 50" className={anim} width="100%" height="100%">
-        <g>
-          <ellipse cx="20" cy="30" rx="13" ry="12" fill={c} stroke={PAL.tinta} strokeWidth="2.4" />
-          <ellipse cx="36" cy="32" rx="11" ry="10" fill={c} stroke={PAL.tinta} strokeWidth="2.2" opacity="0.92" />
-          <circle cx="16" cy="27" r="3.6" fill="#fff" stroke={PAL.tinta} strokeWidth="1.4" />
-          <circle cx="24" cy="27" r="3.6" fill="#fff" stroke={PAL.tinta} strokeWidth="1.4" />
-          <circle cx="16.5" cy="28" r="1.6" fill={PAL.tinta} />
-          <circle cx="24.5" cy="28" r="1.6" fill={PAL.tinta} />
-          <path d="M20 6 L20 18 M14 10 L20 18 L26 10" fill="none" stroke={PAL.tinta} strokeWidth="1.8" strokeLinecap="round" />
-        </g>
-      </svg>
-    );
-  }
-  // cogollero (oruga verde por segmentos)
-  return (
-    <svg viewBox="0 0 64 48" className={anim} width="100%" height="100%">
-      <g>
-        {[12, 24, 36, 48].map((cx, i) => (
-          <circle key={cx} cx={cx} cy={30 - (i % 2) * 2} r="11" fill={i === 3 ? '#a7d06a' : '#8fbf55'} stroke={PAL.tinta} strokeWidth="2.4" />
-        ))}
-        <circle cx="52" cy="24" r="3.4" fill="#fff" stroke={PAL.tinta} strokeWidth="1.4" />
-        <circle cx="52.8" cy="24.6" r="1.6" fill={PAL.tinta} />
-        <path d="M50 32 q4 3 8 0" fill="none" stroke={PAL.tinta} strokeWidth="1.8" strokeLinecap="round" />
-      </g>
-    </svg>
-  );
-});
+/* PlagaSprite ahora vive en ./metalslug/PlagasSprites.jsx (bestiario expresivo). */
 
 /* ── Ficha didáctica al controlar una plaga. ────────────────────────────────── */
 function FichaDidactica({ enemigoId, onCerrar }) {
@@ -883,11 +877,8 @@ function StyleMSC() {
 /* juego */
 .msc-juego{position:absolute;inset:0;display:flex;flex-direction:column;}
 .msc-vista{position:relative;flex:1;overflow:hidden;background:${PAL.cielo};}
-.msc-cielo{position:absolute;inset:0;background:linear-gradient(${PAL.cielo} 0%,${PAL.cieloBajo} 72%);}
-.msc-loma{position:absolute;left:-10%;right:-10%;bottom:14%;height:200px;will-change:transform;}
-.msc-loma--lejos{background:radial-gradient(120% 100% at 50% 100%,${PAL.lomaLejos} 0 60%,transparent 61%);opacity:.8;bottom:20%;height:240px;}
-.msc-loma--cerca{background:radial-gradient(120% 100% at 40% 100%,${PAL.lomaCerca} 0 58%,transparent 59%);bottom:12%;height:220px;}
-.msc-marco{position:absolute;top:0;left:0;transform-origin:top left;will-change:transform;}
+.msc-jefe-cielo{position:absolute;top:2%;right:4%;z-index:2;opacity:.92;filter:drop-shadow(0 6px 14px rgba(180,80,20,.35));will-change:transform;pointer-events:none;}
+.msc-marco{position:absolute;top:0;left:0;transform-origin:top left;will-change:transform;z-index:3;}
 .msc-mundo{position:absolute;top:0;left:0;height:${ALTO_2D}px;will-change:transform;}
 .msc-suelo{position:absolute;left:0;height:${ALTO_2D}px;background:linear-gradient(${PAL.suelo} 0 12px,${PAL.sueloClaro} 12px 100%);}
 .msc-pasto{position:absolute;left:0;height:14px;background:repeating-linear-gradient(90deg,${PAL.pasto} 0 8px,#5f9345 8px 16px);border-radius:6px 6px 0 0;}
@@ -895,9 +886,10 @@ function StyleMSC() {
 .msc-mata--maiz{background:linear-gradient(#8bbf4a,#6d9c37);box-shadow:inset -4px 0 0 rgba(0,0,0,.12);}
 .msc-mata--maiz::after{content:"";position:absolute;top:6px;left:50%;width:12px;height:26px;background:#e6c34a;border-radius:6px;transform:translateX(-50%);}
 .msc-mata--frijol{background:linear-gradient(#7bab54,#557f36);border-radius:12px 12px 0 0;box-shadow:inset -3px 0 0 rgba(0,0,0,.12);}
-.msc-plaga{position:absolute;will-change:transform;}
+.msc-plaga{position:absolute;will-change:transform;filter:drop-shadow(0 3px 2px rgba(0,0,0,.18));}
 .msc-plaga[data-dir="1"]{transform:scaleX(-1);}
-.msc-proyectil{position:absolute;border-radius:50%;box-shadow:0 0 8px rgba(255,255,255,.6),inset 0 0 4px rgba(255,255,255,.7);border:2px solid rgba(0,0,0,.35);will-change:transform;}
+.msc-proyectil{position:absolute;will-change:transform;pointer-events:none;}
+.msc-fx-hold{position:absolute;width:0;height:0;pointer-events:none;}
 .msc-jugador{position:absolute;display:grid;place-items:center;will-change:transform;}
 .msc-jugador[data-mira="-1"]{transform:scaleX(-1);}
 .msc-jugador[data-inv="1"]{animation:msc-parpadeo .18s steps(2,end) infinite;}
@@ -911,12 +903,8 @@ function StyleMSC() {
 .msc-hud{position:absolute;top:8px;left:0;right:0;z-index:20;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:0 12px 0 96px;pointer-events:none;}
 .msc-hud-izq,.msc-hud-der{display:flex;flex-direction:column;gap:3px;background:rgba(0,0,0,.34);border-radius:12px;padding:6px 11px;color:#fff;font-weight:800;}
 .msc-hud-der{text-align:right;font-size:13.5px;}
-.msc-energia b{font-size:19px;color:#ff5a4d;}
-.msc-energia b.off{color:rgba(255,255,255,.28);}
-.msc-puntaje{font-size:17px;color:#ffd66b;}
-.msc-arma-actual{pointer-events:auto;display:flex;align-items:center;gap:7px;background:rgba(0,0,0,.42);border:2px solid rgba(255,255,255,.5);border-radius:12px;padding:6px 11px;color:#fff;font-weight:800;font-size:14px;cursor:pointer;position:absolute;right:12px;top:64px;max-width:60%;}
-.msc-arma-actual b{font-size:16px;}
-.msc-arma-actual em{font-style:normal;opacity:.7;font-size:11.5px;font-weight:700;}
+.msc-puntaje{font-size:17px;color:#ffd66b;margin-top:2px;}
+.msc-hud-muni{position:absolute;right:12px;top:62px;pointer-events:auto;max-width:62%;}
 
 /* overlays */
 .msc-overlay{position:absolute;inset:0;z-index:30;display:grid;place-items:center;background:rgba(20,15,8,.5);padding:18px;animation:msc-aparece .18s ease;}
@@ -947,18 +935,53 @@ function StyleMSC() {
 .msc-ctrl--sec{width:52px;height:52px;font-size:20px;}
 
 /* animaciones (gated por reduced-motion vía data-rm) */
-@keyframes msc-wobble{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
-.msc-wobble{animation:msc-wobble 1.1s ease-in-out infinite;transform-origin:50% 70%;}
 @keyframes msc-parpadeo{0%{opacity:1}50%{opacity:.35}100%{opacity:1}}
 @keyframes msc-brinco{0%{transform:translateY(0)}40%{transform:translateY(-22px)}100%{transform:translateY(0)}}
 @keyframes msc-aparece{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.msc-root[data-rm="1"] .msc-wobble{animation:none;}
+
+/* ── bestiario: secundarias por sprite (transform-box para origen local) ─── */
+.msc-flutter,.msc-drill,.msc-curl,.msc-spring,.msc-legs8,.msc-morph,.msc-carga{transform-box:view-box;}
+@keyframes msc-b-leg{0%,100%{transform:translateY(0)}50%{transform:translateY(1.6px)}}
+.msc-leg{animation:msc-b-leg .5s ease-in-out infinite;}
+.msc-leg--1{animation-delay:.16s;}
+.msc-leg--2{animation-delay:.32s;}
+@keyframes msc-b-flutter{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.66)}}
+.msc-flutter{animation:msc-b-flutter .26s ease-in-out infinite;}
+@keyframes msc-b-drill{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
+.msc-drill{animation:msc-b-drill .16s ease-in-out infinite;}
+@keyframes msc-b-curl{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(.94) rotate(-3deg)}}
+.msc-curl{animation:msc-b-curl 1.5s ease-in-out infinite;}
+@keyframes msc-b-spring{0%,100%{transform:rotate(0)}50%{transform:rotate(-9deg)}}
+.msc-spring{animation:msc-b-spring .9s ease-in-out infinite;}
+@keyframes msc-b-legs8{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.msc-legs8{animation:msc-b-legs8 .6s ease-in-out infinite;}
+@keyframes msc-b-morph{0%,100%{transform:scale(1) skewX(0)}50%{transform:scale(1.05,.95) skewX(3deg)}}
+.msc-morph{animation:msc-b-morph 2.1s ease-in-out infinite;}
+@keyframes msc-b-carga{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.msc-carga{animation:msc-b-carga 1.7s ease-in-out infinite;}
+@keyframes msc-b-drip{0%{transform:translateY(0);opacity:.9}70%{opacity:.9}100%{transform:translateY(5px);opacity:0}}
+.msc-drip{animation:msc-b-drip 1.6s ease-in infinite;}
+
+/* ── jefe SEQUÍA ─────────────────────────────────────────────────────────── */
+@keyframes msc-js-rayos{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes msc-js-halo{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.08);opacity:.85}}
+@keyframes msc-js-pulso{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes msc-js-ojos{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.15)}}
+@keyframes msc-js-calor{0%{transform:translateY(0);opacity:.5}100%{transform:translateY(-8px);opacity:0}}
+.msc-jefe-alive{animation:msc-js-pulso 3.2s ease-in-out infinite;transform-box:view-box;transform-origin:120px 118px;}
+.msc-jefe-alive .msc-jefe-rayos{animation:msc-js-rayos 26s linear infinite;transform-box:view-box;transform-origin:120px 118px;}
+.msc-jefe-alive .msc-jefe-halo{animation:msc-js-halo 3.2s ease-in-out infinite;transform-box:view-box;transform-origin:120px 118px;}
+.msc-jefe-alive .msc-jefe-ojos{animation:msc-js-ojos 4s ease-in-out infinite;transform-box:view-box;transform-origin:120px 108px;}
+.msc-jefe-alive .msc-jefe-calor{animation:msc-js-calor 1.8s ease-in infinite;transform-box:view-box;}
+
 .msc-root[data-rm="1"] .msc-jugador[data-inv="1"]{animation:none;opacity:.6;}
 .msc-root[data-rm="1"] .msc-rehen--libre{animation:none;}
 .msc-root[data-rm="1"] .msc-overlay,.msc-root[data-rm="1"] .msc-toast{animation:none;}
+.msc-root[data-rm="1"] .msc-leg,.msc-root[data-rm="1"] .msc-flutter,.msc-root[data-rm="1"] .msc-drill,.msc-root[data-rm="1"] .msc-curl,.msc-root[data-rm="1"] .msc-spring,.msc-root[data-rm="1"] .msc-legs8,.msc-root[data-rm="1"] .msc-morph,.msc-root[data-rm="1"] .msc-carga,.msc-root[data-rm="1"] .msc-drip{animation:none;}
 @media (prefers-reduced-motion: reduce){
-  .msc-wobble{animation:none;}
   .msc-jugador[data-inv="1"]{animation:none;opacity:.6;}
+  .msc-leg,.msc-flutter,.msc-drill,.msc-curl,.msc-spring,.msc-legs8,.msc-morph,.msc-carga,.msc-drip{animation:none;}
+  .msc-jefe-alive,.msc-jefe-alive *{animation:none;}
 }
 `}</style>
   );
