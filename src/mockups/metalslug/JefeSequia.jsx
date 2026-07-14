@@ -14,7 +14,7 @@ import { memo } from 'react';
 
 const TINTA = '#5a2408';
 
-const JefeSequia = memo(function JefeSequia({ size = 260, reducedMotion = false, title = 'Sequía' }) {
+const JefeSequia = memo(function JefeSequia(/** @type {any} */ { size = 260, reducedMotion = false, title = 'Sequía' }) {
   const anim = !reducedMotion;
   return (
     <svg

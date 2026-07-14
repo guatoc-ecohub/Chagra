@@ -94,7 +94,7 @@ function MaizAlto({ x, c = '#7f9e2c' }) {
   );
 }
 
-const EscenarioFondo = memo(function EscenarioFondo({ piso = 'templado', cam = 0, reducedMotion = false }) {
+const EscenarioFondo = memo(function EscenarioFondo(/** @type {any} */ { piso = 'templado', cam = 0, reducedMotion = false }) {
   const P = paletaPiso(piso);
   const rm = reducedMotion;
 

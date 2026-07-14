@@ -115,7 +115,9 @@ export function Sonrisa({ cx = 0, cy = 0, w = 3, prof = 1.4, ink = RH_INK }) {
  * @param {boolean} [props.sway=false]
  * @param {number} [props.delay=0]
  * @param {string} [props.clase]  clase extra del gesto (p.ej. 'crt-brazo-l')
- * @param {string} [props.origen='top center']  transform-origin (el hombro)
+ * @param {string} [props.origen='top center']  transform-origen (el hombro)
+ * @param {string} [props.ink]
+ * @param {string} [props.glove]
  */
 export function Miembro({
   d, ancho = 2.3, punta = null, puntaR = 1.6, pie = false, sway = false, delay = 0,

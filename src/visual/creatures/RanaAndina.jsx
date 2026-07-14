@@ -100,7 +100,7 @@ export function RanaAndina({
   const auraR = 7.6 + 1.4 * (energia ?? 1);
 
   // CLIMA → cuerpo (perfil rana). Sin clima = neutro digno.
-  const cuerpoClima = cuerpoDeClima(clima, { enso, tier, perfil: PERFIL_RANA });
+  const cuerpoClima = cuerpoDeClima(clima, { enso: /** @type {any} */ (enso), tier, perfil: PERFIL_RANA });
   const estiloClima = (cuerpoClima.tinte || cuerpoClima.opacidad < 1)
     ? { filter: cuerpoClima.tinte || undefined, opacity: cuerpoClima.opacidad < 1 ? cuerpoClima.opacidad : undefined }
     : undefined;

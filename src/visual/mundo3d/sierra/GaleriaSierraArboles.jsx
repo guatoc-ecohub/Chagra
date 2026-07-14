@@ -289,7 +289,7 @@ function CordilleraFondo() {
         { x: -1, z: 8.5, s: [17, 5.6, 6], c: '#ddccab' },
         { x: 10, z: 10, s: [14, 4.8, 6], c: '#e3d4b4' },
       ].map((r, i) => (
-        <mesh key={i} position={[r.x, 0, r.z]} scale={r.s}>
+        <mesh key={i} position={/** @type {[number, number, number]} */ ([r.x, 0, r.z])} scale={/** @type {[number, number, number]} */ (r.s)}>
           <sphereGeometry args={[1, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <meshLambertMaterial color={r.c} />
         </mesh>
@@ -464,7 +464,7 @@ function Frailejones({ centro, cuantos }) {
   return (
     <group>
       {items.map((f, i) => (
-        <group key={i} position={f.world} rotation={[0, f.giro, 0]}>
+        <group key={i} position={/** @type {[number, number, number]} */ (f.world)} rotation={[0, f.giro, 0]}>
           <mesh position={[0, f.alto / 2, 0]}>
             <cylinderGeometry args={[0.05, 0.07, f.alto, 6]} />
             <meshLambertMaterial color={FRAILEJON.tronco} flatShading />
@@ -525,7 +525,7 @@ function VinetaPiso({ pisoId, ancla, def, tier, reducedMotion }) {
 
   /* offsets relativos al ancla, con la Y muestreada del monte (el compañero se
      posa en SU punto de la ladera, no flota a la altura del héroe) */
-  const rel = (ox, oz) => [ox, alturaMonte(ancla[0] + ox, ancla[2] + oz) - ancla[1], oz];
+  const rel = (ox, oz) => /** @type {[number, number, number]} */ ([ox, alturaMonte(ancla[0] + ox, ancla[2] + oz) - ancla[1], oz]);
   const tilt = -Math.PI / 2 - Math.atan(pendienteEn(ancla[0], ancla[2]));
   const claroR = def.alto * 0.85;
 

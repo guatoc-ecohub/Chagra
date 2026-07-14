@@ -129,7 +129,7 @@ export function useLipSync({ activo = true, debounceMs = DEBOUNCE_MS } = {}) {
         crudo = visemaFallback(ahora() - inicioFallbackRef.current);
       }
       const estable = debounceRef.current(crudo, ahora());
-      setVisema((prev) => (prev === estable ? prev : estable));
+      setVisema(/** @type {any} */ ((prev) => (prev === estable ? prev : estable)));
       rafRef.current = requestAnimationFrame(loop);
     };
 

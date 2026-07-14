@@ -152,7 +152,7 @@ function NieblaRasante({ n, reducedMotion }) {
   return (
     <group ref={grupo}>
       {bancos.map((b, i) => (
-        <mesh key={i} geometry={geo} material={mat} position={b.base} />
+        <mesh key={i} geometry={geo} material={mat} position={/** @type {[number, number, number]} */ (b.base)} />
       ))}
     </group>
   );
