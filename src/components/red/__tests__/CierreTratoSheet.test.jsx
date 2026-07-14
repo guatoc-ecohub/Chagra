@@ -29,7 +29,7 @@ const OFERTA = { id: 'of-1', producto: 'Mora de Castilla', vereda: 'El Rosal', m
 
 describe('CierreTratoSheet', () => {
   it('registra con defaults honestos: entregado, sin calidad, PRIVADO', async () => {
-    render(<CierreTratoSheet oferta={OFERTA} onClose={() => {}} />);
+    render(<CierreTratoSheet oferta={OFERTA} onClose={() => {}} onRegistrado={vi.fn()} />);
     fireEvent.click(screen.getByTestId('registrar-trato'));
 
     await waitFor(() => expect(registrarTrato).toHaveBeenCalledWith({
@@ -64,7 +64,7 @@ describe('CierreTratoSheet', () => {
 
   it('si el registro falla, muestra error honesto y no pasa a "registrado"', async () => {
     registrarTrato.mockResolvedValue(null);
-    render(<CierreTratoSheet oferta={OFERTA} onClose={() => {}} />);
+    render(<CierreTratoSheet oferta={OFERTA} onClose={() => {}} onRegistrado={vi.fn()} />);
     fireEvent.click(screen.getByTestId('registrar-trato'));
 
     expect(await screen.findByTestId('trato-error')).toBeTruthy();
@@ -72,7 +72,7 @@ describe('CierreTratoSheet', () => {
   });
 
   it('tocar de nuevo la misma estrella des-califica (vuelve a null)', async () => {
-    render(<CierreTratoSheet oferta={OFERTA} onClose={() => {}} />);
+    render(<CierreTratoSheet oferta={OFERTA} onClose={() => {}} onRegistrado={vi.fn()} />);
     fireEvent.click(screen.getByTestId('calidad-3'));
     fireEvent.click(screen.getByTestId('calidad-3'));
     fireEvent.click(screen.getByTestId('registrar-trato'));

@@ -494,7 +494,7 @@ function DetalleOferta({ oferta, onClose, onEliminar }) {
       </div>
 
       {cerrandoTrato && (
-        <CierreTratoSheet oferta={oferta} onClose={() => setCerrandoTrato(false)} />
+        <CierreTratoSheet oferta={oferta} onClose={() => setCerrandoTrato(false)} onRegistrado={() => setCerrandoTrato(false)} />
       )}
     </div>
   );

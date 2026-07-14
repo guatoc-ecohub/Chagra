@@ -84,7 +84,7 @@ describe('PreguntarVecinoPanel', () => {
     }));
     expect(screen.getByText(/de su misma vereda/i)).toBeTruthy();
     // El mensaje es de la persona: editable antes de enviar.
-    expect(screen.getByLabelText(/Mensaje para el vecino/i).value).toMatch(/red de Chagra/i);
+    expect(/** @type {HTMLInputElement} */ (screen.getByLabelText(/Mensaje para el vecino/i)).value).toMatch(/red de Chagra/i);
     // El saber no se vende — el principio queda a la vista.
     expect(screen.getByText(/el saber no se vende/i)).toBeTruthy();
   });
