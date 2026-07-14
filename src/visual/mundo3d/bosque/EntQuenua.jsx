@@ -78,25 +78,78 @@ function ClusterHojas({ cluster, geo, mat, reducedMotion, fase }) {
   );
 }
 
-/* El rostro tallado: ojos hundidos + brillo, cejas de corteza, boca-grieta. */
-function Rostro({ matOjo, matBrillo, matCorteza, matGrieta, reducedMotion, blinkRefs }) {
+/* El rostro tallado y VIVO del guardián: ojos hundidos con MIRADA (iris cálido +
+   pupila + chispa que derivan despacio, "te ve"), párpados de corteza que
+   PARPADEAN de verdad (bajan sobre el ojo, no aplastan la cuenca), cejas con
+   ánimo BENÉVOLO (alza que acoge más que fruncir) y una boca-grieta que murmura
+   con la tierra y a ratos entibia una sonrisa: el gesto de un abuelo sabio que
+   invita a acercarse. Con reducedMotion queda quieto y sereno. */
+function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, reducedMotion, blinkRefs }) {
   const { centro, radio } = useMemo(() => anclaRostro(7), []);
   // Superficie frontal del tronco a la altura de la mirada (mira al +Z).
   const frente = radio * 0.9;
 
-  const bocaGeo = useMemo(() => {
-    // Boca larga y grave, con una comisura que baja apenas (gesto ancestral).
-    const curve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-0.26, -0.30, 0.0),
-      new THREE.Vector3(-0.09, -0.37, 0.03),
-      new THREE.Vector3(0.09, -0.375, 0.03),
-      new THREE.Vector3(0.26, -0.29, 0.0),
-    ], false, 'catmullrom', 0.5);
-    return new THREE.TubeGeometry(curve, 24, 0.03, 7, false);
-  }, []);
+  // Refs de los gestos: la mirada de cada ojo, las cejas, la boca y los pómulos.
+  const gazeIzq = useRef(null);
+  const gazeDer = useRef(null);
+  const cejaIzq = useRef(null);
+  const cejaDer = useRef(null);
+  const bocaRef = useRef(null);
+  const pomuloIzq = useRef(null);
+  const pomuloDer = useRef(null);
 
-  const Ojo = ({ x, refKey }) => (
-    <group position={[x, 0.06, frente - 0.05]} ref={blinkRefs[refKey]}>
+  const bocaGeo = useMemo(() => {
+    // Boca serena con las comisuras apenas ALZADAS (benévola, no severa). Se
+    // centra en el origen (translate) para que ABRA en su sitio al escalar.
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.26, -0.28, 0.0),
+      new THREE.Vector3(-0.09, -0.35, 0.03),
+      new THREE.Vector3(0.09, -0.35, 0.03),
+      new THREE.Vector3(0.26, -0.27, 0.0),
+    ], false, 'catmullrom', 0.5);
+    const geo = new THREE.TubeGeometry(curve, 24, 0.032, 7, false);
+    geo.translate(0, 0.3125, 0); // pivote de la boca en su propio centro
+    return geo;
+  }, []);
+  useLayoutEffect(() => () => bocaGeo.dispose(), [bocaGeo]);
+
+  // Los GESTOS: la vida del rostro. Capas lentas y desfasadas para que nunca se
+  // sienta mecánico — mira alrededor, piensa (alza/frunce), murmura, sonríe.
+  useFrame((state) => {
+    if (reducedMotion) return;
+    const t = state.clock.elapsedTime;
+    // MIRADA: deriva lenta (recorre, se detiene, vuelve). Ambos ojos juntos.
+    const gx = Math.sin(t * 0.24) * 0.03 + Math.sin(t * 0.09 + 1.1) * 0.015;
+    const gy = Math.sin(t * 0.17 + 0.6) * 0.018;
+    if (gazeIzq.current) gazeIzq.current.position.set(gx, gy, 0.12);
+    if (gazeDer.current) gazeDer.current.position.set(gx, gy, 0.12);
+    // CEJAS: sesgo BENÉVOLO — la alza que acoge domina sobre el ceño sabio.
+    const ceno = (Math.sin(t * 0.3) + Math.sin(t * 0.11 + 2)) * 0.5; // ~-1..1 lento
+    const frunce = Math.max(0, ceno) * 0.6; // el ceño, contenido
+    const alza = Math.max(0, -ceno) * 1.15; // la acogida, dominante
+    if (cejaIzq.current) {
+      cejaIzq.current.position.y = 0.25 + alza * 0.035 - frunce * 0.012;
+      cejaIzq.current.rotation.z = -0.3 - frunce * 0.16 + alza * 0.05;
+    }
+    if (cejaDer.current) {
+      cejaDer.current.position.y = 0.25 + alza * 0.035 - frunce * 0.012;
+      cejaDer.current.rotation.z = 0.3 + frunce * 0.16 - alza * 0.05;
+    }
+    // SONRISA: calidez muy lenta y rara que sube comisuras y pómulos.
+    const sonrisa = Math.max(0, Math.sin(t * 0.13 + 0.5)) * Math.max(0, Math.sin(t * 0.07));
+    // BOCA: murmura despacio (respira / conversa con la tierra) + la sonrisa.
+    if (bocaRef.current) {
+      const murmur = (Math.sin(t * 1.0) + Math.sin(t * 0.47 + 1)) * 0.25 + 0.5; // 0..1
+      bocaRef.current.scale.y = 1 + murmur * 0.8;
+      bocaRef.current.scale.x = 1 + murmur * 0.05 + sonrisa * 0.08;
+      bocaRef.current.position.y = sonrisa * 0.02;
+    }
+    if (pomuloIzq.current) pomuloIzq.current.position.y = -0.12 + sonrisa * 0.03;
+    if (pomuloDer.current) pomuloDer.current.position.y = -0.12 + sonrisa * 0.03;
+  });
+
+  const Ojo = ({ x, refKey, gazeRef }) => (
+    <group position={[x, 0.06, frente - 0.05]}>
       {/* cuenca hundida: gran cavidad oscura empotrada en la corteza */}
       <mesh position={[0, 0, -0.03]} scale={[1.3, 1.5, 0.55]}>
         <sphereGeometry args={[0.15, 16, 14]} />
@@ -107,25 +160,47 @@ function Rostro({ matOjo, matBrillo, matCorteza, matGrieta, reducedMotion, blink
         <sphereGeometry args={[0.115, 18, 16]} />
         <primitive object={matOjo} attach="material" />
       </mesh>
-      {/* la chispa de vida (grande y clara) */}
-      <mesh position={[x > 0 ? 0.038 : 0.03, 0.045, 0.15]}>
-        <sphereGeometry args={[0.026, 10, 10]} />
-        <primitive object={matBrillo} attach="material" />
-      </mesh>
+      {/* LA MIRADA: iris cálido + pupila + chispa, en un grupo que deriva lento
+          (el ojo "mira" alrededor). Es el mayor salto de personalidad del rostro. */}
+      <group ref={gazeRef} position={[0, 0, 0.12]}>
+        <mesh>
+          <sphereGeometry args={[0.052, 14, 12]} />
+          <primitive object={matIris} attach="material" />
+        </mesh>
+        {/* pupila: pozo oscuro en el centro del iris */}
+        <mesh position={[0, 0, 0.032]}>
+          <sphereGeometry args={[0.03, 12, 10]} />
+          <primitive object={matGrieta} attach="material" />
+        </mesh>
+        {/* la chispa de vida (catchlight): arriba a un lado */}
+        <mesh position={[0.022, 0.03, 0.05]}>
+          <sphereGeometry args={[0.02, 10, 10]} />
+          <primitive object={matBrillo} attach="material" />
+        </mesh>
+      </group>
+      {/* PÁRPADO de corteza: pivota arriba y BAJA sobre el ojo al parpadear.
+          En reposo queda retraído (sliver) bajo la ceja; solo baja al pestañear. */}
+      <group ref={blinkRefs[refKey]} position={[0, 0.14, 0.07]} scale={[1, 0.02, 1]}>
+        <mesh position={[0, -0.12, 0]} scale={[1, 1, 0.55]}>
+          <sphereGeometry args={[0.135, 14, 10]} />
+          <primitive object={matCorteza} attach="material" />
+        </mesh>
+      </group>
     </group>
   );
 
   return (
     <group position={[centro.x, centro.y, centro.z]} scale={[1.5, 1.55, 1.15]}>
-      <Ojo x={-0.24} refKey="izq" />
-      <Ojo x={0.24} refKey="der" />
+      <Ojo x={-0.24} refKey="izq" gazeRef={gazeIzq} />
+      <Ojo x={0.24} refKey="der" gazeRef={gazeDer} />
 
-      {/* cejas de corteza: crestas gruesas e inclinadas, ceño sabio/severo */}
-      <mesh position={[-0.24, 0.24, frente + 0.01]} rotation={[0, 0, -0.34]}>
+      {/* cejas de corteza: crestas inclinadas, ánimo (alza/frunce) legible a
+          distancia — el guardián acoge más de lo que reprende */}
+      <mesh ref={cejaIzq} position={[-0.24, 0.25, frente + 0.01]} rotation={[0, 0, -0.3]}>
         <boxGeometry args={[0.34, 0.085, 0.13]} />
         <primitive object={matCorteza} attach="material" />
       </mesh>
-      <mesh position={[0.24, 0.24, frente + 0.01]} rotation={[0, 0, 0.34]}>
+      <mesh ref={cejaDer} position={[0.24, 0.25, frente + 0.01]} rotation={[0, 0, 0.3]}>
         <boxGeometry args={[0.34, 0.085, 0.13]} />
         <primitive object={matCorteza} attach="material" />
       </mesh>
@@ -135,20 +210,30 @@ function Rostro({ matOjo, matBrillo, matCorteza, matGrieta, reducedMotion, blink
         <boxGeometry args={[0.1, 0.4, 0.12]} />
         <primitive object={matCorteza} attach="material" />
       </mesh>
-      {/* pómulos/bolsas bajo los ojos: dan edad y peso al rostro */}
-      <mesh position={[-0.24, -0.12, frente]} rotation={[0, 0, 0.2]}>
+      {/* pómulos/bolsas bajo los ojos: dan edad y peso; suben apenas al sonreír */}
+      <mesh ref={pomuloIzq} position={[-0.24, -0.12, frente]} rotation={[0, 0, 0.2]}>
         <boxGeometry args={[0.26, 0.07, 0.1]} />
         <primitive object={matCorteza} attach="material" />
       </mesh>
-      <mesh position={[0.24, -0.12, frente]} rotation={[0, 0, -0.2]}>
+      <mesh ref={pomuloDer} position={[0.24, -0.12, frente]} rotation={[0, 0, -0.2]}>
         <boxGeometry args={[0.26, 0.07, 0.1]} />
         <primitive object={matCorteza} attach="material" />
       </mesh>
 
-      {/* la boca-grieta */}
-      <mesh position={[0, 0, frente]} geometry={bocaGeo}>
-        <primitive object={matGrieta} attach="material" />
-      </mesh>
+      {/* la boca-grieta con cavidad oscura detrás: al murmurar se abre y se ve el
+          fondo (habla). El grupo `bocaRef` se escala en su propio centro. */}
+      <group position={[0, -0.3125, frente]}>
+        <group ref={bocaRef}>
+          {/* cavidad: pozo oscuro que asoma cuando la boca se abre */}
+          <mesh position={[0, 0, -0.03]} scale={[1, 0.55, 0.4]}>
+            <sphereGeometry args={[0.2, 12, 10]} />
+            <primitive object={matGrieta} attach="material" />
+          </mesh>
+          <mesh geometry={bocaGeo}>
+            <primitive object={matGrieta} attach="material" />
+          </mesh>
+        </group>
+      </group>
     </group>
   );
 }
