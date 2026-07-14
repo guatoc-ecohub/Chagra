@@ -2,24 +2,22 @@
    compartidos (MATERIAL_FINCA para la arboleda, MATERIAL_HATO para el ganado)
    además del componente. */
 /*
- * Animales de finca del valle — REALISTAS por raza (veredicto del operador:
- * "formas muy geométricas, aún no parecen animales reales" → rehechos).
+ * Animales de finca del valle — REALISTAS por raza (feedback del operador:
+ * "la vaca que parezca vaca, los cerdos por raza").
  *
- * Las mallas viven en src/visual/mundo3d/finca/fincaRealista.geom.js: torso
- * como loft orgánico (silueta continua con lomo, grupa y panza reales), AO y
- * luz de cielo HORNEADOS en vertexColors y normales suaves preservadas en la
- * fusión. Cada animal son DOS draw-calls: el cuerpo (una malla) y la cabeza
- * (otra, local al pivote del cuello) para conservar el gesto vivo — la vaca
- * pasta, la gallina picotea, el cerdo hocica, el perro mira. Con
- * `reducedMotion` la escena queda quieta en un fotograma digno. Todo
- * procedural: cero GLTF, cero texturas, offline y liviano.
+ * Las mallas viven en src/visual/mundo3d/finca/fincaRealista.geom.js (patrón
+ * floraParamo: geometría FUSIONADA con color horneado en vertexColors). Cada
+ * animal son DOS draw-calls: el cuerpo (una malla) y la cabeza (otra, local al
+ * pivote del cuello) para conservar el gesto vivo — la vaca pasta, la gallina
+ * picotea, el cerdo hocica, el perro mira. Con `reducedMotion` la escena queda
+ * quieta en un fotograma digno. Todo procedural: cero GLTF, offline y liviano.
  *
  * El hato del valle (razas reales de Colombia):
  *   · vaca Holstein (la lechera de clima frío) con su ternera criolla
  *   · cerdos que SE DISTINGUEN: zungo negro, duroc colorado y una landrace
  *     rosada larga con sus dos lechones
- *   · ovejas criollas de cara oscura (cada una con su vellón), gallinas
- *     (campesina/negra/blanca) + gallo, y el perro criollo amarillo
+ *   · ovejas criollas de cara oscura, gallinas (campesina/negra/blanca) + gallo
+ *   · el perro criollo amarillo que no falta en ninguna finca
  *
  * Los personajes rubber-hose (src/visual/creatures/) NO se tocan: son la fauna
  * con alma. Esto es el ganado, y va realista. Decorativo (aria-hidden): el
@@ -37,20 +35,11 @@ import {
   geomOveja,
 } from '../../visual/mundo3d/finca/fincaRealista.geom.js';
 
-/* El material de las mallas fusionadas con color horneado por vértice que usa
-   la ARBOLEDA por especie. flatShading le da carácter a un tronco — pero a un
-   lomo de vaca lo delata como poliedro, por eso el hato NO lo comparte. */
+/* Material ÚNICO compartido por toda la finca realista: cada malla trae su
+   color horneado en vertexColors → un solo programa para todo el hato. */
 export const MATERIAL_FINCA = new THREE.MeshLambertMaterial({
   vertexColors: true,
   flatShading: true,
-});
-
-/* El material del HATO: mismo Lambert + vertexColors (el sombreado viene
-   horneado en la geometría), pero con normales SUAVES — carne curva, no
-   facetas. Uno solo para todos los animales: un programa, 2 draw-calls por
-   animal. */
-export const MATERIAL_HATO = new THREE.MeshLambertMaterial({
-  vertexColors: true,
 });
 
 /* Los GESTOS de idle: reescriben solo la rotación del grupo-cabeza (el cuerpo
@@ -84,9 +73,6 @@ const GESTOS = {
 /*
  * Un animal realista: cuerpo + cabeza pivotante. `geom` es el resultado de la
  * fábrica ({cuerpo, cabeza, pivote}); `gesto` elige el idle de la cabeza.
- * El jitter determinista por instancia (escala no uniforme + inclinación
- * mínima, sembrado por `fase`) evita que dos animales de la misma raza sean
- * clones — la repetición evidente mata la escena (DR §1).
  */
 function Animal({ geom, gesto, pos = [0, 0, 0], giro = 0, escala = 1, fase = 0, reducedMotion }) {
   const cabeza = useRef(null);
@@ -103,14 +89,10 @@ function Animal({ geom, gesto, pos = [0, 0, 0], giro = 0, escala = 1, fase = 0, 
     };
   }, [escala, giro, fase]);
   return (
-    <group
-      position={[pos[0], pos[1], pos[2]]}
-      rotation={/** @type {[number, number, number]} */ (jitter.rot)}
-      scale={/** @type {[number, number, number]} */ (jitter.esc)}
-    >
-      <mesh geometry={geom.cuerpo} material={MATERIAL_HATO} castShadow />
+    <group position={[pos[0], pos[1], pos[2]]} rotation={[0, giro, 0]} scale={escala}>
+      <mesh geometry={geom.cuerpo} material={MATERIAL_FINCA} castShadow />
       <group ref={cabeza} position={geom.pivote}>
-        <mesh geometry={geom.cabeza} material={MATERIAL_HATO} castShadow />
+        <mesh geometry={geom.cabeza} material={MATERIAL_FINCA} castShadow />
       </group>
     </group>
   );
@@ -135,17 +117,16 @@ export default function AnimalesDeFinca({ reducedMotion = false, q = 1 }) {
   const g = useMemo(
     () => ({
       holstein: geomVaca({ raza: 'holstein', q }),
-      ternera: geomVaca({ raza: 'criolla', ubre: false, cuerno: 0, q }, 23),
+      ternera: geomVaca({ raza: 'criolla', ubre: false, q }),
       zungo: geomCerdo({ raza: 'zungo', q }),
-      duroc: geomCerdo({ raza: 'duroc', q }, 33),
-      landrace: geomCerdo({ raza: 'landrace', q }, 35),
+      duroc: geomCerdo({ raza: 'duroc', q }),
+      landrace: geomCerdo({ raza: 'landrace', q }),
       lechon: geomLechon({ raza: 'landrace' }),
-      oveja1: geomOveja({ q }),
-      oveja2: geomOveja({ q }, 67),
+      oveja: geomOveja({ q }),
       campesina: geomGallina({ tipo: 'campesina', q }),
-      negra: geomGallina({ tipo: 'negra', q }, 43),
-      blanca: geomGallina({ tipo: 'blanca', q }, 45),
-      gallo: geomGallina({ tipo: 'gallo', q }, 47),
+      negra: geomGallina({ tipo: 'negra', q }),
+      blanca: geomGallina({ tipo: 'blanca', q }),
+      gallo: geomGallina({ tipo: 'gallo', q }),
       perro: geomPerro({ q }),
     }),
     [q],
@@ -160,11 +141,11 @@ export default function AnimalesDeFinca({ reducedMotion = false, q = 1 }) {
       <Animal geom={g.zungo} gesto="hocica" pos={[-1.45, 0, -0.5]} giro={0.3} escala={0.62} reducedMotion={rm} />
       <Animal geom={g.duroc} gesto="hocica" pos={[-0.95, 0, -1.0]} giro={1.1} escala={0.6} fase={1.9} reducedMotion={rm} />
       <Animal geom={g.landrace} gesto="hocica" pos={[-1.55, 0, 0.35]} giro={-0.7} escala={0.62} fase={3.4} reducedMotion={rm} />
-      <mesh geometry={g.lechon} material={MATERIAL_HATO} position={[-1.2, 0, 0.62]} rotation={[0, -0.4, 0]} castShadow />
-      <mesh geometry={g.lechon} material={MATERIAL_HATO} position={[-1.75, 0, 0.72]} rotation={[0, 0.9, 0]} scale={0.9} castShadow />
-      {/* las ovejas criollas — vellones DISTINTOS (seed propia) */}
-      <Animal geom={g.oveja1} gesto="tantea" pos={[-0.45, 0, 1.05]} giro={1.4} escala={0.52} fase={1.7} reducedMotion={rm} />
-      <Animal geom={g.oveja2} gesto="tantea" pos={[0.15, 0, 1.35]} giro={0.5} escala={0.48} fase={4.1} reducedMotion={rm} />
+      <mesh geometry={g.lechon} material={MATERIAL_FINCA} position={[-1.2, 0, 0.62]} rotation={[0, -0.4, 0]} castShadow />
+      <mesh geometry={g.lechon} material={MATERIAL_FINCA} position={[-1.75, 0, 0.72]} rotation={[0, 0.9, 0]} scale={0.9} castShadow />
+      {/* las ovejas criollas */}
+      <Animal geom={g.oveja} gesto="tantea" pos={[-0.45, 0, 1.05]} giro={1.4} escala={0.52} fase={1.7} reducedMotion={rm} />
+      <Animal geom={g.oveja} gesto="tantea" pos={[0.15, 0, 1.35]} giro={0.5} escala={0.48} fase={4.1} reducedMotion={rm} />
       {/* el gallinero suelto: tres gallinas + el gallo vigilante */}
       <Animal geom={g.campesina} gesto="picotea" pos={[1.15, 0, 0.6]} giro={2.4} escala={0.8} fase={0.4} reducedMotion={rm} />
       <Animal geom={g.negra} gesto="picotea" pos={[1.5, 0, 0.05]} giro={-1.2} escala={0.76} fase={2.1} reducedMotion={rm} />
