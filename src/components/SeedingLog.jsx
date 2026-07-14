@@ -3,6 +3,8 @@
  * a nivel de archivo —mismo criterio que SpeciesSelect / SeguimientoProcesoScreen—
  */
 // @ts-nocheck
+import { ENV } from '../config/env.js';
+
 export default function SeedingLog({ onBack, onSave, initialData: initialDataRaw }) {
   // Fallback graceful: sin conexión a farmOS (env vars no definidas), mostrar
   // estado vacío digno en vez de romper el ErrorBoundary.
