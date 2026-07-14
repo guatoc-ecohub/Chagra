@@ -24,8 +24,11 @@ export const OSO_PALETA = {
   cuerpo: '#3b2a1e',       // pelaje pardo oscuro
   cuerpoGlow: 'rgba(90,64,44,0.7)',
   panza: '#5a4130',        // vientre un tono más cálido
-  crema: '#f0dcb4',        // hocico, pecho y ANTEOJOS (el rasgo de la especie)
+  crema: '#f0dcb4',        // pecho/bib claro
   cremaClara: '#fbeed0',   // realce del pecho
+  anteojo: '#f6e7c4',      // los ANTEOJOS crema alrededor de los ojos (la firma)
+  anteojoBorde: '#8a6a44', // borde tenue del anteojo (lo define contra el pelaje)
+  hocicoClaro: '#cdaa78',  // el MORRO tan claro del oso (distinto del anteojo)
   hocico: '#241812',       // nariz/trufa
   oreja: '#2e2016',        // pabellón de la oreja
 };

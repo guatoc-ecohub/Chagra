@@ -60,11 +60,21 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
-  // ── Vista global (Sierra Nevada) ───────────────────────────────
+  // ── Vista global (Sierra Nevada) — galería de mundos pulida ────
   {
     path: 'sierra_global',
-    componente: 'VistaGlobalSierra',
-    importLazy: 'src/visual/mundo3d/VistaGlobalSierra.jsx',
+    alias: ['sierra', 'vista_sierra'],
+    componente: 'GaleriaSierraArboles',
+    importLazy: 'src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx',
+    categoria: '3D',
+  },
+
+  // ── El Bosque Vivo — Ent queñua landmark + microsuelo (capas) ──
+  {
+    path: 'bosque_vivo',
+    alias: ['bosque', 'bosque_vivo_3d', 'ent', 'quenua'],
+    componente: 'MundoEntBosque',
+    importLazy: 'src/visual/mundo3d/bosque/MundoEntBosque.jsx',
     categoria: '3D',
   },
 

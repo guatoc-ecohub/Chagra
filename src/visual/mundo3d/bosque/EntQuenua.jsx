@@ -30,7 +30,12 @@ import {
   hojasDeCluster,
   colorHoja,
   anclaRostro,
+  anclaBrazo,
   factorParpadeo,
+  factorHabla,
+  factorSonrisa,
+  specsBarba,
+  BARBA,
   CORTEZA,
 } from './entQuenua.geom.js';
 
@@ -92,22 +97,8 @@ function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, reducedMoti
   const gazeDer = useRef(null);
   const cejaIzq = useRef(null);
   const cejaDer = useRef(null);
-  const bocaRef = useRef(null);
-
-  const bocaGeo = useMemo(() => {
-    // Boca larga y grave, con una comisura que baja apenas (gesto ancestral).
-    // Se centra en el origen (translate) para que ABRA en su sitio al escalar.
-    const curve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-0.26, -0.30, 0.0),
-      new THREE.Vector3(-0.09, -0.37, 0.03),
-      new THREE.Vector3(0.09, -0.375, 0.03),
-      new THREE.Vector3(0.26, -0.29, 0.0),
-    ], false, 'catmullrom', 0.5);
-    const geo = new THREE.TubeGeometry(curve, 24, 0.032, 7, false);
-    geo.translate(0, 0.335, 0); // pivote de la boca en su propio centro
-    return geo;
-  }, []);
-  useLayoutEffect(() => () => bocaGeo.dispose(), [bocaGeo]);
+  const mandibulaRef = useRef(null); // la mandíbula que baja al HABLAR (abre hacia abajo)
+  const bocaRef = useRef(null); // el conjunto de la boca (para la sonrisa de las comisuras)
 
   // Los GESTOS: la vida del rostro. Capas lentas y desfasadas para que nunca se
   // sienta mecánico — mira alrededor, piensa (frunce), murmura.
@@ -131,11 +122,22 @@ function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, reducedMoti
       cejaDer.current.position.y = 0.24 + alza * 0.03 - frunce * 0.015;
       cejaDer.current.rotation.z = 0.34 + frunce * 0.18;
     }
-    // BOCA: murmura despacio (respira / conversa con la tierra bajo sus raíces).
+    // BOCA: HABLA con articulaciones claras (sílabas) y SONRÍE apenas. La
+    // mandíbula baja SIEMPRE hacia abajo (nunca invade la nariz); las comisuras
+    // suben con la sonrisa. Gestos legibles a distancia, no un murmullo confuso.
+    const abre = factorHabla(t); // 0..1 apertura
+    const sonrisa = factorSonrisa(t); // 0..1
+    if (mandibulaRef.current) {
+      // baja el mentón (traslada + abre la cavidad hacia abajo). Parte de una
+      // apertura EN REPOSO (labios apenas separados) para que la boca se lea como
+      // boca aun quieta, y crece con el habla — nunca sube hacia la nariz.
+      mandibulaRef.current.position.y = -0.03 - abre * 0.14;
+      mandibulaRef.current.rotation.x = 0.1 + abre * 0.45;
+    }
     if (bocaRef.current) {
-      const murmur = (Math.sin(t * 1.1) + Math.sin(t * 0.5 + 1)) * 0.25 + 0.5; // 0..1
-      bocaRef.current.scale.y = 1 + murmur * 0.9;
-      bocaRef.current.scale.x = 1 + murmur * 0.06;
+      // la sonrisa ensancha la boca apenas y la sube un pelín (calidez de sabio)
+      bocaRef.current.scale.x = 1 + sonrisa * 0.06;
+      bocaRef.current.position.y = -0.44 + sonrisa * 0.015;
     }
   });
 
@@ -188,9 +190,16 @@ function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, reducedMoti
         <primitive object={matCorteza} attach="material" />
       </mesh>
 
-      {/* caballete de la nariz: nudo vertical entre los ojos */}
-      <mesh position={[0, -0.09, frente + 0.04]} rotation={[0.18, 0, 0]}>
-        <boxGeometry args={[0.1, 0.4, 0.12]} />
+      {/* caballete de la nariz: nudo vertical entre los ojos. MÁS CORTO que antes
+          (terminaba encima de la boca): ahora deja un surco/filtrum limpio hasta
+          los labios para que la boca se lea sola y no choque con la nariz. */}
+      <mesh position={[0, 0.0, frente + 0.04]} rotation={[0.18, 0, 0]}>
+        <boxGeometry args={[0.1, 0.28, 0.12]} />
+        <primitive object={matCorteza} attach="material" />
+      </mesh>
+      {/* base/punta de la nariz: nudo redondeado donde termina el caballete */}
+      <mesh position={[0, -0.17, frente + 0.05]}>
+        <sphereGeometry args={[0.075, 10, 8]} />
         <primitive object={matCorteza} attach="material" />
       </mesh>
       {/* pómulos/bolsas bajo los ojos: dan edad y peso al rostro */}
@@ -203,17 +212,41 @@ function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, reducedMoti
         <primitive object={matCorteza} attach="material" />
       </mesh>
 
-      {/* la boca-grieta, con cavidad oscura detrás: al murmurar se abre y se ve
-          el fondo (habla). El grupo `bocaRef` se escala en su propio centro. */}
-      <group position={[0, -0.335, frente]}>
-        <group ref={bocaRef}>
-          {/* cavidad: pozo oscuro que asoma cuando la boca se abre */}
-          <mesh position={[0, 0, -0.03]} scale={[1, 0.55, 0.4]}>
-            <sphereGeometry args={[0.2, 12, 10]} />
-            <primitive object={matGrieta} attach="material" />
+      {/* LA BOCA — rehecha: dos LABIOS de corteza (arriba fijo, abajo en la
+          MANDÍBULA que baja) con una cavidad oscura detrás. Va BIEN bajo la nariz
+          (filtrum limpio) y ABRE hacia abajo → el gesto de HABLAR se lee claro y
+          nunca invade la nariz. Comisuras marcadas para que la sonrisa se note. */}
+      <group ref={bocaRef} position={[0, -0.44, frente]}>
+        {/* cavidad oscura: el fondo de la boca (fijo). Asoma al abrir la mandíbula */}
+        <mesh position={[0, -0.03, -0.05]} scale={[0.3, 0.14, 0.1]}>
+          <sphereGeometry args={[1, 14, 12]} />
+          <primitive object={matGrieta} attach="material" />
+        </mesh>
+
+        {/* labio SUPERIOR: cresta de corteza fija, apenas curvada hacia arriba */}
+        <mesh position={[0, 0.055, 0.03]} rotation={[-0.12, 0, 0]}>
+          <boxGeometry args={[0.42, 0.07, 0.14]} />
+          <primitive object={matCorteza} attach="material" />
+        </mesh>
+        {/* comisuras: nudos en los extremos (dan a la boca su ancho y la sonrisa) */}
+        {[-0.22, 0.22].map((cx) => (
+          <mesh key={cx} position={[cx, 0.0, 0.03]}>
+            <sphereGeometry args={[0.045, 8, 7]} />
+            <primitive object={matCorteza} attach="material" />
           </mesh>
-          <mesh geometry={bocaGeo}>
-            <primitive object={matGrieta} attach="material" />
+        ))}
+
+        {/* la MANDÍBULA: labio inferior + mentón. Baja al hablar (pivota en el
+            origen de este grupo, que está en la línea de los labios). */}
+        <group ref={mandibulaRef}>
+          <mesh position={[0, -0.07, 0.03]} rotation={[0.14, 0, 0]}>
+            <boxGeometry args={[0.4, 0.08, 0.14]} />
+            <primitive object={matCorteza} attach="material" />
+          </mesh>
+          {/* el mentón: nudo macizo bajo el labio (peso de árbol viejo) */}
+          <mesh position={[0, -0.17, 0.0]}>
+            <boxGeometry args={[0.3, 0.1, 0.12]} />
+            <primitive object={matCorteza} attach="material" />
           </mesh>
         </group>
       </group>
@@ -221,11 +254,128 @@ function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, reducedMoti
   );
 }
 
+/* La BARBA de árbol-anciano (Bárbol): cortinas de musgo que cuelgan de la
+   mandíbula, raicillas leñosas en el mentón y matas de liquen a los lados. Enmarca
+   la boca sin taparla y se mece despacio (un Ent sabio y muy viejo). */
+function Barba({ ancla, matMusgo, matMusgoClaro, matRaiz, matLiquen, matLiquenAzul, reducedMotion }) {
+  const { centro, radio } = ancla;
+  const frente = radio * 0.9;
+  const { mechones, raicillas, liquenes } = useMemo(() => specsBarba(91), []);
+  const grupoRef = useRef(null);
+  useFrame((st) => {
+    if (reducedMotion || !grupoRef.current) return;
+    const t = st.clock.elapsedTime;
+    grupoRef.current.rotation.z = Math.sin(t * 0.5) * 0.02;
+    grupoRef.current.rotation.x = 0.04 + Math.sin(t * 0.4 + 1) * 0.015;
+  });
+  return (
+    <group position={[centro.x, centro.y, centro.z]} scale={[1.5, 1.55, 1.15]}>
+      <group ref={grupoRef} position={[0, 0, frente]}>
+        {/* mechones de musgo (cortina de la barba). Cono con la punta hacia ABAJO. */}
+        {mechones.map((m, i) => (
+          <mesh key={`mb-${i}`} position={[m.x, m.yTop - m.len / 2, m.z]} rotation={[Math.PI, 0, m.tilt]}>
+            <coneGeometry args={[m.grosor, m.len, 5]} />
+            <primitive object={m.claro ? matMusgoClaro : matMusgo} attach="material" />
+          </mesh>
+        ))}
+        {/* raicillas leñosas: hebras largas en el centro del mentón */}
+        {raicillas.map((m, i) => (
+          <mesh key={`rc-${i}`} position={[m.x, m.yTop - m.len / 2, m.z]} rotation={[Math.PI, 0, m.tilt]}>
+            <coneGeometry args={[m.grosor, m.len, 5]} />
+            <primitive object={matRaiz} attach="material" />
+          </mesh>
+        ))}
+        {/* matas de liquen prendidas a los lados de la boca */}
+        {liquenes.map((l, i) => (
+          <mesh key={`lq-${i}`} position={l.pos} scale={[l.esc * 1.5, l.esc * 0.55, l.esc]}>
+            <icosahedronGeometry args={[1, 0]} />
+            <primitive object={l.azul ? matLiquenAzul : matLiquen} attach="material" />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  );
+}
+
+/* El BRAZO MAESTRO: una rama-brazo que sale del fuste, se estira hacia afuera y
+   BAJA, y termina en una MANO cuyo índice SEÑALA el subsuelo. Es el gesto
+   pedagógico — con él el Ent abre y enseña las capas del suelo. Opt-in (`señala`):
+   los demás mundos (bosque, micorrizas) no lo montan. */
+function BrazoMaestro({ P, matCorteza, matCortezaLisa, reducedMotion }) {
+  const grupoRef = useRef(null);
+  const { curva, muñeca } = useMemo(() => {
+    const hombro = anclaBrazo(0.47, 7);
+    const pts = [
+      hombro.clone(),
+      hombro.clone().add(new THREE.Vector3(0.5, 0.0, 0.32)),
+      hombro.clone().add(new THREE.Vector3(1.1, -0.65, 0.9)), // codo
+      hombro.clone().add(new THREE.Vector3(1.7, -1.7, 1.5)), // el antebrazo baja
+      hombro.clone().add(new THREE.Vector3(1.95, -2.35, 1.9)), // muñeca sobre el suelo
+    ];
+    const c = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5);
+    return { curva: c, muñeca: pts[pts.length - 1].clone() };
+  }, []);
+  const brazoGeo = useMemo(
+    () => tuboOrganico(curva, {
+      tubular: Math.max(20, Math.round(P.tubular * 0.4)),
+      radial: Math.max(6, P.radial - 4),
+      taperFn: taperLineal(0.32, 0.11),
+      dispAmp: 0.7,
+      seedAng: 3,
+    }),
+    [curva, P.tubular, P.radial],
+  );
+  useLayoutEffect(() => () => brazoGeo.dispose(), [brazoGeo]);
+  useFrame((st) => {
+    if (reducedMotion || !grupoRef.current) return;
+    const t = st.clock.elapsedTime;
+    // respira mientras enseña: el brazo se mece apenas
+    grupoRef.current.rotation.z = Math.sin(t * 0.6) * 0.02;
+    grupoRef.current.position.y = Math.sin(t * 0.5 + 0.5) * 0.03;
+  });
+  return (
+    <group ref={grupoRef}>
+      <mesh geometry={brazoGeo} material={matCorteza} castShadow receiveShadow />
+      {/* LA MANO en la muñeca */}
+      <group position={[muñeca.x, muñeca.y, muñeca.z]}>
+        {/* palma: nudo aplanado */}
+        <mesh rotation={[0.5, 0, 0]}>
+          <boxGeometry args={[0.2, 0.12, 0.22]} />
+          <primitive object={matCortezaLisa} attach="material" />
+        </mesh>
+        {/* ÍNDICE: el dedo largo que SEÑALA el suelo (abajo y adelante) */}
+        <mesh position={[0.02, -0.16, 0.16]} rotation={[Math.PI - 0.55, 0, 0]}>
+          <coneGeometry args={[0.045, 0.5, 6]} />
+          <primitive object={matCortezaLisa} attach="material" />
+        </mesh>
+        {/* nudillo del índice */}
+        <mesh position={[0.02, -0.05, 0.12]}>
+          <sphereGeometry args={[0.05, 8, 7]} />
+          <primitive object={matCortezaLisa} attach="material" />
+        </mesh>
+        {/* los otros tres dedos: cortos y recogidos (apuntan al frente) */}
+        {[-0.07, 0.0, 0.07].map((dx, i) => (
+          <mesh key={i} position={[dx, -0.12, -0.02]} rotation={[Math.PI - 1.4, 0, 0]}>
+            <coneGeometry args={[0.032, 0.2, 5]} />
+            <primitive object={matCortezaLisa} attach="material" />
+          </mesh>
+        ))}
+        {/* pulgar: nudo lateral */}
+        <mesh position={[-0.11, -0.02, 0.05]} rotation={[0, 0, 0.9]}>
+          <coneGeometry args={[0.035, 0.16, 5]} />
+          <primitive object={matCortezaLisa} attach="material" />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
 /**
  * El Ent de la queñua. Montar dentro de un <Canvas>.
- * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean}} props
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, señala?: boolean}} props
+ *   `señala`: monta el BRAZO MAESTRO que apunta al subsuelo (mundo Ent-maestro).
  */
-export default function EntQuenua({ tier = 'alto', reducedMotion = false }) {
+export default function EntQuenua({ tier = 'alto', reducedMotion = false, señala = false }) {
   const P = paramsDeTier(tier);
   const swayRef = useRef(null);
   const ojoIzq = useRef(null);
@@ -307,14 +457,25 @@ export default function EntQuenua({ tier = 'alto', reducedMotion = false }) {
   );
   const hojaGeo = useMemo(() => new THREE.IcosahedronGeometry(1, 0), []);
 
+  // Materiales de la BARBA (musgo/liquen/raicilla): Lambert siempre (baratos y
+  // pequeños; el musgo no pide PBR). El ancla del rostro sitúa la barba en el mentón.
+  const matMusgo = useMemo(() => new THREE.MeshLambertMaterial({ color: BARBA.musgo }), []);
+  const matMusgoClaro = useMemo(() => new THREE.MeshLambertMaterial({ color: BARBA.musgoClaro }), []);
+  const matBarbaRaiz = useMemo(() => new THREE.MeshLambertMaterial({ color: BARBA.raicilla }), []);
+  const matLiquen = useMemo(() => new THREE.MeshLambertMaterial({ color: BARBA.liquen }), []);
+  const matLiquenAzul = useMemo(() => new THREE.MeshLambertMaterial({ color: BARBA.liquenAzul }), []);
+  const ancla = useMemo(() => anclaRostro(7), []);
+
   // Liberar GPU al desmontar (geometrías y materiales procedurales).
   useLayoutEffect(() => () => {
     troncoGeo.dispose();
     ramasGeo.forEach((g) => g.dispose());
     raicesGeo.forEach((g) => g.dispose());
     hojaGeo.dispose();
-    [matCorteza, matCortezaLisa, matGrieta, matOjo, matBrillo, matIris, matHoja].forEach((m) => m.dispose());
-  }, [troncoGeo, ramasGeo, raicesGeo, hojaGeo, matCorteza, matCortezaLisa, matGrieta, matOjo, matBrillo, matIris, matHoja]);
+    [matCorteza, matCortezaLisa, matGrieta, matOjo, matBrillo, matIris, matHoja,
+      matMusgo, matMusgoClaro, matBarbaRaiz, matLiquen, matLiquenAzul].forEach((m) => m.dispose());
+  }, [troncoGeo, ramasGeo, raicesGeo, hojaGeo, matCorteza, matCortezaLisa, matGrieta, matOjo, matBrillo, matIris, matHoja,
+    matMusgo, matMusgoClaro, matBarbaRaiz, matLiquen, matLiquenAzul]);
 
   // --- Vida: balanceo pesado + parpadeo lento ---
   useFrame((state) => {
@@ -352,6 +513,27 @@ export default function EntQuenua({ tier = 'alto', reducedMotion = false }) {
           reducedMotion={reducedMotion}
           blinkRefs={{ izq: ojoIzq, der: ojoDer }}
         />
+
+        {/* la BARBA de árbol-anciano (siempre): musgo, liquen y raicillas */}
+        <Barba
+          ancla={ancla}
+          matMusgo={matMusgo}
+          matMusgoClaro={matMusgoClaro}
+          matRaiz={matBarbaRaiz}
+          matLiquen={matLiquen}
+          matLiquenAzul={matLiquenAzul}
+          reducedMotion={reducedMotion}
+        />
+
+        {/* el BRAZO MAESTRO que señala el subsuelo (solo en el mundo Ent-maestro) */}
+        {señala && (
+          <BrazoMaestro
+            P={P}
+            matCorteza={matCorteza}
+            matCortezaLisa={matCortezaLisa}
+            reducedMotion={reducedMotion}
+          />
+        )}
 
         {clusters.map((c, i) => (
           <ClusterHojas
