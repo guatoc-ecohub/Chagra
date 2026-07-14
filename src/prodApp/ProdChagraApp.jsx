@@ -218,9 +218,11 @@ function parseHash() {
 // ── Componente principal ────────────────────────────────────────
 
 export default function ProdChagraApp() {
-  const [auth, setAuth] = useState(() => {
-    try { return isAuthenticated(); } catch { return false; }
-  });
+  // auth: null = determinando, true = autenticado, false = no autenticado.
+  // Arranca null para evitar el flash de login mientras se verifica el token
+  // en localforage (IndexedDB asíncrona). isAuthenticated() es async y NUNCA
+  // debe usarse en un if() síncrono — siempre devuelve Promise truthy.
+  const [auth, setAuth] = useState(null);
   const [currentView, setCurrentView] = useState('loading');
 
   const navigate = useCallback((view) => {
@@ -232,11 +234,16 @@ export default function ProdChagraApp() {
   useEffect(() => {
     const onHash = () => {
       const { view } = parseHash();
-      if (isAuthenticated() || view === 'login' || view === 'oauth-callback') {
-        setCurrentView(view || 'valle3d');
-      } else {
+      // Verificar auth de forma asíncrona real (isAuthenticated es async)
+      isAuthenticated().then((autenticado) => {
+        if (autenticado || view === 'login' || view === 'oauth-callback') {
+          setCurrentView(view || 'valle3d');
+        } else {
+          setCurrentView('login');
+        }
+      }).catch(() => {
         setCurrentView('login');
-      }
+      });
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
@@ -244,14 +251,19 @@ export default function ProdChagraApp() {
 
   useEffect(() => {
     const { view } = parseHash();
-    if (isAuthenticated()) {
-      setAuth(true);
-      setCurrentView(view || 'valle3d');
-    } else if (view === 'oauth-callback') {
-      setCurrentView('oauth-callback');
-    } else {
+    isAuthenticated().then((autenticado) => {
+      setAuth(autenticado);
+      if (autenticado) {
+        setCurrentView(view || 'valle3d');
+      } else if (view === 'oauth-callback') {
+        setCurrentView('oauth-callback');
+      } else {
+        setCurrentView('login');
+      }
+    }).catch(() => {
+      setAuth(false);
       setCurrentView('login');
-    }
+    });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLoginSuccess = useCallback(() => {
@@ -260,8 +272,8 @@ export default function ProdChagraApp() {
     window.location.hash = '';
   }, []);
 
-  // ── Loading ────────────────────────────────────────────────
-  if (currentView === 'loading') return <ChagraGrowLoader />;
+  // ── Loading (auth state aún no determinado) ───────────────────
+  if (auth === null || currentView === 'loading') return <ChagraGrowLoader />;
 
   // ── Auth gate ───────────────────────────────────────────────
   if (!auth && currentView !== 'login' && currentView !== 'oauth-callback') {
