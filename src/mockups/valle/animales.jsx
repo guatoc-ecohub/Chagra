@@ -112,6 +112,8 @@ export default function AnimalesDeFinca({ reducedMotion = false, q = 1 }) {
       zungo: geomCerdo({ raza: 'zungo', q }),
       duroc: geomCerdo({ raza: 'duroc', q }),
       landrace: geomCerdo({ raza: 'landrace', q }),
+      sanpedreno: geomCerdo({ raza: 'sanpedreno', q }),
+      pietrain: geomCerdo({ raza: 'pietrain', q }),
       lechon: geomLechon({ raza: 'landrace' }),
       oveja: geomOveja({ q }),
       campesina: geomGallina({ tipo: 'campesina', q }),
@@ -128,10 +130,14 @@ export default function AnimalesDeFinca({ reducedMotion = false, q = 1 }) {
       {/* la Holstein manda el corral; su ternera criolla al lado */}
       <Animal geom={g.holstein} gesto="pasta" pos={[0.2, 0, -0.4]} giro={-0.5} escala={0.62} reducedMotion={rm} />
       <Animal geom={g.ternera} gesto="pasta" pos={[0.85, 0, 0.15]} giro={-1.1} escala={0.38} fase={2.2} reducedMotion={rm} />
-      {/* los cerdos POR RAZA: negro zungo, colorado duroc, landrace con cría */}
+      {/* los cerdos POR RAZA — las 5 de fincaRealista.geom.js: negro zungo,
+          colorado duroc, landrace con cría, san pedreño de calcetines claros
+          y pietrain blanco manchado */}
       <Animal geom={g.zungo} gesto="hocica" pos={[-1.45, 0, -0.5]} giro={0.3} escala={0.62} reducedMotion={rm} />
       <Animal geom={g.duroc} gesto="hocica" pos={[-0.95, 0, -1.0]} giro={1.1} escala={0.6} fase={1.9} reducedMotion={rm} />
       <Animal geom={g.landrace} gesto="hocica" pos={[-1.55, 0, 0.35]} giro={-0.7} escala={0.62} fase={3.4} reducedMotion={rm} />
+      <Animal geom={g.sanpedreno} gesto="hocica" pos={[-1.05, 0, 0.85]} giro={2.1} escala={0.6} fase={0.8} reducedMotion={rm} />
+      <Animal geom={g.pietrain} gesto="hocica" pos={[-1.95, 0, -1.15]} giro={-1.6} escala={0.62} fase={4.6} reducedMotion={rm} />
       <mesh geometry={g.lechon} material={MATERIAL_FINCA} position={[-1.2, 0, 0.62]} rotation={[0, -0.4, 0]} castShadow />
       <mesh geometry={g.lechon} material={MATERIAL_FINCA} position={[-1.75, 0, 0.72]} rotation={[0, 0.9, 0]} scale={0.9} castShadow />
       {/* las ovejas criollas */}

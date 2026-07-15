@@ -39,6 +39,9 @@ const HATO_MUESTRA = [
   { especie: 'cerdo', nombre: 'Rosita', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
   { especie: 'cerdo', nombre: 'Manchas', raza: 'sanpedreño', tamano: 'pequeño', estado: 'sano' },
   { especie: 'cerdo', nombre: 'Tocineta', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
+  // Overo: la 5ª raza del arte de fincaRealista.geom.js (pietrain) — antes el
+  // corral de muestra solo cubría 4 de las 5 razas dibujadas.
+  { especie: 'cerdo', nombre: 'Overo', raza: 'pietrain', tamano: 'mediano', estado: 'sano' },
   { especie: 'vaca', nombre: 'Lola', raza: 'normando', tamano: 'grande', estado: 'sano' },
   // Camilo: VENDIDO. En el corral queda su huella; en el mercado llega en cuerpo.
   { especie: 'vaca', nombre: 'Camilo', raza: 'cebú', tamano: 'grande', estado: 'vendido' },
