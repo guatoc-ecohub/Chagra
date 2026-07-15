@@ -7,11 +7,16 @@
  * maíz, índigo. Nunca chillón. INK = la línea de tinta gruesa que "respira".
  */
 
-/** Línea de tinta rubber-hose: negro cálido (no negro puro). */
-export const INK = '#241a10';
+import { RH_SPEC_TINTA, RH_SPEC_HUESO } from './rubberhoseSpec.js';
 
-/** Blanco hueso de los ojos de goma / brillos. */
-export const HUESO = '#fff8ec';
+/** Línea de tinta rubber-hose: negro cálido (no negro puro). MISMA tinta que
+    el kit de los 9 bichos (`rubberhoseSpec.js`) — antes este archivo tenía su
+    propia tinta (#241a10) y la fauna benéfica se veía de otra familia. */
+export const INK = RH_SPEC_TINTA;
+
+/** Blanco hueso de los ojos de goma / brillos (el mismo blanco-de-ojo de la
+    familia; antes #fff8ec, una cuarta variante de blanco sin jerarquía). */
+export const HUESO = RH_SPEC_HUESO;
 
 /** Paletas por criatura. `Hi` = luz/brillo de goma; `rombo` = acento andino. */
 export const PALETA = {

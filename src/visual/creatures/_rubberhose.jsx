@@ -14,12 +14,20 @@
  * solo PONEN las clases; el CSS decide si corren.
  */
 
+import {
+  RH_SPEC_TINTA, RH_SPEC_PUPILA, RH_SPEC_HUESO, RH_SPEC_GUANTE,
+  RH_SPEC_CHISPA, RH_SPEC_CHAPETA, RH_SPEC_BOCA, RH_SPEC_LENGUA,
+} from './rubberhoseSpec.js';
+
 /* Tinta cálida (no negro puro): el contorno grueso "andino" de toda la familia.
-   Rubber-hose = línea que manda; que sea tierra-oscura, no industrial. */
-export const RH_INK = '#2a1a0c';
+   Rubber-hose = línea que manda; que sea tierra-oscura, no industrial.
+   Los VALORES viven en `rubberhoseSpec.js` (la ley como datos, fuente única
+   compartida con `_faunaRubberTokens.js`); aquí solo se re-exportan con los
+   nombres históricos del kit. */
+export const RH_INK = RH_SPEC_TINTA;
 /* Guante/mitón crema (manos de goma) y chapeta coral (cachete campesino). */
-export const RH_GLOVE = '#fff3d8';
-export const RH_CHEEK = '#f2907a';
+export const RH_GLOVE = RH_SPEC_GUANTE;
+export const RH_CHEEK = RH_SPEC_CHAPETA;
 
 /**
  * Ojos expresivos de goma (Cuphead/Miss Minutes): esclerótica blanca con
@@ -42,15 +50,15 @@ export function OjosRubber({ ojos = [], mirar = [0.32, 0.34], parpadea = true, i
         const py = o.cy + my * o.r;
         return (
           <g key={i}>
-            <circle cx={o.cx} cy={o.cy} r={o.r} fill="#fffaf0" stroke={ink} strokeWidth={o.r * 0.42} />
+            <circle cx={o.cx} cy={o.cy} r={o.r} fill={RH_SPEC_HUESO} stroke={ink} strokeWidth={o.r * 0.42} />
             {/* pupila + catchlight en su grupo `rh-mirada`: cuando la criatura
                 está viva, las pupilas se van de reojo y miran arriba curiosas
                 (período co-primo con el parpadeo — nunca el mismo compás).
                 Ambos ojos comparten la clase → dardean sincronizados. */}
             <g className={parpadea ? 'rh-mirada' : undefined}>
-              <circle cx={px} cy={py} r={pr} fill="#20130a" />
+              <circle cx={px} cy={py} r={pr} fill={RH_SPEC_PUPILA} />
               {/* catchlight arriba-izquierda: la chispa de vida del ojo */}
-              <circle cx={px - pr * 0.4} cy={py - pr * 0.5} r={pr * 0.42} fill="#fffdf7" />
+              <circle cx={px - pr * 0.4} cy={py - pr * 0.5} r={pr * 0.42} fill={RH_SPEC_CHISPA} />
             </g>
           </g>
         );
@@ -163,7 +171,7 @@ export function AntenaRubber({ d, bulbo, bulboR = 1.15, sway = false, delay = 0,
 }
 
 /* Boca interior (garganta) para las bocas abiertas — un rojo cálido tenue. */
-export const RH_BOCA = '#8a3b34';
+export const RH_BOCA = RH_SPEC_BOCA;
 
 /**
  * BocaVisema — la BOCA de goma en sus 4 formas de LIP-SYNC
@@ -207,7 +215,7 @@ export function BocaVisema({ cx = 0, cy = 0, w = 3, prof = 1.1, visema = 'V1', i
     return (
       <g>
         <ellipse cx={cx} cy={cy + prof * 0.55} rx={w * 0.42} ry={prof * 1.05} fill={boca} stroke={ink} strokeWidth="0.9" />
-        <path d={`M${cx - w * 0.3},${cy + prof * 1.1} Q${cx},${cy + prof * 1.7} ${cx + w * 0.3},${cy + prof * 1.1} Z`} fill="#d1615a" />
+        <path d={`M${cx - w * 0.3},${cy + prof * 1.1} Q${cx},${cy + prof * 1.7} ${cx + w * 0.3},${cy + prof * 1.1} Z`} fill={RH_SPEC_LENGUA} />
       </g>
     );
   }

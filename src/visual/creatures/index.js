@@ -93,6 +93,14 @@ export {
 export { AccesoriosClima } from './AccesoriosClima.jsx';
 // Line-boil (contorno que vibra, años 30).
 export { LineBoilFilter, BOIL_SEEDS } from './LineBoilFilter.jsx';
+// LA LEY rubber-hose como datos: tinta/blancos canónicos, easings por fase,
+// compás del line-boil, períodos co-primos del idle y el registro
+// rubber-hose-vs-realista. GUIA humana: src/visual/GUIA-RUBBERHOSE.md.
+export {
+  RH_SPEC_TINTA, RH_SPEC_PUPILA, RH_SPEC_HUESO, RH_SPEC_GUANTE,
+  RH_SPEC_CHISPA, RH_SPEC_CHAPETA, RH_SPEC_BOCA, RH_SPEC_LENGUA,
+  RH_EASE, RH_LINE_BOIL, RH_PERIODOS, RH_REGISTRO, esRubberhose,
+} from './rubberhoseSpec.js';
 
 import AbejaAngelita from './AbejaAngelita.jsx';
 import Colibri from './Colibri.jsx';
