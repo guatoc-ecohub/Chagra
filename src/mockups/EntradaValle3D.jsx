@@ -56,6 +56,10 @@ import Mundo, {
   TransicionNewDonk,
   useAudioMundo,
 } from '../visual/mundo3d/index.js';
+/* El VELO ODYSSEY (lenguaje de transición aprobado): VOLVER al valle es
+   "regresar a casa" — el velo `luz` exhala tibio, con su asimetría propia.
+   Barrel DOM-safe: cero three en el bundle base. */
+import { VeloOdyssey } from '../visual/mundo3d/transiciones/index.js';
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
 import { buildSpatialAgentInitialContext } from '../services/spatialAgentContext';
@@ -161,6 +165,14 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
   //    de más abajo). Reduced-motion no llega aquí: el hook salta 'viajando'.
   const usarNewDonk = ENTRADA_NEWDONK && !reducedMotion;
   const [newDonk, setNewDonk] = useState(null);
+
+  // ── VOLVER como VELO ODYSSEY (la pieza aprobada del lenguaje): el velo
+  //    `luz` ("de vuelta a casa") cubre, el swap va en su meseta (`onCubierto`
+  //    → completarViaje) y el valle se REVELA cálido — un regreso, no un
+  //    corte. Se arma en el handler que zarpa (como newDonk, nunca en un
+  //    effect) y se apaga solo en su `onFin`. Reduced-motion no lo arma: el
+  //    hook ya corta directo. null | { fase: 'entrando'|'saliendo', destino }.
+  const [velo, setVelo] = useState(null);
 
   // La escucha puede llegar con un mundo ya resuelto por el NLU. Se consume
   // una vez al montar para que volver al valle siga siendo una decisión de la
@@ -379,18 +391,22 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
       // Enciende el mural New Donk en el MISMO tick que zarpa el viaje (mismo
       // render que la fase 'viajando') → el velo queda suprimido y el aplane
       // del valle corre bajo este overlay. Se apaga solo en su `onFin`.
+      // Con el flag apagado, el velo Odyssey del destino cubre la entrada.
       if (usarNewDonk) setNewDonk(id);
+      else if (!reducedMotion) setVelo({ fase: 'entrando', destino: id });
       setPanel(null);
       decir(`Angelita lo lleva a ${tituloDeMundo(id)}.`);
     },
-    [nav, decir, usarNewDonk],
+    [nav, decir, usarNewDonk, reducedMotion],
   );
 
-  // ── VOLVER del mundo al valle (misma transición, en reversa).
+  // ── VOLVER del mundo al valle: el velo Odyssey `luz` — regresar a casa
+  //    exhala (asimetría del lenguaje), no repite la ceremonia de entrada.
   const salirDelMundo = useCallback(() => {
+    if (!reducedMotion) setVelo({ fase: 'saliendo', destino: 'valle' });
     nav.volverAlValle();
     decir('De vuelta al valle de su finca.');
-  }, [nav, decir]);
+  }, [nav, decir, reducedMotion]);
 
   // ── EL MUNDO HABLA (BUG-AG-02, el "cuarto mudo"): al llegar a un mundo,
   //    Angelita lo narra consumiendo `entrada.narra` del registro (BUG-AG-01:
@@ -472,6 +488,11 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
                 reducedMotion={reducedMotion}
                 tier={equipo.tier}
                 aplanando={!!newDonk && nav.fase === 'viajando'}
+                /* La CÁMARA DE DIRECTOR también en la entrada real (antes solo
+                   la tenía la escena del framework): el barrido establishing
+                   que muestra el valle vivo + follow de Angelita. Va gateada
+                   por tier/reduced-motion adentro; una vez por sesión. */
+                camaraDirector
               />
               {/* Dispara el cruce 2D→3D cuando el chunk 3D del valle resolvió
                   (hermano de <Valle3D> en el Suspense). DOM puro, sin three. */}
@@ -535,7 +556,22 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
           onFin={() => setNewDonk(null)}
         />
       )}
-      {nav.enViaje && nav.mundoId && !(newDonk && nav.fase === 'viajando') && (
+      {/* El VELO ODYSSEY del viaje (entrar sin New Donk / volver a casa):
+          cubre → swap en la meseta (`onCubierto`) → revela el destino ya
+          montado. Identidad por destino (volver = `luz`, la de la casa). */}
+      {velo && (
+        <VeloOdyssey
+          fase={velo.fase}
+          destino={velo.destino}
+          tier={equipo.tier}
+          reducedMotion={reducedMotion}
+          onCubierto={nav.completarViaje}
+          onFin={() => setVelo(null)}
+        />
+      )}
+      {/* Respaldo (viajes que nadie armó, p. ej. el deep-link inicial): el
+          velo clásico de siempre, con su swap al final. */}
+      {nav.enViaje && nav.mundoId && !(newDonk && nav.fase === 'viajando') && !velo && (
         <TransicionMundo
           mundoId={nav.mundoId}
           sentido={nav.fase === 'viajando' ? 'entrar' : 'volver'}
