@@ -64,7 +64,12 @@ const fmt = (ms) => {
   return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 };
 
-export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
+export default function RegistroVozScreen({ onBack, onSave, onManual = null, onNavigate = undefined }) {
+  // Fallback sin prop (barrido de controles 2026-07-15): ningún shell pasaba
+  // onManual → el respaldo "O escríbelo a mano" (clave para quien no puede
+  // usar la voz) estaba escondido en TODOS los shells. Con onNavigate (que el
+  // shell de prod inyecta) lleva al formulario del flujo unificado.
+  const manual = onManual ?? (onNavigate ? () => onNavigate('registro_unificado') : null);
   const { audioLevel, amplitudeHistory, durationMs, start, stop, reset, error: recorderError, hardLimitMs } = useVoiceRecorder();
 
   const [view, setView] = useState(ST.IDLE);
@@ -201,10 +206,10 @@ export default function RegistroVozScreen({ onBack, onSave, onManual = null }) {
             {/* Respaldo manual del flujo unificado (#23): para quien no quiere o
                 no puede usar la voz, un solo formulario adaptativo. Solo se
                 muestra si el contenedor pasó onManual (flujo unificado). */}
-            {onManual && (
+            {manual && (
               <button
                 type="button"
-                onClick={onManual}
+                onClick={manual}
                 className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-xl bg-slate-800/70 hover:bg-slate-700 border border-slate-700 text-sm font-semibold text-slate-200"
                 data-testid="registro-manual-cta"
               >

@@ -119,7 +119,37 @@ const EXAMPLE_CHIPS = {
   invernadero_tamano: { values: ['6 x 10 metros', 'Uno pequeño', 'Media hectárea'], append: false },
 };
 
-export default function OnboardingProfile({ onComplete, onClose = undefined, onExplorarEjemplo = undefined }) {
+export default function OnboardingProfile({
+  onComplete,
+  onClose = undefined,
+  onExplorarEjemplo = undefined,
+  // Inyectadas por el shell de prod (barrido de controles 2026-07-15): prod
+  // no pasa onComplete/onClose/onExplorarEjemplo (props específicas del shell
+  // viejo) → "Listo", "Saltar todo", la X de cierre y el SKIP rico eran taps
+  // muertos: terminabas el onboarding y la pantalla no iba a ningún lado.
+  onNavigate = undefined,
+  onBack = undefined,
+}) {
+  // Fallbacks con la MISMA semántica del shell viejo (App.jsx):
+  //   onComplete → confirmar ubicación y seguir al home
+  //   onClose    → atrás
+  //   onExplorarEjemplo → sembrar finca de ejemplo y entrar al home
+  const completar = onComplete ?? (onNavigate
+    ? () => onNavigate('ubicacion-detectada', { next: 'dashboard' })
+    : undefined);
+  const cerrar = onClose ?? onBack;
+  const explorarEjemploFallback = onNavigate
+    ? async () => {
+      try {
+        const { seedExampleFinca } = await import('../services/demoFincaEjemplo');
+        await seedExampleFinca();
+      } catch (err) {
+        console.error('[OnboardingProfile] No se pudo sembrar la finca de ejemplo:', err);
+      }
+      onNavigate('dashboard');
+    }
+    : undefined;
+  const explorarEjemploCb = onExplorarEjemplo ?? explorarEjemploFallback;
   const [answers, setAnswers] = useState(() => getProfile());
   const [index, setIndex] = useState(0);
   const [sembrando, setSembrando] = useState(false);
@@ -153,7 +183,7 @@ export default function OnboardingProfile({ onComplete, onClose = undefined, onE
 
   const goBack = () => {
     if (index > 0) setIndex((i) => i - 1);
-    else if (onClose) onClose();
+    else if (cerrar) cerrar();
   };
 
   const skipQuestion = () => {
@@ -163,13 +193,13 @@ export default function OnboardingProfile({ onComplete, onClose = undefined, onE
   const finish = () => {
     markProfileDone();
     const profile = getProfile();
-    if (onComplete) onComplete(profile);
+    if (completar) completar(profile);
   };
 
   const skipAll = () => {
     markProfileSkipped();
     const profile = getProfile();
-    if (onComplete) onComplete(profile);
+    if (completar) completar(profile);
   };
 
   // SKIP rico: marcar el perfil como saltado, sembrar la finca de ejemplo y
@@ -179,7 +209,7 @@ export default function OnboardingProfile({ onComplete, onClose = undefined, onE
     setSembrando(true);
     markProfileSkipped();
     try {
-      await onExplorarEjemplo?.();
+      await explorarEjemploCb?.();
     } finally {
       setSembrando(false);
     }
@@ -252,7 +282,7 @@ export default function OnboardingProfile({ onComplete, onClose = undefined, onE
         {/* SKIP rico: explorar con la finca de ejemplo ya poblada (demo público).
             No pide llenar nada — entra a una finca completa (multi-piso, con
             historial y problemas reales). */}
-        {typeof onExplorarEjemplo === 'function' && (
+        {typeof explorarEjemploCb === 'function' && (
           <div className="max-w-xl mx-auto mb-2.5">
             <button
               type="button"
