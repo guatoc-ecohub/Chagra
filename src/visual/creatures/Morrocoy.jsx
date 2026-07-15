@@ -1,5 +1,6 @@
-import { useId } from 'react';
+import { useId, useRef } from 'react';
 import './creatures.css';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
 import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, BocaVisema, RH_INK, RH_BOCA } from './_rubberhose.jsx';
 import { MORROCOY_PALETA, MORROCOY_PROPORCION, MORROCOY_SLUG, PERFIL_MORROCOY } from './morrocoyIdentidad.js';
@@ -122,6 +123,14 @@ export function Morrocoy({
      OPT-IN: la testa cabecea lento y firme ("sí, mijo, con paciencia"). Su otra
      reacción-firma. Default false. */
   asiente = false,
+  /* ── VIDA PROPIA (idle-cerebro v2 — la vara de Angelita) ───────────────────
+     Default ON: un reloj con jitter hojea el repertorio de la especie
+     (vidaEstados.js) — el bicho EXISTE aunque nadie le hable. Cada instancia
+     parpadea a SU aire (ritmo propio) y sus pupilas SIGUEN su puntero/dedo
+     cuando anda cerca. El cerebro CEDE ante el host (cualquier gesto manual
+     lo apaga); animated=false, tier 'bajo' y reduced-motion lo apagan entero.
+     vida={false} = el bicho de antes, idéntico. */
+  vida = true,
   /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + respiración del domo + shimmer)
      y deja los estados reactivos. Sin prop (standalone: avatares, catálogo) = pleno. */
@@ -156,6 +165,19 @@ export function Morrocoy({
   const vivo = animated;
   const auraOp = Math.max(0.14, Math.min(0.42, 0.18 + 0.26 * (energia ?? 1)));
   const auraR = 9.0 + 1.6 * (energia ?? 1);
+
+  // ═══ VIDA PROPIA (idle-cerebro + ritmo propio + mirada — vara Angelita v2).
+  // El cerebro solo manda cuando el host no dirige (pose base, sin gestos
+  // manuales ni lip-sync); sus momentos se funden con los props opt-in para
+  // reusar TODO el CSS existente de los gestos-firma.
+  const raizRef = useRef(null);
+  const ritmoPropio = useRitmoPropio();
+  const enBase = pose === 'anda' && !seRetrae && !asiente && !visema;
+  const momento = useVidaIdle('morrocoy', vida && vivo && tier !== 'bajo' && enBase);
+  useMiradaUsted(raizRef, vida && vivo && tier !== 'bajo');
+  const seRetraeFx = seRetrae || momento === 'seRetrae';
+  const asienteFx = asiente || momento === 'asiente';
+  const poseFx = momento === 'reposo' ? 'reposo' : pose;
 
   // CLIMA → cuerpo (determinista, una vez por render): tinte + opacidad al
   // contorno. El morrocoy no tiene alas (velocidadAlas siempre 1: no se usa).
@@ -343,30 +365,34 @@ export function Morrocoy({
 
   const estadoAttrs = {
     'data-creature': MORROCOY_SLUG,
-    'data-pose': vivo ? pose : undefined,
+    'data-pose': vivo ? poseFx : undefined,
     'data-animo': animo,
     'data-tier': tier || undefined,
     'data-visema': visema || undefined,
     'data-ruana': ropa?.ruana ? '1' : undefined,
     'data-mojado': ropa?.mojado ? '1' : undefined,
-    'data-retrae': seRetrae ? '1' : undefined,
-    'data-asiente': asiente ? '1' : undefined,
+    'data-retrae': seRetraeFx ? '1' : undefined,
+    'data-asiente': asienteFx ? '1' : undefined,
+    'data-vida': momento || undefined,
     'data-lineboil': lineBoil ? '1' : undefined,
     'data-prop': mundoId || undefined,
   };
+
+  // El ritmo propio (parpadeo/dardeo por instancia) viaja como vars CSS.
+  const estiloRaiz = { ...ritmoPropio, ...estiloClima };
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
     // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
     return (
-      <g className={className} style={estiloClima} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
+      <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}
         {cuerpoVivo}
       </g>
     );
   }
   const svg = (
-    <svg viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloClima}
+    <svg ref={raizRef} viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloRaiz}
       role="img" aria-label={title} {...estadoAttrs} {...rest}>
       <title>{title}</title>
       {defs}

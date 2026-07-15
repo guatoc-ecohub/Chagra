@@ -1,5 +1,6 @@
-import { useId } from 'react';
+import { useId, useRef } from 'react';
 import './creatures.css';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
 import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, BocaVisema, Miembro, RH_INK } from './_rubberhose.jsx';
 import { cuerpoDeClima, ropaDeClimaBicho } from './creatureClimaCuerpo.js';
@@ -101,6 +102,14 @@ export function Perezoso({
      OPT-IN: el cuerpo se ALARGA despacio y SOSTIENE el estirón (el clásico
      bostezo-estiramiento del perezoso, lentísimo). Default false. */
   estira = false,
+  /* ── VIDA PROPIA (idle-cerebro v2 — la vara de Angelita) ───────────────────
+     Default ON: un reloj con jitter hojea el repertorio de la especie
+     (vidaEstados.js) — el bicho EXISTE aunque nadie le hable. Cada instancia
+     parpadea a SU aire (ritmo propio) y sus pupilas SIGUEN su puntero/dedo
+     cuando anda cerca. El cerebro CEDE ante el host (cualquier gesto manual
+     lo apaga); animated=false, tier 'bajo' y reduced-motion lo apagan entero.
+     vida={false} = el bicho de antes, idéntico. */
+  vida = true,
   /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + mecerse) y deja los estados
      reactivos. Sin prop (standalone: avatares, catálogo) = pleno. */
@@ -133,6 +142,19 @@ export function Perezoso({
   const auraOp = Math.max(0.14, Math.min(0.4, 0.16 + 0.24 * (energia ?? 1)));
   const auraR = 8.2 + 1.5 * (energia ?? 1);
 
+  // ═══ VIDA PROPIA (idle-cerebro + ritmo propio + mirada — vara Angelita v2).
+  // El cerebro solo manda cuando el host no dirige (pose base, sin gestos
+  // manuales ni lip-sync); sus momentos se funden con los props opt-in para
+  // reusar TODO el CSS existente de los gestos-firma.
+  const raizRef = useRef(null);
+  const ritmoPropio = useRitmoPropio();
+  const enBase = pose === 'anda' && !dormita && !estira && !visema;
+  const momento = useVidaIdle('perezoso', vida && vivo && tier !== 'bajo' && enBase);
+  useMiradaUsted(raizRef, vida && vivo && tier !== 'bajo');
+  const dormitaFx = dormita || momento === 'dormita';
+  const estiraFx = estira || momento === 'estira';
+  const poseFx = momento === 'reposo' ? 'reposo' : pose;
+
   // CLIMA → cuerpo (determinista, una vez por render): tinte + opacidad al
   // contorno. El perezoso no tiene alas (velocidadAlas siempre 1: no se usa).
   const cuerpoClima = cuerpoDeClima(clima, { enso, tier, perfil: PERFIL_PEREZOSO });
@@ -157,7 +179,7 @@ export function Perezoso({
   // "Z" del sueño: tres zetas que flotan LENTO y se disuelven (el perezoso
   // dormita). CSS (perezoso-zzz-mota) las anima; con animated=false / RM quedan
   // colgando dignas. Opt-in (dormita).
-  const zzz = dormita ? (
+  const zzz = dormitaFx ? (
     <g className="perezoso-zzz" fill="none" stroke={RH_INK} strokeWidth="0.9"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" opacity="0.75">
       <path className={vivo ? 'perezoso-zzz-mota' : undefined} d="M2,-12 h2 l-2,2 h2" />
@@ -297,23 +319,27 @@ export function Perezoso({
 
   const estadoAttrs = {
     'data-creature': 'perezoso',
-    'data-pose': vivo ? pose : undefined,
+    'data-pose': vivo ? poseFx : undefined,
     'data-animo': animo,
     'data-tier': tier || undefined,
     'data-visema': visema || undefined,
     'data-ruana': ropa?.ruana ? '1' : undefined,
     'data-mojado': ropa?.mojado ? '1' : undefined,
-    'data-dormita': dormita ? '1' : undefined,
-    'data-estira': estira ? '1' : undefined,
+    'data-dormita': dormitaFx ? '1' : undefined,
+    'data-estira': estiraFx ? '1' : undefined,
+    'data-vida': momento || undefined,
     'data-lineboil': lineBoil ? '1' : undefined,
     'data-prop': mundoId || undefined,
   };
+
+  // El ritmo propio (parpadeo/dardeo por instancia) viaja como vars CSS.
+  const estiloRaiz = { ...ritmoPropio, ...estiloClima };
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
     // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
     return (
-      <g className={className} style={estiloClima} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
+      <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}
         {rama}
         {cuerpoVivo}
@@ -321,7 +347,7 @@ export function Perezoso({
     );
   }
   const svg = (
-    <svg viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloClima}
+    <svg ref={raizRef} viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloRaiz}
       role="img" aria-label={title} {...estadoAttrs} {...rest}>
       <title>{title}</title>
       {defs}
