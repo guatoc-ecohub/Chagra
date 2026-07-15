@@ -15,10 +15,12 @@ import { describe, it, expect } from 'vitest';
 import { NUCLEO_3D, NUCLEO_APP, PENDIENTE_DECISION, EXCLUIDO } from '../rutasProdChagraApp.js';
 
 /** Mismo orden y misma regla de exclusión que ProdChagraApp.jsx. */
+/** @typedef {{ path: string, alias?: string[], componente: string }} EntradaRuta */
+/** @type {Array<[string, EntradaRuta[]]>} */
 const BLOQUES = [
   ['NUCLEO_3D', NUCLEO_3D],
   ['NUCLEO_APP', NUCLEO_APP],
-  ['PENDIENTE_DECISION', PENDIENTE_DECISION],
+  ['PENDIENTE_DECISION', /** @type {any} */ (PENDIENTE_DECISION)],
 ];
 
 function registrarTodo() {

@@ -24,8 +24,18 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+/**
+ * @param {Object} [opciones]
+ * @param {'alto'|'medio'|'bajo'} [opciones.tier]
+ * @param {boolean} [opciones.reducedMotion]
+ * @param {(destino: string|null) => void} [opciones.onSwap]  se dispara con la
+ *   pantalla 100% cubierta; destino=null significa "de vuelta a casa".
+ */
 export function useCruceMundo({ tier = 'medio', reducedMotion = false, onSwap } = {}) {
-  const [estado, setEstado] = useState({ fase: 'quieto', destino: null });
+  const [estado, setEstado] = useState(
+    /** @type {{ fase: 'quieto'|'entrando'|'saliendo', destino: string|null }} */
+    ({ fase: 'quieto', destino: null }),
+  );
   const swapRef = useRef(onSwap);
   const estadoRef = useRef(estado);
   // Sincroniza los refs DESPUÉS del render (no durante): los callbacks de abajo

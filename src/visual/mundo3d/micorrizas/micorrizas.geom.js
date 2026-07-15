@@ -555,7 +555,17 @@ export function pintarGeo(geo, base, punta = null) {
   return geo;
 }
 
-/* Mete una PIEZA (una primitiva) pintada y transformada en la lista a fundir. */
+/**
+ * Mete una PIEZA (una primitiva) pintada y transformada en la lista a fundir.
+ * @param {any[]} geos
+ * @param {any} geo
+ * @param {any} color
+ * @param {Object} [opt]
+ * @param {number[]} [opt.pos]
+ * @param {number[]} [opt.rot]
+ * @param {number|number[]} [opt.esc]  escalar uniforme o [x,y,z] (ver abajo)
+ * @param {any} [opt.punta]
+ */
 function pieza(geos, geo, color, { pos = [0, 0, 0], rot = [0, 0, 0], esc = 1, punta = null } = {}) {
   const s = Array.isArray(esc) ? new THREE.Vector3(...esc) : new THREE.Vector3(esc, esc, esc);
   pintarGeo(indexar(geo), color, punta);
@@ -1447,15 +1457,21 @@ export function agregadosHumus({ x0, x1, techo, piso, cara, tier = 'alto', seed 
   return { geo: fundir(geos), gotas };
 }
 
-/*
+/**
  * LA LOMBRIZ. No es un adorno rosado: se come la hojarasca y la caga hecha
  * humus —el humus es literalmente eso—, y al pasar deja un TÚNEL por donde entra
  * el aire y baja el agua. Media docena de lombrices en un terrón es el mejor
  * examen de suelo que hay, y es gratis. La quema las mata de una.
  * Devuelve la curva por donde va (el componente le pone la onda que la mueve) y
  * el túnel que va dejando atrás.
+ * @param {Object} [opt]
+ * @param {number} [opt.x]
+ * @param {number} [opt.y]
+ * @param {number} [opt.cara]  la profundidad de la cara del corte
+ * @param {number} [opt.largo]
+ * @param {number} [opt.seed]
  */
-export function lombrizCorte({ x = 0, y = -0.8, cara, largo = 0.66, seed = 73 } = {}) {
+export function lombrizCorte({ x = 0, y = -0.8, cara = 0, largo = 0.66, seed = 73 } = {}) {
   const r = rng(seed);
   const z = cara - 0.06;
   const curva = new THREE.CatmullRomCurve3([

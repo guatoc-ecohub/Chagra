@@ -47,9 +47,9 @@ export const RECETAS_ARTESANIA = {
  * Crea el material de taller `nombre` para el perfil del tier.
  *
  * @param {keyof typeof RECETAS_ARTESANIA} nombre — receta ('fique', 'chamba'…)
- * @param {{ materialRico?: boolean }} [perfil] — perfilDeTier(tier)
- * @param {object} [extra] — overrides finales (p. ej. { color })
- * @param {{ repetir?: [number, number] }} [mapa] — cuántas veces repite la
+ * @param {{ materialRico?: boolean }} [perfil]  perfilDeTier(tier)
+ * @param {object} [extra]  overrides finales (p. ej. { color })
+ * @param {{ repetir?: [number, number] }} [mapa]  cuántas veces repite la
  *   textura sobre la pieza (un panel ancho quiere más casillas de tejido).
  * @returns {THREE.Material}
  */

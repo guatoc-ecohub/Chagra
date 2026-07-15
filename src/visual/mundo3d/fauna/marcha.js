@@ -431,6 +431,9 @@ export function moverCola(cola, ancla, reposo, dt, rigidez = 0.5) {
 /*  RECORRER UN CAMINO                                                        */
 /* -------------------------------------------------------------------------- */
 
+/** @typedef {THREE.Vector3[] & { _largos?: number[], _total?: number }} SendaConCache
+ *  Polilínea con los largos de tramo cacheados en el propio array (ver abajo). */
+
 /**
  * El animal no camina en el vacío: recorre una SENDA. Esto devuelve dónde está
  * y hacia dónde mira, dada la distancia recorrida.
@@ -438,12 +441,13 @@ export function moverCola(cola, ancla, reposo, dt, rigidez = 0.5) {
  * `puntos` es una polilínea cerrada (el animal da la vuelta y sigue: el monte
  * no se acaba en el borde del encuadre).
  *
- * @param {THREE.Vector3[]} puntos
+ * @param {SendaConCache} puntosArg
  * @param {number} distancia  metros recorridos desde el arranque
  * @param {THREE.Vector3} posSalida
  * @param {THREE.Vector3} dirSalida
  */
-export function andarCamino(puntos, distancia, posSalida, dirSalida) {
+export function andarCamino(puntosArg, distancia, posSalida, dirSalida) {
+  const puntos = /** @type {SendaConCache} */ (puntosArg);
   const n = puntos.length;
   /* los largos de cada tramo, cacheados en el propio array (se calcula una vez) */
   if (!puntos._largos) {

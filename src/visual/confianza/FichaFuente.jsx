@@ -28,10 +28,10 @@ import { VERDES, PALETA } from '../mundo3d/paleta/index.js';
 export default function FichaFuente({
   titulo,
   tipo = 'catalogo',
-  detalle,
-  url,
+  detalle = '',
+  url = '',
   animated = true,
-  className,
+  className = '',
 }) {
   const [abierta, setAbierta] = useState(false);
   const t = TIPOS_FUENTE[tipo] || TIPOS_FUENTE.catalogo;

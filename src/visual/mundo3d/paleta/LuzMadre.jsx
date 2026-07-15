@@ -90,7 +90,7 @@ export default function LuzMadre({
         shadow-camera-bottom={-12}
       />
       <directionalLight
-        position={LUZ_MADRE.rellenoPos}
+        position={/** @type {[number, number, number]} */ (LUZ_MADRE.rellenoPos)}
         intensity={(madre.rellenoInt ?? LUZ_MADRE.relleno) * escala}
         color={madre.relleno}
       />

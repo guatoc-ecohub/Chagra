@@ -105,7 +105,7 @@ export default function TransicionesOdysseyDemo() {
         )}
         <label className="tod__ajustes">
           Equipo
-          <select value={tier} onChange={(e) => setTier(e.target.value)}>
+          <select value={tier} onChange={(e) => setTier(/** @type {'alto'|'medio'|'bajo'} */ (e.target.value))}>
             <option value="alto">alto</option>
             <option value="medio">medio</option>
             <option value="bajo">bajo</option>

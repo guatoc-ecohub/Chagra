@@ -134,7 +134,7 @@ export function crearCuerdaFique({
 /**
  * Muchas cuerdas → UNA malla (cerca completa, red de conectores: 1 draw call).
  * @param {Array<object>} tendidas — opciones de crearCuerdaFique por cuerda
- * @param {object} [comunes] — opciones compartidas (radio, hebras, tramos…)
+ * @param {object} [comunes]  opciones compartidas (radio, hebras, tramos...)
  */
 export function crearCuerdasFique(tendidas, comunes = {}) {
   const geos = tendidas.map((t, i) => crearCuerdaFique({ seed: 7 + i * 13, ...comunes, ...t }));
@@ -186,6 +186,14 @@ export function crearAmarra({ radio = 0.05, grosor = 0.013, cruces = 2, seed = 7
 /* silueta jamás diverge entre dimensiones. El lathe de pocos          */
 /* segmentos ES el estilo; `amanar` le pone el pulso del torno real.   */
 /* ------------------------------------------------------------------ */
+/**
+ * @param {keyof typeof import('../artesaniaAndina.js').SILUETAS_ANDINAS} [nombre]
+ * @param {Object} [opciones]
+ * @param {number} [opciones.alto]
+ * @param {number} [opciones.radio]
+ * @param {number} [opciones.seed]
+ * @param {number} [opciones.segmentos]
+ */
 export function crearVasijaAmano(nombre = 'vasija', {
   alto = 1,
   radio,

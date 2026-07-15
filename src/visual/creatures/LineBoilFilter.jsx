@@ -29,7 +29,7 @@ export const BOIL_SEEDS = RH_LINE_BOIL.seeds;
  * @param {number} [props.baseFrequency=0.025]  turbulencia (spec 0.02–0.03).
  * @param {number} [props.scale=4.5]  desplazamiento (spec 4.0–5.0).
  * @param {boolean} [props.animated=true]  rota la seed (line-boil). false = fijo.
- * @param {number[]} [props.seeds=BOIL_SEEDS]  los 3 estados de seed.
+ * @param {readonly number[]} [props.seeds=BOIL_SEEDS]  los 3 estados de seed.
  * @param {string} [props.dur='0.4s']  duración del ciclo escalonado.
  * @returns {import('react').JSX.Element}
  */

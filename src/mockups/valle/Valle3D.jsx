@@ -254,7 +254,7 @@ function ArboledaEspecies({ q }) {
           key={i}
           geometry={a.geo}
           material={MATERIAL_FINCA}
-          position={a.args}
+          position={/** @type {[number, number, number]} */ (a.args)}
           rotation={[0, a.rot, 0]}
           scale={a.esc}
           castShadow

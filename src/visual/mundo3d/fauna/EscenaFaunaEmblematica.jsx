@@ -274,7 +274,7 @@ export default function EscenaFaunaEmblematica({
     <Canvas
       shadows={!!perfil.sombras}
       dpr={perfil.materialRico ? [1, 2] : [1, 1.5]}
-      camera={{ position: enc.pos, fov: 42, near: 0.02, far: 120 }}
+      camera={{ position: /** @type {[number, number, number]} */ (enc.pos), fov: 42, near: 0.02, far: 120 }}
       gl={{ antialias: !!perfil.antialias }}
     >
       <color attach="background" args={[cielo.fondo]} />
@@ -311,7 +311,7 @@ export default function EscenaFaunaEmblematica({
           <ColibriGuardian
             ficha={FAUNA_EMBLEMATICA.colibri}
             perfil={perfil}
-            posicion={COLIBRI_POS}
+            posicion={/** @type {[number, number, number]} */ (COLIBRI_POS)}
             quieto={reducedMotion}
           />
         )}
@@ -323,7 +323,7 @@ export default function EscenaFaunaEmblematica({
 
       {controles && (
         <OrbitControls
-          target={enc.mira}
+          target={/** @type {[number, number, number]} */ (enc.mira)}
           enablePan={false}
           /* se puede llegar hasta los 15 cm: sin eso, el arlequín no existe */
           minDistance={0.15}

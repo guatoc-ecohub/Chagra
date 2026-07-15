@@ -54,8 +54,15 @@ function Escena({ perfil }) {
         </Html>
       </PanelArtesanal>
 
-      {/* La loza y el canasto, sobre el mismo suelo. */}
-      <VasijaChamba nombre="cantaro" alto={0.5} perfil={perfil} position={[0.4, 0, -1.1]} />
+      {/* La loza y el canasto, sobre el mismo suelo.
+          OJO: artesania/GUIA.md trae el ejemplo con nombre="cantaro", pero ese
+          NO es de la tabla que lee esta pieza: `VasijaChamba` → `crearVasijaAmano`
+          → `puntosSilueta` leen SILUETAS_ANDINAS (vasija|mojon|telar|terraza|totem),
+          mientras que 'cantaro' vive en PERFILES_VASIJA (otra tabla, del lathe 2D).
+          `puntosSilueta` hace `SILUETAS_ANDINAS[nombre] || SILUETAS_ANDINAS.vasija`,
+          así que "cantaro" caía a `vasija` EN SILENCIO. Acá se pide `vasija`
+          de frente, que es lo que de verdad se dibuja. */}
+      <VasijaChamba nombre="vasija" alto={0.5} perfil={perfil} position={[0.4, 0, -1.1]} />
       <CanastoAndino alto={0.4} radio={0.34} perfil={perfil} position={[1.3, 0, -0.6]} />
 
       {/* La cuerda cosiendo panel y poste, como haría en cualquier mundo. */}

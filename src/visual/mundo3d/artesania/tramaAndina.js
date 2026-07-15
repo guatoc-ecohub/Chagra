@@ -146,6 +146,7 @@ export function perfilGuadua(alto = 1.6, radio = 0.05, { seed = 7 } = {}) {
   const nudos = nudosGuadua(alto, { seed });
   const banda = Math.min(alto * 0.02, radio * 0.6);
   const radioEn = (y) => radio * (1 - 0.14 * (y / alto));
+  /** @type {[number, number][]} */
   const puntos = [
     [0, 0],
     [radio, 0],

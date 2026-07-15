@@ -33,7 +33,7 @@ export default function TrazoConfianza({
   nivel = 'media',
   animated = true,
   decorativo = false,
-  className,
+  className = '',
 }) {
   const id = nivelDelHilo(nivel) || 'media';
   const t = NIVELES_CONFIANZA[id];

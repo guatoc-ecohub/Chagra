@@ -254,7 +254,10 @@ export default function AristasGrafo({ grafo, posiciones, tier, enfocado, relaci
 
   // La resolución del material (para el grosor en píxeles) sí sigue al viewport.
   useEffect(() => {
-    for (const m of mallas) m.mat.resolution?.set(tamano.width, tamano.height);
+    // `mat` es LineBasicMaterial (gama baja, sin .resolution) o LineMaterial
+    // (el resto): el `?.` ya cubre el caso en runtime, este cast solo calla a
+    // TS sobre la unión.
+    for (const m of mallas) /** @type {any} */ (m.mat).resolution?.set(tamano.width, tamano.height);
   }, [mallas, tamano]);
 
   // Liberar GPU al re-tejer o desmontar: si no, cada enfoque filtra ~900 curvas.

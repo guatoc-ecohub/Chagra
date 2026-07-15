@@ -139,6 +139,7 @@ function cuerpoRana(ficha, tier) {
  * @param {object} props.perfil  perfilDeTier(tier)
  * @param {THREE.Vector3[]} [props.camino]  su senda (chiquita: 4 cm/s no llega lejos)
  * @param {boolean} [props.quieto]
+ * @param {number} [props.arranque]  desfase inicial en la senda (0..1)
  */
 export default function RanaArlequin({ ficha, perfil, camino = null, quieto = false, arranque = 0 }) {
   const tier = useMemo(() => detalleDeFauna(perfil), [perfil]);

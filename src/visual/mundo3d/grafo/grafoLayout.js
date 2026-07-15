@@ -63,13 +63,13 @@ const ITERACIONES = { alto: 90, medio: 40, bajo: 0 };
  * @returns {{
  *   posiciones: Map<string, [number, number, number]>,
  *   bandas: Array<object>,
- *   alto: number, radioMax: number
+ *   alto: number, radioMax: number, yMin: number, yMax: number
  * }}
  */
 export function calcularLayout(grafo, { tier = 'alto', semilla = 1808 } = {}) {
   const posiciones = new Map();
   const bandas = [];
-  if (!grafo || !grafo.nodos.length) return { posiciones, bandas, alto: 1, radioMax: 1 };
+  if (!grafo || !grafo.nodos.length) return { posiciones, bandas, alto: 1, radioMax: 1, yMin: 0, yMax: 1 };
 
   const rnd = rngArtesania(semilla); // 1808: el año de la Memoria de Caldas
   const pisosPorId = new Map(grafo.pisos.map((p) => [p.id, p]));

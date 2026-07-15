@@ -49,7 +49,7 @@ const _c = new THREE.Color();
  * @param {THREE.BufferGeometry} geo
  * @param {string|THREE.Color} colorHex color como lo vemos nosotros
  * @param {Object} [opt]
- * @param {boolean} [opt.guia=false]  ¿es una GUÍA DE NÉCTAR ultravioleta?
+ * @param {boolean} [opt.guia=false]  es una GUÍA DE NÉCTAR ultravioleta
  *   Para nosotros es un tono apenas distinto; para ella es una pista encendida.
  * @param {number} [opt.brillo=1]  modulación (sombra propia barata, horneada)
  * @returns {THREE.BufferGeometry} la misma geo, con `color` y `colorAbeja`

@@ -278,11 +278,15 @@ export default function ColibriGuardian({
     if (barba.current) {
       const ang = anguloIridiscente(barba.current, estado.camera);
       colorEnRampa(rampa, ang, _color);
-      matBarba.color.copy(_color);
+      // crearMaterialMadre() puede devolver Lambert (gama media/baja) o
+      // Standard (alta) — ambas tienen `color`, solo Standard trae `emissive`
+      // (chequeado en runtime abajo). Cast para que TS conozca ambas props.
+      const matBarbaTintable = /** @type {import('three').MeshStandardMaterial} */ (matBarba);
+      matBarbaTintable.color.copy(_color);
       /* y el DESTELLO: cuando la barba te encara, chispea. Dura un cuarto de
          segundo y es lo que uno recuerda del bicho. */
-      if (matBarba.emissive) {
-        matBarba.emissive.copy(lumbre).multiplyScalar(fuerzaDelDestello(ang) * 0.5);
+      if (matBarbaTintable.emissive) {
+        matBarbaTintable.emissive.copy(lumbre).multiplyScalar(fuerzaDelDestello(ang) * 0.5);
       }
       /* la barba se abre cuando corteja o se planta: no siempre cuelga igual */
       barba.current.rotation.x = 0.35 + Math.sin(t * 1.7) * 0.12 - (libando ? 0.3 : 0);

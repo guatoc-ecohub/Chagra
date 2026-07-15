@@ -30,7 +30,7 @@ import { PALETA, TIERRAS } from '../mundo3d/paleta/index.js';
  * @param {boolean} [props.animated=true]
  * @param {string} [props.className]
  */
-export default function NoSeHonesto({ children, caminos = [], animated = true, className }) {
+export default function NoSeHonesto({ children, caminos = [], animated = true, className = '' }) {
   const cls = className ? `cfz-nose ${className}` : 'cfz-nose';
   return (
     <aside

@@ -72,7 +72,10 @@ const NOMBRE_PISO = {
  * pidió quien activó esa preferencia).
  */
 function CamaraEnfoque({ enfocado, posiciones, centro, radioMax, reducedMotion }) {
-  const controles = useThree((s) => s.controls);
+  // r3f tipa `s.controls` genérico (acepta cualquier implementación); aquí
+  // siempre es el <OrbitControls> de drei montado más abajo (mismo patrón
+  // `any` que DirectorValle.jsx usa para su ref de controls).
+  const controles = /** @type {any} */ (useThree((s) => s.controls));
   const invalidar = useThree((s) => s.invalidate);
   const destino = useRef(new THREE.Vector3());
   const distDestino = useRef(1);

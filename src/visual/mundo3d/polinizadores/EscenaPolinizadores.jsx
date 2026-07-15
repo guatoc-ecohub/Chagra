@@ -79,7 +79,7 @@ function RinconDeMonte({ tier, sombras }) {
   return (
     <group>
       {arboles.map((a) => (
-        <group key={a.key} position={a.pos}>
+        <group key={a.key} position={/** @type {[number, number, number]} */ (a.pos)}>
           <mesh position={[0, a.alto * 0.45, 0]} castShadow={sombras}>
             <cylinderGeometry args={[0.06, 0.1, a.alto * 0.9, 5]} />
             <meshLambertMaterial color="#5e4630" />

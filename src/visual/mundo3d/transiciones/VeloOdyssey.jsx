@@ -71,6 +71,17 @@ const PATH_HORIZONTE =
   'C39,5.7 41,3.6 43,3.6 C45,3.6 46,6.1 51,6.1 C59,6.6 63,4.6 71,5.1 ' +
   'L72.8,2.6 L74.6,5.6 C82,5 88,7 100,5.9 L100,10 Z';
 
+/**
+ * @param {Object} props
+ * @param {null|'entrando'|'saliendo'} [props.fase]  null no monta nada
+ * @param {string} [props.destino]  mundoId o familia ('bosque_vivo', 'microsuelo', 'sierra'…)
+ * @param {string} [props.velo]  override explícito de la identidad ('niebla'|'tierra'|…)
+ * @param {'alto'|'medio'|'bajo'} [props.tier]
+ * @param {boolean} [props.reducedMotion]
+ * @param {string} [props.letrero]  texto bajo el velo (default según fase; '' = mudo)
+ * @param {() => void} [props.onCubierto]
+ * @param {() => void} [props.onFin]
+ */
 export default function VeloOdyssey({
   fase = null,
   destino = 'valle',

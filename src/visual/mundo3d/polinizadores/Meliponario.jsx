@@ -180,7 +180,7 @@ export default function Meliponario({
       <mesh
         geometry={geoBanco}
         material={mat}
-        position={sitio.banco.pos}
+        position={/** @type {[number, number, number]} */ (sitio.banco.pos)}
         castShadow={sombra}
         receiveShadow={sombra}
       />
@@ -211,7 +211,7 @@ export default function Meliponario({
       )}
 
       {/* El platón con piedritas: en verano el rocío no alcanza. */}
-      <mesh geometry={geoAgua} material={mat} position={sitio.agua.pos} receiveShadow={sombra} />
+      <mesh geometry={geoAgua} material={mat} position={/** @type {[number, number, number]} */ (sitio.agua.pos)} receiveShadow={sombra} />
 
       {/* Las guardianas de la piquera. */}
       <instancedMesh
@@ -223,7 +223,7 @@ export default function Meliponario({
 
       {/* EL SOMBRÍO: el árbol que le da la media sombra a las cajas. Sin él, el
           meliponario estaría mal puesto — así que es infraestructura, no paisaje. */}
-      <group position={sitio.sombrio.pos}>
+      <group position={/** @type {[number, number, number]} */ (sitio.sombrio.pos)}>
         <mesh castShadow={sombra} position={[0, 0.9, 0]}>
           <cylinderGeometry args={[0.07, 0.11, 1.8, 6]} />
           <meshLambertMaterial color="#6b5236" />

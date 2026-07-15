@@ -282,7 +282,16 @@ function Bicho({ tipo, mat, pos, rot = [0, 0, 0], esc = 1, fase = 0, reducedMoti
     o.position.x = pos[0] + Math.sin(t * 0.32 + fase) * 0.07;
     o.rotation.z = rot[2] + Math.sin(t * 0.9 + fase) * 0.06;
   });
-  return <mesh ref={ref} geometry={geo} material={mat} position={pos} rotation={rot} scale={esc} />;
+  return (
+    <mesh
+      ref={ref}
+      geometry={geo}
+      material={mat}
+      position={pos}
+      rotation={/** @type {[number, number, number]} */ (rot)}
+      scale={esc}
+    />
+  );
 }
 
 /* ── EL HUMUS ─────────────────────────────────────────────────────────────── */

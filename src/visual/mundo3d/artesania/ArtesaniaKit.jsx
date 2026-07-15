@@ -63,6 +63,17 @@ function useMatTaller(nombre, perfil, extra, mapa) {
 /* CUERDA — el conector visual de la casa (la pista del grafo, con     */
 /* cuerpo). Puntos en el espacio del padre; la comba ya viene puesta.  */
 /* ------------------------------------------------------------------ */
+/**
+ * @param {Object} props
+ * @param {[number, number, number]} [props.de]
+ * @param {[number, number, number]} [props.a]
+ * @param {number} [props.comba]
+ * @param {number} [props.radio]
+ * @param {number} [props.hebras]
+ * @param {number} [props.seed]
+ * @param {{ materialRico?: boolean }} [props.perfil]
+ * @param {string} [props.color]  override del tinte (si no, la receta 'fique')
+ */
 export function CuerdaFique({
   de = [0, 0.8, 0],
   a = [1.4, 0.8, 0],
@@ -105,7 +116,10 @@ export function PosteGuadua({
     return [(r() - 0.5) * 2 * MANO.inclinacionPoste, r() * Math.PI * 2, (r() - 0.5) * 2 * MANO.inclinacionPoste];
   }, [seed]);
   return (
-    <group position={position} rotation={desplome}>
+    <group
+      position={/** @type {[number, number, number]} */ (position)}
+      rotation={/** @type {[number, number, number]} */ (desplome)}
+    >
       <mesh geometry={geo} material={mat} />
       {conAmarra && <mesh geometry={geoAmarra} material={matFique} position={[0, alto * 0.88, 0]} />}
     </group>
@@ -164,7 +178,7 @@ export function CercaTejida({
           geometry={geoPoste}
           material={matGuadua}
           position={[i * paso, 0, 0]}
-          rotation={rot}
+          rotation={/** @type {[number, number, number]} */ (rot)}
         />
       ))}
       <mesh geometry={geoSogas} material={matFique} />
@@ -280,7 +294,10 @@ export function VasijaChamba({
   receta = 'chamba',
   ...props
 }) {
-  const geo = useGeo(() => crearVasijaAmano(nombre, { alto, seed }), [nombre, alto, seed]);
+  // `nombre` es una clave de SILUETAS_ANDINAS (vasija|mojon|telar|terraza|totem);
+  // el cast evita re-declarar la unión aquí (este componente pasa `...props` al
+  // mesh, y un JSDoc explícito de props rompería ese rest).
+  const geo = useGeo(() => crearVasijaAmano(/** @type {any} */ (nombre), { alto, seed }), [nombre, alto, seed]);
   const mat = useMatTaller(receta, perfil);
   return <mesh geometry={geo} material={mat} {...props} />;
 }
