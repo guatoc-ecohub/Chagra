@@ -57,6 +57,12 @@ export const METRIC_DIRECTION = {
   verified_rate: 'up',
   validation_rate: 'up',
   keywords_pct: 'up',
+  recall_at_1: 'up',
+  recall_at_5: 'up',
+  mrr: 'up',
+  hard_case_recall_at_1: 'up',
+  hard_case_recall_at_5: 'up',
+  hard_case_mrr: 'up',
   graph_consistency_pct: 'up',
   grounded_pct: 'up',
   subspecies_ok_pct: 'up',
@@ -74,6 +80,8 @@ export const METRIC_DIRECTION = {
   latency_p50_ms: 'down',
   latency_p95_ms: 'down',
   latency_avg_ms: 'down',
+  doc_embed_avg_ms: 'down',
+  query_embed_avg_ms: 'down',
   cold_load_ms: 'down',
 };
 
