@@ -35,9 +35,9 @@ const LAZY_MAP = {
   VentanaValle3D: lazy(() => import('../components/VentanaValle3D.jsx')),
   VistaGlobalSierra: lazy(() => import('../visual/mundo3d/VistaGlobalSierra.jsx')),
   GaleriaSierraArboles: lazy(() => import('../visual/mundo3d/sierra/GaleriaSierraArboles.jsx')),
-  NavegadorGrafoDemo: lazy(() => import('../mockups/NavegadorGrafoDemo.jsx')),
+  // NavegadorGrafoDemo y DemoAtmosferaViva: desconectados a propósito (orden
+  // del operador) — ver nota en rutasProdChagraApp.js. Archivos intactos.
   RestauracionEnElTiempo: lazy(() => import('../visual/mundo3d/restauracion/RestauracionEnElTiempo.jsx')),
-  DemoAtmosferaViva: lazy(() => import('../visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx')),
   TransicionesOdysseyDemo: lazy(() => import('../mockups/TransicionesOdysseyDemo.jsx')),
   EscenaPolinizadores: lazy(() => import('../visual/mundo3d/polinizadores/EscenaPolinizadores.jsx')),
   EscenaFaunaEmblematica: lazy(() => import('../visual/mundo3d/fauna/EscenaFaunaEmblematica.jsx')),

@@ -71,29 +71,22 @@ export const NUCLEO_3D = [
 
 
   // ── Arte nuevo — en revisión del operador (2026-07-14) ─────────
-  {
-    path: 'grafo_navegador',
-    alias: ['grafo', 'constelacion'],
-    componente: 'NavegadorGrafoDemo',
-    importLazy: 'src/mockups/NavegadorGrafoDemo.jsx',
-    categoria: '3D',
-  },
+  // NOTA (orden del operador): 'grafo_navegador' se DESCONECTA a propósito —
+  // HYTA (oracle-lab) ya tiene un navegador de grafo terminado; chagra no lo
+  // duplica. Los archivos (src/visual/mundo3d/grafo/,
+  // src/mockups/NavegadorGrafoDemo.jsx) se quedan en el repo, solo sin ruta.
+  // 'atmosfera' TAMBIÉN se desconecta: DemoAtmosferaViva es un maniquí de QA
+  // que se publicó por error ("no cableado a ninguna ruta", la "casa feíta"
+  // que el operador ya había señalado). Mismo criterio: desconectar, no borrar.
   {
     // OJO: 'restauracion' (sin _3d) YA es la pantalla 2D de más abajo
     // (RestauracionScreen, categoria 2D-app) — mismo path colisionaba y la
     // 2D pisaba a esta en el Map (bug conocido de la integración). Este
     // módulo 3D vive en 'restauracion_3d'.
     path: 'restauracion_3d',
-    alias: ['restaurar_3d', 'monte_vuelve'],
+    alias: ['restaurar', 'monte_vuelve'],
     componente: 'RestauracionEnElTiempo',
     importLazy: 'src/visual/mundo3d/restauracion/RestauracionEnElTiempo.jsx',
-    categoria: '3D',
-  },
-  {
-    path: 'atmosfera',
-    alias: ['dia_vivo', 'hora'],
-    componente: 'DemoAtmosferaViva',
-    importLazy: 'src/visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx',
     categoria: '3D',
   },
   {
