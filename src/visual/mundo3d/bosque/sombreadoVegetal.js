@@ -299,11 +299,17 @@ export function hornearCorteza(geo, o) {
  * @param {(t:number)=>number} o.taper  radio-mundo en t∈[0,1].
  * @param {number} [o.arruga]  amplitud relativa del relieve de corteza.
  * @param {number} [o.semilla] desfase del relieve (para que no se repita).
+ * @param {number} [o.minRadio] piso del radio. Por defecto 0.02, que es lo que
+ *   quiere un TRONCO (nunca degenera a un hilo). Pero una HIFA micorrízica vive
+ *   entre 0.002 y 0.03: con el piso de tronco toda la jerarquía (rizomorfo →
+ *   secundaria → punta) se aplasta a un mismo grosor y la red vuelve a leerse
+ *   como una maraña pareja. Los llamadores finos lo bajan.
  */
 export function tuboOrganico(curva, o) {
   const { tubular, radial, taper } = o;
   const arruga = o.arruga ?? 0.12;
   const semilla = o.semilla ?? 0;
+  const minRadio = o.minRadio ?? 0.02;
   const geo = new THREE.TubeGeometry(curva, tubular, 1, radial, false);
   const pos = geo.attributes.position;
   const nAnillo = radial + 1;
@@ -327,7 +333,7 @@ export function tuboOrganico(curva, o) {
       + Math.sin(ang * 15 - semilla * 2 + t * 3) * 0.25
       + (ruido3D(Math.cos(ang) * 3 + semilla, t * 9, Math.sin(ang) * 3) - 0.5) * 1.4;
     const disp = 1 + surco * arruga * (1 + (1 - t) * 0.5);
-    v.copy(centro).addScaledVector(off, Math.max(0.02, taper(t) * disp));
+    v.copy(centro).addScaledVector(off, Math.max(minRadio, taper(t) * disp));
     pos.setXYZ(k, v.x, v.y, v.z);
   }
   pos.needsUpdate = true;
