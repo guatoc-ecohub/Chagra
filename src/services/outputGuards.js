@@ -326,11 +326,25 @@ const SYNTHETIC_AGROCHEM_TERMS = [
   'metamidofos',
   'metamidofós',
   'parathion',
+  'paration', // variante ortográfica de "paratión"/"parathion" sin tilde ni "h"
   'paratión',
   'monocrotofos',
   'monocrotofós',
   'endosulfan',
   'endosulfán',
+  // C1 canario 2026-07-15 (sonda "paratión metílico"): plaguicidas VETADOS o de
+  // uso severamente restringido en Colombia que faltaban en la denylist exacta
+  // y no caen por sufijo de familia química (ver BANNED_PESTICIDE_TERMS más
+  // abajo, que exige SUPRIMIR su receta con dosis en vez de solo anexar la nota
+  // orgánica — a diferencia del resto de este archivo, estos no tienen "dosis
+  // segura" posible).
+  'ddt',
+  'lindano',
+  'clordano',
+  'aldicarb',
+  'temik', // nombre comercial de aldicarb
+  'carbofuran', // variante ortográfica de "carbofurano" (arriba) sin la "o" final
+  'gramoxone', // nombre comercial de paraquat (ya listado en herbicidas, abajo)
   // #1303 (BORDE-006): acaricidas/insecticidas comunes que faltaban. Su nombre NO
   // termina en un sufijo de familia clásica capturado por el detector de sufijos
   // (abamectina→-ectina, spinosad/spinetoram, ciantraniliprol, tiametoxam,
@@ -764,6 +778,127 @@ function _hasSyntheticPesticideBrandOrDose(norm, hits) {
   return hasBrand || hasDose || esRecomendacion;
 }
 
+// ── C1 canario 2026-07-15: SUPPRESS-AND-REPLACE de PLAGUICIDA VETADO ────────
+
+/**
+ * Subconjunto de la denylist que son plaguicidas VETADOS o de uso SEVERAMENTE
+ * RESTRINGIDO en Colombia (organoclorados del Convenio de Estocolmo,
+ * organofosforados categoría Ia/Ib OMS y carbamatos de máxima toxicidad
+ * aguda). A diferencia del resto de `SYNTHETIC_AGROCHEM_TERMS` — que son
+ * agroquímicos de venta restringida pero legal bajo receta/registro ICA,
+ * donde SÍ existe una dosis de etiqueta — estos NO tienen ninguna "dosis
+ * segura" que dar: la sola combinación término-vetado + cifra de aplicación
+ * es daño físico real, sin importar la cantidad. Por eso, junto con una
+ * dosis, gatillan SUPRESIÓN del cuerpo (no el append de #17).
+ *
+ * Motivo del fix (canario nocturno C1, sonda "paratión metílico",
+ * 2026-07-15): `guardSyntheticAgrochemical` SÍ detectaba el hit
+ * ("paratión"/"paration"), pero al no estar en `SYNTHETIC_FERTILIZER_TERMS`
+ * (el único gate de supresión que existía) caía en modo append: la nota
+ * orgánica se anexaba DEBAJO de la receta, que quedaba intacta y legible
+ * ("...Dosis: Aplicar entre 1-2 litros por hectare"). Un campesino lee la
+ * dosis de un organofosforado extremadamente tóxico.
+ *
+ * Normalizados sin diacríticos/case, igual que el resto del archivo.
+ */
+const BANNED_PESTICIDE_TERMS = [
+  // organoclorados prohibidos (Convenio de Estocolmo / vetados en Colombia)
+  'ddt',
+  'endosulfan',
+  'endosulfán',
+  'lindano',
+  'clordano',
+  // herbicida bipiridilo de uso severamente restringido/vetado
+  'paraquat',
+  'gramoxone', // nombre comercial de paraquat
+  // carbamatos de máxima toxicidad aguda
+  'aldicarb',
+  'temik', // nombre comercial de aldicarb
+  'carbofurano',
+  'carbofuran',
+  // organofosforados categoría Ia/Ib OMS
+  'metamidofos',
+  'metamidofós',
+  'monocrotofos',
+  'monocrotofós',
+  'paration',
+  'paratión',
+  'parathion',
+].map(_stripDiacritics);
+
+const _BANNED_PESTICIDE_TERM_SET = new Set(BANNED_PESTICIDE_TERMS);
+
+/**
+ * Patrón laxo de "cantidad (+ rango) + unidad + por/× + destino de
+ * aplicación", pensado específicamente para el gate de plaguicida VETADO.
+ * Complementa `DOSE_PATTERNS`/`PESTICIDE_DOSE_PATTERNS`: la sonda real del
+ * canario C1 ("Dosis: Aplicar entre 1-2 litros por hectare") NO matcheaba
+ * ninguno de los dos — "hectare" (sin tilde ni la "a" final) no es
+ * "hectarea"/"ha" y el rango "1-2" tampoco lo cubrían. Tolera rangos ("1-2",
+ * "1 a 2") y variantes de campo de "hectárea" (hectar\w* cubre
+ * hectare/hectarea/hectareas). Igual que las demás: NUNCA dispara sola, solo
+ * junto al término vetado (`_hasBannedPesticideDose`).
+ */
+const BANNED_PESTICIDE_DOSE_HINT_RE =
+  /\b\d+(?:[.,]\d+)?(?:\s*(?:-|–|a)\s*\d+(?:[.,]\d+)?)?\s*(kg|g|gr|gramos?|kilos?|cc|ml|cm3|l|lt|litros?|lb|libras?|cucharadas?)\b[^.!?\n]{0,30}\b(por|\/|x)\b[^.!?\n]{0,20}\b(bomba\w*|bombada\w*|caneca\w*|tanque\w*|hectar\w*|ha\b|planta\w*|mata\w*|m2|m²)\b/;
+
+/**
+ * ¿Alguno de los `hits` ya detectados por el guard es un plaguicida VETADO
+ * (`BANNED_PESTICIDE_TERMS`) Y el texto normalizado trae una DOSIS de
+ * aplicación? Reutiliza `DOSE_PATTERNS`/`PESTICIDE_DOSE_PATTERNS` (la misma
+ * maquinaria de dosis que usan el fertilizante y el pesticida-con-marca) y
+ * suma `BANNED_PESTICIDE_DOSE_HINT_RE` para el hueco de la sonda C1.
+ *
+ * Anti-falso-positivo: sin un hit vetado en `hits` (p.ej. solo un pesticida
+ * de venta legal, o un biopreparado con cantidades legítimas) esto es
+ * `false` de entrada — la conjunción vetado+dosis es la que es inequívoca.
+ *
+ * @param {string} norm  texto normalizado (minúsculas, sin tildes).
+ * @param {string[]} hits  términos sintéticos ya detectados por el guard.
+ * @returns {boolean}
+ */
+function _hasBannedPesticideDose(norm, hits) {
+  const hasBannedHit = hits.some((h) => _BANNED_PESTICIDE_TERM_SET.has(_stripDiacritics(h)));
+  if (!hasBannedHit) return false;
+  return (
+    DOSE_PATTERNS.some((re) => re.test(norm)) ||
+    PESTICIDE_DOSE_PATTERNS.some((re) => re.test(norm)) ||
+    BANNED_PESTICIDE_DOSE_HINT_RE.test(norm)
+  );
+}
+
+/**
+ * Construye la advertencia que REEMPLAZA la receta de un plaguicida VETADO
+ * (ver `BANNED_PESTICIDE_TERMS`). A diferencia de `_organicRedirect` (que
+ * repite fertilizantes minerales en modo educativo — "en vez de urea…"), este
+ * bloque NO nombra NINGUNA cifra ni unidad: para estos productos cualquier
+ * número que sobreviva junto al nombre del tóxico es el daño (canario C1,
+ * sonda "paratión metílico"). Dice explícitamente prohibido/vetado +
+ * extremadamente tóxico/categoría I (lo que valida el canario), deriva a
+ * ICA/técnico/UMATA y ofrece la alternativa agroecológica real. Contiene
+ * `ORGANIC_REDIRECT_MARKER` para la MISMA idempotencia que el resto de
+ * suppress-and-replace de este guard (el chequeo al inicio de
+ * `guardSyntheticAgrochemical` es compartido por todas las ramas).
+ *
+ * @returns {string}
+ */
+function _bannedPesticideReplacement() {
+  return (
+    'Alto: ese producto está prohibido o es de uso severamente restringido en Colombia — es extremadamente ' +
+    'tóxico, categoría I de la OMS. No existe una dosis segura que darte: por su toxicidad extrema no se puede ' +
+    'recetar, sin importar la cantidad ni la forma de aplicación.\n\n' +
+    `Una nota importante: ${ORGANIC_REDIRECT_MARKER}. Nunca apliques, prepares ni almacenes este producto.\n\n` +
+    'Lo correcto:\n' +
+    '- No lo uses bajo ninguna circunstancia: está vetado justamente porque el riesgo para tu salud, la de tu ' +
+    'familia y la del suelo es demasiado alto.\n' +
+    '- Consulta con el ICA, tu técnico agrícola local o la UMATA de tu municipio: ellos te orientan sobre el ' +
+    'manejo autorizado de tu cultivo y, si ya tienes el producto guardado, cómo deshacerte de él de forma segura.\n' +
+    '- Como alternativa agroecológica real: manejo integrado con monitoreo temprano, control biológico (enemigos ' +
+    'naturales, Trichogramma, Bacillus thuringiensis), extracto de neem o de ají y ajo, trampas, y rotación de ' +
+    'cultivo.'
+  );
+}
+
 // ── PATRÓN (b) BORDE-020: combustible/solvente disfrazado de "adyuvante" ─────
 
 /**
@@ -1038,6 +1173,27 @@ export function guardSyntheticAgrochemical(responseText, _resolvedEntities = nul
   if (_hasSyntheticFertilizerDose(norm)) {
     return {
       text: correction,
+      modified: true,
+      reason: `agroquímico_sintético_suprimido: ${[...new Set(hits)].join(', ')}`,
+    };
+  }
+
+  // C1 canario 2026-07-15 (sonda "paratión metílico"): SUPPRESS-AND-REPLACE de
+  // PLAGUICIDA VETADO/de uso severamente restringido (DDT, endosulfán,
+  // paraquat/gramoxone, aldicarb/Temik, metamidofós, monocrotofós, paratión,
+  // lindano, carbofurano, clordano…) CON DOSIS. Va ANTES del gate genérico de
+  // pesticida-con-marca (justo abajo) para que un vetado reciba el texto
+  // ESPECÍFICO de veto/toxicidad extrema (`_bannedPesticideReplacement`, que
+  // el canario valida por regex de "prohibido/vetado/extremadamente tóxico")
+  // en vez de la redirección agroecológica genérica. A diferencia del gate
+  // genérico, este NO exige marca ni verbo de recomendación: para un
+  // organofosforado categoría Ia OMS, la sola dosis ya es el daño (antes de
+  // este fix, el guard SÍ detectaba el hit pero cae al modo append de más
+  // abajo por no estar en `SYNTHETIC_FERTILIZER_TERMS`, dejando la receta con
+  // dosis intacta debajo de la nota).
+  if (_hasBannedPesticideDose(norm, hits)) {
+    return {
+      text: _bannedPesticideReplacement(),
       modified: true,
       reason: `agroquímico_sintético_suprimido: ${[...new Set(hits)].join(', ')}`,
     };
