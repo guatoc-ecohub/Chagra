@@ -177,15 +177,33 @@ function apuntar(geo, pos, dir, esc = [1, 1, 1]) {
   return geo;
 }
 
-/** Fusiona la lista de partes (ya coloreadas) en UNA geometría.
-    OJO: los poliedros (Icosahedron) son NO-indexados y el resto sí — merge
-    directo devolvía null EN SILENCIO y la especie quedaba invisible (aliso y
-    gaque no se dibujaban en prod; tercera mordida de esta trampa). Se
-    uniformiza todo a no-indexado antes de fusionar (mismo fix ya probado en
-    dev, fable/direccion-valle). */
+/**
+ * Fusiona la lista de partes (ya coloreadas) en UNA geometría.
+ *
+ * ⚠️ mergeGeometries devuelve NULL EN SILENCIO si las partes mezclan geometrías
+ * indexadas (Cone/Cylinder/Sphere) con no-indexadas (Icosahedron/Dodecahedron).
+ * Ese null invisible tenía APAGADAS seis especies (frailejón, roble, encenillo,
+ * aliso, gaque, romerillo) y, en el valle, además mataba el render entero con
+ * `null.boundingSphere`. Es la TERCERA mordida de esta trampa (2026-07-15) y la
+ * cazaron dos agentes por separado, en esta rama y en fable/direccion-valle.
+ *
+ * Se DESINDEXA todo antes de fusionar y se TRUENA si aun así falla: mejor un
+ * error de build que una especie invisible en producción.
+ *
+ * El `dispose()` no es opcional: `toNonIndexed()` devuelve una geometría NUEVA y
+ * la original se queda en memoria de GPU. Sin liberarla, cada rebuild filtra —
+ * y esto corre en un Android barato.
+ */
 function fusionar(partes) {
-  const buenas = partes.filter(Boolean).map((g) => (g.index ? g.toNonIndexed() : g));
+  const buenas = partes.filter(Boolean).map((p) => {
+    const plana = p.index ? p.toNonIndexed() : p;
+    if (plana !== p) p.dispose();
+    return plana;
+  });
   const g = mergeGeometries(buenas, false);
+  if (!g) {
+    throw new Error('floraParamo: mergeGeometries devolvió null — atributos incompatibles entre partes');
+  }
   // Las partes de entrada nunca tocaron la GPU: quedan para el GC.
   return g;
 }
