@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components -- exporta MATERIAL_FINCA
+   (constante compartida de las mallas horneadas) además del componente. */
 /*
  * Animales de finca del valle — el mundo 'animales' (antes una casita muda).
  *

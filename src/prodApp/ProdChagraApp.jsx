@@ -8,7 +8,7 @@
  * resuelve en build-time sin penalizar el build completo.
  */
 import React, { lazy, Suspense, useState, useEffect, useCallback } from 'react';
-import { isAuthenticated, logoutUser } from '../services/authService';
+import { isAuthenticated } from '../services/authService';
 import {
   NUCLEO_3D,
   NUCLEO_APP,
@@ -30,14 +30,6 @@ const OAuthCallback = lazy(() => import('../components/OAuthCallback.jsx'));
 // Cada entrada asocia un importLazy → React.lazy con el path exacto.
 // El manifiesto es la fuente de verdad; esta sección es el puente
 // entre el data-driven declare y el sistema de imports de Vite.
-
-/**
- * @param {string} importPath — ej. 'src/mockups/EntradaValle3D.jsx'
- * @returns {string} path relativo desde este archivo
- */
-function rel(importPath) {
-  return '../' + importPath.replace(/^src\//, '');
-}
 
 // Los imports lazy se declaran EXPLICITAMENTE para que Vite pueda
 // hacer tree-shaking y code-splitting. El mapa RUTAS abajo los indexa.
@@ -315,8 +307,10 @@ export default function ProdChagraApp() {
 
   useEffect(() => {
     const { view, data } = parseHash();
-    setNavData(data ?? null);
     isAuthenticated().then((autenticado) => {
+      // El navData del deep-link se asienta junto con la vista (asíncrono:
+      // un setState síncrono dentro del effect dispara renders en cascada).
+      setNavData(data ?? null);
       setAuth(autenticado);
       if (autenticado) {
         setCurrentView(view || 'valle3d');
@@ -329,7 +323,7 @@ export default function ProdChagraApp() {
       setAuth(false);
       setCurrentView('login');
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLoginSuccess = useCallback(() => {
     setAuth(true);
