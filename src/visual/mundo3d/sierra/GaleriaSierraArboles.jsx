@@ -62,8 +62,18 @@ import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { ATMOSFERA } from '../atmosferaMadre.js';
 import { perfilDeTier } from '../deviceTier.js';
 import { PISOS_TERMICOS } from '../pisosTermicos.js';
+import CamaraDirector from '../escenas/CamaraDirector.jsx';
 import ArbolMayor from './ArbolMayor.jsx';
 import { arbolDePiso, frailejonar, FRAILEJON } from './arbolesMayores.js';
+
+/* ── LA POSE DE CÁMARA (dirección): un TRES CUARTOS suave, no el frontal
+      centrado de maqueta de museo. La cámara se corre apenas al oriente y
+      mira un punto DESCENTRADO (tercios): el macizo gana escorzo y
+      profundidad, el sol dorado queda a contraluz lateral y la subida
+      cálido→nieve se lee como diagonal, no como telón plano. UNA fuente
+      para el Canvas y para el establishing (aterrizan en el mismo cuadro). ── */
+const CAMARA_SIERRA = { position: [3.4, 4.6, 15.6], fov: 42 };
+const MIRA_SIERRA = [-1.1, 2.5, 0.2];
 
 /* ── Geometría del monte (coords propias del macizo). X=E-O, Y=altura, Z=pie(−9)
       →cumbre(+1.6). La ladera-galería mira a −z; el diorama entero se gira π en
@@ -864,10 +874,13 @@ const CSS = `
 .gsierra-rotulo--suyo { border: 2px solid #d9a13b; }
 .gsierra-rotulo__piso { font: 600 0.6rem/1 system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.09em; color: #8a6a3a; }
 .gsierra-rotulo__arbol { font: 700 0.92rem/1.1 system-ui, sans-serif; color: #33240f; }
-.gsierra-rotulo__cient { font: italic 500 0.68rem/1.1 Georgia, serif; color: #5a4326; opacity: 0.85; }
+.gsierra-rotulo__cient { display: none; font: italic 500 0.68rem/1.1 Georgia, serif; color: #5a4326; opacity: 0.85; }
 .gsierra-rotulo__rasgo { display: none; font: 500 0.66rem/1.25 system-ui, sans-serif; color: #4a3720; max-width: 13rem; white-space: normal; text-align: center; margin-top: 0.1rem; }
 .gsierra-rotulo__entrar { display: none; font: 700 0.6rem/1 system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.07em; color: #fff8e9; background: #b5763a; padding: 0.22rem 0.5rem; border-radius: 99px; margin-top: 0.22rem; }
-.gsierra-rotulo--viva .gsierra-rotulo__rasgo, .gsierra-rotulo--viva .gsierra-rotulo__entrar { display: block; }
+/* Jerarquía de información (dirección): en reposo cada árbol dice SOLO piso y
+   nombre — el paisaje manda, no cuatro fichas de museo. El binomio, el rasgo y
+   la invitación abren al acercarse (hover/toque). */
+.gsierra-rotulo--viva .gsierra-rotulo__cient, .gsierra-rotulo--viva .gsierra-rotulo__rasgo, .gsierra-rotulo--viva .gsierra-rotulo__entrar { display: block; }
 .gsierra-rotulo__mio { font: 700 0.56rem/1 system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.08em; color: #8a5a1f; margin-top: 0.14rem; }
 .gsierra-chrome { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
 .gsierra-titulo { margin: 0; padding: 0.95rem 1rem 0; color: #3a2a18; text-shadow: 0 1px 4px rgba(255,246,224,0.85); font: 700 clamp(1.12rem, 3.4vw, 1.4rem)/1.2 system-ui, sans-serif; }
@@ -1004,7 +1017,7 @@ export default function GaleriaSierraArboles({
         className={`gsierra-canvas${listo ? ' gsierra-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [0, 5.2, 16.6], fov: 42 }}
+        camera={CAMARA_SIERRA}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
@@ -1022,13 +1035,25 @@ export default function GaleriaSierraArboles({
           enableZoom
           minDistance={10.5}
           maxDistance={20}
-          target={[0, 2.7, 0.2]}
+          target={MIRA_SIERRA}
           minPolarAngle={0.95}
           maxPolarAngle={1.42}
           minAzimuthAngle={-0.5}
           maxAzimuthAngle={0.5}
           enableDamping
           dampingFactor={0.08}
+        />
+        {/* A la Sierra SE LLEGA (dirección): el establishing baja y asienta en
+            la pose de reposo — el mismo lenguaje del valle. Una vez por
+            sesión; gama baja y calma quedan en el encuadre fijo digno. */}
+        <CamaraDirector
+          controls={controles}
+          reposo={CAMARA_SIERRA.position}
+          duracion={3.0}
+          amplio={1.38}
+          respiro={0.05}
+          activa={!reducedMotion && tier !== 'bajo'}
+          unaVezClave="sierra"
         />
         <DerivaCamara controles={controles} reducedMotion={reducedMotion} />
         <AdaptiveDpr pixelated />
