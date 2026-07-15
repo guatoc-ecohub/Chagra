@@ -7,7 +7,7 @@
  * Usa import.meta.glob con paths EXACTOS (no wildcard) — Vite los
  * resuelve en build-time sin penalizar el build completo.
  */
-import React, { lazy, Suspense, useState, useEffect, useCallback } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
 import { isAuthenticated } from '../services/authService';
 import {
   NUCLEO_3D,
@@ -15,6 +15,15 @@ import {
   PENDIENTE_DECISION,
   EXCLUIDO,
 } from '../config/rutasProdChagraApp.js';
+// Rutas dinámicas 'seguimiento_<key>' (reforestación/silvopastoreo/páramo/
+// cerdos): el shell viejo las parseaba en el switch; sin esto, las tarjetas de
+// seguimiento del dashboard y el enlace de VacasScreen eran taps muertos.
+import { parseSeguimientoView } from '../config/seguimientoProcesos.js';
+// Barra offline/sync (autocontenida, escucha online/offline/syncError/
+// syncComplete). El shell viejo la montaba; prod no — en una app de campo
+// offline-first, quedarse sin la señal de "sin conexión / X por sincronizar"
+// es un bug, no un detalle.
+import NetworkStatusBar from '../components/NetworkStatusBar.jsx';
 
 // Audio cleanup: al cambiar de ruta, detener cualquier voz (Kokoro/Web Speech)
 // que haya quedado sonando de la vista anterior. El loop eterno reportado
@@ -107,6 +116,7 @@ const LAZY_MAP = {
   BoticaScreen: lazy(() => import('../components/botica/BoticaScreen.jsx')),
   FiqueScreen: lazy(() => import('../components/fique/FiqueScreen.jsx')),
   MilpaScreen: lazy(() => import('../components/milpa/MilpaScreen.jsx')),
+  QuinuaScreen: lazy(() => import('../components/quinua/QuinuaScreen.jsx')),
   SanidadSintomaScreen: lazy(() => import('../components/sanidad/SanidadSintomaScreen.jsx')),
   InvasiveObservationLog: lazy(() => import('../components/InvasiveObservationLog.jsx')),
   ToxicologiaScreen: lazy(() => import('../components/ToxicologiaScreen.jsx')),
@@ -215,6 +225,25 @@ function parseHash() {
   return { view: view || 'valle3d', data };
 }
 
+// ── Vistas SIN control de salida propio (verificado archivo por archivo,
+//    barrido de controles 2026-07-15: cero location.hash / chagraNavigate /
+//    onBack / history.back en todo el árbol del componente). En una PWA
+//    instalada (sin barra del navegador) son TRAMPAS: el campesino entra y no
+//    puede volver. Para estas, el shell superpone un botón de casa. Las vistas
+//    con salida propia (valle, mundos con AcompananteMundo, pantallas con
+//    ScreenShell) NO están acá — un segundo botón de casa confundiría.
+const VISTAS_SIN_SALIDA = new Set([
+  'valle3d_noche',
+  'sierra_global', 'sierra', 'vista_sierra',
+  'diorama_abejas', 'diorama_paramo', 'diorama_suelo', 'diorama_compost',
+  'subsuelo', 'mundo3d_micorrizas',
+  'camara_director', 'artesania_andina', 'efectos_funcionales',
+  'catalogo_infra', 'colocar_infra', 'gemelos_2d',
+  'aliados_finca', 'momento_venta',
+  'fermentos', 'asociaciones', 'mapa',
+  'mockup_voz_con_forma', 'mockup_conversacion_voz',
+]);
+
 // ── Componente principal ────────────────────────────────────────
 
 export default function ProdChagraApp() {
@@ -229,12 +258,39 @@ export default function ProdChagraApp() {
   // para sobrevivir recarga y botón atrás del navegador.
   const [navData, setNavData] = useState(null);
 
+  // ── Toast del shell. Dos bocas, misma campana:
+  //    1. prop `onSave` (SeedingLog, TaskScreen, RegistroVoz, invasoras… —
+  //       el shell viejo pasaba onSave={showToast} y prod no pasaba NADA:
+  //       guardabas y no había ninguna confirmación).
+  //    2. CustomEvent 'chagraToast' (7 componentes lo despachan: foto muy
+  //       pesada, plan de alimentación sugerido, reporte registrado…) que NO
+  //       tenía listener en NINGÚN shell — todos esos avisos eran no-ops.
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(/** @type {any} */ (null));
+  const mostrarToast = useCallback((message, isError = false) => {
+    if (typeof message !== 'string' || !message) return;
+    setToast({ message, isError: isError === true });
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 4000);
+  }, []);
+  useEffect(() => {
+    /** @param {Event & { detail?: any }} e */
+    const onToast = (e) => mostrarToast(e.detail?.message, e.detail?.isError);
+    window.addEventListener('chagraToast', onToast);
+    return () => {
+      window.removeEventListener('chagraToast', onToast);
+      clearTimeout(toastTimer.current);
+    };
+  }, [mostrarToast]);
+
   const navigate = useCallback((view, data = null) => {
     if (!view || view === 'loading') return;
     // Guard de rutas: las pantallas piden vistas que a veces no existen en el
     // manifiesto de prod (ej. tiles legacy del dashboard). Ignorar el toque es
     // mejor que caer al valle "porque sí" (el fallback del router confunde).
-    if (!RUTAS.has(view) && view !== 'login' && view !== 'oauth-callback') return;
+    // Las 'seguimiento_<key>' son rutas paramétricas válidas (no están en el
+    // manifiesto como literales).
+    if (!RUTAS.has(view) && !parseSeguimientoView(view) && view !== 'login' && view !== 'oauth-callback') return;
     // Detener cualquier audio de la vista anterior antes de montar la nueva.
     // El loop eterno reportado ocurre cuando el audio asíncrono resuelve
     // después del desmontaje del componente 3D.
@@ -346,14 +402,20 @@ export default function ProdChagraApp() {
   }
 
   // ── Router data-driven ────────────────────────────────────
-  const ruta = RUTAS.get(currentView);
-  const Componente = ruta ? ruta.Lazy : RUTAS.get('valle3d')?.Lazy;
+  // 'seguimiento_<key>' es paramétrica: no vive en RUTAS como literal.
+  // El path estático 'seguimiento' acepta la key por navData (#seguimiento/"reforestacion").
+  const segKey = parseSeguimientoView(currentView)
+    || (currentView === 'seguimiento' && typeof navData === 'string' ? navData : null);
+  const ruta = segKey ? null : RUTAS.get(currentView);
+  const Componente = segKey
+    ? /** @type {React.ComponentType<any>} */ (LAZY_MAP.SeguimientoProcesoScreen)
+    : (ruta ? ruta.Lazy : RUTAS.get('valle3d')?.Lazy);
 
   if (!Componente) return <ChagraGrowLoader />;
 
   // El HOME (valle 3D) no lleva `onBack`: no hay a dónde volver desde casa
   // (las pantallas esconden/muestran su botón según llegue la prop).
-  const esHome = !ruta || ruta.path === 'valle3d';
+  const esHome = !segKey && (!ruta || ruta.path === 'valle3d');
 
   return (
     <Suspense fallback={<ChagraGrowLoader />}>
@@ -362,15 +424,73 @@ export default function ProdChagraApp() {
           CRASHEABA (onClick={() => onNavigate(...)} sin guard → TypeError →
           ErrorBoundary raíz). Cada componente toma las props que declare e
           ignora el resto (initialContext la usa AgentScreen; initialMundoId,
-          el valle en deep-links `#valle3d/"agua"`). */}
+          el valle en deep-links `#valle3d/"agua"`; procesoKey, el seguimiento
+          de procesos; onSave, las pantallas de registro — el shell viejo
+          pasaba showToast y prod no pasaba nada). */}
       <Componente
         onBack={esHome ? undefined : volverAtras}
         onHome={irAlInicio}
         onNavigate={navigate}
+        onSave={mostrarToast}
         initialData={navData ?? undefined}
         initialContext={navData ?? undefined}
         initialMundoId={esHome && typeof navData === 'string' ? navData : undefined}
+        procesoKey={segKey ?? undefined}
       />
+      {/* Salida para las vistas-trampa: sin esto, en PWA instalada no hay
+          forma de volver (ni barra del navegador ni control propio). */}
+      {!esHome && VISTAS_SIN_SALIDA.has(currentView) && (
+        <button
+          type="button"
+          onClick={irAlInicio}
+          aria-label="Volver al valle"
+          title="Volver al valle"
+          style={{
+            position: 'fixed',
+            top: 'calc(env(safe-area-inset-top, 0px) + 10px)',
+            left: 'calc(env(safe-area-inset-left, 0px) + 10px)',
+            zIndex: 60,
+            width: 42,
+            height: 42,
+            borderRadius: '50%',
+            border: '1px solid rgba(255,255,255,0.3)',
+            background: 'rgba(15,23,42,0.72)',
+            color: '#fff',
+            fontSize: 20,
+            lineHeight: 1,
+            cursor: 'pointer',
+            backdropFilter: 'blur(4px)',
+            WebkitBackdropFilter: 'blur(4px)',
+          }}
+        >
+          🏠
+        </button>
+      )}
+      {/* Toast del shell (onSave + CustomEvent 'chagraToast'). */}
+      {toast && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: 'fixed',
+            bottom: 'calc(env(safe-area-inset-bottom, 0px) + 18px)',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 70,
+            maxWidth: 'min(92vw, 480px)',
+            padding: '10px 16px',
+            borderRadius: 12,
+            background: toast.isError ? 'rgba(127,29,29,0.95)' : 'rgba(15,23,42,0.92)',
+            border: `1px solid ${toast.isError ? 'rgba(248,113,113,0.5)' : 'rgba(52,211,153,0.4)'}`,
+            color: '#f8fafc',
+            font: '600 0.85rem/1.35 system-ui, sans-serif',
+            boxShadow: '0 6px 24px rgba(0,0,0,0.45)',
+          }}
+        >
+          {toast.message}
+        </div>
+      )}
+      <NetworkStatusBar />
     </Suspense>
   );
 }

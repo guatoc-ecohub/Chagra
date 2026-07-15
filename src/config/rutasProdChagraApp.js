@@ -89,6 +89,10 @@ export const NUCLEO_3D = [
   // ── Puerta maestra a los 12 mundos ─────────────────────────────
   {
     path: 'vitrina_maestra',
+    // alias mockup_vitrina_maestra: MundosDeMiFinca (dashboard) navega con el
+    // nombre viejo — sin el alias esa tile era un tap muerto en prod
+    // (barrido de controles 2026-07-15).
+    alias: ['mockup_vitrina_maestra'],
     componente: 'VitrinaMaestraMundos',
     importLazy: 'src/mockups/VitrinaMaestraMundos.jsx',
     categoria: '3D',
@@ -153,6 +157,10 @@ export const NUCLEO_3D = [
   },
   {
     path: 'subsuelo',
+    // alias mundo3d_micorrizas: la tile "suelo vivo 3D" de mundosFinca.js usa
+    // el nombre del shell viejo; en prod el mundo micorrízico es el subsuelo
+    // (misma decisión que wire3DNav, PR #2479).
+    alias: ['mundo3d_micorrizas'],
     componente: 'MundoSubsuelo',
     importLazy: 'src/components/juego/MundoSubsuelo.jsx',
     categoria: '3D',
@@ -529,6 +537,17 @@ export const NUCLEO_APP = [
     path: 'milpa_cultivo',
     componente: 'MilpaScreen',
     importLazy: 'src/components/milpa/MilpaScreen.jsx',
+    categoria: '2D-app',
+  },
+  {
+    // Mundo "Quinua y granos andinos" — estaba en el shell viejo (case
+    // 'quinua' + tile en mundosFinca.js) y NO estaba en EXCLUIDO: omisión del
+    // manifiesto, no decisión. Sin esta entrada la tile del hub de cultivos
+    // era un tap muerto en prod (barrido de controles 2026-07-15).
+    path: 'quinua',
+    alias: ['granos-andinos', 'quinoa'],
+    componente: 'QuinuaScreen',
+    importLazy: 'src/components/quinua/QuinuaScreen.jsx',
     categoria: '2D-app',
   },
 
@@ -1006,7 +1025,7 @@ export const EXCLUIDO = [
  * @property {string}  motivo
  */
 
-/** @type {Array<{path:string, componente:string, importLazy:string, decision:null, motivo:string}>} */
+/** @type {Array<{path:string, alias?:string[], componente:string, importLazy:string|null, decision:null, motivo:string}>} */
 export const PENDIENTE_DECISION = [
   // ── Onboarding: ¿Profile o Siembra (mockup)? ──────────────────
   {
@@ -1038,6 +1057,13 @@ export const PENDIENTE_DECISION = [
   },
   {
     path: 'mercados',
+    // alias 'mercado': SIETE superficies de prod (DashboardLive, FiqueScreen,
+    // mundosFinca, pisosTermicos, mundoData, cicloVivoData, FincaVivaHero)
+    // navegan a 'mercado' — y MercadosScreen YA está montada en prod como
+    // #mercados. El alias hace que esos CTAs aterricen en la pantalla que ya
+    // se embarca en vez de morir en el guard. Si el operador decide sacar el
+    // mercado de prod, quitar el alias JUNTO CON la entrada entera.
+    alias: ['mercado'],
     componente: 'MercadosScreen',
     importLazy: 'src/components/MercadosScreen.jsx',
     decision: null,
