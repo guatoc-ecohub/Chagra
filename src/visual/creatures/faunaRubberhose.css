@@ -10,11 +10,13 @@
    ──────────────────────────────────────────────────────────────────────── */
 
 /* boil: la línea dibujada a mano que "hierve" — jitter discreto en fotogramas
-   (steps) para que se lea a mano, no interpolado. Se aplica al grupo entero. */
+   (steps) para que se lea a mano, no interpolado. Se aplica al grupo entero.
+   COMPÁS CANÓNICO: 0.4s / 3 estados ≈ 10fps — el MISMO del LineBoilFilter SMIL
+   (rubberhoseSpec.RH_LINE_BOIL): toda la familia hierve al mismo pulso. */
 .frh-boil {
   transform-box: fill-box;
   transform-origin: center;
-  animation: frh-boil 0.34s steps(1) infinite;
+  animation: frh-boil 0.4s steps(1) infinite;
 }
 @keyframes frh-boil {
   0%   { transform: translate(0, 0) rotate(0deg); }
@@ -35,15 +37,20 @@
   72%      { transform: scale(0.98, 1.03); } /* stretch */
 }
 
-/* parpadeo de los ojos de goma (scaleY sobre el bbox del ojo) */
+/* parpadeo de los ojos de goma (scaleY sobre el bbox del ojo).
+   MISMA cadencia irregular que .rh-blink de creatures.css (5.6s, un parpadeo
+   suelto + un blink-blink doble): la cadencia pareja delataba al robot, y la
+   fauna benéfica parpadeaba distinto que los 9 bichos (dos personalidades). */
 .frh-blink {
   transform-box: fill-box;
   transform-origin: center;
-  animation: frh-blink 4.6s ease-in-out infinite;
+  animation: frh-blink 5.6s linear infinite;
 }
 @keyframes frh-blink {
-  0%, 93%, 100% { transform: scaleY(1); }
-  96.5%         { transform: scaleY(0.12); }
+  0%, 36%, 40%, 74%, 78%, 82%, 86%, 100% { transform: scaleY(1); }
+  38% { transform: scaleY(0.12); }  /* parpadeo suelto */
+  76% { transform: scaleY(0.1); }   /* blink-blink: dos golpes seguidos */
+  80% { transform: scaleY(0.14); }
 }
 
 /* aleteo veloz (abejorro) — ala izquierda/derecha con su propio pivote */
