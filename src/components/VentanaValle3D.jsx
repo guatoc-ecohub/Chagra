@@ -137,7 +137,9 @@ function EnredaderaMarco() {
  * @param {string}  [props.className]  clases extra del botón-ventana.
  */
 export function VentanaValle3D({
-  onEntrar,
+  // Sin host que decida (ruta `ventana_valle` de prod, montada sin props), la
+  // puerta lleva a su destino natural: el valle. Antes era un tap muerto.
+  onEntrar = () => { window.location.hash = ''; },
   tier: tierProp,
   reducedMotion: rmProp,
   titulo = 'Entrar al valle',

@@ -62,7 +62,11 @@ import Mundo, {
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
 import { speak, speakKokoro, stop as stopSpeak } from '../services/ttsService.js';
-import { navegarDesde3D } from '../prodApp/wire3DNav.js';
+import { navegarDesde3D, rutaDesdeMundo3D } from '../prodApp/wire3DNav.js';
+/* El VELO ODYSSEY (lenguaje de transición aprobado por el operador): cubrir →
+   swap en la meseta → revelar, con la identidad del DESTINO y variación por
+   tier. Barrel DOM-safe: cero three en el bundle base. */
+import { VeloOdyssey } from '../visual/mundo3d/transiciones/index.js';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
@@ -178,6 +182,18 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
   //    de más abajo). Reduced-motion no llega aquí: el hook salta 'viajando'.
   const usarNewDonk = ENTRADA_NEWDONK && !reducedMotion;
   const [newDonk, setNewDonk] = useState(null);
+
+  // ── El VELO ODYSSEY en los tres viajes del valle:
+  //    · ABRIR una pantalla 2D (`irA`): el velo del destino cubre y el cambio
+  //      de hash va BAJO la meseta cubierta — antes era un corte seco a los
+  //      700ms que mataba la cámara a mitad de vuelo.
+  //    · ENTRAR a un mundo 3D sin New Donk: velo del destino (identidad andina).
+  //    · VOLVER al valle: velo `luz` ("de vuelta a casa") — exhala, no repite
+  //      la ceremonia de entrada.
+  //    Se arma en el handler que zarpa (nunca en un effect) y se apaga solo en
+  //    su `onFin`. Reduced-motion no lo arma: corte directo digno.
+  //    null | { fase: 'entrando'|'saliendo', destino, irA?: mundoId }.
+  const [velo, setVelo] = useState(null);
 
   // La escucha puede llegar con un mundo ya resuelto por el NLU. Se consume
   // una vez al montar para que volver al valle siga siendo una decisión de la
@@ -341,24 +357,23 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
       setFocoId(id);
       setPanel(id);
       decir(NARRACION[id] || MUNDO_VALLE_BY_ID[id]?.lema || '');
-      // Navegar al 2D correspondiente (wire nav 3D→2D).
-      // Retardo para que la cámara enfoque antes de cambiar de pantalla.
-      setTimeout(() => navegarDesde3D(id), 700);
     },
     [decir],
   );
 
-  // ── ABRIR la pantalla real de un lugar: el túnel recibe el cambio de hash
-  //    bajo su meseta cubierta. Con reduced-motion, corte directo.
+  // ── ABRIR la pantalla real de un lugar (el cableo 3D→2D de prod, PR #2453):
+  //    el velo del DESTINO cubre y `navegarDesde3D` corre bajo la meseta — el
+  //    usuario nunca ve el corte del swap de shell. Con reduced-motion, corte
+  //    directo (el velo no se arma).
   const abrirPantalla = useCallback(
-    (id, origen = null) => {
+    (id) => {
       if (!rutaDesdeMundo3D(id)) return;
       stopSpeak();
       if (reducedMotion) {
         navegarDesde3D(id);
         return;
       }
-      setTunelLamina({ destino: id, rect: rectDeOrigen(origen) });
+      setVelo({ fase: 'entrando', destino: id, irA: id });
     },
     [reducedMotion],
   );
@@ -417,11 +432,14 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
       // Enciende el mural New Donk en el MISMO tick que zarpa el viaje (mismo
       // render que la fase 'viajando') → el velo queda suprimido y el aplane
       // del valle corre bajo este overlay. Se apaga solo en su `onFin`.
+      // Con el flag New Donk apagado, el velo Odyssey del destino cubre la
+      // entrada (identidad andina) en vez del velo genérico.
       if (usarNewDonk) setNewDonk(id);
+      else if (!reducedMotion) setVelo({ fase: 'entrando', destino: id });
       setPanel(null);
       decir(`Angelita lo lleva a ${tituloDeMundo(id)}.`);
     },
-    [nav, decir, usarNewDonk],
+    [nav, decir, usarNewDonk, reducedMotion],
   );
 
   // ── VOLVER del mundo al valle: el velo Odyssey `luz` — regresar a casa
@@ -518,6 +536,11 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
                 reducedMotion={reducedMotion}
                 tier={equipo.tier}
                 aplanando={!!newDonk && nav.fase === 'viajando'}
+                /* La CÁMARA DE DIRECTOR también en la entrada real (antes solo
+                   la tenía la escena del framework): el barrido establishing
+                   que presenta el valle vivo. Gateada por tier/reduced-motion
+                   adentro; una sola vez por sesión. */
+                camaraDirector
               />
               {/* Dispara el cruce 2D→3D cuando el chunk 3D del valle resolvió
                   (hermano de <Valle3D> en el Suspense). DOM puro, sin three. */}
@@ -600,7 +623,26 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
           onFin={() => setNewDonk(null)}
         />
       )}
-      {nav.enViaje && nav.mundoId && !(newDonk && nav.fase === 'viajando') && (
+      {/* El VELO ODYSSEY del viaje: cubre → swap en la meseta (`onCubierto`) →
+          revela. Con `irA`, el swap es el cambio de hash a la pantalla 2D real
+          (el shell desmonta este árbol ya cubierto: el corte queda escondido).
+          Sin `irA`, el swap es el del framework de mundos. */}
+      {velo && (
+        <VeloOdyssey
+          fase={velo.fase}
+          destino={velo.destino}
+          tier={equipo.tier}
+          reducedMotion={reducedMotion}
+          onCubierto={() => {
+            if (velo.irA) navegarDesde3D(velo.irA);
+            else nav.completarViaje();
+          }}
+          onFin={() => setVelo(null)}
+        />
+      )}
+      {/* Respaldo (viajes que nadie armó, p. ej. el deep-link inicial): el
+          velo clásico de siempre, con su swap al final. */}
+      {nav.enViaje && nav.mundoId && !(newDonk && nav.fase === 'viajando') && !velo && (
         <TransicionMundo
           mundoId={nav.mundoId}
           sentido={nav.fase === 'viajando' ? 'entrar' : 'volver'}
@@ -684,7 +726,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
                 Antes un setTimeout arrancaba solo, y este panel — con los
                 mundos 3D y sus transiciones aprobadas — era inalcanzable. */}
             {rutaPanel && (
-              <button type="button" className="valle-cta" onClick={(event) => abrirPantalla(mundoPanel.id, event)}>
+              <button type="button" className="valle-cta" onClick={() => abrirPantalla(mundoPanel.id)}>
                 Abrir {mundoPanel.titulo}
               </button>
             )}

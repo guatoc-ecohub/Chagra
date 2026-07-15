@@ -46,12 +46,29 @@ import { Colibri } from '../../visual/creatures/Colibri.jsx';
 import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
 import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
 import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
-import AnimalesDeFinca from './animales.jsx';
+import AnimalesDeFinca, { MATERIAL_FINCA } from './animales.jsx';
+/* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
+   (roble, aliso, gaque) que ya viven en floraParamo — cada árbol se distingue. */
+import { geomRoble, geomAliso, geomGaque } from '../../visual/mundo3d/bosque/floraParamo.geom.js';
 /* Luciérnagas de la noche: el kit instanciado que ya existe (1-3 draw calls),
    sembrado sobre la tierra baja del valle cuando la franja las trae. */
 import { ParticulasAmbientales } from '../../visual/mundo3d/ParticulasAmbientales.jsx';
 /* Duración canónica de la transición entre franjas (misma que CielosHora). */
 import { TRANSICION } from '../../visual/mundo3d/cielosHoraData.js';
+/* LA DIRECCIÓN del valle (capa de composición sobre valleData): la casa-ancla,
+   los senderos del trajín, los patios de tierra pisada, los vecinos (los
+   personajes en su casa) y la disposición COMPUESTA de los lugares. La ley
+   vive como datos en visual/mundo3d/direccion; las piezas r3f, al lado. */
+import {
+  componerMundos,
+  JERARQUIA_PERSONAJES,
+} from '../../visual/mundo3d/direccion/composicionValle.js';
+import {
+  CasaCampesina,
+  SenderosValle,
+  PatiosLugares,
+  VecinosDelValle,
+} from './composicionValle3D.jsx';
 import './rotulosValle3D.css';
 import {
   MUNDOS_VALLE,
@@ -66,50 +83,6 @@ import {
       escena entera consume ESTA lista — geometría, rótulos, faro y foco. ── */
 const MUNDOS_DIR = componerMundos(MUNDOS_VALLE);
 const MUNDO_DIR_BY_ID = Object.fromEntries(MUNDOS_DIR.map((m) => [m.id, m]));
-
-/* ── EL VOCABULARIO DE ANGELITA (auditoría 2026-07-18): los lugares del
-      valle (valleData.js LUGARES) tienen SU PROPIO id ('cafe', 'cultivos',
-      'micorrizas'…); el motor (angelitaInteligencia.MUNDOS) habla en un
-      vocabulario más ancho ('mis_matas', 'mis_animales', 'clima', 'vender',
-      'aprender', 'bosque', 'paramo', 'finca'). Esta tabla traduce uno al
-      otro para que `comentarioDeMundo`/`entrarMundo` sepan qué decir de
-      cada lugar tocado. */
-const LUGAR_A_MUNDO_ANGELITA = {
-  cultivos: 'mis_matas',
-  cafe: 'mis_matas',
-  suelo: 'mis_matas',
-  sanidad: 'mis_matas',
-  semillero: 'mis_matas',
-  abono: 'mis_matas',
-  micorrizas: 'bosque',
-  animales: 'mis_animales',
-  agua: 'clima',
-  clima: 'clima',
-  mercado: 'vender',
-  disenio: 'bosque',
-  aprender: 'aprender',
-  paramo: 'paramo',
-};
-
-/* Los 6 lugares que Angelita husmea SOLA en reposo — los mismos 6 portales
-   principales (PORTALES_VALLE en composicionValle.js): rotan uno a la vez,
-   espaciados por HUSMEO_MS; el propio store (cooldown de 20 min por mundo)
-   decide si de verdad vale la pena interrumpir. Nunca a mitad de un viaje
-   real, nunca con reduced-motion. */
-const HUSMEO_LUGARES = ['cultivos', 'animales', 'clima', 'mercado', 'aprender', 'disenio'];
-const HUSMEO_PRIMERO_MS = 4200; // el primer husmeo llega pronto: se ve viva al cargar
-const HUSMEO_CADA_MS = 13000; // cadencia entre husmeos (feedback operador: 40s se sentía MUERTA; 13s = viva sin ser errática)
-const HUSMEO_VISIBLE_MS = 7000; // piso: ningún aviso dura menos que esto
-/* Cuánto se queda un aviso en pantalla: lo que tarda la máquina de escribir en
-   ponerlo (≈16 ms por letra) MÁS el tiempo de leerlo con calma (≈70 ms por
-   letra ≈ 170 palabras por minuto, ritmo cómodo para una niña o alguien que
-   lee despacio). Un aviso corto se va rápido; uno largo espera. Techo de 16 s
-   para que Angelita no se quede pegada. */
-function duracionAviso(mensaje) {
-  const n = String(mensaje || '').length;
-  if (!n) return HUSMEO_VISIBLE_MS;
-  return Math.min(16000, Math.max(HUSMEO_VISIBLE_MS, Math.round(n * 16 + n * 70 + 1200)));
-}
 
 /* Altura del terreno por (x,z): la LADERA ANDINA. El eje z es la montaña — al
    fondo (z negativo) trepa al páramo alto, al frente (z positivo) baja a tierra
@@ -331,13 +304,9 @@ function Quebrada({ color, viva, perfil, nocturno = false }) {
       floraParamo (color horneado por vértice, 1 draw call por árbol); escala
       ~0.5 para el diorama. `q` baja el detalle en perfil frugal. ── */
 const SITIOS_ARBOLEDA = [
-  // (El monte del portal "toda mi finca" se espesó: 5 árboles, 3 especies —
-  //  dosel multiespecie, no un parche de conos.)
-  { geom: geomRoble, args: [-0.6, 0, 0.15], esc: 0.55, rot: 0.8, seed: 91 },
-  { geom: geomAliso, args: [0.5, 0, -0.4], esc: 0.5, rot: 2.1, seed: 92 },
-  { geom: geomGaque, args: [0.2, 0, 0.6], esc: 0.55, rot: 4.4, seed: 93 },
-  { geom: geomRoble, args: [0.85, 0, 0.45], esc: 0.42, rot: 3.3, seed: 94 },
-  { geom: geomAliso, args: [-0.35, 0, -0.7], esc: 0.44, rot: 5.2, seed: 95 },
+  { geom: geomRoble, args: [-0.55, 0, 0.15], esc: 0.52, rot: 0.8, seed: 91 },
+  { geom: geomAliso, args: [0.45, 0, -0.35], esc: 0.5, rot: 2.1, seed: 92 },
+  { geom: geomGaque, args: [0.2, 0, 0.55], esc: 0.55, rot: 4.4, seed: 93 },
 ];
 
 function ArboledaEspecies({ q }) {
@@ -1506,7 +1475,7 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
       mundo (`entrando`), BAJA y se acerca al lugar — "entra" al mundo, y la
       cámara la acompaña. Su ánimo/energía (salud real de la finca) tiñen su
       color, su aura y qué tan vivo es su vuelo. Mira hacia donde viaja. ── */
-function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null }) {
+function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false }) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const prevX = useRef(foco.x);
@@ -1633,13 +1602,10 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
       prevX.current = ref.current.position.x;
     }
   });
-  // 3x más grande (feedback del operador 2026-07-18: la abeja se veía chiquita
-  // y la burbuja la aplastaba). Angelita es la protagonista — que se vea.
-  const [pxMin, pxMax] = JERARQUIA_PERSONAJES.protagonistaPx;
-  const size = Math.round((pxMin + Math.round(energiaReal * (pxMax - pxMin))) * 3);
+  const size = 44 + Math.round(energiaReal * 14);
   const luz = JERARQUIA_PERSONAJES.luzProtagonista;
   return (
-    <group ref={ref} position={[CALMA_ABEJA.x, yCalma + 2.2, CALMA_ABEJA.z]}>
+    <group ref={ref} position={[foco.x + 0.4, foco.y + 2.3, foco.z + 0.6]}>
       {/* JERARQUÍA: Angelita es la ÚNICA con luz propia — su calidez baña el
           terreno bajo su vuelo y el ojo la encuentra primero, sobre todo al
           atardecer y de noche. Solo donde el perfil ya paga luces extra. */}
@@ -1784,7 +1750,7 @@ function AplaneNewDonk({ foco, aplanando }) {
       suelta el control para que el usuario siga haciendo zoom a mano). Durante
       el APLANE New Donk cede TODO el control a AplaneNewDonk (early-return): no
       mueve target ni zoom para no pelear con la caída. ── */
-function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false }) {
+function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, kReposo = 1 }) {
   const trans = useRef(0);
   const prevKey = useRef(focoKey);
   const entrando = focoKey !== 'valle';
@@ -1832,6 +1798,11 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false }
     if (!panLibre.current) {
       c.target.lerp(new THREE.Vector3(foco.x, foco.y + 0.6, foco.z), k);
     }
+    /* ASIMETRÍA DEL VIAJE (dirección): ENTRAR es decidido (el toque pide ir
+       ya); VOLVER es una exhalación — más lento, el valle se abre con calma y
+       llegar a casa se siente distinto a salir de ella. */
+    const k = entrando ? 0.07 : 0.042;
+    c.target.lerp(new THREE.Vector3(foco.x, foco.y + 0.6, foco.z), k);
     if (trans.current > 0) {
       const cam = c.object;
       const dir = cam.position.clone().sub(c.target);
@@ -1841,35 +1812,6 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false }
       dir.setLength(THREE.MathUtils.lerp(dir.length(), deseada, k));
       cam.position.copy(c.target.clone().add(dir));
       trans.current = Math.max(0, trans.current - (entrando ? 0.012 : 0.009));
-    }
-    /* PANEO ACOTADO (AoE): muro duro en límite+sobra, resorte elástico hacia
-       el área — la corrección traslada mira Y cámara juntas para no torcer
-       el encuadre. Con reduced-motion el borde es un clamp seco (sin rebote). */
-    {
-      const t = c.target;
-      const cam = c.object;
-      const antesX = t.x;
-      const antesZ = t.z;
-      let nx = THREE.MathUtils.clamp(t.x, PAN_LIMITES.x0 - PAN_SOBRA, PAN_LIMITES.x1 + PAN_SOBRA);
-      let nz = THREE.MathUtils.clamp(t.z, PAN_LIMITES.z0 - PAN_SOBRA, PAN_LIMITES.z1 + PAN_SOBRA);
-      const kR = reducedMotion ? 1 : PAN_RESORTE;
-      nx += (THREE.MathUtils.clamp(nx, PAN_LIMITES.x0, PAN_LIMITES.x1) - nx) * kR;
-      nz += (THREE.MathUtils.clamp(nz, PAN_LIMITES.z0, PAN_LIMITES.z1) - nz) * kR;
-      if (nx !== antesX || nz !== antesZ) {
-        t.setX(nx);
-        t.setZ(nz);
-        cam.position.setX(cam.position.x + (nx - antesX));
-        cam.position.setZ(cam.position.z + (nz - antesZ));
-      }
-      /* La mira se pega al TERRENO durante el paseo: subir al páramo encuadra
-         el páramo (la cámara sube con ella — translación, no picada). */
-      if (panLibre.current && !entrando) {
-        const dy = (alturaTerreno(t.x, t.z) + 0.8 - t.y) * (reducedMotion ? 1 : PAN_PEGA_SUELO);
-        if (dy !== 0) {
-          t.setY(t.y + dy);
-          cam.position.setY(cam.position.y + dy);
-        }
-      }
     }
     c.update();
   });
@@ -2048,8 +1990,29 @@ const CAMARA_VALLE = { position: /** @type {[number, number, number]} */ ([10.5,
    DirectorValle aterriza EXACTO aquí para no dar ningún salto al soltar. */
 const MIRA_VALLE = [0, 1.6, 1.4];
 
+/* El REPOSO CONSCIENTE DEL ASPECTO (dirección de cámara): el fov de three es
+   VERTICAL — en un teléfono parado (aspecto ~0.46) los 40° dejan un fov
+   horizontal de ~19° y la composición entera (lugares en x ∈ [-7.5, 7.5], el
+   oso en el borde del monte) queda FUERA del cuadro: medio valle existía y
+   nadie lo veía (la misma clase de fallo que los árboles tras el macizo de la
+   sierra). En pantallas angostas la cámara retrocede y abre un poco el fov —
+   con techo, para no caer en ojo de pez — y el valle entero vuelve al cuadro.
+   En landscape (aspecto ≥ 0.9) la pose aprobada queda EXACTA. */
+function poseValleParaAspecto(aspect) {
+  if (!aspect || aspect >= 0.9) return { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1 };
+  const k = Math.min(1.6, Math.pow(0.9 / aspect, 0.62));
+  const fov = Math.min(54, Math.round(CAMARA_VALLE.fov * Math.pow(0.9 / aspect, 0.4)));
+  return {
+    position: /** @type {[number, number, number]} */ (CAMARA_VALLE.position.map((v) => v * k)),
+    fov,
+    k,
+  };
+}
+
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false }) {
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null }) {
+  /* La pose de reposo (aspecto-consciente, viene del host del Canvas). */
+  const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1 };
   const controls = useRef(null);
   /* La cámara de director (FASE 4, flag `camaraDirector`) se monta DESPUÉS de
      CamaraViajera y gana por orden de frame durante su barrido. `avatarRef`
@@ -2062,7 +2025,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
   const occluders = useMemo(() => [terrenoRef, cordilleraRef], []);
   const c = CLIMAS[clima];
   const foco = useMemo(() => {
-    const m = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;
+    const m = focoId ? MUNDO_DIR_BY_ID[focoId] : null;
     // Sin foco, la cámara encuadra el corazón del valle (algo hacia el frente,
     // regla de tercios) para dar aire y leer la ladera que sube al fondo.
     if (!m) return new THREE.Vector3(0, 1.0, 1.4);
@@ -2112,16 +2075,41 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
       <Quebrada color={nocturno ? '#2a4a6a' : '#5fb2c9'} viva={c.lluviaViva} perfil={perfil} />
       <VegetacionPisos nocturno={nocturno} perfil={perfil} />
 
-      {MUNDOS_VALLE.map((m) => (
-        <MundoLugar key={m.id} mundo={m} reducedMotion={reducedMotion} perfil={perfil} />
+      {/* LA DIRECCIÓN DEL CUADRO: la casa-ancla donde descansa el ojo (con su
+          ventana cálida), los senderos de tierra pisada que nacen de ella (el
+          rastro del uso diario: el ojo camina por donde caminan los pies) y
+          los patios bajo cada lugar navegable (afordancia sin UI). */}
+      <CasaCampesina alturaDe={alturaTerreno} perfil={perfil} />
+      <SenderosValle alturaDe={alturaTerreno} perfil={perfil} />
+      {!portada && <PatiosLugares mundos={MUNDOS_DIR} alturaDe={alturaTerreno} />}
+
+      {MUNDOS_DIR.map((m) => (
+        <MundoLugar
+          key={m.id}
+          mundo={m}
+          reducedMotion={reducedMotion}
+          perfil={perfil}
+          onEntrar={portada ? null : onEntrar}
+        />
       ))}
+
+      {/* Los VECINOS del valle (el oso, el borugo, el jaguar…): los personajes
+          en su casa, con presencia digna — acompañan a Angelita sin pelearle
+          el primer plano. Billboards DOM baratos: viven en TODOS los tiers
+          (el operador no debería necesitar GPU rica para conocer al oso);
+          la franja horaria decide quién está afuera. */}
+      <VecinosDelValle
+        alturaDe={alturaTerreno}
+        reducedMotion={reducedMotion}
+        franja={clima}
+      />
       {/* MODO PORTADA (la cara de prod.chagra.app): el valle es ATMÓSFERA de
           la entrada — sin rótulos que compitan con el formulario ni faro que
           pida un toque que aún no puede darse. La vida (criaturas, Angelita,
           ciclo del día) se queda: la finca espera, no está muerta. */}
       {!portada && (
         <RotulosLugares
-          mundos={MUNDOS_VALLE}
+          mundos={MUNDOS_DIR}
           focoId={focoId}
           onEntrar={onEntrar}
           occluders={occluders}
@@ -2142,6 +2130,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         hayAlerta={hayAlerta}
         reducedMotion={reducedMotion}
         posRef={camaraDirector ? avatarRef : null}
+        conLuz={perfil.luzBeacon}
       />
 
       <CamaraViajera
@@ -2150,6 +2139,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         controls={controls}
         autoOrbit={autoOrbit}
         aplanando={aplanando}
+        kReposo={poseReposo.k}
       />
       {/* La CÁMARA DE DIRECTOR (FASE 4). Con el flag `camaraDirector`:
           DirectorValle (establishing + follow + beats), montado DESPUÉS de
@@ -2159,9 +2149,9 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
       {camaraDirector ? (
         <DirectorValle
           controls={controls}
-          reposo={CAMARA_VALLE.position}
+          reposo={poseReposo.position}
           mira={MIRA_VALLE}
-          fov={CAMARA_VALLE.fov}
+          fov={poseReposo.fov}
           foco={foco}
           avatarRef={avatarRef}
           beatsRef={beatsRef}
@@ -2175,7 +2165,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
       ) : (
         <CamaraDirector
           controls={controls}
-          reposo={CAMARA_VALLE.position}
+          reposo={poseReposo.position}
           /* En portada la llegada es más lenta y amplia (contemplar, no operar)
              y NO consume la clave 'valle': al cruzar la tranquera, el home aún
              estrena su propio establishing — llegar dos veces se siente bien. */
@@ -2242,8 +2232,7 @@ export default function Valle3D({
   /* El PERFIL DE RENDER del tier (DR-3D-PERF-GAMABAJA): 'alto' conserva este
      look intacto; 'medio'/'bajo' degradan sombras, DPR, antialias, densidad e
      instancian lo repetido. El default 'alto' preserva a los hosts viejos. */
-  const perfil = useMemo(() => perfilDeTier(tierInicial), [tierInicial]);
-  const presupuesto = useMemo(() => presupuestoDeTier(tierInicial), [tierInicial]);
+  const perfil = useMemo(() => perfilDeTier(tier), [tier]);
   /* La pose de reposo según el ASPECTO del equipo (una vez por montaje: girar
      el teléfono re-monta rutas enteras en la práctica; no vale un resize
      listener que mueva la cámara bajo los dedos del usuario). */
@@ -2263,7 +2252,7 @@ export default function Valle3D({
       shadows={perfil.sombras}
       dpr={perfil.dpr}
       gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-      camera={/** @type {any} */ (CAMARA_VALLE)}
+      camera={/** @type {any} */ ({ position: pose.position, fov: pose.fov })}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={({ gl }) => {
         setListo(true);
@@ -2305,6 +2294,7 @@ export default function Valle3D({
           camaraDirector={camaraDirector}
           beatsRef={beatsRef}
           portada={portada}
+          pose={pose}
         />
       </Suspense>
     </Canvas>
