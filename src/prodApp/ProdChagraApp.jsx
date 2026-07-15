@@ -391,7 +391,14 @@ export default function ProdChagraApp() {
   if (auth === null || currentView === 'loading') return <ChagraGrowLoader />;
 
   // ── Auth gate ───────────────────────────────────────────────
-  if (!auth && currentView !== 'login' && currentView !== 'oauth-callback') {
+  // La raíz SIN sesión aterriza en el valle 3D, igual que el shell clásico
+  // (App.jsx:1157): "el valle 3D es el tema de entrada; el login sigue
+  // accesible con #login o el botón volver del valle". prod.chagra.app es la
+  // vista 3D: tapar la entrada con el formulario 2D hacía inalcanzable a
+  // EntradaValle3D — que está registrada en el LAZY_MAP y nunca se dibujaba.
+  // Las rutas 3D son públicas; lo que pide sesión es la finca del campesino.
+  if (!auth && !RUTAS.has(currentView) && currentView !== 'valle3d'
+      && currentView !== 'login' && currentView !== 'oauth-callback') {
     return <Suspense fallback={<ChagraGrowLoader />}><LoginScreen onLoginSuccess={handleLoginSuccess} onSave={() => {}} /></Suspense>;
   }
   if (currentView === 'login') {
