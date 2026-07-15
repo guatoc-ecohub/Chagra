@@ -1,0 +1,2062 @@
+{
+  "tag": "finetuned",
+  "model": "/home/kortux/qlora-out/embedder/finetuned",
+  "n_test_pairs": 621,
+  "n_corpus_docs": 742,
+  "global": {
+    "n": 621,
+    "recall_at_1": 0.36231884057971014,
+    "recall_at_5": 0.499194847020934,
+    "mrr": 0.42122067595292834
+  },
+  "confusable": {
+    "n": 199,
+    "recall_at_1": 0.3316582914572864,
+    "recall_at_5": 0.542713567839196,
+    "mrr": 0.4180393936616293
+  },
+  "by_source": {
+    "regional_label": {
+      "n": 68,
+      "recall_at_1": 0.3088235294117647,
+      "recall_at_5": 0.38235294117647056,
+      "mrr": 0.3451866808921326
+    },
+    "nombre_comun": {
+      "n": 100,
+      "recall_at_1": 0.97,
+      "recall_at_5": 1.0,
+      "mrr": 0.9833333333333333
+    },
+    "nombres_comunes": {
+      "n": 453,
+      "recall_at_1": 0.23620309050772628,
+      "recall_at_5": 0.40618101545253865,
+      "mrr": 0.3085474881518105
+    }
+  },
+  "by_confusable_group": {
+    "arracacha_vs_yuca": {
+      "n": 36,
+      "recall_at_1": 0.2777777777777778,
+      "recall_at_5": 0.3888888888888889,
+      "mrr": 0.32765377458915806
+    },
+    "passifloras": {
+      "n": 52,
+      "recall_at_1": 0.23076923076923078,
+      "recall_at_5": 0.36538461538461536,
+      "mrr": 0.2770586065915312
+    },
+    "papa_vs_papaya_vs_papayuela": {
+      "n": 44,
+      "recall_at_1": 0.3181818181818182,
+      "recall_at_5": 0.5454545454545454,
+      "mrr": 0.41665813065114643
+    },
+    "tomate_vs_tomate_de_arbol": {
+      "n": 39,
+      "recall_at_1": 0.358974358974359,
+      "recall_at_5": 0.7692307692307693,
+      "mrr": 0.5168405325352514
+    },
+    "brassica_oleracea": {
+      "n": 28,
+      "recall_at_1": 0.5714285714285714,
+      "recall_at_5": 0.75,
+      "mrr": 0.6606256211846302
+    }
+  },
+  "confusable_details": [
+    {
+      "query": "yuca_brava",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 1,
+      "top1_species": "manihot_esculenta",
+      "top1_nombre": "Yuca brava amazónica",
+      "correct": true
+    },
+    {
+      "query": "taxo",
+      "true_species": "passiflora_tarminiana",
+      "true_nombre": "Granadilla común / Granadilla de China",
+      "group": "passifloras",
+      "rank": 518,
+      "top1_species": "chrysanthemum_sp",
+      "top1_nombre": "chrysanthemum_sp",
+      "correct": false
+    },
+    {
+      "query": "chaucha",
+      "true_species": "solanum_phureja",
+      "true_nombre": "Papa criolla",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 261,
+      "top1_species": "cyclanthera_pedata",
+      "top1_nombre": "Achocha",
+      "correct": false
+    },
+    {
+      "query": "chupita",
+      "true_species": "solanum_betaceum",
+      "true_nombre": "Tomate de árbol / Tamarillo",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 481,
+      "top1_species": "tagetes_minuta",
+      "top1_nombre": "Chinchilla",
+      "correct": false
+    },
+    {
+      "query": "taxo",
+      "true_species": "passiflora_tripartita_mollissima",
+      "true_nombre": "Curuba de Castilla",
+      "group": "passifloras",
+      "rank": 563,
+      "top1_species": "chrysanthemum_sp",
+      "top1_nombre": "chrysanthemum_sp",
+      "correct": false
+    },
+    {
+      "query": "cholupa",
+      "true_species": "passiflora_maliformis",
+      "true_nombre": "Granadilla de fraile / Maracuyá silvestre",
+      "group": "passifloras",
+      "rank": 583,
+      "top1_species": "passiflora_edulis_morada",
+      "top1_nombre": "Gulupa",
+      "correct": false
+    },
+    {
+      "query": "granadilla de fraile",
+      "true_species": "passiflora_maliformis",
+      "true_nombre": "Granadilla de fraile / Maracuyá silvestre",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_maliformis",
+      "top1_nombre": "Granadilla de fraile / Maracuyá silvestre",
+      "correct": true
+    },
+    {
+      "query": "curuba de castilla",
+      "true_species": "passiflora_tripartita_mollissima",
+      "true_nombre": "Curuba de Castilla",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_tripartita_mollissima",
+      "top1_nombre": "Curuba de Castilla",
+      "correct": true
+    },
+    {
+      "query": "tacso",
+      "true_species": "passiflora_tripartita_mollissima",
+      "true_nombre": "Curuba de Castilla",
+      "group": "passifloras",
+      "rank": 576,
+      "top1_species": "zanthoxylum_rhoifolium",
+      "top1_nombre": "Tachuelo",
+      "correct": false
+    },
+    {
+      "query": "curuba india",
+      "true_species": "passiflora_tarminiana",
+      "true_nombre": "Granadilla común / Granadilla de China",
+      "group": "passifloras",
+      "rank": 551,
+      "top1_species": "passiflora_tripartita_mollissima",
+      "top1_nombre": "Curuba de Castilla",
+      "correct": false
+    },
+    {
+      "query": "parcha",
+      "true_species": "passiflora_edulis_flavicarpa",
+      "true_nombre": "Maracuyá",
+      "group": "passifloras",
+      "rank": 54,
+      "top1_species": "passiflora_quadrangularis",
+      "top1_nombre": "Badea",
+      "correct": false
+    },
+    {
+      "query": "gulupa morada",
+      "true_species": "passiflora_edulis_morada",
+      "true_nombre": "Gulupa",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_edulis_morada",
+      "top1_nombre": "Gulupa",
+      "correct": true
+    },
+    {
+      "query": "tamarillo",
+      "true_species": "solanum_betaceum",
+      "true_nombre": "Tomate de árbol / Tamarillo",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": true
+    },
+    {
+      "query": "tomate de palo",
+      "true_species": "solanum_betaceum",
+      "true_nombre": "Tomate de árbol / Tamarillo",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": true
+    },
+    {
+      "query": "zanahoria blanca",
+      "true_species": "arracacia_xanthorrhiza",
+      "true_nombre": "Arracacha / Zanahoria blanca",
+      "group": "arracacha_vs_yuca",
+      "rank": 1,
+      "top1_species": "arracacia_xanthorrhiza",
+      "top1_nombre": "Arracacha / Zanahoria blanca",
+      "correct": true
+    },
+    {
+      "query": "apio criollo",
+      "true_species": "arracacia_xanthorrhiza",
+      "true_nombre": "Arracacha / Zanahoria blanca",
+      "group": "arracacha_vs_yuca",
+      "rank": 568,
+      "top1_species": "apium_graveolens",
+      "top1_nombre": "Apio",
+      "correct": false
+    },
+    {
+      "query": "racacha",
+      "true_species": "arracacia_xanthorrhiza",
+      "true_nombre": "Arracacha / Zanahoria blanca",
+      "group": "arracacha_vs_yuca",
+      "rank": 9,
+      "top1_species": "oreocallis_grandiflora",
+      "top1_nombre": "Ñacha (Oreocallis grandiflora)",
+      "correct": false
+    },
+    {
+      "query": "mandioca",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 1,
+      "top1_species": "manihot_esculenta",
+      "top1_nombre": "Yuca brava amazónica",
+      "correct": true
+    },
+    {
+      "query": "casabe (planta)",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 498,
+      "top1_species": "bertholletia_excelsa",
+      "top1_nombre": "Castaño amazónico",
+      "correct": false
+    },
+    {
+      "query": "guacamota",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 55,
+      "top1_species": "schizolobium_parahyba",
+      "top1_nombre": "Guacamayo",
+      "correct": false
+    },
+    {
+      "query": "papayo",
+      "true_species": "carica_papaya",
+      "true_nombre": "Papaya",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "carica_papaya",
+      "top1_nombre": "Papaya",
+      "correct": true
+    },
+    {
+      "query": "mamon (papaya)",
+      "true_species": "carica_papaya",
+      "true_nombre": "Papaya",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 3,
+      "top1_species": "melicoccus_bijugatus",
+      "top1_nombre": "Mamón",
+      "correct": false
+    },
+    {
+      "query": "casabe",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 295,
+      "top1_species": "astrocaryum_chambira",
+      "top1_nombre": "Chambira",
+      "correct": false
+    },
+    {
+      "query": "yuca brava",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 1,
+      "top1_species": "manihot_esculenta",
+      "top1_nombre": "Yuca brava amazónica",
+      "correct": true
+    },
+    {
+      "query": "parchita",
+      "true_species": "passiflora_edulis_flavicarpa",
+      "true_nombre": "Maracuyá",
+      "group": "passifloras",
+      "rank": 43,
+      "top1_species": "passiflora_quadrangularis",
+      "top1_nombre": "Badea",
+      "correct": false
+    },
+    {
+      "query": "chupitá",
+      "true_species": "solanum_betaceum",
+      "true_nombre": "Tomate de árbol / Tamarillo",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 546,
+      "top1_species": "tagetes_minuta",
+      "top1_nombre": "Chinchilla",
+      "correct": false
+    },
+    {
+      "query": "papa criolla",
+      "true_species": "solanum_phureja",
+      "true_nombre": "Papa criolla",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "solanum_phureja",
+      "top1_nombre": "Papa criolla",
+      "correct": true
+    },
+    {
+      "query": "gulupa",
+      "true_species": "passiflora_edulis_morada",
+      "true_nombre": "Gulupa",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_edulis_morada",
+      "top1_nombre": "Gulupa",
+      "correct": true
+    },
+    {
+      "query": "granadilla",
+      "true_species": "passiflora_ligularis",
+      "true_nombre": "Granadilla",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_ligularis",
+      "top1_nombre": "Granadilla",
+      "correct": true
+    },
+    {
+      "query": "Kale rizado verde",
+      "true_species": "brassica_oleracea_acephala_curly",
+      "true_nombre": "Kale rizado verde",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_acephala_curly",
+      "top1_nombre": "Kale rizado verde",
+      "correct": true
+    },
+    {
+      "query": "Kale toscano / Cavolo nero",
+      "true_species": "brassica_oleracea_acephala_lacinato",
+      "true_nombre": "Kale toscano / Cavolo nero",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_acephala_lacinato",
+      "top1_nombre": "Kale toscano / Cavolo nero",
+      "correct": true
+    },
+    {
+      "query": "Kale morado / Red Russian",
+      "true_species": "brassica_oleracea_acephala_red_russian",
+      "true_nombre": "Kale morado / Red Russian",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_acephala_red_russian",
+      "top1_nombre": "Kale morado / Red Russian",
+      "correct": true
+    },
+    {
+      "query": "maracuyá amarillo",
+      "true_species": "passiflora_edulis_flavicarpa",
+      "true_nombre": "Maracuyá",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_edulis_flavicarpa",
+      "top1_nombre": "Maracuyá",
+      "correct": true
+    },
+    {
+      "query": "Maracuyá",
+      "true_species": "passiflora_edulis_flavicarpa",
+      "true_nombre": "Maracuyá",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_edulis_flavicarpa",
+      "top1_nombre": "Maracuyá",
+      "correct": true
+    },
+    {
+      "query": "frutilla",
+      "true_species": "solanum_lycopersicum_sungold",
+      "true_nombre": "Tomate cherry amarillo / Sungold",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 152,
+      "top1_species": "prunus_domestica",
+      "top1_nombre": "Ciruela",
+      "correct": false
+    },
+    {
+      "query": "Tomate cherry amarillo / Sungold",
+      "true_species": "solanum_lycopersicum_sungold",
+      "true_nombre": "Tomate cherry amarillo / Sungold",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_lycopersicum_sungold",
+      "top1_nombre": "Tomate cherry amarillo / Sungold",
+      "correct": true
+    },
+    {
+      "query": "tomatillo",
+      "true_species": "solanum_lycopersicum_cerasiforme_uvalina",
+      "true_nombre": "Tomate cherry uvalina / Grape",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 4,
+      "top1_species": "physalis_philadelphica",
+      "top1_nombre": "Tomatillo verde",
+      "correct": false
+    },
+    {
+      "query": "Tomate cherry uvalina / Grape",
+      "true_species": "solanum_lycopersicum_cerasiforme_uvalina",
+      "true_nombre": "Tomate cherry uvalina / Grape",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_lycopersicum_cerasiforme_uvalina",
+      "top1_nombre": "Tomate cherry uvalina / Grape",
+      "correct": true
+    },
+    {
+      "query": "Col rizada / Kale",
+      "true_species": "brassica_oleracea_var_acephala",
+      "true_nombre": "Col rizada / Kale",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_var_acephala",
+      "top1_nombre": "Col rizada / Kale",
+      "correct": true
+    },
+    {
+      "query": "Papayuela endémica",
+      "true_species": "vasconcellea_goudotiana",
+      "true_nombre": "Papayuela endémica",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "vasconcellea_goudotiana",
+      "top1_nombre": "Papayuela endémica",
+      "correct": true
+    },
+    {
+      "query": "Papa Argentina",
+      "true_species": "solanum_tuberosum_argentina",
+      "true_nombre": "Papa Argentina",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "solanum_tuberosum_argentina",
+      "top1_nombre": "Papa Argentina",
+      "correct": true
+    },
+    {
+      "query": "granada de castilla",
+      "true_species": "passiflora_edulis_morada",
+      "true_nombre": "Gulupa",
+      "group": "passifloras",
+      "rank": 161,
+      "top1_species": "punica_granatum",
+      "top1_nombre": "Granado",
+      "correct": false
+    },
+    {
+      "query": "granadilla",
+      "true_species": "passiflora_edulis_morada",
+      "true_nombre": "Gulupa",
+      "group": "passifloras",
+      "rank": 121,
+      "top1_species": "passiflora_ligularis",
+      "top1_nombre": "Granadilla",
+      "correct": false
+    },
+    {
+      "query": "maracuyá",
+      "true_species": "passiflora_edulis_morada",
+      "true_nombre": "Gulupa",
+      "group": "passifloras",
+      "rank": 156,
+      "top1_species": "passiflora_edulis_flavicarpa",
+      "top1_nombre": "Maracuyá",
+      "correct": false
+    },
+    {
+      "query": "granada china",
+      "true_species": "passiflora_ligularis",
+      "true_nombre": "Granadilla",
+      "group": "passifloras",
+      "rank": 3,
+      "top1_species": "punica_granatum",
+      "top1_nombre": "Granado",
+      "correct": false
+    },
+    {
+      "query": "cranix",
+      "true_species": "passiflora_ligularis",
+      "true_nombre": "Granadilla",
+      "group": "passifloras",
+      "rank": 59,
+      "top1_species": "lantana_camara",
+      "top1_nombre": "Camaroncillo",
+      "correct": false
+    },
+    {
+      "query": "granada-china",
+      "true_species": "passiflora_ligularis",
+      "true_nombre": "Granadilla",
+      "group": "passifloras",
+      "rank": 3,
+      "top1_species": "passiflora_tarminiana",
+      "top1_nombre": "Granadilla común / Granadilla de China",
+      "correct": false
+    },
+    {
+      "query": "granadilla de china",
+      "true_species": "passiflora_ligularis",
+      "true_nombre": "Granadilla",
+      "group": "passifloras",
+      "rank": 2,
+      "top1_species": "passiflora_tarminiana",
+      "top1_nombre": "Granadilla común / Granadilla de China",
+      "correct": false
+    },
+    {
+      "query": "parchita amarilla",
+      "true_species": "passiflora_ligularis",
+      "true_nombre": "Granadilla",
+      "group": "passifloras",
+      "rank": 89,
+      "top1_species": "cinchona_officinalis",
+      "top1_nombre": "Quina amarilla",
+      "correct": false
+    },
+    {
+      "query": "ceibey",
+      "true_species": "passiflora_edulis_amarilla_colombia",
+      "true_nombre": "Gulupa amarilla colombiana",
+      "group": "passifloras",
+      "rank": 543,
+      "top1_species": "ceiba_pentandra",
+      "top1_nombre": "Ceiba algodón",
+      "correct": false
+    },
+    {
+      "query": "chinola",
+      "true_species": "passiflora_edulis_amarilla_colombia",
+      "true_nombre": "Gulupa amarilla colombiana",
+      "group": "passifloras",
+      "rank": 234,
+      "top1_species": "tagetes_minuta",
+      "top1_nombre": "Chinchilla",
+      "correct": false
+    },
+    {
+      "query": "curuba",
+      "true_species": "passiflora_edulis_amarilla_colombia",
+      "true_nombre": "Gulupa amarilla colombiana",
+      "group": "passifloras",
+      "rank": 40,
+      "top1_species": "passiflora_tripartita_mollissima",
+      "top1_nombre": "Curuba de Castilla",
+      "correct": false
+    },
+    {
+      "query": "flor de las cinco lagas",
+      "true_species": "passiflora_edulis_amarilla_colombia",
+      "true_nombre": "Gulupa amarilla colombiana",
+      "group": "passifloras",
+      "rank": 87,
+      "top1_species": "cattleya_trianae",
+      "top1_nombre": "Flor de Mayo",
+      "correct": false
+    },
+    {
+      "query": "maracuyá",
+      "true_species": "passiflora_edulis_amarilla_colombia",
+      "true_nombre": "Gulupa amarilla colombiana",
+      "group": "passifloras",
+      "rank": 189,
+      "top1_species": "passiflora_edulis_flavicarpa",
+      "top1_nombre": "Maracuyá",
+      "correct": false
+    },
+    {
+      "query": "parcha",
+      "true_species": "passiflora_edulis_amarilla_colombia",
+      "true_nombre": "Gulupa amarilla colombiana",
+      "group": "passifloras",
+      "rank": 364,
+      "top1_species": "passiflora_quadrangularis",
+      "top1_nombre": "Badea",
+      "correct": false
+    },
+    {
+      "query": "parchita",
+      "true_species": "passiflora_edulis_amarilla_colombia",
+      "true_nombre": "Gulupa amarilla colombiana",
+      "group": "passifloras",
+      "rank": 300,
+      "top1_species": "passiflora_quadrangularis",
+      "top1_nombre": "Badea",
+      "correct": false
+    },
+    {
+      "query": "Gulupa amarilla colombiana",
+      "true_species": "passiflora_edulis_amarilla_colombia",
+      "true_nombre": "Gulupa amarilla colombiana",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_edulis_amarilla_colombia",
+      "top1_nombre": "Gulupa amarilla colombiana",
+      "correct": true
+    },
+    {
+      "query": "lima tomate",
+      "true_species": "solanum_betaceum_naranja",
+      "true_nombre": "Tomate de árbol naranja",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 3,
+      "top1_species": "citrus_latifolia",
+      "top1_nombre": "Limón Tahití",
+      "correct": false
+    },
+    {
+      "query": "tomate",
+      "true_species": "solanum_betaceum_naranja",
+      "true_nombre": "Tomate de árbol naranja",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 2,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": false
+    },
+    {
+      "query": "tomate extranjero",
+      "true_species": "solanum_betaceum_naranja",
+      "true_nombre": "Tomate de árbol naranja",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 2,
+      "top1_species": "physalis_philadelphica",
+      "top1_nombre": "Tomatillo verde",
+      "correct": false
+    },
+    {
+      "query": "tomate de palo",
+      "true_species": "solanum_betaceum_naranja",
+      "true_nombre": "Tomate de árbol naranja",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 2,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": false
+    },
+    {
+      "query": "tomate de árbol",
+      "true_species": "solanum_betaceum_naranja",
+      "true_nombre": "Tomate de árbol naranja",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 2,
+      "top1_species": "solanum_betaceum_morado",
+      "top1_nombre": "Tomate de árbol morado",
+      "correct": false
+    },
+    {
+      "query": "tomato de arbol",
+      "true_species": "solanum_betaceum_naranja",
+      "true_nombre": "Tomate de árbol naranja",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 3,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": false
+    },
+    {
+      "query": "tamarillo",
+      "true_species": "solanum_betaceum_naranja",
+      "true_nombre": "Tomate de árbol naranja",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 24,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": false
+    },
+    {
+      "query": "tomate serrano",
+      "true_species": "solanum_betaceum_naranja",
+      "true_nombre": "Tomate de árbol naranja",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_betaceum_naranja",
+      "top1_nombre": "Tomate de árbol naranja",
+      "correct": true
+    },
+    {
+      "query": "Tomate de árbol naranja",
+      "true_species": "solanum_betaceum_naranja",
+      "true_nombre": "Tomate de árbol naranja",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_betaceum_naranja",
+      "top1_nombre": "Tomate de árbol naranja",
+      "correct": true
+    },
+    {
+      "query": "lima tomate",
+      "true_species": "solanum_betaceum_morado",
+      "true_nombre": "Tomate de árbol morado",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 4,
+      "top1_species": "citrus_latifolia",
+      "top1_nombre": "Limón Tahití",
+      "correct": false
+    },
+    {
+      "query": "tomate",
+      "true_species": "solanum_betaceum_morado",
+      "true_nombre": "Tomate de árbol morado",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 4,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": false
+    },
+    {
+      "query": "tomate extranjero",
+      "true_species": "solanum_betaceum_morado",
+      "true_nombre": "Tomate de árbol morado",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 3,
+      "top1_species": "physalis_philadelphica",
+      "top1_nombre": "Tomatillo verde",
+      "correct": false
+    },
+    {
+      "query": "tomate de palo",
+      "true_species": "solanum_betaceum_morado",
+      "true_nombre": "Tomate de árbol morado",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 3,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": false
+    },
+    {
+      "query": "tomate de árbol",
+      "true_species": "solanum_betaceum_morado",
+      "true_nombre": "Tomate de árbol morado",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_betaceum_morado",
+      "top1_nombre": "Tomate de árbol morado",
+      "correct": true
+    },
+    {
+      "query": "tomato de arbol",
+      "true_species": "solanum_betaceum_morado",
+      "true_nombre": "Tomate de árbol morado",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 2,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": false
+    },
+    {
+      "query": "tamarillo",
+      "true_species": "solanum_betaceum_morado",
+      "true_nombre": "Tomate de árbol morado",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 75,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": false
+    },
+    {
+      "query": "tomate serrano",
+      "true_species": "solanum_betaceum_morado",
+      "true_nombre": "Tomate de árbol morado",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 4,
+      "top1_species": "solanum_betaceum_naranja",
+      "top1_nombre": "Tomate de árbol naranja",
+      "correct": false
+    },
+    {
+      "query": "Tomate de árbol morado",
+      "true_species": "solanum_betaceum_morado",
+      "true_nombre": "Tomate de árbol morado",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_betaceum_morado",
+      "top1_nombre": "Tomate de árbol morado",
+      "correct": true
+    },
+    {
+      "query": "frutilla",
+      "true_species": "solanum_lycopersicum",
+      "true_nombre": "Tomate chonto",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 316,
+      "top1_species": "prunus_domestica",
+      "top1_nombre": "Ciruela",
+      "correct": false
+    },
+    {
+      "query": "Tomate chonto",
+      "true_species": "solanum_lycopersicum",
+      "true_nombre": "Tomate chonto",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_lycopersicum",
+      "top1_nombre": "Tomate chonto",
+      "correct": true
+    },
+    {
+      "query": "apio",
+      "true_species": "arracacia_xanthorrhiza_amarilla",
+      "true_nombre": "Arracacha amarilla",
+      "group": "arracacha_vs_yuca",
+      "rank": 505,
+      "top1_species": "apium_graveolens",
+      "top1_nombre": "Apio",
+      "correct": false
+    },
+    {
+      "query": "arracacha",
+      "true_species": "arracacia_xanthorrhiza_amarilla",
+      "true_nombre": "Arracacha amarilla",
+      "group": "arracacha_vs_yuca",
+      "rank": 1,
+      "top1_species": "arracacia_xanthorrhiza_amarilla",
+      "top1_nombre": "Arracacha amarilla",
+      "correct": true
+    },
+    {
+      "query": "arracache",
+      "true_species": "arracacia_xanthorrhiza_amarilla",
+      "true_nombre": "Arracacha amarilla",
+      "group": "arracacha_vs_yuca",
+      "rank": 1,
+      "top1_species": "arracacia_xanthorrhiza_amarilla",
+      "top1_nombre": "Arracacha amarilla",
+      "correct": true
+    },
+    {
+      "query": "maya",
+      "true_species": "arracacia_xanthorrhiza_amarilla",
+      "true_nombre": "Arracacha amarilla",
+      "group": "arracacha_vs_yuca",
+      "rank": 682,
+      "top1_species": "cattleya_trianae",
+      "top1_nombre": "Flor de Mayo",
+      "correct": false
+    },
+    {
+      "query": "sacha zanahoria",
+      "true_species": "arracacia_xanthorrhiza_amarilla",
+      "true_nombre": "Arracacha amarilla",
+      "group": "arracacha_vs_yuca",
+      "rank": 72,
+      "top1_species": "plukenetia_volubilis",
+      "top1_nombre": "Sacha inchi",
+      "correct": false
+    },
+    {
+      "query": "yurak zanahoria",
+      "true_species": "arracacia_xanthorrhiza_amarilla",
+      "true_nombre": "Arracacha amarilla",
+      "group": "arracacha_vs_yuca",
+      "rank": 368,
+      "top1_species": "chrysanthemum_sp",
+      "top1_nombre": "chrysanthemum_sp",
+      "correct": false
+    },
+    {
+      "query": "zanahoria",
+      "true_species": "arracacia_xanthorrhiza_amarilla",
+      "true_nombre": "Arracacha amarilla",
+      "group": "arracacha_vs_yuca",
+      "rank": 167,
+      "top1_species": "daucus_carota_subsp_sativus",
+      "top1_nombre": "Zanahoria",
+      "correct": false
+    },
+    {
+      "query": "zanahoria blanca",
+      "true_species": "arracacia_xanthorrhiza_amarilla",
+      "true_nombre": "Arracacha amarilla",
+      "group": "arracacha_vs_yuca",
+      "rank": 141,
+      "top1_species": "arracacia_xanthorrhiza",
+      "top1_nombre": "Arracacha / Zanahoria blanca",
+      "correct": false
+    },
+    {
+      "query": "Arracacha amarilla",
+      "true_species": "arracacia_xanthorrhiza_amarilla",
+      "true_nombre": "Arracacha amarilla",
+      "group": "arracacha_vs_yuca",
+      "rank": 1,
+      "top1_species": "arracacia_xanthorrhiza_amarilla",
+      "top1_nombre": "Arracacha amarilla",
+      "correct": true
+    },
+    {
+      "query": "frutilla",
+      "true_species": "solanum_lycopersicum_cerasiforme",
+      "true_nombre": "Tomate cherry estándar",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 307,
+      "top1_species": "prunus_domestica",
+      "top1_nombre": "Ciruela",
+      "correct": false
+    },
+    {
+      "query": "Tomate cherry estándar",
+      "true_species": "solanum_lycopersicum_cerasiforme",
+      "true_nombre": "Tomate cherry estándar",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_lycopersicum_cerasiforme",
+      "top1_nombre": "Tomate cherry estándar",
+      "correct": true
+    },
+    {
+      "query": "frutilla",
+      "true_species": "solanum_lycopersicum_san_marzano",
+      "true_nombre": "Tomate San Marzano",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 651,
+      "top1_species": "prunus_domestica",
+      "top1_nombre": "Ciruela",
+      "correct": false
+    },
+    {
+      "query": "Tomate San Marzano",
+      "true_species": "solanum_lycopersicum_san_marzano",
+      "true_nombre": "Tomate San Marzano",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_lycopersicum_san_marzano",
+      "top1_nombre": "Tomate San Marzano",
+      "correct": true
+    },
+    {
+      "query": "Repollo morado",
+      "true_species": "brassica_oleracea_capitata_rubra",
+      "true_nombre": "Repollo morado",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_capitata_rubra",
+      "top1_nombre": "Repollo morado",
+      "correct": true
+    },
+    {
+      "query": "chinpalu",
+      "true_species": "solanum_tuberosum_sabanera",
+      "true_nombre": "Papa Sabanera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 403,
+      "top1_species": "jacaranda_copaia",
+      "top1_nombre": "Chingalé",
+      "correct": false
+    },
+    {
+      "query": "papa",
+      "true_species": "solanum_tuberosum_sabanera",
+      "true_nombre": "Papa Sabanera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 10,
+      "top1_species": "solanum_tuberosum_argentina",
+      "top1_nombre": "Papa Argentina",
+      "correct": false
+    },
+    {
+      "query": "papa leona",
+      "true_species": "solanum_tuberosum_sabanera",
+      "true_nombre": "Papa Sabanera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 8,
+      "top1_species": "solanum_tuberosum_diacol_capiro",
+      "top1_nombre": "Papa Diacol Capiro",
+      "correct": false
+    },
+    {
+      "query": "papa pulos",
+      "true_species": "solanum_tuberosum_sabanera",
+      "true_nombre": "Papa Sabanera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 11,
+      "top1_species": "solanum_tuberosum",
+      "top1_nombre": "Papa parda pastusa",
+      "correct": false
+    },
+    {
+      "query": "papa uvilla",
+      "true_species": "solanum_tuberosum_sabanera",
+      "true_nombre": "Papa Sabanera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 11,
+      "top1_species": "pourouma_cecropiifolia_silvestre",
+      "top1_nombre": "Uvilla silvestre",
+      "correct": false
+    },
+    {
+      "query": "patata",
+      "true_species": "solanum_tuberosum_sabanera",
+      "true_nombre": "Papa Sabanera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 13,
+      "top1_species": "ipomoea_batatas",
+      "top1_nombre": "Batata / Camote",
+      "correct": false
+    },
+    {
+      "query": "potato",
+      "true_species": "solanum_tuberosum_sabanera",
+      "true_nombre": "Papa Sabanera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 45,
+      "top1_species": "ipomoea_batatas",
+      "top1_nombre": "Batata / Camote",
+      "correct": false
+    },
+    {
+      "query": "sacha papa",
+      "true_species": "solanum_tuberosum_sabanera",
+      "true_nombre": "Papa Sabanera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 2,
+      "top1_species": "plukenetia_volubilis",
+      "top1_nombre": "Sacha inchi",
+      "correct": false
+    },
+    {
+      "query": "Papa Sabanera",
+      "true_species": "solanum_tuberosum_sabanera",
+      "true_nombre": "Papa Sabanera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "solanum_tuberosum_sabanera",
+      "top1_nombre": "Papa Sabanera",
+      "correct": true
+    },
+    {
+      "query": "curuba",
+      "true_species": "passiflora_maliformis",
+      "true_nombre": "Granadilla de fraile / Maracuyá silvestre",
+      "group": "passifloras",
+      "rank": 706,
+      "top1_species": "passiflora_tripartita_mollissima",
+      "top1_nombre": "Curuba de Castilla",
+      "correct": false
+    },
+    {
+      "query": "granadilla de bueso",
+      "true_species": "passiflora_maliformis",
+      "true_nombre": "Granadilla de fraile / Maracuyá silvestre",
+      "group": "passifloras",
+      "rank": 5,
+      "top1_species": "passiflora_ligularis",
+      "top1_nombre": "Granadilla",
+      "correct": false
+    },
+    {
+      "query": "granadilla de hueso",
+      "true_species": "passiflora_maliformis",
+      "true_nombre": "Granadilla de fraile / Maracuyá silvestre",
+      "group": "passifloras",
+      "rank": 4,
+      "top1_species": "passiflora_ligularis",
+      "top1_nombre": "Granadilla",
+      "correct": false
+    },
+    {
+      "query": "granadilla de piedra",
+      "true_species": "passiflora_maliformis",
+      "true_nombre": "Granadilla de fraile / Maracuyá silvestre",
+      "group": "passifloras",
+      "rank": 4,
+      "top1_species": "passiflora_ligularis",
+      "top1_nombre": "Granadilla",
+      "correct": false
+    },
+    {
+      "query": "guerito",
+      "true_species": "passiflora_maliformis",
+      "true_nombre": "Granadilla de fraile / Maracuyá silvestre",
+      "group": "passifloras",
+      "rank": 417,
+      "top1_species": "sechium_edule",
+      "top1_nombre": "Guatila / Chayote",
+      "correct": false
+    },
+    {
+      "query": "parcha cimarrona",
+      "true_species": "passiflora_maliformis",
+      "true_nombre": "Granadilla de fraile / Maracuyá silvestre",
+      "group": "passifloras",
+      "rank": 245,
+      "top1_species": "loricaria_complanata",
+      "top1_nombre": "Escobilla paramuna",
+      "correct": false
+    },
+    {
+      "query": "Granadilla de fraile / Maracuyá silvestre",
+      "true_species": "passiflora_maliformis",
+      "true_nombre": "Granadilla de fraile / Maracuyá silvestre",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_maliformis",
+      "top1_nombre": "Granadilla de fraile / Maracuyá silvestre",
+      "correct": true
+    },
+    {
+      "query": "gullán",
+      "true_species": "passiflora_tarminiana",
+      "true_nombre": "Granadilla común / Granadilla de China",
+      "group": "passifloras",
+      "rank": 94,
+      "top1_species": "cestrum_nocturnum",
+      "top1_nombre": "Galán de noche",
+      "correct": false
+    },
+    {
+      "query": "taksu",
+      "true_species": "passiflora_tarminiana",
+      "true_nombre": "Granadilla común / Granadilla de China",
+      "group": "passifloras",
+      "rank": 555,
+      "top1_species": "chrysanthemum_sp",
+      "top1_nombre": "chrysanthemum_sp",
+      "correct": false
+    },
+    {
+      "query": "curuba ecuatoriana",
+      "true_species": "passiflora_tarminiana",
+      "true_nombre": "Granadilla común / Granadilla de China",
+      "group": "passifloras",
+      "rank": 429,
+      "top1_species": "passiflora_tripartita_mollissima",
+      "top1_nombre": "Curuba de Castilla",
+      "correct": false
+    },
+    {
+      "query": "curuba quiteña",
+      "true_species": "passiflora_tarminiana",
+      "true_nombre": "Granadilla común / Granadilla de China",
+      "group": "passifloras",
+      "rank": 560,
+      "top1_species": "passiflora_tripartita_mollissima",
+      "top1_nombre": "Curuba de Castilla",
+      "correct": false
+    },
+    {
+      "query": "tacso amarillo",
+      "true_species": "passiflora_tarminiana",
+      "true_nombre": "Granadilla común / Granadilla de China",
+      "group": "passifloras",
+      "rank": 550,
+      "top1_species": "cosmos_sulphureus",
+      "top1_nombre": "Cosmos amarillo",
+      "correct": false
+    },
+    {
+      "query": "Granadilla común / Granadilla de China",
+      "true_species": "passiflora_tarminiana",
+      "true_nombre": "Granadilla común / Granadilla de China",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_tarminiana",
+      "top1_nombre": "Granadilla común / Granadilla de China",
+      "correct": true
+    },
+    {
+      "query": "col",
+      "true_species": "brassica_oleracea_var_capitata",
+      "true_nombre": "Repollo",
+      "group": "brassica_oleracea",
+      "rank": 37,
+      "top1_species": "brassica_oleracea_var_acephala",
+      "top1_nombre": "Col rizada / Kale",
+      "correct": false
+    },
+    {
+      "query": "col repollo",
+      "true_species": "brassica_oleracea_var_capitata",
+      "true_nombre": "Repollo",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_var_capitata",
+      "top1_nombre": "Repollo",
+      "correct": true
+    },
+    {
+      "query": "lombarda",
+      "true_species": "brassica_oleracea_var_capitata",
+      "true_nombre": "Repollo",
+      "group": "brassica_oleracea",
+      "rank": 177,
+      "top1_species": "lavandula_angustifolia",
+      "top1_nombre": "Lavanda",
+      "correct": false
+    },
+    {
+      "query": "repollo",
+      "true_species": "brassica_oleracea_var_capitata",
+      "true_nombre": "Repollo",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_var_capitata",
+      "top1_nombre": "Repollo",
+      "correct": true
+    },
+    {
+      "query": "andigena",
+      "true_species": "solanum_tuberosum_carrera_negra",
+      "true_nombre": "Papa Negra Carrera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 466,
+      "top1_species": "carapa_guianensis",
+      "top1_nombre": "andiroba",
+      "correct": false
+    },
+    {
+      "query": "papa amarilla",
+      "true_species": "solanum_tuberosum_carrera_negra",
+      "true_nombre": "Papa Negra Carrera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 4,
+      "top1_species": "mammea_americana",
+      "top1_nombre": "Mamey amarillo",
+      "correct": false
+    },
+    {
+      "query": "Papa Negra Carrera",
+      "true_species": "solanum_tuberosum_carrera_negra",
+      "true_nombre": "Papa Negra Carrera",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "solanum_tuberosum_carrera_negra",
+      "top1_nombre": "Papa Negra Carrera",
+      "correct": true
+    },
+    {
+      "query": "airo bai a’so",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 187,
+      "top1_species": "chrysanthemum_sp",
+      "top1_nombre": "chrysanthemum_sp",
+      "correct": false
+    },
+    {
+      "query": "apach mama",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 75,
+      "top1_species": "pouteria_sapota",
+      "top1_nombre": "Mamey colorado",
+      "correct": false
+    },
+    {
+      "query": "api lumu",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 75,
+      "top1_species": "solanum_quitoense",
+      "top1_nombre": "Lulo / Naranjilla / Chuva",
+      "correct": false
+    },
+    {
+      "query": "arajuno lumu",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 107,
+      "top1_species": "solanum_quitoense",
+      "top1_nombre": "Lulo / Naranjilla / Chuva",
+      "correct": false
+    },
+    {
+      "query": "auka lumu",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 49,
+      "top1_species": "chrysanthemum_sp",
+      "top1_nombre": "chrysanthemum_sp",
+      "correct": false
+    },
+    {
+      "query": "awa llakta lumu",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 123,
+      "top1_species": "solanum_quitoense",
+      "top1_nombre": "Lulo / Naranjilla / Chuva",
+      "correct": false
+    },
+    {
+      "query": "aypi",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 89,
+      "top1_species": "cyperus_articulatus",
+      "top1_nombre": "Papiro andino",
+      "correct": false
+    },
+    {
+      "query": "a’so",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 369,
+      "top1_species": "oreopanax_floribundum",
+      "top1_nombre": "Mano de oso",
+      "correct": false
+    },
+    {
+      "query": "Yuca brava amazónica",
+      "true_species": "manihot_esculenta",
+      "true_nombre": "Yuca brava amazónica",
+      "group": "arracacha_vs_yuca",
+      "rank": 1,
+      "top1_species": "manihot_esculenta",
+      "top1_nombre": "Yuca brava amazónica",
+      "correct": true
+    },
+    {
+      "query": "Papa Pastusa Suprema",
+      "true_species": "solanum_tuberosum_pastusa_suprema",
+      "true_nombre": "Papa Pastusa Suprema",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "solanum_tuberosum_pastusa_suprema",
+      "top1_nombre": "Papa Pastusa Suprema",
+      "correct": true
+    },
+    {
+      "query": "Papa Diacol Capiro",
+      "true_species": "solanum_tuberosum_diacol_capiro",
+      "true_nombre": "Papa Diacol Capiro",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "solanum_tuberosum_diacol_capiro",
+      "top1_nombre": "Papa Diacol Capiro",
+      "correct": true
+    },
+    {
+      "query": "col",
+      "true_species": "brassica_oleracea_capitata_alba",
+      "true_nombre": "Repollo blanco",
+      "group": "brassica_oleracea",
+      "rank": 29,
+      "top1_species": "brassica_oleracea_var_acephala",
+      "top1_nombre": "Col rizada / Kale",
+      "correct": false
+    },
+    {
+      "query": "col repollo",
+      "true_species": "brassica_oleracea_capitata_alba",
+      "true_nombre": "Repollo blanco",
+      "group": "brassica_oleracea",
+      "rank": 2,
+      "top1_species": "brassica_oleracea_var_capitata",
+      "top1_nombre": "Repollo",
+      "correct": false
+    },
+    {
+      "query": "lombarda",
+      "true_species": "brassica_oleracea_capitata_alba",
+      "true_nombre": "Repollo blanco",
+      "group": "brassica_oleracea",
+      "rank": 109,
+      "top1_species": "lavandula_angustifolia",
+      "top1_nombre": "Lavanda",
+      "correct": false
+    },
+    {
+      "query": "repollo",
+      "true_species": "brassica_oleracea_capitata_alba",
+      "true_nombre": "Repollo blanco",
+      "group": "brassica_oleracea",
+      "rank": 2,
+      "top1_species": "brassica_oleracea_var_capitata",
+      "top1_nombre": "Repollo",
+      "correct": false
+    },
+    {
+      "query": "Repollo blanco",
+      "true_species": "brassica_oleracea_capitata_alba",
+      "true_nombre": "Repollo blanco",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_capitata_alba",
+      "top1_nombre": "Repollo blanco",
+      "correct": true
+    },
+    {
+      "query": "col de milán",
+      "true_species": "brassica_oleracea_sabauda",
+      "true_nombre": "Repollo rizado / Savoy",
+      "group": "brassica_oleracea",
+      "rank": 371,
+      "top1_species": "brassica_oleracea_gemmifera",
+      "top1_nombre": "Coles de Bruselas",
+      "correct": false
+    },
+    {
+      "query": "col de saboya",
+      "true_species": "brassica_oleracea_sabauda",
+      "true_nombre": "Repollo rizado / Savoy",
+      "group": "brassica_oleracea",
+      "rank": 2,
+      "top1_species": "holcus_lanatus",
+      "top1_nombre": "Saboya",
+      "correct": false
+    },
+    {
+      "query": "col lombarda",
+      "true_species": "brassica_oleracea_sabauda",
+      "true_nombre": "Repollo rizado / Savoy",
+      "group": "brassica_oleracea",
+      "rank": 549,
+      "top1_species": "brassica_oleracea_acephala_lacinato",
+      "top1_nombre": "Kale toscano / Cavolo nero",
+      "correct": false
+    },
+    {
+      "query": "Repollo rizado / Savoy",
+      "true_species": "brassica_oleracea_sabauda",
+      "true_nombre": "Repollo rizado / Savoy",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_sabauda",
+      "top1_nombre": "Repollo rizado / Savoy",
+      "correct": true
+    },
+    {
+      "query": "gullán",
+      "true_species": "passiflora_tripartita_mollissima",
+      "true_nombre": "Curuba de Castilla",
+      "group": "passifloras",
+      "rank": 212,
+      "top1_species": "cestrum_nocturnum",
+      "top1_nombre": "Galán de noche",
+      "correct": false
+    },
+    {
+      "query": "taksu",
+      "true_species": "passiflora_tripartita_mollissima",
+      "true_nombre": "Curuba de Castilla",
+      "group": "passifloras",
+      "rank": 379,
+      "top1_species": "chrysanthemum_sp",
+      "top1_nombre": "chrysanthemum_sp",
+      "correct": false
+    },
+    {
+      "query": "taxo cultivado",
+      "true_species": "passiflora_tripartita_mollissima",
+      "true_nombre": "Curuba de Castilla",
+      "group": "passifloras",
+      "rank": 387,
+      "top1_species": "triticum_aestivum",
+      "top1_nombre": "Trigo",
+      "correct": false
+    },
+    {
+      "query": "taxo de castilla",
+      "true_species": "passiflora_tripartita_mollissima",
+      "true_nombre": "Curuba de Castilla",
+      "group": "passifloras",
+      "rank": 3,
+      "top1_species": "bertholletia_excelsa",
+      "top1_nombre": "Castaño amazónico",
+      "correct": false
+    },
+    {
+      "query": "taxo silvestre",
+      "true_species": "passiflora_tripartita_mollissima",
+      "true_nombre": "Curuba de Castilla",
+      "group": "passifloras",
+      "rank": 690,
+      "top1_species": "uva_bifera",
+      "top1_nombre": "Tilo / Tilo silvestre",
+      "correct": false
+    },
+    {
+      "query": "lima tomate",
+      "true_species": "solanum_betaceum",
+      "true_nombre": "Tomate de árbol / Tamarillo",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 2,
+      "top1_species": "citrus_latifolia",
+      "top1_nombre": "Limón Tahití",
+      "correct": false
+    },
+    {
+      "query": "tomate",
+      "true_species": "solanum_betaceum",
+      "true_nombre": "Tomate de árbol / Tamarillo",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": true
+    },
+    {
+      "query": "tomate extranjero",
+      "true_species": "solanum_betaceum",
+      "true_nombre": "Tomate de árbol / Tamarillo",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 4,
+      "top1_species": "physalis_philadelphica",
+      "top1_nombre": "Tomatillo verde",
+      "correct": false
+    },
+    {
+      "query": "tomate de árbol",
+      "true_species": "solanum_betaceum",
+      "true_nombre": "Tomate de árbol / Tamarillo",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 3,
+      "top1_species": "solanum_betaceum_morado",
+      "top1_nombre": "Tomate de árbol morado",
+      "correct": false
+    },
+    {
+      "query": "tomato de arbol",
+      "true_species": "solanum_betaceum",
+      "true_nombre": "Tomate de árbol / Tamarillo",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": true
+    },
+    {
+      "query": "tomate serrano",
+      "true_species": "solanum_betaceum",
+      "true_nombre": "Tomate de árbol / Tamarillo",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 6,
+      "top1_species": "solanum_betaceum_naranja",
+      "top1_nombre": "Tomate de árbol naranja",
+      "correct": false
+    },
+    {
+      "query": "Tomate de árbol / Tamarillo",
+      "true_species": "solanum_betaceum",
+      "true_nombre": "Tomate de árbol / Tamarillo",
+      "group": "tomate_vs_tomate_de_arbol",
+      "rank": 1,
+      "top1_species": "solanum_betaceum",
+      "top1_nombre": "Tomate de árbol / Tamarillo",
+      "correct": true
+    },
+    {
+      "query": "chinpalu",
+      "true_species": "solanum_tuberosum",
+      "true_nombre": "Papa parda pastusa",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 239,
+      "top1_species": "jacaranda_copaia",
+      "top1_nombre": "Chingalé",
+      "correct": false
+    },
+    {
+      "query": "papa",
+      "true_species": "solanum_tuberosum",
+      "true_nombre": "Papa parda pastusa",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 3,
+      "top1_species": "solanum_tuberosum_argentina",
+      "top1_nombre": "Papa Argentina",
+      "correct": false
+    },
+    {
+      "query": "papa leona",
+      "true_species": "solanum_tuberosum",
+      "true_nombre": "Papa parda pastusa",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 3,
+      "top1_species": "solanum_tuberosum_diacol_capiro",
+      "top1_nombre": "Papa Diacol Capiro",
+      "correct": false
+    },
+    {
+      "query": "papa pulos",
+      "true_species": "solanum_tuberosum",
+      "true_nombre": "Papa parda pastusa",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "solanum_tuberosum",
+      "top1_nombre": "Papa parda pastusa",
+      "correct": true
+    },
+    {
+      "query": "papa uvilla",
+      "true_species": "solanum_tuberosum",
+      "true_nombre": "Papa parda pastusa",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 2,
+      "top1_species": "pourouma_cecropiifolia_silvestre",
+      "top1_nombre": "Uvilla silvestre",
+      "correct": false
+    },
+    {
+      "query": "patata",
+      "true_species": "solanum_tuberosum",
+      "true_nombre": "Papa parda pastusa",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 26,
+      "top1_species": "ipomoea_batatas",
+      "top1_nombre": "Batata / Camote",
+      "correct": false
+    },
+    {
+      "query": "potato",
+      "true_species": "solanum_tuberosum",
+      "true_nombre": "Papa parda pastusa",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 116,
+      "top1_species": "ipomoea_batatas",
+      "top1_nombre": "Batata / Camote",
+      "correct": false
+    },
+    {
+      "query": "sacha papa",
+      "true_species": "solanum_tuberosum",
+      "true_nombre": "Papa parda pastusa",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 4,
+      "top1_species": "plukenetia_volubilis",
+      "top1_nombre": "Sacha inchi",
+      "correct": false
+    },
+    {
+      "query": "Papa parda pastusa",
+      "true_species": "solanum_tuberosum",
+      "true_nombre": "Papa parda pastusa",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "solanum_tuberosum",
+      "top1_nombre": "Papa parda pastusa",
+      "correct": true
+    },
+    {
+      "query": "badea",
+      "true_species": "passiflora_quadrangularis",
+      "true_nombre": "Badea",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_quadrangularis",
+      "top1_nombre": "Badea",
+      "correct": true
+    },
+    {
+      "query": "granadilla",
+      "true_species": "passiflora_quadrangularis",
+      "true_nombre": "Badea",
+      "group": "passifloras",
+      "rank": 108,
+      "top1_species": "passiflora_ligularis",
+      "top1_nombre": "Granadilla",
+      "correct": false
+    },
+    {
+      "query": "granadilla real",
+      "true_species": "passiflora_quadrangularis",
+      "true_nombre": "Badea",
+      "group": "passifloras",
+      "rank": 158,
+      "top1_species": "passiflora_ligularis",
+      "top1_nombre": "Granadilla",
+      "correct": false
+    },
+    {
+      "query": "brecolera",
+      "true_species": "brassica_oleracea_italica",
+      "true_nombre": "Brócoli",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_italica",
+      "top1_nombre": "Brócoli",
+      "correct": true
+    },
+    {
+      "query": "brécol",
+      "true_species": "brassica_oleracea_italica",
+      "true_nombre": "Brócoli",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_italica",
+      "top1_nombre": "Brócoli",
+      "correct": true
+    },
+    {
+      "query": "brócoli",
+      "true_species": "brassica_oleracea_italica",
+      "true_nombre": "Brócoli",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_italica",
+      "top1_nombre": "Brócoli",
+      "correct": true
+    },
+    {
+      "query": "coliflor",
+      "true_species": "brassica_oleracea_botrytis",
+      "true_nombre": "Coliflor",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_botrytis",
+      "top1_nombre": "Coliflor",
+      "correct": true
+    },
+    {
+      "query": "Yuca de árbol / Caucho de Ceará",
+      "true_species": "manihot_glaziovii",
+      "true_nombre": "Yuca de árbol / Caucho de Ceará",
+      "group": "arracacha_vs_yuca",
+      "rank": 1,
+      "top1_species": "manihot_glaziovii",
+      "top1_nombre": "Yuca de árbol / Caucho de Ceará",
+      "correct": true
+    },
+    {
+      "query": "Pasionaria medicinal",
+      "true_species": "passiflora_incarnata",
+      "true_nombre": "Pasionaria medicinal",
+      "group": "passifloras",
+      "rank": 1,
+      "top1_species": "passiflora_incarnata",
+      "top1_nombre": "Pasionaria medicinal",
+      "correct": true
+    },
+    {
+      "query": "apio",
+      "true_species": "arracacia_xanthorrhiza",
+      "true_nombre": "Arracacha / Zanahoria blanca",
+      "group": "arracacha_vs_yuca",
+      "rank": 599,
+      "top1_species": "apium_graveolens",
+      "top1_nombre": "Apio",
+      "correct": false
+    },
+    {
+      "query": "arracacha",
+      "true_species": "arracacia_xanthorrhiza",
+      "true_nombre": "Arracacha / Zanahoria blanca",
+      "group": "arracacha_vs_yuca",
+      "rank": 3,
+      "top1_species": "arracacia_xanthorrhiza_amarilla",
+      "top1_nombre": "Arracacha amarilla",
+      "correct": false
+    },
+    {
+      "query": "arracache",
+      "true_species": "arracacia_xanthorrhiza",
+      "true_nombre": "Arracacha / Zanahoria blanca",
+      "group": "arracacha_vs_yuca",
+      "rank": 3,
+      "top1_species": "arracacia_xanthorrhiza_amarilla",
+      "top1_nombre": "Arracacha amarilla",
+      "correct": false
+    },
+    {
+      "query": "maya",
+      "true_species": "arracacia_xanthorrhiza",
+      "true_nombre": "Arracacha / Zanahoria blanca",
+      "group": "arracacha_vs_yuca",
+      "rank": 506,
+      "top1_species": "cattleya_trianae",
+      "top1_nombre": "Flor de Mayo",
+      "correct": false
+    },
+    {
+      "query": "sacha zanahoria",
+      "true_species": "arracacia_xanthorrhiza",
+      "true_nombre": "Arracacha / Zanahoria blanca",
+      "group": "arracacha_vs_yuca",
+      "rank": 3,
+      "top1_species": "plukenetia_volubilis",
+      "top1_nombre": "Sacha inchi",
+      "correct": false
+    },
+    {
+      "query": "yurak zanahoria",
+      "true_species": "arracacia_xanthorrhiza",
+      "true_nombre": "Arracacha / Zanahoria blanca",
+      "group": "arracacha_vs_yuca",
+      "rank": 26,
+      "top1_species": "chrysanthemum_sp",
+      "top1_nombre": "chrysanthemum_sp",
+      "correct": false
+    },
+    {
+      "query": "zanahoria",
+      "true_species": "arracacia_xanthorrhiza",
+      "true_nombre": "Arracacha / Zanahoria blanca",
+      "group": "arracacha_vs_yuca",
+      "rank": 2,
+      "top1_species": "daucus_carota_subsp_sativus",
+      "top1_nombre": "Zanahoria",
+      "correct": false
+    },
+    {
+      "query": "Arracacha / Zanahoria blanca",
+      "true_species": "arracacia_xanthorrhiza",
+      "true_nombre": "Arracacha / Zanahoria blanca",
+      "group": "arracacha_vs_yuca",
+      "rank": 1,
+      "top1_species": "arracacia_xanthorrhiza",
+      "top1_nombre": "Arracacha / Zanahoria blanca",
+      "correct": true
+    },
+    {
+      "query": "chamburo",
+      "true_species": "vasconcellea_pubescens",
+      "true_nombre": "Papayuela / Papayo de monte",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 473,
+      "top1_species": "astrocaryum_chambira",
+      "top1_nombre": "Chambira",
+      "correct": false
+    },
+    {
+      "query": "chanpuru",
+      "true_species": "vasconcellea_pubescens",
+      "true_nombre": "Papayuela / Papayo de monte",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 255,
+      "top1_species": "psychotria_viridis",
+      "top1_nombre": "Chacruna",
+      "correct": false
+    },
+    {
+      "query": "chiblacán",
+      "true_species": "vasconcellea_pubescens",
+      "true_nombre": "Papayuela / Papayo de monte",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 708,
+      "top1_species": "tecoma_stans",
+      "top1_nombre": "Chicalá",
+      "correct": false
+    },
+    {
+      "query": "chihualcán",
+      "true_species": "vasconcellea_pubescens",
+      "true_nombre": "Papayuela / Papayo de monte",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 496,
+      "top1_species": "tecoma_stans",
+      "top1_nombre": "Chicalá",
+      "correct": false
+    },
+    {
+      "query": "jigacho",
+      "true_species": "vasconcellea_pubescens",
+      "true_nombre": "Papayuela / Papayo de monte",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 482,
+      "top1_species": "nectandra_acutifolia",
+      "top1_nombre": "Jigua",
+      "correct": false
+    },
+    {
+      "query": "papayuela",
+      "true_species": "vasconcellea_pubescens",
+      "true_nombre": "Papayuela / Papayo de monte",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "vasconcellea_pubescens",
+      "top1_nombre": "Papayuela / Papayo de monte",
+      "correct": true
+    },
+    {
+      "query": "rolo jimba",
+      "true_species": "vasconcellea_pubescens",
+      "true_nombre": "Papayuela / Papayo de monte",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 684,
+      "top1_species": "simarouba_amara",
+      "top1_nombre": "Simaruba",
+      "correct": false
+    },
+    {
+      "query": "siglalón",
+      "true_species": "vasconcellea_pubescens",
+      "true_nombre": "Papayuela / Papayo de monte",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 611,
+      "top1_species": "samanea_saman",
+      "top1_nombre": "Samán",
+      "correct": false
+    },
+    {
+      "query": "Papayuela / Papayo de monte",
+      "true_species": "vasconcellea_pubescens",
+      "true_nombre": "Papayuela / Papayo de monte",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "vasconcellea_pubescens",
+      "top1_nombre": "Papayuela / Papayo de monte",
+      "correct": true
+    },
+    {
+      "query": "fruta bomba",
+      "true_species": "carica_papaya",
+      "true_nombre": "Papaya",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 5,
+      "top1_species": "ananas_comosus",
+      "top1_nombre": "Piña",
+      "correct": false
+    },
+    {
+      "query": "papaya de monte",
+      "true_species": "carica_papaya",
+      "true_nombre": "Papaya",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 2,
+      "top1_species": "vasconcellea_pubescens",
+      "top1_nombre": "Papayuela / Papayo de monte",
+      "correct": false
+    },
+    {
+      "query": "papaya de pájaro",
+      "true_species": "carica_papaya",
+      "true_nombre": "Papaya",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "carica_papaya",
+      "top1_nombre": "Papaya",
+      "correct": true
+    },
+    {
+      "query": "mamón",
+      "true_species": "carica_papaya",
+      "true_nombre": "Papaya",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 19,
+      "top1_species": "melicoccus_bijugatus",
+      "top1_nombre": "Mamón",
+      "correct": false
+    },
+    {
+      "query": "papaya",
+      "true_species": "carica_papaya",
+      "true_nombre": "Papaya",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 1,
+      "top1_species": "carica_papaya",
+      "top1_nombre": "Papaya",
+      "correct": true
+    },
+    {
+      "query": "papayero",
+      "true_species": "carica_papaya",
+      "true_nombre": "Papaya",
+      "group": "papa_vs_papaya_vs_papayuela",
+      "rank": 2,
+      "top1_species": "vasconcellea_pubescens",
+      "top1_nombre": "Papayuela / Papayo de monte",
+      "correct": false
+    },
+    {
+      "query": "col rizada",
+      "true_species": "brassica_oleracea_sabellica",
+      "true_nombre": "Kale morado / Col rizada morada",
+      "group": "brassica_oleracea",
+      "rank": 2,
+      "top1_species": "brassica_oleracea_var_acephala",
+      "top1_nombre": "Col rizada / Kale",
+      "correct": false
+    },
+    {
+      "query": "col crespa",
+      "true_species": "brassica_oleracea_sabellica",
+      "true_nombre": "Kale morado / Col rizada morada",
+      "group": "brassica_oleracea",
+      "rank": 6,
+      "top1_species": "brassica_oleracea_gemmifera",
+      "top1_nombre": "Coles de Bruselas",
+      "correct": false
+    },
+    {
+      "query": "Kale morado / Col rizada morada",
+      "true_species": "brassica_oleracea_sabellica",
+      "true_nombre": "Kale morado / Col rizada morada",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_sabellica",
+      "top1_nombre": "Kale morado / Col rizada morada",
+      "correct": true
+    },
+    {
+      "query": "col de bruselas",
+      "true_species": "brassica_oleracea_gemmifera",
+      "true_nombre": "Coles de Bruselas",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_gemmifera",
+      "top1_nombre": "Coles de Bruselas",
+      "correct": true
+    },
+    {
+      "query": "repollo de bruselas",
+      "true_species": "brassica_oleracea_gemmifera",
+      "true_nombre": "Coles de Bruselas",
+      "group": "brassica_oleracea",
+      "rank": 4,
+      "top1_species": "brassica_oleracea_var_capitata",
+      "top1_nombre": "Repollo",
+      "correct": false
+    },
+    {
+      "query": "Coles de Bruselas",
+      "true_species": "brassica_oleracea_gemmifera",
+      "true_nombre": "Coles de Bruselas",
+      "group": "brassica_oleracea",
+      "rank": 1,
+      "top1_species": "brassica_oleracea_gemmifera",
+      "top1_nombre": "Coles de Bruselas",
+      "correct": true
+    }
+  ]
+}
