@@ -177,10 +177,26 @@ function apuntar(geo, pos, dir, esc = [1, 1, 1]) {
   return geo;
 }
 
-/** Fusiona la lista de partes (ya coloreadas) en UNA geometría indexada. */
+/**
+ * Fusiona la lista de partes (ya coloreadas) en UNA geometría.
+ *
+ * ⚠️ mergeGeometries devuelve NULL EN SILENCIO si las partes mezclan geometrías
+ * indexadas (Cone/Cylinder/Sphere) con no-indexadas (Icosahedron/Dodecahedron).
+ * Ese null invisible tenía APAGADAS seis especies (frailejón, roble, encenillo,
+ * aliso, gaque, romerillo) — cazado 2026-07-15. Se DESINDEXA todo antes de
+ * fusionar y se TRUENA si aun así falla: mejor un error de build que una
+ * especie invisible en producción.
+ */
 function fusionar(partes) {
-  const buenas = partes.filter(Boolean);
+  const buenas = partes.filter(Boolean).map((p) => {
+    const plana = p.index ? p.toNonIndexed() : p;
+    if (plana !== p) p.dispose();
+    return plana;
+  });
   const g = mergeGeometries(buenas, false);
+  if (!g) {
+    throw new Error('floraParamo: mergeGeometries devolvió null — atributos incompatibles entre partes');
+  }
   // Las partes de entrada nunca tocaron la GPU: quedan para el GC.
   return g;
 }
