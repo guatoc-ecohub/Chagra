@@ -171,9 +171,26 @@ function NieblaRasante({ n, reducedMotion }) {
 
 /**
  * La capa de flora del páramo alrededor del Ent. Montar dentro del <Canvas>.
- * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean}} props
+ *
+ * `excluir` deja sembrar el MISMO páramo en encuadres distintos. El microsuelo lo
+ * necesita: allí la cámara mira el corte de frente y de cerca, así que cualquier
+ * mata sembrada entre la cámara y la vitrina TAPA la lección, y el frailejonar
+ * (que arranca a radio 3.4) cae justo sobre el corte (que está a 3.14 del Ent).
+ * Sin esto, la única salida era dejar al guardián parado en un césped pelado —
+ * que es de donde venía el "aire muerto".
+ *
+ * `excluir` recibe la posición `[x, y, z]` de la mata y devuelve `true` para
+ * quitarla. DEBE ser estable entre renders (una constante de módulo): va en las
+ * dependencias del useMemo de la distribución, y una lambda en línea re-filtraría
+ * el páramo entero en cada frame.
+ *
+ * @param {{
+ *   tier?: 'alto'|'medio'|'bajo',
+ *   reducedMotion?: boolean,
+ *   excluir?: (pos: number[]) => boolean,
+ * }} props
  */
-export default function FloraParamo({ tier = 'alto', reducedMotion = false }) {
+export default function FloraParamo({ tier = 'alto', reducedMotion = false, excluir }) {
   const perfil = perfilDeTier(tier);
   const conteos = floraDeTier(tier);
   const q = calidadDeTier(tier);
@@ -205,7 +222,20 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false }) {
   }, [perfil.materialRico]);
 
   // --- Distribución en bosquetes (una vez por tier). ---
-  const dist = useMemo(() => distribucionFlora(conteos, 707), [conteos]);
+  // El filtro se aplica DESPUÉS de sembrar, nunca antes: la siembra es
+  // determinista (bosquetes, claros, distancia mínima) y re-sembrar con otro
+  // dominio movería el páramo entero. Filtrando, el bosque es EL MISMO en la
+  // entrada y en el microsuelo — solo que allí se quitan las matas que estorban.
+  const dist = useMemo(() => {
+    const d = distribucionFlora(conteos, 707);
+    if (!excluir) return d;
+    return Object.fromEntries(
+      Object.entries(d).map(([k, items]) => [
+        k,
+        Array.isArray(items) ? items.filter((it) => !excluir(it.pos)) : items,
+      ]),
+    );
+  }, [conteos, excluir]);
 
   // Liberar GPU al desmontar.
   useLayoutEffect(() => () => {
