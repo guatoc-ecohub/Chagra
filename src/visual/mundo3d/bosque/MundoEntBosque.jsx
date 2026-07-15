@@ -23,9 +23,20 @@ import EscenaBosqueVivo from './EscenaBosqueVivo.jsx';
 import EscenaEntMaestro from './EscenaEntMaestro.jsx';
 import { decidirTier, permite3D } from '../deviceTier.js';
 
-/* La invitación aparece cuando la cámara ya llegó al claro (~5.2s de caminata). */
+/* La invitación aparece a los ~2s (antes eran 5.6s: el operador la perdía de
+   vista buscando la lección). Mientras tanto, una pista discreta abajo avisa
+   que algo viene — para que la espera no se sienta como una pantalla muda. */
 const CSS = `
 .entb { position: relative; width: 100%; height: 100%; overflow: hidden; background: #c3cfce; }
+.entb__pista {
+  position: absolute; left: 50%; bottom: max(1.3rem, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: 0.55rem; height: 0.55rem; border-radius: 999px;
+  background: rgba(55, 214, 176, 0.85);
+  box-shadow: 0 0 10px 3px rgba(55, 214, 176, 0.45);
+  opacity: 0;
+  animation: entb-pista 2s ease forwards;
+}
 .entb__panel {
   position: absolute; left: 50%; bottom: max(0.9rem, env(safe-area-inset-bottom));
   transform: translateX(-50%);
@@ -37,7 +48,7 @@ const CSS = `
   backdrop-filter: blur(6px);
   color: #e9efdd;
   opacity: 0;
-  animation: entb-aparece 0.9s ease 5.6s forwards;
+  animation: entb-aparece 0.9s ease 2s forwards;
 }
 .entb__panel--ya { opacity: 1; animation: none; }
 .entb__kicker { margin: 0 0 0.15rem; font: 600 0.68rem/1.2 system-ui, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #aebd97; }
@@ -61,7 +72,18 @@ const CSS = `
   backdrop-filter: blur(6px);
 }
 .entb__volver:active { transform: scale(0.97); }
+@keyframes entb-pista {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.6); }
+  15% { opacity: 1; transform: translateX(-50%) scale(1); }
+  80% { opacity: 1; transform: translateX(-50%) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1); }
+}
+@keyframes entb-aparece {
+  from { opacity: 0; transform: translateX(-50%) translateY(0.6rem); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
 @media (prefers-reduced-motion: reduce) {
+  .entb__pista { display: none; }
   .entb__panel { opacity: 1; animation: none; }
   .entb__bajar, .entb__volver { transition: none; }
 }
@@ -88,6 +110,10 @@ export default function MundoEntBosque({ tier: tierProp, reducedMotion: rmProp }
       {modo === 'entrada' ? (
         <>
           <EscenaBosqueVivo tier={tier} reducedMotion={reducedMotion} />
+          {/* Pista discreta: avisa desde el primer fotograma que algo va a
+              aparecer abajo, mientras el panel real hace su fade-in (~2s). Sin
+              esto la espera se sentía como pantalla muda. */}
+          {!reducedMotion && <div className="entb__pista" aria-hidden="true" />}
           <div className={`entb__panel${reducedMotion ? ' entb__panel--ya' : ''}`}>
             <p className="entb__kicker">El guardián del páramo</p>
             <p className="entb__texto">
