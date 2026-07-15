@@ -1,0 +1,57 @@
+{
+  "_meta": {
+    "description": "Allowlist de capacidades (exports same-repo / endpoints del sidecar agro-mcp) construidas y verificadas como SIN consumidor real en src/, declaradas a propósito en vez de quedar como un olvido silencioso. Cada entrada requiere reason + date. Ver ops/audit-integraciones.mjs (el script que lo hace cumplir en CI) y el ADR de contexto.",
+    "adr": "Chagra-strategy/ops/ADR-INTEGRACIONES-NO-CONSUMIDAS-2026-07-15.md (repo privado — discute el detalle de infraestructura y de chagra-pro que no puede vivir acá)",
+    "how_to_add_entry": "Si scripts/audit-integraciones.mjs falla por una capacidad nueva sin consumidor: (1) decidí primero si DEBE cablearse — si sí, cableala y borrá esta entrada en vez de agregarla; (2) si no debe cablearse ahora (razón de producto, infra rota, latencia, offline-first, etc.), agregá una entrada acá con reason concreta + date de hoy. Una entrada sin razón real es exactamente el problema que este archivo existe para prevenir."
+  },
+  "same_repo": [
+    {
+      "id": "grafoRelations.getKnowledgeTopics",
+      "file": "src/services/grafoRelations.js",
+      "export": "getKnowledgeTopics",
+      "reason": "Conocimiento offline (piso_termico/micorrizas/polinizacion/cambio_climatico/fitoquimica/alelopatia) agregado a grafo-relations.json 2026-07-14. La función existe y tiene test, pero cablearla al prompt del agente requiere decidir un disparador (¿qué mensaje amerita inyectar qué tópico? — no hay heurística todavía, y hacerlo mal infla el prompt sin criterio) más presupuesto de tokens. Es una decisión de diseño de grounding, no un cableado de una línea. Caso 1 del ADR — pendiente de diseño, no de olvido.",
+      "date": "2026-07-15"
+    },
+    {
+      "id": "grafoRelations.getKnowledgeTopic",
+      "file": "src/services/grafoRelations.js",
+      "export": "getKnowledgeTopic",
+      "reason": "Mismo caso que getKnowledgeTopics — accesor de un tópico puntual, sin disparador todavía. Ver esa entrada.",
+      "date": "2026-07-15"
+    },
+    {
+      "id": "grafoRelations.buildKnowledgeTopicBlock",
+      "file": "src/services/grafoRelations.js",
+      "export": "buildKnowledgeTopicBlock",
+      "reason": "Formatea el bloque de grounding para el system prompt a partir de getKnowledgeTopic — mismo caso, depende de que exista el disparador antes de que tenga sentido cablear el formateador.",
+      "date": "2026-07-15"
+    }
+  ],
+  "sidecar_endpoints": [
+    {
+      "endpoint": "/hybrid-retrieve",
+      "reason": "Retrieve híbrido pgvector+grafo AGE (PR #148 chagra-pro, 2026-06-02), usado hoy solo internamente por /deep-research (PR #149) — cero consumidores desde el chat interactivo (confirmado: 7 días de logs del sidecar en alpha, cero hits fuera de deep-research). Decisión: NO cablear todavía. Motivo verificado 2026-07-15: la extensión pgvector del contenedor postgres-farm en alpha está rota a nivel de infraestructura (falta el .so de la extensión tras una recreación del contenedor — deuda ya trackeada en guatoc-nixos/modules/agriculture/postgres-farm.nix desde 2026-06-13, catálogo dice 'instalada' pero el binario no está). Confirmado empíricamente: cualquier query a corpus_chunks falla con 'could not access file \"$libdir/vector\"', y el endpoint responde 200 con results:[] silenciosamente en vez de degraded:true — cablearlo hoy sería conectar un tubo roto y reportarlo como 'activado'. Aun arreglada la infra, falta validar latencia real (la medida hoy no es representativa — el query nunca llega a ejecutar el HNSW) y solapamiento con el RAG cliente (BM25+arctic-embed2 sobre rag-embeddings.json) antes de cablear en un chat voice-first. Ver ADR para el detalle completo.",
+      "date": "2026-07-15"
+    },
+    {
+      "endpoint": "/telemetry/summary",
+      "reason": "Por diseño explícito (comentario del propio server.ts, chagra-pro): 'Pensado para el panel privado del operador, NO para la PWA pública'. No es un gap — el endpoint hermano /telemetry/usage sí tiene consumidor real en src/ (usageTelemetrySync.js) porque ese sí es analítica de producto pensada para agregarse desde el cliente.",
+      "date": "2026-07-15"
+    },
+    {
+      "endpoint": "/clima/refresh",
+      "reason": "Fuerza un refresh en vivo del snapshot de clima cacheado; el cliente lee vía /clima/snapshot (sí consumido, getClimaSnapshot). No encontré un comentario de diseño explícito que declare /clima/refresh como ops-only (a diferencia de /telemetry/summary) — a diferencia de ese caso, esto queda como sospecha razonable, no como certeza. Allowlisted para no bloquear CI mientras se decide si el cliente necesita forzar un refresh manual (ej. botón \"actualizar clima\") o si es puramente un trigger de cron/ops.",
+      "date": "2026-07-15"
+    },
+    {
+      "endpoint": "/resolve-entities-batch",
+      "reason": "Construido (chagra-pro #276, QUICK-13) para 'cuando el PWA quiere prefetch de varias preguntas recientes del chat' — la feature de prefetch del lado cliente que lo consumiría nunca se construyó. Mismo patrón que hybrid-retrieve y piso_termico: infraestructura pagada, cero consumidores. Encontrado por este mismo script durante su primera corrida (2026-07-15) — no estaba en el reporte original de 3 casos del operador; se suma como Caso 4 del ADR.",
+      "date": "2026-07-15"
+    },
+    {
+      "endpoint": "/resolve-ubicacion",
+      "reason": "Construido chagra-pro #77 (serie ubicación, PRs #75-77) para una cascada Tier1/Tier2 vía sidecar. El propio spec tests/ubicacion-auto.spec.js lo documenta: 'muchos tests están skipped hasta que se mergee el PR 4/4'. Ese PR4 SÍ se mergeó (#1143, 2026-06) pero implementó otra cosa — un fallback OFFLINE (32 dptos x municipios curados) para cuando Nominatim falla, no la llamada al sidecar. locationService.js::resolveUbicacion() es una reimplementación cliente (Nominatim + fallback offline) con el mismo nombre mas no llama al endpoint. A diferencia de los otros casos, esto NO parece un olvido sino una decisión de producto razonable (mejor para offline-first evitar el round-trip a alpha) que dejó el endpoint del sidecar como infraestructura huérfana sin que nadie lo haya limpiado del lado chagra-pro. No cablear — si acaso, evaluar deprecar el endpoint en chagra-pro. Caso 5 del ADR, encontrado por este script.",
+      "date": "2026-07-15"
+    }
+  ]
+}
