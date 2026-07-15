@@ -41,8 +41,11 @@ import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
 import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
 import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
 import AnimalesDeFinca, { MATERIAL_FINCA } from './animales.jsx';
+/* Cultivos REALISTAS de la finca (feedback del operador: "el maíz que parezca
+   maíz"): milpa y cafetal fusionados con color horneado — 1 draw-call cada uno. */
+import { geomMilpa, geomCafetal } from '../../visual/mundo3d/finca/fincaRealista.geom.js';
 /* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
-   (roble, aliso, gaque) que ya viven en floraParamo — cada árbol se distingue. */
+   (roble, aliso, gaque) que ya viven en floraParamo. */
 import { geomRoble, geomAliso, geomGaque } from '../../visual/mundo3d/bosque/floraParamo.geom.js';
 /* Luciérnagas de la noche: el kit instanciado que ya existe (1-3 draw calls),
    sembrado sobre la tierra baja del valle cuando la franja las trae. */
@@ -281,55 +284,20 @@ function ArboledaEspecies({ q }) {
   );
 }
 
-/* ── Materiales/paletas de cada landmark de mundo, por `tipo`. Formas
-      redondeadas (cilindros, conos, esferas) — pocas piezas por lugar para
-      dejar aire. La arboleda va por especie (mallas de floraParamo); `q` baja
+/* ── Materiales/paletas de cada landmark de mundo, por `tipo`. Los cultivos y
+      animales de la finca van REALISTAS (fincaRealista.geom: mallas fusionadas
+      con color horneado); el resto sigue en primitivas redondeadas. `q` baja
       el detalle geométrico en perfil frugal. ── */
 function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
   const [fuerte, suave] = tinte;
   switch (tipo) {
-    case 'milpa': // maíz: cañas altas con penacho + hojas
+    case 'milpa': // el maíz REAL: caña con nudos, hojas arqueadas, mazorca y penacho
       return (
-        <group>
-          {[-0.42, 0.05, 0.42].map((dx, i) => (
-            <group key={i} position={[dx, 0, (i % 2) * 0.36 - 0.18]}>
-              <mesh position={[0, 0.7, 0]} castShadow>
-                <cylinderGeometry args={[0.05, 0.08, 1.4, 6]} />
-                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-              </mesh>
-              {/* hojas: conos aplanados que salen de la caña */}
-              <mesh position={[0.16, 0.9, 0]} rotation={[0, 0, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.12, 0.5, 4]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              <mesh position={[-0.16, 0.62, 0]} rotation={[0, Math.PI, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.12, 0.5, 4]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              <mesh position={[0, 1.5, 0]}>
-                <coneGeometry args={[0.08, 0.42, 6]} />
-                <meshStandardMaterial color="#e7c96b" flatShading />
-              </mesh>
-            </group>
-          ))}
-        </group>
+        <mesh geometry={geomMilpa({ q, matas: q > 0.6 ? 6 : 4 })} material={MATERIAL_FINCA} castShadow />
       );
-    case 'cafetal': // arbustos redondos con frutos, en la ladera
+    case 'cafetal': // cafetos de verdad: pisos de ramas, hoja oscura y cereza roja
       return (
-        <group>
-          {[-0.5, 0.1, 0.55].map((dx, i) => (
-            <group key={i} position={[dx, 0, (i % 2) * 0.42]}>
-              <mesh position={[0, 0.16, 0]}>
-                <cylinderGeometry args={[0.05, 0.07, 0.32, 6]} />
-                <meshStandardMaterial color="#6b4a2e" flatShading />
-              </mesh>
-              <mesh position={[0, 0.44, 0]} castShadow>
-                <sphereGeometry args={[0.32, 10, 9]} />
-                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-              </mesh>
-            </group>
-          ))}
-        </group>
+        <mesh geometry={geomCafetal({ q })} material={MATERIAL_FINCA} castShadow />
       );
     case 'era': // eras del semillero: camellones redondeados (lomos de tierra)
       return (
@@ -367,8 +335,8 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
           ))}
         </group>
       );
-    case 'animales': // los animales de la finca (reemplaza la vieja casita)
-      return <AnimalesDeFinca reducedMotion={reducedMotion} />;
+    case 'animales': // el hato realista por raza (vaca, cerdos, gallinas, perro)
+      return <AnimalesDeFinca reducedMotion={reducedMotion} q={q} />;
     case 'huerta': // camas de la huerta: lomos redondeados con matas
       return (
         <group>

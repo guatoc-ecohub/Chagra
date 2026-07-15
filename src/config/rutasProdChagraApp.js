@@ -69,6 +69,37 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
+
+  // ── Arte nuevo — en revisión del operador (2026-07-14) ─────────
+  {
+    path: 'grafo_navegador',
+    alias: ['grafo', 'constelacion'],
+    componente: 'NavegadorGrafoDemo',
+    importLazy: 'src/mockups/NavegadorGrafoDemo.jsx',
+    categoria: '3D',
+  },
+  {
+    path: 'restauracion',
+    alias: ['restaurar', 'monte_vuelve'],
+    componente: 'RestauracionEnElTiempo',
+    importLazy: 'src/visual/mundo3d/restauracion/RestauracionEnElTiempo.jsx',
+    categoria: '3D',
+  },
+  {
+    path: 'atmosfera',
+    alias: ['dia_vivo', 'hora'],
+    componente: 'DemoAtmosferaViva',
+    importLazy: 'src/visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx',
+    categoria: '3D',
+  },
+  {
+    path: 'transiciones',
+    alias: ['odyssey', 'velo'],
+    componente: 'TransicionesOdysseyDemo',
+    importLazy: 'src/mockups/TransicionesOdysseyDemo.jsx',
+    categoria: '3D',
+  },
+
   // ── El Bosque Vivo — Ent queñua landmark + microsuelo (capas) ──
   {
     path: 'bosque_vivo',

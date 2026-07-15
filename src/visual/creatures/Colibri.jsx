@@ -1,5 +1,6 @@
-import { useId } from 'react';
+import { useId, useRef } from 'react';
 import './creatures.css';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
 import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, RH_INK, RH_BOCA } from './_rubberhose.jsx';
 import { COLIBRI_PALETA, COLIBRI_PROPORCION } from './faunaAndina.js';
@@ -102,6 +103,23 @@ export function Colibri({
      estelas={false} las apaga (hosts que quieran al colibrí sobrio). Con
      animated=false / reduced-motion / tier bajo no existen o quedan ocultas. */
   estelas = true,
+  /* ── ACICALA (aseo de ave — gesto-firma NUEVO, vida v2) ────────────────────
+     OPT-IN: el pico baja al ala trasera y la peina con dos pasadas (el aseo
+     que toda ave real hace a cada rato). Dardo y estelas se pausan: nadie se
+     asea dardeando. Default false. */
+  acicala = false,
+  /* ── VIBRA (burst staccato — gesto-firma NUEVO, vida v2) ───────────────────
+     OPT-IN: la emoción que no cabe — jitter veloz con squash&stretch y el
+     aleteo a más revoluciones (olla a presión, puro hiperactivo). Default
+     false. */
+  vibra = false,
+  /* ── VIDA PROPIA (idle-cerebro v2 — la vara de Angelita) ───────────────────
+     Default ON: un reloj con jitter hojea el repertorio del colibrí (acicala,
+     vibra, se posa) — el hiperactivo EXISTE aunque nadie le hable. Cada
+     instancia parpadea a SU aire y sus pupilas SIGUEN su puntero/dedo cerca.
+     El cerebro CEDE ante el host; animated=false, tier 'bajo' y
+     reduced-motion lo apagan entero. vida={false} = el colibrí de antes. */
+  vida = true,
   /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga lo continuo (dardo + estelas + boil) y deja aleteo y
      estados reactivos. Sin prop (standalone: avatares, catálogo) = pleno. */
@@ -136,6 +154,16 @@ export function Colibri({
   const auraOp = Math.max(0.16, Math.min(0.5, 0.2 + 0.3 * (energia ?? 1)));
   const auraR = 5.2 + 1.2 * (energia ?? 1);
   const estelasOn = vivo && !!estelas;
+
+  // ═══ VIDA PROPIA (idle-cerebro + ritmo propio + mirada — vara Angelita v2).
+  const raizRef = useRef(null);
+  const ritmoPropio = useRitmoPropio();
+  const enBase = pose === 'vuela' && !acicala && !vibra && !visema;
+  const momento = useVidaIdle('colibri', vida && vivo && tier !== 'bajo' && enBase);
+  useMiradaUsted(raizRef, vida && vivo && tier !== 'bajo');
+  const acicalaFx = acicala || momento === 'acicala';
+  const vibraFx = vibra || momento === 'vibra';
+  const poseFx = momento === 'reposo' ? 'reposo' : pose;
 
   // CLIMA → cuerpo (perfil colibrí). El aleteo base HIPERVELOZ (0.11s, en el
   // CSS del bloque colibrí) se apura (dorada) o pesa (lluvia) escalando por
@@ -287,29 +315,35 @@ export function Colibri({
 
   const estadoAttrs = {
     'data-creature': 'colibri',
-    'data-pose': vivo ? pose : undefined,
+    'data-pose': vivo ? poseFx : undefined,
     'data-animo': animo,
     'data-tier': tier || undefined,
     'data-visema': visema || undefined,
     'data-ruana': ropa?.ruana ? '1' : undefined,
     'data-mojado': ropa?.mojado ? '1' : undefined,
     'data-estelas': estelasOn ? '1' : undefined,
+    'data-acicala': acicalaFx ? '1' : undefined,
+    'data-vibra': vibraFx ? '1' : undefined,
+    'data-vida': momento || undefined,
     'data-lineboil': lineBoil ? '1' : undefined,
     'data-prop': mundoId || undefined,
   };
+
+  // El ritmo propio (parpadeo/dardeo por instancia) viaja como vars CSS.
+  const estiloRaiz = { ...ritmoPropio, ...estiloClima };
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
     // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
     return (
-      <g className={className} style={estiloClima} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
+      <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}
         {cuerpoVivo}
       </g>
     );
   }
   const svg = (
-    <svg viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloClima}
+    <svg ref={raizRef} viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloRaiz}
       role="img" aria-label={title} {...estadoAttrs} {...rest}>
       <title>{title}</title>
       {defs}

@@ -1,0 +1,477 @@
+/**
+ * navegadorGrafo.css — la piel de papel sobre el cerro.
+ *
+ * Todo el chrome es DOM real, no textura dentro del canvas: se lee nítido en
+ * cualquier pantalla, lo agranda el sistema si usted tiene la letra grande, el
+ * lector de pantalla lo anuncia, y se puede tocar con el pulgar. En una vista
+ * para campesinos con teléfonos baratos eso no es un lujo — es la vista.
+ *
+ * Los hex están CALCULADOS desde `grafoPaleta.js` (el CSS no puede importar JS,
+ * así que se copian). Si allá cambia un tinte, aquí también. Son la misma
+ * paleta, no una parecida.
+ *
+ * Sobre el fondo: el cerro vive en tierra honda (#302417). El papel encima es
+ * hueso. Ese contraste (papel claro sobre tierra) es la lámina andina del
+ * proyecto — tinta sobre papel—, no un panel de vidrio de dashboard.
+ */
+
+.grafo-nav {
+  --g-tierra: #302417; /* AIRE.fondo — la tierra honda del anochecer */
+  --g-niebla: #7e6848; /* AIRE.niebla */
+  --g-papel: #f6efe0; /* PALETA_ANDINA.hueso */
+  --g-crudo: #ece0c7; /* PALETA_ANDINA.crudo */
+  --g-tinta: #2a2016; /* PALETA_ANDINA.tinta — LA línea rubber-hose */
+  --g-fique: #e8d6b6; /* la cuerda de la milpa */
+  --g-plaga: #b06832;
+  --g-remedio: #6d9fb7;
+  --g-aliado: #d9a441;
+
+  /* El trazo rubber-hose: grueso, redondo, nunca un hairline de 1 px. */
+  --g-trazo: 2.5px;
+  --g-radio: 14px;
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  overflow: hidden;
+  background: var(--g-tierra);
+  color: var(--g-papel);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.grafo-nav--aviso {
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.grafo-aviso {
+  max-width: 32ch;
+  text-align: center;
+  color: var(--g-crudo);
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.grafo-canvas {
+  position: absolute;
+  inset: 0;
+  /* El cerro entra fundiéndose: aparecer de golpe se siente a error. */
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+
+.grafo-canvas--lista {
+  opacity: 1;
+}
+
+/* El chrome NO recibe toques: los recibe el cerro. Solo los controles de
+   verdad se rescatan con pointer-events. Sin esto, una capa invisible se come
+   el arrastre de la cámara y el mapa se siente muerto. */
+.grafo-chrome {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+/* ── El título ───────────────────────────────────────────────────────────── */
+.grafo-titulo {
+  max-width: 34ch;
+  text-shadow: 0 2px 12px rgba(42, 32, 22, 0.9);
+}
+
+.grafo-titulo h2 {
+  margin: 0;
+  font-size: clamp(1.15rem, 3.2vw, 1.6rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--g-papel);
+}
+
+.grafo-titulo p {
+  margin: 0.25rem 0 0;
+  font-size: 0.87rem;
+  line-height: 1.45;
+  color: var(--g-crudo);
+  opacity: 0.9;
+}
+
+/* ── La leyenda ──────────────────────────────────────────────────────────
+   Nota al pie, no protagonista: el mapa se explica solo (la forma dice qué es),
+   la leyenda apenas confirma. Por eso va chiquita y translúcida. */
+.grafo-leyenda {
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+  align-self: flex-start;
+  background: rgba(42, 32, 22, 0.72);
+  border: 1px solid rgba(236, 224, 199, 0.18);
+  border-radius: var(--g-radio);
+  backdrop-filter: blur(3px);
+}
+
+.grafo-leyenda li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--g-crudo);
+}
+
+/* Las figuras de la leyenda son las MISMAS siluetas del 3D, en CSS: redondo =
+   mata, pico = plaga, vasija = remedio, anillo = aliado. Si no coincidieran,
+   la leyenda enseñaría un idioma distinto al del mapa. */
+.grafo-leyenda__figura {
+  width: 13px;
+  height: 13px;
+  background: var(--fig-tinte);
+  flex: none;
+}
+
+.grafo-leyenda__figura--mata {
+  border-radius: 50%;
+}
+
+.grafo-leyenda__figura--plaga {
+  /* rombo puntudo = el pico de la amenaza */
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.grafo-leyenda__figura--vasija {
+  /* hombro ancho arriba, base recogida: la silueta de la olla */
+  clip-path: polygon(28% 0, 72% 0, 100% 42%, 82% 100%, 18% 100%, 0 42%);
+}
+
+.grafo-leyenda__figura--anillo {
+  border-radius: 50%;
+  background: none;
+  border: 3px solid var(--fig-tinte);
+}
+
+/* ── El rótulo de cada piso (dentro del canvas, vía <Html>) ─────────────── */
+.grafo-banda {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 0.3rem 0.55rem;
+  border: none;
+  border-left: var(--g-trazo) solid var(--banda-tinte);
+  border-radius: 0 8px 8px 0;
+  background: rgba(42, 32, 22, 0.82);
+  color: var(--g-crudo);
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.grafo-banda__nombre {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--banda-tinte);
+}
+
+.grafo-banda__alt {
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+.grafo-banda__cuenta {
+  font-size: 0.66rem;
+  opacity: 0.7;
+}
+
+.grafo-banda--niebla {
+  border-left-style: dashed; /* el hueco del dato se dice con línea rota */
+}
+
+/* Al enfocar algo, los rótulos de piso se hacen a un lado: usted ya no está
+   leyendo la montaña, está leyendo una mata. */
+.grafo-banda--tenue {
+  opacity: 0.28;
+}
+
+/* ── El nombre bajo el dedo ──────────────────────────────────────────────── */
+.grafo-sobre {
+  position: absolute;
+  left: 50%;
+  bottom: 1.1rem;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(42, 32, 22, 0.9);
+  color: var(--g-papel);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  max-width: 80vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Volver ──────────────────────────────────────────────────────────────── */
+.grafo-volver,
+.grafo-carta__cerrar,
+.grafo-carta__salto {
+  pointer-events: auto;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.grafo-volver {
+  position: absolute;
+  left: 50%;
+  bottom: 1.1rem;
+  transform: translateX(-50%);
+  /* 44 px de alto real: se toca con el pulgar, con guantes y en un bus. */
+  min-height: 44px;
+  padding: 0.55rem 1.2rem;
+  border: var(--g-trazo) solid var(--g-tinta);
+  border-radius: 999px;
+  background: var(--g-crudo);
+  color: var(--g-tinta);
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: 0 4px 0 rgba(42, 32, 22, 0.55);
+}
+
+.grafo-volver:active {
+  transform: translateX(-50%) translateY(2px);
+  box-shadow: 0 2px 0 rgba(42, 32, 22, 0.55);
+}
+
+.grafo-recorte {
+  position: absolute;
+  right: clamp(0.75rem, 2vw, 1.25rem);
+  bottom: 0.6rem;
+  margin: 0;
+  font-size: 0.68rem;
+  color: var(--g-crudo);
+  opacity: 0.55;
+}
+
+/* ── La carta ────────────────────────────────────────────────────────────
+   Papel real: hueso, tinta, borde grueso y una sombra dura abajo (el volumen
+   rubber-hose se hace con un desplazamiento sólido, no con un blur suave). */
+.grafo-carta {
+  pointer-events: auto;
+  position: absolute;
+  top: clamp(0.75rem, 2vw, 1.25rem);
+  right: clamp(0.75rem, 2vw, 1.25rem);
+  width: min(20rem, 42vw);
+  max-height: calc(100% - 2.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1rem 1.1rem 1.2rem;
+  border: var(--g-trazo) solid var(--g-tinta);
+  border-top: 6px solid var(--carta-tinte);
+  border-radius: var(--g-radio);
+  background: var(--g-papel);
+  color: var(--g-tinta);
+  box-shadow: 0 6px 0 rgba(42, 32, 22, 0.5);
+  animation: grafo-carta-entra 0.28s ease;
+}
+
+@keyframes grafo-carta-entra {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.grafo-carta__cerrar {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--g-tinta);
+  font-size: 1.4rem;
+  line-height: 1;
+  opacity: 0.55;
+}
+
+.grafo-carta__cerrar:hover {
+  opacity: 1;
+  background: rgba(42, 32, 22, 0.08);
+}
+
+.grafo-carta__tipo {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--carta-tinte);
+  /* El tinte de la carta puede ser muy claro (una mata del nival): se oscurece
+     con una sombra de tinta para que el rótulo no se borre sobre el papel. */
+  text-shadow: 0 0 1px rgba(42, 32, 22, 0.5);
+}
+
+.grafo-carta__nombre {
+  margin: 0.15rem 0 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.grafo-carta__sub {
+  margin: 0.1rem 0 0;
+  font-size: 0.78rem;
+  font-style: italic;
+  opacity: 0.65;
+}
+
+.grafo-carta__piso {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.grafo-carta__punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(42, 32, 22, 0.45);
+  flex: none;
+}
+
+.grafo-carta__alias,
+.grafo-carta__vacio {
+  margin: 0.55rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  opacity: 0.75;
+}
+
+.grafo-carta__grupo {
+  margin-top: 0.9rem;
+}
+
+.grafo-carta__rel {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* El punto de color de cada relación: el mismo tinte de la cuerda en el 3D. La
+   carta y el cerro hablan el mismo idioma. */
+.grafo-carta__rel::before {
+  content: '';
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--rel-tinte);
+  border: 1px solid rgba(42, 32, 22, 0.35);
+  flex: none;
+}
+
+.grafo-carta__cuenta {
+  margin-left: auto;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: rgba(42, 32, 22, 0.1);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
+.grafo-carta__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+/* Cada vecino es un BOTÓN: tocarlo salta allá. Así se recorre el grafo —
+   saltando de mata en mata— y no leyendo una tabla. */
+.grafo-carta__salto {
+  min-height: 32px;
+  padding: 0.25rem 0.6rem;
+  border: 1.5px solid rgba(42, 32, 22, 0.28);
+  border-radius: 999px;
+  background: var(--g-crudo);
+  color: var(--g-tinta);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.grafo-carta__salto:hover,
+.grafo-carta__salto:focus-visible {
+  background: var(--carta-tinte);
+  border-color: var(--g-tinta);
+}
+
+/* Foco visible SIEMPRE: se navega con teclado y con lector de pantalla. */
+.grafo-nav :focus-visible {
+  outline: 3px solid var(--g-aliado);
+  outline-offset: 2px;
+}
+
+/* ── Teléfono: la carta se vuelve una hoja que sube desde abajo ───────────
+   En una pantalla angosta un panel lateral tapa el cerro entero. Abajo, deja
+   ver la mata enfocada arriba mientras usted lee. */
+@media (max-width: 640px) {
+  .grafo-carta {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    max-height: 52%;
+    border-radius: var(--g-radio) var(--g-radio) 0 0;
+    border-bottom: none;
+    box-shadow: 0 -6px 0 rgba(42, 32, 22, 0.5);
+    animation: grafo-carta-sube 0.28s ease;
+  }
+
+  @keyframes grafo-carta-sube {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Con la hoja abierta, "Ver todo el mapa" se sube para que no quede debajo. */
+  .grafo-volver {
+    bottom: auto;
+    top: 3.6rem;
+  }
+
+  .grafo-leyenda {
+    font-size: 0.7rem;
+  }
+}
+
+/* ── Quien pidió calma, recibe calma ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .grafo-canvas,
+  .grafo-banda,
+  .grafo-carta,
+  .grafo-carta__salto {
+    transition: none;
+    animation: none;
+  }
+}

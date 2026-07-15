@@ -55,7 +55,7 @@
  *
  * Montar SOLO dentro de un <Canvas> (el named); el default trae el suyo.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
@@ -63,7 +63,14 @@ import { ATMOSFERA } from '../atmosferaMadre.js';
 import { perfilDeTier } from '../deviceTier.js';
 import { PISOS_TERMICOS } from '../pisosTermicos.js';
 import ArbolMayor from './ArbolMayor.jsx';
-import { arbolDePiso, frailejonar, FRAILEJON } from './arbolesMayores.js';
+import { geomCacheada, limpiarCacheArboles } from './cacheArboles.js';
+import { arbolDePiso, tipoDePiso, calidadDeTier, variantesDeTier } from './arbolMayor.geom.js';
+import { distribucionBosque, bosqueDeTier } from './bosqueSierra.js';
+import { frailejonar } from './arbolesMayores.js';
+/* El frailejón bueno ya existía: `floraParamo.geom` lo arma con su enagua de
+   hojas muertas y su roseta plateada. Antes esta escena dibujaba a mano un palo
+   con una bolita blanca encima —un fósforo— teniendo el bueno al lado. Se reusa. */
+import { geomFrailejon } from '../bosque/floraParamo.geom.js';
 
 /* ── Geometría del monte (coords propias del macizo). X=E-O, Y=altura, Z=pie(−9)
       →cumbre(+1.6). La ladera-galería mira a −z; el diorama entero se gira π en
@@ -153,12 +160,16 @@ function colorMonte(yf, d, out) {
 }
 
 /* Fracción de altura del centro de cada banda (para posar su árbol mayor). Sube
-   con el clima igual que los umbrales de la banda. */
+   con el clima igual que los umbrales de la banda.
+   La X NO va a intervalos parejos a propósito: repartidos cada 4.3 unidades
+   exactas, los cuatro héroes se leían como una FILA —una grilla, justo lo que el
+   DR manda evitar—. Corridos a distancias desiguales, el ojo lee cuatro lugares
+   de una ladera y no cuatro casillas. Siguen bien separados y visibles. */
 const CENTROS = {
-  calido: { base: 0.09, factor: 1.0, x: -6.5 },
-  templado: { base: 0.26, factor: 1.05, x: -2.4 },
-  frio: { base: 0.44, factor: 1.2, x: 2.4 },
-  paramo: { base: 0.61, factor: 1.0, x: 6.4 },
+  calido: { base: 0.09, factor: 1.0, x: -7.4 },
+  templado: { base: 0.26, factor: 1.05, x: -1.6 },
+  frio: { base: 0.44, factor: 1.2, x: 3.9 },
+  paramo: { base: 0.61, factor: 1.0, x: -3.8 },
 };
 /* Punto de la LADERA FRONTAL donde una fracción de altura se posa, a una X dada.
    Busca en el frente (z creciente) el z cuya altura iguala el objetivo. */
@@ -289,7 +300,7 @@ function CordilleraFondo() {
         { x: -1, z: 8.5, s: [17, 5.6, 6], c: '#ddccab' },
         { x: 10, z: 10, s: [14, 4.8, 6], c: '#e3d4b4' },
       ].map((r, i) => (
-        <mesh key={i} position={/** @type {[number, number, number]} */ ([r.x, 0, r.z])} scale={/** @type {[number, number, number]} */ (r.s)}>
+        <mesh key={i} position={[r.x, 0, r.z]} scale={r.s}>
           <sphereGeometry args={[1, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <meshLambertMaterial color={r.c} />
         </mesh>
@@ -361,17 +372,21 @@ function NieblaBosque({ cuantos, reducedMotion }) {
       ch.position.x = puffs[i].x + Math.sin(t * 0.05 + i * 2.1) * 0.7;
     });
   });
+  /* Muy tenue y MUY aplastada. Antes eran esferas a opacidad 0.4: se leían como
+     pastillas de plástico cruzando la ladera, no como niebla. La niebla del
+     bosque de niebla es un VELO que deja ver a través — si se le ve el borde, ya
+     mintió. Ancha, baja y casi transparente: se lee como jirón, no como bulto. */
   return (
     <group ref={grupo}>
       {puffs.map((p, i) => (
         <group key={i} position={[p.x, p.y, p.z]}>
-          <mesh scale={[p.e * 1.7, p.e * 0.5, p.e * 0.9]}>
-            <sphereGeometry args={[1, 8, 6]} />
-            <meshBasicMaterial color="#fbf3df" transparent opacity={0.4} depthWrite={false} />
+          <mesh scale={[p.e * 3.4, p.e * 0.28, p.e * 1.1]}>
+            <sphereGeometry args={[1, 10, 6]} />
+            <meshBasicMaterial color="#fbf3df" transparent opacity={0.17} depthWrite={false} />
           </mesh>
-          <mesh position={[p.e * 1.2, -p.e * 0.06, 0.2]} scale={[p.e * 0.9, p.e * 0.34, p.e * 0.6]}>
+          <mesh position={[p.e * 1.6, -p.e * 0.05, 0.25]} scale={[p.e * 2.1, p.e * 0.2, p.e * 0.8]}>
             <sphereGeometry args={[1, 8, 6]} />
-            <meshBasicMaterial color="#fbf3df" transparent opacity={0.28} depthWrite={false} />
+            <meshBasicMaterial color="#fbf3df" transparent opacity={0.12} depthWrite={false} />
           </mesh>
         </group>
       ))}
@@ -450,34 +465,130 @@ function CondorAndino({ radio = 6, altura = 7.2, fase = 0, reducedMotion, escala
   );
 }
 
-/* Los frailejones del páramo, alrededor de la queñua: tronco columnar + roseta
-   lanuda plateada + flor amarilla. Baratos, instanciados a mano (~pocos). */
-function Frailejones({ centro, cuantos }) {
-  const items = useMemo(() => {
-    const base = frailejonar(cuantos, 2.2, 7);
-    return base.map((f) => {
+/* ── Un banco de instancias: UNA geometría, UN material, N copias → UNA
+      draw-call. Es el patrón de `FloraParamo.jsx`; aquí lo usan el frailejonar y
+      el bosque de la ladera. ── */
+function Banco({ geo, mat, items }) {
+  const ref = useRef(null);
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh || !items.length) return;
+    const m = new THREE.Matrix4();
+    const q = new THREE.Quaternion();
+    const e = new THREE.Euler();
+    const p = new THREE.Vector3();
+    const s = new THREE.Vector3();
+    const col = new THREE.Color();
+    for (let i = 0; i < items.length; i++) {
+      const it = items[i];
+      p.set(it.pos[0], it.pos[1], it.pos[2]);
+      e.set(it.inclina?.[0] || 0, it.giroY ?? it.giro ?? 0, it.inclina?.[1] || 0);
+      q.setFromEuler(e);
+      s.setScalar(it.escala ?? 1);
+      m.compose(p, q, s);
+      mesh.setMatrixAt(i, m);
+      if (it.tint) {
+        col.setRGB(it.tint[0], it.tint[1], it.tint[2]);
+        mesh.setColorAt(i, col);
+      }
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [items]);
+  if (!geo || !items.length) return null;
+  return <instancedMesh ref={ref} args={[geo, mat, items.length]} frustumCulled={false} />;
+}
+
+/* Los frailejones del páramo, alrededor de la queñua. Geometría reusada de
+   `floraParamo.geom` (roseta plateada + enagua marcescente), instanciada. */
+function Frailejones({ centro, cuantos, tier }) {
+  const q = calidadDeTier(tier);
+  const geo = useMemo(() => geomFrailejon({ q }, 21), [q]);
+  const geoFlor = useMemo(() => geomFrailejon({ flor: true, q }, 22), [q]);
+  const mat = useMemo(() => new THREE.MeshLambertMaterial({ vertexColors: true }), []);
+  useEffect(() => () => { geo.dispose(); geoFlor.dispose(); mat.dispose(); }, [geo, geoFlor, mat]);
+
+  const { simples, floridos } = useMemo(() => {
+    const base = frailejonar(cuantos, 2.6, 7).map((f) => {
       const wx = centro[0] + f.pos[0];
       const wz = centro[2] + f.pos[2];
-      return { ...f, world: [wx, alturaMonte(wx, wz), wz] };
+      return {
+        pos: /** @type {[number, number, number]} */ ([wx, alturaMonte(wx, wz), wz]),
+        giroY: f.giro,
+        // el frailejón real ronda 1-2 m: aquí va chico contra el árbol mayor
+        escala: 0.3 + f.alto * 0.42,
+      };
     });
+    // uno de cada cinco, en flor (no todos: el páramo no florece en bloque)
+    return {
+      simples: base.filter((_, i) => i % 5 !== 0),
+      floridos: base.filter((_, i) => i % 5 === 0),
+    };
   }, [centro, cuantos]);
+
   return (
     <group>
-      {items.map((f, i) => (
-        <group key={i} position={/** @type {[number, number, number]} */ (f.world)} rotation={[0, f.giro, 0]}>
-          <mesh position={[0, f.alto / 2, 0]}>
-            <cylinderGeometry args={[0.05, 0.07, f.alto, 6]} />
-            <meshLambertMaterial color={FRAILEJON.tronco} flatShading />
-          </mesh>
-          <mesh position={[0, f.alto, 0]}>
-            <sphereGeometry args={[0.13, 7, 5]} />
-            <meshLambertMaterial color={FRAILEJON.roseta} flatShading />
-          </mesh>
-          <mesh position={[0, f.alto + 0.09, 0]}>
-            <sphereGeometry args={[0.045, 6, 5]} />
-            <meshLambertMaterial color={FRAILEJON.flor} />
-          </mesh>
-        </group>
+      <Banco geo={geo} mat={mat} items={simples} />
+      <Banco geo={geoFlor} mat={mat} items={floridos} />
+    </group>
+  );
+}
+
+/* ── EL BOSQUE DE LA LADERA — lo que faltaba para que esto fuera un monte ────
+      Cada especie vive en SU banda de altitud y se agrupa en rodales (ver
+      `bosqueSierra.js`). Por especie y variante: un InstancedMesh. Los árboles
+      de relleno usan calidad 'bajo' aunque el tier sea alto — son LOD: a esa
+      distancia lo único que se lee es la silueta, y el detalle ahí es plata
+      tirada (DR §LOD). El detalle fino se lo queda el héroe, que está cerca. ── */
+function BosqueLadera({ tier, d, claros }) {
+  const conteos = bosqueDeTier(tier);
+  const variantes = variantesDeTier(tier);
+  const mat = useMemo(() => new THREE.MeshLambertMaterial({ vertexColors: true }), []);
+  useEffect(() => () => mat.dispose(), [mat]);
+
+  const siembra = useMemo(
+    () =>
+      distribucionBosque({
+        altura: alturaMonte,
+        cima: CIMA,
+        /* El bosque arranca LADERA ARRIBA, no en la orilla: el pie del monte le
+           queda a la cámara 2.4x más cerca que la cumbre, y sembrarlo hasta el
+           borde ponía un muro de árboles delante de todo — tapaba el macizo y a
+           los propios héroes. Dejar libre la franja de playa también es honesto:
+           ahí hay arena, no bosque. */
+        area: { x0: -ANCHO / 2 + 1.5, x1: ANCHO / 2 - 1.5, z0: Z_FRENTE + 2.6, z1: Z_CUMBRE + 2.2 },
+        conteos,
+        claros,
+        d,
+        variantes,
+      }),
+    [conteos, claros, d, variantes],
+  );
+
+  // agrupa las instancias por (especie, variante): cada grupo, una draw-call
+  const bancos = useMemo(() => {
+    const out = [];
+    for (const [especie, items] of Object.entries(siembra)) {
+      for (let v = 0; v < variantes; v++) {
+        const suyos = items.filter((it) => it.variante === v);
+        if (!suyos.length) continue;
+        out.push({
+          clave: `${especie}-${v}`,
+          // sss=false: estas instancias giran (poco, pero giran) y además se ven
+          // de lejos; el contraluz horneado no se justifica. AO y gradiente sí
+          // viajan (son invariantes al giro en Y).
+          geo: geomCacheada(especie, { q: calidadDeTier('bajo'), variante: v, sss: false }),
+          items: suyos,
+        });
+      }
+    }
+    return out;
+  }, [siembra, variantes]);
+
+  return (
+    <group>
+      {bancos.map((b) => (
+        <Banco key={b.clave} geo={b.geo} mat={mat} items={b.items} />
       ))}
     </group>
   );
@@ -521,11 +632,10 @@ const CLARO_PISO = {
 function VinetaPiso({ pisoId, ancla, def, tier, reducedMotion }) {
   const rica = tier === 'alto';
   const media = rica || tier === 'medio';
-  const flat = tier === 'alto';
 
   /* offsets relativos al ancla, con la Y muestreada del monte (el compañero se
      posa en SU punto de la ladera, no flota a la altura del héroe) */
-  const rel = (ox, oz) => /** @type {[number, number, number]} */ ([ox, alturaMonte(ancla[0] + ox, ancla[2] + oz) - ancla[1], oz]);
+  const rel = (ox, oz) => [ox, alturaMonte(ancla[0] + ox, ancla[2] + oz) - ancla[1], oz];
   const tilt = -Math.PI / 2 - Math.atan(pendienteEn(ancla[0], ancla[2]));
   const claroR = def.alto * 0.85;
 
@@ -580,10 +690,10 @@ function VinetaPiso({ pisoId, ancla, def, tier, reducedMotion }) {
       {pisoId === 'frio' && rica && (
         <>
           <group position={rel(-1.25, 0.55)}>
-            <ArbolMayor tipo="roble" escala={0.42} semilla={7.3} blobs={4} flat={flat} reducedMotion={reducedMotion} />
+            <ArbolMayor tipo="roble" tier={tier} variante={1} escala={0.42} semilla={7.3} reducedMotion={reducedMotion} />
           </group>
           <group position={rel(1.2, -0.4)}>
-            <ArbolMayor tipo="roble" escala={0.3} semilla={4.6} blobs={3} flat={flat} reducedMotion={reducedMotion} />
+            <ArbolMayor tipo="roble" tier={tier} variante={2} escala={0.3} semilla={4.6} reducedMotion={reducedMotion} />
           </group>
           <mesh position={[0.4, def.alto * 0.55, 0.9]} scale={[1.5, 0.4, 0.7]}>
             <sphereGeometry args={[1, 8, 6]} />
@@ -607,7 +717,7 @@ function VinetaPiso({ pisoId, ancla, def, tier, reducedMotion }) {
       )}
       {pisoId === 'paramo' && rica && (
         <group position={rel(-1.2, 0.35)}>
-          <ArbolMayor tipo="quenua" escala={0.52} semilla={9.1} blobs={3} flat={flat} reducedMotion={reducedMotion} />
+          <ArbolMayor tipo="quenua" tier={tier} variante={1} escala={0.52} semilla={9.1} reducedMotion={reducedMotion} />
         </group>
       )}
     </group>
@@ -653,7 +763,6 @@ function HeroArbol({ pisoId, d, tier, reducedMotion, onEntrar, resaltado }) {
   });
 
   if (!def || !piso) return null;
-  const blobs = tier === 'alto' ? undefined : tier === 'medio' ? 4 : 3;
   const escala = tier === 'bajo' ? 0.85 : 1;
   return (
     <group
@@ -670,11 +779,11 @@ function HeroArbol({ pisoId, d, tier, reducedMotion, onEntrar, resaltado }) {
       </mesh>
       <ArbolMayor
         tipo={tipoDeArbol(pisoId)}
+        tier={tier}
+        variante={0}
         escala={escala}
         reducedMotion={reducedMotion}
         semilla={pisoId.length + cfg.x}
-        blobs={blobs}
-        flat={tier === 'alto'}
       />
       <VinetaPiso pisoId={pisoId} ancla={ancla} def={def} tier={tier} reducedMotion={reducedMotion} />
       {/* anillo sutil de "aquí está su árbol mayor" cuando es el piso del usuario */}
@@ -707,9 +816,10 @@ function HeroArbol({ pisoId, d, tier, reducedMotion, onEntrar, resaltado }) {
   );
 }
 
-/* Mapa piso→arquetipo de árbol (la clave del catálogo arbolesMayores). */
+/* Mapa piso→arquetipo de árbol. Lo resuelve el catálogo (cada especie declara su
+   piso), así no hay dos listas que se puedan desincronizar. */
 function tipoDeArbol(pisoId) {
-  return { paramo: 'quenua', frio: 'roble', templado: 'guayacan', calido: 'ceiba' }[pisoId] || 'roble';
+  return tipoDePiso(pisoId) || 'roble';
 }
 
 /* Luces de la hora dorada: el sol rasante entra por la derecha-atrás (donde
@@ -764,6 +874,24 @@ export function SierraArbolesDiorama({
     [d],
   );
 
+  /* Los claros de los héroes: el bosque los rodea pero no se les encima, así el
+     hito sigue siendo tocable y legible. Se recalculan con el clima porque los
+     héroes MIGRAN cuesta arriba (y su claro viaja con ellos). */
+  const claros = useMemo(
+    () =>
+      ['calido', 'templado', 'frio', 'paramo'].map((pid) => {
+        const c = CENTROS[pid];
+        const a = anclaLadera(c.x, c.base, d, c.factor);
+        const def = arbolDePiso(pid);
+        return { x: a[0], z: a[2], r: (def?.alto || 2) * 0.95 };
+      }),
+    [d],
+  );
+
+  // la caché de geometría es compartida entre héroes y bosque: se libera cuando
+  // se va la ESCENA, no cuando se desmonta un árbol suelto
+  useEffect(() => () => limpiarCacheArboles(), []);
+
   return (
     <>
       {atmosfera && <color attach="background" args={[ATMOSFERA.fondo]} />}
@@ -782,8 +910,13 @@ export function SierraArbolesDiorama({
           <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
         </mesh>
 
+        {/* EL BOSQUE: cada especie en su banda de altitud, en rodales. Va ANTES
+            que los héroes porque es el telón contra el que se leen (y el que les
+            da la escala que no tenían cuando la ladera estaba pelada). */}
+        <BosqueLadera tier={tier} d={d} claros={claros} />
+
         {/* frailejonar del páramo, junto a la queñua */}
-        {frailejones > 0 && <Frailejones centro={anclaParamo} cuantos={frailejones} />}
+        {frailejones > 0 && <Frailejones centro={anclaParamo} cuantos={frailejones} tier={tier} />}
 
         {/* la niebla enganchada al bosque de niebla (piso frío) */}
         {nubes > 0 && <NieblaBosque cuantos={nubes} reducedMotion={reducedMotion} />}
@@ -801,15 +934,22 @@ export function SierraArbolesDiorama({
           />
         ))}
 
-        {/* el cóndor andino, planeando sobre la nieve (fauna realista) */}
+        {/* El cóndor andino, planeando sobre la nieve (fauna realista).
+            A escala 1 medía 2.3 unidades de punta a punta —casi tanto como el
+            roble mayor, que son 2.7—: un pajarraco del tamaño de un árbol, que
+            de cerca se leía como un borrón negro. El cóndor tiene la mayor
+            envergadura de los Andes (~3 m) pero un roble andino pasa de 20 m:
+            la proporción real es ~1:7. A esta escala se lee por su SILUETA
+            —alas fijas en diedro, primarias abiertas—, que es justo como se
+            reconoce un cóndor de verdad: por el perfil contra el cielo. */}
         {Array.from({ length: condores }).map((_, i) => (
           <CondorAndino
             key={i}
             radio={5.8 + i * 1.7}
-            altura={7.2 + i * 0.6}
+            altura={7.6 + i * 0.6}
             fase={i * 2.3}
             reducedMotion={reducedMotion}
-            escala={1 - i * 0.15}
+            escala={0.4 - i * 0.06}
           />
         ))}
       </group>
@@ -825,21 +965,36 @@ function DerivaCamara({ controles, reducedMotion }) {
   const dir = useRef(1);
   const quieto = useRef(false);
   const enganchado = useRef(false);
-  useEffect(() => () => {
-    const c = controles.current;
-    if (c && enganchado.current) {
-      c.removeEventListener('start', c.__gsierraParar);
-      c.removeEventListener('end', c.__gsierraSoltar);
-    }
+  /* Los handlers viven en refs de ESTE componente. Antes se colgaban como
+     propiedades (`__gsierraParar`) del objeto de controles —que llega por prop—
+     para poder desengancharlos después: eso muta un objeto ajeno y además el
+     linter lo prohíbe. En un ref propio se guardan igual y no se ensucia nada. */
+  const parar = useRef(() => { quieto.current = true; });
+  const soltar = useRef(() => { quieto.current = false; });
+
+  useEffect(() => {
+    const ref = controles;
+    // copiados aquí a propósito: en la limpieza hay que quitar EXACTAMENTE los
+    // mismos handlers que se engancharon, no lo que el ref diga entonces
+    const alParar = parar.current;
+    const alSoltar = soltar.current;
+    return () => {
+      const c = ref.current;
+      if (c && enganchado.current) {
+        c.removeEventListener('start', alParar);
+        c.removeEventListener('end', alSoltar);
+        enganchado.current = false;
+      }
+    };
   }, [controles]);
+
   useFrame((_, dt) => {
     const c = controles.current;
     if (!c) return;
+    // los controles aparecen después del primer frame: se engancha al verlos
     if (!enganchado.current) {
-      c.__gsierraParar = () => { quieto.current = true; };
-      c.__gsierraSoltar = () => { quieto.current = false; };
-      c.addEventListener('start', c.__gsierraParar);
-      c.addEventListener('end', c.__gsierraSoltar);
+      c.addEventListener('start', parar.current);
+      c.addEventListener('end', soltar.current);
       enganchado.current = true;
     }
     if (quieto.current || reducedMotion) return;
@@ -906,13 +1061,17 @@ button.gsierra-leyenda__banda:focus-visible .gsierra-leyenda__nombre, button.gsi
       Las bandas con árbol mayor son botones que entran a su mundo. ── */
 function LeyendaPisos({ clima, pisoUsuario, onEntrarPiso }) {
   const d = clamp(clima, 0, 1);
+  /* Las bandas se apilan: cada una arranca donde terminó la anterior. Antes esto
+     era un `.map()` que reasignaba un `let` de afuera —mutación durante el
+     render, que el linter marca—. Un bucle que acumula en local dice lo mismo
+     sin ese enredo. */
+  const bandas = [];
   let base = 0;
-  const bandas = BANDAS.map((b) => {
+  for (const b of BANDAS) {
     const top = Number.isFinite(b.top) ? topDesplazado(b, d) : 1;
-    const seg = { id: b.id, alto: Math.max(0.02, top - base), base };
+    bandas.push({ id: b.id, alto: Math.max(0.02, top - base), base });
     base = Math.min(top, 1);
-    return seg;
-  });
+  }
   const conArbol = new Set(['calido', 'templado', 'frio', 'paramo']);
   return (
     <div className="gsierra-leyenda" role="group" aria-label="Pisos térmicos de la Sierra, del mar a la nieve. Las bandas con árbol entran a su mundo.">
@@ -979,7 +1138,6 @@ function hexLerp(a, b, t) {
  * @param {string}  [props.pisoUsuario]  piso de la finca a resaltar (opcional).
  * @param {(pisoId:string)=>void} [props.onEntrarPiso]  navegar al mundo del piso.
  * @param {string}  [props.className]
- * @param {(view: string, data?: any) => void} [props.onNavigate]  inyectada por el shell de prod; fallback de onEntrarPiso.
  */
 export default function GaleriaSierraArboles({
   tier = 'alto',
@@ -987,14 +1145,7 @@ export default function GaleriaSierraArboles({
   pisoUsuario,
   onEntrarPiso,
   className = '',
-  // Inyectada por el shell de prod (barrido de controles 2026-07-15): nadie
-  // cableaba onEntrarPiso → los árboles héroe y las bandas de la leyenda eran
-  // taps muertos. Sin prop específica, entrar al piso lleva a la navegación
-  // de mundos por piso térmico (montaña), con el piso tocado como dato.
-  onNavigate = undefined,
 }) {
-  const entrarPiso = onEntrarPiso
-    ?? (onNavigate ? (pisoId) => onNavigate('montana_mundos', { piso: pisoId }) : undefined);
   const [listo, setListo] = useState(false);
   const [clima, setClima] = useState(0);
   const controles = useRef(null);
@@ -1021,7 +1172,7 @@ export default function GaleriaSierraArboles({
           reducedMotion={reducedMotion}
           clima={clima}
           pisoUsuario={pisoUsuario}
-          onEntrarPiso={entrarPiso}
+          onEntrarPiso={onEntrarPiso}
         />
         <OrbitControls
           ref={controles}
@@ -1050,7 +1201,7 @@ export default function GaleriaSierraArboles({
           <small>Del mar Caribe a la nieve: toque el árbol mayor de un piso para entrar a su mundo.</small>
         </h2>
 
-        <LeyendaPisos clima={clima} pisoUsuario={pisoUsuario} onEntrarPiso={entrarPiso} />
+        <LeyendaPisos clima={clima} pisoUsuario={pisoUsuario} onEntrarPiso={onEntrarPiso} />
 
         <div className="gsierra-abajo">
           {/* SLIDER CLIMÁTICO: el corrimiento de los pisos hoy→2050 */}

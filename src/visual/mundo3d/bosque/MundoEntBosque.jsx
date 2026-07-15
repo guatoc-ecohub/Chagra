@@ -23,20 +23,15 @@ import EscenaBosqueVivo from './EscenaBosqueVivo.jsx';
 import EscenaEntMaestro from './EscenaEntMaestro.jsx';
 import { decidirTier, permite3D } from '../deviceTier.js';
 
-/* La invitación aparece a los ~2s (antes eran 5.6s: el operador la perdía de
-   vista buscando la lección). Mientras tanto, una pista discreta abajo avisa
-   que algo viene — para que la espera no se sienta como una pantalla muda. */
+/*
+ * La invitación aparece CASI ENSEGUIDA (1.4s). Antes esperaba 5.6s "a que la
+ * cámara llegara al claro", y el operador reportó *"no veo la lección del
+ * subsuelo"*: se quedaba mirando el árbol sin saber que había un camino abajo.
+ * La lección es la razón de existir de la pieza — no puede estar escondida
+ * detrás de una espera larga y un botón que aparece sin avisar.
+ */
 const CSS = `
 .entb { position: relative; width: 100%; height: 100%; overflow: hidden; background: #c3cfce; }
-.entb__pista {
-  position: absolute; left: 50%; bottom: max(1.3rem, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  width: 0.55rem; height: 0.55rem; border-radius: 999px;
-  background: rgba(55, 214, 176, 0.85);
-  box-shadow: 0 0 10px 3px rgba(55, 214, 176, 0.45);
-  opacity: 0;
-  animation: entb-pista 2s ease forwards;
-}
 .entb__panel {
   position: absolute; left: 50%; bottom: max(0.9rem, env(safe-area-inset-bottom));
   transform: translateX(-50%);
@@ -48,7 +43,7 @@ const CSS = `
   backdrop-filter: blur(6px);
   color: #e9efdd;
   opacity: 0;
-  animation: entb-aparece 0.9s ease 2s forwards;
+  animation: entb-aparece 0.9s ease 1.4s forwards;
 }
 .entb__panel--ya { opacity: 1; animation: none; }
 .entb__kicker { margin: 0 0 0.15rem; font: 600 0.68rem/1.2 system-ui, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #aebd97; }
@@ -72,22 +67,29 @@ const CSS = `
   backdrop-filter: blur(6px);
 }
 .entb__volver:active { transform: scale(0.97); }
-@keyframes entb-pista {
-  0% { opacity: 0; transform: translateX(-50%) scale(0.6); }
-  15% { opacity: 1; transform: translateX(-50%) scale(1); }
-  80% { opacity: 1; transform: translateX(-50%) scale(1); }
-  100% { opacity: 0; transform: translateX(-50%) scale(1); }
-}
-@keyframes entb-aparece {
-  from { opacity: 0; transform: translateX(-50%) translateY(0.6rem); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
 @media (prefers-reduced-motion: reduce) {
-  .entb__pista { display: none; }
   .entb__panel { opacity: 1; animation: none; }
   .entb__bajar, .entb__volver { transition: none; }
 }
 `;
+
+/*
+ * Modo inicial según el hash: `#bosque_vivo` entra por el bosque y
+ * `#bosque_vivo/microsuelo` cae DIRECTO en la lección de las capas del suelo.
+ *
+ * El router de prod parte el hash por '/' y se queda con el primer segmento
+ * como ruta, así que el segundo viaja libre hasta aquí. Lo leemos nosotros
+ * (el router no reparte `data` a los componentes) — así la lección es
+ * enlazable, compartible y verificable con una captura, sin tocar el router.
+ * OJO: la ruta va SIN barra inicial (`#bosque_vivo`); con `#/bosque_vivo` el
+ * primer segmento queda vacío y el shell cae al valle.
+ */
+function modoDelHash() {
+  if (typeof window === 'undefined') return 'entrada';
+  const raw = window.location.hash.replace(/^#/, '');
+  const sub = raw.split('/')[1];
+  return sub === 'microsuelo' ? 'microsuelo' : 'entrada';
+}
 
 /**
  * El mundo del Ent completo: entrada-landmark + elección + microsuelo.
@@ -101,7 +103,15 @@ export default function MundoEntBosque({ tier: tierProp, reducedMotion: rmProp }
   const auto = useMemo(() => decidirTier(), []);
   const tier = tierProp ?? (permite3D(auto.tier) ? auto.tier : 'bajo');
   const reducedMotion = rmProp ?? auto.reducedMotion;
-  const [modo, setModo] = useState('entrada'); // 'entrada' | 'microsuelo'
+  const [modo, setModo] = useState(modoDelHash); // 'entrada' | 'microsuelo'
+
+  // El hash sigue al modo (enlazable y con "atrás" del navegador coherente).
+  const irA = (m) => {
+    setModo(m);
+    if (typeof window === 'undefined') return;
+    const base = window.location.hash.replace(/^#/, '').split('/')[0] || 'bosque_vivo';
+    window.location.hash = m === 'microsuelo' ? `#${base}/microsuelo` : `#${base}`;
+  };
 
   return (
     <div className="entb">
@@ -110,10 +120,6 @@ export default function MundoEntBosque({ tier: tierProp, reducedMotion: rmProp }
       {modo === 'entrada' ? (
         <>
           <EscenaBosqueVivo tier={tier} reducedMotion={reducedMotion} />
-          {/* Pista discreta: avisa desde el primer fotograma que algo va a
-              aparecer abajo, mientras el panel real hace su fade-in (~2s). Sin
-              esto la espera se sentía como pantalla muda. */}
-          {!reducedMotion && <div className="entb__pista" aria-hidden="true" />}
           <div className={`entb__panel${reducedMotion ? ' entb__panel--ya' : ''}`}>
             <p className="entb__kicker">El guardián del páramo</p>
             <p className="entb__texto">
@@ -123,7 +129,7 @@ export default function MundoEntBosque({ tier: tierProp, reducedMotion: rmProp }
             <button
               type="button"
               className="entb__bajar"
-              onClick={() => setModo('microsuelo')}
+              onClick={() => irA('microsuelo')}
             >
               Bajar al microsuelo
             </button>
@@ -135,7 +141,7 @@ export default function MundoEntBosque({ tier: tierProp, reducedMotion: rmProp }
           <button
             type="button"
             className="entb__volver"
-            onClick={() => setModo('entrada')}
+            onClick={() => irA('entrada')}
           >
             ← Volver al bosque
           </button>

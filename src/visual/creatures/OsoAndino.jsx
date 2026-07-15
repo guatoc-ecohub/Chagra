@@ -1,5 +1,6 @@
-import { useId } from 'react';
+import { useId, useRef } from 'react';
 import './creatures.css';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
 import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, BocaVisema, Miembro, RH_INK } from './_rubberhose.jsx';
 import { OSO_PALETA, OSO_PROPORCION } from './faunaAndina.js';
@@ -66,6 +67,15 @@ export function OsoAndino({
      OPT-IN: el oso se rasca la panza con la zarpa derecha (gesto de oso, pausado
      y entrañable). Default false. */
   rasca = false,
+  /* ── VIDA PROPIA (idle-cerebro v2 — la vara de Angelita) ───────────────────
+     Default ON: un reloj con jitter hojea el repertorio del oso (resopla,
+     rasca, se sienta a respirar) — el guardián EXISTE aunque nadie le hable.
+     Además cada instancia parpadea a SU aire (ritmo propio) y sus pupilas
+     SIGUEN su puntero/dedo cuando anda cerca. El cerebro CEDE ante el host:
+     cualquier gesto manual (resopla/rasca/pose/visema) lo apaga. Gates de la
+     casa: animated=false, tier 'bajo' y reduced-motion lo apagan entero.
+     vida={false} = el oso de antes, idéntico. */
+  vida = true,
   /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + follow-through) y deja los
      estados reactivos. Sin prop (standalone: avatares, catálogo) = pleno. */
@@ -100,6 +110,19 @@ export function OsoAndino({
   const auraOp = Math.max(0.14, Math.min(0.42, 0.18 + 0.26 * (energia ?? 1)));
   const auraR = 8.5 + 1.6 * (energia ?? 1);
 
+  // ═══ VIDA PROPIA (idle-cerebro + ritmo propio + mirada — vara Angelita v2).
+  // El cerebro solo manda cuando el host no está dirigiendo (pose base, sin
+  // gestos manuales ni lip-sync); sus momentos se funden con los props opt-in
+  // (`resoplaFx = resopla || momento`) para reusar TODO el CSS existente.
+  const raizRef = useRef(null);
+  const ritmoPropio = useRitmoPropio();
+  const enBase = pose === 'anda' && !resopla && !rasca && !visema;
+  const momento = useVidaIdle('oso-andino', vida && vivo && tier !== 'bajo' && enBase);
+  useMiradaUsted(raizRef, vida && vivo && tier !== 'bajo');
+  const resoplaFx = resopla || momento === 'resopla';
+  const rascaFx = rasca || momento === 'rasca';
+  const poseFx = momento === 'reposo' ? 'reposo' : pose;
+
   // CLIMA → cuerpo (determinista, una vez por render): tinte + opacidad al
   // contorno. El oso no tiene alas (velocidadAlas siempre 1: no se usa).
   const cuerpoClima = cuerpoDeClima(clima, { enso: /** @type {any} */ (enso), tier, perfil: PERFIL_OSO });
@@ -125,7 +148,7 @@ export function OsoAndino({
   // VAHO del resoplido: dos motas claras que salen de la trufa y se disuelven
   // (el oso resopla — su gruñido corporal). CSS (crt-vaho-mota) las anima; con
   // animated=false / RM quedan colgando dignas. Opt-in (resopla).
-  const vaho = resopla ? (
+  const vaho = resoplaFx ? (
     <g className="crt-vaho" fill={OSO_PALETA.cremaClara} aria-hidden="true" opacity="0.7">
       <circle className={vivo ? 'crt-vaho-mota' : undefined} cx="2.6" cy="-4.4" r="1.1" />
       <circle className={vivo ? 'crt-vaho-mota' : undefined} style={{ animationDelay: '-0.7s' }} cx="3.6" cy="-3.2" r="0.85" />
@@ -267,30 +290,33 @@ export function OsoAndino({
 
   const estadoAttrs = {
     'data-creature': 'oso-andino',
-    'data-pose': vivo ? pose : undefined,
+    'data-pose': vivo ? poseFx : undefined,
     'data-animo': animo,
     'data-tier': tier || undefined,
     'data-visema': visema || undefined,
     'data-ruana': ropa?.ruana ? '1' : undefined,
     'data-mojado': ropa?.mojado ? '1' : undefined,
-    'data-resopla': resopla ? '1' : undefined,
-    'data-rasca': rasca ? '1' : undefined,
+    'data-resopla': resoplaFx ? '1' : undefined,
+    'data-rasca': rascaFx ? '1' : undefined,
+    'data-vida': momento || undefined,
     'data-lineboil': lineBoil ? '1' : undefined,
     'data-prop': mundoId || undefined,
   };
+  // El ritmo propio (parpadeo/dardeo por instancia) viaja como vars CSS.
+  const estiloRaiz = { ...ritmoPropio, ...estiloClima };
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
     // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
     return (
-      <g className={className} style={estiloClima} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
+      <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}
         {cuerpoVivo}
       </g>
     );
   }
   const svg = (
-    <svg viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloClima}
+    <svg ref={raizRef} viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloRaiz}
       role="img" aria-label={title} {...estadoAttrs} {...rest}>
       <title>{title}</title>
       {defs}

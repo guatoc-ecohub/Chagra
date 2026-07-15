@@ -1,5 +1,6 @@
-import { useId } from 'react';
+import { useId, useRef } from 'react';
 import './creatures.css';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
 import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, BocaVisema, Miembro, RH_INK } from './_rubberhose.jsx';
 import { ARDILLA_PALETA, ARDILLA_PROPORCION } from './faunaAndina.js';
@@ -66,6 +67,14 @@ export function Ardilla({
      OPT-IN: la ardilla sostiene una bellota y la ROE a mordiscos rápidos (los
      incisivos castañetean, olfateo veloz). Default false. */
   roe = false,
+  /* ── VIDA PROPIA (idle-cerebro v2 — la vara de Angelita) ───────────────────
+     Default ON: un reloj con jitter hojea el repertorio de la especie
+     (vidaEstados.js) — el bicho EXISTE aunque nadie le hable. Cada instancia
+     parpadea a SU aire (ritmo propio) y sus pupilas SIGUEN su puntero/dedo
+     cuando anda cerca. El cerebro CEDE ante el host (cualquier gesto manual
+     lo apaga); animated=false, tier 'bajo' y reduced-motion lo apagan entero.
+     vida={false} = el bicho de antes, idéntico. */
+  vida = true,
   /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
      pleno; 'bajo' apaga el idle continuo (boil + cola + olfateo) y deja los
      estados reactivos. Sin prop (standalone) = pleno. */
@@ -95,6 +104,19 @@ export function Ardilla({
   const vivo = animated;
   const auraOp = Math.max(0.14, Math.min(0.44, 0.18 + 0.28 * (energia ?? 1)));
   const auraR = 7.8 + 1.5 * (energia ?? 1);
+
+  // ═══ VIDA PROPIA (idle-cerebro + ritmo propio + mirada — vara Angelita v2).
+  // El cerebro solo manda cuando el host no dirige (pose base, sin gestos
+  // manuales ni lip-sync); sus momentos se funden con los props opt-in para
+  // reusar TODO el CSS existente de los gestos-firma.
+  const raizRef = useRef(null);
+  const ritmoPropio = useRitmoPropio();
+  const enBase = pose === 'anda' && !inspecciona && !roe && !visema;
+  const momento = useVidaIdle('ardilla', vida && vivo && tier !== 'bajo' && enBase);
+  useMiradaUsted(raizRef, vida && vivo && tier !== 'bajo');
+  const inspeccionaFx = inspecciona || momento === 'inspecciona';
+  const roeFx = roe || momento === 'roe';
+  const poseFx = momento === 'reposo' ? 'reposo' : pose;
   const P = ARDILLA_PROPORCION;
   const C = ARDILLA_PALETA;
 
@@ -128,7 +150,7 @@ export function Ardilla({
   ) : null;
 
   // La BELLOTA que roe (solo con roe): entre las patitas, a la altura de la boca.
-  const bellota = roe ? (
+  const bellota = roeFx ? (
     <g className="ardilla-bellota" aria-hidden="true">
       <ellipse cx="0" cy="0.6" rx="1.7" ry="2.0" fill={C.bellota} stroke={RH_INK} strokeWidth="0.7" />
       <path d="M-1.7,-0.6 A1.7,1.4 0 0 1 1.7,-0.6 Z" fill="#5f3a17" stroke={RH_INK} strokeWidth="0.5" />
@@ -268,29 +290,33 @@ export function Ardilla({
 
   const estadoAttrs = {
     'data-creature': 'ardilla',
-    'data-pose': vivo ? pose : undefined,
+    'data-pose': vivo ? poseFx : undefined,
     'data-animo': animo,
     'data-tier': tier || undefined,
     'data-visema': visema || undefined,
     'data-ruana': ropa?.ruana ? '1' : undefined,
     'data-mojado': ropa?.mojado ? '1' : undefined,
-    'data-inspecciona': inspecciona ? '1' : undefined,
-    'data-roe': roe ? '1' : undefined,
+    'data-inspecciona': inspeccionaFx ? '1' : undefined,
+    'data-roe': roeFx ? '1' : undefined,
+    'data-vida': momento || undefined,
     'data-lineboil': lineBoil ? '1' : undefined,
     'data-prop': mundoId || undefined,
   };
 
+  // El ritmo propio (parpadeo/dardeo por instancia) viaja como vars CSS.
+  const estiloRaiz = { ...ritmoPropio, ...estiloClima };
+
   if (inline) {
     // En modo inline el power-up lo pone el host DOM; acá solo marcamos data-poder.
     return (
-      <g className={className} style={estiloClima} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
+      <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}
         {cuerpoVivo}
       </g>
     );
   }
   const svg = (
-    <svg viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloClima}
+    <svg ref={raizRef} viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloRaiz}
       role="img" aria-label={title} {...estadoAttrs} {...rest}>
       <title>{title}</title>
       {defs}

@@ -93,6 +93,14 @@ export {
 export { AccesoriosClima } from './AccesoriosClima.jsx';
 // Line-boil (contorno que vibra, años 30).
 export { LineBoilFilter, BOIL_SEEDS } from './LineBoilFilter.jsx';
+// VIDA v2 (la vara de Angelita en los 8): idle-cerebro species-agnostic +
+// ritmo propio de parpadeo + la mirada que reconoce. Los bichos ya la traen
+// por dentro (default ON); se exporta para hosts que quieran dirigirla.
+export {
+  VIDA_REPERTORIO, MOMENTO_POSE,
+  elegirMomentoVida, duracionDeMomentoVida, duracionDeDescanso, crearRitmoPropio,
+} from './vidaEstados.js';
+export { useVidaIdle, useRitmoPropio, useMiradaUsted, prefiereQuietud } from './useVidaIdle.js';
 
 import AbejaAngelita from './AbejaAngelita.jsx';
 import Colibri from './Colibri.jsx';
