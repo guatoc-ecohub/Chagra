@@ -979,6 +979,7 @@ function hexLerp(a, b, t) {
  * @param {string}  [props.pisoUsuario]  piso de la finca a resaltar (opcional).
  * @param {(pisoId:string)=>void} [props.onEntrarPiso]  navegar al mundo del piso.
  * @param {string}  [props.className]
+ * @param {(view: string, data?: any) => void} [props.onNavigate]  inyectada por el shell de prod; fallback de onEntrarPiso.
  */
 export default function GaleriaSierraArboles({
   tier = 'alto',
@@ -986,7 +987,14 @@ export default function GaleriaSierraArboles({
   pisoUsuario,
   onEntrarPiso,
   className = '',
+  // Inyectada por el shell de prod (barrido de controles 2026-07-15): nadie
+  // cableaba onEntrarPiso → los árboles héroe y las bandas de la leyenda eran
+  // taps muertos. Sin prop específica, entrar al piso lleva a la navegación
+  // de mundos por piso térmico (montaña), con el piso tocado como dato.
+  onNavigate = undefined,
 }) {
+  const entrarPiso = onEntrarPiso
+    ?? (onNavigate ? (pisoId) => onNavigate('montana_mundos', { piso: pisoId }) : undefined);
   const [listo, setListo] = useState(false);
   const [clima, setClima] = useState(0);
   const controles = useRef(null);
@@ -1013,7 +1021,7 @@ export default function GaleriaSierraArboles({
           reducedMotion={reducedMotion}
           clima={clima}
           pisoUsuario={pisoUsuario}
-          onEntrarPiso={onEntrarPiso}
+          onEntrarPiso={entrarPiso}
         />
         <OrbitControls
           ref={controles}
@@ -1042,7 +1050,7 @@ export default function GaleriaSierraArboles({
           <small>Del mar Caribe a la nieve: toque el árbol mayor de un piso para entrar a su mundo.</small>
         </h2>
 
-        <LeyendaPisos clima={clima} pisoUsuario={pisoUsuario} onEntrarPiso={onEntrarPiso} />
+        <LeyendaPisos clima={clima} pisoUsuario={pisoUsuario} onEntrarPiso={entrarPiso} />
 
         <div className="gsierra-abajo">
           {/* SLIDER CLIMÁTICO: el corrimiento de los pisos hoy→2050 */}

@@ -255,6 +255,8 @@ function ThermalMountain({ altitud, pisoSlug }) {
  * @param {string} [props.initialMunicipio]
  * @param {number|null} [props.altitud]
  * @param {function(Object):void} [props.onConfirm]
+ * @param {Object|string|null} [props.initialData] - datos de navegación del shell de prod ({ coords, altitud, municipio, next }).
+ * @param {(view: string, data?: any) => void} [props.onNavigate] - inyectada por el shell de prod; fallback de onConfirm.
  * @param {function():void} [props.onBack]
  */
 export default function LocationDetectedScreen({
