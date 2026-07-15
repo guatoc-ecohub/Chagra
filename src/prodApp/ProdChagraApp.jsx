@@ -8,7 +8,7 @@
  * resuelve en build-time sin penalizar el build completo.
  */
 import React, { lazy, Suspense, useState, useEffect, useCallback } from 'react';
-import { isAuthenticated, logoutUser } from '../services/authService';
+import { isAuthenticated } from '../services/authService';
 import {
   NUCLEO_3D,
   NUCLEO_APP,
@@ -25,14 +25,6 @@ const OAuthCallback = lazy(() => import('../components/OAuthCallback.jsx'));
 // El manifiesto es la fuente de verdad; esta sección es el puente
 // entre el data-driven declare y el sistema de imports de Vite.
 
-/**
- * @param {string} importPath — ej. 'src/mockups/EntradaValle3D.jsx'
- * @returns {string} path relativo desde este archivo
- */
-function rel(importPath) {
-  return '../' + importPath.replace(/^src\//, '');
-}
-
 // Los imports lazy se declaran EXPLICITAMENTE para que Vite pueda
 // hacer tree-shaking y code-splitting. El mapa RUTAS abajo los indexa.
 const LAZY_MAP = {
@@ -43,6 +35,10 @@ const LAZY_MAP = {
   VentanaValle3D: lazy(() => import('../components/VentanaValle3D.jsx')),
   VistaGlobalSierra: lazy(() => import('../visual/mundo3d/VistaGlobalSierra.jsx')),
   GaleriaSierraArboles: lazy(() => import('../visual/mundo3d/sierra/GaleriaSierraArboles.jsx')),
+  NavegadorGrafoDemo: lazy(() => import('../mockups/NavegadorGrafoDemo.jsx')),
+  RestauracionEnElTiempo: lazy(() => import('../visual/mundo3d/restauracion/RestauracionEnElTiempo.jsx')),
+  DemoAtmosferaViva: lazy(() => import('../visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx')),
+  TransicionesOdysseyDemo: lazy(() => import('../mockups/TransicionesOdysseyDemo.jsx')),
   MundoEntBosque: lazy(() => import('../visual/mundo3d/bosque/MundoEntBosque.jsx')),
   MontanaMundosCampesino: lazy(() => import('../mockups/MontanaMundosCampesino.jsx')),
   VitrinaMaestraMundos: lazy(() => import('../mockups/VitrinaMaestraMundos.jsx')),
@@ -221,7 +217,16 @@ export default function ProdChagraApp() {
   const [auth, setAuth] = useState(() => {
     try { return isAuthenticated(); } catch { return false; }
   });
-  const [currentView, setCurrentView] = useState('loading');
+  // Estado inicial calculado directo (auth + hash son síncronos): nada de
+  // 'loading' + setState en un efecto de montaje — eso causaba un parpadeo
+  // del loader Y dispara react-hooks/set-state-in-effect (cascading render).
+  const [currentView, setCurrentView] = useState(() => {
+    const { view } = parseHash();
+    try {
+      if (isAuthenticated()) return view || 'valle3d';
+    } catch { /* cae a login abajo */ }
+    return view === 'oauth-callback' ? 'oauth-callback' : 'login';
+  });
 
   const navigate = useCallback((view) => {
     if (!view || view === 'loading') return;
@@ -242,26 +247,11 @@ export default function ProdChagraApp() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  useEffect(() => {
-    const { view } = parseHash();
-    if (isAuthenticated()) {
-      setAuth(true);
-      setCurrentView(view || 'valle3d');
-    } else if (view === 'oauth-callback') {
-      setCurrentView('oauth-callback');
-    } else {
-      setCurrentView('login');
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   const handleLoginSuccess = useCallback(() => {
     setAuth(true);
     setCurrentView('valle3d');
     window.location.hash = '';
   }, []);
-
-  // ── Loading ────────────────────────────────────────────────
-  if (currentView === 'loading') return <ChagraGrowLoader />;
 
   // ── Auth gate ───────────────────────────────────────────────
   if (!auth && currentView !== 'login' && currentView !== 'oauth-callback') {

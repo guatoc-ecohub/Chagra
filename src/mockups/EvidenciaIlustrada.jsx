@@ -468,7 +468,7 @@ function TarjetaEvidencia({ dato, indice }) {
 export default function EvidenciaIlustrada({ onBack }) {
   const volver = () => {
     if (onBack) onBack();
-    else window.location.hash = '#/dashboard';
+    else window.location.hash = '#dashboard';
   };
   return (
     <div className="ev-root">
@@ -476,7 +476,7 @@ export default function EvidenciaIlustrada({ onBack }) {
         <div className="ev-topbar">
           <a
             className="ev-back"
-            href="#/dashboard"
+            href="#dashboard"
             onClick={(e) => { e.preventDefault(); volver(); }}
           >
             ← Volver

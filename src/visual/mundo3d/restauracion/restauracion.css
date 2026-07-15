@@ -1,0 +1,63 @@
+/*
+ * restauracion.css — el marco de la pieza.
+ *
+ * Casi nada: la ladera ocupa todo y la línea de tiempo se sienta abajo. El único
+ * detalle que importa es que el canvas ENTRE en fundido (`--lista`): un WebGL que
+ * aparece de golpe en negro asusta, y esta pieza trata justamente de que las cosas
+ * no aparezcan de golpe.
+ */
+
+.rest {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 22rem;
+  background: #d9dcc9; /* el cielo lavado del año 0: no hay salto al montar */
+  overflow: hidden;
+}
+
+.rest__lienzo {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.rest__lienzo canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none; /* el dedo gira la ladera; la página no se va detrás */
+}
+
+/* El canvas entra en fundido cuando ya tiene algo que mostrar. */
+.rest-canvas {
+  opacity: 0;
+  transition: opacity 420ms ease-out;
+}
+
+.rest-canvas--lista {
+  opacity: 1;
+}
+
+/* Mientras baja el chunk de three: el cielo del año 0, quieto. Sin ruedas ni
+   porcentajes — la pieza empieza cuando empieza. */
+.rest__esperando {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #d9dcc9, #cfc7a8);
+}
+
+/* El corte SVG de gama baja: llena el lienzo igual que el canvas. */
+.rest__franjas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rest-canvas {
+    transition: none;
+  }
+}

@@ -69,6 +69,41 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
+
+  // ── Arte nuevo — en revisión del operador (2026-07-14) ─────────
+  {
+    path: 'grafo_navegador',
+    alias: ['grafo', 'constelacion'],
+    componente: 'NavegadorGrafoDemo',
+    importLazy: 'src/mockups/NavegadorGrafoDemo.jsx',
+    categoria: '3D',
+  },
+  {
+    // OJO: 'restauracion' (sin _3d) YA es la pantalla 2D de más abajo
+    // (RestauracionScreen, categoria 2D-app) — mismo path colisionaba y la
+    // 2D pisaba a esta en el Map (bug conocido de la integración). Este
+    // módulo 3D vive en 'restauracion_3d'.
+    path: 'restauracion_3d',
+    alias: ['restaurar_3d', 'monte_vuelve'],
+    componente: 'RestauracionEnElTiempo',
+    importLazy: 'src/visual/mundo3d/restauracion/RestauracionEnElTiempo.jsx',
+    categoria: '3D',
+  },
+  {
+    path: 'atmosfera',
+    alias: ['dia_vivo', 'hora'],
+    componente: 'DemoAtmosferaViva',
+    importLazy: 'src/visual/mundo3d/atmosfera/DemoAtmosferaViva.jsx',
+    categoria: '3D',
+  },
+  {
+    path: 'transiciones',
+    alias: ['odyssey', 'velo'],
+    componente: 'TransicionesOdysseyDemo',
+    importLazy: 'src/mockups/TransicionesOdysseyDemo.jsx',
+    categoria: '3D',
+  },
+
   // ── El Bosque Vivo — Ent queñua landmark + microsuelo (capas) ──
   {
     path: 'bosque_vivo',
