@@ -1,0 +1,104 @@
+/*
+ * laminasBotanicas — la hoja de papel, como objeto en la pantalla.
+ *
+ * Namespace propio `lam-bot-*` para no pisar el `lam-*` de la librería
+ * hermana (../laminas.css). Acá va SÓLO lo que una lámina necesita como
+ * pliego autónomo: dimensionado y el aire de papel. Cero animación de
+ * entrada: una lámina botánica no "aparece con estilo" — está ahí, como
+ * está ahí un pliego clavado en la pared del cuarto de herramientas.
+ */
+
+/* El pliego: ancho completo, alto por proporción A (1000×1414 ≈ √2). */
+.lam-bot {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  /* la sombra del papel sobre la mesa: mínima. Un drop-shadow fuerte
+     convierte el pliego en una tarjeta de app, que es justo lo contrario. */
+  filter: drop-shadow(0 1px 2px rgb(36 26 16 / 12%));
+}
+
+/* Colección: las láminas se leen de a una, a lo ancho, con aire entre ellas.
+   Un grid apretado de miniaturas es un catálogo de stock, no un cuaderno. */
+.lam-bot-coleccion {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  grid-template-columns: 1fr;
+  max-width: 62rem;
+  margin-inline: auto;
+}
+
+/* En pantalla ancha, dos pliegos lado a lado — que es como se comparan la
+   papa y la yuca, o el mildeo y el oídio. La comparación es el uso. */
+@media (min-width: 68rem) {
+  .lam-bot-coleccion--par {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* El pliego suelto, centrado y con un tope: más ancho que esto, la tipografía
+   de 8,5 px del aparato crítico se vuelve un cartel y pierde su lugar. */
+.lam-bot--pliego {
+  max-width: 52rem;
+  margin-inline: auto;
+}
+
+/* Índice de la colección: la lista de las 21. */
+.lam-bot-indice {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  color: #3a2c1e;
+}
+
+.lam-bot-indice__piso {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8d7862;
+  border-bottom: 1px solid #d8c9a6;
+  padding-bottom: 0.25rem;
+}
+
+.lam-bot-indice__mata {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.2rem 0;
+}
+
+.lam-bot-indice__cientifico {
+  font-style: italic;
+  color: #6d5946;
+  font-size: 0.9em;
+}
+
+.lam-bot-indice__regionales {
+  color: #8d7862;
+  font-size: 0.8em;
+  margin-left: auto;
+}
+
+/* Impresión: el destino natural de una lámina es el papel. Que salga sin
+   sombra, sin fondo de app y a página completa — para clavarla en la pared
+   del cuarto de herramientas, que es donde de verdad sirve. */
+@media print {
+  .lam-bot {
+    filter: none;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    width: 100%;
+    max-width: none;
+  }
+
+  .lam-bot-coleccion {
+    display: block;
+    max-width: none;
+  }
+
+  .lam-bot-coleccion > * {
+    break-after: page;
+    page-break-after: always;
+  }
+}
