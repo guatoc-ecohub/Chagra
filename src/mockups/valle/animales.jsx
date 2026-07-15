@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components -- exporta MATERIAL_FINCA
+   (constante compartida de las mallas horneadas) además del componente. */
 /*
  * Animales de finca del valle — el mundo 'animales' (antes una casita muda).
  *
@@ -14,6 +16,16 @@
  */
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+
+/* El material COMPARTIDO de las mallas fusionadas con color horneado por
+   vértice (arboleda por especie hoy; el hato realista de finca-realismo-d1
+   cuando mergee — mismo export, cero conflicto). UNO para todas: cada malla
+   fusionada es 1 draw call. */
+export const MATERIAL_FINCA = new THREE.MeshLambertMaterial({
+  vertexColors: true,
+  flatShading: true,
+});
 
 /* Patas: cuatro cilindros finos y cortos, iguales para todos los cuadrúpedos. */
 function Patas({ x = 0.28, z = 0.16, alto = 0.26, r = 0.05, color }) {

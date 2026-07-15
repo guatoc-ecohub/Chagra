@@ -183,9 +183,16 @@ function apuntar(geo, pos, dir, esc = [1, 1, 1]) {
  * ⚠️ mergeGeometries devuelve NULL EN SILENCIO si las partes mezclan geometrías
  * indexadas (Cone/Cylinder/Sphere) con no-indexadas (Icosahedron/Dodecahedron).
  * Ese null invisible tenía APAGADAS seis especies (frailejón, roble, encenillo,
- * aliso, gaque, romerillo) — cazado 2026-07-15. Se DESINDEXA todo antes de
- * fusionar y se TRUENA si aun así falla: mejor un error de build que una
- * especie invisible en producción.
+ * aliso, gaque, romerillo) y, en el valle, además mataba el render entero con
+ * `null.boundingSphere`. Es la TERCERA mordida de esta trampa (2026-07-15) y la
+ * cazaron dos agentes por separado, en esta rama y en fable/direccion-valle.
+ *
+ * Se DESINDEXA todo antes de fusionar y se TRUENA si aun así falla: mejor un
+ * error de build que una especie invisible en producción.
+ *
+ * El `dispose()` no es opcional: `toNonIndexed()` devuelve una geometría NUEVA y
+ * la original se queda en memoria de GPU. Sin liberarla, cada rebuild filtra —
+ * y esto corre en un Android barato.
  */
 function fusionar(partes) {
   const buenas = partes.filter(Boolean).map((p) => {

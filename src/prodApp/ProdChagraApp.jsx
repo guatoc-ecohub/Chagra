@@ -8,13 +8,19 @@
  * resuelve en build-time sin penalizar el build completo.
  */
 import React, { lazy, Suspense, useState, useEffect, useCallback } from 'react';
-import { isAuthenticated, logoutUser } from '../services/authService';
+import { isAuthenticated } from '../services/authService';
 import {
   NUCLEO_3D,
   NUCLEO_APP,
   PENDIENTE_DECISION,
   EXCLUIDO,
 } from '../config/rutasProdChagraApp.js';
+
+// Audio cleanup: al cambiar de ruta, detener cualquier voz (Kokoro/Web Speech)
+// que haya quedado sonando de la vista anterior. El loop eterno reportado
+// por el operador ocurre cuando el fetch asíncrono de speakKokoro resuelve
+// DESPUES de que el componente se desmontó → el audio se reproduce sin dueño.
+import { stop as stopAllAudio } from '../services/ttsService.js';
 
 import ChagraGrowLoader from '../components/ChagraGrowLoader';
 const LoginScreen = lazy(() => import('../components/LoginScreen.jsx'));
@@ -24,14 +30,6 @@ const OAuthCallback = lazy(() => import('../components/OAuthCallback.jsx'));
 // Cada entrada asocia un importLazy → React.lazy con el path exacto.
 // El manifiesto es la fuente de verdad; esta sección es el puente
 // entre el data-driven declare y el sistema de imports de Vite.
-
-/**
- * @param {string} importPath — ej. 'src/mockups/EntradaValle3D.jsx'
- * @returns {string} path relativo desde este archivo
- */
-function rel(importPath) {
-  return '../' + importPath.replace(/^src\//, '');
-}
 
 // Los imports lazy se declaran EXPLICITAMENTE para que Vite pueda
 // hacer tree-shaking y code-splitting. El mapa RUTAS abajo los indexa.
@@ -172,7 +170,9 @@ const LAZY_MAP = {
 /**
  * @typedef {Object} RutaRegistrada
  * @property {string} path
- * @property {React.ComponentType} Lazy
+ * @property {React.ComponentType<any>} Lazy — `any`: cada pantalla declara sus
+ *   props (onBack/onNavigate/initialContext…) y el router pasa el set común;
+ *   los componentes ignoran las que no usan.
  */
 
 /** @type {Map<string, RutaRegistrada>} */
@@ -218,41 +218,112 @@ function parseHash() {
 // ── Componente principal ────────────────────────────────────────
 
 export default function ProdChagraApp() {
-  const [auth, setAuth] = useState(() => {
-    try { return isAuthenticated(); } catch { return false; }
-  });
+  // auth: null = determinando, true = autenticado, false = no autenticado.
+  // Arranca null para evitar el flash de login mientras se verifica el token
+  // en localforage (IndexedDB asíncrona). isAuthenticated() es async y NUNCA
+  // debe usarse en un if() síncrono — siempre devuelve Promise truthy.
+  const [auth, setAuth] = useState(null);
   const [currentView, setCurrentView] = useState('loading');
+  // Datos de navegación (ej. el contexto espacial que EntradaValle3D manda al
+  // agente). Viajan EN el hash (`#vista/<json-uri>`) — parseHash ya los lee —
+  // para sobrevivir recarga y botón atrás del navegador.
+  const [navData, setNavData] = useState(null);
 
-  const navigate = useCallback((view) => {
+  const navigate = useCallback((view, data = null) => {
     if (!view || view === 'loading') return;
+    // Guard de rutas: las pantallas piden vistas que a veces no existen en el
+    // manifiesto de prod (ej. tiles legacy del dashboard). Ignorar el toque es
+    // mejor que caer al valle "porque sí" (el fallback del router confunde).
+    if (!RUTAS.has(view) && view !== 'login' && view !== 'oauth-callback') return;
+    // Detener cualquier audio de la vista anterior antes de montar la nueva.
+    // El loop eterno reportado ocurre cuando el audio asíncrono resuelve
+    // después del desmontaje del componente 3D.
+    try { stopAllAudio(); } catch { /* ttsService puede no estar inicializado */ }
+    setNavData(data ?? null);
     setCurrentView(view);
-    window.location.hash = view === 'valle3d' ? '' : '#' + view;
+    const sufijo = data != null ? '/' + encodeURIComponent(JSON.stringify(data)) : '';
+    window.location.hash = view === 'valle3d' && !sufijo ? '' : '#' + view + sufijo;
   }, []);
+
+  // ── El botón atrás DE LA APP (no confundir con el del navegador): las
+  //    pantallas lo esconden si no reciben `onBack` — sin esto, en una PWA
+  //    instalada (sin barra del navegador) el usuario queda atrapado.
+  const volverAtras = useCallback(() => {
+    if (window.history.length > 1) window.history.back();
+    else navigate('valle3d');
+  }, [navigate]);
+
+  const irAlInicio = useCallback(() => navigate('valle3d'), [navigate]);
+
+  // ── Listeners de navegación GLOBAL. ScreenShell (el header de ~70 pantallas
+  //    2D) despacha `chagra:nav` (botones casa/ayuda/campana) y el flujo del
+  //    agente (EntradaValle3D "Pregúntele a su finca…", AcompananteMundo,
+  //    SeedingLog…) despacha `chagraNavigate`. Los listeners vivían SOLO en
+  //    App.jsx (el shell viejo que main-prod NO monta) → en prod eran botones
+  //    muertos: el operador lo cazó ("el botón de casa y el de ayuda no hacen
+  //    nada"). Aquí es donde el evento por fin aterriza.
+  useEffect(() => {
+    const resolver = (view, data) => {
+      if (!view) return;
+      // En prod 3D-first el INICIO es el valle: el botón casa del ScreenShell
+      // pide 'dashboard' (su destino histórico en el shell viejo) — aquí
+      // significa "volver a casa". `#dashboard` directo sigue funcionando.
+      navigate(view === 'dashboard' ? 'valle3d' : view, data);
+    };
+    /** @param {Event & { detail?: any }} e — detail: string (formato simple) u objeto { view, data }. */
+    const onNavSimple = (e) => {
+      const d = e.detail;
+      if (typeof d === 'string') resolver(d, null);
+      else resolver(d?.view, d?.data ?? null);
+    };
+    /** @param {Event & { detail?: any }} e — detail: { view, initialData } (AgentFab/EscuchaOverlay/valle). */
+    const onNavRico = (e) => resolver(e.detail?.view, e.detail?.initialData ?? e.detail?.data ?? null);
+    window.addEventListener('chagra:nav', onNavSimple);
+    window.addEventListener('chagraNavigate', onNavRico);
+    return () => {
+      window.removeEventListener('chagra:nav', onNavSimple);
+      window.removeEventListener('chagraNavigate', onNavRico);
+    };
+  }, [navigate]);
 
   useEffect(() => {
     const onHash = () => {
-      const { view } = parseHash();
-      if (isAuthenticated() || view === 'login' || view === 'oauth-callback') {
-        setCurrentView(view || 'valle3d');
-      } else {
+      const { view, data } = parseHash();
+      // Verificar auth de forma asíncrona real (isAuthenticated es async)
+      isAuthenticated().then((autenticado) => {
+        if (autenticado || view === 'login' || view === 'oauth-callback') {
+          setNavData(data ?? null);
+          setCurrentView(view || 'valle3d');
+        } else {
+          setCurrentView('login');
+        }
+      }).catch(() => {
         setCurrentView('login');
-      }
+      });
     };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
   useEffect(() => {
-    const { view } = parseHash();
-    if (isAuthenticated()) {
-      setAuth(true);
-      setCurrentView(view || 'valle3d');
-    } else if (view === 'oauth-callback') {
-      setCurrentView('oauth-callback');
-    } else {
+    const { view, data } = parseHash();
+    isAuthenticated().then((autenticado) => {
+      // El navData del deep-link se asienta junto con la vista (asíncrono:
+      // un setState síncrono dentro del effect dispara renders en cascada).
+      setNavData(data ?? null);
+      setAuth(autenticado);
+      if (autenticado) {
+        setCurrentView(view || 'valle3d');
+      } else if (view === 'oauth-callback') {
+        setCurrentView('oauth-callback');
+      } else {
+        setCurrentView('login');
+      }
+    }).catch(() => {
+      setAuth(false);
       setCurrentView('login');
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    });
+  }, []);
 
   const handleLoginSuccess = useCallback(() => {
     setAuth(true);
@@ -260,8 +331,8 @@ export default function ProdChagraApp() {
     window.location.hash = '';
   }, []);
 
-  // ── Loading ────────────────────────────────────────────────
-  if (currentView === 'loading') return <ChagraGrowLoader />;
+  // ── Loading (auth state aún no determinado) ───────────────────
+  if (auth === null || currentView === 'loading') return <ChagraGrowLoader />;
 
   // ── Auth gate ───────────────────────────────────────────────
   if (!auth && currentView !== 'login' && currentView !== 'oauth-callback') {
@@ -280,9 +351,26 @@ export default function ProdChagraApp() {
 
   if (!Componente) return <ChagraGrowLoader />;
 
+  // El HOME (valle 3D) no lleva `onBack`: no hay a dónde volver desde casa
+  // (las pantallas esconden/muestran su botón según llegue la prop).
+  const esHome = !ruta || ruta.path === 'valle3d';
+
   return (
     <Suspense fallback={<ChagraGrowLoader />}>
-      <Componente />
+      {/* Las pantallas se montaban SIN PROPS: todo CTA interno que llamara
+          `onNavigate`/`onBack` quedaba muerto — y el dashboard directamente
+          CRASHEABA (onClick={() => onNavigate(...)} sin guard → TypeError →
+          ErrorBoundary raíz). Cada componente toma las props que declare e
+          ignora el resto (initialContext la usa AgentScreen; initialMundoId,
+          el valle en deep-links `#valle3d/"agua"`). */}
+      <Componente
+        onBack={esHome ? undefined : volverAtras}
+        onHome={irAlInicio}
+        onNavigate={navigate}
+        initialData={navData ?? undefined}
+        initialContext={navData ?? undefined}
+        initialMundoId={esHome && typeof navData === 'string' ? navData : undefined}
+      />
     </Suspense>
   );
 }
