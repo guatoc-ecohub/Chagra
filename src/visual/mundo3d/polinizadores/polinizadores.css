@@ -1,0 +1,105 @@
+/*
+ * polinizadores.css — LA CADENCIA DEL MUNDO POLINIZADORES.
+ *
+ * Poquísimo a propósito: casi toda la vida de este mundo pasa DENTRO del canvas
+ * (el vuelo, la red, el cuaje), donde el CSS no llega. Acá vive solo lo que rodea
+ * al lienzo — la aparición y el estado de la finca — con los gates de la casa:
+ * `prefers-reduced-motion` congela en fotograma digno y el tier bajo corta lo
+ * continuo decorativo.
+ *
+ * REGLA DE ORO de la casa: el DIBUJO en los .jsx/.geom.js; la CADENCIA acá.
+ */
+
+/* ── El lienzo ───────────────────────────────────────────────────────────────
+   Aparece en fundido: el 3D tarda en montar y un salto seco se siente barato.
+   La finca amanece, no se enciende. */
+.polz-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  transition: opacity 620ms ease-out;
+  /* El tacto arrastra la cámara; el navegador no debe robarse el gesto. */
+  touch-action: none;
+}
+.polz-canvas--lista {
+  opacity: 1;
+}
+
+/* ── El velo de la noche ─────────────────────────────────────────────────────
+   Cuando el mundo cambia de turno, el contenedor acompaña con una temperatura
+   distinta. La 3D ya cambia su luz por dentro; esto es solo el marco. */
+.polz-mundo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #bfe3f2;
+  transition: background 900ms ease-in-out;
+}
+.polz-mundo[data-momento='noche'] {
+  background: #141d33;
+}
+/* En visión de abeja hasta el marco se corre al violeta: el mundo de ella está
+   más allá del azul, y el encuadre no debería fingir lo contrario. */
+.polz-mundo[data-vision='abeja'] {
+  background: #8f9ee8;
+}
+
+/* ── El pulso de la red ──────────────────────────────────────────────────────
+   Un latido lentísimo para lo que quiera decir "la red está viva" alrededor del
+   lienzo (un indicador, un borde). Lento de verdad: esto no es un cargando. */
+@keyframes polz-latido-red {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+.polz-pulso {
+  animation: polz-latido-red 3.4s ease-in-out infinite;
+}
+
+/* ── La deriva ───────────────────────────────────────────────────────────────
+   Cuando el veneno cruza, el marco entero se enferma un momento. No es rojo de
+   alarma: es ese verde-gris que uno no sabe nombrar y le da mala espina. */
+@keyframes polz-deriva-marco {
+  0% { box-shadow: inset 0 0 0 rgba(184, 199, 160, 0); }
+  45% { box-shadow: inset 0 0 90px rgba(184, 199, 160, 0.5); }
+  100% { box-shadow: inset 0 0 0 rgba(184, 199, 160, 0); }
+}
+.polz-mundo[data-veneno='1']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: polz-deriva-marco 9s ease-in-out;
+}
+
+/* ── Gates de la casa ────────────────────────────────────────────────────────
+   Calma: se congela lo decorativo. OJO — lo que NO se congela nunca es la red
+   tejiéndose dentro del canvas: pedir calma es pedir que nada brinque, no pedir
+   que el mundo deje de tener algo que decir. */
+@media (prefers-reduced-motion: reduce) {
+  .polz-canvas {
+    transition: none;
+    opacity: 1;
+  }
+  .polz-pulso {
+    animation: none;
+    opacity: 0.8;
+  }
+  .polz-mundo[data-veneno='1']::after {
+    animation: none;
+    box-shadow: inset 0 0 90px rgba(184, 199, 160, 0.35);
+  }
+  .polz-mundo {
+    transition: none;
+  }
+}
+
+/* Gama baja: fuera lo continuo. El equipo humilde gasta su presupuesto en la
+   red, no en el marco. */
+.polz-mundo[data-tier='bajo'] .polz-pulso {
+  animation: none;
+  opacity: 0.8;
+}
+.polz-mundo[data-tier='bajo'] .polz-canvas {
+  transition-duration: 300ms;
+}
