@@ -14,6 +14,9 @@ export {
   NIVELES_CONFIANZA,
   POSE_DE_ESTADO,
   ARIA_DE_ESTADO,
+  MOMENTOS_IDLE,
   estadoCanonico,
   nivelDeConfianza,
+  elegirMomentoIdle,
+  duracionDeMomento,
 } from './angelitaEstados.js';
