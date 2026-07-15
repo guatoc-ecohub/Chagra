@@ -177,9 +177,14 @@ function apuntar(geo, pos, dir, esc = [1, 1, 1]) {
   return geo;
 }
 
-/** Fusiona la lista de partes (ya coloreadas) en UNA geometría indexada. */
+/** Fusiona la lista de partes (ya coloreadas) en UNA geometría.
+    OJO: los poliedros (Icosahedron) son NO-indexados y el resto sí — merge
+    directo devolvía null EN SILENCIO y la especie quedaba invisible (aliso y
+    gaque no se dibujaban en prod; tercera mordida de esta trampa). Se
+    uniformiza todo a no-indexado antes de fusionar (mismo fix ya probado en
+    dev, fable/direccion-valle). */
 function fusionar(partes) {
-  const buenas = partes.filter(Boolean);
+  const buenas = partes.filter(Boolean).map((g) => (g.index ? g.toNonIndexed() : g));
   const g = mergeGeometries(buenas, false);
   // Las partes de entrada nunca tocaron la GPU: quedan para el GC.
   return g;
