@@ -12,7 +12,19 @@
 
    Los overrides a piezas internas de la abeja (.crt-brazo-*, .rh-mirada) van
    SIEMPRE detrás de [data-agente='angelita'][data-agt-vivo='1'] — dos atributos
-   de especificidad: pisan el sway/mirada base del kit sin tocar creatures.css. */
+   de especificidad: pisan el sway/mirada base del kit sin tocar creatures.css.
+
+   V2 — LA VIDA. Tres sistemas nuevos, todos gateados igual que el resto:
+   · `.agt-vuelo` (física): entrada de estado con anticipación (one-shot que se
+     replaya porque el wrapper se remonta con key=estado), deriva en figura-8
+     con banqueo e inercia en acompana, aterrizaje/despegue con peso.
+   · [data-agt-idle=…] (idle-cerebro): los micro-gestos del repertorio
+     MOMENTOS_IDLE — las duraciones de estos one-shot deben COINCIDIR con las
+     de angelitaEstados.js (el scheduler suelta el atributo cuando el gesto
+     cierra en identidad).
+   · [data-agt-mira='usted'] (la mirada): las pupilas siguen el puntero vía
+     vars --agt-mx/--agt-my; la regla vive al FINAL del archivo para ganar el
+     empate de especificidad contra la actuación de mirada por estado. */
 
 /* ═══ EL CUERPO (wrapper que carga abeja + señales de cara) ══════════════════
    Las señales pegadas a la cara (cejas, gota de sudor) viven DENTRO de
@@ -22,6 +34,299 @@
 .agt-cuerpo {
   transform-box: fill-box;
   transform-origin: center bottom;
+}
+
+/* ═══ EL VUELO (física: entrada, deriva con inercia, peso) ═══════════════════
+   `.agt-vuelo` envuelve a `.agt-cuerpo`: capa de POSICIÓN (dónde está en el
+   aire), separada de la capa de GESTO (qué hace el cuerpo). Así la deriva, el
+   aterrizaje y la entrada de estado componen con los gestos sin pisarse. */
+.agt-vuelo {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+/* ENTRADA DE ESTADO — cada cambio de estado remonta el wrapper (key=estado) y
+   esta anticipación corre UNA vez: se recoge (squash), rebasa hacia el gesto
+   nuevo y asienta. Las transiciones fluyen; nada aparece en seco. */
+[data-agt-vivo='1'] .agt-vuelo {
+  animation: agt-entra 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1;
+}
+@keyframes agt-entra {
+  0%   { transform: translateY(0) scale(1, 1); }
+  30%  { transform: translateY(0.85px) scale(1.06, 0.91); }  /* anticipa: se recoge */
+  68%  { transform: translateY(-0.7px) scale(0.965, 1.05); } /* rebasa hacia el gesto */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* DERIVA (solo acompana) — vuelo con INERCIA: figura-8 lenta con banqueo (se
+   ladea hacia donde va) y bolsillos de gravedad (cae un pelo al cambiar de
+   rumbo — el aire pesa, no es un flotador). Arranca después de la entrada. */
+[data-agt-vivo='1'][data-agt-estado='acompana'] .agt-vuelo {
+  animation:
+    agt-entra 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1,
+    agt-deriva 13s ease-in-out 0.5s infinite;
+}
+@keyframes agt-deriva {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  12%  { transform: translate(0.8px, -0.7px) rotate(2.2deg); }    /* rumbo derecha: banquea */
+  25%  { transform: translate(1.2px, 0.15px) rotate(0.6deg); }    /* bolsillo: cae un pelo */
+  38%  { transform: translate(0.3px, -1.1px) rotate(-1.6deg); }   /* remonta a la izquierda */
+  52%  { transform: translate(-0.9px, -0.5px) rotate(-2.5deg); }  /* banquea al otro lado */
+  64%  { transform: translate(-1.25px, 0.35px) rotate(-0.7deg); } /* deja caer el peso */
+  78%  { transform: translate(-0.5px, -0.9px) rotate(1.5deg); }   /* retoma altura */
+  90%  { transform: translate(0.2px, -0.35px) rotate(1.1deg); }
+}
+/* El cuerpo SIGUE al vuelo con retraso (follow-through): mismo período que la
+   deriva pero contra-rotación suave y 0.7s tarde — la cabeza dirige, el cuerpo
+   la alcanza. Solo en el vuelo sereno (flota); los momentos ponen el suyo. */
+[data-agt-vivo='1'][data-agt-estado='acompana'][data-agt-idle='flota'] .agt-cuerpo {
+  animation: agt-cuerpo-sigue 13s ease-in-out 1.2s infinite;
+}
+@keyframes agt-cuerpo-sigue {
+  0%, 100% { transform: rotate(0deg); }
+  12%  { transform: rotate(-1.3deg); }
+  25%  { transform: rotate(-0.2deg); }
+  38%  { transform: rotate(0.9deg); }
+  52%  { transform: rotate(1.5deg); }
+  64%  { transform: rotate(0.4deg); }
+  78%  { transform: rotate(-1deg); }
+  90%  { transform: rotate(-0.6deg); }
+}
+
+/* Las alitas de tul BORRONEAN de verdad: un velo de motion-blur (unidades del
+   viewBox: ~0.5px de pantalla en un avatar de 96). Es la única capa raster del
+   agente; tier bajo la corta al final del archivo, y posada la apaga (alas
+   plegadas y quietas se ven nítidas). */
+[data-agente='angelita'][data-agt-vivo='1'] .crt-wing {
+  filter: blur(0.24px);
+}
+/* Plegadas no borronean: en escuchando (pose reposo) el tul se ve nítido —
+   el blur es firma de VELOCIDAD, no maquillaje. (posada lo apaga más abajo.) */
+[data-agente='angelita'][data-agt-estado='escuchando'] .crt-wing {
+  filter: none;
+}
+
+/* El parpadeo lleva RITMO PROPIO por instancia (vars con azar que estampa
+   Angelita.jsx al montar): dos Angelitas jamás parpadean al tiempo, y ninguna
+   parpadea como metrónomo entre sesiones. */
+[data-agente='angelita'] .rh-blink {
+  animation-duration: var(--agt-blink-dur, 5.6s);
+  animation-delay: var(--agt-blink-delay, 0s);
+}
+
+/* ═══ EL IDLE VIVO — los micro-gestos del acompana ([data-agt-idle]) ══════════
+   Una criatura que EXISTE aunque nadie le hable. El scheduler pone el atributo
+   el tiempo exacto del one-shot; cada gesto cierra en identidad para que el
+   empalme con el vuelo sereno no salte. Mientras hay gesto, los antics del kit
+   (vuelta de campana, saltitos) callan: el gesto lee limpio. */
+[data-agente='angelita'][data-agt-idle]:not([data-agt-idle='flota']) .rh-antic,
+[data-agente='angelita'][data-agt-idle]:not([data-agt-idle='flota']) .rh-travieso {
+  animation: none;
+}
+
+/* MIRA ALREDEDOR — curiosa: los ojos van PRIMERO (¿allá?… ¿o allá?) y la
+   cabeza los sigue con retraso — las pupilas anticipan el movimiento. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='mira'] .rh-mirada {
+  animation: agt-idle-mira 2.6s ease-in-out 1;
+}
+@keyframes agt-idle-mira {
+  0%, 100% { transform: translate(0, 0); }
+  10%, 30% { transform: translate(-0.6px, -0.1px); }   /* ojos: ¿qué hay allá? */
+  42%, 66% { transform: translate(0.55px, -0.25px); }  /* …¿y allá? */
+  80%  { transform: translate(-0.15px, 0.05px); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='mira'] .agt-cuerpo {
+  animation: agt-idle-mira-cuerpo 2.6s ease-in-out 1;
+}
+@keyframes agt-idle-mira-cuerpo {
+  0%, 100% { transform: rotate(0deg); }
+  18%, 34% { transform: rotate(-2.6deg); }  /* la cabeza alcanza a los ojos */
+  50%, 70% { transform: rotate(2.2deg); }
+  84%  { transform: rotate(-0.6deg); }
+}
+
+/* SE DISTRAE — pasa una mota de vilano y la despide con los ojos; la cabeza
+   gira detrás (otra vez: pupilas anticipan, cuerpo sigue). La mota cruza UNA
+   vez y se va con el viento. */
+.agt-mota {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+[data-agt-vivo='1'] .agt-mota {
+  animation: agt-mota-cruza 3.6s ease-in-out 1;
+}
+@keyframes agt-mota-cruza {
+  0%   { transform: translate(-19px, -6px) rotate(0deg); opacity: 0; }
+  12%  { opacity: 0.65; }
+  30%  { transform: translate(-8px, -9.5px) rotate(50deg); }
+  55%  { transform: translate(3px, -6px) rotate(105deg); opacity: 0.6; }
+  80%  { transform: translate(13px, -10.5px) rotate(160deg); opacity: 0.5; }
+  100% { transform: translate(20px, -13.5px) rotate(200deg); opacity: 0; }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='distraida'] .rh-mirada {
+  animation: agt-sigue-mota 3.6s ease-in-out 1;
+}
+@keyframes agt-sigue-mota {
+  0%   { transform: translate(0, 0); }
+  14%  { transform: translate(-0.65px, -0.15px); }  /* la pilla entrando */
+  55%  { transform: translate(0.1px, -0.35px); }    /* la acompaña de largo */
+  85%  { transform: translate(0.6px, -0.5px); }     /* la despide arriba-derecha */
+  100% { transform: translate(0, 0); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='distraida'] .agt-cuerpo {
+  animation: agt-sigue-mota-cuerpo 3.6s ease-in-out 1;
+}
+@keyframes agt-sigue-mota-cuerpo {
+  0%, 100% { transform: rotate(0deg); }
+  26%  { transform: rotate(-2.2deg); }  /* gira tarde hacia donde ya miró */
+  62%  { transform: rotate(1.4deg); }
+  86%  { transform: rotate(2deg); }     /* la sigue con la cabeza al salir */
+}
+
+/* SE ACICALA — aseo de abeja: la manita derecha sube a la antena (rebasa),
+   da dos pasaditas y recoge; la cabeza se agacha hacia la manita y los ojos
+   se van bizcos arriba, mirándose la antena. Vecina, no logo. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='acicala'] .crt-brazo-r {
+  animation: agt-acicala-brazo 3s cubic-bezier(0.4, 0, 0.3, 1.3) 1;
+}
+@keyframes agt-acicala-brazo {
+  0%, 100% { transform: rotate(0deg); }
+  16%  { transform: rotate(-160deg); }  /* sube junto a la antena (rebasa) */
+  24%  { transform: rotate(-147deg); }  /* asienta al borde de la cabecita */
+  34%  { transform: rotate(-156deg); }  /* pasadita 1 */
+  46%  { transform: rotate(-144deg); }
+  56%  { transform: rotate(-154deg); }  /* pasadita 2 */
+  66%  { transform: rotate(-146deg); }
+  86%  { transform: rotate(-4deg); }    /* recoge con follow-through */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='acicala'] .agt-cuerpo {
+  animation: agt-acicala-cuerpo 3s ease-in-out 1;
+}
+@keyframes agt-acicala-cuerpo {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  20%, 64% { transform: rotate(3deg) translateY(0.3px); }  /* agacha la cabeza a la manita */
+  82%  { transform: rotate(-0.8deg) translateY(0); }       /* rebote al soltar */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='acicala'] .rh-mirada {
+  animation: none;
+  transform: translate(0.4px, -0.45px);  /* bizca, mirándose la antena */
+}
+
+/* SE RASCA — la manita izquierda a la barriguita: ras-ras-ras y suelta con
+   rebote; el cuerpo se recuesta al gusto (squash de satisfacción). */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='rasca'] .crt-brazo-l {
+  animation: agt-rasca-brazo 2.4s cubic-bezier(0.4, 0, 0.3, 1.3) 1;
+}
+@keyframes agt-rasca-brazo {
+  0%, 100% { transform: rotate(0deg); }
+  14%  { transform: rotate(-62deg); }  /* llega a la barriguita (rebasa) */
+  22%  { transform: rotate(-52deg); }
+  30%  { transform: rotate(-60deg); }  /* ras… */
+  38%  { transform: rotate(-51deg); }
+  46%  { transform: rotate(-59deg); }  /* …ras… */
+  54%  { transform: rotate(-52deg); }
+  66%  { transform: rotate(-56deg); }  /* …ras (más lento: qué rico) */
+  88%  { transform: rotate(3deg); }    /* suelta con rebote */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='rasca'] .agt-cuerpo {
+  animation: agt-rasca-cuerpo 2.4s ease-in-out 1;
+}
+@keyframes agt-rasca-cuerpo {
+  0%, 100% { transform: rotate(0deg) scale(1, 1); }
+  18%, 60% { transform: rotate(-2deg) scale(1.02, 0.97); }  /* se recuesta al gusto */
+  78%  { transform: rotate(0.6deg) scale(0.995, 1.01); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='rasca'] .rh-mirada {
+  animation: none;
+  transform: translate(-0.35px, 0.45px);  /* mira lo que se rasca */
+}
+
+/* SACUDE LAS ALAS — escalofrío alegre: se infla, tiembla en ráfaga corta con
+   el aleteo a tope (blur extra) y queda esponjada. Ventana breve, no epilepsia. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='sacude'] .agt-cuerpo {
+  animation: agt-sacude 1.5s ease-in-out 1;
+}
+@keyframes agt-sacude {
+  0%, 100% { transform: rotate(0deg) scale(1, 1); }
+  12%  { transform: rotate(-2deg) scale(0.97, 1.05); }   /* se infla: prepara */
+  20%  { transform: rotate(4deg) scale(1.03, 0.97); }
+  28%  { transform: rotate(-4.5deg) scale(1, 1); }
+  36%  { transform: rotate(4.5deg) scale(1, 1); }
+  44%  { transform: rotate(-3.5deg) scale(1, 1); }
+  52%  { transform: rotate(2.5deg) scale(1, 1); }
+  60%  { transform: rotate(-1.2deg) scale(1, 1); }
+  74%  { transform: rotate(0.4deg) scale(0.99, 1.02); }  /* queda esponjada */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='sacude'] .crt-wing {
+  animation-duration: 0.06s;
+  filter: blur(0.42px);
+}
+
+/* SE POSA — aterrizar CUESTA: se alza un pelo eligiendo el sitio, baja con
+   peso (ease-in), amortigua con squash y queda abajo (fill forwards empalma
+   con la quietud de 'posada'). Las alitas siguen frenando en el aire. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='posa'] .agt-vuelo {
+  animation: agt-aterriza 1.15s cubic-bezier(0.55, 0, 0.65, 1) 1 forwards;
+}
+@keyframes agt-aterriza {
+  0%   { transform: translateY(0); }
+  18%  { transform: translateY(-1.2px); }  /* se alza: elige el sitio */
+  70%  { transform: translateY(5.9px); }   /* baja con peso */
+  84%  { transform: translateY(5.3px); }   /* amortigua */
+  100% { transform: translateY(5.6px); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='posa'] .agt-cuerpo {
+  animation: agt-aterriza-cuerpo 1.15s ease-in-out 1;
+}
+@keyframes agt-aterriza-cuerpo {
+  0%, 45% { transform: scale(1, 1); }
+  62%  { transform: scale(0.955, 1.06); }  /* se estira mientras cae */
+  76%  { transform: scale(1.1, 0.88); }    /* squash del impacto */
+  88%  { transform: scale(0.98, 1.03); }   /* rebote */
+  100% { transform: scale(1, 1); }
+}
+
+/* POSADA — descansa: quieta abajo (transform estático que empalma con el
+   forwards del aterrizaje), alitas PLEGADAS que respiran (reusa el keyframe
+   del kit) y respiración honda de cuerpo. Nítida: sin blur de alas. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='posada'] .agt-vuelo {
+  animation: none;
+  transform: translateY(5.6px);
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='posada'] .agt-cuerpo {
+  animation: agt-posada-respira 4.2s ease-in-out infinite;
+}
+@keyframes agt-posada-respira {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%  { transform: translateY(-0.35px) scale(0.985, 1.035); }  /* respira hondo */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='posada'] .crt-wing {
+  animation: crt-wing-reposo 3.6s ease-in-out infinite alternate;
+  filter: none;
+}
+
+/* DESPEGA — coger vuelo cuesta también: se agacha (squash de impulso), salta
+   al aire con stretch, rebasa la altura y asienta en el vuelo sereno. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='despega'] .agt-vuelo {
+  animation: agt-despega 0.95s cubic-bezier(0.34, 1.56, 0.64, 1) 1;
+}
+@keyframes agt-despega {
+  0%   { transform: translateY(5.6px); }
+  22%  { transform: translateY(6.6px); }   /* se agacha: coge impulso */
+  60%  { transform: translateY(-1.6px); }  /* ¡al aire! (rebasa) */
+  80%  { transform: translateY(0.5px); }
+  100% { transform: translateY(0); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='despega'] .agt-cuerpo {
+  animation: agt-despega-cuerpo 0.95s cubic-bezier(0.34, 1.56, 0.64, 1) 1;
+}
+@keyframes agt-despega-cuerpo {
+  0%   { transform: scale(1, 1); }
+  22%  { transform: scale(1.1, 0.86); }   /* squash del impulso */
+  55%  { transform: scale(0.9, 1.12); }   /* stretch de subida */
+  80%  { transform: scale(1.02, 0.97); }
+  100% { transform: scale(1, 1); }
 }
 
 /* ── ESCUCHANDO — se posa (pose reposo la pliega) y LADEA la cabeza hacia
@@ -60,11 +365,20 @@
    globos de pensamiento van despegados del cuerpo, como en los cómics);
    adentro laten tres puntos y pasan RECUERDOS de la finca (hoja, gota, flor).
    El bracito derecho sube a la barbilla con overshoot y da golpecitos "hmm";
-   las pupilas se van arriba-derecha, a donde uno mira cuando recuerda. */
+   las pupilas se van arriba-derecha, a donde uno mira cuando recuerda.
+   La burbuja NACE elástica desde su colita (el estado la monta al entrar:
+   pop de anticipación una vez) y después flota con su bob. */
 [data-agt-vivo='1'] .agt-burbuja {
   transform-box: fill-box;
-  transform-origin: center;
-  animation: agt-burbuja-bob 3.7s ease-in-out infinite;
+  transform-origin: 20% 92%;  /* la colita: el pensamiento brota de ella */
+  animation:
+    agt-burbuja-nace 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1,
+    agt-burbuja-bob 3.7s ease-in-out 0.5s infinite;
+}
+@keyframes agt-burbuja-nace {
+  0%   { transform: scale(0); opacity: 0; }
+  55%  { transform: scale(1.08); opacity: 1; }  /* brota y rebasa */
+  100% { transform: scale(1); opacity: 1; }
 }
 @keyframes agt-burbuja-bob {
   0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -229,11 +543,34 @@
   animation: agt-encoge 3.6s cubic-bezier(0.4, 0, 0.3, 1.35) infinite;
 }
 @keyframes agt-encoge {
-  0%, 100% { transform: scale(1, 1) translateY(0); }
-  18%  { transform: scale(1.05, 0.92) translateY(0.7px); }   /* hombros ARRIBA (squash) */
-  26%  { transform: scale(1.02, 0.96) translateY(0.4px); }   /* asienta encogida */
-  68%  { transform: scale(1.02, 0.96) translateY(0.4px); }   /* sostiene: "pues no sé…" */
-  82%  { transform: scale(0.985, 1.03) translateY(-0.3px); } /* suelta con rebote */
+  0%, 100% { transform: scale(1, 1) translateY(0) rotate(0deg); }
+  18%  { transform: scale(1.05, 0.92) translateY(0.7px) rotate(-1.6deg); }   /* hombros ARRIBA (squash) */
+  26%  { transform: scale(1.02, 0.96) translateY(0.4px) rotate(-2.8deg); }   /* asienta encogida, LADEA la cabeza */
+  68%  { transform: scale(1.02, 0.96) translateY(0.4px) rotate(-2.8deg); }   /* sostiene: "pues no sé, vea…" */
+  82%  { transform: scale(0.985, 1.03) translateY(-0.3px) rotate(0.8deg); }  /* suelta con rebote */
+}
+/* La honestidad se ESCRIBE delante de usted: el "?" se dibuja de un trazo
+   (pathLength=1 en el JSX) y el puntico cae al final, como tiza en tablero. */
+[data-agt-vivo='1'] .agt-nose-signo path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: agt-nose-dibuja 0.55s ease-out 0.12s forwards;
+}
+@keyframes agt-nose-dibuja {
+  to { stroke-dashoffset: 0; }
+}
+[data-agt-vivo='1'] .agt-nose-signo circle {
+  opacity: 0;
+  animation: agt-nose-punto 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) 0.66s forwards;
+}
+@keyframes agt-nose-punto {
+  from { opacity: 0; transform: translateY(-0.8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* Y las chapetas se quedan ENCENDIDAS: no saber no la avergüenza — sonríe. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='no-se'] .rh-rubor {
+  animation: none;
+  opacity: 0.92;
 }
 [data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='no-se'] .crt-brazo-l {
   animation: agt-shrug-l 3.6s cubic-bezier(0.4, 0, 0.3, 1.35) infinite;
@@ -369,20 +706,123 @@
   40%      { transform: scale(1.1); opacity: 0.85; }
 }
 
+/* ═══ ACTUACIÓN DE MIRADA — los ojos son lo que más humaniza ═════════════════
+   Cada estado actúa TAMBIÉN con las pupilas, sincronizadas al ciclo del gesto
+   del estado (mismo período): la mirada y el cuerpo cuentan una sola cosa. */
+
+/* ESCUCHANDO — lo mira a USTED (la voz entra por la izquierda) sosteniendo el
+   contacto; a mitad del ciclo se le van los ojos un instante (procesa) y
+   vuelven. Período 4.6s = el del ladeo de cabeza. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='escuchando'] .rh-mirada {
+  animation: agt-mirada-escucha 4.6s ease-in-out infinite;
+}
+@keyframes agt-mirada-escucha {
+  0%, 44%, 100% { transform: translate(-0.5px, 0.12px); }  /* en sus ojos: lo escucha */
+  12%  { transform: translate(-0.55px, 0.22px); }          /* micro-asentimiento */
+  52%, 60% { transform: translate(-0.28px, -0.18px); }     /* procesa un instante */
+  68%  { transform: translate(-0.5px, 0.12px); }
+}
+
+/* RESPONDIENDO — conversa con los ojos: lo mira al hablar, busca la palabra
+   arriba un momento (como hace la gente) y vuelve para el remate. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='respondiendo'] .rh-mirada {
+  animation: agt-mirada-habla 3.4s ease-in-out infinite;
+}
+@keyframes agt-mirada-habla {
+  0%, 30%, 100% { transform: translate(-0.42px, 0.1px); }  /* le habla mirándolo */
+  40%, 52% { transform: translate(0.3px, -0.42px); }       /* busca la palabra arriba */
+  62%  { transform: translate(-0.42px, 0.1px); }           /* vuelve para el remate */
+  78%, 86% { transform: translate(-0.5px, 0.18px); }       /* énfasis: se acerca con los ojos */
+}
+
+/* CONTENTA — ojos achinaditos de dicha (el squint vale más que mil chispas),
+   sincronizados con el brinco (1.15s): se cierran en el salto y respiran al
+   caer. Las chapetas encendidas. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='contenta'] .rh-blink {
+  animation: agt-ojos-felices 1.15s ease-in-out infinite;
+}
+@keyframes agt-ojos-felices {
+  0%, 100% { transform: scaleY(0.72); }  /* achinaditos */
+  40%  { transform: scaleY(0.52); }      /* en el salto casi se cierran */
+  62%  { transform: scaleY(0.8); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='contenta'] .rh-rubor {
+  animation: none;
+  opacity: 0.95;
+}
+
+/* PREOCUPADA — los ojos van del problema (abajo, la finca) a usted: "¿vio?".
+   La preocupación honesta COMPARTE, no se aísla. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='preocupada'] .rh-mirada {
+  animation: agt-mirada-preocupa 3.9s ease-in-out infinite;
+}
+@keyframes agt-mirada-preocupa {
+  0%, 26%, 100% { transform: translate(0.32px, 0.5px); }  /* mira el problema */
+  36%, 46% { transform: translate(-0.5px, 0.1px); }       /* lo busca a usted: "¿vio?" */
+  56%, 84% { transform: translate(0.35px, 0.48px); }      /* vuelve al problema */
+}
+
+/* NO-SÉ — lo mira DE FRENTE mientras se encoge de hombros: la honestidad
+   sostiene la mirada, no la esquiva. Período 3.6s = el del encogimiento. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='no-se'] .rh-mirada {
+  animation: agt-mirada-nose 3.6s ease-in-out infinite;
+}
+@keyframes agt-mirada-nose {
+  0%, 8% { transform: translate(0, 0); }
+  16%, 72% { transform: translate(-0.5px, 0.15px); }  /* a sus ojos, franca, sin pena */
+  84%, 100% { transform: translate(-0.15px, 0.05px); }
+}
+
+/* SEÑALA — clava los ojos donde apunta el bracito y CHEQUEA con usted a mitad
+   del gesto ("¿sí lo ve?") — la guía de verdad confirma. Período 2.9s. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='senala'] .rh-mirada {
+  animation: agt-mirada-senala 2.9s ease-in-out infinite;
+}
+@keyframes agt-mirada-senala {
+  0%, 100% { transform: translate(0, 0); }
+  16%, 44% { transform: translate(0.6px, 0.55px); }   /* los ojos al punto señalado */
+  54%, 62% { transform: translate(-0.45px, 0.1px); }  /* chequea: "¿sí lo ve?" */
+  70%, 82% { transform: translate(0.6px, 0.55px); }   /* y de vuelta al punto */
+}
+
+/* INVITA — lo mira a usted mientras hace "venga": el convite es de frente.
+   Período 2.8s = el del gesto de la manita. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='invita'] .rh-mirada {
+  animation: agt-mirada-invita 2.8s ease-in-out infinite;
+}
+@keyframes agt-mirada-invita {
+  0%, 100% { transform: translate(-0.2px, 0.05px); }
+  12%, 64% { transform: translate(-0.55px, 0.2px); }  /* en sus ojos: "venga" */
+  78%  { transform: translate(-0.35px, 0.1px); }
+}
+
 /* ═══ LIMPIEZA DE GESTO — los estados del agente PISAN los antics internos ═══
    Una abeja pensando/preocupada/encogida no da además vueltas de campana ni
    saltitos traviesos: el gesto lee limpio (mismo criterio de creatures.css con
    mojada/sed/poses). En preocupada y no-sé se apaga TAMBIÉN el boil: sus
    señales de cara (cejas, sudor) van pegadas al cuerpo y el wrapper .agt-cuerpo
-   ya pone la emoción — nada se despega. */
+   ya pone la emoción — nada se despega. (La mirada de preocupada ya no se
+   apaga: ahora ACTÚA — va del problema a usted, arriba.) */
 [data-agt-estado='pensando'] .rh-antic, [data-agt-estado='pensando'] .rh-travieso,
 [data-agt-estado='respondiendo'] .rh-antic, [data-agt-estado='respondiendo'] .rh-travieso,
 [data-agt-estado='preocupada'] .rh-antic, [data-agt-estado='preocupada'] .rh-travieso,
-[data-agt-estado='preocupada'] .rh-mirada,
 [data-agt-estado='no-se'] .rh-antic, [data-agt-estado='no-se'] .rh-travieso,
 [data-agt-estado='invita'] .rh-antic, [data-agt-estado='invita'] .rh-travieso { animation: none; }
 [data-agt-estado='preocupada'] .rh-boil,
 [data-agt-estado='no-se'] .rh-boil { animation: none; }
+
+/* ═══ LA MIRADA QUE LO RECONOCE ([data-agt-mira='usted']) ════════════════════
+   Cuando su puntero/dedo anda cerca, Angelita LO MIRA: las pupilas siguen las
+   vars --agt-mx/--agt-my que estampa el JSX (rAF) con una sacadita elástica
+   (transition con rebase corto — ojo vivo, no cursor). Vive AL FINAL de las
+   reglas de mirada: a igual especificidad, reconocerlo a usted gana sobre la
+   actuación del estado. El JSX solo la activa en estados que lo miran
+   (acompana, escuchando, respondiendo, invita) y la suelta a los ~2s. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-mira='usted'] .rh-mirada {
+  animation: none;
+  transform: translate(var(--agt-mx, 0px), var(--agt-my, 0px));
+  transition: transform 0.16s cubic-bezier(0.3, 1.5, 0.55, 1);
+}
 
 /* ═══ GATES ══════════════════════════════════════════════════════════════════
    device-tier 'bajo': fuera lo continuo decorativo (halo animado, recuerdos,
@@ -403,6 +843,13 @@
 /* Los recuerdos en tier bajo no se hojean: se quedan en el primero, visible. */
 [data-tier='bajo'] .agt-recuerdo { opacity: 0; }
 [data-tier='bajo'] .agt-recuerdo:first-of-type { opacity: 1; }
+/* V2 en tier bajo: fuera la física continua (entrada+deriva del vuelo, la
+   mirada por estado) y el blur de alas (raster). El idle-cerebro y el
+   seguimiento de mirada ya se apagan solos en el JS con el mismo gate. */
+[data-tier='bajo'][data-agt-vivo='1'] .agt-vuelo,
+[data-tier='bajo'] .agt-mota,
+[data-tier='bajo'][data-agente='angelita'][data-agt-vivo='1'] .rh-mirada { animation: none; }
+[data-agente='angelita'][data-tier='bajo'] .crt-wing { filter: none; }
 
 @media (prefers-reduced-motion: reduce) {
   /* Fotograma digno: TODAS las señales del agente visibles pero quietas. Las
@@ -412,12 +859,33 @@
   .agt-onda-in, .agt-onda-out, .agt-chispa, .agt-sudor, .agt-alerta,
   .agt-nose-signo, .agt-poi, .agt-venga-onda,
   .agt-halo-alta, .agt-halo-media, .agt-halo-baja, .agt-duda-punto,
+  .agt-vuelo, .agt-mota,
   [data-agente='angelita'] .crt-brazo-l,
   [data-agente='angelita'] .crt-brazo-r,
+  [data-agente='angelita'] .rh-blink,
   [data-agente='angelita'] .rh-mirada { animation: none !important; }
   .agt-onda-in, .agt-onda-out, .agt-venga-onda { opacity: 0.45; }
   .agt-chispa { opacity: 0.7; transform: scale(1); }
   .agt-poi { opacity: 0.7; transform: scale(1); }
   .agt-recuerdo { opacity: 0; }
   .agt-recuerdo:first-of-type { opacity: 1; }
+  /* V2 quieta: la mota ni aparece; las alas nítidas (sin blur); el "?" del
+     no-sé ya dibujado (sin trazo animado, el signo completo y digno). El
+     idle-cerebro y el seguimiento de puntero se apagan en el JS con el mismo
+     matchMedia — aquí solo el seguro de la capa CSS. */
+  .agt-mota { opacity: 0; }
+  [data-agente='angelita'][data-agt-vivo='1'] .crt-wing { filter: none; }
+  [data-agt-vivo='1'] .agt-nose-signo path {
+    animation: none !important;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+  [data-agt-vivo='1'] .agt-nose-signo circle {
+    animation: none !important;
+    opacity: 1;
+  }
+  [data-agente='angelita'][data-agt-vivo='1'][data-agt-mira='usted'] .rh-mirada {
+    transform: none;
+    transition: none;
+  }
 }
