@@ -1,5 +1,3 @@
-/* eslint-disable react-refresh/only-export-components -- exporta el helper
-   poseDesdeArrays junto con la cámara (API del módulo de transiciones). */
 /*
  * CamaraCruce — la CÁMARA del cruce Odyssey: el viaje que hace sentir que uno
  * se MUEVE de un lugar a otro, no que la pantalla cambió.

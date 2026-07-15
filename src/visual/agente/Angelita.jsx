@@ -7,7 +7,6 @@ import {
   estadoCanonico,
   POSE_DE_ESTADO,
   ARIA_DE_ESTADO,
-  CEJAS_DE_ESTADO,
   nivelDeConfianza,
   elegirMomentoIdle,
   duracionDeMomento,
@@ -95,32 +94,6 @@ import {
  * Todos los sistemas nuevos respetan los gates: animated=false los apaga,
  * prefers-reduced-motion los apaga (JS incluido), tier 'bajo' apaga scheduler,
  * seguimiento de mirada, deriva y blur — el feedback de estado permanece.
- *
- * ═══ V3 — LA CARA VIVA (C14+C15: la cara ES el personaje) ═══════════════════
- *
- * La expresividad Miss-Minutes de la carita, SIN tocar el dibujo base: todo va
- * por CSS sobre las clases internas de los ojos (.rh-blink / .rh-mirada), que
- * viven DENTRO del cuerpo de la abeja — así la cara sigue cada squash, antic y
- * pose sin desprenderse jamás. Scoped a [data-agente='angelita']: la abeja del
- * valle y los demás bichos del kit no cambian.
- *
- * 1. OJOS ÁMBAR VIVOS (todos los estados): iris ámbar (anillo del mismo dorado
- *    del cuerpo alrededor de la pupila de tinta), ojos un pelo más grandes y
- *    la chispa del ojo (catchlight) que TITILA de vez en cuando — período
- *    co-primo con parpadeo y dardeo, nunca el mismo compás.
- * 2. PÁRPADOS POR ESTADO: pensando entrecierra (media asta, repasa memoria);
- *    escuchando parpadea MENOS (quien escucha de verdad casi no pestañea);
- *    preocupada abre los ojos y ENCOGE la pupila (la alarma se ve en el ojo
- *    antes que en el gesto) con blink doble nervioso; contenta ya achinaba.
- * 3. LA CEJITA DEL PENSAR: ceja asimétrica (una arqueada alto, la otra baja)
- *    dibujada aquí como las de preocupada/no-sé, con un tironcito sincronizado
- *    a los golpecitos de barbilla ("¿será?…"). Pensando apaga el boil interno
- *    (mismo criterio que preocupada/no-sé: nada se despega de la cara).
- * 4. LA VOZ ACOPLADA A LA BOCA: el root estampa data-agt-visema (el mismo
- *    'V1'..'V4' que ya mueve la boquita vía BocaVisema del kit); cuando el
- *    host manda visemas, las ondas de miel fluyen SOLO mientras la boca se
- *    mueve (V1 = silencio = ondas en calma). Host sin TTS: nada cambia.
- *    Y mientras conversa, las chapetas quedan encendidas — calor de vecina.
  *
  * Tier-safe: SVG + CSS transform/opacity, cero deps nuevas, cero three.
  */
@@ -224,8 +197,6 @@ function MotaDeVilano() {
  * @param {number} [props.energia]
  * @param {string|null} [props.mundoId]  su herramienta por mundo (PropEnMano).
  * @param {boolean} [props.lineBoil]  contorno que hierve (momentos heroicos).
- * @param {boolean|'poniendose'} [props.gafas]  gafas para la entrada teatral.
- * @param {string} [props.cejas]  expresión de cejas opcional.
  * @param {string} [props.title]  pisa la narración aria derivada del estado.
  */
 export function Angelita({
@@ -243,12 +214,6 @@ export function Angelita({
   energia = 1,
   mundoId = null,
   lineBoil = false,
-  /* Gafas de sol (día soleado / entrada teatral): passthrough al cuerpo.
-     false | true | 'poniendose' (la caída one-shot). */
-  gafas = false,
-  /* Cejas: si el host no manda, cada estado actúa con las SUYAS
-     (CEJAS_DE_ESTADO — el que habla hace eyebrow-flash, la contenta arquea). */
-  cejas = undefined,
   title = undefined,
   ...rest
 }) {
@@ -346,9 +311,6 @@ export function Angelita({
   // El estado tiñe el ánimo del cuerpo base (aura/antics) salvo que el host
   // mande el suyo: contenta brilla 'pleno', preocupada se pone 'atento'.
   const animoDelEstado = animo ?? (e === 'contenta' ? 'pleno' : e === 'preocupada' ? 'atento' : 'sereno');
-  // Y actúa con las CEJAS (salvo que el host mande las suyas): eyebrow-flash
-  // al hablar, arqueadas de dicha, fruncidas de concentración fisgona.
-  const cejasDelEstado = cejas !== undefined ? cejas : CEJAS_DE_ESTADO[e] ?? null;
   const aria = title ?? (ARIA_DE_ESTADO[e] + (nivel === 'baja' ? ' (con dudas)' : ''));
   // Clase de animación solo cuando está viva; quieta = opacidad digna inline.
   const cls = (c) => (vivo ? c : undefined);
@@ -416,19 +378,6 @@ export function Angelita({
       {/* una ceja arqueada y la otra tranquila: honestidad curiosa, sin pena */}
       <path d="M5.9,-5.2 Q7.3,-6.1 8.6,-5.3" />
       <path d="M9.5,-4.8 L11.3,-4.7" />
-    </g>
-  ) : null;
-  // PENSANDO — la cejita del "mmm": la cercana se arquea ALTO (persigue la
-  // idea) y la otra baja, concentrada. El CSS le da un tironcito sincronizado
-  // con los golpecitos de barbilla; con RM/quieta, la asimetría sola ya lee.
-  const caraPensando = e === 'pensando' ? (
-    <g
-      className={cls('agt-ceja-piensa')}
-      stroke={RH_INK} strokeWidth="0.8" strokeLinecap="round" fill="none"
-      aria-hidden="true"
-    >
-      <path d="M9.1,-5.4 Q10.35,-6.35 11.55,-5.45" />
-      <path d="M6.45,-4.35 L8.25,-4.6" />
     </g>
   ) : null;
 
@@ -531,22 +480,6 @@ export function Angelita({
       <path d={CHISPA_D} fill={COLOR_CERTEZA} stroke={RH_INK} strokeWidth="0.35" />
     </g>
   ) : null;
-  // HUSMEA — las virutas de olor que entran hacia su nariz (la carita vive a
-  // la derecha, x≈13): tres hilitos serpenteantes desfasados que ella persigue
-  // inclinada (el cuerpo lo pone el CSS agm-husmea-cuerpo).
-  const virutasOlor = e === 'husmea' ? (
-    <g stroke={RH_INK} strokeWidth="0.6" strokeLinecap="round" fill="none" aria-hidden="true">
-      {[[15.2, 0.6, 0], [17.1, -1.4, -0.7], [15.9, 2.8, -1.4]].map(([x, y, d], i) => (
-        <path
-          key={i}
-          className={cls('agm-olor')}
-          style={vivo ? { animationDelay: `${d}s` } : undefined}
-          opacity={vivo ? undefined : 0.55}
-          d={`M${x},${y} q1.1,-0.7 2.2,0 q1.1,0.7 2.2,0`}
-        />
-      ))}
-    </g>
-  ) : null;
   // INVITA — estelas del "venga": arcos que viajan HACIA ella.
   const estelasInvita = e === 'invita' ? (
     <g stroke={COLOR_VOZ_MIEL} strokeWidth="0.95" strokeLinecap="round" fill="none" aria-hidden="true">
@@ -586,10 +519,6 @@ export function Angelita({
       data-agente="angelita"
       data-agt-estado={e}
       data-agt-vivo={vivo ? '1' : undefined}
-      /* El visema del TTS también en el root: el CSS acopla las ondas de miel
-         al movimiento real de la boquita (V1 = silencio). Solo se estampa si
-         el host manda visemas — sin TTS, nada cambia. */
-      data-agt-visema={visema || undefined}
       data-agt-idle={idleActivo ? momento : undefined}
       data-agt-confianza={nivel || undefined}
       data-tier={tier || undefined}
@@ -612,12 +541,9 @@ export function Angelita({
             energia={energia}
             mundoId={mundoId}
             lineBoil={lineBoil}
-            gafas={gafas}
-            cejas={cejasDelEstado}
           />
           {caraPreocupada}
           {caraNoSe}
-          {caraPensando}
         </g>
       </g>
       {burbuja}
@@ -627,7 +553,6 @@ export function Angelita({
       {signoNoSe}
       {destelloPoi}
       {estelasInvita}
-      {virutasOlor}
       {mota}
     </svg>
   );

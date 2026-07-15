@@ -1,5 +1,6 @@
-import { useId } from 'react';
+import { useId, useRef } from 'react';
 import './creatures.css';
+import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
 import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, BocaVisema, Miembro, RH_INK } from './_rubberhose.jsx';
 import { RANA_PALETA, RANA_PROPORCION } from './faunaAndina.js';
@@ -65,6 +66,23 @@ export function RanaAndina({
      piel de cuerpoDeClima. tempC afina frío/calor. */
   vestuario = false,
   tempC = undefined,
+  /* ── CROA (el canto — gesto-firma NUEVO, vida v2) ──────────────────────────
+     OPT-IN: la garganta que ya late se INFLA grande dos veces con el compás
+     del canto y el cuerpo acompaña con squash de esfuerzo. La rana canta
+     plantada (el salto espera). Default false. */
+  croa = false,
+  /* ── MEDITA (zen hondo — gesto-firma NUEVO, vida v2) ───────────────────────
+     OPT-IN: los párpados caen despacio y se quedan caídos, la respiración se
+     vuelve honda y lenta — la paciente-MUY-inteligente se va para adentro.
+     Default false. */
+  medita = false,
+  /* ── VIDA PROPIA (idle-cerebro v2 — la vara de Angelita) ───────────────────
+     Default ON: un reloj con jitter hojea el repertorio de la rana (croa,
+     medita, reposa) — la sabia del agua EXISTE aunque nadie le hable. Cada
+     instancia parpadea a SU aire y sus pupilas SIGUEN su puntero/dedo cerca.
+     El cerebro CEDE ante el host; animated=false, tier 'bajo' y
+     reduced-motion lo apagan entero. vida={false} = la rana de antes. */
+  vida = true,
   /* Device-tier: 'alto'|'medio' corren la cadencia zen plena; 'bajo' apaga lo
      continuo (boil + garganta + salto + follow-through) y deja los estados
      reactivos. Sin prop (standalone: avatares, catálogo) = pleno. El CSS gatea
@@ -98,6 +116,16 @@ export function RanaAndina({
   const vivo = animated;
   const auraOp = Math.max(0.14, Math.min(0.44, 0.18 + 0.28 * (energia ?? 1)));
   const auraR = 7.6 + 1.4 * (energia ?? 1);
+
+  // ═══ VIDA PROPIA (idle-cerebro + ritmo propio + mirada — vara Angelita v2).
+  const raizRef = useRef(null);
+  const ritmoPropio = useRitmoPropio();
+  const enBase = pose === 'anda' && !croa && !medita && !visema;
+  const momento = useVidaIdle('rana-andina', vida && vivo && tier !== 'bajo' && enBase);
+  useMiradaUsted(raizRef, vida && vivo && tier !== 'bajo');
+  const croaFx = croa || momento === 'croa';
+  const meditaFx = medita || momento === 'medita';
+  const poseFx = momento === 'reposo' ? 'reposo' : pose;
 
   // CLIMA → cuerpo (perfil rana). Sin clima = neutro digno.
   const cuerpoClima = cuerpoDeClima(clima, { enso: /** @type {any} */ (enso), tier, perfil: PERFIL_RANA });
@@ -213,29 +241,35 @@ export function RanaAndina({
 
   const estadoAttrs = {
     'data-creature': 'rana-andina',
-    'data-pose': vivo ? pose : undefined,
+    'data-pose': vivo ? poseFx : undefined,
     'data-animo': animo,
     'data-tier': tier || undefined,
     'data-visema': visema || undefined,
     'data-ruana': ropa?.ruana ? '1' : undefined,
     'data-sombrero': ropa?.sombrero ? '1' : undefined,
     'data-sudor': ropa?.sudor ? '1' : undefined,
+    'data-croa': croaFx ? '1' : undefined,
+    'data-medita': meditaFx ? '1' : undefined,
+    'data-vida': momento || undefined,
     'data-lineboil': lineBoil ? '1' : undefined,
     'data-prop': mundoId || undefined,
   };
+
+  // El ritmo propio (parpadeo/dardeo por instancia) viaja como vars CSS.
+  const estiloRaiz = { ...ritmoPropio, ...estiloClima };
 
   if (inline) {
     // En modo inline el power-up lo pone el host DOM (::before/mix-blend no
     // aplican a SVG); acá solo marcamos data-poder por si el host lo consulta.
     return (
-      <g className={className} style={estiloClima} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
+      <g ref={raizRef} className={className} style={estiloRaiz} data-poder={poder ? '1' : undefined} {...estadoAttrs}>
         {defs}
         {cuerpoVivo}
       </g>
     );
   }
   const svg = (
-    <svg viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloClima}
+    <svg ref={raizRef} viewBox={VIEWBOX} width={size} height={size} className={className} style={estiloRaiz}
       role="img" aria-label={title} {...estadoAttrs} {...rest}>
       <title>{title}</title>
       {defs}

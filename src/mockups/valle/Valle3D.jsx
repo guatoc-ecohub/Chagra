@@ -47,8 +47,11 @@ import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
 import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
 import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
 import AnimalesDeFinca, { MATERIAL_FINCA } from './animales.jsx';
+/* Cultivos REALISTAS de la finca (feedback del operador: "el maíz que parezca
+   maíz"): milpa y cafetal fusionados con color horneado — 1 draw-call cada uno. */
+import { geomMilpa, geomCafetal } from '../../visual/mundo3d/finca/fincaRealista.geom.js';
 /* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
-   (roble, aliso, gaque) que ya viven en floraParamo — cada árbol se distingue. */
+   (roble, aliso, gaque) que ya viven en floraParamo. */
 import { geomRoble, geomAliso, geomGaque } from '../../visual/mundo3d/bosque/floraParamo.geom.js';
 /* Luciérnagas de la noche: el kit instanciado que ya existe (1-3 draw calls),
    sembrado sobre la tierra baja del valle cuando la franja las trae. */
@@ -299,10 +302,9 @@ function Quebrada({ color, viva, perfil, nocturno = false }) {
 }
 
 /* ── La arboleda POR ESPECIE del landmark 'bosque': roble andino (copa ancha
-      oscura), aliso (cónico de tronco claro) y gaque (domo bajo lustroso) —
-      cada árbol se distingue, nada de conos genéricos. Las mallas son las de
-      floraParamo (color horneado por vértice, 1 draw call por árbol); escala
-      ~0.5 para el diorama. `q` baja el detalle en perfil frugal. ── */
+      oscura con bellotas), aliso (cónico de tronco claro) y gaque (domo bajo
+      lustroso) — cada árbol se distingue, nada de conos genéricos. Las mallas
+      son las de floraParamo (color horneado); escala ~0.5 para el diorama. ── */
 const SITIOS_ARBOLEDA = [
   { geom: geomRoble, args: [-0.55, 0, 0.15], esc: 0.52, rot: 0.8, seed: 91 },
   { geom: geomAliso, args: [0.45, 0, -0.35], esc: 0.5, rot: 2.1, seed: 92 },
@@ -321,7 +323,7 @@ function ArboledaEspecies({ q }) {
           key={i}
           geometry={a.geo}
           material={MATERIAL_FINCA}
-          position={/** @type {[number, number, number]} */ (a.args)}
+          position={a.args}
           rotation={[0, a.rot, 0]}
           scale={a.esc}
           castShadow
@@ -331,143 +333,20 @@ function ArboledaEspecies({ q }) {
   );
 }
 
-/* ── Materiales/paletas de cada landmark de mundo, por `tipo`. Formas
-      redondeadas (cilindros, conos, esferas) — pocas piezas por lugar para
-      dejar aire. La arboleda va por especie (mallas de floraParamo); `q` baja
+/* ── Materiales/paletas de cada landmark de mundo, por `tipo`. Los cultivos y
+      animales de la finca van REALISTAS (fincaRealista.geom: mallas fusionadas
+      con color horneado); el resto sigue en primitivas redondeadas. `q` baja
       el detalle geométrico en perfil frugal. ── */
 function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
   const [fuerte, suave] = tinte;
   switch (tipo) {
-    case 'milpa': // LA PARCELA VIVA (estilo granja de Age of Empires, en modo
-      // milpa): la tierra labrada como base, y encima las TRES HERMANAS
-      // juntas — maíz (caña con penacho), fríjol (bejuco enroscado a la
-      // caña) y calabaza (frutos naranjas con su hoja ancha tapando el
-      // suelo). Se lee POLICULTIVO de un vistazo: nada de hileras clonadas.
+    case 'milpa': // el maíz REAL: caña con nudos, hojas arqueadas, mazorca y penacho
       return (
-        <group>
-          {/* la tierra labrada de la parcela (la "granja" que se lee de lejos) */}
-          <mesh position={[0, 0.045, 0]} receiveShadow>
-            <boxGeometry args={[2.1, 0.09, 1.7]} />
-            <meshStandardMaterial color="#5f4429" flatShading roughness={1} />
-          </mesh>
-          {/* surcos suaves (dos lomos que cruzan la parcela) */}
-          {[-0.45, 0.35].map((dz, i) => (
-            <mesh key={i} position={[0, 0.09, dz]} rotation={[0, 0, Math.PI / 2]}>
-              <capsuleGeometry args={[0.06, 1.85, 3, 6]} />
-              <meshStandardMaterial color="#6b4e30" flatShading roughness={1} />
-            </mesh>
-          ))}
-          {/* el maíz con su fríjol trepado (quincunce, alturas variadas) */}
-          {[
-            [-0.75, -0.5, 1.35], [-0.1, -0.25, 1.5], [0.6, -0.55, 1.25],
-            [-0.45, 0.25, 1.45], [0.3, 0.4, 1.3],
-          ].map(([dx, dz, h], i) => (
-            <group key={i} position={[dx, 0.08, dz]}>
-              <mesh position={[0, h / 2, 0]} castShadow>
-                <cylinderGeometry args={[0.045, 0.075, h, 6]} />
-                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-              </mesh>
-              {/* hojas de la caña */}
-              <mesh position={[0.15, h * 0.62, 0]} rotation={[0, 0, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.11, 0.46, 4]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              <mesh position={[-0.15, h * 0.44, 0]} rotation={[0, Math.PI, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.11, 0.46, 4]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              {/* el penacho */}
-              <mesh position={[0, h + 0.16, 0]}>
-                <coneGeometry args={[0.07, 0.36, 6]} />
-                <meshStandardMaterial color="#e7c96b" flatShading />
-              </mesh>
-              {/* el FRÍJOL enroscado a la caña (dos vueltas del bejuco) */}
-              <mesh position={[0, h * 0.3, 0]} rotation={[Math.PI / 2.3, 0, 0.2]}>
-                <torusGeometry args={[0.1, 0.028, 5, 10]} />
-                <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
-              </mesh>
-              <mesh position={[0.02, h * 0.55, 0]} rotation={[Math.PI / 1.9, 0, -0.3]}>
-                <torusGeometry args={[0.09, 0.026, 5, 10]} />
-                <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
-              </mesh>
-            </group>
-          ))}
-          {/* las CALABAZAS tapando el suelo entre matas (fruto + hoja ancha) */}
-          {[[-0.55, 0.75], [0.15, 0.85], [0.75, 0.1], [-0.85, 0.05]].map(([dx, dz], i) => (
-            <group key={i} position={[dx, 0.09, dz]}>
-              <mesh position={[0, 0.09, 0]} scale={[1, 0.72, 1]} castShadow>
-                <sphereGeometry args={[0.14, 9, 7]} />
-                <meshStandardMaterial color="#d98e2b" flatShading roughness={1} />
-              </mesh>
-              <mesh position={[0, 0.16, 0]}>
-                <cylinderGeometry args={[0.018, 0.025, 0.07, 5]} />
-                <meshStandardMaterial color="#4f7a3a" flatShading />
-              </mesh>
-              {/* la hoja ancha que cubre el suelo */}
-              <mesh position={[0.18, 0.06, 0.1]} rotation={[-Math.PI / 2.2, 0, 0.6]} scale={[1, 1, 0.5]}>
-                <circleGeometry args={[0.16, 7]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} side={2} />
-              </mesh>
-            </group>
-          ))}
-        </group>
+        <mesh geometry={geomMilpa({ q, matas: q > 0.6 ? 6 : 4 })} material={MATERIAL_FINCA} castShadow />
       );
-    case 'cafetal': // café CON SOMBRÍO (policultivo, no hilera): los arbustos
-      // cargados de cereza roja DEBAJO de su guamo de sombra y con una mata
-      // de plátano al lado — el trío clásico del cafetal campesino.
+    case 'cafetal': // cafetos de verdad: pisos de ramas, hoja oscura y cereza roja
       return (
-        <group>
-          {/* el GUAMO de sombrío: tronco alto + copa ancha y plana encima */}
-          <group position={[-0.15, 0, -0.1]}>
-            <mesh position={[0, 0.8, 0]} castShadow>
-              <cylinderGeometry args={[0.07, 0.1, 1.6, 6]} />
-              <meshStandardMaterial color="#6b4a2e" flatShading roughness={1} />
-            </mesh>
-            <mesh position={[0, 1.7, 0]} scale={[1, 0.34, 1]} castShadow>
-              <sphereGeometry args={[1.05, 10, 8]} />
-              <meshStandardMaterial color="#3f7a38" flatShading roughness={1} />
-            </mesh>
-          </group>
-          {/* la mata de plátano acompañante (pseudotallo + hojas colgantes) */}
-          <group position={[0.85, 0, -0.45]}>
-            <mesh position={[0, 0.5, 0]} castShadow>
-              <cylinderGeometry args={[0.08, 0.12, 1.0, 7]} />
-              <meshStandardMaterial color="#7a9a55" flatShading roughness={1} />
-            </mesh>
-            {[0, 1, 2, 3].map((k) => (
-              <mesh
-                key={k}
-                position={[0, 0.95, 0]}
-                rotation={[0, (k / 4) * Math.PI * 2 + 0.4, -0.9]}
-                scale={[1, 1, 0.28]}
-                castShadow
-              >
-                <coneGeometry args={[0.2, 0.85, 4]} />
-                <meshStandardMaterial color="#4f9a44" flatShading roughness={1} />
-              </mesh>
-            ))}
-          </group>
-          {/* los arbustos de café bajo la sombra, con su cereza roja */}
-          {[[-0.6, 0.35], [0.05, 0.15], [0.5, 0.55], [-0.2, 0.7]].map(([dx, dz], i) => (
-            <group key={i} position={[dx, 0, dz]}>
-              <mesh position={[0, 0.16, 0]}>
-                <cylinderGeometry args={[0.05, 0.07, 0.32, 6]} />
-                <meshStandardMaterial color="#6b4a2e" flatShading />
-              </mesh>
-              <mesh position={[0, 0.44, 0]} castShadow>
-                <sphereGeometry args={[0.3, 10, 9]} />
-                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-              </mesh>
-              {/* la cereza madura que pinta el arbusto */}
-              {[[0.16, 0.5, 0.16], [-0.14, 0.42, 0.18], [0.05, 0.6, -0.2]].map(([bx, by, bz], j) => (
-                <mesh key={j} position={[bx, by, bz]}>
-                  <sphereGeometry args={[0.035, 6, 5]} />
-                  <meshBasicMaterial color="#c9392e" />
-                </mesh>
-              ))}
-            </group>
-          ))}
-        </group>
+        <mesh geometry={geomCafetal({ q })} material={MATERIAL_FINCA} castShadow />
       );
     case 'era': // eras del semillero: camellones redondeados (lomos de tierra)
       return (
@@ -505,7 +384,7 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
           ))}
         </group>
       );
-    case 'animales': // los animales de la finca (reemplaza la vieja casita)
+    case 'animales': // el hato realista por raza (vaca, cerdos, gallinas, perro)
       return <AnimalesDeFinca reducedMotion={reducedMotion} q={q} />;
     case 'huerta': // camas de la huerta: lomos redondeados con matas
       return (

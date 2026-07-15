@@ -33,10 +33,7 @@
    no es de cuarzo). El TEMPERAMENTO va en el compás: los nerviosos (ardilla,
    colibrí) gesticulan seguido; los lentos (morrocoy, perezoso) casi nunca. */
 export const VIDA_REPERTORIO = {
-  /* Tremarctos ornatus. El slug vivo del registro es 'oso-guardian'; los dibujos
-     archivados ('oso-andino' el café, 'oso-anteojos') siguen leyendo esta misma
-     fila por alias más abajo: MISMA especie, mismo temperamento lento. */
-  'oso-guardian': {
+  'oso-andino': {
     descanso: [4200, 9800],
     momentos: {
       resopla: { dur: 4500, peso: 2 }, // 3× oso-resoplido 1.5s · 5× oso-cejas-frunce 0.9s
@@ -97,22 +94,6 @@ export const VIDA_REPERTORIO = {
     momentos: {
       olfatea: { dur: 3300, peso: 2.5 }, // 6× borugo-olfateo 0.55s · 3× orejas 1.1s
       acurruca: { dur: 4600, peso: 1 }, // 1× borugo-acurruca 4.6s — el corazón del cierre
-      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo
-    },
-  },
-  dalmata: {
-    descanso: [2600, 6400], // perro joven: gesticula seguido, casi no se aquieta
-    momentos: {
-      menea: { dur: 3000, peso: 2.5 }, // 6× dalmata-cola-feliz 0.5s · 6× grupa 0.5s
-      ladea: { dur: 2400, peso: 2 }, // 1× dalmata-ladeo 2.4s · 2× orejas-perk 1.2s
-      reposo: { dur: 4400, peso: 0.8 }, // 1× rh-g-reposo — descansa POCO
-    },
-  },
-  beagle: {
-    descanso: [3400, 8200], // sabueso paciente: entre rastro y rastro, calma
-    momentos: {
-      olfatea: { dur: 3300, peso: 2.5 }, // 3× beagle-olfateo-cabeza 1.1s · 6× trufa 0.55s
-      aulla: { dur: 2600, peso: 1 }, // 1× beagle-aullido-cabeza 2.6s — raro y entrañable
       reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo
     },
   },

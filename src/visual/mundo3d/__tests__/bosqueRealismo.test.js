@@ -31,7 +31,7 @@ import {
   BARBA,
 } from '../bosque/entQuenua.geom.js';
 import {
-  geomFrailejon, geomEncenillo, geomAliso, geomGaque,
+  geomFrailejon, geomQuenua, geomEncenillo, geomAliso, geomGaque,
   geomRoble, geomYarumo, geomMortino, geomRomerillo, geomRoca, geomMusgo,
   distribucionFlora, floraDeTier, calidadDeTier,
 } from '../bosque/floraParamo.geom.js';
@@ -161,6 +161,7 @@ describe('LAS MATAS ya no son árboles de navidad', () => {
   const especies = {
     frailejon: (q) => geomFrailejon({ flor: false, q }, 1),
     frailejonFlor: (q) => geomFrailejon({ flor: true, q }, 2),
+    quenua: (q) => geomQuenua({ q }, 3),
     encenillo: (q) => geomEncenillo({ q }, 4),
     aliso: (q) => geomAliso({ q }, 5),
     gaque: (q) => geomGaque({ q }, 6),

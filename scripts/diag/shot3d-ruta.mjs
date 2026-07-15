@@ -46,34 +46,6 @@ page.on('console', (m) => {
   if (m.type() === 'error') errores.push(`[console] ${m.text()}`);
 });
 
-// Sesión falsa para pasar el gate de login (isAuthenticated lee localforage:
-// farmos_access_token + expiry futuro bastan, no hay red de por medio).
-// localforage usa IndexedDB: default 'localforage/keyvaluepairs' y la app
-// clásica 'Chagra/syncQueue' — se siembra en ambas antes de cargar la app.
-await page.addInitScript(() => {
-  const sembrar = (db, store) =>
-    new Promise((res) => {
-      const req = indexedDB.open(db, 2);
-      req.onupgradeneeded = () => {
-        try { req.result.createObjectStore(store); } catch { /* ya existe */ }
-      };
-      req.onsuccess = () => {
-        try {
-          const tx = req.result.transaction(store, 'readwrite');
-          const st = tx.objectStore(store);
-          st.put('shot3d-token-diagnostico', 'farmos_access_token');
-          st.put(Date.now() + 86400000, 'farmos_token_expiry');
-          tx.oncomplete = () => res(undefined);
-          tx.onerror = () => res(undefined);
-        } catch { res(undefined); }
-      };
-      req.onerror = () => res(undefined);
-    });
-  // fire-and-forget: corre antes del primer script de la app
-  sembrar('localforage', 'keyvaluepairs');
-  sembrar('Chagra', 'syncQueue');
-});
-
 const shell = getFlag('shell', '/index-prod.html');
 await page.goto(`${base}${shell}#${ruta}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
 await page.waitForTimeout(wait);
@@ -97,21 +69,7 @@ const info = await page.evaluate(() => {
 
 const clipArg = getFlag('clip', null); // "x,y,w,h" en px del viewport
 const clip = clipArg ? (() => { const [x, y, w, h] = clipArg.split(',').map(Number); return { x, y, width: w, height: h }; })() : undefined;
-// --serie "0,12000,30000": esperas ADICIONALES acumulativas tras `wait`, una
-// captura por parada EN LA MISMA SESIÓN (out-1.png, out-2.png…) — para probar
-// movimiento real: fauna que entra y sale, gestos que cambian con el tiempo.
-const serieArg = getFlag('serie', null);
-if (serieArg) {
-  const paradas = serieArg.split(',').map(Number);
-  for (let i = 0; i < paradas.length; i++) {
-    if (i > 0) await page.waitForTimeout(paradas[i] - paradas[i - 1]);
-    const f = out.replace(/\.png$/, `-${i + 1}.png`);
-    await page.screenshot({ path: f, timeout: 120000, animations: 'disabled', ...(clip ? { clip } : {}) });
-    console.log(`[shot3d] serie ${i + 1}/${paradas.length} t=+${paradas[i]}ms → ${f}`);
-  }
-} else {
-  await page.screenshot({ path: out, timeout: 120000, animations: 'disabled', ...(clip ? { clip } : {}) });
-}
+await page.screenshot({ path: out, timeout: 120000, animations: 'disabled', ...(clip ? { clip } : {}) });
 console.log(`[shot3d] ruta=${ruta} out=${out} canvas=${JSON.stringify(info)}`);
 if (errores.length) console.log(`[shot3d] ERRORES:\n${errores.slice(0, 12).join('\n')}`);
 else console.log('[shot3d] sin errores de consola');
