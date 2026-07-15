@@ -53,7 +53,7 @@ const PROF_CUT = 1.7;
 const CARA = PROF_CUT / 2; // el plano frontal expuesto del corte
 
 /* Dónde se planta la vitrina de suelo, al lado del Ent (donde apunta su mano). */
-const CORTE_POS = [2.5, 0, 1.9];
+const CORTE_POS = /** @type {[number, number, number]} */ ([2.5, 0, 1.9]);
 
 /*
  * LAS CAPAS del suelo, de arriba abajo — la lección. `alto` en metros-escena,
@@ -61,12 +61,24 @@ const CORTE_POS = [2.5, 0, 1.9];
  * (Grounded: hojarasca que abriga, humus vivo, zona de raíces, la red de hongos
  * que reparte, y la roca madre de donde nace la tierra.)
  */
+/*
+ * OJO CON LOS COLORES: la primera versión pintaba el humus '#241611' y las
+ * micorrizas '#140f0c' — casi negro puro. Con la luz del páramo (cenital y
+ * difusa) la cara frontal del corte no recibe casi nada, y la vitrina entera se
+ * veía como un AGUJERO NEGRO: la lección existía y era imposible de leer. Ese
+ * era, literalmente, el *"no veo la lección del subsuelo"* del operador.
+ *
+ * La tierra real, iluminada, NO es negra: es parda. Estos tonos siguen siendo
+ * oscuros y siguen dejando brillar la red micorrízica, pero se VEN. Y la banda
+ * de las micorrizas se mantiene la más oscura a propósito, para que el
+ * bioluminiscente resalte contra ella.
+ */
 const CAPAS = [
-  { id: 'hojarasca', nombre: 'Hojarasca', alto: 0.42, color: '#6e4a2a', hint: 'Las hojas caídas que abrigan y alimentan el suelo.' },
-  { id: 'humus', nombre: 'Humus', alto: 0.95, color: '#241611', hint: 'Tierra negra viva: lombrices y bacterias hacen el alimento.' },
-  { id: 'raices', nombre: 'Zona de raíces', alto: 1.15, color: '#3a2618', hint: 'Aquí las matas beben agua y minerales.' },
-  { id: 'micorrizas', nombre: 'Red micorrízica', alto: 1.35, color: '#140f0c', hint: 'El internet de hongos: reparte comida entre las plantas.' },
-  { id: 'roca', nombre: 'Roca madre', alto: 0.92, color: '#4b4a52', hint: 'La piedra de donde, poco a poco, nace la tierra.' },
+  { id: 'hojarasca', nombre: 'Hojarasca', alto: 0.42, color: '#8a6038', hint: 'Las hojas caídas que abrigan y alimentan el suelo.' },
+  { id: 'humus', nombre: 'Humus', alto: 0.95, color: '#4a3325', hint: 'Tierra negra viva: lombrices y bacterias hacen el alimento.' },
+  { id: 'raices', nombre: 'Zona de raíces', alto: 1.15, color: '#63492f', hint: 'Aquí las matas beben agua y minerales.' },
+  { id: 'micorrizas', nombre: 'Red micorrízica', alto: 1.35, color: '#33261c', hint: 'El internet de hongos: reparte comida entre las plantas.' },
+  { id: 'roca', nombre: 'Roca madre', alto: 0.92, color: '#6d6b78', hint: 'La piedra de donde, poco a poco, nace la tierra.' },
 ];
 
 const DUR_CAPA = 3.6; // segundos que el Ent "enseña" cada capa
@@ -123,6 +135,7 @@ function redDeBanda(alto, tier) {
 
 /* La malla de la red (un draw-call, aditiva, respira). */
 function RedMicelio({ geo, reducedMotion }) {
+  const meshRef = useRef(null);
   const mat = useMemo(
     () => new THREE.MeshBasicMaterial({
       vertexColors: true, transparent: true, opacity: 0.92,
@@ -132,11 +145,13 @@ function RedMicelio({ geo, reducedMotion }) {
   );
   useLayoutEffect(() => () => mat.dispose(), [mat]);
   useFrame((st) => {
-    if (reducedMotion) return;
-    mat.opacity = 0.84 + Math.sin(st.clock.elapsedTime * 0.9) * 0.1;
+    if (reducedMotion || !meshRef.current) return;
+    // Vía el ref de la malla: mutar el material del useMemo directamente está
+    // prohibido (valor capturado), y por el ref es el mismo objeto.
+    meshRef.current.material.opacity = 0.84 + Math.sin(st.clock.elapsedTime * 0.9) * 0.1;
   });
   if (!geo) return null;
-  return <mesh geometry={geo} material={mat} frustumCulled={false} />;
+  return <mesh ref={meshRef} geometry={geo} material={mat} frustumCulled={false} />;
 }
 
 /* Los NODOS del micelio (arbúsculos/nodos/esporas), instanciados. */
@@ -254,7 +269,9 @@ function DetalleCapa({ capa, alto, red, reducedMotion }) {
   if (capa.id === 'hojarasca') {
     // hojitas caídas sobre la cara (flecos ocres)
     const hojas = Array.from({ length: 10 }, (_, i) => ({
-      key: i, pos: [(r() - 0.5) * (ANCHO_CUT - 0.4), (r() - 0.5) * alto * 0.6, CARA - 0.02], giro: r() * Math.PI,
+      key: i,
+      pos: /** @type {[number, number, number]} */ ([(r() - 0.5) * (ANCHO_CUT - 0.4), (r() - 0.5) * alto * 0.6, CARA - 0.02]),
+      giro: r() * Math.PI,
     }));
     return (
       <group>
@@ -309,7 +326,9 @@ function DetalleCapa({ capa, alto, red, reducedMotion }) {
   if (capa.id === 'roca') {
     // roca madre: pedruscos facetados grises embebidos
     const rocas = Array.from({ length: 6 }, (_, i) => ({
-      key: i, pos: [(r() - 0.5) * (ANCHO_CUT - 0.4), (r() - 0.5) * alto * 0.7, CARA - 0.05], esc: 0.14 + r() * 0.16,
+      key: i,
+      pos: /** @type {[number, number, number]} */ ([(r() - 0.5) * (ANCHO_CUT - 0.4), (r() - 0.5) * alto * 0.7, CARA - 0.05]),
+      esc: 0.14 + r() * 0.16,
     }));
     return (
       <group>
@@ -360,7 +379,7 @@ function Capa({ capa, activa, red, reducedMotion }) {
 
 /* La VITRINA de suelo completa + la LECCIÓN (qué capa está enseñando el Ent). */
 function CorteSuelo({ tier, reducedMotion }) {
-  const capas = useMemo(centrosCapas, []);
+  const capas = useMemo(() => centrosCapas(), []);
   const bandaMic = useMemo(() => capas.find((c) => c.id === 'micorrizas'), [capas]);
   const red = useMemo(() => redDeBanda(bandaMic.alto, tier), [bandaMic.alto, tier]);
   useLayoutEffect(() => () => red.geo?.dispose(), [red]);
@@ -411,12 +430,26 @@ function Diorama({ tier, reducedMotion }) {
         shadow-camera-bottom={-8}
       />
       <directionalLight position={[-5, 6, -6]} intensity={0.4} color="#b9cdd6" />
+      {/*
+        LUZ DE VITRINA — la clave para que la lección se vea. El sol del páramo
+        viene de arriba, así que la CARA FRONTAL del corte (que mira al +Z, a la
+        cámara) quedaba a contraluz y en sombra: la tierra se leía negra y las
+        capas no existían. Esta luz frontal, casi horizontal, es la que "abre" la
+        vitrina. No castea sombras: es relleno puro y barato.
+      */}
+      <directionalLight
+        position={[CORTE_POS[0] + 1, 1.5, CORTE_POS[2] + 12]}
+        intensity={1.05}
+        color="#f0ead8"
+      />
       {/* relleno cálido bajo tierra: da cuerpo a la red y a las capas */}
       <pointLight position={[CORTE_POS[0], -1.6, CORTE_POS[2] + 1]} intensity={0.6} color="#37d6b0" distance={9} decay={2} />
+      {/* segundo relleno abajo del todo: la roca madre no puede caer a negro */}
+      <pointLight position={[CORTE_POS[0], -4.2, CORTE_POS[2] + 2.5]} intensity={0.5} color="#cfd6dd" distance={7} decay={2} />
 
       {/* parche de musgo del páramo bajo el Ent */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-        <circleGeometry args={[3.0, 32]} />
+        <circleGeometry args={[4.2, 32]} />
         <meshLambertMaterial color={PARAMO.musgo} />
       </mesh>
       {/* apron de tierra que lleva del musgo a la vitrina de suelo */}
@@ -433,11 +466,11 @@ function Diorama({ tier, reducedMotion }) {
 
       <OrbitControls
         makeDefault
-        target={[1.5, -0.2, 0.9]}
+        target={[1.5, -1.5, 1.1]}
         enablePan={false}
         enableZoom
-        minDistance={7}
-        maxDistance={22}
+        minDistance={9}
+        maxDistance={26}
         minPolarAngle={0.5}
         maxPolarAngle={1.52}
         enableDamping
@@ -466,7 +499,7 @@ export default function EscenaEntMaestro({ tier = 'alto', reducedMotion = false 
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
         shadows={perfil.sombras ? 'soft' : false}
-        camera={{ position: [4.5, 2.0, 14], fov: 46 }}
+        camera={{ position: [3.4, 0.2, 14.6], fov: 46 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
