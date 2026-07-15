@@ -69,11 +69,8 @@ export function franjaViva(h) {
   if (x < 6) return 'madrugada';
   if (x < 11) return 'manana';
   if (x < 15) return 'mediodia';
-  /* Crepúsculo ecuatorial CORTO (misma verdad que franjaDeHoraDecimal): el
-     sol se esconde ~18:00-18:15 todo el año y a las 18:40 ya es noche —
-     el atardecer andino es una franja breve, no una hora europea. */
-  if (x < 17.5) return 'tarde';
-  if (x < 18.6) return 'atardecer';
+  if (x < 18) return 'tarde';
+  if (x < 19) return 'atardecer';
   return 'noche';
 }
 
