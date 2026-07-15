@@ -1,0 +1,332 @@
+/*
+ * olor.css — el vestido del control.
+ *
+ * Sobrio a propósito: la protagonista es la cochera, no el widget. Nada brilla,
+ * nada pulsa, nada felicita.
+ *
+ * NI UN ROJO DE ALARMA. En la paleta de la casa el rojo es cochinilla y café
+ * cereza —textil y fruto—, nunca "rojo catástrofe de UI". Y acá eso además es
+ * de fondo: pintar de rojo la cochera del que mira sería exactamente el regaño
+ * que la pieza evita. Cuando algo va mal, se dice en ÁMBAR (la señal amable de
+ * la casa, `ACENTOS.ambar`); cuando va bien, en el verde de trabajo. Y el único
+ * ámbar cargado es el de la fosa, porque ahí sí se muere gente.
+ *
+ * El riel se llena del color del MATERIAL SECO (la vega clara del aserrín y la
+ * cascarilla), no de un verde de "correcto". Uno no está completando una barra
+ * de progreso: está echando cascarilla.
+ *
+ * Blancos sobre un velo oscuro: la escena de atrás va de un aire turbio a una
+ * tarde de finca limpia, así que el panel no puede depender del fondo.
+ *
+ * Blancos de toque de 44px para mano de campo (guante, barro, sol en la
+ * pantalla).
+ */
+
+/* ----------------------------------------------------------- la pieza --- */
+
+/*
+ * El cuadro: la cochera arriba, la palada abajo. Nada más. Sin marco, sin
+ * título, sin botonera — el que llega ve una cochera y un deslizador, y eso ya
+ * es una pregunta.
+ */
+.olor {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 22rem;
+  overflow: hidden;
+  background: #ecdcc2; /* = CIELOS.corral.fondo: la tarde de finca, mientras carga */
+}
+
+.olor__lienzo {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.olor__lienzo canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* La escena entra con un fundido corto: nunca un salto en negro. */
+.olor-canvas {
+  opacity: 0;
+  transition: opacity 0.45s ease-out;
+}
+
+.olor-canvas--lista {
+  opacity: 1;
+}
+
+/* Mientras baja three: el fondo de la tarde de finca, quieto. Sin "Cargando…",
+   sin spinner. La cochera va a estar ahí en un segundo. */
+.olor__esperando {
+  position: absolute;
+  inset: 0;
+  background: #ecdcc2;
+}
+
+/* El corte de perfil (gama baja): ocupa el lienzo completo, respirando. */
+.ol__corte {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ---------------------------------------------------------- el control --- */
+
+.ol {
+  /* Los tokens, derivados de la paleta madre — ni un hex de gusto propio.
+     ámbar = ACENTOS.ambar (#d9a13b) · verde = VERDES.trabajo (#5f8a3f)
+     seco  = TIERRAS.vega  (#c9b593) · tinta = NEUTROS.tinta  (#241a10) */
+  --ol-tinta: 250 248 240;
+  --ol-tenue: rgb(250 248 240 / 0.62);
+  --ol-linea: rgb(250 248 240 / 0.22);
+  --ol-ambar: 217 161 59;
+  --ol-verde: 122 154 63;
+  --ol-seco: 201 181 147;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.9rem 1.05rem 0.8rem;
+  color: rgb(var(--ol-tinta));
+  /* Pardo cálido, no gris de app: esto pasa en una finca. */
+  background: linear-gradient(to top, rgb(26 20 14 / 0.88), rgb(26 20 14 / 0.64));
+  backdrop-filter: blur(7px);
+  border-top: 1px solid var(--ol-linea);
+  font-family: inherit;
+}
+
+/* ---------------------------------------------------------------- cabeza --- */
+
+.ol__cabeza {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.ol__titulo {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.ol__texto {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--ol-tenue);
+  max-width: 46ch;
+}
+
+/* ------------------------------------------------------------------ riel --- */
+
+.ol__riel {
+  position: relative;
+  height: 44px; /* mano de campo */
+  display: flex;
+  align-items: center;
+}
+
+.ol__pista {
+  position: absolute;
+  inset-inline: 0;
+  height: 6px;
+  border-radius: 3px;
+  background: rgb(250 248 240 / 0.16);
+  overflow: visible;
+}
+
+/* Lo lleno es el material seco: cascarilla, aserrín. No un verde de aprobado. */
+.ol__seco {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(to right, rgb(var(--ol-seco) / 0.55), rgb(var(--ol-seco)));
+  transition: width 0.08s linear;
+}
+
+.ol__hito {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 10px;
+  margin-left: -1px;
+  transform: translateY(-50%);
+  background: rgb(250 248 240 / 0.34);
+  border-radius: 1px;
+}
+
+/* El input de verdad, invisible encima del riel dibujado. */
+.ol__input {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.ol__input:focus-visible {
+  outline: 2px solid rgb(var(--ol-ambar));
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.ol__input::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgb(var(--ol-seco));
+  border: 2px solid rgb(26 20 14 / 0.5);
+  box-shadow: 0 1px 5px rgb(0 0 0 / 0.4);
+  cursor: grab;
+}
+
+.ol__input::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgb(var(--ol-seco));
+  border: 2px solid rgb(26 20 14 / 0.5);
+  box-shadow: 0 1px 5px rgb(0 0 0 / 0.4);
+  cursor: grab;
+}
+
+.ol__input:active::-webkit-slider-thumb {
+  cursor: grabbing;
+}
+
+.ol__input::-webkit-slider-runnable-track,
+.ol__input::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
+/* --------------------------------------------------------------- paradas --- */
+
+.ol__paradas {
+  position: relative;
+  height: 1.9rem;
+}
+
+.ol__parada {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  padding: 0.2rem 0.4rem;
+  min-width: 44px;
+  min-height: 30px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ol-tenue);
+  font: inherit;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* Las de los extremos no se salen del panel. */
+.ol__parada:first-child {
+  transform: translateX(-8%);
+}
+
+.ol__parada:last-child {
+  transform: translateX(-92%);
+}
+
+.ol__parada:hover {
+  color: rgb(var(--ol-tinta));
+}
+
+.ol__parada--aqui {
+  color: rgb(var(--ol-tinta));
+  background: rgb(250 248 240 / 0.1);
+}
+
+.ol__parada:focus-visible {
+  outline: 2px solid rgb(var(--ol-ambar));
+  outline-offset: 1px;
+}
+
+/* -------------------------------------------------------------- señales --- */
+
+/*
+ * Las tres señales del cuerpo: el puño, los ojos, la mosca. Esto es lo que en
+ * otra app sería un panel de métricas. Acá son frases, porque el maestro no da
+ * cifras: da señales que uno puede comprobar con la mano.
+ */
+.ol__senales {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  margin: 0.1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ol__senal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid rgb(var(--ol-ambar) / 0.75);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgb(var(--ol-tinta) / 0.92);
+}
+
+.ol__senal--bien {
+  border-left-color: rgb(var(--ol-verde));
+  color: var(--ol-tenue);
+}
+
+.ol__senalTexto {
+  font-weight: 500;
+}
+
+/*
+ * El aparte: la frase que traduce lo que uno está sintiendo. Va en cursiva y en
+ * ámbar tenue — es el maestro hablando bajito al lado de uno, no un cartel de
+ * advertencia. Si esto fuera un banner rojo, sería un regaño.
+ */
+.ol__aparte {
+  font-size: 0.72rem;
+  font-style: italic;
+  line-height: 1.35;
+  color: rgb(var(--ol-ambar));
+  max-width: 44ch;
+}
+
+/* ------------------------------------------------------------------ pie --- */
+
+.ol__tesis {
+  margin: 0.15rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--ol-tenue);
+  max-width: 48ch;
+}
+
+/* ---------------------------------------------------------------- calma --- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ol__seco {
+    transition: none;
+  }
+}
