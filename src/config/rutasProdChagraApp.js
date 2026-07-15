@@ -103,6 +103,55 @@ export const NUCLEO_3D = [
     importLazy: 'src/mockups/TransicionesOdysseyDemo.jsx',
     categoria: '3D',
   },
+  {
+    path: 'polinizadores',
+    alias: ['abejas_red', 'red_polinizacion'],
+    componente: 'EscenaPolinizadores',
+    importLazy: 'src/visual/mundo3d/polinizadores/EscenaPolinizadores.jsx',
+    categoria: '3D',
+  },
+  {
+    path: 'fauna_emblematica',
+    alias: ['guardianes_monte', 'fauna_paramo'],
+    componente: 'EscenaFaunaEmblematica',
+    importLazy: 'src/visual/mundo3d/fauna/EscenaFaunaEmblematica.jsx',
+    categoria: '3D',
+  },
+  {
+    // vitrina de la libreria confianza/ (trae su propia Galeria*, se cablea tal cual)
+    path: 'confianza',
+    alias: ['lenguaje_confianza', 'puntada'],
+    componente: 'GaleriaConfianza',
+    importLazy: 'src/visual/confianza/GaleriaConfianza.jsx',
+    categoria: '3D',
+  },
+  {
+    path: 'cuaderno_vivo',
+    alias: ['cuaderno', 'observar_registrar_aprender'],
+    componente: 'CuadernoVivo',
+    importLazy: 'src/visual/cuaderno/CuadernoVivo.jsx',
+    categoria: '3D',
+  },
+  {
+    // paleta/ es una libreria sin demo propia: vitrina minima montada para la
+    // integracion (src/mockups/PaletaMadreDemo.jsx) — no toca el modulo.
+    path: 'paleta_madre',
+    alias: ['paleta', 'sistema_visual_madre'],
+    componente: 'PaletaMadreDemo',
+    importLazy: 'src/mockups/PaletaMadreDemo.jsx',
+    categoria: '3D',
+  },
+  {
+    // artesania/ (D3, el kit NUEVO) tampoco trae demo propia: vitrina minima
+    // montada para la integracion (src/mockups/ArtesaniaKitDemo.jsx). NO
+    // confundir con 'artesania_andina' (mas abajo): ese es un modulo hermano
+    // 2D/lathe mas viejo con su propia demo ya wireada.
+    path: 'artesania_kit',
+    alias: ['artesania_3d', 'cesteria_fique_guadua'],
+    componente: 'ArtesaniaKitDemo',
+    importLazy: 'src/mockups/ArtesaniaKitDemo.jsx',
+    categoria: '3D',
+  },
 
   // ── El Bosque Vivo — Ent queñua landmark + microsuelo (capas) ──
   {
