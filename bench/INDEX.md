@@ -4,7 +4,7 @@
 > `node bench/run.mjs --regen-index`. No editar a mano (un test verifica
 > que este sincronizado).
 
-Generado: 2026-06-17. Entradas: 19 (15 benches/meta + 4 suites de test).
+Generado: 2026-07-15. Entradas: 20 (16 benches/meta + 4 suites de test).
 
 ## Como se usa
 
@@ -59,6 +59,13 @@ _Latencia del retrieve BM25 sobre el corpus real._
 | id | que hace | tipo | infra | ejecutar |
 |---|---|---|---|---|
 | `rag-retrieve` | Mide retrieve(query, topK) sobre el corpus real (491+ species). Cold load + warm p50/p95. Consolidado de 3 archivos a 1 (loader hook ahora inline via data: URL). NOTA: ejecucion completa bajo Node puro necesita shim import.meta.env (gap... | Bench latencia | corpus | `node bench/run.mjs rag-retrieve` |
+
+### Cluster: embeddings
+_Bench de embedders sobre pares reales del grafo y casos confusables._
+
+| id | que hace | tipo | infra | ejecutar |
+|---|---|---|---|---|
+| `embedder-bench` | READ-ONLY. Evalua embedders sobre pares reales del grafo Chagra: 325 RegionalLabel + 507 nombres_comunes, con recall@1/@5, MRR y un corte de confundibles (papa/papaya/papayuela, siete passiflora, tomate de arbol vs tomate, brassica... | Bench LLM | age, ollama, gpu | `node bench/run.mjs embedder-bench` |
 
 ### Cluster: grafo
 _Cobertura de la capa de conocimiento (Apache AGE chagra_kg): que tanto del catalogo canonico esta como arista en el grafo (capa Co)._

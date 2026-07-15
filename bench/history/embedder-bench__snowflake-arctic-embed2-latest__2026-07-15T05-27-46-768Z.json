@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "bench": "embedder-bench",
+  "date": "2026-07-15T05:27:46.768Z",
+  "model": "snowflake-arctic-embed2:latest",
+  "config": "chagra_kg",
+  "commit": "983d499",
+  "metrics": {
+    "recall_at_1": 38.4,
+    "recall_at_5": 64.5,
+    "mrr": 0.4853,
+    "query_embed_avg_ms": 695.9,
+    "hard_case_recall_at_1": 0,
+    "hard_case_recall_at_5": 0,
+    "hard_case_mrr": 0,
+    "doc_embed_avg_ms": 880.7
+  },
+  "passCount": 1594,
+  "failCount": 877,
+  "passPct": 64.5,
+  "notes": "graph=chagra_kg docs=742 queries=2471",
+  "seed": false
+}

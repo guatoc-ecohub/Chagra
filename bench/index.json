@@ -6,6 +6,7 @@
     "anti-hallucination": "Miden alucinacion real (AH% = FAIL/total) con must_include + red_flags y juez independiente.",
     "vision": "Reconocimiento de especies desde fotos + grounding del sidecar (validate_visual_match).",
     "rag": "Latencia del retrieve BM25 sobre el corpus real.",
+    "embeddings": "Bench de embedders sobre pares reales del grafo y casos confusables.",
     "grafo": "Cobertura de la capa de conocimiento (Apache AGE chagra_kg): que tanto del catalogo canonico esta como arista en el grafo (capa Co).",
     "judge": "Smoke + ranking del LLM-judge.",
     "nocturno": "Bench largo de FarmProcess con escenarios + eliminacion temprana.",
@@ -306,6 +307,36 @@
       "output": "consola + bench/history (via --history-out)",
       "history": true,
       "runnable": "parcial"
+    },
+    {
+      "id": "embedder-bench",
+      "title": "Embedders reales del grafo (RegionalLabel + nombres_comunes)",
+      "type": "bench-llm",
+      "cluster": "embeddings",
+      "status": "active",
+      "script": "scripts/bench-embedders.mjs",
+      "cmd": [
+        "node",
+        "{{script}}"
+      ],
+      "infra": [
+        "age",
+        "ollama",
+        "gpu"
+      ],
+      "metrics": [
+        "recall_at_1",
+        "recall_at_5",
+        "mrr",
+        "hard_case_recall_at_1",
+        "hard_case_recall_at_5",
+        "hard_case_mrr",
+        "doc_embed_avg_ms",
+        "query_embed_avg_ms"
+      ],
+      "what": "READ-ONLY. Evalua embedders sobre pares reales del grafo Chagra: 325 RegionalLabel + 507 nombres_comunes, con recall@1/@5, MRR y un corte de confundibles (papa/papaya/papayuela, siete passiflora, tomate de arbol vs tomate, brassica oleracea, arracacha vs yuca). Sirve para decidir si el embedder de produccion sigue siendo el correcto.",
+      "output": "data/bench-runs/embedder-bench-YYYY-MM-DD.json + bench/history/embedder-bench__<model>__<ts>.json + ops/BENCH-EMBEDDER-2026-07-15.md",
+      "history": true
     },
     {
       "id": "grafo-cobertura",
