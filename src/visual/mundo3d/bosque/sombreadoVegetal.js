@@ -96,12 +96,8 @@ export function desindexar(geo) {
  *
  * @param {THREE.BufferGeometry[]} partes
  * @param {string} etiqueta  nombre de la especie, para que el error diga QUIÉN.
- * @param {{preservarNormales?: boolean}} [opts]  con `preservarNormales`, la
- *   fusión RESPETA las normales que cada parte ya trae (p. ej. las RADIALES de
- *   `matojoNube`, que hacen que una copa se sombree como masa suave de hojas).
- *   Por defecto recalcula (per-face en no-indexadas → look facetado clásico).
  */
-export function fusionarSeguro(partes, etiqueta = 'sin-nombre', opts = {}) {
+export function fusionarSeguro(partes, etiqueta = 'sin-nombre') {
   const buenas = partes.filter(Boolean).map(desindexar);
   if (!buenas.length) {
     throw new Error(`[sombreadoVegetal] "${etiqueta}": no hay partes que fusionar.`);
@@ -126,7 +122,7 @@ export function fusionarSeguro(partes, etiqueta = 'sin-nombre', opts = {}) {
       + 'dispares. La especie habría quedado INVISIBLE sin error.',
     );
   }
-  if (!opts.preservarNormales) g.computeVertexNormals();
+  g.computeVertexNormals();
   return g;
 }
 
@@ -303,17 +299,11 @@ export function hornearCorteza(geo, o) {
  * @param {(t:number)=>number} o.taper  radio-mundo en t∈[0,1].
  * @param {number} [o.arruga]  amplitud relativa del relieve de corteza.
  * @param {number} [o.semilla] desfase del relieve (para que no se repita).
- * @param {number} [o.minRadio] piso del radio. Por defecto 0.02, que es lo que
- *   quiere un TRONCO (nunca degenera a un hilo). Pero una HIFA micorrízica vive
- *   entre 0.002 y 0.03: con el piso de tronco toda la jerarquía (rizomorfo →
- *   secundaria → punta) se aplasta a un mismo grosor y la red vuelve a leerse
- *   como una maraña pareja. Los llamadores finos lo bajan.
  */
 export function tuboOrganico(curva, o) {
   const { tubular, radial, taper } = o;
   const arruga = o.arruga ?? 0.12;
   const semilla = o.semilla ?? 0;
-  const minRadio = o.minRadio ?? 0.02;
   const geo = new THREE.TubeGeometry(curva, tubular, 1, radial, false);
   const pos = geo.attributes.position;
   const nAnillo = radial + 1;
@@ -337,7 +327,7 @@ export function tuboOrganico(curva, o) {
       + Math.sin(ang * 15 - semilla * 2 + t * 3) * 0.25
       + (ruido3D(Math.cos(ang) * 3 + semilla, t * 9, Math.sin(ang) * 3) - 0.5) * 1.4;
     const disp = 1 + surco * arruga * (1 + (1 - t) * 0.5);
-    v.copy(centro).addScaledVector(off, Math.max(minRadio, taper(t) * disp));
+    v.copy(centro).addScaledVector(off, Math.max(0.02, taper(t) * disp));
     pos.setXYZ(k, v.x, v.y, v.z);
   }
   pos.needsUpdate = true;
@@ -460,37 +450,5 @@ export function matojoHoja(radio, semilla = 1, deform = 0.42) {
     pos.setXYZ(i, v.x, v.y, v.z);
   }
   pos.needsUpdate = true;
-  return g;
-}
-
-/**
- * Nube de follaje SUAVE: un icosaedro SUBDIVIDIDO, deformado con ruido y con
- * NORMALES RADIALES puestas a mano — el matojo se sombrea como una masa redonda
- * de hojas (Ori/BOTW), no como un poliedro facetado. Es la pieza que mata el
- * "icosaedro literal": fusiónela con `fusionarSeguro(..., {preservarNormales:
- * true})` para que el merge no le pise las normales.
- *
- * `matojoHoja` (arriba) es la variante BARATA facetada; esta es la copa-masa
- * calibre consola (nació en el queñual del bosque TAKE A).
- */
-export function matojoNube(radio, semilla = 1, deform = 0.5) {
-  const g = new THREE.IcosahedronGeometry(radio, 1);
-  const pos = g.attributes.position;
-  const v = new THREE.Vector3();
-  for (let i = 0; i < pos.count; i++) {
-    v.fromBufferAttribute(pos, i);
-    const n = ruidoFbm(v.x * 2.2 + semilla, v.y * 2.2, v.z * 2.2) - 0.5;
-    v.multiplyScalar(1 + n * deform * 2);
-    pos.setXYZ(i, v.x, v.y, v.z);
-  }
-  pos.needsUpdate = true;
-  const nor = new Float32Array(pos.count * 3);
-  for (let i = 0; i < pos.count; i++) {
-    v.fromBufferAttribute(pos, i).normalize();
-    nor[i * 3] = v.x;
-    nor[i * 3 + 1] = v.y;
-    nor[i * 3 + 2] = v.z;
-  }
-  g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
   return g;
 }

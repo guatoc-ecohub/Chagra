@@ -1,18 +1,22 @@
 /*
- * FloraParamo — el ECOSISTEMA de páramo que rodea al Ent de la queñua.
+ * FloraParamo — el BOSQUE ALTOANDINO que rodea al Ent de la queñua.
  *
- * Una CAPA de flora altoandina colombiana sembrada alrededor del guardián (que
- * sigue siendo EL árbol mayor y el foco): el frailejonar al frente, el sotobosque
- * de mortiño y romerillo, las rocas con líquen y el musgo del suelo, y —velados
- * por la niebla, en el anillo exterior— los árboles del bosque de niebla: roble
- * andino, aliso, encenillo, gaque y el yarumo plateado/blanco de envés blanco.
- * Así el claro se lee como un páramo VIVO y el Ent RESALTA como el más grande.
+ * Una capa de flora de páramo sembrada en BOSQUETES alrededor del guardián (que
+ * sigue siendo EL árbol mayor y el foco): el frailejonar en el anillo interior,
+ * el sotobosque de mortiño y romerillo en los bordes, las rocas con líquen y el
+ * musgo del suelo, y —velados por la niebla, más lejos— el cortejo leñoso:
+ * queñuas jóvenes (la familia del Ent), encenillos, alisos y gaques.
  *
- * Tier-safe (DR §3): cada especie es UN InstancedMesh de una geometría fusionada
- * → una draw-call por especie por más matas que haya. La flora es PAISAJE: monta
- * quieta (el foco animado es el Ent). Solo en 'alto' se añade un vaho a la deriva.
- * Todo procedural: cero CDN/imágenes externas (la niebla usa una CanvasTexture
- * generada en runtime).
+ * El cortejo cambió tras el rechazo del operador: se fueron el yarumo y el roble
+ * (que son de bosque andino/subandino, no de páramo) y entró la QUEÑUA joven, que
+ * es la misma especie del Ent — el guardián deja de ser un solitario y pasa a ser
+ * el más viejo de su familia.
+ *
+ * Tier-safe: cada especie es UN InstancedMesh de una geometría fusionada con el
+ * color ya horneado → una draw-call por especie por más matas que haya. La flora
+ * es PAISAJE: monta quieta (el foco animado es el Ent). Solo en 'alto' se añade
+ * un vaho a la deriva. Todo procedural: cero CDN/imágenes externas (la niebla usa
+ * una CanvasTexture generada en runtime).
  *
  * Componente r3f: montar dentro del <Canvas> de EscenaBosqueVivo.
  */
@@ -25,8 +29,7 @@ import {
   calidadDeTier,
   distribucionFlora,
   geomFrailejon,
-  geomYarumo,
-  geomRoble,
+  geomQuenua,
   geomEncenillo,
   geomAliso,
   geomGaque,
@@ -36,7 +39,12 @@ import {
   geomMusgo,
 } from './floraParamo.geom.js';
 
-/* Un banco de matas de UNA especie: una geometría, un material, N instancias. */
+/*
+ * Un banco de matas de UNA especie: una geometría, un material, N instancias.
+ * Cada instancia lleva su propia rotación, INCLINACIÓN, escala y tinte: es la
+ * variación por instancia que el DR pide para que un bosque no se lea como el
+ * mismo mesh repetido (retorno alto, costo casi nulo).
+ */
 function Especie({ geo, mat, items, castShadow = false }) {
   const ref = useRef(null);
 
@@ -52,7 +60,10 @@ function Especie({ geo, mat, items, castShadow = false }) {
     for (let i = 0; i < items.length; i++) {
       const it = items[i];
       p.set(it.pos[0], it.pos[1], it.pos[2]);
-      e.set(0, it.rotY, 0);
+      // Inclinación sutil (x,z) + giro propio: ningún ejemplar está a plomo ni
+      // mira igual que su vecino.
+      const inc = it.inclina || [0, 0];
+      e.set(inc[0], it.rotY, inc[1]);
       q.setFromEuler(e);
       s.setScalar(it.escala);
       m.compose(p, q, s);
@@ -118,7 +129,7 @@ function NieblaRasante({ n, reducedMotion }) {
       const ang = (i / n) * Math.PI * 2 + i * 1.3;
       const rad = 7 + (i % 3) * 1.8;
       arr.push({
-        base: [Math.cos(ang) * rad, 1.1 + (i % 2) * 0.5, Math.sin(ang) * rad],
+        base: /** @type {[number, number, number]} */ ([Math.cos(ang) * rad, 1.1 + (i % 2) * 0.5, Math.sin(ang) * rad]),
         fase: i * 2.1,
         amp: 1.2 + (i % 3) * 0.6,
       });
@@ -172,27 +183,28 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false }) {
     const g = {};
     if (conteos.frailejon) g.frailejon = geomFrailejon({ flor: false, q }, 1);
     if (conteos.frailejonFlor) g.frailejonFlor = geomFrailejon({ flor: true, q }, 2);
-    if (conteos.yarumo) g.yarumo = geomYarumo({ q }, 3);
-    if (conteos.roble) g.roble = geomRoble({ q }, 4);
-    if (conteos.encenillo) g.encenillo = geomEncenillo({ q }, 5);
-    if (conteos.aliso) g.aliso = geomAliso({ q }, 6);
-    if (conteos.gaque) g.gaque = geomGaque({ q }, 7);
-    if (conteos.mortino) g.mortino = geomMortino({ q }, 8);
-    if (conteos.romerillo) g.romerillo = geomRomerillo({ q }, 9);
-    if (conteos.roca) g.roca = geomRoca(10);
-    if (conteos.musgo) g.musgo = geomMusgo(11);
+    if (conteos.quenua) g.quenua = geomQuenua({ q }, 3);
+    if (conteos.encenillo) g.encenillo = geomEncenillo({ q }, 4);
+    if (conteos.aliso) g.aliso = geomAliso({ q }, 5);
+    if (conteos.gaque) g.gaque = geomGaque({ q }, 6);
+    if (conteos.mortino) g.mortino = geomMortino({ q }, 7);
+    if (conteos.romerillo) g.romerillo = geomRomerillo({ q }, 8);
+    if (conteos.roca) g.roca = geomRoca(9);
+    if (conteos.musgo) g.musgo = geomMusgo(10);
     return g;
   }, [conteos, q]);
 
-  // --- Material único con vertexColors (cada geometría trae su color horneado). ---
+  // --- Material único con vertexColors (cada geometría trae su color horneado).
+  // OJO: flatShading NO — el sombreado horneado (AO + gradiente) ya da el
+  // volumen, y facetar encima devuelve el look de papiroflexia que se rechazó.
   const mat = useMemo(() => {
-    const base = { vertexColors: true, flatShading: perfil.flatShading };
+    const base = { vertexColors: true, flatShading: false };
     return perfil.materialRico
-      ? new THREE.MeshStandardMaterial({ ...base, roughness: 0.9, metalness: 0.0 })
+      ? new THREE.MeshStandardMaterial({ ...base, roughness: 0.92, metalness: 0.0 })
       : new THREE.MeshLambertMaterial(base);
-  }, [perfil.materialRico, perfil.flatShading]);
+  }, [perfil.materialRico]);
 
-  // --- Distribución biogeográfica (una vez por tier). ---
+  // --- Distribución en bosquetes (una vez por tier). ---
   const dist = useMemo(() => distribucionFlora(conteos, 707), [conteos]);
 
   // Liberar GPU al desmontar.
@@ -213,15 +225,14 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false }) {
       <Especie geo={geos.romerillo} mat={mat} items={dist.romerillo} />
       <Especie geo={geos.mortino} mat={mat} items={dist.mortino} />
 
-      {/* Frailejonar: el ícono del páramo, al frente. */}
+      {/* Frailejonar: el ícono del páramo, en el anillo interior. */}
       <Especie geo={geos.frailejon} mat={mat} items={dist.frailejon} />
       <Especie geo={geos.frailejonFlor} mat={mat} items={dist.frailejonFlor} />
 
-      {/* Árboles de fondo (anillo exterior, velados por la niebla). */}
+      {/* El cortejo leñoso (bosquetes exteriores, velados por la niebla). */}
       <Especie geo={geos.gaque} mat={mat} items={dist.gaque} castShadow={sombra} />
+      <Especie geo={geos.quenua} mat={mat} items={dist.quenua} castShadow={sombra} />
       <Especie geo={geos.encenillo} mat={mat} items={dist.encenillo} castShadow={sombra} />
-      <Especie geo={geos.roble} mat={mat} items={dist.roble} castShadow={sombra} />
-      <Especie geo={geos.yarumo} mat={mat} items={dist.yarumo} castShadow={sombra} />
       <Especie geo={geos.aliso} mat={mat} items={dist.aliso} castShadow={sombra} />
 
       {/* Vaho del páramo a la deriva (solo 'alto'). */}
