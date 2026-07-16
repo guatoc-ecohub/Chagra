@@ -33,6 +33,10 @@ import { stop as stopAllAudio } from '../services/ttsService.js';
 
 import ChagraGrowLoader from '../components/ChagraGrowLoader';
 const LoginScreen = lazy(() => import('../components/LoginScreen.jsx'));
+// Angelita viva en TODA pantalla: App.jsx la monta global y prod nunca lo hizo.
+// El asistente existia, con idle-cerebro, ritmo propio, mirada y lip-sync — y en
+// produccion no aparecia en ninguna de las 48 pantallas.
+const AgentFab = lazy(() => import('../components/AgentFab.jsx'));
 const OAuthCallback = lazy(() => import('../components/OAuthCallback.jsx'));
 
 // ── Mapa de lazy components (generado del manifiesto) ─────────────
@@ -520,6 +524,14 @@ export default function ProdChagraApp() {
         >
           {toast.message}
         </div>
+      )}
+      {/* Angelita — asistente vivo en TODA pantalla, igual que el shell clasico
+          (App.jsx:3574). Se oculta solo donde estorbaria: loading, login y el
+          callback de oauth. */}
+      {/* En TODAS las pantallas (orden del operador). Solo se oculta mientras
+          el estado de auth aun no se resolvio, para no parpadear al arrancar. */}
+      {currentView !== 'loading' && (
+        <AgentFab onNavigate={navigate} />
       )}
       <NetworkStatusBar />
     </Suspense>
