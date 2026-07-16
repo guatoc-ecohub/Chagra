@@ -1,0 +1,91 @@
+{
+  "species_slug": "inga_feuilleei",
+  "scientific_name": "Inga feuilleei DC.",
+  "common_names": [
+    "Pacae amazónico"
+  ],
+  "family": "Fabaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "nitrogen_fixer",
+    "nurse_plant",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Semilla recalcitrante: germina espontáneamente dentro de la vaina madura por viviparidad incipiente, sembrar inmediatamente. Vivero 4-6 meses. Trasplante a 8x8 m como sombra de café/cacao, 5x5 m como cortina cortavientos. Crecimiento rápido (2-3 m/año juveniles). Fija nitrógeno por simbiosis con rizobios. Primera vainas a 3-4 años."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 200,
+      "optimo_min": 500,
+      "optimo_max": 1800,
+      "max_absoluto": 2400
+    },
+    "temperatura_c": {
+      "helada_letal": 2,
+      "optimo_min": 18,
+      "optimo_max": 28,
+      "max_tolerable": 34
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El pacae amazónico o guabo (Inga feuilleei DC., familia Fabaceae subfamilia Mimosoideae) es un árbol mediano-grande (10-18 m altura, copa amplia umbeliforme) nativo de la vertiente oriental andina y piedemonte amazónico colombiano-peruano-ecuatoriano, cultivado tradicionalmente desde tiempos prehispánicos por culturas amazónicas e incaicas (registros arqueobotánicos de Pacae en sitios pre-Tiwanaku, Wari y Chimú peruanos demuestran domesticación temprana). Produce vainas péndulas alargadas características del género Inga (15-50 cm largo, 3-5 cm ancho, ligeramente curvadas en forma de sable) que al abrirse revelan semillas grandes negras rodeadas de un arilo blanco esponjoso muy dulce (15-18 °Brix) con textura algodonosa y sabor a vainilla-helado, lección viva del fenómeno biológico de los arilos como pulpas adyacentes a la semilla (no fruto verdadero — el fruto es la vaina seca dehiscente, el dulce es arilo adaptado a dispersión zoocórica). El género Inga es uno de los más diversos del bosque neotropical (300+ especies, con centro de diversidad en la cuenca amazónica) y las especies son icónicas como árboles de sombra en sistemas agroforestales de cacao y café desde tiempos coloniales. Lección viva: árbol-pilar del SAF amazónico y andino que enseña cinco conceptos críticos: (1) la simbiosis radical con rizobios (Bradyrhizobium spp., bacterias fijadoras de nitrógeno atmosférico) que permite a Inga aportar 100-300 kg N/ha/año al sistema, ejemplo magistral de fijación biológica de nitrógeno (FBN) sin agroquímicos, base de la fertilidad sostenible en chagras amazónicas; (2) la función ecológica de árbol sombra en cultivos de café arábigo, cacao, lulo, plátano, copoazú y vainilla — el pacae actúa como nurse plant clave que mejora microclima, recicla nutrientes vía hojarasca, conserva humedad del suelo y reduce 30-50% la incidencia de patógenos foliares; (3) la diferencia entre fruto verdadero (legumbre) y arilo (estructura adicional adaptada a dispersión zoocórica) — concepto clave de morfología floral y carpológica que se enseña en biología vegetal usando el pacae como ejemplo didáctico ideal; (4) la domesticación pre-incaica de árboles en los Andes y Amazonía como ejemplo de manejo forestal antiguo, el pacae fue mencionado por cronistas españoles del s. XVI como uno de los frutales más apreciados; (5) la importancia del género Inga para restauración ecológica y agroforestería del trópico — sistema de 'Inga alley cropping' (cultivo en callejones de Inga) desarrollado por Mike Hands en Belice y replicado en Amazonía como alternativa sostenible al slash-and-burn. Manejo agroecológico: siembra en chagras como sombra inicial para cacao, café o copoazú; asocio rotatorio con cultivos anuales bajo callejones (alley cropping); poda anual de ramas para mulch in-situ (kg de biomasa/ha) que aporta N al suelo; corta y deja (chop-and-drop) tradicional; cero agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.383Z"
+}

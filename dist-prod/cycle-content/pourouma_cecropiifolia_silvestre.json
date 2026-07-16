@@ -1,0 +1,76 @@
+{
+  "species_slug": "pourouma_cecropiifolia_silvestre",
+  "scientific_name": "Pourouma cecropiifolia Mart.",
+  "common_names": [
+    "Uvilla silvestre"
+  ],
+  "family": "Urticaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "no_evaluada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semillas frescas (despulpado manual con agua), siembra inmediata sin escarificación. Germinación rápida 15-30 días en sustrato húmedo a sol parcial. Trasplante a sistema agroforestal a los 4-6 meses con sol parcial. Establecimiento 12-18 meses; primer fruto a los 3-4 años. Distinta a la variedad cultivada (pourouma_cecropiifolia ya en catálogo) por menor tamaño de fruto, mayor variabilidad genética y manejo de poblaciones silvestres-semicultivadas.",
+    "tiempo_a_establecimiento_dias": 450,
+    "notas": "Forma silvestre/semicultivada del 'uvilla amazónica' (P. cecropiifolia var. silvestris en sentido amplio) manejada por TIKUNA, HUITOTO, BORA, MUINANE, YAGUA, COFAN y comunidades AFROCOLOMBIANAS del Pacífico chocoano como recurso forestal no maderable.",
+    "fuente": "POWO Kew; GBIF; Cárdenas-Salinas frutales amazónicos; Sinchi"
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 800,
+      "max_absoluto": 1200
+    },
+    "temperatura_c": {
+      "helada_letal": 10,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La uvilla silvestre (Pourouma cecropiifolia Mart., familia Urticaceae — antes Cecropiaceae/Moraceae) es un árbol frutal nativo amazónico-chocoano de poblaciones silvestres y semicultivadas, distinto a la forma cultivada-domesticada del mismo taxón (pourouma_cecropiifolia ya en catálogo como 'uvilla amazónica' del manejo agroforestal) — esta entrada documenta el manejo de poblaciones silvestres del bosque chocoano biogeográfico y amazónico, con menor selección genética, mayor variabilidad de tamaño de fruto, y un patrón cultural de recolección comunitaria distinto al cultivo intensificado. Se distribuye en bosque húmedo y muy húmedo tropical entre 0 y 1.200 msnm en Colombia (Chocó: Bajo Atrato, San Juan, Baudó, Quibdó; Valle del Cauca pacífico: Buenaventura, Bajo Calima; Cauca pacífico: Guapi, Timbiquí; Nariño pacífico: Tumaco, Barbacoas; Amazonia colombiana: Leticia, Puerto Nariño, La Pedrera, Tarapacá, Mitú; Caquetá, Putumayo, Guaviare; piedemonte llanero del Meta), Brasil amazónico (Amazonas, Pará, Acre, Rondônia), Perú (Loreto, Ucayali), Ecuador amazónico, Venezuela amazónica y norte de Bolivia. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del manejo ancestral de bosques húmedos tropicales por parte de los pueblos indígenas TIKUNA (trapecio amazónico colombiano — Leticia, Puerto Nariño, comunidades Maranguapé, San Sebastián), HUITOTO/MUINANE/BORA (medio Caquetá-Putumayo — territorios de Predio Putumayo, Aduche), YAGUA (Amazonas trapecio), COFAN (piedemonte putumayense), INGA (Sibundoy, alto Putumayo) del piedemonte amazónico colombiano, y por las COMUNIDADES AFROCOLOMBIANAS del Chocó biogeográfico (consejos comunitarios Cocomacia, Acadesan, Cocomasur del Bajo Atrato, San Juan, Baudó, Buenaventura, Guapi, Timbiquí, Tumaco) y comunidades EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano-vallecaucano — el manejo cultural de poblaciones silvestres-semicultivadas en sistemas agroforestales tradicionales 'de monte' (no cultivo intensificado) incluye protección selectiva de árboles productivos, dispersión asistida de semillas, y cosecha rotacional comunitaria. Pertenece al género Pourouma (Urticaceae, antes Cecropiaceae) — emparentado con Cecropia (yarumos) — con unos 30 taxa neotropicales. Árbol dioico de 12-20 m altura con tronco recto delgado, hojas alternas grandes peltadas-palmatilobadas 20-50 cm (parecidas a Cecropia — de ahí 'cecropiifolia') con haz verde-oscuro y envés blanquecino, infrutescencias dioicas con frutos en racimos péndulos masivos de 100-300 drupas globosas 1.5-3 cm púrpura-violetas-vinotintas con pulpa blanco-cremosa dulce-aromática que recuerda a uva-cacao-mango con pepita marrón endurecida. Distinta a la variedad cultivada por su menor tamaño de fruto (en monte 1.5-2 cm, cultivada 2.5-3 cm), mayor diversidad genética intra-poblacional, manejo no intensificado y patrón cultural de recolección de monte. USOS: pulpa consumida fresca, en jugo, vino artesanal 'vino de uvilla' (chicha fermentada tradicional), helados, mermeladas; semillas consumidas tostadas (similar a almendras); madera ligera para tablones de canoa-bote; corteza interior fibrosa para cuerdas. Manejo agroecológico: dispersión natural por monos churucos (Lagothrix), aulladores (Alouatta), pájaros frugívoros (tucanes, loros, paujiles); siembra enriquecimiento en claros del bosque a 6-8 m entre árboles; sol parcial 60-80%; cosecha de monte con escalado tradicional (no tala). Función en chagra/agroforestal chocoano-amazónica como recurso forestal no maderable, conservación de bosques húmedos tropicales del Chocó y Amazonia, banco genético silvestre del taxón (importante para mejoramiento de la forma cultivada), seguridad alimentaria estacional comunitaria, fauna asociada conservada. Fuentes Tier A: POWO Kew, GBIF, Sinchi, IIAP Pacífico, Cárdenas-Salinas frutales amazónicos, Bernal 2015.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.396Z"
+}

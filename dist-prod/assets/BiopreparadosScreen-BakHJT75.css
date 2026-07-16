@@ -1,0 +1,1 @@
+@keyframes bio-foto-entra{0%{opacity:0}to{opacity:1}}.bio-foto{animation:.5s ease-out bio-foto-entra}@keyframes bio-ficha-entra{0%{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}.bio-ficha-cuerpo{animation:.25s ease-out bio-ficha-entra}@media (prefers-reduced-motion:reduce){.bio-foto,.bio-ficha-cuerpo{animation:none}}

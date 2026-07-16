@@ -1,0 +1,85 @@
+{
+  "species_slug": "prosopis_juliflora",
+  "scientific_name": "Prosopis juliflora (Sw.) DC.",
+  "common_names": [
+    "Algarrobo"
+  ],
+  "family": "Fabaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nitrogen_fixer",
+    "pollinator_attractor",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla muy dura escarificación obligatoria: ácido sulfúrico 20 min o agua hirviendo + remojo 24-48 h. Germinación 70-90% a 5-12 días. Vivero 3-4 meses. Plantación a 25-35 cm. Crecimiento extremadamente rápido en zonas áridas.",
+    "tiempo_a_establecimiento_dias": 45,
+    "notas": "MANEJO ESPINAS CRÍTICO: espinas ramales robustas 2-5 cm causan heridas profundas que pueden infectarse. Poda obligatoria con guantes cuero-cuerina, lentes de protección, podadora extensiva. CONTROL CAPRINO: cabras y ovejas son los principales dispersores naturales de la semilla — vainas dulces consumidas, semilla escarificada en sistema digestivo caprino, germina en heces. Manejo caprino extensivo descontrolado puede convertir el algarrobo en invasor agresivo (caso India, Sudán). En Colombia La Guajira y Cesar nativo y manejado, pero monitorear expansión.",
+    "fuente": "Bernal 2015; POWO; FAO Ecocrop; CIAT manuales zonas áridas; IUCN ISSG (advertencia invasivo fuera de rango)"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 800,
+      "max_absoluto": 1200
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 32,
+      "max_tolerable": 42
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El algarrobo, cují, trupillo o mezquite (Prosopis juliflora (Sw.) DC., Fabaceae subfamilia Mimosoideae) es uno de los árboles más patrimoniales y simultáneamente más controversiales del bosque seco tropical (bs-T) árido del Caribe colombiano, especialmente La Guajira donde es alimento ancestral del pueblo Wayúu: las vainas dulces molidas producen la \"harina de cují\" (algarroba), proteína-carbohidrato base de la dieta tradicional desde tiempos precolombinos. Su nombre Wayúu es \"kuusi\" y constituye patrimonio bio-cultural reconocido. Nativo del Neotrópico desde el sur de Estados Unidos hasta Perú-Argentina, en Colombia es genuinamente nativo del bs-T árido y semiárido de La Guajira (cuenca alta-media-baja), Cesar (Valledupar, La Paz), Magdalena (Santa Marta seco), Atlántico (interior), Sucre y Bolívar (interior seco) entre 0-800 msnm en zona térmica cálida extrema con precipitaciones 200-800 mm/año y temperaturas hasta 42°C. Árbol o arbusto espinoso caducifolio de 5-12 m de altura (rara vez hasta 15 m) con copa amplia tortuosa, fuste corto ramificado desde baja altura, corteza grisácea fisurada profundamente con tonalidades pardas, hojas bipinnadas con folíolos pequeños caducas en estación seca extrema, ESPINAS RAMALES robustas de 2-5 cm en pares en las axilas foliares (rasgo diagnóstico y riesgo de manejo), flores amarillo-verdosas en espigas pendulares de 5-10 cm melíferas (miel monoflora premium \"miel de algarrobo\"), frutos vaina linear cilíndrica recta amarillo-pajiza dulce indehiscente con 10-30 semillas inmersas en pulpa dulce. MANEJO DE ESPINAS (CRÍTICO): las espinas ramales son robustas, rectas y pueden penetrar 1-2 cm en tejido humano causando heridas profundas con alto riesgo de infección bacteriana (Clostridium, Staphylococcus) — la poda y cosecha requieren equipo de protección personal (PPE) completo: guantes de cuero o cuerina gruesos hasta el codo, lentes de protección, ropa manga larga, calzado cerrado, podadora extensiva para no acercar manos a ramas espinosas, y atención médica inmediata ante punción profunda (riesgo tétanos, considerar vacuna antitetánica al día). NO plantar cerca de áreas de juego infantil. CONTROL CAPRINO Y DISPERSIÓN: las vainas dulces son el alimento preferido de cabras (Capra hircus), ovejas (Ovis aries), bovinos y equinos, que consumen las vainas enteras y excretan semillas escarificadas naturalmente por el sistema digestivo — esta escarificación biológica resulta en germinación 80-95% en heces caprinas, lo cual convierte al ganado caprino extensivo en el principal dispersor natural de la especie. Esta interacción mutualista, benéfica en su rango natural del Caribe seco colombiano, ha convertido al algarrobo en una especie INVASORA AGRESIVA fuera de su rango natural cuando es introducida con ganado caprino descontrolado (caso India, Pakistán, Sudán, Etiopía, Kenya: la especie nativa americana hoy es plaga global), por lo cual el manejo en finca requiere monitorear densidad caprina, registrar dispersión post-plantación, controlar plántulas no deseadas en parcelas vecinas durante los primeros 2-3 años, y en caso de expansión no deseada eliminar plántulas mediante arranque manual con guante o aplicación foliar de glifosato 2% como último recurso. Como leguminosa Mimosoideae fija nitrógeno biológico en suelos extremadamente pobres y áridos donde pocas plantas prosperan, transformando desiertos en oasis productivos. Las vainas dulces (sacarosa 20-30% MS, proteína 8-12% MS, fibra digestible) son alimento estratégico en estación seca extrema: forraje para cabras (5-10 kg/día), ovejas, bovinos y equinos, y harina humana patrimonial Wayúu para arepas, tortas, bebidas refrescantes (chicha de cují), endulzante natural. Su madera marrón-rojiza extremadamente dura (1.0-1.2 g/cm³, una de las más densas del Neotrópico) es combustible premium (carbón vegetal de altísima calidad calórica), postes para cerca viva en zonas áridas, durmientes, construcción rural pesada. La miel monoflora de algarrobo (octubre-diciembre) es premium internacional. Manejo agroecológico: propagación por semilla con escarificación obligatoria (ácido sulfúrico 20 min o agua hirviendo + remojo 24-48 h, germinación 70-90% a 5-12 días), vivero 3-4 meses, plantación definitiva a 25-35 cm en zonas áridas Guajira-Cesar, distancia 6×6 m a 8×8 m en silvopastoril (100-200 árb/ha), cosecha de vainas septiembre-diciembre con PPE anti-espinas, primera cosecha año 3-4. Es lección extraordinaria de complejidad bio-cultural: una especie simultáneamente patrimonio ancestral indígena Wayúu, alimento estratégico de seguridad alimentaria en La Guajira (única región de Colombia donde el algarrobo es harina humana tradicional), forraje irremplazable en clima extremo, fijador biológico de N en desierto, fuente de miel monoflora premium, madera-combustible premium, y simultáneamente especie con riesgo de invasividad si se introduce fuera de rango natural con ganado caprino descontrolado — la lección agroecológica es que el contexto ecológico-cultural determina si una especie es bendición o maldición: en Guajira con manejo Wayúu milenario es bendición; fuera de rango con manejo caprino industrial descontrolado es plaga global. Defenderlo en Guajira es defender la seguridad alimentaria Wayúu y la memoria bio-cultural del Caribe árido colombiano. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, FAO Ecocrop, IUCN ISSG (Invasive Species Specialist Group).",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- cordia_alliodora — Nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken)\n- gliricidia_sepium — Matarratón (Gliricidia sepium (Jacq.) Kunth ex Walp.)\n- pithecellobium_dulce — Chiminango (Pithecellobium dulce (Roxb.) Benth.)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "issg-uicn-invasoras",
+      "title": "issg-uicn-invasoras",
+      "tier": "A",
+      "url": "http://www.iucngisd.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.390Z"
+}

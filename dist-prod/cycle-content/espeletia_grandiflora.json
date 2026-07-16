@@ -1,0 +1,99 @@
+{
+  "species_slug": "espeletia_grandiflora",
+  "scientific_name": "Espeletia grandiflora Humb. & Bonpl.",
+  "common_names": [
+    "Frailejón mayor"
+  ],
+  "family": "Asteraceae",
+  "category": "ornamentales_nativas",
+  "cultivable": false,
+  "conservation_status": "nativo_protegido",
+  "thermal_zones": [
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Recoleccion de aquenios de inflorescencias maduras (temporada seca, diciembre-febrero en cordillera oriental). Siembra en sustrato de turba de paramo: tierra de subparamo 50% + arena 30% + materia organica 20%. Germinacion lenta: 30-90 dias. Trasplante a bolsa a los 4-6 meses. Plantacion definitiva >12 meses a 15-20cm.",
+    "tiempo_a_establecimiento_dias": 180,
+    "notas": "Tasa de germinacion natural baja (5-20%). Crecimiento ~1cm/año: individuos de 2m tardan ~200 años. Protegida por Ley 1930/2018 y Resolucion 383/2010 MADS."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 2800,
+      "optimo_min": 3200,
+      "optimo_max": 3800,
+      "max_absoluto": 4200
+    },
+    "temperatura_c": {
+      "helada_letal": -15,
+      "optimo_min": 2,
+      "optimo_max": 10,
+      "max_tolerable": 18
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Simbolo del paramo colombiano. Ensenia adaptaciones extremas (hojas marcescentes, pubescencia protectora, congelacion inhibida en citoplasma), regulacion hidrica de paramos, restauracion ecologica de ecosistemas fragiles y crisis climatica en alta montana.",
+  "sources": [
+    {
+      "id": "humboldt-2016-frailejones",
+      "title": "humboldt-2016-frailejones",
+      "tier": "A",
+      "url": "https://www.humboldt.org.co"
+    },
+    {
+      "id": "diazgranados-2012-espeletiinae",
+      "title": "diazgranados-2012-espeletiinae",
+      "tier": "A",
+      "url": "10.3897/phytokeys.16.3186"
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "title": "ley-1930-2018-paramos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "mads-res-383-2010",
+      "title": "mads-res-383-2010",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "uicn-red-list",
+      "title": "uicn-red-list",
+      "tier": "A",
+      "url": "https://www.iucnredlist.org"
+    },
+    {
+      "id": "restauracion-cruz-verde-sumapaz",
+      "title": "restauracion-cruz-verde-sumapaz",
+      "tier": "B",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.371Z"
+}

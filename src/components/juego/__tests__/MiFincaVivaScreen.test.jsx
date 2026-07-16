@@ -107,6 +107,24 @@ describe('MiFincaVivaScreen', () => {
     expect(onNavigate).toHaveBeenCalledWith('subsuelo');
   });
 
+  it('expone la entrada a Mi finca en 3D (Odyssey) y navega a finca_odyssey', async () => {
+    const onNavigate = vi.fn();
+    render(<MiFincaVivaScreen onNavigate={onNavigate} />);
+    const entrada = await screen.findByTestId('entrada-finca-odyssey');
+    expect(entrada).toBeTruthy();
+    fireEvent.click(entrada);
+    expect(onNavigate).toHaveBeenCalledWith('finca_odyssey');
+  });
+
+  it('expone la entrada a Mono vs Poli y navega a mono_vs_poli (rescate huérfano)', async () => {
+    const onNavigate = vi.fn();
+    render(<MiFincaVivaScreen onNavigate={onNavigate} />);
+    const entrada = await screen.findByTestId('entrada-mono-vs-poli');
+    expect(entrada).toBeTruthy();
+    fireEvent.click(entrada);
+    expect(onNavigate).toHaveBeenCalledWith('mono_vs_poli');
+  });
+
   it('siempre muestra la galería de criaturas (con siluetas si vacía)', async () => {
     render(<MiFincaVivaScreen />);
     expect(await screen.findByTestId('criatura-collection')).toBeTruthy();
