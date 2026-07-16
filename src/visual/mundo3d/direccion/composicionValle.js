@@ -11,11 +11,13 @@
  * La cámara INMERSIVA y el paisaje denso de la v2 son sagrados: el rediseño
  * anterior alejó la cámara y el valle quedó lejano y vacío. Esta pasada
  * reconstruye ENCIMA de la v2 lo que sí funcionó del rediseño:
- *   1. LA CASA ES LA PUERTA: su puerta iluminada abre el mapa de los 6
- *      portales. El corazón Y la boca.
- *   2. JERARQUÍA DE PORTALES: los 6 principales son VENTANAS VIVAS al mundo
- *      (notorias, inmersivas — ver VentanasVivas); los pórticos de madera
- *      quedan SOLO para los lugares secundarios de menos uso.
+ *   1. LA CASA ES LA VÍA SECUNDARIA: su puerta iluminada lleva a la
+ *      ventana-puerta de los mundos. El corazón del cuadro, no la boca de
+ *      todo — la entrada principal son los portales-paisaje directos.
+ *   2. JERARQUÍA DE PORTALES: los 6 principales son VENTANAS VIVAS — arcos
+ *      de vegetación que enmarcan la VIÑETA 3D de su mundo (paisajes en
+ *      miniatura, cero discos-espejo — ver VentanasVivas); los pórticos de
+ *      madera quedan SOLO para los lugares secundarios de menos uso.
  *   3. EL PÁRAMO SE VE: el acceso al páramo es el páramo MISMO, arriba, con
  *      el Ent-queñua magnífico — una vista al mundo, no un letrero.
  *   4. LA FINCA ES POLICULTIVO: potrero con cercas vivas, biofábrica con su
@@ -114,11 +116,13 @@ export function componerMundos(mundos) {
 
 /* ── 3. LOS 6 PORTALES (las puertas grandes de la finca) ─────────────────
    La promesa del valle en seis puertas legibles: mis matas · mis animales ·
-   el tiempo · vender · aprender · toda mi finca. La puerta de la casa abre
-   este mapa como panel, y en la ESCENA cada portal es una VENTANA VIVA al
-   mundo (jerarquía del operador: notorios e inmersivos — los pórticos de
-   madera quedan solo para lo secundario). `id` = el mundo que surte el
-   portal. */
+   el tiempo · vender · aprender · toda mi finca. En la ESCENA cada portal
+   es una VENTANA VIVA: un arco de vegetación que enmarca la VIÑETA 3D de
+   su mundo (paisaje en miniatura, no espejo — fix del operador 2026-07-16;
+   los pórticos de madera quedan solo para lo secundario). La ENTRADA
+   PRINCIPAL a cada mundo es tocar su portal directo; la puerta de la casa
+   es la vía secundaria a la ventana de los mundos. `id` = el mundo que
+   surte el portal. */
 export const PORTALES_VALLE = [
   { id: 'cultivos', nombre: 'Mis matas', emoji: '🌱' },
   { id: 'animales', nombre: 'Mis animales', emoji: '🐄' },

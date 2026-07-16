@@ -57,10 +57,6 @@ import Mundo, {
 } from '../visual/mundo3d/index.js';
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
-/* Los 6 PORTALES del valle (la ley de la composición, datos puros): la puerta
-   de la casa abre este mapa como panel — mis matas · mis animales · el tiempo
-   · vender · aprender · toda mi finca. */
-import { PORTALES_VALLE } from '../visual/mundo3d/direccion/composicionValle.js';
 import { buildSpatialAgentInitialContext } from '../services/spatialAgentContext';
 import { speak, speakKokoro, stop as stopSpeak } from '../services/ttsService.js';
 import { navegarDesde3D, rutaDesdeMundo3D } from '../prodApp/wire3DNav.js';
@@ -373,14 +369,12 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
     decir(COSA_DEL_DIA.vozTexto);
   }, [decir]);
 
-  // ── LA CASA ES LA PUERTA (rediseño §2): tocar la puerta iluminada de la
-  //    casa abre el mapa de los 6 portales — mis matas, mis animales, el
-  //    tiempo, vender, aprender, toda mi finca. Angelita lo narra.
-  const abrirCasa = useCallback(() => {
-    setFocoId(null);
-    setPanel('casa');
-    decir(NARRACION.casa);
-  }, [decir]);
+  // ── LA CASA ES LA VÍA SECUNDARIA (fix del operador 2026-07-16): tocar la
+  //    puerta iluminada lleva a la VENTANA-PUERTA de los mundos (la ruta
+  //    `ventana_valle` ya construida), por el mismo velo del cableo 3D→2D.
+  //    La entrada PRINCIPAL a cada mundo es su portal-paisaje del valle,
+  //    tocado directo — la casa no vuelve a ser la boca de todo.
+  const abrirCasa = useCallback(() => abrirPantalla('casa'), [abrirPantalla]);
 
   const volverAlValle = useCallback(() => {
     setFocoId(null);
@@ -706,39 +700,6 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
             <button type="button" className="valle-ghost" onClick={() => decir(COSA_DEL_DIA.vozTexto)}>
               🔊 Escuchar
             </button>
-          </div>
-        </aside>
-      )}
-
-      {/* ── Panel de LA CASA: el mapa de los 6 portales (rediseño §2). La
-              puerta iluminada de la casa abre estas seis puertas — tocar una
-              enfoca su lugar del valle y abre su panel. ── */}
-      {panel === 'casa' && (
-        <aside className="valle-panel valle-panel--casa" aria-live="polite">
-          <button type="button" className="valle-panel__x" onClick={volverAlValle} aria-label="Cerrar">×</button>
-          <span className="valle-panel__tag">🏡 Su casa</span>
-          <h2>Las puertas de su finca</h2>
-          <p>Desde la casa sale a todo. Toque una puerta para ir a su patio.</p>
-          <div className="valle-puertas">
-            {PORTALES_VALLE.map((p) => {
-              const m = MUNDO_VALLE_BY_ID[p.id];
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  className="valle-puerta"
-                  style={{ '--p-tinte': m?.tinte?.[0] }}
-                  onClick={() => entrarMundo(p.id)}
-                  aria-label={`Puerta ${p.nombre}`}
-                >
-                  <span className="valle-puerta__emoji" aria-hidden="true">{p.emoji}</span>
-                  <span>
-                    {p.nombre}
-                    {m?.titulo && m.titulo !== p.nombre && <small>{m.titulo}</small>}
-                  </span>
-                </button>
-              );
-            })}
           </div>
         </aside>
       )}

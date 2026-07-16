@@ -14,6 +14,11 @@
 
 /** @type {Record<string, string>} */
 export const RUTA_2D_DESDE_3D = {
+  // ── La casa del valle (vía SECUNDARIA, fix del operador 2026-07-16):
+  //    tocar la puerta iluminada lleva a la ventana-puerta de los mundos.
+  //    La entrada principal a cada mundo es su portal-paisaje directo. ──
+  casa: 'ventana_valle',
+
   // ── Mundos principales del valle (valleData.js LUGARES) ─────────
   agua: 'agua',
   cafe: 'cafe',
