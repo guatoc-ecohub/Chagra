@@ -1548,7 +1548,9 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
           yCalma + alto + bob + tembleque * 0.5,
           CALMA_ABEJA.z + vagarZ,
         );
-    ref.current.position.lerp(dest, (entrando ? 0.05 : 0.035) * mVel);
+    // 0.045 al salir de foco: el valor de la v2 aprobada (0.035 hacía la
+    // salida pegajosa — regresión detectada en la auditoría 2026-07-16).
+    ref.current.position.lerp(dest, (entrando ? 0.05 : 0.045) * mVel);
     // Comparte su posición viva para que la cámara de director la SIGA (follow
     // con lead): copia dentro del Vector3 compartido (mutación por método sobre
     // un local — no reasigna el prop, como CamaraViajera con controls.current).
@@ -1814,9 +1816,10 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, 
          y la atmósfera, no el tiovivo. */
       autoRotateSpeed={0.12}
       enableDamping
-      /* 0.08 → 0.12: el paneo respondía con manteca de más ("algo de
-         lentitud", feedback del operador) — sigue suave pero obedece. */
-      dampingFactor={0.12}
+      /* 0.08: la "sensación de lentitud/peso" de la v2 que el operador
+         APROBÓ (la subida a 0.12 fue la regresión de cámara — auditoría
+         v2-vs-actual 2026-07-16: la cámara quedó seca). */
+      dampingFactor={0.08}
       onStart={tomada ? undefined : () => setTomada(true)}
     />
   );
@@ -2119,11 +2122,12 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       />
       <VegetacionPisos nocturno={nocturno} perfil={perfil} />
 
-      {/* LA DIRECCIÓN DEL CUADRO: la casa-PUERTA donde descansa el ojo (su
-          puerta iluminada abre el mapa de los 6 portales), los senderos de
-          tierra pisada que nacen de ella, las VENTANAS VIVAS de los portales
-          principales, los pórticos humildes de lo secundario, la vista del
-          páramo con su Ent, y los patios bajo cada lugar (afordancia sin UI). */}
+      {/* LA DIRECCIÓN DEL CUADRO: la casa donde descansa el ojo (su puerta
+          iluminada es la vía SECUNDARIA a la ventana de los mundos), los
+          senderos de tierra pisada que nacen de ella, las VENTANAS VIVAS de
+          los portales principales (la entrada PRINCIPAL: paisajes en
+          miniatura, no espejos), los pórticos humildes de lo secundario, la
+          vista del páramo con su Ent, y los patios bajo cada lugar. */}
       <CasaCampesina
         alturaDe={alturaTerreno}
         perfil={perfil}
@@ -2133,13 +2137,15 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       />
       <SenderosValle alturaDe={alturaTerreno} perfil={perfil} />
       {/* JERARQUÍA DE PORTALES (regla del operador): los 6 grandes son
-          ventanas VIVAS al mundo — notorias, inmersivas; los toris de madera
-          quedan SOLO para los lugares secundarios de menos uso. */}
+          PAISAJES vivos — cada arco enmarca la viñeta 3D de su mundo (cero
+          discos-espejo); los toris de madera quedan SOLO para los lugares
+          secundarios de menos uso. */}
       <VentanasVivas
         mundos={MUNDOS_DIR}
         alturaDe={alturaTerreno}
         nocturno={nocturno}
         reducedMotion={reducedMotion}
+        perfil={perfil}
         onEntrar={portada ? null : onEntrar}
       />
       <PorticosSecundarios mundos={MUNDOS_DIR} alturaDe={alturaTerreno} />
@@ -2282,7 +2288,9 @@ export default function Valle3D({
   energia = 1,
   onEntrar,
   onAlerta,
-  /* Tocar la puerta iluminada de la casa: abre el mapa de los 6 portales. */
+  /* Tocar la puerta iluminada de la casa: la vía SECUNDARIA — lleva a la
+     ventana-puerta de los mundos (el host decide el destino). La entrada
+     principal a cada mundo son sus portales-paisaje, tocados directo. */
   onCasa = null,
   /* Tocar a Angelita: hablarle a la finca (el host abre el agente). */
   onAngelita = null,
@@ -2316,7 +2324,6 @@ export default function Valle3D({
      restauración automática, y al `webglcontextrestored` esta key REMONTA el
      <Canvas> entero — contexto nuevo, escena repintada, nunca negro fijo. */
   const [glKey, setGlKey] = useState(0);
-  const tierInicial = useMemo(() => detectarTierInicial({ tier, reducedMotion }), [tier, reducedMotion]);
   /* El PERFIL DE RENDER del tier (DR-3D-PERF-GAMABAJA): 'alto' conserva este
      look intacto; 'medio'/'bajo' degradan sombras, DPR, antialias, densidad e
      instancian lo repetido. El default 'alto' preserva a los hosts viejos. */

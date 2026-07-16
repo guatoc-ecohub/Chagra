@@ -420,44 +420,9 @@
 }
 .valle-ghost:hover { background: rgba(255, 255, 255, 0.1); }
 
-/* ── Panel de LA CASA: el mapa de los 6 portales (rediseño §2) ──
-   La puerta de la casa abre estas seis puertas: grilla 2×3 de botones con
-   el tinte de cada mundo — piso táctil generoso, legible de un vistazo. */
-.valle-panel--casa .valle-panel__tag { background: rgba(255, 216, 143, 0.26); color: #ffe2b0; }
-.valle-puertas {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.6rem;
-  margin-top: 1rem;
-}
-.valle-puerta {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  min-height: 56px;
-  padding: 0.55rem 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 0.9rem;
-  background: color-mix(in srgb, var(--p-tinte, #7fd08a) 22%, rgba(15, 24, 30, 0.6));
-  color: #fff;
-  font-family: inherit;
-  font-size: 0.98rem;
-  font-weight: 800;
-  line-height: 1.15;
-  text-align: left;
-  cursor: pointer;
-}
-.valle-puerta:hover {
-  background: color-mix(in srgb, var(--p-tinte, #7fd08a) 36%, rgba(15, 24, 30, 0.55));
-  border-color: color-mix(in srgb, var(--p-tinte, #7fd08a) 70%, transparent);
-}
-.valle-puerta__emoji { font-size: 1.35rem; }
-.valle-puerta small {
-  display: block;
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.72);
-}
+/* (El panel de LA CASA con el mapa de los 6 portales se retiró — fix del
+   operador 2026-07-16: la casa es vía SECUNDARIA a la ventana de los mundos
+   y los portales-paisaje del valle son la entrada principal.) */
 
 /* ── Barra del agente (abajo, fija) ── */
 .valle-agente {

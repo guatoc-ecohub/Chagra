@@ -7,13 +7,15 @@
  * frame. Recibe `alturaDe(x, z)` del host (Valle3D es dueño del terreno):
  * nada de aquí importa Valle3D — sin ciclos.
  *
- *   · CasaCampesina    — el corazón del cuadro Y LA PUERTA DE LOS MUNDOS:
- *                        la puerta iluminada invita a tocar y abre el mapa
- *                        de los 6 portales.
- *   · VentanasVivas    — los 6 portales PRINCIPALES como ventanas VIVAS al
- *                        mundo: un arco de vegetación con el lente del mundo
- *                        brillando adentro (jerarquía del operador: notorios
- *                        e inmersivos, nada de toris para lo principal).
+ *   · CasaCampesina    — el corazón del cuadro y la VÍA SECUNDARIA: la
+ *                        puerta iluminada invita a tocar y lleva a la
+ *                        ventana-puerta de los mundos (el host decide a
+ *                        dónde). La entrada PRINCIPAL son los portales.
+ *   · VentanasVivas    — los 6 portales PRINCIPALES como PAISAJES: un arco
+ *                        de vegetación que enmarca una VIÑETA 3D en
+ *                        miniatura del mundo de destino (el potrero con sus
+ *                        animalitos, la milpa, el puesto del mercado…).
+ *                        CERO discos-espejo (fix del operador 2026-07-16).
  *   · PorticosSecundarios — los pórticos de madera SOLO para los lugares
  *                        secundarios de menos uso (eras, huerta, vivero…).
  *   · VistaParamoEnt   — el acceso al páramo: el Ent-queñua MAGNÍFICO parado
@@ -67,10 +69,12 @@ const CASA = {
 };
 
 /**
- * La casa campesina: el corazón del cuadro y LA PUERTA DE LOS MUNDOS. Su
- * puerta está ABIERTA y con luz cálida adentro (la casa invita), pulsa apenas
- * como el faro del día, y tocarla abre el mapa de los 6 portales (`onPuerta`).
- * Modesta a propósito en lo demás: sostiene el cuadro sin pedir espectáculo.
+ * La casa campesina: el corazón del cuadro y la VÍA SECUNDARIA a los mundos.
+ * Su puerta está ABIERTA y con luz cálida adentro (la casa invita), pulsa
+ * apenas como el faro del día, y tocarla lleva a la ventana-puerta de los
+ * mundos (`onPuerta`; el host decide el destino). El acceso PRINCIPAL a cada
+ * mundo son sus portales-paisaje, tocados directo en el valle. Modesta a
+ * propósito en lo demás: sostiene el cuadro sin pedir espectáculo.
  */
 export function CasaCampesina({ alturaDe, perfil, nocturno = false, reducedMotion = false, onPuerta = null }) {
   const [cx, cz] = CASA_VALLE.pos;
@@ -220,15 +224,297 @@ export function CasaCampesina({ alturaDe, perfil, nocturno = false, reducedMotio
 /* ── VENTANAS VIVAS: los 6 portales principales ──────────────────────────
    Jerarquía del operador (2026-07-16): los portales grandes (mis matas ·
    mis animales · el tiempo · vender · aprender · toda mi finca) son
-   NOTORIOS e inmersivos — ventanas VIVAS al mundo, no toris de madera.
+   NOTORIOS e inmersivos — y son PAISAJES, no espejos (fix del operador
+   2026-07-16: CERO discos translúcidos).
 
    Cada ventana es un ARCO DE VEGETACIÓN (un anillo vivo brotado de la
-   tierra, con hojas y flores del tinte del mundo) con el LENTE del mundo
-   brillando adentro: un velo de color que respira — se ve el mundo del otro
-   lado. Se para al borde del patio mirando hacia la casa (de donde llega el
-   sendero) y tocarla ENTRA, igual que el lugar. Cero texturas: anillo,
-   discos y esferitas. */
+   tierra, con hojas y flores del tinte del mundo) que enmarca una VIÑETA
+   3D en miniatura del mundo de destino: el potrero con su vaca y su cerca,
+   la milpa de tres hermanas, el puesto del mercado con su toldo… Se ve A
+   QUÉ se entra. Se para al borde del patio mirando hacia la casa (de donde
+   llega el sendero) y tocarla ENTRA, igual que el lugar.
+
+   Técnica Android-barata (tier-safe): viñetas low-poly horneadas a mano —
+   primitivas + materiales Lambert COMPARTIDOS a nivel de módulo (6 viñetas
+   no pagan 6 shaders), cero texturas, cero render-targets, cero alocación
+   por frame. Presupuesto comparable al arco que ya existía. */
 const MAT_ARCO_VIVO = new THREE.MeshLambertMaterial({ color: '#4f7d3c' });
+
+/* La paleta compartida de las viñetas: UN material por color en todo el
+   frente de portales. */
+const VIN = {
+  tierra: new THREE.MeshLambertMaterial({ color: '#6d4f30' }),
+  pasto: new THREE.MeshLambertMaterial({ color: '#5c8a44' }),
+  madera: new THREE.MeshLambertMaterial({ color: '#7a5a38' }),
+  hoja: new THREE.MeshLambertMaterial({ color: '#3f7a45' }),
+  hojaClara: new THREE.MeshLambertMaterial({ color: '#5f9c50' }),
+  maiz: new THREE.MeshLambertMaterial({ color: '#8fae4a' }),
+  paja: new THREE.MeshLambertMaterial({ color: '#c9a95c' }),
+  crema: new THREE.MeshLambertMaterial({ color: '#f3ecdc' }),
+  nube: new THREE.MeshLambertMaterial({ color: '#f7f4ec' }),
+  teja: new THREE.MeshLambertMaterial({ color: '#c94f4f' }),
+  fruta: new THREE.MeshLambertMaterial({ color: '#d9713e' }),
+  auyama: new THREE.MeshLambertMaterial({ color: '#e8b23e' }),
+  agua: new THREE.MeshLambertMaterial({ color: '#5fb2c9' }),
+  pizarra: new THREE.MeshLambertMaterial({ color: '#2f4a3a' }),
+  plata: new THREE.MeshLambertMaterial({ color: '#9fb3a0' }),
+};
+/* El sol de la viñeta del tiempo: el único emisivo propio (brilla solo). */
+const VIN_SOL = new THREE.MeshStandardMaterial({
+  color: '#f2c766',
+  emissive: '#f2c766',
+  emissiveIntensity: 0.85,
+  flatShading: true,
+});
+
+/* MIS MATAS: la milpa de tres hermanas en policultivo — maíz de tutor,
+   fríjol trepando y auyama rastrera sobre su era de tierra. Jamás se lee
+   monocultivo (regla dura de la composición). */
+function VinetaMatas() {
+  return (
+    <group>
+      <mesh position={[0, 0.05, 0]} material={VIN.tierra}>
+        <cylinderGeometry args={[0.72, 0.78, 0.1, 9]} />
+      </mesh>
+      {/* tres matas de maíz a distinta altura (la milpa viva, no en fila) */}
+      {[[-0.34, 0.62, 0.02], [0.05, 0.78, -0.16], [0.4, 0.55, 0.08]].map(([x, h, z], i) => (
+        <group key={i} position={[x, 0.1, z]}>
+          <mesh position={[0, h / 2, 0]} material={VIN.maiz}>
+            <cylinderGeometry args={[0.022, 0.035, h, 5]} />
+          </mesh>
+          <mesh position={[0, h, 0]} material={VIN.hojaClara} scale={[1.5, 1, 0.55]}>
+            <coneGeometry args={[0.12, 0.3, 5]} />
+          </mesh>
+        </group>
+      ))}
+      {/* el fríjol trepador, subiendo por el tutor del centro */}
+      {[0.3, 0.52].map((y, i) => (
+        <mesh key={i} position={[0.1 + i * 0.03, y, -0.12]} material={VIN.hoja}>
+          <sphereGeometry args={[0.06, 6, 5]} />
+        </mesh>
+      ))}
+      {/* la auyama rastrera con su hoja ancha cubriendo el suelo */}
+      <mesh position={[-0.12, 0.15, 0.32]} material={VIN.auyama} scale={[1, 0.72, 1]}>
+        <sphereGeometry args={[0.11, 7, 6]} />
+      </mesh>
+      <mesh position={[0.2, 0.13, 0.34]} material={VIN.hoja} scale={[1.6, 0.5, 1.2]}>
+        <sphereGeometry args={[0.09, 6, 5]} />
+      </mesh>
+    </group>
+  );
+}
+
+/* MIS ANIMALES: el potrero en miniatura — pasto, la cerca de madera y el
+   hato de patio (la vaca y su gallina). */
+function VinetaAnimales() {
+  return (
+    <group>
+      <mesh position={[0, 0.05, 0]} material={VIN.pasto}>
+        <cylinderGeometry args={[0.74, 0.8, 0.1, 9]} />
+      </mesh>
+      {/* la cerca: tres postes y dos largueros */}
+      {[-0.5, 0, 0.5].map((x, i) => (
+        <mesh key={i} position={[x, 0.28, -0.3]} material={VIN.madera}>
+          <cylinderGeometry args={[0.02, 0.026, 0.38, 5]} />
+        </mesh>
+      ))}
+      {[0.34, 0.2].map((y, i) => (
+        <mesh key={i} position={[0, y, -0.3]} material={VIN.madera}>
+          <boxGeometry args={[1.06, 0.035, 0.03]} />
+        </mesh>
+      ))}
+      {/* la vaca: cuerpo, cabeza y sus cuatro patas */}
+      <group position={[-0.16, 0.1, 0.08]}>
+        <mesh position={[0, 0.21, 0]} material={VIN.crema}>
+          <boxGeometry args={[0.34, 0.18, 0.17]} />
+        </mesh>
+        <mesh position={[0.21, 0.28, 0]} material={VIN.crema}>
+          <boxGeometry args={[0.12, 0.12, 0.12]} />
+        </mesh>
+        {[[-0.12, -0.055], [-0.12, 0.055], [0.12, -0.055], [0.12, 0.055]].map(([dx, dz], i) => (
+          <mesh key={i} position={[dx, 0.06, dz]} material={VIN.crema}>
+            <cylinderGeometry args={[0.02, 0.02, 0.12, 4]} />
+          </mesh>
+        ))}
+      </group>
+      {/* la gallina criolla, picoteando el patio */}
+      <mesh position={[0.34, 0.16, 0.3]} material={VIN.teja} scale={[1, 0.85, 1.25]}>
+        <sphereGeometry args={[0.07, 6, 5]} />
+      </mesh>
+      <mesh position={[0.4, 0.24, 0.35]} material={VIN.teja}>
+        <sphereGeometry args={[0.035, 5, 4]} />
+      </mesh>
+    </group>
+  );
+}
+
+/* EL TIEMPO: el cielo LEÍDO desde la finca — la veleta, el sol y la nube
+   con su aguacero. El paisaje del pronóstico, no un ícono. */
+function VinetaTiempo() {
+  return (
+    <group>
+      <mesh position={[0, 0.05, 0]} material={VIN.pasto}>
+        <cylinderGeometry args={[0.7, 0.76, 0.1, 9]} />
+      </mesh>
+      {/* la veleta en su poste */}
+      <mesh position={[0, 0.5, 0.05]} material={VIN.madera}>
+        <cylinderGeometry args={[0.018, 0.024, 0.8, 5]} />
+      </mesh>
+      <group position={[0, 0.88, 0.05]} rotation={[0, 0.6, 0]}>
+        <mesh material={VIN.crema}>
+          <boxGeometry args={[0.3, 0.045, 0.02]} />
+        </mesh>
+        <mesh position={[0.18, 0, 0]} rotation={[0, 0, -Math.PI / 2]} material={VIN.teja}>
+          <coneGeometry args={[0.05, 0.1, 4]} />
+        </mesh>
+      </group>
+      {/* el sol de la mañana */}
+      <mesh position={[-0.4, 0.9, -0.12]} material={VIN_SOL}>
+        <sphereGeometry args={[0.13, 8, 7]} />
+      </mesh>
+      {/* la nube que trae el aguacero, con sus dos gotas */}
+      <group position={[0.38, 0.78, -0.08]}>
+        {[[-0.1, 0, 0.12], [0.1, 0.02, 0.11], [0, 0.07, 0.14]].map(([dx, dy, r], i) => (
+          <mesh key={i} position={[dx, dy, 0]} material={VIN.nube}>
+            <sphereGeometry args={[r, 7, 6]} />
+          </mesh>
+        ))}
+        {[[-0.06, -0.18], [0.07, -0.25]].map(([dx, dy], i) => (
+          <mesh key={i} position={[dx, dy, 0]} material={VIN.agua} scale={[1, 1.6, 1]}>
+            <sphereGeometry args={[0.026, 5, 4]} />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  );
+}
+
+/* VENDER: el puesto de plaza — toldo, mesa y la cosecha en sus canastos. */
+function VinetaVender() {
+  const canastos = [
+    { x: -0.24, mat: VIN.auyama },
+    { x: 0.05, mat: VIN.fruta },
+    { x: 0.32, mat: VIN.hojaClara },
+  ];
+  return (
+    <group>
+      <mesh position={[0, 0.05, 0]} material={VIN.tierra}>
+        <cylinderGeometry args={[0.72, 0.78, 0.1, 9]} />
+      </mesh>
+      {/* los dos parales y el toldo inclinado */}
+      {[-0.4, 0.4].map((x, i) => (
+        <mesh key={i} position={[x, 0.5, -0.12]} material={VIN.madera}>
+          <cylinderGeometry args={[0.02, 0.026, 0.84, 5]} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.94, 0.02]} rotation={[0.34, 0, 0]} material={VIN.teja}>
+        <boxGeometry args={[1.0, 0.035, 0.52]} />
+      </mesh>
+      {/* la mesa del puesto */}
+      <mesh position={[0, 0.4, 0.1]} material={VIN.madera}>
+        <boxGeometry args={[0.84, 0.05, 0.4]} />
+      </mesh>
+      {[-0.34, 0.34].map((x, i) => (
+        <mesh key={i} position={[x, 0.2, 0.1]} material={VIN.madera}>
+          <boxGeometry args={[0.05, 0.36, 0.3]} />
+        </mesh>
+      ))}
+      {/* los canastos con la cosecha de colores (lo que sale a venderse) */}
+      {canastos.map((c, i) => (
+        <group key={i} position={[c.x, 0.46, 0.12]}>
+          <mesh material={VIN.paja}>
+            <cylinderGeometry args={[0.085, 0.065, 0.09, 7]} />
+          </mesh>
+          <mesh position={[0, 0.05, 0]} material={c.mat}>
+            <sphereGeometry args={[0.06, 6, 5]} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+/* APRENDER: el kiosco del saber — el tablero bajo su techito de paja, con
+   sus rayitas de tiza y el banquito del que aprende. */
+function VinetaAprender() {
+  return (
+    <group>
+      <mesh position={[0, 0.05, 0]} material={VIN.tierra}>
+        <cylinderGeometry args={[0.7, 0.76, 0.1, 9]} />
+      </mesh>
+      {[-0.34, 0.34].map((x, i) => (
+        <mesh key={i} position={[x, 0.42, 0]} material={VIN.madera}>
+          <cylinderGeometry args={[0.022, 0.028, 0.68, 5]} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.88, 0]} material={VIN.paja}>
+        <coneGeometry args={[0.56, 0.32, 6]} />
+      </mesh>
+      {/* el tablero con sus rayitas de tiza */}
+      <mesh position={[0, 0.46, 0.02]} material={VIN.pizarra}>
+        <boxGeometry args={[0.56, 0.36, 0.03]} />
+      </mesh>
+      {[[-0.08, 0.54, 0.2], [-0.02, 0.47, 0.28], [0.02, 0.4, 0.16]].map(([x, y, w], i) => (
+        <mesh key={i} position={[x, y, 0.04]} material={VIN.crema}>
+          <boxGeometry args={[w, 0.018, 0.008]} />
+        </mesh>
+      ))}
+      {/* el banquito del que aprende */}
+      <mesh position={[0.02, 0.13, 0.34]} material={VIN.madera}>
+        <boxGeometry args={[0.24, 0.05, 0.14]} />
+      </mesh>
+    </group>
+  );
+}
+
+/* TODA MI FINCA: el monte por estratos — árboles de especies distintas
+   (copas de forma y verde diferentes: roble, aliso, yarumo, gaque) con el
+   frailejón plateado del filo. Biodiversidad: la regla dura del 3D. */
+function VinetaFinca() {
+  const arboles = [
+    { x: -0.4, z: 0.16, h: 0.34, cono: true, mat: VIN.hojaClara },
+    { x: -0.05, z: -0.05, h: 0.5, cono: false, mat: VIN.hoja },
+    { x: 0.36, z: 0.1, h: 0.42, cono: false, mat: VIN.hojaClara },
+    { x: 0.16, z: -0.3, h: 0.62, cono: true, mat: VIN.hoja },
+  ];
+  return (
+    <group>
+      <mesh position={[0, 0.05, 0]} material={VIN.pasto}>
+        <cylinderGeometry args={[0.74, 0.8, 0.1, 9]} />
+      </mesh>
+      {arboles.map((a, i) => (
+        <group key={i} position={[a.x, 0.1, a.z]}>
+          <mesh position={[0, a.h / 2, 0]} material={VIN.madera}>
+            <cylinderGeometry args={[0.02, 0.03, a.h, 5]} />
+          </mesh>
+          <mesh position={[0, a.h + 0.08, 0]} material={a.mat}>
+            {a.cono ? <coneGeometry args={[0.16, 0.34, 6]} /> : <sphereGeometry args={[0.15, 6, 5]} />}
+          </mesh>
+        </group>
+      ))}
+      {/* el frailejón del filo: la seña del páramo que corona la finca */}
+      <group position={[-0.3, 0.1, -0.34]}>
+        <mesh position={[0, 0.09, 0]} material={VIN.madera}>
+          <cylinderGeometry args={[0.045, 0.05, 0.18, 6]} />
+        </mesh>
+        <mesh position={[0, 0.22, 0]} material={VIN.plata} scale={[1, 0.75, 1]}>
+          <sphereGeometry args={[0.09, 6, 5]} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/* El reparto viñeta↔mundo. Un portal sin viñeta registrada monta solo el
+   arco (no truena): las ramas que sumen portales nuevos no rompen esto. */
+const VINETAS = {
+  cultivos: VinetaMatas,
+  animales: VinetaAnimales,
+  clima: VinetaTiempo,
+  mercado: VinetaVender,
+  aprender: VinetaAprender,
+  disenio: VinetaFinca,
+};
 
 function sitiosVentanas(mundos) {
   const [cx, cz] = CASA_VALLE.pos;
@@ -261,20 +547,22 @@ const HOJAS_ARCO = Array.from({ length: 10 }, (_, i) => {
   return { a, r: 0.92 + j * 0.08, s: 0.1 + Math.abs(j) * 0.06, giro: j * 2.4 };
 });
 
-function VentanaViva({ sitio, alturaDe, nocturno, reducedMotion, onEntrar }) {
+function VentanaViva({ sitio, alturaDe, nocturno, reducedMotion, rico = true, onEntrar }) {
   const y = alturaDe(sitio.x, sitio.z);
-  const lenteRef = useRef(null);
   const brilloRef = useRef(null);
-  // El lente RESPIRA (el velo del mundo ondea, ~0.3 Hz, con fase por portal
-  // para que el frente no pulse al unísono): vivo, no intermitente.
+  // Las flores del arco RESPIRAN (~0.3 Hz, con fase por portal para que el
+  // frente no pulse al unísono): vivo, no intermitente.
   const fase = useMemo(() => sitio.x * 2.1 + sitio.z * 1.3, [sitio]);
   useFrame((state) => {
     if (reducedMotion) return;
     const p = (Math.sin(state.clock.elapsedTime * 1.9 + fase) + 1) / 2;
-    if (lenteRef.current) lenteRef.current.opacity = 0.34 + p * 0.18;
     if (brilloRef.current) brilloRef.current.emissiveIntensity = 0.5 + p * 0.5;
   });
-  const [fuerte, suave] = sitio.tinte;
+  const [fuerte] = sitio.tinte;
+  // En gama media/baja el arco viste menos hojas; la viñeta SIEMPRE va (ES
+  // el portal: sin ella se vuelve un anillo mudo).
+  const hojas = rico ? HOJAS_ARCO : HOJAS_ARCO.slice(0, 6);
+  const Vineta = VINETAS[sitio.mundo.id] || null;
   return (
     <group
       position={[sitio.x, y, sitio.z]}
@@ -295,7 +583,7 @@ function VentanaViva({ sitio, alturaDe, nocturno, reducedMotion, onEntrar }) {
         <torusGeometry args={[0.95, 0.085, 7, 26]} />
       </mesh>
       {/* las hojas que lo visten (mismo material: 0 draw calls extra de shader) */}
-      {HOJAS_ARCO.map((h, i) => (
+      {hojas.map((h, i) => (
         <mesh
           key={i}
           material={MAT_ARCO_VIVO}
@@ -306,7 +594,8 @@ function VentanaViva({ sitio, alturaDe, nocturno, reducedMotion, onEntrar }) {
           <sphereGeometry args={[1, 6, 5]} />
         </mesh>
       ))}
-      {/* cuatro flores del tinte del mundo coronando el arco (la seña) */}
+      {/* cuatro flores del tinte del mundo coronando el arco (la seña; de
+          noche brillan más fuerte — la práctica que orienta) */}
       {[0.6, 1.25, 1.9, 2.55].map((a, i) => (
         <mesh
           key={i}
@@ -317,46 +606,32 @@ function VentanaViva({ sitio, alturaDe, nocturno, reducedMotion, onEntrar }) {
             ref={i === 1 ? brilloRef : undefined}
             color={fuerte}
             emissive={fuerte}
-            emissiveIntensity={0.7}
+            emissiveIntensity={nocturno ? 1.0 : 0.7}
             flatShading
           />
         </mesh>
       ))}
-      {/* EL LENTE: el velo del mundo — se ve "el otro lado" en su color */}
-      <mesh position={[0, 1.12, 0]}>
-        <circleGeometry args={[0.88, 24]} />
-        <meshBasicMaterial
-          ref={lenteRef}
-          color={suave}
-          transparent
-          opacity={0.4}
-          side={2}
-          depthWrite={false}
-        />
-      </mesh>
-      <mesh position={[0, 1.12, -0.02]}>
-        <circleGeometry args={[0.55, 20]} />
-        <meshBasicMaterial color={fuerte} transparent opacity={0.3} side={2} depthWrite={false} />
-      </mesh>
+      {/* LA VIÑETA: el mundo de destino en miniatura, parado DENTRO del arco
+          — se ve a qué se entra. Un paso detrás del plano del anillo para
+          que el marco la abrace (el arco mira hacia la casa). */}
+      {Vineta && (
+        <group position={[0, 0.02, -0.18]}>
+          <Vineta />
+        </group>
+      )}
       {/* los dos raigones donde el anillo agarra la tierra */}
       {[-0.82, 0.82].map((dx, i) => (
         <mesh key={i} position={[dx, 0.14, 0]} material={MAT_ARCO_VIVO}>
           <coneGeometry args={[0.16, 0.5, 5]} />
         </mesh>
       ))}
-      {/* de noche el lente ES una práctica: un brillo que orienta */}
-      {nocturno && (
-        <mesh position={[0, 1.12, 0.02]}>
-          <circleGeometry args={[0.88, 24]} />
-          <meshBasicMaterial color={fuerte} transparent opacity={0.18} side={2} depthWrite={false} />
-        </mesh>
-      )}
     </group>
   );
 }
 
-export function VentanasVivas({ mundos, alturaDe, nocturno = false, reducedMotion = false, onEntrar = null }) {
+export function VentanasVivas({ mundos, alturaDe, nocturno = false, reducedMotion = false, perfil = null, onEntrar = null }) {
   const sitios = useMemo(() => sitiosVentanas(mundos), [mundos]);
+  const rico = perfil ? !!perfil.materialRico : true;
   return (
     <group>
       {sitios.map((s) => (
@@ -366,6 +641,7 @@ export function VentanasVivas({ mundos, alturaDe, nocturno = false, reducedMotio
           alturaDe={alturaDe}
           nocturno={nocturno}
           reducedMotion={reducedMotion}
+          rico={rico}
           onEntrar={onEntrar}
         />
       ))}
