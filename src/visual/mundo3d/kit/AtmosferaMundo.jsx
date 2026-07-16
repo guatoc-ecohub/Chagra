@@ -37,6 +37,12 @@ import { useAtmosferaMundo } from './atmosfera.js';
  *   "posan" el diorama. Póngalo en false si la escena ya trae su propio suelo.
  * @param {boolean} [props.conNiebla=true]  monta la niebla de profundidad.
  * @param {boolean} [props.conEstrellas=true]  deja asomar las estrellas de noche.
+ * @param {{left:number,right:number,top:number,bottom:number,far:number}|null}
+ *   [props.sombra=null]  frustum de sombra a medida de la escena (el contrato de
+ *   LuzMadre): cuando viene Y el tier lo permite (perfil.sombras, solo 'alto'),
+ *   el sol de la franja proyecta shadow-map real — la luz colada del sombrío que
+ *   los mundos de cultivo no pueden perder. Sin `sombra`, cero shadow-map (el
+ *   costo de siempre).
  */
 export default function AtmosferaMundo({
   familia = 'neutro',
@@ -47,10 +53,12 @@ export default function AtmosferaMundo({
   conSuelo = true,
   conNiebla = true,
   conEstrellas = true,
+  sombra = null,
 }) {
   const atm = useAtmosferaMundo({ familia, reducedMotion });
   const frugal = tier === 'bajo';
   const perfil = perfilDeTier(tier);
+  const conSombra = !!(sombra && perfil.sombras);
 
   return (
     <>
@@ -62,8 +70,23 @@ export default function AtmosferaMundo({
       <ambientLight intensity={0.28 * atm.intensidad} color={atm.luz} />
       {/* El sol de la franja — mismo arco que el valle (rasante al amanecer,
           cenital al mediodía, luna de noche): el lenguaje de sombreado no cambia
-          al entrar al mundo. */}
-      <directionalLight position={atm.solPos} intensity={0.9 * atm.intensidad} color={atm.luz} />
+          al entrar al mundo. Con `sombra` (y tier alto) proyecta shadow-map. */}
+      <directionalLight
+        position={atm.solPos}
+        intensity={0.9 * atm.intensidad}
+        color={atm.luz}
+        castShadow={conSombra}
+        {...(conSombra
+          ? {
+              'shadow-mapSize': [1024, 1024],
+              'shadow-camera-far': sombra.far ?? 30,
+              'shadow-camera-left': sombra.left ?? -12,
+              'shadow-camera-right': sombra.right ?? 12,
+              'shadow-camera-top': sombra.top ?? 12,
+              'shadow-camera-bottom': sombra.bottom ?? -12,
+            }
+          : null)}
+      />
       {/* Relleno frío tenue desde el lado opuesto: despega los volúmenes del
           fondo cálido sin matar el contraste (clave del look claymation). */}
       <directionalLight position={[-5, 4, -6]} intensity={0.22} color={atm.relleno} />
