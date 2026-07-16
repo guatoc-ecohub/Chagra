@@ -96,12 +96,13 @@ const ANTICIPO = { abre: 0.06 };
 const ZERO3 = Object.freeze(new THREE.Vector3());
 
 /* ── El BARRIDO de presentación ───────────────────────────────────────────
-   Waypoints en unidades de mundo del valle (terreno 34×34; la cordillera al
-   fondo en z≈-15, la quebrada baja de (-3.4,-7.2) a (3.6,8), los mundos entre
-   z -2.5 y 6.5). Arranca ALTO sobre el páramo mirando la ladera, planea sobre
-   la quebrada y los mundos, y cae hacia la pose jugable. El último tramo lo
-   cubre el resorte de asentamiento (por eso la curva termina CERCA del reposo,
-   no encima). El modo sobrio recorta el barrido a un dolly corto en arco. */
+   Waypoints en unidades de mundo del valle (terreno 48×48 tras el rediseño;
+   la cordillera al fondo en z≈-22, la quebrada baja de (-4.6,-11) a
+   (4.6,11.5), los mundos entre z -9.4 y 9.6). Arranca ALTO sobre el páramo
+   mirando la ladera, planea sobre la quebrada y los mundos, y cae hacia la
+   pose jugable. El último tramo lo cubre el resorte de asentamiento (por eso
+   la curva termina CERCA del reposo, no encima). El modo sobrio recorta el
+   barrido a un dolly corto en arco. */
 export function waypointsPresentacion(modo, reposo, mira) {
   const [rx, ry, rz] = reposo;
   const [mx, my, mz] = mira;
@@ -122,15 +123,15 @@ export function waypointsPresentacion(modo, reposo, mira) {
   }
   return {
     pos: [
-      [-13, 15.5, -6], // alto sobre el páramo: la ladera entera y el río de lado
-      [-14.5, 11, 6], // planeo por el costado: la quebrada baja en cuadro
-      [-4, 8.6, 15], // frente del valle: los mundos y la fauna, de cerca
+      [-18, 20, -9], // alto sobre el páramo: la ladera entera y el río de lado
+      [-20, 15, 9], // planeo por el costado: la quebrada baja en cuadro
+      [-6, 11.5, 21], // frente del valle: la casa-puerta, los pórticos, la fauna
       [rx * 0.86, ry * 1.06, rz * 0.94], // casi la pose jugable (remata el resorte)
     ],
     mira: [
-      [1.5, 2.6, 2.5],
-      [0.5, 1.6, 0.8],
-      [0.2, 1.2, 0.6],
+      [2, 3.2, 3.2],
+      [0.7, 2.2, 1.2],
+      [0.2, 1.6, 1.0],
       [mx, my + 0.1, mz - 0.1],
     ],
     fovDesde: 46,
