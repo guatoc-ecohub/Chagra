@@ -380,22 +380,28 @@ async function runPlantaFoto(ctx) {
   if (!created.ok && rels.location) { delete rels.location; created = await farmosWrite(base, token, '/api/asset/plant', { data: { type: 'asset--plant', attributes: { name: `CANARIO planta ${target} ${stamp}`, status: 'active' }, relationships: rels } }); }
   const plantId = created.ok ? created.json?.data?.id : null;
 
-  // Subir la foto al campo `image` de la planta por el flujo NATIVO de farmOS 4.x /
-  // Drupal 10 — el MISMO que usa el cliente real (uploadBinaryToFarmOS en
-  // src/services/apiService.js). Es en DOS pasos:
-  //   A) POST /api/{entity}/{bundle}/{field} (octet-stream) crea un file--file NUEVO
-  //      y devuelve su UUID. OJO: la forma con el UUID en la ruta
-  //      (/api/asset/plant/{id}/image) NO EXISTE en este farmOS (404 sin auth → 500
-  //      con token; verificado 2026-07-11) y ningún código de producción la usa.
+  // Subir la foto por el MISMO camino que corre el usuario real: `POST
+  // /api/file/upload` con FormData. Son los dos únicos sitios que suben binarios a
+  // farmOS en producción: uploadToFarmOS (src/services/operatorPhotoService.js) y
+  // el sync de evidencia (src/services/syncManager.js). En DOS pasos:
+  //   A) POST /api/file/upload (multipart) crea un file--file y devuelve su UUID.
   //   B) PATCH del plant relacionando el file, para que persista (un file--file sin
   //      referencia queda temporal y el cron de Drupal lo borra ~6 h).
+  // NO volver a la forma JSON:API de campo (POST /api/{entity}/{bundle}/{field},
+  // octet-stream): ningún código de producción la usa, así que probarla no dice
+  // nada sobre lo que le pasa al usuario. Se intentó dos veces y el farmOS real la
+  // rechazó — 500 con el UUID en la ruta (2026-07-11) y 403 sin él (2026-07-16).
+  // Content-Type se OMITE a propósito: lo pone fetch con el boundary multipart,
+  // igual que fetchFromFarmOS, que borra el header cuando el body es FormData.
   let fileId = null; let uploadStatus = null;
   if (plantId) {
     const bytes = Buffer.from(CANARY_JPEG_B64, 'base64');
-    const up = await httpFetch(`${base}/api/asset/plant/image`, {
+    const form = new FormData();
+    form.append('file', new Blob([bytes], { type: 'image/jpeg' }), `CANARIO-${target}-${dateStr}.jpg`);
+    const up = await httpFetch(`${base}/api/file/upload`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/octet-stream', 'Content-Disposition': `file; filename="CANARIO-${target}-${dateStr}.jpg"`, Accept: 'application/vnd.api+json' },
-      body: bytes, timeoutMs: 45000,
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.api+json' },
+      body: form, timeoutMs: 45000,
     });
     uploadStatus = up.status;
     if (up.ok && up.json?.data?.id) {
