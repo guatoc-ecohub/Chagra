@@ -380,14 +380,18 @@ export const CLIMAS = {
     luciernagas: 0,
   },
   noche: {
+    /* DÍA POR NOCHE (dirección de fotografía): nadie filma la noche a oscuras.
+       Azul índigo levantado (se VE), luz de luna plateada con intensidad de
+       contraluz, y la niebla abierta para que la ladera entera se lea. Las
+       prácticas (ventana de la casa, luciérnagas, el faro) hacen el resto. */
     etiqueta: 'Noche',
     grade: 'vfx-grade--glacial',
-    cielo: ['#0b1830', '#132a4e'],
-    luz: '#9fc2e8',
-    ambiente: '#26364f',
-    niebla: '#13203a',
-    nieblaLejos: 22,
-    intensidad: 0.5,
+    cielo: ['#152a52', '#1e3d6e'],
+    luz: '#b3cdf0',
+    ambiente: '#35486b',
+    niebla: '#1d3153',
+    nieblaLejos: 30,
+    intensidad: 0.72,
     estrellas: true,
     sol: [-6, 7, -4],
     luciernagas: 1,
