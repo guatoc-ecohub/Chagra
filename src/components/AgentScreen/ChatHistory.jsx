@@ -139,9 +139,9 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
                 className="text-slate-200 text-xl mb-2"
                 style={{ fontFamily: "'Baloo 2', 'Nunito', system-ui, sans-serif", fontWeight: 700, letterSpacing: '-0.3px' }}
               >
-                ¡Hola! Soy tu asistente agroecológico.
+                ¡Hola! Soy Angelita, su asistente agroecológica.
               </p>
-              <p className="text-slate-500 text-xs">Puedes hablarme o escribirme sobre tus plantas.</p>
+              <p className="text-slate-500 text-xs">Puede hablarme o escribirme sobre sus plantas.</p>
             </>
           )}
         </div>
@@ -348,7 +348,9 @@ function ProactiveGreeting({ greeting }) {
         className="text-slate-200 text-xl mb-1.5"
         style={{ fontFamily: "'Baloo 2', 'Nunito', system-ui, sans-serif", fontWeight: 700, letterSpacing: '-0.3px' }}
       >
-        {hi}. Soy <span className="text-emerald-300">Chagra</span>.
+        {/* 2026-07-16: el agente ES Angelita (la abeja) — el texto acompaña
+            a la cara que el operador ya ve arriba. */}
+        {hi}. Soy <span className="text-emerald-300">Angelita</span>, de Chagra.
       </p>
       <p
         className="text-slate-300 text-sm leading-relaxed mb-3"

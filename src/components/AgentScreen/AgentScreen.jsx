@@ -120,7 +120,8 @@ import { prependCorrectionBlock } from './responseGuards';
 // idea contextual (cultivo/clima/temporada) sin inventar alarmas. Lógica pura
 // y testeable extraída a proactiveGreeting; aquí solo la hidratamos desde los
 // stores en vivo y la pintamos en el empty-state del chat.
-import { resolveProactiveGreeting } from '../../services/proactiveGreeting';
+import { resolveProactiveGreeting, saludoPorHora } from '../../services/proactiveGreeting';
+import { saludoDePantalla } from '../../services/saludoPantalla';
 import useLogStore from '../../store/useLogStore';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
 // La lógica pura del merge del estado final vive en agentPartialMerge (testeable
@@ -138,7 +139,6 @@ import ChatHistory from './ChatHistory';
 import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
-import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
 import { AgentManoOverlay } from '../agent/AgentShell';
 import { mapCapabilityPick } from '../agent/capabilityRouting';
 import { agentSounds } from '../../services/agentSoundService';
@@ -574,6 +574,19 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         ensoOutlook = getEnsoOutlook({ phase, region, probabilities: probs });
       }
     } catch (_) { /* sin ENSO no pasa nada — la idea cae a temporada/piso */ }
+    // SALUDO CONTEXTUAL POR PANTALLA (2026-07-16): si el operador tocó a
+    // Angelita desde una pantalla mapeada (AgentFab pasa `desdePantalla`),
+    // ella saluda sobre ESO — "¿le ayudo con la germinación?" en #semilla.
+    // Los pendientes URGENTES siguen mandando (una alerta de plaga le gana
+    // a la cortesía); el saludo de pantalla solo reemplaza la idea genérica.
+    const saludoPantalla = saludoDePantalla(initialContext?.desdePantalla);
+    const greetingDePantalla = (hi) => ({
+      state: 'idea',
+      hi: hi || saludoPorHora(),
+      lead: saludoPantalla,
+      items: [],
+      restCount: 0,
+    });
     resolveProactiveGreeting({
       activeAlerts,
       getPendingTasks: () => useLogStore.getState().getPendingTasks(),
@@ -581,8 +594,17 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       altitud: finca?.altitud != null ? Number(finca.altitud) : null,
       ensoOutlook,
     }).then((g) => {
-      if (alive) setProactiveGreeting(g);
-    }).catch(() => { /* degrada silencioso al copy estático */ });
+      if (!alive) return;
+      if (saludoPantalla && (!g || g.state !== 'pending')) {
+        setProactiveGreeting(greetingDePantalla(g?.hi));
+      } else {
+        setProactiveGreeting(g);
+      }
+    }).catch(() => {
+      // Degrada silencioso: con saludo de pantalla lo usamos igual; sin él,
+      // cae al copy estático de siempre.
+      if (alive && saludoPantalla) setProactiveGreeting(greetingDePantalla());
+    });
     return () => { alive = false; };
     // Solo al montar: el saludo es la primera impresión, no debe re-evaluarse en
     // cada cambio de inventario/alerta mientras el operador ya está leyéndolo.
@@ -3568,8 +3590,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         >
           <Home size={20} />
         </button>
-        {/* Avatar + título */}
-        <ChagraAgentAvatarColibriPhoto
+        {/* Avatar + título. 2026-07-16: iba directo a la foto del colibrí
+            saltándose el wrapper — ahora respeta la preferencia (default
+            Angelita, "jubila el colibrí" — operador). */}
+        <ChagraAgentAvatar
           state={state === STATE_RECORDING ? 'listening' : (state === STATE_THINKING || isVoicePlaying) ? 'thinking' : 'idle'}
           size={36}
           onDoubleClick={async () => {
