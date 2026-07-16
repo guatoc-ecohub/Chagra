@@ -175,6 +175,13 @@ const LAZY_MAP = {
   // ── PENDIENTE_DECISION (operador dijo "nada afuera") ────────────
   OnboardingCondensado: lazy(() => import('../components/OnboardingCondensado.jsx')),
   OnboardingSiembra: lazy(() => import('../mockups/OnboardingSiembra.jsx')),
+  // La sala de juegos: el hub que hace VISIBLES los juegos (#juegos) desde
+  // Aprender. Los dos de abajo estaban en el manifiesto SIN entrada aquí →
+  // rutas muertas en prod ("construido pero no cableado"): sus tarjetas del
+  // hub no abrían nada.
+  HubJuegos: lazy(() => import('../components/juego/HubJuegos.jsx')),
+  JuegoMiFincaOdyssey: lazy(() => import('../mockups/JuegoMiFincaOdyssey.jsx')),
+  MonoVsPoliSimulator: lazy(() => import('../components/juego/MonoVsPoliSimulator.jsx')),
   MiFincaVivaScreen: lazy(() => import('../components/juego/MiFincaVivaScreen.jsx')),
   DefensoresFincaScreen: lazy(() => import('../components/juego/DefensoresFincaScreen.jsx')),
   MilpaSimulator: lazy(() => import('../components/juego/MilpaSimulator.jsx')),
@@ -258,6 +265,10 @@ const VISTAS_SIN_SALIDA = new Set([
   'aliados_finca', 'momento_venta',
   'fermentos', 'asociaciones', 'mapa',
   'mockup_voz_con_forma', 'mockup_conversacion_voz',
+  // Juegos sin control de salida propio (verificado componente por
+  // componente): el comparador mono-vs-poli y la ladera 3D de restauración
+  // no traen onBack ni ScreenShell — sin el botón de casa serían trampas.
+  'mono_vs_poli', 'monte_vuelve', 'restaurar',
 ]);
 
 // ── Componente principal ────────────────────────────────────────
@@ -539,8 +550,12 @@ export default function ProdChagraApp() {
           sea sobre ESA pantalla (saludoPantalla.js). Se oculta solo donde
           estorba: cargando (parpadeo de auth), el propio agente (ya está
           ella en grande), la escucha de voz, los mockups de diseño y el
-          onboarding guiado — mismo criterio del shell clásico (App.jsx). */}
-      {currentView !== 'loading'
+          onboarding guiado — mismo criterio del shell clásico (App.jsx).
+          EN EL VALLE (home) NO se monta: allá Angelita YA vive en la escena
+          (una sola abeja — feedback del operador 2026-07-16: "se ven 3
+          abejitas") y la barra "Pregúntele a su finca…" abre el agente. */}
+      {!esHome
+        && currentView !== 'loading'
         && currentView !== 'agente'
         && currentView !== 'voz'
         && !currentView.startsWith('mockup_')

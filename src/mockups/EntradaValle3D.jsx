@@ -43,7 +43,6 @@ import {
 import useCicloDia from '../visual/mundo3d/useCicloDia.js';
 import Valle2DFallback from './valle/Valle2DFallback';
 import AbejaTransicion, { AlMontarEscena } from '../visual/creatures/AbejaTransicion.jsx';
-import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
 /* El framework de MUNDOS (three-free en el barrel; los dioramas 3D bajan
    perezosos en `vendor-three`): tocar un lugar del valle ENTRA de verdad. */
 import Mundo, {
@@ -645,38 +644,19 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
         </p>
       )}
 
-      {/* ── El compañero: Angelita en una sola línea puntual (imagen-first).
-              Es el ser al que se cuida; su cara refleja el ánimo real. Se
-              esconde si hay un panel abierto — una cosa clara a la vez.
-              DENTRO de un mundo sigue presente y HABLA: narra el lugar y
-              nombra las puertas. Lo que dice (`dicho`) va SIEMPRE en su
-              burbuja de texto (aria-live) — si la voz falta o está apagada,
-              la burbuja es la voz. ── */}
-      {(dicho || (!panel && !nav.enMundo)) && (
+      {/* ── La burbuja de voz de Angelita (aria-live): lo que ella DICE va
+              SIEMPRE en texto — si la voz falta o está apagada, la burbuja ES
+              la voz. Angelita VIVE en la ESCENA del valle (UNA sola abeja —
+              feedback del operador 2026-07-16: "se ven 3 abejitas"): este chip
+              ya no lleva su cara 2D ni la frase fija de ánimo; aparece solo
+              mientras ella habla. ── */}
+      {dicho && (
         <div
           className={`valle-companero${nav.enMundo ? ' valle-companero--mundo' : ''}`}
-          data-gesto={gesto || undefined}
           role="status"
           aria-live="polite"
         >
-          {/* DENTRO de un mundo Angelita vive en la ESCENA (una sola compañera,
-              no dos abejas): aquí el chip queda solo como su burbuja de voz. En
-              el valle sí lleva su cara (la tarjeta puntual imagen-first). */}
-          {!nav.enMundo && (
-            <span className="valle-companero__cara" aria-hidden="true">
-              <AbejaAngelita
-                size={34}
-                pose={gesto || 'vuela'}
-                animo={companero.animo}
-                energia={companero.energia}
-                animated={!reducedMotion}
-              />
-              <i className="valle-companero__sombra" />
-            </span>
-          )}
-          {(dicho || !nav.enMundo) && (
-            <span className="valle-companero__txt">{dicho || companero.frase}</span>
-          )}
+          <span className="valle-companero__txt">{dicho}</span>
         </div>
       )}
 
