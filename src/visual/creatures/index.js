@@ -43,6 +43,12 @@ export { Borugo } from './Borugo.jsx';
    su perfil de clima). El 9º y ÚLTIMO bicho — el ANIMAL DE CIERRE. Solo datos:
    jamás arrastra three al bundle base — igual que jaguarIdentidad/abejaIdentidad. */
 export { BORUGO_PALETA, BORUGO_PROPORCION, BORUGO_SLUG, PERFIL_BORUGO } from './borugoIdentidad.js';
+export { Danta } from './Danta.jsx';
+/* La IDENTIDAD de la danta como datos (paleta lanuda + borde blanco de orejas/
+   labios, proporciones y su perfil de clima). La emblemática que faltaba en el
+   bosque — la JARDINERA que siembra al andar. Solo datos: jamás arrastra three
+   al bundle base — igual que borugoIdentidad/jaguarIdentidad. */
+export { DANTA_PALETA, DANTA_PROPORCION, DANTA_SLUG, PERFIL_DANTA } from './dantaIdentidad.js';
 /* La IDENTIDAD del trío andino como datos (paletas + proporciones). Solo datos:
    jamás arrastra three al bundle base — igual que abejaIdentidad. */
 export {
@@ -111,6 +117,7 @@ import Ardilla from './Ardilla.jsx';
 import Jaguar from './Jaguar.jsx';
 import Morrocoy from './Morrocoy.jsx';
 import Borugo from './Borugo.jsx';
+import Danta from './Danta.jsx';
 import Lombriz from './Lombriz.jsx';
 import Mariposa from './Mariposa.jsx';
 import Escarabajo from './Escarabajo.jsx';
@@ -127,6 +134,7 @@ export const CREATURES = {
   jaguar: { Component: Jaguar, nombre: 'Jaguar', cientifico: 'Panthera onca' },
   morrocoy: { Component: Morrocoy, nombre: 'Morrocoy de patas rojas', cientifico: 'Chelonoidis carbonarius' },
   borugo: { Component: Borugo, nombre: 'Borugo', cientifico: 'Cuniculus taczanowskii' },
+  danta: { Component: Danta, nombre: 'Danta de páramo', cientifico: 'Tapirus pinchaque' },
   lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },
   mariposa: { Component: Mariposa, nombre: 'Mariposa pasionaria', cientifico: 'Dione juno' },
   escarabajo: { Component: Escarabajo, nombre: 'Escarabajo estercolero', cientifico: 'Dichotomius belus' },

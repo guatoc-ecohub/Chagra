@@ -1,12 +1,18 @@
 /*
  * MundoAbejas3D: diorama standalone sobre polinizacion, miel y conservacion.
- * Todo es procedural, local y determinista. Las abejas nativas sin aguijon
- * comparten el paisaje con colmenas Langstroth, sin confundir sus viviendas.
+ * Procedural, local y determinista — salvo LAS ABEJAS: el ENJAMBRE es la
+ * AbejaAngelita rubber-hose de la casa (src/visual/creatures/) montada como
+ * billboards <Html>, el MISMO patrón de los vecinos del Bosque Vivo. Cada
+ * abeja lleva su órbita lissajous, su fase y su compás propios (nada vuela en
+ * fila ni bate al unísono): el colmenar se siente ZUMBANDO. Las abejas nativas
+ * sin aguijon comparten el paisaje con colmenas Langstroth, sin confundir sus
+ * viviendas.
  */
 import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { AdaptiveDpr, OrbitControls } from '@react-three/drei';
+import { AdaptiveDpr, Html, OrbitControls } from '@react-three/drei';
+import { AbejaAngelita } from '../visual/creatures/index.js';
 import { ATMOSFERA, PALETA, mezclar } from '../visual/mundo3d/atmosferaMadre.js';
 import { CIELOS_HORA } from '../visual/mundo3d/cielosHoraData.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
@@ -24,10 +30,22 @@ const COLORES = {
   blanco: '#f8efd9',
 };
 
-const ABEJAS = [
-  [-3.7, 2.15, 1.8, 0.1], [-2.7, 1.65, 2.9, 1.4], [-1.7, 2.4, 1.25, 2.3],
-  [0.4, 2.2, 2.7, 3.1], [1.8, 1.55, 1.6, 4.4], [3.2, 2.35, 2.35, 5.2],
-  [4.1, 1.8, 0.7, 0.8], [-0.2, 1.45, -0.7, 2.8], [2.4, 2.65, -1.3, 4.9],
+/* EL ENJAMBRE — cada Angelita con su puesto de trabajo (ancla), su órbita
+   lissajous (rx/rz), su velocidad, su fase y su tamaño propios: velocidades y
+   frecuencias co-primas para que NUNCA se sincronicen (ritmo, no metrónomo).
+   Las primeras seis patrullan el surco de flores; las últimas tres trabajan
+   las viviendas (colmenas Langstroth, caja melipona y panal). El orden importa:
+   tier bajo recorta del final (las flores mandan). */
+const ENJAMBRE = [
+  { ancla: [-3.9, 1.0, 2.6], rx: 1.05, rz: 0.7, v: 0.62, fase: 0.0, px: 30 },
+  { ancla: [-2.2, 1.3, 3.0], rx: 0.8, rz: 0.95, v: 0.5, fase: 1.7, px: 26 },
+  { ancla: [-0.6, 0.9, 2.7], rx: 1.15, rz: 0.6, v: 0.73, fase: 3.1, px: 28 },
+  { ancla: [1.4, 1.15, 3.1], rx: 0.9, rz: 0.8, v: 0.57, fase: 4.4, px: 30 },
+  { ancla: [3.4, 0.95, 2.9], rx: 1.0, rz: 0.7, v: 0.67, fase: 2.4, px: 26 },
+  { ancla: [4.6, 1.35, 2.2], rx: 0.7, rz: 0.9, v: 0.46, fase: 5.3, px: 24 },
+  { ancla: [-3.3, 1.5, -0.9], rx: 0.95, rz: 0.6, v: 0.54, fase: 0.9, px: 26 },
+  { ancla: [3.6, 1.4, -1.2], rx: 0.7, rz: 0.75, v: 0.61, fase: 3.8, px: 24 },
+  { ancla: [0.6, 1.9, -1.9], rx: 0.85, rz: 0.5, v: 0.44, fase: 2.0, px: 28 },
 ];
 const FLORES = [
   [-4.8, 0.45, 2.5, '#f6bf3c'], [-4.1, 0.4, 3.4, '#fff1bb'],
@@ -125,27 +143,54 @@ function Apicultor() {
   );
 }
 
-function Abeja({ datos, reducedMotion }) {
-  const grupo = useRef(null);
-  const [x, y, z, fase] = datos;
+/* Sombra suave bajo cada Angelita (billboard <Html>, patrón Bosque Vivo). */
+const ESTILO_ANGELITA = {
+  filter: 'drop-shadow(0 2px 3px rgba(71, 49, 20, 0.3))',
+  pointerEvents: 'none',
+};
+
+/* UNA Angelita del enjambre: el SVG rubber-hose de la casa como billboard,
+   volando SU órbita lissajous (frecuencias 1 : 1.37 — nunca cierra igual dos
+   veces al ojo) con bamboleo vertical propio y un temblorcito de zumbido. Mira
+   hacia donde va (flip del SVG por la derivada en x, con histéresis para no
+   parpadear en los bordes de la órbita). Estado en refs: cero re-renders. Con
+   reduced-motion queda posada en su ancla, digna y quieta. */
+function AbejaDelEnjambre({ datos, reducedMotion }) {
+  const grupo = useRef(/** @type {any} */ (null));
+  const capa = useRef(/** @type {HTMLDivElement|null} */ (null));
+  const mirando = useRef(1);
   useFrame(({ clock }) => {
-    if (reducedMotion || !grupo.current) return;
-    const t = clock.elapsedTime + fase;
-    grupo.current.position.set(x + Math.sin(t * 1.7) * 0.28, y + Math.sin(t * 2.4) * 0.12, z + Math.cos(t * 1.7) * 0.24);
-    grupo.current.rotation.y = -t * 1.7;
+    const g = grupo.current;
+    if (reducedMotion || !g) return;
+    const t = clock.elapsedTime * datos.v + datos.fase;
+    g.position.set(
+      datos.ancla[0] + Math.sin(t) * datos.rx,
+      datos.ancla[1] + Math.sin(t * 2.09) * 0.18 + Math.sin(clock.elapsedTime * 6.3 + datos.fase) * 0.035,
+      datos.ancla[2] + Math.sin(t * 1.37 + 0.9) * datos.rz,
+    );
+    // El rumbo sale del propio camino (derivada en x); histéresis para que el
+    // flip solo ocurra cuando de verdad cambia de rumbo.
+    const dx = Math.cos(t) * datos.rx;
+    const dir = dx < -0.04 ? -1 : dx > 0.04 ? 1 : mirando.current;
+    if (dir !== mirando.current && capa.current) {
+      mirando.current = dir;
+      capa.current.style.transform = dir < 0 ? 'scaleX(-1)' : '';
+    }
   });
   return (
-    <group ref={grupo} position={[x, y, z]} scale={0.55}>
-      <mesh rotation={[0, 0, Math.PI / 2]}><capsuleGeometry args={[0.11, 0.2, 4, 7]} /><meshLambertMaterial color="#35251a" /></mesh>
-      <mesh position={[0.11, 0, 0]}><sphereGeometry args={[0.11, 7, 6]} /><meshLambertMaterial color="#e2a62b" /></mesh>
-      {[-0.1, 0.1].map((zAla) => <mesh key={zAla} position={[0, 0.12, zAla]} rotation={[-0.25, 0, zAla * 4]}><circleGeometry args={[0.14, 7]} /><meshBasicMaterial color="#fff8d9" transparent opacity={0.66} side={THREE.DoubleSide} /></mesh>)}
+    <group ref={grupo} position={/** @type {[number, number, number]} */ (datos.ancla)}>
+      <Html center distanceFactor={9} zIndexRange={[4, 0]} pointerEvents="none">
+        <div ref={capa} aria-hidden="true" data-enjambre="abeja-angelita" style={ESTILO_ANGELITA}>
+          <AbejaAngelita size={datos.px} animated={!reducedMotion} />
+        </div>
+      </Html>
     </group>
   );
 }
 
 function Escena({ tier, reducedMotion }) {
   const perfil = perfilDeTier(tier);
-  const abejas = tier === 'bajo' ? ABEJAS.slice(0, 4) : tier === 'medio' ? ABEJAS.slice(0, 7) : ABEJAS;
+  const abejas = tier === 'bajo' ? ENJAMBRE.slice(0, 4) : tier === 'medio' ? ENJAMBRE.slice(0, 7) : ENJAMBRE;
   return (
     <>
       <color attach="background" args={[DORADA.cielo]} />
@@ -161,7 +206,7 @@ function Escena({ tier, reducedMotion }) {
       <Panal />
       <Apicultor />
       {FLORES.map(([x, y, z, color]) => <Flor key={`${x}-${z}`} posicion={[x, y, z]} color={color} />)}
-      {abejas.map((datos) => <Abeja key={datos.join('-')} datos={datos} reducedMotion={reducedMotion} />)}
+      {abejas.map((datos) => <AbejaDelEnjambre key={datos.ancla.join('-')} datos={datos} reducedMotion={reducedMotion} />)}
       <ParticulasAmbientales tipo="polen" tier={tier} reducedMotion={reducedMotion} area={[10, 3.5, 7]} position={[0, 0.5, 0]} />
       <OrbitControls makeDefault enablePan={false} minDistance={8.5} maxDistance={15} minPolarAngle={0.65} maxPolarAngle={1.35} target={[0, 0.8, 0]} />
       {tier === 'alto' ? <AdaptiveDpr pixelated /> : null}

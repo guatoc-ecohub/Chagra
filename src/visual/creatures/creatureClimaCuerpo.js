@@ -247,6 +247,9 @@ export const ROPA_PERFIL_POR_BICHO = Object.freeze({
   // Borugo: roedor NOCTURNO de montaña húmeda — siente el frío pronto y de páramo
   // NUNCA suda (como el oso/la rana).
   borugo: { frioC: 8, calorC: 22, sudaAlSol: false },
+  // Danta: el tapir LANUDO de tierra fría (páramo/bosque altoandino) — aguanta
+  // el frío mejor que nadie y NUNCA suda (como el oso/la rana).
+  danta: { frioC: 3, calorC: 18, sudaAlSol: false },
 });
 
 /* Perfil neutro (slug desconocido / standalone). */

@@ -26,6 +26,7 @@ import {
   geomPiedrasQuebrada,
   geomArcoPiedra,
   geomLomitas,
+  geomBancales,
   geomLajasSendero,
 } from '../miradorAndino.geom.js';
 import { VINETAS_GEOM, geomVineta } from '../vinetasMundos.geom.js';
@@ -93,6 +94,10 @@ describe('el paisaje del mirador', () => {
     esGeomValida(geomPiedrasQuebrada());
     esGeomValida(geomLajasSendero());
     esGeomValida(geomLomitas([[0, 0, -9], [4, 0.5, -9]]));
+    esGeomValida(geomBancales([
+      { radio: 9.3, altura: 1.6, caida: 2.1, arco: 64 },
+      { radio: 12, altura: 3.45, caida: 2.3, arco: 56 },
+    ]));
   });
 
   it('el arco de piedra construye en todas las calidades de tier', () => {
@@ -116,11 +121,12 @@ describe('el paisaje del mirador', () => {
   });
 });
 
-describe('las doce viñetas-diorama', () => {
-  it('hay viñeta para los DOCE mundos del manifiesto', () => {
+describe('las quince viñetas-diorama', () => {
+  it('hay viñeta para los QUINCE mundos del manifiesto', () => {
     const mundos = [
       'valle', 'cafe', 'agua', 'sanidad', 'mercado', 'animales',
       'semillero', 'suelo', 'sierra', 'paramo', 'lluvia', 'compost',
+      'cacao', 'papa', 'abejas',
     ];
     expect(Object.keys(VINETAS_GEOM).sort()).toEqual([...mundos].sort());
   });

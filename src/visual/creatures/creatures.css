@@ -1874,136 +1874,108 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   VIDA v2 — LA VARA DE ANGELITA APLICADA A LOS 8 BICHOS (idle-cerebro +
-   mirada que reconoce + gestos-firma nuevos de colibrí y rana).
-   El reloj vive en useVidaIdle.js; el repertorio en vidaEstados.js. Aquí:
-     1. La MIRADA QUE LO RECONOCE — data-rh-mira='usted' pisa el dardeo
-        natural y las pupilas siguen su puntero (vars --rh-mx/--rh-my).
-     2. COLIBRÍ: acicala (pico al ala) + vibra (burst staccato de emoción).
-     3. RANA: croa (la garganta canta) + medita (zen hondo, ojos que caen).
-   Todo transform/opacity (GPU, Android gama baja), RM-safe, tier-safe.
+   DANTA (Tapirus pinchaque) — el 10º bicho: la JARDINERA DEL BOSQUE.
+   ───────────────────────────────────────────────────────────────────────────
+   El CARÁCTER de la MANSEDUMBRE MONUMENTAL: el tapir andino, la mole lanuda de
+   tierra fría que siembra el bosque al andar. Movimientos LENTOS y con PESO
+   (nada de vibrar ligero): respiración honda de mole, la TROMPA que ondula
+   idle y HUSMEA en periscopio (su reacción-firma), las orejas de borde blanco
+   que se enderezan. Aditivo sobre el KIT species-agnostic (no toca a ningún
+   otro bicho): la danta reescribe SU boil (hondo y manso) y suma la vida de la
+   trompa. Todo transform/opacity (GPU, gama baja). Gates RM + tier al final.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── LA MIRADA QUE LO RECONOCE (species-agnostic) ────────────────────────────
-   Cuando el bicho "se da cuenta" de usted (useMiradaUsted pone el attr en el
-   nodo raíz), las pupilas dejan su dardeo y lo SIGUEN con un empalme suave.
-   Al soltarlo (~2s quieto) vuelven a su dardeo natural. Al final del archivo
-   para ganar la cascada sobre .rh-mirada. */
-[data-rh-mira='usted'] .rh-mirada {
-  animation: none;
-  transform: translate(var(--rh-mx, 0px), var(--rh-my, 0px));
-  transition: transform 0.16s ease-out;
+/* BOIL HONDO — la danta NO vibra: respira con PESO de mole, más lento aún que
+   el oso (la masa asienta despacio). Reescribe SOLO el boil de la danta (misma
+   clase .rh-boil, mayor especificidad por el data-creature) con longhands para
+   no pisar el resto de props de animación. */
+[data-creature='danta'] .rh-boil {
+  animation-name: danta-boil;
+  animation-duration: 4.1s;
+  animation-timing-function: ease-in-out;
+}
+@keyframes danta-boil {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(0.45px) scale(1.016, 0.984); } /* respiración honda de mole */
 }
 
-/* ── COLIBRÍ · ACICALA (aseo de ave: el pico peina el ala) ───────────────────
-   El cuerpo entero pica hacia el ala trasera (transform-origin al centro),
-   da DOS pasadas de peine y vuelve con overshoot. 2.6s = un loop exacto del
-   compás del cerebro. El dardo y las estelas se pausan (nadie se asea
-   dardeando); los antics ceden como en todos los gestos de la casa. */
-[data-creature='colibri'][data-acicala='1'] .crt-body {
-  animation: colibri-acicala 2.6s cubic-bezier(0.4, 0, 0.3, 1.3) infinite;
-  transform-box: fill-box;
-  transform-origin: center;
+/* LA TROMPA ONDULA — el idle permanente del tapir: el hocico-probóscide se
+   mece apenas, tanteando el aire sin prisa (pivote arriba, donde nace). */
+.danta-trompa {
+  animation: danta-trompa-ondula 3.3s ease-in-out infinite;
 }
-@keyframes colibri-acicala {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  16%      { transform: rotate(-26deg) translateY(0.7px); } /* baja el pico al ala */
-  30%      { transform: rotate(-19deg) translateY(0.5px); } /* pasada 1 */
-  44%      { transform: rotate(-27deg) translateY(0.7px); } /* pasada 2 */
-  58%      { transform: rotate(-18deg) translateY(0.4px); }
-  82%      { transform: rotate(5deg) translateY(-0.2px); }  /* overshoot al volver */
-}
-[data-creature='colibri'][data-acicala='1'] .colibri-estela { opacity: 0; }
-[data-creature='colibri'][data-acicala='1'] .colibri-dardo,
-[data-creature='colibri'][data-vibra='1'] .colibri-dardo { animation: none; }
-
-/* ── COLIBRÍ · VIBRA (el burst staccato: la emoción que no cabe) ─────────────
-   Jitter chiquito y VELOZ con squash&stretch — el hiperactivo vibra en el
-   sitio como olla a presión. 0.45s por loop; el cerebro lo sostiene 4 loops. */
-[data-creature='colibri'][data-vibra='1'] .crt-body {
-  animation: colibri-vibra 0.45s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-@keyframes colibri-vibra {
-  0%, 100% { transform: translate(0, 0) scale(1, 1); }
-  25%      { transform: translate(0.3px, -0.5px) scale(1.04, 0.95); }
-  50%      { transform: translate(-0.25px, 0.2px) scale(0.96, 1.05); }
-  75%      { transform: translate(0.25px, 0.3px) scale(1.03, 0.97); }
-}
-/* el aleteo se apura durante el burst (la emoción sube las revoluciones) */
-[data-creature='colibri'][data-vibra='1'] .crt-wing { animation-duration: 0.07s; }
-
-/* ── RANA · CROA (el canto: la garganta se INFLA y suelta) ───────────────────
-   La papada que ya late (crt-garganta) se hincha GRANDE dos veces con el
-   compás del canto; el cuerpo acompaña con squash de esfuerzo. La rana canta
-   PLANTADA: el salto espera a que termine. 2.4s = un loop del cerebro. */
-[data-creature='rana-andina'][data-croa='1'] .crt-garganta {
-  animation: rana-croa-garganta 2.4s cubic-bezier(0.4, 0, 0.5, 1) infinite;
-}
-@keyframes rana-croa-garganta {
-  0%, 100% { transform: scale(1, 1); }
-  20%      { transform: scale(1.55, 1.75); } /* se INFLA — el globo del croar */
-  36%      { transform: scale(1.1, 1.14); }  /* suelta el canto */
-  56%      { transform: scale(1.48, 1.65); } /* segundo croar */
-  78%      { transform: scale(0.95, 0.92); } /* exhala, vacía */
-}
-[data-creature='rana-andina'][data-croa='1'] .crt-body {
-  animation: rana-croa-cuerpo 2.4s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center bottom;
-}
-@keyframes rana-croa-cuerpo {
-  0%, 100% { transform: scale(1, 1); }
-  20%      { transform: scale(1.06, 0.93); } /* el esfuerzo del canto (squash) */
-  56%      { transform: scale(1.05, 0.94); }
+@keyframes danta-trompa-ondula {
+  0%, 100% { transform: rotate(-2.5deg) scaleY(1); }
+  50%      { transform: rotate(3deg) scaleY(1.03); }   /* tantea sin prisa */
 }
 
-/* ── RANA · MEDITA (zen hondo — paciente pero MUY inteligente) ───────────────
-   Los párpados CAEN despacio y se quedan caídos casi todo el rato (pisa el
-   parpadeo normal), la respiración se vuelve honda y lenta. La quietud como
-   gesto: la sabia del agua se va para adentro. 4.8s = un loop del cerebro. */
-[data-creature='rana-andina'][data-medita='1'] .rh-blink {
-  animation: rana-medita-ojos 4.8s ease-in-out infinite;
+/* OREJAS de borde blanco — atentas, se mecen apenas (permanente, manso). */
+.danta-orejas {
+  animation: danta-orejas 4.9s ease-in-out infinite;
 }
-@keyframes rana-medita-ojos {
-  0%, 100%  { transform: scaleY(1); }
-  16%, 84%  { transform: scaleY(0.12); } /* párpados caídos, serena */
+@keyframes danta-orejas {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(-0.3px) scaleY(1.04); }  /* atentas y mansas */
 }
-[data-creature='rana-andina'][data-medita='1'] .crt-body {
-  animation: rana-medita-respira 4.8s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center bottom;
-}
-@keyframes rana-medita-respira {
-  0%, 100% { transform: scale(1, 1) translateY(0); }
-  45%      { transform: scale(1.05, 1.07) translateY(-0.35px); } /* inhala hondo */
-  72%      { transform: scale(0.985, 0.965) translateY(0.1px); } /* suelta despacio */
-}
-/* la rana ni salta ni dardea la mirada mientras canta o medita */
-[data-creature='rana-andina'][data-croa='1'] .rana-salto,
-[data-creature='rana-andina'][data-medita='1'] .rana-salto,
-[data-creature='rana-andina'][data-medita='1'] .rh-mirada { animation: none; }
 
-/* Los ANTICS ceden durante los gestos nuevos (patrón de toda la casa: un
-   gesto a la vez — la vuelta de campana no interrumpe el canto). */
-[data-creature='colibri'][data-acicala='1'] .rh-antic,
-[data-creature='colibri'][data-acicala='1'] .rh-travieso,
-[data-creature='colibri'][data-vibra='1'] .rh-antic,
-[data-creature='colibri'][data-vibra='1'] .rh-travieso,
-[data-creature='rana-andina'][data-croa='1'] .rh-antic,
-[data-creature='rana-andina'][data-croa='1'] .rh-travieso,
-[data-creature='rana-andina'][data-medita='1'] .rh-antic,
-[data-creature='rana-andina'][data-medita='1'] .rh-travieso { animation: none; }
+/* HUSMEA — la reacción-firma: la TROMPA sube en PERISCOPIO y tantea a lado y
+   lado (algo huele a fruta o a visita) y las orejas se enderezan. Pisan el
+   idle por especificidad (dos atributos). */
+[data-creature='danta'][data-husmea='1'] .danta-trompa {
+  animation: danta-trompa-periscopio 1.15s ease-in-out infinite;
+}
+@keyframes danta-trompa-periscopio {
+  0%, 100% { transform: rotate(12deg) scaleY(0.9) translateY(-0.3px); }
+  50%      { transform: rotate(-16deg) scaleY(0.86) translateY(-0.5px); }  /* el periscopio curioso */
+}
+[data-creature='danta'][data-husmea='1'] .danta-orejas {
+  animation: danta-orejas-perk 0.95s ease-in-out infinite;
+}
+@keyframes danta-orejas-perk {
+  0%, 100% { transform: translateY(-0.3px) scaleY(1.05); }
+  50%      { transform: translateY(-0.9px) scaleY(1.13); }  /* alerta dulce */
+}
+/* y la cabeza se adelanta apenas (el interés de la mole, sin brusquedad) */
+[data-creature='danta'][data-husmea='1'] .danta-cabeza {
+  animation: danta-cabeza-interes 2.3s ease-in-out infinite;
+}
+@keyframes danta-cabeza-interes {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-0.5px) scale(1.02); }
+}
 
-/* Cinturón y tirantes: quietud pedida = fotograma digno (los gestos nuevos
-   quedan estáticos; la mirada-que-sigue ni se activa — el JS ya no corre). */
+/* HABLA (lip-sync): la trompa se alza CORTÉS para dejar ver la boca — sway
+   corto y elevado mientras dure el visema (V2..V4; V1 = boca en reposo). */
+[data-creature='danta'][data-visema='V2'] .danta-trompa,
+[data-creature='danta'][data-visema='V3'] .danta-trompa,
+[data-creature='danta'][data-visema='V4'] .danta-trompa {
+  animation: danta-trompa-habla 1.6s ease-in-out infinite;
+}
+@keyframes danta-trompa-habla {
+  0%, 100% { transform: rotate(7deg) scaleY(0.9); }
+  50%      { transform: rotate(11deg) scaleY(0.88); }   /* alzada, cede la palabra */
+}
+
+/* El estado husmea PISA el arrebato (antic/travieso): una mole que tantea el
+   aire con la trompa no da vueltas de campana. */
+[data-creature='danta'][data-husmea='1'] .rh-antic,
+[data-creature='danta'][data-husmea='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito de la danta lo reactivaría (misma
+   clase) → re-apagarlo aquí (mayor especificidad + orden posterior). La trompa
+   y las orejas continuas también se cortan; el estado reactivo (husmea) sigue
+   contando la verdad. */
+[data-tier='bajo'][data-creature='danta'] .rh-boil,
+[data-tier='bajo'][data-creature='danta'] .danta-trompa,
+[data-tier='bajo'][data-creature='danta'] .danta-orejas { animation: none; }
+
 @media (prefers-reduced-motion: reduce) {
-  [data-creature='colibri'][data-acicala='1'] .crt-body,
-  [data-creature='colibri'][data-vibra='1'] .crt-body,
-  [data-creature='rana-andina'][data-croa='1'] .crt-garganta,
-  [data-creature='rana-andina'][data-croa='1'] .crt-body,
-  [data-creature='rana-andina'][data-medita='1'] .rh-blink,
-  [data-creature='rana-andina'][data-medita='1'] .crt-body { animation: none !important; }
-  [data-rh-mira='usted'] .rh-mirada { transition: none !important; }
+  [data-creature='danta'] .rh-boil,
+  .danta-trompa, .danta-orejas,
+  [data-creature='danta'][data-husmea='1'] .danta-trompa,
+  [data-creature='danta'][data-husmea='1'] .danta-orejas,
+  [data-creature='danta'][data-husmea='1'] .danta-cabeza,
+  [data-creature='danta'][data-visema='V2'] .danta-trompa,
+  [data-creature='danta'][data-visema='V3'] .danta-trompa,
+  [data-creature='danta'][data-visema='V4'] .danta-trompa { animation: none !important; }
 }

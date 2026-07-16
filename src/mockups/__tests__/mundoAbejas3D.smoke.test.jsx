@@ -11,6 +11,8 @@ vi.mock('@react-three/fiber', () => ({
 vi.mock('@react-three/drei', () => ({
   AdaptiveDpr: () => null,
   OrbitControls: () => null,
+  // El enjambre monta las Angelitas rubber-hose como billboards <Html>.
+  Html: ({ children }) => <div data-testid="html-billboard">{children}</div>,
 }));
 
 vi.mock('../../visual/mundo3d/ParticulasAmbientales.jsx', () => ({
