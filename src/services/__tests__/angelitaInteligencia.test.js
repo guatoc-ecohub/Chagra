@@ -130,8 +130,7 @@ describe('comentarioDeMundo — grounded + honesto', () => {
     expect(conAlerta).toMatch(/2 avisos/i);
     const conFase = comentarioDeMundo('clima', {
       snapshot: { enso_status: { phase: 'nina_fuerte' } },
-      describirFase: (/** @type {string} */ p) =>
-        (p === 'nina_fuerte' ? 'La Niña fuerte, mucha lluvia' : 'Estado del clima desconocido'),
+      describirFase: (p) => (p === 'nina_fuerte' ? 'La Niña fuerte — mucha lluvia' : 'Estado del clima desconocido'),
     });
     expect(conFase).toMatch(/niña fuerte/i);
     const sinDato = comentarioDeMundo('clima', {});
