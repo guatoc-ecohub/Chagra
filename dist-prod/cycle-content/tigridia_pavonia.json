@@ -1,0 +1,83 @@
+{
+  "species_slug": "tigridia_pavonia",
+  "scientific_name": "Tigridia pavonia (L.f.) DC.",
+  "common_names": [
+    "Tigridia / Flor de tigre"
+  ],
+  "family": "Iridaceae",
+  "category": "cercas_vivas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "bulbo",
+      "semilla"
+    ],
+    "best_method": "bulbo",
+    "protocol_resumen": "Bulbos plantados a 5-8cm de profundidad, separacion 15-20cm. Florece 2-3 meses despues de la siembra. Flores duran un dia pero se suceden por semanas.",
+    "notas": "Herbacea bulbosa ornamental de flores vistosas. Cada flor abre al amanecer y se cierra al atardecer (un solo dia de vida). Uso en bordes de cerca viva.",
+    "fuente": "Perez Arbelaez 1947; GBIF"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 800,
+      "optimo_max": 2000,
+      "max_absoluto": 2600
+    },
+    "temperatura_c": {
+      "helada_letal": -3,
+      "optimo_min": 15,
+      "optimo_max": 22,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La tigridia o flor de tigre (Tigridia pavonia (L.f.) DC., familia Iridaceae) es una herbácea bulbosa perenne nativa de México y Centroamérica, naturalizada y cultivada en jardines campesinos colombianos como ornamental de bordes de cerca viva entre 800 y 2.000 msnm en zonas templadas. Recibe los nombres regionales lirio tigre y oceloxóchitl (náhuatl, flor de ocelote), por las manchas atigradas que decoran el centro de sus flores triangulares de 8-15 cm de pétalos vistosos (rojo, naranja, amarillo, blanco según cultivar). Su rasgo botánico más singular es la efemerofloración: cada flor individual abre al amanecer del día, alcanza receptividad polínica máxima al mediodía, y se marchita irreversiblemente al atardecer del mismo día (anthesis circadiana de aproximadamente 8-10 horas), pero el escapo floral produce sucesivamente nuevas flores durante semanas, dando continuidad de polen y néctar al agroecosistema. Lección viva del reloj del huerto: cada flor abre al amanecer y vive solo un día, enseñando la sincronización de la planta con el ciclo solar (cronobiología vegetal, ritmos circadianos regulados por fitocromos y criptocromos sensibles a la luz azul-roja del alba), el concepto de esfuerzo reproductivo distribuido en el tiempo como estrategia evolutiva alternativa a la flor de larga duración, y la importancia de los polinizadores nativos (abejas Apidae, Halictidae, colibríes Trochilidae y mariposas Lepidoptera) que deben sincronizar su forrajeo matinal con la apertura floral en una ventana corta. Excelente herramienta pedagógica para enseñar a niños la observación fenológica diaria y la conexión profunda planta-polinizador-tiempo solar. Manejo agroecológico: propagación por bulbos a 5-8 cm profundidad con separación 15-20 cm, floración 2-3 meses tras siembra, sin agroquímicos, asocio en bordes de cerca viva y guildas ornamentales-polinizadoras. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, SIB Colombia, Bernal 2015 Catálogo Plantas Colombia, Pérez Arbeláez 1947 Plantas Útiles.",
+  "sources": [
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.377Z"
+}

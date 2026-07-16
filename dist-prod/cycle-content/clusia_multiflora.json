@@ -1,0 +1,100 @@
+{
+  "species_slug": "clusia_multiflora",
+  "scientific_name": "Clusia multiflora Kunth",
+  "common_names": [
+    "Gaque"
+  ],
+  "family": "Clusiaceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "biomass_producer",
+    "pollinator_attractor"
+  ],
+  "antagonists": [
+    "eucalyptus_globulus",
+    "pinus_patula"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Propagación por semilla fresca recolectada de frutos maduros dehiscentes (cápsulas que abren liberando semillas con arilo carnoso anaranjado, dispersadas por aves frugívoras como tucanetas y mirlas). Germinación 45-90 días en sustrato turba-arena (3:1) con sombra parcial 50% y humedad constante. Trasplante a bolsa a los 4-6 meses. Plantación definitiva 12-18 meses. También por esqueje semileñoso de 20-25 cm tratado con AIB 2000 ppm (enraizamiento 40-60%). Crecimiento moderado 30-60 cm/año.",
+    "tiempo_a_establecimiento_dias": 540,
+    "notas": "Especie hemiepífita facultativa: puede germinar sobre otros árboles y eventualmente lanzar raíces al suelo (estrategia 'strangler-like' suave, sin matar al hospedante). Indica buena humedad atmosférica y suelos con hojarasca acumulada."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2200,
+      "optimo_max": 2900,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 8,
+      "optimo_max": 16,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El gaque o chagualo (Clusia multiflora Kunth, familia Clusiaceae) es un árbol perennifolio hemiepífito facultativo (8-20 m altura) emblemático del bosque alto andino de la Cordillera Oriental colombiana, distribuido entre 1800 y 3200 msnm en piso térmico FRÍO (Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander, Norte de Santander). Es planta nativa silvestre central para la restauración ecológica de la franja 2000-3000 msnm de Cruz Verde-Sumapaz, Chingaza, Iguaque y Guerrero, donde forma rodales mixtos con encenillo (Weinmannia tomentosa), roble (Quercus humboldtii), mortiño (Hesperomeles goudotiana) y raque (Vallea stipularis). Sus hojas coriáceas crasas opuestas (rasgo distintivo de Clusiaceae junto con el látex amarillo-resinoso al corte) son resistentes a la radiación intensa de alta montaña y a la desecación atmosférica de la estación seca. Sus flores blanco-cremosas dioicas atraen polinizadores nativos (abejas sin aguijón Meliponini, sírfidos y mariposas de alta montaña) y sus cápsulas dehiscentes con semillas de arilo carnoso anaranjado son alimento clave de aves frugívoras alto-andinas (mirlas, tucanetas esmeralda, atrapamoscas de páramo) — por eso es especie 'sombrilla' o 'paraguas ecológico': su presencia indica un bosque sano y su plantación recupera no solo la cubierta arbórea sino también la red trófica de aves dispersoras. Estrategia hemiepífita facultativa: puede germinar sobre otros árboles (epifitismo inicial sobre robles, encenillos, raques) y luego lanzar raíces aéreas al suelo formando una estructura columnar — NO mata al hospedante (a diferencia del 'strangler fig' Ficus tropical), sino que coexiste, lo que la hace ecológicamente noble. Lección viva sobre BOSQUE ALTO ANDINO, HEMIEPIFITISMO, RESTAURACIÓN DE LADERAS COLOMBIANAS y DISPERSIÓN ORNITÓCORA: el gaque es ejemplo paradigmático de cómo una especie nativa con estrategia ecológica sofisticada (hemiepífita + dioica + ornitócora) sostiene ecosistemas enteros, y de cómo su plantación en proyectos de restauración del flanco occidental de la Cordillera Oriental (Cruz Verde-Sumapaz, Chingaza) acelera la regeneración del bosque alto andino vs plantaciones monoespecíficas de pino o eucalipto que esterilizan el suelo. Manejo agroecológico: propagación por semilla fresca con sombra parcial 50%, trasplante 4-6 meses, plantación 12-18 meses; asocio con encenillo, roble andino y raque; densidades 200-400 ind/ha para reconectar fragmentos boscosos; evitar sitios expuestos al viento de páramo. Estado conservación: nativo silvestre NO amenazado pero localmente raro en sitios donde el bosque alto andino fue convertido a pastura para ganadería lechera (Sabana de Bogotá, altiplano cundiboyacense, altiplano nariñense). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Libro Rojo Plantas Colombia, Humboldt Flora Alto-Andina, JBB Plantas Medicinales, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- quercus_humboldtii — Roble negro andino (Quercus humboldtii Bonpl.)\n- vallea_stipularis — Raque (Vallea stipularis L. f.)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- eucalyptus_globulus — Eucalipto blanco (Eucalyptus globulus Labill.)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.402Z"
+}

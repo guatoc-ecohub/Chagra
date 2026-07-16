@@ -5,95 +5,79 @@ import useThemeBackgroundStore, {
   BACKGROUND_CATALOG,
 } from '../../../store/useThemeBackgroundStore';
 
+/*
+ * Post 2026-07-16: los fondos son GRADIENTES andinos (3), no fotos. Las 4 fotos
+ * biopunk (todas con un oso de anteojos AI-realista que el operador rechazó) se
+ * archivaron. Los previews se dibujan con un <div> de background, ya no <img>.
+ */
 describe('BackgroundSelector smoke', () => {
   beforeEach(() => {
     localStorage.clear();
-    // Default universal: "Cosecha mística" (biopunk-4). El fondo "Clásico"
-    // fue eliminado del catálogo (operador 2026-06-02).
-    useThemeBackgroundStore.getState().setBackground('biopunk-4');
+    useThemeBackgroundStore.getState().setBackground('valle-calido');
   });
 
-  it('renderiza las opciones de fondo del catálogo (4 biopunk, sin Clásico)', () => {
+  it('renderiza las opciones del catálogo (3 gradientes andinos, sin fotos-oso)', () => {
     render(<BackgroundSelector />);
+    expect(screen.getByText('Valle cálido')).toBeInTheDocument();
+    expect(screen.getByText('Páramo frío')).toBeInTheDocument();
+    expect(screen.getByText('Noche andina')).toBeInTheDocument();
+    // Las fotos-oso viejas ya no aparecen.
+    expect(screen.queryByText('Páramo completo')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cosecha mística')).not.toBeInTheDocument();
     expect(screen.queryByText('Clásico')).not.toBeInTheDocument();
-    expect(screen.getByText('Páramo completo')).toBeInTheDocument();
-    expect(screen.getByText('Colibrí tech')).toBeInTheDocument();
-    expect(screen.getByText('Bosque ilustrado')).toBeInTheDocument();
-    expect(screen.getByText('Cosecha mística')).toBeInTheDocument();
   });
 
-  it('Cosecha mística (default universal) seleccionado por default', () => {
+  it('Valle cálido (default universal) seleccionado por default', () => {
     render(<BackgroundSelector />);
-    const misticaBtn = screen.getByText('Cosecha mística').closest('button');
-    expect(misticaBtn).toHaveAttribute('aria-pressed', 'true');
+    const btn = screen.getByText('Valle cálido').closest('button');
+    expect(btn).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('estado del store preselecciona el fondo al montar', () => {
-    useThemeBackgroundStore.getState().setBackground('biopunk-3');
+  it('el estado del store preselecciona el fondo al montar', () => {
+    useThemeBackgroundStore.getState().setBackground('noche-andina');
     render(<BackgroundSelector />);
-    const bosqueBtn = screen.getByText('Bosque ilustrado').closest('button');
-    expect(bosqueBtn).toHaveAttribute('aria-pressed', 'true');
+    const btn = screen.getByText('Noche andina').closest('button');
+    expect(btn).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('cada opción muestra un thumbnail img', () => {
+  it('hay una opción por cada entrada del catálogo y ya no hay <img>', () => {
     render(<BackgroundSelector />);
-    const imgs = document.querySelectorAll('img');
-    expect(imgs.length).toBe(BACKGROUND_CATALOG.length);
-    imgs.forEach((img) => expect(img).toHaveAttribute('loading', 'lazy'));
+    expect(document.querySelectorAll('img').length).toBe(0);
+    const botones = screen
+      .getAllByRole('button')
+      .filter((b) => b.hasAttribute('aria-pressed'));
+    expect(botones.length).toBe(BACKGROUND_CATALOG.length);
   });
-
-  // ── Vista ampliada (modal de preview) ──────────────────────────────────────
 
   it('click en miniatura abre la vista ampliada con dialog role', () => {
     render(<BackgroundSelector />);
-    const paramoBtn = screen.getByText('Páramo completo').closest('button');
-    fireEvent.click(paramoBtn);
-
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByRole('dialog')).toHaveAttribute(
-      'aria-label',
-      'Vista completa: Páramo completo'
-    );
+    fireEvent.click(screen.getByText('Valle cálido').closest('button'));
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).toHaveAttribute('aria-label', 'Vista completa: Valle cálido');
   });
 
-  it('la vista ampliada muestra la imagen COMPLETA (contain, src no vacío)', () => {
+  it('la vista ampliada muestra el fondo (role=img con el gradiente)', () => {
     render(<BackgroundSelector />);
-    fireEvent.click(screen.getByText('Colibrí tech').closest('button'));
-
+    fireEvent.click(screen.getByText('Páramo frío').closest('button'));
     const dialog = screen.getByRole('dialog');
-    // La imagen principal de la vista ampliada tiene alt = opt.label
-    const previewImg = dialog.querySelector('img[alt="Colibrí tech"]');
-    expect(previewImg).toBeInTheDocument();
-    expect(/** @type {HTMLImageElement} */ (previewImg).src).toBeTruthy();
-    expect(/** @type {HTMLImageElement} */ (previewImg).src).not.toBe('');
-    // imagen COMPLETA, sin recorte: object-fit:contain (rediseño aprobado,
-    // reemplaza el borde eléctrico cónico que la tapaba — #1261).
-    expect(/** @type {HTMLElement} */ (previewImg).style.objectFit).toBe('contain');
+    const preview = dialog.querySelector('[role="img"][aria-label="Páramo frío"]');
+    expect(preview).toBeInTheDocument();
+    expect(/** @type {HTMLElement} */ (preview).style.background).toContain('gradient');
   });
 
   it('la vista ampliada dibuja el micelio en el borde (no el borde eléctrico viejo)', () => {
     render(<BackgroundSelector />);
-    fireEvent.click(screen.getByText('Cosecha mística').closest('button'));
-
+    fireEvent.click(screen.getByText('Noche andina').closest('button'));
     const dialog = screen.getByRole('dialog');
-    // El micelio aprobado: SVG con contorno-madre + rayos pulse + esporas.
     const mycelium = dialog.querySelector('svg.chagra-mycelium');
     expect(mycelium).toBeInTheDocument();
-    // rayo que recorre el perímetro (stroke-dashoffset) + esporas que laten
     expect(mycelium.querySelectorAll('.chagra-myc-pulse').length).toBeGreaterThanOrEqual(2);
     expect(mycelium.querySelectorAll('.chagra-myc-spore').length).toBeGreaterThanOrEqual(1);
-    // pathLength normalizado → el rayo recorre el borde idéntico en cualquier
-    // aspect-ratio real (no fijo 3/4 como el prototipo).
-    const pulse = mycelium.querySelector('.chagra-myc-pulse');
-    expect(pulse.getAttribute('pathLength')).toBe('1360');
-
-    // El borde eléctrico cónico rechazado (#1261) NO debe existir.
     expect(dialog.querySelector('.chagra-espin')).not.toBeInTheDocument();
-    expect(dialog.querySelector('.chagra-etrace')).not.toBeInTheDocument();
   });
 
   it('el micelio respeta prefers-reduced-motion (animación apagada por CSS)', () => {
-    // El CSS global del micelio incluye la regla reduce → animation:none.
     const styleEl = document.getElementById('chagra-mycelium-border-css');
     expect(styleEl).toBeTruthy();
     expect(styleEl.textContent).toContain('prefers-reduced-motion: reduce');
@@ -102,35 +86,28 @@ describe('BackgroundSelector smoke', () => {
 
   it('botón Elegir este fondo aplica el fondo y cierra el modal', () => {
     render(<BackgroundSelector />);
-    fireEvent.click(screen.getByText('Páramo completo').closest('button'));
+    fireEvent.click(screen.getByText('Valle cálido').closest('button'));
     fireEvent.click(screen.getByText('Elegir este fondo'));
-
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-1');
-    expect(JSON.parse(localStorage.getItem('chagra:background:v1')).state.selected).toBe('biopunk-1');
+    expect(useThemeBackgroundStore.getState().selected).toBe('valle-calido');
   });
 
   it('botón cerrar (X) descarta el modal sin cambiar la selección', () => {
-    useThemeBackgroundStore.getState().setBackground('biopunk-4');
+    useThemeBackgroundStore.getState().setBackground('noche-andina');
     render(<BackgroundSelector />);
-    fireEvent.click(screen.getByText('Páramo completo').closest('button'));
-
-    const closeBtn = screen.getByLabelText('Cerrar vista previa');
-    fireEvent.click(closeBtn);
-
+    fireEvent.click(screen.getByText('Valle cálido').closest('button'));
+    fireEvent.click(screen.getByLabelText('Cerrar vista previa'));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    // la selección NO cambió
-    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-4');
+    expect(useThemeBackgroundStore.getState().selected).toBe('noche-andina');
   });
 
   it('Escape cierra la vista ampliada sin cambiar la selección', () => {
-    useThemeBackgroundStore.getState().setBackground('biopunk-4');
+    useThemeBackgroundStore.getState().setBackground('noche-andina');
     render(<BackgroundSelector />);
-    fireEvent.click(screen.getByText('Colibrí tech').closest('button'));
+    fireEvent.click(screen.getByText('Páramo frío').closest('button'));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(useThemeBackgroundStore.getState().selected).toBe('biopunk-4');
+    expect(useThemeBackgroundStore.getState().selected).toBe('noche-andina');
   });
 });

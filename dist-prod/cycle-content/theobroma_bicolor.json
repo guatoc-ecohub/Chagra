@@ -1,0 +1,78 @@
+{
+  "species_slug": "theobroma_bicolor",
+  "scientific_name": "Theobroma bicolor Humb. & Bonpl.",
+  "common_names": [
+    "Cacao blanco"
+  ],
+  "family": "Malvaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "no_evaluada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje",
+      "injerto"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semillas frescas recalcitrantes (no toleran desecación). Despulpado manual, lavado de mucílago, siembra inmediata. Germinación 15-30 días en sustrato húmedo. Trasplante a sistema agroforestal con sombra 50% a los 6-9 meses. Establecimiento 18-24 meses; primer fruto a los 4-6 años.",
+    "tiempo_a_establecimiento_dias": 540,
+    "notas": "Especie hermana de Theobroma cacao (ya en catálogo) — uso tradicional ancestral mesoamericano (patashte maya — bebida ceremonial Popol Vuh) y amazónico-chocoano (bacao). Manejada por EMBERA, TIKUNA, HUITOTO, BORA y comunidades AFROCOLOMBIANAS pacíficas.",
+    "fuente": "POWO Kew; GBIF; Cárdenas-Salinas; Sinchi"
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1000,
+      "max_absoluto": 1400
+    },
+    "temperatura_c": {
+      "helada_letal": 10,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El cacao blanco, bacao o patashte (Theobroma bicolor Humb. & Bonpl., familia Malvaceae — antes Sterculiaceae) es un frutal nativo neotropical hermano del cacao común (Theobroma cacao — ya en catálogo) distribuido desde el sur de México (Chiapas — patashte maya) por Centroamérica (Guatemala, Belice, Honduras), Colombia (Chocó biogeográfico: Chocó, Valle del Cauca pacífico — Bajo Calima, Cauca pacífico, Nariño pacífico; Amazonia: Leticia, Caquetá, Putumayo, Vaupés, Guaviare, Amazonas; piedemonte llanero del Meta y Casanare), Ecuador, Perú amazónico, Venezuela amazónica y Brasil amazónico, entre 0 y 1.400 msnm en bosque húmedo tropical. Es PEDAGÓGICAMENTE EXCELENTE como lección viva de manejo ancestral por parte de las CULTURAS PREHISPÁNICAS MAYAS (patashte ceremonial mencionado en Popol Vuh y códices), los pueblos indígenas amazónicos TIKUNA (trapecio amazónico — Leticia, Puerto Nariño), HUITOTO/MUINANE/BORA (medio Caquetá-Putumayo donde se considera 'cacao de monte' sagrado), YAGUA, COFAN, INGA del piedemonte amazónico, y EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano, así como por las COMUNIDADES AFROCOLOMBIANAS del Chocó (Cocomacia, Acadesan, consejos comunitarios del Bajo Atrato, San Juan, Baudó, Buenaventura, Guapi, Tumaco) que durante siglos lo han manejado como 'bacao' en sistemas agroforestales tradicionales — frecuentemente intercalado con cacao común (T. cacao), copoazú (T. grandiflorum — ya en catálogo), borojó (Borojoa patinoi y B. sorbilis), chontaduro (Bactris gasipaes), don pedrito (Oenocarpus mapora) y plátano (Musa spp.). Pertenece al género Theobroma (Malvaceae, subfamilia Byttnerioideae) junto a T. cacao, T. grandiflorum (copoazú), T. subincanum (cacao de monte), T. speciosum y T. obovatum. Árbol de 8-15 m altura con tronco recto cilíndrico, hojas alternas elípticas-ovaladas 20-30 cm verde-oscuras coriáceas con envés blanquecino-tomentoso (característica diagnóstica — de ahí 'bicolor'), inflorescencias caulifloras (flores directamente sobre tronco y ramas gruesas — fenómeno caulifloría como en T. cacao) con flores pequeñas blanco-rosadas polinizadas por mosquitas Forcipomyia (Ceratopogonidae), fruto cápsula leñosa elipsoidal-oblonga 15-30 cm largo x 8-15 cm ancho con cáscara dura amarilla-anaranjada cuando madura conteniendo 30-50 semillas inmersas en pulpa blanca-cremosa dulce-acidulada aromática. Diferencias con T. cacao: fruto más grande, cáscara amarilla (no roja-purpúrea), pulpa más dulce-aromática (perfil mango-piña-cacao), semillas más grandes y de uso menos chocolatero (más para harina y pulpa fresca); diferencias con T. grandiflorum: pulpa más dulce (no tan ácida), fruto menos elongado, hojas con envés tomentoso (vs envés glabro en grandiflorum). USOS: pulpa fresca consumida directamente, en jugos, helados, mermeladas, dulces; semillas tostadas y molidas dan bebida 'patashte' o 'chicha de bacao' (tradición maya y amazónica) similar al chocolate pero más ligera; semillas también consumidas tostadas como 'pepas' (similar a almendras); cáscara como abono y forraje. Manejo agroecológico: requiere sombra parcial 40-60% (igual que T. cacao); siembra a 5-7 m entre plantas; asocio con cacao, plátano, copoazú, borojó, palmas en sistema agroforestal multiestrato; tolerancia mayor a humedad alta que T. cacao (resistente a monilia y escoba de bruja); cosecha cuando el fruto suene hueco al golpe. Función en chagra/agroforestal pacífica y amazónica como cosecha comunitaria sostenible, conservación de género Theobroma neotropical, diversificación de cadena cacaotera (mercado especialidad 'cacao blanco' creciente), banco genético prehispánico mesoamericano-amazónico. Fuentes Tier A: POWO Kew, GBIF, Sinchi, IIAP Pacífico, Cárdenas-Salinas frutales amazónicos, AGROSAVIA Pacífico, Bernal 2015.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.396Z"
+}

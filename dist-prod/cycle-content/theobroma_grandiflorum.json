@@ -1,0 +1,88 @@
+{
+  "species_slug": "theobroma_grandiflorum",
+  "scientific_name": "Theobroma grandiflorum (Willd. ex Spreng.) K.Schum.",
+  "common_names": [
+    "Copoazú"
+  ],
+  "family": "Malvaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Semilla recalcitrante: sembrar fresca tras extracción de mucílago (germinación 12-25 días). Vivero 5-7 meses con sombra 50-70% bajo plátano o guamo. Trasplante a sitio definitivo en lluvias a 5x5 m bajo sombra de Inga edulis o Erythrina. Primera fructificación 3-5 años, plena producción a 7-8 años. Tradicionalmente sembrado en chagras amazónicas y pacíficas asociado a cacao y plátano."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 400,
+      "max_absoluto": 800
+    },
+    "temperatura_c": {
+      "helada_letal": 10,
+      "optimo_min": 22,
+      "optimo_max": 28,
+      "max_tolerable": 34
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El copoazú o cupuaçu (Theobroma grandiflorum (Willd. ex Spreng.) K.Schum., familia Malvaceae subfamilia Byttnerioideae) es un árbol frutal nativo de la Amazonía sudoccidental (5-15 m altura, ramificación baja en candelabro) cultivado tradicionalmente por pueblos indígenas amazónicos brasileños, peruanos y colombianos (Caquetá, Putumayo, Amazonas, Guainía, Vaupés) desde tiempos precolombinos, considerado uno de los frutales nativos amazónicos más valiosos junto al cacao (Theobroma cacao) y el macambo (Theobroma bicolor). Produce frutos elipsoidales muy grandes (15-25 cm largo, 10-12 cm diámetro, 1-2 kg peso) de cáscara dura leñosa marrón-rojiza pubescente que protege una pulpa blanco-cremosa fibrosa muy aromática (aroma a chocolate-piña-mango) muy ácida (pH 3.2-3.8) con 15-25 semillas grandes elipsoidales similares a las del cacao. La pulpa contiene compuestos volátiles únicos (theaspirano, linalool, mirceno, copaeno) responsables del perfume distintivo que la convierte en materia prima de pulpa congelada de exportación, helados, jugos y mermeladas; las semillas se procesan como 'cupulate' (análogo amazónico al chocolate sin estimulantes, ya que carecen de teobromina pero contienen teacrina). Distribución natural en bosque húmedo tropical de tierra firme (bh-T) sobre suelos ácidos ferralíticos bien drenados, requiere precipitación >2.000 mm/año bien distribuida y humedad relativa >80%. Lección viva: árbol-emblema de la chagra amazónica que enseña tres lecciones críticas: (1) la pulpa cremosa con perfil aromático complejo es resultado de coevolución con dispersores mamíferos grandes (tapires Tapirus terrestris, dantos, sahínos Pecari tajacu) que tragan las semillas enteras y las defecan a kilómetros del árbol madre, lección clave sobre síndromes de dispersión y endozoocoria; (2) la diferencia funcional con el cacao Theobroma cacao (su 'primo' mesoamericano): mientras el cacao se procesa por las semillas (teobromina, manteca de cacao), el copoazú se aprovecha principalmente por la pulpa y las semillas dan un producto sin estimulantes apto para niños y adultos sensibles a la cafeína; (3) el potencial de los frutales nativos amazónicos como alternativa económica viable a la ganadería extensiva y la coca, sustentando proyectos productivos de la Cámara de Comercio del Amazonas, SINCHI y AGROSAVIA en cadenas de valor de pulpa congelada y cosméticos (manteca de cupuaçu como ingrediente premium en hidratantes). Manejo agroecológico: siembra bajo sombra de Inga edulis o Erythrina poeppigiana al 50%, asocio en sistemas agroforestales (SAF) con cacao, plátano, açaí y achiote, no tolera agroquímicos sintéticos, cosecha manual de frutos caídos maduros (no se cortan del árbol — caen solos al madurar, indicador claro de cosecha óptima). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.382Z"
+}

@@ -1,0 +1,1 @@
+var e=e=>new Promise((t,n)=>{let r=new FileReader;r.onloadend=()=>{typeof r.result==`string`?t(r.result):n(Error(`FileReader devolvió un tipo inesperado (esperaba string).`))},r.onerror=()=>n(r.error),r.readAsDataURL(e)});export{e as t};

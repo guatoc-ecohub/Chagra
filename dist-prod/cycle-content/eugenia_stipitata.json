@@ -1,0 +1,69 @@
+{
+  "species_slug": "eugenia_stipitata",
+  "scientific_name": "Eugenia stipitata McVaugh",
+  "common_names": [
+    "Arazá"
+  ],
+  "family": "Myrtaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Los frutos contienen múltiples semillas que se extraen de la pulpa; germinación en 2-4 semanas bajo condiciones de alta humedad."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 600,
+      "max_absoluto": 1000
+    },
+    "temperatura_c": {
+      "helada_letal": 2,
+      "optimo_min": 22,
+      "optimo_max": 28,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El arazá (Eugenia stipitata McVaugh) es un frutal nativo de la Amazonía colombiana, presente en los departamentos de Putumayo, Caquetá, Amazonas y Vaupés entre 0 y 1000 msnm en zonas térmicas calidas. Su manejo agronómico incluye propagación por semilla con germinación de 2-4 semanas bajo alta humedad, ciclo de fructificación de 3-4 años desde la siembra, requiere ambientes con alta humedad relativa y suelos bien drenados, y presenta sensibilidad a enfermedades fúngicas como la antracnosis (Colletotrichum gloeosporioides) y ataque de moscas de la fruta (Anastrepha spp.). En el contexto cultural amazonense, esta especie ha sido tradicionalmente consumida por comunidades indígenas y campesinas amazónicas como fruta fresca y en preparaciones de jugos y mermeladas, representando un recurso alimenticio nativo de la región biogeográfica del Amazonas colombiano. Según el inventario taxonómico verificado por GBIF Backbone Taxonomy, Plants of the World Online (POWO), GBIF Colombia y el Sistema de Información sobre Biodiversidad de Colombia (SiB Colombia), su nombre científico válido es Eugenia stipitata McVaugh.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.360Z"
+}

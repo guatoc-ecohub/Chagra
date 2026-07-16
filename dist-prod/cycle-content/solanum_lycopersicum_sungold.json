@@ -1,0 +1,66 @@
+{
+  "species_slug": "solanum_lycopersicum_sungold",
+  "scientific_name": "Solanum lycopersicum 'Sungold'",
+  "common_names": [
+    "Tomate cherry amarillo / Sungold"
+  ],
+  "family": "Solanaceae",
+  "category": "hortalizas_fruto_flor",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Indeterminado. Muy vigoroso; requiere espacio y atención al riego para evitar el rajado por dulzor extremo."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 500,
+      "optimo_min": 1800,
+      "optimo_max": 2500,
+      "max_absoluto": 2900
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 16,
+      "optimo_max": 22,
+      "max_tolerable": 30
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El tomate cherry Sungold (Solanum lycopersicum L. cv. 'Sungold', familia Solanaceae) es un híbrido determinado dorado-naranja de tamaño cherry desarrollado para invernadero comercial y huerta agroecológica colombiana, valorado por su altísimo dulzor (Brix 9-12, vs cherry rojo 6-7) y producción extendida bajo cobertura plástica. Se cultiva en Sabana de Bogotá (Mosquera, Madrid, Sopó), Boyacá altiplano, Cundinamarca templada (Sopó, La Calera), Eje cafetero y Antioquia entre 500 y 2.900 msnm en zona térmica cálida a fría bajo invernadero. Ciclo 90-120 días desde trasplante a primera cosecha, productividad sostenida 6-8 meses. Rendimientos 8-15 kg/planta en sistema vertical entutorado. Lección viva de sabor y color: enseña cómo el color naranja intenso indica altos niveles de azúcares solubles y betacarotenos (precursores vitamina A), siendo el referente mundial de dulzor en tomates cherry. Manejo agroecológico: entutorado vertical individual, podas semanales de chupones, fertilización con biol foliar + bocashi al fondo, control de tuta absoluta (Phthorimaea absoluta) con Bacillus thuringiensis + trampas feromonales, control de mosca blanca con neem + ortiga. Fuentes Tier A: ICA Resolución 3168/2015, AGROSAVIA Manual Biopreparados 2015, POWO Kew, GBIF Backbone Taxonomy.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- urtica_dioica — Ortiga (Urtica dioica L.)",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "agrosavia-manual-biopreparados-2015",
+      "title": "agrosavia-manual-biopreparados-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.366Z"
+}

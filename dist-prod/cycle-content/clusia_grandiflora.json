@@ -1,0 +1,94 @@
+{
+  "species_slug": "clusia_grandiflora",
+  "scientific_name": "Clusia grandiflora Splitg.",
+  "common_names": [
+    "Gaque grande"
+  ],
+  "family": "Clusiaceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "biomass_producer",
+    "pollinator_attractor"
+  ],
+  "antagonists": [
+    "eucalyptus_globulus",
+    "pinus_patula"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Propagación por semilla fresca de cápsulas maduras (las semillas envueltas en arilo anaranjado son dispersadas por aves grandes — pavas, tucanetas, mirlas grandes). Germinación 60-120 días en sustrato turba-arena con sombra parcial 60%. Trasplante 6-8 meses. Plantación 18-24 meses. Esqueje semileñoso con AIB (enraizamiento 30-50%). Crecimiento lento 25-50 cm/año.",
+    "tiempo_a_establecimiento_dias": 600,
+    "notas": "Especie sucesional tardía del bosque alto andino. Indica madurez ecológica del rodal. Sus flores grandes blanco-rosáceas son entre las más vistosas de la Clusiaceae andina."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2000,
+      "optimo_max": 2700,
+      "max_absoluto": 2900
+    },
+    "temperatura_c": {
+      "helada_letal": -3,
+      "optimo_min": 10,
+      "optimo_max": 17,
+      "max_tolerable": 24
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Clusia grandiflora Splitg. (gaque grande, chagualo grande, cape grande — familia Clusiaceae) es un árbol perennifolio (10-25 m altura) hermano botánico de Clusia multiflora pero distinguible por sus hojas mucho más grandes (15-25 cm vs 8-15 cm) y por sus flores espectaculares blanco-rosáceas de 8-12 cm de diámetro — entre las más vistosas de las Clusiaceae andinas. Su distribución abarca el escudo guayanés-amazónico-andino oriental: Colombia (Cundinamarca, Boyacá, Santander, Antioquia, piedemonte del Caquetá), Venezuela, Guyana, Surinam, Brasil amazónico. En Colombia se encuentra en el bosque alto andino y subandino 1800-2800 msnm en piso térmico FRÍO con tendencia a templado-húmedo (zona de transición). A diferencia de su hermana C. multiflora (más generalista y tolerante), C. grandiflora es una especie SUCESIONAL TARDÍA del bosque alto andino — indica madurez ecológica del rodal y solo se establece cuando hay sombra parcial inicial, suelos profundos con hojarasca acumulada y red micorrízica activa. Por eso es especie BIOINDICADORA de bosques alto-andinos maduros y poco intervenidos. Lección viva sobre SUCESIÓN ECOLÓGICA, ESPECIES BIOINDICADORAS DE MADUREZ FORESTAL y RESTAURACIÓN POR FASES: en proyectos de restauración del bosque alto andino de la Cordillera Oriental (Cruz Verde-Sumapaz, Chingaza, Iguaque) y de la Cordillera Central (Antioquia, Cordillera Central de Caldas), C. grandiflora se planta en una FASE TARDÍA de la restauración — primero entran especies pioneras (Alnus acuminata, Sambucus peruviana, Vallea stipularis, Hesperomeles goudotiana), luego sucesionales intermedias (Weinmannia tomentosa, Clusia multiflora, Escallonia paniculata, Miconia squamulosa), y finalmente sucesionales tardías como C. grandiflora, Prumnopitys montana, Quercus humboldtii. Plantarla en sitios desnudos o sin sombra previa fracasa — confirma el principio agroecológico de que la restauración no es plantar árboles al azar sino reconstruir el SISTEMA con sus fases sucesionales en orden. Manejo agroecológico: propagación por semilla fresca con sombra parcial 60%; trasplante 6-8 meses; plantación 18-24 meses; asocio con C. multiflora, encenillo, roble andino; densidades 100-200 ind/ha en restauración avanzada; suelos profundos con hojarasca. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- clusia_multiflora — Gaque (Clusia multiflora Kunth)\n- quercus_humboldtii — Roble negro andino (Quercus humboldtii Bonpl.)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- eucalyptus_globulus — Eucalipto blanco (Eucalyptus globulus Labill.)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.402Z"
+}

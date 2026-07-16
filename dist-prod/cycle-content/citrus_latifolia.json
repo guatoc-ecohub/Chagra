@@ -1,0 +1,62 @@
+{
+  "species_slug": "citrus_latifolia",
+  "scientific_name": "Citrus × latifolia (Yu. Tanaka) Tanaka",
+  "common_names": [
+    "Limón Tahití"
+  ],
+  "family": "Rutaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 400,
+      "optimo_max": 1600,
+      "max_absoluto": 2000
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El limón Tahití o lima persa (Citrus × latifolia, Rutaceae) es híbrido cítrico triploide entre limón mexicano y cidra/limón dulce, hoy la lima ácida más cultivada en Colombia (Tolima, Cundinamarca, Antioquia, Llanos). Árbol perenne 5-8 m, espinas reducidas, frutos verdes con piel lisa-delgada, pulpa muy ácida (pH 2.0-2.5, alta vitamina C). Reproducción por injerto sobre patrones tolerantes: Volkameriana, Cleopatra, citrumelo. Lección agroecológica: el limón Tahití es CLONAL VEGETATIVAMENTE — todas las plantaciones derivan de pocos genotipos seleccionados, vulnerable a Citrus Greening (Candidatus Liberibacter asiaticus, vector Diaphorina citri psyllido). Manejo agroecológico: distancia 6x6 m, sombrío parcial primer año, fertilización balanceada con énfasis en Zn (deficiencia común síntoma característico hojas pequeñas amarillentas con nervios verdes), poda anual de mantenimiento, tutorado del injerto primeros 2 años. Asocio con leguminosas de cobertura.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.406Z"
+}

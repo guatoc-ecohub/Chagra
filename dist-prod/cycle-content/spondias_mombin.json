@@ -1,0 +1,69 @@
+{
+  "species_slug": "spondias_mombin",
+  "scientific_name": "Spondias mombin L.",
+  "common_names": [
+    "Jobo / Hobo"
+  ],
+  "family": "Anacardiaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Propagación por semilla fresca directamente en campo o por injerto para acelerar fructificación. La semilla tiene baja viabilidad almacenamiento, requiere siembra inmediata post-cosecha."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 600,
+      "max_absoluto": 800
+    },
+    "temperatura_c": {
+      "helada_letal": 2,
+      "optimo_min": 24,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El jobo (Spondias mombin L.) se distribuye naturalmente en las regiones Caribe y Orinoquía colombianas, presente en departamentos como Cesar, Magdalena, Bolívar, Córdoba, Sucre, Meta y Casanare, entre 0 y 800 msnm en zona térmica cálida. Su manejo agronómico incluye propagación por semilla fresca o injerto para obtener fructificación en 3-4 años, ciclo productivo de 4-6 meses post-floración, con asociaciones beneficiosas en sistemas agroforestales con cacao, plátano y frutales nativos, tolerando podas de formación y respondiendo bien a manejo orgánico. En el contexto cultural Caribe y Llanero, el jobo ha sido históricamente utilizado por comunidades indígenas y campesinas para consumo fresco de su fruto ácido-dulce, preparación de jugos, conservas y como medicinal para trastornos digestivos, conocimiento tradicional documentado en la obra clásica de Pérez Arbeláez 'Plantas Útiles de Colombia' (1947) que registra sus múltiples usos tradicionales en la región tropical colombiana.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.370Z"
+}

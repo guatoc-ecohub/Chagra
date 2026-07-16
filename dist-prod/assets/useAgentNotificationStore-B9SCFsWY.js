@@ -1,0 +1,1 @@
+import{i as e}from"./vendor-state-B0RGfjQJ.js";var t=e(e=>({responseReady:!1,lastAssistantMessage:null,setResponseReady:t=>e({responseReady:!!t}),setLastMessage:t=>e({lastAssistantMessage:typeof t==`string`&&t.length>0?t:null}),markRead:()=>e({responseReady:!1})}));export{t};
