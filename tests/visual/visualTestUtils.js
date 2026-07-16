@@ -345,7 +345,7 @@ async function seedIndexedDb(page, state) {
     // Debe coincidir con DB_VERSION exportado en src/db/dbCore.js. Corre en
     // contexto de browser (page.evaluate) → no se puede importar; mantener
     // sincronizado a mano. Abrir con version < existente lanza VersionError.
-    const DB_VERSION = 26;
+    const DB_VERSION = 27;
     const db = await new Promise((resolve, reject) => {
       const req = indexedDB.open(DB_NAME, DB_VERSION);
       req.onsuccess = () => resolve(req.result);
