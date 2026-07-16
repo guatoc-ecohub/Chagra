@@ -1,5 +1,6 @@
-/* eslint-disable react-refresh/only-export-components -- exporta MATERIAL_FINCA
-   (constante compartida de las mallas horneadas) además del componente. */
+/* eslint-disable react-refresh/only-export-components -- exporta los materiales
+   compartidos (MATERIAL_FINCA para la arboleda, MATERIAL_HATO para el ganado)
+   además del componente. */
 /*
  * Animales de finca del valle — REALISTAS por raza (veredicto del operador:
  * "formas muy geométricas, aún no parecen animales reales" → rehechos).
@@ -27,15 +28,14 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-
-/* El material COMPARTIDO de las mallas fusionadas con color horneado por
-   vértice (arboleda por especie hoy; el hato realista de finca-realismo-d1
-   cuando mergee — mismo export, cero conflicto). UNO para todas: cada malla
-   fusionada es 1 draw call. */
-export const MATERIAL_FINCA = new THREE.MeshLambertMaterial({
-  vertexColors: true,
-  flatShading: true,
-});
+import {
+  geomVaca,
+  geomCerdo,
+  geomLechon,
+  geomGallina,
+  geomPerro,
+  geomOveja,
+} from '../../visual/mundo3d/finca/fincaRealista.geom.js';
 
 /* El material de las mallas fusionadas con color horneado por vértice que usa
    la ARBOLEDA por especie. flatShading le da carácter a un tronco — pero a un
