@@ -60,12 +60,15 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
-  // ── Vista global (Sierra Nevada) — galería de mundos pulida ────
+  // ── Vista global (Sierra Nevada) — la montaña cortada por la mitad ────
+  // Lámina estática: los pisos térmicos del mar a la nieve, cada banda entra a
+  // su mundo. Reemplaza la galería en 3/4 (compleja, no se entendía). La galería
+  // vieja (GaleriaSierraArboles.jsx) queda en el repo, sin cablear.
   {
     path: 'sierra_global',
     alias: ['sierra', 'vista_sierra'],
-    componente: 'GaleriaSierraArboles',
-    importLazy: 'src/visual/mundo3d/sierra/GaleriaSierraArboles.jsx',
+    componente: 'SierraCorteVertical',
+    importLazy: 'src/visual/mundo3d/sierra/SierraCorteVertical.jsx',
     categoria: '3D',
   },
 
