@@ -186,6 +186,23 @@ const VARIANTES_BORUGO = [
   { label: 'sin animación', props: { size: 88, animated: false } },
 ];
 
+/* LA DANTA completa luce la fundación transversal con su carácter de mole
+   mansa: la TROMPA que husmea en periscopio (su firma), ruana de tierra fría,
+   modo poder VERDE SEMILLA (la jardinera del bosque) y prop por mundo. */
+const VARIANTES_DANTA = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'anda', props: { size: 88 } },
+  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'husmea (periscopio)', props: { size: 88, husmea: true } },
+  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder VERDE SEMILLA', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+
 /* EL ENT DEL PÁRAMO — el árbol-maestro del Bosque Vivo (NO un bicho). Presencia
    GRANDE e imponente. Luce sus 5 frentes: expresividad de árbol vivo (line-boil
    lento, roseta que se mece, rostro sabio), lip-sync (boca en las grietas),
@@ -214,6 +231,7 @@ const VARIANTES_POR_SLUG = {
   jaguar: VARIANTES_JAGUAR,
   morrocoy: VARIANTES_MORROCOY,
   borugo: VARIANTES_BORUGO,
+  danta: VARIANTES_DANTA,
   'ent-frailejon': VARIANTES_ENT,
 };
 
@@ -229,6 +247,7 @@ const NOTAS_CREATURE = {
   jaguar: 'Felino de tierra cálida, majestuoso y acechador; leonado con rosetas de centro ocre (su firma), aura púrpura.',
   morrocoy: 'Galápago de patas rojas, el anciano ancestral y paciente; caparazón de domo hexagonal (su firma) y patas rojizas, aura bronce. Se retrae elástico a la concha.',
   borugo: 'La paca de montaña andina, roedor nocturno tierno; pardo con hileras de motas crema (su firma), olfateo tímido y aura plata lunar. El animal de cierre — vivo, a salvo y digno.',
+  danta: 'El tapir andino, la mole lanuda y mansa del bosque altoandino; trompa corta que husmea en periscopio y borde blanco de orejas y labios (su firma doble). La jardinera del bosque: siembra semillas al andar, aura verde semilla.',
   'ent-frailejon': 'El árbol-guardián que enseña: frailejón gigante del páramo, tronco con rostro sabio y faldita de hojas muertas, corona en roseta plateada y flores amarillas. Guardián del agua; anciano sereno y lento. Modo-guardián verde-plateado cuando el páramo peligra.',
   lombriz: 'La ingeniera del suelo; ondula por segmentos con clitelo marcado.',
   mariposa: 'Alas naranjas con venación; poliniza y anuncia buen suelo.',
