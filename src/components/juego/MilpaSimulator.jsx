@@ -49,6 +49,13 @@ import { agentSounds, isSoundEnabled, setSoundEnabled } from '../../services/age
 import { speak, stop as stopSpeak, isSupported as ttsSupported } from '../../services/ttsService';
 import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 
+// FUSIÓN MILPA (audit juegos 2026-07-16): "La milpa: las tres hermanas" (mockup
+// SVG pulido, antes URL-only #/mockups/juego-la-milpa) se pliega DENTRO de este
+// simulador como su "modo ilustrado". Una sola entrada en el hub → el simulador
+// hondo (5 sistemas, LER/N/carbono) con un botón para el juego bonito de intro.
+// No se reescribe ninguna mecánica: es cableado/composición.
+import JuegoLaMilpa from '../../mockups/JuegoLaMilpa';
+
 import './milpa.css';
 
 /** Acentos por color de cultivo (estética Chagra). */
@@ -196,6 +203,9 @@ export default function MilpaSimulator({ onBack, onHome }) {
   const [consejoVisible, setConsejoVisible] = useState({});
   const [resultadosTemporadas, setResultadosTemporadas] = useState([]);
   const [medallasObtenidas, setMedallasObtenidas] = useState([]);
+  // Modo de vista de la Milpa fusionada: 'simulador' (hondo, por defecto) vs
+  // 'ilustrado' (el mini-juego SVG "tres hermanas"). Una sola entrada, dos caras.
+  const [modoVista, setModoVista] = useState('simulador');
 
   // Telemetría de uso ANÓNIMA: inicio del juego al montar (una vez).
   useEffect(() => { recordGameStart('milpa'); }, []);
@@ -416,6 +426,13 @@ export default function MilpaSimulator({ onBack, onHome }) {
     return asoc.cultivos.map((id) => CULTIVO_POR_ID[id]).filter(Boolean);
   }, [sistemaActivo]);
 
+  // Modo ilustrado (juego SVG "las tres hermanas"). Se monta como pantalla
+  // completa; su "Salir" regresa al simulador hondo. El early-return va DESPUÉS
+  // de todos los hooks para no violar las reglas de hooks.
+  if (modoVista === 'ilustrado') {
+    return <JuegoLaMilpa onBack={() => setModoVista('simulador')} />;
+  }
+
   return (
     <ScreenShell
       title="Asociaciones"
@@ -471,6 +488,18 @@ export default function MilpaSimulator({ onBack, onHome }) {
                 Las plantas se ayudan cuando crecen juntas. Elige una asociación
                 y descubre cómo rinde más que sembrar cada cultivo solo.
               </p>
+              {/* Puente a la "cara bonita" de la Milpa: el mini-juego SVG de las
+                  tres hermanas (fusión audit 2026-07-16). Misma Milpa, modo
+                  ilustrado para entrar jugando. */}
+              <button
+                type="button"
+                data-testid="milpa-modo-ilustrado"
+                onClick={() => setModoVista('ilustrado')}
+                className="mt-3 inline-flex items-center gap-2 rounded-2xl border-2 border-lime-300/50 bg-lime-500/15 px-4 py-2.5 text-sm font-black text-lime-100 hover:bg-lime-500/25 active:scale-[0.98] transition"
+              >
+                <Sparkles size={18} aria-hidden="true" />
+                Jugar «Las tres hermanas» (modo ilustrado)
+              </button>
             </header>
 
             <section className="grid grid-cols-1 gap-3">
