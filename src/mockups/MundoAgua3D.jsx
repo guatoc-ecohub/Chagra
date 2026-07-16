@@ -34,6 +34,15 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { ATMOSFERA, CIELOS, PALETA, mezclarCielo } from '../visual/mundo3d/atmosferaMadre.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
+import {
+  Cardumen,
+  Garza,
+  MartinPescador,
+  MirlaDeAgua,
+  Libelulas,
+  RanaQuebrada,
+} from '../visual/mundo3d/agua/faunaAcuatica.jsx';
+import { Aliso, VegetacionRibera } from '../visual/mundo3d/agua/vegetacionRibera.jsx';
 
 /* ── El cielo del mundo agua, mezclado hacia la hora dorada (misma receta que
       EscenaBase3D → entrar aquí se siente del MISMO atardecer). Constante de
@@ -411,21 +420,8 @@ function Filtracion({ cuantas, reducedMotion }) {
 
 /* ── Piezas quietas (arquitectura del agua) ───────────────────────────────── */
 
-/* Árbol low-poly: el monte que PROTEGE el nacimiento (ronda hídrica). */
-function Arbol({ pos, esc = 1, tono = PALETA.follajeOscuro }) {
-  return (
-    <group position={pos} scale={esc}>
-      <mesh position={[0, 0.32, 0]}>
-        <cylinderGeometry args={[0.06, 0.09, 0.64, 6]} />
-        <meshLambertMaterial color={PALETA.madera} />
-      </mesh>
-      <mesh position={[0, 0.85, 0]}>
-        <coneGeometry args={[0.42, 0.95, 7]} />
-        <meshLambertMaterial color={tono} flatShading />
-      </mesh>
-    </group>
-  );
-}
+/* El monte que PROTEGE el nacimiento es ahora ALISO real (Alnus acuminata), el
+   árbol de ronda hídrica por excelencia — vive en vegetacionRibera.jsx. */
 
 /* El nacimiento: ojo de agua entre piedras, con su ronda de monte. */
 function Nacimiento() {
@@ -452,7 +448,7 @@ function Nacimiento() {
         </mesh>
       ))}
       {monte.map(([px, py, pz, e], i) => (
-        <Arbol key={`a${i}`} pos={[px, py, pz]} esc={e} />
+        <Aliso key={`a${i}`} pos={[px, py, pz]} esc={e * 0.72} rot={i * 1.7} />
       ))}
     </group>
   );
@@ -531,7 +527,7 @@ function Reservorio({ reducedMotion }) {
           emissive="#2a6a86"
           emissiveIntensity={0.3}
           transparent
-          opacity={0.95}
+          opacity={0.72}
         />
       </mesh>
       <mesh position={[0, 0.09, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -870,6 +866,23 @@ function DioramaAgua({ perfil, tier, reducedMotion, estacion, onSoltar, controle
   const nGoteo = tier === 'alto' ? 20 : tier === 'medio' ? 12 : 8;
   const nFiltra = tier === 'alto' ? 8 : 5;
 
+  /* fauna acuática/ribereña — presupuesto por tier (individuos, no partículas) */
+  const nTrucha = tier === 'alto' ? 8 : tier === 'medio' ? 5 : 3;
+  const nCapitan = tier === 'alto' ? 3 : tier === 'medio' ? 2 : 1;
+  const nSabaleta = tier === 'alto' ? 5 : tier === 'medio' ? 3 : 2;
+  const ySupReservorio = altura(RESERVORIO.x, RESERVORIO.z) + 0.1; // lámina del espejo
+  const anclasLibelulas = useMemo(() => {
+    const base = [
+      [RESERVORIO.x - 0.3, ySupReservorio + 0.5, RESERVORIO.z - 0.2],
+      [-3.0, altura(-3.0, 2.0) + 0.55, 2.0],
+      [-3.3, altura(-3.3, 6.0) + 0.55, 6.0],
+      [RESERVORIO.x + 0.6, ySupReservorio + 0.7, RESERVORIO.z + 0.5],
+      [-3.7, altura(-3.7, -3.6) + 0.55, -3.6],
+    ];
+    const n = tier === 'alto' ? 5 : tier === 'medio' ? 3 : 2;
+    return base.slice(0, n);
+  }, [tier, ySupReservorio]);
+
   return (
     <>
       <color attach="background" args={[CIELO.fondo]} />
@@ -886,8 +899,9 @@ function DioramaAgua({ perfil, tier, reducedMotion, estacion, onSoltar, controle
         <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
       </mesh>
 
-      {/* el agua: quebrada + canal + reservorio, respirando */}
-      <EspejoAgua geometria={geoCintas.quebrada} reducedMotion={reducedMotion} />
+      {/* el agua: quebrada + canal + reservorio, respirando (la quebrada un
+          poco más clara para dejar ver la sabaleta que remonta) */}
+      <EspejoAgua geometria={geoCintas.quebrada} reducedMotion={reducedMotion} opacidad={0.82} />
       <EspejoAgua geometria={geoCintas.canal} reducedMotion={reducedMotion} fase={1.4} />
       <Reservorio reducedMotion={reducedMotion} />
 
@@ -908,6 +922,50 @@ function DioramaAgua({ perfil, tier, reducedMotion, estacion, onSoltar, controle
       <Lluvia cuantas={nLluvia} reducedMotion={reducedMotion} />
       <GoteoRiego cuantas={nGoteo} reducedMotion={reducedMotion} />
       <Filtracion cuantas={nFiltra} reducedMotion={reducedMotion} />
+
+      {/* ── LA VIDA DEL AGUA (fauna real por piso térmico, ver faunaAcuatica) ── */}
+      {/* El reservorio como estanque de aguas frías: trucha (cardumen) y
+          capitán bentónico pegado al fondo. */}
+      <Cardumen
+        modo="estanque"
+        centro={[RESERVORIO.x, 0, RESERVORIO.z]}
+        radio={RESERVORIO.r}
+        superficieY={ySupReservorio}
+        especieId="trucha"
+        cuantas={nTrucha}
+        reducedMotion={reducedMotion}
+      />
+      <Cardumen
+        modo="estanque"
+        centro={[RESERVORIO.x, 0, RESERVORIO.z]}
+        radio={RESERVORIO.r}
+        superficieY={ySupReservorio}
+        especieId="capitan"
+        cuantas={nCapitan}
+        reducedMotion={reducedMotion}
+      />
+      {/* La quebrada viva: sabaleta remontando la corriente */}
+      <Cardumen
+        modo="quebrada"
+        curva={curvas.quebrada}
+        altura={altura}
+        especieId="sabaleta"
+        cuantas={nSabaleta}
+        reducedMotion={reducedMotion}
+      />
+
+      {/* aves de ribera */}
+      <Garza pos={[RESERVORIO.x - 0.1, altura(RESERVORIO.x - 0.1, RESERVORIO.z + 1.55), RESERVORIO.z + 1.55]} rot={Math.PI} reducedMotion={reducedMotion} />
+      <MartinPescador pos={[-2.55, altura(-2.55, 3.7) + 0.45, 3.7]} rot={-0.7} reducedMotion={reducedMotion} />
+      <MirlaDeAgua pos={[-3.2, altura(-3.2, 5.5) + 0.02, 5.5]} rot={0.5} reducedMotion={reducedMotion} />
+      <RanaQuebrada pos={[-3.95, altura(-3.95, -3.1) + 0.02, -3.1]} rot={0.8} reducedMotion={reducedMotion} />
+      <RanaQuebrada pos={[-2.75, altura(-2.75, 4.7) + 0.02, 4.7]} rot={-1.4} reducedMotion={reducedMotion} />
+
+      {/* libélulas (bioindicador de agua limpia) */}
+      <Libelulas anclas={anclasLibelulas} reducedMotion={reducedMotion} />
+
+      {/* vegetación de ribera real: aliso · sauce · guadua a lo largo de la quebrada */}
+      <VegetacionRibera curva={curvas.quebrada} altura={altura} />
 
       {/* rótulos de las estaciones, sobrios */}
       <Rotulo pos={[QUEBRADA_XZ[0][0], altura(...QUEBRADA_XZ[0]) + 1.9, QUEBRADA_XZ[0][1]]} texto="Nacimiento" sub="protegido con monte" />
