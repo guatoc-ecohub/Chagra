@@ -97,7 +97,21 @@ const info = await page.evaluate(() => {
 
 const clipArg = getFlag('clip', null); // "x,y,w,h" en px del viewport
 const clip = clipArg ? (() => { const [x, y, w, h] = clipArg.split(',').map(Number); return { x, y, width: w, height: h }; })() : undefined;
-await page.screenshot({ path: out, timeout: 120000, animations: 'disabled', ...(clip ? { clip } : {}) });
+// --serie "0,12000,30000": esperas ADICIONALES acumulativas tras `wait`, una
+// captura por parada EN LA MISMA SESIÓN (out-1.png, out-2.png…) — para probar
+// movimiento real: fauna que entra y sale, gestos que cambian con el tiempo.
+const serieArg = getFlag('serie', null);
+if (serieArg) {
+  const paradas = serieArg.split(',').map(Number);
+  for (let i = 0; i < paradas.length; i++) {
+    if (i > 0) await page.waitForTimeout(paradas[i] - paradas[i - 1]);
+    const f = out.replace(/\.png$/, `-${i + 1}.png`);
+    await page.screenshot({ path: f, timeout: 120000, animations: 'disabled', ...(clip ? { clip } : {}) });
+    console.log(`[shot3d] serie ${i + 1}/${paradas.length} t=+${paradas[i]}ms → ${f}`);
+  }
+} else {
+  await page.screenshot({ path: out, timeout: 120000, animations: 'disabled', ...(clip ? { clip } : {}) });
+}
 console.log(`[shot3d] ruta=${ruta} out=${out} canvas=${JSON.stringify(info)}`);
 if (errores.length) console.log(`[shot3d] ERRORES:\n${errores.slice(0, 12).join('\n')}`);
 else console.log('[shot3d] sin errores de consola');
