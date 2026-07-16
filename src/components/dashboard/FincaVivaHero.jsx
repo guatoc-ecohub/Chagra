@@ -51,6 +51,12 @@ import PanelVitalidadEspiritu from './PanelVitalidadEspiritu';
 import SceneFincaNature from './SceneFincaNature';
 import SceneHuertoVivo from './SceneHuertoVivo';
 import SceneTrazoMinimal from './SceneTrazoMinimal';
+// EL UMBRAL DEL VALLE + LAS PUERTAS COMO CARTAS (encargo FABLE_50 §A6,
+// "home máximo" 2026-07-16): la vista viva que ES la puerta cinematográfica
+// al valle 3D, y las puertas pintadas como cartas en la mano. Los destinos
+// siguen saliendo de buildPuertas (fuente única); solo cambió la piel.
+import UmbralValle from './UmbralValle';
+import PortalesMano from './PortalesMano';
 import './scene-finca-organismo.css';
 import './scene-finca-nature.css';
 import './scene-huerto-vivo.css';
@@ -764,29 +770,20 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
           </div>
         </main>
 
-        {/* ── LAS 6 PUERTAS (usabilidad campesina #5) ─────────────────────────
-            Antes: 4 portales con descripción + ~20 tarjetas + ~35 chips abajo.
-            Ahora: SEIS puertas de una-dos palabras, dibujo grande + palabra
-            grande, targets ≥96px (#8). Cada una enruta a un mundo/vista que YA
-            existe (nada nuevo que mantener). "Toda mi finca" abre los mundos
-            completos en la hoja de abajo. */}
+        {/* ── EL UMBRAL DEL VALLE (encargo "home máximo" 2026-07-16) ──────────
+            La vista viva del valle andino a la hora real — y LA PUERTA GRANDE:
+            tocarla inunda la pantalla con el cielo de la franja y aterriza en
+            el valle 3D ('valle3d', existe en ambos shells). Solo con finca
+            propia: la RED institucional del extensionista no es un valle. */}
+        {tieneFincaPropia && <UmbralValle onNavigate={onNavigate} />}
+
+        {/* ── LAS 6 PUERTAS como CARTAS EN LA MANO (usabilidad campesina #5 +
+            FABLE_50 §A6). Antes: tarjetas planas con emoji. Ahora: viñetas de
+            autor sobre el cielo vivo, palabra grande + a dónde abre, targets
+            ≥96px. Cada una enruta a un mundo/vista que YA existe; los destinos
+            salen de buildPuertas (fuente única, tests intactos). */}
         <div className="fvh-portales-tit">¿A dónde va? <span /></div>
-        <nav className="fvh-puertas" aria-label="Puertas de su finca" data-testid="finca-viva-puertas">
-          {buildPuertas({ onNavigate, irATodaMiFinca, mostrarAnimales }).map((p, i) => (
-            <button
-              key={p.id}
-              type="button"
-              className={`fvh-puerta t-${p.tinte}`}
-              data-testid={`puerta-${p.id}`}
-              onClick={p.onClick}
-              style={{ animationDelay: `${0.08 + i * 0.06}s` }}
-              aria-label={`${p.nombre}: abre ${p.abre}`}
-            >
-              <span className="fvh-puerta-emoji" aria-hidden="true">{p.emoji}</span>
-              <span className="fvh-puerta-nombre">{p.nombre}</span>
-            </button>
-          ))}
-        </nav>
+        <PortalesMano puertas={buildPuertas({ onNavigate, irATodaMiFinca, mostrarAnimales })} />
 
         <div className="fvh-fill" />
         <p className="fvh-titulo-sr">{titulo || 'Mi finca viva'}</p>
