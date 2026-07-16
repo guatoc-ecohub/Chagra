@@ -1,18 +1,10 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import Angelita from '../visual/agente/Angelita';
 import useAgentNotificationStore from '../store/useAgentNotificationStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { isSpeaking, stop, replayLast, isKokoroAvailable } from '../services/ttsService';
 import { agentSounds } from '../services/agentSoundService';
 import { fvhSkinClass } from '../config/fvhSkin';
-/* EL CEREBRO DE ANGELITA (auditoría 2026-07-18: construido y DESCONECTADO).
-   El FAB vive en TODA pantalla — es el lugar correcto para que
-   `notificacionesInteligentes()` (qué atender hoy, con datos REALES) llegue
-   como aviso de la abeja sin esperar a que el operador abra el chat. */
-import useAngelitaStore from '../store/useAngelitaStore';
-import useAlertStore from '../store/useAlertStore';
-import useLogStore from '../store/useLogStore';
-import { notificacionesInteligentes } from '../services/angelitaInteligencia';
 import './agent-fab-skin.css';
 
 /**
@@ -50,31 +42,6 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
   const setTtsEnabled = usePrefsStore((s) => s.setTtsEnabled);
   const activeAlerts = useAlertStore((s) => s.activeAlerts);
-
-  // ── EL CEREBRO, CABLEADO (auditoría 2026-07-18): notificacionesInteligentes
-  //    decide QUÉ atender hoy con datos REALES (alertas activas + tareas
-  //    vencidas de useLogStore) — antes nadie la llamaba. Si de verdad hay
-  //    algo Y la anti-molestia del propio store lo deja pasar (cooldown,
-  //    nunca a mitad de un husmeo que la abeja del valle ya esté mostrando),
-  //    el FAB brilla con el MISMO aviso — cero dato inventado, cero glow
-  //    porque sí. Re-evalúa cuando cambian las alertas reales.
-  useEffect(() => {
-    let vivo = true;
-    useLogStore.getState().getPendingTasks()
-      .then((pendingTasks) => {
-        if (!vivo) return;
-        const notificaciones = notificacionesInteligentes({ activeAlerts, pendingTasks });
-        if (!notificaciones.hay) return; // nada real que avisar: no tocar el store compartido
-        if (useAngelitaStore.getState().estado === 'husmea') return; // no le quita el turno a un husmeo en curso
-        const decision = useAngelitaStore.getState().evaluar({ notificaciones });
-        if (decision.interrumpe) {
-          setLastMessage(decision.mensaje);
-          setResponseReady(true);
-        }
-      })
-      .catch(() => { /* degrada silencioso: sin dato real, la abeja no inventa aviso */ });
-    return () => { vivo = false; };
-  }, [activeAlerts, setLastMessage, setResponseReady]);
 
   // Estado de Angelita: el tacto manda sobre el aviso, y el aviso sobre el idle.
   const estado = pressed
@@ -142,8 +109,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         position: 'fixed',
         bottom: 'max(90px, calc(env(safe-area-inset-bottom) + 90px))',
         right: 14,
-        width: 84,
-        height: 84,
+        width: 64,
+        height: 64,
         borderRadius: '50%',
         // Angelita vuela LIBRE: sin plinto ni borde — una abeja en la esquina,
         // no un icono enfrascado. La legibilidad sobre cualquier fondo la pone
@@ -173,7 +140,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       <span style={{ pointerEvents: 'none', display: 'flex' }} aria-hidden="true">
         <Angelita
           estado={estado}
-          size={82}
+          size={62}
           direccion="izquierda"
           className={responseReady ? 'agt-avatar-glow' : undefined}
           title="Angelita, la asistente de Chagra"
