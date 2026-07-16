@@ -296,6 +296,9 @@ const MundoFrutales3DMockup = lazy(() => import('./mockups/MundoFrutales3D'));
 // maíz + fríjol + calabaza —, quinua en grupo con panojas de color, yucas
 // frondosas). Standalone tipo botica: no monta el sistema MUNDO ni EscenaBase3D.
 const MundoLeguminosas3DMockup = lazy(() => import('./mockups/MundoLeguminosas3D'));
+// Angelita al máximo: la entrada teatral (gafas + crecimiento) y el repertorio
+// completo de estados del agente, uno al lado del otro.
+const AngelitaVivaMockup = lazy(() => import('./mockups/AngelitaViva'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -748,6 +751,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
   'mockups/mundo-leguminosas-3d': 'mockup_mundo_leguminosas_3d',
   'mockups/hoja-prueba-valle': 'mockup_hoja_prueba_valle',
+  'mockups/angelita-viva': 'mockup_angelita_viva',
 };
 
 const HASH_VIEW_ROUTES = {

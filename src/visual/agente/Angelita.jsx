@@ -7,6 +7,7 @@ import {
   estadoCanonico,
   POSE_DE_ESTADO,
   ARIA_DE_ESTADO,
+  CEJAS_DE_ESTADO,
   nivelDeConfianza,
   elegirMomentoIdle,
   duracionDeMomento,
@@ -214,6 +215,12 @@ export function Angelita({
   energia = 1,
   mundoId = null,
   lineBoil = false,
+  /* Gafas de sol (día soleado / entrada teatral): passthrough al cuerpo.
+     false | true | 'poniendose' (la caída one-shot). */
+  gafas = false,
+  /* Cejas: si el host no manda, cada estado actúa con las SUYAS
+     (CEJAS_DE_ESTADO — el que habla hace eyebrow-flash, la contenta arquea). */
+  cejas = undefined,
   title = undefined,
   ...rest
 }) {
@@ -311,6 +318,9 @@ export function Angelita({
   // El estado tiñe el ánimo del cuerpo base (aura/antics) salvo que el host
   // mande el suyo: contenta brilla 'pleno', preocupada se pone 'atento'.
   const animoDelEstado = animo ?? (e === 'contenta' ? 'pleno' : e === 'preocupada' ? 'atento' : 'sereno');
+  // Y actúa con las CEJAS (salvo que el host mande las suyas): eyebrow-flash
+  // al hablar, arqueadas de dicha, fruncidas de concentración fisgona.
+  const cejasDelEstado = cejas !== undefined ? cejas : CEJAS_DE_ESTADO[e] ?? null;
   const aria = title ?? (ARIA_DE_ESTADO[e] + (nivel === 'baja' ? ' (con dudas)' : ''));
   // Clase de animación solo cuando está viva; quieta = opacidad digna inline.
   const cls = (c) => (vivo ? c : undefined);
@@ -480,6 +490,22 @@ export function Angelita({
       <path d={CHISPA_D} fill={COLOR_CERTEZA} stroke={RH_INK} strokeWidth="0.35" />
     </g>
   ) : null;
+  // HUSMEA — las virutas de olor que entran hacia su nariz (la carita vive a
+  // la derecha, x≈13): tres hilitos serpenteantes desfasados que ella persigue
+  // inclinada (el cuerpo lo pone el CSS agm-husmea-cuerpo).
+  const virutasOlor = e === 'husmea' ? (
+    <g stroke={RH_INK} strokeWidth="0.6" strokeLinecap="round" fill="none" aria-hidden="true">
+      {[[15.2, 0.6, 0], [17.1, -1.4, -0.7], [15.9, 2.8, -1.4]].map(([x, y, d], i) => (
+        <path
+          key={i}
+          className={cls('agm-olor')}
+          style={vivo ? { animationDelay: `${d}s` } : undefined}
+          opacity={vivo ? undefined : 0.55}
+          d={`M${x},${y} q1.1,-0.7 2.2,0 q1.1,0.7 2.2,0`}
+        />
+      ))}
+    </g>
+  ) : null;
   // INVITA — estelas del "venga": arcos que viajan HACIA ella.
   const estelasInvita = e === 'invita' ? (
     <g stroke={COLOR_VOZ_MIEL} strokeWidth="0.95" strokeLinecap="round" fill="none" aria-hidden="true">
@@ -541,6 +567,8 @@ export function Angelita({
             energia={energia}
             mundoId={mundoId}
             lineBoil={lineBoil}
+            gafas={gafas}
+            cejas={cejasDelEstado}
           />
           {caraPreocupada}
           {caraNoSe}
@@ -553,6 +581,7 @@ export function Angelita({
       {signoNoSe}
       {destelloPoi}
       {estelasInvita}
+      {virutasOlor}
       {mota}
     </svg>
   );
