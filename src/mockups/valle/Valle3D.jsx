@@ -368,7 +368,7 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
         </group>
       );
     case 'animales': // los animales de la finca (reemplaza la vieja casita)
-      return <AnimalesDeFinca reducedMotion={reducedMotion} />;
+      return <AnimalesDeFinca reducedMotion={reducedMotion} q={q} />;
     case 'huerta': // camas de la huerta: lomos redondeados con matas
       return (
         <group>
