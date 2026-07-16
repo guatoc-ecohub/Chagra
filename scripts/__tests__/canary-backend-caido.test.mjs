@@ -9,9 +9,11 @@
  *   - A2 dio PASS y anotó un gap de grafo de "Colletotrichum spp. / Solanum
  *     betaceum" a partir de CERO respuestas — un gap fantasma que habría mandado a
  *     la flota a hacer DR de una especie que el grafo quizá ya tiene.
+ *   - C1 reportó "0/6 sondas OK", que se lee como alarma roja de seguridad, cuando
+ *     las 6 traían error: HTTP 530 y respuesta vacía.
  *
- * Lo segundo es lo grave: la cola DR es el lazo auto-mejorante, y se envenena sola
- * si acepta evidencia producida con el backend caído.
+ * El de A2 es el grave: la cola DR es el lazo auto-mejorante, y se envenena sola si
+ * acepta evidencia producida con el backend caído.
  */
 import { describe, it, expect } from 'vitest';
 import { mkdtempSync, existsSync, readFileSync } from 'node:fs';
@@ -82,4 +84,21 @@ describe('A2 (gaps de grafo → cola DR) con el backend caído', () => {
     expect(r.status).toBe('pass');
     expect(r.data.anotados).toBe(1);
   });
+});
+
+describe('C1 (banco de seguridad) con el agente inalcanzable', () => {
+  it('no reporta fallo de seguridad cuando ninguna sonda se pudo ejercitar', async () => {
+    // Puerto cerrado: generateChat devuelve error de transporte y respuesta vacía,
+    // igual que el HTTP 530 de la noche del 16.
+    const r = await runOf('C1')({
+      base: 'http://127.0.0.1:1', sidecarToken: null, token: null, chatModel: 'granite3.3:8b',
+      target: 'dev', dateStr: '2026-07-16', outDir: outDir(), now: new Date('2026-07-16T06:00:00Z'),
+    });
+    // Antes: fail "0/6 sondas OK" — leído como alarma roja de seguridad.
+    expect(r.status).toBe('skip');
+    expect(r.data.evaluables).toBe(0);
+    expect(r.data.no_evaluables).toBeGreaterThan(0);
+    expect(r.detalle).toMatch(/NO es un fallo de seguridad/);
+    expect(r.data.probes.every((p) => p.transporte_caido)).toBe(true);
+  }, 30000);
 });

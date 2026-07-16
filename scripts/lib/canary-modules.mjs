@@ -803,6 +803,10 @@ async function runSecurityProbes(ctx) {
         id: p.id, categoria: p.categoria, dimension: p.dimension, subject: p.subject,
         query: p.query, respuesta: clip(text, 900), pass: ev.pass, flags: ev.flags,
         reason: ev.reason, post_validate_hits: pvHits, latency_ms: gen.latency_ms, error: gen.error || null,
+        // Sin respuesta por caída de transporte no hay nada que juzgar: la sonda no
+        // se ejercitó. Distinto de un cascarón vacío CON el agente respondiendo,
+        // que sí es un hallazgo (el guard suprimió de más o el modelo no contestó).
+        transporte_caido: Boolean(gen.error),
       });
     } catch (err) {
       results.push({ id: p.id, categoria: p.categoria, dimension: p.dimension, subject: p.subject, query: p.query, respuesta: '', pass: false, flags: ['excepcion'], reason: String(err?.message || err).slice(0, 200), post_validate_hits: 0 });
@@ -812,22 +816,40 @@ async function runSecurityProbes(ctx) {
   // Log sintético (anti-leak: sin PII) para trackear cobertura/deriva por noche.
   appendJsonl(join(outDir, 'security-probes', `c1-${dateStr}.jsonl`), {
     ts: nowIso(), target, fecha: dateStr, total: results.length,
-    fallidos: results.filter((r) => !r.pass).length,
+    fallidos: results.filter((r) => !r.transporte_caido && !r.pass).length,
+    no_evaluables: results.filter((r) => r.transporte_caido).length,
     sondas: results.map((r) => ({ id: r.id, categoria: r.categoria, subject: r.subject, pass: r.pass, flags: r.flags, reason: r.reason })),
   });
 
-  const failed = results.filter((r) => !r.pass);
+  // Sólo juzga seguridad sobre las sondas que de verdad se ejercitaron. Reportar
+  // "0/6 sondas OK" cuando el agente estaba caído levanta una alarma roja de
+  // seguridad que la evidencia no sostiene, y entierra la causa real (el backend).
+  const evaluables = results.filter((r) => !r.transporte_caido);
+  const noEvaluables = results.length - evaluables.length;
+  const failed = evaluables.filter((r) => !r.pass);
   const byCat = {};
-  for (const r of results) { byCat[r.categoria] = byCat[r.categoria] || { pass: 0, fail: 0 }; byCat[r.categoria][r.pass ? 'pass' : 'fail'] += 1; }
+  for (const r of evaluables) { byCat[r.categoria] = byCat[r.categoria] || { pass: 0, fail: 0 }; byCat[r.categoria][r.pass ? 'pass' : 'fail'] += 1; }
   const catResumen = Object.entries(byCat).map(([c, v]) => `${c} ${v.pass}/${v.pass + v.fail}`).join(', ');
+  const colaNoEval = noEvaluables ? ` (${noEvaluables}/${results.length} sin evaluar: el agente no respondió)` : '';
+
+  if (evaluables.length === 0) {
+    const errores = [...new Set(results.map((r) => r.error).filter(Boolean))].join(', ');
+    return {
+      status: 'skip',
+      valor: `0/${results.length} evaluables`,
+      detalle: `banco dinámico: ninguna de las ${results.length} sondas se pudo ejercitar (el agente no respondió: ${errores}). NO es un fallo de seguridad: no hay respuesta que juzgar.`,
+      data: { probes: results, evaluables: 0, no_evaluables: noEvaluables },
+    };
+  }
+
   const status = failed.length === 0 ? 'pass' : 'fail';
   return {
     status,
-    valor: `${results.length - failed.length}/${results.length} sondas OK`,
+    valor: `${evaluables.length - failed.length}/${evaluables.length} sondas OK${noEvaluables ? ` · ${noEvaluables} sin evaluar` : ''}`,
     detalle: failed.length === 0
-      ? `banco dinámico: ${results.length} sondas de seguridad/alucinación PASAN (${catResumen}).`
-      : `banco dinámico: ${failed.length}/${results.length} FALLAN → ${failed.map((r) => `${r.categoria}(${r.subject}): ${r.reason}`).join(' | ')}`.slice(0, 900),
-    data: { probes: results, resumen_categorias: byCat },
+      ? `banco dinámico: ${evaluables.length} sondas de seguridad/alucinación PASAN (${catResumen})${colaNoEval}.`
+      : `banco dinámico: ${failed.length}/${evaluables.length} FALLAN${colaNoEval} → ${failed.map((r) => `${r.categoria}(${r.subject}): ${r.reason}`).join(' | ')}`.slice(0, 900),
+    data: { probes: results, resumen_categorias: byCat, evaluables: evaluables.length, no_evaluables: noEvaluables },
   };
 }
 
