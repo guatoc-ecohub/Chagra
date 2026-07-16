@@ -1464,6 +1464,28 @@ const MIRA_VALLE = [0, 1.6, 1.4];
    la pantalla, los lugares se separan en vertical y cada rótulo respira. La
    mira baja y avanza (la finca al centro, el cielo de remate arriba).
    En landscape (aspecto ≥ 0.9) la pose aprobada queda EXACTA. */
+/* LA POSE DE PORTADA (tranquera/login 3D-first, pulido 2026-07-16): el picado
+   operativo del teléfono muestra pura LADERA (correcto para tocar lugares,
+   mudo como paisaje). La portada no se opera — se CONTEMPLA detrás del
+   letrero: cámara baja a altura de mirada, horizonte alto y CIELO en el
+   cuadro (la franja del día es la primera señal viva de la entrada). El fov
+   abre un poco en vertical para que la ladera respire a lo ancho. Solo la usa
+   el modo `portada`; el valle-home conserva sus poses aprobadas intactas. */
+function posePortadaParaAspecto(aspect) {
+  const a = aspect || 1;
+  const base = a >= 0.9
+    ? { position: [11.5, 4.6, 16.5], fov: 42, mira: [-0.5, 3.0, 0.6] }
+    : { position: [8.5, 5.2, 15.5], fov: 50, mira: [-0.8, 2.0, 0.6] };
+  const dist = (p, m) => Math.hypot(p[0] - m[0], p[1] - m[1], p[2] - m[2]);
+  const dist0 = dist(CAMARA_VALLE.position, MIRA_VALLE);
+  return {
+    position: /** @type {[number, number, number]} */ (base.position),
+    fov: base.fov,
+    mira: /** @type {[number, number, number]} */ (base.mira),
+    k: dist(base.position, base.mira) / dist0,
+  };
+}
+
 function poseValleParaAspecto(aspect) {
   if (!aspect || aspect >= 0.9) {
     return { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
@@ -1721,15 +1743,15 @@ export default function Valle3D({
   /* La pose de reposo según el ASPECTO del equipo (una vez por montaje: girar
      el teléfono re-monta rutas enteras en la práctica; no vale un resize
      listener que mueva la cámara bajo los dedos del usuario). */
-  const pose = useMemo(
-    () =>
-      poseValleParaAspecto(
-        typeof window !== 'undefined' && window.innerHeight > 0
-          ? window.innerWidth / window.innerHeight
-          : 1,
-      ),
-    [],
-  );
+  const pose = useMemo(() => {
+    const aspect =
+      typeof window !== 'undefined' && window.innerHeight > 0
+        ? window.innerWidth / window.innerHeight
+        : 1;
+    /* Portada = paisaje que se contempla (horizonte + cielo); valle-home =
+       la pose operativa aprobada. */
+    return portada ? posePortadaParaAspecto(aspect) : poseValleParaAspecto(aspect);
+  }, [portada]);
   return (
     <Canvas
       className={`valle-canvas${listo ? ' valle-canvas--listo' : ''}`}
