@@ -656,6 +656,306 @@ function AvePosada() {
   );
 }
 
+/* ── EL ENT-FRAILEJÓN: el GUARDIÁN-MAESTRO del páramo ──────────────────────
+      Un frailejón MONUMENTAL (Espeletia hecha anciano) que se alza sobre el
+      frailejonal y enseña: columna velluda vestida de enagua marcescente, un
+      ROSTRO sereno que emerge del tallo (ojos ámbar hundidos bajo cejas
+      afelpadas, boca-grieta amable) y la gran ROSETA plateada por corona. Un
+      brazo florido (escapo de capítulos amarillos) que hace ademán de señalar,
+      y un halo de páramo a sus pies. Es el par del Ent-queñua del bosque: aquí,
+      arriba, el maestro es el frailejón. Digno, quieto, sabio. ── */
+function EntFrailejonMaestro({ pos, esc = 1, reducedMotion }) {
+  const cuerpo = useRef(null);
+  const brazo = useRef(null);
+  const halo = useRef(null);
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime;
+    // respira/mece apenas (anciano sereno, no bailarín)
+    if (!reducedMotion) {
+      if (cuerpo.current) cuerpo.current.rotation.z = Math.sin(t * 0.4) * 0.02;
+      if (brazo.current) brazo.current.rotation.z = -0.5 + Math.sin(t * 0.6) * 0.06;
+    }
+    if (halo.current) {
+      const pulso = reducedMotion ? 1 : 0.72 + 0.28 * Math.sin(t * 0.9);
+      halo.current.material.opacity = 0.16 * pulso;
+    }
+  });
+
+  // La enagua: anillos de hojas secas colgantes (conos abiertos) a lo largo del
+  // tallo — le da CUERPO de fraile, no palo. Recientes arriba, curtidas abajo.
+  const enagua = useMemo(() => {
+    const arr = [];
+    const n = 6;
+    for (let i = 0; i < n; i++) {
+      const f = i / (n - 1); // 0 base(vieja) → 1 arriba(reciente)
+      arr.push({
+        y: 0.5 + f * 1.7,
+        r: 0.44 - f * 0.06,
+        col: f < 0.4 ? P.frailejonTallo : mezclar(P.frailejonTallo, TINTE, 0.3),
+      });
+    }
+    return arr;
+  }, []);
+
+  // La roseta: un POMPÓN plateado pleno — TRES coronas de hojas anchas y
+  // afelpadas sobre un domo pálido, para que se lea como la roseta gorda del
+  // frailejón (no un mohawk) y RESALTE como el punto más claro del oro.
+  const hojasRoseta = useMemo(() => {
+    const rng = crearRng(707);
+    const corona = (n, incMin, incSpan, largoMin, largoSpan, ancho, claroMin, fase) =>
+      Array.from({ length: n }, (_, i) => ({
+        ang: (i / n) * Math.PI * 2 + fase + rng() * 0.12,
+        inc: incMin + rng() * incSpan,
+        largo: largoMin + rng() * largoSpan,
+        ancho,
+        claro: claroMin + rng() * 0.35,
+      }));
+    return [
+      // externa: ancha y arqueada afuera (el faldón de la roseta)
+      ...corona(20, 1.0, 0.28, 0.62, 0.2, 0.19, 0.1, 0),
+      // media: intermedia
+      ...corona(16, 0.6, 0.3, 0.52, 0.18, 0.17, 0.4, 0.4),
+      // interna: corta y erguida (el cogollo, la más pálida)
+      ...corona(10, 0.2, 0.24, 0.34, 0.14, 0.14, 0.7, 0.8),
+    ];
+  }, []);
+
+  // Colores plateados de la roseta: brillan claro para RESALTAR en la niebla
+  // dorada (la firma plateada del frailejón, el punto más luminoso de la escena).
+  const PLATA = mezclar('#c3ceb0', TINTE, 0.12);
+  const PLATA_CLARO = mezclar('#e4ead8', TINTE, 0.08);
+
+  return (
+    <group position={pos} scale={esc}>
+      {/* halo de maestro a los pies (aditivo, respira) */}
+      <mesh ref={halo} position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.7, 1.5, 32]} />
+        <meshBasicMaterial color="#f2e6c4" transparent opacity={0.16} depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} />
+      </mesh>
+
+      <group ref={cuerpo}>
+        {/* el TALLO velludo, grueso y alto */}
+        <mesh position={[0, 1.2, 0]} castShadow>
+          <cylinderGeometry args={[0.34, 0.44, 2.4, 11]} />
+          <meshLambertMaterial color={P.frailejonTallo} flatShading />
+        </mesh>
+        {/* la enagua de hojas muertas (marcescentes) por anillos */}
+        {enagua.map((e, i) => (
+          <mesh key={i} position={[0, e.y, 0]}>
+            <coneGeometry args={[e.r, 0.5, 11, 1, true]} />
+            <meshLambertMaterial color={e.col} flatShading side={THREE.DoubleSide} />
+          </mesh>
+        ))}
+
+        {/* ── EL ROSTRO que emerge del tallo (a ~1.6 de alto) ── */}
+        <group position={[0, 1.62, 0.28]}>
+          {/* frente/mejilla: una cáscara suave sobre el tallo (más clara) */}
+          <mesh position={[0, 0.05, -0.06]} scale={[1, 1.1, 0.7]}>
+            <sphereGeometry args={[0.3, 14, 12]} />
+            <meshLambertMaterial color={mezclar(P.frailejonTallo, '#c8b483', 0.35)} flatShading />
+          </mesh>
+          {/* cejas afelpadas (dos tufos claros sobre los ojos) */}
+          {[-1, 1].map((s) => (
+            <mesh key={s} position={[s * 0.12, 0.13, 0.16]} rotation={[0, 0, -s * 0.3]} scale={[1.2, 0.5, 0.6]}>
+              <sphereGeometry args={[0.08, 8, 6]} />
+              <meshLambertMaterial color={P.frailejonHoja} flatShading />
+            </mesh>
+          ))}
+          {/* ojos: cuenca honda + iris ámbar-miel que asoma de la sombra */}
+          {[-1, 1].map((s) => (
+            <group key={s} position={[s * 0.12, 0.0, 0.18]}>
+              <mesh position={[0, 0, -0.02]} scale={[1, 1.05, 0.8]}>
+                <sphereGeometry args={[0.075, 12, 10]} />
+                <meshLambertMaterial color="#4a3115" flatShading />
+              </mesh>
+              <mesh position={[0, 0, 0.03]}>
+                <sphereGeometry args={[0.05, 12, 10]} />
+                <meshLambertMaterial color="#e0ad4c" emissive="#a5702a" emissiveIntensity={0.35} flatShading />
+              </mesh>
+              <mesh position={[0, 0, 0.06]}>
+                <sphereGeometry args={[0.02, 8, 8]} />
+                <meshLambertMaterial color="#2a1c0a" flatShading />
+              </mesh>
+              <mesh position={[s * 0.015, 0.02, 0.075]}>
+                <sphereGeometry args={[0.008, 6, 6]} />
+                <meshBasicMaterial color="#fff6e2" />
+              </mesh>
+            </group>
+          ))}
+          {/* nariz de nudo */}
+          <mesh position={[0, -0.1, 0.2]} scale={[0.8, 1.1, 0.9]}>
+            <sphereGeometry args={[0.06, 8, 7]} />
+            <meshLambertMaterial color={mezclar(P.frailejonTallo, '#8a6a44', 0.4)} flatShading />
+          </mesh>
+          {/* boca-grieta amable (leve arco) */}
+          <mesh position={[0, -0.22, 0.17]} rotation={[0.2, 0, 0]} scale={[1.5, 0.32, 0.5]}>
+            <sphereGeometry args={[0.09, 10, 6]} />
+            <meshLambertMaterial color="#3a2712" flatShading />
+          </mesh>
+        </group>
+
+        {/* ── LA ROSETA plateada: pompón pleno de tres coronas sobre un domo ── */}
+        <group position={[0, 2.4, 0]}>
+          {/* domo pálido: el cuerpo de la roseta bajo las hojas (le da bulto) */}
+          <mesh position={[0, 0.12, 0]} scale={[1, 0.72, 1]}>
+            <sphereGeometry args={[0.42, 14, 10]} />
+            <meshLambertMaterial color={mezclar('#cdd6bd', TINTE, 0.12)} flatShading />
+          </mesh>
+          {hojasRoseta.map((h, i) => (
+            <mesh
+              key={i}
+              position={[Math.cos(h.ang) * 0.2, 0.06, Math.sin(h.ang) * 0.2]}
+              rotation={[h.inc, -h.ang, 0]}
+              castShadow
+            >
+              <coneGeometry args={[h.ancho, h.largo, 4]} />
+              <meshLambertMaterial color={new THREE.Color(PLATA).lerp(new THREE.Color(PLATA_CLARO), h.claro)} flatShading />
+            </mesh>
+          ))}
+          {/* cogollo velloso central (el punto más pálido, el corazón afelpado) */}
+          <mesh position={[0, 0.2, 0]}>
+            <sphereGeometry args={[0.16, 12, 9]} />
+            <meshLambertMaterial color={mezclar('#eef2e6', TINTE, 0.08)} flatShading />
+          </mesh>
+        </group>
+
+        {/* ── EL BRAZO florido: escapo que sale del costado y hace ademán de
+             señalar (el maestro que enseña) con capítulos amarillos ── */}
+        <group ref={brazo} position={[0.4, 1.8, 0.12]} rotation={[0, 0, -0.5]}>
+          <mesh position={[0, 0.45, 0]}>
+            <cylinderGeometry args={[0.03, 0.045, 0.95, 6]} />
+            <meshLambertMaterial color={P.frailejonHoja} flatShading />
+          </mesh>
+          {[[0, 0.92, 0.05], [0.09, 0.86, -0.03], [-0.07, 0.84, 0.05], [0.03, 0.98, -0.02]].map((f, i) => (
+            <mesh key={i} position={/** @type {[number, number, number]} */ (f)}>
+              <sphereGeometry args={[0.07, 8, 6]} />
+              <meshLambertMaterial color={P.frailejonFlor} emissive="#7a5e18" emissiveIntensity={0.2} flatShading />
+            </mesh>
+          ))}
+        </group>
+      </group>
+    </group>
+  );
+}
+
+/* ── CHUSQUE (Chusquea, el bambú del páramo): macollas de culmos finos y
+      ARQUEADOS que se doblan con el viento. Cero copa: es fino y plumoso. ── */
+function Chusque({ pos, esc = 1, seed = 5 }) {
+  const rng = useMemo(() => crearRng(seed), [seed]);
+  const culmos = useMemo(
+    () => Array.from({ length: 7 }, () => ({
+      ang: rng() * Math.PI * 2,
+      inc: 0.2 + rng() * 0.35,
+      alto: 0.9 + rng() * 0.7,
+      verde: rng(),
+    })),
+    [rng],
+  );
+  return (
+    <group position={pos} scale={esc}>
+      {culmos.map((c, i) => (
+        <group key={i} rotation={[Math.cos(c.ang) * c.inc, 0, Math.sin(c.ang) * c.inc]}>
+          <mesh position={[0, c.alto / 2, 0]}>
+            <cylinderGeometry args={[0.012, 0.02, c.alto, 4]} />
+            <meshLambertMaterial color={mezclar('#8a9a55', TINTE, 0.25 + c.verde * 0.15)} flatShading />
+          </mesh>
+          {/* penacho de hoja fina arriba */}
+          <mesh position={[0, c.alto + 0.06, 0]}>
+            <coneGeometry args={[0.07, 0.28, 4]} />
+            <meshLambertMaterial color={mezclar('#9caf5f', TINTE, 0.28)} flatShading />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+/* ── CARDÓN (Puya, la bromelia gigante del páramo): roseta de hojas duras
+      espinosas en corona baja y, a veces, una vara-inflorescencia alta. ── */
+function Cardon({ pos, esc = 1, vara = true, seed = 9 }) {
+  const rng = useMemo(() => crearRng(seed), [seed]);
+  const hojas = useMemo(
+    () => Array.from({ length: 14 }, (_, i) => ({
+      ang: (i / 14) * Math.PI * 2 + rng() * 0.2,
+      inc: 0.7 + rng() * 0.4,
+      largo: 0.4 + rng() * 0.2,
+    })),
+    [rng],
+  );
+  return (
+    <group position={pos} scale={esc}>
+      {hojas.map((h, i) => (
+        <mesh
+          key={i}
+          position={[Math.cos(h.ang) * 0.06, 0.06, Math.sin(h.ang) * 0.06]}
+          rotation={[h.inc, -h.ang, 0]}
+        >
+          <coneGeometry args={[0.05, h.largo, 3]} />
+          <meshLambertMaterial color={mezclar('#7e9a58', TINTE, 0.32)} flatShading />
+        </mesh>
+      ))}
+      {vara && (
+        <group position={[0, 0.1, 0]}>
+          <mesh position={[0, 0.65, 0]}>
+            <cylinderGeometry args={[0.03, 0.05, 1.3, 6]} />
+            <meshLambertMaterial color={mezclar('#9a8a5a', TINTE, 0.3)} flatShading />
+          </mesh>
+          <mesh position={[0, 1.35, 0]}>
+            <sphereGeometry args={[0.16, 8, 7]} />
+            <meshLambertMaterial color={mezclar('#5f7d4a', TINTE, 0.28)} flatShading />
+          </mesh>
+        </group>
+      )}
+    </group>
+  );
+}
+
+/* ── ROMERO DE PÁRAMO (Diplostephium): arbustillo bajo, denso y aromático, de
+      follaje fino gris-verde. El sotobosque leñoso del moor, instanciado. ── */
+function RomeroParamo({ n }) {
+  const ref = useRef(null);
+  const sitios = useMemo(() => {
+    const rng = crearRng(163);
+    const lista = [];
+    let intentos = 0;
+    while (lista.length < n && intentos < n * 10) {
+      intentos += 1;
+      const wx = (rng() - 0.5) * (ANCHO - 8);
+      const wz = (rng() - 0.5) * (FONDO - 10);
+      if (humedad(wx, wz) > 0.5) continue;
+      const y = alturaParamo(wx, wz);
+      if (y > 3.4) continue;
+      lista.push({ wx, wz, y, esc: 0.5 + rng() * 0.6, giro: rng() * Math.PI, verde: rng() });
+    }
+    return lista;
+  }, [n]);
+  useEffect(() => {
+    const m = ref.current;
+    if (!m) return;
+    const dummy = new THREE.Object3D();
+    const tinte = new THREE.Color();
+    const base = new THREE.Color(mezclar('#6f8a52', TINTE, 0.3));
+    const claro = new THREE.Color(mezclar('#8aa565', TINTE, 0.28));
+    sitios.forEach((s, i) => {
+      dummy.position.set(s.wx, s.y + 0.16 * s.esc, s.wz);
+      dummy.rotation.set(0, s.giro, 0);
+      dummy.scale.set(s.esc, s.esc * 1.15, s.esc);
+      dummy.updateMatrix();
+      m.setMatrixAt(i, dummy.matrix);
+      tinte.copy(base).lerp(claro, s.verde);
+      m.setColorAt(i, tinte);
+    });
+    m.instanceMatrix.needsUpdate = true;
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  }, [sitios]);
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
+      <dodecahedronGeometry args={[0.26]} />
+      <meshLambertMaterial flatShading />
+    </instancedMesh>
+  );
+}
+
 /* La escena completa (grupo r3f interno; el default la monta en su Canvas). */
 function EscenaParamo({ tier, reducedMotion, fabrica }) {
   const perfil = perfilDeTier(tier);
@@ -666,11 +966,12 @@ function EscenaParamo({ tier, reducedMotion, fabrica }) {
   useEffect(() => () => geo.dispose(), [geo]);
 
   // presupuestos de la colonia por tier
-  const nFrailejones = tier === 'alto' ? 16 : 10;
+  const nFrailejones = tier === 'alto' ? 18 : 11;
   const nPaja = tier === 'alto' ? 150 : 90;
   const nMusgo = tier === 'alto' ? 46 : 28;
   const nNiebla = tier === 'alto' ? 9 : 6;
   const nAves = tier === 'alto' ? 3 : 2;
+  const nRomero = tier === 'alto' ? 22 : 12;
 
   /* `color`/`fog` se adjuntan a la ESCENA: hijos directos, nunca en <group>. */
   return (
@@ -685,10 +986,27 @@ function EscenaParamo({ tier, reducedMotion, fabrica }) {
       </mesh>
 
       <NacimientoAgua reducedMotion={reducedMotion} fabrica={fabrica} />
-      <FrailejonHeroe pos={[-2.2, alturaParamo(-2.2, 2.4), 2.4]} reducedMotion={reducedMotion} />
+
+      {/* ══ EL GUARDIÁN-MAESTRO ══ el Ent-frailejón monumental que se alza sobre
+          el frailejonal y enseña. Elevado y adelantado a la izquierda para que
+          domine el cuadro sin tapar el nacimiento del agua. */}
+      <EntFrailejonMaestro pos={[-1.9, alturaParamo(-1.9, 1.4) - 0.1, 1.4]} esc={1.6} reducedMotion={reducedMotion} />
+
+      {/* el frailejón "de detalle" pasa a acompañante, más al costado */}
+      <FrailejonHeroe pos={[2.6, alturaParamo(2.6, 1.4), 1.4]} reducedMotion={reducedMotion} />
       <FrailejonalInstanciado n={nFrailejones} />
       <Pajonal n={nPaja} />
       <CojinesMusgo n={nMusgo} />
+      <RomeroParamo n={nRomero} />
+
+      {/* chusque (bambú del páramo) en macollas en las faldas húmedas */}
+      <Chusque pos={[-5.4, alturaParamo(-5.4, 3.2), 3.2]} esc={1.1} seed={5} />
+      <Chusque pos={[4.6, alturaParamo(4.6, -3.4), -3.4]} esc={0.95} seed={13} />
+      {tier === 'alto' && <Chusque pos={[-6.8, alturaParamo(-6.8, -1.2), -1.2]} esc={1.0} seed={21} />}
+
+      {/* cardón (Puya) — la bromelia gigante del páramo, roseta espinosa + vara */}
+      <Cardon pos={[3.4, alturaParamo(3.4, 3.6), 3.6]} esc={1.0} vara seed={9} />
+      <Cardon pos={[-4.2, alturaParamo(-4.2, 5.2), 5.2]} esc={0.85} vara={false} seed={31} />
 
       {/* quenuas dispersas en las faldas; la niebla se les engancha */}
       <Quenua pos={[-8.2, alturaParamo(-8.2, -4.5), -4.5]} esc={1.25} />
@@ -738,7 +1056,7 @@ const CSS_PARAMO = `
 
 /* La copia didáctica: en calma, la invitación; en modo fábrica, cómo nace. */
 const COPY_CALMA =
-  'El páramo es la fábrica de agua. Toque el botón para ver de dónde nace el agua que baja a las veredas.';
+  'Este es el páramo, la fábrica de agua, y su guardián: el frailejón-maestro que enseña a cuidarlo. Toque el botón para ver de dónde nace el agua que baja a las veredas.';
 const COPY_FABRICA =
   'Los frailejones peinan la niebla con sus hojas velludas; el musgo y la turba la guardan como una esponja. Del hondón, gota a gota, nace el agua. Por eso el páramo se cuida: si se seca, se seca el río.';
 
@@ -798,7 +1116,7 @@ export default function MundoParamo3D() {
       <div className="paramo-chrome">
         <h2 className="paramo-titulo">
           El páramo: la fábrica de agua
-          <small>Bosque altoandino de niebla — frailejones, musgo y el nacimiento del agua</small>
+          <small>El frailejón-maestro, el frailejonal, el chusque y el nacimiento del agua</small>
         </h2>
         <div className="paramo-pie">
           <button

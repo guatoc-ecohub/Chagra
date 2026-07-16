@@ -37,6 +37,7 @@ import { SombraContacto } from '../escenas/SombraContacto.jsx';
 import SueloRico from '../terreno/SueloRico.jsx';
 import EntQuenua from './EntQuenua.jsx';
 import FloraParamo from './FloraParamo.jsx';
+import DoselBiodiverso from './DoselBiodiverso.jsx';
 import FaunaBosque from './FaunaBosque.jsx';
 import {
   alturaBosque,
@@ -627,6 +628,13 @@ function Diorama({ tier, reducedMotion, pose }) {
       {/* El ECOSISTEMA de páramo (frailejonar, sotobosque, árboles vecinos),
           POSADO sobre el relieve con alturaDe. */}
       <FloraParamo tier={tier} reducedMotion={reducedMotion} alturaDe={alturaBosque} />
+
+      {/* EL DOSEL BIODIVERSO: la variedad andina/subandina colombiana que
+          TRIPLICA los árboles — emergentes (guadua, nogal cafetero, cedro),
+          dosel florecido (cámbulo rojo, gualanday morado, siete cueros magenta),
+          sotobosque (helecho arbóreo, heliconia) y epífitas (quiche). Con esto
+          el claro se lee como BOSQUE de tres estratos, no un árbol solo. */}
+      <DoselBiodiverso tier={tier} alturaDe={alturaBosque} />
 
       {/* LA VIDA: cóndor, vecinos rubber-hose, mariposas, luciérnagas. */}
       <FaunaBosque tier={tier} reducedMotion={reducedMotion} />
