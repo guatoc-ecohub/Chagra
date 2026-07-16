@@ -50,6 +50,7 @@ const LAZY_MAP = {
   VentanaValle3D: lazy(() => import('../components/VentanaValle3D.jsx')),
   VistaGlobalSierra: lazy(() => import('../visual/mundo3d/VistaGlobalSierra.jsx')),
   GaleriaSierraArboles: lazy(() => import('../visual/mundo3d/sierra/GaleriaSierraArboles.jsx')),
+  SierraMonte3D: lazy(() => import('../visual/mundo3d/sierra/SierraMonte3D.jsx')),
   SierraCorteVertical: lazy(() => import('../visual/mundo3d/sierra/SierraCorteVertical.jsx')),
   MundoEntBosque: lazy(() => import('../visual/mundo3d/bosque/MundoEntBosque.jsx')),
   MontanaMundosCampesino: lazy(() => import('../mockups/MontanaMundosCampesino.jsx')),
@@ -236,6 +237,7 @@ function parseHash() {
 const VISTAS_SIN_SALIDA = new Set([
   'valle3d_noche',
   'sierra_global', 'sierra', 'vista_sierra',
+  'sierra_corte', 'sierra_lamina', 'vista_sierra_corte',
   'diorama_abejas', 'diorama_paramo', 'diorama_suelo', 'diorama_compost',
   'subsuelo', 'mundo3d_micorrizas',
   'camara_director', 'artesania_andina', 'efectos_funcionales',
