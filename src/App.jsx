@@ -226,6 +226,7 @@ const MundoMercado3DMockup = lazy(() => import('./mockups/MundoMercado3D'));
 // La CARA 3D-first de prod.chagra.app: entrada-tranquera con el valle vivo de
 // fondo → velo dorado del cruce → el valle como HOME (EntradaValle3D).
 const CaraProd3DMockup = lazy(() => import('./mockups/CaraProd3D'));
+const SueloDemo3DMockup = lazy(() => import('./mockups/SueloDemo3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -653,6 +654,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-gallinero-3d': 'mockup_mundo_gallinero_3d',
   'mockups/mundo-mercado-3d': 'mockup_mundo_mercado_3d',
   'mockups/cara-prod': 'mockup_cara_prod',
+  'mockups/suelo-demo-3d': 'mockup_suelo_demo_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2191,6 +2193,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La cara de Chagra (prod 3D)">
               <CaraProd3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_suelo_demo_3d':
+        // El SUELO calibre Switch (#/mockups/suelo-demo-3d): terreno fbm con
+        // color por zona, sendero, detalle al ras. ?vista=aerea|cerca|sendero.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El suelo del páramo">
+              <SueloDemo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
