@@ -56,10 +56,6 @@ import { recordGameStart, recordGameComplete } from '../../services/usageTelemet
 // No se reescribe ninguna mecánica: es cableado/composición.
 import JuegoLaMilpa from '../../mockups/JuegoLaMilpa';
 
-import { Crisopa } from '../../visual/creatures/Crisopa.jsx';
-import { Trichogramma } from '../../visual/creatures/Trichogramma.jsx';
-import { Sirfido } from '../../visual/creatures/Sirfido.jsx';
-
 import './milpa.css';
 
 /**

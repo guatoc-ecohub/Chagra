@@ -857,10 +857,29 @@ export const NUCLEO_APP = [
     categoria: '2D-app',
   },
   {
+    // Fusionado DENTRO de MilpaSimulator como "modo ilustrado" (audit juegos
+    // 2026-07-16). Se mantiene la ruta/alias para el deep-link directo, pero el
+    // hub MiFincaViva ya no lo lista como entrada aparte (una sola Milpa).
     path: 'juego_la_milpa',
     alias: ['mockup_juego_la_milpa'],
     componente: 'JuegoLaMilpa',
     importLazy: 'src/mockups/JuegoLaMilpa.jsx',
+    categoria: '2D-app',
+  },
+  {
+    // Promovido de URL-only (#/mockups/juego-mi-finca) a ruta de primera clase
+    // + enlace desde el hub (audit juegos 2026-07-16). La joya 2D↔3D Odyssey.
+    path: 'finca_odyssey',
+    alias: ['mockup_juego_mi_finca'],
+    componente: 'JuegoMiFincaOdyssey',
+    importLazy: 'src/mockups/JuegoMiFincaOdyssey.jsx',
+    categoria: '2D-app',
+  },
+  {
+    // Rescatado de huérfano total sin ruta (audit juegos 2026-07-16). AGR 9.
+    path: 'mono_vs_poli',
+    componente: 'MonoVsPoliSimulator',
+    importLazy: 'src/components/juego/MonoVsPoliSimulator.jsx',
     categoria: '2D-app',
   },
 
