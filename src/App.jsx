@@ -1595,6 +1595,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo del cacao">
               <CacaoVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_papa_viva_3d':
         // Vitrina pública del MUNDO DE LA PAPA: el papal en surcos de la tierra
         // fría en 3D REAL — caballones de tierra negra horneados en el relieve
