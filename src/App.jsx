@@ -2229,6 +2229,9 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Criaturas nocturnas">
               <CriaturasNocturnasMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_angelita_viva':
         // Angelita al máximo (#/mockups/angelita-viva): la entrada teatral
         // (asoma pequeñita → gafas si hace sol → crece con overshoot) y el

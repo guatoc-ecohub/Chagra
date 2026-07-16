@@ -7,89 +7,93 @@
  * acompaña, por dónde camina el ojo. Valle3D lo consume como capa de
  * composición ENCIMA de valleData (que no se toca: otros frentes viven ahí).
  *
- * ── REDISEÑO 2026-07 (feedback del operador) ─────────────────────────────
- * "Todo muy pegado; aprovechar mejor el espacio; los animales más regados
- * pero más lejos; nada se vea monocultivo; la casa no se ve como la entrada
- * a los mundos." De ahí las cuatro leyes nuevas de esta composición:
- *
- *   1. EL VALLE RESPIRA: terreno jugable 48×48 (antes 34×34), aire mínimo
- *      ~3 u entre lugares vecinos (antes ~2), cámara de reposo más lejos.
- *   2. LA CASA ES LA PUERTA: deja de ser solo ancla — su puerta iluminada
- *      ABRE el mapa de los mundos (los 6 portales). El corazón Y la boca.
- *   3. SEIS PORTALES LEGIBLES: mis matas · mis animales · el tiempo ·
- *      vender · aprender · toda mi finca — cada uno con su pórtico de
- *      madera, su patio de tierra y su sendero desde la casa.
+ * ── REDISEÑO 2026-07 SOBRE LA BASE CERCANA (feedback del operador) ────────
+ * La cámara INMERSIVA y el paisaje denso de la v2 son sagrados: el rediseño
+ * anterior alejó la cámara y el valle quedó lejano y vacío. Esta pasada
+ * reconstruye ENCIMA de la v2 lo que sí funcionó del rediseño:
+ *   1. LA CASA ES LA PUERTA: su puerta iluminada abre el mapa de los 6
+ *      portales. El corazón Y la boca.
+ *   2. JERARQUÍA DE PORTALES: los 6 principales son VENTANAS VIVAS al mundo
+ *      (notorias, inmersivas — ver VentanasVivas); los pórticos de madera
+ *      quedan SOLO para los lugares secundarios de menos uso.
+ *   3. EL PÁRAMO SE VE: el acceso al páramo es el páramo MISMO, arriba, con
+ *      el Ent-queñua magnífico — una vista al mundo, no un letrero.
  *   4. LA FINCA ES POLICULTIVO: potrero con cercas vivas, biofábrica con su
- *      pila (el ciclo estiércol→abono legible), invernadero como micro-mundo,
- *      milpa como parcela viva estilo "granja de Age of Empires".
+ *      pila, invernadero como micro-mundo, milpa de tres hermanas y cafetal
+ *      con sombrío. Nada se lee monocultivo.
  *
  * ── LOS TRES CRITERIOS DEL ENCUADRE ──────────────────────────────────────
- * La cámara de reposo mira desde [14.6, 12.2, 18.8] hacia [0, 2.0, 2.0]:
+ * La cámara de reposo mira desde [10.5, 9, 13.5] hacia [0, 1.6, 1.4]:
  * el frente (+z, tierra caliente) queda CERCA y abajo; la ladera trepa al
  * páramo (-z) al fondo. De ahí las tres franjas de dirección:
  *
  *   1. LO DIARIO, A LA MANO (frente, cerca de la casa): lo que el campesino
- *      toca todos los días — las eras, el invernadero, la huerta.
- *   2. LO SEMANAL, A MEDIA LADERA: la milpa, el cafetal, el agua, y el
- *      potrero de los animales (más lejos, con su propio aire).
+ *      toca todos los días — el corral, las eras, el semillero, la huerta.
+ *      La finca real es así: el trajín vive alrededor de la casa.
+ *   2. LO SEMANAL, A MEDIA LADERA: la milpa, el cafetal, el agua. Se sube
+ *      a ellos; el ojo los alcanza sin estorbar el frente.
  *   3. LO CONTEMPLATIVO, AL FONDO: el monte, la veleta en el filo del
  *      páramo. Son horizonte: se miran más de lo que se tocan.
+ *
+ * ── EL ANCLA: LA CASA ────────────────────────────────────────────────────
+ * Toda finca se organiza alrededor de su casa, y el valle no tenía una: el
+ * ojo descansaba en pasto vacío. La casa campesina (encalada, zócalo pintado,
+ * techo de teja, la ventana con luz cálida) va donde la mirada de reposo
+ * aterriza — no es un mundo navegable, es el HOGAR: el punto de silencio
+ * del cuadro. Los senderos nacen de ella: el camino dice qué se usa.
  */
 
-/* ── 1. LA CASA (el corazón Y la puerta de los mundos) ───────────────────
-   Apenas a la izquierda del punto de mira de reposo ([0, 2.0, 2.0]) para
-   componer por tercios: la casa descansa, la quebrada brilla a su derecha.
-   Ya NO es solo ancla: su puerta iluminada es NAVEGABLE — tocarla abre el
-   mapa de los 6 portales. `escala` la agranda a la medida del valle nuevo. */
+/* ── 1. LA CASA (ancla de composición, no navegable) ─────────────────────
+   Apenas a la izquierda del punto de mira de reposo ([0, 1.6, 1.4]) para
+   componer por tercios: la casa descansa, la quebrada brilla a su derecha,
+   y el faro de la alerta queda con aire propio al frente. */
 export const CASA_VALLE = {
-  pos: [-1.4, 3.0], // [x, z] — la y la da el terreno
+  pos: [-0.9, 2.6], // [x, z] — la y la da el terreno
   rotY: 0.42, // el corredor mira hacia la cámara de reposo (suroriente)
-  escala: 1.3, // la casa creció con el valle: sigue mandando el cuadro
+  // La casa creció un pelo (es la puerta de los mundos, tiene que mandar el
+  // cuadro) sin robarle aire al valle cercano de la v2.
+  escala: 1.12,
 };
 
 /* ── 2. DISPOSICIÓN COMPUESTA de los lugares ─────────────────────────────
-   Override de posición [x, z] por id de mundo — EL MAPA COMPLETO del valle
-   grande. Reglas duras que cumplen estas coordenadas:
-     · aire mínimo ~3 u entre lugares vecinos (el valle regado que pidió el
-       operador — antes era ~2 u y todo se leía apeñuscado);
-     · cada lugar respeta su piso térmico (valleData.PISOS_TERMICOS, ya
-       escalados al terreno 48×48);
-     · lo diario rodea la casa; el potrero va lejos con su propio llano; las
-       salidas (mercado) van al borde del cuadro; el páramo manda arriba. */
+   Override de posición [x, z] por id de mundo. Solo se mueven los que
+   estaban puestos sin componer; los bien contados (agua sobre la quebrada,
+   la veleta en el filo del páramo, el bosque trepando al frío, el cafetal
+   en su piso) se quedan. Reglas duras que cumplen estas coordenadas:
+     · aire mínimo ~2 u entre lugares vecinos (los rótulos ya anti-colisionan
+       en pantalla; esto compone la GEOMETRÍA, no las etiquetas);
+     · cada lugar respeta su piso térmico (valleData.PISOS_TERMICOS);
+     · lo diario rodea la casa; las salidas (mercado) van al borde del cuadro. */
 export const COMPOSICION_LUGARES = {
-  // La milpa-parcela (portal MIS MATAS): media ladera izquierda, clima medio.
-  cultivos: [-8.4, 0.8],
-  // El potrero (portal MIS ANIMALES): el llano frontal-izquierdo, LEJOS y
-  // ancho — los animales regados en sus apartos de cerca viva.
-  animales: [-8.6, 8.6],
-  // La biofábrica (pila de compost): CERCA del potrero pero DIFERENCIADA —
-  // el viaje del estiércol a la pila se lee en un sendero corto.
-  abono: [-4.9, 9.6],
+  // El POTRERO (portal MIS ANIMALES) cierra la esquina izquierda del frente:
+  // apartos con cerca viva y el hato regado — pisa ancho, por eso gana medio
+  // paso de aire respecto al corral viejo.
+  animales: [-5.7, 6.1],
+  // La BIOFÁBRICA (pila de compost): detrás del potrero hacia el frente,
+  // CERCA de los animales pero diferenciada — el viaje del estiércol a la
+  // pila se lee en un ramal corto de sendero.
+  abono: [-3.3, 8.1],
+  // El INVERNADERO (micro-mundo del semillero): al frente de la casa, a la
+  // mano — la matica se cría cerca. (Cedió su puesto viejo al potrero.)
+  semillero: [-0.6, 6.6],
   // Las eras al frente-izquierda de la casa: donde el faro del día se lee solo.
-  suelo: [-3.6, 6.8],
-  // El invernadero (micro-mundo del semillero): entre las eras y el potrero,
-  // a la mano de la casa — la matica se cría cerca y el túnel SE VE (corrido
-  // del frente de la píldora de la alerta, que le tapaba los arcos).
-  semillero: [-6.8, 6.6],
+  // (Un paso más allá de la casa: la píldora de la alerta — anclada aquí —
+  //  pisaba el techo desde la cámara de reposo; ahora el faro respira solo.)
+  suelo: [-2.3, 5.5],
+  // La huerta ES "la huerta de la casa" (su propia narración): pegada a ella.
+  sanidad: [3.4, 4.4],
+  // El mercado es LA SALIDA a la plaza: borde derecho-frontal, el camino que
+  // se va del cuadro. Antes tapaba el centro-bajo del encuadre.
+  mercado: [4.9, 6.3],
+  // El KIOSCO DEL SABER (portal APRENDER): a la vera del camino de la plaza,
+  // el tablero bajo techito de paja donde la finca enseña.
+  aprender: [6.4, 4.6],
   // Los hongos en el corazón cultivado, con aire de la casa y de la milpa.
-  micorrizas: [-5.2, 1.6],
-  // La huerta ES "la huerta de la casa": pegada a ella, del lado del sol.
-  sanidad: [2.8, 5.6],
-  // El mercado (portal VENDER) es LA SALIDA a la plaza: borde derecho-frontal,
-  // el camino que se va del cuadro.
-  mercado: [8.6, 9.0],
-  // El kiosco del saber (portal APRENDER): a la vera del camino de la plaza —
-  // el tablero bajo el árbol donde se aprende y se juega.
-  aprender: [7.4, 4.2],
-  // El cafetal con sombrío: clima medio, subiendo hacia el monte.
-  cafe: [6.0, 0.6],
-  // El monte (portal TODA MI FINCA): la arboleda trepando al clima frío.
-  disenio: [7.2, -4.4],
-  // La toma de agua sobre la quebrada, donde el cauce cruza el clima frío.
-  agua: [1.0, -2.0],
-  // La veleta (portal EL TIEMPO): arriba en el filo del páramo, donde se lee
-  // el cielo. Sola, con el horizonte entero para ella.
-  clima: [-5.0, -9.4],
+  // (Corridos un paso al monte: desde la cámara de reposo quedaban justo
+  //  DETRÁS de la píldora de la alerta y su chip nunca se veía.)
+  micorrizas: [-3.8, 3.9],
+  // La milpa cede un paso a la izquierda para darle aire a los hongos.
+  cultivos: [-5.2, 2.2],
 };
 
 /**
@@ -108,11 +112,13 @@ export function componerMundos(mundos) {
   });
 }
 
-/* ── 3. LOS 6 PORTALES (las puertas de la finca) ─────────────────────────
-   La promesa del valle en seis puertas legibles: cada portal es un LUGAR
-   con pórtico de madera (dos pies derechos + dintel + farolito), su patio
-   de tierra pisada y su sendero desde la casa. La puerta de la casa abre
-   este mismo mapa como panel. `id` = el mundo del valle que surte el portal. */
+/* ── 3. LOS 6 PORTALES (las puertas grandes de la finca) ─────────────────
+   La promesa del valle en seis puertas legibles: mis matas · mis animales ·
+   el tiempo · vender · aprender · toda mi finca. La puerta de la casa abre
+   este mapa como panel, y en la ESCENA cada portal es una VENTANA VIVA al
+   mundo (jerarquía del operador: notorios e inmersivos — los pórticos de
+   madera quedan solo para lo secundario). `id` = el mundo que surte el
+   portal. */
 export const PORTALES_VALLE = [
   { id: 'cultivos', nombre: 'Mis matas', emoji: '🌱' },
   { id: 'animales', nombre: 'Mis animales', emoji: '🐄' },
@@ -122,108 +128,126 @@ export const PORTALES_VALLE = [
   { id: 'disenio', nombre: 'Toda mi finca', emoji: '🌳' },
 ];
 
+/* Los lugares SECUNDARIOS que sí llevan pórtico de madera (la puerta humilde
+   del patio de trabajo): lo de menos uso. Los 6 principales NO van aquí —
+   ellos tienen ventana viva — ni el páramo, que se accede por su propia
+   vista (el Ent magnífico arriba). */
+export const PORTICOS_SECUNDARIOS = ['suelo', 'sanidad', 'semillero', 'abono', 'agua', 'micorrizas'];
+
+/* ── 3b. LA VISTA DEL PÁRAMO (el acceso de arriba) ───────────────────────
+   Regla del operador: el acceso al páramo ES el páramo visible — el
+   Ent-queñua MAGNÍFICO parado en el filo, rodeado de frailejones, no un
+   torii. Tocarlo entra al mundo del monte ('disenio': toda mi finca, de
+   donde se cuida el páramo). */
+export const VISTA_PARAMO = {
+  punto: [2.2, -7.4], // el filo alto, a la derecha de la veleta: se ve entero
+  escala: 0.62, // el Ent mide ~6 u a escala 1: aquí corona sin tapar el cielo
+  mundoId: 'disenio',
+};
+
 /* ── 4. LOS SENDEROS (la mano del campesino sobre el terreno) ────────────
    Caminos de tierra pisada que NACEN de la casa: el rastro honesto del uso
-   diario. Cada PORTAL tiene su sendero (la puerta se camina, no se adivina);
-   el ramal potrero→pila cuenta el ciclo estiércol→abono. Waypoints [x, z];
+   diario. No son UI — son el valle contando qué se camina. Waypoints [x, z];
    la y la posa el terreno. `frugal: true` = también en gama media/baja
-   (los seis del portal + el ciclo del abono); el resto solo donde sobra GPU. */
+   (los principales); el resto solo donde sobra GPU. */
 export const SENDEROS_VALLE = [
   {
-    id: 'trajin', // casa → eras → invernadero → potrero: el circuito de la mañana
-    puntos: [[-1.4, 3.4], [-3.4, 6.4], [-6.2, 6.4], [-7.8, 7.6], [-8.4, 8.4]],
+    id: 'trajin', // casa → eras → la tranquera del potrero: el circuito de la mañana
+    puntos: [[-0.9, 3.0], [-2.0, 5.1], [-3.0, 5.9], [-3.6, 6.4]],
     frugal: true,
   },
   {
-    id: 'abono', // potrero → la pila: el viaje del estiércol al abono
-    puntos: [[-7.4, 9.0], [-6.2, 9.5], [-5.2, 9.6]],
+    id: 'abono', // la tranquera → la pila: el viaje del estiércol al abono
+    puntos: [[-3.6, 6.7], [-3.4, 7.4], [-3.3, 8.0]],
     frugal: true,
   },
   {
-    id: 'plaza', // casa → huerta → el kiosco → mercado → y SALE del cuadro
-    puntos: [[-0.9, 3.3], [1.2, 4.4], [2.8, 5.2], [5.2, 4.8], [7.3, 5.4], [8.4, 8.6], [9.6, 11.8]],
+    id: 'vivero', // eras → el invernadero (la matica se cría al lado)
+    puntos: [[-1.9, 5.6], [-1.2, 6.1], [-0.7, 6.5]],
+    frugal: false,
+  },
+  {
+    id: 'plaza', // casa → huerta → mercado → y SALE del cuadro (a la vereda)
+    puntos: [[-0.4, 2.9], [1.4, 4.0], [3.2, 4.7], [4.8, 6.2], [6.6, 7.8]],
     frugal: true,
+  },
+  {
+    id: 'saber', // el desvío de la plaza al kiosco del tablero
+    puntos: [[3.4, 4.8], [4.9, 4.6], [6.2, 4.6]],
+    frugal: false,
   },
   {
     id: 'milpa', // casa → los hongos → la milpa (la subida del lote)
-    puntos: [[-1.9, 2.9], [-4.6, 1.8], [-6.8, 1.0], [-8.2, 0.8]],
-    frugal: true,
-  },
-  {
-    id: 'monte', // casa → cafetal → el monte (toda mi finca)
-    puntos: [[-1.0, 2.4], [2.0, 1.4], [5.4, 0.6], [6.8, -2.2], [7.2, -4.2]],
-    frugal: true,
-  },
-  {
-    id: 'paramo', // casa → la veleta: la subida al filo donde se lee el cielo
-    puntos: [[-1.8, 2.4], [-3.0, -1.0], [-3.8, -4.6], [-4.6, -7.6], [-5.0, -9.2]],
-    frugal: true,
+    puntos: [[-1.3, 2.5], [-3.6, 3.7], [-5.0, 2.4]],
+    frugal: false,
   },
   {
     id: 'agua', // casa → la toma de la quebrada (el viaje del balde)
-    puntos: [[-0.8, 2.2], [0.2, 0.4], [0.9, -1.6]],
+    puntos: [[-0.5, 2.2], [0.5, 1.0], [1.3, 0.1]],
     frugal: false,
   },
 ];
 
-/* ── 5. LOS PATIOS (tierra pisada bajo cada lugar navegable) ─────────────
+/* ── 4. LOS PATIOS (tierra pisada bajo cada lugar navegable) ─────────────
    El suelo desnudo donde se trabaja: la señal diegética de "aquí se llega"
    — el sendero desemboca en un patio, el patio sostiene el lugar. Afordancia
    sin UI: se entiende sin leer nada. */
 export const PATIO = {
-  radioBase: 1.0, // × escala del lugar (creció con el valle)
+  radioBase: 0.92, // × escala del lugar
   color: '#96703f', // tierra pisada: más clara que el pasto, más viva que el barro
   opacidad: 0.42,
 };
 
-/* ── 6. JERARQUÍA DE PERSONAJES (la ley, en números) ─────────────────────
+/* ── 5. JERARQUÍA DE PERSONAJES (la ley, en números) ─────────────────────
    ANGELITA GUÍA — y es UNA SOLA (feedback 2026-07-16: se veían tres
    abejitas; las laterales las quita el dueño del dashboard). La del valle
-   es la central: MÁS GRANDE que antes (se veía diminuta), en POSICIÓN DE
-   CALMA sobre el corredor de la casa (no husmeando errática), con su luz
-   propia que invita a tocarla. Los demás son VECINOS con casa propia: cada
-   uno vive en su rincón del valle con presencia digna, y la puesta en
-   escena — no el tamaño de Angelita — dice quién guía. */
+   es la central: en POSICIÓN DE CALMA sobre el patio de la casa (no
+   husmeando errática), algo más grande, con su luz propia que invita a
+   tocarla — tocarla es hablarle a la finca. Los demás son VECINOS con casa
+   propia: cada uno vive en su rincón del valle con presencia digna, y la
+   puesta en escena — no el tamaño de Angelita — dice quién guía. */
 export const JERARQUIA_PERSONAJES = {
   /** La guía del valle: la única con follow de cámara y luz propia. */
   protagonista: 'abeja-angelita',
   /** Tamaño vivo de Angelita (px del billboard; crece con su energía).
-      Subido de [44,58]: en el valle grande se leía diminuta. */
-  protagonistaPx: [58, 76],
+      Subido de [44,58]: la anfitriona de la casa-puerta se veía tímida. */
+  protagonistaPx: [50, 66],
   /** La luz cálida que la sigue: SOLO ella ilumina (perfil.luzBeacon). */
-  luzProtagonista: { color: '#ffdda6', intensidad: 1.0, alcance: 4.2 },
-  /** Techo de un vecino (px): nunca el tamaño pleno ni el primer plano
-      de Angelita. */
+  luzProtagonista: { color: '#ffdda6', intensidad: 1.0, alcance: 4.0 },
+  /** Techo de un vecino (px): nunca el tamaño pleno de Angelita ni su
+      primer plano. */
   vecinoMaxPx: 44,
   /** Los vecinos viven en SUS lugares (monte, quebrada, matorral), nunca en
       el centro del encuadre (radio en unidades de mundo alrededor de la mira). */
-  radioSagradoCentro: 4.0,
-  /** Los vecinos jamás capturan toques ni voz: presencia, no interfaz.
-      (Angelita SÍ: tocarla es hablarle a la finca — ella es la interfaz.) */
+  radioSagradoCentro: 3.2,
+  /** Los vecinos jamás capturan toques ni voz: presencia, no interfaz. */
   interactivos: false,
 };
 
-/* ── 7. LOS VECINOS DEL VALLE (la puesta en escena de los personajes) ─────
+/* ── 6. LOS VECINOS DEL VALLE (la puesta en escena de los personajes) ─────
    Personajes rubber-hose, cada uno EN SU CASA del valle: la rana en la
    quebrada, el perezoso en la arboleda, el jaguar en el filo. Data-driven
    contra CREATURES: un slug ausente no monta nada (las ramas de personajes
    mejoran el dibujo al mergear y este mapa ni se entera).
 
-   `franjas` = cuándo sale (null = siempre): el jaguar es un aparecido del
-   amanecer, el atardecer y la niebla — verlo es un premio, no un mueble.
+   `franjas` = cuándo sale (null = siempre): el borugo es crepuscular y el
+   jaguar es un aparecido del amanecer, el atardecer y la niebla — verlo es
+   un premio, no un mueble. Eso también es jerarquía: la frecuencia cuenta.
 
-   Ubicaciones al día con el VALLE GRANDE (cámara de reposo [14.6,12.2,18.8]
-   → [0,2,2], fov 40): todas a la vista, ninguna detrás de la cordillera
-   (los picos viven en z≤-21) ni pisando un lugar compuesto (aire ≥3 u del
-   mapa COMPOSICION_LUGARES). */
+   Ubicaciones verificadas contra la cámara de reposo ([10.5,9,13.5] →
+   [0,1.6,1.4], fov 40): todas a la vista, ninguna detrás de la cordillera
+   (los picos viven en z≤-15) ni tapada por un lugar compuesto (aire ≥2u del
+   mapa COMPOSICION_LUGARES). El precedente de la sierra (3 de 4 árboles
+   ocultos tras el macizo) no se repite aquí. */
 export const VECINOS_VALLE = [
   // NOTA (rediseño 2026-07): el oso rubber-hose café se RETIRÓ del valle por
-  // decisión del operador. Este slot de ancla ([7.8, -2.0], px≈44) queda
-  // reservado para el CÓNDOR (Vultur gryphus, en curso en el pase de arte):
-  // planea alto sobre el filo — presencia diurna del páramo.
+  // decisión del operador. Su presencia mayor la toma el CÓNDOR (Vultur
+  // gryphus), que no vive aquí sino en el CIELO: CondorBillboard en órbita
+  // térmica sobre el páramo (lo monta Valle3D — un vecino de aire, no de
+  // suelo).
   {
     slug: 'perezoso',
-    punto: [4.8, -3.2], // colgado a la falda de la arboleda del monte
+    punto: [3.1, -2.2], // colgado a la falda de la arboleda, detrás del oso
     px: 30,
     factor: 8,
     dy: 1.5, // vive arriba, en las ramas
@@ -231,7 +255,7 @@ export const VECINOS_VALLE = [
   },
   {
     slug: 'ardilla',
-    punto: [4.4, -1.4], // entre el cafetal y el monte, siempre de paso
+    punto: [3.2, -1.2], // entre el cafetal y el monte, siempre de paso
     px: 26,
     factor: 7.5,
     dy: 0.25,
@@ -239,7 +263,7 @@ export const VECINOS_VALLE = [
   },
   {
     slug: 'rana-andina',
-    punto: [3.4, 3.0], // la orilla baja de la quebrada (el agua es su casa)
+    punto: [2.4, 2.8], // la orilla baja de la quebrada (el agua es su casa)
     px: 22,
     factor: 6.5,
     dy: 0.18,
@@ -247,7 +271,7 @@ export const VECINOS_VALLE = [
   },
   {
     slug: 'morrocoy',
-    punto: [4.8, 8.2], // la tierra caliente del frente, a paso lento
+    punto: [3.2, 6.8], // la tierra caliente del frente, a paso lento
     px: 26,
     factor: 7,
     dy: 0.2,
@@ -255,7 +279,7 @@ export const VECINOS_VALLE = [
   },
   {
     slug: 'jaguar',
-    punto: [-8.6, -7.2], // el filo del páramo, lejos, del lado de la veleta: el místico
+    punto: [-5.8, -4.6], // el filo del páramo, lejos, del lado de la veleta: el místico
     px: 40,
     factor: 10, // lejos pero con silueta: verlo tiene que sentirse
     dy: 0.3,
