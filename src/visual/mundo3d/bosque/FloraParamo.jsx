@@ -160,9 +160,11 @@ function NieblaRasante({ n, reducedMotion }) {
 
 /**
  * La capa de flora del páramo alrededor del Ent. Montar dentro del <Canvas>.
- * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean}} props
+ * `alturaDe(x,z)` (opcional) POSA cada mata sobre el relieve del terreno:
+ * sin ella la siembra queda en y=0 (el claro plano de siempre).
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, alturaDe?: ((x:number,z:number)=>number)|null}} props
  */
-export default function FloraParamo({ tier = 'alto', reducedMotion = false }) {
+export default function FloraParamo({ tier = 'alto', reducedMotion = false, alturaDe = null }) {
   const perfil = perfilDeTier(tier);
   const conteos = floraDeTier(tier);
   const q = calidadDeTier(tier);
@@ -192,8 +194,16 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false }) {
       : new THREE.MeshLambertMaterial(base);
   }, [perfil.materialRico, perfil.flatShading]);
 
-  // --- Distribución biogeográfica (una vez por tier). ---
-  const dist = useMemo(() => distribucionFlora(conteos, 707), [conteos]);
+  // --- Distribución biogeográfica (una vez por tier), posada en el relieve. ---
+  const dist = useMemo(() => {
+    const d = distribucionFlora(conteos, 707);
+    if (!alturaDe) return d;
+    const posar = (items) => items.map((it) => ({
+      ...it,
+      pos: [it.pos[0], alturaDe(it.pos[0], it.pos[2]) + (it.pos[1] || 0), it.pos[2]],
+    }));
+    return Object.fromEntries(Object.entries(d).map(([k, v]) => [k, posar(v)]));
+  }, [conteos, alturaDe]);
 
   // Liberar GPU al desmontar.
   useLayoutEffect(() => () => {
