@@ -1,13 +1,16 @@
 /*
  * EscenaCafetalVivo — el MUNDO donde vive el café (piso templado, 1.000–2.000 m).
  *
- * Una LADERA de la montaña cafetera al final de la mañana: luz tibia de media
- * montaña, bruma que se come el valle del fondo, y el cultivo contado como es —
- * los surcos de cafetos a curva de nivel ABAJO, el SOMBRÍO de guamos y nogales
- * ARRIBA tendiéndoles techo, el plátano intercalado, y al fondo, medio velada
- * por la bruma, la casa campesina con su beneficiadero y la marquesina de secar.
- * La cámara mira la ladera desde abajo, como quien llega subiendo; se puede
- * girar con el dedo.
+ * Una LADERA de la montaña cafetera EN LA HORA VIVA DEL VALLE: la atmósfera ya
+ * no es un cielo clavado sino la del kit compartido (`AtmosferaMundo`, familia
+ * `corral`) — el cafetal amanece, dora y anochece CON el valle. Y en clave de
+ * la TOMA B (estilizada Switch/BOTW, decisión por piso térmico): domo de
+ * gradiente con el glow del sol (`DomoCielo`), terreno y montes por BANDAS
+ * (`useGradienteBandas` + toon), luz dorada dramática de la franja y silueta
+ * fuerte. El cultivo se cuenta como es — los surcos de cafetos a curva de nivel
+ * ABAJO, el SOMBRÍO de guamos y nogales ARRIBA tendiéndoles techo, el plátano
+ * intercalado y la casa-beneficiadero medio velada al fondo. La cámara LLEGA
+ * (CamaraDirector, dolly de establishing) y se puede girar con el dedo.
  *
  * Todo procedural (cero CDN/imágenes). Tier-safe vía `perfilDeTier`: 'alto' con
  * sombras + bruma + luz colada; 'medio' frugal; 'bajo' mínimo. Con
@@ -27,8 +30,16 @@ import { Fauna } from '../escenas/FaunaEscena.jsx';
 import FloraCafetal from './FloraCafetal.jsx';
 import { ANCHO, FONDO, alturaLadera, SITIO_CASA } from './floraCafetal.geom.js';
 import {
-  CIELOS,
-  mezclarCielo,
+  AtmosferaMundo,
+  DomoCielo,
+  useAtmosferaMundo,
+  useGradienteBandas,
+  construirTerreno,
+  ruidoTerreno,
+  smoothstep,
+  CamaraDirector,
+} from '../kit/index.js';
+import {
   mezclar,
   VERDES,
   TIERRAS,
@@ -37,87 +48,45 @@ import {
   LUCES,
   NIEBLAS,
   PALETA,
-  LuzMadre,
 } from '../paleta/index.js';
 
-/* La atmósfera del piso templado, DERIVADA de la madre: la familia `corral`
-   ("corral y cafetal: tarde de finca") mezclada 60% hacia la hora dorada —
-   la misma ley de EscenaBase3D. El cafetal deja de inventar su cielo. */
-const TEMPLADO = mezclarCielo(CIELOS.corral);
+/* La identidad del piso templado dentro de la familia del valle: `corral`
+   ("corral y cafetal: tarde de finca"). El 60% restante lo pone la HORA. */
+const FAMILIA_CAFETAL = 'corral';
 
-/* Las montañas del fondo: el monte templado comido por la niebla dorada
-   (perspectiva aérea con los MISMOS tokens, no tres verdes sueltos). */
-const MONTES = {
-  cerca: mezclar(VERDES.monte, TEMPLADO.niebla, 0.2),
-  media: mezclar(VERDES.monte, TEMPLADO.niebla, 0.28),
-  lejos: mezclar(VERDES.monte, TEMPLADO.niebla, 0.38),
-};
+/* Escala de la escena para el kit (cámara↔centro ~14.5): la niebla del kit cae
+   a radio*1.4→radio*4.6 ≈ el 16→46 que este mundo ya calibró. */
+const RADIO_CAFETAL = 11;
 
-const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-const smoothstep = (a, b, x) => {
-  const t = clamp((x - a) / (b - a), 0, 1);
-  return t * t * (3 - 2 * t);
-};
-function ruido(wx, wz) {
-  return (
-    Math.sin(wx * 0.8 + wz * 0.6) * 0.5 +
-    Math.sin(wx * 1.9 - wz * 1.4 + 2.3) * 0.3 +
-    Math.sin(wx * 3.1 + wz * 2.7 + 5.1) * 0.2
-  );
-}
+/* El frustum de sombra a medida de la ladera (la luz colada del sombrío). */
+const SOMBRA_CAFETAL = { left: -16, right: 16, top: 16, bottom: -6, far: 40 };
 
-/* La malla de la ladera con colores por vértice: arvenses verdes (cobertura
+/* La malla de la ladera — el heightfield del KIT (mismo andamiaje que todos los
+   mundos) con la pintura PROPIA del piso templado: arvenses verdes (cobertura
    viva), tierra roja andina asomando y el mantillo pardo hacia la sombra. */
 function construirLadera(seg, plano) {
-  const nx = seg + 1;
-  const nz = seg + 1;
-  const pos = new Float32Array(nx * nz * 3);
-  const col = new Float32Array(nx * nz * 3);
   const cPasto = new THREE.Color(VERDES.brote); // pasto al sol del piso templado
   const cPasto2 = new THREE.Color(VERDES.calido); // el oliva que asoma hacia lo seco
   const cTierra = new THREE.Color(TIERRAS.arcilla); // la tierra roja cafetera
   const cMantillo = new THREE.Color(TIERRAS.mantillo); // hojarasca bajo el sombrío
   const cCamino = new THREE.Color(mezclar(TIERRAS.camino, TIERRAS.vega, 0.4));
-  const c = new THREE.Color();
-  let p = 0;
-  for (let iz = 0; iz < nz; iz++) {
-    const wz = -FONDO / 2 + (FONDO * iz) / seg;
-    for (let ix = 0; ix < nx; ix++) {
-      const wx = -ANCHO / 2 + (ANCHO * ix) / seg;
-      pos[p] = wx;
-      pos[p + 1] = alturaLadera(wx, wz);
-      pos[p + 2] = wz;
+  return construirTerreno({
+    ancho: ANCHO,
+    fondo: FONDO,
+    seg,
+    plano,
+    altura: alturaLadera,
+    pintar: (wx, wz, alt, c) => {
       const enLoma = smoothstep(5, -8, wz);
-      c.lerpColors(cPasto, cPasto2, 0.5 + 0.5 * ruido(wx * 0.9, wz * 0.7));
+      c.lerpColors(cPasto, cPasto2, 0.5 + 0.5 * ruidoTerreno(wx * 0.9, wz * 0.7));
       // la tierra roja asoma a manchas entre los surcos
-      c.lerp(cTierra, smoothstep(-0.1, 0.85, ruido(wx * 1.3, wz * 1.1)) * 0.45 * enLoma);
+      c.lerp(cTierra, smoothstep(-0.1, 0.85, ruidoTerreno(wx * 1.3, wz * 1.1)) * 0.45 * enLoma);
       // el mantillo pardo gana hacia lo alto (más sombrío, más hojarasca)
       c.lerp(cMantillo, enLoma * 0.22);
       // el caminito seco del frente, por donde se llega
       c.lerp(cCamino, smoothstep(1.2, 0, Math.abs(wx - Math.sin(wz * 0.4) * 2.2)) * smoothstep(2, 12, wz));
-      col[p] = c.r;
-      col[p + 1] = c.g;
-      col[p + 2] = c.b;
-      p += 3;
-    }
-  }
-  const idx = [];
-  for (let iz = 0; iz < seg; iz++) {
-    for (let ix = 0; ix < seg; ix++) {
-      const a = iz * nx + ix;
-      const b = a + 1;
-      const d = a + nx;
-      const e = d + 1;
-      idx.push(a, d, b, b, d, e);
-    }
-  }
-  let geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  geo.setIndex(idx);
-  if (plano) geo = geo.toNonIndexed();
-  geo.computeVertexNormals();
-  return geo;
+    },
+  });
 }
 
 /* La casa campesina con su BENEFICIADERO, arriba al fondo: paredes encaladas,
@@ -248,9 +217,28 @@ const FAUNA_CAFETAL = [
 function Diorama({ tier, reducedMotion, foco }) {
   const perfil = perfilDeTier(tier);
 
+  /* La atmósfera VIVA (misma resolución que monta AtmosferaMundo: barata,
+     cambia por franja) — alimenta el domo y la perspectiva aérea del fondo. */
+  const atm = useAtmosferaMundo({ familia: FAMILIA_CAFETAL, reducedMotion });
+
+  /* EL gradiente de bandas de la escena (toma B): terreno y montes comparten
+     los mismos escalones de luz — ilustración en movimiento. */
+  const bandas = useGradienteBandas();
+
   const geoLadera = useMemo(
     () => construirLadera(perfil.segmentosTerreno, perfil.flatShading),
     [perfil.segmentosTerreno, perfil.flatShading],
+  );
+
+  /* Las montañas del fondo, comidas por la niebla DE LA HORA (perspectiva
+     aérea viva: al atardecer se doran, de noche se apagan con el valle). */
+  const montes = useMemo(
+    () => ({
+      cerca: mezclar(VERDES.monte, atm.niebla, 0.2),
+      media: mezclar(VERDES.monte, atm.niebla, 0.28),
+      lejos: mezclar(VERDES.monte, atm.niebla, 0.38),
+    }),
+    [atm.niebla],
   );
 
   const fauna = useMemo(
@@ -258,39 +246,43 @@ function Diorama({ tier, reducedMotion, foco }) {
     [tier],
   );
 
+  const controls = useRef(null);
   const casaY = alturaLadera(SITIO_CASA[0], SITIO_CASA[1]);
 
   return (
     <>
-      <color attach="background" args={[TEMPLADO.fondo]} />
-      {perfil.fog && <fog attach="fog" args={[TEMPLADO.niebla, 16, 46]} />}
-
-      {/* LA LUZ DE LA CASA: la receta madre con el tinte de la familia corral.
-          El sol alto de la composición y el frustum a medida de la ladera. */}
-      <LuzMadre
-        cielo={CIELOS.corral}
-        perfil={perfil}
-        solPos={[8, 12, 5]}
-        sombra={{ left: -16, right: 16, top: 16, bottom: -6, far: 40 }}
+      {/* LA ATMÓSFERA DEL KIT: fondo, niebla, luces y estrellas de LA HORA DEL
+          VALLE (familia corral), con el shadow-map del sombrío en gama alta. */}
+      <AtmosferaMundo
+        familia={FAMILIA_CAFETAL}
+        tier={tier}
+        reducedMotion={reducedMotion}
+        radio={RADIO_CAFETAL}
+        conSuelo={false}
+        sombra={SOMBRA_CAFETAL}
       />
 
-      {/* LA LADERA (recibe la sombra del sombrío en gama alta) */}
+      {/* El DOMO de la toma B: gradiente cenit→horizonte + glow del sol de la
+          franja — el atardecer del piso templado es el cartel. */}
+      <DomoCielo atm={atm} radio={64} />
+
+      {/* LA LADERA por bandas (recibe la sombra del sombrío en gama alta) */}
       <mesh geometry={geoLadera} receiveShadow={perfil.sombras}>
-        <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
+        <meshToonMaterial vertexColors gradientMap={bandas} flatShading={perfil.flatShading} />
       </mesh>
 
-      {/* las montañas cafeteras del fondo, comidas por la niebla dorada */}
+      {/* las montañas cafeteras del fondo, comidas por la niebla de la hora */}
       <mesh position={[-13, 2.2, -21]} scale={[9, 4.2, 5]}>
         <sphereGeometry args={[1, 12, 8]} />
-        <meshLambertMaterial color={MONTES.media} />
+        <meshToonMaterial color={montes.media} gradientMap={bandas} />
       </mesh>
       <mesh position={[9, 2.6, -24]} scale={[11, 5.4, 6]}>
         <sphereGeometry args={[1, 12, 8]} />
-        <meshLambertMaterial color={MONTES.lejos} />
+        <meshToonMaterial color={montes.lejos} gradientMap={bandas} />
       </mesh>
       <mesh position={[22, 1.6, -20]} scale={[8, 3.4, 5]}>
         <sphereGeometry args={[1, 12, 8]} />
-        <meshLambertMaterial color={MONTES.cerca} />
+        <meshToonMaterial color={montes.cerca} gradientMap={bandas} />
       </mesh>
 
       {/* EL CAFETAL: surcos, cerezas, sombrío, plátano, luz colada */}
@@ -306,6 +298,7 @@ function Diorama({ tier, reducedMotion, foco }) {
       <FocoPaso foco={foco} reducedMotion={reducedMotion} />
 
       <OrbitControls
+        ref={controls}
         makeDefault
         target={[0, 2.6, -3]}
         enablePan={false}
@@ -320,6 +313,16 @@ function Diorama({ tier, reducedMotion, foco }) {
         dampingFactor={0.08}
         autoRotate={!reducedMotion}
         autoRotateSpeed={0.12}
+      />
+      {/* La LLEGADA del kit: dolly de establishing con tilt-down suave — entrar
+          al cafetal se siente como llegar subiendo, una vez por sesión. */}
+      <CamaraDirector
+        controls={controls}
+        reposo={[1.5, 4.6, 14.5]}
+        mirada={[0, 3.6, -3]}
+        respiro={0.04}
+        activa={!reducedMotion && tier !== 'bajo'}
+        unaVezClave="mundoCafetal"
       />
       <AdaptiveDpr pixelated />
     </>
