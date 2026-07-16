@@ -1567,9 +1567,6 @@ function RomeroParamo({ n }) {
       const wx = (rng() - 0.5) * (ANCHO - 8);
       const wz = (rng() - 0.5) * (FONDO - 10);
       if (humedad(wx, wz) > 0.5) continue;
-      if (Math.hypot(wx - ENT_X, wz - ENT_Z) < 2.2) continue; // no contra la guardiana
-      if (Math.hypot(wx - TAJO_X, wz - TAJO_Z) < 3.2) continue; // no en la cárcava
-      if (distSendero(wx, wz) < 0.9) continue; // no en el sendero
       const y = alturaParamo(wx, wz);
       if (y > 3.4) continue;
       lista.push({ wx, wz, y, esc: 0.5 + rng() * 0.6, giro: rng() * Math.PI, verde: rng() });
@@ -1603,473 +1600,6 @@ function RomeroParamo({ n }) {
   );
 }
 
-/* ── ROCÍO FRÍO EN SUSPENSIÓN: la humedad del páramo hecha visible. Un `Points`
-      de motas azul-plata que caen MUY despacio y reaparecen arriba —el aire de
-      3.500 m siempre está mojado, cargado de bruma que se condensa. Reemplaza al
-      polen dorado del valle: aquí no hay oro flotando, hay agua. Aditivo y sutil;
-      determinista por semilla; reduced-motion lo deja quieto (presencia sin
-      caída). Es geometría propia del páramo, ligera (un solo draw call). ── */
-function RocioFrio({ tier, reducedMotion, semilla = 17 }) {
-  const ref = useRef(null);
-  const n = tier === 'alto' ? 130 : tier === 'bajo' ? 30 : 70;
-  const ANCHA = 26, ALTA = 6, HONDA = 22;
-  const datos = useMemo(() => {
-    const rng = crearRng(semilla);
-    const pos = new Float32Array(n * 3);
-    const vel = new Float32Array(n);
-    for (let i = 0; i < n; i++) {
-      pos[i * 3] = (rng() - 0.5) * ANCHA;
-      pos[i * 3 + 1] = rng() * ALTA;
-      pos[i * 3 + 2] = -3 + (rng() - 0.5) * HONDA;
-      vel[i] = 0.12 + rng() * 0.22; // la gota fría baja lento entre la bruma
-    }
-    return { pos, vel };
-  }, [n, semilla]);
-  useFrame((_, delta) => {
-    if (reducedMotion || !ref.current) return;
-    const arr = ref.current.geometry.attributes.position.array;
-    const dt = Math.min(delta, 0.05);
-    for (let i = 0; i < n; i++) {
-      const yi = i * 3 + 1;
-      arr[yi] -= datos.vel[i] * dt;
-      if (arr[yi] < 0.05) arr[yi] = ALTA; // reaparece arriba
-      arr[i * 3] += Math.sin((arr[yi] + i) * 0.6) * dt * 0.08; // deriva lateral leve
-    }
-    ref.current.geometry.attributes.position.needsUpdate = true;
-  });
-  return (
-    <points ref={ref} frustumCulled={false}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[datos.pos, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        color="#dbe9f0"
-        size={0.07}
-        sizeAttenuation
-        transparent
-        opacity={0.5}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
-    </points>
-  );
-}
-
-/* ── LA DANTA DE PÁRAMO — Tapirus pinchaque, la vecina grande del frailejonal.
-   El mamífero emblemático del páramo, POR FIN en su casa epónima: el SVG
-   rubber-hose de la casa (Danta.jsx — mole lanuda, trompa que tantea, borde
-   blanco de orejas y labios) como billboard <Html>, igual que los vecinos del
-   Bosque Vivo (FaunaBosque). Nada de low-poly: el estándar es el dibujo.
-
-   Su VIDA es un reloj con jitter (el patrón useVidaIdle, local): PASTA
-   paseando unos pasos entre los frailejones y vuelve (movimiento 3D real del
-   billboard, con el bamboleo del andar pesado y el flip de la vuelta), HUSMEA
-   con la trompa en periscopio (su seña-firma) y REPOSA respirando hondo.
-   Nunca el mismo gesto dos veces seguidas. reduced-motion / tier bajo =
-   quieta y digna en su puesto (el fotograma manda, ni un timer vivo). */
-const DANTA_POS = [4.6, alturaParamo(4.6, 4.2) + 0.85, 4.2]; // el claro del frailejonal, al frente-derecha
-const VIDA_DANTA = {
-  primero: 'pasea', // abre caminando: lo primero que se ve es que VIVE
-  descanso: [6000, 13000],
-  momentos: {
-    pasea: { dur: 11000, props: { pose: 'anda' }, paseo: [-2.0, 0, 0.9] },
-    husmea: { dur: 4600, props: { husmea: true } },
-    reposo: { dur: 6200, props: { pose: 'reposo' } },
-  },
-};
-const ESTILO_DANTA = {
-  filter: 'drop-shadow(0 2px 4px rgba(30, 44, 56, 0.4))',
-  pointerEvents: 'none',
-};
-
-/* El reloj de vida (patrón useRelojDeVida de FaunaBosque, local al mockup):
-   descanso → gesto → descanso → otro gesto… con jitter y sin repetir. Gate
-   activo=false (reduced-motion, tier bajo) = ni un timer vivo. */
-function useRelojDanta(activo) {
-  const [momento, setMomento] = useState(/** @type {string|null} */ (null));
-  useEffect(() => {
-    if (!activo) return undefined;
-    let timer = 0;
-    let ultimo = /** @type {string|null} */ (null);
-    let esPrimera = true;
-    const claves = Object.keys(VIDA_DANTA.momentos);
-    const azarMs = (a, b) => a + Math.random() * (b - a);
-    const descansa = () => {
-      setMomento(null);
-      timer = window.setTimeout(gesticula, azarMs(VIDA_DANTA.descanso[0], VIDA_DANTA.descanso[1]));
-    };
-    const gesticula = () => {
-      let m = esPrimera ? VIDA_DANTA.primero : claves[Math.floor(Math.random() * claves.length)];
-      while (m === ultimo) m = claves[Math.floor(Math.random() * claves.length)];
-      esPrimera = false;
-      ultimo = m;
-      setMomento(m);
-      timer = window.setTimeout(descansa, VIDA_DANTA.momentos[m].dur);
-    };
-    // Arranca pronto: la vida se nota en los primeros segundos, no al minuto.
-    timer = window.setTimeout(gesticula, azarMs(1800, 4200));
-    return () => {
-      window.clearTimeout(timer);
-      setMomento(null);
-    };
-  }, [activo]);
-  return momento;
-}
-
-function DantaDelParamo({ tier, reducedMotion }) {
-  const vivo = !reducedMotion && tier !== 'bajo';
-  const momento = useRelojDanta(vivo);
-  const grupo = useRef(/** @type {any} */ (null));
-  const capa = useRef(/** @type {HTMLDivElement|null} */ (null));
-  const paseo = useRef(/** @type {{t0: number|null, dur: number, rumbo: number[]}|null} */ (null));
-
-  const momentoCfg = momento ? VIDA_DANTA.momentos[momento] : null;
-  useEffect(() => {
-    paseo.current = momentoCfg?.paseo
-      ? { t0: null, dur: momentoCfg.dur / 1000, rumbo: momentoCfg.paseo }
-      : null;
-  }, [momentoCfg]);
-
-  useFrame(({ clock }) => {
-    const g = grupo.current;
-    if (!g || !vivo) return;
-    const pw = paseo.current;
-    if (pw) {
-      const t = clock.getElapsedTime();
-      if (pw.t0 == null) pw.t0 = t;
-      const p = Math.min(1, (t - pw.t0) / pw.dur);
-      const ida = Math.sin(p * Math.PI); // sale y VUELVE, suave en las puntas
-      g.position.set(
-        DANTA_POS[0] + pw.rumbo[0] * ida,
-        DANTA_POS[1] + Math.abs(Math.sin(t * 3.4)) * 0.045 * ida, // el bamboleo del andar pesado
-        DANTA_POS[2] + pw.rumbo[2] * ida,
-      );
-      // A la vuelta, el flip: la mole regresa mirando a su puesto.
-      if (capa.current) capa.current.style.transform = p > 0.5 ? 'scaleX(-1)' : '';
-    } else if (g.position.x !== DANTA_POS[0] || g.position.y !== DANTA_POS[1]) {
-      g.position.set(DANTA_POS[0], DANTA_POS[1], DANTA_POS[2]);
-      if (capa.current) capa.current.style.transform = '';
-    }
-  });
-
-  return (
-    <group ref={grupo} position={/** @type {[number, number, number]} */ (DANTA_POS)}>
-      <Html center distanceFactor={13} zIndexRange={[6, 0]} pointerEvents="none">
-        <div
-          ref={capa}
-          aria-hidden="true"
-          data-vecino="danta"
-          data-momento={momento ?? undefined}
-          style={ESTILO_DANTA}
-        >
-          <Danta size={78} animated={vivo} {...(momentoCfg?.props ?? null)} />
-        </div>
-      </Html>
-    </group>
-  );
-}
-
-/* ── EL CHIVITO DE PÁRAMO — Oxypogon (barbudito), CO-PROTAGONISTA. El colibrí
-      endémico del páramo, POSADO en la flor del frailejón héroe (como en el
-      video real del operador), en registro RUBBER-HOSE (billboard <Html>, igual
-      que la danta): reusa `BarbuditoParamo` de creatures/. Su reloj de vida lo
-      tiene la MAYOR parte del tiempo POSADO —el colibrí de páramo se posa, no
-      como el de tierra caliente— con visitas cortas a la corola (liba con la
-      lengua afuera y el ala en borrón). reduced-motion / tier bajo = quieto y
-      posado (el fotograma manda). Pequeño pero espectacular: la intimidad
-      icónica del páramo. ── */
-const BARB_POS = /** @type {[number, number, number]} */ ([HERO_X + 0.12, HERO_Y + 1.42, HERO_Z + 0.12]);
-function useRelojBarbudito(activo) {
-  const [pose, setPose] = useState('posa');
-  useEffect(() => {
-    if (!activo) return undefined;
-    let timer = 0;
-    const ciclo = () => {
-      // el barbudito se POSA la mayor parte del tiempo (como el bicho real);
-      // de a ratos visita la corola y liba, y vuelve a posarse.
-      const posando = Math.random() < 0.62;
-      setPose(posando ? 'posa' : 'liba');
-      timer = window.setTimeout(ciclo, posando ? 4200 + Math.random() * 3200 : 2000 + Math.random() * 1600);
-    };
-    timer = window.setTimeout(ciclo, 1400 + Math.random() * 1600);
-    return () => { window.clearTimeout(timer); setPose('posa'); };
-  }, [activo]);
-  return pose;
-}
-function BarbuditoDelFrailejon({ tier, reducedMotion }) {
-  const vivo = !reducedMotion && tier !== 'bajo';
-  const pose = useRelojBarbudito(vivo);
-  return (
-    <group position={BARB_POS}>
-      <Html center distanceFactor={5.4} zIndexRange={[6, 0]} pointerEvents="none">
-        <div
-          aria-hidden="true"
-          data-vecino="barbudito"
-          data-pose={vivo ? pose : 'posa'}
-          style={{ filter: 'drop-shadow(0 1px 3px rgba(30, 44, 56, 0.45))', pointerEvents: 'none' }}
-        >
-          <BarbuditoParamo size={64} animated={vivo} pose={vivo ? pose : 'posa'} />
-        </div>
-      </Html>
-    </group>
-  );
-}
-
-/* ── RAYOS DE LUZ VOLUMÉTRICOS: los haces fríos que se cuelan entre la niebla
-      y bañan a la guardiana — la luz de catedral del páramo. Quads aditivos con
-      gradiente PROCEDURAL (canvas en memoria, cero assets externos), fog off
-      para que la bruma no se los coma. El haz 0 es el MAYOR: cae sobre la
-      queñua. reduced-motion los deja quietos (presencia sin pulso). ── */
-function texturaHaz() {
-  if (typeof document === 'undefined') return null;
-  const c = document.createElement('canvas');
-  c.width = 64;
-  c.height = 256;
-  const g = c.getContext('2d');
-  if (!g) return null;
-  // vertical: nace pleno arriba y se disuelve hacia el suelo
-  const gv = g.createLinearGradient(0, 0, 0, 256);
-  gv.addColorStop(0, 'rgba(255,255,255,0.9)');
-  gv.addColorStop(0.6, 'rgba(255,255,255,0.32)');
-  gv.addColorStop(1, 'rgba(255,255,255,0)');
-  g.fillStyle = gv;
-  g.fillRect(0, 0, 64, 256);
-  // lateral: bordes suaves (el haz no es una cinta dura)
-  const gh = g.createLinearGradient(0, 0, 64, 0);
-  gh.addColorStop(0, 'rgba(255,255,255,0)');
-  gh.addColorStop(0.3, 'rgba(255,255,255,1)');
-  gh.addColorStop(0.7, 'rgba(255,255,255,1)');
-  gh.addColorStop(1, 'rgba(255,255,255,0)');
-  g.globalCompositeOperation = 'destination-in';
-  g.fillStyle = gh;
-  g.fillRect(0, 0, 64, 256);
-  return new THREE.CanvasTexture(c);
-}
-
-function RayosDeLuz({ n, reducedMotion }) {
-  const grupo = useRef(null);
-  const tex = useMemo(() => texturaHaz(), []);
-  useEffect(() => () => { if (tex) tex.dispose(); }, [tex]);
-  const haces = useMemo(() => {
-    const rng = crearRng(407);
-    return Array.from({ length: n }, (_, i) => {
-      const sobreEnt = i === 0; // el haz mayor baña a la guardiana
-      return {
-        x: sobreEnt ? ENT_X + 0.5 : (rng() - 0.5) * 17,
-        z: sobreEnt ? ENT_Z + 1.2 : -7 + rng() * 12,
-        top: 10.8 + rng() * 2.5,
-        alto: sobreEnt ? 12.5 : 8.5 + rng() * 3.5,
-        ancho: sobreEnt ? 3.2 : 1.1 + rng() * 1.5,
-        tilt: -0.1 - rng() * 0.1, // la copa del haz se ladea hacia el sol velado
-        giro: -0.3 + rng() * 0.6,
-        op: sobreEnt ? 0.38 : 0.2 + rng() * 0.12,
-        fase: rng() * Math.PI * 2,
-        vel: 0.25 + rng() * 0.3,
-      };
-    });
-  }, [n]);
-  useFrame(({ clock }) => {
-    if (reducedMotion || !grupo.current) return;
-    const t = clock.elapsedTime;
-    grupo.current.children.forEach((m, i) => {
-      const h = haces[i];
-      m.material.opacity = h.op * (0.75 + 0.25 * Math.sin(t * h.vel + h.fase));
-      m.rotation.z = h.tilt + Math.sin(t * 0.16 + h.fase) * 0.012;
-    });
-  });
-  if (!tex) return null;
-  return (
-    <group ref={grupo}>
-      {haces.map((h, i) => (
-        <mesh key={i} position={[h.x, h.top - h.alto / 2, h.z]} rotation={[0, h.giro, h.tilt]}>
-          <planeGeometry args={[h.ancho, h.alto]} />
-          <meshBasicMaterial
-            map={tex}
-            color="#f6fbf3"
-            transparent
-            opacity={h.op}
-            depthWrite={false}
-            blending={THREE.AdditiveBlending}
-            side={THREE.DoubleSide}
-            fog={false}
-          />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-/* ── PIEDRAS DEL SENDERO: losas hexagonales claras que caminan la polilínea con
-      jitter — el camino de piedra calibre-Switch de las referencias de suelo.
-      Instanciadas: 1 draw call para todo el camino. ── */
-function PiedrasSendero() {
-  const ref = useRef(null);
-  const sitios = useMemo(() => {
-    const rng = crearRng(271);
-    const lista = [];
-    for (let i = 0; i < SENDERO_PUNTOS.length - 1; i++) {
-      const [ax, az] = SENDERO_PUNTOS[i];
-      const [bx, bz] = SENDERO_PUNTOS[i + 1];
-      const largo = Math.hypot(bx - ax, bz - az);
-      const pasos = Math.max(2, Math.round(largo / 0.75));
-      for (let k = 0; k < pasos; k++) {
-        const t = k / pasos;
-        const wx = ax + (bx - ax) * t + (rng() - 0.5) * 0.7;
-        const wz = az + (bz - az) * t + (rng() - 0.5) * 0.7;
-        lista.push({ wx, wz, y: alturaParamo(wx, wz), esc: 0.26 + rng() * 0.22, giro: rng() * Math.PI, ovalo: 0.8 + rng() * 0.5, claro: rng() });
-      }
-    }
-    return lista;
-  }, []);
-  useEffect(() => {
-    const m = ref.current;
-    if (!m) return;
-    const dummy = new THREE.Object3D();
-    const tinte = new THREE.Color();
-    const base = new THREE.Color(P.piedraSendero);
-    const sombra = new THREE.Color(mezclar(P.piedraSendero, P.turba, 0.35));
-    sitios.forEach((s, i) => {
-      dummy.position.set(s.wx, s.y + 0.03, s.wz);
-      dummy.rotation.set(0, s.giro, 0);
-      dummy.scale.set(s.esc, 0.5, s.esc * s.ovalo);
-      dummy.updateMatrix();
-      m.setMatrixAt(i, dummy.matrix);
-      tinte.copy(sombra).lerp(base, s.claro);
-      m.setColorAt(i, tinte);
-    });
-    m.instanceMatrix.needsUpdate = true;
-    if (m.instanceColor) m.instanceColor.needsUpdate = true;
-  }, [sitios]);
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
-      <cylinderGeometry args={[1, 1.15, 0.16, 6]} />
-      <meshLambertMaterial flatShading />
-    </instancedMesh>
-  );
-}
-
-/* ── LA QUEÑUA GUARDIANA: el Ent-queñua REAL del Bosque Vivo (rostro tallado,
-      barba de usnea, brazos), MONUMENTAL sobre su altozano. `señala` siempre:
-      su brazo maestro apunta al tajo de la lección del suelo, a su derecha.
-      NO se duplica geometría: es el mismo componente EntQuenua. ── */
-function QuenuaGuardiana({ tier, reducedMotion }) {
-  return (
-    <group position={[ENT_X, Y_ENT - 0.15, ENT_Z]} rotation={[0, 0.06, 0]} scale={ESC_ENT}>
-      <EntQuenua tier={tier} reducedMotion={reducedMotion} señala />
-      {/* halo frío tras la copa: la guardiana se recorta contra la luz */}
-      <mesh position={[0, 6.9, -1.6]}>
-        <circleGeometry args={[2.0, 36]} />
-        <meshBasicMaterial
-          color="#eef6f0"
-          transparent
-          opacity={0.1}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          side={THREE.DoubleSide}
-          fog={false}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-/* ══ CÁMARAS DE LA ESCENA ══ */
-const CAM_LIBRE = /** @type {[number, number, number]} */ ([0, 6.1, 17.0]);
-const MIRADA_LIBRE = /** @type {[number, number, number]} */ ([0, 1.8, 1.3]);
-const CARA_GUARDIANA = /** @type {[number, number, number]} */ ([ENT_X, Y_ENT + 2.35, ENT_Z]);
-/* Encuadre de la lección: cámara casi HORIZONTAL a media altura del corte (la
-   cara frontal de las capas debe LEERSE de frente, no en picada) con el rostro
-   de la guardiana entrando por la izquierda. */
-/* Encuadre de la lección: la cámara DENTRO del barranco, baja y casi
-   horizontal — la cara de las 5 capas de frente, el rostro de la guardiana
-   asomando arriba a la izquierda. */
-const CAM_LECCION = /** @type {[number, number, number]} */ ([CORTE_WX + 1.6, Y_TAPA - 1.2, CORTE_WZ + 5.8]);
-const MIRADA_LECCION = /** @type {[number, number, number]} */ ([CORTE_WX - 0.6, Y_TAPA - 2.4, CORTE_WZ]);
-const _miradaTmp = new THREE.Vector3();
-
-/* El PANEO DE ENTRADA: abre pegado al rostro de la guardiana, barre el
-   frailejonal hacia el occidente y se asienta en el plano general. Mientras
-   vuela, los OrbitControls están desmontados (nadie pelea la cámara). */
-const PANEO_DUR = 9;
-function PaneoEntrada({ onFin }) {
-  const { camera } = useThree();
-  const ini = useRef(/** @type {number|null} */ (null));
-  const hecho = useRef(false);
-  const { curva, va, vb } = useMemo(() => ({
-    curva: new THREE.CatmullRomCurve3(
-      [
-        new THREE.Vector3(ENT_X + 2.6, Y_ENT + 2.2, ENT_Z + 5.4),
-        new THREE.Vector3(-6.2, 3.2, 5.2),
-        new THREE.Vector3(-6.8, 4.4, 11.2),
-        new THREE.Vector3(...CAM_LIBRE),
-      ],
-      false,
-      'catmullrom',
-      0.35,
-    ),
-    va: new THREE.Vector3(...CARA_GUARDIANA),
-    vb: new THREE.Vector3(...MIRADA_LIBRE),
-  }), []);
-  useFrame(({ clock }) => {
-    if (hecho.current) return;
-    if (ini.current == null) ini.current = clock.elapsedTime;
-    const t = Math.min(1, (clock.elapsedTime - ini.current) / PANEO_DUR);
-    const e = t * t * (3 - 2 * t);
-    curva.getPoint(e, camera.position);
-    _miradaTmp.copy(va).lerp(vb, smoothstep(0.55, 1, e));
-    camera.lookAt(_miradaTmp);
-    if (t >= 1) {
-      hecho.current = true;
-      onFin();
-    }
-  });
-  return null;
-}
-
-/* VUELO genérico: de donde esté la cámara HASTA un punto, con arco suave y
-   mirada cruzada. dur<=0 = salto seco (reduced-motion: sin animación). */
-function VueloCamara({ hasta, miradaDe, miradaA, dur, onFin }) {
-  const { camera, invalidate } = useThree();
-  const ini = useRef(/** @type {number|null} */ (null));
-  const hecho = useRef(false);
-  const { curva, va, vb } = useMemo(() => {
-    const p0 = camera.position.clone();
-    const p2 = new THREE.Vector3(...hasta);
-    const p1 = p0.clone().lerp(p2, 0.5);
-    p1.y = Math.max(p0.y, p2.y) + 1.2; // el arco por encima, nunca a ras
-    return {
-      curva: new THREE.CatmullRomCurve3([p0, p1, p2], false, 'catmullrom', 0.4),
-      va: new THREE.Vector3(...miradaDe),
-      vb: new THREE.Vector3(...miradaA),
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useLayoutEffect(() => {
-    if (dur > 0) return;
-    // salto seco (reduced-motion): posiciona y entrega sin depender de frames
-    camera.position.set(hasta[0], hasta[1], hasta[2]);
-    camera.lookAt(_miradaTmp.set(miradaA[0], miradaA[1], miradaA[2]));
-    hecho.current = true;
-    invalidate();
-    onFin();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useFrame(({ clock }) => {
-    if (hecho.current) return;
-    if (ini.current == null) ini.current = clock.elapsedTime;
-    const t = Math.min(1, (clock.elapsedTime - ini.current) / dur);
-    const e = t * t * (3 - 2 * t);
-    curva.getPoint(e, camera.position);
-    _miradaTmp.copy(va).lerp(vb, smoothstep(0.25, 0.9, e));
-    camera.lookAt(_miradaTmp);
-    if (t >= 1) {
-      hecho.current = true;
-      onFin();
-    }
-  });
-  return null;
-}
-
 /* La escena completa (grupo r3f interno; el default la monta en su Canvas). */
 function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
   const perfil = perfilDeTier(tier);
@@ -2079,15 +1609,13 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
   );
   useEffect(() => () => geo.dispose(), [geo]);
 
-  // presupuestos de la colonia por tier — PASADA 3 densifica el rodal para el
-  // paneo (instanciado: la colonia entera sigue siendo 2 draw calls)
-  const nFrailejones = tier === 'alto' ? 64 : 36; // frailejonal POBLADO, por edades
-  const nPaja = tier === 'alto' ? 200 : 120;
-  const nMusgo = tier === 'alto' ? 64 : 38; // más cojines: páramo húmedo
-  const nNiebla = tier === 'alto' ? 14 : 9; // más bancos de bruma fría
+  // presupuestos de la colonia por tier
+  const nFrailejones = tier === 'alto' ? 18 : 11;
+  const nPaja = tier === 'alto' ? 150 : 90;
+  const nMusgo = tier === 'alto' ? 46 : 28;
+  const nNiebla = tier === 'alto' ? 9 : 6;
   const nAves = tier === 'alto' ? 3 : 2;
-  const nRomero = tier === 'alto' ? 34 : 18; // sotobosque leñoso más denso
-  const nRayos = tier === 'alto' ? 7 : 5; // haces de luz entre la niebla
+  const nRomero = tier === 'alto' ? 22 : 12;
 
   /* `color`/`fog` se adjuntan a la ESCENA: hijos directos, nunca en <group>. */
   return (
@@ -2102,57 +1630,14 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
       </mesh>
 
       <NacimientoAgua reducedMotion={reducedMotion} fabrica={fabrica} />
-      {/* ══ EL HILO DE AGUA ══ prioridad #1: el agua SALE del hondón y baja a las
-          veredas por el cauce excavado — la imagen que le faltaba a la fábrica
-          de agua ("si se seca, se seca el río" necesita ver el río naciendo). */}
-      <HiloDeAgua reducedMotion={reducedMotion} />
 
-      {/* ══ LA QUEÑUA GUARDIANA ══ la PROTAGONISTA: el Ent-queñua real, monumental
-          sobre su altozano al fondo-centro, bañada por el haz mayor de luz.
-          Su brazo maestro señala el tajo de la lección del suelo. */}
-      <QuenuaGuardiana tier={tier} reducedMotion={reducedMotion} />
+      {/* ══ EL GUARDIÁN-MAESTRO ══ el Ent-frailejón monumental que se alza sobre
+          el frailejonal y enseña. Elevado y adelantado a la izquierda para que
+          domine el cuadro sin tapar el nacimiento del agua. */}
+      <EntFrailejonMaestro pos={[-1.9, alturaParamo(-1.9, 1.4) - 0.1, 1.4]} esc={1.6} reducedMotion={reducedMotion} />
 
-      {/* ══ LA LECCIÓN DEL SUELO ══ la vitrina de 5 capas de EscenaEntMaestro,
-          REUSADA (hojarasca → humus → raíces → red micorrízica → roca madre),
-          plantada en el tajo donde la mano de la guardiana señala. Los rótulos
-          solo se muestran en modo lección (de lejos serían ruido). */}
-      <group
-        position={[
-          CORTE_WX - ESC_CORTE * CORTE_POS_EM[0],
-          Y_TAPA,
-          CORTE_WZ - ESC_CORTE * CORTE_POS_EM[2],
-        ]}
-        scale={ESC_CORTE}
-      >
-        <CorteSuelo tier={tier} reducedMotion={reducedMotion} rotulos={leccion} arco={leccion} />
-      </group>
-      {/* luz de vitrina (solo en lección): abre la cara del corte, que mira a la
-          cámara a contraluz del cielo; + relleno frío para la roca madre */}
-      {leccion && (
-        <>
-          <directionalLight
-            position={[CORTE_WX + 1, Y_TAPA + 1.2, CORTE_WZ + 11]}
-            intensity={0.85}
-            color="#eef0dd"
-          />
-          <pointLight
-            position={[CORTE_WX, Y_TAPA - 3.1, CORTE_WZ + 1.6]}
-            intensity={0.5}
-            color="#cfd6dd"
-            distance={6}
-            decay={2}
-          />
-        </>
-      )}
-
-      {/* el frailejón-maestro pasa a ACOMPAÑANTE al occidente, más atrás y menor:
-          sigue enseñando, pero la protagonista del páramo es la queñua */}
-      <EntFrailejonMaestro pos={[-7.6, alturaParamo(-7.6, 0.2) - 0.1, 0.2]} esc={1.15} reducedMotion={reducedMotion} />
-
-      {/* el frailejón "de detalle", acompañante junto al sendero — y en su flor,
-          el CHIVITO DE PÁRAMO posado (la intimidad icónica del páramo) */}
-      <FrailejonHeroe pos={[HERO_X, HERO_Y, HERO_Z]} reducedMotion={reducedMotion} />
-      <BarbuditoDelFrailejon tier={tier} reducedMotion={reducedMotion} />
+      {/* el frailejón "de detalle" pasa a acompañante, más al costado */}
+      <FrailejonHeroe pos={[2.6, alturaParamo(2.6, 1.4), 1.4]} reducedMotion={reducedMotion} />
       <FrailejonalInstanciado n={nFrailejones} />
 
       {/* ══ ANCLA DE ESCALA HUMANA ══ un frailejón ANCIANO (patriarca de ~3 m)
@@ -2164,6 +1649,15 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
       <Pajonal n={nPaja} />
       <CojinesMusgo n={nMusgo} />
       <RomeroParamo n={nRomero} />
+
+      {/* chusque (bambú del páramo) en macollas en las faldas húmedas */}
+      <Chusque pos={[-5.4, alturaParamo(-5.4, 3.2), 3.2]} esc={1.1} seed={5} />
+      <Chusque pos={[4.6, alturaParamo(4.6, -3.4), -3.4]} esc={0.95} seed={13} />
+      {tier === 'alto' && <Chusque pos={[-6.8, alturaParamo(-6.8, -1.2), -1.2]} esc={1.0} seed={21} />}
+
+      {/* cardón (Puya) — la bromelia gigante del páramo, roseta espinosa + vara */}
+      <Cardon pos={[3.4, alturaParamo(3.4, 3.6), 3.6]} esc={1.0} vara seed={9} />
+      <Cardon pos={[-4.2, alturaParamo(-4.2, 5.2), 5.2]} esc={0.85} vara={false} seed={31} />
 
       {/* chusque (Chusquea, el bambú del páramo) en macollas en las faldas húmedas */}
       <Chusque pos={[-5.4, alturaParamo(-5.4, 3.2), 3.2]} esc={1.15} seed={5} />
@@ -2223,7 +1717,7 @@ const CSS_PARAMO = `
 /* La copia didáctica: en calma, la invitación; en fábrica, cómo nace el agua;
    en lección, las cinco capas del suelo que la guardiana enseña. */
 const COPY_CALMA =
-  'Este es el páramo altoandino: niebla fría, rayos de sol que se cuelan, y su guardiana, la queñua — el árbol más alto de la montaña. Siga el sendero hasta sus pies, o toque un botón para aprender.';
+  'Este es el páramo, la fábrica de agua, y su guardián: el frailejón-maestro que enseña a cuidarlo. Toque el botón para ver de dónde nace el agua que baja a las veredas.';
 const COPY_FABRICA =
   'Los frailejones peinan la niebla con sus hojas velludas; el musgo y la turba la guardan como una esponja. Del hondón, gota a gota, nace el agua. Por eso el páramo se cuida: si se seca, se seca el río.';
 const COPY_LECCION =
@@ -2348,7 +1842,7 @@ export default function MundoParamo3D() {
       <div className="paramo-chrome">
         <h2 className="paramo-titulo">
           El páramo: la fábrica de agua
-          <small>La queñua guardiana, el frailejonal, la lección del suelo y el nacimiento del agua</small>
+          <small>El frailejón-maestro, el frailejonal, el chusque y el nacimiento del agua</small>
         </h2>
         <div className="paramo-pie">
           <button

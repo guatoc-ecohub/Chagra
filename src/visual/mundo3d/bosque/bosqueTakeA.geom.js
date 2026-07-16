@@ -314,8 +314,8 @@ const AZ_CAMARA = 0.61;
 const ANCLAS_VECINOS = [[-3.7, 3.0], [3.1, 3.2], [-4.9, 4.4], [3.0, 2.1]];
 
 const CUPO_QUENUAL = {
-  alto: { cerca: 7, lejos: 9 },
-  medio: { cerca: 5, lejos: 5 },
+  alto: { cerca: 8, lejos: 12 },
+  medio: { cerca: 5, lejos: 6 },
   bajo: { cerca: 3, lejos: 0 },
 };
 
