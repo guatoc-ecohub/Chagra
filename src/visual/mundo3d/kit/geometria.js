@@ -45,7 +45,6 @@ export {
   /* Cúmulos de follaje con huecos y borde mordido (anti árbol-de-navidad). */
   sembrarFollaje,
   matojoHoja,
-  matojoNube,
 } from '../bosque/sombreadoVegetal.js';
 
 /**

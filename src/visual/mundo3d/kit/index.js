@@ -39,7 +39,7 @@ export {
   fusionarSeguro, desindexar, poner, apuntar,
   pintarPorVertice, pintarPlano, hornearFollaje, hornearCorteza,
   tuboOrganico, taperLineal, taperTronco, curvaTronco,
-  sembrarFollaje, matojoHoja, matojoNube, sembrarEnAnillo,
+  sembrarFollaje, matojoHoja, sembrarEnAnillo,
 } from './geometria.js';
 
 /* ── Terreno (heightfield con color por vértice) ────────────────────────────── */
@@ -48,10 +48,6 @@ export { construirTerreno } from './terreno.js';
 /* ── Atmósfera del mundo (hora viva del valle, lista para cualquier Canvas) ──── */
 export { atmosferaDeFamilia, useAtmosferaMundo } from './atmosfera.js';
 export { default as AtmosferaMundo } from './AtmosferaMundo.jsx';
-
-/* ── Cielo con domo + color por bandas (la clave estilizada de la toma B) ────── */
-export { default as DomoCielo } from './DomoCielo.jsx';
-export { crearGradienteBandas, useGradienteBandas } from './bandas.js';
 
 /* ── Paleta madre + cielos por hora (dirección de arte central) ─────────────── */
 export { ATMOSFERA, PALETA, CIELOS, BLOOM, mezclar, mezclarCielo } from '../atmosferaMadre.js';
