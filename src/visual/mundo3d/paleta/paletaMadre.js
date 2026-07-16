@@ -98,6 +98,9 @@ export const TIERRAS = {
   siembra: '#6b4a2e', // = PALETA.tierra: cama de siembra, tierra removida
   camino: '#8a6a44', // = PALETA.tierraClara: suelo seco, camino de finca
   turba: '#5a3d28', // fauna, el suelo de la lombriz (tierra viva del páramo)
+  arcilla: '#8a5636', // cafetal, la tierra roja andina que asoma entre surcos
+  mantillo: '#7d6038', // cacaotal, la hojarasca parda bajo el sombrío
+  mantilloSombra: '#6b5230', // cacaotal, el mantillo húmedo hacia la sombra
   pajonal: '#a5975c', // sierra, banda de páramo (paja dorada-verdosa)
   rocaSierra: '#6f6357', // sierra, el risco que asoma en lo empinado
   rocaParamo: '#7c7c70', // bosque, piedra con líquen
@@ -171,6 +174,23 @@ export const ACENTOS = {
   ambar: '#d9a13b', // = PALETA.ambar: señal, alerta amable (nunca rojo UI)
   indigo: '#33305c', // bosque, la baya del mortiño (el índigo textil)
   florDeMonte: '#e46b9b', // fauna, la flor que visita el abejorro
+};
+
+/* ------------------------------------------------------------------ */
+/* CASA — la casa campesina canónica, EXTRAÍDA del valle (el estándar  */
+/* de referencia: composicionValle3D.jsx). Cada mundo venía inventando */
+/* SU teja, SU zócalo y SU carpintería: tres casas que no eran la misma*/
+/* casa. Esta es LA casa — en cualquier piso térmico se reconoce.      */
+/* ------------------------------------------------------------------ */
+export const CASA = {
+  encalado: '#f3ecdc', // valle, el muro de tapia encalada
+  zocalo: '#a35a3c', // valle, la franja pintada de toda casa de vereda
+  teja: '#b0603f', // valle, el faldón de teja al sol
+  tejaSombra: '#8f4b31', // valle, el faldón en sombra y la cumbrera
+  madera: '#6b4a2e', // valle, puerta y marco (= PALETA.tierra, madera curtida)
+  ventana: '#ffd9a0', // valle, la luz cálida de "la casa espera"
+  carpinteria: '#44685a', // puerta/ventana pintadas: el verde-aguamarina campesino
+  bejuco: '#a9713c', // el canasto de cosecha (cafetal/cacaotal/papal, ya idéntico)
 };
 
 /* ------------------------------------------------------------------ */

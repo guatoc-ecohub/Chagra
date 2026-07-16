@@ -33,6 +33,9 @@ import { VERDES, TIERRAS, CORTEZAS, AGUAS, ACENTOS, NEUTROS } from '../paleta';
   (`ACENTOS.indigo`) como acento. Cielos: los pone la atmósfera, no vos.
 - **Acentos a cucharadas**: `ACENTOS` (cochinilla, maíz, guayacán…) es para
   una cinta, una baya, una señal — jamás para superficies grandes.
+- **La casa campesina es UNA**: `CASA` (encalado, zócalo, teja/tejaSombra,
+  carpintería, bejuco) viene del valle — el estándar. Si tu mundo tiene casa,
+  es ESTA casa, en cualquier piso térmico.
 - **Nada de grises fabriles ni negro puro**: `NEUTROS.lamina/concreto` ya
   vienen entibiados; la línea oscura es `NEUTROS.tinta` (negro cálido).
 - ¿Falta un color? Primero buscá el pariente más cercano y derivalo con
@@ -93,6 +96,14 @@ const c = useMemo(() => mezclarCielo(CIELOS.ladera), []);
 `cielo` (tu familia), `perfil` (sombras solo tier alto) y `escala`. Cuatro
 luces, cero costo por frame. **No calqués los números a mano**: la deriva de
 calcos es exactamente lo que este componente elimina.
+
+Si tu composición pide el sol en otro sitio o un frustum de sombra a la
+medida de tu geometría, eso NO es excusa para calcar el rig: pasá `solPos`
+y/o `sombra={{left,right,top,bottom,far}}` — la receta (proporciones, colores,
+mezcla 60%) sigue siendo la de la casa. Adopción de referencia: los mundos
+del cafetal, el cacaotal y el papal (`EscenaCafetalVivo`, `EscenaCacaoVivo`,
+`EscenaPapaVivo`) derivan su atmósfera con `mezclarCielo(CIELOS.corral /
+sotobosque / ladera)` y montan esta luz.
 
 ## 4. Bloom: no lo montés vos
 

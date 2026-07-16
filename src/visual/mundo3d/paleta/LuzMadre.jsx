@@ -30,6 +30,9 @@
  * Costo: 4 luces y una mezcla memoizada. Nada por frame. El fondo y la
  * niebla NO van aquí (son de la escena): ver GUIA.md para el par de líneas.
  */
+/* eslint-disable react-refresh/only-export-components -- exporta LUZ_MADRE
+   (las proporciones de la receta como dato) junto al componente: es la misma
+   ley en dos formas y separarlas duplicaría la fuente (precedente: CamaraCruce). */
 import { useMemo } from 'react';
 import { ATMOSFERA, mezclarCielo } from '../atmosferaMadre.js';
 
@@ -52,12 +55,19 @@ export const LUZ_MADRE = {
  *                                 60% hacia la madre. Default: madre pura.
  * @param {object} [props.perfil]  perfilDeTier(tier); decide castShadow.
  * @param {number} [props.escala]  atenuador global (1 = receta tal cual).
+ * @param {number[]} [props.solPos] posición del sol si la composición de la
+ *                                 escena pide otro ángulo (misma luz, otro sitio).
+ * @param {object} [props.sombra]  frustum de sombra a medida de la geometría:
+ *                                 {left,right,top,bottom,far}. Default: el de
+ *                                 la casa (±12, far 30).
  */
 export default function LuzMadre({
   madre = ATMOSFERA,
   cielo = null,
   perfil = null,
   escala = 1,
+  solPos = null,
+  sombra = null,
 }) {
   /* La mezcla 60%-hacia-la-madre es la MISMA ley de EscenaBase3D (7 lerps,
      memoizados aquí): un consumidor standalone pinta IGUAL que el framework. */
@@ -77,16 +87,16 @@ export default function LuzMadre({
         color={madre.luz}
       />
       <directionalLight
-        position={madre.solPos ?? LUZ_MADRE.solPos}
+        position={solPos ?? madre.solPos ?? LUZ_MADRE.solPos}
         intensity={(madre.sol ?? LUZ_MADRE.sol) * k}
         color={madre.luz}
         castShadow={sombras}
         shadow-mapSize={[1024, 1024]}
-        shadow-camera-far={30}
-        shadow-camera-left={-12}
-        shadow-camera-right={12}
-        shadow-camera-top={12}
-        shadow-camera-bottom={-12}
+        shadow-camera-far={sombra?.far ?? 30}
+        shadow-camera-left={sombra?.left ?? -12}
+        shadow-camera-right={sombra?.right ?? 12}
+        shadow-camera-top={sombra?.top ?? 12}
+        shadow-camera-bottom={sombra?.bottom ?? -12}
       />
       <directionalLight
         position={LUZ_MADRE.rellenoPos}
