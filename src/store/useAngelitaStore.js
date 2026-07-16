@@ -5,8 +5,6 @@ import {
   llaveDeDecision,
   estadoVisualDeComportamiento,
 } from '../services/angelitaInteligencia';
-import { variarMensaje } from '../services/angelitaVariedad';
-import { tipoDeDecision } from '../visual/agente/angelitaAvisoTipos';
 
 /**
  * useAngelitaStore — LA API EN VIVO del comportamiento de Angelita.
@@ -46,10 +44,6 @@ const inicial = {
   prioridad: 0,
   prompt: null,
   mundoActual: null,
-  // Capa de notificaciones bellas (2026-07-18, ADITIVA — la cadencia y el
-  // husmeo NO se tocaron): tipo del aviso (angelitaAvisoTipos, 8 categorías)
-  // para color+ícono de la burbuja. null en calma.
-  tipo: null,
 };
 
 const useAngelitaStore = create(
@@ -61,10 +55,6 @@ const useAngelitaStore = create(
       ultimaHablaPorLlave: /** @type {Record<string, number>} */ ({}),
       ultimoLogroId: /** @type {string|null} */ (null),
       silenciado: false,
-
-      // Efímero por sesión (NO persistido): ¿ya saludó en esta sesión? El
-      // primer husmeo de la sesión se clasifica como 'bienvenida'.
-      saludoSesionHecho: false,
 
       /**
        * Aplica una decisión del motor al estado vivo, y si de verdad surge un
@@ -80,22 +70,10 @@ const useAngelitaStore = create(
         }
         const llave = llaveDeDecision(decision, mundo);
         const ahora = Date.now();
-        // CAPA DE VARIEDAD (aditiva, post-decisión): el motor y su
-        // anti-molestia ya aprobaron ESTE mensaje — aquí solo se clasifica
-        // (tipo → color+ícono de la burbuja) y se viste con una variante
-        // fresca (angelitaVariedad: determinista al instante, LLM en segundo
-        // plano para próximas veces). El núcleo factual queda intacto.
-        const esBienvenida = decision.estado === 'husmea' && !get().saludoSesionHecho;
-        const tipo = tipoDeDecision(decision, { mundo, esBienvenida });
-        const mensajeVestido = decision.mensaje
-          ? variarMensaje(decision.mensaje, tipo || 'informativa')
-          : decision.mensaje;
         set((s) => ({
           estado: decision.estado,
           visualEstado: decision.visualEstado,
-          mensaje: mensajeVestido,
-          tipo,
-          saludoSesionHecho: true,
+          mensaje: decision.mensaje,
           aria: decision.aria,
           severidad: decision.severidad,
           prioridad: decision.prioridad,
@@ -112,7 +90,7 @@ const useAngelitaStore = create(
        * Corre el motor con el contexto en vivo. El shell arma `ctx` con lo que
        * tenga localmente (notificaciones, logro, mundo+datos, ocupado…); el
        * store inyecta la memoria anti-molestia y el silencio.
-       * @param {Object} ctx - ver resolverComportamiento (sin la parte de memoria).
+       * @param {Object} ctx — ver resolverComportamiento (sin la parte de memoria).
        */
       evaluar: (ctx = {}) => {
         const { ultimaHablaPorLlave, ultimoLogroId, silenciado } = get();
@@ -131,7 +109,7 @@ const useAngelitaStore = create(
        * Husmear un mundo: comentario grounded al entrar. Atajo de evaluar()
        * para el caso más común (navegación entre mundos).
        * @param {string} mundo
-       * @param {Object} [datos] - datos reales del mundo (ver comentarioDeMundo).
+       * @param {Object} [datos] — datos reales del mundo (ver comentarioDeMundo).
        * @param {{ ocupado?: boolean, ahoraMs?: number }} [opts]
        */
       entrarMundo: (mundo, datos = {}, opts = {}) =>
