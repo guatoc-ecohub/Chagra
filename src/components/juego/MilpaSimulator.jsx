@@ -56,7 +56,47 @@ import { recordGameStart, recordGameComplete } from '../../services/usageTelemet
 // No se reescribe ninguna mecánica: es cableado/composición.
 import JuegoLaMilpa from '../../mockups/JuegoLaMilpa';
 
+import { Crisopa } from '../../visual/creatures/Crisopa.jsx';
+import { Trichogramma } from '../../visual/creatures/Trichogramma.jsx';
+import { Sirfido } from '../../visual/creatures/Sirfido.jsx';
+
 import './milpa.css';
+
+/**
+ * Los aliados naturales que llegan SOLOS cuando la finca tiene variedad: la
+ * crisopa y el sírfido se comen los áfidos, la avispita Trichogramma parasita
+ * los huevos de las plagas. Es control biológico REAL — un policultivo diverso
+ * les da flores y refugio, y ellos hacen la vigilancia gratis. Puro visual y
+ * educativo; no toca la mecánica del simulador.
+ */
+const ALIADOS_BIOLOGICOS = [
+  { Criatura: Sirfido, nombre: 'Sírfido', hace: 'come áfidos y poliniza' },
+  { Criatura: Crisopa, nombre: 'Crisopa', hace: 'caza mosca blanca y pulgón' },
+  { Criatura: Trichogramma, nombre: 'Avispita', hace: 'ataca el huevo de la plaga' },
+];
+
+/** Tira de los aliados de control biológico que atrae el policultivo. */
+function AliadosNaturales() {
+  return (
+    <div
+      className="rounded-3xl border border-lime-300/25 bg-emerald-950/40 p-3 milpa-fade-in"
+      data-testid="milpa-aliados-naturales"
+    >
+      <p className="mb-2 text-center text-[11px] font-black uppercase tracking-wide text-lime-300/90">
+        Cuando hay variedad, llegan solos los aliados
+      </p>
+      <div className="flex items-start justify-around gap-2">
+        {ALIADOS_BIOLOGICOS.map(({ Criatura, nombre, hace }) => (
+          <div key={nombre} className="flex flex-1 flex-col items-center gap-1 text-center">
+            <Criatura size={52} title={nombre} className="milpa-brota" />
+            <span className="text-[11px] font-black text-emerald-100">{nombre}</span>
+            <span className="text-[9px] leading-tight text-emerald-300/80">{hace}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /** Acentos por color de cultivo (estética Chagra). */
 const ACENTO = {
@@ -501,6 +541,8 @@ export default function MilpaSimulator({ onBack, onHome }) {
                 Jugar «Las tres hermanas» (modo ilustrado)
               </button>
             </header>
+
+            <AliadosNaturales />
 
             <section className="grid grid-cols-1 gap-3">
               <h3 className="text-sm font-black text-emerald-200">Sistemas</h3>

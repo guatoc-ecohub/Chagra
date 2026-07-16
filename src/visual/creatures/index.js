@@ -67,6 +67,15 @@ export { Perezoso, PEREZOSO_PALETA, PEREZOSO_PROPORCION } from './Perezoso.jsx';
 export { Lombriz } from './Lombriz.jsx';
 export { Mariposa } from './Mariposa.jsx';
 export { Escarabajo } from './Escarabajo.jsx';
+/* EL TRÍO DE CONTROL BIOLÓGICO — los aliados reales de la agroecología que los
+   juegos Defensores y Milpa necesitaban como protagonistas: la crisopa (alas
+   verdes translúcidas, ojos dorados), la avispita Trichogramma (diminuta pero
+   brava, ojos rojos, alas con flecos) y el sírfido (mosca que imita abeja: un
+   par de alas, ojos enormes, antenitas mínimas). Fauna benéfica REAL con
+   binomio verificado — misma fundación rubber-hose que Mariposa/Escarabajo. */
+export { Crisopa } from './Crisopa.jsx';
+export { Trichogramma } from './Trichogramma.jsx';
+export { Sirfido } from './Sirfido.jsx';
 /* EL ENT DEL PÁRAMO — el árbol-guardián que enseña (frailejón gigante). NO es un
    bicho: es el corazón del "Bosque Vivo". Hereda la MISMA fundación transversal
    (line-boil, lip-sync, modo-poder=guardián, clima) adaptada a su escala y su
@@ -128,6 +137,9 @@ import Condor from './Condor.jsx';
 import Lombriz from './Lombriz.jsx';
 import Mariposa from './Mariposa.jsx';
 import Escarabajo from './Escarabajo.jsx';
+import Crisopa from './Crisopa.jsx';
+import Trichogramma from './Trichogramma.jsx';
+import Sirfido from './Sirfido.jsx';
 import EntFrailejon from './EntFrailejon.jsx';
 
 /* Registro consultable: slug → componente + binomio verificado. */
@@ -146,6 +158,10 @@ export const CREATURES = {
   lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },
   mariposa: { Component: Mariposa, nombre: 'Mariposa pasionaria', cientifico: 'Dione juno' },
   escarabajo: { Component: Escarabajo, nombre: 'Escarabajo estercolero', cientifico: 'Dichotomius belus' },
+  // El trío de control biológico (aliados reales de Defensores y Milpa).
+  crisopa: { Component: Crisopa, nombre: 'Crisopa', cientifico: 'Chrysoperla externa' },
+  trichogramma: { Component: Trichogramma, nombre: 'Avispita Trichogramma', cientifico: 'Trichogramma' },
+  sirfido: { Component: Sirfido, nombre: 'Mosca de las flores (sírfido)', cientifico: 'Syrphidae' },
   // El árbol-maestro del Bosque Vivo (flora, no fauna): el frailejón guardián.
   'ent-frailejon': { Component: EntFrailejon, nombre: 'El Ent del páramo', cientifico: 'Espeletia sp.' },
 };
