@@ -49,10 +49,14 @@ import { PISOS_TERMICOS } from '../pisosTermicos.js';
 import {
   R_MONTE, H_PICO, Y_MAR,
   geometriaMonte,
-  geomPalmera, geomCafeto, geomNiebla, geomFrailejon,
-  vegDeTier, calidadVeg, distribuirVegetacion,
   curvaQuebrada, puntoEnLadera, metrosDeY, yDeMetros,
 } from './sierraMonte.geom.js';
+import {
+  geomsEspeciesSierra, vegSierraDeTier, calidadSierra, distribuirEspeciesReales,
+  geomVenadoCuerpo, geomVenadoPata, geomAguilaCuerpo, geomAguilaAla,
+} from './sierraBiodiversa.geom.js';
+import CondorBillboard from '../CondorBillboard.jsx';
+import { OsoAndino } from '../../creatures/index.js';
 
 /* Las cuatro bandas navegables, del grafo (pisosTermicos.js). `azimut` reparte
    sus hotspots alrededor del macizo para que orbitar los descubra. */
@@ -115,22 +119,19 @@ function Especie({ geo, mat, items, castShadow = false }) {
       instanciada por banda. Clicable: el punto tocado decide su piso. ── */
 function Macizo({ tier, onEntrar }) {
   const perfil = perfilDeTier(tier);
-  const q = calidadVeg(tier);
-  const conteos = vegDeTier(tier);
+  const q = calidadSierra(tier);
+  const conteos = vegSierraDeTier(tier);
 
   const geoTerreno = useMemo(() => {
     const g = geometriaMonte(perfil.segmentosTerreno);
     return perfil.flatShading ? g.toNonIndexed() : g;
   }, [perfil.segmentosTerreno, perfil.flatShading]);
 
-  const geos = useMemo(() => ({
-    palmera: geomPalmera(q, 9),
-    cafeto: geomCafeto(q, 3),
-    niebla: geomNiebla(q, 5),
-    frailejon: geomFrailejon(q, 11),
-  }), [q]);
+  // Cinco especies REALES, una por piso (ceiba/guayacán/roble/queñua) + frailejón
+  // coronando el páramo. Reusan la geometría de arbolMayor.geom / sierraMonte.geom.
+  const geos = useMemo(() => geomsEspeciesSierra(q), [q]);
 
-  const dist = useMemo(() => distribuirVegetacion(conteos, 707), [conteos]);
+  const dist = useMemo(() => distribuirEspeciesReales(conteos, 909), [conteos]);
 
   const matTerreno = useMemo(() => {
     const base = { vertexColors: true, flatShading: perfil.flatShading };
@@ -171,9 +172,13 @@ function Macizo({ tier, onEntrar }) {
         onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
         onPointerOut={() => { document.body.style.cursor = ''; }}
       />
-      <Especie geo={geos.palmera} mat={matVeg} items={dist.palmera} castShadow={sombra} />
-      <Especie geo={geos.cafeto} mat={matVeg} items={dist.cafeto} castShadow={sombra} />
-      <Especie geo={geos.niebla} mat={matVeg} items={dist.niebla} castShadow={sombra} />
+      {/* ceiba (cálido), guayacán (templado), roble (frío) y queñua (filo del
+          páramo): las cuatro especies mayores reales, cada una en su piso. */}
+      <Especie geo={geos.ceiba} mat={matVeg} items={dist.ceiba} castShadow={sombra} />
+      <Especie geo={geos.guayacan} mat={matVeg} items={dist.guayacan} castShadow={sombra} />
+      <Especie geo={geos.roble} mat={matVeg} items={dist.roble} castShadow={sombra} />
+      <Especie geo={geos.quenua} mat={matVeg} items={dist.quenua} castShadow={sombra} />
+      {/* el frailejonar corona el páramo abierto, sobre la queñua */}
       <Especie geo={geos.frailejon} mat={matVeg} items={dist.frailejon} />
     </group>
   );
@@ -322,6 +327,179 @@ function VeloParamo({ tier, reducedMotion }) {
   );
 }
 
+/* ── FAUNA ALTOANDINA — la vida REAL de la Sierra, que faltaba ────────────────
+   La Sierra Nevada es LA sede simbólica del cóndor en el imaginario colombiano y
+   hábitat del oso de anteojos, el venado coliblanco y el águila mora. Cóndor y
+   oso reusan los SVG rubber-hose de la casa como billboards (el estándar de
+   calidad); el venado y el águila van en geometría procedural mínima
+   (`sierraBiodiversa.geom`). Todo gateado por tier/reducedMotion: en calma queda
+   quieto y digno. ── */
+const ESTILO_BICHO = {
+  filter: 'drop-shadow(0 2px 3px rgba(25, 32, 28, 0.32))',
+  pointerEvents: 'none',
+};
+
+/* El OSO DE ANTEOJOS (Tremarctos ornatus, el único oso de Suramérica) en el
+   bosque de niebla (piso frío): SVG de la casa como billboard que encara la
+   cámara. `occlude`: se esconde tras el macizo cuando la órbita lo deja detrás. */
+function OsoDeAnteojos({ pos, tier, animated, px = 56, factor = 15 }) {
+  return (
+    <group position={/** @type {[number,number,number]} */ (pos)}>
+      <Html center distanceFactor={factor} zIndexRange={[12, 0]} occlude pointerEvents="none">
+        <div aria-hidden="true" data-vecino="oso-andino" style={ESTILO_BICHO}>
+          <OsoAndino size={px} animated={animated} tier={tier} />
+        </div>
+      </Html>
+    </group>
+  );
+}
+
+/* El VENADO COLIBLANCO ANDINO (Odocoileus goudotii, la subespecie de páramo):
+   pace alerta en el frío/páramo. Cuerpo tostado fusionado + cuatro patas + la
+   COLA BLANCA en alto (su firma). Idle sutil: mecido de peso y coleteo. */
+function VenadoSierra({ pos, escala = 0.3, giro = 0, reducedMotion }) {
+  const grupo = useRef(null);
+  const cola = useRef(null);
+  const geoCuerpo = useMemo(() => geomVenadoCuerpo(), []);
+  const geoPata = useMemo(() => geomVenadoPata(), []);
+  const matCafe = useMemo(() => new THREE.MeshLambertMaterial({ vertexColors: true }), []);
+  const matPata = useMemo(() => new THREE.MeshLambertMaterial({ color: '#5d4530' }), []);
+  const matBlanco = useMemo(() => new THREE.MeshLambertMaterial({ color: '#f3efe2' }), []);
+  useEffect(
+    () => () => {
+      geoCuerpo.dispose();
+      geoPata.dispose();
+      matCafe.dispose();
+      matPata.dispose();
+      matBlanco.dispose();
+    },
+    [geoCuerpo, geoPata, matCafe, matPata, matBlanco],
+  );
+  useFrame(({ clock }) => {
+    if (reducedMotion || !grupo.current) return;
+    const t = clock.getElapsedTime();
+    grupo.current.rotation.z = Math.sin(t * 0.5 + pos[0]) * 0.03; // mecido de peso
+    if (cola.current) cola.current.rotation.x = Math.max(0, Math.sin(t * 1.3 + pos[2])) * 0.5; // coleteo
+  });
+  return (
+    <group ref={grupo} position={/** @type {[number,number,number]} */ (pos)} rotation={[0, giro, 0]} scale={escala}>
+      <mesh geometry={geoCuerpo} material={matCafe} />
+      {[[0.42, 0.16], [0.42, -0.16], [-0.5, 0.16], [-0.5, -0.16]].map(([px, pz], i) => (
+        <mesh key={i} geometry={geoPata} material={matPata} position={[px, 0.74, pz]} />
+      ))}
+      {/* la cola blanca en alto (Odocoileus la levanta como bandera) */}
+      <group ref={cola} position={[-0.66, 1.04, 0]}>
+        <mesh material={matBlanco} position={[-0.04, 0.06, 0]} scale={[0.9, 1.5, 0.7]}>
+          <sphereGeometry args={[0.1, 6, 5]} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/* El ÁGUILA MORA (Geranoaetus melanoleucus, águila real de páramo): planea en
+   círculos los altos de la Sierra, bajo el cóndor. Cuerpo oscuro fuselado + dos
+   alas anchas que baten a rachas + cola corta en cuña (su firma frente al
+   cóndor). El cuerpo mira +z (rumbo); la órbita lo rota a la tangente. */
+function AguilaSierra({ centro = [0, H_PICO * 0.62, 0], radio = R_MONTE * 0.46, fase = 0, reducedMotion }) {
+  const ave = useRef(null);
+  const alaIzq = useRef(null);
+  const alaDer = useRef(null);
+  const geoCuerpo = useMemo(() => geomAguilaCuerpo(), []);
+  const geoAlaD = useMemo(() => geomAguilaAla(1), []);
+  const geoAlaI = useMemo(() => geomAguilaAla(-1), []);
+  const mat = useMemo(() => new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }), []);
+  useEffect(
+    () => () => {
+      geoCuerpo.dispose();
+      geoAlaD.dispose();
+      geoAlaI.dispose();
+      mat.dispose();
+    },
+    [geoCuerpo, geoAlaD, geoAlaI, mat],
+  );
+  useFrame(({ clock }) => {
+    const g = ave.current;
+    if (!g) return;
+    if (reducedMotion) {
+      g.position.set(centro[0] + radio, centro[1], centro[2]);
+      return;
+    }
+    const t = clock.getElapsedTime();
+    const a = t * 0.16 + fase; // una vuelta cada ~40 s (más nerviosa que el cóndor)
+    const r = radio + Math.sin(t * 0.07) * radio * 0.12;
+    g.position.set(
+      centro[0] + Math.cos(a) * r,
+      centro[1] + Math.sin(t * 0.3 + fase) * 0.6,
+      centro[2] + Math.sin(a) * r,
+    );
+    g.rotation.y = -a; // el cuerpo (+z) apunta a la tangente del giro
+    g.rotation.z = 0.12 + Math.sin(t * 0.5) * 0.06; // banqueo hacia adentro
+    // aletea a rachas: dos golpes cada tanto, el resto plancha
+    const rafaga = Math.max(0, Math.sin(t * 0.4 + fase) - 0.78) * 6;
+    const flap = Math.sin(t * 7) * 0.4 * rafaga;
+    const base = 0.16; // diedro leve en reposo
+    if (alaDer.current) alaDer.current.rotation.z = base + flap;
+    if (alaIzq.current) alaIzq.current.rotation.z = -(base + flap);
+  });
+  return (
+    <group ref={ave} position={/** @type {[number,number,number]} */ (centro)}>
+      <mesh geometry={geoCuerpo} material={mat} />
+      <mesh ref={alaDer} geometry={geoAlaD} material={mat} />
+      <mesh ref={alaIzq} geometry={geoAlaI} material={mat} />
+    </group>
+  );
+}
+
+/* Toda la fauna altoandina de la Sierra, gateada por tier/reducedMotion. */
+function FaunaSierra({ tier, reducedMotion }) {
+  const animado = !reducedMotion && tier !== 'bajo';
+  const nCondor = tier === 'alto' ? 2 : 1;
+  const hayAguila = tier !== 'bajo';
+  const nVenado = tier === 'alto' ? 2 : tier === 'medio' ? 1 : 0;
+
+  const osoPos = useMemo(() => {
+    const p = puntoEnLadera(2450, -2.15); // el bosque de niebla, piso frío
+    return [p[0], p[1] + 0.02, p[2]];
+  }, []);
+  const venados = useMemo(
+    () =>
+      [
+        { pos: puntoEnLadera(2900, 1.35), giro: 2.1, escala: 0.3 },
+        { pos: puntoEnLadera(3200, -0.5), giro: -1.2, escala: 0.27 },
+      ].slice(0, nVenado),
+    [nVenado],
+  );
+
+  return (
+    <group>
+      {/* El cóndor de los Andes (Vultur gryphus): planea alto sobre la nieve. */}
+      {Array.from({ length: nCondor }).map((_, i) => (
+        <CondorBillboard
+          key={i}
+          centro={[0, H_PICO * (0.92 + i * 0.06), 0]}
+          radio={R_MONTE * (0.7 + i * 0.18)}
+          velocidad={0.075}
+          px={tier === 'alto' ? 60 : 48}
+          factor={22}
+          animated={animado}
+          tier={tier}
+        />
+      ))}
+      {/* El águila mora (Geranoaetus melanoleucus): círculos más bajos y nerviosos. */}
+      {hayAguila && (
+        <AguilaSierra centro={[0, H_PICO * 0.62, 0]} radio={R_MONTE * 0.46} reducedMotion={!animado} />
+      )}
+      {/* El oso de anteojos (Tremarctos ornatus) en el bosque de niebla. */}
+      <OsoDeAnteojos pos={osoPos} tier={tier} animated={animado} />
+      {/* El venado coliblanco andino (Odocoileus goudotii) paciendo en el frío/páramo. */}
+      {venados.map((v, i) => (
+        <VenadoSierra key={i} pos={v.pos} giro={v.giro} escala={v.escala} reducedMotion={!animado} />
+      ))}
+    </group>
+  );
+}
+
 /* ── Los HOTSPOTS de piso: un pin que cuelga de la altura REAL de su banda en la
       ladera. Toque = entra a ese mundo. El páramo va aparte (frío, "se cuida"). ── */
 function HotspotsPisos({ onEntrar }) {
@@ -425,6 +603,7 @@ function EscenaMonte({ tier, reducedMotion, onEntrarPiso }) {
       <Macizo tier={tier} onEntrar={onEntrarPiso} />
       {agua && <Quebrada tier={tier} reducedMotion={reducedMotion} />}
       {agua && <VeloParamo tier={tier} reducedMotion={reducedMotion} />}
+      <FaunaSierra tier={tier} reducedMotion={reducedMotion} />
       <HotspotsPisos onEntrar={onEntrarPiso} />
       <OrbitControls
         makeDefault
