@@ -27,6 +27,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { perfilDeTier } from '../deviceTier.js';
 import { Fauna } from '../escenas/FaunaEscena.jsx';
+import FaunaCalido from '../escenas/FaunaCalido.jsx';
 import FloraCafetal from './FloraCafetal.jsx';
 import { ANCHO, FONDO, alturaLadera, SITIO_CASA } from './floraCafetal.geom.js';
 import {
@@ -214,6 +215,20 @@ const FAUNA_CAFETAL = [
   { tipo: 'mariposa', base: [7.2, 1.9, 0.6], patron: 'revoloteo', size: 22, fase: 2.9, df: 9 },
 ];
 
+/* La FAUNA EMBLEMÁTICA DEL PISO CÁLIDO que sube al cinturón cafetero bajo/
+   sub-andino (~1.000–1.400 m, donde el café templado y la tierra caliente se
+   tocan). Especies REALES colombianas con su nombre científico, del DR
+   fauna-piso-cálido (gemini, GBIF): la guacamaya que cruza en lo alto, el tucán
+   posado en el sombrío, el mico entre las ramas y el morfo azul del sotobosque.
+   Billboards SVG con coreografía por nicho (FaunaCalido). Orden = prominencia:
+   el recorte por tier deja siempre lo insignia. */
+const FAUNA_CALIDO_CAFETAL = [
+  { tipo: 'guacamaya', base: [0, 5.6, -6], patron: 'vuela', size: 62, fase: 0.4, df: 12, title: 'Guacamaya bandera (Ara macao)' },
+  { tipo: 'tucan', base: [-5.2, 3.5, -1.2], patron: 'posa', size: 60, fase: 1.1, df: 9, title: 'Tucán pechiblanco (Ramphastos tucanus)' },
+  { tipo: 'mico', base: [5.4, 3.2, -1.6], patron: 'trepa', size: 54, fase: 2.0, df: 9, title: 'Mico maicero (Saimiri sciureus)' },
+  { tipo: 'morfo', base: [-2.6, 2.3, 2.6], patron: 'morfo', size: 40, fase: 0.7, df: 9, title: 'Morfo azul (Morpho peleides)' },
+];
+
 function Diorama({ tier, reducedMotion, foco }) {
   const perfil = perfilDeTier(tier);
 
@@ -243,6 +258,13 @@ function Diorama({ tier, reducedMotion, foco }) {
 
   const fauna = useMemo(
     () => (tier === 'alto' ? FAUNA_CAFETAL : FAUNA_CAFETAL.slice(0, 2)),
+    [tier],
+  );
+
+  /* La fauna del cálido que asoma al café bajo: recortada por tier (alto todo,
+     medio deja lo insignia — guacamaya + tucán). */
+  const faunaCalido = useMemo(
+    () => (tier === 'alto' ? FAUNA_CALIDO_CAFETAL : FAUNA_CALIDO_CAFETAL.slice(0, 2)),
     [tier],
   );
 
@@ -295,6 +317,10 @@ function Diorama({ tier, reducedMotion, foco }) {
 
       {/* LA VIDA que la sombra trae: mariposas y el colibrí */}
       {perfil.criaturas > 0 && <Fauna items={fauna} reducedMotion={reducedMotion} />}
+
+      {/* LA FAUNA DEL CÁLIDO que sube al café bajo: guacamaya en vuelo, tucán
+          posado, mico en las ramas y el morfo azul del sotobosque. */}
+      {perfil.criaturas > 0 && <FaunaCalido items={faunaCalido} reducedMotion={reducedMotion} />}
 
       {/* el anillo del paso didáctico (lo maneja el host) */}
       <FocoPaso foco={foco} reducedMotion={reducedMotion} />

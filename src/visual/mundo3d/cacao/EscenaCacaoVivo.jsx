@@ -28,6 +28,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { perfilDeTier } from '../deviceTier.js';
 import { Fauna } from '../escenas/FaunaEscena.jsx';
+import FaunaCalido from '../escenas/FaunaCalido.jsx';
 import FloraCacao from './FloraCacao.jsx';
 import { ANCHO, FONDO, alturaVega, SITIO_CASA } from './floraCacao.geom.js';
 import {
@@ -239,6 +240,22 @@ const FAUNA_CACAOTAL = [
   { tipo: 'escarabajo', base: [-1.2, 0.5, 6.2], patron: 'reptar', size: 22, fase: 1.2, df: 8 },
 ];
 
+/* La FAUNA EMBLEMÁTICA DEL PISO CÁLIDO-TROPICAL BAJO (0–1.200 m): el cacaotal ES
+   tierra caliente y su dosel está lleno de vida. Especies REALES colombianas con
+   su nombre científico, del DR fauna-piso-cálido (gemini, GBIF): la guacamaya
+   bandera que ronda en lo alto, el tucán posado, el perezoso colgado lentísimo,
+   el mico entre las ramas, la iguana asoleándose en el tronco caído y el morfo
+   azul del sotobosque. Billboards SVG con coreografía por nicho (FaunaCalido).
+   Orden = prominencia: el recorte por tier deja siempre lo insignia. */
+const FAUNA_CALIDO_CACAO = [
+  { tipo: 'guacamaya', base: [0, 6.2, -6.5], patron: 'vuela', size: 66, fase: 0.5, df: 13, title: 'Guacamaya bandera (Ara macao)' },
+  { tipo: 'tucan', base: [-3.0, 4.6, -1.0], patron: 'posa', size: 60, fase: 1.4, df: 9, title: 'Tucán pechiblanco (Ramphastos tucanus)' },
+  { tipo: 'perezoso', base: [3.4, 4.2, -0.4], patron: 'cuelga', size: 66, fase: 0.9, df: 9, title: 'Perezoso de tres dedos (Bradypus variegatus)' },
+  { tipo: 'mico', base: [5.6, 3.6, -1.4], patron: 'trepa', size: 54, fase: 2.2, df: 9, title: 'Mico maicero (Saimiri sciureus)' },
+  { tipo: 'iguana', base: [-5.2, 0.9, 3.0], patron: 'asolea', size: 58, fase: 0.3, df: 8.5, title: 'Iguana verde (Iguana iguana)' },
+  { tipo: 'morfo', base: [-1.8, 2.7, 3.0], patron: 'morfo', size: 40, fase: 0.6, df: 9, title: 'Morfo azul (Morpho peleides)' },
+];
+
 function Diorama({ tier, reducedMotion, foco }) {
   const perfil = perfilDeTier(tier);
 
@@ -268,6 +285,13 @@ function Diorama({ tier, reducedMotion, foco }) {
 
   const fauna = useMemo(
     () => (tier === 'alto' ? FAUNA_CACAOTAL : FAUNA_CACAOTAL.slice(0, 2)),
+    [tier],
+  );
+
+  /* La fauna emblemática del cálido: recortada por tier (alto todo el elenco;
+     medio deja lo insignia — guacamaya + tucán + perezoso). */
+  const faunaCalido = useMemo(
+    () => (tier === 'alto' ? FAUNA_CALIDO_CACAO : FAUNA_CALIDO_CACAO.slice(0, 3)),
     [tier],
   );
 
@@ -320,6 +344,10 @@ function Diorama({ tier, reducedMotion, foco }) {
 
       {/* LA VIDA que la sombra trae: mariposas y el escarabajo del mantillo */}
       {perfil.criaturas > 0 && <Fauna items={fauna} reducedMotion={reducedMotion} />}
+
+      {/* LA FAUNA EMBLEMÁTICA DEL CÁLIDO: guacamaya en vuelo, tucán posado,
+          perezoso colgado, mico en las ramas, iguana al sol y el morfo azul. */}
+      {perfil.criaturas > 0 && <FaunaCalido items={faunaCalido} reducedMotion={reducedMotion} />}
 
       {/* el anillo del paso didáctico (lo maneja el host) */}
       <FocoPaso foco={foco} reducedMotion={reducedMotion} />
