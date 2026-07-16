@@ -63,6 +63,10 @@ import {
   PatiosLugares,
   VecinosDelValle,
 } from './composicionValle3D.jsx';
+/* El ANCLAJE: la sombra de contacto bajo cada landmark (casa, lugares,
+   árboles, matas, vecinos) — sin ella los objetos flotan sobre la loma.
+   2 draw calls instanciados, textura radial pre-horneada, cero costo/frame. */
+import SombrasContacto from './SombrasContacto.jsx';
 import './rotulosValle3D.css';
 import {
   MUNDOS_VALLE,
@@ -1565,6 +1569,15 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
           los patios bajo cada lugar navegable (afordancia sin UI). */}
       <CasaCampesina alturaDe={alturaTerreno} perfil={perfil} nocturno={nocturno} />
       <SenderosValle alturaDe={alturaTerreno} perfil={perfil} />
+      {/* EL PESO DE LAS COSAS: la sombra de contacto que planta cada objeto
+          en su loma. Separa la profundidad sin mover nada — la casa, los
+          hitos y las matas dejan de flotar. De noche se atenúa, no se va. */}
+      <SombrasContacto
+        mundos={MUNDOS_DIR}
+        alturaDe={alturaTerreno}
+        nocturno={nocturno}
+        franja={clima}
+      />
       {!portada && (
         <PatiosLugares mundos={MUNDOS_DIR} alturaDe={alturaTerreno} nocturno={nocturno} />
       )}
