@@ -2,10 +2,10 @@
  * FaunaBosque — LA VIDA del Bosque Vivo. Un bosque sin bichos es un decorado.
  *
  * EL REGISTRO (decisión del operador, 2026-07): la fauna EMBLEMÁTICA del
- * bosque — oso, rana, colibrí, borugo, jaguar — va con los SVG rubber-hose
- * de `src/visual/creatures/` como billboards <Html>: son el estándar de
- * calidad de la casa (la danta emblemática queda TODO: no existe su SVG
- * todavía y NO se inventa en polígonos). La fauna AMBIENTAL de fondo —
+ * bosque — oso, rana, colibrí, borugo, jaguar, danta — va con los SVG
+ * rubber-hose de `src/visual/creatures/` como billboards <Html>: son el
+ * estándar de calidad de la casa (la danta ya tiene su SVG — Danta.jsx, la
+ * jardinera del bosque — y anda de día/atardecer con los vecinos). La fauna AMBIENTAL de fondo —
  * cóndor, venado en la niebla, bandada, quetzal fugaz, mariposas, abejas,
  * escarabajo, luciérnagas — sí es geometría mínima procedural (siluetas que
  * el fog completa). Hubo un intento de oso/rana procedurales: quedó jubilado
@@ -552,9 +552,8 @@ function QuetzalFugaz() {
    acompañan desde el frailejonar y el borde del monte). `franjas` = cuándo
    sale (null = siempre). `vida` = su repertorio de gestos (los que el bicho
    YA sabe hacer: props opt-in de su componente) y el compás de su reloj.
-   `paseo` = hasta dónde camina y vuelve (solo el oso).
-   TODO fauna emblemática pendiente: la DANTA (el operador la quiere; no
-   existe su SVG todavía — se crea aparte, no se inventa en polígonos). */
+   `paseo` = hasta dónde camina y vuelve (el oso y la danta, cada uno con su
+   rumbo y su compás — nunca en fila ni al unísono). */
 const VECINOS_BOSQUE = [
   {
     slug: 'oso-andino',
@@ -599,6 +598,28 @@ const VECINOS_BOSQUE = [
       momentos: {
         olfatea: { dur: 3600, props: { olfatea: true } },
         acurruca: { dur: 6000, props: { acurruca: true } },
+      },
+    },
+  },
+  {
+    /* LA DANTA — la jardinera del bosque, por fin en SVG de la casa. Mole
+       diurna y mansa: sale del arbolado del costado derecho y PASEA hacia el
+       claro con su andar pesado (rumbo y compás propios, nunca en fila con el
+       oso), husmea con la trompa en periscopio, reposa y otea. Al caer la
+       noche se retira monte adentro (franjas de día/atardecer). */
+    slug: 'danta',
+    pos: [3.0, 0.95, 2.1],
+    px: 66,
+    factor: 18,
+    franjas: ['manana', 'mediodia', 'tarde', 'atardecer'],
+    vida: {
+      primero: 'pasea',
+      descanso: [6000, 13000],
+      momentos: {
+        pasea: { dur: 10500, props: { pose: 'anda' }, paseo: [-2.0, 0, 1.1] },
+        husmea: { dur: 4200, props: { husmea: true } },
+        reposo: { dur: 5600, props: { pose: 'reposo' } },
+        mira: { dur: 3200, props: { pose: 'señala' } },
       },
     },
   },

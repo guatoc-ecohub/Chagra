@@ -1862,3 +1862,110 @@
   .ent-poder .ent-roseta,
   [data-creature='ent-frailejon'][data-poder='1'] .ent-roseta { transform: scale(1.06); }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DANTA (Tapirus pinchaque) — el 10º bicho: la JARDINERA DEL BOSQUE.
+   ───────────────────────────────────────────────────────────────────────────
+   El CARÁCTER de la MANSEDUMBRE MONUMENTAL: el tapir andino, la mole lanuda de
+   tierra fría que siembra el bosque al andar. Movimientos LENTOS y con PESO
+   (nada de vibrar ligero): respiración honda de mole, la TROMPA que ondula
+   idle y HUSMEA en periscopio (su reacción-firma), las orejas de borde blanco
+   que se enderezan. Aditivo sobre el KIT species-agnostic (no toca a ningún
+   otro bicho): la danta reescribe SU boil (hondo y manso) y suma la vida de la
+   trompa. Todo transform/opacity (GPU, gama baja). Gates RM + tier al final.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL HONDO — la danta NO vibra: respira con PESO de mole, más lento aún que
+   el oso (la masa asienta despacio). Reescribe SOLO el boil de la danta (misma
+   clase .rh-boil, mayor especificidad por el data-creature) con longhands para
+   no pisar el resto de props de animación. */
+[data-creature='danta'] .rh-boil {
+  animation-name: danta-boil;
+  animation-duration: 4.1s;
+  animation-timing-function: ease-in-out;
+}
+@keyframes danta-boil {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(0.45px) scale(1.016, 0.984); } /* respiración honda de mole */
+}
+
+/* LA TROMPA ONDULA — el idle permanente del tapir: el hocico-probóscide se
+   mece apenas, tanteando el aire sin prisa (pivote arriba, donde nace). */
+.danta-trompa {
+  animation: danta-trompa-ondula 3.3s ease-in-out infinite;
+}
+@keyframes danta-trompa-ondula {
+  0%, 100% { transform: rotate(-2.5deg) scaleY(1); }
+  50%      { transform: rotate(3deg) scaleY(1.03); }   /* tantea sin prisa */
+}
+
+/* OREJAS de borde blanco — atentas, se mecen apenas (permanente, manso). */
+.danta-orejas {
+  animation: danta-orejas 4.9s ease-in-out infinite;
+}
+@keyframes danta-orejas {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50%      { transform: translateY(-0.3px) scaleY(1.04); }  /* atentas y mansas */
+}
+
+/* HUSMEA — la reacción-firma: la TROMPA sube en PERISCOPIO y tantea a lado y
+   lado (algo huele a fruta o a visita) y las orejas se enderezan. Pisan el
+   idle por especificidad (dos atributos). */
+[data-creature='danta'][data-husmea='1'] .danta-trompa {
+  animation: danta-trompa-periscopio 1.15s ease-in-out infinite;
+}
+@keyframes danta-trompa-periscopio {
+  0%, 100% { transform: rotate(12deg) scaleY(0.9) translateY(-0.3px); }
+  50%      { transform: rotate(-16deg) scaleY(0.86) translateY(-0.5px); }  /* el periscopio curioso */
+}
+[data-creature='danta'][data-husmea='1'] .danta-orejas {
+  animation: danta-orejas-perk 0.95s ease-in-out infinite;
+}
+@keyframes danta-orejas-perk {
+  0%, 100% { transform: translateY(-0.3px) scaleY(1.05); }
+  50%      { transform: translateY(-0.9px) scaleY(1.13); }  /* alerta dulce */
+}
+/* y la cabeza se adelanta apenas (el interés de la mole, sin brusquedad) */
+[data-creature='danta'][data-husmea='1'] .danta-cabeza {
+  animation: danta-cabeza-interes 2.3s ease-in-out infinite;
+}
+@keyframes danta-cabeza-interes {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-0.5px) scale(1.02); }
+}
+
+/* HABLA (lip-sync): la trompa se alza CORTÉS para dejar ver la boca — sway
+   corto y elevado mientras dure el visema (V2..V4; V1 = boca en reposo). */
+[data-creature='danta'][data-visema='V2'] .danta-trompa,
+[data-creature='danta'][data-visema='V3'] .danta-trompa,
+[data-creature='danta'][data-visema='V4'] .danta-trompa {
+  animation: danta-trompa-habla 1.6s ease-in-out infinite;
+}
+@keyframes danta-trompa-habla {
+  0%, 100% { transform: rotate(7deg) scaleY(0.9); }
+  50%      { transform: rotate(11deg) scaleY(0.88); }   /* alzada, cede la palabra */
+}
+
+/* El estado husmea PISA el arrebato (antic/travieso): una mole que tantea el
+   aire con la trompa no da vueltas de campana. */
+[data-creature='danta'][data-husmea='1'] .rh-antic,
+[data-creature='danta'][data-husmea='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito de la danta lo reactivaría (misma
+   clase) → re-apagarlo aquí (mayor especificidad + orden posterior). La trompa
+   y las orejas continuas también se cortan; el estado reactivo (husmea) sigue
+   contando la verdad. */
+[data-tier='bajo'][data-creature='danta'] .rh-boil,
+[data-tier='bajo'][data-creature='danta'] .danta-trompa,
+[data-tier='bajo'][data-creature='danta'] .danta-orejas { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='danta'] .rh-boil,
+  .danta-trompa, .danta-orejas,
+  [data-creature='danta'][data-husmea='1'] .danta-trompa,
+  [data-creature='danta'][data-husmea='1'] .danta-orejas,
+  [data-creature='danta'][data-husmea='1'] .danta-cabeza,
+  [data-creature='danta'][data-visema='V2'] .danta-trompa,
+  [data-creature='danta'][data-visema='V3'] .danta-trompa,
+  [data-creature='danta'][data-visema='V4'] .danta-trompa { animation: none !important; }
+}
