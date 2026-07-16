@@ -69,21 +69,30 @@ import {
  * frailejonal viene por EDADES (tres bancos + el que florece) para que el
  * paisaje tenga gradiente de edad, no clones.
  */
+/*
+ * NOTA (rediseño 2026-07-16, dos-mundos): el frailejón es la firma del PÁRAMO
+ * (mundo aparte). Aquí, en el BOSQUE andino/subandino de biodiversidad, queda
+ * solo como un ACENTO raro del filo alto (la transición hacia el páramo de
+ * arriba) — el grueso de la variedad lo llevan los árboles nativos (yarumo,
+ * roble, encenillo, aliso, gaque) MÁS el dosel multiespecie (DoselBiodiverso:
+ * guadua, nogal, cedro, cámbulo, gualanday, siete cueros, helecho, heliconia,
+ * quiche). Por eso se subieron los árboles y se bajaron los frailejones.
+ */
 export const FLORA_TIER = {
   alto: {
-    frailejonJoven: 12, frailejon: 14, frailejonViejo: 7, frailejonFlor: 5,
-    yarumo: 3, roble: 3, encenillo: 4,
-    aliso: 3, gaque: 2, mortino: 10, romerillo: 12, roca: 9, musgo: 12, niebla: 3,
+    frailejonJoven: 4, frailejon: 4, frailejonViejo: 2, frailejonFlor: 2,
+    yarumo: 5, roble: 5, encenillo: 6,
+    aliso: 5, gaque: 4, mortino: 14, romerillo: 14, roca: 9, musgo: 12, niebla: 3,
   },
   medio: {
-    frailejonJoven: 7, frailejon: 8, frailejonViejo: 4, frailejonFlor: 3,
-    yarumo: 2, roble: 2, encenillo: 2,
-    aliso: 2, gaque: 1, mortino: 6, romerillo: 7, roca: 5, musgo: 6, niebla: 0,
+    frailejonJoven: 2, frailejon: 3, frailejonViejo: 1, frailejonFlor: 1,
+    yarumo: 3, roble: 3, encenillo: 3,
+    aliso: 3, gaque: 2, mortino: 8, romerillo: 8, roca: 5, musgo: 6, niebla: 0,
   },
   bajo: {
-    frailejonJoven: 3, frailejon: 4, frailejonViejo: 0, frailejonFlor: 0,
-    yarumo: 1, roble: 1, encenillo: 0,
-    aliso: 0, gaque: 0, mortino: 2, romerillo: 3, roca: 2, musgo: 3, niebla: 0,
+    frailejonJoven: 1, frailejon: 2, frailejonViejo: 0, frailejonFlor: 0,
+    yarumo: 2, roble: 2, encenillo: 1,
+    aliso: 1, gaque: 0, mortino: 3, romerillo: 3, roca: 2, musgo: 3, niebla: 0,
   },
 };
 
