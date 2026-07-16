@@ -61,14 +61,9 @@ describe('BackgroundSelector smoke', () => {
     render(<BackgroundSelector />);
     fireEvent.click(screen.getByText('Páramo frío').closest('button'));
     const dialog = screen.getByRole('dialog');
-    // La imagen principal de la vista ampliada tiene alt = opt.label
-    const previewImg = dialog.querySelector('img[alt="Colibrí tech"]');
-    expect(previewImg).toBeInTheDocument();
-    expect(/** @type {HTMLImageElement} */ (previewImg).src).toBeTruthy();
-    expect(/** @type {HTMLImageElement} */ (previewImg).src).not.toBe('');
-    // imagen COMPLETA, sin recorte: object-fit:contain (rediseño aprobado,
-    // reemplaza el borde eléctrico cónico que la tapaba — #1261).
-    expect(/** @type {HTMLElement} */ (previewImg).style.objectFit).toBe('contain');
+    const preview = dialog.querySelector('[role="img"][aria-label="Páramo frío"]');
+    expect(preview).toBeInTheDocument();
+    expect(/** @type {HTMLElement} */ (preview).style.background).toContain('gradient');
   });
 
   it('la vista ampliada dibuja el micelio en el borde (no el borde eléctrico viejo)', () => {
