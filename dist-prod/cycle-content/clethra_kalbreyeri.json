@@ -1,0 +1,82 @@
+{
+  "species_slug": "clethra_kalbreyeri",
+  "scientific_name": "Clethra kalbreyeri Britton",
+  "common_names": [
+    "Laurel de páramo (Clethra kalbreyeri)"
+  ],
+  "family": "Clethraceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Cápsulas maduras con semillas diminutas (>1000 semillas/g). Siembra superficial sobre sustrato turba + arena gruesa 1:1, humedad constante, germinación 30-60 días bajo malla 70%. Trasplante a bolsa 6-8 meses, plantación >18 meses. Crecimiento lento (~5-8 cm/año). Atractor abejas nativas, sírfidos y mariposas paramunas. Aplica Ley 1930/2018 en páramo delimitado."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 2900,
+      "optimo_min": 3000,
+      "optimo_max": 3600,
+      "max_absoluto": 3800
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 5,
+      "optimo_max": 13,
+      "max_tolerable": 18
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El laurel de páramo o manzano de páramo (Clethra kalbreyeri Britton, familia Clethraceae) es un árbol o arbusto arborescente del bosque altoandino y sub-páramo colombiano (2.900-3.800 msnm), pertenecientea la familia Clethraceae — pequeña familia (~75 especies, solo dos géneros Clethra y Purdiaea) con distribución disyunta neotropical-asiática-norteamericana, descrita por James Britton en honor al colector alemán Friedrich Carl Wilhelm Kalbreyer que colectó intensamente la flora colombiana 1879-1882 para Veitch Nurseries y Kew Gardens. Arbolito 4-10 m altura con tronco corto y ramificación desde baja, corteza pardo-rojiza fisurada longitudinalmente. Hojas alternas oblongo-elípticas (6-12 cm) coriáceas, margen aserrado distal, haz verde-oscuro lustroso con nervación impresa, envés verde-claro con pubescencia estrellada característica de Clethra. Inflorescencia en racimo terminal erecto (10-20 cm largo) con numerosas flores blancas pequeñas (5-7 mm) muy fragantes, 5 pétalos libres, 10 estambres con anteras dehiscencia por poros apicales — estructura floral conservada de la familia. Polinización entomófila por himenópteros (Bombus, abejas nativas Meliponini, abejas solitarias andinas Halictidae y Andrenidae), sírfidos y mariposas; recurso floral importante por la abundancia de flores fragantes en racimos prolongados. Fruto cápsula loculicida pequeña con numerosas semillas diminutas anemócoras. Distribución colombiana: presencia en cordilleras Central (Cauca, Huila, Tolima, Quindío) y Oriental (Cundinamarca, Boyacá, Santander) en franja altoandina y sub-páramo (2.900-3.800 msnm) — frecuente en bordes de bosque altoandino, claros y laderas con humedad sostenida, ausente o muy escaso en complejos paramunos secos como Berlín (Santander) o La Rusia (Boyacá). Servicio ecosistémico: nurse plant para regeneración de especies pioneras (Polylepis, Weinmannia, Drimys), recurso nectarífero para polinizadores andinos en temporada de floración, estructura forestal del ecotono altoandino-páramo. Amenazas moderadas: tala para leña y madera de carpintería rústica (madera blanca-rosada de grano fino, históricamente usada para cucharas y utensilios — origen del nombre \"cucharo\"), apertura de potreros, fragmentación. Protección legal: cuando crece dentro de páramo delimitado aplica Ley 1930/2018, en bosque altoandino aplica regulación CAR + Decreto 1076/2015 régimen forestal. Manejo agroecológico (restauración con autorización CAR): recolección de cápsulas maduras temporada seca, siembra superficial de semillas diminutas sobre sustrato turba + arena 1:1, vivero bajo malla 70%, plantación intercalada con Weinmannia tomentosa, Drimys granadensis, Vallea stipularis a densidades 400-700 ind/ha. Especie multiservicio: nurse plant + atractor polinizadores + madera blanda artesanal (uso restringido a podas de manejo en proyectos autorizados). Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015 Catálogo Plantas Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Ley 1930/2018.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "title": "ley-1930-2018-paramos",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.404Z"
+}

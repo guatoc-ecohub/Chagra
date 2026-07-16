@@ -1,0 +1,72 @@
+{
+  "species_slug": "solanum_lycopersicum_cerasiforme",
+  "scientific_name": "Solanum lycopersicum var. cerasiforme (Dunal) A.Gray",
+  "common_names": [
+    "Tomate cherry estándar"
+  ],
+  "family": "Solanaceae",
+  "category": "hortalizas_fruto_flor",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Crecimiento indeterminado; requiere tutorado (colgado) y podas frecuentes de chupones."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 1500,
+      "optimo_max": 2400,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 18,
+      "optimo_max": 26,
+      "max_tolerable": 32
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El tomate cherry estándar (Solanum lycopersicum L. var. cerasiforme cultivares Sweet 100, Sungold, Sweet Million) es una solanácea de fruto pequeño dulce ampliamente cultivada en invernaderos y huertas familiares colombianas para autoconsumo y mercados gourmet. Se cultiva en Sabana de Bogotá (Mosquera, Madrid, Cota), altiplano Boyacá, Antioquia y Cauca entre 1.500 y 2.800 msnm en zona térmica fría a templada bajo invernadero, o cálida a campo abierto. Ciclo 90-120 días a primera cosecha, productividad sostenida 6-9 meses en invernadero. Tutorado vertical obligatorio. Manejo agroecológico: poda axilas, deshoje semanal, fertilización con biol foliar y bocashi al fondo, control integrado de trozador (Bacillus thuringiensis), polilla del tomate Tuta absoluta (trichograma + neem) y mosca blanca (Trialeurodes) con trampas amarillas + jabón potásico. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- urtica_dioica — Ortiga (Urtica dioica L.)",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-sol-andina",
+      "title": "agrosavia-sol-andina",
+      "tier": "A",
+      "url": "https://www.agrosavia.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.366Z"
+}

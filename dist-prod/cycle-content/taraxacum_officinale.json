@@ -1,0 +1,90 @@
+{
+  "species_slug": "taraxacum_officinale",
+  "scientific_name": "Taraxacum officinale F.H.Wigg.",
+  "common_names": [
+    "Diente de leon"
+  ],
+  "family": "Asteraceae",
+  "category": "atractores_polinizadores",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "dynamic_accumulator"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Siembra directa; las semillas con vilano se dispersan por viento. Especie pionera que mejora la estructura del suelo con su raiz pivotante profunda."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 1500,
+      "optimo_max": 3200,
+      "max_absoluto": 3600
+    },
+    "temperatura_c": {
+      "helada_letal": -15,
+      "optimo_min": 8,
+      "optimo_max": 18,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El diente de león (Taraxacum officinale F.H.Wigg., familia Asteraceae) es una asterácea perenne herbácea originaria de Eurasia, naturalizada cosmopolita y abundante en huertos andinos colombianos, con roseta basal de hojas dentadas y capítulos florales amarillos sostenidos por escapos huecos sin hojas, seguidos de aquenios con vilano (pappus) dispersados por viento. Su raíz pivotante profunda (hasta 50-60 cm) y el látex blanco amargo (taraxaceno, taraxacina) son rasgos diagnósticos. Se encuentra en Cundinamarca (Sabana de Bogotá, Subachoque, Chía), Boyacá (Tunja, Villa de Leyva, Sutamarchán), Nariño (Pasto, Túquerres, Sandoná) y zonas de páramo bajo entre 1.500 y 3.200 msnm en zona térmica fría a páramo bajo. Ciclo perenne, floración continua durante todo el año en clima andino estable. Lección viva de acumulación dinámica: su raíz pivotante extrae potasio, calcio, hierro y oligoelementos de capas profundas del subsuelo (40-60 cm) inaccesibles para hortalizas de raíz somera (lechuga, espinaca, rábano), bombeando nutrientes hacia las hojas que al descomponerse enriquecen el horizonte A — clave en sistemas regenerativos. Sus flores son el primer alimento (néctar y polen) de abejas nativas (Bombus rohweri, Apis mellifera) al inicio de la temporada de lluvias andinas (marzo-abril, septiembre-octubre). Manejo agroecológico: bioindicador de compactación moderada y agotamiento de calcio del suelo, se tolera o cultiva intencionalmente en franjas marginales del huerto, hojas jóvenes son comestibles (ensaladas amargas) y medicinales (digestivo, hepatoprotector por amargos), no requiere control siempre que se cosechen flores antes de la dispersión del vilano. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, Bernal 2015 Catálogo Plantas Colombia, Pamplona-Roger 2006 Plantas Medicinales.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.371Z"
+}

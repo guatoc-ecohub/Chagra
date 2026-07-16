@@ -1,0 +1,88 @@
+{
+  "species_slug": "cariniana_estrellensis",
+  "scientific_name": "Cariniana estrellensis (Raddi) Kuntze",
+  "common_names": [
+    "Jequitibá"
+  ],
+  "family": "Lecythidaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "en_peligro",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nurse_plant",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla alada dentro de cápsula pyxidium leñosa con opérculo. Recolección de cápsulas caídas en estación de fructificación. Sin tratamiento pre-germinativo. Germinación 50-70% a 25-50 días en bandejas con sustrato orgánico. Trasplante a bolsa grande 3-5 L a las 12 semanas. Plantación definitiva a los 7-9 meses (40-60 cm). Crecimiento juvenil moderado 0.8-1.5 m/año. Productivo desde los 12-18 años.",
+    "tiempo_a_establecimiento_dias": 210,
+    "notas": "Madera durable amarillo-rosada de densidad media-alta (0.6-0.8 g/cm³), apreciada en construcción civil, mueblería fina, ebanistería y carpintería de calidad. Cápsula pyxidium leñosa similar a otras Lecythidaceae — usada artesanalmente. Distinta a Cariniana pyriformis (abarco) del Pacífico-Magdalena en distribución y características."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 800,
+      "max_absoluto": 1200
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 20,
+      "optimo_max": 28,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El jequitibá (Cariniana estrellensis (Raddi) Kuntze, familia Lecythidaceae) es un árbol perennifolio GIGANTE EMERGENTE de 30 hasta 50 m de altura con fuste recto cilíndrico, copa amplia y frutos en cápsula pyxidium leñoso característico de la familia, nativo del bosque semicaducifolio y bosque húmedo tropical neotropical desde el sur de Brasil (Mata Atlántica-Cerrado) hasta la Amazonía baja colombiana, en piso térmico CÁLIDO (<1.200 msnm). En Colombia se distribuye en la Amazonía baja (Amazonas, Caquetá bajo, Putumayo bajo) y piedemonte orinocense (Meta, Casanare, Vichada bordes de galería), distinto en distribución de su pariente Cariniana pyriformis (abarco) que es exclusivo del Pacífico-Magdalena. Pertenece a la familia Lecythidaceae —misma de la nuez de Brasil (Bertholletia excelsa), olla de mono (Lecythis), cumbre/cannonball tree (Couroupita guianensis)— una de las familias botánicas más espectaculares del Neotrópico por la morfología única de sus frutos en cápsulas pyxidiums leñosas con opérculo. Es UNO DE LOS ÁRBOLES MÁS GRANDES DEL BOSQUE BRASILEÑO Y SUDAMERICANO —con ejemplares documentados de hasta 50 m de altura y 3-4 m de diámetro en la Mata Atlántica brasileña, registrados como árboles patrimoniales centenarios— y forma parte del dosel emergente. Su nombre \"jequitibá\" proviene del tupí-guaraní brasileño \"yikitiba\" (árbol grande), y se ha extendido al castellano sudamericano. La madera color amarillo-rosado de densidad media-alta (0.6-0.8 g/cm³) es muy apreciada en construcción civil, mueblería fina, ebanistería y carpintería de calidad en Brasil, Argentina, Paraguay y Bolivia. Custodia: comunidades indígenas amazónicas colombianas (Tikuna, Bora, Uitoto, Murui-Muinane del trapecio amazónico y bajo Caquetá-Putumayo) y pueblos del piedemonte orinocense (Sikuani, Achagua en bordes de galería). Manejo agroecológico: vivero con semilla alada recolectada de cápsulas pyxidiums caídas, plantación 30-60 ind/ha en sistemas agroforestales amazónicos asociada a cacao silvestre amazónico, copoazú, caucho, palma chontaduro; cosecha maderable turno 40-60 años a diámetros >50 cm; restauración 80-150 ind/ha en mosaicos del bosque húmedo tropical bajo amazónico-orinocense asociada a Cedrela odorata, Aspidosperma polyneuron, Bertholletia excelsa (donde aplique), Cariniana micrantha. Lección viva sobre ÁRBOLES GIGANTES EMERGENTES (jequitibás centenarios como árboles patrimoniales del Neotrópico), LECYTHIDACEAE NEOTROPICALES (pyxidiums leñosos espectaculares), DIVERSIDAD DEL GÉNERO CARINIANA (16 especies neotropicales, con C. pyriformis del Pacífico-Magdalena, C. estrellensis amazónico-orinocense, C. micrantha amazónico, todas con maderas valiosas y conservación crítica), MATA ATLÁNTICA BRASILEÑA-AMAZONÍA COMO CONTINUO BIOGEOGRÁFICO y AGROFORESTERÍA INTERGENERACIONAL. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, UICN Red List, SINCHI Amazonía Colombiana, Libro Rojo de Plantas de Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "uicn-red-list",
+      "title": "uicn-red-list",
+      "tier": "A",
+      "url": "https://www.iucnredlist.org"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.401Z"
+}

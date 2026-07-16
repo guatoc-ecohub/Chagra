@@ -1,0 +1,67 @@
+{
+  "_note": "Fotos del mundo AROMÁTICAS Y CONDIMENTARIAS (la huerta de la cocina) — Wikimedia Commons, licencia abierta (CC0/PD/CC BY/CC BY-SA únicamente, ninguna NC/ND). Redimensionadas ~640px por la API de Commons (iiurlwidth). Cada foto fue verificada VISUALMENTE (planta correcta, viva, sin plaga ni herbario seco) y por licencia contra la API. Atribución embebida en AromaticasScreen (Créditos de las fotos) y aquí para auditoría. Los datos de cultivo de cada hierba están groundeados en public/catalog.sqlite (no en estas fotos).",
+  "cilantro": {
+    "file": "File:Koriander (Coriandrum sativum) Blätter-- Josef Schlaghecken.jpg",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Schlaghecken Josef",
+    "source": "https://commons.wikimedia.org/wiki/File:Koriander_(Coriandrum_sativum)_Bl%C3%A4tter--_Josef_Schlaghecken.jpg",
+    "term": "Coriandrum sativum plant leaves"
+  },
+  "cebollin": {
+    "file": "File:HK SYP Best of Best Vegetable Peking Welsh onion Allium Aug-2012.JPG",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Genmewcaugsa",
+    "source": "https://commons.wikimedia.org/wiki/File:HK_SYP_Best_of_Best_Vegetable_Peking_Welsh_onion_Allium_Aug-2012.JPG",
+    "term": "Allium fistulosum plant"
+  },
+  "oregano": {
+    "file": "File:P1000277 Origanum vulgare (Wild Marjoram) (Labiatae) Plant.JPG",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "artist": "Magnus Manske",
+    "source": "https://commons.wikimedia.org/wiki/File:P1000277_Origanum_vulgare_(Wild_Marjoram)_(Labiatae)_Plant.JPG",
+    "term": "Origanum vulgare garden plant"
+  },
+  "albahaca": {
+    "file": "File:Starr-090707-2398-Ocimum basilicum-leaves-Olinda-Maui (24969058135).jpg",
+    "license": "CC BY 3.0 US",
+    "license_url": "https://creativecommons.org/licenses/by/3.0/us/deed.en",
+    "artist": "Forest and Kim Starr",
+    "source": "https://commons.wikimedia.org/wiki/File:Starr-090707-2398-Ocimum_basilicum-leaves-Olinda-Maui_(24969058135).jpg",
+    "term": "Ocimum basilicum plant leaves"
+  },
+  "hierbabuena": {
+    "file": "File:Starr-080608-7435-Mentha spicata-leaves-Water plant Sand Island-Midway Atoll (41264499822).jpg",
+    "license": "CC BY 3.0 US",
+    "license_url": "https://creativecommons.org/licenses/by/3.0/us/deed.en",
+    "artist": "Forest and Kim Starr",
+    "source": "https://commons.wikimedia.org/wiki/File:Starr-080608-7435-Mentha_spicata-leaves-Water_plant_Sand_Island-Midway_Atoll_(41264499822).jpg",
+    "term": "Mentha spicata plant leaves"
+  },
+  "poleo": {
+    "file": "File:Mentha Pulegium 11.jpg",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "artist": "EmirDzaferovic",
+    "source": "https://commons.wikimedia.org/wiki/File:Mentha_Pulegium_11.jpg",
+    "term": "Mentha pulegium plant"
+  },
+  "laurel": {
+    "file": "File:Starr-120305-3522-Laurus nobilis-leaves-Park Building 11 HNP-Maui (24506716444).jpg",
+    "license": "CC BY 3.0 US",
+    "license_url": "https://creativecommons.org/licenses/by/3.0/us/deed.en",
+    "artist": "Forest and Kim Starr",
+    "source": "https://commons.wikimedia.org/wiki/File:Starr-120305-3522-Laurus_nobilis-leaves-Park_Building_11_HNP-Maui_(24506716444).jpg",
+    "term": "Laurus nobilis leaves plant"
+  },
+  "tomillo": {
+    "file": "File:Thymus vulgaris Paludi 01.jpg",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Syrio",
+    "source": "https://commons.wikimedia.org/wiki/File:Thymus_vulgaris_Paludi_01.jpg",
+    "term": "Thymus vulgaris plant"
+  }
+}

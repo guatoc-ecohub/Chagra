@@ -1,0 +1,82 @@
+{
+  "species_slug": "solanum_tuberosum_pastusa_suprema",
+  "scientific_name": "Solanum tuberosum L. subsp. tuberosum cv. 'Pastusa Suprema'",
+  "common_names": [
+    "Papa Pastusa Suprema"
+  ],
+  "family": "Solanaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "tuberculo (semilla asexual)",
+    "notas": "Variedad industrial moderna liberada por ICA-CORPOICA en 1996. Ciclo 5-6 meses. Alta productividad pero alta dependencia de insumos sintéticos y muy susceptible a Phytophthora infestans. Requiere semilla certificada cada 2-3 ciclos para mantener vigor. Resiembra con tubérculo entero o cortado con yemas, distancia 30 cm x 90 cm."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2200,
+      "optimo_min": 2500,
+      "optimo_max": 3000,
+      "max_absoluto": 3300
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 10,
+      "optimo_max": 17,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La papa Pastusa Suprema (Solanum tuberosum L. subsp. tuberosum cv. 'Pastusa Suprema') es la variedad comercial dominante en Colombia desde su liberación oficial por ICA-CORPOICA en 1996, surgida de un cruzamiento dirigido para combinar la calidad culinaria de la pastusa tradicional con mayor rendimiento agronómico. Se cultiva intensivamente en Nariño (Túquerres, Pupiales, Guachucal, Ipiales), Cundinamarca (Subachoque, Zipaquirá, Carmen de Carupa, Une), Boyacá (Ventaquemada, Toca, Soracá) y zona norte de Antioquia (La Unión, Sonsón) entre 2.500 y 3.000 msnm. Rendimientos comerciales 30-45 t/ha bajo manejo convencional, tubérculos grandes (150-250 g) oblongos de piel rosa-crema y carne crema con bajo contenido de azúcares reductores: ideal para fritura industrial (papas a la francesa) y mercados de plaza. Es una lección crítica sobre el modelo agroindustrial: aunque productiva, la pastusa suprema es extremadamente susceptible a Phytophthora infestans (tizón tardío) y polilla guatemalteca (Tecia solanivora), lo que ata su cultivo a 8-14 aplicaciones de fungicida/insecticida sintético por ciclo, costo que estrangula al pequeño productor y deja residuos en suelo, agua y tubérculo. En contraste con las nativas Andigenum (carrera negra, criolla, sabanera), depende totalmente de semilla certificada renovada cada 2-3 ciclos por degeneración viral (PVY, PLRV). Manejo agroecológico de transición: rotación obligatoria con haba o arveja para fijar nitrógeno, aplicación de compost o bocashi al surco, biopreparados como caldo bordelés preventivo (no curativo) y trichoderma, monitoreo semanal de adultos de polilla con feromonas, asociación con tagetes para repelencia. La pastusa suprema enseña por contraste el costo real de la dependencia a paquetes tecnológicos y por qué la conservación in situ de variedades nativas es seguro alimentario. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, Núñez-Rodríguez 2024 UNAL, Pérez-Rodríguez-Gómez 2008, ICA Resolución 3168/2015, GBIF Backbone, POWO Kew.",
+  "feeding_plan_markdown": "### Plan de alimentación\n\nFuente: Agrosavia — Manual tubérculos andinos (2017) + Pérez-Rodríguez-Gómez (2008) Plan fertilización papa criolla altiplano. Papa pastusa ciclo 5-6 meses clima frío 2000-3000 msnm.\n\n- D+0: Aplicar bocashi al surco · bocashi · 250 g — Surco preparado 0-20 cm. Tubérculos-semilla pre-brotados con yemas activas. Suelo bien drenado.\n- D+25: Inocular Trichoderma harzianum al sustrato · trichoderma_harzianum_suelo · 15 g — Preventivo Rhizoctonia solani y Spongospora subterranea — patógenos críticos en papa altiplano.\n- D+45: Aporque + drench con humus líquido · humus_liquido · 200 ml — Dilución 1:5. Aporque obligatorio para tuberización. Aporte de NPK orgánico antes de bulbificación.\n- D+60: Foliar con biol fase pre-tuberización · biol · 150 ml — Dilución 1:7. Etapa crítica — papa define número de tubérculos en los 10-20 días pre-tuberización.\n- D+80: Foliar con caldo bordelés preventivo gota · caldo_bordeles · 100 ml — Concentración 1%. Preventivo Phytophthora infestans (gota o tizón) — enemigo principal de la papa. Cada 14 días en lluvia activa.\n- D+100: Foliar con supermagro durante llenado · supermagro · 60 ml — Dilución 1:15. K crítico para llenado de tubérculo y materia seca final.\n- D+130: Suspender riego para maduración piel · biofertilizante no especificado · dosis no especificada — Reducir riego 80% últimas 3 semanas. Maduración piel = mejor conservación post-cosecha. Cosecha 150-180 días.",
+  "sources": [
+    {
+      "id": "agrosavia-manual-tuberculos-andinos-2017",
+      "title": "agrosavia-manual-tuberculos-andinos-2017",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "nustez-rodriguez-2024-unal",
+      "title": "nustez-rodriguez-2024-unal",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-rodriguez-gomez-2008",
+      "title": "perez-rodriguez-gomez-2008",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.381Z"
+}

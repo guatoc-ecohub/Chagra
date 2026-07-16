@@ -1,0 +1,81 @@
+{
+  "species_slug": "piper_bogotense",
+  "scientific_name": "Piper bogotense C.DC.",
+  "common_names": [
+    "Cordoncillo de Bogotá"
+  ],
+  "family": "Piperaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "endemica_colombia",
+  "thermal_zones": [
+    "frio",
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "pest_repellent",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2200,
+      "optimo_max": 3000,
+      "max_absoluto": 3300
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El cordoncillo de Bogotá (Piper bogotense C.DC., Piperaceae) es un arbusto o arbolito andino endémico de Colombia (1-4 m altura), propio del sotobosque del bosque alto-andino y bordes de páramo entre 2.200 y 3.000 msnm, con distribución concentrada en la cordillera Oriental: Cundinamarca (cerros orientales de Bogotá, Cruz Verde, Sumapaz, Verjón, Chingaza, Guasca), Boyacá (Iguaque, Arcabuco, Chiquinquirá), Santander (Berlín, Almorzadero) y norte de Tolima. Hojas elípticas-lanceoladas de 8-15 cm con punto pellúcido aromático característico (aceites esenciales con safrol, miristicina, eugenol), espigas erectas blanco-amarillentas características del género Piper. Su carácter endémico colombiano lo convierte en pieza clave de soberanía botánica y patrimonio biológico nacional. Es lección viva sobre el sotobosque andino que enseña a niñas y niños por qué los bosques nativos son irreemplazables: el cordoncillo solo existe aquí, ningún país más en el mundo lo tiene, y depende del microclima húmedo, sombreado y mantillado del bosque alto-andino que solo las especies nativas pueden generar. Uso tradicional medicinal por comunidades campesinas de Cundinamarca-Boyacá: hojas en cataplasma para inflamaciones, infusión digestiva carminativa (uso validado farmacognosticamente por JBB e ICTA-UNAL); también usado como repelente natural de insectos en huertos (frotando hojas sobre tutores). Manejo agroecológico: propagación por esqueje semileñoso (90% prendimiento bajo cámara húmeda con hojas reducidas a 1/3) o semilla recolectada de espigas maduras (vivero 4-6 meses), trasplante en lluvias bajo sombra parcial, distancia 1.5-2 m, función ecológica como sotobosque enriquecedor en planes de restauración Cruz Verde-Sumapaz y como repelente vivo en linderos de huertas frío-paramunas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "restauracion-cruz-verde-sumapaz",
+      "title": "restauracion-cruz-verde-sumapaz",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.380Z"
+}

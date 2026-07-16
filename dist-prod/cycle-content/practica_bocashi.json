@@ -1,0 +1,77 @@
+{
+  "_doc_type": "practica_agroecologica",
+  "_generated_by": "feat/rag-corpus-practicas (manual curation)",
+  "_generated_at": "2026-06-23T00:00:00.000Z",
+  "species_slug": "practica_bocashi",
+  "scientific_name": null,
+  "common_names": ["Bocashi", "Abono fermentado tipo bocashi"],
+  "family": null,
+  "category": "practica_agroecologica",
+  "cultivable": false,
+  "conservation_status": "practica_validada",
+  "thermal_zones": ["calido", "templado", "frio"],
+  "roles_in_guild": ["fertilizante_organico"],
+  "valor_pedagogico": "El bocashi es un abono orgánico sólido obtenido por fermentación aeróbica rápida de materiales orgánicos, desarrollado originalmente en Japón y adaptado a la agroecología latinoamericana. Jairo Restrepo Rivera lo describe en 'Abonos Orgánicos Fermentados' (CEDECO, 2001) como una de las herramientas centrales de la agricultura orgánica tropical. En Colombia es recomendado por AGROSAVIA como enmienda de suelos en sistemas de producción sostenible (Cartilla AGROSAVIA 'Abonos Orgánicos', 2019). El proceso demora entre 15 y 25 días a temperatura ambiente (25-35 °C). Ingredientes básicos por tonelada (según Restrepo Rivera, 2001): 800 kg de cascarilla de arroz o material de relleno seco, 400 kg de gallinaza o estiércol bovino maduro, 400 kg de tierra negra de bosque o tierra con microbios activos, 80 kg de cal dolomítica o cal agrícola (pH buffer), 40 kg de carbón vegetal triturado, 40 kg de ceniza de madera, 10 kg de melaza de caña, 10 kg de levadura de panadería, agua suficiente para llevar la humedad al 40-50 % (prueba del puño: al apretarlo no debe gotear). El proceso consiste en mezclar todos los ingredientes en capas sobre una superficie limpia, incorporar la mezcla de melaza-levadura-agua uniformemente, formar un montículo de 60-80 cm de altura, cubrir con costal de fique o plástico oscuro para retener calor, voltear cada 24 horas los primeros 5 días y luego cada 48 horas, controlar la temperatura interna entre 45 y 60 °C (máximo tolerable 65 °C para no matar los microorganismos benéficos). El bocashi está listo cuando la temperatura desciende a temperatura ambiente, el olor es similar a tierra de bosque o fermentación suave, y el color es oscuro homogéneo. Dosis de aplicación: entre 1 y 2 kg por metro cuadrado incorporado al suelo o en el hoyo de siembra. Para hortalizas intensivas hasta 4 kg/m². Según Restrepo (2001) y fichas AGROSAVIA, el bocashi mejora la estructura del suelo, aporta N-P-K en forma orgánica de liberación lenta, introduce microbiota benéfica y aumenta la capacidad de retención de humedad. Uso predial libre sin registro ICA (Resolución ICA 698/2011 artículo 3: los abonos orgánicos de producción predial no requieren registro para uso propio). Se puede usar en todos los cultivos. No tiene restricciones en certificación orgánica.",
+  "milestones": [
+    {
+      "dia": 1,
+      "label": "Mezcla inicial",
+      "description": "Combinar todos los ingredientes en capas, incorporar solución melaza-levadura-agua, formar montículo de 60-80 cm de altura. Humedad objetivo 40-50 %."
+    },
+    {
+      "dia": 2,
+      "label": "Primer volteo",
+      "description": "Temperatura interna debe estar entre 45 y 60 °C. Si supera 65 °C, voltear inmediatamente para evitar muerte de microorganismos."
+    },
+    {
+      "dia": 5,
+      "label": "Cambio de frecuencia de volteo",
+      "description": "Desde el día 5 voltear cada 48 horas. La temperatura empieza a estabilizarse."
+    },
+    {
+      "dia": 15,
+      "label": "Verificación de madurez",
+      "description": "Bocashi maduro: temperatura ambiente, olor a tierra de bosque, color oscuro uniforme. Si aún está caliente, continuar volteos hasta 25 días."
+    }
+  ],
+  "failure_modes": [
+    {
+      "mode": "Olor putrefacto o muy amoniacal",
+      "solucion": "Exceso de humedad o material demasiado nitrogenado. Agregar cascarilla seca y voltear con más frecuencia."
+    },
+    {
+      "mode": "No sube la temperatura",
+      "solucion": "Falta de microorganismos activos (levadura vieja) o humedad insuficiente. Revisar humedad (prueba del puño) y agregar levadura fresca disuelta en melaza."
+    },
+    {
+      "mode": "Temperatura supera 70 °C",
+      "solucion": "Voltear inmediatamente y extender el montículo para disipar calor. Temperatura alta mata hongos benéficos."
+    }
+  ],
+  "leccion_agroecologica": "El bocashi convierte residuos de finca en enmienda microbiana activa en menos de 25 días, cerrando el ciclo de nutrientes sin dependencia de insumos externos. Es el pilar de la fertilidad en chagras diversas y sistemas de transición agroecológica colombianos.",
+  "advertencia_toxicologica": null,
+  "fuente_principal": "Restrepo Rivera, J. (2001). Abonos Orgánicos Fermentados. CEDECO, San José de Costa Rica. / AGROSAVIA (2019). Abonos Orgánicos. Cartilla Divulgativa. Bogotá.",
+  "validation_level": "field_tested",
+  "ica_registro_requerido": false,
+  "uso_predial_libre": true,
+  "sources": [
+    {
+      "id": "restrepo-abonos-organicos-2001",
+      "title": "Restrepo Rivera, J. (2001). Abonos Orgánicos Fermentados. CEDECO.",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-abonos-organicos-2019",
+      "title": "AGROSAVIA (2019). Abonos Orgánicos. Cartilla Divulgativa.",
+      "tier": "A",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "ica-res-698-2011",
+      "title": "ICA Resolución 698 de 2011 — Registro de bioinsumos",
+      "tier": "A",
+      "url": null
+    }
+  ]
+}

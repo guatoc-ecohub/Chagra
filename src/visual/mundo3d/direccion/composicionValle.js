@@ -205,14 +205,6 @@ export const VECINOS_VALLE = [
     franjas: null,
   },
   {
-    slug: 'borugo',
-    punto: [-6.4, 0.4], // el matorral del borde izquierdo, a media ladera
-    px: 34,
-    factor: 8.5,
-    dy: 0.25,
-    franjas: ['atardecer', 'dorada', 'noche', 'amanecer'], // crepuscular real
-  },
-  {
     slug: 'jaguar',
     punto: [-5.8, -4.6], // el filo del páramo, lejos, del lado de la veleta: el místico
     px: 40,

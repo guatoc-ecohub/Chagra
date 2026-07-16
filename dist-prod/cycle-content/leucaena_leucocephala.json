@@ -1,0 +1,76 @@
+{
+  "species_slug": "leucaena_leucocephala",
+  "scientific_name": "Leucaena leucocephala (Lam.) de Wit",
+  "common_names": [
+    "Leucaena"
+  ],
+  "family": "Fabaceae",
+  "category": "cercas_vivas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "nitrogen_fixer",
+    "living_fence",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1200,
+      "max_absoluto": 1800
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "La leucaena (Leucaena leucocephala (Lam.) de Wit, Fabaceae-Mimosoideae) es un árbol leguminoso de origen mesoamericano (México-Centroamérica) ampliamente naturalizado en el trópico colombiano (0-1.200 msnm), cultivado en Tolima, Huila, Cesar, Magdalena, Córdoba, Valle del Cauca, Cauca, Antioquia, Casanare y Meta como componente protagónico de sistemas silvopastoriles intensivos (SSPi) diseñados y validados por CIPAV-AGROSAVIA con bovinos cebú-mestizos. Árbol o arbolito de 4-10 m (raramente hasta 15 m), copa abierta, fuste recto, corteza gris-pardusca con lenticelas, hojas bipinnadas alternas (4-9 pares de pinnas, cada pinna con 11-22 pares de folíolos), inflorescencias en cabezuelas globosas blanco-cremas (1.5-2 cm) muy mielíferas, frutos en legumbres lineares aplanadas (10-20 cm) que viran de verde a marrón al madurar, semillas oblongas brillantes pardas. Fija nitrógeno biológico atmosférico (~200-500 kg N/ha/año en SSPi de alta densidad) por simbiosis con Rhizobium específicos del género Mesorhizobium. Forrajera proteínica de primer orden: hojas frescas con 22-30% proteína cruda, alta digestibilidad, palatable a bovinos, ovinos, caprinos y conejos (manejar mimosina <8% en dieta total para evitar caída de pelo en monogástricos; rumiantes adaptados con cepa Synergistes jonesii la degradan). Manejo agroecológico: propagación por semilla escarificada (agua caliente 80°C/3 min o ácido sulfúrico 5 min, germinación 70-90% en 5-10 días), siembra directa o vivero, distancia 0.5-1 m en franjas a 1.5-2 m entre franjas para SSPi (densidad 5.000-10.000 plantas/ha), poda de igualación a 1 m altura cada 60-90 días en lluvias, ramoneo directo de bovinos o corte-acarreo. Banco forrajero proteico complementa pastos megatérmicos (Cynodon, Megathyrsus, Urochloa). Otros usos: cerca viva, sombra ligera, leña, postes durables. Lección viva de soberanía proteica ganadera y carbono-neutralidad: una hectárea de SSPi con leucaena puede producir 20-30 ton MS forrajera/año fijando N propio, secuestrando 4-7 t CO2/ha/año y reduciendo emisiones entéricas de metano por mejor balance nutricional, mostrando a productores y estudiantes que la ganadería sostenible NO es oxímoron sino diseño agroforestal. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Silvopastoriles, AGROSAVIA Forrajeras 2022, IAvH Flora, Pérez Arbeláez 1947.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.387Z"
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "slug": "polinizacion-cultivo",
+    "file": "polinizacion-cultivo.jpg",
+    "commonsTitle": "Apis mellifera on Prunus flower.jpg",
+    "autor": "Anita Martinz",
+    "licencia": "CC BY 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Apis_mellifera_on_Prunus_flower.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "angelita",
+    "file": "angelita.jpg",
+    "commonsTitle": "Tetragonisca angustula (Jataí) (51680100828).jpg",
+    "autor": "Carlos Eduardo Joos",
+    "licencia": "CC BY 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Tetragonisca_angustula_(Jata%C3%AD)_(51680100828).jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "meliponario-entrada",
+    "file": "meliponario-entrada.jpg",
+    "commonsTitle": "Tetragonisca angustula nest entrance.jpg",
+    "autor": "Sintropepe",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Tetragonisca_angustula_nest_entrance.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "abeja-de-miel",
+    "file": "abeja-de-miel.jpg",
+    "commonsTitle": "Apis mellifera - Brassica napus - Valingu.jpg",
+    "autor": "Ivar Leidus",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Apis_mellifera_-_Brassica_napus_-_Valingu.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "flores-polinizador",
+    "file": "flores-polinizador.jpg",
+    "commonsTitle": "Cornflowers (Centaurea cyanus) with pollinating Bumblebee.jpg",
+    "autor": "David Wright",
+    "licencia": "CC BY 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Cornflowers_(Centaurea_cyanus)_with_pollinating_Bumblebee.jpg",
+    "fuente": "Wikimedia Commons"
+  }
+]

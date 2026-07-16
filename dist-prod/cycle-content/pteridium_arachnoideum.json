@@ -1,0 +1,90 @@
+{
+  "species_slug": "pteridium_arachnoideum",
+  "scientific_name": "Pteridium arachnoideum (Kaulf.) Maxon",
+  "common_names": [
+    "Helecho marranero amazónico"
+  ],
+  "family": "Dennstaedtiaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "ground_cover",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "rizoma",
+      "espora"
+    ],
+    "best_method": "rizoma",
+    "protocol_resumen": "Reproducción NATURAL en campo por rizomas profundos y esporas — NO se recomienda propagación intencional por agricultor (tendencia ruderal agresiva). Estudio in situ exclusivamente. Documentación etnobotánica de manejo tradicional Tikuna-Cocama-Uitoto en Amazonas.",
+    "tiempo_a_establecimiento_dias": 180,
+    "notas": "DISTINTA DE Pteridium aquilinum (helecho marranero cosmopolita ya en catálogo): P. arachnoideum es el helecho marranero amazónico-andino-suramericano nativo (anteriormente considerado subespecie de aquilinum pero hoy aceptado como especie aparte por POWO/GBIF 2015+), con hojas más anchas y rizoma más superficial. Igual que aquilinum es CARCINÓGENO por ptaquilosida — NO consumir helecho crudo ni cocido prolongadamente, no usar en forrajes bovinos (causa hematuria enzoótica bovina BEH-leukemia bovina).",
+    "fuente": "POWO Kew; SiB Colombia; flora-colombia-pteridophyta; Sinchi Amazonia"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 100,
+      "optimo_min": 500,
+      "optimo_max": 2000,
+      "max_absoluto": 2600
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 16,
+      "optimo_max": 26,
+      "max_tolerable": 32
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El helecho marranero amazónico o amambay (Pteridium arachnoideum (Kaulf.) Maxon, Dennstaedtiaceae, anteriormente considerado subespecie Pteridium aquilinum var. arachnoideum pero hoy aceptado como ESPECIE APARTE por POWO 2015+ y GBIF Backbone Taxonomy tras revisiones moleculares y morfológicas) es un helecho terrestre rizomatoso perenne NATIVO suramericano de distribución amplia desde Centroamérica hasta Argentina-Paraguay-Uruguay incluyendo gran parte del trópico amazónico-andino colombiano, silvestre y a veces ruderal en Colombia entre 500 y 2.000 msnm en zonas térmicas cálidas-templadas-moderadas tropicales: Amazonas colombiano (Leticia, Puerto Nariño, La Pedrera, Tarapacá, Mirití-Paraná — patrimonio biocultural Tikuna-Cocama-Uitoto-Yagua-Bora), Caquetá (Florencia, Belén, San Vicente del Caguán, El Doncello, La Montañita, Solano — patrimonio amazónico colono y indígena), Putumayo (Mocoa, Puerto Asís, Villagarzón, Orito, La Hormiga, Valle del Guamuez — patrimonio Inga-Kamentsá-Cofán piedemonte amazónico), Vaupés (Mitú, Carurú — patrimonio Cubeo-Tucano), Guaviare (San José del Guaviare, Calamar, El Retorno, Miraflores), Vichada (Cumaribo, Puerto Carreño parte sur), Meta (Mapiripán, San José del Guaviare borde, La Macarena, Mesetas, Vistahermosa), Casanare baja, Arauca baja, piedemonte llanero, Magdalena Medio rural, partes del Pacífico colombiano (Chocó alto piedemonte selva, Buenaventura selva, Tumaco selva, Guapi-Timbiquí-López de Micay), zonas montañosas templadas-cálidas. DIFERENCIACIÓN CRÍTICA con Pteridium aquilinum L. Kuhn (helecho marranero cosmopolita ya presente en catálogo): P. arachnoideum es ESPECIE APARTE recientemente reconocida del complejo arachnoideum-aquilinum-caudatum-esculentum suramericano, hojas más anchas (segmentos pinnados-pinnatífidos más amplios y obtusos que aquilinum), rizoma más superficial, distribución más estrictamente suramericana neotropical y mayor sensibilidad a heladas. Comparte con aquilinum la condición de PLANTA POTENCIALMENTE CARCINÓGENA por contenido de ptaquilósido (norsesquiterpeno glicósido — carcinógeno documentado en literatura agrícola internacional desde 1980, asociado a cáncer gástrico humano en regiones donde se consume el helecho — Japón fiddleheads, Brasil hematuria enzoótica bovina BEH, Colombia Boyacá-Cundinamarca-Putumayo casos sospechosos en bovinos pastoreando praderas con helecho dominante), por tanto NO RECOMENDABLE PARA CONSUMO HUMANO NI ANIMAL en forrajes bovinos-equinos-ovinos por riesgo de hematuria enzoótica bovina-leucemia bovina enzoótica BEH-BL. Helecho terrestre rizomatoso perenne robusto de 0.5-1.5 m altura con rizomas subterráneos largos rastreros (1-5 m longitud horizontal) con tomento marrón-rojizo aracnoide característico (de ahí el epíteto 'arachnoideum'), hojas (frondas) tripinnado-pinnatífidas grandes triangulares-deltoides (60-150 cm largo x 30-90 cm ancho) verde-claras coriáceas con pelos arancnoides pubescentes en envés, soros marginales (esporas) continuos a lo largo del margen del pinnula bajo indusio falso-marginal, esporas amarillo-marrones dispersables por viento a larga distancia (anemocoria). Uso etnobotánico tradicional ancestral indígena amazónico documentado (Tikuna-Cocama-Uitoto-Yagua-Bora-Inga-Kamentsá-Cofán): rizoma cocido como antihelmíntico tradicional (purga de parásitos intestinales — uso muy controlado), cataplasma de fronda cocida en quemaduras leves, cobertura del piso de malocas-ranchos como aislante térmico-acústico y repelente de insectos por la pubescencia foliar, paja-techos temporales en construcción tradicional indígena, alimento ceremonial muy restringido (cabezas inmaduras 'fiddleheads' cocidas en aguas múltiples — NO recomendado actualmente por carcinogenicidad demostrada de ptaquilósido). Patrón biológico relevante para chagra agroecológica andina-amazónica: especie indicadora de suelos ácidos perturbados degradados con baja fertilidad y baja humedad superficial (la presencia abundante de Pteridium spp señala suelos compactados degradados o praderas sobrepastoreadas en proceso de invasión por helecho — recuperación posible mediante encalado moderado, materia orgánica y rotación de pastos), planta colonizadora pionera tras fuego (rebrote vigoroso desde rizomas profundos), competidora agresiva en praderas con helechos dominantes que requiere manejo por alelopatía rizoma. Manejo NO se recomienda propagación intencional — manejo en campo solo como documentación etnobotánica in situ. Función en chagra/huerto amazónico-piedemonte llanero como referencia etnobotánica indígena ancestral con uso muy restringido controlado, indicador biológico de suelos degradados que requieren recuperación, no recomendado para consumo humano-animal por carcinogenicidad documentada. Fuentes Tier A: GBIF, POWO Kew, SiB Colombia, Flora Colombia Pteridophyta, GBIF Colombia, Bernal 2015 Catálogo Plantas Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "flora-colombia-pteridophyta",
+      "title": "flora-colombia-pteridophyta",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.397Z"
+}

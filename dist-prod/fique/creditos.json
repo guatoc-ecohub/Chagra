@@ -1,0 +1,44 @@
+[
+  {
+    "slug": "planta",
+    "file": "planta.jpg",
+    "commonsTitle": "File:Furcraea andina (9172593946).jpg",
+    "autor": "Dick Culbert",
+    "licencia": "CC BY 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Furcraea_andina_(9172593946).jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "cabuya",
+    "file": "cabuya.jpg",
+    "commonsTitle": "File:Fique - Cabuya (Furcraea cabuya) - Flickr - Alejandro Bayer.jpg",
+    "autor": "Alejandro Bayer Tamayo",
+    "licencia": "CC BY-SA 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Fique_-_Cabuya_(Furcraea_cabuya)_-_Flickr_-_Alejandro_Bayer.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "fibra",
+    "file": "fibra.jpg",
+    "commonsTitle": "File:SisalFarmDrying.jpg",
+    "autor": "WRI Staff",
+    "licencia": "CC BY 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:SisalFarmDrying.jpg",
+    "fuente": "Wikimedia Commons",
+    "aproximada": true,
+    "nota": "Fibra de agave (sisal) secandose al sol; ilustra la fibra vegetal en bruto. La cabuya de fique se beneficia y seca igual, con el mismo aspecto blanco-crema. Sin foto CC de fibra de fique en bruto disponible en Commons."
+  },
+  {
+    "slug": "artesania",
+    "file": "artesania.jpg",
+    "commonsTitle": "File:Weaving fique fibre for bags.jpg",
+    "autor": "Bioversity International",
+    "licencia": "CC BY 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Weaving_fique_fibre_for_bags.jpg",
+    "fuente": "Wikimedia Commons"
+  }
+]

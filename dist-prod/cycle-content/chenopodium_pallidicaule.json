@@ -1,0 +1,82 @@
+{
+  "species_slug": "chenopodium_pallidicaule",
+  "scientific_name": "Chenopodium pallidicaule Aellen",
+  "common_names": [
+    "Kañiwa"
+  ],
+  "family": "Amaranthaceae",
+  "category": "cereales",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "frio",
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Pseudocereal sagrado del altiplano puneño-boliviano, sembrado entre 3.500 y 4.200 msnm donde ningún otro grano prospera. Ciclo corto a medio (4-6 meses), tolera heladas hasta -8°C, granizo, sequía y suelos salinos del altiplano. Reintroducido en Nariño (Cumbal, Túquerres) y Boyacá (páramo de Rabanal, Pisba) en proyectos de rescate andino. Semilla muy menuda (1 mm). Siembra al voleo poco enterrada (0.5-1 cm). Cosecha por arranque manual de la planta entera y trilla por golpeo."
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 3000,
+      "optimo_min": 3500,
+      "optimo_max": 4200,
+      "max_absoluto": 4500
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 5,
+      "optimo_max": 14,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La kañiwa (Chenopodium pallidicaule Aellen, Amaranthaceae) es el pseudocereal más altitudinal del mundo y uno de los 'granos sagrados' del altiplano andino, cultivado entre 3.500 y 4.200 msnm en el altiplano peruano-boliviano (departamentos de Puno, La Paz, Oruro, Potosí) y reintroducido en zonas altoandinas de Nariño (Cumbal, Túquerres, páramo del Galeras) y Boyacá (páramo de Rabanal, Pisba) en proyectos de rescate de granos andinos. Es pariente cercano de la quinua (Chenopodium quinoa) pero más rústico, más pequeño (planta erecta de 30-70 cm vs. 1.5-2 m de la quinua), más resistente a heladas (-8°C vs. -4°C de la quinua), libre de saponinas (no requiere lavado pre-cocción a diferencia de la quinua), y de ciclo más corto (4-6 meses vs. 6-8 meses). Semilla menudita (1 mm) marrón oscuro a negruzca, con perfil nutricional excepcional: proteína 14-19% con aminoácidos esenciales completos (incluida lisina), alto contenido de hierro, calcio, magnesio y zinc, libre de gluten. Es lección viva de adaptación extrema y soberanía alimentaria altoandina: la kañiwa es el último cultivo viable en el límite altitudinal donde quinua, papa amarga (Solanum juzepczukii) y mauka apenas sobreviven, y para los pueblos Aimara y Quechua del altiplano fue por milenios el seguro alimentario contra las heladas que destruían los demás cultivos. NRC 1989 la incluyó en su lista de cultivos andinos perdidos a rescatar, y desde entonces FAO, INIA-Perú y AGROSAVIA-Colombia han impulsado su recuperación. Usos: pito de kañiwa (harina tostada en agua o leche, base proteica del desayuno altiplánico), galletas, panes integrales, mazamorras. Manejo agroecológico: siembra al voleo al inicio de lluvias del altiplano (octubre-noviembre); poca tapada (0.5-1 cm); tolera suelos pobres, salinos y ácidos; biopreparados: caldo de ceniza contra mildiu (Peronospora variabilis); cosecha por arranque manual de la planta entera, secado en parva, trilla por golpeo o pisoteo sobre lona. Conservación de semilla en cántaros de arcilla con ceniza. Fuentes Tier A: NRC 1989 Cultivos Andinos, FAO 2013 Quinua y andinos, Mujica 1992 Quinua y andinos, Pérez Arbeláez 1947, GBIF Backbone, POWO Kew.",
+  "sources": [
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "fao-2013-quinua",
+      "title": "fao-2013-quinua",
+      "tier": "A",
+      "url": "https://www.fao.org/quinoa-2013"
+    },
+    {
+      "id": "mujica-1992-quinua",
+      "title": "mujica-1992-quinua",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.382Z"
+}
