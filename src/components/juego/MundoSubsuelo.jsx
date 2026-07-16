@@ -4,6 +4,7 @@ import { recordGameStart, recordGameComplete } from '../../services/usageTelemet
 import { fvhSkinClass } from '../../config/fvhSkin';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import { evaluarSubsuelo, mensajeMeta } from '../../services/mundoSubsueloEngine';
+import { Lombriz } from '../../visual/creatures/index.js';
 import './mundo-subsuelo.css';
 
 function clamp(value, min = 0, max = 100) {
@@ -36,25 +37,21 @@ function Mascot({ name, title, children, active }) {
           aria-hidden="true"
           className={`msx-avatar grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${name === 'Miquito' ? 'bg-cyan-200' : 'bg-amber-200'}`}
         >
-          <svg viewBox="0 0 48 48" className="h-10 w-10" role="img" aria-label={name}>
-            {name === 'Miquito' ? (
-              <>
-                <path d="M12 23c1-9 7-15 15-15s13 6 14 15H12Z" fill="#38bdf8" />
-                <path d="M18 23h17l-3 15H21l-3-15Z" fill="#f8fafc" />
-                <circle cx="22" cy="18" r="2.5" fill="#f0fdfa" />
-                <circle cx="31" cy="17" r="2" fill="#f0fdfa" />
-                <path d="M22 31c3 2 6 2 9 0" stroke="#164e63" strokeWidth="2" fill="none" strokeLinecap="round" />
-              </>
-            ) : (
-              <>
-                <path d="M9 28c8-12 23-13 31-2 2 3 0 8-5 9-9 2-20 1-26-7Z" fill="#d97706" />
-                <circle cx="25" cy="23" r="9" fill="#fbbf24" />
-                <circle cx="22" cy="22" r="1.7" fill="#422006" />
-                <circle cx="29" cy="22" r="1.7" fill="#422006" />
-                <path d="M22 27c3 2 6 2 8 0" stroke="#422006" strokeWidth="2" fill="none" strokeLinecap="round" />
-              </>
-            )}
-          </svg>
+          {name === 'Miquito' ? (
+            <svg viewBox="0 0 48 48" className="h-10 w-10" role="img" aria-label={name}>
+              <path d="M12 23c1-9 7-15 15-15s13 6 14 15H12Z" fill="#38bdf8" />
+              <path d="M18 23h17l-3 15H21l-3-15Z" fill="#f8fafc" />
+              <circle cx="22" cy="18" r="2.5" fill="#f0fdfa" />
+              <circle cx="31" cy="17" r="2" fill="#f0fdfa" />
+              <path d="M22 31c3 2 6 2 9 0" stroke="#164e63" strokeWidth="2" fill="none" strokeLinecap="round" />
+            </svg>
+          ) : (
+            /* Lombricita = la Lombriz rubber-hose de la casa, no una carita
+               genérica (spec belleza-juegos: la guía-protagonista de verdad).
+               El contenedor ya es aria-hidden; el título del SVG es descriptivo
+               y distinto del nombre (para no duplicar el texto "Lombricita"). */
+            <Lombriz size={40} title="Lombriz de tierra" animated={active} />
+          )}
         </div>
         <div>
           <h3 className="text-base font-black text-stone-950">{name}</h3>
@@ -221,21 +218,19 @@ function SoilScene({ soilLife, activeDecision }) {
           />
         ))}
 
-        {/* Lombrices meneándose, con carita para la niña que juega. */}
+        {/* Lombrices = la Lombriz rubber-hose de la casa, meneándose en su
+            galería (spec belleza-juegos: la protagonista viva de la red del
+            suelo, no un trazo con puntico). Inline dentro del corte, escalada y
+            un poco rotada para acostarse en su galería del suelo. */}
         {Array.from({ length: wormCount }).map((_, index) => {
           const wx = 112 + index * 178;
           const wy = 345 - (index % 2) * 34;
+          const rot = index % 2 === 0 ? 26 : -14;
           return (
             <g key={`worm-${index}`} className="msx-lombriz" style={{ animationDelay: `${index * 0.6}s` }}>
-              <path
-                d={`M${wx} ${wy}c20-18 45 16 68-4`}
-                stroke="#f59e0b"
-                strokeWidth="10"
-                fill="none"
-                strokeLinecap="round"
-              />
-              <circle cx={wx + 68} cy={wy - 4} r="6.5" fill="#d97706" />
-              <circle cx={wx + 70} cy={wy - 6} r="1.5" fill="#451a03" />
+              <g transform={`translate(${wx + 26} ${wy - 30}) scale(1.75) rotate(${rot})`}>
+                <Lombriz inline animated title="Lombriz" />
+              </g>
             </g>
           );
         })}

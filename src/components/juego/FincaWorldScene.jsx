@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { fvhSkinClass } from '../../config/fvhSkin';
+import { CriaturaFinca, criaturaTieneSvg } from './CriaturaFinca.jsx';
 
 /**
  * FincaWorldScene — el MUNDO ilustrado de "Mi Finca Viva".
@@ -289,12 +290,31 @@ export default function FincaWorldScene({
         )}
       </svg>
 
-      {/* Criaturas vivas — emojis flotando sobre el mundo (modo juego) */}
+      {/* Criaturas vivas — sus PERSONAJES rubber-hose viviendo sobre el mundo
+          (spec belleza-juegos: actores como protagonistas, no emojis de adorno).
+          Cada bicho reconocido es su SVG de la casa con su vida idle; los que aún
+          no tienen SVG fiel (mariquita, quetzal) caen a su emoji, honesto. La
+          altura respeta su hábitat: voladores arriba (cielo), suelo abajo. */}
       {!modoRico && !vacia && criaturasVivas.length > 0 && (
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           {criaturasVivas.map((c, i) => {
-            const left = 12 + ((i * 31) % 70);
-            const top = 12 + ((i * 19) % 42);
+            const svg = criaturaTieneSvg(c.id);
+            const n = criaturasVivas.length;
+            // Reparto horizontal parejo, legible (composición estilo Age of
+            // Empires: actores separados, nada amontonado) evitando la esquina
+            // del sol (arriba-derecha). Franja 8%–70% del ancho.
+            const left = n <= 1 ? 40 : Math.round(8 + (i * 62) / (n - 1));
+            // Banda de hábitat: voladores (colibrí/mariposa/abeja) alto en el
+            // cielo; suelo (lombriz) abajo; resto al medio. Jitter determinista
+            // por índice para que no queden en fila rígida.
+            const volador = c.id === 'colibri' || c.id === 'mariposa' || c.id === 'abeja';
+            const suelo = c.id === 'lombriz';
+            const jitter = (i % 2 === 0 ? 0 : 6);
+            const top = suelo
+              ? 62 + jitter
+              : volador
+                ? 10 + ((i * 5) % 14) + jitter
+                : 38 + jitter;
             return (
               <span
                 key={c.id}
@@ -302,11 +322,16 @@ export default function FincaWorldScene({
                 style={{
                   left: `${left}%`,
                   top: `${top}%`,
-                  fontSize: '1.7rem',
+                  fontSize: svg ? undefined : '1.7rem',
+                  filter: 'drop-shadow(0 3px 4px rgba(20,30,22,0.28))',
                   animationDelay: `${i * 0.5}s`,
                 }}
               >
-                {c.emoji}
+                {svg ? (
+                  <CriaturaFinca id={c.id} emoji={c.emoji} nombre={c.nombre} size={46} />
+                ) : (
+                  c.emoji
+                )}
               </span>
             );
           })}

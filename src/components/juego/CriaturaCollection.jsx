@@ -1,4 +1,5 @@
 import { Volume2 } from 'lucide-react';
+import { CriaturaFinca } from './CriaturaFinca.jsx';
 
 /**
  * CriaturaCollection — la galería de criaturas coleccionables.
@@ -56,11 +57,14 @@ export default function CriaturaCollection({ criaturas = [], vivas = 0, total = 
                 : `${c.nombre}: bloqueada. Pista: ${c.pista}`
             }
           >
-            <span
-              className={c.desbloqueada ? 'text-4xl' : 'text-4xl grayscale opacity-30'}
-              aria-hidden="true"
-            >
-              {c.desbloqueada ? c.emoji : '❔'}
+            <span className="flex items-center justify-center h-[52px]" aria-hidden="true">
+              <CriaturaFinca
+                id={c.id}
+                emoji={c.emoji}
+                nombre={c.nombre}
+                size={52}
+                fantasma={!c.desbloqueada}
+              />
             </span>
             <span
               className={[
