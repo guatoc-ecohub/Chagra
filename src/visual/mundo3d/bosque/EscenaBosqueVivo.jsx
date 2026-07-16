@@ -133,7 +133,7 @@ function Diorama({ tier, reducedMotion }) {
         target={[0, 3.2, 0]}
         enablePan={false}
         enableZoom
-        minDistance={7}
+        minDistance={4}
         maxDistance={20}
         minPolarAngle={0.55}
         maxPolarAngle={1.5}
