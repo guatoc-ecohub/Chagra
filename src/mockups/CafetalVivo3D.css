@@ -9,7 +9,8 @@
   min-height: 100vh;
   min-height: 100dvh;
   padding: 1rem 0.9rem 2.5rem;
-  background: linear-gradient(180deg, #cfe0d5 0%, #dde6d6 44%, #ece7d2 100%);
+  /* la familia corral bajo la hora dorada (paleta madre): sin menta fría */
+  background: linear-gradient(180deg, #e2e0c9 0%, #e9e2cb 44%, #f0e6cd 100%);
   color: #2b3226;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
