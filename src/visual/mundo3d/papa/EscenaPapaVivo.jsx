@@ -35,14 +35,32 @@ import {
   SITIO_CASA,
   SITIO_COSECHA,
 } from './floraPapa.geom.js';
+import {
+  CIELOS,
+  mezclarCielo,
+  mezclar,
+  VERDES,
+  TIERRAS,
+  CASA,
+  ACENTOS,
+  LUCES,
+  NEUTROS,
+  LuzMadre,
+} from '../paleta/index.js';
 
-/* La atmósfera del piso frío: cielo azul limpio y luz dura de montaña alta. */
-const FRIO = {
-  fondo: '#b7d2e4',
-  bruma: '#c9dce8',
-  sol: '#fff8e6',
-  cielo: '#ddeaf4',
-  suelo: '#3b3226',
+/* La atmósfera del piso frío, DERIVADA de la madre: la familia `ladera`
+   ("bruma sí, pero verde-plata, no celeste frío") mezclada 60% hacia la hora
+   dorada — la misma ley de EscenaBase3D. El cielo azul de postal se va: el
+   frío se cuenta con los verdes callados y la bruma, no con otro sol. */
+const FRIO = mezclarCielo(CIELOS.ladera);
+
+/* Los cerros del fondo, ya con cara de páramo: la hoja coriácea comida por
+   la bruma dorada (perspectiva aérea con los MISMOS tokens de la casa). */
+const CERROS = {
+  cerca: mezclar(VERDES.paramoHoja, FRIO.niebla, 0.22),
+  media: mezclar(VERDES.paramoHoja, FRIO.niebla, 0.3),
+  lejos: mezclar(VERDES.paramoHoja, FRIO.niebla, 0.4),
+  filo: mezclar(TIERRAS.rocaParamo, FRIO.niebla, 0.45),
 };
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -67,13 +85,13 @@ function construirLadera(seg, plano) {
   const nz = seg + 1;
   const pos = new Float32Array(nx * nz * 3);
   const col = new Float32Array(nx * nz * 3);
-  const cPajonal = new THREE.Color('#9aa056');
-  const cPajonal2 = new THREE.Color('#aab061');
-  const cLomo = new THREE.Color('#4a3a2b'); // la tierra negra del caballón
-  const cLomoSeco = new THREE.Color('#5c4936'); // la cresta que el sol ya secó
-  const cSurco = new THREE.Color('#332920'); // el fondo húmedo entre lomos
-  const cCamino = new THREE.Color('#8d7a58');
-  const cLoma = new THREE.Color('#7f8a52'); // la loma alta, más parda de frío
+  const cPajonal = new THREE.Color(mezclar(TIERRAS.pajonal, VERDES.paramoLiquen, 0.5));
+  const cPajonal2 = new THREE.Color(VERDES.paramoLiquen);
+  const cLomo = new THREE.Color(mezclar(TIERRAS.turba, NEUTROS.tinta, 0.3)); // tierra negra del caballón
+  const cLomoSeco = new THREE.Color(mezclar(TIERRAS.turba, TIERRAS.camino, 0.25)); // la cresta que el sol secó
+  const cSurco = new THREE.Color(mezclar(TIERRAS.turba, NEUTROS.tinta, 0.65)); // el fondo húmedo entre lomos
+  const cCamino = new THREE.Color(mezclar(TIERRAS.camino, TIERRAS.vega, 0.25));
+  const cLoma = new THREE.Color(mezclar(VERDES.paramoLiquen, VERDES.paramoMusgo, 0.4)); // la loma alta, parda de frío
   const c = new THREE.Color();
   let p = 0;
   for (let iz = 0; iz < nz; iz++) {
@@ -135,37 +153,37 @@ function construirLadera(seg, plano) {
 function CasaFria({ pos }) {
   return (
     <group position={pos} rotation={[0, 0.4, 0]}>
-      {/* la casa: adobe encalado con zócalo de tierra */}
+      {/* la casa: LA casa campesina de la paleta madre (la misma del valle) */}
       <mesh position={[0, 0.7, 0]}>
         <boxGeometry args={[2.4, 1.4, 1.8]} />
-        <meshLambertMaterial color="#ece4d2" flatShading />
+        <meshLambertMaterial color={CASA.encalado} flatShading />
       </mesh>
       <mesh position={[0, 0.17, 0]}>
         <boxGeometry args={[2.44, 0.34, 1.84]} />
-        <meshLambertMaterial color="#7a5a3c" flatShading />
+        <meshLambertMaterial color={CASA.zocalo} flatShading />
       </mesh>
-      {/* la puerta y la ventanita (maderas verdes de tierra fría) */}
+      {/* la puerta y la ventanita (la carpintería pintada de la casa) */}
       <mesh position={[0.42, 0.6, 0.91]}>
         <boxGeometry args={[0.42, 0.92, 0.06]} />
-        <meshLambertMaterial color="#3e5c40" flatShading />
+        <meshLambertMaterial color={CASA.carpinteria} flatShading />
       </mesh>
       <mesh position={[-0.55, 0.84, 0.91]}>
         <boxGeometry args={[0.46, 0.4, 0.06]} />
-        <meshLambertMaterial color="#3e5c40" flatShading />
+        <meshLambertMaterial color={CASA.carpinteria} flatShading />
       </mesh>
       {/* techo a dos aguas de teja */}
       <mesh position={[0, 1.56, -0.58]} rotation={[-0.6, 0, 0]}>
         <boxGeometry args={[2.8, 0.08, 1.42]} />
-        <meshLambertMaterial color="#96482f" flatShading />
+        <meshLambertMaterial color={CASA.tejaSombra} flatShading />
       </mesh>
       <mesh position={[0, 1.56, 0.58]} rotation={[0.6, 0, 0]}>
         <boxGeometry args={[2.8, 0.08, 1.42]} />
-        <meshLambertMaterial color="#a25136" flatShading />
+        <meshLambertMaterial color={CASA.teja} flatShading />
       </mesh>
       {/* la chimenea de fogón de leña (en el frío se cocina con candela) */}
       <mesh position={[-0.85, 1.85, -0.3]}>
         <boxGeometry args={[0.24, 0.6, 0.24]} />
-        <meshLambertMaterial color="#8a8074" flatShading />
+        <meshLambertMaterial color={mezclar(NEUTROS.lamina, TIERRAS.rocaParamo, 0.5)} flatShading />
       </mesh>
 
       {/* los COSTALES de papa cosidos en el patio, la cosecha que ya subió */}
@@ -175,11 +193,11 @@ function CasaFria({ pos }) {
         <group key={`s${i}`} position={[q[0], 0, q[1] ?? 0]} rotation={[0, q[2] ?? 0, 0]}>
           <mesh position={[0, 0.34, 0]}>
             <cylinderGeometry args={[0.24, 0.28, 0.68, 8, 1]} />
-            <meshLambertMaterial color="#c8b184" flatShading />
+            <meshLambertMaterial color={TIERRAS.vega} flatShading />
           </mesh>
           <mesh position={[0, 0.7, 0]} scale={[1, 0.5, 1]}>
             <sphereGeometry args={[0.2, 7, 5]} />
-            <meshLambertMaterial color="#b49c6e" flatShading />
+            <meshLambertMaterial color={mezclar(TIERRAS.vega, TIERRAS.camino, 0.35)} flatShading />
           </mesh>
         </group>
       ))}
@@ -188,11 +206,11 @@ function CasaFria({ pos }) {
       <group position={[-1.28, 0, 0.72]} rotation={[0, 0, 0.35]}>
         <mesh position={[0, 0.6, 0]}>
           <cylinderGeometry args={[0.03, 0.03, 1.2, 5, 1]} />
-          <meshLambertMaterial color="#8a6c48" flatShading />
+          <meshLambertMaterial color={TIERRAS.camino} flatShading />
         </mesh>
         <mesh position={[0.1, 0.06, 0]} rotation={[0, 0, -1.2]}>
           <boxGeometry args={[0.3, 0.14, 0.05]} />
-          <meshLambertMaterial color="#6e6a62" flatShading />
+          <meshLambertMaterial color={mezclar(NEUTROS.lamina, NEUTROS.tinta, 0.3)} flatShading />
         </mesh>
       </group>
     </group>
@@ -208,27 +226,27 @@ function RinconCosecha({ pos }) {
       <group position={[0.6, 0, -1.2]}>
         <mesh position={[0, 0.2, 0]}>
           <cylinderGeometry args={[0.3, 0.22, 0.4, 9, 1, true]} />
-          <meshLambertMaterial color="#a9713c" flatShading side={THREE.DoubleSide} />
+          <meshLambertMaterial color={CASA.bejuco} flatShading side={THREE.DoubleSide} />
         </mesh>
         <mesh position={[0, 0.4, 0]} scale={[1, 0.45, 1]}>
           <sphereGeometry args={[0.26, 8, 5]} />
-          <meshLambertMaterial color="#dfb43a" flatShading />
+          <meshLambertMaterial color={mezclar(ACENTOS.guayacan, ACENTOS.ambar, 0.5)} flatShading />
         </mesh>
       </group>
       {/* la manta tendida donde se aparta la saca por tamaños */}
       <mesh position={[-0.9, 0.03, 0.9]} rotation={[-Math.PI / 2, 0, 0.4]}>
         <planeGeometry args={[1.7, 1.2]} />
-        <meshLambertMaterial color="#cbbfa4" flatShading side={THREE.DoubleSide} />
+        <meshLambertMaterial color={mezclar(TIERRAS.vega, NEUTROS.cal, 0.35)} flatShading side={THREE.DoubleSide} />
       </mesh>
       {/* el azadón clavado en el montículo, en plena faena */}
       <group position={[1.3, 0, 0.6]} rotation={[0.5, 0.6, -0.35]}>
         <mesh position={[0, 0.62, 0]}>
           <cylinderGeometry args={[0.03, 0.03, 1.24, 5, 1]} />
-          <meshLambertMaterial color="#8a6c48" flatShading />
+          <meshLambertMaterial color={TIERRAS.camino} flatShading />
         </mesh>
         <mesh position={[0.1, 0.04, 0]} rotation={[0, 0, -1.2]}>
           <boxGeometry args={[0.3, 0.15, 0.05]} />
-          <meshLambertMaterial color="#6e6a62" flatShading />
+          <meshLambertMaterial color={mezclar(NEUTROS.lamina, NEUTROS.tinta, 0.3)} flatShading />
         </mesh>
       </group>
     </group>
@@ -255,7 +273,7 @@ function FocoPaso({ foco, reducedMotion }) {
     <mesh ref={anillo} position={[foco[0], foco[1] + 0.12, foco[2]]} rotation={[-Math.PI / 2, 0, 0]}>
       <ringGeometry args={[1.25, 1.65, 32]} />
       <meshBasicMaterial
-        color="#ffe9ae"
+        color={LUCES.candela}
         transparent
         opacity={0.4}
         depthWrite={false}
@@ -294,27 +312,16 @@ function Diorama({ tier, reducedMotion, foco }) {
   return (
     <>
       <color attach="background" args={[FRIO.fondo]} />
-      {perfil.fog && <fog attach="fog" args={[FRIO.bruma, 22, 58]} />}
+      {perfil.fog && <fog attach="fog" args={[FRIO.niebla, 22, 58]} />}
 
-      {/* la luz de montaña alta: cielo azul limpio, sol blanco y duro */}
-      <hemisphereLight intensity={0.95} color={FRIO.cielo} groundColor={FRIO.suelo} />
-      <ambientLight intensity={0.3} color="#e8eef4" />
-      <directionalLight
-        position={[9, 14, 6]}
-        intensity={1.35}
-        color={FRIO.sol}
-        castShadow={perfil.sombras}
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-near={1}
-        shadow-camera-far={44}
-        shadow-camera-left={-17}
-        shadow-camera-right={17}
-        shadow-camera-top={17}
-        shadow-camera-bottom={-7}
+      {/* LA LUZ DE LA CASA: la receta madre con el tinte de la ladera de
+          páramo. El sol alto del frío y el frustum a medida del papal. */}
+      <LuzMadre
+        cielo={CIELOS.ladera}
+        perfil={perfil}
+        solPos={[9, 14, 6]}
+        sombra={{ left: -17, right: 17, top: 17, bottom: -7, far: 44 }}
       />
-      {/* contraluz azulado que enfría las sombras (el frío se ve) */}
-      <directionalLight position={[-7, 6, -8]} intensity={0.38} color="#b8cede" />
 
       {/* LA LADERA con sus caballones horneados en el relieve */}
       <mesh geometry={geoLadera} receiveShadow={perfil.sombras}>
@@ -324,20 +331,20 @@ function Diorama({ tier, reducedMotion, foco }) {
       {/* los cerros fríos del fondo, ya con cara de páramo */}
       <mesh position={[-14, 4.2, -24]} scale={[10, 5.6, 5]}>
         <sphereGeometry args={[1, 12, 8]} />
-        <meshLambertMaterial color="#6d7c54" />
+        <meshLambertMaterial color={CERROS.media} />
       </mesh>
       <mesh position={[6, 5.2, -27]} scale={[12, 7, 6]}>
         <sphereGeometry args={[1, 12, 8]} />
-        <meshLambertMaterial color="#66755a" />
+        <meshLambertMaterial color={CERROS.lejos} />
       </mesh>
       <mesh position={[21, 3.4, -23]} scale={[8, 4.6, 5]}>
         <sphereGeometry args={[1, 12, 8]} />
-        <meshLambertMaterial color="#75825a" />
+        <meshLambertMaterial color={CERROS.cerca} />
       </mesh>
       {/* y detrasito, el filo pelado con su neblina pegada */}
       <mesh position={[-3, 7.8, -31]} scale={[16, 5, 5]}>
         <sphereGeometry args={[1, 10, 7]} />
-        <meshLambertMaterial color="#8b95a0" />
+        <meshLambertMaterial color={CERROS.filo} />
       </mesh>
 
       {/* EL PAPAL: matas en surcos, flores, cosecha, pajonal, frailejones */}

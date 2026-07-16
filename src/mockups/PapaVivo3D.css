@@ -9,7 +9,8 @@
   min-height: 100vh;
   min-height: 100dvh;
   padding: 1rem 0.9rem 2.5rem;
-  background: linear-gradient(180deg, #c8dcea 0%, #d9e2cf 46%, #e9e4cb 100%);
+  /* la ladera de páramo bajo la hora dorada (paleta madre): verde-plata, no celeste */
+  background: linear-gradient(180deg, #dce0d2 0%, #e4e0c9 46%, #ece4ca 100%);
   color: #2c3128;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
