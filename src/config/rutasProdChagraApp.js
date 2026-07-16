@@ -99,7 +99,7 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
-  // ── Puerta maestra a los 12 mundos ─────────────────────────────
+  // ── Puerta maestra a los mundos (15, por piso térmico) ─────────
   {
     path: 'vitrina_maestra',
     // alias mockup_vitrina_maestra: MundosDeMiFinca (dashboard) navega con el
