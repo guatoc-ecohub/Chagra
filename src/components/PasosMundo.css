@@ -1,0 +1,197 @@
+.pasos-mundo {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 35;
+  width: min(25rem, calc(100vw - 2rem));
+  pointer-events: none;
+  color: #2d2317;
+  font-family: inherit;
+}
+
+.pasos-mundo__card {
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(91, 69, 39, 0.2);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.7), transparent 36%),
+    linear-gradient(180deg, rgba(255, 250, 240, 0.98), rgba(246, 236, 218, 0.96));
+  box-shadow: 0 1rem 2.5rem rgba(46, 32, 15, 0.18);
+  padding: 1rem 1rem 0.9rem;
+  backdrop-filter: blur(14px);
+}
+
+.pasos-mundo__card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(102, 71, 32, 0.12), transparent 28%),
+    linear-gradient(135deg, rgba(135, 95, 38, 0.06), transparent 42%);
+  pointer-events: none;
+}
+
+.pasos-mundo__eyebrow {
+  position: relative;
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(75, 54, 28, 0.7);
+}
+
+.pasos-mundo__title {
+  position: relative;
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.1;
+  font-weight: 800;
+  color: #2a2014;
+}
+
+.pasos-mundo__intro {
+  position: relative;
+  margin: 0.45rem 0 0.85rem;
+  font-size: 0.94rem;
+  line-height: 1.45;
+  color: rgba(49, 36, 20, 0.92);
+}
+
+.pasos-mundo__steps {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.pasos-mundo__step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  padding: 0.62rem 0.7rem;
+  border-radius: 0.95rem;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(112, 83, 41, 0.12);
+}
+
+.pasos-mundo__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.45rem;
+  min-height: 1.45rem;
+  border-radius: 999px;
+  background: #6f8f44;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pasos-mundo__text {
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: #2e2315;
+}
+
+.pasos-mundo__footer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-top: 0.85rem;
+}
+
+.pasos-mundo__close,
+.pasos-mundo__reopen {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.pasos-mundo__close {
+  flex: 1 1 auto;
+  padding: 0.78rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #5f8140, #46602f);
+  color: #fffdf6;
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 0 0.5rem 1rem rgba(64, 85, 34, 0.24);
+}
+
+.pasos-mundo__close:hover,
+.pasos-mundo__close:focus-visible,
+.pasos-mundo__reopen:hover,
+.pasos-mundo__reopen:focus-visible {
+  transform: translateY(-1px);
+}
+
+.pasos-mundo__close:focus-visible,
+.pasos-mundo__reopen:focus-visible {
+  outline: 2px solid #243119;
+  outline-offset: 2px;
+}
+
+.pasos-mundo__hint {
+  font-size: 0.82rem;
+  color: rgba(67, 49, 28, 0.72);
+  text-align: right;
+}
+
+.pasos-mundo__reopen {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 34;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fff7e9, #ead9b7);
+  border: 1px solid rgba(84, 61, 31, 0.18);
+  color: #3f2f1b;
+  font-size: 1.1rem;
+  font-weight: 800;
+  box-shadow: 0 0.55rem 1.15rem rgba(50, 35, 18, 0.18);
+}
+
+@media (max-width: 640px) {
+  .pasos-mundo {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: calc(100vw - 1.5rem);
+  }
+
+  .pasos-mundo__card {
+    padding: 0.9rem 0.85rem 0.8rem;
+    border-radius: 1.05rem;
+  }
+
+  .pasos-mundo__title {
+    font-size: 1.04rem;
+  }
+
+  .pasos-mundo__intro,
+  .pasos-mundo__text {
+    font-size: 0.9rem;
+  }
+
+  .pasos-mundo__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pasos-mundo__hint {
+    text-align: left;
+  }
+}

@@ -25,6 +25,7 @@ import Mundo2D from './Mundo2D.jsx';
 import useAudioMundo from './useAudioMundo.js';
 import useFincaViva from './useFincaViva.js';
 import InvitacionAudioMundo from './InvitacionAudioMundo.jsx';
+import PasosMundo from '../../components/PasosMundo.jsx';
 import './mundo.css';
 
 /* Los dioramas 3D se cargan PEREZOSO: three/@react-three viven en su propio
@@ -211,6 +212,7 @@ function MundoInterno({
         {/* Invitación de PRIMER USO del sonido ambiental (una sola vez): vive
             en el host para cubrir app y vitrinas por igual (allá no hay Perfil). */}
         <InvitacionAudioMundo reducedMotion={reducedMotion} tinte={tinte} />
+        <PasosMundo id={mundoId} />
         <MigaVolver onSalir={onSalir} mundoId={mundoId} />
       </div>
     );
@@ -230,6 +232,7 @@ function MundoInterno({
         energia={energia}
       />
       <InvitacionAudioMundo reducedMotion={reducedMotion} tinte={tinte} />
+      <PasosMundo id={mundoId} />
       <MigaVolver onSalir={onSalir} mundoId={mundoId} />
     </div>
   );
