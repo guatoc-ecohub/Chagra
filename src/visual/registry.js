@@ -203,6 +203,26 @@ const VARIANTES_DANTA = [
   { label: 'sin animación', props: { size: 88, animated: false } },
 ];
 
+/* EL CÓNDOR completo luce la fundación transversal con su carácter de señor
+   del viento: el PLANEO imperturbable (casi no aletea — dos golpes secos cada
+   tanto), las plumas-dedo que tantean el aire, OTEA (la cabeza pelada escanea
+   el valle, su firma), celebra con la ENVERGADURA en V, modo poder CELESTE DE
+   ALTURA y prop en las garras. SIN ruana: su collar de plumón ES su ruana
+   (contrato de altura). */
+const VARIANTES_CONDOR = [
+  { label: '48 px', props: { size: 48 } },
+  { label: 'planea', props: { size: 88 } },
+  { label: 'celebra (alas en V)', props: { size: 88, pose: 'celebra' } },
+  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
+  { label: 'señala', props: { size: 88, pose: 'señala' } },
+  { label: 'otea el valle', props: { size: 88, otea: true } },
+  { label: 'habla (lip-sync)', props: { size: 88, visema: 'V3' } },
+  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
+  { label: 'poder CELESTE DE ALTURA', props: { size: 88, poder: true } },
+  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
+  { label: 'sin animación', props: { size: 88, animated: false } },
+];
+
 /* EL ENT DEL PÁRAMO — el árbol-maestro del Bosque Vivo (NO un bicho). Presencia
    GRANDE e imponente. Luce sus 5 frentes: expresividad de árbol vivo (line-boil
    lento, roseta que se mece, rostro sabio), lip-sync (boca en las grietas),
@@ -232,6 +252,7 @@ const VARIANTES_POR_SLUG = {
   morrocoy: VARIANTES_MORROCOY,
   borugo: VARIANTES_BORUGO,
   danta: VARIANTES_DANTA,
+  condor: VARIANTES_CONDOR,
   'ent-frailejon': VARIANTES_ENT,
 };
 
@@ -248,6 +269,7 @@ const NOTAS_CREATURE = {
   morrocoy: 'Galápago de patas rojas, el anciano ancestral y paciente; caparazón de domo hexagonal (su firma) y patas rojizas, aura bronce. Se retrae elástico a la concha.',
   borugo: 'La paca de montaña andina, roedor nocturno tierno; pardo con hileras de motas crema (su firma), olfateo tímido y aura plata lunar. El animal de cierre — vivo, a salvo y digno.',
   danta: 'El tapir andino, la mole lanuda y mansa del bosque altoandino; trompa corta que husmea en periscopio y borde blanco de orejas y labios (su firma doble). La jardinera del bosque: siembra semillas al andar, aura verde semilla.',
+  condor: 'El ave voladora más grande del mundo, el emblema del páramo; alas enormes de plumas-dedo, collar blanco de plumón y cabeza pelada con carúncula (su firma triple). El señor del viento: casi no aletea — planea las térmicas y verlo es saber que la montaña está sana. Aura celeste de altura.',
   'ent-frailejon': 'El árbol-guardián que enseña: frailejón gigante del páramo, tronco con rostro sabio y faldita de hojas muertas, corona en roseta plateada y flores amarillas. Guardián del agua; anciano sereno y lento. Modo-guardián verde-plateado cuando el páramo peligra.',
   lombriz: 'La ingeniera del suelo; ondula por segmentos con clitelo marcado.',
   mariposa: 'Alas naranjas con venación; poliniza y anuncia buen suelo.',

@@ -5,43 +5,44 @@
  * parecen más árboles de navidad que matas"*. Tenía toda la razón, y el DR de
  * realismo-3d-vegetacion nombra el fallo exacto que teníamos:
  *
- *   ANTES: `CylinderGeometry` recto + un puñado de `IcosahedronGeometry` regados
- *   en un domo, cada parte con UN color plano horneado (`pintar`). Es la
- *   definición literal del "cono/esfera de follaje sobre un cilindro" del DR:
- *   sin conicidad, sin jerarquía de ramas, sin huecos, sin AO, sin gradiente.
- *   El aliso incluso construía la copa como un CONO explícito. Árbol de navidad.
+ *   · Frailejón (Espeletia)      — el ícono: columna con enagua de hojas muertas
+ *                                  y ROSETA plateada afelpada. Viene en EDADES
+ *                                  (joven al ras / adulto / viejo de tronco alto)
+ *                                  y crece en COLONIAS: el frailejonal es un
+ *                                  PAISAJE con gradiente de edad, no clones.
+ *   · Yarumo plateado/blanco     — Cecropia telealba: tronco pálido esbelto y copa
+ *     (Cecropia telealba)          en sombrilla de hojas palmeadas de ENVÉS BLANCO.
+ *   · Roble andino               — Quercus humboldtii: tronco robusto fisurado y
+ *     (Quercus humboldtii)         copa ANCHA que es MASA de hojas (con bellotas).
+ *   · Encenillo (Weinmannia)     — árbol de niebla: tronco rojizo torcido, copa
+ *                                  oscura compacta y barbas de musgo colgando.
+ *   · Aliso (Alnus acuminata)    — tronco gris claro esbelto, copa cónica verde
+ *                                  fresca; el vecino más alto (aun así < Ent).
+ *   · Gaque (Clusia)             — un domo DENSO de hoja gruesa verde-lustrosa.
+ *   · Mortiño (Vaccinium         — arbusto bajo con BAYAS azul-moradas (agraz andino).
+ *     meridionale)
+ *   · Romerillo                  — mata baja de follaje fino amarillo-verde.
+ *   · Rocas con líquen + musgo   — el suelo del páramo.
  *
- *   AHORA: todas las especies leñosas salen de `construirArbol`, que aplica las
- *   recetas del DR por orden de retorno visual:
- *     · tronco con CURVA, conicidad real, raigón y arruga en la geometría;
- *     · JERARQUÍA de ramas (primarias en ángulo áureo → secundarias);
- *     · copas sembradas en los EXTREMOS de rama, con HUECOS y borde MORDIDO
- *       (el cielo se ve a través → se acabó la masa sólida);
- *     · sombreado horneado por vértice: AO + gradiente de altura + contraluz;
- *     · variación determinista por instancia (rotación/escala/inclinación/tinte).
+ * CALIBRE de copa (2026-07-16): los árboles del cortejo dejaron los icosaedros
+ * literales — cada copa es una MASA de hojas con huecos y borde mordido
+ * (`sembrarFollaje` + `matojoNube` con normales RADIALES + `hornearFollaje` con
+ * AO/gradiente/contraluz), la misma técnica del queñual de la toma A. Los troncos
+ * son `tuboOrganico` con conicidad, arruga y corteza horneada — nada de cilindros
+ * de catálogo. Todo pasa por el TALLER compartido (`sombreadoVegetal`), la casa
+ * canónica del kit: cero duplicados caseros, `fusionarSeguro` es la única fusión.
  *
- * Cada especie conserva lo que la hace INCONFUNDIBLE (si se ven genéricas,
- * fallamos):
- *   · Frailejón (Espeletia)      — roseta vellosa plateada + enagua de hojas
- *                                  muertas marcescentes. El ícono del páramo.
- *   · Queñua (Polylepis)         — tronco retorcido + corteza rojiza que se
- *                                  descama en LÁMINAS DE PAPEL (geometría real).
- *   · Encenillo (Weinmannia)     — árbol de niebla: tronco rojizo, copa oscura
- *                                  compacta, velo de musgo.
- *   · Aliso (Alnus acuminata)    — tronco gris claro esbelto, copa alta y fresca
- *                                  (alargada e IRREGULAR, nunca un cono).
- *   · Gaque (Clusia)             — copa redonda densa de hoja gruesa lustrosa.
- *   · Mortiño (Vaccinium)        — arbusto bajo con bayas azul-moradas (agraz).
- *   · Romerillo, rocas con líquen, musgo — el suelo y el sotobosque.
+ * TÉCNICA tier-safe (DR §3): cada especie (y cada EDAD del frailejón) se FUSIONA
+ * en UNA sola geometría (tronco + follaje + detalles) con color horneado en
+ * vertexColors, y se dibuja con UN InstancedMesh → una draw-call por banco por
+ * más matas que haya. Cero assets externos: todo procedural, corre headless.
  *
- * TÉCNICA tier-safe: cada especie se fusiona en UNA geometría con el color ya
- * horneado → UN InstancedMesh → una draw-call por especie por más matas que
- * haya. Cero assets externos. Corre headless (three core puro).
+ * El componente r3f (`FloraParamo.jsx`) consume esto: instancia, ubica y le pone
+ * luz. Aquí viven SOLO los datos y las mallas (nada de WebGL).
  */
 import * as THREE from 'three';
 import {
   rng,
-  ruidoFbm,
   fusionarSeguro,
   poner,
   apuntar,
@@ -49,44 +50,51 @@ import {
   hornearFollaje,
   hornearCorteza,
   tuboOrganico,
-  taperLineal,
   taperTronco,
   curvaTronco,
   sembrarFollaje,
-  matojoHoja,
+  matojoNube,
 } from './sombreadoVegetal.js';
-
-export { rng };
 
 /* -------------------------------------------------------------------------- */
 /*  Presupuesto por tier                                                       */
 /* -------------------------------------------------------------------------- */
 
 /*
- * Cuántas matas de cada especie. 'alto' puebla un bosque pleno; 'medio' es
- * frugal; 'bajo' deja lo mínimo para que AÚN se lea "páramo". Cada especie es
- * UN InstancedMesh → estos números son instancias, no draw-calls.
+ * Cuántas matas de cada especie (tier-safe). 'alto' puebla un ecosistema pleno;
+ * 'medio' es frugal; 'bajo' deja lo mínimo para que AÚN se lea "páramo" (unos
+ * frailejones, un par de árboles, rocas y musgo) si algo fuerza el 3D. Cada
+ * banco es UN InstancedMesh → estos números son instancias, no draw-calls. El
+ * frailejonal viene por EDADES (tres bancos + el que florece) para que el
+ * paisaje tenga gradiente de edad, no clones.
  */
 export const FLORA_TIER = {
   alto: {
-    frailejon: 34, frailejonFlor: 7, quenua: 5, encenillo: 5, aliso: 4,
-    gaque: 3, mortino: 12, romerillo: 14, roca: 10, musgo: 14, niebla: 3,
+    frailejonJoven: 12, frailejon: 14, frailejonViejo: 7, frailejonFlor: 5,
+    yarumo: 3, roble: 3, encenillo: 4,
+    aliso: 3, gaque: 2, mortino: 10, romerillo: 12, roca: 9, musgo: 12, niebla: 3,
   },
   medio: {
-    frailejon: 20, frailejonFlor: 4, quenua: 3, encenillo: 3, aliso: 2,
-    gaque: 2, mortino: 7, romerillo: 8, roca: 6, musgo: 7, niebla: 0,
+    frailejonJoven: 7, frailejon: 8, frailejonViejo: 4, frailejonFlor: 3,
+    yarumo: 2, roble: 2, encenillo: 2,
+    aliso: 2, gaque: 1, mortino: 6, romerillo: 7, roca: 5, musgo: 6, niebla: 0,
   },
   bajo: {
-    frailejon: 8, frailejonFlor: 0, quenua: 2, encenillo: 0, aliso: 0,
-    gaque: 0, mortino: 3, romerillo: 3, roca: 2, musgo: 3, niebla: 0,
+    frailejonJoven: 3, frailejon: 4, frailejonViejo: 0, frailejonFlor: 0,
+    yarumo: 1, roble: 1, encenillo: 0,
+    aliso: 0, gaque: 0, mortino: 2, romerillo: 3, roca: 2, musgo: 3, niebla: 0,
   },
 };
 
 /** Conteos de flora para un tier (desconocido → frugal, nunca el más caro). */
 export const floraDeTier = (tier) => FLORA_TIER[tier] || FLORA_TIER.medio;
 
-/* Factor de DETALLE geométrico por tier: escala hojas/ramas por mata. */
-export const CALIDAD_TIER = { alto: 1, medio: 0.6, bajo: 0.4 };
+/*
+ * Factor de DETALLE geométrico por tier: escala cuántas hojas/matojos lleva cada
+ * mata. Menos detalle en gama baja = menos vértices por instancia (que se
+ * multiplican por el número de matas).
+ */
+export const CALIDAD_TIER = { alto: 1, medio: 0.62, bajo: 0.42 };
 export const calidadDeTier = (tier) => CALIDAD_TIER[tier] ?? CALIDAD_TIER.medio;
 
 /* -------------------------------------------------------------------------- */
@@ -96,13 +104,14 @@ export const calidadDeTier = (tier) => CALIDAD_TIER[tier] ?? CALIDAD_TIER.medio;
 export const PAL = {
   // Frailejón
   frailejonTronco: '#6f5c40', // tallo bajo la enagua
-  frailejonSeco: '#907753', // hojas muertas de la enagua (marcescentes) — pajizo
-  frailejonSeco2: '#6a5232', // marcescentes más oscuras/curtidas (variedad)
-  frailejonPlata: '#cfd4c7', // roseta: centro joven, tomento MÁS blanco (la firma)
-  frailejonPlata2: '#b0ba9c', // hojas externas: plateado-salvia más apagado
-  frailejonCorazon: '#dde2d6', // cogollo velloso central (el punto más pálido)
-  frailejonFlor: '#e0c24a', // capítulos amarillos
-  frailejonTallo: '#95a06a', // escapo floral
+  frailejonSeco: '#9a7f57', // enagua: marcescentes pajizas (arriba, recientes)
+  frailejonSeco2: '#67502f', // marcescentes viejas curtidas (abajo, oscuras)
+  frailejonSeco3: '#7f6640', // tono intermedio dorado-marrón (variedad)
+  frailejonPlata: '#d7dccf', // roseta centro: tomento plateado-blanco (la firma)
+  frailejonPlata2: '#a9b593', // hojas externas: plateado-salvia apagado (viejas)
+  frailejonCorazon: '#e9eee2', // cogollo velloso central (el punto más pálido)
+  frailejonFlor: '#e6c84e', // capítulos amarillos
+  frailejonTallo: '#93a06a', // escapo floral
 
   // Queñua (Polylepis) — corteza rojiza en láminas de papel.
   quenuaGrieta: '#4a2a20',
@@ -112,33 +121,47 @@ export const PAL = {
   quenuaHoja: '#4e6640',
   quenuaHojaSol: '#8ba06d',
 
-  // Encenillo (Weinmannia) — el árbol de la niebla.
-  encenilloGrieta: '#3d2419',
-  encenilloTronco: '#6d4535',
-  encenilloHoja: '#31462d',
-  encenilloHojaSol: '#5c7a4c',
-  encenilloMusgo: '#6b7d4c',
+  // Roble andino (Quercus humboldtii)
+  robleTronco: '#6a5c4a', // corteza gris-parda fisurada
+  robleGrieta: '#453a2c', // fondo de la fisura
+  robleCresta: '#83745e', // lomo expuesto de la corteza
+  robleHoja: '#43593b', // hoja coriácea verde oscuro (penumbra)
+  robleHoja2: '#5d7847', // hoja al sol
+  robleLuz: '#a8b775', // contraluz de borde
+  robleBellota: '#7a5a34', // bellota
+  robleCapa: '#54432a', // capuchón de la bellota
 
-  // Aliso (Alnus acuminata) — corteza gris clara.
-  alisoGrieta: '#5f6156',
-  alisoTronco: '#9a9a8f',
-  alisoLenticela: '#c2c2b4',
-  alisoHoja: '#415c30',
-  alisoHojaSol: '#83a05a',
+  // Encenillo (Weinmannia tomentosa)
+  encenilloTronco: '#6d4535', // corteza rojiza
+  encenilloGrieta: '#3f281e',
+  encenilloCresta: '#8a5a44',
+  encenilloHoja: '#37502f', // copa oscura compacta (penumbra)
+  encenilloHoja2: '#4d6844', // al sol
+  encenilloLuz: '#93a86f', // contraluz tímido (árbol sombrío)
+  encenilloMusgo: '#93a877', // velo de musgo del árbol de niebla
 
-  // Gaque (Clusia) — hoja gruesa verde muy oscuro lustrosa.
-  gaqueGrieta: '#33291f',
+  // Aliso (Alnus acuminata)
+  alisoTronco: '#9a9a8f', // corteza gris clara
+  alisoGrieta: '#6f6f64',
+  alisoCresta: '#b5b5a8',
+  alisoHoja: '#4f6d3d', // verde fresco (penumbra)
+  alisoHoja2: '#6d8c50', // al sol
+  alisoLuz: '#c9d67f', // contraluz fresco
+
+  // Gaque (Clusia)
   gaqueTronco: '#57493a',
-  gaqueHoja: '#263d24',
-  gaqueHojaSol: '#4e6f43',
+  gaqueGrieta: '#372e23',
+  gaqueCresta: '#6d5c48',
+  gaqueHoja: '#2f4a2d', // verde muy oscuro lustroso (penumbra)
+  gaqueHoja2: '#456339', // al sol
+  gaqueLuz: '#7fa25b', // brillo de hoja gruesa
 
-  // Mortiño (Vaccinium meridionale) — agraz andino.
-  mortinoRama: '#5a4030',
-  mortinoHoja: '#37502f',
-  mortinoHojaSol: '#6a8248',
-  mortinoBrote: '#7a4536',
-  mortinoBaya: '#33305c',
-  mortinoBaya2: '#454078',
+  // Mortiño (Vaccinium meridionale)
+  mortinoHoja: '#3f5a3a',
+  mortinoHoja2: '#517048',
+  mortinoBrote: '#7a4536', // brote rojizo nuevo
+  mortinoBaya: '#33305c', // baya azul-morada (agraz)
+  mortinoBaya2: '#3d3768',
 
   // Roble andino (Quercus humboldtii) — no es de páramo; lo usan la ladera de
   // restauración y el valle. Copa ancha de hoja coriácea oscura + bellotas.
@@ -173,43 +196,20 @@ export const PAL = {
 const LIQUEN_PIE = '#7c8a5e';
 
 /* -------------------------------------------------------------------------- */
-/*  El constructor de ÁRBOLES (jerarquía de ramas + copas con huecos)          */
+/*  Utilidades de construcción (kit/taller compartido + ayudas locales)        */
 /* -------------------------------------------------------------------------- */
 
-const AUREO = Math.PI * (3 - Math.sqrt(5)); // ángulo áureo: filotaxia real
+/** Color plano horneado (alias del taller — todas las partes DEBEN traer color). */
+const pintar = pintarPlano;
 
-/**
- * Construye un árbol procedural completo y lo devuelve FUSIONADO (1 draw-call).
- *
- * Sigue la receta del DR en orden de retorno: silueta y jerarquía primero,
- * sombreado horneado encima. Las copas NO son un domo relleno: se siembran
- * cúmulos en las PUNTAS DE RAMA, cada uno con huecos y borde mordido.
- *
- * @param {object} o
- * @param {string} o.nombre        etiqueta (para que un merge nulo diga quién).
- * @param {number} o.altura        altura del fuste.
- * @param {number} o.r0            radio en la base.
- * @param {number} o.r1            radio en la punta.
- * @param {number} [o.inclina]     cuánto se inclina el fuste con la altura.
- * @param {number} [o.sinuoso]     cuánto serpentea alrededor de su eje.
- * @param {number} [o.raigon]      ensanche del pie (contrafuertes).
- * @param {number} [o.arruga]      amplitud del relieve de corteza.
- * @param {object} o.corteza       paleta de corteza (ver hornearCorteza).
- * @param {object} o.copa          { inicio, ramas, largo, alza, sub, subLargo }
- * @param {object} o.follaje       { base, sol, luz, radio, hojas, achatado, ... }
- * @param {number} o.q             calidad (tier): escala el detalle.
- * @param {number} o.semilla
- * @param {(partes:THREE.BufferGeometry[], ctx:object)=>void} [o.firma]
- *        gancho para el rasgo INCONFUNDIBLE de la especie (láminas de papel del
- *        Polylepis, lenticelas del aliso, musgo del encenillo, bayas…).
+/*
+ * La fusión canónica del taller, PRESERVANDO las normales que cada parte trae:
+ * las copas-masa llevan normales RADIALES (matojoNube) que son lo que las hace
+ * leerse como masa suave de hojas — recalcular normales las devolvería a
+ * poliedro facetado. Desindexa, valida atributos y TRUENA si el merge da null
+ * (la trampa que ya apagó seis especies sin un solo error en consola).
  */
-export function construirArbol(o) {
-  const {
-    nombre, altura, r0, r1, corteza, copa, follaje, q = 1, semilla = 1,
-    inclina = 0.08, sinuoso = 0.1, raigon = 0.35, arruga = 0.13,
-  } = o;
-  const r = rng(semilla);
-  const partes = [];
+const fusionar = (partes, etiqueta = 'floraParamo') => fusionarSeguro(partes, etiqueta, { preservarNormales: true });
 
   // 1) El FUSTE: curva sinuosa + conicidad con raigón + arruga en la malla.
   const giro = r() * Math.PI * 2;
@@ -347,121 +347,261 @@ export function construirArbol(o) {
   return fusionarSeguro(partes, nombre);
 }
 
+/**
+ * Hornea un GRADIENTE a lo largo del eje Y local (base→punta): cada vértice toma
+ * un color según su altura entre `y0` y `y1`. Sirve para el TOMENTO del frailejón:
+ * hoja plateada en la base y casi blanca en la punta → toda la roseta se lee
+ * frosteada/afelpada (la pelusa), no como piedra facetada de un solo tono.
+ */
+function pintarGradiente(geo, colBase, colPunta, y0, y1) {
+  const a = colBase instanceof THREE.Color ? colBase : new THREE.Color(colBase);
+  const b = colPunta instanceof THREE.Color ? colPunta : new THREE.Color(colPunta);
+  const pos = geo.attributes.position;
+  const n = pos.count;
+  const arr = new Float32Array(n * 3);
+  const c = new THREE.Color();
+  const span = (y1 - y0) || 1;
+  for (let i = 0; i < n; i++) {
+    let t = (pos.getY(i) - y0) / span;
+    t = t < 0 ? 0 : t > 1 ? 1 : t;
+    c.copy(a).lerp(b, Math.pow(t, 0.7)); // sesga hacia la punta pálida
+    arr[i * 3] = c.r;
+    arr[i * 3 + 1] = c.g;
+    arr[i * 3 + 2] = c.b;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+  return geo;
+}
+
+/**
+ * Pétalo/hoja CARNOSA: un elipsoide de PUNTA REDONDA que nace en su base (origen)
+ * y se extiende por +Y. Es la clave contra el look "cerda": una hoja gruesa y
+ * roma, no un cono puntudo. Se orienta con `apuntar` (que lleva +Y hacia `dir`).
+ * `ancho`/`grosor` son SEMI-ejes (mitad del ancho/espesor); `largo` es el total.
+ */
+function petalo(ancho, largo, grosor, wSeg = 6, hSeg = 3) {
+  const g = new THREE.SphereGeometry(1, wSeg, hSeg);
+  // escala a elipsoide y sube su base al origen (span y ∈ [0, largo]).
+  poner(g, [0, largo / 2, 0], [0, 0, 0], [ancho, largo / 2, grosor]);
+  return g;
+}
+
+/**
+ * COPA-MASA: la técnica del queñual para cualquier árbol del cortejo. Cada
+ * lóbulo {c, radio} se llena con matojos-nube (normales radiales) sembrados con
+ * huecos y borde mordido, y se hornea AO + gradiente + contraluz. El resultado
+ * se lee como masa de hojas con el cielo colándose — nunca como icosaedro literal.
+ *
+ * @param {{c:[number,number,number], radio:number}[]} lobulos
+ * @param {object} o  {base, sol, luz, q, seed, achatado?, huecos?, mordida?,
+ *                     ao?, manchas?, densidad?, distMin?}
+ * @returns {THREE.BufferGeometry[]} una geometría horneada por lóbulo
+ */
+function copaMasa(lobulos, o) {
+  const {
+    base, sol, luz, q = 1, seed = 1,
+    achatado = 0.74, huecos = 0.42, mordida = 0.36,
+    ao = 0.62, manchas = 0.14, densidad = 10,
+  } = o;
+  const copas = [];
+  for (let i = 0; i < lobulos.length; i++) {
+    const lb = lobulos[i];
+    const puntos = sembrarFollaje({
+      centro: lb.c,
+      radio: lb.radio,
+      achatado,
+      n: Math.max(4, Math.round(densidad * q * lb.radio)),
+      semilla: seed * 13 + i * 3,
+      huecos,
+      mordida,
+      distMin: (o.distMin ?? 0.3) * lb.radio,
+    });
+    const matojos = puntos.map((p, k) => {
+      const m = matojoNube((0.28 + 0.16 * p.esc) * lb.radio, seed * 17 + i * 5 + k, 0.5);
+      poner(m, p.pos, p.giro, [1, 0.82, 1]);
+      return m;
+    });
+    if (!matojos.length) {
+      const m = matojoNube(lb.radio * 0.7, seed * 17 + i * 5, 0.5);
+      poner(m, lb.c, [0, 0, 0], [1, 0.82, 1]);
+      matojos.push(m);
+    }
+    const copa = fusionar(matojos, 'copa-masa');
+    hornearFollaje(copa, {
+      base, sol, luz, centro: lb.c, radio: lb.radio * 1.2, ao, manchas,
+    });
+    copas.push(copa);
+  }
+  return copas;
+}
+
+/**
+ * TRONCO orgánico horneado: una `curvaTronco` (inclinación/sinuosidad/torsión) +
+ * `tuboOrganico` (conicidad + arruga de corteza) + `hornearCorteza`. Devuelve la
+ * geometría Y la curva (para colgar la copa de su punta). Nada de cilindros.
+ */
+function troncoHorneado({
+  H, r0, r1, inclina = 0.1, sinuoso = 0.09, giro = 0, arruga = 0.15,
+  raigon = 0.42, q = 1, corteza, hastaLiquen = 0.4, liquen = PAL.liquen,
+}, seed) {
+  const curva = curvaTronco({ altura: H, inclina, sinuoso, giro }, seed);
+  const geo = tuboOrganico(curva, {
+    tubular: Math.max(8, Math.round(16 * q)),
+    radial: Math.max(6, Math.round(8 * q)),
+    taper: taperTronco(r0, r1, raigon),
+    arruga,
+    semilla: seed * 3.1,
+  });
+  hornearCorteza(geo, {
+    grieta: corteza.grieta,
+    cuerpo: corteza.cuerpo,
+    cresta: corteza.cresta,
+    liquen,
+    escalaGrano: corteza.escalaGrano ?? 4.2,
+    hastaLiquen,
+  });
+  return { geo, curva };
+}
+
 /* -------------------------------------------------------------------------- */
 /*  FRAILEJÓN (Espeletia) — el ícono, y el más difícil                         */
 /* -------------------------------------------------------------------------- */
 
 /*
- * Silueta de MONJE: un tronco columnar VESTIDO de arriba abajo con la ENAGUA de
- * hojas muertas (marcescentes) que cuelgan pegadas al tallo como un hábito —eso
- * le da CUERPO, no es un palo—, coronado por la ROSETA plateada peluda: un
- * penacho DENSO de hojas anchas, carnosas y afelpadas (tomento plateado, NO
- * cerdas) en espiral áurea, más erguidas al centro y recostadas al borde. Esa
- * roseta blanquecina afelpada + la falda de hojas secas es lo que lo hace
- * inequívoco. Con `flor`, un escapo con capítulos amarillos asoma de la roseta.
+ * Silueta de FRAILE: una columna VESTIDA de arriba abajo con la ENAGUA de hojas
+ * muertas (marcescentes) —láminas anchas y secas superpuestas como tejas, no
+ * púas— que le dan CUERPO (sin ella sería un palo), coronada por la ROSETA: un
+ * cogollo DENSO de hojas carnosas y afelpadas (tomento plateado-blanco),
+ * apretadas en espiral áurea sobre una cúpula. Esa bola velluda plateada + la
+ * falda de hojas secas es lo que lo hace inequívoco. Con `flor`, un escapo con
+ * racimo de capítulos amarillos asoma de la roseta.
+ *
+ * La EDAD manda la silueta (Espeletia crece ~1 cm/año): `edad`∈(0..1] —
+ *   · ~0.25 JOVEN: columna muy corta, roseta casi al ras, enagua apenas;
+ *   · ~0.6  ADULTO: columna media vestida de enagua, roseta plena;
+ *   · ~0.95 VIEJO: columna alta con hábito largo de marcescentes.
+ * Un frailejonal es un PAISAJE con gradiente de edad: se instancian los tres
+ * bancos mezclados (distribucionFlora) y NO se lee clonado.
  */
-export function geomFrailejon({ flor = false, q = 1 } = {}, seed = 1) {
+export function geomFrailejon({ flor = false, q = 1, edad = 0.6 } = {}, seed = 1) {
   const r = rng(seed);
   const partes = [];
-  const H = 1.0; // alto del tallo vestido
+  const GOLDEN = Math.PI * (3 - Math.sqrt(5));
+  const e = Math.max(0.12, Math.min(1, edad));
 
-  // Frailejón erguido y solemne: columna alta (crece ~1cm/año, se lee vertical).
-  const Ht = 1.12 + r() * 0.55;
+  // La columna crece con la edad; la roseta es casi constante (el joven es "casi
+  // pura roseta al ras", el viejo un hábito alto coronado por la misma cabeza).
+  const Ht = 0.14 + e * 1.62 + r() * 0.16;
   const cy = Ht + 0.05; // la roseta se posa como una cabeza sobre la columna
+  const rosF = 1.06 - e * 0.16; // la roseta joven, un pelo más grande en relativo
 
   // 1) Tallo columnar — casi todo oculto por la enagua.
-  const tronco = new THREE.CylinderGeometry(0.12, 0.15, Ht, 7, 1);
+  const tronco = new THREE.CylinderGeometry(0.11, 0.155, Ht, 7, 1);
   poner(tronco, [0, Ht / 2, 0]);
   partes.push(pintar(tronco, PAL.frailejonTronco));
 
-  // 2) ENAGUA de hojas muertas: el HÁBITO. Hojas anchas y secas que cuelgan casi
-  //    a plomo, pegadas al tronco y superpuestas como tejas, vistiendo la columna
-  //    entera (de la base a la roseta). Es lo que le da cuerpo de "fraile grande".
-  const anillos = Math.max(3, Math.round(6 * q));
+  // 2) ENAGUA (el HÁBITO): láminas secas ANCHAS que cuelgan pegadas al tallo,
+  //    superpuestas como tejas de la base a la roseta. Cuanto más abajo, más
+  //    viejas y oscuras. El número de anillos escala con la altura (el viejo
+  //    lleva hábito largo; el joven, apenas un faldón).
+  const anillos = Math.max(2, Math.round((Ht / 0.24) * q));
   const porAnillo = Math.max(6, Math.round(10 * q));
   for (let a = 0; a < anillos; a++) {
-    const f = a / anillos; // 0 base → 1 bajo la roseta
-    const y = 0.14 + f * (Ht - 0.1);
+    const f = a / anillos; // 0 base(vieja) → 1 bajo la roseta(reciente)
+    const y = 0.1 + f * (Ht - 0.06);
     const rad = 0.15;
     for (let i = 0; i < porAnillo; i++) {
-      const ang = (i / porAnillo) * Math.PI * 2 + a * 0.6;
-      const largo = 0.30 + r() * 0.14;
-      // hoja seca ANCHA y aplanada (lámina, no púa), colgando casi vertical.
-      const hoja = new THREE.ConeGeometry(0.085, largo, 4, 1);
+      const ang = (i / porAnillo) * Math.PI * 2 + a * 0.55;
+      const largo = 0.32 + r() * 0.16;
+      // lámina seca ancha (6 lados, aplanada) colgando casi a plomo y algo afuera.
+      const hoja = new THREE.ConeGeometry(0.11, largo, 6, 1);
       apuntar(
         hoja,
         [Math.cos(ang) * rad, y, Math.sin(ang) * rad],
-        [Math.cos(ang) * 0.3, -1, Math.sin(ang) * 0.3],
-        [1, 1, 0.42],
+        [Math.cos(ang) * 0.32, -1, Math.sin(ang) * 0.32],
+        [1, 1, 0.5],
       );
-      partes.push(pintar(hoja, variar(r() > 0.55 ? PAL.frailejonSeco : PAL.frailejonSeco2, r, 0.14)));
+      // pajiza arriba (reciente) → curtida oscura abajo (vieja), con variedad.
+      const tono = f > 0.55
+        ? (r() > 0.5 ? PAL.frailejonSeco : PAL.frailejonSeco3)
+        : (r() > 0.5 ? PAL.frailejonSeco3 : PAL.frailejonSeco2);
+      partes.push(pintar(hoja, variar(tono, r, 0.12)));
     }
   }
 
-  // 3) ROSETA plateada peluda — la FIRMA. Un COGOLLO afelpado, no una estrella:
-  //    hojas anchas, carnosas y GRUESAS (poco aplanadas) nacidas sobre una cúpula,
-  //    en espiral áurea, apenas abiertas (cuenco erguido, NO tendidas al ras), muy
-  //    densas y superpuestas → una bola velluda plateada. Las de afuera se recuestan
-  //    y agrisan (viejas); el centro es blanco y erguido (yema joven, tomento fresco).
-  const nRoseta = Math.max(18, Math.round(40 * q));
+  // 3) ROSETA — la FIRMA. Cogollo afelpado: HOJAS CARNOSAS (elipsoides de punta
+  //    redonda, nunca cerdas) en espiral áurea sobre una cúpula, erguidas al
+  //    centro y recostadas al borde, muy densas → una bola velluda plateada.
+  //    Tomento horneado en gradiente (base salvia → punta casi blanca).
+  const nRoseta = Math.max(18, Math.round(38 * q));
+  const wSeg = Math.max(5, Math.round(6 * q));
+  const hSeg = Math.max(3, Math.round(4 * q));
   const plataInt = new THREE.Color(PAL.frailejonPlata);
   const plataExt = new THREE.Color(PAL.frailejonPlata2);
-  for (let i = 0; i < nRoseta; i++) {
-    const f = i / nRoseta; // 0 centro erguido → 1 borde recostado
-    const ang = i * GOLDEN + (r() - 0.5) * 0.18;
-    const posR = 0.03 + f * 0.11; // nacen sobre una cúpula, no de un punto
-    const posY = cy - f * 0.08; // las de afuera, más bajas → domo redondo
-    const tilt = 0.26 + f * 0.78 + (r() - 0.5) * 0.08; // cuenco: 15°→60°, sin aplanarse
+  const hojaRoseta = (f, ang, extraTilt = 0) => {
+    const posR = (0.02 + f * 0.12) * rosF; // nacen sobre una cúpula, no de un punto
+    const posY = cy - f * 0.1 * rosF; // borde más bajo → domo redondo
+    const tilt = 0.2 + f * 0.62 + (r() - 0.5) * 0.09 + extraTilt; // cuenco 11°→47°
     const s = Math.sin(tilt);
-    const largo = 0.28 + (1 - f) * 0.13 + r() * 0.05; // cortas y llenas, no lanzas
-    // hoja carnosa ANCHA y con CUERPO (poco aplanada) — nada de cerda fina.
-    const hoja = new THREE.ConeGeometry(0.115, largo, 4, 1);
+    const largo = (0.27 + (1 - f) * 0.13 + r() * 0.05) * rosF; // cortas y llenas
+    const hoja = petalo((0.1 + f * 0.02) * rosF, largo, 0.06, wSeg, hSeg);
+    const base = variar(plataInt.clone().lerp(plataExt, f), r, 0.05);
+    pintarGradiente(hoja, base, PAL.frailejonCorazon, 0, largo);
     apuntar(
       hoja,
       [Math.cos(ang) * posR, posY, Math.sin(ang) * posR],
       [Math.cos(ang) * s, Math.cos(tilt), Math.sin(ang) * s],
-      [1, 1, 0.6],
     );
-    const col = plataInt.clone().lerp(plataExt, f);
-    partes.push(pintar(hoja, variar(col, r, 0.05)));
+    partes.push(hoja);
+  };
+  for (let i = 0; i < nRoseta; i++) {
+    hojaRoseta(i / nRoseta, i * GOLDEN + (r() - 0.5) * 0.18);
   }
-  // Corona interior: unas pocas hojas cortas y ERGUIDAS que tapan el centro y lo
-  // hacen leer como un cogollo lleno (sin hueco oscuro), del blanco más pálido.
-  const nCorona = Math.max(4, Math.round(7 * q));
+  // capa de relleno: espiral desfasada, un pelo más erguida → tapa los huecos y
+  // hace que el domo se lea LLENO y velludo (no una estrella con agujeros).
+  const nRelleno = Math.max(8, Math.round(18 * q));
+  for (let i = 0; i < nRelleno; i++) {
+    hojaRoseta(((i + 0.5) / nRelleno) * 0.85, i * GOLDEN + 1.7 + (r() - 0.5) * 0.2, -0.1);
+  }
+  // corona interior: pocas hojas cortas y ERGUIDAS, del blanco más pálido, que
+  // tapan el centro (sin hueco oscuro) → cogollo lleno y afelpado.
+  const nCorona = Math.max(5, Math.round(10 * q));
   for (let i = 0; i < nCorona; i++) {
     const ang = i * GOLDEN + 1.3;
-    const tilt = 0.14 + r() * 0.12;
+    const tilt = 0.1 + r() * 0.14;
     const s = Math.sin(tilt);
-    const hoja = new THREE.ConeGeometry(0.075, 0.20 + r() * 0.05, 4, 1);
+    const largoC = (0.16 + r() * 0.05) * rosF;
+    const hoja = petalo(0.072 * rosF, largoC, 0.052, wSeg, hSeg);
+    pintarGradiente(hoja, variar(PAL.frailejonPlata, r, 0.04), '#f3f6ee', 0, largoC);
     apuntar(
       hoja,
-      [Math.cos(ang) * 0.03, cy + 0.05, Math.sin(ang) * 0.03],
+      [Math.cos(ang) * 0.025, cy + 0.04, Math.sin(ang) * 0.025],
       [Math.cos(ang) * s, Math.cos(tilt), Math.sin(ang) * s],
-      [1, 1, 0.7],
     );
-    partes.push(pintar(hoja, variar(PAL.frailejonCorazon, r, 0.04)));
+    partes.push(hoja);
   }
-  // Yema vellosa central (el punto más pálido, afelpado).
-  const corazon = new THREE.IcosahedronGeometry(0.09, 0);
-  poner(corazon, [0, cy + 0.11, 0], [0, 0, 0], [1, 0.9, 1]);
+  // Yema vellosa central (el punto más pálido, afelpado) — cierra el cogollo.
+  const corazon = new THREE.IcosahedronGeometry(0.07 * rosF, 0);
+  poner(corazon, [0, cy + 0.07, 0], [0, 0, 0], [1, 0.85, 1]);
   partes.push(pintar(corazon, PAL.frailejonCorazon));
 
-  // 4) Escapo floral (solo en flor): tallo + capítulos amarillos sobre la roseta.
+  // 4) Escapo floral (solo en flor): vara CORTA que asoma de la roseta con un
+  //    racimo apretado de capítulos amarillos (no un poste pelado).
   if (flor) {
-    const tallo = new THREE.CylinderGeometry(0.028, 0.045, 0.9, 5, 1);
-    poner(tallo, [0.05, cy + 0.45, 0], [0, 0, 0.08]);
+    const tallo = new THREE.CylinderGeometry(0.03, 0.052, 0.5, 5, 1);
+    poner(tallo, [0.05, cy + 0.24, 0], [0, 0, 0.1]);
     partes.push(pintar(tallo, PAL.frailejonTallo));
-    const nCap = Math.max(4, Math.round(7 * q));
+    const nCap = Math.max(5, Math.round(9 * q));
     for (let i = 0; i < nCap; i++) {
-      const ang = (i / nCap) * Math.PI * 2;
-      const rad = 0.1 + r() * 0.06;
-      const cap = new THREE.IcosahedronGeometry(0.055 + r() * 0.02, 0);
-      poner(cap, [0.08 + Math.cos(ang) * rad, cy + 0.85 + r() * 0.1, Math.sin(ang) * rad], [0, 0, 0], [1, 0.7, 1]);
+      const ang = (i / nCap) * Math.PI * 2 + r();
+      const rad = 0.05 + r() * 0.1;
+      const cap = new THREE.IcosahedronGeometry(0.05 + r() * 0.028, 0);
+      poner(cap, [0.06 + Math.cos(ang) * rad, cy + 0.44 + r() * 0.11, Math.sin(ang) * rad], [0, 0, 0], [1, 0.72, 1]);
       partes.push(pintar(cap, variar(PAL.frailejonFlor, r, 0.08)));
     }
   }
 
-  return fusionarSeguro(partes, flor ? 'frailejon-flor' : 'frailejon');
+  return fusionar(partes, 'frailejon');
 }
 
 /* -------------------------------------------------------------------------- */
@@ -469,10 +609,10 @@ export function geomFrailejon({ flor = false, q = 1 } = {}, seed = 1) {
 /* -------------------------------------------------------------------------- */
 
 /*
- * La misma especie del Ent, pero de porte normal: un cortejo de queñuas
- * jóvenes alrededor del guardián (una familia, no un solitario). Su firma es la
- * corteza rojiza que se DESCAMA en láminas de papel: se modela con geometría
- * (anillos de lámina despegada), que es lo único que la lee de verdad.
+ * Pionera esbelta: tronco pálido y recto, ramas en candelabro arriba y una copa
+ * en SOMBRILLA de hojas palmeadas (mano de 7 lóbulos) cuyo ENVÉS es blanco-plata.
+ * Desde abajo se ve ese blanco: la firma inconfundible del yarumo. (No lleva
+ * copa-masa: su silueta ES la sombrilla de manos, no un follaje mullido.)
  */
 export function geomQuenua({ q = 1 } = {}, seed = 2) {
   return construirArbol({
@@ -516,118 +656,46 @@ export function geomQuenua({ q = 1 } = {}, seed = 2) {
   });
 }
 
-/* -------------------------------------------------------------------------- */
-/*  ENCENILLO (Weinmannia tomentosa) — el árbol de la niebla                   */
-/* -------------------------------------------------------------------------- */
+  const { geo, curva } = troncoHorneado({
+    H, r0: 0.13, r1: 0.06, inclina: 0.05, sinuoso: 0.06, giro: r() * 6, arruga: 0.08,
+    raigon: 0.3, q, hastaLiquen: 0.3, liquen: PAL.liquen,
+    corteza: { grieta: '#9a9d90', cuerpo: PAL.yarumoTronco, cresta: '#d0d3c6', escalaGrano: 3 },
+  }, seed + 1);
+  partes.push(geo);
 
-export function geomEncenillo({ q = 1 } = {}, seed = 3) {
-  return construirArbol({
-    nombre: 'encenillo',
-    altura: 2.6, r0: 0.15, r1: 0.045,
-    inclina: 0.1, sinuoso: 0.13, arruga: 0.14,
-    corteza: {
-      grieta: PAL.encenilloGrieta, cuerpo: PAL.encenilloTronco, cresta: '#8a5c46',
-      liquen: '#6f8055', escalaGrano: 6,
-    },
-    // Copa compacta y estrecha: vive apretado en el bosque de niebla.
-    copa: { inicio: 0.46, ramas: 5, largo: 0.5, alza: 0.66, sub: 2, subLargo: 0.3 },
-    follaje: {
-      base: '#22331f', sol: PAL.encenilloHojaSol, luz: '#adc07e',
-      radio: 0.46, hojas: 52, achatado: 0.92, huecos: 0.36, mordida: 0.3,
-      escHoja: 0.36, aplana: 0.8, ao: 0.68, manchas: 0.1,
-    },
-    q,
-    semilla: seed,
-    // FIRMA: el velo de MUSGO que lo cubre (vive envuelto en niebla).
-    firma: (partes, { r, curva, taper, q: qq }) => {
-      const n = Math.max(4, Math.round(11 * qq));
-      for (let i = 0; i < n; i++) {
-        const t = 0.12 + r() * 0.7;
-        const c = curva.getPointAt(t);
-        const ang = r() * Math.PI * 2;
-        const rad = taper(t) * 1.05;
-        const m = matojoHoja(0.1 + r() * 0.07, seed + i * 3, 0.5);
-        poner(m, [c.x + Math.cos(ang) * rad, c.y, c.z + Math.sin(ang) * rad], [r(), r(), r()], [1.3, 0.9, 1.3]);
-        hornearFollaje(m, {
-          base: '#3d4a2a', sol: PAL.encenilloMusgo, luz: '#c2cf94',
-          centro: [c.x, c.y, c.z], radio: 0.4, yMin: 0, yMax: 2.6, ao: 0.4, manchas: 0.2,
-        });
-        partes.push(m);
-      }
-    },
-  });
-}
+  // Ramas en candelabro (pocas, arriba).
+  const nRamas = Math.max(2, Math.round(3 * q));
+  const top = curva.getPointAt(1);
+  const puntas = [[top.x, H + 0.05, top.z]];
+  for (let i = 0; i < nRamas; i++) {
+    const ang = (i / nRamas) * Math.PI * 2 + 0.4;
+    const largo = 0.7 + r() * 0.3;
+    const dir = [Math.cos(ang) * 0.7, 0.7, Math.sin(ang) * 0.7];
+    const base = [top.x + Math.cos(ang) * 0.05, H - 0.35 + i * 0.06, top.z + Math.sin(ang) * 0.05];
+    const rama = new THREE.CylinderGeometry(0.03, 0.05, largo, 5, 1);
+    apuntar(rama, [base[0] + dir[0] * largo * 0.3, base[1] + dir[1] * largo * 0.3, base[2] + dir[2] * largo * 0.3], dir);
+    partes.push(pintar(rama, PAL.yarumoRama));
+    puntas.push([base[0] + dir[0] * largo, base[1] + dir[1] * largo, base[2] + dir[2] * largo]);
+  }
 
-/* -------------------------------------------------------------------------- */
-/*  ALISO (Alnus acuminata) — el vecino esbelto de corteza clara               */
-/* -------------------------------------------------------------------------- */
+  // Hojas palmeadas: discos aplanados de 7 lóbulos, envés blanco, colgando.
+  const porPunta = Math.max(2, Math.round(3 * q));
+  for (const p of puntas) {
+    for (let i = 0; i < porPunta; i++) {
+      const ang = (i / porPunta) * Math.PI * 2 + r();
+      const rad = 0.18 + r() * 0.12;
+      const hoja = new THREE.ConeGeometry(0.42, 0.09, 7, 1); // 7-gono chato = "mano"
+      apuntar(
+        hoja,
+        [p[0] + Math.cos(ang) * rad, p[1] - 0.05 - r() * 0.08, p[2] + Math.sin(ang) * rad],
+        [Math.cos(ang) * 0.4, 0.9, Math.sin(ang) * 0.4],
+        [1, 0.5, 1],
+      );
+      partes.push(pintar(hoja, variar(PAL.yarumoEnves, r, 0.05)));
+    }
+  }
 
-/*
- * OJO: la versión anterior construía su copa como un CONO explícito ("copa
- * cónica: blobs que se estrechan hacia arriba") — el árbol de navidad literal.
- * Ahora la copa es alta y ovalada pero IRREGULAR: se estrecha porque las ramas
- * de arriba son cortas, no porque la dibujemos como un cono.
- */
-export function geomAliso({ q = 1 } = {}, seed = 4) {
-  return construirArbol({
-    nombre: 'aliso',
-    altura: 3.3, r0: 0.13, r1: 0.04,
-    inclina: 0.06, sinuoso: 0.08, raigon: 0.28, arruga: 0.08, // recto y esbelto
-    corteza: {
-      grieta: PAL.alisoGrieta, cuerpo: PAL.alisoTronco, cresta: PAL.alisoLenticela,
-      liquen: '#8a9668', escalaGrano: 7,
-    },
-    copa: { inicio: 0.42, ramas: 6, largo: 0.6, alza: 0.72, sub: 2, subLargo: 0.32 },
-    follaje: {
-      base: '#2c4020', sol: PAL.alisoHojaSol, luz: '#d2dc8e',
-      radio: 0.5, hojas: 56, achatado: 0.86, huecos: 0.5, mordida: 0.42,
-      escHoja: 0.34, aplana: 0.7, ao: 0.58, manchas: 0.12,
-    },
-    q,
-    semilla: seed,
-    // FIRMA: las LENTICELAS: las rayitas claras horizontales de su corteza gris.
-    firma: (partes, { r, curva, taper, q: qq }) => {
-      const n = Math.max(6, Math.round(16 * qq));
-      for (let i = 0; i < n; i++) {
-        const t = 0.06 + r() * 0.68;
-        const c = curva.getPointAt(t);
-        const ang = r() * Math.PI * 2;
-        const rad = taper(t);
-        const len = new THREE.BoxGeometry(0.07 + r() * 0.06, 0.014, 0.03);
-        poner(
-          len,
-          [c.x + Math.cos(ang) * rad * 0.98, c.y, c.z + Math.sin(ang) * rad * 0.98],
-          [0, -ang, 0],
-        );
-        partes.push(pintarPlano(len, PAL.alisoLenticela));
-      }
-    },
-  });
-}
-
-/* -------------------------------------------------------------------------- */
-/*  GAQUE (Clusia) — copa redonda densa de hoja gruesa lustrosa                */
-/* -------------------------------------------------------------------------- */
-
-export function geomGaque({ q = 1 } = {}, seed = 5) {
-  return construirArbol({
-    nombre: 'gaque',
-    altura: 1.9, r0: 0.17, r1: 0.06,
-    inclina: 0.1, sinuoso: 0.1, arruga: 0.1,
-    corteza: {
-      grieta: PAL.gaqueGrieta, cuerpo: PAL.gaqueTronco, cresta: '#75664f',
-      liquen: LIQUEN_PIE, escalaGrano: 6.5,
-    },
-    // Ramas cortas y muy abiertas → domo bajo, ancho y macizo.
-    copa: { inicio: 0.4, ramas: 6, largo: 0.72, alza: 0.34, sub: 2, subLargo: 0.36 },
-    follaje: {
-      base: '#182a17', sol: PAL.gaqueHojaSol, luz: '#9ab97e',
-      radio: 0.56, hojas: 58, achatado: 0.72, huecos: 0.3, mordida: 0.26,
-      escHoja: 0.4, aplana: 0.66, ao: 0.7, manchas: 0.08,
-    },
-    q,
-    semilla: seed,
-  });
+  return fusionar(partes, 'yarumo');
 }
 
 /* -------------------------------------------------------------------------- */
@@ -635,10 +703,9 @@ export function geomGaque({ q = 1 } = {}, seed = 5) {
 /* -------------------------------------------------------------------------- */
 
 /*
- * No es de páramo (es del robledal andino, más abajo), así que NO entra en el
- * cortejo del Ent — pero lo usan la ladera de restauración y el valle, y esos
- * mundos también merecen dejar de tener bombones. Su firma: tronco grueso y
- * copa ANCHA y densa de hoja coriácea oscura, con bellotas.
+ * Árbol robusto de robledal altoandino: tronco grueso de corteza gris-parda
+ * fisurada y una copa ANCHA y densa —MASA de hoja coriácea verde oscuro con
+ * huecos— con bellotas. Imponente pero SIEMPRE menor que el Ent.
  */
 export function geomRoble({ q = 1 } = {}, seed = 11) {
   return construirArbol({
@@ -692,73 +759,57 @@ export function geomYarumo({ q = 1 } = {}, seed = 12) {
   const partes = [];
   const H = 3.4;
 
-  // Tronco pálido, esbelto y anillado.
-  const curva = curvaTronco({ altura: H, inclina: 0.07, sinuoso: 0.06, giro: r() * 6.28 }, seed);
-  const taper = taperTronco(0.14, 0.06, 0.2);
-  const tronco = tuboOrganico(curva, {
-    tubular: Math.max(8, Math.round(14 * q)), radial: Math.max(5, Math.round(8 * q)),
-    taper, arruga: 0.05, semilla: seed * 3,
-  });
-  hornearCorteza(tronco, {
-    grieta: '#8e9186', cuerpo: PAL.yarumoTronco, cresta: '#d6d9cc',
-    liquen: LIQUEN_PIE, hastaLiquen: H * 0.18, escalaGrano: 3,
-  });
-  partes.push(tronco);
+  const { geo, curva } = troncoHorneado({
+    H, r0: 0.23, r1: 0.1, inclina: 0.06, sinuoso: 0.08, giro: r() * 6, arruga: 0.18,
+    raigon: 0.5, q,
+    corteza: { grieta: PAL.robleGrieta, cuerpo: PAL.robleTronco, cresta: PAL.robleCresta, escalaGrano: 4.4 },
+  }, seed + 1);
+  partes.push(geo);
+  const top = curva.getPointAt(1);
 
-  // Anillos: las cicatrices de hoja caída que le marcan el tronco.
-  const nAnillos = Math.max(3, Math.round(8 * q));
-  for (let i = 0; i < nAnillos; i++) {
-    const t = 0.12 + (i / nAnillos) * 0.72;
-    const c = curva.getPointAt(t);
-    const rad = taper(t);
-    const anillo = new THREE.TorusGeometry(rad * 1.02, 0.012, 4, 9);
-    poner(anillo, [c.x, c.y, c.z], [Math.PI / 2, 0, 0]);
-    partes.push(pintarPlano(anillo, '#9fa294'));
-  }
-
-  // Ramas en candelabro: pocas, arriba, muy abiertas.
-  const nRamas = Math.max(2, Math.round(4 * q));
-  const puntas = [curva.getPointAt(1).clone()];
+  // Ramas gruesas bajas que abren la copa ancha.
+  const nRamas = Math.max(2, Math.round(3 * q));
   for (let i = 0; i < nRamas; i++) {
-    const ang = i * AUREO + r() * 0.4;
-    const largo = 0.72 + r() * 0.3;
-    const base = curva.getPointAt(0.86 + (i / nRamas) * 0.1);
-    const fin = base.clone().add(new THREE.Vector3(Math.cos(ang) * largo, 0.66 + r() * 0.2, Math.sin(ang) * largo));
-    const cR = new THREE.CatmullRomCurve3([
-      base.clone(),
-      base.clone().lerp(fin, 0.55).add(new THREE.Vector3(0, 0.1, 0)),
-      fin.clone(),
-    ], false, 'catmullrom', 0.5);
-    const g = tuboOrganico(cR, {
-      tubular: 5, radial: 4, taper: taperLineal(0.045, 0.022), arruga: 0.05, semilla: seed + i,
-    });
-    hornearCorteza(g, { grieta: '#8a8d82', cuerpo: PAL.yarumoRama, cresta: '#c8cbbe', liquen: null, hastaLiquen: 0, escalaGrano: 4 });
-    partes.push(g);
-    puntas.push(fin);
+    const ang = (i / nRamas) * Math.PI * 2 + 0.5;
+    const largo = 0.85 + r() * 0.3;
+    const rama = new THREE.CylinderGeometry(0.055, 0.095, largo, 6, 1);
+    apuntar(rama, [top.x + Math.cos(ang) * 0.3, H - 0.5, top.z + Math.sin(ang) * 0.3], [Math.cos(ang) * 0.85, 0.55, Math.sin(ang) * 0.85]);
+    partes.push(pintar(rama, PAL.robleTronco));
   }
 
-  // Las HOJAS palmeadas: discos grandes de 7 lóbulos, casi horizontales, con el
-  // envés blanco mirando al suelo. Es la sombrilla del yarumo.
-  const porPunta = Math.max(2, Math.round(3 * q));
-  for (const p of puntas) {
-    for (let i = 0; i < porPunta; i++) {
-      const ang = i * AUREO + r() * 1.2;
-      const rad = 0.2 + r() * 0.14;
-      const hoja = new THREE.ConeGeometry(0.44, 0.08, 7, 1); // heptágono chato = "mano"
-      const pos = /** @type {[number, number, number]} */ ([p.x + Math.cos(ang) * rad, p.y - 0.04 - r() * 0.08, p.z + Math.sin(ang) * rad]);
-      apuntar(hoja, pos, [Math.cos(ang) * 0.34, 0.94, Math.sin(ang) * 0.34], [1, 0.5, 1]);
-      // El haz apenas verdea; el envés (abajo) es blanco-plata: el gradiente de
-      // altura de hornearFollaje hace justo eso si le damos un rango corto.
-      hornearFollaje(hoja, {
-        base: PAL.yarumoEnves, sol: PAL.yarumoHaz, luz: '#f2f6ee',
-        centro: pos, radio: 0.5, yMin: pos[1] - 0.06, yMax: pos[1] + 0.06,
-        ao: 0.18, manchas: 0.05,
-      });
-      partes.push(hoja);
+  // Copa ANCHA: domo central + corona de lóbulos alrededor (masa de hojas).
+  const lobs = [{ c: [top.x, top.y + 0.55, top.z], radio: 0.9 }];
+  const nL = Math.max(3, Math.round(5 * q));
+  for (let i = 0; i < nL; i++) {
+    const ang = (i / nL) * Math.PI * 2 + r() * 0.6;
+    const rad = 0.6 + r() * 0.5;
+    lobs.push({
+      c: [Math.cos(ang) * rad, H + 0.1 + r() * 0.7, Math.sin(ang) * rad],
+      radio: 0.55 + r() * 0.32,
+    });
+  }
+  copaMasa(lobs, {
+    base: PAL.robleHoja, sol: PAL.robleHoja2, luz: PAL.robleLuz,
+    q, seed: seed + 7, achatado: 0.82, huecos: 0.44, mordida: 0.4, ao: 0.66, manchas: 0.15,
+  }).forEach((cc) => partes.push(cc));
+
+  // Bellotas (unas pocas, cuelgan del borde de la copa).
+  if (q > 0.5) {
+    const nBel = Math.max(2, Math.round(4 * q));
+    for (let i = 0; i < nBel; i++) {
+      const ang = r() * Math.PI * 2;
+      const rad = 0.7 + r() * 0.5;
+      const y = H + 0.2 + r() * 0.5;
+      const bellota = new THREE.IcosahedronGeometry(0.06, 0);
+      poner(bellota, [Math.cos(ang) * rad, y, Math.sin(ang) * rad], [0, 0, 0], [1, 1.4, 1]);
+      partes.push(pintar(bellota, PAL.robleBellota));
+      const capa = new THREE.SphereGeometry(0.05, 6, 4, 0, Math.PI * 2, 0, Math.PI * 0.5);
+      poner(capa, [Math.cos(ang) * rad, y + 0.07, Math.sin(ang) * rad]);
+      partes.push(pintar(capa, PAL.robleCapa));
     }
   }
 
-  return fusionarSeguro(partes, 'yarumo');
+  return fusionar(partes, 'roble');
 }
 
 /* -------------------------------------------------------------------------- */
@@ -766,73 +817,202 @@ export function geomYarumo({ q = 1 } = {}, seed = 12) {
 /* -------------------------------------------------------------------------- */
 
 /*
- * Arbusto bajo y ramoso. No pasa por `construirArbol` (no tiene fuste): es una
- * mata de varitas que salen del suelo, con hojita menuda y —la firma— BAYAS
- * azul-moradas salpicadas.
+ * Copa oscura, compacta e irregular —masa de hojas sombría— sobre tronco rojizo
+ * algo torcido, con barbas de musgo colgando (vive envuelto en niebla). Más
+ * estrecho y sombrío que el roble.
  */
-export function geomMortino({ q = 1 } = {}, seed = 6) {
+export function geomEncenillo({ q = 1 } = {}, seed = 4) {
+  const r = rng(seed);
+  const partes = [];
+  const H = 2.3;
+
+  const { geo, curva } = troncoHorneado({
+    H, r0: 0.15, r1: 0.07, inclina: 0.16, sinuoso: 0.16, giro: r() * 6, arruga: 0.17,
+    raigon: 0.42, q, hastaLiquen: 0.9, liquen: PAL.encenilloMusgo,
+    corteza: { grieta: PAL.encenilloGrieta, cuerpo: PAL.encenilloTronco, cresta: PAL.encenilloCresta, escalaGrano: 4.2 },
+  }, seed + 1);
+  partes.push(geo);
+  const top = curva.getPointAt(1);
+
+  // Copa estrecha y alta: lóbulos apilados que suben poco a poco.
+  const lobs = [{ c: [top.x, top.y + 0.45, top.z], radio: 0.62 }];
+  const nL = Math.max(3, Math.round(5 * q));
+  for (let i = 0; i < nL; i++) {
+    const f = i / nL;
+    const ang = r() * Math.PI * 2;
+    const rad = 0.15 + r() * 0.42;
+    lobs.push({
+      c: [Math.cos(ang) * rad, H + 0.1 + f * 0.9 + r() * 0.3, Math.sin(ang) * rad],
+      radio: 0.4 + r() * 0.28,
+    });
+  }
+  copaMasa(lobs, {
+    base: PAL.encenilloHoja, sol: PAL.encenilloHoja2, luz: PAL.encenilloLuz,
+    q, seed: seed + 7, achatado: 0.78, huecos: 0.4, mordida: 0.34, ao: 0.68, manchas: 0.16,
+  }).forEach((cc) => partes.push(cc));
+
+  // Barbas de musgo/usnea colgando del borde de la copa (el velo de la niebla).
+  const nBarbas = Math.max(2, Math.round(5 * q));
+  for (let i = 0; i < nBarbas; i++) {
+    const lb = lobs[i % lobs.length];
+    const ang = r() * Math.PI * 2;
+    const largo = 0.28 + r() * 0.3;
+    const barba = new THREE.ConeGeometry(0.04, largo, 4, 1);
+    apuntar(
+      barba,
+      [lb.c[0] + Math.cos(ang) * lb.radio * 0.6, lb.c[1] - lb.radio * 0.5 - largo * 0.35, lb.c[2] + Math.sin(ang) * lb.radio * 0.6],
+      [Math.cos(ang) * 0.12, -1, Math.sin(ang) * 0.12],
+    );
+    partes.push(pintar(barba, variar(PAL.encenilloMusgo, r, 0.14)));
+  }
+
+  return fusionar(partes, 'encenillo');
+}
+
+/* -------------------------------------------------------------------------- */
+/*  ALISO (Alnus acuminata) — el vecino alto de corteza clara                  */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * Tronco recto y esbelto de corteza gris clara, copa CÓNICA-ovalada de verde
+ * fresco —masa de hojas que se estrecha hacia arriba—. Es el árbol más alto del
+ * cortejo (crece rápido) pero no llega al Ent.
+ */
+export function geomAliso({ q = 1 } = {}, seed = 5) {
+  const r = rng(seed);
+  const partes = [];
+  const H = 3.2;
+
+  const { geo, curva } = troncoHorneado({
+    H, r0: 0.12, r1: 0.055, inclina: 0.05, sinuoso: 0.07, giro: r() * 6, arruga: 0.1,
+    raigon: 0.34, q, hastaLiquen: 0.5, liquen: PAL.liquen2,
+    corteza: { grieta: PAL.alisoGrieta, cuerpo: PAL.alisoTronco, cresta: PAL.alisoCresta, escalaGrano: 3.4 },
+  }, seed + 1);
+  partes.push(geo);
+  const top = curva.getPointAt(1);
+
+  // Copa cónica: lóbulos que se estrechan y sesgan hacia arriba desde el fuste.
+  const lobs = [];
+  const nL = Math.max(4, Math.round(6 * q));
+  for (let i = 0; i < nL; i++) {
+    const f = i / (nL - 1); // 0 abajo → 1 punta
+    const ang = r() * Math.PI * 2;
+    const rad = (0.62 - f * 0.5) * (0.4 + r() * 0.7);
+    lobs.push({
+      c: [top.x + Math.cos(ang) * rad, H - 1.0 + f * 2.1 + r() * 0.15, top.z + Math.sin(ang) * rad],
+      radio: (0.52 - f * 0.24) + r() * 0.12,
+    });
+  }
+  copaMasa(lobs, {
+    base: PAL.alisoHoja, sol: PAL.alisoHoja2, luz: PAL.alisoLuz,
+    q, seed: seed + 7, achatado: 0.82, huecos: 0.42, mordida: 0.36, ao: 0.62, manchas: 0.15,
+  }).forEach((cc) => partes.push(cc));
+
+  return fusionar(partes, 'aliso');
+}
+
+/* -------------------------------------------------------------------------- */
+/*  GAQUE (Clusia) — un domo denso de hoja gruesa lustrosa                       */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * Copa REDONDA densa y baja —un domo compacto de hoja gruesa verde muy oscuro
+ * (casi lustrosa)— sobre tronco corto y firme. Sólido y macizo.
+ */
+export function geomGaque({ q = 1 } = {}, seed = 6) {
+  const r = rng(seed);
+  const partes = [];
+  const H = 1.9;
+
+  const { geo, curva } = troncoHorneado({
+    H, r0: 0.18, r1: 0.11, inclina: 0.04, sinuoso: 0.06, giro: r() * 6, arruga: 0.14,
+    raigon: 0.5, q, hastaLiquen: 0.35, liquen: PAL.liquen,
+    corteza: { grieta: PAL.gaqueGrieta, cuerpo: PAL.gaqueTronco, cresta: PAL.gaqueCresta, escalaGrano: 4 },
+  }, seed + 1);
+  partes.push(geo);
+  const top = curva.getPointAt(1);
+
+  // Domo bajo y ancho: un lóbulo grande central + pocos de relleno pegados.
+  const lobs = [{ c: [top.x, top.y + 0.45, top.z], radio: 1.0 }];
+  const nL = Math.max(2, Math.round(4 * q));
+  for (let i = 0; i < nL; i++) {
+    const ang = (i / nL) * Math.PI * 2 + r() * 0.5;
+    const rad = 0.4 + r() * 0.4;
+    lobs.push({
+      c: [Math.cos(ang) * rad, H + 0.3 + r() * 0.45, Math.sin(ang) * rad],
+      radio: 0.5 + r() * 0.28,
+    });
+  }
+  copaMasa(lobs, {
+    base: PAL.gaqueHoja, sol: PAL.gaqueHoja2, luz: PAL.gaqueLuz,
+    q, seed: seed + 7, achatado: 0.7, huecos: 0.34, mordida: 0.3, ao: 0.7, manchas: 0.12, densidad: 11,
+  }).forEach((cc) => partes.push(cc));
+
+  return fusionar(partes, 'gaque');
+}
+
+/* -------------------------------------------------------------------------- */
+/*  MORTIÑO (Vaccinium meridionale) — arbusto de agraz con bayas azules         */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * Mata baja de hojitas verdes con brotes rojizos y —la firma— BAYAS azul-moradas
+ * (el agraz andino) salpicadas entre el follaje. La fronda es masa menuda de
+ * hojas (matojos-nube pequeños), no bolas facetadas.
+ */
+export function geomMortino({ q = 1 } = {}, seed = 7) {
   const r = rng(seed);
   const partes = [];
 
-  // Varitas desde la base (mata ramosa).
-  const nVaras = Math.max(3, Math.round(6 * q));
-  const puntas = [];
-  for (let i = 0; i < nVaras; i++) {
-    const ang = i * AUREO + r() * 0.5;
-    const alto = 0.42 + r() * 0.3;
-    const abre = 0.12 + r() * 0.16;
-    const pts = [
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(Math.cos(ang) * abre * 0.5, alto * 0.5, Math.sin(ang) * abre * 0.5),
-      new THREE.Vector3(Math.cos(ang) * abre, alto, Math.sin(ang) * abre),
-    ];
-    const c = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5);
-    const g = tuboOrganico(c, {
-      tubular: 4, radial: 4, taper: taperLineal(0.022, 0.01), arruga: 0.1, semilla: seed + i,
-    });
-    hornearCorteza(g, { grieta: '#38271c', cuerpo: PAL.mortinoRama, cresta: '#7a5a44', liquen: null, hastaLiquen: 0, escalaGrano: 10 });
-    partes.push(g);
-    puntas.push(pts[2]);
-  }
-
-  // Hojita menuda alrededor de las varitas.
-  const nHojas = Math.max(6, Math.round(16 * q));
-  for (let i = 0; i < nHojas; i++) {
-    const p = puntas[i % puntas.length];
-    const ang = r() * Math.PI * 2;
-    const rad = 0.06 + r() * 0.16;
-    const pos = [p.x + Math.cos(ang) * rad, 0.16 + r() * 0.42, p.z + Math.sin(ang) * rad];
-    const h = matojoHoja(0.08 + r() * 0.05, seed + i * 3, 0.4);
-    poner(h, pos, [r(), r(), r()], [1, 0.6, 1]);
-    hornearFollaje(h, {
-      base: '#25361f', sol: r() > 0.78 ? PAL.mortinoBrote : PAL.mortinoHojaSol, luz: '#b6c883',
-      centro: [0, 0.4, 0], radio: 0.5, yMin: 0, yMax: 0.8, ao: 0.5, manchas: 0.14,
-    });
-    partes.push(h);
-  }
-
-  // FIRMA: las bayas de agraz, azul-moradas con su punto de brillo.
-  const nBayas = Math.max(3, Math.round(9 * q));
-  for (let i = 0; i < nBayas; i++) {
+  const lobs = [];
+  const nBlobs = Math.max(3, Math.round(5 * q));
+  for (let i = 0; i < nBlobs; i++) {
     const ang = r() * Math.PI * 2;
     const rad = r() * 0.3;
-    const baya = new THREE.IcosahedronGeometry(0.038 + r() * 0.014, 0);
-    poner(baya, [Math.cos(ang) * rad, 0.16 + r() * 0.42, Math.sin(ang) * rad]);
-    hornearFollaje(baya, {
-      base: '#1d1b38', sol: r() > 0.5 ? PAL.mortinoBaya : PAL.mortinoBaya2, luz: '#8f88d0',
-      centro: [Math.cos(ang) * rad, 0.3, Math.sin(ang) * rad], radio: 0.05, ao: 0.3, manchas: 0,
+    lobs.push({
+      c: [Math.cos(ang) * rad, 0.2 + r() * 0.42, Math.sin(ang) * rad],
+      radio: 0.2 + r() * 0.16,
     });
-    partes.push(baya);
+  }
+  copaMasa(lobs, {
+    base: PAL.mortinoHoja, sol: PAL.mortinoHoja2, luz: '#9ab06a',
+    q, seed: seed + 5, achatado: 0.8, huecos: 0.34, mordida: 0.32, ao: 0.58, manchas: 0.18, densidad: 8,
+  }).forEach((cc) => partes.push(cc));
+
+  // Brotes rojizos nuevos (puntas tiernas).
+  const nBrote = Math.max(1, Math.round(3 * q));
+  for (let i = 0; i < nBrote; i++) {
+    const ang = r() * Math.PI * 2;
+    const rad = r() * 0.28;
+    const brote = new THREE.ConeGeometry(0.03, 0.12, 4, 1);
+    apuntar(brote, [Math.cos(ang) * rad, 0.42 + r() * 0.3, Math.sin(ang) * rad], [(r() - 0.5) * 0.4, 1, (r() - 0.5) * 0.4]);
+    partes.push(pintar(brote, variar(PAL.mortinoBrote, r, 0.1)));
   }
 
-  return fusionarSeguro(partes, 'mortino');
+  // Bayas azul-moradas (la firma del agraz).
+  const nBayas = Math.max(3, Math.round(10 * q));
+  for (let i = 0; i < nBayas; i++) {
+    const ang = r() * Math.PI * 2;
+    const rad = r() * 0.32;
+    const y = 0.15 + r() * 0.45;
+    const baya = new THREE.IcosahedronGeometry(0.04 + r() * 0.015, 0);
+    poner(baya, [Math.cos(ang) * rad, y, Math.sin(ang) * rad]);
+    partes.push(pintar(baya, variar(r() > 0.5 ? PAL.mortinoBaya : PAL.mortinoBaya2, r, 0.1)));
+  }
+
+  return fusionar(partes, 'mortino');
 }
 
 /* -------------------------------------------------------------------------- */
 /*  ROMERILLO — cojín bajo de follaje fino                                      */
 /* -------------------------------------------------------------------------- */
 
-export function geomRomerillo({ q = 1 } = {}, seed = 7) {
+/*
+ * Cojín bajo de follaje FINO amarillo-verde (hojita de escama tipo romero de
+ * páramo), a veces con puntos de flor amarilla. Relleno del sotobosque. Su
+ * identidad ES el manojo de ramitas finas, así que se queda en conos delgados.
+ */
+export function geomRomerillo({ q = 1 } = {}, seed = 8) {
   const r = rng(seed);
   const partes = [];
   const nRamitas = Math.max(6, Math.round(16 * q));
@@ -862,7 +1042,8 @@ export function geomRomerillo({ q = 1 } = {}, seed = 7) {
       partes.push(pintarPlano(flor, PAL.romerilloFlor));
     }
   }
-  return fusionarSeguro(partes, 'romerillo');
+
+  return fusionar(partes, 'romerillo');
 }
 
 /* -------------------------------------------------------------------------- */
@@ -892,7 +1073,7 @@ export function geomRoca(seed = 8) {
     });
     partes.push(parche);
   }
-  return fusionarSeguro(partes, 'roca');
+  return fusionar(partes, 'roca');
 }
 
 /** Montículo de musgo húmedo (domo bajo e irregular). */
@@ -912,15 +1093,13 @@ export function geomMusgo(seed = 9) {
 /* -------------------------------------------------------------------------- */
 
 /*
- * El DR §"La disposición" es tajante: los árboles no crecen en cuadrícula NI en
- * anillos regulares. La versión anterior sembraba cada especie en un ANILLO
- * concéntrico con reparto angular parejo (`uniforme: true`) → se leía como un
- * decorado de teatro alrededor del Ent.
- *
- * Ahora: BOSQUETES. Cada especie elige unos pocos núcleos alrededor del claro y
- * sus matas caen cerca de ellos (dispersión gaussiana). Un campo de ruido decide
- * la densidad → aparecen claros de verdad. El sotobosque se agolpa en el BORDE
- * de los bosquetes, que es donde crece en el bosque real.
+ * Estratos concéntricos (el Ent en el centro, 0,0,0). La cámara ORBITA, así que
+ * la composición es un anillo por estrato (no un frente fijo):
+ *   · frailejonar (tres edades entremezcladas) + sotobosque + suelo → anillo
+ *     interior-medio (al frente visual);
+ *   · árboles (roble, encenillo, aliso, yarumo, gaque) → anillo exterior,
+ *     velados por la niebla → dan fondo y hacen que el Ent RESALTE como el mayor.
+ * Devuelve, por banco, instancias {pos, rotY, escala, tint, [tiltX, tiltZ]}.
  */
 
 function tinteInstancia(r, amt) {
@@ -959,30 +1138,32 @@ function sembrarBosquete(n, rMin, rMax, r, opts = {}) {
   }
 
   const arr = [];
-  const intentos = n * 26;
-  for (let i = 0; i < intentos && arr.length < n; i++) {
-    const c = centros[Math.floor(r() * centros.length) % centros.length];
-    const x = c[0] + gauss(r) * disper;
-    const z = c[1] + gauss(r) * disper;
-    const rad = Math.hypot(x, z);
-    if (rad < rMin || rad > rMax) continue;
-    // Claros: el campo de ruido apaga zonas → el bosque respira.
-    if (ruidoFbm(x * 0.16 + 40, 0, z * 0.16 + 40) < claros * 0.55) continue;
-    // Distancia mínima: nada de matas incrustadas.
-    let choca = false;
-    for (let k = 0; k < arr.length; k++) {
-      const q = arr[k].pos;
-      if ((q[0] - x) ** 2 + (q[2] - z) ** 2 < distMin * distMin) { choca = true; break; }
-    }
-    if (choca) continue;
-    arr.push({
-      pos: [x, 0, z],
+  const eMin = opts.eMin ?? 0.9;
+  const eMax = opts.eMax ?? 1.15;
+  for (let i = 0; i < n; i++) {
+    // Árboles (uniforme): reparto angular parejo + leve jitter → no se solapan.
+    // Sotobosque/frailejonar (agrupado): ángulo aleatorio → matorral natural.
+    const ang = opts.uniforme
+      ? (i / Math.max(1, n)) * Math.PI * 2 + (r() - 0.5) * 0.7
+      : r() * Math.PI * 2;
+    const rad = rMin + (rMax - rMin) * (opts.haciaAfuera ? Math.sqrt(r()) : r());
+    const it = {
+      pos: [Math.cos(ang) * rad, 0, Math.sin(ang) * rad],
       rotY: r() * Math.PI * 2,
       // Inclinación sutil por instancia: ningún árbol real está a plomo.
       inclina: [(r() - 0.5) * (opts.inclina ?? 0.1), (r() - 0.5) * (opts.inclina ?? 0.1)],
       escala: eMin + r() * (eMax - eMin),
       tint: tinteInstancia(r, opts.varia ?? 0.12),
-    });
+    };
+    // Ladeo por instancia (solo especies con `lean`): unos grados de cabeceo para
+    // que el frailejonal no se lea clonado (cada mata mira distinto). El pivote
+    // está en la base → el ladeo no despega la mata del suelo. Los r() se corren
+    // SOLO cuando hay lean, para no alterar el RNG de las demás especies.
+    if (opts.lean) {
+      it.tiltX = (r() - 0.5) * 2 * opts.lean;
+      it.tiltZ = (r() - 0.5) * 2 * opts.lean;
+    }
+    arr.push(it);
   }
   return arr;
 }
@@ -994,21 +1175,17 @@ function sembrarBosquete(n, rMin, rMax, r, opts = {}) {
 export function distribucionFlora(conteos, seed = 707) {
   const c = conteos;
   return {
-    // Frailejonar: bosquetes densos en el anillo interior-medio. Es lo primero
-    // que se ve y lo que dice "esto es páramo".
-    frailejon: sembrarBosquete(c.frailejon, 3.4, 11, rng(seed + 1), {
-      nucleos: 5, disper: 1.7, distMin: 0.78, eMin: 0.78, eMax: 1.34, varia: 0.15, claros: 0.3, inclina: 0.14,
-    }),
-    frailejonFlor: sembrarBosquete(c.frailejonFlor, 4, 10, rng(seed + 2), {
-      nucleos: 3, disper: 1.9, distMin: 0.9, eMin: 0.9, eMax: 1.22, varia: 0.1, claros: 0.3, inclina: 0.12,
-    }),
-    // Sotobosque: se agolpa en el borde de los bosquetes.
-    mortino: sembrarBosquete(c.mortino, 3, 12.5, rng(seed + 3), {
-      nucleos: 4, disper: 1.8, distMin: 0.7, eMin: 0.78, eMax: 1.25, varia: 0.14, claros: 0.4,
-    }),
-    romerillo: sembrarBosquete(c.romerillo, 2.6, 12.5, rng(seed + 4), {
-      nucleos: 5, disper: 1.9, distMin: 0.62, eMin: 0.75, eMax: 1.3, varia: 0.16, claros: 0.42,
-    }),
+    // Frailejonal: TRES edades entremezcladas en el mismo anillo interior-medio,
+    // agrupadas, con mucha variación de tamaño + ladeo por instancia (`lean`) →
+    // un paisaje con gradiente de edad, nada clonado. Los jóvenes se acercan más
+    // al claro (rMin menor); los viejos quedan un poco más afuera.
+    frailejonJoven: sembrar(c.frailejonJoven, 3.4, 9.5, rng(seed + 1), { eMin: 0.78, eMax: 1.12, varia: 0.13, lean: 0.14 }),
+    frailejon: sembrar(c.frailejon, 3.8, 10.5, rng(seed + 12), { eMin: 0.86, eMax: 1.22, varia: 0.14, lean: 0.15 }),
+    frailejonViejo: sembrar(c.frailejonViejo, 4.4, 11, rng(seed + 13), { eMin: 0.9, eMax: 1.3, varia: 0.14, lean: 0.17 }),
+    frailejonFlor: sembrar(c.frailejonFlor, 4.5, 9.5, rng(seed + 2), { eMin: 0.9, eMax: 1.2, varia: 0.1, lean: 0.12 }),
+    // Sotobosque.
+    mortino: sembrar(c.mortino, 4, 12, rng(seed + 3), { eMin: 0.8, eMax: 1.2, varia: 0.12 }),
+    romerillo: sembrar(c.romerillo, 3, 12, rng(seed + 4), { eMin: 0.8, eMax: 1.25, varia: 0.14 }),
     // Suelo.
     roca: sembrarBosquete(c.roca, 1.8, 12, rng(seed + 5), {
       nucleos: 4, disper: 2.4, distMin: 0.85, eMin: 0.65, eMax: 1.6, varia: 0.12, claros: 0.25,
