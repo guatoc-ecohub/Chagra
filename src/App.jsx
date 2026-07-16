@@ -228,6 +228,9 @@ const MundoMercado3DMockup = lazy(() => import('./mockups/MundoMercado3D'));
 const CaraProd3DMockup = lazy(() => import('./mockups/CaraProd3D'));
 const SueloDemo3DMockup = lazy(() => import('./mockups/SueloDemo3D'));
 const CriaturasNocturnasMockup = lazy(() => import('./mockups/CriaturasNocturnas'));
+// Angelita al máximo: la entrada teatral (gafas + crecimiento) y el repertorio
+// completo de estados del agente, uno al lado del otro.
+const AngelitaVivaMockup = lazy(() => import('./mockups/AngelitaViva'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -661,6 +664,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/cara-prod': 'mockup_cara_prod',
   'mockups/suelo-demo-3d': 'mockup_suelo_demo_3d',
   'mockups/criaturas-nocturnas': 'mockup_criaturas_nocturnas',
+  'mockups/angelita-viva': 'mockup_angelita_viva',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2225,6 +2229,14 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Criaturas nocturnas">
               <CriaturasNocturnasMockup onBack={() => navigate('dashboard')} />
+      case 'mockup_angelita_viva':
+        // Angelita al máximo (#/mockups/angelita-viva): la entrada teatral
+        // (asoma pequeñita → gafas si hace sol → crece con overshoot) y el
+        // repertorio de estados del agente. ?estado=<nombre> agranda uno.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Angelita, la compañera viva">
+              <AngelitaVivaMockup onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );

@@ -1,7 +1,9 @@
 import { useId } from 'react';
 import './creatures.css';
+import './angelita-missminutes.css';
 import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, BocaVisema, Miembro, AntenaRubber, RH_INK } from './_rubberhose.jsx';
+import { GafasSol, CejasRubber } from './AngelitaGafas.jsx';
 import { ABEJA_PALETA, ABEJA_PROPORCION } from './abejaIdentidad.js';
 import { cuerpoDeClima, PERFIL_ABEJA, ropaDeClimaBicho } from './creatureClimaCuerpo.js';
 import { AccesoriosClima } from './AccesoriosClima.jsx';
@@ -109,6 +111,17 @@ export function AbejaAngelita({
      mundoId (o mundo sin prop) entra con las manos libres. Va en su manita
      izquierda (el lado libre; la carita vive a la derecha). */
   mundoId = null,
+  /* ── GAFAS DE SOL (AngelitaGafas) ──────────────────────────────────────────
+     OPT-IN: false (default, nada cambia) | true (puestas sobre los ojitos) |
+     'poniendose' (reproduce UNA vez la caída teatral: baja girada, rebasa,
+     rebota y asienta — su entrada de día soleado). La cadencia vive en
+     angelita-missminutes.css gateada por data-gafas; RM = puestas quietas. */
+  gafas = false,
+  /* ── CEJAS EXPRESIVAS (AngelitaGafas.CejasRubber) ──────────────────────────
+     OPT-IN: null (default: la carita de siempre) | 'alegres' | 'altas' |
+     'vivas' (con eyebrow-flash al hablar) | 'fruncidas' (concentrada). El
+     agente las deriva por estado; cualquier host puede pedirlas directo. */
+  cejas = null,
   ...rest
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -265,9 +278,14 @@ export function AbejaAngelita({
         mirar={[0.3, 0.34]}
         parpadea={vivo}
       />
+      {/* cejas expresivas (opt-in): el rasgo que actúa alegría/atención/foco */}
+      {cejas && <CejasRubber estilo={cejas} />}
       {/* antenas con bombillo que se mecen (secondary motion) */}
       <AntenaRubber d="M7.7,-4.7 C6.7,-7.3 7.0,-9.3 8.3,-10.1" bulbo={[8.3, -10.3]} sway={vivo} delay={0} />
       <AntenaRubber d="M9.7,-4.6 C11.0,-6.7 11.3,-8.7 10.5,-10.3" bulbo={[10.5, -10.5]} sway={vivo} delay={-0.3} />
+      {/* gafas de sol (opt-in): por ENCIMA de ojos y cejas — con 'poniendose'
+          caen desde arriba con overshoot y el destello barre el lente */}
+      {gafas && <GafasSol puesta={gafas === 'poniendose' ? 'poniendose' : 'puesta'} animated={vivo} />}
 
       {/* Vestuario por clima+hora (ruana/sombrero/sudor) — solo con vestuario=true. */}
       {ropa && (
@@ -318,6 +336,8 @@ export function AbejaAngelita({
     'data-lineboil': lineBoil ? '1' : undefined,
     'data-polen': polen ? '1' : undefined,
     'data-prop': mundoId || undefined,
+    'data-gafas': gafas ? (gafas === 'poniendose' && vivo ? 'poniendose' : '1') : undefined,
+    'data-cejas': cejas || undefined,
   };
 
   if (inline) {
