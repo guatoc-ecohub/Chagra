@@ -50,7 +50,7 @@ const HORAS = {
   night: 'Buenas noches',
 };
 
-function saludoPorHora(date = new Date()) {
+export function saludoPorHora(date = new Date()) {
   const h = date.getHours();
   if (h >= 5 && h < 12) return HORAS.morning;
   if (h >= 12 && h < 18) return HORAS.afternoon;

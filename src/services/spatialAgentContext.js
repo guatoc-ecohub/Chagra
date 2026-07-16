@@ -58,6 +58,9 @@ export function buildSpatialContextPin(spatialContext) {
     mundoId: cleanText(spatialContext.mundoId, 80),
     hotspotActivo: cleanText(spatialContext.hotspotActivo),
     clima: cleanText(spatialContext.clima, 40),
+    // Pantalla 2D de origen (AgentFab → currentView): el agente sabe DESDE
+    // dónde le hablan aunque no venga de un mundo 3D (p. ej. '#semilla').
+    pantalla: cleanText(spatialContext.pantalla, 60),
     estadoFinca: cleanEstadoFinca(spatialContext.estadoFinca),
   };
 

@@ -3631,7 +3631,7 @@ export default function App() {
           CTA "Explorar con finca de ejemplo" del footer y la usuaria nueva aún
           no conoce al agente — ruido en su primer flujo. */}
       <Suspense fallback={null}>
-        {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} />}
+        {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && currentView !== 'voz' && currentView !== 'agente' && currentView !== 'dashboard' && currentView !== 'onboarding-perfil' && currentView !== 'onboarding-perfil-clasico' && <AgentFab onNavigate={navigate} pantalla={currentView} />}
       </Suspense>
       {/* Escucha manos libres (operador 2026-07-05, caso guantes/manos
           embarradas). Abre el widget "Chagra está escuchando" que navega o

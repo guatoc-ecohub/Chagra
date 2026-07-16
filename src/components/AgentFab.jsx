@@ -1,42 +1,37 @@
 import React, { useState, useCallback } from 'react';
-import ChagraAgentAvatar from './ChagraAgentAvatar';
+import Angelita from '../visual/agente/Angelita';
 import useAgentNotificationStore from '../store/useAgentNotificationStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { isSpeaking, stop, replayLast, isKokoroAvailable } from '../services/ttsService';
 import { agentSounds } from '../services/agentSoundService';
 import { fvhSkinClass } from '../config/fvhSkin';
-import { colibriRealActivo } from '../config/colibriFlag';
-import { BarbuditoPosado } from './colibri/Barbudito';
 import './agent-fab-skin.css';
 
-// ¿Avatar del FAB = colibrí REAL (barbudito posado)? Gateado por VITE_COLIBRI
-// (dev-only). Con la flag OFF (prod) el FAB conserva su avatar actual
-// (ChagraAgentAvatar). Se evalúa una sola vez (flag de build).
-const COLIBRI_REAL = colibriRealActivo();
-
 /**
- * AgentFab — Floating Action Button para abrir el agente Chagra IA.
+ * AgentFab — Angelita, el agente vivo presente en TODA pantalla.
  *
- * Operator 2026-05-19:
- *   - default state idle (alas batiendo suave, vuelo estacionario).
- *   - mouse over → estado `thinking` (colibri se acerca a libar la flor).
- *   - mouse down / pulsacion → estado `speaking` mas breve para sentir el feedback.
- *   - touch (mobile) → estado `thinking` mientras se mantiene el toque.
+ * Decisión del operador (2026-07-16): "Angelita como el agente, jubila el
+ * colibrí". El FAB deja de ser un porthole con foto de colibrí: es Angelita
+ * volando libre en la esquina — compañía, no interrupción. El colibrí
+ * (barbudito) se retira del rol de asistente y queda de decoración en los
+ * mundos 3D (faunaFuncional, rol polinizador).
  *
- * Task #122 (2026-05-23): el FAB ahora es el avatar global. Lee de
- * `useAgentNotificationStore`:
- *   - `responseReady` → glow drop-shadow amber para anunciar "respuesta lista"
- *     mientras el operador está en otra pantalla.
- * Double-click handler:
- *   - Si TTS está reproduciendo → stop() inmediato + ttsEnabled=false.
- *   - Si TTS OFF y hay último mensaje → replayLast() + ttsEnabled=true.
- *   - Si no hay nada que reproducir, no-op (sin error visible).
- * Single click → abrir AgentScreen (comportamiento previo).
+ * Sus tres momentos (rubber-hose, angelitaEstados.js):
+ *   - default        → 'acompana': idle-cerebro vivo (flota, se acicala, se
+ *                      posa a descansar) — presente sin hablar sola.
+ *   - hover / focus  → 'escuchando': se posa y ladea la cabeza hacia usted.
+ *   - tap / pressed  → 'contenta': brinquito de celebración al tocarla.
+ *   - respuesta lista→ 'invita' + glow ámbar: "venga, le tengo algo".
  *
- * El FAB tambien escala 1.06x al hover/active para feedback claro de boton
- * sin perder el sello visual del colibri.
+ * CONTEXTUAL POR PANTALLA: si el shell le pasa `pantalla` (currentView), al
+ * tocarla navega al agente con `{ desdePantalla, spatialContext.pantalla }` —
+ * AgentScreen saluda sobre ESA pantalla (saludoPantalla.js) y el LLM recibe
+ * la pantalla en el pin espacial (spatialAgentContext.js).
+ *
+ * Double-click (Task #122, sin cambios): TTS hablando → stop + mute; TTS OFF
+ * con último mensaje → replay + unmute.
  */
-export default function AgentFab({ onNavigate }) {
+export default function AgentFab({ onNavigate, pantalla = null }) {
   const [hover, setHover] = useState(false);
   const [pressed, setPressed] = useState(false);
 
@@ -45,11 +40,14 @@ export default function AgentFab({ onNavigate }) {
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
   const setTtsEnabled = usePrefsStore((s) => s.setTtsEnabled);
 
-  // Estado del avatar:
-  // - pressed -> 'speaking' (cuerpo bob, plumaje pulsa) durante el tap
-  // - hover -> 'thinking' (sip motion hacia la flor)
-  // - default -> 'idle'
-  const state = pressed ? 'speaking' : hover ? 'thinking' : 'idle';
+  // Estado de Angelita: el tacto manda sobre el aviso, y el aviso sobre el idle.
+  const estado = pressed
+    ? 'contenta'
+    : hover
+      ? 'escuchando'
+      : responseReady
+        ? 'invita'
+        : 'acompana';
 
   const handleEnter = () => setHover(true);
   const handleLeave = () => { setHover(false); setPressed(false); };
@@ -57,32 +55,29 @@ export default function AgentFab({ onNavigate }) {
   const handleUp = () => setPressed(false);
 
   const handleClick = () => {
-    onNavigate('agente');
+    // El shell prod pasa `pantalla` (currentView): viaja como initialContext
+    // para que el saludo y el pin espacial sean sobre la pantalla de origen.
+    onNavigate('agente', pantalla
+      ? { desdePantalla: pantalla, spatialContext: { pantalla } }
+      : undefined);
   };
 
   // Task #122: double-click toggle silencia/reactiva audio global.
-  // - Si está hablando (Kokoro o Web Speech) → stop() + ttsEnabled OFF.
-  // - Si silenciado y hay last message → replayLast() + ttsEnabled ON.
-  // - Sin último mensaje: feedback sutil (cancel sound) y no-op de TTS.
   const handleDoubleClick = useCallback(async (e) => {
     e.stopPropagation();
     e.preventDefault();
     if (isSpeaking() || ttsEnabled) {
-      // Cualquier playback activo OR estado "enabled" lo apagamos
       stop();
       setTtsEnabled(false);
       agentSounds.cancel();
       return;
     }
-    // TTS OFF: reactivar + replay si hay algo cacheado
     if (lastAssistantMessage) {
       setTtsEnabled(true);
       const kokoroReady = await isKokoroAvailable();
       await replayLast({ useKokoro: kokoroReady });
       agentSounds.chime();
     } else {
-      // No hay nada que reproducir. Reactivamos el toggle igual para que
-      // futuras respuestas suenen, pero sin chime engañoso.
       setTtsEnabled(true);
     }
   }, [ttsEnabled, lastAssistantMessage, setTtsEnabled]);
@@ -91,11 +86,11 @@ export default function AgentFab({ onNavigate }) {
     <button
       type="button"
       className={fvhSkinClass(`chagra-fab${hover ? ' is-hover' : ''}${responseReady ? ' is-ready' : ''}`)}
-      aria-label={responseReady ? 'Chagra IA tiene respuesta nueva' : 'Asistente Chagra IA'}
+      aria-label={responseReady ? 'Angelita (Chagra IA) tiene respuesta nueva' : 'Angelita, la asistente Chagra IA'}
       title={
         responseReady
-          ? 'Chagra IA tiene respuesta nueva. Doble click silencia o reactiva la voz'
-          : 'Hablar con Chagra IA. Doble click silencia o reactiva la voz'
+          ? 'Angelita tiene respuesta nueva. Doble click silencia o reactiva la voz'
+          : 'Hablar con Angelita. Doble click silencia o reactiva la voz'
       }
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
@@ -110,38 +105,44 @@ export default function AgentFab({ onNavigate }) {
       style={{
         position: 'fixed',
         bottom: 'max(90px, calc(env(safe-area-inset-bottom) + 90px))',
-        right: 18,
-        width: 56,
-        height: 56,
+        right: 14,
+        width: 64,
+        height: 64,
         borderRadius: '50%',
-        border: responseReady
-          ? '2px solid rgba(255,183,0,.7)'
-          : '2px solid rgba(16,185,129,.55)',
-        background: hover
-          ? 'radial-gradient(circle at 30% 25%, #1e3a2f 0%, #0a1320 70%)'
-          : 'radial-gradient(circle at 30% 25%, #1e293b 0%, #0f172a 70%)',
+        // Angelita vuela LIBRE: sin plinto ni borde — una abeja en la esquina,
+        // no un icono enfrascado. La legibilidad sobre cualquier fondo la pone
+        // el drop-shadow de tinta; el aviso "respuesta lista", el glow ámbar
+        // (.agt-avatar-glow via Angelita className + anillo .is-ready de
+        // motion.css sobre el círculo táctil).
+        border: 'none',
+        background: 'transparent',
         color: 'white',
         cursor: 'pointer',
-        boxShadow: hover
-          ? '0 6px 22px rgba(0,0,0,0.5), 0 0 22px rgba(16,185,129,.65), 0 0 6px rgba(6,182,212,.45) inset'
-          : '0 4px 16px rgba(0,0,0,0.4), 0 0 14px rgba(16,185,129,.35)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 40,
         padding: 0,
-        overflow: 'hidden',
-        transform: pressed ? 'scale(0.95)' : hover ? 'scale(1.06)' : 'scale(1)',
-        transition: 'transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, background .25s ease, border-color .25s ease',
+        overflow: 'visible',
+        filter: 'drop-shadow(0 3px 6px rgba(10, 15, 26, 0.45))',
+        transform: pressed ? 'scale(0.94)' : hover ? 'scale(1.08)' : 'scale(1)',
+        transition: 'transform .18s cubic-bezier(.34,1.56,.64,1), filter .25s ease',
       }}
     >
-      {COLIBRI_REAL ? (
-        // Colibrí REAL (barbudito POSADO recortado), con un leve flotar. El
-        // botón ya es circular y recorta (overflow:hidden).
-        <BarbuditoPosado size={46} ariaLabel="Chagra IA" />
-      ) : (
-        <ChagraAgentAvatar state={state} size={48} ariaLabel="Chagra IA" glow={responseReady} />
-      )}
+      {/* pointer-events:none — CRÍTICO: el click debe caer en el BOTÓN, nunca
+          en el SVG. Angelita se REMONTA al cambiar de estado (key=estado en su
+          .agt-vuelo) y hover/pressed cambian el estado: si el mousedown cae en
+          un nodo del dibujo que se desconecta antes del mouseup, el navegador
+          se traga el click (verificado con playwright 2026-07-16). */}
+      <span style={{ pointerEvents: 'none', display: 'flex' }} aria-hidden="true">
+        <Angelita
+          estado={estado}
+          size={62}
+          direccion="izquierda"
+          className={responseReady ? 'agt-avatar-glow' : undefined}
+          title="Angelita, la asistente de Chagra"
+        />
+      </span>
     </button>
   );
 }
