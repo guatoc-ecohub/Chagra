@@ -1,0 +1,46 @@
+/* criaturas-nocturnas.css — animaciones biopunk de la fauna nocturna.
+   Mismos tiempos/curvas que guardian-espiritu.css para que el set se sienta de
+   la misma familia. Prefijo `cn-`. */
+
+.cn-av-camina { animation: cn-camina 3.6s ease-in-out infinite; transform-origin: center; }
+.cn-av-flota { animation: cn-flota 3.8s ease-in-out infinite; transform-origin: center; }
+.cn-av-vuela { animation: cn-vuela 3.2s ease-in-out infinite; transform-origin: center; }
+.cn-av-planea { animation: cn-planea 5.4s ease-in-out infinite; transform-origin: center; }
+
+.cn-ala-mur { animation: cn-aleteo-mur 0.34s ease-in-out infinite alternate; transform-origin: center bottom; }
+.cn-luz { animation: cn-luz-pulso 1.8s ease-in-out infinite; transform-origin: center; }
+.cn-luz-halo { animation: cn-halo-pulso 1.8s ease-in-out infinite; transform-origin: center; }
+
+@keyframes cn-camina {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-1.5px) rotate(1deg); }
+}
+@keyframes cn-flota {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2.5px); }
+}
+@keyframes cn-vuela {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-3.5px) rotate(2deg); }
+}
+@keyframes cn-planea {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-2px) rotate(1deg); }
+}
+@keyframes cn-aleteo-mur {
+  from { transform: scaleY(0.82) translateY(0.5px); }
+  to { transform: scaleY(1.05) translateY(-0.5px); }
+}
+@keyframes cn-luz-pulso {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+@keyframes cn-halo-pulso {
+  0%, 100% { opacity: 0.28; transform: scale(0.9); }
+  50% { opacity: 0.55; transform: scale(1.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cn-av-camina, .cn-av-flota, .cn-av-vuela, .cn-av-planea,
+  .cn-ala-mur, .cn-luz, .cn-luz-halo { animation: none !important; }
+}

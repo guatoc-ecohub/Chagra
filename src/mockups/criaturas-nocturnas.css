@@ -1,0 +1,141 @@
+/* criaturas-nocturnas.css (vitrina) — cielo nocturno + tarjetas biopunk.
+   Prefijo `cnv-`. Paleta oscura tomada del lenguaje del GuardianEspiritu. */
+
+.cnv {
+  position: relative;
+  min-height: 100vh;
+  padding: 28px 18px 48px;
+  color: #eafff6;
+  background:
+    radial-gradient(120% 80% at 78% -8%, #241a52 0%, rgba(36,26,82,0) 46%),
+    radial-gradient(100% 70% at 12% 8%, #12203f 0%, rgba(18,32,63,0) 52%),
+    linear-gradient(180deg, #0a0820 0%, #0c1030 46%, #070512 100%);
+  overflow: hidden;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ---- cielo: luna + estrellas ------------------------------------------- */
+.cnv-cielo { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+
+.cnv-luna {
+  position: absolute;
+  top: 30px; right: 46px;
+  width: 92px; height: 92px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 34%, #f4ffe9 0%, #cfe6d8 42%, #9fc7bd 100%);
+  box-shadow: 0 0 46px rgba(157, 255, 220, 0.4), inset -14px -10px 0 rgba(8, 14, 30, 0.28);
+  opacity: 0.9;
+}
+
+.cnv-estrellas {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1.4px 1.4px at 12% 22%, #eafff6 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 32% 12%, #bfeaff 50%, transparent 52%),
+    radial-gradient(1.6px 1.6px at 52% 30%, #eafff6 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 68% 8%, #d8ff6a 50%, transparent 52%),
+    radial-gradient(1.3px 1.3px at 88% 26%, #eafff6 50%, transparent 52%),
+    radial-gradient(1.1px 1.1px at 22% 40%, #7fd0ff 50%, transparent 52%),
+    radial-gradient(1.5px 1.5px at 44% 46%, #eafff6 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 78% 44%, #c78bff 50%, transparent 52%);
+  opacity: 0.85;
+  animation: cnv-titila 4.6s ease-in-out infinite;
+}
+
+@keyframes cnv-titila { 0%, 100% { opacity: 0.6; } 50% { opacity: 0.95; } }
+
+/* ---- encabezado --------------------------------------------------------- */
+.cnv-head { position: relative; z-index: 1; max-width: 760px; margin: 0 auto 26px; }
+
+.cnv-back {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(45, 255, 196, 0.42);
+  background: rgba(12, 16, 48, 0.6);
+  color: #9dffdf;
+  font-size: 13px;
+  cursor: pointer;
+}
+.cnv-back:hover { border-color: rgba(45, 255, 196, 0.8); }
+
+.cnv-kicker {
+  display: block;
+  font-size: 12px; letter-spacing: 0.22em;
+  color: #7fd0ff; opacity: 0.85;
+  margin-bottom: 6px;
+}
+.cnv-title {
+  margin: 0 0 8px;
+  font-size: clamp(24px, 5vw, 38px);
+  line-height: 1.06;
+  color: #eafff6;
+  text-shadow: 0 0 18px rgba(45, 255, 196, 0.22);
+}
+.cnv-sub { margin: 0; max-width: 620px; font-size: 15px; line-height: 1.5; color: #b9c8d6; }
+
+/* ---- grilla de tarjetas ------------------------------------------------- */
+.cnv-grid {
+  position: relative; z-index: 1;
+  list-style: none; margin: 0 auto; padding: 0;
+  max-width: 1080px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.cnv-card {
+  display: flex; gap: 14px; align-items: center;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(var(--cnv-acc-rgb), 0.34);
+  background:
+    radial-gradient(120% 90% at 18% 0%, rgba(var(--cnv-acc-rgb), 0.12) 0%, rgba(var(--cnv-acc-rgb), 0) 60%),
+    linear-gradient(180deg, rgba(20, 18, 46, 0.92) 0%, rgba(9, 8, 26, 0.94) 100%);
+  box-shadow: 0 10px 26px rgba(3, 4, 14, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.cnv-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(var(--cnv-acc-rgb), 0.7);
+  box-shadow: 0 14px 34px rgba(3, 4, 14, 0.6), 0 0 22px rgba(var(--cnv-acc-rgb), 0.22);
+}
+
+.cnv-card-avatar {
+  flex: 0 0 auto;
+  width: 132px; height: 132px;
+  display: grid; place-items: center;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(var(--cnv-acc-rgb), 0.16) 0%, rgba(var(--cnv-acc-rgb), 0) 62%),
+    #060512;
+  box-shadow: inset 0 0 0 1px rgba(var(--cnv-acc-rgb), 0.28);
+}
+
+.cnv-card-txt { min-width: 0; }
+.cnv-card-eje {
+  display: inline-block;
+  font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--cnv-acc);
+  padding: 3px 8px; border-radius: 999px;
+  background: rgba(var(--cnv-acc-rgb), 0.12);
+  border: 1px solid rgba(var(--cnv-acc-rgb), 0.32);
+  margin-bottom: 7px;
+}
+.cnv-card-nombre { margin: 0 0 2px; font-size: 18px; line-height: 1.15; color: #eafff6; }
+.cnv-card-cientifico { margin: 0 0 8px; font-size: 12.5px; font-style: italic; color: rgba(var(--cnv-acc-rgb), 0.92); }
+.cnv-card-rol { margin: 0 0 8px; font-size: 13px; line-height: 1.42; color: #c3d0dc; }
+.cnv-card-fuente { display: block; font-size: 11px; color: #7d8aa0; }
+
+/* ---- pie ---------------------------------------------------------------- */
+.cnv-foot {
+  position: relative; z-index: 1;
+  max-width: 760px; margin: 26px auto 0;
+  font-size: 12px; color: #7d8aa0; text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cnv-estrellas { animation: none; }
+  .cnv-card { transition: none; }
+}
