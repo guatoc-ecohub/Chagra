@@ -1,0 +1,233 @@
+/*
+ * CafetalVivo3D.css — vitrina del mundo del café (#/mockups/cafetal-vivo-3d).
+ * Autocontenida: sin fuentes/imágenes externas. Móvil-first desde 320px.
+ * Paleta de piso templado: verde cafetal, bruma clara y el rojo de la cereza.
+ * Solo opacity/transform se animan.
+ */
+
+.cviva {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  background: linear-gradient(180deg, #cfe0d5 0%, #dde6d6 44%, #ece7d2 100%);
+  color: #2b3226;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.cviva__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.cviva__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8e3f2c;
+}
+.cviva__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #2e402e;
+}
+.cviva__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.cviva__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.cviva__lienzo {
+  position: relative;
+  height: min(66vh, 32rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(142, 63, 44, 0.25);
+  box-shadow: 0 12px 30px rgba(44, 54, 40, 0.16);
+  background: radial-gradient(120% 90% at 50% 20%, #c6dcd0 0%, #a8bfa8 100%);
+}
+.cviva__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+.cafetal-canvas {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.cafetal-canvas--lista {
+  opacity: 1;
+}
+
+.cviva__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  color: #3c4a38;
+  opacity: 0.85;
+}
+
+.cviva__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.cviva__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.cviva__toggle {
+  border: 1.5px solid #8e3f2c;
+  background: #fff;
+  color: #8e3f2c;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.cviva__toggle:hover,
+.cviva__toggle:focus-visible {
+  background: #8e3f2c;
+  color: #fff;
+  outline-offset: 2px;
+}
+
+/* ---- Ficha 2D (fallback digno, sin GPU) ---- */
+.cviva__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: radial-gradient(120% 90% at 50% 25%, #d2ddc9 0%, #a3b295 100%);
+}
+.cviva__estampa {
+  position: relative;
+  width: 180px;
+  height: 175px;
+  margin-bottom: 0.4rem;
+}
+/* el guamo del sombrío, detrás y más alto */
+.cviva__guamo {
+  position: absolute;
+  top: 0;
+  left: 18px;
+  width: 130px;
+  height: 62px;
+  border-radius: 56% 44% 60% 40% / 70% 74% 26% 30%;
+  background: radial-gradient(circle at 42% 30%, #74995177 0%, #4b7c3a 65%, #3d6630 100%);
+  box-shadow: inset -8px -6px 14px rgba(0, 0, 0, 0.16);
+}
+.cviva__guamo-tronco {
+  position: absolute;
+  top: 48px;
+  left: 76px;
+  width: 14px;
+  height: 78px;
+  border-radius: 40%;
+  background: linear-gradient(90deg, #4f3c28 0%, #6b533a 55%, #4a3a26 100%);
+}
+/* el cafeto abajo, tupido y cargado */
+.cviva__cafeto {
+  position: absolute;
+  bottom: 0;
+  left: 50px;
+  width: 92px;
+  height: 78px;
+  border-radius: 48% 52% 44% 56% / 62% 58% 42% 38%;
+  background: radial-gradient(circle at 38% 32%, #477a3d 0%, #2e5c33 70%, #234b28 100%);
+  box-shadow: inset -7px -6px 12px rgba(0, 0, 0, 0.2);
+}
+.cviva__cereza {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  box-shadow: inset -2px -2px 3px rgba(0, 0, 0, 0.28);
+}
+.cviva__cereza--verde { top: 18px; left: 14px; background: #6f9e3c; }
+.cviva__cereza--pinton { top: 40px; left: 60px; background: #dca63c; }
+.cviva__cereza--roja { top: 30px; left: 38px; background: #c1301f; }
+.cviva__cereza--roja2 { top: 52px; left: 26px; background: #a82818; }
+.cviva__ficha-nombre {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #2e402e;
+}
+.cviva__ficha-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #4c5a44;
+}
+
+/* ---- Saberes ---- */
+.cviva__saberes {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.cviva__saberes h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.7rem;
+  color: #2e402e;
+}
+.cviva__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+@media (min-width: 640px) {
+  .cviva__saberes ol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.cviva__saberes li {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(142, 63, 44, 0.16);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+}
+.cviva__emoji {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+.cviva__saberes b {
+  display: block;
+  font-size: 0.92rem;
+  color: #2e402e;
+}
+.cviva__saberes li p {
+  margin: 0.15rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+.cviva__cierre {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #3c4a38;
+  max-width: 42rem;
+}

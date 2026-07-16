@@ -60,13 +60,23 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
-  // ── Vista global (Sierra Nevada) — la montaña cortada por la mitad ────
-  // Lámina estática: los pisos térmicos del mar a la nieve, cada banda entra a
-  // su mundo. Reemplaza la galería en 3/4 (compleja, no se entendía). La galería
-  // vieja (GaleriaSierraArboles.jsx) queda en el repo, sin cablear.
+  // ── Vista global (Sierra Nevada) — la MONTAÑA 3D que se orbita ────────
+  // Macizo con relieve real: los pisos como terreno (color por altura + veg
+  // instanciada), la cámara la recorre girando, y tocar una zona entra a su
+  // mundo. Reemplaza el corte vertical (que se lee como lámina; se GUARDA en
+  // `sierra_corte` como vista-mapa por si se quiere comparar).
   {
     path: 'sierra_global',
     alias: ['sierra', 'vista_sierra'],
+    componente: 'SierraMonte3D',
+    importLazy: 'src/visual/mundo3d/sierra/SierraMonte3D.jsx',
+    categoria: '3D',
+  },
+  // El corte vertical, GUARDADO y accesible: la vista-mapa estática de la
+  // geografía (SierraMonte3D enlaza aquí con "Ver el corte de geografía").
+  {
+    path: 'sierra_corte',
+    alias: ['sierra_lamina', 'vista_sierra_corte'],
     componente: 'SierraCorteVertical',
     importLazy: 'src/visual/mundo3d/sierra/SierraCorteVertical.jsx',
     categoria: '3D',
@@ -120,7 +130,7 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
-  // ── Puerta maestra a los 12 mundos ─────────────────────────────
+  // ── Puerta maestra a los mundos (15, por piso térmico) ─────────
   {
     path: 'vitrina_maestra',
     // alias mockup_vitrina_maestra: MundosDeMiFinca (dashboard) navega con el

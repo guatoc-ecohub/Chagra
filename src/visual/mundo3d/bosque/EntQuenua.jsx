@@ -35,6 +35,7 @@ import {
   factorHabla,
   factorSonrisa,
   specsBarba,
+  geometriaHebraBarba,
   BARBA,
   CORTEZA,
 } from './entQuenua.geom.js';
@@ -83,11 +84,64 @@ function ClusterHojas({ cluster, geo, mat, reducedMotion, fase }) {
   );
 }
 
+/* UN OJO del Ent (a nivel de módulo, no se crea en render): recoveco de sombra +
+   globo con iris ÁMBAR-MIEL grande que casi cubre el ojo (nada de pozo negro) +
+   pupila y dos chispas de húmedo + párpado inferior cálido. El blink escala solo
+   el globo; la mirada deriva en gazeRef. `flip` (-1/1) da una leve asimetría. */
+function Ojo({ x, frente, blinkRef, gazeRef, flip, matGrieta, matOjo, matIris, matBrillo, matCresta }) {
+  return (
+    <group position={[x, 0.02, frente - 0.02]}>
+      {/* recoveco de sombra donde SE ASIENTA el ojo (nudo de la corteza): marrón
+          muy oscuro, pequeño — el ojo lo llena casi todo, NO es un agujero negro */}
+      <mesh position={[0, -0.005, -0.02]} scale={[1.06, 1.14, 0.4]}>
+        <sphereGeometry args={[0.115, 12, 10]} />
+        <primitive object={matGrieta} attach="material" />
+      </mesh>
+      {/* el OJO que parpadea (globo + iris): el blink escala solo esto */}
+      <group ref={blinkRef}>
+        {/* globo oscuro: solo asoma como fino borde húmedo del ojo */}
+        <mesh position={[0, 0, 0.055]}>
+          <sphereGeometry args={[0.097, 16, 14]} />
+          <primitive object={matOjo} attach="material" />
+        </mesh>
+        {/* LA MIRADA: iris ÁMBAR-MIEL GRANDE que casi cubre el globo → el ojo se
+            lee CÁLIDO y vivo (no un pozo negro). Pupila y dos chispas de húmedo. */}
+        <group ref={gazeRef} position={[0, -0.004, 0.072]}>
+          <mesh>
+            <sphereGeometry args={[0.085, 18, 16]} />
+            <primitive object={matIris} attach="material" />
+          </mesh>
+          {/* pupila: pozo oscuro en el centro del iris */}
+          <mesh position={[0, 0, 0.046]}>
+            <sphereGeometry args={[0.038, 12, 10]} />
+            <primitive object={matGrieta} attach="material" />
+          </mesh>
+          {/* chispa mayor (catchlight): arriba a un lado — la vida del ojo */}
+          <mesh position={[0.028, 0.033, 0.064]}>
+            <sphereGeometry args={[0.014, 10, 10]} />
+            <primitive object={matBrillo} attach="material" />
+          </mesh>
+          {/* chispa menor abajo: el húmedo del ojo vivo (truco de animación) */}
+          <mesh position={[-0.022, -0.028, 0.06]}>
+            <sphereGeometry args={[0.006, 8, 8]} />
+            <primitive object={matBrillo} attach="material" />
+          </mesh>
+        </group>
+      </group>
+      {/* párpado inferior: reborde cálido y fino que asienta el ojo (edad, bondad) */}
+      <mesh position={[0, -0.082, 0.05]} rotation={[-0.28, 0, -flip * 0.14]} scale={[1.0, 0.36, 0.52]}>
+        <sphereGeometry args={[0.1, 12, 8]} />
+        <primitive object={matCresta} attach="material" />
+      </mesh>
+    </group>
+  );
+}
+
 /* El rostro tallado: ojos hundidos con MIRADA viva (iris + pupila que se mueven),
    cejas de corteza que fruncen el ceño (ánimo legible) y boca-grieta que murmura
    (habla despacio con la tierra). Los gestos son sutiles y ancestrales, nunca de
    caricatura; con reducedMotion el rostro queda quieto y sereno. */
-function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, reducedMotion, blinkRefs }) {
+function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, matPliegue, matCresta, reducedMotion, blinkRefs }) {
   const { centro, radio } = useMemo(() => anclaRostro(7), []);
   // Superficie frontal del tronco a la altura de la mirada (mira al +Z).
   const frente = radio * 0.9;
@@ -115,12 +169,12 @@ function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, reducedMoti
     const frunce = Math.max(0, ceno);
     const alza = Math.max(0, -ceno);
     if (cejaIzq.current) {
-      cejaIzq.current.position.y = 0.24 + alza * 0.03 - frunce * 0.015;
-      cejaIzq.current.rotation.z = -0.34 - frunce * 0.18;
+      cejaIzq.current.position.y = 0.14 + alza * 0.04 - frunce * 0.025;
+      cejaIzq.current.rotation.z = -0.11 - frunce * 0.16;
     }
     if (cejaDer.current) {
-      cejaDer.current.position.y = 0.24 + alza * 0.03 - frunce * 0.015;
-      cejaDer.current.rotation.z = 0.34 + frunce * 0.18;
+      cejaDer.current.position.y = 0.15 + alza * 0.04 - frunce * 0.025;
+      cejaDer.current.rotation.z = 0.13 + frunce * 0.16;
     }
     // BOCA: HABLA con articulaciones claras (sílabas) y SONRÍE apenas. La
     // mandíbula baja SIEMPRE hacia abajo (nunca invade la nariz); las comisuras
@@ -141,76 +195,82 @@ function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, reducedMoti
     }
   });
 
-  const Ojo = ({ x, refKey, gazeRef }) => (
-    <group position={[x, 0.06, frente - 0.05]} ref={blinkRefs[refKey]}>
-      {/* cuenca hundida: gran cavidad oscura empotrada en la corteza */}
-      <mesh position={[0, 0, -0.03]} scale={[1.3, 1.5, 0.55]}>
-        <sphereGeometry args={[0.15, 16, 14]} />
-        <primitive object={matGrieta} attach="material" />
-      </mesh>
-      {/* globo del ojo: oscuro, con brillo húmedo */}
-      <mesh position={[0, 0, 0.05]}>
-        <sphereGeometry args={[0.115, 18, 16]} />
-        <primitive object={matOjo} attach="material" />
-      </mesh>
-      {/* LA MIRADA: iris cálido + pupila + chispa, en un grupo que deriva lento
-          (el ojo "mira" alrededor). Es el mayor salto de personalidad del rostro. */}
-      <group ref={gazeRef} position={[0, 0, 0.12]}>
-        <mesh>
-          <sphereGeometry args={[0.052, 14, 12]} />
-          <primitive object={matIris} attach="material" />
-        </mesh>
-        {/* pupila: pozo oscuro en el centro del iris */}
-        <mesh position={[0, 0, 0.032]}>
-          <sphereGeometry args={[0.03, 12, 10]} />
-          <primitive object={matGrieta} attach="material" />
-        </mesh>
-        {/* la chispa de vida (catchlight): arriba a un lado */}
-        <mesh position={[0.022, 0.03, 0.05]}>
-          <sphereGeometry args={[0.02, 10, 10]} />
-          <primitive object={matBrillo} attach="material" />
-        </mesh>
-      </group>
-    </group>
-  );
+  const ojoMats = { matGrieta, matOjo, matIris, matBrillo, matCresta };
 
   return (
     <group position={[centro.x, centro.y, centro.z]} scale={[1.5, 1.55, 1.15]}>
-      <Ojo x={-0.24} refKey="izq" gazeRef={gazeIzq} />
-      <Ojo x={0.24} refKey="der" gazeRef={gazeDer} />
+      <Ojo x={-0.24} frente={frente} blinkRef={blinkRefs.izq} gazeRef={gazeIzq} flip={-1} {...ojoMats} />
+      <Ojo x={0.24} frente={frente} blinkRef={blinkRefs.der} gazeRef={gazeDer} flip={1} {...ojoMats} />
 
-      {/* cejas de corteza: crestas gruesas e inclinadas, ceño sabio/severo que
-          se mueve (fruncir/alzar) = el ánimo del guardián, legible a distancia */}
-      <mesh ref={cejaIzq} position={[-0.24, 0.24, frente + 0.01]} rotation={[0, 0, -0.34]}>
-        <boxGeometry args={[0.34, 0.085, 0.13]} />
+      {/* CEJAS: crestas de corteza REDONDEADAS que sobresalen y ensombrecen los
+          ojos (frente pesada de guardián), no tablas pegadas. Una chispa de
+          corteza pelada corona cada una. Se mueven (fruncir/alzar) = el ánimo.
+          Ligera asimetría izq/der para que no sea un molde. */}
+      <group ref={cejaIzq} position={[-0.265, 0.14, frente + 0.055]} rotation={[0, 0, -0.11]}>
+        <mesh scale={[1.75, 0.6, 1.0]}>
+          <sphereGeometry args={[0.17, 14, 10]} />
+          <primitive object={matCorteza} attach="material" />
+        </mesh>
+        <mesh position={[0, 0.07, 0.05]} scale={[1.5, 0.22, 0.5]}>
+          <sphereGeometry args={[0.13, 10, 8]} />
+          <primitive object={matCresta} attach="material" />
+        </mesh>
+      </group>
+      <group ref={cejaDer} position={[0.265, 0.15, frente + 0.055]} rotation={[0, 0, 0.13]}>
+        <mesh scale={[1.75, 0.6, 1.0]}>
+          <sphereGeometry args={[0.17, 14, 10]} />
+          <primitive object={matCorteza} attach="material" />
+        </mesh>
+        <mesh position={[0, 0.07, 0.05]} scale={[1.5, 0.22, 0.5]}>
+          <sphereGeometry args={[0.13, 10, 8]} />
+          <primitive object={matCresta} attach="material" />
+        </mesh>
+      </group>
+      {/* SURCO del entrecejo: la arruga fina del pensamiento (guardián que medita) */}
+      <mesh position={[0.01, 0.13, frente + 0.05]} rotation={[0, 0, 0.06]}>
+        <boxGeometry args={[0.035, 0.16, 0.04]} />
+        <primitive object={matPliegue} attach="material" />
+      </mesh>
+
+      {/* NARIZ: un LOMO redondeado de corteza que baja del entrecejo — no un cajón
+          pegado, sino un nudo de la madera que crece de la cara. Deja filtrum limpio
+          hasta los labios para que la boca se lea sola. */}
+      <mesh position={[0, 0.0, frente + 0.05]} rotation={[0.16, 0, 0]} scale={[0.92, 2.0, 0.92]}>
+        <sphereGeometry args={[0.072, 12, 12]} />
         <primitive object={matCorteza} attach="material" />
       </mesh>
-      <mesh ref={cejaDer} position={[0.24, 0.24, frente + 0.01]} rotation={[0, 0, 0.34]}>
-        <boxGeometry args={[0.34, 0.085, 0.13]} />
-        <primitive object={matCorteza} attach="material" />
-      </mesh>
-
-      {/* caballete de la nariz: nudo vertical entre los ojos. MÁS CORTO que antes
-          (terminaba encima de la boca): ahora deja un surco/filtrum limpio hasta
-          los labios para que la boca se lea sola y no choque con la nariz. */}
-      <mesh position={[0, 0.0, frente + 0.04]} rotation={[0.18, 0, 0]}>
-        <boxGeometry args={[0.1, 0.28, 0.12]} />
-        <primitive object={matCorteza} attach="material" />
+      {/* cresta iluminada del caballete (corteza pelada sobre el lomo de la nariz) */}
+      <mesh position={[0, 0.01, frente + 0.105]} scale={[0.9, 1.8, 0.9]}>
+        <sphereGeometry args={[0.018, 8, 10]} />
+        <primitive object={matCresta} attach="material" />
       </mesh>
       {/* base/punta de la nariz: nudo redondeado donde termina el caballete */}
-      <mesh position={[0, -0.17, frente + 0.05]}>
-        <sphereGeometry args={[0.075, 10, 8]} />
+      <mesh position={[0, -0.155, frente + 0.06]} scale={[1.05, 0.9, 1]}>
+        <sphereGeometry args={[0.07, 10, 8]} />
         <primitive object={matCorteza} attach="material" />
       </mesh>
-      {/* pómulos/bolsas bajo los ojos: dan edad y peso al rostro */}
-      <mesh position={[-0.24, -0.12, frente]} rotation={[0, 0, 0.2]}>
-        <boxGeometry args={[0.26, 0.07, 0.1]} />
-        <primitive object={matCorteza} attach="material" />
-      </mesh>
-      <mesh position={[0.24, -0.12, frente]} rotation={[0, 0, -0.2]}>
-        <boxGeometry args={[0.26, 0.07, 0.1]} />
-        <primitive object={matCorteza} attach="material" />
-      </mesh>
+      {/* fosas nasales: dos recovecos oscuros bajo la punta (DR: sugerir, no tallar) */}
+      {[-0.04, 0.04].map((nx) => (
+        <mesh key={nx} position={[nx, -0.185, frente + 0.08]} scale={[0.7, 0.9, 0.7]}>
+          <sphereGeometry args={[0.022, 8, 8]} />
+          <primitive object={matGrieta} attach="material" />
+        </mesh>
+      ))}
+
+      {/* PÓMULOS: nudos redondeados y cálidos que pegan la luz — la calidez del
+          oso de anteojos. Cada uno con una chispa de corteza pelada arriba. */}
+      {[-1, 1].map((s) => (
+        <group key={`pom-${s}`}>
+          <mesh position={[s * 0.3, -0.13, frente - 0.02]} scale={[1.5, 1.0, 0.8]}>
+            <sphereGeometry args={[0.1, 12, 10]} />
+            <primitive object={matCorteza} attach="material" />
+          </mesh>
+          <mesh position={[s * 0.32, -0.07, frente + 0.04]} scale={[1.25, 0.4, 0.55]}>
+            <sphereGeometry args={[0.058, 10, 8]} />
+            <primitive object={matCresta} attach="material" />
+          </mesh>
+        </group>
+      ))}
 
       {/* LA BOCA — rehecha: dos LABIOS de corteza (arriba fijo, abajo en la
           MANDÍBULA que baja) con una cavidad oscura detrás. Va BIEN bajo la nariz
@@ -254,44 +314,92 @@ function Rostro({ matOjo, matBrillo, matIris, matCorteza, matGrieta, reducedMoti
   );
 }
 
-/* La BARBA de árbol-anciano (Bárbol): cortinas de musgo que cuelgan de la
-   mandíbula, raicillas leñosas en el mentón y matas de liquen a los lados. Enmarca
-   la boca sin taparla y se mece despacio (un Ent sabio y muy viejo). */
-function Barba({ ancla, matMusgo, matMusgoClaro, matRaiz, matLiquen, matLiquenAzul, reducedMotion }) {
+/* La BARBA de LÍQUEN (Usnea, "barba de viejo"): una cortina DENSA de mechones
+   finos que cuelgan del mentón en tres capas de volumen, con gradiente raíz→punta
+   (sombra→plata), más matas de liquen foliáceo prendidas arriba. Instanciada
+   (2 draw-calls) para poder ser densa y barata; se mece despacio. */
+function Barba({ ancla, matHebra, matTuft, densidad = 1, reducedMotion }) {
   const { centro, radio } = ancla;
   const frente = radio * 0.9;
-  const { mechones, raicillas, liquenes } = useMemo(() => specsBarba(91), []);
+  const { hebras, tufts } = useMemo(() => specsBarba(91), []);
+  // Recorte por tier (densidad): menos hebras en gama baja, pero la SILUETA se
+  // conserva (las capas se recortan por igual porque van intercaladas por seed).
+  const hb = useMemo(
+    () => hebras.slice(0, Math.max(10, Math.round(hebras.length * densidad))),
+    [hebras, densidad],
+  );
+  const tf = useMemo(
+    () => tufts.slice(0, Math.max(5, Math.round(tufts.length * densidad))),
+    [tufts, densidad],
+  );
+  const hebraGeo = useMemo(() => geometriaHebraBarba(), []);
+  const tuftGeo = useMemo(() => new THREE.IcosahedronGeometry(1, 1), []);
+  useLayoutEffect(() => () => { hebraGeo.dispose(); tuftGeo.dispose(); }, [hebraGeo, tuftGeo]);
+
+  const hebraRef = useRef(null);
+  const tuftRef = useRef(null);
   const grupoRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const mesh = hebraRef.current;
+    if (mesh) {
+      const m = new THREE.Matrix4();
+      const q = new THREE.Quaternion();
+      const e = new THREE.Euler();
+      const p = new THREE.Vector3();
+      const s = new THREE.Vector3();
+      const col = new THREE.Color();
+      for (let i = 0; i < hb.length; i++) {
+        const h = hb[i];
+        p.set(h.pos[0], h.pos[1], h.pos[2]);
+        e.set(h.lean, h.yaw, h.tilt);
+        q.setFromEuler(e);
+        s.set(h.grosor, h.len, h.grosor);
+        m.compose(p, q, s);
+        mesh.setMatrixAt(i, m);
+        // tinte por instancia = TONO de usnea (sage↔plateado, o leñosa). La
+        // geometría trae la rampa de luminancia raíz→punta; el tono la colorea →
+        // mechón pálido y plateado, más oscuro donde nace del mentón.
+        if (h.woody) col.copy(BARBA.raicilla);
+        else col.copy(BARBA.usnea).lerp(BARBA.usneaGris, h.tono);
+        mesh.setColorAt(i, col);
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    }
+    const tmesh = tuftRef.current;
+    if (tmesh) {
+      const m = new THREE.Matrix4();
+      const q = new THREE.Quaternion();
+      const p = new THREE.Vector3();
+      const s = new THREE.Vector3();
+      const col = new THREE.Color();
+      for (let i = 0; i < tf.length; i++) {
+        const l = tf[i];
+        p.set(l.pos[0], l.pos[1], l.pos[2]);
+        s.set(l.esc * 1.6, l.esc * 0.7, l.esc * 1.1);
+        m.compose(p, q, s);
+        tmesh.setMatrixAt(i, m);
+        col.copy(l.azul ? BARBA.liquenAzul : BARBA.liquen);
+        tmesh.setColorAt(i, col);
+      }
+      tmesh.instanceMatrix.needsUpdate = true;
+      if (tmesh.instanceColor) tmesh.instanceColor.needsUpdate = true;
+    }
+  }, [hb, tf]);
+
   useFrame((st) => {
     if (reducedMotion || !grupoRef.current) return;
     const t = st.clock.elapsedTime;
     grupoRef.current.rotation.z = Math.sin(t * 0.5) * 0.02;
     grupoRef.current.rotation.x = 0.04 + Math.sin(t * 0.4 + 1) * 0.015;
   });
+
   return (
     <group position={[centro.x, centro.y, centro.z]} scale={[1.5, 1.55, 1.15]}>
       <group ref={grupoRef} position={[0, 0, frente]}>
-        {/* mechones de musgo (cortina de la barba). Cono con la punta hacia ABAJO. */}
-        {mechones.map((m, i) => (
-          <mesh key={`mb-${i}`} position={[m.x, m.yTop - m.len / 2, m.z]} rotation={[Math.PI, 0, m.tilt]}>
-            <coneGeometry args={[m.grosor, m.len, 5]} />
-            <primitive object={m.claro ? matMusgoClaro : matMusgo} attach="material" />
-          </mesh>
-        ))}
-        {/* raicillas leñosas: hebras largas en el centro del mentón */}
-        {raicillas.map((m, i) => (
-          <mesh key={`rc-${i}`} position={[m.x, m.yTop - m.len / 2, m.z]} rotation={[Math.PI, 0, m.tilt]}>
-            <coneGeometry args={[m.grosor, m.len, 5]} />
-            <primitive object={matRaiz} attach="material" />
-          </mesh>
-        ))}
-        {/* matas de liquen prendidas a los lados de la boca */}
-        {liquenes.map((l, i) => (
-          <mesh key={`lq-${i}`} position={l.pos} scale={[l.esc * 1.5, l.esc * 0.55, l.esc]}>
-            <icosahedronGeometry args={[1, 0]} />
-            <primitive object={l.azul ? matLiquenAzul : matLiquen} attach="material" />
-          </mesh>
-        ))}
+        <instancedMesh ref={hebraRef} args={[hebraGeo, matHebra, hb.length]} frustumCulled={false} />
+        <instancedMesh ref={tuftRef} args={[tuftGeo, matTuft, tf.length]} frustumCulled={false} />
       </group>
     </group>
   );
@@ -433,6 +541,22 @@ export default function EntQuenua({ tier = 'alto', reducedMotion = false, señal
       : new THREE.MeshLambertMaterial({ color: '#20130d' })),
     [P.materialRico],
   );
+  // Tallado del rostro por VALOR (receta del DR): matPliegue oscurece los surcos
+  // (entrecejo, nasolabiales) y matCresta ilumina los cantos (cejas, caballete,
+  // pómulos) con el tono de la corteza PELADA de la queñua → la cara se esculpe
+  // con luz y sombra, no queda como una careta plana pegada al tronco.
+  const matPliegue = useMemo(
+    () => (P.materialRico
+      ? new THREE.MeshStandardMaterial({ color: CORTEZA.valle, roughness: 0.95 })
+      : new THREE.MeshLambertMaterial({ color: CORTEZA.valle })),
+    [P.materialRico],
+  );
+  const matCresta = useMemo(
+    () => (P.materialRico
+      ? new THREE.MeshStandardMaterial({ color: CORTEZA.papel, roughness: 0.85 })
+      : new THREE.MeshLambertMaterial({ color: CORTEZA.papel })),
+    [P.materialRico],
+  );
   const matOjo = useMemo(
     () => (P.materialRico
       ? new THREE.MeshStandardMaterial({ color: '#120d0a', roughness: 0.18, metalness: 0.1 })
@@ -445,8 +569,8 @@ export default function EntQuenua({ tier = 'alto', reducedMotion = false, señal
   // le puede seguir el gesto). Rico = emisivo real; frugal = básico constante.
   const matIris = useMemo(
     () => (P.materialRico
-      ? new THREE.MeshStandardMaterial({ color: '#c98a3a', emissive: '#7a4616', emissiveIntensity: 0.7, roughness: 0.35, metalness: 0.05 })
-      : new THREE.MeshBasicMaterial({ color: '#d69a48' })),
+      ? new THREE.MeshStandardMaterial({ color: '#a86c2c', emissive: '#5a3210', emissiveIntensity: 0.3, roughness: 0.45, metalness: 0.05 })
+      : new THREE.MeshBasicMaterial({ color: '#a97636' })),
     [P.materialRico],
   );
   const matHoja = useMemo(
@@ -457,13 +581,11 @@ export default function EntQuenua({ tier = 'alto', reducedMotion = false, señal
   );
   const hojaGeo = useMemo(() => new THREE.IcosahedronGeometry(1, 0), []);
 
-  // Materiales de la BARBA (musgo/liquen/raicilla): Lambert siempre (baratos y
-  // pequeños; el musgo no pide PBR). El ancla del rostro sitúa la barba en el mentón.
-  const matMusgo = useMemo(() => new THREE.MeshLambertMaterial({ color: BARBA.musgo }), []);
-  const matMusgoClaro = useMemo(() => new THREE.MeshLambertMaterial({ color: BARBA.musgoClaro }), []);
-  const matBarbaRaiz = useMemo(() => new THREE.MeshLambertMaterial({ color: BARBA.raicilla }), []);
-  const matLiquen = useMemo(() => new THREE.MeshLambertMaterial({ color: BARBA.liquen }), []);
-  const matLiquenAzul = useMemo(() => new THREE.MeshLambertMaterial({ color: BARBA.liquenAzul }), []);
+  // Materiales de la BARBA de usnea: Lambert siempre (baratos; el líquen no pide
+  // PBR). La hebra usa vertexColors (gradiente raíz→punta HORNEADO en la geometría)
+  // y el instanceColor tinta cada mechón; el tuft tinta por instancia sobre blanco.
+  const matHebra = useMemo(() => new THREE.MeshLambertMaterial({ vertexColors: true }), []);
+  const matTuft = useMemo(() => new THREE.MeshLambertMaterial({ color: '#ffffff' }), []);
   const ancla = useMemo(() => anclaRostro(7), []);
 
   // Liberar GPU al desmontar (geometrías y materiales procedurales).
@@ -472,10 +594,10 @@ export default function EntQuenua({ tier = 'alto', reducedMotion = false, señal
     ramasGeo.forEach((g) => g.dispose());
     raicesGeo.forEach((g) => g.dispose());
     hojaGeo.dispose();
-    [matCorteza, matCortezaLisa, matGrieta, matOjo, matBrillo, matIris, matHoja,
-      matMusgo, matMusgoClaro, matBarbaRaiz, matLiquen, matLiquenAzul].forEach((m) => m.dispose());
-  }, [troncoGeo, ramasGeo, raicesGeo, hojaGeo, matCorteza, matCortezaLisa, matGrieta, matOjo, matBrillo, matIris, matHoja,
-    matMusgo, matMusgoClaro, matBarbaRaiz, matLiquen, matLiquenAzul]);
+    [matCorteza, matCortezaLisa, matGrieta, matPliegue, matCresta, matOjo, matBrillo, matIris, matHoja,
+      matHebra, matTuft].forEach((m) => m.dispose());
+  }, [troncoGeo, ramasGeo, raicesGeo, hojaGeo, matCorteza, matCortezaLisa, matGrieta, matPliegue, matCresta, matOjo, matBrillo, matIris, matHoja,
+    matHebra, matTuft]);
 
   // --- Vida: balanceo pesado + parpadeo lento ---
   useFrame((state) => {
@@ -510,18 +632,18 @@ export default function EntQuenua({ tier = 'alto', reducedMotion = false, señal
           matIris={matIris}
           matCorteza={matCortezaLisa}
           matGrieta={matGrieta}
+          matPliegue={matPliegue}
+          matCresta={matCresta}
           reducedMotion={reducedMotion}
           blinkRefs={{ izq: ojoIzq, der: ojoDer }}
         />
 
-        {/* la BARBA de árbol-anciano (siempre): musgo, liquen y raicillas */}
+        {/* la BARBA de usnea (siempre): cortina densa de líquen colgante */}
         <Barba
           ancla={ancla}
-          matMusgo={matMusgo}
-          matMusgoClaro={matMusgoClaro}
-          matRaiz={matBarbaRaiz}
-          matLiquen={matLiquen}
-          matLiquenAzul={matLiquenAzul}
+          matHebra={matHebra}
+          matTuft={matTuft}
+          densidad={P.barbaDens}
           reducedMotion={reducedMotion}
         />
 
