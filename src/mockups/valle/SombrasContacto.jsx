@@ -57,25 +57,29 @@ function texturaSombra() {
    (× escala del mundo). Una casa proyecta más que una mata: el corral y el
    mercado pisan ancho; la veleta es un poste y apenas marca su pie. */
 const HUELLAS = {
-  milpa: [0.85, 0.72],
-  cafetal: [0.95, 0.78],
+  milpa: [1.15, 0.95], // la parcela viva pisa ancho (la "granja" AoE)
+  cafetal: [1.0, 0.85], // café + guamo + plátano: el sombrío proyecta
   era: [0.92, 0.78],
   quebrada: [0.8, 0.8],
-  animales: [1.05, 0.85],
+  animales: [1.5, 1.25], // el potrero con sus apartos: la huella mayor
   huerta: [0.85, 0.72],
   mercado: [0.95, 0.8],
   veleta: [0.4, 0.4],
-  semillero: [0.78, 0.85],
+  invernadero: [0.95, 1.0], // el micro-mundo del semillero
   hongos: [0.8, 0.75],
+  compost: [0.85, 0.75], // la biofábrica y su pila
+  saber: [0.85, 0.65], // el kiosco del tablero
 };
 const HUELLA_DEFECTO = [0.8, 0.7];
 
 /* El bosque no es UNA mancha: cada árbol (roble, aliso, gaque — offsets de
-   SITIOS_ARBOLEDA en Valle3D) planta SU propia sombra bajo su copa. */
+   SITIOS_ARBOLEDA en Valle3D, hoy 5 árboles) planta SU sombra bajo su copa. */
 const ARBOLES_BOSQUE = [
-  { dx: -0.55, dz: 0.15, r: 0.62 }, // roble: copa ancha
-  { dx: 0.45, dz: -0.35, r: 0.52 }, // aliso: cónico
-  { dx: 0.2, dz: 0.55, r: 0.58 }, // gaque: domo bajo
+  { dx: -0.6, dz: 0.15, r: 0.64 }, // roble: copa ancha
+  { dx: 0.5, dz: -0.4, r: 0.52 }, // aliso: cónico
+  { dx: 0.2, dz: 0.6, r: 0.58 }, // gaque: domo bajo
+  { dx: 0.85, dz: 0.45, r: 0.46 }, // roble menor
+  { dx: -0.35, dz: -0.7, r: 0.44 }, // aliso menor
 ];
 
 /* Las matas sueltas de los pisos térmicos: sombra leve según su porte. */
@@ -130,9 +134,11 @@ export default function SombrasContacto({ mundos, alturaDe, nocturno = false, fr
   const { fuertes, leves } = useMemo(() => {
     /** @type {Array<{x:number,z:number,rx:number,rz:number,rot?:number}>} */
     const fuertes = [];
-    // La casa-ancla: la sombra más grande del valle (y girada con ella).
+    // La casa-puerta: la sombra más grande del valle (girada con ella y a
+    // la medida de su escala nueva).
     const [cx, cz] = CASA_VALLE.pos;
-    fuertes.push({ x: cx, z: cz, rx: 1.25, rz: 0.95, rot: CASA_VALLE.rotY });
+    const escCasa = CASA_VALLE.escala || 1;
+    fuertes.push({ x: cx, z: cz, rx: 1.25 * escCasa, rz: 0.95 * escCasa, rot: CASA_VALLE.rotY });
     for (const m of mundos) {
       const esc = m.escala || 1;
       const [mx, , mz] = /** @type {[number, number, number]} */ (m.pos);

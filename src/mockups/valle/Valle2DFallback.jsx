@@ -11,10 +11,12 @@
 import { MUNDOS_VALLE, MUNDO_VALLE_BY_ID, COSA_DEL_DIA, CLIMAS } from './valleData';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 
-/* Proyección isométrica plana de las coordenadas del valle a la lámina SVG. */
+/* Proyección isométrica plana de las coordenadas del valle a la lámina SVG.
+   (Escala al día con el VALLE GRANDE: los lugares viven en x ∈ [-8.6, 8.6],
+   z ∈ [-9.4, 9.6] — la lámina 400×340 los abraza todos con aire.) */
 function iso(x, z) {
-  const cx = 200 + (x - z) * 30;
-  const cy = 150 + (x + z) * 15;
+  const cx = 200 + (x - z) * 10.5;
+  const cy = 155 + (x + z) * 7.5;
   return { cx, cy };
 }
 

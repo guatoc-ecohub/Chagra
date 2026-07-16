@@ -35,13 +35,15 @@ import { horaDeReloj } from '../../visual/mundo3d/cielosHoraData.js';
  * cálido) hacia arriba (fondo, páramo).
  */
 export const PISOS_TERMICOS = [
+  // (Franjas ESCALADAS al valle grande — terreno 48×48, rediseño 2026-07:
+  //  el valle respira y cada piso ocupa más ladera.)
   {
     id: 'calido',
     nombre: 'Tierra caliente',
     msnm: '0–1000 m',
     tempC: '> 24 °C',
-    z0: 3.4, // borde frontal de la franja (bajo, cerca de la cámara)
-    z1: 8.5, // borde trasero
+    z0: 4.9, // borde frontal de la franja (bajo, cerca de la cámara)
+    z1: 12.4, // borde trasero
     color: '#84a83f', // verde cálido amarillento
     cresta: '#afc85a',
     vegetacion: 'platano',
@@ -52,8 +54,8 @@ export const PISOS_TERMICOS = [
     nombre: 'Clima medio',
     msnm: '1000–2000 m',
     tempC: '18–24 °C',
-    z0: -0.6,
-    z1: 3.4,
+    z0: -0.9,
+    z1: 4.9,
     color: '#4e9143', // verde vivo
     cresta: '#77b256',
     vegetacion: 'cafe',
@@ -64,8 +66,8 @@ export const PISOS_TERMICOS = [
     nombre: 'Clima frío',
     msnm: '2000–3000 m',
     tempC: '12–18 °C',
-    z0: -5.2,
-    z1: -0.6,
+    z0: -7.6,
+    z1: -0.9,
     color: '#3c7f64', // verde-azulado
     cresta: '#5fa07f',
     vegetacion: 'papa',
@@ -76,8 +78,8 @@ export const PISOS_TERMICOS = [
     nombre: 'Páramo',
     msnm: '> 3000 m',
     tempC: '< 12 °C',
-    z0: -11,
-    z1: -5.2,
+    z0: -16,
+    z1: -7.6,
     color: '#63807a', // frío grisáceo del alto andino
     cresta: '#8ba597',
     vegetacion: 'frailejon',
@@ -98,27 +100,24 @@ export function pisoEnZ(z) {
  * el centro y hacen legible el cambio de vegetación por altura). Cada una trae
  * el `tipo` que su piso siembra — la geometría la resuelve la escena. */
 export const VEGETACION_PISOS = [
-  { piso: 'paramo', pos: [-5.6, -7.8] },
-  { piso: 'paramo', pos: [1.2, -8.3] },
-  { piso: 'paramo', pos: [4.8, -6.6] },
-  // ARCHIVADO 2026-07-18 (pedido del operador): estos 3 frailejones extra
-  // arropaban al Ent-queñua de la vista del páramo en [2.2, -7.4]
-  // (VistaParamoEnt, ver src/mockups/valle/_archivo/vistaParamo.archivado.jsx),
-  // que se sacó de la vista del valle por amontonada. Sin el Ent no hacen
-  // falta — el páramo ya se lee con los 3 de arriba. Si se reactiva el Ent,
-  // reactivar también estos tres:
-  //   { piso: 'paramo', pos: [3.3, -7.9] },
-  //   { piso: 'paramo', pos: [2.9, -6.6] },
-  //   { piso: 'paramo', pos: [-7.4, -6.9] },
-  { piso: 'frio', pos: [-6.0, -3.6] },
-  { piso: 'frio', pos: [3.0, -4.4] },
-  { piso: 'frio', pos: [-7.6, -2.4] },
-  { piso: 'templado', pos: [-2.4, 1.0] },
-  { piso: 'templado', pos: [6.2, 2.6] },
-  { piso: 'templado', pos: [-7.4, 1.2] },
-  { piso: 'calido', pos: [-7.9, 8.3] }, // corrida: su puesto viejo quedó dentro del potrero
-  { piso: 'calido', pos: [7.4, 7.2] },
-  { piso: 'calido', pos: [0.9, 8.0] },
+  // (Regadas por el valle grande: más matas, más aire entre ellas.)
+  { piso: 'paramo', pos: [-8.2, -11.4] },
+  { piso: 'paramo', pos: [-1.6, -12.6] },
+  { piso: 'paramo', pos: [2.4, -12.0] },
+  { piso: 'paramo', pos: [7.0, -9.6] },
+  { piso: 'paramo', pos: [-11.4, -9.0] },
+  { piso: 'frio', pos: [-8.8, -5.2] },
+  { piso: 'frio', pos: [-1.8, -5.6] },
+  { piso: 'frio', pos: [4.2, -6.6] },
+  { piso: 'frio', pos: [10.2, -3.6] },
+  { piso: 'templado', pos: [-11.0, 2.4] },
+  { piso: 'templado', pos: [-3.2, 0.2] },
+  { piso: 'templado', pos: [9.6, 1.6] },
+  { piso: 'templado', pos: [4.4, 2.6] },
+  { piso: 'calido', pos: [-11.2, 7.6] },
+  { piso: 'calido', pos: [-1.4, 9.2] },
+  { piso: 'calido', pos: [5.6, 10.8] },
+  { piso: 'calido', pos: [10.8, 6.4] },
 ].map((v) => {
   const piso = PISOS_TERMICOS.find((p) => p.id === v.piso);
   return { ...v, tipo: piso ? piso.vegetacion : 'platano' };
@@ -138,30 +137,47 @@ export const VEGETACION_PISOS = [
 const LUGARES = [
   // (Las posiciones finales las manda COMPOSICION_LUGARES — la capa del
   //  director en visual/mundo3d/direccion; estas son el respaldo crudo.)
-  { id: 'agua', pos: [1.4, 0, -0.2], escala: 1, tipo: 'quebrada' },
+  { id: 'agua', pos: [1.0, 0, -2.0], escala: 1, tipo: 'quebrada' },
   // El cafetal CON SOMBRÍO: café bajo guamo y plátano — policultivo, no hilera.
-  { id: 'cafe', pos: [4.4, 0, 1.0], escala: 1.05, tipo: 'cafetal' },
+  { id: 'cafe', pos: [6.0, 0, 0.6], escala: 1.1, tipo: 'cafetal' },
   // La milpa-PARCELA (portal MIS MATAS): maíz + fríjol + calabaza juntos,
   // leída como granja viva de Age of Empires — jamás monocultivo.
-  { id: 'cultivos', pos: [-4.4, 0, 2.4], escala: 1.15, tipo: 'milpa' },
-  { id: 'suelo', pos: [-1.4, 0, 4.8], escala: 1, tipo: 'era' },
-  { id: 'sanidad', pos: [3.8, 0, 4.9], escala: 0.95, tipo: 'huerta' },
+  { id: 'cultivos', pos: [-8.4, 0, 0.8], escala: 1.3, tipo: 'milpa' },
+  { id: 'suelo', pos: [-3.6, 0, 6.8], escala: 1, tipo: 'era' },
+  { id: 'sanidad', pos: [2.8, 0, 5.6], escala: 0.95, tipo: 'huerta' },
   // El POTRERO (portal MIS ANIMALES): apartos divididos por cercas vivas de
   // matarratón, nacedero y botón de oro; los animales regados, no amontonados.
-  // (Escala contenida: el valle cercano de la v2 no aguanta el llano de 48×48.)
-  { id: 'animales', pos: [-5.0, 0, 5.4], escala: 0.82, tipo: 'animales' },
-  { id: 'disenio', pos: [5.2, 0, -3.4], escala: 1.1, tipo: 'bosque' },
-  { id: 'clima', pos: [-3.2, 0, -6.0], escala: 1, tipo: 'veleta' },
-  // El mercado (portal VENDER), abajo en la tierra caliente, cerca de la salida
-  // a la plaza: el puesto con su toldo donde la cosecha sale a venderse.
-  { id: 'mercado', pos: [1.2, 0, 6.6], escala: 1, tipo: 'mercado' },
-  // El semillero, abajo cerca de la casa: el túnel de media-sombra donde nace y
-  // se cría la matica antes de salir al lote. (anti-conflicto: lugar nuevo al final.)
-  { id: 'semillero', pos: [-2.6, 0, 6.2], escala: 1, tipo: 'semillero' },
-  // El suelo vivo / red micorrízica, en el corazón cultivado (entre el suelo y
-  // los cultivos): unos hongos que asoman = el fruto de la red bajo tierra. Toque
-  // ahí para BAJAR al mundo subterráneo. (anti-conflicto: lugar nuevo al final.)
-  { id: 'micorrizas', pos: [-2.7, 0, 3.3], escala: 1, tipo: 'hongos' },
+  { id: 'animales', pos: [-8.6, 0, 8.6], escala: 1.35, tipo: 'animales' },
+  { id: 'disenio', pos: [7.2, 0, -4.4], escala: 1.25, tipo: 'bosque' },
+  { id: 'clima', pos: [-5.0, 0, -9.4], escala: 1.05, tipo: 'veleta' },
+  // El mercado (portal VENDER), abajo en la tierra caliente, la salida a la
+  // plaza: el puesto con su toldo donde la cosecha sale a venderse.
+  { id: 'mercado', pos: [8.6, 0, 9.0], escala: 1.05, tipo: 'mercado' },
+  // El INVERNADERO (micro-mundo del semillero): arcos y plástico donde nace
+  // y se cría la matica antes de salir al lote.
+  { id: 'semillero', pos: [-6.8, 0, 6.6], escala: 1.25, tipo: 'invernadero' },
+  // El suelo vivo / red micorrízica: unos hongos que asoman = el fruto de la
+  // red bajo tierra. Toque ahí para BAJAR al mundo subterráneo.
+  { id: 'micorrizas', pos: [-5.2, 0, 1.6], escala: 1, tipo: 'hongos' },
+  // La BIOFÁBRICA (mundo real 'abono'): la pila de compost cerca del potrero
+  // pero diferenciada — el ciclo estiércol→abono legible en el mapa.
+  { id: 'abono', pos: [-4.9, 0, 9.6], escala: 1, tipo: 'compost' },
+  // El KIOSCO DEL SABER (portal APRENDER): el tablero bajo techito de paja a
+  // la vera del camino de la plaza. Aún sin mundo propio en el manifiesto:
+  // trae su identidad de respaldo (fallbackMundo) mientras el hub de juegos
+  // abre su puerta (otro frente lo construye).
+  {
+    id: 'aprender',
+    pos: [7.4, 0, 4.2],
+    escala: 1.05,
+    tipo: 'saber',
+    fallbackMundo: {
+      titulo: 'Aprender',
+      emoji: '📖',
+      lema: 'Los juegos y saberes de la finca, reunidos en un solo patio.',
+      tinte: ['#b3771d', '#f2dfae'],
+    },
+  },
 ];
 
 /**
@@ -465,6 +481,4 @@ export const NARRACION = {
     'El kiosco del saber: el tablero donde la finca enseña. Aquí van llegando los juegos y las lecciones del monte.',
   casa:
     'Esta es su casa: el corazón de la finca y la puerta de sus mundos. Toque una de las seis puertas para salir a donde necesite.',
-  paramo:
-    'El páramo de su finca: los frailejones le peinan el agua a la niebla y se la entregan despacio al suelo. Por eso el páramo se cuida, no se ara. Entre y véalo de cerca.',
 };
