@@ -110,17 +110,18 @@ export function taperTronco(t) {
 export function desplazamientoCorteza(t, ang) {
   // Surcos FINOS y numerosos (corteza acanalada), poco profundos: dan textura
   // sin partir el tronco en "trenzas". La rugosidad de nudo se concentra abajo.
-  const surcos = 0.055 * Math.sin(ang * 9.0 + t * 2.5); // acanaladuras verticales finas
-  const surcosF = 0.03 * Math.sin(ang * 17 - t * 3); // grano de corteza más fino
-  const bandas = 0.035 * Math.sin(t * 22 + ang * 1.5); // vetas horizontales
-  const nudos = 0.05 * Math.sin(ang * 2.0 - t * 6.5) * Math.sin(t * Math.PI); // nudos suaves
-  const aspereza = 0.015 * Math.sin(ang * 23 + t * 40); // aspereza
+  const surcos = 0.075 * Math.sin(ang * 9.0 + t * 2.5); // acanaladuras verticales
+  const surcosF = 0.04 * Math.sin(ang * 17 - t * 3); // grano de corteza más fino
+  const bandas = 0.04 * Math.sin(t * 22 + ang * 1.5); // vetas horizontales
+  const nudos = 0.06 * Math.sin(ang * 2.0 - t * 6.5) * Math.sin(t * Math.PI); // nudos suaves
+  const aspereza = 0.02 * Math.sin(ang * 23 + t * 40); // aspereza
   // PLACAS: crestas anchas de borde firme (tanh aplana el seno → meseta) que
   // parten la corteza en placas leñosas serpenteantes — el tallado profundo que
-  // se lee de lejos, encima del grano fino.
-  const placas = 0.055 * Math.tanh(Math.sin(ang * 3.4 + Math.sin(t * 5.2) * 1.1 + t * 0.8) * 2.4);
-  const masAbajo = 1 + (1 - t) * 0.35; // el pie es algo más rugoso, sin exagerar
-  return (surcos + surcosF + bandas + nudos + aspereza + placas) * masAbajo;
+  // se lee de lejos, encima del grano fino. Amplitud generosa: madera vieja.
+  const placas = 0.09 * Math.tanh(Math.sin(ang * 3.4 + Math.sin(t * 5.2) * 1.1 + t * 0.8) * 2.4);
+  const placasV = 0.05 * Math.tanh(Math.sin(t * 9 + ang * 0.6 + Math.sin(ang * 2) * 0.8) * 2.2); // segmenta a lo alto
+  const masAbajo = 1 + (1 - t) * 0.4; // el pie es algo más rugoso
+  return (surcos + surcosF + bandas + nudos + aspereza + placas + placasV) * masAbajo;
 }
 
 /* Color de corteza para un desplazamiento dado (cresta pelada clara, grieta
@@ -370,6 +371,12 @@ const g2 = (x, y, cx, cy, rx, ry) => {
    (coordenada Y local del grupo del rostro — la misma que usan ojos y barba). */
 export const ROSTRO_T = 0.34;
 export const ROSTRO_BOCA_Y = -0.445;
+// Escala del grupo del rostro (y de la barba, que comparte ancla). La cáscara
+// (`mallaRostro`) usa estos mismos factores para convertir las coords del tronco
+// a las locales, así que TODO lo que lo monte debe usar ROSTRO_ESCALA — cambiarla
+// aquí reescala rostro y barba a la vez sin desalinear la talla.
+/** @type {[number, number, number]} */
+export const ROSTRO_ESCALA = [1.62, 1.68, 1.24];
 
 /*
  * El CAMPO del rostro: para un punto (x lateral, y vertical) en coords locales
@@ -381,36 +388,48 @@ export const ROSTRO_BOCA_Y = -0.445;
  */
 export function campoRostro(x, y) {
   let d = 0;
-  // FRENTE maciza que corona el rostro
-  d += 0.14 * g2(x, y, 0, 0.38, 0.5, 0.3);
-  // CEJAS: cornisa pesada de corteza sobre cada ojo (leve asimetría = madera viva)
-  d += 0.22 * g2(x, y, -0.24, 0.145, 0.2, 0.08);
-  d += 0.22 * g2(x, y, 0.245, 0.16, 0.21, 0.085);
-  // entrecejo: el surco vertical del pensamiento
-  d -= 0.09 * g2(x, y, 0, 0.17, 0.06, 0.13);
-  // CUENCAS: los pozos hondos donde viven los ojos (la sombra los encapucha)
-  const cuencas = g2(x, y, -0.24, 0.0, 0.14, 0.105) + g2(x, y, 0.24, 0.01, 0.145, 0.11);
-  d -= 0.34 * cuencas;
-  // NARIZ: lomo que baja del entrecejo, se ensancha y termina en nudo
-  const caida = Math.min(1, Math.max(0, (0.16 - y) / 0.3)); // 0 arriba → 1 punta
-  d += (0.08 + 0.13 * caida) * g2(x, 0, 0, 0, 0.085 + 0.045 * caida, 1) * g2(0, y, 0, -0.02, 1, 0.21);
-  d += 0.15 * g2(x, y, 0, -0.155, 0.115, 0.075); // el nudo de la punta
-  const fosas = g2(x, y, -0.055, -0.215, 0.038, 0.03) + g2(x, y, 0.055, -0.215, 0.038, 0.03);
-  d -= 0.09 * fosas;
-  // PÓMULOS que pegan la luz + surcos nasolabiales que bajan de la nariz
-  d += 0.12 * (g2(x, y, -0.4, -0.15, 0.18, 0.15) + g2(x, y, 0.4, -0.14, 0.18, 0.15));
-  d -= 0.05 * (g2(x, y, -0.17, -0.3, 0.05, 0.11) + g2(x, y, 0.17, -0.3, 0.05, 0.11));
-  // BOCA: labios de corteza alrededor de la grieta (la grieta es el pozo)
-  d += 0.07 * g2(x, y, 0, -0.365, 0.27, 0.05); // labio superior
-  d += 0.09 * g2(x, y, 0, -0.53, 0.24, 0.06); // labio inferior
-  const grieta = g2(x, y, 0, ROSTRO_BOCA_Y, 0.3, 0.048);
-  d -= 0.26 * grieta;
+  // PANEL FACIAL: la cara vive sobre un plano frontal REHUNDIDO en el tronco (así
+  // Bárbol: la madera se aplana y retrocede, y los rasgos se tallan sobre ese
+  // panel). Sin esto la suma de rasgos abomba toda la cara como una cúpula pegada.
+  const panel = g2(x, y, 0, -0.06, 0.46, 0.6);
+  d -= 0.13 * panel;
+  // FRENTE: apenas se recupera del panel (superficie sobre la que cuelga la cornisa)
+  d += 0.05 * g2(x, y, 0, 0.36, 0.5, 0.26);
+  // CEJAS-CORNISA: los aleros pesados de corteza que SOBRESALEN y encapuchan los
+  // ojos. Fuertes hacia afuera, con leve asimetría (madera viva).
+  d += 0.2 * g2(x, y, -0.235, 0.13, 0.21, 0.07);
+  d += 0.2 * g2(x, y, 0.245, 0.145, 0.22, 0.075);
+  // el HUECO de sombra justo bajo la cornisa (el párpado hundido) — carga el
+  // encapuchado que hace la mirada sabia
+  d -= 0.14 * (g2(x, y, -0.235, 0.03, 0.17, 0.06) + g2(x, y, 0.245, 0.04, 0.18, 0.065));
+  // entrecejo: el surco vertical del pensamiento, hondo entre las cejas
+  d -= 0.11 * g2(x, y, 0, 0.15, 0.05, 0.14);
+  // CUENCAS: pozos HONDOS donde se hunden los ojos ámbar (sombra que los encapucha)
+  const cuencas = g2(x, y, -0.235, -0.03, 0.15, 0.12) + g2(x, y, 0.245, -0.02, 0.155, 0.125);
+  d -= 0.44 * cuencas;
+  // NARIZ: lomo ANCHO de madera que baja del entrecejo, se ensancha y termina en
+  // nudo — sobresale de verdad (el rasgo más prominente de la cara).
+  const caida = Math.min(1, Math.max(0, (0.14 - y) / 0.3)); // 0 arriba → 1 punta
+  d += (0.12 + 0.16 * caida) * g2(x, 0, 0, 0, 0.09 + 0.05 * caida, 1) * g2(0, y, 0, -0.04, 1, 0.22);
+  d += 0.17 * g2(x, y, 0, -0.17, 0.12, 0.08); // el nudo de la punta
+  const fosas = g2(x, y, -0.07, -0.235, 0.045, 0.035) + g2(x, y, 0.07, -0.235, 0.045, 0.035);
+  d -= 0.12 * fosas;
+  // PÓMULOS anchos que pegan la luz + surcos nasolabiales hondos (la vejez del árbol)
+  d += 0.09 * (g2(x, y, -0.42, -0.16, 0.19, 0.16) + g2(x, y, 0.42, -0.15, 0.19, 0.16));
+  d -= 0.08 * (g2(x, y, -0.2, -0.32, 0.055, 0.13) + g2(x, y, 0.2, -0.32, 0.055, 0.13));
+  // bolsas bajo los ojos (peso de los años)
+  d += 0.05 * (g2(x, y, -0.235, -0.16, 0.13, 0.05) + g2(x, y, 0.245, -0.15, 0.13, 0.05));
+  // BOCA: labios de corteza alrededor de la grieta (la grieta es un pozo hondo)
+  d += 0.08 * g2(x, y, 0, -0.375, 0.28, 0.055); // labio superior
+  d += 0.1 * g2(x, y, 0, -0.53, 0.25, 0.065); // labio inferior
+  const grieta = g2(x, y, 0, ROSTRO_BOCA_Y, 0.32, 0.05);
+  d -= 0.36 * grieta;
   // MENTÓN macizo (el peso del árbol viejo; la barba lo enmarca)
-  d += 0.11 * g2(x, y, 0, -0.68, 0.21, 0.13);
+  d += 0.12 * g2(x, y, 0, -0.68, 0.22, 0.14);
   // ARRUGAS de madera: grano fino que cruza el rostro (leve — sigue siendo corteza)
-  d += 0.016 * Math.sin(x * 30 + y * 6) + 0.014 * Math.sin(y * 24 + x * 4);
-  d -= 0.018 * Math.sin(y * 34) * g2(x, y, 0, 0.42, 0.42, 0.2); // pliegues de la frente
-  const sombra = Math.min(1, cuencas * 0.9 + grieta * 1.1 + fosas * 0.8);
+  d += 0.02 * Math.sin(x * 30 + y * 6) + 0.017 * Math.sin(y * 24 + x * 4);
+  d -= 0.03 * Math.sin(y * 30) * g2(x, y, 0, 0.4, 0.44, 0.22); // pliegues de la frente
+  const sombra = Math.min(1, cuencas * 1.0 + grieta * 1.15 + fosas * 0.8 + panel * 0.12);
   return { d, sombra };
 }
 
@@ -430,7 +449,7 @@ export function mallaRostro({ segRostro = [48, 54] } = {}, seed = 7) {
   const curva = curvaTronco(seed);
   const centro = curva.getPointAt(ROSTRO_T);
   const [segU, segV] = segRostro;
-  const angMax = 1.22; // medio-abanico alrededor del frente (+Z)
+  const angMax = 1.4; // medio-abanico amplio: la cara ocupa buena parte del frente
 
   // wBajo/wAlto: cuánto se tuca cada borde horizontal. Los bordes EXTERIORES se
   // hunden de lleno en el tronco; los bordes de la COSTURA de la boca apenas
@@ -447,28 +466,31 @@ export function mallaRostro({ segRostro = [48, 54] } = {}, seed = 7) {
       const vN = iv / filas;
       const y = yMin + (yMax - yMin) * vN;
       // la cáscara SIGUE el tronco: a esta altura local, qué t, radio y centro
-      const t = Math.max(0.02, Math.min(0.98, ROSTRO_T + (y * 1.55) / ALTURA_TRONCO));
+      const t = Math.max(0.02, Math.min(0.98, ROSTRO_T + (y * ROSTRO_ESCALA[1]) / ALTURA_TRONCO));
       const R = taperTronco(t);
       const pC = curva.getPointAt(t);
-      const offX = (pC.x - centro.x) / 1.5;
-      const offZ = (pC.z - centro.z) / 1.15;
+      const offX = (pC.x - centro.x) / ROSTRO_ESCALA[0];
+      const offZ = (pC.z - centro.z) / ROSTRO_ESCALA[2];
       for (let iu = 0; iu < cols; iu++) {
         const uN = iu / segU;
         const ang = (uN * 2 - 1) * angMax;
-        const xl = (Math.sin(ang) * R) / 1.5; // lateral local sobre la superficie
+        const xl = (Math.sin(ang) * R) / ROSTRO_ESCALA[0]; // lateral local sobre la superficie
         const { d, sombra } = campoRostro(xl, y);
         // máscara del óvalo: adentro manda la talla; afuera, la corteza normal
-        const m = Math.exp(-((xl / 0.5) ** 2 + ((y + 0.08) / 0.62) ** 2));
+        const m = Math.exp(-((xl / 0.56) ** 2 + ((y + 0.08) / 0.66) ** 2));
         const bark = desplazamientoCorteza(t, ang + 0.6) * (0.35 + 0.65 * (1 - m));
         // borde: la cáscara se HUNDE en el tronco (jamás un canto flotando)
-        const eU = suave(0.68, 1, Math.abs(ang) / angMax);
+        const eU = suave(0.7, 1, Math.abs(ang) / angMax);
         const eV = Math.max(wAlto * suave(0.78, 1, vN), wBajo * suave(0.78, 1, 1 - vN));
         const borde = Math.max(eU, eV);
-        const f = (1 + d * (1 - borde) + bark) * (1 - 0.3 * borde) * 1.02;
+        // GANANCIA de relieve: el tallado es HONDO de verdad (el rostro emerge y se
+        // hunde en la madera, no un bajorrelieve tímido). Sin proud global → al ras.
+        const relieve = d * 1.5 * m;
+        const f = (1 + relieve * (1 - borde) + bark) * (1 - 0.28 * borde);
         const k = (iv * cols + iu) * 3;
-        pos[k] = (Math.sin(ang) * R * f) / 1.5 + offX;
+        pos[k] = (Math.sin(ang) * R * f) / ROSTRO_ESCALA[0] + offX;
         pos[k + 1] = y - pivotY;
-        pos[k + 2] = (Math.cos(ang) * R * f) / 1.15 + offZ;
+        pos[k + 2] = (Math.cos(ang) * R * f) / ROSTRO_ESCALA[2] + offZ;
         // color: corteza + pátina clara de madera vieja + cresta pelada + sombra
         c.copy(colorCorteza(bark + d * 0.9, t));
         if (m > 0.2) c.lerp(CORTEZA.papel, m * 0.14);
@@ -660,8 +682,8 @@ export const BARBA = {
   usnea: new THREE.Color('#aebb96'), // cuerpo del líquen: verde-gris PÁLIDO (sage)
   usneaGris: new THREE.Color('#c3cab4'), // mechón más plateado (variedad)
   raicilla: new THREE.Color('#725036'), // pocas hebras leñosas marrones (contraste)
-  liquen: new THREE.Color('#c7d0b6'), // mata de liquen foliáceo pálido (plata-sage)
-  liquenAzul: new THREE.Color('#b4c1b4'), // liquen azul-grisáceo (variedad)
+  liquen: new THREE.Color('#8f9c7a'), // mata de liquen foliáceo (sage apagado, NO blanco)
+  liquenAzul: new THREE.Color('#828f7e'), // liquen gris-verdoso (variedad)
 };
 
 /*
@@ -727,62 +749,77 @@ export function specsBarba(seed = 91) {
   // solape entre capas es lo que hace que se lea como BARBA con cuerpo. Densa y
   // con el CENTRO lleno (el mentón de Bárbol), no cuatro hebras a los lados.
   const capas = [
-    { z: -0.04, lenMul: 0.86, n: 22 },
-    { z: 0.03, lenMul: 1.0, n: 28 },
-    { z: 0.1, lenMul: 1.12, n: 22 },
+    { z: -0.03, lenMul: 0.72, n: 34 },
+    { z: 0.05, lenMul: 0.86, n: 40 },
+    { z: 0.12, lenMul: 0.98, n: 34 },
   ];
   for (const capa of capas) {
     for (let i = 0; i < capa.n; i++) {
       // sesgo al centro: raíz cuadrada empuja las muestras hacia el mentón para
       // que la barba tenga cuerpo en el medio y se disperse hacia las mejillas.
       const u = (i + r() * 0.8) / capa.n; // 0..1 crudo
-      const f = 0.5 + (u - 0.5) * Math.sqrt(Math.abs(u - 0.5) * 2) * 1.15;
-      const x = (f - 0.5) * 1.02; // a lo ancho de la mandíbula
+      const f = 0.5 + (u - 0.5) * Math.sqrt(Math.abs(u - 0.5) * 2) * 1.05;
+      const x = (f - 0.5) * 0.92; // a lo ancho de la mandíbula (más ceñida)
       const centro = Math.max(0, 1 - Math.abs(f - 0.5) * 1.7); // 1 en el mentón
-      // arranca BAJO la boca (deja ver los labios) y cuelga largo desde el mentón
-      const yTop = -0.47 - centro * 0.06 - Math.abs(f - 0.5) * 0.02;
-      const len = (0.6 + centro * 1.15 + r() * 0.3) * capa.lenMul; // barba LARGA
+      // arranca BAJO la boca (deja ver los labios) y cuelga desde el mentón
+      const yTop = -0.5 - centro * 0.05 - Math.abs(f - 0.5) * 0.03;
+      const len = (0.4 + centro * 0.6 + r() * 0.22) * capa.lenMul; // barba CORTA y tupida
       hebras.push({
-        pos: [x + (r() - 0.5) * 0.05, yTop, capa.z + (r() - 0.5) * 0.02],
+        pos: [x + (r() - 0.5) * 0.045, yTop, capa.z + (r() - 0.5) * 0.02],
         len,
-        grosor: 0.5 + r() * 0.5, // fino (hilo de usnea), varía
-        tilt: (f - 0.5) * 0.28 + (r() - 0.5) * 0.24, // cuelgan casi rectos, poco abanico
-        lean: 0.04 + r() * 0.16, // caen hacia el frente
-        yaw: (r() - 0.5) * 0.5,
+        grosor: 0.8 + r() * 0.7, // más gruesa: mechones tupidos, no hilo suelto
+        tilt: (f - 0.5) * 0.22 + (r() - 0.5) * 0.18, // cuelgan casi rectos
+        lean: 0.05 + r() * 0.14, // caen hacia el frente
+        yaw: (r() - 0.5) * 0.4,
         tono: r(), // 0 usnea sage → 1 plateado
-        woody: r() > 0.9, // muy pocas hebras leñosas marrones (contraste)
+        woody: r() > 0.92, // muy pocas hebras leñosas marrones (contraste)
       });
     }
   }
-  // COLUMNA CENTRAL del mentón: mechones largos que cuelgan RECTOS en el eje para
-  // que la barba no se parta en dos y tape el surco vertical del tronco (el mentón
-  // macizo de Bárbol). Es lo que une la cortina en una sola barba.
-  const CENTRO = 20;
+  // COLUMNA CENTRAL del mentón: mechones que cuelgan RECTOS en el eje para que la
+  // barba no se parta en dos y tape el surco vertical del tronco (el mentón macizo
+  // de un árbol viejo). Es lo que une la cortina en una sola barba maciza.
+  const CENTRO = 30;
   for (let i = 0; i < CENTRO; i++) {
     // arrancan JUSTO bajo el labio y cuelgan rectos, adelantados para tapar el
     // surco vertical del tronco → una sola barba maciza, sin raya al medio.
     hebras.push({
-      pos: [(r() - 0.5) * 0.28, -0.44 - r() * 0.1, 0.09 + r() * 0.05],
-      len: 1.2 + r() * 0.55, // las más largas (el chorro central del mentón)
-      grosor: 0.6 + r() * 0.5,
-      tilt: (r() - 0.5) * 0.14, // casi vertical
-      lean: 0.03 + r() * 0.12,
+      pos: [(r() - 0.5) * 0.3, -0.48 - r() * 0.08, 0.1 + r() * 0.05],
+      len: 0.7 + r() * 0.4, // el chorro central del mentón (corto y denso)
+      grosor: 0.9 + r() * 0.6,
+      tilt: (r() - 0.5) * 0.12, // casi vertical
+      lean: 0.04 + r() * 0.1,
+      yaw: (r() - 0.5) * 0.35,
+      tono: r(),
+      woody: r() > 0.92,
+    });
+  }
+  // BIGOTE / patillas cortas: mechones cortos prendidos a las mejillas justo bajo
+  // los pómulos, que cierran el marco de la cara (barba que sube por las patillas).
+  for (let i = 0; i < 16; i++) {
+    const s = i < 8 ? -1 : 1;
+    hebras.push({
+      pos: [s * (0.28 + r() * 0.14), -0.34 - r() * 0.14, 0.06 + r() * 0.05],
+      len: 0.24 + r() * 0.2,
+      grosor: 0.7 + r() * 0.5,
+      tilt: s * (0.12 + r() * 0.1),
+      lean: 0.05 + r() * 0.12,
       yaw: (r() - 0.5) * 0.4,
       tono: r(),
       woody: r() > 0.9,
     });
   }
-  // matas de liquen foliáceo: acentos PEQUEÑOS del enredo de usnea, prendidos al
-  // borde superior de la barba y trepando por las patillas (mejillas). Chicos y
-  // numerosos: dan textura sin tapar la boca ni verse como piedras.
+  // matas de liquen foliáceo: acentos MINÚSCULOS del enredo de usnea, prendidos al
+  // borde de la barba y trepando por las patillas. Chicos, planos y sage-apagado
+  // para que se lean como líquen enredado — NUNCA como sombreros de hongo blancos.
   const tufts = [];
-  const L = 22;
+  const L = 16;
   for (let i = 0; i < L; i++) {
     const f = i / (L - 1);
     const lado = Math.abs(f - 0.5) * 2; // 0 centro → 1 mejilla
     tufts.push({
-      pos: [(f - 0.5) * 1.02, -0.5 - r() * 0.22 + lado * 0.16, 0.05 + r() * 0.07],
-      esc: 0.028 + r() * 0.03, // MUCHO más chicos que antes
+      pos: [(f - 0.5) * 0.94, -0.52 - r() * 0.2 + lado * 0.18, 0.05 + r() * 0.06],
+      esc: 0.016 + r() * 0.018, // minúsculos: textura, no piedras/hongos
       azul: r() > 0.6,
     });
   }

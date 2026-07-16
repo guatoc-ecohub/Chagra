@@ -130,10 +130,10 @@ function Diorama({ tier, reducedMotion }) {
 
       <OrbitControls
         makeDefault
-        target={[0, 3.2, 0]}
+        target={[0, 2.15, 0]}
         enablePan={false}
         enableZoom
-        minDistance={4}
+        minDistance={2.2}
         maxDistance={20}
         minPolarAngle={0.55}
         maxPolarAngle={1.5}
