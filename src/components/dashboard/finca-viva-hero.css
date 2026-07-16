@@ -1352,33 +1352,69 @@ html[data-theme="biopunk"] .fvh {
 .fvh-escuchar:active,
 .fvh-sol-toggle:active { transform: scale(0.97); }
 
-/* ── LAS 6 PUERTAS ── */
+/* ── LAS 6 PUERTAS (pulido de portada 2026-07-16) ──────────────────────────
+   Cada puerta es una ESTAMPA de lugar: dibujo SVG propio (PuertaArte) sobre
+   una tarjeta con el cielo suave de su tinte arriba, borde y LABIO de
+   contacto de su color (el plinto 3D que ancla la tarjeta — mismo lenguaje
+   que las sombras de contacto del valle) y un press con squash de juguete.
+   Todo CSS barato: gradientes y sombras planas, cero blur/filter (Android). */
 .fvh-puertas {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
   padding: 0 16px;
 }
 @media (min-width: 720px) { .fvh-puertas { grid-template-columns: repeat(3, 1fr); } }
 .fvh-puerta {
-  min-height: 112px;
+  min-height: 118px;
   border-radius: 22px;
   border: 2px solid var(--fvh-p-borde, var(--fvh-card-border));
-  background: var(--fvh-card-bg);
+  /* cielo del tinte arriba → superficie del tema abajo: cada lugar tiene su
+     clima de color sin volver arcoíris el home (los dibujos comparten línea). */
+  background:
+    linear-gradient(180deg, var(--fvh-p-cielo, rgba(132, 204, 22, 0.10)), rgba(255, 255, 255, 0) 62%),
+    var(--fvh-card-bg);
   color: var(--fvh-card-tinta);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
-  padding: 12px 8px;
-  box-shadow: 0 10px 24px rgba(20, 30, 20, 0.25);
+  padding: 10px 8px 12px;
+  /* labio de contacto del tinte (plinto) + caída suave: asienta la tarjeta. */
+  box-shadow:
+    0 4px 0 -1px var(--fvh-p-labio, rgba(60, 80, 50, 0.35)),
+    0 12px 22px rgba(20, 30, 20, 0.20);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
   animation: fvh-puerta-brota 0.5s ease-out both;
 }
-.fvh-puerta:active { transform: scale(0.97); }
+/* press de juguete: la tarjeta BAJA hasta su labio (squash físico). */
+.fvh-puerta:active {
+  transform: translateY(3px) scale(0.985);
+  box-shadow:
+    0 1px 0 -1px var(--fvh-p-labio, rgba(60, 80, 50, 0.35)),
+    0 5px 10px rgba(20, 30, 20, 0.18);
+}
+@media (hover: hover) and (pointer: fine) {
+  .fvh-puerta:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 7px 0 -1px var(--fvh-p-labio, rgba(60, 80, 50, 0.35)),
+      0 18px 30px var(--fvh-p-glow, rgba(20, 30, 20, 0.28));
+  }
+  .fvh-puerta:hover .fvh-puerta-arte { transform: translateY(-2px) scale(1.05); }
+}
 .fvh-puerta:focus-visible { outline: 3px solid var(--fvh-lima); outline-offset: 2px; }
 .fvh-puerta-emoji { font-size: 40px; line-height: 1; }
+/* la estampa: dibujo grande, sin animación interna (Android barato) */
+.fvh-puerta-arte {
+  width: 96px;
+  height: 64px;
+  display: block;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.fvh-puerta-arte svg { display: block; width: 100%; height: 100%; }
 .fvh-puerta-nombre {
   font-family: var(--fvh-display);
   font-size: 19px;
@@ -1390,13 +1426,47 @@ html[data-theme="biopunk"] .fvh {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-/* tinte por puerta: solo el borde, para no volver arcoíris el home */
-.fvh-puerta.t-verde { --fvh-p-borde: rgba(132, 204, 22, 0.6); }
-.fvh-puerta.t-teja { --fvh-p-borde: rgba(234, 88, 12, 0.6); }
-.fvh-puerta.t-cielo { --fvh-p-borde: rgba(56, 189, 248, 0.6); }
-.fvh-puerta.t-ambar { --fvh-p-borde: rgba(245, 158, 11, 0.65); }
-.fvh-puerta.t-uva { --fvh-p-borde: rgba(167, 139, 250, 0.6); }
-.fvh-puerta.t-menta { --fvh-p-borde: rgba(45, 212, 191, 0.6); }
+/* el clima de color de cada puerta: cielo suave + borde + labio + glow */
+.fvh-puerta.t-verde {
+  --fvh-p-borde: rgba(101, 163, 52, 0.65);
+  --fvh-p-cielo: rgba(132, 204, 22, 0.14);
+  --fvh-p-labio: rgba(77, 124, 15, 0.45);
+  --fvh-p-glow: rgba(77, 124, 15, 0.30);
+}
+.fvh-puerta.t-teja {
+  --fvh-p-borde: rgba(214, 93, 32, 0.6);
+  --fvh-p-cielo: rgba(234, 120, 44, 0.13);
+  --fvh-p-labio: rgba(178, 74, 24, 0.42);
+  --fvh-p-glow: rgba(178, 74, 24, 0.28);
+}
+.fvh-puerta.t-cielo {
+  --fvh-p-borde: rgba(44, 156, 208, 0.6);
+  --fvh-p-cielo: rgba(56, 189, 248, 0.15);
+  --fvh-p-labio: rgba(35, 118, 160, 0.42);
+  --fvh-p-glow: rgba(35, 118, 160, 0.28);
+}
+.fvh-puerta.t-ambar {
+  --fvh-p-borde: rgba(222, 148, 18, 0.65);
+  --fvh-p-cielo: rgba(245, 158, 11, 0.15);
+  --fvh-p-labio: rgba(180, 116, 12, 0.42);
+  --fvh-p-glow: rgba(180, 116, 12, 0.28);
+}
+.fvh-puerta.t-uva {
+  --fvh-p-borde: rgba(147, 118, 235, 0.6);
+  --fvh-p-cielo: rgba(167, 139, 250, 0.14);
+  --fvh-p-labio: rgba(109, 84, 190, 0.4);
+  --fvh-p-glow: rgba(109, 84, 190, 0.28);
+}
+.fvh-puerta.t-menta {
+  --fvh-p-borde: rgba(32, 178, 156, 0.6);
+  --fvh-p-cielo: rgba(45, 212, 191, 0.15);
+  --fvh-p-labio: rgba(19, 138, 120, 0.42);
+  --fvh-p-glow: rgba(19, 138, 120, 0.28);
+}
+@media (prefers-reduced-motion: reduce) {
+  .fvh-puerta,
+  .fvh-puerta-arte { transition: none; animation: none; opacity: 1; }
+}
 
 /* ── VARIANTE "PLENO SOL" (alto contraste de mediodía) ─────────────────────
    Redefine los tokens del hero a un papel claro con tinta oscura dura. Va al

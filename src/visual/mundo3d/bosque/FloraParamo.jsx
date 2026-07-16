@@ -52,7 +52,8 @@ function Especie({ geo, mat, items, castShadow = false }) {
     for (let i = 0; i < items.length; i++) {
       const it = items[i];
       p.set(it.pos[0], it.pos[1], it.pos[2]);
-      e.set(0, it.rotY, 0);
+      // tiltX/tiltZ: ladeo por instancia (frailejonar) para que no se lea clonado.
+      e.set(it.tiltX || 0, it.rotY, it.tiltZ || 0);
       q.setFromEuler(e);
       s.setScalar(it.escala);
       m.compose(p, q, s);

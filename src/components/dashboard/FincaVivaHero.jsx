@@ -782,7 +782,15 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
               style={{ animationDelay: `${0.08 + i * 0.06}s` }}
               aria-label={`${p.nombre}: abre ${p.abre}`}
             >
-              <span className="fvh-puerta-emoji" aria-hidden="true">{p.emoji}</span>
+              {/* DIBUJO PROPIO por puerta (pulido de portada 2026-07-16): cada
+                  puerta es un mini-LUGAR ilustrado (SVG inline, paleta andina,
+                  sombra de contacto — el mismo lenguaje del valle 3D) en vez
+                  del emoji de plataforma, que en Android barato salía con
+                  glifos distintos y planos. El emoji queda como respaldo si
+                  algún id nuevo no trae dibujo. */}
+              <span className="fvh-puerta-arte" aria-hidden="true">
+                <PuertaArte id={p.id} fallback={p.emoji} />
+              </span>
               <span className="fvh-puerta-nombre">{p.nombre}</span>
             </button>
           ))}
@@ -1278,6 +1286,149 @@ const PLENO_SOL_KEY = 'chagra:home:pleno-sol';
  *   · Aprender      → 'aprende'.
  *   · Toda mi finca → LOS MUNDOS completos en la hoja de abajo (revelar).
  */
+/**
+ * PuertaArte — el DIBUJO de cada puerta del home: un mini-lugar ilustrado
+ * (SVG inline, rsvg-safe, sin animación interna: Android barato) con la
+ * paleta andina del valle — verdes de monte, teja, ámbar de cosecha, cielo
+ * de páramo — línea gruesa cálida (clave Cuphead-andina del norte visual) y
+ * una sombra de contacto elíptica que ancla la viñeta a la tarjeta, el mismo
+ * truco que separa los landmarks del valle 3D. Colores fijos a propósito:
+ * la viñeta es ARTE (como una estampa), no superficie de tema.
+ *
+ * @param {{ id: string, fallback?: string }} props
+ */
+function PuertaArte({ id, fallback = '' }) {
+  const svg = PUERTA_ARTE[id];
+  if (!svg) return <span className="fvh-puerta-emoji">{fallback}</span>;
+  return svg;
+}
+
+/* Trazos compartidos de las estampas: línea tinta-verde oscura, uniones
+   redondas (la línea "dibujada a mano" del norte visual). */
+const PA_LINEA = /** @type {import('react').SVGAttributes<SVGElement>} */ ({
+  stroke: '#33412c',
+  strokeWidth: 2.4,
+  strokeLinecap: 'round',
+  strokeLinejoin: 'round',
+});
+const PA_SOMBRA = (cx, rx) => (
+  <ellipse cx={cx} cy="62" rx={rx} ry="4.5" fill="#33412c" opacity="0.16" />
+);
+
+const PUERTA_ARTE = {
+  /* MIS MATAS — la mata brotando del surco, con su hermanita al lado. */
+  matas: (
+    <svg viewBox="0 0 96 68" role="img">
+      {PA_SOMBRA(48, 26)}
+      {/* surco de tierra */}
+      <path d="M26 62 q22 -9 44 0 q-10 5 -22 5 t-22 -5 Z" fill="#8a5a34" {...PA_LINEA} />
+      <path d="M31 60 q17 -6 34 0" fill="none" stroke="#6e4a2a" strokeWidth="1.6" strokeLinecap="round" opacity=".7" />
+      {/* tallo + hojas gorditas */}
+      <path d="M48 58 V26" fill="none" {...PA_LINEA} stroke="#2e6b3a" strokeWidth="3.4" />
+      <path d="M48 46 Q34 44 30 32 Q44 31 48 42 Z" fill="#4ca35c" {...PA_LINEA} />
+      <path d="M48 38 Q62 36 66 24 Q52 23 48 34 Z" fill="#5cb56c" {...PA_LINEA} />
+      <path d="M48 26 Q42 16 48 8 Q54 16 48 26 Z" fill="#7ccf84" {...PA_LINEA} />
+      {/* la hermanita brotando */}
+      <path d="M70 58 v-8" fill="none" {...PA_LINEA} stroke="#2e6b3a" strokeWidth="2.6" />
+      <path d="M70 52 q-7 -1 -9 -8 q8 0 9 6 Z" fill="#5cb56c" {...PA_LINEA} strokeWidth="2" />
+    </svg>
+  ),
+  /* MIS ANIMALES — la gallina criolla con su pollito, patas en tierra. */
+  animales: (
+    <svg viewBox="0 0 96 68" role="img">
+      {PA_SOMBRA(44, 28)}
+      {/* cuerpo */}
+      <path d="M26 40 q0 -16 17 -16 q15 0 16 13 q1 9 -6 14 q-9 6 -18 2 q-9 -4 -9 -13 Z" fill="#fff4dc" {...PA_LINEA} />
+      {/* ala */}
+      <path d="M36 40 q9 -5 15 1 q-6 7 -15 3 Z" fill="#f0ddba" {...PA_LINEA} strokeWidth="2" />
+      {/* cola */}
+      <path d="M27 36 q-8 -3 -9 -11 q7 1 11 7" fill="#e8cfa4" {...PA_LINEA} strokeWidth="2" />
+      {/* cabeza: cresta + pico + ojo */}
+      <path d="M55 26 q1 -6 6 -7 q0 4 -2 6 q5 -2 7 1 q-3 3 -7 3 Z" fill="#d94f3a" {...PA_LINEA} strokeWidth="2" />
+      <path d="M64 32 l7 3 l-7 3 Z" fill="#f0b13c" {...PA_LINEA} strokeWidth="2" />
+      <circle cx="57" cy="31" r="1.8" fill="#33412c" />
+      {/* patas */}
+      <path d="M40 53 v7 m-4 0 h8 M50 52 v8 m-4 0 h8" fill="none" {...PA_LINEA} stroke="#c98a2e" strokeWidth="2.2" />
+      {/* pollito */}
+      <circle cx="76" cy="52" r="7" fill="#ffd24d" {...PA_LINEA} strokeWidth="2" />
+      <circle cx="78.5" cy="50" r="1.3" fill="#33412c" />
+      <path d="M83 52 l4 1.6 l-4 1.6 Z" fill="#f0b13c" {...PA_LINEA} strokeWidth="1.6" />
+      <path d="M74 59 v3 m4 -3 v3" fill="none" {...PA_LINEA} stroke="#c98a2e" strokeWidth="1.8" />
+    </svg>
+  ),
+  /* EL TIEMPO — sol de páramo asomando tras la nube, con su lluvia. */
+  tiempo: (
+    <svg viewBox="0 0 96 68" role="img">
+      {/* sol con rayos cortos */}
+      <circle cx="60" cy="24" r="11" fill="#ffd24d" {...PA_LINEA} />
+      <g {...PA_LINEA} stroke="#e8a92e" strokeWidth="2.2">
+        <path d="M60 7 v5 M74 12 l-3.4 3.4 M79 24 h-5 M74 37 l-3.4 -3.4" fill="none" />
+      </g>
+      {/* nube crema */}
+      <path d="M22 36 q1 -9 10 -9 q4 -7 12 -5 q7 2 8 8 q8 1 8 8 q0 7 -9 7 H30 q-9 0 -8 -9 Z" fill="#fdf8ea" {...PA_LINEA} />
+      {/* gotas */}
+      <g fill="#5b97c6" {...PA_LINEA} strokeWidth="1.8" stroke="#3a6f9e">
+        <path d="M32 52 q3 5 0 7 q-3 -2 0 -7 Z" />
+        <path d="M46 54 q3 5 0 7 q-3 -2 0 -7 Z" />
+        <path d="M60 52 q3 5 0 7 q-3 -2 0 -7 Z" />
+      </g>
+    </svg>
+  ),
+  /* VENDER — el canasto tejido con la cosecha (tomates + maíz). */
+  vender: (
+    <svg viewBox="0 0 96 68" role="img">
+      {PA_SOMBRA(48, 27)}
+      {/* cosecha asomando */}
+      <circle cx="38" cy="30" r="8" fill="#e0532f" {...PA_LINEA} />
+      <path d="M38 22 q-1 -4 3 -5" fill="none" {...PA_LINEA} stroke="#2e6b3a" strokeWidth="2" />
+      <circle cx="55" cy="28" r="8" fill="#e8663c" {...PA_LINEA} />
+      <path d="M66 34 q8 -12 4 -20 q-9 3 -10 17" fill="#ffd24d" {...PA_LINEA} strokeWidth="2" />
+      {/* canasto */}
+      <path d="M26 36 h44 l-5 24 q-1 3 -4 3 H35 q-3 0 -4 -3 Z" fill="#d99a4e" {...PA_LINEA} />
+      <path d="M26 36 h44" fill="none" {...PA_LINEA} stroke="#a06a2c" strokeWidth="2.6" />
+      <path d="M32 42 h32 M34 49 h28 M36 56 h24" fill="none" stroke="#a06a2c" strokeWidth="1.8" strokeLinecap="round" opacity=".75" />
+      <path d="M40 36 v25 M56 36 v25 M48 36 v27" fill="none" stroke="#a06a2c" strokeWidth="1.6" strokeLinecap="round" opacity=".5" />
+    </svg>
+  ),
+  /* APRENDER — el cuaderno de campo abierto del que brota una matica. */
+  aprender: (
+    <svg viewBox="0 0 96 68" role="img">
+      {PA_SOMBRA(48, 28)}
+      {/* páginas abiertas */}
+      <path d="M48 30 q-12 -7 -26 -4 v30 q14 -3 26 4 Z" fill="#fdf8ea" {...PA_LINEA} />
+      <path d="M48 30 q12 -7 26 -4 v30 q-14 -3 -26 4 Z" fill="#f6edd6" {...PA_LINEA} />
+      <path d="M48 30 v30" fill="none" {...PA_LINEA} stroke="#8b78d8" strokeWidth="2.8" />
+      {/* renglones dibujados */}
+      <g fill="none" stroke="#8b78d8" strokeWidth="1.7" strokeLinecap="round" opacity=".75">
+        <path d="M28 36 q8 -1.5 14 1 M28 42 q8 -1.5 14 1 M28 48 q8 -1.5 14 1" />
+        <path d="M54 37 q8 -2.5 14 -1 M54 43 q8 -2.5 14 -1" />
+      </g>
+      {/* la matica que brota de la página */}
+      <path d="M62 34 V22" fill="none" {...PA_LINEA} stroke="#2e6b3a" strokeWidth="2.6" />
+      <path d="M62 28 q-8 -1 -10 -9 q9 0 10 7 Z" fill="#5cb56c" {...PA_LINEA} strokeWidth="2" />
+      <path d="M62 22 q6 -1 8 -7 q-7 -1 -8 5 Z" fill="#7ccf84" {...PA_LINEA} strokeWidth="2" />
+    </svg>
+  ),
+  /* TODA MI FINCA — la casita de teja entre sus montañas, el valle chiquito. */
+  finca: (
+    <svg viewBox="0 0 96 68" role="img">
+      {/* montañas al fondo */}
+      <path d="M6 56 L28 22 L46 56 Z" fill="#5b8f83" {...PA_LINEA} />
+      <path d="M46 56 L68 16 L92 56 Z" fill="#3f7a6d" {...PA_LINEA} />
+      <path d="M68 16 L76 29 q-4 3 -8 0 q-4 3 -8 0 Z" fill="#fdf8ea" {...PA_LINEA} strokeWidth="2" />
+      {/* loma de pasto */}
+      <path d="M2 66 q46 -16 92 0 Z" fill="#4ca35c" {...PA_LINEA} strokeWidth="2" />
+      {/* casita de teja */}
+      <path d="M30 52 h20 v-12 l-10 -8 l-10 8 Z" fill="#fff4dc" {...PA_LINEA} />
+      <path d="M27 41 l13 -10 l13 10" fill="none" {...PA_LINEA} stroke="#c2562f" strokeWidth="4" />
+      <rect x="36.5" y="44" width="7" height="8" rx="1.5" fill="#8a5a34" {...PA_LINEA} strokeWidth="1.8" />
+      {/* arbolito */}
+      <path d="M62 54 v-6" fill="none" {...PA_LINEA} stroke="#6e4a2a" strokeWidth="2.4" />
+      <circle cx="62" cy="43" r="6.5" fill="#5cb56c" {...PA_LINEA} strokeWidth="2" />
+    </svg>
+  ),
+};
+
 function buildPuertas({ onNavigate, irATodaMiFinca, mostrarAnimales }) {
   const puertas = [
     { id: 'matas', emoji: '🌱', nombre: 'Mis matas', tinte: 'verde', abre: 'sus siembras y cultivos', onClick: () => onNavigate?.('mundo_cultivos') },
