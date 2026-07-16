@@ -156,6 +156,12 @@ const BosqueVivo3DMockup = lazy(() => import('./mockups/BosqueVivo3D'));
 // de guamos y nogales, y la casa-beneficiadero en la bruma. Device-tiering
 // real. Ruta #/mockups/cafetal-vivo-3d, sin auth.
 const CafetalVivo3DMockup = lazy(() => import('./mockups/CafetalVivo3D'));
+// 3D: el MUNDO DEL CACAO — el cacaotal bajo sombra del piso cálido: la vega
+// sembrada a distancia pareja, la MAZORCA pegada del tronco (caulifloria)
+// madurando verde→amarillo→rojo-marrón por instancia, el sombrío de guamos con
+// plátano, y la casa con su cajón de fermentar y su pasera. Device-tiering
+// real. Ruta #/mockups/cacao-vivo-3d, sin auth.
+const CacaoVivo3DMockup = lazy(() => import('./mockups/CacaoVivo3D'));
 // 3D: el MUNDO DE LA PAPA — el papal en surcos de la tierra fría: caballones
 // horneados en el relieve a curva de nivel, la mata aporcada con su flor lila/
 // blanca por instancia, la cosecha de criollas (amarilla/roja/morada) y los
@@ -581,6 +587,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
   'mockups/bosque-vivo-3d': 'mockup_bosque_vivo_3d',
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
+  'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
   'mockups/papa-viva-3d': 'mockup_papa_viva_3d',
   'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
   'mockups/voz-con-forma': 'mockup_voz_con_forma',
@@ -1577,6 +1584,17 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_cacao_vivo_3d':
+        // Vitrina pública del MUNDO DEL CACAO: el cacaotal bajo sombra del
+        // piso cálido en 3D REAL — la mazorca pegada del tronco (caulifloria)
+        // madurando verde→amarillo→rojo-marrón por instancia, el sombrío de
+        // guamos con su luz colada, el plátano intercalado y la casa con el
+        // cajón de fermentar y la pasera. Cuatro pasos didácticos. En equipo
+        // humilde muestra la ficha. Ruta #/mockups/cacao-vivo-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del cacao">
+              <CacaoVivo3DMockup />
       case 'mockup_papa_viva_3d':
         // Vitrina pública del MUNDO DE LA PAPA: el papal en surcos de la tierra
         // fría en 3D REAL — caballones de tierra negra horneados en el relieve
