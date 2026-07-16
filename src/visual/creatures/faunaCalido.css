@@ -1,0 +1,103 @@
+/*
+ * faunaCalido.css — el idle interno de la fauna del PISO CÁLIDO (tucán,
+ * guacamaya, mico, iguana, morfo). Self-contained: keyframes propios con prefijo
+ * `fc-` para no pisar `creatures.css` (el kit rubber-hose de la casa). El
+ * movimiento de POSICIÓN en la escena lo pone el billboard (useFrame); aquí solo
+ * vive el gesto DENTRO del dibujo: aletear, mecer la cola, respirar, la papada.
+ *
+ * Los componentes SOLO montan estas clases con `animated` (billboard vivo). Aun
+ * así el guard de reduced-motion al final las apaga por si alguien las usa de
+ * avatar sin apagar `animated`.
+ */
+
+.fc-billboard {
+  pointer-events: none;
+  will-change: transform;
+  filter: drop-shadow(0 3px 4px rgba(22, 30, 18, 0.34));
+}
+
+/* ── Alas (morfo + guacamaya): abren y cierran desde el cuerpo ─────────────── */
+.fc-wing-l,
+.fc-wing-r {
+  transform-box: fill-box;
+  will-change: transform;
+}
+.fc-wing-l {
+  transform-origin: right center;
+  animation: fc-flutter 0.9s ease-in-out infinite alternate;
+}
+.fc-wing-r {
+  transform-origin: left center;
+  animation: fc-flutter 0.9s ease-in-out infinite alternate;
+}
+@keyframes fc-flutter {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.58); }
+}
+/* Aleteo de AVE (guacamaya en vuelo): más rápido y con un empuje vertical. */
+.fc-wing-l.fc-wing--ave,
+.fc-wing-r.fc-wing--ave {
+  animation-duration: 0.62s;
+}
+
+/* ── Cola larga (mico / iguana): se mece pausada ──────────────────────────── */
+.fc-tail {
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+  will-change: transform;
+  animation: fc-tailsway 2.6s ease-in-out infinite alternate;
+}
+.fc-tail--der {
+  transform-origin: 100% 50%;
+}
+@keyframes fc-tailsway {
+  from { transform: rotate(-5deg); }
+  to { transform: rotate(6deg); }
+}
+
+/* ── Respiración del cuerpo (posado / asoleado): sube y baja el pecho ──────── */
+.fc-breathe {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  will-change: transform;
+  animation: fc-breathe 3.6s ease-in-out infinite alternate;
+}
+@keyframes fc-breathe {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(1.035); }
+}
+
+/* ── Cabeceo (mico curioso): la cabeza inclina despacio ───────────────────── */
+.fc-nod {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  will-change: transform;
+  animation: fc-nod 2.9s ease-in-out infinite alternate;
+}
+@keyframes fc-nod {
+  from { transform: rotate(-4deg); }
+  to { transform: rotate(5deg); }
+}
+
+/* ── Papada de la iguana: late suave (termorregula) ───────────────────────── */
+.fc-dewlap {
+  transform-box: fill-box;
+  transform-origin: top center;
+  will-change: transform;
+  animation: fc-dewlap 4.2s ease-in-out infinite alternate;
+}
+@keyframes fc-dewlap {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(1.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fc-wing-l,
+  .fc-wing-r,
+  .fc-tail,
+  .fc-breathe,
+  .fc-nod,
+  .fc-dewlap {
+    animation: none !important;
+  }
+}
