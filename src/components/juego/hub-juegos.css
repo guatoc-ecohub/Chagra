@@ -1,0 +1,385 @@
+/* ── LA SALA DE JUEGOS — feria de pueblo campesina ──────────────────────────
+   Tokens de la sala:
+     tinta        #f2ead8  (crema serigrafiada)
+     noche        #0a1410 → #0e1a13 (verde-noche de vereda)
+     toldo A      #e9b44c  (ámbar de carpa)
+     toldo B      #f2ead8  (crema de carpa)
+     cada cartel  --hj-tinte (triplete RGB propio del juego)
+   Firma visual: el TOLDO de festones arriba + la criatura rubber-hose viva
+   en su medallón de luz con sombra de contacto que late. */
+
+.hj-root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(120% 55% at 50% -8%, rgba(233, 180, 76, 0.14), transparent 60%),
+    linear-gradient(178deg, #0e1a13 0%, #0a1410 46%, #081009 100%);
+  color: #f2ead8;
+  overflow-x: hidden;
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+}
+
+/* ── El toldo: festones de carpa alternando ámbar/crema ── */
+.hj-toldo {
+  display: block;
+  flex: 0 0 auto;
+  height: 30px;
+  background:
+    /* festones (dos capas intercaladas) */
+    radial-gradient(circle at 14px 10px, #e9b44c 0 12px, transparent 13px) 0 8px / 56px 30px repeat-x,
+    radial-gradient(circle at 14px 10px, #caa14e 0 12px, transparent 13px) 28px 8px / 56px 30px repeat-x,
+    /* la banda rayada de la carpa */
+    repeating-linear-gradient(90deg, #e9b44c 0 28px, #b3873c 28px 56px);
+  background-color: transparent;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+}
+
+/* ── Encabezado de la sala ── */
+.hj-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem clamp(0.9rem, 4vw, 1.6rem) 0.4rem;
+  max-width: 46rem;
+  width: 100%;
+  margin: 0 auto;
+}
+.hj-volver {
+  align-self: start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  min-height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(242, 234, 216, 0.22);
+  background: rgba(242, 234, 216, 0.06);
+  color: #f2ead8;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.hj-volver:hover { background: rgba(242, 234, 216, 0.14); }
+.hj-header__texto { min-width: 0; }
+.hj-eyebrow {
+  margin: 0;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(233, 180, 76, 0.92);
+}
+.hj-titulo {
+  margin: 0.1rem 0 0;
+  font-size: clamp(1.6rem, 6.5vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  color: #f2ead8;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+.hj-lema {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: rgba(242, 234, 216, 0.68);
+  max-width: 30rem;
+}
+
+/* Los porteros del mostrador: los obreros del suelo, asomados y vivos. */
+.hj-porteros,
+.hj-banner__porteros {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.15rem;
+}
+.hj-portero {
+  position: relative;
+  display: inline-flex;
+  padding-bottom: 6px;
+  animation: hj-portero-flota 3.6s ease-in-out calc(var(--hj-orden, 0) * -1.2s) infinite;
+}
+.hj-portero__sombra {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 20px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5), transparent 70%);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+@keyframes hj-portero-flota {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@media (max-width: 430px) {
+  .hj-porteros { display: none; } /* en tela angosta manda el título */
+}
+
+/* ── La feria: la grilla de carteles ── */
+.hj-feria {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.7rem;
+  padding: 0.9rem clamp(0.9rem, 4vw, 1.6rem) 0.4rem;
+  max-width: 46rem;
+  width: 100%;
+  margin: 0 auto;
+}
+@media (min-width: 640px) {
+  .hj-feria { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── El cartel serigrafiado de cada juego ── */
+.hj-cartel {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'medallon cuerpo'
+    'medallon jugar';
+  align-items: center;
+  column-gap: 0.8rem;
+  row-gap: 0.4rem;
+  text-align: left;
+  padding: 0.9rem 0.95rem 0.8rem;
+  min-height: 118px;
+  border-radius: 20px;
+  border: 2px solid rgba(var(--hj-tinte), 0.42);
+  background:
+    radial-gradient(90% 120% at 12% 0%, rgba(var(--hj-tinte), 0.2), transparent 55%),
+    linear-gradient(165deg, rgba(var(--hj-tinte), 0.1), rgba(8, 14, 11, 0.2) 55%),
+    #101c15;
+  /* doble filete de afiche serigrafiado */
+  box-shadow:
+    inset 0 0 0 1px rgba(6, 10, 8, 0.9),
+    inset 0 0 0 3px rgba(var(--hj-tinte), 0.16),
+    0 8px 22px rgba(0, 0, 0, 0.38);
+  color: #f2ead8;
+  cursor: pointer;
+  animation: hj-cartel-entra 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  animation-delay: calc(var(--hj-orden, 0) * 60ms);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.hj-cartel:hover {
+  transform: translateY(-3px);
+  border-color: rgba(var(--hj-tinte), 0.75);
+  box-shadow:
+    inset 0 0 0 1px rgba(6, 10, 8, 0.9),
+    inset 0 0 0 3px rgba(var(--hj-tinte), 0.22),
+    0 14px 30px rgba(0, 0, 0, 0.5),
+    0 0 24px rgba(var(--hj-tinte), 0.18);
+}
+.hj-cartel:active { transform: translateY(-1px) scale(0.988); }
+.hj-cartel:focus-visible {
+  outline: 3px solid rgba(var(--hj-tinte), 0.9);
+  outline-offset: 2px;
+}
+@keyframes hj-cartel-entra {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* El medallón de luz: la criatura protagonista, viva, con piso propio. */
+.hj-medallon {
+  grid-area: medallon;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(var(--hj-tinte), 0.3), rgba(var(--hj-tinte), 0.08) 62%, transparent 75%);
+  box-shadow: inset 0 0 0 1.5px rgba(var(--hj-tinte), 0.35);
+}
+.hj-medallon > :first-child {
+  animation: hj-portero-flota 3.4s ease-in-out infinite;
+}
+.hj-medallon__sombra {
+  position: absolute;
+  left: 50%;
+  bottom: 7px;
+  width: 26px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5), transparent 70%);
+  transform: translateX(-50%);
+  animation: hj-sombra-late 3.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes hj-sombra-late {
+  0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.55; }
+  50% { transform: translateX(-50%) scaleX(0.72); opacity: 0.3; }
+}
+
+.hj-cartel__cuerpo {
+  grid-area: cuerpo;
+  display: block;
+  min-width: 0;
+}
+.hj-cartel__ensena {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(var(--hj-tinte), 0.95);
+}
+.hj-cartel__ensena::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgb(var(--hj-tinte));
+  box-shadow: 0 0 6px rgba(var(--hj-tinte), 0.8);
+}
+.hj-cartel__titulo {
+  display: block;
+  margin-top: 0.18rem;
+  font-size: 1.08rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+  color: #f7f1e1;
+}
+.hj-cartel__detalle {
+  display: block;
+  margin-top: 0.28rem;
+  font-size: 0.8rem;
+  line-height: 1.42;
+  color: rgba(242, 234, 216, 0.7);
+}
+
+/* El botón-señal de jugar (todo el cartel es tocable; esto es la señal). */
+.hj-cartel__jugar {
+  grid-area: jugar;
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(var(--hj-tinte), 0.55);
+  background: rgba(var(--hj-tinte), 0.14);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--hj-tinte));
+  transition: background 0.15s ease;
+}
+.hj-cartel:hover .hj-cartel__jugar {
+  background: rgba(var(--hj-tinte), 0.26);
+}
+
+.hj-pie {
+  margin: 0.6rem auto 0;
+  padding: 0 1.2rem 0.8rem;
+  max-width: 46rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  text-align: center;
+  color: rgba(242, 234, 216, 0.45);
+}
+
+/* ── El banner de entrada (vive dentro de Aprender) ─────────────────────── */
+.hj-banner {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: left;
+  border-radius: 20px;
+  border: 2px solid rgba(233, 180, 76, 0.45);
+  background:
+    radial-gradient(110% 130% at 15% 0%, rgba(233, 180, 76, 0.18), transparent 55%),
+    linear-gradient(170deg, #14211a 0%, #0c1611 70%);
+  box-shadow:
+    inset 0 0 0 1px rgba(6, 10, 8, 0.9),
+    inset 0 0 0 3px rgba(233, 180, 76, 0.14),
+    0 8px 22px rgba(0, 0, 0, 0.38);
+  color: #f2ead8;
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.hj-banner:hover {
+  transform: translateY(-2px);
+  border-color: rgba(233, 180, 76, 0.75);
+  box-shadow:
+    inset 0 0 0 1px rgba(6, 10, 8, 0.9),
+    inset 0 0 0 3px rgba(233, 180, 76, 0.2),
+    0 12px 28px rgba(0, 0, 0, 0.5),
+    0 0 24px rgba(233, 180, 76, 0.16);
+}
+.hj-banner:active { transform: scale(0.988); }
+.hj-banner:focus-visible {
+  outline: 3px solid rgba(233, 180, 76, 0.9);
+  outline-offset: 2px;
+}
+.hj-toldo--banner {
+  height: 16px;
+  background:
+    radial-gradient(circle at 9px 5px, #e9b44c 0 7px, transparent 8px) 0 4px / 36px 16px repeat-x,
+    radial-gradient(circle at 9px 5px, #caa14e 0 7px, transparent 8px) 18px 4px / 36px 16px repeat-x,
+    repeating-linear-gradient(90deg, #e9b44c 0 18px, #b3873c 18px 36px);
+  filter: none;
+}
+.hj-banner__fila {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem 0.85rem;
+}
+.hj-banner__porteros { flex: 0 0 auto; }
+.hj-banner__texto { flex: 1; min-width: 0; }
+.hj-banner__eyebrow {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(233, 180, 76, 0.92);
+}
+.hj-banner__titulo {
+  display: block;
+  margin-top: 0.12rem;
+  font-size: 1.2rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.08;
+  color: #f7f1e1;
+}
+.hj-banner__sub {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: rgba(242, 234, 216, 0.68);
+}
+.hj-banner__flecha {
+  flex: 0 0 auto;
+  color: rgba(233, 180, 76, 0.9);
+}
+@media (max-width: 380px) {
+  .hj-banner__porteros { display: none; }
+}
+
+/* ── Calma: sin flotes, sin entradas, sin latidos ── */
+@media (prefers-reduced-motion: reduce) {
+  .hj-cartel { animation: none; transition: none; }
+  .hj-cartel:hover { transform: none; }
+  .hj-portero,
+  .hj-medallon > :first-child { animation: none; }
+  .hj-medallon__sombra { animation: none; }
+  .hj-banner { transition: none; }
+  .hj-banner:hover { transform: none; }
+}

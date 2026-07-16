@@ -185,8 +185,9 @@
   will-change: transform;
 }
 
-/* ── El compañero como TARJETA puntual (imagen-first, una sola línea) ──
-      El ser al que se cuida vive también en el DOM: su cara refleja el ánimo. */
+/* ── La BURBUJA DE VOZ de Angelita (solo texto, mientras habla) ──
+      La abeja vive en la ESCENA del valle — una sola. Este chip es su voz
+      escrita (aria-live): aparece con lo dicho y se va solo. */
 .valle-companero {
   position: absolute;
   left: 1.1rem;
@@ -196,7 +197,7 @@
   align-items: center;
   gap: 0.5rem;
   max-width: min(74vw, 22rem);
-  padding: 0.35rem 0.8rem 0.35rem 0.4rem;
+  padding: 0.45rem 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 999px;
   background: rgba(15, 24, 30, 0.7);
@@ -271,7 +272,7 @@
 .valle-companero--mundo {
   z-index: 35;
   bottom: 4.9rem;
-  padding: 0.3rem 0.75rem 0.3rem 0.4rem;
+  padding: 0.4rem 0.8rem;
   background: rgba(15, 24, 30, 0.62);
 }
 

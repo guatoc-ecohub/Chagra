@@ -114,7 +114,10 @@ describe('entrada-3d — voz con respaldo visible', () => {
     const { container } = render(<EntradaValle3D onBack={() => {}} />);
 
     act(() => vi.advanceTimersByTime(1000));
-    expect(container.querySelector('.valle-companero')).not.toHaveTextContent(/Bienvenido/i);
+    // Antes del primer gesto Angelita no ha dicho nada: la burbuja de voz ni
+    // se monta (el chip ya no lleva frase fija de ánimo — una sola abeja, la
+    // de la escena).
+    expect(container.querySelector('.valle-companero')).toBeNull();
 
     fireEvent.pointerDown(container.querySelector('.valle-root'));
     expect(container.querySelector('.valle-companero')).toHaveTextContent(/Bienvenido/i);
