@@ -82,30 +82,44 @@ const PREAMBLE = "LOAD 'age';\nSET search_path = ag_catalog, public;\n";
 /**
  * Obtiene todos los NoncoPest sin puente CO_RELEVANT a un Pest.
  */
-function getNoncoPestSinPuente(env) {
-  const sql = PREAMBLE + `
-SELECT * FROM cypher('${GRAPH}', $$
-  MATCH (n:NoncoPest)
-  WHERE NOT EXISTS {
-    MATCH (n)-[:CO_RELEVANT]->(:Pest)
-  }
-  RETURN n
-$$) AS (v agtype);
-`;
-  const out = runSql(sql, env);
-  // Parsear salida (formato: agtype JSON)
+/**
+ * Parsea la salida agtype de AGE en nodos PLANOS para los matchers.
+ * AGE devuelve `{"id": <graphid>, "label": "...", "properties": {...}}::vertex`.
+ * - Hay que quitar el sufijo `::vertex` ANTES de JSON.parse (rompe el parse).
+ * - Se aplana: props al top-level, `id` = graphid interno (para id(a)= en el MERGE),
+ *   `slug` = el id de negocio (props.id) para los reportes legibles.
+ */
+function parseVertices(out) {
   return out
     .split('\n')
     .map(l => l.trim())
     .filter(l => l && l !== 'v')
     .map(l => {
+      const jsonPart = l.replace(/::(vertex|edge|path)\s*$/, '');
       try {
-        return JSON.parse(l);
+        const node = JSON.parse(jsonPart);
+        const props = node.properties || {};
+        return { ...props, id: node.id, slug: props.id };
       } catch {
         return null;
       }
     })
     .filter(n => n !== null);
+}
+
+function getNoncoPestSinPuente(env) {
+  // AGE 1.5.0 NO soporta `WHERE NOT EXISTS { ... }` (subquery con llaves).
+  // Patrón equivalente compatible: OPTIONAL MATCH + count(r)=0.
+  const sql = PREAMBLE + `
+SELECT * FROM cypher('${GRAPH}', $$
+  MATCH (n:NoncoPest)
+  OPTIONAL MATCH (n)-[r:CO_RELEVANT]->(:Pest)
+  WITH n, count(r) AS c
+  WHERE c = 0
+  RETURN n
+$$) AS (v agtype);
+`;
+  return parseVertices(runSql(sql, env));
 }
 
 /**
@@ -118,19 +132,7 @@ SELECT * FROM cypher('${GRAPH}', $$
   RETURN p
 $$) AS (v agtype);
 `;
-  const out = runSql(sql, env);
-  return out
-    .split('\n')
-    .map(l => l.trim())
-    .filter(l => l && l !== 'v')
-    .map(l => {
-      try {
-        return JSON.parse(l);
-      } catch {
-        return null;
-      }
-    })
-    .filter(n => n !== null);
+  return parseVertices(runSql(sql, env));
 }
 
 /**
@@ -277,27 +279,25 @@ function matchBySinonimos(noncoPest, allPests, pestSynonyms) {
 /**
  * Genera un MERGE para crear un puente CO_RELEVANT.
  */
-function emitCoRelevantRel(fromId, toId, metodo, confianza, razon) {
-  const fromNode = `(a:NoncoPest {id: '${fromId}'})`;
-  const toNode = `(b:Pest {id: '${toId}'})`;
-  const relProps = {
-    metodo,
-    confianza,
-    razon,
-    provenance: PROVENANCE,
-    created_at: new Date().toISOString(),
-  };
-  
-  const propClause = Object.entries(relProps)
-    .map(([k, v]) => `${k}: ${v === 'string' ? `'${v}'` : v}`)
-    .join(', ');
-  
+function emitCoRelevantRel(fromId, toId, metodo, confianza, razon, createdAt = new Date().toISOString()) {
+  // AGE 1.5.0: los NoncoPest/Pest se emparejan por su id INTERNO (id(a)=<graphid>),
+  // NO por una propiedad `id`. Cada valor va con su tipo: strings escapadas y entre
+  // comillas, números crudos. Se evita `SET r += {map}` (soporte dudoso) usando SET
+  // explícito por propiedad. created_at se pasa como arg para no depender de reloj.
+  const q = (s) => `'${String(s).replace(/'/g, "\\'")}'`;
+  const setClauses = [
+    `r.metodo = ${q(metodo)}`,
+    `r.confianza = ${Number(confianza)}`,
+    `r.razon = ${q(razon)}`,
+    `r.created_at = ${q(createdAt)}`,
+  ].join(', ');
+
   return `
-MATCH ${fromNode}
-MATCH ${toNode}
+MATCH (a:NoncoPest), (b:Pest)
+WHERE id(a) = ${fromId} AND id(b) = ${toId}
 MERGE (a)-[r:CO_RELEVANT {provenance: '${PROVENANCE}'}]->(b)
-SET r += {${propClause}}
-RETURN 0;
+SET ${setClauses}
+RETURN id(r)
 `;
 }
 
@@ -394,15 +394,24 @@ async function main() {
       sqlStatements.push(wrapCypher(cypher));
     }
 
-    for (const match of matchesBySinonimos) {
-      const cypher = emitCoRelevantRel(
-        match.noncoPest,
-        match.pest,
-        match.metodo,
-        match.confianza,
-        match.razon
-      );
-      sqlStatements.push(wrapCypher(cypher));
+    // ⚠️ matchBySinonimos tiene un bug de lógica: la rama `pestNombre === synLower`
+    // no involucra al NoncoPest actual → puentea a TODO Pest cuyo nombre sea sinónimo
+    // (explosión cartesiana: 2053 falsos positivos para 75 NoncoPest). Se DESACTIVA por
+    // defecto hasta arreglar el matcher (canonicalizar ambos lados y comparar canónicos).
+    // Habilitar solo con --incluir-sinonimos-ROTO para inspección.
+    if (argv.includes('--incluir-sinonimos-ROTO')) {
+      for (const match of matchesBySinonimos) {
+        const cypher = emitCoRelevantRel(
+          match.noncoPest,
+          match.pest,
+          match.metodo,
+          match.confianza,
+          match.razon
+        );
+        sqlStatements.push(wrapCypher(cypher));
+      }
+    } else if (matchesBySinonimos.length > 0) {
+      console.error(`[puente-nonco] ⚠️  ${matchesBySinonimos.length} matches por sinónimos OMITIDOS (matcher con bug de explosión cartesiana — pendiente de arreglo).`);
     }
 
     const sql = `${PREAMBLE}\n${sqlStatements.join('\n')}`;

@@ -199,20 +199,23 @@ describe('puente-nonco - generación SQL', () => {
   describe('emitCoRelevantRel', () => {
     it('debería generar SQL válido para puente CO_RELEVANT', () => {
       const sql = emitCoRelevantRel(
-        'nonco_pest_1',
-        'pest_1',
+        10977524091715694,
+        2251799813685379,
         'binomio_exacto',
         1.0,
-        'Binomio científico idéntico'
+        'Binomio científico idéntico',
+        '2026-07-16T00:00:00.000Z'
       );
 
-      expect(sql).toContain('MATCH (a:NoncoPest {id');
-      expect(sql).toContain('MATCH (b:Pest {id');
+      // AGE 1.5.0: empareja por id INTERNO (id(a)=...), no por propiedad `id`.
+      expect(sql).toContain('WHERE id(a) = 10977524091715694 AND id(b) = 2251799813685379');
       expect(sql).toContain('MERGE (a)-[r:CO_RELEVANT');
-      expect(sql).toContain('metodo');
-      expect(sql).toContain('confianza');
-      expect(sql).toContain('razon');
+      expect(sql).toContain('r.metodo');
+      expect(sql).toContain('r.confianza');
+      expect(sql).toContain('r.razon');
       expect(sql).toContain('provenance');
+      // sin `;` dentro del bloque Cypher (rompe el cypher() de AGE)
+      expect(sql).not.toContain('RETURN id(r);');
     });
   });
 
