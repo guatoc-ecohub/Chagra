@@ -175,6 +175,29 @@
   transition: transform 0.25s ease; /* voltea hacia donde vuela */
   transform-origin: center;
 }
+/* Angelita TOCABLE (rediseño §6): el billboard central es un botón de verdad
+   — brilla cálido e invita a tocar (tocarla = hablarle a la finca). El brillo
+   es de la ESCENA (este wrapper), no del personaje. */
+.valle-abeja--toque {
+  pointer-events: auto;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  animation: valle-abeja-brilla 3.4s ease-in-out infinite;
+}
+@keyframes valle-abeja-brilla {
+  0%, 100% {
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4))
+      drop-shadow(0 0 10px rgba(255, 214, 140, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4))
+      drop-shadow(0 0 18px rgba(255, 222, 150, 0.8));
+  }
+}
 
 /* ── Criaturas sembradas por el valle (colibrí, mariposas, escarabajo,
       lombriz): billboards reusados de la librería de fauna. Decorativas: no
@@ -397,6 +420,45 @@
 }
 .valle-ghost:hover { background: rgba(255, 255, 255, 0.1); }
 
+/* ── Panel de LA CASA: el mapa de los 6 portales (rediseño §2) ──
+   La puerta de la casa abre estas seis puertas: grilla 2×3 de botones con
+   el tinte de cada mundo — piso táctil generoso, legible de un vistazo. */
+.valle-panel--casa .valle-panel__tag { background: rgba(255, 216, 143, 0.26); color: #ffe2b0; }
+.valle-puertas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.valle-puerta {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 56px;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--p-tinte, #7fd08a) 22%, rgba(15, 24, 30, 0.6));
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: left;
+  cursor: pointer;
+}
+.valle-puerta:hover {
+  background: color-mix(in srgb, var(--p-tinte, #7fd08a) 36%, rgba(15, 24, 30, 0.55));
+  border-color: color-mix(in srgb, var(--p-tinte, #7fd08a) 70%, transparent);
+}
+.valle-puerta__emoji { font-size: 1.35rem; }
+.valle-puerta small {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.72);
+}
+
 /* ── Barra del agente (abajo, fija) ── */
 .valle-agente {
   position: absolute;
@@ -583,6 +645,12 @@
   .valle2d__cam,
   .valle2d__abeja,
   .valle-abeja__cara { transition: none; }
+  /* Angelita tocable en calma: brillo fijo digno, sin pulso. */
+  .valle-abeja--toque {
+    animation: none;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4))
+      drop-shadow(0 0 12px rgba(255, 214, 140, 0.5));
+  }
 }
 
 @media (max-width: 560px) {
