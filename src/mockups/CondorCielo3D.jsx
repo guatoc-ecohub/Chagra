@@ -30,6 +30,7 @@ const NIEBLA = '#c3dbe8';
 
 /* La cordillera de siluetas: picos que se ALEJAN por tono (la atmósfera hace
    la profundidad, no los polígonos). [x, z, radio, alto, color] */
+/** @type {[number, number, number, number, string][]} */
 const PICOS = [
   [-16, -30, 10, 15, '#7fa3b8'],
   [-4, -36, 13, 19, '#8fb2c4'],
