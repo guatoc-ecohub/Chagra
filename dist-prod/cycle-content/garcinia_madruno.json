@@ -1,0 +1,83 @@
+{
+  "species_slug": "garcinia_madruno",
+  "scientific_name": "Garcinia madruno (Kunth) Hammel",
+  "common_names": [
+    "Madroño del Chocó"
+  ],
+  "family": "Clusiaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "no_evaluada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "injerto"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semillas recalcitrantes — siembra inmediata sin desecación. Germinación 30-60 días en sustrato húmedo a sombra plena. Trasplante a sistema agroforestal con sombra 50-70% a los 8-12 meses. Establecimiento 24-36 meses; primer fruto a los 6-8 años. Especies hermana del mangostán asiático Garcinia mangostana — produce frutos análogos pero menores.",
+    "tiempo_a_establecimiento_dias": 720,
+    "notas": "Frutal nativo del Chocó biogeográfico, Magdalena medio y piedemonte amazónico-llanero. Manejado por comunidades AFROCOLOMBIANAS del Pacífico, EMBERA-WOUNAAN y campesinos del Magdalena medio.",
+    "fuente": "POWO Kew; GBIF; AGROSAVIA; Bernal 2015"
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1200,
+      "max_absoluto": 1600
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El madroño del Chocó (Garcinia madruno (Kunth) Hammel, familia Clusiaceae — antes Guttiferae, sinonimias antiguas Rheedia madruno y Calophyllum madruno) es un frutal nativo neotropical hermano del célebre mangostán asiático (Garcinia mangostana) — produce frutos análogos en tamaño menor pero con la misma pulpa traslúcida-gelatinosa de sabor dulce-acidulado refrescante. Se distribuye en bosque húmedo y muy húmedo tropical y bosque premontano desde Honduras-Nicaragua-Costa Rica-Panamá por toda Colombia (Chocó biogeográfico: Chocó, Valle del Cauca pacífico, Cauca pacífico, Nariño pacífico; Magdalena medio: Caldas, Antioquia, Boyacá, Santander, Cesar; piedemonte amazónico-llanero: Caquetá, Putumayo, Meta, Casanare; piedemonte amazónico: Amazonas, Vaupés, Guaviare), Venezuela, Ecuador, Perú amazónico, Bolivia y Brasil amazónico, entre 0 y 1.600 msnm. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del manejo agroforestal del bosque tropical húmedo por parte de las COMUNIDADES AFROCOLOMBIANAS del Pacífico colombiano (consejos comunitarios Cocomacia, Acadesan, Cocomasur del Bajo Atrato, San Juan, Baudó, Buenaventura, Guapi, Timbiquí, Tumaco) — el madroño es uno de los frutales emblemáticos del 'monte chocoano' manejado en parches productivos comunitarios — y por los pueblos indígenas EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano-vallecaucano, INGA del alto Putumayo, COFAN del piedemonte putumayense, y comunidades campesinas mestizas del Magdalena medio (Cimitarra, Yondó, Yarumal, Puerto Berrío) donde es frutal de jardín-huerta tradicional. Pertenece al género Garcinia (Clusiaceae) con ~250 especies pantropicales (la mayoría asiáticas — G. mangostana mangostán, G. atroviridis, G. hanburyi gamboge, etc.) y solo unas 15 neotropicales (G. madruno, G. magnifolia, G. intermedia, G. macrophylla — varias también productoras de frutos). Árbol perennifolio dioico de 8-15 m altura con tronco recto cilíndrico, corteza marrón-grisácea exudante de látex amarillo (carácter diagnóstico de Clusiaceae — el látex se solidifica al aire), hojas opuestas decusadas elípticas-oblongas 10-20 cm verde-oscuras coriáceas brillantes con nervadura prominente y látex amarillo en venas cortadas, flores pequeñas blanco-cremas-rosadas unisexuales aromáticas polinizadas por abejas trigonas y meliponas, fruto baya globosa 3-5 cm amarillo-anaranjada brillante con piel coriácea conteniendo 2-4 semillas grandes envueltas en pulpa traslúcida blanco-cremosa-gelatinosa dulce-acidulada-aromática — el sabor recuerda al mangostán asiático con notas cítricas-florales (de ahí 'lemon drop mangosteen' en inglés). USOS: pulpa consumida fresca directa del fruto (muy refrescante), en jugos, mermeladas, dulces; cáscara y semillas con compuestos xantónicos (mangostina, garcinia-ácido — antiinflamatorios y antioxidantes documentados); látex como sello traumatúrgico en uso tradicional; madera dura para construcción menor y carpintería rústica. Manejo agroecológico: sombra parcial 50-70%; siembra a 6-8 m entre árboles en sistema agroforestal con cacao, bacao, borojó, copoazú; tolerancia a humedad alta del Pacífico; cosecha manual cuando el fruto amarillea completamente. Función en chagra/agroforestal del Pacífico y Magdalena medio como cosecha comunitaria sostenible (cadena de valor 'mangostán del Chocó' con potencial gourmet creciente), conservación del género Garcinia neotropical, diversificación de frutales chocoanos, banco genético frutal de Clusiaceae nativa. Fuentes Tier A: POWO Kew, GBIF, AGROSAVIA Pacífico, Sinchi, IIAP Pacífico, Bernal 2015, Pérez Arbeláez 1947.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.396Z"
+}

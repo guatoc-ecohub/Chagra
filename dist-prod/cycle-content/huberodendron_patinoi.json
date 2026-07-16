@@ -1,0 +1,87 @@
+{
+  "species_slug": "huberodendron_patinoi",
+  "scientific_name": "Huberodendron patinoi Cuatrec.",
+  "common_names": [
+    "Carrá"
+  ],
+  "family": "Malvaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "en_peligro",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla con tegumento blando dentro de cápsula tomentosa. Recolección de frutos maduros caídos —difícil por crecimiento emergente y dispersión por viento+gravedad. Siembra inmediata (semilla recalcitrante). Germinación 50-65% a 30-60 días en bandejas con sustrato orgánico bajo sombra. Trasplante a bolsa grande 5-8 L a las 12 semanas. Plantación definitiva a los 10-14 meses (40-60 cm). Crecimiento juvenil lento 0.5-1 m/año. Productivo desde los 20-30 años.",
+    "tiempo_a_establecimiento_dias": 300,
+    "notas": "Madera \"carrá\" color crema-amarillento de densidad media (0.4-0.5 g/cm³), excelente para contraenchapados navales, construcción ligera, embalaje. Raíces tablares espectaculares hasta 3-4 m de altura. Crecimiento lento — inversión patrimonial de largo plazo. Plantaciones agroforestales chocoanas son críticas para recuperación."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 50,
+      "optimo_max": 600,
+      "max_absoluto": 900
+    },
+    "temperatura_c": {
+      "helada_letal": 14,
+      "optimo_min": 24,
+      "optimo_max": 30,
+      "max_tolerable": 34
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El carrá (Huberodendron patinoi Cuatrec., familia Malvaceae —antes Bombacaceae—) es un árbol perennifolio GIGANTE EMERGENTE de 30 hasta 45 m de altura con tronco recto cilíndrico, raíces tablares espectaculares (raíces zancudas-aletadas hasta 3-4 m de altura desde el suelo, contrafuertes adaptados a suelos saturados-anegadizos del bosque pluvial) y copa amplia, ESPECIE ENDÉMICA del bosque pluvial tropical chocoano-darienita-ecuatoriano-esmeraldeño en piso térmico CÁLIDO (0-900 msnm). En Colombia distribución estrictamente restringida al Pacífico (Chocó: cuencas del Atrato, San Juan, Baudó; Valle: cuenca del Naya, Calima; Cauca: Pacífico cauca-nariñense; Nariño: Pacífico nariñense) y Darién panameño-colombiano. El género Huberodendron es endémico del Neotrópico con apenas 5 especies (H. patinoi del Pacífico colombo-ecuatoriano, H. ingens de Brasil, H. duckei de la Amazonía, H. swietenioides de Bolivia-Brasil, H. mortinii de Ecuador-Perú), todas amenazadas por sobreexplotación y deforestación. H. patinoi es CUSTODIA OBLIGATORIA de las comunidades afrodescendientes del Pacífico colombiano —titulación colectiva Ley 70 de 1993 que reconoce derechos territoriales colectivos a comunidades negras del Pacífico— a través de los consejos comunitarios COCOMACIA, COCOMOPOCA, ASCOBA (Atrato), ACADESAN (San Juan), COCOMABA (Baudó), y de pueblos indígenas Embera, Wounaan, Embera-Katío y Embera-Chamí del Chocó-Darién. La madera \"carrá\" color crema-amarillento de densidad media (0.4-0.5 g/cm³) fue altamente cotizada entre 1950-2010 para contraenchapados navales (industria Cartón Colombia/Cartopel), construcción civil, mueblería ligera y embalaje, lo que llevó la especie a estatus EN PELIGRO (EN) tanto en el Libro Rojo de Plantas de Colombia como en la UICN Red List, con poblaciones reducidas >80% en gran parte de su rango histórico. La conservación de Huberodendron patinoi es INDISOCIABLE de la conservación del BOSQUE PLUVIAL CHOCOANO —uno de los HOTSPOTS DE BIODIVERSIDAD MÁS AMENAZADOS DEL PLANETA según Conservation International, con la mayor pluviosidad de las Américas (8.000-13.000 mm/año en Lloró, Quibdó, Andagoya, Tutunendo), endemismos masivos de orquídeas, palmas, anfibios y aves; amenazado por minería ilegal de oro (mercurio, dragado), monocultivo de palma africana, ganadería extensiva, conflicto armado interno, narcotráfico y debilidad estatal histórica— y de los derechos territoriales colectivos AFROCHOCOANOS (Ley 70/1993, Constitución Política Art. 55 transitorio, Convenio 169 OIT). Las raíces tablares espectaculares (contrafuertes que pueden alcanzar 3-4 m de altura) son una adaptación al suelo saturado-anegadizo del bosque pluvial: estabilizan el árbol gigante en sustrato hídrico inestable y aumentan el área de absorción de nutrientes en suelos pobres y lixiviados por la altísima pluviosidad. El epíteto específico \"patinoi\" honra al naturalista colombiano Víctor Manuel Patiño Rodríguez (1912-2001) —historiador y botánico del Valle del Cauca, especialista en plantas útiles del Pacífico y autor de las \"Plantas Cultivadas y Animales Domésticos en América Equinoccial\" (1963-1972)—. Manejo agroecológico chocoano: vivero comunitario con semilla recalcitrante recolectada de individuos remanentes, plantación 30-60 ind/ha en sistemas agroforestales chocoanos con manejo comunitario afrodescendiente-embera asociada a cacao chocoano (Theobroma cacao var. \"chocó\"), plátano hartón (Musa AAB), borojó (Alibertia patinoi), naidí (Euterpe oleracea), chontaduro (Bactris gasipaes); cosecha maderable turno 40-60 años con manejo sostenible bajo permisos especiales CAR; restauración 50-100 ind/ha en mosaicos del bosque pluvial chocoano asociada a Dipteryx oleifera (almendro choibá), Carapa guianensis (cedro macho), Otoba lehmannii (otobo), Brosimum utile (sande). Lección viva sobre ENDEMISMOS DEL CHOCÓ BIOGEOGRÁFICO (hotspot global), CONSERVACIÓN INDISOCIABLE DE DERECHOS TERRITORIALES COLECTIVOS AFROCOLOMBIANOS (Ley 70/1993), RAÍCES TABLARES como adaptación al bosque pluvial, BIOGEOGRAFÍA DEL CHOCÓ (la región más lluviosa de las Américas), CUSTODIA COMUNITARIA AFROCHOCOANA-EMBERA, y SOBREEXPLOTACIÓN MADERERA INDUSTRIAL HISTÓRICA (Cartón Colombia, contraenchapados navales) como advertencia para futuras políticas extractivas. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Libro Rojo de Plantas de Colombia, UICN Red List, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "uicn-red-list",
+      "title": "uicn-red-list",
+      "tier": "A",
+      "url": "https://www.iucnredlist.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.402Z"
+}

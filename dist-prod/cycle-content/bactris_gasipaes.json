@@ -1,0 +1,65 @@
+{
+  "species_slug": "bactris_gasipaes",
+  "scientific_name": "Bactris gasipaes Kunth",
+  "common_names": [
+    "Chontaduro"
+  ],
+  "family": "Arecaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "biomass_producer",
+    "living_fence"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Germinacion lenta (3-6 meses); se recomienda siembra en bolsa y transplante con 2-3 hojas. Tradicionalmente sembrado en las chagras indigenas del Pacifico y Amazonia."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 500,
+      "max_absoluto": 1000
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 24,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Palma multiproposito por excelencia del tropico colombiano: fruto rico en vitamina A y aceites, palmito comestible, y madera para construccion rural. Ensenia agroforesteria tropical y seguridad alimentaria.",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.374Z"
+}

@@ -1,0 +1,5183 @@
+{
+  "_meta": {
+    "kind": "chagra-grafo-relations-offline",
+    "schema_version": 1,
+    "generated_at": "2026-06-20T17:23:29.918Z",
+    "source": "Chagra knowledge graph (Apache AGE)",
+    "catalog": "chagra-catalog-oss-subset-v3.2.json",
+    "relations_exported": [
+      "pest_controllers",
+      "compatible_with",
+      "antagonist_of",
+      "biopreparados",
+      "nombres_comunes",
+      "establishment_means",
+      "threat_status",
+      "conservation_status"
+    ],
+    "species_count": 134,
+    "relation_count": 1297,
+    "note": "Datos derivados del grafo AGE. NO contiene infraestructura ni secretos.",
+    "pest_synonyms_count": 162,
+    "pest_labels_count": 78,
+    "pest_synonyms_added": "2026-06-25",
+    "frutales_tuberculos_fable_enriched": "2026-07-06",
+    "restauracion_grounding_fix_2026_07_09": "+21 especies (audit AUDIT-RESTAURACION-GROUNDING-2026-07-09.md); establishment_means corregido en cordia_alliodora, tabebuia_rosea, enterolobium_cyclocarpum",
+    "animal_forrajeras_grounding_fix": "2026-07-09"
+  },
+  "_pest_synonyms": {
+    "gota": "Tizon tardio / gota (papa y tomate)",
+    "tizón tardío": "Tizon tardio / gota (papa y tomate)",
+    "tizon tardio": "Tizon tardio / gota (papa y tomate)",
+    "tizón": "Tizon tardio / gota (papa y tomate)",
+    "phytophthora infestans": "Tizon tardio / gota (papa y tomate)",
+    "quemazón de la papa": "Tizon tardio / gota (papa y tomate)",
+    "broca": "Broca del café",
+    "broca del café": "Broca del café",
+    "broca del cafe": "Broca del café",
+    "hypothenemus hampei": "Broca del café",
+    "chapola": "Broca del café",
+    "roya": "Roya del café",
+    "roya del cafeto": "Roya del café",
+    "hemileia vastatrix": "Roya del café",
+    "ojo de gallo": "Ojo de gallo del café",
+    "mancha de hierro": "Mancha de hierro o cercospora del café",
+    "cercospora": "Mancha de hierro o cercospora del café",
+    "cercospora del café": "Mancha de hierro o cercospora del café",
+    "cogollero": "Gusano cogollero del maíz (y otras hortalizas)",
+    "gusano cogollero": "Gusano cogollero del maíz (y otras hortalizas)",
+    "spodoptera frugiperda": "Gusano cogollero del maíz (y otras hortalizas)",
+    "gusano de la mazorca": "Pudrición de la mazorca del maíz por Fusarium",
+    "mosca blanca": "Mosca blanca (complejo)",
+    "bemisia": "Mosca blanca (complejo)",
+    "bemisia tabaci": "Mosca blanca (complejo)",
+    "minador": "Minador de la hoja (mosca minadora)",
+    "minador de la hoja": "Minador de la hoja (mosca minadora)",
+    "mosca minadora": "Minador de la hoja (mosca minadora)",
+    "liriomyza": "Minador de la hoja (mosca minadora)",
+    "antracnosis": "Antracnosis",
+    "colletotrichum": "Antracnosis",
+    "antracnosis del frijol": "Antracnosis del fríjol",
+    "antracnosis del fríjol": "Antracnosis del fríjol",
+    "antracnosis del tomate de árbol": "Antracnosis del tomate de árbol",
+    "monilia": "moniliasis del cacao",
+    "moniliasis": "moniliasis del cacao",
+    "moniliophthora roreri": "moniliasis del cacao",
+    "moho del cacao": "moniliasis del cacao",
+    "escoba de bruja": "escoba de bruja cacao",
+    "moniliophthora perniciosa": "escoba de bruja cacao",
+    "sigatoka": "Sigatoka negra",
+    "sigatoka negra": "Sigatoka negra",
+    "mycosphaerella fijiensis": "Sigatoka negra",
+    "mal de panamá": "Mal de Panamá (Fusarium f.sp. cubense)",
+    "mal de panama": "Mal de Panamá (Fusarium f.sp. cubense)",
+    "fusarium del banano": "Mal de Panamá (Fusarium del banano)",
+    "raza 4 tropical": "Mal de Panamá (Fusarium f.sp. cubense)",
+    "foc r4t": "Mal de Panamá (Fusarium f.sp. cubense)",
+    "moko": "Moko del plátano y banano",
+    "moko del plátano": "Moko del plátano y banano",
+    "ralstonia solanacearum": "Moko del plátano y banano",
+    "picudo del plátano": "Picudo negro del plátano y banano",
+    "picudo del platano": "Picudo negro del plátano y banano",
+    "cosmopolites sordidus": "Picudo negro del plátano y banano",
+    "gusano tornillo": "Picudo negro del plátano y banano",
+    "picudo del algodón": "Picudo del algodón (cuarentenaria ICA)",
+    "picudo del algodon": "Picudo del algodón (cuarentenaria ICA)",
+    "picudo algodonero": "Picudo del algodón (cuarentenaria ICA)",
+    "gorgojo del algodonero": "Picudo del algodón (cuarentenaria ICA)",
+    "anthonomus grandis": "Picudo del algodón (cuarentenaria ICA)",
+    "polilla de la papa": "Polilla de la papa",
+    "palomilla de la papa": "Polilla de la papa",
+    "tecia solanivora": "Polilla guatemalteca de la papa",
+    "polilla guatemalteca": "Polilla guatemalteca de la papa",
+    "gusano blanco de la papa": "Gusano blanco de la papa",
+    "premnotrypes": "Gusano blanco de la papa",
+    "chiza": "Gusano blanco del maíz (gallina ciega)",
+    "gallina ciega": "Gusano blanco del maíz (gallina ciega)",
+    "mojojoy de raíz": "Gusano blanco del maíz (gallina ciega)",
+    "ácaro": "Arana roja / acaro de dos manchas (polifago: tomate, frijol, etc.)",
+    "acaro": "Arana roja / acaro de dos manchas (polifago: tomate, frijol, etc.)",
+    "araña roja": "Arana roja / acaro de dos manchas (polifago: tomate, frijol, etc.)",
+    "arana roja": "Arana roja / acaro de dos manchas (polifago: tomate, frijol, etc.)",
+    "tetranychus": "Arana roja / acaro de dos manchas (polifago: tomate, frijol, etc.)",
+    "tetranychus urticae": "Arana roja / acaro de dos manchas (polifago: tomate, frijol, etc.)",
+    "pulgón": "pulgones",
+    "pulgon": "pulgones",
+    "áfidos": "pulgones",
+    "afidos": "pulgones",
+    "pulgón del algodón": "pulgón del algodón",
+    "aphis gossypii": "pulgón del algodón",
+    "trips": "Trips de la cebolla",
+    "trips de la cebolla": "Trips de la cebolla",
+    "frankliniella": "Trips de la cebolla",
+    "thrips tabaci": "Trips de la cebolla",
+    "mancha púrpura": "Mancha púrpura de la cebolla y ajo",
+    "mancha purpura": "Mancha púrpura de la cebolla y ajo",
+    "alternaria de la cebolla": "Mancha púrpura de la cebolla y ajo",
+    "mildiu de la cebolla": "Mildiu velloso de la cebolla",
+    "mildeo velloso de la cebolla": "Mildiu velloso de la cebolla",
+    "mancha angular": "Mancha angular del fríjol",
+    "roya del frijol": "Roya del fríjol",
+    "roya del fríjol": "Roya del fríjol",
+    "mosca del aguacate": "Mosca del aguacate",
+    "heilipus": "Barrenador del fruto del aguacate",
+    "heilipus lauri": "Barrenador del fruto del aguacate",
+    "barrenador del aguacate": "Barrenador del fruto del aguacate",
+    "rondón": "Barrenador del fruto del aguacate",
+    "pudrición de raíz del aguacate": "Pudrición radicular del aguacate",
+    "phytophthora cinnamomi": "Pudrición radicular del aguacate",
+    "marchitez del aguacate": "Pudrición radicular del aguacate",
+    "hlb": "Huanglongbing (HLB) / dragón amarillo de los cítricos",
+    "huanglongbing": "Huanglongbing (HLB) / dragón amarillo de los cítricos",
+    "dragón amarillo": "Huanglongbing (HLB) / dragón amarillo de los cítricos",
+    "psílido de los cítricos": "Psílido asiático de los cítricos",
+    "diaphorina citri": "Psílido asiático de los cítricos",
+    "botrytis": "Podredumbre gris (Botrytis)",
+    "moho gris": "Podredumbre gris (Botrytis)",
+    "podredumbre gris": "Podredumbre gris (Botrytis)",
+    "nematodo": "Nematodo agallador",
+    "nematodo agallador": "Nematodo agallador",
+    "meloidogyne": "Nematodo agallador",
+    "nematodo nodulador": "Nematodo agallador",
+    "hernia de las crucíferas": "Hernia de las cruciferas (clubroot)",
+    "hernia de la col": "Hernia de las cruciferas (clubroot)",
+    "plasmodiophora": "Hernia de las cruciferas (clubroot)",
+    "clubroot": "Hernia de las cruciferas (clubroot)",
+    "mildeo polvoso": "Mildeo polvoso de las cucurbitáceas",
+    "oidio": "Mildeo polvoso de las cucurbitáceas",
+    "cenicilla": "Mildeo polvoso de las cucurbitáceas",
+    "mildeo velloso": "Mildeo velloso en cucurbitáceas",
+    "secadera del maracuyá": "Secadera o dormidera del maracuyá",
+    "dormidera del maracuyá": "Secadera o dormidera del maracuyá",
+    "fusarium del maracuyá": "Secadera o dormidera del maracuyá",
+    "pudrición blanda": "Pudrición blanda por Erwinia",
+    "erwinia": "Pudrición blanda por Erwinia",
+    "pectobacterium": "Pudrición blanda por Erwinia",
+    "marchitez bacteriana de la papa": "Marchitez bacteriana o dormidera de la papa",
+    "dormidera de la papa": "Marchitez bacteriana o dormidera de la papa",
+    "pulguilla de la papa": "Pulguilla negra de la papa",
+    "epitrix": "Pulguilla negra de la papa",
+    "sarna de la papa": "Sarna polvorienta de la papa",
+    "sarna polvorienta": "Sarna polvorienta de la papa",
+    "spongospora": "Sarna polvorienta de la papa",
+    "ácaro verde de la yuca": "Ácaro verde de la yuca",
+    "mononychellus": "Ácaro verde de la yuca",
+    "mosca blanca de la yuca": "mosca blanca de la yuca",
+    "piojo harinoso de la yuca": "piojo harinoso de la yuca",
+    "cochinilla de la yuca": "piojo harinoso de la yuca",
+    "bacteriosis de la yuca": "Bacteriosis de la yuca (añublo bacteriano)",
+    "añublo bacteriano de la yuca": "Bacteriosis de la yuca (añublo bacteriano)",
+    "lorito verde": "Lorito verde (chicharrita) del fríjol y yuca",
+    "chicharrita": "Lorito verde (chicharrita) del fríjol y yuca",
+    "empoasca": "Lorito verde (chicharrita) del fríjol y yuca",
+    "mariposa de la col": "Falso medidor del repollo y hortalizas",
+    "falso medidor": "Falso medidor del repollo y hortalizas",
+    "trichoplusia": "Falso medidor del repollo y hortalizas",
+    "polilla de las crucíferas": "polilla dorso diamante",
+    "polilla del dorso de diamante": "polilla dorso diamante",
+    "plutella xylostella": "polilla dorso diamante",
+    "mariposa blanca de la col": "pieris_rapae",
+    "pieris rapae": "pieris_rapae",
+    "mosca de la fruta": "Mosca del Mediterráneo",
+    "ceratitis capitata": "Mosca del Mediterráneo",
+    "drosophila de alas manchadas": "Mosca de alas manchadas",
+    "drosophila suzukii": "Mosca de alas manchadas",
+    "hypothenemus_hampei_broca": "Broca del café",
+    "hemileia_vastatrix_roya": "Roya del café",
+    "spodoptera_frugiperda_cogollero": "Gusano cogollero del maíz (y otras hortalizas)",
+    "bemisia_tabaci": "Mosca blanca (complejo)",
+    "brevicoryne_brassicae": "pulgones",
+    "fusarium_oxysporum_fsp_cepae": "Mancha púrpura de la cebolla y ajo"
+  },
+  "_pest_synonyms_note": "Mapa sinónimo→plaga canónica. La 'canonica' DEBE existir como label de plaga en grafo-relations (pest_controllers[].plaga). Términos coloquiales/regionales/científicos colombianos verificables (AGROSAVIA, Cenicafé, ICA, glosario regional). Anti-confusión respetada: monalonion=chinche (NO Fusarium); broca=Hypothenemus hampei.",
+  "_pest_index": {
+    "pulgón del algodón": [
+      "passiflora_edulis_flavicarpa",
+      "physalis_peruviana"
+    ],
+    "Antracnosis de frutales": [
+      "passiflora_edulis_flavicarpa",
+      "capsicum_chinense_aji_panca",
+      "rubus_glaucus",
+      "solanum_quitoense",
+      "solanum_betaceum",
+      "persea_americana"
+    ],
+    "Pudrición radicular del aguacate": [
+      "vaccinium_corymbosum_biloxi",
+      "persea_americana"
+    ],
+    "Podredumbre gris (Botrytis)": [
+      "vaccinium_corymbosum_biloxi",
+      "rubus_glaucus",
+      "fragaria_ananassa_monterrey",
+      "fragaria_vesca"
+    ],
+    "Mosca de alas manchadas": [
+      "vaccinium_corymbosum_biloxi",
+      "fragaria_ananassa_monterrey",
+      "fragaria_vesca"
+    ],
+    "pulgones": [
+      "vaccinium_corymbosum_biloxi"
+    ],
+    "Secadera o dormidera del maracuyá": [
+      "passiflora_edulis_morada",
+      "passiflora_ligularis"
+    ],
+    "Antracnosis": [
+      "passiflora_edulis_morada",
+      "passiflora_ligularis"
+    ],
+    "Mosca del boton floral de la granadilla": [
+      "passiflora_edulis_morada",
+      "passiflora_ligularis"
+    ],
+    "Antracnosis del tomate de árbol": [
+      "capsicum_chinense_aji_panca",
+      "solanum_quitoense",
+      "solanum_betaceum",
+      "fragaria_ananassa_monterrey"
+    ],
+    "phytophthora_capsici": [
+      "capsicum_chinense_aji_panca",
+      "cucumis_melo",
+      "cucumis_sativus"
+    ],
+    "Marchitez bacteriana o dormidera de la papa": [
+      "capsicum_chinense_aji_panca",
+      "solanum_tuberosum"
+    ],
+    "heliothis": [
+      "solanum_lycopersicum_san_marzano"
+    ],
+    "Psílido asiático de los cítricos": [
+      "citrus_sinensis",
+      "citrus_latifolia"
+    ],
+    "Huanglongbing (HLB) / dragón amarillo de los cítricos": [
+      "citrus_sinensis",
+      "citrus_latifolia"
+    ],
+    "Arana roja / acaro de dos manchas (polifago: tomate, frijol, etc.)": [
+      "rubus_glaucus",
+      "fragaria_ananassa_monterrey"
+    ],
+    "Pasador del fruto de tomate y berenjena": [
+      "solanum_quitoense",
+      "solanum_betaceum"
+    ],
+    "Tizon tardio / gota (papa y tomate)": [
+      "solanum_quitoense",
+      "solanum_phureja",
+      "solanum_betaceum",
+      "solanum_tuberosum"
+    ],
+    "Mal de Panamá (Fusarium del banano)": [
+      "solanum_quitoense",
+      "physalis_peruviana"
+    ],
+    "Nematodo agallador": [
+      "solanum_quitoense",
+      "solanum_tuberosum",
+      "oxalis_tuberosa",
+      "arracacia_xanthorrhiza",
+      "ullucus_tuberosus",
+      "cucumis_melo",
+      "citrullus_lanatus"
+    ],
+    "Trips de la cebolla": [
+      "allium_fistulosum",
+      "allium_cepa",
+      "allium_sativum"
+    ],
+    "Mildiu velloso de la cebolla": [
+      "allium_fistulosum",
+      "allium_cepa",
+      "allium_sativum"
+    ],
+    "bemisia_tabaci": [
+      "manihot_esculenta",
+      "phaseolus_vulgaris",
+      "cucumis_melo",
+      "cucurbita_moschata",
+      "cucumis_sativus",
+      "citrullus_lanatus"
+    ],
+    "piojo harinoso de la yuca": [
+      "manihot_esculenta"
+    ],
+    "mosca blanca de la yuca": [
+      "manihot_esculenta"
+    ],
+    "Gusano cachón de la yuca": [
+      "manihot_esculenta"
+    ],
+    "Ácaro verde de la yuca": [
+      "manihot_esculenta"
+    ],
+    "Bacteriosis de la yuca (añublo bacteriano)": [
+      "manihot_esculenta"
+    ],
+    "Broca del café": [
+      "coffea_arabica"
+    ],
+    "Mancha de hierro o cercospora del café": [
+      "coffea_arabica"
+    ],
+    "Roya del café": [
+      "coffea_arabica"
+    ],
+    "Ojo de gallo del café": [
+      "coffea_arabica"
+    ],
+    "Cochinilla harinosa de la raíz del café": [
+      "coffea_arabica",
+      "ananas_comosus"
+    ],
+    "hypothenemus_hampei_broca": [
+      "coffea_arabica"
+    ],
+    "hemileia_vastatrix_roya": [
+      "coffea_arabica"
+    ],
+    "Polilla guatemalteca de la papa": [
+      "solanum_phureja",
+      "solanum_tuberosum"
+    ],
+    "Gusano blanco de la papa": [
+      "solanum_phureja",
+      "solanum_tuberosum"
+    ],
+    "Mancha púrpura de la cebolla y ajo": [
+      "allium_cepa"
+    ],
+    "fusarium_oxysporum_fsp_cepae": [
+      "allium_cepa"
+    ],
+    "sclerotium_cepivorum": [
+      "allium_cepa",
+      "allium_sativum"
+    ],
+    "Minador de la hoja (mosca minadora)": [
+      "allium_cepa"
+    ],
+    "scolytidae": [
+      "erythrina_edulis"
+    ],
+    "moniliasis del cacao": [
+      "theobroma_cacao"
+    ],
+    "Pudrición del cogollo de la palma de aceite": [
+      "theobroma_cacao"
+    ],
+    "escoba de bruja cacao": [
+      "theobroma_cacao"
+    ],
+    "Sarna polvorienta de la papa": [
+      "solanum_tuberosum"
+    ],
+    "Pudrición blanda por Erwinia": [
+      "solanum_tuberosum"
+    ],
+    "Polilla de la papa": [
+      "solanum_tuberosum"
+    ],
+    "Tizón de la vaina del arroz": [
+      "solanum_tuberosum"
+    ],
+    "Pulguilla negra de la papa": [
+      "solanum_tuberosum"
+    ],
+    "Gusano blanco del maíz (gallina ciega)": [
+      "solanum_tuberosum"
+    ],
+    "Mancha angular del fríjol": [
+      "phaseolus_vulgaris"
+    ],
+    "Antracnosis del fríjol": [
+      "phaseolus_vulgaris"
+    ],
+    "Roya del fríjol": [
+      "phaseolus_vulgaris"
+    ],
+    "Mosca blanca (complejo)": [
+      "phaseolus_vulgaris",
+      "cucurbita_moschata"
+    ],
+    "Lorito verde (chicharrita) del fríjol y yuca": [
+      "phaseolus_vulgaris"
+    ],
+    "polilla dorso diamante": [
+      "brassica_oleracea_italica",
+      "brassica_oleracea_botrytis"
+    ],
+    "brevicoryne_brassicae": [
+      "brassica_oleracea_italica",
+      "brassica_oleracea_botrytis"
+    ],
+    "Falso medidor del repollo y hortalizas": [
+      "brassica_oleracea_italica"
+    ],
+    "pieris_rapae": [
+      "brassica_oleracea_italica",
+      "brassica_oleracea_botrytis"
+    ],
+    "Hernia de las cruciferas (clubroot)": [
+      "brassica_oleracea_italica",
+      "brassica_oleracea_botrytis"
+    ],
+    "Sigatoka negra": [
+      "musa_paradisiaca"
+    ],
+    "Picudo negro del plátano y banano": [
+      "musa_paradisiaca"
+    ],
+    "Mal de Panamá (Fusarium f.sp. cubense)": [
+      "musa_paradisiaca"
+    ],
+    "Nematodo barrenador del banano": [
+      "musa_paradisiaca"
+    ],
+    "Moko del plátano y banano": [
+      "musa_paradisiaca"
+    ],
+    "Tizón foliar del maíz por Helmintosporium": [
+      "zea_mays"
+    ],
+    "Pudrición de la mazorca del maíz por Fusarium": [
+      "zea_mays"
+    ],
+    "Gusano cogollero del maíz (y otras hortalizas)": [
+      "zea_mays"
+    ],
+    "cucarroncito de las hojas": [
+      "zea_mays"
+    ],
+    "gusano de la mazorca": [
+      "zea_mays"
+    ],
+    "spodoptera_frugiperda_cogollero": [
+      "zea_mays"
+    ],
+    "Mildeo polvoso de las cucurbitáceas": [
+      "cucumis_melo",
+      "cucurbita_moschata",
+      "cucumis_sativus",
+      "citrullus_lanatus"
+    ],
+    "Mildeo velloso en cucurbitáceas": [
+      "cucumis_melo",
+      "cucurbita_moschata",
+      "cucumis_sativus",
+      "citrullus_lanatus"
+    ],
+    "Gusano perforador de cucurbitaceas": [
+      "cucurbita_moschata",
+      "cucumis_sativus"
+    ],
+    "Mosca del Mediterráneo": [
+      "eriobotrya_japonica"
+    ],
+    "Mosca del aguacate": [
+      "persea_americana"
+    ],
+    "Barrenador del fruto del aguacate": [
+      "persea_americana"
+    ]
+  },
+  "species": {
+    "brassica_oleracea_acephala_curly": {
+      "nombre_comun": "Kale rizado verde",
+      "nombre_cientifico": "Brassica oleracea var. acephala 'Curly'",
+      "conservation_status": "cultivo_comun",
+      "antagonist_of": [
+        "solanum_lycopersicum_san_marzano"
+      ]
+    },
+    "calamagrostis_effusa": {
+      "nombre_comun": "Paja de páramo",
+      "nombre_cientifico": "Calamagrostis effusa (Kunth) Steud.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre",
+      "compatible_with": [
+        "quercus_humboldtii"
+      ],
+      "antagonist_of": [
+        "pennisetum_setaceum"
+      ]
+    },
+    "foeniculum_vulgare": {
+      "nombre_comun": "Hinojo",
+      "nombre_cientifico": "Foeniculum vulgare Mill.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "antagonist_of": [
+        "coffea_arabica",
+        "phaseolus_vulgaris",
+        "solanum_lycopersicum_san_marzano",
+        "zea_mays"
+      ]
+    },
+    "passiflora_edulis_flavicarpa": {
+      "nombre_comun": "Maracuyá",
+      "nombre_cientifico": "Passiflora edulis f. flavicarpa Deg.",
+      "nombres_comunes": [
+        "parcha"
+      ],
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "pulgón del algodón",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatógeno (verticillium)",
+            "Crisopa / león de áfidos",
+            "Crisopa neotropical",
+            "Mariquita / catarina convergente",
+            "Mariquita roja",
+            "Avispa parasitoide de áfidos",
+            "Avispa parasitoide de pulgones",
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo"
+          ]
+        }
+      ]
+    },
+    "lactuca_sativa_crispa_verde": {
+      "nombre_comun": "Lechuga crespa verde",
+      "nombre_cientifico": "Lactuca sativa L. var. crispa L.",
+      "conservation_status": "cultivo_comun",
+      "biopreparados": [
+        {
+          "id": "bacillus_subtilis_foliar",
+          "nombre": "Bacillus subtilis (aplicación foliar)"
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi"
+        },
+        {
+          "id": "humus_liquido",
+          "nombre": "Humus líquido (lixiviado de lombriz)"
+        },
+        {
+          "id": "ceniza_vegetal_espolvoreo",
+          "nombre": "Ceniza vegetal espolvoreada en seco"
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol"
+        },
+        {
+          "id": "purin_ortiga",
+          "nombre": "Purín de ortiga"
+        }
+      ]
+    },
+    "pennisetum_setaceum": {
+      "nombre_comun": "Pasto fuente",
+      "nombre_cientifico": "Pennisetum setaceum (Forssk.) Chiov.",
+      "establishment_means": "introducido",
+      "conservation_status": "invasor",
+      "antagonist_of": [
+        "calamagrostis_effusa"
+      ]
+    },
+    "quercus_humboldtii": {
+      "nombre_comun": "Roble negro andino",
+      "nombre_cientifico": "Quercus humboldtii Bonpl.",
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_protegido",
+      "compatible_with": [
+        "alnus_acuminata",
+        "calamagrostis_effusa",
+        "weinmannia_tomentosa"
+      ],
+      "antagonist_of": [
+        "pinus_patula"
+      ]
+    },
+    "calendula_officinalis": {
+      "nombre_comun": "Caléndula",
+      "nombre_cientifico": "Calendula officinalis L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "solanum_lycopersicum_san_marzano"
+      ]
+    },
+    "solanum_lycopersicum_sungold": {
+      "nombre_comun": "Tomate cherry amarillo / Sungold",
+      "nombre_cientifico": "Solanum lycopersicum 'Sungold'",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "urtica_dioica"
+      ]
+    },
+    "weinmannia_tomentosa": {
+      "nombre_comun": "Encenillo",
+      "nombre_cientifico": "Weinmannia tomentosa L. f.",
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_silvestre",
+      "compatible_with": [
+        "alnus_acuminata",
+        "quercus_humboldtii"
+      ],
+      "antagonist_of": [
+        "eucalyptus_globulus"
+      ]
+    },
+    "vaccinium_corymbosum_biloxi": {
+      "nombre_comun": "Arándano Biloxi",
+      "nombre_cientifico": "Vaccinium corymbosum 'Biloxi'",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "antagonist_of": [
+        "brassica_oleracea_capitata_alba",
+        "physalis_peruviana"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Pudrición radicular del aguacate",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Podredumbre gris (Botrytis)",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Mosca de alas manchadas",
+          "controladores": [
+            "Trichopria drosophilae",
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "pulgones",
+          "controladores": [
+            "Hongo entomopatógeno (verticillium)",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Crisopa / león de áfidos",
+            "Crisopa neotropical",
+            "Mariquita / catarina convergente",
+            "Mariquita roja",
+            "Avispa parasitoide de áfidos",
+            "Avispa parasitoide de pulgones"
+          ]
+        }
+      ]
+    },
+    "spondias_mombin": {
+      "nombre_comun": "Jobo / Hobo",
+      "nombre_cientifico": "Spondias mombin L.",
+      "nombres_comunes": [
+        "jobo",
+        "hobo"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "naturalizada"
+    },
+    "cucurbita_maxima": {
+      "nombre_comun": "Calabaza / Auyama",
+      "nombre_cientifico": "Cucurbita maxima Duchesne",
+      "nombres_comunes": [
+        "zapallo"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "helianthus_annuus",
+        "manihot_esculenta",
+        "phaseolus_vulgaris",
+        "solanum_tuberosum_sabanera",
+        "zea_mays"
+      ]
+    },
+    "ipomoea_batatas": {
+      "nombre_comun": "Batata / Camote",
+      "nombre_cientifico": "Ipomoea batatas (L.) Lam.",
+      "nombres_comunes": [
+        "apichu",
+        "camote",
+        "batata"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "DATA_DEFICIENT",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "phaseolus_vulgaris",
+        "zea_mays"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Picudo de la batata (gorgojo del camote)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        }
+      ]
+    },
+    "passiflora_edulis_morada": {
+      "nombre_comun": "Gulupa",
+      "nombre_cientifico": "Passiflora edulis f. edulis Sims",
+      "nombres_comunes": [
+        "gulupa morada"
+      ],
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "urtica_dioica"
+      ],
+      "biopreparados": [
+        {
+          "id": "lixiviado_frutas",
+          "nombre": "Lixiviado de frutas"
+        },
+        {
+          "id": "caldo_bordeles",
+          "nombre": "Caldo bordelés"
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi"
+        },
+        {
+          "id": "humus_liquido",
+          "nombre": "Humus líquido (lixiviado de lombriz)"
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol"
+        },
+        {
+          "id": "supermagro",
+          "nombre": "Supermagro"
+        },
+        {
+          "id": "trichoderma_harzianum_suelo",
+          "nombre": "Trichoderma harzianum (aplicación al suelo)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Secadera o dormidera del maracuyá",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Antracnosis",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp"
+          ]
+        },
+        {
+          "plaga": "Mosca del boton floral de la granadilla",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        }
+      ]
+    },
+    "passiflora_ligularis": {
+      "nombre_comun": "Granadilla",
+      "nombre_cientifico": "Passiflora ligularis Juss.",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "Secadera o dormidera del maracuyá",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Antracnosis",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp"
+          ]
+        },
+        {
+          "plaga": "Mosca del boton floral de la granadilla",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        }
+      ]
+    },
+    "enterolobium_cyclocarpum": {
+      "nombre_comun": "Orejero",
+      "nombre_cientifico": "Enterolobium cyclocarpum (Jacq.) Griseb.",
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_silvestre",
+      "compatible_with": [
+        "coffea_arabica",
+        "cordia_alliodora",
+        "gliricidia_sepium",
+        "samanea_saman"
+      ]
+    },
+    "samanea_saman": {
+      "nombre_comun": "Samán",
+      "nombre_cientifico": "Samanea saman (Jacq.) Merr.",
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_silvestre",
+      "compatible_with": [
+        "coffea_arabica",
+        "cordia_alliodora",
+        "enterolobium_cyclocarpum",
+        "gliricidia_sepium",
+        "tabebuia_rosea"
+      ]
+    },
+    "capsicum_chinense_aji_panca": {
+      "nombre_comun": "Ají panca",
+      "nombre_cientifico": "Capsicum chinense Jacq. cv. 'Panca'",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "Antracnosis del tomate de árbol",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "phytophthora_capsici",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Marchitez bacteriana o dormidera de la papa",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "capsicum_annuum_aji_dulce_caribe": {
+      "nombre_comun": "Ají dulce caribe",
+      "nombre_cientifico": "Capsicum annuum L. cv. 'Dulce'",
+      "nombres_comunes": [
+        "aji dulce"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun"
+    },
+    "lactuca_sativa_capitata": {
+      "nombre_comun": "Lechuga cogollo morada",
+      "nombre_cientifico": "Lactuca sativa var. capitata L.",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "phaseolus_vulgaris",
+        "raphanus_sativus_niger",
+        "solanum_lycopersicum_san_marzano"
+      ]
+    },
+    "helianthus_annuus": {
+      "nombre_comun": "Girasol",
+      "nombre_cientifico": "Helianthus annuus L.",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "cucurbita_maxima",
+        "phaseolus_vulgaris",
+        "zea_mays"
+      ]
+    },
+    "viola_tricolor": {
+      "nombre_comun": "Pensamiento / Trinitaria",
+      "nombre_cientifico": "Viola tricolor L.",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "allium_schoenoprasum",
+        "fragaria_vesca"
+      ]
+    },
+    "ulex_europaeus": {
+      "nombre_comun": "Retamo espinoso",
+      "nombre_cientifico": "Ulex europaeus L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "invasor",
+      "antagonist_of": [
+        "erythrina_edulis"
+      ]
+    },
+    "eucalyptus_globulus": {
+      "nombre_comun": "Eucalipto blanco",
+      "nombre_cientifico": "Eucalyptus globulus Labill.",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "invasor",
+      "antagonist_of": [
+        "weinmannia_tomentosa"
+      ]
+    },
+    "solanum_lycopersicum_cerasiforme": {
+      "nombre_comun": "Tomate cherry estándar",
+      "nombre_cientifico": "Solanum lycopersicum var. cerasiforme (Dunal) A.Gray",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "urtica_dioica"
+      ]
+    },
+    "pouteria_sapota": {
+      "nombre_comun": "Mamey colorado",
+      "nombre_cientifico": "Pouteria sapota (Jacq.) H.E.Moore & Stearn",
+      "nombres_comunes": [
+        "zapote mamey"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun"
+    },
+    "spondias_purpurea": {
+      "nombre_comun": "Ciruela criolla",
+      "nombre_cientifico": "Spondias purpurea L.",
+      "nombres_comunes": [
+        "jocote",
+        "ciruela calentana"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun"
+    },
+    "solanum_lycopersicum_san_marzano": {
+      "nombre_comun": "Tomate San Marzano",
+      "nombre_cientifico": "Solanum lycopersicum 'San Marzano'",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "calendula_officinalis",
+        "cymbopogon_citratus",
+        "lactuca_sativa_capitata",
+        "melissa_officinalis",
+        "petroselinum_crispum",
+        "tropaeolum_majus",
+        "urtica_dioica"
+      ],
+      "antagonist_of": [
+        "brassica_oleracea_acephala_curly",
+        "brassica_oleracea_capitata_alba",
+        "cucumis_sativus",
+        "foeniculum_vulgare",
+        "solanum_phureja"
+      ],
+      "biopreparados": [
+        {
+          "id": "lixiviado_frutas",
+          "nombre": "Lixiviado de frutas"
+        },
+        {
+          "id": "bacillus_subtilis_foliar",
+          "nombre": "Bacillus subtilis (aplicación foliar)"
+        },
+        {
+          "id": "caldo_bordeles",
+          "nombre": "Caldo bordelés"
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi"
+        },
+        {
+          "id": "humus_liquido",
+          "nombre": "Humus líquido (lixiviado de lombriz)"
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol"
+        },
+        {
+          "id": "supermagro",
+          "nombre": "Supermagro"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "heliothis",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos"
+          ]
+        }
+      ]
+    },
+    "urtica_dioica": {
+      "nombre_comun": "Ortiga",
+      "nombre_cientifico": "Urtica dioica L.",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "passiflora_edulis_morada",
+        "passiflora_tripartita_mollissima",
+        "rosmarinus_officinalis",
+        "rubus_glaucus",
+        "solanum_lycopersicum_cerasiforme",
+        "solanum_lycopersicum_san_marzano",
+        "solanum_lycopersicum_sungold",
+        "solanum_phureja"
+      ],
+      "biopreparados": [
+        {
+          "id": "te_compost",
+          "nombre": "Té de compost"
+        },
+        {
+          "id": "compost_maduro",
+          "nombre": "Compost maduro"
+        }
+      ]
+    },
+    "citrus_sinensis": {
+      "nombre_comun": "Naranja",
+      "nombre_cientifico": "Citrus × sinensis (L.) Osbeck",
+      "nombres_comunes": [
+        "naranja dulce"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "eugenia_stipitata"
+      ],
+      "biopreparados": [
+        {
+          "id": "trampa_melaza_atrayente",
+          "nombre": "Trampa de melaza (cebo atrayente líquido)"
+        },
+        {
+          "id": "sal_epsom_foliar",
+          "nombre": "Sal de Epsom foliar (sulfato de magnesio)"
+        },
+        {
+          "id": "emulsion_nim",
+          "nombre": "Aceite/emulsión de nim (neem)"
+        },
+        {
+          "id": "aceite_jabon_anticochinilla",
+          "nombre": "Aceite mineral/vegetal + jabón (anti-cochinilla y escamas)"
+        },
+        {
+          "id": "lechada_cal_troncos",
+          "nombre": "Lechada de cal (encalado de troncos)"
+        },
+        {
+          "id": "caldo_ceniza_jabon_concentrado",
+          "nombre": "Caldo ceniza-jabón concentrado (anti-minador/cochinilla)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Psílido asiático de los cítricos",
+          "controladores": [
+            "Hongo entomopatogeno (Isaria/Cordyceps)",
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Mariquita roja",
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Huanglongbing (HLB) / dragón amarillo de los cítricos",
+          "controladores": [
+            "Mariquita roja"
+          ]
+        },
+        {
+          "plaga": "Mosca del Mediterráneo",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Picudo de los cítricos / barrenador",
+          "controladores": [
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Minador de la hoja de cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Piojo blanco o coma de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Ácaro tostador de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Mosca de la fruta (Anastrepha spp.)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro rojo de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "mosca sudamericana de la fruta",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla harinosa de los cítricos",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Nematodo espiral del café y frutales",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Mosca blanca algodonosa de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Leprosis de los cítricos (ácaro vector)",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Escama roja de los cítricos y frutales",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla rosada del hibisco",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Cochinilla acanalada de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Mariquita destructora de cochinillas"
+          ]
+        },
+        {
+          "plaga": "Áfido pardo de los cítricos (vector de la tristeza)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)",
+            "Mariquita roja"
+          ]
+        },
+        {
+          "plaga": "Escama blanca del aguacate",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Escama verde de los cítricos",
+          "controladores": [
+            "Hongo entomopatógeno (verticillium)"
+          ]
+        },
+        {
+          "plaga": "Mancha negra de los cítricos",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Alternaria del fruto del cítrico",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Pudrición peduncular del mango y aguacate",
+          "controladores": [
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Bicho de cesto o canasta (plaga de ornamentales y frutales)",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)"
+          ]
+        },
+        {
+          "plaga": "Comején de los árboles frutales",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro blanco tropical",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (neoseiulus)"
+          ]
+        },
+        {
+          "plaga": "Nemátodo de los cítricos (decaimiento lento)",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)"
+          ]
+        },
+        {
+          "plaga": "Hormiga arriera (zompopa)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
+          ]
+        },
+        {
+          "plaga": "Picudo de los cítricos",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "solanum_tuberosum_sabanera": {
+      "nombre_comun": "Papa Sabanera",
+      "nombre_cientifico": "Solanum tuberosum L. subsp. andigenum var. Sabanera",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "allium_cepa",
+        "arracacia_xanthorrhiza",
+        "cucurbita_maxima",
+        "cucurbita_moschata",
+        "oxalis_tuberosa",
+        "phaseolus_vulgaris",
+        "tropaeolum_tuberosum"
+      ],
+      "antagonist_of": [
+        "cucumis_sativus",
+        "passiflora_tarminiana",
+        "solanum_melongena",
+        "spinacia_oleracea"
+      ]
+    },
+    "smallanthus_sonchifolius": {
+      "nombre_comun": "Yacon / Llacon",
+      "nombre_cientifico": "Smallanthus sonchifolius (Poepp.) H.Rob.",
+      "nombres_comunes": [
+        "jicama andina",
+        "llacon",
+        "aricoma"
+      ],
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun"
+    },
+    "rubus_glaucus": {
+      "nombre_comun": "Mora andina / Mora de Castilla",
+      "nombre_cientifico": "Rubus glaucus Benth.",
+      "nombres_comunes": [
+        "mora castellana",
+        "mora de castilla",
+        "mora andina",
+        "mora de Castilla",
+        "zarzamora"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "urtica_dioica"
+      ],
+      "biopreparados": [
+        {
+          "id": "lixiviado_frutas",
+          "nombre": "Lixiviado de frutas"
+        },
+        {
+          "id": "caldo_bordeles",
+          "nombre": "Caldo bordelés"
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi"
+        },
+        {
+          "id": "humus_liquido",
+          "nombre": "Humus líquido (lixiviado de lombriz)"
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Podredumbre gris (Botrytis)",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Arana roja / acaro de dos manchas (polifago: tomate, frijol, etc.)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Crisopa / león de áfidos",
+            "Chinche pirata (orius)",
+            "Ácaro depredador (neoseiulus)",
+            "Ácaro depredador de araña roja",
+            "Ácaro depredador (amblyseius)",
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo"
+          ]
+        }
+      ]
+    },
+    "solanum_quitoense": {
+      "nombre_comun": "Lulo / Naranjilla / Chuva",
+      "nombre_cientifico": "Solanum quitoense Lam.",
+      "nombres_comunes": [
+        "chuva",
+        "lulo de castilla",
+        "naranjilla"
+      ],
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "Antracnosis del tomate de árbol",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Pasador del fruto de tomate y berenjena",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos"
+          ]
+        },
+        {
+          "plaga": "Tizon tardio / gota (papa y tomate)",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Mal de Panamá (Fusarium del banano)",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Nematodo agallador",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Trichoderma spp",
+            "Pochonia chlamydosporia"
+          ]
+        },
+        {
+          "plaga": "sclerotinia_sclerotiorum",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Marchitez del lulo y solanáceas por Fusarium",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "passiflora_maliformis": {
+      "nombre_comun": "Granadilla de fraile / Maracuyá silvestre",
+      "nombre_cientifico": "Passiflora maliformis L.",
+      "nombres_comunes": [
+        "granadilla de fraile",
+        "cholupa"
+      ],
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "naturalizada"
+    },
+    "passiflora_tarminiana": {
+      "nombre_comun": "Granadilla común / Granadilla de China",
+      "nombre_cientifico": "Passiflora tarminiana Coppens & V.E.Barney",
+      "nombres_comunes": [
+        "curuba india"
+      ],
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "zea_mays"
+      ],
+      "antagonist_of": [
+        "solanum_tuberosum_sabanera"
+      ]
+    },
+    "allium_fistulosum": {
+      "nombre_comun": "Cebollín / Cebolla larga",
+      "nombre_cientifico": "Allium fistulosum L.",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "antagonist_of": [
+        "phaseolus_vulgaris"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Trips de la cebolla",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Chinche pirata (orius)",
+            "Depredador de control biológico",
+            "Amblyseius spp"
+          ]
+        },
+        {
+          "plaga": "Mildiu velloso de la cebolla",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)"
+          ]
+        }
+      ]
+    },
+    "alnus_acuminata": {
+      "nombre_comun": "Aliso andino",
+      "nombre_cientifico": "Alnus acuminata Kunth",
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_silvestre",
+      "compatible_with": [
+        "coffea_arabica",
+        "erythrina_edulis",
+        "lupinus_mutabilis",
+        "passiflora_tripartita_mollissima",
+        "quercus_humboldtii",
+        "solanum_phureja",
+        "vicia_faba",
+        "weinmannia_tomentosa"
+      ]
+    },
+    "daucus_carota_subsp_sativus": {
+      "nombre_comun": "Zanahoria",
+      "nombre_cientifico": "Daucus carota L. subsp. sativus (Hoffm.) Arcang.",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "allium_cepa",
+        "raphanus_sativus_niger"
+      ]
+    },
+    "allium_schoenoprasum": {
+      "nombre_comun": "Cebollino",
+      "nombre_cientifico": "Allium schoenoprasum L.",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "viola_tricolor"
+      ],
+      "antagonist_of": [
+        "phaseolus_vulgaris"
+      ]
+    },
+    "manihot_esculenta": {
+      "nombre_comun": "Yuca brava amazónica",
+      "nombre_cientifico": "Manihot esculenta Crantz",
+      "nombres_comunes": [
+        "guacamota",
+        "casabe (planta)",
+        "mandioca",
+        "casabe",
+        "yuca brava"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "borojoa_sorbilis",
+        "cajanus_cajan",
+        "cucurbita_maxima",
+        "cucurbita_moschata",
+        "musa_paradisiaca",
+        "phaseolus_vulgaris",
+        "plukenetia_volubilis",
+        "zea_mays"
+      ],
+      "biopreparados": [
+        {
+          "id": "beauveria_bassiana",
+          "nombre": "Beauveria bassiana (hongo entomopatógeno)"
+        },
+        {
+          "id": "trampa_amarilla_pegante",
+          "nombre": "Trampa amarilla pegante (mosca blanca / áfidos alados)"
+        },
+        {
+          "id": "purpureocillium_lilacinum",
+          "nombre": "Hongo nematófago Purpureocillium lilacinum (Paecilomyces)"
+        },
+        {
+          "id": "pochonia_chlamydosporia",
+          "nombre": "Hongo nematófago Pochonia chlamydosporia"
+        },
+        {
+          "id": "abono_verde_crotalaria",
+          "nombre": "Abono verde de crotalaria (Crotalaria spectabilis/juncea) supresor de nematodos"
+        },
+        {
+          "id": "cebo_hormiga_arriera",
+          "nombre": "Cebo tóxico-cultural para hormiga arriera (cítricos/sésamo/Trichoderma)"
+        },
+        {
+          "id": "harina_neem_suelo",
+          "nombre": "Harina de neem aplicada al suelo (torta de nim)"
+        },
+        {
+          "id": "micorrizas_arbusculares",
+          "nombre": "Micorrizas arbusculares (inoculante de HMA)"
+        },
+        {
+          "id": "extracto_tagetes_nematicida",
+          "nombre": "Extracto/incorporación de tagetes (Tagetes — flor de muerto) nematicida"
+        },
+        {
+          "id": "aceite_jabon_anticochinilla",
+          "nombre": "Aceite mineral/vegetal + jabón (anti-cochinilla y escamas)"
+        },
+        {
+          "id": "metarhizium_anisopliae",
+          "nombre": "Metarhizium anisopliae (hongo entomopatógeno verde)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "bemisia_tabaci",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatógeno (verticillium)",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Crisopa / león de áfidos",
+            "Crisopa neotropical",
+            "Ácaro depredador (amblyseius)",
+            "Parasitoide de mosca blanca (eretmocerus)",
+            "Avispita parasitoide de mosca blanca"
+          ]
+        },
+        {
+          "plaga": "piojo harinoso de la yuca",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "mosca blanca de la yuca",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Avispita parasitoide de mosca blanca",
+            "Encarsia spp",
+            "Parasitoide de control biológico",
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "Gusano cachón de la yuca",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos",
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Ácaro verde de la yuca",
+          "controladores": [
+            "Ácaro depredador (neoseiulus)",
+            "Typhlodromalus aripo"
+          ]
+        },
+        {
+          "plaga": "Bacteriosis de la yuca (añublo bacteriano)",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Mosca blanca (complejo)",
+          "controladores": [
+            "Hongo entomopatogeno (Isaria/Cordyceps)",
+            "Encarsia spp",
+            "Parasitoide de control biológico",
+            "Depredador de control biológico",
+            "Avispita parasitoide de mosca blanca",
+            "Hongo entomopatógeno (beauveria)",
+            "Parasitoide de mosca blanca (eretmocerus)",
+            "Crisopa neotropical",
+            "Crisopa / león de áfidos",
+            "Hongo entomopatógeno (verticillium)",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Ácaro depredador (amblyseius)"
+          ]
+        },
+        {
+          "plaga": "Arana roja / acaro de dos manchas (polifago: tomate, frijol, etc.)",
+          "controladores": [
+            "Ácaro depredador (amblyseius)",
+            "Depredador de control biológico",
+            "Chinche pirata (orius)",
+            "Crisopa / león de áfidos",
+            "Ácaro depredador de araña roja",
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (neoseiulus)"
+          ]
+        },
+        {
+          "plaga": "Lorito verde (chicharrita) del fríjol y yuca",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Nematodo agallador",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Trichoderma spp",
+            "Pochonia chlamydosporia"
+          ]
+        },
+        {
+          "plaga": "Piojo harinoso de la yuca",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Pudrición basal por Fusarium en yuca",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Virus del mosaico de la yuca (transmitido por mosca blanca)",
+          "controladores": [
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "Nematodo lesionador",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Hormiga arriera (zompopa)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
+          ]
+        }
+      ]
+    },
+    "coffea_arabica": {
+      "nombre_comun": "Café caturra / Castillo / Cenicafé 1",
+      "nombre_cientifico": "Coffea arabica L.",
+      "establishment_means": "introducido",
+      "threat_status": "ENDANGERED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "albizia_guachapele",
+        "alnus_acuminata",
+        "arachis_pintoi",
+        "cordia_alliodora",
+        "enterolobium_cyclocarpum",
+        "erythrina_edulis",
+        "inga_edulis",
+        "musa_paradisiaca",
+        "samanea_saman",
+        "tabebuia_rosea"
+      ],
+      "antagonist_of": [
+        "foeniculum_vulgare"
+      ],
+      "biopreparados": [
+        {
+          "id": "beauveria_bassiana",
+          "nombre": "Beauveria bassiana (hongo entomopatógeno)"
+        },
+        {
+          "id": "lixiviado_frutas",
+          "nombre": "Lixiviado de frutas"
+        },
+        {
+          "id": "bacillus_subtilis_foliar",
+          "nombre": "Bacillus subtilis (aplicación foliar)"
+        },
+        {
+          "id": "caldo_bordeles",
+          "nombre": "Caldo bordelés"
+        },
+        {
+          "id": "vinagre_madera_pirolenoso",
+          "nombre": "vinagre de madera (ácido piroleñoso)"
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi"
+        },
+        {
+          "id": "humus_liquido",
+          "nombre": "Humus líquido (lixiviado de lombriz)"
+        },
+        {
+          "id": "pochonia_chlamydosporia",
+          "nombre": "Hongo nematófago Pochonia chlamydosporia"
+        },
+        {
+          "id": "cebo_hormiga_arriera",
+          "nombre": "Cebo tóxico-cultural para hormiga arriera (cítricos/sésamo/Trichoderma)"
+        },
+        {
+          "id": "micorrizas_arbusculares",
+          "nombre": "Micorrizas arbusculares (inoculante de HMA)"
+        },
+        {
+          "id": "emulsion_nim",
+          "nombre": "Aceite/emulsión de nim (neem)"
+        },
+        {
+          "id": "te_gallinaza_compostada",
+          "nombre": "Té de gallinaza compostada (aireado)"
+        },
+        {
+          "id": "aceite_jabon_anticochinilla",
+          "nombre": "Aceite mineral/vegetal + jabón (anti-cochinilla y escamas)"
+        },
+        {
+          "id": "caldo_cola_caballo_ceniza_antiroya",
+          "nombre": "Caldo de cola de caballo + ceniza anti-roya (refuerzo silíceo)"
+        },
+        {
+          "id": "lechada_cal_troncos",
+          "nombre": "Lechada de cal (encalado de troncos)"
+        },
+        {
+          "id": "caldo_ceniza_jabon_concentrado",
+          "nombre": "Caldo ceniza-jabón concentrado (anti-minador/cochinilla)"
+        },
+        {
+          "id": "macerado_papaya_antiroya",
+          "nombre": "Macerado de hojas de papaya / ortiga-papaya (anti-roya)"
+        },
+        {
+          "id": "trichoderma_tratamiento_semilla",
+          "nombre": "Trichoderma para tratamiento de semilla (fríjol/papa/maíz)"
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol"
+        },
+        {
+          "id": "supermagro",
+          "nombre": "Supermagro"
+        },
+        {
+          "id": "trichoderma_harzianum_suelo",
+          "nombre": "Trichoderma harzianum (aplicación al suelo)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Broca del café",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Avispa parasitoide de la broca",
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Mancha de hierro o cercospora del café",
+          "controladores": [
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Roya del café",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Hongo entomopatógeno (verticillium)"
+          ]
+        },
+        {
+          "plaga": "Ojo de gallo del café",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Cochinilla harinosa de la raíz del café",
+          "controladores": [
+            "Mariquita roja",
+            "Mariquita destructora de cochinillas"
+          ]
+        },
+        {
+          "plaga": "hypothenemus_hampei_broca",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Avispa parasitoide de la broca"
+          ]
+        },
+        {
+          "plaga": "hemileia_vastatrix_roya",
+          "controladores": [
+            "Hongo antagonista del suelo"
+          ]
+        }
+      ]
+    },
+    "solanum_phureja": {
+      "nombre_comun": "Papa criolla",
+      "nombre_cientifico": "Solanum phureja Juz. & Bukasov",
+      "nombres_comunes": [
+        "chaucha",
+        "papa criolla"
+      ],
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "alnus_acuminata",
+        "mirabilis_expansa",
+        "urtica_dioica",
+        "zea_mays"
+      ],
+      "antagonist_of": [
+        "solanum_lycopersicum_san_marzano",
+        "solanum_melongena"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Polilla guatemalteca de la papa",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Parasitoide de control biológico",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Gusano blanco de la papa",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)"
+          ]
+        },
+        {
+          "plaga": "Tizon tardio / gota (papa y tomate)",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        }
+      ]
+    },
+    "solanum_tuberosum_pastusa_suprema": {
+      "nombre_comun": "Papa Pastusa Suprema",
+      "nombre_cientifico": "Solanum tuberosum L. subsp. tuberosum cv. 'Pastusa Suprema'",
+      "conservation_status": "cultivo_comun",
+      "biopreparados": [
+        {
+          "id": "caldo_bordeles",
+          "nombre": "Caldo bordelés"
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi"
+        },
+        {
+          "id": "humus_liquido",
+          "nombre": "Humus líquido (lixiviado de lombriz)"
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol"
+        },
+        {
+          "id": "supermagro",
+          "nombre": "Supermagro"
+        },
+        {
+          "id": "trichoderma_harzianum_suelo",
+          "nombre": "Trichoderma harzianum (aplicación al suelo)"
+        }
+      ]
+    },
+    "brassica_oleracea_capitata_alba": {
+      "nombre_comun": "Repollo blanco",
+      "nombre_cientifico": "Brassica oleracea var. capitata L.",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "antagonist_of": [
+        "solanum_lycopersicum_san_marzano",
+        "vaccinium_corymbosum_biloxi"
+      ]
+    },
+    "vaccinium_meridionale": {
+      "nombre_comun": "Mortino / Agraz",
+      "nombre_cientifico": "Vaccinium meridionale Sw.",
+      "nombres_comunes": [
+        "mortino",
+        "agraz"
+      ],
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "allium_cepa": {
+      "nombre_comun": "Cebolla cabezona",
+      "nombre_cientifico": "Allium cepa L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "solanum_tuberosum_sabanera"
+      ],
+      "antagonist_of": [
+        "phaseolus_vulgaris"
+      ],
+      "biopreparados": [
+        {
+          "id": "caldo_bordeles",
+          "nombre": "Caldo bordelés"
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi"
+        },
+        {
+          "id": "humus_liquido",
+          "nombre": "Humus líquido (lixiviado de lombriz)"
+        },
+        {
+          "id": "trampa_azul_pegante",
+          "nombre": "Trampa azul pegante (trips)"
+        },
+        {
+          "id": "ceniza_vegetal_espolvoreo",
+          "nombre": "Ceniza vegetal espolvoreada en seco"
+        },
+        {
+          "id": "caldo_ajo_concentrado",
+          "nombre": "Caldo de ajo concentrado (anti-fúngico/bactericida)"
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol"
+        },
+        {
+          "id": "purin_ortiga",
+          "nombre": "Purín de ortiga"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Trips de la cebolla",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Chinche pirata (orius)",
+            "Depredador de control biológico",
+            "Amblyseius spp"
+          ]
+        },
+        {
+          "plaga": "Mancha púrpura de la cebolla y ajo",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Mildiu velloso de la cebolla",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)"
+          ]
+        },
+        {
+          "plaga": "fusarium_oxysporum_fsp_cepae",
+          "controladores": [
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "sclerotium_cepivorum",
+          "controladores": [
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Minador de la hoja (mosca minadora)",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        }
+      ]
+    },
+    "melissa_officinalis": {
+      "nombre_comun": "Toronjil",
+      "nombre_cientifico": "Melissa officinalis L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "solanum_lycopersicum_san_marzano"
+      ]
+    },
+    "passiflora_tripartita_mollissima": {
+      "nombre_comun": "Curuba de Castilla",
+      "nombre_cientifico": "Passiflora tripartita var. mollissima (Kunth) Holm-Niels. & Jørg.",
+      "nombres_comunes": [
+        "tacso",
+        "curuba de castilla",
+        "taxo"
+      ],
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "alnus_acuminata",
+        "urtica_dioica"
+      ]
+    },
+    "erythrina_edulis": {
+      "nombre_comun": "Chachafruto / Balú",
+      "nombre_cientifico": "Erythrina edulis Triana ex Micheli",
+      "nombres_comunes": [
+        "poroto",
+        "balu",
+        "guatote",
+        "guato",
+        "sachaporoto",
+        "basul"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "alnus_acuminata",
+        "coffea_arabica",
+        "cordia_alliodora",
+        "tabebuia_rosea"
+      ],
+      "antagonist_of": [
+        "ulex_europaeus"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "scolytidae",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        }
+      ]
+    },
+    "pinus_patula": {
+      "nombre_comun": "Pino pátula",
+      "nombre_cientifico": "Pinus patula Schiede ex Schltdl. & Cham.",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "invasor",
+      "antagonist_of": [
+        "quercus_humboldtii"
+      ]
+    },
+    "cymbopogon_citratus": {
+      "nombre_comun": "Limonaria",
+      "nombre_cientifico": "Cymbopogon citratus (DC.) Stapf",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "solanum_lycopersicum_san_marzano"
+      ]
+    },
+    "solanum_betaceum": {
+      "nombre_comun": "Tomate de árbol / Tamarillo",
+      "nombre_cientifico": "Solanum betaceum Cav.",
+      "nombres_comunes": [
+        "tomate de palo",
+        "tamarillo",
+        "chupitá"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "DATA_DEFICIENT",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "Antracnosis del tomate de árbol",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Pasador del fruto de tomate y berenjena",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos"
+          ]
+        },
+        {
+          "plaga": "Tizon tardio / gota (papa y tomate)",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Marchitez del lulo y solanáceas por Fusarium",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "theobroma_cacao": {
+      "nombre_comun": "Cacao",
+      "nombre_cientifico": "Theobroma cacao L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "naturalizada",
+      "compatible_with": [
+        "gliricidia_sepium",
+        "musa_paradisiaca"
+      ],
+      "biopreparados": [
+        {
+          "id": "emulsion_nim",
+          "nombre": "Aceite/emulsión de nim (neem)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "moniliasis del cacao",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Pudrición del cogollo de la palma de aceite",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "escoba de bruja cacao",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "solanum_tuberosum": {
+      "nombre_comun": "Papa parda pastusa",
+      "nombre_cientifico": "Solanum tuberosum L. subsp. andigenum var. parda pastusa",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "compatible_with": [
+        "lupinus_mutabilis",
+        "pisum_sativum_andina",
+        "tropaeolum_tuberosum",
+        "tropaeolum_tuberosum_mashua"
+      ],
+      "biopreparados": [
+        {
+          "id": "caldo_bordeles",
+          "nombre": "Caldo bordelés",
+          "specificity": {
+            "score": 0.98,
+            "label": "muy alta",
+            "provenance": "AGROSAVIA manual biopreparados and potato late blight literature"
+          }
+        },
+        {
+          "id": "caldo_bordeles_trichoderma",
+          "nombre": "Caldo bordelés enriquecido con Trichoderma (manejo de gota integrado)",
+          "specificity": {
+            "score": 0.97,
+            "label": "muy alta",
+            "provenance": "Integrated potato late blight and soil disease management"
+          }
+        },
+        {
+          "id": "trichoderma_harzianum_suelo",
+          "nombre": "Trichoderma harzianum (aplicación al suelo)",
+          "specificity": {
+            "score": 0.96,
+            "label": "muy alta",
+            "provenance": "Potato soilborne disease control, especially Rhizoctonia"
+          }
+        },
+        {
+          "id": "trichoderma_tratamiento_semilla",
+          "nombre": "Trichoderma para tratamiento de semilla (fríjol/papa/maíz)",
+          "specificity": {
+            "score": 0.94,
+            "label": "alta",
+            "provenance": "Potato seed tuber treatment for soilborne disease pressure"
+          }
+        },
+        {
+          "id": "caldo_ceniza_cal_antigota",
+          "nombre": "Caldo de ceniza y cal anti-gota (variante mineral para tizón de papa)",
+          "specificity": {
+            "score": 0.88,
+            "label": "alta",
+            "provenance": "Potato late blight preventive variant"
+          }
+        },
+        {
+          "id": "trampa_feromona_cogollero",
+          "nombre": "Trampa de feromona sexual para cogollero / polilla",
+          "specificity": {
+            "score": 0.83,
+            "label": "alta",
+            "provenance": "Potato moth monitoring and lepidopteran pressure"
+          }
+        },
+        {
+          "id": "beauveria_bassiana",
+          "nombre": "Beauveria bassiana (hongo entomopatógeno)",
+          "specificity": {
+            "score": 0.82,
+            "label": "alta",
+            "provenance": "Potato tuber moth and potato beetle biocontrol literature"
+          }
+        },
+        {
+          "id": "metarhizium_anisopliae",
+          "nombre": "Metarhizium anisopliae (hongo entomopatógeno verde)",
+          "specificity": {
+            "score": 0.8,
+            "label": "alta",
+            "provenance": "Broad entomopathogen used against potato soil pests"
+          }
+        },
+        {
+          "id": "purpureocillium_lilacinum",
+          "nombre": "Hongo nematófago Purpureocillium lilacinum (Paecilomyces)",
+          "specificity": {
+            "score": 0.78,
+            "label": "media",
+            "provenance": "Potato cyst nematodes and root-knot nematodes"
+          }
+        },
+        {
+          "id": "pochonia_chlamydosporia",
+          "nombre": "Hongo nematófago Pochonia chlamydosporia",
+          "specificity": {
+            "score": 0.78,
+            "label": "media",
+            "provenance": "Potato cyst nematodes and root-knot nematodes"
+          }
+        },
+        {
+          "id": "trampa_azul_pegante",
+          "nombre": "Trampa azul pegante (trips)",
+          "specificity": {
+            "score": 0.76,
+            "label": "media",
+            "provenance": "Potato thrips monitoring"
+          }
+        },
+        {
+          "id": "trampa_amarilla_pegante",
+          "nombre": "Trampa amarilla pegante (mosca blanca / áfidos alados)",
+          "specificity": {
+            "score": 0.74,
+            "label": "media",
+            "provenance": "Potato whitefly and aphid monitoring"
+          }
+        },
+        {
+          "id": "extracto_tagetes_nematicida",
+          "nombre": "Extracto/incorporación de tagetes (Tagetes — flor de muerto) nematicida",
+          "specificity": {
+            "score": 0.69,
+            "label": "media",
+            "provenance": "Nematicide used in potato rotations and soil sanitation"
+          }
+        },
+        {
+          "id": "harina_neem_suelo",
+          "nombre": "Harina de neem aplicada al suelo (torta de nim)",
+          "specificity": {
+            "score": 0.68,
+            "label": "media",
+            "provenance": "Potato soil pest and nematode suppression"
+          }
+        },
+        {
+          "id": "tierra_diatomeas",
+          "nombre": "Tierra de diatomeas (polvo de sílice amorfo)",
+          "specificity": {
+            "score": 0.64,
+            "label": "media",
+            "provenance": "Contact pest control, generic but useful in potato"
+          }
+        },
+        {
+          "id": "extracto_paraiso_melia",
+          "nombre": "Extracto/purín de paraíso (Melia azedarach)",
+          "specificity": {
+            "score": 0.62,
+            "label": "media",
+            "provenance": "Botanical repellent used in potato systems"
+          }
+        },
+        {
+          "id": "azufre_mojable_foliar",
+          "nombre": "Azufre mojable foliar (anti-ácaros y oídio)",
+          "specificity": {
+            "score": 0.6,
+            "label": "media",
+            "provenance": "Broad fungicide and acaricide useful on potato"
+          }
+        },
+        {
+          "id": "caldo_cola_caballo",
+          "nombre": "Caldo/macerado de cola de caballo (Equisetum)",
+          "specificity": {
+            "score": 0.58,
+            "label": "media",
+            "provenance": "Broad antifungal, sometimes used on potato foliage"
+          }
+        },
+        {
+          "id": "abono_verde_crotalaria",
+          "nombre": "Abono verde de crotalaria (Crotalaria spectabilis/juncea) supresor de nematodos",
+          "specificity": {
+            "score": 0.52,
+            "label": "media",
+            "provenance": "Rotation and nematode suppression in potato systems"
+          }
+        },
+        {
+          "id": "sal_epsom_foliar",
+          "nombre": "Sal de Epsom foliar (sulfato de magnesio)",
+          "specificity": {
+            "score": 0.5,
+            "label": "media",
+            "provenance": "Nutrient correction useful in potato but not exclusive"
+          }
+        },
+        {
+          "id": "extracto_eucalipto",
+          "nombre": "Extracto de eucalipto repelente",
+          "specificity": {
+            "score": 0.42,
+            "label": "baja",
+            "provenance": "Broad botanical repellent, not potato-specific"
+          }
+        },
+        {
+          "id": "ceniza_vegetal_espolvoreo",
+          "nombre": "Ceniza vegetal espolvoreada en seco",
+          "specificity": {
+            "score": 0.36,
+            "label": "baja",
+            "provenance": "Mineral barrier, broadly applicable across crops"
+          }
+        },
+        {
+          "id": "supermagro",
+          "nombre": "Supermagro",
+          "specificity": {
+            "score": 0.31,
+            "label": "baja",
+            "provenance": "General biofertilizer, applicable across crops"
+          }
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi",
+          "specificity": {
+            "score": 0.3,
+            "label": "baja",
+            "provenance": "General soil amendment, not potato-specific"
+          }
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol",
+          "specificity": {
+            "score": 0.29,
+            "label": "baja",
+            "provenance": "General biofertilizer, applicable across crops"
+          }
+        },
+        {
+          "id": "humus_liquido",
+          "nombre": "Humus líquido (lixiviado de lombriz)",
+          "specificity": {
+            "score": 0.28,
+            "label": "baja",
+            "provenance": "General fertility input, broadly applicable"
+          }
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Polilla guatemalteca de la papa",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Parasitoide de control biológico",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Gusano blanco de la papa",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)"
+          ]
+        },
+        {
+          "plaga": "Tizon tardio / gota (papa y tomate)",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Sarna polvorienta de la papa",
+          "controladores": [
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Pudrición blanda por Erwinia",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Polilla de la papa",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Bt (bacteria bioinsecticida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Tizón de la vaina del arroz",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Pulguilla negra de la papa",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
+          ]
+        },
+        {
+          "plaga": "Nematodo agallador",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Trichoderma spp",
+            "Pochonia chlamydosporia"
+          ]
+        },
+        {
+          "plaga": "Marchitez bacteriana o dormidera de la papa",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Gusano blanco del maíz (gallina ciega)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno de chizas",
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "Nematodo quiste de la papa",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Psílido de la papa",
+          "controladores": [
+            "Crisopa / león de áfidos",
+            "Hongo entomopatógeno (beauveria)",
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Minador de la hoja en papa y hortalizas",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "pulgón verde durazno",
+          "controladores": [
+            "Coccinella septempunctata",
+            "Avispa parasitoide de pulgones",
+            "Crisopa neotropical",
+            "Hongo entomopatógeno (beauveria)",
+            "Crisopa / león de áfidos"
+          ]
+        },
+        {
+          "plaga": "nematodo dorado papa",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Pochonia chlamydosporia"
+          ]
+        },
+        {
+          "plaga": "brevicoryne_brassicae",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Avispa parasitoide de pulgones",
+            "Avispa parasitoide de áfidos"
+          ]
+        },
+        {
+          "plaga": "trozador",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bt (bacteria bioinsecticida)"
+          ]
+        },
+        {
+          "plaga": "chisa",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "globodera_pallida",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Pochonia chlamydosporia"
+          ]
+        },
+        {
+          "plaga": "Tizón temprano de la papa",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Pudrición basal por Sclerotium",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Bacteria antagonista (biofungicida)"
+          ]
+        },
+        {
+          "plaga": "Ácaro blanco tropical",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (neoseiulus)"
+          ]
+        }
+      ]
+    },
+    "phaseolus_vulgaris": {
+      "nombre_comun": "Frijol arbustivo / voluble",
+      "nombre_cientifico": "Phaseolus vulgaris L.",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "cucumis_sativus",
+        "cucurbita_maxima",
+        "cucurbita_moschata",
+        "helianthus_annuus",
+        "lactuca_sativa_capitata",
+        "manihot_esculenta",
+        "musa_paradisiaca",
+        "solanum_tuberosum_sabanera",
+        "zea_mays"
+      ],
+      "antagonist_of": [
+        "allium_cepa",
+        "allium_fistulosum",
+        "allium_sativum",
+        "allium_schoenoprasum",
+        "foeniculum_vulgare"
+      ],
+      "biopreparados": [
+        {
+          "id": "beauveria_bassiana",
+          "nombre": "Beauveria bassiana (hongo entomopatógeno)"
+        },
+        {
+          "id": "trampa_amarilla_pegante",
+          "nombre": "Trampa amarilla pegante (mosca blanca / áfidos alados)"
+        },
+        {
+          "id": "extracto_paraiso_melia",
+          "nombre": "Extracto/purín de paraíso (Melia azedarach)"
+        },
+        {
+          "id": "trampa_azul_pegante",
+          "nombre": "Trampa azul pegante (trips)"
+        },
+        {
+          "id": "purpureocillium_lilacinum",
+          "nombre": "Hongo nematófago Purpureocillium lilacinum (Paecilomyces)"
+        },
+        {
+          "id": "pochonia_chlamydosporia",
+          "nombre": "Hongo nematófago Pochonia chlamydosporia"
+        },
+        {
+          "id": "abono_verde_crotalaria",
+          "nombre": "Abono verde de crotalaria (Crotalaria spectabilis/juncea) supresor de nematodos"
+        },
+        {
+          "id": "cebo_hormiga_arriera",
+          "nombre": "Cebo tóxico-cultural para hormiga arriera (cítricos/sésamo/Trichoderma)"
+        },
+        {
+          "id": "harina_neem_suelo",
+          "nombre": "Harina de neem aplicada al suelo (torta de nim)"
+        },
+        {
+          "id": "bicarbonato_aceite_antioidio",
+          "nombre": "Bicarbonato de sodio/potasio + aceite (anti-oídio y antracnosis)"
+        },
+        {
+          "id": "extracto_chipaca_bidens",
+          "nombre": "Té/extracto de chipaca o guasca (Bidens pilosa) repelente"
+        },
+        {
+          "id": "extracto_eucalipto",
+          "nombre": "Extracto de eucalipto repelente"
+        },
+        {
+          "id": "leche_cruda_foliar_antioidio",
+          "nombre": "Solución de leche cruda foliar (anti-oídio)"
+        },
+        {
+          "id": "azufre_mojable_foliar",
+          "nombre": "Azufre mojable foliar (anti-ácaros y oídio)"
+        },
+        {
+          "id": "micorrizas_arbusculares",
+          "nombre": "Micorrizas arbusculares (inoculante de HMA)"
+        },
+        {
+          "id": "extracto_tagetes_nematicida",
+          "nombre": "Extracto/incorporación de tagetes (Tagetes — flor de muerto) nematicida"
+        },
+        {
+          "id": "caldo_ajo_concentrado",
+          "nombre": "Caldo de ajo concentrado (anti-fúngico/bactericida)"
+        },
+        {
+          "id": "caldo_cola_caballo_ceniza_antiroya",
+          "nombre": "Caldo de cola de caballo + ceniza anti-roya (refuerzo silíceo)"
+        },
+        {
+          "id": "lactosuero_fermentado_foliar",
+          "nombre": "Lactosuero (suero de leche) fermentado foliar"
+        },
+        {
+          "id": "tierra_diatomeas",
+          "nombre": "Tierra de diatomeas (polvo de sílice amorfo)"
+        },
+        {
+          "id": "inoculante_rhizobium_frijol",
+          "nombre": "Inoculante de Rhizobium para fríjol (fijación de nitrógeno)"
+        },
+        {
+          "id": "macerado_tabaco_jabon",
+          "nombre": "Macerado/caldo de tabaco con jabón"
+        },
+        {
+          "id": "macerado_papaya_antiroya",
+          "nombre": "Macerado de hojas de papaya / ortiga-papaya (anti-roya)"
+        },
+        {
+          "id": "trichoderma_tratamiento_semilla",
+          "nombre": "Trichoderma para tratamiento de semilla (fríjol/papa/maíz)"
+        },
+        {
+          "id": "bacillus_thuringiensis_aizawai_cogollero",
+          "nombre": "Bacillus thuringiensis var. aizawai/kurstaki para cogollero"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Mancha angular del fríjol",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Antracnosis del fríjol",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Roya del fríjol",
+          "controladores": [
+            "Hongo entomopatógeno (verticillium)"
+          ]
+        },
+        {
+          "plaga": "Mosca blanca (complejo)",
+          "controladores": [
+            "Hongo entomopatogeno (Isaria/Cordyceps)",
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatógeno (verticillium)",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Crisopa / león de áfidos",
+            "Crisopa neotropical",
+            "Ácaro depredador (amblyseius)",
+            "Parasitoide de mosca blanca (eretmocerus)",
+            "Avispita parasitoide de mosca blanca",
+            "Encarsia spp",
+            "Parasitoide de control biológico",
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "bemisia_tabaci",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatógeno (verticillium)",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Crisopa / león de áfidos",
+            "Crisopa neotropical",
+            "Ácaro depredador (amblyseius)",
+            "Parasitoide de mosca blanca (eretmocerus)",
+            "Avispita parasitoide de mosca blanca"
+          ]
+        },
+        {
+          "plaga": "Lorito verde (chicharrita) del fríjol y yuca",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
+          ]
+        }
+      ]
+    },
+    "bixa_orellana": {
+      "nombre_comun": "Achiote",
+      "nombre_cientifico": "Bixa orellana L.",
+      "nombres_comunes": [
+        "bija",
+        "onoto",
+        "achote"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_silvestre"
+    },
+    "fragaria_ananassa_monterrey": {
+      "nombre_comun": "Fresa Monterrey",
+      "nombre_cientifico": "Fragaria × ananassa 'Monterrey'",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "spinacia_oleracea"
+      ],
+      "biopreparados": [
+        {
+          "id": "lixiviado_frutas",
+          "nombre": "Lixiviado de frutas"
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi"
+        },
+        {
+          "id": "humus_liquido",
+          "nombre": "Humus líquido (lixiviado de lombriz)"
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol"
+        },
+        {
+          "id": "supermagro",
+          "nombre": "Supermagro"
+        },
+        {
+          "id": "trichoderma_harzianum_suelo",
+          "nombre": "Trichoderma harzianum (aplicación al suelo)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Antracnosis del tomate de árbol",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Podredumbre gris (Botrytis)",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Arana roja / acaro de dos manchas (polifago: tomate, frijol, etc.)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Crisopa / león de áfidos",
+            "Chinche pirata (orius)",
+            "Ácaro depredador (neoseiulus)",
+            "Ácaro depredador de araña roja",
+            "Ácaro depredador (amblyseius)",
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "Mosca de alas manchadas",
+          "controladores": [
+            "Trichopria drosophilae",
+            "Parasitoide de control biológico"
+          ]
+        }
+      ]
+    },
+    "brassica_oleracea_italica": {
+      "nombre_comun": "Brócoli",
+      "nombre_cientifico": "Brassica oleracea var. italica Plenck",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "polilla dorso diamante",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos",
+            "Parasitoide de control biológico",
+            "Diadegma insulare",
+            "Cotesia plutellae"
+          ]
+        },
+        {
+          "plaga": "brevicoryne_brassicae",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Avispa parasitoide de pulgones"
+          ]
+        },
+        {
+          "plaga": "Falso medidor del repollo y hortalizas",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos",
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "pieris_rapae",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos"
+          ]
+        },
+        {
+          "plaga": "Hernia de las cruciferas (clubroot)",
+          "controladores": [
+            "Trichoderma spp"
+          ]
+        }
+      ]
+    },
+    "spinacia_oleracea": {
+      "nombre_comun": "Espinaca",
+      "nombre_cientifico": "Spinacia oleracea L.",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "fragaria_ananassa_monterrey"
+      ],
+      "antagonist_of": [
+        "solanum_tuberosum_sabanera"
+      ]
+    },
+    "lupinus_mutabilis": {
+      "nombre_comun": "Chocho / Tarwi",
+      "nombre_cientifico": "Lupinus mutabilis Sweet",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "alnus_acuminata",
+        "zea_mays"
+      ]
+    },
+    "inga_edulis": {
+      "nombre_comun": "Guamo",
+      "nombre_cientifico": "Inga edulis Mart.",
+      "nombres_comunes": [
+        "guama",
+        "guamo santafereno"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "naturalizada",
+      "compatible_with": [
+        "coffea_arabica",
+        "cordia_alliodora",
+        "tabebuia_rosea"
+      ]
+    },
+    "cordia_alliodora": {
+      "nombre_comun": "Nogal cafetero",
+      "nombre_cientifico": "Cordia alliodora (Ruiz & Pav.) Oken",
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_silvestre",
+      "compatible_with": [
+        "albizia_guachapele",
+        "coffea_arabica",
+        "enterolobium_cyclocarpum",
+        "erythrina_edulis",
+        "inga_edulis",
+        "samanea_saman",
+        "tabebuia_rosea"
+      ]
+    },
+    "tabebuia_rosea": {
+      "nombre_comun": "Guayacán rosado",
+      "nombre_cientifico": "Tabebuia rosea (Bertol.) DC.",
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_silvestre",
+      "compatible_with": [
+        "albizia_guachapele",
+        "coffea_arabica",
+        "cordia_alliodora",
+        "erythrina_edulis",
+        "inga_edulis",
+        "samanea_saman"
+      ]
+    },
+    "allium_sativum": {
+      "nombre_comun": "Ajo",
+      "nombre_cientifico": "Allium sativum L.",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "daucus_carota_subsp_sativus",
+        "solanum_melongena"
+      ],
+      "antagonist_of": [
+        "phaseolus_vulgaris"
+      ],
+      "biopreparados": [
+        {
+          "id": "caldo_bordeles",
+          "nombre": "Caldo bordelés"
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi"
+        },
+        {
+          "id": "humus_liquido",
+          "nombre": "Humus líquido (lixiviado de lombriz)"
+        },
+        {
+          "id": "caldo_ajo_concentrado",
+          "nombre": "Caldo de ajo concentrado (anti-fúngico/bactericida)"
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol"
+        },
+        {
+          "id": "supermagro",
+          "nombre": "Supermagro"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Trips de la cebolla",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Chinche pirata (orius)",
+            "Depredador de control biológico",
+            "Amblyseius spp"
+          ]
+        },
+        {
+          "plaga": "Mildiu velloso de la cebolla",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)"
+          ]
+        },
+        {
+          "plaga": "sclerotium_cepivorum",
+          "controladores": [
+            "Hongo antagonista del suelo"
+          ]
+        }
+      ]
+    },
+    "brassica_oleracea_botrytis": {
+      "nombre_comun": "Coliflor",
+      "nombre_cientifico": "Brassica oleracea var. botrytis L.",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "polilla dorso diamante",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos",
+            "Parasitoide de control biológico",
+            "Diadegma insulare",
+            "Cotesia plutellae"
+          ]
+        },
+        {
+          "plaga": "brevicoryne_brassicae",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Avispa parasitoide de pulgones"
+          ]
+        },
+        {
+          "plaga": "pieris_rapae",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos"
+          ]
+        },
+        {
+          "plaga": "Hernia de las cruciferas (clubroot)",
+          "controladores": [
+            "Trichoderma spp"
+          ]
+        }
+      ]
+    },
+    "oxalis_tuberosa": {
+      "nombre_comun": "Oca / Hibia",
+      "nombre_cientifico": "Oxalis tuberosa Molina",
+      "nombres_comunes": [
+        "quiba",
+        "ibia",
+        "hibia"
+      ],
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "arracacia_xanthorrhiza",
+        "solanum_tuberosum_sabanera",
+        "tropaeolum_tuberosum",
+        "zea_mays"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Nematodo agallador",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "tropaeolum_tuberosum": {
+      "nombre_comun": "Mashua / Cubio",
+      "nombre_cientifico": "Tropaeolum tuberosum Ruiz & Pav.",
+      "nombres_comunes": [
+        "anu",
+        "isano",
+        "cubio",
+        "mashua"
+      ],
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "arracacia_xanthorrhiza",
+        "oxalis_tuberosa",
+        "solanum_tuberosum_sabanera",
+        "zea_mays"
+      ]
+    },
+    "pisum_sativum_andina": {
+      "nombre_comun": "Arveja andina",
+      "nombre_cientifico": "Pisum sativum L. var. andina",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "solanum_tuberosum"
+      ],
+      "biopreparados": [
+        {
+          "id": "inoculante_rhizobium_frijol",
+          "nombre": "Inoculante de Rhizobium para fríjol (fijación de nitrógeno)"
+        }
+      ]
+    },
+    "citrus_latifolia": {
+      "nombre_comun": "Limón Tahití",
+      "nombre_cientifico": "Citrus × latifolia (Yu. Tanaka) Tanaka",
+      "nombres_comunes": [
+        "limon mandarino"
+      ],
+      "conservation_status": "cultivo_comun",
+      "biopreparados": [
+        {
+          "id": "trampa_melaza_atrayente",
+          "nombre": "Trampa de melaza (cebo atrayente líquido)"
+        },
+        {
+          "id": "sal_epsom_foliar",
+          "nombre": "Sal de Epsom foliar (sulfato de magnesio)"
+        },
+        {
+          "id": "emulsion_nim",
+          "nombre": "Aceite/emulsión de nim (neem)"
+        },
+        {
+          "id": "aceite_jabon_anticochinilla",
+          "nombre": "Aceite mineral/vegetal + jabón (anti-cochinilla y escamas)"
+        },
+        {
+          "id": "lechada_cal_troncos",
+          "nombre": "Lechada de cal (encalado de troncos)"
+        },
+        {
+          "id": "caldo_ceniza_jabon_concentrado",
+          "nombre": "Caldo ceniza-jabón concentrado (anti-minador/cochinilla)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Psílido asiático de los cítricos",
+          "controladores": [
+            "Hongo entomopatogeno (Isaria/Cordyceps)",
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Mariquita roja",
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Huanglongbing (HLB) / dragón amarillo de los cítricos",
+          "controladores": [
+            "Mariquita roja"
+          ]
+        },
+        {
+          "plaga": "Mosca del Mediterráneo",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Picudo de los cítricos / barrenador",
+          "controladores": [
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Minador de la hoja de cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Piojo blanco o coma de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Ácaro tostador de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro rojo de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "mosca sudamericana de la fruta",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla harinosa de los cítricos",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Nematodo espiral del café y frutales",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Mosca blanca algodonosa de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Leprosis de los cítricos (ácaro vector)",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Escama roja de los cítricos y frutales",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla rosada del hibisco",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Cochinilla acanalada de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Mariquita destructora de cochinillas"
+          ]
+        },
+        {
+          "plaga": "Áfido pardo de los cítricos (vector de la tristeza)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)",
+            "Mariquita roja"
+          ]
+        },
+        {
+          "plaga": "Escama blanca del aguacate",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Escama verde de los cítricos",
+          "controladores": [
+            "Hongo entomopatógeno (verticillium)"
+          ]
+        },
+        {
+          "plaga": "Mancha negra de los cítricos",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Alternaria del fruto del cítrico",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Pudrición peduncular del mango y aguacate",
+          "controladores": [
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Bicho de cesto o canasta (plaga de ornamentales y frutales)",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)"
+          ]
+        },
+        {
+          "plaga": "Comején de los árboles frutales",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro blanco tropical",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (neoseiulus)"
+          ]
+        },
+        {
+          "plaga": "Nemátodo de los cítricos (decaimiento lento)",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)"
+          ]
+        },
+        {
+          "plaga": "Hormiga arriera (zompopa)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
+          ]
+        }
+      ]
+    },
+    "chenopodium_quinoa": {
+      "nombre_comun": "Quinua",
+      "nombre_cientifico": "Chenopodium quinoa Willd.",
+      "nombres_comunes": [
+        "quinua dulce"
+      ],
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "zea_mays"
+      ]
+    },
+    "petroselinum_crispum": {
+      "nombre_comun": "Perejil crespo",
+      "nombre_cientifico": "Petroselinum crispum (Mill.) Fuss",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "solanum_lycopersicum_san_marzano"
+      ]
+    },
+    "rosmarinus_officinalis": {
+      "nombre_comun": "Romero",
+      "nombre_cientifico": "Salvia rosmarinus Spenn. (syn. Rosmarinus officinalis L.)",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "urtica_dioica"
+      ]
+    },
+    "physalis_peruviana": {
+      "nombre_comun": "Uchuva",
+      "nombre_cientifico": "Physalis peruviana L.",
+      "nombres_comunes": [
+        "guchuva",
+        "uvilla"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "antagonist_of": [
+        "vaccinium_corymbosum_biloxi"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "pulgón del algodón",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatógeno (verticillium)",
+            "Crisopa / león de áfidos",
+            "Crisopa neotropical",
+            "Mariquita / catarina convergente",
+            "Mariquita roja",
+            "Avispa parasitoide de áfidos",
+            "Avispa parasitoide de pulgones",
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Mal de Panamá (Fusarium del banano)",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)"
+          ]
+        }
+      ]
+    },
+    "borojoa_patinoi": {
+      "nombre_comun": "Borojó",
+      "nombre_cientifico": "Borojoa patinoi Cuatrec.",
+      "nombres_comunes": [
+        "borojo"
+      ],
+      "conservation_status": "endemica_colombia"
+    },
+    "arracacia_xanthorrhiza": {
+      "nombre_comun": "Arracacha / Zanahoria blanca",
+      "nombre_cientifico": "Arracacia xanthorrhiza Bancr.",
+      "nombres_comunes": [
+        "racacha",
+        "apio criollo",
+        "zanahoria blanca"
+      ],
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "oxalis_tuberosa",
+        "solanum_tuberosum_sabanera",
+        "tropaeolum_tuberosum",
+        "zea_mays"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Nematodo agallador",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Trichoderma spp",
+            "Pochonia chlamydosporia"
+          ]
+        }
+      ]
+    },
+    "mucuna_pruriens": {
+      "nombre_comun": "Frijol terciopelo",
+      "nombre_cientifico": "Mucuna pruriens (L.) DC.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "zea_mays"
+      ]
+    },
+    "mangifera_indica": {
+      "nombre_comun": "Mango",
+      "nombre_cientifico": "Mangifera indica L.",
+      "nombres_comunes": [
+        "mango de azucar",
+        "manga",
+        "mango",
+        "mancera"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "DATA_DEFICIENT",
+      "conservation_status": "naturalizada",
+      "compatible_with": [
+        "chrysophyllum_cainito",
+        "mammea_americana",
+        "melicoccus_bijugatus",
+        "spondias_dulcis",
+        "stylosanthes_guianensis"
+      ],
+      "biopreparados": [
+        {
+          "id": "lechada_cal_troncos",
+          "nombre": "Lechada de cal (encalado de troncos)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Mosca del Mediterráneo",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Mosca de la fruta (Anastrepha spp.)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "mosca sudamericana de la fruta",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla rosada del hibisco",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro de las yemas del mango",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (amblyseius)"
+          ]
+        },
+        {
+          "plaga": "Oidio o mildeo polvoso",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Trips del cacao",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Chinche pirata (orius)"
+          ]
+        },
+        {
+          "plaga": "Mancha bacteriana del mango",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)"
+          ]
+        },
+        {
+          "plaga": "Pudrición peduncular del mango y aguacate",
+          "controladores": [
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Comején de los árboles frutales",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        }
+      ]
+    },
+    "gliricidia_sepium": {
+      "nombre_comun": "Matarratón",
+      "nombre_cientifico": "Gliricidia sepium (Jacq.) Kunth ex Walp.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "albizia_guachapele",
+        "enterolobium_cyclocarpum",
+        "samanea_saman",
+        "trichanthera_gigantea"
+      ]
+    },
+    "leucaena_leucocephala": {
+      "nombre_comun": "Leucaena",
+      "nombre_cientifico": "Leucaena leucocephala (Lam.) de Wit",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "naturalizada"
+    },
+    "tithonia_diversifolia": {
+      "nombre_comun": "Botón de oro",
+      "nombres_comunes": [
+        "suncho"
+      ],
+      "nombre_cientifico": "Tithonia diversifolia (Hemsl.) A.Gray",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "naturalizada"
+    },
+    "morus_alba": {
+      "nombre_comun": "Morera blanca",
+      "nombre_cientifico": "Morus alba L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "naturalizada"
+    },
+    "cratylia_argentea": {
+      "nombre_comun": "Cratylia",
+      "nombres_comunes": [
+        "rabo de iguana"
+      ],
+      "nombre_cientifico": "Cratylia argentea (Desv.) Kuntze",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "naturalizada"
+    },
+    "azolla_filiculoides": {
+      "nombre_comun": "Azolla",
+      "nombre_cientifico": "Azolla filiculoides Lam.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "ananas_comosus": {
+      "nombre_comun": "Piña",
+      "nombre_cientifico": "Ananas comosus (L.) Merr.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "Cochinilla harinosa de la raíz del café",
+          "controladores": [
+            "Mariquita roja",
+            "Mariquita destructora de cochinillas"
+          ]
+        }
+      ]
+    },
+    "musa_paradisiaca": {
+      "nombre_comun": "Plátano",
+      "nombre_cientifico": "Musa × paradisiaca L.",
+      "nombres_comunes": [
+        "popocho",
+        "platano dominico",
+        "platano harton"
+      ],
+      "establishment_means": "introducido",
+      "conservation_status": "naturalizada",
+      "compatible_with": [
+        "coffea_arabica",
+        "manihot_esculenta",
+        "phaseolus_vulgaris",
+        "zea_mays"
+      ],
+      "biopreparados": [
+        {
+          "id": "lixiviado_frutas",
+          "nombre": "Lixiviado de frutas"
+        },
+        {
+          "id": "caldo_bordeles",
+          "nombre": "Caldo bordelés"
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi"
+        },
+        {
+          "id": "purpureocillium_lilacinum",
+          "nombre": "Hongo nematófago Purpureocillium lilacinum (Paecilomyces)"
+        },
+        {
+          "id": "te_gallinaza_compostada",
+          "nombre": "Té de gallinaza compostada (aireado)"
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol"
+        },
+        {
+          "id": "supermagro",
+          "nombre": "Supermagro"
+        },
+        {
+          "id": "trichoderma_harzianum_suelo",
+          "nombre": "Trichoderma harzianum (aplicación al suelo)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Sigatoka negra",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Picudo negro del plátano y banano",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Mal de Panamá (Fusarium f.sp. cubense)",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Nematodo barrenador del banano",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Moko del plátano y banano",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "tropaeolum_majus": {
+      "nombre_comun": "Capuchina / Taco de reina",
+      "nombre_cientifico": "Tropaeolum majus L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "solanum_lycopersicum_san_marzano"
+      ]
+    },
+    "ullucus_tuberosus": {
+      "nombre_comun": "Ulluco / Chugua",
+      "nombre_cientifico": "Ullucus tuberosus Caldas",
+      "nombres_comunes": [
+        "melloco",
+        "ruba",
+        "chugua",
+        "chigua"
+      ],
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "Nematodo agallador",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "physalis_angulata": {
+      "nombre_comun": "Uchuva silvestre / Topotopo",
+      "nombre_cientifico": "Physalis angulata L.",
+      "nombres_comunes": [
+        "topotopo"
+      ],
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "naturalizada"
+    },
+    "solanum_melongena": {
+      "nombre_comun": "Berenjena",
+      "nombre_cientifico": "Solanum melongena L.",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "allium_sativum"
+      ],
+      "antagonist_of": [
+        "solanum_phureja",
+        "solanum_tuberosum_sabanera"
+      ]
+    },
+    "zea_mays": {
+      "nombre_comun": "Maíz criollo",
+      "nombre_cientifico": "Zea mays L.",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "arracacia_xanthorrhiza",
+        "canavalia_ensiformis",
+        "chenopodium_quinoa",
+        "citrullus_lanatus",
+        "crotalaria_juncea",
+        "cucumis_sativus",
+        "cucurbita_maxima",
+        "cucurbita_moschata",
+        "helianthus_annuus",
+        "lupinus_mutabilis",
+        "manihot_esculenta",
+        "mucuna_pruriens",
+        "musa_paradisiaca",
+        "oxalis_tuberosa",
+        "passiflora_tarminiana",
+        "phaseolus_vulgaris",
+        "solanum_phureja",
+        "tropaeolum_tuberosum"
+      ],
+      "antagonist_of": [
+        "foeniculum_vulgare"
+      ],
+      "biopreparados": [
+        {
+          "id": "beauveria_bassiana",
+          "nombre": "Beauveria bassiana (hongo entomopatógeno)"
+        },
+        {
+          "id": "cebo_melaza_bt_cogollero",
+          "nombre": "Cebo casero de melaza + Bt para cogollo de maíz"
+        },
+        {
+          "id": "extracto_paraiso_melia",
+          "nombre": "Extracto/purín de paraíso (Melia azedarach)"
+        },
+        {
+          "id": "abono_verde_crotalaria",
+          "nombre": "Abono verde de crotalaria (Crotalaria spectabilis/juncea) supresor de nematodos"
+        },
+        {
+          "id": "cebo_hormiga_arriera",
+          "nombre": "Cebo tóxico-cultural para hormiga arriera (cítricos/sésamo/Trichoderma)"
+        },
+        {
+          "id": "trampa_feromona_cogollero",
+          "nombre": "Trampa de feromona sexual para cogollero / polilla"
+        },
+        {
+          "id": "extracto_chipaca_bidens",
+          "nombre": "Té/extracto de chipaca o guasca (Bidens pilosa) repelente"
+        },
+        {
+          "id": "micorrizas_arbusculares",
+          "nombre": "Micorrizas arbusculares (inoculante de HMA)"
+        },
+        {
+          "id": "te_gallinaza_compostada",
+          "nombre": "Té de gallinaza compostada (aireado)"
+        },
+        {
+          "id": "caldo_cola_caballo_ceniza_antiroya",
+          "nombre": "Caldo de cola de caballo + ceniza anti-roya (refuerzo silíceo)"
+        },
+        {
+          "id": "lactosuero_fermentado_foliar",
+          "nombre": "Lactosuero (suero de leche) fermentado foliar"
+        },
+        {
+          "id": "trichoderma_tratamiento_semilla",
+          "nombre": "Trichoderma para tratamiento de semilla (fríjol/papa/maíz)"
+        },
+        {
+          "id": "bacillus_thuringiensis_aizawai_cogollero",
+          "nombre": "Bacillus thuringiensis var. aizawai/kurstaki para cogollero"
+        },
+        {
+          "id": "metarhizium_anisopliae",
+          "nombre": "Metarhizium anisopliae (hongo entomopatógeno verde)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Tizón foliar del maíz por Helmintosporium",
+          "controladores": [
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Pudrición de la mazorca del maíz por Fusarium",
+          "controladores": [
+            "Trichoderma spp",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Gusano cogollero del maíz (y otras hortalizas)",
+          "controladores": [
+            "Telenomus remus",
+            "Hongo verde entomopatógeno",
+            "Bt (bacteria bioinsecticida)",
+            "Crisopa neotropical",
+            "Chinche depredador (podisus)",
+            "Avispita parasitoide de huevos",
+            "Cotesia marginiventris",
+            "Trichogramma spp",
+            "Parasitoide de control biológico",
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "cucarroncito de las hojas",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "gusano de la mazorca",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Crisopa neotropical",
+            "Chinche depredador (podisus)",
+            "Avispita parasitoide de huevos"
+          ]
+        },
+        {
+          "plaga": "spodoptera_frugiperda_cogollero",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Chinche depredador (podisus)",
+            "Avispita parasitoide de huevos"
+          ]
+        }
+      ]
+    },
+    "amaranthus_caudatus": {
+      "nombre_comun": "Amaranto",
+      "nombre_cientifico": "Amaranthus caudatus L.",
+      "nombres_comunes": [
+        "sangorache",
+        "bledo",
+        "kiwicha"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun"
+    },
+    "cucumis_melo": {
+      "nombre_comun": "Melón",
+      "nombre_cientifico": "Cucumis melo L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "Mildeo polvoso de las cucurbitáceas",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)"
+          ]
+        },
+        {
+          "plaga": "Mildeo velloso en cucurbitáceas",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "bemisia_tabaci",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatógeno (verticillium)",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Crisopa / león de áfidos",
+            "Crisopa neotropical",
+            "Ácaro depredador (amblyseius)",
+            "Parasitoide de mosca blanca (eretmocerus)",
+            "Avispita parasitoide de mosca blanca"
+          ]
+        },
+        {
+          "plaga": "phytophthora_capsici",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Nematodo agallador",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "vicia_faba": {
+      "nombre_comun": "Haba",
+      "nombre_cientifico": "Vicia faba L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "alnus_acuminata",
+        "avena_sativa"
+      ],
+      "biopreparados": [
+        {
+          "id": "inoculante_rhizobium_frijol",
+          "nombre": "Inoculante de Rhizobium para fríjol (fijación de nitrógeno)"
+        }
+      ]
+    },
+    "fragaria_vesca": {
+      "nombre_comun": "Fresa silvestre andina",
+      "nombre_cientifico": "Fragaria vesca L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre",
+      "compatible_with": [
+        "viola_tricolor"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Podredumbre gris (Botrytis)",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Mosca de alas manchadas",
+          "controladores": [
+            "Trichopria drosophilae",
+            "Parasitoide de control biológico"
+          ]
+        }
+      ]
+    },
+    "avena_sativa": {
+      "nombre_comun": "Avena forrajera",
+      "nombre_cientifico": "Avena sativa L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "vicia_faba"
+      ]
+    },
+    "bactris_gasipaes": {
+      "nombre_comun": "Chontaduro",
+      "nombre_cientifico": "Bactris gasipaes Kunth",
+      "nombres_comunes": [
+        "cachipay",
+        "pijuayo",
+        "pejibaye"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "VULNERABLE",
+      "conservation_status": "cultivo_comun"
+    },
+    "euterpe_oleracea": {
+      "nombre_comun": "Asai",
+      "nombre_cientifico": "Euterpe oleracea Mart.",
+      "nombres_comunes": [
+        "naidi",
+        "acai",
+        "murrapo"
+      ],
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun"
+    },
+    "cucurbita_moschata": {
+      "nombre_comun": "Ahuyama Amarilla",
+      "nombre_cientifico": "Cucurbita moschata Duchesne",
+      "nombres_comunes": [
+        "auyama"
+      ],
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "manihot_esculenta",
+        "phaseolus_vulgaris",
+        "solanum_tuberosum_sabanera",
+        "zea_mays"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Mildeo polvoso de las cucurbitáceas",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)"
+          ]
+        },
+        {
+          "plaga": "Mildeo velloso en cucurbitáceas",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Mosca blanca (complejo)",
+          "controladores": [
+            "Hongo entomopatogeno (Isaria/Cordyceps)",
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatógeno (verticillium)",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Crisopa / león de áfidos",
+            "Crisopa neotropical",
+            "Ácaro depredador (amblyseius)",
+            "Parasitoide de mosca blanca (eretmocerus)",
+            "Avispita parasitoide de mosca blanca",
+            "Encarsia spp",
+            "Parasitoide de control biológico",
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "bemisia_tabaci",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatógeno (verticillium)",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Crisopa / león de áfidos",
+            "Crisopa neotropical",
+            "Ácaro depredador (amblyseius)",
+            "Parasitoide de mosca blanca (eretmocerus)",
+            "Avispita parasitoide de mosca blanca"
+          ]
+        },
+        {
+          "plaga": "Gusano perforador de cucurbitaceas",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos",
+            "Trichogramma spp"
+          ]
+        }
+      ]
+    },
+    "pouteria_caimito": {
+      "nombre_comun": "Abiu",
+      "nombre_cientifico": "Pouteria caimito (Ruiz & Pav.) Radlk.",
+      "nombres_comunes": [
+        "abiu",
+        "caimito amazonico"
+      ],
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_silvestre"
+    },
+    "theobroma_grandiflorum": {
+      "nombre_comun": "Copoazú",
+      "nombre_cientifico": "Theobroma grandiflorum (Willd. ex Spreng.) K.Schum.",
+      "nombres_comunes": [
+        "copoazu",
+        "cupuacu",
+        "copoasu"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun"
+    },
+    "eriobotrya_japonica": {
+      "nombre_comun": "Níspero japonés",
+      "nombre_cientifico": "Eriobotrya japonica (Thunb.) Lindl.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "Mosca del Mediterráneo",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        }
+      ]
+    },
+    "albizia_guachapele": {
+      "nombre_comun": "Iguá hoja menuda",
+      "nombre_cientifico": "Albizia niopoides (Spruce ex Benth.) Burkart",
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_silvestre",
+      "compatible_with": [
+        "coffea_arabica",
+        "cordia_alliodora",
+        "gliricidia_sepium",
+        "tabebuia_rosea"
+      ]
+    },
+    "persea_americana": {
+      "nombre_comun": "Aguacate",
+      "nombre_cientifico": "Persea americana Mill.",
+      "nombres_comunes": [
+        "cura",
+        "palta",
+        "aguacatillo"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "arachis_pintoi",
+        "melicoccus_bijugatus",
+        "spondias_dulcis"
+      ],
+      "antagonist_of": [
+        "eucalyptus_globulus"
+      ],
+      "biopreparados": [
+        {
+          "id": "bacillus_subtilis_foliar",
+          "nombre": "Bacillus subtilis (aplicación foliar)"
+        },
+        {
+          "id": "caldo_bordeles",
+          "nombre": "Caldo bordelés"
+        },
+        {
+          "id": "bocashi",
+          "nombre": "Bocashi"
+        },
+        {
+          "id": "sal_epsom_foliar",
+          "nombre": "Sal de Epsom foliar (sulfato de magnesio)"
+        },
+        {
+          "id": "lechada_cal_troncos",
+          "nombre": "Lechada de cal (encalado de troncos)"
+        },
+        {
+          "id": "biol",
+          "nombre": "Biol"
+        },
+        {
+          "id": "supermagro",
+          "nombre": "Supermagro"
+        },
+        {
+          "id": "trichoderma_harzianum_suelo",
+          "nombre": "Trichoderma harzianum (aplicación al suelo)"
+        },
+        {
+          "id": "micorrizas_arbusculares",
+          "nombre": "Micorrizas arbusculares (inoculante de HMA)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Pudrición radicular del aguacate",
+          "controladores": [
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Hongo antagonista (trichoderma)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)",
+            "Trichoderma spp",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Mosca del aguacate",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Barrenador del fruto del aguacate",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos"
+          ]
+        },
+        {
+          "plaga": "Antracnosis del tomate de árbol",
+          "controladores": [
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "ácaro del café",
+          "controladores": [
+            "Ácaro depredador (neoseiulus)",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Escama roja de los cítricos y frutales",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Escama blanca del aguacate",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Trips del cacao",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Chinche pirata (orius)"
+          ]
+        },
+        {
+          "plaga": "Barrenador del aguacate",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
+          ]
+        },
+        {
+          "plaga": "chinche de la chamusquina",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno",
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "Pudrición peduncular del mango y aguacate",
+          "controladores": [
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Ácaro del aguacate",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Depredador de control biológico"
+          ]
+        },
+        {
+          "plaga": "Bicho de cesto o canasta (plaga de ornamentales y frutales)",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)"
+          ]
+        },
+        {
+          "plaga": "Comején de los árboles frutales",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        }
+      ]
+    },
+    "cucumis_sativus": {
+      "nombre_comun": "Pepino cohombro",
+      "nombre_cientifico": "Cucumis sativus L.",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "phaseolus_vulgaris",
+        "zea_mays"
+      ],
+      "antagonist_of": [
+        "solanum_lycopersicum_san_marzano",
+        "solanum_tuberosum_sabanera"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Mildeo polvoso de las cucurbitáceas",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)"
+          ]
+        },
+        {
+          "plaga": "Mildeo velloso en cucurbitáceas",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "bemisia_tabaci",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatógeno (verticillium)",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Crisopa / león de áfidos",
+            "Crisopa neotropical",
+            "Ácaro depredador (amblyseius)",
+            "Parasitoide de mosca blanca (eretmocerus)",
+            "Avispita parasitoide de mosca blanca"
+          ]
+        },
+        {
+          "plaga": "phytophthora_capsici",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Gusano perforador de cucurbitaceas",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)",
+            "Avispita parasitoide de huevos",
+            "Trichogramma spp"
+          ]
+        }
+      ]
+    },
+    "citrullus_lanatus": {
+      "nombre_comun": "Patilla / Sandía",
+      "nombre_cientifico": "Citrullus lanatus (Thunb.) Matsum. & Nakai",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "zea_mays"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Mildeo polvoso de las cucurbitáceas",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Bacteria antagonista (biofungicida)"
+          ]
+        },
+        {
+          "plaga": "Mildeo velloso en cucurbitáceas",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "bemisia_tabaci",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatógeno (verticillium)",
+            "Hongo entomopatógeno (paecilomyces)",
+            "Crisopa / león de áfidos",
+            "Crisopa neotropical",
+            "Ácaro depredador (amblyseius)",
+            "Parasitoide de mosca blanca (eretmocerus)",
+            "Avispita parasitoide de mosca blanca"
+          ]
+        },
+        {
+          "plaga": "Nematodo agallador",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "raphanus_sativus_niger": {
+      "nombre_comun": "Rábano blanco / Rábano picante",
+      "nombre_cientifico": "Raphanus sativus var. niger (DC.) G.J.Hagen",
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "daucus_carota_subsp_sativus",
+        "lactuca_sativa_capitata"
+      ]
+    },
+    "psidium_guajava": {
+      "nombre_comun": "Guayaba",
+      "nombre_cientifico": "Psidium guajava L.",
+      "establishment_means": "introducido",
+      "threat_status": "LEAST_CONCERN",
+      "compatible_with": [
+        "eugenia_uniflora"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Mosca del Mediterráneo",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Mosca de la fruta (Anastrepha spp.)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "mosca sudamericana de la fruta",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Picudo de la guayaba",
+          "controladores": [
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "Cochinilla rosada del hibisco",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        }
+      ]
+    },
+    "citrus_reticulata": {
+      "nombre_comun": "Mandarina",
+      "nombre_cientifico": "Citrus reticulata Blanco",
+      "nombres_comunes": [
+        "mandarino"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "cultivo_comun",
+      "biopreparados": [
+        {
+          "id": "trampa_melaza_atrayente",
+          "nombre": "Trampa de melaza (cebo atrayente líquido)"
+        },
+        {
+          "id": "sal_epsom_foliar",
+          "nombre": "Sal de Epsom foliar (sulfato de magnesio)"
+        },
+        {
+          "id": "emulsion_nim",
+          "nombre": "Aceite/emulsión de nim (neem)"
+        },
+        {
+          "id": "aceite_jabon_anticochinilla",
+          "nombre": "Aceite mineral/vegetal + jabón (anti-cochinilla y escamas)"
+        },
+        {
+          "id": "lechada_cal_troncos",
+          "nombre": "Lechada de cal (encalado de troncos)"
+        },
+        {
+          "id": "caldo_ceniza_jabon_concentrado",
+          "nombre": "Caldo ceniza-jabón concentrado (anti-minador/cochinilla)"
+        }
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Psílido asiático de los cítricos",
+          "controladores": [
+            "Hongo entomopatógeno (paecilomyces)",
+            "Mariquita roja",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo entomopatogeno (Isaria/Cordyceps)",
+            "Hongo verde entomopatógeno"
+          ]
+        },
+        {
+          "plaga": "Huanglongbing (HLB) / dragón amarillo de los cítricos",
+          "controladores": [
+            "Mariquita roja"
+          ]
+        },
+        {
+          "plaga": "Mosca del Mediterráneo",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Picudo de los cítricos / barrenador",
+          "controladores": [
+            "Nematodos entomopatógenos (Steinernema carpocapsae)",
+            "Nematodos entomopatógenos (Steinernema feltiae)",
+            "Nematodos entomopatógenos (Heterorhabditis bacteriophora)"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Minador de la hoja de cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Piojo blanco o coma de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Ácaro tostador de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro rojo de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "mosca sudamericana de la fruta",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla harinosa de los cítricos",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Nematodo espiral del café y frutales",
+          "controladores": [
+            "Hongo nematófago (paecilomyces)",
+            "Hongo antagonista del suelo"
+          ]
+        },
+        {
+          "plaga": "Mosca blanca algodonosa de los cítricos",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Leprosis de los cítricos (ácaro vector)",
+          "controladores": [
+            "Depredador de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Escama roja de los cítricos y frutales",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Cochinilla rosada del hibisco",
+          "controladores": [
+            "Mariquita destructora de cochinillas",
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Cochinilla acanalada de los cítricos",
+          "controladores": [
+            "Depredador de control biológico",
+            "Mariquita destructora de cochinillas"
+          ]
+        },
+        {
+          "plaga": "Áfido pardo de los cítricos (vector de la tristeza)",
+          "controladores": [
+            "Parasitoide de control biológico",
+            "Hongo entomopatógeno (beauveria)",
+            "Mariquita roja"
+          ]
+        },
+        {
+          "plaga": "Escama blanca del aguacate",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Escama verde de los cítricos",
+          "controladores": [
+            "Hongo entomopatógeno (verticillium)"
+          ]
+        },
+        {
+          "plaga": "Mancha negra de los cítricos",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Alternaria del fruto del cítrico",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        },
+        {
+          "plaga": "Pudrición peduncular del mango y aguacate",
+          "controladores": [
+            "Hongo antagonista (trichoderma)"
+          ]
+        },
+        {
+          "plaga": "Bicho de cesto o canasta (plaga de ornamentales y frutales)",
+          "controladores": [
+            "Bt (bacteria bioinsecticida)"
+          ]
+        },
+        {
+          "plaga": "Comején de los árboles frutales",
+          "controladores": [
+            "Hongo verde entomopatógeno",
+            "Hongo entomopatógeno (beauveria)"
+          ]
+        },
+        {
+          "plaga": "Ácaro blanco tropical",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Ácaro depredador (neoseiulus)"
+          ]
+        },
+        {
+          "plaga": "Nemátodo de los cítricos (decaimiento lento)",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)"
+          ]
+        },
+        {
+          "plaga": "Hormiga arriera (zompopa)",
+          "controladores": [
+            "Hongo entomopatógeno (beauveria)",
+            "Hongo verde entomopatógeno"
+          ]
+        }
+      ]
+    },
+    "dioscorea_rotundata": {
+      "nombre_comun": "Ñame blanco africano",
+      "nombre_cientifico": "Dioscorea rotundata Poir.",
+      "nombres_comunes": [
+        "name espino",
+        "ñame blanco"
+      ],
+      "conservation_status": "naturalizada",
+      "pest_controllers": [
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "dioscorea_alata": {
+      "nombre_comun": "Ñame blanco",
+      "nombre_cientifico": "Dioscorea alata L.",
+      "nombres_comunes": [
+        "name criollo",
+        "name diamante"
+      ],
+      "establishment_means": "introducido",
+      "conservation_status": "cultivo_comun",
+      "pest_controllers": [
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "carica_papaya": {
+      "nombre_comun": "Papaya",
+      "nombre_cientifico": "Carica papaya L.",
+      "nombres_comunes": [
+        "papayo",
+        "mamon (papaya)"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "DATA_DEFICIENT",
+      "conservation_status": "cultivo_comun",
+      "compatible_with": [
+        "borojoa_sorbilis",
+        "mammea_americana",
+        "melicoccus_bijugatus",
+        "spondias_dulcis"
+      ],
+      "pest_controllers": [
+        {
+          "plaga": "Nematodo agallador",
+          "controladores": [
+            "Microorganismo de control biológico (DR-MIP-1)",
+            "Hongo antagonista del suelo",
+            "Hongo nematófago (paecilomyces)",
+            "Trichoderma spp",
+            "Pochonia chlamydosporia"
+          ]
+        },
+        {
+          "plaga": "Mosca de la fruta de la papaya",
+          "controladores": [
+            "Parasitoide de control biológico"
+          ]
+        },
+        {
+          "plaga": "Antracnosis de frutales",
+          "controladores": [
+            "Hongo antagonista del suelo",
+            "Trichoderma spp",
+            "Bacteria antagonista (biofungicida)",
+            "Microorganismo de control biológico (DR-MIP-1)"
+          ]
+        }
+      ]
+    },
+    "ochroma_pyramidale": {
+      "nombre_comun": "Balso",
+      "nombre_cientifico": "Ochroma pyramidale (Cav. ex Lam.) Urb.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "guazuma_ulmifolia": {
+      "nombre_comun": "Guácimo",
+      "nombre_cientifico": "Guazuma ulmifolia Lam.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "trichanthera_gigantea": {
+      "nombre_comun": "Nacedero",
+      "nombre_cientifico": "Trichanthera gigantea (Bonpl.) Nees",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "guadua_angustifolia": {
+      "nombre_comun": "Guadua",
+      "nombre_cientifico": "Guadua angustifolia Kunth",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "cedrela_odorata": {
+      "nombre_comun": "Cedro",
+      "nombre_cientifico": "Cedrela odorata L.",
+      "establishment_means": "nativo",
+      "threat_status": "VULNERABLE",
+      "conservation_status": "nativo_protegido"
+    },
+    "anacardium_excelsum": {
+      "nombre_comun": "Caracolí",
+      "nombre_cientifico": "Anacardium excelsum (Bertero & Balb. ex Kunth) Skeels",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "ceiba_pentandra": {
+      "nombre_comun": "Ceiba",
+      "nombre_cientifico": "Ceiba pentandra (L.) Gaertn.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "baccharis_latifolia": {
+      "nombre_comun": "Chilco",
+      "nombre_cientifico": "Baccharis latifolia (Ruiz & Pav.) Pers.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "myrcianthes_leucoxyla": {
+      "nombre_comun": "Arrayán",
+      "nombre_cientifico": "Myrcianthes leucoxyla (Ortega) McVaugh",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_protegido"
+    },
+    "morella_pubescens": {
+      "nombre_comun": "Laurel de cera",
+      "nombre_cientifico": "Morella pubescens (Humb. & Bonpl. ex Willd.) Wilbur",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "cedrela_montana": {
+      "nombre_comun": "Cedro andino",
+      "nombre_cientifico": "Cedrela montana Moritz ex Turcz.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_protegido"
+    },
+    "juglans_neotropica": {
+      "nombre_comun": "Nogal",
+      "nombre_cientifico": "Juglans neotropica Diels",
+      "establishment_means": "nativo",
+      "threat_status": "ENDANGERED",
+      "conservation_status": "nativo_protegido"
+    },
+    "hesperomeles_goudotiana": {
+      "nombre_comun": "Mortiño",
+      "nombre_cientifico": "Hesperomeles goudotiana (Decne.) Killip",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "polylepis_quadrijuga": {
+      "nombre_comun": "Polylepis / Colorado",
+      "nombre_cientifico": "Polylepis quadrijuga Bitter",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_protegido"
+    },
+    "ceroxylon_quindiuense": {
+      "nombre_comun": "Palma de cera del Quindío",
+      "nombre_cientifico": "Ceroxylon quindiuense (H.Karst.) H.Wendl.",
+      "establishment_means": "nativo",
+      "threat_status": "ENDANGERED",
+      "conservation_status": "nativo_protegido"
+    },
+    "diplostephium_rosmarinifolium": {
+      "nombre_comun": "Romero de páramo",
+      "nombre_cientifico": "Diplostephium rosmarinifolium (Benth.) Wedd.",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "hypericum_juniperinum": {
+      "nombre_comun": "Chite",
+      "nombre_cientifico": "Hypericum juniperinum Kunth",
+      "establishment_means": "nativo",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "nativo_silvestre"
+    },
+    "espeletia_grandiflora": {
+      "nombre_comun": "Frailejón",
+      "nombre_cientifico": "Espeletia grandiflora Humb. & Bonpl.",
+      "establishment_means": "nativo",
+      "threat_status": "LEAST_CONCERN",
+      "conservation_status": "nativo_protegido"
+    },
+    "genista_monspessulana": {
+      "nombre_comun": "Retamo liso",
+      "nombre_cientifico": "Genista monspessulana (L.) L.A.S.Johnson",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "invasor"
+    },
+    "thunbergia_alata": {
+      "nombre_comun": "Ojo de poeta",
+      "nombre_cientifico": "Thunbergia alata Bojer ex Sims",
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "invasor"
+    },
+    "cenchrus_clandestinus": {
+      "nombre_comun": "Kikuyo",
+      "nombre_cientifico": "Cenchrus clandestinus (Hochst. ex Chiov.) Morrone",
+      "nombres_comunes": [
+        "pasto kikuyo"
+      ],
+      "establishment_means": "introducido",
+      "threat_status": "NOT_EVALUATED",
+      "conservation_status": "invasor"
+    }
+  }
+}

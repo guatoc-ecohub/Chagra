@@ -1,0 +1,94 @@
+{
+  "species_slug": "oreopanax_incisus",
+  "scientific_name": "Oreopanax incisus (Willd. ex Roem. & Schult.) Decne. & Planch.",
+  "common_names": [
+    "Mano de oso de páramo bajo"
+  ],
+  "family": "Araliaceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "pollinator_attractor",
+    "biomass_producer"
+  ],
+  "antagonists": [
+    "eucalyptus_globulus",
+    "pinus_patula"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Propagación por semilla fresca de drupas maduras negras, despulpadas y sembradas inmediatamente en sustrato turba-arena con sombra parcial 50%. Germinación 60-120 días. Trasplante 6-8 meses. Plantación 18-24 meses. Esqueje semileñoso con AIB (enraizamiento 30-50%). Crecimiento lento-moderado 30-50 cm/año.",
+    "tiempo_a_establecimiento_dias": 600,
+    "notas": "Especie típica de la franja de transición bosque alto andino — subpáramo (2800-3400 msnm). Sus hojas grandes palmatilobadas son reconocibles 'desde lejos' — silueta inconfundible en el dosel andino."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 2000,
+      "optimo_min": 2400,
+      "optimo_max": 3100,
+      "max_absoluto": 3400
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 6,
+      "optimo_max": 14,
+      "max_tolerable": 20
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Oreopanax incisus (Willd. ex Roem. & Schult.) Decne. & Planch. (mano de oso, pata de gallina arbórea, mano de león — familia Araliaceae) es un árbol perennifolio (8-20 m altura) nativo de los Andes (Colombia, Ecuador, Venezuela, Perú), distribuido en bosque alto andino y subpáramo entre 2000 y 3400 msnm en piso térmico FRÍO con tolerancia a heladas leves. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander. El género Oreopanax es endemismo neotropical-andino con varias especies hermanas en Colombia (O. incisus, O. floribundus, O. capitatus, O. cundinamarcensis) — todas reconocibles por sus HOJAS GRANDES PALMATILOBADAS-INCISAS de 15-30 cm de diámetro que recuerdan vagamente la 'mano de un oso' o la 'pata de una gallina gigante' (de ahí los nombres populares). Las hojas dispuestas alternas en ramas gruesas y la INFLORESCENCIA TERMINAL PANICULADA DE UMBELAS (rasgo típico de Araliaceae junto con ginseng, hiedra y aralia) producen abundantes drupas pequeñas negras muy buscadas por avifauna alto-andina, tucanetas esmeralda, mirlas patiblancas y atrapamoscas. Lección viva sobre BOTÁNICA DE ARALIACEAE NEOTROPICALES, FRANJA DE TRANSICIÓN BOSQUE-PÁRAMO y RESTAURACIÓN ECOTONAL: el mano de oso es ESPECIE TÍPICA DE ECOTONO — la franja de transición entre el bosque alto andino y el subpáramo (2800-3400 msnm) en la Cordillera Oriental colombiana es uno de los ecotonos más biodiversos del país, y O. incisus es indicador estructural de ese ecotono. En restauración de Cruz Verde-Sumapaz, Chingaza, Iguaque y Guerrero, el mano de oso se planta en la FRANJA SUPERIOR (2800-3400 msnm) donde otras especies de bosque alto andino ya no prosperan, junto con queñoa (Polylepis quadrijuga), encenillo, gaque y mortiño — formando un mosaico estructural de bosque enano subpáramo que es resistente a heladas, retiene agua de niebla y protege la cabecera de cuenca. Etnobotánica: hojas grandes usadas como envolventes para envueltos de masa en pueblos campesinos del altiplano cundiboyacense (tradición pre-hojas de plátano en el frío); corteza astringente en cocimientos antidiarreicos. Manejo agroecológico: propagación por semilla fresca con sombra parcial; trasplante 6-8 meses; plantación 18-24 meses; crecimiento 30-50 cm/año; asocio con queñoa, encenillo y mortiño en restauración ecotonal; densidades 200-400 ind/ha; protección anti-heladas con mulch grueso el primer año. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, JBB Plantas Medicinales.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- clusia_multiflora — Gaque (Clusia multiflora Kunth)\n- hesperomeles_goudotiana — Esmeralda chiquita (Hesperomeles goudotiana (Decne.) Killip)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- eucalyptus_globulus — Eucalipto blanco (Eucalyptus globulus Labill.)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.402Z"
+}

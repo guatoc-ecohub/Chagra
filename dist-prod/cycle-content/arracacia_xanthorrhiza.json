@@ -1,0 +1,58 @@
+{
+  "species_slug": "arracacia_xanthorrhiza",
+  "scientific_name": "Arracacia xanthorrhiza Bancr.",
+  "common_names": [
+    "Arracacha / Zanahoria blanca"
+  ],
+  "family": "Apiaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "hijuelos (cornos)",
+    "notas": "Se propaga vegetativamente mediante cornos (hijuelos de la corona). Ciclo largo (10-12 meses). Raiz muy perecedera post-cosecha."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 1800,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 13,
+      "optimo_max": 20,
+      "max_tolerable": 25
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La arracacha o zanahoria blanca (Arracacia xanthorrhiza Bancr., familia Apiaceae) es una apiácea perenne herbácea cultivada como tubérculo andino por excelencia de la chagra muisca colombiana, producida tradicionalmente por comunidades campesinas de Boyacá, Cundinamarca y Cauca por sus raíces tuberosas amarillo-pálidas a crema de textura suave, alta digestibilidad y bajo contenido de antinutrientes, recomendadas en dietas de destete infantil tradicional. Se cultiva en Boyacá (Sutamarchán, Tunja, Saboyá, Cucaita), Cundinamarca (Sumapaz, Pacho, Subachoque), Cauca (Silvia, Totoró), Nariño (Pasto, Yacuanquer) y Eje cafetero entre 1.500 y 2.800 msnm en zona térmica templada a fría. Ciclo largo 10-14 meses a cosecha, requiere paciencia y planificación de la chagra. Rendimientos 8-15 t/ha raíz fresca. Lección viva: enseña el manejo de cultivos de ciclo largo (vs hortalizas de ciclo corto 90-120 días), raíces de alta digestibilidad para alimentación infantil y adultos mayores, y valor económico campesino como cultivo comercial estable. Manejo agroecológico: siembra por hijuelos del cuello (propágulo vegetativo) en hoyos profundos 30 cm con compost al fondo, asocio con maíz y fríjol, aporque a los 4 meses, cosecha cuando follaje amarillea, almacenamiento en pozo fresco hasta 60 días. Fuentes Tier A: NRC 1989 Lost Crops of the Incas, AGROSAVIA Manual Tubérculos Andinos, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+  "sources": [
+    {
+      "id": "agrosavia-manual-tuberculos-andinos-2017",
+      "title": "agrosavia-manual-tuberculos-andinos-2017",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.369Z"
+}

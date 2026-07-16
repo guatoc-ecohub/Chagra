@@ -37,39 +37,46 @@ import { persist, createJSONStorage } from 'zustand/middleware';
  * store. Consumir `selected` (string) y derivar el resto vía helpers puros
  * que retornan refs estables del catálogo congelado.
  */
+/*
+ * Fondos = GRADIENTES andinos (sin foto). Las 4 fotos biopunk (fondo-biopunk-1..4.jpg)
+ * se archivaron 2026-07-16: TODAS traían un oso de anteojos AI-realista que el operador
+ * rechazó ("archiva el oso feo, no lo quiero ver en ningún lado") y que además chocaba
+ * con el estilo rubber-hose/3D de la app. Estos gradientes son livianos, congruentes con
+ * la paleta del valle, y no tienen fauna realista. `src` es un valor CSS `*-gradient(...)`
+ * (los consumidores lo detectan con `esGradiente()` y lo usan tal cual, sin `url()`).
+ */
 export const BACKGROUND_CATALOG = Object.freeze([
   Object.freeze({
-    id: 'biopunk-1',
-    label: 'Páramo completo',
-    sub: 'Oso, cóndor, colibrí, frailejones',
-    src: '/fondo-biopunk-1.jpg',
+    id: 'valle-calido',
+    label: 'Valle cálido',
+    sub: 'Amanecer andino, verde y tierra',
+    src: 'radial-gradient(120% 95% at 50% 12%, #3a4a24 0%, #263318 45%, #141d0d 100%)',
   }),
   Object.freeze({
-    id: 'biopunk-2',
-    label: 'Colibrí tech',
-    sub: 'Esfera polinizadora hexagonal',
-    src: '/fondo-biopunk-2.jpg',
+    id: 'paramo-frio',
+    label: 'Páramo frío',
+    sub: 'Niebla plateada de altura',
+    src: 'linear-gradient(165deg, #1a2530 0%, #26343c 45%, #33454a 100%)',
   }),
   Object.freeze({
-    id: 'biopunk-3',
-    label: 'Bosque ilustrado',
-    sub: 'Osos, armadillo, quetzal, raíces',
-    src: '/fondo-biopunk-3.jpg',
-  }),
-  Object.freeze({
-    id: 'biopunk-4',
-    label: 'Cosecha mística',
-    sub: 'Maíz raíces, colibrí en orbe, jaguar',
-    src: '/fondo-biopunk-4.jpg',
+    id: 'noche-andina',
+    label: 'Noche andina',
+    sub: 'Índigo con luz de luna',
+    src: 'radial-gradient(120% 95% at 50% 22%, #1c2445 0%, #0f1530 60%, #070a16 100%)',
   }),
 ]);
+
+/** ¿El valor de fondo es un gradiente CSS (vs una ruta de imagen)? */
+export function esGradiente(v) {
+  return typeof v === 'string' && /-gradient\(/.test(v);
+}
 
 /**
  * Id del fondo por defecto universal — "Páramo completo" (biopunk-1).
  * Decisión operador 2026-06-06. Cualquier id desconocido o localStorage
  * legado con el viejo 'default' (Clásico, ya eliminado) resuelve acá.
  */
-export const DEFAULT_BACKGROUND_ID = 'biopunk-1';
+export const DEFAULT_BACKGROUND_ID = 'valle-calido';
 
 /**
  * Fondo por defecto de TODA la app y el login — "Páramo completo" (biopunk-1).
@@ -77,7 +84,7 @@ export const DEFAULT_BACKGROUND_ID = 'biopunk-1';
  * que no haya elegido explícitamente otro fondo (incluido login/incógnito) lo ve.
  * (Antes existía '/biodiversidad-bg.jpg', el "fondo Clásico" que el operador eliminó.)
  */
-export const DEFAULT_BACKGROUND_SRC = '/fondo-biopunk-1.jpg';
+export const DEFAULT_BACKGROUND_SRC = 'radial-gradient(120% 95% at 50% 12%, #3a4a24 0%, #263318 45%, #141d0d 100%)';
 
 /** Entrada del catálogo del fondo por defecto (ref estable congelada). */
 const DEFAULT_BACKGROUND_ENTRY = Object.freeze(

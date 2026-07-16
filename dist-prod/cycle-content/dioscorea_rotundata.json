@@ -1,0 +1,88 @@
+{
+  "species_slug": "dioscorea_rotundata",
+  "scientific_name": "Dioscorea rotundata Poir.",
+  "common_names": [
+    "Ñame blanco africano"
+  ],
+  "family": "Dioscoreaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "tuberculo"
+    ],
+    "best_method": "tuberculo",
+    "protocol_resumen": "Propagación por trozos de tubérculo (semilla-tubérculo) de 100-300 g con yemas viables, siembra en hoyos profundos 30-40 cm con compost al fondo, distancia 1 x 1 m, requiere tutorado obligatorio en espaldera 2-3 m. Ciclo 8-10 meses cosecha tubérculo único grande. Rendimiento 10-25 t/ha.",
+    "tiempo_a_establecimiento_dias": 30,
+    "notas": "Dioscoreácea trepadora vigorosa con tallos CILÍNDRICOS lisos sin alas (diferencia clave con D. alata que tiene tallos cuadrangulares alados). Tubérculo único cilíndrico-irregular grande (2-15 kg) pulpa blanca harinosa. Naturalizado Caribe colombiano siglos XVII-XX como cultivo afrocolombiano patrimonial.",
+    "fuente": "AGROSAVIA Manual Tubérculos Andinos 2017; POWO Kew Dioscorea rotundata; NRC 1996 Lost Crops Africa Vol III"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 600,
+      "max_absoluto": 1000
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 24,
+      "optimo_max": 30,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El ñame blanco africano (Dioscorea rotundata Poir., familia Dioscoreaceae) es una dioscoreácea herbácea perenne trepadora vigorosa originaria del África Occidental tropical (cinturón ñamero — Nigeria, Ghana, Costa de Marfil, Benín, Togo, Camerún del sur, Sierra Leona — el llamado 'Yam Belt' o cinturón del ñame africano que produce el 95% del ñame mundial) donde fue domesticada hace ~7000 años por pueblos bantúes-Niger-Congo y constituye cultivo de base alimentaria de >70 millones de africanos occidentales. Introducida masivamente en el Caribe americano durante el comercio transatlántico de esclavos (siglos XVI-XIX) como cultivo de subsistencia de poblaciones afroamericanas esclavizadas, naturalizada profundamente en el Caribe colombiano donde se ha cultivado por casi 4 siglos como base alimentaria afrocaribeña — patrimonio agroecológico-cultural afrocolombiano fundamental. Se cultiva tradicionalmente en Caribe colombiano (Córdoba — Montería, Ciénaga de Oro, San Bernardo del Viento, Lorica, Tierralta; Sucre — Sincelejo, Sampués, San Onofre, Tolú, Corozal; Bolívar — María La Baja, San Juan Nepomuceno, San Jacinto, El Carmen de Bolívar — DENOMINACIÓN DE ORIGEN para ñame Montes de María; Magdalena — Plato, Pivijay, Sitionuevo; Cesar — Valledupar, San Diego; La Guajira — Riohacha sur), Antioquia (Urabá — Apartadó, Turbo, Chigorodó; Bajo Cauca — Caucasia, El Bagre) y Chocó (Quibdó, Bajo Baudó) entre 0 y 1.000 msnm en zonas térmicas cálidas húmedas-bimodales. Lección viva PEDAGÓGICAMENTE EXCELENTE de cultivo afrocolombiano patrimonial diasporán de seguridad alimentaria: enseña a niñas y niños las raíces históricas del 'Triángulo Atlántico' (África-Caribe-América) en cultivos alimentarios diaspóranos, la importancia de los Montes de María como zona ñamera de denominación de origen colombiana, y la nutrición del ñame como carbohidrato de bajo índice glicémico (IG 51, almidón resistente prebiótico) base de la dieta sancocho-mote-pasteles-pasabocas costeñas. Diferencia diagnóstica taxonómica clave con D. alata (ñame blanco asiático): D. rotundata tiene tallos CILÍNDRICOS lisos sin alas (D. alata tiene tallos cuadrangulares-alados característicos), foliolos cordiformes-acuminados (D. alata sagitados-cordados), tubérculo único cilíndrico-irregular vertical 2-15 kg con pulpa blanca harinosa firme (D. alata produce 1-3 tubérculos irregulares pulpa blanca-violácea), ciclo 9-11 meses (D. alata 8-10 meses), preferencia por sabanas africanas con estación seca marcada (D. alata por trópicos húmedos asiáticos sin estación seca pronunciada). Planta trepadora vigorosa con tallos cilíndricos lisos verdes a marrones espinescentes en la base, hojas cordiformes-acuminadas alternas grandes (8-20 cm) verde oscuras brillantes, inflorescencias en espigas axilares pequeñas (planta dioica — flores masculinas y femeninas separadas en plantas distintas), frutos cápsulas trialadas (rara vez forma fruto en cultivo — predomina propagación vegetativa por tubérculo-semilla), tubérculo subterráneo único cilíndrico-irregular vertical (2-15 kg, hasta 30 kg en variedades gigantes africanas) corteza marrón-negruzca rugosa con pulpa blanca-cremosa harinosa firme rica en almidón (70-78% peso seco), proteínas (6-8%), fibra (3-5%), minerales K-Mg-Ca-P-Fe, vitaminas C-B6, polisacáridos mucilaginosos digestivos. Manejo agroecológico afrocaribeño tradicional: propagación por trozos de tubérculo-semilla 100-300 g con yemas viables o tubérculos pequeños enteros, siembra en hoyos profundos 30-40 cm con compost-bocashi al fondo, distancia 1 m x 1 m (10000 plantas/ha), requiere tutorado obligatorio en espaldera 2-3 m de altura o tutor vivo con guadua o caña brava (tradicional Montes de María) o tutorado vivo con yuca-plátano, asocio tradicional milpa caribeña con maíz-yuca-plátano-ñame en sistema multiestrato afrocolombiano, control biológico de antracnosis Colletotrichum gloeosporioides con podas sanitarias + rotación 3-4 años + caldo bordelés moderado, control de cochinillas Pseudococcidae con sulfocálcico-jabón potásico, cosecha por arranque manual a los 8-10 meses cuando hojas amarillean, almacenamiento post-cosecha en pilas ventiladas a la sombra 4-6 meses sin refrigeración. Rendimientos 10-25 t/ha tubérculo según variedad y manejo (Montes de María registra hasta 30 t/ha en cultivares élite). Función en chagra/huerto escolar afrocaribeño como TUBÉRCULO BASE DE LA SEGURIDAD ALIMENTARIA AFROCOLOMBIANA, cultivo patrimonial diaspórico africano-caribeño, ground cover trepador, sistema productivo tradicional Montes de María (denominación de origen colombiana), lección viva del Triángulo Atlántico de cultivos diaspórinos, soberanía alimentaria comunidades afrodescendientes. Fuentes Tier A: AGROSAVIA Manual Tubérculos Andinos 2017, NRC 1996 Lost Crops Africa Vol III, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-manual-tuberculos-andinos-2017",
+      "title": "agrosavia-manual-tuberculos-andinos-2017",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.398Z"
+}

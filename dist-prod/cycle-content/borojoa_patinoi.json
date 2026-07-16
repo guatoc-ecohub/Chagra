@@ -1,0 +1,69 @@
+{
+  "species_slug": "borojoa_patinoi",
+  "scientific_name": "Borojoa patinoi Cuatrec.",
+  "common_names": [
+    "Borojó"
+  ],
+  "family": "Rubiaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "endemica_colombia",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Fruto globoso de pulpa cremosa; requiere sombra parcial en establecimiento. Frutación entre 3-5 años post-siembra."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 800,
+      "max_absoluto": 1000
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 24,
+      "optimo_max": 28,
+      "max_tolerable": 32
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El borojó (Borojoa patinoi Cuatrec.) es una especie endémica del Pacífico Chocó colombiano, distribuida principalmente en los departamentos de Chocó, Valle del Cauca y Nariño, entre 0 y 1000 msnm en zonas térmicas cálidas con alta humedad relativa (bosque pluvial tropical). Su manejo agronómico incluye propagación por semillas recolectadas de frutos maduros, con requiereniento de sombra parcial durante el establecimiento, ciclo productivo de 3-5 años desde siembra hasta primera fructificación, y asociaciones beneficiosas con otras especies del bosque pluvial como palmas y heliconias. En el contexto cultural de las comunidades afrocolombianas del Pacífico, el borojó se utiliza tradicionalmente en preparaciones de jugos, batidos y dulces por su alto contenido de azúcares naturales y propiedades nutricionales. Según el catálogo de plantas de Colombia de Bernal et al. (2015) y la base de datos del Sistema de Información sobre Biodiversidad de Colombia (SiB Colombia), esta especie está confirmada como endémica del Chocó biogeográfico. Las fuentes taxonómicas verificadas GBIF Backbone Taxonomy y Plants of the World Online (POWO) confirman su nombre científico válido Borojoa patinoi Cuatrec., descrito por el botánico José Cuatrecasas.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.379Z"
+}

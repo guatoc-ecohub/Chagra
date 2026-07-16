@@ -1,0 +1,83 @@
+{
+  "species_slug": "phaseolus_vulgaris_bola_roja",
+  "scientific_name": "Phaseolus vulgaris L. cv. 'Bola Roja'",
+  "common_names": [
+    "Fríjol Bola Roja"
+  ],
+  "family": "Fabaceae",
+  "category": "granos_legumbres",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "nitrogen_fixer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Variedad nativa cundiboyacense voluble (trepadora), grano grande esférico color rojo brillante. Ciclo 5-7 meses. Siembra asociada con maíz capio que sirve de soporte natural. Fija nitrógeno atmosférico (Rhizobium leguminosarum) en simbiosis radicular, aporta 40-80 kg N/ha/ciclo al sistema."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2200,
+      "optimo_max": 2800,
+      "max_absoluto": 3100
+    },
+    "temperatura_c": {
+      "helada_letal": -1,
+      "optimo_min": 12,
+      "optimo_max": 20,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El fríjol bola roja (Phaseolus vulgaris L. cv. 'Bola Roja') es una variedad nativa cundiboyacense del altiplano andino colombiano, voluble (trepadora) de grano grande esférico color rojo brillante. Se cultiva por pequeños productores y campesinas tradicionales en Boyacá (Tunja, Ventaquemada, Ramiriquí, Tibasosa, Toca), Cundinamarca (Subachoque, Pacho, Une, Choachí) y zonas templadas de Nariño y Cauca entre 2.200 y 2.800 msnm. Su carácter voluble (trepa por tutor) lo hace pareja ideal del maíz capio en el policultivo 'tres hermanas' altoandino: el maíz da soporte vertical, el fríjol fija nitrógeno atmosférico vía simbiosis con Rhizobium leguminosarum (40-80 kg N/ha/ciclo), y la ahuyama de altura (Cucurbita maxima) o el cubio (Tropaeolum tuberosum) cubren el suelo. Es lección viva de la lógica policultivo prehispánica: el bola roja no es solo grano, es servicio ecosistémico de fertilidad del suelo, dependiente de la presencia del maíz como soporte (sin él se enreda en sí mismo y reduce producción). Grano apreciado para sopas espesas (sopa de mute boyacense, mazamorra de fríjol), guisos campesinos, fríjoles antioqueños 'paisas' (bandeja paisa), conserva seca tradicional. Comparado con variedades arbustivas comerciales (ICA Caraota), el bola roja conserva mejor sabor y textura mantecosa al cocinarse pero requiere más tiempo de cocción (45-90 min con remojo previo). Manejo agroecológico: siembra simultánea con maíz capio al inicio de lluvias mayores; 2-3 granos por hoyo a 20 cm del tallo del maíz; abono orgánico al surco (compost o bocashi); biopreparados: caldo sulfocalcio contra antracnosis (Colletotrichum lindemuthianum), trichoderma al inicio. Cosecha en seco a los 5-7 meses, vainas marchitadas; desvainado manual; conservación con ceniza de leña o piedras de cal en frasco hermético. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, Pérez Arbeláez 1947, NRC 1989 Cultivos Andinos, Pérez-Rodríguez-Gómez 2008, GBIF Backbone, POWO Kew.",
+  "sources": [
+    {
+      "id": "agrosavia-leguminosas-andinas",
+      "title": "agrosavia-leguminosas-andinas",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-rodriguez-gomez-2008",
+      "title": "perez-rodriguez-gomez-2008",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.382Z"
+}

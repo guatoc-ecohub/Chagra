@@ -1,0 +1,94 @@
+{
+  "species_slug": "ilex_kunthiana",
+  "scientific_name": "Ilex kunthiana Triana",
+  "common_names": [
+    "Palo de zorro"
+  ],
+  "family": "Aquifoliaceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "nurse_plant",
+    "biomass_producer"
+  ],
+  "antagonists": [
+    "eucalyptus_globulus",
+    "pinus_patula"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Propagación por semilla fresca de drupas maduras rojo-violáceas, despulpadas y sometidas a estratificación fría 4°C por 60-90 días para romper dormancia. Germinación 90-180 días en sustrato turba-arena. Trasplante 6-8 meses. Plantación 18-24 meses. Esqueje semileñoso con AIB (enraizamiento 30-50%). Crecimiento lento 25-40 cm/año.",
+    "tiempo_a_establecimiento_dias": 600,
+    "notas": "Especie DIOICA — requiere plantar ejemplares masculinos y femeninos para producción de drupas. Las drupas atraen avifauna alto-andina (mirlas, tucanetas, atrapamoscas)."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 2000,
+      "optimo_min": 2300,
+      "optimo_max": 2900,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -7,
+      "optimo_min": 7,
+      "optimo_max": 15,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Ilex kunthiana Triana (palo de zorro, acebo andino, huesito — familia Aquifoliaceae) es un árbol perennifolio DIOICO (6-15 m altura) nativo de los Andes (Colombia, Ecuador, Venezuela, Perú), distribuido en bosque alto andino entre 2000 y 3200 msnm en piso térmico FRÍO. En Colombia se encuentra en Cundinamarca, Boyacá, Antioquia, Nariño, Cauca, Santander y Tolima. La familia AQUIFOLIACEAE es monogenérica de gran trascendencia botánica — el género Ilex incluye al acebo europeo (Ilex aquifolium, sagrado para los celtas y emblema navideño europeo desde el medievo), al yerba mate sudamericano (Ilex paraguariensis, base de la infusión cultural rioplatense), al té de yaupon norteamericano (Ilex vomitoria, infusión ritual y cafeinada de los indios algonquinos del sureste de EEUU) y a este palo de zorro andino — TODAS las especies de Ilex comparten morfología similar (hojas coriáceas alternas con margen variable, flores dioicas pequeñas, drupas globosas pequeñas) y muchas contienen CAFEÍNA Y TEOBROMINA (los alcaloides estimulantes que han hecho del mate, té y café las bebidas más consumidas del mundo). Aunque NO está documentado que Ilex kunthiana se haya usado tradicionalmente como bebida estimulante en Colombia (a diferencia del mate argentino-paraguayo), su pertenencia al género Ilex la hace candidata interesante para investigación etnofarmacológica andina. Su epíteto 'kunthiana' honra a Karl Sigismund Kunth (1788-1850), el botánico alemán colaborador de Humboldt y Bonpland que describió cientos de especies de la flora de Colombia, Venezuela y Ecuador en la obra 'Nova Genera et Species Plantarum' (1815-1825) — fundacional para la botánica neotropical. Lección viva sobre BOTÁNICA SISTEMÁTICA DE ILEX, COSMOPOLITISMO DE LA AQUIFOLIACEAE y HISTORIA DE LA BOTÁNICA COLOMBIANA: el palo de zorro andino es ejemplo paradigmático de cómo una especie aparentemente menor del bosque colombiano pertenece a un género cosmopolita (acebo europeo + mate sudamericano + té yaupon norteamericano) con valor cultural, medicinal y económico global. Como especie DIOICA, la restauración requiere plantar proporción 1 macho : 4-5 hembras para asegurar producción de drupas — error frecuente en proyectos es plantar solo hembras y no obtener fruta. En restauración de Cruz Verde-Sumapaz, Chingaza, Iguaque y altiplano nariñense, las drupas rojo-violáceas son ALIMENTO CRÍTICO para avifauna alto-andina (mirlas patiblancas, tucanetas esmeralda, atrapamoscas, copetones) en la estación seca diciembre-marzo cuando otros frutos escasean. Manejo agroecológico: propagación por semilla fresca con estratificación fría 60-90 días; trasplante 6-8 meses; plantación 18-24 meses; crecimiento lento 25-40 cm/año; proporción dioica 1M:4-5H; densidades 200-300 ind/ha; restauración alto-andina con vista a alimento de avifauna en seca. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- clusia_multiflora — Gaque (Clusia multiflora Kunth)\n- hesperomeles_goudotiana — Esmeralda chiquita (Hesperomeles goudotiana (Decne.) Killip)\n- weinmannia_tomentosa — Encenillo (Weinmannia tomentosa L. f.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- eucalyptus_globulus — Eucalipto blanco (Eucalyptus globulus Labill.)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.403Z"
+}
