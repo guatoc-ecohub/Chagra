@@ -1,0 +1,19 @@
+<!doctype html>
+<!-- Arnés de diagnóstico VISUAL del cóndor (solo dev, nunca entra al build de
+     prod): sirve con `vite dev` y monta el cóndor rubber-hose en dos vistas
+     (?vista=grid → variantes del SVG de cerca · ?vista=cielo → el mockup
+     CondorCielo3D con el billboard planeando) para capturas antes/después. -->
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>diag: cóndor de los Andes</title>
+    <style>
+      html, body, #root { margin: 0; width: 100%; height: 100%; background: #a8cfe4; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/scripts/diag/condor-main.jsx"></script>
+  </body>
+</html>
