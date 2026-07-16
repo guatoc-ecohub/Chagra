@@ -574,15 +574,18 @@ export function geomGallina({ tipo = 'campesina', q = 1 } = {}, seed = 41) {
       c.push(pintar(pincho, '#c8352a'));
     }
     for (const lado of [1, -1]) {
-      const barbilla = new THREE.SphereGeometry(0.02 * T.cresta, 5, 4);
-      poner(barbilla, [0.115, 0.10, lado * 0.02], [0, 0, 0], [1, 1.4, 0.7]);
-      c.push(pintar(barbilla, '#c8352a'));
-      const ojo = new THREE.SphereGeometry(0.014, 5, 4);
-      poner(ojo, [0.10, 0.17, lado * 0.055]);
-      c.push(pintar(ojo, '#1f1a14'));
+      const barbilla = new THREE.SphereGeometry(0.019 * T.cresta, 6, 5);
+      poner(barbilla, [0.115, 0.1, lado * 0.018], [0, 0, 0], [1, 1.45, 0.65]);
+      c.push(pintarPlano(barbilla, '#c8352a'));
+      const ojo = new THREE.SphereGeometry(0.013, 5, 4);
+      poner(ojo, [0.1, 0.17, lado * 0.052]);
+      c.push(pintarPlano(ojo, '#1f1a14'));
     }
+    const cabezaGeo = hornearPelaje(fusionarHato(c, `cabeza-gallina-${tipo}`), {
+      yBajo: -0.02, yAlto: 0.2, ao: 0.22, moteado: 0.07, semilla: seed + 3,
+    });
 
-    return { cuerpo: cuerpoGeo, cabeza: fusionar(c), pivote: [0.11, 0.30, 0] };
+    return { cuerpo, cabeza: cabezaGeo, pivote: [0.11, 0.3 + alza, 0] };
   });
 }
 
@@ -591,11 +594,12 @@ export function geomGallina({ tipo = 'campesina', q = 1 } = {}, seed = 41) {
 /* -------------------------------------------------------------------------- */
 
 /**
- * El perro criollo amarillo que no falta en ninguna finca: pecho hondo, orejas
- * a media asta y cola alzada. Mira a +X. @returns {{cuerpo, cabeza, pivote}}
+ * El perro criollo amarillo que no falta en ninguna finca: pecho hondo,
+ * cintura recogida, orejas a media asta y la cola enroscada sobre el lomo.
+ * Mira a +X. @returns {{cuerpo, cabeza, pivote}}
  */
 export function geomPerro({ q = 1 } = {}, seed = 51) {
-  return memo(`perro|${q}`, () => {
+  return memo(`perro|${q}|${seed}`, () => {
     const PELAJE = '#c08b4d';
     const CREMA = '#e2c9a0';
     const r = rng(seed);

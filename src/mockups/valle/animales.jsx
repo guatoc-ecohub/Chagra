@@ -1,5 +1,6 @@
-/* eslint-disable react-refresh/only-export-components -- exporta MATERIAL_FINCA
-   (constante compartida de las mallas horneadas) además del componente. */
+/* eslint-disable react-refresh/only-export-components -- exporta los materiales
+   compartidos (MATERIAL_FINCA para la arboleda, MATERIAL_HATO para el ganado)
+   además del componente. */
 /*
  * Animales de finca del valle — REALISTAS por raza (feedback del operador:
  * "la vaca que parezca vaca, los cerdos por raza").
@@ -25,15 +26,14 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-
-/* Material ÚNICO compartido por toda la finca realista: cada malla trae su
-   color horneado en vertexColors → un solo programa para todo el hato, y la
-   arboleda por especie usa el mismo export. UNO para todas: cada malla
-   fusionada es 1 draw call. */
-export const MATERIAL_FINCA = new THREE.MeshLambertMaterial({
-  vertexColors: true,
-  flatShading: true,
-});
+import {
+  geomVaca,
+  geomCerdo,
+  geomLechon,
+  geomGallina,
+  geomPerro,
+  geomOveja,
+} from '../../visual/mundo3d/finca/fincaRealista.geom.js';
 
 /* Los GESTOS de idle: reescriben solo la rotación del grupo-cabeza (el cuerpo
    queda plantado). Amplitudes chicas: vida, no espectáculo. */
