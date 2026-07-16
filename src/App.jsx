@@ -162,6 +162,11 @@ const CafetalVivo3DMockup = lazy(() => import('./mockups/CafetalVivo3D'));
 // plátano, y la casa con su cajón de fermentar y su pasera. Device-tiering
 // real. Ruta #/mockups/cacao-vivo-3d, sin auth.
 const CacaoVivo3DMockup = lazy(() => import('./mockups/CacaoVivo3D'));
+// 3D: el MUNDO DE LA PAPA — el papal en surcos de la tierra fría: caballones
+// horneados en el relieve a curva de nivel, la mata aporcada con su flor lila/
+// blanca por instancia, la cosecha de criollas (amarilla/roja/morada) y los
+// frailejones en silueta. Device-tiering real. Ruta #/mockups/papa-viva-3d, sin auth.
+const PapaVivo3DMockup = lazy(() => import('./mockups/PapaVivo3D'));
 // 3D: el MUNDO SUELO VIVO — la RED MICORRÍZICA bajo tierra (el wood-wide web):
 // la red de hongos bioluminiscente que enlaza las raíces y reparte nutrientes,
 // con pulsos corriendo por los hilos y el Ent asomando. Device-tiering real.
@@ -583,6 +588,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/bosque-vivo-3d': 'mockup_bosque_vivo_3d',
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
   'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
+  'mockups/papa-viva-3d': 'mockup_papa_viva_3d',
   'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
   'mockups/voz-con-forma': 'mockup_voz_con_forma',
   'mockups/conversacion-voz': 'mockup_conversacion_voz',
@@ -1589,6 +1595,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo del cacao">
               <CacaoVivo3DMockup />
+      case 'mockup_papa_viva_3d':
+        // Vitrina pública del MUNDO DE LA PAPA: el papal en surcos de la tierra
+        // fría en 3D REAL — caballones de tierra negra horneados en el relieve
+        // a curva de nivel, la mata aporcada con su flor lila/blanca, el
+        // pajonal, los frailejones en silueta y la cosecha de criollas
+        // destapada (amarilla/roja/morada). Cuatro pasos didácticos. En equipo
+        // humilde muestra la ficha del corte. Ruta #/mockups/papa-viva-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de la papa">
+              <PapaVivo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
