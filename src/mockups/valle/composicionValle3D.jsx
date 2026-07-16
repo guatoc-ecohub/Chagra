@@ -45,7 +45,7 @@ const CASA = {
  * La ventana emisiva es "la casa espera": de día apenas se nota, al
  * atardecer y de noche es el corazón cálido del valle.
  */
-export function CasaCampesina({ alturaDe, perfil }) {
+export function CasaCampesina({ alturaDe, perfil, nocturno = false }) {
   const [cx, cz] = CASA_VALLE.pos;
   const y = alturaDe(cx, cz);
   const rico = perfil.materialRico;
@@ -79,16 +79,42 @@ export function CasaCampesina({ alturaDe, perfil }) {
         <boxGeometry args={[0.3, 0.52, 0.05]} />
         <meshStandardMaterial color={CASA.madera} flatShading roughness={1} />
       </mesh>
-      {/* LA VENTANA CON LUZ: la casa espera (emisiva, cálida, chiquita) */}
+      {/* LA VENTANA CON LUZ: la casa espera (emisiva, cálida, chiquita).
+          De NOCHE es el FARO del valle (día-por-noche: la práctica que
+          orienta): brilla más fuerte, tira un charco cálido sobre la tierra
+          del corredor, y — solo donde el perfil paga luces — una pointLight
+          ámbar baña la fachada. El punto de referencia para volver a casa. */}
       <mesh position={[0.34, 0.56, 0.52]}>
         <boxGeometry args={[0.26, 0.24, 0.04]} />
         <meshStandardMaterial
           color={CASA.ventana}
           emissive={CASA.ventana}
-          emissiveIntensity={0.8}
+          emissiveIntensity={nocturno ? 1.8 : 0.8}
           flatShading
         />
       </mesh>
+      {nocturno && (
+        <>
+          {/* el charco de luz de la ventana (todos los tiers: es un disco) */}
+          <mesh position={[0.4, 0.05, 0.95]} rotation={[-Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[0.85, 20]} />
+            <meshBasicMaterial
+              color={CASA.ventana}
+              transparent
+              opacity={0.2}
+              depthWrite={false}
+            />
+          </mesh>
+          {perfil.luzBeacon && (
+            <pointLight
+              color={CASA.ventana}
+              intensity={1.1}
+              distance={5.2}
+              position={[0.38, 0.7, 0.9]}
+            />
+          )}
+        </>
+      )}
       {/* el corredor: dos pies derechos y su tramo de techo (solo tier alto) */}
       {rico && (
         <group>
@@ -138,7 +164,7 @@ export function SenderosValle({ alturaDe, perfil }) {
 /* ── Patios de tierra pisada bajo los lugares navegables ─────────────────
    Todos en UNA InstancedMesh (1 draw call). Círculo plano apenas levantado;
    depthWrite off para no pelear con la ondulación del terreno. */
-export function PatiosLugares({ mundos, alturaDe }) {
+export function PatiosLugares({ mundos, alturaDe, nocturno = false }) {
   const sitios = useMemo(
     () =>
       mundos.map((m) => ({
@@ -152,10 +178,13 @@ export function PatiosLugares({ mundos, alturaDe }) {
   return (
     <Instances limit={sitios.length}>
       <circleGeometry args={[1, 22]} />
+      {/* De noche la tierra pisada AGARRA la luna (emisivo leve): los claros
+          se leen como lugares a los que se llega, no como huecos negros. */}
       <meshLambertMaterial
-        color={PATIO.color}
+        color={nocturno ? '#8a9bb8' : PATIO.color}
+        emissive={nocturno ? '#1b2940' : '#000000'}
         transparent
-        opacity={PATIO.opacidad}
+        opacity={nocturno ? 0.26 : PATIO.opacidad}
         depthWrite={false}
       />
       {sitios.map((s, i) => (
