@@ -291,9 +291,11 @@ function Diorama({ tier, reducedMotion, foco }) {
           de tierra caliente — el atardecer del piso cálido es el cartel. */}
       <DomoCielo atm={atm} radio={64} />
 
-      {/* LA VEGA por bandas (recibe la sombra del sombrío en gama alta) */}
+      {/* LA VEGA por bandas (recibe la sombra del sombrío en gama alta).
+          El look facetado no necesita flag: con perfil.flatShading el terreno
+          ya viene DESINDEXADO con normales planas horneadas (construirTerreno). */}
       <mesh geometry={geoVega} receiveShadow={perfil.sombras}>
-        <meshToonMaterial vertexColors gradientMap={bandas} flatShading={perfil.flatShading} />
+        <meshToonMaterial vertexColors gradientMap={bandas} />
       </mesh>
 
       {/* las lomas calientes del fondo, comidas por la calina de la hora */}

@@ -266,9 +266,11 @@ function Diorama({ tier, reducedMotion, foco }) {
           franja — el atardecer del piso templado es el cartel. */}
       <DomoCielo atm={atm} radio={64} />
 
-      {/* LA LADERA por bandas (recibe la sombra del sombrío en gama alta) */}
+      {/* LA LADERA por bandas (recibe la sombra del sombrío en gama alta).
+          El look facetado no necesita flag: con perfil.flatShading el terreno
+          ya viene DESINDEXADO con normales planas horneadas (construirTerreno). */}
       <mesh geometry={geoLadera} receiveShadow={perfil.sombras}>
-        <meshToonMaterial vertexColors gradientMap={bandas} flatShading={perfil.flatShading} />
+        <meshToonMaterial vertexColors gradientMap={bandas} />
       </mesh>
 
       {/* las montañas cafeteras del fondo, comidas por la niebla de la hora */}
