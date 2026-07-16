@@ -100,7 +100,10 @@ const _centrosPiso = PISOS_TERMICOS.map((p) => ({
   color: new THREE.Color(p.color),
   cresta: new THREE.Color(p.cresta),
 }));
-const _colNoche = new THREE.Color('#1f3a2c');
+/* La noche del cine es AZUL, no negra (día por noche): el suelo se enfría
+   hacia un azul-luna y solo 45% — las franjas de pisos térmicos siguen
+   leyéndose como bandas de altitud, apagadas pero presentes. */
+const _colNoche = new THREE.Color('#2c4560');
 
 function colorSueloEnZ(z, alto, nocturno, out) {
   // Buscar los dos centros de piso que rodean a z e interpolar.
@@ -121,7 +124,7 @@ function colorSueloEnZ(z, alto, nocturno, out) {
   out.copy(lo.color).lerp(hi.color, t);
   // Relieve: las crestas más claras; los vallecitos, el color base.
   out.lerp(lo.cresta.clone().lerp(hi.cresta, t), THREE.MathUtils.clamp(alto, 0, 1) * 0.35);
-  if (nocturno) out.lerp(_colNoche, 0.62);
+  if (nocturno) out.lerp(_colNoche, 0.56);
   return out;
 }
 
@@ -204,8 +207,11 @@ function Cordillera({ color, innerRef, perfil }) {
   );
 }
 
-/* ── La quebrada: una cinta de agua que serpentea por el cauce. ── */
-function Quebrada({ color, viva, perfil }) {
+/* ── La quebrada: una cinta de agua que serpentea por el cauce. De noche es
+      LO QUE MÁS BRILLA del suelo (el reflejo de la luna sobre el agua, la
+      firma del día-por-noche): emissive tenue que además guía el ojo ladera
+      abajo — el agua se vuelve el sendero luminoso del valle dormido. ── */
+function Quebrada({ color, viva, perfil, nocturno = false }) {
   const ref = useRef(null);
   useFrame((state) => {
     // `ref` apunta al material (no al mesh): animar su opacidad directamente.
@@ -236,13 +242,22 @@ function Quebrada({ color, viva, perfil }) {
         <meshStandardMaterial
           ref={ref}
           color={color}
+          emissive={nocturno ? '#3f6f9e' : '#000000'}
+          emissiveIntensity={nocturno ? 0.42 : 0}
           transparent
           opacity={0.78}
           roughness={0.25}
           metalness={0.35}
         />
       ) : (
-        <meshLambertMaterial ref={ref} color={color} transparent opacity={0.78} />
+        <meshLambertMaterial
+          ref={ref}
+          color={color}
+          emissive={nocturno ? '#3f6f9e' : '#000000'}
+          emissiveIntensity={nocturno ? 0.42 : 0}
+          transparent
+          opacity={0.78}
+        />
       )}
     </mesh>
   );
@@ -1183,10 +1198,16 @@ function AplaneNewDonk({ foco, aplanando }) {
       suelta el control para que el usuario siga haciendo zoom a mano). Durante
       el APLANE New Donk cede TODO el control a AplaneNewDonk (early-return): no
       mueve target ni zoom para no pelear con la caída. ── */
-function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, kReposo = 1 }) {
+function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, kReposo = 1, miraInicial = null }) {
   const trans = useRef(0);
   const prevKey = useRef(focoKey);
   const entrando = focoKey !== 'valle';
+  /* LA CÁMARA ES DEL USUARIO DESDE QUE LA TOCA: la deriva de reposo
+     (autoRotate) es bienvenida mientras nadie maneja, pero girar el valle
+     BAJO el dedo que está apuntando a un lugar era el "difícil de manejar a
+     ratos" — el chip se corría del toque. El primer gesto de órbita apaga la
+     deriva por el resto de la sesión del valle. */
+  const [tomada, setTomada] = useState(false);
   useFrame(() => {
     if (!controls.current || aplanando) return;
     const c = controls.current;
@@ -1217,14 +1238,26 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, 
       makeDefault
       enablePan={false}
       enableZoom
+      /* El target ARRANCA en la mira de reposo (no en el origen): el primer
+         fotograma ya es el encuadre de autor — clave en reduced-motion
+         (frameloop demand), donde el lerp por frame gatea. */
+      target={miraInicial || undefined}
       minDistance={7}
-      maxDistance={28}
+      /* El techo de zoom respeta el reposo del aspecto: si la pose vertical
+         vive más lejos, el clamp no pelea contra ella (antes, en teléfono,
+         el reposo caía FUERA del techo y los controles daban tirones). */
+      maxDistance={Math.max(28, Math.ceil(20 * kReposo) + 4)}
       minPolarAngle={0.45}
       maxPolarAngle={1.18}
-      autoRotate={autoOrbit && !entrando}
-      autoRotateSpeed={0.35}
+      autoRotate={autoOrbit && !entrando && !tomada}
+      /* Deriva de reposo APENAS perceptible (~0.7°/s): a 0.35 el valle giraba
+         ~2°/s y en un minuto la composición de autor ya no estaba en pantalla
+         — y el chip apuntado se corría del dedo. La vida la ponen los bichos
+         y la atmósfera, no el tiovivo. */
+      autoRotateSpeed={0.12}
       enableDamping
       dampingFactor={0.08}
+      onStart={tomada ? undefined : () => setTomada(true)}
     />
   );
 }
@@ -1350,6 +1383,56 @@ function AtmosferaValle({ c, perfil, reducedMotion }) {
   );
 }
 
+/* ── LA LUNA DEL VALLE: el disco de plata que AUTORIZA la luz nocturna ──────
+      La noche del cine tiene autora: la direccional fría sale de aquí
+      (CLIMAS.noche.sol apunta desde -x,-z) y verla en el cielo hace legible
+      el contraluz. Discos meshBasic (5 planos transparentes, cero luces
+      extra): corre en TODOS los tiers. Se orienta a la cámara con lookAt
+      (~2 veces/s alcanza — la luna está lejos y el orbit es lento). ── */
+/* La LUNA SALIENDO tras el filo del páramo (izquierda-fondo, baja sobre el
+   horizonte): la pose de reposo pica 23° hacia abajo, así que el único cielo
+   del cuadro es la franja rasante sobre la silueta de la ladera — ahí vive
+   la luna, como se ve una luna que apenas sale. Verificado contra el terreno:
+   el rayo cámara→luna libra la loma (y=6.9 sobre 1.5 en x=-10; 6.2 sobre 3.1
+   en el borde x=-17) y la cordillera queda lejos (z≤-15). */
+const POS_LUNA = /** @type {[number, number, number]} */ ([-21, 3.4, -8]);
+
+function LunaValle({ reducedMotion }) {
+  const ref = useRef(null);
+  const tick = useRef(0);
+  useFrame(({ camera }) => {
+    if (!ref.current) return;
+    if (tick.current++ % 30 !== 0 && !reducedMotion) return;
+    ref.current.lookAt(camera.position);
+  });
+  return (
+    <group ref={ref} position={POS_LUNA} scale={1.1}>
+      <mesh>
+        <circleGeometry args={[1.15, 36]} />
+        <meshBasicMaterial color="#f2f0e2" transparent opacity={0.98} depthWrite={false} fog={false} />
+      </mesh>
+      {/* mares: sombras suaves que hacen luna, no plato */}
+      <mesh position={[-0.3, 0.26, 0.01]}>
+        <circleGeometry args={[0.3, 18]} />
+        <meshBasicMaterial color="#d4d2c2" transparent opacity={0.5} depthWrite={false} fog={false} />
+      </mesh>
+      <mesh position={[0.34, -0.28, 0.01]}>
+        <circleGeometry args={[0.19, 16]} />
+        <meshBasicMaterial color="#d9d7c6" transparent opacity={0.45} depthWrite={false} fog={false} />
+      </mesh>
+      {/* halo doble: el velo húmedo del páramo alrededor de la luna */}
+      <mesh position={[0, 0, -0.05]}>
+        <circleGeometry args={[2.1, 36]} />
+        <meshBasicMaterial color="#b3cdf0" transparent opacity={0.18} depthWrite={false} fog={false} />
+      </mesh>
+      <mesh position={[0, 0, -0.1]}>
+        <circleGeometry args={[3.6, 36]} />
+        <meshBasicMaterial color="#3d5178" transparent opacity={0.12} depthWrite={false} fog={false} />
+      </mesh>
+    </group>
+  );
+}
+
 /* Caja de las luciérnagas: la tierra baja del frente del valle (referencia
    ESTABLE — ParticulasAmbientales re-siembra si la caja cambia). */
 const AREA_LUCIERNAGAS = /** @type {[number, number, number]} */ ([18, 2.4, 7]);
@@ -1367,24 +1450,44 @@ const MIRA_VALLE = [0, 1.6, 1.4];
    horizontal de ~19° y la composición entera (lugares en x ∈ [-7.5, 7.5], el
    oso en el borde del monte) queda FUERA del cuadro: medio valle existía y
    nadie lo veía (la misma clase de fallo que los árboles tras el macizo de la
-   sierra). En pantallas angostas la cámara retrocede y abre un poco el fov —
-   con techo, para no caer en ojo de pez — y el valle entero vuelve al cuadro.
+   sierra).
+
+   EL PLANO VERTICAL ES OTRO PLANO (no el mismo, más lejos): retroceder a lo
+   ancho regalaba el 40% del cuadro al cielo vacío y apeñuscaba la finca abajo
+   — los rótulos colisionaban todos y la anti-colisión escondía la mayoría (el
+   "difícil de manejar" del operador). En vertical la cámara SUBE y PICA: la
+   ladera entera (tierra caliente → páramo, 16 u de fondo) corre a lo LARGO de
+   la pantalla, los lugares se separan en vertical y cada rótulo respira. La
+   mira baja y avanza (la finca al centro, el cielo de remate arriba).
    En landscape (aspecto ≥ 0.9) la pose aprobada queda EXACTA. */
 function poseValleParaAspecto(aspect) {
-  if (!aspect || aspect >= 0.9) return { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1 };
-  const k = Math.min(1.6, Math.pow(0.9 / aspect, 0.62));
-  const fov = Math.min(54, Math.round(CAMARA_VALLE.fov * Math.pow(0.9 / aspect, 0.4)));
-  return {
-    position: /** @type {[number, number, number]} */ (CAMARA_VALLE.position.map((v) => v * k)),
-    fov,
-    k,
-  };
+  if (!aspect || aspect >= 0.9) {
+    return { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
+  }
+  const cuanVertical = Math.min(1, (0.9 - aspect) / 0.44); // 0 en 0.9 → 1 en ~0.46
+  // El PLANO PICADO del teléfono parado (misma acimut de la pose aprobada,
+  // polar ~40°): la cámara sube a 18.7 y la mira avanza a la finca (z 3.2).
+  const PICADO = { position: [9.3, 18.7, 15.1], fov: 58, mira: [-0.5, 0.6, 2.7] };
+  const lerp = (a, b) => a + (b - a) * cuanVertical;
+  const position = /** @type {[number, number, number]} */ (
+    CAMARA_VALLE.position.map((v, i) => lerp(v, PICADO.position[i]))
+  );
+  const mira = /** @type {[number, number, number]} */ (
+    MIRA_VALLE.map((v, i) => lerp(v, PICADO.mira[i]))
+  );
+  const fov = Math.round(lerp(CAMARA_VALLE.fov, PICADO.fov));
+  // k = razón de distancia (cámara→mira) contra la pose landscape: gobierna
+  // el zoom de reposo de CamaraViajera y el techo de los controles.
+  const dist = (p, m) => Math.hypot(p[0] - m[0], p[1] - m[1], p[2] - m[2]);
+  const k = dist(position, mira) / dist(CAMARA_VALLE.position, MIRA_VALLE);
+  return { position, fov, k, mira };
 }
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
 function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null }) {
   /* La pose de reposo (aspecto-consciente, viene del host del Canvas). */
-  const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1 };
+  const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
+  const miraReposo = poseReposo.mira || MIRA_VALLE;
   const controls = useRef(null);
   /* La cámara de director (FASE 4, flag `camaraDirector`) se monta DESPUÉS de
      CamaraViajera y gana por orden de frame durante su barrido. `avatarRef`
@@ -1399,11 +1502,12 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
   const foco = useMemo(() => {
     const m = focoId ? MUNDO_DIR_BY_ID[focoId] : null;
     // Sin foco, la cámara encuadra el corazón del valle (algo hacia el frente,
-    // regla de tercios) para dar aire y leer la ladera que sube al fondo.
-    if (!m) return new THREE.Vector3(0, 1.0, 1.4);
+    // regla de tercios) — la mira de reposo es ASPECTO-CONSCIENTE: en vertical
+    // baja y avanza hacia la finca (CamaraViajera le suma 0.6 en y).
+    if (!m) return new THREE.Vector3(miraReposo[0], miraReposo[1] - 0.6, miraReposo[2]);
     const y = alturaTerreno(m.pos[0], m.pos[2]);
     return new THREE.Vector3(m.pos[0], y, m.pos[2]);
-  }, [focoId]);
+  }, [focoId, miraReposo]);
   const autoOrbit = !reducedMotion && !focoId;
   const entrando = !!focoId;
   const nocturno = clima === 'noche';
@@ -1442,18 +1546,28 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         />
       )}
 
+      {/* La LUNA: la autora de la luz nocturna. Verla ancla el contraluz. */}
+      {nocturno && <LunaValle reducedMotion={reducedMotion} />}
+
       <Terreno nocturno={nocturno} innerRef={terrenoRef} perfil={perfil} />
-      <Cordillera color={nocturno ? '#3a4a63' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
-      <Quebrada color={nocturno ? '#2a4a6a' : '#5fb2c9'} viva={c.lluviaViva} perfil={perfil} />
+      <Cordillera color={nocturno ? '#48598a' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
+      <Quebrada
+        color={nocturno ? '#7fb3d9' : '#5fb2c9'}
+        viva={c.lluviaViva}
+        perfil={perfil}
+        nocturno={nocturno}
+      />
       <VegetacionPisos nocturno={nocturno} perfil={perfil} />
 
       {/* LA DIRECCIÓN DEL CUADRO: la casa-ancla donde descansa el ojo (con su
           ventana cálida), los senderos de tierra pisada que nacen de ella (el
           rastro del uso diario: el ojo camina por donde caminan los pies) y
           los patios bajo cada lugar navegable (afordancia sin UI). */}
-      <CasaCampesina alturaDe={alturaTerreno} perfil={perfil} />
+      <CasaCampesina alturaDe={alturaTerreno} perfil={perfil} nocturno={nocturno} />
       <SenderosValle alturaDe={alturaTerreno} perfil={perfil} />
-      {!portada && <PatiosLugares mundos={MUNDOS_DIR} alturaDe={alturaTerreno} />}
+      {!portada && (
+        <PatiosLugares mundos={MUNDOS_DIR} alturaDe={alturaTerreno} nocturno={nocturno} />
+      )}
 
       {MUNDOS_DIR.map((m) => (
         <MundoLugar
@@ -1511,6 +1625,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         autoOrbit={autoOrbit}
         aplanando={aplanando}
         kReposo={poseReposo.k}
+        miraInicial={miraReposo}
       />
       {/* La CÁMARA DE DIRECTOR (FASE 4). Con el flag `camaraDirector`:
           DirectorValle (establishing + follow + beats), montado DESPUÉS de
@@ -1521,7 +1636,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         <DirectorValle
           controls={controls}
           reposo={poseReposo.position}
-          mira={MIRA_VALLE}
+          mira={miraReposo}
           fov={poseReposo.fov}
           foco={foco}
           avatarRef={avatarRef}
