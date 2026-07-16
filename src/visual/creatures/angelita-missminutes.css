@@ -1,0 +1,259 @@
+/* ─── ANGELITA AL MÁXIMO — cadencia nueva de la compañera viva ───────────────
+ *
+ * La capa de animación que sube a Angelita a su tope de carisma rubber-hose:
+ *
+ *   1. GAFAS DE SOL (data-gafas)     — la caída teatral one-shot al ponérselas
+ *                                      (baja girada, rebasa, rebota, asienta) +
+ *                                      el destello que barre el lente + el
+ *                                      recoil del cuerpito al aterrizarle.
+ *   2. CEJAS (data-cejas)            — vida de cejas: el eyebrow-flash del que
+ *                                      habla, el temblor de concentración.
+ *   3. HUSMEA (data-agt-estado)      — el estado nuevo del agente: se inclina
+ *                                      a fisgonear, la mirada barre el piso,
+ *                                      las antenas apuntan, y las virutas de
+ *                                      olor entran hacia su nariz.
+ *   4. ENTRADA TEATRAL (.ang-entrada)— asoma pequeñita → (si hace sol) se pone
+ *                                      las gafas → anticipa y CRECE con
+ *                                      overshoot a tamaño de asistente, con su
+ *                                      aro de energía. Timing de cartoon puro.
+ *
+ * REGLAS DE LA CASA (las mismas de creatures.css / angelita-agente.css):
+ *   · Solo transform/opacity (GPU, gama baja).
+ *   · prefers-reduced-motion congela TODO en fotograma digno (gafas puestas,
+ *     tamaño final, cejas quietas).
+ *   · [data-tier='bajo'] corta lo continuo decorativo; conserva los one-shot
+ *     de estado (la entrada sí se ve — es feedback, no decoración).
+ */
+
+/* ═══ 1. LAS GAFAS DE SOL ════════════════════════════════════════════════════ */
+
+/* La CAÍDA teatral (one-shot): baja girada desde arriba de la cabeza, REBASA
+   la cara (slam), rebota dos veces decreciente y asienta. Curvas por tramo:
+   la entrada es rápida (gravedad), el asentado elástico. */
+.agz-cae {
+  animation: agz-ponerse 0.95s cubic-bezier(0.3, 0.9, 0.4, 1) both;
+}
+@keyframes agz-ponerse {
+  0% { transform: translate(1.6px, -10.5px) rotate(-24deg); opacity: 0; }
+  10% { opacity: 1; }
+  52% { transform: translate(0.2px, 0.95px) rotate(5deg); }
+  70% { transform: translate(0, -0.55px) rotate(-2.2deg); }
+  85% { transform: translate(0, 0.2px) rotate(0.8deg); }
+  100% { transform: none; }
+}
+/* El DESTELLO que barre el vidrio justo al aterrizar (delay = el slam). */
+.agz-cae .agz-chispa {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: agz-destello 0.7s 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+@keyframes agz-destello {
+  0% { transform: translate(-2.1px, 2.1px); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: none; opacity: 0.85; }
+}
+/* El cuerpito ACUSA el golpecito: squash de recoil cuando las gafas tocan cara
+   (mismo delay del slam). Pisa el boil idle ese instante y se lo devuelve. */
+[data-gafas='poniendose'] .crt-body {
+  animation: agz-recoil 0.5s 0.48s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes agz-recoil {
+  0% { transform: none; }
+  30% { transform: scale(1.06, 0.9) translateY(0.6px); }
+  65% { transform: scale(0.97, 1.04); }
+  100% { transform: none; }
+}
+/* Con las gafas PUESTAS al sol, un brillito perezoso recorre el lente cada
+   tanto (continuo decorativo: se corta en tier bajo). */
+[data-gafas='1'] .agz-chispa {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: agz-brilla 7.3s ease-in-out infinite;
+}
+@keyframes agz-brilla {
+  0%, 86%, 100% { transform: none; opacity: 0.85; }
+  90% { transform: translate(-0.9px, 0.9px); opacity: 0.4; }
+  95% { transform: translate(0.5px, -0.5px); opacity: 1; }
+}
+
+/* ═══ 2. VIDA DE CEJAS ═══════════════════════════════════════════════════════ */
+
+/* El EYEBROW-FLASH del que habla (cejas 'vivas'): suben un pelo con el énfasis
+   y bajan — período co-primo con la gesticulación de brazos (1.7/1.55s). */
+[data-cejas='vivas'] .rh-cejas {
+  animation: rh-cejas-flash 2.3s ease-in-out infinite;
+}
+@keyframes rh-cejas-flash {
+  0%, 100% { transform: none; }
+  12% { transform: translateY(-0.75px); }
+  22% { transform: translateY(0.1px); }
+  58% { transform: translateY(-0.45px); }
+  70% { transform: none; }
+}
+/* Concentración (fruncidas): micro-temblor de esfuerzo, casi subliminal. */
+[data-cejas='fruncidas'] .rh-cejas {
+  animation: rh-cejas-esfuerzo 3.7s ease-in-out infinite;
+}
+@keyframes rh-cejas-esfuerzo {
+  0%, 100% { transform: none; }
+  45% { transform: translateY(0.3px); }
+  55% { transform: translateY(0.15px); }
+}
+/* Atención (altas): respiran arriba — sostener la sorpresa cuesta. */
+[data-cejas='altas'] .rh-cejas {
+  animation: rh-cejas-altas 4.1s ease-in-out infinite;
+}
+@keyframes rh-cejas-altas {
+  0%, 100% { transform: none; }
+  50% { transform: translateY(0.45px); }
+}
+
+/* ═══ 3. HUSMEA — el estado fisgón del agente ════════════════════════════════
+   La abeja detective: se inclina hacia adelante-abajo (fisgonea el piso),
+   cabecea siguiendo el rastro, la mirada barre, y las virutas de olor entran
+   hacia su nariz. Selectores en el espacio del agente (angelita-agente.css). */
+[data-agt-vivo='1'][data-agt-estado='husmea'] .agt-cuerpo {
+  animation: agm-husmea-cuerpo 2.8s cubic-bezier(0.45, 0, 0.3, 1.25) infinite;
+}
+@keyframes agm-husmea-cuerpo {
+  0%, 100% { transform: rotate(4deg) translate(0.6px, 0.8px); }
+  22% { transform: rotate(9deg) translate(1.4px, 2.2px); }
+  38% { transform: rotate(7deg) translate(1.1px, 1.6px); }
+  60% { transform: rotate(11deg) translate(1.8px, 2.8px); }
+  78% { transform: rotate(5deg) translate(0.8px, 1.1px); }
+}
+/* Quieta (fotograma digno): inclinada fisgoneando, sin loop. */
+[data-agt-estado='husmea'] .agt-cuerpo {
+  transform: rotate(7deg) translate(1.2px, 1.8px);
+}
+/* La mirada BARRE el rastro (abajo, de lado a lado) — pisa el dardeo neutro. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='husmea'] .rh-mirada {
+  animation: agm-husmea-mirada 2.8s ease-in-out infinite;
+}
+@keyframes agm-husmea-mirada {
+  0%, 100% { transform: translate(0.35px, 0.55px); }
+  30% { transform: translate(-0.35px, 0.6px); }
+  55% { transform: translate(0.5px, 0.7px); }
+  80% { transform: translate(-0.2px, 0.5px); }
+}
+/* Las VIRUTAS DE OLOR (markup del agente): entran serpenteando hacia la nariz
+   y se disuelven — tres, desfasadas por delay inline. */
+.agm-olor {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+[data-agt-vivo='1'] .agm-olor {
+  animation: agm-olor 2.1s ease-in-out infinite;
+}
+@keyframes agm-olor {
+  0% { transform: translate(3.4px, 1.4px); opacity: 0; }
+  30% { opacity: 0.75; }
+  70% { opacity: 0.5; }
+  100% { transform: translate(-1.6px, -0.6px); opacity: 0; }
+}
+
+/* ═══ 4. LA ENTRADA TEATRAL (.ang-entrada) ═══════════════════════════════════
+   Después del paneo del host: asoma PEQUEÑITA (pop elástico) → si hace sol se
+   pone las gafas (fase quieta a escala chiquita: el show es de las gafas) →
+   anticipa (se recoge) y CRECE con overshoot a su tamaño de asistente, con el
+   aro de energía que revienta al llegar. El JS (AngelitaEntrada.jsx) solo
+   cambia la clase de fase; el timing vive aquí. */
+.ang-entrada {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ang-entrada__escala {
+  display: inline-flex;
+  transform-origin: 50% 78%; /* crece desde su base: brota, no infla */
+  will-change: transform;
+}
+/* espera: todavía nada (el paneo del host sigue andando) */
+.ang-entrada--espera .ang-entrada__escala { transform: scale(0.36); opacity: 0; }
+/* asoma: pop elástico a tamaño pequeñito */
+.ang-entrada--asoma .ang-entrada__escala {
+  animation: ang-asoma 0.9s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+@keyframes ang-asoma {
+  0% { transform: scale(0.1); opacity: 0; }
+  18% { opacity: 1; }
+  62% { transform: scale(0.44); }
+  82% { transform: scale(0.33); }
+  100% { transform: scale(0.36); opacity: 1; }
+}
+/* gafas: quieta a escala chica (el one-shot de las gafas manda) */
+.ang-entrada--gafas .ang-entrada__escala { transform: scale(0.36); }
+/* crece: anticipación (se agacha y recoge) → estirón con overshoot → asienta */
+.ang-entrada--crece .ang-entrada__escala {
+  animation: ang-crece 1.3s cubic-bezier(0.3, 0.9, 0.35, 1) both;
+}
+@keyframes ang-crece {
+  0% { transform: scale(0.36); }
+  16% { transform: scale(0.42, 0.28) translateY(3%); }  /* se agacha: coge impulso */
+  30% { transform: scale(0.3, 0.5) translateY(-1%); }   /* se estira hacia arriba */
+  58% { transform: scale(1.14, 1.22) translateY(-2%); } /* el estirón — REBASA */
+  74% { transform: scale(0.94, 0.9) translateY(0.5%); } /* squash de aterrizaje */
+  88% { transform: scale(1.04, 1.05); }                 /* rebotico */
+  100% { transform: none; }
+}
+.ang-entrada--lista .ang-entrada__escala { transform: none; }
+
+/* El ARO DE ENERGÍA que revienta cuando alcanza su tamaño (delay = el pico del
+   estirón). Un anillo ámbar que se expande y disuelve — llegó la compañera. */
+.ang-entrada__aro {
+  position: absolute;
+  inset: 12%;
+  border: 2.5px solid rgba(255, 181, 79, 0.9);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.4);
+}
+/* forwards (no both): antes del delay el aro queda en su base (opacity 0) —
+   con both se veía el 0% congelado desde el arranque del crecimiento. */
+.ang-entrada--crece .ang-entrada__aro {
+  animation: ang-aro 0.85s 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes ang-aro {
+  0% { transform: scale(0.4); opacity: 0.9; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ═══ GATES DE LA CASA ═══════════════════════════════════════════════════════ */
+
+/* Tier bajo: fuera lo continuo decorativo (brillito de lente, vida de cejas,
+   virutas — el estado husmea conserva SU cuerpo, que es feedback). El one-shot
+   de gafas y la entrada quedan: son momentos, no loops. */
+[data-tier='bajo'] .agz-chispa,
+[data-tier='bajo'] .rh-cejas,
+[data-tier='bajo'] .agm-olor {
+  animation: none;
+}
+
+/* Reduced-motion: TODO congela en su fotograma digno — gafas puestas, cejas
+   quietas, husmeo inclinado estático, entrada YA en tamaño final (el JS de
+   AngelitaEntrada además salta directo a 'lista'; esto es el cinturón). */
+@media (prefers-reduced-motion: reduce) {
+  .agz-cae,
+  .agz-cae .agz-chispa,
+  [data-gafas='poniendose'] .crt-body,
+  [data-gafas='1'] .agz-chispa,
+  .rh-cejas,
+  [data-agt-estado='husmea'] .agt-cuerpo,
+  [data-agente='angelita'][data-agt-estado='husmea'] .rh-mirada,
+  .agm-olor,
+  .ang-entrada__escala,
+  .ang-entrada__aro {
+    animation: none !important;
+  }
+  .ang-entrada--espera .ang-entrada__escala,
+  .ang-entrada--asoma .ang-entrada__escala,
+  .ang-entrada--gafas .ang-entrada__escala,
+  .ang-entrada--crece .ang-entrada__escala {
+    transform: none;
+    opacity: 1;
+  }
+  .agm-olor { opacity: 0.55; }
+}
