@@ -94,15 +94,15 @@ export const calidadDeTier = (tier) => CALIDAD_TIER[tier] ?? CALIDAD_TIER.medio;
 /* -------------------------------------------------------------------------- */
 
 export const PAL = {
-  // Frailejón — la roseta plateada vellosa es la firma.
-  frailejonTronco: '#5f4e36',
-  frailejonSeco: '#7d6544', // enagua de hojas muertas marcescentes
-  frailejonSeco2: '#93794f',
-  frailejonPlata: '#a8b79a', // roseta: verde-plata vellosa (NO blanco tiza)
-  frailejonPlataSol: '#c8d3b6',
-  frailejonCorazon: '#b9c4a4',
-  frailejonFlor: '#dcbc46',
-  frailejonTallo: '#8d9866',
+  // Frailejón
+  frailejonTronco: '#6f5c40', // tallo bajo la enagua
+  frailejonSeco: '#907753', // hojas muertas de la enagua (marcescentes) — pajizo
+  frailejonSeco2: '#6a5232', // marcescentes más oscuras/curtidas (variedad)
+  frailejonPlata: '#cfd4c7', // roseta: centro joven, tomento MÁS blanco (la firma)
+  frailejonPlata2: '#b0ba9c', // hojas externas: plateado-salvia más apagado
+  frailejonCorazon: '#dde2d6', // cogollo velloso central (el punto más pálido)
+  frailejonFlor: '#e0c24a', // capítulos amarillos
+  frailejonTallo: '#95a06a', // escapo floral
 
   // Queñua (Polylepis) — corteza rojiza en láminas de papel.
   quenuaGrieta: '#4a2a20',
@@ -352,115 +352,112 @@ export function construirArbol(o) {
 /* -------------------------------------------------------------------------- */
 
 /*
- * Dos rasgos lo hacen inconfundible y los dos son geometría, no color:
- *   · la ENAGUA: el tallo va vestido con las hojas MUERTAS de toda su vida, que
- *     no se caen (marcescencia) — se apelmazan hacia abajo contra el tallo y lo
- *     engordan. Es lo que le da su silueta de columna peluda.
- *   · la ROSETA: hojas lanceoladas, gruesas y VELLOSAS, en espiral áurea,
- *     apretadas y erguidas formando una copa compacta — no un erizo de púas.
- *
- * La versión anterior fallaba justo aquí: pocas hojas, muy separadas, muy
- * blancas y muy abiertas → parecía un erizo blanco clavado en un palo.
+ * Silueta de MONJE: un tronco columnar VESTIDO de arriba abajo con la ENAGUA de
+ * hojas muertas (marcescentes) que cuelgan pegadas al tallo como un hábito —eso
+ * le da CUERPO, no es un palo—, coronado por la ROSETA plateada peluda: un
+ * penacho DENSO de hojas anchas, carnosas y afelpadas (tomento plateado, NO
+ * cerdas) en espiral áurea, más erguidas al centro y recostadas al borde. Esa
+ * roseta blanquecina afelpada + la falda de hojas secas es lo que lo hace
+ * inequívoco. Con `flor`, un escapo con capítulos amarillos asoma de la roseta.
  */
 export function geomFrailejon({ flor = false, q = 1 } = {}, seed = 1) {
   const r = rng(seed);
   const partes = [];
   const H = 1.0; // alto del tallo vestido
 
-  // 1) Tallo columnar (casi todo oculto por la enagua).
-  const tallo = new THREE.CylinderGeometry(0.1, 0.13, H, 7, 1);
-  poner(tallo, [0, H / 2, 0]);
-  hornearCorteza(tallo, {
-    grieta: '#3f3324', cuerpo: PAL.frailejonTronco, cresta: '#7d6a4c',
-    liquen: null, hastaLiquen: 0, escalaGrano: 9,
-  });
-  partes.push(tallo);
+  // Frailejón erguido y solemne: columna alta (crece ~1cm/año, se lee vertical).
+  const Ht = 1.12 + r() * 0.55;
+  const cy = Ht + 0.05; // la roseta se posa como una cabeza sobre la columna
 
-  // 2) ENAGUA: anillos densos de hojas muertas pegadas al tallo, apuntando
-  //    abajo-afuera. Muchas y solapadas: es un manto, no un fleco.
-  const anillos = Math.max(4, Math.round(7 * q));
+  // 1) Tallo columnar — casi todo oculto por la enagua.
+  const tronco = new THREE.CylinderGeometry(0.12, 0.15, Ht, 7, 1);
+  poner(tronco, [0, Ht / 2, 0]);
+  partes.push(pintar(tronco, PAL.frailejonTronco));
+
+  // 2) ENAGUA de hojas muertas: el HÁBITO. Hojas anchas y secas que cuelgan casi
+  //    a plomo, pegadas al tronco y superpuestas como tejas, vistiendo la columna
+  //    entera (de la base a la roseta). Es lo que le da cuerpo de "fraile grande".
+  const anillos = Math.max(3, Math.round(6 * q));
   const porAnillo = Math.max(6, Math.round(10 * q));
   for (let a = 0; a < anillos; a++) {
-    const f = a / anillos;
-    const y = 0.1 + f * (H - 0.06);
-    const rad = 0.13 - f * 0.015;
+    const f = a / anillos; // 0 base → 1 bajo la roseta
+    const y = 0.14 + f * (Ht - 0.1);
+    const rad = 0.15;
     for (let i = 0; i < porAnillo; i++) {
-      const ang = (i / porAnillo) * Math.PI * 2 + a * 0.71 + r() * 0.16;
-      const largo = 0.3 + r() * 0.1;
-      const hoja = new THREE.ConeGeometry(0.055, largo, 4, 1);
-      // Cuelgan pegadas: casi verticales hacia abajo, apenas abiertas.
+      const ang = (i / porAnillo) * Math.PI * 2 + a * 0.6;
+      const largo = 0.30 + r() * 0.14;
+      // hoja seca ANCHA y aplanada (lámina, no púa), colgando casi vertical.
+      const hoja = new THREE.ConeGeometry(0.085, largo, 4, 1);
       apuntar(
         hoja,
         [Math.cos(ang) * rad, y, Math.sin(ang) * rad],
-        [Math.cos(ang) * 0.45, -0.9, Math.sin(ang) * 0.45],
+        [Math.cos(ang) * 0.3, -1, Math.sin(ang) * 0.3],
         [1, 1, 0.42],
       );
-      const seca = r() > 0.5 ? PAL.frailejonSeco : PAL.frailejonSeco2;
-      hornearFollaje(hoja, {
-        base: '#4a3a26', sol: seca, luz: '#a98d5e',
-        centro: [0, y, 0], radio: 0.4, yMin: 0, yMax: H, ao: 0.42, manchas: 0.14,
-      });
-      partes.push(hoja);
+      partes.push(pintar(hoja, variar(r() > 0.55 ? PAL.frailejonSeco : PAL.frailejonSeco2, r, 0.14)));
     }
   }
 
-  // 3) ROSETA: hojas lanceoladas apretadas en espiral áurea. Las de afuera se
-  //    abren; las del centro van casi verticales → cogollo compacto y velloso.
-  const nRoseta = Math.max(16, Math.round(34 * q));
-  const cy = H + 0.02;
+  // 3) ROSETA plateada peluda — la FIRMA. Un COGOLLO afelpado, no una estrella:
+  //    hojas anchas, carnosas y GRUESAS (poco aplanadas) nacidas sobre una cúpula,
+  //    en espiral áurea, apenas abiertas (cuenco erguido, NO tendidas al ras), muy
+  //    densas y superpuestas → una bola velluda plateada. Las de afuera se recuestan
+  //    y agrisan (viejas); el centro es blanco y erguido (yema joven, tomento fresco).
+  const nRoseta = Math.max(18, Math.round(40 * q));
+  const plataInt = new THREE.Color(PAL.frailejonPlata);
+  const plataExt = new THREE.Color(PAL.frailejonPlata2);
   for (let i = 0; i < nRoseta; i++) {
-    const f = i / nRoseta; // 0 = exterior (vieja) → 1 = centro (nueva)
-    const ang = i * AUREO;
-    // Las viejas se tumban (casi horizontales), las nuevas se yerguen.
-    const tilt = 0.85 - f * 0.62 + (r() - 0.5) * 0.08;
+    const f = i / nRoseta; // 0 centro erguido → 1 borde recostado
+    const ang = i * GOLDEN + (r() - 0.5) * 0.18;
+    const posR = 0.03 + f * 0.11; // nacen sobre una cúpula, no de un punto
+    const posY = cy - f * 0.08; // las de afuera, más bajas → domo redondo
+    const tilt = 0.26 + f * 0.78 + (r() - 0.5) * 0.08; // cuenco: 15°→60°, sin aplanarse
     const s = Math.sin(tilt);
-    const largo = 0.32 - f * 0.1;
-    // ANCHA y CORTA: una hoja de frailejón es una lengua carnosa, no una púa.
-    // La versión anterior usaba conos largos y finos (r=0.062, l=0.5) muy
-    // separados → el conjunto se leía como un ERIZO blanco clavado en un palo,
-    // que es justo lo que el operador rechazó. Ancho ×2 y largo ×0.8, más
-    // hojas y menos abiertas → roseta compacta y vellosa.
-    const hoja = new THREE.ConeGeometry(0.135, largo, 6, 1);
+    const largo = 0.28 + (1 - f) * 0.13 + r() * 0.05; // cortas y llenas, no lanzas
+    // hoja carnosa ANCHA y con CUERPO (poco aplanada) — nada de cerda fina.
+    const hoja = new THREE.ConeGeometry(0.115, largo, 4, 1);
     apuntar(
       hoja,
-      [Math.cos(ang) * 0.03, cy + f * 0.045, Math.sin(ang) * 0.03],
+      [Math.cos(ang) * posR, posY, Math.sin(ang) * posR],
       [Math.cos(ang) * s, Math.cos(tilt), Math.sin(ang) * s],
-      [1, 1, 0.5], // lanceolada: carnosa. Aplanarla a 0.3 la volvía una púa.
+      [1, 1, 0.6],
     );
-    // Vellosa: verde-plata MATE. Nada de blanco tiza (eso la volvía un erizo de
-    // nieve); el frailejón es verde grisáceo con pelusa que apenas aclara.
-    hornearFollaje(hoja, {
-      base: '#5e6d4e', sol: PAL.frailejonPlata, luz: '#c2cdb0',
-      centro: [0, cy, 0], radio: 0.5, yMin: cy - 0.2, yMax: cy + 0.38,
-      ao: 0.5, manchas: 0.1,
-    });
-    partes.push(hoja);
+    const col = plataInt.clone().lerp(plataExt, f);
+    partes.push(pintar(hoja, variar(col, r, 0.05)));
   }
-  // Cogollo velloso: el corazón apretado de la roseta.
-  const corazon = matojoHoja(0.11, seed + 3, 0.3);
-  poner(corazon, [0, cy + 0.08, 0], [0, 0, 0], [1, 0.8, 1]);
-  hornearFollaje(corazon, {
-    base: '#8e9a7c', sol: PAL.frailejonCorazon, luz: '#e2e8d6',
-    centro: [0, cy + 0.08, 0], radio: 0.13, ao: 0.3, manchas: 0.06,
-  });
-  partes.push(corazon);
+  // Corona interior: unas pocas hojas cortas y ERGUIDAS que tapan el centro y lo
+  // hacen leer como un cogollo lleno (sin hueco oscuro), del blanco más pálido.
+  const nCorona = Math.max(4, Math.round(7 * q));
+  for (let i = 0; i < nCorona; i++) {
+    const ang = i * GOLDEN + 1.3;
+    const tilt = 0.14 + r() * 0.12;
+    const s = Math.sin(tilt);
+    const hoja = new THREE.ConeGeometry(0.075, 0.20 + r() * 0.05, 4, 1);
+    apuntar(
+      hoja,
+      [Math.cos(ang) * 0.03, cy + 0.05, Math.sin(ang) * 0.03],
+      [Math.cos(ang) * s, Math.cos(tilt), Math.sin(ang) * s],
+      [1, 1, 0.7],
+    );
+    partes.push(pintar(hoja, variar(PAL.frailejonCorazon, r, 0.04)));
+  }
+  // Yema vellosa central (el punto más pálido, afelpado).
+  const corazon = new THREE.IcosahedronGeometry(0.09, 0);
+  poner(corazon, [0, cy + 0.11, 0], [0, 0, 0], [1, 0.9, 1]);
+  partes.push(pintar(corazon, PAL.frailejonCorazon));
 
-  // 4) Escapo floral (solo en flor): capítulos amarillos sobre tallo velloso.
+  // 4) Escapo floral (solo en flor): tallo + capítulos amarillos sobre la roseta.
   if (flor) {
-    const tf = new THREE.CylinderGeometry(0.026, 0.038, 0.9, 5, 1);
-    poner(tf, [0.04, cy + 0.44, 0], [0, 0, 0.07]);
-    partes.push(pintarPlano(tf, PAL.frailejonTallo));
-    const nCap = Math.max(4, Math.round(8 * q));
+    const tallo = new THREE.CylinderGeometry(0.028, 0.045, 0.9, 5, 1);
+    poner(tallo, [0.05, cy + 0.45, 0], [0, 0, 0.08]);
+    partes.push(pintar(tallo, PAL.frailejonTallo));
+    const nCap = Math.max(4, Math.round(7 * q));
     for (let i = 0; i < nCap; i++) {
-      const ang = i * AUREO;
-      const rad = 0.09 + r() * 0.07;
-      const cap = matojoHoja(0.05 + r() * 0.018, seed + i, 0.24);
-      poner(cap, [0.07 + Math.cos(ang) * rad, cy + 0.86 + r() * 0.1, Math.sin(ang) * rad], [0, 0, 0], [1, 0.72, 1]);
-      hornearFollaje(cap, {
-        base: '#9b8420', sol: PAL.frailejonFlor, luz: '#f3e08a',
-        centro: [0.07, cy + 0.9, 0], radio: 0.2, ao: 0.3, manchas: 0.05,
-      });
-      partes.push(cap);
+      const ang = (i / nCap) * Math.PI * 2;
+      const rad = 0.1 + r() * 0.06;
+      const cap = new THREE.IcosahedronGeometry(0.055 + r() * 0.02, 0);
+      poner(cap, [0.08 + Math.cos(ang) * rad, cy + 0.85 + r() * 0.1, Math.sin(ang) * rad], [0, 0, 0], [1, 0.7, 1]);
+      partes.push(pintar(cap, variar(PAL.frailejonFlor, r, 0.08)));
     }
   }
 

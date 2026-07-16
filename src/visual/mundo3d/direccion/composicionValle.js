@@ -52,14 +52,18 @@ export const COMPOSICION_LUGARES = {
   // El semillero entre el corral y las eras, un paso adelante (se cría cerca).
   semillero: [-3.5, 6.5],
   // Las eras al frente-izquierda de la casa: donde el faro del día se lee solo.
-  suelo: [-1.6, 5.0],
+  // (Un paso más allá de la casa: la píldora de la alerta — anclada aquí —
+  //  pisaba el techo desde la cámara de reposo; ahora el faro respira solo.)
+  suelo: [-2.3, 5.5],
   // La huerta ES "la huerta de la casa" (su propia narración): pegada a ella.
   sanidad: [3.4, 4.4],
   // El mercado es LA SALIDA a la plaza: borde derecho-frontal, el camino que
   // se va del cuadro. Antes tapaba el centro-bajo del encuadre.
   mercado: [4.9, 6.3],
   // Los hongos en el corazón cultivado, con aire de la casa y de la milpa.
-  micorrizas: [-3.2, 3.7],
+  // (Corridos un paso al monte: desde la cámara de reposo quedaban justo
+  //  DETRÁS de la píldora de la alerta y su chip nunca se veía.)
+  micorrizas: [-3.8, 3.9],
   // La milpa cede un paso a la izquierda para darle aire a los hongos.
   cultivos: [-5.2, 2.2],
 };
@@ -88,7 +92,7 @@ export function componerMundos(mundos) {
 export const SENDEROS_VALLE = [
   {
     id: 'trajin', // casa → eras → semillero → corral: el circuito de la mañana
-    puntos: [[-0.9, 3.0], [-1.6, 4.6], [-3.3, 6.1], [-5.0, 5.9]],
+    puntos: [[-0.9, 3.0], [-2.0, 5.1], [-3.3, 6.1], [-5.0, 5.9]],
     frugal: true,
   },
   {
@@ -98,7 +102,7 @@ export const SENDEROS_VALLE = [
   },
   {
     id: 'milpa', // casa → los hongos → la milpa (la subida del lote)
-    puntos: [[-1.3, 2.5], [-3.0, 3.4], [-5.0, 2.4]],
+    puntos: [[-1.3, 2.5], [-3.6, 3.7], [-5.0, 2.4]],
     frugal: false,
   },
   {
