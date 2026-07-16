@@ -560,16 +560,35 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
           style={{ '--vm-tinte': tinteDeMundo(nav.mundoId)[0] }}
           aria-label={`Mundo ${tituloDeMundo(nav.mundoId)}`}
         >
-          <Mundo
-            mundoId={nav.mundoId}
-            tier={equipo.tier}
-            reducedMotion={reducedMotion}
-            onHotspot={onPuertaMundo}
-            onSalir={salirDelMundo}
-            animo={companero.animo}
-            energia={companero.energia}
-            hablando={!!dicho}
-          />
+          {/* DEFENSA EN PROFUNDIDAD: si un mundo falla al montar (p. ej. una
+              escena que no resuelve), el error queda ACOTADO al mundo — se
+              muestra una salida digna y se vuelve al valle, en vez de tumbar
+              toda la app. La causa raíz (React #306 por el lazy sin `default`)
+              queda arreglada en Mundo.jsx; esto es el cinturón de seguridad. */}
+          <Valle3DGuard
+            key={nav.mundoId}
+            fallback={(
+              <div className="mundo-caida" role="status" style={{ '--m-tinte': tinteDeMundo(nav.mundoId)[0] }}>
+                <p className="mundo-caida__txt">
+                  Este mundo no abrió bien. Su finca sigue completa; vuelva al valle e inténtelo de nuevo.
+                </p>
+                <button type="button" className="mundo-caida__btn" onClick={salirDelMundo}>
+                  ‹ El valle
+                </button>
+              </div>
+            )}
+          >
+            <Mundo
+              mundoId={nav.mundoId}
+              tier={equipo.tier}
+              reducedMotion={reducedMotion}
+              onHotspot={onPuertaMundo}
+              onSalir={salirDelMundo}
+              animo={companero.animo}
+              energia={companero.energia}
+              hablando={!!dicho}
+            />
+          </Valle3DGuard>
         </section>
       )}
 

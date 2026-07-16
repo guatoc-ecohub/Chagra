@@ -48,8 +48,13 @@ const IMPORTA_ESCENA = {
   // propio, atmósfera subterránea), fuera de escenas/ pero con el mismo contrato.
   micorrizas: () => import('./micorrizas/EscenaMicorrizas.jsx'),
 };
+/* React.lazy EXIGE que la promesa resuelva a `{ default: Componente }`. El
+   `importa().then(m => m.default || m)` resolvía al COMPONENTE pelado, así que
+   React leía `Componente.default` → `undefined` → crash #306 al entrar a
+   CUALQUIER mundo 3D (todas las escenas exportan default). Se envuelve en
+   `{ default: … }` — el mismo contrato que ya usa VitrinaMaestraMundos. */
 const ESCENAS_3D = Object.fromEntries(
-  Object.entries(IMPORTA_ESCENA).map(([k, importa]) => [k, lazy(() => importa().then(m => (/** @type {any} */ (m)).default || m))]),
+  Object.entries(IMPORTA_ESCENA).map(([k, importa]) => [k, lazy(() => importa().then(m => ({ default: (/** @type {any} */ (m)).default || m })))]),
 );
 
 /* Cuánto esperamos el chunk 3D antes de la CAÍDA DIGNA al 2D. Con señal
