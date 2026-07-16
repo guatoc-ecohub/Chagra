@@ -46,6 +46,34 @@ page.on('console', (m) => {
   if (m.type() === 'error') errores.push(`[console] ${m.text()}`);
 });
 
+// Sesión falsa para pasar el gate de login (isAuthenticated lee localforage:
+// farmos_access_token + expiry futuro bastan, no hay red de por medio).
+// localforage usa IndexedDB: default 'localforage/keyvaluepairs' y la app
+// clásica 'Chagra/syncQueue' — se siembra en ambas antes de cargar la app.
+await page.addInitScript(() => {
+  const sembrar = (db, store) =>
+    new Promise((res) => {
+      const req = indexedDB.open(db, 2);
+      req.onupgradeneeded = () => {
+        try { req.result.createObjectStore(store); } catch { /* ya existe */ }
+      };
+      req.onsuccess = () => {
+        try {
+          const tx = req.result.transaction(store, 'readwrite');
+          const st = tx.objectStore(store);
+          st.put('shot3d-token-diagnostico', 'farmos_access_token');
+          st.put(Date.now() + 86400000, 'farmos_token_expiry');
+          tx.oncomplete = () => res(undefined);
+          tx.onerror = () => res(undefined);
+        } catch { res(undefined); }
+      };
+      req.onerror = () => res(undefined);
+    });
+  // fire-and-forget: corre antes del primer script de la app
+  sembrar('localforage', 'keyvaluepairs');
+  sembrar('Chagra', 'syncQueue');
+});
+
 const shell = getFlag('shell', '/index-prod.html');
 await page.goto(`${base}${shell}#${ruta}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
 await page.waitForTimeout(wait);
