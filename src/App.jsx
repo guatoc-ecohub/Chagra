@@ -151,6 +151,11 @@ const VitrinaCriaturasMockup = lazy(() => import('./mockups/vitrina3d/VitrinaCri
 // Polylepis) — mallas three reales (tronco retorcido con rostro tallado, copa
 // instanciada), device-tiering real. Ruta #/mockups/bosque-vivo-3d, sin auth.
 const BosqueVivo3DMockup = lazy(() => import('./mockups/BosqueVivo3D'));
+// 3D: el MUNDO DEL CAFÉ — el cafetal bajo sombra del piso templado: surcos a
+// curva de nivel, cereza madurando verde→pintón→rojo por instancia, el sombrío
+// de guamos y nogales, y la casa-beneficiadero en la bruma. Device-tiering
+// real. Ruta #/mockups/cafetal-vivo-3d, sin auth.
+const CafetalVivo3DMockup = lazy(() => import('./mockups/CafetalVivo3D'));
 // 3D: el MUNDO SUELO VIVO — la RED MICORRÍZICA bajo tierra (el wood-wide web):
 // la red de hongos bioluminiscente que enlaza las raíces y reparte nutrientes,
 // con pulsos corriendo por los hilos y el Ent asomando. Device-tiering real.
@@ -570,6 +575,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-milpa': 'mockup_mundo3d_milpa',
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
   'mockups/bosque-vivo-3d': 'mockup_bosque_vivo_3d',
+  'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
   'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
   'mockups/voz-con-forma': 'mockup_voz_con_forma',
   'mockups/conversacion-voz': 'mockup_conversacion_voz',
@@ -1549,6 +1555,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El bosque vivo">
               <BosqueVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_cafetal_vivo_3d':
+        // Vitrina pública del MUNDO DEL CAFÉ: el cafetal bajo sombra del piso
+        // templado en 3D REAL — surcos a curva de nivel, cereza verde→pintón→
+        // rojo por instancia, el sombrío de guamos y nogales con su luz colada,
+        // y la casa-beneficiadero en la bruma. Cuatro pasos didácticos. En
+        // equipo humilde muestra la ficha. Ruta #/mockups/cafetal-vivo-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del café">
+              <CafetalVivo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
