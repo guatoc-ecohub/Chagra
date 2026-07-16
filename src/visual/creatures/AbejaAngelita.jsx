@@ -3,6 +3,7 @@ import './creatures.css';
 import './angelita-missminutes.css';
 import { CreatureFilters } from './_filters.jsx';
 import { OjosRubber, Cachetes, Sonrisa, BocaVisema, Miembro, AntenaRubber, RH_INK } from './_rubberhose.jsx';
+import { GafasSol, CejasRubber } from './AngelitaGafas.jsx';
 import { ABEJA_PALETA, ABEJA_PROPORCION } from './abejaIdentidad.js';
 import { cuerpoDeClima, PERFIL_ABEJA, ropaDeClimaBicho } from './creatureClimaCuerpo.js';
 import { AccesoriosClima } from './AccesoriosClima.jsx';
@@ -107,6 +108,17 @@ export function AbejaAngelita({
      mundoId (o mundo sin prop) entra con las manos libres. Va en su manita
      izquierda (el lado libre; la carita vive a la derecha). */
   mundoId = null,
+  /* ── GAFAS DE SOL (AngelitaGafas) ──────────────────────────────────────────
+     OPT-IN: false (default, nada cambia) | true (puestas sobre los ojitos) |
+     'poniendose' (reproduce UNA vez la caída teatral: baja girada, rebasa,
+     rebota y asienta — su entrada de día soleado). La cadencia vive en
+     angelita-missminutes.css gateada por data-gafas; RM = puestas quietas. */
+  gafas = false,
+  /* ── CEJAS EXPRESIVAS (AngelitaGafas.CejasRubber) ──────────────────────────
+     OPT-IN: null (default: la carita de siempre) | 'alegres' | 'altas' |
+     'vivas' (con eyebrow-flash al hablar) | 'fruncidas' (concentrada). El
+     agente las deriva por estado; cualquier host puede pedirlas directo. */
+  cejas = null,
   ...rest
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -296,19 +308,6 @@ export function AbejaAngelita({
       {/* Prop del mundo en la manita (entra heroica con su herramienta). */}
       {propMundo}
 
-      {/* Vestuario por clima+hora (ruana/sombrero/sudor) — solo con vestuario=true. */}
-      {ropa && (
-        <AccesoriosClima
-          estado={ropa}
-          tronco={{ cx: 0, cy: 0, rx: ABEJA_PROPORCION.troncoRx, ry: ABEJA_PROPORCION.troncoRy }}
-          cabeza={{ cx: 8.6, cy: -1.0, r: ABEJA_PROPORCION.cabezaR }}
-          animated={vivo}
-        />
-      )}
-
-      {/* Prop del mundo en la manita (entra heroica con su herramienta). */}
-      {propMundo}
-
       {lengua}
       {gotas}
       {polenEl}
@@ -345,6 +344,8 @@ export function AbejaAngelita({
     'data-lineboil': lineBoil ? '1' : undefined,
     'data-polen': polen ? '1' : undefined,
     'data-prop': mundoId || undefined,
+    'data-gafas': gafas ? (gafas === 'poniendose' && vivo ? 'poniendose' : '1') : undefined,
+    'data-cejas': cejas || undefined,
   };
 
   if (inline) {

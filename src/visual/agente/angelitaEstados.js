@@ -35,6 +35,7 @@ export const ESTADOS_ANGELITA = [
   'no-se',        // honesta: se encoge de hombros — no sabe y LO DICE
   'senala',       // guía: se inclina y apunta al POI, con destello donde señala
   'invita',       // guía: hace "venga" con la manita, acercándose
+  'husmea',       // fisgona: se inclina a olfatear el rastro (revisa la finca)
 ];
 
 /* Sinónimos amables → canónico. El host escribe como piensa; el cuerpo entiende. */
@@ -56,6 +57,10 @@ const ALIAS = {
   guia: 'senala',
   'guía': 'senala',
   ven: 'invita',
+  calma: 'acompana',
+  aviso: 'preocupada',
+  husmeando: 'husmea',
+  fisgonea: 'husmea',
 };
 
 /**
@@ -84,6 +89,24 @@ export const POSE_DE_ESTADO = {
   'no-se': 'vuela',
   senala: 'señala',       // el gesto afinado que ya vive en creatures.css
   invita: 'vuela',
+  husmea: 'vuela',        // la inclinación fisgona la pone el CSS del estado
+};
+
+/* Cada estado ACTÚA también con las CEJAS (CejasRubber, opt-in del cuerpo):
+   el que habla hace eyebrow-flash, la contenta las arquea, la que escucha las
+   levanta, la fisgona las frunce de concentración. null = la carita de siempre
+   (preocupada y no-se conservan SUS cejas dibujadas por el agente). */
+export const CEJAS_DE_ESTADO = {
+  acompana: null,
+  escuchando: 'altas',
+  pensando: null,
+  respondiendo: 'vivas',
+  contenta: 'alegres',
+  preocupada: null,
+  'no-se': null,
+  senala: 'fruncidas',
+  invita: 'altas',
+  husmea: 'fruncidas',
 };
 
 /* Narración para lectores de pantalla — usted, cercano, sin tecnicismos. */
@@ -97,6 +120,7 @@ export const ARIA_DE_ESTADO = {
   'no-se': 'Angelita no sabe la respuesta, y se lo dice con honestidad',
   senala: 'Angelita le está señalando algo',
   invita: 'Angelita lo invita a acercarse',
+  husmea: 'Angelita está husmeando: revisa la finca con cuidado',
 };
 
 /* ── EL REPERTORIO DEL IDLE VIVO (estado acompana) ───────────────────────────
