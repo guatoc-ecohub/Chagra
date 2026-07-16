@@ -594,6 +594,91 @@ export function geomLomitas(centros, seed = 44) {
   return fusionar(partes, 'geomLomitas');
 }
 
+/* -------------------------------------------------------------------------- */
+/*  BANCALES — los andenes de cultivo donde se asientan los pisos térmicos     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Terrazas de cultivo (andenes campesinos) que suben la montaña del mirador:
+ * cada fila de portales se asienta en su bancal. Cada bancal es una MESETA
+ * anular (el piso del andén, pasto con parches y cota apenas ondulada) más su
+ * TALUD al frente (el muro de tierra viva, oscuro al pie — AO horneado, con
+ * el pasto descolgándose por el borde). UNA geometría para todos.
+ *
+ * El talud se construye como arco de cilindro centrado en −z (donde vive la
+ * montaña). Sus normales nacen apuntando AFUERA del eje (lejos de la cámara):
+ * se espeja en X para voltear el winding (el arco es simétrico: la forma no
+ * cambia) y se niegan las normales a mano — la cara que la cámara ve queda
+ * front-face y con luz correcta.
+ *
+ * @param {Array<{radio:number, altura:number, caida:number, arco:number}>} filas
+ *   radio: radio medio del andén · altura: cota del piso · caida: alto del
+ *   talud (que se hunde en el andén de abajo) · arco: medio-ángulo (grados)
+ *   del abanico, medido desde −z.
+ * @param {number} seed
+ */
+export function geomBancales(filas, seed = 77) {
+  const pastoBase = new THREE.Color(PALM.pastoBase);
+  const pastoSeco = new THREE.Color(PALM.pastoSeco);
+  const pastoHumedo = new THREE.Color(PALM.pastoHumedo);
+  const tierra = new THREE.Color(PALM.tierraHumeda);
+  const tierraClara = new THREE.Color(PALM.tierraPisada);
+  /** @type {THREE.BufferGeometry[]} */
+  const partes = [];
+  filas.forEach((f, fi) => {
+    const A = THREE.MathUtils.degToRad(f.arco);
+    const rIn = f.radio - 1.9;
+    const rOut = f.radio + 1.8;
+
+    // La meseta: anillo en XY (θ=π/2−A..π/2+A cae en −z tras acostarlo) con la
+    // cota ondulada en z ANTES de rotar (z pre-rotación = altura post-rotación).
+    const meseta = new THREE.RingGeometry(rIn, rOut, 36, 3, Math.PI / 2 - A, A * 2);
+    const posM = meseta.attributes.position;
+    for (let v = 0; v < posM.count; v++) {
+      posM.setZ(v, (ruido2D(posM.getX(v) * 0.6 + fi * 11, posM.getY(v) * 0.6, seed) - 0.5) * 0.18);
+    }
+    pintarPorVertice(meseta, (x, y) => {
+      const c = pastoBase.clone();
+      c.lerp(pastoSeco, ruido2D(x * 2.1 + fi * 13, y * 2.1, seed + 3) * 0.5);
+      c.lerp(pastoHumedo, ruido2D(x * 0.9 - 7, y * 0.9 + fi, seed + 9) * 0.4);
+      return c;
+    });
+    poner(meseta, [0, f.altura, 0], [-Math.PI / 2, 0, 0]);
+    partes.push(meseta);
+
+    // El talud: arco de cilindro (θ=π−A..π+A ⇒ centrado en −z), pie más ancho.
+    const talud = new THREE.CylinderGeometry(
+      rIn + 0.02,
+      rIn + 0.6,
+      f.caida,
+      36,
+      3,
+      true,
+      Math.PI - A,
+      A * 2,
+    );
+    pintarPorVertice(talud, (x, y, z) => {
+      const t = THREE.MathUtils.clamp(y / f.caida + 0.5, 0, 1); // 1 = borde alto
+      /* el talud vive EN PASTO (talud campesino), la tierra asoma por parches
+         y hacia el pie — nunca un muro oscuro */
+      const c = pastoBase.clone().lerp(pastoSeco, ruido2D(x * 2.3, y * 2.3 + fi * 7, seed + 13) * 0.5);
+      c.lerp(tierra.clone().lerp(tierraClara, ruido2D(x * 1.7, z * 1.7 + fi * 5, seed + 21) * 0.6), 0.55 - t * 0.35);
+      c.multiplyScalar(0.88 + t * 0.18); // sombra suave hacia el pie
+      return c;
+    });
+    // espejo en X (winding volteado, forma intacta) + normales negadas: la
+    // cara visible desde la cámara queda front-face con luz correcta.
+    talud.scale(-1, 1, 1);
+    const nrm = talud.attributes.normal;
+    for (let v = 0; v < nrm.count; v++) {
+      nrm.setXYZ(v, -nrm.getX(v), -nrm.getY(v), -nrm.getZ(v));
+    }
+    poner(talud, [0, f.altura - f.caida / 2, 0]);
+    partes.push(talud);
+  });
+  return fusionar(partes, 'geomBancales');
+}
+
 export function geomLajasSendero(seed = 99) {
   const r = rng(seed);
   /** @type {THREE.BufferGeometry[]} */

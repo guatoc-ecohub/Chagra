@@ -4,7 +4,7 @@
  * REINVENCIÓN COMPLETA (feedback operador 2026-07-14: "está feíta, bien feíta,
  * merece una reinvención completa; lo único que sirve son los efectos de
  * entrada"). QUÉ ES AHORA: un MIRADOR ANDINO REALISTA a la hora dorada — el
- * lugar desde donde se ven los doce mundos de la finca. Registro visual del
+ * lugar desde donde se ven los quince mundos de la finca. Registro visual del
  * proyecto: los MUNDOS van realistas (los personajes rubber-hose viven en el
  * chrome DOM y en la fauna ambiental, nunca dentro del paisaje).
  *
@@ -32,6 +32,19 @@
  *   · Viñetas: DIORAMAS realistas horneados en una geometría por mundo (el
  *     cafetal con surcos, los frailejones con su enagua, la cresta nevada) —
  *     12 draw-calls estáticas, CERO useFrame por viñeta (antes eran 12 loops).
+ *
+ * SEGUNDO PASE (encargo del operador 2026-07-16: "validar que la entrada a los
+ * portales se lea clara y no apelotonada"). Antes: DOS filas de 6 arcos casi
+ * pegados que se montaban una sobre otra. Ahora el mirador es una MONTAÑA:
+ * CUATRO TERRAZAS por PISO TÉRMICO que suben del cálido al páramo — el ojo
+ * entiende "subo la montaña, cambian los mundos".
+ *   · PISOS es la fuente de verdad (mundo→piso, colores, ángulos, terraza).
+ *   · Cada fila se asienta en su BANCAL (geomBancales: andén campesino con
+ *     talud de tierra viva) y las filas se intercalan en pantalla (stagger).
+ *   · Se sumaron los mundos nuevos del carril app-3d: cacao (cálido), papa
+ *     (tierra fría) y abejas (templado) — 15 portales, cada uno con su
+ *     diorama horneado.
+ *   · Los chips y la rejilla 2D se agrupan por piso térmico con su etiqueta.
  *
  * MÁXIMO UN CANVAS VIVO: la galería muestra dioramas horneados, no las escenas
  * reales. El mundo real se monta por lazy import SOLO al cruzar, cuando el
@@ -62,6 +75,7 @@ import {
   geomArcoPiedra,
   geomLajasSendero,
   geomLomitas,
+  geomBancales,
   alturaTerreno,
   CAUCE_QUEBRADA,
 } from '../visual/mundo3d/vitrina/miradorAndino.geom.js';
@@ -85,7 +99,7 @@ const PUNTOS_FAUNA_VITRINA = [
 ];
 
 /* ══════════════════════════════════════════════════════════════════════════
-   LOS DOCE MUNDOS — datos de la vitrina + importadores perezosos
+   LOS QUINCE MUNDOS — datos de la vitrina + importadores perezosos
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* Importadores sueltos para PRECALENTAR el chunk al elegir (el dolly esconde
@@ -103,6 +117,9 @@ const IMPORTADORES = {
   suelo: () => import('./MundoSueloVivo3D.jsx'),
   lluvia: () => import('./ValleLluvia3D.jsx'),
   sierra: () => import('../visual/mundo3d/VistaGlobalSierra.jsx'),
+  cacao: () => import('./CacaoVivo3D.jsx'),
+  papa: () => import('./PapaVivo3D.jsx'),
+  abejas: () => import('./MundoAbejas3D.jsx'),
 };
 
 /* React 19 exige que lazy() resuelva a `{ default: Componente }` — devolver el
@@ -117,25 +134,89 @@ const COMPONENTES = /** @type {Record<string, import('react').ComponentType<any>
   )
 );
 
-/* La fila de ADELANTE (los mundos del diario) y la de ATRÁS en su terraza.
-   El orden ES el arco, de izquierda a derecha. colorA/colorB alimentan el
-   iris del cruce, los chips y la rejilla 2D — no el paisaje. */
-const FILA_FRENTE = [
-  { id: 'valle', titulo: 'El valle', emoji: '🏡', colorA: '#f2c063', colorB: '#1d4030' },
-  { id: 'cafe', titulo: 'El café', emoji: '☕', colorA: '#c96a2f', colorB: '#3a2416' },
-  { id: 'agua', titulo: 'El agua', emoji: '💧', colorA: '#7db8d4', colorB: '#1e3a4f' },
-  { id: 'sanidad', titulo: 'La sanidad', emoji: '🐞', colorA: '#f2c531', colorB: '#2e4020' },
-  { id: 'mercado', titulo: 'El mercado', emoji: '🧺', colorA: '#e0a458', colorB: '#4a2c18' },
-  { id: 'animales', titulo: 'Los animales', emoji: '🐔', colorA: '#d9a066', colorB: '#3f2a1a' },
+/* LOS PISOS TÉRMICOS — la fuente de verdad de la vitrina. El mirador es una
+   MONTAÑA: cuatro terrazas que suben del cálido al páramo. Cada piso define
+   su terraza (radio, cota del aro, escala de compensación por distancia y los
+   ángulos del abanico — intercalados con la fila de abajo para que en pantalla
+   ningún arco se monte sobre otro). El orden dentro de `mundos` ES el arco de
+   izquierda a derecha; colorA/colorB alimentan el iris del cruce, la brasa,
+   los chips y la rejilla 2D — no el paisaje. */
+const PISOS = [
+  {
+    id: 'calido',
+    nombre: 'Tierra cálida',
+    lema: 'el plan del río',
+    icono: '☀️',
+    color: '#c97a2e',
+    radio: 6.2,
+    alturaAro: 0.85,
+    escala: 1,
+    angulos: [-45, -15, 15, 45],
+    mundos: [
+      { id: 'cacao', titulo: 'El cacao', emoji: '🍫', colorA: '#c9873c', colorB: '#3a2416' },
+      { id: 'mercado', titulo: 'El mercado', emoji: '🧺', colorA: '#e0a458', colorB: '#4a2c18' },
+      { id: 'animales', titulo: 'Los animales', emoji: '🐔', colorA: '#d9a066', colorB: '#3f2a1a' },
+      { id: 'compost', titulo: 'El compost', emoji: '🍂', colorA: '#8a6a3a', colorB: '#241a0e' },
+    ],
+  },
+  {
+    id: 'templado',
+    nombre: 'Tierra templada',
+    lema: 'la ladera del café',
+    icono: '🌿',
+    color: '#7a9a3f',
+    radio: 9.3,
+    alturaAro: 2.8,
+    escala: 1.06,
+    angulos: [-50, -25, 0, 25, 50],
+    mundos: [
+      { id: 'cafe', titulo: 'El café', emoji: '☕', colorA: '#c96a2f', colorB: '#3a2416' },
+      { id: 'sanidad', titulo: 'La sanidad', emoji: '🐞', colorA: '#f2c531', colorB: '#2e4020' },
+      { id: 'valle', titulo: 'El valle', emoji: '🏡', colorA: '#f2c063', colorB: '#1d4030' },
+      { id: 'abejas', titulo: 'Las abejas', emoji: '🐝', colorA: '#e8b83a', colorB: '#3a2c14' },
+      { id: 'semillero', titulo: 'El semillero', emoji: '🌱', colorA: '#9fc46a', colorB: '#25391c' },
+    ],
+  },
+  {
+    id: 'frio',
+    nombre: 'Tierra fría',
+    lema: 'la tierra de la papa',
+    icono: '🌬️',
+    color: '#6f96a0',
+    radio: 12.0,
+    alturaAro: 4.75,
+    escala: 1.18,
+    angulos: [-42, -14, 14, 42],
+    mundos: [
+      { id: 'papa', titulo: 'La papa', emoji: '🥔', colorA: '#b28a52', colorB: '#2e2618' },
+      { id: 'suelo', titulo: 'El suelo vivo', emoji: '🪱', colorA: '#a97b4f', colorB: '#2b1d10' },
+      { id: 'agua', titulo: 'El agua', emoji: '💧', colorA: '#7db8d4', colorB: '#1e3a4f' },
+      { id: 'lluvia', titulo: 'La lluvia', emoji: '🌧️', colorA: '#9fb3c8', colorB: '#26323f' },
+    ],
+  },
+  {
+    id: 'paramo',
+    nombre: 'El páramo',
+    lema: 'donde nace el agua',
+    icono: '⛰️',
+    color: '#8fa6b4',
+    radio: 14.0,
+    alturaAro: 6.4,
+    escala: 1.3,
+    angulos: [-26, 26],
+    mundos: [
+      { id: 'paramo', titulo: 'El páramo', emoji: '🌫️', colorA: '#aec7cf', colorB: '#2a3b40' },
+      { id: 'sierra', titulo: 'La Sierra', emoji: '🏔️', colorA: '#e8ddc0', colorB: '#274035' },
+    ],
+  },
 ];
-const FILA_ATRAS = [
-  { id: 'semillero', titulo: 'El semillero', emoji: '🌱', colorA: '#9fc46a', colorB: '#25391c' },
-  { id: 'suelo', titulo: 'El suelo vivo', emoji: '🪱', colorA: '#a97b4f', colorB: '#2b1d10' },
-  { id: 'sierra', titulo: 'La Sierra', emoji: '🏔️', colorA: '#e8ddc0', colorB: '#274035' },
-  { id: 'paramo', titulo: 'El páramo', emoji: '🌫️', colorA: '#aec7cf', colorB: '#2a3b40' },
-  { id: 'lluvia', titulo: 'La lluvia', emoji: '🌧️', colorA: '#9fb3c8', colorB: '#26323f' },
-  { id: 'compost', titulo: 'El compost', emoji: '🍂', colorA: '#8a6a3a', colorB: '#241a0e' },
-];
+
+/* Un piso con más mundos que ángulos es un bug de datos: TRONAR al montar. */
+for (const piso of PISOS) {
+  if (piso.angulos.length !== piso.mundos.length) {
+    throw new Error(`VitrinaMaestraMundos: piso "${piso.id}" tiene ${piso.mundos.length} mundos y ${piso.angulos.length} ángulos`);
+  }
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    GEOMETRÍA DE LA GALERÍA — arcos, poses y bocas (constantes de módulo)
@@ -145,17 +226,17 @@ const FILA_ATRAS = [
 const CENTRO_MIRA = new THREE.Vector3(0, 1.3, 9);
 
 const POSE_GALERIA = {
-  pos: new THREE.Vector3(0, 3.3, 12.8),
-  mira: new THREE.Vector3(0, 1.6, -1.5),
-  fov: 46,
+  pos: new THREE.Vector3(0, 4.1, 14.6),
+  mira: new THREE.Vector3(0, 2.9, -2.5),
+  fov: 47,
 };
 /* En PORTRAIT el FOV horizontal se estrangula (hFov = f(vFov·aspecto)) y el
    arco de portales queda fuera de cuadro: la pose de galería se adapta —
-   más FOV y cámara más atrás — para que el mirador completo quepa parado. */
+   más FOV y cámara más atrás — para que la montaña completa quepa parada. */
 const POSE_GALERIA_ANGOSTA = {
-  pos: new THREE.Vector3(0, 3.4, 17.2),
-  mira: new THREE.Vector3(0, 1.95, -1.5),
-  fov: 58,
+  pos: new THREE.Vector3(0, 4.7, 23.0),
+  mira: new THREE.Vector3(0, 3.5, -2.5),
+  fov: 63,
 };
 const poseGaleria = (aspecto) => (aspecto < 0.9 ? POSE_GALERIA_ANGOSTA : POSE_GALERIA);
 const TMP_MIRA = new THREE.Vector3();
@@ -175,27 +256,57 @@ function aplicarFov(camera, fov) {
 }
 
 /* Arma un portal del arco: posición, giro hacia la galería y la pose de BOCA
-   (donde la cámara "mete la cara" al portal: FOV 15, mirando a la garganta). */
-function armarPortal(def, radio, alturaAro, anguloGrados) {
+   (donde la cámara "mete la cara" al portal: FOV 15, mirando a la garganta).
+   La escala del piso compensa la distancia (los arcos altos no se achican
+   hasta perderse) y estira el dolly en la misma proporción. */
+function armarPortal(def, piso, anguloGrados) {
   const a = THREE.MathUtils.degToRad(anguloGrados);
-  const pos = new THREE.Vector3(Math.sin(a) * radio, alturaAro, -Math.cos(a) * radio);
+  const pos = new THREE.Vector3(Math.sin(a) * piso.radio, piso.alturaAro, -Math.cos(a) * piso.radio);
   const dir = new THREE.Vector3(CENTRO_MIRA.x - pos.x, 0, CENTRO_MIRA.z - pos.z).normalize();
   const rotY = Math.atan2(dir.x, dir.z);
   const boca = {
-    pos: new THREE.Vector3().copy(pos).addScaledVector(dir, 1.55),
+    pos: new THREE.Vector3().copy(pos).addScaledVector(dir, 1.55 * piso.escala),
     mira: new THREE.Vector3().copy(pos).addScaledVector(dir, -0.6),
   };
-  return { ...def, pos: [pos.x, pos.y, pos.z], rotY, boca, atras: alturaAro > 2 };
+  return {
+    ...def,
+    pos: [pos.x, pos.y, pos.z],
+    rotY,
+    boca,
+    escala: piso.escala,
+    atras: piso.alturaAro > 2,
+    pisoId: piso.id,
+    pisoNombre: piso.nombre,
+  };
 }
 
-const ANGULOS_FRENTE = [-58, -35, -12, 12, 35, 58];
-const ANGULOS_ATRAS = [-52, -31, -10.5, 10.5, 31, 52];
-
-const PORTALES = [
-  ...FILA_FRENTE.map((def, i) => armarPortal(def, 6.3, 1.05, ANGULOS_FRENTE[i])),
-  ...FILA_ATRAS.map((def, i) => armarPortal(def, 9.6, 2.55, ANGULOS_ATRAS[i])),
-];
+const PORTALES = PISOS.flatMap((piso) =>
+  piso.mundos.map((def, i) => armarPortal(def, piso, piso.angulos[i])),
+);
 const PORTAL_POR_ID = Object.fromEntries(PORTALES.map((p) => [p.id, p]));
+
+/* Los bancales (andenes) de los pisos ALTOS, derivados de PISOS: el piso del
+   andén queda donde el arco apoya su laja de umbral. El cálido vive en la
+   plaza, sin bancal. */
+const BASE_ARCO = 1.14; // del centro del aro a su laja (geomArcoPiedra)
+const ARCOS_BANCAL = [64, 56, 40]; // medio-ángulo del abanico por piso alto
+const FILAS_BANCAL = PISOS.slice(1).map((piso, i) => {
+  const altura = piso.alturaAro - BASE_ARCO * piso.escala;
+  const alturaPrev = i === 0 ? 0 : PISOS[i].alturaAro - BASE_ARCO * PISOS[i].escala;
+  return {
+    radio: piso.radio,
+    altura,
+    caida: altura - alturaPrev + 0.55, // el talud se hunde en el andén de abajo
+    arco: ARCOS_BANCAL[i],
+  };
+});
+
+/* Lomitas que rematan el corte de cada bancal (el andén no termina en muro
+   seco) — una a cada punta del abanico. */
+const LOMITAS_REMATE = FILAS_BANCAL.flatMap((f) => {
+  const a = THREE.MathUtils.degToRad(f.arco);
+  return [-1, 1].map((lado) => [Math.sin(a) * f.radio * lado, f.altura - 1.0, -Math.cos(a) * f.radio]);
+});
 
 /* ══════════════════════════════════════════════════════════════════════════
    CÁMARA — el viaje Odyssey de la vitrina (INTACTO: es lo aprobado)
@@ -335,9 +446,9 @@ function PaisajeMirador({ tier }) {
       quebrada: geomQuebrada(),
       piedras: geomPiedrasQuebrada(),
       lajas: geomLajasSendero(),
-      lomitas: geomLomitas(
-        PORTALES.filter((p) => p.atras).map((p) => [p.pos[0], p.pos[1] - 2.2, p.pos[2]]),
-      ),
+      /* los andenes de la montaña + las lomitas que rematan sus cortes */
+      bancales: geomBancales(FILAS_BANCAL),
+      lomitas: geomLomitas(LOMITAS_REMATE),
     }),
     [tier],
   );
@@ -348,6 +459,7 @@ function PaisajeMirador({ tier }) {
           vive en sus vertexColors — Lambert las apagaba, el fog las lavaba */}
       <mesh geometry={geos.cordilleras} material={MAT_CORDILLERA} />
       <mesh geometry={geos.terreno} material={MAT_PAISAJE} />
+      <mesh geometry={geos.bancales} material={MAT_PAISAJE} />
       <mesh geometry={geos.lomitas} material={MAT_PAISAJE} />
       <mesh geometry={geos.quebrada} material={MAT_HORNEADO} />
       <mesh geometry={geos.piedras} material={MAT_PAISAJE} />
@@ -423,16 +535,17 @@ function Especie({ geo, items }) {
 }
 
 /* Bosquetes: los árboles se AGRUPAN (DR: agrupamiento y claros, no cuadrícula).
-   Zonas seguras: flancos del claro y el anillo detrás de la fila de atrás.
-   Jamás sobre la plaza (r<10 despejada para portales/cámara) ni el sendero. */
+   Zonas seguras: flancos del claro, marco del primer plano y los REMATES de
+   los andenes (con su cota `y` sobre el bancal — el terreno de atrás quedó
+   debajo de las terrazas). Jamás sobre la plaza ni delante de un arco. */
 const ZONAS_ARBOLEDA = [
-  { cx: -13.5, cz: 2.5, radio: 4.5, n: 7 }, // bosquete del flanco izquierdo
-  { cx: 13.5, cz: 2.0, radio: 4.5, n: 7 }, // bosquete del flanco derecho
-  { cx: -10, cz: -12.5, radio: 3.0, n: 4 }, // detrás de la terraza, izquierda
-  { cx: 10.5, cz: -12.5, radio: 3.0, n: 4 }, // detrás de la terraza, derecha
-  { cx: 0, cz: -17, radio: 2.6, n: 3 }, // el telón de fondo central (lejos: no asoma sobre los arcos)
+  { cx: -13.5, cz: 4.5, radio: 4.2, n: 7 }, // bosquete del flanco izquierdo
+  { cx: 13.5, cz: 4.0, radio: 4.2, n: 7 }, // bosquete del flanco derecho
   { cx: -11, cz: 9.5, radio: 2.6, n: 3 }, // marco del primer plano (izq)
   { cx: 11.5, cz: 9.0, radio: 2.6, n: 3 }, // marco del primer plano (der)
+  // arbolitos bajos a la orilla de la plaza: vida sin tapar ningún arco
+  { cx: -9.8, cz: -1.6, radio: 1.5, n: 3, s: 0.7 },
+  { cx: 9.8, cz: -1.6, radio: 1.5, n: 3, s: 0.7 },
 ];
 
 function ArbolesMirador({ tier }) {
@@ -467,10 +580,11 @@ function ArbolesMirador({ tier }) {
         const esp = r() < 0.6 ? dominante : especies[Math.floor(r() * especies.length)];
         const tintK = 1.15 + r() * 0.4; // tinte por instancia (rompe lo idéntico y levanta el verde al sol)
         porEspecie[esp].push({
-          pos: [x, alturaTerreno(x, z) - 0.05, z],
+          /* sobre un andén la zona trae su cota; en el claro manda el terreno */
+          pos: [x, (zona.y ?? alturaTerreno(x, z)) - 0.05, z],
           rotY: r() * Math.PI * 2,
           ladeo: (r() - 0.5) * 0.06,
-          escala: 1.0 + r() * 0.9,
+          escala: (1.0 + r() * 0.9) * (zona.s ?? 1),
           anchoExtra: 0.92 + r() * 0.16,
           tint: [tintK, tintK * (0.96 + r() * 0.08), tintK * (0.92 + r() * 0.1)],
         });
@@ -549,7 +663,7 @@ function Luciernagas({ tier, animada }) {
    PORTAL — arco de piedra seca + diorama horneado + brasa que llama
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* El arco es UNA geometría instanciada 12 veces (misma cantera). */
+/* El arco es UNA geometría instanciada 15 veces (misma cantera). */
 function ArcosPiedra({ tier }) {
   const q = calidadDeTier(tier);
   const geo = useMemo(() => geomArcoPiedra({ q }, 88), [q]);
@@ -567,6 +681,7 @@ function ArcosPiedra({ tier }) {
       p.set(portal.pos[0], portal.pos[1], portal.pos[2]);
       e.set(0, portal.rotY, portal.atras ? -0.02 : 0.02);
       qt.setFromEuler(e);
+      s.setScalar(portal.escala); // los pisos altos compensan la distancia
       m.compose(p, qt, s);
       mesh.setMatrixAt(i, m);
     });
@@ -616,7 +731,11 @@ function PortalMundo({ portal, elegido, interactivo, tier, onElegir, onSenalar }
   );
 
   return (
-    <group position={portal.pos} rotation={[0, portal.rotY, portal.atras ? -0.02 : 0.02]}>
+    <group
+      position={portal.pos}
+      rotation={[0, portal.rotY, portal.atras ? -0.02 : 0.02]}
+      scale={portal.escala}
+    >
       {/* garganta de sombra tras el diorama (profundidad de la boca) */}
       <mesh position={[0, 0, -0.55]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.8, 0.8, 0.9, 16, 1, true]} />
@@ -644,14 +763,16 @@ function PortalMundo({ portal, elegido, interactivo, tier, onElegir, onSenalar }
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   GALERÍA — el mirador completo con las dos terrazas de portales
+   GALERÍA — la montaña completa con las cuatro terrazas de pisos térmicos
    ══════════════════════════════════════════════════════════════════════════ */
 
 function GaleriaVitrina({ elegidoId, interactivo, tier, reducedMotion, onElegir, onSenalar }) {
   const animada = !reducedMotion;
   return (
     <group>
-      <fog attach="fog" args={[PALM.neblina, 20, 54]} />
+      {/* la niebla arranca DETRÁS del páramo (r≈14, cám a ~20): los dioramas
+          de los pisos altos se leen nítidos; la bruma queda para cordilleras */}
+      <fog attach="fog" args={[PALM.neblina, 30, 62]} />
       {/* la luz de la hora dorada: el sol rasante ILUMINA lo que la cámara ve
           (clave cálida desde el frente-derecha) + contraluz que separa copas */}
       <hemisphereLight args={['#d9e2e8', '#54503a', 1.05]} />
@@ -664,7 +785,7 @@ function GaleriaVitrina({ elegidoId, interactivo, tier, reducedMotion, onElegir,
       <ArbolesMirador tier={tier} />
       <Luciernagas tier={tier} animada={animada} />
 
-      {/* los doce arcos de piedra seca (una cantera, un InstancedMesh) */}
+      {/* los quince arcos de piedra seca (una cantera, un InstancedMesh) */}
       <ArcosPiedra tier={tier} />
 
       {/* cada boca: su diorama + su brasa + su blanco de toque */}
@@ -715,6 +836,7 @@ const CSS_VMX = `
   padding: 18px 20px calc(16px + env(safe-area-inset-bottom, 0px));
   pointer-events: none;
   transition: opacity 700ms ease;
+  z-index: 3; /* los chips por piso van SOBRE el Ent decorativo (z 2) */
 }
 .vmx-raiz[data-fase='acercando'] .vmx-chrome,
 .vmx-raiz[data-viaje='1'] .vmx-chrome { opacity: 0; }
@@ -779,11 +901,29 @@ const CSS_VMX = `
 }
 .vmx-chips {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
   padding: 4px 2px 6px;
   pointer-events: auto;
   scrollbar-width: thin;
+}
+/* cada piso térmico agrupa sus chips en una banda tintada con su color */
+.vmx-chips__grupo {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 12px;
+  border: 1.5px solid rgba(122, 90, 56, 0.25);
+  border-radius: 999px;
+}
+.vmx-chips__piso {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #4a3520;
+  white-space: nowrap;
 }
 .vmx-chip {
   appearance: none;
@@ -848,17 +988,40 @@ const CSS_VMX = `
 .vmx-volver:active { transform: translateY(1px); }
 
 /* ── rejilla gemela para tier bajo (el ritual sin WebGL) ──
-   Cada tarjeta lleva su VIÑETA CSS: el aro lleno con el cielo del mundo y el
+   Agrupada por PISO TÉRMICO (la montaña leída de abajo hacia arriba); cada
+   tarjeta lleva su VIÑETA CSS: el aro lleno con el cielo del mundo y el
    emoji flotando — la misma promesa de la ventana viva, en barato. */
 .vmx-rejilla {
   position: absolute;
   inset: 0;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 132px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(${PALM.cieloCenit} 0%, ${PALM.cieloHorizonte} 55%, ${PALM.tierraPisada} 100%);
+}
+.vmx-piso { display: flex; flex-direction: column; gap: 10px; }
+.vmx-piso__titulo {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #3a2a18;
+  line-height: 1.2;
+  border-left: 5px solid var(--piso, #7a5a38);
+  padding-left: 10px;
+  text-shadow: 0 1px 0 rgba(255, 244, 214, 0.5);
+}
+.vmx-piso__titulo small {
+  display: block;
+  font-size: 0.78em;
+  font-weight: 600;
+  opacity: 0.75;
+}
+.vmx-piso__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 12px;
-  padding: 96px 16px calc(20px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(${PALM.cieloCenit} 0%, ${PALM.cieloHorizonte} 55%, ${PALM.tierraPisada} 100%);
 }
 .vmx-tarjeta {
   appearance: none;
@@ -1013,7 +1176,7 @@ export default function VitrinaMaestraMundos({ onBack }) {
       data-fase={fase}
       data-viaje={viaje ? '1' : '0'}
       data-tier={tier}
-      aria-label="Vitrina maestra: un mirador andino de arcos de piedra lleva a cada mundo 3D de la finca con un viaje de túnel"
+      aria-label="Vitrina maestra: una montaña andina de cuatro pisos térmicos, con arcos de piedra que llevan a cada mundo 3D de la finca con un viaje de túnel"
     >
       <style>{CSS_VMX}</style>
 
@@ -1043,27 +1206,41 @@ export default function VitrinaMaestraMundos({ onBack }) {
         </Canvas>
       )}
 
-      {/* gemela sin WebGL: la rejilla de tarjetas-portal (tier bajo) */}
+      {/* gemela sin WebGL: la rejilla de tarjetas-portal (tier bajo), agrupada
+          por piso térmico — la misma montaña, leída de abajo hacia arriba */}
       {sinCanvas && fase !== 'mundo' && (
-        <div className="vmx-rejilla" role="list" aria-label="Los mundos de la finca">
-          {PORTALES.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              role="listitem"
-              className="vmx-tarjeta"
-              style={{ background: `linear-gradient(160deg, ${p.colorA} 0%, ${p.colorB} 100%)` }}
-              onClick={() => elegir(p.id)}
+        <div className="vmx-rejilla" aria-label="Los mundos de la finca, por piso térmico">
+          {PISOS.map((piso) => (
+            <section
+              key={piso.id}
+              className="vmx-piso"
+              style={/** @type {import('react').CSSProperties} */ ({ '--piso': piso.color })}
             >
-              <span
-                className="vmx-tarjeta__aro"
-                aria-hidden="true"
-                style={{ background: `radial-gradient(circle at 50% 30%, ${p.colorA} 0%, ${p.colorB} 85%)` }}
-              >
-                <span>{p.emoji}</span>
-              </span>
-              {p.titulo}
-            </button>
+              <h3 className="vmx-piso__titulo">
+                <span aria-hidden="true">{piso.icono}</span> {piso.nombre} <small>{piso.lema}</small>
+              </h3>
+              <div className="vmx-piso__grid" role="list">
+                {piso.mundos.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    role="listitem"
+                    className="vmx-tarjeta"
+                    style={{ background: `linear-gradient(160deg, ${p.colorA} 0%, ${p.colorB} 100%)` }}
+                    onClick={() => elegir(p.id)}
+                  >
+                    <span
+                      className="vmx-tarjeta__aro"
+                      aria-hidden="true"
+                      style={{ background: `radial-gradient(circle at 50% 30%, ${p.colorA} 0%, ${p.colorB} 85%)` }}
+                    >
+                      <span>{p.emoji}</span>
+                    </span>
+                    {p.titulo}
+                  </button>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       )}
@@ -1073,7 +1250,7 @@ export default function VitrinaMaestraMundos({ onBack }) {
           <div className="vmx-cabecera">
             <h2 className="vmx-titulo">
               El mirador de los mundos
-              <small>Toque un arco: el túnel lo lleva y lo trae</small>
+              <small>Del cálido al páramo: toque un arco y el túnel lo lleva</small>
             </h2>
             <div className="vmx-abeja">
               {/* Entrada HEROICA del CENTRAL (el avatar elegido; hoy Angelita):
@@ -1094,23 +1271,36 @@ export default function VitrinaMaestraMundos({ onBack }) {
           <div className="vmx-pie">
             {defSenalado && (
               <p className="vmx-senal" role="status">
-                {defSenalado.emoji} {defSenalado.titulo} — toque para entrar
+                {defSenalado.emoji} {defSenalado.titulo} — {defSenalado.pisoNombre.toLowerCase()} · toque para entrar
               </p>
             )}
             {!sinCanvas && (
-              <div className="vmx-chips" role="list" aria-label="Entrar a un mundo">
-                {PORTALES.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    role="listitem"
-                    className="vmx-chip"
-                    onClick={() => elegir(p.id)}
-                    disabled={!enGaleria}
+              <div className="vmx-chips" role="list" aria-label="Entrar a un mundo, por piso térmico">
+                {PISOS.map((piso) => (
+                  <div
+                    key={piso.id}
+                    className="vmx-chips__grupo"
+                    role="group"
+                    aria-label={`${piso.nombre} — ${piso.lema}`}
+                    style={{ background: `${piso.color}26`, borderColor: `${piso.color}55` }}
                   >
-                    <span aria-hidden="true">{p.emoji}</span>
-                    {p.titulo}
-                  </button>
+                    <span className="vmx-chips__piso" aria-hidden="true">
+                      {piso.icono} {piso.nombre}
+                    </span>
+                    {piso.mundos.map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        role="listitem"
+                        className="vmx-chip"
+                        onClick={() => elegir(p.id)}
+                        disabled={!enGaleria}
+                      >
+                        <span aria-hidden="true">{p.emoji}</span>
+                        {p.titulo}
+                      </button>
+                    ))}
+                  </div>
                 ))}
               </div>
             )}
@@ -1174,7 +1364,9 @@ export default function VitrinaMaestraMundos({ onBack }) {
                 style={{ background: `linear-gradient(160deg, ${portal.colorB} 0%, ${portal.colorA} 140%)` }}
               >
                 <span aria-hidden="true">{portal.emoji}</span>
-                Entrando a {portal.titulo.toLowerCase()}…
+                Entrando {portal.titulo.toLowerCase().startsWith('el ')
+                  ? `al ${portal.titulo.toLowerCase().slice(3)}`
+                  : `a ${portal.titulo.toLowerCase()}`}…
               </div>
             }
           >

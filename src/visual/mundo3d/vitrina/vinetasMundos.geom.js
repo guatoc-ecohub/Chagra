@@ -1,5 +1,5 @@
 /*
- * vinetasMundos.geom — los DOCE DIORAMAS que viven dentro de los arcos de la
+ * vinetasMundos.geom — los QUINCE DIORAMAS que viven dentro de los arcos de la
  * Vitrina Maestra.
  *
  * Cada viñeta es una MINIATURA REALISTA del mundo al que abre el arco (registro
@@ -150,7 +150,7 @@ function mata(r, x, y, z, s, oscuro, claro, blobs = 3) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*  LAS DOCE VIÑETAS                                                           */
+/*  LAS QUINCE VIÑETAS                                                         */
 /* -------------------------------------------------------------------------- */
 
 /** 🏡 El valle: la casita campesina encalada en su loma, con su camino. */
@@ -916,6 +916,210 @@ export function vinetaCompost({ q = 1 } = {}, seed = 112) {
   return fusionar(partes, 'vinetaCompost');
 }
 
+/** 🍫 El cacao: mazorcas sobre el tronco (caulifloria) bajo la sombra alta. */
+export function vinetaCacao({ q = 1 } = {}, seed = 113) {
+  const r = rng(seed);
+  const partes = fondo(
+    { cieloAlto: '#93ab8e', cieloBajo: '#efd6a0', suelo: '#4f3d28', sueloVar: '#6a5138', lomas: ['#42563c'] },
+    seed,
+  );
+
+  // plátanos de sombra a los flancos: tallo + hojas alargadas que cuelgan
+  for (const [px, py, ps] of [[-0.44, -0.12, 0.95], [0.46, -0.18, 0.75]]) {
+    const tallo = new THREE.CylinderGeometry(0.014 * ps, 0.022 * ps, 0.34 * ps, 5);
+    poner(tallo, [px, py + 0.14 * ps, -0.33], [0, 0, (r() - 0.5) * 0.2]);
+    pintar(tallo, variar('#7a8a4e', r, 0.08));
+    partes.push(tallo);
+    for (let i = 0; i < 4; i++) {
+      const ang = -1.1 + i * 0.72 + (r() - 0.5) * 0.25;
+      const hoja = new THREE.CircleGeometry(0.15 * ps, 6);
+      poner(
+        hoja,
+        [px + Math.cos(ang) * 0.09 * ps, py + 0.3 * ps + Math.sin(ang) * 0.05, -0.325 + i * 0.003],
+        [0, 0, ang],
+        [1.6, 0.3, 1],
+      );
+      pintar(hoja, variar(i % 2 ? '#5c7a40' : '#4c6a38', r, 0.1));
+      partes.push(hoja);
+    }
+  }
+
+  // el cacaotero protagonista: tronco bajo con su horqueta
+  const tronco = new THREE.CylinderGeometry(0.034, 0.055, 0.52, 6);
+  poner(tronco, [-0.04, -0.2, -0.27], [0, 0, 0.08]);
+  pintar(tronco, variar('#5a4432', r, 0.08));
+  partes.push(tronco);
+  for (const [rx, ry, ra] of [[0.1, 0.12, -0.72], [-0.16, 0.1, 0.66]]) {
+    const rama = new THREE.CylinderGeometry(0.015, 0.026, 0.3, 5);
+    poner(rama, [rx, ry, -0.27], [0, 0, ra]);
+    pintar(rama, variar('#5a4432', r, 0.08));
+    partes.push(rama);
+  }
+  // copa de hojas grandes (blobs anchos, verde profundo con luz arriba)
+  const nCopa = Math.max(4, Math.round(6 * q));
+  for (let i = 0; i < nCopa; i++) {
+    const ang = (i / nCopa) * Math.PI * 2 + r() * 0.5;
+    const blob = new THREE.IcosahedronGeometry(0.09 + r() * 0.05, 0);
+    poner(
+      blob,
+      [-0.03 + Math.cos(ang) * (0.12 + r() * 0.1), 0.26 + Math.sin(ang) * 0.07 + r() * 0.06, -0.29],
+      [r(), r(), r()],
+      [1.35, 0.6 + r() * 0.25, 1],
+    );
+    pintar(blob, new THREE.Color('#3d5233').lerp(new THREE.Color('#5c7a46'), 0.25 + r() * 0.5));
+    partes.push(blob);
+  }
+  // LAS MAZORCAS pegadas al tronco (caulifloria: la firma del cacao)
+  const coloresMazorca = ['#d9a33c', '#c97e2e', '#a8542a', '#8a9b3a', '#c9702e'];
+  const puestos = [[-0.1, -0.12], [0.04, -0.26], [0.02, 0.0], [0.16, 0.18], [-0.14, -0.32], [-0.2, 0.16]];
+  const nMaz = Math.max(4, Math.round(puestos.length * q));
+  for (let i = 0; i < nMaz; i++) {
+    const [mx, my] = puestos[i];
+    const maz = new THREE.IcosahedronGeometry(0.05 + r() * 0.018, 0);
+    poner(maz, [mx, my, -0.23], [0, 0, (r() - 0.5) * 0.5], [0.72, 1.2, 0.72]);
+    pintar(maz, variar(coloresMazorca[i % coloresMazorca.length], r, 0.08));
+    partes.push(maz);
+  }
+  // la mazorca cosechada al pie
+  const caida = new THREE.IcosahedronGeometry(0.055, 0);
+  poner(caida, [0.3, -0.52, -0.22], [0, 0, 1.35], [0.72, 1.15, 0.72]);
+  pintar(caida, variar('#c97e2e', r, 0.06));
+  partes.push(caida);
+  return fusionar(partes, 'vinetaCacao');
+}
+
+/** 🥔 La papa: surcos de la tierra fría en diagonal, matas en flor. */
+export function vinetaPapa({ q = 1 } = {}, seed = 114) {
+  const r = rng(seed);
+  const partes = fondo(
+    { cieloAlto: '#8ea6ba', cieloBajo: '#ddd6b6', suelo: '#4a3a28', sueloVar: '#61503a', lomas: ['#5a6a52', '#7d8b96'] },
+    seed,
+  );
+
+  // los surcos: lomos de tierra en diagonal que llenan la media luna
+  const angSurco = 0.32; // caída de la ladera
+  const ux = -Math.cos(angSurco);
+  const uy = -Math.sin(angSurco);
+  for (let s = 0; s < 3; s++) {
+    const largo = 1.0 - s * 0.16;
+    const cx = -0.04 + s * 0.12;
+    const cy = -0.14 - s * 0.17;
+    const surco = new THREE.CylinderGeometry(0.042, 0.06, largo, 7);
+    pintarPorVertice(surco, (x, y) =>
+      new THREE.Color('#54422c').lerp(new THREE.Color('#6f5a3c'), ruido2D(x * 14, y * 5 + s * 3, seed) * 0.6),
+    );
+    poner(surco, [cx, cy, -0.3 + s * 0.02], [0, 0, Math.PI / 2 + angSurco]);
+    partes.push(surco);
+    // matas de papa sobre el lomo, con sus flores moradas y blancas
+    const nM = Math.max(2, Math.round(3 * q));
+    for (let i = 0; i < nM; i++) {
+      const t = (i / Math.max(1, nM - 1) - 0.5) * (largo - 0.22);
+      const mx = cx + ux * t;
+      const my = cy + uy * t + 0.05;
+      partes.push(...mata(r, mx, my, -0.26 + s * 0.02, 0.8, '#35523a', '#57744a', 3));
+      if (r() > 0.3) {
+        const flor = new THREE.IcosahedronGeometry(0.014, 0);
+        poner(flor, [mx + (r() - 0.5) * 0.05, my + 0.09, -0.235 + s * 0.02]);
+        pintar(flor, r() > 0.5 ? '#b9a3cc' : '#e8e4da');
+        partes.push(flor);
+      }
+    }
+  }
+  // la cosecha desenterrada al pie del surco
+  for (let i = 0; i < 3; i++) {
+    const papa = new THREE.IcosahedronGeometry(0.032 + r() * 0.012, 0);
+    poner(papa, [-0.26 + i * 0.11 + r() * 0.03, -0.55 + r() * 0.03, -0.22], [r(), r(), r()], [1.25, 0.85, 1]);
+    pintar(papa, variar('#b28a52', r, 0.1));
+    partes.push(papa);
+  }
+  // el azadón descansando contra el surco
+  const palo = new THREE.CylinderGeometry(0.009, 0.009, 0.4, 5);
+  poner(palo, [0.4, -0.34, -0.24], [0, 0, -0.5]);
+  pintar(palo, '#8a6a46');
+  partes.push(palo);
+  const lamina = new THREE.BoxGeometry(0.07, 0.05, 0.012);
+  poner(lamina, [0.31, -0.5, -0.24], [0, 0, 0.4]);
+  pintar(lamina, '#6d7880');
+  partes.push(lamina);
+  return fusionar(partes, 'vinetaPapa');
+}
+
+/** 🐝 Las abejas: la colmena blanca en su pradera florida, nube dorada. */
+export function vinetaAbejas({ q = 1 } = {}, seed = 115) {
+  const r = rng(seed);
+  const partes = fondo(
+    { cieloAlto: '#a3bdd0', cieloBajo: '#f2dfae', suelo: '#5d7241', sueloVar: '#7d8c4e', lomas: ['#55704a'] },
+    seed,
+  );
+
+  // la colmena Langstroth sobre su banquito de madera
+  const bx = -0.16;
+  for (const px of [-0.08, 0.08]) {
+    const pata = new THREE.BoxGeometry(0.03, 0.07, 0.03);
+    poner(pata, [bx + px, -0.46, -0.28]);
+    pintar(pata, variar('#6a5844', r, 0.08));
+    partes.push(pata);
+  }
+  const alzas = [
+    { w: 0.3, h: 0.13, y: -0.36, c: '#e8e2d2' },
+    { w: 0.3, h: 0.12, y: -0.235, c: '#d9d0ba' },
+    { w: 0.26, h: 0.1, y: -0.125, c: '#e8e2d2' },
+  ];
+  for (const a of alzas) {
+    const caja = new THREE.BoxGeometry(a.w, a.h, 0.2);
+    pintarPorVertice(caja, (x, y) =>
+      new THREE.Color(a.c).lerp(new THREE.Color('#b8ae96'), Math.max(0, -y) * 3 * ruido2D(x * 9, y * 9, seed) + 0.08),
+    );
+    poner(caja, [bx, a.y, -0.28], [0, 0, (r() - 0.5) * 0.04]);
+    partes.push(caja);
+  }
+  // la tapa de lámina y la piquera oscura con su tabla de vuelo
+  const tapa = new THREE.BoxGeometry(0.32, 0.035, 0.23);
+  poner(tapa, [bx, -0.055, -0.28], [0, 0, 0.02]);
+  pintar(tapa, variar('#8a8579', r, 0.06));
+  partes.push(tapa);
+  const piquera = new THREE.BoxGeometry(0.16, 0.022, 0.02);
+  poner(piquera, [bx, -0.415, -0.175]);
+  pintar(piquera, '#3a3026');
+  partes.push(piquera);
+  const tabla = new THREE.BoxGeometry(0.18, 0.014, 0.05);
+  poner(tabla, [bx, -0.435, -0.15], [0.35, 0, 0]);
+  pintar(tabla, variar('#a09048', r, 0.08));
+  partes.push(tabla);
+
+  // la nube dorada: abejas saliendo de la piquera en arco hacia las flores
+  const nAbejas = Math.max(5, Math.round(9 * q));
+  for (let i = 0; i < nAbejas; i++) {
+    const t = i / (nAbejas - 1);
+    const ax = bx + 0.1 + t * 0.42 + (r() - 0.5) * 0.07;
+    const ay = -0.38 + Math.sin(t * Math.PI) * (0.3 + r() * 0.1);
+    const abeja = new THREE.IcosahedronGeometry(0.013 + r() * 0.005, 0);
+    poner(abeja, [ax, ay, -0.2], [r(), r(), r()], [1.35, 0.9, 1]);
+    pintar(abeja, variar(i % 3 === 2 ? '#3a3026' : '#e0a83c', r, 0.08));
+    partes.push(abeja);
+  }
+
+  // la pradera florida que las llama (tallos + cabezas de color)
+  const coloresFlor = ['#e8e4da', '#e8c04a', '#b9a3cc', '#cc7a5a'];
+  const nFlores = Math.max(4, Math.round(6 * q));
+  for (let i = 0; i < nFlores; i++) {
+    const fx = 0.18 + (i / nFlores) * 0.4 + (r() - 0.5) * 0.05;
+    const fy = -0.52 + r() * 0.1;
+    const alto = 0.08 + r() * 0.08;
+    const talloF = new THREE.CylinderGeometry(0.004, 0.005, alto, 4);
+    poner(talloF, [fx, fy + alto / 2, -0.24], [0, 0, (r() - 0.5) * 0.3]);
+    pintar(talloF, variar('#57744a', r, 0.1));
+    partes.push(talloF);
+    const cabeza = new THREE.IcosahedronGeometry(0.02 + r() * 0.008, 0);
+    poner(cabeza, [fx, fy + alto + 0.015, -0.24]);
+    pintar(cabeza, variar(coloresFlor[i % coloresFlor.length], r, 0.08));
+    partes.push(cabeza);
+  }
+  // una mata de sombra al fondo, del lado de la colmena
+  partes.push(...mata(r, -0.5, -0.3, -0.3, 1.15, '#3f5a35', '#5c7a46', 4));
+  return fusionar(partes, 'vinetaAbejas');
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Registro                                                                   */
 /* -------------------------------------------------------------------------- */
@@ -934,6 +1138,9 @@ export const VINETAS_GEOM = {
   paramo: vinetaParamo,
   lluvia: vinetaLluvia,
   compost: vinetaCompost,
+  cacao: vinetaCacao,
+  papa: vinetaPapa,
+  abejas: vinetaAbejas,
 };
 
 /**
