@@ -46,7 +46,6 @@ import {
 import useCicloDia from '../visual/mundo3d/useCicloDia.js';
 import Valle2DFallback from './valle/Valle2DFallback';
 import AbejaTransicion, { AlMontarEscena } from '../visual/creatures/AbejaTransicion.jsx';
-import { AbejaAngelita } from '../visual/creatures/AbejaAngelita.jsx';
 /* El framework de MUNDOS (three-free en el barrel; los dioramas 3D bajan
    perezosos en `vendor-three`): tocar un lugar del valle ENTRA de verdad. */
 import Mundo, {
