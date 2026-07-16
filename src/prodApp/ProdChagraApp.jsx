@@ -351,14 +351,24 @@ export default function ProdChagraApp() {
       const { view, data } = parseHash();
       // Verificar auth de forma asíncrona real (isAuthenticated es async)
       isAuthenticated().then((autenticado) => {
-        if (autenticado || view === 'login' || view === 'oauth-callback') {
+        // Las rutas 3D y el valle son PÚBLICAS: prod.chagra.app es la vista 3D
+        // y su puerta de entrada es el valle, no un formulario (App.jsx:1157
+        // hace lo mismo y lo documenta). Solo la finca del campesino pide
+        // sesión. Antes este else forzaba 'login' para CUALQUIER vista, así que
+        // EntradaValle3D y los 12 mundos eran inalcanzables aunque estuvieran
+        // registrados en el LAZY_MAP.
+        const publica = !view || view === 'valle3d' || RUTAS.has(view)
+          || view === 'login' || view === 'oauth-callback';
+        if (autenticado || publica) {
           setNavData(data ?? null);
           setCurrentView(view || 'valle3d');
         } else {
           setCurrentView('login');
         }
       }).catch(() => {
-        setCurrentView('login');
+        // Sin poder verificar la sesión, la vista pública sigue siendo pública.
+        setNavData(data ?? null);
+        setCurrentView(view && RUTAS.has(view) ? view : 'valle3d');
       });
     };
     window.addEventListener('hashchange', onHash);
@@ -372,16 +382,26 @@ export default function ProdChagraApp() {
       // un setState síncrono dentro del effect dispara renders en cascada).
       setNavData(data ?? null);
       setAuth(autenticado);
+      // prod.chagra.app ES la vista 3D: su puerta es el valle, no un
+      // formulario. Las rutas 3D y el valle son PÚBLICAS; lo que pide sesión es
+      // la finca del campesino. App.jsx:1157 hace exactamente esto y lo
+      // documenta. Antes, este else mandaba a 'login' CUALQUIER vista sin
+      // sesión → EntradaValle3D y los 12 mundos eran inalcanzables aunque
+      // estuvieran registrados en el LAZY_MAP: construidos y tapados.
+      const publica = !view || view === 'valle3d' || RUTAS.has(view);
       if (autenticado) {
         setCurrentView(view || 'valle3d');
       } else if (view === 'oauth-callback') {
         setCurrentView('oauth-callback');
+      } else if (publica) {
+        setCurrentView(view || 'valle3d');
       } else {
         setCurrentView('login');
       }
     }).catch(() => {
+      // Sin poder verificar la sesión, lo público sigue público.
       setAuth(false);
-      setCurrentView('login');
+      setCurrentView(view && RUTAS.has(view) ? view : 'valle3d');
     });
   }, []);
 

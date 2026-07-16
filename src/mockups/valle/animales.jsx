@@ -34,17 +34,10 @@ import {
   geomOveja,
 } from '../../visual/mundo3d/finca/fincaRealista.geom.js';
 
-/* El material COMPARTIDO de las mallas fusionadas con color horneado por
-   vértice (arboleda por especie hoy; el hato realista de finca-realismo-d1
-   cuando mergee — mismo export, cero conflicto). UNO para todas: cada malla
-   fusionada es 1 draw call. */
-export const MATERIAL_FINCA = new THREE.MeshLambertMaterial({
-  vertexColors: true,
-  flatShading: true,
-});
-
 /* Material ÚNICO compartido por toda la finca realista: cada malla trae su
-   color horneado en vertexColors → un solo programa para todo el hato. */
+   color horneado en vertexColors → un solo programa para todo el hato, y la
+   arboleda por especie usa el mismo export. UNO para todas: cada malla
+   fusionada es 1 draw call. */
 export const MATERIAL_FINCA = new THREE.MeshLambertMaterial({
   vertexColors: true,
   flatShading: true,
