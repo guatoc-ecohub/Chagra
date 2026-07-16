@@ -102,8 +102,13 @@ export default function DomoCielo({ atm, radio = 60, glow = null }) {
     const m = meshRef.current;
     if (!m) return;
     const u = m.material.uniforms;
-    u.uCenit.value.set(atm.cielo);
-    u.uHorizonte.value.set(atm.niebla);
+    /* La NOCHE apaga el domo: las familias cálidas (corral, sotobosque)
+       aportan su 40% claro a la mezcla y sin esto el cielo nocturno queda
+       gris-lavado. `intensidad` ya ES "cuánto baja la hora" (noche 0.55,
+       día ≥0.9): se reusa como atenuador — de día no muerde (clamp a 1). */
+    const kNoche = Math.min(1, 0.22 + 0.78 * atm.intensidad);
+    u.uCenit.value.set(atm.cielo).multiplyScalar(kNoche);
+    u.uHorizonte.value.set(atm.niebla).multiplyScalar(kNoche);
     u.uAstro.value.set(atm.luz);
     u.uSolDir.value.set(atm.solPos[0], atm.solPos[1], atm.solPos[2]);
     u.uGlow.value = glow ?? GLOW_FRANJA[atm.franja] ?? 0.3;
