@@ -164,14 +164,11 @@ export const JERARQUIA_PERSONAJES = {
    mapa COMPOSICION_LUGARES). El precedente de la sierra (3 de 4 árboles
    ocultos tras el macizo) no se repite acá. */
 export const VECINOS_VALLE = [
-  {
-    slug: 'oso-andino',
-    punto: [5.4, -1.2], // el borde del monte, junto al bosque que trepa al frío
-    px: 44, // el mayor de los vecinos: presencia de verdad, no miniatura
-    factor: 9, // presencia del mayor: casi el factor de Angelita (9)
-    dy: 0.3,
-    franjas: null, // el oso ronda a toda hora
-  },
+  // NOTA (rediseño 2026-07): el oso rubber-hose café (`oso-andino`, paleta
+  // parda #3b2a1e) se RETIRA del valle por decisión del operador — la
+  // caricatura quedó fea. El oso NEGRO bueno (biopunk) vive en el selector de
+  // guardián del home (GuardianEspiritu). Este slot de ancla ([5.4,-1.2],
+  // px≈44) queda reservado para el CÓNDOR (por crear en el pase de arte).
   {
     slug: 'perezoso',
     punto: [3.1, -2.2], // colgado a la falda de la arboleda, detrás del oso
