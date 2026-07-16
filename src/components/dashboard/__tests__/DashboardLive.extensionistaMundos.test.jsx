@@ -20,7 +20,7 @@ import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('../../../config/glaciarAccess', () => ({
   tieneAccesoGlaciarActual: () => false,
-  esOperadorActual: () => true, // el operador ve todo (renderJavier, etc.)
+  esOperadorActual: () => true, // el operador ve todo (renderCampoPanel, etc.)
 }));
 
 vi.mock('../../../config/fincaVivaHomeFlag', () => ({

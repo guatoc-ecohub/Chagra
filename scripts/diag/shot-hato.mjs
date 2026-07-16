@@ -5,9 +5,11 @@ import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const OUTDIR = process.env.SHOT_OUTDIR || tmpdir();
 const PORT = 5199;
 const BASE = `http://127.0.0.1:${PORT}`;
 const [etiqueta = 'x', ...vistasArg] = process.argv.slice(2);
@@ -36,7 +38,7 @@ for (const vista of VISTAS) {
   try {
     await page.goto(`${BASE}/scripts/diag/hato.html?vista=${vista}`, { waitUntil: 'load', timeout: 40000 });
     await sleep(5000);
-    const f = `/tmp/claude-1000/-home-kortux/93695a3d-dc16-45f5-8c0e-608e6e767ffd/scratchpad/hato-${etiqueta}-${vista}.png`;
+    const f = path.join(OUTDIR, `hato-${etiqueta}-${vista}.png`);
     await page.screenshot({ path: f, timeout: 60000 });
     console.log('OK', vista, f);
   } catch (e) { console.log('FAIL', vista, String(e).slice(0, 120)); }

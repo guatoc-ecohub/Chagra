@@ -47,6 +47,7 @@ import { tieneAccesoGlaciarActual, esOperadorActual } from '../../config/glaciar
 import { esExtensionistaRealActual } from '../../config/extensionistaAccess';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import { registroUnificadoActivo } from '../../config/registroUnificadoFlag';
+import { PRIMARY_WORKER_NAME } from '../../config/workerConfig';
 import SelectedBackgroundReveal from './SelectedBackgroundReveal';
 import MiFincaVivaHomeCard from './MiFincaVivaHomeCard';
 import FincaRedInstitucional from './FincaRedInstitucional';
@@ -383,13 +384,13 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             return true; // Fail-open: no esconder el módulo por un error.
         }
     });
-    // Rescate huérfano 2026-06-24 (descubribilidad): "Campo, Javier"
-    // (WorkerDashboard) era HUÉRFANO — solo accesible desde el NAV_TILES del
-    // DashboardView muerto o por #javier. Es una vista de SUPERVISOR/trabajador
-    // (nicho), así que la exponemos gateada al OPERADOR (no se la mostramos al
-    // campesino dueño para no ensuciar la home). La ruta #javier sigue viva en el
-    // router. Ref: CAPABILITIES_STATUS.md §2.
-    const [mostrarJavier] = useState(() => {
+    // Rescate huérfano 2026-06-24 (descubribilidad): el panel "Campo,
+    // <trabajador>" (WorkerDashboard) era HUÉRFANO — solo accesible desde el
+    // NAV_TILES del DashboardView muerto o por #campo_trabajador. Es una vista de
+    // SUPERVISOR/trabajador (nicho), así que la exponemos gateada al OPERADOR (no
+    // se la mostramos al campesino dueño para no ensuciar la home). La ruta
+    // #campo_trabajador sigue viva en el router. Ref: CAPABILITIES_STATUS.md §2.
+    const [mostrarCampoPanel] = useState(() => {
         try {
             return esOperadorActual();
         } catch (_) {
@@ -630,20 +631,20 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
         </div>
     );
 
-    // Banner "Campo, Javier" (gateado al operador) — idéntico en ambos layouts.
-    const renderJavier = () => (mostrarJavier && (
+    // Banner "Campo, <trabajador>" (gateado al operador) — idéntico en ambos layouts.
+    const renderCampoPanel = () => (mostrarCampoPanel && (
         <div className={`px-4 pt-3 ${fincaVivaFlag ? 'fvh-resto-block' : ''}`}>
             <button
                 type="button"
-                onClick={() => onNavigate('javier')}
+                onClick={() => onNavigate('campo_trabajador')}
                 className="w-full flex items-center gap-3 p-3.5 rounded-2xl border border-slate-700/60 bg-slate-900/40 hover:bg-slate-800/50 active:scale-[0.99] transition text-left"
-                aria-label="Campo, Javier: panel de trabajo en finca"
+                aria-label={`Campo, ${PRIMARY_WORKER_NAME}: panel de trabajo en finca`}
             >
                 <span className="shrink-0 w-11 h-11 rounded-xl bg-emerald-500/15 grid place-items-center">
                     <Eye size={24} className="text-emerald-300" />
                 </span>
                 <span className="flex-1 min-w-0">
-                    <span className="block font-bold text-slate-100 leading-tight">Campo, Javier</span>
+                    <span className="block font-bold text-slate-100 leading-tight">Campo, {PRIMARY_WORKER_NAME}</span>
                     <span className="block text-xs text-slate-400 leading-tight">
                         Panel de trabajo: tareas por proximidad y registro en finca
                     </span>
@@ -963,8 +964,8 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
                     <CaseStudyTopWidget onNavigate={onNavigate} maxItems={3} />
                 </div>
 
-                {/* "Campo, Javier" (gateado al operador), al fondo. */}
-                {renderJavier()}
+                {/* "Campo, <trabajador>" (gateado al operador), al fondo. */}
+                {renderCampoPanel()}
 
                 {/* Pie del cuaderno: ayuda y preguntas frecuentes, discretas
                     pero siempre alcanzables (antes "Preguntas frecuentes" era
@@ -1061,8 +1062,8 @@ export default function DashboardLive({ onNavigate, regionalGreeting = null, onL
             {/* MERCADO. */}
             {renderMercado()}
 
-            {/* "Campo, Javier" (gateado al operador). */}
-            {renderJavier()}
+            {/* "Campo, <trabajador>" (gateado al operador). */}
+            {renderCampoPanel()}
 
             {/* MÓDULO ANIMALES — gateado por perfil. */}
             {mostrarAnimales && (

@@ -1,7 +1,12 @@
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
 import { setTimeout as sleep } from 'node:timers/promises';
-const REPO = '/home/kortux/Workspace/chagra/.claude/worktrees/agent-acc693963161d0026';
+import { fileURLToPath } from 'node:url';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
+// Raíz del repo derivada de la ubicación del script (no hardcodear rutas locales).
+const REPO = process.env.SHOT_REPO || path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const OUT = process.env.SHOT_OUT || path.join(tmpdir(), 'valle-integracion.png');
 const PORT = 5201;
 const BASE = `http://127.0.0.1:${PORT}`;
 const srv = spawn('npx', ['vite', '--port', String(PORT), '--host', '127.0.0.1', '--strictPort'], { cwd: REPO, stdio: 'ignore' });
@@ -14,7 +19,7 @@ const page = await browser.newPage({ viewport: { width: 390, height: 844 }, devi
 page.on('pageerror', (e) => console.log('PAGE_ERR:', String(e).slice(0, 300)));
 await page.goto(BASE + '/#/mockups/entrada-3d', { waitUntil: 'load', timeout: 40000 });
 await sleep(9000);
-await page.screenshot({ path: '/tmp/claude-1000/-home-kortux/93695a3d-dc16-45f5-8c0e-608e6e767ffd/scratchpad/valle-integracion.png' });
-console.log('OK');
+await page.screenshot({ path: OUT });
+console.log('OK', OUT);
 await browser.close();
 srv.kill('SIGKILL');

@@ -19,7 +19,7 @@
 - **Temas viejos dashboard**: BiopunkBackground, SceneFinca*, PanelVitalidad, RelojFrailejon, ArbolDeMundos, ManoChagraGlyph — reemplazados por valle 3D como fondo principal.
 - **Duplicados**: EntradaCampesina (→ EntradaValle3D), HomeCampesino (→ DashboardLive), MontanaMundos v1 y v3 (→ MontanaMundosCampesino).
 - **Prototipos reemplazados**: BotonAnarquia (→ AgentFab), AvatarGame* (→ Espíritu Guardián), MapaAcuarela (→ FarmMap), ClimaAtmosfera (→ ClimaBoletinScreen), DiaEnFinca (→ HoyEnFincaScreen), SaludFinca, PrimerCultivo, Guardianes, HojaVidaMata, DiagnosticoSobreFoto, EvidenciaIlustrada.
-- **Funcionalidad nicho**: WorkerDashboard "Javier", AuditoriaInventario.
+- **Funcionalidad nicho**: WorkerDashboard (panel de trabajador de finca), AuditoriaInventario.
 
 ### Pendiente decisión (Miguel)
 

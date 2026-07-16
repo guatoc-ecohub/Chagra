@@ -1,0 +1,59 @@
+name: Boundary Gate (anti-leak)
+
+# Gate anti-leak (ADR-002 / ADR-020). Cierra la causa raíz del leak:
+# hasta ahora NINGUNO de los dos controles corría en CI de GitHub —
+#   - tests/unit/boundaryAudit.test.js NO estaba en ningún workflow
+#     (unit-tests.yml solo corre el test del entrypoint), y
+#   - scripts/audit-bundle.mjs solo se invocaba manual (pre-merge-main.sh).
+# Resultado: codenames / identidad / rutas locales entraban a las ramas de
+# integración sin que nada fallara el PR. Este job los frena en cada PR.
+#
+# Dos capas:
+#   1. Guardián de FUENTE (boundaryAudit): escanea el árbol por codenames de
+#      agente, identidad personal y rutas absolutas del operador.
+#   2. Auditor de BUNDLE (audit-bundle): build + inspección de dist/ contra
+#      oss-pro/PROHIBITED_IN_PUBLIC.md — atrapa lo que llega al artefacto servido.
+#
+# Corre en PR a las ramas de integración (main, dev, app-3d) y en push a las
+# ramas que despliegan (main, app-3d). Barato: sin GPU, sin red, sin self-hosted.
+
+on:
+  pull_request:
+    branches: [main, dev, app-3d]
+  push:
+    branches: [main, app-3d]
+
+permissions:
+  contents: read
+
+jobs:
+  boundary:
+    name: anti-leak (fuente + bundle)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Capa 1 — Guardián de fuente. Falla si aparece un codename, identidad o
+      # ruta local del operador en el árbol (case-insensitive; ver el test).
+      - name: Guardián de frontera (fuente)
+        run: npm run test:unit -- tests/unit/boundaryAudit.test.js
+
+      # Capa 2 — Auditor del bundle. audit-bundle.mjs inspecciona dist/, así que
+      # primero hay que construir. Mismo comando de build que perf-budget.yml
+      # (ubuntu-latest, sin env extra).
+      - name: Build
+        run: npm run build
+
+      - name: Auditor del bundle (dist/)
+        run: npm run audit:bundle
