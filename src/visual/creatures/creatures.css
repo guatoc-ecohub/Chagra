@@ -281,11 +281,7 @@
 .rh-blink {
   transform-box: fill-box;
   transform-origin: center;
-  /* RITMO PROPIO (vida v2): cada instancia trae su duración y su fase por
-     vars (useRitmoPropio) — dos bichos jamás parpadean al tiempo. Sin vars
-     (consumidores viejos) queda el compás clásico de 5.6s. */
-  animation: rh-blink var(--rh-blink-dur, 5.6s) linear infinite;
-  animation-delay: var(--rh-blink-delay, 0s);
+  animation: rh-blink 5.6s linear infinite;
 }
 @keyframes rh-blink {
   0%, 36%, 40%, 74%, 78%, 82%, 86%, 100% { transform: scaleY(1); }
@@ -301,8 +297,6 @@
    loop). Amplitudes en unidades del viewBox (≈2px en un avatar de 64). */
 .rh-mirada {
   animation: rh-mirada 7.9s ease-in-out infinite;
-  /* Fase propia por instancia (vida v2): los dardeos tampoco son de metrónomo. */
-  animation-delay: var(--rh-mirada-delay, 0s);
 }
 @keyframes rh-mirada {
   0%, 20%, 47%, 58%, 76%, 100% { transform: translate(0, 0); }
@@ -1212,9 +1206,7 @@
 }
 [data-creature='jaguar'][data-ruge='1'] .jaguar-cejas,
 [data-creature='jaguar'][data-acecha='1'] .jaguar-cejas {
-  /* 1.6s divide exacto el rugido (1.6s) y el acecho (3.2s): el idle-cerebro
-     suelta el gesto en identidad sin que las cejas queden a mitad de fruncido. */
-  animation: jaguar-cejas-frunce 1.6s ease-in-out infinite;
+  animation: jaguar-cejas-frunce 1.1s ease-in-out infinite;
 }
 @keyframes jaguar-cejas-frunce {
   0%, 100% { transform: translateY(0) scaleX(1); }
@@ -1631,9 +1623,7 @@
   50%      { transform: scaleX(1.14) rotate(1.2deg); }  /* los bigotes se abren */
 }
 [data-creature='borugo'][data-olfatea='1'] .borugo-orejas {
-  /* 1.1s = 1/3 del olfateo del cerebro (3.3s = 6× nariz 0.55s): las orejitas
-     cierran en identidad exacto cuando el idle-cerebro suelta el gesto. */
-  animation: borugo-orejas-perk 1.1s ease-in-out infinite;
+  animation: borugo-orejas-perk 0.9s ease-in-out infinite;
 }
 @keyframes borugo-orejas-perk {
   0%, 100% { transform: translateY(-0.3px) scaleY(1.06); }
@@ -1874,138 +1864,6 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   VIDA v2 — LA VARA DE ANGELITA APLICADA A LOS 8 BICHOS (idle-cerebro +
-   mirada que reconoce + gestos-firma nuevos de colibrí y rana).
-   El reloj vive en useVidaIdle.js; el repertorio en vidaEstados.js. Aquí:
-     1. La MIRADA QUE LO RECONOCE — data-rh-mira='usted' pisa el dardeo
-        natural y las pupilas siguen su puntero (vars --rh-mx/--rh-my).
-     2. COLIBRÍ: acicala (pico al ala) + vibra (burst staccato de emoción).
-     3. RANA: croa (la garganta canta) + medita (zen hondo, ojos que caen).
-   Todo transform/opacity (GPU, Android gama baja), RM-safe, tier-safe.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ── LA MIRADA QUE LO RECONOCE (species-agnostic) ────────────────────────────
-   Cuando el bicho "se da cuenta" de usted (useMiradaUsted pone el attr en el
-   nodo raíz), las pupilas dejan su dardeo y lo SIGUEN con un empalme suave.
-   Al soltarlo (~2s quieto) vuelven a su dardeo natural. Al final del archivo
-   para ganar la cascada sobre .rh-mirada. */
-[data-rh-mira='usted'] .rh-mirada {
-  animation: none;
-  transform: translate(var(--rh-mx, 0px), var(--rh-my, 0px));
-  transition: transform 0.16s ease-out;
-}
-
-/* ── COLIBRÍ · ACICALA (aseo de ave: el pico peina el ala) ───────────────────
-   El cuerpo entero pica hacia el ala trasera (transform-origin al centro),
-   da DOS pasadas de peine y vuelve con overshoot. 2.6s = un loop exacto del
-   compás del cerebro. El dardo y las estelas se pausan (nadie se asea
-   dardeando); los antics ceden como en todos los gestos de la casa. */
-[data-creature='colibri'][data-acicala='1'] .crt-body {
-  animation: colibri-acicala 2.6s cubic-bezier(0.4, 0, 0.3, 1.3) infinite;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-@keyframes colibri-acicala {
-  0%, 100% { transform: rotate(0deg) translateY(0); }
-  16%      { transform: rotate(-26deg) translateY(0.7px); } /* baja el pico al ala */
-  30%      { transform: rotate(-19deg) translateY(0.5px); } /* pasada 1 */
-  44%      { transform: rotate(-27deg) translateY(0.7px); } /* pasada 2 */
-  58%      { transform: rotate(-18deg) translateY(0.4px); }
-  82%      { transform: rotate(5deg) translateY(-0.2px); }  /* overshoot al volver */
-}
-[data-creature='colibri'][data-acicala='1'] .colibri-estela { opacity: 0; }
-[data-creature='colibri'][data-acicala='1'] .colibri-dardo,
-[data-creature='colibri'][data-vibra='1'] .colibri-dardo { animation: none; }
-
-/* ── COLIBRÍ · VIBRA (el burst staccato: la emoción que no cabe) ─────────────
-   Jitter chiquito y VELOZ con squash&stretch — el hiperactivo vibra en el
-   sitio como olla a presión. 0.45s por loop; el cerebro lo sostiene 4 loops. */
-[data-creature='colibri'][data-vibra='1'] .crt-body {
-  animation: colibri-vibra 0.45s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-@keyframes colibri-vibra {
-  0%, 100% { transform: translate(0, 0) scale(1, 1); }
-  25%      { transform: translate(0.3px, -0.5px) scale(1.04, 0.95); }
-  50%      { transform: translate(-0.25px, 0.2px) scale(0.96, 1.05); }
-  75%      { transform: translate(0.25px, 0.3px) scale(1.03, 0.97); }
-}
-/* el aleteo se apura durante el burst (la emoción sube las revoluciones) */
-[data-creature='colibri'][data-vibra='1'] .crt-wing { animation-duration: 0.07s; }
-
-/* ── RANA · CROA (el canto: la garganta se INFLA y suelta) ───────────────────
-   La papada que ya late (crt-garganta) se hincha GRANDE dos veces con el
-   compás del canto; el cuerpo acompaña con squash de esfuerzo. La rana canta
-   PLANTADA: el salto espera a que termine. 2.4s = un loop del cerebro. */
-[data-creature='rana-andina'][data-croa='1'] .crt-garganta {
-  animation: rana-croa-garganta 2.4s cubic-bezier(0.4, 0, 0.5, 1) infinite;
-}
-@keyframes rana-croa-garganta {
-  0%, 100% { transform: scale(1, 1); }
-  20%      { transform: scale(1.55, 1.75); } /* se INFLA — el globo del croar */
-  36%      { transform: scale(1.1, 1.14); }  /* suelta el canto */
-  56%      { transform: scale(1.48, 1.65); } /* segundo croar */
-  78%      { transform: scale(0.95, 0.92); } /* exhala, vacía */
-}
-[data-creature='rana-andina'][data-croa='1'] .crt-body {
-  animation: rana-croa-cuerpo 2.4s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center bottom;
-}
-@keyframes rana-croa-cuerpo {
-  0%, 100% { transform: scale(1, 1); }
-  20%      { transform: scale(1.06, 0.93); } /* el esfuerzo del canto (squash) */
-  56%      { transform: scale(1.05, 0.94); }
-}
-
-/* ── RANA · MEDITA (zen hondo — paciente pero MUY inteligente) ───────────────
-   Los párpados CAEN despacio y se quedan caídos casi todo el rato (pisa el
-   parpadeo normal), la respiración se vuelve honda y lenta. La quietud como
-   gesto: la sabia del agua se va para adentro. 4.8s = un loop del cerebro. */
-[data-creature='rana-andina'][data-medita='1'] .rh-blink {
-  animation: rana-medita-ojos 4.8s ease-in-out infinite;
-}
-@keyframes rana-medita-ojos {
-  0%, 100%  { transform: scaleY(1); }
-  16%, 84%  { transform: scaleY(0.12); } /* párpados caídos, serena */
-}
-[data-creature='rana-andina'][data-medita='1'] .crt-body {
-  animation: rana-medita-respira 4.8s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center bottom;
-}
-@keyframes rana-medita-respira {
-  0%, 100% { transform: scale(1, 1) translateY(0); }
-  45%      { transform: scale(1.05, 1.07) translateY(-0.35px); } /* inhala hondo */
-  72%      { transform: scale(0.985, 0.965) translateY(0.1px); } /* suelta despacio */
-}
-/* la rana ni salta ni dardea la mirada mientras canta o medita */
-[data-creature='rana-andina'][data-croa='1'] .rana-salto,
-[data-creature='rana-andina'][data-medita='1'] .rana-salto,
-[data-creature='rana-andina'][data-medita='1'] .rh-mirada { animation: none; }
-
-/* Los ANTICS ceden durante los gestos nuevos (patrón de toda la casa: un
-   gesto a la vez — la vuelta de campana no interrumpe el canto). */
-[data-creature='colibri'][data-acicala='1'] .rh-antic,
-[data-creature='colibri'][data-acicala='1'] .rh-travieso,
-[data-creature='colibri'][data-vibra='1'] .rh-antic,
-[data-creature='colibri'][data-vibra='1'] .rh-travieso,
-[data-creature='rana-andina'][data-croa='1'] .rh-antic,
-[data-creature='rana-andina'][data-croa='1'] .rh-travieso,
-[data-creature='rana-andina'][data-medita='1'] .rh-antic,
-[data-creature='rana-andina'][data-medita='1'] .rh-travieso { animation: none; }
-
-/* Cinturón y tirantes: quietud pedida = fotograma digno (los gestos nuevos
-   quedan estáticos; la mirada-que-sigue ni se activa — el JS ya no corre). */
-@media (prefers-reduced-motion: reduce) {
-  [data-creature='colibri'][data-acicala='1'] .crt-body,
-  [data-creature='colibri'][data-vibra='1'] .crt-body,
-  [data-creature='rana-andina'][data-croa='1'] .crt-garganta,
-  [data-creature='rana-andina'][data-croa='1'] .crt-body,
-  [data-creature='rana-andina'][data-medita='1'] .rh-blink,
-  [data-creature='rana-andina'][data-medita='1'] .crt-body { animation: none !important; }
-  [data-rh-mira='usted'] .rh-mirada { transition: none !important; }
    DANTA (Tapirus pinchaque) — el 10º bicho: la JARDINERA DEL BOSQUE.
    ───────────────────────────────────────────────────────────────────────────
    El CARÁCTER de la MANSEDUMBRE MONUMENTAL: el tapir andino, la mole lanuda de

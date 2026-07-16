@@ -60,6 +60,11 @@ const LAZY_MAP = {
   TransicionesOdysseyDemo: lazy(() => import('../mockups/TransicionesOdysseyDemo.jsx')),
   SierraMonte3D: lazy(() => import('../visual/mundo3d/sierra/SierraMonte3D.jsx')),
   SierraCorteVertical: lazy(() => import('../visual/mundo3d/sierra/SierraCorteVertical.jsx')),
+  // Mundos de cultivo por piso térmico (café templado, cacao cálido, papa fría):
+  // el arte vivía solo en App.jsx (shell clásico) y en prod era inalcanzable.
+  CafetalVivo3D: lazy(() => import('../mockups/CafetalVivo3D.jsx')),
+  CacaoVivo3D: lazy(() => import('../mockups/CacaoVivo3D.jsx')),
+  PapaVivo3D: lazy(() => import('../mockups/PapaVivo3D.jsx')),
   MundoEntBosque: lazy(() => import('../visual/mundo3d/bosque/MundoEntBosque.jsx')),
   MontanaMundosCampesino: lazy(() => import('../mockups/MontanaMundosCampesino.jsx')),
   VitrinaMaestraMundos: lazy(() => import('../mockups/VitrinaMaestraMundos.jsx')),

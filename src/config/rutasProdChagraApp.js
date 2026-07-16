@@ -81,6 +81,29 @@ export const NUCLEO_3D = [
     importLazy: 'src/visual/mundo3d/sierra/SierraCorteVertical.jsx',
     categoria: '3D',
   },
+  // Los mundos de cultivo por piso térmico — navegables y PÚBLICOS en prod
+  // (el arte estaba solo cableado en App.jsx / shell clásico).
+  {
+    path: 'cafetal_vivo',
+    alias: ['cafetal', 'mundo_cafe', 'cafetal-vivo-3d'],
+    componente: 'CafetalVivo3D',
+    importLazy: 'src/mockups/CafetalVivo3D.jsx',
+    categoria: '3D',
+  },
+  {
+    path: 'cacao_vivo',
+    alias: ['cacao', 'mundo_cacao', 'cacao-vivo-3d'],
+    componente: 'CacaoVivo3D',
+    importLazy: 'src/mockups/CacaoVivo3D.jsx',
+    categoria: '3D',
+  },
+  {
+    path: 'papa_vivo',
+    alias: ['papa', 'mundo_papa', 'papa-viva-3d'],
+    componente: 'PapaVivo3D',
+    importLazy: 'src/mockups/PapaVivo3D.jsx',
+    categoria: '3D',
+  },
 
 
   // ── Arte nuevo — en revisión del operador (2026-07-14) ─────────
