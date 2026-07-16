@@ -448,7 +448,7 @@ function PaisajeMirador({ tier }) {
       lajas: geomLajasSendero(),
       /* los andenes de la montaña + las lomitas que rematan sus cortes */
       bancales: geomBancales(FILAS_BANCAL),
-      lomitas: geomLomitas(LOMITAS_REMATE),
+      lomitas: geomLomitas(/** @type {[number, number, number][]} */ (LOMITAS_REMATE)),
     }),
     [tier],
   );
