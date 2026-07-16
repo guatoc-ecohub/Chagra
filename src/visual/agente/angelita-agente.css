@@ -889,3 +889,19 @@
     transition: none;
   }
 }
+
+/* ═══ GLOW "RESPUESTA LISTA" (avatar del agente, task #122) ═══════════════════
+   El aviso ámbar que antes ponía el porthole del FAB ahora vive en el propio
+   cuerpo: drop-shadow que late, mismo ámbar #FFB700 de la campana. Con
+   reduced-motion queda el aviso FIJO (visible, sin latido). */
+.agt-avatar-glow {
+  filter: drop-shadow(0 0 7px rgb(255 183 0 / 0.75));
+  animation: agt-avatar-glow-late 2.6s ease-in-out infinite;
+}
+@keyframes agt-avatar-glow-late {
+  0%, 100% { filter: drop-shadow(0 0 5px rgb(255 183 0 / 0.55)); }
+  50% { filter: drop-shadow(0 0 11px rgb(255 183 0 / 0.9)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .agt-avatar-glow { animation: none; }
+}

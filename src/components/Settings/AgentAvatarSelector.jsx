@@ -1,30 +1,32 @@
 import { Check } from 'lucide-react';
 import useAgentAvatarType from '../../hooks/useAgentAvatarType';
 import ChagraAgentAvatarColibri from '../ChagraAgentAvatarColibri';
-import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
+import ChagraAgentAvatarAngelita from '../ChagraAgentAvatarAngelita';
 import ChagraAgentAvatarMaiz from '../ChagraAgentAvatarMaiz';
 
 /**
  * AgentAvatarSelector — selector visual para el avatar del agente IA.
  *
- * 3 opciones: colibrí foto-realista (default), colibrí ilustrado SVG,
- * o planta de maíz. Persiste vía useAgentAvatarType (localStorage
+ * 3 opciones: Angelita la abeja (default), colibrí ilustrado SVG, o planta
+ * de maíz. Persiste vía useAgentAvatarType (localStorage
  * `chagra:agent-avatar-type`). Cambio inmediato — afecta a todas las
  * instancias del avatar en la app.
  *
- * 2026-05-28: la opción 'colibri' foto-realista reemplaza al R3F que
- * el operador rechazó. La ilustración SVG sigue accesible bajo
- * 'colibri_svg' para quien prefiera el estilo botánico anterior.
+ * 2026-07-16 (operador): "Angelita como el agente, jubila el colibrí". La
+ * opción default pasa a ser Angelita; conserva el slug guardado 'colibri'
+ * (default histórico) para que nadie necesite migración. El colibrí
+ * ilustrado sigue disponible como preferencia explícita.
  */
 export default function AgentAvatarSelector() {
     const [type, setType] = useAgentAvatarType();
 
     const OPTIONS = [
         {
+            // Slug histórico 'colibri' = el default de siempre; hoy es Angelita.
             id: 'colibri',
-            label: 'Colibrí real',
-            sub: 'Foto biopunk (recomendado)',
-            Component: ChagraAgentAvatarColibriPhoto,
+            label: 'Angelita, la abeja',
+            sub: 'La vecina que sabe de finca (recomendado)',
+            Component: ChagraAgentAvatarAngelita,
         },
         {
             id: 'colibri_svg',
