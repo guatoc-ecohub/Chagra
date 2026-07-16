@@ -129,13 +129,20 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         transition: 'transform .18s cubic-bezier(.34,1.56,.64,1), filter .25s ease',
       }}
     >
-      <Angelita
-        estado={estado}
-        size={62}
-        direccion="izquierda"
-        className={responseReady ? 'agt-avatar-glow' : undefined}
-        title="Angelita, la asistente de Chagra"
-      />
+      {/* pointer-events:none — CRÍTICO: el click debe caer en el BOTÓN, nunca
+          en el SVG. Angelita se REMONTA al cambiar de estado (key=estado en su
+          .agt-vuelo) y hover/pressed cambian el estado: si el mousedown cae en
+          un nodo del dibujo que se desconecta antes del mouseup, el navegador
+          se traga el click (verificado con playwright 2026-07-16). */}
+      <span style={{ pointerEvents: 'none', display: 'flex' }} aria-hidden="true">
+        <Angelita
+          estado={estado}
+          size={62}
+          direccion="izquierda"
+          className={responseReady ? 'agt-avatar-glow' : undefined}
+          title="Angelita, la asistente de Chagra"
+        />
+      </span>
     </button>
   );
 }
