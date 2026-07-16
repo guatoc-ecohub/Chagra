@@ -64,10 +64,12 @@ import { TRANSICION } from '../../visual/mundo3d/cielosHoraData.js';
    vive como datos en visual/mundo3d/direccion; las piezas r3f, al lado. */
 import {
   componerMundos,
+  CASA_VALLE,
   JERARQUIA_PERSONAJES,
 } from '../../visual/mundo3d/direccion/composicionValle.js';
 import {
   CasaCampesina,
+  PorticosPortales,
   SenderosValle,
   PatiosLugares,
   VecinosDelValle,
@@ -96,11 +98,12 @@ const MUNDO_DIR_BY_ID = Object.fromEntries(MUNDOS_DIR.map((m) => [m.id, m]));
    caliente. Así el gradiente de pisos térmicos se LEE como pendiente. La subida
    usa smoothstep (curva suave, sin quiebres) + una ondulación menuda para que
    las lomas se vean redondas, no planas. Determinista → los landmarks se posan
-   encima. */
+   encima. (Rediseño 2026-07: el valle creció a 48×48 — la subida es más larga
+   y un pelo más alta, la ondulación más ancha: lomas de valle grande.) */
 function alturaTerreno(x, z) {
-  const subida = THREE.MathUtils.smoothstep(-z, -8, 11) * 5.4;
-  const ondul = Math.sin(x * 0.42) * 0.14 + Math.cos(z * 0.36 + x * 0.2) * 0.12;
-  const cauce = -0.32 * Math.exp(-((x - 1.2) ** 2) / 6) * Math.exp(-((z + 1) ** 2) / 55);
+  const subida = THREE.MathUtils.smoothstep(-z, -11, 16) * 6.2;
+  const ondul = Math.sin(x * 0.3) * 0.16 + Math.cos(z * 0.27 + x * 0.15) * 0.13;
+  const cauce = -0.36 * Math.exp(-((x - 1.9) ** 2) / 8) * Math.exp(-((z + 1.5) ** 2) / 110);
   return subida + ondul + cauce;
 }
 
@@ -148,7 +151,7 @@ function colorSueloEnZ(z, alto, nocturno, out) {
 function Terreno({ nocturno, innerRef, perfil }) {
   const seg = perfil.segmentosTerreno;
   const geo = useMemo(() => {
-    const g = new THREE.PlaneGeometry(34, 34, seg, seg);
+    const g = new THREE.PlaneGeometry(48, 48, seg, seg);
     g.rotateX(-Math.PI / 2);
     const pos = g.attributes.position;
     const colores = new Float32Array(pos.count * 3);
@@ -158,7 +161,7 @@ function Terreno({ nocturno, innerRef, perfil }) {
       const z = pos.getZ(i);
       const y = alturaTerreno(x, z);
       pos.setY(i, y);
-      const subida = THREE.MathUtils.smoothstep(-z, -8, 11) * 5.4;
+      const subida = THREE.MathUtils.smoothstep(-z, -11, 16) * 6.2;
       const alto = THREE.MathUtils.clamp((y - subida + 0.3) / 0.6, 0, 1);
       colorSueloEnZ(z, alto, nocturno, col);
       colores[i * 3] = col.r;
@@ -186,10 +189,12 @@ function Terreno({ nocturno, innerRef, perfil }) {
       alta (perspectiva aérea). Su base se posa sobre el terreno del páramo
       (que ya subió a ~5) y las cumbres coronan la escena. ── */
 const PICOS_CORDILLERA = [
-  { x: -9, z: -15.5, h: 7, r: 5, base: 4.2 },
-  { x: -2, z: -17, h: 9.5, r: 6, base: 4.6 },
-  { x: 6, z: -16, h: 8, r: 5.2, base: 4.2 },
-  { x: 12, z: -15, h: 6, r: 4.5, base: 4.0 },
+  // (Empujados al fondo del valle grande: z ≤ -21, sobre el páramo que ya
+  //  subió a ~6. Más anchos y altos para coronar el cuadro nuevo.)
+  { x: -13, z: -22, h: 8.5, r: 6.5, base: 5.0 },
+  { x: -3, z: -24, h: 11.5, r: 7.5, base: 5.4 },
+  { x: 8, z: -23, h: 9.5, r: 6.5, base: 5.0 },
+  { x: 17, z: -21, h: 7, r: 5.5, base: 4.8 },
 ];
 
 /* LA SEGUNDA CORDILLERA (perspectiva aérea — la escala se SIENTE, no se
@@ -266,16 +271,16 @@ function Quebrada({ color, viva, perfil, nocturno = false }) {
     // Nace arriba (páramo) y BAJA por la ladera hasta la tierra caliente:
     // cada punto se posa sobre el terreno (+un pelo) para leer la pendiente.
     const pts = [
-      [-3.4, -7.2],
-      [-1.2, -4.2],
-      [0.8, -1.4],
-      [1.6, 1.8],
-      [2.6, 5.4],
-      [3.6, 8],
+      [-4.6, -11],
+      [-2.2, -6.4],
+      [0.6, -2.4],
+      [2.2, 1.6],
+      [3.4, 6.4],
+      [4.6, 11.5],
     ].map(([x, z]) => new THREE.Vector3(x, alturaTerreno(x, z) + 0.06, z));
     const curve = new THREE.CatmullRomCurve3(pts);
     // Frugal: menos anillos/segmentos — la cinta se lee igual desde lejos.
-    const g = new THREE.TubeGeometry(curve, rico ? 80 : 48, 0.34, rico ? 7 : 5, false);
+    const g = new THREE.TubeGeometry(curve, rico ? 88 : 52, 0.4, rico ? 7 : 5, false);
     return g;
   }, [rico]);
   return (
@@ -310,9 +315,13 @@ function Quebrada({ color, viva, perfil, nocturno = false }) {
       lustroso) — cada árbol se distingue, nada de conos genéricos. Las mallas
       son las de floraParamo (color horneado); escala ~0.5 para el diorama. ── */
 const SITIOS_ARBOLEDA = [
-  { geom: geomRoble, args: [-0.55, 0, 0.15], esc: 0.52, rot: 0.8, seed: 91 },
-  { geom: geomAliso, args: [0.45, 0, -0.35], esc: 0.5, rot: 2.1, seed: 92 },
-  { geom: geomGaque, args: [0.2, 0, 0.55], esc: 0.55, rot: 4.4, seed: 93 },
+  // (El monte del portal "toda mi finca" se espesó: 5 árboles, 3 especies —
+  //  dosel multiespecie, no un parche de conos.)
+  { geom: geomRoble, args: [-0.6, 0, 0.15], esc: 0.55, rot: 0.8, seed: 91 },
+  { geom: geomAliso, args: [0.5, 0, -0.4], esc: 0.5, rot: 2.1, seed: 92 },
+  { geom: geomGaque, args: [0.2, 0, 0.6], esc: 0.55, rot: 4.4, seed: 93 },
+  { geom: geomRoble, args: [0.85, 0, 0.45], esc: 0.42, rot: 3.3, seed: 94 },
+  { geom: geomAliso, args: [-0.35, 0, -0.7], esc: 0.44, rot: 5.2, seed: 95 },
 ];
 
 function ArboledaEspecies({ q }) {
@@ -344,13 +353,136 @@ function ArboledaEspecies({ q }) {
 function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
   const [fuerte, suave] = tinte;
   switch (tipo) {
-    case 'milpa': // el maíz REAL: caña con nudos, hojas arqueadas, mazorca y penacho
+    case 'milpa': // LA PARCELA VIVA (estilo granja de Age of Empires, en modo
+      // milpa): la tierra labrada como base, y encima las TRES HERMANAS
+      // juntas — maíz (caña con penacho), fríjol (bejuco enroscado a la
+      // caña) y calabaza (frutos naranjas con su hoja ancha tapando el
+      // suelo). Se lee POLICULTIVO de un vistazo: nada de hileras clonadas.
       return (
-        <mesh geometry={geomMilpa({ q, matas: q > 0.6 ? 6 : 4 })} material={MATERIAL_FINCA} castShadow />
+        <group>
+          {/* la tierra labrada de la parcela (la "granja" que se lee de lejos) */}
+          <mesh position={[0, 0.045, 0]} receiveShadow>
+            <boxGeometry args={[2.1, 0.09, 1.7]} />
+            <meshStandardMaterial color="#5f4429" flatShading roughness={1} />
+          </mesh>
+          {/* surcos suaves (dos lomos que cruzan la parcela) */}
+          {[-0.45, 0.35].map((dz, i) => (
+            <mesh key={i} position={[0, 0.09, dz]} rotation={[0, 0, Math.PI / 2]}>
+              <capsuleGeometry args={[0.06, 1.85, 3, 6]} />
+              <meshStandardMaterial color="#6b4e30" flatShading roughness={1} />
+            </mesh>
+          ))}
+          {/* el maíz con su fríjol trepado (quincunce, alturas variadas) */}
+          {[
+            [-0.75, -0.5, 1.35], [-0.1, -0.25, 1.5], [0.6, -0.55, 1.25],
+            [-0.45, 0.25, 1.45], [0.3, 0.4, 1.3],
+          ].map(([dx, dz, h], i) => (
+            <group key={i} position={[dx, 0.08, dz]}>
+              <mesh position={[0, h / 2, 0]} castShadow>
+                <cylinderGeometry args={[0.045, 0.075, h, 6]} />
+                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+              </mesh>
+              {/* hojas de la caña */}
+              <mesh position={[0.15, h * 0.62, 0]} rotation={[0, 0, -0.7]} scale={[1, 1, 0.3]}>
+                <coneGeometry args={[0.11, 0.46, 4]} />
+                <meshStandardMaterial color={suave} flatShading roughness={1} />
+              </mesh>
+              <mesh position={[-0.15, h * 0.44, 0]} rotation={[0, Math.PI, -0.7]} scale={[1, 1, 0.3]}>
+                <coneGeometry args={[0.11, 0.46, 4]} />
+                <meshStandardMaterial color={suave} flatShading roughness={1} />
+              </mesh>
+              {/* el penacho */}
+              <mesh position={[0, h + 0.16, 0]}>
+                <coneGeometry args={[0.07, 0.36, 6]} />
+                <meshStandardMaterial color="#e7c96b" flatShading />
+              </mesh>
+              {/* el FRÍJOL enroscado a la caña (dos vueltas del bejuco) */}
+              <mesh position={[0, h * 0.3, 0]} rotation={[Math.PI / 2.3, 0, 0.2]}>
+                <torusGeometry args={[0.1, 0.028, 5, 10]} />
+                <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
+              </mesh>
+              <mesh position={[0.02, h * 0.55, 0]} rotation={[Math.PI / 1.9, 0, -0.3]}>
+                <torusGeometry args={[0.09, 0.026, 5, 10]} />
+                <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
+              </mesh>
+            </group>
+          ))}
+          {/* las CALABAZAS tapando el suelo entre matas (fruto + hoja ancha) */}
+          {[[-0.55, 0.75], [0.15, 0.85], [0.75, 0.1], [-0.85, 0.05]].map(([dx, dz], i) => (
+            <group key={i} position={[dx, 0.09, dz]}>
+              <mesh position={[0, 0.09, 0]} scale={[1, 0.72, 1]} castShadow>
+                <sphereGeometry args={[0.14, 9, 7]} />
+                <meshStandardMaterial color="#d98e2b" flatShading roughness={1} />
+              </mesh>
+              <mesh position={[0, 0.16, 0]}>
+                <cylinderGeometry args={[0.018, 0.025, 0.07, 5]} />
+                <meshStandardMaterial color="#4f7a3a" flatShading />
+              </mesh>
+              {/* la hoja ancha que cubre el suelo */}
+              <mesh position={[0.18, 0.06, 0.1]} rotation={[-Math.PI / 2.2, 0, 0.6]} scale={[1, 1, 0.5]}>
+                <circleGeometry args={[0.16, 7]} />
+                <meshStandardMaterial color={suave} flatShading roughness={1} side={2} />
+              </mesh>
+            </group>
+          ))}
+        </group>
       );
-    case 'cafetal': // cafetos de verdad: pisos de ramas, hoja oscura y cereza roja
+    case 'cafetal': // café CON SOMBRÍO (policultivo, no hilera): los arbustos
+      // cargados de cereza roja DEBAJO de su guamo de sombra y con una mata
+      // de plátano al lado — el trío clásico del cafetal campesino.
       return (
-        <mesh geometry={geomCafetal({ q })} material={MATERIAL_FINCA} castShadow />
+        <group>
+          {/* el GUAMO de sombrío: tronco alto + copa ancha y plana encima */}
+          <group position={[-0.15, 0, -0.1]}>
+            <mesh position={[0, 0.8, 0]} castShadow>
+              <cylinderGeometry args={[0.07, 0.1, 1.6, 6]} />
+              <meshStandardMaterial color="#6b4a2e" flatShading roughness={1} />
+            </mesh>
+            <mesh position={[0, 1.7, 0]} scale={[1, 0.34, 1]} castShadow>
+              <sphereGeometry args={[1.05, 10, 8]} />
+              <meshStandardMaterial color="#3f7a38" flatShading roughness={1} />
+            </mesh>
+          </group>
+          {/* la mata de plátano acompañante (pseudotallo + hojas colgantes) */}
+          <group position={[0.85, 0, -0.45]}>
+            <mesh position={[0, 0.5, 0]} castShadow>
+              <cylinderGeometry args={[0.08, 0.12, 1.0, 7]} />
+              <meshStandardMaterial color="#7a9a55" flatShading roughness={1} />
+            </mesh>
+            {[0, 1, 2, 3].map((k) => (
+              <mesh
+                key={k}
+                position={[0, 0.95, 0]}
+                rotation={[0, (k / 4) * Math.PI * 2 + 0.4, -0.9]}
+                scale={[1, 1, 0.28]}
+                castShadow
+              >
+                <coneGeometry args={[0.2, 0.85, 4]} />
+                <meshStandardMaterial color="#4f9a44" flatShading roughness={1} />
+              </mesh>
+            ))}
+          </group>
+          {/* los arbustos de café bajo la sombra, con su cereza roja */}
+          {[[-0.6, 0.35], [0.05, 0.15], [0.5, 0.55], [-0.2, 0.7]].map(([dx, dz], i) => (
+            <group key={i} position={[dx, 0, dz]}>
+              <mesh position={[0, 0.16, 0]}>
+                <cylinderGeometry args={[0.05, 0.07, 0.32, 6]} />
+                <meshStandardMaterial color="#6b4a2e" flatShading />
+              </mesh>
+              <mesh position={[0, 0.44, 0]} castShadow>
+                <sphereGeometry args={[0.3, 10, 9]} />
+                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+              </mesh>
+              {/* la cereza madura que pinta el arbusto */}
+              {[[0.16, 0.5, 0.16], [-0.14, 0.42, 0.18], [0.05, 0.6, -0.2]].map(([bx, by, bz], j) => (
+                <mesh key={j} position={[bx, by, bz]}>
+                  <sphereGeometry args={[0.035, 6, 5]} />
+                  <meshBasicMaterial color="#c9392e" />
+                </mesh>
+              ))}
+            </group>
+          ))}
+        </group>
       );
     case 'era': // eras del semillero: camellones redondeados (lomos de tierra)
       return (
@@ -517,8 +649,8 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
           {/* el cajón de madera en U que contiene la pila */}
           {[
             { p: [0, 0.16, -0.5], s: [1.15, 0.32, 0.08] },
-            { p: [-0.56, 0.16, -0.05], s: [0.08, 0.32, 0.95] },
-            { p: [0.56, 0.16, -0.05], s: [0.08, 0.32, 0.95] },
+            { p: [-0.56, 0.16, -0.05], s: [0.08, 0.32, 0.95], r: 0 },
+            { p: [0.56, 0.16, -0.05], s: [0.08, 0.32, 0.95], r: 0 },
           ].map((w, i) => (
             <mesh key={i} position={/** @type {any} */ (w.p)} castShadow>
               <boxGeometry args={/** @type {any} */ (w.s)} />
@@ -562,42 +694,6 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
               <cylinderGeometry args={[0.08, 0.08, 0.04, 10]} />
               <meshStandardMaterial color="#4a3a2a" flatShading roughness={1} />
             </mesh>
-          </group>
-          {/* LAS CANECAS AZULES DE BIOPREPARADOS sobre su estiba: la seña
-              inconfundible de la biofábrica — el caldo trabajando en sus
-              tanques (nada más en el valle es azul plástico). */}
-          <group position={[0.78, 0, 0.42]} rotation={[0, -0.35, 0]}>
-            {/* la estiba de madera (tarima + dos travesaños que asoman) */}
-            <mesh position={[0, 0.05, 0]} castShadow>
-              <boxGeometry args={[0.66, 0.045, 0.52]} />
-              <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
-            </mesh>
-            {[-0.2, 0.2].map((dz, i) => (
-              <mesh key={i} position={[0, 0.015, dz]}>
-                <boxGeometry args={[0.7, 0.03, 0.09]} />
-                <meshStandardMaterial color="#6b4a2e" flatShading roughness={1} />
-              </mesh>
-            ))}
-            {/* la caneca grande con su tapa y la mediana */}
-            <mesh position={[-0.16, 0.29, -0.04]} castShadow>
-              <cylinderGeometry args={[0.13, 0.13, 0.42, 9]} />
-              <meshStandardMaterial color="#2f6fa8" flatShading roughness={0.8} />
-            </mesh>
-            <mesh position={[-0.16, 0.52, -0.04]}>
-              <cylinderGeometry args={[0.135, 0.135, 0.035, 9]} />
-              <meshStandardMaterial color="#1f4d78" flatShading roughness={0.8} />
-            </mesh>
-            <mesh position={[0.15, 0.23, 0.05]} castShadow>
-              <cylinderGeometry args={[0.1, 0.1, 0.3, 9]} />
-              <meshStandardMaterial color="#3a86b8" flatShading roughness={0.8} />
-            </mesh>
-            {/* los tarros del biopreparado listos para el lote (en fila) */}
-            {[-0.02, 0.12, 0.26].map((dx, i) => (
-              <mesh key={i} position={[dx, 0.12, 0.28]}>
-                <cylinderGeometry args={[0.045, 0.045, 0.13, 7]} />
-                <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
-              </mesh>
-            ))}
           </group>
         </group>
       );
@@ -645,51 +741,6 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
               <meshStandardMaterial color="#f2efe4" flatShading />
             </mesh>
           </group>
-        </group>
-      );
-    case 'frailejonal': // LA PUERTA DEL PÁRAMO: el frailejonal con su niebla
-      // fría — la seña del alto (coherente con MundoParamo3D: frailejones,
-      // piedra y bruma). Tocar aquí sube al mundo del páramo.
-      return (
-        <group>
-          {/* el grupito de frailejones (roseta plateada sobre tronco lanudo) */}
-          {[[-0.5, 0.22, 1], [0.2, -0.3, 0.85], [0.55, 0.35, 0.7], [-0.05, 0.5, 0.6]].map(([x, z, s], i) => (
-            <group key={i} position={[x, 0, z]} scale={s}>
-              <mesh position={[0, 0.45, 0]} castShadow>
-                <cylinderGeometry args={[0.11, 0.14, 0.9, 7]} />
-                <meshStandardMaterial color="#6e6a52" flatShading roughness={1} />
-              </mesh>
-              <mesh position={[0, 0.98, 0]} scale={[1, 0.5, 1]} castShadow>
-                <coneGeometry args={[0.34, 0.5, 8]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              {/* la flor amarilla del frailejón (la seña de la Espeletia) */}
-              <mesh position={[0.1, 1.16, 0.06]}>
-                <sphereGeometry args={[0.05, 6, 5]} />
-                <meshStandardMaterial color="#e8c94f" flatShading />
-              </mesh>
-            </group>
-          ))}
-          {/* la piedra del alto, con su musgo */}
-          <mesh position={[0.6, 0.12, -0.35]} scale={[1, 0.7, 0.9]} castShadow>
-            <icosahedronGeometry args={[0.22, 0]} />
-            <meshStandardMaterial color="#828b90" flatShading roughness={1} />
-          </mesh>
-          {/* LA NIEBLA FRÍA que arropa el frailejonal (motas traslúcidas que
-              hacen páramo, como el vaho de la pila pero frío) */}
-          {[[-0.35, 0.55, 0.4, 0.3], [0.4, 0.75, 0.1, 0.24], [0, 1.0, -0.25, 0.19]].map(([x, yv, z, r], i) => (
-            <mesh key={i} position={[x, yv, z]}>
-              <sphereGeometry args={[r, 8, 6]} />
-              <meshBasicMaterial color="#dfe8ea" transparent opacity={0.2} depthWrite={false} />
-            </mesh>
-          ))}
-          {/* el hito de piedras apiladas: la seña del sendero de páramo */}
-          {[0.16, 0.11, 0.07].map((r, i) => (
-            <mesh key={i} position={[-0.72, 0.1 + i * 0.17, -0.1]} scale={[1, 0.65, 1]}>
-              <icosahedronGeometry args={[r, 0]} />
-              <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-            </mesh>
-          ))}
         </group>
       );
     case 'hongos': // el suelo vivo: hongos que asoman (el fruto del micelio), con
@@ -941,13 +992,14 @@ function Veleta({ color, reducedMotion = false }) {
       eras. Pocas y bien puestas: el valle se siente vivo, no amontonado. Son
       decorativas (aria-hidden) y no capturan toques. ── */
 const CRIATURAS_VALLE = [
-  // (posiciones al día con la DISPOSICIÓN COMPUESTA: la milpa cedió a la
-  //  izquierda y la huerta se arrimó a la casa — sus bichos las siguen.)
-  { crt: 'mariposa', x: -4.8, z: 1.9, dy: 2.0, size: 30, factor: 8 },
-  { crt: 'mariposa', x: -5.6, z: 2.8, dy: 1.5, size: 24, factor: 8 },
-  { crt: 'colibri', x: 3.1, z: 3.9, dy: 1.9, size: 34, factor: 8 },
-  { crt: 'escarabajo', x: 4.7, z: -2.9, dy: 0.5, size: 28, factor: 7 },
-  { crt: 'lombriz', x: -1.2, z: 5.4, dy: 0.28, size: 26, factor: 6.5 },
+  // (posiciones al día con el VALLE GRANDE: las mariposas sobre la milpa,
+  //  el colibrí en la huerta de la casa, el escarabajo en la hojarasca del
+  //  monte, la lombriz asomada en las eras — cada bicho en su nicho.)
+  { crt: 'mariposa', x: -7.6, z: -0.4, dy: 2.2, size: 30, factor: 8 },
+  { crt: 'mariposa', x: -9.2, z: 1.8, dy: 1.7, size: 24, factor: 8 },
+  { crt: 'colibri', x: 2.3, z: 4.6, dy: 1.9, size: 34, factor: 8 },
+  { crt: 'escarabajo', x: 6.4, z: -3.6, dy: 0.5, size: 28, factor: 7 },
+  { crt: 'lombriz', x: -3.0, z: 6.2, dy: 0.28, size: 26, factor: 6.5 },
 ];
 
 function CriaturaSvg({ tipo, size, animated }) {
@@ -1353,12 +1405,22 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
   );
 }
 
-/* ── El COMPAÑERO-JUGADOR: Angelita, la abeja. Es el avatar que vuela por el
-      valle. Al reposo, ronda sobre el valle con vaivén vivo; cuando se toca un
-      mundo (`entrando`), BAJA y se acerca al lugar — "entra" al mundo, y la
-      cámara la acompaña. Su ánimo/energía (salud real de la finca) tiñen su
-      color, su aura y qué tan vivo es su vuelo. Mira hacia donde viaja. ── */
-function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false }) {
+/* ── El COMPAÑERO-JUGADOR: Angelita, la abeja — UNA SOLA, la del valle.
+      Rediseño 2026-07 (§6): POSICIÓN DE CALMA — al reposo ya no husmea
+      errática por el valle: flota serena sobre el corredor de la casa (el
+      corazón del cuadro), con un vaivén mínimo de respiración. Es MÁS
+      GRANDE (se veía diminuta) y BRILLA con su luz propia: invita a tocarla
+      — tocarla es hablarle a la finca (`onTocar`). Cuando se toca un mundo
+      (`entrando`), vuela y se acerca al lugar, y la cámara la acompaña. Su
+      ánimo/energía (salud real de la finca) tiñen su color y su vuelo. ── */
+const CALMA_ABEJA = {
+  // Al frente-derecha del corredor, sobre el patio de la casa (no encima del
+  // techo): Angelita ES la anfitriona de la casa-puerta.
+  x: CASA_VALLE.pos[0] + 1.9,
+  z: CASA_VALLE.pos[1] + 2.1,
+};
+
+function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false, onTocar = null }) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const prevX = useRef(foco.x);
@@ -1464,16 +1526,25 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
     const brio = (0.35 + 0.65 * energiaReal) * mVel; // energía y clima animan el vuelo
     const bob = reducedMotion ? 0 : Math.sin(t * (1.6 + brio)) * (0.1 + 0.16 * brio);
     const tembleque = tiembla ? Math.sin(t * 13) * tiembla : 0;
-    // Al reposo deriva en un círculo calmo; al entrar se posa junto al lugar.
-    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.55) * 0.9 * mVagar;
-    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.55) * 0.6 * mVagar;
-    const alto = (entrando ? 1.05 : 2.3) * mAltura;
-    const dest = new THREE.Vector3(
-      foco.x + (entrando ? 0.55 : 0.4 + vagarX) + tembleque,
-      foco.y + alto + bob + tembleque * 0.5,
-      foco.z + (entrando ? 0.7 : 0.6 + vagarZ),
-    );
-    ref.current.position.lerp(dest, (entrando ? 0.05 : 0.045) * mVel);
+    // POSICIÓN DE CALMA (§6): al reposo Angelita ya no ronda el valle en un
+    // círculo errático — flota SERENA sobre el corredor de la casa con una
+    // deriva mínima y lenta (respiración, no husmeo). Al entrar a un mundo
+    // sí vuela y se posa junto al lugar.
+    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.28) * 0.28 * mVagar;
+    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.22) * 0.2 * mVagar;
+    const alto = (entrando ? 1.05 : 2.5) * mAltura;
+    const dest = entrando
+      ? new THREE.Vector3(
+          foco.x + 0.55 + tembleque,
+          foco.y + alto + bob + tembleque * 0.5,
+          foco.z + 0.7,
+        )
+      : new THREE.Vector3(
+          CALMA_ABEJA.x + vagarX + tembleque,
+          yCalma + alto + bob + tembleque * 0.5,
+          CALMA_ABEJA.z + vagarZ,
+        );
+    ref.current.position.lerp(dest, (entrando ? 0.05 : 0.035) * mVel);
     // Comparte su posición viva para que la cámara de director la SIGA (follow
     // con lead): copia dentro del Vector3 compartido (mutación por método sobre
     // un local — no reasigna el prop, como CamaraViajera con controls.current).
@@ -1485,10 +1556,13 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
       prevX.current = ref.current.position.x;
     }
   });
-  const size = 44 + Math.round(energiaReal * 14);
+  // MÁS GRANDE (§6): el px base sube de 44 a la banda de JERARQUIA (58-76) —
+  // en el valle grande la guía se veía diminuta.
+  const [pxMin, pxMax] = JERARQUIA_PERSONAJES.protagonistaPx;
+  const size = pxMin + Math.round(energiaReal * (pxMax - pxMin));
   const luz = JERARQUIA_PERSONAJES.luzProtagonista;
   return (
-    <group ref={ref} position={[foco.x + 0.4, foco.y + 2.3, foco.z + 0.6]}>
+    <group ref={ref} position={[CALMA_ABEJA.x, yCalma + 2.5, CALMA_ABEJA.z]}>
       {/* JERARQUÍA: Angelita es la ÚNICA con luz propia — su calidez baña el
           terreno bajo su vuelo y el ojo la encuentra primero, sobre todo al
           atardecer y de noche. Solo donde el perfil ya paga luces extra. */}
@@ -1500,13 +1574,12 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
           position={[0, -0.2, 0]}
         />
       )}
-      <Html center distanceFactor={9} zIndexRange={[40, 10]}>
-        {/* TOCABLE: Angelita brilla e invita — tocarla es hablarle a la
+      <Html center distanceFactor={15} zIndexRange={[40, 10]}>
+        {/* TOCABLE (§6): Angelita brilla e invita — tocarla es hablarle a la
             finca (el host abre el agente). Botón real por accesibilidad. */}
         <button
           type="button"
           className="valle-abeja valle-abeja--toque"
-          data-angelita={estadoAngelita || 'calma'}
           aria-label="Hable con Angelita, la guía de su finca"
           onClick={
             onTocar
@@ -1697,7 +1770,8 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, 
       const dir = cam.position.clone().sub(c.target);
       // Acercarse al entrar; al volver, abrir hasta el reposo del ASPECTO
       // real (kReposo): en un teléfono parado el valle respira más lejos.
-      const deseada = entrando ? 9 : 18 * kReposo;
+      // (Distancias del valle GRANDE: entrar a 10.5, reposo a ~25.)
+      const deseada = entrando ? 10.5 : 25 * kReposo;
       dir.setLength(THREE.MathUtils.lerp(dir.length(), deseada, k));
       cam.position.copy(c.target.clone().add(dir));
       trans.current = Math.max(0, trans.current - (entrando ? 0.012 : 0.009));
@@ -1723,11 +1797,11 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, 
          fotograma ya es el encuadre de autor — clave en reduced-motion
          (frameloop demand), donde el lerp por frame gatea. */
       target={miraInicial || undefined}
-      minDistance={7}
+      minDistance={8}
       /* El techo de zoom respeta el reposo del aspecto: si la pose vertical
          vive más lejos, el clamp no pelea contra ella (antes, en teléfono,
          el reposo caía FUERA del techo y los controles daban tirones). */
-      maxDistance={Math.max(28, Math.ceil(20 * kReposo) + 4)}
+      maxDistance={Math.max(38, Math.ceil(27 * kReposo) + 5)}
       minPolarAngle={0.45}
       maxPolarAngle={1.18}
       autoRotate={autoOrbit && !entrando && !tomada}
@@ -1769,7 +1843,9 @@ function estadoAtmosfera(c) {
     niebla: new THREE.Color(c.niebla),
     solPos: new THREE.Vector3(...(c.sol || SOL_DEFECTO)),
     intensidad: c.intensidad,
-    nieblaLejos: c.nieblaLejos + 8,
+    // El valle grande pide más aire antes de la niebla (antes +8): que la
+    // cordillera nueva (z≤-21) se lea, no se coma.
+    nieblaLejos: c.nieblaLejos + 18,
   };
 }
 
@@ -1839,7 +1915,7 @@ function AtmosferaValle({ c, perfil, reducedMotion }) {
       <color ref={fondoRef} attach="background" args={[ini.cielo[1]]} />
       {/* La niebla se paga por fragmento: en perfil 'bajo' se apaga. */}
       {perfil.fog && (
-        <fog ref={fogRef} attach="fog" args={[ini.niebla, 12, ini.nieblaLejos + 8]} />
+        <fog ref={fogRef} attach="fog" args={[ini.niebla, 16, ini.nieblaLejos + 18]} />
       )}
       <hemisphereLight
         ref={hemiRef}
@@ -1879,7 +1955,7 @@ function AtmosferaValle({ c, perfil, reducedMotion }) {
    la luna, como se ve una luna que apenas sale. Verificado contra el terreno:
    el rayo cámara→luna libra la loma (y=6.9 sobre 1.5 en x=-10; 6.2 sobre 3.1
    en el borde x=-17) y la cordillera queda lejos (z≤-15). */
-const POS_LUNA = /** @type {[number, number, number]} */ ([-21, 3.4, -8]);
+const POS_LUNA = /** @type {[number, number, number]} */ ([-28, 4.6, -11]);
 
 function LunaValle({ reducedMotion }) {
   const ref = useRef(null);
@@ -1919,15 +1995,17 @@ function LunaValle({ reducedMotion }) {
 
 /* Caja de las luciérnagas: la tierra baja del frente del valle (referencia
    ESTABLE — ParticulasAmbientales re-siembra si la caja cambia). */
-const AREA_LUCIERNAGAS = /** @type {[number, number, number]} */ ([18, 2.4, 7]);
+const AREA_LUCIERNAGAS = /** @type {[number, number, number]} */ ([26, 2.6, 10]);
 
 /* La pose de cámara del valle: UNA fuente para el Canvas y para el establishing
-   shot de la CámaraDirector (así el dolly aterriza EXACTO donde siempre). */
-const CAMARA_VALLE = { position: /** @type {[number, number, number]} */ ([10.5, 9, 13.5]), fov: 40 };
+   shot de la CámaraDirector (así el dolly aterriza EXACTO donde siempre).
+   REDISEÑO 2026-07: la cámara RETROCEDIÓ con el valle grande (48×48) — el
+   cuadro respira, los lugares regados caben todos y nada queda apeñuscado. */
+const CAMARA_VALLE = { position: /** @type {[number, number, number]} */ ([15.2, 13.4, 19.6]), fov: 40 };
 /* El target de reposo del valle: el corazón del mapa, al que CamaraViajera
-   lleva el target sin foco ((0,1.0,1.4) + 0.6 en y). El establishing del
+   lleva el target sin foco ((0,1.4,2.0) + 0.6 en y). El establishing del
    DirectorValle aterriza EXACTO aquí para no dar ningún salto al soltar. */
-const MIRA_VALLE = [0, 1.6, 1.4];
+const MIRA_VALLE = [0.3, 1.8, 2.6];
 
 /* El REPOSO CONSCIENTE DEL ASPECTO (dirección de cámara): el fov de three es
    VERTICAL — en un teléfono parado (aspecto ~0.46) los 40° dejan un fov
@@ -1950,8 +2028,9 @@ function poseValleParaAspecto(aspect) {
   }
   const cuanVertical = Math.min(1, (0.9 - aspect) / 0.44); // 0 en 0.9 → 1 en ~0.46
   // El PLANO PICADO del teléfono parado (misma acimut de la pose aprobada,
-  // polar ~40°): la cámara sube a 18.7 y la mira avanza a la finca (z 3.2).
-  const PICADO = { position: [9.3, 18.7, 15.1], fov: 58, mira: [-0.5, 0.6, 2.7] };
+  // polar ~40°): la cámara sube y pica para que la ladera del valle GRANDE
+  // corra a lo largo de la pantalla y los lugares respiren en vertical.
+  const PICADO = { position: [13, 26, 21], fov: 58, mira: [-0.6, 0.8, 3.6] };
   const lerp = (a, b) => a + (b - a) * cuanVertical;
   const position = /** @type {[number, number, number]} */ (
     CAMARA_VALLE.position.map((v, i) => lerp(v, PICADO.position[i]))
@@ -1968,7 +2047,7 @@ function poseValleParaAspecto(aspect) {
 }
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null }) {
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = null, onAngelita = null, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null }) {
   /* La pose de reposo (aspecto-consciente, viene del host del Canvas). */
   const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
   const miraReposo = poseReposo.mira || MIRA_VALLE;
@@ -2043,12 +2122,26 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
       />
       <VegetacionPisos nocturno={nocturno} perfil={perfil} />
 
-      {/* LA DIRECCIÓN DEL CUADRO: la casa-ancla donde descansa el ojo (con su
-          ventana cálida), los senderos de tierra pisada que nacen de ella (el
-          rastro del uso diario: el ojo camina por donde caminan los pies) y
-          los patios bajo cada lugar navegable (afordancia sin UI). */}
-      <CasaCampesina alturaDe={alturaTerreno} perfil={perfil} nocturno={nocturno} />
+      {/* LA DIRECCIÓN DEL CUADRO: la casa-PUERTA donde descansa el ojo (su
+          puerta iluminada abre el mapa de los mundos), los senderos de tierra
+          pisada que nacen de ella (el rastro del uso diario), los PÓRTICOS de
+          los 6 portales (la puerta legible de cada patio) y los patios bajo
+          cada lugar navegable (afordancia sin UI). */}
+      <CasaCampesina
+        alturaDe={alturaTerreno}
+        perfil={perfil}
+        nocturno={nocturno}
+        reducedMotion={reducedMotion}
+        onPuerta={portada ? null : onCasa}
+      />
       <SenderosValle alturaDe={alturaTerreno} perfil={perfil} />
+      <PorticosPortales
+        mundos={MUNDOS_DIR}
+        alturaDe={alturaTerreno}
+        perfil={perfil}
+        nocturno={nocturno}
+        onEntrar={portada ? null : onEntrar}
+      />
       {/* EL PESO DE LAS COSAS: la sombra de contacto que planta cada objeto
           en su loma. Separa la profundidad sin mover nada — la casa, los
           hitos y las matas dejan de flotar. De noche se atenúa, no se va. */}
@@ -2110,6 +2203,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
         reducedMotion={reducedMotion}
         posRef={camaraDirector ? avatarRef : null}
         conLuz={perfil.luzBeacon}
+        onTocar={portada ? null : onAngelita}
       />
 
       <CamaraViajera
@@ -2172,11 +2266,11 @@ export default function Valle3D({
   energia = 1,
   onEntrar,
   onAlerta,
-  /* Tocar la puerta iluminada de la casa: la vía SECUNDARIA — lleva a la
-     ventana-puerta de los mundos (el host decide el destino). La entrada
-     principal a cada mundo son sus portales-paisaje, tocados directo. */
+  /* LA CASA ES LA PUERTA (§2): tocar la puerta iluminada de la casa llama
+     aquí — el host abre el mapa de los 6 portales. */
   onCasa = null,
-  /* Tocar a Angelita: hablarle a la finca (el host abre el agente). */
+  /* ANGELITA INVITA (§6): tocar a la abeja central llama aquí — el host
+     abre la conversación con el agente. */
   onAngelita = null,
   reducedMotion,
   tier = 'alto',
