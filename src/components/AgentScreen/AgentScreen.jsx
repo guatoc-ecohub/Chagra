@@ -139,7 +139,6 @@ import ChatHistory from './ChatHistory';
 import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
-import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
 import { AgentManoOverlay } from '../agent/AgentShell';
 import { mapCapabilityPick } from '../agent/capabilityRouting';
 import { agentSounds } from '../../services/agentSoundService';
@@ -3591,8 +3590,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         >
           <Home size={20} />
         </button>
-        {/* Avatar + título */}
-        <ChagraAgentAvatarColibriPhoto
+        {/* Avatar + título. 2026-07-16: iba directo a la foto del colibrí
+            saltándose el wrapper — ahora respeta la preferencia (default
+            Angelita, "jubila el colibrí" — operador). */}
+        <ChagraAgentAvatar
           state={state === STATE_RECORDING ? 'listening' : (state === STATE_THINKING || isVoicePlaying) ? 'thinking' : 'idle'}
           size={36}
           onDoubleClick={async () => {
