@@ -25,7 +25,6 @@ import {
   alturaLadera,
   geomCafeto,
   geomCereza,
-  geomFlorCafe,
   geomGuamo,
   geomNogal,
   geomPlatano,
@@ -141,15 +140,8 @@ export default function FloraCafetal({ tier = 'alto', reducedMotion = false }) {
   // Geometrías fusionadas (una vez por tier).
   const geos = useMemo(
     () => ({
-      /* UNA MALLA POR PORTE. La ladera dejó de ser un molde repetido: conviven
-         matas de un tallo, zoqueadas y agobiadas, que es como se ve un cafetal
-         de verdad. Cuesta dos draw-calls más y compra que a media distancia el
-         cultivo NO se lea como un pinar de clones. */
-      cafetoTallo: geomCafeto({ q, porte: 'tallo' }, 21),
-      cafetoZoqueo: geomCafeto({ q, porte: 'zoqueo' }, 41),
-      cafetoAgobio: geomCafeto({ q, porte: 'agobio' }, 61),
+      cafeto: geomCafeto({ q }, 21),
       cereza: geomCereza(),
-      flor: conteos.flor ? geomFlorCafe(27) : null,
       guamo: conteos.guamo ? geomGuamo({ q }, 22) : null,
       nogal: conteos.nogal ? geomNogal({ q }, 23) : null,
       platano: conteos.platano ? geomPlatano({ q }, 24) : null,
@@ -168,22 +160,8 @@ export default function FloraCafetal({ tier = 'alto', reducedMotion = false }) {
       : new THREE.MeshLambertMaterial(base);
   }, [perfil.materialRico, perfil.flatShading]);
 
-  // El material LUSTROSO del cultivo: hoja de café brillante y cereza con
-  // cuero de fruta (roughness bajo). Solo en gama con material rico; en la
-  // frugal se reusa el material único (cero costo extra).
-  const matLustre = useMemo(() => {
-    if (!perfil.materialRico) return mat;
-    return new THREE.MeshStandardMaterial({
-      vertexColors: true,
-      flatShading: perfil.flatShading,
-      roughness: 0.38,
-      metalness: 0,
-    });
-  }, [perfil.materialRico, perfil.flatShading, mat]);
-
-  // Distribución determinista (una vez por tier; `q` fija sobre qué pisos de
-  // rama pueden cargar cerezas y flores).
-  const dist = useMemo(() => distribucionCafetal(conteos, 311, q), [conteos, q]);
+  // Distribución determinista (una vez por tier).
+  const dist = useMemo(() => distribucionCafetal(conteos, 311), [conteos]);
   const centros = useMemo(() => centrosSombrio(conteos), [conteos]);
 
   // Liberar GPU al desmontar.
@@ -191,9 +169,8 @@ export default function FloraCafetal({ tier = 'alto', reducedMotion = false }) {
     () => () => {
       Object.values(geos).forEach((g) => g && g.dispose());
       mat.dispose();
-      if (matLustre !== mat) matLustre.dispose();
     },
-    [geos, mat, matLustre],
+    [geos, mat],
   );
 
   const sombra = perfil.sombras; // solo el sombrío proyecta sombra en 'alto'
@@ -204,14 +181,9 @@ export default function FloraCafetal({ tier = 'alto', reducedMotion = false }) {
       <Especie geo={geos.hojarasca} mat={mat} items={dist.hojarasca} />
       <Especie geo={geos.piedra} mat={mat} items={dist.piedra} />
 
-      {/* EL CULTIVO: los surcos de cafetos con hoja LUSTROSA, sus cerezas en
-          racimos pegados a la rama (verde→pintón→rojo→vino) y la flor blanca
-          axilar — flor y cosecha conviviendo, el ciclo real del arábica. */}
-      <Especie geo={geos.cafetoTallo} mat={matLustre} items={dist.cafeto.tallo} />
-      <Especie geo={geos.cafetoZoqueo} mat={matLustre} items={dist.cafeto.zoqueo} />
-      <Especie geo={geos.cafetoAgobio} mat={matLustre} items={dist.cafeto.agobio} />
-      <Especie geo={geos.cereza} mat={matLustre} items={dist.cereza} />
-      <Especie geo={geos.flor} mat={matLustre} items={dist.flor} />
+      {/* EL CULTIVO: los surcos de cafetos y sus cerezas (verde→pintón→rojo). */}
+      <Especie geo={geos.cafeto} mat={mat} items={dist.cafeto} />
+      <Especie geo={geos.cereza} mat={mat} items={dist.cereza} />
 
       {/* EL SOMBRÍO: guamos y nogales que le hacen techo al café. */}
       <Especie geo={geos.guamo} mat={mat} items={dist.guamo} castShadow={sombra} />
