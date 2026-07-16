@@ -32,14 +32,17 @@ export const PARAMS_TIER = {
   alto: {
     tubular: 124, radial: 16, hojas: 680, clusters: 9, ramas: 5, raices: 6,
     frailejones: 5, materialRico: true, flatShading: true, fog: true,
+    barbaDens: 1,
   },
   medio: {
     tubular: 76, radial: 10, hojas: 340, clusters: 7, ramas: 5, raices: 5,
     frailejones: 4, materialRico: false, flatShading: false, fog: true,
+    barbaDens: 0.62,
   },
   bajo: {
     tubular: 44, radial: 8, hojas: 120, clusters: 4, ramas: 3, raices: 4,
     frailejones: 0, materialRico: false, flatShading: false, fog: false,
+    barbaDens: 0.34,
   },
 };
 
@@ -369,68 +372,141 @@ export function factorSonrisa(t) {
   return Math.max(0, s); // solo sonríe (nunca "amarga" la boca)
 }
 
-/* ── BARBA de árbol-anciano (referente: Bárbol / Treebeard). Cortinas de MUSGO
-      que cuelgan de la mandíbula, RAICILLAS leñosas más largas en el mentón y
-      matas de LIQUEN prendidas a los lados. Todo procedural, cuelga y se mece. ── */
+/* ── BARBA de líquen del páramo (Usnea, "barba de viejo"): NO es musgo verde
+      plano, es líquen colgante FIBROSO de tono verde-gris PLATEADO. La barba se
+      arma como una CORTINA DENSA de mechones finos, en capas para dar volumen,
+      con gradiente raíz-en-sombra → punta-plateada. Referente: Bárbol/WETA. ── */
 export const BARBA = {
-  musgo: new THREE.Color('#5f6f42'), // musgo del páramo, verde apagado
-  musgoClaro: new THREE.Color('#879463'), // mechón más claro (variedad)
-  raicilla: new THREE.Color('#5a3b2b'), // raicilla leñosa colgante (marrón)
-  liquen: new THREE.Color('#aeb890'), // liquen foliáceo pálido (sage)
-  liquenAzul: new THREE.Color('#93a89a'), // liquen azul-grisáceo
+  usnea: new THREE.Color('#aebb96'), // cuerpo del líquen: verde-gris PÁLIDO (sage)
+  usneaGris: new THREE.Color('#c3cab4'), // mechón más plateado (variedad)
+  raicilla: new THREE.Color('#725036'), // pocas hebras leñosas marrones (contraste)
+  liquen: new THREE.Color('#c7d0b6'), // mata de liquen foliáceo pálido (plata-sage)
+  liquenAzul: new THREE.Color('#b4c1b4'), // liquen azul-grisáceo (variedad)
 };
 
 /*
+ * Geometría de UN mechón de usnea (líquen colgante): un tubo FINO y tapereado
+ * que nace en el mentón (y=0) y CAE con una leve enroscadura hacia el frente,
+ * como hilo de barba de viejo. Trae horneado el gradiente de color a lo largo:
+ * raíz en sombra → punta plateada (la receta del DR: oscuro en la base, claro en
+ * la punta). Una sola geometría compartida por TODOS los mechones (InstancedMesh,
+ * 1 draw-call); la variedad de largo/grosor/color va por instancia.
+ */
+export function geometriaHebraBarba(segmentos = 6, radial = 4) {
+  const pts = [
+    new THREE.Vector3(0.0, 0.0, 0.0),
+    new THREE.Vector3(0.02, -0.28, 0.05),
+    new THREE.Vector3(-0.02, -0.58, 0.06),
+    new THREE.Vector3(0.03, -0.84, 0.02),
+    new THREE.Vector3(0.0, -1.0, -0.03),
+  ];
+  const curva = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.5);
+  const geo = new THREE.TubeGeometry(curva, segmentos, 1, radial, false);
+  const pos = geo.attributes.position;
+  const nAnillo = radial + 1;
+  const centros = [];
+  for (let i = 0; i <= segmentos; i++) centros.push(curva.getPointAt(i / segmentos));
+  const colores = new Float32Array(pos.count * 3);
+  const v = new THREE.Vector3();
+  const off = new THREE.Vector3();
+  // El color va como RAMPA DE LUMINANCIA (raíz en sombra → punta encendida); el
+  // TONO real de usnea lo pone el instanceColor. Así el mechón queda pálido y
+  // plateado (multiplicar dos verdes medios lo ensuciaba a oliva-espagueti).
+  const lumRaiz = 0.5;
+  const lumPunta = 1.0;
+  for (let k = 0; k < pos.count; k++) {
+    const anillo = Math.floor(k / nAnillo);
+    const t = Math.min(1, anillo / segmentos); // 0 raíz → 1 punta
+    const radio = 0.03 * (1 - t) + 0.006; // fino, más fino aún en la punta
+    const cen = centros[Math.min(anillo, centros.length - 1)];
+    v.fromBufferAttribute(pos, k);
+    off.subVectors(v, cen).multiplyScalar(radio); // offset unitario → grosor real
+    v.copy(cen).add(off);
+    pos.setXYZ(k, v.x, v.y, v.z);
+    const lum = lumRaiz + (lumPunta - lumRaiz) * Math.min(1, t * 1.1);
+    colores[k * 3] = lum;
+    colores[k * 3 + 1] = lum;
+    colores[k * 3 + 2] = lum * 0.97; // punta apenas cálida
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(colores, 3));
+  pos.needsUpdate = true;
+  geo.computeVertexNormals();
+  return geo;
+}
+
+/*
  * Mechones de la barba en coords del rostro (0,0,0 = ancla del mentón; -y cuelga,
- * +z al frente). Forma de barba: larga en el centro (mentón), corta en las
- * mejillas; enmarca la boca SIN taparla (arranca por debajo del labio).
+ * +z al frente). Forma de barba REAL: densa, larga en el centro (mentón), corta y
+ * dispersa hacia las mejillas, en TRES CAPAS de profundidad para que tenga
+ * VOLUMEN (no un plano de cuatro hebras). Devuelve transformaciones por instancia.
  */
 export function specsBarba(seed = 91) {
   const r = rng(seed);
-  const mechones = [];
-  const N = 15;
-  for (let i = 0; i < N; i++) {
-    const f = i / (N - 1); // 0..1 de mejilla izq a der
-    const x = (f - 0.5) * 0.94; // a lo ancho de la mandíbula
-    const centro = Math.max(0, 1 - Math.abs(f - 0.5) * 1.7); // largo hacia el mentón
-    const len = 0.44 + centro * 0.78 + r() * 0.16;
-    mechones.push({
-      x,
-      yTop: -0.56 - Math.abs(f - 0.5) * 0.1, // bajo la boca, sube por las mejillas
-      z: 0.02 + r() * 0.05,
-      len,
-      tilt: (f - 0.5) * 0.7 + (r() - 0.5) * 0.2, // se abren hacia afuera
-      grosor: 0.05 + r() * 0.03,
-      claro: r() > 0.62,
-      fase: i * 1.3,
+  const hebras = [];
+  // Capas: fondo (volumen), medio y frente (las más largas y visibles). El
+  // solape entre capas es lo que hace que se lea como BARBA con cuerpo. Densa y
+  // con el CENTRO lleno (el mentón de Bárbol), no cuatro hebras a los lados.
+  const capas = [
+    { z: -0.04, lenMul: 0.86, n: 22 },
+    { z: 0.03, lenMul: 1.0, n: 28 },
+    { z: 0.1, lenMul: 1.12, n: 22 },
+  ];
+  for (const capa of capas) {
+    for (let i = 0; i < capa.n; i++) {
+      // sesgo al centro: raíz cuadrada empuja las muestras hacia el mentón para
+      // que la barba tenga cuerpo en el medio y se disperse hacia las mejillas.
+      const u = (i + r() * 0.8) / capa.n; // 0..1 crudo
+      const f = 0.5 + (u - 0.5) * Math.sqrt(Math.abs(u - 0.5) * 2) * 1.15;
+      const x = (f - 0.5) * 1.02; // a lo ancho de la mandíbula
+      const centro = Math.max(0, 1 - Math.abs(f - 0.5) * 1.7); // 1 en el mentón
+      // arranca BAJO la boca (deja ver los labios) y cuelga largo desde el mentón
+      const yTop = -0.47 - centro * 0.06 - Math.abs(f - 0.5) * 0.02;
+      const len = (0.6 + centro * 1.15 + r() * 0.3) * capa.lenMul; // barba LARGA
+      hebras.push({
+        pos: [x + (r() - 0.5) * 0.05, yTop, capa.z + (r() - 0.5) * 0.02],
+        len,
+        grosor: 0.5 + r() * 0.5, // fino (hilo de usnea), varía
+        tilt: (f - 0.5) * 0.28 + (r() - 0.5) * 0.24, // cuelgan casi rectos, poco abanico
+        lean: 0.04 + r() * 0.16, // caen hacia el frente
+        yaw: (r() - 0.5) * 0.5,
+        tono: r(), // 0 usnea sage → 1 plateado
+        woody: r() > 0.9, // muy pocas hebras leñosas marrones (contraste)
+      });
+    }
+  }
+  // COLUMNA CENTRAL del mentón: mechones largos que cuelgan RECTOS en el eje para
+  // que la barba no se parta en dos y tape el surco vertical del tronco (el mentón
+  // macizo de Bárbol). Es lo que une la cortina en una sola barba.
+  const CENTRO = 20;
+  for (let i = 0; i < CENTRO; i++) {
+    // arrancan JUSTO bajo el labio y cuelgan rectos, adelantados para tapar el
+    // surco vertical del tronco → una sola barba maciza, sin raya al medio.
+    hebras.push({
+      pos: [(r() - 0.5) * 0.28, -0.44 - r() * 0.1, 0.09 + r() * 0.05],
+      len: 1.2 + r() * 0.55, // las más largas (el chorro central del mentón)
+      grosor: 0.6 + r() * 0.5,
+      tilt: (r() - 0.5) * 0.14, // casi vertical
+      lean: 0.03 + r() * 0.12,
+      yaw: (r() - 0.5) * 0.4,
+      tono: r(),
+      woody: r() > 0.9,
     });
   }
-  // raicillas leñosas: más largas, en el centro (el mentón de Bárbol)
-  const raicillas = [];
-  const M = 4;
-  for (let i = 0; i < M; i++) {
-    raicillas.push({
-      x: (r() - 0.5) * 0.34,
-      yTop: -0.62,
-      z: 0.0 + r() * 0.04,
-      len: 0.98 + r() * 0.6,
-      tilt: (r() - 0.5) * 0.28,
-      grosor: 0.036 + r() * 0.02,
-      fase: i * 2.1,
-    });
-  }
-  // matas de liquen prendidas a lo alto de la barba, a los lados de la boca
-  const liquenes = [];
-  const L = 9;
+  // matas de liquen foliáceo: acentos PEQUEÑOS del enredo de usnea, prendidos al
+  // borde superior de la barba y trepando por las patillas (mejillas). Chicos y
+  // numerosos: dan textura sin tapar la boca ni verse como piedras.
+  const tufts = [];
+  const L = 22;
   for (let i = 0; i < L; i++) {
     const f = i / (L - 1);
-    liquenes.push({
-      pos: [(f - 0.5) * 0.9, -0.5 - r() * 0.28, 0.05 + r() * 0.05],
-      esc: 0.06 + r() * 0.055,
+    const lado = Math.abs(f - 0.5) * 2; // 0 centro → 1 mejilla
+    tufts.push({
+      pos: [(f - 0.5) * 1.02, -0.5 - r() * 0.22 + lado * 0.16, 0.05 + r() * 0.07],
+      esc: 0.028 + r() * 0.03, // MUCHO más chicos que antes
       azul: r() > 0.6,
     });
   }
-  return { mechones, raicillas, liquenes };
+  return { hebras, tufts };
 }
 
 /*
