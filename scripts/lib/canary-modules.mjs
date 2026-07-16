@@ -430,13 +430,27 @@ async function runPlantaFoto(ctx) {
 /** B0c — verificar que la conversación quedó registrada en el store del sidecar. */
 async function runCaptura(ctx) {
   const { base, sidecarToken, target, dateStr, responses = [] } = ctx;
+  // Distingue "no configurado" (no hay comando) de "no pude medir" (el comando
+  // falló: host de captura caído, ssh muerto). Colapsar ambos a null hacía que el
+  // detalle culpara siempre a la config, escondiendo una caída del host.
   const conta = () => {
     const cmd = process.env.CANARY_CONV_COUNT_CMD;
-    if (!cmd) return null;
-    try { const n = parseInt(execSync(cmd, { encoding: 'utf-8', timeout: 30000 }).trim().split(/\s+/)[0], 10); return Number.isFinite(n) ? n : null; } catch (_) { return null; }
+    if (!cmd) return { n: null, reason: 'unset' };
+    try {
+      const n = parseInt(execSync(cmd, { encoding: 'utf-8', timeout: 30000 }).trim().split(/\s+/)[0], 10);
+      return Number.isFinite(n) ? { n, reason: 'ok' } : { n: null, reason: 'error' };
+    } catch (_) { return { n: null, reason: 'error' }; }
   };
-  const before = conta();
+
   const withText = responses.filter((r) => r.agent_text);
+  // Sin respuestas del agente no hay NADA que capturar, así que Δ=0 es el
+  // resultado correcto y no evidencia de un bug de captura. Marcar FAIL acá
+  // acusa al store de estar roto cuando lo que falló fue B0 (agente/backend).
+  if (withText.length === 0) {
+    return { status: 'skip', valor: 'sin respuestas que capturar', detalle: 'B0 no produjo respuestas (agente/backend caído): sin insumo este check no es evaluable. NO implica bug de captura.', data: { posted: 0, evaluable: false } };
+  }
+
+  const before = conta();
   let posted = 0;
   const sessionId = `canario-${target}-${dateStr}`;
   for (const r of withText) {
@@ -452,12 +466,19 @@ async function runCaptura(ctx) {
   }
   await sleep(1500);
   const after = conta();
-  if (before === null || after === null) {
-    return { status: posted > 0 ? 'pass' : 'fail', valor: `endpoint aceptó ${posted}/${withText.length}`, detalle: `POST /log-conversation aceptó ${posted}/${withText.length} turnos (verificación en disco no configurada: falta CANARY_CONV_COUNT_CMD).`, data: { posted, disk_verified: false } };
+  if (before.n === null || after.n === null) {
+    const reason = before.reason === 'ok' ? after.reason : before.reason;
+    const causa = reason === 'unset'
+      ? 'verificación en disco no configurada: falta CANARY_CONV_COUNT_CMD'
+      : 'no pude leer el store: CANARY_CONV_COUNT_CMD falló (¿host de captura caído?)';
+    return { status: posted > 0 ? 'pass' : 'fail', valor: `endpoint aceptó ${posted}/${withText.length}`, detalle: `POST /log-conversation aceptó ${posted}/${withText.length} turnos (${causa}).`, data: { posted, disk_verified: false, count_reason: reason } };
   }
-  const delta = after - before;
+  const delta = after.n - before.n;
   const ok = delta >= posted && posted > 0;
-  return { status: ok ? 'pass' : 'fail', valor: `${before}→${after} (Δ=${delta})`, detalle: `store de conversaciones: ${before} → ${after} líneas (Δ=${delta}, posteados=${posted}). ${ok ? 'incrementa correctamente.' : 'NO incrementó lo esperado → posible bug de captura.'}`, data: { posted, before, after, delta, disk_verified: true } };
+  const porque = ok ? 'incrementa correctamente.'
+    : posted === 0 ? `el endpoint /log-conversation rechazó los ${withText.length} turnos → no se capturó nada.`
+      : 'NO incrementó lo esperado → posible bug de captura.';
+  return { status: ok ? 'pass' : 'fail', valor: `${before.n}→${after.n} (Δ=${delta})`, detalle: `store de conversaciones: ${before.n} → ${after.n} líneas (Δ=${delta}, posteados=${posted}). ${porque}`, data: { posted, before: before.n, after: after.n, delta, disk_verified: true } };
 }
 
 // ── B0f: CASO GOLDEN/REGRESIÓN — ración avícola en altura (Choachí 2513 msnm) ───
@@ -709,12 +730,19 @@ async function runGaps(ctx) {
   let anotados = 0;
 
   // (1) Heurística: el sujeto del tema no resolvió en el grafo.
-  const resolvedAll = norm(responses.flatMap((r) => r.entities_grounded || []).join(' | '));
+  // Solo es evaluable si el agente ALCANZÓ a responder. Con B0 caído (502/530) no
+  // hay entities_grounded, y "el grafo no tiene la especie" queda indistinguible de
+  // "nunca se llegó a preguntar": anotaríamos un gap FANTASMA que manda a la flota
+  // a hacer DR de algo que el grafo quizá ya tiene. El lazo auto-mejorante se
+  // envenena solo. Sin insumo no se concluye nada.
+  const withText = responses.filter((r) => r.agent_text);
+  const heuristicaEvaluable = withText.length > 0;
+  const resolvedAll = norm(withText.flatMap((r) => r.entities_grounded || []).join(' | '));
   const subjectResolved =
     resolvedAll.includes(norm(topic.patogeno).split(' ')[0]) ||
     resolvedAll.includes(norm(topic.cientifico).split(' ')[0]) ||
     resolvedAll.includes(norm(topic.cultivo));
-  if (!subjectResolved) {
+  if (heuristicaEvaluable && !subjectResolved) {
     appendJsonl(file, {
       ts: nowIso(), target, tema: topic.id, entidad_faltante: `${topic.patogeno} / ${topic.cientifico}`, cultivo: topic.cultivo,
       que_se_necesita: `Especie/plaga "${topic.patogeno}" (${topic.tipo}) en ${topic.cultivo} (${topic.cientifico}) y sus aristas (AFFECTS/SUSCEPTIBLE_TO, control cultural, biopreparados, fuente ${topic.fuente}) no resolvieron. Encolar DR/ingest.`,
@@ -734,6 +762,9 @@ async function runGaps(ctx) {
     anotados += 1;
   }
 
+  if (anotados === 0 && !heuristicaEvaluable) {
+    return { status: 'skip', valor: 'no evaluable (sin respuestas)', detalle: `B0 no produjo respuestas (agente/backend caído): sin entities_grounded no se puede afirmar que al grafo le falte ${topic.patogeno}/${topic.cientifico}. No se anota gap para no envenenar la cola DR.`, data: { evaluable: false, anotados: 0 } };
+  }
   if (anotados === 0) return { status: 'pass', valor: 'sin gaps', detalle: `El sujeto del tema (${topic.patogeno}/${topic.cientifico}) resolvió y el juez corrigió con el grafo; sin gap.` };
   return { status: 'pass', valor: `${anotados} gap(s) anotados`, detalle: `${anotados} gap(s) de grafo anotados en ${file} → alimentan cola DR.`, data: { file, anotados, judge_gaps: judgeGaps.length } };
 }
