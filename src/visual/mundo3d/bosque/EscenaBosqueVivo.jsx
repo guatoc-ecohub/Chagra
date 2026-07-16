@@ -19,6 +19,7 @@ import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { perfilDeTier } from '../deviceTier.js';
 import EntQuenua from './EntQuenua.jsx';
 import FloraParamo from './FloraParamo.jsx';
+import FaunaBosque from './FaunaBosque.jsx';
 
 /* Cielo del páramo: gris-azul frío, alto y húmedo. */
 const PARAMO = { fondo: '#c3cfce', niebla: '#c9d3d1', suelo: '#4b5340', musgo: '#5c6844' };
@@ -119,6 +120,10 @@ function Diorama({ tier, reducedMotion }) {
       {/* EL ECOSISTEMA de páramo: frailejonar, sotobosque, árboles de niebla,
           rocas, musgo y vaho. Alrededor del guardián, sin taparlo. */}
       <FloraParamo tier={tier} reducedMotion={reducedMotion} />
+
+      {/* LA VIDA: el cóndor arriba, los vecinos en su casa, mariposas y
+          abejas sobre el frailejonar. Un bosque sin bichos es un decorado. */}
+      <FaunaBosque tier={tier} reducedMotion={reducedMotion} />
 
       {/* EL GUARDIÁN */}
       <EntQuenua tier={tier} reducedMotion={reducedMotion} />
