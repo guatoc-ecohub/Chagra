@@ -1,29 +1,38 @@
 import { Check } from 'lucide-react';
 import useAgentAvatarType from '../../hooks/useAgentAvatarType';
+import ChagraAgentAvatarColibri from '../ChagraAgentAvatarColibri';
 import ChagraAgentAvatarAngelita from '../ChagraAgentAvatarAngelita';
 import ChagraAgentAvatarMaiz from '../ChagraAgentAvatarMaiz';
 
 /**
  * AgentAvatarSelector — selector visual para el avatar del agente IA.
  *
- * 2 opciones: Angelita la abeja (default) o planta de maíz. Persiste vía
- * useAgentAvatarType (localStorage `chagra:agent-avatar-type`). Cambio
- * inmediato — afecta a todas las instancias del avatar en la app.
+ * 3 opciones: Angelita la abeja (default), colibrí ilustrado SVG, o planta
+ * de maíz. Persiste vía useAgentAvatarType (localStorage
+ * `chagra:agent-avatar-type`). Cambio inmediato — afecta a todas las
+ * instancias del avatar en la app.
  *
- * 2026-07-16 (operador): "Angelita como el agente, jubila el colibrí".
- * 2026-07-18 (operador): el colibrí sale también de las opciones — "solo
- * abejita". Los slugs viejos 'colibri'/'colibri_svg' migran a 'angelita'
- * en el hook, sin acción del usuario.
+ * 2026-07-16 (operador): "Angelita como el agente, jubila el colibrí". La
+ * opción default pasa a ser Angelita; conserva el slug guardado 'colibri'
+ * (default histórico) para que nadie necesite migración. El colibrí
+ * ilustrado sigue disponible como preferencia explícita.
  */
 export default function AgentAvatarSelector() {
     const [type, setType] = useAgentAvatarType();
 
     const OPTIONS = [
         {
-            id: 'angelita',
+            // Slug histórico 'colibri' = el default de siempre; hoy es Angelita.
+            id: 'colibri',
             label: 'Angelita, la abeja',
             sub: 'La vecina que sabe de finca (recomendado)',
             Component: ChagraAgentAvatarAngelita,
+        },
+        {
+            id: 'colibri_svg',
+            label: 'Colibrí ilustrado',
+            sub: 'SVG botánico animado',
+            Component: ChagraAgentAvatarColibri,
         },
         {
             id: 'maiz',

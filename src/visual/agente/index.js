@@ -9,15 +9,11 @@
  *   <Angelita estado="pensando" confianza={0.8} />
  */
 export { Angelita, default } from './Angelita.jsx';
-export { AngelitaEntrada, esDiaSoleado } from './AngelitaEntrada.jsx';
-export { AngelitaGuia } from './AngelitaGuia.jsx';
-export { useAngelitaGuia, calcularPuestoGuia } from '../../hooks/useAngelitaGuia.js';
 export {
   ESTADOS_ANGELITA,
   NIVELES_CONFIANZA,
   POSE_DE_ESTADO,
   ARIA_DE_ESTADO,
-  CEJAS_DE_ESTADO,
   MOMENTOS_IDLE,
   estadoCanonico,
   nivelDeConfianza,
