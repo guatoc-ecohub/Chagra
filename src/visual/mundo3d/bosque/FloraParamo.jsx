@@ -52,7 +52,9 @@ function Especie({ geo, mat, items, castShadow = false }) {
     for (let i = 0; i < items.length; i++) {
       const it = items[i];
       p.set(it.pos[0], it.pos[1], it.pos[2]);
-      e.set(0, it.rotY, 0);
+      // tiltX/tiltZ: ladeo por instancia (frailejonar) — cada mata cabecea
+      // distinto para que la colonia no se lea clonada. Pivote en la base.
+      e.set(it.tiltX || 0, it.rotY, it.tiltZ || 0);
       q.setFromEuler(e);
       s.setScalar(it.escala);
       m.compose(p, q, s);
@@ -170,10 +172,15 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
   const q = calidadDeTier(tier);
 
   // --- Geometrías fusionadas (una vez por tier). Solo lo que tenga matas. ---
+  // El frailejón viene en TRES edades (silueta distinta, no solo escala): joven
+  // casi al ras, adulto de columna media, viejo de hábito alto. Cada edad es su
+  // banco → el frailejonal se lee como un paisaje con gradiente de edad.
   const geos = useMemo(() => {
     const g = {};
-    if (conteos.frailejon) g.frailejon = geomFrailejon({ flor: false, q }, 1);
-    if (conteos.frailejonFlor) g.frailejonFlor = geomFrailejon({ flor: true, q }, 2);
+    if (conteos.frailejonJoven) g.frailejonJoven = geomFrailejon({ flor: false, q, edad: 0.26 }, 21);
+    if (conteos.frailejon) g.frailejon = geomFrailejon({ flor: false, q, edad: 0.62 }, 1);
+    if (conteos.frailejonViejo) g.frailejonViejo = geomFrailejon({ flor: false, q, edad: 0.95 }, 37);
+    if (conteos.frailejonFlor) g.frailejonFlor = geomFrailejon({ flor: true, q, edad: 0.78 }, 2);
     if (conteos.yarumo) g.yarumo = geomYarumo({ q }, 3);
     if (conteos.roble) g.roble = geomRoble({ q }, 4);
     if (conteos.encenillo) g.encenillo = geomEncenillo({ q }, 5);
@@ -223,8 +230,11 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
       <Especie geo={geos.romerillo} mat={mat} items={dist.romerillo} />
       <Especie geo={geos.mortino} mat={mat} items={dist.mortino} />
 
-      {/* Frailejonar: el ícono del páramo, al frente. */}
+      {/* Frailejonar: el ícono del páramo, al frente — tres EDADES entremezcladas
+          (joven al ras, adulto, viejo de columna alta) + los que florecen. */}
+      <Especie geo={geos.frailejonJoven} mat={mat} items={dist.frailejonJoven} />
       <Especie geo={geos.frailejon} mat={mat} items={dist.frailejon} />
+      <Especie geo={geos.frailejonViejo} mat={mat} items={dist.frailejonViejo} />
       <Especie geo={geos.frailejonFlor} mat={mat} items={dist.frailejonFlor} />
 
       {/* Árboles de fondo (anillo exterior, velados por la niebla). */}

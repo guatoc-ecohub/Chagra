@@ -19,11 +19,9 @@
  *   · three core puro: corre headless, sin contexto GL.
  */
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import {
   rng,
-  ruidoFbm,
-  desindexar,
+  fusionarSeguro,
   poner,
   apuntar,
   pintarPlano,
@@ -34,184 +32,110 @@ import {
   taperLineal,
   curvaTronco,
   sembrarFollaje,
+  matojoNube,
 } from './sombreadoVegetal.js';
+import { crearSueloRico } from '../terreno/sueloRico.geom.js';
 
 const ss = THREE.MathUtils.smoothstep;
 
+/* Fusión que PRESERVA las normales radiales de las copas-nube (matojoNube):
+   la opción canónica del taller — nada de reimplementar la trampa del null. */
+const fusionarConNormales = (partes, etiqueta) => fusionarSeguro(partes, etiqueta, { preservarNormales: true });
+
 /* -------------------------------------------------------------------------- */
-/*  Fusión que PRESERVA normales                                               */
+/*  EL TERRENO — el anfiteatro del bosque de niebla, sobre el SUELO RICO       */
 /* -------------------------------------------------------------------------- */
 
 /*
- * fusionarSeguro (del taller) recalcula normales al final — correcto para la
- * flora facetada, letal para las copas-nube: sus normales RADIALES (puestas a
- * mano) son lo que las hace leerse como masa suave de hojas y no como
- * icosaedros. Esta variante desindexa, truena si el merge da null, y respeta
- * las normales que cada parte ya trae.
- */
-function fusionarConNormales(partes, etiqueta = 'sin-nombre') {
-  const buenas = partes.filter(Boolean).map(desindexar);
-  if (!buenas.length) {
-    throw new Error(`[bosqueTakeA] "${etiqueta}": no hay partes que fusionar.`);
-  }
-  const refAttrs = Object.keys(buenas[0].attributes).sort().join(',');
-  for (let i = 0; i < buenas.length; i++) {
-    const attrs = Object.keys(buenas[i].attributes).sort().join(',');
-    if (attrs !== refAttrs) {
-      throw new Error(
-        `[bosqueTakeA] "${etiqueta}": la parte ${i} tiene atributos [${attrs}] `
-        + `pero se esperaba [${refAttrs}] — mergeGeometries devolvería null.`,
-      );
-    }
-  }
-  const g = mergeGeometries(buenas, false);
-  if (!g) {
-    throw new Error(
-      `[bosqueTakeA] "${etiqueta}": mergeGeometries devolvió NULL — la pieza `
-      + 'habría quedado invisible sin error.',
-    );
-  }
-  return g;
-}
-
-/* -------------------------------------------------------------------------- */
-/*  EL TERRENO — el anfiteatro del bosque de niebla                            */
-/* -------------------------------------------------------------------------- */
-
-/*
- * Altura del terreno en (x,z). La composición:
- *   · CLARO central plano (r<3.2): el Ent y los vecinos viven en y≈0 — la
- *     fauna billboard y las raíces del guardián no flotan ni se entierran.
- *   · ONDULACIÓN media (r 3.2→9.5): lomos suaves de musgo, el microrelieve
- *     que hace que el suelo deje de ser una mesa.
- *   · PARED del anfiteatro (r>12.5): la ladera trepa hasta ~6 con crestas
- *     irregulares por ángulo — el cuenco que la niebla se come al fondo.
- *   · CAÑADA del arroyo: una vaguada honda que baja del fondo brumoso y
+ * El relieve es una COMPOSICIÓN: el sistema compartido `crearSueloRico`
+ * (heightfield fbm con warp de dominio + claro central llano + SENDERO que
+ * recorta el relieve — el suelo calibre consola de toda escena) MÁS la
+ * identidad del bosque de niebla, que el sistema no conoce:
+ *   · la PARED del anfiteatro (r>12.5) que trepa hasta ~6 con crestas
+ *     irregulares por ángulo — el cuenco que la niebla se come al fondo;
+ *   · la CAÑADA del arroyo: la vaguada honda que baja del fondo brumoso y
  *     cruza el flanco derecho del claro.
- * Determinista y barata: los objetos se POSAN encima con esta misma función.
+ * Determinista y barata: TODO lo que se siembra se posa con `alturaBosque`.
  */
 export function xArroyo(z) {
   return 4.7 + Math.sin(z * 0.24 + 1.3) * 1.5;
 }
 
-export function alturaBosque(x, z) {
+/* La identidad del anfiteatro (lo que crearSueloRico no sabe). */
+function extraAnfiteatro(x, z) {
   const r = Math.hypot(x, z);
   const ang = Math.atan2(z, x);
-  const onda = (Math.sin(x * 0.52 + 1.7) * Math.cos(z * 0.47 - 0.6) * 0.36
-    + Math.sin(x * 1.25 - z * 0.85 + 2.1) * 0.13) * ss(r, 3.2, 9.5);
-  const micro = (Math.sin(x * 2.6 + z * 1.9) * 0.04
-    + Math.cos(x * 1.7 - z * 2.8) * 0.035) * ss(r, 2.2, 5);
   const cresta = 1 + 0.34 * Math.sin(ang * 3 + 1.2)
     + 0.2 * Math.sin(ang * 7 - 0.7)
     + 0.12 * Math.sin(ang * 13 + 2.3);
   const pared = ss(r, 12.5, 30) ** 1.25 * 4.8 * cresta;
   const dx = x - xArroyo(z);
   const canada = -0.4 * Math.exp(-(dx * dx) / 1.15) * ss(z, -13, -6) * (1 - ss(r, 20, 28));
-  return onda + micro + pared + canada;
+  return pared + canada;
 }
 
-/* Paleta del suelo (musgo, hojarasca, tierra pisada, humedad, roca). */
-const SUELO = {
-  musgoOscuro: new THREE.Color('#3d4b2c'),
-  musgoClaro: new THREE.Color('#5a6b3a'),
-  hojarasca: new THREE.Color('#6e5838'),
-  hojarasca2: new THREE.Color('#7d6a44'),
-  tierra: new THREE.Color('#5c4a33'),
-  humedo: new THREE.Color('#2f3d2b'),
-  roca: new THREE.Color('#7b8074'),
-  rocaOscura: new THREE.Color('#5d6156'),
-  noche: new THREE.Color('#243349'),
+/* Paleta del bosque de niebla para el suelo rico: musgo hondo en vez de pasto
+   de páramo, trillo pardo húmedo, roca fría — el mood de la toma A. */
+export const PALETA_BOSQUE = {
+  base: '#48552f', // musgo del claro
+  pastoVivo: '#5a6b3a', // musgo claro (nubes grandes de mota)
+  humedo: '#2f3d2b', // hondonadas y la orilla de la cañada
+  seco: '#7e7a4e', // lomos apenas pajizos (bosque húmedo: sin oro de páramo)
+  hojarasca: '#6e5838', // manto pardo bajo el queñual
+  tierraSenda: '#8a7048', // el trillo pisado que entra al claro
+  tierraHumeda: '#4c3f2e',
+  roca: '#7b8074', // piedra fría del anfiteatro
+  rocaClara: '#989b8c',
+  liquen: '#9aa86a',
+  raiz: '#5b4a35',
+  paja: '#8f855a',
+  pajaVerde: '#66713f',
+  flor: '#e8e3c9',
+  florMiel: '#d9b45a',
 };
 
-export const LADO_TERRENO = 64;
+/* El trillo: entra por el flanco izquierdo del frente y muere en el claro del
+   guardián (la afordancia de "por aquí se llega") — lejos del arroyo. */
+const PUNTOS_SENDERO = /** @type {Array<[number, number]>} */ ([
+  [-15.5, 11.5], [-11.5, 8.6], [-8.2, 6.3], [-5.2, 4.4], [-2.7, 2.3], [-0.9, 0.6],
+]);
 
-/*
- * La malla del terreno, PINTADA por vértice: musgo moteado de base, parches de
- * hojarasca bajo el anillo de árboles, el patio de tierra pisada del Ent, la
- * humedad oscura de la cañada y la roca pálida asomando en lo alto de la
- * pared. De noche todo se enfría hacia el azul-luna (día por noche del cine).
+const sueloBase = crearSueloRico({
+  tam: 64,
+  seed: 929,
+  amplitud: 0.5,
+  micro: 0.085,
+  claro: { radio: 3.2, transicion: 6.3 },
+  falda: null, // la pared del anfiteatro (con crestas) la pone extraAnfiteatro
+  sendero: { puntos: PUNTOS_SENDERO, ancho: 1.05 },
+  paleta: PALETA_BOSQUE,
+});
+
+/**
+ * EL SUELO del bosque: el contrato `SueloRico` (alturaDe/pendienteDe/
+ * senderoCerca/opts) con la identidad del anfiteatro compuesta encima —
+ * `geomSueloRico`/`<SueloRico>` lo consumen tal cual, y TODO lo que la escena
+ * siembra (queñual, flora, hojarasca, arroyo) se posa con su `alturaDe`.
  */
-export function geomTerrenoBosque({ seg = 90, nocturno = false } = {}) {
-  const g = new THREE.PlaneGeometry(LADO_TERRENO, LADO_TERRENO, seg, seg);
-  g.rotateX(-Math.PI / 2);
-  const pos = g.attributes.position;
-  const colores = new Float32Array(pos.count * 3);
-  const col = new THREE.Color();
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i);
-    const z = pos.getZ(i);
-    const y = alturaBosque(x, z);
-    pos.setY(i, y);
-    const r = Math.hypot(x, z);
+export const sueloDelBosque = {
+  ...sueloBase,
+  alturaDe: (x, z) => sueloBase.alturaDe(x, z) + extraAnfiteatro(x, z),
+  pendienteDe: (x, z, e = 0.4) => {
+    const a = sueloDelBosque.alturaDe;
+    const dx = (a(x + e, z) - a(x - e, z)) / (2 * e);
+    const dz = (a(x, z + e) - a(x, z - e)) / (2 * e);
+    return Math.hypot(dx, dz);
+  },
+};
 
-    // Musgo moteado (dos verdes que el ruido mezcla en nubes grandes).
-    const mote = ruidoFbm(x * 0.33 + 3, 0, z * 0.33);
-    col.copy(SUELO.musgoOscuro).lerp(SUELO.musgoClaro, mote);
-
-    // Hojarasca bajo el anillo del queñual (parches, no alfombra).
-    const mHoja = ruidoFbm(x * 0.21 + 9, 0, z * 0.21);
-    if (r > 4 && r < 18 && mHoja > 0.55) {
-      const t = ss(mHoja, 0.55, 0.82) * 0.85;
-      col.lerp(mHoja > 0.7 ? SUELO.hojarasca2 : SUELO.hojarasca, t);
-    }
-
-    // El patio de tierra pisada bajo el guardián (afordancia sin UI).
-    const patio = 1 - ss(r, 1.5, 2.8);
-    if (patio > 0) col.lerp(SUELO.tierra, patio * 0.75);
-
-    // La humedad de la cañada (el suelo oscuro y mojado junto al agua).
-    const dxA = x - xArroyo(z);
-    const fCa = Math.exp(-(dxA * dxA) / 1.6) * ss(z, -13, -6) * (1 - ss(r, 20, 28));
-    if (fCa > 0.02) col.lerp(SUELO.humedo, fCa * 0.7);
-
-    // Roca asomando en lo alto de la pared del anfiteatro.
-    const fR = ss(y, 2.0, 4.8);
-    if (fR > 0) {
-      const veta = ruidoFbm(x * 0.5, y * 0.5, z * 0.5);
-      col.lerp(veta > 0.5 ? SUELO.roca : SUELO.rocaOscura, fR * 0.75);
-    }
-
-    if (nocturno) col.lerp(SUELO.noche, 0.55);
-    colores[i * 3] = col.r;
-    colores[i * 3 + 1] = col.g;
-    colores[i * 3 + 2] = col.b;
-  }
-  g.setAttribute('color', new THREE.BufferAttribute(colores, 3));
-  g.computeVertexNormals(); // indexada → normales SUAVES (lomas redondas)
-  return g;
+/** Cota del terreno del bosque en (x,z) — la función que TODO usa para posarse. */
+export function alturaBosque(x, z) {
+  return sueloDelBosque.alturaDe(x, z);
 }
 
 /* -------------------------------------------------------------------------- */
 /*  LA QUEÑUA (Polylepis) — el árbol del bosque de niebla                      */
 /* -------------------------------------------------------------------------- */
-
-/*
- * Nube de follaje SUAVE: un icosaedro subdividido, deformado con ruido y con
- * NORMALES RADIALES puestas a mano — así el matojo se sombrea como una masa
- * redonda de hojas (Ori/BOTW), no como un poliedro facetado. Es la pieza que
- * mata el "icosaedro literal" que el operador odia.
- */
-function matojoNube(radio, semilla = 1, deform = 0.5) {
-  const g = new THREE.IcosahedronGeometry(radio, 1);
-  const pos = g.attributes.position;
-  const v = new THREE.Vector3();
-  for (let i = 0; i < pos.count; i++) {
-    v.fromBufferAttribute(pos, i);
-    const n = ruidoFbm(v.x * 2.2 + semilla, v.y * 2.2, v.z * 2.2) - 0.5;
-    v.multiplyScalar(1 + n * deform * 2);
-    pos.setXYZ(i, v.x, v.y, v.z);
-  }
-  pos.needsUpdate = true;
-  const nor = new Float32Array(pos.count * 3);
-  for (let i = 0; i < pos.count; i++) {
-    v.fromBufferAttribute(pos, i).normalize();
-    nor[i * 3] = v.x;
-    nor[i * 3 + 1] = v.y;
-    nor[i * 3 + 2] = v.z;
-  }
-  g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
-  return g;
-}
 
 /* Paleta Polylepis: corteza roja que se despapela + hoja menuda verde-gris. */
 const QUENUA = {
@@ -420,6 +344,8 @@ export function sitiosQuenual(tier = 'alto') {
     for (const [ax, az] of ANCLAS_VECINOS) {
       if ((ax - x) ** 2 + (az - z) ** 2 < 1.8 * 1.8) return false;
     }
+    // El trillo queda libre: ninguna queñua plantada sobre el sendero.
+    if (sueloDelBosque.senderoCerca(x, z).d < 1.7) return false;
     return true;
   };
 

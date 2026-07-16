@@ -33,12 +33,14 @@ import { perfilDeTier } from '../deviceTier.js';
 import useCicloDia from '../useCicloDia.js';
 import { CIELOS_HORA, TRANSICION, mezclaHex } from '../cielosHoraData.js';
 import CamaraDirector from '../escenas/CamaraDirector.jsx';
+import { SombraContacto } from '../escenas/SombraContacto.jsx';
+import SueloRico from '../terreno/SueloRico.jsx';
 import EntQuenua from './EntQuenua.jsx';
 import FloraParamo from './FloraParamo.jsx';
 import FaunaBosque from './FaunaBosque.jsx';
 import {
   alturaBosque,
-  geomTerrenoBosque,
+  sueloDelBosque,
   geomQuenua,
   sitiosQuenual,
   geomLosetaHojarasca,
@@ -207,22 +209,6 @@ function AtmosferaBosque({ franja, perfil, reducedMotion }) {
         color={ini.relleno}
       />
     </>
-  );
-}
-
-/* ── EL TERRENO ──────────────────────────────────────────────────────────── */
-function TerrenoBosque({ nocturno, perfil }) {
-  const seg = Math.round(perfil.segmentosTerreno * 1.6);
-  const geo = useMemo(() => geomTerrenoBosque({ seg, nocturno }), [seg, nocturno]);
-  useLayoutEffect(() => () => geo.dispose(), [geo]);
-  return (
-    <mesh geometry={geo} receiveShadow={perfil.sombras}>
-      {perfil.materialRico ? (
-        <meshStandardMaterial vertexColors roughness={1} metalness={0} />
-      ) : (
-        <meshLambertMaterial vertexColors />
-      )}
-    </mesh>
   );
 }
 
@@ -579,6 +565,10 @@ function BrumaParallax({ franja, reducedMotion }) {
       Ent respira sin perder el queñual de los flancos. */
 const POSE_BOSQUE = { position: [8.0, 2.55, 11.6], fov: 42, mira: [0, 3.0, 0] };
 
+/* Anclas de sombra de contacto que la escena le pasa a SueloRico: el claro del
+   guardián (el Ent es el objeto mayor y necesita el AO ancho que lo planta). */
+const ANCLAS_SUELO = [{ x: 0, z: 0, radio: 1.7 }];
+
 function poseBosqueParaAspecto(aspect) {
   if (!aspect || aspect >= 0.9) return { ...POSE_BOSQUE, k: 1 };
   const t = Math.min(1, (0.9 - aspect) / 0.44);
@@ -618,8 +608,11 @@ function Diorama({ tier, reducedMotion, pose }) {
         />
       )}
 
-      {/* El anfiteatro: terreno con relieve, pintado por vértice. */}
-      <TerrenoBosque nocturno={nocturno} perfil={perfil} />
+      {/* El anfiteatro: el SUELO RICO compartido (relieve fbm, color por zona,
+          sendero que entra al claro, detalle al ras) sobre el contrato del
+          bosque (sueloDelBosque = suelo rico + pared del anfiteatro + cañada).
+          El guardián recibe su sombra de contacto como ancla de la escena. */}
+      <SueloRico suelo={sueloDelBosque} tier={tier} anclas={ANCLAS_SUELO} />
 
       {/* El queñual: héroes que enmarcan + siluetas lejanas en la niebla. */}
       <Quenual tier={tier} perfil={perfil} />
@@ -644,12 +637,11 @@ function Diorama({ tier, reducedMotion, pose }) {
       {/* La bruma con parallax que da profundidad física al orbitar. */}
       {perfil.fog && <BrumaParallax franja={franja} reducedMotion={reducedMotion} />}
 
-      {/* Sombra de contacto del guardián (todos los tiers: lo planta). */}
-      {perfil.sombrasContacto && (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
-          <circleGeometry args={[1.7, 24]} />
-          <meshBasicMaterial color="#20281c" transparent opacity={0.38} />
-        </mesh>
+      {/* Sombra de contacto del guardián. En alto/medio la pone SueloRico (ancla
+          de la escena); en 'bajo' SueloRico no dibuja sombras, así que el kit la
+          planta acá para que el Ent no flote. */}
+      {!perfil.sombrasContacto && (
+        <SombraContacto pos={[0, 0.04, 0]} radio={1.6} color="#20281c" opacidad={0.34} orden={2} />
       )}
 
       {/* ══ MOUNT DEL ENT ══ El guardián vive AQUÍ (origen del claro). Otra
