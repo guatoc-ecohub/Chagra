@@ -880,6 +880,16 @@ export const NUCLEO_APP = [
 
   // ── Juegos (promovidos de PENDIENTE, smoke-test OK 2026-07-14) ─
   {
+    // LA SALA DE JUEGOS — el hub que hace VISIBLES los 9 juegos (feedback del
+    // operador 2026-07-16: "no veo los juegos"). Enlazado desde Aprender
+    // (SalaJuegosBanner) y con deep-link directo #juegos.
+    path: 'juegos',
+    alias: ['sala_juegos', 'hub_juegos'],
+    componente: 'HubJuegos',
+    importLazy: 'src/components/juego/HubJuegos.jsx',
+    categoria: '2D-app',
+  },
+  {
     path: 'juego',
     componente: 'MiFincaVivaScreen',
     importLazy: 'src/components/juego/MiFincaVivaScreen.jsx',
