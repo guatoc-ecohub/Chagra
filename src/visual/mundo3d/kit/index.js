@@ -39,7 +39,7 @@ export {
   fusionarSeguro, desindexar, poner, apuntar,
   pintarPorVertice, pintarPlano, hornearFollaje, hornearCorteza,
   tuboOrganico, taperLineal, taperTronco, curvaTronco,
-  sembrarFollaje, matojoHoja, sembrarEnAnillo,
+  sembrarFollaje, matojoHoja, matojoNube, sembrarEnAnillo,
 } from './geometria.js';
 
 /* ── Terreno (heightfield con color por vértice) ────────────────────────────── */
