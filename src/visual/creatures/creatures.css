@@ -1969,3 +1969,140 @@
   [data-creature='danta'][data-visema='V3'] .danta-trompa,
   [data-creature='danta'][data-visema='V4'] .danta-trompa { animation: none !important; }
 }
+
+/* ═══ EL CÓNDOR DE LOS ANDES — el señor del viento (Condor.jsx) ══════════════
+   Carácter: MAJESTUOSO e imperturbable. Su vida idle NO es antic/travieso
+   (un cóndor no hace volteretas): es el PLANEO — banqueo lento de térmica
+   (.condor-planeo), alas PLANCHADAS que solo cada tanto dan DOS golpes secos
+   (.condor-ala), las plumas-dedo vibrando al viento (.condor-primarias) y la
+   cola-timón corrigiendo el rumbo (.condor-cola). */
+
+/* BOIL MÍNIMO — el cóndor NO squashea: respira apenas (la majestad no rebota).
+   Reescribe SOLO el boil del cóndor (misma clase, selector más específico). */
+[data-creature='condor'] .rh-boil {
+  animation-name: condor-boil;
+  animation-duration: 5.6s;
+}
+@keyframes condor-boil {
+  0%, 100% { transform: scale(1, 1); }
+  50%      { transform: scale(1.008, 0.992); }   /* la respiración de altura */
+}
+
+/* EL PLANEO — el banqueo de térmica sobre el dibujo entero: se ladea suave a
+   un lado, se endereza, se ladea al otro, y la corriente lo mece en vertical.
+   Período largo y ease amplio: paciencia de cóndor. */
+.condor-planeo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: condor-planeo 8.4s ease-in-out infinite;
+}
+@keyframes condor-planeo {
+  0%, 100% { transform: rotate(2deg) translateY(0.2px); }
+  25%      { transform: rotate(0.4deg) translateY(-0.5px); }  /* remonta la térmica */
+  50%      { transform: rotate(-2.2deg) translateY(0.1px); }
+  75%      { transform: rotate(-0.4deg) translateY(-0.4px); }
+}
+
+/* LAS ALAS PLANCHADAS — el 88% del ciclo, quietas (esa quietud ES el cóndor);
+   al final, DOS golpes de ala secos y de vuelta a la plancha. El origin vive
+   en el hombro (right center del fill-box); el ala derecha va espejada por su
+   grupo exterior (.condor-ala-mount) así que el mismo keyframe sirve. */
+.condor-ala {
+  animation: condor-aleteo 11s ease-in-out infinite;
+}
+@keyframes condor-aleteo {
+  0%, 86%  { transform: rotate(0deg); }
+  89%      { transform: rotate(-10deg); }   /* primer golpe */
+  92%      { transform: rotate(3deg); }
+  95%      { transform: rotate(-6deg); }    /* segundo golpe */
+  98%, 100% { transform: rotate(0deg); }    /* la plancha perfecta */
+}
+
+/* LAS PRIMARIAS — las plumas-dedo tantean el viento: vibración mínima y
+   continua (lo único que nunca para: el aire se toca con los dedos). */
+.condor-primarias {
+  animation: condor-primarias 2.7s ease-in-out infinite;
+}
+@keyframes condor-primarias {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(1.6deg); }
+}
+
+/* LA COLA-TIMÓN — corrige el rumbo a destiempo del banqueo (períodos
+   co-primos: nunca el mismo compás). */
+.condor-cola {
+  animation: condor-timon 6.5s ease-in-out infinite;
+}
+@keyframes condor-timon {
+  0%, 100% { transform: rotate(-2deg); }
+  50%      { transform: rotate(2.4deg); }
+}
+
+/* OTEA (reacción-firma, opt-in): la cabeza pelada ESCANEA el valle a lado y
+   lado con pausa de vigía — el censo del carroñero: nada se le escapa. El
+   collar se esponja apenas (alerta). */
+[data-creature='condor'][data-otea='1'] .condor-cabeza {
+  animation: condor-otea 3.4s ease-in-out infinite;
+}
+@keyframes condor-otea {
+  0%, 100% { transform: rotate(-11deg); }
+  20%      { transform: rotate(-11deg); }   /* la pausa del vigía */
+  50%      { transform: rotate(12deg); }
+  70%      { transform: rotate(12deg); }
+}
+[data-creature='condor'][data-otea='1'] .condor-collar {
+  animation: condor-collar-esponja 3.4s ease-in-out infinite;
+}
+@keyframes condor-collar-esponja {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+/* CELEBRA — el cóndor no tiene bracitos: celebra con la ENVERGADURA. Las alas
+   se alzan en V de victoria (con el overshoot elástico de la casa) mientras el
+   cuerpo brinca con el gesto genérico (rh-g-celebra sobre .crt-body). */
+[data-creature='condor'][data-pose='celebra'] .condor-ala {
+  animation: condor-ala-v 1.15s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes condor-ala-v {
+  0%, 100% { transform: rotate(0deg); }
+  38%      { transform: rotate(30deg); }    /* la V de victoria (positivo = la punta SUBE) */
+  55%      { transform: rotate(24deg); }    /* el overshoot elástico */
+  75%      { transform: rotate(27deg); }
+}
+
+/* HABLA (lip-sync): la cabeza pelada se adelanta cortés mientras dure el
+   visema (V2..V4; V1 = boca en reposo). */
+[data-creature='condor'][data-visema='V2'] .condor-cabeza,
+[data-creature='condor'][data-visema='V3'] .condor-cabeza,
+[data-creature='condor'][data-visema='V4'] .condor-cabeza {
+  animation: condor-cabeza-habla 1.7s ease-in-out infinite;
+}
+@keyframes condor-cabeza-habla {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(0.4px); }   /* se acerca a quien escucha */
+}
+
+/* El estado otea PISA el planeo del banqueo NO (sigue planeando: un cóndor
+   otea EN vuelo) — pero sí congela la cola para que la mirada mande. */
+[data-creature='condor'][data-otea='1'] .condor-cola { animation: none; }
+
+/* device-tier 'bajo': se corta el idle continuo (planeo + alas + primarias +
+   cola + boil reescrito); los estados reactivos (otea, celebra) siguen
+   contando la verdad. */
+[data-tier='bajo'][data-creature='condor'] .rh-boil,
+[data-tier='bajo'] .condor-planeo,
+[data-tier='bajo'] .condor-ala,
+[data-tier='bajo'] .condor-primarias,
+[data-tier='bajo'] .condor-cola { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='condor'] .rh-boil,
+  .condor-planeo, .condor-ala, .condor-primarias, .condor-cola,
+  [data-creature='condor'][data-otea='1'] .condor-cabeza,
+  [data-creature='condor'][data-otea='1'] .condor-collar,
+  [data-creature='condor'][data-pose='celebra'] .condor-ala,
+  [data-creature='condor'][data-visema='V2'] .condor-cabeza,
+  [data-creature='condor'][data-visema='V3'] .condor-cabeza,
+  [data-creature='condor'][data-visema='V4'] .condor-cabeza { animation: none !important; }
+}

@@ -37,6 +37,7 @@ export const AURA_POR_BICHO = Object.freeze({
   morrocoy: '#ff7a3c',         // caparazón que brilla (ámbar-rojizo)
   borugo: '#dbe8ff',           // PLATA LUNAR / blanco luminoso (nocturno sagrado, el animal de cierre)
   danta: '#a8e05f',            // VERDE SEMILLA (la jardinera del bosque: todo lo que pisa, germina)
+  condor: '#9fd8ff',           // CELESTE DE ALTURA (el señor del viento: el cielo a 5000 msnm)
   'ent-frailejon': '#8fdcae',  // VERDE-PLATEADO del guardián del páramo (modo-guardián: el frailejón se yergue a intervenir)
 });
 

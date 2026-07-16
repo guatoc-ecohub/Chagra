@@ -49,6 +49,12 @@ export { Danta } from './Danta.jsx';
    bosque — la JARDINERA que siembra al andar. Solo datos: jamás arrastra three
    al bundle base — igual que borugoIdentidad/jaguarIdentidad. */
 export { DANTA_PALETA, DANTA_PROPORCION, DANTA_SLUG, PERFIL_DANTA } from './dantaIdentidad.js';
+export { Condor } from './Condor.jsx';
+/* La IDENTIDAD del cóndor como datos (paleta azabache + coberteras plateadas +
+   collar de plumón, proporciones y su perfil de clima). EL EMBLEMA DEL PÁRAMO —
+   el señor del viento que casi no aletea. Solo datos: jamás arrastra three al
+   bundle base — igual que dantaIdentidad/borugoIdentidad. */
+export { CONDOR_PALETA, CONDOR_PROPORCION, CONDOR_SLUG, PERFIL_CONDOR } from './condorIdentidad.js';
 /* La IDENTIDAD del trío andino como datos (paletas + proporciones). Solo datos:
    jamás arrastra three al bundle base — igual que abejaIdentidad. */
 export {
@@ -110,6 +116,7 @@ import Jaguar from './Jaguar.jsx';
 import Morrocoy from './Morrocoy.jsx';
 import Borugo from './Borugo.jsx';
 import Danta from './Danta.jsx';
+import Condor from './Condor.jsx';
 import Lombriz from './Lombriz.jsx';
 import Mariposa from './Mariposa.jsx';
 import Escarabajo from './Escarabajo.jsx';
@@ -127,6 +134,7 @@ export const CREATURES = {
   morrocoy: { Component: Morrocoy, nombre: 'Morrocoy de patas rojas', cientifico: 'Chelonoidis carbonarius' },
   borugo: { Component: Borugo, nombre: 'Borugo', cientifico: 'Cuniculus taczanowskii' },
   danta: { Component: Danta, nombre: 'Danta de páramo', cientifico: 'Tapirus pinchaque' },
+  condor: { Component: Condor, nombre: 'Cóndor de los Andes', cientifico: 'Vultur gryphus' },
   lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },
   mariposa: { Component: Mariposa, nombre: 'Mariposa pasionaria', cientifico: 'Dione juno' },
   escarabajo: { Component: Escarabajo, nombre: 'Escarabajo estercolero', cientifico: 'Dichotomius belus' },
