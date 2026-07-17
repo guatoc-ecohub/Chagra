@@ -104,6 +104,20 @@ export const NUCLEO_3D = [
     importLazy: 'src/mockups/PapaVivo3D.jsx',
     categoria: '3D',
   },
+  {
+    path: 'mundo_piscicultura',
+    alias: ['piscicultura', 'mundo_peces', 'mundo-piscicultura-3d'],
+    componente: 'MundoPiscicultura3D',
+    importLazy: 'src/mockups/MundoPiscicultura3D.jsx',
+    categoria: '3D',
+  },
+  {
+    path: 'lecheria_viva',
+    alias: ['lecheria', 'mundo_lecheria', 'lecheria-viva-3d'],
+    componente: 'LecheriaViva3D',
+    importLazy: 'src/mockups/LecheriaViva3D.jsx',
+    categoria: '3D',
+  },
 
 
   // ── Arte nuevo — en revisión del operador (2026-07-14) ─────────
