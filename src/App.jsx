@@ -167,6 +167,20 @@ const CacaoVivo3DMockup = lazy(() => import('./mockups/CacaoVivo3D'));
 // blanca por instancia, la cosecha de criollas (amarilla/roja/morada) y los
 // frailejones en silueta. Device-tiering real. Ruta #/mockups/papa-viva-3d, sin auth.
 const PapaVivo3DMockup = lazy(() => import('./mockups/PapaVivo3D'));
+// 3D: el MUNDO DE LOS ESTANQUES — la piscicultura de la finca por piso térmico
+// en una sola ladera: la quebrada baja al estanque frío (trucha, agua
+// oxigenada), el caño sigue al estanque cálido (mojarra + cachama en
+// policultivo, bocachico limpiando el fondo) y el agua sale a la acuaponía y
+// al riego de la vega. Lodos al abono, no al río. Device-tiering real. Ruta
+// #/mockups/mundo-piscicultura-3d, sin auth.
+const MundoPiscicultura3DMockup = lazy(() => import('./mockups/MundoPiscicultura3D'));
+// 3D: el MUNDO DE LA CADENA LÁCTEA — el potrero silvopastoril bajo el banco
+// forrajero (nacedero, matarratón, leucaena, botón de oro), el hato según su
+// piso térmico (Holstein/Normando en frío, criolla/cruce cebú en cálido), la
+// quesera donde la leche se hace queso/cuajada/kumis/yogur/arequipe, y el
+// biodigestor que cierra el ciclo del estiércol. Device-tiering real. Ruta
+// #/mockups/lecheria-viva-3d, sin auth.
+const LecheriaViva3DMockup = lazy(() => import('./mockups/LecheriaViva3D'));
 // 3D: el MUNDO SUELO VIVO — la RED MICORRÍZICA bajo tierra (el wood-wide web):
 // la red de hongos bioluminiscente que enlaza las raíces y reparte nutrientes,
 // con pulsos corriendo por los hilos y el Ent asomando. Device-tiering real.
@@ -598,6 +612,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
   'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
   'mockups/papa-viva-3d': 'mockup_papa_viva_3d',
+  'mockups/mundo-piscicultura-3d': 'mockup_mundo_piscicultura_3d',
+  'mockups/lecheria-viva-3d': 'mockup_lecheria_viva_3d',
   'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
   'mockups/voz-con-forma': 'mockup_voz_con_forma',
   'mockups/conversacion-voz': 'mockup_conversacion_voz',
@@ -1627,6 +1643,33 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo de la papa">
               <PapaVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_piscicultura_3d':
+        // Vitrina pública del MUNDO DE LOS ESTANQUES: la piscicultura de la
+        // finca por piso térmico en 3D REAL — la quebrada baja al estanque
+        // frío (trucha), el caño sigue al estanque cálido (mojarra + cachama
+        // en policultivo, bocachico limpiando el fondo), y el agua sale a la
+        // acuaponía y al riego de la vega. Cuatro estaciones didácticas.
+        // Ruta #/mockups/mundo-piscicultura-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Los estanques de la finca">
+              <MundoPiscicultura3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_lecheria_viva_3d':
+        // Vitrina pública del MUNDO DE LA CADENA LÁCTEA: el potrero
+        // silvopastoril en 3D REAL — el hato pastando bajo el banco
+        // forrajero, la quesera donde la leche se hace queso/cuajada/kumis/
+        // yogur/arequipe, y el biodigestor que cierra el ciclo del estiércol.
+        // Cuatro pasos didácticos. Ruta #/mockups/lecheria-viva-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El potrero, la quesera y el ciclo">
+              <LecheriaViva3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
