@@ -118,6 +118,19 @@ export const NUCLEO_3D = [
     importLazy: 'src/mockups/LecheriaViva3D.jsx',
     categoria: '3D',
   },
+  // El MUNDO DE LOS POLINIZADORES — la finca completa (rincón de monte,
+  // meliponario, cerca viva florida, maracuyá, ahuyama, cafetal y maizal) con
+  // la red de polen tejiéndose entre las ocho especies. El arte estaba
+  // completo en `visual/mundo3d/polinizadores/` pero nada lo montaba (hallazgo
+  // #1 del audit de biodiversidad 3D, 2026-07-16: cero rutas, cero
+  // componentMap).
+  {
+    path: 'mundo_polinizadores',
+    alias: ['polinizadores', 'mundo_polinizadores_3d', 'polinizadores-vivo-3d'],
+    componente: 'MundoPolinizadores3D',
+    importLazy: 'src/mockups/MundoPolinizadores3D.jsx',
+    categoria: '3D',
+  },
 
 
   // ── Arte nuevo — en revisión del operador (2026-07-14) ─────────
