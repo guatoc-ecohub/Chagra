@@ -67,6 +67,7 @@ const LAZY_MAP = {
   PapaVivo3D: lazy(() => import('../mockups/PapaVivo3D.jsx')),
   MundoPiscicultura3D: lazy(() => import('../mockups/MundoPiscicultura3D.jsx')),
   LecheriaViva3D: lazy(() => import('../mockups/LecheriaViva3D.jsx')),
+  MundoPolinizadores3D: lazy(() => import('../mockups/MundoPolinizadores3D.jsx')),
   MundoEntBosque: lazy(() => import('../visual/mundo3d/bosque/MundoEntBosque.jsx')),
   MontanaMundosCampesino: lazy(() => import('../mockups/MontanaMundosCampesino.jsx')),
   VitrinaMaestraMundos: lazy(() => import('../mockups/VitrinaMaestraMundos.jsx')),

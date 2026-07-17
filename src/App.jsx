@@ -181,6 +181,14 @@ const MundoPiscicultura3DMockup = lazy(() => import('./mockups/MundoPiscicultura
 // biodigestor que cierra el ciclo del estiércol. Device-tiering real. Ruta
 // #/mockups/lecheria-viva-3d, sin auth.
 const LecheriaViva3DMockup = lazy(() => import('./mockups/LecheriaViva3D'));
+// 3D: el MUNDO DE LOS POLINIZADORES — la finca completa con la red de polen
+// tejiéndose entre ocho especies (angelita, abeja de miel, abejorro, colibrí,
+// murciélago, mariposa, sírfido, escarabajo) y siete síndromes florales
+// reales, sobre el maracuyá, la ahuyama, el cafetal y la cerca viva. Tres
+// interruptores: el turno día/noche, el ojo de la abeja (guías UV) y la
+// deriva del veneno vecino. Device-tiering real. Ruta
+// #/mockups/mundo-polinizadores-3d, sin auth.
+const MundoPolinizadores3DMockup = lazy(() => import('./mockups/MundoPolinizadores3D'));
 // 3D: el MUNDO SUELO VIVO — la RED MICORRÍZICA bajo tierra (el wood-wide web):
 // la red de hongos bioluminiscente que enlaza las raíces y reparte nutrientes,
 // con pulsos corriendo por los hilos y el Ent asomando. Device-tiering real.
@@ -681,6 +689,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/suelo-demo-3d': 'mockup_suelo_demo_3d',
   'mockups/criaturas-nocturnas': 'mockup_criaturas_nocturnas',
   'mockups/angelita-viva': 'mockup_angelita_viva',
+  'mockups/mundo-polinizadores-3d': 'mockup_mundo_polinizadores_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1670,6 +1679,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El potrero, la quesera y el ciclo">
               <LecheriaViva3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_polinizadores_3d':
+        // Vitrina pública del MUNDO DE LOS POLINIZADORES: la finca completa en
+        // 3D REAL — el rincón de monte donde anidan los silvestres, el
+        // meliponario de la angelita, la cerca viva florida, el maracuyá en
+        // su emparrado, la ahuyama, el cafetal bajo sombrío y el maizal — con
+        // la RED de polen tejiéndose entre ocho especies. Tres interruptores:
+        // el turno día/noche, el ojo de la abeja (guías UV) y la deriva del
+        // veneno vecino. Ruta #/mockups/mundo-polinizadores-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de los polinizadores">
+              <MundoPolinizadores3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
