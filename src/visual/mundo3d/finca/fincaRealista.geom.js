@@ -773,16 +773,288 @@ export function geomGallina({ tipo = 'campesina', q = 1 } = {}, seed = 41) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*  PERRO criollo                                                              */
+/*  PERROS — criollo de finca + las razas del arreo (dálmata y beagle)         */
 /* -------------------------------------------------------------------------- */
 
 /**
- * El perro criollo amarillo que no falta en ninguna finca: pecho hondo,
- * cintura recogida, orejas a media asta y la cola enroscada sobre el lomo.
- * Mira a +X. @returns {{cuerpo, cabeza, pivote}}
+ * MANCHAS REDONDAS de dálmata (FCI 107: negras, REDONDAS, bien definidas y
+ * SEPARADAS — nunca ruido celular): siembra discos deterministas sobre la
+ * malla YA fusionada, eligiendo centros entre los vértices CLAROS (así jamás
+ * caen sobre nariz/ojos/orejas ya oscuros) y rechazando el que pise a otro.
+ * Cada vértice dentro del disco se funde a negro con borde corto — a este
+ * conteo de polígonos la interpolación lo redondea sola. Se aplica ANTES de
+ * hornearPelaje para que el AO sombree también la mancha.
  */
-export function geomPerro({ q = 1 } = {}, seed = 51) {
-  return memo(`perro|${q}|${seed}`, () => {
+function sembrarManchasRedondas(geo, { n = 14, rMin = 0.045, rMax = 0.07, negro = '#26262b', semilla = 1, separacion = 1.2 } = {}) {
+  const pos = geo.attributes.position;
+  const col = geo.attributes.color;
+  const r = rng(semilla);
+  const centros = [];
+  for (let intento = 0; intento < n * 40 && centros.length < n; intento++) {
+    const i = Math.floor(r() * pos.count);
+    if ((col.getX(i) + col.getY(i) + col.getZ(i)) / 3 < 0.6) continue; // solo piel blanca
+    const cx = pos.getX(i);
+    const cy = pos.getY(i);
+    const cz = pos.getZ(i);
+    const rad = rMin + r() * (rMax - rMin);
+    let pisa = false;
+    for (const m of centros) {
+      if (Math.hypot(cx - m[0], cy - m[1], cz - m[2]) < (rad + m[3]) * separacion) {
+        pisa = true;
+        break;
+      }
+    }
+    if (!pisa) centros.push([cx, cy, cz, rad]);
+  }
+  const cNegro = new THREE.Color(negro);
+  const cV = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const z = pos.getZ(i);
+    let cubre = 0;
+    for (const [mx, my, mz, rad] of centros) {
+      const d = Math.hypot(x - mx, y - my, z - mz);
+      if (d < rad) cubre = Math.max(cubre, clamp01((rad - d) / (rad * 0.35)));
+    }
+    if (cubre > 0) {
+      cV.fromBufferAttribute(col, i).lerp(cNegro, cubre);
+      col.setXYZ(i, cV.r, cV.g, cV.b);
+    }
+  }
+  return geo;
+}
+
+/** Pata canina parametrizable (muslo→caña→garra, solapadas y con jitter):
+    la comparten dálmata (larga y fina) y beagle (corta y fuerte). */
+function pataCanina(p, r, { x, z, atras, yMuslo, hMuslo, rMuslo, yCana, hCana, rCana, yGarra, rGarra, colorMuslo, colorCana, colorGarra }) {
+  const j = () => (r() - 0.5) * 0.012;
+  const dx = x + j();
+  const dz = z + j();
+  const muslo = new THREE.CylinderGeometry(rMuslo, rCana * 1.15, hMuslo, 7, 1);
+  poner(muslo, [dx, yMuslo, dz], [0, 0, (atras ? -0.09 : 0.04) + j() * 3]);
+  p.push(pintarPlano(muslo, colorMuslo));
+  const bajaX = dx + (atras ? -0.018 : 0.008);
+  const cana = new THREE.CylinderGeometry(rCana, rCana * 0.85, hCana, 6, 1);
+  poner(cana, [bajaX, yCana, dz], [0, 0, j() * 2]);
+  p.push(pintarPlano(cana, colorCana));
+  const garra = new THREE.SphereGeometry(rGarra, 7, 5);
+  poner(garra, [bajaX + 0.012, yGarra, dz], [0, 0, 0], [1.3, 0.65, 1]);
+  p.push(pintarPlano(garra, colorGarra));
+}
+
+/*
+ * DÁLMATA (FCI 107) — la silueta ES la raza: cuerpo casi CUADRADO (largo≈alto),
+ * atlético, pecho profundo con cintura recogida, patas LARGAS y elegantes,
+ * cuello erguido, hocico largo y parejo, orejas medianas caídas pegadas a la
+ * mejilla, cola larga de sable en S suave (JAMÁS enroscada). Blanco puro con
+ * manchas negras redondas sembradas (~35% del manto). Mira a +X, cruz ~0.5.
+ */
+function perroDalmata(q, seed) {
+  const BLANCO = '#f3efe7';
+  const NEGRO = '#26262b';
+  const r = rng(seed);
+  const p = [];
+  const nSeg = Math.max(13, Math.round(18 * q));
+  const nRad = Math.max(11, Math.round(14 * q));
+
+  const torso = cuerpoOrganico({
+    largo: 0.66,
+    nSeg,
+    nRad,
+    semilla: seed,
+    ruido: 0.018,
+    espina: (t) => 0.455 + 0.035 * campana(t, 0.85, 0.3) - 0.012 * campana(t, 0.4, 0.35),
+    arriba: (t) => (0.075 + 0.012 * campana(t, 0.8, 0.35)) * remate(t, 0.42),
+    abajo: (t) => (0.05 + 0.115 * campana(t, 0.74, 0.38)) * remate(t, 0.46),
+    lado: (t) => (0.075 + 0.016 * campana(t, 0.78, 0.35)) * remate(t, 0.46),
+  });
+  p.push(pintarPlano(torso, BLANCO));
+  const anca = new THREE.SphereGeometry(0.072, 10, 8);
+  poner(anca, [-0.22, 0.45, 0], [0, 0, 0.12], [1, 1, 0.8]);
+  p.push(pintarPlano(anca, BLANCO));
+  // Patas LARGAS y finas: casi la mitad de la altura es aire bajo el pecho.
+  for (const [px, pz, atras] of /** @type {[number, number, boolean][]} */ ([[0.24, 0.055, false], [0.24, -0.055, false], [-0.22, 0.065, true], [-0.22, -0.065, true]])) {
+    pataCanina(p, r, {
+      x: px, z: pz, atras,
+      yMuslo: 0.32, hMuslo: 0.28, rMuslo: 0.042,
+      yCana: 0.13, hCana: 0.22, rCana: 0.017,
+      yGarra: 0.02, rGarra: 0.022,
+      colorMuslo: BLANCO, colorCana: BLANCO, colorGarra: BLANCO,
+    });
+  }
+  // Cola de SABLE larga en S suave: cae del anca y el último tercio se
+  // endereza con un latigazo leve — nunca la rosca del criollo.
+  const cola1 = new THREE.CylinderGeometry(0.012, 0.02, 0.2, 6, 2);
+  apuntar(cola1, [-0.378, 0.426, 0.008], [-0.87, -0.49, 0.09]);
+  p.push(pintarPlano(cola1, BLANCO));
+  const cola2 = new THREE.CylinderGeometry(0.007, 0.013, 0.16, 6, 1);
+  apuntar(cola2, [-0.533, 0.381, 0.031], [-0.98, 0.06, 0.21]);
+  p.push(pintarPlano(cola2, BLANCO));
+  const puntaCola = new THREE.SphereGeometry(0.009, 6, 5);
+  poner(puntaCola, [-0.611, 0.386, 0.048]);
+  p.push(pintarPlano(puntaCola, BLANCO));
+  // Cuello ERGUIDO y largo (porte de carroza, no el cuello bajo del criollo).
+  const cuello = new THREE.CylinderGeometry(0.052, 0.085, 0.21, 9, 2);
+  apuntar(cuello, [0.3, 0.52, 0], [0.55, 0.85, 0], [1, 1, 0.8]);
+  p.push(pintarPlano(cuello, BLANCO));
+
+  const cuerpo = hornearPelaje(
+    sembrarManchasRedondas(fusionarHato(p, 'perro-dalmata'), {
+      n: 15, rMin: 0.045, rMax: 0.07, negro: NEGRO, semilla: seed + 11,
+    }),
+    { yBajo: 0.015, yAlto: 0.56, ao: 0.34, moteado: 0.05, semilla: seed },
+  );
+
+  // ── CABEZA: cráneo alargado, hocico LARGO y parejo con stop suave, orejas
+  //    medianas caídas NEGRAS (cachorro de carroza), manchitas en la cara ──
+  const c = [];
+  const craneo = new THREE.SphereGeometry(0.08, 11, 9);
+  poner(craneo, [0.015, 0.005, 0], [0, 0, -0.05], [1.25, 0.92, 0.82]);
+  c.push(pintarPlano(craneo, BLANCO));
+  const hocico = new THREE.SphereGeometry(0.047, 9, 7);
+  poner(hocico, [0.15, -0.02, 0], [0, 0, -0.12], [1.95, 0.66, 0.62]);
+  c.push(pintarPlano(hocico, BLANCO));
+  const nariz = new THREE.SphereGeometry(0.017, 6, 5);
+  poner(nariz, [0.235, -0.005, 0]);
+  c.push(pintarPlano(nariz, '#1c1815'));
+  for (const lado of [1, -1]) {
+    const oreja = orejaPetalo([0.0, 0.07, lado * 0.052], [0.05, -0.75, lado * 0.62], 0.115, 0.062, 0.28);
+    c.push(pintarPlano(oreja, NEGRO));
+    const ojo = new THREE.SphereGeometry(0.014, 5, 4);
+    poner(ojo, [0.09, 0.03, lado * 0.05]);
+    c.push(pintarPlano(ojo, '#1f1a14'));
+  }
+  const cabeza = hornearPelaje(
+    sembrarManchasRedondas(fusionarHato(c, 'cabeza-perro-dalmata'), {
+      n: 5, rMin: 0.018, rMax: 0.032, negro: NEGRO, semilla: seed + 17, separacion: 1.4,
+    }),
+    { yBajo: -0.1, yAlto: 0.1, ao: 0.24, moteado: 0.04, semilla: seed + 3 },
+  );
+
+  return { cuerpo, cabeza, pivote: [0.4, 0.6, 0] };
+}
+
+/*
+ * BEAGLE (FCI 161) — compacto y BAJITO: cuerpo más largo que alto (~5:4),
+ * espalda corta y nivelada, patas CORTAS y fuertes, hocico ancho casi
+ * cuadrado, orejas MUY largas anchas y caídas (casi tapan el hocico) y cola
+ * corta ERGUIDA con punta blanca (la "bandera" del rastreador). Tricolor
+ * clásico: silla negra en el lomo, canela en cabeza/hombros/anca, blanco en
+ * panza, pecho, patas y punta de cola. Mira a +X, cruz ~0.38.
+ */
+function perroBeagle(q, seed) {
+  const BLANCO = '#f2ecdc';
+  const NEGRO = '#2a2622';
+  const CANELA = '#a5622c';
+  const OREJA = '#5f3d20';
+  const r = rng(seed);
+  const p = [];
+  const nSeg = Math.max(11, Math.round(15 * q));
+  const nRad = Math.max(10, Math.round(12 * q));
+
+  // Torso long-and-low: lomo nivelado, barril lleno, casi sin cintura.
+  const torso = cuerpoOrganico({
+    largo: 0.58,
+    nSeg,
+    nRad,
+    semilla: seed,
+    ruido: 0.022,
+    espina: (t) => 0.3 + 0.015 * campana(t, 0.8, 0.4),
+    arriba: (t) => (0.085 + 0.01 * campana(t, 0.5, 0.6)) * remate(t, 0.45),
+    abajo: (t) => (0.08 + 0.07 * campana(t, 0.62, 0.5)) * remate(t, 0.5),
+    lado: (t) => (0.1 + 0.01 * campana(t, 0.7, 0.4)) * remate(t, 0.5),
+  });
+  // Tricolor pintado por vértice SOBRE el loft (bordes con ruido, no serrucho):
+  // silla negra arriba, canela en el flanco, blanco en bajos y pechera.
+  const cB = new THREE.Color(BLANCO);
+  const cN = new THREE.Color(NEGRO);
+  const cC = new THREE.Color(CANELA);
+  pintarPorVertice(torso, (x, y, z, i, c) => {
+    const n = (ruidoFbm(x * 4.2 + seed, y * 4.2, z * 4.2) - 0.5) * 0.05;
+    if (y < 0.2 + n) return c.copy(cB); // panza y bajos
+    if (x > 0.2 + n) return c.copy(cB); // pechera
+    if (y > 0.3 + n && x > -0.23 && x < 0.09) return c.copy(cN); // la silla
+    return c.copy(cC); // flancos, hombros, transiciones
+  });
+  p.push(torso);
+  const anca = new THREE.SphereGeometry(0.075, 10, 8);
+  poner(anca, [-0.19, 0.31, 0], [0, 0, 0.12], [1, 1, 0.85]);
+  p.push(pintarPlano(anca, CANELA));
+  const pechera = new THREE.SphereGeometry(0.06, 9, 7);
+  poner(pechera, [0.24, 0.24, 0], [0, 0, 0.5], [0.75, 1.05, 0.68]);
+  p.push(pintarPlano(pechera, BLANCO));
+  // Patas CORTAS y fuertes, blancas (fuego canela en los muslos delanteros).
+  for (const [px, pz, atras] of /** @type {[number, number, boolean][]} */ ([[0.2, 0.06, false], [0.2, -0.06, false], [-0.18, 0.07, true], [-0.18, -0.07, true]])) {
+    pataCanina(p, r, {
+      x: px, z: pz, atras,
+      yMuslo: 0.155, hMuslo: 0.15, rMuslo: 0.045,
+      yCana: 0.065, hCana: 0.11, rCana: 0.021,
+      yGarra: 0.018, rGarra: 0.024,
+      colorMuslo: atras ? BLANCO : CANELA, colorCana: BLANCO, colorGarra: BLANCO,
+    });
+  }
+  // La BANDERA: cola corta ERGUIDA (base negra que sigue la silla, punta
+  // blanca bien marcada — así el rastreador se ve entre el pasto).
+  const cola = new THREE.CylinderGeometry(0.011, 0.017, 0.17, 6, 2);
+  apuntar(cola, [-0.278, 0.44, 0], [-0.33, 0.94, 0]);
+  pintarPorVertice(cola, (x, y, z, i, c) => c.copy(y > 0.465 ? cB : cN));
+  p.push(cola);
+  const puntaBandera = new THREE.SphereGeometry(0.014, 6, 5);
+  poner(puntaBandera, [-0.308, 0.525, 0]);
+  p.push(pintarPlano(puntaBandera, BLANCO));
+  // Cuello corto y macizo.
+  const cuello = new THREE.CylinderGeometry(0.058, 0.088, 0.14, 9, 2);
+  apuntar(cuello, [0.26, 0.36, 0], [0.8, 0.6, 0], [1, 1, 0.85]);
+  p.push(pintarPlano(cuello, CANELA));
+
+  const cuerpo = hornearPelaje(fusionarHato(p, 'perro-beagle'), {
+    yBajo: 0.015, yAlto: 0.42, ao: 0.36, moteado: 0.06, semilla: seed,
+  });
+
+  // ── CABEZA: cráneo abombado, hocico ANCHO y corto con lista blanca al
+  //    frente, ojos grandes dulces y las orejas ENORMES colgando bajo la
+  //    quijada — de lejos, el beagle SON las orejas ──
+  const c = [];
+  const craneo = new THREE.SphereGeometry(0.082, 11, 9);
+  poner(craneo, [0.01, 0.015, 0], [0, 0, -0.06], [1.1, 1.05, 0.9]);
+  pintarPorVertice(craneo, (x, y, z, i, cc) => {
+    if (Math.abs(z) < 0.016 && x > 0.02) return cc.copy(cB); // la lista
+    return cc.copy(cC);
+  });
+  c.push(craneo);
+  const hocico = new THREE.SphereGeometry(0.05, 9, 7);
+  poner(hocico, [0.115, -0.025, 0], [0, 0, -0.15], [1.45, 0.72, 0.85]);
+  pintarPorVertice(hocico, (x, y, z, i, cc) => cc.copy(x > 0.14 || y < -0.045 ? cB : cC));
+  c.push(hocico);
+  const nariz = new THREE.SphereGeometry(0.019, 6, 5);
+  poner(nariz, [0.185, -0.012, 0]);
+  c.push(pintarPlano(nariz, '#241d18'));
+  for (const lado of [1, -1]) {
+    const oreja = orejaPetalo([0.015, 0.055, lado * 0.06], [0.1, -0.9, lado * 0.35], 0.175, 0.095, 0.25);
+    c.push(pintarPlano(oreja, variar(OREJA, r, 0.05)));
+    const ojo = new THREE.SphereGeometry(0.016, 5, 4);
+    poner(ojo, [0.075, 0.035, lado * 0.05]);
+    c.push(pintarPlano(ojo, '#241709'));
+  }
+  const cabeza = hornearPelaje(fusionarHato(c, 'cabeza-perro-beagle'), {
+    yBajo: -0.12, yAlto: 0.1, ao: 0.24, moteado: 0.05, semilla: seed + 3,
+  });
+
+  return { cuerpo, cabeza, pivote: [0.34, 0.44, 0] };
+}
+
+/**
+ * Perro de finca por raza. `criollo` (default) es el amarillo de siempre:
+ * pecho hondo, cintura recogida, orejas a media asta y cola enroscada sobre
+ * el lomo. `dalmata` y `beagle` son las razas del arreo del hato, con
+ * anatomía Y capa propias (la silueta es lo que se lee de lejos — no basta
+ * recolorear al criollo). Mira a +X. @returns {{cuerpo, cabeza, pivote}}
+ */
+export function geomPerro({ raza = 'criollo', q = 1 } = {}, seed = 51) {
+  return memo(`perro|${raza}|${q}|${seed}`, () => {
+    if (raza === 'dalmata') return perroDalmata(q, seed);
+    if (raza === 'beagle') return perroBeagle(q, seed);
     const PELAJE = '#c08b4d';
     const CREMA = '#e2c9a0';
     const r = rng(seed);
