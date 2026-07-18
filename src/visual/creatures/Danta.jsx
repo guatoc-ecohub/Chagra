@@ -68,9 +68,22 @@ export function Danta({
      inconfundible cuando algo huele a fruta o a visita. Default false →
      ondulación idle suave (avatar sereno). */
   husmea = false,
+  /* ── RAMONEA (el otro gesto-firma de la trompita, hacia ABAJO) ──────────────
+     OPT-IN: la cabeza baja mansa al pasto y la TROMPA PRENSIL se estira y
+     curla a lado y lado agarrando brotes (así siembra el bosque al andar).
+     Complemento del husmea (que sube en periscopio): ramonea BAJA. Si ambos
+     llegan encendidos, gana husmea (la visita puede más que el pasto).
+     Default false → nada cambia. */
+  ramonea = false,
+  /* ── CRÍA (guiño opcional): los tapires NACEN RAYADOS. Con cria=true el
+     flanco lanudo luce las rayas/motas pálidas de bebé (líneas quebradas +
+     motitas, el camuflaje de sotobosque). Solo pelaje — el tamaño lo pone el
+     host con `size`. Default false → la adulta de siempre. */
+  cria = false,
   /* Device-tier (DR-3D-PERF-GAMABAJA): 'alto'|'medio' corren el rubber-hose
-     pleno; 'bajo' apaga el idle continuo (boil + trompa + orejas) y deja los
-     estados reactivos. Sin prop (standalone: avatares, catálogo) = pleno. */
+     pleno; 'bajo' apaga el idle continuo (boil + trompa + orejas + cola) y
+     deja los estados reactivos (husmea/ramonea). Sin prop (standalone:
+     avatares, catálogo) = pleno. */
   tier,
   /* ── LÍNEA QUE RESPIRA (line-boil, Cuphead años 30 — LineBoilFilter) ────────
      OPT-IN: con lineBoil el CONTORNO de la danta vibra escalonado
@@ -139,7 +152,7 @@ export function Danta({
     : <Sonrisa cx={0} cy={-2.2} w={3.0} prof={1.0} />;
 
   // ── CUERPO rubber-hose (atrás→adelante): aura, orejas de borde blanco,
-  //    patas traseras, tronco lanudo con lomo hondo, bracitos manguera, cabeza
+  //    colita, patas traseras, tronco lanudo con lomo hondo, bracitos manguera, cabeza
   //    (cachetes + labios + boca + ojos dulces) y LA TROMPA encima de todo
   //    (grupo .danta-trompa: ondula idle, husmea en periscopio). `.crt-body`
   //    es el nodo que squashea (boil danta: LENTO y con peso de mole).
@@ -159,6 +172,15 @@ export function Danta({
         <ellipse cx="4.4" cy="-12.7" rx={PR.orejaR * 0.3} ry={PR.orejaR * 0.4} fill={P.oreja} />
       </g>
 
+      {/* COLITA de tapir (corta, casi un botón — asoma por el flanco IZQUIERDO,
+          DETRÁS del tronco, y se menea mansa: .danta-cola). El rasgo que
+          faltaba de la silueta real del pinchaque: cola corta de mole. */}
+      <g className="danta-cola" style={{ transformBox: 'fill-box', transformOrigin: 'right center' }}>
+        <ellipse cx="-11.2" cy="0.9" rx={PR.colaR * 1.15} ry={PR.colaR * 0.75}
+          fill={P.cuerpo} stroke={RH_INK} strokeWidth="1.1"
+          transform="rotate(-18 -11.2 0.9)" />
+      </g>
+
       {/* patas traseras CORTAS de mole (con almohadilla clara). Se mecen suave. */}
       <Miembro d="M-6.8,7.4 C-8.4,9.2 -8.6,10.8 -7.4,12.0" ancho={3.6} punta={[-7.4, 12.2]} puntaR={2.0} pie sway={vivo} delay={-0.7} glove={P.labio} />
       <Miembro d="M6.8,7.4 C8.4,9.2 8.6,10.8 7.4,12.0" ancho={3.6} punta={[7.4, 12.2]} puntaR={2.0} pie sway={vivo} delay={-1.0} glove={P.labio} />
@@ -173,6 +195,19 @@ export function Danta({
         fill={P.lomo} opacity="0.6" />
       {/* panza apenas más clara (mole discreta, nada de bib llamativo) */}
       <ellipse cx="0" cy="4.6" rx="5.6" ry="4.0" fill={P.panza} opacity="0.85" />
+      {/* GUIÑO DE CRÍA (opt-in): las rayas quebradas + motitas pálidas con que
+          nacen los tapires (camuflaje de sotobosque), sobre el flanco lanudo. */}
+      {cria && (
+        <g className="danta-cria" opacity="0.55">
+          <path d="M-6.6,-1.4 C-6.2,0.6 -6.4,2.4 -7.0,4.0" stroke={P.cria} strokeWidth="1.0" fill="none" strokeLinecap="round" />
+          <path d="M-2.3,-2.6 C-1.9,-0.4 -2.1,1.6 -2.7,3.4" stroke={P.cria} strokeWidth="1.0" fill="none" strokeLinecap="round" />
+          <path d="M2.3,-2.6 C1.9,-0.4 2.1,1.6 2.7,3.4" stroke={P.cria} strokeWidth="1.0" fill="none" strokeLinecap="round" />
+          <path d="M6.6,-1.4 C6.2,0.6 6.4,2.4 7.0,4.0" stroke={P.cria} strokeWidth="1.0" fill="none" strokeLinecap="round" />
+          <circle cx="-4.5" cy="5.6" r="0.55" fill={P.cria} />
+          <circle cx="4.5" cy="5.6" r="0.55" fill={P.cria} />
+          <circle cx="0" cy="6.4" r="0.5" fill={P.cria} />
+        </g>
+      )}
 
       {/* bracitos manguera (patas delanteras cortas) con almohadilla clara,
           pivote en el HOMBRO para que celebra/señala los alcen desde ahí. */}
@@ -253,6 +288,8 @@ export function Danta({
     'data-ruana': ropa?.ruana ? '1' : undefined,
     'data-mojado': ropa?.mojado ? '1' : undefined,
     'data-husmea': husmea ? '1' : undefined,
+    'data-ramonea': (ramonea && !husmea) ? '1' : undefined,
+    'data-cria': cria ? '1' : undefined,
     'data-lineboil': lineBoil ? '1' : undefined,
     'data-prop': mundoId || undefined,
   };
