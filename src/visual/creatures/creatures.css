@@ -2106,3 +2106,259 @@
   [data-creature='condor'][data-visema='V3'] .condor-cabeza,
   [data-creature='condor'][data-visema='V4'] .condor-cabeza { animation: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DÁLMATA — el CARÁCTER del perro atlético: alegre, leal, INCANSABLE.
+   Elástico y brincón (perro joven), nunca la mole del oso ni la elegancia
+   contenida del jaguar. Aditivo sobre el KIT species-agnostic (no toca a
+   ningún otro bicho): el dálmata reescribe SU boil (brincón, con rebote), suma
+   la COLA LÁTIGO que menea (rápida en `menea`, con la GRUPA contagiada), el
+   HEAD-TILT curioso (`ladea`), el vaivén de las orejas caídas y el JADEO de la
+   lengüita. Todo transform/opacity (GPU, gama baja). Gates RM + tier al final.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL BRINCÓN — el perro joven no asienta como mole: rebota ELÁSTICO con
+   squash marcado y recobro rápido. Reescribe SOLO el boil del dálmata (misma
+   clase .rh-boil, mayor especificidad por el data-creature) con longhands
+   para no pisar el resto de props de animación. */
+[data-creature='dalmata'] .rh-boil {
+  animation-name: dalmata-boil;
+  animation-duration: 2.3s;
+  animation-timing-function: steps(12, end);
+}
+@keyframes dalmata-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  30%  { transform: translateY(-0.5px) scale(0.965, 1.045); }  /* se estira listo para saltar */
+  55%  { transform: translateY(0.55px) scale(1.05, 0.95); }    /* squash brincón */
+  75%  { transform: translateY(-0.1px) scale(0.99, 1.01); }    /* overshoot elástico */
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* COLA LÁTIGO — wag CONTINUO suave (un dálmata contento nunca tiene la cola
+   quieta del todo). Pivota desde la base en la grupa (fill-box en el nodo). */
+.dalmata-cola {
+  animation: dalmata-cola 1.6s ease-in-out infinite;
+}
+@keyframes dalmata-cola {
+  0%, 100% { transform: rotate(-5deg); }
+  50%      { transform: rotate(7deg); }
+}
+
+/* OREJAS CAÍDAS — flop suave con follow-through (cuelgan y respiran). */
+.dalmata-orejas {
+  animation: dalmata-orejas 4.1s ease-in-out infinite;
+}
+@keyframes dalmata-orejas {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(2.5deg); }
+}
+
+/* LENGÜITA — jadeo feliz: la lengua asoma y late (los perros jadean, no
+   sudan). Sutil en idle; el CSS de `menea` la acelera. */
+.dalmata-lengua {
+  animation: dalmata-jadeo 1s ease-in-out infinite;
+}
+@keyframes dalmata-jadeo {
+  0%, 100% { transform: scaleY(0.85); }
+  50%      { transform: scaleY(1.1); }
+}
+
+/* MENEA — la felicidad leída en la cola: bate RÁPIDO y la GRUPA entera se
+   contagia (un perro feliz menea desde la cadera). dur vida = 3000ms
+   (6× cola-feliz 0.5s · 6× grupa 0.5s · 3× jadeo-feliz 1.0s). */
+[data-creature='dalmata'][data-menea='1'] .dalmata-cola {
+  animation: dalmata-cola-feliz 0.5s ease-in-out infinite;
+}
+@keyframes dalmata-cola-feliz {
+  0%, 100% { transform: rotate(-14deg); }
+  50%      { transform: rotate(16deg); }
+}
+[data-creature='dalmata'][data-menea='1'] .crt-body {
+  animation: dalmata-menea-grupa 0.5s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes dalmata-menea-grupa {
+  0%, 100% { transform: translateX(-0.35px) rotate(-1.2deg); }
+  50%      { transform: translateX(0.35px) rotate(1.2deg); }
+}
+[data-creature='dalmata'][data-menea='1'] .dalmata-lengua {
+  animation: dalmata-jadeo 0.5s ease-in-out infinite;
+}
+
+/* LADEA — el head-tilt curioso: la cabeza se inclina a un lado con overshoot
+   de goma y las orejas caídas se ALZAN apenas (¿qué fue eso?). dur vida =
+   2400ms (1× ladeo 2.4s · 2× orejas-perk 1.2s). */
+[data-creature='dalmata'][data-ladea='1'] .dalmata-cabeza {
+  animation: dalmata-ladeo 2.4s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes dalmata-ladeo {
+  0%, 100% { transform: rotate(0deg); }
+  22%      { transform: rotate(-13deg); }  /* ladea con overshoot elástico */
+  48%      { transform: rotate(-10deg); }  /* sostiene la curiosidad */
+  74%      { transform: rotate(2deg); }    /* vuelve pasándose un pelo */
+}
+[data-creature='dalmata'][data-ladea='1'] .dalmata-orejas {
+  animation: dalmata-orejas-perk 1.2s ease-in-out infinite;
+}
+@keyframes dalmata-orejas-perk {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-0.7px) rotate(-2deg); }  /* la oreja caída intenta pararse */
+}
+
+/* Los estados del dálmata (menea/ladea) PISAN el arrebato (antic/travieso):
+   el gesto debe leerse limpio. */
+[data-creature='dalmata'][data-menea='1'] .rh-antic,
+[data-creature='dalmata'][data-menea='1'] .rh-travieso,
+[data-creature='dalmata'][data-ladea='1'] .rh-antic,
+[data-creature='dalmata'][data-ladea='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito lo reactivaría (misma clase) →
+   re-apagarlo aquí. La cola, orejas y lengua continuas también se cortan; los
+   estados reactivos (menea/ladea) siguen contando la verdad. */
+[data-tier='bajo'][data-creature='dalmata'] .rh-boil,
+[data-tier='bajo'][data-creature='dalmata'] .dalmata-cola,
+[data-tier='bajo'][data-creature='dalmata'] .dalmata-orejas,
+[data-tier='bajo'][data-creature='dalmata'] .dalmata-lengua { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dalmata-cola, .dalmata-orejas, .dalmata-lengua,
+  [data-creature='dalmata'][data-menea='1'] .dalmata-cola,
+  [data-creature='dalmata'][data-menea='1'] .crt-body,
+  [data-creature='dalmata'][data-menea='1'] .dalmata-lengua,
+  [data-creature='dalmata'][data-ladea='1'] .dalmata-cabeza,
+  [data-creature='dalmata'][data-ladea='1'] .dalmata-orejas { animation: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BEAGLE — el CARÁCTER del sabueso: dulce, curioso, NARIZ-PRIMERO. Blandito y
+   bonachón (rechoncho feliz), nunca atlético como el dálmata. Aditivo sobre el
+   KIT species-agnostic (no toca a ningún otro bicho): el beagle reescribe SU
+   boil (blandito), suma el vaivén de las OREJOTAS (su seña de silueta), el wag
+   de la COLA-BANDERA erguida, el temblor de la TRUFA (la nariz siempre
+   trabaja), el OLFATEO de rastro (cabeza al suelo) y el AULLIDO (hocico al
+   cielo). Todo transform/opacity (GPU, gama baja). Gates RM + tier al final.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL BLANDITO — el rechoncho respira con squash amplio y recobro manso
+   (bonachón, sin el rebote nervioso del dálmata). */
+[data-creature='beagle'] .rh-boil {
+  animation-name: beagle-boil;
+  animation-duration: 2.7s;
+  animation-timing-function: steps(12, end);
+}
+@keyframes beagle-boil {
+  0%   { transform: translateY(0) scale(1, 1); }
+  32%  { transform: translateY(-0.2px) scale(0.98, 1.025); }  /* inhala blandito */
+  58%  { transform: translateY(0.5px) scale(1.045, 0.955); }  /* panza que asienta */
+  80%  { transform: translateY(0.1px) scale(1.0, 1.0); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+/* OREJOTAS — el vaivén de las orejas LARGAS caídas (péndulos de goma con
+   follow-through; cada oreja trae su delay inline). LA seña de su silueta. */
+.beagle-oreja {
+  animation: beagle-oreja 3.9s ease-in-out infinite;
+}
+@keyframes beagle-oreja {
+  0%, 100% { transform: rotate(-2.5deg); }
+  50%      { transform: rotate(3deg); }
+}
+
+/* COLA-BANDERA — la cola ERGUIDA ondea corta y contenta (bandera al viento,
+   nunca cae: es la firma del sabueso en el monte). */
+.beagle-cola {
+  animation: beagle-bandera 1.7s ease-in-out infinite;
+}
+@keyframes beagle-bandera {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate(5deg); }
+}
+
+/* TRUFA — la nariz de sabueso SIEMPRE trabaja un poquito (temblor idle). */
+.beagle-nariz {
+  animation: beagle-nariz 2.1s ease-in-out infinite;
+}
+@keyframes beagle-nariz {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.07) translateY(-0.1px); }
+}
+
+/* OLFATEA — el sabueso agarró un RASTRO: la cabeza BAJA al suelo, la trufa
+   tiembla RÁPIDO y las orejotas cuelgan hacia adelante (cortinas del rastreo).
+   dur vida = 3300ms (3× cabeza 1.1s · 6× trufa 0.55s · 3× orejas 1.1s). */
+[data-creature='beagle'][data-olfatea='1'] .beagle-cabeza {
+  animation: beagle-olfateo-cabeza 1.1s ease-in-out infinite;
+}
+@keyframes beagle-olfateo-cabeza {
+  0%, 100% { transform: translateY(1.6px) rotate(3deg); }   /* la testa al suelo */
+  50%      { transform: translateY(2.2px) rotate(-3deg); }  /* barre el rastro */
+}
+[data-creature='beagle'][data-olfatea='1'] .beagle-nariz {
+  animation: beagle-trufa-viva 0.55s ease-in-out infinite;
+}
+@keyframes beagle-trufa-viva {
+  0%, 100% { transform: scale(0.95); }
+  50%      { transform: scale(1.18) translateY(-0.2px); }
+}
+[data-creature='beagle'][data-olfatea='1'] .beagle-oreja {
+  animation: beagle-orejas-rastreo 1.1s ease-in-out infinite;
+}
+@keyframes beagle-orejas-rastreo {
+  0%, 100% { transform: rotate(4deg) translateY(0.5px); }   /* cuelgan adelante */
+  50%      { transform: rotate(7deg) translateY(0.9px); }
+}
+
+/* AULLA — el canto del sabueso: el hocico apunta AL CIELO, la boca en O
+   palpita y el pecho hincha con el aullido (entrañable, no amenazante).
+   dur vida = 2600ms (1× cabeza 2.6s · 1× pecho 2.6s · 2× boca 1.3s). */
+[data-creature='beagle'][data-aulla='1'] .beagle-cabeza {
+  animation: beagle-aullido-cabeza 2.6s ease-in-out infinite;
+}
+@keyframes beagle-aullido-cabeza {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  30%      { transform: rotate(-8deg) translateY(-1.4px); }  /* alza el hocico al cielo */
+  70%      { transform: rotate(-7deg) translateY(-1.2px); }  /* sostiene el canto */
+}
+[data-creature='beagle'][data-aulla='1'] .crt-body {
+  animation: beagle-aullido-pecho 2.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+@keyframes beagle-aullido-pecho {
+  0%, 100% { transform: scale(1, 1); }
+  30%      { transform: scale(0.97, 1.05); }  /* el pecho hincha (toma aire) */
+  70%      { transform: scale(1.02, 0.99); }  /* suelta el aullido */
+}
+[data-creature='beagle'][data-aulla='1'] .beagle-aullido-boca {
+  animation: beagle-aullido-boca 1.3s ease-in-out infinite;
+}
+@keyframes beagle-aullido-boca {
+  0%, 100% { transform: scale(0.9); }
+  50%      { transform: scale(1.15); }
+}
+
+/* Los estados del beagle (olfatea/aulla) PISAN el arrebato (antic/travieso):
+   un sabueso en el rastro no da vueltas de campana. */
+[data-creature='beagle'][data-olfatea='1'] .rh-antic,
+[data-creature='beagle'][data-olfatea='1'] .rh-travieso,
+[data-creature='beagle'][data-aulla='1'] .rh-antic,
+[data-creature='beagle'][data-aulla='1'] .rh-travieso { animation: none; }
+
+/* device-tier 'bajo': el boil reescrito lo reactivaría (misma clase) →
+   re-apagarlo aquí. Orejas, cola y trufa continuas también se cortan; los
+   estados reactivos (olfatea/aulla) siguen contando la verdad. */
+[data-tier='bajo'][data-creature='beagle'] .rh-boil,
+[data-tier='bajo'][data-creature='beagle'] .beagle-oreja,
+[data-tier='bajo'][data-creature='beagle'] .beagle-cola,
+[data-tier='bajo'][data-creature='beagle'] .beagle-nariz { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .beagle-oreja, .beagle-cola, .beagle-nariz,
+  [data-creature='beagle'][data-olfatea='1'] .beagle-cabeza,
+  [data-creature='beagle'][data-olfatea='1'] .beagle-nariz,
+  [data-creature='beagle'][data-olfatea='1'] .beagle-oreja,
+  [data-creature='beagle'][data-aulla='1'] .beagle-cabeza,
+  [data-creature='beagle'][data-aulla='1'] .crt-body,
+  [data-creature='beagle'][data-aulla='1'] .beagle-aullido-boca { animation: none !important; }
+}
