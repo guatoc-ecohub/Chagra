@@ -177,6 +177,23 @@ const LUGARES = [
       tinte: ['#b3771d', '#f2dfae'],
     },
   },
+  // EL PÁRAMO (la puerta de arriba): el frailejonal con su niebla fría en la
+  // zona alta de la cordillera. Antes el páramo se veía (el Ent en el filo)
+  // pero no tenía ENTRADA propia en el valle; este lugar la abre — tocarla
+  // sube al mundo del páramo (MundoParamo3D, vía diorama_paramo). Sin mundo
+  // propio en el manifiesto: trae su identidad de respaldo.
+  {
+    id: 'paramo',
+    pos: [-0.9, 0, -7.6],
+    escala: 0.95,
+    tipo: 'frailejonal',
+    fallbackMundo: {
+      titulo: 'El páramo',
+      emoji: '🏔️',
+      lema: 'El frailejonal que le peina el agua a la niebla y se la guarda a la finca.',
+      tinte: ['#63807a', '#c9d8d2'],
+    },
+  },
 ];
 
 /**
@@ -481,5 +498,5 @@ export const NARRACION = {
   casa:
     'Esta es su casa: el corazón de la finca y la puerta de sus mundos. Toque una de las seis puertas para salir a donde necesite.',
   paramo:
-    'Ahí arriba está el páramo, con su guardián de queñua entre los frailejones. Tóquelo y él le muestra el monte entero.',
+    'El páramo de su finca: los frailejones le peinan el agua a la niebla y se la entregan despacio al suelo. Por eso el páramo se cuida, no se ara. Entre y véalo de cerca.',
 };
