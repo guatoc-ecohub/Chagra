@@ -287,5 +287,22 @@ export const VECINOS_VALLE = [
     factor: 10, // lejos pero con silueta: verlo tiene que sentirse
     dy: 0.3,
     franjas: ['amanecer', 'atardecer', 'niebla'], // aparecido, no mueble
+    props: { aparicion: true }, // el espíritu se materializa y se disuelve en la niebla
+  },
+  {
+    slug: 'dalmata',
+    punto: [-1.4, 4.4], // perro de casa: el frente del patio, junto a los senderos
+    px: 34,
+    factor: 7,
+    dy: 0.18,
+    franjas: null,
+  },
+  {
+    slug: 'beagle',
+    punto: [1.3, 5.0], // el otro perro de casa, husmeando cerca de la huerta
+    px: 28,
+    factor: 7,
+    dy: 0.16,
+    franjas: null,
   },
 ];
