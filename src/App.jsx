@@ -174,6 +174,12 @@ const PapaVivo3DMockup = lazy(() => import('./mockups/PapaVivo3D'));
 // al riego de la vega. Lodos al abono, no al río. Device-tiering real. Ruta
 // #/mockups/mundo-piscicultura-3d, sin auth.
 const MundoPiscicultura3DMockup = lazy(() => import('./mockups/MundoPiscicultura3D'));
+// 3D: la LECHERÍA CAMPESINA como diorama standalone tipo botica — el potrero
+// en rotación con el hato y la cerca viva, la ramada del ordeño (campesino,
+// balde, cantina con lienzo de colar), la quesería encalada (olla de cuajada,
+// cuajo, molde y prensa de piedra, queso escurriendo) y el ciclo del suero a
+// cerdos/gallinas + boñiga→abono→pasto. Ruta #/mockups/mundo-lecheria-3d, sin auth.
+const MundoLecheria3DMockup = lazy(() => import('./mockups/MundoLecheria3D'));
 // 3D: el MUNDO DE LA CADENA LÁCTEA — el potrero silvopastoril bajo el banco
 // forrajero (nacedero, matarratón, leucaena, botón de oro), el hato según su
 // piso térmico (Holstein/Normando en frío, criolla/cruce cebú en cálido), la
@@ -630,6 +636,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
   'mockups/papa-viva-3d': 'mockup_papa_viva_3d',
   'mockups/mundo-piscicultura-3d': 'mockup_mundo_piscicultura_3d',
+  'mockups/mundo-lecheria-3d': 'mockup_mundo_lecheria_3d',
   'mockups/lecheria-viva-3d': 'mockup_lecheria_viva_3d',
   'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
   'mockups/voz-con-forma': 'mockup_voz_con_forma',
@@ -1677,6 +1684,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Los estanques de la finca">
               <MundoPiscicultura3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_lecheria_3d':
+        // La lechería campesina (diorama standalone tipo botica): el potrero
+        // en rotación con el hato y su cerca viva, la ramada del ordeño con
+        // la cantina y el lienzo de colar, la quesería encalada con la olla
+        // de la cuajada, el cuajo, el molde con su prensa de piedra y el
+        // queso fresco escurriendo, y el ciclo que no bota nada: suero a
+        // cerdos/gallinas, boñiga al abono, abono al pasto. Botón «paso a
+        // paso» 1→6. Ruta #/mockups/mundo-lecheria-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La lechería campesina">
+              <MundoLecheria3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
