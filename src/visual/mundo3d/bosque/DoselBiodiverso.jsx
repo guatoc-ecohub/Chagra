@@ -1,11 +1,13 @@
 /*
  * DoselBiodiverso — la CAPA de dosel multiespecie del bosque andino colombiano.
  *
- * Monta el bosque VARIADO alrededor del claro del Ent: emergentes al fondo
- * (guadua, nogal cafetero, cedro), el color del dosel florecido (cámbulo rojo,
- * gualanday morado, siete cueros magenta), el sotobosque de niebla (helecho
- * arbóreo, heliconia) y las epífitas (quiche) al pie de todo. Con esto el claro
- * deja de ser "un árbol solo" y se lee como un BOSQUE de tres estratos.
+ * Monta un bosque andino DENSO alrededor del claro del Ent: una muralla de
+ * emergentes al fondo (guadua, nogal cafetero, cedro, yarumo pálido, aliso de
+ * agua), el color del dosel florecido (cámbulo rojo, gualanday morado, siete
+ * cueros magenta, chachafruto naranja) y de sombra (guácimo), el sotobosque de
+ * niebla (helecho arbóreo, heliconia) y las epífitas (quiche) al pie de todo.
+ * Trece especies REALES colombianas: el claro deja de ser "un árbol solo" y se
+ * cierra como un BOSQUE espeso de tres estratos.
  *
  * Tier-safe (idéntico a FloraParamo): cada especie es UN InstancedMesh de una
  * geometría fusionada con color horneado → una draw-call por especie. La flora
@@ -24,9 +26,13 @@ import {
   geomGuadua,
   geomNogal,
   geomCedro,
+  geomYarumo,
+  geomAliso,
+  geomGuacimo,
   geomCambulo,
   geomGualanday,
   geomSieteCueros,
+  geomChachafruto,
   geomHelecho,
   geomHeliconia,
   geomQuiche,
@@ -87,9 +93,13 @@ export default function DoselBiodiverso({ tier = 'alto', alturaDe = null }) {
     if (conteos.guadua) g.guadua = geomGuadua({ q }, 2);
     if (conteos.nogal) g.nogal = geomNogal({ q }, 3);
     if (conteos.cedro) g.cedro = geomCedro({ q }, 4);
+    if (conteos.yarumo) g.yarumo = geomYarumo({ q }, 11);
+    if (conteos.aliso) g.aliso = geomAliso({ q }, 12);
+    if (conteos.guacimo) g.guacimo = geomGuacimo({ q }, 13);
     if (conteos.cambulo) g.cambulo = geomCambulo({ q }, 5);
     if (conteos.gualanday) g.gualanday = geomGualanday({ q }, 6);
     if (conteos.sieteCueros) g.sieteCueros = geomSieteCueros({ q }, 7);
+    if (conteos.chachafruto) g.chachafruto = geomChachafruto({ q }, 14);
     if (conteos.helecho) g.helecho = geomHelecho({ q }, 8);
     if (conteos.heliconia) g.heliconia = geomHeliconia({ q }, 9);
     if (conteos.quiche) g.quiche = geomQuiche({ q }, 10);
@@ -129,15 +139,19 @@ export default function DoselBiodiverso({ tier = 'alto', alturaDe = null }) {
       <Especie geo={geos.heliconia} mat={mat} items={dist.heliconia} />
       <Especie geo={geos.helecho} mat={mat} items={dist.helecho} />
 
-      {/* Dosel florecido (el color, anillo medio). */}
+      {/* Dosel florecido y de sombra (el color y la textura, anillo medio). */}
       <Especie geo={geos.sieteCueros} mat={mat} items={dist.sieteCueros} castShadow={sombra} />
       <Especie geo={geos.cambulo} mat={mat} items={dist.cambulo} castShadow={sombra} />
       <Especie geo={geos.gualanday} mat={mat} items={dist.gualanday} castShadow={sombra} />
+      <Especie geo={geos.chachafruto} mat={mat} items={dist.chachafruto} castShadow={sombra} />
+      <Especie geo={geos.guacimo} mat={mat} items={dist.guacimo} castShadow={sombra} />
 
-      {/* Emergentes (la pared verde del fondo). */}
+      {/* Emergentes (la muralla de dosel del fondo). */}
       <Especie geo={geos.cedro} mat={mat} items={dist.cedro} castShadow={sombra} />
       <Especie geo={geos.nogal} mat={mat} items={dist.nogal} castShadow={sombra} />
       <Especie geo={geos.guadua} mat={mat} items={dist.guadua} castShadow={sombra} />
+      <Especie geo={geos.yarumo} mat={mat} items={dist.yarumo} castShadow={sombra} />
+      <Especie geo={geos.aliso} mat={mat} items={dist.aliso} castShadow={sombra} />
     </group>
   );
 }
