@@ -857,7 +857,7 @@ export function VecinosDelValle({ alturaDe, reducedMotion, franja = null }) {
           <group key={i} position={[x, y, z]}>
             <Html center distanceFactor={vec.factor} zIndexRange={[6, 0]} pointerEvents="none">
               <div className="valle-critter" data-vecino={vec.slug} aria-hidden="true">
-                <Bicho size={px} animated={!reducedMotion} />
+                <Bicho size={px} animated={!reducedMotion} {...(vec.props || {})} />
               </div>
             </Html>
           </group>
