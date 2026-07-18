@@ -2106,6 +2106,8 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       {nocturno && <LunaValle reducedMotion={reducedMotion} />}
 
       <Terreno nocturno={nocturno} innerRef={terrenoRef} perfil={perfil} />
+      {/* AoE: detalle de suelo (pasto corto/flores/piedras) + surcos de cultivo — mata el verde vacío */}
+      <DetalleSueloValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
       <Cordillera color={nocturno ? '#48598a' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
       <Quebrada
         color={nocturno ? '#7fb3d9' : '#5fb2c9'}

@@ -32,6 +32,9 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import '../visual/effects/effects.css';
 import './entradaValle3D.css';
+import MinimapaValle from './valle/MinimapaValle.jsx';
+import { componerMundos } from '../visual/mundo3d/direccion/composicionValle.js';
+import { MUNDOS_VALLE } from './valle/valleData.js';
 import {
   MUNDO_VALLE_BY_ID,
   COSA_DEL_DIA,
@@ -67,6 +70,10 @@ import { VeloOdyssey } from '../visual/mundo3d/transiciones/index.js';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
+/* Los lugares del valle en planta, para el minimapa RTS (AoE). */
+const LUGARES_MINIMAPA = componerMundos(MUNDOS_VALLE).map((m) => ({
+  id: m.id, x: m.pos[0], z: m.pos[2], emoji: m.emoji, tinte: m.tinte,
+}));
 
 /* ENTRAR a un mundo como MURAL New Donk (flujo vivo): en vez del velo plano, la
    cámara del valle 3D hace dolly + aplane ortográfico hacia el lugar del mundo
@@ -542,6 +549,16 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
             </Suspense>
             </Valle3DGuard>
           )}
+        {/* AoE: el minimapa RTS del valle (planta, blips, salto-a-lugar) — solo con el valle a la vista */}
+        {!nav.enMundo && (
+          <MinimapaValle
+            lugares={LUGARES_MINIMAPA}
+            foco={focoId}
+            onSaltar={entrarMundo}
+            tier={equipo.tier}
+            reducedMotion={reducedMotion}
+          />
+        )}
         {/* El OVERLAY del cruce: la abeja 2D vuela y se clava como mesh 3D — así
             el usuario SÍ ve el 2D→3D. Se desmonta solo al terminar (onFin);
             reducedMotion → AbejaTransicion no monta nada. */}
