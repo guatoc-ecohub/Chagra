@@ -1680,9 +1680,10 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
       prevX.current = ref.current.position.x;
     }
   });
-  // Más grande que antes: la anfitriona de la casa-puerta se veía tímida.
+  // 3x más grande (feedback del operador 2026-07-18: la abeja se veía chiquita
+  // y la burbuja la aplastaba). Angelita es la protagonista — que se vea.
   const [pxMin, pxMax] = JERARQUIA_PERSONAJES.protagonistaPx;
-  const size = pxMin + Math.round(energiaReal * (pxMax - pxMin));
+  const size = Math.round((pxMin + Math.round(energiaReal * (pxMax - pxMin))) * 3);
   const luz = JERARQUIA_PERSONAJES.luzProtagonista;
   return (
     <group ref={ref} position={[CALMA_ABEJA.x, yCalma + 2.2, CALMA_ABEJA.z]}>
