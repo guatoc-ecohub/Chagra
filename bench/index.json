@@ -408,23 +408,6 @@
       "history": true
     },
     {
-      "id": "summary-diff",
-      "title": "Gate GREEN/YELLOW/RED comparando dos summary.md",
-      "type": "meta",
-      "cluster": "meta",
-      "status": "active",
-      "script": "scripts/bench-summary-diff.mjs",
-      "cmd": null,
-      "infra": [
-        "ninguna"
-      ],
-      "metrics": [],
-      "what": "Herramienta META: compara dos summary.md y emite gate GREEN/YELLOW/RED (exit 0/1/2/3). NO corre modelos. Requiere --baseline y --current.",
-      "manualCmd": "node scripts/bench-summary-diff.mjs --baseline=<a/summary.md> --current=<b/summary.md>",
-      "output": "consola + exit code",
-      "history": false
-    },
-    {
       "id": "suite-unit-ci",
       "title": "Suite unitaria del gate de CI (entrypoint del agente)",
       "type": "test-suite",
