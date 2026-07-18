@@ -96,6 +96,32 @@ import {
  * prefers-reduced-motion los apaga (JS incluido), tier 'bajo' apaga scheduler,
  * seguimiento de mirada, deriva y blur — el feedback de estado permanece.
  *
+ * ═══ V3 — LA CARA VIVA (C14+C15: la cara ES el personaje) ═══════════════════
+ *
+ * La expresividad Miss-Minutes de la carita, SIN tocar el dibujo base: todo va
+ * por CSS sobre las clases internas de los ojos (.rh-blink / .rh-mirada), que
+ * viven DENTRO del cuerpo de la abeja — así la cara sigue cada squash, antic y
+ * pose sin desprenderse jamás. Scoped a [data-agente='angelita']: la abeja del
+ * valle y los demás bichos del kit no cambian.
+ *
+ * 1. OJOS ÁMBAR VIVOS (todos los estados): iris ámbar (anillo del mismo dorado
+ *    del cuerpo alrededor de la pupila de tinta), ojos un pelo más grandes y
+ *    la chispa del ojo (catchlight) que TITILA de vez en cuando — período
+ *    co-primo con parpadeo y dardeo, nunca el mismo compás.
+ * 2. PÁRPADOS POR ESTADO: pensando entrecierra (media asta, repasa memoria);
+ *    escuchando parpadea MENOS (quien escucha de verdad casi no pestañea);
+ *    preocupada abre los ojos y ENCOGE la pupila (la alarma se ve en el ojo
+ *    antes que en el gesto) con blink doble nervioso; contenta ya achinaba.
+ * 3. LA CEJITA DEL PENSAR: ceja asimétrica (una arqueada alto, la otra baja)
+ *    dibujada aquí como las de preocupada/no-sé, con un tironcito sincronizado
+ *    a los golpecitos de barbilla ("¿será?…"). Pensando apaga el boil interno
+ *    (mismo criterio que preocupada/no-sé: nada se despega de la cara).
+ * 4. LA VOZ ACOPLADA A LA BOCA: el root estampa data-agt-visema (el mismo
+ *    'V1'..'V4' que ya mueve la boquita vía BocaVisema del kit); cuando el
+ *    host manda visemas, las ondas de miel fluyen SOLO mientras la boca se
+ *    mueve (V1 = silencio = ondas en calma). Host sin TTS: nada cambia.
+ *    Y mientras conversa, las chapetas quedan encendidas — calor de vecina.
+ *
  * Tier-safe: SVG + CSS transform/opacity, cero deps nuevas, cero three.
  */
 
@@ -390,6 +416,19 @@ export function Angelita({
       <path d="M9.5,-4.8 L11.3,-4.7" />
     </g>
   ) : null;
+  // PENSANDO — la cejita del "mmm": la cercana se arquea ALTO (persigue la
+  // idea) y la otra baja, concentrada. El CSS le da un tironcito sincronizado
+  // con los golpecitos de barbilla; con RM/quieta, la asimetría sola ya lee.
+  const caraPensando = e === 'pensando' ? (
+    <g
+      className={cls('agt-ceja-piensa')}
+      stroke={RH_INK} strokeWidth="0.8" strokeLinecap="round" fill="none"
+      aria-hidden="true"
+    >
+      <path d="M9.1,-5.4 Q10.35,-6.35 11.55,-5.45" />
+      <path d="M6.45,-4.35 L8.25,-4.6" />
+    </g>
+  ) : null;
 
   /* ═══ CAPA AIRE: lo que flota alrededor (burbuja, ondas, signos) ═════════ */
   // PENSANDO — burbuja de pensamiento con colita, tres puntos que laten y los
@@ -545,6 +584,10 @@ export function Angelita({
       data-agente="angelita"
       data-agt-estado={e}
       data-agt-vivo={vivo ? '1' : undefined}
+      /* El visema del TTS también en el root: el CSS acopla las ondas de miel
+         al movimiento real de la boquita (V1 = silencio). Solo se estampa si
+         el host manda visemas — sin TTS, nada cambia. */
+      data-agt-visema={visema || undefined}
       data-agt-idle={idleActivo ? momento : undefined}
       data-agt-confianza={nivel || undefined}
       data-tier={tier || undefined}
@@ -572,6 +615,7 @@ export function Angelita({
           />
           {caraPreocupada}
           {caraNoSe}
+          {caraPensando}
         </g>
       </g>
       {burbuja}
