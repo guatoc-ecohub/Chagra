@@ -262,6 +262,10 @@ const MundoBoticaCana3DMockup = lazy(() => import('./mockups/MundoBoticaCana3D')
 // cítricos, guayabo, papayo, injerto con tutor, plateo y cosecha a mano).
 // Standalone tipo botica: no monta el sistema MUNDO ni toca EscenaBase3D.
 const MundoFrutales3DMockup = lazy(() => import('./mockups/MundoFrutales3D'));
+// 3D: LA CLÍNICA DEL CULTIVO — diagnosticar plagas y enfermedades por
+// observación (hoja sana vs enferma, broca/minador/áfidos/gota, plaga-vs-
+// enfermedad, control biológico). Anti-agroquímico. Standalone tipo botica.
+const MundoSanidad3DMockup = lazy(() => import('./mockups/MundoSanidad3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -701,6 +705,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-polinizadores-3d': 'mockup_mundo_polinizadores_3d',
   'mockups/mundo-botica-cana-3d': 'mockup_mundo_botica_cana_3d',
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
+  'mockups/mundo-sanidad-3d': 'mockup_mundo_sanidad_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2399,6 +2404,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El huerto de frutales">
               <MundoFrutales3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_sanidad_3d':
+        // La clínica del cultivo: diagnosticar plagas y enfermedades por
+        // observación. Hoja sana vs hoja enferma en el tablero con la lupa,
+        // el estante de láminas (broca, minador, áfidos/cochinilla, gota),
+        // el cartel plaga-vs-enfermedad (se mueve / se expande) y los aliados
+        // de control biológico (mariquita, crisopa, avispita, sírfido, trampa,
+        // caldo, poda). Anti-agroquímico: enseñar a VER. Ruta
+        // #/mockups/mundo-sanidad-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La clínica del cultivo">
+              <MundoSanidad3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

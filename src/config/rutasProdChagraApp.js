@@ -226,6 +226,12 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
   {
+    path: 'diorama_sanidad',
+    componente: 'MundoSanidad3D',
+    importLazy: 'src/mockups/MundoSanidad3D.jsx',
+    categoria: '3D',
+  },
+  {
     path: 'diorama_frutales',
     componente: 'MundoFrutales3D',
     importLazy: 'src/mockups/MundoFrutales3D.jsx',
