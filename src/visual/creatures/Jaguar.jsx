@@ -232,6 +232,15 @@ export function Jaguar({
      Default false → los consumidores actuales NO cambian. Se poda en tier
      bajo / reduced-motion (quedan las marcas encendidas, quietas). */
   revelacion = false,
+  /* ── APARICIÓN ESPECTRAL (el espíritu que se materializa y se desvanece) ────
+     OPT-IN: con aparicion=true el jaguar-espíritu APARECE y DESAPARECE
+     místicamente en ciclo — se desvanece casi por completo y vuelve a
+     materializarse desde la bruma (opacidad que respira + emergencia leve,
+     como una presencia sagrada que va y viene). Pensado para su entrada/
+     ambiente en el valle/bosque. Default false → los consumidores actuales NO
+     cambian. Se poda en tier bajo / reduced-motion (queda PRESENTE y quieto,
+     nunca invisible — fotograma digno). */
+  aparicion = false,
   /* ── PROP POR MUNDO (herramienta en la zarpa — propsPorMundo/PropEnMano) ─────
      mundoId opcional: al ENTRAR a un mundo el jaguar carga su herramienta
      (agua→manguerita, suelo→lupa, animales→lazo, semillero→canasto…). Sin
@@ -624,10 +633,14 @@ export function Jaguar({
   const conBoil = lineBoil ? <g filter={`url(#${boil})`}>{conAntics}</g> : conAntics;
   // La LEVITACIÓN de la revelación envuelve todo (ingravidez del espíritu):
   // el wrapper siempre existe, la animación solo corre con data-revelacion (CSS)
-  // → cero costo para los consumidores actuales.
+  // → cero costo para los consumidores actuales. La APARICIÓN espectral lo
+  // envuelve por fuera (nodo aparte: opacity+scale de materialización, sin
+  // pisar el transform de la levitación); solo anima con data-aparicion.
   const cuerpoVivo = (
-    <g className="jaguar-levita" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
-      {conBoil}
+    <g className="jaguar-aparicion" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+      <g className="jaguar-levita" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+        {conBoil}
+      </g>
     </g>
   );
 
@@ -642,6 +655,7 @@ export function Jaguar({
     'data-ruge': rugeFx ? '1' : undefined,
     'data-acecha': acechaFx ? '1' : undefined,
     'data-revelacion': revelacion ? '1' : undefined,
+    'data-aparicion': aparicion ? '1' : undefined,
     'data-vida': momento || undefined,
     'data-lineboil': lineBoil ? '1' : undefined,
     'data-prop': mundoId || undefined,
