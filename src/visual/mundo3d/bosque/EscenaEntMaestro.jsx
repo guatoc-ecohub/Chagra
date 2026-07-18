@@ -70,7 +70,19 @@ const PARAMO = { fondo: '#c3cfce', niebla: '#c9d3d1' };
 /* Dónde se planta la vitrina de suelo, al lado del Ent (donde apunta su mano). */
 const CORTE_POS = /** @type {[number, number, number]} */ ([2.5, 0, 1.9]);
 
-const DUR_CAPA = 3.6; // segundos que el Ent "enseña" cada capa
+const DUR_CAPA = 3.6; // segundos que el Ent "enseña" cada capa (loop uniforme, modo base)
+
+/*
+ * EL ARCO (modo `arco`, opt-in): no un tic-tac uniforme sino una LECCIÓN con
+ * ritmo — apertura arriba, descenso, y un CLÍMAX LARGO en las micorrizas (la red
+ * repartiendo la comida: la banda de pulsos merece 2-3× cualquier capa), y
+ * cierre. Duraciones DESIGUALES en el orden top→bottom de CAPAS
+ * (hojarasca, humus, raíces, micorrizas, roca). El ciclo vuelve a la superficie
+ * (índice 0), nunca reinicia a media red. Sin `arco` el loop uniforme de siempre
+ * (el mundo EscenaEntMaestro no cambia).
+ */
+const ARCO = [3.0, 3.4, 3.6, 9.2, 3.2]; // clímax largo en micorrizas (índice 3)
+const ARCO_TOTAL = ARCO.reduce((a, b) => a + b, 0);
 
 /*
  * QUÉ FLORA SE QUITA en este encuadre — y por qué el páramo tiene que estar.
@@ -354,7 +366,7 @@ function Capa({ capa, geo, activa, red, tier, reducedMotion, rotulos = true }) {
    EXPORTADA: el páramo (MundoParamo3D) la reusa al pie de la queñua guardiana —
    misma lección, mismo componente, cero duplicación. `rotulos` apaga los Html
    cuando la vitrina se ve de lejos. */
-export function CorteSuelo({ tier, reducedMotion, rotulos = true }) {
+export function CorteSuelo({ tier, reducedMotion, rotulos = true, arco = false }) {
   /*
    * Orden OBLIGATORIO: primero la red, porque la tierra de la banda se hornea
    * CON la luz de la red (las `muestras`). Es lo que deja la banda legible sin
@@ -395,7 +407,18 @@ export function CorteSuelo({ tier, reducedMotion, rotulos = true }) {
   const [activa, setActiva] = useState(0);
   useFrame((st) => {
     if (reducedMotion) return;
-    const idx = Math.floor((st.clock.elapsedTime / DUR_CAPA) % CAPAS.length);
+    let idx;
+    if (arco && ARCO.length === CAPAS.length) {
+      // arco con clímax: caminar las duraciones desiguales
+      let ph = st.clock.elapsedTime % ARCO_TOTAL;
+      idx = ARCO.length - 1;
+      for (let i = 0; i < ARCO.length; i++) {
+        if (ph < ARCO[i]) { idx = i; break; }
+        ph -= ARCO[i];
+      }
+    } else {
+      idx = Math.floor((st.clock.elapsedTime / DUR_CAPA) % CAPAS.length);
+    }
     setActiva((a) => (a === idx ? a : idx));
   });
 
