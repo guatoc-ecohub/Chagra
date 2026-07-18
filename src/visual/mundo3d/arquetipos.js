@@ -93,6 +93,17 @@ export const ARQUETIPOS = {
     nombre: 'El semillero/vivero', clave: 'la propagación: germinar, repicar y endurecer bajo el túnel protegido',
     ejemplo: 'semillero', tambien: [],
   },
+  // El huerto de frutales: la familia del `cafe` (un cultivo hecho lugar), pero
+  // su lección es el SOLAR de clima cálido/templado — aguacate, mango y cítricos
+  // a distinta edad y altura (nunca fila monótona), con plateo, poda señalada,
+  // injerto joven con tutor y la cosecha a mano (escalera y canastos). En equipo
+  // humilde cae a su ficha 2D digna (la tarjeta de frutales de siempre).
+  // (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  frutales: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'frutales', espejo: 'mirror',
+    nombre: 'El huerto de frutales', clave: 'los frutales de clima cálido/templado: aguacate, mango y cítricos — edades, poda, plateo y cosecha',
+    ejemplo: 'frutales', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {

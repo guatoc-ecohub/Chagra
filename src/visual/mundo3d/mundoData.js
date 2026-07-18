@@ -255,22 +255,53 @@ export const MUNDO = {
     },
   },
 
-  // 🍊 FRUTALES — arquetipo `ficha`: tarjeta de especie foto-secuencial.
+  // 🍊 FRUTALES — arquetipo SÍ-3D `frutales`: el HUERTO DE FRUTALES de clima
+  //    cálido/templado hecho lugar. El diorama muestra el solar campesino de
+  //    verdad: el AGUACATE mayor con su fruto verde-oscuro colgando, el MANGO de
+  //    copa ancha con el fruto dorado en su pedúnculo largo, los CÍTRICOS
+  //    (naranjo, limonero, mandarino) cargados de color, las EDADES (del injerto
+  //    con tutor al árbol mayor: el huerto se renueva), el PLATEO al pie de cada
+  //    árbol, la PODA señalada con su corte limpio y la COSECHA a mano (escalera
+  //    y canastos, la fruta no se apalea). Cada punto es una puerta a una
+  //    pantalla REAL. En equipo humilde cae a su ficha 2D digna (la tarjeta de
+  //    frutales de siempre).
   frutales: {
-    escena: 'ficha',
+    escena: 'frutales',
     params: {
-      nombre: 'Frutales de la finca',
-      emoji: '🍊',
-      hechos: [
-        { clave: 'Propagación', valor: 'injerto y semilla según especie' },
-        { clave: 'Piso térmico', valor: 'de cálido (cítricos, mango) a frío (mora, tomate de árbol)' },
-        { clave: 'Sin veneno', valor: 'trampas, poda sanitaria y control biológico' },
+      // El diorama tiene defaults propios; aquí los hacemos explícitos y
+      // deterministas (mismos árboles, edades y frutos siempre). El mango lleva
+      // la seña de la poda (corte limpio, sin drama).
+      arboles: [
+        { especie: 'aguacate', pos: [-1.35, 0, -0.75], alto: 2.15, ancho: 1.15, frutos: 5 },
+        { especie: 'mango', pos: [1.4, 0, -0.8], alto: 1.7, ancho: 1.35, frutos: 6, poda: true },
+        { especie: 'naranjo', pos: [0.12, 0, -0.2], alto: 1.15, ancho: 1, frutos: 8 },
+        { especie: 'limonero', pos: [-1.05, 0, 0.72], alto: 0.95, ancho: 0.9, frutos: 7 },
+        { especie: 'mandarino', pos: [0.95, 0, 0.6], alto: 0.85, ancho: 0.85, frutos: 9 },
       ],
     },
     hotspots: [
-      { id: 'frutales', pos: [], emoji: '🍊', label: 'Ficha de frutales', view: 'frutales' },
+      { id: 'frutales', pos: [0.12, 1.95, -0.2], emoji: '🍊', label: 'Frutales de la finca', view: 'frutales' },
+      { id: 'aguacate', pos: [-1.35, 3.05, -0.75], emoji: '🥑', label: 'El aguacate, a fondo', view: 'aguacate' },
+      { id: 'mango', pos: [1.4, 2.65, -0.8], emoji: '🥭', label: 'El mango y su poda', view: 'mango' },
+      { id: 'citricos', pos: [-1.05, 1.6, 0.72], emoji: '🍋', label: 'Los cítricos', view: 'citricos' },
+      { id: 'injerto', pos: [-0.18, 1.0, 1.2], emoji: '🌱', label: 'El injerto y el vivero', view: 'germinacion' },
+      { id: 'cosecha', pos: [1.15, 1.35, 0.35], emoji: '🧺', label: 'Cosecha y poscosecha', view: 'poscosecha' },
     ],
-    entrada: {},
+    entrada: { zoom: 7, narra: 'frutales' },
+    // El gemelo 2D digno: la tarjeta de frutales de siempre (misma lección).
+    fallback2d: {
+      escena: 'ficha',
+      params: {
+        nombre: 'Frutales de la finca',
+        emoji: '🍊',
+        hechos: [
+          { clave: 'Propagación', valor: 'injerto y semilla según especie' },
+          { clave: 'Piso térmico', valor: 'de cálido (cítricos, mango) a frío (mora, tomate de árbol)' },
+          { clave: 'Sin veneno', valor: 'trampas, poda sanitaria y control biológico' },
+          { clave: 'Cosecha', valor: 'a mano y con escalera: la fruta golpeada se pierde' },
+        ],
+      },
+    },
   },
 
   // 🧺 MERCADO Y DESPENSA — arquetipo SÍ-3D `mercado`: el MERCADO CAMPESINO, la

@@ -336,4 +336,6 @@ export const NARRACION = {
     'Suba por la montaña: del cálido al páramo, cada piso con lo suyo. Arriba manda el frailejón, que le peina el agua a la niebla y la entrega despacio al suelo. Por eso el páramo se cuida, no se ara.',
   semillero:
     'El semillero, bajo su túnel de media-sombra. Aquí nace la matica: la semilla despierta en la bandeja, se repica a la bolsa y se endurece al sol antes de irse al campo. Del grano fuerte sale la finca fuerte.',
+  frutales:
+    'El huerto de frutales. El aguacate mayor, el mango de copa ancha y los cítricos cargados de color, cada uno con su edad y su plateo. La fruta se baja con la mano y con escalera — la fruta golpeada se pierde.',
 };

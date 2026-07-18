@@ -12,7 +12,7 @@ afterEach(() => cleanup());
 
 describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
   test('arquetipos: 5 dioramas 3D + arquetipos 2D de primera clase', () => {
-    expect(ARQUETIPOS_3D.sort()).toEqual(['boveda', 'cafe', 'cutaway', 'estratos', 'flujo', 'mercado', 'recinto', 'sanidad', 'semillero', 'valle']);
+    expect(ARQUETIPOS_3D.sort()).toEqual(['boveda', 'cafe', 'cutaway', 'estratos', 'flujo', 'frutales', 'mercado', 'recinto', 'sanidad', 'semillero', 'valle']);
     ['lamina', 'infografia', 'ficha', 'mirror', 'valle2d'].forEach((k) => {
       expect(ARQUETIPOS_2D).toContain(k);
       expect(ARQUETIPOS[k].dim).toBe('2d');
@@ -30,10 +30,20 @@ describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
     expect(bajo.motivo).toBe('cutaway');
   });
 
-  test('un mundo 2D-dato declara su arquetipo DIRECTO (frutales → ficha)', () => {
-    const r = resolverMundo('frutales', 'alto'); // aun en tier alto sigue 2D
+  test('un mundo 2D-dato declara su arquetipo DIRECTO (cultivos → lamina)', () => {
+    const r = resolverMundo('cultivos', 'alto'); // aun en tier alto sigue 2D
     expect(r.modo).toBe('2d');
-    expect(r.escena).toBe('ficha');
+    expect(r.escena).toBe('lamina');
+  });
+
+  test('los frutales suben al arquetipo 3D nuevo `frutales` (y degradan a su ficha 2D)', () => {
+    const alto = resolverMundo('frutales', 'alto');
+    expect(alto.modo).toBe('3d');
+    expect(alto.escena).toBe('frutales');
+    // equipo humilde → cae a su fallback2d declarado (la tarjeta de frutales)
+    const bajo = resolverMundo('frutales', 'bajo');
+    expect(bajo.modo).toBe('2d');
+    expect(bajo.escena).toBe('ficha');
   });
 
   test('el mercado sube al arquetipo 3D nuevo `mercado` (y degrada a su ficha 2D)', () => {
@@ -77,9 +87,9 @@ describe('framework de mundos — resolución data-driven (2D + 3D)', () => {
   });
 
   test('<Mundo> monta un mundo 2D sin lanzar (sin three, three-free)', () => {
-    // frutales es 2D nativo (ficha); no monta Canvas → seguro en jsdom.
+    // cultivos es 2D nativo (lamina); no monta Canvas → seguro en jsdom.
     const { container } = render(
-      <Mundo mundoId="frutales" tier="alto" onHotspot={() => {}} onSalir={() => {}} />,
+      <Mundo mundoId="cultivos" tier="alto" onHotspot={() => {}} onSalir={() => {}} />,
     );
     expect(container.querySelector('.mundo-root[data-dim="2d"]')).toBeInTheDocument();
     // el espejo 2D de un 3D degradado también es three-free:

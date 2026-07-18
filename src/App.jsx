@@ -110,6 +110,11 @@ const Mundo3DCafeMockup = lazy(() => import('./mockups/Mundo3DCafe'));
 // germinación en bandeja, repique a bolsa, endurecimiento, semilla propia vs
 // comprada y el túnel de media-sombra. El 3D va perezoso (vendor-three).
 const Mundo3DSemilleroMockup = lazy(() => import('./mockups/Mundo3DSemillero'));
+// 3D: "El mundo de los frutales" — monta <Mundo mundoId="frutales"> del
+// framework: el huerto de clima cálido/templado (arquetipo nuevo `frutales`,
+// familia cafe): aguacate, mango y cítricos a distinta edad y altura, plateo,
+// poda, injerto con tutor y cosecha a mano. El 3D va perezoso (vendor-three).
+const Mundo3DFrutalesMockup = lazy(() => import('./mockups/Mundo3DFrutales'));
 // 3D: "La infraestructura de su finca" — vitrina de la LIBRERÍA de construcciones
 // (src/visual/mundo3d/infraestructura): invernaderos, galpón, establo, bodega,
 // compostera, tanque, secadero, media-sombra. Grilla data-driven con device-tier
@@ -568,6 +573,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
   'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
+  'mockups/mundo3d-frutales': 'mockup_mundo3d_frutales',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1705,6 +1711,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo del semillero">
               <Mundo3DSemilleroMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo3d_frutales':
+        // Vitrina pública del MUNDO DE FRUTALES: monta <Mundo mundoId="frutales">
+        // del framework (src/visual/mundo3d) con device-tiering real. Ruta
+        // #/mockups/mundo3d-frutales, sin auth. El huerto de clima cálido/
+        // templado: aguacate (fruto verde-oscuro colgando), mango (pedúnculo
+        // largo, copa ancha) y cítricos (naranjo/limonero/mandarino), a
+        // distinta edad y altura; plateo, poda con corte limpio, injerto con
+        // tutor y cosecha a mano (escalera y canastos).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de los frutales">
+              <Mundo3DFrutalesMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

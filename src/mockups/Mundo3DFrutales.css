@@ -1,0 +1,152 @@
+/*
+ * Mundo3DFrutales.css — vitrina pública del mundo de los frutales
+ * (#/mockups/mundo3d-frutales). Autocontenida: sin fuentes/imágenes externas.
+ * Móvil-first desde 320px. Solo opacity/transform animables; reduced-motion las
+ * apaga. Paleta cálida de solar: naranja de cítrico sobre crema de tarde.
+ */
+
+.m3dfru {
+  --m3dfru-a: #c96a1f;
+  --m3dfru-b: #f4e6cc;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  background:
+    linear-gradient(180deg, var(--m3dfru-b) 0%, #f2e4c4 44%, #dbc490 100%);
+  color: #3d2c14;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.m3dfru__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.m3dfru__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--m3dfru-a);
+}
+.m3dfru__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #7a4310;
+}
+.m3dfru__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 38rem;
+}
+
+.m3dfru__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+/* El host <Mundo> llena este marco; en 3D necesita altura real. */
+.m3dfru__escena .mundo-root {
+  height: min(62vh, 30rem);
+  min-height: 300px;
+  border: 1px solid rgba(201, 106, 31, 0.3);
+  box-shadow: 0 10px 28px rgba(61, 44, 20, 0.14);
+}
+.m3dfru__escena .mundo-root[data-dim='2d'] {
+  height: auto;
+  background: #fcf4e2;
+}
+
+.m3dfru__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.m3dfru__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.m3dfru__toggle {
+  border: 1.5px solid var(--m3dfru-a);
+  background: #fff;
+  color: var(--m3dfru-a);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.m3dfru__toggle:hover,
+.m3dfru__toggle:focus-visible {
+  background: var(--m3dfru-a);
+  color: #fff;
+  outline-offset: 2px;
+}
+
+.m3dfru__nota {
+  margin: 0.5rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-left: 3px solid var(--m3dfru-a);
+  border-radius: 0 10px 10px 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.m3dfru__leyenda {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.m3dfru__leyenda h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.7rem;
+  color: #7a4310;
+}
+.m3dfru__leyenda ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+@media (min-width: 640px) {
+  .m3dfru__leyenda ol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.m3dfru__leyenda li {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(201, 106, 31, 0.2);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+}
+.m3dfru__emoji {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+.m3dfru__leyenda b {
+  display: block;
+  font-size: 0.92rem;
+  color: #7a4310;
+}
+.m3dfru__leyenda li p {
+  margin: 0.15rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+.m3dfru__cierre {
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-style: italic;
+  color: #4c3717;
+}
