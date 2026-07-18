@@ -5,6 +5,7 @@ import { fvhSkinClass } from '../../config/fvhSkin';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import { evaluarSubsuelo, mensajeMeta } from '../../services/mundoSubsueloEngine';
 import { Lombriz } from '../../visual/creatures/index.js';
+import { construirSubsuelo } from './subsueloRedGeom';
 import './mundo-subsuelo.css';
 
 function clamp(value, min = 0, max = 100) {
@@ -65,11 +66,48 @@ function Mascot({ name, title, children, active }) {
 
 function SoilScene({ soilLife, activeDecision }) {
   const stage = getSoilStage(soilLife);
-  const rootDepth = 38 + soilLife * 0.7;
-  const hifaCount = Math.max(2, Math.round(soilLife / 12));
-  const wormCount = Math.max(1, Math.round(soilLife / 22));
-  const sparkCount = Math.max(0, Math.round((soilLife - 40) / 10));
   const isTired = soilLife < 35;
+
+  // TODA la geometría del subsuelo (raíces, red micorrízica, nódulos, agua,
+  // minerales) sale de un módulo PURO y determinista; solo depende de la vida
+  // del suelo, así que memoiza por valor y se re-teje cuando la tierra cambia.
+  const sub = useMemo(() => construirSubsuelo(soilLife), [soilLife]);
+  const { raices, nodulos, nodos, hilos, gotas, minerales, vida } = sub;
+
+  // Cuántos hilos de la red se ven encendidos: tierra cansada = pocos y
+  // apagados; tierra viva = casi toda la malla brilla. Los PUENTES (el reparto
+  // entre matas) van siempre de primeros: son la lección.
+  const hilosOrdenados = useMemo(() => {
+    const puentes = hilos.filter((h) => h.puente);
+    const resto = hilos.filter((h) => !h.puente);
+    return [...puentes, ...resto];
+  }, [hilos]);
+  const hilosVisibles = Math.max(
+    hilosOrdenados.filter((h) => h.puente).length,
+    Math.round(hilosOrdenados.length * (0.35 + vida * 0.65)),
+  );
+
+  // Chispas de nutriente que viajan por la red (los pulsos): más vida = más
+  // pulsos. Se paran sobre los PUENTES primero (ahí se lee el intercambio).
+  // Tierra muy cansada = red muda (sin pulsos), como el suelo real sin vida.
+  const sparkCount = Math.max(0, Math.round((soilLife - 40) / 8));
+  const chispas = useMemo(() => {
+    const base = hilosOrdenados.slice(0, Math.max(1, hilosVisibles));
+    return Array.from({ length: sparkCount }, (_, i) => {
+      const h = base[(i * 3 + 1) % base.length] || base[0];
+      // punto sobre la Bézier del hilo (t variado por chispa) — el pulso viaja
+      const t = 0.3 + ((i * 0.27) % 0.4);
+      const u = 1 - t;
+      const cx = u * u * h.a.x + 2 * u * t * h.mid.x + t * t * h.b.x;
+      const cy = u * u * h.a.y + 2 * u * t * h.mid.y + t * t * h.b.y;
+      return { cx, cy, puente: h.puente, i };
+    });
+  }, [hilosOrdenados, hilosVisibles, sparkCount]);
+
+  // La Lombricita protagonista: su galería (un túnel curvo excavado) cruza el
+  // corte y ella va acostada adentro, grande y viva. Más lombricitas menudas
+  // aparecen cuando la tierra despierta (suelo vivo = más fauna).
+  const wormCount = Math.max(1, Math.round(soilLife / 26));
 
   return (
     <div
@@ -78,7 +116,7 @@ function SoilScene({ soilLife, activeDecision }) {
       data-stage={stage}
       className={fvhSkinClass('ms-vinneta overflow-hidden rounded-3xl border border-amber-200 bg-[#f6efe1] shadow-[0_24px_70px_rgba(60,46,26,0.16)]')}
     >
-      <svg viewBox="0 0 760 430" role="img" aria-label="Corte transversal del suelo con raices, hongos, agua y lombrices" className="block h-auto w-full">
+      <svg viewBox="0 0 760 430" role="img" aria-label="Corte transversal del suelo con raices, red de hongos micorrizicos, nodulos, agua que se infiltra y lombrices" className="block h-auto w-full">
         <defs>
           <linearGradient id="ms-sky" x1="0" x2="1" y1="0" y2="1">
             <stop offset="0%" stopColor="#b9f3ff" />
@@ -86,8 +124,14 @@ function SoilScene({ soilLife, activeDecision }) {
           </linearGradient>
           <linearGradient id="ms-soil" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor={isTired ? '#b88452' : '#8a5a32'} />
-            <stop offset="100%" stopColor={isTired ? '#7a5236' : '#3f2d20'} />
+            <stop offset="55%" stopColor={isTired ? '#8a5f3d' : '#5a3d28'} />
+            <stop offset="100%" stopColor={isTired ? '#6b4a30' : '#2c1e15'} />
           </linearGradient>
+          <radialGradient id="ms-nodo" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#e9fffb" />
+            <stop offset="55%" stopColor="#9df5da" />
+            <stop offset="100%" stopColor="#37d6b0" stopOpacity="0" />
+          </radialGradient>
           <filter id="ms-glow">
             <feGaussianBlur stdDeviation="3" result="blur" />
             <feMerge>
@@ -173,75 +217,167 @@ function SoilScene({ soilLife, activeDecision }) {
           </g>
         ))}
 
-        {/* Raíces: crecen con un pop suave cada vez que ganan profundidad. */}
-        <g key={`raices-${rootDepth}`} className="msx-raices">
-          {[92, 265, 438, 608].map((x, index) => (
-            <g key={x}>
-              <path d={`M${x + 29} 153v${rootDepth}`} stroke="#f5e8b7" strokeWidth="7" strokeLinecap="round" />
-              <path d={`M${x + 29} 205c-${18 + index * 4} 16-${28 + index * 3} 31-${38 + index * 2} 49`} stroke="#f5e8b7" strokeWidth="4" fill="none" strokeLinecap="round" />
-              <path d={`M${x + 29} 224c${18 + index * 3} 17 ${31 + index * 2} 34 ${42 + index * 2} 58`} stroke="#f5e8b7" strokeWidth="4" fill="none" strokeLinecap="round" />
+        {/* AGUA que se infiltra: canales ondulados que bajan desde la superficie
+            (percolación) con su gotica al final. Tierra viva y esponjosa = más
+            infiltración. Va detrás de las raíces (es el telón húmedo). */}
+        <g aria-hidden="true">
+          {gotas.map((g, index) => (
+            <g key={`agua-${index}`}>
+              <path d={g.d} stroke="#7dd3fc" strokeWidth="2" fill="none" strokeLinecap="round" opacity={0.18 + vida * 0.22} />
+              <circle
+                className="msx-gota"
+                style={{ animationDelay: `${g.delay}s` }}
+                cx={g.cx}
+                cy={g.cy}
+                r="3.4"
+                fill="#38bdf8"
+                opacity="0.85"
+              />
             </g>
           ))}
         </g>
 
-        {/* La firma: nutrientes viajando por el internet de los hongos. */}
-        {Array.from({ length: hifaCount }).map((_, index) => {
-          const y = 245 + (index % 4) * 35;
-          const start = 92 + index * 82;
-          return (
-            <path
-              key={`hifa-${index}`}
-              className="msx-hifa"
-              style={{ animationDelay: `${index * 0.45}s` }}
-              d={`M${start} ${y} C${start + 42} ${y - 30}, ${start + 96} ${y + 28}, ${start + 148} ${y - 6}`}
-              stroke="#67e8f9"
-              strokeWidth={soilLife > 70 ? 5 : 3}
-              fill="none"
-              strokeLinecap="round"
-              opacity={isTired ? 0.24 : 0.78}
-              filter={soilLife > 55 ? 'url(#ms-glow)' : undefined}
-            />
-          );
-        })}
+        {/* RAÍCES profundas: trazo cálido con un realce claro encima (da volumen,
+            la punta que busca). Crecen con un pop suave al ganar vida. */}
+        <g key={`raices-${soilLife}`} className="msx-raices" aria-hidden="true">
+          {raices.map((rz, index) => (
+            <g key={`raiz-${index}`}>
+              <path d={rz.d} stroke="#8a5f36" strokeWidth={rz.ancho} fill="none" strokeLinecap="round" />
+              <path d={rz.d} stroke="#e7cf9a" strokeWidth={rz.ancho * 0.5} fill="none" strokeLinecap="round" opacity="0.9" />
+            </g>
+          ))}
+          {/* NÓDULOS del fríjol: bolitas donde las bacterias fijan el nitrógeno
+              del aire (la leguminosa que abona la tierra). Un realce rosado. */}
+          {nodulos.map((nd, index) => (
+            <g key={`nodulo-${index}`}>
+              <circle cx={nd.x} cy={nd.y} r={nd.r} fill="#f9a8d4" opacity="0.92" />
+              <circle cx={nd.x - nd.r * 0.3} cy={nd.y - nd.r * 0.3} r={nd.r * 0.4} fill="#fce7f3" opacity="0.9" />
+            </g>
+          ))}
+        </g>
 
-        {Array.from({ length: sparkCount }).map((_, index) => (
+        {/* MINERALES suspendidos (fósforo ámbar, nitrógeno azul, potasio malva):
+            los que están junto a una punta de raíz brillan y suben — el uptake
+            que la red hace posible. */}
+        <g aria-hidden="true">
+          {minerales.map((m, index) => (
+            <circle
+              key={`min-${index}`}
+              className={m.uptake ? 'msx-mineral' : undefined}
+              style={m.uptake ? { animationDelay: `${m.delay}s` } : undefined}
+              cx={m.x}
+              cy={m.y}
+              r={m.r}
+              fill={m.color}
+              opacity={m.uptake ? 0.95 : 0.5 + vida * 0.2}
+              filter={m.uptake ? 'url(#ms-glow)' : undefined}
+            />
+          ))}
+        </g>
+
+        {/* LA RED MICORRÍZICA — la firma del mundo: hifas turquesa que enlazan las
+            puntas de raíz entre sí (el "wood wide web"). Los PUENTES entre matas
+            distintas van más gruesos y claros: ahí se reparte el alimento. El
+            flujo (dash animado) hace correr el nutriente por los hilos. */}
+        <g fill="none" strokeLinecap="round">
+          {hilosOrdenados.slice(0, hilosVisibles).map((h, index) => (
+            <path
+              key={`hilo-${h.k}`}
+              className="msx-hifa"
+              style={{ animationDelay: `${(index % 8) * 0.35}s` }}
+              d={h.d}
+              stroke={h.puente ? '#a7f3d0' : '#5eead4'}
+              strokeWidth={h.puente ? 3 : 1.6}
+              opacity={isTired ? 0.3 : h.puente ? 0.95 : 0.6 + vida * 0.3}
+              filter={!isTired && (h.puente || vida > 0.6) ? 'url(#ms-glow)' : undefined}
+            />
+          ))}
+        </g>
+
+        {/* NODOS de la red: puntas de raíz (intercambio, cálido), uniones del
+            micelio (verde-blanco que respira) y esporas (perla malva, la memoria
+            del suelo). Solo se dibujan los que cuelgan de hilos visibles. */}
+        <g aria-hidden="true">
+          {nodos.map((nd, index) => {
+            const esRaiz = nd.tipo === 'raiz';
+            const esEspora = nd.tipo === 'espora';
+            const apagado = isTired && !esRaiz;
+            const fill = esRaiz ? '#ffd27a' : esEspora ? '#d8b4fe' : 'url(#ms-nodo)';
+            return (
+              <g key={`nodo-${index}`}>
+                {!esRaiz && !apagado && vida > 0.35 && (
+                  <circle
+                    className="msx-nodo"
+                    style={{ animationDelay: `${(index % 6) * 0.4}s` }}
+                    cx={nd.x}
+                    cy={nd.y}
+                    r={esEspora ? 5 : 6}
+                    fill="url(#ms-nodo)"
+                    opacity="0.55"
+                  />
+                )}
+                <circle cx={nd.x} cy={nd.y} r={esRaiz ? 3.4 : 2.6} fill={fill} opacity={apagado ? 0.35 : 0.95} />
+              </g>
+            );
+          })}
+        </g>
+
+        {/* Los PULSOS de nutriente que corren por la red (chispas). Sobre los
+            puentes cuentan la lección: fósforo/azúcar viajando de mata a mata. */}
+        {chispas.map((c) => (
           <circle
-            key={`spark-${index}`}
+            key={`spark-${c.i}`}
             data-testid="nutrient-spark"
             className="msx-chispa"
-            style={{ animationDelay: `${index * 0.35}s` }}
-            cx={132 + index * 92}
-            cy={238 + (index % 3) * 46}
-            r="6"
-            fill={index % 2 ? '#fef08a' : '#22d3ee'}
+            style={{ animationDelay: `${c.i * 0.3}s` }}
+            cx={c.cx}
+            cy={c.cy}
+            r={c.puente ? 6 : 4.5}
+            fill={c.i % 2 ? '#fde68a' : '#5eead4'}
             filter="url(#ms-glow)"
           />
         ))}
 
-        {/* Lombrices = la Lombriz rubber-hose de la casa, meneándose en su
-            galería (spec belleza-juegos: la protagonista viva de la red del
-            suelo, no un trazo con puntico). Inline dentro del corte, escalada y
-            un poco rotada para acostarse en su galería del suelo. */}
+        {/* LA LOMBRICITA protagonista — la Lombriz rubber-hose de la casa — en su
+            galería excavada (el túnel claro que cruza el corte). Grande y viva,
+            con su sombra sobre la tierra; es la guía del mundo, no un puntico. */}
+        <g aria-hidden="true">
+          <path
+            d="M96 372c48-26 108-14 168-30 58-16 118-8 180-2"
+            stroke="#caa06c"
+            strokeWidth="18"
+            fill="none"
+            strokeLinecap="round"
+            opacity="0.32"
+          />
+          <path
+            d="M96 372c48-26 108-14 168-30 58-16 118-8 180-2"
+            stroke="#3a281a"
+            strokeWidth="20"
+            fill="none"
+            strokeLinecap="round"
+            opacity="0.16"
+          />
+        </g>
+        <g className="msx-lombriz" style={{ animationDelay: '0s' }}>
+          <g transform="translate(150 352) scale(3) rotate(-18)">
+            <Lombriz inline animated title="Lombricita, guia del suelo" />
+          </g>
+        </g>
+
+        {/* Lombricitas menudas que aparecen cuando la tierra despierta. */}
         {Array.from({ length: wormCount }).map((_, index) => {
-          const wx = 112 + index * 178;
-          const wy = 345 - (index % 2) * 34;
-          const rot = index % 2 === 0 ? 26 : -14;
+          const wx = 430 + index * 120;
+          const wy = 360 - (index % 2) * 46;
+          const rot = index % 2 === 0 ? 24 : -16;
           return (
-            <g key={`worm-${index}`} className="msx-lombriz" style={{ animationDelay: `${index * 0.6}s` }}>
-              <g transform={`translate(${wx + 26} ${wy - 30}) scale(1.75) rotate(${rot})`}>
+            <g key={`worm-${index}`} className="msx-lombriz" style={{ animationDelay: `${index * 0.6 + 0.3}s` }} aria-hidden="true">
+              <g transform={`translate(${wx} ${wy}) scale(1.5) rotate(${rot})`}>
                 <Lombriz inline animated title="Lombriz" />
               </g>
             </g>
           );
         })}
-
-        {soilLife >= 55 && (
-          <g fill="#38bdf8" opacity="0.82">
-            <path className="msx-agua" d="M641 161c-22 47-24 78-2 116 22-38 21-69 2-116Z" />
-            <path className="msx-agua" style={{ animationDelay: '0.8s' }} d="M688 154c-18 37-20 62-1 92 18-30 17-56 1-92Z" />
-            <path className="msx-agua" style={{ animationDelay: '1.5s' }} d="M595 164c-15 33-17 54-1 81 15-27 14-49 1-81Z" />
-          </g>
-        )}
 
         {isTired && (
           <g>
