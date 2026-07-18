@@ -1,7 +1,13 @@
 /*
  * MundoLeguminosas3D — el MUNDO DE LEGUMINOSAS Y RAÍCES ANDINAS en 3D.
  *
- * Tres matas que le dan de comer a la familia Y a la tierra, en hora dorada:
+ * Un LOTE denso en hora dorada ("Age of Empires del campo"): al centro la MILPA
+ * de las tres hermanas (maíz de vara + fríjol trepando en él + calabaza al pie),
+ * a la izquierda una PARCELA de fríjol tutorado (cañamazo de varas), a la derecha
+ * un MANCHÓN de quinua y dos yucas frondosas, con cobertura de pasto y piedritas
+ * que matan el vacío. La mata-hero de fríjol conserva su lección al frente:
+ *
+ * Las matas que le dan de comer a la familia Y a la tierra, en hora dorada:
  *   - FRÍJOL (leguminosa trepadora): sube por su estaca con hojas y VAINAS, y a
  *     un lado, en un CORTE del subsuelo, se ven los NÓDULOS ROSADOS de Rhizobium
  *     en la raíz — las fábricas de nitrógeno, el abono gratis del aire. Es el
@@ -82,6 +88,26 @@ const P = {
   quinuaRojo: mezclar('#c1343a', TINTE, 0.08), // panoja roja
   quinuaDorado: mezclar('#e0a52a', TINTE, 0.1), // panoja dorada
   quinuaMorado: mezclar('#933f8a', TINTE, 0.08), // panoja morada
+
+  // maíz (la vara de la milpa: por él trepa el fríjol)
+  maizTallo: mezclar('#8fa84e', TINTE, 0.28), // la caña verde-cálida
+  maizNudo: mezclar('#6f8a3c', TINTE, 0.24),
+  maizHoja: mezclar('#77a23f', TINTE, 0.3), // hoja-cinta larga
+  maizHojaSeca: mezclar('#bda45a', TINTE, 0.3),
+  maizEspiga: mezclar('#e7d488', TINTE, 0.12), // espiga (flor macho) dorada
+  mazorca: mezclar('#f2cf5a', TINTE, 0.1), // el grano de la mazorca
+  mazorcaHoja: mezclar('#9cb85a', TINTE, 0.28), // el capacho verde
+
+  // calabaza (zapallo: la tercera hermana, cobija el suelo)
+  calabazaHoja: mezclar('#4f8a3e', TINTE, 0.3),
+  calabazaHojaClara: mezclar('#6aa64c', TINTE, 0.28),
+  calabazaFruto: mezclar('#d98a34', TINTE, 0.16), // el zapallo naranja
+  calabazaGuia: mezclar('#5c8f43', TINTE, 0.28),
+
+  // suelo vivo
+  cuerda: mezclar('#cbb488', TINTE, 0.2), // el cañamazo/tutor del fríjol
+  piedra: mezclar('#8f8674', TINTE, 0.32), // piedritas del lote
+  piedraClara: mezclar('#a89f88', TINTE, 0.32),
 };
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -439,7 +465,7 @@ function HojaPalmada({ pos, giro = 0, incl = 0, esc = 1 }) {
 
 /* ── LA YUCA: arbusto de tallo leñoso nudoso, copa de hojas palmadas y las
       raíces tuberosas asomando en la base. Aguanta el suelo pobre. ── */
-function MataYuca({ pos }) {
+function MataYuca({ pos, esc = 1, giro = 0 }) {
   const groundY = alturaCampo(pos[0], pos[2]);
   // el tallo leñoso: tres tramos que zig-zaguean en los nudos (como la yuca).
   const tramos = [
@@ -447,11 +473,17 @@ function MataYuca({ pos }) {
     { y: 0.98, x: 0.08, incl: -0.12, h: 0.62 },
     { y: 1.52, x: 0.02, incl: 0.08, h: 0.5 },
   ];
+  // copa frondosa: hojas palmadas en abanico a dos alturas (no ralas)
   const hojas = [
-    { pos: [0.1, 1.78, 0.05], giro: 0.2, incl: -0.2, esc: 1.05 },
-    { pos: [0.0, 1.72, 0.0], giro: 2.1, incl: -0.1, esc: 1.0 },
-    { pos: [-0.05, 1.8, -0.02], giro: 4.0, incl: -0.25, esc: 0.95 },
-    { pos: [0.15, 1.68, -0.08], giro: 5.4, incl: -0.05, esc: 0.9 },
+    { pos: [0.1, 1.82, 0.05], giro: 0.2, incl: -0.2, esc: 1.15 },
+    { pos: [0.0, 1.76, 0.0], giro: 1.15, incl: -0.1, esc: 1.08 },
+    { pos: [-0.05, 1.84, -0.02], giro: 2.1, incl: -0.25, esc: 1.02 },
+    { pos: [0.15, 1.72, -0.08], giro: 3.05, incl: -0.05, esc: 0.98 },
+    { pos: [-0.12, 1.8, 0.08], giro: 4.0, incl: -0.22, esc: 1.05 },
+    { pos: [0.08, 1.74, -0.1], giro: 5.0, incl: -0.12, esc: 0.95 },
+    { pos: [-0.02, 1.9, 0.0], giro: 5.9, incl: -0.32, esc: 0.9 },
+    { pos: [0.18, 1.6, 0.05], giro: 0.9, incl: 0.05, esc: 0.85 },
+    { pos: [-0.18, 1.58, -0.05], giro: 3.7, incl: 0.08, esc: 0.82 },
   ];
   // tubérculos radiando de la base, medio enterrados (asomando).
   const tuberculos = [
@@ -462,7 +494,7 @@ function MataYuca({ pos }) {
     { ang: 5.6, largo: 0.58, baja: 0.26 },
   ];
   return (
-    <group position={[pos[0], groundY, pos[2]]}>
+    <group position={[pos[0], groundY, pos[2]]} rotation={[0, giro, 0]} scale={esc}>
       {/* raíces tuberosas asomando en la base */}
       {tuberculos.map((tb, i) => (
         <group key={i} rotation={[0, tb.ang, 0]}>
@@ -585,6 +617,413 @@ function MataQuinua({ pos, esc = 1, colorHex, reducedMotion, semilla, granos }) 
   );
 }
 
+/* ── EL MAÍZ: la vara de la milpa. Caña alta con nudos, hojas-cinta que arquean,
+      dos mazorcas con capacho y la espiga (flor macho) dorada al tope. Cuando
+      lleva fríjol, la enredadera sube por la caña: eso es la asociación. ── */
+function HojaMaiz({ y, giro, largo, incl, seca = false }) {
+  // la hoja-cinta larga que sale del tallo, sube un poco y CAE arqueada (dos
+  // tramos: base recta + punta colgante), ancha para que lea "maíz".
+  return (
+    <group position={[0, y, 0]} rotation={[0, giro, 0]}>
+      <mesh position={[largo * 0.32, incl * 0.12, 0]} rotation={[0, 0, -incl * 0.4]} scale={[largo * 0.62, 0.02, 0.17]}>
+        <sphereGeometry args={[1, 9, 4]} />
+        <meshLambertMaterial color={seca ? P.maizHojaSeca : P.maizHoja} flatShading side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[largo * 0.82, -incl * 0.55, 0]} rotation={[0, 0, -incl - 0.55]} scale={[largo * 0.5, 0.018, 0.13]}>
+        <sphereGeometry args={[1, 9, 4]} />
+        <meshLambertMaterial color={seca ? P.maizHojaSeca : P.maizHoja} flatShading side={THREE.DoubleSide} />
+      </mesh>
+    </group>
+  );
+}
+
+/* La enredadera de fríjol que trepa por la caña de maíz (sin corte ni nódulos:
+   ese saber vive en la mata-hero; aquí se ve la ASOCIACIÓN viva). */
+function FrijolTrepa({ alto, esc = 1 }) {
+  const curva = useMemo(() => {
+    const pts = [];
+    const vueltas = 4.2, r0 = 0.13 * esc, N = 46;
+    for (let i = 0; i <= N; i++) {
+      const t = i / N;
+      const a = t * vueltas * Math.PI * 2;
+      const r = r0 * (1 + 0.14 * Math.sin(t * 6));
+      pts.push(new THREE.Vector3(Math.cos(a) * r, t * alto * 0.94, Math.sin(a) * r));
+    }
+    return new THREE.CatmullRomCurve3(pts);
+  }, [alto, esc]);
+  const hojas = useMemo(
+    () => [0.22, 0.4, 0.55, 0.7, 0.85].map((t, i) => {
+      const p = curva.getPoint(t);
+      return { pos: [p.x * 1.4, p.y, p.z * 1.4], giro: i * 1.8, esc: 0.82, claro: i % 2 === 0 };
+    }),
+    [curva],
+  );
+  const vainas = useMemo(
+    () => [0.5, 0.66, 0.8].map((t, i) => {
+      const p = curva.getPoint(t);
+      return { pos: [p.x * 1.55, p.y, p.z * 1.55], giro: i * 2.0, incl: 0.15 };
+    }),
+    [curva],
+  );
+  return (
+    <group>
+      <mesh>
+        <tubeGeometry args={[curva, 48, 0.024, 5, false]} />
+        <meshLambertMaterial color={P.frijolTallo} flatShading />
+      </mesh>
+      {hojas.map((h, i) => (
+        <HojaTrifoliada key={i} pos={h.pos} giro={h.giro} esc={h.esc} claro={h.claro} />
+      ))}
+      {vainas.map((v, i) => (
+        <Vaina key={i} pos={v.pos} giro={v.giro} incl={v.incl} />
+      ))}
+    </group>
+  );
+}
+
+function Maiz({ pos, esc = 1, conFrijol = false, reducedMotion, semilla = 1 }) {
+  const espiga = useRef(null);
+  const groundY = alturaCampo(pos[0], pos[2]);
+  const alto = 2.5 * esc;
+  const hojas = useMemo(() => {
+    const rng = crearRng(semilla);
+    const n = 9;
+    return Array.from({ length: n }, (_, i) => {
+      const t = 0.14 + (i / n) * 0.78;
+      return {
+        y: t * alto,
+        giro: i * 2.399 + rng() * 0.5,
+        largo: (0.98 - t * 0.34) * esc,
+        incl: 0.5 - t * 0.14,
+        seca: i === 0,
+      };
+    });
+  }, [alto, esc, semilla]);
+  const espigas = useMemo(
+    () => Array.from({ length: 9 }, (_, i) => {
+      const a = (i / 9) * Math.PI * 2 + (i % 2) * 0.35;
+      const spread = 0.35 + (i % 3) * 0.12;
+      return { x: Math.cos(a) * 0.045 * esc, z: Math.sin(a) * 0.045 * esc, rx: Math.cos(a) * spread, rz: Math.sin(a) * spread, largo: 0.5 + (i % 3) * 0.12 };
+    }),
+    [esc],
+  );
+  useFrame(({ clock }) => {
+    if (reducedMotion || !espiga.current) return;
+    espiga.current.rotation.z = Math.sin(clock.elapsedTime * 0.7 + semilla) * 0.05;
+  });
+  return (
+    <group position={[pos[0], groundY, pos[2]]}>
+      {/* la caña */}
+      <mesh position={[0, alto / 2, 0]}>
+        <cylinderGeometry args={[0.035 * esc, 0.08 * esc, alto, 7]} />
+        <meshLambertMaterial color={P.maizTallo} flatShading />
+      </mesh>
+      {[0.25, 0.5, 0.72].map((t, i) => (
+        <mesh key={i} position={[0, t * alto, 0]}>
+          <sphereGeometry args={[0.06 * esc, 7, 5]} />
+          <meshLambertMaterial color={P.maizNudo} flatShading />
+        </mesh>
+      ))}
+      {hojas.map((h, i) => (
+        <HojaMaiz key={i} y={h.y} giro={h.giro} largo={h.largo} incl={h.incl} seca={h.seca} />
+      ))}
+      {/* las mazorcas con capacho */}
+      {[[0.44, 1.0], [0.58, -1.9]].map((mz, i) => (
+        <group key={i} position={[Math.cos(mz[1]) * 0.1 * esc, mz[0] * alto, Math.sin(mz[1]) * 0.1 * esc]} rotation={[0.5, mz[1], 0.35]}>
+          <mesh scale={[0.06 * esc, 0.2 * esc, 0.06 * esc]}>
+            <sphereGeometry args={[1, 8, 7]} />
+            <meshLambertMaterial color={P.mazorca} flatShading />
+          </mesh>
+          <mesh position={[0, 0.03 * esc, 0]} scale={[0.085 * esc, 0.24 * esc, 0.085 * esc]}>
+            <coneGeometry args={[1, 1.6, 6, 1, true]} />
+            <meshLambertMaterial color={P.mazorcaHoja} flatShading side={THREE.DoubleSide} />
+          </mesh>
+        </group>
+      ))}
+      {/* la espiga (flor macho) dorada al tope: plumero de varias raspas */}
+      <group ref={espiga} position={[0, alto, 0]}>
+        {espigas.map((e, i) => (
+          <mesh key={i} position={[e.x, e.largo * 0.42 * esc, e.z]} rotation={[e.rx, 0, e.rz]}>
+            <cylinderGeometry args={[0.005, 0.014, e.largo * esc, 4]} />
+            <meshLambertMaterial color={P.maizEspiga} flatShading />
+          </mesh>
+        ))}
+      </group>
+      {conFrijol && <FrijolTrepa alto={alto} esc={esc} />}
+    </group>
+  );
+}
+
+/* ── LA CALABAZA (zapallo): la tercera hermana. Guías rastreras con hojas
+      acorazonadas grandes que cobijan el suelo, y un fruto naranja. ── */
+function Calabaza({ pos, esc = 1, semilla = 3 }) {
+  const groundY = alturaCampo(pos[0], pos[2]);
+  const hojas = useMemo(() => {
+    const rng = crearRng(semilla);
+    return Array.from({ length: 7 }, (_, i) => {
+      const a = (i / 7) * Math.PI * 2 + rng() * 0.6;
+      const r = (0.3 + rng() * 0.4) * esc;
+      return { x: Math.cos(a) * r, z: Math.sin(a) * r, giro: a, esc: (0.85 + rng() * 0.5) * esc, claro: i % 2 === 0, r };
+    });
+  }, [esc, semilla]);
+  return (
+    <group position={[pos[0], groundY, pos[2]]}>
+      {hojas.map((h, i) => (
+        <group key={i} position={[h.x, 0.05, h.z]} rotation={[0, h.giro, 0]}>
+          {/* la guía rastrera hacia el centro */}
+          <mesh position={[-h.x * 0.45, 0, -h.z * 0.45]} rotation={[0, Math.atan2(h.z, h.x), 1.4]} scale={[0.012, h.r * 0.55, 0.012]}>
+            <cylinderGeometry args={[1, 1, 1, 5]} />
+            <meshLambertMaterial color={P.calabazaGuia} flatShading />
+          </mesh>
+          {/* la hoja acorazonada, casi horizontal */}
+          <mesh rotation={[-1.35, 0, 0]} scale={[0.28 * h.esc, 0.02, 0.26 * h.esc]}>
+            <sphereGeometry args={[1, 7, 5]} />
+            <meshLambertMaterial color={h.claro ? P.calabazaHojaClara : P.calabazaHoja} flatShading side={THREE.DoubleSide} />
+          </mesh>
+        </group>
+      ))}
+      {/* el zapallo */}
+      <group position={[0.16 * esc, 0.17 * esc, 0.1 * esc]}>
+        <mesh scale={[0.25 * esc, 0.19 * esc, 0.25 * esc]}>
+          <sphereGeometry args={[1, 12, 9]} />
+          <meshLambertMaterial color={P.calabazaFruto} flatShading />
+        </mesh>
+        <mesh position={[0, 0.19 * esc, 0]} scale={[0.03, 0.06, 0.03]}>
+          <cylinderGeometry args={[1, 1.3, 1, 6]} />
+          <meshLambertMaterial color={P.mazorcaHoja} flatShading />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/* La enredadera helicoidal de un poste del tutorado (fríjol de mata trepando). */
+function VidPoste({ base, alto }) {
+  const curva = useMemo(() => {
+    const pts = [];
+    const N = 34, vueltas = 3.4, r = 0.13;
+    for (let i = 0; i <= N; i++) {
+      const t = i / N;
+      const a = t * vueltas * Math.PI * 2;
+      pts.push(new THREE.Vector3(base[0] + Math.cos(a) * r, base[1] + t * alto, base[2] + Math.sin(a) * r));
+    }
+    return new THREE.CatmullRomCurve3(pts);
+  }, [base, alto]);
+  return (
+    <mesh>
+      <tubeGeometry args={[curva, 36, 0.019, 5, false]} />
+      <meshLambertMaterial color={P.frijolTallo} flatShading />
+    </mesh>
+  );
+}
+
+/* ── EL TUTORADO (cañamazo): filas de varas de fríjol de la parcela. Postes
+      instanciados + cuerda superior + una enredadera por poste + follaje
+      instanciado (muchas hojitas en pocos draw calls). Esto es lo que mata el
+      vacío: una PARCELA sembrada, no matas sueltas. ── */
+function Tutorado({ origin = [0, 0, 0], filas = 2, porFila = 5, sep = 1.0, sepFila = 1.5, semilla = 7 }) {
+  const [ox, , oz] = origin;
+  const ALTO_P = 1.95;
+  const posteRef = useRef(null);
+  const follRef = useRef(null);
+  const vainaRef = useRef(null);
+
+  const postes = useMemo(() => {
+    const list = [];
+    for (let f = 0; f < filas; f++) {
+      for (let i = 0; i < porFila; i++) {
+        const wx = ox + (i - (porFila - 1) / 2) * sep;
+        const wz = oz + (f - (filas - 1) / 2) * sepFila;
+        list.push({ wx, wz, y: alturaCampo(wx, wz) });
+      }
+    }
+    return list;
+  }, [ox, oz, filas, porFila, sep, sepFila]);
+
+  const hojas = useMemo(() => {
+    const rng = crearRng(semilla + 100);
+    const out = [];
+    postes.forEach((p) => {
+      const nh = 9;
+      for (let k = 0; k < nh; k++) {
+        const t = 0.14 + (k / nh) * 0.82;
+        const a = t * 3.4 * Math.PI * 2 + rng() * 0.6;
+        const r = 0.15 + 0.05 * Math.sin(t * 7);
+        out.push({
+          x: p.wx + Math.cos(a) * r,
+          y: p.y + t * ALTO_P,
+          z: p.wz + Math.sin(a) * r,
+          giro: a,
+          esc: 0.7 + rng() * 0.5,
+          claro: k % 2 === 0,
+        });
+      }
+    });
+    return out;
+  }, [postes, semilla]);
+
+  const vainas = useMemo(() => {
+    const rng = crearRng(semilla + 200);
+    const out = [];
+    postes.forEach((p) => {
+      for (let k = 0; k < 3; k++) {
+        const t = 0.4 + rng() * 0.4;
+        const a = t * 3.4 * Math.PI * 2 + rng();
+        out.push({ x: p.wx + Math.cos(a) * 0.16, y: p.y + t * ALTO_P, z: p.wz + Math.sin(a) * 0.16, giro: a });
+      }
+    });
+    return out;
+  }, [postes, semilla]);
+
+  useEffect(() => {
+    const m = posteRef.current;
+    if (!m) return;
+    const d = new THREE.Object3D();
+    postes.forEach((p, i) => {
+      d.position.set(p.wx, p.y + ALTO_P / 2, p.wz);
+      d.rotation.set(0, 0, 0);
+      d.scale.set(1, 1, 1);
+      d.updateMatrix();
+      m.setMatrixAt(i, d.matrix);
+    });
+    m.instanceMatrix.needsUpdate = true;
+  }, [postes]);
+
+  useEffect(() => {
+    const m = follRef.current;
+    if (!m) return;
+    const d = new THREE.Object3D();
+    const c = new THREE.Color();
+    const base = new THREE.Color(P.frijolHoja);
+    const claro = new THREE.Color(P.frijolHojaClara);
+    hojas.forEach((h, i) => {
+      d.position.set(h.x, h.y, h.z);
+      d.rotation.set(-0.5, h.giro, 0.2);
+      d.scale.set(0.12 * h.esc, 0.03 * h.esc, 0.15 * h.esc);
+      d.updateMatrix();
+      m.setMatrixAt(i, d.matrix);
+      c.copy(h.claro ? claro : base);
+      m.setColorAt(i, c);
+    });
+    m.instanceMatrix.needsUpdate = true;
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  }, [hojas]);
+
+  useEffect(() => {
+    const m = vainaRef.current;
+    if (!m) return;
+    const d = new THREE.Object3D();
+    vainas.forEach((v, i) => {
+      d.position.set(v.x, v.y, v.z);
+      d.rotation.set(0.2, v.giro, 0.25);
+      d.scale.set(0.04, 0.14, 0.04);
+      d.updateMatrix();
+      m.setMatrixAt(i, d.matrix);
+    });
+    m.instanceMatrix.needsUpdate = true;
+  }, [vainas]);
+
+  return (
+    <group>
+      <instancedMesh ref={posteRef} args={[undefined, undefined, postes.length]} frustumCulled={false}>
+        <cylinderGeometry args={[0.028, 0.045, ALTO_P, 6]} />
+        <meshLambertMaterial color={P.estaca} flatShading />
+      </instancedMesh>
+      {/* cuerda superior que une cada fila (el cañamazo) */}
+      {Array.from({ length: filas }).map((_, f) => {
+        const wz = oz + (f - (filas - 1) / 2) * sepFila;
+        const y = alturaCampo(ox, wz) + ALTO_P * 0.86;
+        const len = (porFila - 1) * sep + 0.4;
+        return (
+          <mesh key={f} position={[ox, y, wz]} scale={[len, 0.012, 0.012]}>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshLambertMaterial color={P.cuerda} flatShading />
+          </mesh>
+        );
+      })}
+      {postes.map((p, i) => (
+        <VidPoste key={i} base={[p.wx, p.y, p.wz]} alto={ALTO_P} />
+      ))}
+      <instancedMesh ref={follRef} args={[undefined, undefined, hojas.length]} frustumCulled={false}>
+        <sphereGeometry args={[1, 6, 4]} />
+        <meshLambertMaterial flatShading />
+      </instancedMesh>
+      <instancedMesh ref={vainaRef} args={[undefined, undefined, vainas.length]} frustumCulled={false}>
+        <sphereGeometry args={[1, 6, 5]} />
+        <meshLambertMaterial color={P.frijolVaina} flatShading />
+      </instancedMesh>
+    </group>
+  );
+}
+
+/* Piedritas del lote instanciadas (1 draw call): el suelo real tiene piedra. */
+function Piedritas({ n }) {
+  const ref = useRef(null);
+  const sitios = useMemo(() => {
+    const rng = crearRng(53);
+    const list = [];
+    let intentos = 0;
+    while (list.length < n && intentos < n * 8) {
+      intentos += 1;
+      const wx = (rng() - 0.5) * (ANCHO - 4);
+      const wz = (rng() - 0.5) * (FONDO - 4);
+      list.push({ wx, wz, y: alturaCampo(wx, wz), esc: 0.4 + rng() * 0.9, giro: rng() * Math.PI, claro: rng() > 0.5 });
+    }
+    return list;
+  }, [n]);
+  useEffect(() => {
+    const m = ref.current;
+    if (!m) return;
+    const d = new THREE.Object3D();
+    const c = new THREE.Color();
+    const a = new THREE.Color(P.piedra);
+    const b = new THREE.Color(P.piedraClara);
+    sitios.forEach((s, i) => {
+      d.position.set(s.wx, s.y + 0.03 * s.esc, s.wz);
+      d.rotation.set(s.giro * 0.3, s.giro, s.giro * 0.2);
+      d.scale.set(0.11 * s.esc, 0.07 * s.esc, 0.13 * s.esc);
+      d.updateMatrix();
+      m.setMatrixAt(i, d.matrix);
+      c.copy(s.claro ? b : a);
+      m.setColorAt(i, c);
+    });
+    m.instanceMatrix.needsUpdate = true;
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  }, [sitios]);
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
+      <dodecahedronGeometry args={[1, 0]} />
+      <meshLambertMaterial flatShading />
+    </instancedMesh>
+  );
+}
+
+/* Un grupo de quinuas (no 3 sueltas): un manchón sembrado con alturas y colores
+   de panoja variados, alrededor de un centro. */
+function QuinuaGrupo({ centro, n = 7, reducedMotion, granos }) {
+  const matas = useMemo(() => {
+    const colores = [P.quinuaDorado, P.quinuaRojo, P.quinuaMorado];
+    const rng = crearRng(71);
+    return Array.from({ length: n }, (_, i) => {
+      const a = rng() * Math.PI * 2;
+      const r = 0.3 + rng() * 1.5;
+      return {
+        pos: [centro[0] + Math.cos(a) * r, 0, centro[2] + Math.sin(a) * r * 0.8],
+        esc: 0.8 + rng() * 0.7,
+        colorHex: colores[i % colores.length],
+        semilla: 5 + i * 6,
+      };
+    });
+  }, [centro, n]);
+  return (
+    <>
+      {matas.map((m, i) => (
+        <MataQuinua key={i} pos={m.pos} esc={m.esc} colorHex={m.colorHex} reducedMotion={reducedMotion} semilla={m.semilla} granos={granos} />
+      ))}
+    </>
+  );
+}
+
 /* La escena completa (grupo r3f interno; el default la monta en su Canvas). */
 function EscenaLeguminosas({ tier, reducedMotion, saber }) {
   const perfil = perfilDeTier(tier);
@@ -594,21 +1033,27 @@ function EscenaLeguminosas({ tier, reducedMotion, saber }) {
   );
   useEffect(() => () => geo.dispose(), [geo]);
 
-  const nCobertura = tier === 'alto' ? 90 : tier === 'medio' ? 55 : 24;
-  const granosPanoja = tier === 'alto' ? 60 : tier === 'medio' ? 40 : 22;
+  // La cobertura y las piedritas escalan con el tier; las MATAS del mundo (milpa,
+  // tutorado, quinua, yuca, la mata-hero) se siembran SIEMPRE — son el lote, no
+  // adorno: aunque el equipo caiga a frugal, la chagra no puede verse vacía.
+  const nCobertura = tier === 'alto' ? 170 : tier === 'medio' ? 110 : 60;
+  const nPiedras = tier === 'alto' ? 44 : tier === 'medio' ? 28 : 14;
+  const granosPanoja = tier === 'alto' ? 55 : tier === 'medio' ? 38 : 22;
 
   // Fauna del kit (billboards SVG), por rol ecológico. Recortada al presupuesto.
   const faunaItems = [
-    { tipo: 'mariposa', rol: 'polinizador', base: [0.6, 1.7, -2.4], size: 30, fase: 0.4, title: 'Mariposa polinizando las panojas' },
-    { tipo: 'colibri', rol: 'polinizador', base: [-2.4, 2.3, 3.9], size: 32, fase: 1.6, title: 'Colibrí en las flores del fríjol' },
-    { tipo: 'escarabajo', rol: 'descomponedor', base: [3.6, 0.2, 0.4], size: 26, fase: 2.4, title: 'Escarabajo cerrando el ciclo del abono' },
+    { tipo: 'mariposa', rol: 'polinizador', base: [0.5, 1.9, -0.3], size: 30, fase: 0.4, title: 'Mariposa polinizando la milpa' },
+    { tipo: 'colibri', rol: 'polinizador', base: [-2.4, 2.3, 3.6], size: 32, fase: 1.6, title: 'Colibrí en las flores del fríjol' },
+    { tipo: 'mariposa', rol: 'polinizador', base: [2.4, 1.7, -2.3], size: 26, fase: 2.2, title: 'Mariposa sobre las panojas de quinua' },
+    { tipo: 'escarabajo', rol: 'descomponedor', base: [3.3, 0.2, 1.1], size: 26, fase: 2.4, title: 'Escarabajo cerrando el ciclo del abono' },
+    { tipo: 'lombriz', rol: 'descomponedor', base: [-2.0, 0.05, 3.0], size: 24, fase: 0.9, title: 'Lombriz aireando el suelo bajo el fríjol' },
   ].slice(0, perfil.criaturas);
 
   /* `color`/`fog` se adjuntan a la ESCENA: hijos directos, nunca en <group>. */
   return (
     <>
       <color attach="background" args={[DORADA.fondo]} />
-      {perfil.fog && <fog attach="fog" args={[DORADA.niebla, DORADA.nieblaCerca + 4, DORADA.nieblaLejos]} />}
+      {perfil.fog && <fog attach="fog" args={[DORADA.niebla, DORADA.nieblaCerca + 6, DORADA.nieblaLejos + 6]} />}
       <LucesDoradas />
       <SolBajo />
 
@@ -617,13 +1062,34 @@ function EscenaLeguminosas({ tier, reducedMotion, saber }) {
       </mesh>
 
       <Cobertura n={nCobertura} />
+      <Piedritas n={nPiedras} />
 
-      {/* Las tres matas, a distinta altura/edad, NO en fila. */}
+      {/* ── LA MILPA (las tres hermanas): el corazón agroecológico andino. El
+           MAÍZ da la vara, el FRÍJOL trepa por él y le abona la tierra con
+           nitrógeno, la CALABAZA cobija el suelo. Un bloquecito, no una mata. ── */}
+      <Maiz pos={[0.5, 0, 0.1]} esc={1.2} conFrijol reducedMotion={reducedMotion} semilla={2} />
+      <Calabaza pos={[1.2, 0, 0.8]} esc={1.1} semilla={4} />
+      <Maiz pos={[1.7, 0, -0.7]} esc={1.02} conFrijol reducedMotion={reducedMotion} semilla={8} />
+      <Maiz pos={[-0.6, 0, -0.5]} esc={1.1} conFrijol reducedMotion={reducedMotion} semilla={13} />
+      <Maiz pos={[2.7, 0, 0.2]} esc={0.95} reducedMotion={reducedMotion} semilla={21} />
+      <Maiz pos={[-0.1, 0, -1.5]} esc={1.05} reducedMotion={reducedMotion} semilla={27} />
+      <Calabaza pos={[-1.0, 0, 0.7]} esc={0.95} semilla={33} />
+
+      {/* La PARCELA de fríjol tutorado (el cañamazo): dos filas de varas que
+          matan el vacío a la izquierda — la chagra sembrada de verdad. */}
+      <Tutorado origin={[-3.4, 0, -0.7]} filas={2} porFila={5} sep={1.0} sepFila={1.5} semilla={7} />
+
+      {/* La mata-HERO de fríjol con el CORTE del subsuelo y los nódulos rosados
+          de Rhizobium: la lección intacta, al frente para leerse bien. */}
       <MataFrijol pos={[-2.4, 0, 3.5]} reducedMotion={reducedMotion} saber={saber} />
-      <MataYuca pos={[3.6, 0, -0.6]} />
-      <MataQuinua pos={[0.2, 0, -2.9]} esc={1.35} colorHex={P.quinuaDorado} reducedMotion={reducedMotion} semilla={5} granos={granosPanoja} />
-      <MataQuinua pos={[2.0, 0, -2.0]} esc={1.0} colorHex={P.quinuaRojo} reducedMotion={reducedMotion} semilla={11} granos={granosPanoja} />
-      <MataQuinua pos={[-1.9, 0, -1.6]} esc={0.82} colorHex={P.quinuaMorado} reducedMotion={reducedMotion} semilla={17} granos={granosPanoja} />
+
+      {/* Yuca frondosa: dos matas (aguantan el suelo pobre), giradas distinto. */}
+      <MataYuca pos={[3.6, 0, -0.6]} esc={1.1} giro={0.4} />
+      <MataYuca pos={[4.4, 0, 1.8]} esc={0.92} giro={2.3} />
+
+      {/* La QUINUA en GRUPO (un manchón sembrado, no tres sueltas). */}
+      <QuinuaGrupo centro={[2.2, 0, -2.7]} n={7} reducedMotion={reducedMotion} granos={granosPanoja} />
+      <MataQuinua pos={[-1.9, 0, -1.7]} esc={1.0} colorHex={P.quinuaMorado} reducedMotion={reducedMotion} semilla={17} granos={granosPanoja} />
 
       {perfil.criaturas > 0 && <Fauna items={faunaItems} reducedMotion={reducedMotion} />}
 
@@ -656,12 +1122,13 @@ const CSS_LEGUM = `
 
 /* La copia didáctica: en calma, la invitación; con el saber encendido, los nódulos. */
 const COPY_CALMA =
-  'El fríjol, la yuca y la quinua: tres matas que le dan de comer a la familia y a la tierra. Toque el botón para ver, bajo el fríjol, los nódulos rosados que fijan el nitrógeno.';
+  'La milpa de las tres hermanas: el maíz da la vara, el fríjol trepa por él y le abona la tierra, y la calabaza cobija el suelo. Con la yuca y la quinua, el lote le da de comer a la familia y al suelo. Toque el botón para ver, bajo el fríjol, los nódulos rosados que fijan el nitrógeno.';
 const COPY_SABER =
-  'Esas pelotitas rosadas en la raíz del fríjol son fábricas de nitrógeno (bacterias Rhizobium): abono gratis del aire. Por eso conviene asociar el fríjol con el maíz — el maíz da la vara y el fríjol le abona la tierra.';
+  'Esas pelotitas rosadas en la raíz del fríjol son fábricas de nitrógeno (bacterias Rhizobium): abono gratis del aire. Por eso el fríjol trepa el maíz de la milpa — el maíz le presta la vara y el fríjol le abona la tierra. La calabaza al pie tapa el suelo y le cuida la humedad.';
 
 const CHIPS = [
-  { emoji: '🫘', txt: <>Fríjol: <b>fija nitrógeno gratis</b> (asócielo con maíz)</> },
+  { emoji: '🌽', txt: <>Milpa: <b>maíz + fríjol + calabaza</b> (las tres hermanas)</> },
+  { emoji: '🫘', txt: <>Fríjol: <b>fija nitrógeno gratis</b> del aire</> },
   { emoji: '🌿', txt: <>Yuca: <b>aguanta el suelo pobre</b></> },
   { emoji: '🌾', txt: <>Quinua: <b>proteína de la altura</b></> },
 ];
@@ -675,7 +1142,9 @@ const CHIPS = [
 export default function MundoLeguminosas3D() {
   const [listo, setListo] = useState(false);
   const [saber, setSaber] = useState(false);
-  const tier = useMemo(() => decidirTier(), []);
+  // `decidirTier()` devuelve { tier, motivo, reducedMotion }: se extrae el tier
+  // (string) para que `perfilDeTier` y las densidades por tier acierten.
+  const { tier } = useMemo(() => decidirTier(), []);
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&
@@ -696,7 +1165,7 @@ export default function MundoLeguminosas3D() {
         className={`legum-canvas${listo ? ' legum-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [0.5, 4.2, 12], fov: 44 }}
+        camera={{ position: [0.4, 4.4, 12.5], fov: 46 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
@@ -723,7 +1192,7 @@ export default function MundoLeguminosas3D() {
       <div className="legum-chrome">
         <h2 className="legum-titulo">
           Leguminosas y raíces andinas
-          <small>Fríjol que abona · yuca que aguanta · quinua que alimenta</small>
+          <small>La milpa · fríjol que abona · yuca que aguanta · quinua que alimenta</small>
         </h2>
         <div className="legum-pie">
           <div className="legum-chips">
