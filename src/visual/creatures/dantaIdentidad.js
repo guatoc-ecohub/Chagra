@@ -51,6 +51,7 @@ export const DANTA_PALETA = {
   oreja: '#2f2924',         // interior de la oreja redonda
   cachete: '#6b5d4e',       // chapetas pardas claras a los lados
   pezuna: '#2b2521',        // pezuñitas oscuras
+  cria: '#d6c8ab',          // las RAYAS/MOTAS pálidas de cría (los tapires nacen rayados)
   /* ── La jardinera del bosque (el verde semilla) ── */
   semilla: '#a8e05f',       // el verde-lima de su aura de poder (lo que germina)
   brote: '#d4f0a2',         // el brillo tierno de los brotes (chispas de vida)
@@ -62,6 +63,7 @@ export const DANTA_PROPORCION = {
   cabezaR: 5.2,
   orejaR: 1.8,             // orejas redondas de borde blanco, atentas
   trompaLargo: 4.2,        // la trompa corta que cae y tantea
+  colaR: 1.5,              // la colita-nudito de tapir (corta, casi un botón)
 };
 
 /*
