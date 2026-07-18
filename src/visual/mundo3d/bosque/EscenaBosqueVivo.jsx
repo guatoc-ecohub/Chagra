@@ -76,8 +76,8 @@ function presetBosque(franja) {
     sol: p.sol,
     rellenoInt: p.rellenoInt,
     solPos: p.solPos,
-    nieblaCerca: Math.max(5, p.nieblaCerca * 0.6),
-    nieblaLejos: 14 + p.nieblaLejos * 0.5,
+    nieblaCerca: Math.max(6, p.nieblaCerca * 0.72),
+    nieblaLejos: 26 + p.nieblaLejos * 0.7,
     estrellas: Number(p.estrellas) || 0,
   };
 }
@@ -196,11 +196,11 @@ function AtmosferaBosque({ franja, perfil, reducedMotion }) {
         castShadow={perfil.sombras}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-near={1}
-        shadow-camera-far={60}
-        shadow-camera-left={-15}
-        shadow-camera-right={15}
-        shadow-camera-top={15}
-        shadow-camera-bottom={-15}
+        shadow-camera-far={88}
+        shadow-camera-left={-20}
+        shadow-camera-right={20}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
       />
       {/* contraluz frío opuesto al sol: separa las copas de la niebla */}
       <directionalLight
@@ -388,11 +388,11 @@ function texturaRayo() {
 }
 
 const LAMINAS_RAYO = [
-  { ox: -2.6, oz: 1.2, w: 0.9, l: 11, giro: 0.3 },
-  { ox: -0.8, oz: -1.8, w: 1.4, l: 12.5, giro: 1.2 },
-  { ox: 1.4, oz: 0.6, w: 0.7, l: 10, giro: 2.1 },
-  { ox: 3.1, oz: -1.1, w: 1.1, l: 12, giro: 0.8 },
-  { ox: -4.4, oz: -0.4, w: 0.8, l: 10.5, giro: 1.7 },
+  { ox: -3.4, oz: 1.6, w: 1.3, l: 18, giro: 0.3 },
+  { ox: -1.0, oz: -2.4, w: 2.0, l: 21, giro: 1.2 },
+  { ox: 1.8, oz: 0.8, w: 1.0, l: 16, giro: 2.1 },
+  { ox: 4.0, oz: -1.4, w: 1.6, l: 20, giro: 0.8 },
+  { ox: -5.6, oz: -0.5, w: 1.1, l: 17, giro: 1.7 },
 ];
 
 const _UP = new THREE.Vector3(0, 1, 0);
@@ -468,10 +468,11 @@ function RayosDeSol({ franja, reducedMotion }) {
       deslizan a velocidades distintas y el bosque gana profundidad física.
       La franja pesa: más bruma al amanecer y de noche. */
 const CAPAS_BRUMA = [
-  { rad: 13.5, y: 2.3, w: 24, h: 5.5, op: 0.16, vel: 0.011, fase: 0 },
-  { rad: 17, y: 3.1, w: 32, h: 7, op: 0.14, vel: -0.008, fase: 2.2 },
-  { rad: 21.5, y: 4.2, w: 42, h: 9, op: 0.12, vel: 0.006, fase: 4.1 },
-  { rad: 26, y: 5.6, w: 54, h: 11, op: 0.1, vel: -0.004, fase: 1.3 },
+  { rad: 13.5, y: 2.6, w: 26, h: 6.5, op: 0.16, vel: 0.011, fase: 0 },
+  { rad: 18, y: 4.0, w: 36, h: 9, op: 0.15, vel: -0.008, fase: 2.2 },
+  { rad: 23, y: 6.0, w: 48, h: 12, op: 0.13, vel: 0.006, fase: 4.1 },
+  { rad: 29, y: 8.5, w: 62, h: 15, op: 0.12, vel: -0.004, fase: 1.3 },
+  { rad: 36, y: 12, w: 84, h: 20, op: 0.1, vel: 0.003, fase: 5.5 },
 ];
 const PESO_BRUMA = {
   amanecer: 1.4, manana: 1.0, mediodia: 0.65, tarde: 0.9, atardecer: 1.25, noche: 1.15,
@@ -564,16 +565,20 @@ function BrumaParallax({ franja, reducedMotion }) {
       guardián, el arroyo entrando por la derecha del cuadro). En un teléfono
       parado la cámara retrocede y sube apenas: el fov vertical alcanza y el
       Ent respira sin perder el queñual de los flancos. */
-const POSE_BOSQUE = { position: [8.0, 2.55, 11.6], fov: 42, mira: [0, 3.0, 0] };
+/* El guardián creció 1.4× (mount-ent scale): para conservar EXACTO el encuadre
+   héroe aprobado (leve contrapicado, el rostro tallado legible), el rig de
+   cámara se escala con él — misma proporción árbol/cuadro que el original, solo
+   que 1.4× más grande y con el bosque catedral abriéndose alrededor. */
+const POSE_BOSQUE = { position: [11.2, 3.6, 16.2], fov: 42, mira: [0, 4.2, 0] };
 
 /* Anclas de sombra de contacto que la escena le pasa a SueloRico: el claro del
    guardián (el Ent es el objeto mayor y necesita el AO ancho que lo planta). */
-const ANCLAS_SUELO = [{ x: 0, z: 0, radio: 1.7 }];
+const ANCLAS_SUELO = [{ x: 0, z: 0, radio: 2.7 }];
 
 function poseBosqueParaAspecto(aspect) {
   if (!aspect || aspect >= 0.9) return { ...POSE_BOSQUE, k: 1 };
   const t = Math.min(1, (0.9 - aspect) / 0.44);
-  const B = { position: [10.6, 4.4, 15.4], fov: 56, mira: [0, 2.7, 0] };
+  const B = { position: [14.8, 6.2, 21.6], fov: 56, mira: [0, 3.8, 0] };
   const lerp = (a, b) => a + (b - a) * t;
   const position = POSE_BOSQUE.position.map((v, i) => lerp(v, B.position[i]));
   const mira = POSE_BOSQUE.mira.map((v, i) => lerp(v, B.mira[i]));
@@ -600,8 +605,8 @@ function Diorama({ tier, reducedMotion, pose }) {
       <AtmosferaBosque franja={franja} perfil={perfil} reducedMotion={reducedMotion} />
       {fracEstrellas > 0 && perfil.estrellas > 0 && (
         <Stars
-          radius={44}
-          depth={22}
+          radius={60}
+          depth={26}
           count={Math.max(24, Math.round(perfil.estrellas * fracEstrellas))}
           factor={3}
           fade
@@ -649,13 +654,13 @@ function Diorama({ tier, reducedMotion, pose }) {
           de la escena); en 'bajo' SueloRico no dibuja sombras, así que el kit la
           planta acá para que el Ent no flote. */}
       {!perfil.sombrasContacto && (
-        <SombraContacto pos={[0, 0.04, 0]} radio={1.6} color="#20281c" opacidad={0.34} orden={2} />
+        <SombraContacto pos={[0, 0.04, 0]} radio={2.6} color="#20281c" opacidad={0.34} orden={2} />
       )}
 
-      {/* ══ MOUNT DEL ENT ══ El guardián vive AQUÍ (origen del claro). Otra
-          rama lo eleva de calibre: inyectar el Ent nuevo en este group sin
-          tocar el resto del escenario. */}
-      <group name="mount-ent">
+      {/* ══ MOUNT DEL ENT ══ El guardián vive AQUÍ (origen del claro). Crece con
+          la grandeza del bosque (scale) SIN tocar su geometría ni su rostro
+          refinado — el corazón acompaña la escala catedral, no la pierde. */}
+      <group name="mount-ent" scale={1.4}>
         <EntQuenua tier={tier} reducedMotion={reducedMotion} />
       </group>
 
@@ -665,10 +670,10 @@ function Diorama({ tier, reducedMotion, pose }) {
         target={pose.mira}
         enablePan={false}
         enableZoom
-        minDistance={6}
-        maxDistance={Math.max(20, Math.ceil(16 * pose.k) + 5)}
+        minDistance={7}
+        maxDistance={Math.max(30, Math.ceil(22 * pose.k) + 6)}
         minPolarAngle={0.5}
-        maxPolarAngle={1.42}
+        maxPolarAngle={1.5}
         enableDamping
         dampingFactor={0.08}
         autoRotate={!reducedMotion}
@@ -679,9 +684,9 @@ function Diorama({ tier, reducedMotion, pose }) {
       <CamaraDirector
         controls={controls}
         reposo={pose.position}
-        mirada={[0, 4.6, 0]}
-        duracion={2.6}
-        amplio={1.35}
+        mirada={[0, 6.4, 0]}
+        duracion={3.0}
+        amplio={1.6}
         respiro={0.045}
         activa={!reducedMotion && tier !== 'bajo'}
         unaVezClave="bosqueTakeA"

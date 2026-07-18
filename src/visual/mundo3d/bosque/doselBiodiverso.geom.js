@@ -328,7 +328,7 @@ export function geomGuadua({ q = 1 } = {}, seed = 2) {
   const partes = [];
   const nCulmos = Math.max(3, Math.round(6 * q));
   for (let c = 0; c < nCulmos; c++) {
-    const H = 3.6 + r() * 2.6;
+    const H = 4.8 + r() * 3.6;
     const giro = r() * Math.PI * 2;
     const rad = 0.15 + r() * 0.55; // separación en la macolla
     const off = [Math.cos(giro) * rad, 0, Math.sin(giro) * rad];
@@ -336,7 +336,7 @@ export function geomGuadua({ q = 1 } = {}, seed = 2) {
     const culmo = tuboOrganico(curva, {
       tubular: Math.max(9, Math.round(16 * q)),
       radial: Math.max(5, Math.round(6 * q)),
-      taper: taperLineal(0.075 + r() * 0.02, 0.03),
+      taper: taperLineal(0.088 + r() * 0.024, 0.032),
       arruga: 0.05,
       semilla: seed + c * 2,
     });
@@ -393,9 +393,9 @@ export function geomGuadua({ q = 1 } = {}, seed = 2) {
 export function geomNogal({ q = 1 } = {}, seed = 3) {
   const r = rng(seed);
   const partes = [];
-  const H = 4.2 + r() * 0.8;
+  const H = 5.8 + r() * 1.5;
   const { geo, curva } = troncoHorneado(
-    { H, r0: 0.16, r1: 0.06, inclina: 0.03, sinuoso: 0.05, giro: r() * 6, arruga: 0.1, raigon: 0.4, q, hastaLiquen: 0.5,
+    { H, r0: 0.2, r1: 0.075, inclina: 0.03, sinuoso: 0.05, giro: r() * 6, arruga: 0.1, raigon: 0.4, q, hastaLiquen: 0.5,
       corteza: { grieta: PB.nogalGrieta, cuerpo: PB.nogalTronco, cresta: PB.nogalCresta, escalaGrano: 3.6 } },
     seed + 1,
   );
@@ -442,9 +442,9 @@ export function geomNogal({ q = 1 } = {}, seed = 3) {
 export function geomCedro({ q = 1 } = {}, seed = 4) {
   const r = rng(seed);
   const partes = [];
-  const H = 3.6 + r() * 0.7;
+  const H = 5.0 + r() * 1.3;
   const { geo, curva } = troncoHorneado(
-    { H, r0: 0.2, r1: 0.08, inclina: 0.04, sinuoso: 0.06, giro: r() * 6, arruga: 0.16, raigon: 0.55, q, hastaLiquen: 0.6,
+    { H, r0: 0.25, r1: 0.1, inclina: 0.04, sinuoso: 0.06, giro: r() * 6, arruga: 0.16, raigon: 0.55, q, hastaLiquen: 0.6,
       corteza: { grieta: PB.cedroGrieta, cuerpo: PB.cedroTronco, cresta: PB.cedroCresta, escalaGrano: 4.6 } },
     seed + 1,
   );
@@ -688,13 +688,13 @@ export function geomQuiche({ q = 1 } = {}, seed = 10) {
 export function geomYarumo({ q = 1 } = {}, seed = 11) {
   const r = rng(seed);
   const partes = [];
-  const H = 4.4 + r() * 1.3;
+  const H = 6.2 + r() * 2.2;
   // Fuste pálido, recto y liso, con anillos oscuros (cicatrices de hoja).
   const curva = curvaTronco({ altura: H, inclina: 0.03, sinuoso: 0.04, giro: r() * 6 }, seed + 1);
   const fuste = tuboOrganico(curva, {
     tubular: Math.max(9, Math.round(16 * q)),
     radial: Math.max(6, Math.round(7 * q)),
-    taper: taperTronco(0.13, 0.05, 0.35),
+    taper: taperTronco(0.155, 0.06, 0.35),
     arruga: 0.05,
     semilla: seed * 3,
   });
@@ -767,9 +767,9 @@ export function geomYarumo({ q = 1 } = {}, seed = 11) {
 export function geomAliso({ q = 1 } = {}, seed = 12) {
   const r = rng(seed);
   const partes = [];
-  const H = 3.8 + r() * 1.0;
+  const H = 5.4 + r() * 1.6;
   const { geo, curva } = troncoHorneado(
-    { H, r0: 0.16, r1: 0.055, inclina: 0.03, sinuoso: 0.05, giro: r() * 6, arruga: 0.12, raigon: 0.4, q, hastaLiquen: 0.55, liquen: '#8f9a5e',
+    { H, r0: 0.2, r1: 0.07, inclina: 0.03, sinuoso: 0.05, giro: r() * 6, arruga: 0.12, raigon: 0.4, q, hastaLiquen: 0.55, liquen: '#8f9a5e',
       corteza: { grieta: PB.alisoGrieta, cuerpo: PB.alisoTronco, cresta: PB.alisoCresta, escalaGrano: 4.0 } },
     seed + 1,
   );
@@ -939,26 +939,30 @@ function sembrar(n, rMin, rMax, r, o = {}) {
 export function distribucionDosel(conteos, seed = 909) {
   const c = conteos;
   return {
-    // Emergentes: pared del fondo, altos, reparto parejo, velados por niebla.
-    // Anillos ANCHOS y solapados (10→27) para que el dosel se cierre denso y
-    // gane profundidad — el bosque se lee como muralla de árboles, no como fila.
-    guadua: sembrar(c.guadua, 10, 26, rng(seed + 1), { eMin: 0.95, eMax: 1.4, varia: 0.08, evitaFrente: true, evitaAgua: true }),
-    nogal: sembrar(c.nogal, 11, 26, rng(seed + 2), { eMin: 0.95, eMax: 1.25, varia: 0.07, evitaFrente: true, evitaAgua: true }),
-    cedro: sembrar(c.cedro, 12, 27, rng(seed + 3), { eMin: 0.95, eMax: 1.25, varia: 0.08, evitaFrente: true, evitaAgua: true }),
-    // Yarumo: emergente pionero, disperso y alto, entra hasta el anillo medio.
-    yarumo: sembrar(c.yarumo, 10, 25, rng(seed + 10), { eMin: 1.0, eMax: 1.35, varia: 0.06, evitaFrente: true, evitaAgua: true }),
+    // Emergentes: la MURALLA CATEDRAL del fondo. Anillos anchos empujados hacia
+    // afuera (12→31, sobre el mismo plano-terreno de 64) CON sesgo `haciaAfuera`
+    // (sqrt): el grueso se apila LEJOS y trepa la pared del anfiteatro, y la
+    // escala de instancia sube hasta ~2× (los más altos se salen del cuadro).
+    // Un bosque que RECEDE en profundidad y ABRUMA hacia arriba, no una fila.
+    guadua: sembrar(c.guadua, 12, 30, rng(seed + 1), { eMin: 1.1, eMax: 2.05, varia: 0.08, evitaFrente: true, evitaAgua: true, haciaAfuera: true }),
+    nogal: sembrar(c.nogal, 13, 30, rng(seed + 2), { eMin: 1.1, eMax: 1.85, varia: 0.07, evitaFrente: true, evitaAgua: true, haciaAfuera: true }),
+    cedro: sembrar(c.cedro, 14, 31, rng(seed + 3), { eMin: 1.1, eMax: 1.85, varia: 0.08, evitaFrente: true, evitaAgua: true, haciaAfuera: true }),
+    // Yarumo: emergente pionero, pálido y ALTÍSIMO, disperso hacia el fondo.
+    yarumo: sembrar(c.yarumo, 12, 30, rng(seed + 10), { eMin: 1.15, eMax: 2.1, varia: 0.06, evitaFrente: true, evitaAgua: true, haciaAfuera: true }),
     // Aliso: árbol de AGUA — se le deja pisar cerca del arroyo (sin evitaAgua).
-    aliso: sembrar(c.aliso, 8, 22, rng(seed + 11), { eMin: 0.95, eMax: 1.3, varia: 0.07, evitaFrente: true }),
+    aliso: sembrar(c.aliso, 11, 28, rng(seed + 11), { eMin: 1.1, eMax: 1.9, varia: 0.07, evitaFrente: true, haciaAfuera: true }),
     // Dosel florecido y de sombra: anillo medio, salpicado (color y textura).
-    guacimo: sembrar(c.guacimo, 8, 18, rng(seed + 12), { eMin: 0.9, eMax: 1.2, varia: 0.08, evitaAgua: true }),
-    cambulo: sembrar(c.cambulo, 8, 18, rng(seed + 4), { eMin: 0.9, eMax: 1.2, varia: 0.08, evitaAgua: true }),
-    gualanday: sembrar(c.gualanday, 8, 18, rng(seed + 5), { eMin: 0.9, eMax: 1.2, varia: 0.08, evitaAgua: true }),
-    sieteCueros: sembrar(c.sieteCueros, 6, 16, rng(seed + 6), { eMin: 0.85, eMax: 1.2, varia: 0.1, agrupa: true, evitaAgua: true }),
-    chachafruto: sembrar(c.chachafruto, 7, 17, rng(seed + 13), { eMin: 0.9, eMax: 1.2, varia: 0.09, evitaAgua: true }),
+    // Con `evitaFrente`: dejan LIBRE el corredor de cámara para que el rostro del
+    // Ent (el coloso central) nunca quede tapado por una copa de flor de enfrente.
+    guacimo: sembrar(c.guacimo, 9, 22, rng(seed + 12), { eMin: 0.95, eMax: 1.45, varia: 0.08, evitaAgua: true, evitaFrente: true }),
+    cambulo: sembrar(c.cambulo, 9, 22, rng(seed + 4), { eMin: 0.95, eMax: 1.45, varia: 0.08, evitaAgua: true, evitaFrente: true }),
+    gualanday: sembrar(c.gualanday, 9, 22, rng(seed + 5), { eMin: 0.95, eMax: 1.45, varia: 0.08, evitaAgua: true, evitaFrente: true }),
+    sieteCueros: sembrar(c.sieteCueros, 7, 19, rng(seed + 6), { eMin: 0.9, eMax: 1.35, varia: 0.1, agrupa: true, evitaAgua: true, evitaFrente: true }),
+    chachafruto: sembrar(c.chachafruto, 8, 20, rng(seed + 13), { eMin: 0.95, eMax: 1.4, varia: 0.09, evitaAgua: true, evitaFrente: true }),
     // Sotobosque: interior-medio, agrupado (manchones espesos).
-    helecho: sembrar(c.helecho, 4.5, 14, rng(seed + 7), { eMin: 0.8, eMax: 1.35, varia: 0.12, agrupa: true, evitaAgua: true }),
-    heliconia: sembrar(c.heliconia, 4, 13, rng(seed + 8), { eMin: 0.85, eMax: 1.3, varia: 0.12, agrupa: true, evitaAgua: true }),
+    helecho: sembrar(c.helecho, 4.5, 16, rng(seed + 7), { eMin: 0.85, eMax: 1.45, varia: 0.12, agrupa: true, evitaAgua: true }),
+    heliconia: sembrar(c.heliconia, 4, 15, rng(seed + 8), { eMin: 0.9, eMax: 1.4, varia: 0.12, agrupa: true, evitaAgua: true }),
     // Epífitas: rosetas cerca del claro, agrupadas al pie de todo.
-    quiche: sembrar(c.quiche, 3.4, 12, rng(seed + 9), { eMin: 0.8, eMax: 1.45, varia: 0.12, agrupa: true }),
+    quiche: sembrar(c.quiche, 3.4, 13, rng(seed + 9), { eMin: 0.85, eMax: 1.5, varia: 0.12, agrupa: true }),
   };
 }
