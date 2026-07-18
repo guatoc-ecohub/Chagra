@@ -24,7 +24,11 @@
      cierra en identidad).
    · [data-agt-mira='usted'] (la mirada): las pupilas siguen el puntero vía
      vars --agt-mx/--agt-my; la regla vive al FINAL del archivo para ganar el
-     empate de especificidad contra la actuación de mirada por estado. */
+     empate de especificidad contra la actuación de mirada por estado.
+
+   V3 — LA CARA VIVA (sección propia más abajo): ojos ámbar (iris + catchlight
+   que titila), párpados por estado (pensativa/atenta/alerta), la cejita del
+   pensar y la voz acoplada al visema ([data-agt-visema] en el root). */
 
 /* ═══ EL CUERPO (wrapper que carga abeja + señales de cara) ══════════════════
    Las señales pegadas a la cara (cejas, gota de sudor) viven DENTRO de
@@ -796,6 +800,107 @@
   78%  { transform: translate(-0.35px, 0.1px); }
 }
 
+/* ═══ LA CARA VIVA (V3) — ojos ámbar Miss-Minutes + párpados por estado ══════
+   Todo por CSS sobre las clases internas de los ojos (.rh-blink = grupo que
+   parpadea, con un <g> por ojo; .rh-mirada = pupila + catchlight de cada ojo):
+   viven DENTRO del cuerpo de la abeja, así la cara sigue cada squash, antic y
+   pose sin desprenderse jamás. Scoped a [data-agente='angelita'] — la abeja
+   del valle y los demás bichos del kit no cambian. */
+
+/* Ojos GRANDES: cada ojo crece alrededor de su propio centro (el contorno
+   engorda con él: más goma). El dardeo/parpadeo animan otros nodos — componen. */
+[data-agente='angelita'] .rh-blink > g {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(1.09);
+}
+/* IRIS ÁMBAR: un anillo del dorado del cuerpo (#ffb54f — abejaIdentidad)
+   alrededor de la pupila de tinta. Ojo de goma, ahora con sol adentro. */
+[data-agente='angelita'] .rh-mirada > circle:first-of-type {
+  stroke: #ffb54f;
+  stroke-width: 0.52;
+}
+/* La CHISPA del ojo (catchlight) TITILA de vez en cuando — período co-primo
+   con el parpadeo (5.6s) y el dardeo (7.9s): el brillo nunca cae en compás. */
+[data-agente='angelita'][data-agt-vivo='1'] .rh-mirada > circle:last-of-type {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: agt-catchlight 8.9s ease-in-out infinite;
+}
+@keyframes agt-catchlight {
+  0%, 76%, 86%, 100% { transform: scale(1); opacity: 1; }
+  80% { transform: scale(1.45); }           /* destello: la vida asoma */
+  83% { transform: scale(0.8); opacity: 0.85; }
+}
+
+/* PENSANDO — párpados a media asta (está repasando su memoria) con un
+   parpadeo lento; la base estática deja el entrecerrado digno con RM/quieta. */
+[data-agente='angelita'][data-agt-estado='pensando'] .rh-blink {
+  transform: scaleY(0.88);
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='pensando'] .rh-blink {
+  animation: agt-ojos-pensativos 5.7s linear infinite;
+}
+@keyframes agt-ojos-pensativos {
+  0%, 34%, 38%, 100% { transform: scaleY(0.88); }
+  36% { transform: scaleY(0.12); }  /* un parpadeo lento, ensimismado */
+}
+/* Y la cejita del pensar (dibujada en Angelita.jsx) da un TIRONCITO arriba en
+   cada golpecito de barbilla — mismo período 4.8s del bracito: "¿será?…". */
+.agt-ceja-piensa {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+[data-agt-vivo='1'] .agt-ceja-piensa {
+  animation: agt-ceja-piensa 4.8s ease-in-out infinite;
+}
+@keyframes agt-ceja-piensa {
+  0%, 38%, 66%, 100% { transform: translateY(0); }
+  45% { transform: translateY(-0.45px); }  /* tironcito con el "hmm" */
+  50% { transform: translateY(-0.1px); }
+  56% { transform: translateY(-0.5px); }   /* el segundo golpecito */
+  61% { transform: translateY(-0.15px); }
+}
+
+/* ESCUCHANDO — la atención parpadea MENOS (quien escucha de verdad casi no
+   pestañea): mismo ritmo propio de la instancia, ciclo más largo. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='escuchando'] .rh-blink {
+  animation-duration: calc(var(--agt-blink-dur, 5.6s) * 1.6);
+}
+
+/* PREOCUPADA — la alarma se ve en el OJO antes que en el gesto: bien abiertos,
+   pupila encogida y un blink-blink nervioso con ventanas de calma. */
+[data-agente='angelita'][data-agt-estado='preocupada'] .rh-blink {
+  transform: scaleY(1.07);
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='preocupada'] .rh-blink {
+  animation: agt-ojos-alerta 3.3s linear infinite;
+}
+@keyframes agt-ojos-alerta {
+  0%, 52%, 56%, 60%, 64%, 100% { transform: scaleY(1.07); }
+  54% { transform: scaleY(0.14); }  /* blink-blink nervioso… */
+  62% { transform: scaleY(0.12); }
+}
+[data-agente='angelita'][data-agt-estado='preocupada'] .rh-mirada > circle:first-of-type {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.82);  /* pupila chiquita: alerta */
+}
+
+/* RESPONDIENDO — conversar le da calor de vecina: chapetas encendidas. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='respondiendo'] .rh-rubor {
+  animation: none;
+  opacity: 0.88;
+}
+/* Y su voz FLUYE con la boquita: cuando el host manda visemas (data-agt-visema
+   en el root), las ondas de miel corren solo mientras la boca se mueve — en
+   silencio (V1) quedan en calma, a media luz. Host sin TTS: sin atributo,
+   las ondas fluyen como siempre. */
+[data-agente='angelita'][data-agt-visema='V1'] .agt-onda-out {
+  animation: none;
+  opacity: 0.14;
+}
+
 /* ═══ LIMPIEZA DE GESTO — los estados del agente PISAN los antics internos ═══
    Una abeja pensando/preocupada/encogida no da además vueltas de campana ni
    saltitos traviesos: el gesto lee limpio (mismo criterio de creatures.css con
@@ -809,7 +914,8 @@
 [data-agt-estado='no-se'] .rh-antic, [data-agt-estado='no-se'] .rh-travieso,
 [data-agt-estado='invita'] .rh-antic, [data-agt-estado='invita'] .rh-travieso { animation: none; }
 [data-agt-estado='preocupada'] .rh-boil,
-[data-agt-estado='no-se'] .rh-boil { animation: none; }
+[data-agt-estado='no-se'] .rh-boil,
+[data-agt-estado='pensando'] .rh-boil { animation: none; }
 
 /* ═══ LA MIRADA QUE LO RECONOCE ([data-agt-mira='usted']) ════════════════════
    Cuando su puntero/dedo anda cerca, Angelita LO MIRA: las pupilas siguen las
@@ -850,6 +956,11 @@
 [data-tier='bajo'] .agt-mota,
 [data-tier='bajo'][data-agente='angelita'][data-agt-vivo='1'] .rh-mirada { animation: none; }
 [data-agente='angelita'][data-tier='bajo'] .crt-wing { filter: none; }
+/* V3 en tier bajo: fuera lo continuo de la cara (titileo de catchlight,
+   tironcito de cejita). El PAINT queda: iris ámbar, ojos grandes, párpados
+   estáticos por estado — la expresión se lee igual, solo que quieta. */
+[data-tier='bajo'][data-agente='angelita'] .rh-mirada > circle:last-of-type,
+[data-tier='bajo'] .agt-ceja-piensa { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
   /* Fotograma digno: TODAS las señales del agente visibles pero quietas. Las
@@ -857,13 +968,17 @@
      que el estado se lea aún sin movimiento. */
   .agt-cuerpo, .agt-burbuja, .agt-piensa-punto, .agt-recuerdo,
   .agt-onda-in, .agt-onda-out, .agt-chispa, .agt-sudor, .agt-alerta,
-  .agt-nose-signo, .agt-poi, .agt-venga-onda,
+  .agt-nose-signo, .agt-poi, .agt-venga-onda, .agt-ceja-piensa,
   .agt-halo-alta, .agt-halo-media, .agt-halo-baja, .agt-duda-punto,
   .agt-vuelo, .agt-mota,
   [data-agente='angelita'] .crt-brazo-l,
   [data-agente='angelita'] .crt-brazo-r,
   [data-agente='angelita'] .rh-blink,
-  [data-agente='angelita'] .rh-mirada { animation: none !important; }
+  [data-agente='angelita'] .rh-mirada,
+  [data-agente='angelita'] .rh-mirada > circle:last-of-type { animation: none !important; }
+  /* La cara V3 quieta conserva su PAINT y sus párpados de estado (transforms
+     estáticos): iris ámbar, ojos grandes, entrecerrado pensativo, ojos de
+     alerta — la expresión se lee sin un solo fotograma de movimiento. */
   .agt-onda-in, .agt-onda-out, .agt-venga-onda { opacity: 0.45; }
   .agt-chispa { opacity: 0.7; transform: scale(1); }
   .agt-poi { opacity: 0.7; transform: scale(1); }
