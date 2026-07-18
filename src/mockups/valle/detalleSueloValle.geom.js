@@ -19,9 +19,9 @@ import { fusionar, pintarPorVertice } from '../../visual/mundo3d/terreno/sueloRi
 
 /* ── Presupuestos por tier (instancias, no draw calls) ─────────────────── */
 export const PRESUPUESTO = {
-  bajo: { detalle: 400, surcos: 60 },
-  medio: { detalle: 2000, surcos: 200 },
-  alto: { detalle: 8000, surcos: 500 },
+  bajo: { detalle: 300, surcos: 60 },
+  medio: { detalle: 1100, surcos: 200 },
+  alto: { detalle: 3800, surcos: 500 },
 };
 /* Reparto de la capa 1: el pasto manda, las flores y piedras acentúan. */
 const FRACCION = { matojo: 0.72, flor: 0.14, piedra: 0.14 };
