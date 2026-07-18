@@ -49,7 +49,18 @@ async function embedTexts(texts) {
         const res = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: EMBED_MODEL, prompt: text }),
+          // Default CPU (num_gpu:0): en la M6000 de 12GB el batch OOMea cuando
+          // granite (7GB, keep_alive 24h) recarga a mitad del embed (verificado
+          // 2026-07-18). En CPU arctic (1.2GB) NO pelea VRAM y no hay que parar
+          // el sidecar. Mas lento por vector, aceptable para un regen one-off.
+          // CHAGRA_EMBED_GPU=1 fuerza GPU (mas rapido; requiere granite descargado).
+          body: JSON.stringify({
+            model: EMBED_MODEL,
+            prompt: text,
+            ...(process.env.CHAGRA_EMBED_GPU === '1'
+              ? {}
+              : { options: { num_gpu: 0 } }),
+          }),
         });
         if (!res.ok) throw new Error(`Ollama ${res.status}: ${await res.text().catch(() => res.statusText)}`);
         const data = await res.json();
@@ -86,6 +97,27 @@ function extractPassageText(doc) {
     });
   }
   if (doc.leccion_agroecologica) parts.push(doc.leccion_agroecologica);
+  // Clima / altitud / piso termico (RUNPATH 2026-07-15 #9): antes NO se embebian,
+  // asi que la capa SEMANTICA nunca recuperaba DONDE crece una mata (complementa
+  // el fix BM25 de flattenDoc, #00). Se construyen frases legibles para que nomic
+  // capte "clima frio / altura alta", no numeros sueltos.
+  if (Array.isArray(doc.thermal_zones) && doc.thermal_zones.length) {
+    parts.push(`Piso termico: ${doc.thermal_zones.join(', ')}.`);
+  }
+  const req = doc.requirements;
+  if (req && typeof req === 'object') {
+    const alt = req.altitud_msnm;
+    if (alt && typeof alt === 'object') {
+      const lo = alt.optimo_min ?? alt.min_absoluto;
+      const hi = alt.optimo_max ?? alt.max_absoluto;
+      if (lo != null && hi != null) parts.push(`Altitud optima: ${lo} a ${hi} msnm.`);
+    }
+    const temp = req.temperatura_c;
+    if (temp && typeof temp === 'object' && temp.optimo_min != null && temp.optimo_max != null) {
+      parts.push(`Temperatura optima: ${temp.optimo_min} a ${temp.optimo_max} grados C.`);
+    }
+    if (typeof req.agua === 'string' && req.agua) parts.push(`Requerimiento de agua: ${req.agua}.`);
+  }
   return parts.join(' ').trim();
 }
 
@@ -127,7 +159,10 @@ async function main() {
   const vectors = await embedTexts(texts);
 
   const output = {};
-  const quantize = process.argv.includes('--quantize');
+  // int8 por DEFAULT: el reader (ragRetriever) espera {q:'int8',s,v}; floats
+  // crudos rompen el retrieve y pesan 6x (10MB vs 1.6MB). --no-quantize solo para
+  // debug. (Antes el default eran floats crudos: footgun real, 2026-07-18.)
+  const quantize = !process.argv.includes('--no-quantize');
 
   if (quantize) {
     // int8 quantization: cada vector 768d float32 → Int8Array + escala
