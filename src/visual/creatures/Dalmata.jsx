@@ -43,18 +43,22 @@ function Mancha({ cx, cy, r = 1.2, fill, opacity = 0.96 }) {
   return <ellipse cx={cx} cy={cy} rx={r} ry={r * 0.94} fill={fill} opacity={opacity} />;
 }
 
-/* MANCHAS del cuerpo: GRANDES, redondas, LLENAS y bien SEPARADAS (nunca se
-   tocan), sin centro. Cubren ~30-40% del tronco para que se lea "dálmata" a
-   distancia (la firma inequívoca). Distribución dispersa por todo el cuerpo. */
+/* MANCHAS del cuerpo: redondas, LLENAS y bien SEPARADAS (nunca se tocan), sin
+   centro. Cubren ~30-35% del tronco para que se lea "dálmata" a distancia (la
+   firma inequívoca). Van CLIPEADAS a la elipse del tronco: las de la orilla se
+   RECORTAN contra el contorno (el patrón ENVUELVE el volumen, como el pelaje
+   real — nunca rompe la silueta → nada de ruido en el borde de tinta). */
 const MANCHAS = [
-  { cx: -4.6, cy: -1.2, r: 1.9 },
-  { cx: 4.4, cy: -1.8, r: 1.7 },
-  { cx: 5.6, cy: 3.2, r: 1.8 },
-  { cx: -5.4, cy: 4.4, r: 1.7 },
-  { cx: -1.4, cy: 7.6, r: 1.6 },
-  { cx: 3.0, cy: 8.0, r: 1.5 },
-  { cx: 0.4, cy: 1.6, r: 1.5 },
-  { cx: -0.2, cy: -3.8, r: 1.2 },
+  { cx: -6.8, cy: 0.2, r: 1.55 },  // orilla izquierda (se recorta: envuelve)
+  { cx: -3.4, cy: -3.2, r: 1.2 },
+  { cx: -5.6, cy: 5.0, r: 1.5 },
+  { cx: -1.6, cy: 8.6, r: 1.35 },  // baja al vientre
+  { cx: 1.2, cy: 2.2, r: 1.45 },
+  { cx: 4.9, cy: -2.2, r: 1.35 },
+  { cx: 7.0, cy: 2.6, r: 1.6 },    // orilla derecha (se recorta: envuelve)
+  { cx: 3.6, cy: 7.6, r: 1.4 },
+  { cx: -1.8, cy: -0.4, r: 0.95 },
+  { cx: 5.2, cy: 5.4, r: 0.85 },
 ];
 
 export function Dalmata({
@@ -131,6 +135,8 @@ export function Dalmata({
   const glow = `crt-glow-${uid}`;
   const blur = `crt-blur-${uid}`;
   const boil = `crt-boil-${uid}`;
+  const pelaje = `crt-pelaje-${uid}`;
+  const clipTronco = `crt-clip-${uid}`;
   const vivo = animated;
   const auraOp = Math.max(0.12, Math.min(0.36, 0.14 + 0.22 * (energia ?? 1)));
   const auraR = 8.4 + 1.5 * (energia ?? 1);
@@ -163,6 +169,20 @@ export function Dalmata({
   const defs = (
     <defs>
       <CreatureFilters glow={glow} blur={blur} />
+      {/* PELAJE CON VOLUMEN — gradiente radial del blanco (luz dorsal arriba →
+          blanco medio → marfil en penumbra al borde ventral): el mismo def
+          viste tronco y cabeza (objectBoundingBox: cada uno recibe su luz).
+          Sin esto el blanco es un fill PLANO — el origen del look blobby. */}
+      <radialGradient id={pelaje} cx="42%" cy="30%" r="85%">
+        <stop offset="0%" stopColor={P.cuerpoLuz} />
+        <stop offset="58%" stopColor={P.cuerpo} />
+        <stop offset="100%" stopColor={P.cuerpoSombra} />
+      </radialGradient>
+      {/* Clip del tronco: las manchas se RECORTAN contra la silueta (el patrón
+          envuelve el volumen — jamás pisa el contorno de tinta). */}
+      <clipPath id={clipTronco}>
+        <ellipse cx="0" cy="2.7" rx={PR.troncoRx} ry={PR.troncoRy} />
+      </clipPath>
       {lineBoil && <LineBoilFilter id={boil} animated={vivo} />}
     </defs>
   );
@@ -177,121 +197,176 @@ export function Dalmata({
   // (la felicidad de perro por defecto). El visema pisa la lengua (no se puede
   // articular con la lengua afuera).
   const boca = visema
-    ? <BocaVisema cx={0} cy={-3.6} w={3.0} prof={1.1} visema={visema} />
+    ? <BocaVisema cx={0} cy={-3.7} w={3.0} prof={1.1} visema={visema} />
     : (
       <g>
-        <Sonrisa cx={0} cy={-3.5} w={3.0} prof={1.1} />
-        {/* lengüita rosada asomando (jadeo feliz — grupo .dalmata-lengua) */}
+        <Sonrisa cx={0} cy={-3.6} w={3.2} prof={1.15} />
+        {/* lengüita rosada asomando (jadeo feliz — grupo .dalmata-lengua):
+            lóbulo redondeado CON pliegue central (volumen, no triángulo). */}
         <g className={vivo ? 'dalmata-lengua' : undefined}
           style={{ transformBox: 'fill-box', transformOrigin: 'center top' }} aria-hidden="true">
-          <path d="M-0.85,-3.2 Q0,-1.4 0.85,-3.2 Z" fill={P.lengua} stroke={RH_INK} strokeWidth="0.3" />
+          {/* cuelga apenas LADEADA (la asimetría con encanto de la casa —
+              vara Angelita: nada de simetría muerta) */}
+          <path d="M-0.95,-3.3 C-1.15,-1.9 -0.7,-1.3 -0.1,-1.32 C0.55,-1.36 1.05,-2.0 0.85,-3.3 Z"
+            fill={P.lengua} stroke={RH_INK} strokeWidth="0.32" />
+          <path d="M-0.08,-3.1 L-0.12,-1.8" stroke={P.lenguaHondo} strokeWidth="0.28" strokeLinecap="round" />
         </g>
       </g>
     );
 
-  // ── CUERPO rubber-hose (atrás→adelante): aura, cola látigo moteada, patas
-  //    traseras LARGAS, tronco esbelto blanco, MANCHAS (la firma), collar rojo,
-  //    patas delanteras LARGAS, cabeza (orejas caídas moteadas + hocico LARGO +
-  //    ojos alerta/cachetes/boca + trufa). `.crt-body` squashea (boil dálmata:
-  //    brincón y elástico — perro joven).
+  // ── CUERPO rubber-hose (atrás→adelante): sombra de suelo (peso), aura, cola
+  //    con MASA que cae en "S", patas traseras LARGAS, tronco esbelto con
+  //    GRADIENTE de pelaje (volumen), MANCHAS clipeadas (la firma envuelve),
+  //    definición muscular, collar rojo, patas delanteras, cabeza estructurada
+  //    (orejas-lóbulo moteadas + hocico LARGO + cejas amables + ojos ámbar con
+  //    alma). `.crt-body` squashea (boil dálmata: brincón y elástico).
   const body = (
     <g className={`crt-body${vivo ? ' rh-boil' : ''}`} filter={`url(#${glow})`}>
+      {/* SOMBRA DE SUELO — la mancha blanda bajo las patas que le da PESO al
+          perro (un animal con masa, no un sticker). Ancla las patas largas. */}
+      <ellipse cx="0" cy="13.8" rx="8.2" ry="1.45"
+        fill={P.sombraSuelo} filter={`url(#${blur})`} aria-hidden="true" />
       {/* aura viva (presencia cálida) */}
       <circle cx="0" cy="2" r={auraR} fill={P.cuerpo} opacity={auraOp} filter={`url(#${blur})`} />
 
-      {/* COLA LARGA en "S" suave que CAE y fluye (curva, no enroscada — la
-          anti-cola del beagle, que va erguida). Blanca moteada, al lado
-          derecho. Pivota desde su base en la grupa (sway relajado idle, wag
-          amplio en menea). */}
+      {/* COLA LARGA en "S" que CAE con MASA (la anti-cola del beagle, que va
+          erguida): tubo con TAPER (grueso en la base, fino a la punta — dos
+          trazos superpuestos, como la cola del jaguar) + contorno de tinta.
+          Blanca moteada, al lado derecho. Pivota desde su base en la grupa
+          (sway relajado idle, wag amplio en menea). */}
       <g className={vivo ? 'dalmata-cola' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'left top' }}>
-        <path d="M6.4,3.8 C10.8,4.4 13.0,7.4 11.8,10.6 C11.2,12.2 12.6,13.2 13.9,12.4"
-          fill="none" stroke={P.cuerpo} strokeWidth="2.2" strokeLinecap="round" />
-        <path d="M6.4,3.8 C10.8,4.4 13.0,7.4 11.8,10.6 C11.2,12.2 12.6,13.2 13.9,12.4"
-          fill="none" stroke={RH_INK} strokeWidth="0.65" strokeLinecap="round" opacity="0.55" />
+        <path d="M6.6,2.0 C10.8,1.2 13.0,4.0 12.3,7.4 C11.9,9.8 12.7,11.6 14.1,11.2"
+          fill="none" stroke={P.cuerpo} strokeWidth="2.9" strokeLinecap="round" />
+        {/* la base más gruesa (el taper que le da masa donde nace) */}
+        <path d="M6.6,2.0 C9.2,1.5 10.9,2.3 11.9,4.3"
+          fill="none" stroke={P.cuerpo} strokeWidth="3.7" strokeLinecap="round" />
+        {/* contorno de tinta encima (la línea que manda del rubber-hose) */}
+        <path d="M6.6,2.0 C10.8,1.2 13.0,4.0 12.3,7.4 C11.9,9.8 12.7,11.6 14.1,11.2"
+          fill="none" stroke={RH_INK} strokeWidth="0.7" strokeLinecap="round" opacity="0.55" />
         {/* manchas de la cola (la firma llega hasta la punta) */}
-        <Mancha cx={10.6} cy={6.6} r={0.9} fill={P.mancha} />
-        <Mancha cx={12.4} cy={10.4} r={0.75} fill={P.mancha} />
+        <Mancha cx={10.6} cy={2.9} r={0.8} fill={P.mancha} />
+        <Mancha cx={12.4} cy={7.3} r={0.65} fill={P.mancha} />
+        <Mancha cx={13.3} cy={10.5} r={0.5} fill={P.mancha} />
       </g>
 
-      {/* patas traseras LARGAS y FINAS (esbeltas, con pie blanco). Se mecen suave. */}
-      <Miembro d="M-5.0,7.0 C-6.4,9.6 -6.2,11.8 -5.0,13.2" ancho={2.4} punta={[-5.0, PR.pataLarga]} puntaR={1.8} pie sway={vivo} delay={-0.7} glove={P.vientre} />
-      <Miembro d="M5.0,7.0 C6.4,9.6 6.2,11.8 5.0,13.2" ancho={2.4} punta={[5.0, PR.pataLarga]} puntaR={1.8} pie sway={vivo} delay={-1.0} glove={P.vientre} />
+      {/* patas traseras LARGAS y finas pero con SUSTANCIA (no alambres), pie
+          blanco anclado a la sombra de suelo. Se mecen suave. */}
+      <Miembro d="M-5.2,6.8 C-6.6,9.2 -6.6,11.4 -5.6,13.0" ancho={2.7} punta={[-5.6, PR.pataLarga]} puntaR={1.95} pie sway={vivo} delay={-0.7} glove={P.vientre} />
+      <Miembro d="M5.2,6.8 C6.6,9.2 6.6,11.4 5.6,13.0" ancho={2.7} punta={[5.6, PR.pataLarga]} puntaR={1.95} pie sway={vivo} delay={-1.0} glove={P.vientre} />
 
       {/* tronco BLANCO esbelto, más ALTO que ancho (atlético, casi cuadrado —
-          la anti-silueta del beagle chato) */}
-      <ellipse cx="0" cy="2.6" rx={PR.troncoRx} ry={PR.troncoRy}
-        fill={P.cuerpo} stroke={RH_INK} strokeWidth="1.4"
+          la anti-silueta del beagle chato). El fill es el GRADIENTE de pelaje:
+          luz dorsal → marfil ventral (volumen real, no blanco plano). */}
+      <ellipse cx="0" cy="2.7" rx={PR.troncoRx} ry={PR.troncoRy}
+        fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="1.4"
         style={{ filter: `drop-shadow(0 0 5px ${P.cuerpoGlow})` }} />
-      {/* pecho aún más claro (el brillo del blanco) */}
-      <path d="M0,-4.6 C3.4,-3.8 4.4,0.8 3.4,5.2 C2.0,7.8 -2.0,7.8 -3.4,5.2 C-4.4,0.8 -3.4,-3.8 0,-4.6 Z"
-        fill={P.vientre} opacity="0.85" />
+      {/* pecho aún más claro (el brillo del blanco sobre el gradiente) */}
+      <path d="M0,-4.4 C3.6,-3.4 4.6,1.4 3.5,5.8 C2.0,8.4 -2.0,8.4 -3.5,5.8 C-4.6,1.4 -3.6,-3.4 0,-4.4 Z"
+        fill={P.vientre} opacity="0.75" />
 
-      {/* MANCHAS del cuerpo (negras, redondas, SEPARADAS — LA FIRMA). */}
-      <g aria-hidden="true">
+      {/* MANCHAS del cuerpo (negras, redondas, SEPARADAS — LA FIRMA),
+          CLIPEADAS al tronco: las de la orilla se recortan contra la silueta
+          (el patrón envuelve el volumen, nunca pisa el contorno de tinta). */}
+      <g aria-hidden="true" clipPath={`url(#${clipTronco})`}>
         {MANCHAS.map((m, i) => (
           <Mancha key={i} cx={m.cx} cy={m.cy} r={m.r} fill={P.mancha} />
         ))}
       </g>
 
-      {/* COLLAR ROJO de perro de finca (con tachuelita dorada al lado). Va
-          antes de la cabeza: el hocico largo cae encima. */}
+      {/* DEFINICIÓN MUSCULAR sutil (el atleta se siente): dos trazos de anca
+          sobre los muslos y el surco del pectoral. Tinta a baja opacidad —
+          sugiere, no delinea. */}
+      <g aria-hidden="true" fill="none" stroke={RH_INK} strokeWidth="0.5" opacity="0.18" strokeLinecap="round">
+        <path d="M-7.0,4.2 C-6.4,6.6 -5.1,8.2 -3.5,8.9" />
+        <path d="M7.0,4.2 C6.4,6.6 5.1,8.2 3.5,8.9" />
+        <path d="M-1.5,-3.3 C-0.5,-2.6 0.5,-2.6 1.5,-3.3" />
+      </g>
+
+      {/* COLLAR ROJO de perro de finca (tachuela + plaquita dorada al lado).
+          Va antes de la cabeza: el hocico largo cae encima. */}
       <g aria-hidden="true">
-        <path d="M-4.9,-5.8 C-2.4,-4.3 2.4,-4.3 4.9,-5.8 L4.6,-4.1 C2.2,-2.8 -2.2,-2.8 -4.6,-4.1 Z"
+        <path d="M-4.9,-5.7 C-2.4,-4.2 2.4,-4.2 4.9,-5.7 L4.5,-3.9 C2.2,-2.6 -2.2,-2.6 -4.5,-3.9 Z"
           fill={P.collar} stroke={RH_INK} strokeWidth="0.55" strokeLinejoin="round" />
-        <circle cx="3.1" cy="-3.9" r="0.62" fill={P.placa} stroke={RH_INK} strokeWidth="0.35" />
+        <circle cx="-2.7" cy="-4.15" r="0.3" fill={P.placa} stroke={RH_INK} strokeWidth="0.25" />
+        <circle cx="3.1" cy="-3.6" r="0.68" fill={P.placa} stroke={RH_INK} strokeWidth="0.35" />
       </g>
 
       {/* patas delanteras LARGAS manguera, pivote en el HOMBRO para que
           celebra/señala las alcen desde el hombro. */}
       <Miembro clase="crt-brazo-l" origen="right top"
-        d="M-5.8,-1.0 C-8.8,1.0 -9.7,5.2 -9.0,9.4" ancho={2.3} punta={[-9.0, 9.8]} puntaR={1.8} pie sway={vivo} delay={-0.15} glove={P.vientre} />
+        d="M-5.9,-0.8 C-8.6,1.2 -9.5,5.4 -8.9,9.6" ancho={2.5} punta={[-8.9, 10.0]} puntaR={1.95} pie sway={vivo} delay={-0.15} glove={P.vientre} />
       <Miembro clase="crt-brazo-r" origen="left top"
-        d="M5.8,-1.0 C8.8,1.0 9.7,5.2 9.0,9.4" ancho={2.3} punta={[9.0, 9.8]} puntaR={1.8} pie sway={vivo} delay={-0.45} glove={P.vientre} />
+        d="M5.9,-0.8 C8.6,1.2 9.5,5.4 8.9,9.6" ancho={2.5} punta={[8.9, 10.0]} puntaR={1.95} pie sway={vivo} delay={-0.45} glove={P.vientre} />
 
-      {/* CABEZA (grupo propio .dalmata-cabeza para el head-tilt de `ladea`). */}
+      {/* CABEZA (grupo propio .dalmata-cabeza para el head-tilt de `ladea`).
+          Cráneo apenas más ancho que alto (perro fino, no carita-círculo),
+          vestido con el MISMO gradiente de pelaje (volumen). */}
       <g className="dalmata-cabeza" style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}>
-        {/* OREJAS CAÍDAS moteadas (cuelgan a los lados; se alzan apenas al
-            ladear). Grupo propio .dalmata-orejas. */}
-        <g className="dalmata-orejas" style={{ transformBox: 'fill-box', transformOrigin: 'center top' }}>
-          <g transform="rotate(-22 -5 -13)">
-            <ellipse cx="-5.0" cy="-11.6" rx={PR.orejaRx} ry={PR.orejaRy} fill={P.oreja} stroke={RH_INK} strokeWidth="1.15" />
-            {/* orejas MOTEADAS: la mancha grande cubre casi el lóbulo (la firma
-                llega hasta las orejas) */}
-            <Mancha cx={-5.1} cy={-11.8} r={1.35} fill={P.mancha} opacity={0.9} />
-            <Mancha cx={-4.6} cy={-9.0} r={0.7} fill={P.mancha} opacity={0.85} />
-          </g>
-          <g transform="rotate(22 5 -13)">
-            <ellipse cx="5.0" cy="-11.6" rx={PR.orejaRx} ry={PR.orejaRy} fill={P.oreja} stroke={RH_INK} strokeWidth="1.15" />
-            <Mancha cx={5.1} cy={-11.8} r={1.35} fill={P.mancha} opacity={0.9} />
-            <Mancha cx={4.6} cy={-9.0} r={0.7} fill={P.mancha} opacity={0.85} />
-          </g>
-        </g>
-        <circle cx="0" cy="-10.2" r={PR.cabezaR} fill={P.cuerpo} stroke={RH_INK} strokeWidth="1.3" />
-        {/* manchitas de la cabeza (pequeñas, a los lados — nunca tapan el ojo) */}
+        <ellipse cx="0" cy="-10.2" rx={PR.cabezaRx} ry={PR.cabezaRy}
+          fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="1.35" />
+        {/* manchitas de la cabeza (pequeñas, asimétricas — el encanto del
+            parche propio; nunca tapan el ojo) */}
         <g aria-hidden="true">
-          <Mancha cx={-3.9} cy={-13.4} r={0.7} fill={P.mancha} />
-          <Mancha cx={4.1} cy={-12.8} r={0.6} fill={P.mancha} />
+          <Mancha cx={3.4} cy={-13.3} r={0.95} fill={P.mancha} />
+          <Mancha cx={-2.0} cy={-14.0} r={0.6} fill={P.mancha} />
         </g>
         {/* HOCICO LARGO claro (la seña atlética de la raza: el morro baja BIEN
-            por debajo de la cara redonda — nada de carita chata). Cuelga hasta
-            y≈-1.7 (la cabeza termina en -4.9): eso es lo que lee "hocico largo". */}
-        <path d="M-2.5,-8.4 C-3.0,-5.0 -2.0,-2.0 0,-1.7 C2.0,-2.0 3.0,-5.0 2.5,-8.4 C1.25,-7.2 -1.25,-7.2 -2.5,-8.4 Z"
-          fill={P.hocico} opacity="0.95" />
+            por debajo de la cara — nada de carita chata). Cuelga hasta y≈-2.3
+            (la cabeza termina en -5.0): eso es lo que lee "hocico largo". */}
+        <path d="M-2.7,-8.7 C-3.3,-5.3 -2.4,-2.6 0,-2.3 C2.4,-2.6 3.3,-5.3 2.7,-8.7 C1.35,-7.6 -1.35,-7.6 -2.7,-8.7 Z"
+          fill={P.hocico} opacity="0.96" />
+        {/* CEJAS AMABLES (arcos suaves — la nobleza del perro viejo y bueno;
+            lo contrario de la ceja fiera del jaguar). La izquierda va apenas
+            MÁS ALTA (la carita expresiva asimétrica — vara Angelita). */}
+        <g aria-hidden="true" fill="none" stroke={RH_INK} strokeWidth="0.8" strokeLinecap="round" opacity="0.75">
+          <path d="M-3.7,-13.7 Q-2.5,-14.4 -1.3,-13.9" />
+          <path d="M3.7,-13.5 Q2.5,-14.1 1.3,-13.7" />
+        </g>
         {/* chapetas (rubor amable) */}
-        <Cachetes puntos={[{ cx: -4.2, cy: -7.6, r: 1.1 }, { cx: 4.2, cy: -7.6, r: 1.1 }]} vivo={vivo} />
+        <Cachetes puntos={[{ cx: -4.3, cy: -7.9, r: 1.05 }, { cx: 4.3, cy: -7.9, r: 1.05 }]} vivo={vivo} />
         {boca}
-        {/* trufa negra grande sobre el hocico largo */}
-        <path d="M-1.3,-5.4 L1.3,-5.4 L0,-4.1 Z" fill={P.nariz} />
-        {/* OJOS GRANDES, brillantes y amables (café). */}
+        {/* puntos de VIBRISAS en el morro (realismo de perro sin perder la goma) */}
+        <g aria-hidden="true" fill={P.mancha} opacity="0.4">
+          <circle cx="-1.8" cy="-5.8" r="0.18" /><circle cx="-1.3" cy="-5.3" r="0.15" />
+          <circle cx="1.8" cy="-5.8" r="0.18" /><circle cx="1.3" cy="-5.3" r="0.15" />
+        </g>
+        {/* TRUFA negra grande MODELADA (redondeada, no triángulo duro) con su
+            brillito húmedo (la nariz sana del perro querido) + filtrum */}
+        <path d="M-1.35,-6.15 C-1.35,-6.8 1.35,-6.8 1.35,-6.15 C1.35,-5.25 0.6,-4.65 0,-4.65 C-0.6,-4.65 -1.35,-5.25 -1.35,-6.15 Z"
+          fill={P.nariz} />
+        <circle cx="-0.45" cy="-6.1" r="0.3" fill="#fffdf7" opacity="0.65" aria-hidden="true" />
+        <path d="M0,-4.65 L0,-3.95" stroke={RH_INK} strokeWidth="0.32" strokeLinecap="round" opacity="0.6" aria-hidden="true" />
+        {/* OJOS GRANDES ámbar-café, vivos y amables (catchlight del kit +
+            iris que enmarca la pupila — el alma en el ojo, nunca vacío). */}
+        {/* mirada de REOJO curiosa (vara Angelita: la pupila descentrada es lo
+            que da el alma — mirar al frente fijo se lee muerto) */}
         <OjosRubber
-          ojos={[{ cx: -2.5, cy: -11.2, r: 1.85 }, { cx: 2.5, cy: -11.2, r: 1.85 }]}
-          mirar={[0, 0.12]}
+          ojos={[{ cx: -2.3, cy: -11.2, r: 1.85 }, { cx: 2.3, cy: -11.2, r: 1.85 }]}
+          mirar={[0.22, 0.2]}
           parpadea={vivo}
         />
-        {/* iris café que enmarca la pupila (mirada alerta, no fiera) */}
-        <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.55" opacity="0.75">
-          <circle cx="-2.5" cy="-11.2" r="1.42" />
-          <circle cx="2.5" cy="-11.2" r="1.42" />
+        <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.6" opacity="0.85">
+          <circle cx="-2.3" cy="-11.2" r="1.44" />
+          <circle cx="2.3" cy="-11.2" r="1.44" />
+        </g>
+        {/* OREJAS CAÍDAS moteadas — LÓBULOS reales (path de gota, no elipse
+            genérica) que nacen arriba del cráneo y cuelgan ENMARCANDO la cara
+            sin tocar los ojos. Se alzan apenas al ladear (.dalmata-orejas).
+            La derecha es la izquierda espejada (scale -1). */}
+        <g className="dalmata-orejas" style={{ transformBox: 'fill-box', transformOrigin: 'center top' }}>
+          {/* cada oreja cuelga con SU caída (asimetría viva — vara Angelita) */}
+          {[false, true].map((espejo) => (
+            <g key={espejo ? 'd' : 'i'}
+              transform={espejo ? 'scale(-1 1) rotate(3 -5.5 -13.5)' : 'rotate(-2 -5.5 -13.5)'}>
+              <path d="M-3.7,-14.1 C-6.2,-13.9 -7.9,-11.6 -7.7,-8.6 C-7.5,-6.3 -6.3,-5.0 -5.1,-5.7 C-4.3,-6.2 -4.4,-8.4 -4.5,-10.3 C-4.6,-11.9 -4.3,-13.0 -3.7,-14.1 Z"
+                fill={P.oreja} stroke={RH_INK} strokeWidth="1.15" strokeLinejoin="round" />
+              {/* penumbra del lóbulo (volumen de la oreja que cuelga) */}
+              <ellipse cx="-5.7" cy="-7.2" rx="1.0" ry="1.45" fill={P.cuerpoSombra} opacity="0.4" aria-hidden="true" />
+              {/* orejas MOTEADAS: la firma llega hasta las orejas */}
+              <Mancha cx={-6.3} cy={-10.2} r={1.15} fill={P.mancha} opacity={0.9} />
+              <Mancha cx={-5.8} cy={-6.9} r={0.55} fill={P.mancha} opacity={0.85} />
+            </g>
+          ))}
         </g>
       </g>
 
@@ -300,7 +375,7 @@ export function Dalmata({
       {ropa && (
         <AccesoriosClima
           estado={ropa}
-          tronco={{ cx: 0, cy: 2.6, rx: PR.troncoRx, ry: PR.troncoRy }}
+          tronco={{ cx: 0, cy: 2.7, rx: PR.troncoRx, ry: PR.troncoRy }}
           cabeza={{ cx: 0, cy: -10.2, r: PR.cabezaR }}
           animated={vivo}
         />
