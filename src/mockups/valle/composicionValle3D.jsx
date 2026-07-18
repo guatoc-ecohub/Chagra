@@ -11,11 +11,13 @@
  *                        puerta iluminada invita a tocar y lleva a la
  *                        ventana-puerta de los mundos (el host decide a
  *                        dónde). La entrada PRINCIPAL son los portales.
- *   · VentanasVivas    — los 6 portales PRINCIPALES como PAISAJES: un arco
- *                        de vegetación que enmarca una VIÑETA 3D en
- *                        miniatura del mundo de destino (el potrero con sus
- *                        animalitos, la milpa, el puesto del mercado…).
- *                        CERO discos-espejo (fix del operador 2026-07-16).
+ *   · VentanasVivas    — los 6 portales PRINCIPALES como PAISAJES: la
+ *                        VIÑETA 3D en miniatura del mundo de destino (el
+ *                        potrero con sus animalitos, la milpa, el puesto del
+ *                        mercado…) sobre un UMBRAL DE LUZ a ras de suelo.
+ *                        CERO discos-espejo (fix del operador 2026-07-16) y
+ *                        CERO aros de follaje que tapen la entrada (fix del
+ *                        operador 2026-07-18: la entrada se dice con luz).
  *   · PorticosSecundarios — los pórticos de madera SOLO para los lugares
  *                        secundarios de menos uso (eras, huerta, vivero…).
  *   · VistaParamoEnt   — el acceso al páramo: el Ent-queñua MAGNÍFICO parado
@@ -227,18 +229,19 @@ export function CasaCampesina({ alturaDe, perfil, nocturno = false, reducedMotio
    NOTORIOS e inmersivos — y son PAISAJES, no espejos (fix del operador
    2026-07-16: CERO discos translúcidos).
 
-   Cada ventana es un ARCO DE VEGETACIÓN (un anillo vivo brotado de la
-   tierra, con hojas y flores del tinte del mundo) que enmarca una VIÑETA
-   3D en miniatura del mundo de destino: el potrero con su vaca y su cerca,
-   la milpa de tres hermanas, el puesto del mercado con su toldo… Se ve A
-   QUÉ se entra. Se para al borde del patio mirando hacia la casa (de donde
-   llega el sendero) y tocarla ENTRA, igual que el lugar.
+   REDISEÑO 2026-07-18 (fix del operador): los AROS verticales de follaje
+   que envolvían cada viñeta TAPABAN la entrada — bloqueaban la vista del
+   potrero, la milpa, el puesto… Se retiraron. Ahora cada portal es su
+   VIÑETA 3D protagonista (el mundo de destino en miniatura, más grande)
+   sobre un UMBRAL DE LUZ: un halo del tinte del mundo a ras de suelo que
+   respira como la puerta de la casa, y dos faroles bajos de vara
+   flanqueando el paso. El ojo sabe "aquí se entra" por la LUZ, no por un
+   aro que estorba. Tocar el umbral ENTRA, igual que el lugar.
 
    Técnica Android-barata (tier-safe): viñetas low-poly horneadas a mano —
    primitivas + materiales Lambert COMPARTIDOS a nivel de módulo (6 viñetas
-   no pagan 6 shaders), cero texturas, cero render-targets, cero alocación
-   por frame. Presupuesto comparable al arco que ya existía. */
-const MAT_ARCO_VIVO = new THREE.MeshLambertMaterial({ color: '#4f7d3c' });
+   no pagan 6 shaders), cero texturas, cero render-targets, cero pointLights
+   por portal (emisivo + discos meshBasic), cero alocación por frame. */
 
 /* La paleta compartida de las viñetas: UN material por color en todo el
    frente de portales. */
@@ -539,29 +542,24 @@ function sitiosVentanas(mundos) {
   }).filter(Boolean);
 }
 
-/* Las hojas que visten el anillo: puntos sobre la circunferencia (en el
-   plano local x/y del arco), con jitter determinista. */
-const HOJAS_ARCO = Array.from({ length: 10 }, (_, i) => {
-  const a = (i / 10) * Math.PI * 2 + 0.3;
-  const j = Math.sin(i * 12.9898) * 0.5;
-  return { a, r: 0.92 + j * 0.08, s: 0.1 + Math.abs(j) * 0.06, giro: j * 2.4 };
-});
-
 function VentanaViva({ sitio, alturaDe, nocturno, reducedMotion, rico = true, onEntrar }) {
   const y = alturaDe(sitio.x, sitio.z);
-  const brilloRef = useRef(null);
-  // Las flores del arco RESPIRAN (~0.3 Hz, con fase por portal para que el
-  // frente no pulse al unísono): vivo, no intermitente.
+  const haloRef = useRef(null);
+  // El umbral RESPIRA (~0.3 Hz, con fase por portal para que el frente no
+  // pulse al unísono): vivo, no intermitente.
   const fase = useMemo(() => sitio.x * 2.1 + sitio.z * 1.3, [sitio]);
+  const [fuerte] = sitio.tinte;
+  // Los materiales emisivos de los dos faroles del portal, por REF (mismo
+  // patrón que el brillo del arco viejo): el pulso los escribe imperativo.
+  const faroles = useRef([]);
   useFrame((state) => {
     if (reducedMotion) return;
-    const p = (Math.sin(state.clock.elapsedTime * 1.9 + fase) + 1) / 2;
-    if (brilloRef.current) brilloRef.current.emissiveIntensity = 0.5 + p * 0.5;
+    const p = (Math.sin(state.clock.elapsedTime * 1.7 + fase) + 1) / 2;
+    for (const f of faroles.current) {
+      if (f) f.emissiveIntensity = (nocturno ? 0.95 : 0.6) + p * 0.6;
+    }
+    if (haloRef.current) haloRef.current.opacity = (nocturno ? 0.32 : 0.3) + p * 0.18;
   });
-  const [fuerte] = sitio.tinte;
-  // En gama media/baja el arco viste menos hojas; la viñeta SIEMPRE va (ES
-  // el portal: sin ella se vuelve un anillo mudo).
-  const hojas = rico ? HOJAS_ARCO : HOJAS_ARCO.slice(0, 6);
   const Vineta = VINETAS[sitio.mundo.id] || null;
   return (
     <group
@@ -578,53 +576,61 @@ function VentanaViva({ sitio, alturaDe, nocturno, reducedMotion, rico = true, on
       onPointerOver={onEntrar ? alApuntar : undefined}
       onPointerOut={onEntrar ? alSoltar : undefined}
     >
-      {/* el ANILLO VIVO: la enredadera que hace de marco, parada en la tierra */}
-      <mesh position={[0, 1.12, 0]} material={MAT_ARCO_VIVO} castShadow>
-        <torusGeometry args={[0.95, 0.085, 7, 26]} />
+      {/* EL HALO DE ENTRADA a ras de suelo: el anillo de luz del tinte del
+          mundo que respira — "aquí se entra" dicho con luz, sin tapar nada
+          (mismo lenguaje que el charco de la puerta de la casa y el faro). */}
+      <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[1.02, 1.34, 28]} />
+        <meshBasicMaterial
+          ref={haloRef}
+          color={fuerte}
+          transparent
+          opacity={nocturno ? 0.36 : 0.32}
+          depthWrite={false}
+          side={2}
+        />
       </mesh>
-      {/* las hojas que lo visten (mismo material: 0 draw calls extra de shader) */}
-      {hojas.map((h, i) => (
-        <mesh
-          key={i}
-          material={MAT_ARCO_VIVO}
-          position={[Math.cos(h.a) * h.r, 1.12 + Math.sin(h.a) * h.r, 0.03]}
-          rotation={[0, 0, h.giro]}
-          scale={[h.s * 1.7, h.s, h.s * 0.5]}
-        >
-          <sphereGeometry args={[1, 6, 5]} />
-        </mesh>
-      ))}
-      {/* cuatro flores del tinte del mundo coronando el arco (la seña; de
-          noche brillan más fuerte — la práctica que orienta) */}
-      {[0.6, 1.25, 1.9, 2.55].map((a, i) => (
-        <mesh
-          key={i}
-          position={[Math.cos(a) * 0.98, 1.12 + Math.sin(a) * 0.98, 0.08]}
-        >
-          <sphereGeometry args={[0.065, 6, 5]} />
-          <meshStandardMaterial
-            ref={i === 1 ? brilloRef : undefined}
+      {/* el charco tenue dentro del anillo (solo tier rico: un disco más) */}
+      {rico && (
+        <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[1.0, 22]} />
+          <meshBasicMaterial
             color={fuerte}
-            emissive={fuerte}
-            emissiveIntensity={nocturno ? 1.0 : 0.7}
-            flatShading
+            transparent
+            opacity={nocturno ? 0.12 : 0.07}
+            depthWrite={false}
           />
         </mesh>
+      )}
+      {/* los DOS FAROLES DE VARA que flanquean el paso: bajitos y a los
+          lados — señalan la entrada sin bloquear la vista de la viñeta */}
+      {[-1.18, 1.18].map((dx, i) => (
+        <group key={i} position={[dx, 0, 0.3]}>
+          <mesh position={[0, 0.27, 0]} material={VIN.madera} castShadow>
+            <cylinderGeometry args={[0.028, 0.04, 0.54, 5]} />
+          </mesh>
+          <mesh position={[0, 0.6, 0]}>
+            <sphereGeometry args={[0.1, 8, 7]} />
+            <meshStandardMaterial
+              ref={(m) => {
+                faroles.current[i] = m;
+              }}
+              color={fuerte}
+              emissive={fuerte}
+              emissiveIntensity={nocturno ? 1.15 : 0.65}
+              flatShading
+            />
+          </mesh>
+        </group>
       ))}
-      {/* LA VIÑETA: el mundo de destino en miniatura, parado DENTRO del arco
-          — se ve a qué se entra. Un paso detrás del plano del anillo para
-          que el marco la abrace (el arco mira hacia la casa). */}
+      {/* LA VIÑETA: el mundo de destino en miniatura — ahora PROTAGONISTA
+          (sin aro que la tape) y más grande: la jerarquía de los 6 portales
+          principales se lee por tamaño y por luz. */}
       {Vineta && (
-        <group position={[0, 0.02, -0.18]}>
+        <group position={[0, 0.02, -0.12]} scale={1.18}>
           <Vineta />
         </group>
       )}
-      {/* los dos raigones donde el anillo agarra la tierra */}
-      {[-0.82, 0.82].map((dx, i) => (
-        <mesh key={i} position={[dx, 0.14, 0]} material={MAT_ARCO_VIVO}>
-          <coneGeometry args={[0.16, 0.5, 5]} />
-        </mesh>
-      ))}
     </group>
   );
 }
