@@ -106,6 +106,9 @@ export function Beagle({
   const glow = `crt-glow-${uid}`;
   const blur = `crt-blur-${uid}`;
   const boil = `crt-boil-${uid}`;
+  const pelajeBlanco = `crt-pelb-${uid}`;
+  const pelajeCanela = `crt-pelc-${uid}`;
+  const clipTronco = `crt-clip-${uid}`;
   const vivo = animated;
   const auraOp = Math.max(0.13, Math.min(0.38, 0.15 + 0.23 * (energia ?? 1)));
   const auraR = 8.6 + 1.5 * (energia ?? 1);
@@ -137,6 +140,25 @@ export function Beagle({
   const defs = (
     <defs>
       <CreatureFilters glow={glow} blur={blur} />
+      {/* PELAJE CON VOLUMEN — dos gradientes radiales (luz dorsal → sombra
+          ventral): el BLANCO viste el tronco, el CANELA viste la cabeza. Sin
+          esto los planos de color quedan PLANOS — el origen del look blobby. */}
+      <radialGradient id={pelajeBlanco} cx="42%" cy="30%" r="85%">
+        <stop offset="0%" stopColor={P.cuerpoLuz} />
+        <stop offset="58%" stopColor={P.cuerpo} />
+        <stop offset="100%" stopColor={P.cuerpoSombra} />
+      </radialGradient>
+      <radialGradient id={pelajeCanela} cx="42%" cy="30%" r="85%">
+        <stop offset="0%" stopColor={P.canelaLuz} />
+        <stop offset="55%" stopColor={P.canela} />
+        <stop offset="100%" stopColor={P.canelaHondo} />
+      </radialGradient>
+      {/* Clip del tronco: silla, ribete y fuego de hombros se RECORTAN contra
+          la silueta (el tricolor envuelve el volumen — jamás pisa el contorno
+          de tinta ni queda como lentes flotantes). */}
+      <clipPath id={clipTronco}>
+        <ellipse cx="0" cy="4.4" rx={PR.troncoRx} ry={PR.troncoRy} />
+      </clipPath>
       {lineBoil && <LineBoilFilter id={boil} animated={vivo} />}
     </defs>
   );
@@ -159,125 +181,166 @@ export function Beagle({
     ? <BocaVisema cx={0} cy={-2.4} w={3.4} prof={1.1} visema={visema} />
     : <Sonrisa cx={0} cy={-2.3} w={3.4} prof={1.2} />;
 
-  // ── CUERPO rubber-hose (atrás→adelante): aura, cola-BANDERA erguida, patas
-  //    traseras CORTAS, tronco blanco chato con SILLA negra ribeteada de canela
-  //    (el tricolor), paticas delanteras CORTAS, cabeza canela (orejotas caídas
-  //    + LISTA blanca + hocico ancho + trufa grande + ojos grandes/cachetes/
-  //    boca). `.crt-body` squashea (boil beagle: blandito y bonachón).
+  // ── CUERPO rubber-hose (atrás→adelante): sombra de suelo (peso), aura,
+  //    cola-BANDERA con taper y punta blanca, patas traseras CORTAS, tronco
+  //    blanco chato con GRADIENTE (volumen) y SILLA negra + ribete canela
+  //    CLIPEADOS a la silueta (tricolor limpio, no lentes flotantes), paticas
+  //    delanteras CORTAS, cabeza canela con volumen (orejotas-LÓBULO
+  //    larguísimas + LISTA blanca + hocico ancho + trufa grande + ojos dulces).
+  //    `.crt-body` squashea (boil beagle: blandito y bonachón).
   const body = (
     <g className={`crt-body${vivo ? ' rh-boil' : ''}`} filter={`url(#${glow})`}>
+      {/* SOMBRA DE SUELO — la mancha blanda bajo las paticas que le da PESO al
+          sabueso (un animal con masa, no un sticker). */}
+      <ellipse cx="0" cy="13.2" rx="9.0" ry="1.5"
+        fill={P.sombraSuelo} filter={`url(#${blur})`} aria-hidden="true" />
       {/* aura viva (presencia cálida canela) */}
       <circle cx="0" cy="3" r={auraR} fill={P.canela} opacity={auraOp} filter={`url(#${blur})`} />
 
       {/* COLA ERGUIDA con PUNTA BLANCA — la "bandera" del sabueso (SUBE, no
-          cae: lo contrario de la cola-látigo del dálmata). Wag de bandera en
-          idle; pivota desde su base en la grupa. */}
+          cae: lo contrario de la cola-látigo del dálmata). Tubo con TAPER
+          (base canela gruesa → tramo negro del manto → banderín blanco) +
+          contorno de tinta: masa real, no un alambre. Wag de bandera en idle;
+          pivota desde su base en la grupa. */}
       <g className={vivo ? 'beagle-cola' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'left bottom' }}>
-        <path d={`M7.8,1.6 C9.8,-1.2 10.6,-4.8 10.0,${PR.colaAlto + 0.6}`}
-          fill="none" stroke={P.manto} strokeWidth="2.0" strokeLinecap="round" />
-        <path d={`M7.8,1.6 C9.8,-1.2 10.6,-4.8 10.0,${PR.colaAlto + 0.6}`}
-          fill="none" stroke={RH_INK} strokeWidth="0.6" strokeLinecap="round" opacity="0.5" />
-        {/* LA PUNTA BLANCA (la bandera que se ve entre el monte) */}
-        <circle cx="10.0" cy={PR.colaAlto} r="1.45" fill={P.colaPunta} stroke={RH_INK} strokeWidth="0.7" />
+        <path d="M8.0,2.4 C9.6,-0.4 10.5,-4.2 10.1,-7.8"
+          fill="none" stroke={P.canela} strokeWidth="2.3" strokeLinecap="round" />
+        {/* la base más gruesa (el taper donde la cola nace de la grupa) */}
+        <path d="M8.0,2.4 C8.8,0.9 9.4,-0.6 9.8,-2.2"
+          fill="none" stroke={P.canela} strokeWidth="3.0" strokeLinecap="round" />
+        {/* el tramo NEGRO del manto (el tricolor sube por la cola) */}
+        <path d="M9.9,-3.0 C10.3,-4.8 10.4,-6.4 10.2,-7.6"
+          fill="none" stroke={P.manto} strokeWidth="2.3" strokeLinecap="round" />
+        {/* contorno de tinta encima (la línea que manda del rubber-hose) */}
+        <path d="M8.0,2.4 C9.6,-0.4 10.5,-4.2 10.1,-7.8"
+          fill="none" stroke={RH_INK} strokeWidth="0.65" strokeLinecap="round" opacity="0.5" />
+        {/* LA PUNTA BLANCA (el banderín que se ve entre el monte) */}
+        <ellipse cx="10.15" cy={PR.colaAlto + 0.3} rx="1.2" ry="1.6"
+          transform={`rotate(-7 10.15 ${PR.colaAlto + 0.3})`}
+          fill={P.colaPunta} stroke={RH_INK} strokeWidth="0.7" />
       </g>
 
-      {/* patas traseras CORTAS (paticas rechonchas con pie blanco) */}
-      <Miembro d="M-5.4,8.6 C-6.2,9.8 -6.0,10.8 -5.2,11.2" ancho={3.2} punta={[-5.2, PR.pataCorta]} puntaR={1.9} pie sway={vivo} delay={-0.7} />
-      <Miembro d="M5.4,8.6 C6.2,9.8 6.0,10.8 5.2,11.2" ancho={3.2} punta={[5.2, PR.pataCorta]} puntaR={1.9} pie sway={vivo} delay={-1.0} />
+      {/* patas traseras CORTAS y robustas (paticas rechonchas, pie BLANCO
+          anclado a la sombra de suelo) */}
+      <Miembro d="M-5.8,8.2 C-6.7,9.6 -6.6,10.9 -5.8,11.7" ancho={3.4} punta={[-5.8, PR.pataCorta]} puntaR={2.05} pie sway={vivo} delay={-0.7} glove={P.cuerpo} />
+      <Miembro d="M5.8,8.2 C6.7,9.6 6.6,10.9 5.8,11.7" ancho={3.4} punta={[5.8, PR.pataCorta]} puntaR={2.05} pie sway={vivo} delay={-1.0} glove={P.cuerpo} />
 
       {/* tronco BLANCO chato y compacto, más ANCHO que alto (bajito de patas
-          cortas — la anti-silueta del dálmata esbelto) */}
-      <ellipse cx="0" cy="4" rx={PR.troncoRx} ry={PR.troncoRy}
-        fill={P.cuerpo} stroke={RH_INK} strokeWidth="1.4"
+          cortas — la anti-silueta del dálmata esbelto). El fill es el GRADIENTE
+          de pelaje: luz dorsal → marfil ventral (volumen real). */}
+      <ellipse cx="0" cy="4.4" rx={PR.troncoRx} ry={PR.troncoRy}
+        fill={`url(#${pelajeBlanco})`} stroke={RH_INK} strokeWidth="1.4"
         style={{ filter: `drop-shadow(0 0 5px ${P.cuerpoGlow})` }} />
-      {/* ribete CANELA bajo la silla (la transición del tricolor) */}
-      <path d="M-9.2,2.6 C-4.6,-2.6 4.6,-2.6 9.2,2.6 C7.2,6.2 -7.2,6.2 -9.2,2.6 Z"
-        fill={P.canela} opacity="0.85" />
-      {/* SILLA NEGRA del lomo (LA FIRMA tricolor: el manto oscuro montado
-          sobre el ribete canela y el fondo blanco) */}
-      <path d="M-8.6,2.0 C-4.2,-2.4 4.2,-2.4 8.6,2.0 C6.6,4.8 -6.6,4.8 -8.6,2.0 Z"
-        fill={P.manto} opacity="0.96" />
-      {/* pecho/panza blanca (lo de abajo siempre blanco) */}
-      <path d="M0,3.0 C3.8,3.6 4.8,6.2 3.6,8.6 C2.0,10.2 -2.0,10.2 -3.6,8.6 C-4.8,6.2 -3.8,3.6 0,3.0 Z"
-        fill={P.cuerpo} opacity="0.95" />
-
-      {/* FUEGO/canela en las PATAS DELANTERAS (el tricolor también baja a los
-          hombros/brazos — la patita termina en pie BLANCO). Va bajo las patas
-          para que el pie crema quede encima. */}
-      <g aria-hidden="true">
-        <ellipse cx="-6.8" cy="4.8" rx="2.1" ry="2.9" fill={P.canela} opacity="0.92" />
-        <ellipse cx="6.8" cy="4.8" rx="2.1" ry="2.9" fill={P.canela} opacity="0.92" />
+      {/* TRICOLOR del lomo, CLIPEADO a la silueta del tronco (envuelve el
+          volumen; jamás pisa el contorno de tinta): primero el ribete CANELA,
+          encima la SILLA NEGRA con borde inferior FESTONEADO (el manto real
+          cae en ondas, no en lente dura), y el fuego canela de los hombros. */}
+      <g aria-hidden="true" clipPath={`url(#${clipTronco})`}>
+        <path d="M-10,4.8 C-6,-0.6 6,-0.6 10,4.8 C6.6,7.4 -6.6,7.4 -10,4.8 Z"
+          fill={P.canela} opacity="0.9" />
+        <path d="M-10.2,3.2 C-5.6,-3.0 5.6,-3.0 10.2,3.2 C7.4,5.2 4.8,4.4 2.5,5.0 C0.9,5.4 -0.9,5.4 -2.5,5.0 C-4.8,4.4 -7.4,5.2 -10.2,3.2 Z"
+          fill={P.manto} opacity="0.97" />
+        {/* FUEGO/canela en los hombros (el tricolor baja a las paticas — la
+            patita termina en pie BLANCO encima) */}
+        <ellipse cx="-7.2" cy="5.0" rx="2.0" ry="2.7" fill={P.canela} opacity="0.9" />
+        <ellipse cx="7.2" cy="5.0" rx="2.0" ry="2.7" fill={P.canela} opacity="0.9" />
       </g>
-      {/* paticas delanteras CORTAS y robustas, pivote en el HOMBRO. */}
-      <Miembro clase="crt-brazo-l" origen="right top"
-        d="M-6.6,2.4 C-8.6,4.0 -9.2,6.2 -8.6,8.4" ancho={3.2} punta={[-8.6, 8.8]} puntaR={2.0} pie sway={vivo} delay={-0.15} />
-      <Miembro clase="crt-brazo-r" origen="left top"
-        d="M6.6,2.4 C8.6,4.0 9.2,6.2 8.6,8.4" ancho={3.2} punta={[8.6, 8.8]} puntaR={2.0} pie sway={vivo} delay={-0.45} />
+      {/* pecho/panza blanca (lo de abajo siempre blanco) */}
+      <path d="M0,4.2 C3.8,4.6 4.9,6.9 3.7,9.0 C2.0,10.4 -2.0,10.4 -3.7,9.0 C-4.9,6.9 -3.8,4.6 0,4.2 Z"
+        fill={P.cuerpo} opacity="0.95" />
+      {/* DEFINICIÓN sutil de las ancas (el rechoncho también tiene cuerpo):
+          tinta a baja opacidad — sugiere, no delinea. */}
+      <g aria-hidden="true" fill="none" stroke={RH_INK} strokeWidth="0.5" opacity="0.18" strokeLinecap="round">
+        <path d="M-8.6,5.8 C-8.0,7.6 -6.6,8.8 -5.0,9.4" />
+        <path d="M8.6,5.8 C8.0,7.6 6.6,8.8 5.0,9.4" />
+      </g>
 
-      {/* CABEZA (grupo propio .beagle-cabeza: baja al olfatear, sube al aullar). */}
+      {/* paticas delanteras CORTAS y robustas, pie BLANCO, pivote en el HOMBRO. */}
+      <Miembro clase="crt-brazo-l" origen="right top"
+        d="M-6.6,3.0 C-8.4,4.8 -9.0,6.9 -8.5,8.8" ancho={3.3} punta={[-8.5, 9.2]} puntaR={2.05} pie sway={vivo} delay={-0.15} glove={P.cuerpo} />
+      <Miembro clase="crt-brazo-r" origen="left top"
+        d="M6.6,3.0 C8.4,4.8 9.0,6.9 8.5,8.8" ancho={3.3} punta={[8.5, 9.2]} puntaR={2.05} pie sway={vivo} delay={-0.45} glove={P.cuerpo} />
+
+      {/* CABEZA (grupo propio .beagle-cabeza: baja al olfatear, sube al
+          aullar). Abombada y dulce, vestida con el gradiente CANELA (volumen). */}
       <g className="beagle-cabeza" style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}>
-        {/* OREJAS LARGUÍSIMAS anchas y CAÍDAS (canela) — tan largas que casi
-            TAPAN el hocico en reposo: cuelgan hasta bien por debajo de la
-            mejilla y su borde interno roza el morro. LA seña del sabueso. Cada
-            una con su vaivén propio; el grupo .beagle-orejas las gobierna en
-            olfatea (cuelgan adelante). */}
-        <g className="beagle-orejas">
-          <g className={vivo ? 'beagle-oreja' : undefined}
-            style={{ transformBox: 'fill-box', transformOrigin: 'center top', animationDelay: '-0.4s' }}>
-            <g transform="rotate(-13 -5.6 -10.0)">
-              <ellipse cx="-5.6" cy="-5.6" rx={PR.orejaRx} ry={PR.orejaRy} fill={P.canela} stroke={RH_INK} strokeWidth="1.2" />
-              <ellipse cx="-5.7" cy="-4.6" rx={PR.orejaRx * 0.55} ry={PR.orejaRy * 0.66} fill={P.canelaHondo} opacity="0.6" />
-            </g>
-          </g>
-          <g className={vivo ? 'beagle-oreja' : undefined}
-            style={{ transformBox: 'fill-box', transformOrigin: 'center top', animationDelay: '-1.7s' }}>
-            <g transform="rotate(13 5.6 -10.0)">
-              <ellipse cx="5.6" cy="-5.6" rx={PR.orejaRx} ry={PR.orejaRy} fill={P.canela} stroke={RH_INK} strokeWidth="1.2" />
-              <ellipse cx="5.7" cy="-4.6" rx={PR.orejaRx * 0.55} ry={PR.orejaRy * 0.66} fill={P.canelaHondo} opacity="0.6" />
-            </g>
-          </g>
-        </g>
-        {/* cara CANELA (cabeza grande y dulce de sabueso) */}
-        <circle cx="0" cy="-6.6" r={PR.cabezaR} fill={P.canela} stroke={RH_INK} strokeWidth="1.3" />
+        <ellipse cx="0" cy="-7.8" rx={PR.cabezaRx} ry={PR.cabezaRy}
+          fill={`url(#${pelajeCanela})`} stroke={RH_INK} strokeWidth="1.35" />
         {/* LISTA BLANCA que sube por el centro de la cara (del hocico a la
             frente, entre los ojos — la firma de la cara tricolor) */}
-        <path d="M-1.4,-1.2 C-1.9,-5.2 -1.3,-9.4 0,-12.4 C1.3,-9.4 1.9,-5.2 1.4,-1.2 Z"
+        <path d="M-1.3,-2.8 C-1.8,-6.4 -1.5,-10.2 0,-13.1 C1.5,-10.2 1.8,-6.4 1.3,-2.8 Z"
           fill={P.lista} opacity="0.95" />
-        {/* HOCICO ANCHO y CUADRADO con belfos de sabueso (morro amplio y romo,
-            nada fino — el morro cuadrado es firma de la raza) */}
-        <path d="M-3.8,-4.7 C-4.1,-1.5 -2.1,-0.6 0,-0.6 C2.1,-0.6 4.1,-1.5 3.8,-4.7 C1.9,-3.3 -1.9,-3.3 -3.8,-4.7 Z"
-          fill={P.hocico} opacity="0.96" />
-        {/* la línea de los belfos (del centro de la trufa a la boca) */}
-        <line x1="0" y1="-4.0" x2="0" y2="-2.8" stroke={RH_INK} strokeWidth="0.35" opacity="0.7" />
-        {/* chapetas (rubor dulce) */}
-        <Cachetes puntos={[{ cx: -4.3, cy: -4.6, r: 1.2 }, { cx: 4.3, cy: -4.6, r: 1.2 }]} vivo={vivo} />
+        {/* CEJAS PREOCUPADAS con el interior alzado (la carita que ruega —
+            LA expresión del beagle). La derecha sube apenas MÁS (la súplica
+            asimétrica con encanto — vara Angelita, nada de simetría muerta). */}
+        <g aria-hidden="true" fill="none" stroke={RH_INK} strokeWidth="0.85" strokeLinecap="round" opacity="0.8">
+          <path d="M-4.4,-10.1 Q-3.0,-10.5 -1.7,-11.1" />
+          <path d="M4.4,-10.2 Q3.0,-10.7 1.7,-11.4" />
+        </g>
+        {/* HOCICO ANCHO y ROMO con belfos de sabueso (morro amplio y cuadrado,
+            nada fino — firma de la raza; cuelga por debajo de la cara) */}
+        <path d="M-3.9,-4.9 C-4.3,-2.1 -2.6,-0.8 0,-0.8 C2.6,-0.8 4.3,-2.1 3.9,-4.9 C1.95,-3.5 -1.95,-3.5 -3.9,-4.9 Z"
+          fill={P.hocico} opacity="0.97" />
+        {/* chapetas (rubor dulce, asomando junto a las orejotas) */}
+        <Cachetes puntos={[{ cx: -3.4, cy: -3.9, r: 0.9 }, { cx: 3.4, cy: -3.9, r: 0.9 }]} vivo={vivo} />
         {boca}
+        {/* la línea de los belfos (del centro de la trufa a la boca) */}
+        <line x1="0" y1="-3.5" x2="0" y2="-2.75" stroke={RH_INK} strokeWidth="0.35" opacity="0.7" />
+        {/* puntos de VIBRISAS en el morro (realismo de sabueso sin perder la goma) */}
+        <g aria-hidden="true" fill={P.manto} opacity="0.4">
+          <circle cx="-2.4" cy="-2.9" r="0.17" /><circle cx="-2.9" cy="-3.5" r="0.15" />
+          <circle cx="2.4" cy="-2.9" r="0.17" /><circle cx="2.9" cy="-3.5" r="0.15" />
+        </g>
         {/* TRUFA GRANDE negra (la nariz manda: el sabueso ES su nariz) —
             grupo propio .beagle-nariz (tiembla al olfatear) */}
         <g className={vivo ? 'beagle-nariz' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
-          <ellipse cx="0" cy="-4.6" rx="1.6" ry="1.2" fill={P.nariz} />
+          <ellipse cx="0" cy="-4.7" rx="1.75" ry="1.35" fill={P.nariz} />
           {/* el brillito húmedo de la trufa sana */}
-          <circle cx="-0.5" cy="-4.95" r="0.36" fill="#fffdf7" opacity="0.7" />
+          <circle cx="-0.55" cy="-5.1" r="0.4" fill="#fffdf7" opacity="0.7" />
         </g>
-        {/* OJOS MUY GRANDES y REDONDOS café — la mirada dulce-suplicante ("de
-            llanto") del beagle: su gancho de simpatía. */}
+        {/* OJOS GRANDES y REDONDOS café-ámbar — la mirada dulce-suplicante
+            ("de llanto") del beagle: su gancho de simpatía. Catchlight del
+            kit + iris que enmarca la pupila (alma, nunca vacío). */}
+        {/* mirada de REOJO dulce (vara Angelita: la pupila descentrada da el
+            alma — el reojo suplicante hacia arriba es el gesto del sabueso) */}
         <OjosRubber
-          ojos={[{ cx: -2.8, cy: -7.7, r: 2.25 }, { cx: 2.8, cy: -7.7, r: 2.25 }]}
-          mirar={[0, 0.1]}
+          ojos={[{ cx: -2.4, cy: -8.4, r: 1.95 }, { cx: 2.4, cy: -8.4, r: 1.95 }]}
+          mirar={[0.22, -0.08]}
           parpadea={vivo}
         />
-        {/* iris café grande que enmarca la pupila (dulzura, no fiereza) */}
-        <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.6" opacity="0.75">
-          <circle cx="-2.8" cy="-7.7" r="1.72" />
-          <circle cx="2.8" cy="-7.7" r="1.72" />
+        <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.62" opacity="0.85">
+          <circle cx="-2.4" cy="-8.4" r="1.52" />
+          <circle cx="2.4" cy="-8.4" r="1.52" />
         </g>
-        {/* PÁRPADO INFERIOR húmedo (el borde de "llanto" que da la súplica) +
-            CEJAS PREOCUPADAS con el interior alzado (la carita que ruega). */}
+        {/* PÁRPADO INFERIOR húmedo (el borde de "llanto" que da la súplica) */}
         <g aria-hidden="true" fill="none" stroke={RH_INK} strokeLinecap="round">
-          <path d="M-4.7,-6.0 Q-2.8,-4.9 -0.9,-6.0" strokeWidth="0.5" opacity="0.5" />
-          <path d="M0.9,-6.0 Q2.8,-4.9 4.7,-6.0" strokeWidth="0.5" opacity="0.5" />
-          <path d="M-4.9,-10.0 Q-3.2,-10.8 -1.5,-10.6" strokeWidth="0.85" opacity="0.8" />
-          <path d="M4.9,-10.0 Q3.2,-10.8 1.5,-10.6" strokeWidth="0.85" opacity="0.8" />
+          <path d="M-4.05,-6.6 Q-2.4,-5.6 -0.75,-6.6" strokeWidth="0.5" opacity="0.5" />
+          <path d="M4.05,-6.6 Q2.4,-5.6 0.75,-6.6" strokeWidth="0.5" opacity="0.5" />
+        </g>
+        {/* OREJAS LARGUÍSIMAS anchas y CAÍDAS — LÓBULOS reales (path de gota
+            larga, no elipse genérica) que nacen ALTO en el cráneo y cuelgan
+            hasta por debajo de la quijada ENMARCANDO la cara ("casi tapan el
+            hocico"). LA seña del sabueso. Con penumbra interior y filo de luz
+            (volumen del lóbulo que cuelga). Cada una con su vaivén propio
+            (.beagle-oreja); el grupo .beagle-orejas las gobierna en olfatea.
+            La derecha es la izquierda espejada (scale -1). */}
+        <g className="beagle-orejas">
+          {/* cada oreja cuelga con SU caída (asimetría viva — vara Angelita) */}
+          {[false, true].map((espejo) => (
+            <g key={espejo ? 'd' : 'i'} className={vivo ? 'beagle-oreja' : undefined}
+              style={{ transformBox: 'fill-box', transformOrigin: 'center top', animationDelay: espejo ? '-1.7s' : '-0.4s' }}>
+              <g transform={espejo ? 'scale(-1 1) rotate(3 -6.4 -11)' : 'rotate(-2 -6.4 -11)'}>
+                <path d="M-4.1,-12.0 C-6.8,-11.8 -8.8,-9.2 -8.7,-5.5 C-8.6,-2.1 -7.1,0.5 -5.4,0.1 C-4.5,-0.1 -4.6,-2.8 -4.8,-5.6 C-5.0,-7.9 -4.7,-10.1 -4.1,-12.0 Z"
+                  fill={P.canela} stroke={RH_INK} strokeWidth="1.2" strokeLinejoin="round" />
+                {/* penumbra interior del lóbulo (el peso de la oreja que cuelga) */}
+                <ellipse cx="-6.6" cy="-4.8" rx="1.45" ry="3.4"
+                  transform="rotate(-5 -6.6 -4.8)" fill={P.canelaHondo} opacity="0.5" aria-hidden="true" />
+                {/* filo de luz en el borde externo (volumen, no plano) */}
+                <path d="M-4.9,-11.6 C-7.0,-11.3 -8.4,-8.9 -8.35,-6.0"
+                  fill="none" stroke={P.canelaLuz} strokeWidth="0.5" strokeLinecap="round" opacity="0.6" aria-hidden="true" />
+              </g>
+            </g>
+          ))}
         </g>
       </g>
 
@@ -286,8 +349,8 @@ export function Beagle({
       {ropa && (
         <AccesoriosClima
           estado={ropa}
-          tronco={{ cx: 0, cy: 4, rx: PR.troncoRx, ry: PR.troncoRy }}
-          cabeza={{ cx: 0, cy: -6.6, r: PR.cabezaR }}
+          tronco={{ cx: 0, cy: 4.4, rx: PR.troncoRx, ry: PR.troncoRy }}
+          cabeza={{ cx: 0, cy: -7.8, r: PR.cabezaR }}
           animated={vivo}
         />
       )}

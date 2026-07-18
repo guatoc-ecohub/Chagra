@@ -36,27 +36,31 @@ export const DALMATA_SLUG = 'dalmata';
    (distribuidas por todo el cuerpo, orejas caídas moteadas, hasta la cola).
    Ojos café alerta y amables, trufa negra, lengüita rosada que jadea feliz. */
 export const DALMATA_PALETA = {
-  cuerpo: '#fdfaf2',        // pelaje BLANCO puro (cálido, no clínico)
+  cuerpo: '#fdfaf2',        // pelaje BLANCO puro (cálido, no clínico — tono medio del gradiente)
+  cuerpoLuz: '#ffffff',     // luz dorsal del pelaje (el sol sobre el lomo — volumen)
+  cuerpoSombra: '#e7dcc4',  // sombra ventral del blanco (marfil en penumbra — volumen, no gris sucio)
   cuerpoGlow: 'rgba(253,250,242,0.75)',
   vientre: '#ffffff',       // pecho aún más claro (brillo del blanco)
   mancha: '#241608',        // la mancha NEGRA redonda (tinta oscura cálida — SIN centro: no es roseta)
   oreja: '#f3ecdd',         // oreja caída (blanca, moteada por encima)
   hocico: '#fbf5e8',        // hocico largo claro
   nariz: '#241608',         // trufa negra grande
-  iris: '#8a5a2a',          // ojo café alerta y amable
+  iris: '#9c6527',          // ojo ámbar-café GRANDE, vivo y amable (con alma, nunca vacío)
   lengua: '#ef8398',        // lengüita rosada del jadeo feliz
+  lenguaHondo: '#d76a82',   // el pliegue central de la lengua (volumen del jadeo)
   collar: '#d64541',        // collar ROJO clásico de perro de finca/bombero
   placa: '#ffd54a',         // la plaquita dorada del collar
+  sombraSuelo: 'rgba(36,22,8,0.32)', // la sombra blanda bajo las patas (peso real)
 };
 
 export const DALMATA_PROPORCION = {
-  troncoRx: 7.6,            // ATLÉTICO: cuerpo casi CUADRADO (rx≈ry, ~1:1) con pecho PROFUNDO
-  troncoRy: 7.8,
-  cabezaR: 5.3,             // cabeza proporcionada (no cachetona: perro fino)
-  orejaRx: 2.0,             // oreja caída (lóbulo colgante MOTEADO)
-  orejaRy: 3.5,
-  hocicoLargo: 4.6,         // el HOCICO LARGO de la raza (baja bien por debajo de la cara)
-  pataLarga: 13.4,          // hasta dónde llegan las PATAS LARGAS y FINAS (y del pie)
+  troncoRx: 7.3,            // ATLÉTICO: cuerpo casi CUADRADO (rx≈ry, ~1:1) con pecho PROFUNDO
+  troncoRy: 8.2,
+  cabezaRx: 5.7,            // cráneo apenas más ancho que alto (perro fino, no carita-círculo)
+  cabezaRy: 5.2,
+  cabezaR: 5.45,            // radio medio (lo consumen ropa/accesorios)
+  hocicoLargo: 6.5,         // el HOCICO LARGO de la raza (baja bien por debajo de la cara)
+  pataLarga: 13.3,          // hasta dónde llegan las PATAS LARGAS y FINAS (y del pie)
 };
 
 /*
