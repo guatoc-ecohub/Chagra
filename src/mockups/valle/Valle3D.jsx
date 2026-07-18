@@ -664,6 +664,42 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
               <meshStandardMaterial color="#4a3a2a" flatShading roughness={1} />
             </mesh>
           </group>
+          {/* LAS CANECAS AZULES DE BIOPREPARADOS sobre su estiba: la seña
+              inconfundible de la biofábrica — el caldo trabajando en sus
+              tanques (nada más en el valle es azul plástico). */}
+          <group position={[0.78, 0, 0.42]} rotation={[0, -0.35, 0]}>
+            {/* la estiba de madera (tarima + dos travesaños que asoman) */}
+            <mesh position={[0, 0.05, 0]} castShadow>
+              <boxGeometry args={[0.66, 0.045, 0.52]} />
+              <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+            </mesh>
+            {[-0.2, 0.2].map((dz, i) => (
+              <mesh key={i} position={[0, 0.015, dz]}>
+                <boxGeometry args={[0.7, 0.03, 0.09]} />
+                <meshStandardMaterial color="#6b4a2e" flatShading roughness={1} />
+              </mesh>
+            ))}
+            {/* la caneca grande con su tapa y la mediana */}
+            <mesh position={[-0.16, 0.29, -0.04]} castShadow>
+              <cylinderGeometry args={[0.13, 0.13, 0.42, 9]} />
+              <meshStandardMaterial color="#2f6fa8" flatShading roughness={0.8} />
+            </mesh>
+            <mesh position={[-0.16, 0.52, -0.04]}>
+              <cylinderGeometry args={[0.135, 0.135, 0.035, 9]} />
+              <meshStandardMaterial color="#1f4d78" flatShading roughness={0.8} />
+            </mesh>
+            <mesh position={[0.15, 0.23, 0.05]} castShadow>
+              <cylinderGeometry args={[0.1, 0.1, 0.3, 9]} />
+              <meshStandardMaterial color="#3a86b8" flatShading roughness={0.8} />
+            </mesh>
+            {/* los tarros del biopreparado listos para el lote (en fila) */}
+            {[-0.02, 0.12, 0.26].map((dx, i) => (
+              <mesh key={i} position={[dx, 0.12, 0.28]}>
+                <cylinderGeometry args={[0.045, 0.045, 0.13, 7]} />
+                <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
+              </mesh>
+            ))}
+          </group>
         </group>
       );
     case 'saber': // el KIOSCO DEL SABER (portal Aprender): el tablero bajo su
@@ -710,6 +746,51 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1 }) {
               <meshStandardMaterial color="#f2efe4" flatShading />
             </mesh>
           </group>
+        </group>
+      );
+    case 'frailejonal': // LA PUERTA DEL PÁRAMO: el frailejonal con su niebla
+      // fría — la seña del alto (coherente con MundoParamo3D: frailejones,
+      // piedra y bruma). Tocar aquí sube al mundo del páramo.
+      return (
+        <group>
+          {/* el grupito de frailejones (roseta plateada sobre tronco lanudo) */}
+          {[[-0.5, 0.22, 1], [0.2, -0.3, 0.85], [0.55, 0.35, 0.7], [-0.05, 0.5, 0.6]].map(([x, z, s], i) => (
+            <group key={i} position={[x, 0, z]} scale={s}>
+              <mesh position={[0, 0.45, 0]} castShadow>
+                <cylinderGeometry args={[0.11, 0.14, 0.9, 7]} />
+                <meshStandardMaterial color="#6e6a52" flatShading roughness={1} />
+              </mesh>
+              <mesh position={[0, 0.98, 0]} scale={[1, 0.5, 1]} castShadow>
+                <coneGeometry args={[0.34, 0.5, 8]} />
+                <meshStandardMaterial color={suave} flatShading roughness={1} />
+              </mesh>
+              {/* la flor amarilla del frailejón (la seña de la Espeletia) */}
+              <mesh position={[0.1, 1.16, 0.06]}>
+                <sphereGeometry args={[0.05, 6, 5]} />
+                <meshStandardMaterial color="#e8c94f" flatShading />
+              </mesh>
+            </group>
+          ))}
+          {/* la piedra del alto, con su musgo */}
+          <mesh position={[0.6, 0.12, -0.35]} scale={[1, 0.7, 0.9]} castShadow>
+            <icosahedronGeometry args={[0.22, 0]} />
+            <meshStandardMaterial color="#828b90" flatShading roughness={1} />
+          </mesh>
+          {/* LA NIEBLA FRÍA que arropa el frailejonal (motas traslúcidas que
+              hacen páramo, como el vaho de la pila pero frío) */}
+          {[[-0.35, 0.55, 0.4, 0.3], [0.4, 0.75, 0.1, 0.24], [0, 1.0, -0.25, 0.19]].map(([x, yv, z, r], i) => (
+            <mesh key={i} position={[x, yv, z]}>
+              <sphereGeometry args={[r, 8, 6]} />
+              <meshBasicMaterial color="#dfe8ea" transparent opacity={0.2} depthWrite={false} />
+            </mesh>
+          ))}
+          {/* el hito de piedras apiladas: la seña del sendero de páramo */}
+          {[0.16, 0.11, 0.07].map((r, i) => (
+            <mesh key={i} position={[-0.72, 0.1 + i * 0.17, -0.1]} scale={[1, 0.65, 1]}>
+              <icosahedronGeometry args={[r, 0]} />
+              <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            </mesh>
+          ))}
         </group>
       );
     case 'hongos': // el suelo vivo: hongos que asoman (el fruto del micelio), con
