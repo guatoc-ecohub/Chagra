@@ -7,16 +7,18 @@
  * NACE el agua que baja a las veredas. La escena existe para que se entienda
  * —sin una sola cifra— por qué el páramo se cuida: si se seca, se seca el río.
  *
- * DIRECCIÓN DE ARTE (todo dentro del framework, nada inventado por fuera):
- *   - La atmósfera es la MISMA hora dorada del valle: preset `CIELOS_HORA.dorada`
- *     (espejo exacto de `ATMOSFERA` / atmosferaMadre). Entrar al páramo se siente
- *     como acercarse dentro del mismo atardecer, no como abrir otra app.
- *   - Los materiales salen de `PALETA` (atmosferaMadre) entintados hacia la
- *     niebla dorada con `mezclar` — la ley de coherencia del framework. La
- *     identidad plateada del páramo (frailejón, musgo, roca) sobrevive sin
- *     romper la paleta común.
- *   - El polen/rocío en suspensión son las `ParticulasAmbientales` del kit
- *     (tipo=polen), sin tocar: mismo presupuesto por tier.
+ * DIRECCIÓN DE ARTE — PASADA 2 (dentro del framework, entintado hacia el frío):
+ *   - La atmósfera es la BRUMA FRÍA ALTOANDINA: el CONTRASTE deliberado con la
+ *     hora dorada del valle. Se deriva del preset `CIELOS_HORA.dorada` (su
+ *     presupuesto de luz) entintando cada color hacia el azul-plata con la propia
+ *     `mezclaHex` del kit; la luz se aplana (sol débil velado, mucho ambiente) y
+ *     la niebla se cierra. Entrar al páramo se siente como SUBIR: del atardecer
+ *     tibio a la neblina húmeda y fría de los 3.500 m.
+ *   - Los materiales salen de `PALETA`/hexes de planta, entintados hacia la
+ *     niebla FRÍA con `mezclar` — la ley de coherencia del framework. La
+ *     identidad plateada del páramo (frailejón, musgo, roca) se refuerza.
+ *   - El rocío/llovizna frío en suspensión es un `RocioFrio` local (páramo puro):
+ *     puntos azul-plata que caen despacio, la humedad del aire hecha visible.
  *
  * ECOSISTEMA (low-poly, cada pieza con propósito didáctico):
  *   - Frailejones : el héroe. Tallo velludo de hojas marcescentes + roseta
@@ -46,33 +48,59 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
-import { CIELOS_HORA } from '../visual/mundo3d/cielosHoraData.js';
+import { CIELOS_HORA, mezclaHex } from '../visual/mundo3d/cielosHoraData.js';
 import { PALETA, mezclar } from '../visual/mundo3d/atmosferaMadre.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
-import { ParticulasAmbientales } from '../visual/mundo3d/ParticulasAmbientales.jsx';
 import { crearRng } from '../visual/mundo3d/particulasData.js';
 
-/* La hora dorada canónica (espejo de ATMOSFERA): única fuente de la atmósfera. */
-const DORADA = CIELOS_HORA.dorada;
+/* LA BRUMA FRÍA DEL PÁRAMO (pasada 2) — el CONTRASTE deliberado con la hora
+   dorada del valle. El páramo altoandino no vive el atardecer tibio: vive su
+   propia atmósfera húmeda, azul-plata y encapotada, a 3.500 m. Para no salirnos
+   del kit, partimos del PRESUPUESTO DE LUZ de la hora madre (`CIELOS_HORA.dorada`)
+   y entintamos cada color hacia el azul-plata frío con la propia `mezclaHex` del
+   framework: misma lógica de luz (hemisferio + ambiente + sol + relleno), piel
+   fría. Además la luz se aplana (más ambiente, sol débil velado por nube) y la
+   niebla se cierra: el páramo se siente mojado, alto y frío. */
+const FRIO = '#b7c9d6'; // el azul-plata de la niebla altoandina, el norte de todo
+const AZUL_HONDO = '#8ba0b4'; // el fondo frío de las cuchillas lejanas
+const ATMO = {
+  ...CIELOS_HORA.dorada,
+  fondo: mezclaHex(CIELOS_HORA.dorada.fondo, FRIO, 0.86),
+  cielo: mezclaHex(CIELOS_HORA.dorada.cielo, '#a6bccd', 0.82),
+  suelo: mezclaHex(CIELOS_HORA.dorada.suelo, '#586460', 0.58),
+  luz: mezclaHex(CIELOS_HORA.dorada.luz, '#dcebf1', 0.74), // sol difuso, casi blanco-azul
+  relleno: mezclaHex(CIELOS_HORA.dorada.relleno, AZUL_HONDO, 0.5),
+  niebla: mezclaHex(CIELOS_HORA.dorada.niebla, FRIO, 0.88), // la bruma, el alma de la escena
+  sombra: mezclaHex(CIELOS_HORA.dorada.sombra, '#242f39', 0.62),
+  // luz de páramo encapotado: mucho ambiente, sol tenue (a menudo tras la nube)
+  hemisferio: 0.64,
+  ambiente: 0.46,
+  sol: 0.5,
+  rellenoInt: 0.34,
+  // la humedad cierra la distancia: la niebla se come el fondo mucho antes
+  nieblaCerca: 5,
+  nieblaLejos: 24,
+};
 
-/* La paleta del framework entintada hacia la niebla dorada del páramo. El
-   páramo es plateado y frío de suyo; se le da apenas el tinte cálido de la hora
-   para que el ojo lea "el mismo atardecer", conservando su identidad de bruma. */
-const TINTE = DORADA.niebla;
+/* La paleta del framework, ahora entintada hacia la BRUMA FRÍA (no la dorada):
+   el páramo es plateado y frío de suyo, y la pasada 2 lo lleva a su verdad
+   altoandina. La identidad de cada planta (paja tostada, tallo velludo, roseta
+   salvia) sobrevive; el aire la enfría, la humedece y la platea. */
+const TINTE = ATMO.niebla;
 const P = {
-  turba: mezclar('#4a4028', TINTE, 0.3), // suelo húmedo de turba, junto al agua
-  paja: mezclar('#c0a35a', TINTE, 0.32), // pajonal, la paja dorada del páramo
-  pajaSol: mezclar('#dcc078', TINTE, 0.28), // macolla donde pega el sol rasante
-  roca: mezclar('#9a917b', TINTE, 0.4), // afloramiento de roca, gris pardo alto
-  frailejonTallo: mezclar('#b3a37c', TINTE, 0.3), // tallo velludo (hoja marcescente)
-  frailejonHoja: mezclar('#9db081', TINTE, 0.32), // roseta plateada verde-salvia
-  frailejonFlor: mezclar('#e6c24a', TINTE, 0.15), // los capítulos amarillos
-  quenuaTronco: mezclar('#8a5236', TINTE, 0.3), // Polylepis: corteza rojiza papirosa
-  quenuaHoja: mezclar('#7d9463', TINTE, 0.4), // copa plateada de páramo
-  musgo: mezclar('#6f8a49', TINTE, 0.3), // cojín de musgo, la esponja del agua
-  musgoClaro: mezclar('#8aa85c', TINTE, 0.28),
-  piedra: mezclar(PALETA.piedra, TINTE, 0.35), // piedra del nacimiento
-  agua: mezclar('#5aa6b4', DORADA.cielo, 0.32), // el agua que espeja el cielo dorado
+  turba: mezclar('#3f3a2c', TINTE, 0.28), // suelo húmedo de turba negra, junto al agua
+  paja: mezclar('#bfa863', TINTE, 0.4), // pajonal (Calamagrostis), paja tostada
+  pajaSol: mezclar('#d8c584', TINTE, 0.34), // macolla donde se cuela la poca luz
+  roca: mezclar('#8f9088', TINTE, 0.46), // afloramiento de roca, gris frío alto
+  frailejonTallo: mezclar('#b0a27f', TINTE, 0.36), // tallo velludo (hoja marcescente)
+  frailejonHoja: mezclar('#93a97f', TINTE, 0.4), // roseta plateada verde-salvia
+  frailejonFlor: mezclar('#e6c24a', TINTE, 0.2), // los capítulos amarillos
+  quenuaTronco: mezclar('#8a5236', TINTE, 0.34), // Polylepis: corteza rojiza papirosa
+  quenuaHoja: mezclar('#7a9166', TINTE, 0.46), // copa plateada de páramo
+  musgo: mezclar('#5f8048', TINTE, 0.32), // cojín de musgo, la esponja del agua
+  musgoClaro: mezclar('#83a35a', TINTE, 0.3),
+  piedra: mezclar(PALETA.piedra, TINTE, 0.42), // piedra fría del nacimiento
+  agua: mezclar('#4f8fa8', ATMO.cielo, 0.4), // el agua que espeja el cielo frío
 };
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -156,35 +184,37 @@ function construirTerreno(seg, plano) {
   return geo;
 }
 
-/* Las luces de la hora dorada del kit: hemisferio cálido, ambiente suave, el sol
-   bajo como direccional principal y un relleno frío opuesto (cielo abierto). */
-function LucesDoradas() {
+/* Las luces del páramo frío: hemisferio azul-plata, mucho ambiente (día
+   encapotado), el sol débil velado como direccional principal y un relleno frío
+   opuesto. La lógica es la del kit; los números vienen aplanados hacia el frío. */
+function LucesParamo() {
   return (
     <>
-      <hemisphereLight intensity={DORADA.hemisferio} color={DORADA.cielo} groundColor={DORADA.suelo} />
-      <ambientLight intensity={DORADA.ambiente} color={DORADA.luz} />
-      <directionalLight position={/** @type {[number, number, number]} */ (DORADA.solPos)} intensity={DORADA.sol} color={DORADA.luz} />
-      <directionalLight position={[-6, 4, -7]} intensity={DORADA.rellenoInt} color={DORADA.relleno} />
+      <hemisphereLight intensity={ATMO.hemisferio} color={ATMO.cielo} groundColor={ATMO.suelo} />
+      <ambientLight intensity={ATMO.ambiente} color={ATMO.luz} />
+      <directionalLight position={/** @type {[number, number, number]} */ (ATMO.solPos)} intensity={ATMO.sol} color={ATMO.luz} />
+      <directionalLight position={[-6, 4, -7]} intensity={ATMO.rellenoInt} color={ATMO.relleno} />
     </>
   );
 }
 
-/* El sol bajo del atardecer: un disco tibio con halo, del lado del solPos.
-   No ilumina (de eso se encargan las luces); es el ancla visual de la hora. */
-function SolBajo() {
+/* El sol VELADO del páramo: no un disco franco, sino una mancha pálida y fría
+   difuminada tras la niebla — apenas se adivina dónde está detrás de la nube.
+   No ilumina (de eso se encargan las luces); es el ancla del cielo encapotado. */
+function SolVelado() {
   return (
-    <group position={[10, 7.5, -14]}>
+    <group position={[8, 8.5, -14]}>
       <mesh>
-        <circleGeometry args={[1.6, 40]} />
-        <meshBasicMaterial color="#fff0cf" transparent opacity={0.95} depthWrite={false} side={THREE.DoubleSide} />
+        <circleGeometry args={[1.9, 40]} />
+        <meshBasicMaterial color="#eaf1f5" transparent opacity={0.5} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
       <mesh position={[0, 0, -0.05]}>
-        <circleGeometry args={[3.0, 40]} />
-        <meshBasicMaterial color={DORADA.luz} transparent opacity={0.22} depthWrite={false} side={THREE.DoubleSide} />
+        <circleGeometry args={[3.6, 40]} />
+        <meshBasicMaterial color={ATMO.luz} transparent opacity={0.16} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
       <mesh position={[0, 0, -0.1]}>
-        <circleGeometry args={[5.2, 40]} />
-        <meshBasicMaterial color={DORADA.cielo} transparent opacity={0.13} depthWrite={false} side={THREE.DoubleSide} />
+        <circleGeometry args={[6.4, 40]} />
+        <meshBasicMaterial color={ATMO.cielo} transparent opacity={0.1} depthWrite={false} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
@@ -258,9 +288,14 @@ function FrailejonHeroe({ pos, reducedMotion }) {
   );
 }
 
-/* ── El campo de frailejones: la colonia. Dos InstancedMesh (tallos + rosetas)
-      = 2 draw calls para todo el frailejonal. Sembrado determinista sobre el
-      relieve, evitando el agua; roseta un pelín ladeada por instancia. ── */
+/* ── El frailejonal POR EDADES: la colonia contada como un rodal real, donde
+      conviven las tres generaciones del frailejón (Espeletia crece ~1 cm/año, así
+      que un tallo alto es un ANCIANO de siglos):
+        · JÓVENES  — rosetas plateadas a ras de suelo, aún sin tallo, las crías.
+        · ADULTOS  — tallo medio y roseta plena, el grueso del rodal.
+        · ANCIANOS — tallo alto y velludo con roseta imponente, los patriarcas.
+      Dos InstancedMesh (tallos + rosetas) = 2 draw calls para TODO el campo.
+      La altura del tallo se escala por instancia (scale.y), de ahí las edades. ── */
 function FrailejonalInstanciado({ n }) {
   const tallos = useRef(null);
   const rosetas = useRef(null);
@@ -270,12 +305,28 @@ function FrailejonalInstanciado({ n }) {
     let intentos = 0;
     while (lista.length < n && intentos < n * 12) {
       intentos += 1;
-      const wx = (rng() - 0.5) * (ANCHO - 8);
-      const wz = -6 + (rng() - 0.5) * (FONDO - 14); // detrás y a los lados del agua
-      if (humedad(wx, wz) > 0.35) continue; // el frailejón no crece en el charco
+      const wx = (rng() - 0.5) * (ANCHO - 6);
+      const wz = -5 + (rng() - 0.5) * (FONDO - 12); // detrás y a los lados del agua
+      if (humedad(wx, wz) > 0.38) continue; // el frailejón no crece en el charco
       const y = alturaParamo(wx, wz);
-      if (y > 3.2) continue; // ni en la roca pelada de las cuchillas
-      lista.push({ wx, wz, y, esc: 0.75 + rng() * 0.7, giro: rng() * Math.PI * 2, ladeo: (rng() - 0.5) * 0.3 });
+      if (y > 3.4) continue; // ni en la roca pelada de las cuchillas
+      // sorteo de EDAD: pocos ancianos, muchos adultos, una camada de jóvenes
+      const d = rng();
+      let esc, alto, edad;
+      if (d < 0.3) {
+        edad = 0; // joven: roseta a ras de suelo, casi sin tallo
+        esc = 0.34 + rng() * 0.22;
+        alto = 0.05 + rng() * 0.12;
+      } else if (d < 0.78) {
+        edad = 1; // adulto: el grueso del rodal
+        esc = 0.66 + rng() * 0.34;
+        alto = 0.7 + rng() * 0.55;
+      } else {
+        edad = 2; // anciano: tallo alto, roseta imponente
+        esc = 0.95 + rng() * 0.4;
+        alto = 1.45 + rng() * 0.85;
+      }
+      lista.push({ wx, wz, y, esc, alto, edad, giro: rng() * Math.PI * 2, ladeo: (rng() - 0.5) * 0.28 });
     }
     return lista;
   }, [n]);
@@ -288,21 +339,22 @@ function FrailejonalInstanciado({ n }) {
     const baseTallo = new THREE.Color(P.frailejonTallo);
     const baseHoja = new THREE.Color(P.frailejonHoja);
     sitios.forEach((s, i) => {
-      // tallo
-      dummy.position.set(s.wx, s.y + 0.5 * s.esc, s.wz);
+      const stemH = s.esc * s.alto; // altura visible del tallo (cilindro h=1.0)
+      // tallo: los ancianos más curtidos (oscurecen), los jóvenes casi ocultos
+      dummy.position.set(s.wx, s.y + stemH * 0.5, s.wz);
       dummy.rotation.set(s.ladeo, s.giro, 0);
-      dummy.scale.set(s.esc, s.esc, s.esc);
+      dummy.scale.set(s.esc, Math.max(s.esc * s.alto, 0.02), s.esc);
       dummy.updateMatrix();
       mt.setMatrixAt(i, dummy.matrix);
-      tinte.copy(baseTallo).offsetHSL(0, 0, (i % 5) * 0.012 - 0.024);
+      tinte.copy(baseTallo).offsetHSL(0, 0, -0.03 * s.edad + ((i % 5) * 0.01 - 0.02));
       mt.setColorAt(i, tinte);
-      // roseta, sobre el tallo
-      dummy.position.set(s.wx, s.y + 1.02 * s.esc, s.wz);
+      // roseta sobre el tallo; los ancianos la lucen algo más plateada (clara)
+      dummy.position.set(s.wx, s.y + stemH + 0.14 * s.esc, s.wz);
       dummy.rotation.set(s.ladeo, s.giro, 0);
       dummy.scale.set(s.esc, s.esc * 0.7, s.esc);
       dummy.updateMatrix();
       mr.setMatrixAt(i, dummy.matrix);
-      tinte.copy(baseHoja).offsetHSL(0, 0, (i % 4) * 0.014 - 0.02);
+      tinte.copy(baseHoja).offsetHSL(0, -0.02 * s.edad, 0.02 * s.edad + ((i % 4) * 0.012 - 0.018));
       mr.setColorAt(i, tinte);
     });
     mt.instanceMatrix.needsUpdate = true;
@@ -443,39 +495,45 @@ function Quenua({ pos, esc = 1 }) {
   );
 }
 
-/* ── Niebla enganchada: jirones que se atoran entre las copas y derivan despacio.
-      Esferas planas muy tenues, tinte niebla. reduced-motion las deja quietas
-      (presencia sin movimiento). Es el páramo respirando. ── */
+/* ── Niebla enganchada: BANCOS de bruma húmeda que se pegan al suelo del páramo
+      y jirones que se atoran entre las copas, todos derivando despacio. Esferas
+      planas y anchas, azul-plata frío; las bajas casi lamen el pajonal (la
+      humedad que sube de la turba). reduced-motion las deja quietas (presencia
+      sin movimiento). Es el páramo respirando, mojado y frío. ── */
 function NieblaEnganchada({ n, reducedMotion }) {
   const grupo = useRef(null);
   const jirones = useMemo(() => {
     const rng = crearRng(131);
-    return Array.from({ length: n }, () => ({
-      x: (rng() - 0.5) * (ANCHO - 8),
-      y: 1.0 + rng() * 1.8,
-      z: -4 + (rng() - 0.5) * (FONDO - 12),
-      esc: 1.6 + rng() * 2.2,
-      vel: 0.2 + rng() * 0.4,
-      fase: rng() * Math.PI * 2,
-      op: 0.05 + rng() * 0.07,
-    }));
+    return Array.from({ length: n }, (_, i) => {
+      const bajo = i % 2 === 0; // la mitad son bancos que se pegan al suelo
+      return {
+        x: (rng() - 0.5) * (ANCHO - 6),
+        y: bajo ? 0.35 + rng() * 0.7 : 1.3 + rng() * 1.7,
+        z: -3 + (rng() - 0.5) * (FONDO - 10),
+        esc: bajo ? 2.6 + rng() * 2.6 : 1.8 + rng() * 2.0,
+        aplana: bajo ? 0.24 : 0.42, // los bancos bajos, más chatos
+        vel: 0.16 + rng() * 0.34,
+        fase: rng() * Math.PI * 2,
+        op: (bajo ? 0.09 : 0.06) + rng() * 0.07,
+      };
+    });
   }, [n]);
   useFrame(({ clock }) => {
     if (reducedMotion || !grupo.current) return;
     const t = clock.elapsedTime;
     grupo.current.children.forEach((m, i) => {
       const j = jirones[i];
-      m.position.x = j.x + Math.sin(t * j.vel * 0.3 + j.fase) * 1.4;
-      m.position.y = j.y + Math.sin(t * j.vel * 0.5 + j.fase) * 0.18;
+      m.position.x = j.x + Math.sin(t * j.vel * 0.3 + j.fase) * 1.5;
+      m.position.y = j.y + Math.sin(t * j.vel * 0.5 + j.fase) * 0.16;
       m.material.opacity = j.op * (0.7 + 0.3 * Math.sin(t * 0.4 + j.fase));
     });
   });
   return (
     <group ref={grupo}>
       {jirones.map((j, i) => (
-        <mesh key={i} position={[j.x, j.y, j.z]} scale={[j.esc, j.esc * 0.4, j.esc]}>
+        <mesh key={i} position={[j.x, j.y, j.z]} scale={[j.esc, j.esc * j.aplana, j.esc]}>
           <sphereGeometry args={[1, 7, 5]} />
-          <meshBasicMaterial color={DORADA.niebla} transparent opacity={j.op} depthWrite={false} />
+          <meshBasicMaterial color={ATMO.niebla} transparent opacity={j.op} depthWrite={false} />
         </mesh>
       ))}
     </group>
@@ -526,7 +584,7 @@ function NacimientoAgua({ reducedMotion, fabrica }) {
       {/* brillo del cielo sobre el agua (aditivo, sutil) */}
       <mesh position={[0, Y_AGUA + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.9, 1]}>
         <circleGeometry args={[1.9, 32]} />
-        <meshBasicMaterial color={DORADA.cielo} transparent opacity={0.16} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial color={ATMO.cielo} transparent opacity={0.16} depthWrite={false} blending={THREE.AdditiveBlending} />
       </mesh>
       {/* el halo del nacimiento: crece y brilla en modo fábrica */}
       <mesh ref={halo} position={[0, Y_AGUA + 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -956,6 +1014,58 @@ function RomeroParamo({ n }) {
   );
 }
 
+/* ── ROCÍO FRÍO EN SUSPENSIÓN: la humedad del páramo hecha visible. Un `Points`
+      de motas azul-plata que caen MUY despacio y reaparecen arriba —el aire de
+      3.500 m siempre está mojado, cargado de bruma que se condensa. Reemplaza al
+      polen dorado del valle: aquí no hay oro flotando, hay agua. Aditivo y sutil;
+      determinista por semilla; reduced-motion lo deja quieto (presencia sin
+      caída). Es geometría propia del páramo, ligera (un solo draw call). ── */
+function RocioFrio({ tier, reducedMotion, semilla = 17 }) {
+  const ref = useRef(null);
+  const n = tier === 'alto' ? 130 : tier === 'bajo' ? 30 : 70;
+  const ANCHA = 26, ALTA = 6, HONDA = 22;
+  const datos = useMemo(() => {
+    const rng = crearRng(semilla);
+    const pos = new Float32Array(n * 3);
+    const vel = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      pos[i * 3] = (rng() - 0.5) * ANCHA;
+      pos[i * 3 + 1] = rng() * ALTA;
+      pos[i * 3 + 2] = -3 + (rng() - 0.5) * HONDA;
+      vel[i] = 0.12 + rng() * 0.22; // la gota fría baja lento entre la bruma
+    }
+    return { pos, vel };
+  }, [n, semilla]);
+  useFrame((_, delta) => {
+    if (reducedMotion || !ref.current) return;
+    const arr = ref.current.geometry.attributes.position.array;
+    const dt = Math.min(delta, 0.05);
+    for (let i = 0; i < n; i++) {
+      const yi = i * 3 + 1;
+      arr[yi] -= datos.vel[i] * dt;
+      if (arr[yi] < 0.05) arr[yi] = ALTA; // reaparece arriba
+      arr[i * 3] += Math.sin((arr[yi] + i) * 0.6) * dt * 0.08; // deriva lateral leve
+    }
+    ref.current.geometry.attributes.position.needsUpdate = true;
+  });
+  return (
+    <points ref={ref} frustumCulled={false}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[datos.pos, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        color="#dbe9f0"
+        size={0.07}
+        sizeAttenuation
+        transparent
+        opacity={0.5}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
+}
+
 /* La escena completa (grupo r3f interno; el default la monta en su Canvas). */
 function EscenaParamo({ tier, reducedMotion, fabrica }) {
   const perfil = perfilDeTier(tier);
@@ -965,21 +1075,21 @@ function EscenaParamo({ tier, reducedMotion, fabrica }) {
   );
   useEffect(() => () => geo.dispose(), [geo]);
 
-  // presupuestos de la colonia por tier
-  const nFrailejones = tier === 'alto' ? 18 : 11;
-  const nPaja = tier === 'alto' ? 150 : 90;
-  const nMusgo = tier === 'alto' ? 46 : 28;
-  const nNiebla = tier === 'alto' ? 9 : 6;
+  // presupuestos de la colonia por tier — PASADA 2 sube la densidad del rodal
+  const nFrailejones = tier === 'alto' ? 38 : 22; // frailejonal poblado, por edades
+  const nPaja = tier === 'alto' ? 180 : 110;
+  const nMusgo = tier === 'alto' ? 64 : 38; // más cojines: páramo húmedo
+  const nNiebla = tier === 'alto' ? 14 : 9; // más bancos de bruma fría
   const nAves = tier === 'alto' ? 3 : 2;
-  const nRomero = tier === 'alto' ? 22 : 12;
+  const nRomero = tier === 'alto' ? 34 : 18; // sotobosque leñoso más denso
 
   /* `color`/`fog` se adjuntan a la ESCENA: hijos directos, nunca en <group>. */
   return (
     <>
-      <color attach="background" args={[DORADA.fondo]} />
-      {perfil.fog && <fog attach="fog" args={[DORADA.niebla, DORADA.nieblaCerca + 2, DORADA.nieblaLejos]} />}
-      <LucesDoradas />
-      <SolBajo />
+      <color attach="background" args={[ATMO.fondo]} />
+      {perfil.fog && <fog attach="fog" args={[ATMO.niebla, ATMO.nieblaCerca + 2, ATMO.nieblaLejos]} />}
+      <LucesParamo />
+      <SolVelado />
 
       <mesh geometry={geo}>
         <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
@@ -987,26 +1097,30 @@ function EscenaParamo({ tier, reducedMotion, fabrica }) {
 
       <NacimientoAgua reducedMotion={reducedMotion} fabrica={fabrica} />
 
-      {/* ══ EL GUARDIÁN-MAESTRO ══ el Ent-frailejón monumental que se alza sobre
-          el frailejonal y enseña. Elevado y adelantado a la izquierda para que
-          domine el cuadro sin tapar el nacimiento del agua. */}
-      <EntFrailejonMaestro pos={[-1.9, alturaParamo(-1.9, 1.4) - 0.1, 1.4]} esc={1.6} reducedMotion={reducedMotion} />
+      {/* ══ EL GUARDIÁN-MAESTRO ══ el Ent-frailejón MONUMENTAL que se alza sobre
+          el frailejonal y enseña. Pasada 2 lo hace más imponente (esc 2.0):
+          elevado y adelantado a la izquierda para que domine el cuadro sin tapar
+          el nacimiento del agua. */}
+      <EntFrailejonMaestro pos={[-2.1, alturaParamo(-2.1, 1.3) - 0.1, 1.3]} esc={2.0} reducedMotion={reducedMotion} />
 
       {/* el frailejón "de detalle" pasa a acompañante, más al costado */}
-      <FrailejonHeroe pos={[2.6, alturaParamo(2.6, 1.4), 1.4]} reducedMotion={reducedMotion} />
+      <FrailejonHeroe pos={[2.7, alturaParamo(2.7, 1.5), 1.5]} reducedMotion={reducedMotion} />
       <FrailejonalInstanciado n={nFrailejones} />
       <Pajonal n={nPaja} />
       <CojinesMusgo n={nMusgo} />
       <RomeroParamo n={nRomero} />
 
-      {/* chusque (bambú del páramo) en macollas en las faldas húmedas */}
-      <Chusque pos={[-5.4, alturaParamo(-5.4, 3.2), 3.2]} esc={1.1} seed={5} />
+      {/* chusque (Chusquea, el bambú del páramo) en macollas en las faldas húmedas */}
+      <Chusque pos={[-5.4, alturaParamo(-5.4, 3.2), 3.2]} esc={1.15} seed={5} />
       <Chusque pos={[4.6, alturaParamo(4.6, -3.4), -3.4]} esc={0.95} seed={13} />
+      <Chusque pos={[6.0, alturaParamo(6.0, 3.0), 3.0]} esc={1.05} seed={44} />
       {tier === 'alto' && <Chusque pos={[-6.8, alturaParamo(-6.8, -1.2), -1.2]} esc={1.0} seed={21} />}
+      {tier === 'alto' && <Chusque pos={[-3.3, alturaParamo(-3.3, 5.0), 5.0]} esc={0.85} seed={57} />}
 
       {/* cardón (Puya) — la bromelia gigante del páramo, roseta espinosa + vara */}
-      <Cardon pos={[3.4, alturaParamo(3.4, 3.6), 3.6]} esc={1.0} vara seed={9} />
+      <Cardon pos={[3.4, alturaParamo(3.4, 3.6), 3.6]} esc={1.05} vara seed={9} />
       <Cardon pos={[-4.2, alturaParamo(-4.2, 5.2), 5.2]} esc={0.85} vara={false} seed={31} />
+      <Cardon pos={[5.4, alturaParamo(5.4, -1.4), -1.4]} esc={0.9} vara seed={63} />
 
       {/* quenuas dispersas en las faldas; la niebla se les engancha */}
       <Quenua pos={[-8.2, alturaParamo(-8.2, -4.5), -4.5]} esc={1.25} />
@@ -1018,45 +1132,31 @@ function EscenaParamo({ tier, reducedMotion, fabrica }) {
       <AvePosada />
       {!reducedMotion && <AvesParamo n={nAves} />}
 
-      {/* el polen/rocío dorado en suspensión (kit de partículas) */}
-      <ParticulasAmbientales
-        tipo="polen"
-        tier={tier}
-        reducedMotion={reducedMotion}
-        position={[0, 0.5, 1]}
-        semilla={17}
-      />
-      <ParticulasAmbientales
-        tipo="polen"
-        densidad={0.6}
-        tier={tier}
-        reducedMotion={reducedMotion}
-        position={[-4, 0.8, -3]}
-        semilla={29}
-      />
+      {/* el ROCÍO FRÍO en suspensión: la humedad del páramo, no el polen dorado */}
+      <RocioFrio tier={tier} reducedMotion={reducedMotion} semilla={17} />
     </>
   );
 }
 
 /* Estilos de ESTA escena (chrome DOM sobre el Canvas). */
 const CSS_PARAMO = `
-.paramo-root { position: relative; width: 100%; height: 100dvh; min-height: 320px; overflow: hidden; background: ${DORADA.fondo}; }
+.paramo-root { position: relative; width: 100%; height: 100dvh; min-height: 320px; overflow: hidden; background: ${ATMO.fondo}; }
 .paramo-canvas { position: absolute; inset: 0; opacity: 0; transition: opacity 0.9s ease; }
 .paramo-canvas--lista { opacity: 1; }
 .paramo-chrome { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
-.paramo-titulo { margin: 0; padding: 0.9rem 1rem 0; color: #4a3418; text-shadow: 0 1px 8px rgba(255,244,214,0.7); font: 700 1.18rem/1.2 system-ui, sans-serif; letter-spacing: 0.01em; }
-.paramo-titulo small { display: block; font: 500 0.8rem/1.3 system-ui, sans-serif; opacity: 0.82; margin-top: 0.15rem; }
+.paramo-titulo { margin: 0; padding: 0.9rem 1rem 0; color: #22303c; text-shadow: 0 1px 8px rgba(226,238,245,0.75); font: 700 1.18rem/1.2 system-ui, sans-serif; letter-spacing: 0.01em; }
+.paramo-titulo small { display: block; font: 500 0.8rem/1.3 system-ui, sans-serif; opacity: 0.84; margin-top: 0.15rem; }
 .paramo-pie { padding: 0 1rem 0.9rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.6rem; }
-.paramo-carta { margin: 0; max-width: 32rem; text-align: center; padding: 0.5rem 0.95rem; border-radius: 0.7rem; background: rgba(74,52,24,0.62); backdrop-filter: blur(3px); color: #fbf3e2; font: 500 0.8rem/1.5 system-ui, sans-serif; }
-.paramo-boton { pointer-events: auto; appearance: none; border: 1px solid rgba(74,52,24,0.35); border-radius: 999px; padding: 0.44rem 1rem; background: rgba(255,247,228,0.82); color: #5a3f1c; font: 600 0.8rem/1.1 system-ui, sans-serif; cursor: pointer; backdrop-filter: blur(3px); transition: background 0.2s ease, border-color 0.2s ease; }
-.paramo-boton:hover, .paramo-boton:focus-visible { background: rgba(255,255,255,0.95); border-color: rgba(74,52,24,0.6); outline: none; }
-.paramo-boton[aria-pressed='true'] { background: #ffe8b0; border-color: rgba(90,63,28,0.75); color: #4a3418; }
+.paramo-carta { margin: 0; max-width: 32rem; text-align: center; padding: 0.5rem 0.95rem; border-radius: 0.7rem; background: rgba(30,44,56,0.62); backdrop-filter: blur(3px); color: #eef5f9; font: 500 0.8rem/1.5 system-ui, sans-serif; }
+.paramo-boton { pointer-events: auto; appearance: none; border: 1px solid rgba(30,44,56,0.35); border-radius: 999px; padding: 0.44rem 1rem; background: rgba(233,242,247,0.85); color: #26333d; font: 600 0.8rem/1.1 system-ui, sans-serif; cursor: pointer; backdrop-filter: blur(3px); transition: background 0.2s ease, border-color 0.2s ease; }
+.paramo-boton:hover, .paramo-boton:focus-visible { background: rgba(255,255,255,0.95); border-color: rgba(30,44,56,0.6); outline: none; }
+.paramo-boton[aria-pressed='true'] { background: #cfe3ee; border-color: rgba(38,51,61,0.75); color: #22303c; }
 @media (prefers-reduced-motion: reduce) { .paramo-canvas { transition: none; } }
 `;
 
 /* La copia didáctica: en calma, la invitación; en modo fábrica, cómo nace. */
 const COPY_CALMA =
-  'Este es el páramo, la fábrica de agua, y su guardián: el frailejón-maestro que enseña a cuidarlo. Toque el botón para ver de dónde nace el agua que baja a las veredas.';
+  'Este es el páramo altoandino: aire frío y húmedo, niebla azul que no se va, y su guardián, el frailejón-maestro. Toque el botón para ver de dónde nace el agua que baja a las veredas.';
 const COPY_FABRICA =
   'Los frailejones peinan la niebla con sus hojas velludas; el musgo y la turba la guardan como una esponja. Del hondón, gota a gota, nace el agua. Por eso el páramo se cuida: si se seca, se seca el río.';
 
@@ -1068,7 +1168,9 @@ const COPY_FABRICA =
 export default function MundoParamo3D() {
   const [listo, setListo] = useState(false);
   const [fabrica, setFabrica] = useState(false);
-  const tier = useMemo(() => decidirTier(), []);
+  // decidirTier() devuelve { tier, motivo, reducedMotion }: hay que sacar el
+  // tier (si no, `tier === 'alto'` nunca es cierto y el rodal cae a `medio`).
+  const { tier } = useMemo(() => decidirTier(), []);
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&
