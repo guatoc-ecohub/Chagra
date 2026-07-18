@@ -32,6 +32,15 @@ describe('classifyMetric', () => {
     expect(classifyMetric('cold_load_ms')).toBe('latency');
     expect(classifyMetric('recall1_bm25')).toBe('other');
   });
+  it('los CONTEOS crudos NO son familia hallucination (no llevan umbral pp)', () => {
+    // Bug 2026-07-18: subspecies_disconnections (256) tratado como % daba
+    // "+212pp" -> RED falso. Los conteos caen a 'other' (info, no votan).
+    expect(classifyMetric('subspecies_disconnections')).toBe('other');
+    expect(classifyMetric('hallucinations')).toBe('other');
+    // las TASAS si son gate real:
+    expect(classifyMetric('ah_pct')).toBe('hallucination');
+    expect(classifyMetric('hallucination_rate')).toBe('hallucination');
+  });
 });
 
 describe('regressionAmount', () => {
@@ -123,6 +132,15 @@ describe('diffRecords - veredicto global', () => {
     );
     expect(d.verdict).toBe('GREEN');
     expect(d.unmatched.map((u) => u.name)).toContain('nueva_metrica');
+  });
+  it('un salto grande de CONTEO no bloquea (info-only, reproduce el bug 2026-07-18)', () => {
+    const d = diffRecords(
+      rec({ ah_pct: 10, subspecies_disconnections: 256 }),
+      rec({ ah_pct: 10, subspecies_disconnections: 468 }), // +212 en conteo
+    );
+    expect(d.verdict).toBe('GREEN'); // antes daba RED por "+212pp"
+    expect(d.blockers).toHaveLength(0);
+    expect(d.metrics.find((m) => m.name === 'subspecies_disconnections').severity).toBe('info');
   });
   it('anota advertencia si la config es cruda (no producto)', () => {
     const d = diffRecords(
