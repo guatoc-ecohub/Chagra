@@ -1,1 +1,0 @@
-import{i as e}from"./rolldown-runtime-aKtaBQYM.js";import{t}from"./vendor-react-Bl3EXeX9.js";import{t as n}from"./ChagraAgentAvatarColibri-BRipYpBw.js";import{n as r,r as i,t as a}from"./useAgentAvatarType-D0BQNvTV.js";var o=e(t(),1);function s(e){let[t]=a();return t===`maiz`?(0,o.jsx)(i,{...e}):t===`colibri_svg`?(0,o.jsx)(n,{...e}):(0,o.jsx)(r,{...e})}export{s as t};
