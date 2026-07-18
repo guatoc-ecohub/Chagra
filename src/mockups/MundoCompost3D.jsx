@@ -1,22 +1,31 @@
 /*
- * MundoCompost3D — el MUNDO DEL COMPOST: el ciclo del abono contado en 3D, del
- * residuo al suelo vivo, como un ANILLO que se cierra. No es un montón de basura
- * que se pudre: es el órgano que devuelve al suelo lo que la cocina y la huerta
- * dejan de usar, y así vuelve a nacer la próxima planta.
+ * MundoCompost3D — el MUNDO DEL COMPOST como una BIOFÁBRICA VIVA: el ciclo del
+ * abono contado en 3D, del residuo al suelo vivo, como un ANILLO que se cierra.
+ * No es un montón de basura que se pudre: es el órgano que devuelve al suelo lo
+ * que la cocina, la huerta y el corral dejan de usar, movido por un EQUIPO de
+ * descomponedores reales, y así vuelve a nacer la próxima planta.
  *
  * La escena es un ANILLO de cuatro estaciones sobre la tierra dorada, recorrido
- * por puntos ámbar que marcan el sentido del ciclo (nada se bota, todo vuelve):
+ * por puntos ámbar que marcan el sentido del ciclo (nada se bota, todo vuelve),
+ * más una estación pecuaria satélite:
  *   1. RESIDUOS   — lo que sobra: verdes (frescos, nitrógeno) y marrones (secos,
  *                   carbono) esperando en un canasto.
  *   2. LA PILA    — la pila de compost por CAPAS (verde/marrón alternadas), con el
  *                   CALOR de la descomposición saliendo en vapor sutil (la fase
  *                   termófila) y la horquilla al lado para VOLTEARLA (airear).
+ *                   La trabajan descomponedores REALES: el velo blanco de los
+ *                   ACTINOMICETOS (Streptomyces & cía., el olor a tierra), HONGOS
+ *                   saprófitos y un ESCARABAJO entre los restos.
  *   3. LOMBRICULTURA — la cama de la lombriz roja californiana: madera, humus
- *                   oscuro y las lombrices trabajando; al lado, una MUESTRA de
- *                   cerca (se reutiliza el diorama del framework) de la vida que
- *                   hace el humus.
+ *                   oscuro y las lombrices trabajando; al lado, un TRONCO en
+ *                   descomposición con hongos y musgo, y una MUESTRA de cerca (se
+ *                   reutiliza el diorama del framework) de la vida que hace el humus.
  *   4. SUELO VIVO — el humus terminado, tierra negra donde ya asoma un brote: el
  *                   anillo se cierra, porque esa planta dará nuevos residuos.
+ *   5. EL CICLO PECUARIO — a un lado: el montón de ESTIÉRCOL con escarabajos
+ *                   peloteros, el BIODIGESTOR de campana flotante (biogás) y el
+ *                   balde de BIOL (abono líquido). Un flujo ámbar lleva el biol de
+ *                   vuelta a la pila: el estiércol también se vuelve abono.
  *
  * DIRECCIÓN DE ARTE (todo dentro del framework, nada inventado por fuera):
  *   - Atmósfera: la MISMA hora dorada del valle (`CIELOS_HORA.dorada`, espejo de
@@ -78,6 +87,24 @@ const P = {
   ambar: PALETA.ambar, // el anillo del ciclo
   ambarVivo: '#f0b850',
   vapor: '#fff2dd', // el calor termófilo hecho vapor
+  /* Descomponedores reales que trabajan la materia */
+  escarabajo: mezclar('#241d15', TINTE, 0.08), // el escarabajo pelotero (élitros)
+  escarabajoBrillo: mezclar('#4a3a26', TINTE, 0.1), // el reflejo del caparazón
+  bola: mezclar('#3a2a18', TINTE, 0.12), // la bola de estiércol que rueda
+  hongoTallo: mezclar('#e6d8ba', TINTE, 0.18), // el pie del hongo saprófito
+  hongoSombrero: mezclar('#a9743f', TINTE, 0.16), // el sombrero (una variedad)
+  hongoSombreroAlt: mezclar('#c9a86a', TINTE, 0.14), // otra variedad más pálida
+  actino: '#f4ecd8', // el velo blanco de los actinomicetos (olor a tierra)
+  tronco: mezclar('#4a382a', TINTE, 0.16), // el tronco en descomposición
+  musgo: mezclar('#5f7a3a', TINTE, 0.2), // el musgo sobre el tronco
+  /* El ciclo del estiércol: montón → biodigestor → biol (abono líquido) */
+  estiercol: mezclar('#453322', TINTE, 0.14), // el montón de estiércol crudo
+  estiercolAlt: mezclar('#57422b', TINTE, 0.14),
+  tanque: mezclar('#2c2822', TINTE, 0.1), // el tanque del biodigestor (polietileno)
+  gasometro: mezclar('#586b60', TINTE, 0.22), // la campana de gas (gasómetro flotante)
+  tuberia: mezclar(PALETA.lamina, TINTE, 0.14), // las tuberías (entrada/salida)
+  biol: '#7a5620', // el biol: abono líquido ámbar oscuro
+  biolClaro: '#9c7330',
 };
 
 /* La geometría del anillo: cuatro estaciones sobre un círculo de radio R. El
@@ -705,6 +732,417 @@ function PinEstacion({ posicion, emoji, nombre, sub }) {
   );
 }
 
+/* ── El escarabajo pelotero: el descomponedor que entierra y rueda la boñiga ──── *
+   Élitros oscuros con brillo, cabeza-pala, seis patas que baten, y su bola de
+   estiércol delante. Da vueltas lentas sobre el montón (la enterrará para poner
+   sus huevos y airear el suelo). reducedMotion lo deja quieto en su pose. */
+function EscarabajoPelotero({ base = [0, 0, 0], radio = 0.5, escala = 1, fase = 0, conBola = true, reducedMotion }) {
+  const cuerpo = useRef(null);
+  const patas = useRef([]);
+  const patasDef = useMemo(
+    () => Array.from({ length: 6 }, (_, i) => {
+      const lado = i < 3 ? 1 : -1;
+      const idx = i % 3;
+      return { key: i, lado, z: (idx - 1) * 0.09, ang: (idx - 1) * 0.35 };
+    }),
+    [],
+  );
+  useFrame(({ clock }) => {
+    const g = cuerpo.current;
+    if (!g || reducedMotion) return;
+    const a = clock.elapsedTime * 0.5 + fase;
+    g.position.x = base[0] + Math.cos(a) * radio;
+    g.position.z = base[2] + Math.sin(a) * radio;
+    g.position.y = base[1] + Math.abs(Math.sin(a * 6)) * 0.012 * escala;
+    g.rotation.y = -a + Math.PI / 2; // mira hacia donde empuja
+    for (let i = 0; i < patas.current.length; i++) {
+      const p = patas.current[i];
+      if (p) p.rotation.x = Math.sin(clock.elapsedTime * 9 + i * 1.3) * 0.35;
+    }
+  });
+  return (
+    <group ref={cuerpo} position={/** @type {[number, number, number]} */ (base)} scale={escala}>
+      {/* los élitros: elipsoide oscuro y brillante */}
+      <mesh position={[0, 0.1, 0]} scale={[1, 0.8, 1.3]}>
+        <sphereGeometry args={[0.12, 12, 10]} />
+        <meshLambertMaterial color={P.escarabajo} flatShading />
+      </mesh>
+      {/* la costura/brillo del caparazón */}
+      <mesh position={[0, 0.19, 0]} scale={[0.22, 0.4, 1.15]}>
+        <sphereGeometry args={[0.12, 8, 6]} />
+        <meshLambertMaterial color={P.escarabajoBrillo} flatShading />
+      </mesh>
+      {/* cabeza-pala */}
+      <mesh position={[0, 0.08, 0.16]} scale={[0.85, 0.6, 0.7]}>
+        <sphereGeometry args={[0.07, 8, 8]} />
+        <meshLambertMaterial color={P.escarabajo} flatShading />
+      </mesh>
+      {/* seis patas que baten */}
+      {patasDef.map((pt, i) => (
+        <group key={pt.key} position={[0.1 * pt.lado, 0.03, pt.z]} rotation={[0, 0, pt.ang * pt.lado]}>
+          <group ref={(el) => { patas.current[i] = el; }}>
+            <mesh position={[0.07 * pt.lado, -0.03, 0]} rotation={[0, 0, pt.lado * 0.7]}>
+              <cylinderGeometry args={[0.008, 0.006, 0.14, 4]} />
+              <meshBasicMaterial color={P.escarabajo} />
+            </mesh>
+          </group>
+        </group>
+      ))}
+      {/* la bola de estiércol que rueda por delante */}
+      {conBola && (
+        <mesh position={[0, 0.13, 0.33]}>
+          <dodecahedronGeometry args={[0.14, 0]} />
+          <meshLambertMaterial color={P.bola} flatShading />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
+/* ── Los hongos saprófitos: pie + sombrero, la boca del reino fungi que desarma
+      la lignina que ni la lombriz muerde. Respiran apenas (reducedMotion: quietos). */
+function Hongo({ pos, escala = 1, alt = false, fase = 0, reducedMotion }) {
+  const cap = useRef(null);
+  useFrame(({ clock }) => {
+    if (reducedMotion || !cap.current) return;
+    cap.current.rotation.z = Math.sin(clock.elapsedTime * 0.9 + fase) * 0.05;
+  });
+  return (
+    <group position={/** @type {[number, number, number]} */ (pos)} scale={escala}>
+      <mesh position={[0, 0.13, 0]}>
+        <cylinderGeometry args={[0.028, 0.05, 0.26, 6]} />
+        <meshLambertMaterial color={P.hongoTallo} flatShading />
+      </mesh>
+      <group ref={cap} position={[0, 0.26, 0]}>
+        <mesh scale={[1, 0.62, 1]}>
+          <sphereGeometry args={[0.12, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshLambertMaterial color={alt ? P.hongoSombreroAlt : P.hongoSombrero} flatShading />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+function HongosCluster({ centro, semilla = 1, n = 4, reducedMotion }) {
+  const setas = useMemo(() => {
+    const r = rng(semilla);
+    return Array.from({ length: n }, () => ({
+      x: (r() - 0.5) * 0.5,
+      z: (r() - 0.5) * 0.5,
+      s: 0.65 + r() * 0.75,
+      alt: r() < 0.4,
+      fase: r() * 6,
+    }));
+  }, [semilla, n]);
+  return (
+    <group position={/** @type {[number, number, number]} */ (centro)}>
+      {setas.map((s, i) => (
+        <Hongo key={i} pos={[s.x, 0, s.z]} escala={s.s} alt={s.alt} fase={s.fase} reducedMotion={reducedMotion} />
+      ))}
+    </group>
+  );
+}
+
+/* ── El tronco en descomposición: sustrato de los hongos. Madera reblandecida con
+      musgo y setas creciendo — el reino fungi devolviendo el árbol al suelo. ──── */
+function TroncoDescomposicion({ centro, tier, reducedMotion }) {
+  return (
+    <group position={/** @type {[number, number, number]} */ (centro)} rotation={[0, 0.5, 0]}>
+      {/* el tronco caído */}
+      <mesh position={[0, 0.17, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.19, 0.22, 1.7, 10]} />
+        <meshLambertMaterial color={P.tronco} flatShading />
+      </mesh>
+      {/* el corte del extremo (madera clara, los anillos) */}
+      <mesh position={[0.85, 0.17, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.195, 0.195, 0.03, 10]} />
+        <meshLambertMaterial color={P.maderaClara} flatShading />
+      </mesh>
+      {/* musgo sobre la corteza */}
+      <Chunks
+        n={tier === 'bajo' ? 14 : 26}
+        caja={[1.5, 0.04, 0.3]}
+        centro={[0, 0.33, 0]}
+        rMin={0.04}
+        rMax={0.09}
+        colores={[P.musgo, mezclar(P.musgo, P.brote, 0.4)]}
+        forma="grumo"
+        domo={0.1}
+        seed={53}
+      />
+      {/* orejas de palo (repisas laterales del hongo) */}
+      {[-0.4, 0.15].map((x, i) => (
+        <mesh key={i} position={[x, 0.28, 0.18]} rotation={[Math.PI / 2.4, 0, 0]} scale={[1.6, 1, 0.5]}>
+          <cylinderGeometry args={[0.12, 0.12, 0.03, 10, 1, false, 0, Math.PI]} />
+          <meshLambertMaterial color={P.hongoSombreroAlt} flatShading side={THREE.DoubleSide} />
+        </mesh>
+      ))}
+      {/* setas creciendo del tronco */}
+      <HongosCluster centro={[-0.15, 0.3, -0.05]} semilla={61} n={tier === 'bajo' ? 3 : 5} reducedMotion={reducedMotion} />
+    </group>
+  );
+}
+
+/* ── El velo de actinomicetos: la telilla blanca (Streptomyces & cía.) que da al
+      buen compost su OLOR A TIERRA. Filamentos finos que abrazan la cúpula de la
+      pila, con un pulso tenue. Comparten un material (un solo brillo para el velo);
+      reducedMotion los deja quietos. No monta en gama baja. ──────────────────── */
+function ActinomicetosVelo({ centro, tier, reducedMotion }) {
+  const n = tier === 'bajo' ? 0 : tier === 'medio' ? 14 : 24;
+  const material = useMemo(
+    () => new THREE.MeshBasicMaterial({ color: P.actino, transparent: true, opacity: 0.42, depthWrite: false }),
+    [],
+  );
+  useEffect(() => () => material.dispose(), [material]);
+  const filas = useMemo(() => {
+    const r = rng(307);
+    return Array.from({ length: n }, () => {
+      const ang = r() * Math.PI * 2;
+      const rad = 0.2 + r() * 0.95;
+      return {
+        pos: [Math.cos(ang) * rad, PILA_TOPE - rad * rad * 0.5 + 0.05, Math.sin(ang) * rad * 0.82],
+        rotY: ang + Math.PI / 2 + (r() - 0.5),
+        largo: 0.12 + r() * 0.24,
+      };
+    });
+  }, [n]);
+  useFrame(({ clock }) => {
+    if (reducedMotion) return;
+    material.opacity = 0.32 + 0.16 * Math.sin(clock.elapsedTime * 1.3);
+  });
+  if (n === 0) return null;
+  return (
+    <group position={/** @type {[number, number, number]} */ (centro)}>
+      {filas.map((f, i) => (
+        <mesh key={i} position={/** @type {[number, number, number]} */ (f.pos)} rotation={[Math.PI * 0.42, f.rotY, 0]} material={material}>
+          <cylinderGeometry args={[0.006, 0.006, f.largo, 4]} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* ── El montón de estiércol: la entrada del ciclo pecuario. Boñiga cruda con paja
+      asomando; los escarabajos peloteros ya trabajando encima. ─────────────────── */
+function MontonEstiercol({ centro, tier, reducedMotion }) {
+  return (
+    <group position={/** @type {[number, number, number]} */ (centro)}>
+      {/* la masa: media esfera achatada, oscura */}
+      <mesh position={[0, 0.02, 0]} scale={[1, 0.55, 0.92]}>
+        <sphereGeometry args={[0.72, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        <meshLambertMaterial color={P.estiercol} flatShading />
+      </mesh>
+      {/* grumos de boñiga vistiendo el montón */}
+      <Chunks
+        n={tier === 'bajo' ? 16 : 30}
+        caja={[1.0, 0, 0.85]}
+        centro={[0, 0.32, 0]}
+        rMin={0.05}
+        rMax={0.11}
+        colores={[P.estiercol, P.estiercolAlt]}
+        forma="grumo"
+        domo={0.28}
+        seed={241}
+      />
+      {/* la paja seca que asoma (fibra sin digerir) */}
+      <Chunks
+        n={tier === 'bajo' ? 8 : 16}
+        caja={[1.1, 0, 0.95]}
+        centro={[0, 0.36, 0]}
+        rMin={0.08}
+        rMax={0.15}
+        colores={[P.hojaSeca, P.marronAlt]}
+        forma="hoja"
+        domo={0.22}
+        seed={251}
+      />
+      {/* los escarabajos peloteros (descomponedores del estiércol) */}
+      <EscarabajoPelotero base={[0, 0.42, 0]} radio={0.55} fase={0} reducedMotion={reducedMotion} />
+      {tier !== 'bajo' && (
+        <EscarabajoPelotero base={[0.1, 0.44, 0]} radio={0.38} fase={2.4} escala={0.82} conBola={false} reducedMotion={reducedMotion} />
+      )}
+    </group>
+  );
+}
+
+/* ── El biodigestor: campana flotante (gasómetro) que sube al llenarse de biogás,
+      tanque de polietileno con la carga, y sus tuberías de entrada y de salida. El
+      gas fermenta y sube; abajo decanta el biol. reducedMotion congela el gas. ── */
+function Biodigestor({ centro, reducedMotion }) {
+  const campana = useRef(null);
+  useFrame(({ clock }) => {
+    if (reducedMotion || !campana.current) return;
+    // el gasómetro sube y baja según se acumula/consume el biogás
+    campana.current.position.y = 0.62 + (0.5 + 0.5 * Math.sin(clock.elapsedTime * 0.5)) * 0.14;
+  });
+  return (
+    <group position={/** @type {[number, number, number]} */ (centro)}>
+      {/* el tanque (foso de polietileno oscuro) */}
+      <mesh position={[0, 0.35, 0]}>
+        <cylinderGeometry args={[0.62, 0.66, 0.7, 20]} />
+        <meshLambertMaterial color={P.tanque} flatShading />
+      </mesh>
+      {/* la carga fermentando dentro (asoma en el borde) */}
+      <mesh position={[0, 0.66, 0]}>
+        <cylinderGeometry args={[0.58, 0.58, 0.04, 20]} />
+        <meshLambertMaterial color={P.estiercolAlt} flatShading />
+      </mesh>
+      {/* aro superior del tanque */}
+      <mesh position={[0, 0.7, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.62, 0.03, 6, 22]} />
+        <meshLambertMaterial color={P.tuberia} flatShading />
+      </mesh>
+      {/* la campana de gas flotante (gasómetro) */}
+      <group ref={campana} position={[0, 0.62, 0]}>
+        <mesh>
+          <cylinderGeometry args={[0.56, 0.56, 0.3, 20, 1, true]} />
+          <meshLambertMaterial color={P.gasometro} flatShading side={THREE.DoubleSide} />
+        </mesh>
+        <mesh position={[0, 0.15, 0]} scale={[1, 0.5, 1]}>
+          <sphereGeometry args={[0.56, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshLambertMaterial color={P.gasometro} flatShading />
+        </mesh>
+        {/* el tubo de biogás y su llave */}
+        <mesh position={[0, 0.33, 0]}>
+          <cylinderGeometry args={[0.028, 0.028, 0.2, 6]} />
+          <meshLambertMaterial color={P.tuberia} flatShading />
+        </mesh>
+        <mesh position={[0.06, 0.4, 0]} rotation={[0, 0, Math.PI / 2]}>
+          <cylinderGeometry args={[0.02, 0.02, 0.12, 6]} />
+          <meshLambertMaterial color={P.lombriz} flatShading />
+        </mesh>
+      </group>
+      {/* tubería de entrada (desde el montón de estiércol) */}
+      <mesh position={[-0.62, 0.5, -0.5]} rotation={[0.7, 0.5, 0]}>
+        <cylinderGeometry args={[0.06, 0.06, 0.95, 8]} />
+        <meshLambertMaterial color={P.tuberia} flatShading />
+      </mesh>
+      {/* tubería de salida del biol (hacia el balde) */}
+      <mesh position={[0.6, 0.3, 0.42]} rotation={[Math.PI / 2.1, 0, Math.PI / 3.2]}>
+        <cylinderGeometry args={[0.05, 0.05, 0.6, 8]} />
+        <meshLambertMaterial color={P.tuberia} flatShading />
+      </mesh>
+    </group>
+  );
+}
+
+/* ── El balde de biol: el abono LÍQUIDO que decanta el biodigestor. Superficie
+      ámbar que tiembla apenas y gotas que caen del tubo. reducedMotion: quieto. ── */
+function BaldeBiol({ centro, reducedMotion }) {
+  const liquido = useRef(null);
+  const gotas = useRef(null);
+  const NG = 3;
+  const semillas = useMemo(() => Array.from({ length: NG }, (_, i) => i / NG), []);
+  useFrame(({ clock }) => {
+    if (reducedMotion) return;
+    const t = clock.elapsedTime;
+    if (liquido.current) liquido.current.position.y = 0.3 + Math.sin(t * 2) * 0.006;
+    const m = gotas.current;
+    if (m) {
+      const dummy = new THREE.Object3D();
+      for (let i = 0; i < NG; i++) {
+        const p = (semillas[i] + t * 0.9) % 1;
+        dummy.position.set(0.18, 0.66 - p * 0.34, 0.16);
+        const s = 0.03 * (1 - p * 0.3);
+        dummy.scale.set(s, s * 1.5, s);
+        dummy.updateMatrix();
+        m.setMatrixAt(i, dummy.matrix);
+      }
+      m.instanceMatrix.needsUpdate = true;
+    }
+  });
+  return (
+    <group position={/** @type {[number, number, number]} */ (centro)}>
+      {/* el balde */}
+      <mesh position={[0, 0.22, 0]}>
+        <cylinderGeometry args={[0.32, 0.26, 0.44, 16, 1, true]} />
+        <meshLambertMaterial color={P.tuberia} flatShading side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[0, 0.01, 0]}>
+        <cylinderGeometry args={[0.26, 0.26, 0.03, 16]} />
+        <meshLambertMaterial color={P.maderaOscura} flatShading />
+      </mesh>
+      {/* el biol dentro (ámbar oscuro) */}
+      <mesh ref={liquido} position={[0, 0.3, 0]}>
+        <cylinderGeometry args={[0.3, 0.26, 0.06, 16]} />
+        <meshLambertMaterial color={P.biol} flatShading transparent opacity={0.94} />
+      </mesh>
+      {/* las gotas que caen del tubo de salida */}
+      <instancedMesh ref={gotas} args={[undefined, undefined, NG]} frustumCulled={false}>
+        <sphereGeometry args={[1, 6, 5]} />
+        <meshLambertMaterial color={P.biolClaro} flatShading />
+      </instancedMesh>
+    </group>
+  );
+}
+
+/* La estación PECUARIA: estiércol → biodigestor → biol. Cierra el ciclo animal,
+   igual que la pila cierra el vegetal: nada del corral se pierde. */
+function CicloEstiercol({ centro, tier, reducedMotion }) {
+  return (
+    <group position={/** @type {[number, number, number]} */ (centro)}>
+      <MontonEstiercol centro={[0.55, 0, -1.45]} tier={tier} reducedMotion={reducedMotion} />
+      <Biodigestor centro={[-0.2, 0, 0]} reducedMotion={reducedMotion} />
+      <BaldeBiol centro={[0.6, 0, 0.95]} reducedMotion={reducedMotion} />
+    </group>
+  );
+}
+
+/* ── El flujo del abono: puntos ámbar que van del biodigestor a la pila, para
+      DECIR que el estiércol procesado (biol) también alimenta el compost/suelo.
+      Recorre un arco suave; reducedMotion lo deja repartido y quieto. ─────────── */
+function FlujoAbono({ desde, hasta, tier, reducedMotion }) {
+  const ref = useRef(null);
+  const n = tier === 'bajo' ? 0 : tier === 'medio' ? 7 : 12;
+  const datos = useMemo(() => {
+    const r = rng(271);
+    return Array.from({ length: n }, (_, i) => ({ t0: i / n, s: 0.05 + r() * 0.04, vel: 0.14 + r() * 0.05 }));
+  }, [n]);
+  const puntoEn = (p) => {
+    const [ax, ay, az] = desde;
+    const [bx, by, bz] = hasta;
+    const arco = Math.sin(p * Math.PI) * 1.1; // se alza y baja
+    return [ax + (bx - ax) * p, ay + (by - ay) * p + arco, az + (bz - az) * p];
+  };
+  useEffect(() => {
+    const m = ref.current;
+    if (!m || n === 0) return;
+    const dummy = new THREE.Object3D();
+    const c = new THREE.Color(P.biolClaro);
+    datos.forEach((d, i) => {
+      const [x, y, z] = puntoEn(d.t0);
+      dummy.position.set(x, y, z);
+      dummy.scale.setScalar(d.s);
+      dummy.updateMatrix();
+      m.setMatrixAt(i, dummy.matrix);
+      m.setColorAt(i, c);
+    });
+    m.instanceMatrix.needsUpdate = true;
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  }, [datos]); // eslint-disable-line react-hooks/exhaustive-deps
+  useFrame(({ clock }) => {
+    if (reducedMotion || !ref.current || n === 0) return;
+    const t = clock.elapsedTime;
+    const dummy = new THREE.Object3D();
+    for (let i = 0; i < datos.length; i++) {
+      const d = datos[i];
+      const p = (d.t0 + t * d.vel) % 1;
+      const [x, y, z] = puntoEn(p);
+      dummy.position.set(x, y, z);
+      dummy.scale.setScalar(d.s * (0.5 + 0.5 * Math.sin(p * Math.PI))); // aparece y se funde
+      dummy.updateMatrix();
+      ref.current.setMatrixAt(i, dummy.matrix);
+    }
+    ref.current.instanceMatrix.needsUpdate = true;
+  });
+  if (n === 0) return null;
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, n]} frustumCulled={false}>
+      <sphereGeometry args={[1, 7, 6]} />
+      <meshBasicMaterial color={P.biolClaro} transparent opacity={0.85} />
+    </instancedMesh>
+  );
+}
+
 /* La escena completa (grupo r3f interno; el default la monta en su Canvas). */
 function EscenaCompost({ tier, reducedMotion, volteo }) {
   const perfil = perfilDeTier(tier);
@@ -732,7 +1170,8 @@ function EscenaCompost({ tier, reducedMotion, volteo }) {
       <Residuos tier={tier} centro={cResiduos} />
       <PinEstacion posicion={[cResiduos[0], 1.5, cResiduos[2]]} emoji="🍂" nombre="Residuos" sub="verdes frescos y marrones secos" />
 
-      {/* 2 — La pila caliente + su vapor + la horquilla de voltear */}
+      {/* 2 — La pila caliente + su vapor + la horquilla + los descomponedores que
+             la trabajan: el velo blanco de actinomicetos, hongos y un escarabajo */}
       <PilaCompost tier={tier} centro={cPila} />
       <VaporTermofilo
         tier={tier}
@@ -740,13 +1179,26 @@ function EscenaCompost({ tier, reducedMotion, volteo }) {
         activo={volteo}
         position={[cPila[0], cPila[1] + PILA_TOPE + 0.1, cPila[2]]}
       />
+      <ActinomicetosVelo centro={cPila} tier={tier} reducedMotion={reducedMotion} />
+      <group position={[cPila[0], 0, cPila[2]]}>
+        <HongosCluster centro={[0.95, 0.14, 1.35]} semilla={97} n={tier === 'bajo' ? 3 : 5} reducedMotion={reducedMotion} />
+        <EscarabajoPelotero base={[-0.9, 0.16, 1.4]} radio={0.35} fase={1.1} escala={0.85} conBola={false} reducedMotion={reducedMotion} />
+      </group>
       <Horquilla centro={[cPila[0] + 2.1, 0, cPila[2] + 0.6]} activo={volteo} reducedMotion={reducedMotion} />
-      <PinEstacion posicion={[cPila[0], PILA_TOPE + 2.5, cPila[2]]} emoji="♨️" nombre="La pila caliente" sub="capas y calor de descomposición" />
+      <PinEstacion posicion={[cPila[0], PILA_TOPE + 2.5, cPila[2]]} emoji="♨️" nombre="La pila caliente" sub="capas, calor y el velo de actinomicetos" />
 
-      {/* 3 — Lombricultura + la muestra de cerca reutilizada */}
+      {/* 3 — Lombricultura + el tronco con hongos + la muestra de cerca reutilizada */}
       <CamaLombrices tier={tier} centro={cLombrices} reducedMotion={reducedMotion} />
       <PinEstacion posicion={[cLombrices[0], 1.7, cLombrices[2]]} emoji="🪱" nombre="Lombricultura" sub="la lombriz roja hace humus" />
+      <TroncoDescomposicion centro={[cLombrices[0] + 0.4, 0, cLombrices[2] + 1.9]} tier={tier} reducedMotion={reducedMotion} />
+      <PinEstacion posicion={[cLombrices[0] + 0.4, 1.2, cLombrices[2] + 1.9]} emoji="🍄" nombre="Los descomponedores" sub="hongos, escarabajos y actinomicetos" />
       {tier !== 'bajo' && <MuestraDeCerca tier={tier} reducedMotion={reducedMotion} />}
+
+      {/* 5 — El ciclo pecuario: estiércol → biodigestor → biol, y el biol que
+             regresa a alimentar el suelo vivo (nada del corral se pierde) */}
+      <CicloEstiercol centro={[-4.9, 0, 2.5]} tier={tier} reducedMotion={reducedMotion} />
+      <FlujoAbono desde={[-4.4, 0.8, 2.5]} hasta={[cSuelo[0] - 0.8, 0.4, cSuelo[2] - 0.5]} tier={tier} reducedMotion={reducedMotion} />
+      <PinEstacion posicion={[-5.1, 1.95, 2.5]} emoji="🛢️" nombre="Biodigestor" sub="el estiércol se vuelve biogás y biol" />
 
       {/* 4 — El suelo vivo: el humus terminado con el brote (cierra el anillo) */}
       <SueloVivo tier={tier} centro={cSuelo} reducedMotion={reducedMotion} />
@@ -799,9 +1251,9 @@ const CSS_COMPOST = `
 /* La copia didáctica: en reposo, la invitación al ciclo; al voltear, la lección
    del calor termófilo y la aireación. */
 const COPY_CALMA =
-  'El compost cierra el anillo: lo que sobra en la cocina y la huerta —verdes (frescos) y marrones (secos)— se apila por capas y se vuelve tierra. La lombriz roja californiana convierte esos restos en humus, el suelo vivo que alimenta la próxima planta. Toque el botón para voltear la pila.';
+  'El compost es una biofábrica viva: lo que sobra —verdes frescos y marrones secos— se apila por capas y lo desarma todo un equipo de descomponedores. La lombriz roja hace humus; los hongos rompen la madera dura; el velo blanco de actinomicetos le da el olor a tierra; y los escarabajos entierran la boñiga. Aparte, el biodigestor convierte el estiércol en biogás y en biol (abono líquido) que también vuelve a la pila. Toque el botón para voltear la pila.';
 const COPY_VOLTEO =
-  'Al voltear la pila entra aire: los microorganismos termófilos se reactivan y sube el calor —por eso el vapor. Voltearla cada tanto acelera la descomposición y evita malos olores. Del residuo al humus, el anillo se cierra: nada se bota, todo vuelve al suelo.';
+  'Al voltear la pila entra aire: los microorganismos termófilos se reactivan y sube el calor —por eso el vapor. Voltearla cada tanto acelera la descomposición y evita malos olores. Del residuo y del estiércol al humus, el anillo se cierra: nada se bota, todo vuelve al suelo.';
 
 /**
  * MundoCompost3D — el ciclo del compost, montable con su propio `<Canvas>`.
@@ -818,7 +1270,7 @@ export default function MundoCompost3D() {
     <section
       className="compost-root"
       data-tier={tier}
-      aria-label="El mundo del compost: el ciclo del abono, del residuo al suelo vivo, con la pila por capas, el calor de la descomposición, el volteo y la lombricultura"
+      aria-label="El mundo del compost: una biofábrica viva. El ciclo del abono del residuo al suelo vivo, con la pila por capas, el calor de la descomposición, el volteo, la lombricultura, los hongos, escarabajos y actinomicetos, y el biodigestor que hace biol del estiércol"
     >
       <style>{CSS_COMPOST}</style>
       <Canvas
@@ -849,8 +1301,8 @@ export default function MundoCompost3D() {
 
       <div className="compost-chrome">
         <h2 className="compost-titulo">
-          El mundo del compost: el anillo que se cierra
-          <small>Del residuo al suelo vivo — capas, calor, volteo y lombricultura</small>
+          El mundo del compost: la biofábrica viva
+          <small>Del residuo y el estiércol al suelo vivo — capas, calor, descomponedores y biodigestor</small>
         </h2>
         <div className="compost-pie">
           <button
