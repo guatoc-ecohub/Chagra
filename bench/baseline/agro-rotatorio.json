@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "bench": "agro-rotatorio",
+  "date": "2026-06-17T15:57:35.257Z",
+  "model": "granite3.3:8b",
+  "config": "daily-rotating",
+  "commit": "c0fbb14",
+  "metrics": {
+    "graph_consistency_pct": 26,
+    "grounded_pct": 44,
+    "hallucinations": 0,
+    "subspecies_disconnections": 256,
+    "subspecies_ok_pct": 92,
+    "score_global": 45.5
+  },
+  "passCount": 22,
+  "failCount": 256,
+  "passPct": 7.9,
+  "notes": "seed=2026-06-17 | graph_source=catalog-fallback | Para fidelidad total use sidecar con token y AGE disponible via CHAGRA_KG_* o CHAGRA_KG_PSQL_CMD.",
+  "seed": false
+}
