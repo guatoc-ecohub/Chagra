@@ -27,11 +27,15 @@ export { RH_INK as JAGUAR_TINTA } from './_rubberhose.jsx';
 export const JAGUAR_SLUG = 'jaguar';
 
 /* ── JAGUAR — Panthera onca (el felino de tierra cálida/selva). Pelaje leonado
-   dorado con ROSETAS negras de centro ocre (su firma — manchas con centro, NO
-   puntos como el leopardo), vientre crema, cuerpo MUSCULOSO, orejas redondas,
-   mirada felina ÁMBAR intensa y cola larga y pesada. Majestuoso y poderoso. */
+   dorado CON VOLUMEN (luz dorsal → sombra ventral, gradiente en el componente)
+   y ROSETAS negras de ANILLO ROTO con centro ocre (su firma — manchas con
+   centro, NO puntos como el leopardo), vientre crema, cuerpo MUSCULOSO, orejas
+   redondas, mirada felina ÁMBAR intensa y cola larga y pesada. Majestuoso y
+   poderoso: un animal con PESO (sombra de suelo), no un sticker. */
 export const JAGUAR_PALETA = {
-  cuerpo: '#d99a45',        // pelaje leonado dorado
+  cuerpo: '#d99a45',        // pelaje leonado dorado (tono medio)
+  cuerpoLuz: '#e9b968',     // luz dorsal del pelaje (el sol sobre el lomo — volumen)
+  cuerpoSombra: '#bb7d31',  // sombra ventral del pelaje (la panza en penumbra — volumen)
   cuerpoGlow: 'rgba(217,154,69,0.7)',
   vientre: '#f4e6c8',       // pecho/vientre crema
   hombro: '#c9853a',        // omóplato un tono más hondo (el músculo del acecho)
@@ -42,10 +46,15 @@ export const JAGUAR_PALETA = {
   oreja: '#7a4718',         // dorso oscuro de la oreja
   iris: '#e8a53a',          // ojo felino ámbar (mirada intensa)
   colmillo: '#fff8ec',      // colmillos del rugido
+  vibrisa: '#f7edd8',       // bigotes (vibrisas) crema claro
+  sombraSuelo: 'rgba(36,22,8,0.38)', // la sombra bajo las zarpas (peso real)
   /* ── Místico (el jaguar-espíritu del chamán, cosmología andino-amazónica) ── */
   espectral: '#b98cff',     // aura etérea / presencia sagrada (violeta espectral)
   estrella: '#efe6ff',      // el titileo de las constelaciones en las rosetas
   ojoBrillo: '#ffe6a0',     // fosforescencia del ojo-espíritu (visión nocturna)
+  bruma: '#cdb4ff',         // el velo de niebla del mundo-espíritu a los pies
+  mota: '#ece1ff',          // motas de luz que flotan lento (polvo del espíritu)
+  marcaEspiritu: '#c9a4ff', // las rosetas gemelas que BRILLAN en la revelación
 };
 
 export const JAGUAR_PROPORCION = {
