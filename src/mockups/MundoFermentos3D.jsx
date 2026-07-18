@@ -59,6 +59,15 @@ const ARROZ = '#efe6cf'; // el arroz cocido del canasto MM
 const CARBON = '#3a2f28'; // la capa de carbón del bocashi
 const MICELIO = '#f3efe2'; // el hongo blanco de los MM
 
+/* Los caldos MICROBIOLÓGICOS en frasco (EM, lactosuero, lacto-microbios): la vida
+   viva que se cría y se guarda. Colores turbios "vivos", no aguas claras. */
+const VIDRIO = '#d8e6e2'; // el vidrio del frasco (verde-agua muy pálido)
+const EM_MADRE = '#a06a34'; // EM activado: melaza + microbios, ámbar turbio
+const LACTOSUERO = '#eae3cf'; // suero de leche fermentado, blanco-marfil
+const LACTO_ROSA = '#c98d6a'; // lacto-microbios con panela, terracota suave
+const NATA = '#efe7d2'; // la nata/biofilm (la "madre") que flota arriba
+const MICROBRILLO = '#fff3c8'; // el destello de la vida microbiana en suspensión
+
 /* ── Geografía del patio (coordenadas de mundo):
       X oriente(+)/occidente(−) · Y altura · Z monte atrás(−) → vega adelante(+) ── */
 const ANCHO = 16;
@@ -139,7 +148,8 @@ const P_BIOL = [0.5, 1.9]; // la caneca del fermento líquido
 const P_SULFO = [2.8, -0.1]; // el caldo sulfocálcico al fuego
 const P_BORDE = [3.6, 1.9]; // el caldo bordelés azul
 const P_MESA = [0.1, -0.7]; // la mesa con la melaza (alimento común)
-const P_CAMA = [-0.5, 4.1]; // el suelo que se alimenta y se protege
+const P_EM = [1.9, 3.1]; // el estante de frascos de caldos microbiológicos (EM)
+const P_CAMA = [-0.5, 4.4]; // el suelo que se alimenta y se protege
 
 /* ── Partículas que SUBEN (vapor, burbujas) o CAEN (rocío): un solo instanced.
       `crecer` = vapor que se expande; `alto` negativo = rocío que cae. ─────── */
@@ -615,6 +625,147 @@ function MesaMelaza() {
   );
 }
 
+/* ── UN FRASCO de caldo microbiológico (EM / lactosuero / lacto-microbios) ────
+      Vidrio traslúcido + líquido TURBIO (vivo, no agua clara) + la nata/biofilm
+      que flota arriba + tapa de tela o trampa de aire. Los que fermentan fuerte
+      burbujean (CO₂) y sueltan un destello de vida microbiana. */
+function Frasco({ x, alto, liquido, tapa, burbujea, brillo, nBurb, reducedMotion }) {
+  const hVidrio = 0.28 + alto * 0.2;
+  const hLiq = hVidrio * 0.72;
+  const yBase = 0.53; // sobre el tablero del estante
+  return (
+    <group position={[x, yBase, 0]}>
+      {/* el líquido vivo y turbio (primero: se ve a través del vidrio) */}
+      <mesh position={[0, hLiq / 2 + 0.02, 0]}>
+        <cylinderGeometry args={[0.096, 0.096, hLiq, 14]} />
+        <meshLambertMaterial color={liquido} emissive={liquido} emissiveIntensity={0.14} />
+      </mesh>
+      {/* la nata / "madre" (biofilm) que flota en la superficie */}
+      <mesh position={[0, hLiq + 0.03, 0]} scale={[1, 0.4, 1]}>
+        <sphereGeometry args={[0.09, 12, 8]} />
+        <meshLambertMaterial color={NATA} flatShading transparent opacity={0.92} />
+      </mesh>
+      {/* el vidrio del frasco (traslúcido, encima) */}
+      <mesh position={[0, hVidrio / 2 + 0.02, 0]}>
+        <cylinderGeometry args={[0.11, 0.105, hVidrio, 16]} />
+        <meshLambertMaterial color={VIDRIO} transparent opacity={0.26} depthWrite={false} />
+      </mesh>
+      {/* cuello del frasco */}
+      <mesh position={[0, hVidrio + 0.05, 0]}>
+        <cylinderGeometry args={[0.07, 0.09, 0.06, 12]} />
+        <meshLambertMaterial color={VIDRIO} transparent opacity={0.3} depthWrite={false} />
+      </mesh>
+      {/* burbujas de la fermentación (CO₂ que sube por el caldo) */}
+      {burbujea && (
+        <ParticulasSuben
+          origen={[0, 0.06, 0]}
+          ancho={0.13}
+          alto={hLiq - 0.02}
+          cuantas={nBurb}
+          radio={0.014}
+          color="#f4fbf7"
+          velocidad={0.4}
+          opacidad={0.7}
+          reducedMotion={reducedMotion}
+        />
+      )}
+      {/* tapa: tela amarrada (la mayoría) o trampa de aire (airlock) */}
+      {tapa === 'trampa' ? (
+        <group position={[0, hVidrio + 0.08, 0]}>
+          {/* tapón */}
+          <mesh>
+            <cylinderGeometry args={[0.072, 0.072, 0.05, 10]} />
+            <meshLambertMaterial color={PALETA.maderaOscura} />
+          </mesh>
+          {/* el codo del airlock */}
+          <mesh position={[0.05, 0.12, 0]} rotation={[0, 0, -0.35]}>
+            <cylinderGeometry args={[0.017, 0.017, 0.24, 8]} />
+            <meshLambertMaterial color="#cfe4ea" transparent opacity={0.6} />
+          </mesh>
+          <mesh position={[0.12, 0.18, 0]}>
+            <sphereGeometry args={[0.045, 12, 10]} />
+            <meshLambertMaterial color={PALETA.agua} transparent opacity={0.7} emissive="#2a6a86" emissiveIntensity={0.2} />
+          </mesh>
+        </group>
+      ) : (
+        <group position={[0, hVidrio + 0.07, 0]}>
+          {/* trapo de tela sobre la boca */}
+          <mesh scale={[1, 0.5, 1]}>
+            <sphereGeometry args={[0.11, 12, 8]} />
+            <meshLambertMaterial color={PALETA.cal} flatShading />
+          </mesh>
+          {/* el caucho / cabuya que la amarra */}
+          <mesh position={[0, -0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[0.088, 0.012, 6, 18]} />
+            <meshLambertMaterial color={PALETA.ambar} />
+          </mesh>
+        </group>
+      )}
+      {/* el destello de la vida microbiana en suspensión (hacer visible lo vivo) */}
+      {brillo && (
+        <ParticulasSuben
+          origen={[0, hLiq * 0.4 + 0.05, 0]}
+          ancho={0.14}
+          alto={hLiq * 0.7}
+          cuantas={nBurb}
+          radio={0.01}
+          color={MICROBRILLO}
+          velocidad={0.16}
+          opacidad={0.85}
+          reducedMotion={reducedMotion}
+        />
+      )}
+    </group>
+  );
+}
+
+/* ── ESTACIÓN 5 · ESTANTE DE CALDOS MICROBIOLÓGICOS EN FRASCO (EM y lacto) ────
+      Los "microorganismos eficientes" y el lactosuero: microbios que se CRÍAN y
+      se guardan en frasco, listos para activar con melaza. La vida embotellada. */
+function FrascosEM({ reducedMotion, tier }) {
+  const y = altura(P_EM[0], P_EM[1]);
+  const nBurb = tier === 'alto' ? 8 : tier === 'medio' ? 5 : 3;
+  const frascos = useMemo(
+    () => [
+      { x: -0.5, alto: 0.9, liquido: EM_MADRE, tapa: 'trampa', burbujea: true, brillo: true },
+      { x: -0.16, alto: 0.7, liquido: LACTOSUERO, tapa: 'tela', burbujea: false, brillo: true },
+      { x: 0.18, alto: 1.0, liquido: LACTO_ROSA, tapa: 'tela', burbujea: true, brillo: false },
+      { x: 0.52, alto: 0.6, liquido: EM_MADRE, tapa: 'tela', burbujea: false, brillo: false },
+    ],
+    [],
+  );
+  return (
+    <group position={[P_EM[0], y, P_EM[1]]} rotation={[0, -0.5, 0]}>
+      {/* el tablero del estante */}
+      <mesh position={[0, 0.5, 0]}>
+        <boxGeometry args={[1.5, 0.06, 0.44]} />
+        <meshLambertMaterial color={PALETA.maderaClara} flatShading />
+      </mesh>
+      {/* respaldo del estante (una tabla parada atrás) */}
+      <mesh position={[0, 0.72, -0.2]}>
+        <boxGeometry args={[1.5, 0.5, 0.04]} />
+        <meshLambertMaterial color={PALETA.maderaOscura} flatShading />
+      </mesh>
+      {/* patas */}
+      {[[0.66, 0.18], [-0.66, 0.18], [0.66, -0.18], [-0.66, -0.18]].map(([lx, lz], i) => (
+        <mesh key={i} position={[lx, 0.24, lz]}>
+          <cylinderGeometry args={[0.03, 0.03, 0.5, 5]} />
+          <meshLambertMaterial color={PALETA.maderaOscura} />
+        </mesh>
+      ))}
+      {/* los frascos con la vida embotellada */}
+      {frascos.map((f, i) => (
+        <Frasco key={i} {...f} nBurb={nBurb} reducedMotion={reducedMotion} />
+      ))}
+      {/* el balde de melaza para activarlos (el alimento que despierta el EM) */}
+      <mesh position={[0.62, 0.62, 0.02]}>
+        <cylinderGeometry args={[0.08, 0.07, 0.16, 10]} />
+        <meshLambertMaterial color={MELAZA} transparent opacity={0.9} emissive="#3a1f06" emissiveIntensity={0.2} />
+      </mesh>
+    </group>
+  );
+}
+
 /* ── El SUELO que se alimenta y se protege: la cama con matas sanas + rocío ── */
 function CamaCultivo({ tier, reducedMotion }) {
   const y = altura(P_CAMA[0], P_CAMA[1]);
@@ -736,6 +887,13 @@ const ESTACIONES = [
     cam: () => [P_BIOL[0] + 1.2, 2.2, P_BIOL[1] + 3.4],
   },
   {
+    id: 'em',
+    titulo: 'Caldos microbiológicos',
+    frase: 'Microorganismos eficientes y lactosuero criados en frasco: microbios vivos que se guardan turbios y se activan con melaza; algunos burbujean de puro vivos.',
+    mira: () => [P_EM[0], 0.7, P_EM[1]],
+    cam: () => [P_EM[0] + 0.8, 2.2, P_EM[1] + 3.0],
+  },
+  {
     id: 'caldos',
     titulo: 'Caldos minerales',
     frase: 'Sulfocálcico al fuego y bordelés azul: minerales que protegen la hoja de hongos y plagas, sin veneno de síntesis.',
@@ -821,6 +979,7 @@ function DioramaFermentos({ perfil, tier, reducedMotion, estacion, onSoltar, con
       <CaldoSulfocalcico reducedMotion={reducedMotion} tier={tier} />
       <CaldoBordeles />
       <MesaMelaza />
+      <FrascosEM reducedMotion={reducedMotion} tier={tier} />
       <CamaCultivo tier={tier} reducedMotion={reducedMotion} />
 
       {/* el aire de la hora dorada (kit del framework, sin tocarlo) */}
@@ -834,6 +993,7 @@ function DioramaFermentos({ perfil, tier, reducedMotion, estacion, onSoltar, con
       <Rotulo pos={[P_SULFO[0], 1.5, P_SULFO[1]]} texto="Sulfocálcico" sub="mineral al fuego" distancia={12} />
       <Rotulo pos={[P_BORDE[0], 1.2, P_BORDE[1]]} texto="Bordelés" sub="mineral azul" distancia={12} />
       <Rotulo pos={[P_MESA[0], 1.3, P_MESA[1]]} texto="Melaza" sub="el alimento común" distancia={12} />
+      <Rotulo pos={[P_EM[0], 1.35, P_EM[1]]} texto="Caldos microbiológicos" sub="EM y lactosuero en frasco" distancia={12} />
       <Rotulo pos={[P_CAMA[0], 1.2, P_CAMA[1]]} texto="El suelo se alimenta" sub="y la mata se protege" distancia={13} />
 
       <OrbitControls
