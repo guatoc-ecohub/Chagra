@@ -68,9 +68,9 @@ function extraAnfiteatro(x, z) {
   const cresta = 1 + 0.34 * Math.sin(ang * 3 + 1.2)
     + 0.2 * Math.sin(ang * 7 - 0.7)
     + 0.12 * Math.sin(ang * 13 + 2.3);
-  const pared = ss(r, 12.5, 30) ** 1.25 * 4.8 * cresta;
+  const pared = ss(r, 14, 40) ** 1.2 * 7.4 * cresta;
   const dx = x - xArroyo(z);
-  const canada = -0.4 * Math.exp(-(dx * dx) / 1.15) * ss(z, -13, -6) * (1 - ss(r, 20, 28));
+  const canada = -0.4 * Math.exp(-(dx * dx) / 1.15) * ss(z, -13, -6) * (1 - ss(r, 28, 40));
   return pared + canada;
 }
 
@@ -329,8 +329,9 @@ function tinteInstancia(r, amt = 0.1) {
 /**
  * Sitios del queñual para un tier: anillo HÉROE (r 6.4–10.6, enmarca el claro
  * sin tapar el corredor de cámara ni el arroyo ni a los vecinos) + anillo
- * LEJANO (r 12.5–19.5, sobre la falda de la pared, velado por la niebla, con
- * escala mayor: siluetas que dan fondo). Determinista.
+ * LEJANO (r 15–28, sobre la falda de la pared del anfiteatro, velado por la
+ * niebla, con escala 1.5–2.4×: siluetas COLOSALES que dan fondo catedral).
+ * Determinista.
  */
 export function sitiosQuenual(tier = 'alto') {
   const cupo = CUPO_QUENUAL[tier] || CUPO_QUENUAL.medio;
@@ -359,11 +360,11 @@ export function sitiosQuenual(tier = 'alto') {
     const x = Math.cos(ang) * rad;
     const z = Math.sin(ang) * rad;
     if (z > -13 && Math.abs(x - xArroyo(z)) < 1.4) continue; // no pisar el agua
-    if (!cabe(x, z, 2.6)) continue;
+    if (!cabe(x, z, 2.8)) continue;
     sitios.push({
       pos: [x, alturaBosque(x, z) - 0.06, z],
       rotY: r() * Math.PI * 2,
-      esc: 0.92 + r() * 0.35,
+      esc: 1.02 + r() * 0.42,
       variante: sitios.length % 3,
       tinte: tinteInstancia(r),
     });
@@ -376,15 +377,15 @@ export function sitiosQuenual(tier = 'alto') {
     const ang = r() * Math.PI * 2;
     const d = Math.atan2(Math.sin(ang - AZ_CAMARA), Math.cos(ang - AZ_CAMARA));
     if (Math.abs(d) < 0.22) continue; // ni las lejanas tapan al Ent de frente
-    const rad = 12.5 + r() * 7;
+    const rad = 15 + r() * 13;
     const x = Math.cos(ang) * rad;
     const z = Math.sin(ang) * rad;
     if (z > -13 && Math.abs(x - xArroyo(z)) < 1.6) continue;
-    if (!cabe(x, z, 3.1)) continue;
+    if (!cabe(x, z, 3.6)) continue;
     sitios.push({
       pos: [x, alturaBosque(x, z) - 0.1, z],
       rotY: r() * Math.PI * 2,
-      esc: 1.15 + r() * 0.5,
+      esc: 1.5 + r() * 0.95,
       variante: sitios.length % 3,
       tinte: tinteInstancia(r, 0.14),
     });
