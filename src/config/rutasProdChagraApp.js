@@ -238,6 +238,12 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
   {
+    path: 'diorama_piscicultura',
+    componente: 'MundoPiscicultura3D',
+    importLazy: 'src/mockups/MundoPiscicultura3D.jsx',
+    categoria: '3D',
+  },
+  {
     path: 'diorama_agua',
     componente: 'MundoAgua3D',
     importLazy: 'src/mockups/MundoAgua3D.jsx',
