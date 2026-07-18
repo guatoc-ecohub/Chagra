@@ -1,0 +1,111 @@
+# Bench Gate CI — automatiza el gate manual de BENCH_GATE_PIPELINE.md (§6).
+#
+# Corre un bench de PRODUCTO sobre el runner self-hosted de alpha, compara el
+# resultado (history v1) contra el baseline commiteado en bench/baseline/ via
+# bench/gate.mjs, comenta la tabla delta en el PR y BLOQUEA el merge si el
+# veredicto es RED (accuracy -5pp / halluc +3pp / parse -2pp / latency +25%).
+#
+# OPT-IN por diseno: solo corre cuando el PR lleva la label `bench-required`
+# (o por workflow_dispatch manual). Motivo: el bench usa la GPU M6000 del nodo
+# de PRODUCCION; correrlo en cada PR tumbaria el agente. La concurrency
+# serializa las corridas para que nunca haya dos benches peleando por la GPU.
+#
+# REGLA DURA DEL PLAN: el gate corre el bench de PRODUCTO (config con tools/RAG),
+# NUNCA el modelo crudo (eval_completo.py). El default `agro-rotatorio` es corpus
+# (sin GPU); `borde-alucinacion` es el AH sellado a CONFIG-PROD (mas pesado).
+name: Bench Gate
+
+on:
+  pull_request:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      bench:
+        description: "id del bench a gatear (debe existir en bench/index.json y emitir history v1)"
+        default: agro-rotatorio
+        required: true
+      pr:
+        description: "numero de PR a comentar (solo para run manual)"
+        required: false
+      strict:
+        description: "YELLOW tambien bloquea"
+        type: boolean
+        default: false
+
+# Un solo bench a la vez (la GPU es unica). No cancela: dejar terminar el que corre.
+concurrency:
+  group: bench-gate-${{ github.event.pull_request.number || github.event.inputs.pr || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bench-gate:
+    # Solo si la label es exactamente `bench-required`, o si es dispatch manual.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.label.name == 'bench-required'
+    runs-on: [self-hosted, alpha]
+    timeout-minutes: 45
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      - name: Resolver bench + PR
+        id: cfg
+        run: |
+          BENCH="${{ github.event.inputs.bench }}"
+          BENCH="${BENCH:-agro-rotatorio}"
+          PR="${{ github.event.pull_request.number || github.event.inputs.pr }}"
+          echo "bench=$BENCH" >> "$GITHUB_OUTPUT"
+          echo "pr=$PR" >> "$GITHUB_OUTPUT"
+          echo "Gateando bench '$BENCH' para PR #$PR"
+
+      - name: Correr bench de producto (emite history v1)
+        run: |
+          node bench/run.mjs "${{ steps.cfg.outputs.bench }}"
+
+      - name: Evaluar gate vs baseline
+        id: gate
+        run: |
+          set +e
+          STRICT=""
+          [ "${{ github.event.inputs.strict }}" = "true" ] && STRICT="--strict"
+          node bench/gate.mjs \
+            --bench "${{ steps.cfg.outputs.bench }}" \
+            --baseline-dir bench/baseline \
+            --history-dir bench/history \
+            --md-out gate-comment.md $STRICT
+          echo "verdict_exit=$?" >> "$GITHUB_OUTPUT"
+          cat gate-comment.md
+
+      - name: Comentar resultado en el PR
+        if: steps.cfg.outputs.pr != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('gate-comment.md', 'utf8');
+            const marker = '<!-- bench-gate -->';
+            const pr = Number('${{ steps.cfg.outputs.pr }}');
+            const { data: comments } = await github.rest.issues.listComments(
+              { owner: context.repo.owner, repo: context.repo.repo, issue_number: pr });
+            const prev = comments.find((c) => c.body && c.body.includes(marker));
+            const full = `${marker}\n${body}`;
+            if (prev) {
+              await github.rest.issues.updateComment(
+                { owner: context.repo.owner, repo: context.repo.repo, comment_id: prev.id, body: full });
+            } else {
+              await github.rest.issues.createComment(
+                { owner: context.repo.owner, repo: context.repo.repo, issue_number: pr, body: full });
+            }
+
+      - name: Fallar si RED (bloquea merge)
+        run: |
+          EXIT="${{ steps.gate.outputs.verdict_exit }}"
+          if [ "$EXIT" = "2" ]; then
+            echo "::error::Bench Gate RED - regresion critica vs baseline. Ver el comentario del PR."
+            exit 1
+          elif [ "$EXIT" = "1" ]; then
+            echo "::warning::Bench Gate YELLOW (strict) - regresion menor."
+            exit 1
+          fi
+          echo "Bench Gate OK (GREEN o YELLOW no-estricto)."
