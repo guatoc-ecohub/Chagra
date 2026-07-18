@@ -1,0 +1,71 @@
+/* ── <Typewriter> — efecto máquina de escribir (ver Typewriter.jsx).
+      Molde invisible fija el layout; la tinta se pinta encima; el cursor
+      parpadea mientras escribe y se despide con un fade al terminar. */
+
+.tw {
+  position: relative;
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+/* El texto completo, invisible: reserva el tamaño final desde el frame 1. */
+.tw__molde {
+  visibility: hidden;
+}
+
+/* Lo ya escrito, superpuesto exactamente sobre el molde (misma fuente y
+   mismo ancho → mismo wrapping, línea por línea). */
+.tw__tinta {
+  position: absolute;
+  inset: 0;
+  white-space: pre-wrap;
+}
+
+/* El cursor: una plumilla fina que respira al ritmo de la escritura. */
+.tw__cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  border-radius: 1px;
+  vertical-align: -0.12em;
+  background: currentColor;
+  animation: tw-parpadeo 0.9s steps(1) infinite;
+}
+
+/* Al terminar, el cursor se despide suave (no desaparece de golpe). */
+.tw--terminado .tw__cursor {
+  animation: tw-despedida 0.6s ease 0.4s forwards;
+}
+
+@keyframes tw-parpadeo {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes tw-despedida {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Solo para lectores de pantalla: la frase entera desde el inicio. */
+.tw__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tw__cursor {
+    display: none;
+  }
+}
