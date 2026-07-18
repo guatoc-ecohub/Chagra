@@ -262,6 +262,12 @@ const MundoBoticaCana3DMockup = lazy(() => import('./mockups/MundoBoticaCana3D')
 // cítricos, guayabo, papayo, injerto con tutor, plateo y cosecha a mano).
 // Standalone tipo botica: no monta el sistema MUNDO ni toca EscenaBase3D.
 const MundoFrutales3DMockup = lazy(() => import('./mockups/MundoFrutales3D'));
+// 3D: el VERGEL AGROFORESTAL de frutales andinos — la lección de APILAR
+// estratos: aguacates y mango arriba (sombra), cítricos y guayabo en medio,
+// lulo/tomate de árbol/papayo al abrigo, y cobertura viva + hojarasca en el
+// suelo. Fruta en tres momentos: flor, verde y madura.
+// Standalone tipo botica: no monta el sistema MUNDO ni toca EscenaBase3D.
+const MundoVergelFrutal3DMockup = lazy(() => import('./mockups/MundoVergelFrutal3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -701,6 +707,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-polinizadores-3d': 'mockup_mundo_polinizadores_3d',
   'mockups/mundo-botica-cana-3d': 'mockup_mundo_botica_cana_3d',
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
+  'mockups/mundo-vergel-frutal-3d': 'mockup_mundo_vergel_frutal_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2399,6 +2406,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El huerto de frutales">
               <MundoFrutales3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_vergel_frutal_3d':
+        // El vergel agroforestal: la lección de APILAR estratos como el
+        // monte — aguacates (Hass y criollo) y mango arriba dando sombra,
+        // cítricos (naranjo en flor y cargado, mandarino, limonero) y
+        // guayabo en medio, lulo/tomate de árbol/papayo al abrigo, y el
+        // suelo tapado con maní forrajero + hojarasca instanciados. Botón
+        // de etiquetas: los 4 estratos numerados y cada frutal con su
+        // nombre. Ruta #/mockups/mundo-vergel-frutal-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El vergel agroforestal">
+              <MundoVergelFrutal3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
