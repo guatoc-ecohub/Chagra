@@ -13,7 +13,7 @@ import {
   AlertCircle,
   SkipForward,
 } from 'lucide-react';
-import ChagraAgentAvatarColibri from './ChagraAgentAvatarColibri';
+import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
 import AvatarSelector from './Settings/AvatarSelector';
 import { useGeolocation } from '../hooks/useGeolocation';
 import {
@@ -550,7 +550,7 @@ export default function OnboardingCondensado({
           <>
             <div className="flex items-center gap-4">
               <div className="shrink-0">
-                <ChagraAgentAvatarColibri size={72} state="idle" ariaLabel="Colibrí de Chagra" />
+                <ChagraAgentAvatarAngelita size={96} state="idle" ariaLabel="Angelita, la abeja de Chagra" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-2xl font-black leading-tight text-slate-100">
@@ -934,7 +934,7 @@ export default function OnboardingCondensado({
         {/* ═══ LISTO ═══ */}
         {paso === 3 && (
           <div className="flex-1 flex flex-col items-center justify-center text-center gap-5">
-            <ChagraAgentAvatarColibri size={132} state="speaking" ariaLabel="Colibrí de Chagra" />
+            <ChagraAgentAvatarAngelita size={168} state="speaking" ariaLabel="Angelita, la abeja de Chagra" />
             <div className="flex flex-col gap-2">
               <h1 className="text-3xl font-black leading-tight text-slate-100">
                 Su finca está lista 🌱

@@ -1,38 +1,29 @@
 import { Check } from 'lucide-react';
 import useAgentAvatarType from '../../hooks/useAgentAvatarType';
-import ChagraAgentAvatarColibri from '../ChagraAgentAvatarColibri';
 import ChagraAgentAvatarAngelita from '../ChagraAgentAvatarAngelita';
 import ChagraAgentAvatarMaiz from '../ChagraAgentAvatarMaiz';
 
 /**
  * AgentAvatarSelector — selector visual para el avatar del agente IA.
  *
- * 3 opciones: Angelita la abeja (default), colibrí ilustrado SVG, o planta
- * de maíz. Persiste vía useAgentAvatarType (localStorage
- * `chagra:agent-avatar-type`). Cambio inmediato — afecta a todas las
- * instancias del avatar en la app.
+ * 2 opciones: Angelita la abeja (default) o planta de maíz. Persiste vía
+ * useAgentAvatarType (localStorage `chagra:agent-avatar-type`). Cambio
+ * inmediato — afecta a todas las instancias del avatar en la app.
  *
- * 2026-07-16 (operador): "Angelita como el agente, jubila el colibrí". La
- * opción default pasa a ser Angelita; conserva el slug guardado 'colibri'
- * (default histórico) para que nadie necesite migración. El colibrí
- * ilustrado sigue disponible como preferencia explícita.
+ * 2026-07-16 (operador): "Angelita como el agente, jubila el colibrí".
+ * 2026-07-18 (operador): el colibrí sale también de las opciones — "solo
+ * abejita". Los slugs viejos 'colibri'/'colibri_svg' migran a 'angelita'
+ * en el hook, sin acción del usuario.
  */
 export default function AgentAvatarSelector() {
     const [type, setType] = useAgentAvatarType();
 
     const OPTIONS = [
         {
-            // Slug histórico 'colibri' = el default de siempre; hoy es Angelita.
-            id: 'colibri',
+            id: 'angelita',
             label: 'Angelita, la abeja',
             sub: 'La vecina que sabe de finca (recomendado)',
             Component: ChagraAgentAvatarAngelita,
-        },
-        {
-            id: 'colibri_svg',
-            label: 'Colibrí ilustrado',
-            sub: 'SVG botánico animado',
-            Component: ChagraAgentAvatarColibri,
         },
         {
             id: 'maiz',
@@ -50,7 +41,7 @@ export default function AgentAvatarSelector() {
                     Elige cómo se ve la IA en la app. Cambio inmediato.
                 </p>
             </div>
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-2 gap-2.5">
                 {OPTIONS.map((opt) => {
                     const selected = type === opt.id;
                     return (
@@ -70,7 +61,7 @@ export default function AgentAvatarSelector() {
                                     <Check size={12} strokeWidth={3} aria-hidden="true" />
                                 </span>
                             )}
-                            <opt.Component state={selected ? 'thinking' : 'idle'} size={60} onDoubleClick={() => {}} ariaLabel={opt.label} />
+                            <opt.Component state={selected ? 'thinking' : 'idle'} size={84} onDoubleClick={() => {}} ariaLabel={opt.label} />
                             <div className="text-center">
                                 <p className="text-xs sm:text-sm font-bold text-slate-100 leading-tight">{opt.label}</p>
                                 <p className="text-[10px] text-slate-500 mt-0.5 leading-tight">{opt.sub}</p>

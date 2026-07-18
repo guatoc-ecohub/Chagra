@@ -1074,7 +1074,7 @@ export default function App() {
   const [currentViewData, setCurrentViewData] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastLogMessage, setLastLogMessage] = useState('');
-  // Transición colibrí (home→conversación): se activa al pasar de la portada
+  // Transición Angelita (home→conversación): se activa al pasar de la portada
   // (dashboard, donde vive el AgentHero) al agente. El overlay va ENCIMA y la
   // conversación monta detrás; al terminar, queda la conversación limpia.
   const [colibriTransition, setColibriTransition] = useState(false);
@@ -1084,7 +1084,7 @@ export default function App() {
   // dashboard → vista_con_initialData → dashboard → misma_vista_otra_vez
   // reusaba el initialData stale (bug latente de UX).
   const navigate = useCallback((view, initialData = null) => {
-    // Transición colibrí solo en home→conversación (la portada con el hero del
+    // Transición Angelita solo en home→conversación (la portada con el hero del
     // agente → el agente). Otras entradas al agente (FAB, tile, notificación)
     // conservan la entrada suave estándar del AgentScreen, sin video.
     if (view === 'agente' && currentView === 'dashboard') {
@@ -3714,7 +3714,7 @@ export default function App() {
 
   return (
     <>
-      {/* Transición colibrí home→conversación (~2s). Encima de todo (z alto);
+      {/* Transición Angelita home→conversación (~2s). Encima de todo (z alto);
           la conversación monta detrás y queda limpia al terminar. */}
       <ColibriTransition active={colibriTransition} onDone={() => setColibriTransition(false)} />
       <NetworkStatusBar />

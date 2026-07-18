@@ -2,23 +2,25 @@ import { useEffect, useState, useCallback } from 'react';
 
 const STORAGE_KEY = 'chagra:agent-avatar-type';
 
-// 'colibri' = avatar foto-realista (foto biopunk Lili). Es el nuevo
-// default 2026-05-28 ("reemplazar el 3D R3F" — operador). Los usuarios
-// que ya tenían 'colibri' en localStorage automáticamente ven la foto
-// sin migration (mismo slug, distinta implementación).
-//
-// 'colibri_svg' = ilustración SVG (Amazilia libando del abutilón). Antes
-// era el componente detrás de 'colibri'; ahora vive bajo su propio slug
-// para quien prefiera estilo botánico ilustrado.
+// 'angelita' = Angelita, la abeja angelita (Tetragonisca angustula). ES el
+// agente de Chagra desde 2026-07-16 ("Angelita como el agente, jubila el
+// colibrí" — operador; 2026-07-18: el colibrí sale también de las opciones —
+// "solo abejita"). El colibrí queda de fauna decorativa en los mundos 3D,
+// nunca como cara del agente.
 //
 // 'maiz' = planta de maíz, alternativa cultural ancestral.
-export const AVATAR_TYPES = ['colibri', 'colibri_svg', 'maiz'];
-export const DEFAULT_AVATAR_TYPE = 'colibri';
+export const AVATAR_TYPES = ['angelita', 'maiz'];
+export const DEFAULT_AVATAR_TYPE = 'angelita';
+
+// Slugs históricos guardados en localStorage de instalaciones viejas:
+// ambos colibríes migran a Angelita sin que el usuario haga nada.
+const LEGACY_TYPES = { colibri: 'angelita', colibri_svg: 'angelita' };
 
 function readPref() {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw && AVATAR_TYPES.includes(raw)) return raw;
+        if (raw && LEGACY_TYPES[raw]) return LEGACY_TYPES[raw];
     } catch {
         // private mode / quota → fallback
     }
