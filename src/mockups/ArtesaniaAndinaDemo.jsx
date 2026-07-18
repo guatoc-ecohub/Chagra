@@ -236,7 +236,7 @@ export default function ArtesaniaAndinaDemo() {
   const [listo, setListo] = useState(false);
   const [generico, setGenerico] = useState(false);
   const [sel, setSel] = useState(SILUETA_NOMBRES[0]);
-  const tier = useMemo(() => decidirTier(), []);
+  const tier = useMemo(() => decidirTier().tier, []);
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&

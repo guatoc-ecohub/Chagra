@@ -1016,7 +1016,7 @@ const COPY_RIEGO =
 export default function MundoSueloVivo3D() {
   const [listo, setListo] = useState(false);
   const [riego, setRiego] = useState(false);
-  const tier = useMemo(() => decidirTier(), []);
+  const tier = useMemo(() => decidirTier().tier, []);
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&

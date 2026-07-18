@@ -464,7 +464,7 @@ function DemoColocar({ modo3D, tier, reducedMotion }) {
 
 /* ── La vitrina ────────────────────────────────────────────────────────────── */
 export default function VitrinaInfraestructura({ onBack }) {
-  const tierInicial = useMemo(() => decidirTier(), []);
+  const tierInicial = useMemo(() => decidirTier().tier, []);
   const [pestana, setPestana] = useState(PESTANAS[0].id);
   const [tier, setTier] = useState(/** @type {any} */ (tierInicial));
   const [soloFichas, setSoloFichas] = useState(() => !permite3D(tierInicial));

@@ -1243,7 +1243,7 @@ const COPY_ESTACIONES =
 export default function MundoSanidad3D() {
   const [listo, setListo] = useState(false);
   const [etiquetas, setEtiquetas] = useState(false);
-  const tier = useMemo(() => decidirTier(), []);
+  const tier = useMemo(() => decidirTier().tier, []);
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&
