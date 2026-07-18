@@ -1501,10 +1501,31 @@
   50%      { transform: translateY(-0.95px); }
 }
 
+/* ── APARICIÓN ESPECTRAL — el jaguar-espíritu se MATERIALIZA y se DESVANECE ───
+   Ciclo místico de presencia (opt-in, data-aparicion): emerge desde la bruma
+   (opacidad que sube + leve escala/ascenso, como si se condensara del aire) se
+   queda un rato PRESENTE y vuelve a disolverse en la nada. Solo opacity+transform
+   (GPU). El nodo .jaguar-aparicion envuelve TODO el dibujo por fuera de la
+   levitación → no pisa su transform. Cae a PRESENTE y quieto en RM / tier bajo
+   (nunca invisible). */
+[data-creature='jaguar'][data-aparicion='1'] .jaguar-aparicion {
+  animation: jaguar-aparicion 8.5s ease-in-out infinite;
+}
+@keyframes jaguar-aparicion {
+  0%   { opacity: 0;    transform: scale(0.94) translateY(1.3px); }  /* la nada */
+  14%  { opacity: 0.22; transform: scale(0.97) translateY(0.6px); }  /* se insinúa */
+  32%  { opacity: 1;    transform: scale(1) translateY(0); }         /* materializado */
+  66%  { opacity: 1;    transform: scale(1) translateY(0); }         /* presente, sagrado */
+  86%  { opacity: 0.18; transform: scale(0.985) translateY(0.5px); } /* se disuelve */
+  100% { opacity: 0;    transform: scale(0.94) translateY(1.3px); }  /* vuelve a la nada */
+}
+
 /* device-tier 'bajo': PODA el brillo/estrellas místicas (raster caro en gama
    baja) — se detiene la animación y queda un rastro estático y digno. */
 [data-tier='bajo'][data-creature='jaguar'] .jaguar-glifos,
 [data-tier='bajo'][data-creature='jaguar'] .jaguar-ojos { animation: none; transition: none; }
+/* aparición: sin ciclo → queda PRESENTE (visible, opacidad plena, quieto). */
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-aparicion { animation: none; opacity: 1; transform: none; }
 [data-tier='bajo'][data-creature='jaguar'] .jaguar-aura-espectral,
 [data-tier='bajo'][data-creature='jaguar'] .jaguar-ojo-brillo,
 [data-tier='bajo'][data-creature='jaguar'] .jaguar-shimmer,
@@ -1534,6 +1555,8 @@
   [data-creature='jaguar'][data-poder='1'] .jaguar-estrella { animation: none !important; opacity: 0.5; }
   /* Ojos: sin transición — saltan a su forma (redonda o almendrada) sin morphear. */
   .jaguar-ojos { transition: none !important; }
+  /* Aparición: NUNCA invisible — queda PRESENTE, opacidad plena y quieto. */
+  .jaguar-aparicion { animation: none !important; opacity: 1 !important; transform: none !important; }
 }
 
 
