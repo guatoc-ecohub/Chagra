@@ -13,7 +13,7 @@ import {
   AlertCircle,
   SkipForward,
 } from 'lucide-react';
-import ChagraAgentAvatarColibri from './ChagraAgentAvatarColibri';
+import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
 import AvatarSelector from './Settings/AvatarSelector';
 import { useGeolocation } from '../hooks/useGeolocation';
 import {
