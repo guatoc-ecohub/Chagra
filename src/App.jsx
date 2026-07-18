@@ -258,6 +258,11 @@ const AngelitaVivaMockup = lazy(() => import('./mockups/AngelitaViva'));
 // PANELERA (cañal, trapiche de buey, hornilla con paila y gaveras). Didáctico:
 // caña → molino → jugo → paila → panela.
 const MundoBoticaCana3DMockup = lazy(() => import('./mockups/MundoBoticaCana3D'));
+// 3D: la CLÍNICA DE SANIDAD del cultivo — diagnosticar por observación
+// (hoja sana vs enferma, mural de plagas: broca, minador, cochinilla/áfidos,
+// gota/tizón; plaga vs enfermedad; manejo agroecológico sin veneno: mariquita,
+// avispa parasitoide, trampa amarilla, poda sanitaria, caldo). Standalone.
+const MundoSanidad3DMockup = lazy(() => import('./mockups/MundoSanidad3D'));
 // 3D: el HUERTO DE FRUTALES del solar (aguacate mayor, mango con poda,
 // cítricos, guayabo, papayo, injerto con tutor, plateo y cosecha a mano).
 // Standalone tipo botica: no monta el sistema MUNDO ni toca EscenaBase3D.
@@ -700,6 +705,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/angelita-viva': 'mockup_angelita_viva',
   'mockups/mundo-polinizadores-3d': 'mockup_mundo_polinizadores_3d',
   'mockups/mundo-botica-cana-3d': 'mockup_mundo_botica_cana_3d',
+  'mockups/mundo-sanidad-3d': 'mockup_mundo_sanidad_3d',
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
 };
 
@@ -2386,6 +2392,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La botica y el trapiche">
               <MundoBoticaCana3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_sanidad_3d':
+        // La clínica de sanidad del cultivo: la mesa de diagnóstico con la
+        // lupa, la hoja sana vs enferma, el mural de plagas (broca, minador,
+        // cochinilla/áfidos, gota/tizón), la distinción plaga vs enfermedad y
+        // el manejo agroecológico sin veneno (mariquita, avispa parasitoide,
+        // trampa amarilla, poda sanitaria, caldo). Enseña a OBSERVAR, no a
+        // matar bichos. Ruta #/mockups/mundo-sanidad-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La clínica del cultivo">
+              <MundoSanidad3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
