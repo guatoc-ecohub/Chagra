@@ -99,26 +99,14 @@ export function pisoEnZ(z) {
  * el `tipo` que su piso siembra — la geometría la resuelve la escena. */
 export const VEGETACION_PISOS = [
   { piso: 'paramo', pos: [-5.6, -7.8] },
-  { piso: 'paramo', pos: [1.2, -8.3] },
+  { piso: 'paramo', pos: [1.4, -8.4] },
   { piso: 'paramo', pos: [4.8, -6.6] },
-  // ARCHIVADO 2026-07-18 (pedido del operador): estos 3 frailejones extra
-  // arropaban al Ent-queñua de la vista del páramo en [2.2, -7.4]
-  // (VistaParamoEnt, ver src/mockups/valle/_archivo/vistaParamo.archivado.jsx),
-  // que se sacó de la vista del valle por amontonada. Sin el Ent no hacen
-  // falta — el páramo ya se lee con los 3 de arriba. Si se reactiva el Ent,
-  // reactivar también estos tres:
-  //   { piso: 'paramo', pos: [3.3, -7.9] },
-  //   { piso: 'paramo', pos: [2.9, -6.6] },
-  //   { piso: 'paramo', pos: [-7.4, -6.9] },
   { piso: 'frio', pos: [-6.0, -3.6] },
   { piso: 'frio', pos: [3.0, -4.4] },
-  { piso: 'frio', pos: [-7.6, -2.4] },
   { piso: 'templado', pos: [-2.4, 1.0] },
   { piso: 'templado', pos: [6.2, 2.6] },
-  { piso: 'templado', pos: [-7.4, 1.2] },
-  { piso: 'calido', pos: [-7.9, 8.3] }, // corrida: su puesto viejo quedó dentro del potrero
-  { piso: 'calido', pos: [7.4, 7.2] },
-  { piso: 'calido', pos: [0.9, 8.0] },
+  { piso: 'calido', pos: [-6.4, 6.4] },
+  { piso: 'calido', pos: [5.8, 6.0] },
 ].map((v) => {
   const piso = PISOS_TERMICOS.find((p) => p.id === v.piso);
   return { ...v, tipo: piso ? piso.vegetacion : 'platano' };
@@ -136,78 +124,33 @@ export const VEGETACION_PISOS = [
  * semillero abajo en la tierra caliente. Pocos y separados > muchos amontonados.
  */
 const LUGARES = [
-  // (Las posiciones finales las manda COMPOSICION_LUGARES — la capa del
-  //  director en visual/mundo3d/direccion; estas son el respaldo crudo.)
   { id: 'agua', pos: [1.4, 0, -0.2], escala: 1, tipo: 'quebrada' },
-  // El cafetal CON SOMBRÍO: café bajo guamo y plátano — policultivo, no hilera.
-  { id: 'cafe', pos: [4.4, 0, 1.0], escala: 1.05, tipo: 'cafetal' },
-  // La milpa-PARCELA (portal MIS MATAS): maíz + fríjol + calabaza juntos,
-  // leída como granja viva de Age of Empires — jamás monocultivo.
+  { id: 'cafe', pos: [4.4, 0, 1.0], escala: 1, tipo: 'cafetal' },
   { id: 'cultivos', pos: [-4.4, 0, 2.4], escala: 1.15, tipo: 'milpa' },
   { id: 'suelo', pos: [-1.4, 0, 4.8], escala: 1, tipo: 'era' },
   { id: 'sanidad', pos: [3.8, 0, 4.9], escala: 0.95, tipo: 'huerta' },
-  // El POTRERO (portal MIS ANIMALES): apartos divididos por cercas vivas de
-  // matarratón, nacedero y botón de oro; los animales regados, no amontonados.
-  // (Escala contenida: el valle cercano de la v2 no aguanta el llano de 48×48.)
-  { id: 'animales', pos: [-5.0, 0, 5.4], escala: 0.82, tipo: 'animales' },
+  { id: 'animales', pos: [-5.0, 0, 5.4], escala: 1, tipo: 'animales' },
   { id: 'disenio', pos: [5.2, 0, -3.4], escala: 1.1, tipo: 'bosque' },
   { id: 'clima', pos: [-3.2, 0, -6.0], escala: 1, tipo: 'veleta' },
-  // El mercado (portal VENDER), abajo en la tierra caliente, cerca de la salida
-  // a la plaza: el puesto con su toldo donde la cosecha sale a venderse.
+  // El mercado, abajo en la tierra caliente, cerca de la salida a la plaza: el
+  // puesto con su toldo donde la cosecha de la finca sale a venderse.
   { id: 'mercado', pos: [1.2, 0, 6.6], escala: 1, tipo: 'mercado' },
-  // El INVERNADERO (micro-mundo del semillero): arcos, plástico lechoso y sus
-  // mesas de germinación — donde nace y se cría la matica antes del lote.
-  { id: 'semillero', pos: [-2.6, 0, 6.2], escala: 0.9, tipo: 'invernadero' },
+  // El semillero, abajo cerca de la casa: el túnel de media-sombra donde nace y
+  // se cría la matica antes de salir al lote. (anti-conflicto: lugar nuevo al final.)
+  { id: 'semillero', pos: [-2.6, 0, 6.2], escala: 1, tipo: 'semillero' },
   // El suelo vivo / red micorrízica, en el corazón cultivado (entre el suelo y
   // los cultivos): unos hongos que asoman = el fruto de la red bajo tierra. Toque
   // ahí para BAJAR al mundo subterráneo. (anti-conflicto: lugar nuevo al final.)
   { id: 'micorrizas', pos: [-2.7, 0, 3.3], escala: 1, tipo: 'hongos' },
-  // La BIOFÁBRICA (mundo real 'abono'): la pila de compost cerca del potrero
-  // pero diferenciada — el ciclo estiércol→abono legible en el mapa.
-  { id: 'abono', pos: [-3.3, 0, 8.1], escala: 0.85, tipo: 'compost' },
-  // El KIOSCO DEL SABER (portal APRENDER): el tablero bajo techito de paja a
-  // la vera del camino de la plaza. Aún sin mundo propio en el manifiesto:
-  // trae su identidad de respaldo (fallbackMundo) mientras el hub de juegos
-  // abre su puerta (otro frente lo construye).
-  {
-    id: 'aprender',
-    pos: [6.4, 0, 4.6],
-    escala: 0.9,
-    tipo: 'saber',
-    fallbackMundo: {
-      titulo: 'Aprender',
-      emoji: '📖',
-      lema: 'Los juegos y saberes de la finca, reunidos en un solo patio.',
-      tinte: ['#b3771d', '#f2dfae'],
-    },
-  },
-  // EL PÁRAMO (la puerta de arriba): el frailejonal con su niebla fría en la
-  // zona alta de la cordillera. Antes el páramo se veía (el Ent en el filo)
-  // pero no tenía ENTRADA propia en el valle; este lugar la abre — tocarla
-  // sube al mundo del páramo (MundoParamo3D, vía diorama_paramo). Sin mundo
-  // propio en el manifiesto: trae su identidad de respaldo.
-  {
-    id: 'paramo',
-    pos: [-0.9, 0, -7.6],
-    escala: 0.95,
-    tipo: 'frailejonal',
-    fallbackMundo: {
-      titulo: 'El páramo',
-      emoji: '🏔️',
-      lema: 'El frailejonal que le peina el agua a la niebla y se la guarda a la finca.',
-      tinte: ['#63807a', '#c9d8d2'],
-    },
-  },
 ];
 
 /**
  * Mundos del valle, ya resueltos contra el manifiesto real. Cada uno trae su
- * `titulo`, `emoji` y `tinte` verdaderos + la geometría de su lugar. Un lugar
- * sin mundo en el manifiesto (el kiosco de aprender) usa su `fallbackMundo`.
+ * `titulo`, `emoji` y `tinte` verdaderos + la geometría de su lugar.
  */
 export const MUNDOS_VALLE = LUGARES.map((l) => {
   /** @type {{ titulo?: string, emoji?: string, lema?: string, tinte?: string[] }} */
-  const real = MUNDO_BY_ID[l.id] || l.fallbackMundo || {};
+  const real = MUNDO_BY_ID[l.id] || {};
   return {
     ...l,
     titulo: real.titulo || l.id,
@@ -483,8 +426,7 @@ export const NARRACION = {
   cafe: 'El cafetal bajo sombra. El café vive debajo del guamo, cargado de cereza roja. De ahí sale el grano: cereza, pergamino y oro. En la finca no se tuesta.',
   suelo: 'Las eras y el semillero. La tierra de aquí es la que pide cuidado esta noche.',
   agua: 'La quebrada que baja del monte. De aquí sale el agua para toda la finca.',
-  animales:
-    'El potrero, dividido en apartos por cercas vivas de matarratón, nacedero y botón de oro: la cerca que también es comida y sombra. Los animales andan regados, cada grupo en su aparto.',
+  animales: 'El corral. Las gallinas y el ganado que cierran el ciclo del abono.',
   sanidad:
     'La huerta de la casa. Aquí es donde primero se ven las plagas, para atajarlas a tiempo.',
   disenio: 'El monte y los árboles que sembró. La finca también es el bosque que la abraza.',
@@ -494,13 +436,5 @@ export const NARRACION = {
   pisos:
     'Suba por la montaña: del cálido al páramo, cada piso con lo suyo. Arriba manda el frailejón, que le peina el agua a la niebla y la entrega despacio al suelo. Por eso el páramo se cuida, no se ara.',
   semillero:
-    'El invernadero: el micro-mundo donde nace la matica. La semilla despierta en la bandeja bajo el plástico, se repica a la bolsa y se endurece al sol antes de irse al campo. Del grano fuerte sale la finca fuerte.',
-  abono:
-    'La biofábrica. Del potrero sale el estiércol, aquí se vuelve abono: la pila trabaja sola, con su calorcito y sus lombrices. El ciclo que no bota nada.',
-  aprender:
-    'El kiosco del saber: el tablero donde la finca enseña. Aquí van llegando los juegos y las lecciones del monte.',
-  casa:
-    'Esta es su casa: el corazón de la finca y la puerta de sus mundos. Toque una de las seis puertas para salir a donde necesite.',
-  paramo:
-    'El páramo de su finca: los frailejones le peinan el agua a la niebla y se la entregan despacio al suelo. Por eso el páramo se cuida, no se ara. Entre y véalo de cerca.',
+    'El semillero, bajo su túnel de media-sombra. Aquí nace la matica: la semilla despierta en la bandeja, se repica a la bolsa y se endurece al sol antes de irse al campo. Del grano fuerte sale la finca fuerte.',
 };

@@ -11,13 +11,10 @@
 import { MUNDOS_VALLE, MUNDO_VALLE_BY_ID, COSA_DEL_DIA, CLIMAS } from './valleData';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 
-/* Proyección isométrica plana de las coordenadas del valle a la lámina SVG.
-   (Escala ajustada para que TODA la finca quepa en la lámina 400×340: con el
-   potrero y la biofábrica el rango (x−z) llega a ±11.5 — a 30 px/u el corral
-   caía fuera del cuadro.) */
+/* Proyección isométrica plana de las coordenadas del valle a la lámina SVG. */
 function iso(x, z) {
-  const cx = 222 + (x - z) * 16;
-  const cy = 148 + (x + z) * 8;
+  const cx = 200 + (x - z) * 30;
+  const cy = 150 + (x + z) * 15;
   return { cx, cy };
 }
 
