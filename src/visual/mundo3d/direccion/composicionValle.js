@@ -138,16 +138,15 @@ export const PORTALES_VALLE = [
    vista (el Ent magnífico arriba). */
 export const PORTICOS_SECUNDARIOS = ['suelo', 'sanidad', 'semillero', 'abono', 'agua', 'micorrizas'];
 
-/* ── 3b. LA VISTA DEL PÁRAMO (el acceso de arriba) ───────────────────────
-   Regla del operador: el acceso al páramo ES el páramo visible — el
-   Ent-queñua MAGNÍFICO parado en el filo, rodeado de frailejones, no un
-   torii. Tocarlo entra al mundo del monte ('disenio': toda mi finca, de
-   donde se cuida el páramo). */
-export const VISTA_PARAMO = {
-  punto: [2.2, -7.4], // el filo alto, a la derecha de la veleta: se ve entero
-  escala: 0.62, // el Ent mide ~6 u a escala 1: aquí corona sin tapar el cielo
-  mundoId: 'disenio',
-};
+/* ── 3b. LA VISTA DEL PÁRAMO — ARCHIVADA 2026-07-18 ──────────────────────
+   El Ent-queñua parado en el filo + los frailejones que lo arropaban se
+   veían amontonados en la vista del valle (pedido del operador): se
+   ARCHIVARON completos, NO se borraron — ver
+   src/mockups/valle/_archivo/vistaParamo.archivado.jsx (VISTA_PARAMO +
+   VistaParamoEnt), listos para retomarse en otra composición.
+   El PORTAL/entrada REAL al páramo no vivía aquí y sigue intacto:
+   valleData.js LUGARES id:'paramo' (su propio rótulo en el valle) →
+   wire3DNav.js `paramo: 'diorama_paramo'` → MundoParamo3D. */
 
 /* ── 4. LOS SENDEROS (la mano del campesino sobre el terreno) ────────────
    Caminos de tierra pisada que NACEN de la casa: el rastro honesto del uso

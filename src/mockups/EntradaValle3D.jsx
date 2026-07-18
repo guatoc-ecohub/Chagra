@@ -369,11 +369,12 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
     decir(COSA_DEL_DIA.vozTexto);
   }, [decir]);
 
-  // ── LA CASA ES LA VÍA SECUNDARIA (fix del operador 2026-07-16): tocar la
-  //    puerta iluminada lleva a la VENTANA-PUERTA de los mundos (la ruta
-  //    `ventana_valle` ya construida), por el mismo velo del cableo 3D→2D.
-  //    La entrada PRINCIPAL a cada mundo es su portal-paisaje del valle,
-  //    tocado directo — la casa no vuelve a ser la boca de todo.
+  // ── LA CASA ES LA VÍA SECUNDARIA (fix del operador 2026-07-16, recableada
+  //    2026-07-18): tocar la puerta iluminada lleva al MIRADOR DE LOS
+  //    MUNDOS (VitrinaMaestraMundos, ruta `vitrina_maestra` — wire3DNav.js
+  //    `casa:`), por el mismo velo del cableo 3D→2D. La entrada PRINCIPAL a
+  //    cada mundo es su portal-paisaje del valle, tocado directo — la casa
+  //    no vuelve a ser la boca de todo.
   const abrirCasa = useCallback(() => abrirPantalla('casa'), [abrirPantalla]);
 
   const volverAlValle = useCallback(() => {
