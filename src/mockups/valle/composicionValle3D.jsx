@@ -20,8 +20,10 @@
  *                        operador 2026-07-18: la entrada se dice con luz).
  *   · PorticosSecundarios — los pórticos de madera SOLO para los lugares
  *                        secundarios de menos uso (eras, huerta, vivero…).
- *   · VistaParamoEnt   — el acceso al páramo: el Ent-queñua MAGNÍFICO parado
- *                        en el filo entre frailejones. El páramo se VE.
+ *   · (VistaParamoEnt ARCHIVADA 2026-07-18: el Ent-queñua del filo se veía
+ *                        amontonado en la vista del valle — ver
+ *                        _archivo/vistaParamo.archivado.jsx. El portal REAL
+ *                        al páramo sigue en valleData.js LUGARES id:'paramo'.)
  *   · SenderosValle    — la tierra pisada que nace de la casa: el rastro del
  *                        uso diario, el ojo camina por donde caminan los pies.
  *   · PatiosLugares    — el suelo desnudo bajo cada lugar navegable: la
@@ -38,14 +40,12 @@ import { CREATURES } from '../../visual/creatures/index.js';
    EL oso del valle — cuerpo casi negro, contorno neón teal, anteojos crema;
    el rubber-hose café quedó retirado). SVG puro: billboard barato. */
 import { GuardianAvatar } from '../../components/dashboard/GuardianEspiritu.jsx';
-import EntQuenua from '../../visual/mundo3d/bosque/EntQuenua.jsx';
 import {
   CASA_VALLE,
   SENDEROS_VALLE,
   PATIO,
   PORTALES_VALLE,
   PORTICOS_SECUNDARIOS,
-  VISTA_PARAMO,
   JERARQUIA_PERSONAJES,
   VECINOS_VALLE,
 } from '../../visual/mundo3d/direccion/composicionValle.js';
@@ -736,36 +736,14 @@ export function PorticosSecundarios({ mundos, alturaDe }) {
   );
 }
 
-/* ── LA VISTA DEL PÁRAMO: el Ent-queñua magnífico en el filo ─────────────
-   Regla del operador: el acceso al páramo ES el páramo visible — arriba, el
-   Ent (queñua/Polylepis, mallas reales de EntQuenua) parado entre los
-   frailejones, meciéndose con el viento del páramo. Tocarlo entra al mundo
-   del monte. El detalle va con techo 'medio' (el 'alto' pleno es para SU
-   mundo; aquí es un habitante del fondo, no la escena entera). */
-export function VistaParamoEnt({ alturaDe, tier = 'alto', reducedMotion = false, onEntrar = null }) {
-  const [x, z] = VISTA_PARAMO.punto;
-  const y = alturaDe(x, z);
-  const tierEnt = tier === 'bajo' ? 'bajo' : 'medio';
-  return (
-    <group
-      position={[x, y, z]}
-      rotation={[0, 0.5, 0]}
-      scale={VISTA_PARAMO.escala}
-      onClick={
-        onEntrar
-          ? (e) => {
-              e.stopPropagation();
-              onEntrar(VISTA_PARAMO.mundoId);
-            }
-          : undefined
-      }
-      onPointerOver={onEntrar ? alApuntar : undefined}
-      onPointerOut={onEntrar ? alSoltar : undefined}
-    >
-      <EntQuenua tier={tierEnt} reducedMotion={reducedMotion} />
-    </group>
-  );
-}
+/* ── LA VISTA DEL PÁRAMO — ARCHIVADA 2026-07-18 ───────────────────────────
+   `VistaParamoEnt` (el Ent-queñua magnífico parado en el filo, entre
+   frailejones) se sacó de la vista del valle: se veía amontonada en el
+   cuadro (pedido del operador). Componente completo conservado, NO
+   borrado — ver src/mockups/valle/_archivo/vistaParamo.archivado.jsx para
+   reactivarlo. El portal/entrada REAL al páramo no vivía aquí — sigue
+   intacto en valleData.js LUGARES id:'paramo' → wire3DNav.js
+   `paramo: 'diorama_paramo'` → MundoParamo3D. */
 
 /* ── Senderos: cintas de tierra pisada posadas sobre el terreno ──────────
    Un tubo enterrado a medias por sendero (queda la venita superior visible):
