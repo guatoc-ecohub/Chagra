@@ -33,6 +33,9 @@ export const RUTA_2D_DESDE_3D = {
   // Los hongos no tienen pantalla propia todavía: el mundo subterráneo
   // (subsuelo) es su casa 2D hasta entonces (fix del director, DIRECCION #3).
   micorrizas: 'subsuelo',
+  // La puerta del páramo en el valle (el frailejonal de la zona fría):
+  // abre el mundo del páramo entero.
+  paramo: 'diorama_paramo',
   bosque_vivo: 'bosque_vivo',
 
   // ── Sub-hotspots de cada escena 3D (mundoData.js hotspots con view:) ─
