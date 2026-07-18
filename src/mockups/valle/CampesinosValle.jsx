@@ -1,15 +1,21 @@
-/* eslint-disable react-refresh/only-export-components -- exporta el ROSTER
-   (CAMPESINOS_VALLE) además del componente, para que quien cablee pueda
-   reposicionar cada faena sobre el terreno real sin tocar el dibujo. */
 /*
- * CAMPESINOS EN FAENA — el alma Age-of-Empires del valle.
+ * LOS DOS CAMPESINOS DEL VALLE — el alma Age-of-Empires, ahora con jornada.
  *
  * Gente trabajando con PROPÓSITO LEGIBLE: se tiene que leer QUÉ hace cada
  * uno de un vistazo, como los aldeanos de AoE — el que siembra está agachado
  * soltando la semilla, el del azadón golpea la tierra, la cosechadora lleva
  * su canasto, el compostero voltea la pila (con su vapor), la ordeñadora
- * está sentada en el butaco con el balde, y el carguero CAMINA de verdad por
- * el sendero con el costal al hombro.
+ * está sentada en el butaco con el balde, el carguero CAMINA de verdad por
+ * el sendero con el costal al hombro, y al mediodía se DESCANSA con un
+ * tinto a la sombra.
+ *
+ * Son EXACTAMENTE DOS (decisión de dirección: menos gente, más vida) y su
+ * faena CAMBIA con la franja del día real — la jornada del campo colombiano:
+ * ordeño al amanecer, siembra y deshierba en la mañana, descanso al
+ * mediodía, cosecha y compost por la tarde, la carga a casa y el segundo
+ * ordeño al atardecer, y de noche se recoge todo. El mapa franja → faena
+ * vive en campesinosFaenas.js (datos puros) y Angelita lo narra con
+ * `actividadCampesinosAhora()`.
  *
  * Mismo lenguaje que los vecinos del valle: billboards `<Html>` baratos,
  * SVG rubber-hose (tinta gruesa RH, extremidades de manguera, manos crema,
@@ -17,21 +23,25 @@
  * AUTOCONTENIDO: dibujo + keyframes viven aquí (el CSS se inyecta una sola
  * vez en <head>); no toca el kit de creatures ni la escena.
  *
- * Cada faena vive DONDE tiene sentido (composicionValle.js):
- * eras para sembrar, huerta para deshierbar, milpa para cosechar, la pila
- * de abono para voltear, la tranquera del potrero para ordeñar, y los
- * senderos 'plaza' y 'agua' para los que cargan. Jerarquía respetada:
- * px ≤ 44 (vecinoMaxPx), nadie compite con Angelita.
+ * Cada faena vive DONDE tiene sentido (campesinosFaenas.js ↔
+ * composicionValle.js): eras, huerta, milpa, pila de abono, tranquera del
+ * potrero, sendero 'plaza'. Jerarquía respetada: px ≤ 44 (vecinoMaxPx),
+ * nadie compite con Angelita.
  *
  * Props:
  *   alturaDe(x, z) → y   posa cada campesino en el terreno real
- *   tier                 'bajo' | 'medio' | 'alto' → 3 / 8 / 12 campesinos
+ *   franja               franja/clima del valle ('amanecer'…'noche', o una
+ *                        piel tipo 'lluvia'); null → reloj real del equipo
+ *   tier                 'bajo' | 'medio' | 'alto' — los dos viven en todos
+ *                        los tiers (2 billboards ya es el piso)
  *   reducedMotion        true → fotograma digno (pose mid-faena, sin loops
  *                        ni caminantes; los caminantes quedan plantados)
  */
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
+import { horaDeReloj } from '../../visual/mundo3d/cielosHoraData.js';
+import { CAMPESINOS, FAENAS_POR_FRANJA, normalizarFranja } from './campesinosFaenas.js';
 
 /* ── La tinta y las pieles (mismo INK del kit rubber-hose) ─────────────── */
 const INK = '#2a1a0c';
@@ -46,36 +56,9 @@ const PALETAS = [
   { ruana: '#5d4a6b', franja: '#41334c', camisa: '#dccfa9', piel: '#9c5c33', ala: '#e9d9a8' },
 ];
 
-/* ── EL ROSTER (dónde y qué faena — exportado para el cableado) ──────────
-   punto [x, z] en unidades de mundo del valle (misma escala que
-   VECINOS_VALLE / SENDEROS_VALLE de composicionValle.js). Los caminantes
-   llevan `ruta` (waypoints tomados de SENDEROS_VALLE) en vez de punto.
-   `tier` = el mínimo en que aparece ('bajo' ⊂ 'medio' ⊂ 'alto'). */
-export const CAMPESINOS_VALLE = [
-  // — TIER BAJO (3): el mínimo vital, una faena de cada familia —
-  { id: 'sembrador-eras', faena: 'siembra', punto: [-2.1, 5.3], tier: 'bajo', px: 32, factor: 7.8, dy: 0.5 },
-  { id: 'azadon-huerta', faena: 'deshierba', punto: [1.6, 4.2], tier: 'bajo', px: 33, factor: 7.8, dy: 0.5 },
-  {
-    id: 'carguero-plaza', faena: 'carga', carga: 'bulto', tier: 'bajo', px: 33, factor: 8, dy: 0.52,
-    ruta: [[1.4, 4.0], [3.2, 4.7], [4.8, 6.2]], velocidad: 0.55, // sendero 'plaza'
-  },
-  // — TIER MEDIO (+5 = 8): el valle en jornada —
-  { id: 'ordenadora-potrero', faena: 'ordeno', punto: [-4.15, 6.85], tier: 'medio', px: 30, factor: 7.5, dy: 0.42 },
-  { id: 'compostero-pila', faena: 'compost', punto: [-3.05, 7.75], tier: 'medio', px: 32, factor: 7.6, dy: 0.5 },
-  { id: 'cosechadora-milpa', faena: 'cosecha', punto: [-4.7, 2.6], tier: 'medio', px: 32, factor: 7.8, dy: 0.5 },
-  { id: 'sembradora-vivero', faena: 'siembra', punto: [-0.85, 6.35], tier: 'medio', px: 30, factor: 7.4, dy: 0.48 },
-  {
-    id: 'aguatero-quebrada', faena: 'carga', carga: 'balde', tier: 'medio', px: 30, factor: 7.6, dy: 0.5,
-    ruta: [[-0.5, 2.2], [0.5, 1.0], [1.3, 0.1]], velocidad: 0.45, // sendero 'agua'
-  },
-  // — TIER ALTO (+4 = 12): la vereda entera trabajando —
-  { id: 'cosechador-huerta', faena: 'cosecha', punto: [1.1, 3.55], tier: 'alto', px: 30, factor: 7.4, dy: 0.48 },
-  { id: 'deshierba-eras', faena: 'deshierba', punto: [-1.5, 4.8], tier: 'alto', px: 30, factor: 7.4, dy: 0.48 },
-  { id: 'azadon-milpa', faena: 'deshierba', punto: [-5.25, 2.15], tier: 'alto', px: 30, factor: 7.6, dy: 0.48 },
-  { id: 'sembrador-milpa', faena: 'siembra', punto: [-4.45, 3.05], tier: 'alto', px: 29, factor: 7.4, dy: 0.46 },
-];
-
-const NIVEL = { bajo: 0, medio: 1, alto: 2 };
+/* El roster ya no vive aquí: la pareja (CAMPESINOS) y su jornada
+   (FAENAS_POR_FRANJA) están en campesinosFaenas.js — datos puros que
+   Angelita también lee para narrar qué está pasando en el valle. */
 
 /* ── El CSS de las faenas (keyframes) — inyectado UNA vez ────────────────
    Cada gesto es un loop corto con la física rubber-hose: anticipación
@@ -526,6 +509,50 @@ function FiguraCarga({ paleta, carga = 'bulto' }) {
   );
 }
 
+/** DESCANSO: sentado en el butaco a la sombra con el pocillo de tinto
+    humeando — el mediodía del campo. Compuesto SOLO con piezas y keyframes
+    que ya existían: respira (cv-respira) y el vapor sube (cv-vapor).
+    Quietud ganada, no un rig nuevo. */
+function FiguraDescanso({ paleta }) {
+  return (
+    <g transform="translate(0 4)">
+      {/* la sombrita fresca en el suelo (mancha suave, no dura) */}
+      <ellipse cx="1" cy="25.5" rx="11" ry="2.1" fill="#1e2a1a" opacity="0.16" />
+      {/* butaco de tres patas (el mismo del ordeño) */}
+      <g>
+        <ellipse cx="-2" cy="12" rx="4.4" ry="1.6" fill="#8a5a33" stroke={INK} strokeWidth="1" />
+        <path d="M -4.6 13 L -5.4 22 M -2 13.4 L -2 22.5 M 0.6 13 L 1.4 22" stroke={INK} strokeWidth="1.6" strokeLinecap="round" />
+      </g>
+      {/* piernas estiradas al frente: el que POR FIN se sentó */}
+      <Manguera d="M -1 10 Q 3 11 6 14 L 8 19.5" punta={[8.6, 21]} pie puntaR={1.5} />
+      <Manguera d="M 0.5 10.5 Q 4.5 12.5 7.5 16 L 9 20.5" punta={[9.5, 21.8]} pie puntaR={1.5} />
+      <g className="cv-g cv-respira" style={{ transformOrigin: '50% 100%' }}>
+        {/* torso recostado un pelín atrás: descanso, no siesta */}
+        <g transform="translate(-2 -6) rotate(-5)">
+          <Ruana paleta={paleta} y={-9} alto={16} />
+          <Cabeza paleta={paleta} y={-15} />
+          <Sombrero paleta={paleta} y={-21} giro={-9} />
+        </g>
+        {/* brazo apoyado sobre la pierna */}
+        <Manguera d="M -6 -8 Q -7.5 -3 -5.5 1" punta={[-5.1, 2]} />
+        {/* brazo del tinto: el pocillo cerca del pecho */}
+        <Manguera d="M 0 -9 Q 4 -7 5 -3.5" punta={[5.4, -2.6]} />
+        {/* el pocillo con su oreja */}
+        <g>
+          <path d="M 3.6 -1.8 L 8 -1.8 L 7.4 2.2 L 4.2 2.2 Z" fill="#e9edf0" stroke={INK} strokeWidth="0.9" strokeLinejoin="round" />
+          <path d="M 8 -1 q 1.8 0.6 0 2.4" fill="none" stroke={INK} strokeWidth="0.8" />
+          <ellipse cx="5.8" cy="-1.8" rx="2.2" ry="0.7" fill="#5c3a22" stroke={INK} strokeWidth="0.6" />
+        </g>
+        {/* el vapor del tinto (mismo keyframe del compost) */}
+        <g className="cv-g cv-vapor">
+          <path d="M 5 -3.5 q -1 -2 0.3 -3.8 q 1.2 -1.6 0.3 -3.2" stroke="#e8e0d0" strokeWidth="0.9" fill="none" strokeLinecap="round" />
+          <path d="M 7 -3.2 q 0.8 -1.8 -0.2 -3.4" stroke="#e8e0d0" strokeWidth="0.7" fill="none" strokeLinecap="round" />
+        </g>
+      </g>
+    </g>
+  );
+}
+
 const FIGURAS = {
   siembra: FiguraSiembra,
   deshierba: FiguraDeshierba,
@@ -533,6 +560,7 @@ const FIGURAS = {
   compost: FiguraCompost,
   ordeno: FiguraOrdeno,
   carga: FiguraCarga,
+  descanso: FiguraDescanso,
 };
 
 /* ── El billboard de un campesino (mismo contrato que VecinosDelValle) ─── */
@@ -629,36 +657,61 @@ function CampesinoCaminante({ def, paleta, alturaDe, animated, delayBase }) {
   );
 }
 
+/* Sigue la franja del día: manda la de la escena (prop); sin prop, el reloj
+   real del equipo con un chequeo suave por minuto (cero costo por frame). */
+function useFranjaCampo(franjaProp) {
+  const [deReloj, setDeReloj] = useState(() => horaDeReloj());
+  useEffect(() => {
+    if (franjaProp) return undefined; // la escena manda: nada que vigilar
+    const id = setInterval(() => {
+      setDeReloj((prev) => {
+        const f = horaDeReloj();
+        return f === prev ? prev : f; // mismo valor → cero re-render
+      });
+    }, 60000);
+    return () => clearInterval(id);
+  }, [franjaProp]);
+  return normalizarFranja(franjaProp) ?? deReloj;
+}
+
 /**
- * <CampesinosValle> — el grupo r3f de la gente en faena.
+ * <CampesinosValle> — los DOS campesinos del valle, en la faena que toca
+ * según la hora del campo. Angelita narra lo mismo que se ve aquí leyendo
+ * `actividadCampesinosAhora()` de campesinosFaenas.js.
  *
  * @param {Object} props
  * @param {(x:number, z:number) => number} props.alturaDe  y del terreno
- * @param {'bajo'|'medio'|'alto'} [props.tier='alto']  3 / 8 / 12 campesinos
+ * @param {string|null} [props.franja=null]  franja/clima de la escena
+ *   ('amanecer'…'noche', o una piel tipo 'lluvia'); null → reloj real
+ * @param {'bajo'|'medio'|'alto'} [props.tier='alto']  aceptado por contrato;
+ *   los dos viven en todos los tiers (2 billboards ya es el piso)
  * @param {boolean} [props.reducedMotion=false]
  */
-export function CampesinosValle({ alturaDe, tier = 'alto', reducedMotion = false }) {
+export function CampesinosValle({ alturaDe, tier = 'alto', reducedMotion = false, franja = null }) {
   useEstiloCampesinos();
-  const nivel = NIVEL[tier] ?? NIVEL.alto;
-  const activos = useMemo(
-    () => CAMPESINOS_VALLE.filter((c) => NIVEL[c.tier] <= nivel),
-    [nivel],
-  );
+  void tier;
+  const franjaCampo = useFranjaCampo(franja);
+  const defs = FAENAS_POR_FRANJA[franjaCampo] ?? FAENAS_POR_FRANJA.manana;
   const animated = !reducedMotion;
   return (
     <group>
-      {activos.map((def, i) => {
-        // paleta y desfase deterministas por índice: vereda variada, no clones
-        const paleta = PALETAS[i % PALETAS.length];
+      {defs.map((faenaDef, i) => {
+        const quien = CAMPESINOS[i];
+        if (!quien || faenaDef.visible === false) return null; // está adentro (la noche)
+        // identidad estable: la ruana de cada uno no cambia con la faena
+        const paleta = PALETAS[quien.paleta % PALETAS.length];
         const delayBase = -((i * 0.77) % 2.6);
+        const def = { ...faenaDef, id: quien.id };
+        // key con franja: al cambiar de faena el billboard renace limpio
+        const key = `${quien.id}-${franjaCampo}`;
         return def.ruta ? (
           <CampesinoCaminante
-            key={def.id} def={def} paleta={paleta} alturaDe={alturaDe}
+            key={key} def={def} paleta={paleta} alturaDe={alturaDe}
             animated={animated} delayBase={delayBase}
           />
         ) : (
           <CampesinoFijo
-            key={def.id} def={def} paleta={paleta} alturaDe={alturaDe}
+            key={key} def={def} paleta={paleta} alturaDe={alturaDe}
             animated={animated} delayBase={delayBase}
           />
         );
