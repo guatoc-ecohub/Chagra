@@ -8,10 +8,18 @@
  * cafetal campesino. Cada especie con su identidad inequívoca:
  *
  *   · Cafeto (Coffea arabica)   — arbusto de porte columnar con PISOS de ramas
- *                                 horizontales y hoja verde oscura lustrosa.
- *   · Cereza de café            — el fruto, INSTANCIADO APARTE con color por
- *                                 instancia: verde → pintón amarillo → ROJO
- *                                 cereza (el estado de maduración varía por mata).
+ *                                 plagiotrópicas (horizontales) VISIBLES y hojas
+ *                                 elípticas opuestas, verde oscuro lustroso. La
+ *                                 tabla de ramas (PISOS_CAFETO + anguloRamaCafeto)
+ *                                 se EXPORTA: la distribución siembra las cerezas
+ *                                 SOBRE esas mismas ramas — racimos pegados a la
+ *                                 rama, como carga el café de verdad.
+ *   · Cereza de café            — el fruto OVOIDE, INSTANCIADO APARTE con color
+ *                                 por instancia: verde → pintón → rojo cereza →
+ *                                 VINO maduro (la gama real de la cosecha).
+ *   · Flor de café              — el racimo axilar BLANCO: en la misma ladera
+ *                                 conviven flor, cereza verde y cereza madura
+ *                                 (dato real del ciclo del arábica).
  *   · Guamo (Inga)              — el árbol de sombrío clásico: tronco que se
  *                                 bifurca y copa ANCHA y plana, un parasol.
  *   · Nogal cafetero            — el otro sombrío: tronco recto y alto, copa
@@ -76,9 +84,9 @@ export function alturaLadera(wx, wz) {
  * el conteo del InstancedMesh de frutos (repartidos entre las matas cargadas).
  */
 export const FLORA_CAFETAL = {
-  alto: { cafeto: 120, cereza: 360, guamo: 7, nogal: 3, platano: 6, hojarasca: 14, piedra: 6 },
-  medio: { cafeto: 70, cereza: 190, guamo: 5, nogal: 2, platano: 4, hojarasca: 8, piedra: 4 },
-  bajo: { cafeto: 30, cereza: 80, guamo: 3, nogal: 1, platano: 2, hojarasca: 4, piedra: 2 },
+  alto: { cafeto: 120, cereza: 460, flor: 90, guamo: 10, nogal: 4, platano: 9, hojarasca: 14, piedra: 6 },
+  medio: { cafeto: 70, cereza: 250, flor: 40, guamo: 6, nogal: 2, platano: 5, hojarasca: 8, piedra: 4 },
+  bajo: { cafeto: 30, cereza: 100, flor: 0, guamo: 3, nogal: 1, platano: 2, hojarasca: 4, piedra: 2 },
 };
 
 /** Conteos para un tier (desconocido → frugal, nunca el más caro). */
@@ -95,19 +103,28 @@ export const calidadCafetal = (tier) => CALIDAD_CAFETAL[tier] ?? CALIDAD_CAFETAL
 export const PAL = {
   // Cafeto
   cafetoTallo: '#5a4430', // tallo leñoso delgado
-  cafetoHoja: '#2e5c33', // hoja verde oscura lustrosa (la firma del café)
-  cafetoHojaSol: '#477a3d', // la cara del piso que da al sol
+  cafetoRama: '#6b5138', // la rama plagiotrópica, la percha de las cerezas
+  cafetoHoja: '#24512c', // hoja verde MUY oscura lustrosa (la firma del café)
+  cafetoHojaSol: '#3d7238', // la cara de la hoja que da al sol
+  cafetoHojaSombra: '#1c3f23', // el corazón tupido de cada piso, tras las hojas
   cafetoBrote: '#7fa24c', // cogollo tierno arriba
 
-  // Los tres estados de la cereza (van POR INSTANCIA, no aquí; referencia):
-  cerezaVerde: '#6f9e3c',
-  cerezaPinton: '#dca63c',
-  cerezaRoja: '#c1301f',
+  // Los estados de la cereza (van POR INSTANCIA, no aquí; referencia — la gama
+  // real de la foto de cosecha: verde → pintón naranja → rojo cereza → VINO):
+  cerezaVerde: '#7aa244',
+  cerezaPinton: '#e0a33a',
+  cerezaRoja: '#cf2a1d',
+  cerezaVino: '#8e1a20',
+
+  // La flor axilar blanca del arábica (nace pegada a la rama, como la cereza)
+  florCafe: '#f6f1e2',
+  florCentro: '#e9d98d',
 
   // Guamo (Inga) — el parasol del sombrío
   guamoTronco: '#6b533a',
   guamoCopa: '#4b7c3a',
   guamoCopaSol: '#699a48',
+  guama: '#82a854', // las vainas verdes colgantes (la firma del Inga)
 
   // Nogal cafetero (Cordia alliodora) — el sombrío alto y recto
   nogalTronco: '#8a8274',
@@ -119,6 +136,8 @@ export const PAL = {
   platanoHoja: '#5d9440',
   platanoHojaSol: '#7cb04e',
   platanoHojaSeca: '#a5924c',
+  platanoRacimo: '#8fae55', // las manos verdes del racimo
+  platanoBellota: '#77293a', // la bellota vinotinto que cuelga debajo
 
   // Suelo
   hojarasca: '#8a6c42',
@@ -201,46 +220,127 @@ function variar(base, r, amt = 0.06) {
 /* -------------------------------------------------------------------------- */
 
 /*
- * Porte columnar con PISOS: un tallo leñoso central y 3 pisos de follaje
- * anchos y bajos (las ramas horizontales del café leídas como masas), hoja
- * oscura abajo y cara al sol arriba, cogollo tierno en la punta. Las CEREZAS
- * no van aquí: son un InstancedMesh aparte con color por instancia.
+ * La ARQUITECTURA del arábica, compartida entre la malla y la distribución:
+ * pisos de ramas plagiotrópicas (horizontales, apenas caídas) alrededor del
+ * tallo ortotrópico. Se EXPORTA para que las cerezas y las flores se siembren
+ * SOBRE la misma rama que la geometría dibuja — el racimo pegado a la rama.
+ */
+export const PISOS_CAFETO = [
+  { y: 0.34, ramas: 4, len: 0.56, caida: -0.16 }, // el piso bajo, el más ancho
+  { y: 0.6, ramas: 4, len: 0.5, caida: -0.12 },
+  { y: 0.84, ramas: 3, len: 0.42, caida: -0.08 },
+  { y: 1.06, ramas: 3, len: 0.32, caida: -0.05 }, // el piso alto, el más corto
+];
+
+/** El ángulo de la rama j del piso i (filotaxis simple, determinista). */
+export const anguloRamaCafeto = (piso, j, n) => (j / n) * Math.PI * 2 + piso * 0.55 + 0.35;
+
+/** Cuántos pisos de ramas dibuja (y carga) cada tier. */
+export const pisosCafetoDeQ = (q) => (q < 0.5 ? 2 : q < 0.85 ? 3 : PISOS_CAFETO.length);
+
+/*
+ * Porte columnar REAL del arábica: tallo leñoso central, pisos de RAMAS
+ * horizontales visibles (la percha donde la distribución cuelga las cerezas),
+ * HOJAS elípticas opuestas — grandes, oscuras, lustrosas: la firma del café —
+ * y un corazón tupido por piso que da densidad a la silueta. Las CEREZAS y las
+ * FLORES no van aquí: son InstancedMesh aparte, sembradas sobre estas ramas.
  */
 export function geomCafeto({ q = 1 } = {}, seed = 1) {
   const r = rng(seed);
   const partes = [];
 
-  // El tallo leñoso central.
-  const tallo = new THREE.CylinderGeometry(0.035, 0.06, 1.2, 5, 1);
-  poner(tallo, [0, 0.6, 0]);
+  // El tallo ortotrópico central.
+  const tallo = new THREE.CylinderGeometry(0.028, 0.058, 1.24, 5, 1);
+  poner(tallo, [0, 0.62, 0]);
   partes.push(pintar(tallo, PAL.cafetoTallo));
 
-  // Los PISOS de follaje: anchos abajo, angostos arriba (el porte del café).
-  const pisos = [
-    { y: 0.46, rad: 0.44, cara: false },
-    { y: 0.78, rad: 0.37, cara: true },
-    { y: 1.06, rad: 0.28, cara: true },
-  ];
-  const nPisos = q < 0.5 ? 2 : 3;
+  const nPisos = pisosCafetoDeQ(q);
+  const nudosPorRama = q < 0.85 ? 1 : 2; // pares de hojas por rama según tier
   for (let i = 0; i < nPisos; i++) {
-    const p = pisos[i];
-    const masa = new THREE.IcosahedronGeometry(p.rad, 1); // detail 1: la mata tupida
-    poner(masa, [(r() - 0.5) * 0.08, p.y, (r() - 0.5) * 0.08], [0, r() * Math.PI, 0], [1.35, 0.6, 1.35]);
-    partes.push(pintar(masa, variar(p.cara ? PAL.cafetoHojaSol : PAL.cafetoHoja, r, 0.05)));
+    const p = PISOS_CAFETO[i];
+
+    // El corazón tupido del piso (la masa oscura tras las hojas).
+    const core = new THREE.IcosahedronGeometry(p.len * 0.5, 0);
+    poner(
+      core,
+      [(r() - 0.5) * 0.06, p.y + 0.04, (r() - 0.5) * 0.06],
+      [0, r() * Math.PI, 0],
+      [1.3, 0.55, 1.3],
+    );
+    partes.push(pintar(core, variar(PAL.cafetoHojaSombra, r, 0.05)));
+
+    for (let j = 0; j < p.ramas; j++) {
+      const a = anguloRamaCafeto(i, j, p.ramas);
+      const d = new THREE.Vector3(Math.cos(a), p.caida, Math.sin(a)).normalize();
+
+      // La rama plagiotrópica visible (donde cargan racimos y hojas).
+      const rama = new THREE.CylinderGeometry(0.011, 0.021, p.len, 4, 1, true);
+      apuntar(
+        rama,
+        [d.x * p.len * 0.5, p.y + d.y * p.len * 0.5, d.z * p.len * 0.5],
+        [d.x, d.y, d.z],
+      );
+      partes.push(pintar(rama, PAL.cafetoRama));
+
+      // HOJAS elípticas OPUESTAS en los nudos (medio y punta de la rama):
+      // grandes y tendidas casi horizontales — de lejos se leen "hojas de café".
+      for (let k = 0; k < nudosPorRama * 2; k++) {
+        const t = nudosPorRama === 1 ? 0.85 : k < 2 ? 0.5 : 0.92;
+        const lado = k % 2 ? 1 : -1;
+        const nx = d.x * p.len * t;
+        const ny = p.y + d.y * p.len * t;
+        const nz = d.z * p.len * t;
+        const ah = a + lado * 1.15; // la hoja sale casi perpendicular a la rama
+        const hoja = new THREE.SphereGeometry(1, 4, 2);
+        poner(
+          hoja,
+          [nx + Math.cos(ah) * 0.1, ny - 0.01, nz + Math.sin(ah) * 0.1],
+          [0, -ah, lado * 0.16], // tendida, con una caída leve hacia su lado
+          [0.19 + r() * 0.03, 0.028, 0.1 + r() * 0.02],
+        );
+        partes.push(
+          pintar(hoja, variar((i + k) % 2 ? PAL.cafetoHojaSol : PAL.cafetoHoja, r, 0.05)),
+        );
+      }
+    }
   }
 
   // El cogollo tierno de la punta.
-  const brote = new THREE.IcosahedronGeometry(0.12, 0);
-  poner(brote, [0, 1.24, 0], [0, r() * Math.PI, 0], [1, 0.8, 1]);
+  const brote = new THREE.IcosahedronGeometry(0.1, 0);
+  poner(brote, [0, 1.28, 0], [0, r() * Math.PI, 0], [1, 0.8, 1]);
   partes.push(pintar(brote, PAL.cafetoBrote));
 
   return fusionar(partes);
 }
 
-/** La cereza del café: UNA bolita blanca — el color real va POR INSTANCIA. */
+/** La cereza del café: OVOIDE (como en la rama real), pintada blanca — el
+    color verdadero (verde→pintón→rojo→vino) va POR INSTANCIA. */
 export function geomCereza() {
-  const g = new THREE.IcosahedronGeometry(0.07, 0);
+  const g = new THREE.IcosahedronGeometry(0.068, 0);
+  g.scale(1, 1.28, 1);
   return pintar(g.index ? g.toNonIndexed() : g, '#ffffff');
+}
+
+/** El racimo axilar de FLOR blanca del arábica: tres motas y su centro crema.
+    Nace pegado a la rama, igual que la cereza (misma tabla de pisos). */
+export function geomFlorCafe(seed = 7) {
+  const r = rng(seed);
+  const partes = [];
+  for (let i = 0; i < 3; i++) {
+    const a = (i / 3) * Math.PI * 2 + r();
+    const mota = new THREE.IcosahedronGeometry(0.042 + r() * 0.018, 0);
+    poner(
+      mota,
+      [Math.cos(a) * 0.05, (r() - 0.5) * 0.03, Math.sin(a) * 0.05],
+      [r() * 0.6, r() * Math.PI, r() * 0.6],
+      [1.15, 0.8, 1.15],
+    );
+    partes.push(pintar(mota, PAL.florCafe));
+  }
+  const centro = new THREE.IcosahedronGeometry(0.028, 0);
+  poner(centro, [0, 0.035, 0]);
+  partes.push(pintar(centro, PAL.florCentro));
+  return fusionar(partes);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -263,19 +363,35 @@ export function geomGuamo({ q = 1 } = {}, seed = 2) {
     partes.push(pintar(rama, PAL.guamoTronco));
   }
 
-  // La copa ANCHA y plana: el techo de hojas sobre el cafetal.
+  // La copa ANCHA y plana: el techo de hojas sobre el cafetal (el parasol
+  // del Inga — más ancho que alto, para que el café quepa DEBAJO).
   const nMasas = Math.max(3, Math.round(5 * q));
   for (let i = 0; i < nMasas; i++) {
     const a = (i / nMasas) * Math.PI * 2 + 0.7;
-    const rad = i === 0 ? 0 : 1.0 + r() * 0.4;
-    const masa = new THREE.IcosahedronGeometry(i === 0 ? 1.25 : 0.95 + r() * 0.25, 1);
+    const rad = i === 0 ? 0 : 1.2 + r() * 0.45;
+    const masa = new THREE.IcosahedronGeometry(i === 0 ? 1.3 : 0.95 + r() * 0.25, 1);
     poner(
       masa,
-      [Math.cos(a) * rad, 3.55 + (r() - 0.5) * 0.35, Math.sin(a) * rad],
+      [Math.cos(a) * rad, 3.6 + (r() - 0.5) * 0.3, Math.sin(a) * rad],
       [0, r() * Math.PI, 0],
-      [1.7, 0.74, 1.7],
+      [2.0, 0.66, 2.0],
     );
     partes.push(pintar(masa, variar(i % 2 ? PAL.guamoCopaSol : PAL.guamoCopa, r, 0.06)));
+  }
+
+  // Las GUAMAS: vainas verdes colgando bajo la copa — la firma del Inga
+  // (y la merienda del cafetero). Pocas y gordas, legibles de lejos.
+  const nGuamas = Math.max(2, Math.round(4 * q));
+  for (let i = 0; i < nGuamas; i++) {
+    const a = r() * Math.PI * 2;
+    const rad = 0.7 + r() * 1.1;
+    const vaina = new THREE.CylinderGeometry(0.03, 0.045, 0.5 + r() * 0.22, 4, 1);
+    poner(
+      vaina,
+      [Math.cos(a) * rad, 3.0 + (r() - 0.5) * 0.25, Math.sin(a) * rad],
+      [(r() - 0.5) * 0.5, r() * Math.PI, (r() - 0.5) * 0.5],
+    );
+    partes.push(pintar(vaina, variar(PAL.guama, r, 0.07)));
   }
 
   return fusionar(partes);
@@ -341,6 +457,29 @@ export function geomPlatano({ q = 1 } = {}, seed = 4) {
     partes.push(pintar(hoja, variar(seca ? PAL.platanoHojaSeca : i % 2 ? PAL.platanoHojaSol : PAL.platanoHoja, r, 0.05)));
   }
 
+  // EL RACIMO con su BELLOTA: la señal inequívoca del plátano. El vástago se
+  // descuelga de la corona, las manos verdes en pisos y la bellota vinotinto
+  // rematando abajo.
+  const ar = r() * Math.PI * 2;
+  const rx = Math.cos(ar);
+  const rz = Math.sin(ar);
+  const vastago = new THREE.CylinderGeometry(0.028, 0.038, 0.6, 4, 1);
+  apuntar(vastago, [rx * 0.38, 1.72, rz * 0.38], [rx * 0.7, -1, rz * 0.7]);
+  partes.push(pintar(vastago, variar(PAL.platanoTallo, r, 0.06)));
+  for (let i = 0; i < 3; i++) {
+    const mano = new THREE.IcosahedronGeometry(0.15 - i * 0.025, 0);
+    poner(
+      mano,
+      [rx * (0.5 + i * 0.05), 1.52 - i * 0.16, rz * (0.5 + i * 0.05)],
+      [0, r() * Math.PI, 0],
+      [1.25, 0.8, 1.25],
+    );
+    partes.push(pintar(mano, variar(PAL.platanoRacimo, r, 0.05)));
+  }
+  const bellota = new THREE.IcosahedronGeometry(0.085, 0);
+  poner(bellota, [rx * 0.68, 0.94, rz * 0.68], [0, r() * Math.PI, 0], [0.85, 1.4, 0.85]);
+  partes.push(pintar(bellota, PAL.platanoBellota));
+
   return fusionar(partes);
 }
 
@@ -373,15 +512,21 @@ export function geomPiedra(seed = 6) {
 /* -------------------------------------------------------------------------- */
 
 /* El sombrío vive FIJO en la ladera (posiciones compuestas a mano para que el
-   techo de sombra cubra el cultivo sin taparlo todo). Se recortan por tier. */
+   techo de sombra cubra TODO el cultivo — también los surcos del FRENTE, que
+   antes quedaban a pleno sol: café sin sombrío parece potrero, y eso aquí no
+   va). El ORDEN importa: se recortan por tier con slice, así que las primeras
+   posiciones reparten frente y fondo para que hasta 'medio' y 'bajo' lean
+   "cafetal bajo sombra", nunca hileras desnudas. */
 const SITIOS_GUAMO = [
-  [-8.5, -5.5], [-1.5, -8.5], [6.5, -6.0], [11.0, -2.5], [-12.5, -10.0], [2.5, -12.5], [-4.5, -2.0],
+  [-8.5, -5.5], [3.2, 2.4], [6.5, -6.0], [-6.8, 1.6], [-1.5, -8.5],
+  [11.0, -2.5], [14.2, 1.2], [-12.5, -10.0], [-4.5, -2.0], [2.5, -12.5],
 ];
 const SITIOS_NOGAL = [
-  [9.5, -10.5], [-6.5, -13.0], [14.0, -7.5],
+  [9.5, -10.5], [-6.5, -13.0], [14.0, -7.5], [-15.2, -3.0],
 ];
 const SITIOS_PLATANO = [
-  [-11.5, -3.0], [4.0, -3.8], [-3.0, -11.0], [12.5, -12.0], [-14.5, -7.0], [8.0, -1.2],
+  [-11.5, -3.0], [-2.4, 1.9], [4.0, -3.8], [9.8, 2.8], [-3.0, -11.0],
+  [12.5, -12.0], [-14.5, -7.0], [8.0, -1.2], [-16.2, 0.8],
 ];
 
 /* La casa/beneficiadero vive arriba al fondo; los surcos la respetan. */
@@ -396,13 +541,17 @@ function madurezEn(wz, r) {
 /**
  * Siembra determinista del cafetal completo. Devuelve items por especie:
  * `{pos, rotY, escala, tint}` (contrato del componente `Especie`), y para la
- * cereza el `tint` ES el color del fruto (verde → pintón → rojo por instancia).
+ * cereza el `tint` ES el color del fruto (verde → pintón → rojo → vino por
+ * instancia). `q` es la calidad del tier: define cuántos pisos de ramas dibuja
+ * la mata — y por tanto sobre cuáles pisos pueden cargar cerezas y flores
+ * (nunca fruto flotando sobre una rama que el tier no dibujó).
  */
-export function distribucionCafetal(conteos, seed = 311) {
+export function distribucionCafetal(conteos, seed = 311, q = 1) {
   const c = conteos;
   const rCaf = rng(seed + 1);
   const rCer = rng(seed + 2);
   const rSue = rng(seed + 3);
+  const rFlo = rng(seed + 5);
 
   // --- Los surcos a curva de nivel (el café nunca se siembra ladera abajo). ---
   const sitios = [];
@@ -426,10 +575,17 @@ export function distribucionCafetal(conteos, seed = 311) {
       });
     }
   });
-  // recorte determinista al presupuesto del tier (salto parejo, no los primeros N)
-  const paso = Math.max(1, Math.floor(sitios.length / Math.max(1, c.cafeto)));
+  // Recorte determinista al presupuesto del tier: muestreo PAREJO de TODA la
+  // ladera con paso FRACCIONAL — nunca "los primeros N". (El paso entero con
+  // floor daba 1 con ~239 sitios y 120 matas: sembraba solo las filas del
+  // frente y dejaba el fondo pelado, sin matas verdes para la flor.)
   const matas = [];
-  for (let i = 0; i < sitios.length && matas.length < c.cafeto; i += paso) matas.push(sitios[i]);
+  if (sitios.length <= c.cafeto) {
+    matas.push(...sitios);
+  } else {
+    const paso = sitios.length / c.cafeto;
+    for (let k = 0; k < c.cafeto; k++) matas.push(sitios[Math.floor(k * paso)]);
+  }
 
   const cafeto = matas.map((s) => ({
     pos: [s.px, alturaLadera(s.px, s.pz), s.pz],
@@ -438,36 +594,83 @@ export function distribucionCafetal(conteos, seed = 311) {
     tint: [0.92 + rCaf() * 0.16, 0.92 + rCaf() * 0.16, 0.92 + rCaf() * 0.16],
   }));
 
-  // --- Las cerezas: racimos alrededor de los pisos de las matas cargadas. ---
+  // --- Las cerezas: RACIMOS EN FILA sobre la MISMA rama que la geometría
+  //     dibuja (PISOS_CAFETO + anguloRamaCafeto) — el café carga pegado a la
+  //     rama, en cuentas apretadas, no flotando en el follaje. Cada racimo
+  //     mezcla estados (verde/pintón/rojo/vino), como en la rama real. ---
   const verde = new THREE.Color(PAL.cerezaVerde);
   const pinton = new THREE.Color(PAL.cerezaPinton);
   const roja = new THREE.Color(PAL.cerezaRoja);
+  const vino = new THREE.Color(PAL.cerezaVino);
   const col = new THREE.Color();
   const cereza = [];
+  const nPisos = pisosCafetoDeQ(q);
   const cargadas = matas.filter((s) => s.carga > 0.3);
+  /* Un punto local de la rama (piso i, rama j, avance t) llevado al mundo:
+     escala de la mata + su giro + su sitio en la ladera. */
+  const enRama = (s, i, j, t, dy, jit, rr) => {
+    const p = PISOS_CAFETO[i];
+    const a = anguloRamaCafeto(i, j, p.ramas);
+    const lx = Math.cos(a) * p.len * t + (rr() - 0.5) * jit;
+    const ly = p.y + p.caida * p.len * t + dy + (rr() - 0.5) * jit * 0.6;
+    const lz = Math.sin(a) * p.len * t + (rr() - 0.5) * jit;
+    const cosR = Math.cos(s.rotY);
+    const sinR = Math.sin(s.rotY);
+    return [
+      s.px + (lx * cosR + lz * sinR) * s.esc,
+      alturaLadera(s.px, s.pz) + ly * s.esc,
+      s.pz + (-lx * sinR + lz * cosR) * s.esc,
+    ];
+  };
   let gi = 0;
   while (cereza.length < c.cereza && cargadas.length > 0) {
     const s = cargadas[gi % cargadas.length];
     gi += 1;
-    if (gi > cargadas.length * 9) break;
-    const cuantas = 2 + Math.floor(rCer() * 3);
+    if (gi > cargadas.length * 12) break;
+    // los pisos BAJOS cargan más (madera más vieja, más cosecha)
+    const i = Math.floor(rCer() * Math.min(nPisos, 3));
+    const p = PISOS_CAFETO[i];
+    const j = Math.floor(rCer() * p.ramas);
+    const cuantas = 3 + Math.floor(rCer() * 4);
+    const t0 = 0.2 + rCer() * 0.28;
     for (let k = 0; k < cuantas && cereza.length < c.cereza; k++) {
-      const a = rCer() * Math.PI * 2;
-      const nivel = rCer();
-      const rad = (0.3 + nivel * -0.08 + rCer() * 0.16) * s.esc * 1.2;
-      const y = (0.42 + nivel * 0.6) * s.esc;
+      const t = t0 + k * 0.085; // el racimo EN FILA, cuenta tras cuenta
+      if (t > 0.82) break; // la punta de la rama es de las hojas
       // el estado del fruto: la madurez de la mata + su propio azar
-      const m = clamp(s.maduro + (rCer() - 0.5) * 0.5, 0, 1);
-      if (m < 0.5) col.lerpColors(verde, pinton, m * 2);
-      else col.lerpColors(pinton, roja, (m - 0.5) * 2);
-      col.multiplyScalar(0.92 + rCer() * 0.16);
+      const m = clamp(s.maduro + (rCer() - 0.5) * 0.45, 0, 1);
+      if (m < 0.35) col.lerpColors(verde, pinton, m / 0.35);
+      else if (m < 0.68) col.lerpColors(pinton, roja, (m - 0.35) / 0.33);
+      else col.lerpColors(roja, vino, (m - 0.68) / 0.32);
+      col.multiplyScalar(0.94 + rCer() * 0.12);
       cereza.push({
-        pos: [s.px + Math.cos(a) * rad, alturaLadera(s.px, s.pz) + y, s.pz + Math.sin(a) * rad],
+        pos: enRama(s, i, j, t, -0.045, 0.035, rCer), // colgada APENAS bajo la rama
         rotY: rCer() * Math.PI,
-        escala: 0.85 + rCer() * 0.4,
+        escala: 0.8 + rCer() * 0.45,
         tint: [col.r, col.g, col.b],
       });
     }
+  }
+
+  // --- Las FLORES: racimos axilares blancos en las matas más VERDES (arriba,
+  //     donde la madurez aún no llega) — flor y cereza conviviendo en la misma
+  //     ladera, el ciclo real del arábica a la vista. ---
+  const flor = [];
+  const florecidas = matas.filter((s) => s.maduro < 0.45);
+  let fi = 0;
+  while (flor.length < (c.flor || 0) && florecidas.length > 0) {
+    const s = florecidas[fi % florecidas.length];
+    fi += 1;
+    if (fi > florecidas.length * 6) break;
+    const i = Math.floor(rFlo() * nPisos);
+    const p = PISOS_CAFETO[i];
+    const j = Math.floor(rFlo() * p.ramas);
+    const t = 0.28 + rFlo() * 0.5;
+    flor.push({
+      pos: enRama(s, i, j, t, 0.025, 0.02, rFlo), // asomada SOBRE la rama
+      rotY: rFlo() * Math.PI * 2,
+      escala: 0.85 + rFlo() * 0.4,
+      tint: [1, 0.99 - rFlo() * 0.03, 0.95 - rFlo() * 0.04],
+    });
   }
 
   // --- El sombrío y el plátano (sitios fijos recortados por tier). ---
@@ -478,9 +681,11 @@ export function distribucionCafetal(conteos, seed = 311) {
     tint: [0.94 + rr() * 0.12, 0.94 + rr() * 0.12, 0.94 + rr() * 0.12],
   });
   const rArb = rng(seed + 4);
-  const guamo = SITIOS_GUAMO.slice(0, c.guamo).map((p) => enLadera(p, 0.95 + rArb() * 0.35, rArb));
-  const nogal = SITIOS_NOGAL.slice(0, c.nogal).map((p) => enLadera(p, 0.95 + rArb() * 0.25, rArb));
-  const platano = SITIOS_PLATANO.slice(0, c.platano).map((p) => enLadera(p, 0.85 + rArb() * 0.3, rArb));
+  // alturas MEZCLADAS a propósito: el dosel del sombrío es desigual (guamos
+  // viejos y jóvenes conviven) — nada aquí puede parecer plantación pareja.
+  const guamo = SITIOS_GUAMO.slice(0, c.guamo).map((p) => enLadera(p, 0.82 + rArb() * 0.55, rArb));
+  const nogal = SITIOS_NOGAL.slice(0, c.nogal).map((p) => enLadera(p, 0.9 + rArb() * 0.35, rArb));
+  const platano = SITIOS_PLATANO.slice(0, c.platano).map((p) => enLadera(p, 0.8 + rArb() * 0.42, rArb));
 
   // --- El suelo: hojarasca bajo el sombrío, piedras sueltas. ---
   const hojarasca = [];
@@ -508,7 +713,7 @@ export function distribucionCafetal(conteos, seed = 311) {
     });
   }
 
-  return { cafeto, cereza, guamo, nogal, platano, hojarasca, piedra };
+  return { cafeto, cereza, flor, guamo, nogal, platano, hojarasca, piedra };
 }
 
 /** Los centros del sombrío del tier (para la luz colada bajo las copas). */
