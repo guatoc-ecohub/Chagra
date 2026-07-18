@@ -46,18 +46,23 @@ import {
   construirTerreno,
 } from './corteSuelo.geom.js';
 
-/* CSS del lienzo + de los rótulos de cada capa (self-contained). */
-const CSS = `
-.entm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.8s ease; }
-.entm-canvas--lista { opacity: 1; }
+/* CSS de los RÓTULOS de capa, exportado aparte: los hosts que reusan la
+   vitrina (`CorteSuelo`) fuera de este mundo —el páramo— lo inyectan tal cual. */
+export const CSS_ROTULOS = `
 .entm-rot { transform: translate(-6%, -50%); pointer-events: none; }
 .entm-rot__caja { min-width: 8.5rem; max-width: 12.5rem; padding: 0.34rem 0.6rem; border-radius: 0.7rem; background: rgba(14, 12, 9, 0.62); box-shadow: inset 0 0 0 1px rgba(180, 200, 150, 0.28); color: #e9efdd; transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease; }
 .entm-rot__caja--activa { background: rgba(26, 40, 26, 0.9); box-shadow: inset 0 0 0 1px rgba(126, 240, 200, 0.8), 0 0 16px 2px rgba(55, 214, 176, 0.35); transform: scale(1.06); }
 .entm-rot__n { display: block; font: 700 0.82rem/1.15 system-ui, sans-serif; }
 .entm-rot__h { display: block; margin-top: 0.12rem; font: 500 0.66rem/1.2 system-ui, sans-serif; color: #c3ccb4; }
 .entm-rot__caja--activa .entm-rot__h { color: #d9ffef; }
-@media (prefers-reduced-motion: reduce) { .entm-canvas { transition: none; } }
 `;
+
+/* CSS del lienzo (self-contained) + los rótulos. */
+const CSS = `
+.entm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.8s ease; }
+.entm-canvas--lista { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .entm-canvas { transition: none; } }
+${CSS_ROTULOS}`;
 
 /* Cielo del páramo (mismo aire que el Bosque Vivo, para que el Ent se lea igual). */
 const PARAMO = { fondo: '#c3cfce', niebla: '#c9d3d1' };
@@ -312,8 +317,9 @@ function DetalleCapa({ capa, alto, red, tier, reducedMotion }) {
   return <group>{terrones.map((t) => <Terron key={t.key} pos={t.pos} r={t.rr} color={capa.color} />)}</group>;
 }
 
-/* Una CAPA del corte: el bloque de tierra horneado + su detalle + su rótulo. */
-function Capa({ capa, geo, activa, red, tier, reducedMotion }) {
+/* Una CAPA del corte: el bloque de tierra horneado + su detalle + su rótulo.
+   `rotulos=false` (hosts que reusan la vitrina de lejos) omite el Html. */
+function Capa({ capa, geo, activa, red, tier, reducedMotion, rotulos = true }) {
   const zCara = zFrenteDe(capa.id);
   const mat = useMemo(() => new THREE.MeshLambertMaterial({ vertexColors: true }), []);
   useLayoutEffect(() => () => mat.dispose(), [mat]);
@@ -332,18 +338,23 @@ function Capa({ capa, geo, activa, red, tier, reducedMotion }) {
       )}
 
       {/* el rótulo (nombre + hint) al costado derecho de la capa */}
-      <Html position={[ANCHO_CUT / 2 + 0.18, 0, zCara - 0.1]} className="entm-rot" zIndexRange={[30, 10]}>
-        <div className={`entm-rot__caja${activa ? ' entm-rot__caja--activa' : ''}`}>
-          <span className="entm-rot__n">{capa.nombre}</span>
-          <span className="entm-rot__h">{capa.hint}</span>
-        </div>
-      </Html>
+      {rotulos && (
+        <Html position={[ANCHO_CUT / 2 + 0.18, 0, zCara - 0.1]} className="entm-rot" zIndexRange={[30, 10]}>
+          <div className={`entm-rot__caja${activa ? ' entm-rot__caja--activa' : ''}`}>
+            <span className="entm-rot__n">{capa.nombre}</span>
+            <span className="entm-rot__h">{capa.hint}</span>
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
 
-/* La VITRINA de suelo completa + la LECCIÓN (qué capa está enseñando el Ent). */
-function CorteSuelo({ tier, reducedMotion }) {
+/* La VITRINA de suelo completa + la LECCIÓN (qué capa está enseñando el Ent).
+   EXPORTADA: el páramo (MundoParamo3D) la reusa al pie de la queñua guardiana —
+   misma lección, mismo componente, cero duplicación. `rotulos` apaga los Html
+   cuando la vitrina se ve de lejos. */
+export function CorteSuelo({ tier, reducedMotion, rotulos = true }) {
   /*
    * Orden OBLIGATORIO: primero la red, porque la tierra de la banda se hornea
    * CON la luz de la red (las `muestras`). Es lo que deja la banda legible sin
@@ -406,6 +417,7 @@ function CorteSuelo({ tier, reducedMotion }) {
           activa={i === activa}
           tier={tier}
           reducedMotion={reducedMotion}
+          rotulos={rotulos}
         />
       ))}
     </group>
