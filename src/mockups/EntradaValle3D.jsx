@@ -72,7 +72,7 @@ import { VeloOdyssey } from '../visual/mundo3d/transiciones/index.js';
 const Valle3D = lazy(() => import('./valle/Valle3D'));
 /* Los lugares del valle en planta, para el minimapa RTS (AoE). */
 const LUGARES_MINIMAPA = componerMundos(MUNDOS_VALLE).map((m) => ({
-  id: m.id, x: m.pos[0], z: m.pos[2], emoji: m.emoji, tinte: m.tinte,
+  id: m.id, x: m.pos[0], z: m.pos[2], emoji: m.emoji, tinte: m.tinte, nombre: m.nombre,
 }));
 
 /* ENTRAR a un mundo como MURAL New Donk (flujo vivo): en vez del velo plano, la
