@@ -101,11 +101,15 @@ export const VEGETACION_PISOS = [
   { piso: 'paramo', pos: [-5.6, -7.8] },
   { piso: 'paramo', pos: [1.2, -8.3] },
   { piso: 'paramo', pos: [4.8, -6.6] },
-  // Los frailejones que ARROPAN al Ent de la vista del páramo (VISTA_PARAMO
-  // en [2.2, -7.4]): el filo se lee páramo de verdad, no un solo mojón.
-  { piso: 'paramo', pos: [3.3, -7.9] },
-  { piso: 'paramo', pos: [2.9, -6.6] },
-  { piso: 'paramo', pos: [-7.4, -6.9] },
+  // ARCHIVADO 2026-07-18 (pedido del operador): estos 3 frailejones extra
+  // arropaban al Ent-queñua de la vista del páramo en [2.2, -7.4]
+  // (VistaParamoEnt, ver src/mockups/valle/_archivo/vistaParamo.archivado.jsx),
+  // que se sacó de la vista del valle por amontonada. Sin el Ent no hacen
+  // falta — el páramo ya se lee con los 3 de arriba. Si se reactiva el Ent,
+  // reactivar también estos tres:
+  //   { piso: 'paramo', pos: [3.3, -7.9] },
+  //   { piso: 'paramo', pos: [2.9, -6.6] },
+  //   { piso: 'paramo', pos: [-7.4, -6.9] },
   { piso: 'frio', pos: [-6.0, -3.6] },
   { piso: 'frio', pos: [3.0, -4.4] },
   { piso: 'frio', pos: [-7.6, -2.4] },

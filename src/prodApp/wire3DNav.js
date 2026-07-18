@@ -14,10 +14,13 @@
 
 /** @type {Record<string, string>} */
 export const RUTA_2D_DESDE_3D = {
-  // ── La casa del valle (vía SECUNDARIA, fix del operador 2026-07-16):
-  //    tocar la puerta iluminada lleva a la ventana-puerta de los mundos.
-  //    La entrada principal a cada mundo es su portal-paisaje directo. ──
-  casa: 'ventana_valle',
+  // ── La casa del valle (vía SECUNDARIA, fix del operador 2026-07-16,
+  //    recableada 2026-07-18): tocar la puerta iluminada lleva al MIRADOR
+  //    DE LOS MUNDOS — VitrinaMaestraMundos, la puerta maestra a los 15
+  //    mundos 3D por piso térmico (con su viaje Odyssey), no la ventana
+  //    plana de antes. La entrada principal a cada mundo sigue siendo su
+  //    portal-paisaje directo en el valle. ──
+  casa: 'vitrina_maestra',
 
   // ── Mundos principales del valle (valleData.js LUGARES) ─────────
   agua: 'agua',
