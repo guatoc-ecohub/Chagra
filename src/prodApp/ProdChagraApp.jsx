@@ -78,7 +78,6 @@ const LAZY_MAP = {
   MundoBoticaCana3D: lazy(() => import('../mockups/MundoBoticaCana3D.jsx')),
   MundoFrutales3D: lazy(() => import('../mockups/MundoFrutales3D.jsx')),
   MundoLeguminosas3D: lazy(() => import('../mockups/MundoLeguminosas3D.jsx')),
-  MundoPiscicultura3D: lazy(() => import('../mockups/MundoPiscicultura3D.jsx')),
   MundoSemillero3D: lazy(() => import('../mockups/MundoSemillero3D.jsx')),
   MundoAgua3D: lazy(() => import('../mockups/MundoAgua3D.jsx')),
   MundoSueloVivo3D: lazy(() => import('../mockups/MundoSueloVivo3D.jsx')),
