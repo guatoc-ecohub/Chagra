@@ -290,19 +290,15 @@ export const VECINOS_VALLE = [
     props: { aparicion: true }, // el espíritu se materializa y se disuelve en la niebla
   },
   {
-    slug: 'dalmata',
-    punto: [-1.4, 4.4], // perro de casa: el frente del patio, junto a los senderos
-    px: 34,
-    factor: 7,
-    dy: 0.18,
-    franjas: null,
-  },
-  {
-    slug: 'beagle',
-    punto: [1.3, 5.0], // el otro perro de casa, husmeando cerca de la huerta
-    px: 28,
-    factor: 7,
-    dy: 0.16,
-    franjas: null,
+    slug: 'danta',
+    punto: [3.8, -5.2], // la danta de páramo: el borde del bosque frío, cerca de los frailejones
+    px: 40,
+    factor: 9,
+    dy: 0.28,
+    franjas: null, // residente tímida del monte alto, no aparecida
   },
 ];
+// NOTA (2026-07-18): los perros Dante y Oliver del valle son los 3D del hato
+// (HatoMovil: dálmata que arrea + beagle detrás) — la versión buena aprobada.
+// Los billboards rubber-hose se retiraron de aquí (eran redundantes); la
+// versión rehecha vive en el selector de avatares.
