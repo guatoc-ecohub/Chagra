@@ -262,6 +262,11 @@ const MundoBoticaCana3DMockup = lazy(() => import('./mockups/MundoBoticaCana3D')
 // cítricos, guayabo, papayo, injerto con tutor, plateo y cosecha a mano).
 // Standalone tipo botica: no monta el sistema MUNDO ni toca EscenaBase3D.
 const MundoFrutales3DMockup = lazy(() => import('./mockups/MundoFrutales3D'));
+// 3D: la LECHERÍA CAMPESINA andina (potrero rotado con hato y ternero,
+// ordeño de la mañana bajo la ramada, quesería artesanal con paila/molde/
+// prensa y el ciclo virtuoso: suero→cerdos/gallinas, boñiga→compost→pastura).
+// Standalone tipo botica: no monta el sistema MUNDO ni toca EscenaBase3D.
+const MundoLecheria3DMockup = lazy(() => import('./mockups/MundoLecheria3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -701,6 +706,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-polinizadores-3d': 'mockup_mundo_polinizadores_3d',
   'mockups/mundo-botica-cana-3d': 'mockup_mundo_botica_cana_3d',
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
+  'mockups/mundo-lecheria-3d': 'mockup_mundo_lecheria_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2399,6 +2405,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El huerto de frutales">
               <MundoFrutales3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_lecheria_3d':
+        // La lechería campesina: el potrero rotado con el hato y su ternero
+        // (franja del día / franja en descanso, cercas vivas de botón de
+        // oro), el ordeño manso de la mañana bajo la ramada (balde, lienzo
+        // de colar, cantina), la quesería artesanal (paila cuajando, molde,
+        // prensa de piedra, queso escurriendo, suero apartado) y el ciclo
+        // virtuoso: suero → cerdos/gallinas, boñiga → compost → pastura.
+        // Ruta #/mockups/mundo-lecheria-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La lechería campesina">
+              <MundoLecheria3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
