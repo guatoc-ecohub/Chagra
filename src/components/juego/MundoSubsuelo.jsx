@@ -5,6 +5,7 @@ import { fvhSkinClass } from '../../config/fvhSkin';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import { evaluarSubsuelo, mensajeMeta } from '../../services/mundoSubsueloEngine';
 import { Lombriz } from '../../visual/creatures/index.js';
+import { construirSubsuelo } from './subsueloRedGeom';
 import './mundo-subsuelo.css';
 
 function clamp(value, min = 0, max = 100) {
@@ -337,17 +338,41 @@ function SoilScene({ soilLife, activeDecision }) {
           />
         ))}
 
-        {/* Lombrices = la Lombriz rubber-hose de la casa, meneándose en su
-            galería (spec belleza-juegos: la protagonista viva de la red del
-            suelo, no un trazo con puntico). Inline dentro del corte, escalada y
-            un poco rotada para acostarse en su galería del suelo. */}
+        {/* LA LOMBRICITA protagonista — la Lombriz rubber-hose de la casa — en su
+            galería excavada (el túnel claro que cruza el corte). Grande y viva,
+            con su sombra sobre la tierra; es la guía del mundo, no un puntico. */}
+        <g aria-hidden="true">
+          <path
+            d="M96 372c48-26 108-14 168-30 58-16 118-8 180-2"
+            stroke="#caa06c"
+            strokeWidth="18"
+            fill="none"
+            strokeLinecap="round"
+            opacity="0.32"
+          />
+          <path
+            d="M96 372c48-26 108-14 168-30 58-16 118-8 180-2"
+            stroke="#3a281a"
+            strokeWidth="20"
+            fill="none"
+            strokeLinecap="round"
+            opacity="0.16"
+          />
+        </g>
+        <g className="msx-lombriz" style={{ animationDelay: '0s' }}>
+          <g transform="translate(150 352) scale(3) rotate(-18)">
+            <Lombriz inline animated title="Lombricita, guia del suelo" />
+          </g>
+        </g>
+
+        {/* Lombricitas menudas que aparecen cuando la tierra despierta. */}
         {Array.from({ length: wormCount }).map((_, index) => {
-          const wx = 112 + index * 178;
-          const wy = 345 - (index % 2) * 34;
-          const rot = index % 2 === 0 ? 26 : -14;
+          const wx = 430 + index * 120;
+          const wy = 360 - (index % 2) * 46;
+          const rot = index % 2 === 0 ? 24 : -16;
           return (
-            <g key={`worm-${index}`} className="msx-lombriz" style={{ animationDelay: `${index * 0.6}s` }}>
-              <g transform={`translate(${wx + 26} ${wy - 30}) scale(1.75) rotate(${rot})`}>
+            <g key={`worm-${index}`} className="msx-lombriz" style={{ animationDelay: `${index * 0.6 + 0.3}s` }} aria-hidden="true">
+              <g transform={`translate(${wx} ${wy}) scale(1.5) rotate(${rot})`}>
                 <Lombriz inline animated title="Lombriz" />
               </g>
             </g>
