@@ -46,6 +46,12 @@ import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
 import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
 import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
 import AnimalesDeFinca, { MATERIAL_FINCA } from './animales.jsx';
+/* AoE ("Age of Empires del campo"): componentes NUEVOS que densifican y dan
+   vida al valle (cada uno instanciado, draw calls acotados). */
+import BosqueDensoValle from './BosqueDensoValle.jsx';
+import DetalleSueloValle from './DetalleSueloValle.jsx';
+import { CampesinosValle } from './CampesinosValle.jsx';
+import HatoMovil from './HatoMovil.jsx';
 /* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
    (roble, aliso, gaque) que ya viven en floraParamo — cada árbol se distingue. */
 import { geomRoble, geomAliso, geomGaque } from '../../visual/mundo3d/bosque/floraParamo.geom.js';
@@ -2108,6 +2114,10 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
         nocturno={nocturno}
       />
       <VegetacionPisos nocturno={nocturno} perfil={perfil} />
+      {/* AoE: bosque denso 3x + detalle de suelo/surcos + campesinos en faena + hato en movimiento */}
+      <BosqueDensoValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
+      {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 20 : tier === 'bajo' ? 6 : 12} reducedMotion={reducedMotion} />}
 
       {/* LA DIRECCIÓN DEL CUADRO: la casa donde descansa el ojo (su puerta
           iluminada es la vía SECUNDARIA a la ventana de los mundos), los
