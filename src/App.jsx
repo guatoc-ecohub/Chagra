@@ -253,6 +253,11 @@ const CriaturasNocturnasMockup = lazy(() => import('./mockups/CriaturasNocturnas
 // Angelita al máximo: la entrada teatral (gafas + crecimiento) y el repertorio
 // completo de estados del agente, uno al lado del otro.
 const AngelitaVivaMockup = lazy(() => import('./mockups/AngelitaViva'));
+// 3D: la BOTICA campesina (canteros de medicinales y aromáticas: ruda,
+// caléndula, hierbabuena, sábila, limoncillo, ortiga, manzanilla) + la CAÑA
+// PANELERA (cañal, trapiche de buey, hornilla con paila y gaveras). Didáctico:
+// caña → molino → jugo → paila → panela.
+const MundoBoticaCana3DMockup = lazy(() => import('./mockups/MundoBoticaCana3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -690,6 +695,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/criaturas-nocturnas': 'mockup_criaturas_nocturnas',
   'mockups/angelita-viva': 'mockup_angelita_viva',
   'mockups/mundo-polinizadores-3d': 'mockup_mundo_polinizadores_3d',
+  'mockups/mundo-botica-cana-3d': 'mockup_mundo_botica_cana_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2360,6 +2366,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El páramo altoandino">
               <MundoParamo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_botica_cana_3d':
+        // La botica y el trapiche: los canteros de plantas medicinales y
+        // aromáticas de la casa campesina (ruda, caléndula, hierbabuena,
+        // sábila, limoncillo, ortiga, manzanilla — cada una con su copia
+        // didáctica de saber campesino) + la molienda panelera: el cañal, el
+        // trapiche de rodillos que mueve el buey, la hornilla con la paila
+        // hirviendo y las gaveras. Botón «paso a paso»: caña → molino → jugo
+        // → paila → panela. Ruta #/mockups/mundo-botica-cana-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La botica y el trapiche">
+              <MundoBoticaCana3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

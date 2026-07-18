@@ -220,6 +220,12 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
   {
+    path: 'diorama_botica_cana',
+    componente: 'MundoBoticaCana3D',
+    importLazy: 'src/mockups/MundoBoticaCana3D.jsx',
+    categoria: '3D',
+  },
+  {
     path: 'diorama_agua',
     componente: 'MundoAgua3D',
     importLazy: 'src/mockups/MundoAgua3D.jsx',
