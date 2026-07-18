@@ -33,10 +33,6 @@ import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
 import CamaraDirector from '../../visual/mundo3d/escenas/CamaraDirector.jsx';
 import DirectorValle from './DirectorValle.jsx';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
-/* La ANGELITA RICA (wrapper del agente): cara Miss-Minutes, cejas, visemas,
-   estados legibles (escuchando/pensando/respondiendo/preocupada/contenta/senala/
-   invita). El valle montaba la abeja CRUDA — por eso se veía simple. */
-import { Angelita } from '../../visual/agente/Angelita.jsx';
 /* EL CEREBRO DE ANGELITA (auditoría 2026-07-18: estaba construido y
    DESCONECTADO — ningún componente vivo lo consumía). La abeja del valle
    (CompaneroAbeja) lo usa para husmear con criterio: comentarios grounded
@@ -134,9 +130,6 @@ const HUSMEO_LUGARES = ['cultivos', 'animales', 'clima', 'mercado', 'aprender', 
 const HUSMEO_PRIMERO_MS = 5200; // el primer husmeo llega pronto: se ve viva al cargar
 const HUSMEO_CADA_MS = 40000; // cadencia entre intentos de husmeo autónomo
 const HUSMEO_VISIBLE_MS = 7200; // cuánto dura el comentario antes de volver a calma
-// Máquina de escribir: los 4 visemas ('V1'..'V4') rotan mientras Angelita
-// "teclea/habla" para que la boca se mueva con el texto.
-const TECLA_VISEMAS = ['V1', 'V2', 'V3', 'V4'];
 
 /* Altura del terreno por (x,z): la LADERA ANDINA. El eje z es la montaña — al
    fondo (z negativo) trepa al páramo alto, al frente (z positivo) baja a tierra
@@ -1480,29 +1473,6 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   //         portal y comenta — el store decide si de verdad interrumpe.
   const estadoAngelita = useAngelitaStore((s) => s.estado);
   const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
-  // MÁQUINA DE ESCRIBIR (feedback operador): el aviso se teclea letra por letra
-  // para llamar la atención; la boca de Angelita se mueve con visemas al hacerlo.
-  const [tecleado, setTecleado] = useState('');
-  const tecleandoAngelita = mensajeAngelita ? tecleado.length < mensajeAngelita.length : false;
-  const visemaActual = TECLA_VISEMAS[tecleado.length % TECLA_VISEMAS.length];
-  useEffect(() => {
-    if (!mensajeAngelita) {
-      setTecleado('');
-      return undefined;
-    }
-    if (reducedMotion) {
-      setTecleado(mensajeAngelita);
-      return undefined;
-    }
-    setTecleado('');
-    let i = 0;
-    const id = setInterval(() => {
-      i += 1;
-      setTecleado(mensajeAngelita.slice(0, i));
-      if (i >= mensajeAngelita.length) clearInterval(id);
-    }, 34);
-    return () => clearInterval(id);
-  }, [mensajeAngelita, reducedMotion]);
   const entrarMundoAngelita = useAngelitaStore((s) => s.entrarMundo);
   const reposarAngelita = useAngelitaStore((s) => s.reposar);
 
@@ -1657,22 +1627,20 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
           }
         >
           <div ref={caraRef} className="valle-abeja__cara">
-            <Angelita
+            <AbejaAngelita
               size={size}
-              estado={
-                tecleandoAngelita
-                  ? 'respondiendo'
-                  : estadoAngelita === 'celebra'
-                    ? 'contenta'
-                    : estadoAngelita === 'aviso'
-                      ? 'preocupada'
-                      : estadoAngelita === 'husmea'
-                        ? 'senala'
-                        : 'acompana'
+              pose={
+                estadoAngelita === 'celebra'
+                  ? 'celebra'
+                  : estadoAngelita === 'husmea' || estadoAngelita === 'aviso'
+                    ? 'senala'
+                    : 'vuela'
               }
-              visema={tecleandoAngelita ? visemaActual : null}
               animo={animoReal}
               energia={energiaReal}
+              mojada={reaccion?.mojada ?? false}
+              sed={reaccion?.sed ?? false}
+              comiendo={reaccion?.comiendo ?? false}
               animated={!reducedMotion}
             />
           </div>
@@ -1688,10 +1656,7 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
             role="status"
             aria-live="polite"
           >
-            {tecleado}
-            {tecleandoAngelita && (
-              <span className="valle-abeja__cursor" aria-hidden="true" />
-            )}
+            {mensajeAngelita}
           </div>
         </Html>
       )}

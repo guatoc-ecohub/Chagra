@@ -93,55 +93,20 @@
       visual que .valle-companero (la burbuja DOM de la entrada, en
       entradaValle3D.css): la misma voz en dos capas distintas. */
 .valle-abeja__burbuja {
-  position: relative;
-  width: max-content;
-  max-width: 340px;
-  min-width: 132px;
-  padding: 0.55rem 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-top-color: rgba(255, 255, 255, 0.4);
-  border-radius: 16px;
-  /* Con profundidad (no plano): gradiente + brillo arriba + sombra abajo. */
-  background: linear-gradient(180deg, rgba(34, 48, 58, 0.94) 0%, rgba(13, 21, 27, 0.95) 100%);
-  color: rgba(255, 255, 255, 0.97);
+  max-width: 220px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(15, 24, 30, 0.84);
+  color: rgba(255, 255, 255, 0.96);
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  line-height: 1.32;
-  text-align: left;
-  backdrop-filter: blur(7px);
-  box-shadow:
-    0 10px 26px rgba(0, 0, 0, 0.42),
-    0 2px 5px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  animation: valle-abeja-burbuja-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-/* La colita de la burbuja: apunta hacia abajo, a Angelita. */
-.valle-abeja__burbuja::after {
-  content: '';
-  position: absolute;
-  bottom: -7px;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-  width: 12px;
-  height: 12px;
-  background: rgba(13, 21, 27, 0.95);
-  border-right: 1px solid rgba(255, 255, 255, 0.16);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-}
-/* El cursor de máquina de escribir: parpadea al final del texto. */
-.valle-abeja__cursor {
-  display: inline-block;
-  width: 2px;
-  height: 1em;
-  margin-left: 2px;
-  vertical-align: -0.12em;
-  background: rgba(255, 223, 150, 0.95);
-  animation: valle-abeja-cursor 0.7s steps(1, end) infinite;
-}
-@keyframes valle-abeja-cursor {
-  0%, 50% { opacity: 1; }
-  50.01%, 100% { opacity: 0; }
+  line-height: 1.25;
+  text-align: center;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  animation: valle-abeja-burbuja-in 0.35s ease both;
 }
 /* Un aviso (severidad, prioridad alta) se tiñe cálido — se distingue del
    husmeo tranquilo sin gritar. */
