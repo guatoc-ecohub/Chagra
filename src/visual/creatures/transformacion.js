@@ -27,7 +27,6 @@ export const CLASE_PODER = 'is-powered-up';
    color base — fable los refina con gradientes por-bicho después. */
 export const AURA_POR_BICHO = Object.freeze({
   'abeja-angelita': '#ffd54a', // dorada clásica
-  'oso-andino': '#ff3b30',     // roja berserker
   'rana-andina': '#39d98a',    // verde-zen (slug real de la creature)
   'rana-arlequin': '#39d98a',  // alias biblia
   colibri: '#4fd1ff',          // iridiscente (aprox. celeste)
@@ -35,7 +34,6 @@ export const AURA_POR_BICHO = Object.freeze({
   ardilla: '#ff9f1c',          // chispas ámbar
   perezoso: '#1ec9b7',         // turquesa/teal zen irónico (distinto del verde de la rana)
   morrocoy: '#ff7a3c',         // caparazón que brilla (ámbar-rojizo)
-  borugo: '#dbe8ff',           // PLATA LUNAR / blanco luminoso (nocturno sagrado, el animal de cierre)
   danta: '#a8e05f',            // VERDE SEMILLA (la jardinera del bosque: todo lo que pisa, germina)
   condor: '#9fd8ff',           // CELESTE DE ALTURA (el señor del viento: el cielo a 5000 msnm)
   'ent-frailejon': '#8fdcae',  // VERDE-PLATEADO del guardián del páramo (modo-guardián: el frailejón se yergue a intervenir)

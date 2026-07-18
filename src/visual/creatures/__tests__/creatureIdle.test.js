@@ -142,20 +142,20 @@ describe('creatureIdle — gates (noche, reduced-motion, tier)', () => {
 });
 
 describe('creatureIdle — genérica por especie (misma máquina, otro animal)', () => {
-  it('los cuatro perfiles de la casa existen y declaran su medio', () => {
-    for (const slug of ['abeja-angelita', 'colibri', 'oso-andino', 'rana-dorada']) {
+  it('los tres perfiles de la casa existen y declaran su medio', () => {
+    for (const slug of ['abeja-angelita', 'colibri', 'rana-dorada']) {
       expect(IDLE_PERFILES[slug]).toBeDefined();
       expect(['aire', 'suelo']).toContain(IDLE_PERFILES[slug].medio);
       expect(IDLE_PERFILES[slug].poseBase).toBeTruthy();
     }
   });
 
-  it('el oso anda (poseBase de suelo) y su timeline NO calca la de la abeja', () => {
-    const oso = idleDeCreature(3.3, { especie: 'oso-andino' });
-    expect(oso.pose).toBe('anda');
-    const vueltasOso = arranquesDe('vuelta', { especie: 'oso-andino' });
+  it('la rana anda (poseBase de suelo) y su timeline NO calca la de la abeja', () => {
+    const rana = idleDeCreature(3.3, { especie: 'rana-dorada' });
+    expect(rana.pose).toBe('anda');
+    const vueltasRana = arranquesDe('vuelta', { especie: 'rana-dorada' });
     const vueltasAbeja = arranquesDe('vuelta', { especie: 'abeja-angelita' });
-    expect(vueltasOso).not.toEqual(vueltasAbeja);
+    expect(vueltasRana).not.toEqual(vueltasAbeja);
   });
 
   it('especie desconocida cae al perfil de Angelita (nunca undefined)', () => {

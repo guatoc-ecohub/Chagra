@@ -19,17 +19,22 @@ import {
 } from '../vidaEstados.js';
 import { CREATURES } from '../index.js';
 
-/* Los 8 con vida propia: todos los personajes del registro menos la abeja
-   (su cerebro v2 vive en el agente — es la vara), la microfauna decorativa
-   y el Ent (árbol-maestro, otro compás). */
+/* Los con vida propia: todos los personajes del registro menos la abeja
+   (su cerebro v2 vive en el agente — es la vara), la microfauna decorativa,
+   el Ent (árbol-maestro, otro compás) y los que aún no tienen repertorio
+   idle-vida propio (danta, condor, y el trío de control biológico
+   crisopa/trichogramma/sirfido — pendiente en otra ola). */
 const CON_VIDA = Object.keys(CREATURES).filter(
-  (s) => !['abeja-angelita', 'lombriz', 'mariposa', 'escarabajo', 'ent-frailejon'].includes(s),
+  (s) => ![
+    'abeja-angelita', 'lombriz', 'mariposa', 'escarabajo', 'ent-frailejon',
+    'danta', 'condor', 'crisopa', 'trichogramma', 'sirfido',
+  ].includes(s),
 );
 
-describe('1. El repertorio cubre exacto a los 8 bichos', () => {
-  it('cada bicho del registro (menos abeja/microfauna/Ent) tiene repertorio', () => {
+describe('1. El repertorio cubre exacto a los bichos con vida propia', () => {
+  it('cada bicho del registro (menos abeja/microfauna/Ent/pendientes) tiene repertorio', () => {
     expect(Object.keys(VIDA_REPERTORIO).sort()).toEqual(CON_VIDA.sort());
-    expect(CON_VIDA).toHaveLength(8);
+    expect(CON_VIDA).toHaveLength(6);
   });
 
   it('cada repertorio trae descanso [min,max] y ≥2 gestos con peso > 0', () => {
@@ -57,8 +62,8 @@ describe('2. elegirMomentoVida — azar ponderado sin repetir', () => {
   });
 
   it('el azar se inyecta: rand=0 da siempre el primer candidato (determinista)', () => {
-    const a = elegirMomentoVida('oso-andino', null, () => 0);
-    const b = elegirMomentoVida('oso-andino', null, () => 0);
+    const a = elegirMomentoVida('jaguar', null, () => 0);
+    const b = elegirMomentoVida('jaguar', null, () => 0);
     expect(a).toBe(b);
   });
 
@@ -70,8 +75,8 @@ describe('2. elegirMomentoVida — azar ponderado sin repetir', () => {
 
 describe('3. Duraciones — el contrato con el CSS', () => {
   it('duracionDeMomentoVida devuelve el dur del repertorio (0 si no existe)', () => {
-    expect(duracionDeMomentoVida('oso-andino', 'resopla')).toBe(4500);
-    expect(duracionDeMomentoVida('oso-andino', 'nada')).toBe(0);
+    expect(duracionDeMomentoVida('jaguar', 'ruge')).toBe(3200);
+    expect(duracionDeMomentoVida('jaguar', 'nada')).toBe(0);
     expect(duracionDeMomentoVida('nadie', 'resopla')).toBe(0);
   });
 

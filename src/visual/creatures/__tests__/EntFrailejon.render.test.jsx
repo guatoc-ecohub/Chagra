@@ -92,9 +92,9 @@ describe('3. Modo-GUARDIÁN — aura VERDE-PLATEADA de 4 capas', () => {
     expect(wrap.getAttribute('data-creature-poder')).toBe('ent-frailejon');
     expect(wrap.getAttribute('style')).toContain('--aura-color');
     expect(wrap.getAttribute('style')).toContain(auraDeBicho('ent-frailejon'));
-    // el aura del Ent NO es la dorada de la abeja ni la roja del oso
+    // el aura del Ent NO es la dorada de la abeja ni la púrpura del jaguar
     expect(auraDeBicho('ent-frailejon')).not.toBe(auraDeBicho('abeja-angelita'));
-    expect(auraDeBicho('ent-frailejon')).not.toBe(auraDeBicho('oso-andino'));
+    expect(auraDeBicho('ent-frailejon')).not.toBe(auraDeBicho('jaguar'));
     // capa 4: las corrientes (AuraPoder)
     expect(container.querySelector('.poder-corrientes')).toBeTruthy();
   });

@@ -56,7 +56,6 @@ import {
   geomVenadoCuerpo, geomVenadoPata, geomAguilaCuerpo, geomAguilaAla,
 } from './sierraBiodiversa.geom.js';
 import CondorBillboard from '../CondorBillboard.jsx';
-import { OsoAndino } from '../../creatures/index.js';
 
 /* Las cuatro bandas navegables, del grafo (pisosTermicos.js). `azimut` reparte
    sus hotspots alrededor del macizo para que orbitar los descubra. */
@@ -329,30 +328,10 @@ function VeloParamo({ tier, reducedMotion }) {
 
 /* ── FAUNA ALTOANDINA — la vida REAL de la Sierra, que faltaba ────────────────
    La Sierra Nevada es LA sede simbólica del cóndor en el imaginario colombiano y
-   hábitat del oso de anteojos, el venado coliblanco y el águila mora. Cóndor y
-   oso reusan los SVG rubber-hose de la casa como billboards (el estándar de
-   calidad); el venado y el águila van en geometría procedural mínima
-   (`sierraBiodiversa.geom`). Todo gateado por tier/reducedMotion: en calma queda
-   quieto y digno. ── */
-const ESTILO_BICHO = {
-  filter: 'drop-shadow(0 2px 3px rgba(25, 32, 28, 0.32))',
-  pointerEvents: 'none',
-};
-
-/* El OSO DE ANTEOJOS (Tremarctos ornatus, el único oso de Suramérica) en el
-   bosque de niebla (piso frío): SVG de la casa como billboard que encara la
-   cámara. `occlude`: se esconde tras el macizo cuando la órbita lo deja detrás. */
-function OsoDeAnteojos({ pos, tier, animated, px = 56, factor = 15 }) {
-  return (
-    <group position={/** @type {[number,number,number]} */ (pos)}>
-      <Html center distanceFactor={factor} zIndexRange={[12, 0]} occlude pointerEvents="none">
-        <div aria-hidden="true" data-vecino="oso-andino" style={ESTILO_BICHO}>
-          <OsoAndino size={px} animated={animated} tier={tier} />
-        </div>
-      </Html>
-    </group>
-  );
-}
+   hábitat del venado coliblanco y el águila mora. El cóndor reusa el SVG
+   rubber-hose de la casa como billboard (el estándar de calidad); el venado y
+   el águila van en geometría procedural mínima (`sierraBiodiversa.geom`). Todo
+   gateado por tier/reducedMotion: en calma queda quieto y digno. ── */
 
 /* El VENADO COLIBLANCO ANDINO (Odocoileus goudotii, la subespecie de páramo):
    pace alerta en el frío/páramo. Cuerpo tostado fusionado + cuatro patas + la
@@ -458,10 +437,6 @@ function FaunaSierra({ tier, reducedMotion }) {
   const hayAguila = tier !== 'bajo';
   const nVenado = tier === 'alto' ? 2 : tier === 'medio' ? 1 : 0;
 
-  const osoPos = useMemo(() => {
-    const p = puntoEnLadera(2450, -2.15); // el bosque de niebla, piso frío
-    return [p[0], p[1] + 0.02, p[2]];
-  }, []);
   const venados = useMemo(
     () =>
       [
@@ -490,8 +465,6 @@ function FaunaSierra({ tier, reducedMotion }) {
       {hayAguila && (
         <AguilaSierra centro={[0, H_PICO * 0.62, 0]} radio={R_MONTE * 0.46} reducedMotion={!animado} />
       )}
-      {/* El oso de anteojos (Tremarctos ornatus) en el bosque de niebla. */}
-      <OsoDeAnteojos pos={osoPos} tier={tier} animated={animado} />
       {/* El venado coliblanco andino (Odocoileus goudotii) paciendo en el frío/páramo. */}
       {venados.map((v, i) => (
         <VenadoSierra key={i} pos={v.pos} giro={v.giro} escala={v.escala} reducedMotion={!animado} />

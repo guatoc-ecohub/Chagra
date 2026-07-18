@@ -1,11 +1,11 @@
 /*
  * dantaIdentidad — LA IDENTIDAD VISUAL DE LA DANTA, COMO DATOS.
  *
- * Hermana de `borugoIdentidad.js` / `jaguarIdentidad.js` / `faunaAndina.js`: la
+ * Hermana de `jaguarIdentidad.js` / `faunaAndina.js`: la
  * DANTA DE PÁRAMO (Tapirus pinchaque — el tapir andino, el mamífero grande del
  * bosque altoandino) tiene aquí su silueta canónica. Rubber-hose (Cuphead +
  * Miss Minutes) con calidez campesina — el MISMO lenguaje de goma de la abeja,
- * el oso y el borugo, otro animal y otro CARÁCTER: MANSA, monumental y
+ * otro animal y otro CARÁCTER: MANSA, monumental y
  * andariega. LA JARDINERA DEL BOSQUE: come frutos monte adentro y va sembrando
  * el bosque al andar (las semillas viajan en ella) — todo lo que pisa, germina.
  *
@@ -13,11 +13,11 @@
  * probóscide que tantea, husmea y saluda) y el BORDE BLANCO de las orejas y
  * los labios claros (la marca del pinchaque contra el pelaje lanudo oscuro).
  * Su color de poder es el VERDE SEMILLA (lima tierno, la vida que germina a su
- * paso) — distinto de los 9: dorado (abeja), rojo (oso), verde-zen (rana),
+ * paso) — distinto del resto: dorado (abeja), verde-zen (rana),
  * iridiscente (colibrí), púrpura (jaguar), ámbar (ardilla), turquesa
- * (perezoso), bronce (morrocoy) y plata lunar (borugo).
+ * (perezoso) y bronce (morrocoy).
  *
- * REGLA DE ORO (idéntica a borugoIdentidad/faunaAndina): SOLO datos. Cero
+ * REGLA DE ORO (idéntica a jaguarIdentidad/faunaAndina): SOLO datos. Cero
  * three, cero react. La creature del bundle base lo importa; jamás debe
  * arrastrar `vendor-three`. La CADENCIA (animación) vive en `creatures.css`
  * (clases `rh-*`/`crt-*`/`danta-*`); el DIBUJO compone el KIT
@@ -66,7 +66,7 @@ export const DANTA_PROPORCION = {
 
 /*
  * PERFIL_DANTA — el perfil de CLIMA→cuerpo de la danta para `cuerpoDeClima`
- * (creatureClimaCuerpo.js). Mismo shape que PERFIL_OSO/PERFIL_BORUGO — se pasa
+ * (creatureClimaCuerpo.js). Mismo shape que PERFIL_RANA — se pasa
  * vía la opción `perfil`, así NO hay que tocar el archivo compartido
  * (anti-conflicto).
  *   alas    false → sin aleteo (velocidadAlas siempre 1).

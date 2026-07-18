@@ -2026,10 +2026,10 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
         />
       ))}
 
-      {/* Los VECINOS del valle (el oso, el borugo, el jaguar…): los personajes
+      {/* Los VECINOS del valle (la ardilla, el morrocoy, el jaguar…): los personajes
           en su casa, con presencia digna — acompañan a Angelita sin pelearle
           el primer plano. Billboards DOM baratos: viven en TODOS los tiers
-          (el operador no debería necesitar GPU rica para conocer al oso);
+          (el operador no debería necesitar GPU rica para conocerlos);
           la franja horaria decide quién está afuera. */}
       <VecinosDelValle
         alturaDe={alturaTerreno}

@@ -856,9 +856,10 @@ export function OsoNegroDelMonte({ alturaDe }) {
 
 /* ── Los VECINOS del valle: los personajes en su casa ────────────────────
    La puesta en escena de los personajes rubber-hose (feedback del operador:
-   el oso y los demás no pueden ser garnish de la abejita). Cada vecino vive
+   los vecinos no pueden ser garnish de la abejita). Cada vecino vive
    en SU rincón (VECINOS_VALLE) con presencia digna, y `franjas` decide
-   cuándo sale — el borugo al caer el sol, el jaguar solo como aparecido.
+   cuándo sale — el jaguar solo como aparecido (amanecer/atardecer/niebla),
+   el resto siempre presente.
    Billboards <Html> aria-hidden, cero toques (JERARQUIA_PERSONAJES): la ley
    sigue siendo presencia, no interfaz. Un slug que no exista en CREATURES
    simplemente no monta — las ramas de personajes mejoran el dibujo al

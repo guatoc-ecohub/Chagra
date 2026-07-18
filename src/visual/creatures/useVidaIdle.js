@@ -4,8 +4,8 @@
  *
  * Lo que separa una criatura de un logo es que EXISTE aunque nadie le hable:
  * un reloj con jitter hojea el repertorio de su especie (vidaEstados.js) —
- * el oso resopla y se rasca, el jaguar acecha, la ardilla se cuelga de cabeza,
- * el morrocoy asiente, el borugo olfatea, la rana croa, el colibrí se acicala,
+ * el jaguar acecha, la ardilla se cuelga de cabeza,
+ * el morrocoy asiente, la rana croa, el colibrí se acicala,
  * el perezoso dormita — y entre gesto y gesto vuelve a su identidad serena.
  * Nunca repite el mismo gesto dos veces seguidas.
  *

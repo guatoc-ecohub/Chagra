@@ -8,7 +8,7 @@ describe('auraDeBicho', () => {
   it('devuelve el color del bicho conocido', () => {
     expect(auraDeBicho('abeja-angelita')).toBe('#ffd54a');
     expect(auraDeBicho('jaguar')).toBe('#a855f7');
-    expect(auraDeBicho('oso-andino')).toBe('#ff3b30');
+    expect(auraDeBicho('danta')).toBe('#a8e05f');
   });
 
   it('slug desconocido / no-string → aura por defecto', () => {

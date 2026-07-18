@@ -10,8 +10,8 @@ import { CREATURES } from '../visual/creatures/index.js';
  *   const { id, Component, nombre, cientifico } = useAvatarCreature();
  *   <Component size={64} />
  *
- * Data-driven: cualquier bicho nuevo que aterrice en CREATURES (p. ej. el
- * borugo) queda disponible sin tocar este hook. Si el slug guardado no existe
+ * Data-driven: cualquier bicho nuevo que aterrice en CREATURES queda
+ * disponible sin tocar este hook. Si el slug guardado no existe
  * en el registro (typo, bicho retirado), cae al default: la abeja Angelita.
  *
  * Consumidores conocidos: ProfileScreen (cédula), OnboardingCondensado

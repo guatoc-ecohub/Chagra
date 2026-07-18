@@ -20,7 +20,7 @@
  *     = microbiano). El único BOTÁNICO es el purín de ortiga, documentado en
  *     `catalog/biopreparados-seed.json` como repelente de insectos chupadores.
  *   - Los REHENES son fauna con identidad visual ya canónica en el repo
- *     (`src/visual/creatures/`): borugo, oso andino, jaguar y morrocoy. La
+ *     (`src/visual/creatures/`): jaguar y morrocoy. La
  *     causa real de cacería se grounds en el contexto que ya vive en esos
  *     archivos (carne de monte, conflicto, mascota/tráfico).
  *   - Los JEFES son amenazas estructurales (sequía, deforestación, agroquímico)
@@ -394,7 +394,7 @@ export const ENEMIGOS = Object.freeze([
  * REHENES — animales silvestres cazados a rescatar (estilo POW de Metal Slug).
  *
  * Cada uno es fauna con identidad visual canónica en `src/visual/creatures/`
- * (borugoIdentidad.js, faunaAndina.js, jaguarIdentidad.js, morrocoyIdentidad.js).
+ * (jaguarIdentidad.js, morrocoyIdentidad.js).
  * La causa de la cacería se documenta tal cual la realidad colombiana: carne de
  * monte, conflicto con cultivos/ganado, o tráfico como mascota.
  * NADA de sangre ni cacería gráfica en el juego: el jugador LOS LIBERA.
@@ -411,26 +411,6 @@ export const ENEMIGOS = Object.freeze([
  */
 
 export const REHENES = Object.freeze([
-  {
-    id: 'borugo',
-    nombre: 'Borugo (paca de montaña)',
-    cientifico: 'Cuniculus taczanowskii',
-    por_que_lo_cazan:
-      'En la vereda lo cazan con perros para vender su carne como "carne de monte". Es roedor nocturno de bosque andino.',
-    mensaje_educativo:
-      'El borugo es tímido y nocturno: dispersa semillas del bosque. Si lo cuidamos, el bosque se regenera y hay agua limpia abajo.',
-    amenaza: 'Casi amenazada (NT) — IUCN, presión por cacería y pérdida de bosque.',
-  },
-  {
-    id: 'oso_andino',
-    nombre: 'Oso de anteojos (oso andino)',
-    cientifico: 'Tremarctos ornatus',
-    por_que_lo_cazan:
-      'Lo cazan por conflicto con cultivos y ganado, y por trofeo. Es el único oso de Suramérica y depende del bosque andino.',
-    mensaje_educativo:
-      'El oso andino siembra el bosque: lleva semillas en el estiércol y abre claros que renuevan el monte. Sin oso, no hay bosque de niebla.',
-    amenaza: 'Vulnerable (VU) — IUCN, pérdida de hábitat y cacería retaliativa.',
-  },
   {
     id: 'jaguar',
     nombre: 'Jaguar (yaguareté)',
@@ -492,7 +472,7 @@ export const JEFES = Object.freeze([
     mecanica_sugerida:
       'Jefe-correteo: arrasa con bosque en franjas. El jugador debe reforestnar (sembrar árboles nativos en los claros) para cerrarle el paso mientras libera a los animales cercados.',
     ensenanza:
-      'Talar el bosque andino seca los nacimientos de agua y deja ir a oso, borugo y jaguar. Reforestar con nativas (aliso, nacedero, encenillo) devuelve el agua y devuelve la fauna.',
+      'Talar el bosque andino seca los nacimientos de agua y deja ir al jaguar y al morrocoy. Reforestar con nativas (aliso, nacedero, encenillo) devuelve el agua y devuelve la fauna.',
     fuente: 'IAvH / CIPAV; ver src/data/restauracion-especies.json.',
   },
   {
@@ -535,10 +515,10 @@ export const NIVELES = Object.freeze([
     nombre: 'La huerta de la ladera (templado)',
     piso_termico: 'templado',
     enemigos: ['cogollero', 'pulgon', 'afido', 'moscablanca'],
-    rehen: 'oso_andino',
+    rehen: 'jaguar',
     jefe: 'jefe_sequia',
     intro:
-      'Mañana en la ladera templada. Pulgones, áfidos y cogollero atacan la huerta. El oso andino está acorralado; la sequía aprieta.',
+      'Mañana en la ladera templada. Pulgones, áfidos y cogollero atacan la huerta. El jaguar quedó acorralado por el conflicto con el ganado; la sequía aprieta.',
   },
   {
     id: 'nivel_2',
@@ -546,10 +526,10 @@ export const NIVELES = Object.freeze([
     nombre: 'El cafetal en la niebla (frío)',
     piso_termico: 'frio',
     enemigos: ['broca', 'minador', 'cochinilla', 'trips', 'aranita'],
-    rehen: 'borugo',
+    rehen: 'morrocoy',
     jefe: 'jefe_agroquimico',
     intro:
-      'Niebla en el cafetal de altura. Broca, minador y cochinilla presionan los granos. El borugo huye de los perros; el agroquímico amenaza el agua.',
+      'Niebla en el cafetal de altura. Broca, minador y cochinilla presionan los granos. El morrocoy fue traficado hasta aquí y quedó enjaulado; el agroquímico amenaza el agua.',
   },
   {
     id: 'nivel_3',

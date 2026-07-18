@@ -2,7 +2,7 @@
  * FaunaBosque — LA VIDA del Bosque Vivo. Un bosque sin bichos es un decorado.
  *
  * EL REGISTRO (decisión del operador, 2026-07): la fauna EMBLEMÁTICA del
- * bosque — oso, rana, colibrí, borugo, jaguar, danta — va con los SVG
+ * bosque — rana, colibrí, jaguar, danta — va con los SVG
  * rubber-hose de `src/visual/creatures/` como billboards <Html>: son el
  * estándar de calidad de la casa (la danta ya tiene su SVG — Danta.jsx, la
  * jardinera del bosque — y anda de día/atardecer con los vecinos). La fauna AMBIENTAL de fondo —
@@ -19,10 +19,9 @@
  *   · MEDIO  — los VECINOS rubber-hose en SU casa, ya no muebles: un
  *     IDLE-CEREBRO local (el patrón useVidaIdle de PR #2482, adaptado) hojea
  *     el repertorio que cada bicho YA sabe hacer con un reloj con jitter —
- *     el oso PASEA unos pasos y vuelve (movimiento 3D real del billboard),
- *     resopla, se rasca, se sienta; el jaguar acecha y ruge en la niebla; el
- *     borugo olfatea y se acurruca; la rana pega su brinquito. Nunca el
- *     mismo gesto dos veces seguidas, nunca al unísono.
+ *     la danta PASEA unos pasos y vuelve (movimiento 3D real del billboard),
+ *     husmea, se sienta; el jaguar acecha y ruge en la niebla; la rana pega
+ *     su brinquito. Nunca el mismo gesto dos veces seguidas, nunca al unísono.
  *   · CERCA — MARIPOSAS (la Morpho azul manda) y ABEJAS sobre el frailejonar,
  *     el COLIBRÍ que llega a una flor, liba y se va a otra (y a veces se
  *     pierde un rato del cuadro), un ESCARABAJO arrastrándose por el musgo y
@@ -552,27 +551,9 @@ function QuetzalFugaz() {
    acompañan desde el frailejonar y el borde del monte). `franjas` = cuándo
    sale (null = siempre). `vida` = su repertorio de gestos (los que el bicho
    YA sabe hacer: props opt-in de su componente) y el compás de su reloj.
-   `paseo` = hasta dónde camina y vuelve (el oso y la danta, cada uno con su
+   `paseo` = hasta dónde camina y vuelve (la danta con su propio
    rumbo y su compás — nunca en fila ni al unísono). */
 const VECINOS_BOSQUE = [
-  {
-    slug: 'oso-andino',
-    pos: [-3.7, 0.85, 3.0],
-    px: 62,
-    factor: 17,
-    franjas: null,
-    vida: {
-      primero: 'pasea',
-      descanso: [5000, 12000],
-      momentos: {
-        pasea: { dur: 8500, props: { pose: 'anda' }, paseo: [1.7, 0, 1.0] },
-        resopla: { dur: 2600, props: { resopla: true } },
-        rasca: { dur: 3800, props: { rasca: true } },
-        reposo: { dur: 5200, props: { pose: 'reposo' } },
-        mira: { dur: 3000, props: { pose: 'señala' } },
-      },
-    },
-  },
   {
     slug: 'rana-andina',
     pos: [3.1, 0.32, 3.2],
@@ -588,24 +569,10 @@ const VECINOS_BOSQUE = [
     },
   },
   {
-    slug: 'borugo',
-    pos: [-4.9, 0.5, 4.4],
-    px: 36,
-    factor: 10,
-    franjas: ['atardecer', 'noche', 'amanecer'],
-    vida: {
-      descanso: [8000, 18000],
-      momentos: {
-        olfatea: { dur: 3600, props: { olfatea: true } },
-        acurruca: { dur: 6000, props: { acurruca: true } },
-      },
-    },
-  },
-  {
     /* LA DANTA — la jardinera del bosque, por fin en SVG de la casa. Mole
        diurna y mansa: sale del arbolado del costado derecho y PASEA hacia el
-       claro con su andar pesado (rumbo y compás propios, nunca en fila con el
-       oso), husmea con la trompa en periscopio, reposa y otea. Al caer la
+       claro con su andar pesado (rumbo y compás propios), husmea con la
+       trompa en periscopio, reposa y otea. Al caer la
        noche se retira monte adentro (franjas de día/atardecer). */
     slug: 'danta',
     pos: [3.0, 0.95, 2.1],
@@ -641,7 +608,9 @@ const VECINOS_BOSQUE = [
   },
 ];
 
-const VECINOS_TIER_BAJO = new Set(['oso-andino']);
+/* En tier bajo se retiró el oso rubber-hose (feo, sacado del elenco); la rana
+   (el sprite más liviano del bosque) queda como el único vecino visible ahí. */
+const VECINOS_TIER_BAJO = new Set(['rana-andina']);
 
 const ESTILO_CRITTER = {
   filter: 'drop-shadow(0 2px 3px rgba(25, 32, 28, 0.35))',

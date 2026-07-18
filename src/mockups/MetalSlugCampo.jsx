@@ -3,7 +3,7 @@
  *
  * Run-and-gun agroecológico SIN violencia: Angelita la abeja recorre la huerta de
  * la ladera templada (NIVELES[0]), "combate" plagas reales lanzando el CONTROL
- * BIOLÓGICO correcto (Bt, mariquita, Beauveria, crisopa), libera al oso andino
+ * BIOLÓGICO correcto (Bt, mariquita, Beauveria, crisopa), libera al jaguar
  * cazado (rehén estilo POW) y aprende con fichas didácticas al vencer cada plaga.
  *
  * REÚSA (no reinventa motores):
@@ -11,7 +11,7 @@
  *     (`avanzarFisica`, `rectsOverlap`).
  *   - Lógica de disparo/par arma↔plaga/rescate → `metalSlugCampoEngine` (puro, testeado).
  *   - Data agronómica REAL → `../data/metalSlugCampoData` (enemigos, armas, rehenes, nivel).
- *   - Sprites rubber-hose canónicos → `../visual/creatures` (Abeja héroe, Oso rehén).
+ *   - Sprites rubber-hose canónicos → `../visual/creatures` (Abeja héroe, Jaguar rehén).
  *   - Tier + reduced-motion → `../visual/mundo3d/deviceTier` (mismo criterio que el Odyssey).
  *
  * Determinismo: la simulación corre a PASO FIJO (1/60 s) con acumulador, así el
@@ -23,7 +23,7 @@
    (mismo criterio que metalSlugCampoData / defensoresFincaData): copy pedagógico
    campesino en «usted», no strings de UI transversal migrables a messages.js. */
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AbejaAngelita, OsoAndino } from '../visual/creatures';
+import { AbejaAngelita, Jaguar } from '../visual/creatures';
 import { decidirTier } from '../visual/mundo3d/deviceTier.js';
 import {
   NIVELES,
@@ -239,7 +239,7 @@ function simularTick(w, ahora, teclas, reducedMotion) {
     }
   }
 
-  /* rescate del rehén (oso andino cazado) */
+  /* rescate del rehén (jaguar cazado) */
   if (alcanzaRehen(j, w.rehen)) {
     w.rehen.liberado = true;
     w.puntaje += PUNTOS_REHEN;
@@ -643,14 +643,14 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
               ),
             )}
 
-            {/* rehén (oso andino) */}
+            {/* rehén (jaguar) */}
             <div
               className={`msc-rehen ${w.rehen.liberado ? 'msc-rehen--libre' : 'msc-rehen--preso'}`}
               style={{ left: w.rehen.x, top: w.rehen.y, width: w.rehen.w, height: w.rehen.h }}
             >
               {!w.rehen.liberado && <div className="msc-jaula" aria-hidden="true" />}
               {/* @ts-ignore IntrinsicAttributes & object - memo-wrapped component */}
-              <SpriteOso tier={tier} reducedMotion={reducedMotion} />
+              <SpriteRehen tier={tier} reducedMotion={reducedMotion} />
               {!w.rehen.liberado && <div className="msc-sos" aria-hidden="true">¡SOS!</div>}
             </div>
 
@@ -680,7 +680,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
           </div>
           <div className="msc-hud-der">
             <span className="msc-plagas-cnt">Plagas: {plagasVivas}</span>
-            <span className="msc-rehen-cnt">{w.rehen.liberado ? 'Oso a salvo ✓' : 'Oso: rescátelo'}</span>
+            <span className="msc-rehen-cnt">{w.rehen.liberado ? 'Jaguar a salvo ✓' : 'Jaguar: rescátelo'}</span>
           </div>
           <div className="msc-hud-muni">
             {/* @ts-ignore IntrinsicAttributes & object - component defined in metalslug/ */}
@@ -801,8 +801,8 @@ const SpriteHeroe = memo(function SpriteHeroe(/** @type {{ tier: any; reducedMot
   return <AbejaAngelita size={JUGADOR_H + 20} inline={false} animated={!reducedMotion} tier={tier} title="Angelita" />;
 });
 
-const SpriteOso = memo(function SpriteOso(/** @type {{ tier: any; reducedMotion: any }} */ { tier, reducedMotion }) {
-  return <OsoAndino size={92} inline={false} animated={!reducedMotion} tier={tier} title="Oso andino" />;
+const SpriteRehen = memo(function SpriteRehen(/** @type {{ tier: any; reducedMotion: any }} */ { tier, reducedMotion }) {
+  return <Jaguar size={92} inline={false} animated={!reducedMotion} tier={tier} title="Jaguar" />;
 });
 
 /* PlagaSprite ahora vive en ./metalslug/PlagasSprites.jsx (bestiario expresivo). */

@@ -42,15 +42,15 @@ describe('ropaDeClima — gates de clima/hora', () => {
   });
 
   it('sol pero bicho que NO suda al sol (páramo, sin temp) → sin sombrero', () => {
-    const oso = ropaPerfilDeBicho('oso-andino');
-    const r = ropaDeClima('soleado', { perfil: oso });
+    const danta = ropaPerfilDeBicho('danta');
+    const r = ropaDeClima('soleado', { perfil: danta });
     expect(r.sombrero).toBe(false);
     expect(r.sudor).toBe(false);
   });
 
   it('temperatura real manda: sol + calor sobre calorC → suda aunque el perfil sea de páramo', () => {
-    const oso = ropaPerfilDeBicho('oso-andino'); // calorC 18
-    const r = ropaDeClima('soleado', { perfil: oso, tempC: 22 });
+    const danta = ropaPerfilDeBicho('danta'); // calorC 18
+    const r = ropaDeClima('soleado', { perfil: danta, tempC: 22 });
     expect(r.sudor).toBe(true);
   });
 
@@ -81,8 +81,8 @@ describe('ropaDeClima — gates de clima/hora', () => {
 });
 
 describe('ropaDeClimaBicho — por slug', () => {
-  it('oso de noche → ruana', () => {
-    expect(ropaDeClimaBicho('oso-andino', 'noche').ruana).toBe(true);
+  it('danta de noche → ruana', () => {
+    expect(ropaDeClimaBicho('danta', 'noche').ruana).toBe(true);
   });
   it('abeja al sol → suda', () => {
     expect(ropaDeClimaBicho('abeja-angelita', 'soleado').sudor).toBe(true);
