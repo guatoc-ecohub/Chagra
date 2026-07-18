@@ -5,8 +5,10 @@
  * paran a pastar, las ovejas van en rebaño (un ancla que deriva y cada oveja
  * la sigue con su puesto), las gallinas picotean y se DISPERSAN cuando pasa
  * los perros, y DOS perros arrean orbitando el rebaño: el DÁLMATA grande
- * (blanco moteado, manda el arreo) y el BEAGLE chico (tricolor, va detrás,
- * más nervioso) — que se NOTE quién es el grande. Locomoción real: rumbo
+ * (alto y casi cuadrado, blanco de manchas negras redondas, manda el arreo)
+ * y el BEAGLE chico (bajito y alargado, orejón, tricolor con cola en bandera,
+ * va detrás, más nervioso) — cada uno con malla de SU raza (fincaRealista):
+ * se distinguen por SILUETA desde lejos, no solo por color. Rumbo
  * suavizado, vaivén de paso (bob + balanceo), pausas de pastoreo.
  *
  * Reusa el banco de fauna REALISTA del valle (veredicto del operador: el
@@ -77,78 +79,6 @@ function geomEntera({ cuerpo, cabeza, pivote }, etiqueta) {
   return g;
 }
 
-/*
- * Repintado por vértice SIN tocar la fábrica: clona la geometría y reescribe
- * el atributo color según posición, CONSERVANDO el sombreado horneado (AO,
- * moteado) como multiplicador de luminancia y dejando quietos los rasgos ya
- * oscuros (nariz, ojos, garras: lum < 0.22). Así el criollo amarillo de la
- * fábrica se vuelve beagle o dálmata sin duplicar mallas ni perder la luz.
- */
-const LUM_BASE = 0.55; // luminancia aprox del pelaje base #c08b4d
-function repinta(geom, pintor) {
-  const g2 = geom.clone();
-  const pos = g2.attributes.position;
-  const col = g2.attributes.color;
-  const c = new THREE.Color();
-  const objetivo = new THREE.Color();
-  for (let i = 0; i < col.count; i++) {
-    c.fromBufferAttribute(col, i);
-    const lum = (c.r + c.g + c.b) / 3;
-    if (lum < 0.22) continue; // nariz/ojos/rasgos oscuros: se respetan
-    if (!pintor(pos.getX(i), pos.getY(i), pos.getZ(i), objetivo)) continue;
-    const sombra = Math.min(1.3, lum / LUM_BASE);
-    col.setXYZ(
-      i,
-      Math.min(1, objetivo.r * sombra),
-      Math.min(1, objetivo.g * sombra),
-      Math.min(1, objetivo.b * sombra),
-    );
-  }
-  return g2;
-}
-
-/* Paleta canina. Negro NO puro: que el sombreado se lea. */
-const P_BLANCO = new THREE.Color('#f3efe7');
-const P_NEGRO = new THREE.Color('#26262b');
-const P_CAFE = new THREE.Color('#8a5730');
-const P_CAFE_OSCURO = new THREE.Color('#5c3a1e');
-
-/* BEAGLE — tricolor: silla negra en el lomo, café en hombros/anca y cabeza,
-   blanco en patas, panza, pecho y punta de cola (la banderita). */
-function pintaBeagleCuerpo(x, y, z, out) {
-  if (y < 0.24) out.copy(P_BLANCO); // patas y panza
-  else if (x > 0.24) out.copy(P_BLANCO); // pechera
-  else if (x < -0.24 && y > 0.4) out.copy(P_BLANCO); // cola en bandera
-  else if (y > 0.3 && x > -0.2 && x < 0.14) out.copy(P_NEGRO); // la silla
-  else out.copy(P_CAFE); // hombros, anca, transiciones
-  return true;
-}
-function pintaBeagleCabeza(x, y, z, out) {
-  if (Math.abs(z) > 0.05 && x < 0.06) out.copy(P_CAFE_OSCURO); // orejas largas
-  else if (x > 0.1 || Math.abs(z) < 0.016) out.copy(P_BLANCO); // hocico + lista
-  else out.copy(P_CAFE);
-  return true;
-}
-
-/* DÁLMATA — blanco con manchas negras: celdas deterministas (~9 cm) que
-   deciden mancha sí/no por hash; orejas negras de cachorro de carroza. */
-function esMancha(x, y, z) {
-  const h = Math.abs(
-    Math.sin(Math.floor(x / 0.09) * 12.9898 + Math.floor(y / 0.09) * 78.233 + Math.floor(z / 0.09) * 37.719) *
-      43758.5453,
-  );
-  return h % 1 > 0.66;
-}
-function pintaDalmataCuerpo(x, y, z, out) {
-  out.copy(y > 0.1 && esMancha(x, y, z) ? P_NEGRO : P_BLANCO);
-  return true;
-}
-function pintaDalmataCabeza(x, y, z, out) {
-  if (Math.abs(z) > 0.05 && x < 0.06) out.copy(P_NEGRO); // orejas
-  else out.copy(esMancha(x + 3.1, y, z) ? P_NEGRO : P_BLANCO);
-  return true;
-}
-
 /* ── Composición del hato por tier (6 / 12 / 20 animales) ─────────────── */
 const TIERS = {
   6: { vacas: 1, ovejas: 2, gallinas: 2 },
@@ -159,11 +89,14 @@ const TIERS = {
 /*
  * Los DOS perros del arreo (pedido del operador): el dálmata GRANDE manda la
  * órbita ancha y el beagle CHICO trota detrás, más rápido de patas y más
- * nervioso. escala 0.9 vs 0.5: la diferencia se ve de lejos.
+ * nervioso. Cada uno tiene MALLA de su raza (fincaRealista.geom): la
+ * diferencia de lejos no es solo escala — el dálmata es alto y casi cuadrado
+ * (cruz ~0.5 de malla) y el beagle bajito y alargado (cruz ~0.38), así que
+ * 0.9 vs 0.62 deja al beagle a ~media altura del dálmata sin volverlo pulga.
  */
 const PERROS = [
   { nombre: 'Oliver', raza: 'dalmata', escala: 0.9, rOrb: 1.0, velAng: 0.42, tranco: 7.5, fase: 0.8 },
-  { nombre: 'Dante', raza: 'beagle', escala: 0.5, rOrb: 0.72, velAng: 0.58, tranco: 11.5, fase: 3.4 },
+  { nombre: 'Dante', raza: 'beagle', escala: 0.62, rOrb: 0.72, velAng: 0.58, tranco: 11.5, fase: 3.4 },
 ];
 
 /* Tintes de instancia (multiplican el color horneado por vértice). */
@@ -194,33 +127,25 @@ export default function HatoMovil({
   const [cx, cz] = centro;
 
   /* Geometrías: articuladas para vacas/perros, fusionadas para instancias.
-     Los perros son el criollo de la fábrica REPINTADO por vértice: Oliver el
-     dálmata (seed propia para otra silueta) y Dante el beagle. */
-  const g = useMemo(() => {
-    const base = geomPerro({ q });
-    const base2 = geomPerro({ q }, 53);
-    return {
+     Los perros vienen de la fábrica con malla Y capa de SU raza (silueta
+     dálmata alta/cuadrada vs beagle bajito/orejón — un recoloreo del criollo
+     no alcanzaba para leerlas de lejos). */
+  const g = useMemo(
+    () => ({
       vacas: [
         geomVaca({ raza: 'holstein', q }),
         geomVaca({ raza: 'criolla', ubre: false, cuerno: 0, q }, 23),
         geomVaca({ raza: 'holstein', q }, 77),
       ],
       perros: {
-        dalmata: {
-          cuerpo: repinta(base2.cuerpo, pintaDalmataCuerpo),
-          cabeza: repinta(base2.cabeza, pintaDalmataCabeza),
-          pivote: base2.pivote,
-        },
-        beagle: {
-          cuerpo: repinta(base.cuerpo, pintaBeagleCuerpo),
-          cabeza: repinta(base.cabeza, pintaBeagleCabeza),
-          pivote: base.pivote,
-        },
+        dalmata: geomPerro({ raza: 'dalmata', q }),
+        beagle: geomPerro({ raza: 'beagle', q }),
       },
       oveja: geomEntera(geomOveja({ q }), 'oveja-instanciada'),
       gallina: geomEntera(geomGallina({ tipo: 'campesina', q }), 'gallina-instanciada'),
-    };
-  }, [q]);
+    }),
+    [q],
+  );
 
   /*
    * El estado vivo del hato (mutable, FUERA de React: vive en un ref y se
