@@ -178,7 +178,7 @@ export function Beagle({
         <path d={`M7.8,1.6 C9.8,-1.2 10.6,-4.8 10.0,${PR.colaAlto + 0.6}`}
           fill="none" stroke={RH_INK} strokeWidth="0.6" strokeLinecap="round" opacity="0.5" />
         {/* LA PUNTA BLANCA (la bandera que se ve entre el monte) */}
-        <circle cx="10.0" cy={PR.colaAlto} r="1.25" fill={P.colaPunta} stroke={RH_INK} strokeWidth="0.7" />
+        <circle cx="10.0" cy={PR.colaAlto} r="1.45" fill={P.colaPunta} stroke={RH_INK} strokeWidth="0.7" />
       </g>
 
       {/* patas traseras CORTAS (paticas rechonchas con pie blanco) */}
@@ -201,30 +201,39 @@ export function Beagle({
       <path d="M0,3.0 C3.8,3.6 4.8,6.2 3.6,8.6 C2.0,10.2 -2.0,10.2 -3.6,8.6 C-4.8,6.2 -3.8,3.6 0,3.0 Z"
         fill={P.cuerpo} opacity="0.95" />
 
-      {/* paticas delanteras CORTAS manguera, pivote en el HOMBRO. */}
+      {/* FUEGO/canela en las PATAS DELANTERAS (el tricolor también baja a los
+          hombros/brazos — la patita termina en pie BLANCO). Va bajo las patas
+          para que el pie crema quede encima. */}
+      <g aria-hidden="true">
+        <ellipse cx="-6.8" cy="4.8" rx="2.1" ry="2.9" fill={P.canela} opacity="0.92" />
+        <ellipse cx="6.8" cy="4.8" rx="2.1" ry="2.9" fill={P.canela} opacity="0.92" />
+      </g>
+      {/* paticas delanteras CORTAS y robustas, pivote en el HOMBRO. */}
       <Miembro clase="crt-brazo-l" origen="right top"
-        d="M-6.6,2.4 C-8.6,4.0 -9.2,6.2 -8.6,8.4" ancho={3.0} punta={[-8.6, 8.8]} puntaR={1.9} pie sway={vivo} delay={-0.15} />
+        d="M-6.6,2.4 C-8.6,4.0 -9.2,6.2 -8.6,8.4" ancho={3.2} punta={[-8.6, 8.8]} puntaR={2.0} pie sway={vivo} delay={-0.15} />
       <Miembro clase="crt-brazo-r" origen="left top"
-        d="M6.6,2.4 C8.6,4.0 9.2,6.2 8.6,8.4" ancho={3.0} punta={[8.6, 8.8]} puntaR={1.9} pie sway={vivo} delay={-0.45} />
+        d="M6.6,2.4 C8.6,4.0 9.2,6.2 8.6,8.4" ancho={3.2} punta={[8.6, 8.8]} puntaR={2.0} pie sway={vivo} delay={-0.45} />
 
       {/* CABEZA (grupo propio .beagle-cabeza: baja al olfatear, sube al aullar). */}
       <g className="beagle-cabeza" style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}>
-        {/* OREJAS LARGUÍSIMAS anchas y CAÍDAS (canela, llegan bajo la mejilla —
-            LA seña del sabueso). Cada una con su vaivén propio; el grupo
-            .beagle-orejas las gobierna en olfatea (cuelgan adelante). */}
+        {/* OREJAS LARGUÍSIMAS anchas y CAÍDAS (canela) — tan largas que casi
+            TAPAN el hocico en reposo: cuelgan hasta bien por debajo de la
+            mejilla y su borde interno roza el morro. LA seña del sabueso. Cada
+            una con su vaivén propio; el grupo .beagle-orejas las gobierna en
+            olfatea (cuelgan adelante). */}
         <g className="beagle-orejas">
           <g className={vivo ? 'beagle-oreja' : undefined}
             style={{ transformBox: 'fill-box', transformOrigin: 'center top', animationDelay: '-0.4s' }}>
-            <g transform="rotate(-16 -5.6 -10.5)">
-              <ellipse cx="-5.8" cy="-6.6" rx={PR.orejaRx} ry={PR.orejaRy} fill={P.canela} stroke={RH_INK} strokeWidth="1.2" />
-              <ellipse cx="-5.9" cy="-5.8" rx={PR.orejaRx * 0.55} ry={PR.orejaRy * 0.68} fill={P.canelaHondo} opacity="0.6" />
+            <g transform="rotate(-13 -5.6 -10.0)">
+              <ellipse cx="-5.6" cy="-5.6" rx={PR.orejaRx} ry={PR.orejaRy} fill={P.canela} stroke={RH_INK} strokeWidth="1.2" />
+              <ellipse cx="-5.7" cy="-4.6" rx={PR.orejaRx * 0.55} ry={PR.orejaRy * 0.66} fill={P.canelaHondo} opacity="0.6" />
             </g>
           </g>
           <g className={vivo ? 'beagle-oreja' : undefined}
             style={{ transformBox: 'fill-box', transformOrigin: 'center top', animationDelay: '-1.7s' }}>
-            <g transform="rotate(16 5.6 -10.5)">
-              <ellipse cx="5.8" cy="-6.6" rx={PR.orejaRx} ry={PR.orejaRy} fill={P.canela} stroke={RH_INK} strokeWidth="1.2" />
-              <ellipse cx="5.9" cy="-5.8" rx={PR.orejaRx * 0.55} ry={PR.orejaRy * 0.68} fill={P.canelaHondo} opacity="0.6" />
+            <g transform="rotate(13 5.6 -10.0)">
+              <ellipse cx="5.6" cy="-5.6" rx={PR.orejaRx} ry={PR.orejaRy} fill={P.canela} stroke={RH_INK} strokeWidth="1.2" />
+              <ellipse cx="5.7" cy="-4.6" rx={PR.orejaRx * 0.55} ry={PR.orejaRy * 0.66} fill={P.canelaHondo} opacity="0.6" />
             </g>
           </g>
         </g>
@@ -234,31 +243,41 @@ export function Beagle({
             frente, entre los ojos — la firma de la cara tricolor) */}
         <path d="M-1.4,-1.2 C-1.9,-5.2 -1.3,-9.4 0,-12.4 C1.3,-9.4 1.9,-5.2 1.4,-1.2 Z"
           fill={P.lista} opacity="0.95" />
-        {/* HOCICO ANCHO claro con belfos de sabueso (morro amplio, no fino) */}
-        <path d="M-3.1,-4.4 C-3.5,-1.8 -1.7,-0.9 0,-0.9 C1.7,-0.9 3.5,-1.8 3.1,-4.4 C1.5,-3.1 -1.5,-3.1 -3.1,-4.4 Z"
+        {/* HOCICO ANCHO y CUADRADO con belfos de sabueso (morro amplio y romo,
+            nada fino — el morro cuadrado es firma de la raza) */}
+        <path d="M-3.8,-4.7 C-4.1,-1.5 -2.1,-0.6 0,-0.6 C2.1,-0.6 4.1,-1.5 3.8,-4.7 C1.9,-3.3 -1.9,-3.3 -3.8,-4.7 Z"
           fill={P.hocico} opacity="0.96" />
         {/* la línea de los belfos (del centro de la trufa a la boca) */}
-        <line x1="0" y1="-3.9" x2="0" y2="-2.9" stroke={RH_INK} strokeWidth="0.35" opacity="0.7" />
+        <line x1="0" y1="-4.0" x2="0" y2="-2.8" stroke={RH_INK} strokeWidth="0.35" opacity="0.7" />
         {/* chapetas (rubor dulce) */}
         <Cachetes puntos={[{ cx: -4.3, cy: -4.6, r: 1.2 }, { cx: 4.3, cy: -4.6, r: 1.2 }]} vivo={vivo} />
         {boca}
         {/* TRUFA GRANDE negra (la nariz manda: el sabueso ES su nariz) —
             grupo propio .beagle-nariz (tiembla al olfatear) */}
         <g className={vivo ? 'beagle-nariz' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
-          <ellipse cx="0" cy="-4.5" rx="1.35" ry="1.0" fill={P.nariz} />
+          <ellipse cx="0" cy="-4.6" rx="1.6" ry="1.2" fill={P.nariz} />
           {/* el brillito húmedo de la trufa sana */}
-          <circle cx="-0.4" cy="-4.8" r="0.3" fill="#fffdf7" opacity="0.7" />
+          <circle cx="-0.5" cy="-4.95" r="0.36" fill="#fffdf7" opacity="0.7" />
         </g>
-        {/* OJOS GRANDES café dulces (mirada de sabueso que pide caminata) */}
+        {/* OJOS MUY GRANDES y REDONDOS café — la mirada dulce-suplicante ("de
+            llanto") del beagle: su gancho de simpatía. */}
         <OjosRubber
-          ojos={[{ cx: -2.7, cy: -7.8, r: 2.0 }, { cx: 2.7, cy: -7.8, r: 2.0 }]}
-          mirar={[0, 0.14]}
+          ojos={[{ cx: -2.8, cy: -7.7, r: 2.25 }, { cx: 2.8, cy: -7.7, r: 2.25 }]}
+          mirar={[0, 0.1]}
           parpadea={vivo}
         />
         {/* iris café grande que enmarca la pupila (dulzura, no fiereza) */}
-        <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.55" opacity="0.75">
-          <circle cx="-2.7" cy="-7.8" r="1.55" />
-          <circle cx="2.7" cy="-7.8" r="1.55" />
+        <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.6" opacity="0.75">
+          <circle cx="-2.8" cy="-7.7" r="1.72" />
+          <circle cx="2.8" cy="-7.7" r="1.72" />
+        </g>
+        {/* PÁRPADO INFERIOR húmedo (el borde de "llanto" que da la súplica) +
+            CEJAS PREOCUPADAS con el interior alzado (la carita que ruega). */}
+        <g aria-hidden="true" fill="none" stroke={RH_INK} strokeLinecap="round">
+          <path d="M-4.7,-6.0 Q-2.8,-4.9 -0.9,-6.0" strokeWidth="0.5" opacity="0.5" />
+          <path d="M0.9,-6.0 Q2.8,-4.9 4.7,-6.0" strokeWidth="0.5" opacity="0.5" />
+          <path d="M-4.9,-10.0 Q-3.2,-10.8 -1.5,-10.6" strokeWidth="0.85" opacity="0.8" />
+          <path d="M4.9,-10.0 Q3.2,-10.8 1.5,-10.6" strokeWidth="0.85" opacity="0.8" />
         </g>
       </g>
 

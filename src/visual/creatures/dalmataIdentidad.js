@@ -50,13 +50,13 @@ export const DALMATA_PALETA = {
 };
 
 export const DALMATA_PROPORCION = {
-  troncoRx: 7.4,            // ATLÉTICO: más ALTO que ancho (cuerpo casi cuadrado, esbelto)
-  troncoRy: 8.8,
+  troncoRx: 7.6,            // ATLÉTICO: cuerpo casi CUADRADO (rx≈ry, ~1:1) con pecho PROFUNDO
+  troncoRy: 7.8,
   cabezaR: 5.3,             // cabeza proporcionada (no cachetona: perro fino)
-  orejaRx: 1.9,             // oreja caída (lóbulo colgante moteado)
-  orejaRy: 3.3,
+  orejaRx: 2.0,             // oreja caída (lóbulo colgante MOTEADO)
+  orejaRy: 3.5,
   hocicoLargo: 4.6,         // el HOCICO LARGO de la raza (baja bien por debajo de la cara)
-  pataLarga: 13.2,          // hasta dónde llegan las PATAS LARGAS (y del pie)
+  pataLarga: 13.4,          // hasta dónde llegan las PATAS LARGAS y FINAS (y del pie)
 };
 
 /*
