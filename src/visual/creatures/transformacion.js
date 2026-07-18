@@ -39,6 +39,8 @@ export const AURA_POR_BICHO = Object.freeze({
   danta: '#a8e05f',            // VERDE SEMILLA (la jardinera del bosque: todo lo que pisa, germina)
   condor: '#9fd8ff',           // CELESTE DE ALTURA (el señor del viento: el cielo a 5000 msnm)
   'ent-frailejon': '#8fdcae',  // VERDE-PLATEADO del guardián del páramo (modo-guardián: el frailejón se yergue a intervenir)
+  dalmata: '#3b7dff',          // AZUL COBALTO leal (el perro atlético de la casa)
+  beagle: '#c9772e',           // CANELA DE RASTRO (la nariz de oro del sabueso)
 });
 
 /* Aura por defecto si el slug no está mapeado (la dorada de la guía). */
