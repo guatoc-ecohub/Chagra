@@ -106,8 +106,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
         position: 'fixed',
         bottom: 'max(90px, calc(env(safe-area-inset-bottom) + 90px))',
         right: 14,
-        width: 64,
-        height: 64,
+        width: 84,
+        height: 84,
         borderRadius: '50%',
         // Angelita vuela LIBRE: sin plinto ni borde — una abeja en la esquina,
         // no un icono enfrascado. La legibilidad sobre cualquier fondo la pone
@@ -137,7 +137,7 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       <span style={{ pointerEvents: 'none', display: 'flex' }} aria-hidden="true">
         <Angelita
           estado={estado}
-          size={62}
+          size={82}
           direccion="izquierda"
           className={responseReady ? 'agt-avatar-glow' : undefined}
           title="Angelita, la asistente de Chagra"

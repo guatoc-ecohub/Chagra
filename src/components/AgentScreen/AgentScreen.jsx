@@ -3595,7 +3595,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             Angelita, "jubila el colibrí" — operador). */}
         <ChagraAgentAvatar
           state={state === STATE_RECORDING ? 'listening' : (state === STATE_THINKING || isVoicePlaying) ? 'thinking' : 'idle'}
-          size={36}
+          size={52}
           onDoubleClick={async () => {
             if (isSpeaking() || ttsEnabled) {
               stop(); setTtsEnabled(false); agentSounds.cancel(); return;
@@ -4096,7 +4096,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               }}
             >
               <ChagraAgentAvatar
-                size={38}
+                size={46}
                 state={state === STATE_THINKING ? 'thinking' : 'idle'}
                 ariaLabel="Enviar al agente"
               />

@@ -36,12 +36,19 @@ export default function ChagraAgentAvatarAngelita({
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
+    // Extras que solo Angelita entiende (los avatares hermanos los ignoran):
+    // visema 'V1'..'V4' de useLipSync (lip-sync al hablar) y confianza del
+    // modo científico (0..1 o 'alta'|'media'|'baja' → anillo de certeza).
+    visema = null,
+    confianza = null,
 }) {
     const estado = ESTADO_DE_STATE[state] || 'acompana';
     const abeja = (
         <Angelita
             estado={estado}
             size={size}
+            visema={visema}
+            confianza={confianza}
             className={`${glow ? 'agt-avatar-glow ' : ''}${className}`.trim() || undefined}
             title={ariaLabel}
         />

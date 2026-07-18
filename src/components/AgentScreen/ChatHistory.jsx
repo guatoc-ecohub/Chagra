@@ -281,7 +281,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
             <span className="v3-byline-avatar is-streaming">
               <ChagraAgentAvatar
                 state="thinking"
-                size={22}
+                size={30}
                 ariaLabel={MSG.agente.pensandoAria}
               />
             </span>

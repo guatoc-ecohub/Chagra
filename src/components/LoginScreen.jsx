@@ -6,7 +6,7 @@ import { setCurrentOperator } from '../services/operatorIdentityService';
 import { setActiveTenantId } from '../services/tenantContext';
 import { version as APP_VERSION } from '../../package.json';
 import ChagraGrowLoader from './ChagraGrowLoader';
-import ChagraAgentAvatarColibri from './ChagraAgentAvatarColibri';
+import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
 import LegalLinks from './LegalLinks';
 import WelcomeStatsHero from './WelcomeStatsHero';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
@@ -196,10 +196,10 @@ export default function LoginScreen({ onLoginSuccess, onSave }) {
               aria-hidden="true"
               className="absolute inset-0 rounded-full ring-1 ring-muzo/20 animate-pulse"
             />
-            <ChagraAgentAvatarColibri
+            <ChagraAgentAvatarAngelita
               state="idle"
-              size={92}
-              ariaLabel="Colibrí Barbudito, símbolo de Chagra"
+              size={108}
+              ariaLabel="Angelita, la abeja de Chagra"
             />
           </div>
 
