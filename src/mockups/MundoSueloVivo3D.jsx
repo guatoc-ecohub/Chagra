@@ -12,10 +12,16 @@
  *   R — Roca madre: el cimiento pétreo del que, con siglos, se hace un suelo.
  *
  * Y lo que hace que ese perfil esté VIVO, no sea un diagrama:
- *   - una planta con su SISTEMA RADICULAR real bajando por O→A→B;
+ *   - una planta (frijol) con su SISTEMA RADICULAR real bajando por O→A→B, y sus
+ *     NÓDULOS DE RHIZOBIUM rosados: la leguminosa fijando nitrógeno del aire;
  *   - las MICORRIZAS (hifas doradas) abrazando la raíz — la sociedad hongo-raíz;
+ *   - la macro-fauna del suelo sano, por capas: la LOMBRIZ y el ESCARABAJO
+ *     ESTERCOLERO (SVG rubber-hose de la casa, como billboards), las HORMIGAS en
+ *     fila por su túnel, los ÁCAROS caminando la hojarasca, y los HONGOS
+ *     descomponedores con su MICELIO saprofito comiéndose la hoja muerta;
  *   - el AGUA que se infiltra desde la superficie y baja de horizonte a horizonte;
- *   - la MATERIA ORGÁNICA (hojas y motas) que se descompone hacia humus;
+ *   - la HOJARASCA EN DESCOMPOSICIÓN en tres estados (fresca→parda→esqueleto)
+ *     fragmentándose y bajando hacia el humus;
  *   - y, a la derecha, una MUESTRA AMPLIADA (se reutiliza el diorama de
  *     MicrofaunaSuelo del framework) con la micro-fauna que no se ve a simple
  *     vista: lombriz, colémbolo, ácaro, la red de hifas y las bacterias.
@@ -47,6 +53,8 @@ import { PALETA, mezclar } from '../visual/mundo3d/atmosferaMadre.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
 import { ParticulasAmbientales } from '../visual/mundo3d/ParticulasAmbientales.jsx';
 import { DioramaMicrofaunaSuelo } from '../visual/mundo3d/MicrofaunaSuelo.jsx';
+import { Lombriz } from '../visual/creatures/Lombriz.jsx';
+import { Escarabajo } from '../visual/creatures/Escarabajo.jsx';
 
 /* La hora dorada canónica (espejo de ATMOSFERA): única fuente de la atmósfera. */
 const DORADA = CIELOS_HORA.dorada;
@@ -77,6 +85,21 @@ const P = {
   agua: mezclar(PALETA.agua, DORADA.cielo, 0.3), // la gota que se infiltra
   lombriz: '#e39a86', // la lombriz del corte macro
   lombrizAlt: '#d6836d',
+  // — la vida del suelo que se agrega en este corte —
+  nodulo: '#e79a86', // nódulo de rhizobium en la raíz de frijol (rosado = N₂ fijado)
+  noduloAlt: '#f4b39c',
+  micelio: '#f4efe2', // micelio saprofito: hilos casi blancos que digieren la hojarasca
+  hongoTallo: mezclar('#e8dcc4', TINTE, 0.14), // estípite (pie) pálido de la seta
+  hongoSombrero: mezclar('#c25a38', TINTE, 0.16), // sombrero teja andino
+  hongoSombreroAlt: mezclar('#d98844', TINTE, 0.16),
+  hongoLaminas: mezclar('#7c4a2e', TINTE, 0.12), // láminas bajo el sombrero
+  hormiga: mezclar('#241610', TINTE, 0.06), // hormiga parda oscura
+  hormigaAlt: mezclar('#3c2416', TINTE, 0.08),
+  acaroCuerpo: mezclar('#b34b34', TINTE, 0.12), // ácaro rojo-teja estilizado
+  acaroPata: '#241610',
+  hojaVerde: mezclar('#6f9a45', TINTE, 0.16), // hoja recién caída (fresca)
+  hojaParda: mezclar('#8a6a30', TINTE, 0.2), // hoja a media descomposición
+  hojaEsqueleto: mezclar('#54401f', TINTE, 0.18), // hoja esqueletizada, ya casi humus
 };
 
 /* Geometría del bloque cortado. El FRENTE es la cara leída: la vida se pega o
@@ -323,10 +346,29 @@ function generarRaiz(seed, hx, maxDepth) {
   const raizSegs = [];
   const hifaSegs = [];
   const nodos = [];
+  const nodulos = []; // nódulos de rhizobium: el frijol es leguminosa y fija nitrógeno
+  const lado = new THREE.Vector3();
   function crecer(origen, dir, largo, radio, depth) {
     const d = dir.clone().normalize();
     const fin = origen.clone().addScaledVector(d, largo);
     raizSegs.push({ ...segmento(origen, fin), radio });
+    // nódulos de rhizobium en las raíces medias del frijol (rosados = fijando N₂)
+    if (depth >= 1 && depth <= maxDepth && r() < 0.55) {
+      // se cuelgan a un costado de la raíz, donde de verdad crecen
+      lado.set(d.z, 0, -d.x).normalize().multiplyScalar(radio * 1.4 + 0.02);
+      const centro = origen.clone().add(fin).multiplyScalar(0.5).add(lado);
+      const cuantos = 1 + Math.floor(r() * 3);
+      for (let k = 0; k < cuantos; k++) {
+        nodulos.push({
+          pos: [
+            centro.x + (r() - 0.5) * 0.06,
+            centro.y + (r() - 0.5) * 0.08,
+            centro.z + (r() - 0.5) * 0.05,
+          ],
+          s: 0.032 + r() * 0.026,
+        });
+      }
+    }
     // penacho de micorrizas en el nodo (la raíz "pesca" nutrientes con el hongo)
     if (depth >= 1 && r() < 0.85) {
       const nh = 1 + Math.floor(r() * 2);
@@ -358,11 +400,11 @@ function generarRaiz(seed, hx, maxDepth) {
     }
   }
   crecer(new THREE.Vector3(hx, 0.0, FRENTE - 0.25), new THREE.Vector3(0, -1, 0), 0.85, 0.1, 0);
-  return { raizSegs, hifaSegs, nodos };
+  return { raizSegs, hifaSegs, nodos, nodulos };
 }
 
 function SistemaRaiz({ hx, maxDepth, reducedMotion }) {
-  const { raizSegs, hifaSegs, nodos } = useMemo(() => generarRaiz(41, hx, maxDepth), [hx, maxDepth]);
+  const { raizSegs, hifaSegs, nodos, nodulos } = useMemo(() => generarRaiz(41, hx, maxDepth), [hx, maxDepth]);
   const mats = useRef([]);
   const nodoRefs = useRef([]);
   const colBase = useMemo(() => new THREE.Color(P.hifa), []);
@@ -407,42 +449,339 @@ function SistemaRaiz({ hx, maxDepth, reducedMotion }) {
           <meshBasicMaterial color={P.nodo} />
         </mesh>
       ))}
+      {/* nódulos de rhizobium: bolitas rosadas colgadas de la raíz del frijol.
+          El rosa es leghemoglobina: la señal de que ahí se está fijando nitrógeno. */}
+      {nodulos.map((nd, i) => (
+        <mesh key={`nod-${i}`} position={nd.pos} scale={nd.s}>
+          <sphereGeometry args={[1, 8, 7]} />
+          <meshLambertMaterial color={i % 2 === 0 ? P.nodulo : P.noduloAlt} flatShading />
+        </mesh>
+      ))}
     </group>
   );
 }
 
-/* ── Una lombriz en el humus: cadena de esferas con onda peristáltica ──────── */
-function LombrizMacro({ base, reducedMotion }) {
-  const segs = useRef([]);
-  const puntos = useMemo(() => {
-    const N = 8;
-    return Array.from({ length: N }, (_, i) => {
-      const u = i / (N - 1);
-      return { x: -0.5 + u * 1.0, y: Math.sin(u * Math.PI * 1.2) * 0.14, r: 0.05 + 0.03 * Math.sin(u * Math.PI) };
-    });
-  }, []);
-  useFrame((state) => {
-    if (reducedMotion) return;
-    const t = state.clock.elapsedTime * 2.0;
-    for (let i = 0; i < segs.current.length; i++) {
-      const g = segs.current[i];
-      if (!g) continue;
-      const w = Math.sin(t - i * 0.55);
-      g.position.y = puntos[i].y + w * 0.04;
-      g.scale.set(1 - w * 0.1, 1 + w * 0.2, 1 - w * 0.1);
-    }
+/* ── La LOMBRIZ (SVG rubber-hose de la casa) asomando por su túnel en el humus ─ *
+   Se reutiliza el SVG `Lombriz` (Martiodrilus, la gigante andina) como billboard,
+   no se re-dibuja en low-poly (decisión de arte: el SVG le gana). El túnel oscuro
+   detrás le da el "acaba de asomar del suelo". Se mece suave (asomar/mecerse lo
+   pone la escena, como dice la propia criatura). */
+function LombrizBillboard({ pos, px = 66, factor = 2.7, giro = 0, fase = 0, tunel = true, reducedMotion }) {
+  const grupo = useRef(null);
+  useFrame(({ clock }) => {
+    if (reducedMotion || !grupo.current) return;
+    const t = clock.elapsedTime;
+    grupo.current.position.y = pos[1] + Math.sin(t * 1.2 + fase) * 0.05;
+    grupo.current.position.x = pos[0] + Math.sin(t * 0.6 + fase) * 0.025;
   });
   return (
+    <group ref={grupo} position={pos}>
+      {/* boca del túnel: mancha oscura de donde sale la lombriz */}
+      {tunel && (
+        <mesh position={[0, -0.02, -0.06]}>
+          <circleGeometry args={[0.18, 16]} />
+          <meshBasicMaterial color={P.humus} transparent opacity={0.9} depthWrite={false} />
+        </mesh>
+      )}
+      <Html center distanceFactor={factor} zIndexRange={[18, 0]} pointerEvents="none">
+        <div
+          aria-hidden="true"
+          data-bicho="lombriz"
+          style={{ transform: `rotate(${giro}deg)`, filter: 'drop-shadow(0 2px 4px rgba(20,14,8,0.4))', pointerEvents: 'none' }}
+        >
+          <Lombriz size={px} animated={!reducedMotion} />
+        </div>
+      </Html>
+    </group>
+  );
+}
+
+/* ── El ESCARABAJO ESTERCOLERO (SVG de la casa) rodando su bola de abono ─────── *
+   Dichotomius: entierra el estiércol y recicla nutrientes. Se reutiliza el SVG
+   `Escarabajo` (que ya trae bola + patas animadas) como billboard, empujándolo
+   despacio por la superficie de la hojarasca. */
+function EscarabajoBillboard({ base, px = 74, factor = 2.6, reducedMotion }) {
+  const grupo = useRef(null);
+  useFrame(({ clock }) => {
+    if (reducedMotion || !grupo.current) return;
+    const p = (clock.elapsedTime * 0.16) % 1;
+    grupo.current.position.x = base[0] + (0.5 - p) * 2.0; // avanza empujando la bola
+    grupo.current.position.y = base[1] + Math.abs(Math.sin(p * Math.PI * 7)) * 0.025; // brinquitos
+  });
+  return (
+    <group ref={grupo} position={base}>
+      <Html center distanceFactor={factor} zIndexRange={[19, 0]} pointerEvents="none">
+        <div
+          aria-hidden="true"
+          data-bicho="escarabajo"
+          style={{ filter: 'drop-shadow(0 2px 5px rgba(20,14,8,0.45))', pointerEvents: 'none' }}
+        >
+          <Escarabajo size={px} animated={!reducedMotion} />
+        </div>
+      </Html>
+    </group>
+  );
+}
+
+/* ── HONGOS: setas sobre la hojarasca + micelio saprofito que la digiere ─────── *
+   No es la micorriza de la raíz (esa es la sociedad hongo↔planta): éste es el
+   hongo descomponedor que come la hoja muerta y la vuelve humus. Sombrero teja,
+   pie pálido, láminas debajo; y una malla de hilos blancos que baja al humus. */
+function Hongos({ base, n, reducedMotion }) {
+  const capaRefs = useRef([]);
+  const setas = useMemo(() => {
+    const r = rng(577);
+    return Array.from({ length: n }, (_, i) => ({
+      key: i,
+      x: (r() - 0.5) * 0.9,
+      z: (r() - 0.5) * 0.5,
+      alto: 0.14 + r() * 0.12,
+      radio: 0.09 + r() * 0.07,
+      giro: r() * Math.PI,
+      col: r() < 0.5 ? P.hongoSombrero : P.hongoSombreroAlt,
+      fase: r() * Math.PI * 2,
+    }));
+  }, [n]);
+  // micelio: hilos que salen del pie del racimo y se abren bajando al humus
+  const hilos = useMemo(() => {
+    const r = rng(601);
+    const raiz = new THREE.Vector3(0, -0.02, 0);
+    return Array.from({ length: n * 4 + 6 }, () => {
+      const dir = new THREE.Vector3((r() - 0.5) * 1.4, -0.4 - r() * 0.6, (r() - 0.5) * 0.6).normalize();
+      const largo = 0.28 + r() * 0.45;
+      const fin = raiz.clone().addScaledVector(dir, largo);
+      return { ...segmento(raiz, fin), largo };
+    });
+  }, [n]);
+
+  useFrame(({ clock }) => {
+    if (reducedMotion) return;
+    const t = clock.elapsedTime;
+    for (let i = 0; i < capaRefs.current.length; i++) {
+      const c = capaRefs.current[i];
+      if (!c) continue;
+      c.rotation.z = Math.sin(t * 1.1 + setas[i].fase) * 0.06; // brisa bajo tierra, mínima
+    }
+  });
+
+  return (
     <group position={base}>
-      {puntos.map((p, i) => (
-        <group key={i} ref={(el) => { segs.current[i] = el; }} position={[p.x, p.y, 0]}>
-          <mesh>
-            <sphereGeometry args={[p.r, 8, 6]} />
-            <meshLambertMaterial color={i % 2 === 0 ? P.lombriz : P.lombrizAlt} flatShading />
+      {/* la malla de micelio saprofito (hilos casi blancos, mate) */}
+      {hilos.map((h, i) => (
+        <mesh key={`mic-${i}`} position={h.pos} quaternion={h.quat} scale={[0.006, h.largo, 0.006]}>
+          <cylinderGeometry args={[1, 1, 1, 4]} />
+          <meshBasicMaterial color={P.micelio} transparent opacity={0.72} />
+        </mesh>
+      ))}
+      {/* el racimo de setas */}
+      {setas.map((s, i) => (
+        <group key={s.key} position={[s.x, 0, s.z]} rotation={[0, s.giro, 0]}>
+          <group ref={(el) => { capaRefs.current[i] = el; }}>
+            {/* pie */}
+            <mesh position={[0, s.alto / 2, 0]}>
+              <cylinderGeometry args={[s.radio * 0.32, s.radio * 0.42, s.alto, 6]} />
+              <meshLambertMaterial color={P.hongoTallo} flatShading />
+            </mesh>
+            {/* láminas bajo el sombrero */}
+            <mesh position={[0, s.alto, 0]}>
+              <cylinderGeometry args={[s.radio * 0.9, s.radio * 0.55, s.radio * 0.28, 10]} />
+              <meshLambertMaterial color={P.hongoLaminas} flatShading />
+            </mesh>
+            {/* sombrero (media esfera achatada) */}
+            <mesh position={[0, s.alto + s.radio * 0.16, 0]} scale={[1, 0.62, 1]}>
+              <sphereGeometry args={[s.radio, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+              <meshLambertMaterial color={s.col} flatShading />
+            </mesh>
+          </group>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+/* ── HORMIGAS en fila: cabeza+tórax+gáster, 6 patas, antenas. Recorren un túnel ─ *
+   Las hormigas del suelo airean la tierra y bajan materia orgánica a sus nidos.
+   Van en hilera por un sendero determinista dentro del humus. */
+function Hormiga({ escala = 1, reducedMotion }) {
+  const patas = useRef([]);
+  useFrame(({ clock }) => {
+    if (reducedMotion) return;
+    const t = clock.elapsedTime * 9;
+    for (let i = 0; i < patas.current.length; i++) {
+      const p = patas.current[i];
+      if (p) p.rotation.z = Math.sin(t + i * 1.3) * 0.35;
+    }
+  });
+  const patasDef = useMemo(
+    () => [-0.03, 0, 0.03].flatMap((zx) => [1, -1].map((lado) => ({ zx, lado }))),
+    [],
+  );
+  return (
+    <group scale={escala}>
+      {/* gáster (abdomen) */}
+      <mesh position={[-0.06, 0.015, 0]} scale={[1.3, 1, 1]}>
+        <sphereGeometry args={[0.032, 8, 7]} />
+        <meshLambertMaterial color={P.hormiga} flatShading />
+      </mesh>
+      {/* tórax */}
+      <mesh position={[0, 0.012, 0]}>
+        <sphereGeometry args={[0.02, 8, 7]} />
+        <meshLambertMaterial color={P.hormigaAlt} flatShading />
+      </mesh>
+      {/* cabeza */}
+      <mesh position={[0.045, 0.015, 0]}>
+        <sphereGeometry args={[0.024, 8, 7]} />
+        <meshLambertMaterial color={P.hormiga} flatShading />
+      </mesh>
+      {/* ojitos */}
+      <mesh position={[0.058, 0.022, 0.014]}><sphereGeometry args={[0.006, 6, 6]} /><meshBasicMaterial color="#fbf6ec" /></mesh>
+      <mesh position={[0.058, 0.022, -0.014]}><sphereGeometry args={[0.006, 6, 6]} /><meshBasicMaterial color="#fbf6ec" /></mesh>
+      {/* antenas */}
+      <mesh position={[0.06, 0.035, 0.01]} rotation={[0, 0, -0.7]}><cylinderGeometry args={[0.003, 0.003, 0.05, 4]} /><meshBasicMaterial color={P.hormigaAlt} /></mesh>
+      <mesh position={[0.06, 0.035, -0.01]} rotation={[0, 0, -0.7]}><cylinderGeometry args={[0.003, 0.003, 0.05, 4]} /><meshBasicMaterial color={P.hormigaAlt} /></mesh>
+      {/* patas */}
+      {patasDef.map((pt, i) => (
+        <group key={i} ref={(el) => { patas.current[i] = el; }} position={[pt.zx, 0.006, 0.016 * pt.lado]}>
+          <mesh position={[0, -0.012, 0.014 * pt.lado]} rotation={[pt.lado * 0.5, 0, pt.lado * 0.5]}>
+            <cylinderGeometry args={[0.0028, 0.0028, 0.05, 4]} />
+            <meshBasicMaterial color={P.acaroPata} />
           </mesh>
         </group>
       ))}
     </group>
+  );
+}
+
+function HormigasEnFila({ n, reducedMotion }) {
+  const refs = useRef([]);
+  // sendero determinista dentro del humus (curva suave que baja hacia el nido)
+  const camino = useMemo(() => {
+    const puntos = [];
+    for (let i = 0; i <= 24; i++) {
+      const u = i / 24;
+      puntos.push(new THREE.Vector3(
+        3.4 - u * 3.2,
+        -0.35 - u * 1.15 + Math.sin(u * Math.PI * 2) * 0.12,
+        FRENTE - 0.06 - Math.sin(u * Math.PI) * 0.12,
+      ));
+    }
+    return new THREE.CatmullRomCurve3(puntos);
+  }, []);
+  const hormigas = useMemo(
+    () => Array.from({ length: n }, (_, i) => ({ key: i, off: i / n, escala: 0.85 + (i % 2) * 0.16 })),
+    [n],
+  );
+  const up = useMemo(() => new THREE.Vector3(0, 1, 0), []);
+
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime * (reducedMotion ? 0 : 0.045);
+    for (let i = 0; i < refs.current.length; i++) {
+      const g = refs.current[i];
+      if (!g) continue;
+      const u = ((t + hormigas[i].off) % 1 + 1) % 1;
+      const pos = camino.getPoint(u);
+      const tan = camino.getTangent(u);
+      g.position.copy(pos);
+      g.quaternion.setFromUnitVectors(new THREE.Vector3(1, 0, 0), tan.clone().setY(tan.y * 0.4).normalize());
+      // ligera corrección para que no se vuelquen
+      g.up.copy(up);
+    }
+  });
+
+  return (
+    <group>
+      {hormigas.map((h, i) => (
+        <group key={h.key} ref={(el) => { refs.current[i] = el; }}>
+          <Hormiga escala={h.escala} reducedMotion={reducedMotion} />
+        </group>
+      ))}
+    </group>
+  );
+}
+
+/* ── ÁCARO estilizado: cuerpo redondo teja + 8 patitas, camina lento por la hoja ─ */
+function AcaroSuelo({ base, escala = 1, fase = 0, reducedMotion }) {
+  const cuerpo = useRef(null);
+  const patas = useRef([]);
+  const patasDef = useMemo(() => Array.from({ length: 8 }, (_, i) => ({ lado: i < 4 ? 1 : -1, ang: ((i % 4) - 1.5) * 0.5 })), []);
+  useFrame(({ clock }) => {
+    if (reducedMotion || !cuerpo.current) return;
+    const a = clock.elapsedTime * 0.4 + fase;
+    cuerpo.current.position.x = base[0] + Math.cos(a) * 0.22;
+    cuerpo.current.position.z = base[2] + Math.sin(a * 1.3) * 0.04;
+    cuerpo.current.rotation.y = a + Math.PI / 2;
+    for (let i = 0; i < patas.current.length; i++) {
+      const p = patas.current[i];
+      if (p) p.rotation.x = Math.sin(clock.elapsedTime * 7 + i * 1.1) * 0.3;
+    }
+  });
+  return (
+    <group ref={cuerpo} position={base} scale={escala}>
+      <mesh><sphereGeometry args={[0.075, 10, 9]} /><meshLambertMaterial color={P.acaroCuerpo} flatShading /></mesh>
+      <mesh position={[0, 0.015, 0.06]} scale={[0.7, 0.6, 0.7]}><sphereGeometry args={[0.05, 8, 7]} /><meshLambertMaterial color="#9a3d2a" flatShading /></mesh>
+      <mesh position={[0.028, 0.03, 0.07]}><sphereGeometry args={[0.012, 6, 6]} /><meshBasicMaterial color="#fbf6ec" /></mesh>
+      <mesh position={[-0.028, 0.03, 0.07]}><sphereGeometry args={[0.012, 6, 6]} /><meshBasicMaterial color="#fbf6ec" /></mesh>
+      {patasDef.map((pt, i) => (
+        <group key={i} position={[0.062 * pt.lado, -0.012, 0]} rotation={[0, 0, pt.ang * pt.lado]}>
+          <group ref={(el) => { patas.current[i] = el; }}>
+            <mesh position={[0.05 * pt.lado, -0.012, 0]} rotation={[0, 0, pt.lado * 0.6]}>
+              <cylinderGeometry args={[0.005, 0.004, 0.1, 4]} />
+              <meshBasicMaterial color={P.acaroPata} />
+            </mesh>
+          </group>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+/* ── HOJARASCA EN DESCOMPOSICIÓN: hojas en tres estados (fresca→parda→esqueleto)
+      posadas sobre el horizonte O, fragmentándose y bajando hacia el humus. ── */
+function HojarascaDescompone({ tier }) {
+  const hojas = useMemo(() => {
+    const r = rng(733);
+    const N = tier === 'bajo' ? 8 : tier === 'medio' ? 16 : 26;
+    const estados = [
+      { col: P.hojaVerde, y: 0.345, r0: 0.18, r1: 0.26 }, // recién caída, arriba
+      { col: P.hojaParda, y: 0.315, r0: 0.13, r1: 0.2 }, // a medio comer
+      { col: P.hojaEsqueleto, y: -0.06, r0: 0.07, r1: 0.13 }, // ya casi humus, hundiéndose
+    ];
+    return Array.from({ length: N }, (_, i) => {
+      const e = estados[i % 3];
+      return {
+        key: i,
+        x: (r() - 0.5) * (ANCHO - 0.6),
+        y: e.y - (i % 3 === 2 ? r() * 0.25 : 0),
+        z: FRENTE - 0.04 - r() * (PROF - 0.6),
+        giroY: r() * Math.PI,
+        inclina: -Math.PI / 2 + (r() - 0.5) * 0.5,
+        s: e.r0 + r() * (e.r1 - e.r0),
+        col: e.col,
+        segs: i % 3 === 2 ? 3 : 5, // las esqueletizadas, más rotas
+      };
+    });
+  }, [tier]);
+  return (
+    <group>
+      {hojas.map((h) => (
+        <mesh key={`hd-${h.key}`} position={[h.x, h.y, h.z]} rotation={[h.inclina, h.giroY, 0]}>
+          <circleGeometry args={[h.s, h.segs]} />
+          <meshLambertMaterial color={h.col} flatShading side={THREE.DoubleSide} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* ── etiqueta didáctica de bicho (píldora billboard, reutiliza el chrome) ────── */
+function EtiquetaVida({ pos, emoji, texto }) {
+  return (
+    <Html position={pos} center distanceFactor={12} zIndexRange={[28, 0]}>
+      <span className="suelo-bicho">
+        <span className="suelo-bicho__emoji" aria-hidden="true">{emoji}</span>
+        {texto}
+      </span>
+    </Html>
   );
 }
 
@@ -567,10 +906,37 @@ function EscenaSuelo({ tier, reducedMotion, riego }) {
       <SolBajo />
 
       <BloqueHorizontes tier={tier} />
+      {/* la hojarasca en descomposición: hoja fresca → parda → esqueleto → humus */}
+      <HojarascaDescompone tier={tier} />
       <PlantaHeroe hx={hx} reducedMotion={reducedMotion} />
       <SistemaRaiz hx={hx} maxDepth={maxDepth} reducedMotion={reducedMotion} />
-      <LombrizMacro base={[1.4, -0.7, FRENTE - 0.05]} reducedMotion={reducedMotion} />
-      {tier !== 'bajo' && <LombrizMacro base={[-0.2, -1.15, FRENTE - 0.15]} reducedMotion={reducedMotion} />}
+
+      {/* LOMBRICES: el SVG de la casa asomando por sus túneles en el humus */}
+      <LombrizBillboard pos={[1.5, -0.62, FRENTE + 0.02]} giro={-14} fase={0} reducedMotion={reducedMotion} />
+      {tier !== 'bajo' && (
+        <LombrizBillboard pos={[-0.35, -1.12, FRENTE + 0.01]} giro={24} fase={2.1} px={58} factor={2.4} reducedMotion={reducedMotion} />
+      )}
+
+      {/* ESCARABAJO ESTERCOLERO: rueda su bola de abono por la superficie */}
+      <EscarabajoBillboard base={[2.5, 0.52, FRENTE + 0.05]} reducedMotion={reducedMotion} />
+
+      {/* HONGOS descomponedores + micelio: comen la hoja muerta y la hacen humus */}
+      <Hongos base={[-3.0, 0.33, FRENTE - 0.35]} n={tier === 'bajo' ? 2 : tier === 'medio' ? 3 : 4} reducedMotion={reducedMotion} />
+      {tier === 'alto' && (
+        <Hongos base={[0.7, 0.33, FRENTE - 0.55]} n={2} reducedMotion={reducedMotion} />
+      )}
+
+      {/* HORMIGAS en fila por su túnel (airean el suelo, bajan materia orgánica) */}
+      {tier !== 'bajo' && (
+        <HormigasEnFila n={tier === 'alto' ? 5 : 3} reducedMotion={reducedMotion} />
+      )}
+
+      {/* ÁCAROS estilizados caminando por la hojarasca */}
+      <AcaroSuelo base={[-2.0, 0.36, FRENTE - 0.1]} escala={1} fase={0.4} reducedMotion={reducedMotion} />
+      {tier !== 'bajo' && (
+        <AcaroSuelo base={[3.2, -0.28, FRENTE - 0.05]} escala={0.85} fase={2.7} reducedMotion={reducedMotion} />
+      )}
+
       <AguaInfiltra n={nGotas} riego={riego} reducedMotion={reducedMotion} />
 
       {/* los pines de los cinco horizontes, a la izquierda del corte */}
@@ -584,6 +950,17 @@ function EscenaSuelo({ tier, reducedMotion, riego }) {
           color={h.color}
         />
       ))}
+
+      {/* etiquetas de la vida del suelo (solo en gama alta, para no recargar) */}
+      {tier === 'alto' && (
+        <>
+          <EtiquetaVida pos={[1.5, -0.2, FRENTE + 0.2]} emoji="🪱" texto="Lombriz" />
+          <EtiquetaVida pos={[2.5, 0.95, FRENTE + 0.2]} emoji="🪲" texto="Escarabajo" />
+          <EtiquetaVida pos={[-3.0, 0.85, FRENTE - 0.2]} emoji="🍄" texto="Hongos" />
+          <EtiquetaVida pos={[3.2, 0.25, FRENTE + 0.2]} emoji="🐜" texto="Hormigas" />
+          <EtiquetaVida pos={[hx + 0.9, -1.7, FRENTE]} emoji="🌸" texto="Nódulos (nitrógeno)" />
+        </>
+      )}
 
       {/* la muestra ampliada: la micro-fauna del framework, reutilizada */}
       {tier !== 'bajo' && <MuestraAmpliada tier={tier} reducedMotion={reducedMotion} vida={vidaMuestra} />}
@@ -620,12 +997,14 @@ const CSS_SUELO = `
 .suelo-pin__txt small { font: 500 0.62rem/1.1 system-ui, sans-serif; opacity: 0.8; }
 .suelo-lupa { display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; padding: 0.22rem 0.6rem; border-radius: 999px; background: rgba(58,42,21,0.7); color: #fbf3e2; font: 700 0.72rem/1.1 system-ui, sans-serif; box-shadow: 0 1px 6px rgba(0,0,0,0.3); }
 .suelo-lupa__emoji { font-size: 0.85rem; }
+.suelo-bicho { display: inline-flex; align-items: center; gap: 0.28rem; white-space: nowrap; user-select: none; padding: 0.14rem 0.5rem; border-radius: 999px; background: rgba(255,247,228,0.86); color: #4a3416; font: 700 0.64rem/1.1 system-ui, sans-serif; box-shadow: 0 1px 5px rgba(58,42,21,0.28); border: 1px solid rgba(58,42,21,0.28); }
+.suelo-bicho__emoji { font-size: 0.78rem; }
 @media (prefers-reduced-motion: reduce) { .suelo-canvas { transition: none; } }
 `;
 
 /* La copia didáctica: en calma, la invitación; con riego, la lección del ciclo. */
 const COPY_CALMA =
-  'El suelo no es tierra muerta: es un cuerpo vivo. Baje por el corte —de la hojarasca a la roca madre— y vea las raíces, los hongos y la vida que lo sostienen. Toque el botón para regar.';
+  'El suelo no es tierra muerta: es un cuerpo vivo. Baje por el corte —de la hojarasca a la roca madre— y vea la lombriz, el escarabajo, las hormigas, los hongos que descomponen la hoja y los nódulos que fijan nitrógeno en la raíz del frijol. Toque el botón para regar.';
 const COPY_RIEGO =
   'El agua entra por la hojarasca, baja por el humus abrazando las raíces y se remansa en el subsuelo. Un suelo vivo la guarda como una esponja; uno muerto la deja correr. Por eso se cuida el suelo: es la base de todo.';
 
@@ -685,7 +1064,7 @@ export default function MundoSueloVivo3D() {
       <div className="suelo-chrome">
         <h2 className="suelo-titulo">
           El suelo vivo: la base de todo
-          <small>Corte de perfil — de la hojarasca a la roca madre, con raíces, hongos y micro-fauna</small>
+          <small>Corte de perfil — lombrices, escarabajos, hormigas, hongos, ácaros y raíces con nódulos, de la hojarasca a la roca madre</small>
         </h2>
         <div className="suelo-pie">
           <button
