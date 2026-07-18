@@ -711,7 +711,7 @@ const COPY_ETIQ =
 export default function MundoFrutales3D() {
   const [listo, setListo] = useState(false);
   const [etiquetas, setEtiquetas] = useState(false);
-  const tier = useMemo(() => decidirTier(), []);
+  const tier = useMemo(() => decidirTier().tier, []);
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&

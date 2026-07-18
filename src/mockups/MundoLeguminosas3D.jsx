@@ -1169,7 +1169,7 @@ const CHIPS = [
 export default function MundoLeguminosas3D() {
   const [listo, setListo] = useState(false);
   const [saber, setSaber] = useState(false);
-  const tier = useMemo(() => decidirTier(), []);
+  const tier = useMemo(() => decidirTier().tier, []);
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&
