@@ -72,17 +72,8 @@ import { VeloOdyssey } from '../visual/mundo3d/transiciones/index.js';
 const Valle3D = lazy(() => import('./valle/Valle3D'));
 /* Los lugares del valle en planta, para el minimapa RTS (AoE). */
 const LUGARES_MINIMAPA = componerMundos(MUNDOS_VALLE).map((m) => ({
-  id: m.id, x: m.pos[0], z: m.pos[2], emoji: m.emoji, tinte: m.tinte, nombre: m.nombre,
+  id: m.id, x: m.pos[0], z: m.pos[2], emoji: m.emoji, tinte: m.tinte,
 }));
-
-/* ENTRAR a un mundo como MURAL New Donk (flujo vivo): en vez del velo plano, la
-   cámara del valle 3D hace dolly + aplane ortográfico hacia el lugar del mundo
-   (el 3D asoma en los bordes) y solo al caer dentro un destello con la luz del
-   destino cubre el intercambio de escena. Flag de módulo para revertir al velo
-   de un toque. VOLVER al valle conserva el velo (el New Donk es de ENTRADA).
-   Reduced-motion: el hook de navegación salta la fase 'viajando' → corte
-   directo, sin dolly ni overlay (ni este ni el velo se montan). */
-const ENTRADA_NEWDONK = true;
 
 /* ENTRAR a un mundo como MURAL New Donk (flujo vivo): en vez del velo plano, la
    cámara del valle 3D hace dolly + aplane ortográfico hacia el lugar del mundo
@@ -548,6 +539,16 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
             </Suspense>
             </Valle3DGuard>
           )}
+        {/* AoE: el minimapa RTS del valle (planta, blips, salto-a-lugar) — solo con el valle a la vista */}
+        {!nav.enMundo && (
+          <MinimapaValle
+            lugares={LUGARES_MINIMAPA}
+            foco={focoId}
+            onSaltar={entrarMundo}
+            tier={equipo.tier}
+            reducedMotion={reducedMotion}
+          />
+        )}
         {/* El OVERLAY del cruce: la abeja 2D vuela y se clava como mesh 3D — así
             el usuario SÍ ve el 2D→3D. Se desmonta solo al terminar (onFin);
             reducedMotion → AbejaTransicion no monta nada. */}
