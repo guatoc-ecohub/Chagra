@@ -50,6 +50,8 @@ import AnimalesDeFinca, { MATERIAL_FINCA } from './animales.jsx';
 /* AoE ("Age of Empires del campo"): componentes NUEVOS que densifican y dan
    vida al valle (cada uno instanciado, draw calls acotados). */
 import BosqueDensoValle from './BosqueDensoValle.jsx';
+import CafetalDensoValle from './CafetalDensoValle.jsx';
+import ParamoDensoValle from './ParamoDensoValle.jsx';
 import DetalleSueloValle from './DetalleSueloValle.jsx';
 import { CampesinosValle } from './CampesinosValle.jsx';
 import HatoMovil from './HatoMovil.jsx';
@@ -2118,6 +2120,8 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       <VegetacionPisos nocturno={nocturno} perfil={perfil} />
       {/* AoE: bosque denso 3x + detalle de suelo/surcos + campesinos en faena + hato en movimiento */}
       <BosqueDensoValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      <CafetalDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} zona={[{ cx: 5.2, cz: 1.6, rx: 2.6, rz: 2.2 }]} />
+      <ParamoDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} />
       {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
       {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 14 : tier === 'bajo' ? 5 : 9} radio={3.6} reducedMotion={reducedMotion} />}
 
