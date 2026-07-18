@@ -67,6 +67,7 @@ import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr, Html } from '@react-three/drei';
 import { Danta } from '../visual/creatures/Danta.jsx';
+import { BarbuditoParamo } from '../visual/creatures/BarbuditoParamo.jsx';
 import EntQuenua from '../visual/mundo3d/bosque/EntQuenua.jsx';
 import {
   CorteSuelo,
@@ -199,15 +200,52 @@ function distSendero(wx, wz) {
   return Math.sqrt(d2);
 }
 
+/* ══ EL HILO DE AGUA que SALE del hondón (prioridad agroecológica #1) ══
+   El páramo es una FÁBRICA DE AGUA: sin ver el agua IRSE, "baja a las veredas"
+   no tiene imagen. Del labio frontal del nacimiento sale un cauce que serpentea
+   hacia la cámara (el frente-centro, entre el sendero al occidente y la cárcava
+   al oriente) y se AHONDA hacia el frente: el agua se ve marcharse cuesta abajo,
+   como el hilo de agua que de verdad nace en la turbera y arma la quebrada. */
+const HILO_PUNTOS = [
+  [-0.4, 5.0], // sale del borde SW del ojo de agua
+  [-1.3, 6.6],
+  [-1.9, 8.2],
+  [-2.7, 9.9],
+  [-3.0, 11.8], // desemboca al frente-izquierda (visible, cuesta abajo, fuera de la tarjeta)
+];
+function distHilo(wx, wz) {
+  let d2 = Infinity;
+  for (let i = 0; i < HILO_PUNTOS.length - 1; i++) {
+    const [ax, az] = HILO_PUNTOS[i];
+    const [bx, bz] = HILO_PUNTOS[i + 1];
+    const dx = bx - ax, dz = bz - az;
+    const t = clamp(((wx - ax) * dx + (wz - az) * dz) / (dx * dx + dz * dz), 0, 1);
+    const px = ax + dx * t - wx, pz = az + dz * t - wz;
+    const dd = px * px + pz * pz;
+    if (dd < d2) d2 = dd;
+  }
+  return Math.sqrt(d2);
+}
+
 function alturaParamo(wx, wz) {
   let h = 1.2; // la meseta base, alta
   h += ruido(wx * 0.45, wz * 0.45) * 0.55; // ondulación suave del moor
   h += gauss(wx, wz, -10, -11, 5.6, 4.6) * 2.3; // cuchilla occidental
   h += gauss(wx, wz, 10, -12, 6.2, 4.4) * 2.8; // cuchilla oriental (más alta)
   h += gauss(wx, wz, 0, -15, 8.5, 3.6) * 1.7; // el fondo que cierra el cuenco
-  h -= gauss(wx, wz, AGUA_CX, AGUA_CZ, 5.0, 3.4) * 2.0; // el hondón del nacimiento
+  h -= gauss(wx, wz, AGUA_CX, AGUA_CZ, 5.0, 3.4) * 1.6; // el hondón del nacimiento (menos hondo: el agua se ve)
   h += gauss(wx, wz, ENT_X, ENT_Z, 4.6, 3.8) * 1.15; // el ALTOZANO de la guardiana
   h -= smoothstep(1.2, 0.5, distSendero(wx, wz)) * 0.14; // la huella del sendero
+  // el CAUCE del hilo de agua: un canalito que se AHONDA hacia el frente, para
+  // que el agua del nacimiento se vea MARCHARSE cuesta abajo hacia las veredas.
+  {
+    // canal ANCHO (~2.8) para que la malla del terreno lo resuelva en todo tier
+    // (spacing 0.57/1.0/1.6): un swale de turbera con el agua adentro, no una
+    // ranura fina que la malla gruesa no capta (dejaría la cinta flotando).
+    const enCauce = smoothstep(1.4, 0.35, distHilo(wx, wz));
+    const rampa = smoothstep(5.5, 11.5, wz); // más hondo cuanto más al frente
+    h -= enCauce * (0.16 + rampa * 0.5);
+  }
   // la CÁRCAVA de la lección: NO un pozo — un BARRANCO abierto hacia el frente
   // (+z), como el diorama de EscenaEntMaestro. Un pozo cerrado deja siempre un
   // labio de terreno entre la cámara y las capas bajas y la lección no se ve
@@ -269,6 +307,8 @@ function construirTerreno(seg, plano) {
       c.lerp(cTurba, clamp(humedad(wx, wz) * 0.9, 0, 0.85));
       // el SENDERO de tierra pisada: la línea que guía el ojo hasta la guardiana
       c.lerp(cSendero, smoothstep(1.2, 0.45, distSendero(wx, wz)) * 0.95);
+      // las orillas del HILO de agua: turba negra saturada (el banco mojado)
+      c.lerp(cTurba, smoothstep(1.55, 0.35, distHilo(wx, wz)) * 0.82);
       col[p] = c.r; col[p + 1] = c.g; col[p + 2] = c.b;
       p += 3;
     }
@@ -732,6 +772,7 @@ function Pajonal({ n }) {
       if (Math.hypot(wx - ENT_X, wz - ENT_Z) < 1.6) continue; // no contra el fuste
       if (Math.hypot(wx - TAJO_X, wz - TAJO_Z) < 3.1) continue; // no en la cárcava
       if (distSendero(wx, wz) < 0.5) continue; // no en plena huella
+      if (distHilo(wx, wz) < 0.9) continue; // ni parada dentro del hilo de agua
       const y = alturaParamo(wx, wz);
       if (y > 3.6) continue;
       lista.push({ wx, wz, y, esc: 0.6 + rng() * 0.8, giro: rng() * Math.PI, ladeo: (rng() - 0.5) * 0.4 });
@@ -833,6 +874,82 @@ function Quenua({ pos, esc = 1 }) {
         <sphereGeometry args={[0.38, 7, 5]} />
         <meshLambertMaterial color={mezclar(P.quenuaHoja, TINTE, 0.25)} flatShading />
       </mesh>
+    </group>
+  );
+}
+
+/* ── BOSQUETE de queñuas: un QUEÑUAL apretado y abrigado (NO un damero por el
+      páramo abierto). Las Polylepis se refugian del viento EN GRUPO, al pie de
+      la roca / en un pliegue — así crecen de verdad. Copas que se tocan y la
+      niebla enganchándose entre ellas. ── */
+function BosqueteQuenua({ centro, seed = 7, n = 6 }) {
+  const arboles = useMemo(() => {
+    const rng = crearRng(seed);
+    return Array.from({ length: n }, () => {
+      const a = rng() * Math.PI * 2;
+      const r = 0.3 + rng() * 2.1; // apretado: radio pequeño
+      const x = centro[0] + Math.cos(a) * r;
+      const z = centro[1] + Math.sin(a) * r * 0.8;
+      return { x, z, esc: 0.82 + rng() * 0.8 };
+    });
+  }, [centro, seed, n]);
+  return (
+    <group>
+      {arboles.map((t, i) => (
+        <Quenua key={i} pos={[t.x, alturaParamo(t.x, t.z), t.z]} esc={t.esc} />
+      ))}
+    </group>
+  );
+}
+
+/* ── ROQUEDAL con LÍQUENES: un afloramiento de peñascos fríos manchados de
+      líquenes naranja y amarillo (Caloplaca/Rhizocarpon) — el color HONESTO del
+      páramo alto, sin una sola flor de jardín. Los cojines de líquen se posan en
+      la cara alta de cada peña. Determinista, low-poly. ── */
+function Roquedal({ pos, seed = 3, esc = 1 }) {
+  const rocas = useMemo(() => {
+    const rng = crearRng(seed);
+    return Array.from({ length: 6 }, () => ({
+      x: (rng() - 0.5) * 2.6,
+      z: (rng() - 0.5) * 2.0,
+      r: 0.42 + rng() * 0.72,
+      giro: /** @type {[number, number, number]} */ ([rng() * Math.PI, rng() * Math.PI, rng() * Math.PI]),
+      liquen: Array.from({ length: 2 + Math.floor(rng() * 3) }, () => ({
+        a: rng() * Math.PI * 2,
+        inc: rng() * 0.9, // hemisferio alto: el líquen prende arriba
+        rr: 0.12 + rng() * 0.2,
+        naranja: rng() > 0.45,
+      })),
+    }));
+  }, [seed]);
+  return (
+    <group position={pos} scale={esc}>
+      {rocas.map((ro, i) => {
+        const y = alturaParamo(pos[0] + ro.x, pos[2] + ro.z) - pos[1] + ro.r * 0.45;
+        return (
+          <group key={i} position={[ro.x, y, ro.z]}>
+            <mesh rotation={ro.giro}>
+              <dodecahedronGeometry args={[ro.r, 0]} />
+              <meshLambertMaterial color={mezclar(P.roca, '#6a6c64', 0.35)} flatShading />
+            </mesh>
+            {ro.liquen.map((lq, j) => {
+              const sx = Math.sin(lq.inc) * Math.cos(lq.a);
+              const sy = Math.cos(lq.inc);
+              const sz = Math.sin(lq.inc) * Math.sin(lq.a);
+              return (
+                <mesh
+                  key={j}
+                  position={[sx * ro.r * 0.92, sy * ro.r * 0.92, sz * ro.r * 0.92]}
+                  scale={[lq.rr, lq.rr * 0.35, lq.rr]}
+                >
+                  <sphereGeometry args={[1, 6, 5]} />
+                  <meshLambertMaterial color={lq.naranja ? '#cf8330' : '#c3ad3a'} flatShading />
+                </mesh>
+              );
+            })}
+          </group>
+        );
+      })}
     </group>
   );
 }
@@ -989,10 +1106,17 @@ function NacimientoAgua({ reducedMotion, fabrica }) {
       <mesh geometry={geoTurba} position={[0, Y_AGUA - 0.07, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <meshLambertMaterial color={mezclar(P.turba, '#181206', 0.4)} flatShading />
       </mesh>
-      {/* brillo del cielo sobre el agua (aditivo, sutil) */}
-      <mesh position={[0, Y_AGUA + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.9, 1]}>
-        <circleGeometry args={[1.9, 32]} />
-        <meshBasicMaterial color={ATMO.cielo} transparent opacity={0.16} depthWrite={false} blending={THREE.AdditiveBlending} />
+      {/* el espejo de agua de turbera (turbia pero LEGIBLE: es la fábrica de
+          agua, tiene que verse el agua) — borde lobulado, no de estanque. Un
+          leve emissive frío para que el agua NO se la trague la bruma. */}
+      <mesh ref={laguna} geometry={geo} position={[0, Y_AGUA, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <meshLambertMaterial color={mezclar('#3f5f5c', P.turba, 0.42)} emissive="#1b3a38" emissiveIntensity={0.16} transparent opacity={0.95} />
+      </mesh>
+      {/* brillo frío del cielo sobre el agua (aditivo, SIN fog para que atraviese
+          la niebla): la lámina que espeja el cielo */}
+      <mesh position={[0, Y_AGUA + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.86, 1]}>
+        <circleGeometry args={[1.9, 30]} />
+        <meshBasicMaterial color="#d8f0f5" transparent opacity={0.24} depthWrite={false} blending={THREE.AdditiveBlending} fog={false} />
       </mesh>
       {/* el halo del nacimiento: crece y brilla en modo fábrica */}
       <mesh ref={halo} position={[0, Y_AGUA + 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
@@ -1641,6 +1765,52 @@ function DantaDelParamo({ tier, reducedMotion }) {
   );
 }
 
+/* ── EL CHIVITO DE PÁRAMO — Oxypogon (barbudito), CO-PROTAGONISTA. El colibrí
+      endémico del páramo, POSADO en la flor del frailejón héroe (como en el
+      video real del operador), en registro RUBBER-HOSE (billboard <Html>, igual
+      que la danta): reusa `BarbuditoParamo` de creatures/. Su reloj de vida lo
+      tiene la MAYOR parte del tiempo POSADO —el colibrí de páramo se posa, no
+      como el de tierra caliente— con visitas cortas a la corola (liba con la
+      lengua afuera y el ala en borrón). reduced-motion / tier bajo = quieto y
+      posado (el fotograma manda). Pequeño pero espectacular: la intimidad
+      icónica del páramo. ── */
+const BARB_POS = /** @type {[number, number, number]} */ ([HERO_X + 0.12, HERO_Y + 1.42, HERO_Z + 0.12]);
+function useRelojBarbudito(activo) {
+  const [pose, setPose] = useState('posa');
+  useEffect(() => {
+    if (!activo) return undefined;
+    let timer = 0;
+    const ciclo = () => {
+      // el barbudito se POSA la mayor parte del tiempo (como el bicho real);
+      // de a ratos visita la corola y liba, y vuelve a posarse.
+      const posando = Math.random() < 0.62;
+      setPose(posando ? 'posa' : 'liba');
+      timer = window.setTimeout(ciclo, posando ? 4200 + Math.random() * 3200 : 2000 + Math.random() * 1600);
+    };
+    timer = window.setTimeout(ciclo, 1400 + Math.random() * 1600);
+    return () => { window.clearTimeout(timer); setPose('posa'); };
+  }, [activo]);
+  return pose;
+}
+function BarbuditoDelFrailejon({ tier, reducedMotion }) {
+  const vivo = !reducedMotion && tier !== 'bajo';
+  const pose = useRelojBarbudito(vivo);
+  return (
+    <group position={BARB_POS}>
+      <Html center distanceFactor={5.4} zIndexRange={[6, 0]} pointerEvents="none">
+        <div
+          aria-hidden="true"
+          data-vecino="barbudito"
+          data-pose={vivo ? pose : 'posa'}
+          style={{ filter: 'drop-shadow(0 1px 3px rgba(30, 44, 56, 0.45))', pointerEvents: 'none' }}
+        >
+          <BarbuditoParamo size={64} animated={vivo} pose={vivo ? pose : 'posa'} />
+        </div>
+      </Html>
+    </group>
+  );
+}
+
 /* ── RAYOS DE LUZ VOLUMÉTRICOS: los haces fríos que se cuelan entre la niebla
       y bañan a la guardiana — la luz de catedral del páramo. Quads aditivos con
       gradiente PROCEDURAL (canvas en memoria, cero assets externos), fog off
@@ -1800,8 +1970,8 @@ function QuenuaGuardiana({ tier, reducedMotion }) {
 }
 
 /* ══ CÁMARAS DE LA ESCENA ══ */
-const CAM_LIBRE = /** @type {[number, number, number]} */ ([0, 5.8, 16.3]);
-const MIRADA_LIBRE = /** @type {[number, number, number]} */ ([0, 2.6, -1]);
+const CAM_LIBRE = /** @type {[number, number, number]} */ ([0, 6.1, 17.0]);
+const MIRADA_LIBRE = /** @type {[number, number, number]} */ ([0, 1.8, 1.3]);
 const CARA_GUARDIANA = /** @type {[number, number, number]} */ ([ENT_X, Y_ENT + 2.35, ENT_Z]);
 /* Encuadre de la lección: cámara casi HORIZONTAL a media altura del corte (la
    cara frontal de las capas debe LEERSE de frente, no en picada) con el rostro
@@ -1928,6 +2098,10 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
       </mesh>
 
       <NacimientoAgua reducedMotion={reducedMotion} fabrica={fabrica} />
+      {/* ══ EL HILO DE AGUA ══ prioridad #1: el agua SALE del hondón y baja a las
+          veredas por el cauce excavado — la imagen que le faltaba a la fábrica
+          de agua ("si se seca, se seca el río" necesita ver el río naciendo). */}
+      <HiloDeAgua reducedMotion={reducedMotion} />
 
       {/* ══ LA QUEÑUA GUARDIANA ══ la PROTAGONISTA: el Ent-queñua real, monumental
           sobre su altozano al fondo-centro, bañada por el haz mayor de luz.
@@ -1946,7 +2120,7 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
         ]}
         scale={ESC_CORTE}
       >
-        <CorteSuelo tier={tier} reducedMotion={reducedMotion} rotulos={leccion} />
+        <CorteSuelo tier={tier} reducedMotion={reducedMotion} rotulos={leccion} arco={leccion} />
       </group>
       {/* luz de vitrina (solo en lección): abre la cara del corte, que mira a la
           cámara a contraluz del cielo; + relleno frío para la roca madre */}
@@ -1971,8 +2145,10 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
           sigue enseñando, pero la protagonista del páramo es la queñua */}
       <EntFrailejonMaestro pos={[-7.6, alturaParamo(-7.6, 0.2) - 0.1, 0.2]} esc={1.15} reducedMotion={reducedMotion} />
 
-      {/* el frailejón "de detalle", acompañante junto al sendero */}
-      <FrailejonHeroe pos={[-3.2, alturaParamo(-3.2, 1.2), 1.2]} reducedMotion={reducedMotion} />
+      {/* el frailejón "de detalle", acompañante junto al sendero — y en su flor,
+          el CHIVITO DE PÁRAMO posado (la intimidad icónica del páramo) */}
+      <FrailejonHeroe pos={[HERO_X, HERO_Y, HERO_Z]} reducedMotion={reducedMotion} />
+      <BarbuditoDelFrailejon tier={tier} reducedMotion={reducedMotion} />
       <FrailejonalInstanciado n={nFrailejones} />
 
       {/* ══ ANCLA DE ESCALA HUMANA ══ un frailejón ANCIANO (patriarca de ~3 m)
@@ -1984,18 +2160,6 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
       <Pajonal n={nPaja} />
       <CojinesMusgo n={nMusgo} />
       <RomeroParamo n={nRomero} />
-
-      {/* chusque (Chusquea, el bambú del páramo) en macollas en las faldas húmedas */}
-      <Chusque pos={[-5.4, alturaParamo(-5.4, 3.2), 3.2]} esc={1.15} seed={5} />
-      <Chusque pos={[4.6, alturaParamo(4.6, -3.4), -3.4]} esc={0.95} seed={13} />
-      <Chusque pos={[6.0, alturaParamo(6.0, 3.0), 3.0]} esc={1.05} seed={44} />
-      {tier === 'alto' && <Chusque pos={[-6.8, alturaParamo(-6.8, -1.2), -1.2]} esc={1.0} seed={21} />}
-      {tier === 'alto' && <Chusque pos={[-3.3, alturaParamo(-3.3, 5.0), 5.0]} esc={0.85} seed={57} />}
-
-      {/* cardón (Puya) — la bromelia gigante del páramo, roseta espinosa + vara */}
-      <Cardon pos={[3.4, alturaParamo(3.4, 3.6), 3.6]} esc={1.05} vara seed={9} />
-      <Cardon pos={[-4.2, alturaParamo(-4.2, 5.2), 5.2]} esc={0.85} vara={false} seed={31} />
-      <Cardon pos={[5.4, alturaParamo(5.4, -1.4), -1.4]} esc={0.9} vara seed={63} />
 
       {/* chusque (Chusquea, el bambú del páramo) en macollas en las faldas húmedas */}
       <Chusque pos={[-5.4, alturaParamo(-5.4, 3.2), 3.2]} esc={1.15} seed={5} />
@@ -2163,8 +2327,9 @@ export default function MundoParamo3D() {
             maxAzimuthAngle={0.9}
             enableDamping
             dampingFactor={0.08}
-            autoRotate={!reducedMotion}
-            autoRotateSpeed={0.05}
+            /* SIN autoRotate en la lección: la cámara NO pelea la observación —
+               solo se mueve en las transiciones (el campesino mira a su ritmo). */
+            autoRotate={false}
           />
         )}
         <AdaptiveDpr pixelated />
