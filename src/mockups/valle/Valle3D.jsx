@@ -38,7 +38,6 @@ import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
    (CompaneroAbeja) lo usa para husmear con criterio: comentarios grounded
    por mundo, con la anti-molestia (cooldowns) resuelta adentro del store. */
 import useAngelitaStore from '../../store/useAngelitaStore';
-import BurbujaAngelita from '../../visual/agente/BurbujaAngelita';
 /* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
    mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
 import { reaccionDeFinca, ESTADO_FINCA_MUESTRA } from '../../visual/mundo3d/escenas/reaccionFinca.js';
@@ -71,7 +70,6 @@ import {
   CasaCampesina,
   VentanasVivas,
   PorticosSecundarios,
-  VistaParamoEnt,
   SenderosValle,
   PatiosLugares,
   VecinosDelValle,
@@ -101,6 +99,40 @@ import {
       escena entera consume ESTA lista — geometría, rótulos, faro y foco. ── */
 const MUNDOS_DIR = componerMundos(MUNDOS_VALLE);
 const MUNDO_DIR_BY_ID = Object.fromEntries(MUNDOS_DIR.map((m) => [m.id, m]));
+
+/* ── EL VOCABULARIO DE ANGELITA (auditoría 2026-07-18): los lugares del
+      valle (valleData.js LUGARES) tienen SU PROPIO id ('cafe', 'cultivos',
+      'micorrizas'…); el motor (angelitaInteligencia.MUNDOS) habla en un
+      vocabulario más ancho ('mis_matas', 'mis_animales', 'clima', 'vender',
+      'aprender', 'bosque', 'paramo', 'finca'). Esta tabla traduce uno al
+      otro para que `comentarioDeMundo`/`entrarMundo` sepan qué decir de
+      cada lugar tocado. */
+const LUGAR_A_MUNDO_ANGELITA = {
+  cultivos: 'mis_matas',
+  cafe: 'mis_matas',
+  suelo: 'mis_matas',
+  sanidad: 'mis_matas',
+  semillero: 'mis_matas',
+  abono: 'mis_matas',
+  micorrizas: 'bosque',
+  animales: 'mis_animales',
+  agua: 'clima',
+  clima: 'clima',
+  mercado: 'vender',
+  disenio: 'bosque',
+  aprender: 'aprender',
+  paramo: 'paramo',
+};
+
+/* Los 6 lugares que Angelita husmea SOLA en reposo — los mismos 6 portales
+   principales (PORTALES_VALLE en composicionValle.js): rotan uno a la vez,
+   espaciados por HUSMEO_MS; el propio store (cooldown de 20 min por mundo)
+   decide si de verdad vale la pena interrumpir. Nunca a mitad de un viaje
+   real, nunca con reduced-motion. */
+const HUSMEO_LUGARES = ['cultivos', 'animales', 'clima', 'mercado', 'aprender', 'disenio'];
+const HUSMEO_PRIMERO_MS = 5200; // el primer husmeo llega pronto: se ve viva al cargar
+const HUSMEO_CADA_MS = 40000; // cadencia entre intentos de husmeo autónomo
+const HUSMEO_VISIBLE_MS = 7200; // cuánto dura el comentario antes de volver a calma
 
 /* Altura del terreno por (x,z): la LADERA ANDINA. El eje z es la montaña — al
    fondo (z negativo) trepa al páramo alto, al frente (z positivo) baja a tierra
@@ -1505,7 +1537,7 @@ const CALMA_ABEJA = {
   z: CASA_VALLE.pos[1] + 1.5,
 };
 
-function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false, onTocar = null }) {
+function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false, onTocar = null }) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const prevX = useRef(foco.x);
@@ -1529,7 +1561,6 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
   //         portal y comenta — el store decide si de verdad interrumpe.
   const estadoAngelita = useAngelitaStore((s) => s.estado);
   const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
-  const tipoAngelita = useAngelitaStore((s) => s.tipo);
   const entrarMundoAngelita = useAngelitaStore((s) => s.entrarMundo);
   const reposarAngelita = useAngelitaStore((s) => s.reposar);
 
@@ -1565,8 +1596,6 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
     let ocultarTimer = null;
     const tick = () => {
       if (!vivo) return;
-      /* Cuánto se queda EL AVISO DE ESTA VUELTA: depende de su largo. */
-      let duraEste = HUSMEO_VISIBLE_MS;
       if (!entrandoRef.current) {
         const lugar = HUSMEO_LUGARES[husmeoIdx.current % HUSMEO_LUGARES.length];
         husmeoIdx.current += 1;
@@ -1575,19 +1604,13 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
         if (decision?.interrumpe) {
           husmeoLugarRef.current = lugar;
           if (ocultarTimer) clearTimeout(ocultarTimer);
-          /* El aviso dura LO QUE CUESTA LEERLO, no un tiempo fijo (feedback del
-             operador: "desaparecen muy rápido"). Escritura + lectura cómoda.
-             Si la decisión no trae texto, cae al piso digno. */
-          duraEste = duracionAviso(decision?.mensaje ?? decision?.texto);
           ocultarTimer = setTimeout(() => {
             husmeoLugarRef.current = null;
             reposarAngelita();
-          }, duraEste);
+          }, HUSMEO_VISIBLE_MS);
         }
       }
-      /* El siguiente husmeo espera a que el anterior TERMINE de leerse (+ respiro):
-         un aviso largo ya no se lo come el que viene detrás. */
-      temporizador = setTimeout(tick, Math.max(HUSMEO_CADA_MS, duraEste + 3500));
+      temporizador = setTimeout(tick, HUSMEO_CADA_MS);
     };
     temporizador = setTimeout(tick, HUSMEO_PRIMERO_MS);
     return () => {
@@ -1597,6 +1620,7 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
     };
     // `entrando` vive en entrandoRef a propósito: un viaje real no debe
     // reiniciar la cadencia del husmeo autónomo.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reducedMotion, entrarMundoAngelita, reposarAngelita]);
 
   useFrame((state) => {
@@ -1611,27 +1635,40 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
     const brio = (0.35 + 0.65 * energiaReal) * mVel; // energía y clima animan el vuelo
     const bob = reducedMotion ? 0 : Math.sin(t * (1.6 + brio)) * (0.1 + 0.16 * brio);
     const tembleque = tiembla ? Math.sin(t * 13) * tiembla : 0;
-    // POSICIÓN DE CALMA: al reposo Angelita ya no ronda el valle en un
-    // círculo errático — flota serena sobre el patio de la casa con una
-    // deriva mínima y lenta (respiración, no husmeo). Al entrar a un mundo
-    // sí vuela y se posa junto al lugar.
-    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.28) * 0.26 * mVagar;
-    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.22) * 0.18 * mVagar;
-    const alto = (entrando ? 1.05 : 2.2) * mAltura;
+    // HUSMEO AUTÓNOMO: mientras no hay viaje real, el lugar que el store
+    // aceptó (husmeoLugarRef) manda un TERCER destino — un solo lugar a la
+    // vez, temporal, nunca un círculo errático.
+    const lugarHusmeo = !entrando ? husmeoLugarRef.current : null;
+    const anclaHusmeo = lugarHusmeo ? MUNDO_DIR_BY_ID[lugarHusmeo] : null;
+    // POSICIÓN DE CALMA: al reposo (sin viaje real NI husmeo activo) Angelita
+    // ya no ronda el valle en un círculo errático — flota serena sobre el
+    // patio de la casa con una deriva mínima y lenta (respiración). Al
+    // entrar a un mundo (real o husmeado) sí vuela y se posa junto al lugar.
+    const vagarX = reducedMotion || entrando || anclaHusmeo ? 0 : Math.sin(t * 0.28) * 0.26 * mVagar;
+    const vagarZ = reducedMotion || entrando || anclaHusmeo ? 0 : Math.cos(t * 0.22) * 0.18 * mVagar;
+    const alto = (entrando ? 1.05 : anclaHusmeo ? 1.4 : 2.2) * mAltura;
     const dest = entrando
       ? new THREE.Vector3(
           foco.x + 0.55 + tembleque,
           foco.y + alto + bob + tembleque * 0.5,
           foco.z + 0.7,
         )
-      : new THREE.Vector3(
-          CALMA_ABEJA.x + vagarX + tembleque,
-          yCalma + alto + bob + tembleque * 0.5,
-          CALMA_ABEJA.z + vagarZ,
-        );
+      : anclaHusmeo
+        ? new THREE.Vector3(
+            anclaHusmeo.pos[0] + 0.5 + tembleque,
+            alturaTerreno(anclaHusmeo.pos[0], anclaHusmeo.pos[2]) + alto + bob + tembleque * 0.5,
+            anclaHusmeo.pos[2] + 0.6,
+          )
+        : new THREE.Vector3(
+            CALMA_ABEJA.x + vagarX + tembleque,
+            yCalma + alto + bob + tembleque * 0.5,
+            CALMA_ABEJA.z + vagarZ,
+          );
     // 0.045 al salir de foco: el valor de la v2 aprobada (0.035 hacía la
-    // salida pegajosa — regresión detectada en la auditoría 2026-07-16).
-    ref.current.position.lerp(dest, (entrando ? 0.05 : 0.045) * mVel);
+    // salida pegajosa — regresión detectada en la auditoría 2026-07-16). El
+    // husmeo autónomo vuela más SUAVE que una entrada real decidida (0.03).
+    const kVuelo = entrando ? 0.05 : anclaHusmeo ? 0.03 : 0.045;
+    ref.current.position.lerp(dest, kVuelo * mVel);
     // Comparte su posición viva para que la cámara de director la SIGA (follow
     // con lead): copia dentro del Vector3 compartido (mutación por método sobre
     // un local — no reasigna el prop, como CamaraViajera con controls.current).
@@ -1701,11 +1738,13 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
           también se narre a lectores de pantalla. */}
       {mensajeAngelita && (
         <Html center position={[0, 1.3, 0]} distanceFactor={9} zIndexRange={[45, 20]} style={{ pointerEvents: 'none' }}>
-          <BurbujaAngelita
-            mensaje={mensajeAngelita}
-            tipo={tipoAngelita || 'informativa'}
-            animado={!reducedMotion}
-          />
+          <div
+            className={`valle-abeja__burbuja valle-abeja__burbuja--${estadoAngelita}`}
+            role="status"
+            aria-live="polite"
+          >
+            {mensajeAngelita}
+          </div>
         </Html>
       )}
     </group>
@@ -2230,14 +2269,12 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
         onEntrar={portada ? null : onEntrar}
       />
       <PorticosSecundarios mundos={MUNDOS_DIR} alturaDe={alturaTerreno} />
-      {/* EL ACCESO AL PÁRAMO: el páramo VISIBLE — el Ent-queñua magnífico
-          parado en el filo entre frailejones. Tocarlo entra al monte. */}
-      <VistaParamoEnt
-        alturaDe={alturaTerreno}
-        tier={tier}
-        reducedMotion={reducedMotion}
-        onEntrar={portada ? null : onEntrar}
-      />
+      {/* EL ACCESO AL PÁRAMO — el Ent-queñua+frailejones del filo (VistaParamoEnt)
+          se ARCHIVÓ 2026-07-18 (pedido del operador): se veía amontonado en la
+          vista del valle. Ver src/mockups/valle/_archivo/vistaParamo.archivado.jsx.
+          El portal REAL al páramo NO estaba aquí y sigue intacto: el lugar
+          'paramo' de valleData.js (su propio rótulo tocable en el valle) sigue
+          llevando a MundoParamo3D vía wire3DNav.js `paramo: 'diorama_paramo'`. */}
       {/* El cóndor: planea su térmica sobre el filo del páramo y a ratos se
           POSA en el pico de la cordillera, de día (de noche duerme en la
           peña). Un billboard: vive en todos los tiers. */}
