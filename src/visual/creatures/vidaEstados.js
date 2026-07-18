@@ -97,6 +97,22 @@ export const VIDA_REPERTORIO = {
       reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo
     },
   },
+  dalmata: {
+    descanso: [2600, 6400], // perro joven: gesticula seguido, casi no se aquieta
+    momentos: {
+      menea: { dur: 3000, peso: 2.5 }, // 6× dalmata-cola-feliz 0.5s · 6× grupa 0.5s
+      ladea: { dur: 2400, peso: 2 }, // 1× dalmata-ladeo 2.4s · 2× orejas-perk 1.2s
+      reposo: { dur: 4400, peso: 0.8 }, // 1× rh-g-reposo — descansa POCO
+    },
+  },
+  beagle: {
+    descanso: [3400, 8200], // sabueso paciente: entre rastro y rastro, calma
+    momentos: {
+      olfatea: { dur: 3300, peso: 2.5 }, // 3× beagle-olfateo-cabeza 1.1s · 6× trufa 0.55s
+      aulla: { dur: 2600, peso: 1 }, // 1× beagle-aullido-cabeza 2.6s — raro y entrañable
+      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo
+    },
+  },
 };
 
 /* El nombre de momento que significa "pose species-agnostic", no gesto-firma:
