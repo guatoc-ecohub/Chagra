@@ -34,20 +34,48 @@ import { auraDeBicho } from './transformacion.js';
    Tejido con gusto, permanente y sutil: OJOS LUMINOSOS que respiran
    (fosforescencia, visión nocturna del espíritu), un AURA ESPECTRAL etérea que
    lo envuelve (no solo en poder), CONSTELACIONES de geometría sagrada sobre las
-   rosetas (estrellas que titilan, patrón andino) y un SHIMMER espectral en el
-   contorno. En modo poder el aura, los ojos y las estrellas se vuelven
-   CHAMÁNICOS (el jaguar-espíritu se revela). Todo se PODA en tier bajo /
-   reduced-motion (queda un fotograma digno y quieto). */
+   rosetas (estrellas que titilan, patrón andino), un SHIMMER espectral en el
+   contorno, BRUMA etérea a los pies y MOTAS de luz que flotan lento (polvo del
+   espíritu). En modo poder el aura, los ojos y las estrellas se vuelven
+   CHAMÁNICOS, y con `revelacion` (opt-in, su entrada cinematográfica) el
+   espíritu SE MANIFIESTA: las marcas gemelas brillan sobre las rosetas, la
+   bruma se adensa y el felino levita apenas (ingravidez). Todo se PODA en tier
+   bajo / reduced-motion (queda un fotograma digno y quieto).
+
+   VOLUMEN Y PESO (que parezca de verdad): el pelaje lleva GRADIENTE radial (luz
+   dorsal → sombra ventral), las rosetas son ANILLOS ROTOS reales de Panthera
+   onca (arcos con cortes, giro propio por mancha, motas internas en las
+   grandes), hay definición muscular sutil en ancas y pecho, VIBRISAS y motas
+   oscuras en el hocico, y una SOMBRA DE SUELO blanda bajo las zarpas — un
+   animal con masa, no un sticker.
+
+   CARÁCTER (el registro de casa, tipo reloj-carismático de los años 30):
+   CARISMÁTICO y encantador en reposo — ojos grandes ámbar con catchlight,
+   sonrisa de goma, cachetes — PERO capaz de volverse SERIO e IMPONENTE
+   (acecho, rugido, revelación). Esa DUALIDAD es su corazón: guardián sagrado
+   que cae bien y a la vez impone respeto. Nunca gore, nunca ojos vacíos. */
 const VIEWBOX = '-16 -20 32 40';
 
-/* Roseta del jaguar: anillo oscuro con centro ocre (la firma de la especie —
-   mancha CON centro, no el puntito del leopardo). Decorativa (aria-hidden en el
-   grupo padre). */
-function Roseta({ cx, cy, r = 1.5, ink, centro, opacity = 0.9 }) {
+/* Anillo ROTO de la roseta: la roseta real de Panthera onca no es un aro
+   cerrado sino ARCOS con cortes (manchas periféricas que casi cierran). El
+   dasharray reparte 3 arcos + 3 cortes sobre el perímetro aproximado. */
+function anilloRoto(r) {
+  const c = Math.PI * r * 1.88; // perímetro aprox de la elipse (rx=r, ry=0.88r)
+  return `${c * 0.3} ${c * 0.08} ${c * 0.26} ${c * 0.1} ${c * 0.18} ${c * 0.08}`;
+}
+
+/* Roseta del jaguar: ANILLO ROTO oscuro con centro ocre (la firma de la
+   especie — mancha CON centro, no el puntito del leopardo). Cada roseta gira
+   distinto (`rot`) para que los cortes del anillo no se repitan, y las GRANDES
+   del lomo llevan una mota interna extra (`motas`), como en el animal real.
+   Decorativa (aria-hidden en el grupo padre). */
+function Roseta({ cx, cy, r = 1.5, ink, centro, opacity = 0.9, rot = 0, motas = 1 }) {
   return (
-    <g opacity={opacity}>
-      <ellipse cx={cx} cy={cy} rx={r} ry={r * 0.88} fill="none" stroke={ink} strokeWidth={r * 0.46} />
+    <g opacity={opacity} transform={rot ? `rotate(${rot} ${cx} ${cy})` : undefined}>
+      <ellipse cx={cx} cy={cy} rx={r} ry={r * 0.88} fill="none" stroke={ink}
+        strokeWidth={r * 0.46} strokeDasharray={anilloRoto(r)} strokeLinecap="round" />
       <circle cx={cx} cy={cy} r={r * 0.3} fill={centro} />
+      {motas > 1 && <circle cx={cx + r * 0.38} cy={cy - r * 0.32} r={r * 0.16} fill={ink} />}
     </g>
   );
 }
@@ -71,15 +99,60 @@ function Estrella({ cx, cy, r = 0.9, color, delay = 0, vivo = false }) {
   );
 }
 
-/* Vértices de la constelación: coinciden con centros de rosetas (frente + lomo)
-   para que el "cielo" viva SOBRE las manchas. */
-const ESTRELLAS = [
-  { cx: -3.4, cy: -10.6, r: 0.85, d: 0 },
-  { cx: 3.4, cy: -10.6, r: 0.85, d: -0.5 },
+/* ROSETAS del cuerpo y la cara, como DATOS (una sola fuente): las dibuja la
+   capa de tinta y las REUSA la capa de marcas-espíritu (las gemelas
+   espectrales que se encienden en la revelación). rot varía el corte del
+   anillo; las dos grandes del lomo llevan mota interna (motas: 2). */
+const ROSETAS_CUERPO = [
+  { cx: -5.4, cy: 2.6, r: 1.5, rot: 15, motas: 2 },
+  { cx: -2.0, cy: 5.0, r: 1.35, rot: 130 },
+  { cx: 5.6, cy: 1.4, r: 1.5, rot: 250, motas: 2 },
+  { cx: 6.6, cy: 4.6, r: 1.15, rot: 40, o: 0.8 },
+  { cx: 2.4, cy: -0.6, r: 1.2, rot: 205, o: 0.85 },
+  { cx: -6.6, cy: -0.8, r: 1.2, rot: 320, o: 0.8 },
+];
+const ROSETAS_CARA = [
+  { cx: -3.4, cy: -10.6, r: 0.95, rot: 25, o: 0.8 },
+  { cx: 3.4, cy: -10.6, r: 0.95, rot: 200, o: 0.8 },
+  { cx: -4.8, cy: -7.6, r: 0.85, rot: 95, o: 0.7 },
+  { cx: 4.8, cy: -7.6, r: 0.85, rot: 300, o: 0.7 },
+];
+
+/* Vértices de la constelación: coinciden con centros de rosetas para que el
+   "cielo" viva SOBRE las manchas. Partida en dos: el LOMO (grandes + menores,
+   la telaraña sagrada) va en el tronco; la FRENTE va DENTRO del grupo de la
+   cabeza (si no, el círculo de la cabeza — que se pinta después — la tapa) y
+   así además acompaña el acecho cuando la testa baja. */
+const ESTRELLAS_LOMO = [
   { cx: -5.4, cy: 2.6, r: 0.95, d: -1.1 },
   { cx: 2.4, cy: -0.6, r: 0.8, d: -0.7 },
   { cx: 5.6, cy: 1.4, r: 0.95, d: -1.5 },
+  { cx: -6.6, cy: -0.8, r: 0.55, d: -0.3 },
+  { cx: -2.0, cy: 5.0, r: 0.5, d: -1.9 },
+  { cx: 6.6, cy: 4.6, r: 0.55, d: -2.2 },
 ];
+const ESTRELLAS_FRENTE = [
+  { cx: -3.4, cy: -10.6, r: 0.85, d: 0 },
+  { cx: 3.4, cy: -10.6, r: 0.85, d: -0.5 },
+];
+
+/* MOTAS de luz (polvo del espíritu): flotan lento alrededor del felino, cada
+   una con su delay/duración propios (nunca en compás — vida, no metrónomo). */
+const MOTAS = [
+  { cx: -10.6, cy: 3.2, r: 0.5, d: 0, s: 6.4 },
+  { cx: 11.2, cy: -1.6, r: 0.42, d: -2.1, s: 7.2 },
+  { cx: -8.2, cy: -6.8, r: 0.38, d: -3.4, s: 5.8 },
+  { cx: 9.0, cy: 6.4, r: 0.55, d: -1.2, s: 6.9 },
+  { cx: -12.0, cy: -2.4, r: 0.34, d: -4.6, s: 7.6 },
+  { cx: 6.4, cy: -10.2, r: 0.4, d: -5.2, s: 6.1 },
+];
+
+/* GLIFO ESPIRAL — geometría sagrada (espiral, principio estético andino: San
+   Agustín / Chavín / orfebrería, NO copia de un diseño específico). Símbolo de
+   PODER como adorno (nunca arma). Invisible en reposo; se enciende en la
+   revelación / el poder. Se posiciona/espeja con transform en cada hombro. */
+const GLIFO_ESPIRAL = 'M0,0 C0.3,-0.3 0.75,-0.15 0.85,0.35 C0.95,0.95 0.35,1.4 -0.4,1.15 '
+  + 'C-1.35,0.85 -1.6,-0.35 -0.95,-1.15 C-0.2,-2.05 1.3,-1.95 2.05,-0.95';
 
 export function Jaguar({
   size = 64,
@@ -150,6 +223,24 @@ export function Jaguar({
      (::before/mix-blend no aplican a nodos SVG); acá solo marcamos data-poder por
      si el host lo consulta. */
   poder = false,
+  /* ── REVELACIÓN DEL ESPÍRITU (estado héroe — su entrada cinematográfica) ────
+     OPT-IN: con revelacion=true el jaguar-espíritu SE MANIFIESTA — las
+     marcas-espíritu (rosetas gemelas espectrales) se encienden y laten, la
+     bruma etérea se adensa, el felino LEVITA apenas (ingravidez contenida), la
+     sombra del suelo cede (el peso se vuelve espíritu) y aura/ojos/estrellas
+     suben a su registro chamánico. MAJESTAD, no susto: todo lento y digno.
+     Default false → los consumidores actuales NO cambian. Se poda en tier
+     bajo / reduced-motion (quedan las marcas encendidas, quietas). */
+  revelacion = false,
+  /* ── APARICIÓN ESPECTRAL (el espíritu que se materializa y se desvanece) ────
+     OPT-IN: con aparicion=true el jaguar-espíritu APARECE y DESAPARECE
+     místicamente en ciclo — se desvanece casi por completo y vuelve a
+     materializarse desde la bruma (opacidad que respira + emergencia leve,
+     como una presencia sagrada que va y viene). Pensado para su entrada/
+     ambiente en el valle/bosque. Default false → los consumidores actuales NO
+     cambian. Se poda en tier bajo / reduced-motion (queda PRESENTE y quieto,
+     nunca invisible — fotograma digno). */
+  aparicion = false,
   /* ── PROP POR MUNDO (herramienta en la zarpa — propsPorMundo/PropEnMano) ─────
      mundoId opcional: al ENTRAR a un mundo el jaguar carga su herramienta
      (agua→manguerita, suelo→lupa, animales→lazo, semillero→canasto…). Sin
@@ -162,6 +253,7 @@ export function Jaguar({
   const glow = `crt-glow-${uid}`;
   const blur = `crt-blur-${uid}`;
   const boil = `crt-boil-${uid}`;
+  const pelaje = `crt-pelaje-${uid}`;
   const vivo = animated;
   const auraOp = Math.max(0.14, Math.min(0.42, 0.18 + 0.26 * (energia ?? 1)));
   const auraR = 8.5 + 1.6 * (energia ?? 1);
@@ -172,7 +264,7 @@ export function Jaguar({
   // reusar TODO el CSS existente de los gestos-firma.
   const raizRef = useRef(null);
   const ritmoPropio = useRitmoPropio();
-  const enBase = pose === 'anda' && !ruge && !acecha && !visema;
+  const enBase = pose === 'anda' && !ruge && !acecha && !visema && !revelacion;
   const momento = useVidaIdle('jaguar', vida && vivo && tier !== 'bajo' && enBase);
   useMiradaUsted(raizRef, vida && vivo && tier !== 'bajo');
   const rugeFx = ruge || momento === 'ruge';
@@ -199,6 +291,14 @@ export function Jaguar({
   const defs = (
     <defs>
       <CreatureFilters glow={glow} blur={blur} />
+      {/* PELAJE CON VOLUMEN — gradiente radial del pelaje (luz dorsal arriba a
+          la izquierda → leonado medio → sombra ventral en el borde): el mismo
+          def viste tronco y cabeza (objectBoundingBox: cada uno recibe su luz). */}
+      <radialGradient id={pelaje} cx="42%" cy="30%" r="82%">
+        <stop offset="0%" stopColor={P.cuerpoLuz} />
+        <stop offset="55%" stopColor={P.cuerpo} />
+        <stop offset="100%" stopColor={P.cuerpoSombra} />
+      </radialGradient>
       {/* Line-boil (contorno que hierve) — solo se instancia si se pide. */}
       {lineBoil && <LineBoilFilter id={boil} animated={vivo} />}
     </defs>
@@ -234,6 +334,11 @@ export function Jaguar({
   //    controlado y elegante — poder contenido).
   const body = (
     <g className={`crt-body${vivo ? ' rh-boil' : ''}`} filter={`url(#${glow})`}>
+      {/* SOMBRA DE SUELO — la mancha blanda bajo las zarpas que le da PESO al
+          felino (un animal con masa, no un sticker). Estática (no anima); en
+          la revelación CEDE por CSS (el peso se vuelve espíritu). */}
+      <ellipse className="jaguar-sombra-suelo" cx="0" cy="13.2" rx="8.2" ry="1.5"
+        fill={P.sombraSuelo} filter={`url(#${blur})`} aria-hidden="true" />
       {/* AURA ESPECTRAL etérea (PERMANENTE, sutil): la presencia sagrada del
           jaguar-espíritu del chamán envuelve al felino aun en reposo. Late lento
           y se vuelve CHAMÁNICA en modo poder (CSS). */}
@@ -244,41 +349,49 @@ export function Jaguar({
       {/* aura viva */}
       <circle cx="0" cy="2" r={auraR} fill={P.cuerpo} opacity={auraOp} filter={`url(#${blur})`} />
 
-      {/* COLA LARGA que ondea con PESO (la firma del acecho, al lado derecho para
+      {/* COLA CORTA y GRUESA en la base (clave anti-leopardo: el jaguar la lleva
+          más corta), ondea con PESO (la firma del acecho, al lado derecho para
           no pisar el prop de la zarpa izquierda). Pivota desde su base en el
-          lomo. Rosetas + punta oscura. */}
+          lomo. Lleva ANILLOS (no rosetas — la firma de la cola del jaguar) +
+          punta negra. */}
       <g className={vivo ? 'jaguar-cola' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'left bottom' }}>
-        <path d="M8.4,5.4 C13.2,4.4 15.4,0.2 13.8,-4.4 C13.0,-6.6 11.2,-7.2 9.6,-6.4"
-          fill="none" stroke={P.cuerpo} strokeWidth="3.0" strokeLinecap="round" />
+        {/* relleno del tubo, más grueso en la base (dos trazos superpuestos) */}
+        <path d="M8.2,5.6 C12.2,4.8 13.4,1.0 12.5,-2.8 C11.9,-4.7 10.6,-5.4 9.3,-5.0"
+          fill="none" stroke={P.cuerpo} strokeWidth="3.6" strokeLinecap="round" />
+        {/* ANILLOS: copia del tubo en tinta oscura con dash → bandas perpendiculares
+            perfectas siguiendo la curva (el patrón anillado real). */}
+        <path d="M8.2,5.6 C12.2,4.8 13.4,1.0 12.5,-2.8 C11.9,-4.7 10.6,-5.4 9.3,-5.0"
+          fill="none" stroke={P.roseta} strokeWidth="3.6" strokeLinecap="butt"
+          strokeDasharray="1.5 3.3" strokeDashoffset="-1.6" opacity="0.9" />
         {/* contorno de tinta encima (la línea que manda del rubber-hose) */}
-        <path d="M8.4,5.4 C13.2,4.4 15.4,0.2 13.8,-4.4 C13.0,-6.6 11.2,-7.2 9.6,-6.4"
+        <path d="M8.2,5.6 C12.2,4.8 13.4,1.0 12.5,-2.8 C11.9,-4.7 10.6,-5.4 9.3,-5.0"
           fill="none" stroke={RH_INK} strokeWidth="0.7" strokeLinecap="round" opacity="0.55" />
-        {/* punta oscura + rosetas de la cola */}
-        <circle cx="9.9" cy="-6.2" r="1.5" fill={P.roseta} />
-        <Roseta cx={13.7} cy={-1.0} r={1.15} ink={P.roseta} centro={P.rosetaCentro} opacity={0.85} />
-        <Roseta cx={11.4} cy={3.6} r={1.1} ink={P.roseta} centro={P.rosetaCentro} opacity={0.85} />
+        {/* punta negra */}
+        <circle cx="9.5" cy="-4.9" r="1.7" fill={P.roseta} />
       </g>
 
       {/* orejas redondas de felino (detrás de la cabeza, se mecen con
           follow-through) */}
       <g className={vivo ? 'rh-sway' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'center bottom', animationDelay: '-0.2s' }}>
-        <circle cx="-4.4" cy="-13.4" r={PR.orejaR} fill={P.cuerpo} stroke={RH_INK} strokeWidth="1.2" />
+        <circle cx="-4.4" cy="-13.4" r={PR.orejaR} fill={P.cuerpoLuz} stroke={RH_INK} strokeWidth="1.2" />
         <circle cx="-4.4" cy="-13.4" r={PR.orejaR * 0.5} fill={P.oreja} />
       </g>
       <g className={vivo ? 'rh-sway' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'center bottom', animationDelay: '-0.5s' }}>
-        <circle cx="4.4" cy="-13.4" r={PR.orejaR} fill={P.cuerpo} stroke={RH_INK} strokeWidth="1.2" />
+        <circle cx="4.4" cy="-13.4" r={PR.orejaR} fill={P.cuerpoLuz} stroke={RH_INK} strokeWidth="1.2" />
         <circle cx="4.4" cy="-13.4" r={PR.orejaR * 0.5} fill={P.oreja} />
       </g>
 
-      {/* patas traseras (muslos musculosos con planta crema, detrás del tronco).
+      {/* patas traseras GRUESAS y CORTAS (muslos musculosos con planta crema,
+          zarpas grandes y redondas — centro de gravedad bajo, anti-leopardo).
           Se mecen suave. */}
-      <Miembro d="M-6.6,7.0 C-8.6,9.0 -8.8,10.8 -7.4,12.0" ancho={3.4} punta={[-7.4, 12.2]} puntaR={2.0} pie sway={vivo} delay={-0.7} />
-      <Miembro d="M6.6,7.0 C8.6,9.0 8.8,10.8 7.4,12.0" ancho={3.4} punta={[7.4, 12.2]} puntaR={2.0} pie sway={vivo} delay={-1.0} />
+      <Miembro d="M-6.6,7.4 C-8.4,9.0 -8.6,10.6 -7.4,11.8" ancho={4.2} punta={[-7.4, 12.0]} puntaR={2.6} pie sway={vivo} delay={-0.7} />
+      <Miembro d="M6.6,7.4 C8.4,9.0 8.6,10.6 7.4,11.8" ancho={4.2} punta={[7.4, 12.0]} puntaR={2.6} pie sway={vivo} delay={-1.0} />
 
       {/* tronco leonado musculoso con contorno grueso (la línea que respira con
-          el boil) */}
+          el boil). El fill es el GRADIENTE de pelaje: luz dorsal → sombra
+          ventral (volumen real, no color plano). */}
       <ellipse cx="0" cy="2" rx={PR.troncoRx} ry={PR.troncoRy}
-        fill={P.cuerpo} stroke={RH_INK} strokeWidth="1.4"
+        fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="1.4"
         style={{ filter: `drop-shadow(0 0 6px ${P.cuerpoGlow})` }} />
       {/* SHIMMER MÍSTICO — destello espectral sutil en el contorno (se apoya en
           el glow del cuerpo; el line-boil lo remata en su entrada heroica).
@@ -289,26 +402,51 @@ export function Jaguar({
       {/* vientre/pecho crema */}
       <path d="M0,-4.2 C4.2,-3.2 5.4,2 4.0,6.2 C2.4,9.0 -2.4,9.0 -4.0,6.2 C-5.4,2 -4.2,-3.2 0,-4.2 Z"
         fill={P.vientre} opacity="0.9" />
+      {/* mechones del pecho (el zigzag de pelo crema donde el vientre nace) */}
+      <path d="M-1.8,-3.95 L-1.2,-3.3 L-0.6,-4.0 L0,-3.3 L0.6,-4.0 L1.2,-3.3 L1.8,-3.95"
+        fill="none" stroke={P.vientre} strokeWidth="0.5" strokeLinecap="round" opacity="0.9" aria-hidden="true" />
 
-      {/* ROSETAS del cuerpo (manchas de centro ocre — la firma). Decorativas. */}
-      <g aria-hidden="true">
-        <Roseta cx={-5.4} cy={2.6} r={1.5} ink={P.roseta} centro={P.rosetaCentro} />
-        <Roseta cx={-2.0} cy={5.0} r={1.35} ink={P.roseta} centro={P.rosetaCentro} />
-        <Roseta cx={5.6} cy={1.4} r={1.5} ink={P.roseta} centro={P.rosetaCentro} />
-        <Roseta cx={6.6} cy={4.6} r={1.15} ink={P.roseta} centro={P.rosetaCentro} opacity={0.8} />
-        <Roseta cx={2.4} cy={-0.6} r={1.2} ink={P.roseta} centro={P.rosetaCentro} opacity={0.85} />
-        <Roseta cx={-6.6} cy={-0.8} r={1.2} ink={P.roseta} centro={P.rosetaCentro} opacity={0.8} />
+      {/* DEFINICIÓN MUSCULAR sutil (que se sienta la masa del felino): dos
+          trazos de anca sobre los muslos y el surco del pectoral. Tinta a baja
+          opacidad — sugiere, no delinea. */}
+      <g aria-hidden="true" fill="none" stroke={RH_INK} strokeWidth="0.55" opacity="0.22" strokeLinecap="round">
+        <path d="M-8.6,3.2 C-8.0,5.6 -6.6,7.2 -4.8,7.9" />
+        <path d="M8.6,3.2 C8.0,5.6 6.6,7.2 4.8,7.9" />
+        <path d="M-1.6,-3.2 C-0.5,-2.5 0.5,-2.5 1.6,-3.2" />
       </g>
 
-      {/* CONSTELACIÓN — geometría sagrada sobre las rosetas: líneas etéreas
-          punteadas (el patrón andino) + estrellas que TITILAN en los centros de
-          mancha. El cielo nocturno del jaguar-espíritu. Decorativa. */}
+      {/* ROSETAS del cuerpo (anillos ROTOS de centro ocre — la firma). Una
+          sola fuente de datos (ROSETAS_CUERPO) que también visten las
+          marcas-espíritu. Decorativas. */}
+      <g aria-hidden="true">
+        {ROSETAS_CUERPO.map((m, i) => (
+          <Roseta key={i} cx={m.cx} cy={m.cy} r={m.r} rot={m.rot} motas={m.motas}
+            ink={P.roseta} centro={P.rosetaCentro} opacity={m.o ?? 0.9} />
+        ))}
+      </g>
+      {/* MARCAS-ESPÍRITU del lomo — las rosetas gemelas espectrales: invisibles
+          en reposo (opacity 0 por CSS), se ENCIENDEN y laten cuando el espíritu
+          se revela (revelación / modo poder). */}
+      <g className="jaguar-marcas-espiritu" aria-hidden="true" fill="none"
+        stroke={P.marcaEspiritu} strokeLinecap="round">
+        {ROSETAS_CUERPO.map((m, i) => (
+          <ellipse key={i} cx={m.cx} cy={m.cy} rx={m.r} ry={m.r * 0.88}
+            strokeWidth={m.r * 0.5} strokeDasharray={anilloRoto(m.r)}
+            transform={`rotate(${m.rot} ${m.cx} ${m.cy})`} />
+        ))}
+      </g>
+
+      {/* CONSTELACIÓN del lomo — geometría sagrada sobre las rosetas: la
+          telaraña de líneas etéreas punteadas (el patrón andino) RESPIRA
+          (pulso co-primo con el titilar) y las estrellas TITILAN en los
+          centros de mancha — grandes en los vértices mayores, menores en los
+          secundarios. El cielo nocturno del jaguar-espíritu. Decorativa. */}
       <g className="jaguar-constelacion" aria-hidden="true">
-        <path d="M-3.4,-10.6 L3.4,-10.6" fill="none" stroke={P.espectral}
+        <path className={vivo ? 'jaguar-constelacion-linea' : undefined}
+          d="M-6.6,-0.8 L-5.4,2.6 L-2.0,5.0 M-5.4,2.6 L2.4,-0.6 L5.6,1.4 L6.6,4.6"
+          fill="none" stroke={P.espectral}
           strokeWidth="0.3" strokeLinecap="round" strokeDasharray="0.5 1.1" opacity="0.28" />
-        <path d="M-5.4,2.6 L2.4,-0.6 L5.6,1.4" fill="none" stroke={P.espectral}
-          strokeWidth="0.3" strokeLinecap="round" strokeDasharray="0.5 1.1" opacity="0.28" />
-        {ESTRELLAS.map((e, i) => (
+        {ESTRELLAS_LOMO.map((e, i) => (
           <Estrella key={i} cx={e.cx} cy={e.cy} r={e.r} delay={e.d} color={P.estrella} vivo={vivo} />
         ))}
       </g>
@@ -322,56 +460,130 @@ export function Jaguar({
         <path d="M6.4,-1.4 Q4.4,-6.2 1.8,-2.6 Z" fill={P.hombro} stroke={RH_INK} strokeWidth="1.1" strokeLinejoin="round" />
       </g>
 
-      {/* bracitos manguera (zarpas delanteras) con planta crema, pivote en el
-          HOMBRO para que celebra/señala los alcen desde el hombro. */}
-      <Miembro clase="crt-brazo-l" origen="right top"
-        d="M-7.0,-1.2 C-10.0,0.4 -11.0,3.4 -10.0,6.2" ancho={3.2} punta={[-10.0, 6.6]} puntaR={2.1} pie sway={vivo} delay={-0.15} />
-      <Miembro clase="crt-brazo-r" origen="left top"
-        d="M7.0,-1.2 C10.0,0.4 11.0,3.4 10.0,6.2" ancho={3.2} punta={[10.0, 6.6]} puntaR={2.1} pie sway={vivo} delay={-0.45} />
+      {/* GLIFOS SAGRADOS — espirales de geometría andina (cobre de orfebrería)
+          sobre los hombros. Símbolo de poder como ADORNO (nunca arma).
+          Invisibles en reposo; se encienden en la revelación / el poder (CSS).
+          Van sobre el lomo, bajo los bracitos y la cabeza. Decorativos. */}
+      <g className="jaguar-glifos" aria-hidden="true" fill="none" stroke={P.cobre}
+        strokeWidth="0.42" strokeLinecap="round">
+        <path transform="translate(-5.4 -0.6) scale(0.85)" d={GLIFO_ESPIRAL} />
+        <path transform="translate(5.4 -0.6) scale(-0.85 0.85)" d={GLIFO_ESPIRAL} />
+      </g>
 
-      {/* CABEZA (grupo propio .jaguar-cabeza para que el ACECHO la baje). */}
+      {/* bracitos manguera GRUESOS (zarpas delanteras grandes y redondas) con
+          planta crema, pivote en el HOMBRO para que celebra/señala los alcen
+          desde el hombro. Patas cortas y macizas — el felino asienta bajo. */}
+      <Miembro clase="crt-brazo-l" origen="right top"
+        d="M-7.0,-1.0 C-9.6,0.6 -10.4,3.2 -9.6,5.8" ancho={3.9} punta={[-9.6, 6.2]} puntaR={2.6} pie sway={vivo} delay={-0.15} />
+      <Miembro clase="crt-brazo-r" origen="left top"
+        d="M7.0,-1.0 C9.6,0.6 10.4,3.2 9.6,5.8" ancho={3.9} punta={[9.6, 6.2]} puntaR={2.6} pie sway={vivo} delay={-0.45} />
+
+      {/* CABEZA MACIZA (grupo propio .jaguar-cabeza para que el ACECHO la baje).
+          Ancha y robusta — el jaguar tiene la cabeza más maciza y la mordida
+          más potente de los felinos americanos: elipse MÁS ANCHA que alta +
+          mejillas/mandíbula prominentes. NO redondita-genérica. */}
       <g className="jaguar-cabeza" style={{ transformBox: 'fill-box', transformOrigin: 'center top' }}>
-        <circle cx="0" cy="-8.2" r={PR.cabezaR} fill={P.cuerpo} stroke={RH_INK} strokeWidth="1.3" />
-        {/* hocico claro que baja al morro */}
-        <path d="M-2.6,-6.6 C-1.2,-5.2 1.2,-5.2 2.6,-6.6 C2.8,-3.6 1.8,-2.0 0,-1.8 C-1.8,-2.0 -2.8,-3.6 -2.6,-6.6 Z"
-          fill={P.hocico} opacity="0.95" />
-        {/* rosetas de la frente/mejillas (la firma también en la cara) */}
+        {/* MEJILLAS/MANDÍBULA anchas (las carrilleras del jaguar) — bajo el
+            cráneo, ensanchan la testa a los lados. Van primero (el hocico y la
+            cara se apoyan encima). */}
         <g aria-hidden="true">
-          <Roseta cx={-3.4} cy={-10.6} r={0.95} ink={P.roseta} centro={P.rosetaCentro} opacity={0.8} />
-          <Roseta cx={3.4} cy={-10.6} r={0.95} ink={P.roseta} centro={P.rosetaCentro} opacity={0.8} />
-          <Roseta cx={-4.8} cy={-7.6} r={0.85} ink={P.roseta} centro={P.rosetaCentro} opacity={0.7} />
-          <Roseta cx={4.8} cy={-7.6} r={0.85} ink={P.roseta} centro={P.rosetaCentro} opacity={0.7} />
+          <ellipse cx="-5.2" cy="-6.4" rx="2.3" ry="2.7" fill={P.cuerpoSombra} stroke={RH_INK} strokeWidth="1.1" />
+          <ellipse cx="5.2" cy="-6.4" rx="2.3" ry="2.7" fill={P.cuerpoSombra} stroke={RH_INK} strokeWidth="1.1" />
+        </g>
+        {/* cráneo ancho (elipse maciza, más ancha que alta) */}
+        <ellipse cx="0" cy="-8.2" rx={PR.cabezaR * 1.14} ry={PR.cabezaR * 0.98}
+          fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="1.3" />
+        {/* hocico claro ANCHO que baja al morro (mandíbula robusta) */}
+        <path d="M-3.0,-6.6 C-1.4,-5.0 1.4,-5.0 3.0,-6.6 C3.2,-3.4 2.0,-1.8 0,-1.6 C-2.0,-1.8 -3.2,-3.4 -3.0,-6.6 Z"
+          fill={P.hocico} opacity="0.95" />
+        {/* rosetas de la frente/mejillas (anillos rotos — la firma también en
+            la cara), desde la misma fuente de datos que sus marcas-espíritu */}
+        <g aria-hidden="true">
+          {ROSETAS_CARA.map((m, i) => (
+            <Roseta key={i} cx={m.cx} cy={m.cy} r={m.r} rot={m.rot}
+              ink={P.roseta} centro={P.rosetaCentro} opacity={m.o} />
+          ))}
+        </g>
+        {/* PUNTOS SÓLIDOS pequeños de la corona/hocico (distribución real: la
+            cabeza lleva puntos sólidos, no rosetas — anti-leopardo por zona). */}
+        <g aria-hidden="true" fill={P.roseta} opacity="0.62">
+          <circle cx="-1.7" cy="-12.9" r="0.42" />
+          <circle cx="1.7" cy="-12.9" r="0.42" />
+          <circle cx="0" cy="-13.4" r="0.36" />
+          <circle cx="-0.9" cy="-6.9" r="0.3" />
+          <circle cx="0.9" cy="-6.9" r="0.3" />
+        </g>
+        {/* marcas-espíritu de la cara (gemelas espectrales, ver las del lomo) */}
+        <g className="jaguar-marcas-espiritu" aria-hidden="true" fill="none"
+          stroke={P.marcaEspiritu} strokeLinecap="round">
+          {ROSETAS_CARA.map((m, i) => (
+            <ellipse key={i} cx={m.cx} cy={m.cy} rx={m.r} ry={m.r * 0.88}
+              strokeWidth={m.r * 0.5} strokeDasharray={anilloRoto(m.r)}
+              transform={`rotate(${m.rot} ${m.cx} ${m.cy})`} />
+          ))}
+        </g>
+        {/* CONSTELACIÓN de la frente — vive DENTRO de la cabeza (dibujada tras
+            el círculo, si no quedaba oculta) y baja con la testa en el acecho. */}
+        <g className="jaguar-constelacion" aria-hidden="true">
+          <path className={vivo ? 'jaguar-constelacion-linea' : undefined}
+            d="M-3.4,-10.6 L3.4,-10.6" fill="none" stroke={P.espectral}
+            strokeWidth="0.3" strokeLinecap="round" strokeDasharray="0.5 1.1" opacity="0.28" />
+          {ESTRELLAS_FRENTE.map((e, i) => (
+            <Estrella key={i} cx={e.cx} cy={e.cy} r={e.r} delay={e.d} color={P.estrella} vivo={vivo} />
+          ))}
         </g>
         {/* CEJAS FIERAS del depredador (mirada intensa y focalizada): trazos
             angulados con el extremo INTERNO más bajo. Identidad (no opt-in); se
             fruncen más al rugir/acechar (CSS). En su grupo .jaguar-cejas. */}
         <g className="jaguar-cejas" stroke={RH_INK} strokeWidth="1.25" strokeLinecap="round" fill="none">
-          <path d="M-5.0,-11.4 L-1.6,-10.3" />
-          <path d="M5.0,-11.4 L1.6,-10.3" />
+          <path d="M-5.2,-11.9 L-1.7,-10.8" />
+          <path d="M5.2,-11.9 L1.7,-10.8" />
         </g>
         {/* chapetas + boca + trufa + ojos ámbar dentro de la cara */}
         <Cachetes puntos={[{ cx: -4.4, cy: -6.4, r: 1.2 }, { cx: 4.4, cy: -6.4, r: 1.2 }]} vivo={vivo} />
         {boca}
+        {/* VIBRISAS — los bigotes del felino (crema claro, finísimos) nacen de
+            motas oscuras en el hocico, como en el jaguar real. Realismo felino
+            sin perder la goma. */}
+        <g aria-hidden="true" fill={P.roseta} opacity="0.45">
+          <circle cx="-1.9" cy="-5.1" r="0.2" /><circle cx="-1.4" cy="-4.6" r="0.18" /><circle cx="-2.3" cy="-4.5" r="0.16" />
+          <circle cx="1.9" cy="-5.1" r="0.2" /><circle cx="1.4" cy="-4.6" r="0.18" /><circle cx="2.3" cy="-4.5" r="0.16" />
+        </g>
+        <g aria-hidden="true" fill="none" stroke={P.vibrisa} strokeWidth="0.32" strokeLinecap="round" opacity="0.55">
+          <path d="M-2.6,-5.0 C-4.4,-4.8 -5.8,-5.0 -7.0,-5.6" />
+          <path d="M-2.6,-4.4 C-4.3,-4.0 -5.6,-3.9 -6.8,-4.2" />
+          <path d="M2.6,-5.0 C4.4,-4.8 5.8,-5.0 7.0,-5.6" />
+          <path d="M2.6,-4.4 C4.3,-4.0 5.6,-3.9 6.8,-4.2" />
+        </g>
         {/* trufa (nariz) */}
         <path d="M-1.3,-4.7 L1.3,-4.7 L0,-3.5 Z" fill={P.nariz} />
-        <OjosRubber
-          ojos={[{ cx: -2.5, cy: -9.2, r: 1.7 }, { cx: 2.5, cy: -9.2, r: 1.7 }]}
-          mirar={[0, 0.1]}
-          parpadea={vivo}
-        />
-        {/* MIRADA FELINA ÁMBAR: iris que enmarca la pupila (sobre la esclerótica,
-            fuera del negro de la pupila) → la intensidad del ojo de gato. */}
-        <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.55" opacity="0.85">
-          <circle cx="-2.5" cy="-9.2" r="1.32" />
-          <circle cx="2.5" cy="-9.2" r="1.32" />
-        </g>
-        {/* OJOS LUMINOSOS — fosforescencia del espíritu (visión nocturna del
-            chamán): un halo suave que respira sobre cada ojo. Sutil siempre;
-            CHAMÁNICO (más brillante) en modo poder (CSS). */}
-        <g className={vivo ? 'jaguar-ojo-brillo' : undefined} filter={`url(#${blur})`} aria-hidden="true"
-          style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
-          <circle cx="-2.5" cy="-9.2" r="1.15" fill={P.ojoBrillo} opacity="0.55" />
-          <circle cx="2.5" cy="-9.2" r="1.15" fill={P.ojoBrillo} opacity="0.55" />
+        {/* OJOS grandes, ámbar y EXPRESIVOS (el registro de casa: carisma con
+            alma — catchlight del kit + parpadeo + micro-mirada). Nunca vacíos:
+            la nobleza vive en el ojo aunque el gesto se ponga serio. El grupo
+            .jaguar-ojos CAMBIA DE FORMA por CSS: REDONDOS en reposo (carisma
+            cálido) → ALMENDRADOS al acechar/rugir/revelarse (concentración,
+            "mira a través de ti"), conservando la nobleza felina (registro
+            Mufasa: autoridad noble, jamás villano). */}
+        <g className="jaguar-ojos" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+          <OjosRubber
+            ojos={[{ cx: -2.5, cy: -9.2, r: 1.85 }, { cx: 2.5, cy: -9.2, r: 1.85 }]}
+            mirar={[0, 0.1]}
+            parpadea={vivo}
+          />
+          {/* MIRADA FELINA ÁMBAR: iris que enmarca la pupila (sobre la esclerótica,
+              fuera del negro de la pupila) → la intensidad del ojo de gato. */}
+          <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.6" opacity="0.85">
+            <circle cx="-2.5" cy="-9.2" r="1.44" />
+            <circle cx="2.5" cy="-9.2" r="1.44" />
+          </g>
+          {/* OJOS LUMINOSOS — fosforescencia del espíritu (visión nocturna del
+              chamán): un halo suave que respira sobre cada ojo. Sutil siempre;
+              CHAMÁNICO (más brillante) en modo poder / revelación (CSS). */}
+          <g className={vivo ? 'jaguar-ojo-brillo' : undefined} filter={`url(#${blur})`} aria-hidden="true"
+            style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+            <circle cx="-2.5" cy="-9.2" r="1.25" fill={P.ojoBrillo} opacity="0.55" />
+            <circle cx="2.5" cy="-9.2" r="1.25" fill={P.ojoBrillo} opacity="0.55" />
+          </g>
         </g>
       </g>
 
@@ -388,6 +600,24 @@ export function Jaguar({
 
       {/* Prop del mundo en la zarpa (entra heroico con su herramienta). */}
       {propMundo}
+
+      {/* BRUMA ETÉREA — el velo del mundo-espíritu a los pies: vela apenas las
+          zarpas (por eso va al frente) y deriva lentísimo. En la revelación se
+          ADENSA (CSS). */}
+      <ellipse className={vivo ? 'jaguar-bruma' : undefined} cx="0" cy="11.8" rx="9.4" ry="2.1"
+        fill={P.bruma} opacity="0.1" filter={`url(#${blur})`}
+        style={{ transformBox: 'fill-box', transformOrigin: 'center' }} aria-hidden="true" />
+
+      {/* MOTAS DE LUZ — polvo del espíritu que flota lento alrededor del
+          felino; cada mota con su delay/duración propios (nunca en compás).
+          Quietas y tenues con animated=false / RM / tier bajo. */}
+      <g aria-hidden="true" fill={P.mota}>
+        {MOTAS.map((m, i) => (
+          <circle key={i} className={vivo ? 'jaguar-mota' : undefined}
+            cx={m.cx} cy={m.cy} r={m.r} opacity="0.3"
+            style={vivo ? { animationDelay: `${m.d}s`, animationDuration: `${m.s}s` } : undefined} />
+        ))}
+      </g>
     </g>
   );
 
@@ -400,7 +630,19 @@ export function Jaguar({
     </g>
   ) : body;
   // El line-boil (contorno que hierve) envuelve TODO el dibujo cuando se pide.
-  const cuerpoVivo = lineBoil ? <g filter={`url(#${boil})`}>{conAntics}</g> : conAntics;
+  const conBoil = lineBoil ? <g filter={`url(#${boil})`}>{conAntics}</g> : conAntics;
+  // La LEVITACIÓN de la revelación envuelve todo (ingravidez del espíritu):
+  // el wrapper siempre existe, la animación solo corre con data-revelacion (CSS)
+  // → cero costo para los consumidores actuales. La APARICIÓN espectral lo
+  // envuelve por fuera (nodo aparte: opacity+scale de materialización, sin
+  // pisar el transform de la levitación); solo anima con data-aparicion.
+  const cuerpoVivo = (
+    <g className="jaguar-aparicion" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+      <g className="jaguar-levita" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+        {conBoil}
+      </g>
+    </g>
+  );
 
   const estadoAttrs = {
     'data-creature': JAGUAR_SLUG,
@@ -412,6 +654,8 @@ export function Jaguar({
     'data-mojado': ropa?.mojado ? '1' : undefined,
     'data-ruge': rugeFx ? '1' : undefined,
     'data-acecha': acechaFx ? '1' : undefined,
+    'data-revelacion': revelacion ? '1' : undefined,
+    'data-aparicion': aparicion ? '1' : undefined,
     'data-vida': momento || undefined,
     'data-lineboil': lineBoil ? '1' : undefined,
     'data-prop': mundoId || undefined,

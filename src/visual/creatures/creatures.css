@@ -1335,6 +1335,42 @@
   50%      { opacity: 0.32; }
 }
 
+/* MOTAS DE LUZ — el polvo del espíritu flota lento alrededor del felino (cada
+   mota trae SU delay/duración inline: nunca en compás). Nace tenue a los pies
+   del ciclo, sube y se apaga — el bucle salta con opacidad 0 (invisible). */
+.jaguar-mota {
+  animation: jaguar-mota 6.5s ease-in-out infinite;
+}
+@keyframes jaguar-mota {
+  0%   { opacity: 0;    transform: translateY(0.8px); }
+  38%  { opacity: 0.75; }
+  100% { opacity: 0;    transform: translateY(-3.2px); }
+}
+
+/* BRUMA ETÉREA — el velo de niebla del mundo-espíritu a los pies: deriva
+   lateral lentísima que respira. */
+.jaguar-bruma {
+  animation: jaguar-bruma 7.8s ease-in-out infinite;
+}
+@keyframes jaguar-bruma {
+  0%, 100% { opacity: 0.07; transform: translateX(-0.5px) scaleX(1); }
+  50%      { opacity: 0.16; transform: translateX(0.5px) scaleX(1.07); }
+}
+
+/* LÍNEAS DE LA CONSTELACIÓN — la geometría sagrada respira (pulso lentísimo,
+   período co-primo con el titilar de las estrellas). */
+.jaguar-constelacion-linea {
+  animation: jaguar-constelacion-linea 6.2s ease-in-out infinite;
+}
+@keyframes jaguar-constelacion-linea {
+  0%, 100% { opacity: 0.16; }
+  50%      { opacity: 0.4; }
+}
+
+/* MARCAS-ESPÍRITU — las rosetas gemelas espectrales: INVISIBLES en reposo; se
+   encienden cuando el espíritu se revela (revelación / modo poder, abajo). */
+.jaguar-marcas-espiritu { opacity: 0; }
+
 /* MODO PODER CHAMÁNICO — el jaguar-espíritu se revela: el aura, los ojos y las
    estrellas se intensifican y aceleran. Vale tanto en standalone (wrapper
    .jaguar-poder) como en inline (data-poder en el <g>). */
@@ -1369,16 +1405,144 @@
 [data-creature='jaguar'][data-poder='1'] .jaguar-shimmer {
   animation-duration: 2.4s;
 }
+/* En poder también se encienden las marcas-espíritu (ver regla compartida con
+   la revelación, abajo). */
+
+/* ── REVELACIÓN DEL ESPÍRITU (estado héroe, prop `revelacion`, default OFF) ──
+   La entrada cinematográfica: el jaguar-espíritu SE MANIFIESTA — las marcas
+   gemelas brillan sobre las rosetas, la bruma se adensa, el felino LEVITA
+   apenas (ingravidez contenida), la sombra del suelo cede (el peso se vuelve
+   espíritu) y aura/ojos/estrellas suben a su registro chamánico. MAJESTAD, no
+   susto: todo lento, digno, transform/opacity. */
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-aura-espectral {
+  animation-name: jaguar-aura-chaman;
+  animation-duration: 3.4s;
+}
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-ojo-brillo {
+  animation-name: jaguar-ojo-chaman;
+  animation-duration: 2.4s;
+}
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-estrella {
+  animation-name: jaguar-titilar-chaman;
+  animation-duration: 1.7s;
+}
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-shimmer { animation-duration: 2.6s; }
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-mota { animation-duration: 4.2s; }
+
+/* ingravidez: el cuerpo entero flota y asienta lentísimo */
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-levita {
+  animation: jaguar-levita 4.8s ease-in-out infinite;
+}
+@keyframes jaguar-levita {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-1.1px); }
+}
+/* la sombra del suelo CEDE (el peso se vuelve espíritu) */
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-sombra-suelo { opacity: 0.45; }
+
+/* la bruma de la manifestación: más densa y más viva */
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-bruma {
+  animation-name: jaguar-bruma-densa;
+  animation-duration: 5.4s;
+}
+@keyframes jaguar-bruma-densa {
+  0%, 100% { opacity: 0.18; transform: translateX(-0.6px) scale(1.02, 1.1); }
+  50%      { opacity: 0.34; transform: translateX(0.6px) scale(1.12, 1.25); }
+}
+
+/* las marcas-espíritu se ENCIENDEN y laten (también en modo poder) */
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-marcas-espiritu,
+.jaguar-poder .jaguar-marcas-espiritu,
+[data-creature='jaguar'][data-poder='1'] .jaguar-marcas-espiritu {
+  opacity: 0.55;
+  animation: jaguar-marcas 2.8s ease-in-out infinite;
+}
+@keyframes jaguar-marcas {
+  0%, 100% { opacity: 0.28; }
+  50%      { opacity: 0.85; }
+}
+
+/* GLIFOS SAGRADOS (espirales cobre) — invisibles en reposo; se encienden y
+   laten en la revelación / el poder (símbolo de poder como adorno). */
+.jaguar-glifos { opacity: 0; }
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-glifos,
+.jaguar-poder .jaguar-glifos,
+[data-creature='jaguar'][data-poder='1'] .jaguar-glifos {
+  opacity: 0.6;
+  animation: jaguar-glifos 3.6s ease-in-out infinite;
+}
+@keyframes jaguar-glifos {
+  0%, 100% { opacity: 0.34; }
+  50%      { opacity: 0.72; }
+}
+
+/* la revelación PISA el arrebato (antic/travieso): el espíritu manifiesto no
+   hace travesuras — majestad pura. */
+[data-creature='jaguar'][data-revelacion='1'] .rh-antic,
+[data-creature='jaguar'][data-revelacion='1'] .rh-travieso { animation: none; }
+
+/* ── OJOS QUE CAMBIAN DE FORMA (registro Mufasa: carisma ↔ autoridad) ────────
+   REDONDOS en reposo (carisma cálido) → ALMENDRADOS al concentrarse
+   (acecho/rugido/revelación): la mirada se afila y "atraviesa", conservando la
+   nobleza felina. Es un cambio de ESTADO (transición, no bucle) → en RM
+   simplemente salta a la forma seria (fotograma digno). */
+.jaguar-ojos { transition: transform 0.55s ease; }
+[data-creature='jaguar'][data-acecha='1'] .jaguar-ojos,
+[data-creature='jaguar'][data-ruge='1'] .jaguar-ojos { transform: scaleY(0.8); }
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-ojos { transform: scaleY(0.86); }
+
+/* CEJAS NOBLES de la revelación — se ALZAN (sabiduría ancestral, no el fruncido
+   del acecho): la autoridad serena del guardián-espíritu, jamás villano. */
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-cejas {
+  animation: jaguar-cejas-noble 4.4s ease-in-out infinite;
+}
+@keyframes jaguar-cejas-noble {
+  0%, 100% { transform: translateY(-0.5px); }
+  50%      { transform: translateY(-0.95px); }
+}
+
+/* ── APARICIÓN ESPECTRAL — el jaguar-espíritu se MATERIALIZA y se DESVANECE ───
+   Ciclo místico de presencia (opt-in, data-aparicion): emerge desde la bruma
+   (opacidad que sube + leve escala/ascenso, como si se condensara del aire) se
+   queda un rato PRESENTE y vuelve a disolverse en la nada. Solo opacity+transform
+   (GPU). El nodo .jaguar-aparicion envuelve TODO el dibujo por fuera de la
+   levitación → no pisa su transform. Cae a PRESENTE y quieto en RM / tier bajo
+   (nunca invisible). */
+[data-creature='jaguar'][data-aparicion='1'] .jaguar-aparicion {
+  animation: jaguar-aparicion 8.5s ease-in-out infinite;
+}
+@keyframes jaguar-aparicion {
+  0%   { opacity: 0;    transform: scale(0.94) translateY(1.3px); }  /* la nada */
+  14%  { opacity: 0.22; transform: scale(0.97) translateY(0.6px); }  /* se insinúa */
+  32%  { opacity: 1;    transform: scale(1) translateY(0); }         /* materializado */
+  66%  { opacity: 1;    transform: scale(1) translateY(0); }         /* presente, sagrado */
+  86%  { opacity: 0.18; transform: scale(0.985) translateY(0.5px); } /* se disuelve */
+  100% { opacity: 0;    transform: scale(0.94) translateY(1.3px); }  /* vuelve a la nada */
+}
 
 /* device-tier 'bajo': PODA el brillo/estrellas místicas (raster caro en gama
    baja) — se detiene la animación y queda un rastro estático y digno. */
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-glifos,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-ojos { animation: none; transition: none; }
+/* aparición: sin ciclo → queda PRESENTE (visible, opacidad plena, quieto). */
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-aparicion { animation: none; opacity: 1; transform: none; }
 [data-tier='bajo'][data-creature='jaguar'] .jaguar-aura-espectral,
 [data-tier='bajo'][data-creature='jaguar'] .jaguar-ojo-brillo,
-[data-tier='bajo'][data-creature='jaguar'] .jaguar-shimmer { animation: none; }
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-shimmer,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-bruma,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-constelacion-linea,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-levita,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-marcas-espiritu { animation: none; }
 [data-tier='bajo'][data-creature='jaguar'] .jaguar-estrella { animation: none; opacity: 0.4; }
+/* motas: quietas y tenues (cae al opacity del atributo, 0.3) */
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-mota { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .jaguar-aura-espectral, .jaguar-ojo-brillo, .jaguar-shimmer,
+  /* animation:none !important en la clase base pisa TODA variante (poder /
+     revelación reasignan animation-name sin !important) */
+  .jaguar-mota, .jaguar-bruma, .jaguar-constelacion-linea,
+  .jaguar-levita, .jaguar-marcas-espiritu, .jaguar-glifos,
   .jaguar-poder .jaguar-aura-espectral,
   .jaguar-poder .jaguar-ojo-brillo,
   .jaguar-poder .jaguar-shimmer,
@@ -1389,6 +1553,10 @@
   .jaguar-estrella,
   .jaguar-poder .jaguar-estrella,
   [data-creature='jaguar'][data-poder='1'] .jaguar-estrella { animation: none !important; opacity: 0.5; }
+  /* Ojos: sin transición — saltan a su forma (redonda o almendrada) sin morphear. */
+  .jaguar-ojos { transition: none !important; }
+  /* Aparición: NUNCA invisible — queda PRESENTE, opacidad plena y quieto. */
+  .jaguar-aparicion { animation: none !important; opacity: 1 !important; transform: none !important; }
 }
 
 
