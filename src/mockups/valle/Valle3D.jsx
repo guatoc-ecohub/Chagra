@@ -127,9 +127,9 @@ const LUGAR_A_MUNDO_ANGELITA = {
    decide si de verdad vale la pena interrumpir. Nunca a mitad de un viaje
    real, nunca con reduced-motion. */
 const HUSMEO_LUGARES = ['cultivos', 'animales', 'clima', 'mercado', 'aprender', 'disenio'];
-const HUSMEO_PRIMERO_MS = 5200; // el primer husmeo llega pronto: se ve viva al cargar
-const HUSMEO_CADA_MS = 40000; // cadencia entre intentos de husmeo autónomo
-const HUSMEO_VISIBLE_MS = 7200; // cuánto dura el comentario antes de volver a calma
+const HUSMEO_PRIMERO_MS = 4200; // el primer husmeo llega pronto: se ve viva al cargar
+const HUSMEO_CADA_MS = 13000; // cadencia entre husmeos (feedback operador: 40s se sentía MUERTA; 13s = viva sin ser errática)
+const HUSMEO_VISIBLE_MS = 7000; // cuánto dura el comentario antes de volver a calma
 
 /* Altura del terreno por (x,z): la LADERA ANDINA. El eje z es la montaña — al
    fondo (z negativo) trepa al páramo alto, al frente (z positivo) baja a tierra
