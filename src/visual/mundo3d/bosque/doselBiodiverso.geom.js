@@ -12,11 +12,18 @@
  *   · Nogal cafetero (Cordia alliodora) — fuste recto y limpio, ramas en piso
  *     (verticilos) y copa clara: el árbol de sombrío y madera del cafetal.
  *   · Cedro (Cedrela odorata) — bole recto y copa ancha y aparasolada.
+ *   · Yarumo (Cecropia) — fuste PÁLIDO anillado + candelabro ralo con rosetas de
+ *     hojas palmadas de envés plateado: la silueta que delata el bosque andino.
+ *   · Aliso (Alnus acuminata) — el árbol de agua de las cañadas: copa CÓNICA
+ *     verde oscura, huso vertical que rompe las copas redondas.
  *
  *   DOSEL FLORECIDO (el color que rompe el verde)
  *   · Cámbulo / búcaro (Erythrina fusca) — copa abierta encendida en ROJO-naranja.
  *   · Gualanday (Jacaranda caucana) — nube MORADA-lila sobre fuste gris.
  *   · Siete cueros (Tibouchina lepidota) — arbolito andino de flor MAGENTA.
+ *   · Chachafruto (Erythrina edulis) — flor NARANJA-salmón + vainas colgantes
+ *     del fríjol de árbol comestible.
+ *   · Guácimo (Guazuma ulmifolia) — copa ANCHA y baja (umbráculo), verde denso.
  *
  *   SOTOBOSQUE (la penumbra viva bajo el dosel)
  *   · Helecho arbóreo (Cyathea) — el ícono del bosque de niebla: fuste fibroso
@@ -60,25 +67,27 @@ import {
 /* -------------------------------------------------------------------------- */
 
 /*
- * 'alto' arma un bosque pleno de tres estratos; 'medio' lo raciona; 'bajo' deja
- * lo justo para que AÚN lea "bosque variado" (unos emergentes, algo de color,
- * unos helechos). Junto al queñual y la FloraParamo, esto TRIPLICA los árboles.
+ * 'alto' arma un bosque andino DENSO de tres estratos —una pared de dosel
+ * multiespecie que cierra el fondo—; 'medio' lo raciona; 'bajo' deja lo justo
+ * para que AÚN lea "bosque variado" (unos emergentes, algo de color, unos
+ * helechos). Junto al queñual y la FloraParamo, esto TRIPLICA los árboles y
+ * multiplica la variedad hasta trece especies reales colombianas.
  */
 export const DOSEL_TIER = {
   alto: {
-    guadua: 9, nogal: 6, cedro: 5,
-    cambulo: 4, gualanday: 4, sieteCueros: 6,
-    helecho: 14, heliconia: 16, quiche: 20,
+    guadua: 15, nogal: 11, cedro: 9, yarumo: 10, aliso: 9, guacimo: 8,
+    cambulo: 7, gualanday: 7, sieteCueros: 11, chachafruto: 6,
+    helecho: 26, heliconia: 26, quiche: 36,
   },
   medio: {
-    guadua: 5, nogal: 3, cedro: 3,
-    cambulo: 2, gualanday: 2, sieteCueros: 3,
-    helecho: 7, heliconia: 8, quiche: 10,
+    guadua: 8, nogal: 6, cedro: 5, yarumo: 5, aliso: 4, guacimo: 4,
+    cambulo: 3, gualanday: 3, sieteCueros: 5, chachafruto: 3,
+    helecho: 13, heliconia: 13, quiche: 18,
   },
   bajo: {
-    guadua: 3, nogal: 2, cedro: 1,
-    cambulo: 1, gualanday: 1, sieteCueros: 1,
-    helecho: 3, heliconia: 3, quiche: 4,
+    guadua: 4, nogal: 3, cedro: 2, yarumo: 2, aliso: 2, guacimo: 1,
+    cambulo: 1, gualanday: 1, sieteCueros: 2, chachafruto: 1,
+    helecho: 5, heliconia: 5, quiche: 7,
   },
 };
 export const doselDeTier = (tier) => DOSEL_TIER[tier] || DOSEL_TIER.medio;
@@ -164,6 +173,40 @@ const PB = {
   quicheHojaSol: '#83a656',
   quicheCentro: '#c34a3a', // el corazón encendido (rojo/coral)
   quicheCentro2: '#dc7a3f',
+
+  // Yarumo (Cecropia) — fuste PÁLIDO anillado + hoja palmada de envés plateado
+  yarumoTronco: '#b7b3a4',
+  yarumoTroncoLuz: '#d2cebf',
+  yarumoAnillo: '#8d8877',
+  yarumoHoja: '#496b3f',
+  yarumoHojaLuz: '#c4ccb0', // el envés blanco-plateado que voltea el viento
+
+  // Aliso (Alnus acuminata) — árbol de agua, copa CÓNICA verde oscura
+  alisoTronco: '#7f7360',
+  alisoGrieta: '#514736',
+  alisoCresta: '#9a8c74',
+  alisoHoja: '#33502f',
+  alisoHojaSol: '#557a3e',
+  alisoHojaLuz: '#93b46a',
+
+  // Guácimo (Guazuma ulmifolia) — copa ANCHA y baja (umbráculo)
+  guacimoTronco: '#877459',
+  guacimoGrieta: '#544632',
+  guacimoCresta: '#a08a6c',
+  guacimoHoja: '#43602f',
+  guacimoHojaSol: '#6b8f46',
+  guacimoHojaLuz: '#b0c778',
+
+  // Chachafruto (Erythrina edulis) — flor NARANJA-salmón + vaina colgante
+  chachaTronco: '#7a6a52',
+  chachaGrieta: '#4b3d2c',
+  chachaCresta: '#95816a',
+  chachaHoja: '#45613c',
+  chachaHojaSol: '#6d9150',
+  chachaHojaLuz: '#b6cd7c',
+  chachaFlor: '#e2632a', // naranja-salmón
+  chachaFlor2: '#f0913f',
+  chachaVaina: '#6a7d3c', // la vaina verde del fruto comestible
 };
 
 /* -------------------------------------------------------------------------- */
@@ -631,6 +674,210 @@ export function geomQuiche({ q = 1 } = {}, seed = 10) {
 }
 
 /* -------------------------------------------------------------------------- */
+/*  YARUMO (Cecropia) — el pionero de fuste pálido, la silueta más andina       */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * El árbol que delata el bosque andino de lejos: fuste RECTO, PÁLIDO (gris-
+ * blancuzco) y anillado por las cicatrices de las hojas caídas, rematado en un
+ * CANDELABRO ralo de pocas ramas; en cada punta, una roseta de grandes hojas
+ * PALMADAS (en estrella) que voltean su envés BLANCO-plateado al viento. Poca
+ * hoja, muy separada — nada de copa-globo: la firma del yarumo es el aire entre
+ * sus estrellas y el tronco claro.
+ */
+export function geomYarumo({ q = 1 } = {}, seed = 11) {
+  const r = rng(seed);
+  const partes = [];
+  const H = 4.4 + r() * 1.3;
+  // Fuste pálido, recto y liso, con anillos oscuros (cicatrices de hoja).
+  const curva = curvaTronco({ altura: H, inclina: 0.03, sinuoso: 0.04, giro: r() * 6 }, seed + 1);
+  const fuste = tuboOrganico(curva, {
+    tubular: Math.max(9, Math.round(16 * q)),
+    radial: Math.max(6, Math.round(7 * q)),
+    taper: taperTronco(0.13, 0.05, 0.35),
+    arruga: 0.05,
+    semilla: seed * 3,
+  });
+  const cuerpo = new THREE.Color(PB.yarumoTronco);
+  const claro = new THREE.Color(PB.yarumoTroncoLuz);
+  const anillo = new THREE.Color(PB.yarumoAnillo);
+  const tmp = new THREE.Color();
+  pintarPorVertice(fuste, (x, y) => {
+    const t = Math.min(1, Math.max(0, y / H));
+    tmp.copy(cuerpo).lerp(claro, t * 0.5);
+    const band = Math.abs(((y / 0.5) % 1) - 0.5); // anillos cada ~0.5 m
+    if (band > 0.44) tmp.lerp(anillo, ((band - 0.44) / 0.06) * 0.6);
+    return tmp;
+  });
+  partes.push(fuste);
+
+  // Candelabro: pocas ramas que suben-abren, más un ápice; cada punta lleva
+  // una roseta de hojas palmadas.
+  const top = curva.getPointAt(1);
+  const tips = [[top.x, top.y + 0.22, top.z]];
+  const nBr = Math.max(2, Math.round(3 * q));
+  for (let i = 0; i < nBr; i++) {
+    const ang = (i / nBr) * Math.PI * 2 + r() * 0.5;
+    const largo = 0.85 + r() * 0.5;
+    const dir = [Math.cos(ang) * 0.72, 1.05, Math.sin(ang) * 0.72];
+    const rama = new THREE.CylinderGeometry(0.024, 0.045, largo, 5, 1);
+    apuntar(rama, [top.x, top.y - 0.12, top.z], dir);
+    partes.push(pintar(rama, PB.yarumoTronco));
+    const nrm = Math.hypot(dir[0], dir[1], dir[2]);
+    tips.push([
+      top.x + (dir[0] / nrm) * largo,
+      top.y - 0.12 + (dir[1] / nrm) * largo,
+      top.z + (dir[2] / nrm) * largo,
+    ]);
+  }
+  for (let ti = 0; ti < tips.length; ti++) {
+    const tip = tips[ti];
+    const nH = Math.max(4, Math.round(6 * q));
+    for (let j = 0; j < nH; j++) {
+      const a = (j / nH) * Math.PI * 2 + r();
+      const rad = 0.32 + r() * 0.2;
+      // Hoja palmada: cono MUY plano de 7 lados (estrella) apuntando arriba-afuera.
+      const hoja = new THREE.ConeGeometry(rad, 0.06, 7, 1);
+      apuntar(
+        hoja,
+        [tip[0] + Math.cos(a) * 0.14, tip[1] + 0.02 + r() * 0.06, tip[2] + Math.sin(a) * 0.14],
+        [Math.cos(a) * 0.5, 0.86, Math.sin(a) * 0.5],
+        [1, 1, 1],
+      );
+      // envés plateado ↔ haz verde: mezcla que da el brillo característico.
+      const cc = new THREE.Color(PB.yarumoHoja).lerp(new THREE.Color(PB.yarumoHojaLuz), r() * 0.7);
+      partes.push(pintar(hoja, cc));
+    }
+    const cogollo = matojoNube(0.11 + r() * 0.04, seed * 7 + ti, 0.4);
+    poner(cogollo, [tip[0], tip[1] + 0.05, tip[2]]);
+    partes.push(pintar(cogollo, PB.yarumoHojaLuz));
+  }
+  return fusionar(partes, 'yarumo');
+}
+
+/* -------------------------------------------------------------------------- */
+/*  ALISO (Alnus acuminata) — el árbol de agua, copa CÓNICA verde oscura        */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * El árbol de las orillas y las cañadas altoandinas (fija nitrógeno, cura el
+ * suelo). Fuste recto grisáceo y copa CÓNICA/aparasolada estrecha, verde muy
+ * oscura — un huso vertical que contrasta con las copas redondas del resto.
+ */
+export function geomAliso({ q = 1 } = {}, seed = 12) {
+  const r = rng(seed);
+  const partes = [];
+  const H = 3.8 + r() * 1.0;
+  const { geo, curva } = troncoHorneado(
+    { H, r0: 0.16, r1: 0.055, inclina: 0.03, sinuoso: 0.05, giro: r() * 6, arruga: 0.12, raigon: 0.4, q, hastaLiquen: 0.55, liquen: '#8f9a5e',
+      corteza: { grieta: PB.alisoGrieta, cuerpo: PB.alisoTronco, cresta: PB.alisoCresta, escalaGrano: 4.0 } },
+    seed + 1,
+  );
+  partes.push(geo);
+  const top = curva.getPointAt(1);
+  // Copa CÓNICA: lóbulos apilados que decrecen hacia arriba (huso/pirámide).
+  const lobs = [];
+  const nNiv = Math.max(3, Math.round(4 * q));
+  for (let k = 0; k < nNiv; k++) {
+    const t = k / nNiv;
+    const y = top.y - 0.1 + t * (H * 0.62);
+    const radio = 0.86 * (1 - t * 0.72) + 0.16;
+    const nEn = k < nNiv - 1 ? 2 : 1;
+    for (let i = 0; i < nEn; i++) {
+      const ang = (i / nEn) * Math.PI * 2 + k * 0.9;
+      const off = radio * 0.42;
+      lobs.push({ c: [top.x + Math.cos(ang) * off, y, top.z + Math.sin(ang) * off], radio });
+    }
+  }
+  copaMasa(lobs, { base: PB.alisoHoja, sol: PB.alisoHojaSol, luz: PB.alisoHojaLuz, q, seed: seed + 7, achatado: 0.86, huecos: 0.42, mordida: 0.42, ao: 0.64 }).forEach((cc) => partes.push(cc));
+  return fusionar(partes, 'aliso');
+}
+
+/* -------------------------------------------------------------------------- */
+/*  GUÁCIMO (Guazuma ulmifolia) — la copa ANCHA y baja (umbráculo de potrero)   */
+/* -------------------------------------------------------------------------- */
+
+export function geomGuacimo({ q = 1 } = {}, seed = 13) {
+  const r = rng(seed);
+  const partes = [];
+  const H = 2.6 + r() * 0.6;
+  const { geo, curva } = troncoHorneado(
+    { H, r0: 0.17, r1: 0.08, inclina: 0.08, sinuoso: 0.12, giro: r() * 6, arruga: 0.16, raigon: 0.45, q,
+      corteza: { grieta: PB.guacimoGrieta, cuerpo: PB.guacimoTronco, cresta: PB.guacimoCresta, escalaGrano: 4.4 } },
+    seed + 1,
+  );
+  partes.push(geo);
+  const top = curva.getPointAt(1);
+  // Copa ANCHA y baja: muchos lóbulos horizontales, densos (umbráculo).
+  const lobs = [{ c: [top.x, top.y + 0.2, top.z], radio: 1.0 }];
+  const nL = Math.max(5, Math.round(7 * q));
+  for (let i = 0; i < nL; i++) {
+    const ang = (i / nL) * Math.PI * 2 + r() * 0.4;
+    const rad = 0.95 + r() * 0.55;
+    const rama = new THREE.CylinderGeometry(0.035, 0.06, rad + 0.2, 5, 1);
+    apuntar(rama, [top.x + Math.cos(ang) * 0.15, H - 0.35, top.z + Math.sin(ang) * 0.15], [Math.cos(ang), 0.12, Math.sin(ang)]);
+    partes.push(pintar(rama, PB.guacimoCresta));
+    lobs.push({ c: [Math.cos(ang) * rad, H - 0.05 + r() * 0.3, Math.sin(ang) * rad], radio: 0.6 + r() * 0.28 });
+  }
+  copaMasa(lobs, { base: PB.guacimoHoja, sol: PB.guacimoHojaSol, luz: PB.guacimoHojaLuz, q, seed: seed + 7, achatado: 0.56, huecos: 0.44, mordida: 0.42, ao: 0.64 }).forEach((cc) => partes.push(cc));
+  return fusionar(partes, 'guacimo');
+}
+
+/* -------------------------------------------------------------------------- */
+/*  CHACHAFRUTO (Erythrina edulis) — flor NARANJA-salmón + vaina colgante        */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * El fríjol de árbol de la montaña: pariente del cámbulo, pero de flor más
+ * NARANJA-salmón y —su seña— largas VAINAS colgantes con las semillas que se
+ * comen. Copa abierta, mediana. Se distingue del cámbulo por el naranja y por
+ * los frutos que penden bajo el follaje.
+ */
+export function geomChachafruto({ q = 1 } = {}, seed = 14) {
+  const r = rng(seed);
+  const partes = [];
+  const H = 2.8 + r() * 0.6;
+  const { geo, curva } = troncoHorneado(
+    { H, r0: 0.15, r1: 0.07, inclina: 0.08, sinuoso: 0.12, giro: r() * 6, arruga: 0.14, raigon: 0.42, q,
+      corteza: { grieta: PB.chachaGrieta, cuerpo: PB.chachaTronco, cresta: PB.chachaCresta, escalaGrano: 4.0 } },
+    seed + 1,
+  );
+  partes.push(geo);
+  const top = curva.getPointAt(1);
+  const lobs = [{ c: [top.x, top.y + 0.35, top.z], radio: 0.72 }];
+  const nL = Math.max(3, Math.round(5 * q));
+  for (let i = 0; i < nL; i++) {
+    const ang = (i / nL) * Math.PI * 2 + r() * 0.5;
+    const rad = 0.62 + r() * 0.45;
+    const rama = new THREE.CylinderGeometry(0.03, 0.055, rad + 0.25, 5, 1);
+    apuntar(rama, [top.x + Math.cos(ang) * 0.13, H - 0.45, top.z + Math.sin(ang) * 0.13], [Math.cos(ang), 0.55, Math.sin(ang)]);
+    partes.push(pintar(rama, PB.chachaCresta));
+    lobs.push({ c: [Math.cos(ang) * rad, H + 0.2 + r() * 0.35, Math.sin(ang) * rad], radio: 0.46 + r() * 0.24 });
+  }
+  copaMasa(lobs, { base: PB.chachaHoja, sol: PB.chachaHojaSol, luz: PB.chachaHojaLuz, q, seed: seed + 7, achatado: 0.72, huecos: 0.5, mordida: 0.42, ao: 0.6 }).forEach((cc) => partes.push(cc));
+  floresEnCopa(lobs, { colorA: PB.chachaFlor, colorB: PB.chachaFlor2, q, seed: seed + 3, densidad: 5, escala: 0.5 }).forEach((f) => partes.push(f));
+  // Vainas colgantes (el fruto que le da el nombre): cilindros largos, verdes.
+  if (q > 0.5) {
+    for (const lb of lobs) {
+      const nV = Math.max(1, Math.round(2 * q));
+      for (let i = 0; i < nV; i++) {
+        const ang = r() * Math.PI * 2;
+        const rr = lb.radio * (0.4 + r() * 0.5);
+        const largo = 0.5 + r() * 0.35;
+        const vaina = new THREE.CylinderGeometry(0.022, 0.03, largo, 5, 1);
+        poner(
+          vaina,
+          [lb.c[0] + Math.cos(ang) * rr, lb.c[1] - largo * 0.5 - 0.1, lb.c[2] + Math.sin(ang) * rr],
+          [0, 0, r() * 0.24 - 0.12],
+        );
+        partes.push(pintar(vaina, variar(PB.chachaVaina, r, 0.1)));
+      }
+    }
+  }
+  return fusionar(partes, 'chachafruto');
+}
+
+/* -------------------------------------------------------------------------- */
 /*  DISTRIBUCIÓN — dónde crece cada estrato (el Ent en 0,0,0; la cámara orbita) */
 /* -------------------------------------------------------------------------- */
 
@@ -693,17 +940,25 @@ export function distribucionDosel(conteos, seed = 909) {
   const c = conteos;
   return {
     // Emergentes: pared del fondo, altos, reparto parejo, velados por niebla.
-    guadua: sembrar(c.guadua, 11, 22, rng(seed + 1), { eMin: 0.95, eMax: 1.35, varia: 0.08, evitaFrente: true, evitaAgua: true }),
-    nogal: sembrar(c.nogal, 12, 23, rng(seed + 2), { eMin: 0.95, eMax: 1.2, varia: 0.07, evitaFrente: true, evitaAgua: true }),
-    cedro: sembrar(c.cedro, 13, 24, rng(seed + 3), { eMin: 0.95, eMax: 1.2, varia: 0.08, evitaFrente: true, evitaAgua: true }),
-    // Dosel florecido: anillo medio, salpicado (color).
-    cambulo: sembrar(c.cambulo, 9, 18, rng(seed + 4), { eMin: 0.9, eMax: 1.15, varia: 0.08, evitaAgua: true }),
-    gualanday: sembrar(c.gualanday, 9, 18, rng(seed + 5), { eMin: 0.9, eMax: 1.15, varia: 0.08, evitaAgua: true }),
-    sieteCueros: sembrar(c.sieteCueros, 6, 15, rng(seed + 6), { eMin: 0.85, eMax: 1.2, varia: 0.1, agrupa: true, evitaAgua: true }),
-    // Sotobosque: interior-medio, agrupado (manchones).
-    helecho: sembrar(c.helecho, 5, 13, rng(seed + 7), { eMin: 0.8, eMax: 1.3, varia: 0.12, agrupa: true, evitaAgua: true }),
-    heliconia: sembrar(c.heliconia, 4.5, 12, rng(seed + 8), { eMin: 0.85, eMax: 1.25, varia: 0.12, agrupa: true, evitaAgua: true }),
-    // Epífitas: rosetas cerca del claro, agrupadas.
-    quiche: sembrar(c.quiche, 3.6, 11, rng(seed + 9), { eMin: 0.8, eMax: 1.4, varia: 0.12, agrupa: true }),
+    // Anillos ANCHOS y solapados (10→27) para que el dosel se cierre denso y
+    // gane profundidad — el bosque se lee como muralla de árboles, no como fila.
+    guadua: sembrar(c.guadua, 10, 26, rng(seed + 1), { eMin: 0.95, eMax: 1.4, varia: 0.08, evitaFrente: true, evitaAgua: true }),
+    nogal: sembrar(c.nogal, 11, 26, rng(seed + 2), { eMin: 0.95, eMax: 1.25, varia: 0.07, evitaFrente: true, evitaAgua: true }),
+    cedro: sembrar(c.cedro, 12, 27, rng(seed + 3), { eMin: 0.95, eMax: 1.25, varia: 0.08, evitaFrente: true, evitaAgua: true }),
+    // Yarumo: emergente pionero, disperso y alto, entra hasta el anillo medio.
+    yarumo: sembrar(c.yarumo, 10, 25, rng(seed + 10), { eMin: 1.0, eMax: 1.35, varia: 0.06, evitaFrente: true, evitaAgua: true }),
+    // Aliso: árbol de AGUA — se le deja pisar cerca del arroyo (sin evitaAgua).
+    aliso: sembrar(c.aliso, 8, 22, rng(seed + 11), { eMin: 0.95, eMax: 1.3, varia: 0.07, evitaFrente: true }),
+    // Dosel florecido y de sombra: anillo medio, salpicado (color y textura).
+    guacimo: sembrar(c.guacimo, 8, 18, rng(seed + 12), { eMin: 0.9, eMax: 1.2, varia: 0.08, evitaAgua: true }),
+    cambulo: sembrar(c.cambulo, 8, 18, rng(seed + 4), { eMin: 0.9, eMax: 1.2, varia: 0.08, evitaAgua: true }),
+    gualanday: sembrar(c.gualanday, 8, 18, rng(seed + 5), { eMin: 0.9, eMax: 1.2, varia: 0.08, evitaAgua: true }),
+    sieteCueros: sembrar(c.sieteCueros, 6, 16, rng(seed + 6), { eMin: 0.85, eMax: 1.2, varia: 0.1, agrupa: true, evitaAgua: true }),
+    chachafruto: sembrar(c.chachafruto, 7, 17, rng(seed + 13), { eMin: 0.9, eMax: 1.2, varia: 0.09, evitaAgua: true }),
+    // Sotobosque: interior-medio, agrupado (manchones espesos).
+    helecho: sembrar(c.helecho, 4.5, 14, rng(seed + 7), { eMin: 0.8, eMax: 1.35, varia: 0.12, agrupa: true, evitaAgua: true }),
+    heliconia: sembrar(c.heliconia, 4, 13, rng(seed + 8), { eMin: 0.85, eMax: 1.3, varia: 0.12, agrupa: true, evitaAgua: true }),
+    // Epífitas: rosetas cerca del claro, agrupadas al pie de todo.
+    quiche: sembrar(c.quiche, 3.4, 12, rng(seed + 9), { eMin: 0.8, eMax: 1.45, varia: 0.12, agrupa: true }),
   };
 }
