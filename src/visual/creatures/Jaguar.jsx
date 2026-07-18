@@ -147,6 +147,13 @@ const MOTAS = [
   { cx: 6.4, cy: -10.2, r: 0.4, d: -5.2, s: 6.1 },
 ];
 
+/* GLIFO ESPIRAL — geometría sagrada (espiral, principio estético andino: San
+   Agustín / Chavín / orfebrería, NO copia de un diseño específico). Símbolo de
+   PODER como adorno (nunca arma). Invisible en reposo; se enciende en la
+   revelación / el poder. Se posiciona/espeja con transform en cada hombro. */
+const GLIFO_ESPIRAL = 'M0,0 C0.3,-0.3 0.75,-0.15 0.85,0.35 C0.95,0.95 0.35,1.4 -0.4,1.15 '
+  + 'C-1.35,0.85 -1.6,-0.35 -0.95,-1.15 C-0.2,-2.05 1.3,-1.95 2.05,-0.95';
+
 export function Jaguar({
   size = 64,
   className = '',
@@ -333,19 +340,25 @@ export function Jaguar({
       {/* aura viva */}
       <circle cx="0" cy="2" r={auraR} fill={P.cuerpo} opacity={auraOp} filter={`url(#${blur})`} />
 
-      {/* COLA LARGA que ondea con PESO (la firma del acecho, al lado derecho para
+      {/* COLA CORTA y GRUESA en la base (clave anti-leopardo: el jaguar la lleva
+          más corta), ondea con PESO (la firma del acecho, al lado derecho para
           no pisar el prop de la zarpa izquierda). Pivota desde su base en el
-          lomo. Rosetas + punta oscura. */}
+          lomo. Lleva ANILLOS (no rosetas — la firma de la cola del jaguar) +
+          punta negra. */}
       <g className={vivo ? 'jaguar-cola' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'left bottom' }}>
-        <path d="M8.4,5.4 C13.2,4.4 15.4,0.2 13.8,-4.4 C13.0,-6.6 11.2,-7.2 9.6,-6.4"
-          fill="none" stroke={P.cuerpo} strokeWidth="3.0" strokeLinecap="round" />
+        {/* relleno del tubo, más grueso en la base (dos trazos superpuestos) */}
+        <path d="M8.2,5.6 C12.2,4.8 13.4,1.0 12.5,-2.8 C11.9,-4.7 10.6,-5.4 9.3,-5.0"
+          fill="none" stroke={P.cuerpo} strokeWidth="3.6" strokeLinecap="round" />
+        {/* ANILLOS: copia del tubo en tinta oscura con dash → bandas perpendiculares
+            perfectas siguiendo la curva (el patrón anillado real). */}
+        <path d="M8.2,5.6 C12.2,4.8 13.4,1.0 12.5,-2.8 C11.9,-4.7 10.6,-5.4 9.3,-5.0"
+          fill="none" stroke={P.roseta} strokeWidth="3.6" strokeLinecap="butt"
+          strokeDasharray="1.5 3.3" strokeDashoffset="-1.6" opacity="0.9" />
         {/* contorno de tinta encima (la línea que manda del rubber-hose) */}
-        <path d="M8.4,5.4 C13.2,4.4 15.4,0.2 13.8,-4.4 C13.0,-6.6 11.2,-7.2 9.6,-6.4"
+        <path d="M8.2,5.6 C12.2,4.8 13.4,1.0 12.5,-2.8 C11.9,-4.7 10.6,-5.4 9.3,-5.0"
           fill="none" stroke={RH_INK} strokeWidth="0.7" strokeLinecap="round" opacity="0.55" />
-        {/* punta oscura + rosetas de la cola */}
-        <circle cx="9.9" cy="-6.2" r="1.5" fill={P.roseta} />
-        <Roseta cx={13.7} cy={-1.0} r={1.15} rot={70} ink={P.roseta} centro={P.rosetaCentro} opacity={0.85} />
-        <Roseta cx={11.4} cy={3.6} r={1.1} rot={230} ink={P.roseta} centro={P.rosetaCentro} opacity={0.85} />
+        {/* punta negra */}
+        <circle cx="9.5" cy="-4.9" r="1.7" fill={P.roseta} />
       </g>
 
       {/* orejas redondas de felino (detrás de la cabeza, se mecen con
@@ -359,10 +372,11 @@ export function Jaguar({
         <circle cx="4.4" cy="-13.4" r={PR.orejaR * 0.5} fill={P.oreja} />
       </g>
 
-      {/* patas traseras (muslos musculosos con planta crema, detrás del tronco).
+      {/* patas traseras GRUESAS y CORTAS (muslos musculosos con planta crema,
+          zarpas grandes y redondas — centro de gravedad bajo, anti-leopardo).
           Se mecen suave. */}
-      <Miembro d="M-6.6,7.0 C-8.6,9.0 -8.8,10.8 -7.4,12.0" ancho={3.4} punta={[-7.4, 12.2]} puntaR={2.0} pie sway={vivo} delay={-0.7} />
-      <Miembro d="M6.6,7.0 C8.6,9.0 8.8,10.8 7.4,12.0" ancho={3.4} punta={[7.4, 12.2]} puntaR={2.0} pie sway={vivo} delay={-1.0} />
+      <Miembro d="M-6.6,7.4 C-8.4,9.0 -8.6,10.6 -7.4,11.8" ancho={4.2} punta={[-7.4, 12.0]} puntaR={2.6} pie sway={vivo} delay={-0.7} />
+      <Miembro d="M6.6,7.4 C8.4,9.0 8.6,10.6 7.4,11.8" ancho={4.2} punta={[7.4, 12.0]} puntaR={2.6} pie sway={vivo} delay={-1.0} />
 
       {/* tronco leonado musculoso con contorno grueso (la línea que respira con
           el boil). El fill es el GRADIENTE de pelaje: luz dorsal → sombra
@@ -437,18 +451,41 @@ export function Jaguar({
         <path d="M6.4,-1.4 Q4.4,-6.2 1.8,-2.6 Z" fill={P.hombro} stroke={RH_INK} strokeWidth="1.1" strokeLinejoin="round" />
       </g>
 
-      {/* bracitos manguera (zarpas delanteras) con planta crema, pivote en el
-          HOMBRO para que celebra/señala los alcen desde el hombro. */}
-      <Miembro clase="crt-brazo-l" origen="right top"
-        d="M-7.0,-1.2 C-10.0,0.4 -11.0,3.4 -10.0,6.2" ancho={3.2} punta={[-10.0, 6.6]} puntaR={2.1} pie sway={vivo} delay={-0.15} />
-      <Miembro clase="crt-brazo-r" origen="left top"
-        d="M7.0,-1.2 C10.0,0.4 11.0,3.4 10.0,6.2" ancho={3.2} punta={[10.0, 6.6]} puntaR={2.1} pie sway={vivo} delay={-0.45} />
+      {/* GLIFOS SAGRADOS — espirales de geometría andina (cobre de orfebrería)
+          sobre los hombros. Símbolo de poder como ADORNO (nunca arma).
+          Invisibles en reposo; se encienden en la revelación / el poder (CSS).
+          Van sobre el lomo, bajo los bracitos y la cabeza. Decorativos. */}
+      <g className="jaguar-glifos" aria-hidden="true" fill="none" stroke={P.cobre}
+        strokeWidth="0.42" strokeLinecap="round">
+        <path transform="translate(-5.4 -0.6) scale(0.85)" d={GLIFO_ESPIRAL} />
+        <path transform="translate(5.4 -0.6) scale(-0.85 0.85)" d={GLIFO_ESPIRAL} />
+      </g>
 
-      {/* CABEZA (grupo propio .jaguar-cabeza para que el ACECHO la baje). */}
+      {/* bracitos manguera GRUESOS (zarpas delanteras grandes y redondas) con
+          planta crema, pivote en el HOMBRO para que celebra/señala los alcen
+          desde el hombro. Patas cortas y macizas — el felino asienta bajo. */}
+      <Miembro clase="crt-brazo-l" origen="right top"
+        d="M-7.0,-1.0 C-9.6,0.6 -10.4,3.2 -9.6,5.8" ancho={3.9} punta={[-9.6, 6.2]} puntaR={2.6} pie sway={vivo} delay={-0.15} />
+      <Miembro clase="crt-brazo-r" origen="left top"
+        d="M7.0,-1.0 C9.6,0.6 10.4,3.2 9.6,5.8" ancho={3.9} punta={[9.6, 6.2]} puntaR={2.6} pie sway={vivo} delay={-0.45} />
+
+      {/* CABEZA MACIZA (grupo propio .jaguar-cabeza para que el ACECHO la baje).
+          Ancha y robusta — el jaguar tiene la cabeza más maciza y la mordida
+          más potente de los felinos americanos: elipse MÁS ANCHA que alta +
+          mejillas/mandíbula prominentes. NO redondita-genérica. */}
       <g className="jaguar-cabeza" style={{ transformBox: 'fill-box', transformOrigin: 'center top' }}>
-        <circle cx="0" cy="-8.2" r={PR.cabezaR} fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="1.3" />
-        {/* hocico claro que baja al morro */}
-        <path d="M-2.6,-6.6 C-1.2,-5.2 1.2,-5.2 2.6,-6.6 C2.8,-3.6 1.8,-2.0 0,-1.8 C-1.8,-2.0 -2.8,-3.6 -2.6,-6.6 Z"
+        {/* MEJILLAS/MANDÍBULA anchas (las carrilleras del jaguar) — bajo el
+            cráneo, ensanchan la testa a los lados. Van primero (el hocico y la
+            cara se apoyan encima). */}
+        <g aria-hidden="true">
+          <ellipse cx="-5.2" cy="-6.4" rx="2.3" ry="2.7" fill={P.cuerpoSombra} stroke={RH_INK} strokeWidth="1.1" />
+          <ellipse cx="5.2" cy="-6.4" rx="2.3" ry="2.7" fill={P.cuerpoSombra} stroke={RH_INK} strokeWidth="1.1" />
+        </g>
+        {/* cráneo ancho (elipse maciza, más ancha que alta) */}
+        <ellipse cx="0" cy="-8.2" rx={PR.cabezaR * 1.14} ry={PR.cabezaR * 0.98}
+          fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="1.3" />
+        {/* hocico claro ANCHO que baja al morro (mandíbula robusta) */}
+        <path d="M-3.0,-6.6 C-1.4,-5.0 1.4,-5.0 3.0,-6.6 C3.2,-3.4 2.0,-1.8 0,-1.6 C-2.0,-1.8 -3.2,-3.4 -3.0,-6.6 Z"
           fill={P.hocico} opacity="0.95" />
         {/* rosetas de la frente/mejillas (anillos rotos — la firma también en
             la cara), desde la misma fuente de datos que sus marcas-espíritu */}
@@ -457,6 +494,15 @@ export function Jaguar({
             <Roseta key={i} cx={m.cx} cy={m.cy} r={m.r} rot={m.rot}
               ink={P.roseta} centro={P.rosetaCentro} opacity={m.o} />
           ))}
+        </g>
+        {/* PUNTOS SÓLIDOS pequeños de la corona/hocico (distribución real: la
+            cabeza lleva puntos sólidos, no rosetas — anti-leopardo por zona). */}
+        <g aria-hidden="true" fill={P.roseta} opacity="0.62">
+          <circle cx="-1.7" cy="-12.9" r="0.42" />
+          <circle cx="1.7" cy="-12.9" r="0.42" />
+          <circle cx="0" cy="-13.4" r="0.36" />
+          <circle cx="-0.9" cy="-6.9" r="0.3" />
+          <circle cx="0.9" cy="-6.9" r="0.3" />
         </g>
         {/* marcas-espíritu de la cara (gemelas espectrales, ver las del lomo) */}
         <g className="jaguar-marcas-espiritu" aria-hidden="true" fill="none"
@@ -504,25 +550,31 @@ export function Jaguar({
         <path d="M-1.3,-4.7 L1.3,-4.7 L0,-3.5 Z" fill={P.nariz} />
         {/* OJOS grandes, ámbar y EXPRESIVOS (el registro de casa: carisma con
             alma — catchlight del kit + parpadeo + micro-mirada). Nunca vacíos:
-            la nobleza vive en el ojo aunque el gesto se ponga serio. */}
-        <OjosRubber
-          ojos={[{ cx: -2.5, cy: -9.2, r: 1.85 }, { cx: 2.5, cy: -9.2, r: 1.85 }]}
-          mirar={[0, 0.1]}
-          parpadea={vivo}
-        />
-        {/* MIRADA FELINA ÁMBAR: iris que enmarca la pupila (sobre la esclerótica,
-            fuera del negro de la pupila) → la intensidad del ojo de gato. */}
-        <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.6" opacity="0.85">
-          <circle cx="-2.5" cy="-9.2" r="1.44" />
-          <circle cx="2.5" cy="-9.2" r="1.44" />
-        </g>
-        {/* OJOS LUMINOSOS — fosforescencia del espíritu (visión nocturna del
-            chamán): un halo suave que respira sobre cada ojo. Sutil siempre;
-            CHAMÁNICO (más brillante) en modo poder / revelación (CSS). */}
-        <g className={vivo ? 'jaguar-ojo-brillo' : undefined} filter={`url(#${blur})`} aria-hidden="true"
-          style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
-          <circle cx="-2.5" cy="-9.2" r="1.25" fill={P.ojoBrillo} opacity="0.55" />
-          <circle cx="2.5" cy="-9.2" r="1.25" fill={P.ojoBrillo} opacity="0.55" />
+            la nobleza vive en el ojo aunque el gesto se ponga serio. El grupo
+            .jaguar-ojos CAMBIA DE FORMA por CSS: REDONDOS en reposo (carisma
+            cálido) → ALMENDRADOS al acechar/rugir/revelarse (concentración,
+            "mira a través de ti"), conservando la nobleza felina (registro
+            Mufasa: autoridad noble, jamás villano). */}
+        <g className="jaguar-ojos" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+          <OjosRubber
+            ojos={[{ cx: -2.5, cy: -9.2, r: 1.85 }, { cx: 2.5, cy: -9.2, r: 1.85 }]}
+            mirar={[0, 0.1]}
+            parpadea={vivo}
+          />
+          {/* MIRADA FELINA ÁMBAR: iris que enmarca la pupila (sobre la esclerótica,
+              fuera del negro de la pupila) → la intensidad del ojo de gato. */}
+          <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.6" opacity="0.85">
+            <circle cx="-2.5" cy="-9.2" r="1.44" />
+            <circle cx="2.5" cy="-9.2" r="1.44" />
+          </g>
+          {/* OJOS LUMINOSOS — fosforescencia del espíritu (visión nocturna del
+              chamán): un halo suave que respira sobre cada ojo. Sutil siempre;
+              CHAMÁNICO (más brillante) en modo poder / revelación (CSS). */}
+          <g className={vivo ? 'jaguar-ojo-brillo' : undefined} filter={`url(#${blur})`} aria-hidden="true"
+            style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+            <circle cx="-2.5" cy="-9.2" r="1.25" fill={P.ojoBrillo} opacity="0.55" />
+            <circle cx="2.5" cy="-9.2" r="1.25" fill={P.ojoBrillo} opacity="0.55" />
+          </g>
         </g>
       </g>
 
