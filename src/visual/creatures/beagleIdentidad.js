@@ -39,27 +39,31 @@ export const BEAGLE_SLUG = 'beagle';
    orejas. Orejas LARGAS anchas caídas, hocico ANCHO, trufa grande (la nariz es
    su vida), ojos grandes café dulces, cola erguida con punta BLANCA. */
 export const BEAGLE_PALETA = {
-  cuerpo: '#fdf8ec',        // base BLANCA (pecho, patas, vientre — lo de abajo)
+  cuerpo: '#fdf8ec',        // base BLANCA (pecho, patas, vientre — tono medio del gradiente)
+  cuerpoLuz: '#ffffff',     // luz dorsal del blanco (volumen)
+  cuerpoSombra: '#e9dcc0',  // sombra ventral del blanco (marfil en penumbra)
   cuerpoGlow: 'rgba(211,150,77,0.6)',
-  canela: '#d3964d',        // el FUEGO/canela de cabeza y orejas
-  canelaHondo: '#b3753a',   // canela más hondo (interior/sombra de la oreja)
-  manto: '#33200f',         // la SILLA NEGRA del lomo (negro cálido, no industrial)
+  canela: '#d3964d',        // el FUEGO/canela de cabeza y orejas (tono medio)
+  canelaLuz: '#e6b269',     // luz del canela (la frente al sol — volumen de la cabeza)
+  canelaHondo: '#a96e33',   // canela más hondo (interior/sombra de la oreja, penumbra de la mejilla)
+  manto: '#2f1d0d',         // la SILLA NEGRA del lomo (negro cálido, no industrial)
   lista: '#fdf8ec',         // la LISTA blanca que sube por el centro de la cara
   hocico: '#fbf3e2',        // hocico ancho claro (belfos de sabueso)
   nariz: '#241608',         // trufa GRANDE negra (la nariz manda)
-  iris: '#6b4423',          // ojo GRANDE café dulce (mirada de sabueso)
+  iris: '#7a4c22',          // ojo GRANDE café-ámbar dulce (mirada suplicante de sabueso)
   lengua: '#ef8398',        // lengüita rosada
   colaPunta: '#ffffff',     // la PUNTA BLANCA de la cola (la bandera)
+  sombraSuelo: 'rgba(36,22,8,0.32)', // la sombra blanda bajo las paticas (peso real)
 };
 
 export const BEAGLE_PROPORCION = {
-  troncoRx: 9.8,            // LONG AND LOW: claramente más ancho que alto (~1.6:1) — la anti-silueta del dálmata cuadrado
-  troncoRy: 6.2,
-  cabezaR: 6.0,             // cabeza grande y dulce (abombada de sabueso)
-  orejaRx: 2.7,             // orejas LARGUÍSIMAS anchas caídas: casi TAPAN el hocico en reposo
-  orejaRy: 6.3,
-  pataCorta: 11.8,          // hasta dónde llegan las PATAS CORTAS y robustas (y del pie)
-  colaAlto: -9.0,           // hasta dónde SUBE la cola erguida (bandera)
+  troncoRx: 9.7,            // LONG AND LOW: claramente más ancho que alto (~1.6:1) — la anti-silueta del dálmata cuadrado
+  troncoRy: 6.1,
+  cabezaRx: 5.8,            // cabeza grande, abombada y dulce de sabueso
+  cabezaRy: 5.5,
+  cabezaR: 5.65,            // radio medio (lo consumen ropa/accesorios)
+  pataCorta: 12.1,          // hasta dónde llegan las PATAS CORTAS y robustas (y del pie)
+  colaAlto: -8.9,           // hasta dónde SUBE la cola erguida (bandera)
 };
 
 /*
