@@ -7,6 +7,23 @@
  * acompaña, por dónde camina el ojo. Valle3D lo consume como capa de
  * composición ENCIMA de valleData (que no se toca: otros frentes viven ahí).
  *
+ * ── REDISEÑO 2026-07 SOBRE LA BASE CERCANA (feedback del operador) ────────
+ * La cámara INMERSIVA y el paisaje denso de la v2 son sagrados: el rediseño
+ * anterior alejó la cámara y el valle quedó lejano y vacío. Esta pasada
+ * reconstruye ENCIMA de la v2 lo que sí funcionó del rediseño:
+ *   1. LA CASA ES LA VÍA SECUNDARIA: su puerta iluminada lleva a la
+ *      ventana-puerta de los mundos. El corazón del cuadro, no la boca de
+ *      todo — la entrada principal son los portales-paisaje directos.
+ *   2. JERARQUÍA DE PORTALES: los 6 principales son VENTANAS VIVAS — arcos
+ *      de vegetación que enmarcan la VIÑETA 3D de su mundo (paisajes en
+ *      miniatura, cero discos-espejo — ver VentanasVivas); los pórticos de
+ *      madera quedan SOLO para los lugares secundarios de menos uso.
+ *   3. EL PÁRAMO SE VE: el acceso al páramo es el páramo MISMO, arriba, con
+ *      el Ent-queñua magnífico — una vista al mundo, no un letrero.
+ *   4. LA FINCA ES POLICULTIVO: potrero con cercas vivas, biofábrica con su
+ *      pila, invernadero como micro-mundo, milpa de tres hermanas y cafetal
+ *      con sombrío. Nada se lee monocultivo.
+ *
  * ── LOS TRES CRITERIOS DEL ENCUADRE ──────────────────────────────────────
  * La cámara de reposo mira desde [10.5, 9, 13.5] hacia [0, 1.6, 1.4]:
  * el frente (+z, tierra caliente) queda CERCA y abajo; la ladera trepa al
@@ -35,6 +52,9 @@
 export const CASA_VALLE = {
   pos: [-0.9, 2.6], // [x, z] — la y la da el terreno
   rotY: 0.42, // el corredor mira hacia la cámara de reposo (suroriente)
+  // La casa creció un pelo (es la puerta de los mundos, tiene que mandar el
+  // cuadro) sin robarle aire al valle cercano de la v2.
+  escala: 1.12,
 };
 
 /* ── 2. DISPOSICIÓN COMPUESTA de los lugares ─────────────────────────────
@@ -47,10 +67,17 @@ export const CASA_VALLE = {
      · cada lugar respeta su piso térmico (valleData.PISOS_TERMICOS);
      · lo diario rodea la casa; las salidas (mercado) van al borde del cuadro. */
 export const COMPOSICION_LUGARES = {
-  // El corral cierra la esquina izquierda del frente: lo diario, con aire.
-  animales: [-5.4, 5.8],
-  // El semillero entre el corral y las eras, un paso adelante (se cría cerca).
-  semillero: [-3.5, 6.5],
+  // El POTRERO (portal MIS ANIMALES) cierra la esquina izquierda del frente:
+  // apartos con cerca viva y el hato regado — pisa ancho, por eso gana medio
+  // paso de aire respecto al corral viejo.
+  animales: [-5.7, 6.1],
+  // La BIOFÁBRICA (pila de compost): detrás del potrero hacia el frente,
+  // CERCA de los animales pero diferenciada — el viaje del estiércol a la
+  // pila se lee en un ramal corto de sendero.
+  abono: [-3.3, 8.1],
+  // El INVERNADERO (micro-mundo del semillero): al frente de la casa, a la
+  // mano — la matica se cría cerca. (Cedió su puesto viejo al potrero.)
+  semillero: [-0.6, 6.6],
   // Las eras al frente-izquierda de la casa: donde el faro del día se lee solo.
   // (Un paso más allá de la casa: la píldora de la alerta — anclada aquí —
   //  pisaba el techo desde la cámara de reposo; ahora el faro respira solo.)
@@ -60,6 +87,9 @@ export const COMPOSICION_LUGARES = {
   // El mercado es LA SALIDA a la plaza: borde derecho-frontal, el camino que
   // se va del cuadro. Antes tapaba el centro-bajo del encuadre.
   mercado: [4.9, 6.3],
+  // El KIOSCO DEL SABER (portal APRENDER): a la vera del camino de la plaza,
+  // el tablero bajo techito de paja donde la finca enseña.
+  aprender: [6.4, 4.6],
   // Los hongos en el corazón cultivado, con aire de la casa y de la milpa.
   // (Corridos un paso al monte: desde la cámara de reposo quedaban justo
   //  DETRÁS de la píldora de la alerta y su chip nunca se veía.)
@@ -84,21 +114,70 @@ export function componerMundos(mundos) {
   });
 }
 
-/* ── 3. LOS SENDEROS (la mano del campesino sobre el terreno) ────────────
+/* ── 3. LOS 6 PORTALES (las puertas grandes de la finca) ─────────────────
+   La promesa del valle en seis puertas legibles: mis matas · mis animales ·
+   el tiempo · vender · aprender · toda mi finca. En la ESCENA cada portal
+   es una VENTANA VIVA: un arco de vegetación que enmarca la VIÑETA 3D de
+   su mundo (paisaje en miniatura, no espejo — fix del operador 2026-07-16;
+   los pórticos de madera quedan solo para lo secundario). La ENTRADA
+   PRINCIPAL a cada mundo es tocar su portal directo; la puerta de la casa
+   es la vía secundaria a la ventana de los mundos. `id` = el mundo que
+   surte el portal. */
+export const PORTALES_VALLE = [
+  { id: 'cultivos', nombre: 'Mis matas', emoji: '🌱' },
+  { id: 'animales', nombre: 'Mis animales', emoji: '🐄' },
+  { id: 'clima', nombre: 'El tiempo', emoji: '⛅' },
+  { id: 'mercado', nombre: 'Vender', emoji: '🧺' },
+  { id: 'aprender', nombre: 'Aprender', emoji: '📖' },
+  { id: 'disenio', nombre: 'Toda mi finca', emoji: '🌳' },
+];
+
+/* Los lugares SECUNDARIOS que sí llevan pórtico de madera (la puerta humilde
+   del patio de trabajo): lo de menos uso. Los 6 principales NO van aquí —
+   ellos tienen ventana viva — ni el páramo, que se accede por su propia
+   vista (el Ent magnífico arriba). */
+export const PORTICOS_SECUNDARIOS = ['suelo', 'sanidad', 'semillero', 'abono', 'agua', 'micorrizas'];
+
+/* ── 3b. LA VISTA DEL PÁRAMO — ARCHIVADA 2026-07-18 ──────────────────────
+   El Ent-queñua parado en el filo + los frailejones que lo arropaban se
+   veían amontonados en la vista del valle (pedido del operador): se
+   ARCHIVARON completos, NO se borraron — ver
+   src/mockups/valle/_archivo/vistaParamo.archivado.jsx (VISTA_PARAMO +
+   VistaParamoEnt), listos para retomarse en otra composición.
+   El PORTAL/entrada REAL al páramo no vivía aquí y sigue intacto:
+   valleData.js LUGARES id:'paramo' (su propio rótulo en el valle) →
+   wire3DNav.js `paramo: 'diorama_paramo'` → MundoParamo3D. */
+
+/* ── 4. LOS SENDEROS (la mano del campesino sobre el terreno) ────────────
    Caminos de tierra pisada que NACEN de la casa: el rastro honesto del uso
    diario. No son UI — son el valle contando qué se camina. Waypoints [x, z];
    la y la posa el terreno. `frugal: true` = también en gama media/baja
    (los principales); el resto solo donde sobra GPU. */
 export const SENDEROS_VALLE = [
   {
-    id: 'trajin', // casa → eras → semillero → corral: el circuito de la mañana
-    puntos: [[-0.9, 3.0], [-2.0, 5.1], [-3.3, 6.1], [-5.0, 5.9]],
+    id: 'trajin', // casa → eras → la tranquera del potrero: el circuito de la mañana
+    puntos: [[-0.9, 3.0], [-2.0, 5.1], [-3.0, 5.9], [-3.6, 6.4]],
     frugal: true,
+  },
+  {
+    id: 'abono', // la tranquera → la pila: el viaje del estiércol al abono
+    puntos: [[-3.6, 6.7], [-3.4, 7.4], [-3.3, 8.0]],
+    frugal: true,
+  },
+  {
+    id: 'vivero', // eras → el invernadero (la matica se cría al lado)
+    puntos: [[-1.9, 5.6], [-1.2, 6.1], [-0.7, 6.5]],
+    frugal: false,
   },
   {
     id: 'plaza', // casa → huerta → mercado → y SALE del cuadro (a la vereda)
     puntos: [[-0.4, 2.9], [1.4, 4.0], [3.2, 4.7], [4.8, 6.2], [6.6, 7.8]],
     frugal: true,
+  },
+  {
+    id: 'saber', // el desvío de la plaza al kiosco del tablero
+    puntos: [[3.4, 4.8], [4.9, 4.6], [6.2, 4.6]],
+    frugal: false,
   },
   {
     id: 'milpa', // casa → los hongos → la milpa (la subida del lote)
@@ -123,23 +202,23 @@ export const PATIO = {
 };
 
 /* ── 5. JERARQUÍA DE PERSONAJES (la ley, en números) ─────────────────────
-   ANGELITA GUÍA. Es la cara de la IA y la compañera de viaje: vuela en
-   primer plano, la cámara la sigue (DirectorValle.follow) y es la única con
-   luz propia. Pero el valle NO es solo suyo — feedback del operador
-   (2026-07-14): "los personajes como el oso y demás aparecen como
-   secundarias a la abejita". Los demás son VECINOS con casa propia: cada uno
-   vive en su rincón del valle con presencia digna (escala real, no garnish
-   de 30px), y la puesta en escena — no el tamaño de Angelita — dice quién
-   guía. Ninguno captura toques: presencia, no interfaz. */
+   ANGELITA GUÍA — y es UNA SOLA (feedback 2026-07-16: se veían tres
+   abejitas; las laterales las quita el dueño del dashboard). La del valle
+   es la central: en POSICIÓN DE CALMA sobre el patio de la casa (no
+   husmeando errática), algo más grande, con su luz propia que invita a
+   tocarla — tocarla es hablarle a la finca. Los demás son VECINOS con casa
+   propia: cada uno vive en su rincón del valle con presencia digna, y la
+   puesta en escena — no el tamaño de Angelita — dice quién guía. */
 export const JERARQUIA_PERSONAJES = {
   /** La guía del valle: la única con follow de cámara y luz propia. */
   protagonista: 'abeja-angelita',
-  /** Tamaño vivo de Angelita (px del billboard; crece con su energía). */
-  protagonistaPx: [44, 58],
+  /** Tamaño vivo de Angelita (px del billboard; crece con su energía).
+      Subido de [44,58]: la anfitriona de la casa-puerta se veía tímida. */
+  protagonistaPx: [50, 66],
   /** La luz cálida que la sigue: SOLO ella ilumina (perfil.luzBeacon). */
-  luzProtagonista: { color: '#ffdda6', intensidad: 0.85, alcance: 3.6 },
-  /** Techo de un vecino (px): puede igualar el piso de Angelita (el oso es
-      el mayor de los vecinos), nunca su tamaño pleno ni su primer plano. */
+  luzProtagonista: { color: '#ffdda6', intensidad: 1.0, alcance: 4.0 },
+  /** Techo de un vecino (px): nunca el tamaño pleno de Angelita ni su
+      primer plano. */
   vecinoMaxPx: 44,
   /** Los vecinos viven en SUS lugares (monte, quebrada, matorral), nunca en
       el centro del encuadre (radio en unidades de mundo alrededor de la mira). */
@@ -149,8 +228,8 @@ export const JERARQUIA_PERSONAJES = {
 };
 
 /* ── 6. LOS VECINOS DEL VALLE (la puesta en escena de los personajes) ─────
-   Personajes rubber-hose, cada uno EN SU CASA del valle: el oso en el borde
-   del monte, la rana en la quebrada, el perezoso en la arboleda. Data-driven
+   Personajes rubber-hose, cada uno EN SU CASA del valle: la rana en la
+   quebrada, el perezoso en la arboleda, el jaguar en el filo. Data-driven
    contra CREATURES: un slug ausente no monta nada (las ramas de personajes
    mejoran el dibujo al mergear y este mapa ni se entera).
 
@@ -162,16 +241,13 @@ export const JERARQUIA_PERSONAJES = {
    [0,1.6,1.4], fov 40): todas a la vista, ninguna detrás de la cordillera
    (los picos viven en z≤-15) ni tapada por un lugar compuesto (aire ≥2u del
    mapa COMPOSICION_LUGARES). El precedente de la sierra (3 de 4 árboles
-   ocultos tras el macizo) no se repite acá. */
+   ocultos tras el macizo) no se repite aquí. */
 export const VECINOS_VALLE = [
-  {
-    slug: 'oso-andino',
-    punto: [5.4, -1.2], // el borde del monte, junto al bosque que trepa al frío
-    px: 44, // el mayor de los vecinos: presencia de verdad, no miniatura
-    factor: 9, // presencia del mayor: casi el factor de Angelita (9)
-    dy: 0.3,
-    franjas: null, // el oso ronda a toda hora
-  },
+  // NOTA (rediseño 2026-07): el oso rubber-hose café se RETIRÓ del valle por
+  // decisión del operador. Su presencia mayor la toma el CÓNDOR (Vultur
+  // gryphus), que no vive aquí sino en el CIELO: CondorBillboard en órbita
+  // térmica sobre el páramo (lo monta Valle3D — un vecino de aire, no de
+  // suelo).
   {
     slug: 'perezoso',
     punto: [3.1, -2.2], // colgado a la falda de la arboleda, detrás del oso
