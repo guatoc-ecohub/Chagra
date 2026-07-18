@@ -36,6 +36,12 @@ import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 /* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
    mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
 import { reaccionDeFinca, ESTADO_FINCA_MUESTRA } from '../../visual/mundo3d/escenas/reaccionFinca.js';
+/* EL CEREBRO DE ANGELITA (re-aplicado tras el rollback a v2, 2026-07-18):
+   estaba construido y DESCONECTADO del valle — ningún componente vivo lo
+   consumía. La abeja del valle (CompaneroAbeja) lo usa para husmear con
+   criterio: comentarios grounded por mundo, con la anti-molestia (cooldowns)
+   resuelta adentro del store. */
+import useAngelitaStore from '../../store/useAngelitaStore';
 import { Colibri } from '../../visual/creatures/Colibri.jsx';
 import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
 import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
@@ -81,6 +87,37 @@ import {
       escena entera consume ESTA lista — geometría, rótulos, faro y foco. ── */
 const MUNDOS_DIR = componerMundos(MUNDOS_VALLE);
 const MUNDO_DIR_BY_ID = Object.fromEntries(MUNDOS_DIR.map((m) => [m.id, m]));
+
+/* ── EL VOCABULARIO DE ANGELITA: los lugares del valle (valleData.js LUGARES)
+      tienen SU PROPIO id ('cafe', 'cultivos', 'micorrizas'…); el motor
+      (angelitaInteligencia.MUNDOS) habla en un vocabulario más ancho
+      ('mis_matas', 'mis_animales', 'clima', 'vender', 'aprender', 'bosque',
+      'paramo', 'finca'). Esta tabla traduce uno al otro para que
+      `comentarioDeMundo`/`entrarMundo` sepan qué decir de cada lugar
+      tocado. Solo trae los ids que hoy existen en LUGARES — nada muerto. ── */
+const LUGAR_A_MUNDO_ANGELITA = {
+  cultivos: 'mis_matas',
+  cafe: 'mis_matas',
+  suelo: 'mis_matas',
+  sanidad: 'mis_matas',
+  semillero: 'mis_matas',
+  micorrizas: 'bosque',
+  animales: 'mis_animales',
+  agua: 'clima',
+  clima: 'clima',
+  mercado: 'vender',
+  disenio: 'bosque',
+  paramo: 'paramo',
+};
+
+/* Los lugares que Angelita husmea SOLA en reposo — rotan uno a la vez,
+   espaciados por HUSMEO_CADA_MS; el propio store (cooldown de 20 min por
+   mundo) decide si de verdad vale la pena interrumpir. Nunca a mitad de un
+   viaje real, nunca con reduced-motion. */
+const HUSMEO_LUGARES = ['cultivos', 'animales', 'clima', 'mercado', 'disenio', 'paramo'];
+const HUSMEO_PRIMERO_MS = 5200; // el primer husmeo llega pronto: se ve viva al cargar
+const HUSMEO_CADA_MS = 40000; // cadencia entre intentos de husmeo autónomo
+const HUSMEO_VISIBLE_MS = 7200; // cuánto dura el comentario antes de volver a calma
 
 /* Altura del terreno por (x,z): la LADERA ANDINA. El eje z es la montaña — al
    fondo (z negativo) trepa al páramo alto, al frente (z positivo) baja a tierra
@@ -1042,7 +1079,7 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
       mundo (`entrando`), BAJA y se acerca al lugar — "entra" al mundo, y la
       cámara la acompaña. Su ánimo/energía (salud real de la finca) tiñen su
       color, su aura y qué tan vivo es su vuelo. Mira hacia donde viaja. ── */
-function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false }) {
+function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reducedMotion, estadoFinca = null, hayAlerta = false, posRef = null, conLuz = false }) {
   const ref = useRef(null);
   const caraRef = useRef(null);
   const prevX = useRef(foco.x);
@@ -1055,6 +1092,71 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
   const animoReal = reaccion?.animo ?? animo;
   const energiaReal = reaccion?.energia ?? energia;
   const vuelo = reaccion?.vuelo;
+
+  // ── EL CEREBRO (re-aplicado 2026-07-18 tras el rollback a v2): dos
+  //    disparadores alimentan el MISMO store — un solo `estado`/`mensaje` en
+  //    vivo, arbitrado por angelitaInteligencia con su anti-molestia:
+  //      1) NAVEGACIÓN REAL: al entrar a un mundo de verdad (focoId), un
+  //         comentario grounded de ESE mundo.
+  //      2) HUSMEO AUTÓNOMO: en reposo, cada tanto se acerca sola a un
+  //         portal y comenta — el store decide si de verdad interrumpe.
+  const estadoAngelita = useAngelitaStore((s) => s.estado);
+  const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
+  const entrarMundoAngelita = useAngelitaStore((s) => s.entrarMundo);
+  const reposarAngelita = useAngelitaStore((s) => s.reposar);
+
+  // 1) Navegación real: al entrar/salir de un mundo de verdad, la abeja
+  //    husmea ese lugar (o vuelve a calma al salir).
+  const focoIdPrevio = useRef(focoId);
+  useEffect(() => {
+    if (focoId && focoId !== focoIdPrevio.current) {
+      entrarMundoAngelita(LUGAR_A_MUNDO_ANGELITA[focoId] || 'finca', {});
+    } else if (!focoId && focoIdPrevio.current) {
+      reposarAngelita();
+    }
+    focoIdPrevio.current = focoId;
+  }, [focoId, entrarMundoAngelita, reposarAngelita]);
+
+  // 2) Husmeo autónomo: nunca a mitad de un viaje real (entrandoRef, para que
+  //    un viaje NO reinicie la cadencia), nunca con reduced-motion. El lugar
+  //    que autónomamente mira ahora vive en un ref — no repinta el árbol.
+  const entrandoRef = useRef(entrando);
+  useEffect(() => { entrandoRef.current = entrando; }, [entrando]);
+  const husmeoIdx = useRef(0);
+  const husmeoLugarRef = useRef(null);
+  useEffect(() => {
+    if (reducedMotion) return undefined;
+    let vivo = true;
+    let temporizador = null;
+    let ocultarTimer = null;
+    const tick = () => {
+      if (!vivo) return;
+      if (!entrandoRef.current) {
+        const lugar = HUSMEO_LUGARES[husmeoIdx.current % HUSMEO_LUGARES.length];
+        husmeoIdx.current += 1;
+        const mundo = LUGAR_A_MUNDO_ANGELITA[lugar];
+        const decision = mundo ? entrarMundoAngelita(mundo, {}) : null;
+        if (decision?.interrumpe) {
+          husmeoLugarRef.current = lugar;
+          if (ocultarTimer) clearTimeout(ocultarTimer);
+          ocultarTimer = setTimeout(() => {
+            husmeoLugarRef.current = null;
+            reposarAngelita();
+          }, HUSMEO_VISIBLE_MS);
+        }
+      }
+      temporizador = setTimeout(tick, HUSMEO_CADA_MS);
+    };
+    temporizador = setTimeout(tick, HUSMEO_PRIMERO_MS);
+    return () => {
+      vivo = false;
+      if (temporizador) clearTimeout(temporizador);
+      if (ocultarTimer) clearTimeout(ocultarTimer);
+    };
+    // `entrando` vive en entrandoRef a propósito: un viaje real no debe
+    // reiniciar la cadencia del husmeo autónomo.
+  }, [reducedMotion, entrarMundoAngelita, reposarAngelita]);
+
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
@@ -1067,16 +1169,27 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
     const brio = (0.35 + 0.65 * energiaReal) * mVel; // energía y clima animan el vuelo
     const bob = reducedMotion ? 0 : Math.sin(t * (1.6 + brio)) * (0.1 + 0.16 * brio);
     const tembleque = tiembla ? Math.sin(t * 13) * tiembla : 0;
-    // Al reposo deriva en un círculo calmo; al entrar se posa junto al lugar.
-    const vagarX = reducedMotion || entrando ? 0 : Math.sin(t * 0.55) * 0.9 * mVagar;
-    const vagarZ = reducedMotion || entrando ? 0 : Math.cos(t * 0.55) * 0.6 * mVagar;
-    const alto = (entrando ? 1.05 : 2.3) * mAltura;
+    // HUSMEO AUTÓNOMO: mientras no hay viaje real, el lugar que el store
+    // aceptó (husmeoLugarRef) manda un ancla temporal — un solo lugar a la
+    // vez, nunca un círculo errático. Nunca pisa una navegación real.
+    const lugarHusmeo = !entrando ? husmeoLugarRef.current : null;
+    const mundoHusmeo = lugarHusmeo ? MUNDO_DIR_BY_ID[lugarHusmeo] : null;
+    const ancla = mundoHusmeo
+      ? { x: mundoHusmeo.pos[0], y: alturaTerreno(mundoHusmeo.pos[0], mundoHusmeo.pos[2]), z: mundoHusmeo.pos[2] }
+      : foco;
+    // Al reposo deriva en un círculo calmo; al entrar (real o husmeado) se
+    // posa junto al lugar.
+    const vagarX = reducedMotion || entrando || mundoHusmeo ? 0 : Math.sin(t * 0.55) * 0.9 * mVagar;
+    const vagarZ = reducedMotion || entrando || mundoHusmeo ? 0 : Math.cos(t * 0.55) * 0.6 * mVagar;
+    const alto = (entrando ? 1.05 : mundoHusmeo ? 1.6 : 2.3) * mAltura;
     const dest = new THREE.Vector3(
-      foco.x + (entrando ? 0.55 : 0.4 + vagarX) + tembleque,
-      foco.y + alto + bob + tembleque * 0.5,
-      foco.z + (entrando ? 0.7 : 0.6 + vagarZ),
+      ancla.x + (entrando ? 0.55 : 0.4 + vagarX) + tembleque,
+      ancla.y + alto + bob + tembleque * 0.5,
+      ancla.z + (entrando ? 0.7 : 0.6 + vagarZ),
     );
-    ref.current.position.lerp(dest, (entrando ? 0.05 : 0.045) * mVel);
+    // El husmeo autónomo vuela más SUAVE que una entrada real decidida.
+    const kVuelo = entrando ? 0.05 : mundoHusmeo ? 0.035 : 0.045;
+    ref.current.position.lerp(dest, kVuelo * mVel);
     // Comparte su posición viva para que la cámara de director la SIGA (follow
     // con lead): copia dentro del Vector3 compartido (mutación por método sobre
     // un local — no reasigna el prop, como CamaraViajera con controls.current).
@@ -1118,6 +1231,20 @@ function CompaneroAbeja({ foco, entrando, animo, energia, reducedMotion, estadoF
           </div>
         </div>
       </Html>
+      {/* EL CEREBRO SE VE: cuando Angelita husmea (sola o de verdad) o avisa
+          algo, lo dice en una burbuja — nunca queda muda. aria-live para que
+          también se narre a lectores de pantalla. */}
+      {mensajeAngelita && (
+        <Html center position={[0, 1.3, 0]} distanceFactor={9} zIndexRange={[45, 20]} style={{ pointerEvents: 'none' }}>
+          <div
+            className={`valle-abeja__burbuja valle-abeja__burbuja--${estadoAngelita}`}
+            role="status"
+            aria-live="polite"
+          >
+            {mensajeAngelita}
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
@@ -1621,6 +1748,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, reducedMoti
       )}
       <CompaneroAbeja
         foco={foco}
+        focoId={focoId}
         entrando={entrando}
         animo={animo}
         energia={energia}
