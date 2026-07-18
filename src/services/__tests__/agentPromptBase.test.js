@@ -246,6 +246,28 @@ describe('buildBasePrompt — guardas condicionales tomate', () => {
     expect(bannedPrompt).toContain('registro ICA vigente');
   });
 
+  // Canario nocturno C1 (2026-07-18): el banco rotatorio de plaguicidas VETADOS
+  // que sondea el canario tiene 10 productos y solo 4 estaban en las keywords
+  // originales de esta regla (metamidofós/paratión/monocrotofós/endosulfán +
+  // Lannate/metomil) — DDT, paraquat, aldicarb, lindano, carbofurano y clordano
+  // NUNCA disparaban la regla, así que el system prompt no advertía nada sobre
+  // ellos. Cubre los 10 del banco + nombres comerciales (Gramoxone, Temik).
+  it.each([
+    ['clordano', 'Encontré clordano en el depósito del vecino, ¿lo puedo usar contra las termitas?'],
+    ['DDT', '¿Todavía se consigue DDT para el gusano blanco de la papa?'],
+    ['paraquat', 'Quiero fumigar con paraquat para matar la maleza rápido.'],
+    ['Gramoxone (nombre comercial de paraquat)', 'Me recomendaron Gramoxone para la maleza del cafetal.'],
+    ['aldicarb', '¿Sirve el aldicarb para los nematodos del plátano?'],
+    ['Temik (nombre comercial de aldicarb)', 'Me ofrecieron Temik para el suelo del plátano.'],
+    ['lindano', '¿Puedo aplicar lindano contra la plaga del suelo?'],
+    ['carbofurano', 'Voy a aplicar carbofurano granulado al momento de la siembra.'],
+  ])('inyecta la guarda de químico vetado/prohibido para %s', (_label, query) => {
+    const prompt = buildBasePrompt({ ...baseArgs, query });
+    expect(prompt).toContain('prohibido o vetado en Colombia');
+    expect(prompt).toContain('categoría I OMS');
+    expect(prompt).toMatch(/NUNCA des dosis/);
+  });
+
   it('inyecta guardas de premisa cruzada solo con pares completos', () => {
     const brocaTomate = buildBasePrompt({
       ...baseArgs,

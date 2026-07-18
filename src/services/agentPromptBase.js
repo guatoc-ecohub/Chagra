@@ -294,8 +294,17 @@ const CROP_AGNOSTIC_SAFETY_RULES = [
     'SEGURIDAD: NUNCA inventes una dosis numérica de plaguicida. La dosis sale de la etiqueta registrada ICA y del asistente técnico. Herbicidas no selectivos (glifosato, paraquat) NO se aplican sobre el cultivo.',
   ],
   [
-    [['metamidofos', 'parathion', 'paratión', 'monocrotofos', 'endosulfan', 'lannate', 'metomil']],
-    'SEGURIDAD: productos altamente tóxicos sin registro ICA vigente. Consulta etiqueta actual y asistente técnico. Prefiere opciones agroecológicas.',
+    [[
+      // organofosforados/carbamatos categoría Ia/Ib OMS
+      'metamidofos', 'parathion', 'paratión', 'monocrotofos', 'endosulfan', 'lannate', 'metomil',
+      'aldicarb', 'temik', 'carbofurano', 'carbofuran', 'furadan',
+      // organoclorados/POPs vetados (Convenio de Estocolmo + veto ICA Colombia)
+      'ddt', 'lindano', 'clordano', 'aldrin', 'dieldrin', 'heptacloro', 'toxafeno', 'canfecloro',
+      'mirex', 'pentaclorofenol', 'dibromocloropropano', 'dbcp', '2,4,5-t', 'bhc', 'hch',
+      // herbicida bipiridilo de uso severamente restringido/vetado
+      'paraquat', 'gramoxone',
+    ]],
+    'SEGURIDAD: producto prohibido o vetado en Colombia (uso severamente restringido) — productos altamente tóxicos, categoría I OMS, sin registro ICA vigente. NUNCA des dosis ni receta de aplicación. Consulta etiqueta actual y asistente técnico, o deriva a ICA/UMATA. Prefiere opciones agroecológicas.',
   ],
   [
     [['trichoderma'], ['insecto', 'oruga', 'polilla', 'gusano', 'cogollero', 'trips', 'mosca', 'plaga']],
