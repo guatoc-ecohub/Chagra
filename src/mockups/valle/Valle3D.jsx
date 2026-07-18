@@ -38,6 +38,7 @@ import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
    (CompaneroAbeja) lo usa para husmear con criterio: comentarios grounded
    por mundo, con la anti-molestia (cooldowns) resuelta adentro del store. */
 import useAngelitaStore from '../../store/useAngelitaStore';
+import BurbujaAngelita from '../../visual/agente/BurbujaAngelita';
 /* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
    mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
 import { reaccionDeFinca, ESTADO_FINCA_MUESTRA } from '../../visual/mundo3d/escenas/reaccionFinca.js';
@@ -1479,6 +1480,7 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   //         portal y comenta — el store decide si de verdad interrumpe.
   const estadoAngelita = useAngelitaStore((s) => s.estado);
   const mensajeAngelita = useAngelitaStore((s) => s.mensaje);
+  const tipoAngelita = useAngelitaStore((s) => s.tipo);
   const entrarMundoAngelita = useAngelitaStore((s) => s.entrarMundo);
   const reposarAngelita = useAngelitaStore((s) => s.reposar);
 
@@ -1657,13 +1659,11 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
           también se narre a lectores de pantalla. */}
       {mensajeAngelita && (
         <Html center position={[0, 1.3, 0]} distanceFactor={9} zIndexRange={[45, 20]} style={{ pointerEvents: 'none' }}>
-          <div
-            className={`valle-abeja__burbuja valle-abeja__burbuja--${estadoAngelita}`}
-            role="status"
-            aria-live="polite"
-          >
-            {mensajeAngelita}
-          </div>
+          <BurbujaAngelita
+            mensaje={mensajeAngelita}
+            tipo={tipoAngelita || 'informativa'}
+            animado={!reducedMotion}
+          />
         </Html>
       )}
     </group>
