@@ -61,9 +61,14 @@ const ACCURACY_METRICS = new Set([
   'subspecies_ok_pct', 'score_global', 'factualidad', 'promedio',
   'normalized_score', 'lift_pp',
 ]);
+// SOLO tasas/porcentajes (0-100). Los CONTEOS crudos (hallucinations,
+// subspecies_disconnections) NO van aca: aplicarles un umbral en pp es un bug
+// -- un conteo 256->468 es +82% relativo, no "+212pp". Caen a 'other' (info):
+// se reportan pero NO votan, para que un gate que BLOQUEA merges no de
+// falsos-RED por la varianza natural de un conteo. El gate vota sobre las TASAS
+// (ah_pct / hallucination_rate / rejection_rate), que es lo que el spec define.
 const HALLUC_METRICS = new Set([
-  'ah_pct', 'hallucination_rate', 'hallucinations', 'rejection_rate',
-  'subspecies_disconnections',
+  'ah_pct', 'hallucination_rate', 'rejection_rate',
 ]);
 
 /**
