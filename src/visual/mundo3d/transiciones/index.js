@@ -10,10 +10,24 @@
  * Piezas:
  *   · VeloOdyssey    — el velo/cortina con identidad andina por destino;
  *   · useCruceMundo  — la máquina de estados del viaje (entrar/volver/swap);
- *   · velosData      — datos y reloj puros (velos, duraciones, curvaCruce).
+ *   · velosData      — datos y reloj puros (velos, duraciones, curvaCruce);
+ *   · TunelLamina    — el túnel Odyssey 2D↔3D: la lámina del cuaderno como
+ *     boca del mundo (despega, túnel de anillos, destello, aterrizaje);
+ *   · useTunelLamina — su máquina de estados con captura de rect de origen;
+ *   · tunelLaminaData — reloj y geometría (FLIP) puros del túnel.
  */
 export { default as VeloOdyssey } from './VeloOdyssey.jsx';
 export { useCruceMundo } from './useCruceMundo.js';
+export { default as TunelLamina } from './TunelLamina.jsx';
+export { useTunelLamina } from './useTunelLamina.js';
+export {
+  TUNEL_MS,
+  duracionTunel,
+  momentoCubiertoTunel,
+  rectDeOrigen,
+  varsDeTunel,
+  tintaDeTunel,
+} from './tunelLaminaData.js';
 export {
   VELOS,
   VELO_IDS,
