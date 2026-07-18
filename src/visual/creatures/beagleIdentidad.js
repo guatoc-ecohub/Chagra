@@ -53,12 +53,12 @@ export const BEAGLE_PALETA = {
 };
 
 export const BEAGLE_PROPORCION = {
-  troncoRx: 9.6,            // COMPACTO y BAJITO: más ancho que alto (lo contrario del dálmata)
-  troncoRy: 6.4,
+  troncoRx: 9.8,            // LONG AND LOW: claramente más ancho que alto (~1.6:1) — la anti-silueta del dálmata cuadrado
+  troncoRy: 6.2,
   cabezaR: 6.0,             // cabeza grande y dulce (abombada de sabueso)
-  orejaRx: 2.4,             // orejas LARGUÍSIMAS anchas caídas (llegan bajo la mejilla)
-  orejaRy: 5.4,
-  pataCorta: 11.4,          // hasta dónde llegan las PATAS CORTAS (y del pie)
+  orejaRx: 2.7,             // orejas LARGUÍSIMAS anchas caídas: casi TAPAN el hocico en reposo
+  orejaRy: 6.3,
+  pataCorta: 11.8,          // hasta dónde llegan las PATAS CORTAS y robustas (y del pie)
   colaAlto: -9.0,           // hasta dónde SUBE la cola erguida (bandera)
 };
 

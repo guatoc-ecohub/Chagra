@@ -43,16 +43,18 @@ function Mancha({ cx, cy, r = 1.2, fill, opacity = 0.96 }) {
   return <ellipse cx={cx} cy={cy} rx={r} ry={r * 0.94} fill={fill} opacity={opacity} />;
 }
 
-/* MANCHAS del cuerpo: redondas, bien SEPARADAS, distribuidas por todo el
-   tronco (la distribución dispersa es lo que lee "dálmata" de lejos). */
+/* MANCHAS del cuerpo: GRANDES, redondas, LLENAS y bien SEPARADAS (nunca se
+   tocan), sin centro. Cubren ~30-40% del tronco para que se lea "dálmata" a
+   distancia (la firma inequívoca). Distribución dispersa por todo el cuerpo. */
 const MANCHAS = [
-  { cx: -4.6, cy: -2.2, r: 1.3 },
-  { cx: 3.9, cy: -3.4, r: 1.05 },
-  { cx: 5.2, cy: 1.8, r: 1.35 },
-  { cx: -5.6, cy: 3.6, r: 1.1 },
-  { cx: -1.8, cy: 6.6, r: 1.0 },
-  { cx: 2.6, cy: 8.6, r: 1.15 },
-  { cx: -0.6, cy: 0.8, r: 0.85 },
+  { cx: -4.6, cy: -1.2, r: 1.9 },
+  { cx: 4.4, cy: -1.8, r: 1.7 },
+  { cx: 5.6, cy: 3.2, r: 1.8 },
+  { cx: -5.4, cy: 4.4, r: 1.7 },
+  { cx: -1.4, cy: 7.6, r: 1.6 },
+  { cx: 3.0, cy: 8.0, r: 1.5 },
+  { cx: 0.4, cy: 1.6, r: 1.5 },
+  { cx: -0.2, cy: -3.8, r: 1.2 },
 ];
 
 export function Dalmata({
@@ -197,21 +199,23 @@ export function Dalmata({
       {/* aura viva (presencia cálida) */}
       <circle cx="0" cy="2" r={auraR} fill={P.cuerpo} opacity={auraOp} filter={`url(#${blur})`} />
 
-      {/* COLA LÁTIGO moteada (larga y fina, al lado derecho). Wag suave idle;
-          bate RÁPIDO en menea. Pivota desde su base en la grupa. */}
-      <g className={vivo ? 'dalmata-cola' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'left bottom' }}>
-        <path d="M6.8,6.6 C11.4,5.8 13.6,2.2 12.8,-2.6"
+      {/* COLA LARGA en "S" suave que CAE y fluye (curva, no enroscada — la
+          anti-cola del beagle, que va erguida). Blanca moteada, al lado
+          derecho. Pivota desde su base en la grupa (sway relajado idle, wag
+          amplio en menea). */}
+      <g className={vivo ? 'dalmata-cola' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'left top' }}>
+        <path d="M6.4,3.8 C10.8,4.4 13.0,7.4 11.8,10.6 C11.2,12.2 12.6,13.2 13.9,12.4"
           fill="none" stroke={P.cuerpo} strokeWidth="2.2" strokeLinecap="round" />
-        <path d="M6.8,6.6 C11.4,5.8 13.6,2.2 12.8,-2.6"
+        <path d="M6.4,3.8 C10.8,4.4 13.0,7.4 11.8,10.6 C11.2,12.2 12.6,13.2 13.9,12.4"
           fill="none" stroke={RH_INK} strokeWidth="0.65" strokeLinecap="round" opacity="0.55" />
         {/* manchas de la cola (la firma llega hasta la punta) */}
-        <Mancha cx={11.3} cy={4.4} r={0.75} fill={P.mancha} />
-        <Mancha cx={13.1} cy={0.2} r={0.7} fill={P.mancha} />
+        <Mancha cx={10.6} cy={6.6} r={0.9} fill={P.mancha} />
+        <Mancha cx={12.4} cy={10.4} r={0.75} fill={P.mancha} />
       </g>
 
-      {/* patas traseras LARGAS (esbeltas, con pie blanco). Se mecen suave. */}
-      <Miembro d="M-5.2,7.4 C-6.6,9.8 -6.4,11.8 -5.2,13.0" ancho={2.8} punta={[-5.2, PR.pataLarga]} puntaR={1.9} pie sway={vivo} delay={-0.7} glove={P.vientre} />
-      <Miembro d="M5.2,7.4 C6.6,9.8 6.4,11.8 5.2,13.0" ancho={2.8} punta={[5.2, PR.pataLarga]} puntaR={1.9} pie sway={vivo} delay={-1.0} glove={P.vientre} />
+      {/* patas traseras LARGAS y FINAS (esbeltas, con pie blanco). Se mecen suave. */}
+      <Miembro d="M-5.0,7.0 C-6.4,9.6 -6.2,11.8 -5.0,13.2" ancho={2.4} punta={[-5.0, PR.pataLarga]} puntaR={1.8} pie sway={vivo} delay={-0.7} glove={P.vientre} />
+      <Miembro d="M5.0,7.0 C6.4,9.6 6.2,11.8 5.0,13.2" ancho={2.4} punta={[5.0, PR.pataLarga]} puntaR={1.8} pie sway={vivo} delay={-1.0} glove={P.vientre} />
 
       {/* tronco BLANCO esbelto, más ALTO que ancho (atlético, casi cuadrado —
           la anti-silueta del beagle chato) */}
@@ -240,9 +244,9 @@ export function Dalmata({
       {/* patas delanteras LARGAS manguera, pivote en el HOMBRO para que
           celebra/señala las alcen desde el hombro. */}
       <Miembro clase="crt-brazo-l" origen="right top"
-        d="M-6.0,-1.2 C-9.0,0.8 -9.9,4.8 -9.2,8.8" ancho={2.6} punta={[-9.2, 9.2]} puntaR={1.9} pie sway={vivo} delay={-0.15} glove={P.vientre} />
+        d="M-5.8,-1.0 C-8.8,1.0 -9.7,5.2 -9.0,9.4" ancho={2.3} punta={[-9.0, 9.8]} puntaR={1.8} pie sway={vivo} delay={-0.15} glove={P.vientre} />
       <Miembro clase="crt-brazo-r" origen="left top"
-        d="M6.0,-1.2 C9.0,0.8 9.9,4.8 9.2,8.8" ancho={2.6} punta={[9.2, 9.2]} puntaR={1.9} pie sway={vivo} delay={-0.45} glove={P.vientre} />
+        d="M5.8,-1.0 C8.8,1.0 9.7,5.2 9.0,9.4" ancho={2.3} punta={[9.0, 9.8]} puntaR={1.8} pie sway={vivo} delay={-0.45} glove={P.vientre} />
 
       {/* CABEZA (grupo propio .dalmata-cabeza para el head-tilt de `ladea`). */}
       <g className="dalmata-cabeza" style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}>
@@ -251,13 +255,15 @@ export function Dalmata({
         <g className="dalmata-orejas" style={{ transformBox: 'fill-box', transformOrigin: 'center top' }}>
           <g transform="rotate(-22 -5 -13)">
             <ellipse cx="-5.0" cy="-11.6" rx={PR.orejaRx} ry={PR.orejaRy} fill={P.oreja} stroke={RH_INK} strokeWidth="1.15" />
-            <Mancha cx={-5.3} cy={-12.6} r={0.6} fill={P.mancha} />
-            <Mancha cx={-4.7} cy={-10.2} r={0.5} fill={P.mancha} />
+            {/* orejas MOTEADAS: la mancha grande cubre casi el lóbulo (la firma
+                llega hasta las orejas) */}
+            <Mancha cx={-5.1} cy={-11.8} r={1.35} fill={P.mancha} opacity={0.9} />
+            <Mancha cx={-4.6} cy={-9.0} r={0.7} fill={P.mancha} opacity={0.85} />
           </g>
           <g transform="rotate(22 5 -13)">
             <ellipse cx="5.0" cy="-11.6" rx={PR.orejaRx} ry={PR.orejaRy} fill={P.oreja} stroke={RH_INK} strokeWidth="1.15" />
-            <Mancha cx={5.3} cy={-12.6} r={0.6} fill={P.mancha} />
-            <Mancha cx={4.7} cy={-10.2} r={0.5} fill={P.mancha} />
+            <Mancha cx={5.1} cy={-11.8} r={1.35} fill={P.mancha} opacity={0.9} />
+            <Mancha cx={4.6} cy={-9.0} r={0.7} fill={P.mancha} opacity={0.85} />
           </g>
         </g>
         <circle cx="0" cy="-10.2" r={PR.cabezaR} fill={P.cuerpo} stroke={RH_INK} strokeWidth="1.3" />
@@ -276,16 +282,16 @@ export function Dalmata({
         {boca}
         {/* trufa negra grande sobre el hocico largo */}
         <path d="M-1.3,-5.4 L1.3,-5.4 L0,-4.1 Z" fill={P.nariz} />
-        {/* OJOS alerta y amables (café) */}
+        {/* OJOS GRANDES, brillantes y amables (café). */}
         <OjosRubber
-          ojos={[{ cx: -2.5, cy: -11.3, r: 1.6 }, { cx: 2.5, cy: -11.3, r: 1.6 }]}
+          ojos={[{ cx: -2.5, cy: -11.2, r: 1.85 }, { cx: 2.5, cy: -11.2, r: 1.85 }]}
           mirar={[0, 0.12]}
           parpadea={vivo}
         />
         {/* iris café que enmarca la pupila (mirada alerta, no fiera) */}
-        <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.5" opacity="0.75">
-          <circle cx="-2.5" cy="-11.3" r="1.22" />
-          <circle cx="2.5" cy="-11.3" r="1.22" />
+        <g aria-hidden="true" fill="none" stroke={P.iris} strokeWidth="0.55" opacity="0.75">
+          <circle cx="-2.5" cy="-11.2" r="1.42" />
+          <circle cx="2.5" cy="-11.2" r="1.42" />
         </g>
       </g>
 
