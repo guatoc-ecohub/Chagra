@@ -58,6 +58,27 @@ export async function httpFetch(url, { method = 'GET', headers = {}, body, timeo
   }
 }
 
+/**
+ * Extrae la CAUSA legible de una respuesta de error JSON:API (Drupal). Un código
+ * HTTP suelto ("403") no dice si el problema es la ruta, el rol o el payload, y
+ * esa ambigüedad ya costó tres "arreglos" de B0b que rotaron la ruta a ciegas
+ * (2026-07-08 → #2328 → #2490) cuando Drupal venía diciendo, en `errors[0].detail`,
+ * que era un permiso del rol. Reportar la causa es lo que corta ese ciclo.
+ * Recorta a 300 chars (el detalle de Drupal puede traer el listado de permisos).
+ */
+function jsonApiError(res) {
+  const err = res?.json?.errors?.[0];
+  const detail = err?.detail || err?.title || null;
+  const raw = detail || (typeof res?.text === 'string' ? res.text.trim() : '');
+  if (!raw) return null;
+  return raw.replace(/\s+/g, ' ').slice(0, 300);
+}
+
+/** ¿La causa del error es de PERMISOS del rol (no de ruta ni de payload)? */
+function isPermissionError(msg) {
+  return typeof msg === 'string' && /not permitted|permission|forbidden|access denied|no autorizado/i.test(msg);
+}
+
 const JSONAPI = { Accept: 'application/vnd.api+json', 'Content-Type': 'application/vnd.api+json' };
 // JPEG 1x1 válido (marcador de foto del canario; embebido para no depender de assets).
 const CANARY_JPEG_B64 =
@@ -389,7 +410,7 @@ async function runPlantaFoto(ctx) {
   //      con token; verificado 2026-07-11) y ningún código de producción la usa.
   //   B) PATCH del plant relacionando el file, para que persista (un file--file sin
   //      referencia queda temporal y el cron de Drupal lo borra ~6 h).
-  let fileId = null; let uploadStatus = null;
+  let fileId = null; let uploadStatus = null; let uploadError = null;
   if (plantId) {
     const bytes = Buffer.from(CANARY_JPEG_B64, 'base64');
     const up = await httpFetch(`${base}/api/asset/plant/image`, {
@@ -398,6 +419,7 @@ async function runPlantaFoto(ctx) {
       body: bytes, timeoutMs: 45000,
     });
     uploadStatus = up.status;
+    if (!up.ok) uploadError = jsonApiError(up);
     if (up.ok && up.json?.data?.id) {
       fileId = up.json.data.id;
       // Paso B: adjuntar el file al plant (lo vuelve permanente). El campo `image`
@@ -405,7 +427,7 @@ async function runPlantaFoto(ctx) {
       // single, reintentar con forma de objeto.
       let rel = await farmosWrite(base, token, `/api/asset/plant/${plantId}`, { data: { type: 'asset--plant', id: plantId, relationships: { image: { data: [{ type: 'file--file', id: fileId }] } } } }, 'PATCH');
       if (!rel.ok) rel = await farmosWrite(base, token, `/api/asset/plant/${plantId}`, { data: { type: 'asset--plant', id: plantId, relationships: { image: { data: { type: 'file--file', id: fileId } } } } }, 'PATCH');
-      if (!rel.ok) uploadStatus = rel.status;
+      if (!rel.ok) { uploadStatus = rel.status; uploadError = jsonApiError(rel); }
     }
   }
 
@@ -419,11 +441,17 @@ async function runPlantaFoto(ctx) {
   }
 
   const status = plantId && verified && photoOk ? 'pass' : 'fail';
+  // La CAUSA, no solo el código: un 403 con "The following permissions are
+  // required: 'create asset'" es config del rol en farmOS, NO un bug de ruta del
+  // canario — distinción que decide si el arreglo es un PR o un cambio de permisos.
+  const causa = uploadError
+    ? `${isPermissionError(uploadError) ? 'PERMISOS del rol' : 'causa'}: ${uploadError}`
+    : null;
   return {
     status,
-    valor: `planta=${plantId ? 'sí' : 'NO'}, foto=${photoOk ? 'persiste' : `NO (upload HTTP ${uploadStatus})`}`,
-    detalle: `planta ${plantId ? plantId.slice(0, 8) : 'NO'} (verificada=${verified}) bajo ${landId ? 'CANARIO-PRUEBAS' : 'sin land'}; foto ${fileId ? fileId.slice(0, 8) : `NO (HTTP ${uploadStatus})`} persiste=${photoOk}. Sin borrar (acumula).`,
-    data: { plantId, fileId, landId, verified, photoOk, uploadStatus },
+    valor: `planta=${plantId ? 'sí' : 'NO'}, foto=${photoOk ? 'persiste' : `NO (upload HTTP ${uploadStatus}${isPermissionError(uploadError) ? ', permisos' : ''})`}`,
+    detalle: `planta ${plantId ? plantId.slice(0, 8) : 'NO'} (verificada=${verified}) bajo ${landId ? 'CANARIO-PRUEBAS' : 'sin land'}; foto ${fileId ? fileId.slice(0, 8) : `NO (HTTP ${uploadStatus})`} persiste=${photoOk}. Sin borrar (acumula).${causa ? ` ${causa}` : ''}`,
+    data: { plantId, fileId, landId, verified, photoOk, uploadStatus, uploadError },
   };
 }
 
