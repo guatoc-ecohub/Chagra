@@ -13,6 +13,10 @@
  *     "hacia dónde estoy mirando" como en AoE;
  *   · TAP-PARA-SALTAR: tocar un blip llama onSaltar(id) — la escena decide
  *     el viaje. Este componente NO toca la escena: es un mapa, no un mando.
+ *   · LABELS dinámicos: hover o foco de teclado sobre un blip muestran su
+ *     NOMBRE en un chip; en táctil (sin hover) el 1er toque muestra el
+ *     nombre y arma el blip, el 2º toque salta. El label del foco vigente
+ *     queda visible siempre.
  *
  * Geografía por DATOS, no a mano: pisos de valleData.PISOS_TERMICOS, casa y
  * senderos de direccion/composicionValle — el minimapa es EL MISMO lugar que
@@ -20,7 +24,7 @@
  *
  * Colapsable: en teléfono ocupa ~124-148px de esquina y se pliega a un botón.
  */
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { PISOS_TERMICOS } from './valleData';
 import { CASA_VALLE, SENDEROS_VALLE } from '../../visual/mundo3d/direccion/composicionValle';
 import './minimapaValle.css';
@@ -111,6 +115,18 @@ const D_SENDEROS = SENDEROS_VALLE
 const CASA_XY = [sx(CASA_VALLE.pos[0]), sy(CASA_VALLE.pos[1])];
 const CAM_XY = [sx(CAMARA_PLANTA[0]), sy(CAMARA_PLANTA[1])];
 
+/**
+ * Nombre visible de un lugar: `nombre` del contrato de datos si viene, o un
+ * fallback legible derivado del `id` (guiones/underscores → espacios, inicial
+ * mayúscula). El nombre REAL debe llegar en `lugares[].nombre` desde quien
+ * compone los mundos — este fallback es solo red de seguridad.
+ */
+function nombreDe(l) {
+  if (l.nombre) return l.nombre;
+  const s = String(l.id).replace(/[-_]+/g, ' ').trim();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 /* La cordillera del fondo (los picos viven en z≤-15, fuera del mapa): unos
    chevrones en la franja del páramo la sugieren. */
 const CHEVRONES = [
@@ -123,9 +139,10 @@ const CHEVRONES = [
  * El minimapa del valle, estilo RTS. Overlay de esquina, colapsable.
  *
  * @param {object} props
- * @param {Array<{id: string, x: number, z: number, emoji: string, tinte: string[]|string}>} props.lugares
+ * @param {Array<{id: string, nombre?: string, x: number, z: number, emoji: string, tinte: string[]|string}>} props.lugares
  *   Los lugares navegables del valle en planta. `tinte` acepta el par del
- *   manifiesto (['#a', '#b'] — usa el primero) o un color suelto.
+ *   manifiesto (['#a', '#b'] — usa el primero) o un color suelto. `nombre`
+ *   es el nombre visible del lugar (label); si falta, se deriva del `id`.
  * @param {string|{id: string}|null} [props.foco] El lugar en foco (id o el
  *   objeto del mundo): su blip pulsa y el cono de cámara lo apunta. null =
  *   reposo (el cono mira al centro del valle).
@@ -142,6 +159,15 @@ export default function MinimapaValle({
   reducedMotion = false,
 }) {
   const [abierto, setAbierto] = useState(true);
+  /* Estados de label: hover (mouse), foco de teclado, y "armado" (táctil:
+     1er toque muestra el nombre, el 2º salta). */
+  const [hoverId, setHoverId] = useState(null);
+  const [focusId, setFocusId] = useState(null);
+  const [armadoId, setArmadoId] = useState(null);
+  /* Con qué se tocó por última vez: decide tap-directo (mouse/teclado/AT)
+     vs dos-toques (touch). 'mouse' de arranque para que activaciones sin
+     pointerdown (lectores de pantalla) salten directo. */
+  const ultimoPuntero = useRef('mouse');
   const quieto = reducedMotion || tier === 'bajo';
   const focoId = typeof foco === 'string' ? foco : (foco && foco.id) || null;
 
@@ -155,6 +181,26 @@ export default function MinimapaValle({
 
   const saltar = (id) => {
     if (onSaltar) onSaltar(id);
+  };
+
+  /* Click/tap en un blip. Mouse/teclado/AT: salta directo. Táctil: el 1er
+     toque arma el blip (muestra el nombre), el 2º sobre el MISMO salta;
+     tocar otro blip re-arma; tocar el fondo del mapa desarma. */
+  const clickBlip = (e, id) => {
+    e.stopPropagation();
+    if (ultimoPuntero.current === 'touch' && armadoId !== id) {
+      setArmadoId(id);
+      return;
+    }
+    setArmadoId(null);
+    saltar(id);
+  };
+
+  const cerrarMapa = () => {
+    setAbierto(false);
+    setArmadoId(null);
+    setHoverId(null);
+    setFocusId(null);
   };
 
   if (!abierto) {
@@ -189,7 +235,7 @@ export default function MinimapaValle({
           type="button"
           className="mmv-toggle"
           aria-label="Ocultar el minimapa"
-          onClick={() => setAbierto(false)}
+          onClick={cerrarMapa}
         >
           <span aria-hidden="true">▾</span>
         </button>
@@ -198,6 +244,7 @@ export default function MinimapaValle({
           viewBox={`0 0 ${ANCHO} ${ALTO.toFixed(1)}`}
           role="presentation"
           focusable="false"
+          onClick={() => setArmadoId(null)}
         >
           <defs>
             <radialGradient id="mmv-vineta" cx="50%" cy="46%" r="72%">
@@ -266,20 +313,30 @@ export default function MinimapaValle({
           <g className="mmv-blips">
             {lugares.map((l) => {
               const esFoco = focoId === l.id;
+              const esArmado = armadoId === l.id;
               const tinte = Array.isArray(l.tinte) ? l.tinte[0] : (l.tinte || '#3f8f4e');
               return (
                 <g
                   key={l.id}
-                  className={`mmv-blip${esFoco ? ' mmv-blip--foco' : ''}`}
+                  className={`mmv-blip${esFoco ? ' mmv-blip--foco' : ''}${esArmado ? ' mmv-blip--armado' : ''}`}
                   transform={`translate(${sx(l.x).toFixed(1)} ${sy(l.z).toFixed(1)})`}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Ir a ${l.id}`}
-                  onClick={() => saltar(l.id)}
+                  aria-label={`Ir a ${nombreDe(l)}`}
+                  onPointerDown={(e) => { ultimoPuntero.current = e.pointerType || 'mouse'; }}
+                  onPointerEnter={(e) => { if (e.pointerType !== 'touch') setHoverId(l.id); }}
+                  onPointerLeave={() => setHoverId((v) => (v === l.id ? null : v))}
+                  onFocus={() => setFocusId(l.id)}
+                  onBlur={() => setFocusId((v) => (v === l.id ? null : v))}
+                  onClick={(e) => clickBlip(e, l.id)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
+                      setArmadoId(null);
                       saltar(l.id);
+                    } else if (e.key === 'Escape') {
+                      setArmadoId(null);
+                      e.currentTarget.blur();
                     }
                   }}
                 >
@@ -294,6 +351,38 @@ export default function MinimapaValle({
             })}
           </g>
         </svg>
+
+        {/* Los labels: chips HTML sobre el mapa (texto nítido, no escala con
+            el viewBox del SVG). aria-hidden: el nombre ya viaja en el
+            aria-label del blip. Se renderizan todos para que la salida
+            también transicione; --on los enciende. */}
+        <div className="mmv-labels" aria-hidden="true">
+          {lugares.map((l) => {
+            const px = sx(l.x) / ANCHO;
+            const py = sy(l.z) / ALTO;
+            const esArmado = armadoId === l.id;
+            const visible = esArmado || hoverId === l.id || focusId === l.id || focoId === l.id;
+            const clases = [
+              'mmv-label',
+              py < 0.22 && 'mmv-label--abajo',
+              px < 0.24 && 'mmv-label--izq',
+              px > 0.72 && 'mmv-label--der',
+              focoId === l.id && 'mmv-label--foco',
+              esArmado && 'mmv-label--armado',
+              visible && 'mmv-label--on',
+            ].filter(Boolean).join(' ');
+            return (
+              <span
+                key={l.id}
+                className={clases}
+                style={{ left: `${(px * 100).toFixed(1)}%`, top: `${(py * 100).toFixed(1)}%` }}
+              >
+                {nombreDe(l)}
+                {esArmado && <em className="mmv-label-pista">toque de nuevo para ir</em>}
+              </span>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

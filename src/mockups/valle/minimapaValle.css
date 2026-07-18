@@ -154,9 +154,16 @@
   stroke: rgba(255, 255, 255, 0.95);
   stroke-width: 1.1;
 }
-.mmv-blip--foco .mmv-blip-punto {
+.mmv-blip--foco .mmv-blip-punto,
+.mmv-blip--armado .mmv-blip-punto {
   stroke: #fff;
   stroke-width: 1.1;
+}
+
+/* En pantalla táctil el hit-area del blip crece hacia el target de 44px
+   (r es geometry property CSS en SVG2; el atributo r="8.2" queda de base). */
+@media (pointer: coarse) {
+  .mmv-blip-tap { r: 15.5px; }
 }
 
 /* el aro que pulsa sobre el lugar en foco */
@@ -172,6 +179,67 @@
   0% { transform: scale(0.55); opacity: 0.95; }
   70% { transform: scale(1.12); opacity: 0.18; }
   100% { transform: scale(1.2); opacity: 0; }
+}
+
+/* ── Los labels: chips con el nombre del lugar ─────────────────────────────
+   HTML posicionado en % sobre el área del mapa (inset = padding del marco).
+   Aparecen en hover / foco de teclado / blip armado (táctil); el del foco
+   de la escena queda fijo. Aparición y salida con la misma transición. */
+.mmv-labels {
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.mmv-label {
+  /* desplazamiento respecto del blip: arriba-centrado por defecto,
+     ajustable por modificadores de borde */
+  --lx: -50%;
+  --ly: calc(-100% - 9px);
+  position: absolute;
+  max-width: 132px;
+  padding: 3px 7px;
+  border: 1px solid rgba(255, 233, 176, 0.28);
+  border-radius: 7px;
+  background: rgba(10, 16, 12, 0.9);
+  color: #f6efdd;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transform: translate(var(--lx), var(--ly)) scale(0.92);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+.mmv-label--on {
+  opacity: 1;
+  transform: translate(var(--lx), var(--ly)) scale(1);
+}
+
+/* cerca del borde superior el chip baja; cerca de los laterales se corre */
+.mmv-label--abajo { --ly: 11px; }
+.mmv-label--izq { --lx: -12%; }
+.mmv-label--der { --lx: -88%; }
+
+/* el label del lugar en foco: fijo, con el latón del marco más presente */
+.mmv-label--foco {
+  border-color: rgba(255, 233, 176, 0.55);
+}
+
+/* la pista del 2º toque (solo en el chip armado por táctil) */
+.mmv-label-pista {
+  display: block;
+  margin-top: 1px;
+  font-size: 8.5px;
+  font-style: normal;
+  font-weight: 500;
+  opacity: 0.75;
 }
 
 /* ── Plegar / desplegar ────────────────────────────────────────────────── */
@@ -226,10 +294,18 @@
 .mmv--quieto .mmv-quebrada-brillo {
   display: none;
 }
+.mmv--quieto .mmv-label {
+  transition: none;
+  transform: translate(var(--lx), var(--ly)) scale(1);
+}
 
 @media (prefers-reduced-motion: reduce) {
   .mmv .mmv-blip-aro { animation: none; transform: scale(1); opacity: 0.6; }
   .mmv .mmv-cam { transition: none; }
+  .mmv .mmv-label {
+    transition: none;
+    transform: translate(var(--lx), var(--ly)) scale(1);
+  }
 }
 
 /* ── Teléfono: más chico, más pegado a la esquina ──────────────────────── */
@@ -242,5 +318,12 @@
   .mmv-toggle {
     width: 24px;
     height: 24px;
+  }
+  .mmv-label {
+    max-width: 112px;
+    font-size: 9.5px;
+  }
+  .mmv-label-pista {
+    font-size: 8px;
   }
 }
