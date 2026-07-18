@@ -250,6 +250,11 @@ export const ROPA_PERFIL_POR_BICHO = Object.freeze({
   // Danta: el tapir LANUDO de tierra fría (páramo/bosque altoandino) — aguanta
   // el frío mejor que nadie y NUNCA suda (como el oso/la rana).
   danta: { frioC: 3, calorC: 18, sudaAlSol: false },
+  // Perros de la casa: pelo corto (el dálmata siente el frío pronto); los
+  // perros JADEAN, no sudan → sudaAlSol false (la creature además suprime
+  // sombrero/sudor por su cuenta; el jadeo vive en la lengüita del dálmata).
+  dalmata: { frioC: 12, calorC: 27, sudaAlSol: false },
+  beagle: { frioC: 10, calorC: 27, sudaAlSol: false },
 });
 
 /* Perfil neutro (slug desconocido / standalone). */

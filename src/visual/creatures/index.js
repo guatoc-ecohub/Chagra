@@ -50,6 +50,18 @@ export { Danta } from './Danta.jsx';
    al bundle base — igual que borugoIdentidad/jaguarIdentidad. */
 export { DANTA_PALETA, DANTA_PROPORCION, DANTA_SLUG, PERFIL_DANTA } from './dantaIdentidad.js';
 export { Condor } from './Condor.jsx';
+export { Dalmata } from './Dalmata.jsx';
+/* La IDENTIDAD del dálmata como datos (paleta blanco+manchas negras redondas,
+   proporciones atléticas y su perfil de clima). El perro ALTO y moteado de la
+   casa. Solo datos: jamás arrastra three al bundle base — igual que
+   jaguarIdentidad/borugoIdentidad. */
+export { DALMATA_PALETA, DALMATA_PROPORCION, DALMATA_SLUG, PERFIL_DALMATA } from './dalmataIdentidad.js';
+export { Beagle } from './Beagle.jsx';
+/* La IDENTIDAD del beagle como datos (paleta TRICOLOR silla-negra/blanco/
+   canela, proporciones bajitas y orejonas y su perfil de clima). El sabueso
+   BAJITO de la casa — la anti-silueta del dálmata. Solo datos: jamás arrastra
+   three al bundle base — igual que dalmataIdentidad. */
+export { BEAGLE_PALETA, BEAGLE_PROPORCION, BEAGLE_SLUG, PERFIL_BEAGLE } from './beagleIdentidad.js';
 /* La IDENTIDAD del cóndor como datos (paleta azabache + coberteras plateadas +
    collar de plumón, proporciones y su perfil de clima). EL EMBLEMA DEL PÁRAMO —
    el señor del viento que casi no aletea. Solo datos: jamás arrastra three al
@@ -134,6 +146,8 @@ import Morrocoy from './Morrocoy.jsx';
 import Borugo from './Borugo.jsx';
 import Danta from './Danta.jsx';
 import Condor from './Condor.jsx';
+import Dalmata from './Dalmata.jsx';
+import Beagle from './Beagle.jsx';
 import Lombriz from './Lombriz.jsx';
 import Mariposa from './Mariposa.jsx';
 import Escarabajo from './Escarabajo.jsx';
@@ -155,6 +169,9 @@ export const CREATURES = {
   borugo: { Component: Borugo, nombre: 'Borugo', cientifico: 'Cuniculus taczanowskii' },
   danta: { Component: Danta, nombre: 'Danta de páramo', cientifico: 'Tapirus pinchaque' },
   condor: { Component: Condor, nombre: 'Cóndor de los Andes', cientifico: 'Vultur gryphus' },
+  // Los perros de la casa (razas reconocibles: el alto moteado y el bajito orejón).
+  dalmata: { Component: Dalmata, nombre: 'Dálmata', cientifico: 'Canis lupus familiaris' },
+  beagle: { Component: Beagle, nombre: 'Beagle', cientifico: 'Canis lupus familiaris' },
   lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },
   mariposa: { Component: Mariposa, nombre: 'Mariposa pasionaria', cientifico: 'Dione juno' },
   escarabajo: { Component: Escarabajo, nombre: 'Escarabajo estercolero', cientifico: 'Dichotomius belus' },
