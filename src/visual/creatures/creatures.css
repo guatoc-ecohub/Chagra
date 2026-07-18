@@ -1462,13 +1462,49 @@
   50%      { opacity: 0.85; }
 }
 
+/* GLIFOS SAGRADOS (espirales cobre) — invisibles en reposo; se encienden y
+   laten en la revelación / el poder (símbolo de poder como adorno). */
+.jaguar-glifos { opacity: 0; }
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-glifos,
+.jaguar-poder .jaguar-glifos,
+[data-creature='jaguar'][data-poder='1'] .jaguar-glifos {
+  opacity: 0.6;
+  animation: jaguar-glifos 3.6s ease-in-out infinite;
+}
+@keyframes jaguar-glifos {
+  0%, 100% { opacity: 0.34; }
+  50%      { opacity: 0.72; }
+}
+
 /* la revelación PISA el arrebato (antic/travieso): el espíritu manifiesto no
    hace travesuras — majestad pura. */
 [data-creature='jaguar'][data-revelacion='1'] .rh-antic,
 [data-creature='jaguar'][data-revelacion='1'] .rh-travieso { animation: none; }
 
+/* ── OJOS QUE CAMBIAN DE FORMA (registro Mufasa: carisma ↔ autoridad) ────────
+   REDONDOS en reposo (carisma cálido) → ALMENDRADOS al concentrarse
+   (acecho/rugido/revelación): la mirada se afila y "atraviesa", conservando la
+   nobleza felina. Es un cambio de ESTADO (transición, no bucle) → en RM
+   simplemente salta a la forma seria (fotograma digno). */
+.jaguar-ojos { transition: transform 0.55s ease; }
+[data-creature='jaguar'][data-acecha='1'] .jaguar-ojos,
+[data-creature='jaguar'][data-ruge='1'] .jaguar-ojos { transform: scaleY(0.8); }
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-ojos { transform: scaleY(0.86); }
+
+/* CEJAS NOBLES de la revelación — se ALZAN (sabiduría ancestral, no el fruncido
+   del acecho): la autoridad serena del guardián-espíritu, jamás villano. */
+[data-creature='jaguar'][data-revelacion='1'] .jaguar-cejas {
+  animation: jaguar-cejas-noble 4.4s ease-in-out infinite;
+}
+@keyframes jaguar-cejas-noble {
+  0%, 100% { transform: translateY(-0.5px); }
+  50%      { transform: translateY(-0.95px); }
+}
+
 /* device-tier 'bajo': PODA el brillo/estrellas místicas (raster caro en gama
    baja) — se detiene la animación y queda un rastro estático y digno. */
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-glifos,
+[data-tier='bajo'][data-creature='jaguar'] .jaguar-ojos { animation: none; transition: none; }
 [data-tier='bajo'][data-creature='jaguar'] .jaguar-aura-espectral,
 [data-tier='bajo'][data-creature='jaguar'] .jaguar-ojo-brillo,
 [data-tier='bajo'][data-creature='jaguar'] .jaguar-shimmer,
@@ -1485,7 +1521,7 @@
   /* animation:none !important en la clase base pisa TODA variante (poder /
      revelación reasignan animation-name sin !important) */
   .jaguar-mota, .jaguar-bruma, .jaguar-constelacion-linea,
-  .jaguar-levita, .jaguar-marcas-espiritu,
+  .jaguar-levita, .jaguar-marcas-espiritu, .jaguar-glifos,
   .jaguar-poder .jaguar-aura-espectral,
   .jaguar-poder .jaguar-ojo-brillo,
   .jaguar-poder .jaguar-shimmer,
@@ -1496,6 +1532,8 @@
   .jaguar-estrella,
   .jaguar-poder .jaguar-estrella,
   [data-creature='jaguar'][data-poder='1'] .jaguar-estrella { animation: none !important; opacity: 0.5; }
+  /* Ojos: sin transición — saltan a su forma (redonda o almendrada) sin morphear. */
+  .jaguar-ojos { transition: none !important; }
 }
 
 

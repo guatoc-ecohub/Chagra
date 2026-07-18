@@ -35,7 +35,7 @@ export const JAGUAR_SLUG = 'jaguar';
 export const JAGUAR_PALETA = {
   cuerpo: '#d99a45',        // pelaje leonado dorado (tono medio)
   cuerpoLuz: '#e9b968',     // luz dorsal del pelaje (el sol sobre el lomo — volumen)
-  cuerpoSombra: '#bb7d31',  // sombra ventral del pelaje (la panza en penumbra — volumen)
+  cuerpoSombra: '#b06e2c',  // sombra ventral leonado→rojizo-marrón (la panza en penumbra)
   cuerpoGlow: 'rgba(217,154,69,0.7)',
   vientre: '#f4e6c8',       // pecho/vientre crema
   hombro: '#c9853a',        // omóplato un tono más hondo (el músculo del acecho)
@@ -48,13 +48,16 @@ export const JAGUAR_PALETA = {
   colmillo: '#fff8ec',      // colmillos del rugido
   vibrisa: '#f7edd8',       // bigotes (vibrisas) crema claro
   sombraSuelo: 'rgba(36,22,8,0.38)', // la sombra bajo las zarpas (peso real)
-  /* ── Místico (el jaguar-espíritu del chamán, cosmología andino-amazónica) ── */
+  /* ── Místico (el jaguar-espíritu del chamán, cosmología andino-amazónica) ──
+     Paleta de acentos: violeta/azul (cielo nocturno, la piel = noche estrellada)
+     + DORADO/COBRE (orfebrería andina Tairona/Zenú + el sol del jaguar). */
   espectral: '#b98cff',     // aura etérea / presencia sagrada (violeta espectral)
   estrella: '#efe6ff',      // el titileo de las constelaciones en las rosetas
   ojoBrillo: '#ffe6a0',     // fosforescencia del ojo-espíritu (visión nocturna)
   bruma: '#cdb4ff',         // el velo de niebla del mundo-espíritu a los pies
   mota: '#ece1ff',          // motas de luz que flotan lento (polvo del espíritu)
   marcaEspiritu: '#c9a4ff', // las rosetas gemelas que BRILLAN en la revelación
+  cobre: '#e0a24a',         // glifos de geometría sagrada (cobre de orfebrería)
 };
 
 export const JAGUAR_PROPORCION = {
