@@ -1,11 +1,11 @@
 /*
  * condorIdentidad — LA IDENTIDAD VISUAL DEL CÓNDOR, COMO DATOS.
  *
- * Hermano de `dantaIdentidad.js` / `borugoIdentidad.js` / `faunaAndina.js`: el
+ * Hermano de `dantaIdentidad.js` / `faunaAndina.js`: el
  * CÓNDOR DE LOS ANDES (Vultur gryphus — el ave voladora más grande del mundo,
  * el emblema del páramo y del escudo) tiene aquí su silueta canónica.
  * Rubber-hose (Cuphead + Miss Minutes) con calidez campesina — el MISMO
- * lenguaje de goma de la abeja, el oso y la danta, otro animal y otro
+ * lenguaje de goma de la abeja y la danta, otro animal y otro
  * CARÁCTER: MAJESTUOSO, paciente y de otra altura. EL SEÑOR DEL VIENTO:
  * casi nunca aletea — se DESLIZA en las térmicas con las alas planchadas,
  * y verlo cruzar el cielo es saber que el páramo está sano (carroñero
@@ -16,9 +16,9 @@
  * COLLAR BLANCO de plumón esponjoso (su ruana propia — jamás necesita otra)
  * y la CABEZA PELADA rosada con la cresta carnosa (la carúncula). Su color
  * de poder es el CELESTE DE ALTURA (el azul del cielo a 5000 msnm, el viento
- * del glaciar) — distinto de los 10: dorado (abeja), rojo (oso), verde-zen
+ * del glaciar) — distinto del resto: dorado (abeja), verde-zen
  * (rana), iridiscente (colibrí), púrpura (jaguar), ámbar (ardilla), turquesa
- * (perezoso), bronce (morrocoy), plata lunar (borugo) y verde semilla (danta).
+ * (perezoso), bronce (morrocoy) y verde semilla (danta).
  *
  * REGLA DE ORO (idéntica a dantaIdentidad/faunaAndina): SOLO datos. Cero
  * three, cero react. La creature del bundle base lo importa; jamás debe

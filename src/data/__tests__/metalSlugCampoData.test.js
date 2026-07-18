@@ -215,11 +215,11 @@ describe('REHENES — fauna real con causa y lección', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('al menos 2 rehenes (mínimo: borugo y oso andino)', () => {
+  it('al menos 2 rehenes (mínimo: jaguar y morrocoy)', () => {
     const ids = REHENES.map((r) => r.id);
     expect(REHENES.length).toBeGreaterThanOrEqual(2);
-    expect(ids).toContain('borugo');
-    expect(ids).toContain('oso_andino');
+    expect(ids).toContain('jaguar');
+    expect(ids).toContain('morrocoy');
   });
 });
 
@@ -340,8 +340,8 @@ describe('helpers de lookup (data-driven, puros)', () => {
   });
 
   it('getRehen devuelve el rehén y undefined para ids desconocidos', () => {
-    expect(getRehen('borugo')).toBeDefined();
-    expect(getRehen('borugo').cientifico).toBe('Cuniculus taczanowskii');
+    expect(getRehen('jaguar')).toBeDefined();
+    expect(getRehen('jaguar').cientifico).toBe('Panthera onca');
     expect(getRehen('no_existe')).toBeUndefined();
   });
 

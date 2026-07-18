@@ -9,7 +9,7 @@ import useAvatarCreature, { resolveAvatarCreature } from '../../../hooks/useAvat
  * AvatarSelector ("Elija su animal") + useAvatarCreature.
  * La grilla es DATA-DRIVEN del registro CREATURES: se asercionan las opciones
  * contra el registro (no contra una lista a mano), así el test sigue verde
- * cuando aterrice el borugo.
+ * cuando aterrice un bicho nuevo.
  */
 
 const STORAGE_KEY = 'chagra:prefs:avatar-creature';
@@ -65,15 +65,15 @@ describe('useAvatarCreature — resolución slug→personaje', () => {
     it('sigue la elección del store en vivo', () => {
         const { result } = renderHook(() => useAvatarCreature());
         act(() => {
-            usePrefsStore.getState().setAvatarCreatureId('oso-andino');
+            usePrefsStore.getState().setAvatarCreatureId('jaguar');
         });
-        expect(result.current.id).toBe('oso-andino');
-        expect(result.current.Component).toBe(CREATURES['oso-andino'].Component);
-        expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toBe('oso-andino');
+        expect(result.current.id).toBe('jaguar');
+        expect(result.current.Component).toBe(CREATURES['jaguar'].Component);
+        expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toBe('jaguar');
     });
 
     it('slug desconocido (bicho retirado / typo) cae al default', () => {
-        expect(resolveAvatarCreature('borugo-que-no-existe').id).toBe(AVATAR_CREATURE_DEFAULT);
+        expect(resolveAvatarCreature('bicho-que-no-existe').id).toBe(AVATAR_CREATURE_DEFAULT);
         expect(resolveAvatarCreature(null).id).toBe(AVATAR_CREATURE_DEFAULT);
     });
 

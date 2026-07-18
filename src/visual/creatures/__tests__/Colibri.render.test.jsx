@@ -109,7 +109,7 @@ describe('3. Modo poder — aura IRIDISCENTE cian-magenta (standalone)', () => {
     expect(wrap.getAttribute('style')).toContain('--aura-color');
     expect(wrap.getAttribute('style')).toContain(auraDeBicho('colibri'));
     expect(auraDeBicho('colibri')).not.toBe(auraDeBicho('abeja-angelita'));
-    expect(auraDeBicho('colibri')).not.toBe(auraDeBicho('oso-andino'));
+    expect(auraDeBicho('colibri')).not.toBe(auraDeBicho('jaguar'));
     // capa 4: las corrientes (AuraPoder)
     expect(container.querySelector('.poder-corrientes')).toBeTruthy();
   });

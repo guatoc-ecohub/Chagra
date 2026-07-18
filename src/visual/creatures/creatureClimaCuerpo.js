@@ -9,7 +9,7 @@
  * parámetros de cuerpo que la creature aplica tal cual.
  *
  * GENÉRICO A PROPÓSITO: toda la familia rubber-hose (abeja Angelita, colibrí,
- * oso andino, rana…) comparte el MISMO lenguaje CSS/SVG — `.crt-body`,
+ * rana, danta…) comparte el MISMO lenguaje CSS/SVG — `.crt-body`,
  * `.crt-wing`, glow/blur de `_filters.jsx`, contorno de tinta que respira — así
  * que la MISMA lógica clima→cuerpo (mojado / sed / niebla / vibrante) vale para
  * todas. Lo único que cambia es CUÁNTO le pega cada clima a cada especie: eso
@@ -137,11 +137,6 @@ export const PERFIL_ABEJA = Object.freeze({
 export const PERFIL_COLIBRI = Object.freeze({
   alas: true, humedad: 0.55, difusa: 0.9, sequia: 0.7,
 });
-/* Oso andino: pelaje que empapa despacio, mole grande (la niebla apenas lo
-   difumina), robusto ante la seca. Sin alas. */
-export const PERFIL_OSO = Object.freeze({
-  alas: false, humedad: 0.7, difusa: 0.45, sequia: 0.4,
-});
 /* Rana: anfibia — la más brillante mojada y la MÁS golpeada por la sequía
    (la piel se le reseca). Sin alas. Su tinte de lluvia empuja el verde húmedo. */
 export const PERFIL_RANA = Object.freeze({
@@ -153,7 +148,6 @@ export const PERFIL_RANA = Object.freeze({
 export const PERFILES = Object.freeze({
   'abeja-angelita': PERFIL_ABEJA,
   colibri: PERFIL_COLIBRI,
-  'oso-andino': PERFIL_OSO,
   rana: PERFIL_RANA,
   'rana-andina': PERFIL_RANA, // alias del slug de la creature 2D (RanaAndina)
 });
@@ -236,7 +230,6 @@ export default cuerpoDeClima;
  */
 export const ROPA_PERFIL_POR_BICHO = Object.freeze({
   'abeja-angelita': { frioC: 12, calorC: 26, sudaAlSol: true },
-  'oso-andino': { frioC: 4, calorC: 18, sudaAlSol: false },
   'rana-andina': { frioC: 8, calorC: 22, sudaAlSol: false }, // slug real de la creature
   'rana-arlequin': { frioC: 8, calorC: 22, sudaAlSol: false }, // alias biblia
   colibri: { frioC: 11, calorC: 26, sudaAlSol: true },
@@ -244,11 +237,8 @@ export const ROPA_PERFIL_POR_BICHO = Object.freeze({
   ardilla: { frioC: 11, calorC: 26, sudaAlSol: true },
   perezoso: { frioC: 12, calorC: 27, sudaAlSol: true },
   morrocoy: { frioC: 16, calorC: 32, sudaAlSol: true },
-  // Borugo: roedor NOCTURNO de montaña húmeda — siente el frío pronto y de páramo
-  // NUNCA suda (como el oso/la rana).
-  borugo: { frioC: 8, calorC: 22, sudaAlSol: false },
   // Danta: el tapir LANUDO de tierra fría (páramo/bosque altoandino) — aguanta
-  // el frío mejor que nadie y NUNCA suda (como el oso/la rana).
+  // el frío mejor que nadie y NUNCA suda (como la rana).
   danta: { frioC: 3, calorC: 18, sudaAlSol: false },
 });
 

@@ -126,17 +126,6 @@ export const IDLE_PERFILES = {
     celebra: { dur: 1.2, grados: 360 },
     noche: { freq: 1.1, amp: 0.045, rot: -5 },
   },
-  /* Tremarctos ornatus — pesado y entrañable: respira hondo, voltereta lenta,
-     se rasca la panza largo y se sienta un buen rato. */
-  'oso-andino': {
-    medio: 'suelo', poseBase: 'anda',
-    respira: { freq: 1.05, amp: 0.05, vaiven: 0.23 },
-    vuelta: { base: 36, jitter: 4, dur: 1.9, grados: 360, anticipo: 18 },
-    aseo: { base: 14, jitter: 4, dur: 1.5 },
-    percha: { base: 46, jitter: 8, dur: 9 },
-    celebra: { dur: 2.0, grados: 360 },
-    noche: { freq: 0.55, amp: 0.07, rot: -8 },
-  },
   /* Phyllobates terribilis — la garganta late; su "vuelta" es la voltereta
      de brinco y su percha, quedarse quieta en la hoja (es lo suyo). */
   'rana-dorada': {

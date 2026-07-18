@@ -25,7 +25,6 @@ export {
 } from './AbejaTransicion.jsx';
 export { avisarSalidaAbeja, resetSalidaAbeja, useSalidaAbeja } from './senalSalidaAbeja.js';
 export { Colibri } from './Colibri.jsx';
-export { OsoAndino } from './OsoAndino.jsx';
 export { RanaAndina } from './RanaAndina.jsx';
 export { Ardilla } from './Ardilla.jsx';
 export { Jaguar } from './Jaguar.jsx';
@@ -38,22 +37,17 @@ export { Morrocoy } from './Morrocoy.jsx';
    proporciones y su perfil de clima). Solo datos: jamás arrastra three al bundle
    base — igual que jaguarIdentidad/faunaAndina. */
 export { MORROCOY_PALETA, MORROCOY_PROPORCION, MORROCOY_SLUG, PERFIL_MORROCOY } from './morrocoyIdentidad.js';
-export { Borugo } from './Borugo.jsx';
-/* La IDENTIDAD del borugo como datos (paleta parda + motas crema, proporciones y
-   su perfil de clima). El 9º y ÚLTIMO bicho — el ANIMAL DE CIERRE. Solo datos:
-   jamás arrastra three al bundle base — igual que jaguarIdentidad/abejaIdentidad. */
-export { BORUGO_PALETA, BORUGO_PROPORCION, BORUGO_SLUG, PERFIL_BORUGO } from './borugoIdentidad.js';
 export { Danta } from './Danta.jsx';
 /* La IDENTIDAD de la danta como datos (paleta lanuda + borde blanco de orejas/
    labios, proporciones y su perfil de clima). La emblemática que faltaba en el
    bosque — la JARDINERA que siembra al andar. Solo datos: jamás arrastra three
-   al bundle base — igual que borugoIdentidad/jaguarIdentidad. */
+   al bundle base — igual que jaguarIdentidad. */
 export { DANTA_PALETA, DANTA_PROPORCION, DANTA_SLUG, PERFIL_DANTA } from './dantaIdentidad.js';
 export { Condor } from './Condor.jsx';
 /* La IDENTIDAD del cóndor como datos (paleta azabache + coberteras plateadas +
    collar de plumón, proporciones y su perfil de clima). EL EMBLEMA DEL PÁRAMO —
    el señor del viento que casi no aletea. Solo datos: jamás arrastra three al
-   bundle base — igual que dantaIdentidad/borugoIdentidad. */
+   bundle base — igual que dantaIdentidad. */
 export { CONDOR_PALETA, CONDOR_PROPORCION, CONDOR_SLUG, PERFIL_CONDOR } from './condorIdentidad.js';
 /* La IDENTIDAD del trío andino como datos (paletas + proporciones). Solo datos:
    jamás arrastra three al bundle base — igual que abejaIdentidad. */
@@ -125,13 +119,11 @@ export { useVidaIdle, useRitmoPropio, useMiradaUsted, prefiereQuietud } from './
 
 import AbejaAngelita from './AbejaAngelita.jsx';
 import Colibri from './Colibri.jsx';
-import OsoAndino from './OsoAndino.jsx';
 import RanaAndina from './RanaAndina.jsx';
 import Perezoso from './Perezoso.jsx';
 import Ardilla from './Ardilla.jsx';
 import Jaguar from './Jaguar.jsx';
 import Morrocoy from './Morrocoy.jsx';
-import Borugo from './Borugo.jsx';
 import Danta from './Danta.jsx';
 import Condor from './Condor.jsx';
 import Lombriz from './Lombriz.jsx';
@@ -146,13 +138,11 @@ import EntFrailejon from './EntFrailejon.jsx';
 export const CREATURES = {
   'abeja-angelita': { Component: AbejaAngelita, nombre: 'Abeja angelita', cientifico: 'Tetragonisca angustula' },
   colibri: { Component: Colibri, nombre: 'Colibrí chillón', cientifico: 'Colibri coruscans' },
-  'oso-andino': { Component: OsoAndino, nombre: 'Oso andino', cientifico: 'Tremarctos ornatus' },
   'rana-andina': { Component: RanaAndina, nombre: 'Rana arlequín andina', cientifico: 'Atelopus spp.' },
   perezoso: { Component: Perezoso, nombre: 'Perezoso de tres dedos', cientifico: 'Bradypus variegatus' },
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },
   jaguar: { Component: Jaguar, nombre: 'Jaguar', cientifico: 'Panthera onca' },
   morrocoy: { Component: Morrocoy, nombre: 'Morrocoy de patas rojas', cientifico: 'Chelonoidis carbonarius' },
-  borugo: { Component: Borugo, nombre: 'Borugo', cientifico: 'Cuniculus taczanowskii' },
   danta: { Component: Danta, nombre: 'Danta de páramo', cientifico: 'Tapirus pinchaque' },
   condor: { Component: Condor, nombre: 'Cóndor de los Andes', cientifico: 'Vultur gryphus' },
   lombriz: { Component: Lombriz, nombre: 'Lombriz de tierra', cientifico: 'Martiodrilus crassus' },

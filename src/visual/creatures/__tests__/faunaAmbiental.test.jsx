@@ -1,6 +1,6 @@
 /**
  * faunaAmbiental.test.jsx — el VALLE VIVO cumple sus reglas duras:
- *   1. CAST data-driven: sale del registro (borugo/morrocoy entrarán solos),
+ *   1. CAST data-driven: sale del registro (un bicho nuevo entra solo),
  *      excluye al central (el protagonista no se duplica) y a la microfauna.
  *   2. CENTRAL manda: resolverCentral valida y cae a Angelita sin avatar.
  *   3. LÍMITES por tier (alto 3 / medio 2 / bajo 1) y reduced-motion = 0.
@@ -45,21 +45,21 @@ describe('1. castAmbiental — data-driven desde el registro', () => {
     const cast = castAmbiental(CENTRAL_DEFECTO);
     expect(cast).not.toContain(CENTRAL_DEFECTO);
     MICROFAUNA_EXCLUIDA.forEach((m) => expect(cast).not.toContain(m));
-    // Los personajes reales del registro sí están (oso, jaguar, colibrí…).
-    expect(cast).toContain('oso-andino');
+    // Los personajes reales del registro sí están (danta, jaguar, colibrí…).
+    expect(cast).toContain('danta');
     expect(cast).toContain('jaguar');
     expect(cast).toContain('colibri');
   });
 
-  it('un personaje NUEVO en el registro entra solo al elenco (borugo-proof)', () => {
-    const registro = { ...CREATURES, borugo: { Component: Bicho, nombre: 'Borugo' } };
-    expect(castAmbiental(CENTRAL_DEFECTO, registro)).toContain('borugo');
+  it('un personaje NUEVO en el registro entra solo al elenco (bicho-nuevo-proof)', () => {
+    const registro = { ...CREATURES, nutria: { Component: Bicho, nombre: 'Nutria' } };
+    expect(castAmbiental(CENTRAL_DEFECTO, registro)).toContain('nutria');
   });
 
-  it('si el central es otro (oso), la abeja entra al coro y el oso sale', () => {
-    const cast = castAmbiental('oso-andino');
+  it('si el central es otro (jaguar), la abeja entra al coro y el jaguar sale', () => {
+    const cast = castAmbiental('jaguar');
     expect(cast).toContain('abeja-angelita');
-    expect(cast).not.toContain('oso-andino');
+    expect(cast).not.toContain('jaguar');
   });
 
   it('el morrocoy (recién aterrizado en CREATURES) ya está en el elenco', () => {
@@ -67,9 +67,9 @@ describe('1. castAmbiental — data-driven desde el registro', () => {
   });
 
   it('excluir saca extras del coro (Angelita donde ya es la acompañante)', () => {
-    const cast = castAmbiental('oso-andino', CREATURES, ['abeja-angelita']);
+    const cast = castAmbiental('danta', CREATURES, ['abeja-angelita']);
     expect(cast).not.toContain('abeja-angelita');
-    expect(cast).not.toContain('oso-andino');
+    expect(cast).not.toContain('danta');
     expect(cast).toContain('jaguar');
   });
 });
@@ -107,7 +107,7 @@ describe('3. limiteAmbiental — el presupuesto duro por gama', () => {
 });
 
 describe('4. el pool rotativo — invariantes bajo mil vueltas', () => {
-  const cast = ['colibri', 'oso-andino', 'rana-andina', 'perezoso', 'ardilla', 'jaguar'];
+  const cast = ['colibri', 'danta', 'rana-andina', 'perezoso', 'ardilla', 'jaguar'];
 
   it('crearEstado arma min(limite, cast) slots, todos descansando', () => {
     const e = crearEstado(cast, 3);
@@ -177,7 +177,7 @@ describe('5. coherencia de entradas — solo el jaguar es mágico', () => {
   it('el jaguar aparece mágico; el resto viene de un lado', () => {
     expect(MAGICOS).toEqual(['jaguar']);
     expect(esMagico('jaguar')).toBe(true);
-    expect(esMagico('oso-andino')).toBe(false);
+    expect(esMagico('danta')).toBe(false);
     expect(esMagico(null)).toBe(false);
   });
 });
@@ -191,7 +191,7 @@ describe('6. <FaunaAmbiental> — el DOM cumple el presupuesto', () => {
   });
 
   const registro = registroFake([
-    'abeja-angelita', 'colibri', 'oso-andino', 'rana-andina', 'perezoso',
+    'abeja-angelita', 'colibri', 'danta', 'rana-andina', 'perezoso',
   ]);
 
   it('reduced-motion → la capa NI SE MONTA', () => {

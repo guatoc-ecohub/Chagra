@@ -33,14 +33,6 @@
    no es de cuarzo). El TEMPERAMENTO va en el compás: los nerviosos (ardilla,
    colibrí) gesticulan seguido; los lentos (morrocoy, perezoso) casi nunca. */
 export const VIDA_REPERTORIO = {
-  'oso-andino': {
-    descanso: [4200, 9800],
-    momentos: {
-      resopla: { dur: 4500, peso: 2 }, // 3× oso-resoplido 1.5s · 5× oso-cejas-frunce 0.9s
-      rasca: { dur: 3000, peso: 2 }, // 3× oso-rasca-cuerpo 1.0s · 6× oso-rasca 0.5s
-      reposo: { dur: 8800, peso: 1 }, // 2× rh-g-reposo 4.4s — el guardián se sienta
-    },
-  },
   colibri: {
     descanso: [2600, 6400], // hiperactivo: casi no se queda quieto
     momentos: {
@@ -87,14 +79,6 @@ export const VIDA_REPERTORIO = {
       asiente: { dur: 5600, peso: 2 }, // 2× morrocoy-asiente 2.8s — el sabio asiente
       seRetrae: { dur: 4600, peso: 1 }, // 1× morrocoy-retrae 4.6s — su firma elástica
       reposo: { dur: 8800, peso: 1.5 }, // 2× rh-g-reposo — descansar es lo suyo
-    },
-  },
-  borugo: {
-    descanso: [4200, 9800],
-    momentos: {
-      olfatea: { dur: 3300, peso: 2.5 }, // 6× borugo-olfateo 0.55s · 3× orejas 1.1s
-      acurruca: { dur: 4600, peso: 1 }, // 1× borugo-acurruca 4.6s — el corazón del cierre
-      reposo: { dur: 4400, peso: 1 }, // 1× rh-g-reposo
     },
   },
 };

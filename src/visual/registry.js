@@ -52,10 +52,10 @@ const VARIANTES_ABEJA = [
   { label: 'sin animación', props: { size: 80, animated: false } },
 ];
 
-/* El trío andino rubber-hose (oso / colibrí / rana) estrena los MISMOS gestos
+/* El colibrí y la rana rubber-hose estrenan los MISMOS gestos
    species-agnostic que Angelita: celebra (brinco + V con overshoot), reposo
    (respira) y señala (se inclina al POI y apunta). Base 'vuela' para el colibrí
-   (alado) y 'anda' para el oso y la rana (de suelo). */
+   (alado) y 'anda' para la rana (de suelo). */
 const VARIANTES_TRIO_AIRE = [
   { label: '48 px', props: { size: 48 } },
   { label: 'vuela', props: { size: 80 } },
@@ -73,25 +73,8 @@ const VARIANTES_TRIO_SUELO = [
   { label: 'sin animación', props: { size: 80, animated: false } },
 ];
 /* Variantes de vitrina por slug (las que difieren del set genérico). */
-/* El OSO ANDINO completo estrena TODA la fundación transversal (espejo de la
-   abeja, con su carácter): peso y line-boil, gruñido (resopla), rascado, ruana
-   del páramo, modo poder ROJO y prop por mundo. La vitrina lo luce con todo. */
-const VARIANTES_OSO = [
-  { label: '48 px', props: { size: 48 } },
-  { label: 'anda', props: { size: 88 } },
-  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
-  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
-  { label: 'señala', props: { size: 88, pose: 'señala' } },
-  { label: 'gruñe (resopla)', props: { size: 88, resopla: true } },
-  { label: 'se rasca', props: { size: 88, rasca: true } },
-  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
-  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
-  { label: 'poder ROJO', props: { size: 88, poder: true } },
-  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
-  { label: 'sin animación', props: { size: 88, animated: false } },
-];
-/* El JAGUAR completo estrena TODA la fundación transversal (espejo de la abeja/
-   oso, con su carácter): acecho de hombros + cola pesada + line-boil, rugido
+/* El JAGUAR completo estrena TODA la fundación transversal (espejo de la abeja,
+   con su carácter): acecho de hombros + cola pesada + line-boil, rugido
    corporal (ruge), modo acecho (acecha), ruana de noche, modo poder PÚRPURA y
    prop por mundo. La vitrina lo luce con todo. */
 const VARIANTES_JAGUAR = [
@@ -109,8 +92,8 @@ const VARIANTES_JAGUAR = [
   { label: 'sin animación', props: { size: 88, animated: false } },
 ];
 
-/* La ARDILLA completa estrena TODA la fundación transversal (espejo de la abeja
-   y del oso, con su CARÁCTER pizpireta): boil veloz + line-boil, INSPECCIÓN
+/* La ARDILLA completa estrena TODA la fundación transversal (espejo de la abeja,
+   con su CARÁCTER pizpireta): boil veloz + line-boil, INSPECCIÓN
    INVERTIDA (su firma), roer, ruana, modo poder ÁMBAR y prop por mundo. La
    vitrina la luce con todo. */
 const VARIANTES_ARDILLA = [
@@ -148,7 +131,7 @@ const VARIANTES_PEREZOSO = [
 ];
 
 /* El MORROCOY completo estrena TODA la fundación transversal (espejo de la abeja/
-   oso/jaguar, con su carácter ANCESTRAL): caparazón que respira + line-boil,
+   jaguar, con su carácter ANCESTRAL): caparazón que respira + line-boil,
    retracción elástica (seRetrae), asentimiento sabio (asiente), ruana de noche,
    modo poder BRONCE y prop por mundo. La vitrina lo luce con todo. */
 const VARIANTES_MORROCOY = [
@@ -162,26 +145,6 @@ const VARIANTES_MORROCOY = [
   { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
   { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
   { label: 'poder BRONCE', props: { size: 88, poder: true } },
-  { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
-  { label: 'sin animación', props: { size: 88, animated: false } },
-];
-
-/* El BORUGO completo — el 9º y ÚLTIMO bicho, el ANIMAL DE CIERRE — estrena TODA
-   la fundación transversal con su CARÁCTER TIERNO y NOCTURNO: olfateo tímido
-   (`olfatea`), acurrucarse a salvo (`acurruca`), boil suave, motas crema que
-   brillan con luz lunar, ruana de noche, modo poder PLATA LUNAR y prop por mundo.
-   La vitrina lo luce con todo. */
-const VARIANTES_BORUGO = [
-  { label: '48 px', props: { size: 48 } },
-  { label: 'anda', props: { size: 88 } },
-  { label: 'celebra', props: { size: 88, pose: 'celebra' } },
-  { label: 'reposo', props: { size: 88, pose: 'reposo' } },
-  { label: 'señala', props: { size: 88, pose: 'señala' } },
-  { label: 'olfatea', props: { size: 88, olfatea: true } },
-  { label: 'se acurruca', props: { size: 88, acurruca: true } },
-  { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
-  { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
-  { label: 'poder PLATA LUNAR', props: { size: 88, poder: true } },
   { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
   { label: 'sin animación', props: { size: 88, animated: false } },
 ];
@@ -244,13 +207,11 @@ const VARIANTES_ENT = [
 const VARIANTES_POR_SLUG = {
   'abeja-angelita': VARIANTES_ABEJA,
   colibri: VARIANTES_TRIO_AIRE,
-  'oso-andino': VARIANTES_OSO,
   'rana-andina': VARIANTES_TRIO_SUELO,
   perezoso: VARIANTES_PEREZOSO,
   ardilla: VARIANTES_ARDILLA,
   jaguar: VARIANTES_JAGUAR,
   morrocoy: VARIANTES_MORROCOY,
-  borugo: VARIANTES_BORUGO,
   danta: VARIANTES_DANTA,
   condor: VARIANTES_CONDOR,
   'ent-frailejon': VARIANTES_ENT,
@@ -261,13 +222,11 @@ const VARIANTES_POR_SLUG = {
 const NOTAS_CREATURE = {
   'abeja-angelita': 'Meliponino sin aguijón, polinizadora de la chagra; alas que baten y antenas vivas.',
   colibri: 'Pico recto y garganta violeta iridiscente; el ave-agente de Chagra, ya en rubber-hose.',
-  'oso-andino': 'Oso de anteojos, guardián del páramo; mole parda entrañable con los anteojos crema (su firma).',
   'rana-andina': 'Rana arlequín del páramo, guardiana del agua; verde húmedo con manchas ocre y ojos saltones.',
   perezoso: 'Perezoso de tres dedos, la calma total; cuelga de la rama por sus garras largas, antifaz y tinte verdoso de algas. Todo en cámara lenta.',
   ardilla: 'Ardilla de cola roja del templado; rufa con la línea dorsal oscura (su firma), cola tupida y su inspección invertida.',
   jaguar: 'Felino de tierra cálida, majestuoso y acechador; leonado con rosetas de centro ocre (su firma), aura púrpura.',
   morrocoy: 'Galápago de patas rojas, el anciano ancestral y paciente; caparazón de domo hexagonal (su firma) y patas rojizas, aura bronce. Se retrae elástico a la concha.',
-  borugo: 'La paca de montaña andina, roedor nocturno tierno; pardo con hileras de motas crema (su firma), olfateo tímido y aura plata lunar. El animal de cierre — vivo, a salvo y digno.',
   danta: 'El tapir andino, la mole lanuda y mansa del bosque altoandino; trompa corta que husmea en periscopio y borde blanco de orejas y labios (su firma doble). La jardinera del bosque: siembra semillas al andar, aura verde semilla.',
   condor: 'El ave voladora más grande del mundo, el emblema del páramo; alas enormes de plumas-dedo, collar blanco de plumón y cabeza pelada con carúncula (su firma triple). El señor del viento: casi no aletea — planea las térmicas y verlo es saber que la montaña está sana. Aura celeste de altura.',
   'ent-frailejon': 'El árbol-guardián que enseña: frailejón gigante del páramo, tronco con rostro sabio y faldita de hojas muertas, corona en roseta plateada y flores amarillas. Guardián del agua; anciano sereno y lento. Modo-guardián verde-plateado cuando el páramo peligra.',

@@ -12,7 +12,7 @@ import { auraDeBicho } from './transformacion.js';
 
 /* Danta de páramo — Tapirus pinchaque (el tapir andino, el mamífero grande del
    bosque altoandino y LA JARDINERA DEL BOSQUE: siembra semillas al andar).
-   Hermana rubber-hose de la abeja Angelita, el oso y el borugo: compone el
+   Hermana rubber-hose de la abeja Angelita y el resto de la familia: compone el
    MISMO kit `_rubberhose.jsx` (ojos de goma, cachetes, sonrisa, miembros
    manguera) y hereda la MISMA fundación transversal — lip-sync (useLipSync →
    BocaVisema), modo poder (transformacion, aura VERDE SEMILLA), ropa por clima

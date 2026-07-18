@@ -10,7 +10,7 @@
  *
  * Este módulo es la fuente única de tres verdades:
  *   1. EL CAST — data-driven desde el registro `CREATURES`: al aterrizar un
- *      personaje nuevo (borugo, morrocoy…) entra SOLO al elenco ambiental,
+ *      personaje nuevo (danta, condor…) entra SOLO al elenco ambiental,
  *      sin tocar este archivo. La microfauna decorativa (lombriz/mariposa/
  *      escarabajo) queda fuera: ella ya vive sembrada por FaunaEscena con
  *      criterio ecológico, no hace giños de personaje.
@@ -56,7 +56,7 @@ export function resolverCentral(slug, registro = CREATURES) {
 /**
  * El ELENCO ambiental: todos los personajes del registro MENOS el central
  * (el protagonista no se duplica en el fondo) y la microfauna decorativa.
- * Data-driven: borugo/morrocoy entran solos al aterrizar en CREATURES.
+ * Data-driven: danta/condor entran solos al aterrizar en CREATURES.
  * @param {string} [centralSlug]
  * @param {object} [registro]
  * @param {string[]} [excluir]  slugs extra fuera del coro (p. ej. Angelita en

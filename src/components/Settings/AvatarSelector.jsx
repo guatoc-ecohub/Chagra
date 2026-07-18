@@ -8,7 +8,7 @@ import { CREATURES } from '../../visual/creatures/index.js';
  *
  * Grilla DATA-DRIVEN de los personajes de fauna del registro CREATURES
  * (src/visual/creatures/index.js): cualquier bicho nuevo que entre al
- * registro (p. ej. el borugo) aparece aquí sin tocar este archivo.
+ * registro aparece aquí sin tocar este archivo.
  *
  * La elección persiste de inmediato en usePrefsStore (`avatarCreatureId`,
  * localStorage `chagra:prefs:avatar-creature`) — no hay botón "guardar".

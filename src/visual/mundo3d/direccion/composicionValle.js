@@ -233,9 +233,10 @@ export const JERARQUIA_PERSONAJES = {
    contra CREATURES: un slug ausente no monta nada (las ramas de personajes
    mejoran el dibujo al mergear y este mapa ni se entera).
 
-   `franjas` = cuándo sale (null = siempre): el borugo es crepuscular y el
-   jaguar es un aparecido del amanecer, el atardecer y la niebla — verlo es
-   un premio, no un mueble. Eso también es jerarquía: la frecuencia cuenta.
+   `franjas` = cuándo sale (null = siempre): el jaguar es un aparecido del
+   amanecer, el atardecer y la niebla — verlo es un premio, no un mueble. El
+   resto de los vecinos está siempre presente. Eso también es jerarquía: la
+   frecuencia cuenta.
 
    Ubicaciones verificadas contra la cámara de reposo ([10.5,9,13.5] →
    [0,1.6,1.4], fov 40): todas a la vista, ninguna detrás de la cordillera
