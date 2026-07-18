@@ -244,6 +244,12 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
   {
+    path: 'diorama_semillero',
+    componente: 'MundoSemillero3D',
+    importLazy: 'src/mockups/MundoSemillero3D.jsx',
+    categoria: '3D',
+  },
+  {
     path: 'diorama_agua',
     componente: 'MundoAgua3D',
     importLazy: 'src/mockups/MundoAgua3D.jsx',
