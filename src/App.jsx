@@ -258,6 +258,10 @@ const AngelitaVivaMockup = lazy(() => import('./mockups/AngelitaViva'));
 // PANELERA (cañal, trapiche de buey, hornilla con paila y gaveras). Didáctico:
 // caña → molino → jugo → paila → panela.
 const MundoBoticaCana3DMockup = lazy(() => import('./mockups/MundoBoticaCana3D'));
+// 3D: el HUERTO DE FRUTALES del solar (aguacate mayor, mango con poda,
+// cítricos, guayabo, papayo, injerto con tutor, plateo y cosecha a mano).
+// Standalone tipo botica: no monta el sistema MUNDO ni toca EscenaBase3D.
+const MundoFrutales3DMockup = lazy(() => import('./mockups/MundoFrutales3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -696,6 +700,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/angelita-viva': 'mockup_angelita_viva',
   'mockups/mundo-polinizadores-3d': 'mockup_mundo_polinizadores_3d',
   'mockups/mundo-botica-cana-3d': 'mockup_mundo_botica_cana_3d',
+  'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2381,6 +2386,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La botica y el trapiche">
               <MundoBoticaCana3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_frutales_3d':
+        // El huerto de frutales del solar: el aguacate mayor, el mango de
+        // copa ancha con su poda, los cítricos cargados, el guayabo, el
+        // papayo de tronco solo, el injerto joven con tutor, el plateo al
+        // pie de cada árbol y la cosecha a mano (escalera + canastos).
+        // Ruta #/mockups/mundo-frutales-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El huerto de frutales">
+              <MundoFrutales3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
