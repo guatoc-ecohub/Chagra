@@ -2076,6 +2076,16 @@
   50%      { transform: translateY(-0.3px) scaleY(1.04); }  /* atentas y mansas */
 }
 
+/* LA COLITA — el nudito de tapir se menea apenas (período co-primo con la
+   trompa y las orejas: la mole nunca repite el compás). Pivote donde nace. */
+.danta-cola {
+  animation: danta-cola-menea 5.7s ease-in-out infinite;
+}
+@keyframes danta-cola-menea {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(-9deg); }   /* contenta y breve */
+}
+
 /* HUSMEA — la reacción-firma: la TROMPA sube en PERISCOPIO y tantea a lado y
    lado (algo huele a fruta o a visita) y las orejas se enderezan. Pisan el
    idle por especificidad (dos atributos). */
@@ -2114,10 +2124,31 @@
   50%      { transform: rotate(11deg) scaleY(0.88); }   /* alzada, cede la palabra */
 }
 
-/* El estado husmea PISA el arrebato (antic/travieso): una mole que tantea el
-   aire con la trompa no da vueltas de campana. */
+/* RAMONEA — el gesto complementario del husmea, hacia ABAJO: la cabeza baja
+   mansa al pasto y la TROMPA PRENSIL se estira y curla agarrando brotes (así
+   siembra el bosque al andar). El JSX garantiza que husmea y ramonea no
+   coexisten (gana husmea). */
+[data-creature='danta'][data-ramonea='1'] .danta-cabeza {
+  animation: danta-cabeza-ramonea 3.4s ease-in-out infinite;
+}
+@keyframes danta-cabeza-ramonea {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  35%, 65% { transform: translateY(1.1px) rotate(-2deg); }  /* baja al pasto */
+}
+[data-creature='danta'][data-ramonea='1'] .danta-trompa {
+  animation: danta-trompa-ramonea 1.7s ease-in-out infinite;
+}
+@keyframes danta-trompa-ramonea {
+  0%, 100% { transform: rotate(-8deg) scaleY(1.10); }
+  50%      { transform: rotate(9deg) scaleY(1.16) translateY(0.3px); }  /* agarra el brote */
+}
+
+/* Los estados husmea y ramonea PISAN el arrebato (antic/travieso): una mole
+   que tantea el aire o pasta con la trompa no da vueltas de campana. */
 [data-creature='danta'][data-husmea='1'] .rh-antic,
-[data-creature='danta'][data-husmea='1'] .rh-travieso { animation: none; }
+[data-creature='danta'][data-husmea='1'] .rh-travieso,
+[data-creature='danta'][data-ramonea='1'] .rh-antic,
+[data-creature='danta'][data-ramonea='1'] .rh-travieso { animation: none; }
 
 /* device-tier 'bajo': el boil reescrito de la danta lo reactivaría (misma
    clase) → re-apagarlo aquí (mayor especificidad + orden posterior). La trompa
@@ -2125,14 +2156,17 @@
    contando la verdad. */
 [data-tier='bajo'][data-creature='danta'] .rh-boil,
 [data-tier='bajo'][data-creature='danta'] .danta-trompa,
-[data-tier='bajo'][data-creature='danta'] .danta-orejas { animation: none; }
+[data-tier='bajo'][data-creature='danta'] .danta-orejas,
+[data-tier='bajo'][data-creature='danta'] .danta-cola { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
   [data-creature='danta'] .rh-boil,
-  .danta-trompa, .danta-orejas,
+  .danta-trompa, .danta-orejas, .danta-cola,
   [data-creature='danta'][data-husmea='1'] .danta-trompa,
   [data-creature='danta'][data-husmea='1'] .danta-orejas,
   [data-creature='danta'][data-husmea='1'] .danta-cabeza,
+  [data-creature='danta'][data-ramonea='1'] .danta-trompa,
+  [data-creature='danta'][data-ramonea='1'] .danta-cabeza,
   [data-creature='danta'][data-visema='V2'] .danta-trompa,
   [data-creature='danta'][data-visema='V3'] .danta-trompa,
   [data-creature='danta'][data-visema='V4'] .danta-trompa { animation: none !important; }
