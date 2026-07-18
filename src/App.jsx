@@ -199,6 +199,10 @@ const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 // 3D: el PÁRAMO altoandino — el ecosistema de la niebla (frailejones, musgo,
 // quenuas, aves) y el NACIMIENTO del agua. Didáctico: la fábrica de agua.
 const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
+// 3D: LEGUMINOSAS y RAÍCES ANDINAS — fríjol trepador con el CORTE de raíz y los
+// nódulos rosados de Rhizobium (nitrógeno gratis), yuca de raíz tuberosa y
+// quinua con panojas rojas/doradas/moradas. Didáctico, hora dorada.
+const MundoLeguminosas3DMockup = lazy(() => import('./mockups/MundoLeguminosas3D'));
 const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
 const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
 const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
@@ -625,6 +629,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
   'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
+  'mockups/mundo-leguminosas-3d': 'mockup_mundo_leguminosas_3d',
   'mockups/camara-director': 'mockup_camara_director',
   'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
   'mockups/artesania-andina': 'mockup_artesania_andina',
@@ -1402,7 +1407,16 @@ export default function App() {
   // (const en TDZ si el effect se declarara antes).
   useEffect(() => {
     const handler = () => {
-      if (currentView === 'login' || currentView === 'loading' || currentView === 'oauth-callback') {
+      // Los mockups públicos (#/mockups/*) son vitrinas SIN sesión: no deben
+      // rebotar a login por un 'session-expired' fantasma (p.ej. una llamada de
+      // fondo a farmOS que 401ea). Sin este exento, cualquier vitrina 3D pública
+      // se caía a login apenas fallaba una petición de API en segundo plano.
+      if (
+        currentView === 'login' ||
+        currentView === 'loading' ||
+        currentView === 'oauth-callback' ||
+        currentView.startsWith('mockup_')
+      ) {
         return;
       }
       logoutUser().catch(() => { /* tokens podrían persistir; getAccessToken igual da null */ });
@@ -2184,6 +2198,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El páramo altoandino">
               <MundoParamo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_leguminosas_3d':
+        // Leguminosas y raíces andinas en 3D: el fríjol trepador con el CORTE de
+        // raíz que muestra los nódulos rosados de Rhizobium (fijación de N,
+        // abono gratis — asociar con maíz), la yuca de raíz tuberosa que aguanta
+        // el suelo pobre y la quinua con panojas rojas/doradas/moradas (proteína
+        // de altura). Hora dorada, fauna del kit. Ruta
+        // #/mockups/mundo-leguminosas-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Leguminosas y raíces andinas">
+              <MundoLeguminosas3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
