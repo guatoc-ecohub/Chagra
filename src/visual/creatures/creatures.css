@@ -399,8 +399,45 @@
   50%      { transform: scaleX(1.3) skewX(-6deg); }
 }
 
+/* ENTRADA / SALIDA de escena con squash-&-stretch (12 principios) — el POP
+   cotidiano species-agnostic del KIT: aparecer/desaparecer de un diálogo, un
+   panel, una percha. One-shot con `both` (rh-entra termina en identidad y ahí
+   se queda; rh-sale termina invisible — el host desmonta después, ~0.65s).
+   NO compite con la ENTRADA TEATRAL de Angelita (.ang-entrada, el número
+   heroico con gafas y aro): esto es el gesto barato de todos los días.
+   Va en un wrapper EXTERNO al antic/boil: capas de transform que no se pisan. */
+.rh-entra {
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform, opacity;
+  animation: rh-entra 0.9s cubic-bezier(0.36, 1.4, 0.5, 1) both;
+}
+@keyframes rh-entra {
+  0%   { transform: scale(0.001); opacity: 0; }
+  18%  { transform: translateY(1.5px) scale(0.3, 0.12); opacity: 1; }  /* anticipación: aplastada, coge impulso */
+  40%  { transform: translateY(-1.2px) scale(0.72, 1.35); }            /* ¡el estirón al brotar! */
+  62%  { transform: translateY(0.3px) scale(1.16, 0.86); }             /* overshoot squash */
+  78%  { transform: scale(0.94, 1.07); }                               /* rebote elástico */
+  90%  { transform: scale(1.03, 0.98); }
+  100% { transform: scale(1); }                                        /* asentada */
+}
+.rh-sale {
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform, opacity;
+  animation: rh-sale 0.62s cubic-bezier(0.5, 0, 0.75, 0.4) both;
+}
+@keyframes rh-sale {
+  0%   { transform: scale(1); opacity: 1; }
+  22%  { transform: translateY(1.2px) scale(1.14, 0.8); }    /* anticipación: se agacha */
+  42%  { transform: translateY(-2px) scale(0.8, 1.3); }      /* ¡estira al despegar! */
+  70%  { transform: translateY(-3.5px) scale(0.4, 0.62); opacity: 1; }
+  100% { transform: translateY(-5px) scale(0.001); opacity: 0; }  /* se esfumó */
+}
+
 /* device-tier 'bajo': corta lo continuo (ahorro gama baja). Los estados
-   reactivos siguen (feedback importante) por su mayor especificidad. */
+   reactivos siguen (feedback importante) por su mayor especificidad.
+   rh-entra/rh-sale QUEDAN: son one-shot baratos y son feedback de presencia. */
 [data-tier='bajo'] .rh-boil,
 [data-tier='bajo'] .rh-sway,
 [data-tier='bajo'] .rh-antic,
@@ -415,7 +452,10 @@
      (bracitos colgando, cuerpo neutro, sonriendo). */
   [data-pose='celebra'] .crt-body, [data-pose='celebra'] .crt-brazo-l, [data-pose='celebra'] .crt-brazo-r,
   [data-pose='reposo'] .crt-body,
-  [data-pose='señala'] .crt-body, [data-pose='señala'] .crt-brazo-r { animation: none !important; }
+  [data-pose='señala'] .crt-body, [data-pose='señala'] .crt-brazo-r,
+  /* Entrada/salida sin teatro: aparece YA (identidad) / se va YA (abajo). */
+  .rh-entra, .rh-sale { animation: none !important; }
+  .rh-sale { opacity: 0; }  /* saliendo bajo RM = ya no está (el host desmonta) */
 }
 
 /* ── REACCIÓN AL ESTADO REAL DE LA FINCA (auditoría §5b) ──────────────────────

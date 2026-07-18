@@ -122,6 +122,19 @@ export function AbejaAngelita({
      'vivas' (con eyebrow-flash al hablar) | 'fruncidas' (concentrada). El
      agente las deriva por estado; cualquier host puede pedirlas directo. */
   cejas = null,
+  /* ── ENTRADA / SALIDA de escena (squash-&-stretch, rh-entra/rh-sale) ───────
+     El pop COTIDIANO (no el número teatral de AngelitaEntrada): aparecer en un
+     diálogo, un panel, una percha — y, sobre todo, DESPEDIRSE (la salida no
+     existía en ningún lado). One-shot con anticipación + overshoot elástico:
+       entrando → brota de la nada: se aplasta cogiendo impulso, estira al
+                  salir, rebasa, rebota y asienta en identidad (0.9s, se queda).
+       saliendo → el reverso: se agacha (anticipación), estira al despegar y
+                  se esfuma chiquita hacia arriba (0.62s; el host desmonta
+                  después, ~0.65s). Si ambos llegan true, gana entrando.
+     Default false ambos → cero cambio para consumidores. Con animated=false o
+     reduced-motion no hay teatro: aparece/desaparece en fotograma digno. */
+  entrando = false,
+  saliendo = false,
   ...rest
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -315,7 +328,14 @@ export function AbejaAngelita({
   // El line-boil (contorno que hierve) envuelve TODO el dibujo cuando se pide:
   // el feDisplacementMap desplaza el trazo entero (Cuphead). Grupo aparte para
   // no colisionar con el glow del `.crt-body` (dos filtros, nodos distintos).
-  const cuerpoVivo = lineBoil ? <g filter={`url(#${boil})`}>{conAntics}</g> : conAntics;
+  const conBoil = lineBoil ? <g filter={`url(#${boil})`}>{conAntics}</g> : conAntics;
+  // ENTRADA/SALIDA (rh-entra/rh-sale): wrapper EXTERNO a todo (antic, boil,
+  // line-boil) — su transform one-shot no pisa ninguna capa del idle. Solo se
+  // monta cuando hace falta y cuando la creature está viva (animated); con
+  // animated=false no hay teatro y el CSS de RM lo congela por su lado.
+  const cuerpoVivo = (vivo && (entrando || saliendo)) ? (
+    <g className={entrando ? 'rh-entra' : 'rh-sale'}>{conBoil}</g>
+  ) : conBoil;
 
   // data-estado agrupa la reacción para el CSS (brillo mojado, jadeo, mordisco).
   // data-pose SOLO cuando está viva: así los gestos (celebra/reposo/señala) no
