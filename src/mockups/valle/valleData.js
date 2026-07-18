@@ -142,15 +142,34 @@ const LUGARES = [
   // los cultivos): unos hongos que asoman = el fruto de la red bajo tierra. Toque
   // ahí para BAJAR al mundo subterráneo. (anti-conflicto: lugar nuevo al final.)
   { id: 'micorrizas', pos: [-2.7, 0, 3.3], escala: 1, tipo: 'hongos' },
+  // EL PÁRAMO (la puerta de arriba): el acceso al alto andino, en el filo frío
+  // del valle (piso 'paramo', ver PISOS_TERMICOS). Tocarlo sube a MundoParamo3D
+  // (wire3DNav `paramo: 'diorama_paramo'`). Ícono simple — SIN Ent-queñua ni
+  // frailejones amontonados alrededor (eso fue el clutter de la v1 descartada):
+  // un portal limpio, igual que los demás lugares del valle. Sin mundo propio
+  // en el manifiesto real: trae su identidad de respaldo (`fallbackMundo`).
+  {
+    id: 'paramo',
+    pos: [-0.9, 0, -7.6],
+    escala: 0.95,
+    tipo: 'frailejonal',
+    fallbackMundo: {
+      titulo: 'El páramo',
+      emoji: '🏔️',
+      lema: 'El frailejonal que le peina el agua a la niebla y se la guarda a la finca.',
+      tinte: ['#63807a', '#c9d8d2'],
+    },
+  },
 ];
 
 /**
  * Mundos del valle, ya resueltos contra el manifiesto real. Cada uno trae su
- * `titulo`, `emoji` y `tinte` verdaderos + la geometría de su lugar.
+ * `titulo`, `emoji` y `tinte` verdaderos + la geometría de su lugar. Un lugar
+ * sin mundo en el manifiesto (ej. el páramo) usa su `fallbackMundo`.
  */
 export const MUNDOS_VALLE = LUGARES.map((l) => {
   /** @type {{ titulo?: string, emoji?: string, lema?: string, tinte?: string[] }} */
-  const real = MUNDO_BY_ID[l.id] || {};
+  const real = MUNDO_BY_ID[l.id] || l.fallbackMundo || {};
   return {
     ...l,
     titulo: real.titulo || l.id,

@@ -45,7 +45,7 @@ const CASA = {
  * La ventana emisiva es "la casa espera": de día apenas se nota, al
  * atardecer y de noche es el corazón cálido del valle.
  */
-export function CasaCampesina({ alturaDe, perfil, nocturno = false }) {
+export function CasaCampesina({ alturaDe, perfil, nocturno = false, onCasa = null }) {
   const [cx, cz] = CASA_VALLE.pos;
   const y = alturaDe(cx, cz);
   const rico = perfil.materialRico;
@@ -89,7 +89,7 @@ export function CasaCampesina({ alturaDe, perfil, nocturno = false }) {
         <meshStandardMaterial
           color={CASA.ventana}
           emissive={CASA.ventana}
-          emissiveIntensity={nocturno ? 1.8 : 0.8}
+          emissiveIntensity={nocturno ? 1.9 : 1.35}
           flatShading
         />
       </mesh>
@@ -114,6 +114,34 @@ export function CasaCampesina({ alturaDe, perfil, nocturno = false }) {
             />
           )}
         </>
+      )}
+      {/* LA CASA ALUMBRA + ES PORTAL AL MIRADOR (la "ventana de los mundos",
+          wire3DNav casa→vitrina_maestra, fix del operador): glow cálido siempre
+          encendido (día y noche) + un botón táctil que abre la vitrina. */}
+      <mesh position={[0.34, 0.56, 0.55]}>
+        <sphereGeometry args={[0.4, 16, 16]} />
+        <meshBasicMaterial color="#ffe6b0" transparent opacity={0.6} depthWrite={false} />
+      </mesh>
+      <mesh position={[0.34, 0.56, 0.56]}>
+        <sphereGeometry args={[0.66, 16, 16]} />
+        <meshBasicMaterial color="#ffd89a" transparent opacity={0.28} depthWrite={false} />
+      </mesh>
+      <pointLight color="#ffcf87" intensity={perfil.luzBeacon ? 2.0 : 1.1} distance={6} position={[0.38, 0.78, 0.9]} />
+      {onCasa && (
+        <Html center position={[0, 1.72, 0]} zIndexRange={[26, 0]}>
+          <button
+            type="button"
+            className="valle-poi v3d-poi valle-poi--casa"
+            onClick={(e) => {
+              e.stopPropagation();
+              onCasa();
+            }}
+            aria-label="Entrar a la ventana de los mundos — el mirador de la finca"
+          >
+            <span className="valle-poi__emoji" aria-hidden="true">🏠</span>
+            <span className="valle-poi__txt">Los mundos</span>
+          </button>
+        </Html>
       )}
       {/* el corredor: dos pies derechos y su tramo de techo (solo tier alto) */}
       {rico && (
