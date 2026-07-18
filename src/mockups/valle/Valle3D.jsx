@@ -2119,7 +2119,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       {/* AoE: bosque denso 3x + detalle de suelo/surcos + campesinos en faena + hato en movimiento */}
       <BosqueDensoValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
       {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
-      {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 20 : tier === 'bajo' ? 6 : 12} reducedMotion={reducedMotion} />}
+      {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 14 : tier === 'bajo' ? 5 : 9} radio={3.6} reducedMotion={reducedMotion} />}
 
       {/* LA DIRECCIÓN DEL CUADRO: la casa donde descansa el ojo (su puerta
           iluminada es la vía SECUNDARIA a la ventana de los mundos), los
