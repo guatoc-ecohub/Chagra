@@ -256,6 +256,18 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
   {
+    path: 'diorama_lecheria',
+    componente: 'MundoLecheria3D',
+    importLazy: 'src/mockups/MundoLecheria3D.jsx',
+    categoria: '3D',
+  },
+  {
+    path: 'diorama_vergel_frutal',
+    componente: 'MundoVergelFrutal3D',
+    importLazy: 'src/mockups/MundoVergelFrutal3D.jsx',
+    categoria: '3D',
+  },
+  {
     path: 'diorama_agua',
     componente: 'MundoAgua3D',
     importLazy: 'src/mockups/MundoAgua3D.jsx',
