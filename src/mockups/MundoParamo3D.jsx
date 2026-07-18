@@ -36,6 +36,10 @@
  *     cielo, piedras y un halo que respira. El botón didáctico lo enciende.
  *   - Aves         : un cóndor que planea alto y aves pequeñas del páramo; una
  *     posada en la piedra para la lectura en calma (reduced-motion no las vuela).
+ *   - Danta        : la danta de páramo (Tapirus pinchaque), la vecina grande
+ *     del frailejonal — el SVG rubber-hose de la casa (Danta.jsx) como
+ *     billboard <Html>, pastando entre los frailejones con su reloj de vida
+ *     (pasea / husmea con la trompa en periscopio / reposa).
  *
  * RENDIMIENTO: frailejones/paja/musgo instanciados (pocos draw calls), un Points
  * para el polen, materiales Lambert sin shadow-map. Presupuestos por
@@ -47,7 +51,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
+import { OrbitControls, AdaptiveDpr, Html } from '@react-three/drei';
+import { Danta } from '../visual/creatures/Danta.jsx';
 import { CIELOS_HORA, mezclaHex } from '../visual/mundo3d/cielosHoraData.js';
 import { PALETA, mezclar } from '../visual/mundo3d/atmosferaMadre.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
@@ -1066,6 +1071,120 @@ function RocioFrio({ tier, reducedMotion, semilla = 17 }) {
   );
 }
 
+/* ── LA DANTA DE PÁRAMO — Tapirus pinchaque, la vecina grande del frailejonal.
+   El mamífero emblemático del páramo, POR FIN en su casa epónima: el SVG
+   rubber-hose de la casa (Danta.jsx — mole lanuda, trompa que tantea, borde
+   blanco de orejas y labios) como billboard <Html>, igual que los vecinos del
+   Bosque Vivo (FaunaBosque). Nada de low-poly: el estándar es el dibujo.
+
+   Su VIDA es un reloj con jitter (el patrón useVidaIdle, local): PASTA
+   paseando unos pasos entre los frailejones y vuelve (movimiento 3D real del
+   billboard, con el bamboleo del andar pesado y el flip de la vuelta), HUSMEA
+   con la trompa en periscopio (su seña-firma) y REPOSA respirando hondo.
+   Nunca el mismo gesto dos veces seguidas. reduced-motion / tier bajo =
+   quieta y digna en su puesto (el fotograma manda, ni un timer vivo). */
+const DANTA_POS = [4.6, alturaParamo(4.6, 4.2) + 0.85, 4.2]; // el claro del frailejonal, al frente-derecha
+const VIDA_DANTA = {
+  primero: 'pasea', // abre caminando: lo primero que se ve es que VIVE
+  descanso: [6000, 13000],
+  momentos: {
+    pasea: { dur: 11000, props: { pose: 'anda' }, paseo: [-2.0, 0, 0.9] },
+    husmea: { dur: 4600, props: { husmea: true } },
+    reposo: { dur: 6200, props: { pose: 'reposo' } },
+  },
+};
+const ESTILO_DANTA = {
+  filter: 'drop-shadow(0 2px 4px rgba(30, 44, 56, 0.4))',
+  pointerEvents: 'none',
+};
+
+/* El reloj de vida (patrón useRelojDeVida de FaunaBosque, local al mockup):
+   descanso → gesto → descanso → otro gesto… con jitter y sin repetir. Gate
+   activo=false (reduced-motion, tier bajo) = ni un timer vivo. */
+function useRelojDanta(activo) {
+  const [momento, setMomento] = useState(/** @type {string|null} */ (null));
+  useEffect(() => {
+    if (!activo) return undefined;
+    let timer = 0;
+    let ultimo = /** @type {string|null} */ (null);
+    let esPrimera = true;
+    const claves = Object.keys(VIDA_DANTA.momentos);
+    const azarMs = (a, b) => a + Math.random() * (b - a);
+    const descansa = () => {
+      setMomento(null);
+      timer = window.setTimeout(gesticula, azarMs(VIDA_DANTA.descanso[0], VIDA_DANTA.descanso[1]));
+    };
+    const gesticula = () => {
+      let m = esPrimera ? VIDA_DANTA.primero : claves[Math.floor(Math.random() * claves.length)];
+      while (m === ultimo) m = claves[Math.floor(Math.random() * claves.length)];
+      esPrimera = false;
+      ultimo = m;
+      setMomento(m);
+      timer = window.setTimeout(descansa, VIDA_DANTA.momentos[m].dur);
+    };
+    // Arranca pronto: la vida se nota en los primeros segundos, no al minuto.
+    timer = window.setTimeout(gesticula, azarMs(1800, 4200));
+    return () => {
+      window.clearTimeout(timer);
+      setMomento(null);
+    };
+  }, [activo]);
+  return momento;
+}
+
+function DantaDelParamo({ tier, reducedMotion }) {
+  const vivo = !reducedMotion && tier !== 'bajo';
+  const momento = useRelojDanta(vivo);
+  const grupo = useRef(/** @type {any} */ (null));
+  const capa = useRef(/** @type {HTMLDivElement|null} */ (null));
+  const paseo = useRef(/** @type {{t0: number|null, dur: number, rumbo: number[]}|null} */ (null));
+
+  const momentoCfg = momento ? VIDA_DANTA.momentos[momento] : null;
+  useEffect(() => {
+    paseo.current = momentoCfg?.paseo
+      ? { t0: null, dur: momentoCfg.dur / 1000, rumbo: momentoCfg.paseo }
+      : null;
+  }, [momentoCfg]);
+
+  useFrame(({ clock }) => {
+    const g = grupo.current;
+    if (!g || !vivo) return;
+    const pw = paseo.current;
+    if (pw) {
+      const t = clock.getElapsedTime();
+      if (pw.t0 == null) pw.t0 = t;
+      const p = Math.min(1, (t - pw.t0) / pw.dur);
+      const ida = Math.sin(p * Math.PI); // sale y VUELVE, suave en las puntas
+      g.position.set(
+        DANTA_POS[0] + pw.rumbo[0] * ida,
+        DANTA_POS[1] + Math.abs(Math.sin(t * 3.4)) * 0.045 * ida, // el bamboleo del andar pesado
+        DANTA_POS[2] + pw.rumbo[2] * ida,
+      );
+      // A la vuelta, el flip: la mole regresa mirando a su puesto.
+      if (capa.current) capa.current.style.transform = p > 0.5 ? 'scaleX(-1)' : '';
+    } else if (g.position.x !== DANTA_POS[0] || g.position.y !== DANTA_POS[1]) {
+      g.position.set(DANTA_POS[0], DANTA_POS[1], DANTA_POS[2]);
+      if (capa.current) capa.current.style.transform = '';
+    }
+  });
+
+  return (
+    <group ref={grupo} position={/** @type {[number, number, number]} */ (DANTA_POS)}>
+      <Html center distanceFactor={13} zIndexRange={[6, 0]} pointerEvents="none">
+        <div
+          ref={capa}
+          aria-hidden="true"
+          data-vecino="danta"
+          data-momento={momento ?? undefined}
+          style={ESTILO_DANTA}
+        >
+          <Danta size={78} animated={vivo} {...(momentoCfg?.props ?? null)} />
+        </div>
+      </Html>
+    </group>
+  );
+}
+
 /* La escena completa (grupo r3f interno; el default la monta en su Canvas). */
 function EscenaParamo({ tier, reducedMotion, fabrica }) {
   const perfil = perfilDeTier(tier);
@@ -1129,6 +1248,12 @@ function EscenaParamo({ tier, reducedMotion, fabrica }) {
       <Quenua pos={[-9.4, alturaParamo(-9.4, 1.6), 1.6]} esc={1.0} />
 
       <NieblaEnganchada n={nNiebla} reducedMotion={reducedMotion} />
+
+      {/* ══ LA DANTA DE PÁRAMO ══ Tapirus pinchaque pastando entre los
+          frailejones: el SVG rubber-hose de la casa como billboard, con su
+          reloj de vida (pasea / husmea / reposa). Su casa epónima. */}
+      <DantaDelParamo tier={tier} reducedMotion={reducedMotion} />
+
       <AvePosada />
       {!reducedMotion && <AvesParamo n={nAves} />}
 
@@ -1143,7 +1268,7 @@ const CSS_PARAMO = `
 .paramo-root { position: relative; width: 100%; height: 100dvh; min-height: 320px; overflow: hidden; background: ${ATMO.fondo}; }
 .paramo-canvas { position: absolute; inset: 0; opacity: 0; transition: opacity 0.9s ease; }
 .paramo-canvas--lista { opacity: 1; }
-.paramo-chrome { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
+.paramo-chrome { position: absolute; inset: 0; z-index: 7; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
 .paramo-titulo { margin: 0; padding: 0.9rem 1rem 0; color: #22303c; text-shadow: 0 1px 8px rgba(226,238,245,0.75); font: 700 1.18rem/1.2 system-ui, sans-serif; letter-spacing: 0.01em; }
 .paramo-titulo small { display: block; font: 500 0.8rem/1.3 system-ui, sans-serif; opacity: 0.84; margin-top: 0.15rem; }
 .paramo-pie { padding: 0 1rem 0.9rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.6rem; }
