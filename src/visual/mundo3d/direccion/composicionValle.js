@@ -227,15 +227,31 @@ export const JERARQUIA_PERSONAJES = {
   interactivos: false,
 };
 
+/* ── 5b. LAS FRANJAS DEL DÍA (vocabulario compartido con Valle3D) ─────────
+   La prop `franja` de VecinosDelValle recibe el `clima` VIVO del valle, que
+   puede ser una franja de reloj (amanecer → … → noche, valleData.climaPorHora)
+   O una piel de condición (dorada/soleado/niebla/lluvia, del selector de
+   clima). Un vecino diurno debe listar TODAS las pieles con sol — si listara
+   solo horas, el selector de clima lo borraría a pleno mediodía. */
+export const FRANJAS_DIA = [
+  'amanecer', 'manana', 'mediodia', 'tarde', 'atardecer',
+  'dorada', 'soleado', 'niebla', 'lluvia',
+];
+/* El turno de la noche: asoma cuando cae el sol y vive la noche entera. */
+export const FRANJAS_ANOCHECER = ['atardecer', 'noche'];
+
 /* ── 6. LOS VECINOS DEL VALLE (la puesta en escena de los personajes) ─────
    Personajes rubber-hose, cada uno EN SU CASA del valle: la rana en la
    quebrada, el perezoso en la arboleda, el jaguar en el filo. Data-driven
    contra CREATURES: un slug ausente no monta nada (las ramas de personajes
    mejoran el dibujo al mergear y este mapa ni se entera).
 
-   `franjas` = cuándo sale (null = siempre): el borugo es crepuscular y el
-   jaguar es un aparecido del amanecer, el atardecer y la niebla — verlo es
-   un premio, no un mueble. Eso también es jerarquía: la frecuencia cuenta.
+   `franjas` = cuándo sale (null = siempre) — y con la noche el reparto CAMBIA
+   DE TURNO: las diurnas (ardilla, morrocoy) se recogen al caer el sol, el
+   turno nocturno (el escarabajo de la pila, la crisopa de la huerta) asoma
+   con el atardecer, y el jaguar es un aparecido del amanecer, el atardecer,
+   la niebla y la luna — verlo es un premio, no un mueble. Eso también es
+   jerarquía: la frecuencia cuenta.
 
    Ubicaciones verificadas contra la cámara de reposo ([10.5,9,13.5] →
    [0,1.6,1.4], fov 40): todas a la vista, ninguna detrás de la cordillera
@@ -262,7 +278,7 @@ export const VECINOS_VALLE = [
     px: 26,
     factor: 7.5,
     dy: 0.25,
-    franjas: null,
+    franjas: FRANJAS_DIA, // diurna: al caer la noche se recoge al monte
   },
   {
     slug: 'rana-andina',
@@ -278,7 +294,7 @@ export const VECINOS_VALLE = [
     px: 26,
     factor: 7,
     dy: 0.2,
-    franjas: null,
+    franjas: FRANJAS_DIA, // de sol: la noche lo guarda bajo su caparazón
   },
   {
     slug: 'jaguar',
@@ -286,7 +302,7 @@ export const VECINOS_VALLE = [
     px: 40,
     factor: 10, // lejos pero con silueta: verlo tiene que sentirse
     dy: 0.3,
-    franjas: ['amanecer', 'atardecer', 'niebla'], // aparecido, no mueble
+    franjas: ['amanecer', 'atardecer', 'niebla', 'noche'], // aparecido, no mueble — y de noche caza bajo la luna
     props: { aparicion: true }, // el espíritu se materializa y se disuelve en la niebla
   },
   {
@@ -296,6 +312,26 @@ export const VECINOS_VALLE = [
     factor: 9,
     dy: 0.28,
     franjas: null, // residente tímida del monte alto, no aparecida
+  },
+  /* ── EL TURNO DE LA NOCHE: los que despiertan cuando cae el sol ─────────
+     Nocturnas REALES que ya viven en CREATURES, cada una en su rincón de
+     oficio. Asoman con el atardecer (FRANJAS_ANOCHECER) — el relevo se ve:
+     la ardilla se recoge y estos salen. */
+  {
+    slug: 'escarabajo',
+    punto: [-2.3, 8.7], // la boca de la biofábrica: la pila también trabaja de noche
+    px: 24,
+    factor: 7,
+    dy: 0.22,
+    franjas: FRANJAS_ANOCHECER, // Dichotomius vuela al caer el sol: el estercolero es del turno nocturno
+  },
+  {
+    slug: 'crisopa',
+    punto: [2.9, 3.7], // sobre las camas de la huerta de la casa
+    px: 20,
+    factor: 6.5,
+    dy: 1.05, // vuela — vive en el aire, no pisa el suelo (sin sombra de contacto)
+    franjas: FRANJAS_ANOCHECER, // la aliada del control biológico sale a cazar de noche
   },
 ];
 // NOTA (2026-07-18): los perros Dante y Oliver del valle son los 3D del hato
