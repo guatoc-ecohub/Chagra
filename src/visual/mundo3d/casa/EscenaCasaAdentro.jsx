@@ -21,6 +21,23 @@
  * del haz de luz, amanecen y anochecen con el resto del juego. El fogón es la
  * luz que NO cambia: la casa siempre espera caliente.
  *
+ * PASADA NOLAN (la luz tiene fuente, la hora se siente):
+ *   · TODA la luz del día entra por los vanos: la direccional sigue el arco
+ *     REAL del sol (hora decimal continua, no franjas a saltos) y por eso el
+ *     RECTÁNGULO DE SOL que la ventana del sur riega en el piso camina y se
+ *     alarga con el día — sliver pegado al muro a mediodía cenital ecuatorial,
+ *     alfombra honda y ámbar al filo de la mañana y de la tarde. La casa es
+ *     también un reloj.
+ *   · La imagen imposible: el HAZ que une el vano con su rectángulo, con las
+ *     MOTAS DE POLVO flotando adentro — la cortina de luz que corta la
+ *     penumbra. Y al mediodía, la TEJA DE VIDRIO (la claraboya campesina)
+ *     deja caer su columna cenital al centro del piso.
+ *   · La PENUMBRA es la imagen: el ambiente se queda corto a propósito — una
+ *     casa de tapia se alumbra por UN vano y el resto es sombra que abriga.
+ *   · De noche el sol se va de verdad: queda la luna plata entrando por la
+ *     ventana del norte y el FOGÓN mandando — la única luz que no obedece
+ *     al reloj.
+ *
  * Todo procedural (cero CDN/GLTF/imágenes). El cuarto entero es UNA geometría
  * fusionada (casaAdentro.geom, vertexColors). Tier-safe vía `perfilDeTier`:
  * 'alto' sombras + humo pleno + candela que titila; 'medio' frugal; 'bajo'
@@ -33,12 +50,14 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { perfilDeTier } from '../deviceTier.js';
 import { useAtmosferaMundo, CamaraDirector } from '../kit/index.js';
+import useCicloDia from '../useCicloDia.js';
 import { mezclar, VERDES, NIEBLAS, LUCES, ACENTOS, AGUAS, CASA, NEUTROS } from '../paleta/index.js';
 import {
   SALA,
   PUERTA,
   VENTANA_SUR,
   VENTANA_MUNDOS,
+  TEJA_LUZ,
   FRASCOS,
   CANASTO,
   construirCasaAdentro,
@@ -56,8 +75,175 @@ const alSoltar = () => {
   document.body.style.cursor = '';
 };
 
+/* ── EL RELOJ DE SOL DE LA CASA (pasada Nolan: la luz tiene fuente) ────────
+   Del reloj continuo del valle (hora decimal) se deriva la posición REAL del
+   sol y lo que esa posición hace ADENTRO:
+     · `pos`  — de dónde viene la direccional (el arco de oriente a poniente,
+       casi cenital a mediodía: 4-5° N, sol ecuatorial).
+     · `rect` — el rectángulo que la ventana del sur proyecta en el piso:
+       geometría de sombra de verdad (dintel y alféizar proyectados por la
+       altura solar). Corto y pegado al muro a mediodía; hondo al amanecer y
+       al atardecer. La mañana lo corre al poniente, la tarde al oriente.
+     · `haz`  — la cortina de luz que une el vano con su rectángulo (posición,
+       largo e inclinación para las láminas aditivas y las motas).
+     · `cenital` — cuánto prende la teja de vidrio (solo con el sol alto).
+   Pura y barata: se memoíza por hora cuantizada (~3 min). */
+function solDeCasa(hora) {
+  const hz = SALA.fondo / 2;
+  const dia = (hora - 6) / 12; // 0 = sale (~6:00) · 1 = se esconde (~18:00)
+  if (dia <= 0.015 || dia >= 0.985) return { deDia: false, fade: 0 };
+  const arco = Math.PI * dia;
+  const pos = [9 * Math.cos(arco), 2.2 + 11.5 * Math.sin(arco), 3.5];
+  const alt = Math.atan2(pos[1], Math.hypot(pos[0], pos[2]));
+  // tras el filo de la cordillera el sol existe pero todavía no entra
+  const fade = Math.min(1, Math.max(0, (alt - 0.12) / 0.15));
+  if (fade <= 0) return { deDia: true, pos, fade: 0 };
+
+  const tanAlt = Math.tan(alt);
+  let z0 = Math.max(hz - VENTANA_SUR.alto / tanAlt, -hz + 0.4); // borde hondo (el dintel)
+  let z1 = Math.min(hz - VENTANA_SUR.base / tanAlt, hz - 0.12); // borde cercano (el alféizar)
+  const yMedio = (VENTANA_SUR.base + VENTANA_SUR.alto) / 2;
+  const cxVano = (VENTANA_SUR.x0 + VENTANA_SUR.x1) / 2;
+  const corrido = cxVano - (pos[0] * yMedio) / pos[1];
+  const cx = Math.min(-0.5, Math.max(-2.9, corrido));
+  // si el sol entra tan sesgado que la mancha se sale del cuarto, se apaga
+  const sesgo = Math.abs(corrido - cx) > 0.01 ? Math.max(0, 1 - Math.abs(corrido - cx) * 0.7) : 1;
+  const largo = z1 - z0;
+  let rect = null;
+  let haz = null;
+  if (largo > 0.05 && sesgo > 0.05) {
+    const rasante = Math.cos(arco) * Math.cos(arco); // la luz baja es la más dramática
+    rect = {
+      x: cx,
+      z: (z0 + z1) / 2,
+      largo,
+      ancho: (VENTANA_SUR.x1 - VENTANA_SUR.x0) * (0.92 + 0.55 * (1 - Math.sin(alt))),
+      op: (0.11 + 0.11 * rasante) * fade * sesgo,
+    };
+    const dx = rect.x - cxVano;
+    const dz = hz - 0.06 - rect.z;
+    rect.haz = true;
+    haz = {
+      mid: [(cxVano + rect.x) / 2, (yMedio + 0.03) / 2, (hz - 0.06 + rect.z) / 2],
+      len: Math.hypot(dx, yMedio, dz) + 0.35,
+      rotX: Math.atan2(dz, yMedio),
+      rotZ: Math.atan2(dx, yMedio) * 0.85,
+      op: rect.op * 0.55,
+    };
+  }
+  // la teja de vidrio solo con el sol alto (el haz cenital del mediodía)
+  const cenital = Math.min(1, Math.max(0, ((alt * 180) / Math.PI - 52) / 22)) * fade;
+  return { deDia: true, pos, fade, rect, haz, cenital };
+}
+
+/* Pseudo-azar estable por índice (las motas no cambian de sitio entre frames). */
+const azar = (i, sal) => {
+  const x = Math.sin(i * 127.1 + sal * 311.7) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+/* ── LAS MOTAS DEL HAZ: el polvo de la casa flotando en la cortina de luz ──
+   La imagen imposible de adentro: partículas diminutas, aditivas, que solo
+   viven DENTRO del haz (coordenadas locales del grupo inclinado) y derivan
+   despacio hacia abajo, titilando al cruzar la luz. */
+function MotasDelHaz({ n, haz, color, reducedMotion }) {
+  const grupo = useRef(null);
+  const motas = useMemo(
+    () =>
+      Array.from({ length: n }, (_, i) => ({
+        u: azar(i, 1) - 0.5, // a lo largo del haz
+        x: (azar(i, 2) - 0.5) * 0.72,
+        z: (azar(i, 3) - 0.5) * 0.2,
+        fase: azar(i, 4) * Math.PI * 2,
+        vel: 0.014 + azar(i, 5) * 0.02,
+        r: 0.011 + azar(i, 6) * 0.013,
+      })),
+    [n],
+  );
+  useFrame(({ clock }) => {
+    const g = grupo.current;
+    if (!g || !haz || reducedMotion) return;
+    const t = clock.elapsedTime;
+    for (let i = 0; i < g.children.length; i++) {
+      const m = g.children[i];
+      const d = motas[i];
+      const u = ((d.u + 0.5 - t * d.vel) % 1 + 1) % 1; // cae despacio a lo largo del haz
+      m.position.set(
+        d.x + 0.03 * Math.sin(t * 0.4 + d.fase),
+        (u - 0.5) * haz.len,
+        d.z + 0.02 * Math.cos(t * 0.33 + d.fase),
+      );
+      m.material.opacity = haz.op * (2.2 + 1.8 * Math.sin(t * 0.9 + d.fase)) * Math.sin(Math.PI * u);
+    }
+  });
+  if (!n || !haz) return null;
+  return (
+    <group ref={grupo} position={haz.mid} rotation={[haz.rotX, 0, haz.rotZ]}>
+      {motas.map((d, i) => (
+        <mesh key={i} position={[d.x, d.u * haz.len, d.z]}>
+          <sphereGeometry args={[d.r, 5, 4]} />
+          <meshBasicMaterial
+            color={color}
+            transparent
+            opacity={reducedMotion ? haz.op * 2.4 : 0}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* ── EL HAZ DE LA TEJA DE VIDRIO: la columna cenital del mediodía ──────────
+   La claraboya campesina (una teja translúcida entre las de barro) deja caer
+   una columna de luz vertical al centro del piso cuando el sol va alto. Dos
+   láminas cruzadas + la teja encendida + su charco. */
+const INCLINACION_TECHO = Math.atan2(SALA.cumbre - SALA.alero, SALA.fondo / 2 + 0.1);
+
+function HazDeLaTeja({ f, color }) {
+  if (f <= 0.03) return null;
+  const [tx, ty, tz] = TEJA_LUZ.pos;
+  const alto = ty - 0.02;
+  return (
+    <group>
+      {/* la teja encendida (la fuente SE VE en el techo) */}
+      <mesh position={[tx, ty, tz]} rotation={[Math.PI / 2 - INCLINACION_TECHO, 0, 0]}>
+        <planeGeometry args={[TEJA_LUZ.ancho, TEJA_LUZ.largo]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.55 * f}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+      {/* la columna: dos láminas cruzadas, levemente más anchas abajo */}
+      {[0, Math.PI / 2].map((ry) => (
+        <mesh key={ry} position={[tx, alto / 2, tz]} rotation={[0, ry, 0]}>
+          <planeGeometry args={[TEJA_LUZ.ancho * 0.92, alto]} />
+          <meshBasicMaterial
+            color={color}
+            transparent
+            opacity={0.085 * f}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      ))}
+      {/* el charco cenital en la tierra pisada */}
+      <mesh position={TEJA_LUZ.piso} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.72, 1]}>
+        <circleGeometry args={[0.34, 16]} />
+        <meshBasicMaterial color={color} transparent opacity={0.2 * f} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </mesh>
+    </group>
+  );
+}
+
 /* ── EL FUEGO DEL FOGÓN: dos llamas que titilan + la luz de la candela ────── */
-function FuegoFogon({ tier, reducedMotion }) {
+function FuegoFogon({ tier, reducedMotion, fuerza = 1 }) {
   const llama1 = useRef(null);
   const llama2 = useRef(null);
   const luz = useRef(null);
@@ -68,7 +254,7 @@ function FuegoFogon({ tier, reducedMotion }) {
     const p = 0.82 + 0.18 * Math.sin(t * 9.1) * Math.sin(t * 3.7 + 1.2);
     if (llama1.current) llama1.current.scale.set(1, p, 1);
     if (llama2.current) llama2.current.scale.set(1, 1.5 - p * 0.5, 1);
-    if (luz.current) luz.current.intensity = 0.85 + 0.22 * (p - 0.82);
+    if (luz.current) luz.current.intensity = (0.85 + 0.22 * (p - 0.82)) * fuerza;
   });
   return (
     <group position={[-2.34, 0.16, 0.2]}>
@@ -85,8 +271,16 @@ function FuegoFogon({ tier, reducedMotion }) {
         <coneGeometry args={[0.06, 0.18, 6]} />
         <meshBasicMaterial color={LUCES.candela} transparent opacity={0.85} />
       </mesh>
-      {/* la luz de la candela: la casa siempre espera caliente */}
-      <pointLight ref={luz} color="#ffb066" intensity={0.92} distance={6.5} decay={1.8} position={[0.1, 0.55, 0]} />
+      {/* la luz de la candela: la casa siempre espera caliente — y de noche,
+          cuando el sol se va de verdad, es ELLA la que manda en el cuarto */}
+      <pointLight
+        ref={luz}
+        color="#ffb066"
+        intensity={0.92 * fuerza}
+        distance={6.5}
+        decay={1.8}
+        position={[0.1, 0.55, 0]}
+      />
     </group>
   );
 }
@@ -337,9 +531,19 @@ function Diorama({ tier, reducedMotion, foco, onPortales, onFermentos }) {
      haz de la ventana. El fogón no la obedece — la casa siempre está tibia. */
   const atm = useAtmosferaMundo({ familia: FAMILIA_CASA, reducedMotion });
 
+  /* El RELOJ CONTINUO (no la franja): de aquí sale el arco real del sol y el
+     rectángulo que camina por el piso. Cuantizado a ~3 min para memoizar. */
+  const { hora } = useCicloDia({ reducedMotion });
+  const horaQ = Math.round(hora * 20) / 20;
+  const sol = useMemo(() => solDeCasa(horaQ), [horaQ]);
+
+  /* De noche y al filo del día, el fogón MANDA (la única luz sin reloj). */
+  const fogonFuerza = !sol.deDia ? 1.55 : sol.fade < 0.35 ? 1.28 : 0.92;
+
   const geoCasa = useMemo(() => construirCasaAdentro(tier === 'alto'), [tier]);
 
   const nHumo = tier === 'alto' ? 7 : tier === 'medio' ? 4 : 0;
+  const nMotas = tier === 'alto' ? 22 : tier === 'medio' ? 10 : 0;
 
   const controls = useRef(null);
   const hz = SALA.fondo / 2;
@@ -349,14 +553,26 @@ function Diorama({ tier, reducedMotion, foco, onPortales, onFermentos }) {
       {/* el fondo: el cielo de la hora (lo que asoma por la puerta) */}
       <color attach="background" args={[atm.fondo]} />
 
-      {/* la penumbra tibia del interior */}
-      <ambientLight color={LUCES.ambienteTibio} intensity={0.34} />
-      <hemisphereLight skyColor={atm.cielo} groundColor={NEUTROS.tinta} intensity={0.22} />
-      {/* el día entrando por la ventana del sur (sombra solo en gama alta) */}
+      {/* LA PENUMBRA es la imagen: el ambiente se queda corto a propósito —
+          una casa de tapia se alumbra por UN vano y el resto es sombra que
+          abriga. De noche baja aún más y queda el fogón. */}
+      <ambientLight
+        color={LUCES.ambienteTibio}
+        intensity={sol.deDia ? 0.15 + 0.14 * atm.intensidad : 0.12}
+      />
+      <hemisphereLight
+        skyColor={atm.cielo}
+        groundColor={NEUTROS.tinta}
+        intensity={sol.deDia ? 0.19 : 0.12}
+      />
+      {/* LA LUZ TIENE FUENTE: de día la direccional viaja por el arco REAL del
+          sol (por eso el rectángulo de la ventana camina y las sombras giran
+          con la hora); de noche es la luna plata entrando desde el norte, por
+          la ventana de los mundos. */}
       <directionalLight
         color={atm.luz}
-        intensity={0.85}
-        position={[-1.7, 3.4, 5.5]}
+        intensity={sol.deDia ? 0.32 + 0.62 * sol.fade : 0.34}
+        position={sol.deDia ? sol.pos : atm.solPos}
         castShadow={perfil.sombras}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -400,25 +616,79 @@ function Diorama({ tier, reducedMotion, foco, onPortales, onFermentos }) {
         <meshBasicMaterial color={mezclar(atm.cielo, NIEBLAS.dorada, 0.35)} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* EL HAZ DE LUZ de la ventana + su charco en el piso de tierra */}
-      <mesh position={[-1.75, 0.78, 1.62]} rotation={[-1.05, 0, 0]}>
-        <planeGeometry args={[0.92, 2.5]} />
-        <meshBasicMaterial
-          color={atm.luz}
-          transparent
-          opacity={0.09}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-      <mesh position={[-1.75, 0.02, 0.85]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.55, 1]}>
-        <circleGeometry args={[0.85, 18]} />
-        <meshBasicMaterial color={atm.luz} transparent opacity={0.14} depthWrite={false} />
-      </mesh>
+      {/* EL RECTÁNGULO DE SOL: la ventana del sur riega su vano en el piso y
+          la mancha CAMINA con el día — sliver al pie del muro a mediodía,
+          alfombra honda y ámbar al filo de la mañana y de la tarde. El halo
+          de abajo la asienta en la tierra pisada. */}
+      {sol.rect && (
+        <group>
+          <mesh
+            position={[sol.rect.x, 0.026, sol.rect.z]}
+            rotation={[-Math.PI / 2, 0, 0]}
+            scale={[sol.rect.ancho, sol.rect.largo, 1]}
+          >
+            <planeGeometry args={[1, 1]} />
+            <meshBasicMaterial
+              color={atm.luz}
+              transparent
+              opacity={sol.rect.op}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+          <mesh
+            position={[sol.rect.x, 0.02, sol.rect.z]}
+            rotation={[-Math.PI / 2, 0, 0]}
+            scale={[sol.rect.ancho * 1.45, sol.rect.largo * 1.35, 1]}
+          >
+            <planeGeometry args={[1, 1]} />
+            <meshBasicMaterial
+              color={atm.luz}
+              transparent
+              opacity={sol.rect.op * 0.32}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+        </group>
+      )}
+
+      {/* LA CORTINA DE LUZ: el haz que une el vano con su rectángulo — dos
+          láminas anidadas (la de adentro más densa) + las motas de polvo
+          flotando. La imagen imposible de la casa. */}
+      {sol.haz && (
+        <group position={sol.haz.mid} rotation={[sol.haz.rotX, 0, sol.haz.rotZ]}>
+          <mesh>
+            <planeGeometry args={[0.88, sol.haz.len]} />
+            <meshBasicMaterial
+              color={atm.luz}
+              transparent
+              opacity={sol.haz.op}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+          <mesh position={[0, 0, 0.015]}>
+            <planeGeometry args={[0.48, sol.haz.len]} />
+            <meshBasicMaterial
+              color={atm.luz}
+              transparent
+              opacity={sol.haz.op * 0.85}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+        </group>
+      )}
+      <MotasDelHaz n={nMotas} haz={sol.haz} color={atm.luz} reducedMotion={reducedMotion} />
+
+      {/* LA TEJA DE VIDRIO: la columna cenital del mediodía ecuatorial */}
+      <HazDeLaTeja f={sol.cenital ?? 0} color={atm.luz} />
 
       {/* EL FOGÓN VIVO: candela + humo subiendo a la teja */}
-      <FuegoFogon tier={tier} reducedMotion={reducedMotion} />
+      <FuegoFogon tier={tier} reducedMotion={reducedMotion} fuerza={fogonFuerza} />
       <HumoFogon n={nHumo} reducedMotion={reducedMotion} />
 
       {/* LOS DOS ACCESOS legibles desde adentro */}
