@@ -311,15 +311,9 @@ export const VECINOS_VALLE = [
     franjas: null, // visible a toda hora mientras se revisa
     props: {}, // sin `aparicion`: que no se desvanezca mientras lo analiza
   },
-  {
-    slug: 'oso-anteojos',
-    punto: [1.6, 3.8], // a la derecha de la casa
-    px: 150,
-    factor: 22,
-    dy: 0.5,
-    sinTope: true,
-    franjas: null,
-  },
+  /* OSO-ANTEOJOS ARCHIVADO (operador, 2026-07-18): 'casi feíto como el
+     anterior'. El oso del valle es el NEGRO de la luna (GuardianAvatar,
+     montado aparte en composicionValle3D). */
   /* DANTE y OLIVER en su versión dibujada, también grandes y al frente: el
      operador quiere ver a los cuatro juntos para juzgarlos. (En el hato siguen
      los perros 3D con su trote; estos son los rubber-hose.) */
