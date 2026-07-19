@@ -59,18 +59,19 @@ export const PARTICULAS = {
     deriva: { ascenso: 0.14, vaiven: 0.32 },
   },
 
-  /* Luciérnagas del atardecer: pocas, grandes, erran despacio y PULSAN con
-     desfase propio (nunca en coro). Con reduced-motion quedan quietas a brillo
-     medio: presencia sin parpadeo. */
+  /* Luciérnagas del atardecer: pocas, grandes, erran despacio y DESTELLAN con
+     desfase propio (flash corto de cocuyo, nunca en coro — ver gesto 'errar').
+     `minimo` bajo: entre destellos la brasa casi muere y el flash REVIENTA.
+     Con reduced-motion quedan quietas a brillo medio: presencia sin parpadeo. */
   luciernagas: {
     conteo: { alto: 22, medio: 12, bajo: 6 },
-    colores: ['#fff3b0', '#ffe08a', '#eaf0a0'],
+    colores: ['#fff3b0', '#ffe08a', '#d9f2a6'], // ámbar cálido + el verdoso frío del cocuyo
     tam: 0.17,
     opacidad: 0.9,
     area: [8, 2.6, 8],
     gesto: 'errar',
     deriva: { vaiven: 0.85 },
-    parpadeo: { frecuencia: 0.9, minimo: 0.1, quieto: 0.55 },
+    parpadeo: { frecuencia: 0.9, minimo: 0.06, quieto: 0.55 },
   },
 
   /* Motas de polvo en un rayo de luz: nube angosta y alta, sesgada como haz que
