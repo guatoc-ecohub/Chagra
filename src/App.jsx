@@ -160,6 +160,10 @@ const CafetalVivo3DMockup = lazy(() => import('./mockups/CafetalVivo3D'));
 // suelo VIVO que se traga el aguacero y lo devuelve limpio todo el verano vs
 // suelo PELADO que lo bota de una. Por qué se seca un cauce.
 const CicloAguaMockup = lazy(() => import('./visual/mundo3d/agua/DemoCicloAgua'));
+// 3D: LA CASA POR DENTRO — fogón vivo, mesa, fermentos y la ventana de los
+// mundos. Se importa la ESCENA directo (el envoltorio de mockups/ no entraba
+// al bundle de prod — ver memoria del bug de empaquetado).
+const CasaAdentroMundo = lazy(() => import('./visual/mundo3d/casa/MundoCasaAdentro'));
 // 3D: el INVERNADERO navegable — túnel de guadua/plástico con almácigo, repique,
 // tomate tutorado, vaho y goteo. Ruta #/mockups/invernadero-vivo-3d, sin auth.
 const InvernaderoVivo3DMockup = lazy(() => import('./mockups/InvernaderoVivo3D'));
@@ -635,6 +639,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/bosque-vivo-3d': 'mockup_bosque_vivo_3d',
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
   'mockups/microcuenca': 'mockup_microcuenca',
+  'casa_adentro': 'mundo_casa_adentro',
+  'mockups/casa-adentro': 'mundo_casa_adentro',
   'mockups/ciclo-agua': 'mockup_microcuenca',
   'mockups/invernadero-vivo-3d': 'mockup_invernadero_vivo_3d',
   'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
@@ -1632,6 +1638,14 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El bosque vivo">
               <BosqueVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mundo_casa_adentro':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La casa por dentro">
+              <CasaAdentroMundo />
             </ErrorFallback>
           </ErrorBoundary>
         );
