@@ -10,7 +10,7 @@
 .mmv {
   position: absolute;
   right: 12px;
-  bottom: 12px;
+  top: 74px; /* bajo el título 'El valle de mi finca'; ya no lo tapan la barra de preguntar ni el botón Voz */
   z-index: 30;
   width: 152px;
   user-select: none;

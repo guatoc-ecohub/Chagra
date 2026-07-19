@@ -186,6 +186,16 @@
   padding: 0;
   margin: 0;
   font: inherit;
+  /* En CALMA la abeja NO brilla: el dorado permanente no significaba nada y
+     cansaba la vista (feedback del operador). Ahora el brillo tiene PROPÓSITO. */
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+}
+/* EL DORADO SIGNIFICA ALGO: Angelita se enciende cuando TIENE ALGO QUE DECIRLE
+   — husmeó algo en la finca, hay un aviso, o está celebrando. Cuando calla,
+   se apaga. Así el brillo es información, no ruido. */
+.valle-abeja--toque[data-angelita='husmea'],
+.valle-abeja--toque[data-angelita='aviso'],
+.valle-abeja--toque[data-angelita='celebra'] {
   animation: valle-abeja-brilla 3.4s ease-in-out infinite;
 }
 @keyframes valle-abeja-brilla {
