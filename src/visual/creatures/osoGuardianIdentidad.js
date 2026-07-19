@@ -92,14 +92,14 @@ export const OSO_GUARDIAN_PROPORCION = {
  *
  *     7.3 + 4.83 + 1.6 = 13.73 ✓
  *
- * El ancho (rx * 1.18 = 10.6) queda DENTRO de la silueta (flancos ±11.9 a esa
- * altura): se apoya, no engulle.
+ * El ancho (rx * 1.18 = 9.2) queda DENTRO de la silueta (flancos ±11.9 a esa
+ * altura): se apoya sobre el regazo, no engulle.
  *
  * OJO: esto es un arreglo de PROPORCIÓN, quirúrgico. El rediseño de fondo de la
  * ruana (que hoy es un trapecio genérico compartido con el resto de la fauna)
  * va aparte, con su propia DR. Si tocás estos números, revisá las dos
  * desigualdades de arriba o la luna se vuelve a tapar. */
-export const OSO_GUARDIAN_RUANA_ANCLA = { cx: 0, cy: 7.3, rx: 9.0, ry: 4.6 };
+export const OSO_GUARDIAN_RUANA_ANCLA = { cx: 0, cy: 7.3, rx: 7.8, ry: 4.6 };
 
 /*
  * PERFIL_OSO_GUARDIAN — perfil de CLIMA→cuerpo para `cuerpoDeClima`
