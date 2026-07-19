@@ -104,9 +104,12 @@ function solDeCasa(hora) {
   let z1 = Math.min(hz - VENTANA_SUR.base / tanAlt, hz - 0.12); // borde cercano (el alféizar)
   const yMedio = (VENTANA_SUR.base + VENTANA_SUR.alto) / 2;
   const cxVano = (VENTANA_SUR.x0 + VENTANA_SUR.x1) / 2;
+  // la mañana corre la mancha al poniente; la tarde la manda LEJOS, al
+  // oriente, cruzando el cuarto (la alfombra larga de las cinco)
   const corrido = cxVano - (pos[0] * yMedio) / pos[1];
-  const cx = Math.min(-0.5, Math.max(-2.9, corrido));
-  // si el sol entra tan sesgado que la mancha se sale del cuarto, se apaga
+  const cx = Math.min(2.9, Math.max(-2.9, corrido));
+  // si el sol entra tan sesgado que la mancha se sale del piso (madrugada:
+  // el primer sol da en el muro del fogón, no en la tierra), se apaga
   const sesgo = Math.abs(corrido - cx) > 0.01 ? Math.max(0, 1 - Math.abs(corrido - cx) * 0.7) : 1;
   const largo = z1 - z0;
   let rect = null;
