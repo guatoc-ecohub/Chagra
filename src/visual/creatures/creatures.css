@@ -2564,3 +2564,87 @@
   [data-creature='beagle'][data-aulla='1'] .crt-body,
   [data-creature='beagle'][data-aulla='1'] .beagle-aullido-boca { animation: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OSO DE ANTEOJOS (negro biopunk) — el MISMO carácter pesado del oso de la
+   casa, en su versión buena (azabache + aros luminosos + esporas de niebla).
+   ADITIVO: reusa los keyframes del bloque OSO ANDINO (oso-boil, oso-cejas-
+   frunce, oso-resoplido, oso-rasca, oso-rasca-cuerpo, oso-vaho) extendiendo
+   los selectores al slug 'oso-anteojos' — cero keyframes duplicados, cero
+   cambios al oso café. Lo NUEVO: el brillo que respira de los anteojos
+   (osoa-anteojo-brillo) y las esporas del bosque nublado (osoa-mota).
+   Todo transform/opacity (GPU, gama baja). Gates RM + tier al final.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL PESADO — la mole asienta despacio (un pelo MÁS lenta que el oso café:
+   gigante gentil, no gruñón). */
+[data-creature='oso-anteojos'] .rh-boil {
+  animation-name: oso-boil;
+  animation-duration: 2.9s;
+  animation-timing-function: steps(14, end);
+}
+
+/* RESOPLA — el refunfuño tierno: mismo huff pesado del oso de la casa. */
+[data-creature='oso-anteojos'][data-resopla='1'] .crt-body {
+  animation: oso-resoplido 1.5s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+[data-creature='oso-anteojos'][data-resopla='1'] .oso-cejas {
+  animation: oso-cejas-frunce 0.9s ease-in-out infinite;
+}
+
+/* RASCA — la panza con la zarpa derecha, pausado y entrañable. */
+[data-creature='oso-anteojos'][data-rasca='1'] .crt-brazo-r {
+  animation: oso-rasca 0.5s ease-in-out infinite;
+}
+[data-creature='oso-anteojos'][data-rasca='1'] .crt-body {
+  animation: oso-rasca-cuerpo 1.0s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+/* Los estados (resopla/rasca) PISAN el arrebato: el gesto lee limpio. */
+[data-creature='oso-anteojos'][data-resopla='1'] .rh-antic,
+[data-creature='oso-anteojos'][data-resopla='1'] .rh-travieso,
+[data-creature='oso-anteojos'][data-rasca='1'] .rh-antic,
+[data-creature='oso-anteojos'][data-rasca='1'] .rh-travieso { animation: none; }
+
+/* ANTEOJOS QUE RESPIRAN — el halo de los aros crema pulsa LENTO (biolumi-
+   niscencia medida, período co-primo con boil/parpadeo: nunca metrónomo). */
+.osoa-anteojo-brillo {
+  animation: osoa-aliento 5.3s ease-in-out infinite;
+}
+@keyframes osoa-aliento {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.06); }
+}
+
+/* ESPORAS del bosque nublado — flotan lento con deriva leve y se atenúan;
+   delays/duraciones inline las desparejan (vida, no compás). */
+.osoa-mota {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: osoa-mota 7s ease-in-out infinite;
+}
+@keyframes osoa-mota {
+  0%, 100% { transform: translate(0, 0); opacity: 0.18; }
+  35%      { transform: translate(0.7px, -1.6px); opacity: 0.5; }
+  70%      { transform: translate(-0.5px, -0.7px); opacity: 0.3; }
+}
+
+/* device-tier 'bajo': el boil reescrito lo reactivaría (misma clase) →
+   re-apagarlo; el brillo continuo y las esporas decorativas también se
+   cortan. Los estados reactivos (resopla/rasca) siguen contando la verdad. */
+[data-tier='bajo'][data-creature='oso-anteojos'] .rh-boil,
+[data-tier='bajo'][data-creature='oso-anteojos'] .oso-cejas,
+[data-tier='bajo'] .osoa-anteojo-brillo,
+[data-tier='bajo'] .osoa-mota { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .osoa-anteojo-brillo, .osoa-mota,
+  [data-creature='oso-anteojos'][data-resopla='1'] .crt-body,
+  [data-creature='oso-anteojos'][data-resopla='1'] .oso-cejas,
+  [data-creature='oso-anteojos'][data-rasca='1'] .crt-brazo-r,
+  [data-creature='oso-anteojos'][data-rasca='1'] .crt-body { animation: none !important; }
+}

@@ -28,6 +28,7 @@ export const CLASE_PODER = 'is-powered-up';
 export const AURA_POR_BICHO = Object.freeze({
   'abeja-angelita': '#ffd54a', // dorada clásica
   'oso-andino': '#ff3b30',     // roja berserker
+  'oso-anteojos': '#2dffc4',   // MENTA bioluminiscente (el oso negro biopunk — la versión buena)
   'rana-andina': '#39d98a',    // verde-zen (slug real de la creature)
   'rana-arlequin': '#39d98a',  // alias biblia
   colibri: '#4fd1ff',          // iridiscente (aprox. celeste)
