@@ -342,7 +342,7 @@ export default function MinimapaValle({
                 >
                   {esFoco && <circle className="mmv-blip-aro" r="7.4" />}
                   <circle className="mmv-blip-tap" r="8.2" />
-                  <circle className="mmv-blip-punto" r="4.6" fill={tinte} />
+                  <circle className="mmv-blip-punto" r="5.9" fill={tinte} />
                   <text className="mmv-blip-emoji" y="1.9" textAnchor="middle">
                     {l.emoji}
                   </text>
