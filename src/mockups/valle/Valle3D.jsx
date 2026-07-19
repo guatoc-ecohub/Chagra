@@ -144,7 +144,17 @@ const LUGAR_A_MUNDO_ANGELITA = {
 const HUSMEO_LUGARES = ['cultivos', 'animales', 'clima', 'mercado', 'aprender', 'disenio'];
 const HUSMEO_PRIMERO_MS = 4200; // el primer husmeo llega pronto: se ve viva al cargar
 const HUSMEO_CADA_MS = 13000; // cadencia entre husmeos (feedback operador: 40s se sentía MUERTA; 13s = viva sin ser errática)
-const HUSMEO_VISIBLE_MS = 7000; // cuánto dura el comentario antes de volver a calma
+const HUSMEO_VISIBLE_MS = 7000; // piso: ningún aviso dura menos que esto
+/* Cuánto se queda un aviso en pantalla: lo que tarda la máquina de escribir en
+   ponerlo (≈16 ms por letra) MÁS el tiempo de leerlo con calma (≈70 ms por
+   letra ≈ 170 palabras por minuto, ritmo cómodo para una niña o alguien que
+   lee despacio). Un aviso corto se va rápido; uno largo espera. Techo de 16 s
+   para que Angelita no se quede pegada. */
+function duracionAviso(mensaje) {
+  const n = String(mensaje || '').length;
+  if (!n) return HUSMEO_VISIBLE_MS;
+  return Math.min(16000, Math.max(HUSMEO_VISIBLE_MS, Math.round(n * 16 + n * 70 + 1200)));
+}
 
 /* Altura del terreno por (x,z): la LADERA ANDINA. El eje z es la montaña — al
    fondo (z negativo) trepa al páramo alto, al frente (z positivo) baja a tierra
@@ -1576,6 +1586,8 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
     let ocultarTimer = null;
     const tick = () => {
       if (!vivo) return;
+      /* Cuánto se queda EL AVISO DE ESTA VUELTA: depende de su largo. */
+      let duraEste = HUSMEO_VISIBLE_MS;
       if (!entrandoRef.current) {
         const lugar = HUSMEO_LUGARES[husmeoIdx.current % HUSMEO_LUGARES.length];
         husmeoIdx.current += 1;
@@ -1584,13 +1596,19 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
         if (decision?.interrumpe) {
           husmeoLugarRef.current = lugar;
           if (ocultarTimer) clearTimeout(ocultarTimer);
+          /* El aviso dura LO QUE CUESTA LEERLO, no un tiempo fijo (feedback del
+             operador: "desaparecen muy rápido"). Escritura + lectura cómoda.
+             Si la decisión no trae texto, cae al piso digno. */
+          duraEste = duracionAviso(decision?.mensaje ?? decision?.texto);
           ocultarTimer = setTimeout(() => {
             husmeoLugarRef.current = null;
             reposarAngelita();
-          }, HUSMEO_VISIBLE_MS);
+          }, duraEste);
         }
       }
-      temporizador = setTimeout(tick, HUSMEO_CADA_MS);
+      /* El siguiente husmeo espera a que el anterior TERMINE de leerse (+ respiro):
+         un aviso largo ya no se lo come el que viene detrás. */
+      temporizador = setTimeout(tick, Math.max(HUSMEO_CADA_MS, duraEste + 3500));
     };
     temporizador = setTimeout(tick, HUSMEO_PRIMERO_MS);
     return () => {
