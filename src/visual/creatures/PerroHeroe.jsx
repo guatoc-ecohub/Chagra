@@ -6,7 +6,10 @@
  * No es un personaje nuevo: es el MISMO Dalmata/Beagle aprobado, más grande,
  * envuelto en su aura de poder (transformacion.js: cobalto leal Oliver,
  * canela de rastro Dante) y con GESTOS de guardián — todos de AVISO y arreo,
- * jamás de ataque:
+ * jamás de ataque. Las señas de identidad congruentes con el mesh 3D
+ * (geomPerroAndante) viven en los componentes base y llegan solas: parche
+ * sobre el ojo izquierdo + collar rojo con plaquita de latón (Oliver);
+ * hocico escarchado + cejas canela + collar verde con plaquita (Dante).
  *
  *   'ladra'  — embestidas cortas del cuerpo (el ¡guau! leído en la masa,
  *              CSS) + la boca ARTICULA de verdad: pulsos de visema V4
