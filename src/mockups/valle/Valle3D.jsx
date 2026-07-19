@@ -56,6 +56,7 @@ import BosqueDensoValle from './BosqueDensoValle.jsx';
 import CafetalDensoValle from './CafetalDensoValle.jsx';
 import ParamoDensoValle from './ParamoDensoValle.jsx';
 import LaderaAltaValle from './LaderaAltaValle.jsx';
+import ArrieriaValle from './ArrieriaValle.jsx';
 import DetalleSueloValle from './DetalleSueloValle.jsx';
 import { CampesinosValle } from './CampesinosValle.jsx';
 import HatoMovil from './HatoMovil.jsx';
@@ -2402,6 +2403,9 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       <LaderaAltaValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} reducedMotion={reducedMotion} />
       {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
       {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 14 : tier === 'bajo' ? 5 : 9} radio={3.6} reducedMotion={reducedMotion} />}
+      {/* LOGÍSTICA VISIBLE (alma Settlers): la mula acarrea estiércol→pila,
+          compost→eras y cosecha→casa por los senderos, y las pilas crecen. */}
+      {!portada && <ArrieriaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
 
       {/* LA DIRECCIÓN DEL CUADRO: la casa donde descansa el ojo (su puerta
           iluminada es la vía SECUNDARIA a la ventana de los mundos), los
