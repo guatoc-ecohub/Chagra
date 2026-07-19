@@ -585,26 +585,47 @@ async function runAvicolaFrio(ctx) {
   const reR = await sidecarPost(base, sidecarToken, '/resolve-entities', { user_message: q }).catch(() => null);
   const entities = reR?.ok && Array.isArray(reR.json?.entities) ? reR.json.entities : [];
   const systemPrompt = buildEnrichedSystemPrompt(entities);
-  const gen = await generateChat(base, token, systemPrompt, q, chatModel);
-  const text = gen.response || '';
+
+  // Investigado 2026-07-19: un cascarón (respuesta '' de longitud 0) NO viene
+  // de un guard del cliente — este check llama a ollama DIRECTO (mismo patrón
+  // que B0), sin pasar por src/services/outputGuards.js. El producto real ya
+  // tiene su propia red de seguridad para esto (agentRequestSender.js relanza
+  // si el LLM devuelve vacío; AgentScreen.jsx muestra recuperación de
+  // "pregunta huérfana" con botón reintentar) — verificado en el repo cliente,
+  // no hay hueco ahí. Lo que SÍ faltaba era resiliencia acá: la corrida de
+  // 2026-07-19 06:03 UTC (target=dev) devolvió '' una sola vez — reproducido
+  // más tarde con la MISMA pregunta+modelo y salió la respuesta completa
+  // (idéntica a la de prod ese mismo minuto) → runner de ollama momentáneamente
+  // sin contenido (carga/co-residencia GPU, ver INFRA_FACTS), no un defecto de
+  // código. Relanzamos UNA vez antes de marcar cascarón, como ya hace el
+  // producto real, para no gritar "guard roto" por un parpadeo transitorio.
+  let gen = await generateChat(base, token, systemPrompt, q, chatModel);
+  let text = gen.response || '';
+  let retried = false;
+  if (!text.trim()) {
+    retried = true;
+    await sleep(2000);
+    gen = await generateChat(base, token, systemPrompt, q, chatModel);
+    text = gen.response || '';
+  }
   const ev = evalAvicolaFrio(text);
 
   // Golden/regresión: acumula la respuesta + sub-flags para trackear cuándo pasa.
   appendJsonl(join(outDir, 'golden', `avicola-frio-${dateStr}.jsonl`), {
-    ts: nowIso(), target, caso: AVICOLA_FRIO_CASE.id, pregunta: q, respuesta: text, modelo: gen.model || chatModel, eval: ev,
+    ts: nowIso(), target, caso: AVICOLA_FRIO_CASE.id, pregunta: q, respuesta: text, modelo: gen.model || chatModel, eval: ev, retried,
   });
 
   const fallos = [];
   if (!ev.daCantidad) fallos.push('(a) sin cantidad g/kg');
   if (!ev.ajustaAltura) fallos.push('(b) no ajusta por frío/altura');
   if (ev.crossThermal) fallos.push('(c) cross_thermal: recomienda planta de clima cálido a 2500 msnm');
-  if (ev.cascaron) fallos.push('(d) cascarón (respuesta suprimida/vacía)');
+  if (ev.cascaron) fallos.push(`(d) cascarón (respuesta suprimida/vacía${retried ? ', persiste TRAS reintento — no fue parpadeo' : ''})`);
   const status = ev.pass ? 'pass' : (text ? 'fail' : 'fail');
   return {
     status,
-    valor: ev.pass ? 'OK' : fallos.join('; '),
-    detalle: `Golden ración avícola 2500 msnm: ${ev.pass ? 'PASA' : 'FALLA — ' + fallos.join('; ')}. (cantidad=${ev.daCantidad} altura=${ev.ajustaAltura} crossThermal=${ev.crossThermal} cascarón=${ev.cascaron})`,
-    data: { eval: ev, respuesta: clip(text, 800) },
+    valor: ev.pass ? (retried ? 'OK (tras reintento)' : 'OK') : fallos.join('; '),
+    detalle: `Golden ración avícola 2500 msnm: ${ev.pass ? 'PASA' : 'FALLA — ' + fallos.join('; ')}. (cantidad=${ev.daCantidad} altura=${ev.ajustaAltura} crossThermal=${ev.crossThermal} cascarón=${ev.cascaron})${retried ? ' [reintentó 1x por respuesta vacía inicial]' : ''}`,
+    data: { eval: ev, respuesta: clip(text, 800), retried },
   };
 }
 
