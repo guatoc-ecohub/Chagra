@@ -14,10 +14,15 @@
  * Reusa el banco de fauna REALISTA del valle (veredicto del operador: el
  * ganado va realista; los rubber-hose son la fauna con alma): las mallas de
  * src/visual/mundo3d/finca/fincaRealista.geom.js y el MATERIAL_HATO de
- * animales.jsx. Presupuesto: vacas y perro articulados (2 draw-calls c/u,
- * cabeza con gesto), ovejas TODAS en una InstancedMesh y gallinas TODAS en
- * otra (1 draw-call por especie, variedad por instanceColor sobre el color
- * horneado). Un solo useFrame mueve todo; cero GLTF, cero texturas.
+ * animales.jsx. Presupuesto: vacas articuladas (2 draw-calls c/u, cabeza con
+ * gesto), ovejas TODAS en una InstancedMesh y gallinas TODAS en otra (1
+ * draw-call por especie, variedad por instanceColor sobre el color horneado).
+ * Los DOS perros son los protagonistas y pagan más: cuerpo + cabeza + 4
+ * patas + cola (+ lengua y baba de Dante) + sombra de contacto ≈ 8-10 draws
+ * c/u — a cambio CAMINAN de verdad (trote en diagonal atado a la distancia
+ * recorrida: cero patinaje). Un solo useFrame mueve todo; cero GLTF; la
+ * única "textura" es una DataTexture 64px procedural para el degradado de
+ * las dos sombras de contacto.
  *
  * Autocontenido: NO toca Valle3D/composicionValle3D. El host lo monta como
  * a OsoNegroDelMonte: <HatoMovil alturaDe={alturaTerreno} /> en coords MUNDO
@@ -32,7 +37,7 @@ import {
   geomVaca,
   geomOveja,
   geomGallina,
-  geomPerro,
+  geomPerroAndante,
 } from '../../visual/mundo3d/finca/fincaRealista.geom.js';
 
 /* ── PRNG determinista (mulberry32): la escena es la misma en cada carga ── */
@@ -88,16 +93,26 @@ const TIERS = {
 
 /*
  * Los DOS perros del arreo (pedido del operador): el dálmata GRANDE manda la
- * órbita ancha y el beagle CHICO trota detrás, más rápido de patas y más
- * nervioso. Cada uno tiene MALLA de su raza (fincaRealista.geom): la
- * diferencia de lejos no es solo escala — el dálmata es alto y casi cuadrado
- * (cruz ~0.5 de malla) y el beagle bajito y alargado (cruz ~0.38), así que
- * 0.9 vs 0.62 deja al beagle a ~media altura del dálmata sin volverlo pulga.
+ * órbita ancha y el beagle CHICO trota detrás, más nervioso. Cada uno tiene
+ * MALLA de su raza (fincaRealista.geom): la diferencia de lejos no es solo
+ * escala — el dálmata es alto y casi cuadrado (cruz ~0.5 de malla) y el
+ * beagle bajito y alargado (cruz ~0.38), así que 0.9 vs 0.62 deja al beagle
+ * a ~media altura del dálmata sin volverlo pulga.
+ *
+ * Van ARTICULADOS (geomPerroAndante): 4 patas + cola + (Dante) lengua, con
+ * un ciclo de TROTE en diagonal cuya fase avanza con la DISTANCIA recorrida
+ * — la cadencia sale sola de la zancada de cada raza (patas cortas de beagle
+ * = pasitos rápidos), y no hay frecuencia que ajustar a mano.
  */
 const PERROS = [
-  { nombre: 'Oliver', raza: 'dalmata', escala: 0.9, rOrb: 1.0, velAng: 0.42, tranco: 7.5, fase: 0.8 },
-  { nombre: 'Dante', raza: 'beagle', escala: 0.62, rOrb: 0.72, velAng: 0.58, tranco: 11.5, fase: 3.4 },
+  { nombre: 'Oliver', raza: 'dalmata', escala: 0.9, rOrb: 1.0, velAng: 0.42, fase: 0.8 },
+  { nombre: 'Dante', raza: 'beagle', escala: 0.62, rOrb: 0.72, velAng: 0.58, fase: 3.4 },
 ];
+
+/* Ciclo de marcha: amplitud del péndulo de pata (rad) y desfase por pata en
+   TROTE (diagonales alternas: del-izq+tras-der vs del-der+tras-izq). */
+const AMP_TRANCO = 0.55;
+const FASE_DIAGONAL = [0, Math.PI, Math.PI, 0];
 
 /* Tintes de instancia (multiplican el color horneado por vértice). */
 const TINTES_OVEJA = ['#ffffff', '#f2e9da', '#d9d2c6', '#fff6e8', '#c9c2b4'];
@@ -138,8 +153,8 @@ export default function HatoMovil({
         geomVaca({ raza: 'holstein', q }, 77),
       ],
       perros: {
-        dalmata: geomPerro({ raza: 'dalmata', q }),
-        beagle: geomPerro({ raza: 'beagle', q }),
+        dalmata: geomPerroAndante({ raza: 'dalmata', q }),
+        beagle: geomPerroAndante({ raza: 'beagle', q }),
       },
       oveja: geomEntera(geomOveja({ q }), 'oveja-instanciada'),
       gallina: geomEntera(geomGallina({ tipo: 'campesina', q }), 'gallina-instanciada'),
@@ -224,26 +239,83 @@ export default function HatoMovil({
 
     // La pareja de arreo orbita el rebaño con arranques de carrera: Oliver
     // (dálmata) por fuera marcando el paso, Dante (beagle) por dentro,
-    // desfasado media órbita para cerrar la pinza.
+    // desfasado media órbita para cerrar la pinza. `faseTranco` es la fase
+    // del ciclo de marcha: avanza con la distancia recorrida, y en
+    // reducedMotion arranca en 0 = zancada PLANTADA (las 4 patas en tierra,
+    // diagonales extendidas — pose digna, no flotando).
     const perros = PERROS.map((cfg, i) => ({
       cfg,
       ang: r() * Math.PI * 2 + i * Math.PI,
       pos: [rebano.pos[0] + cfg.rOrb, rebano.pos[1]],
       rumbo: 0,
+      faseTranco: reducedMotion ? 0 : cfg.fase,
     }));
 
     return { clave: claveHato, vacas, rebano, gallinas, perros };
   };
 
-  /* Refs de escena: vacas/perro articulados + las dos InstancedMesh. */
+  /* Refs de escena: vacas/perros articulados + las dos InstancedMesh. */
   const refVacas = useRef([]);
   const refCabezasVaca = useRef([]);
   const refPerros = useRef([]);
   const refCabezasPerro = useRef([]);
+  const refPatasPerro = useRef([[], []]);
+  const refColasPerro = useRef([]);
+  const refLengua = useRef(null);
+  const refBaba = useRef(null);
+  const refSombras = useRef([]);
   const refOvejas = useRef(null);
   const refGallinas = useRef(null);
   const colocado = useRef(false);
   const util = useMemo(() => ({ o: new THREE.Object3D() }), []);
+
+  /* La GOTA de baba de Dante: hilo + gota colgando del origen hacia abajo
+     (así scale.y la ESTIRA como baba de verdad). Material propio: húmedo,
+     translúcido y con brillo — la única pieza no-Lambert del hato. */
+  const babaAssets = useMemo(() => {
+    const hilo = new THREE.CylinderGeometry(0.004, 0.0025, 0.05, 5, 1).translate(0, -0.025, 0);
+    const gota = new THREE.SphereGeometry(0.011, 6, 5);
+    gota.scale(1, 1.35, 1);
+    gota.translate(0, -0.055, 0);
+    const geom = mergeGeometries([hilo, gota], false); // ambas indexadas → ok
+    const mat = new THREE.MeshPhongMaterial({
+      color: '#cdeaf2',
+      transparent: true,
+      opacity: 0.62,
+      shininess: 90,
+      specular: '#ffffff',
+      depthWrite: false,
+    });
+    return { geom, mat };
+  }, []);
+
+  /* Sombra de contacto de los perros: disco con degradado radial horneado en
+     una DataTexture 64px procedural (sin assets). Acompaña el paso: el cuerpo
+     bota, la sombra queda pegada al suelo y respira con la altura. */
+  const sombraAssets = useMemo(() => {
+    const n = 64;
+    const data = new Uint8Array(n * n * 4);
+    for (let iy = 0; iy < n; iy++) {
+      for (let ix = 0; ix < n; ix++) {
+        const dx = (ix + 0.5) / n - 0.5;
+        const dy = (iy + 0.5) / n - 0.5;
+        const d = Math.min(1, Math.hypot(dx, dy) * 2);
+        const a = (1 - d) * (1 - d);
+        const o = (iy * n + ix) * 4;
+        data[o] = 16;
+        data[o + 1] = 20;
+        data[o + 2] = 14;
+        data[o + 3] = Math.round(215 * a);
+      }
+    }
+    const tex = new THREE.DataTexture(data, n, n);
+    tex.needsUpdate = true;
+    const geom = new THREE.CircleGeometry(0.5, 20).rotateX(-Math.PI / 2);
+    const mats = PERROS.map(
+      () => new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false }),
+    );
+    return { geom, mats };
+  }, []);
 
   /* Tintes de instancia: una vez, determinista. */
   useLayoutEffect(() => {
@@ -331,31 +403,127 @@ export default function HatoMovil({
       }
     }
 
-    /* ── PERROS: Oliver y Dante orbitan el rebaño arreando en pinza ── */
+    /* ── PERROS: Oliver y Dante orbitan arreando — con MARCHA de verdad ──
+       El ciclo de trote va ATADO al desplazamiento: la fase avanza con la
+       distancia recorrida dividida por la zancada de la raza. La pata en
+       apoyo barre hacia atrás mientras el cuerpo pasa por encima (bóveda de
+       paso: alto a mitad de apoyo, bajo en el cruce de diagonales), y la
+       pata en vuelo vuelve PLEGADA (scale.y = rodilla barata). Con eso el
+       pie queda plantado por construcción: cero patinaje a cualquier
+       velocidad, y si el brío acelera la órbita, la cadencia sube sola. */
     hato.perros.forEach((pr, i) => {
-      const { escala, rOrb, velAng, tranco: frecTranco, fase } = pr.cfg;
+      const { escala, rOrb, velAng, fase } = pr.cfg;
+      const info = g.perros[pr.cfg.raza];
       const brio = 0.6 + Math.max(0, Math.sin(t * 0.31 + fase)) * 1.6; // trote↔carrera
       pr.ang += dt * velAng * brio;
       const rr = rOrb + Math.sin(t * 0.23 + fase) * 0.14;
-      const px = rb.pos[0] + Math.cos(pr.ang) * rr;
-      const pz = rb.pos[1] + Math.sin(pr.ang) * rr;
+      let px = rb.pos[0] + Math.cos(pr.ang) * rr;
+      let pz = rb.pos[1] + Math.sin(pr.ang) * rr;
+      // OLIVER el cariñoso: cuando las órbitas se cruzan, se ARRIMA a Dante.
+      const otro = hato.perros[1 - i];
+      const dOtro = Math.hypot(px - otro.pos[0], pz - otro.pos[1]);
+      const carino = i === 0 ? Math.max(0, 1 - dOtro / 0.6) : 0;
+      if (carino > 0) {
+        px += (otro.pos[0] - px) * carino * 0.25;
+        pz += (otro.pos[1] - pz) * carino * 0.25;
+      }
       const dx = px - pr.pos[0];
       const dz = pz - pr.pos[1];
-      if (Math.hypot(dx, dz) > 1e-4) pr.rumbo += giroCorto(pr.rumbo, rumboY(dx, dz)) * Math.min(1, dt * 5);
+      const dFrame = Math.hypot(dx, dz);
+      if (dFrame > 1e-4) pr.rumbo += giroCorto(pr.rumbo, rumboY(dx, dz)) * Math.min(1, dt * 5);
       pr.pos[0] = px;
       pr.pos[1] = pz;
+
+      // Anti-patinaje: zancada = arco de la media vuelta de apoyo (4·AMP·L).
+      const lPata = info.largoPata * escala;
+      const zancada = 4 * AMP_TRANCO * lPata;
+      if (dt > 0) pr.faseTranco += (Math.min(dFrame, zancada) / zancada) * Math.PI * 2;
+      const fT = pr.faseTranco;
+      const cT = Math.cos(fT);
+      // Bóveda del paso: patas extendidas (|cos|→1) = cuerpo abajo; pata de
+      // apoyo vertical (|cos|→0) = cuerpo arriba. 0.7 = pliegue que absorbe.
+      const dip = lPata * (1 - Math.cos(AMP_TRANCO * Math.abs(cT))) * 0.7;
+      const yBase = alturaDe(px, pz);
+
       const grupo = refPerros.current[i];
       if (grupo) {
-        const tranco = t * frecTranco + fase;
-        grupo.position.set(px, alturaDe(px, pz) + Math.abs(Math.sin(tranco)) * 0.03 * brio, pz);
-        grupo.rotation.set(0, pr.rumbo, Math.sin(tranco) * 0.04);
+        grupo.position.set(px, yBase - dip + lPata * 0.012, pz);
+        grupo.rotation.set(
+          Math.sin(fT) * 0.05, // balanceo de cadera: una vez por ciclo
+          pr.rumbo,
+          Math.cos(fT * 2) * 0.03 * Math.min(1, brio), // cabeceo: cada apoyo
+        );
         grupo.scale.setScalar(escala);
       }
+
+      // Las 4 patas: péndulo desde el hombro/cadera, diagonales alternas.
+      const patas = refPatasPerro.current[i];
+      for (let k = 0; k < 4; k++) {
+        const gp = patas && patas[k];
+        if (!gp) continue;
+        const ph = fT + FASE_DIAGONAL[k];
+        gp.rotation.z = AMP_TRANCO * Math.cos(ph); // +z = pata al frente (+X)
+        const vuelo = Math.max(0, -Math.sin(ph)); // >0 solo al volver en el aire
+        gp.scale.y = 1 - 0.24 * vuelo; // la pata se pliega al volar
+      }
+
+      // Colas con alma: Oliver helicóptero al arrimarse; Dante bandera corta.
+      const cola = refColasPerro.current[i];
+      if (cola) {
+        if (i === 0) {
+          const w = t * (7 + 9 * carino) + fase;
+          const amp = 0.35 + carino * 0.55;
+          cola.rotation.x = Math.sin(w) * amp;
+          cola.rotation.y = Math.cos(w) * amp * carino; // el círculo, solo de cariño
+        } else {
+          cola.rotation.x = Math.sin(t * 9 + fase) * 0.28 + Math.sin(fT) * 0.08;
+        }
+      }
+
       const cabeza = refCabezasPerro.current[i];
       if (cabeza) {
-        // Mira al rebaño mientras orbita (el arreo se LEE en la cabeza).
-        cabeza.rotation.y = Math.sin(t * 0.9 + fase) * 0.5;
-        cabeza.rotation.x = Math.sin(t * 0.4 + fase) * 0.08;
+        if (i === 0) {
+          // Oliver arrea mirando al rebaño; con cariño gira hacia Dante,
+          // CABECEA y se le nota la sonrisa de lado.
+          const yawArreo = Math.sin(t * 0.9 + fase) * 0.5;
+          const yawDante = giroCorto(pr.rumbo, rumboY(otro.pos[0] - px, otro.pos[1] - pz));
+          cabeza.rotation.y = yawArreo * (1 - carino) + Math.max(-1, Math.min(1, yawDante)) * carino;
+          cabeza.rotation.x = Math.sin(t * 0.4 + fase) * 0.08 + carino * Math.sin(t * 3.4) * 0.18;
+          cabeza.rotation.z = Math.cos(fT * 2) * 0.02;
+        } else {
+          // Dante JADEA: hocico apenas arriba, cabeceo corto de perro feliz.
+          cabeza.rotation.y = Math.sin(t * 0.9 + fase) * 0.4;
+          cabeza.rotation.x = 0;
+          cabeza.rotation.z = 0.06 + Math.sin(t * 6.2) * 0.045 + Math.cos(fT * 2) * 0.02;
+        }
+      }
+
+      // La LENGUA babosa de Dante: cuelga, se mece con el trote (péndulo con
+      // retraso) y tiembla con el jadeo. La GOTA cuelga de la punta, oscila
+      // a contratiempo y se ESTIRA despacio hasta "gotear" (el ciclo lento
+      // del seno la hace crecer y recogerse — baba eterna de beagle viejo).
+      if (i === 1) {
+        const lengua = refLengua.current;
+        if (lengua) {
+          lengua.rotation.x = Math.sin(fT - 0.9) * 0.22 + Math.sin(t * 6.2) * 0.05;
+          lengua.rotation.z = -0.12 + Math.cos(t * 6.2) * 0.07;
+        }
+        const baba = refBaba.current;
+        if (baba) {
+          baba.rotation.x = -Math.sin(fT - 1.6) * 0.5;
+          baba.rotation.z = 0.14 - Math.cos(t * 6.2) * 0.07;
+          const estira = 0.55 + Math.pow(0.5 + 0.5 * Math.sin(t * 0.9 + 1.1), 2) * 1.15;
+          baba.scale.set(1, estira, 1);
+        }
+      }
+
+      // Sombra de contacto: pegada al suelo, respira con la altura del paso.
+      const sombra = refSombras.current[i];
+      if (sombra) {
+        sombra.position.set(px, yBase + 0.02, pz);
+        const alto = 1 - Math.min(1, dip / (lPata * 0.104 + 1e-6)); // 1 = cuerpo arriba
+        sombra.scale.setScalar(escala * (1.04 - 0.1 * alto));
+        sombraAssets.mats[i].opacity = 0.5 - 0.14 * alto;
       }
     });
 
@@ -478,7 +646,10 @@ export default function HatoMovil({
           </group>
         );
       })}
-      {/* la pareja de arreo: Oliver el dálmata (grande) y Dante el beagle */}
+      {/* la pareja de arreo ARTICULADA: Oliver el dálmata (grande, risueño)
+          y Dante el beagle (chico, baboso). Cuerpo + cabeza + 4 patas con
+          pivote en hombro/cadera + cola con pivote en la raíz + (Dante) la
+          lengua con su gota de baba. 7-9 draws por perro: protagonistas. */}
       {PERROS.map((cfg, i) => {
         const geom = g.perros[cfg.raza];
         return (
@@ -486,10 +657,43 @@ export default function HatoMovil({
             <mesh geometry={geom.cuerpo} material={MATERIAL_HATO} castShadow />
             <group ref={(el) => (refCabezasPerro.current[i] = el)} position={geom.pivote}>
               <mesh geometry={geom.cabeza} material={MATERIAL_HATO} castShadow />
+              {geom.lengua && (
+                <group ref={refLengua} position={geom.lengua.pivote}>
+                  <mesh geometry={geom.lengua.geom} material={MATERIAL_HATO} />
+                  <group ref={refBaba} position={geom.lengua.punta}>
+                    <mesh geometry={babaAssets.geom} material={babaAssets.mat} />
+                  </group>
+                </group>
+              )}
+            </group>
+            {geom.patas.map((pata, k) => (
+              <group
+                key={k}
+                ref={(el) => {
+                  refPatasPerro.current[i][k] = el;
+                }}
+                position={pata.pivote}
+              >
+                <mesh geometry={pata.geom} material={MATERIAL_HATO} castShadow />
+              </group>
+            ))}
+            <group ref={(el) => (refColasPerro.current[i] = el)} position={geom.cola.pivote}>
+              <mesh geometry={geom.cola.geom} material={MATERIAL_HATO} castShadow />
             </group>
           </group>
         );
       })}
+      {/* sombras de contacto de los perros — fuera del grupo: el cuerpo bota
+          con el tranco, la sombra vive pegada al terreno */}
+      {PERROS.map((cfg, i) => (
+        <mesh
+          key={`sombra-${cfg.nombre}`}
+          ref={(el) => (refSombras.current[i] = el)}
+          geometry={sombraAssets.geom}
+          material={sombraAssets.mats[i]}
+          renderOrder={2}
+        />
+      ))}
       {/* rebaño y gallinero: UNA InstancedMesh por especie (frustumCulled off:
           las matrices andan por todo el potrero y el bounding no las sigue) */}
       <instancedMesh
