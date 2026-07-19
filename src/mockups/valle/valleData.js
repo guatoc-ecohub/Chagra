@@ -314,8 +314,13 @@ export function animoDeFinca(clima, { hayAlerta = false, salud = SALUD_FINCA } =
  *               sombras giran y se acortan al mediodía;
  *   estrellas   0..1 — fracción del presupuesto de estrellas del tier (true
  *               histórico = 1);
- *   luciernagas 0..1 — densidad de luciérnagas (asoman al atardecer, plenas
- *               de noche).
+ *   luciernagas 0..2 — multiplicador de densidad de luciérnagas (asoman al
+ *               atardecer, plenas de noche; ParticulasAmbientales acota [0,2]);
+ *   practicas   0..1 — cuánto encienden las LUCES PRÁCTICAS de la finca (la
+ *               ventana y la puerta de la casa, los halos de las ventanas
+ *               vivas): la casa prende foco cuando la luz del cielo baja —
+ *               al atardecer y en la niebla cerrada, no solo de noche. Campo
+ *               opcional (ausente = 0); el cableo vive en Valle3D.
  */
 export const CLIMAS = {
   amanecer: {
@@ -329,7 +334,8 @@ export const CLIMAS = {
     intensidad: 0.95,
     estrellas: 0.15,
     sol: [9, 2.5, 5],
-    luciernagas: 0.15,
+    luciernagas: 0.22, // las últimas se apagan con el alba
+    practicas: 0.35, // la cocina ya está prendida antes de que aclare
   },
   manana: {
     etiqueta: 'Mañana dorada',
@@ -379,9 +385,10 @@ export const CLIMAS = {
     niebla: '#e8a97f',
     nieblaLejos: 24,
     intensidad: 0.9,
-    estrellas: 0.12,
+    estrellas: 0.22, // los primeros luceros se asoman con el sol aún rasante
     sol: [-8, 2.5, 4.5],
-    luciernagas: 0.35,
+    luciernagas: 0.55, // el prado empieza a chispear ANTES de que oscurezca
+    practicas: 0.75, // la hora de prender la luz: las ventanas se encienden con el ocaso
   },
   dorada: {
     etiqueta: 'Hora dorada',
@@ -421,6 +428,7 @@ export const CLIMAS = {
     estrellas: false,
     sol: [6, 9, 4],
     luciernagas: 0,
+    practicas: 0.4, // en la niebla cerrada la ventana de la casa es el faro
   },
   lluvia: {
     etiqueta: 'Lluvia',
@@ -435,6 +443,7 @@ export const CLIMAS = {
     estrellas: false,
     sol: [6, 9, 4],
     luciernagas: 0,
+    practicas: 0.35, // el aguacero oscurece: adentro se prende la luz
   },
   noche: {
     /* DÍA POR NOCHE (dirección de fotografía): nadie filma la noche a oscuras.
@@ -451,7 +460,8 @@ export const CLIMAS = {
     intensidad: 0.72,
     estrellas: true,
     sol: [-6, 7, -4],
-    luciernagas: 1,
+    luciernagas: 1.5, // plenas: la constelación baja del valle (sigue siendo 1 draw call)
+    practicas: 1,
   },
 };
 
