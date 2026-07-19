@@ -11,6 +11,7 @@
  */
 import { useMemo, useState } from 'react';
 import EscenaLecheriaViva from './EscenaLecheriaViva.jsx';
+import PanelPasos from '../PanelPasos.jsx';
 import { decidirTier, permite3D } from '../deviceTier.js';
 import {
   alturaPotrero,
@@ -54,37 +55,22 @@ const CSS = `
 .mlecheria { position: relative; width: 100%; height: 100%; overflow: hidden; background: #cfe0cf; }
 .mlecheria canvas { opacity: 0; transition: opacity 0.9s ease; }
 .mlecheria .lecheria-canvas--lista canvas, .mlecheria canvas.lecheria-canvas--lista { opacity: 1; }
-.mlecheria__panel {
-  position: absolute; left: 50%; bottom: max(0.9rem, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  width: min(26rem, calc(100% - 1.6rem));
-  padding: 0.8rem 0.95rem 0.85rem;
-  border-radius: 1rem;
-  background: rgba(22, 28, 18, 0.68);
-  box-shadow: inset 0 0 0 1px rgba(180, 206, 150, 0.3), 0 6px 24px rgba(12, 14, 8, 0.35);
-  backdrop-filter: blur(6px);
-  color: #f0f3e8;
-}
-.mlecheria__kicker { margin: 0 0 0.15rem; font: 600 0.68rem/1.2 system-ui, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #b9d68f; }
-.mlecheria__texto { margin: 0 0 0.6rem; font: 500 0.85rem/1.38 system-ui, sans-serif; color: #e9efdb; }
-.mlecheria__nav { display: flex; align-items: center; gap: 0.55rem; }
-.mlecheria__btn {
-  min-height: 2.5rem; min-width: 2.9rem; padding: 0 0.8rem;
-  border: 0; border-radius: 0.7rem; cursor: pointer;
-  background: linear-gradient(180deg, rgba(150, 186, 96, 0.95), rgba(102, 140, 58, 0.95));
-  color: #17230b; font: 700 0.9rem/1 system-ui, sans-serif;
-  transition: transform 0.15s ease;
-}
-.mlecheria__btn:active { transform: scale(0.96); }
-.mlecheria__btn[disabled] { opacity: 0.35; cursor: default; }
-.mlecheria__puntos { display: flex; gap: 0.35rem; margin: 0 auto; }
-.mlecheria__punto { width: 0.5rem; height: 0.5rem; border-radius: 999px; background: rgba(233, 239, 219, 0.32); }
-.mlecheria__punto--activo { background: #96ba60; box-shadow: 0 0 8px 1px rgba(150, 186, 96, 0.5); }
 @media (prefers-reduced-motion: reduce) {
   .mlecheria canvas { transition: none; }
-  .mlecheria__btn { transition: none; }
 }
 `;
+
+/* Acento del potrero para el panel compartido (pasto y forraje). */
+const TEMA_PANEL = {
+  fondo: 'rgba(22, 28, 18, 0.68)',
+  borde: 'rgba(180, 206, 150, 0.3)',
+  tinta: '#f0f3e8',
+  kicker: '#b9d68f',
+  acentoA: 'rgba(150, 186, 96, 0.95)',
+  acentoB: 'rgba(102, 140, 58, 0.95)',
+  tintaAccion: '#17230b',
+  activo: '#96ba60',
+};
 
 /**
  * El mundo de la cadena láctea campesina, completo: escena + pasos didácticos.
@@ -104,38 +90,14 @@ export default function MundoLecheria({ tier: tierProp, reducedMotion: rmProp } 
       <style>{CSS}</style>
       <EscenaLecheriaViva tier={tier} reducedMotion={reducedMotion} foco={actual.foco} />
 
-      <div className="mlecheria__panel" role="group" aria-label="La lección de la cadena láctea">
-        <p className="mlecheria__kicker">{actual.kicker}</p>
-        <p className="mlecheria__texto">{actual.texto}</p>
-        <div className="mlecheria__nav">
-          <button
-            type="button"
-            className="mlecheria__btn"
-            onClick={() => setPaso((p) => Math.max(0, p - 1))}
-            disabled={paso === 0}
-            aria-label="Paso anterior"
-          >
-            ←
-          </button>
-          <span className="mlecheria__puntos" aria-hidden="true">
-            {PASOS.map((p, i) => (
-              <span
-                key={p.id}
-                className={`mlecheria__punto${i === paso ? ' mlecheria__punto--activo' : ''}`}
-              />
-            ))}
-          </span>
-          <button
-            type="button"
-            className="mlecheria__btn"
-            onClick={() => setPaso((p) => Math.min(PASOS.length - 1, p + 1))}
-            disabled={paso === PASOS.length - 1}
-            aria-label="Paso siguiente"
-          >
-            →
-          </button>
-        </div>
-      </div>
+      <PanelPasos
+        etiqueta="La lección de la cadena láctea"
+        pasos={PASOS}
+        paso={paso}
+        onPaso={setPaso}
+        tema={TEMA_PANEL}
+        reducedMotion={reducedMotion}
+      />
     </div>
   );
 }
