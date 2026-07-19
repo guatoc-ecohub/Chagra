@@ -916,6 +916,11 @@ function perroDalmata(q, seed, andante = false) {
     collar.rotateX(Math.PI / 2);
     apuntar(collar, [0.276, 0.475, 0], [0.55, 0.85, 0], [1, 1, 0.85]);
     p.push(pintarPlano(collar, '#a83232'));
+    // La PLAQUITA de latón colgando al frente del collar: el destello que
+    // dice "perro con casa" incluso a distancia de valle. Fusionada: 0 draws.
+    const placa = new THREE.SphereGeometry(0.016, 6, 5);
+    poner(placa, [0.335, 0.42, 0], [0, 0, 0], [0.8, 1.15, 0.5]);
+    p.push(pintarPlano(placa, '#c8963a'));
   }
 
   const cuerpo = hornearPelaje(
@@ -966,8 +971,26 @@ function perroDalmata(q, seed, andante = false) {
       c.push(pintarPlano(comisura, '#33201f'));
     }
   }
+  const cabezaFusion = fusionarHato(c, `cabeza-perro-dalmata${andante ? '-andante' : ''}`);
+  if (andante) {
+    // El PARCHE de Oliver: la mancha negra sobre el ojo izquierdo — su seña
+    // particular (la misma del dibujo 2D aprobado), legible desde lejos
+    // donde las motas chicas ya se funden. Disco determinista con borde
+    // corto, pintado ANTES del AO para que el horneado lo sombree también.
+    const posA = cabezaFusion.attributes.position;
+    const colA = cabezaFusion.attributes.color;
+    const cParche = new THREE.Color(NEGRO);
+    const cTmp = new THREE.Color();
+    for (let vi = 0; vi < posA.count; vi++) {
+      const d = Math.hypot(posA.getX(vi) - 0.075, posA.getY(vi) - 0.045, posA.getZ(vi) - 0.055);
+      if (d < 0.052) {
+        cTmp.fromBufferAttribute(colA, vi).lerp(cParche, clamp01((0.052 - d) / 0.018));
+        colA.setXYZ(vi, cTmp.r, cTmp.g, cTmp.b);
+      }
+    }
+  }
   const cabeza = hornearPelaje(
-    sembrarManchasRedondas(fusionarHato(c, `cabeza-perro-dalmata${andante ? '-andante' : ''}`), {
+    sembrarManchasRedondas(cabezaFusion, {
       n: 5, rMin: 0.018, rMax: 0.032, negro: NEGRO, semilla: seed + 17, separacion: 1.4,
     }),
     { yBajo: -0.1, yAlto: 0.1, ao: 0.24, moteado: 0.04, semilla: seed + 3 },
@@ -990,9 +1013,13 @@ function perroDalmata(q, seed, andante = false) {
     geo.translate(0, -PIV_PATA, 0);
     return { geom: geo, pivote: /** @type {[number,number,number]} */ ([px, PIV_PATA, pz]) };
   });
-  const colaGeo = hornearPelaje(fusionarHato(cp, 'cola-dalmata'), {
-    yBajo: 0.3, yAlto: 0.52, ao: 0.22, moteado: 0.04, semilla: seed + 5,
-  });
+  // La cola también lleva sus motas (una cola impoluta se lee plástica).
+  const colaGeo = hornearPelaje(
+    sembrarManchasRedondas(fusionarHato(cp, 'cola-dalmata'), {
+      n: 3, rMin: 0.016, rMax: 0.026, negro: NEGRO, semilla: seed + 29, separacion: 1.1,
+    }),
+    { yBajo: 0.3, yAlto: 0.52, ao: 0.22, moteado: 0.04, semilla: seed + 5 },
+  );
   colaGeo.translate(0.291, -0.475, 0.001); // la raíz de la cola al origen
   return {
     cuerpo, cabeza, pivote: [0.4, 0.6, 0],
@@ -1092,6 +1119,11 @@ function perroBeagle(q, seed, andante = false) {
     collar.rotateX(Math.PI / 2);
     apuntar(collar, [0.235, 0.345, 0], [0.8, 0.6, 0], [1, 1, 0.88]);
     p.push(pintarPlano(collar, '#3a7d44'));
+    // Y su PLAQUITA de latón, gemela de la de Oliver: los dos son perros
+    // CON CASA y la placa lo dice desde lejos. Fusionada: 0 draws extra.
+    const placa = new THREE.SphereGeometry(0.014, 6, 5);
+    poner(placa, [0.292, 0.298, 0], [0, 0, 0], [0.8, 1.15, 0.5]);
+    p.push(pintarPlano(placa, '#c8963a'));
   }
 
   const cuerpo = hornearPelaje(fusionarHato(p, 'perro-beagle'), {
@@ -1135,7 +1167,29 @@ function perroBeagle(q, seed, andante = false) {
     poner(boca, [0.14, -0.052, 0], [0, 0, -0.2], [1.25, 0.5, 0.72]);
     c.push(pintarPlano(boca, '#33201f'));
   }
-  const cabeza = hornearPelaje(fusionarHato(c, `cabeza-perro-beagle${andante ? '-andante' : ''}`), {
+  const cabezaFusionB = fusionarHato(c, `cabeza-perro-beagle${andante ? '-andante' : ''}`);
+  if (andante) {
+    // El HOCICO ESCARCHADO de Dante: 15 años se llevan con canas. Un velo
+    // blanco-hueso que sube desde la trufa por el puente del hocico y ralea
+    // hacia el cráneo — la seña de perro VIEJO que se lee incluso a
+    // distancia de valle. Pintado por vértice ANTES del AO (el horneado lo
+    // sombrea también); las piezas OSCURAS (trufa, boca, ojos) se protegen
+    // por luminancia para que la cara no pierda su dibujo.
+    const posB = cabezaFusionB.attributes.position;
+    const colB = cabezaFusionB.attributes.color;
+    const cEscarcha = new THREE.Color('#eae3d3');
+    const cTmpB = new THREE.Color();
+    for (let vi = 0; vi < posB.count; vi++) {
+      cTmpB.fromBufferAttribute(colB, vi);
+      if (cTmpB.r + cTmpB.g + cTmpB.b < 0.55) continue; // trufa/boca/ojos intactos
+      const d = Math.hypot(posB.getX(vi) - 0.16, posB.getY(vi) + 0.028, posB.getZ(vi));
+      const f = clamp01((0.088 - d) / 0.055) * 0.85;
+      if (f <= 0) continue;
+      cTmpB.lerp(cEscarcha, f);
+      colB.setXYZ(vi, cTmpB.r, cTmpB.g, cTmpB.b);
+    }
+  }
+  const cabeza = hornearPelaje(cabezaFusionB, {
     yBajo: -0.12, yAlto: 0.1, ao: 0.24, moteado: 0.05, semilla: seed + 3,
   });
 
