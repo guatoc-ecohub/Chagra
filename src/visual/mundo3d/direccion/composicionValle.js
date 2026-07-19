@@ -296,45 +296,12 @@ export const VECINOS_VALLE = [
     dy: 0.2,
     franjas: FRANJAS_DIA, // de sol: la noche lo guarda bajo su caparazón
   },
-  {
-    /* REVISIÓN DEL OPERADOR (2026-07-18): el jaguar y el oso estaban puestos
-       lejos, chiquitos (tope de 44px) y con franja horaria — o sea, el
-       operador NUNCA pudo verlos. Quedan a propósito GRANDES y junto a la
-       casa, sin franja y sin desvanecerse, para que los juzgue en su plena
-       expresión. Después de su veredicto se devuelven a su sitio digno. */
-    slug: 'jaguar',
-    punto: [-3.4, 3.6], // a la izquierda de la casa, al frente de la cámara
-    px: 150,
-    factor: 22, // en drei SUBIR el distanceFactor agranda (bajarlo achica)
-    dy: 0.5,
-    sinTope: true,
-    franjas: null, // visible a toda hora mientras se revisa
-    props: {}, // sin `aparicion`: que no se desvanezca mientras lo analiza
-  },
   /* OSO-ANTEOJOS ARCHIVADO (operador, 2026-07-18): 'casi feíto como el
      anterior'. El oso del valle es el NEGRO de la luna (GuardianAvatar,
      montado aparte en composicionValle3D). */
   /* DANTE y OLIVER en su versión dibujada, también grandes y al frente: el
      operador quiere ver a los cuatro juntos para juzgarlos. (En el hato siguen
      los perros 3D con su trote; estos son los rubber-hose.) */
-  {
-    slug: 'dalmata', // Oliver
-    punto: [-1.9, 5.0],
-    px: 130,
-    factor: 20,
-    dy: 0.4,
-    sinTope: true,
-    franjas: null,
-  },
-  {
-    slug: 'beagle', // Dante
-    punto: [0.5, 5.2],
-    px: 130,
-    factor: 20,
-    dy: 0.4,
-    sinTope: true,
-    franjas: null,
-  },
   {
     slug: 'danta',
     punto: [3.8, -5.2], // la danta de páramo: el borde del bosque frío, cerca de los frailejones
