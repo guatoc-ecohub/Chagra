@@ -57,6 +57,7 @@ import CafetalDensoValle from './CafetalDensoValle.jsx';
 import ParamoDensoValle from './ParamoDensoValle.jsx';
 import LaderaAltaValle from './LaderaAltaValle.jsx';
 import ArrieriaValle from './ArrieriaValle.jsx';
+import AguaVivaValle from './AguaVivaValle.jsx';
 import DetalleSueloValle from './DetalleSueloValle.jsx';
 import { CampesinosValle } from './CampesinosValle.jsx';
 import HatoMovil from './HatoMovil.jsx';
@@ -1683,6 +1684,7 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
         <button
           type="button"
           className="valle-abeja valle-abeja--toque"
+          data-angelita={estadoAngelita || 'calma'}
           aria-label="Hable con Angelita, la guía de su finca"
           onClick={
             onTocar
@@ -2373,6 +2375,9 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       {/* AoE: detalle de suelo (pasto corto/flores/piedras) + surcos de cultivo — mata el verde vacío */}
       <DetalleSueloValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
       <Cordillera color={nocturno ? '#48598a' : c.niebla} innerRef={cordilleraRef} perfil={perfil} />
+      {/* AGUA VIVA: el hilo que baja del páramo + las acequias que se ramifican
+          a las eras, el semillero y la huerta, con sus compuertas y pozas. */}
+      <AguaVivaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} caudal={c.lluviaViva ? 1 : 0.85} />
       <Quebrada
         color={nocturno ? '#7fb3d9' : '#5fb2c9'}
         viva={c.lluviaViva}

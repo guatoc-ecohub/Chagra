@@ -14,7 +14,7 @@
   display: inline-flex;
   align-items: flex-start;
   gap: 0.45rem;
-  max-width: 340px;
+  max-width: 400px;
   min-width: 150px;
   padding: 0.5rem 0.8rem 0.5rem 0.55rem;
   border: 1px solid var(--ab-borde);
@@ -22,7 +22,9 @@
   background: var(--ab-fondo);
   color: rgba(255, 255, 255, 0.97);
   font-family: inherit;
-  font-size: 0.78rem;
+  /* Letra GRANDE y legible: el operador no pudo leer un solo aviso — la letra
+     era muy chica y los mensajes muy largos. Se lee de lejos o no sirve. */
+  font-size: 1.05rem;
   font-weight: 600;
   line-height: 1.35;
   text-align: left;
