@@ -412,12 +412,23 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
   };
   const escuchar = async () => {
     try {
-      const tts = await import('../../services/ttsService');
+      // GARGANTA ÚNICA (2026-07-19): el botón habla por la cola de Angelita
+      // (prioridad RESPUESTA — lo pidió el usuario) en vez del speakSentences
+      // suelto que podía pisarse con otra superficie. El estado "hablando"
+      // sigue viniendo del motor (onSpeakingChange).
+      const [tts, voz] = await Promise.all([
+        import('../../services/ttsService'),
+        import('../../services/angelitaVoz'),
+      ]);
       if (!ttsUnsubRef.current) {
         ttsUnsubRef.current = tts.onSpeakingChange((v) => setHablando(!!v));
       }
-      if (tts.isAudioPlaying()) { tts.stop(); return; }
-      await tts.speakSentences(textoEscuchar());
+      if (tts.isAudioPlaying()) { voz.callar(); return; }
+      await voz.decir(textoEscuchar(), {
+        prioridad: voz.PRIORIDAD.RESPUESTA,
+        reemplaza: true,
+        origen: 'hero-escuchar',
+      });
     } catch (_) { /* sin audio disponible: el botón no rompe el home */ }
   };
 

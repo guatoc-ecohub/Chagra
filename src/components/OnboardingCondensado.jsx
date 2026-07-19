@@ -119,10 +119,16 @@ const IDENTIDAD_TARJETAS = [
   },
 ];
 
-/** Lee la pantalla en voz alta (TTS kokoro, import perezoso, fail-silent). */
+/** Lee la pantalla en voz alta por la GARGANTA ÚNICA de Angelita (cola
+ * serializada, prioridad RESPUESTA, reemplaza lo que sonara). Import
+ * perezoso, fail-silent: el texto ya está en pantalla. */
 function escucharTexto(texto) {
-  import('../services/ttsService')
-    .then((m) => m.speakSentences(texto).catch(() => {}))
+  import('../services/angelitaVoz')
+    .then((m) => m.decir(texto, {
+      prioridad: m.PRIORIDAD.RESPUESTA,
+      reemplaza: true,
+      origen: 'onboarding',
+    }).catch(() => {}))
     .catch(() => {});
 }
 

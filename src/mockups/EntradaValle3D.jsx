@@ -61,7 +61,10 @@ import Mundo, {
 /* Coach-mark del primer ingreso (visual, NO depende de la voz — iOS la muda). */
 import CoachMarkToque from '../visual/mundo3d/CoachMarkToque.jsx';
 import { buildSpatialAgentInitialContext } from '../services/spatialAgentContext';
-import { speak, speakKokoro, stop as stopSpeak } from '../services/ttsService.js';
+// GARGANTA ÚNICA (2026-07-19): la voz de Angelita en el valle pasa por la
+// cola serializada (angelitaVoz) — nunca dos audios pisados. El respaldo
+// Web Speech y el carácter (voz, ritmo) viven dentro del motor de la cola.
+import { decir as decirVoz, callar as stopSpeak, PRIORIDAD } from '../services/angelitaVoz.js';
 import { navegarDesde3D, rutaDesdeMundo3D } from '../prodApp/wire3DNav.js';
 /* El VELO ODYSSEY (lenguaje de transición aprobado por el operador): cubrir →
    swap en la meseta → revelar, con la identidad del DESTINO y variación por
@@ -278,15 +281,11 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
     vozRef.current = voz;
   }, [voz]);
 
-  const hablar = useCallback((texto) => {
+  const hablar = useCallback((texto, prioridad = PRIORIDAD.RESPUESTA) => {
     if (!vozRef.current || !texto) return;
-    speakKokoro(texto, { lang: 'es', rate: 0.98 })
-      .then((audio) => {
-        if (!audio && vozRef.current) speak(texto, { rate: 0.98, pitch: 1 });
-      })
-      .catch(() => {
-        if (vozRef.current) speak(texto, { rate: 0.98, pitch: 1 });
-      });
+    // decir() nunca rechaza ni cuelga (cola con watchdog + respaldo
+    // interno); la burbuja ya salió — el texto SIEMPRE llega.
+    decirVoz(texto, { prioridad, origen: 'valle-entrada' }).catch(() => {});
   }, []);
 
   // ── Angelita DICE (voz + burbuja): el texto SIEMPRE acompaña a la voz en la
@@ -295,7 +294,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
   const [dicho, setDicho] = useState(null);
   const dichoTimer = useRef(null);
   const decir = useCallback(
-    (texto) => {
+    (texto, prioridad = PRIORIDAD.RESPUESTA) => {
       if (!texto) return;
       setDicho(texto);
       if (dichoTimer.current) clearTimeout(dichoTimer.current);
@@ -303,7 +302,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
         () => setDicho(null),
         Math.min(14000, 4000 + texto.length * 55),
       );
-      hablar(texto);
+      hablar(texto, prioridad);
     },
     [hablar],
   );
@@ -328,7 +327,9 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
     const saludar = () => {
       if (saludado.current) return;
       saludado.current = true;
-      decir(NARRACION.bienvenida);
+      // Bienvenida espontánea → AMBIENTE: si Angelita ya está hablando en
+      // otra superficie, este saludo se descarta en vez de pisarla.
+      decir(NARRACION.bienvenida, PRIORIDAD.AMBIENTE);
     };
     window.addEventListener('pointerdown', saludar, { once: true, capture: true });
     window.addEventListener('keydown', saludar, { once: true, capture: true });
@@ -465,7 +466,8 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
       MUNDO_VALLE_BY_ID[nav.mundoId]?.lema ||
       `Está en ${tituloDeMundo(nav.mundoId)}.`;
     const t = setTimeout(
-      () => decir(`${texto} Toque un punto para ver a dónde lo lleva.`),
+      // Narración espontánea de entrada → AMBIENTE (no pisa lo que suene).
+      () => decir(`${texto} Toque un punto para ver a dónde lo lleva.`, PRIORIDAD.AMBIENTE),
       700,
     );
     return () => clearTimeout(t);

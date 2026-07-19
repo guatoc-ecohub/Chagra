@@ -35,7 +35,11 @@ import { Children, cloneElement, isValidElement, useCallback, useEffect, useMemo
 import { MUNDO, tituloDeMundo, tinteDeMundo } from '../../visual/mundo3d/index.js';
 import { parseComandoMundo, puertasDeMundo } from '../../visual/mundo3d/comandoMundo.js';
 import { NARRACION, MUNDO_VALLE_BY_ID } from './valleData';
-import { speak, speakKokoro, stop as stopSpeak } from '../../services/ttsService.js';
+// GARGANTA ÚNICA (2026-07-19): la voz del acompañante pasa por la cola de
+// Angelita (angelitaVoz) — nunca dos audios pisados entre mundos/pantallas.
+// El respaldo Web Speech y el carácter (voz kokoro, ritmo pausado) viven
+// dentro del motor de la cola, no aquí.
+import { decir as decirVoz, callar as callarVoz, PRIORIDAD } from '../../services/angelitaVoz.js';
 import './acompananteMundo.css';
 
 /* La narración de un mundo, con la MISMA cadena de fallbacks del shell:
@@ -71,23 +75,23 @@ export function useAcompanante(mundoId) {
     vozRef.current = voz;
   }, [voz]);
 
-  const hablar = useCallback((texto) => {
+  const hablar = useCallback((texto, prioridad = PRIORIDAD.RESPUESTA) => {
     if (!vozRef.current || !texto) return;
-    speakKokoro(texto, { lang: 'es', rate: 0.98 })
-      .then((audio) => {
-        if (!audio && vozRef.current) speak(texto, { rate: 0.98, pitch: 1 });
-      })
-      .catch(() => {
-        if (vozRef.current) speak(texto, { rate: 0.98, pitch: 1 });
-      });
-  }, []);
+    // decir() nunca rechaza ni cuelga (cola con watchdog + respaldos
+    // internos); la burbuja ya salió — el texto SIEMPRE llega.
+    decirVoz(texto, { prioridad, origen: `mundo:${mundoId}` }).catch(() => {});
+  }, [mundoId]);
 
   // ── Angelita DICE (voz + burbuja): el texto SIEMPRE va a la burbuja
   //    (aria-live). Sin voz (equipo o toggle), la burbuja es la voz.
+  //    `prioridad`: lo que el usuario PIDIÓ (botón, puerta, comando) entra
+  //    como RESPUESTA; la narración espontánea de entrada, como AMBIENTE —
+  //    si Angelita ya está hablando en otra parte, el comentario de ambiente
+  //    se descarta en vez de pisarla (política de la cola).
   const [dicho, setDicho] = useState(null);
   const dichoTimer = useRef(null);
   const decir = useCallback(
-    (texto) => {
+    (texto, prioridad = PRIORIDAD.RESPUESTA) => {
       if (!texto) return;
       setDicho(texto);
       if (dichoTimer.current) clearTimeout(dichoTimer.current);
@@ -95,14 +99,14 @@ export function useAcompanante(mundoId) {
         () => setDicho(null),
         Math.min(14000, 4000 + texto.length * 55),
       );
-      hablar(texto);
+      hablar(texto, prioridad);
     },
     [hablar],
   );
   useEffect(
     () => () => {
       if (dichoTimer.current) clearTimeout(dichoTimer.current);
-      stopSpeak();
+      callarVoz();
     },
     [],
   );
@@ -114,7 +118,10 @@ export function useAcompanante(mundoId) {
   //    con gesto para oírla.
   useEffect(() => {
     const t = setTimeout(
-      () => decir(`${narracionDeMundo(mundoId)} Toque un punto para ver a dónde lo lleva.`),
+      () => decir(
+        `${narracionDeMundo(mundoId)} Toque un punto para ver a dónde lo lleva.`,
+        PRIORIDAD.AMBIENTE,
+      ),
       900,
     );
     return () => clearTimeout(t);
@@ -266,7 +273,7 @@ export default function AcompananteMundo({ mundoId, acompanante, children }) {
   // App.jsx escucha desde cualquier pantalla.
   const preguntarAlAgente = useCallback(() => {
     if (typeof window === 'undefined') return;
-    stopSpeak();
+    callarVoz();
     window.dispatchEvent(new CustomEvent('chagraNavigate', { detail: { view: 'agente' } }));
   }, []);
 
@@ -330,7 +337,7 @@ export default function AcompananteMundo({ mundoId, acompanante, children }) {
             onClick={() => {
               const n = !voz;
               setVoz(n);
-              if (!n) stopSpeak();
+              if (!n) callarVoz();
             }}
           >
             {!vozDisponible ? '💬 Texto' : voz ? '🔊 Voz' : '🔇 Voz'}

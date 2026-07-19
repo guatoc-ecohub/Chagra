@@ -30,6 +30,7 @@ import NetworkStatusBar from '../components/NetworkStatusBar.jsx';
 // por el operador ocurre cuando el fetch asíncrono de speakKokoro resuelve
 // DESPUES de que el componente se desmontó → el audio se reproduce sin dueño.
 import { stop as stopAllAudio } from '../services/ttsService.js';
+import { callar as callarAngelita } from '../services/angelitaVoz.js';
 
 import ChagraGrowLoader from '../components/ChagraGrowLoader';
 const LoginScreen = lazy(() => import('../components/LoginScreen.jsx'));
@@ -339,6 +340,9 @@ export default function ProdChagraApp() {
     // Detener cualquier audio de la vista anterior antes de montar la nueva.
     // El loop eterno reportado ocurre cuando el audio asíncrono resuelve
     // después del desmontaje del componente 3D.
+    // callarAngelita() además vacía la COLA de la garganta única — sin esto,
+    // un mensaje encolado en la vista vieja sonaría recién montada la nueva.
+    try { callarAngelita(); } catch { /* la voz puede no estar cargada */ }
     try { stopAllAudio(); } catch { /* ttsService puede no estar inicializado */ }
     setNavData(data ?? null);
     setCurrentView(view);

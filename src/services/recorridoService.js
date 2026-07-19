@@ -35,7 +35,8 @@
 import { getCurrentPosition } from './gpsFincaDetector';
 import * as loteService from './loteService';
 import { haversineMeters } from '../utils/geo';
-import { speakSentences } from './ttsService';
+// (2026-07-19) El TTS ya no se importa directo: el habla sale por la
+// garganta única de Angelita (angelitaVoz, import perezoso más abajo).
 import { normalize } from '../utils/entityMatcher';
 import { newUlid } from '../utils/id';
 
@@ -403,7 +404,17 @@ export function construirResumenRecorrido(observaciones = [], opts = {}) {
  */
 export async function leerResumenRecorrido(observaciones = [], opts = {}) {
   const texto = construirResumenRecorrido(observaciones, opts);
-  const hablar = typeof opts.speak === 'function' ? opts.speak : speakSentences;
+  // GARGANTA ÚNICA (2026-07-19): por defecto el resumen habla por la cola
+  // de Angelita (prioridad RESPUESTA — el campesino lo pidió) en vez del
+  // speakSentences suelto; así no se pisa con narraciones de mundos ni
+  // avisos. `opts.speak` inyectable se mantiene para tests.
+  const hablar = typeof opts.speak === 'function'
+    ? opts.speak
+    : (t) => import('./angelitaVoz.js').then((m) => m.decir(t, {
+        prioridad: m.PRIORIDAD.RESPUESTA,
+        reemplaza: true,
+        origen: 'recorrido-resumen',
+      }));
   try {
     await hablar(texto);
   } catch (_) {

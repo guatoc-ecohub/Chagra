@@ -76,6 +76,18 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     return () => { vivo = false; };
   }, [activeAlerts, setLastMessage, setResponseReady]);
 
+  // ── LA GARGANTA, CABLEADA (2026-07-19): el puente store→voz hace que lo
+  //    que Angelita decide decir SUENE en toda pantalla — con la cola única
+  //    (angelitaVoz) que garantiza que dos audios jamás se pisen. Import
+  //    perezoso (el stack de voz no pesa en el arranque) e idempotente (el
+  //    puente es singleton: montar N FABs instala UNA vez y no se
+  //    desinstala — desinstalarlo con un FAB callaría a los demás).
+  useEffect(() => {
+    import('../services/angelitaVozBridge')
+      .then((m) => m.initAngelitaVozBridge())
+      .catch(() => { /* sin voz no se rompe nada: la burbuja sigue */ });
+  }, []);
+
   // Estado de Angelita: el tacto manda sobre el aviso, y el aviso sobre el idle.
   const estado = pressed
     ? 'contenta'

@@ -131,11 +131,17 @@ export function marcarBienvenidaVista() {
   }
 }
 
-/** Lee el momento en voz alta. Import perezoso del ttsService (no pesa en el
- * bundle del dashboard) y fail-silent: sin red/voz no rompe nada. */
+/** Lee el momento en voz alta por la GARGANTA ÚNICA de Angelita (cola
+ * serializada, prioridad RESPUESTA — lo pidió el usuario; reemplaza lo que
+ * estuviera sonando). Import perezoso (no pesa en el bundle del dashboard)
+ * y fail-silent: sin red/voz no rompe nada — el texto ya está en pantalla. */
 function escucharTexto(texto) {
-  import('../services/ttsService')
-    .then((m) => m.speakSentences(texto).catch(() => {}))
+  import('../services/angelitaVoz')
+    .then((m) => m.decir(texto, {
+      prioridad: m.PRIORIDAD.RESPUESTA,
+      reemplaza: true,
+      origen: 'bienvenida-finca',
+    }).catch(() => {}))
     .catch(() => {});
 }
 

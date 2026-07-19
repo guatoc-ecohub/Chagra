@@ -4,7 +4,7 @@ import {
   OctagonAlert, SearchX, Wrench, ChevronDown,
 } from 'lucide-react';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
-import { speak, speakKokoro, stop, isSpeaking, isKokoroAvailable } from '../../services/ttsService';
+import { stop, isSpeaking } from '../../services/ttsService';
 import { agentSounds } from '../../services/agentSoundService';
 import usePrefsStore from '../../store/usePrefsStore';
 import FeedbackButtons from '../FeedbackButtons';
@@ -439,13 +439,16 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
       return;
     }
     try {
-      const kokoroReady = await isKokoroAvailable();
-      if (kokoroReady) {
-        // Sin rate hardcodeado: hereda la velocidad preferida del operador.
-        await speakKokoro(message.content);
-      } else {
-        speak(message.content, { rate: 0.9, pitch: 1.0 });
-      }
+      // GARGANTA ÚNICA (2026-07-19): la relectura pasa por la cola de
+      // Angelita (reemplaza: el usuario pidió OÍR ESTO ya) — antes era un
+      // speakKokoro suelto que secuestraba el audio por fuera de la cola.
+      // Voz/ritmo y respaldo Web Speech viven en el motor de la cola.
+      const { decir, PRIORIDAD } = await import('../../services/angelitaVoz');
+      await decir(message.content, {
+        prioridad: PRIORIDAD.RESPUESTA,
+        reemplaza: true,
+        origen: 'chat-releer',
+      });
       agentSounds.chime();
     } catch (_) {
       // No reportar al UI — el TTS es secundario, no debe interrumpir lectura.

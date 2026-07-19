@@ -131,7 +131,10 @@ import { mergePartialOnInterruption } from '../../services/agentPartialMerge';
 // comparten el mismo snapshot via `climaService` (cache 30 min).
 import { getCachedClimaSnapshot, fetchClimaSnapshot, resolveClimaLocation } from '../../services/climaService';
 import { FARM_CONFIG } from '../../config/defaults';
-import { speak, speakSentences, stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking, onSpeakingChange, isAudioPlaying, getLastSpoken } from '../../services/ttsService';
+import { stop, init as initTTS, isSupported, isKokoroAvailable, replayLast, isSpeaking, onSpeakingChange, isAudioPlaying, getLastSpoken } from '../../services/ttsService';
+// Garganta única de Angelita (2026-07-19): el habla del personaje pasa por
+// la cola serializada (nunca dos audios pisados) con su carácter de voz.
+import { decir as decirAngelita, PRIORIDAD as PRIORIDAD_VOZ, MOTIVO as MOTIVO_VOZ } from '../../services/angelitaVoz';
 import { executeAction, setActionGateCallback } from '../../services/actionExecutor';
 import { getToolsForLLM } from '../../services/llmTools';
 import { useRotatingTip } from '../../services/tipsService';
@@ -2621,11 +2624,20 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       }
 
       if (ttsEnabled && response) {
-        stop();
-        // TIER 2 #5: degradación amable. Si TODO el stack de voz falla
-        // (Kokoro caído + Web Speech ausente), avisamos en el strip — la
-        // respuesta YA está escrita arriba, nada se rompe ni queda mudo.
-        // Damos 1.2s de gracia porque Web Speech puede demorar el onstart.
+        // GARGANTA ÚNICA (2026-07-19): la respuesta va por la cola de
+        // Angelita con reemplaza:true — la política explícita del chat: una
+        // respuesta nueva deja obsoleta la anterior (la corta y vacía la
+        // cola) en vez del stop() bruto + play suelto que permitía pisones.
+        // El streaming frase-por-frase (latencia kokoro lineal con chars,
+        // 7KB→3s) y el respaldo Web Speech viven DENTRO del motor de la
+        // cola; el rate/voz es el carácter de Angelita (angelitaCaracter).
+        //
+        // TIER 2 #5: degradación amable. Si TODO el stack de voz falla,
+        // avisamos en el strip — la respuesta YA está escrita arriba, nada
+        // se rompe ni queda mudo. decir() nunca rechaza ni cuelga (watchdog
+        // interno), y distingue en `motivo` el fallo real de un corte
+        // legítimo (interrumpida/callada por otra respuesta): solo el fallo
+        // real merece el aviso.
         const warnIfMute = () => {
           setTimeout(() => {
             if (!isAudioPlaying() && !isSpeaking()) {
@@ -2633,18 +2645,16 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             }
           }, 1200);
         };
-        if (kokoroReady) {
-          // Free 7→10 fix-pack #4: streaming frase-por-frase reduce la
-          // latencia hasta-primer-audio de "esperar respuesta entera"
-          // (3-23s) a "esperar primera frase" (<2s). Sin rate hardcodeado:
-          // hereda la velocidad preferida del operador (getPreferredRate).
-          speakSentences(responseBody)
-            .then((ok) => { if (!ok) warnIfMute(); })
-            .catch(() => warnIfMute());
-        } else {
-          const utterance = speak(responseBody, { rate: 0.9, pitch: 1.0 });
-          if (!utterance) warnIfMute();
-        }
+        const FALLOS_REALES = [MOTIVO_VOZ.AUDIO_FALLO, MOTIVO_VOZ.WATCHDOG, MOTIVO_VOZ.SIN_GESTO];
+        decirAngelita(responseBody, {
+          prioridad: PRIORIDAD_VOZ.RESPUESTA,
+          reemplaza: true,
+          origen: 'agente-respuesta',
+        })
+          .then(({ hablado, motivo }) => {
+            if (!hablado && FALLOS_REALES.includes(motivo)) warnIfMute();
+          })
+          .catch(() => warnIfMute());
       }
 
       // 057.4 integration: en lugar de abrir el modal directo, delegamos a
@@ -3485,7 +3495,16 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           ...prev,
           { role: 'assistant', content: rejection, timestamp: Date.now() },
         ]);
-        if (ttsEnabled) { try { speak(rejection, { rate: 0.9, pitch: 1.0 }); } catch (_) { /* noop */ } }
+        // Garganta única: también los rechazos hablan por la cola (voz y
+        // política consistentes; antes era un speak() suelto que podía
+        // pisarse con la respuesta en curso).
+        if (ttsEnabled) {
+          decirAngelita(rejection, {
+            prioridad: PRIORIDAD_VOZ.RESPUESTA,
+            reemplaza: true,
+            origen: 'agente-rechazo-adjunto',
+          }).catch(() => { /* decir() no rechaza; cinturón */ });
+        }
         await outboxMarkAnswered(item.id, { answeredText: rejection });
         return true;
       }
