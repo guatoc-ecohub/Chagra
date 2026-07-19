@@ -49,6 +49,9 @@ import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
 import AnimalesDeFinca, { MATERIAL_FINCA } from './animales.jsx';
 /* AoE ("Age of Empires del campo"): componentes NUEVOS que densifican y dan
    vida al valle (cada uno instanciado, draw calls acotados). */
+import LluviaValle from '../../visual/mundo3d/atmosfera/clima/LluviaValle.jsx';
+import NieblaLadera from '../../visual/mundo3d/atmosfera/clima/NieblaLadera.jsx';
+import HeladaValle from '../../visual/mundo3d/atmosfera/clima/HeladaValle.jsx';
 import BosqueDensoValle from './BosqueDensoValle.jsx';
 import CafetalDensoValle from './CafetalDensoValle.jsx';
 import ParamoDensoValle from './ParamoDensoValle.jsx';
@@ -2123,6 +2126,20 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       <VegetacionPisos nocturno={nocturno} perfil={perfil} />
       {/* AoE: bosque denso 3x + detalle de suelo/surcos + campesinos en faena + hato en movimiento */}
       <BosqueDensoValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      {/* CLIMA VIVO: la lluvia que cae de verdad, la niebla que rueda por la
+          ladera y la ESCARCHA de la helada — el clima real escrito en el suelo. */}
+      {c.lluviaViva && (
+        <LluviaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} nocturno={nocturno} />
+      )}
+      {clima === 'niebla' && (
+        <NieblaLadera alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+      )}
+      {clima === 'amanecer' && (
+        <NieblaLadera modo="amanecer" intensidad={0.55} alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+      )}
+      {hayAlerta && COSA_DEL_DIA.tono === 'helada' && (clima === 'noche' || clima === 'amanecer' || clima === 'helada') && (
+        <HeladaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+      )}
       <CafetalDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} zona={[{ cx: 5.2, cz: 1.6, rx: 2.6, rz: 2.2 }]} />
       <ParamoDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} />
       {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
