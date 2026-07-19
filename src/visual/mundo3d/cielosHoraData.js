@@ -213,12 +213,20 @@ export function presetDeHora(hora) {
  * @returns {'amanecer'|'manana'|'mediodia'|'tarde'|'atardecer'|'noche'}
  */
 export function franjaDeHoraDecimal(h) {
-  if (h < 5) return 'noche';
-  if (h < 7) return 'amanecer';
+  /* CREPÚSCULO ECUATORIAL CORTO (DR luz real de los Andes, 2026-06-19): a
+     4-5° N el sol cae casi vertical y el crepúsculo dura ~20-25 minutos, no
+     horas. El sol sale ~5:50-6:10 y se esconde ~17:50-18:15 TODO el año.
+     Las bandas viejas mentían: mostraban 'amanecer' desde las 5:00 (noche
+     cerrada real) y 'atardecer' hasta las 19:00 (a las 18:40 en Colombia ya
+     es noche). Bandas honestas: el filo del día es breve — y por breve,
+     precioso (quien abre la app a las 6:10 pm ALCANZA el atardecer; a las
+     6:45 pm ya lo perdió, como en la vereda). */
+  if (h < 5.7) return 'noche';
+  if (h < 6.75) return 'amanecer';
   if (h < 11) return 'manana';
   if (h < 15) return 'mediodia';
-  if (h < 17) return 'tarde';
-  if (h < 19) return 'atardecer';
+  if (h < 17.5) return 'tarde';
+  if (h < 18.6) return 'atardecer';
   return 'noche';
 }
 
