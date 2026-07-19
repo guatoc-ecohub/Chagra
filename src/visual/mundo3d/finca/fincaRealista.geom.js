@@ -849,8 +849,14 @@ function pataCanina(p, r, { x, z, atras, yMuslo, hMuslo, rMuslo, yCana, hCana, r
  * cuello erguido, hocico largo y parejo, orejas medianas caídas pegadas a la
  * mejilla, cola larga de sable en S suave (JAMÁS enroscada). Blanco puro con
  * manchas negras redondas sembradas (~35% del manto). Mira a +X, cruz ~0.5.
+ *
+ * `andante`: devuelve el perro DESARMADO para caminar de verdad — cuerpo sin
+ * patas ni cola, cada pata como pieza aparte con pivote en el hombro/cadera y
+ * la cola con pivote en la raíz (para el helicóptero del cariño). Además el
+ * alma de OLIVER: ojos entrecerrados de felicidad, sonrisa perruna con
+ * comisuras arriba y lengua corta, y collar rojo de perro de casa.
  */
-function perroDalmata(q, seed) {
+function perroDalmata(q, seed, andante = false) {
   const BLANCO = '#f3efe7';
   const NEGRO = '#26262b';
   const r = rng(seed);
@@ -874,30 +880,43 @@ function perroDalmata(q, seed) {
   poner(anca, [-0.22, 0.45, 0], [0, 0, 0.12], [1, 1, 0.8]);
   p.push(pintarPlano(anca, BLANCO));
   // Patas LARGAS y finas: casi la mitad de la altura es aire bajo el pecho.
-  for (const [px, pz, atras] of /** @type {[number, number, boolean][]} */ ([[0.24, 0.055, false], [0.24, -0.055, false], [-0.22, 0.065, true], [-0.22, -0.065, true]])) {
-    pataCanina(p, r, {
-      x: px, z: pz, atras,
-      yMuslo: 0.32, hMuslo: 0.28, rMuslo: 0.042,
-      yCana: 0.13, hCana: 0.22, rCana: 0.017,
-      yGarra: 0.02, rGarra: 0.022,
-      colorMuslo: BLANCO, colorCana: BLANCO, colorGarra: BLANCO,
-    });
-  }
+  // Pivote del hombro/cadera arriba del muslo: de ahí cuelga la pata andante.
+  const PIV_PATA = 0.45;
+  const POS_PATAS = /** @type {[number, number, boolean][]} */ (
+    [[0.24, 0.055, false], [0.24, -0.055, false], [-0.22, 0.065, true], [-0.22, -0.065, true]]
+  );
+  const armaPata = (destino, x, z, atras) => pataCanina(destino, r, {
+    x, z, atras,
+    yMuslo: 0.32, hMuslo: 0.28, rMuslo: 0.042,
+    yCana: 0.13, hCana: 0.22, rCana: 0.017,
+    yGarra: 0.02, rGarra: 0.022,
+    colorMuslo: BLANCO, colorCana: BLANCO, colorGarra: BLANCO,
+  });
+  if (!andante) for (const [px, pz, atras] of POS_PATAS) armaPata(p, px, pz, atras);
   // Cola de SABLE larga en S suave: cae del anca y el último tercio se
   // endereza con un latigazo leve — nunca la rosca del criollo.
+  const cp = [];
   const cola1 = new THREE.CylinderGeometry(0.012, 0.02, 0.2, 6, 2);
   apuntar(cola1, [-0.378, 0.426, 0.008], [-0.87, -0.49, 0.09]);
-  p.push(pintarPlano(cola1, BLANCO));
+  cp.push(pintarPlano(cola1, BLANCO));
   const cola2 = new THREE.CylinderGeometry(0.007, 0.013, 0.16, 6, 1);
   apuntar(cola2, [-0.533, 0.381, 0.031], [-0.98, 0.06, 0.21]);
-  p.push(pintarPlano(cola2, BLANCO));
+  cp.push(pintarPlano(cola2, BLANCO));
   const puntaCola = new THREE.SphereGeometry(0.009, 6, 5);
   poner(puntaCola, [-0.611, 0.386, 0.048]);
-  p.push(pintarPlano(puntaCola, BLANCO));
+  cp.push(pintarPlano(puntaCola, BLANCO));
+  if (!andante) p.push(...cp);
   // Cuello ERGUIDO y largo (porte de carroza, no el cuello bajo del criollo).
   const cuello = new THREE.CylinderGeometry(0.052, 0.085, 0.21, 9, 2);
   apuntar(cuello, [0.3, 0.52, 0], [0.55, 0.85, 0], [1, 1, 0.8]);
   p.push(pintarPlano(cuello, BLANCO));
+  if (andante) {
+    // Collar ROJO de perro querido (Oliver es de la niña, no un callejero).
+    const collar = new THREE.TorusGeometry(0.072, 0.014, 7, 14);
+    collar.rotateX(Math.PI / 2);
+    apuntar(collar, [0.276, 0.475, 0], [0.55, 0.85, 0], [1, 1, 0.85]);
+    p.push(pintarPlano(collar, '#a83232'));
+  }
 
   const cuerpo = hornearPelaje(
     sembrarManchasRedondas(fusionarHato(p, 'perro-dalmata'), {
@@ -921,18 +940,67 @@ function perroDalmata(q, seed) {
   for (const lado of [1, -1]) {
     const oreja = orejaPetalo([0.0, 0.07, lado * 0.052], [0.05, -0.75, lado * 0.62], 0.115, 0.062, 0.28);
     c.push(pintarPlano(oreja, NEGRO));
-    const ojo = new THREE.SphereGeometry(0.014, 5, 4);
-    poner(ojo, [0.09, 0.03, lado * 0.05]);
-    c.push(pintarPlano(ojo, '#1f1a14'));
+    if (andante) {
+      // Ojos ENTRECERRADOS de felicidad: media luna inclinada, no botón.
+      const ojo = new THREE.SphereGeometry(0.015, 6, 4);
+      poner(ojo, [0.09, 0.032, lado * 0.05], [0, 0, 0.35], [1.25, 0.38, 0.7]);
+      c.push(pintarPlano(ojo, '#1f1a14'));
+    } else {
+      const ojo = new THREE.SphereGeometry(0.014, 5, 4);
+      poner(ojo, [0.09, 0.03, lado * 0.05]);
+      c.push(pintarPlano(ojo, '#1f1a14'));
+    }
+  }
+  if (andante) {
+    // La SONRISA perruna de Oliver: boca abierta oscura bajo el hocico,
+    // comisuras LEVANTADAS a los lados y una lengua corta rosa — risueño.
+    const boca = new THREE.SphereGeometry(0.032, 8, 6);
+    poner(boca, [0.155, -0.05, 0], [0, 0, -0.15], [1.35, 0.5, 0.75]);
+    c.push(pintarPlano(boca, '#33201f'));
+    const lenguita = new THREE.SphereGeometry(0.02, 7, 5);
+    poner(lenguita, [0.163, -0.058, 0.004], [0, 0, -0.3], [1.35, 0.5, 0.8]);
+    c.push(pintarPlano(lenguita, '#d9737f'));
+    for (const lado of [1, -1]) {
+      const comisura = new THREE.SphereGeometry(0.009, 5, 4);
+      poner(comisura, [0.115, -0.026, lado * 0.04]);
+      c.push(pintarPlano(comisura, '#33201f'));
+    }
   }
   const cabeza = hornearPelaje(
-    sembrarManchasRedondas(fusionarHato(c, 'cabeza-perro-dalmata'), {
+    sembrarManchasRedondas(fusionarHato(c, `cabeza-perro-dalmata${andante ? '-andante' : ''}`), {
       n: 5, rMin: 0.018, rMax: 0.032, negro: NEGRO, semilla: seed + 17, separacion: 1.4,
     }),
     { yBajo: -0.1, yAlto: 0.1, ao: 0.24, moteado: 0.04, semilla: seed + 3 },
   );
 
-  return { cuerpo, cabeza, pivote: [0.4, 0.6, 0] };
+  if (!andante) return { cuerpo, cabeza, pivote: [0.4, 0.6, 0] };
+
+  // Piezas articuladas: 4 patas colgando de su pivote (hombro/cadera) y la
+  // cola con pivote en la raíz. Cada pata lleva sus manchitas — un dálmata de
+  // patas impolutas se lee plástico.
+  const patas = POS_PATAS.map(([px, pz, atras], k) => {
+    const pl = [];
+    armaPata(pl, 0, 0, atras);
+    const geo = hornearPelaje(
+      sembrarManchasRedondas(fusionarHato(pl, `pata-dalmata-${k}`), {
+        n: 2, rMin: 0.018, rMax: 0.032, negro: NEGRO, semilla: seed + 21 + k * 7,
+      }),
+      { yBajo: 0.015, yAlto: 0.5, ao: 0.3, moteado: 0.04, semilla: seed + k },
+    );
+    geo.translate(0, -PIV_PATA, 0);
+    return { geom: geo, pivote: /** @type {[number,number,number]} */ ([px, PIV_PATA, pz]) };
+  });
+  const colaGeo = hornearPelaje(fusionarHato(cp, 'cola-dalmata'), {
+    yBajo: 0.3, yAlto: 0.52, ao: 0.22, moteado: 0.04, semilla: seed + 5,
+  });
+  colaGeo.translate(0.291, -0.475, 0.001); // la raíz de la cola al origen
+  return {
+    cuerpo, cabeza, pivote: [0.4, 0.6, 0],
+    patas,
+    cola: { geom: colaGeo, pivote: /** @type {[number,number,number]} */ ([-0.291, 0.475, -0.001]) },
+    lengua: null,
+    largoPata: PIV_PATA,
+  };
 }
 
 /*
@@ -942,8 +1010,13 @@ function perroDalmata(q, seed) {
  * corta ERGUIDA con punta blanca (la "bandera" del rastreador). Tricolor
  * clásico: silla negra en el lomo, canela en cabeza/hombros/anca, blanco en
  * panza, pecho, patas y punta de cola. Mira a +X, cruz ~0.38.
+ *
+ * `andante`: perro desarmado para el ciclo de marcha (patas y cola con
+ * pivote propio) + el alma de DANTE el baboso: boca abierta de jadeo, cejas
+ * canela, collar verde y una LENGUA aparte que cuelga y se mece — con
+ * `punta` como anclaje para la gota de baba.
  */
-function perroBeagle(q, seed) {
+function perroBeagle(q, seed, andante = false) {
   const BLANCO = '#f2ecdc';
   const NEGRO = '#2a2622';
   const CANELA = '#a5622c';
@@ -985,28 +1058,41 @@ function perroBeagle(q, seed) {
   poner(pechera, [0.24, 0.24, 0], [0, 0, 0.5], [0.75, 1.05, 0.68]);
   p.push(pintarPlano(pechera, BLANCO));
   // Patas CORTAS y fuertes, blancas (fuego canela en los muslos delanteros).
-  for (const [px, pz, atras] of /** @type {[number, number, boolean][]} */ ([[0.2, 0.06, false], [0.2, -0.06, false], [-0.18, 0.07, true], [-0.18, -0.07, true]])) {
-    pataCanina(p, r, {
-      x: px, z: pz, atras,
-      yMuslo: 0.155, hMuslo: 0.15, rMuslo: 0.045,
-      yCana: 0.065, hCana: 0.11, rCana: 0.021,
-      yGarra: 0.018, rGarra: 0.024,
-      colorMuslo: atras ? BLANCO : CANELA, colorCana: BLANCO, colorGarra: BLANCO,
-    });
-  }
+  // Pivote bajito (cadera de perro salchichón): de ahí cuelga la pata andante.
+  const PIV_PATA = 0.22;
+  const POS_PATAS = /** @type {[number, number, boolean][]} */ (
+    [[0.2, 0.06, false], [0.2, -0.06, false], [-0.18, 0.07, true], [-0.18, -0.07, true]]
+  );
+  const armaPata = (destino, x, z, atras) => pataCanina(destino, r, {
+    x, z, atras,
+    yMuslo: 0.155, hMuslo: 0.15, rMuslo: 0.045,
+    yCana: 0.065, hCana: 0.11, rCana: 0.021,
+    yGarra: 0.018, rGarra: 0.024,
+    colorMuslo: atras ? BLANCO : CANELA, colorCana: BLANCO, colorGarra: BLANCO,
+  });
+  if (!andante) for (const [px, pz, atras] of POS_PATAS) armaPata(p, px, pz, atras);
   // La BANDERA: cola corta ERGUIDA (base negra que sigue la silla, punta
   // blanca bien marcada — así el rastreador se ve entre el pasto).
+  const cp = [];
   const cola = new THREE.CylinderGeometry(0.011, 0.017, 0.17, 6, 2);
   apuntar(cola, [-0.278, 0.44, 0], [-0.33, 0.94, 0]);
   pintarPorVertice(cola, (x, y, z, i, c) => c.copy(y > 0.465 ? cB : cN));
-  p.push(cola);
+  cp.push(cola);
   const puntaBandera = new THREE.SphereGeometry(0.014, 6, 5);
   poner(puntaBandera, [-0.308, 0.525, 0]);
-  p.push(pintarPlano(puntaBandera, BLANCO));
+  cp.push(pintarPlano(puntaBandera, BLANCO));
+  if (!andante) p.push(...cp);
   // Cuello corto y macizo.
   const cuello = new THREE.CylinderGeometry(0.058, 0.088, 0.14, 9, 2);
   apuntar(cuello, [0.26, 0.36, 0], [0.8, 0.6, 0], [1, 1, 0.85]);
   p.push(pintarPlano(cuello, CANELA));
+  if (andante) {
+    // Collar VERDE del baboso mayor de la casa.
+    const collar = new THREE.TorusGeometry(0.078, 0.014, 7, 14);
+    collar.rotateX(Math.PI / 2);
+    apuntar(collar, [0.235, 0.345, 0], [0.8, 0.6, 0], [1, 1, 0.88]);
+    p.push(pintarPlano(collar, '#3a7d44'));
+  }
 
   const cuerpo = hornearPelaje(fusionarHato(p, 'perro-beagle'), {
     yBajo: 0.015, yAlto: 0.42, ao: 0.36, moteado: 0.06, semilla: seed,
@@ -1036,12 +1122,59 @@ function perroBeagle(q, seed) {
     const ojo = new THREE.SphereGeometry(0.016, 5, 4);
     poner(ojo, [0.075, 0.035, lado * 0.05]);
     c.push(pintarPlano(ojo, '#241709'));
+    if (andante) {
+      // Cejas canela del tricolor: los dos puntos que hacen "cara de beagle".
+      const ceja = new THREE.SphereGeometry(0.011, 5, 4);
+      poner(ceja, [0.062, 0.072, lado * 0.042], [0, 0, 0], [1.2, 0.7, 1]);
+      c.push(pintarPlano(ceja, '#7d4a1e'));
+    }
   }
-  const cabeza = hornearPelaje(fusionarHato(c, 'cabeza-perro-beagle'), {
+  if (andante) {
+    // Boca ABIERTA de jadeo — la lengua va aparte, articulada, con su baba.
+    const boca = new THREE.SphereGeometry(0.03, 8, 6);
+    poner(boca, [0.14, -0.052, 0], [0, 0, -0.2], [1.25, 0.5, 0.72]);
+    c.push(pintarPlano(boca, '#33201f'));
+  }
+  const cabeza = hornearPelaje(fusionarHato(c, `cabeza-perro-beagle${andante ? '-andante' : ''}`), {
     yBajo: -0.12, yAlto: 0.1, ao: 0.24, moteado: 0.05, semilla: seed + 3,
   });
 
-  return { cuerpo, cabeza, pivote: [0.34, 0.44, 0] };
+  if (!andante) return { cuerpo, cabeza, pivote: [0.34, 0.44, 0] };
+
+  const patas = POS_PATAS.map(([px, pz, atras], k) => {
+    const pl = [];
+    armaPata(pl, 0, 0, atras);
+    const geo = hornearPelaje(fusionarHato(pl, `pata-beagle-${k}`), {
+      yBajo: 0.012, yAlto: 0.26, ao: 0.3, moteado: 0.05, semilla: seed + k,
+    });
+    geo.translate(0, -PIV_PATA, 0);
+    return { geom: geo, pivote: /** @type {[number,number,number]} */ ([px, PIV_PATA, pz]) };
+  });
+  const colaGeo = hornearPelaje(fusionarHato(cp, 'cola-beagle'), {
+    yBajo: 0.34, yAlto: 0.54, ao: 0.2, moteado: 0.04, semilla: seed + 5,
+  });
+  colaGeo.translate(0.25, -0.36, 0); // la raíz de la bandera al origen
+  // La LENGUA del baboso, en coords locales de su pivote (la boca): cuelga
+  // hacia afuera y abajo; `punta` es donde nace la gota de baba.
+  const lp = [];
+  const lengua1 = new THREE.SphereGeometry(0.036, 8, 6);
+  poner(lengua1, [0.04, -0.025, 0], [0.12, 0, -0.5], [1.5, 0.34, 0.55]);
+  lp.push(pintarPlano(lengua1, '#d9737f'));
+  const lengua2 = new THREE.SphereGeometry(0.017, 6, 5);
+  poner(lengua2, [0.085, -0.052, 0], [0, 0, -0.35], [1.05, 0.45, 0.85]);
+  lp.push(pintarPlano(lengua2, '#c4606e'));
+  const lenguaGeo = fusionarHato(lp, 'lengua-beagle');
+  return {
+    cuerpo, cabeza, pivote: [0.34, 0.44, 0],
+    patas,
+    cola: { geom: colaGeo, pivote: /** @type {[number,number,number]} */ ([-0.25, 0.36, 0]) },
+    lengua: {
+      geom: lenguaGeo,
+      pivote: /** @type {[number,number,number]} */ ([0.135, -0.045, 0.006]),
+      punta: /** @type {[number,number,number]} */ ([0.09, -0.062, 0]),
+    },
+    largoPata: PIV_PATA,
+  };
 }
 
 /**
@@ -1140,6 +1273,22 @@ export function geomPerro({ raza = 'criollo', q = 1 } = {}, seed = 51) {
 
     return { cuerpo, cabeza, pivote: [0.38, 0.55, 0] };
   });
+}
+
+/**
+ * Perro ANDANTE: la misma raza pero DESARMADA para caminar de verdad — cuerpo
+ * sin patas ni cola, 4 patas con pivote en hombro/cadera (orden: delantera
+ * izq, delantera der, trasera izq, trasera der), cola con pivote en la raíz
+ * y (el beagle) lengua articulada con anclaje de baba. `largoPata` es el
+ * largo real de la pata en unidades de malla: el consumidor deriva de ahí la
+ * ZANCADA para atar el ciclo de paso al desplazamiento (cero patinaje).
+ * Costo: 7 draw calls por perro (8 el beagle con lengua) contra 2 del
+ * fusionado — son dos perros protagonistas, no un rebaño.
+ * @returns {{cuerpo, cabeza, pivote, patas: {geom, pivote}[], cola: {geom, pivote}, lengua: null|{geom, pivote, punta}, largoPata: number}}
+ */
+export function geomPerroAndante({ raza = 'dalmata', q = 1 } = {}, seed = 51) {
+  return memo(`perroAndante|${raza}|${q}|${seed}`, () =>
+    raza === 'beagle' ? perroBeagle(q, seed, true) : perroDalmata(q, seed, true));
 }
 
 /* -------------------------------------------------------------------------- */
