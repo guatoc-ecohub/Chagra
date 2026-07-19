@@ -55,6 +55,7 @@ import HeladaValle from '../../visual/mundo3d/atmosfera/clima/HeladaValle.jsx';
 import BosqueDensoValle from './BosqueDensoValle.jsx';
 import CafetalDensoValle from './CafetalDensoValle.jsx';
 import ParamoDensoValle from './ParamoDensoValle.jsx';
+import LaderaAltaValle from './LaderaAltaValle.jsx';
 import DetalleSueloValle from './DetalleSueloValle.jsx';
 import { CampesinosValle } from './CampesinosValle.jsx';
 import HatoMovil from './HatoMovil.jsx';
@@ -2396,6 +2397,9 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       )}
       <CafetalDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} zona={[{ cx: 5.2, cz: 1.6, rx: 2.6, rz: 2.2 }]} />
       <ParamoDensoValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} />
+      {/* La LADERA ALTA poblada: terrazas de clima frío en policultivo (papa,
+          haba, cubio, arracacha + barbecho), cerca de piedra, camino y abrigo. */}
+      <LaderaAltaValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} reducedMotion={reducedMotion} />
       {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
       {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 14 : tier === 'bajo' ? 5 : 9} radio={3.6} reducedMotion={reducedMotion} />}
 
