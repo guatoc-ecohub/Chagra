@@ -26,16 +26,25 @@ export {
 export { avisarSalidaAbeja, resetSalidaAbeja, useSalidaAbeja } from './senalSalidaAbeja.js';
 export { Colibri } from './Colibri.jsx';
 export { OsoAndino } from './OsoAndino.jsx';
-/* EL OSO DE ANTEOJOS EN SU VERSIÓN BUENA — NEGRO BIOPUNK (la dirección
-   aprobada por el operador: azabache azulado + aros crema luminosos + acentos
-   menta medidos; ver dashboard/GuardianEspiritu → AvatarOso). El OsoAndino
-   café de arriba queda archivado (decisión del operador: no surfacear); este
-   es EL oso de primera clase para valle/mundos. Identidad como datos: jamás
-   arrastra three al bundle base — igual que jaguarIdentidad. */
+/* OsoAnteojos ARCHIVADO (operador, 2026-07-18: "casi feíto como el anterior")
+   — igual que el OsoAndino café. El componente queda exportado por
+   compatibilidad, pero NO se surfacea (fuera del registro CREATURES). */
 export { OsoAnteojos } from './OsoAnteojos.jsx';
 export {
   OSO_ANTEOJOS_PALETA, OSO_ANTEOJOS_PROPORCION, OSO_ANTEOJOS_SLUG, PERFIL_OSO_ANTEOJOS,
 } from './osoAnteojosIdentidad.js';
+/* EL OSO DE ANTEOJOS EN SU DIRECCIÓN VIGENTE — EL GUARDIÁN NEGRO DE LA LUNA
+   (base: el avatar aprobado del selector del guardián, dashboard/
+   GuardianEspiritu → AvatarOso: azabache azulado + luna creciente en el pecho
+   + aros de luz + menta medida), elevado a proporciones de ADULTO (cabeza
+   chica sobre joroba de hombros, hocico presente, ojos-almendra serenos,
+   garras) para que deje de leer infantil. Identidad como datos: jamás
+   arrastra three al bundle base — igual que jaguarIdentidad. */
+export { OsoGuardian } from './OsoGuardian.jsx';
+export {
+  OSO_GUARDIAN_PALETA, OSO_GUARDIAN_PROPORCION, OSO_GUARDIAN_SLUG,
+  OSO_GUARDIAN_TINTA, PERFIL_OSO_GUARDIAN,
+} from './osoGuardianIdentidad.js';
 export { RanaAndina } from './RanaAndina.jsx';
 export { Ardilla } from './Ardilla.jsx';
 export { Jaguar } from './Jaguar.jsx';
@@ -148,7 +157,7 @@ export { useVidaIdle, useRitmoPropio, useMiradaUsted, prefiereQuietud } from './
 import AbejaAngelita from './AbejaAngelita.jsx';
 import Colibri from './Colibri.jsx';
 import OsoAndino from './OsoAndino.jsx';
-import OsoAnteojos from './OsoAnteojos.jsx';
+import OsoGuardian from './OsoGuardian.jsx';
 import RanaAndina from './RanaAndina.jsx';
 import Perezoso from './Perezoso.jsx';
 import Ardilla from './Ardilla.jsx';
@@ -172,9 +181,11 @@ export const CREATURES = {
   'abeja-angelita': { Component: AbejaAngelita, nombre: 'Abeja angelita', cientifico: 'Tetragonisca angustula' },
   colibri: { Component: Colibri, nombre: 'Colibrí chillón', cientifico: 'Colibri coruscans' },
   'oso-andino': { Component: OsoAndino, nombre: 'Oso andino', cientifico: 'Tremarctos ornatus' },
-  // La VERSIÓN BUENA del oso (negro biopunk, aprobada por el operador). El
-  // 'oso-andino' café de arriba queda archivado; surfacear ESTE.
-  'oso-anteojos': { Component: OsoAnteojos, nombre: 'Oso de anteojos', cientifico: 'Tremarctos ornatus' },
+  /* OSO-ANTEOJOS ARCHIVADO (operador, 2026-07-18): rechazado por feo ("casi
+     feíto como el anterior") — fuera del registro para que NADA data-driven lo
+     surfacee (mismo patrón que el borugo). El componente queda por historia.
+     La dirección vigente del oso es 'oso-guardian' (abajo). */
+  'oso-guardian': { Component: OsoGuardian, nombre: 'Oso de anteojos', cientifico: 'Tremarctos ornatus' },
   'rana-andina': { Component: RanaAndina, nombre: 'Rana arlequín andina', cientifico: 'Atelopus spp.' },
   perezoso: { Component: Perezoso, nombre: 'Perezoso de tres dedos', cientifico: 'Bradypus variegatus' },
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },
