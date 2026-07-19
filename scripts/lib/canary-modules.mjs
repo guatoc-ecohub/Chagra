@@ -653,11 +653,23 @@ async function runClima(ctx) {
   const snap = await httpFetch(`${base}/api/mcp/agro/clima/snapshot`, { headers: { 'X-Chagra-Token': sidecarToken }, timeoutMs: 30000 });
   const fetchedAt = snap.json?.fetched_at || null;
   const staleSnap = daysAgo(fetchedAt) > 2;
-  // Estaciones IDEAM.
-  const ideam = await callTool(base, sidecarToken, 'get_clima_ideam', { action: 'stations_near', municipio: 'Chinchiná', departamento: 'Caldas' });
+  // Estaciones IDEAM. Investigado 2026-07-19 (HTTP 0 reportado esa noche): NO es
+  // endpoint caído ni cambio de contrato — datos.gov.co responde <2s directo, y
+  // el tool en el sidecar (loopback :7880, y por la ruta externa completa)
+  // responde <2s también, reproducido en vivo. La causa real es presupuesto de
+  // timeout: el SocrataClient interno reintenta hasta 4 intentos de 15s c/u +
+  // backoff (250/500/1000ms) = hasta ~61.75s en el peor caso si datos.gov.co
+  // viene lento (no caído), pero este check abortaba su propio fetch a los
+  // 45s (default de callTool) — el cliente se rinde ANTES que el sidecar
+  // termine de reintentar, y reporta "HTTP 0" (abort) aunque el tool hubiera
+  // respondido bien un poco después. Subimos el timeout de ESTE call por
+  // encima del peor caso del sidecar, y si aun así falla, guardamos la razón
+  // real (DNS/TLS/timeout/abort) en vez de solo el código 0.
+  const ideam = await callTool(base, sidecarToken, 'get_clima_ideam', { action: 'stations_near', municipio: 'Chinchiná', departamento: 'Caldas' }, 70000);
   const ideamOk = ideam.ok && ideam.json && !ideam.json.error;
+  const ideamFailReason = !ideamOk && ideam.status === 0 ? ` (${clip(ideam.text, 150) || 'sin detalle'})` : '';
   const status = snap.ok && !staleSnap && ideamOk ? 'pass' : 'fail';
-  return { status, valor: `snapshot ${fetchedAt || 'N/A'}, IDEAM HTTP ${ideam.status}`, detalle: `clima/snapshot HTTP ${snap.status} (fetched_at=${fetchedAt}, ${staleSnap ? 'STALE' : 'fresco'}); get_clima_ideam(stations_near) HTTP ${ideam.status}${ideamOk ? '' : ' → IDEAM degradado'}.`, data: { fetched_at: fetchedAt, ideam_status: ideam.status } };
+  return { status, valor: `snapshot ${fetchedAt || 'N/A'}, IDEAM HTTP ${ideam.status}`, detalle: `clima/snapshot HTTP ${snap.status} (fetched_at=${fetchedAt}, ${staleSnap ? 'STALE' : 'fresco'}); get_clima_ideam(stations_near) HTTP ${ideam.status}${ideamOk ? '' : ` → IDEAM degradado${ideamFailReason}`}.`, data: { fetched_at: fetchedAt, ideam_status: ideam.status, ideam_error: ideamOk ? null : clip(ideam.text, 300) } };
 }
 
 async function runPrecio(ctx) {
