@@ -22,8 +22,11 @@ import { auraDeBicho } from './transformacion.js';
    sobre el lomo, BLANCO en cara-pecho-patas, FUEGO/canela en cabeza y orejas —
    con LISTA blanca subiendo por el centro de la cara, orejas LARGUÍSIMAS
    anchas y CAÍDAS que enmarcan la cara, hocico ANCHO con trufa GRANDE (la
-   nariz es su vida) y la COLA ERGUIDA con PUNTA BLANCA (la "bandera" del
-   cazador). Ojos GRANDES café con expresión dulce. Curioso, dulce,
+   nariz es su vida), el HOCICO ESCARCHADO de perro viejo (Dante tiene 15
+   años: velo blanco-hueso desde la trufa por el puente — su marca de
+   dignidad, la misma del mesh 3D), cejas CANELA del tricolor, collar VERDE
+   con plaquita de LATÓN y la COLA ERGUIDA con PUNTA BLANCA (la "bandera"
+   del cazador). Ojos GRANDES café con expresión dulce. Curioso, dulce,
    NARIZ-PRIMERO. Su seña de vida es el OLFATEO de sabueso (`olfatea` — la
    cabeza BAJA al suelo, la trufa tiembla, las orejas cuelgan hacia adelante) y
    el AULLIDO (`aulla` — hocico al cielo, boca en O, el canto del sabueso). Su
@@ -255,6 +258,17 @@ export function Beagle({
         <path d="M8.6,5.8 C8.0,7.6 6.6,8.8 5.0,9.4" />
       </g>
 
+      {/* COLLAR VERDE de Dante con su plaquita de LATÓN (gemela de la de
+          Oliver: los dos son perros CON CASA) — la misma seña del mesh 3D
+          (geomPerroAndante). Va antes de la cabeza: el hocico ancho cae
+          encima y solo asoman los lados + la placa. */}
+      <g aria-hidden="true">
+        <path d="M-5.6,-3.1 C-2.8,-1.6 2.8,-1.6 5.6,-3.1 L5.2,-1.3 C2.6,-0.1 -2.6,-0.1 -5.2,-1.3 Z"
+          fill={P.collar} stroke={RH_INK} strokeWidth="0.55" strokeLinejoin="round" />
+        <circle cx="-3.1" cy="-2.05" r="0.3" fill={P.placa} stroke={RH_INK} strokeWidth="0.25" />
+        <circle cx="4.4" cy="-1.5" r="0.68" fill={P.placa} stroke={RH_INK} strokeWidth="0.35" />
+      </g>
+
       {/* paticas delanteras CORTAS y robustas, pie BLANCO, pivote en el HOMBRO. */}
       <Miembro clase="crt-brazo-l" origen="right top"
         d="M-6.6,3.0 C-8.4,4.8 -9.0,6.9 -8.5,8.8" ancho={3.3} punta={[-8.5, 9.2]} puntaR={2.05} pie sway={vivo} delay={-0.15} glove={P.cuerpo} />
@@ -270,6 +284,13 @@ export function Beagle({
             frente, entre los ojos — la firma de la cara tricolor) */}
         <path d="M-1.3,-2.8 C-1.8,-6.4 -1.5,-10.2 0,-13.1 C1.5,-10.2 1.8,-6.4 1.3,-2.8 Z"
           fill={P.lista} opacity="0.95" />
+        {/* CEJAS CANELA del tricolor — los dos puntos más hondos sobre los
+            ojos que hacen "cara de beagle" (la misma seña del mesh 3D); van
+            DEBAJO de los trazos de ceja para que la tinta siga dibujando. */}
+        <g aria-hidden="true" fill={P.ceja} opacity="0.85">
+          <ellipse cx="-3.05" cy="-10.5" rx="1.0" ry="0.55" transform="rotate(-12 -3.05 -10.5)" />
+          <ellipse cx="3.05" cy="-10.7" rx="1.0" ry="0.55" transform="rotate(12 3.05 -10.7)" />
+        </g>
         {/* CEJAS PREOCUPADAS con el interior alzado (la carita que ruega —
             LA expresión del beagle). La derecha sube apenas MÁS (la súplica
             asimétrica con encanto — vara Angelita, nada de simetría muerta). */}
@@ -281,6 +302,22 @@ export function Beagle({
             nada fino — firma de la raza; cuelga por debajo de la cara) */}
         <path d="M-3.9,-4.9 C-4.3,-2.1 -2.6,-0.8 0,-0.8 C2.6,-0.8 4.3,-2.1 3.9,-4.9 C1.95,-3.5 -1.95,-3.5 -3.9,-4.9 Z"
           fill={P.hocico} opacity="0.97" />
+        {/* EL HOCICO ESCARCHADO de Dante — 15 años se llevan con canas: el
+            velo blanco-hueso que sube desde la trufa por el puente del hocico
+            y RALEA hacia los ojos, desbordando apenas sobre el canela de las
+            mejillas (la marca de dignidad del perro viejo — no un defecto).
+            La misma seña del mesh 3D. Trufa, boca y ojos van DESPUÉS en el
+            orden de pintado: la cara no pierde su dibujo. Encima, tres
+            CANITAS sueltas (pelitos de luz) que rematan la escarcha. */}
+        <g aria-hidden="true">
+          <ellipse cx="0" cy="-3.4" rx="4.7" ry="3.0" fill={P.escarcha} opacity="0.4" />
+          <ellipse cx="0" cy="-4.5" rx="3.2" ry="2.1" fill={P.escarcha} opacity="0.55" />
+          <g fill="none" stroke={P.cuerpoLuz} strokeWidth="0.32" strokeLinecap="round" opacity="0.7">
+            <path d="M-1.7,-6.1 L-2.1,-6.9" />
+            <path d="M0.4,-6.5 L0.3,-7.3" />
+            <path d="M2.0,-6.0 L2.5,-6.7" />
+          </g>
+        </g>
         {/* chapetas (rubor dulce, asomando junto a las orejotas) */}
         <Cachetes puntos={[{ cx: -3.4, cy: -3.9, r: 0.9 }, { cx: 3.4, cy: -3.9, r: 0.9 }]} vivo={vivo} />
         {boca}

@@ -49,7 +49,7 @@ export const DALMATA_PALETA = {
   lengua: '#ef8398',        // lengüita rosada del jadeo feliz
   lenguaHondo: '#d76a82',   // el pliegue central de la lengua (volumen del jadeo)
   collar: '#d64541',        // collar ROJO clásico de perro de finca/bombero
-  placa: '#ffd54a',         // la plaquita dorada del collar
+  placa: '#d9a848',         // la plaquita de LATÓN del collar (gemela de la de Dante — la misma del 3D)
   sombraSuelo: 'rgba(36,22,8,0.32)', // la sombra blanda bajo las patas (peso real)
 };
 

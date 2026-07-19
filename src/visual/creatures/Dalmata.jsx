@@ -21,7 +21,9 @@ import { auraDeBicho } from './transformacion.js';
    atlético de pelaje BLANCO PURO con MANCHAS NEGRAS REDONDAS bien definidas y
    SEPARADAS (la firma de la raza — mancha llena, SIN centro: no es la roseta
    del jaguar), cuerpo casi cuadrado y esbelto, PATAS LARGAS, HOCICO LARGO,
-   orejas caídas MOTEADAS, collar rojo de perro de finca y lengüita rosada que
+   orejas caídas MOTEADAS, el PARCHE negro sobre el ojo IZQUIERDO (la seña
+   particular de Oliver — la misma del mesh 3D en geomPerroAndante), motas
+   hasta la COLA, collar ROJO con plaquita de LATÓN y lengüita rosada que
    JADEA feliz. Alegre, leal, incansable. Su seña de vida es la COLA LÁTIGO que
    menea (y arrastra la grupa cuando está feliz) y el HEAD-TILT curioso (`ladea`
    — el perro que ladea la cabeza cuando no entiende). Su squash&stretch es
@@ -304,10 +306,14 @@ export function Dalmata({
       <g className="dalmata-cabeza" style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}>
         <ellipse cx="0" cy="-10.2" rx={PR.cabezaRx} ry={PR.cabezaRy}
           fill={`url(#${pelaje})`} stroke={RH_INK} strokeWidth="1.35" />
-        {/* manchitas de la cabeza (pequeñas, asimétricas — el encanto del
-            parche propio; nunca tapan el ojo) */}
+        {/* EL PARCHE DE OLIVER — la mancha negra sobre el ojo IZQUIERDO (a la
+            derecha del espectador): SU seña particular, la misma del mesh 3D
+            (geomPerroAndante). Va ANTES del ojo: el ojo de goma queda montado
+            encima y el catchlight brilla contra el negro. La manchita chica
+            de la frente queda al otro lado (asimetría viva). */}
         <g aria-hidden="true">
-          <Mancha cx={3.4} cy={-13.3} r={0.95} fill={P.mancha} />
+          <ellipse cx="2.5" cy="-11.5" rx="2.65" ry="2.6"
+            transform="rotate(-8 2.5 -11.5)" fill={P.mancha} opacity="0.96" />
           <Mancha cx={-2.0} cy={-14.0} r={0.6} fill={P.mancha} />
         </g>
         {/* HOCICO LARGO claro (la seña atlética de la raza: el morro baja BIEN
@@ -317,10 +323,12 @@ export function Dalmata({
           fill={P.hocico} opacity="0.96" />
         {/* CEJAS AMABLES (arcos suaves — la nobleza del perro viejo y bueno;
             lo contrario de la ceja fiera del jaguar). La izquierda va apenas
-            MÁS ALTA (la carita expresiva asimétrica — vara Angelita). */}
-        <g aria-hidden="true" fill="none" stroke={RH_INK} strokeWidth="0.8" strokeLinecap="round" opacity="0.75">
-          <path d="M-3.7,-13.7 Q-2.5,-14.4 -1.3,-13.9" />
-          <path d="M3.7,-13.5 Q2.5,-14.1 1.3,-13.7" />
+            MÁS ALTA (la carita expresiva asimétrica — vara Angelita). La del
+            lado del PARCHE va en BLANCO: sobre el negro la tinta desaparece
+            y la ceja clara es lo que mantiene la cara expresiva. */}
+        <g aria-hidden="true" fill="none" strokeWidth="0.8" strokeLinecap="round">
+          <path d="M-3.7,-13.7 Q-2.5,-14.4 -1.3,-13.9" stroke={RH_INK} opacity="0.75" />
+          <path d="M3.7,-13.5 Q2.5,-14.1 1.3,-13.7" stroke={P.cuerpo} opacity="0.85" />
         </g>
         {/* chapetas (rubor amable) */}
         <Cachetes puntos={[{ cx: -4.3, cy: -7.9, r: 1.05 }, { cx: 4.3, cy: -7.9, r: 1.05 }]} vivo={vivo} />

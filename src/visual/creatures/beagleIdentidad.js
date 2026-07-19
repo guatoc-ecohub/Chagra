@@ -53,6 +53,10 @@ export const BEAGLE_PALETA = {
   iris: '#7a4c22',          // ojo GRANDE café-ámbar dulce (mirada suplicante de sabueso)
   lengua: '#ef8398',        // lengüita rosada
   colaPunta: '#ffffff',     // la PUNTA BLANCA de la cola (la bandera)
+  collar: '#3a7d44',        // collar VERDE del baboso mayor de la casa (la misma seña del 3D)
+  placa: '#d9a848',         // la plaquita de LATÓN del collar (gemela de la de Oliver — la misma del 3D)
+  escarcha: '#eae3d3',      // el HOCICO ESCARCHADO de perro viejo (15 años — velo blanco-hueso, la misma del 3D)
+  ceja: '#7d4a1e',          // cejas CANELA del tricolor (los dos puntos que hacen "cara de beagle")
   sombraSuelo: 'rgba(36,22,8,0.32)', // la sombra blanda bajo las paticas (peso real)
 };
 
