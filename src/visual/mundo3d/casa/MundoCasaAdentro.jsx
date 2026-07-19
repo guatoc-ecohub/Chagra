@@ -22,6 +22,7 @@
  */
 import { useMemo, useState } from 'react';
 import EscenaCasaAdentro from './EscenaCasaAdentro.jsx';
+import PanelPasos from '../PanelPasos.jsx';
 import { decidirTier, permite3D } from '../deviceTier.js';
 import { SITIO_FOGON, SITIO_MESA, SITIO_FERMENTOS, SITIO_MUNDOS } from './casaAdentro.geom.js';
 
@@ -61,32 +62,6 @@ const CSS = `
 .mcasa { position: relative; width: 100%; height: 100%; overflow: hidden; background: #2b2116; }
 .mcasa canvas { opacity: 0; transition: opacity 0.9s ease; }
 .mcasa .casadentro-canvas--lista canvas, .mcasa canvas.casadentro-canvas--lista { opacity: 1; }
-.mcasa__panel {
-  position: absolute; left: 50%; bottom: max(0.9rem, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  width: min(26rem, calc(100% - 1.6rem));
-  padding: 0.8rem 0.95rem 0.85rem;
-  border-radius: 1rem;
-  background: rgba(26, 20, 10, 0.68);
-  box-shadow: inset 0 0 0 1px rgba(214, 188, 130, 0.3), 0 6px 24px rgba(14, 12, 8, 0.35);
-  backdrop-filter: blur(6px);
-  color: #f3ecda;
-}
-.mcasa__kicker { margin: 0 0 0.15rem; font: 600 0.68rem/1.2 system-ui, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #d9be85; }
-.mcasa__texto { margin: 0 0 0.6rem; font: 500 0.85rem/1.38 system-ui, sans-serif; color: #efe6cf; }
-.mcasa__nav { display: flex; align-items: center; gap: 0.55rem; }
-.mcasa__btn {
-  min-height: 2.5rem; min-width: 2.9rem; padding: 0 0.8rem;
-  border: 0; border-radius: 0.7rem; cursor: pointer;
-  background: linear-gradient(180deg, rgba(226, 178, 82, 0.95), rgba(186, 132, 45, 0.95));
-  color: #241703; font: 700 0.9rem/1 system-ui, sans-serif;
-  transition: transform 0.15s ease;
-}
-.mcasa__btn:active { transform: scale(0.96); }
-.mcasa__btn[disabled] { opacity: 0.35; cursor: default; }
-.mcasa__puntos { display: flex; gap: 0.35rem; margin: 0 auto; }
-.mcasa__punto { width: 0.5rem; height: 0.5rem; border-radius: 999px; background: rgba(233, 220, 190, 0.32); }
-.mcasa__punto--activo { background: #e2b252; box-shadow: 0 0 8px 1px rgba(226, 178, 82, 0.5); }
 .mcasa__accesos {
   position: absolute; top: max(0.8rem, env(safe-area-inset-top)); left: 50%;
   transform: translateX(-50%);
@@ -105,9 +80,21 @@ const CSS = `
 .mcasa__acceso:active { transform: scale(0.96); }
 @media (prefers-reduced-motion: reduce) {
   .mcasa canvas { transition: none; }
-  .mcasa__btn, .mcasa__acceso { transition: none; }
+  .mcasa__acceso { transition: none; }
 }
 `;
+
+/* Acento de la casa para el panel compartido (adobe, vela y oro viejo). */
+const TEMA_PANEL = {
+  fondo: 'rgba(26, 20, 10, 0.68)',
+  borde: 'rgba(214, 188, 130, 0.3)',
+  tinta: '#f3ecda',
+  kicker: '#d9be85',
+  acentoA: 'rgba(226, 178, 82, 0.95)',
+  acentoB: 'rgba(186, 132, 45, 0.95)',
+  tintaAccion: '#241703',
+  activo: '#e2b252',
+};
 
 /* Los destinos por defecto (rutas hash de prod); un host con router propio
    pasa sus callbacks y estos no corren. */
@@ -171,35 +158,14 @@ export default function MundoCasaAdentro({
         </button>
       </div>
 
-      <div className="mcasa__panel" role="group" aria-label="La lección de la casa">
-        <p className="mcasa__kicker">{actual.kicker}</p>
-        <p className="mcasa__texto">{actual.texto}</p>
-        <div className="mcasa__nav">
-          <button
-            type="button"
-            className="mcasa__btn"
-            onClick={() => setPaso((p) => Math.max(0, p - 1))}
-            disabled={paso === 0}
-            aria-label="Paso anterior"
-          >
-            ←
-          </button>
-          <span className="mcasa__puntos" aria-hidden="true">
-            {PASOS.map((p, i) => (
-              <span key={p.id} className={`mcasa__punto${i === paso ? ' mcasa__punto--activo' : ''}`} />
-            ))}
-          </span>
-          <button
-            type="button"
-            className="mcasa__btn"
-            onClick={() => setPaso((p) => Math.min(PASOS.length - 1, p + 1))}
-            disabled={paso === PASOS.length - 1}
-            aria-label="Paso siguiente"
-          >
-            →
-          </button>
-        </div>
-      </div>
+      <PanelPasos
+        etiqueta="La lección de la casa"
+        pasos={PASOS}
+        paso={paso}
+        onPaso={setPaso}
+        tema={TEMA_PANEL}
+        reducedMotion={reducedMotion}
+      />
     </div>
   );
 }
