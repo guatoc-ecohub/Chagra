@@ -2,10 +2,11 @@
  * MundoLecheria — el MUNDO DE LA CADENA LÁCTEA completo: el potrero navegable +
  * la lección. Mismo contrato de host que MundoCafetal: acepta `{tier,
  * reducedMotion}` (o auto-detecta con decidirTier si se monta suelto), llena a su
- * padre y guarda su estado local. Sobre la escena viven los PASOS: cuatro
- * lecciones cortas — el silvopastoril, el hato por piso térmico, la quesera de
- * la finca y el ciclo del estiércol al abono — y cada paso señala SU lugar en el
- * potrero con un anillo que respira. Copy en español de Colombia, en "usted".
+ * padre y guarda su estado local. Sobre la escena viven los PASOS: cinco
+ * lecciones cortas — el silvopastoril, el hato por piso térmico, la hora del
+ * ordeño, la quesera de la finca y el ciclo del estiércol al abono — y cada
+ * paso señala SU lugar en el potrero con un anillo que respira. Copy en
+ * español de Colombia, en "usted".
  *
  * Importa three/@react-three (vía la escena) → montar SOLO perezoso (lazy).
  */
@@ -17,34 +18,42 @@ import {
   alturaPotrero,
   SITIO_QUESERA,
   SITIO_BIODIGESTOR,
+  SITIO_ORDENO,
 } from './floraLecheria.geom.js';
 
 const enSuelo = (x, z) => [x, alturaPotrero(x, z), z];
 const PASOS = [
   {
     id: 'silvopastoril',
-    kicker: 'Paso 1 de 4 · El potrero con árboles',
+    kicker: 'Paso 1 de 5 · El potrero con árboles',
     texto:
       'Esto no es potrero pelado: es un sistema SILVOPASTORIL. Entre el pasto se siembran árboles forrajeros —nacedero, matarratón, leucaena y el arbusto botón de oro—: dan sombra, forraje con proteína y fijan nitrógeno que abona el suelo.',
     foco: enSuelo(-6.5, -1.5),
   },
   {
     id: 'hato',
-    kicker: 'Paso 2 de 4 · El hato por piso',
+    kicker: 'Paso 2 de 5 · El hato por piso',
     texto:
       'La vaca se escoge según el clima: en tierra fría, la Holstein y la Normando de buena leche; en tierra caliente, la criolla y el cruce con cebú (el de la giba), que aguanta el calor y las garrapatas. Se pastorea rotando el potrero para que el pasto descanse.',
     foco: enSuelo(-5.5, -3.2),
   },
   {
+    id: 'ordeno',
+    kicker: 'Paso 3 de 5 · La hora del ordeño',
+    texto:
+      'El ordeño es de MADRUGADA: hacia las cinco, con la bombilla prendida contra el primer azul del amanecer y el aliento del hato en el frío. Fíjese en la ubre —llena antes, vacía después— y en el orden: butaco, balde, filtro de lienzo y cantina de aluminio. Leche limpia y fría se paga mejor.',
+    foco: enSuelo(SITIO_ORDENO[0], SITIO_ORDENO[1]),
+  },
+  {
     id: 'quesera',
-    kicker: 'Paso 3 de 4 · La quesera de la finca',
+    kicker: 'Paso 4 de 5 · La quesera de la finca',
     texto:
       'La leche no se vende cruda y barata: se TRANSFORMA en la finca. En la quesera salen la cuajada y el queso campesino, el doble crema, el kumis y el yogur, y en la olla de cobre el arequipe. Ahí es donde el trabajo del campesino se paga.',
     foco: enSuelo(SITIO_QUESERA[0], SITIO_QUESERA[1]),
   },
   {
     id: 'ciclo',
-    kicker: 'Paso 4 de 4 · Nada se pierde',
+    kicker: 'Paso 5 de 5 · Nada se pierde',
     texto:
       'El estiércol no es basura: entra al biodigestor y da BIOGÁS para cocinar en la quesera y BIOL para abonar el pasto; lo demás va al montón de abono. Así se cierra el ciclo —del potrero a la leche y de vuelta al potrero— sin comprar químicos.',
     foco: enSuelo(SITIO_BIODIGESTOR[0], SITIO_BIODIGESTOR[1]),

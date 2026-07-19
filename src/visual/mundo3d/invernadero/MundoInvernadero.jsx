@@ -34,7 +34,7 @@ const PASOS = [
     id: 'microclima',
     kicker: 'Paso 1 de 5 · Un clima que usted fabrica',
     texto:
-      'Este techo de plástico no es lujo: es CLIMA hecho a mano. Adentro no golpea el aguacero, no quema la helada de madrugada y el calorcito se queda — por eso la matica tierna se cría aquí y no a la intemperie.',
+      'Este techo de plástico no es lujo: es CLIMA hecho a mano. Adentro no golpea el aguacero, no quema la helada de madrugada y el calorcito se queda. Mire el plástico por dentro, perlado de gotas: es el agua que la tierra y las matas sudan y el techo atrapa — el microclima trabajando a la vista.',
     foco: enSuelo(SITIO_PUERTA),
   },
   {
