@@ -1258,11 +1258,15 @@ function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null }) {
  * mundos en cualquiera de los dos modos visibles — la navegación no cambia. ── */
 const _proj = new THREE.Vector3();
 
-function RotulosLugares({ mundos, focoId, onEntrar, occluders }) {
+function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, kReposo = 1 }) {
   const botones = useRef({});
   const tapados = useRef({});
   const plena = useRef(null);
   const tick = useRef(0);
+  /* ZOOM SEMÁNTICO: la banda vigente ('cerca'|'media'|'lejos'), con histéresis
+     en bandaSemantica() — cruzar el umbral despacio no parpadea. Ver el bloque
+     AoE junto a CamaraViajera para los umbrales y qué muestra cada banda. */
+  const banda = useRef('media');
 
   // Anclas en el mundo: misma altura que tenía la etiqueta original (1.7 dentro
   // del group escalado del landmark → 1.7 × escala en coordenadas del valle).
@@ -1290,6 +1294,18 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders }) {
     // ~12 pasadas/s alcanzan para rótulos; corre en el PRIMER frame (importa
     // con frameloop='demand' de reduced-motion, que renderiza pocos frames).
     if (tick.current++ % 5 !== 0) return;
+
+    /* La banda del zoom semántico: distancia cámara→mira de los controles
+       (la mira viaja con el pan/foco — la banda sigue al ENCUADRE, no al
+       origen). Sin controles todavía, se queda en 'media' (lo aprobado). */
+    if (controls?.current) {
+      banda.current = bandaSemantica(
+        banda.current,
+        camera.position.distanceTo(controls.current.target),
+        kReposo,
+      );
+    }
+    const enBanda = banda.current;
 
     const enPantalla = (v) => {
       _proj.copy(v).project(camera);
@@ -1345,16 +1361,52 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders }) {
       let modo = 'oculto';
       if (p.elegible) {
         const esPlena = p.id === candidata;
-        const r = esPlena
-          ? rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48)
-          : rectoDe(p.x, p.y, 44, 44);
-        if (!pisa(r)) {
-          tomados.push(r);
-          modo = esPlena ? 'plena' : 'punto';
+        if (enBanda === 'lejos') {
+          /* ESTRATÉGICA (lejos): el mapa AoE — cada rótulo que quepa muestra
+             su nombre completo; el que no cabe cae a punto-chip, luego cede.
+             La finca entera se entiende de un vistazo. */
+          const rp = rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48);
+          if (!pisa(rp)) {
+            tomados.push(rp);
+            modo = 'plena';
+          } else {
+            const rq = rectoDe(p.x, p.y, 44, 44);
+            if (!pisa(rq)) {
+              tomados.push(rq);
+              modo = 'punto';
+            }
+          }
+        } else if (enBanda === 'cerca' && p.id !== focoId) {
+          /* DETALLE (cerca): mandan las texturas, los bichos y las matas —
+             solo el lugar apuntado conserva un punto-chip (sigue tocable);
+             el resto descansa. El mundo activo (focoId) cae al caso de abajo
+             y conserva su nombre completo mientras se entra. */
+          if (esPlena) {
+            const rq = rectoDe(p.x, p.y, 44, 44);
+            if (!pisa(rq)) {
+              tomados.push(rq);
+              modo = 'punto';
+            }
+          }
+        } else {
+          /* MEDIA: el comportamiento aprobado tal cual — el apuntado con
+             nombre completo, los demás como punto-chip. */
+          const r = esPlena
+            ? rectoDe(p.x, p.y, 76 + p.titulo.length * 9, 48)
+            : rectoDe(p.x, p.y, 44, 44);
+          if (!pisa(r)) {
+            tomados.push(r);
+            modo = esPlena ? 'plena' : 'punto';
+          }
         }
       }
       const btn = botones.current[p.id];
-      if (btn && btn.dataset.modo !== modo) btn.dataset.modo = modo;
+      if (btn) {
+        if (btn.dataset.modo !== modo) btn.dataset.modo = modo;
+        // La banda queda en el DOM (data-banda): CSS futuro puede reaccionar
+        // (p. ej. chips más grandes en estratégica) sin tocar este JS.
+        if (btn.dataset.banda !== enBanda) btn.dataset.banda = enBanda;
+      }
     }
   });
 
@@ -1749,13 +1801,66 @@ function AplaneNewDonk({ foco, aplanando }) {
   return null;
 }
 
+/* ── PANEO GLOBAL "Age of Empires" (backlog AoE #2) + ZOOM SEMÁNTICO ──
+   El valle entero se puede RECORRER (pan) sin perderse:
+   · LÍMITES del paseo: la mira vive dentro de PAN_LIMITES — la finca completa
+     (lugares en x∈[-5.7,6.4], z∈[-7.6,8.1]) más un poco de aire; nunca el
+     vacío del plano de 34×34. Hay una sobra elástica de PAN_SOBRA unidades:
+     llegar al borde no es un muro seco — el resorte PAN_RESORTE devuelve la
+     mira al área con la misma calma del damping 0.08 aprobado. La corrección
+     mueve mira Y cámara juntas (translación): el borde empuja de vuelta sin
+     torcer el encuadre.
+   · La mira se PEGA AL SUELO mientras se pasea (alturaTerreno + 0.8): pasear
+     hacia el páramo encuadra el páramo, no el aire sobre la tierra baja.
+   · Se eligió OrbitControls con pan habilitado (NO MapControls): MapControls
+     cambia el gesto primario a PAN — rompería "un dedo orbita" (el gesto
+     aprobado) y la coreografía existente que comparte este ref (CamaraViajera
+     + DirectorValle + AplaneNewDonk). El pan clampeado da el mapa AoE sin
+     re-cablear ninguna cámara.
+   · VOLVER AL ENCUADRE DE AUTOR: doble-toque/doble-clic sobre el valle
+     regresa suave (VOLVER_S) a la pose de reposo aprobada (posición + mira).
+     Con reduced-motion el regreso es un corte directo, sin animación. */
+const PAN_LIMITES = { x0: -9, x1: 9, z0: -9.5, z1: 9.5 };
+const PAN_SOBRA = 2.5; // sobra elástica más allá del límite antes del muro duro
+const PAN_RESORTE = 0.12; // resorte de regreso al área (fracción por frame)
+const PAN_PEGA_SUELO = 0.1; // qué tan rápido la mira se pega al terreno al pasear
+const VOLVER_S = 1.15; // duración del regreso al encuadre de autor
+const _volverPos = new THREE.Vector3();
+const _volverMira = new THREE.Vector3();
+
+/* Bandas del ZOOM SEMÁNTICO (por distancia cámara→mira) con HISTÉRESIS: el
+   umbral de entrada y el de salida difieren ~1.5 u — cruzar despacio no hace
+   parpadear los rótulos. Los umbrales de 'lejos' escalan con kReposo: en un
+   teléfono parado la pose de reposo vive más lejos y debe seguir cayendo en
+   banda 'media' (el comportamiento aprobado).
+   · 'cerca' (entra d<11 / sale d>12.5): DETALLE — mandan texturas, bichos y
+     matas; los rótulos se calman (solo el apuntado, como punto-chip).
+   · 'media': el comportamiento aprobado tal cual (apuntado plena, resto punto).
+   · 'lejos' (entra d>21·k / sale d<19.5·k): vista ESTRATÉGICA — el mapa AoE:
+     cada rótulo que quepa en pantalla muestra su nombre completo. */
+const BANDA_CERCA_ENTRA = 11;
+const BANDA_CERCA_SALE = 12.5;
+const BANDA_LEJOS_ENTRA = 21;
+const BANDA_LEJOS_SALE = 19.5;
+
+function bandaSemantica(previa, d, k = 1) {
+  const lejosEntra = BANDA_LEJOS_ENTRA * k;
+  const lejosSale = BANDA_LEJOS_SALE * k;
+  if (previa === 'lejos') return d < lejosSale ? (d < BANDA_CERCA_ENTRA ? 'cerca' : 'media') : 'lejos';
+  if (previa === 'cerca') return d > BANDA_CERCA_SALE ? (d > lejosEntra ? 'lejos' : 'media') : 'cerca';
+  return d > lejosEntra ? 'lejos' : d < BANDA_CERCA_ENTRA ? 'cerca' : 'media';
+}
+
 /* ── Cámara: viaja suavemente hacia el foco (target) cuando cambia de mundo Y
       HACE ZOOM hacia el lugar — la sensación de ENTRAR con la abeja, no un modal
       plano. El acercamiento solo se fuerza durante la transición (una vez llega,
       suelta el control para que el usuario siga haciendo zoom a mano). Durante
       el APLANE New Donk cede TODO el control a AplaneNewDonk (early-return): no
-      mueve target ni zoom para no pelear con la caída. ── */
-function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, kReposo = 1, miraInicial = null }) {
+      mueve target ni zoom para no pelear con la caída.
+      Además conduce el PANEO ACOTADO (clamp elástico del target), el paseo
+      libre (apaga el recentrado cuando el usuario panea) y el regreso al
+      encuadre de autor por doble-toque — ver el bloque AoE de arriba. ── */
+function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, kReposo = 1, miraInicial = null, reposo = null, reducedMotion = false }) {
   const trans = useRef(0);
   const prevKey = useRef(focoKey);
   const entrando = focoKey !== 'valle';
@@ -1765,19 +1870,130 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, 
      ratos" — el chip se corría del toque. El primer gesto de órbita apaga la
      deriva por el resto de la sesión del valle. */
   const [tomada, setTomada] = useState(false);
-  useFrame(() => {
+  /* PASEO LIBRE (pan AoE): true desde que el usuario panea o pellizca (2
+     punteros, o arrastre con botón derecho). Mientras dura, el lerp de
+     recentrado al reposo se apaga — si no, el resorte se tragaba el paseo.
+     Se detecta por GESTO (no por movimiento del target): el DirectorValle
+     también mueve el target con offsets aditivos y dispararía falsos. */
+  const panLibre = useRef(false);
+  /* El regreso al encuadre de autor (doble-toque): animación propia. */
+  const volver = useRef({ activo: false, p: 0, desde: new THREE.Vector3(), desdeMira: new THREE.Vector3() });
+  /* Espejo vivo de props para los listeners DOM (se refresca en useFrame):
+     el efecto de listeners se registra UNA vez y no persigue re-renders. */
+  const vivo = useRef({ entrando, aplanando, reducedMotion, reposo, mira: miraInicial });
+  const { gl } = useThree();
+
+  useEffect(() => {
+    const el = gl.domElement;
+    let activos = 0; // punteros abajo ahora mismo (2+ = pan/pellizco táctil)
+    let bajada = null; // dónde bajó el puntero (distinguir TAP de arrastre)
+    let tapPrevio = null; // el tap anterior (detectar el doble-toque)
+    const onDown = (e) => {
+      activos += 1;
+      if (activos >= 2 || e.button === 2) panLibre.current = true;
+      bajada = { x: e.clientX, y: e.clientY };
+    };
+    const onUp = (e) => {
+      activos = Math.max(0, activos - 1);
+      const v = vivo.current;
+      if (!bajada || v.entrando || v.aplanando) {
+        tapPrevio = null;
+        return;
+      }
+      const movio = Math.hypot(e.clientX - bajada.x, e.clientY - bajada.y) > 9;
+      bajada = null;
+      if (movio) {
+        tapPrevio = null; // fue un arrastre (órbita/pan), no un toque
+        return;
+      }
+      const ahora = performance.now();
+      const esDoble =
+        tapPrevio &&
+        ahora - tapPrevio.t < 350 &&
+        Math.hypot(e.clientX - tapPrevio.x, e.clientY - tapPrevio.y) < 28;
+      if (!esDoble) {
+        tapPrevio = { x: e.clientX, y: e.clientY, t: ahora };
+        return;
+      }
+      tapPrevio = null;
+      /* DOBLE-TOQUE sobre el valle (el canvas — los rótulos DOM no llegan
+         aquí; tocar un mundo entra a él y `entrando` bloquea): VOLVER AL
+         ENCUADRE DE AUTOR. Nadie se queda perdido en el paseo. */
+      panLibre.current = false;
+      const c = controls.current;
+      if (!c || !v.reposo || !v.mira) return;
+      if (v.reducedMotion) {
+        // Calma pedida: corte directo a la pose aprobada, sin viaje.
+        c.object.position.set(v.reposo[0], v.reposo[1], v.reposo[2]);
+        c.target.set(v.mira[0], v.mira[1], v.mira[2]);
+        c.update();
+        return;
+      }
+      const va = volver.current;
+      va.activo = true;
+      va.p = 0;
+      va.desde.copy(c.object.position);
+      va.desdeMira.copy(c.target);
+    };
+    const onCancel = () => {
+      activos = Math.max(0, activos - 1);
+      bajada = null;
+      tapPrevio = null;
+    };
+    el.addEventListener('pointerdown', onDown);
+    el.addEventListener('pointerup', onUp);
+    el.addEventListener('pointercancel', onCancel);
+    return () => {
+      el.removeEventListener('pointerdown', onDown);
+      el.removeEventListener('pointerup', onUp);
+      el.removeEventListener('pointercancel', onCancel);
+    };
+  }, [gl, controls]);
+
+  useFrame((_, delta) => {
     if (!controls.current || aplanando) return;
     const c = controls.current;
+    const v = vivo.current;
+    v.entrando = entrando;
+    v.aplanando = aplanando;
+    v.reducedMotion = reducedMotion;
+    v.reposo = reposo;
+    v.mira = miraInicial;
     if (focoKey !== prevKey.current) {
       trans.current = 1; // arrancó una nueva "entrada": acompañar el zoom
       prevKey.current = focoKey;
+      panLibre.current = false; // el viaje manda: el paseo libre se cierra
+      volver.current.activo = false;
+    }
+    /* El REGRESO AL ENCUADRE DE AUTOR: mientras corre, manda este frame. */
+    const va = volver.current;
+    if (va.activo) {
+      if (entrando || !reposo) {
+        va.activo = false;
+      } else {
+        va.p = Math.min(1, va.p + Math.min(delta, 1 / 20) / VOLVER_S);
+        const kv = _easeAplane(va.p);
+        const miraV = miraInicial || MIRA_VALLE;
+        _volverPos.set(reposo[0], reposo[1], reposo[2]);
+        _volverMira.set(miraV[0], miraV[1], miraV[2]);
+        c.object.position.lerpVectors(va.desde, _volverPos, kv);
+        c.target.lerpVectors(va.desdeMira, _volverMira, kv);
+        if (va.p >= 1) va.activo = false;
+        c.update();
+        return;
+      }
     }
     /* ASIMETRÍA DEL VIAJE (dirección): ENTRAR es decidido (el toque pide ir
        ya); VOLVER es una exhalación — más lento, el valle se abre con calma y
        llegar a casa se siente distinto a salir de ella. (El regreso subió de
        0.042: la exhalación se sentía LENTITUD, feedback del operador.) */
     const k = entrando ? 0.07 : 0.052;
-    c.target.lerp(new THREE.Vector3(foco.x, foco.y + 0.6, foco.z), k);
+    /* En PASEO LIBRE el recentrado al reposo se apaga: la cámara es del
+       usuario (si no, este lerp se tragaba el pan a 5%/frame). Los viajes a
+       mundo (entrando) siempre mandan — panLibre se cierra al cambiar foco. */
+    if (!panLibre.current) {
+      c.target.lerp(new THREE.Vector3(foco.x, foco.y + 0.6, foco.z), k);
+    }
     if (trans.current > 0) {
       const cam = c.object;
       const dir = cam.position.clone().sub(c.target);
@@ -1788,13 +2004,51 @@ function CamaraViajera({ foco, focoKey, controls, autoOrbit, aplanando = false, 
       cam.position.copy(c.target.clone().add(dir));
       trans.current = Math.max(0, trans.current - (entrando ? 0.012 : 0.009));
     }
+    /* PANEO ACOTADO (AoE): muro duro en límite+sobra, resorte elástico hacia
+       el área — la corrección traslada mira Y cámara juntas para no torcer
+       el encuadre. Con reduced-motion el borde es un clamp seco (sin rebote). */
+    {
+      const t = c.target;
+      const cam = c.object;
+      const antesX = t.x;
+      const antesZ = t.z;
+      let nx = THREE.MathUtils.clamp(t.x, PAN_LIMITES.x0 - PAN_SOBRA, PAN_LIMITES.x1 + PAN_SOBRA);
+      let nz = THREE.MathUtils.clamp(t.z, PAN_LIMITES.z0 - PAN_SOBRA, PAN_LIMITES.z1 + PAN_SOBRA);
+      const kR = reducedMotion ? 1 : PAN_RESORTE;
+      nx += (THREE.MathUtils.clamp(nx, PAN_LIMITES.x0, PAN_LIMITES.x1) - nx) * kR;
+      nz += (THREE.MathUtils.clamp(nz, PAN_LIMITES.z0, PAN_LIMITES.z1) - nz) * kR;
+      if (nx !== antesX || nz !== antesZ) {
+        t.setX(nx);
+        t.setZ(nz);
+        cam.position.setX(cam.position.x + (nx - antesX));
+        cam.position.setZ(cam.position.z + (nz - antesZ));
+      }
+      /* La mira se pega al TERRENO durante el paseo: subir al páramo encuadra
+         el páramo (la cámara sube con ella — translación, no picada). */
+      if (panLibre.current && !entrando) {
+        const dy = (alturaTerreno(t.x, t.z) + 0.8 - t.y) * (reducedMotion ? 1 : PAN_PEGA_SUELO);
+        if (dy !== 0) {
+          t.setY(t.y + dy);
+          cam.position.setY(cam.position.y + dy);
+        }
+      }
+    }
     c.update();
   });
   return (
     <OrbitControls
       ref={controls}
       makeDefault
-      enablePan={false}
+      /* PANEO AoE habilitado — acotado por el clamp elástico de arriba. */
+      enablePan
+      /* El pan corre HORIZONTAL sobre la finca (no en el plano de pantalla):
+         la mira nunca vuela al cielo — el mapa se recorre, no se descuelga. */
+      screenSpacePanning={false}
+      panSpeed={0.9}
+      /* TÁCTIL (campesino con teléfono): UN dedo ORBITA — el gesto aprobado —,
+         DOS dedos PANEAN y pellizcan ZOOM. Usable con el pulgar; en desktop
+         el arrastre con botón derecho panea (default de OrbitControls). */
+      touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
       enableZoom
       /* El target ARRANCA en la mira de reposo (no en el origen): el primer
          fotograma ya es el encuadre de autor — clave en reduced-motion
@@ -2230,6 +2484,8 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           focoId={focoId}
           onEntrar={onEntrar}
           occluders={occluders}
+          controls={controls}
+          kReposo={poseReposo.k}
         />
       )}
 
@@ -2259,6 +2515,8 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
         aplanando={aplanando}
         kReposo={poseReposo.k}
         miraInicial={miraReposo}
+        reposo={poseReposo.position}
+        reducedMotion={reducedMotion}
       />
       {/* La CÁMARA DE DIRECTOR (FASE 4). Con el flag `camaraDirector`:
           DirectorValle (establishing + follow + beats), montado DESPUÉS de
