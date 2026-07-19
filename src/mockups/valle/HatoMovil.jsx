@@ -4,12 +4,15 @@
  * El potrero deja de ser un bodegón: las vacas CAMINAN entre apartos y se
  * paran a pastar, las ovejas van en rebaño (un ancla que deriva y cada oveja
  * la sigue con su puesto), las gallinas picotean y se DISPERSAN cuando pasa
- * los perros, y DOS perros arrean orbitando el rebaño: el DÁLMATA grande
- * (alto y casi cuadrado, blanco de manchas negras redondas, manda el arreo)
- * y el BEAGLE chico (bajito y alargado, orejón, tricolor con cola en bandera,
- * va detrás, más nervioso) — cada uno con malla de SU raza (fincaRealista):
- * se distinguen por SILUETA desde lejos, no solo por color. Rumbo
- * suavizado, vaivén de paso (bob + balanceo), pausas de pastoreo.
+ * un perro, y DOS perros VIVEN la finca entera: OLIVER el dálmata (alto y
+ * casi cuadrado, blanco de manchas redondas, parche sobre el ojo) y DANTE el
+ * beagle viejo (bajito y alargado, orejón, tricolor de hocico escarchado).
+ * Ya NO orbitan un punto: cada uno RONDA la finca por los senderos reales
+ * con su ruta larga propia (rondaDePerros) y querencia por los animales —
+ * el arreo orbital del hato sobrevive como la mejor etapa del plan. Cada uno
+ * con malla de SU raza (fincaRealista): se distinguen por SILUETA desde
+ * lejos, no solo por color. Rumbo suavizado, paradas de verdad (las patas
+ * ATERRIZAN a la zancada plantada), vaivén de paso.
  *
  * Reusa el banco de fauna REALISTA del valle (veredicto del operador: el
  * ganado va realista; los rubber-hose son la fauna con alma): las mallas de
@@ -39,6 +42,10 @@ import {
   geomGallina,
   geomPerroAndante,
 } from '../../visual/mundo3d/finca/fincaRealista.geom.js';
+import {
+  CASA_VALLE,
+  COMPOSICION_LUGARES,
+} from '../../visual/mundo3d/direccion/composicionValle.js';
 
 /* ── PRNG determinista (mulberry32): la escena es la misma en cada carga ── */
 function prng(semilla) {
@@ -62,6 +69,30 @@ function giroCorto(desde, hacia) {
 
 /* Las mallas miran a +X; rumbo (dx,dz) → rotation.y. */
 const rumboY = (dx, dz) => Math.atan2(-dz, dx);
+
+/* Polilínea por longitud de arco (mismo patrón que ArrieriaValle; copiado
+   chico para mantener el módulo autocontenido). */
+function prepararRuta(puntos) {
+  const largos = [0];
+  for (let i = 1; i < puntos.length; i++) {
+    const dx = puntos[i][0] - puntos[i - 1][0];
+    const dz = puntos[i][1] - puntos[i - 1][1];
+    largos.push(largos[i - 1] + Math.hypot(dx, dz));
+  }
+  return { puntos, largos, total: largos[largos.length - 1] || 1 };
+}
+
+function puntoEnRuta(ruta, s) {
+  const d = s * ruta.total;
+  let i = 1;
+  while (i < ruta.largos.length - 1 && ruta.largos[i] < d) i++;
+  const d0 = ruta.largos[i - 1];
+  const seg = ruta.largos[i] - d0 || 1;
+  const t = (d - d0) / seg;
+  const [x0, z0] = ruta.puntos[i - 1];
+  const [x1, z1] = ruta.puntos[i];
+  return { x: x0 + (x1 - x0) * t, z: z0 + (z1 - z0) * t, dx: x1 - x0, dz: z1 - z0 };
+}
 
 /*
  * Cuerpo + cabeza fusionados en UNA geometría para instanciar (la cabeza
@@ -92,12 +123,20 @@ const TIERS = {
 };
 
 /*
- * Los DOS perros del arreo (pedido del operador): el dálmata GRANDE manda la
- * órbita ancha y el beagle CHICO trota detrás, más nervioso. Cada uno tiene
- * MALLA de su raza (fincaRealista.geom): la diferencia de lejos no es solo
- * escala — el dálmata es alto y casi cuadrado (cruz ~0.5 de malla) y el
- * beagle bajito y alargado (cruz ~0.38), así que 0.9 vs 0.62 deja al beagle
- * a ~media altura del dálmata sin volverlo pulga.
+ * Los DOS perros de la finca (pedido del operador): recorren TODA la finca
+ * JUNTOS ~90% del tiempo, cada uno a su manera. Cada uno tiene MALLA de su
+ * raza (fincaRealista.geom): la diferencia de lejos no es solo escala — el
+ * dálmata es alto y casi cuadrado (cruz ~0.5 de malla) y el beagle bajito y
+ * alargado (cruz ~0.38), así que 0.9 vs 0.62 deja al beagle a ~media altura
+ * del dálmata sin volverlo pulga.
+ *
+ * PERSONALIDAD en números: `vel` (Oliver atlético casi dobla a Dante viejo),
+ * `banquina` (offset perpendicular al sendero: cada uno pisa SU huella, por
+ * fuera del eje que es de la mula de ArrieriaValle), `husmea` (Dante
+ * zigzaguea con la nariz al suelo y se para a olfatear a mitad de tramo),
+ * `rOrb`/`velArreo` (en el hato Oliver orbita ancho y Dante cierra por
+ * dentro). Oliver FRENA y mira atrás si Dante se rezaga (>2.2 u) y ESPERA
+ * en cada cita de fin de etapa: juntos, sin pisarse.
  *
  * Van ARTICULADOS (geomPerroAndante): 4 patas + cola + (Dante) lengua, con
  * un ciclo de TROTE en diagonal cuya fase avanza con la DISTANCIA recorrida
@@ -105,9 +144,57 @@ const TIERS = {
  * = pasitos rápidos), y no hay frecuencia que ajustar a mano.
  */
 const PERROS = [
-  { nombre: 'Oliver', raza: 'dalmata', escala: 0.9, rOrb: 1.0, velAng: 0.42, fase: 0.8 },
-  { nombre: 'Dante', raza: 'beagle', escala: 0.62, rOrb: 0.72, velAng: 0.58, fase: 3.4 },
+  { nombre: 'Oliver', raza: 'dalmata', escala: 0.9, vel: 0.78, banquina: -0.14, husmea: false, rOrb: 1.0, velArreo: 0.42, fase: 0.8 },
+  { nombre: 'Dante', raza: 'beagle', escala: 0.62, vel: 0.52, banquina: 0.16, husmea: true, rOrb: 0.72, velArreo: 0.58, fase: 3.4 },
 ];
+
+/*
+ * LA RONDA DE LA FINCA — el plan compartido de los dos perros (feedback del
+ * operador: "recorrido diferente pero juntos el 90% del tiempo"). UNA sola
+ * secuencia de etapas por los senderos reales (composicionValle): ambos
+ * caminan la misma etapa a la vez — Oliver derecho por su banquina, Dante
+ * zigzagueando por la suya — y al rematar cada etapa hay CITA: nadie arranca
+ * la siguiente hasta que el otro llegue. La única separación real es la
+ * BIFURCACIÓN (etapa con `ptsB`): Dante se desvía a la pila de compost (el
+ * cielo de un beagle) mientras Oliver va derecho a la tranquera y lo espera
+ * — ~10% del ciclo. La querencia por los animales es estructural: la ronda
+ * ARRANCA arreando el hato (la etapa orbital aprobada de siempre) y pasa por
+ * el gallinero; entre ambos es el tramo más largo de pausa del plan.
+ *
+ * Cada etapa: { pts, ptsB?, dur, paraA?, paraB?, paradas? } — pts en coords
+ * MUNDO ([x, z]); `paradas` = fracciones de arco donde Dante clava la nariz.
+ * `paraA`/`paraB` = gesto del alto de fin de etapa (default: Oliver 'vigila'
+ * con la cabeza en barrido alto, Dante 'olfatea' con el hocico clavado).
+ */
+function rondaDePerros(cx, cz, radio) {
+  const L = COMPOSICION_LUGARES;
+  const casaG = [cx + Math.cos(1.2 + Math.PI) * radio * 0.45, cz + Math.sin(1.2 + Math.PI) * radio * 0.45];
+  const tranquera = [cx + 1.4, cz + 1.0];
+  const patio = [CASA_VALLE.pos[0] - 0.4, CASA_VALLE.pos[1] + 0.9];
+  return [
+    // 1 · EL HATO: los dos arrean orbitando el rebaño (la etapa reina).
+    { arrea: true, dur: 9 },
+    // 2 · Al GALLINERO: pasan juntos y las gallinas se dispersan.
+    { pts: [[casaG[0] + 0.55, casaG[1] - 0.35]], dur: 4 },
+    // 3 · BIFURCACIÓN (el ~10% separados): Oliver derecho a la tranquera;
+    //     Dante se desvía por la PILA de compost y olfatea el camino.
+    {
+      pts: [[cx - 0.4, cz + 0.6], tranquera],
+      ptsB: [[cx + 0.2, cz + 1.4], [-3.5, 7.3], [L.abono[0] + 0.2, L.abono[1] - 0.3], [-3.6, 6.9], tranquera],
+      dur: 2.5,
+      paradas: [0.45],
+    },
+    // 4 · Tranquera → eras → el PATIO de la casa (el circuito de la mañana).
+    { pts: [[-2.9, 5.8], [-2.0, 5.2], [L.suelo[0] + 0.3, L.suelo[1] - 0.6], patio], dur: 3, paradas: [0.55] },
+    // 5 · A la QUEBRADA por el camino del balde: los dos BEBEN (cabeza baja).
+    { pts: [[-0.5, 2.2], [0.5, 1.0], [1.35, 0.3]], dur: 3, paraA: 'olfatea' },
+    // 6 · Quebrada → HUERTA → MERCADO por la plaza: la ronda del frente.
+    { pts: [[1.8, 1.5], [2.6, 3.1], [L.sanidad[0] - 0.2, L.sanidad[1] - 0.4], [4.2, 5.4], [L.mercado[0] - 0.3, L.mercado[1] - 0.3]], dur: 2.5, paradas: [0.6] },
+    // 7 · El REGRESO largo: plaza → casa → tranquera → potrero (sin alto:
+    //     desemboca en el arreo y la ronda vuelve a empezar).
+    { pts: [[3.2, 4.9], [1.4, 4.2], [-0.4, 3.1], [-2.0, 5.1], [-3.0, 5.9], [cx + 0.9, cz + 0.4]], dur: 0, paradas: [0.35, 0.7] },
+  ];
+}
 
 /* Ciclo de marcha: amplitud del péndulo de pata (rad) y desfase por pata en
    TROTE (diagonales alternas: del-izq+tras-der vs del-der+tras-izq). */
@@ -237,19 +324,32 @@ export default function HatoMovil({
       };
     });
 
-    // La pareja de arreo orbita el rebaño con arranques de carrera: Oliver
-    // (dálmata) por fuera marcando el paso, Dante (beagle) por dentro,
-    // desfasado media órbita para cerrar la pinza. `faseTranco` es la fase
-    // del ciclo de marcha: avanza con la distancia recorrida, y en
-    // reducedMotion arranca en 0 = zancada PLANTADA (las 4 patas en tierra,
-    // diagonales extendidas — pose digna, no flotando).
-    const perros = PERROS.map((cfg, i) => ({
-      cfg,
-      ang: r() * Math.PI * 2 + i * Math.PI,
-      pos: [rebano.pos[0] + cfg.rOrb, rebano.pos[1]],
-      rumbo: 0,
-      faseTranco: reducedMotion ? 0 : cfg.fase,
-    }));
+    // Los perros arrancan JUNTOS en la tranquera del potrero, cada uno en su
+    // gesto (Oliver plantado alto vigilando el hato, Dante nariz al suelo),
+    // y de ahí salen a la RONDA compartida (rondaDePerros). `faseTranco`
+    // arranca en 0 = zancada PLANTADA (las 4 patas en tierra, diagonales
+    // extendidas): en reducedMotion se quedan así — un fotograma digno.
+    const ronda = rondaDePerros(cx, cz, radio);
+    const perros = PERROS.map((cfg, i) => {
+      const pos = i === 0 ? [cx + 1.35, cz + 0.9] : [cx + 0.85, cz + 1.3];
+      return {
+        cfg,
+        plan: ronda,
+        etapa: ronda.length - 1, // la cita inicial arranca la etapa 0 (arrea)
+        modo: 'para',
+        para: i === 0 ? 'vigila' : 'olfatea',
+        tModo: reducedMotion ? Infinity : 1.6 + i * 0.7,
+        sigueTramo: false,
+        parada: 0,
+        s: 0,
+        ruta: null,
+        angArreo: 0,
+        rArreo: cfg.rOrb,
+        pos,
+        rumbo: rumboY(cx - pos[0], cz - pos[1]),
+        faseTranco: 0,
+      };
+    });
 
     return { clave: claveHato, vacas, rebano, gallinas, perros };
   };
@@ -403,47 +503,152 @@ export default function HatoMovil({
       }
     }
 
-    /* ── PERROS: Oliver y Dante orbitan arreando — con MARCHA de verdad ──
-       El ciclo de trote va ATADO al desplazamiento: la fase avanza con la
-       distancia recorrida dividida por la zancada de la raza. La pata en
-       apoyo barre hacia atrás mientras el cuerpo pasa por encima (bóveda de
-       paso: alto a mitad de apoyo, bajo en el cruce de diagonales), y la
-       pata en vuelo vuelve PLEGADA (scale.y = rodilla barata). Con eso el
-       pie queda plantado por construcción: cero patinaje a cualquier
-       velocidad, y si el brío acelera la órbita, la cadencia sube sola. */
-    hato.perros.forEach((pr, i) => {
-      const { escala, rOrb, velAng, fase } = pr.cfg;
-      const info = g.perros[pr.cfg.raza];
-      const brio = 0.6 + Math.max(0, Math.sin(t * 0.31 + fase)) * 1.6; // trote↔carrera
-      pr.ang += dt * velAng * brio;
-      const rr = rOrb + Math.sin(t * 0.23 + fase) * 0.14;
-      let px = rb.pos[0] + Math.cos(pr.ang) * rr;
-      let pz = rb.pos[1] + Math.sin(pr.ang) * rr;
-      // OLIVER el cariñoso: cuando las órbitas se cruzan, se ARRIMA a Dante.
-      const otro = hato.perros[1 - i];
-      const dOtro = Math.hypot(px - otro.pos[0], pz - otro.pos[1]);
-      const carino = i === 0 ? Math.max(0, 1 - dOtro / 0.6) : 0;
-      if (carino > 0) {
-        px += (otro.pos[0] - px) * carino * 0.25;
-        pz += (otro.pos[1] - pz) * carino * 0.25;
+    /* ── PERROS: Dante y Oliver RONDAN la finca — juntos, con marcha real ──
+       Motor de etapas compartido (rondaDePerros): 'arrea' orbita el rebaño,
+       'camino' avanza por la ruta de la etapa (preparada al entrar con la
+       posición actual prependida: cero teleports entre etapas), 'para' es el
+       alto con gesto (olfatea/vigila/bebe) y 'cita' el reencuentro — nadie
+       arranca la etapa siguiente sin el otro (juntos ~90% del ciclo).
+       El ciclo de trote sigue ATADO al desplazamiento: la fase avanza con la
+       distancia recorrida dividida por la zancada de la raza (la pata en
+       apoyo barre hacia atrás mientras el cuerpo pasa encima; la pata en
+       vuelo vuelve PLEGADA) — cero patinaje a cualquier velocidad, y parado
+       la fase ATERRIZA en la zancada plantada más cercana (kπ). */
+    const entrarEtapa = (pr, idx) => {
+      pr.etapa = idx;
+      pr.parada = 0;
+      pr.sigueTramo = false;
+      const et = pr.plan[idx];
+      if (et.arrea) {
+        pr.modo = 'arrea';
+        pr.tModo = et.dur;
+        pr.angArreo = Math.atan2(pr.pos[1] - rb.pos[1], pr.pos[0] - rb.pos[0]);
+        pr.rArreo = Math.max(0.35, Math.hypot(pr.pos[0] - rb.pos[0], pr.pos[1] - rb.pos[1]));
+      } else {
+        pr.modo = 'camino';
+        pr.s = 0;
+        const pts = pr.cfg.husmea && et.ptsB ? et.ptsB : et.pts;
+        pr.ruta = prepararRuta([[pr.pos[0], pr.pos[1]], ...pts]);
       }
+    };
+    // La CITA: solo cuando LOS DOS remataron su etapa arrancan la siguiente.
+    if (hato.perros.every((pr) => pr.modo === 'cita')) {
+      const sig = (hato.perros[0].etapa + 1) % hato.perros[0].plan.length;
+      hato.perros.forEach((pr) => entrarEtapa(pr, sig));
+    }
+    hato.perros.forEach((pr, i) => {
+      const { escala, fase } = pr.cfg;
+      const info = g.perros[pr.cfg.raza];
+      const otro = hato.perros[1 - i];
+      const dOtro0 = Math.hypot(pr.pos[0] - otro.pos[0], pr.pos[1] - otro.pos[1]);
+      let px = pr.pos[0];
+      let pz = pr.pos[1];
+      let quieto = false;
+
+      if (pr.modo === 'arrea') {
+        // La etapa del hato (la de siempre): Oliver orbita ancho marcando el
+        // paso y Dante cierra la pinza por dentro, con arranques de carrera.
+        const brio = 0.6 + Math.max(0, Math.sin(t * 0.31 + fase)) * 1.4;
+        pr.tModo -= dt;
+        pr.angArreo += dt * pr.cfg.velArreo * brio;
+        pr.rArreo += (pr.cfg.rOrb - pr.rArreo) * Math.min(1, dt * 0.9);
+        const rr = pr.rArreo + Math.sin(t * 0.23 + fase) * 0.12;
+        px = rb.pos[0] + Math.cos(pr.angArreo) * rr;
+        pz = rb.pos[1] + Math.sin(pr.angArreo) * rr;
+        if (pr.tModo <= 0) pr.modo = 'cita';
+      } else if (pr.modo === 'para') {
+        // Alto de verdad: el cuerpo se planta y la cabeza hace el gesto.
+        pr.tModo -= dt;
+        quieto = true;
+        if (pr.tModo <= 0) {
+          if (pr.sigueTramo) {
+            pr.modo = 'camino';
+            pr.sigueTramo = false;
+          } else pr.modo = 'cita';
+        }
+      } else if (pr.modo === 'cita') {
+        // Esperando al compañero (Oliver casi siempre): parado, buscándolo.
+        quieto = true;
+      } else {
+        // En CAMINO por la etapa. Oliver va derecho y ligero — y si Dante se
+        // rezaga (>2.2 u), FRENA a paso corto hasta tenerlo cerca (salvo en
+        // la bifurcación, donde la separación es a propósito).
+        const et = pr.plan[pr.etapa];
+        const brio = 0.8 + Math.max(0, Math.sin(t * 0.27 + fase)) * 0.45;
+        const freno = !pr.cfg.husmea && dOtro0 > 2.2 && !et.ptsB ? 0.3 : 1;
+        pr.s = Math.min(1, pr.s + (dt * pr.cfg.vel * brio * freno) / pr.ruta.total);
+        // Dante: paradas de olfateo a mitad de tramo (el sabueso se distrae).
+        if (pr.cfg.husmea && et.paradas && pr.parada < et.paradas.length && pr.s >= et.paradas[pr.parada]) {
+          pr.parada += 1;
+          pr.modo = 'para';
+          pr.para = 'olfatea';
+          pr.tModo = 1.1 + ((fase * 3) % 1.2);
+          pr.sigueTramo = true;
+        }
+        const punto = puntoEnRuta(pr.ruta, pr.s);
+        const a = Math.atan2(punto.dz, punto.dx);
+        // Cada perro pisa SU banquina (el eje del sendero es de la mula de
+        // ArrieriaValle) y Dante además zigzaguea: la nariz manda.
+        const off = pr.cfg.banquina +
+          (pr.cfg.husmea && pr.ruta.total > 0.6 ? Math.sin(pr.s * pr.ruta.total * 2.4 + fase) * 0.15 : 0);
+        px = punto.x - Math.sin(a) * off;
+        pz = punto.z + Math.cos(a) * off;
+        if (pr.s >= 1) {
+          if (et.dur > 0) {
+            pr.modo = 'para';
+            pr.para = (i === 0 ? et.paraA : et.paraB) ?? (i === 0 ? 'vigila' : 'olfatea');
+            pr.tModo = et.dur;
+          } else pr.modo = 'cita';
+        }
+      }
+
+      // No pisarse: empujón suave si el compañero queda encima…
+      const dOtro = Math.hypot(px - otro.pos[0], pz - otro.pos[1]);
+      if (dOtro > 1e-4 && dOtro < 0.45) {
+        const e = (0.45 - dOtro) * 0.55;
+        px += ((px - otro.pos[0]) / dOtro) * e;
+        pz += ((pz - otro.pos[1]) / dOtro) * e;
+      }
+      // …y esquivar a las vacas al cruzar el potrero.
+      if (Math.hypot(px - cx, pz - cz) < radio + 0.8) {
+        for (const v of hato.vacas) {
+          const dv = Math.hypot(px - v.pos[0], pz - v.pos[1]);
+          if (dv > 1e-4 && dv < 0.55) {
+            const e = (0.55 - dv) * 0.5;
+            px += ((px - v.pos[0]) / dv) * e;
+            pz += ((pz - v.pos[1]) / dv) * e;
+          }
+        }
+      }
+
       const dx = px - pr.pos[0];
       const dz = pz - pr.pos[1];
       const dFrame = Math.hypot(dx, dz);
-      if (dFrame > 1e-4) pr.rumbo += giroCorto(pr.rumbo, rumboY(dx, dz)) * Math.min(1, dt * 5);
+      if (dFrame > 1e-4) pr.rumbo += giroCorto(pr.rumbo, rumboY(dx, dz)) * Math.min(1, dt * 4.5);
       pr.pos[0] = px;
       pr.pos[1] = pz;
 
       // Anti-patinaje: zancada = arco de la media vuelta de apoyo (4·AMP·L).
       const lPata = info.largoPata * escala;
       const zancada = 4 * AMP_TRANCO * lPata;
-      if (dt > 0) pr.faseTranco += (Math.min(dFrame, zancada) / zancada) * Math.PI * 2;
+      if (dt > 0) {
+        if (quieto || dFrame < 1e-5) {
+          // Aterrizar: la fase se asienta en la zancada plantada (kπ: las
+          // cuatro patas en tierra, diagonales extendidas — nada congelado
+          // en el aire).
+          const meta = Math.round(pr.faseTranco / Math.PI) * Math.PI;
+          pr.faseTranco += (meta - pr.faseTranco) * Math.min(1, dt * 7);
+        } else {
+          pr.faseTranco += (Math.min(dFrame, zancada) / zancada) * Math.PI * 2;
+        }
+      }
       const fT = pr.faseTranco;
       const cT = Math.cos(fT);
       // Bóveda del paso: patas extendidas (|cos|→1) = cuerpo abajo; pata de
       // apoyo vertical (|cos|→0) = cuerpo arriba. 0.7 = pliegue que absorbe.
       const dip = lPata * (1 - Math.cos(AMP_TRANCO * Math.abs(cT))) * 0.7;
       const yBase = alturaDe(px, pz);
+      const velInst = dt > 0 ? dFrame / dt : 0;
 
       const grupo = refPerros.current[i];
       if (grupo) {
@@ -451,7 +656,7 @@ export default function HatoMovil({
         grupo.rotation.set(
           Math.sin(fT) * 0.05, // balanceo de cadera: una vez por ciclo
           pr.rumbo,
-          Math.cos(fT * 2) * 0.03 * Math.min(1, brio), // cabeceo: cada apoyo
+          Math.cos(fT * 2) * 0.03 * Math.min(1, velInst / 0.45), // cabeceo al andar
         );
         grupo.scale.setScalar(escala);
       }
@@ -467,34 +672,53 @@ export default function HatoMovil({
         gp.scale.y = 1 - 0.24 * vuelo; // la pata se pliega al volar
       }
 
-      // Colas con alma: Oliver helicóptero al arrimarse; Dante bandera corta.
+      // Cercanía = reencuentro: cuando se juntan, Oliver se alegra.
+      const saludo = Math.max(0, 1 - dOtro / 0.9);
+
+      // Colas con alma: Oliver helicóptero al reencontrarse; Dante bandera
+      // corta que se ACELERA cuando el olfato encuentra algo bueno.
       const cola = refColasPerro.current[i];
       if (cola) {
         if (i === 0) {
-          const w = t * (7 + 9 * carino) + fase;
-          const amp = 0.35 + carino * 0.55;
+          const w = t * (7 + 9 * saludo) + fase;
+          const amp = 0.35 + saludo * 0.55;
           cola.rotation.x = Math.sin(w) * amp;
-          cola.rotation.y = Math.cos(w) * amp * carino; // el círculo, solo de cariño
+          cola.rotation.y = Math.cos(w) * amp * saludo; // el círculo, solo de alegría
         } else {
-          cola.rotation.x = Math.sin(t * 9 + fase) * 0.28 + Math.sin(fT) * 0.08;
+          const emocion = quieto && pr.para === 'olfatea' && pr.modo === 'para' ? 1 : 0;
+          cola.rotation.x = Math.sin(t * (9 + emocion * 4) + fase) * (0.28 + emocion * 0.22) + Math.sin(fT) * 0.08;
         }
       }
 
       const cabeza = refCabezasPerro.current[i];
       if (cabeza) {
         if (i === 0) {
-          // Oliver arrea mirando al rebaño; con cariño gira hacia Dante,
-          // CABECEA y se le nota la sonrisa de lado.
-          const yawArreo = Math.sin(t * 0.9 + fase) * 0.5;
-          const yawDante = giroCorto(pr.rumbo, rumboY(otro.pos[0] - px, otro.pos[1] - pz));
-          cabeza.rotation.y = yawArreo * (1 - carino) + Math.max(-1, Math.min(1, yawDante)) * carino;
-          cabeza.rotation.x = Math.sin(t * 0.4 + fase) * 0.08 + carino * Math.sin(t * 3.4) * 0.18;
-          cabeza.rotation.z = Math.cos(fT * 2) * 0.02;
+          // OLIVER: cabeza alta de atleta. En la cita se GIRA a buscar a
+          // Dante; vigilando barre despacio el horizonte; bebiendo en la
+          // quebrada baja el hocico al agua.
+          const yawDante = Math.max(-1.1, Math.min(1.1, giroCorto(pr.rumbo, rumboY(otro.pos[0] - px, otro.pos[1] - pz))));
+          const busca = pr.modo === 'cita' || saludo > 0.25;
+          const bebe = pr.modo === 'para' && pr.para === 'olfatea';
+          cabeza.rotation.y = busca
+            ? yawDante
+            : quieto
+              ? Math.sin(t * 0.55 + fase) * 0.85
+              : Math.sin(t * 0.9 + fase) * 0.35;
+          cabeza.rotation.x = Math.sin(t * 0.4 + fase) * 0.06 + saludo * Math.sin(t * 3.4) * 0.18;
+          cabeza.rotation.z = bebe ? -0.42 + Math.sin(t * 5.5) * 0.04 : quieto ? 0.1 : Math.cos(fT * 2) * 0.02;
         } else {
-          // Dante JADEA: hocico apenas arriba, cabeceo corto de perro feliz.
-          cabeza.rotation.y = Math.sin(t * 0.9 + fase) * 0.4;
+          // DANTE: la nariz MANDA. Caminando barre el rastro con el hocico
+          // bajo; en el alto lo CLAVA (resoplidos cortos); en la cita y el
+          // arreo sube la cabeza con su jadeo de siempre.
+          const olfatea = pr.modo === 'para';
+          const rastrea = pr.modo === 'camino';
+          cabeza.rotation.y = rastrea ? Math.sin(t * 1.6 + fase) * 0.55 : Math.sin(t * 0.9 + fase) * 0.4;
           cabeza.rotation.x = 0;
-          cabeza.rotation.z = 0.06 + Math.sin(t * 6.2) * 0.045 + Math.cos(fT * 2) * 0.02;
+          cabeza.rotation.z = olfatea
+            ? -0.52 + Math.sin(t * 8.2) * 0.05
+            : rastrea
+              ? -0.3 + Math.sin(t * 7.1) * 0.045
+              : 0.06 + Math.sin(t * 6.2) * 0.045 + Math.cos(fT * 2) * 0.02;
         }
       }
 
