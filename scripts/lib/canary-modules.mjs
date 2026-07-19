@@ -173,6 +173,9 @@ async function farmosGet(base, token, path) {
 async function farmosWrite(base, token, path, payload, method = 'POST') {
   return httpFetch(`${base}${path}`, { method, headers: { ...JSONAPI, Authorization: `Bearer ${token}` }, body: JSON.stringify(payload), timeoutMs: 30000 });
 }
+async function farmosDelete(base, token, path) {
+  return httpFetch(`${base}${path}`, { method: 'DELETE', headers: { ...JSONAPI, Authorization: `Bearer ${token}` }, timeoutMs: 30000 });
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // MÓDULOS P0 (implementados)
@@ -447,11 +450,47 @@ async function runPlantaFoto(ctx) {
   const causa = uploadError
     ? `${isPermissionError(uploadError) ? 'PERMISOS del rol' : 'causa'}: ${uploadError}`
     : null;
+
+  // Limpieza: bug reportado 2026-07-19 — "sin borrar (acumula)" dejó 25 plantas
+  // huérfanas bajo CANARIO-PRUEBAS desde 2026-07-08 (una por corrida fallida/
+  // exitosa, nunca borradas). Ya verificamos lo que había que verificar
+  // (creación + persistencia de la foto); borramos la planta y el archivo que
+  // ESTA corrida creó. Best-effort: si la limpieza falla no cambiamos el
+  // `status` del check (no es lo que se está probando) pero lo dejamos
+  // trazado en `data.cleanup` y en el detalle para que no se repita en
+  // silencio. La ubicación CANARIO-PRUEBAS (land) NO se borra — es el
+  // registro fijo reutilizable que aísla las pruebas de la finca real.
+  //
+  // Nota conocida (2026-07-19): el DELETE del file--file falla con 403
+  // "'delete any file' permission is required" — farm_manager no tiene
+  // permisos sobre la entidad `file` en absoluto (farmOS solo gestiona
+  // dinámicamente asset/log/plan/taxonomy_term/quantity/data_stream por rol,
+  // `file` queda afuera de ese esquema). Otorgar 'delete any file' es un
+  // permiso GLOBAL (cualquier archivo de cualquier usuario, no solo los del
+  // canario) — decisión de producto/seguridad que le toca al operador, no la
+  // tomamos acá. La planta SÍ se borra (con los permisos que ya tiene el
+  // rol), que es la parte visible/reportada del bug.
+  const cleanup = { attempted: false, plantDeleted: null, fileDeleted: null };
+  if (plantId) {
+    cleanup.attempted = true;
+    const delPlant = await farmosDelete(base, token, `/api/asset/plant/${plantId}`);
+    cleanup.plantDeleted = delPlant.ok || delPlant.status === 404;
+    if (fileId) {
+      const delFile = await farmosDelete(base, token, `/api/file/file/${fileId}`);
+      cleanup.fileDeleted = delFile.ok || delFile.status === 404;
+    }
+  }
+  const cleanupNota = !cleanup.attempted
+    ? ''
+    : cleanup.plantDeleted && (cleanup.fileDeleted ?? true)
+      ? ' Limpieza: planta y foto borradas (no acumula).'
+      : ` Limpieza parcial (queda huérfana: planta=${cleanup.plantDeleted ? 'ok' : 'NO'}${fileId ? `, foto=${cleanup.fileDeleted ? 'ok' : 'NO (falta permiso "delete any file")'}` : ''}).`;
+
   return {
     status,
     valor: `planta=${plantId ? 'sí' : 'NO'}, foto=${photoOk ? 'persiste' : `NO (upload HTTP ${uploadStatus}${isPermissionError(uploadError) ? ', permisos' : ''})`}`,
-    detalle: `planta ${plantId ? plantId.slice(0, 8) : 'NO'} (verificada=${verified}) bajo ${landId ? 'CANARIO-PRUEBAS' : 'sin land'}; foto ${fileId ? fileId.slice(0, 8) : `NO (HTTP ${uploadStatus})`} persiste=${photoOk}. Sin borrar (acumula).${causa ? ` ${causa}` : ''}`,
-    data: { plantId, fileId, landId, verified, photoOk, uploadStatus, uploadError },
+    detalle: `planta ${plantId ? plantId.slice(0, 8) : 'NO'} (verificada=${verified}) bajo ${landId ? 'CANARIO-PRUEBAS' : 'sin land'}; foto ${fileId ? fileId.slice(0, 8) : `NO (HTTP ${uploadStatus})`} persiste=${photoOk}.${cleanupNota}${causa ? ` ${causa}` : ''}`,
+    data: { plantId, fileId, landId, verified, photoOk, uploadStatus, uploadError, cleanup },
   };
 }
 
