@@ -2074,6 +2074,9 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
   // pocas se asoman al atardecer, todas de noche) y luciérnagas por densidad.
   const fracEstrellas = c.estrellas === true ? 1 : Number(c.estrellas) || 0;
   const luciernagas = Number(c.luciernagas) || 0;
+  /* Luces prácticas de la finca (0..1): las ventanas se encienden CON el ocaso,
+     no en un switch binario noche/día (ciclo día↔noche, fable 2026-07-18). */
+  const practicas = Number(c.practicas) || 0;
 
   return (
     <>
@@ -2135,6 +2138,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
         alturaDe={alturaTerreno}
         perfil={perfil}
         nocturno={nocturno}
+        practicas={practicas}
         reducedMotion={reducedMotion}
         onPuerta={portada ? null : onCasa}
       />
@@ -2147,6 +2151,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
         mundos={MUNDOS_DIR}
         alturaDe={alturaTerreno}
         nocturno={nocturno}
+        practicas={practicas}
         reducedMotion={reducedMotion}
         perfil={perfil}
         onEntrar={portada ? null : onEntrar}
