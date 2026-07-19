@@ -156,7 +156,7 @@ export function OsoGuardian({
   const raizRef = useRef(null);
   const ritmoPropio = useRitmoPropio();
   const enBase = pose === 'anda' && !resopla && !rasca && !visema;
-  const momento = useVidaIdle('oso-andino', vida && vivo && tier !== 'bajo' && enBase);
+  const momento = useVidaIdle('oso-guardian', vida && vivo && tier !== 'bajo' && enBase);
   useMiradaUsted(raizRef, vida && vivo && tier !== 'bajo');
   const resoplaFx = resopla || momento === 'resopla';
   const rascaFx = rasca || momento === 'rasca';
