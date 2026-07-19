@@ -14,6 +14,7 @@
  */
 import { useMemo, useState } from 'react';
 import EscenaInvernaderoVivo from './EscenaInvernaderoVivo.jsx';
+import PanelPasos from '../PanelPasos.jsx';
 import { decidirTier, permite3D } from '../deviceTier.js';
 import {
   alturaInvernadero,
@@ -70,37 +71,22 @@ const CSS = `
 .minvernadero { position: relative; width: 100%; height: 100%; overflow: hidden; background: #d9dcc3; }
 .minvernadero canvas { opacity: 0; transition: opacity 0.9s ease; }
 .minvernadero .invernadero-canvas--lista canvas, .minvernadero canvas.invernadero-canvas--lista { opacity: 1; }
-.minvernadero__panel {
-  position: absolute; left: 50%; bottom: max(0.9rem, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
-  width: min(26rem, calc(100% - 1.6rem));
-  padding: 0.8rem 0.95rem 0.85rem;
-  border-radius: 1rem;
-  background: rgba(26, 24, 12, 0.68);
-  box-shadow: inset 0 0 0 1px rgba(200, 196, 140, 0.3), 0 6px 24px rgba(14, 13, 8, 0.35);
-  backdrop-filter: blur(6px);
-  color: #f2efda;
-}
-.minvernadero__kicker { margin: 0 0 0.15rem; font: 600 0.68rem/1.2 system-ui, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #cfc27a; }
-.minvernadero__texto { margin: 0 0 0.6rem; font: 500 0.85rem/1.38 system-ui, sans-serif; color: #eeead0; }
-.minvernadero__nav { display: flex; align-items: center; gap: 0.55rem; }
-.minvernadero__btn {
-  min-height: 2.5rem; min-width: 2.9rem; padding: 0 0.8rem;
-  border: 0; border-radius: 0.7rem; cursor: pointer;
-  background: linear-gradient(180deg, rgba(178, 196, 92, 0.95), rgba(122, 148, 52, 0.95));
-  color: #1d2405; font: 700 0.9rem/1 system-ui, sans-serif;
-  transition: transform 0.15s ease;
-}
-.minvernadero__btn:active { transform: scale(0.96); }
-.minvernadero__btn[disabled] { opacity: 0.35; cursor: default; }
-.minvernadero__puntos { display: flex; gap: 0.35rem; margin: 0 auto; }
-.minvernadero__punto { width: 0.5rem; height: 0.5rem; border-radius: 999px; background: rgba(230, 226, 190, 0.32); }
-.minvernadero__punto--activo { background: #b2c45c; box-shadow: 0 0 8px 1px rgba(178, 196, 92, 0.5); }
 @media (prefers-reduced-motion: reduce) {
   .minvernadero canvas { transition: none; }
-  .minvernadero__btn { transition: none; }
 }
 `;
+
+/* Acento del invernadero para el panel compartido (verde plántula y guadua). */
+const TEMA_PANEL = {
+  fondo: 'rgba(26, 24, 12, 0.68)',
+  borde: 'rgba(200, 196, 140, 0.3)',
+  tinta: '#f2efda',
+  kicker: '#cfc27a',
+  acentoA: 'rgba(178, 196, 92, 0.95)',
+  acentoB: 'rgba(122, 148, 52, 0.95)',
+  tintaAccion: '#1d2405',
+  activo: '#b2c45c',
+};
 
 /**
  * El micro-mundo del invernadero, completo: escena + pasos didácticos.
@@ -122,38 +108,14 @@ export default function MundoInvernadero({ tier: tierProp, reducedMotion: rmProp
       <style>{CSS}</style>
       <EscenaInvernaderoVivo tier={tier} reducedMotion={reducedMotion} foco={actual.foco} />
 
-      <div className="minvernadero__panel" role="group" aria-label="La lección del invernadero">
-        <p className="minvernadero__kicker">{actual.kicker}</p>
-        <p className="minvernadero__texto">{actual.texto}</p>
-        <div className="minvernadero__nav">
-          <button
-            type="button"
-            className="minvernadero__btn"
-            onClick={() => setPaso((p) => Math.max(0, p - 1))}
-            disabled={paso === 0}
-            aria-label="Paso anterior"
-          >
-            ←
-          </button>
-          <span className="minvernadero__puntos" aria-hidden="true">
-            {PASOS.map((p, i) => (
-              <span
-                key={p.id}
-                className={`minvernadero__punto${i === paso ? ' minvernadero__punto--activo' : ''}`}
-              />
-            ))}
-          </span>
-          <button
-            type="button"
-            className="minvernadero__btn"
-            onClick={() => setPaso((p) => Math.min(PASOS.length - 1, p + 1))}
-            disabled={paso === PASOS.length - 1}
-            aria-label="Paso siguiente"
-          >
-            →
-          </button>
-        </div>
-      </div>
+      <PanelPasos
+        etiqueta="La lección del invernadero"
+        pasos={PASOS}
+        paso={paso}
+        onPaso={setPaso}
+        tema={TEMA_PANEL}
+        reducedMotion={reducedMotion}
+      />
     </div>
   );
 }

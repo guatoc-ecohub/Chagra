@@ -86,7 +86,10 @@ const CSS_CIELO = `
 .cielotoque--lluvia .cielotoque__nube { background: #8a99a0; transform: scale(1.08); }
 .cielotoque__gota { position: absolute; top: 0; bottom: 0; width: 2px; border-radius: 2px; background: linear-gradient(to bottom, rgba(210, 228, 238, 0) 0%, rgba(210, 228, 238, 0) 78%, rgba(210, 228, 238, 0.7) 90%, rgba(210, 228, 238, 0) 100%); transform: translate3d(0, -100%, 0); will-change: transform; animation: cielotoque-caer linear infinite; }
 @keyframes cielotoque-caer { from { transform: translate3d(0, -100%, 0); } to { transform: translate3d(0, 100%, 0); } }
-.cielotoque__carta { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); max-width: min(88%, 34rem); margin: 0; padding: 0.55rem 0.9rem; border-radius: 0.8rem; background: rgba(13, 30, 42, 0.78); color: #f2f6f5; font-size: 0.85rem; line-height: 1.35; text-align: center; backdrop-filter: blur(4px); transition: opacity 0.5s ease; }
+/* La carta del cielo NO cruza el centro del valle (regla dura: los textos no
+   tapan el mundo ni a Angelita): pastilla compacta en la esquina inferior
+   izquierda, y solo mientras dura el clima prestado. */
+.cielotoque__carta { position: absolute; left: max(0.7rem, env(safe-area-inset-left)); bottom: max(0.7rem, env(safe-area-inset-bottom)); max-width: min(70%, 19rem); margin: 0; padding: 0.55rem 0.85rem; border-radius: 0.8rem; background: rgba(13, 30, 42, 0.78); color: #f2f6f5; font-size: 0.9rem; line-height: 1.4; text-align: left; backdrop-filter: blur(4px); transition: opacity 0.5s ease; }
 .cielotoque__carta[data-visible='false'] { opacity: 0; visibility: hidden; }
 .cielotoque--rm .cielotoque__capa *, .cielotoque--rm .cielotoque__brillo, .cielotoque--rm .cielotoque__carta { transition: none !important; animation: none !important; }
 `;
