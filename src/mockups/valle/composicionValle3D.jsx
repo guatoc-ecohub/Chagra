@@ -851,7 +851,9 @@ export function VecinosDelValle({ alturaDe, reducedMotion, franja = null }) {
         if (vec.franjas && franja && !vec.franjas.includes(franja)) return null;
         const Bicho = reg.Component;
         const [x, z] = vec.punto;
-        const px = Math.min(vec.px, JERARQUIA_PERSONAJES.vecinoMaxPx);
+        /*  salta el techo de vecino: se usa para PONER A JUZGAR un
+           personaje a tamaño pleno (revisión del operador), no para producción. */
+        const px = vec.sinTope ? vec.px : Math.min(vec.px, JERARQUIA_PERSONAJES.vecinoMaxPx);
         const y = alturaDe(x, z) + (vec.dy ?? 0.3);
         return (
           <group key={i} position={[x, y, z]}>
