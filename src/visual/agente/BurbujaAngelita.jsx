@@ -2,6 +2,22 @@ import Typewriter from '../../components/Typewriter';
 import { aparienciaDeTipo } from './angelitaAvisoTipos';
 import './angelitaBurbuja.css';
 
+/* Un aviso que no se lee de un vistazo no sirve (feedback del operador: "los
+   avisos son muy largos y entre más largos más difíciles de leer"). Se corta
+   en la primera frontera de frase que quepa; si no hay ninguna, en la última
+   palabra completa. Además evita que la máquina de escribir reserve un cajón
+   enorme y vacío mientras arranca. */
+const TOPE_AVISO = 105;
+export function recortarAviso(texto, tope = TOPE_AVISO) {
+  const t = String(texto || '').trim();
+  if (t.length <= tope) return t;
+  const cabe = t.slice(0, tope);
+  const frase = Math.max(cabe.lastIndexOf('. '), cabe.lastIndexOf('? '), cabe.lastIndexOf('! '));
+  if (frase > tope * 0.45) return t.slice(0, frase + 1).trim();
+  const palabra = cabe.lastIndexOf(' ');
+  return `${(palabra > 0 ? cabe.slice(0, palabra) : cabe).trim()}…`;
+}
+
 /**
  * <BurbujaAngelita> — la burbuja con la voz de Angelita: typewriter + color
  * por tipo de aviso + ícono que desambigua sin color.
@@ -32,10 +48,16 @@ export default function BurbujaAngelita({
   mensaje,
   tipo = 'informativa',
   animado = true,
-  velocidadMs = 26,
+  velocidadMs = 16,
   className = '',
 }) {
   if (!mensaje) return null;
+  /* CORTO DE VERDAD (feedback del operador: "los avisos son muy largos y entre
+     más largos más difíciles de leer"). Un aviso que no se lee de un vistazo no
+     sirve: se corta en la primera frontera de frase que quepa, y si no hay
+     ninguna, en la última palabra completa. Además evita el cajón vacío gigante
+     mientras la máquina de escribir arranca. */
+  mensaje = recortarAviso(mensaje);
   const spec = aparienciaDeTipo(tipo);
   return (
     <div

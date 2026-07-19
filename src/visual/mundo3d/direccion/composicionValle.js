@@ -297,13 +297,28 @@ export const VECINOS_VALLE = [
     franjas: FRANJAS_DIA, // de sol: la noche lo guarda bajo su caparazón
   },
   {
+    /* REVISIÓN DEL OPERADOR (2026-07-18): el jaguar y el oso estaban puestos
+       lejos, chiquitos (tope de 44px) y con franja horaria — o sea, el
+       operador NUNCA pudo verlos. Quedan a propósito GRANDES y junto a la
+       casa, sin franja y sin desvanecerse, para que los juzgue en su plena
+       expresión. Después de su veredicto se devuelven a su sitio digno. */
     slug: 'jaguar',
-    punto: [-5.8, -4.6], // el filo del páramo, lejos, del lado de la veleta: el místico
-    px: 40,
-    factor: 10, // lejos pero con silueta: verlo tiene que sentirse
-    dy: 0.3,
-    franjas: ['amanecer', 'atardecer', 'niebla', 'noche'], // aparecido, no mueble — y de noche caza bajo la luna
-    props: { aparicion: true }, // el espíritu se materializa y se disuelve en la niebla
+    punto: [-3.4, 3.6], // a la izquierda de la casa, al frente de la cámara
+    px: 150,
+    factor: 22, // en drei SUBIR el distanceFactor agranda (bajarlo achica)
+    dy: 0.5,
+    sinTope: true,
+    franjas: null, // visible a toda hora mientras se revisa
+    props: {}, // sin `aparicion`: que no se desvanezca mientras lo analiza
+  },
+  {
+    slug: 'oso-anteojos',
+    punto: [1.6, 3.8], // a la derecha de la casa
+    px: 150,
+    factor: 22,
+    dy: 0.5,
+    sinTope: true,
+    franjas: null,
   },
   {
     slug: 'danta',
