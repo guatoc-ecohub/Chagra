@@ -44,3 +44,146 @@
   .cn-av-camina, .cn-av-flota, .cn-av-vuela, .cn-av-planea,
   .cn-ala-mur, .cn-luz, .cn-luz-halo { animation: none !important; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   BLOQUE NUEVO — criaturas nocturnas elevadas a PERSONAJE (búho + zarigüeya).
+   No reescribe nada de arriba: solo suma. Rubber-hose andino sobre el biopunk:
+   squash & stretch, follow-through y gestos que cuentan qué hace el animal.
+   `transform-box: fill-box` deja que cada parte pivote sobre SU propia caja,
+   sin tener que calcular el origen en coordenadas del viewBox.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Currucutú (Megascops choliba) ─────────────────────────────────────────
+   Respira, gira la cabeza como solo un búho puede, parpadea y le tiemblan los
+   penachos. El peso vive abajo: el pecho se infla, las garras no se mueven. */
+.cn-buho-respira {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: cn-buho-respira 3.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes cn-buho-respira {
+  0%, 100% { transform: scale(1, 1); }
+  45% { transform: scale(0.985, 1.035); }
+  70% { transform: scale(1.012, 0.99); }
+}
+
+/* giro de cabeza: dos miradas al monte con pausa entre ellas (no un vaivén
+   de metrónomo — el búho SE DETIENE a mirar, que es lo que lo hace vigía) */
+.cn-buho-cabeza {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: cn-buho-mira 7.4s cubic-bezier(0.5, 0, 0.25, 1.25) infinite;
+}
+@keyframes cn-buho-mira {
+  0%, 14% { transform: rotate(0deg) translateY(0); }
+  26%, 40% { transform: rotate(8deg) translateY(-0.4px); }
+  52%, 58% { transform: rotate(0deg) translateY(0); }
+  70%, 84% { transform: rotate(-7deg) translateY(-0.3px); }
+  96%, 100% { transform: rotate(0deg) translateY(0); }
+}
+
+/* párpado: baja desde arriba. scaleY(0) = ojo abierto, scaleY(1) = cerrado. */
+.cn-buho-parpado {
+  transform-box: fill-box;
+  transform-origin: center top;
+  /* estado por defecto = ojo ABIERTO: si la animación no corre, el párpado
+     nunca debe quedarse tapando el ojo */
+  transform: scaleY(0);
+  animation: cn-buho-parpadea 6.2s ease-in-out infinite;
+}
+@keyframes cn-buho-parpadea {
+  0%, 6% { transform: scaleY(0); }
+  8% { transform: scaleY(1); }
+  10%, 48% { transform: scaleY(0); }
+  50% { transform: scaleY(1); }
+  53%, 100% { transform: scaleY(0); }
+}
+
+/* penachos: tic auricular corto y seco al final del ciclo */
+.cn-buho-penacho {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: cn-buho-penacho 5.2s ease-in-out infinite;
+}
+.cn-buho-penacho-r { animation-delay: -0.18s; }
+@keyframes cn-buho-penacho {
+  0%, 84%, 100% { transform: rotate(0deg); }
+  88% { transform: rotate(-6deg); }
+  92% { transform: rotate(4deg); }
+  96% { transform: rotate(-1.5deg); }
+}
+
+/* ── Zarigüeya (Didelphis marsupialis) ─────────────────────────────────────
+   Husmea: el marsupial lee el mundo con la nariz, así que el gesto rector es
+   el olfateo, no el paso. La cola prensil arrastra el movimiento (follow-
+   through) y las crías se acomodan encima con su propio ritmo. */
+.cn-zari {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: cn-zari-husmea 3.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes cn-zari-husmea {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  22% { transform: translateY(-0.7px) rotate(-0.8deg); }
+  48% { transform: translateY(0.5px) rotate(0.5deg); }
+  74% { transform: translateY(-0.4px) rotate(-0.3deg); }
+}
+
+/* el hocico olfatea más rápido que el cuerpo: sube, husmea, vuelve */
+.cn-zari-hocico {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: cn-zari-hocico 1.6s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+}
+@keyframes cn-zari-hocico {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  30% { transform: rotate(-2.8deg) translateX(0.35px); }
+  62% { transform: rotate(1.6deg) translateX(-0.2px); }
+}
+
+/* cola prensil: pesada y lenta, va detrás del cuerpo */
+.cn-zari-cola {
+  transform-box: fill-box;
+  transform-origin: right bottom;
+  animation: cn-zari-cola 4.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes cn-zari-cola {
+  0%, 100% { transform: rotate(0deg); }
+  35% { transform: rotate(-4.5deg) translateY(-0.4px); }
+  72% { transform: rotate(2.5deg) translateY(0.3px); }
+}
+
+/* las crías: cada una con su desfase, para que no parezcan calcomanías */
+.cn-zari-cria {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: cn-zari-cria 2.8s ease-in-out infinite;
+}
+.cn-zari-cria-b { animation-delay: -0.7s; }
+.cn-zari-cria-c { animation-delay: -1.5s; }
+@keyframes cn-zari-cria {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  40% { transform: translateY(-0.6px) rotate(2deg); }
+  75% { transform: translateY(0.3px) rotate(-1.2deg); }
+}
+
+/* vibrisas: el temblor fino que delata que está oliendo */
+.cn-zari-bigote {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: cn-zari-bigote 0.9s ease-in-out infinite;
+}
+@keyframes cn-zari-bigote {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-3.5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cn-buho-respira, .cn-buho-cabeza, .cn-buho-parpado, .cn-buho-penacho,
+  .cn-zari, .cn-zari-hocico, .cn-zari-cola, .cn-zari-cria, .cn-zari-bigote {
+    animation: none !important;
+  }
+  /* con el párpado congelado, scaleY(0) por defecto dejaría el ojo tapado:
+     lo forzamos abierto */
+  .cn-buho-parpado { transform: scaleY(0); }
+}
