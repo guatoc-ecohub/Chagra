@@ -91,6 +91,13 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
   {
+    path: 'invernadero_vivo',
+    alias: ['invernadero', 'mundo_invernadero', 'invernadero-vivo-3d'],
+    componente: 'InvernaderoVivo3D',
+    importLazy: 'src/mockups/InvernaderoVivo3D.jsx',
+    categoria: '3D',
+  },
+  {
     path: 'cacao_vivo',
     alias: ['cacao', 'mundo_cacao', 'cacao-vivo-3d'],
     componente: 'CacaoVivo3D',

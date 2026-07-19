@@ -156,6 +156,9 @@ const BosqueVivo3DMockup = lazy(() => import('./mockups/BosqueVivo3D'));
 // de guamos y nogales, y la casa-beneficiadero en la bruma. Device-tiering
 // real. Ruta #/mockups/cafetal-vivo-3d, sin auth.
 const CafetalVivo3DMockup = lazy(() => import('./mockups/CafetalVivo3D'));
+// 3D: el INVERNADERO navegable — túnel de guadua/plástico con almácigo, repique,
+// tomate tutorado, vaho y goteo. Ruta #/mockups/invernadero-vivo-3d, sin auth.
+const InvernaderoVivo3DMockup = lazy(() => import('./mockups/InvernaderoVivo3D'));
 // 3D: el MUNDO DEL CACAO — el cacaotal bajo sombra del piso cálido: la vega
 // sembrada a distancia pareja, la MAZORCA pegada del tronco (caulifloria)
 // madurando verde→amarillo→rojo-marrón por instancia, el sombrío de guamos con
@@ -627,6 +630,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
   'mockups/bosque-vivo-3d': 'mockup_bosque_vivo_3d',
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
+  'mockups/invernadero-vivo-3d': 'mockup_invernadero_vivo_3d',
   'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
   'mockups/papa-viva-3d': 'mockup_papa_viva_3d',
   'mockups/mundo-piscicultura-3d': 'mockup_mundo_piscicultura_3d',
@@ -1635,6 +1639,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo del café">
               <CafetalVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_invernadero_vivo_3d':
+        // Vitrina pública del INVERNADERO navegable: túnel de guadua/plástico,
+        // camas de almácigo, repique a bolsa, tomate bajo techo, agua por goteo,
+        // con vaho y condensación. En equipo humilde muestra la ficha.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El invernadero">
+              <InvernaderoVivo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
