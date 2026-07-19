@@ -39,6 +39,7 @@ import {
   geomGallina,
   geomPerroAndante,
 } from '../../visual/mundo3d/finca/fincaRealista.geom.js';
+import { usePerrosGuardianes } from '../../visual/creatures/senalPerrosGuardianes.js';
 
 /* ── PRNG determinista (mulberry32): la escena es la misma en cada carga ── */
 function prng(semilla) {
@@ -140,6 +141,12 @@ export default function HatoMovil({
 }) {
   const conteo = TIERS[tier] || TIERS[12];
   const [cx, cz] = centro;
+
+  /* EL MOMENTO (escena de los guardianes): la señal DOM→canvas que gobierna
+     el cruce 3D↔2D de los perros. 'alerta' los planta ladrando hacia el
+     monte; 'oculto' apaga el mesh SECO (su héroe 2D está en pantalla) y lo
+     CONGELA donde está — al volver a 'normal' renace en el mismo punto. */
+  const guardia = usePerrosGuardianes();
 
   /* Geometrías: articuladas para vacas/perros, fusionadas para instancias.
      Los perros vienen de la fábrica con malla Y capa de SU raza (silueta
@@ -414,6 +421,57 @@ export default function HatoMovil({
     hato.perros.forEach((pr, i) => {
       const { escala, rOrb, velAng, fase } = pr.cfg;
       const info = g.perros[pr.cfg.raza];
+
+      // ── LA SEÑAL DE LOS GUARDIANES (EL MOMENTO, cruce 3D↔2D) ───────────
+      const modoGuardian = guardia[pr.cfg.raza];
+      if (modoGuardian === 'oculto') return; // héroe 2D activo: mesh dormido y CONGELADO (el JSX lo esconde)
+      if (modoGuardian === 'alerta') {
+        // AVISA: se planta mirando al monte y LADRA — pulsos que empinan el
+        // cuerpo y rematan en el hocico; patas plantadas en diagonales, cola
+        // alta y tensa. Es anticipación de guardián, nunca agresión.
+        const grp = refPerros.current[i];
+        if (!grp) return;
+        const hacia = guardia.hacia;
+        if (hacia) {
+          const rx = hacia[0] - pr.pos[0];
+          const rz = hacia[1] - pr.pos[1];
+          if (Math.hypot(rx, rz) > 1e-4) {
+            pr.rumbo += giroCorto(pr.rumbo, rumboY(rx, rz)) * Math.min(1, dt * 6);
+          }
+        }
+        const yB = alturaDe(pr.pos[0], pr.pos[1]);
+        const ladra = Math.pow(Math.max(0, Math.sin(t * 8.5 + i * 1.9)), 2); // pulso ¡guau!
+        grp.visible = true;
+        grp.position.set(pr.pos[0], yB + info.largoPata * escala * 0.012 + ladra * 0.014, pr.pos[1]);
+        grp.rotation.set(0, pr.rumbo, ladra * 0.07); // se empina al ladrar
+        grp.scale.setScalar(escala);
+        const patasAl = refPatasPerro.current[i];
+        for (let k = 0; k < 4; k++) {
+          const gp = patasAl && patasAl[k];
+          if (!gp) continue;
+          gp.rotation.z = AMP_TRANCO * 0.5 * Math.cos(FASE_DIAGONAL[k]); // plantado
+          gp.scale.y = 1;
+        }
+        const cabAl = refCabezasPerro.current[i];
+        if (cabAl) {
+          cabAl.rotation.y = 0;
+          cabAl.rotation.x = 0;
+          cabAl.rotation.z = 0.05 + ladra * 0.28; // el hocico remata cada ladrido
+        }
+        const colaAl = refColasPerro.current[i];
+        if (colaAl) {
+          colaAl.rotation.x = Math.sin(t * 10 + i) * 0.16; // alta y tensa
+          colaAl.rotation.y = 0;
+        }
+        const somAl = refSombras.current[i];
+        if (somAl) {
+          somAl.position.set(pr.pos[0], yB + 0.02, pr.pos[1]);
+          somAl.scale.setScalar(escala);
+          sombraAssets.mats[i].opacity = 0.44;
+        }
+        return;
+      }
+
       const brio = 0.6 + Math.max(0, Math.sin(t * 0.31 + fase)) * 1.6; // trote↔carrera
       pr.ang += dt * velAng * brio;
       const rr = rOrb + Math.sin(t * 0.23 + fase) * 0.14;
@@ -653,7 +711,13 @@ export default function HatoMovil({
       {PERROS.map((cfg, i) => {
         const geom = g.perros[cfg.raza];
         return (
-          <group key={cfg.nombre} ref={(el) => (refPerros.current[i] = el)}>
+          <group
+            key={cfg.nombre}
+            ref={(el) => (refPerros.current[i] = el)}
+            /* héroe 2D activo → el mesh se apaga SECO (señal 'oculto');
+               declarativo para que funcione también bajo reducedMotion */
+            visible={guardia[cfg.raza] !== 'oculto'}
+          >
             <mesh geometry={geom.cuerpo} material={MATERIAL_HATO} castShadow />
             <group ref={(el) => (refCabezasPerro.current[i] = el)} position={geom.pivote}>
               <mesh geometry={geom.cabeza} material={MATERIAL_HATO} castShadow />
@@ -692,6 +756,7 @@ export default function HatoMovil({
           geometry={sombraAssets.geom}
           material={sombraAssets.mats[i]}
           renderOrder={2}
+          visible={guardia[cfg.raza] !== 'oculto'}
         />
       ))}
       {/* rebaño y gallinero: UNA InstancedMesh por especie (frustumCulled off:

@@ -72,6 +72,27 @@ export { Beagle } from './Beagle.jsx';
    BAJITO de la casa — la anti-silueta del dálmata. Solo datos: jamás arrastra
    three al bundle base — igual que dalmataIdentidad. */
 export { BEAGLE_PALETA, BEAGLE_PROPORCION, BEAGLE_SLUG, PERFIL_BEAGLE } from './beagleIdentidad.js';
+/* EL MOMENTO de los perros guardianes (Dante el beagle y Oliver el dálmata):
+   el cruce 3D↔2D (PerroTransicion, calca del molde AbejaTransicion), la forma
+   héroe dibujada (PerroHeroe), el overlay maestro (MomentoGuardianes), la
+   máquina de estados de la escena como datos (escenaGuardianes) y la señal
+   DOM→canvas (senalPerrosGuardianes — la lee HatoMovil). Overlay DOM puro,
+   cero three en el bundle base — ver "CABLEADO" en MomentoGuardianes.jsx. */
+export {
+  default as PerroTransicion,
+  PERRO_APAGA_3D_MS, PERRO_CRUCE_HEROE_MS, PERRO_RENACE_3D_MS,
+  PERRO_CRUCE_NORMAL_MS, ESCALON_PERROS_MS,
+} from './PerroTransicion.jsx';
+export { PerroHeroe } from './PerroHeroe.jsx';
+export { default as MomentoGuardianes, POSICIONES_GUARDIANES } from './MomentoGuardianes.jsx';
+export {
+  FASES_GUARDIANES, GUION_GUARDIA, MONTE_GUARDIANES,
+  duracionFase, useEscenaGuardianes,
+} from './escenaGuardianes.js';
+export {
+  usePerrosGuardianes, setModoPerro, setAlertaHacia, resetPerrosGuardianes,
+  RAZAS_GUARDIANES,
+} from './senalPerrosGuardianes.js';
 /* La IDENTIDAD del cóndor como datos (paleta azabache + coberteras plateadas +
    collar de plumón, proporciones y su perfil de clima). EL EMBLEMA DEL PÁRAMO —
    el señor del viento que casi no aletea. Solo datos: jamás arrastra three al
