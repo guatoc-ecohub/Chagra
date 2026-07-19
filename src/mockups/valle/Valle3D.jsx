@@ -257,6 +257,33 @@ const PICOS_CORDILLERA = [
   { x: 12, z: -15, h: 6, r: 4.5, base: 4.0 },
 ];
 
+/* LA SEGUNDA CORDILLERA (perspectiva aérea — la escala se SIENTE, no se
+   informa): otra cadena más lejos y más alta, asomando POR ENTRE los picos
+   cercanos. Vive dentro del fog de la escena, que hace el trabajo de la
+   atmósfera real: en el mediodía claro (nieblaLejos 44) se lee como un
+   fantasma azulado; en el amanecer brumoso desaparece — como las cordilleras
+   de verdad, que aparecen y se van con el aire del día. Los Andes no son una
+   loma: son cadenas detrás de cadenas. 1 draw call instanciado. */
+const PICOS_LEJANOS = [
+  { x: -16, z: -22, h: 10, r: 7.5, base: 3.2 },
+  { x: -6.5, z: -24, h: 12.5, r: 9, base: 3.2 },
+  { x: 2, z: -23, h: 11, r: 8, base: 3.2 },
+  { x: 9.5, z: -24, h: 12, r: 8.5, base: 3.2 },
+  { x: 17, z: -22, h: 9, r: 7, base: 3.2 },
+];
+
+function PicosLejanos({ color }) {
+  return (
+    <Instances limit={PICOS_LEJANOS.length}>
+      <coneGeometry args={[1, 1, 5]} />
+      <meshLambertMaterial color={color} opacity={0.85} transparent />
+      {PICOS_LEJANOS.map((p, i) => (
+        <Instance key={i} position={[p.x, p.base + p.h / 2, p.z]} scale={[p.r, p.h, p.r]} />
+      ))}
+    </Instances>
+  );
+}
+
 function Cordillera({ color, innerRef, perfil }) {
   if (!perfil.materialRico) {
     // Frugal: los 4 picos en UNA InstancedMesh (1 draw call) — un cono unidad
@@ -270,6 +297,7 @@ function Cordillera({ color, innerRef, perfil }) {
             <Instance key={i} position={[p.x, p.base + p.h / 2, p.z]} scale={[p.r, p.h, p.r]} />
           ))}
         </Instances>
+        <PicosLejanos color={color} />
       </group>
     );
   }
@@ -281,6 +309,7 @@ function Cordillera({ color, innerRef, perfil }) {
           <meshStandardMaterial color={color} flatShading roughness={1} opacity={0.92} transparent />
         </mesh>
       ))}
+      <PicosLejanos color={color} />
     </group>
   );
 }
@@ -2226,12 +2255,16 @@ function AtmosferaValle({ c, perfil, reducedMotion }) {
       el contraluz. Discos meshBasic (5 planos transparentes, cero luces
       extra): corre en TODOS los tiers. Se orienta a la cámara con lookAt
       (~2 veces/s alcanza — la luna está lejos y el orbit es lento). ── */
-/* La LUNA SALIENDO tras el filo del páramo (izquierda-fondo, baja sobre el
-   horizonte): la pose de reposo pica 23° hacia abajo, así que el único cielo
-   del cuadro es la franja rasante sobre la silueta de la ladera — ahí vive
-   la luna, como se ve una luna que apenas sale. Verificado contra el terreno:
-   el rayo cámara→luna libra la loma (y=6.9 sobre 1.5 en x=-10; 6.2 sobre 3.1
-   en el borde x=-17) y la cordillera queda lejos (z≤-15). */
+/* La LUNA PONIÉNDOSE tras el filo del páramo (izquierda-fondo, baja sobre el
+   horizonte — en este valle el oriente es +x, por donde sale el sol de
+   CLIMAS.amanecer; una luna en -x va de bajada, como la ve el que madruga):
+   la pose de reposo pica 23° hacia abajo, así que el único cielo del cuadro
+   es la franja rasante sobre la silueta de la ladera — ahí vive la luna.
+   LUZ MOTIVADA: la direccional nocturna (CLIMAS.noche.sol [-13,4.6,-5.2])
+   apunta DESDE este disco — mover la luna es mover también esa luz, o la
+   noche vuelve a mentir. Verificado contra el terreno: el rayo cámara→luna
+   libra la loma (y=6.9 sobre 1.5 en x=-10; 6.2 sobre 3.1 en el borde x=-17)
+   y las cordilleras quedan lejos (z≤-15 la cercana, z≤-22 la lejana). */
 const POS_LUNA = /** @type {[number, number, number]} */ ([-21, 3.4, -8]);
 
 function LunaValle({ reducedMotion }) {
@@ -2273,6 +2306,17 @@ function LunaValle({ reducedMotion }) {
 /* Caja de las luciérnagas: la tierra baja del frente del valle (referencia
    ESTABLE — ParticulasAmbientales re-siembra si la caja cambia). */
 const AREA_LUCIERNAGAS = /** @type {[number, number, number]} */ ([18, 2.4, 7]);
+
+/* EL MAR DE NUBES DEL AMANECER (la imagen imposible-pero-verdadera del valle):
+   la niebla de RADIACIÓN se forma de madrugada en el fondo del valle — el
+   suelo bajo irradia su calor al cielo despejado y la humedad condensa
+   abajo, no arriba (DR luz real de los Andes). Desde la finca, a media
+   ladera, se ve EL MAR: la tierra caliente del frente tapada por un colchón
+   blanco y la casa flotando encima, con las cumbres al fondo. Solo existe
+   en la franja del amanecer (el sol se lo bebe en una hora, como en la
+   vereda) — quien madruga lo ve; quien no, no. Banda ESTABLE de módulo:
+   NieblaLadera re-siembra si la referencia cambia. +1 draw call (Points). */
+const BANDA_MAR_NUBES = { x: /** @type {[number, number]} */ ([-11, 11]), z: /** @type {[number, number]} */ ([4.6, 9.6]) };
 
 /* La pose de cámara del valle: UNA fuente para el Canvas y para el establishing
    shot de la CámaraDirector (así el dolly aterriza EXACTO donde siempre). */
@@ -2415,6 +2459,21 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       )}
       {clima === 'amanecer' && (
         <NieblaLadera modo="amanecer" intensidad={0.55} alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
+      )}
+      {/* EL MAR DE NUBES: el colchón de niebla de radiación posado en la
+          tierra baja del frente — la finca amanece FLOTANDO sobre él. Deriva
+          lentísima (el aire quieto de la madrugada); solo bancos, sin
+          jirones (los del cauce ya los pone la NieblaLadera de arriba). */}
+      {clima === 'amanecer' && (
+        <NieblaLadera
+          intensidad={0.5}
+          velocidad={0.45}
+          banda={BANDA_MAR_NUBES}
+          alturaDe={alturaTerreno}
+          tier={tier}
+          reducedMotion={reducedMotion}
+          semilla={43}
+        />
       )}
       {hayAlerta && COSA_DEL_DIA.tono === 'helada' && (clima === 'noche' || clima === 'amanecer' || clima === 'helada') && (
         <HeladaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
