@@ -675,6 +675,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-piscicultura-3d': 'mockup_mundo_piscicultura_3d',
   'mockups/lecheria-viva-3d': 'mockup_lecheria_viva_3d',
   'mockups/microcuenca': 'mockup_microcuenca',
+  'casa_adentro': 'mundo_casa_adentro',
+  'mockups/casa-adentro': 'mundo_casa_adentro',
   'mockups/ciclo-agua': 'mockup_microcuenca',
   'mockups/invernadero-vivo-3d': 'mockup_invernadero_vivo_3d',
   'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',

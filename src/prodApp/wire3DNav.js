@@ -20,11 +20,15 @@ export const RUTA_2D_DESDE_3D = {
   //    mundos 3D por piso térmico (con su viaje Odyssey), no la ventana
   //    plana de antes. La entrada principal a cada mundo sigue siendo su
   //    portal-paisaje directo en el valle. ──
-  casa: 'vitrina_maestra',
+  // La casa mete ADENTRO en 3D (fogón, fermentos y la ventana de los mundos);
+  // antes saltaba directo a la vitrina 2D. Bug reportado por el operador.
+  casa: 'casa_adentro',
 
   // ── Mundos principales del valle (valleData.js LUGARES) ─────────
   agua: 'agua',
-  cafe: 'cafe',
+  // El portal del café lleva al MUNDO 3D (cafetal con sombrío y cereza roja),
+  // no a la pantalla 2D de precios. Bug reportado por el operador.
+  cafe: 'cafetal_vivo',
   cultivos: 'mundo_cultivos',
   suelo: 'suelo',
   sanidad: 'sanidad_sintoma',
