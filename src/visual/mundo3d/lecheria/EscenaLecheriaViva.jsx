@@ -21,6 +21,22 @@
  * del sol (`DomoCielo`), terreno y cerros por BANDAS toon y silueta fuerte. La
  * cámara LLEGA (CamaraDirector) y se gira con el dedo.
  *
+ * PASADA NOLAN — el tema de la lechería es LA HORA DEL ORDEÑO:
+ *   · El ordeño es de MADRUGADA. La SALA DE ORDEÑO vive del reloj continuo
+ *     del valle: hacia las cinco la BOMBILLA amarilla se prende contra el
+ *     primer azul del amanecer — la mezcla de dos temperaturas de color que
+ *     ES la imagen del ordeño. La luz tiene fuente (el bulbo SE VE, cuelga
+ *     de su cable y titila apenas) y solo se prende cuando hace falta.
+ *   · El piso de CEMENTO MOJADO refleja: la lámina fría del cielo, el
+ *     charco tibio de la bombilla. Un reflejo bien hecho vale más que diez
+ *     objetos.
+ *   · El FRÍO SE VE: el aliento del hato en el aire del páramo, el vaho de
+ *     la leche recién ordeñada subiendo del balde.
+ *   · La UBRE ENSEÑA: llena antes del ordeño, vacía después, llenándose
+ *     despacio el resto del día (GanadoLechero obedece el mismo reloj). Y el
+ *     ORDEN HIGIÉNICO que la extensión rural enseña: el balde, el filtro de
+ *     lienzo, la cantina de aluminio — leche limpia se paga mejor.
+ *
  * Todo procedural (cero CDN/imágenes). Tier-safe vía `perfilDeTier`. Con
  * `reducedMotion` monta QUIETO. Importa three/@react-three → montar SOLO perezosa.
  *
@@ -32,6 +48,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { perfilDeTier } from '../deviceTier.js';
 import { Fauna } from '../escenas/FaunaEscena.jsx';
+import useCicloDia from '../useCicloDia.js';
 import FloraLecheria from './FloraLecheria.jsx';
 import GanadoLechero from './GanadoLechero.jsx';
 import {
@@ -42,6 +59,8 @@ import {
   SITIO_BIODIGESTOR,
   SITIO_ABONO,
   SITIO_BEBEDERO,
+  SITIO_ORDENO,
+  ROT_ORDENO,
   LINEA_CERCA,
 } from './floraLecheria.geom.js';
 import {
@@ -87,6 +106,289 @@ function construirPotrero(seg, plano) {
       c.lerp(cMonte, smoothstep(-9, -18, wz) * 0.5);
     },
   });
+}
+
+/* ── EL RELOJ DEL ORDEÑO (pasada Nolan: la hora se siente) ─────────────────
+   Del reloj continuo del valle se deriva la vida de la sala de ordeño:
+     · `ordeno`   — la campana de los DOS ordeños del día: el grande de la
+       madrugada (~4:15–6:35) y el corto de la tarde (~15:00–16:45). Con
+       ordeño activo hay vaca en el brete, leche en el balde y vapor.
+     · `bombilla` — SOLO la madrugada la necesita: se prende a oscuras y el
+       amanecer la va apagando. Luz motivada: nadie alumbra el mediodía.
+     · `frio`     — el frío del páramo que vuelve VISIBLE el aliento del
+       hato (madrugada y noche).
+     · `llenura`  — la ubre obedece el reloj: llena antes del ordeño, vacía
+       después, llenándose despacio el resto del día. Eso enseña.
+   Pura y barata: se memoíza por hora cuantizada (~3 min). */
+function relojDeOrdeno(hora) {
+  const campana = (c, w) => Math.max(0, 1 - Math.abs(hora - c) / w);
+  const ordeno = Math.max(campana(5.4, 1.2), campana(15.9, 0.9));
+  const bombilla = campana(5.2, 1.5);
+  const frio = hora < 8 ? 1 : hora > 17.5 ? Math.min(1, (hora - 17.5) / 1.5) : 0;
+  let llenura;
+  if (hora >= 6.2 && hora < 15.4) {
+    llenura = 0.15 + ((hora - 6.2) / 9.2) * 0.45; // el día la va llenando
+  } else if (hora >= 15.4 && hora < 16.6) {
+    llenura = 0.15; // recién ordeñada (el ordeño corto de la tarde)
+  } else {
+    const t = hora >= 16.6 ? hora - 16.6 : hora + 7.4; // horas desde las 16:36
+    llenura = Math.min(1, 0.15 + (t / 12.8) * 0.85); // la noche la llena para la madrugada
+  }
+  return { ordeno, bombilla, frio, llenura };
+}
+
+/* El vaho TIBIO de la leche recién ordeñada: dos soplos que suben del balde
+   en el aire frío. Solo con ordeño activo, gama alta y sin reducedMotion. */
+function VaporTibio({ pos, activo, reducedMotion }) {
+  const g = useRef(null);
+  useFrame(({ clock }) => {
+    if (!g.current || reducedMotion) return;
+    const t = clock.elapsedTime;
+    for (let i = 0; i < g.current.children.length; i++) {
+      const m = g.current.children[i];
+      const u = (t * 0.22 + i * 0.5) % 1;
+      m.position.y = 0.28 + u * 0.5;
+      m.position.x = 0.03 * Math.sin(t * 0.8 + i * 2);
+      const s = 0.05 + u * 0.13;
+      m.scale.set(s, s * 0.8, s);
+      m.material.opacity = activo * 0.3 * (1 - u);
+    }
+  });
+  if (activo <= 0.05) return null;
+  return (
+    <group ref={g} position={pos}>
+      {[0, 1].map((i) => (
+        <mesh key={i}>
+          <sphereGeometry args={[1, 6, 5]} />
+          <meshBasicMaterial
+            color={NIEBLAS.lechosa}
+            transparent
+            opacity={0}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* ── LA SALA DE ORDEÑO: la madrugada hecha lugar ───────────────────────────
+   El cobertizo del ordeño con su física de la hora: piso de cemento MOJADO
+   que refleja (la lámina fría del cielo + el charco tibio de la bombilla),
+   la bombilla de finca que cuelga de su cable y solo se prende a oscuras,
+   el brete con su canoa, y el orden higiénico: butaco, balde, filtro de
+   lienzo y cantinas de aluminio contra la media pared. */
+function SalaDeOrdeno({ pos, atm, bombilla, ordeno, tier, reducedMotion }) {
+  const luz = useRef(null);
+  const halo = useRef(null);
+  useFrame(({ clock }) => {
+    if (reducedMotion || bombilla <= 0.02) return;
+    // el titileo mínimo del voltaje de vereda
+    const f = 0.93 + 0.05 * Math.sin(clock.elapsedTime * 11.3) * Math.sin(clock.elapsedTime * 3.1);
+    if (luz.current) luz.current.intensity = 1.55 * bombilla * f;
+    if (halo.current) halo.current.material.opacity = 0.32 * bombilla * f;
+  });
+
+  const madera = PALETA.madera;
+  const zinc = PALETA.lamina;
+  const cemento = mezclar(PALETA.concreto, NEUTROS.tinta, 0.42); // mojado = oscuro
+  const aluminio = mezclar(PALETA.lamina, NEUTROS.hueso, 0.35);
+  const calidoBombilla = '#ffca6a';
+
+  return (
+    <group position={pos} rotation={[0, ROT_ORDENO, 0]}>
+      {/* LA PLANCHA de cemento, lavada del ordeño (roughness corto: brilla) */}
+      <mesh position={[0, 0.06, 0]}>
+        <boxGeometry args={[4.4, 0.12, 3.4]} />
+        <meshStandardMaterial color={cemento} roughness={0.3} metalness={0.06} flatShading />
+      </mesh>
+      {/* la LÁMINA DE AGUA: el cielo de la hora reflejado en el piso mojado */}
+      <mesh position={[0, 0.125, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[4.2, 3.2]} />
+        <meshBasicMaterial
+          color={atm.cielo}
+          transparent
+          opacity={0.09}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      {/* charcos donde el lavado se empoza (reflejan un pelo más) */}
+      {[[-0.9, 0.9, 0.5], [1.3, 0.2, 0.34], [-0.2, -0.9, 0.4]].map(([cx, cz, r], i) => (
+        <mesh key={i} position={[cx, 0.128, cz]} rotation={[-Math.PI / 2, 0, 0]} scale={[1, 0.7, 1]}>
+          <circleGeometry args={[r, 14]} />
+          <meshBasicMaterial
+            color={mezclar(atm.cielo, NEUTROS.hueso, 0.25)}
+            transparent
+            opacity={0.13}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+      ))}
+      {/* EL REFLEJO DE LA BOMBILLA: el charco tibio estirado hacia el frente
+          (la imagen del piso mojado). Solo existe si la bombilla está prendida. */}
+      {bombilla > 0.02 && (
+        <mesh position={[0.15, 0.132, 0.75]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.42, 2.0]} />
+          <meshBasicMaterial
+            color={calidoBombilla}
+            transparent
+            opacity={0.34 * bombilla}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+      )}
+
+      {/* los cuatro POSTES (más altos al frente: el agua corre hacia atrás) */}
+      {[[-1.95, -1.45, 2.05], [1.95, -1.45, 2.05], [-1.95, 1.45, 2.35], [1.95, 1.45, 2.35]].map(
+        ([px, pz, h], i) => (
+          <mesh key={i} position={[px, h / 2 + 0.1, pz]}>
+            <cylinderGeometry args={[0.08, 0.1, h, 6]} />
+            <meshLambertMaterial color={madera} flatShading />
+          </mesh>
+        ),
+      )}
+      {/* el TECHO de zinc a un agua */}
+      <mesh position={[0, 2.42, -0.1]} rotation={[0.11, 0, 0]}>
+        <boxGeometry args={[4.6, 0.07, 3.9]} />
+        <meshLambertMaterial color={zinc} flatShading />
+      </mesh>
+      {/* la MEDIA PARED del fondo (encalada, se lava fácil) */}
+      <mesh position={[0, 0.78, -1.55]}>
+        <boxGeometry args={[4.3, 1.35, 0.1]} />
+        <meshLambertMaterial color={mezclar(NEUTROS.cal, PALETA.concreto, 0.25)} flatShading />
+      </mesh>
+
+      {/* EL BRETE: la canoa del concentrado + las dos varas que ordenan a la
+          vaca del ordeño (a la izquierda, de cara a la pared) */}
+      <mesh position={[-1.05, 0.5, -1.3]}>
+        <boxGeometry args={[1.25, 0.26, 0.4]} />
+        <meshLambertMaterial color={mezclar(madera, NEUTROS.tinta, 0.15)} flatShading />
+      </mesh>
+      {[0.72, 1.02].map((h) => (
+        <mesh key={h} position={[-0.35, h, -0.35]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.03, 0.03, 2.3, 5]} />
+          <meshLambertMaterial color={madera} flatShading />
+        </mesh>
+      ))}
+      <mesh position={[-0.35, 0.55, 0.75]}>
+        <cylinderGeometry args={[0.035, 0.045, 1.1, 5]} />
+        <meshLambertMaterial color={madera} flatShading />
+      </mesh>
+
+      {/* EL ORDEN HIGIÉNICO contra la pared: las cantinas de ALUMINIO */}
+      {[[1.35, -1.0], [1.78, -0.6]].map(([cx, cz], i) => (
+        <group key={i} position={[cx, 0.12, cz]}>
+          <mesh position={[0, 0.34, 0]}>
+            <cylinderGeometry args={[0.19, 0.2, 0.62, 12]} />
+            <meshStandardMaterial color={aluminio} roughness={0.35} metalness={0.6} flatShading />
+          </mesh>
+          <mesh position={[0, 0.7, 0]}>
+            <cylinderGeometry args={[0.1, 0.16, 0.16, 12]} />
+            <meshStandardMaterial color={aluminio} roughness={0.35} metalness={0.6} flatShading />
+          </mesh>
+          <mesh position={[0, 0.8, 0]}>
+            <cylinderGeometry args={[0.11, 0.11, 0.05, 12]} />
+            <meshStandardMaterial color={mezclar(aluminio, NEUTROS.tinta, 0.2)} roughness={0.35} metalness={0.6} flatShading />
+          </mesh>
+        </group>
+      ))}
+      {/* la cantina DESTAPADA con el FILTRO de lienzo encima (la leche se
+          cuela SIEMPRE antes de entrar a la cantina) */}
+      <group position={[0.82, 0.12, -1.12]}>
+        <mesh position={[0, 0.34, 0]}>
+          <cylinderGeometry args={[0.19, 0.2, 0.62, 12]} />
+          <meshStandardMaterial color={aluminio} roughness={0.35} metalness={0.6} flatShading />
+        </mesh>
+        <mesh position={[0, 0.72, 0]}>
+          <cylinderGeometry args={[0.17, 0.06, 0.14, 10, 1, true]} />
+          <meshStandardMaterial color={aluminio} roughness={0.4} metalness={0.55} flatShading side={THREE.DoubleSide} />
+        </mesh>
+        <mesh position={[0, 0.78, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.16, 10]} />
+          <meshLambertMaterial color={NEUTROS.hueso} flatShading />
+        </mesh>
+      </group>
+
+      {/* el BUTACO del ordeñador + el BALDE al pie del brete */}
+      <group position={[-0.12, 0.12, 0.5]}>
+        <mesh position={[0, 0.28, 0]}>
+          <boxGeometry args={[0.24, 0.05, 0.18]} />
+          <meshLambertMaterial color={madera} flatShading />
+        </mesh>
+        {[[-0.08, -0.05], [0.08, -0.05], [0, 0.07]].map(([lx, lz], i) => (
+          <mesh key={i} position={[lx, 0.13, lz]} rotation={[lz > 0 ? -0.12 : 0.12, 0, lx * 1.2]}>
+            <cylinderGeometry args={[0.018, 0.022, 0.28, 5]} />
+            <meshLambertMaterial color={madera} flatShading />
+          </mesh>
+        ))}
+      </group>
+      <group position={[-0.62, 0.12, 0.28]}>
+        <mesh position={[0, 0.11, 0]}>
+          <cylinderGeometry args={[0.13, 0.1, 0.22, 10, 1, true]} />
+          <meshStandardMaterial color={aluminio} roughness={0.35} metalness={0.6} flatShading side={THREE.DoubleSide} />
+        </mesh>
+        {/* la leche del ordeño (solo cuando se está ordeñando) */}
+        {ordeno > 0.1 && (
+          <mesh position={[0, 0.18, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[0.115, 10]} />
+            <meshLambertMaterial color={NEUTROS.hueso} flatShading />
+          </mesh>
+        )}
+      </group>
+      {/* el vaho de la leche tibia en el aire frío */}
+      {tier === 'alto' && (
+        <VaporTibio pos={[-0.62, 0.12, 0.28]} activo={ordeno} reducedMotion={reducedMotion} />
+      )}
+      {/* el REJO colgado en su puntilla (el lazo del que amarra) */}
+      <mesh position={[1.7, 1.18, -1.48]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.12, 0.025, 5, 12]} />
+        <meshLambertMaterial color={CORTEZAS.aliso} flatShading />
+      </mesh>
+
+      {/* LA BOMBILLA: el bulbo SE VE, cuelga de su cable, y solo se prende
+          cuando la madrugada lo pide — contra el azul del amanecer, la mezcla
+          de dos temperaturas que ES la imagen del ordeño */}
+      <group position={[0.15, 0, 0.15]}>
+        <mesh position={[0, 2.18, 0]}>
+          <cylinderGeometry args={[0.008, 0.008, 0.34, 4]} />
+          <meshLambertMaterial color={NEUTROS.tinta} flatShading />
+        </mesh>
+        <mesh position={[0, 1.98, 0]}>
+          <sphereGeometry args={[0.05, 8, 6]} />
+          <meshBasicMaterial
+            color={calidoBombilla}
+            transparent
+            opacity={0.22 + 0.78 * bombilla}
+            depthWrite={false}
+          />
+        </mesh>
+        <mesh ref={halo} position={[0, 1.98, 0]}>
+          <sphereGeometry args={[0.16, 8, 6]} />
+          <meshBasicMaterial
+            color={calidoBombilla}
+            transparent
+            opacity={0.32 * bombilla}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+        {bombilla > 0.02 && (
+          <pointLight
+            ref={luz}
+            color="#ffb85c"
+            intensity={1.55 * bombilla}
+            distance={7.5}
+            decay={1.8}
+            position={[0, 1.95, 0]}
+          />
+        )}
+      </group>
+    </group>
+  );
 }
 
 /* ── LA QUESERA de la finca: la enramada de la transformación ─────────────── */
@@ -417,6 +719,13 @@ function Diorama({ tier, reducedMotion, foco }) {
   const atm = useAtmosferaMundo({ familia: FAMILIA_LECHERIA, reducedMotion });
   const bandas = useGradienteBandas();
 
+  /* EL RELOJ CONTINUO (no la franja): de aquí sale la hora del ordeño — la
+     bombilla contra el amanecer, el aliento del frío, la ubre que enseña.
+     Cuantizado a ~3 min para memoizar. */
+  const { hora } = useCicloDia({ reducedMotion });
+  const horaQ = Math.round(hora * 20) / 20;
+  const reloj = useMemo(() => relojDeOrdeno(horaQ), [horaQ]);
+
   const geoPotrero = useMemo(
     () => construirPotrero(perfil.segmentosTerreno, perfil.flatShading),
     [perfil.segmentosTerreno, perfil.flatShading],
@@ -470,13 +779,30 @@ function Diorama({ tier, reducedMotion, foco }) {
         <meshToonMaterial color={montes.cerca} gradientMap={bandas} />
       </mesh>
 
-      {/* EL BANCO FORRAJERO + el hato lechero pastando */}
+      {/* EL BANCO FORRAJERO + el hato lechero pastando (la ubre y el aliento
+          obedecen el mismo reloj del ordeño) */}
       <FloraLecheria tier={tier} reducedMotion={reducedMotion} />
-      <GanadoLechero tier={tier} reducedMotion={reducedMotion} />
+      <GanadoLechero
+        tier={tier}
+        reducedMotion={reducedMotion}
+        llenura={reloj.llenura}
+        enOrdeno={reloj.ordeno}
+        frio={reloj.frio}
+      />
 
       {/* la cerca viva, el bebedero */}
       <CercaViva puntos={LINEA_CERCA} />
       <Bebedero pos={gY(SITIO_BEBEDERO)} />
+
+      {/* LA SALA DE ORDEÑO (la hora del ordeño hecha lugar) */}
+      <SalaDeOrdeno
+        pos={gY(SITIO_ORDENO)}
+        atm={atm}
+        bombilla={reloj.bombilla}
+        ordeno={reloj.ordeno}
+        tier={tier}
+        reducedMotion={reducedMotion}
+      />
 
       {/* LA QUESERA de la finca (la transformación) */}
       <Quesera pos={gY(SITIO_QUESERA)} />
