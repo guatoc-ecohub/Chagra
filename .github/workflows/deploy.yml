@@ -102,6 +102,11 @@ jobs:
           # Si sidecar timeout/5xx/red caida, sidecarClient devuelve null y el
           # comportamiento es identico al pre-wiring.
           VITE_USE_SIDECAR_AGRO_MCP: "true"
+          # #21 corpus→chat: suma los 5647 chunks del corpus server-side (dr-fanout
+          # colombiano) al RAG del chat vía /hybrid-retrieve. OFF por defecto —
+          # prender a "true" tras probar relevancia/latencia con queries reales.
+          # Fail-soft: si falla, el chat sigue con el RAG cliente (501 fichas).
+          VITE_USE_CORPUS_RETRIEVAL: "false"
           # GO-LIVE 2026-07-04: home finca-viva a produccion (biopunk2 default,
           # biopunk original de respaldo). Autorizado por el operador. Antes solo
           # en dev-deploy.yml; ahora prod renderiza el home de 4 portales + escenas
