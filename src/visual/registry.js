@@ -86,7 +86,7 @@ const VARIANTES_OSO = [
   { label: 'se rasca', props: { size: 88, rasca: true } },
   { label: 'ruana de noche', props: { size: 88, vestuario: true, clima: 'noche' } },
   { label: 'con lupa (suelo)', props: { size: 88, mundoId: 'suelo' } },
-  { label: 'poder ROJO', props: { size: 88, poder: true } },
+  { label: 'poder MENTA', props: { size: 88, poder: true } },
   { label: 'línea que hierve', props: { size: 88, lineBoil: true } },
   { label: 'sin animación', props: { size: 88, animated: false } },
 ];
@@ -244,7 +244,7 @@ const VARIANTES_ENT = [
 const VARIANTES_POR_SLUG = {
   'abeja-angelita': VARIANTES_ABEJA,
   colibri: VARIANTES_TRIO_AIRE,
-  'oso-andino': VARIANTES_OSO,
+  'oso-guardian': VARIANTES_OSO,
   'rana-andina': VARIANTES_TRIO_SUELO,
   perezoso: VARIANTES_PEREZOSO,
   ardilla: VARIANTES_ARDILLA,
@@ -261,7 +261,7 @@ const VARIANTES_POR_SLUG = {
 const NOTAS_CREATURE = {
   'abeja-angelita': 'Meliponino sin aguijón, polinizadora de la chagra; alas que baten y antenas vivas.',
   colibri: 'Pico recto y garganta violeta iridiscente; el ave-agente de Chagra, ya en rubber-hose.',
-  'oso-andino': 'Oso de anteojos, guardián del páramo; mole parda entrañable con los anteojos crema (su firma).',
+  'oso-guardian': 'Oso de anteojos, guardián del páramo; mole azabache de hombros altos con la luna creciente en el pecho (su firma) y rim-light lunar.',
   'rana-andina': 'Rana arlequín del páramo, guardiana del agua; verde húmedo con manchas ocre y ojos saltones.',
   perezoso: 'Perezoso de tres dedos, la calma total; cuelga de la rama por sus garras largas, antifaz y tinte verdoso de algas. Todo en cámara lenta.',
   ardilla: 'Ardilla de cola roja del templado; rufa con la línea dorsal oscura (su firma), cola tupida y su inspección invertida.',

@@ -23,7 +23,7 @@
    (mismo criterio que metalSlugCampoData / defensoresFincaData): copy pedagógico
    campesino en «usted», no strings de UI transversal migrables a messages.js. */
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AbejaAngelita, OsoAndino } from '../visual/creatures';
+import { AbejaAngelita, OsoGuardian } from '../visual/creatures';
 import { decidirTier } from '../visual/mundo3d/deviceTier.js';
 import {
   NIVELES,
@@ -802,7 +802,7 @@ const SpriteHeroe = memo(function SpriteHeroe(/** @type {{ tier: any; reducedMot
 });
 
 const SpriteOso = memo(function SpriteOso(/** @type {{ tier: any; reducedMotion: any }} */ { tier, reducedMotion }) {
-  return <OsoAndino size={92} inline={false} animated={!reducedMotion} tier={tier} title="Oso andino" />;
+  return <OsoGuardian size={92} inline={false} animated={!reducedMotion} tier={tier} title="Oso guardián" />;
 });
 
 /* PlagaSprite ahora vive en ./metalslug/PlagasSprites.jsx (bestiario expresivo). */

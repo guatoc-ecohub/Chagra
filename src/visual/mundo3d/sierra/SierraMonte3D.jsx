@@ -56,7 +56,7 @@ import {
   geomVenadoCuerpo, geomVenadoPata, geomAguilaCuerpo, geomAguilaAla,
 } from './sierraBiodiversa.geom.js';
 import CondorBillboard from '../CondorBillboard.jsx';
-import { OsoAndino } from '../../creatures/index.js';
+import { OsoGuardian } from '../../creatures/index.js';
 
 /* Las cuatro bandas navegables, del grafo (pisosTermicos.js). `azimut` reparte
    sus hotspots alrededor del macizo para que orbitar los descubra. */
@@ -346,8 +346,8 @@ function OsoDeAnteojos({ pos, tier, animated, px = 56, factor = 15 }) {
   return (
     <group position={/** @type {[number,number,number]} */ (pos)}>
       <Html center distanceFactor={factor} zIndexRange={[12, 0]} occlude pointerEvents="none">
-        <div aria-hidden="true" data-vecino="oso-andino" style={ESTILO_BICHO}>
-          <OsoAndino size={px} animated={animated} tier={tier} />
+        <div aria-hidden="true" data-vecino="oso-guardian" style={ESTILO_BICHO}>
+          <OsoGuardian size={px} animated={animated} tier={tier} />
         </div>
       </Html>
     </group>
