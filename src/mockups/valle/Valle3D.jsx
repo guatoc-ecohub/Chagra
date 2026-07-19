@@ -2425,7 +2425,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           haba, cubio, arracacha + barbecho), cerca de piedra, camino y abrigo. */}
       <LaderaAltaValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} reducedMotion={reducedMotion} />
       {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
-      {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 14 : tier === 'bajo' ? 5 : 9} radio={3.6} reducedMotion={reducedMotion} />}
+      {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 10 : tier === 'bajo' ? 4 : 7} radio={4.8} reducedMotion={reducedMotion} />}
       {/* LOGÍSTICA VISIBLE (alma Settlers): la mula acarrea estiércol→pila,
           compost→eras y cosecha→casa por los senderos, y las pilas crecen. */}
       {!portada && <ArrieriaValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}

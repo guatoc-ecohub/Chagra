@@ -12,7 +12,7 @@
   right: 12px;
   top: 74px; /* bajo el título 'El valle de mi finca'; ya no lo tapan la barra de preguntar ni el botón Voz */
   z-index: 30;
-  width: 152px;
+  width: 182px; /* +20%: a 152px los iconos no se leían (operador) */
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -59,14 +59,18 @@
   overflow: hidden;
 }
 
+/* El terreno del mapa va MÁS CLARO que la escena (antes lo oscurecía a 0.88):
+   así los pisos térmicos se distinguen y el páramo se lee arriba, y encima los
+   blips de colores resaltan contra un fondo claro en vez de pelearse con él. */
 .mmv-terreno {
-  filter: brightness(0.88) saturate(0.92);
+  filter: brightness(1.18) saturate(0.86);
 }
 
+/* Las crestas separan los pisos: con el fondo claro pueden marcarse más. */
 .mmv-cresta {
   fill: none;
-  stroke-width: 0.7;
-  opacity: 0.5;
+  stroke-width: 0.9;
+  opacity: 0.72;
 }
 
 .mmv-cordillera path {
@@ -145,7 +149,7 @@
   transition: stroke 0.2s ease;
 }
 .mmv-blip-emoji {
-  font-size: 5px;
+  font-size: 8px; /* era 5px: ilegible. A 182px de mapa esto son ~14px reales */
   pointer-events: none;
   dominant-baseline: middle;
 }
