@@ -232,11 +232,12 @@ function simularDuo(w) {
 
   switch (d.fase) {
     case 'trote': {
-      /* Dante trota ATRÁS del jugador, sin afán; si queda muy lejos apura
-         apenas (15 años: dignidad antes que velocidad). */
+      /* Dante trota ATRÁS del jugador, sin afán; la banda elástica crece con
+         la distancia (15 años: dignidad primero, pero JAMÁS se queda — la
+         dupla nunca se parte en dos pantallas). */
       const atras = j.x - j.mira * 88;
-      const lejos = Math.abs(atras - dante.x) > 340;
-      perroHacia(dante, atras, lejos ? DANTE_MAX : DANTE_VEL);
+      const exceso = Math.max(0, Math.abs(atras - dante.x) - 140);
+      perroHacia(dante, atras, Math.min(DANTE_MAX + exceso / 90, MOVE_SPEED * 1.5));
       /* Oliver ORBITA juguetón entre Dante y el jugador: se adelanta, vuelve,
          nunca abandona al viejo (la seña de la dupla). Sin ENCIMÁRSELE al
          viejo: si la órbita cae sobre Dante, se corre un cuerpo. */
@@ -313,12 +314,18 @@ function simularDuo(w) {
       break;
     }
     case 'celebra': {
-      /* Fiesta junto al oso liberado: Dante aúlla, Oliver brinca y menea. */
-      perroHacia(dante, w.rehen.x - 64, DANTE_MAX);
-      perroHacia(oliver, w.rehen.x + 96, OLIVER_VEL);
-      if (d.faseT >= CELEBRA_S) {
+      /* Fiesta junto al oso liberado: Dante aúlla, Oliver brinca y menea.
+         La cuenta NO corre hasta que AMBOS lleguen (la fiesta es de la dupla
+         completa: si el viejo viene en camino, el oso espera el aullido). */
+      const llegoD = perroHacia(dante, w.rehen.x - 64, DANTE_MAX + 1.6);
+      const llegoO = perroHacia(oliver, w.rehen.x + 96, OLIVER_DASH);
+      dante.fiesta = llegoD;
+      if (!(llegoD && llegoO)) {
+        d.faseT = Math.min(d.faseT, CELEBRA_S - 2.8);
+      } else if (d.faseT >= CELEBRA_S) {
         d.fase = 'trote';
         d.faseT = 0;
+        dante.fiesta = false;
       }
       break;
     }
@@ -881,7 +888,7 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
                     tier={tier}
                     reducedMotion={reducedMotion}
                     olfatea={w.duo.fase === 'rastreo' || w.duo.fase === 'busca'}
-                    aulla={w.duo.fase === 'celebra'}
+                    aulla={w.duo.fase === 'celebra' && !!w.duo.dante.fiesta}
                     senala={!!w.duo.pista}
                   />
                 </div>
