@@ -42,6 +42,10 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { rng } from '../bosque/entQuenua.geom.js';
+import { construirTerreno } from '../kit/terreno.js';
+import { ruidoTerreno } from '../kit/ruido.js';
+import { VERDES, TIERRAS } from '../paleta/paletaMadre.js';
+import { mezclar } from '../atmosferaMadre.js';
 
 /* -------------------------------------------------------------------------- */
 /*  La ladera cafetera (la geografía del mundo, determinista)                  */
@@ -72,6 +76,38 @@ export function alturaLadera(wx, wz) {
   h += sub * 5.4; // la ladera cafetera gana altura hacia atrás
   h += ruido(wx * 0.5, wz * 0.5) * 0.35 * (0.3 + sub); // ondulación natural
   return h;
+}
+
+/*
+ * LA MALLA de la ladera — el heightfield del KIT (mismo andamiaje que todos los
+ * mundos) con la pintura PROPIA del piso templado: arvenses verdes (cobertura
+ * viva), tierra roja andina asomando y el mantillo pardo hacia la sombra. Vivía
+ * duplicada en cada escena que montaba el cafetal; aquí es la geografía única
+ * (headless, testeable, memoizar en quien llama).
+ */
+export function construirLadera(seg, plano) {
+  const cPasto = new THREE.Color(VERDES.brote); // pasto al sol del piso templado
+  const cPasto2 = new THREE.Color(VERDES.calido); // el oliva que asoma hacia lo seco
+  const cTierra = new THREE.Color(TIERRAS.arcilla); // la tierra roja cafetera
+  const cMantillo = new THREE.Color(TIERRAS.mantillo); // hojarasca bajo el sombrío
+  const cCamino = new THREE.Color(mezclar(TIERRAS.camino, TIERRAS.vega, 0.4));
+  return construirTerreno({
+    ancho: ANCHO,
+    fondo: FONDO,
+    seg,
+    plano,
+    altura: alturaLadera,
+    pintar: (wx, wz, alt, c) => {
+      const enLoma = smoothstep(5, -8, wz);
+      c.lerpColors(cPasto, cPasto2, 0.5 + 0.5 * ruidoTerreno(wx * 0.9, wz * 0.7));
+      // la tierra roja asoma a manchas entre los surcos
+      c.lerp(cTierra, smoothstep(-0.1, 0.85, ruidoTerreno(wx * 1.3, wz * 1.1)) * 0.45 * enLoma);
+      // el mantillo pardo gana hacia lo alto (más sombrío, más hojarasca)
+      c.lerp(cMantillo, enLoma * 0.22);
+      // el caminito seco del frente, por donde se llega
+      c.lerp(cCamino, smoothstep(1.2, 0, Math.abs(wx - Math.sin(wz * 0.4) * 2.2)) * smoothstep(2, 12, wz));
+    },
+  });
 }
 
 /* -------------------------------------------------------------------------- */
@@ -532,6 +568,22 @@ const SITIOS_PLATANO = [
 /* La casa/beneficiadero vive arriba al fondo; los surcos la respetan. */
 export const SITIO_CASA = /** @type {[number, number]} */ ([9.0, -14.6]);
 
+/*
+ * Los CAFETOS PROTAGONISTAS del primer plano: tres matas grandes y CARGADAS que
+ * flanquean el camino de entrada (los surcos arrancan en z=2.6; estos viven más
+ * acá, donde la cámara llega). Son la respuesta al reclamo "el café no se
+ * distingue como planta": a esta distancia los pisos de ramas plagiotrópicas,
+ * la hoja elíptica oscura y el racimo de cereza PEGADO a la rama se leen sin
+ * ayuda. Deterministas y en TODOS los tiers (son pocos y son la lección).
+ * `maduro` alto = cosecha a la vista (roja/vino con su pintón); el verde queda
+ * en los surcos del fondo — la maduración despareja real de la ladera.
+ */
+export const SITIOS_HERO = [
+  { px: -2.8, pz: 5.6, esc: 1.6, rotY: 2.2, maduro: 0.85, carga: 1, hero: true },
+  { px: 4.2, pz: 4.6, esc: 1.35, rotY: 0.7, maduro: 0.7, carga: 1, hero: true },
+  { px: -5.0, pz: 3.2, esc: 1.25, rotY: 4.1, maduro: 0.75, carga: 1, hero: true },
+];
+
 /** ¿Qué tan maduro está el café en esta franja? Abajo (más caliente) más rojo. */
 function madurezEn(wz, r) {
   const base = smoothstep(-13.5, 3.0, wz); // el frente de la ladera pinta primero
@@ -586,6 +638,9 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
     const paso = sitios.length / c.cafeto;
     for (let k = 0; k < c.cafeto; k++) matas.push(sitios[Math.floor(k * paso)]);
   }
+  // Los protagonistas del primer plano van SIEMPRE (fuera del presupuesto: son
+  // tres y son la lección — hasta 'bajo' tiene que leer "eso es un cafeto").
+  matas.push(...SITIOS_HERO);
 
   const cafeto = matas.map((s) => ({
     pos: [s.px, alturaLadera(s.px, s.pz), s.pz],
@@ -605,7 +660,17 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
   const col = new THREE.Color();
   const cereza = [];
   const nPisos = pisosCafetoDeQ(q);
-  const cargadas = matas.filter((s) => s.carga > 0.3);
+  // Los héroes del primer plano entran TRES veces a la rueda Y AL FRENTE:
+  // cargan el triple de racimos que una mata del surco y cargan PRIMERO — la
+  // cereza pegada a la rama tiene que leerse desde la entrada en TODOS los
+  // tiers (en 'bajo' el presupuesto se agota rápido: si el héroe espera turno
+  // al final, queda pelado — mordida encontrada en el sanity headless).
+  const cargadas = [
+    ...SITIOS_HERO,
+    ...SITIOS_HERO,
+    ...SITIOS_HERO,
+    ...matas.filter((s) => s.carga > 0.3 && !s.hero),
+  ];
   /* Un punto local de la rama (piso i, rama j, avance t) llevado al mundo:
      escala de la mata + su giro + su sitio en la ladera. */
   const enRama = (s, i, j, t, dy, jit, rr) => {
@@ -631,7 +696,7 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
     const i = Math.floor(rCer() * Math.min(nPisos, 3));
     const p = PISOS_CAFETO[i];
     const j = Math.floor(rCer() * p.ramas);
-    const cuantas = 3 + Math.floor(rCer() * 4);
+    const cuantas = 3 + Math.floor(rCer() * 4) + (s.hero ? 2 : 0);
     const t0 = 0.2 + rCer() * 0.28;
     for (let k = 0; k < cuantas && cereza.length < c.cereza; k++) {
       const t = t0 + k * 0.085; // el racimo EN FILA, cuenta tras cuenta
@@ -645,7 +710,8 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
       cereza.push({
         pos: enRama(s, i, j, t, -0.045, 0.035, rCer), // colgada APENAS bajo la rama
         rotY: rCer() * Math.PI,
-        escala: 0.8 + rCer() * 0.45,
+        // en el héroe la cuenta es un pelín más gorda: legible desde la entrada
+        escala: (0.8 + rCer() * 0.45) * (s.hero ? 1.3 : 1),
         tint: [col.r, col.g, col.b],
       });
     }
