@@ -40,7 +40,7 @@
  * `foco` (opcional): un punto [x,y,z] que el paso didáctico del host señala
  * con un anillo que respira. Importa three/@react-three → montar SOLO perezosa.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr, Stars } from '@react-three/drei';
@@ -211,8 +211,9 @@ function PerlasCondensacion({ n, sol }) {
   const ref = useRef(null);
   const puntos = useMemo(() => puntosCondensacion(n), [n]);
 
-  // las matrices UNA vez: las gotas cuelgan quietas (apenas más largas que anchas)
-  useEffect(() => {
+  // las matrices UNA vez, ANTES del primer paint (useLayoutEffect: sin flash
+  // de esferas identidad): las gotas cuelgan quietas
+  useLayoutEffect(() => {
     const mesh = ref.current;
     if (!mesh) return;
     const m = new THREE.Matrix4();
@@ -230,7 +231,7 @@ function PerlasCondensacion({ n, sol }) {
   }, [puntos]);
 
   // el contraluz de la hora: brillo por gota según su cara al sol
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mesh = ref.current;
     if (!mesh) return;
     const c = new THREE.Color();
