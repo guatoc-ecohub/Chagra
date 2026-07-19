@@ -18,6 +18,18 @@
 export { default as AtmosferaViva } from './AtmosferaViva.jsx';
 export { default as useAtmosferaViva, leerTemporadaParam } from './useAtmosferaViva.js';
 export { default as DemoAtmosferaViva } from './DemoAtmosferaViva.jsx';
+/* CLIMA VIVO (pieza A4-clima): los tres fenómenos montables del valle —
+   aguacero con ondas y charcos, bancos de niebla que ruedan la ladera, y la
+   helada con escarcha real de la alerta. Cada uno 2-5 draw calls, tier-safe. */
+export { default as LluviaValle } from './clima/LluviaValle.jsx';
+export { default as NieblaLadera } from './clima/NieblaLadera.jsx';
+export { default as HeladaValle } from './clima/HeladaValle.jsx';
+export {
+  LLUVIA_TIER,
+  NIEBLA_TIER,
+  HELADA_TIER,
+  CAUCE_QUEBRADA,
+} from './clima/climaVivoData.js';
 export {
   FRANJAS_VIVAS,
   franjaViva,
