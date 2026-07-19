@@ -33,38 +33,62 @@ const VIEWBOX = '-24 -20 48 40';
 
 /* EL ALA — dibujada UNA vez para el lado izquierdo; la derecha la monta el
    cuerpo con scale(-1,1) en un grupo exterior SIN animación (el CSS transform
-   de `.condor-ala` pisaría el atributo). Hombro en (-2.5,-3.5): ahí pivota
-   (transform-origin right center del fill-box — vale igual espejada). */
+   de `.condor-ala` pisaría el atributo). Hombro en (-2.6,-5.0): ahí pivota
+   (transform-origin right center del fill-box — vale igual espejada).
+
+   ANTI-COMETA (2026-07, veredicto del operador): el ala vieja era un
+   TRIÁNGULO tipo vela → con la cola en abanico la silueta cerraba un ROMBO
+   (una cometa, no un ave). El ala nueva es la del Vultur gryphus real:
+     · TABLA ancha de bordes casi paralelos (nada de vela): el borde de fuga
+       festoneado de secundarias llega ancho casi hasta la mano.
+     · DIEDRO LEVE dibujado en la geometría: el borde de ataque SUBE del
+       hombro (-5.0) a la mano (-8.2) — espejada, la silueta hace una V suave.
+     · SEIS PRIMARIAS-DEDO largas, curvas y SEPARADAS (emarginadas) abiertas
+       en abanico de ~100°, la de adelante apuntando ARRIBA (la punta alzada
+       del planeo en térmica). Esa mano abierta ES la seña que hace cóndor a
+       la silueta aun a 40 px — una cometa jamás tiene dedos. */
 function AlaCondor({ P, vivo }) {
   return (
     <g
       className={vivo ? 'condor-ala' : undefined}
       style={{ transformBox: 'fill-box', transformOrigin: 'right center' }}
     >
-      {/* la vela del ala: nace en el hombro y se extiende hasta la punta */}
+      {/* la TABLA del ala: borde de ataque que sube (diedro) y borde de fuga
+          ancho y festoneado (secundarias) — planta rectangular, no triángulo */}
       <path
-        d="M-2.4,-4.6 C-8.2,-7.8 -14.6,-8.4 -19.8,-7.3 L-20.6,-6.2
-           C-15.2,-2.6 -8.6,-0.4 -2.0,0.9 C-0.9,-1.0 -1.1,-3.2 -2.4,-4.6 Z"
+        d="M-2.6,-5.0 C-7.6,-6.9 -12.6,-7.8 -15.8,-8.2 L-16.6,-5.4
+           C-15.0,-4.2 -13.2,-3.6 -11.2,-2.9
+           C-8.4,-1.9 -5.2,-0.6 -2.1,1.5
+           C-1.1,-0.7 -1.2,-3.5 -2.6,-5.0 Z"
         fill={P.ala} stroke={RH_INK} strokeWidth="1.3" strokeLinejoin="round"
       />
-      {/* la banda PLATEADA de coberteras (el relumbre del adulto al sol) */}
+      {/* la banda PLATEADA sobre el ala (el relumbre del adulto al sol),
+          corrida a lo largo de la tabla como panel, no como cuña */}
       <path
-        d="M-3.4,-4.0 C-8.4,-6.8 -13.8,-7.3 -18.4,-6.5
-           C-13.8,-5.0 -8.6,-3.6 -3.6,-2.2 C-3.0,-2.8 -3.0,-3.4 -3.4,-4.0 Z"
-        fill={P.cobertera} opacity="0.9"
+        d="M-3.6,-4.2 C-8.2,-6.0 -12.6,-6.9 -15.4,-7.4
+           C-13.0,-5.6 -9.4,-4.0 -5.0,-2.4 C-4.0,-3.0 -3.7,-3.6 -3.6,-4.2 Z"
+        fill={P.cobertera} opacity="0.85"
       />
-      {/* LAS PRIMARIAS: las plumas-dedo abiertas de la punta (la firma que
-          hace cóndor a la silueta aun a 40 px). Vibran con el viento. */}
+      {/* los cañones de las secundarias (el festón se lee como plumas) */}
+      <g stroke={RH_INK} strokeWidth="0.55" opacity="0.35" fill="none">
+        <path d="M-6.2,-3.2 L-5.1,-0.3" />
+        <path d="M-9.4,-4.5 L-8.7,-2.0" />
+        <path d="M-12.4,-5.7 L-12.0,-3.3" />
+      </g>
+      {/* LAS PRIMARIAS: seis plumas-dedo LARGAS, curvas y separadas, en
+          abanico desde la mano — la primera alzada hacia arriba. Vibran
+          tanteando el viento (.condor-primarias). */}
       <g
         className={vivo ? 'condor-primarias' : undefined}
         style={{ transformBox: 'fill-box', transformOrigin: 'right center' }}
-        stroke={P.pluma} strokeWidth="1.5" strokeLinecap="round" fill="none"
+        stroke={P.pluma} strokeWidth="1.7" strokeLinecap="round" fill="none"
       >
-        <path d="M-18.3,-7.0 L-23.1,-9.6" />
-        <path d="M-19.2,-6.6 L-23.6,-7.2" />
-        <path d="M-19.4,-5.8 L-23.3,-4.6" />
-        <path d="M-19.0,-4.9 L-22.5,-2.4" />
-        <path d="M-18.2,-4.0 L-21.2,-0.6" />
+        <path d="M-15.4,-7.8 Q-18.8,-10.4 -21.6,-13.4" />
+        <path d="M-15.9,-7.3 Q-19.8,-9.4 -22.8,-11.0" />
+        <path d="M-16.2,-6.6 Q-20.2,-7.8 -23.4,-8.2" />
+        <path d="M-16.2,-5.8 Q-20.0,-6.0 -23.0,-5.3" />
+        <path d="M-15.8,-5.0 Q-19.2,-4.2 -21.9,-2.9" />
+        <path d="M-15.3,-4.3 Q-18.0,-2.6 -19.9,-0.9" />
       </g>
     </g>
   );
@@ -163,14 +187,17 @@ export function Condor({
       {/* aura viva (la presencia grande y serena) */}
       <circle cx="0" cy="0" r={auraR} fill={P.cuerpo} opacity={auraOp} filter={`url(#${blur})`} />
 
-      {/* LA COLA-TIMÓN: el abanico corto que corrige el rumbo (grupo propio) */}
+      {/* LA COLA-TIMÓN: corta y CUADRADA (borde recto — Vultur gryphus).
+          El abanico curvo viejo cerraba la punta de abajo del rombo-cometa;
+          el trapecio de remate recto la mata. (grupo propio) */}
       <g className={vivo ? 'condor-cola' : undefined} style={{ transformBox: 'fill-box', transformOrigin: 'center top' }}>
         <path
-          d={`M-2.9,4.6 L-4.4,${4.6 + PR.colaLargo} C-1.5,${6.4 + PR.colaLargo} 1.5,${6.4 + PR.colaLargo} 4.4,${4.6 + PR.colaLargo} L2.9,4.6 Z`}
+          d={`M-3.0,4.4 L-4.1,${4.4 + PR.colaLargo} L4.1,${4.4 + PR.colaLargo} L3.0,4.4 Z`}
           fill={P.cola} stroke={RH_INK} strokeWidth="1.2" strokeLinejoin="round"
         />
-        <path d={`M-1.4,5.4 L-1.9,${5.2 + PR.colaLargo}`} stroke={RH_INK} strokeWidth="0.6" opacity="0.5" />
-        <path d={`M1.4,5.4 L1.9,${5.2 + PR.colaLargo}`} stroke={RH_INK} strokeWidth="0.6" opacity="0.5" />
+        <path d={`M-1.3,5.1 L-1.7,${4.6 + PR.colaLargo}`} stroke={RH_INK} strokeWidth="0.6" opacity="0.5" />
+        <path d={`M0,5.2 L0,${4.7 + PR.colaLargo}`} stroke={RH_INK} strokeWidth="0.6" opacity="0.5" />
+        <path d={`M1.3,5.1 L1.7,${4.6 + PR.colaLargo}`} stroke={RH_INK} strokeWidth="0.6" opacity="0.5" />
       </g>
 
       {/* LAS ALAS ENORMES (la firma: toda la silueta es ala). El grupo exterior

@@ -2309,6 +2309,60 @@
   [data-creature='condor'][data-visema='V4'] .condor-cabeza { animation: none !important; }
 }
 
+/* ── EL CÓNDOR EN EL MUNDO 3D — las FASES del vuelo (CondorBillboard) ────────
+   La máquina de fases del billboard escribe data-attrs en el WRAPPER
+   (data-condor-fase / -aleteo / -otea, mutación por ref: cero re-render) y
+   aquí viven los gestos. La biología manda: casi no aletea — los aletazos
+   son la excepción cara (despegue, flare, remonte de la pasada). */
+
+/* POSADO — la OTRA silueta del cóndor (anti-cometa): alas PLEGADAS al cuerpo
+   (pivotan del hombro, transform estático — vale también bajo RM), cola caída
+   recta, sin banqueo. El vigía del filo, no un rombo. */
+[data-condor-fase='posado'] .condor-ala {
+  animation: none;
+  /* negativo = la punta BAJA (contrato del kit: en condor-ala-v positivo sube):
+     el ala cae plegada a lo largo del cuerpo, encogida hacia el hombro. */
+  transform: rotate(-62deg) scale(0.52, 0.8);
+}
+[data-condor-fase='posado'] .condor-cola { animation: none; transform: scaleY(1.25); }
+[data-condor-fase='posado'] .condor-planeo { animation: none; }
+[data-condor-fase='posado'] [data-creature='condor'] .rh-boil { animation-duration: 7.5s; }
+
+/* ATERRIZAJE — sin banqueo de térmica (viene en flare, recto y solemne). */
+[data-condor-fase='aterrizaje'] .condor-planeo { animation: none; }
+
+/* ALETAZOS — los golpes PESADOS y hondos (despegue / flare / remonte de la
+   pasada): raros, con peso de tres metros de ala — nada de colibrí. */
+[data-condor-aleteo='1'] .condor-ala {
+  animation: condor-aletazos 0.85s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes condor-aletazos {
+  0%, 100% { transform: rotate(4deg); }
+  45%      { transform: rotate(-24deg); }   /* el golpe hondo */
+  70%      { transform: rotate(-8deg); }
+}
+
+/* LA MANO DEL VIENTO — las primarias por fase: en TÉRMICA los dedos tantean
+   la corriente más despiertos; en PLANEO van casi planchados (la recta). */
+[data-condor-fase='termica'] .condor-primarias { animation-duration: 2.1s; }
+[data-condor-fase='planeo'] .condor-primarias { animation-duration: 5.6s; }
+
+/* OTEA desde la percha (wrapper): el mismo gesto de vigía del SVG. */
+[data-condor-otea='1'] .condor-cabeza { animation: condor-otea 3.4s ease-in-out infinite; }
+[data-condor-otea='1'] .condor-collar { animation: condor-collar-esponja 3.4s ease-in-out infinite; }
+
+/* device-tier 'bajo': los aletazos y el otea de wrapper también se apagan
+   (el pliegue posado es transform estático: queda — la silueta cuenta). */
+[data-condor-aleteo='1'] [data-tier='bajo'] .condor-ala,
+[data-condor-otea='1'] [data-tier='bajo'] .condor-cabeza,
+[data-condor-otea='1'] [data-tier='bajo'] .condor-collar { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-condor-aleteo='1'] .condor-ala,
+  [data-condor-otea='1'] .condor-cabeza,
+  [data-condor-otea='1'] .condor-collar { animation: none !important; }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    DÁLMATA — el CARÁCTER del perro atlético: alegre, leal, INCANSABLE.
    Elástico y brincón (perro joven), nunca la mole del oso ni la elegancia

@@ -64,9 +64,10 @@ export const CONDOR_PROPORCION = {
   cuerpoRx: 5.0,            // el torso compacto (todo lo demás es ALA)
   cuerpoRy: 6.4,
   cabezaR: 3.0,             // la cabeza pelada, chica sobre el collar
-  alaLargo: 19.5,           // media envergadura (las alas MANDAN en la silueta)
-  primarias: 5,             // las plumas-dedo de cada punta
-  colaLargo: 5.0,           // el abanico corto
+  alaLargo: 23.4,           // media envergadura HASTA la punta de los dedos
+                            // (rediseño anti-cometa: la tabla ancha + 6 dedos)
+  primarias: 6,             // las plumas-dedo emarginadas de cada mano
+  colaLargo: 3.6,           // cola corta y CUADRADA (el abanico largo hacía rombo)
 };
 
 /*
