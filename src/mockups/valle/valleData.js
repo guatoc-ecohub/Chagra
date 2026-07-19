@@ -445,6 +445,24 @@ export const CLIMAS = {
     luciernagas: 0,
     practicas: 0.35, // el aguacero oscurece: adentro se prende la luz
   },
+  helada: {
+    /* La MADRUGADA DE HELADA (agroclimático honesto): noche/pre-alba
+       DESPEJADA — el suelo irradia su calor al cielo abierto y escarcha.
+       Por eso aquí hay MÁS estrellas y la niebla se abre (aire limpio y
+       quieto), con la luz azul-acero del frío. La escarcha 3D la pone
+       HeladaValle (atmosfera/clima); este preset viste luz y cielo. */
+    etiqueta: 'Helada',
+    grade: 'vfx-grade--glacial',
+    cielo: ['#16294e', '#3d5b8a'],
+    luz: '#c3d8f2',
+    ambiente: '#3a4f74',
+    niebla: '#243a5e',
+    nieblaLejos: 40,
+    intensidad: 0.8,
+    estrellas: 0.7,
+    sol: [8, 2, 4],
+    luciernagas: 0,
+  },
   noche: {
     /* DÍA POR NOCHE (dirección de fotografía): nadie filma la noche a oscuras.
        Azul índigo levantado (se VE), luz de luna plateada con intensidad de
