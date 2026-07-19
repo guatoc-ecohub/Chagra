@@ -273,6 +273,11 @@ const MundoBoticaCana3DMockup = lazy(() => import('./mockups/MundoBoticaCana3D')
 // cítricos, guayabo, papayo, injerto con tutor, plateo y cosecha a mano).
 // Standalone tipo botica: no monta el sistema MUNDO ni toca EscenaBase3D.
 const MundoFrutales3DMockup = lazy(() => import('./mockups/MundoFrutales3D'));
+// 3D: el LOTE DE LEGUMINOSAS Y RAÍCES ANDINAS, denso (frijolar de vara con
+// nódulos de Rhizobium en el corte del subsuelo, milpa de las tres hermanas —
+// maíz + fríjol + calabaza —, quinua en grupo con panojas de color, yucas
+// frondosas). Standalone tipo botica: no monta el sistema MUNDO ni EscenaBase3D.
+const MundoLeguminosas3DMockup = lazy(() => import('./mockups/MundoLeguminosas3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -717,6 +722,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-polinizadores-3d': 'mockup_mundo_polinizadores_3d',
   'mockups/mundo-botica-cana-3d': 'mockup_mundo_botica_cana_3d',
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
+  'mockups/mundo-leguminosas-3d': 'mockup_mundo_leguminosas_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2444,6 +2450,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El huerto de frutales">
               <MundoFrutales3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_leguminosas_3d':
+        // El lote de leguminosas y raíces andinas, denso: el frijolar de vara
+        // en hileras (con la mata héroe que abre el corte del subsuelo y los
+        // nódulos rosados de Rhizobium — el nitrógeno que se ve), la milpa de
+        // las tres hermanas (maíz + fríjol + calabaza), la quinua en grupo con
+        // panojas rojas/doradas/moradas y las yucas frondosas de raíz tuberosa.
+        // Botón «ver el saber bajo tierra». Ruta #/mockups/mundo-leguminosas-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El lote de leguminosas y raíces">
+              <MundoLeguminosas3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
