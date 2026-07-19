@@ -816,7 +816,10 @@ export function PatiosLugares({ mundos, alturaDe, nocturno = false }) {
    "de anteojos" literal). Vive en el borde del monte — el slot de ancla que
    quedó reservado — con presencia clara: es el mayor de los vecinos de
    tierra. Billboard aria-hidden, cero toques (presencia, no interfaz). */
-const OSO_MONTE = { punto: [5.4, -1.2], px: 52, factor: 11, dy: 0.46 };
+/* EL OSO NEGRO de la luna (GuardianAvatar) — el aprobado por el operador. Se
+   trae al frente de la casa y GRANDE: el de anteojos que se hizo hoy quedó
+   archivado por feo. */
+const OSO_MONTE = { punto: [1.6, 3.8], px: 150, factor: 22, dy: 0.5 };
 
 export function OsoNegroDelMonte({ alturaDe }) {
   const [x, z] = OSO_MONTE.punto;

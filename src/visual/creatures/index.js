@@ -174,7 +174,8 @@ export const CREATURES = {
   'oso-andino': { Component: OsoAndino, nombre: 'Oso andino', cientifico: 'Tremarctos ornatus' },
   // La VERSIÓN BUENA del oso (negro biopunk, aprobada por el operador). El
   // 'oso-andino' café de arriba queda archivado; surfacear ESTE.
-  'oso-anteojos': { Component: OsoAnteojos, nombre: 'Oso de anteojos', cientifico: 'Tremarctos ornatus' },
+  /* OSO-ANTEOJOS ARCHIVADO (operador): rechazado por feo. El oso bueno es el
+     negro de la luna del GuardianEspiritu. */
   'rana-andina': { Component: RanaAndina, nombre: 'Rana arlequín andina', cientifico: 'Atelopus spp.' },
   perezoso: { Component: Perezoso, nombre: 'Perezoso de tres dedos', cientifico: 'Bradypus variegatus' },
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },
