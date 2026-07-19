@@ -360,7 +360,10 @@ export const CLIMAS = {
     nieblaLejos: 44,
     intensidad: 1.35,
     estrellas: 0,
-    sol: [2, 12, 3],
+    /* Sol CASI CENITAL (DR luz real: a 4-5° N el mediodía es vertical) —
+       sombras cortas y duras pegadas al pie de cada cosa: la seña del
+       mediodía ecuatorial que cualquier campesino reconoce sin leer nada. */
+    sol: [0.8, 14, 1.4],
     luciernagas: 0,
   },
   tarde: {
@@ -413,7 +416,7 @@ export const CLIMAS = {
     nieblaLejos: 38,
     intensidad: 1.35,
     estrellas: false,
-    sol: [4, 11, 3],
+    sol: [2.5, 13, 2], // alto y duro: el sol ecuatorial de día claro
     luciernagas: 0,
   },
   niebla: {
@@ -477,7 +480,15 @@ export const CLIMAS = {
     nieblaLejos: 30,
     intensidad: 0.72,
     estrellas: true,
-    sol: [-6, 7, -4],
+    /* LUZ MOTIVADA (regla Nolan/Hoytema: toda luz tiene autora visible): la
+       direccional nocturna sale DE la luna que se ve en el cielo — el disco
+       vive en Valle3D.POS_LUNA [-21, 3.4, -8], bajo sobre el filo del
+       páramo. Antes la luz caía desde [-6,7,-4] (una luna alta que no
+       existía en el cuadro); ahora la dirección coincide en acimut y en
+       altura rasante: CONTRALUZ de plata — las lomas que miran a la cámara
+       caen a la penumbra azul del día-por-noche y la quebrada emisiva se
+       vuelve el sendero que más brilla. */
+    sol: [-13, 4.6, -5.2],
     luciernagas: 1.5, // plenas: la constelación baja del valle (sigue siendo 1 draw call)
     practicas: 1,
   },
