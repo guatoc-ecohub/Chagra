@@ -238,8 +238,12 @@ function simularDuo(w) {
       const lejos = Math.abs(atras - dante.x) > 340;
       perroHacia(dante, atras, lejos ? DANTE_MAX : DANTE_VEL);
       /* Oliver ORBITA juguetón entre Dante y el jugador: se adelanta, vuelve,
-         nunca abandona al viejo (la seña de la dupla). */
-      const orbita = j.x + Math.sin(w.reloj * 1.7) * 95 - j.mira * 18;
+         nunca abandona al viejo (la seña de la dupla). Sin ENCIMÁRSELE al
+         viejo: si la órbita cae sobre Dante, se corre un cuerpo. */
+      let orbita = j.x + Math.sin(w.reloj * 1.7) * 95 - j.mira * 18;
+      if (Math.abs(orbita - dante.x) < 44) {
+        orbita = dante.x + 44 * (orbita >= dante.x ? 1 : -1);
+      }
       perroHacia(oliver, orbita, OLIVER_VEL);
       /* ¿hay escondite cerca sin descubrir? La trufa lo agarra primero. */
       const i = w.escondites.findIndex(
@@ -509,6 +513,8 @@ export default function MetalSlugCampo({ onBack }) {
   return (
     <div className="msc-root" data-tier={tier} data-rm={reducedMotion ? '1' : '0'}>
       <StyleMSC />
+      {/* estilos de la dupla en la RAÍZ: la intro también los usa (retratos) */}
+      <StyleDuoPerros />
       <button type="button" className="msc-volver" onClick={onBack}>
         ← Volver
       </button>
@@ -761,7 +767,6 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
     <div className="msc-juego">
       <div ref={vistaRef} className="msc-vista">
         <StyleJuice />
-        <StyleDuoPerros />
 
         {/* fondo por piso térmico (cielo + lomas + ambiente) */}
         {/* eslint-disable-next-line react/no-unknown-property */}
