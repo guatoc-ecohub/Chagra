@@ -48,9 +48,6 @@ import {
   geomCafeto,
   SITIO_CASA,
   PAL,
-  CAMARA,
-  ZOOM_LADERA,
-  CENTRO_LADERA,
 } from '../cafetal/floraCafetal.geom.js';
 import { VERDES, NIEBLAS } from '../paleta/index.js';
 
@@ -58,12 +55,9 @@ import { VERDES, NIEBLAS } from '../paleta/index.js';
    cafetal ("tarde de finca"), mezclada 60% hacia la franja REAL del día. */
 const CIELO_CAFE = CIELOS.corral;
 
-/* El encuadre de la ladera: la cámara llega desde abajo del camino y mira loma
-   arriba — entrar es subir. Sale de floraCafetal.geom (junto a la geografía),
-   así el diagnóstico `encuadre-mundo.mjs cafe` mide ESTE encuadre y no otro.
-   Se retiró y se levantó respecto del anterior: el ojo pasa POR DEBAJO del
-   techo de sombra en vez de quedar metido entre las copas. */
-const ENTRADA_LADERA = { zoom: ZOOM_LADERA, centro: CENTRO_LADERA };
+/* El encuadre por defecto de la ladera (el registro puede pisarlo): la cámara
+   llega desde abajo del camino y mira loma arriba — entrar es subir. */
+const ENTRADA_LADERA = { zoom: 13, centro: /** @type {[number,number,number]} */ ([0, 2.4, -2]) };
 
 /* La fauna que delata el café DE SOMBRA: colibríes y mariposas que el café a
    pleno sol espanta. Pocas y por criterio (la sombra ES el hábitat); alturas
@@ -154,25 +148,6 @@ function TrampaBroca({ pos }) {
         <cylinderGeometry args={[0.11, 0.11, 0.05, 8]} />
         <meshLambertMaterial color={PALETA.maderaOscura} flatShading />
       </mesh>
-
-      {/* el secadero (paseo/parabólico): cama elevada con la capa de grano al sol */}
-      <group position={[0.3, 0, 0.72]}>
-        {[[-0.28, 0.16, -0.16], [0.28, 0.16, -0.16], [-0.28, 0.16, 0.16], [0.28, 0.16, 0.16]].map((p, i) => (
-          <mesh key={i} position={/** @type {[number, number, number]} */ (p)}>
-            <cylinderGeometry args={[0.02, 0.02, 0.32, 5]} />
-            <meshLambertMaterial color={PALETA.madera} flatShading />
-          </mesh>
-        ))}
-        <mesh position={[0, 0.33, 0]}>
-          <boxGeometry args={[0.66, 0.03, 0.44]} />
-          <meshLambertMaterial color={PALETA.maderaClara} flatShading />
-        </mesh>
-        {/* la capa de grano en pergamino secándose */}
-        <mesh position={[0, 0.36, 0]}>
-          <boxGeometry args={[0.6, 0.03, 0.38]} />
-          <meshLambertMaterial color="#d4c199" flatShading />
-        </mesh>
-      </group>
     </group>
   );
 }
@@ -288,9 +263,6 @@ export default function EscenaCafe(props) {
       {...props}
       cielo={CIELO_CAFE}
       entrada={{ ...ENTRADA_LADERA, ...(props.entrada || {}) }}
-      /* La pose EXPLÍCITA de la ladera: la derivada del `zoom` dejaba el ojo
-         entre las copas del sombrío. */
-      camara={props.camara || { position: CAMARA.reposo, fov: CAMARA.fov }}
     >
       <Diorama tier={props.tier || 'alto'} reducedMotion={!!props.reducedMotion} />
     </EscenaBase3D>
