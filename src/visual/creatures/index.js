@@ -180,7 +180,9 @@ export const CREATURES = {
   ardilla: { Component: Ardilla, nombre: 'Ardilla de cola roja', cientifico: 'Notosciurus granatensis' },
   jaguar: { Component: Jaguar, nombre: 'Jaguar', cientifico: 'Panthera onca' },
   morrocoy: { Component: Morrocoy, nombre: 'Morrocoy de patas rojas', cientifico: 'Chelonoidis carbonarius' },
-  borugo: { Component: Borugo, nombre: 'Borugo', cientifico: 'Cuniculus taczanowskii' },
+  /* BORUGO ARCHIVADO (operador, 2026-07-18): dibujo rechazado por feo — fuera
+     del registro para que NADA data-driven lo surfacee (avatar-selector, fauna
+     ambiental, vecinos del valle). El componente queda por si se rehace. */
   danta: { Component: Danta, nombre: 'Danta de páramo', cientifico: 'Tapirus pinchaque' },
   condor: { Component: Condor, nombre: 'Cóndor de los Andes', cientifico: 'Vultur gryphus' },
   // Los perros de la casa (razas reconocibles: el alto moteado y el bajito orejón).

@@ -320,6 +320,27 @@ export const VECINOS_VALLE = [
     sinTope: true,
     franjas: null,
   },
+  /* DANTE y OLIVER en su versión dibujada, también grandes y al frente: el
+     operador quiere ver a los cuatro juntos para juzgarlos. (En el hato siguen
+     los perros 3D con su trote; estos son los rubber-hose.) */
+  {
+    slug: 'dalmata', // Oliver
+    punto: [-1.9, 5.0],
+    px: 130,
+    factor: 20,
+    dy: 0.4,
+    sinTope: true,
+    franjas: null,
+  },
+  {
+    slug: 'beagle', // Dante
+    punto: [0.5, 5.2],
+    px: 130,
+    factor: 20,
+    dy: 0.4,
+    sinTope: true,
+    franjas: null,
+  },
   {
     slug: 'danta',
     punto: [3.8, -5.2], // la danta de páramo: el borde del bosque frío, cerca de los frailejones
