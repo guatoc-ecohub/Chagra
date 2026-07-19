@@ -78,7 +78,7 @@ const CASA = {
  * mundo son sus portales-paisaje, tocados directo en el valle. Modesta a
  * propósito en lo demás: sostiene el cuadro sin pedir espectáculo.
  */
-export function CasaCampesina({ alturaDe, perfil, nocturno = false, reducedMotion = false, onPuerta = null }) {
+export function CasaCampesina({ alturaDe, perfil, nocturno = false, practicas = 0, reducedMotion = false, onPuerta = null }) {
   const [cx, cz] = CASA_VALLE.pos;
   const esc = CASA_VALLE.escala || 1;
   const y = alturaDe(cx, cz);
@@ -90,7 +90,7 @@ export function CasaCampesina({ alturaDe, perfil, nocturno = false, reducedMotio
   useFrame((state) => {
     if (reducedMotion) return;
     const p = (Math.sin(state.clock.elapsedTime * 2.4) + 1) / 2;
-    if (puertaRef.current) puertaRef.current.emissiveIntensity = (nocturno ? 1.5 : 0.85) + p * 0.55;
+    if (puertaRef.current) puertaRef.current.emissiveIntensity = (0.85 + 0.65 * practicas) + p * 0.55;
     if (haloRef.current) haloRef.current.opacity = 0.16 + p * 0.1;
   });
   return (
@@ -159,7 +159,7 @@ export function CasaCampesina({ alturaDe, perfil, nocturno = false, reducedMotio
           ref={puertaRef}
           color={CASA.puerta}
           emissive={CASA.puerta}
-          emissiveIntensity={nocturno ? 1.6 : 1.0}
+          emissiveIntensity={1.0 + 0.6 * practicas}
           flatShading
         />
       </mesh>
@@ -178,7 +178,7 @@ export function CasaCampesina({ alturaDe, perfil, nocturno = false, reducedMotio
         <meshStandardMaterial
           color={CASA.ventana}
           emissive={CASA.ventana}
-          emissiveIntensity={nocturno ? 1.8 : 0.8}
+          emissiveIntensity={0.8 + 1.0 * practicas}
           flatShading
         />
       </mesh>
