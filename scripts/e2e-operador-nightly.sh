@@ -43,7 +43,16 @@ FARMOS_BASE="${FARMOS_BASE:-https://chagra.guatoc.co}"
 E2E_PORT="${E2E_PORT:-4188}"
 FARMOS_CLIENT_ID="${FARMOS_CLIENT_ID:-farm}"
 TEST_EMAIL="e2e-operador@test.chagra.invalid"
-DRUSH="sudo podman exec -e HOME=/tmp farmos /opt/drupal/vendor/bin/drush"
+# sudo del PATH: en NixOS el `sudo` que resuelve el PATH normal (o uno
+# contaminado por un wrapper que antepone /run/current-system/sw/bin) es un
+# symlink al store SIN el bit setuid — falla con "debe ser propiedad del uid 0
+# y tener el bit setuid establecido" y el E2E nunca corre (bug 2026-07-19: el
+# cron de las 3am nunca ejecutó por esto). El sudo con setuid real vive en
+# /run/wrappers/bin/sudo. Usamos la ruta absoluta si existe (NixOS); si no
+# (otros hosts/CI), caemos al `sudo` del PATH.
+SUDO_BIN="sudo"
+[[ -x /run/wrappers/bin/sudo ]] && SUDO_BIN="/run/wrappers/bin/sudo"
+DRUSH="$SUDO_BIN podman exec -e HOME=/tmp farmos /opt/drupal/vendor/bin/drush"
 
 # Guardarraíl: NUNCA usar el usuario real del operador como cuenta de test.
 case "$E2E_OPERADOR_USER" in
