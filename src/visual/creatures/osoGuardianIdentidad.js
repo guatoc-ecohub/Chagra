@@ -59,46 +59,85 @@ export const OSO_GUARDIAN_PALETA = {
   sombraSuelo: 'rgba(4,10,18,0.52)', // el peso de la mole en el suelo
 };
 
-/* PROPORCIONES DEL ADULTO (el corazón del rediseño):
-   hombros 24.4 de ancho contra cabeza de 8.3 → ratio ≈ 0.34 (el OsoAnteojos
-   rechazado andaba por 0.6, proporción de cría/peluche). Cabeza hundida en la
-   joroba de hombros (plantígrado sin cuello), sentado como montaña. */
+/* PROPORCIONES DEL ADULTO — ANATOMÍA, no un domo.
+ *
+ * El rediseño anterior acertó el REGISTRO (cabeza chica sobre cuerpo grande,
+ * ratio ≈ 0.34) pero falló el CUERPO: era una campana lisa, sin cruz, sin
+ * cuello, sin grupa, con la cabeza apoyada encima como calcomanía. Estos
+ * números fijan las marcas anatómicas reales del Tremarctos ornatus para que
+ * la silueta se construya sobre ellas y no a ojo.
+ *
+ * Fuente: DR `anatomia-y-silueta-del-oso-de-anteojos` (brazo gemini, 2026-06-19).
+ * Lo que manda de ahí, y que este oso ahora sí cumple:
+ *   · Musculoso y TREPADOR, no gordo: hay cintura (grupa 12.7 contra costillar
+ *     10.6 = ~17% de estrechamiento). Gradual, nunca cintura de avispa.
+ *   · Cuello CORTO Y MUSCULOSO: el trapecio sube DETRÁS del cráneo (cuelloY)
+ *     y la cabeza nace del cuerpo. No hay cabeza posada.
+ *   · Cruz (paletillas) marcada por pelaje denso — el "ahuecado" del hombro,
+ *     no la joroba de grizzly (que esta especie NO tiene).
+ *   · Patas delanteras MÁS LARGAS que las traseras (adaptación trepadora):
+ *     por eso el codo cae bajo y el antebrazo es largo.
+ *   · Plantígrado: apoya la planta completa, talón y dedos (como nosotros).
+ */
 export const OSO_GUARDIAN_PROPORCION = {
-  hombrosRx: 12.2,   // media anchura de la mole a la altura de los flancos
-  troncoRy: 10.8,    // media altura de la mole (de la joroba al asiento)
-  cabezaRx: 4.15,    // cráneo proporcionado (no cabezón)
+  grupaRx: 12.7,     // el punto MÁS ancho: las ancas del oso sentado
+  grupaY: 7.4,       // altura de esa cadera
+  cinturaRx: 10.6,   // el costillar: hay estrechamiento, es un oso atlético
+  cinturaY: 1.0,
+  cruzX: 6.4,        // dónde asoma la paletilla al costado del cráneo
+  cruzY: -11.0,      // altura de la cruz (por encima de la base del cráneo)
+  cuelloY: -14.0,    // el trapecio sube hasta acá, ESCONDIDO tras el cráneo
+  hombroX: 9.6,      // el deltoides: de ahí nace la pata delantera
+  hombroY: -7.4,
+  sueloY: 13.4,      // la línea de suelo donde apoyan las cuatro plantas
+  cabezaRx: 4.15,    // cráneo proporcionado (no cabezón) — CONSERVADO
   cabezaRy: 3.6,
   orejaR: 1.32,      // orejas chicas y bajas de oso real (no discos de peluche)
+  /* compat: consumidores viejos que leían la media anchura/altura de la mole */
+  hombrosRx: 12.7,
+  troncoRy: 10.8,
 };
 
-/* ANCLA DE LA RUANA (AccesoriosClima) — NO es la medida de la mole.
+/* LA RUANA DEL GUARDIÁN — lana pesada de verdad, no un trapecio.
  *
- * Bug corregido: se le pasaba la mole entera (rx 12.2 / ry 10.8 / cy 2) como
- * ancla. AccesoriosClima dibuja el poncho a `rx * 1.18` de media anchura, o sea
- * 28.8 de ancho en un viewBox de 32: más ancho que el propio oso (flancos a
- * ±12.4) y con el borde superior curvándose hasta y≈-6.6. Resultado: una caja
- * café que se tragaba el cuerpo y tapaba LA LUNA DEL PECHO, que es la firma del
- * personaje. El operador lo llamó "un fail".
+ * Fuente: DR `la-ruana-andina-colombiana` (brazo gemini, 2026-06-19). Lo que
+ * obliga ese dossier y que la ruana genérica de AccesoriosClima no daba:
+ *   · Lana virgen de oveja, ~1 kg: cae con GRAVEDAD. Pliegues amplios y
+ *     definidos que se asientan; no una tela que flota.
+ *   · Se asienta FIRME sobre los hombros y no resbala — por eso hubo que
+ *     dibujarle hombros al oso primero. Sin cruz no hay dónde apoyarla.
+ *   · Abierta al frente (eso la separa del poncho, que es cerrado).
+ *   · Colores sobrios del altiplano cundiboyacense: negro, azul oscuro, gris
+ *     oscuro. Las franjas rojas/amarillas son la variante vieja y acá
+ *     COMPETÍAN en área con la luna del pecho, que es el emblema. Fuera.
+ *   · Al frío se echa una punta sobre el hombro contrario. Eso resuelve dos
+ *     cosas de una: es el gesto auténtico documentado Y deja el pecho abierto,
+ *     así la luna nunca queda tapada.
+ *   · Sobre cuerpo no humano: los pliegues se exageran por la musculatura y la
+ *     prenda se integra. Si "cuelga" sin interactuar, se lee disfraz.
+ */
+export const OSO_GUARDIAN_RUANA = {
+  pano: '#2e2657',        // lana teñida de índigo oscuro (sobrio de altiplano)
+  panoLuz: '#413873',     // el lomo del pliegue donde pega la luz de luna
+  panoSombra: '#171233',  // el fondo de la arruga: la lana es densa, no traslúcida
+  panoRevés: '#4a4180',   // el envés que se ve en la punta echada al hombro
+  franja: '#8e8468',      // UNA banda de lana cruda: sobria, no compite
+  fleco: '#7b7259',       // los flecos del ruedo, tejidos y pesados
+};
+
+/* ANCLA DE LA RUANA GENÉRICA — OBSOLETA, se conserva solo por compatibilidad.
  *
- * La ruana se APOYA sobre el lomo/ancas, por DEBAJO de la luna. La luna vive en
- * un círculo de r=5.4 centrado en (-0.9, -2.2) → su borde inferior está en
- * y=3.2. AccesoriosClima levanta el borde superior del poncho hasta
- * `cy - ry*0.8` (el pico de la curva del cuello), así que la restricción dura es:
+ * Historia: la ruana venía de `AccesoriosClima`, el trapecio species-agnostic
+ * que viste a toda la fauna. Sobre este oso se le pasaba la mole entera como
+ * ancla y el poncho salía más ancho que el propio animal, tapando la luna del
+ * pecho. Se corrigió encogiendo el ancla a estos números — un parche de
+ * PROPORCIÓN, con la nota de que el rediseño de fondo iba aparte.
  *
- *     cy - ry*0.8 > 3.2      → con cy 7.3 / ry 4.6 da 3.62 ✓ (holgura 0.4)
- *
- * y el ruedo (`cy + ry*1.05`, con el vaivén de +1.6 al centro) tiene que quedar
- * sobre el cuerpo, no colgando bajo las garras (y=13.9):
- *
- *     7.3 + 4.83 + 1.6 = 13.73 ✓
- *
- * El ancho (rx * 1.18 = 9.2) queda DENTRO de la silueta (flancos ±11.9 a esa
- * altura): se apoya sobre el regazo, no engulle.
- *
- * OJO: esto es un arreglo de PROPORCIÓN, quirúrgico. El rediseño de fondo de la
- * ruana (que hoy es un trapecio genérico compartido con el resto de la fauna)
- * va aparte, con su propia DR. Si tocás estos números, revisá las dos
- * desigualdades de arriba o la luna se vuelve a tapar. */
+ * Ese rediseño ya se hizo: el guardián tiene su propia `RuanaGuardian.jsx`,
+ * dibujada con la caída, los pliegues y la punta al hombro que documenta la DR
+ * de la ruana andina, y apoyada sobre unos hombros que antes no existían. El
+ * oso ya NO consume AccesoriosClima. Este export queda para no romper a quien
+ * lo reexporte; no lo use para dibujar. */
 export const OSO_GUARDIAN_RUANA_ANCLA = { cx: 0, cy: 7.3, rx: 7.8, ry: 4.6 };
 
 /*
