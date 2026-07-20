@@ -1,0 +1,249 @@
+/*
+ * QuinuaViva3D.css — vitrina del mundo de la quinua (#/mockups/quinua-viva-3d).
+ * Autocontenida: sin fuentes/imágenes externas. Móvil-first desde 320px.
+ * Paleta de tierra fría con el morado de Tunkahuán de acento — que es el color
+ * que hace la foto de este mundo. Solo opacity/transform.
+ */
+
+.qviva {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  /* la ladera alta bajo la hora clara (familia `ladera` de la paleta madre) */
+  background: linear-gradient(180deg, #dfe4d8 0%, #e6e3d4 48%, #ece7d6 100%);
+  color: #2e2a30;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.qviva__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.qviva__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8e4f80;
+}
+.qviva__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #33303a;
+}
+.qviva__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.qviva__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.qviva__lienzo {
+  position: relative;
+  height: min(66vh, 32rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(142, 79, 128, 0.25);
+  box-shadow: 0 12px 30px rgba(44, 42, 50, 0.16);
+  background: radial-gradient(120% 90% at 50% 22%, #e9eee0 0%, #92a084 100%);
+}
+.qviva__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+.quinual-canvas {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.quinual-canvas--lista {
+  opacity: 1;
+}
+
+.qviva__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  color: #3c3842;
+  opacity: 0.85;
+}
+
+.qviva__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.qviva__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.qviva__toggle {
+  border: 1.5px solid #8e4f80;
+  background: #fff;
+  color: #8e4f80;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.qviva__toggle:hover,
+.qviva__toggle:focus-visible {
+  background: #8e4f80;
+  color: #fff;
+  outline-offset: 2px;
+}
+
+/* ---- Ficha 2D (fallback digno, sin GPU): LAS DOS PANOJAS ---- */
+.qviva__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: linear-gradient(180deg, #e9eee0 0%, #d3d8c2 56%, #b4bb9e 100%);
+}
+.qviva__estampa {
+  position: relative;
+  display: flex;
+  gap: 2.4rem;
+  align-items: flex-end;
+  height: 190px;
+  margin-bottom: 0.5rem;
+}
+.qviva__panoja {
+  position: relative;
+  width: 66px;
+  height: 175px;
+}
+.qviva__eje {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #8f9a62 0%, #76824f 100%);
+}
+
+/* GLOMERULADA: los glomérulos apretados contra el eje — se lee maciza */
+.qviva__glom {
+  position: absolute;
+  left: 50%;
+  width: 30px;
+  height: 21px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 32%, #a86bb0 0%, #7b4a86 62%, #5f3669 100%);
+  box-shadow: inset -3px -3px 5px rgba(0, 0, 0, 0.22);
+}
+.qviva__glom--0 { top: 4px; transform: translateX(-52%) scale(0.62); }
+.qviva__glom--1 { top: 20px; transform: translateX(-44%) scale(0.78); }
+.qviva__glom--2 { top: 36px; transform: translateX(-58%) scale(0.9); }
+.qviva__glom--3 { top: 54px; transform: translateX(-42%) scale(1); }
+.qviva__glom--4 { top: 74px; transform: translateX(-58%) scale(1); }
+.qviva__glom--5 { top: 94px; transform: translateX(-44%) scale(0.94); }
+.qviva__glom--6 { top: 114px; transform: translateX(-56%) scale(0.84); }
+.qviva__glom--7 { top: 133px; transform: translateX(-48%) scale(0.7); }
+
+/* AMARANTIFORME: ramitas largas, abiertas y vencidas — se lee suelta */
+.qviva__ramita {
+  position: absolute;
+  left: 50%;
+  width: 40px;
+  height: 9px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #9b3f57 0%, #b85566 55%, #8e3550 100%);
+  box-shadow: inset -2px -1px 3px rgba(0, 0, 0, 0.2);
+  transform-origin: 0 50%;
+}
+.qviva__ramita--0 { top: 16px; transform: rotate(28deg) scaleX(0.62); }
+.qviva__ramita--1 { top: 40px; transform: translateX(-100%) rotate(-30deg) scaleX(0.7); }
+.qviva__ramita--2 { top: 66px; transform: rotate(34deg) scaleX(0.86); }
+.qviva__ramita--3 { top: 94px; transform: translateX(-100%) rotate(-36deg) scaleX(0.94); }
+.qviva__ramita--4 { top: 122px; transform: rotate(40deg) scaleX(1); }
+.qviva__ramita--5 { top: 148px; transform: translateX(-100%) rotate(-42deg) scaleX(0.9); }
+
+.qviva__ficha-nombre {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #33303a;
+}
+.qviva__ficha-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #4c4752;
+  text-align: center;
+  padding: 0 0.8rem;
+}
+
+/* ---- Saberes ---- */
+.qviva__saberes {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.qviva__saberes h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.7rem;
+  color: #33303a;
+}
+.qviva__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+@media (min-width: 640px) {
+  .qviva__saberes ol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.qviva__saberes li {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(142, 79, 128, 0.16);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+}
+.qviva__emoji {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+.qviva__saberes b {
+  display: block;
+  font-size: 0.92rem;
+  color: #33303a;
+}
+.qviva__saberes li p {
+  margin: 0.15rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+.qviva__cierre {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #3c3842;
+  max-width: 42rem;
+}
