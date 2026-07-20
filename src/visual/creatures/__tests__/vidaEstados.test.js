@@ -57,8 +57,8 @@ describe('2. elegirMomentoVida — azar ponderado sin repetir', () => {
   });
 
   it('el azar se inyecta: rand=0 da siempre el primer candidato (determinista)', () => {
-    const a = elegirMomentoVida('oso-andino', null, () => 0);
-    const b = elegirMomentoVida('oso-andino', null, () => 0);
+    const a = elegirMomentoVida('oso-guardian', null, () => 0);
+    const b = elegirMomentoVida('oso-guardian', null, () => 0);
     expect(a).toBe(b);
   });
 
@@ -70,8 +70,8 @@ describe('2. elegirMomentoVida — azar ponderado sin repetir', () => {
 
 describe('3. Duraciones — el contrato con el CSS', () => {
   it('duracionDeMomentoVida devuelve el dur del repertorio (0 si no existe)', () => {
-    expect(duracionDeMomentoVida('oso-andino', 'resopla')).toBe(4500);
-    expect(duracionDeMomentoVida('oso-andino', 'nada')).toBe(0);
+    expect(duracionDeMomentoVida('oso-guardian', 'resopla')).toBe(4500);
+    expect(duracionDeMomentoVida('oso-guardian', 'nada')).toBe(0);
     expect(duracionDeMomentoVida('nadie', 'resopla')).toBe(0);
   });
 
