@@ -69,8 +69,8 @@ export const OSO_GUARDIAN_PALETA = {
  *
  * Fuente: DR `anatomia-y-silueta-del-oso-de-anteojos` (brazo gemini, 2026-06-19).
  * Lo que manda de ahí, y que este oso ahora sí cumple:
- *   · Musculoso y TREPADOR, no gordo: hay cintura (grupa 12.7 contra costillar
- *     10.6 = ~17% de estrechamiento). Gradual, nunca cintura de avispa.
+ *   · Musculoso y TREPADOR, no gordo: hay cintura (grupa 12.5 contra costillar
+ *     10.2 = ~18% de estrechamiento). Gradual, nunca cintura de avispa.
  *   · Cuello CORTO Y MUSCULOSO: el trapecio sube DETRÁS del cráneo (cuelloY)
  *     y la cabeza nace del cuerpo. No hay cabeza posada.
  *   · Cruz (paletillas) marcada por pelaje denso — el "ahuecado" del hombro,
@@ -80,21 +80,21 @@ export const OSO_GUARDIAN_PALETA = {
  *   · Plantígrado: apoya la planta completa, talón y dedos (como nosotros).
  */
 export const OSO_GUARDIAN_PROPORCION = {
-  grupaRx: 12.7,     // el punto MÁS ancho: las ancas del oso sentado
+  grupaRx: 12.5,     // el punto MÁS ancho: las ancas del oso sentado
   grupaY: 7.4,       // altura de esa cadera
-  cinturaRx: 10.6,   // el costillar: hay estrechamiento, es un oso atlético
+  cinturaRx: 10.2,   // el costillar: hay estrechamiento, es un oso atlético
   cinturaY: 1.0,
-  cruzX: 6.4,        // dónde asoma la paletilla al costado del cráneo
-  cruzY: -11.0,      // altura de la cruz (por encima de la base del cráneo)
-  cuelloY: -14.0,    // el trapecio sube hasta acá, ESCONDIDO tras el cráneo
-  hombroX: 9.6,      // el deltoides: de ahí nace la pata delantera
-  hombroY: -7.4,
+  cruzX: 5.8,        // dónde asoma la paletilla al costado del cráneo
+  cruzY: -10.9,      // altura de la cruz (por encima de la base del cráneo)
+  cuelloY: -14.2,    // el trapecio sube hasta acá, ESCONDIDO tras el cráneo
+  hombroX: 8.7,      // el deltoides: de ahí nace la pata delantera
+  hombroY: -7.0,
   sueloY: 13.4,      // la línea de suelo donde apoyan las cuatro plantas
   cabezaRx: 4.15,    // cráneo proporcionado (no cabezón) — CONSERVADO
   cabezaRy: 3.6,
   orejaR: 1.32,      // orejas chicas y bajas de oso real (no discos de peluche)
   /* compat: consumidores viejos que leían la media anchura/altura de la mole */
-  hombrosRx: 12.7,
+  hombrosRx: 12.5,
   troncoRy: 10.8,
 };
 
