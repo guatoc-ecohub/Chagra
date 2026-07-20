@@ -29,27 +29,16 @@ import { perfilDeTier } from '../deviceTier.js';
 import { Fauna } from '../escenas/FaunaEscena.jsx';
 import FaunaCalido from '../escenas/FaunaCalido.jsx';
 import FloraCafetal from './FloraCafetal.jsx';
-import { ANCHO, FONDO, alturaLadera, SITIO_CASA } from './floraCafetal.geom.js';
+import CasaBeneficio from './CasaBeneficio.jsx';
+import { alturaLadera, construirLadera, SITIO_CASA } from './floraCafetal.geom.js';
 import {
   AtmosferaMundo,
   DomoCielo,
   useAtmosferaMundo,
   useGradienteBandas,
-  construirTerreno,
-  ruidoTerreno,
-  smoothstep,
   CamaraDirector,
 } from '../kit/index.js';
-import {
-  mezclar,
-  VERDES,
-  TIERRAS,
-  CASA,
-  ACENTOS,
-  LUCES,
-  NIEBLAS,
-  PALETA,
-} from '../paleta/index.js';
+import { mezclar, VERDES, LUCES } from '../paleta/index.js';
 
 /* La identidad del piso templado dentro de la familia del valle: `corral`
    ("corral y cafetal: tarde de finca"). El 60% restante lo pone la HORA. */
@@ -62,118 +51,9 @@ const RADIO_CAFETAL = 11;
 /* El frustum de sombra a medida de la ladera (la luz colada del sombrío). */
 const SOMBRA_CAFETAL = { left: -16, right: 16, top: 16, bottom: -6, far: 40 };
 
-/* La malla de la ladera — el heightfield del KIT (mismo andamiaje que todos los
-   mundos) con la pintura PROPIA del piso templado: arvenses verdes (cobertura
-   viva), tierra roja andina asomando y el mantillo pardo hacia la sombra. */
-function construirLadera(seg, plano) {
-  const cPasto = new THREE.Color(VERDES.brote); // pasto al sol del piso templado
-  const cPasto2 = new THREE.Color(VERDES.calido); // el oliva que asoma hacia lo seco
-  const cTierra = new THREE.Color(TIERRAS.arcilla); // la tierra roja cafetera
-  const cMantillo = new THREE.Color(TIERRAS.mantillo); // hojarasca bajo el sombrío
-  const cCamino = new THREE.Color(mezclar(TIERRAS.camino, TIERRAS.vega, 0.4));
-  return construirTerreno({
-    ancho: ANCHO,
-    fondo: FONDO,
-    seg,
-    plano,
-    altura: alturaLadera,
-    pintar: (wx, wz, alt, c) => {
-      const enLoma = smoothstep(5, -8, wz);
-      c.lerpColors(cPasto, cPasto2, 0.5 + 0.5 * ruidoTerreno(wx * 0.9, wz * 0.7));
-      // la tierra roja asoma a manchas entre los surcos
-      c.lerp(cTierra, smoothstep(-0.1, 0.85, ruidoTerreno(wx * 1.3, wz * 1.1)) * 0.45 * enLoma);
-      // el mantillo pardo gana hacia lo alto (más sombrío, más hojarasca)
-      c.lerp(cMantillo, enLoma * 0.22);
-      // el caminito seco del frente, por donde se llega
-      c.lerp(cCamino, smoothstep(1.2, 0, Math.abs(wx - Math.sin(wz * 0.4) * 2.2)) * smoothstep(2, 12, wz));
-    },
-  });
-}
-
-/* La casa campesina con su BENEFICIADERO, arriba al fondo: paredes encaladas,
-   techo de teja, y al lado la marquesina — la cama elevada bajo plástico donde
-   el café pergamino se seca al sol. Insinuada, medio velada por la bruma. */
-function CasaBeneficio({ pos }) {
-  return (
-    <group position={pos} rotation={[0, -0.35, 0]}>
-      {/* la casa: LA casa campesina de la paleta madre (la misma del valle) */}
-      <mesh position={[0, 0.72, 0]}>
-        <boxGeometry args={[2.6, 1.44, 1.9]} />
-        <meshLambertMaterial color={CASA.encalado} flatShading />
-      </mesh>
-      <mesh position={[0, 0.18, 0]}>
-        <boxGeometry args={[2.64, 0.36, 1.94]} />
-        <meshLambertMaterial color={CASA.zocalo} flatShading />
-      </mesh>
-      {/* la puerta y una ventana (la carpintería pintada de la casa) */}
-      <mesh position={[0.5, 0.62, 0.96]}>
-        <boxGeometry args={[0.44, 0.95, 0.06]} />
-        <meshLambertMaterial color={CASA.carpinteria} flatShading />
-      </mesh>
-      <mesh position={[-0.6, 0.86, 0.96]}>
-        <boxGeometry args={[0.5, 0.44, 0.06]} />
-        <meshLambertMaterial color={CASA.carpinteria} flatShading />
-      </mesh>
-      {/* techo a dos aguas de teja */}
-      <mesh position={[0, 1.62, -0.62]} rotation={[-0.62, 0, 0]}>
-        <boxGeometry args={[3.0, 0.08, 1.5]} />
-        <meshLambertMaterial color={CASA.tejaSombra} flatShading />
-      </mesh>
-      <mesh position={[0, 1.62, 0.62]} rotation={[0.62, 0, 0]}>
-        <boxGeometry args={[3.0, 0.08, 1.5]} />
-        <meshLambertMaterial color={CASA.teja} flatShading />
-      </mesh>
-
-      {/* la MARQUESINA de secado, al lado: patas + cama de pergamino + techo
-          translúcido a dos aguas (la señal del beneficio) */}
-      <group position={[2.6, 0, 0.4]}>
-        {[[-1.0, -0.55], [1.0, -0.55], [-1.0, 0.55], [1.0, 0.55]].map((q, i) => (
-          <mesh key={i} position={[q[0], 0.35, q[1]]}>
-            <boxGeometry args={[0.09, 0.7, 0.09]} />
-            <meshLambertMaterial color={mezclar(PALETA.madera, PALETA.maderaOscura, 0.5)} flatShading />
-          </mesh>
-        ))}
-        <mesh position={[0, 0.72, 0]}>
-          <boxGeometry args={[2.2, 0.07, 1.3]} />
-          <meshLambertMaterial color={PALETA.maderaClara} flatShading />
-        </mesh>
-        {/* el café pergamino extendido secándose al sol */}
-        <mesh position={[0, 0.77, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[2.0, 1.1]} />
-          <meshLambertMaterial color={mezclar(TIERRAS.arenaOrilla, TIERRAS.camino, 0.2)} flatShading />
-        </mesh>
-        {[[-1.05, -0.62], [1.05, -0.62], [-1.05, 0.62], [1.05, 0.62]].map((q, i) => (
-          <mesh key={`p${i}`} position={[q[0], 1.15, q[1]]}>
-            <boxGeometry args={[0.06, 0.85, 0.06]} />
-            <meshLambertMaterial color={mezclar(PALETA.madera, PALETA.maderaOscura, 0.5)} flatShading />
-          </mesh>
-        ))}
-        <mesh position={[0, 1.62, -0.36]} rotation={[-0.5, 0, 0]}>
-          <planeGeometry args={[2.4, 0.95]} />
-          <meshBasicMaterial color={NIEBLAS.lechosa} transparent opacity={0.34} depthWrite={false} side={THREE.DoubleSide} />
-        </mesh>
-        <mesh position={[0, 1.62, 0.36]} rotation={[0.5, 0, 0]}>
-          <planeGeometry args={[2.4, 0.95]} />
-          <meshBasicMaterial color={NIEBLAS.lechosa} transparent opacity={0.34} depthWrite={false} side={THREE.DoubleSide} />
-        </mesh>
-      </group>
-
-      {/* dos canastos de cosecha esperando en el patio */}
-      {[[-1.8, 0.6], [-1.35, 0.9]].map((q, i) => (
-        <group key={`c${i}`} position={[q[0], 0, q[1]]}>
-          <mesh position={[0, 0.18, 0]}>
-            <cylinderGeometry args={[0.24, 0.17, 0.36, 9, 1, true]} />
-            <meshLambertMaterial color={CASA.bejuco} flatShading side={THREE.DoubleSide} />
-          </mesh>
-          <mesh position={[0, 0.36, 0]} scale={[1, 0.4, 1]}>
-            <sphereGeometry args={[0.2, 8, 5]} />
-            <meshLambertMaterial color={ACENTOS.cafeCereza} flatShading />
-          </mesh>
-        </group>
-      ))}
-    </group>
-  );
-}
+/* La malla de la ladera y la casa-beneficiadero viven ahora en piezas
+   compartidas del cafetal (floraCafetal.geom / CasaBeneficio.jsx): las monta
+   también el arquetipo `cafe` del framework — una sola geografía, dos tomas. */
 
 /* El anillo del paso didáctico: respira sobre el punto que la lección señala.
    Con reducedMotion queda quieto (presencia sin parpadeo). */
