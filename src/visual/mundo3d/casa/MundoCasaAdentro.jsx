@@ -59,7 +59,11 @@ const PASOS = [
 ];
 
 const CSS = `
-.mcasa { position: relative; width: 100%; height: 100%; overflow: hidden; background: #2b2116; }
+.mcasa {
+  position: relative; width: 100%; height: 100vh; height: 100dvh; min-height: 320px;
+  display: flex; overflow: hidden; background: #2b2116;
+}
+.casadentro-canvas { width: 100%; height: 100%; }
 .mcasa canvas { opacity: 0; transition: opacity 0.9s ease; }
 .mcasa .casadentro-canvas--lista canvas, .mcasa canvas.casadentro-canvas--lista { opacity: 1; }
 .mcasa__accesos {
