@@ -106,10 +106,15 @@ export function caminoX(wz) {
  * 'bajo' deja lo mínimo para que AÚN se lea "el mango gigante abajo y los
  * cítricos chicos arriba" — la escala relativa sobrevive a todo recorte.
  */
+/* La CARGA es alta a propósito, y es lo cierto: un palo de mango en cosecha y
+   un naranjo bueno cargan a cientos de frutos. Además es el color que levanta
+   la escena — al mundo del café le pasó que quedó pardo y mustio al lado del
+   valle, y aquí el amarillo del mango y el naranja del cítrico son la defensa.
+   (Medido contra el cafetal: ~1.5x su área de fruta y bastante más claro.) */
 export const FLORA_FRUTALES = {
-  alto: { mango: 5, mangoFruto: 110, citrico: 24, citricoFruto: 320, azahar: 90, hojarasca: 10, piedra: 6 },
-  medio: { mango: 4, mangoFruto: 60, citrico: 14, citricoFruto: 180, azahar: 40, hojarasca: 6, piedra: 4 },
-  bajo: { mango: 2, mangoFruto: 24, citrico: 7, citricoFruto: 70, azahar: 0, hojarasca: 3, piedra: 2 },
+  alto: { mango: 5, mangoFruto: 165, citrico: 24, citricoFruto: 430, azahar: 90, hojarasca: 10, piedra: 6 },
+  medio: { mango: 4, mangoFruto: 92, citrico: 14, citricoFruto: 240, azahar: 40, hojarasca: 6, piedra: 4 },
+  bajo: { mango: 2, mangoFruto: 34, citrico: 7, citricoFruto: 92, azahar: 0, hojarasca: 3, piedra: 2 },
 };
 
 /** Conteos para un tier (desconocido → frugal, nunca el más caro). */
