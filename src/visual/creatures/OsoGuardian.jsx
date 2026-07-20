@@ -4,11 +4,11 @@ import { useVidaIdle, useRitmoPropio, useMiradaUsted } from './useVidaIdle.js';
 import { CreatureFilters } from './_filters.jsx';
 import { BocaVisema } from './_rubberhose.jsx';
 import {
-  OSO_GUARDIAN_PALETA, OSO_GUARDIAN_PROPORCION, OSO_GUARDIAN_RUANA_ANCLA,
+  OSO_GUARDIAN_PALETA, OSO_GUARDIAN_PROPORCION,
   OSO_GUARDIAN_SLUG, OSO_GUARDIAN_TINTA, PERFIL_OSO_GUARDIAN,
 } from './osoGuardianIdentidad.js';
 import { cuerpoDeClima, ropaDeClimaBicho } from './creatureClimaCuerpo.js';
-import { AccesoriosClima } from './AccesoriosClima.jsx';
+import { RuanaGuardian } from './RuanaGuardian.jsx';
 import { LineBoilFilter } from './LineBoilFilter.jsx';
 import { PropEnMano } from './PropEnMano.jsx';
 import { AuraPoder } from './AuraPoder.jsx';
@@ -21,13 +21,27 @@ import { auraDeBicho } from './transformacion.js';
    CRECIENTE crema en el pecho (su emblema, conservado) y los anteojos del oso
    andino hechos de AROS DE LUZ que respiran.
 
-   QUÉ CORRIGE de los dos osos rechazados (el café OsoAndino y el OsoAnteojos
-   de peluche) — el mandato "que no se vea tan infantil":
+   QUÉ CORRIGE ESTA PASADA — la revisión visual a 760 px marcó tres defectos,
+   y son los tres del CUERPO. La cara, la luna del pecho y el rim menta pasaron
+   la revisión y NO se tocaron:
+   · NO TENÍA ANATOMÍA, ERA UN DOMO. El cuerpo era una campana lisa sin cruz,
+     sin cuello y sin grupa, con la cabeza pegada encima como calcomanía. Ahora
+     la silueta recorre las marcas reales del Tremarctos (grupa → cintura →
+     costillar → cruz → cuello), el trapecio sube ESCONDIDO tras el cráneo para
+     que la cabeza nazca del cuerpo, y una GOLILLA de pelaje denso —el
+     "ahuecado" de hombros que documenta la DR— remacha la costura.
+   · LAS EXTREMIDADES NO EXISTÍAN. Al frente había dos rectángulos redondeados
+     flotando a media panza; atrás, cuatro juegos de garras apoyados en el piso
+     SIN PATAS que los sostuvieran. Ahora los brazos nacen del deltoides y son
+     largos (esta especie los tiene más largos que las traseras: es trepadora),
+     y las traseras tienen caña y planta plantígrada completa.
+   · LA RUANA ERA UNA TABLA. Ver RuanaGuardian.jsx: se fue el trapecio genérico
+     de AccesoriosClima y entró una prenda con caída, pliegue y punta al hombro.
+
+   Lo que ya venía bien de la pasada anterior y se conserva:
    · PROPORCIONES DE ADULTO: cabeza chica (ratio cabeza:hombros ≈ 1:3, antes
-     ≈ 1:1.6) hundida en una JOROBA de hombros anchos; la silueta es un PATH
-     propio de mole plantígrada sentada como montaña — no el círculo-sobre-
-     elipse del peluche. Hocico canela PRESENTE que proyecta del cráneo,
-     carrilleras que ensanchan la cara abajo (cara adulta, no carita redonda).
+     ≈ 1:1.6). Hocico canela PRESENTE que proyecta del cráneo, carrilleras que
+     ensanchan la cara abajo (cara adulta, no carita redonda).
    · OJOS CON ALMA, NO DE JUGUETE: almendras oscuras de párpado pesado con
      iris menta-luz chico y catchlight — dentro de los aros luminosos. Nada de
      esclerótica blanca con pupila gigante (OjosRubber queda fuera adrede).
@@ -65,25 +79,140 @@ function Garras({ xs, y, color, largo = 1.2 }) {
    la mole (reusa la cadencia osoa-mota ya existente). Delays/duraciones
    propios: vida, no metrónomo. */
 const ESPORAS = [
-  { cx: -11.8, cy: -5.2, r: 0.46, d: 0, s: 6.9 },
-  { cx: 12.2, cy: -1.4, r: 0.4, d: -2.2, s: 7.5 },
-  { cx: -9.6, cy: 9.4, r: 0.34, d: -3.9, s: 6.1 },
-  { cx: 10.2, cy: -8.8, r: 0.44, d: -1.5, s: 6.5 },
-  { cx: -13.2, cy: 1.6, r: 0.3, d: -4.8, s: 7.8 },
+  { cx: -12.2, cy: -6.4, r: 0.46, d: 0, s: 6.9 },
+  { cx: 12.6, cy: -3.0, r: 0.4, d: -2.2, s: 7.5 },
+  { cx: -14.4, cy: 4.6, r: 0.34, d: -3.9, s: 6.1 },
+  { cx: 10.6, cy: -9.8, r: 0.44, d: -1.5, s: 6.5 },
+  { cx: -13.9, cy: -1.2, r: 0.3, d: -4.8, s: 7.8 },
 ];
 
-/* LA SILUETA DE LA MOLE (el corazón del rediseño): un solo path de oso sentado
-   como montaña — joroba de hombros arriba, flancos que se abren a las ancas,
-   asiento ancho. Nada de elipse de peluche. */
+/* ═══ LA SILUETA — ANATOMÍA DE OSO, NO UN DOMO.
+ *
+ * La versión anterior era una campana lisa: sin cruz, sin cuello, sin grupa, y
+ * con la cabeza apoyada encima como calcomanía. Este path recorre las marcas
+ * reales del Tremarctos ornatus (DR gemini, 2026-06-19), de abajo a arriba por
+ * el costado izquierdo y espejado de vuelta:
+ *
+ *   ASIENTO → GRUPA (±12.7, el punto MÁS ancho del oso sentado: son las ancas)
+ *   → CINTURA (±10.6: hay talle. Es un trepador musculoso, no una bola. El
+ *     estrechamiento es del 17% y GRADUAL — la especie no tiene cintura de
+ *     avispa, la DR es explícita en que la transición es suave)
+ *   → COSTILLAR de pecho profundo → CRUZ (la paletilla sube hasta y=-11, POR
+ *     ENCIMA de la base del cráneo, y asoma a los costados de la cabeza)
+ *   → CUELLO CORTO Y MUSCULOSO: el trapecio sigue subiendo hasta y=-14, pero
+ *     ahí ya va ESCONDIDO detrás del cráneo. Ese tramo es el que hace que la
+ *     cabeza NAZCA del cuerpo en vez de posarse encima. Es literalmente lo
+ *     único que separa un oso de un muñeco de nieve.
+ *
+ * Ojo con la cruz: es pelaje denso, el "ahuecado" de hombro que describe la DR
+ * — NO la joroba del oso pardo, que esta especie no tiene. Si se exagera, deja
+ * de ser un oso andino y pasa a ser un grizzly. */
 const SILUETA_MOLE =
-  'M -10.9,13.1 '
-  + 'C -13.3,10.6 -13.9,6.2 -12.6,1.8 '
-  + 'C -11.8,-1.6 -10.7,-4.2 -9.0,-6.3 '
-  + 'C -7.2,-8.6 -4.0,-9.8 0,-9.8 '
-  + 'C 4.0,-9.8 7.2,-8.6 9.0,-6.3 '
-  + 'C 10.7,-4.2 11.8,-1.6 12.6,1.8 '
-  + 'C 13.9,6.2 13.3,10.6 10.9,13.1 '
-  + 'C 7.4,13.9 -7.4,13.9 -10.9,13.1 Z';
+  'M -10.8,13.6 '
+  + 'C -12.4,12.0 -13.0,9.8 -12.7,7.4 '     // grupa: las ancas, lo más ancho
+  + 'C -12.4,5.0 -11.0,3.0 -10.6,1.0 '      // cintura: el talle del trepador
+  + 'C -10.3,-1.4 -10.6,-4.2 -10.2,-6.0 '   // costillar: el pecho es profundo
+  + 'C -9.8,-8.0 -8.4,-9.8 -6.4,-11.0 '     // CRUZ: la paletilla sube
+  + 'C -5.2,-11.9 -4.2,-13.0 -2.8,-13.7 '   // cuello corto: el trapecio…
+  + 'C -1.5,-14.3 1.5,-14.3 2.8,-13.7 '     // …y acá va oculto tras el cráneo
+  + 'C 4.2,-13.0 5.2,-11.9 6.4,-11.0 '
+  + 'C 8.4,-9.8 9.8,-8.0 10.2,-6.0 '
+  + 'C 10.6,-4.2 10.3,-1.4 10.6,1.0 '
+  + 'C 11.0,3.0 12.4,5.0 12.7,7.4 '
+  + 'C 13.0,9.8 12.4,12.0 10.8,13.6 '
+  + 'C 7.2,14.4 -7.2,14.4 -10.8,13.6 Z';
+
+/* ═══ PATA TRASERA del plantígrado sentado (`s`: -1 izquierda, +1 derecha).
+ *
+ * El defecto que corrige: antes había CUATRO JUEGOS DE GARRAS apoyados en el
+ * piso sin ninguna pata que los sostuviera. Era lo que más gritaba "sin
+ * terminar".
+ *
+ * El muslo ya vive en la silueta (es el bulto de la grupa); lo que falta y se
+ * dibuja acá es la CAÑA que baja de ese muslo hasta el tobillo. Va por delante
+ * del flanco, así que se lee por su contorno sobre el cuerpo oscuro. */
+function canaTrasera(s) {
+  const x = (v) => (s * v).toFixed(2);
+  return (
+    `M ${x(10.6)},6.8 `
+    + `C ${x(11.9)},8.6 ${x(12.6)},10.6 ${x(12.7)},12.3 `  // baja por fuera
+    + `C ${x(12.75)},13.1 ${x(12.2)},13.6 ${x(11.3)},13.65 ` // tobillo
+    + `C ${x(10.4)},13.7 ${x(9.8)},13.2 ${x(9.8)},12.4 `
+    + `C ${x(9.75)},10.6 ${x(9.5)},8.6 ${x(8.9)},7.0 `      // corva interna
+    + `C ${x(9.4)},6.4 ${x(10.1)},6.3 ${x(10.6)},6.8 Z`
+  );
+}
+
+/* PLANTA TRASERA — plantígrada de verdad: apoya la planta COMPLETA, talón y
+ * dedos, como nosotros. Por eso es larga y descansa entera sobre el suelo, no
+ * de puntillas. Va abierta hacia afuera (postura real del oso sentado) con el
+ * talón hacia adentro y los dedos al exterior: así los cuatro apoyos se leen
+ * separados y no se pisan con las manos. */
+function plantaTrasera(s) {
+  const x = (v) => (s * v).toFixed(2);
+  return (
+    `M ${x(9.6)},12.5 `
+    + `C ${x(8.7)},12.55 ${x(8.2)},13.05 ${x(8.25)},13.7 `   // talón (interno)
+    + `C ${x(8.3)},14.3 ${x(9.2)},14.6 ${x(10.5)},14.55 `
+    + `C ${x(12.1)},14.5 ${x(13.4)},14.25 ${x(13.8)},13.65 ` // dedos (externo)
+    + `C ${x(14.1)},13.15 ${x(13.7)},12.55 ${x(12.8)},12.45 `
+    + `C ${x(11.6)},12.3 ${x(10.5)},12.42 ${x(9.6)},12.5 Z`
+  );
+}
+
+/* ═══ PATA DELANTERA. En esta especie las delanteras son MÁS LARGAS que las
+ * traseras — es la adaptación trepadora, y es de las cosas que más rápido
+ * distinguen un oso andino de un oso negro. Por eso el codo cae bajo y el
+ * antebrazo es largo.
+ *
+ * Antes eran dos rectángulos redondeados verticales que arrancaban a media
+ * panza, sin conexión con ningún hombro (porque no había hombro). Ahora nace
+ * en el deltoides, baja por fuera, y el antebrazo entra hacia el centro hasta
+ * la mano — que es como se sienta un oso: los brazos caen y se recogen. */
+function brazo(s) {
+  const x = (v) => (s * v).toFixed(2);
+  return (
+    `M ${x(9.9)},-7.6 `
+    + `C ${x(11.0)},-4.6 ${x(11.3)},-1.0 ${x(10.8)},2.2 `   // brazo por fuera
+    + `C ${x(10.4)},5.2 ${x(9.8)},8.2 ${x(9.2)},10.6 `      // antebrazo largo
+    + `C ${x(8.9)},11.8 ${x(8.2)},12.5 ${x(7.2)},12.7 `     // muñeca
+    + `C ${x(6.0)},12.9 ${x(5.2)},12.4 ${x(5.0)},11.4 `
+    + `C ${x(4.9)},9.0 ${x(5.4)},6.0 ${x(5.9)},3.0 `        // borde interno
+    + `C ${x(6.4)},0.0 ${x(6.8)},-3.2 ${x(7.3)},-6.2 `
+    + `C ${x(7.8)},-7.4 ${x(9.0)},-8.0 ${x(9.9)},-7.6 Z`
+  );
+}
+
+/* MANO plantígrada apoyada: fondo plano contra el suelo (carga peso), lomo
+ * redondo. Las garras salen del borde delantero. */
+function mano(s) {
+  const x = (v) => (s * v).toFixed(2);
+  return (
+    `M ${x(8.7)},12.4 `
+    + `C ${x(8.75)},11.6 ${x(7.9)},11.15 ${x(6.4)},11.15 `
+    + `C ${x(4.9)},11.15 ${x(4.05)},11.6 ${x(4.1)},12.4 `
+    + `C ${x(4.15)},13.3 ${x(4.6)},13.85 ${x(6.4)},13.9 `   // el suelo
+    + `C ${x(8.2)},13.85 ${x(8.65)},13.3 ${x(8.7)},12.4 Z`
+  );
+}
+
+/* GOLILLA DEL CUELLO — el pelaje denso que la DR describe como un "ahuecado"
+ * en cuello y hombros. Además de ser cierto, es el remache del problema de la
+ * cabeza-calcomanía: una corona de mechones que monta sobre los hombros y pasa
+ * por detrás del cráneo cose la cabeza al cuerpo. Los mechones del centro
+ * quedan ocultos tras la cabeza; los que se ven son los de los flancos, que es
+ * justo donde hacía falta la costura. */
+const GOLILLA =
+  'M -8.8,-7.0 '
+  + 'C -8.5,-8.8 -7.6,-10.4 -6.2,-11.5 '
+  + 'C -5.6,-10.3 -5.0,-11.7 -4.4,-10.5 '
+  + 'C -3.9,-11.9 -3.2,-10.9 -2.6,-12.1 '
+  + 'C -1.8,-10.9 -1.0,-12.3 -0.2,-11.1 '
+  + 'C 0.6,-12.3 1.4,-10.9 2.2,-12.1 '
+  + 'C 2.8,-10.9 3.5,-11.9 4.0,-10.5 '
+  + 'C 4.6,-11.7 5.2,-10.3 5.8,-11.5 '
+  + 'C 7.2,-10.4 8.1,-8.8 8.4,-7.0 '
+  + 'C 5.6,-5.9 -6.0,-5.9 -8.8,-7.0 Z';
 
 /* LA LUNA CRECIENTE del pecho — el emblema conservado de la base. Media
    circunferencia externa (r 3.0, centrada en 0,-2.2) + arco interno tendido
@@ -246,51 +375,81 @@ export function OsoGuardian({
   //    bruma y esporas. `.crt-body` respira con oso-boil (pesado, lento).
   const body = (
     <g className={`crt-body${vivo ? ' rh-boil' : ''}`} filter={`url(#${glow})`}>
-      {/* SOMBRA DE SUELO — el peso de la montaña (masa real, no sticker). */}
-      <ellipse cx="0" cy="14.35" rx="12.4" ry="2.1" fill={`url(#${haloSombra})`} aria-hidden="true" />
+      {/* SOMBRA DE SUELO — el peso de la montaña (masa real, no sticker).
+          Ahora abarca las cuatro plantas, que llegan más afuera que la mole. */}
+      <ellipse cx="0" cy="14.9" rx="14.8" ry="2.2" fill={`url(#${haloSombra})`} aria-hidden="true" />
       {/* aura menta tenue: bioluminiscencia de niebla, no neón de feria */}
       <circle cx="0" cy="1.5" r={auraR + 2} fill={`url(#${haloMenta})`} opacity={auraOp * 0.5} />
 
-      {/* PATAS TRASERAS del plantígrado sentado: las plantas asoman adelante,
-          a los lados de la mole (postura real de oso sentado). */}
-      <g aria-hidden="true">
-        <ellipse cx="-10.5" cy="13.15" rx="2.35" ry="1.35" fill={P.planta} stroke={INK} strokeWidth="0.8" />
-        <ellipse cx="10.5" cy="13.15" rx="2.35" ry="1.35" fill={P.planta} stroke={INK} strokeWidth="0.8" />
-        <Garras xs={[-11.5, -10.5, -9.5]} y={13.9} color={P.garra} largo={0.95} />
-        <Garras xs={[9.5, 10.5, 11.5]} y={13.9} color={P.garra} largo={0.95} />
-      </g>
-
-      {/* ═══ LA MOLE — la silueta que manda: joroba de hombros, flancos a las
-          ancas, asiento de montaña. El halo menta va MEDIDO en el drop-shadow
+      {/* ═══ LA MOLE — la silueta que manda: grupa, cintura, cruz y el cuello
+          que sube a buscar el cráneo. El halo menta va MEDIDO en el drop-shadow
           (la estética del avatar aprobado, sin contorno de neón chillón). */}
       <path d={SILUETA_MOLE} fill={`url(#${pelaje})`} stroke={INK} strokeWidth="1.35"
         strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 6px ${P.cuerpoGlow})` }} />
+
+      {/* PATAS TRASERAS — caña + planta plantígrada. Van DELANTE del flanco
+          (un oso sentado recoge las patas hacia adelante), así que se leen por
+          su contorno sobre el cuerpo oscuro. Ya no son garras flotando. */}
+      <g aria-hidden="true">
+        {[-1, 1].map((s) => (
+          <g key={`tras${s}`}>
+            <path d={canaTrasera(s)} fill={P.pata} stroke={INK}
+              strokeWidth="0.85" strokeLinejoin="round" />
+            <path d={plantaTrasera(s)} fill={P.planta} stroke={INK}
+              strokeWidth="0.85" strokeLinejoin="round" />
+          </g>
+        ))}
+        {/* garras traseras: en el borde EXTERNO, que es donde van los dedos */}
+        <Garras xs={[-13.4, -12.4, -11.4]} y={13.95} color={P.garra} largo={0.8} />
+        <Garras xs={[11.4, 12.4, 13.4]} y={13.95} color={P.garra} largo={0.8} />
+      </g>
 
       {/* RIM-LIGHT LUNAR — la luz que dibuja al guardián por el lado de la
           luna (izquierdo), con un eco tenue al flanco derecho. Es EL trazo
           neón de la base, vuelto luz de borde con criterio. */}
       <g aria-hidden="true" fill="none" strokeLinecap="round">
-        <path d="M -12.4,3.0 C -11.6,-2.2 -9.6,-6.3 -5.2,-8.9" stroke={P.menta}
+        {/* sigue el borde nuevo: costillar → cruz, que es donde la luz pega */}
+        <path d="M -11.4,4.2 C -10.6,-0.8 -10.0,-6.4 -6.6,-10.8" stroke={P.menta}
           strokeWidth="0.85" opacity="0.55" style={{ filter: `drop-shadow(0 0 2.5px ${P.menta})` }} />
-        <path d="M 12.45,4.0 C 12.9,7.4 12.4,10.6 10.9,13.0" stroke={P.menta}
+        {/* eco tenue en la grupa del otro flanco */}
+        <path d="M 11.4,3.6 C 12.3,7.0 12.9,10.4 11.4,12.8" stroke={P.menta}
           strokeWidth="0.7" opacity="0.18" />
       </g>
 
-      {/* PELAJE SUGERIDO en la silueta: mechones cortos a contraluz en joroba,
-          flancos y ancas + definición muscular tenue (deltoides y pectoral).
-          Sugiere, no delinea — la mole sigue siendo casi silueta. */}
+      {/* PELAJE Y MÚSCULO SUGERIDOS sobre la anatomía nueva. Sugiere, no
+          delinea — la mole sigue siendo casi silueta. */}
       <g aria-hidden="true" fill="none" stroke={P.cuerpoLuz} strokeLinecap="round">
-        <g strokeWidth="0.5" opacity="0.5">
-          <path d="M -4.6,-9.15 l 0.5,-0.55 l 0.45,0.62 l 0.5,-0.55" />
-          <path d="M 4.6,-9.15 l -0.5,-0.55 l -0.45,0.62 l -0.5,-0.55" />
-          <path d="M -12.9,4.6 l 0.75,0.5 l -0.7,0.62 l 0.72,0.58" />
-          <path d="M 12.9,5.6 l -0.75,0.5 l 0.7,0.62 l -0.72,0.58" />
-          <path d="M -11.9,9.2 l 0.7,0.4 l -0.6,0.6" />
+        {/* mechones cortos a contraluz: costillar, cintura y grupa */}
+        <g strokeWidth="0.5" opacity="0.48">
+          <path d="M -10.7,-3.4 l 0.72,0.48 l -0.68,0.6 l 0.7,0.56" />
+          <path d="M 10.7,-2.6 l -0.72,0.48 l 0.68,0.6 l -0.7,0.56" />
+          <path d="M -11.9,6.4 l 0.75,0.5 l -0.7,0.62 l 0.72,0.58" />
+          <path d="M 12.1,7.4 l -0.75,0.5 l 0.7,0.62 l -0.72,0.58" />
         </g>
-        <g strokeWidth="0.55" opacity="0.22">
-          <path d="M -9.9,-4.4 C -8.7,-2.0 -7.3,-0.6 -5.5,0.3" />
-          <path d="M 9.9,-4.4 C 8.7,-2.0 7.3,-0.6 5.5,0.3" />
-          <path d="M -3.4,-6.4 C -1.5,-5.3 1.5,-5.3 3.4,-6.4" />
+        {/* la ESCÁPULA sobre la cruz: el hueso que se marca cuando el oso
+            carga el peso en las manos. Sin esto la cruz vuelve a ser un bulto */}
+        <g strokeWidth="0.5" opacity="0.26">
+          <path d="M -8.6,-9.6 C -8.0,-7.6 -7.4,-6.2 -6.6,-5.2" />
+          <path d="M 8.6,-9.6 C 8.0,-7.6 7.4,-6.2 6.6,-5.2" />
+        </g>
+        {/* el arco del costillar: el pecho es profundo, y se nota */}
+        <g strokeWidth="0.5" opacity="0.2">
+          <path d="M -8.8,-2.4 C -7.6,0.2 -5.2,1.6 -2.6,2.0" />
+          <path d="M 8.8,-2.4 C 7.6,0.2 5.2,1.6 2.6,2.0" />
+        </g>
+      </g>
+
+      {/* ═══ GOLILLA — el pelaje denso de cuello y hombros. Es anatomía real
+          (el "ahuecado" que describe la DR) y a la vez la costura que ata la
+          cabeza al cuerpo: los mechones montan sobre las paletillas y pasan
+          por detrás del cráneo. Con esto la cabeza deja de estar posada. */}
+      <g aria-hidden="true">
+        <path d={GOLILLA} fill={P.cuerpo} stroke={INK} strokeWidth="0.9"
+          strokeLinejoin="round" opacity="0.96" />
+        {/* mechones a contraluz en las puntas de la golilla */}
+        <g fill="none" stroke={P.cuerpoLuz} strokeWidth="0.42" strokeLinecap="round" opacity="0.4">
+          <path d="M -6.6,-10.6 C -6.2,-9.4 -5.9,-8.4 -5.9,-7.4" />
+          <path d="M 6.6,-10.6 C 6.2,-9.4 5.9,-8.4 5.9,-7.4" />
         </g>
       </g>
 
@@ -317,21 +476,34 @@ export function OsoGuardian({
         </g>
       </g>
 
-      {/* PATAS DELANTERAS: columnas plantadas CORTAS (nacen bajo la luna — el
-          pecho queda abierto para el emblema), redondeadas arriba, en sombra
-          propia para despegarlas del pecho; plantas anchas y GARRAS visibles. */}
+      {/* ═══ PATAS DELANTERAS — nacen del DELTOIDES, no del aire. Largas (esta
+          especie las tiene más largas que las traseras: es trepadora), bajan
+          por fuera y recogen hacia el centro hasta la mano apoyada. El pecho
+          queda libre entre las dos: ahí manda la luna. */}
       <g>
-        <path d="M -7.7,1.0 C -8.3,4.4 -8.3,8.6 -7.7,12.2 C -6.5,12.8 -5.1,12.8 -4.2,12.3 C -4.6,8.6 -4.6,4.6 -4.3,1.6 C -5.4,0.5 -6.9,0.4 -7.7,1.0 Z"
-          fill={P.pata} stroke={INK} strokeWidth="0.85" strokeLinejoin="round" />
-        <path d="M 7.7,1.0 C 8.3,4.4 8.3,8.6 7.7,12.2 C 6.5,12.8 5.1,12.8 4.2,12.3 C 4.6,8.6 4.6,4.6 4.3,1.6 C 5.4,0.5 6.9,0.4 7.7,1.0 Z"
-          fill={P.pata} stroke={INK} strokeWidth="0.85" strokeLinejoin="round" />
-        {/* rim menta finísimo en la columna del lado de la luna */}
-        <path d="M -7.5,2.2 C -8.05,5.2 -8.05,8.8 -7.5,11.8" fill="none"
-          stroke={P.menta} strokeWidth="0.4" opacity="0.28" aria-hidden="true" />
-        <ellipse cx="-6.0" cy="12.7" rx="2.5" ry="1.45" fill={P.planta} stroke={INK} strokeWidth="0.85" />
-        <ellipse cx="6.0" cy="12.7" rx="2.5" ry="1.45" fill={P.planta} stroke={INK} strokeWidth="0.85" />
-        <Garras xs={[-7.6, -6.55, -5.5, -4.45]} y={13.35} color={P.garra} />
-        <Garras xs={[4.45, 5.5, 6.55, 7.6]} y={13.35} color={P.garra} />
+        {[-1, 1].map((s) => (
+          <path key={`brazo${s}`} d={brazo(s)} fill={P.pata} stroke={INK}
+            strokeWidth="0.85" strokeLinejoin="round" />
+        ))}
+        {/* codo y antebrazo insinuados: sin esto el brazo vuelve a ser un tubo */}
+        <g aria-hidden="true" fill="none" stroke={P.cuerpoSombra} strokeWidth="0.5" opacity="0.45" strokeLinecap="round">
+          <path d="M -10.7,1.4 C -9.6,2.0 -8.2,2.1 -7.0,1.6" />
+          <path d="M 10.7,1.4 C 9.6,2.0 8.2,2.1 7.0,1.6" />
+        </g>
+        {/* rim menta finísimo en el brazo del lado de la luna */}
+        <path d="M -10.9,-1.0 C -10.5,3.4 -9.9,7.6 -9.3,10.4" fill="none"
+          stroke={P.menta} strokeWidth="0.4" opacity="0.3" aria-hidden="true" />
+        {[-1, 1].map((s) => (
+          <path key={`mano${s}`} d={mano(s)} fill={P.planta} stroke={INK}
+            strokeWidth="0.85" strokeLinejoin="round" />
+        ))}
+        {/* los dedos de la mano, apenas dichos */}
+        <g aria-hidden="true" fill="none" stroke={INK} strokeWidth="0.4" opacity="0.5" strokeLinecap="round">
+          <path d="M -7.4,13.5 l0,-1.1  M -6.4,13.6 l0,-1.15  M -5.4,13.5 l0,-1.1" />
+          <path d="M 5.4,13.5 l0,-1.1  M 6.4,13.6 l0,-1.15  M 7.4,13.5 l0,-1.1" />
+        </g>
+        <Garras xs={[-7.9, -6.9, -5.9, -4.9]} y={13.5} color={P.garra} largo={0.85} />
+        <Garras xs={[4.9, 5.9, 6.9, 7.9]} y={13.5} color={P.garra} largo={0.85} />
       </g>
 
       {/* ═══ CABEZA proporcionada, hundida en la joroba (sin cuello de peluche).
@@ -421,18 +593,12 @@ export function OsoGuardian({
         {boca}
       </g>
 
-      {/* Vestuario por clima+hora (RUANA de noche/frío del páramo). El ancla NO
-          es la mole entera: es OSO_GUARDIAN_RUANA_ANCLA, calculada para que el
-          poncho se apoye sobre el lomo y deje ver la luna del pecho (ver la
-          nota con las desigualdades en osoGuardianIdentidad.js). */}
-      {ropa && (
-        <AccesoriosClima
-          estado={ropa}
-          tronco={OSO_GUARDIAN_RUANA_ANCLA}
-          cabeza={{ cx: 0, cy: -12.9, r: PR.cabezaRx }}
-          animated={vivo}
-        />
-      )}
+      {/* ═══ LA RUANA del frío del páramo — la propia del guardián, no el
+          trapecio genérico de AccesoriosClima. Se cuelga de la cruz que este
+          rediseño le dio (sin hombro no hay dónde apoyarla), cae abierta al
+          frente dejando el pecho —y la luna— a la vista, y lleva la punta
+          echada al hombro, que es el gesto real de frío de verdad. */}
+      {ropa?.ruana && <RuanaGuardian animated={vivo} ink={INK} />}
 
       {/* Prop del mundo junto a la zarpa. */}
       {propMundo}
@@ -441,7 +607,7 @@ export function OsoGuardian({
       {vaho}
 
       {/* BRUMA a los pies — el velo del bosque nublado (tenue). */}
-      <ellipse cx="0" cy="13.7" rx="11.6" ry="2.3" fill={`url(#${haloMenta})`} opacity="0.09"
+      <ellipse cx="0" cy="14.2" rx="13.8" ry="2.4" fill={`url(#${haloMenta})`} opacity="0.09"
         aria-hidden="true" />
 
       {/* ESPORAS del bosque nublado (cadencia osoa-mota compartida). */}
