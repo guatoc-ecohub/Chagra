@@ -93,13 +93,13 @@ const ESPORAS = [
  * reales del Tremarctos ornatus (DR gemini, 2026-06-19), de abajo a arriba por
  * el costado izquierdo y espejado de vuelta:
  *
- *   ASIENTO → GRUPA (±12.7, el punto MÁS ancho del oso sentado: son las ancas)
- *   → CINTURA (±10.6: hay talle. Es un trepador musculoso, no una bola. El
- *     estrechamiento es del 17% y GRADUAL — la especie no tiene cintura de
+ *   ASIENTO → GRUPA (±12.5, el punto MÁS ancho del oso sentado: son las ancas)
+ *   → CINTURA (±10.2: hay talle. Es un trepador musculoso, no una bola. El
+ *     estrechamiento es del 18% y GRADUAL — la especie no tiene cintura de
  *     avispa, la DR es explícita en que la transición es suave)
- *   → COSTILLAR de pecho profundo → CRUZ (la paletilla sube hasta y=-11, POR
+ *   → COSTILLAR de pecho profundo → CRUZ (la paletilla sube hasta y≈-11, POR
  *     ENCIMA de la base del cráneo, y asoma a los costados de la cabeza)
- *   → CUELLO CORTO Y MUSCULOSO: el trapecio sigue subiendo hasta y=-14, pero
+ *   → CUELLO CORTO Y MUSCULOSO: el trapecio sigue subiendo hasta y≈-14, pero
  *     ahí ya va ESCONDIDO detrás del cráneo. Ese tramo es el que hace que la
  *     cabeza NAZCA del cuerpo en vez de posarse encima. Es literalmente lo
  *     único que separa un oso de un muñeco de nieve.
@@ -108,19 +108,19 @@ const ESPORAS = [
  * — NO la joroba del oso pardo, que esta especie no tiene. Si se exagera, deja
  * de ser un oso andino y pasa a ser un grizzly. */
 const SILUETA_MOLE =
-  'M -10.8,13.6 '
-  + 'C -12.4,12.0 -13.0,9.8 -12.7,7.4 '     // grupa: las ancas, lo más ancho
-  + 'C -12.4,5.0 -11.0,3.0 -10.6,1.0 '      // cintura: el talle del trepador
-  + 'C -10.3,-1.4 -10.6,-4.2 -10.2,-6.0 '   // costillar: el pecho es profundo
-  + 'C -9.8,-8.0 -8.4,-9.8 -6.4,-11.0 '     // CRUZ: la paletilla sube
-  + 'C -5.2,-11.9 -4.2,-13.0 -2.8,-13.7 '   // cuello corto: el trapecio…
-  + 'C -1.5,-14.3 1.5,-14.3 2.8,-13.7 '     // …y acá va oculto tras el cráneo
-  + 'C 4.2,-13.0 5.2,-11.9 6.4,-11.0 '
-  + 'C 8.4,-9.8 9.8,-8.0 10.2,-6.0 '
-  + 'C 10.6,-4.2 10.3,-1.4 10.6,1.0 '
-  + 'C 11.0,3.0 12.4,5.0 12.7,7.4 '
-  + 'C 13.0,9.8 12.4,12.0 10.8,13.6 '
-  + 'C 7.2,14.4 -7.2,14.4 -10.8,13.6 Z';
+  'M -10.6,13.6 '
+  + 'C -12.2,12.0 -12.8,9.8 -12.5,7.4 '     // grupa: las ancas, lo más ancho
+  + 'C -12.2,5.0 -10.6,3.0 -10.2,1.0 '      // cintura: el talle del trepador
+  + 'C -9.9,-1.4 -10.2,-4.0 -9.7,-5.8 '     // costillar: el pecho es profundo
+  + 'C -9.0,-7.8 -7.6,-9.6 -5.8,-10.9 '     // CRUZ: la paletilla sube
+  + 'C -4.8,-11.8 -4.0,-12.8 -2.7,-13.6 '   // cuello corto: el trapecio…
+  + 'C -1.5,-14.2 1.5,-14.2 2.7,-13.6 '     // …y acá va oculto tras el cráneo
+  + 'C 4.0,-12.8 4.8,-11.8 5.8,-10.9 '
+  + 'C 7.6,-9.6 9.0,-7.8 9.7,-5.8 '
+  + 'C 10.2,-4.0 9.9,-1.4 10.2,1.0 '
+  + 'C 10.6,3.0 12.2,5.0 12.5,7.4 '
+  + 'C 12.8,9.8 12.2,12.0 10.6,13.6 '
+  + 'C 7.2,14.4 -7.2,14.4 -10.6,13.6 Z';
 
 /* ═══ PATA TRASERA del plantígrado sentado (`s`: -1 izquierda, +1 derecha).
  *
@@ -134,12 +134,12 @@ const SILUETA_MOLE =
 function canaTrasera(s) {
   const x = (v) => (s * v).toFixed(2);
   return (
-    `M ${x(10.6)},6.8 `
-    + `C ${x(11.9)},8.6 ${x(12.6)},10.6 ${x(12.7)},12.3 `  // baja por fuera
-    + `C ${x(12.75)},13.1 ${x(12.2)},13.6 ${x(11.3)},13.65 ` // tobillo
-    + `C ${x(10.4)},13.7 ${x(9.8)},13.2 ${x(9.8)},12.4 `
-    + `C ${x(9.75)},10.6 ${x(9.5)},8.6 ${x(8.9)},7.0 `      // corva interna
-    + `C ${x(9.4)},6.4 ${x(10.1)},6.3 ${x(10.6)},6.8 Z`
+    `M ${x(10.3)},6.8 `
+    + `C ${x(11.5)},8.6 ${x(12.2)},10.6 ${x(12.3)},12.3 `  // baja por fuera
+    + `C ${x(12.35)},13.1 ${x(11.9)},13.6 ${x(11.0)},13.65 ` // tobillo
+    + `C ${x(10.1)},13.7 ${x(9.5)},13.2 ${x(9.5)},12.4 `
+    + `C ${x(9.45)},10.6 ${x(9.2)},8.6 ${x(8.6)},7.0 `      // corva interna
+    + `C ${x(9.1)},6.4 ${x(9.8)},6.3 ${x(10.3)},6.8 Z`
   );
 }
 
@@ -151,12 +151,12 @@ function canaTrasera(s) {
 function plantaTrasera(s) {
   const x = (v) => (s * v).toFixed(2);
   return (
-    `M ${x(9.6)},12.5 `
-    + `C ${x(8.7)},12.55 ${x(8.2)},13.05 ${x(8.25)},13.7 `   // talón (interno)
-    + `C ${x(8.3)},14.3 ${x(9.2)},14.6 ${x(10.5)},14.55 `
-    + `C ${x(12.1)},14.5 ${x(13.4)},14.25 ${x(13.8)},13.65 ` // dedos (externo)
-    + `C ${x(14.1)},13.15 ${x(13.7)},12.55 ${x(12.8)},12.45 `
-    + `C ${x(11.6)},12.3 ${x(10.5)},12.42 ${x(9.6)},12.5 Z`
+    `M ${x(9.3)},12.5 `
+    + `C ${x(8.4)},12.55 ${x(7.9)},13.05 ${x(7.95)},13.7 `   // talón (interno)
+    + `C ${x(8.0)},14.3 ${x(8.9)},14.6 ${x(10.2)},14.55 `
+    + `C ${x(11.8)},14.5 ${x(13.0)},14.25 ${x(13.4)},13.65 ` // dedos (externo)
+    + `C ${x(13.7)},13.15 ${x(13.3)},12.55 ${x(12.4)},12.45 `
+    + `C ${x(11.3)},12.3 ${x(10.2)},12.42 ${x(9.3)},12.5 Z`
   );
 }
 
@@ -172,14 +172,14 @@ function plantaTrasera(s) {
 function brazo(s) {
   const x = (v) => (s * v).toFixed(2);
   return (
-    `M ${x(9.9)},-7.6 `
-    + `C ${x(11.0)},-4.6 ${x(11.3)},-1.0 ${x(10.8)},2.2 `   // brazo por fuera
-    + `C ${x(10.4)},5.2 ${x(9.8)},8.2 ${x(9.2)},10.6 `      // antebrazo largo
-    + `C ${x(8.9)},11.8 ${x(8.2)},12.5 ${x(7.2)},12.7 `     // muñeca
-    + `C ${x(6.0)},12.9 ${x(5.2)},12.4 ${x(5.0)},11.4 `
-    + `C ${x(4.9)},9.0 ${x(5.4)},6.0 ${x(5.9)},3.0 `        // borde interno
-    + `C ${x(6.4)},0.0 ${x(6.8)},-3.2 ${x(7.3)},-6.2 `
-    + `C ${x(7.8)},-7.4 ${x(9.0)},-8.0 ${x(9.9)},-7.6 Z`
+    `M ${x(8.7)},-7.0 `
+    + `C ${x(9.4)},-4.4 ${x(9.6)},-1.4 ${x(9.3)},1.6 `      // brazo por fuera
+    + `C ${x(9.0)},4.6 ${x(8.6)},7.6 ${x(8.2)},10.1 `       // antebrazo largo
+    + `C ${x(7.9)},11.4 ${x(7.4)},12.1 ${x(6.6)},12.3 `     // muñeca
+    + `C ${x(5.8)},12.5 ${x(5.2)},12.0 ${x(5.1)},11.0 `
+    + `C ${x(5.2)},8.6 ${x(5.7)},5.6 ${x(6.1)},2.6 `        // borde interno
+    + `C ${x(6.5)},-0.4 ${x(6.8)},-3.4 ${x(7.1)},-5.8 `
+    + `C ${x(7.5)},-6.9 ${x(8.1)},-7.3 ${x(8.7)},-7.0 Z`
   );
 }
 
@@ -203,16 +203,16 @@ function mano(s) {
  * quedan ocultos tras la cabeza; los que se ven son los de los flancos, que es
  * justo donde hacía falta la costura. */
 const GOLILLA =
-  'M -8.8,-7.0 '
-  + 'C -8.5,-8.8 -7.6,-10.4 -6.2,-11.5 '
-  + 'C -5.6,-10.3 -5.0,-11.7 -4.4,-10.5 '
-  + 'C -3.9,-11.9 -3.2,-10.9 -2.6,-12.1 '
-  + 'C -1.8,-10.9 -1.0,-12.3 -0.2,-11.1 '
-  + 'C 0.6,-12.3 1.4,-10.9 2.2,-12.1 '
-  + 'C 2.8,-10.9 3.5,-11.9 4.0,-10.5 '
-  + 'C 4.6,-11.7 5.2,-10.3 5.8,-11.5 '
-  + 'C 7.2,-10.4 8.1,-8.8 8.4,-7.0 '
-  + 'C 5.6,-5.9 -6.0,-5.9 -8.8,-7.0 Z';
+  'M -8.0,-7.0 '
+  + 'C -7.8,-8.7 -7.0,-10.2 -5.8,-11.3 '
+  + 'C -5.3,-10.2 -4.7,-11.5 -4.2,-10.4 '
+  + 'C -3.7,-11.7 -3.1,-10.8 -2.5,-11.9 '
+  + 'C -1.7,-10.8 -1.0,-12.1 -0.2,-11.0 '
+  + 'C 0.6,-12.1 1.3,-10.8 2.1,-11.9 '
+  + 'C 2.7,-10.8 3.3,-11.7 3.8,-10.4 '
+  + 'C 4.3,-11.5 4.9,-10.2 5.4,-11.3 '
+  + 'C 6.6,-10.2 7.4,-8.7 7.6,-7.0 '
+  + 'C 5.0,-6.2 -5.4,-6.2 -8.0,-7.0 Z';
 
 /* LA LUNA CRECIENTE del pecho — el emblema conservado de la base. Media
    circunferencia externa (r 3.0, centrada en 0,-2.2) + arco interno tendido
@@ -268,6 +268,8 @@ export function OsoGuardian({
   const boil = `crt-boil-${uid}`;
   const pelaje = `crt-pelaje-${uid}`;
   const lunaGrad = `crt-luna-${uid}`;
+  const limboIzq = `osog-limbo-i-${uid}`;
+  const limboDer = `osog-limbo-d-${uid}`;
   /* HALOS POR GRADIENTE RADIAL (no por blur): los círculos blureados del kit
      recortan su región de filtro en un CUADRADO visible sobre el pelaje
      oscuro (verificado empíricamente con el halo de la luna). El gradiente
@@ -323,6 +325,22 @@ export function OsoGuardian({
         <stop offset="55%" stopColor={P.luna} />
         <stop offset="100%" stopColor="#dcf5e9" />
       </radialGradient>
+      {/* MIEMBROS CON VOLUMEN: un miembro relleno de color plano se lee como
+          una losa pegada encima del animal (fue el defecto de la pasada
+          anterior). Cada pata lleva la luz de luna en su borde EXTERNO y se
+          hunde en sombra hacia el cuerpo — así es un cilindro, no un recorte.
+          Van dos gradientes espejados porque `objectBoundingBox` mapea igual a
+          ambos lados y el de la derecha necesita la luz invertida. */}
+      <linearGradient id={limboIzq} x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stopColor={P.cuerpoLuz} />
+        <stop offset="42%" stopColor={P.pata} />
+        <stop offset="100%" stopColor={P.cuerpoSombra} />
+      </linearGradient>
+      <linearGradient id={limboDer} x1="100%" y1="0%" x2="0%" y2="0%">
+        <stop offset="0%" stopColor={P.cuerpoLuz} />
+        <stop offset="42%" stopColor={P.pata} />
+        <stop offset="100%" stopColor={P.cuerpoSombra} />
+      </linearGradient>
       {/* halos suaves sin filtro (ver nota en los ids) */}
       <radialGradient id={haloCrema}>
         <stop offset="0%" stopColor={P.lunaHalo} stopOpacity="1" />
@@ -393,15 +411,15 @@ export function OsoGuardian({
       <g aria-hidden="true">
         {[-1, 1].map((s) => (
           <g key={`tras${s}`}>
-            <path d={canaTrasera(s)} fill={P.pata} stroke={INK}
-              strokeWidth="0.85" strokeLinejoin="round" />
+            <path d={canaTrasera(s)} fill={`url(#${s < 0 ? limboIzq : limboDer})`}
+              stroke={INK} strokeWidth="0.85" strokeLinejoin="round" />
             <path d={plantaTrasera(s)} fill={P.planta} stroke={INK}
               strokeWidth="0.85" strokeLinejoin="round" />
           </g>
         ))}
         {/* garras traseras: en el borde EXTERNO, que es donde van los dedos */}
-        <Garras xs={[-13.4, -12.4, -11.4]} y={13.95} color={P.garra} largo={0.8} />
-        <Garras xs={[11.4, 12.4, 13.4]} y={13.95} color={P.garra} largo={0.8} />
+        <Garras xs={[-13.0, -12.0, -11.0]} y={13.95} color={P.garra} largo={0.8} />
+        <Garras xs={[11.0, 12.0, 13.0]} y={13.95} color={P.garra} largo={0.8} />
       </g>
 
       {/* RIM-LIGHT LUNAR — la luz que dibuja al guardián por el lado de la
@@ -409,10 +427,10 @@ export function OsoGuardian({
           neón de la base, vuelto luz de borde con criterio. */}
       <g aria-hidden="true" fill="none" strokeLinecap="round">
         {/* sigue el borde nuevo: costillar → cruz, que es donde la luz pega */}
-        <path d="M -11.4,4.2 C -10.6,-0.8 -10.0,-6.4 -6.6,-10.8" stroke={P.menta}
-          strokeWidth="0.85" opacity="0.55" style={{ filter: `drop-shadow(0 0 2.5px ${P.menta})` }} />
+        <path d="M -10.4,2.6 C -10.0,-1.0 -10.1,-4.6 -9.2,-7.2 C -8.8,-8.2 -8.2,-9.0 -7.4,-9.7" stroke={P.menta}
+          strokeWidth="0.85" opacity="0.5" style={{ filter: `drop-shadow(0 0 2.5px ${P.menta})` }} />
         {/* eco tenue en la grupa del otro flanco */}
-        <path d="M 11.4,3.6 C 12.3,7.0 12.9,10.4 11.4,12.8" stroke={P.menta}
+        <path d="M 11.0,3.6 C 12.1,7.0 12.7,10.4 11.2,12.8" stroke={P.menta}
           strokeWidth="0.7" opacity="0.18" />
       </g>
 
@@ -421,21 +439,15 @@ export function OsoGuardian({
       <g aria-hidden="true" fill="none" stroke={P.cuerpoLuz} strokeLinecap="round">
         {/* mechones cortos a contraluz: costillar, cintura y grupa */}
         <g strokeWidth="0.5" opacity="0.48">
-          <path d="M -10.7,-3.4 l 0.72,0.48 l -0.68,0.6 l 0.7,0.56" />
-          <path d="M 10.7,-2.6 l -0.72,0.48 l 0.68,0.6 l -0.7,0.56" />
-          <path d="M -11.9,6.4 l 0.75,0.5 l -0.7,0.62 l 0.72,0.58" />
-          <path d="M 12.1,7.4 l -0.75,0.5 l 0.7,0.62 l -0.72,0.58" />
+          <path d="M -11.9,5.6 C -11.4,6.4 -11.2,7.2 -11.4,8.0" />
+          <path d="M -11.6,9.0 C -11.2,9.7 -11.1,10.4 -11.3,11.0" />
+          <path d="M 12.0,6.6 C 11.5,7.4 11.3,8.2 11.5,9.0" />
         </g>
         {/* la ESCÁPULA sobre la cruz: el hueso que se marca cuando el oso
             carga el peso en las manos. Sin esto la cruz vuelve a ser un bulto */}
-        <g strokeWidth="0.5" opacity="0.26">
-          <path d="M -8.6,-9.6 C -8.0,-7.6 -7.4,-6.2 -6.6,-5.2" />
-          <path d="M 8.6,-9.6 C 8.0,-7.6 7.4,-6.2 6.6,-5.2" />
-        </g>
-        {/* el arco del costillar: el pecho es profundo, y se nota */}
-        <g strokeWidth="0.5" opacity="0.2">
-          <path d="M -8.8,-2.4 C -7.6,0.2 -5.2,1.6 -2.6,2.0" />
-          <path d="M 8.8,-2.4 C 7.6,0.2 5.2,1.6 2.6,2.0" />
+        <g strokeWidth="0.5" opacity="0.24">
+          <path d="M -8.1,-9.2 C -7.6,-7.6 -7.2,-6.4 -6.8,-5.4" />
+          <path d="M 8.1,-9.2 C 7.6,-7.6 7.2,-6.4 6.8,-5.4" />
         </g>
       </g>
 
@@ -444,12 +456,19 @@ export function OsoGuardian({
           cabeza al cuerpo: los mechones montan sobre las paletillas y pasan
           por detrás del cráneo. Con esto la cabeza deja de estar posada. */}
       <g aria-hidden="true">
-        <path d={GOLILLA} fill={P.cuerpo} stroke={INK} strokeWidth="0.9"
-          strokeLinejoin="round" opacity="0.96" />
-        {/* mechones a contraluz en las puntas de la golilla */}
-        <g fill="none" stroke={P.cuerpoLuz} strokeWidth="0.42" strokeLinecap="round" opacity="0.4">
-          <path d="M -6.6,-10.6 C -6.2,-9.4 -5.9,-8.4 -5.9,-7.4" />
-          <path d="M 6.6,-10.6 C 6.2,-9.4 5.9,-8.4 5.9,-7.4" />
+        {/* SIN TRAZO Y SIN BORDE RECTO. La segunda prueba de render la tenía
+            delineada y cerrando con una casi-horizontal a lo ancho del pecho:
+            leía cuello de camisa, y el oso entero pasaba a estar vestido. Una
+            golilla de pelo no tiene dobladillo. Va como SOMBRA suave —el
+            hueco entre cuello y hombros— y nada más. */}
+        <path d={GOLILLA} fill={P.cuerpoSombra} opacity="0.5" />
+        {/* el contraluz SOLO en las puntas de los mechones que asoman al lado
+            del cráneo: es lo que la vuelve pelaje y ata la cabeza al cuerpo */}
+        <g fill="none" stroke={P.cuerpoLuz} strokeWidth="0.42" strokeLinecap="round" opacity="0.38">
+          <path d="M -7.4,-9.4 C -7.0,-8.4 -6.7,-7.6 -6.6,-6.8" />
+          <path d="M -5.6,-10.6 C -5.3,-9.6 -5.1,-8.8 -5.1,-7.9" />
+          <path d="M 5.6,-10.6 C 5.3,-9.6 5.1,-8.8 5.1,-7.9" />
+          <path d="M 7.4,-9.4 C 7.0,-8.4 6.7,-7.6 6.6,-6.8" />
         </g>
       </g>
 
@@ -481,18 +500,33 @@ export function OsoGuardian({
           por fuera y recogen hacia el centro hasta la mano apoyada. El pecho
           queda libre entre las dos: ahí manda la luna. */}
       <g>
+        {/* SIN CONTORNO CERRADO. Un brazo delineado entero con la tinta de la
+            familia se despega del torso y el oso se lee VESTIDO: los brazos
+            pasan a mangas y el pecho a peto. Se vio clarísimo en la segunda
+            prueba de render. Un miembro que nace del mismo cuerpo no tiene
+            línea arriba — se funde en el hombro. Así que el brazo va relleno
+            sin trazo, y solo se dibujan DESPUÉS los dos filos que sí existen:
+            la sombra del borde interno y la luz del borde externo. */}
         {[-1, 1].map((s) => (
-          <path key={`brazo${s}`} d={brazo(s)} fill={P.pata} stroke={INK}
-            strokeWidth="0.85" strokeLinejoin="round" />
+          <path key={`brazo${s}`} d={brazo(s)} fill={`url(#${s < 0 ? limboIzq : limboDer})`} />
         ))}
-        {/* codo y antebrazo insinuados: sin esto el brazo vuelve a ser un tubo */}
-        <g aria-hidden="true" fill="none" stroke={P.cuerpoSombra} strokeWidth="0.5" opacity="0.45" strokeLinecap="round">
-          <path d="M -10.7,1.4 C -9.6,2.0 -8.2,2.1 -7.0,1.6" />
-          <path d="M 10.7,1.4 C 9.6,2.0 8.2,2.1 7.0,1.6" />
+        {/* el filo INTERNO: la sombra que separa el brazo del pecho */}
+        <g aria-hidden="true" fill="none" strokeLinecap="round" stroke={INK}
+          strokeWidth="0.75" strokeOpacity="0.4">
+          <path d="M -6.9,-3.6 C -6.4,1.0 -5.7,6.0 -5.1,10.8" />
+          <path d="M 6.9,-3.6 C 6.4,1.0 5.7,6.0 5.1,10.8" />
         </g>
-        {/* rim menta finísimo en el brazo del lado de la luna */}
-        <path d="M -10.9,-1.0 C -10.5,3.4 -9.9,7.6 -9.3,10.4" fill="none"
-          stroke={P.menta} strokeWidth="0.4" opacity="0.3" aria-hidden="true" />
+        {/* el filo EXTERNO: donde la luna moja el canto del brazo */}
+        <g aria-hidden="true" fill="none" strokeLinecap="round" stroke={P.cuerpoLuz}
+          strokeWidth="0.55" opacity="0.5">
+          <path d="M -9.4,-4.4 C -9.6,-1.4 -9.3,1.6 -9.0,4.6" />
+          <path d="M 9.4,-4.4 C 9.6,-1.4 9.3,1.6 9.0,4.6" />
+        </g>
+        {/* el CODO: el pliegue donde el brazo dobla. Sin él, tubo. */}
+        <g aria-hidden="true" fill="none" stroke={P.cuerpoSombra} strokeWidth="0.5" opacity="0.5" strokeLinecap="round">
+          <path d="M -9.3,1.0 C -8.4,1.7 -7.3,1.8 -6.2,1.4" />
+          <path d="M 9.3,1.0 C 8.4,1.7 7.3,1.8 6.2,1.4" />
+        </g>
         {[-1, 1].map((s) => (
           <path key={`mano${s}`} d={mano(s)} fill={P.planta} stroke={INK}
             strokeWidth="0.85" strokeLinejoin="round" />
@@ -506,7 +540,19 @@ export function OsoGuardian({
         <Garras xs={[4.9, 5.9, 6.9, 7.9]} y={13.5} color={P.garra} largo={0.85} />
       </g>
 
-      {/* ═══ CABEZA proporcionada, hundida en la joroba (sin cuello de peluche).
+      {/* ═══ LA RUANA del frío del páramo — la propia del guardián, no el
+          trapecio genérico de AccesoriosClima. Se cuelga de la cruz que este
+          rediseño le dio (sin hombro no hay dónde apoyarla), cae abierta al
+          frente dejando el pecho —y la luna— a la vista, y lleva la punta
+          echada al hombro, que es el gesto real de frío de verdad.
+
+          VA ANTES DE LA CABEZA a propósito: el canesú tiene que poder subir por
+          detrás del cuello para que se lea UNA prenda cruzando los hombros. Si
+          se dibuja después, o le tapa el hocico o hay que bajarlo tanto que los
+          dos paños quedan sueltos y la ruana se lee como dos mangas. */}
+      {ropa?.ruana && <RuanaGuardian animated={vivo} ink={INK} />}
+
+      {/* ═══ CABEZA proporcionada, hundida en la cruz (sin cuello de peluche).
           QUIETA a propósito: la gravitas del guardián. */}
       <g>
         {/* orejas CHICAS y bajas de oso real (detrás del cráneo) */}
@@ -593,12 +639,6 @@ export function OsoGuardian({
         {boca}
       </g>
 
-      {/* ═══ LA RUANA del frío del páramo — la propia del guardián, no el
-          trapecio genérico de AccesoriosClima. Se cuelga de la cruz que este
-          rediseño le dio (sin hombro no hay dónde apoyarla), cae abierta al
-          frente dejando el pecho —y la luna— a la vista, y lleva la punta
-          echada al hombro, que es el gesto real de frío de verdad. */}
-      {ropa?.ruana && <RuanaGuardian animated={vivo} ink={INK} />}
 
       {/* Prop del mundo junto a la zarpa. */}
       {propMundo}

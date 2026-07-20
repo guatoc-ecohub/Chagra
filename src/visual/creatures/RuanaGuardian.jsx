@@ -121,12 +121,32 @@ export function RuanaGuardian({ animated = true, ink = OSO_GUARDIAN_TINTA }) {
         </linearGradient>
       </defs>
 
+      {/* ── EL CANESÚ: el paño que cruza de hombro a hombro por encima de la
+             cruz y pasa por detrás del cuello. Es LA pieza que convierte dos
+             paños colgando en UNA prenda puesta. Sin él, la primera prueba de
+             render se leyó como dos mangas sueltas: una ruana es una sola
+             manta con un agujero, no un abrigo con brazos. El centro queda
+             tapado por la cabeza, que es exactamente donde va el cuello. ── */}
+      <path d="M -10.5,-6.2
+               C -10.1,-8.7 -8.2,-10.6 -5.4,-11.3
+               C -2.8,-11.8 2.8,-11.8 5.4,-11.3
+               C 8.2,-10.6 10.1,-8.7 10.5,-6.2
+               C 7.6,-7.3 -7.6,-7.3 -10.5,-6.2 Z"
+        fill={`url(#${tejido})`} stroke={ink} strokeWidth="0.95" strokeLinejoin="round" />
+
       {/* ── LOS DOS PAÑOS. Abierta al frente: entre ellos queda el pecho, y
              ahí sigue mandando la luna. ─────────────────────────────────── */}
       <path d={PANO_IZQ} fill={`url(#${tejido})`} stroke={ink}
         strokeWidth="0.95" strokeLinejoin="round" />
       <path d={PANO_DER} fill={`url(#${tejido})`} stroke={ink}
         strokeWidth="0.95" strokeLinejoin="round" />
+
+      {/* el QUIEBRE sobre cada hombro: donde la lana pasa del canesú al paño y
+          se rompe. De ese quiebre nacen los pliegues que bajan. */}
+      <g fill="none" stroke={R.panoSombra} strokeWidth="0.55" opacity="0.5" strokeLinecap="round">
+        <path d="M -10.0,-7.0 C -8.9,-6.1 -7.6,-5.7 -6.3,-5.8" />
+        <path d="M 10.0,-7.0 C 8.9,-6.1 7.6,-5.7 6.3,-5.8" />
+      </g>
 
       {/* ── PLIEGUES. Sombra y luz por pliegue: la arruga tiene fondo y lomo.
              Se cierran arriba (donde la tela se junta en el hombro) y se
@@ -172,17 +192,23 @@ export function RuanaGuardian({ animated = true, ink = OSO_GUARDIAN_TINTA }) {
              tejido toma la luz distinto, y ese cambio de valor es lo que
              convence de que hay dos caras de tela y no una silueta pintada. */}
       <g>
-        <path d="M 4.6,-8.2 C 6.6,-9.6 9.0,-10.2 11.2,-9.4
-                 C 12.0,-8.4 11.6,-6.8 10.6,-5.6
-                 C 9.2,-4.0 7.2,-3.2 5.6,-3.6
-                 C 4.8,-5.2 4.4,-6.8 4.6,-8.2 Z"
-          fill={R.panoRevés} stroke={ink} strokeWidth="0.85" strokeLinejoin="round" />
-        {/* el quiebre del doblez: donde la tela dobla sobre sí misma */}
-        <path d="M 5.4,-7.6 C 7.2,-8.5 9.2,-8.7 10.9,-8.2"
-          fill="none" stroke={R.panoSombra} strokeWidth="0.5" opacity="0.65" strokeLinecap="round" />
-        {/* la punta cuelga por detrás del hombro, con su peso */}
-        <path d="M 10.6,-5.6 C 11.4,-4.6 11.8,-3.4 11.6,-2.2"
-          fill="none" stroke={R.panoSombra} strokeWidth="0.55" opacity="0.5" strokeLinecap="round" />
+        {/* Va en DIAGONAL y termina en punta que cuelga: un doblez de manta.
+            La primera prueba de render lo tenía como un óvalo cerrado sobre el
+            hombro y se leía hombrera de armadura — la diferencia entre tela y
+            placa es que la tela tiene una punta con peso y un filo que dobla. */}
+        <path d="M 5.2,-9.6
+                 C 7.2,-10.6 9.2,-10.7 10.4,-9.8
+                 C 11.0,-9.0 10.9,-7.7 10.4,-6.6
+                 C 10.0,-5.7 9.7,-4.8 9.8,-4.0
+                 C 9.2,-4.9 8.4,-5.7 7.6,-6.6
+                 C 6.6,-7.7 5.6,-8.7 5.2,-9.6 Z"
+          fill={R.panoRevés} stroke={ink} strokeWidth="0.7" strokeOpacity="0.55" strokeLinejoin="round" />
+        {/* el FILO del doblez: la arista donde la manta se pliega sobre sí */}
+        <path d="M 5.9,-9.1 C 7.4,-9.8 8.9,-9.9 10.1,-9.3"
+          fill="none" stroke={R.panoSombra} strokeWidth="0.5" opacity="0.7" strokeLinecap="round" />
+        {/* el peso que tira de la punta hacia abajo */}
+        <path d="M 9.9,-7.2 C 9.8,-6.0 9.7,-5.0 9.8,-4.2"
+          fill="none" stroke={R.panoSombra} strokeWidth="0.5" opacity="0.45" strokeLinecap="round" />
       </g>
     </g>
   );
