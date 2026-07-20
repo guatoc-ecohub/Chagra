@@ -141,7 +141,13 @@ export default function FloraCafetal({ tier = 'alto', reducedMotion = false }) {
   // Geometrías fusionadas (una vez por tier).
   const geos = useMemo(
     () => ({
-      cafeto: geomCafeto({ q }, 21),
+      /* UNA MALLA POR PORTE. La ladera dejó de ser un molde repetido: conviven
+         matas de un tallo, zoqueadas y agobiadas, que es como se ve un cafetal
+         de verdad. Cuesta dos draw-calls más y compra que a media distancia el
+         cultivo NO se lea como un pinar de clones. */
+      cafetoTallo: geomCafeto({ q, porte: 'tallo' }, 21),
+      cafetoZoqueo: geomCafeto({ q, porte: 'zoqueo' }, 41),
+      cafetoAgobio: geomCafeto({ q, porte: 'agobio' }, 61),
       cereza: geomCereza(),
       flor: conteos.flor ? geomFlorCafe(27) : null,
       guamo: conteos.guamo ? geomGuamo({ q }, 22) : null,
@@ -201,7 +207,9 @@ export default function FloraCafetal({ tier = 'alto', reducedMotion = false }) {
       {/* EL CULTIVO: los surcos de cafetos con hoja LUSTROSA, sus cerezas en
           racimos pegados a la rama (verde→pintón→rojo→vino) y la flor blanca
           axilar — flor y cosecha conviviendo, el ciclo real del arábica. */}
-      <Especie geo={geos.cafeto} mat={matLustre} items={dist.cafeto} />
+      <Especie geo={geos.cafetoTallo} mat={matLustre} items={dist.cafeto.tallo} />
+      <Especie geo={geos.cafetoZoqueo} mat={matLustre} items={dist.cafeto.zoqueo} />
+      <Especie geo={geos.cafetoAgobio} mat={matLustre} items={dist.cafeto.agobio} />
       <Especie geo={geos.cereza} mat={matLustre} items={dist.cereza} />
       <Especie geo={geos.flor} mat={matLustre} items={dist.flor} />
 
