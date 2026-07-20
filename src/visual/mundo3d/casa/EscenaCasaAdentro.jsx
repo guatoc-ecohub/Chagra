@@ -66,6 +66,13 @@ import {
 /* La casa pertenece a la familia del patio de la finca: `corral`. */
 const FAMILIA_CASA = 'corral';
 
+/* Lo que se ve por las RENDIJAS del techo (y sobre las culatas) es el CIELO
+   de afuera: el fondo del canvas. La familia `corral` tiñe el DÍA de crema
+   de patio, pero ese crema de noche quedaba gris-claro — rendijas blancas a
+   las ocho de la noche, luz sin fuente. El cielo nocturno de la casa es
+   índigo hondo con un asomo de luna: franjas azules y tenues, o nada. */
+const CIELO_NOCHE_CASA = mezclar('#131a34', LUCES.luna, 0.1);
+
 /* Cursor de "esto se toca" (mismo gesto que la puerta del valle). */
 const alApuntar = (e) => {
   e.stopPropagation();
@@ -543,6 +550,12 @@ function Diorama({ tier, reducedMotion, foco, onPortales, onFermentos }) {
   /* De noche y al filo del día, el fogón MANDA (la única luz sin reloj). */
   const fogonFuerza = !sol.deDia ? 1.55 : sol.fade < 0.35 ? 1.28 : 0.92;
 
+  /* El cielo de las rendijas obedece el MISMO reloj que el haz (solDeCasa):
+     de noche índigo de luna; al filo del día todavía oscuro (sigue el fade). */
+  const fondoCasa = !sol.deDia
+    ? CIELO_NOCHE_CASA
+    : mezclar(CIELO_NOCHE_CASA, atm.fondo, Math.min(1, 0.3 + 0.7 * sol.fade));
+
   const geoCasa = useMemo(() => construirCasaAdentro(tier === 'alto'), [tier]);
 
   const nHumo = tier === 'alto' ? 7 : tier === 'medio' ? 4 : 0;
@@ -553,8 +566,9 @@ function Diorama({ tier, reducedMotion, foco, onPortales, onFermentos }) {
 
   return (
     <>
-      {/* el fondo: el cielo de la hora (lo que asoma por la puerta) */}
-      <color attach="background" args={[atm.fondo]} />
+      {/* el fondo: el cielo de afuera — lo que asoma por las rendijas del
+          techo. De día la hora del valle; de noche se APAGA a índigo. */}
+      <color attach="background" args={[fondoCasa]} />
 
       {/* LA PENUMBRA es la imagen: el ambiente se queda corto a propósito —
           una casa de tapia se alumbra por UN vano y el resto es sombra que
@@ -597,10 +611,19 @@ function Diorama({ tier, reducedMotion, foco, onPortales, onFermentos }) {
         <meshLambertMaterial color={CASA.bejuco} side={THREE.DoubleSide} />
       </mesh>
 
-      {/* lo que se ve AFUERA por la puerta: el pasto del valle a la hora viva */}
-      <mesh position={[1.1, 0, 4.8]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* lo que se ve AFUERA por la puerta: el pasto del valle a la hora
+          viva. Arranca PASADO el borde del piso (el piso llega a z=2.9; a ras
+          y solapado hacía z-fighting: el rectángulo verde lima ADENTRO de la
+          casa). Y de noche el pasto duerme: verde-índigo, nunca lima. */}
+      <mesh position={[1.1, -0.02, 5.55]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[9, 5]} />
-        <meshBasicMaterial color={mezclar(VERDES.brote, atm.niebla, 0.3)} />
+        <meshBasicMaterial
+          color={
+            sol.deDia
+              ? mezclar(VERDES.brote, atm.niebla, 0.3)
+              : mezclar(VERDES.brote, CIELO_NOCHE_CASA, 0.82)
+          }
+        />
       </mesh>
       {/* el resplandor del día en el vano de la puerta */}
       <mesh position={[(PUERTA.x0 + PUERTA.x1) / 2, PUERTA.alto / 2, hz + 0.03]}>
@@ -704,11 +727,11 @@ function Diorama({ tier, reducedMotion, foco, onPortales, onFermentos }) {
       <OrbitControls
         ref={controls}
         makeDefault
-        target={[0, 1.3, -0.1]}
+        target={[-0.2, 0.98, -0.4]}
         enablePan={false}
         enableZoom
         minDistance={1.3}
-        maxDistance={2.8}
+        maxDistance={3.3}
         minPolarAngle={0.6}
         maxPolarAngle={1.52}
         minAzimuthAngle={-1.15}
@@ -720,8 +743,8 @@ function Diorama({ tier, reducedMotion, foco, onPortales, onFermentos }) {
           el centro del cuarto, una vez por sesión. */}
       <CamaraDirector
         controls={controls}
-        reposo={[1.15, 1.6, 2.45]}
-        mirada={[-0.5, 1.15, -0.5]}
+        reposo={[1.35, 1.95, 2.35]}
+        mirada={[-0.3, 1.35, -0.5]}
         respiro={0.03}
         activa={!reducedMotion && tier !== 'bajo'}
         unaVezClave="mundoCasaAdentro"
@@ -756,7 +779,7 @@ export default function EscenaCasaAdentro({
       dpr={perfil.dpr}
       gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
       shadows={perfil.sombras ? 'soft' : false}
-      camera={{ position: [1.15, 1.6, 2.45], fov: 58 }}
+      camera={{ position: [1.35, 1.95, 2.35], fov: 48 }}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >
