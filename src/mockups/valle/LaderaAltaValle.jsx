@@ -67,7 +67,7 @@ import { Banco } from './BancoValle.jsx';
       (siembra suelta, sin terrazas: un desmonte más joven). No pisa el bosque
       de la ladera derecha (x≥3), ni el frailejonal (z≤−5.2), ni el cafetal
       (z≥1.6). ── */
-export const ZONA_LADERA_ALTA = [
+const ZONA_LADERA_ALTA = [
   { cx: -5.0, cz: -3.1, rx: 3.8, rz: 2.1 },
   { cx: -1.9, cz: -1.9, rx: 1.7, rz: 1.3 },
 ];
@@ -75,7 +75,7 @@ export const ZONA_LADERA_ALTA = [
 /* La franja de VIDA de altura: el filo entre el lote y el frailejonal (pajonal
    que sube) + el parchecito a la derecha de la quebrada, bajo la falda del
    bosque. Complementa el páramo denso: aquí no se siembra frailejón. */
-export const ZONA_VIDA_ALTA = [
+const ZONA_VIDA_ALTA = [
   { cx: -4.6, cz: -4.95, rx: 3.4, rz: 0.55 },
   { cx: 1.7, cz: -3.1, rx: 1.1, rz: 1.5 },
 ];
@@ -84,7 +84,7 @@ export const ZONA_VIDA_ALTA = [
    banda (tres claros siguen su cauce); el portal del clima (veleta) vive en el
    filo (−3.2,−6.0); las dos matas de muestra del piso frío (VEGETACION_PISOS)
    se respetan; y el abrigo de piedra reserva su propio patio. */
-export const CLAROS_LADERA_ALTA = [
+const CLAROS_LADERA_ALTA = [
   { x: 0.0, z: -2.0, r: 0.85 },
   { x: -0.5, z: -3.2, r: 0.85 },
   { x: -1.1, z: -4.1, r: 0.85 },
@@ -573,7 +573,7 @@ export default function LaderaAltaValle({
   const yAbrigo = alturaDe ? alturaDe(SITIO_ABRIGO.x, SITIO_ABRIGO.z) : 0;
 
   return (
-    <group>
+    <group name="audit-ladera-alta">
       {/* La ESTRUCTURA fija: terrazas, camino que sube, abrigo de piedra. */}
       {geos.terrazas && <mesh geometry={geos.terrazas} material={matFijo} position={[0, -0.045, 0]} />}
       <mesh geometry={geos.camino} material={matFijo} position={[0, -0.07, 0]} />
