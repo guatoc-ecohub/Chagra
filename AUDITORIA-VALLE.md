@@ -1,9 +1,12 @@
 # Auditoría visual del valle 3D
 
-Fecha de medición: 2026-07-20  
-Objeto auditado: escena del commit `af52e933`, que corresponde al `HEAD` inicial de este worktree  
-Ruta: `/?ciclo=12#/mockups/entrada-3d`  
-Viewport de referencia: 1998 × 1248 px, tier alto, movimiento reducido para congelar la cámara  
+Fecha de medición: 2026-07-20
+
+Objeto auditado: escena del commit `af52e933`, que corresponde al `HEAD` inicial de este worktree
+
+Ruta: `/?ciclo=12#/mockups/entrada-3d`
+
+Viewport de referencia: 1998 × 1248 px, tier alto, movimiento reducido para congelar la cámara
 Alcance: diagnóstico y medición. No se modificó arte.
 
 ## Dictamen
