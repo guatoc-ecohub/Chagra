@@ -36,17 +36,20 @@ const MUNDOS = {
     modulo: 'src/visual/mundo3d/papa/floraPapa.geom.js',
     altura: 'alturaLadera',
     camaraFija: { pos: [2, 5.4, 15.5], mira: [0, 3.8, -3], fov: 46 },
-    sujeto: { nombre: 'el claro de la cosecha', clave: 'SITIO_COSECHA', alto: 0.9 },
+    sujeto: { nombre: 'el claro de la cosecha', clave: 'SITIO_COSECHA' },
+    altoCultivo: 0.45, // la mata de papa es bajita y aporcada
   },
   yuca: {
     modulo: 'src/visual/mundo3d/yuca/floraYuca.geom.js',
     altura: 'alturaYucal',
     sujeto: { nombre: 'el claro del arranque', clave: 'SITIO_ARRANQUE' },
+    altoCultivo: 2.3, // la mata de yuca adulta
   },
   quinua: {
     modulo: 'src/visual/mundo3d/quinua/floraQuinua.geom.js',
     altura: 'alturaQuinual',
     sujeto: { nombre: 'la era de la trilla', clave: 'SITIO_TRILLA' },
+    altoCultivo: 1.6, // la mata de quinua con su panoja
   },
 };
 
@@ -61,21 +64,28 @@ const norm = (v) => {
   return [v[0] / n, v[1] / n, v[2] / n];
 };
 
-/* Marcha por el rayo hasta que baje del terreno. Paso fino cerca (donde está el
-   sujeto) y grueso lejos: exacto donde importa, barato donde no. */
-function golpear(origen, dir, altura, maxDist = 90) {
+/*
+ * Marcha por el rayo hasta que toque el mundo. Paso fino cerca (donde está el
+ * sujeto) y grueso lejos: exacto donde importa, barato donde no.
+ *
+ * OJO — golpea contra el TERRENO MÁS EL DOSEL DEL CULTIVO, no contra el terreno
+ * pelado. Es la diferencia entre medir bien y engañarse: una yuca mide 2,3 m y
+ * una quinua 1,6 m, así que lo que de verdad llena el cuadro de esos mundos es
+ * la planta, no el suelo bajo la planta. Midiendo solo terreno, un quinual
+ * denso "ocupaba 8,6% del cuadro" — y lo que ocupa 8,6% es el barro entre las
+ * matas, que es justo lo que no se ve.
+ */
+function golpear(origen, dir, altura, dosel, maxDist = 90) {
   let t = 0.2;
-  let prevArriba = true;
   while (t < maxDist) {
     const p = [origen[0] + dir[0] * t, origen[1] + dir[1] * t, origen[2] + dir[2] * t];
     // fuera del heightfield: se acabó el mundo, es cielo/telón
     if (Math.abs(p[0]) > 20 || p[2] < -19 || p[2] > 19) return null;
-    const h = altura(p[0], p[2]);
-    if (p[1] <= h) {
-      if (prevArriba) return { t, punto: p, altura: h };
-      return { t, punto: p, altura: h };
+    const suelo = altura(p[0], p[2]);
+    const sobre = dosel(p[0], p[2]);
+    if (p[1] <= suelo + sobre) {
+      return { t, punto: p, altura: suelo, enCultivo: sobre > 0.01 };
     }
-    prevArriba = false;
     t += t < 18 ? 0.16 : 0.55;
   }
   return null;
@@ -98,6 +108,12 @@ async function main() {
   const cam = def.camaraFija || { ...geom.CAMARA, pos: geom.CAMARA.reposo, mira: geom.CAMARA.mirada };
   if (!cam || !cam.pos) throw new Error(`el módulo de «${cual}» no exporta CAMARA`);
   const sujeto = geom[def.sujeto.clave];
+  /* El dosel: cuánto levanta el cultivo sobre el suelo en cada punto del lote.
+     Se apoya en el `dentroLote` del propio mundo, así que respeta los claros
+     (la era, el patio, el sitio de cosecha) sin duplicar esa lógica aquí. */
+  const alto = def.altoCultivo || 0;
+  const dosel = (x, z) =>
+    geom.dentroLote && alto ? geom.dentroLote(x, z) * alto : 0;
 
   const adelante = norm(sub(cam.mira, cam.pos));
   const derecha = norm(cruz(adelante, [0, 1, 0]));
@@ -114,6 +130,7 @@ async function main() {
   let cielo = 0;
   let suelo = 0;
   const porTercio = [0, 0, 0]; // golpes de suelo por tercio vertical del cuadro
+  let enLote = 0; // rayos que caen sobre el cultivo sembrado
   let masCerca = Infinity;
   let masLejos = 0;
   let sumaDist = 0;
@@ -131,7 +148,7 @@ async function main() {
         adelante[1] + derecha[1] * sx * mediaH + arriba[1] * sy * mediaV,
         adelante[2] + derecha[2] * sx * mediaH + arriba[2] * sy * mediaV,
       ]);
-      const g = golpear(cam.pos, dir, altura);
+      const g = golpear(cam.pos, dir, altura, dosel);
       if (!g) {
         cielo += 1;
         continue;
@@ -149,6 +166,11 @@ async function main() {
         if (sujetoFila === null) sujetoFila = f;
         sujetoCol = cN;
       }
+
+      // ¿y cayó sobre el CULTIVO? En un mundo cuyo entregable es la planta
+      // misma (el campo de color de la quinua), esto importa más que dónde cae
+      // tal o cual rincón: mide si el cultivo llena el cuadro.
+      if (g.enCultivo) enLote += 1;
     }
   }
 
@@ -175,6 +197,8 @@ async function main() {
       )} m · más lejos ${masLejos.toFixed(1)} m`,
     );
   }
+
+  console.log(`  sobre el CULTIVO sembrado: ${pct(enLote)} del cuadro`);
 
   console.log(`\n  SUJETO — ${def.sujeto.nombre}:`);
   if (sujetoFila === null) {
@@ -206,6 +230,9 @@ async function main() {
     avisos.push('nada cerca de la cámara: la escena se ve lejana incluso para el estilo de la casa');
   }
   if (sujetoFila === null) avisos.push('EL SUJETO NO ESTÁ EN CUADRO — esto es un bloqueante');
+  if (enLote / total < 0.12) {
+    avisos.push('el cultivo sembrado ocupa muy poco cuadro: se está fotografiando el paisaje, no el cultivo');
+  }
 
   if (avisos.length) {
     console.log('\n  ⚠ avisos:');
