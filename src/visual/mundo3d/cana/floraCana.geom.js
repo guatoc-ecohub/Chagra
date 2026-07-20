@@ -795,14 +795,22 @@ export function sembrarCanaveral(conteos, topesPorVariante, seed = 907) {
       if (tp) {
         const ca = Math.cos(rotY);
         const sa = Math.sin(rotY);
-        const px = x + (tp[0] * ca - tp[2] * sa) * escala;
-        const pz = z + (tp[0] * sa + tp[2] * ca) * escala;
+        const dx = (tp[0] * ca - tp[2] * sa) * escala;
+        const dz = (tp[0] * sa + tp[2] * ca) * escala;
+        const dy = tp[1] * escala - 0.06;
         penacho.push({
-          pos: /** @type {[number,number,number]} */ ([px, y + tp[1] * escala - 0.06, pz]),
+          pos: /** @type {[number,number,number]} */ ([x + dx, y + dy, z + dz]),
           rotY: r() * Math.PI * 2,
           escala: escala * (0.85 + r() * 0.4),
           tint: cPenacho,
-          fase: px * 0.32 + pz * 0.19,
+          // La fase la hereda de SU cepa: penacho y tallo se mecen juntos.
+          fase: x * 0.32 + z * 0.19,
+          /* El penacho no pivota en su propio pie: pivota en el PIE DE LA CEPA,
+             a 4 m más abajo. Sin esto, al mecerse la caña la punta del tallo se
+             corre ~15 cm y el penacho se queda flotando en el aire. `ancla` es
+             el pie de la mata y `brazo` el vector del pie a la punta. */
+          ancla: /** @type {[number,number,number]} */ ([x, y, z]),
+          brazo: /** @type {[number,number,number]} */ ([dx, dy, dz]),
         });
       }
     }

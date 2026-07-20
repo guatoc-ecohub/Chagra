@@ -30,7 +30,7 @@ import { perfilDeTier } from '../deviceTier.js';
 import {
   canaDeTier,
   calidadCana,
-  mallasDeTier,
+  variantesDeTier,
   sembrarCanaveral,
   geomMataCana,
   geomPenachoCana,
@@ -148,18 +148,12 @@ export default function Canaveral({ tier = 'alto', reducedMotion = false }) {
   const perfil = perfilDeTier(tier);
   const conteos = canaDeTier(tier);
   const q = calidadCana(tier);
-  const mallas = useMemo(
-    () => /** @type {{v:number, detalle:'cerca'|'lejos'}[]} */ (mallasDeTier(tier)),
-    [tier],
-  );
+  const nV = variantesDeTier(tier);
 
-  /* Las matas: una geometría por (variante × calidad), una vez por tier. La
-     variante evita que el lote se lea como plantilla; la calidad es lo que hace
-     que quepan más del doble de cepas — las del pasillo con todo el detalle,
-     las del fondo con un tubo de 16 anillos que a esa distancia nadie discute. */
+  /* Las matas (una geometría por variante, una vez por tier). */
   const variantes = useMemo(
-    () => mallas.map((m) => geomMataCana(m.v, { q, detalle: m.detalle }, 101)),
-    [mallas, q],
+    () => Array.from({ length: nV }, (_, v) => geomMataCana(v, { q }, 101)),
+    [nV, q],
   );
 
   const geoPenacho = useMemo(() => geomPenachoCana(q, 41), [q]);
@@ -175,8 +169,8 @@ export default function Canaveral({ tier = 'alto', reducedMotion = false }) {
   /* La siembra determinista: los surcos, los claros del corte, las variedades
      y las puntas donde se montan los penachos. */
   const dist = useMemo(
-    () => sembrarCanaveral(conteos, mallas, variantes.map((v) => v.topes), 907),
-    [conteos, mallas, variantes],
+    () => sembrarCanaveral(conteos, variantes.map((v) => v.topes), 907),
+    [conteos, variantes],
   );
 
   /* Material único con vertexColors (el color va horneado por pieza y el tinte
