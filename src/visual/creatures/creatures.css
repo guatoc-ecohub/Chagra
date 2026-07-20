@@ -2702,3 +2702,68 @@
   [data-creature='oso-anteojos'][data-rasca='1'] .crt-brazo-r,
   [data-creature='oso-anteojos'][data-rasca='1'] .crt-body { animation: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OSO GUARDIÁN (oso-guardian) — la mole serena del guardián negro de la luna.
+   Aditivo sobre el KIT y sobre los keyframes ya existentes del oso (oso-boil,
+   oso-resoplido, oso-rasca-cuerpo, oso-cejas-frunce) — cero keyframes
+   duplicados; solo el LATIDO DE LA LUNA es nuevo (osog-luna). La cabeza NO se
+   mece (gravitas): la vida vive en el respirar pesado, el aliento de los aros
+   (osoa-anteojo-brillo compartido) y la luna que late. Gates RM + tier abajo.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL DE MONTAÑA — aún más lento que el oso café: la masa asienta despacio. */
+[data-creature='oso-guardian'] .rh-boil {
+  animation-name: oso-boil;
+  animation-duration: 3.2s;
+  animation-timing-function: steps(14, end);
+}
+
+/* RESOPLA — el huff grave del guardián (pecho hincha y suelta con peso). */
+[data-creature='oso-guardian'][data-resopla='1'] .crt-body {
+  animation: oso-resoplido 1.8s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+[data-creature='oso-guardian'][data-resopla='1'] .oso-cejas {
+  animation: oso-cejas-frunce 1.1s ease-in-out infinite;
+}
+
+/* RASCA → en este oso es un REMECERSE de peso (sin manoteo: la mole se
+   acomoda de gusto, digna). Reusa el meneíto del cuerpo del oso café. */
+[data-creature='oso-guardian'][data-rasca='1'] .crt-body {
+  animation: oso-rasca-cuerpo 1.3s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+/* Los estados PISAN el arrebato (antic/travieso): el gesto lee limpio. */
+[data-creature='oso-guardian'][data-resopla='1'] .rh-antic,
+[data-creature='oso-guardian'][data-rasca='1'] .rh-antic,
+[data-creature='oso-guardian'][data-resopla='1'] .rh-travieso,
+[data-creature='oso-guardian'][data-rasca='1'] .rh-travieso { animation: none; }
+
+/* LA LUNA LATE — el halo del emblema del pecho respira MUY despacio (7.3s,
+   co-primo con el aliento de los aros 5.3s y el boil 3.2s: nunca en compás). */
+.osog-luna {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: osog-luna 7.3s ease-in-out infinite;
+}
+@keyframes osog-luna {
+  0%, 100% { opacity: 0.22; transform: scale(1); }
+  50%      { opacity: 0.38; transform: scale(1.07); }
+}
+
+/* device-tier 'bajo': el boil reescrito lo reactivaría (misma clase) →
+   re-apagarlo; cejas y luna continuas también. Estados reactivos siguen. */
+[data-tier='bajo'][data-creature='oso-guardian'] .rh-boil,
+[data-tier='bajo'][data-creature='oso-guardian'] .oso-cejas,
+[data-tier='bajo'] .osog-luna { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .osog-luna,
+  [data-creature='oso-guardian'][data-resopla='1'] .crt-body,
+  [data-creature='oso-guardian'][data-resopla='1'] .oso-cejas,
+  [data-creature='oso-guardian'][data-rasca='1'] .crt-body { animation: none !important; }
+}
