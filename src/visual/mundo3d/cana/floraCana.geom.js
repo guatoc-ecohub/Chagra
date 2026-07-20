@@ -139,15 +139,41 @@ export const enTrapiche = (lx, ly, lz) =>
 /* -------------------------------------------------------------------------- */
 
 /*
- * `mata` es el número de CEPAS del lote (cada una ya trae 6–9 tallos, así que la
- * cuenta real de tallos es ~7×). 'alto' llena el cañaveral; 'medio' es frugal;
- * 'bajo' deja lo mínimo para que AÚN se lea "cañaveral alto junto al trapiche".
+ * Las CEPAS del lote (cada una ya trae 7–8 tallos, así que la cuenta real de
+ * tallos es ~7×). Van repartidas en dos calidades, y ese reparto es lo que hace
+ * viable el mundo:
+ *
+ *   · CERCA — las que la cámara pisa de verdad: el pasillo por donde entra la
+ *     lección y el frente del lote que mira al plano general. Van con todo el
+ *     detalle, porque a ochenta centímetros se le ven los nudos al tallo.
+ *   · LEJOS — el resto del lote. A quince metros nadie le cuenta los nudos a
+ *     una caña: bastan un tubo de dieciséis anillos y la mitad de las hojas.
+ *
+ * Sin este reparto había que elegir entre un cañaveral RALO con detalle o uno
+ * denso que no corre. Con él caben más del doble de cepas por MENOS triángulos
+ * que antes — y el pasillo del paso 1, que era lo que importaba, queda tupido.
  */
 export const FLORA_CANA = {
-  alto: { mata: 112, penacho: 40, hojarasca: 20, piedra: 8, matojo: 24 },
-  medio: { mata: 76, penacho: 22, hojarasca: 11, piedra: 5, matojo: 13 },
-  bajo: { mata: 34, penacho: 9, hojarasca: 6, piedra: 3, matojo: 6 },
+  alto: { mataCerca: 140, mataLejos: 76, penacho: 46, hojarasca: 22, piedra: 8, matojo: 26 },
+  medio: { mataCerca: 68, mataLejos: 36, penacho: 24, hojarasca: 12, piedra: 5, matojo: 14 },
+  bajo: { mataCerca: 24, mataLejos: 14, penacho: 9, hojarasca: 6, piedra: 3, matojo: 6 },
 };
+
+/* El detalle geométrico de cada calidad de cepa. `tubular` es lo caro y lo que
+   decide si el NUDO se ve: con ~20 nudos en 4 m hacen falta 2+ anillos por nudo
+   o la banda nodal se aliasea. Alrededor, 4 lados sobran en un tallo de 3 cm. */
+export const DETALLE = {
+  cerca: { tubular: 44, radial: 4, hojas: 1, chala: 1, filasHoja: 8, filasChala: 6 },
+  lejos: { tubular: 16, radial: 4, hojas: 0.5, chala: 0.42, filasHoja: 5, filasChala: 4 },
+};
+
+/*
+ * LA ZONA CERCANA: dónde vale la pena gastar triángulos. Es el pasillo que
+ * recorre el paso 1 más el frente del lote que entra en el plano general, y la
+ * manchita de la derecha junto al camino de llegada. Todo lo demás es fondo.
+ */
+export const enZonaCerca = (x, z) =>
+  (x > -15.5 && x < 1 && z > -9.5 && z < 13.5) || (x > 15.8 && z > -3 && z < 12.5);
 
 /** Conteos para un tier (desconocido → frugal, nunca el más caro). */
 export const canaDeTier = (tier) => FLORA_CANA[tier] || FLORA_CANA.medio;
@@ -156,8 +182,31 @@ export const canaDeTier = (tier) => FLORA_CANA[tier] || FLORA_CANA.medio;
 export const CALIDAD_CANA = { alto: 1, medio: 0.62, bajo: 0.42 };
 export const calidadCana = (tier) => CALIDAD_CANA[tier] ?? CALIDAD_CANA.medio;
 
-/** Cuántas variantes de mata se construyen por tier (anti-plantilla). */
-export const variantesDeTier = (tier) => (tier === 'alto' ? 2 : 1);
+/*
+ * Las MALLAS de cepa que se construyen por tier: una por (variante × calidad).
+ * Dos variantes de mata (una alta y delgada, otra más baja y tupida) por dos
+ * calidades. La variante es lo que evita que el lote se lea como plantilla; la
+ * calidad es lo que lo hace correr. En gama frugal se cae a una sola variante, y
+ * en gama baja a una sola malla.
+ *
+ * @param {string} tier
+ * @returns {{v: number, detalle: 'cerca'|'lejos'}[]}
+ */
+export function mallasDeTier(tier) {
+  if (tier === 'alto') {
+    return [
+      { v: 0, detalle: 'cerca' },
+      { v: 1, detalle: 'cerca' },
+      { v: 0, detalle: 'lejos' },
+      { v: 1, detalle: 'lejos' },
+    ];
+  }
+  if (tier === 'bajo') return [{ v: 0, detalle: 'lejos' }];
+  return [
+    { v: 0, detalle: 'cerca' },
+    { v: 0, detalle: 'lejos' },
+  ];
+}
 
 /* -------------------------------------------------------------------------- */
 /*  Paleta del cañaveral (colores horneados en vertexColors)                   */
@@ -365,11 +414,15 @@ const ENTRENUDO = 0.205;
  * @param {number} o.inclina  cuánto se abre respecto a la vertical (rad).
  * @param {number} o.rumbo    hacia dónde se abre (rad, en XZ).
  * @param {number} [o.q]      calidad (detalle) 0..1.
+ * @param {{tubular:number, radial:number}} [o.det]  el detalle de la CALIDAD de
+ *   cepa (cerca o lejos): cuántos anillos lleva el tubo a lo largo y cuántos
+ *   lados alrededor. Es lo que decide si el nudo se ve o se aliasea.
  * @param {number} [o.semilla]
  */
 export function geomTalloCana(o) {
   const { altura, radio, inclina, rumbo } = o;
   const q = o.q ?? 1;
+  const det = o.det ?? DETALLE.cerca;
   const semilla = o.semilla ?? 1;
   const r = rng(semilla * 11 + 5);
 
@@ -404,12 +457,12 @@ export function geomTalloCana(o) {
     return Math.max(0.012, base * (1 + 0.17 * bulto));
   };
 
-  /* El tallo necesita MUCHOS anillos a lo largo (y muy pocos alrededor: la caña
-     es delgada). Con ~20 nudos en 4 m hacen falta ≥2 anillos por nudo o la banda
-     nodal se aliasea y la caña vuelve a parecer un tubo liso. Alrededor, 5 lados
-     bastan y de frente ni se notan. */
-  const tubular = Math.max(16, Math.round(60 * q));
-  const radial = 5;
+  /* El tallo necesita anillos a lo largo (y muy pocos alrededor: la caña es
+     delgada). Cuántos, lo decide la CALIDAD de la cepa: la de primer plano se
+     gana sus 44 anillos porque a ochenta centímetros se le ven los nudos; la
+     del fondo se conforma con 16, que a quince metros nadie los cuenta. */
+  const tubular = Math.max(8, Math.round(det.tubular * q));
+  const radial = det.radial;
   const geo = tuboOrganico(curva, {
     tubular,
     radial,
@@ -536,23 +589,27 @@ export const N_VARIANTES = VARIANTES_MATA.length;
  * tallos, para que el penacho se pueda sembrar EN una punta y no en el aire.
  *
  * @param {number} v  índice de variante (0…N_VARIANTES-1).
- * @param {{q: number}} o
+ * @param {{q: number, detalle?: 'cerca'|'lejos'}} o  `detalle` decide cuánta
+ *   geometría se gasta: la cepa del pasillo se gana sus 44 anillos por tallo
+ *   porque a ochenta centímetros se le ven los nudos; la del fondo, 16.
  * @param {number} semilla
  * @returns {{tallos: THREE.BufferGeometry, hojas: THREE.BufferGeometry,
  *            chala: THREE.BufferGeometry, topes: [number,number,number][],
  *            alto: number}}
  */
-export function geomMataCana(v, { q }, semilla = 101) {
+export function geomMataCana(v, { q, detalle = 'cerca' }, semilla = 101) {
   const cfg = VARIANTES_MATA[v % VARIANTES_MATA.length];
+  const det = DETALLE[detalle] || DETALLE.cerca;
   const r = rng(semilla + v * 37);
 
   /* El recorte por tier va al CUADRADO de la calidad: la mata es la pieza más
-     cara del mundo (cada tallo es un tubo de 60 anillos) y en gama frugal hay
-     que bajar de 7–8 tallos a 3 sin pensarlo. Con 3 tallos, giro y escala la
-     cepa todavía se lee como macolla. */
+     cara del mundo y en gama frugal hay que bajar de 7–8 tallos a 3 sin
+     pensarlo. Con 3 tallos, giro y escala la cepa todavía se lee como macolla.
+     El número de TALLOS no baja con la distancia (es la silueta de la cepa: sin
+     tallos deja de ser macolla), pero sí bajan las hojas y la chala. */
   const nTallos = Math.max(3, Math.round(cfg.tallos * q * q));
-  const nHojas = Math.max(2, Math.round(cfg.hojas * q));
-  const nChala = Math.max(1, Math.round(cfg.chala * q));
+  const nHojas = Math.max(2, Math.round(cfg.hojas * q * det.hojas));
+  const nChala = Math.max(1, Math.round(cfg.chala * q * det.chala));
 
   const partesTallo = [];
   const partesHoja = [];
@@ -572,7 +629,7 @@ export function geomMataCana(v, { q }, semilla = 101) {
     const rumbo = ang + (r() - 0.5) * 0.8;
     const radio = cfg.radio * (0.86 + r() * 0.3);
 
-    const tallo = geomTalloCana({ altura, radio, inclina, rumbo, q, semilla: semilla + i * 13 });
+    const tallo = geomTalloCana({ altura, radio, inclina, rumbo, q, det, semilla: semilla + i * 13 });
     poner(tallo, [bx, 0, bz]);
     partesTallo.push(tallo);
 
@@ -604,7 +661,7 @@ export function geomMataCana(v, { q }, semilla = 101) {
         doblez: 0.34,
         torsion: 0.85 + r() * 0.6,
         lateral: 0.14 + r() * 0.12,
-        filas: q > 0.8 ? 9 : 6,
+        filas: Math.max(4, Math.round(det.filasHoja * (q > 0.8 ? 1 : 0.75))),
         semilla: semilla + i * 31 + h,
       });
       poner(hoja, [hx, y, hz], [0, -giro, alza]);
@@ -628,7 +685,7 @@ export function geomMataCana(v, { q }, semilla = 101) {
         doblez: 0.46, // y se enrolla sobre sí misma al secarse
         torsion: 1.5 + r() * 0.9,
         lateral: 0.10,
-        filas: q > 0.8 ? 7 : 5,
+        filas: Math.max(3, Math.round(det.filasChala * (q > 0.8 ? 1 : 0.75))),
         seca: true,
         semilla: semilla + i * 17 + c + 400,
       });
@@ -714,39 +771,82 @@ const PASO_CEPA = 1.05; // distancia entre cepas dentro del surco
 
 /* Los tres tablones sembrados del lote. La era del trapiche los parte al medio:
    el cañaveral rodea al trapiche, que es exactamente como se ve en la finca. */
+/*
+ * Los tablones SEMBRADOS A MANO (instanciados). Son deliberadamente más chicos
+ * que el cañaveral que se ve: de ahí para atrás toma el relevo el MURO de fondo,
+ * que cuesta mil triángulos y llena el horizonte. Repartir el presupuesto en un
+ * lote enorme daba un cañaveral RALO — con la cámara metida en el surco se veían
+ * dos matas y el pasillo pelado. Sembrar tupido un área más chica y cerrar
+ * atrás con el muro es lo que hace que se sienta cañaveral.
+ */
 const TABLONES = [
-  // el grande de la izquierda: el que la cámara mira de frente
-  { x0: -23, x1: -1.4, z0: -20, z1: 13.5, giro: 0.06 },
+  // el grande de la izquierda: el que la cámara mira de frente y por el que
+  // camina la lección
+  { x0: -17.5, x1: -1.4, z0: -13, z1: 13.5, giro: 0.06 },
   // el de atrás, subiendo la loma detrás de la enramada
-  { x0: 0.5, x1: 23, z0: -20, z1: -6.5, giro: -0.05 },
+  { x0: 0.5, x1: 19, z0: -13.5, z1: -6.5, giro: -0.05 },
   // la manchita del frente derecho, junto al camino de llegada
-  { x0: 16.5, x1: 23.5, z0: -5, z1: 12, giro: 0.03 },
+  { x0: 16.5, x1: 22.5, z0: -4, z1: 12, giro: 0.03 },
 ];
+
+/**
+ * El eje de un PASILLO entre dos surcos del tablón grande, a la altura `z`.
+ *
+ * Existe por una razón concreta: la lección mete la cámara a caminar por una
+ * calle del cañaveral, y el surco NO es una recta — ondula con el terreno y
+ * sesga con el tablón. Una x fija se sale de la calle a los pocos metros y la
+ * cámara termina dentro de una cepa. Esta función sale de las MISMAS constantes
+ * con las que se siembra (SURCO, TABLONES, la ondulación), así que el pasillo y
+ * las matas no se pueden desalinear: una sola cuenta, no dos.
+ *
+ * @param {number} z    profundidad del mundo.
+ * @param {number} [s]  entre qué surco y el siguiente se camina.
+ */
+export function pasilloCanaveral(z, s = 5) {
+  const tb = TABLONES[0];
+  const xs = tb.x0 + (s + 0.5) * SURCO; // el centro entre el surco s y el s+1
+  return xs + Math.sin(z * 0.17) * 0.42 + z * tb.giro;
+}
 
 /**
  * Siembra el lote completo, determinista.
  *
- * @param {{mata:number, penacho:number, hojarasca:number, piedra:number, matojo:number}} conteos
- * @param {[number,number,number][][]} topesPorVariante  puntas de cada variante.
+ * Cada cepa cae en UNA de las mallas de `mallas` (variante × calidad). La
+ * VARIANTE la decide un ruido de posición (matas vecinas se parecen, como en un
+ * lote real donde una zona macolló mejor que otra); la CALIDAD la decide la
+ * distancia a donde camina la cámara. Los presupuestos de cerca y lejos son
+ * independientes: así el pasillo queda tupido aunque el fondo se ralee.
+ *
+ * @param {{mataCerca:number, mataLejos:number, penacho:number, hojarasca:number,
+ *          piedra:number, matojo:number}} conteos
+ * @param {{v:number, detalle:string}[]} mallas  las mallas construidas.
+ * @param {[number,number,number][][]} topesPorMalla  puntas de tallo por malla.
  * @param {number} [seed]
- * @returns {{matas: {pos:[number,number,number], rotY:number, escala:number, tint:number[]}[][],
- *            hojas: object[][], chala: object[][], penacho: object[],
- *            hojarasca: object[], piedra: object[], matojo: object[]}}
  */
-export function sembrarCanaveral(conteos, topesPorVariante, seed = 907) {
+export function sembrarCanaveral(conteos, mallas, topesPorMalla, seed = 907) {
   const r = rng(seed);
-  const nV = topesPorVariante.length;
+  const nM = mallas.length;
 
-  const matas = Array.from({ length: nV }, () => []);
-  const hojas = Array.from({ length: nV }, () => []);
-  const chala = Array.from({ length: nV }, () => []);
+  const matas = Array.from({ length: nM }, () => []);
+  const hojas = Array.from({ length: nM }, () => []);
+  const chala = Array.from({ length: nM }, () => []);
   const penacho = [];
   const cPenacho = [0.98, 0.96, 0.9];
 
-  /* 1) Se recorren los surcos de cada tablón y se van poniendo cepas hasta
-        gastar el presupuesto de `conteos.mata`. Se reparte proporcional al área
-        para que ningún tablón quede pelado en gama baja. */
-  const sitios = [];
+  /* A qué malla va una cepa. Si el tier no construyó esa combinación (gama
+     frugal o baja), cae en la primera que exista: nunca se pierde una mata por
+     no haber malla — se pierde detalle, que es lo barato. */
+  const mallaDe = (v, detalle) => {
+    const i = mallas.findIndex((m) => m.v === v && m.detalle === detalle);
+    if (i >= 0) return i;
+    const j = mallas.findIndex((m) => m.detalle === detalle);
+    return j >= 0 ? j : 0;
+  };
+
+  /* 1) Se recorren los surcos de cada tablón y se apuntan todos los sitios
+        posibles, separando los de CERCA de los de LEJOS. */
+  const cerca = [];
+  const lejos = [];
   TABLONES.forEach((tb, ti) => {
     const nSurcos = Math.floor((tb.x1 - tb.x0) / SURCO);
     for (let s = 0; s <= nSurcos; s++) {
@@ -761,30 +861,59 @@ export function sembrarCanaveral(conteos, topesPorVariante, seed = 907) {
         if (enLaEra(x, z)) continue; // la era del trapiche está limpia
         // el camino de llegada se respeta (por ahí entra la caña cortada)
         if (Math.abs(x - caminoX(z)) < 2.3 && z > -2) continue;
-        sitios.push([x, z, ti]);
+        (enZonaCerca(x, z) ? cerca : lejos).push([x, z, ti]);
       }
     }
   });
 
   // Barajado determinista: al recortar por tier el lote se ralea PAREJO, no se
   // queda media hectárea llena y la otra vacía.
-  for (let i = sitios.length - 1; i > 0; i--) {
-    const j = Math.floor(r() * (i + 1));
-    const t = sitios[i];
-    sitios[i] = sitios[j];
-    sitios[j] = t;
-  }
+  const barajar = (lista) => {
+    for (let i = lista.length - 1; i > 0; i--) {
+      const j = Math.floor(r() * (i + 1));
+      const t = lista[i];
+      lista[i] = lista[j];
+      lista[j] = t;
+    }
+    return lista;
+  };
+  barajar(cerca);
+  barajar(lejos);
 
-  const cuantas = Math.min(conteos.mata, sitios.length);
-  for (let i = 0; i < cuantas; i++) {
-    const [x, z, ti] = sitios[i];
+  /*
+   * Las cepas de CERCA no se recortan al azar: se gastan EMPEZANDO POR EL
+   * PASILLO que camina la lección y abriéndose hacia afuera. Barajar parejo
+   * dejaba huecos justo donde la cámara se para — un tramo del pasillo con tres
+   * matas y el resto aire, que es exactamente lo que no puede pasar en el plano
+   * que sostiene todo el mundo.
+   *
+   * El ruido que se le suma al puntaje evita lo contrario: sin él quedaría una
+   * franja densa de bordes rectos y el lote se leería como una banda pintada.
+   * Con él, la densidad baja a manchas — como baja de verdad en un cultivo.
+   */
+  cerca.sort((a, b) => {
+    const pa = Math.abs(a[0] - pasilloCanaveral(a[1])) + ruidoFbm(a[0] * 0.5 + 3, 1.5, a[1] * 0.5) * 5.5;
+    const pb = Math.abs(b[0] - pasilloCanaveral(b[1])) + ruidoFbm(b[0] * 0.5 + 3, 1.5, b[1] * 0.5) * 5.5;
+    return pa - pb;
+  });
+
+  const elegidos = [
+    ...cerca.slice(0, conteos.mataCerca).map((s) => [...s, 'cerca']),
+    ...lejos.slice(0, conteos.mataLejos).map((s) => [...s, 'lejos']),
+  ];
+
+  for (let i = 0; i < elegidos.length; i++) {
+    const [x, z, ti, detalle] = elegidos[i];
     const y = alturaVega(x, z);
     // Claros: donde ya pasó el corte queda la cepa rapada. Se salta una de cada
     // tantas, en manchas (ruido), no al azar puro — así se ve el corte por eras.
+    // Solo en el fondo del tablón grande: el pasillo que camina la lección NO se
+    // ralea, que es justo donde se necesita la caña cerrada.
     const corte = ruidoFbm(x * 0.14 + 5, 0.5, z * 0.14);
-    if (corte > 0.74 && ti === 0) continue;
+    if (corte > 0.76 && ti === 0 && detalle === 'lejos') continue;
 
-    const v = nV > 1 ? (ruidoFbm(x * 0.3, 1.5, z * 0.3) > 0.5 ? 1 : 0) : 0;
+    const v = ruidoFbm(x * 0.3, 1.5, z * 0.3) > 0.5 ? 1 : 0;
+    const m = mallaDe(v, detalle);
     const variedad = variedadPara(ruidoFbm(x * 0.09 + 21, 3.5, z * 0.09));
     // las cepas de la orilla del tablón vienen más chicas (menos competencia,
     // pero más golpe de sol y de viento) — el borde de un lote nunca va parejo
@@ -797,17 +926,20 @@ export function sembrarCanaveral(conteos, topesPorVariante, seed = 907) {
       tint: variedad.tinte,
       fase: x * 0.32 + z * 0.19, // la ONDA del viento viaja por el lote
     };
-    matas[v].push(item);
+    matas[m].push(item);
     // hoja y chala comparten transformación con el tallo (misma cepa), pero la
     // hoja va siempre verde: el tinte de la variedad NO le toca el follaje
-    hojas[v].push({ ...item, tint: [0.94 + r() * 0.1, 1, 0.9 + r() * 0.12] });
-    chala[v].push({ ...item, tint: [1, 0.97, 0.92] });
+    hojas[m].push({ ...item, tint: [0.94 + r() * 0.1, 1, 0.9 + r() * 0.12] });
+    chala[m].push({ ...item, tint: [1, 0.97, 0.92] });
 
     /* EL PENACHO: solo en las cepas que ya espigaron, y montado EN una punta
        real de tallo (por eso hicieron falta los `topes`). */
     if (penacho.length < conteos.penacho && r() < 0.42) {
-      const tops = topesPorVariante[v];
-      const tp = tops[Math.floor(r() * tops.length)];
+      /* Las puntas de SU malla. El `||` no es adorno: si un llamador manda
+         menos listas de topes que mallas, sin esto el mundo entero truena al
+         sembrar. Un penacho de menos es barato; una escena en blanco no. */
+      const tops = topesPorMalla[m] || topesPorMalla[0] || [];
+      const tp = tops.length ? tops[Math.floor(r() * tops.length)] : null;
       if (tp) {
         const ca = Math.cos(rotY);
         const sa = Math.sin(rotY);

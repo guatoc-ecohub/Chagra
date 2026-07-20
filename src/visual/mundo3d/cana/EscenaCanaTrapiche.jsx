@@ -358,7 +358,11 @@ function Diorama({ tier, reducedMotion, foco, vista, vistaToken }) {
         minDistance={5}
         maxDistance={34}
         minPolarAngle={0.28}
-        maxPolarAngle={1.5}
+        /* Pasa de los 90°: la cámara TIENE que poder quedar por debajo de su
+           punto de mira. Es lo que permite el plano del paso 1 — parado en el
+           surco mirando hacia arriba. Con el tope en 1,5 rad OrbitControls la
+           subía sola en cuanto empezaba el viaje y el encuadre se enderezaba. */
+        maxPolarAngle={1.7}
         enableDamping
         dampingFactor={0.08}
         autoRotate={false}
