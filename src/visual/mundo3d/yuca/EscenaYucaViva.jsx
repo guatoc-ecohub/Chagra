@@ -42,6 +42,7 @@ import {
   SITIO_CASA,
   SITIO_ARRANQUE,
   SITIO_ESTACAS,
+  CAMARA,
 } from './floraYuca.geom.js';
 import {
   AtmosferaMundo,
@@ -71,29 +72,6 @@ const RADIO_YUCAL = 13;
 
 /* El frustum de sombra a medida del yucal (el sol de media tarde). */
 const SOMBRA_YUCAL = { left: -18, right: 18, top: 16, bottom: -8, far: 46 };
-
-/* -------------------------------------------------------------------------- */
-/*  LA CÁMARA — lo que este mundo NO puede fallar                             */
-/* -------------------------------------------------------------------------- */
-
-/*
- * El sujeto es el claro del ARRANQUE (z ≈ 6,4), no el cerro del fondo. Estos
- * números están verificados por trazado de rayos contra la MISMA función de
- * altura del terreno (scripts/diag: se lanzan rayos por el encuadre y se cuenta
- * qué toca cada uno). El reparto que buscan es: cielo arriba, cultivo en la
- * franja media, y el arranque ocupando el tercio inferior-central — que es
- * donde el ojo cae solo.
- *
- * Si alguien mueve esto, que vuelva a correr el trazado: medir la geometría de
- * las plantas NO es ver la escena, y una cámara enterrada en la loma da números
- * correctos de todo menos de lo único que importa.
- */
-export const CAMARA = {
-  reposo: /** @type {[number, number, number]} */ ([1.4, 5.2, 16.4]),
-  mirada: /** @type {[number, number, number]} */ ([1.8, 3.4, 4.0]),
-  objetivo: /** @type {[number, number, number]} */ ([1.8, 2.2, 3.0]),
-  fov: 50,
-};
 
 /* La malla de la loma — el heightfield del KIT con la pintura PROPIA del clima
    medio: la tierra roja andina del montículo, el claro del arranque abierto a

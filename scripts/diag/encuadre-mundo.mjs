@@ -41,39 +41,14 @@ const MUNDOS = {
   yuca: {
     modulo: 'src/visual/mundo3d/yuca/floraYuca.geom.js',
     altura: 'alturaYucal',
-    camaraModulo: 'src/visual/mundo3d/yuca/EscenaYucaViva.jsx',
-    sujeto: { nombre: 'el claro del arranque', clave: 'SITIO_ARRANQUE', alto: 0.9 },
+    sujeto: { nombre: 'el claro del arranque', clave: 'SITIO_ARRANQUE' },
   },
   quinua: {
     modulo: 'src/visual/mundo3d/quinua/floraQuinua.geom.js',
     altura: 'alturaQuinual',
-    camaraModulo: 'src/visual/mundo3d/quinua/EscenaQuinuaViva.jsx',
-    sujeto: { nombre: 'la era de la trilla', clave: 'SITIO_TRILLA', alto: 0.9 },
+    sujeto: { nombre: 'la era de la trilla', clave: 'SITIO_TRILLA' },
   },
 };
-
-/* La cámara se lee del propio archivo de la escena (constante CAMARA), para que
-   este diagnóstico no pueda quedar desfasado de lo que la escena monta. */
-async function leerCamara(rutaEscena) {
-  const { readFile } = await import('node:fs/promises');
-  const txt = await readFile(resolve(RAIZ, rutaEscena), 'utf8');
-  const num = '(-?\\d+(?:\\.\\d+)?)';
-  const trio = `\\[\\s*${num}\\s*,\\s*${num}\\s*,\\s*${num}\\s*\\]`;
-  // ojo: el `[^\n]*?` (no `[^\[]*`) es a propósito — la anotación de tipo
-  // `/** @type {[number, number, number]} */` trae corchetes por delante y con
-  // la clase negada de corchete el match nunca llega a los números de verdad.
-  const rep = txt.match(new RegExp(`reposo:[^\\n]*?${trio}`));
-  const mir = txt.match(new RegExp(`mirada:[^\\n]*?${trio}`));
-  const fov = txt.match(new RegExp(`fov:\\s*${num}`));
-  if (!rep || !mir || !fov) {
-    throw new Error(`no encontré la constante CAMARA en ${rutaEscena}`);
-  }
-  return {
-    pos: rep.slice(1, 4).map(Number),
-    mira: mir.slice(1, 4).map(Number),
-    fov: Number(fov[1]),
-  };
-}
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const cruz = (a, b) => [
@@ -116,7 +91,12 @@ async function main() {
 
   const geom = await import(resolve(RAIZ, def.modulo));
   const altura = geom[def.altura];
-  const cam = def.camaraFija || (await leerCamara(def.camaraModulo));
+  /* La cámara sale del PROPIO módulo del mundo (constante CAMARA, que vive
+     junto a la geografía): así este diagnóstico no puede quedar desfasado de lo
+     que la escena monta de verdad. El papal, que es anterior a esa convención,
+     la trae escrita a mano aquí arriba. */
+  const cam = def.camaraFija || { ...geom.CAMARA, pos: geom.CAMARA.reposo, mira: geom.CAMARA.mirada };
+  if (!cam || !cam.pos) throw new Error(`el módulo de «${cual}» no exporta CAMARA`);
   const sujeto = geom[def.sujeto.clave];
 
   const adelante = norm(sub(cam.mira, cam.pos));

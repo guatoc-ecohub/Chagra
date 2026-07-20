@@ -175,6 +175,35 @@ export function alturaYucal(wx, wz) {
 }
 
 /* -------------------------------------------------------------------------- */
+/*  LA CÁMARA — lo que este mundo NO puede fallar                             */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * La cámara vive JUNTO A LA GEOGRAFÍA, no en la escena: encuadrar es una
+ * decisión sobre el terreno, y así el diagnóstico de encuadre puede importarla
+ * de verdad en vez de adivinarla leyendo el .jsx.
+ *
+ * El sujeto es el claro del ARRANQUE (z ≈ 6,4), no el cerro del fondo. Estos
+ * números están verificados por trazado de rayos contra esta MISMA función de
+ * altura (`node scripts/diag/encuadre-mundo.mjs yuca`), y calibrados contra el
+ * papal, que es un mundo ya aprobado:
+ *
+ *              cielo   terreno   tercio alto   sujeto
+ *   papal      32.8%    67.2%       0.6%       tercio bajo · derecha
+ *   yucal      37.2%    62.8%       0.0%       tercio bajo · derecha
+ *
+ * Si alguien mueve esto, que vuelva a correr el trazado. Medir el tamaño de las
+ * plantas NO es ver la escena: una cámara enterrada en la loma da números
+ * correctos de todo menos de lo único que importa, que es si el sujeto aparece.
+ */
+export const CAMARA = {
+  reposo: /** @type {[number, number, number]} */ ([1.4, 5.2, 16.4]),
+  mirada: /** @type {[number, number, number]} */ ([1.8, 3.4, 4.0]),
+  objetivo: /** @type {[number, number, number]} */ ([1.8, 2.2, 3.0]),
+  fov: 50,
+};
+
+/* -------------------------------------------------------------------------- */
 /*  Presupuesto por tier                                                       */
 /* -------------------------------------------------------------------------- */
 
