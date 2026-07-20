@@ -235,7 +235,10 @@ export const MUNDO = {
       { id: 'manejo', pos: [4.6, 2.6, -0.6], emoji: '🐞', label: 'Manejo sin veneno', view: 'biopreparados' },
       { id: 'beneficio', pos: [10.2, 7.5, -13.6], emoji: '💧', label: 'Despulpar, fermentar, secar', view: 'poscosecha' },
     ],
-    entrada: { zoom: 13, centro: [0, 2.4, -2], narra: 'cafe' },
+    // El centro se corre atrás y abajo para que la mirada de EscenaBase3D
+    // (centro.y + zoom·0.12) caiga en CAMARA.mirada de floraCafetal.geom: la
+    // cámara pasa POR DEBAJO del techo de sombra, no entre las copas.
+    entrada: { zoom: 13, centro: [-0.4, 2.24, -3.4], narra: 'cafe' },
     // El gemelo 2D digno: la ficha del café (misma lección, en cifras y notas).
     fallback2d: {
       escena: 'infografia',
