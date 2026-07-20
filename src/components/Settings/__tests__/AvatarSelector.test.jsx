@@ -65,11 +65,11 @@ describe('useAvatarCreature — resolución slug→personaje', () => {
     it('sigue la elección del store en vivo', () => {
         const { result } = renderHook(() => useAvatarCreature());
         act(() => {
-            usePrefsStore.getState().setAvatarCreatureId('oso-andino');
+            usePrefsStore.getState().setAvatarCreatureId('oso-guardian');
         });
-        expect(result.current.id).toBe('oso-andino');
-        expect(result.current.Component).toBe(CREATURES['oso-andino'].Component);
-        expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toBe('oso-andino');
+        expect(result.current.id).toBe('oso-guardian');
+        expect(result.current.Component).toBe(CREATURES['oso-guardian'].Component);
+        expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toBe('oso-guardian');
     });
 
     it('slug desconocido (bicho retirado / typo) cae al default', () => {
