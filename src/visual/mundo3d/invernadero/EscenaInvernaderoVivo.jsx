@@ -15,6 +15,23 @@
  * almácigo RESPIRAN (FloraInvernadero). La atmósfera es la del kit compartido
  * (familia `corral`): el invernadero amanece, dora y anochece CON el valle.
  *
+ * PASADA NOLAN — el tema del invernadero es LA LUZ FILTRADA:
+ *   · El plástico calibre 6 NO es vidrio: es un DIFUSOR. Adentro no hay
+ *     sombras duras — en gama alta la cubierta PROYECTA su sombra y mata el
+ *     sol directo, y el interior vive de una luz LECHOSA de bóveda (el cielo
+ *     entero vuelto lámpara). La física de verdad ES el efecto especial.
+ *   · El sol se ve COMO MANCHA: un resplandor difuso que camina por la bóveda
+ *     con la hora continua (rasante y untado al filo del día, cenital y
+ *     compacto al mediodía), y abajo su ALFOMBRA de luz sin borde deriva
+ *     despacio por las camas. El invernadero también es un reloj — pero un
+ *     reloj borroso, porque el plástico difumina.
+ *   · La CONDENSACIÓN PERLADA: cientos de gotas quietas en la cara interna
+ *     del plástico que a CONTRALUZ prenden como perlas — el rasgo que dice
+ *     "invernadero" antes que cualquier letrero. Y el BRILLO DEL PLIEGUE:
+ *     la línea de lustre donde el plástico se tensa sobre cada arco.
+ *   · El CALOR SE VE: la bruma baja de la mañana (el vaho de la tierra
+ *     regada) obedece la hora — espesa al amanecer, rala al mediodía.
+ *
  * Todo procedural (cero CDN/GLTF/imágenes). Tier-safe vía `perfilDeTier`:
  * 'alto' con sombras + vaho + goteo; 'medio' frugal (goteo corto, sin vaho);
  * 'bajo' mínimo y QUIETO. Con `reducedMotion` monta quieto (frameloop demand):
@@ -23,12 +40,13 @@
  * `foco` (opcional): un punto [x,y,z] que el paso didáctico del host señala
  * con un anillo que respira. Importa three/@react-three → montar SOLO perezosa.
  */
-import { useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
+import { OrbitControls, AdaptiveDpr, Stars } from '@react-three/drei';
 import { perfilDeTier } from '../deviceTier.js';
 import { Fauna } from '../escenas/FaunaEscena.jsx';
+import useCicloDia from '../useCicloDia.js';
 import FloraInvernadero from './FloraInvernadero.jsx';
 import {
   ANCHO,
@@ -36,13 +54,13 @@ import {
   INV,
   alturaInvernadero,
   invernaderoDeTier,
+  puntosCondensacion,
   geomEstructura,
   geomPlastico,
   geomCamas,
   geomRiego,
 } from './invernadero.geom.js';
 import {
-  AtmosferaMundo,
   DomoCielo,
   useAtmosferaMundo,
   useGradienteBandas,
@@ -95,10 +113,159 @@ function construirClaro(seg, plano) {
   });
 }
 
+/* ── EL SOL DEL INVERNADERO (pasada Nolan: la luz filtrada) ────────────────
+   Del reloj continuo del valle (hora decimal) se deriva el arco REAL del sol
+   y lo que ese arco hace sobre un techo que DIFUMINA en vez de proyectar:
+     · `pos`      — de dónde viene la direccional (oriente → poniente).
+     · `mancha`   — el resplandor difuso del sol EN la bóveda: el punto del
+       plástico que mira al sol, untado a lo largo del túnel. Rasante y ancho
+       al filo del día (la luz baja se unta más), compacto y cenital al
+       mediodía. Es la única "sombra nítida" que el invernadero permite: la
+       del propio sol vuelto lámpara borrosa.
+     · `alfombra` — el charco de luz SIN BORDE que esa mancha deja en las
+       camas: deriva de poniente (mañana) a oriente (tarde), más ancho y
+       tenue cuanto más difusa la hora.
+   Pura y barata: se memoíza por hora cuantizada (~3 min). */
+function solDeInvernadero(hora) {
+  const dia = (hora - 6) / 12; // 0 = sale (~6:00) · 1 = se esconde (~18:00)
+  if (dia <= 0.015 || dia >= 0.985) return { deDia: false, fade: 0 };
+  const arco = Math.PI * dia;
+  const pos = /** @type {[number,number,number]} */ ([10 * Math.cos(arco), 2.5 + 12 * Math.sin(arco), 4]);
+  const alt = Math.atan2(pos[1], Math.hypot(pos[0], pos[2]));
+  // tras el filo de la cordillera el sol existe pero todavía no unta
+  const fade = Math.min(1, Math.max(0, (alt - 0.1) / 0.16));
+  if (fade <= 0) return { deDia: true, pos, fade: 0, rasante: 1 };
+  const rasante = Math.cos(arco) * Math.cos(arco); // la luz baja es la que dramatiza
+  // el punto de la bóveda que mira al sol (ángulo sobre el arco del túnel)
+  const phi = Math.min(Math.PI - 0.2, Math.max(0.2, Math.atan2(Math.sin(arco) * 0.9 + 0.1, Math.cos(arco))));
+  const mancha = {
+    phi,
+    ancho: 0.3 + 0.5 * rasante, // semiancho angular: el sol bajo se unta más
+    op: (0.15 + 0.19 * rasante) * fade,
+    estira: 4.5 + 3.5 * rasante, // el smear a lo largo del túnel
+  };
+  const alfombra = {
+    x: Math.max(-2.1, Math.min(2.1, -2.3 * Math.cos(arco))),
+    rx: 2.4 + 1.2 * rasante,
+    rz: 5.4,
+    op: (0.055 + 0.055 * rasante) * fade,
+  };
+  return { deDia: true, pos, fade, rasante, mancha, alfombra };
+}
+
+/* La BRUMA por hora: espesa con el fresco de la mañana (la tierra regada
+   devuelve el riego como vaho), rala al mediodía, un respiro al caer la
+   tarde. Multiplica el vaho de siempre — el calor SE VE. */
+function brumaDeHora(hora) {
+  const manana = Math.exp(-(((hora - 7.2) / 2.0) ** 2));
+  const tarde = Math.exp(-(((hora - 17.4) / 2.2) ** 2)) * 0.5;
+  return 0.35 + 0.95 * manana + tarde;
+}
+
+/* ── LA MANCHA DE SOL EN LA BÓVEDA: el sol visto a través del plástico ─────
+   No un disco nítido: un resplandor untado sobre el arco (toro parcial
+   estirado a lo largo del túnel, aditivo) + su halo lechoso. El grupo repite
+   la transformación de la bóveda (escala `aplaste` + arranque) para que la
+   mancha VIVA pegada al plástico. */
+function ManchaDeSol({ mancha, color }) {
+  if (!mancha) return null;
+  const { phi, ancho, op, estira } = mancha;
+  return (
+    <group position={[0, INV.arranque, 0]} scale={[1, INV.aplaste, 1]}>
+      <mesh rotation={[0, 0, phi - ancho]} scale={[1, 1, estira]} renderOrder={6}>
+        <torusGeometry args={[INV.radio + 0.02, 0.3, 6, 12, ancho * 2]} />
+        <meshBasicMaterial color={color} transparent opacity={op} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </mesh>
+      <mesh rotation={[0, 0, phi - ancho * 1.9]} scale={[1, 1, estira * 1.6]} renderOrder={6}>
+        <torusGeometry args={[INV.radio + 0.01, 0.34, 6, 12, ancho * 3.8]} />
+        <meshBasicMaterial color={color} transparent opacity={op * 0.32} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ── EL BRILLO DEL PLIEGUE: donde el plástico se tensa sobre el arco ───────
+   Una línea de lustre por arco (toro fino apenas AFUERA de la cubierta),
+   más viva cuanto más rasante la luz — el plástico tensado se lee tenso. */
+const Z_PLIEGUES = [-4.33, -2.17, 0, 2.17, 4.33];
+function BrilloPliegues({ fade, rasante, color }) {
+  if (fade <= 0.02) return null;
+  const op = fade * (0.045 + 0.1 * rasante);
+  return (
+    <group position={[0, INV.arranque, 0]} scale={[1, INV.aplaste, 1]}>
+      {Z_PLIEGUES.map((z) => (
+        <mesh key={z} position={[0, 0, z]} renderOrder={6}>
+          <torusGeometry args={[INV.radio + 0.05, 0.014, 4, 20, Math.PI]} />
+          <meshBasicMaterial color={color} transparent opacity={op} depthWrite={false} blending={THREE.AdditiveBlending} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* ── LAS PERLAS DE CONDENSACIÓN: el rasgo que dice "invernadero" ───────────
+   Gotas quietas en la cara interna del plástico (InstancedMesh estático, una
+   draw-call). El CONTRALUZ las vuelve perlas: cada gota conoce su normal y
+   las del lado del sol prenden — se recalcula solo al cuantizar la hora. */
+function PerlasCondensacion({ n, sol }) {
+  const ref = useRef(null);
+  const puntos = useMemo(() => puntosCondensacion(n), [n]);
+
+  // las matrices UNA vez, ANTES del primer paint (useLayoutEffect: sin flash
+  // de esferas identidad): las gotas cuelgan quietas
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const m = new THREE.Matrix4();
+    const p = new THREE.Vector3();
+    const q = new THREE.Quaternion();
+    const s = new THREE.Vector3();
+    puntos.forEach((d, i) => {
+      p.set(d.pos[0], d.pos[1], d.pos[2]);
+      const r = 0.008 + 0.016 * d.s;
+      s.set(r, r * 1.35, r);
+      m.compose(p, q, s);
+      mesh.setMatrixAt(i, m);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [puntos]);
+
+  // el contraluz de la hora: brillo por gota según su cara al sol
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const c = new THREE.Color();
+    const base = new THREE.Color(NIEBLAS.lechosa);
+    let sx = 0;
+    let sy = 1;
+    if (sol.deDia && sol.pos) {
+      const l = Math.hypot(sol.pos[0], sol.pos[1]) || 1;
+      sx = sol.pos[0] / l;
+      sy = sol.pos[1] / l;
+    }
+    puntos.forEach((d, i) => {
+      const cara = Math.max(0, d.nx * sx + d.ny * sy);
+      const brillo = sol.deDia ? 0.2 + (0.25 + 0.95 * cara * cara) * sol.fade : 0.13;
+      c.copy(base).multiplyScalar(brillo);
+      mesh.setColorAt(i, c);
+    });
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [puntos, sol]);
+
+  if (!n) return null;
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, n]} frustumCulled={false} renderOrder={5}>
+      <sphereGeometry args={[1, 5, 4]} />
+      <meshBasicMaterial transparent opacity={0.9} depthWrite={false} blending={THREE.AdditiveBlending} />
+    </instancedMesh>
+  );
+}
+
 /* EL VAHO: capas bajas de niebla tibia que derivan despacio entre las camas.
-   Discos aditivos casi transparentes — humedad, no humo. Solo gama alta;
-   con reducedMotion quedan quietos (presencia sin vaivén). */
-function VahoHumedad({ n, reducedMotion }) {
+   Discos aditivos casi transparentes — humedad, no humo. `fuerza` viene del
+   reloj (brumaDeHora): la mañana espesa el vaho, el mediodía lo rala.
+   Con reducedMotion quedan quietos (presencia sin vaivén). */
+function VahoHumedad({ n, fuerza = 1, reducedMotion }) {
   const grupo = useRef(null);
   const capas = useMemo(() => {
     const out = [];
@@ -124,7 +291,9 @@ function VahoHumedad({ n, reducedMotion }) {
       const d = capas[i];
       m.position.x = d.x + 0.35 * Math.sin(t * 0.11 + d.fase);
       m.position.z = d.z + 0.28 * Math.cos(t * 0.09 + d.fase * 1.3);
-      m.material.opacity = d.op * (0.6 + 0.4 * Math.sin(t * 0.23 + d.fase));
+      // el aire tiembla apenas: el calor subiendo de la tierra regada
+      m.position.y = d.y + 0.06 * Math.sin(t * 0.5 + d.fase * 2.1);
+      m.material.opacity = d.op * fuerza * (0.6 + 0.4 * Math.sin(t * 0.23 + d.fase));
     }
   });
 
@@ -137,7 +306,7 @@ function VahoHumedad({ n, reducedMotion }) {
           <meshBasicMaterial
             color={NIEBLAS.lechosa}
             transparent
-            opacity={d.op}
+            opacity={d.op * fuerza}
             depthWrite={false}
             blending={THREE.AdditiveBlending}
             side={THREE.DoubleSide}
@@ -241,6 +410,14 @@ function Diorama({ tier, reducedMotion, foco }) {
   /* La atmósfera VIVA del kit (cambia por franja horaria del valle). */
   const atm = useAtmosferaMundo({ familia: FAMILIA_INVERNADERO, reducedMotion });
 
+  /* El RELOJ CONTINUO (no la franja): de aquí salen el arco real del sol, la
+     mancha en la bóveda, la alfombra difusa y la bruma de la mañana.
+     Cuantizado a ~3 min para memoizar. */
+  const { hora } = useCicloDia({ reducedMotion });
+  const horaQ = Math.round(hora * 20) / 20;
+  const sol = useMemo(() => solDeInvernadero(horaQ), [horaQ]);
+  const bruma = useMemo(() => brumaDeHora(horaQ), [horaQ]);
+
   /* El gradiente de bandas (toma B): terreno y montes comparten escalones. */
   const bandas = useGradienteBandas();
 
@@ -289,15 +466,53 @@ function Diorama({ tier, reducedMotion, foco }) {
 
   return (
     <>
-      {/* LA ATMÓSFERA DEL KIT: fondo, niebla, luces y estrellas de LA HORA. */}
-      <AtmosferaMundo
-        familia={FAMILIA_INVERNADERO}
-        tier={tier}
-        reducedMotion={reducedMotion}
-        radio={RADIO_INVERNADERO}
-        conSuelo={false}
-        sombra={SOMBRA_INVERNADERO}
+      {/* LA ATMÓSFERA de la hora — la receta del kit, pero con el SOL CONTINUO
+          (la luz tiene fuente y la hora se siente). El fondo y la niebla son
+          los del valle; las luces cuentan LA FÍSICA DEL PLÁSTICO: */}
+      <color attach="background" args={[atm.fondo]} />
+      {tier !== 'bajo' && (
+        <fog attach="fog" args={[atm.niebla, RADIO_INVERNADERO * 1.4, RADIO_INVERNADERO * 4.6]} />
+      )}
+      {/* LA LUZ LECHOSA: adentro el plástico difunde — el cielo entero es la
+          lámpara. La bóveda hemisférica sube tintada de lechoso durante el día
+          (la claridad sin dirección que el difusor fabrica). */}
+      <hemisphereLight
+        intensity={(sol.deDia ? 0.6 + 0.24 * sol.fade : 0.5) * atm.intensidad}
+        color={mezclar(atm.cielo, NIEBLAS.lechosa, sol.deDia ? 0.45 : 0.15)}
+        groundColor={atm.suelo}
       />
+      <ambientLight
+        intensity={(sol.deDia ? 0.3 + 0.1 * sol.fade : 0.26) * atm.intensidad}
+        color={mezclar(atm.luz, NIEBLAS.lechosa, 0.4)}
+      />
+      {/* EL SOL DE VERDAD viaja su arco continuo — afuera modela y da sombra;
+          ADENTRO la cubierta (castShadow) se la come: la sombra del plástico
+          ES la difusión. De noche, la luna del kit. */}
+      <directionalLight
+        position={sol.deDia ? sol.pos : atm.solPos}
+        intensity={(sol.deDia ? 0.35 + 0.6 * sol.fade : 0.8) * atm.intensidad}
+        color={atm.luz}
+        castShadow={perfil.sombras}
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-far={SOMBRA_INVERNADERO.far}
+        shadow-camera-left={SOMBRA_INVERNADERO.left}
+        shadow-camera-right={SOMBRA_INVERNADERO.right}
+        shadow-camera-top={SOMBRA_INVERNADERO.top}
+        shadow-camera-bottom={SOMBRA_INVERNADERO.bottom}
+      />
+      {/* relleno frío opuesto: despega los volúmenes (contrato del kit) */}
+      <directionalLight position={[-5, 4, -6]} intensity={0.22} color={atm.relleno} />
+      {tier !== 'bajo' && atm.estrellas > 0 && (
+        <Stars
+          radius={RADIO_INVERNADERO * 8}
+          depth={30}
+          count={Math.round(perfil.estrellas * atm.estrellas)}
+          factor={3}
+          saturation={0}
+          fade
+          speed={reducedMotion ? 0 : 0.5}
+        />
+      )}
 
       {/* El domo de la toma B: gradiente cenit→horizonte + glow del sol. */}
       <DomoCielo atm={atm} radio={56} />
@@ -340,13 +555,60 @@ function Diorama({ tier, reducedMotion, foco }) {
           frutos madurando y la hortaliza. */}
       <FloraInvernadero tier={tier} reducedMotion={reducedMotion} />
 
-      {/* EL AIRE DEL TÚNEL: vaho bajo (alto) + condensación que gotea. */}
-      <VahoHumedad n={conteos.vaho} reducedMotion={reducedMotion} />
+      {/* LA ALFOMBRA DE LUZ DIFUSA: el charco sin borde que la mancha deja en
+          las camas — deriva de poniente a oriente con el día. Dos elipses
+          anidadas (el difusor no dibuja rectángulos). */}
+      {sol.alfombra && (
+        <group>
+          <mesh
+            position={[sol.alfombra.x, 0.05, -0.3]}
+            rotation={[-Math.PI / 2, 0, 0]}
+            scale={[sol.alfombra.rx, sol.alfombra.rz, 1]}
+            renderOrder={3}
+          >
+            <circleGeometry args={[1, 20]} />
+            <meshBasicMaterial
+              color={mezclar(atm.luz, NIEBLAS.lechosa, 0.5)}
+              transparent
+              opacity={sol.alfombra.op}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+          <mesh
+            position={[sol.alfombra.x, 0.06, -0.3]}
+            rotation={[-Math.PI / 2, 0, 0]}
+            scale={[sol.alfombra.rx * 0.55, sol.alfombra.rz * 0.7, 1]}
+            renderOrder={3}
+          >
+            <circleGeometry args={[1, 20]} />
+            <meshBasicMaterial
+              color={mezclar(atm.luz, NIEBLAS.lechosa, 0.35)}
+              transparent
+              opacity={sol.alfombra.op * 0.7}
+              depthWrite={false}
+              blending={THREE.AdditiveBlending}
+            />
+          </mesh>
+        </group>
+      )}
+
+      {/* EL AIRE DEL TÚNEL: vaho que obedece la hora + condensación que gotea. */}
+      <VahoHumedad n={conteos.vaho} fuerza={bruma} reducedMotion={reducedMotion} />
       <GoteoCondensacion n={conteos.gotas} reducedMotion={reducedMotion} />
 
+      {/* LAS PERLAS: la condensación quieta de la cara interna, a contraluz. */}
+      <PerlasCondensacion n={conteos.perlas} sol={sol} />
+
       {/* EL PLÁSTICO al final (translúcido, no escribe depth): vela lo de
-          adentro visto de afuera, y de adentro vela el cielo. */}
-      <mesh geometry={geoPlastico} material={matPlastico} renderOrder={4} />
+          adentro visto de afuera, y de adentro vela el cielo. En gama alta
+          PROYECTA sombra: adentro no entra sol duro — esa sombra es la
+          difusión del calibre 6, la física que este mundo enseña. */}
+      <mesh geometry={geoPlastico} material={matPlastico} renderOrder={4} castShadow={perfil.sombras} />
+
+      {/* la mancha del sol en la bóveda + el brillo de los pliegues */}
+      <ManchaDeSol mancha={sol.deDia ? sol.mancha : null} color={atm.luz} />
+      <BrilloPliegues fade={sol.deDia ? sol.fade : 0} rasante={sol.rasante ?? 0} color={mezclar(atm.luz, NIEBLAS.lechosa, 0.4)} />
 
       {/* la vida que ronda: mariposas y el colibrí de la era */}
       {perfil.criaturas > 0 && <Fauna items={fauna} reducedMotion={reducedMotion} />}

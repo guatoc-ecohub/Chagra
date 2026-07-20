@@ -82,6 +82,24 @@ export const SITIO_BIODIGESTOR = /** @type {[number, number]} */ ([3.6, 5.6]);
 export const SITIO_ABONO = /** @type {[number, number]} */ ([0.4, 6.4]);
 export const SITIO_BEBEDERO = /** @type {[number, number]} */ ([-3.0, -2.4]);
 
+/* LA SALA DE ORDEÑO (pasada Nolan: la hora del ordeño) — el cobertizo del
+   lado del hato, con la boca abierta hacia el oriente y el frente (por donde
+   entra el primer azul de la madrugada). */
+export const SITIO_ORDENO = /** @type {[number, number]} */ ([-11.0, 4.2]);
+export const ROT_ORDENO = -0.5; // giro Y de la sala (la boca mira al sureste)
+
+/* El PUESTO del brete DENTRO de la sala, en coordenadas de mundo: donde la
+   vaca del ordeño se para (GanadoLechero la trae aquí de madrugada), de cara
+   a la canoa de la media pared. */
+const LOCAL_BRETE = [-1.05, -0.35]; // x,z locales de la sala
+export const PUESTO_ORDENO = {
+  pos: /** @type {[number, number]} */ ([
+    SITIO_ORDENO[0] + LOCAL_BRETE[0] * Math.cos(ROT_ORDENO) + LOCAL_BRETE[1] * Math.sin(ROT_ORDENO),
+    SITIO_ORDENO[1] - LOCAL_BRETE[0] * Math.sin(ROT_ORDENO) + LOCAL_BRETE[1] * Math.cos(ROT_ORDENO),
+  ]),
+  giro: Math.PI / 2 + ROT_ORDENO, // el modelo mira +x → queda de cara a la pared (-z local)
+};
+
 /* -------------------------------------------------------------------------- */
 /*  Presupuesto por tier                                                       */
 /* -------------------------------------------------------------------------- */
@@ -512,7 +530,7 @@ export function distribucionLecheria(conteos, seed = 707) {
 
   // Pasto: repartido por el potrero, RALO cerca de lo construido (quesera, ciclo,
   // bebedero) y sin invadir el frente por donde entra la cámara.
-  const evitar = [SITIO_QUESERA, SITIO_BIODIGESTOR, SITIO_ABONO, SITIO_BEBEDERO];
+  const evitar = [SITIO_QUESERA, SITIO_BIODIGESTOR, SITIO_ABONO, SITIO_BEBEDERO, SITIO_ORDENO];
   const pasto = [];
   let intentos = 0;
   while (pasto.length < c.pasto && intentos < c.pasto * 8) {
