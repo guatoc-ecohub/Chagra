@@ -118,6 +118,22 @@ export function enLaEra(wx, wz, margen = 1.06) {
 /* El camino de llegada: entra por el frente y sube hasta la era del trapiche. */
 export const caminoX = (wz) => 10.5 + Math.sin(wz * 0.19) * 2.1 - smoothstep(6, 20, wz) * 1.4;
 
+/** La altura del piso de la era (todo el trapiche se para en este plano). */
+export const Y_ERA = PLANO_TRAPICHE.y;
+
+/**
+ * Pasa un punto en coordenadas LOCALES del trapiche a coordenadas del mundo.
+ * La enramada se arma alrededor de su propio origen (ver trapiche.geom) y se
+ * planta en `SITIO_TRAPICHE`; esta es la única conversión, para que la lección,
+ * el fuego y la cámara no tengan que repetir la cuenta y desalinearse.
+ */
+export const enTrapiche = (lx, ly, lz) =>
+  /** @type {[number,number,number]} */ ([
+    SITIO_TRAPICHE[0] + lx,
+    PLANO_TRAPICHE.y + ly,
+    SITIO_TRAPICHE[1] + lz,
+  ]);
+
 /* -------------------------------------------------------------------------- */
 /*  Presupuesto por tier                                                       */
 /* -------------------------------------------------------------------------- */
