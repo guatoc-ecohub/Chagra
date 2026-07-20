@@ -16,7 +16,17 @@
  *   · la VENTANA DE LOS MUNDOS al fondo (el vano con postigos abiertos por
  *     donde la escena cuelga el resplandor-portal);
  *   · los objetos de finca: el costal de maíz, el sombrero en su clavo, el
- *     azadón recostado, la repisa con tarros y platos, el banco de la ventana.
+ *     azadón recostado, la repisa con tarros y platos, el banco de la ventana;
+ *   · la casa HABITADA (pasada Nolan): el ZARZO sobre el rincón del fogón
+ *     (la troja de tablas donde el grano se cura con el humo), las ristras de
+ *     mazorca colgando de su borde, la RUANA en el clavo junto a la puerta,
+ *     el TIZNE del techo sobre el fogón (años de candela, no decoración) y el
+ *     DESGASTE del piso de tierra por donde más se camina (puerta → mesa →
+ *     fogón: la huella de la rutina, horneada en el color).
+ *
+ * La TEJA DE VIDRIO (la claraboya campesina: una teja translúcida entre las de
+ * barro) se exporta como ancla (`TEJA_LUZ`) — el vidrio y su haz cenital son
+ * material de la escena, aquí solo vive el punto del techo por donde entra.
  *
  * TÉCNICA (mismo contrato que invernadero.geom / floraCafetal.geom): todo lo
  * estático y opaco se FUSIONA en UNA geometría con el color horneado en
@@ -63,9 +73,20 @@ export const VENTANA_MUNDOS = { x0: -0.7, x1: 0.7, base: 0.95, alto: 2.05 };
 
 /* Los sitios que la lección señala ([x, y, z] de mundo). */
 export const SITIO_FOGON = [-2.55, 1.0, 0.2];
+export const SITIO_LUZ = [-1.75, 0.85, 1.5];
 export const SITIO_MESA = [0.45, 0.85, 0.15];
 export const SITIO_FERMENTOS = [3.05, 1.05, -0.6];
 export const SITIO_MUNDOS = [0, 1.5, -2.55];
+
+/* LA TEJA DE VIDRIO: el punto del faldón norte por donde entra el haz cenital
+   del mediodía (la claraboya de toda cocina campesina). `pos` es el centro de
+   la teja sobre el plano del techo; `piso` es donde su charco cae. */
+export const TEJA_LUZ = {
+  pos: [-0.6, 3.34, -0.85],
+  piso: [-0.6, 0.012, -0.85],
+  ancho: 0.4,
+  largo: 0.52,
+};
 
 /* -------------------------------------------------------------------------- */
 /*  Paleta local (todo derivado de la paleta madre)                           */
@@ -296,6 +317,61 @@ export function construirCasaAdentro(rico = true) {
   poner(L, cil(0.09, 0.1, 0.22, 8), PAL.barro, -2.75, 1.64, -hz + 0.26);
   poner(L, cil(0.07, 0.08, 0.18, 8), PAL.barro, -2.45, 1.62, -hz + 0.24);
   poner(L, caja(0.14, 0.2, 0.14), NEUTROS.lamina, -2.1, 1.63, -hz + 0.27);
+
+  /* ── LA CASA HABITADA (pasada Nolan: historia, no catálogo) ────────────── */
+
+  // EL ZARZO: la troja de tablas sobre el rincón noroccidental del fogón,
+  // donde el grano se cura con el humo. Media agua nada más — la otra mitad
+  // queda abierta para que el humo suba libre a la cumbrera.
+  poner(L, caja(0.09, 0.09, 2.0), PAL.vigaOscura, -3.45, 2.46, -1.25); // durmiente del muro
+  poner(L, caja(0.09, 0.09, 2.0), PAL.vigaOscura, -1.55, 2.46, -1.25); // viga del borde
+  for (let i = 0; i < 5; i++) {
+    // las tablas del zarzo, con sus rendijas (por ahí se cuela el humo)
+    poner(L, caja(2.0, 0.045, 0.27), PAL.tabla, -2.5, 2.53, -2.1 + i * 0.42);
+  }
+  // lo que el zarzo guarda: el costal recostado y unas mazorcas al borde
+  poner(L, cil(0.2, 0.24, 0.38, 9), PAL.costal, -2.95, 2.75, -1.35, 0, 0, 0.14);
+  poner(L, cil(0.045, 0.055, 0.24, 7), ACENTOS.maizGrano, -1.85, 2.6, -1.0, 0, 0.4, Math.PI / 2.3);
+  poner(L, cil(0.04, 0.05, 0.22, 7), ACENTOS.maizGrano, -2.1, 2.6, -1.72, 0, 1.1, Math.PI / 2.5);
+  // las ristras colgando del borde del zarzo (el maíz al alcance y al humo)
+  for (const rz of [-0.85, -1.65]) {
+    poner(L, cil(0.012, 0.012, 0.34, 5), PAL.vigaOscura, -1.55, 2.28, rz);
+    for (let i = 0; i < 3; i++) {
+      poner(L, cil(0.042, 0.052, 0.2, 7), ACENTOS.maizGrano, -1.55, 2.12 - i * 0.22, rz + (i % 2) * 0.04);
+      poner(L, cil(0.018, 0.032, 0.09, 6), VERDES.calido, -1.55, 2.25 - i * 0.22, rz + (i % 2) * 0.04);
+    }
+  }
+
+  // LA RUANA en su clavo, junto a la puerta (se cuelga al entrar; lana de
+  // oveja sin teñir con su franja cruda — la prenda es de quien vive aquí).
+  const lanaRuana = mezclar(TIERRAS.turba, NEUTROS.tinta, 0.32);
+  const franjaRuana = mezclar(NEUTROS.cal, TIERRAS.vega, 0.45);
+  poner(L, cil(0.018, 0.018, 0.09, 5), PAL.vigaOscura, -0.35, 1.66, hz - 0.1, Math.PI / 2);
+  poner(L, caja(0.4, 0.13, 0.11), lanaRuana, -0.35, 1.6, hz - 0.15); // el doblez sobre el clavo
+  poner(L, caja(0.37, 0.55, 0.07), lanaRuana, -0.35, 1.28, hz - 0.17); // la caída
+  poner(L, caja(0.375, 0.055, 0.075), franjaRuana, -0.35, 1.1, hz - 0.17); // la franja tejida
+  poner(L, caja(0.375, 0.03, 0.075), franjaRuana, -0.35, 1.02, hz - 0.17); // el fleco
+
+  // EL TIZNE del techo sobre el fogón: años de humo pegados a la teja y a los
+  // pares — la mancha que cuenta cuántas ollas ha visto esta casa.
+  const inclTizne = Math.atan2(cumbre - alero, hz + 0.1);
+  poner(L, caja(1.7, 0.02, 2.1), mezclar(PAL.tejaAdentro, NEUTROS.tinta, 0.55), -2.7, (alero + cumbre) / 2 - 0.055, (hz + 0.1) / 2, inclTizne);
+  poner(L, caja(1.7, 0.02, 2.1), mezclar(PAL.tejaAdentro, NEUTROS.tinta, 0.55), -2.7, (alero + cumbre) / 2 - 0.055, -(hz + 0.1) / 2, -inclTizne);
+  poner(L, caja(1.5, 0.15, 0.17), mezclar(PAL.vigaOscura, NEUTROS.tinta, 0.5), -2.7, cumbre - 0.09, 0); // la cumbrera ahumada (envuelve la viga)
+
+  // EL DESGASTE del piso: la tierra pisada brilla más clara por donde más se
+  // camina — de la puerta a la mesa y de la mesa al fogón. La huella de vivir.
+  const tierraPisada = mezclar(PAL.piso, TIERRAS.vega, 0.24);
+  for (const [px, pz, pr] of [
+    [1.1, 2.3, 0.42], // el umbral de la puerta
+    [0.85, 1.55, 0.36],
+    [0.55, 1.0, 0.34], // llegando a la mesa
+    [-0.9, 0.5, 0.33],
+    [-1.7, 0.35, 0.36], // camino al fogón
+    [-2.15, 0.28, 0.4], // parado frente a la candela
+  ]) {
+    poner(L, cil(pr, pr, 0.012, 12), tierraPisada, px, 0.008, pz);
+  }
 
   /* ── Los detalles del tier alto (no cambian la lectura, la abrigan) ────── */
   if (rico) {
