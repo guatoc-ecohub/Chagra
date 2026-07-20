@@ -156,6 +156,12 @@ const BosqueVivo3DMockup = lazy(() => import('./mockups/BosqueVivo3D'));
 // de guamos y nogales, y la casa-beneficiadero en la bruma. Device-tiering
 // real. Ruta #/mockups/cafetal-vivo-3d, sin auth.
 const CafetalVivo3DMockup = lazy(() => import('./mockups/CafetalVivo3D'));
+// 3D: el MUNDO DEL AGUACATE — el árbol GRANDE, que es todo el punto: el Hass
+// adulto le dobla la altura a la casa y le hace techo a uno. Fruto rugoso en
+// racimos flojos del pedúnculo, panícula con abejas, el envés que platea con
+// el viento, y la hojarasca sin pasto bajo cada copa. Device-tiering real.
+// Ruta #/mockups/aguacatal-vivo-3d, sin auth.
+const AguacatalVivo3DMockup = lazy(() => import('./mockups/AguacatalVivo3D'));
 // 3D: LA MICROCUENCA CORTADA — la misma loma bajo la misma nube, partida:
 // suelo VIVO que se traga el aguacero y lo devuelve limpio todo el verano vs
 // suelo PELADO que lo bota de una. Por qué se seca un cauce.
@@ -643,6 +649,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
   'mockups/bosque-vivo-3d': 'mockup_bosque_vivo_3d',
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
+  'mockups/aguacatal-vivo-3d': 'mockup_aguacatal_vivo_3d',
   'mockups/microcuenca': 'mockup_microcuenca',
   'casa_adentro': 'mundo_casa_adentro',
   'mockups/casa-adentro': 'mundo_casa_adentro',
@@ -1675,6 +1682,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo del café">
               <CafetalVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_aguacatal_vivo_3d':
+        // Vitrina pública del MUNDO DEL AGUACATE: el árbol GRANDE en 3D real —
+        // el Hass adulto que le dobla la altura a la casa y le hace techo a
+        // uno, el fruto rugoso colgando del pedúnculo en racimos flojos, la
+        // panícula con abejas, el envés que platea al viento y la hojarasca sin
+        // pasto bajo la copa. En equipo humilde muestra la ficha, que también
+        // vende la escala. Ruta #/mockups/aguacatal-vivo-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del aguacate">
+              <AguacatalVivo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
