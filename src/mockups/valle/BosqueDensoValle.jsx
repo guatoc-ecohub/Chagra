@@ -59,10 +59,11 @@ import {
   tintarLote,
 } from './siembraValle.js';
 import { Banco } from './BancoValle.jsx';
+import AuditoriaValle from './AuditoriaValle.jsx';
 
 /* ── La zona por defecto: el monte de la ladera derecha. Dos parches
       solapados = silueta orgánica, no una elipse estampada. ── */
-export const ZONA_BOSQUE_LADERA = [
+const ZONA_BOSQUE_LADERA = [
   // El cuerpo del monte: ladera arriba del portal 'disenio', hacia el filo.
   { cx: 8.4, cz: -5.4, rx: 5.4, rz: 4.2 },
   // La falda: baja abrazando el portal sin llegar al cafetal (4.4, 1.0).
@@ -70,7 +71,7 @@ export const ZONA_BOSQUE_LADERA = [
 ];
 
 /* El claro del portal 'disenio' (5.2,-3.4): el bosque lo ENMARCA. */
-export const CLAROS_BOSQUE = [{ x: 5.2, z: -3.4, r: 1.9 }];
+const CLAROS_BOSQUE = [{ x: 5.2, z: -3.4, r: 1.9 }];
 
 /* Al fondo de esta z, banda LOD lejana (media calidad + tinte de niebla). */
 const Z_LOD = -5.6;
@@ -291,7 +292,10 @@ export default function BosqueDensoValle({
   const sombra = tier === 'alto'; // solo la banda cercana y solo en alto
 
   return (
-    <group>
+    <group name="audit-bosque-denso">
+      {/* La escucha de diagnóstico (dormida sin ?auditar=1): vive aquí porque
+          el bosque siempre está montado en la escena del valle. */}
+      <AuditoriaValle />
       {/* Sotobosque: el piso del monte, sin sombra (es relleno de cerca). */}
       <Banco geo={geos.mortino} mat={mat} items={siembra.mortino} />
       <Banco geo={geos.mortino} mat={mat} items={siembra.mortinoLejos} />
