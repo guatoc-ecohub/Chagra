@@ -568,6 +568,43 @@ const SITIOS_PLATANO = [
 /* La casa/beneficiadero vive arriba al fondo; los surcos la respetan. */
 export const SITIO_CASA = /** @type {[number, number]} */ ([9.0, -14.6]);
 
+/* El SUJETO del mundo: el cafeto protagonista junto al camino de llegada — la
+   mata que enseña qué es un cafeto. Se exporta aparte de SITIOS_HERO para que
+   el diagnóstico de encuadre pueda preguntar "¿está en cuadro?" sin conocer la
+   forma interna de la siembra. */
+export const SITIO_CAFETO_HERO = /** @type {[number, number]} */ ([-2.8, 5.6]);
+
+/*
+ * LA CÁMARA del mundo, declarada JUNTO A LA GEOGRAFÍA (convención de la casa):
+ * así `node scripts/diag/encuadre-mundo.mjs cafe` mide EXACTAMENTE el encuadre
+ * que monta la escena y no puede quedar desfasado de ella.
+ *
+ * Mira loma arriba desde el camino de llegada — entrar es subir.
+ */
+export const CAMARA = {
+  reposo: /** @type {[number, number, number]} */ ([7.15, 6.5, 13]),
+  mirada: /** @type {[number, number, number]} */ ([0, 3.96, -2]),
+  fov: 42,
+};
+
+/*
+ * El LOTE SEMBRADO: dónde el piso lleva cafetal encima. Lo usa el diagnóstico
+ * de encuadre para distinguir "el cuadro está lleno de CULTIVO" de "el cuadro
+ * está lleno de loma pelada" — medir solo terreno engaña, porque lo que llena
+ * el cuadro de un cafetal es la mata, no el barro entre surcos. Respeta el
+ * patio del beneficiadero y la calle del camino: los claros son claros.
+ */
+export function dentroLote(wx, wz) {
+  if (Math.abs(wx) > 15.6) return 0;
+  if (wz > 6.4 || wz < -14.2) return 0;
+  const dx = wx - SITIO_CASA[0];
+  const dz = wz - SITIO_CASA[1];
+  if (dx * dx + dz * dz < 16) return 0; // el patio del beneficiadero
+  const calle = Math.abs(wx - Math.sin(wz * 0.4) * 2.2); // el camino de llegada
+  if (wz > 1.5 && calle < 1.15) return 0;
+  return 1;
+}
+
 /*
  * Los CAFETOS PROTAGONISTAS del primer plano: tres matas grandes y CARGADAS que
  * flanquean el camino de entrada (los surcos arrancan en z=2.6; estos viven más
