@@ -83,6 +83,69 @@ describe('LA ESCALA RELATIVA: el mango eclipsa al cítrico', () => {
   });
 });
 
+/*
+ * LA SILUETA A MEDIA DISTANCIA. Al mundo del café le pasó que el cafeto quedaba
+ * perfecto en primer plano pero de lejos la ladera parecía un bosque de PINOS:
+ * la silueta dejaba de decir lo que el árbol era. Este guard mide el PERFIL de
+ * ancho por franjas de altura — lo único que sobrevive a la distancia — y exige
+ * que cada especie conserve su firma en TODO tier:
+ *   · mango  → domo: ensancha a media altura y se cierra arriba (jamás cono)
+ *   · cítrico → bola: tan ancho como alto
+ */
+function perfilSilueta(geo, franjas = 10) {
+  geo.computeBoundingBox();
+  const bb = geo.boundingBox;
+  const h = bb.max.y - bb.min.y;
+  const pos = geo.attributes.position.array;
+  const ancho = new Array(franjas).fill(0);
+  for (let i = 0; i < pos.length; i += 3) {
+    const k = Math.min(franjas - 1, Math.floor(((pos[i + 1] - bb.min.y) / h) * franjas));
+    ancho[k] = Math.max(ancho[k], Math.hypot(pos[i], pos[i + 2]) * 2);
+  }
+  return { ancho, alto: h, max: Math.max(...ancho) };
+}
+
+describe('la silueta a media distancia (que no se vuelva un pino)', () => {
+  ['alto', 'medio', 'bajo'].forEach((tier) => {
+    const q = calidadFrutales(tier);
+
+    it(`mango en tier ${tier}: DOMO — ancho > alto y se cierra arriba`, () => {
+      const g = geomMango({ q }, 21);
+      const { ancho, alto, max } = perfilSilueta(g);
+      // más ancho que alto: la copa del mango se acuesta, no se para
+      expect(max).toBeGreaterThan(alto * 1.3);
+      // la franja más ancha vive a MEDIA altura (un cono la tendría abajo del
+      // todo y adelgazaría monótono hacia la punta)
+      const iMax = ancho.indexOf(max);
+      expect(iMax).toBeGreaterThanOrEqual(3);
+      expect(iMax).toBeLessThanOrEqual(7);
+      // la copa CIERRA arriba (si la punta fuera igual de ancha sería un cubo,
+      // si fuera un pico creciente sería un pino invertido)
+      expect(ancho[9]).toBeLessThan(max * 0.85);
+      // …y también cierra abajo del dosel: hay tronco visible, no falda al piso
+      expect(ancho[0]).toBeLessThan(max * 0.4);
+      g.dispose();
+    });
+
+    it(`cítrico en tier ${tier}: BOLA — tan ancho como alto`, () => {
+      const g = geomCitrico({ q }, 22);
+      const { alto, max } = perfilSilueta(g);
+      expect(max).toBeGreaterThan(alto * 0.8);
+      expect(max).toBeLessThan(alto * 1.25);
+      g.dispose();
+    });
+
+    it(`en tier ${tier} el mango sigue eclipsando al cítrico de un golpe`, () => {
+      const m = perfilSilueta(geomMango({ q }, 21));
+      const c = perfilSilueta(geomCitrico({ q }, 22));
+      // a igual escala 1: el palo de mango dobla largo al arbolito, y el héroe
+      // de la vega (esc 1.7) lo multiplica todavía más
+      expect(m.alto).toBeGreaterThan(c.alto * 2);
+      expect(m.max).toBeGreaterThan(c.max * 3);
+    });
+  });
+});
+
 describe('la geografía térmica (la lección hecha relieve)', () => {
   it('la vega del frente es baja y la ladera del fondo alta', () => {
     expect(alturaFinca(0, 14)).toBeLessThan(1);
