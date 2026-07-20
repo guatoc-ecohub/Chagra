@@ -35,6 +35,8 @@ import {
   ANCHO,
   FONDO,
   PAL,
+  CAMARA,
+  ORBITA,
   alturaFinca,
   caminoX,
   SITIO_CASA,
@@ -68,6 +70,31 @@ const RADIO_FRUTALES = 12;
 
 /* El frustum de sombra a medida: el domo del mango tira sombra ancha. */
 const SOMBRA_FRUTALES = { left: -18, right: 18, top: 16, bottom: -8, far: 44 };
+
+/*
+ * LA CORDILLERA DEL FONDO — anchas, tendidas y TRASLAPADAS, con el pie escondido
+ * tras la cresta del huerto, de modo que lo que asoma sea una línea de montañas
+ * y no una fila de bultos sueltos.
+ *
+ * Antes eran tres elipsoides de 12 segmentos plantados en z −24/−27/−22, o sea
+ * MÁS ALLÁ del borde de la malla del terreno (que termina en z −19) y con
+ * `conSuelo={false}`: nada les tapaba la base. De cada una asomaba solo el
+ * casquete, y un casquete de 3 o 4 caras recortado por el horizonte y bandeado
+ * por el toon se lee como un CONO de utilería, no como una montaña. Ese era el
+ * "cono beige" que se colaba en el cuadro.
+ *
+ * El arreglo es de SILUETA, no de color: el beige de la distancia es correcto
+ * —así lava la perspectiva aérea, y la niebla de la familia `plaza` es crema—,
+ * lo que estaba mal era la forma. De ahí 32 segmentos, siluetas anchas que se
+ * montan una sobre otra, y alturas calculadas para asomar 2–4 m sobre la línea
+ * de visión que pasa rozando la cresta: una cordillera lejana, no un cono.
+ */
+const CORDILLERA = [
+  { pos: [-15, 1.4, -26], esc: [20, 9.0, 8], tono: 'media' },
+  { pos: [2, 2.0, -30], esc: [24, 10.0, 9], tono: 'lejos' },
+  { pos: [19, 0.9, -25], esc: [17, 8.2, 7], tono: 'media' },
+  { pos: [-4, 0.4, -22], esc: [15, 7.4, 6], tono: 'cerca' },
+];
 
 /* La malla de la finca — el heightfield del KIT con la pintura PROPIA de los
    dos pisos: abajo la vega caliente (pasto amarillento, tierra clara y seca),
@@ -288,20 +315,14 @@ function Diorama({ tier, reducedMotion, foco }) {
         <meshToonMaterial vertexColors gradientMap={bandas} />
       </mesh>
 
-      {/* la montaña que SIGUE subiendo detrás del huerto: el piso que ya no da
-          fruta — la lección continúa fuera de cuadro. */}
-      <mesh position={[-14, 3.4, -24]} scale={[10, 5.4, 6]}>
-        <sphereGeometry args={[1, 12, 8]} />
-        <meshToonMaterial color={montes.media} gradientMap={bandas} />
-      </mesh>
-      <mesh position={[8, 4.2, -27]} scale={[12, 7.0, 7]}>
-        <sphereGeometry args={[1, 12, 8]} />
-        <meshToonMaterial color={montes.lejos} gradientMap={bandas} />
-      </mesh>
-      <mesh position={[23, 2.4, -22]} scale={[9, 4.0, 5]}>
-        <sphereGeometry args={[1, 12, 8]} />
-        <meshToonMaterial color={montes.cerca} gradientMap={bandas} />
-      </mesh>
+      {/* LA CORDILLERA que SIGUE subiendo detrás del huerto: el piso que ya no
+          da fruta — la lección continúa fuera de cuadro. */}
+      {CORDILLERA.map((m, i) => (
+        <mesh key={`cord${i}`} position={m.pos} scale={m.esc}>
+          <sphereGeometry args={[1, 32, 20]} />
+          <meshToonMaterial color={montes[m.tono]} gradientMap={bandas} />
+        </mesh>
+      ))}
 
       {/* LOS FRUTALES: el mango de la vega, los cítricos del huerto. */}
       <FloraFrutales tier={tier} reducedMotion={reducedMotion} />
@@ -319,30 +340,33 @@ function Diorama({ tier, reducedMotion, foco }) {
       {/* el anillo del paso didáctico (lo maneja el host) */}
       <FocoPaso foco={foco} reducedMotion={reducedMotion} />
 
+      {/* Los límites salen de ORBITA, que se midió barriendo el volumen
+          alcanzable: ni la cámara entra en una copa ni el cítrico se sale del
+          cuadro. Sin autoRotate a propósito — ver la nota en el geom. */}
       <OrbitControls
         ref={controls}
         makeDefault
-        target={[0, 2.4, 0]}
+        target={CAMARA.mirada}
         enablePan={false}
         enableZoom
-        minDistance={9}
-        maxDistance={30}
-        minPolarAngle={0.45}
-        maxPolarAngle={1.45}
-        minAzimuthAngle={-1.15}
-        maxAzimuthAngle={1.15}
+        minDistance={ORBITA.distMin}
+        maxDistance={ORBITA.distMax}
+        minPolarAngle={ORBITA.polarMin}
+        maxPolarAngle={ORBITA.polarMax}
+        minAzimuthAngle={ORBITA.azimutMin}
+        maxAzimuthAngle={ORBITA.azimutMax}
         enableDamping
         dampingFactor={0.08}
-        autoRotate={!reducedMotion}
-        autoRotateSpeed={0.12}
+        autoRotate={false}
       />
-      {/* La LLEGADA: el dolly entra BAJO, casi al pie del palo de mango, para
-          que la copa se sienta enorme antes de que la cámara suba y muestre el
-          huerto chiquito allá arriba. La escala se hace SENTIR, no se explica. */}
+      {/* La LLEGADA: el dolly se para en la vega a media altura de la copa del
+          palo del patio y mira cruzado hacia el huerto de arriba — el mango
+          entrando enorme por un lado y los cítricos chiquitos en la banda alta,
+          en el MISMO cuadro. La escala se hace SENTIR, no se explica. */}
       <CamaraDirector
         controls={controls}
-        reposo={[2.5, 5.2, 19]}
-        mirada={[-1.5, 3.0, 2]}
+        reposo={CAMARA.reposo}
+        mirada={CAMARA.mirada}
         respiro={0.04}
         activa={!reducedMotion && tier !== 'bajo'}
         unaVezClave="mundoFrutales"
@@ -365,7 +389,7 @@ export default function EscenaFrutalesVivo({ tier = 'alto', reducedMotion = fals
       dpr={perfil.dpr}
       gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
       shadows={perfil.sombras ? 'soft' : false}
-      camera={{ position: [2.5, 5.2, 19], fov: 46 }}
+      camera={{ position: CAMARA.reposo, fov: CAMARA.fov }}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >

@@ -60,8 +60,10 @@ const MUNDOS = {
   frutales: {
     modulo: 'src/visual/mundo3d/frutales/floraFrutales.geom.js',
     altura: 'alturaFinca',
-    camaraFija: { pos: [2.5, 5.2, 19], mira: [-1.5, 3.0, 2], fov: 46 },
-    sujeto: { nombre: 'el palo de mango del patio', punto: [-4.2, 8.6] },
+    /* El sujeto de este mundo no es un claro en el suelo sino un ÁRBOL de 10 m
+       de copa: los rayos le pegan en la cara del domo, a 4–5 m del tronco, así
+       que hay que preguntarle por su radio real y no por el del claro. */
+    sujeto: { nombre: 'el palo de mango del patio', punto: [-4.2, 8.6], radio: 5.3 },
     doselHuerto: true,
   },
 };
@@ -193,6 +195,9 @@ async function main() {
   const cam = def.camaraFija || { ...geom.CAMARA, pos: geom.CAMARA.reposo, mira: geom.CAMARA.mirada };
   if (!cam || !cam.pos) throw new Error(`el módulo de «${cual}» no exporta CAMARA`);
   const sujeto = def.sujeto.punto || geom[def.sujeto.clave];
+  /* 2.55 m es el radio del CLARO con que se calibraron papa/yuca/quinua; un
+     sujeto con cuerpo (un árbol) declara el suyo. */
+  const radioSujeto = def.sujeto.radio || Math.sqrt(6.5);
   /* El dosel: cuánto levanta el cultivo sobre el suelo en cada punto del lote.
      Se apoya en el `dentroLote` del propio mundo, así que respeta los claros
      (la era, el patio, el sitio de cosecha) sin duplicar esa lógica aquí. */
@@ -215,7 +220,14 @@ async function main() {
 
   let cielo = 0;
   let suelo = 0;
-  const porTercio = [0, 0, 0]; // golpes de suelo por tercio vertical del cuadro
+  const porTercio = [0, 0, 0]; // golpes por tercio vertical del cuadro
+  /* Y el mismo reparto contando SOLO TERRENO. La diferencia no es cosmética:
+     terreno en el tercio alto es la cámara enterrada mirando contra la loma
+     (el desastre que este script existe para atrapar), pero COPA en el tercio
+     alto es un palo de mango pasándote por encima — que es precisamente lo que
+     un mundo de frutales quiere. Medirlos juntos confunde la enfermedad con la
+     cura; el papal nunca lo delató porque no tiene nada alto sembrado. */
+  const porTercioSuelo = [0, 0, 0];
   let enLote = 0; // rayos que caen sobre el cultivo sembrado
   const porCapa = {}; // en un huerto: qué copa se llevó cada rayo
   let masCerca = Infinity;
@@ -241,7 +253,9 @@ async function main() {
         continue;
       }
       suelo += 1;
-      porTercio[Math.min(2, Math.floor((f / FILAS) * 3))] += 1;
+      const tercio = Math.min(2, Math.floor((f / FILAS) * 3));
+      porTercio[tercio] += 1;
+      if (!g.enCultivo) porTercioSuelo[tercio] += 1;
       masCerca = Math.min(masCerca, g.t);
       masLejos = Math.max(masLejos, g.t);
       sumaDist += g.t;
@@ -249,7 +263,7 @@ async function main() {
       // ¿este rayo cayó encima del sujeto?
       const dx = g.punto[0] - sujeto[0];
       const dz = g.punto[2] - sujeto[1];
-      if (dx * dx + dz * dz < 6.5) {
+      if (dx * dx + dz * dz < radioSujeto * radioSujeto) {
         if (sujetoFila === null) sujetoFila = f;
         sujetoCol = cN;
       }
@@ -274,10 +288,15 @@ async function main() {
   console.log(`\n  cielo/telón : ${pct(cielo)}`);
   console.log(`  terreno     : ${pct(suelo)}`);
   console.log(
-    `  reparto vertical del terreno — tercio alto ${pct(porTercio[0])} · medio ${pct(
+    `  reparto vertical del cuadro — tercio alto ${pct(porTercio[0])} · medio ${pct(
       porTercio[1],
     )} · bajo ${pct(porTercio[2])}`,
   );
+  if (porTercio[0] !== porTercioSuelo[0]) {
+    console.log(
+      `  de eso, TERRENO pelado — tercio alto ${pct(porTercioSuelo[0])} (lo que delata la cámara enterrada)`,
+    );
+  }
   if (suelo > 0) {
     console.log(
       `  distancia   : más cerca ${masCerca.toFixed(1)} m · promedio ${(sumaDist / suelo).toFixed(
@@ -330,9 +349,11 @@ async function main() {
   const avisos = [];
   if (cielo / total < 0.12) avisos.push('casi no hay cielo: el cuadro se siente tapiado');
   if (cielo / total > 0.55) avisos.push('demasiado cielo: el mundo queda vacío abajo');
-  if (porTercio[0] / total > 0.1) {
+  /* Sobre TERRENO pelado, no sobre copa: un mango que te tapa el cielo es la
+     escena bien compuesta, una loma que te lo tapa es la cámara enterrada. */
+  if (porTercioSuelo[0] / total > 0.1) {
     avisos.push(
-      'el tercio ALTO tiene terreno encima del umbral de la casa (papal: 0.6%): la cámara está mirando contra la loma',
+      'el tercio ALTO tiene TERRENO encima del umbral de la casa (papal: 0.6%): la cámara está enterrada, mirando contra la loma',
     );
   }
   if (suelo > 0 && masCerca > 14) {

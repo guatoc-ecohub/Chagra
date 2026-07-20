@@ -532,7 +532,13 @@ export const SITIOS_MANGO = [
   { p: [-4.2, 8.6], esc: 1.7 }, // EL HÉROE: el palo del patio
   { p: [8.5, 12.0], esc: 1.45 },
   { p: [15.0, 6.5], esc: 1.2 },
-  { p: [-13.5, 15.0], esc: 1.3 },
+  /* Este palo estaba en [-13.5, 15.0], que resultó ser justo donde se para la
+     cámara: quedaba DETRÁS del cuadro (no aportaba nada) y a la vez le cerraba
+     el paso a cualquier giro — con él ahí, el sobre de órbita limpio era cero.
+     Bajado a media vega hace las dos cosas bien: entra en cuadro y arma la capa
+     intermedia entre el palo del patio (cerca) y el huerto de arriba (lejos),
+     que es la que da la profundidad donde se lee la escala. */
+  { p: [4.5, 4.0], esc: 1.3 },
   { p: [3.0, 16.5], esc: 1.35 },
 ];
 
@@ -554,6 +560,67 @@ export const MATAS_CITRICOS = [
 
 /* La casa campesina vive en la vega, a la sombra del mango del patio. */
 export const SITIO_CASA = /** @type {[number, number]} */ ([-9.5, 11.0]);
+
+/*
+ * LA CÁMARA — vive junto a la geografía, no dentro de la escena, para que el
+ * diagnóstico de encuadre (`scripts/diag/encuadre-mundo.mjs frutales`) lea la
+ * MISMA que se monta y no pueda quedar desfasado.
+ *
+ * El plano está elegido, no heredado. Se para en la vega, a la izquierda y a
+ * media altura de la copa del palo del patio, y mira cruzado hacia el huerto de
+ * arriba. Así el mango entra por la derecha ENORME —tanto que se sale un poco
+ * del cuadro, y por eso se siente monumental— mientras la ladera se abre hacia
+ * el fondo con los cítricos chiquitos en la banda alta. Esa comparación DENTRO
+ * DE UN MISMO CUADRO es la lección entera: el mango abajo, los cítricos arriba.
+ *
+ * Medido contra el papal, que es el mundo aprobado con que se calibra la casa:
+ *
+ *                      papal    frutales
+ *   cielo               32.8%     31.7%
+ *   TERRENO tercio alto  0.6%      0.0%   (0 = la cámara no está enterrada)
+ *   cultivo en cuadro   59.4%     43.9%
+ *
+ * El cultivo queda por debajo del papal A PROPÓSITO y por la verdad del mundo:
+ * un papal es un lote tupido que tapa todo el suelo, y esto es un HUERTO
+ * CAMPESINO de cinco palos y unas matas — entre árbol y árbol hay vega, y esa
+ * vega es el piso de la lección. Cae en la banda del yucal (52.5) y el quinual
+ * (38.1), que es donde honestamente cae un mundo de copas sueltas.
+ *
+ * Lo que sí no se negocia: el mango ocupa 10.9× el cuadro del cítrico. La
+ * escala no se explica, se ve.
+ *
+ * (Antes: pos [2.5, 5.2, 19] → 100% del cuadro era UNA copa a 0,2 m. La cámara
+ * estaba metida dentro de las hojas del mango del sitio 5.)
+ */
+export const CAMARA = {
+  reposo: /** @type {[number, number, number]} */ ([-12.4, 5.3, 11.0]),
+  mirada: /** @type {[number, number, number]} */ ([6.1, 6.4, -5.6]),
+  fov: 50,
+};
+
+/*
+ * EL SOBRE DE ÓRBITA — medido, no supuesto.
+ *
+ * Este encuadre es angosto y carga la lección, así que los límites no se
+ * eligieron «a ojo»: se barrió el volumen entero que el usuario puede alcanzar
+ * y se recortó a lo que cumple las dos condiciones a la vez —que la cámara
+ * nunca entre en una copa, y que el cítrico NO desaparezca del cuadro—.
+ *
+ * Lo segundo resultó ser lo apretado. Barriendo el azimut, la lección solo
+ * sobrevive entre −0.96 y −0.78 rad: pasado −0.76 el palo de mango se come el
+ * cuadro y el huerto de arriba cae a 0.0% — o sea, el mundo dejaría de enseñar
+ * lo único que vino a enseñar. Justo por eso este mundo va SIN autoRotate: una
+ * deriva de diez segundos bastaba para dejar la escena sin cítricos, y la foto
+ * podía caer ahí. La vida la pone el `respiro` del CamaraDirector.
+ */
+export const ORBITA = {
+  distMin: 23.8,
+  distMax: 26.0,
+  polarMin: 0.95,
+  polarMax: 1.68,
+  azimutMin: -0.96,
+  azimutMax: -0.78,
+};
 
 /**
  * Siembra determinista de la finca frutalera completa. Devuelve items por
