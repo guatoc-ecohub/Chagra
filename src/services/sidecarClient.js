@@ -37,6 +37,15 @@
 
 import { fetchWithAuthRetry } from './apiService.js';
 import { buildSidecarHeaders } from './tierService.js';
+// Fallo real del canario 2026-07-20: "ICA"/"Fuente" (mención de institución o
+// meta-pregunta) se resolvían a especies fantasma (col rizada / Pennisetum
+// setaceum) y el agente construía la respuesta sobre esa basura porque el
+// único filtro (filterNoiseEntities) corría DESPUÉS de que el LLM ya había
+// respondido (outputGuards.applyOutputGuards). Filtramos ACÁ, apenas llega la
+// respuesta del sidecar, para que ningún consumidor (prompt del LLM incluido)
+// vea entidades-ruido. outputGuards.js no importa nada (0 imports) → no hay
+// ciclo posible al importarlo desde acá.
+import { filterNoiseEntities } from './outputGuards.js';
 
 const NLU_TIMEOUT_MS = 18000;
 export const TOOL_TIMEOUT_MS = 5000;
@@ -509,7 +518,13 @@ export async function resolveEntities(userMessage, opts = {}) {
   if (!raw || typeof raw !== 'object') return null;
   const grounding = raw.grounding && typeof raw.grounding === 'object' ? raw.grounding : null;
   if (!Array.isArray(raw.entities)) return { entities: [], grounding };
-  return { entities: raw.entities, grounding };
+  // Filtramos entidades-ruido (siglas institucionales, meta-vocabulario de
+  // "dame la fuente/norma", muletillas campesinas) ANTES de devolver — así
+  // ningún consumidor (incluido el prompt del LLM en agentPromptBase.js, que
+  // las presenta como "ENTIDADES RESUELTAS... autoritativo") ve basura como
+  // verdad verificada. applyOutputGuards también filtra (idempotente y puro,
+  // aplicarlo dos veces es inofensivo) — se deja así como defensa en capas.
+  return { entities: filterNoiseEntities(raw.entities), grounding };
 }
 
 /**

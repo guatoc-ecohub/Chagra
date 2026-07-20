@@ -261,6 +261,29 @@ const NLU_NOISE_MENTIONS = new Set([
   'pues', 'bueno', 'oiga', 'oye', 'hombre', 'senor', 'senora',
   // genéricos vegetales sin especie concreta (solos)
   'pasto', 'monte', 'hierba', 'yerba', 'mata', 'planta', 'arbol', 'palo',
+  // FALLO REAL DEL CANARIO 2026-07-20: el usuario preguntó "¿de dónde sale esa
+  // recomendación? Dame la fuente o la entidad (ICA / SENA)..." y el resolver
+  // mapeó "ICA" → col rizada (Brassica oleracea, cuya prosa del catálogo cita
+  // "Fuentes Tier A: ICA Resolución 3168/2015...") y "Fuente" → Pennisetum
+  // setaceum (nombre_comun literal "Pasto fuente"). El agente contestó
+  // tratando ambas instituciones como especies fantasma. Siglas
+  // institucionales NUNCA son especies — las instituciones van en la columna
+  // de fuente/cita, jamás como entidad resuelta.
+  'ica', 'sena', 'agrosavia', 'corpoica', 'mads', 'ideam', 'icontec', 'dane',
+  'cenicafe', 'fao', 'minagricultura', 'umata', 'car', 'cvc', 'invima', 'upra',
+  // Vocabulario de META-PREGUNTA: cuando el usuario pide la FUENTE/norma de
+  // una recomendación no está nombrando un cultivo, aunque el resolver a
+  // veces case el token contra prosa del catálogo (ver "fuente" arriba). El
+  // cotejo es sobre `mentioned` COMPLETO y normalizado, no substring: "pasto
+  // fuente" (mención de una especie real) NO cae acá, solo "fuente" sola.
+  'fuente', 'fuentes', 'entidad', 'entidades', 'norma', 'normativa',
+  'resolucion', 'decreto', 'ley', 'cartilla', 'referencia', 'recomendacion',
+  // NOTA: se evaluaron 'ica'/'sena'/'agrosavia'/... y 'car'/'fao' (siglas
+  // cortas, mayor riesgo de colisión) contra `nombre_comun`/`nombre`/
+  // `nombres_comunes_regionales` de todo `catalog/*.json` — ninguna especie
+  // usa esas siglas como nombre común; "CAR" y "FAO" solo aparecen en
+  // catalog/*.json como valores de `autoridad`/`institucion`/`autores`
+  // (metadata de fuente), nunca como nombre de especie. Sin colisión conocida.
 ]);
 
 /**
