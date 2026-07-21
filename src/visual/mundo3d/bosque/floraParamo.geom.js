@@ -78,26 +78,74 @@ import {
  * guadua, nogal, cedro, cámbulo, gualanday, siete cueros, helecho, heliconia,
  * quiche). Por eso se subieron los árboles y se bajaron los frailejones.
  */
+/*
+ * REDISEÑO 2026-07-20 (páramo espectacular, dir. Jackson): el operador revierte
+ * la degradación del 07-16 para ESTE claro. El frailejón vuelve a ser el
+ * PROTAGONISTA visual: un frailejonal DENSO que impone en primer plano, con una
+ * banda HÉROE de adultos f3 (enagua + roseta plateada + flor) grandes y cercanos.
+ * La queñua (Ent) sigue siendo la guardiana del centro — no se toca su rol.
+ *   · frailejonHero: los gigantes de primer plano (3-4 m), la firma del páramo.
+ *   · el resto de edades puebla el frailejonal alrededor (gradiente de edad).
+ */
 export const FLORA_TIER = {
   alto: {
-    frailejonJoven: 4, frailejon: 4, frailejonViejo: 2, frailejonFlor: 2,
+    frailejonHero: 7, frailejonJoven: 9, frailejon: 8, frailejonViejo: 5, frailejonFlor: 4,
     yarumo: 5, roble: 5, encenillo: 6,
-    aliso: 5, gaque: 4, mortino: 14, romerillo: 14, roca: 9, musgo: 12, niebla: 3,
+    aliso: 5, gaque: 4, mortino: 16, romerillo: 16, roca: 10, musgo: 20, niebla: 3,
   },
   medio: {
-    frailejonJoven: 2, frailejon: 3, frailejonViejo: 1, frailejonFlor: 1,
+    frailejonHero: 4, frailejonJoven: 5, frailejon: 5, frailejonViejo: 2, frailejonFlor: 2,
     yarumo: 3, roble: 3, encenillo: 3,
-    aliso: 3, gaque: 2, mortino: 8, romerillo: 8, roca: 5, musgo: 6, niebla: 0,
+    aliso: 3, gaque: 2, mortino: 9, romerillo: 9, roca: 5, musgo: 10, niebla: 0,
   },
   bajo: {
-    frailejonJoven: 1, frailejon: 2, frailejonViejo: 0, frailejonFlor: 0,
+    frailejonHero: 2, frailejonJoven: 2, frailejon: 3, frailejonViejo: 1, frailejonFlor: 0,
     yarumo: 2, roble: 2, encenillo: 1,
-    aliso: 1, gaque: 0, mortino: 3, romerillo: 3, roca: 2, musgo: 3, niebla: 0,
+    aliso: 1, gaque: 0, mortino: 3, romerillo: 3, roca: 2, musgo: 4, niebla: 0,
   },
 };
 
 /** Conteos de flora para un tier (desconocido → frugal, nunca el más caro). */
 export const floraDeTier = (tier) => FLORA_TIER[tier] || FLORA_TIER.medio;
+
+/*
+ * REBIOMA PÁRAMO (2026-07-20, 2a pasada — dir. Jackson / lente Humboldt):
+ * tres revisiones visuales independientes coincidieron en que el claro se leía
+ * como BOSQUE altoandino denso y NO como la planicie abierta del páramo — el
+ * frailejón compartía cuadro con demasiados árboles verdes. El
+ * páramo real sobre 3500 m es planicie con frailejonal disperso, cielo grande y
+ * POCOS árboles (la queñua/Polylepis sube como acento, no como bosque).
+ *
+ * `raleParamo` toma los conteos del bioma "bosque" y los RALEA hacia páramo:
+ *   · el cortejo de árboles (yarumo/roble/encenillo/aliso/gaque) se capa a unos
+ *     pocos que se van al anillo lejano velados por la niebla — acentos, no muro;
+ *   · el frailejonal SE POTENCIA (más héroes y más edades) para que domine el
+ *     primer plano y la media distancia: al mirar la escena, lo primero que se
+ *     lee es "frailejones".
+ * Solo aplica al mundo páramo (EscenaBosqueVivo pasa bioma="paramo"); el resto
+ * de escenas que consumen FloraParamo (p. ej. EscenaEntMaestro) no se tocan.
+ */
+export function raleParamo(c) {
+  const capArbol = (v, cap) => (v > 0 ? Math.max(1, Math.min(v, cap)) : 0);
+  const boost = (v, f) => Math.round(v * f);
+  return {
+    ...c,
+    // El frailejonal manda: más gigantes héroe y más gradiente de edad.
+    frailejonHero: boost(c.frailejonHero, 1.55),
+    frailejonJoven: boost(c.frailejonJoven, 1.5),
+    frailejon: boost(c.frailejon, 1.5),
+    frailejonViejo: boost(c.frailejonViejo, 1.55),
+    frailejonFlor: boost(c.frailejonFlor, 1.4),
+    // El cortejo de árboles se rala a acentos lejanos (planicie, no bosque).
+    yarumo: capArbol(c.yarumo, 2),
+    roble: capArbol(c.roble, 2),
+    encenillo: capArbol(c.encenillo, 2),
+    aliso: capArbol(c.aliso, 1),
+    gaque: capArbol(c.gaque, 1),
+    // El pajonal-sotobosque bajo se conserva/refuerza (cubre el suelo abierto).
+    romerillo: boost(c.romerillo, 1.15),
+  };
+}
 
 /*
  * Factor de DETALLE geométrico por tier: escala cuántas hojas/matojos lleva cada
@@ -114,12 +162,12 @@ export const calidadDeTier = (tier) => CALIDAD_TIER[tier] ?? CALIDAD_TIER.medio;
 export const PAL = {
   // Frailejón
   frailejonTronco: '#6f5c40', // tallo bajo la enagua
-  frailejonSeco: '#9a7f57', // enagua: marcescentes pajizas (arriba, recientes)
-  frailejonSeco2: '#67502f', // marcescentes viejas curtidas (abajo, oscuras)
-  frailejonSeco3: '#7f6640', // tono intermedio dorado-marrón (variedad)
-  frailejonPlata: '#d7dccf', // roseta centro: tomento plateado-blanco (la firma)
-  frailejonPlata2: '#a9b593', // hojas externas: plateado-salvia apagado (viejas)
-  frailejonCorazon: '#e9eee2', // cogollo velloso central (el punto más pálido)
+  frailejonSeco: '#8f7550', // enagua: marcescentes pajizas (arriba, recientes)
+  frailejonSeco2: '#6f5a3a', // marcescentes viejas curtidas (abajo) — poco contraste
+  frailejonSeco3: '#7f6845', // tono intermedio dorado-marrón (variedad)
+  frailejonPlata: '#c2cdab', // roseta: tomento plateado-SALVIA (verde plata, no blanco)
+  frailejonPlata2: '#9fac86', // hojas externas: plateado-salvia apagado (viejas)
+  frailejonCorazon: '#d6dec2', // cogollo velloso central (salvia pálido, NO blanco)
   frailejonFlor: '#e6c84e', // capítulos amarillos
   frailejonTallo: '#93a06a', // escapo floral
 
@@ -364,28 +412,30 @@ export function geomFrailejon({ flor = false, q = 1, edad = 0.6 } = {}, seed = 1
   //    superpuestas como tejas de la base a la roseta. Cuanto más abajo, más
   //    viejas y oscuras. El número de anillos escala con la altura (el viejo
   //    lleva hábito largo; el joven, apenas un faldón).
-  const anillos = Math.max(2, Math.round((Ht / 0.24) * q));
-  const porAnillo = Math.max(6, Math.round(10 * q));
+  // La enagua es un FALDÓN GREÑUDO de tiras secas colgando (thatch), NO cestería:
+  // ángulo con jitter fuerte + giro por tira → se cruzan orgánicas, nunca en malla
+  // regular. Tiras ANCHAS y muy aplanadas que cuelgan casi a plomo, pardas
+  // homogéneas (sin el damero claro/oscuro que delataba el tejido).
+  const anillos = Math.max(3, Math.round((Ht / 0.17) * q));
+  const porAnillo = Math.max(8, Math.round(12 * q));
   for (let a = 0; a < anillos; a++) {
     const f = a / anillos; // 0 base(vieja) → 1 bajo la roseta(reciente)
-    const y = 0.1 + f * (Ht - 0.06);
-    const rad = 0.15;
+    const y = 0.06 + f * (Ht - 0.02);
+    const rad = 0.14;
     for (let i = 0; i < porAnillo; i++) {
-      const ang = (i / porAnillo) * Math.PI * 2 + a * 0.55;
-      const largo = 0.32 + r() * 0.16;
-      // lámina seca ancha (6 lados, aplanada) colgando casi a plomo y algo afuera.
-      const hoja = new THREE.ConeGeometry(0.11, largo, 6, 1);
+      const ang = (i / porAnillo) * Math.PI * 2 + (r() - 0.5) * 1.15;
+      const largo = 0.34 + r() * 0.24;
+      const cae = 0.1 + r() * 0.16; // cuánto se abre de la vertical (poco)
+      const hoja = new THREE.ConeGeometry(0.15 + r() * 0.035, largo, 5, 1);
       apuntar(
         hoja,
         [Math.cos(ang) * rad, y, Math.sin(ang) * rad],
-        [Math.cos(ang) * 0.32, -1, Math.sin(ang) * 0.32],
-        [1, 1, 0.5],
+        [Math.cos(ang) * cae, -1, Math.sin(ang) * cae],
+        [1, 1, 0.3],
+        (r() - 0.5) * 0.9,
       );
-      // pajiza arriba (reciente) → curtida oscura abajo (vieja), con variedad.
-      const tono = f > 0.55
-        ? (r() > 0.5 ? PAL.frailejonSeco : PAL.frailejonSeco3)
-        : (r() > 0.5 ? PAL.frailejonSeco3 : PAL.frailejonSeco2);
-      partes.push(pintar(hoja, variar(tono, r, 0.12)));
+      const tono = r() > 0.6 ? PAL.frailejonSeco : (r() > 0.4 ? PAL.frailejonSeco3 : PAL.frailejonSeco2);
+      partes.push(pintar(hoja, variar(tono, r, 0.08)));
     }
   }
 
@@ -393,18 +443,20 @@ export function geomFrailejon({ flor = false, q = 1, edad = 0.6 } = {}, seed = 1
   //    redonda, nunca cerdas) en espiral áurea sobre una cúpula, erguidas al
   //    centro y recostadas al borde, muy densas → una bola velluda plateada.
   //    Tomento horneado en gradiente (base salvia → punta casi blanca).
-  const nRoseta = Math.max(18, Math.round(38 * q));
+  const nRoseta = Math.max(16, Math.round(32 * q));
   const wSeg = Math.max(5, Math.round(6 * q));
   const hSeg = Math.max(3, Math.round(4 * q));
   const plataInt = new THREE.Color(PAL.frailejonPlata);
   const plataExt = new THREE.Color(PAL.frailejonPlata2);
+  // Roseta = CUENCO ancho y aplanado de hojas que RADIAN (no una bola): las
+  // externas se recuestan casi horizontales (estrella), el centro apenas erguido.
   const hojaRoseta = (f, ang, extraTilt = 0) => {
-    const posR = (0.02 + f * 0.12) * rosF; // nacen sobre una cúpula, no de un punto
-    const posY = cy - f * 0.1 * rosF; // borde más bajo → domo redondo
-    const tilt = 0.2 + f * 0.62 + (r() - 0.5) * 0.09 + extraTilt; // cuenco 11°→47°
+    const posR = (0.03 + f * 0.19) * rosF; // nacen sobre una cúpula ANCHA
+    const posY = cy - f * 0.17 * rosF; // borde bien caído → cuenco plano, no domo
+    const tilt = 0.34 + f * 0.86 + (r() - 0.5) * 0.1 + extraTilt; // 19°→~69° (se abren)
     const s = Math.sin(tilt);
-    const largo = (0.27 + (1 - f) * 0.13 + r() * 0.05) * rosF; // cortas y llenas
-    const hoja = petalo((0.1 + f * 0.02) * rosF, largo, 0.06, wSeg, hSeg);
+    const largo = (0.3 + (1 - f) * 0.1 + r() * 0.05) * rosF; // anchas y llenas
+    const hoja = petalo((0.12 + f * 0.03) * rosF, largo, 0.05, wSeg, hSeg);
     const base = variar(plataInt.clone().lerp(plataExt, f), r, 0.05);
     pintarGradiente(hoja, base, PAL.frailejonCorazon, 0, largo);
     apuntar(
@@ -432,7 +484,7 @@ export function geomFrailejon({ flor = false, q = 1, edad = 0.6 } = {}, seed = 1
     const s = Math.sin(tilt);
     const largoC = (0.16 + r() * 0.05) * rosF;
     const hoja = petalo(0.072 * rosF, largoC, 0.052, wSeg, hSeg);
-    pintarGradiente(hoja, variar(PAL.frailejonPlata, r, 0.04), '#f3f6ee', 0, largoC);
+    pintarGradiente(hoja, variar(PAL.frailejonPlata, r, 0.04), '#e2e8d0', 0, largoC);
     apuntar(
       hoja,
       [Math.cos(ang) * 0.025, cy + 0.04, Math.sin(ang) * 0.025],
@@ -851,6 +903,74 @@ export function geomMusgo(seed = 10) {
 }
 
 /* -------------------------------------------------------------------------- */
+/*  FIGURA DE ESCALA — un campesino pequeño al pie del frailejonal              */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * La lente Shadow of the Colossus: la escala inmensa NO se siente por tamaño
+ * absoluto sino por CONTRASTE con una figura conocida. Un campesino de ~1.7 m
+ * con ruana y sombrero, quieto al pie de un frailejón héroe, le da la vara de
+ * medir al ojo — recién ahí el frailejón de 3-4 m se lee "gigante que tardó un
+ * siglo". Low-poly, silueta legible a distancia, mira al frailejonal. Color
+ * horneado en vertexColors como toda la flora (mismo material compartido).
+ * Anti-leak: figura genérica, sin rostro ni rasgos identificables.
+ */
+const PAL_FIG = {
+  ruana: '#8a3b2e', // ruana rojo-tierra andina
+  ruana2: '#6e2f24', // pliegue en sombra
+  pantalon: '#3a3428',
+  bota: '#241f18',
+  piel: '#a8794f',
+  sombrero: '#c8a768', // paja
+  sombreroCinta: '#59452f',
+};
+
+/** Un campesino de ~1.75 unidades (mira a +Z). Pieza única, no instanciada. */
+export function geomCampesinoEscala(seed = 44) {
+  const r = rng(seed);
+  const partes = [];
+  // Piernas + botas.
+  for (const lado of [-1, 1]) {
+    const pierna = new THREE.CylinderGeometry(0.072, 0.088, 0.72, 6, 1);
+    poner(pierna, [lado * 0.1, 0.4, 0]);
+    partes.push(pintar(pierna, PAL_FIG.pantalon));
+    const bota = new THREE.CylinderGeometry(0.095, 0.11, 0.15, 6, 1);
+    poner(bota, [lado * 0.1, 0.075, 0.03]);
+    partes.push(pintar(bota, PAL_FIG.bota));
+  }
+  // Torso bajo la ruana.
+  const torso = new THREE.CylinderGeometry(0.17, 0.2, 0.5, 7, 1);
+  poner(torso, [0, 1.02, 0]);
+  partes.push(pintar(torso, PAL_FIG.ruana2));
+  // La RUANA: manto que cae en trapecio ancho desde los hombros (la firma andina).
+  const ruana = new THREE.CylinderGeometry(0.26, 0.4, 0.66, 6, 1);
+  poner(ruana, [0, 1.06, 0], [0, Math.PI / 6, 0]);
+  partes.push(pintar(ruana, variar(PAL_FIG.ruana, r, 0.05)));
+  // Hombros redondeados de la ruana (le da cuerpo humano, no cono).
+  const hombros = new THREE.SphereGeometry(0.28, 8, 6, 0, Math.PI * 2, 0, Math.PI * 0.55);
+  poner(hombros, [0, 1.3, 0], [0, 0, 0], [1, 0.7, 0.85]);
+  partes.push(pintar(hombros, variar(PAL_FIG.ruana, r, 0.05)));
+  // Cuello + cabeza.
+  const cuello = new THREE.CylinderGeometry(0.06, 0.07, 0.1, 6, 1);
+  poner(cuello, [0, 1.44, 0]);
+  partes.push(pintar(cuello, PAL_FIG.piel));
+  const cabeza = new THREE.SphereGeometry(0.125, 10, 8);
+  poner(cabeza, [0, 1.57, 0], [0, 0, 0], [1, 1.08, 1]);
+  partes.push(pintar(cabeza, PAL_FIG.piel));
+  // Sombrero: ala + copa + cinta (silueta de sombrero campesino).
+  const ala = new THREE.CylinderGeometry(0.28, 0.28, 0.03, 14, 1);
+  poner(ala, [0, 1.65, 0]);
+  partes.push(pintar(ala, PAL_FIG.sombrero));
+  const copa = new THREE.CylinderGeometry(0.135, 0.155, 0.15, 12, 1);
+  poner(copa, [0, 1.73, 0]);
+  partes.push(pintar(copa, PAL_FIG.sombrero));
+  const cinta = new THREE.CylinderGeometry(0.158, 0.158, 0.045, 12, 1);
+  poner(cinta, [0, 1.68, 0]);
+  partes.push(pintar(cinta, PAL_FIG.sombreroCinta));
+  return fusionarSeguro(partes, 'campesino-escala');
+}
+
+/* -------------------------------------------------------------------------- */
 /*  DISTRIBUCIÓN biogeográfica alrededor del Ent                               */
 /* -------------------------------------------------------------------------- */
 
@@ -900,29 +1020,55 @@ function sembrar(n, rMin, rMax, r, opts = {}) {
   return arr;
 }
 
-/** Todas las instancias de flora para unos conteos dados. */
-export function distribucionFlora(conteos, seed = 707) {
+/** Todas las instancias de flora para unos conteos dados.
+ *  `bioma`: 'bosque' (defecto, cortejo denso) | 'paramo' (planicie abierta —
+ *  frailejonal disperso por toda la media distancia y árboles empujados al
+ *  anillo lejano velado por la niebla). */
+export function distribucionFlora(conteos, seed = 707, bioma = 'bosque') {
   const c = conteos;
+  const paramo = bioma === 'paramo';
+  // Radios por bioma. En páramo el frailejonal se ABRE por la planicie (hasta
+  // media-larga distancia) y los árboles se van MÁS LEJOS (siluetas en la
+  // niebla), para que el primer plano y la media distancia sean todo frailejón.
+  const R = paramo
+    ? {
+      hero: [5.0, 13.5], joven: [3.0, 14.0], frail: [3.5, 15.5], viejo: [4.0, 16.5], flor: [3.5, 13.5],
+      mortino: [4, 15], romerillo: [3, 15], roca: [2, 15], musgo: [1.2, 13],
+      gaque: [15, 24], roble: [16, 26], encenillo: [17, 27], yarumo: [17, 27], aliso: [18, 29],
+    }
+    : {
+      hero: [6.0, 10.5], joven: [2.6, 8.5], frail: [3.0, 9.5], viejo: [3.4, 10.5], flor: [3.2, 9],
+      mortino: [4, 12], romerillo: [3, 12], roca: [2, 11], musgo: [1.2, 9],
+      gaque: [8.5, 14], roble: [9.5, 16], encenillo: [10, 17], yarumo: [10, 17], aliso: [11, 19],
+    };
   return {
-    // Frailejonal: TRES edades entremezcladas en el mismo anillo interior-medio,
-    // agrupadas, con mucha variación de tamaño + ladeo por instancia (`lean`) →
-    // un paisaje con gradiente de edad, nada clonado. Los jóvenes se acercan más
-    // al claro (rMin menor); los viejos quedan un poco más afuera.
-    frailejonJoven: sembrar(c.frailejonJoven, 3.4, 9.5, rng(seed + 1), { eMin: 0.78, eMax: 1.12, varia: 0.13, lean: 0.14 }),
-    frailejon: sembrar(c.frailejon, 3.8, 10.5, rng(seed + 12), { eMin: 0.86, eMax: 1.22, varia: 0.14, lean: 0.15 }),
-    frailejonViejo: sembrar(c.frailejonViejo, 4.4, 11, rng(seed + 13), { eMin: 0.9, eMax: 1.3, varia: 0.14, lean: 0.17 }),
-    frailejonFlor: sembrar(c.frailejonFlor, 4.5, 9.5, rng(seed + 2), { eMin: 0.9, eMax: 1.2, varia: 0.1, lean: 0.12 }),
+    // Banda HÉROE (2026-07-20): los gigantes de PRIMER PLANO. Un anillo CERCANO y
+    // parejo (uniforme) de adultos GRANDES (esc 1.65-2.15 → 3.5-4.5 m) que rodea
+    // el claro pegado a la cámara: desde cualquier ángulo de órbita, varios
+    // quedan enmarcando el cuadro e IMPONEN por delante de la queñua. Ladeo
+    // generoso para que ninguno se lea clonado. La firma del páramo, por fin al
+    // frente. (El proscenio fijo de FloraParamo.jsx garantiza el trío foreground.)
+    // En páramo el anillo se ENSANCHA: héroes también en la media distancia →
+    // colosos de frailejón salpicando toda la planicie hasta la niebla.
+    frailejonHero: sembrar(c.frailejonHero, R.hero[0], R.hero[1], rng(seed + 21), { eMin: 1.65, eMax: 2.15, uniforme: true, varia: 0.12, lean: 0.16 }),
+    // Frailejonal de acompañamiento: TRES edades entremezcladas, agrupadas y
+    // ACERCADAS al claro (rMin bajado desde el rediseño 07-16) con mucha
+    // variación de tamaño + ladeo → gradiente de edad denso, nada clonado.
+    frailejonJoven: sembrar(c.frailejonJoven, R.joven[0], R.joven[1], rng(seed + 1), { eMin: 0.8, eMax: 1.18, varia: 0.13, lean: 0.15 }),
+    frailejon: sembrar(c.frailejon, R.frail[0], R.frail[1], rng(seed + 12), { eMin: 0.95, eMax: 1.4, varia: 0.14, lean: 0.16 }),
+    frailejonViejo: sembrar(c.frailejonViejo, R.viejo[0], R.viejo[1], rng(seed + 13), { eMin: 1.05, eMax: 1.55, varia: 0.14, lean: 0.18 }),
+    frailejonFlor: sembrar(c.frailejonFlor, R.flor[0], R.flor[1], rng(seed + 2), { eMin: 1.0, eMax: 1.45, varia: 0.1, lean: 0.13 }),
     // Sotobosque.
-    mortino: sembrar(c.mortino, 4, 12, rng(seed + 3), { eMin: 0.8, eMax: 1.2, varia: 0.12 }),
-    romerillo: sembrar(c.romerillo, 3, 12, rng(seed + 4), { eMin: 0.8, eMax: 1.25, varia: 0.14 }),
+    mortino: sembrar(c.mortino, R.mortino[0], R.mortino[1], rng(seed + 3), { eMin: 0.8, eMax: 1.2, varia: 0.12 }),
+    romerillo: sembrar(c.romerillo, R.romerillo[0], R.romerillo[1], rng(seed + 4), { eMin: 0.8, eMax: 1.25, varia: 0.14 }),
     // Suelo.
-    roca: sembrar(c.roca, 2, 11, rng(seed + 5), { eMin: 0.7, eMax: 1.5, varia: 0.1 }),
-    musgo: sembrar(c.musgo, 1.2, 9, rng(seed + 6), { eMin: 0.7, eMax: 1.6, varia: 0.12 }),
+    roca: sembrar(c.roca, R.roca[0], R.roca[1], rng(seed + 5), { eMin: 0.7, eMax: 1.5, varia: 0.1 }),
+    musgo: sembrar(c.musgo, R.musgo[0], R.musgo[1], rng(seed + 6), { eMin: 0.7, eMax: 1.6, varia: 0.12 }),
     // Árboles de fondo (anillo exterior, reparto parejo, velados por niebla).
-    gaque: sembrar(c.gaque, 8.5, 14, rng(seed + 7), { eMin: 0.9, eMax: 1.1, uniforme: true, varia: 0.08 }),
-    roble: sembrar(c.roble, 9.5, 16, rng(seed + 8), { eMin: 0.92, eMax: 1.15, uniforme: true, varia: 0.08 }),
-    encenillo: sembrar(c.encenillo, 10, 17, rng(seed + 9), { eMin: 0.85, eMax: 1.1, uniforme: true, varia: 0.08 }),
-    yarumo: sembrar(c.yarumo, 10, 17, rng(seed + 10), { eMin: 0.9, eMax: 1.15, uniforme: true, varia: 0.06 }),
-    aliso: sembrar(c.aliso, 11, 19, rng(seed + 11), { eMin: 0.9, eMax: 1.12, uniforme: true, varia: 0.08 }),
+    gaque: sembrar(c.gaque, R.gaque[0], R.gaque[1], rng(seed + 7), { eMin: 0.9, eMax: 1.1, uniforme: true, varia: 0.08 }),
+    roble: sembrar(c.roble, R.roble[0], R.roble[1], rng(seed + 8), { eMin: 0.92, eMax: 1.15, uniforme: true, varia: 0.08 }),
+    encenillo: sembrar(c.encenillo, R.encenillo[0], R.encenillo[1], rng(seed + 9), { eMin: 0.85, eMax: 1.1, uniforme: true, varia: 0.08 }),
+    yarumo: sembrar(c.yarumo, R.yarumo[0], R.yarumo[1], rng(seed + 10), { eMin: 0.9, eMax: 1.15, uniforme: true, varia: 0.06 }),
+    aliso: sembrar(c.aliso, R.aliso[0], R.aliso[1], rng(seed + 11), { eMin: 0.9, eMax: 1.12, uniforme: true, varia: 0.08 }),
   };
 }

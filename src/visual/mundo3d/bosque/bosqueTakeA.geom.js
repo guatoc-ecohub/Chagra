@@ -313,10 +313,15 @@ const AZ_CAMARA = 0.61;
 /* Los vecinos rubber-hose viven en estas anclas (FaunaBosque): despejarlas. */
 const ANCLAS_VECINOS = [[-3.7, 3.0], [3.1, 3.2], [-4.9, 4.4], [3.0, 2.1]];
 
+/* REBIOMA PÁRAMO (2a pasada 2026-07-20): la queñua (Polylepis) es de los pocos
+   árboles que sube al páramo, y va como ACENTO/personaje, no como bosque que
+   compite con el frailejonal. Se RALEA el anillo cercano (el que se metía junto
+   al frailejonal) y se recorta el lejano, dejando unas pocas siluetas colosales
+   veladas por la niebla que dan fondo catedral sin tapiar la planicie. */
 const CUPO_QUENUAL = {
-  alto: { cerca: 8, lejos: 12 },
-  medio: { cerca: 5, lejos: 6 },
-  bajo: { cerca: 3, lejos: 0 },
+  alto: { cerca: 2, lejos: 4 },
+  medio: { cerca: 1, lejos: 3 },
+  bajo: { cerca: 1, lejos: 0 },
 };
 
 function tinteInstancia(r, amt = 0.1) {
@@ -385,7 +390,9 @@ export function sitiosQuenual(tier = 'alto') {
     sitios.push({
       pos: [x, alturaBosque(x, z) - 0.1, z],
       rotY: r() * Math.PI * 2,
-      esc: 1.5 + r() * 0.95,
+      // Rebioma páramo: siluetas más BAJAS (1.2–1.75, antes 1.5–2.45) para que
+      // la queñua lejana no forme un muro de copas que tapie el cielo grande.
+      esc: 1.2 + r() * 0.55,
       variante: sitios.length % 3,
       tinte: tinteInstancia(r, 0.14),
     });

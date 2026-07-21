@@ -37,7 +37,6 @@ import { SombraContacto } from '../escenas/SombraContacto.jsx';
 import SueloRico from '../terreno/SueloRico.jsx';
 import EntQuenua from './EntQuenua.jsx';
 import FloraParamo from './FloraParamo.jsx';
-import DoselBiodiverso from './DoselBiodiverso.jsx';
 import FaunaBosque from './FaunaBosque.jsx';
 import {
   alturaBosque,
@@ -168,11 +167,25 @@ function AtmosferaBosque({ franja, perfil, reducedMotion }) {
     pintar(actual);
   });
 
-  useFrame((_, dt) => {
+  useFrame((state, dt) => {
     if (reducedMotion) return;
     const k = 1 - Math.exp((-3 / TRANSICION.duracion) * Math.min(dt, 0.1));
     amortiguar(actual, objetivo, k);
     pintar(actual);
+    // LA MAREA DE NIEBLA: una onda lenta (~46 s) que hace ENTRAR y SALIR la
+    // bruma — cuando sube, el fog se cierra y se traga la montaña del fondo; al
+    // bajar, la revela. Es lo que vuelve la niebla protagonista (Jackson): la
+    // catedral aparece y desaparece, no un plano uniforme. Se aplica DESPUÉS de
+    // pintar (no acumula: parte del estado ya amortiguado de esta franja).
+    const marea = 0.5 + 0.5 * Math.sin(state.clock.elapsedTime * (Math.PI * 2 / 46));
+    if (fogRef.current) {
+      fogRef.current.far = actual.nieblaLejos * (1 - 0.44 * marea);
+      fogRef.current.near = actual.nieblaCerca * (1 - 0.22 * marea);
+    }
+    // El fondo se LECHA hacia el color de la niebla cuando la marea cierra: la
+    // pared del anfiteatro se disuelve en blanco y vuelve. copy() antes de lerp
+    // → no acumula (siempre parte del fondo amortiguado de la franja).
+    if (fondoRef.current) fondoRef.current.copy(actual.fondo).lerp(actual.niebla, 0.4 * marea);
   });
 
   return (
@@ -529,6 +542,11 @@ function BrumaParallax({ franja, reducedMotion }) {
     const t = state.clock.elapsedTime;
     const k = reducedMotion ? 1 : 1 - Math.exp(-0.8 * Math.min(dt, 0.1));
     peso.current += ((PESO_BRUMA[franja] ?? 1) - peso.current) * k;
+    // La misma MAREA de niebla que respira en el fog (mismo periodo/fase): las
+    // cartas de bruma se ESPESAN cuando la marea cierra y adelgazan al abrir →
+    // la niebla entra y sale a una, no cada capa por su lado.
+    const marea = reducedMotion ? 0 : 0.5 + 0.5 * Math.sin(t * (Math.PI * 2 / 46));
+    const envMarea = 0.7 + 0.62 * marea;
     let idx = 0;
     for (let c = 0; c < CAPAS_BRUMA.length; c++) {
       const capa = CAPAS_BRUMA[c];
@@ -542,7 +560,7 @@ function BrumaParallax({ franja, reducedMotion }) {
           Math.sin(az) * capa.rad,
         );
         carta.quaternion.copy(state.camera.quaternion);
-        carta.material.opacity = capa.op * peso.current
+        carta.material.opacity = capa.op * peso.current * envMarea
           * (reducedMotion ? 1 : 0.9 + 0.1 * Math.sin(t * 0.07 + capa.fase * 2 + lado * 3));
         idx++;
       }
@@ -569,7 +587,13 @@ function BrumaParallax({ franja, reducedMotion }) {
    héroe aprobado (leve contrapicado, el rostro tallado legible), el rig de
    cámara se escala con él — misma proporción árbol/cuadro que el original, solo
    que 1.4× más grande y con el bosque catedral abriéndose alrededor. */
-const POSE_BOSQUE = { position: [11.2, 3.6, 16.2], fov: 42, mira: [0, 4.2, 0] };
+/* 2a pasada páramo (2026-07-20): se ABRE el encuadre para que respire la
+   PLANICIE. La cámara SUBE (y 3.6→4.7) y mira un pelo HACIA ABAJO (mira y
+   3.7→3.0): el frailejonal se despliega en abanico hacia un horizonte BAJO y el
+   cielo lechoso del páramo ocupa el tercio alto (la firma: planicie abierta,
+   cielo grande). La queñua Ent queda de acento vertical/guardián al fondo, ya no
+   como muro de copas. fov 45→46 para que entre más frailejonal. */
+const POSE_BOSQUE = { position: [12.0, 4.7, 17.6], fov: 46, mira: [0, 3.0, 0] };
 
 /* Anclas de sombra de contacto que la escena le pasa a SueloRico: el claro del
    guardián (el Ent es el objeto mayor y necesita el AO ancho que lo planta). */
@@ -630,16 +654,17 @@ function Diorama({ tier, reducedMotion, pose }) {
       {/* El arroyo que baja de la niebla (de noche, lo que más brilla). */}
       {tier !== 'bajo' && <Arroyo nocturno={nocturno} perfil={perfil} />}
 
-      {/* El ECOSISTEMA de páramo (frailejonar, sotobosque, árboles vecinos),
+      {/* EL FRAILEJONAL DEL PÁRAMO (bioma="paramo"): la planicie abierta con el
+          frailejonar dominando primer plano y media distancia, el cortejo de
+          árboles ralo y empujado al anillo lejano (siluetas en la niebla).
           POSADO sobre el relieve con alturaDe. */}
-      <FloraParamo tier={tier} reducedMotion={reducedMotion} alturaDe={alturaBosque} />
+      <FloraParamo tier={tier} reducedMotion={reducedMotion} alturaDe={alturaBosque} bioma="paramo" />
 
-      {/* EL DOSEL BIODIVERSO: la variedad andina/subandina colombiana que
-          TRIPLICA los árboles — emergentes (guadua, nogal cafetero, cedro),
-          dosel florecido (cámbulo rojo, gualanday morado, siete cueros magenta),
-          sotobosque (helecho arbóreo, heliconia) y epífitas (quiche). Con esto
-          el claro se lee como BOSQUE de tres estratos, no un árbol solo. */}
-      <DoselBiodiverso tier={tier} alturaDe={alturaBosque} />
+      {/* (2a pasada 2026-07-20) SE RETIRÓ el DoselBiodiverso: ese dosel andino/
+          subandino de tres estratos (guadua, cámbulo, gualanday, siete cueros,
+          heliconia, helecho arbóreo, quiche) es un ERROR DE BIOMA para un páramo
+          sobre 3500 m — convertía la planicie en bosque denso y sepultaba al
+          frailejón. El páramo lleva frailejonal + queñua de acento, no dosel. */}
 
       {/* LA VIDA: cóndor, vecinos rubber-hose, mariposas, luciérnagas. */}
       <FaunaBosque tier={tier} reducedMotion={reducedMotion} />
