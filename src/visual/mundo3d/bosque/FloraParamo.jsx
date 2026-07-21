@@ -22,9 +22,11 @@ import * as THREE from 'three';
 import { perfilDeTier } from '../deviceTier.js';
 import {
   floraDeTier,
+  raleParamo,
   calidadDeTier,
   distribucionFlora,
   geomFrailejon,
+  geomCampesinoEscala,
   geomYarumo,
   geomRoble,
   geomEncenillo,
@@ -74,6 +76,71 @@ function Especie({ geo, mat, items, castShadow = false }) {
       frustumCulled={false}
       castShadow={castShadow}
     />
+  );
+}
+
+/* Textura de CHARCO: glint claro al centro que se apaga al borde (sin rim duro).
+   Un espejo de agua que nace del páramo, catch de la luz del cielo. */
+function texturaCharco() {
+  const s = 128;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = s;
+  const ctx = cv.getContext('2d');
+  const g = ctx.createRadialGradient(s / 2, s * 0.42, 0, s / 2, s / 2, s / 2);
+  g.addColorStop(0, 'rgba(226,240,244,0.92)'); // glint del cielo
+  g.addColorStop(0.4, 'rgba(150,190,203,0.66)');
+  g.addColorStop(0.82, 'rgba(96,140,156,0.34)');
+  g.addColorStop(1, 'rgba(96,140,156,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, s, s);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/*
+ * CHARCOS del páramo: unos pocos espejos de agua que nacen entre el musgo (el
+ * páramo es una fábrica de agua). Discos planos con glint del cielo, posados
+ * sobre el relieve. Reciben la niebla (fog) para receder al fondo. Baratos:
+ * una textura, un material, N discos. Quietos (paisaje).
+ */
+const CHARCOS = [
+  { x: 2.6, z: 3.4, r: 0.9 },
+  { x: 4.5, z: 5.6, r: 1.15 },
+  { x: -1.8, z: 4.2, r: 0.72 },
+  { x: 5.9, z: 2.1, r: 0.62 },
+  { x: 0.8, z: 6.6, r: 0.85 },
+];
+function Charcos({ alturaDe }) {
+  const tex = useMemo(() => texturaCharco(), []);
+  const mat = useMemo(
+    () => new THREE.MeshBasicMaterial({
+      map: tex,
+      transparent: true,
+      opacity: 0.72,
+      depthWrite: false,
+    }),
+    [tex],
+  );
+  const geo = useMemo(() => new THREE.CircleGeometry(1, 16), []);
+  useLayoutEffect(() => () => {
+    tex.dispose();
+    mat.dispose();
+    geo.dispose();
+  }, [tex, mat, geo]);
+  return (
+    <group>
+      {CHARCOS.map((c, i) => (
+        <mesh
+          key={i}
+          geometry={geo}
+          material={mat}
+          position={[c.x, (alturaDe ? alturaDe(c.x, c.z) : 0) + 0.035, c.z]}
+          rotation={[-Math.PI / 2, 0, i * 1.3]}
+          scale={[c.r, c.r, 1]}
+        />
+      ))}
+    </group>
   );
 }
 
@@ -160,15 +227,58 @@ function NieblaRasante({ n, reducedMotion }) {
   );
 }
 
+/*
+ * EL PROSCENIO: tres frailejones GIGANTES fijos en el primer plano del lado de
+ * la cámara de reposo (arco az ~55°, radio 4-5.5). Garantizan que —tras el dolly
+ * de llegada— el frailejonal IMPONGA al frente aunque el anillo aleatorio caiga
+ * de otro lado. La roseta plateada queda a la altura de mira (en cuadro). El
+ * campesino se planta a su pie. La queñua (Ent) queda detrás, de guardiana.
+ */
+const PROSCENIO = [
+  { x: 5.7, z: 8.2, escala: 2.3, rotY: 0.5, tiltX: 0.04, tiltZ: -0.05 }, // centro, el mayor
+  { x: 3.5, z: 8.9, escala: 1.9, rotY: 2.6, tiltX: -0.05, tiltZ: 0.05 }, // hacia el borde izq.
+  { x: 7.6, z: 6.6, escala: 2.05, rotY: 4.0, tiltX: 0.05, tiltZ: 0.04 }, // hacia el borde der.
+];
+
+/*
+ * FiguraEscala — el campesino de referencia al pie del frailejonal héroe. Se
+ * planta en el PRIMER PLANO del lado de la cámara en reposo (dirección al Ent),
+ * posado sobre el relieve, mirando hacia el claro (contempla el frailejonal, de
+ * espaldas a la cámara: la silueta pequeña que revela la escala del gigante).
+ */
+const FIGURA_POS = [6.6, 0, 9.0]; // al pie del proscenio, en el corredor de cámara
+function FiguraEscala({ mat, alturaDe }) {
+  const geo = useMemo(() => geomCampesinoEscala(44), []);
+  useLayoutEffect(() => () => geo.dispose(), [geo]);
+  const y = alturaDe ? alturaDe(FIGURA_POS[0], FIGURA_POS[2]) : 0;
+  // Mira hacia el centro del claro (el frailejonal / el Ent).
+  const rotY = Math.atan2(-FIGURA_POS[0], -FIGURA_POS[2]);
+  return (
+    <mesh
+      geometry={geo}
+      material={mat}
+      position={[FIGURA_POS[0], y, FIGURA_POS[2]]}
+      rotation={[0, rotY, 0]}
+      castShadow
+    />
+  );
+}
+
 /**
  * La capa de flora del páramo alrededor del Ent. Montar dentro del <Canvas>.
  * `alturaDe(x,z)` (opcional) POSA cada mata sobre el relieve del terreno:
  * sin ella la siembra queda en y=0 (el claro plano de siempre).
- * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, alturaDe?: ((x:number,z:number)=>number)|null}} props
+ * `bioma`: 'bosque' (defecto — cortejo denso, para EscenaEntMaestro) | 'paramo'
+ * (planicie abierta: frailejonal dominante, árboles ralos y lejanos).
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, alturaDe?: ((x:number,z:number)=>number)|null, bioma?: 'bosque'|'paramo'}} props
  */
-export default function FloraParamo({ tier = 'alto', reducedMotion = false, alturaDe = null }) {
+export default function FloraParamo({ tier = 'alto', reducedMotion = false, alturaDe = null, bioma = 'bosque' }) {
   const perfil = perfilDeTier(tier);
-  const conteos = floraDeTier(tier);
+  // En páramo el cortejo de árboles se rala y el frailejonal se potencia.
+  const conteos = useMemo(
+    () => (bioma === 'paramo' ? raleParamo(floraDeTier(tier)) : floraDeTier(tier)),
+    [tier, bioma],
+  );
   const q = calidadDeTier(tier);
 
   // --- Geometrías fusionadas (una vez por tier). Solo lo que tenga matas. ---
@@ -177,6 +287,9 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
   // banco → el frailejonal se lee como un paisaje con gradiente de edad.
   const geos = useMemo(() => {
     const g = {};
+    // El HÉROE del páramo: adulto pleno f3 — enagua larga + roseta plateada + flor.
+    // La banda héroe lo instancia grande y cerca (frailejonHero) para que imponga.
+    if (conteos.frailejonHero) g.frailejonHero = geomFrailejon({ flor: true, q, edad: 0.98 }, 91);
     if (conteos.frailejonJoven) g.frailejonJoven = geomFrailejon({ flor: false, q, edad: 0.26 }, 21);
     if (conteos.frailejon) g.frailejon = geomFrailejon({ flor: false, q, edad: 0.62 }, 1);
     if (conteos.frailejonViejo) g.frailejonViejo = geomFrailejon({ flor: false, q, edad: 0.95 }, 37);
@@ -203,14 +316,27 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
 
   // --- Distribución biogeográfica (una vez por tier), posada en el relieve. ---
   const dist = useMemo(() => {
-    const d = distribucionFlora(conteos, 707);
+    const d = distribucionFlora(conteos, 707, bioma);
     if (!alturaDe) return d;
     const posar = (items) => items.map((it) => ({
       ...it,
       pos: [it.pos[0], alturaDe(it.pos[0], it.pos[2]) + (it.pos[1] || 0), it.pos[2]],
     }));
     return Object.fromEntries(Object.entries(d).map(([k, v]) => [k, posar(v)]));
-  }, [conteos, alturaDe]);
+  }, [conteos, alturaDe, bioma]);
+
+  // El proscenio fijo (trío foreground): posado en el relieve, tinte neutro.
+  const proscenio = useMemo(
+    () => PROSCENIO.map((p) => ({
+      pos: [p.x, alturaDe ? alturaDe(p.x, p.z) : 0, p.z],
+      rotY: p.rotY,
+      escala: p.escala,
+      tint: [1, 1, 1],
+      tiltX: p.tiltX,
+      tiltZ: p.tiltZ,
+    })),
+    [alturaDe],
+  );
 
   // Liberar GPU al desmontar.
   useLayoutEffect(() => () => {
@@ -222,20 +348,29 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
 
   return (
     <group>
-      {/* Suelo del páramo: rocas con líquen + musgo. */}
+      {/* Suelo del páramo: rocas con líquen + musgo + charcos (agua naciendo). */}
       <Especie geo={geos.roca} mat={mat} items={dist.roca} />
       <Especie geo={geos.musgo} mat={mat} items={dist.musgo} />
+      {tier !== 'bajo' && <Charcos alturaDe={alturaDe} />}
 
       {/* Sotobosque: romerillo y mortiño (con sus bayas de agraz). */}
       <Especie geo={geos.romerillo} mat={mat} items={dist.romerillo} />
       <Especie geo={geos.mortino} mat={mat} items={dist.mortino} />
 
-      {/* Frailejonar: el ícono del páramo, al frente — tres EDADES entremezcladas
-          (joven al ras, adulto, viejo de columna alta) + los que florecen. */}
+      {/* Frailejonar: el ícono del páramo, al frente — la banda HÉROE (adultos f3
+          grandes y cercanos que IMPONEN en primer plano) + tres EDADES
+          entremezcladas (joven al ras, adulto, viejo de columna alta) + los que
+          florecen. El frailejón vuelve a ser el protagonista visible del páramo. */}
+      <Especie geo={geos.frailejonHero} mat={mat} items={proscenio} castShadow={sombra} />
+      <Especie geo={geos.frailejonHero} mat={mat} items={dist.frailejonHero} castShadow={sombra} />
       <Especie geo={geos.frailejonJoven} mat={mat} items={dist.frailejonJoven} />
       <Especie geo={geos.frailejon} mat={mat} items={dist.frailejon} />
       <Especie geo={geos.frailejonViejo} mat={mat} items={dist.frailejonViejo} />
       <Especie geo={geos.frailejonFlor} mat={mat} items={dist.frailejonFlor} />
+
+      {/* La VARA DE MEDIR: un campesino pequeño al pie del frailejonal héroe.
+          Sin él, el ojo no sabe que el frailejón mide 3-4 m (lente Colossus). */}
+      <FiguraEscala mat={mat} alturaDe={alturaDe} />
 
       {/* Árboles de fondo (anillo exterior, velados por la niebla). */}
       <Especie geo={geos.gaque} mat={mat} items={dist.gaque} castShadow={sombra} />
