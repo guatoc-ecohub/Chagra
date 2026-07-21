@@ -46,13 +46,13 @@ import { Banco } from './BancoValle.jsx';
 /* ── La zona por defecto: la franja del clima medio (templado) en la ladera
       izquierda, lejos de la casa (-0.9, 2.6) y de la quebrada (x≈1.2). Dos
       parches solapados = mancha orgánica, no un rectángulo de plantación. ── */
-export const ZONA_CAFETAL = [
+const ZONA_CAFETAL = [
   { cx: -6.0, cz: 1.6, rx: 4.6, rz: 2.4 },
   { cx: -2.6, cz: 2.9, rx: 2.8, rz: 1.5 },
 ];
 
 /* Se respeta un claro alrededor del patio de la casa. */
-export const CLAROS_CAFETAL = [{ x: -0.9, z: 2.6, r: 1.8 }];
+const CLAROS_CAFETAL = [{ x: -0.9, z: 2.6, r: 1.8 }];
 
 /*
  * Presupuesto por tier (instancias, no draw-calls). El café es el grueso; el
@@ -142,7 +142,7 @@ export default function CafetalDensoValle({
   const sombra = tier === 'alto';
 
   return (
-    <group>
+    <group name="audit-cafetal">
       {/* El sombrío: el techo de guamo (ancho) + nogal (alto y recto). */}
       <Banco geo={geos.guamo} mat={mat} items={siembra.guamo} castShadow={sombra} />
       <Banco geo={geos.nogal} mat={mat} items={siembra.nogal} castShadow={sombra} />

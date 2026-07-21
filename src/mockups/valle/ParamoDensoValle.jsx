@@ -46,12 +46,12 @@ import { Banco } from './BancoValle.jsx';
 
 /* ── La zona por defecto: la franja del páramo (fondo de la ladera), al
       centro-izquierda, sin pisar el bosque de la ladera derecha. ── */
-export const ZONA_PARAMO = [
+const ZONA_PARAMO = [
   { cx: -3.0, cz: -7.8, rx: 5.2, rz: 2.6 },
   { cx: 2.6, cz: -8.6, rx: 3.0, rz: 1.8 },
 ];
 
-export const CLAROS_PARAMO = [];
+const CLAROS_PARAMO = [];
 
 /*
  * Presupuesto por tier (instancias, no draw-calls). El frailejón es el grueso,
@@ -160,7 +160,7 @@ export default function ParamoDensoValle({
   const sombra = tier === 'alto';
 
   return (
-    <group>
+    <group name="audit-paramo">
       {/* El suelo del páramo: piedra con líquen y montículos de musgo. */}
       <Banco geo={geos.roca} mat={mat} items={siembra.roca} />
       <Banco geo={geos.musgo} mat={mat} items={siembra.musgo} />

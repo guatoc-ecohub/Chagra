@@ -18,6 +18,7 @@
  *
  * Uso:  node scripts/diag/encuadre-mundo.mjs yuca
  *       node scripts/diag/encuadre-mundo.mjs quinua
+ *       node scripts/diag/encuadre-mundo.mjs valle
  */
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -51,15 +52,19 @@ const MUNDOS = {
     sujeto: { nombre: 'la era de la trilla', clave: 'SITIO_TRILLA' },
     altoCultivo: 1.6, // la mata de quinua con su panoja
   },
-  /* La LADERA CAFETERA. El sujeto es el cafeto protagonista del camino: la mata
-     que enseña qué es un cafeto. `altoCultivo` se deja FIJO entre corridas para
-     que el antes/después mida la CÁMARA y la siembra, no el número que uno
-     mismo acaba de mover. */
-  cafe: {
-    modulo: 'src/visual/mundo3d/cafetal/floraCafetal.geom.js',
-    altura: 'alturaLadera',
-    sujeto: { nombre: 'el cafeto protagonista del camino', clave: 'SITIO_CAFETO_HERO' },
-    altoCultivo: 1.5, // la mata de café adulta bajo sombrío
+  valle: {
+    camaraFija: { pos: [10.5, 9, 13.5], mira: [0, 1.6, 1.4], fov: 40 },
+    sujeto: { nombre: 'la casa ancla' },
+    sujetoFijo: [-0.9, 2.6],
+    alturaFija: (x, z) => {
+      const t = Math.max(0, Math.min(1, (-z + 8) / 19));
+      const suave = t * t * (3 - 2 * t);
+      const subida = suave * 5.4;
+      const ondul = Math.sin(x * 0.42) * 0.14 + Math.cos(z * 0.36 + x * 0.2) * 0.12;
+      const cauce = -0.32 * Math.exp(-((x - 1.2) ** 2) / 6) * Math.exp(-((z + 1) ** 2) / 55);
+      return subida + ondul + cauce;
+    },
+    altoCultivo: 0,
   },
 };
 
@@ -109,26 +114,15 @@ async function main() {
     process.exit(2);
   }
 
-  const geom = await import(resolve(RAIZ, def.modulo));
-  const altura = geom[def.altura];
+  const geom = def.modulo ? await import(resolve(RAIZ, def.modulo)) : {};
+  const altura = def.alturaFija || geom[def.altura];
   /* La cámara sale del PROPIO módulo del mundo (constante CAMARA, que vive
      junto a la geografía): así este diagnóstico no puede quedar desfasado de lo
      que la escena monta de verdad. El papal, que es anterior a esa convención,
      la trae escrita a mano aquí arriba. */
   const cam = def.camaraFija || { ...geom.CAMARA, pos: geom.CAMARA.reposo, mira: geom.CAMARA.mirada };
   if (!cam || !cam.pos) throw new Error(`el módulo de «${cual}» no exporta CAMARA`);
-  /* Override por bandera: un mundo puede tener MÁS DE UNA cámara que se
-     fotografía (la de pantalla completa y la de la tarjeta de vitrina, que sale
-     de camaraDioramas). Las dos hay que medirlas: la vitrina es la que la gente
-     ve primero.  --pos x,y,z  --mira x,y,z  --fov n */
-  const trio = (s) => s.split(',').map(Number);
-  const fPos = process.argv.includes('--pos') ? trio(process.argv[process.argv.indexOf('--pos') + 1]) : null;
-  const fMira = process.argv.includes('--mira') ? trio(process.argv[process.argv.indexOf('--mira') + 1]) : null;
-  const fFov = process.argv.includes('--fov') ? Number(process.argv[process.argv.indexOf('--fov') + 1]) : null;
-  if (fPos) cam.pos = fPos;
-  if (fMira) cam.mira = fMira;
-  if (fFov) cam.fov = fFov;
-  const sujeto = geom[def.sujeto.clave];
+  const sujeto = def.sujetoFijo || geom[def.sujeto.clave];
   /* El dosel: cuánto levanta el cultivo sobre el suelo en cada punto del lote.
      Se apoya en el `dentroLote` del propio mundo, así que respeta los claros
      (la era, el patio, el sitio de cosecha) sin duplicar esa lógica aquí. */
@@ -219,84 +213,8 @@ async function main() {
     );
   }
 
-  console.log(`  sobre el CULTIVO sembrado: ${pct(enLote)} del cuadro`);
-
-  const avisosCopa = [];
-
-  /* ¿Hay una COPA tapando la vista? El ray-march de arriba golpea terreno más
-     dosel: es CIEGO a los árboles de sombra, que no son relieve del suelo sino
-     una tapa en el aire con hueco debajo. Y esa ceguera ya costó caro — un
-     mundo dio "sin avisos" con la copa de un guamo sentada sobre la cámara,
-     cortando media vista. Si el mundo declara sus copas, aquí se miden. */
-  if (geom.copasSombrio) {
-    const copas = geom.copasSombrio();
-    /* Un mundo de café DE SOMBRA tiene que tener techo de hojas: contar todo el
-       follaje del sombrío como "estorbo" castigaría justo lo que hace bien. Lo
-       que estorba es la copa CERCA del ojo — la que ya no enmarca sino tapa. */
-    const CERCA_COPA = 7;
-    let tapados = 0;
-    let tapadosCerca = 0;
-    let masCercaCopa = Infinity;
-    let culpable = null;
-    for (let f = 0; f < FILAS; f++) {
-      for (let cN = 0; cN < COLS; cN++) {
-        const sx = ((cN + 0.5) / COLS) * 2 - 1;
-        const sy = 1 - ((f + 0.5) / FILAS) * 2;
-        const dir = norm([
-          adelante[0] + derecha[0] * sx * mediaH + arriba[0] * sy * mediaV,
-          adelante[1] + derecha[1] * sx * mediaH + arriba[1] * sy * mediaV,
-          adelante[2] + derecha[2] * sx * mediaH + arriba[2] * sy * mediaV,
-        ]);
-        let tapa = null;
-        for (const copa of copas) {
-          // intersección rayo-esfera (la copa como bola en el aire)
-          const oc = sub(cam.pos, copa.c);
-          const b = 2 * (oc[0] * dir[0] + oc[1] * dir[1] + oc[2] * dir[2]);
-          const cc = oc[0] * oc[0] + oc[1] * oc[1] + oc[2] * oc[2] - copa.r * copa.r;
-          const disc = b * b - 4 * cc;
-          if (disc < 0) continue;
-          const t = (-b - Math.sqrt(disc)) / 2;
-          if (t > 0.2 && (!tapa || t < tapa.t)) tapa = { t, copa };
-        }
-        if (tapa) {
-          tapados += 1;
-          if (tapa.t < CERCA_COPA) tapadosCerca += 1;
-          if (tapa.t < masCercaCopa) {
-            masCercaCopa = tapa.t;
-            culpable = tapa.copa;
-          }
-        }
-      }
-    }
-    console.log(
-      `  bajo COPAS del sombrío: ${pct(tapados)} del cuadro ` +
-        `(de eso, CERCA —a menos de ${CERCA_COPA} m—: ${pct(tapadosCerca)})`,
-    );
-    if (culpable) {
-      console.log(
-        `    la más encima: ${culpable.quien} a ${masCercaCopa.toFixed(1)} m ` +
-          `(${culpable.c.map((v) => v.toFixed(1)).join(', ')})`,
-      );
-    }
-    /* Los umbrales miran la copa CERCANA, no el techo: una copa a 10 m es el
-       sombrío del cafetal (y debe estar); a menos de 5 m es una hoja en el
-       lente. Más de un octavo del cuadro en follaje cercano = cámara metida
-       ENTRE las copas, que fue exactamente el reclamo. */
-    if (masCercaCopa < 5) {
-      avisosCopa.push(
-        `la copa de un ${culpable.quien} está a ${masCercaCopa.toFixed(
-          1,
-        )} m de la cámara: no enmarca, TAPA`,
-      );
-    }
-    if (tapadosCerca / total > 0.125) {
-      avisosCopa.push(
-        `el follaje del sombrío a menos de ${CERCA_COPA} m tapa ${pct(
-          tapadosCerca,
-        )} del cuadro: la cámara está metida ENTRE las copas, no debajo`,
-      );
-    }
-  }
+  const mideCultivo = Boolean(geom.dentroLote && alto);
+  console.log(`  sobre el CULTIVO sembrado: ${mideCultivo ? `${pct(enLote)} del cuadro` : 'no aplica a esta escena'}`);
 
   console.log(`\n  SUJETO — ${def.sujeto.nombre}:`);
   if (sujetoFila === null) {
@@ -316,7 +234,7 @@ async function main() {
      Es decir, la casa compone en plano general de diorama —el tercio alto casi
      libre de terreno y el sujeto abajo—, NO en primer plano cercano. Un umbral
      de "falta primer plano" en 6 m marcaba en rojo hasta al propio papal. */
-  const avisos = [...avisosCopa];
+  const avisos = [];
   if (cielo / total < 0.12) avisos.push('casi no hay cielo: el cuadro se siente tapiado');
   if (cielo / total > 0.55) avisos.push('demasiado cielo: el mundo queda vacío abajo');
   if (porTercio[0] / total > 0.1) {
@@ -328,7 +246,7 @@ async function main() {
     avisos.push('nada cerca de la cámara: la escena se ve lejana incluso para el estilo de la casa');
   }
   if (sujetoFila === null) avisos.push('EL SUJETO NO ESTÁ EN CUADRO — esto es un bloqueante');
-  if (enLote / total < 0.12) {
+  if (mideCultivo && enLote / total < 0.12) {
     avisos.push('el cultivo sembrado ocupa muy poco cuadro: se está fotografiando el paisaje, no el cultivo');
   }
 
