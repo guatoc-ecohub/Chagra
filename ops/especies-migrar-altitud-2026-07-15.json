@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-07-15T05:32:05.962Z",
+  "dry_run": true,
+  "altitud": {
+    "solo_canonica": 571,
+    "solo_msnm": 91,
+    "ambas": 79
+  },
+  "temperatura": {
+    "solo_temp": 495,
+    "solo_temp_c": 153,
+    "ambas_temp": 87,
+    "conflicto_temp": 23
+  },
+  "conflictos": [
+    {
+      "id": "tomate",
+      "nombre_comun": "Tomate",
+      "altitud_min_canonica": 0,
+      "altitud_max_canonica": 2400,
+      "altitud_min_msnm": 100,
+      "altitud_max_msnm": 2500
+    },
+    {
+      "id": "maiz",
+      "nombre_comun": "Maíz",
+      "altitud_min_canonica": 0,
+      "altitud_max_canonica": 3000,
+      "altitud_min_msnm": 200,
+      "altitud_max_msnm": 3200
+    },
+    {
+      "id": "frijol",
+      "nombre_comun": "Frijol",
+      "altitud_min_canonica": 0,
+      "altitud_max_canonica": 2800,
+      "altitud_min_msnm": 500,
+      "altitud_max_msnm": 3000
+    }
+  ],
+  "migrar": [
+    {
+      "id": "rosa",
+      "nombre_comun": "Rosa",
+      "altitud_min_msnm": 1800,
+      "altitud_max_msnm": 3000
+    },
+    {
+      "id": "clavel",
+      "nombre_comun": "Clavel",
+      "altitud_min_msnm": 1800,
+      "altitud_max_msnm": 2900
+    },
+    {
+      "id": "crisantemo",
+      "nombre_comun": "Crisantemo",
+      "altitud_min_msnm": 1600,
+      "altitud_max_msnm": 2900
+    },
+    {
+      "id": "vid",
+      "nombre_comun": "Vid",
+      "altitud_min_msnm": 400,
+      "altitud_max_msnm": 2000
+    },
+    {
+      "id": "umari",
+      "nombre_comun": "Umarí",
+      "altitud_min_msnm": 80,
+      "altitud_max_msnm": 500
+    }
+  ]
+}
