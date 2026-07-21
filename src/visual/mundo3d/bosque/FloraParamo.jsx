@@ -227,12 +227,25 @@ function NieblaRasante({ n, reducedMotion }) {
 }
 
 /*
+ * EL PROSCENIO: tres frailejones GIGANTES fijos en el primer plano del lado de
+ * la cámara de reposo (arco az ~55°, radio 4-5.5). Garantizan que —tras el dolly
+ * de llegada— el frailejonal IMPONGA al frente aunque el anillo aleatorio caiga
+ * de otro lado. La roseta plateada queda a la altura de mira (en cuadro). El
+ * campesino se planta a su pie. La queñua (Ent) queda detrás, de guardiana.
+ */
+const PROSCENIO = [
+  { x: 5.7, z: 8.2, escala: 2.3, rotY: 0.5, tiltX: 0.04, tiltZ: -0.05 }, // centro, el mayor
+  { x: 3.5, z: 8.9, escala: 1.9, rotY: 2.6, tiltX: -0.05, tiltZ: 0.05 }, // hacia el borde izq.
+  { x: 7.6, z: 6.6, escala: 2.05, rotY: 4.0, tiltX: 0.05, tiltZ: 0.04 }, // hacia el borde der.
+];
+
+/*
  * FiguraEscala — el campesino de referencia al pie del frailejonal héroe. Se
  * planta en el PRIMER PLANO del lado de la cámara en reposo (dirección al Ent),
  * posado sobre el relieve, mirando hacia el claro (contempla el frailejonal, de
  * espaldas a la cámara: la silueta pequeña que revela la escala del gigante).
  */
-const FIGURA_POS = [3.9, 0, 5.7]; // radio ~6.9 hacia la cámara de reposo
+const FIGURA_POS = [6.6, 0, 9.0]; // al pie del proscenio, en el corredor de cámara
 function FiguraEscala({ mat, alturaDe }) {
   const geo = useMemo(() => geomCampesinoEscala(44), []);
   useLayoutEffect(() => () => geo.dispose(), [geo]);
@@ -305,6 +318,19 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
     return Object.fromEntries(Object.entries(d).map(([k, v]) => [k, posar(v)]));
   }, [conteos, alturaDe]);
 
+  // El proscenio fijo (trío foreground): posado en el relieve, tinte neutro.
+  const proscenio = useMemo(
+    () => PROSCENIO.map((p) => ({
+      pos: [p.x, alturaDe ? alturaDe(p.x, p.z) : 0, p.z],
+      rotY: p.rotY,
+      escala: p.escala,
+      tint: [1, 1, 1],
+      tiltX: p.tiltX,
+      tiltZ: p.tiltZ,
+    })),
+    [alturaDe],
+  );
+
   // Liberar GPU al desmontar.
   useLayoutEffect(() => () => {
     Object.values(geos).forEach((gg) => gg && gg.dispose());
@@ -328,6 +354,7 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
           grandes y cercanos que IMPONEN en primer plano) + tres EDADES
           entremezcladas (joven al ras, adulto, viejo de columna alta) + los que
           florecen. El frailejón vuelve a ser el protagonista visible del páramo. */}
+      <Especie geo={geos.frailejonHero} mat={mat} items={proscenio} castShadow={sombra} />
       <Especie geo={geos.frailejonHero} mat={mat} items={dist.frailejonHero} castShadow={sombra} />
       <Especie geo={geos.frailejonJoven} mat={mat} items={dist.frailejonJoven} />
       <Especie geo={geos.frailejon} mat={mat} items={dist.frailejon} />

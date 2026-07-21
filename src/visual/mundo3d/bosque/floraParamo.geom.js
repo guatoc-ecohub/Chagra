@@ -123,12 +123,12 @@ export const calidadDeTier = (tier) => CALIDAD_TIER[tier] ?? CALIDAD_TIER.medio;
 export const PAL = {
   // Frailejón
   frailejonTronco: '#6f5c40', // tallo bajo la enagua
-  frailejonSeco: '#9a7f57', // enagua: marcescentes pajizas (arriba, recientes)
-  frailejonSeco2: '#67502f', // marcescentes viejas curtidas (abajo, oscuras)
-  frailejonSeco3: '#7f6640', // tono intermedio dorado-marrón (variedad)
-  frailejonPlata: '#d7dccf', // roseta centro: tomento plateado-blanco (la firma)
-  frailejonPlata2: '#a9b593', // hojas externas: plateado-salvia apagado (viejas)
-  frailejonCorazon: '#e9eee2', // cogollo velloso central (el punto más pálido)
+  frailejonSeco: '#8f7550', // enagua: marcescentes pajizas (arriba, recientes)
+  frailejonSeco2: '#6f5a3a', // marcescentes viejas curtidas (abajo) — poco contraste
+  frailejonSeco3: '#7f6845', // tono intermedio dorado-marrón (variedad)
+  frailejonPlata: '#c2cdab', // roseta: tomento plateado-SALVIA (verde plata, no blanco)
+  frailejonPlata2: '#9fac86', // hojas externas: plateado-salvia apagado (viejas)
+  frailejonCorazon: '#d6dec2', // cogollo velloso central (salvia pálido, NO blanco)
   frailejonFlor: '#e6c84e', // capítulos amarillos
   frailejonTallo: '#93a06a', // escapo floral
 
@@ -373,28 +373,30 @@ export function geomFrailejon({ flor = false, q = 1, edad = 0.6 } = {}, seed = 1
   //    superpuestas como tejas de la base a la roseta. Cuanto más abajo, más
   //    viejas y oscuras. El número de anillos escala con la altura (el viejo
   //    lleva hábito largo; el joven, apenas un faldón).
-  const anillos = Math.max(2, Math.round((Ht / 0.24) * q));
-  const porAnillo = Math.max(6, Math.round(10 * q));
+  // La enagua es un FALDÓN GREÑUDO de tiras secas colgando (thatch), NO cestería:
+  // ángulo con jitter fuerte + giro por tira → se cruzan orgánicas, nunca en malla
+  // regular. Tiras ANCHAS y muy aplanadas que cuelgan casi a plomo, pardas
+  // homogéneas (sin el damero claro/oscuro que delataba el tejido).
+  const anillos = Math.max(3, Math.round((Ht / 0.17) * q));
+  const porAnillo = Math.max(8, Math.round(12 * q));
   for (let a = 0; a < anillos; a++) {
     const f = a / anillos; // 0 base(vieja) → 1 bajo la roseta(reciente)
-    const y = 0.1 + f * (Ht - 0.06);
-    const rad = 0.15;
+    const y = 0.06 + f * (Ht - 0.02);
+    const rad = 0.14;
     for (let i = 0; i < porAnillo; i++) {
-      const ang = (i / porAnillo) * Math.PI * 2 + a * 0.55;
-      const largo = 0.32 + r() * 0.16;
-      // lámina seca ancha (6 lados, aplanada) colgando casi a plomo y algo afuera.
-      const hoja = new THREE.ConeGeometry(0.11, largo, 6, 1);
+      const ang = (i / porAnillo) * Math.PI * 2 + (r() - 0.5) * 1.15;
+      const largo = 0.34 + r() * 0.24;
+      const cae = 0.1 + r() * 0.16; // cuánto se abre de la vertical (poco)
+      const hoja = new THREE.ConeGeometry(0.15 + r() * 0.035, largo, 5, 1);
       apuntar(
         hoja,
         [Math.cos(ang) * rad, y, Math.sin(ang) * rad],
-        [Math.cos(ang) * 0.32, -1, Math.sin(ang) * 0.32],
-        [1, 1, 0.5],
+        [Math.cos(ang) * cae, -1, Math.sin(ang) * cae],
+        [1, 1, 0.3],
+        (r() - 0.5) * 0.9,
       );
-      // pajiza arriba (reciente) → curtida oscura abajo (vieja), con variedad.
-      const tono = f > 0.55
-        ? (r() > 0.5 ? PAL.frailejonSeco : PAL.frailejonSeco3)
-        : (r() > 0.5 ? PAL.frailejonSeco3 : PAL.frailejonSeco2);
-      partes.push(pintar(hoja, variar(tono, r, 0.12)));
+      const tono = r() > 0.6 ? PAL.frailejonSeco : (r() > 0.4 ? PAL.frailejonSeco3 : PAL.frailejonSeco2);
+      partes.push(pintar(hoja, variar(tono, r, 0.08)));
     }
   }
 
@@ -402,18 +404,20 @@ export function geomFrailejon({ flor = false, q = 1, edad = 0.6 } = {}, seed = 1
   //    redonda, nunca cerdas) en espiral áurea sobre una cúpula, erguidas al
   //    centro y recostadas al borde, muy densas → una bola velluda plateada.
   //    Tomento horneado en gradiente (base salvia → punta casi blanca).
-  const nRoseta = Math.max(18, Math.round(38 * q));
+  const nRoseta = Math.max(16, Math.round(32 * q));
   const wSeg = Math.max(5, Math.round(6 * q));
   const hSeg = Math.max(3, Math.round(4 * q));
   const plataInt = new THREE.Color(PAL.frailejonPlata);
   const plataExt = new THREE.Color(PAL.frailejonPlata2);
+  // Roseta = CUENCO ancho y aplanado de hojas que RADIAN (no una bola): las
+  // externas se recuestan casi horizontales (estrella), el centro apenas erguido.
   const hojaRoseta = (f, ang, extraTilt = 0) => {
-    const posR = (0.02 + f * 0.12) * rosF; // nacen sobre una cúpula, no de un punto
-    const posY = cy - f * 0.1 * rosF; // borde más bajo → domo redondo
-    const tilt = 0.2 + f * 0.62 + (r() - 0.5) * 0.09 + extraTilt; // cuenco 11°→47°
+    const posR = (0.03 + f * 0.19) * rosF; // nacen sobre una cúpula ANCHA
+    const posY = cy - f * 0.17 * rosF; // borde bien caído → cuenco plano, no domo
+    const tilt = 0.34 + f * 0.86 + (r() - 0.5) * 0.1 + extraTilt; // 19°→~69° (se abren)
     const s = Math.sin(tilt);
-    const largo = (0.27 + (1 - f) * 0.13 + r() * 0.05) * rosF; // cortas y llenas
-    const hoja = petalo((0.1 + f * 0.02) * rosF, largo, 0.06, wSeg, hSeg);
+    const largo = (0.3 + (1 - f) * 0.1 + r() * 0.05) * rosF; // anchas y llenas
+    const hoja = petalo((0.12 + f * 0.03) * rosF, largo, 0.05, wSeg, hSeg);
     const base = variar(plataInt.clone().lerp(plataExt, f), r, 0.05);
     pintarGradiente(hoja, base, PAL.frailejonCorazon, 0, largo);
     apuntar(
@@ -441,7 +445,7 @@ export function geomFrailejon({ flor = false, q = 1, edad = 0.6 } = {}, seed = 1
     const s = Math.sin(tilt);
     const largoC = (0.16 + r() * 0.05) * rosF;
     const hoja = petalo(0.072 * rosF, largoC, 0.052, wSeg, hSeg);
-    pintarGradiente(hoja, variar(PAL.frailejonPlata, r, 0.04), '#f3f6ee', 0, largoC);
+    pintarGradiente(hoja, variar(PAL.frailejonPlata, r, 0.04), '#e2e8d0', 0, largoC);
     apuntar(
       hoja,
       [Math.cos(ang) * 0.025, cy + 0.04, Math.sin(ang) * 0.025],
@@ -981,12 +985,13 @@ function sembrar(n, rMin, rMax, r, opts = {}) {
 export function distribucionFlora(conteos, seed = 707) {
   const c = conteos;
   return {
-    // Banda HÉROE (2026-07-20): los gigantes de PRIMER PLANO. Un anillo cercano y
-    // parejo (uniforme) de adultos GRANDES (esc 1.5-1.95 → 3-4 m) que rodea el
-    // claro a media distancia: desde cualquier ángulo de órbita, varios quedan
-    // enmarcando la cámara e IMPONEN. Ladeo generoso para que ninguno se lea
-    // clonado. Son la firma del páramo — el personaje principal, por fin visible.
-    frailejonHero: sembrar(c.frailejonHero, 5.5, 9.5, rng(seed + 21), { eMin: 1.5, eMax: 1.95, uniforme: true, varia: 0.12, lean: 0.16 }),
+    // Banda HÉROE (2026-07-20): los gigantes de PRIMER PLANO. Un anillo CERCANO y
+    // parejo (uniforme) de adultos GRANDES (esc 1.65-2.15 → 3.5-4.5 m) que rodea
+    // el claro pegado a la cámara: desde cualquier ángulo de órbita, varios
+    // quedan enmarcando el cuadro e IMPONEN por delante de la queñua. Ladeo
+    // generoso para que ninguno se lea clonado. La firma del páramo, por fin al
+    // frente. (El proscenio fijo de FloraParamo.jsx garantiza el trío foreground.)
+    frailejonHero: sembrar(c.frailejonHero, 6.0, 10.5, rng(seed + 21), { eMin: 1.65, eMax: 2.15, uniforme: true, varia: 0.12, lean: 0.16 }),
     // Frailejonal de acompañamiento: TRES edades entremezcladas, agrupadas y
     // ACERCADAS al claro (rMin bajado desde el rediseño 07-16) con mucha
     // variación de tamaño + ladeo → gradiente de edad denso, nada clonado.
