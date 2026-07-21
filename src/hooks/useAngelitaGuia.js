@@ -94,9 +94,9 @@ const HOLGURA_VERTICAL = 6;
  * @param {Object} [opciones]
  * @param {number} [opciones.tamano=64]
  * @param {number} [opciones.margen=14]
- * @param {number} [opciones.viewportW] — default window.innerWidth.
- * @param {number} [opciones.viewportH] — default window.innerHeight.
- * @param {'izquierda'|'derecha'} [opciones.ladoForzado] — la pantalla puede
+ * @param {number} [opciones.viewportW] - default window.innerWidth.
+ * @param {number} [opciones.viewportH] - default window.innerHeight.
+ * @param {'izquierda'|'derecha'} [opciones.ladoForzado] - la pantalla puede
  *   pisar la elección automática (elemento angosto y centrado, por ejemplo).
  * @returns {{x:number,y:number,lado:'izquierda'|'derecha',direccion:'izquierda'|'derecha',enVista:boolean}|null}
  */
@@ -140,21 +140,21 @@ export function calcularPuestoGuia(rect, opciones = {}) {
  * @property {string} id
  * @property {Object|Function} ref — ref de React ({current}) o getter.
  * @property {string} texto — lo que dice en la burbuja (agroecología real).
- * @property {string} [gesto='senala'] — uno de ESTADOS_ANGELITA (o alias).
- * @property {string} [tipo='sugerencia'] — uno de TIPOS_AVISO (color/ícono).
- * @property {'izquierda'|'derecha'} [lado] — pisa el lado automático.
+ * @property {string} [gesto='senala'] - uno de ESTADOS_ANGELITA (o alias).
+ * @property {string} [tipo='sugerencia'] - uno de TIPOS_AVISO (color/ícono).
+ * @property {'izquierda'|'derecha'} [lado] - pisa el lado automático.
  */
 
 /**
  * @param {ParadaGuia[]} paradas
  * @param {Object} [opciones]
- * @param {boolean} [opciones.activo=true] — el host puede apagar toda la guía.
+ * @param {boolean} [opciones.activo=true] - el host puede apagar toda la guía.
  * @param {number} [opciones.tamano=64]
  * @param {number} [opciones.margenViewport=14]
  * @param {number} [opciones.demoraInicialMs=550]
- * @param {string} [opciones.recordarCierreId] — si se da, cerrar() persiste en
+ * @param {string} [opciones.recordarCierreId] - si se da, cerrar() persiste en
  *   este dispositivo (localStorage) y la guía no vuelve a aparecer sola.
- * @param {boolean} [opciones.variar=true] — false = texto literal (tests / sin
+ * @param {boolean} [opciones.variar=true] - false = texto literal (tests / sin
  *   red del pool LLM de angelitaVariedad).
  */
 export function useAngelitaGuia(paradas = [], opciones = {}) {
