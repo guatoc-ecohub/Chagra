@@ -74,6 +74,7 @@ import {
   CSS_ROTULOS,
   CORTE_POS as CORTE_POS_EM,
 } from '../visual/mundo3d/bosque/EscenaEntMaestro.jsx';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { CIELOS_HORA, mezclaHex } from '../visual/mundo3d/cielosHoraData.js';
 import { PALETA, mezclar } from '../visual/mundo3d/atmosferaMadre.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
@@ -365,6 +366,114 @@ function SolVelado() {
   );
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   LA SILUETA DEL FRAILEJÓN — que se LEA como frailejón desde lejos, no como
+   hongo/parasol. El porte es CAULIRROSULADO (roseta sobre tallo): un tallo
+   leñoso columnar VESTIDO con la "enagua" (hojas muertas marcescentes que
+   cuelgan del tallo y lo hacen peludo, no un palo liso), rematado por una
+   ROSETA de hojas lanceoladas plateadas que RADIAN hacia arriba-afuera. Esos
+   tres rasgos —columna+enagua colgante+roseta radiante— son lo que distingue a
+   un frailejón de un hongo. Se construye UNA sola vez y se INSTANCIA para todo
+   el frailejonal (2 draw calls).
+   ── Gotcha mergeGeometries: se DESINDEXA todo antes de fusionar; mezclar
+   indexada+no-indexada devuelve null EN SILENCIO y la planta no se dibuja. ── */
+const _colorFrai = (geo, hex) => {
+  const c = new THREE.Color(hex);
+  const n = geo.attributes.position.count;
+  const arr = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    arr[i * 3] = c.r; arr[i * 3 + 1] = c.g; arr[i * 3 + 2] = c.b;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+  return geo;
+};
+const _ponerFrai = (geo, pos = [0, 0, 0], rot = [0, 0, 0], sc = [1, 1, 1]) => {
+  geo.applyMatrix4(new THREE.Matrix4().compose(
+    new THREE.Vector3(pos[0], pos[1], pos[2]),
+    new THREE.Quaternion().setFromEuler(new THREE.Euler(rot[0], rot[1], rot[2])),
+    new THREE.Vector3(sc[0], sc[1], sc[2]),
+  ));
+  return geo;
+};
+/* Una HOJA lanceolada: cono de 4 caras con la BASE en el origen (para pivotar
+   la hoja desde donde se ancla al tallo, como una hoja real). */
+const _hojaFrai = (largo, ancho) =>
+  new THREE.ConeGeometry(ancho, largo, 4).translate(0, largo / 2, 0);
+const _fusionarFrai = (partes) => {
+  const buenas = partes.filter(Boolean).map((p) => {
+    const plana = p.index ? p.toNonIndexed() : p;
+    if (plana !== p) p.dispose();
+    return plana;
+  });
+  const g = mergeGeometries(buenas, false);
+  if (!g) throw new Error('MundoParamo3D: mergeGeometries devolvió null (silueta frailejón)');
+  return g;
+};
+
+/* El TALLO + ENAGUA (altura unidad = 1.0, base en y=0; la instancia lo escala
+   por edad). Núcleo leñoso fino cubierto por dos coronas de hojas marcescentes
+   que CUELGAN hacia abajo-afuera — la barba de hojas secas que viste al fraile. */
+function geomTalloEnaguaFrai() {
+  const tallo = mezclar(P.frailejonTallo, '#8a7a54', 0.3);
+  const enaguaVieja = mezclar(P.frailejonTallo, '#6a5636', 0.5); // curtida, abajo
+  const enaguaNueva = mezclar(P.frailejonTallo, TINTE, 0.18); // reciente, arriba
+  const partes = [];
+  // núcleo columnar leñoso (fino: la enagua lo tapa)
+  partes.push(_colorFrai(
+    new THREE.CylinderGeometry(0.1, 0.14, 1.0, 7).translate(0, 0.5, 0),
+    tallo,
+  ));
+  // dos coronas de hojas marcescentes colgando (down-out): la "enagua"
+  const rng = crearRng(451);
+  const corona = (y, n, inc, largo, hex, fase) => {
+    for (let i = 0; i < n; i++) {
+      const ang = (i / n) * Math.PI * 2 + fase + rng() * 0.18;
+      const hoja = _colorFrai(_hojaFrai(largo + rng() * 0.08, 0.05), hex);
+      // inc > PI/2 → la punta cae hacia abajo (hoja muerta colgando)
+      _ponerFrai(hoja, [Math.cos(ang) * 0.12, y, Math.sin(ang) * 0.12], [inc, -ang, 0]);
+      partes.push(hoja);
+    }
+  };
+  corona(0.34, 10, 2.5, 0.4, enaguaVieja, 0);
+  corona(0.66, 9, 2.2, 0.36, mezclar(enaguaVieja, enaguaNueva, 0.5), 0.4);
+  corona(0.9, 7, 1.95, 0.3, enaguaNueva, 0.8);
+  return _fusionarFrai(partes);
+}
+
+/* La ROSETA plateada: tres coronas de hojas lanceoladas que radian hacia
+   arriba-afuera sobre un domo pálido — la firma "lanuda" del frailejón. NO un
+   cono liso (eso lee como sombrilla). Footprint ~0.55 de radio (como el rodal
+   previo), para no alterar la densidad del frailejonal. */
+function geomRosetaFrai() {
+  const hojaBase = mezclar(P.frailejonHoja, '#9fb489', 0.25); // salvia
+  const hojaPunta = mezclar('#d7e0c6', TINTE, 0.12); // plata clara (indumento)
+  const cogollo = mezclar('#eef2e6', TINTE, 0.08); // el corazón afelpado, lo más pálido
+  const partes = [];
+  // domo pálido: el cuerpo de la roseta bajo las hojas (le da bulto, no hueco)
+  partes.push(_colorFrai(
+    new THREE.SphereGeometry(0.2, 10, 7).scale(1, 0.62, 1).translate(0, 0.06, 0),
+    mezclar(hojaBase, cogollo, 0.35),
+  ));
+  const rng = crearRng(929);
+  const corona = (n, inc, largo, ancho, hex, fase) => {
+    for (let i = 0; i < n; i++) {
+      const ang = (i / n) * Math.PI * 2 + fase + rng() * 0.12;
+      const hoja = _colorFrai(_hojaFrai(largo + rng() * 0.08, ancho), hex);
+      _ponerFrai(hoja, [Math.cos(ang) * 0.14, 0.05, Math.sin(ang) * 0.14], [inc, -ang, 0]);
+      partes.push(hoja);
+    }
+  };
+  // externa: ancha y arqueada afuera (el faldón de la roseta)
+  corona(16, 1.12, 0.5, 0.085, hojaBase, 0);
+  // media
+  corona(12, 0.78, 0.44, 0.075, mezclar(hojaBase, hojaPunta, 0.4), 0.35);
+  // interna: corta y erguida, la más plateada (el cogollo lanudo)
+  corona(8, 0.4, 0.32, 0.065, hojaPunta, 0.7);
+  // botón velloso central
+  partes.push(_colorFrai(new THREE.SphereGeometry(0.1, 10, 7).translate(0, 0.16, 0), cogollo));
+  return _fusionarFrai(partes);
+}
+
 /* ── Frailejón protagonista: el detalle que enseña la planta. Tallo velludo
       (cilindro + falda de hojas secas marcescentes), roseta plateada de hojas
       lanceoladas y, arriba, la vara con capítulos amarillos. Junto al agua. ── */
@@ -479,30 +588,37 @@ function FrailejonalInstanciado({ n }) {
     return lista;
   }, [n]);
 
+  // Geometrías-firma del frailejón (tallo+enagua y roseta radiante), construidas
+  // UNA vez y compartidas por todas las instancias (2 draw calls para el rodal).
+  const geoTallo = useMemo(() => geomTalloEnaguaFrai(), []);
+  const geoRoseta = useMemo(() => geomRosetaFrai(), []);
+  useEffect(() => () => { geoTallo.dispose(); geoRoseta.dispose(); }, [geoTallo, geoRoseta]);
+
   useEffect(() => {
     const mt = tallos.current, mr = rosetas.current;
     if (!mt || !mr) return;
     const dummy = new THREE.Object3D();
     const tinte = new THREE.Color();
-    const baseTallo = new THREE.Color(P.frailejonTallo);
-    const baseHoja = new THREE.Color(P.frailejonHoja);
     sitios.forEach((s, i) => {
       const stemH = s.esc * s.alto; // altura visible del tallo (cilindro h=1.0)
-      // tallo: los ancianos más curtidos (oscurecen), los jóvenes casi ocultos
-      dummy.position.set(s.wx, s.y + stemH * 0.5, s.wz);
+      // el color base ya vive en la geometría (vertex colors); la instancia solo
+      // MODULA (multiplica) por edad: ancianos algo más curtidos, jóvenes claros
+      dummy.position.set(s.wx, s.y, s.wz);
       dummy.rotation.set(s.ladeo, s.giro, 0);
       dummy.scale.set(s.esc, Math.max(s.esc * s.alto, 0.02), s.esc);
       dummy.updateMatrix();
       mt.setMatrixAt(i, dummy.matrix);
-      tinte.copy(baseTallo).offsetHSL(0, 0, -0.03 * s.edad + ((i % 5) * 0.01 - 0.02));
+      const gt = 1 - 0.05 * s.edad + ((i % 5) * 0.012 - 0.024);
+      tinte.setRGB(gt, gt * 0.99, gt * 0.97);
       mt.setColorAt(i, tinte);
       // roseta sobre el tallo; los ancianos la lucen algo más plateada (clara)
-      dummy.position.set(s.wx, s.y + stemH + 0.14 * s.esc, s.wz);
-      dummy.rotation.set(s.ladeo, s.giro, 0);
-      dummy.scale.set(s.esc, s.esc * 0.7, s.esc);
+      dummy.position.set(s.wx, s.y + stemH + 0.02 * s.esc, s.wz);
+      dummy.rotation.set(s.ladeo * 0.5, s.giro * 1.3, 0);
+      dummy.scale.set(s.esc, s.esc, s.esc);
       dummy.updateMatrix();
       mr.setMatrixAt(i, dummy.matrix);
-      tinte.copy(baseHoja).offsetHSL(0, -0.02 * s.edad, 0.02 * s.edad + ((i % 4) * 0.012 - 0.018));
+      const gr = 1 + 0.035 * s.edad + ((i % 4) * 0.014 - 0.02);
+      tinte.setRGB(Math.min(gr * 0.99, 1.1), Math.min(gr, 1.12), Math.min(gr * 0.98, 1.08));
       mr.setColorAt(i, tinte);
     });
     mt.instanceMatrix.needsUpdate = true;
@@ -513,15 +629,133 @@ function FrailejonalInstanciado({ n }) {
 
   return (
     <group>
+      {/* tallo leñoso VESTIDO de enagua (hojas muertas colgando): fat-stem peludo */}
       <instancedMesh ref={tallos} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
-        <cylinderGeometry args={[0.16, 0.22, 1.0, 7]} />
-        <meshLambertMaterial flatShading />
+        <primitive object={geoTallo} attach="geometry" />
+        <meshLambertMaterial flatShading vertexColors />
       </instancedMesh>
-      {/* la roseta como cono facetado: sus caras leen como hojas radiantes */}
+      {/* la roseta como estrella de hojas lanceoladas radiantes (NO cono liso) */}
       <instancedMesh ref={rosetas} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
-        <coneGeometry args={[0.5, 0.5, 9]} />
-        <meshLambertMaterial flatShading />
+        <primitive object={geoRoseta} attach="geometry" />
+        <meshLambertMaterial flatShading vertexColors />
       </instancedMesh>
+    </group>
+  );
+}
+
+/* ── FRAILEJÓN ANCIANO REAL (sin rostro): un patriarca alto y entero que sirve
+      de ANCLA DE ESCALA. Reusa la silueta-firma (tallo+enagua colgante + roseta
+      radiante plateada) a tamaño de detalle, coronado por el escapo florido. Un
+      Espeletia de siglos alcanza ~3 m: junto a una figura humana, el ojo calibra
+      la inmensidad (Shadow of the Colossus: la escala por contraste conocido). ── */
+function FrailejonAnciano({ pos, esc = 1, giro = 0, reducedMotion }) {
+  const flor = useRef(null);
+  const geoTallo = useMemo(() => geomTalloEnaguaFrai(), []);
+  const geoRoseta = useMemo(() => geomRosetaFrai(), []);
+  useEffect(() => () => { geoTallo.dispose(); geoRoseta.dispose(); }, [geoTallo, geoRoseta]);
+  useFrame(({ clock }) => {
+    if (reducedMotion || !flor.current) return;
+    flor.current.rotation.z = Math.sin(clock.elapsedTime * 0.6) * 0.05;
+  });
+  const ALTO = 2.5; // altura del tallo (unidad 1.0 escalada) → ~3 m de escena
+  return (
+    <group position={pos} rotation={[0, giro, 0]} scale={esc}>
+      {/* tallo vestido de enagua, estirado a patriarca */}
+      <mesh geometry={geoTallo} scale={[1.15, ALTO, 1.15]} castShadow>
+        <meshLambertMaterial flatShading vertexColors />
+      </mesh>
+      {/* roseta plateada plena sobre la corona del tallo */}
+      <mesh geometry={geoRoseta} position={[0, ALTO + 0.04, 0]} scale={1.25} castShadow>
+        <meshLambertMaterial flatShading vertexColors />
+      </mesh>
+      {/* escapo florido: la vara de capítulos amarillos que asoma de la roseta */}
+      <group ref={flor} position={[0.16, ALTO + 0.12, 0.08]} rotation={[0, 0, -0.22]}>
+        <mesh position={[0, 0.34, 0]}>
+          <cylinderGeometry args={[0.025, 0.035, 0.72, 5]} />
+          <meshLambertMaterial color={mezclar(P.frailejonHoja, TINTE, 0.4)} flatShading />
+        </mesh>
+        {[[0.02, 0.66, 0.05], [0.1, 0.58, -0.03], [-0.06, 0.56, 0.05], [0.03, 0.72, -0.02]].map((f, i) => (
+          <mesh key={i} position={/** @type {[number, number, number]} */ (f)}>
+            <sphereGeometry args={[0.075, 8, 6]} />
+            <meshLambertMaterial color={P.frailejonFlor} emissive="#7a5e18" emissiveIntensity={0.2} flatShading />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  );
+}
+
+/* ── CAMINANTE DEL PÁRAMO: una figura humana sencilla y digna (campesina/
+      guardapáramo, con ruana y sombrero) que mira hacia arriba al frailejón
+      anciano. Es la REFERENCIA DE ESCALA HUMANA: ~1.65 de alto, para que el ojo
+      mida la inmensidad del frailejonal. Baja poligonización, cero rostro (una
+      silueta respetuosa, no un personaje). ── */
+function CaminanteParamo({ pos, giro = 0, reducedMotion }) {
+  const cuerpo = useRef(null);
+  useFrame(({ clock }) => {
+    if (reducedMotion || !cuerpo.current) return;
+    // respira apenas, quieta, contemplando (no baila)
+    cuerpo.current.rotation.z = Math.sin(clock.elapsedTime * 0.5) * 0.012;
+  });
+  const RUANA = '#a85f3c'; // lana terracota — un acento cálido contra la plata fría
+  const RUANA_B = mezclar('#7d4426', TINTE, 0.12);
+  const PIEL = mezclar('#a9805c', TINTE, 0.15);
+  const PANTALON = mezclar('#3f4a52', TINTE, 0.2);
+  const SOMBRERO = mezclar('#c9ad6a', TINTE, 0.18); // paja
+  const BOTA = mezclar('#2c2a26', TINTE, 0.12);
+  return (
+    <group position={pos} rotation={[0, giro, 0]}>
+      <group ref={cuerpo}>
+        {/* piernas + botas */}
+        {[-1, 1].map((s) => (
+          <group key={s} position={[s * 0.11, 0, 0]}>
+            <mesh position={[0, 0.36, 0]} castShadow>
+              <cylinderGeometry args={[0.07, 0.06, 0.72, 6]} />
+              <meshLambertMaterial color={PANTALON} flatShading />
+            </mesh>
+            <mesh position={[0, 0.04, 0.03]}>
+              <boxGeometry args={[0.13, 0.1, 0.22]} />
+              <meshLambertMaterial color={BOTA} flatShading />
+            </mesh>
+          </group>
+        ))}
+        {/* torso bajo la ruana */}
+        <mesh position={[0, 1.0, 0]}>
+          <cylinderGeometry args={[0.16, 0.19, 0.62, 8]} />
+          <meshLambertMaterial color={RUANA_B} flatShading />
+        </mesh>
+        {/* la RUANA: manto cuadrado que cae del hombro (cono facetado abierto) */}
+        <mesh position={[0, 1.02, 0]} castShadow>
+          <coneGeometry args={[0.34, 0.66, 4, 1, true]} />
+          <meshLambertMaterial color={RUANA} flatShading side={THREE.DoubleSide} />
+        </mesh>
+        {/* cuello de la ruana (banda más oscura) */}
+        <mesh position={[0, 1.3, 0]}>
+          <cylinderGeometry args={[0.1, 0.12, 0.12, 8]} />
+          <meshLambertMaterial color={RUANA_B} flatShading />
+        </mesh>
+        {/* cabeza (mira un poco hacia arriba, contemplando el frailejón) */}
+        <group position={[0, 1.46, 0.02]} rotation={[-0.18, 0, 0]}>
+          <mesh castShadow>
+            <sphereGeometry args={[0.115, 10, 9]} />
+            <meshLambertMaterial color={PIEL} flatShading />
+          </mesh>
+          {/* sombrero de paja: copa + ala ancha */}
+          <mesh position={[0, 0.11, 0]}>
+            <cylinderGeometry args={[0.1, 0.115, 0.12, 10]} />
+            <meshLambertMaterial color={SOMBRERO} flatShading />
+          </mesh>
+          <mesh position={[0, 0.06, 0]} rotation={[0, 0, 0]}>
+            <cylinderGeometry args={[0.24, 0.24, 0.02, 12]} />
+            <meshLambertMaterial color={SOMBRERO} flatShading />
+          </mesh>
+        </group>
+        {/* bordón/bastón de caminata (una línea vertical que ayuda a leer la escala) */}
+        <mesh position={[0.26, 0.62, 0.06]} rotation={[0, 0, 0.06]}>
+          <cylinderGeometry args={[0.018, 0.022, 1.28, 6]} />
+          <meshLambertMaterial color={mezclar('#6b4a2a', TINTE, 0.2)} flatShading />
+        </mesh>
+      </group>
     </group>
   );
 }
@@ -1920,6 +2154,13 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
       <FrailejonHeroe pos={[HERO_X, HERO_Y, HERO_Z]} reducedMotion={reducedMotion} />
       <BarbuditoDelFrailejon tier={tier} reducedMotion={reducedMotion} />
       <FrailejonalInstanciado n={nFrailejones} />
+
+      {/* ══ ANCLA DE ESCALA HUMANA ══ un frailejón ANCIANO (patriarca de ~3 m)
+          al frente-izquierda con una CAMINANTE del páramo a su pie, mirándolo:
+          el ojo mide la inmensidad por la figura humana conocida (frente-derecha
+          la equilibra la danta). La honestidad de la escala, no un rótulo. */}
+      <FrailejonAnciano pos={[-5.3, alturaParamo(-5.3, 5.4) - 0.05, 5.4]} esc={1.0} giro={0.5} reducedMotion={reducedMotion} />
+      <CaminanteParamo pos={[-4.15, alturaParamo(-4.15, 6.0), 6.0]} giro={-2.2} reducedMotion={reducedMotion} />
       <Pajonal n={nPaja} />
       <CojinesMusgo n={nMusgo} />
       <RomeroParamo n={nRomero} />
