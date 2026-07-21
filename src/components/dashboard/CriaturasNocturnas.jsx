@@ -13,10 +13,11 @@
  * comparten <CriaturasNocturnasDefs/> (glow + blur). El ROSTER se exporta para
  * que la vitrina —u otras superficies— lo pinten sin duplicar datos.
  *
- * NIVEL PERSONAJE: murciélago, gurre y tigrillo dejaron de ser siluetas-chip y
- * son personajes completos (anatomía diagnóstica real, peso, gesto y animación
- * rubber-hose andina — boil steps ~12fps, parpadeo irregular, mirada co-prima;
- * clases cn-* nuevas al final de criaturas-nocturnas.css).
+ * NIVEL PERSONAJE: las OCHO dejaron de ser siluetas-chip y son personajes
+ * completos (anatomía diagnóstica real, peso, gesto y animación rubber-hose
+ * andina — boil steps ~12fps, parpadeo irregular, mirada co-prima). Marteja,
+ * luciérnaga y cóndor se elevaron al mismo nivel que las otras cinco; clases
+ * cn-* nuevas al final de criaturas-nocturnas.css.
  */
 import { useId } from 'react';
 import { LineBoilFilter } from '../../visual/creatures/LineBoilFilter';
@@ -535,63 +536,221 @@ function AvatarMurcielago() {
   );
 }
 
-/* Luciérnaga / cocuyo (Lampyridae): escarabajo con élitros oscuros, antenas y
-   abdomen bioluminiscente pulsante. Acento lima. */
+/* Luciérnaga / cocuyo (Lampyridae) — PERSONAJE COMPLETO.
+   Pose: posada en una HOJA sana, con el FAROL (los últimos segmentos del
+   abdomen) latiendo — su luz solo prende donde el campo está limpio, y ese
+   pulso es todo el personaje. Anatomía real del coleóptero: cabeza con ojos
+   compuestos medio escondida bajo el PRONOTO (el escudo semicircular con margen
+   pálido), ÉLITROS oscuros con la sutura al medio y filas punteadas, SEIS patas
+   articuladas agarrando la hoja y antenas filiformes. La bioluminiscencia
+   proyecta un charco de luz sobre la hoja: el bioindicador en vivo. Acento lima. */
 function AvatarLuciernaga() {
+  const uid = useId().replace(/[:]/g, '');
+  const boilId = `cn-boil-luci-${uid}`;
+
   return (
-    <g className="cn-av-flota">
-      <g filter="url(#cn-glow1)">
-        <circle className="cn-luz-halo" cx="7" cy="4" r="7" fill="#d8ff6a" opacity="0.4" filter="url(#cn-blur3)" />
-        {/* élitros */}
-        <ellipse cx="-0.5" cy="-1" rx="6.8" ry="4.6" fill="#171030" stroke="#c6ff4f" strokeWidth="0.8" strokeOpacity="0.7" />
-        <path d="M-0.5,-5.4 L-0.5,3.4" stroke="#9dff3f" strokeWidth="0.7" opacity="0.6" />
-        {/* pronoto / cabeza */}
-        <circle cx="-6.5" cy="-2.6" r="2.6" fill="#1c1338" stroke="#c6ff4f" strokeWidth="0.7" strokeOpacity="0.6" />
-        {/* antenas */}
-        <path d="M-8,-4 C-11,-6.4 -13.5,-6.4 -15.5,-5.2 M-8,-2.8 C-11,-4 -13.5,-3.4 -15.5,-2.2" stroke="#c6ff4f" strokeWidth="0.7" fill="none" strokeLinecap="round" />
-        {/* abdomen bioluminiscente */}
-        <ellipse className="cn-luz" cx="7" cy="3.4" rx="3.4" ry="2.8" fill="#f6ffb0" style={{ filter: 'drop-shadow(0 0 6px #d8ff6a)' }} />
-        <circle cx="7" cy="3.4" r="1.3" fill="#ffffff" opacity="0.9" />
-        {/* patitas */}
-        <path d="M-3,3 l-1.6,3 M0,4 l-0.4,3 M3,3.4 l1,3" stroke="#9dff3f" strokeWidth="0.7" strokeLinecap="round" />
+    <g className="cn-av-flota" filter="url(#cn-glow1)">
+      <defs>
+        <LineBoilFilter id={boilId} baseFrequency={0.042} scale={1.3} animated={!CN_REDUCED} dur="0.4s" />
+      </defs>
+
+      {/* ── la HOJA sana donde vive (su luz solo prende en campo limpio) ── */}
+      <g filter={`url(#${boilId})`}>
+        <path d="M-11,13.4 C-5,9.6 6,9.6 12,13.4 C6,17.4 -5,17.4 -11,13.4 Z"
+          fill="#141a3a" stroke="#c6ff4f" strokeWidth="0.7" strokeOpacity="0.4" />
+        <path d="M-9.6,13.4 C-3.6,12.8 5,12.8 10.6,13.4" fill="none" stroke="#9dff3f" strokeWidth="0.5" opacity="0.4" />
+        <g stroke="#9dff3f" strokeWidth="0.4" fill="none" opacity="0.3">
+          <path d="M-4,13 C-4.8,12 -5.4,11.4 -5.8,11" /><path d="M0.6,12.8 L0.6,11.2" /><path d="M5,13 C5.8,12 6.4,11.4 6.8,11" />
+        </g>
       </g>
+
+      {/* charco de luz sobre la hoja + halo bioluminiscente pulsante */}
+      <ellipse className="cn-luci-charco" cx="0.6" cy="12.6" rx="6.6" ry="2.4" fill="#d8ff6a" opacity="0.18" filter="url(#cn-blur3)" />
+      <circle className="cn-luz-halo" cx="0.4" cy="9" r="7.6" fill="#d8ff6a" opacity="0.42" filter="url(#cn-blur3)" />
+
+      {/* ── el escarabajo (line-boil de contorno) ── */}
+      <g filter={`url(#${boilId})`}>
+        {/* SEIS patas articuladas agarrando la hoja */}
+        <g className="cn-luci-patas" stroke="#9dff3f" strokeWidth="0.85" strokeLinecap="round" fill="none" opacity="0.85">
+          <path d="M-3.8,-1.4 C-6.8,-1.2 -8.8,0.4 -9.6,2.8" />
+          <path d="M-4.2,1.6 C-7,2.4 -8.8,4.6 -9,7.4" />
+          <path d="M-3.6,4.6 C-6,6.4 -7.4,9 -7.6,12" />
+          <path d="M3.8,-1.4 C6.8,-1.2 8.8,0.4 9.6,2.8" />
+          <path d="M4.2,1.6 C7,2.4 8.8,4.6 9,7.4" />
+          <path d="M3.6,4.6 C6,6.4 7.4,9 7.6,12" />
+          <circle cx="-8.8" cy="0.4" r="0.42" fill="#c6ff4f" stroke="none" opacity="0.7" />
+          <circle cx="8.8" cy="0.4" r="0.42" fill="#c6ff4f" stroke="none" opacity="0.7" />
+        </g>
+
+        {/* antenas filiformes hacia adelante (twitch fino) */}
+        <g className="cn-luci-antena">
+          <path d="M-1.8,-8 C-4,-10.8 -6.2,-11.8 -8.4,-11.6" fill="none" stroke="#c6ff4f" strokeWidth="0.75" strokeLinecap="round" />
+          <path d="M1.8,-8 C4,-10.8 6.2,-11.8 8.4,-11.6" fill="none" stroke="#c6ff4f" strokeWidth="0.75" strokeLinecap="round" />
+          <circle cx="-8.4" cy="-11.6" r="0.55" fill="#c6ff4f" /><circle cx="8.4" cy="-11.6" r="0.55" fill="#c6ff4f" />
+        </g>
+
+        {/* cabeza con ojos compuestos, medio oculta bajo el pronoto */}
+        <ellipse cx="0" cy="-7.2" rx="2.4" ry="1.9" fill="#141a3a" stroke="#c6ff4f" strokeWidth="0.6" strokeOpacity="0.6" />
+        <circle cx="-1.5" cy="-7.4" r="1" fill="#04160f" stroke="#c6ff4f" strokeWidth="0.4" />
+        <circle cx="1.5" cy="-7.4" r="1" fill="#04160f" stroke="#c6ff4f" strokeWidth="0.4" />
+        <circle cx="-1.2" cy="-7.8" r="0.35" fill="#eafff6" /><circle cx="1.8" cy="-7.8" r="0.35" fill="#eafff6" />
+
+        {/* PRONOTO: escudo semicircular sobre la cabeza, margen pálido + manchas */}
+        <path d="M-5.4,-3 C-5.6,-7.6 -3,-9.8 0,-9.8 C3,-9.8 5.6,-7.6 5.4,-3 C3.2,-1.8 -3.2,-1.8 -5.4,-3 Z"
+          fill="#1c1338" stroke="#c6ff4f" strokeWidth="0.85" strokeOpacity="0.7" />
+        <path d="M-4.7,-3.6 C-4.7,-7 -2.5,-8.9 0,-8.9 C2.5,-8.9 4.7,-7 4.7,-3.6" fill="none" stroke="#9dff3f" strokeWidth="0.5" opacity="0.5" />
+        <circle cx="-2.1" cy="-5.4" r="0.75" fill="#c6ff4f" opacity="0.4" /><circle cx="2.1" cy="-5.4" r="0.75" fill="#c6ff4f" opacity="0.4" />
+
+        {/* ── ÉLITROS: dos alas duras oscuras con sutura y filas punteadas ── */}
+        <path d="M-5.4,-3.2 C-7.4,2.2 -6.8,7.4 -3.6,10.2 C-2.2,7.6 -1.6,2 -1,-2.6 C-3,-3.4 -4.4,-3.5 -5.4,-3.2 Z"
+          fill="#171030" stroke="#c6ff4f" strokeWidth="0.85" strokeOpacity="0.72" />
+        <path d="M5.4,-3.2 C7.4,2.2 6.8,7.4 3.6,10.2 C2.2,7.6 1.6,2 1,-2.6 C3,-3.4 4.4,-3.5 5.4,-3.2 Z"
+          fill="#171030" stroke="#c6ff4f" strokeWidth="0.85" strokeOpacity="0.72" />
+        <path d="M0,-2.6 L0.2,8.4" stroke="#9dff3f" strokeWidth="0.6" opacity="0.55" />
+        <g stroke="#9dff3f" strokeWidth="0.45" strokeLinecap="round" opacity="0.4" strokeDasharray="0.5 1.5">
+          <path d="M-2.4,-0.6 L-2.2,6.6" /><path d="M-3.8,0.4 L-3.4,6" />
+          <path d="M2.4,-0.6 L2.2,6.6" /><path d="M3.8,0.4 L3.4,6" />
+        </g>
+        <path d="M-4.8,-2.2 C-6.4,2.4 -5.8,6.6 -3.4,8.8" fill="none" stroke="#eafff6" strokeWidth="0.5" opacity="0.3" />
+      </g>
+
+      {/* ── EL FAROL: abdomen bioluminiscente pulsante (sin boil, es pura luz) ── */}
+      <ellipse className="cn-luz" cx="0.2" cy="9.8" rx="3.7" ry="3.1" fill="#f6ffb0" style={{ filter: 'drop-shadow(0 0 8px #d8ff6a)' }} />
+      <ellipse className="cn-luz" cx="0.2" cy="9.8" rx="2" ry="1.7" fill="#ffffff" opacity="0.95" />
+      <path d="M-2.8,8.6 C-1,9.2 1.6,9.2 3.2,8.6 M-2.9,11 C-1,11.7 1.6,11.7 3.4,11" fill="none" stroke="#bfe86a" strokeWidth="0.4" opacity="0.55" />
     </g>
   );
 }
 
-/* Marteja / mono nocturno (Aotus lemurinus): único primate nocturno de
-   Colombia. Cabeza redonda dominada por OJOS ENORMES reflectantes con glow
-   (rasgo diagnóstico), arcos faciales oscuros, orejas redondas casi ocultas y
-   cola larga colgante; arborícola encogido. Acento naranja. */
+/* Marteja / mono nocturno (Aotus lemurinus) — PERSONAJE COMPLETO.
+   Único primate nocturno de Colombia. Rasgo diagnóstico que manda toda la cara:
+   los OJOS ENORMES reflectantes con glow (el tapetum de la noche). Anatomía real
+   de Aotus: cabeza redonda con la máscara facial pálida entre TRES arcos oscuros
+   (dos sobre los ojos + el central), orejas redondas casi ocultas en el pelo,
+   flancos y hombros anaranjados sobre el vientre buff, y la COLA LARGA colgante
+   (no prensil) de punta oscura. Pose: arborícola encogido agarrado a una rama,
+   sosteniendo un fruto contra el pecho — el frugívoro dispersor en su oficio.
+   Animación: respira, parpadeo lento, mirada curiosa, la cola se mece y la
+   cabeza ladea. Contorno con line-boil. Acento naranja. */
 function AvatarMarteja() {
+  const uid = useId().replace(/[:]/g, '');
+  const boilId = `cn-boil-marteja-${uid}`;
+
   return (
     <g className="cn-av-flota" filter="url(#cn-glow1)">
-      <ellipse cx="0" cy="15" rx="12" ry="3" fill="#000" opacity="0.35" />
-      {/* cola larga enroscada */}
-      <path d="M10,8 C18,8 21,2 19,-4 C18,-6 15,-6 16,-3" fill="none" stroke="#ff9d4f" strokeWidth="1.8" strokeLinecap="round" opacity="0.8" />
-      {/* cuerpo compacto encogido */}
-      <path d="M-9,12 C-11,4 -7,-2 0,-2 C7,-2 11,4 10,11 C9,14 4,15 -2,15 C-6,15 -8,14 -9,12 Z" fill="#171030" stroke="#ff9d4f" strokeWidth="0.9" strokeOpacity="0.6" />
-      {/* brazos que abrazan */}
-      <path d="M-7,3 C-4,7 4,7 7,3" fill="none" stroke="#2a1e50" strokeWidth="2.4" strokeLinecap="round" opacity="0.85" />
-      {/* patas */}
-      <path d="M-5,14 L-5,9 M4,14 L4,9" stroke="#0f0a24" strokeWidth="2.8" strokeLinecap="round" />
-      {/* cabeza redonda */}
-      <circle cx="0" cy="-7" r="7.5" fill="#1c1338" stroke="#ff9d4f" strokeWidth="0.9" strokeOpacity="0.6" />
-      {/* orejitas redondas casi ocultas */}
-      <circle cx="-6.5" cy="-11" r="1.6" fill="#1c1338" stroke="#ff9d4f" strokeWidth="0.6" strokeOpacity="0.6" />
-      <circle cx="6.5" cy="-11" r="1.6" fill="#1c1338" stroke="#ff9d4f" strokeWidth="0.6" strokeOpacity="0.6" />
-      {/* arcos faciales oscuros (patrón de Aotus) */}
-      <path d="M-7,-9.4 C-5,-12.4 -1,-12.4 0,-9.2 M0,-9.2 C1,-12.4 5,-12.4 7,-9.4" fill="none" stroke="#2a1e50" strokeWidth="1.4" opacity="0.75" />
-      {/* OJOS ENORMES reflectantes (rasgo diagnóstico) */}
-      <circle cx="-3.4" cy="-7" r="3.7" fill="#04160f" stroke="#ffcf5a" strokeWidth="1" />
-      <circle cx="3.4" cy="-7" r="3.7" fill="#04160f" stroke="#ffcf5a" strokeWidth="1" />
-      <circle cx="-3.4" cy="-7" r="2.4" fill="#ffb54f" style={{ filter: 'drop-shadow(0 0 5px #ffb54f)' }} />
-      <circle cx="3.4" cy="-7" r="2.4" fill="#ffb54f" style={{ filter: 'drop-shadow(0 0 5px #ffb54f)' }} />
-      <circle cx="-2.5" cy="-7.9" r="0.85" fill="#eafff6" />
-      <circle cx="4.3" cy="-7.9" r="0.85" fill="#eafff6" />
-      {/* naricita + boca */}
-      <ellipse cx="0" cy="-2.6" rx="1.6" ry="1.2" fill="#ffd0a0" opacity="0.7" />
-      <circle cx="0" cy="-3" r="0.6" fill="#04160f" />
+      <defs>
+        <LineBoilFilter id={boilId} baseFrequency={0.036} scale={1.6} animated={!CN_REDUCED} dur="0.44s" />
+      </defs>
+
+      <ellipse cx="0" cy="15.4" rx="11.5" ry="2.6" fill="#000" opacity="0.34" />
+
+      {/* ── la rama que agarra: arborícola de oficio ── */}
+      <g filter={`url(#${boilId})`}>
+        <path d="M-15,13.8 C-6,12.8 7,12.8 15.4,14 C15.4,15.8 -15,15.6 -15,13.8 Z"
+          fill="#141a3a" stroke="#ff9d4f" strokeWidth="0.75" strokeOpacity="0.42" />
+        <path d="M-12,14.4 C-4,13.6 6,13.6 13,14.6" fill="none" stroke="#ffce9a" strokeWidth="0.5" opacity="0.3" />
+        <path d="M11,13.4 C14,11.2 16.4,10.8 18,11.4 C16.4,12.2 14.8,13 13.6,14 Z" fill="#141a3a" stroke="#ff9d4f" strokeWidth="0.6" strokeOpacity="0.35" />
+      </g>
+
+      {/* ── COLA LARGA colgante (no prensil): cuelga, se mece, punta oscura ── */}
+      <g className="cn-marteja-cola" style={{ transformBox: 'fill-box', transformOrigin: '58% 2%' }}>
+        <path d="M7.4,9 C13.4,9.4 17,13 17.2,17.4 C17.3,20 15.4,21.4 13.6,20.2" fill="none" stroke="#ff9d4f" strokeWidth="3.4" strokeLinecap="round" opacity="0.26" />
+        <path d="M7.4,9 C13.4,9.4 17,13 17.2,17.4 C17.3,20 15.4,21.4 13.6,20.2" fill="none" stroke="#1c1338" strokeWidth="2.5" strokeLinecap="round" />
+        <path d="M7.6,8.4 C12.8,8.9 16,12 16.4,16" fill="none" stroke="#ff9d4f" strokeWidth="0.55" opacity="0.5" />
+        {/* punta oscura (Aotus lleva la cola de punta negra) */}
+        <path d="M17.2,17.4 C17.3,20 15.4,21.4 13.6,20.2" fill="none" stroke="#0f0a24" strokeWidth="2.5" strokeLinecap="round" opacity="0.92" />
+        <g stroke="#ff9d4f" strokeWidth="0.5" strokeLinecap="round" opacity="0.4">
+          <path d="M10.4,9.2 l-0.4,1.4" /><path d="M13.6,10.8 l0.8,1.2" /><path d="M16,14 l1.3,0.6" />
+        </g>
+      </g>
+
+      {/* ── cuerpo encogido que respira ── */}
+      <g className="cn-boil">
+        <g filter={`url(#${boilId})`}>
+          <path d="M-9.6,12.6 C-11.4,5.6 -8,-0.6 0,-0.8 C8,-1 11.4,5.4 9.8,12 C8.8,14.4 4,15 -1.4,15 C-5.8,15 -8.6,14.2 -9.6,12.6 Z"
+            fill="#171030" stroke="#ff9d4f" strokeWidth="0.9" strokeOpacity="0.6" />
+          {/* pecho buff/crema (Aotus tiene el vientre anaranjado claro) */}
+          <path d="M-6.4,3.2 C-6.8,8 -4.6,12 0,13 C4.6,12 6.8,8 6.4,3.2 C4,1.4 -4,1.4 -6.4,3.2 Z" fill="#eafff6" opacity="0.16" />
+          <path d="M-5.6,4.2 C-6,8.2 -4.2,11.4 0,12.2 C4.2,11.4 6,8.2 5.6,4.2" fill="none" stroke="#ffb54f" strokeWidth="2" opacity="0.1" />
+          {/* textura del pelaje */}
+          <g stroke="#ffce9a" strokeWidth="0.5" fill="none" opacity="0.3">
+            <path d="M-6.6,5.4 C-4.6,3.8 -1.6,2.8 1.4,2.8" />
+            <path d="M-6.4,9 C-3.4,7.4 0.6,6.6 4.4,6.8" />
+          </g>
+          {/* tono anaranjado de los flancos */}
+          <path d="M-9,3.4 C-10,6 -9.8,9 -8.8,11.6" fill="none" stroke="#ff9d4f" strokeWidth="0.7" opacity="0.4" />
+          <path d="M9,3.4 C10,6 9.8,9 8.8,11.6" fill="none" stroke="#ff9d4f" strokeWidth="0.7" opacity="0.4" />
+        </g>
+
+        {/* pies agarrando la rama con deditos largos */}
+        <path d="M-5.6,12.6 C-6,13.6 -6,14.2 -5.8,14.6" stroke="#0f0a24" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+        <path d="M5.6,12.6 C6,13.6 6,14.2 5.8,14.6" stroke="#0f0a24" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+        <g stroke="#ff9d4f" strokeWidth="0.7" strokeLinecap="round" opacity="0.7">
+          <path d="M-7.4,14.4 C-8,15.2 -8.4,15.6 -8.4,16" /><path d="M-5.8,14.6 L-5.8,15.9" /><path d="M-4.2,14.4 C-3.6,15.2 -3.4,15.6 -3.4,16" />
+          <path d="M7.4,14.4 C8,15.2 8.4,15.6 8.4,16" /><path d="M5.8,14.6 L5.8,15.9" /><path d="M4.2,14.4 C3.6,15.2 3.4,15.6 3.4,16" />
+        </g>
+
+        {/* brazos que sostienen el fruto contra el pecho (frugívoro dispersor) */}
+        <path d="M-6.4,5 C-4.4,8.4 -2,9.4 -0.4,9.2" fill="none" stroke="#2a1e50" strokeWidth="2.6" strokeLinecap="round" opacity="0.9" />
+        <path d="M6.4,5 C4.4,8.4 2,9.4 0.4,9.2" fill="none" stroke="#2a1e50" strokeWidth="2.6" strokeLinecap="round" opacity="0.9" />
+        <g className="cn-marteja-mano" style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}>
+          <circle cx="0" cy="8" r="2" fill="#ff9d4f" opacity="0.9" style={{ filter: 'drop-shadow(0 0 2.5px rgba(255,157,79,0.55))' }} />
+          <circle cx="-0.6" cy="7.4" r="0.6" fill="#eafff6" opacity="0.7" />
+          <path d="M0.4,6.2 C0.8,5.4 1.6,5.2 2,5.6" fill="none" stroke="#6fe6c0" strokeWidth="0.6" strokeLinecap="round" opacity="0.7" />
+          <g stroke="#ff9d4f" strokeWidth="0.55" strokeLinecap="round" opacity="0.7">
+            <path d="M-1.8,8 C-1.4,7.2 -0.8,6.9 -0.2,7" /><path d="M1.8,8 C1.4,7.2 0.8,6.9 0.2,7" />
+          </g>
+        </g>
+      </g>
+
+      {/* ── CABEZA grande y redonda: los OJOS ENORMES mandan ── */}
+      <g className="cn-marteja-cabeza" style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}>
+        {/* orejitas redondas casi ocultas en el pelo */}
+        <circle cx="-6.8" cy="-11.4" r="1.9" fill="#1c1338" stroke="#ff9d4f" strokeWidth="0.6" strokeOpacity="0.6" />
+        <circle cx="6.8" cy="-11.4" r="1.9" fill="#1c1338" stroke="#ff9d4f" strokeWidth="0.6" strokeOpacity="0.6" />
+        <circle cx="-6.8" cy="-11.2" r="0.9" fill="#ffb54f" opacity="0.3" />
+        <circle cx="6.8" cy="-11.2" r="0.9" fill="#ffb54f" opacity="0.3" />
+
+        {/* cráneo redondo */}
+        <circle cx="0" cy="-7.4" r="8" fill="#1c1338" stroke="#ff9d4f" strokeWidth="0.9" strokeOpacity="0.62" />
+
+        {/* máscara facial pálida entre los arcos (patrón de Aotus) */}
+        <path d="M0,-13.4 C-2.6,-10.6 -3.4,-6 -3.2,-2 C-1.8,-0.8 1.8,-0.8 3.2,-2 C3.4,-6 2.6,-10.6 0,-13.4 Z" fill="#eafff6" opacity="0.14" />
+
+        {/* TRES arcos faciales oscuros: dos sobre los ojos + central */}
+        <path d="M-7.4,-10.4 C-5.4,-13.4 -2.4,-13.6 -1,-11" fill="none" stroke="#2a1e50" strokeWidth="1.5" strokeLinecap="round" opacity="0.85" />
+        <path d="M7.4,-10.4 C5.4,-13.4 2.4,-13.6 1,-11" fill="none" stroke="#2a1e50" strokeWidth="1.5" strokeLinecap="round" opacity="0.85" />
+        <path d="M0,-13.6 C-0.6,-12 -0.6,-10.6 0,-9.4 C0.6,-10.6 0.6,-12 0,-13.6 Z" fill="#2a1e50" opacity="0.8" />
+        {/* pelillos de la corona */}
+        <g stroke="#ff9d4f" strokeWidth="0.5" fill="none" opacity="0.4" strokeLinecap="round">
+          <path d="M-4,-14 C-4.4,-15 -4.4,-15.6 -4.2,-16" /><path d="M0,-14.6 L0,-16" /><path d="M4,-14 C4.4,-15 4.4,-15.6 4.2,-16" />
+        </g>
+
+        {/* mejillas claras */}
+        <path d="M-7.2,-5 C-8.4,-3.6 -8.8,-2.4 -8.6,-1.2" fill="none" stroke="#ffce9a" strokeWidth="0.5" opacity="0.4" />
+        <path d="M7.2,-5 C8.4,-3.6 8.8,-2.4 8.6,-1.2" fill="none" stroke="#ffce9a" strokeWidth="0.5" opacity="0.4" />
+
+        {/* ── OJOS ENORMES reflectantes: el rasgo diagnóstico ── */}
+        <circle cx="-3.6" cy="-7" r="4" fill="#04160f" stroke="#ffcf5a" strokeWidth="1.1" />
+        <circle cx="3.6" cy="-7" r="4" fill="#04160f" stroke="#ffcf5a" strokeWidth="1.1" />
+        <circle cx="-3.6" cy="-7" r="2.7" fill="#ffb54f" style={{ filter: 'drop-shadow(0 0 5.5px #ffb54f)' }} />
+        <circle cx="3.6" cy="-7" r="2.7" fill="#ffb54f" style={{ filter: 'drop-shadow(0 0 5.5px #ffb54f)' }} />
+        <g className="cn-mirada">
+          <circle cx="-3.6" cy="-7" r="1.35" fill="#0d0620" />
+          <circle cx="3.6" cy="-7" r="1.35" fill="#0d0620" />
+          <circle cx="-2.7" cy="-7.9" r="0.85" fill="#eafff6" />
+          <circle cx="4.5" cy="-7.9" r="0.85" fill="#eafff6" />
+        </g>
+        {/* párpados: parpadeo lento (default abierto = scaleY(0)) */}
+        <circle className="cn-marteja-parpado" cx="-3.6" cy="-7" r="4.1" fill="#1c1338" />
+        <circle className="cn-marteja-parpado" cx="3.6" cy="-7" r="4.1" fill="#1c1338" />
+
+        {/* naricita + boca pequeña */}
+        <ellipse cx="0" cy="-3.4" rx="1.3" ry="1" fill="#1c1338" />
+        <circle cx="-0.4" cy="-3.6" r="0.28" fill="#ffd0a0" opacity="0.8" />
+        <circle cx="0.4" cy="-3.6" r="0.28" fill="#ffd0a0" opacity="0.8" />
+        <path d="M-1.2,-2.2 C-0.4,-1.4 0.4,-1.4 1.2,-2.2" fill="none" stroke="#ffd0a0" strokeWidth="0.8" strokeLinecap="round" opacity="0.6" />
+      </g>
     </g>
   );
 }
@@ -790,30 +949,85 @@ function AvatarTigrillo() {
   );
 }
 
-/* Cóndor de los Andes (Vultur gryphus): silueta de gran ala planeando con
-   primarias abiertas en dedos, gorguera blanca y cabeza calva con carúncula.
-   DIURNO — el vigía del valle. Acento azul pálido. */
+/* Un ala del cóndor (lado derecho; se refleja para el izquierdo). Secundarias
+   anchas con el PANEL BLANCO del macho, dos filas de coberteras y las PRIMARIAS
+   RANURADAS en dedos con cielo entre ellas — el rasgo del gran planeador. */
+function CondorAla() {
+  return (
+    <g>
+      {/* secundarias: panel interno ancho hasta la muñeca */}
+      <path d="M2.6,-1.6 C8,-3.2 14,-3.8 18.4,-2.8 C18,0.4 14.8,2.4 10,2.6 C6.8,2.7 4,1.6 2.6,-0.2 Z"
+        fill="#141a3a" stroke="#bfe3ff" strokeWidth="0.85" strokeOpacity="0.6" />
+      {/* PANEL BLANCO (el parche alar del macho) */}
+      <path d="M7.6,-2.2 C11,-2.8 14.6,-2.9 17.4,-2.4 C17,-0.8 14.8,0.2 11.4,0.2 C9.6,0.2 8.2,-0.8 7.6,-2.2 Z"
+        fill="#eafff6" opacity="0.82" />
+      {/* coberteras: dos filas de plumitas en el borde de ataque */}
+      <path d="M3.4,-1.8 C6.4,-2.4 9.4,-2.6 12.4,-2.4 M4.4,-0.6 C7.4,-1.1 10.4,-1.2 13.2,-1" fill="none" stroke="#dbf0ff" strokeWidth="0.5" opacity="0.42" />
+      {/* PRIMARIAS EN DEDOS (seis) con cielo entre ellas — flexionan al planear */}
+      <g className="cn-condor-primarias" style={{ transformBox: 'fill-box', transformOrigin: '5% 55%' }}>
+        <path d="M15.6,-2.8 C18.8,-3.9 21.6,-4.1 23.8,-3.4 C21.8,-2.4 19.4,-1.7 17,-1.6 Z" fill="#171030" stroke="#bfe3ff" strokeWidth="0.55" strokeOpacity="0.55" />
+        <path d="M16.4,-1.6 C19.6,-2 22.4,-1.7 24.6,-0.8 C22.4,-0.1 19.8,0.3 17.2,0 Z" fill="#171030" stroke="#bfe3ff" strokeWidth="0.55" strokeOpacity="0.55" />
+        <path d="M16,-0.2 C19,0.3 21.6,1 23.4,2.1 C21,2.3 18.4,2 16,1.2 Z" fill="#171030" stroke="#bfe3ff" strokeWidth="0.55" strokeOpacity="0.55" />
+        <path d="M14.8,1.2 C17.4,2.1 19.6,3.3 21,4.8 C18.6,4.6 16.2,3.6 14,2.4 Z" fill="#171030" stroke="#bfe3ff" strokeWidth="0.55" strokeOpacity="0.55" />
+        <path d="M12.8,2.2 C14.8,3.5 16.4,5.1 17.2,6.8 C15,6.2 13,4.7 11.6,3 Z" fill="#171030" stroke="#bfe3ff" strokeWidth="0.55" strokeOpacity="0.55" />
+      </g>
+    </g>
+  );
+}
+
+/* Cóndor de los Andes (Vultur gryphus) — PERSONAJE COMPLETO.
+   DIURNO — el vigía que plana sobre el valle. (Ojo: el cóndor 3D del valle es
+   otro; este es el CHIP del roster.) Anatomía real: envergadura enorme con las
+   PRIMARIAS RANURADAS abiertas en dedos, el PANEL BLANCO del macho sobre las
+   secundarias, la GORGUERA blanca esponjada al cuello, cola corta en cuña con
+   rectrices, cabeza CALVA con la CARÚNCULA (cresta) del macho y pico ganchudo.
+   Postura de planeo con leve diedro; las primarias flexionan con el aire y la
+   cabeza vigila el valle. Contorno con line-boil. Acento azul pálido. */
 function AvatarCondor() {
+  const uid = useId().replace(/[:]/g, '');
+  const boilId = `cn-boil-condor-${uid}`;
+
   return (
     <g className="cn-av-planea" filter="url(#cn-glow1)">
-      {/* ala izquierda con dedos */}
-      <path d="M-3,-1 C-9,-5 -16,-6 -22,-4 L-23.4,-2.4 L-20.6,-2.2 L-21.6,-0.6 L-19,-0.6 L-19.6,1 L-16.4,0.5 C-11,1 -6,0.6 -3,1.8 Z" fill="#141a3a" stroke="#bfe3ff" strokeWidth="0.9" strokeOpacity="0.65" />
-      {/* ala derecha con dedos */}
-      <path d="M3,-1 C9,-5 16,-6 22,-4 L23.4,-2.4 L20.6,-2.2 L21.6,-0.6 L19,-0.6 L19.6,1 L16.4,0.5 C11,1 6,0.6 3,1.8 Z" fill="#141a3a" stroke="#bfe3ff" strokeWidth="0.9" strokeOpacity="0.65" />
-      {/* nervadura del ala */}
-      <path d="M-4,0 C-9,-2.4 -15,-3 -20,-2.6 M4,0 C9,-2.4 15,-3 20,-2.6" fill="none" stroke="#dbf0ff" strokeWidth="0.7" opacity="0.5" />
-      {/* cuerpo + cola en cuña */}
-      <path d="M-3.4,-1 C-3.4,-3.2 3.4,-3.2 3.4,-1 C3.4,3 1.4,6.4 0,9 C-1.4,6.4 -3.4,3 -3.4,-1 Z" fill="#171030" stroke="#bfe3ff" strokeWidth="0.8" strokeOpacity="0.6" />
-      {/* gorguera blanca */}
-      <ellipse cx="0" cy="-2.6" rx="3.6" ry="1.9" fill="#eafff6" opacity="0.92" />
-      {/* cabeza calva */}
-      <circle cx="0" cy="-6.4" r="2.2" fill="#1c1338" stroke="#bfe3ff" strokeWidth="0.7" strokeOpacity="0.6" />
-      {/* carúncula (cresta del macho) */}
-      <path d="M-0.4,-8.4 C-0.8,-10.6 1,-10.8 0.9,-8.8 Z" fill="#bfe3ff" opacity="0.7" />
-      {/* pico */}
-      <path d="M1.8,-6.6 L4.4,-6.1 L2,-5.1 Z" fill="#dbf0ff" />
-      <circle cx="0.8" cy="-6.8" r="0.55" fill="#04160f" />
-      <circle cx="1" cy="-7" r="0.22" fill="#eafff6" />
+      <defs>
+        <LineBoilFilter id={boilId} baseFrequency={0.03} scale={1.3} animated={!CN_REDUCED} dur="0.46s" />
+      </defs>
+
+      {/* ── las dos grandes alas planeando (line-boil de contorno) ── */}
+      <g filter={`url(#${boilId})`}>
+        <g className="cn-condor-ala"><CondorAla /></g>
+        <g className="cn-condor-ala" transform="scale(-1,1)"><CondorAla /></g>
+
+        {/* ── cuerpo fusiforme + cola en cuña con rectrices ── */}
+        <path d="M-3,-2.4 C-3,-4.4 3,-4.4 3,-2.4 C3,1.4 2.2,4.6 1.4,7 L2.6,11.6 C1.4,12.4 -1.4,12.4 -2.6,11.6 L-1.4,7 C-2.2,4.6 -3,1.4 -3,-2.4 Z"
+          fill="#171030" stroke="#bfe3ff" strokeWidth="0.85" strokeOpacity="0.6" />
+        <path d="M0,7 L0,11.8 M-1.4,7.4 L-0.8,11.4 M1.4,7.4 L0.8,11.4" stroke="#0f0a24" strokeWidth="0.6" opacity="0.7" />
+        {/* quilla iluminada del pecho */}
+        <path d="M0,-3.4 C-1,0 -1,3.6 -0.4,6.4 M0,-3.4 C1,0 1,3.6 0.4,6.4" fill="none" stroke="#dbf0ff" strokeWidth="0.5" opacity="0.3" />
+      </g>
+
+      {/* ── GORGUERA blanca esponjada (el collar del cóndor) ── */}
+      <path d="M-4,-2 C-4.2,-4.6 -2,-5.8 0,-5.8 C2,-5.8 4.2,-4.6 4,-2 C2.6,-0.8 -2.6,-0.8 -4,-2 Z" fill="#eafff6" opacity="0.92" />
+      <g stroke="#cfe6ff" strokeWidth="0.4" fill="none" opacity="0.5">
+        <path d="M-3,-2.2 C-3,-3.6 -2,-4.4 -1.2,-4.6" /><path d="M0,-2 L0,-5.4" /><path d="M3,-2.2 C3,-3.6 2,-4.4 1.2,-4.6" />
+      </g>
+
+      {/* ── CABEZA calva + carúncula + pico ganchudo (vigila el valle) ── */}
+      <g className="cn-condor-cabeza" style={{ transformBox: 'fill-box', transformOrigin: '50% 100%' }}>
+        <circle cx="0" cy="-7.4" r="2.4" fill="#1c1338" stroke="#bfe3ff" strokeWidth="0.75" strokeOpacity="0.62" />
+        <ellipse cx="-0.7" cy="-8.2" rx="1" ry="0.7" fill="#dbf0ff" opacity="0.25" />
+        {/* carúncula / cresta del macho */}
+        <path d="M-0.6,-9.4 C-1.2,-12 1,-12.2 0.8,-9.6 C0.4,-9 -0.2,-9 -0.6,-9.4 Z" fill="#bfe3ff" opacity="0.72" />
+        {/* barbilla carnosa */}
+        <path d="M-0.6,-5.6 C-1.2,-4.4 -0.4,-3.8 0.2,-4.4" fill="#bfe3ff" opacity="0.5" />
+        {/* pico ganchudo pálido */}
+        <path d="M2,-7.6 C4.2,-7.4 5,-6.6 4.4,-5.8 C3.8,-5.4 2.6,-5.6 1.8,-6.2 Z" fill="#dbf0ff" />
+        <path d="M4.4,-5.8 C4.6,-5.2 4.2,-4.8 3.6,-5" fill="none" stroke="#bfe3ff" strokeWidth="0.5" opacity="0.7" />
+        {/* ojo con glow */}
+        <circle cx="0.9" cy="-7.8" r="0.85" fill="#04160f" stroke="#bfe3ff" strokeWidth="0.4" />
+        <circle cx="0.9" cy="-7.8" r="0.4" fill="#dbf0ff" style={{ filter: 'drop-shadow(0 0 2px #bfe3ff)' }} />
+        <circle cx="1.05" cy="-7.95" r="0.18" fill="#eafff6" />
+      </g>
     </g>
   );
 }

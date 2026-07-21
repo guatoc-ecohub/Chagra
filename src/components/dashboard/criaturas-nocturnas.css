@@ -326,3 +326,79 @@
   .cn-gurre-nariz, .cn-gurre-vaho, .cn-gurre-pala, .cn-gurre-tierra,
   .cn-tigri-acecha, .cn-tigri-cola, .cn-tigri-colatip { animation: none !important; }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   BLOQUE NUEVO — las 3 rezagadas elevadas a PERSONAJE (marteja, luciérnaga,
+   cóndor). Solo suma al final; no reescribe nada de arriba. Misma familia
+   rubber-hose andina, períodos co-primos con el boil para que nada lata parejo.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── LUCIÉRNAGA: el farol manda; las patas se aferran, las antenas tantean ── */
+.cn-luci-charco { transform-box: fill-box; transform-origin: center; animation: cn-luci-charco 1.8s ease-in-out infinite; }
+@keyframes cn-luci-charco {
+  0%, 100% { opacity: 0.1; transform: scale(0.92); }
+  50% { opacity: 0.24; transform: scale(1.08); }
+}
+.cn-luci-patas { transform-box: fill-box; transform-origin: center top; animation: cn-luci-patas 2.9s ease-in-out infinite; }
+@keyframes cn-luci-patas {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(0.35px); }   /* asentamiento fino del agarre */
+}
+.cn-luci-antena { transform-box: fill-box; transform-origin: center bottom; animation: cn-luci-antena 1.3s ease-in-out infinite; }
+@keyframes cn-luci-antena {
+  0%, 100% { transform: rotate(0deg); }
+  40% { transform: rotate(-2.4deg); }
+  70% { transform: rotate(1.6deg); }
+}
+
+/* ── MARTEJA: respira con el boil; la cola cuelga y se mece, la cabeza ladea
+   con curiosidad de primate, el parpadeo es lento (ojo grande = blink lento) ── */
+.cn-marteja-cola { animation: cn-marteja-cola 5.2s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+@keyframes cn-marteja-cola {
+  0%, 100% { transform: rotate(0deg); }
+  32% { transform: rotate(3.5deg); }     /* péndulo pesado, va detrás del cuerpo */
+  68% { transform: rotate(-2.4deg); }
+}
+.cn-marteja-cabeza { animation: cn-marteja-cabeza 7.1s cubic-bezier(0.5, 0, 0.3, 1) infinite; }
+@keyframes cn-marteja-cabeza {
+  0%, 44%, 100% { transform: rotate(0deg) translateX(0); }
+  20% { transform: rotate(-2.2deg) translateX(-0.3px); }   /* ladea, curiosa */
+  60%, 74% { transform: rotate(2deg) translateX(0.3px); }
+}
+.cn-marteja-mano { animation: cn-marteja-mano 3.3s ease-in-out infinite; }
+@keyframes cn-marteja-mano {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  46% { transform: translateY(-0.5px) rotate(-2deg); }   /* acerca el fruto */
+}
+/* párpado: default abierto = scaleY(0); baja lento y vuelve (ojo grande) */
+.cn-marteja-parpado {
+  transform-box: fill-box;
+  transform-origin: center top;
+  transform: scaleY(0);
+  animation: cn-marteja-parpado 6.7s ease-in-out infinite;
+}
+@keyframes cn-marteja-parpado {
+  0%, 40% { transform: scaleY(0); }
+  44% { transform: scaleY(1); }        /* blink lento */
+  49%, 100% { transform: scaleY(0); }
+}
+
+/* ── CÓNDOR: plana; las primarias flexionan con el aire (follow-through del
+   planeo) y la cabeza calva vigila el valle sin batir alas ── */
+.cn-condor-primarias { animation: cn-condor-primarias 5.4s ease-in-out infinite; }
+@keyframes cn-condor-primarias {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(2.4deg) translateY(-0.3px); }   /* los dedos ceden al aire */
+}
+.cn-condor-cabeza { animation: cn-condor-cabeza 8.6s cubic-bezier(0.5, 0, 0.3, 1) infinite; }
+@keyframes cn-condor-cabeza {
+  0%, 38%, 100% { transform: rotate(0deg); }
+  18% { transform: rotate(-4deg); }        /* barre el valle */
+  56%, 72% { transform: rotate(3.5deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cn-luci-charco, .cn-luci-patas, .cn-luci-antena,
+  .cn-marteja-cola, .cn-marteja-cabeza, .cn-marteja-mano, .cn-marteja-parpado,
+  .cn-condor-primarias, .cn-condor-cabeza { animation: none !important; }
+}
