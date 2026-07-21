@@ -31,9 +31,9 @@
  * Ritmo, no metrónomo: cada bicho lleva su fase, su reloj y su jitter propios
  * (nada aparece ni parpadea al unísono, ningún ciclo se siente en loop). La
  * franja del día sale de useCicloDia (?ciclo= para fotografiar una hora).
- * Tier-safe: bajo = solo el oso y el colibrí, quietos; medio = vecinos vivos +
- * cóndor + visitantes + pocas mariposas; alto = todo. reducedMotion = nada
- * animado ni intermitente: fotograma digno.
+ * Tier-safe: bajo = solo el colibrí, quieto; medio = vecinos vivos + cóndor +
+ * visitantes + pocas mariposas; alto = todo. reducedMotion = nada animado ni
+ * intermitente: fotograma digno.
  *
  * Cero assets, cero texturas: lo procedural es geometría mínima
  * (fusionarSeguro contra el null silencioso de mergeGeometries) y los vecinos
@@ -609,7 +609,7 @@ const VECINOS_BOSQUE = [
   },
 ];
 
-const VECINOS_TIER_BAJO = new Set(['oso-andino']);
+const VECINOS_TIER_BAJO = new Set([]);
 
 const ESTILO_CRITTER = {
   filter: 'drop-shadow(0 2px 3px rgba(25, 32, 28, 0.35))',

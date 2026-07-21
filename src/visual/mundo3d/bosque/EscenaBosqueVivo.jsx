@@ -579,21 +579,14 @@ function BrumaParallax({ franja, reducedMotion }) {
 }
 
 /* ── LA CÁMARA: pose de reposo consciente del ASPECTO ──────────────────────
-      En landscape la pose aprobada (leve contrapicado que hace imponente al
-      guardián, el arroyo entrando por la derecha del cuadro). En un teléfono
-      parado la cámara retrocede y sube apenas: el fov vertical alcanza y el
-      Ent respira sin perder el queñual de los flancos. */
-/* El guardián creció 1.4× (mount-ent scale): para conservar EXACTO el encuadre
-   héroe aprobado (leve contrapicado, el rostro tallado legible), el rig de
-   cámara se escala con él — misma proporción árbol/cuadro que el original, solo
-   que 1.4× más grande y con el bosque catedral abriéndose alrededor. */
-/* 2a pasada páramo (2026-07-20): se ABRE el encuadre para que respire la
-   PLANICIE. La cámara SUBE (y 3.6→4.7) y mira un pelo HACIA ABAJO (mira y
-   3.7→3.0): el frailejonal se despliega en abanico hacia un horizonte BAJO y el
-   cielo lechoso del páramo ocupa el tercio alto (la firma: planicie abierta,
-   cielo grande). La queñua Ent queda de acento vertical/guardián al fondo, ya no
-   como muro de copas. fov 45→46 para que entre más frailejonal. */
-const POSE_BOSQUE = { position: [12.0, 4.7, 17.6], fov: 46, mira: [0, 3.0, 0] };
+      El encuadre prioriza que se LEAN los rasgos del guardián: ojos, cejas de
+      musgo y barba de usnea. El Ent creció 1.4x (mount-ent scale), así que el
+      rig se escala con él para mantener la misma proporción rostro/cuadro del
+      take aprobado. La cámara queda cerca, con leve contrapicado, y apunta al
+      centro del rostro (y ~4.1, la altura de la mirada tallada). En teléfono
+      parado la cámara retrocede lo justo para que el fov vertical abarque el
+      árbol sin perder el rostro en el fondo. */
+const POSE_BOSQUE = { position: [11.2, 3.6, 16.2], fov: 43, mira: [0, 4.1, 0] };
 
 /* Anclas de sombra de contacto que la escena le pasa a SueloRico: el claro del
    guardián (el Ent es el objeto mayor y necesita el AO ancho que lo planta). */
@@ -602,7 +595,7 @@ const ANCLAS_SUELO = [{ x: 0, z: 0, radio: 2.7 }];
 function poseBosqueParaAspecto(aspect) {
   if (!aspect || aspect >= 0.9) return { ...POSE_BOSQUE, k: 1 };
   const t = Math.min(1, (0.9 - aspect) / 0.44);
-  const B = { position: [14.8, 6.2, 21.6], fov: 56, mira: [0, 3.8, 0] };
+  const B = { position: [14.8, 5.6, 21.6], fov: 56, mira: [0, 4.2, 0] };
   const lerp = (a, b) => a + (b - a) * t;
   const position = POSE_BOSQUE.position.map((v, i) => lerp(v, B.position[i]));
   const mira = POSE_BOSQUE.mira.map((v, i) => lerp(v, B.mira[i]));
