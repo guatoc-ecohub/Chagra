@@ -168,11 +168,25 @@ function AtmosferaBosque({ franja, perfil, reducedMotion }) {
     pintar(actual);
   });
 
-  useFrame((_, dt) => {
+  useFrame((state, dt) => {
     if (reducedMotion) return;
     const k = 1 - Math.exp((-3 / TRANSICION.duracion) * Math.min(dt, 0.1));
     amortiguar(actual, objetivo, k);
     pintar(actual);
+    // LA MAREA DE NIEBLA: una onda lenta (~46 s) que hace ENTRAR y SALIR la
+    // bruma — cuando sube, el fog se cierra y se traga la montaña del fondo; al
+    // bajar, la revela. Es lo que vuelve la niebla protagonista (Jackson): la
+    // catedral aparece y desaparece, no un plano uniforme. Se aplica DESPUÉS de
+    // pintar (no acumula: parte del estado ya amortiguado de esta franja).
+    const marea = 0.5 + 0.5 * Math.sin(state.clock.elapsedTime * (Math.PI * 2 / 46));
+    if (fogRef.current) {
+      fogRef.current.far = actual.nieblaLejos * (1 - 0.44 * marea);
+      fogRef.current.near = actual.nieblaCerca * (1 - 0.22 * marea);
+    }
+    // El fondo se LECHA hacia el color de la niebla cuando la marea cierra: la
+    // pared del anfiteatro se disuelve en blanco y vuelve. copy() antes de lerp
+    // → no acumula (siempre parte del fondo amortiguado de la franja).
+    if (fondoRef.current) fondoRef.current.copy(actual.fondo).lerp(actual.niebla, 0.4 * marea);
   });
 
   return (
@@ -529,6 +543,11 @@ function BrumaParallax({ franja, reducedMotion }) {
     const t = state.clock.elapsedTime;
     const k = reducedMotion ? 1 : 1 - Math.exp(-0.8 * Math.min(dt, 0.1));
     peso.current += ((PESO_BRUMA[franja] ?? 1) - peso.current) * k;
+    // La misma MAREA de niebla que respira en el fog (mismo periodo/fase): las
+    // cartas de bruma se ESPESAN cuando la marea cierra y adelgazan al abrir →
+    // la niebla entra y sale a una, no cada capa por su lado.
+    const marea = reducedMotion ? 0 : 0.5 + 0.5 * Math.sin(t * (Math.PI * 2 / 46));
+    const envMarea = 0.7 + 0.62 * marea;
     let idx = 0;
     for (let c = 0; c < CAPAS_BRUMA.length; c++) {
       const capa = CAPAS_BRUMA[c];
@@ -542,7 +561,7 @@ function BrumaParallax({ franja, reducedMotion }) {
           Math.sin(az) * capa.rad,
         );
         carta.quaternion.copy(state.camera.quaternion);
-        carta.material.opacity = capa.op * peso.current
+        carta.material.opacity = capa.op * peso.current * envMarea
           * (reducedMotion ? 1 : 0.9 + 0.1 * Math.sin(t * 0.07 + capa.fase * 2 + lado * 3));
         idx++;
       }

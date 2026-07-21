@@ -78,6 +78,71 @@ function Especie({ geo, mat, items, castShadow = false }) {
   );
 }
 
+/* Textura de CHARCO: glint claro al centro que se apaga al borde (sin rim duro).
+   Un espejo de agua que nace del páramo, catch de la luz del cielo. */
+function texturaCharco() {
+  const s = 128;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = s;
+  const ctx = cv.getContext('2d');
+  const g = ctx.createRadialGradient(s / 2, s * 0.42, 0, s / 2, s / 2, s / 2);
+  g.addColorStop(0, 'rgba(226,240,244,0.92)'); // glint del cielo
+  g.addColorStop(0.4, 'rgba(150,190,203,0.66)');
+  g.addColorStop(0.82, 'rgba(96,140,156,0.34)');
+  g.addColorStop(1, 'rgba(96,140,156,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, s, s);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/*
+ * CHARCOS del páramo: unos pocos espejos de agua que nacen entre el musgo (el
+ * páramo es una fábrica de agua). Discos planos con glint del cielo, posados
+ * sobre el relieve. Reciben la niebla (fog) para receder al fondo. Baratos:
+ * una textura, un material, N discos. Quietos (paisaje).
+ */
+const CHARCOS = [
+  { x: 2.6, z: 3.4, r: 0.9 },
+  { x: 4.5, z: 5.6, r: 1.15 },
+  { x: -1.8, z: 4.2, r: 0.72 },
+  { x: 5.9, z: 2.1, r: 0.62 },
+  { x: 0.8, z: 6.6, r: 0.85 },
+];
+function Charcos({ alturaDe }) {
+  const tex = useMemo(() => texturaCharco(), []);
+  const mat = useMemo(
+    () => new THREE.MeshBasicMaterial({
+      map: tex,
+      transparent: true,
+      opacity: 0.72,
+      depthWrite: false,
+    }),
+    [tex],
+  );
+  const geo = useMemo(() => new THREE.CircleGeometry(1, 16), []);
+  useLayoutEffect(() => () => {
+    tex.dispose();
+    mat.dispose();
+    geo.dispose();
+  }, [tex, mat, geo]);
+  return (
+    <group>
+      {CHARCOS.map((c, i) => (
+        <mesh
+          key={i}
+          geometry={geo}
+          material={mat}
+          position={[c.x, (alturaDe ? alturaDe(c.x, c.z) : 0) + 0.035, c.z]}
+          rotation={[-Math.PI / 2, 0, i * 1.3]}
+          scale={[c.r, c.r, 1]}
+        />
+      ))}
+    </group>
+  );
+}
+
 /* Textura suave (radial) para el vaho, generada en runtime (sin assets). */
 function texturaVaho() {
   const s = 128;
@@ -250,9 +315,10 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
 
   return (
     <group>
-      {/* Suelo del páramo: rocas con líquen + musgo. */}
+      {/* Suelo del páramo: rocas con líquen + musgo + charcos (agua naciendo). */}
       <Especie geo={geos.roca} mat={mat} items={dist.roca} />
       <Especie geo={geos.musgo} mat={mat} items={dist.musgo} />
+      {tier !== 'bajo' && <Charcos alturaDe={alturaDe} />}
 
       {/* Sotobosque: romerillo y mortiño (con sus bayas de agraz). */}
       <Especie geo={geos.romerillo} mat={mat} items={dist.romerillo} />
