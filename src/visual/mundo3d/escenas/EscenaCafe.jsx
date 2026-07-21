@@ -154,25 +154,6 @@ function TrampaBroca({ pos }) {
         <cylinderGeometry args={[0.11, 0.11, 0.05, 8]} />
         <meshLambertMaterial color={PALETA.maderaOscura} flatShading />
       </mesh>
-
-      {/* el secadero (paseo/parabólico): cama elevada con la capa de grano al sol */}
-      <group position={[0.3, 0, 0.72]}>
-        {[[-0.28, 0.16, -0.16], [0.28, 0.16, -0.16], [-0.28, 0.16, 0.16], [0.28, 0.16, 0.16]].map((p, i) => (
-          <mesh key={i} position={/** @type {[number, number, number]} */ (p)}>
-            <cylinderGeometry args={[0.02, 0.02, 0.32, 5]} />
-            <meshLambertMaterial color={PALETA.madera} flatShading />
-          </mesh>
-        ))}
-        <mesh position={[0, 0.33, 0]}>
-          <boxGeometry args={[0.66, 0.03, 0.44]} />
-          <meshLambertMaterial color={PALETA.maderaClara} flatShading />
-        </mesh>
-        {/* la capa de grano en pergamino secándose */}
-        <mesh position={[0, 0.36, 0]}>
-          <boxGeometry args={[0.6, 0.03, 0.38]} />
-          <meshLambertMaterial color="#d4c199" flatShading />
-        </mesh>
-      </group>
     </group>
   );
 }

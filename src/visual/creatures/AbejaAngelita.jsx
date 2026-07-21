@@ -231,10 +231,10 @@ export function AbejaAngelita({
       {/* alitas de tul con contorno + smear (crt-wingbeat ya lleva el estirón).
           La duración del aleteo la modula el clima real (wingDur): dorada rápida,
           lluvia pesada. celebra/reposo (data-pose) mandan por especificidad CSS. */}
-      <ellipse className={wing} style={alaStyle} cx="-1.8" cy="-7" rx="6" ry="3.6" fill={ABEJA_PALETA.alaTul}
-        opacity="0.62" stroke="rgba(42,26,12,0.4)" strokeWidth="0.5" />
-      <ellipse className={wing} style={alaStyle2} cx="2.2" cy="-6.4"
-        rx="4.6" ry="2.8" fill={ABEJA_PALETA.alaTulClara} opacity="0.5" stroke="rgba(42,26,12,0.35)" strokeWidth="0.5" />
+      <ellipse className={wing} style={alaStyle} cx="-3.4" cy="-6" rx="8.8" ry="3.3" fill={ABEJA_PALETA.alaTul}
+        opacity="0.55" stroke="rgba(42,26,12,0.32)" strokeWidth="0.45" />
+      <ellipse className={wing} style={alaStyle2} cx="-0.4" cy="-5.2"
+        rx="6.6" ry="2.7" fill={ABEJA_PALETA.alaTulClara} opacity="0.44" stroke="rgba(42,26,12,0.28)" strokeWidth="0.45" />
 
       {/* patitas manguera con pie crema (detrás del tronco, se mecen suave) */}
       <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sway={vivo} delay={-0.6} />

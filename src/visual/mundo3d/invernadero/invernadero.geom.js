@@ -68,6 +68,36 @@ export function alturaInvernadero(x, z) {
   return Math.max(0, base) * lejos;
 }
 
+/** Altura de la bóveda del túnel en el semiancho x (|x| ≤ radio). */
+export function yBoveda(x) {
+  const dxr = Math.min(Math.abs(x), INV.radio - 0.02);
+  return INV.arranque + INV.aplaste * Math.sqrt(INV.radio * INV.radio - dxr * dxr);
+}
+
+/**
+ * LA CONDENSACIÓN PERLADA: puntos deterministas sobre la cara INTERNA de la
+ * bóveda — posición + normal exterior (en el plano del arco) + tamaño. Es EL
+ * rasgo del invernadero: el agua que la tierra y las matas sudan, atrapada en
+ * la cara fría del plástico. La escena las instancia como perlas diminutas y
+ * les da CONTRALUZ (las del lado del sol prenden). Puro y headless.
+ */
+export function puntosCondensacion(n, semilla = 517) {
+  const r = rng(semilla);
+  const out = [];
+  const rad = INV.radio - 0.05; // apenas adentro del plástico
+  for (let i = 0; i < n; i++) {
+    const phi = 0.16 + r() * (Math.PI - 0.32);
+    const z = -INV.largo / 2 + 0.35 + r() * (INV.largo - 0.7);
+    out.push({
+      pos: [rad * Math.cos(phi), INV.arranque + INV.aplaste * rad * Math.sin(phi), z],
+      nx: Math.cos(phi),
+      ny: Math.sin(phi),
+      s: 0.55 + r() * 0.9,
+    });
+  }
+  return out;
+}
+
 /* Los sitios que la lección señala (x, z de mundo; el host los sube al suelo). */
 export const SITIO_PUERTA = [0, 6.6];
 export const SITIO_MESA = [1.95, 4.0];
@@ -530,12 +560,12 @@ export function geomBolsa(seed = 11) {
 /** Cuánta vida siembra cada gama (el fotograma digno no se negocia). */
 export function invernaderoDeTier(tier) {
   if (tier === 'alto') {
-    return { tomate: 14, frutosPorMata: 5, hortaliza: 27, bandeja: 6, brotesPorBandeja: 15, bolsa: 8, era: 4, vaho: 5, gotas: 10 };
+    return { tomate: 14, frutosPorMata: 5, hortaliza: 27, bandeja: 6, brotesPorBandeja: 15, bolsa: 8, era: 4, vaho: 5, gotas: 10, perlas: 150 };
   }
   if (tier === 'medio') {
-    return { tomate: 10, frutosPorMata: 4, hortaliza: 18, bandeja: 4, brotesPorBandeja: 12, bolsa: 6, era: 3, vaho: 0, gotas: 6 };
+    return { tomate: 10, frutosPorMata: 4, hortaliza: 18, bandeja: 4, brotesPorBandeja: 12, bolsa: 6, era: 3, vaho: 3, gotas: 6, perlas: 64 };
   }
-  return { tomate: 8, frutosPorMata: 3, hortaliza: 12, bandeja: 3, brotesPorBandeja: 8, bolsa: 4, era: 2, vaho: 0, gotas: 0 };
+  return { tomate: 8, frutosPorMata: 3, hortaliza: 12, bandeja: 3, brotesPorBandeja: 8, bolsa: 4, era: 2, vaho: 0, gotas: 0, perlas: 0 };
 }
 
 const tintDe = (c) => {

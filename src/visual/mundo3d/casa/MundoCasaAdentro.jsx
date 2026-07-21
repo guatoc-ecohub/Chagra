@@ -5,9 +5,10 @@
  * Mismo contrato de host que MundoCafetal/MundoInvernadero: acepta
  * `{tier, reducedMotion}` (o auto-detecta con decidirTier si se monta suelto),
  * llena a su padre y guarda su estado local. Sobre la escena viven los PASOS:
- * cuatro lecciones cortas que recorren lo que la casa cuenta — el fogón, la
- * mesa, el rincón de los fermentos y la ventana de los mundos — y cada paso
- * señala SU lugar con el anillo que respira (el `foco` de la escena).
+ * cinco lecciones cortas que recorren lo que la casa cuenta — el fogón, la
+ * luz de la casa (el reloj de sol de la ventana), la mesa, el rincón de los
+ * fermentos y la ventana de los mundos — y cada paso señala SU lugar con el
+ * anillo que respira (el `foco` de la escena).
  *
  * Los ACCESOS son el contrato con el valle:
  *   · `onPortales`  → tocar la ventana de los mundos (o su botón). Por defecto
@@ -24,34 +25,47 @@ import { useMemo, useState } from 'react';
 import EscenaCasaAdentro from './EscenaCasaAdentro.jsx';
 import PanelPasos from '../PanelPasos.jsx';
 import { decidirTier, permite3D } from '../deviceTier.js';
-import { SITIO_FOGON, SITIO_MESA, SITIO_FERMENTOS, SITIO_MUNDOS } from './casaAdentro.geom.js';
+import {
+  SITIO_FOGON,
+  SITIO_LUZ,
+  SITIO_MESA,
+  SITIO_FERMENTOS,
+  SITIO_MUNDOS,
+} from './casaAdentro.geom.js';
 
-/* Los cuatro pasos de la lección: la casa se lee despacio. */
+/* Los cinco pasos de la lección: la casa se lee despacio. */
 const PASOS = [
   {
     id: 'fogon',
-    kicker: 'Paso 1 de 4 · El fogón',
+    kicker: 'Paso 1 de 5 · El fogón',
     texto:
-      'El fogón de leña es el corazón de la casa: aquí se prende el día antes de que amanezca. La olla que humea, la leña rajada, el hollín en la pared — la casa que cocina es casa viva.',
+      'El fogón de leña es el corazón de la casa: aquí se prende el día antes de que amanezca. La olla que humea, la leña rajada, el hollín en la pared, el zarzo arriba donde el grano se cura con el humo — la casa que cocina es casa viva.',
     foco: SITIO_FOGON,
   },
   {
+    id: 'luz',
+    kicker: 'Paso 2 de 5 · La luz de la casa',
+    texto:
+      'Fíjese en el cuadro de sol que la ventana riega en el piso: camina y se estira con el día. Pegado al muro a mediodía, largo y hondo por la tarde. La casa de tapia se alumbra por un solo vano — y por eso es también un reloj: el abuelo sabía la hora sin mirar ninguna.',
+    foco: SITIO_LUZ,
+  },
+  {
     id: 'mesa',
-    kicker: 'Paso 2 de 4 · La mesa',
+    kicker: 'Paso 3 de 5 · La mesa',
     texto:
       'En la mesa de madera se come lo que la finca dio: la mazorca, la totuma, el pocillo de café. Pero lo que de verdad se sirve aquí es la palabra — en la mesa se decide la siembra y se cuenta el día.',
     foco: SITIO_MESA,
   },
   {
     id: 'fermentos',
-    kicker: 'Paso 3 de 4 · El rincón de los fermentos',
+    kicker: 'Paso 4 de 5 · El rincón de los fermentos',
     texto:
       'En el estante trabajan los que no se ven: la chicha, el vinagre, el guarapo. Microbios buenos transformando la cosecha, sin afán y sin remedio comprado. Toque los frascos para entrar a su mundo.',
     foco: SITIO_FERMENTOS,
   },
   {
     id: 'mundos',
-    kicker: 'Paso 4 de 4 · La ventana de los mundos',
+    kicker: 'Paso 5 de 5 · La ventana de los mundos',
     texto:
       'Desde la casa se ve toda la finca. Esta ventana del fondo mira a los mundos: el agua, el suelo, el café, el páramo. Toque la ventana cuando quiera salir a recorrerlos — la casa aquí lo espera.',
     foco: SITIO_MUNDOS,
@@ -59,7 +73,11 @@ const PASOS = [
 ];
 
 const CSS = `
-.mcasa { position: relative; width: 100%; height: 100%; overflow: hidden; background: #2b2116; }
+.mcasa {
+  position: relative; width: 100%; height: 100vh; height: 100dvh; min-height: 320px;
+  display: flex; overflow: hidden; background: #2b2116;
+}
+.casadentro-canvas { width: 100%; height: 100%; }
 .mcasa canvas { opacity: 0; transition: opacity 0.9s ease; }
 .mcasa .casadentro-canvas--lista canvas, .mcasa canvas.casadentro-canvas--lista { opacity: 1; }
 .mcasa__accesos {

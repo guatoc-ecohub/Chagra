@@ -33,7 +33,10 @@
    no es de cuarzo). El TEMPERAMENTO va en el compás: los nerviosos (ardilla,
    colibrí) gesticulan seguido; los lentos (morrocoy, perezoso) casi nunca. */
 export const VIDA_REPERTORIO = {
-  'oso-andino': {
+  /* Tremarctos ornatus. El slug vivo del registro es 'oso-guardian'; los dibujos
+     archivados ('oso-andino' el café, 'oso-anteojos') siguen leyendo esta misma
+     fila por alias más abajo: MISMA especie, mismo temperamento lento. */
+  'oso-guardian': {
     descanso: [4200, 9800],
     momentos: {
       resopla: { dur: 4500, peso: 2 }, // 3× oso-resoplido 1.5s · 5× oso-cejas-frunce 0.9s
