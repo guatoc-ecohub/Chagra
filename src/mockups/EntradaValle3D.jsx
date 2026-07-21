@@ -34,14 +34,18 @@ import '../visual/effects/effects.css';
 import './entradaValle3D.css';
 import MinimapaValle from './valle/MinimapaValle.jsx';
 import { componerMundos } from '../visual/mundo3d/direccion/composicionValle.js';
-import { MUNDOS_VALLE } from './valle/valleData.js';
+import { construirMundosValle, indexarMundosValle } from './valle/valleData.js';
 import {
-  MUNDO_VALLE_BY_ID,
   COSA_DEL_DIA,
   CLIMAS,
   animoDeFinca,
   NARRACION,
 } from './valle/valleData';
+/* EL VALLE DINÁMICO (spec paso 1-2): el valle se arma del PERFIL DE LA FINCA
+   — si tiene balcón, su valle es un balcón; si tiene 10.000 matas, es el valle
+   completo. Sin perfil, el store entrega el perfil de demo y esto es idéntico
+   al valle de siempre. */
+import usePerfilFincaStore from '../store/usePerfilFincaStore.js';
 /* El reloj del ciclo diurno vivo (franja real del día + override ?ciclo=). */
 import useCicloDia from '../visual/mundo3d/useCicloDia.js';
 import Valle2DFallback from './valle/Valle2DFallback';
@@ -71,7 +75,7 @@ import { TunelLamina, rectDeOrigen, VeloOdyssey } from '../visual/mundo3d/transi
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
 /* Los lugares del valle en planta, para el minimapa RTS (AoE). */
-const LUGARES_MINIMAPA = componerMundos(MUNDOS_VALLE).map((m) => ({
+const lugaresDeMinimapa = (mundosDir) => mundosDir.map((m) => ({
   id: m.id, x: m.pos[0], z: m.pos[2], emoji: m.emoji, tinte: m.tinte, nombre: m.nombre,
 }));
 
@@ -124,6 +128,17 @@ class Valle3DGuard extends Component {
  */
 /** @param {{ onBack?: () => void; onNavigate?: (view: string, data?: any) => void; initialMundoId?: any }} props */
 export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = null }) {
+  /* SU VALLE, NO UN VALLE: los lugares se siembran del perfil de la finca. El
+     store se rehidrata solo cuando el onboarding ubica la finca, así que el
+     valle se ajusta sin recargar. Perfil vacío = el valle completo de siempre. */
+  const perfilFinca = usePerfilFincaStore((s) => s.perfil);
+  const mundosValle = useMemo(() => construirMundosValle(perfilFinca), [perfilFinca]);
+  /* La capa del DIRECTOR sigue mandando el DÓNDE (COMPOSICION_LUGARES): la
+     siembra decide qué hay, el director decide dónde va. */
+  const mundosDir = useMemo(() => componerMundos(mundosValle), [mundosValle]);
+  const mundoValleById = useMemo(() => indexarMundosValle(mundosValle), [mundosValle]);
+  const lugaresMinimapa = useMemo(() => lugaresDeMinimapa(mundosDir), [mundosDir]);
+
   const [focoId, setFocoId] = useState(null);
   const [panel, setPanel] = useState(null); // null | 'alerta' | <mundoId>
   const [voz, setVoz] = useState(true);
@@ -349,9 +364,9 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
     (id) => {
       setFocoId(id);
       setPanel(id);
-      decir(NARRACION[id] || MUNDO_VALLE_BY_ID[id]?.lema || '');
+      decir(NARRACION[id] || mundoValleById[id]?.lema || '');
     },
-    [decir],
+    [decir, mundoValleById],
   );
 
   // ── ABRIR la pantalla real de un lugar: el túnel recibe el cambio de hash
@@ -462,14 +477,14 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
     const texto =
       (clave && NARRACION[clave]) ||
       NARRACION[nav.mundoId] ||
-      MUNDO_VALLE_BY_ID[nav.mundoId]?.lema ||
+      mundoValleById[nav.mundoId]?.lema ||
       `Está en ${tituloDeMundo(nav.mundoId)}.`;
     const t = setTimeout(
       () => decir(`${texto} Toque un punto para ver a dónde lo lleva.`),
       700,
     );
     return () => clearTimeout(t);
-  }, [nav.enMundo, nav.mundoId, decir]);
+  }, [nav.enMundo, nav.mundoId, decir, mundoValleById]);
 
   // ── Una puerta tocada DENTRO del mundo: en la vitrina (sin sesión) no
   //    navega — ANGELITA la nombra (voz + burbuja) y asiente: el agente
@@ -496,7 +511,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
     [nav.mundoId, decir, asentir, onNavigate],
   );
 
-  const mundoPanel = panel && panel !== 'alerta' ? MUNDO_VALLE_BY_ID[panel] : null;
+  const mundoPanel = panel && panel !== 'alerta' ? mundoValleById[panel] : null;
   // ¿Este lugar tiene pantalla real en la app? (wire3DNav). Decide el CTA
   // primario del panel: abrir la pantalla manda; recorrer el 3D acompaña.
   const rutaPanel = mundoPanel ? rutaDesdeMundo3D(mundoPanel.id) : null;
@@ -521,6 +536,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
                   onEntrar={entrarMundo}
                   onAlerta={abrirAlerta}
                   webglBloqueado={valle3dError || equipo.motivo === 'sin-webgl'}
+                  mundos={mundosValle}
                 />
               )}
             >
@@ -542,6 +558,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
                    que presenta el valle vivo. Gateada por tier/reduced-motion
                    adentro; una sola vez por sesión. */
                 camaraDirector
+                mundos={mundosDir}
               />
               {/* Dispara el cruce 2D→3D cuando el chunk 3D del valle resolvió
                   (hermano de <Valle3D> en el Suspense). DOM puro, sin three. */}
@@ -552,7 +569,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
         {/* AoE: el minimapa RTS del valle (planta, blips, salto-a-lugar) — solo con el valle a la vista */}
         {!nav.enMundo && (
           <MinimapaValle
-            lugares={LUGARES_MINIMAPA}
+            lugares={lugaresMinimapa}
             foco={focoId}
             onSaltar={entrarMundo}
             tier={equipo.tier}
