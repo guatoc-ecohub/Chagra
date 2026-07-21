@@ -13,7 +13,10 @@ import { AuraPoder } from './AuraPoder.jsx';
 import { auraDeBicho } from './transformacion.js';
 
 /* Abeja angelita — Tetragonisca angustula (meliponino nativo SIN aguijón, NO
-   Apis). Cuerpo ámbar rayado (chumbe andino), cabeza clara, alitas de tul.
+   Apis). Cabeza y tórax OSCUROS (casi negros) + abdomen ámbar PÁLIDO y LISO,
+   sin bandas: las tres barras oscuras eran la firma de la Apis europea, la que
+   saquea las colmenas de angelita. Cuerpo esbelto, alitas de tul que le sobran
+   del cuerpo, remate redondo sin aguijón.
    Elevada al lenguaje RUBBER-HOSE PLENO (Cuphead + Miss Minutes de Loki):
    contorno grueso que respira, ojos de goma con pupila grande y brillo, cachetes
    campesinos, bracitos/patitas de manguera con mitones, antenas con bombillo que
@@ -24,12 +27,6 @@ import { auraDeBicho } from './transformacion.js';
    fuente que dimensiona/tiñe su presencia 3D (useEntradaAbeja) — una sola abeja. */
 const VIEWBOX = '-15 -15 32 30';
 
-/* Rayas del cuerpo tejidas como CHUMBE andino: banda de tinta con hilo tierra. */
-const BANDAS = [
-  { x: -3.6, y0: -4.7, y1: 4.7 },
-  { x: 0.4, y0: -5.0, y1: 5.0 },
-  { x: 4.0, y0: -4.0, y1: 4.0 },
-];
 
 export function AbejaAngelita({
   size = 64,
@@ -234,26 +231,33 @@ export function AbejaAngelita({
       {/* alitas de tul con contorno + smear (crt-wingbeat ya lleva el estirón).
           La duración del aleteo la modula el clima real (wingDur): dorada rápida,
           lluvia pesada. celebra/reposo (data-pose) mandan por especificidad CSS. */}
-      <ellipse className={wing} style={alaStyle} cx="-1.8" cy="-7" rx="6" ry="3.6" fill={ABEJA_PALETA.alaTul}
-        opacity="0.62" stroke="rgba(42,26,12,0.4)" strokeWidth="0.5" />
-      <ellipse className={wing} style={alaStyle2} cx="2.2" cy="-6.4"
-        rx="4.6" ry="2.8" fill={ABEJA_PALETA.alaTulClara} opacity="0.5" stroke="rgba(42,26,12,0.35)" strokeWidth="0.5" />
+      <ellipse className={wing} style={alaStyle} cx="-3.4" cy="-6" rx="8.8" ry="3.3" fill={ABEJA_PALETA.alaTul}
+        opacity="0.55" stroke="rgba(42,26,12,0.32)" strokeWidth="0.45" />
+      <ellipse className={wing} style={alaStyle2} cx="-0.4" cy="-5.2"
+        rx="6.6" ry="2.7" fill={ABEJA_PALETA.alaTulClara} opacity="0.44" stroke="rgba(42,26,12,0.28)" strokeWidth="0.45" />
 
       {/* patitas manguera con pie crema (detrás del tronco, se mecen suave) */}
       <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sway={vivo} delay={-0.6} />
       <Miembro d="M1.8,4.7 C1.4,6.8 1.3,8.2 1.8,9.4" ancho={1.9} punta={[1.8, 9.6]} puntaR={1.3} pie sway={vivo} delay={-0.95} />
 
-      {/* tronco ámbar con contorno grueso (la línea que respira con el boil) */}
-      <ellipse cx="0" cy="0" rx={ABEJA_PROPORCION.troncoRx} ry={ABEJA_PROPORCION.troncoRy}
+      {/* ABDOMEN ámbar PÁLIDO, esbelto y LISO: SIN las tres barras verticales
+          oscuras (esas eran la firma de la Apis europea). Remata redondo — SIN
+          aguijón. Va a la izquierda, dejándole el lado derecho al tórax; su
+          contorno respira con el boil. */}
+      <ellipse cx="-1.4" cy="0" rx="7.4" ry="5.1"
         fill={ABEJA_PALETA.cuerpo} stroke={RH_INK} strokeWidth="1.3"
         style={{ filter: `drop-shadow(0 0 6px ${ABEJA_PALETA.cuerpoGlow})` }} />
-      {/* rayas = chumbe: banda de tinta + hilo tierra */}
-      {BANDAS.map((b, i) => (
-        <g key={i}>
-          <path d={`M${b.x},${b.y0} L${b.x},${b.y1}`} stroke={RH_INK} strokeWidth="1.9" strokeLinecap="round" />
-          <path d={`M${b.x},${b.y0 + 0.6} L${b.x},${b.y1 - 0.6}`} stroke={ABEJA_PALETA.hiloChumbe} strokeWidth="0.7" strokeLinecap="round" />
-        </g>
-      ))}
+      {/* brillo suave de volumen (el lomo del abdomen) — NUNCA una banda */}
+      <ellipse cx="-2.6" cy="-2.2" rx="3.6" ry="1.7" fill={ABEJA_PALETA.acento} opacity="0.28" />
+      {/* tergite APENAS insinuado (una línea suave que sigue la curva), el
+          detalle de segmento del meliponino, jamás una banda de color */}
+      <path d="M-6.6,-2.4 Q-7.3,0 -6.6,2.6" stroke={ABEJA_PALETA.hiloChumbe}
+        strokeWidth="0.5" fill="none" strokeLinecap="round" opacity="0.45" />
+      {/* TÓRAX oscuro y redondo (peludo): junto con la cabeza forma la mitad
+          OSCURA del cuerpo — la estructura de valores INVERTIDA respecto a la
+          Apis (que lo tiene claro). Sobre el arranque del abdomen, bajo la cabeza. */}
+      <ellipse cx="5.0" cy="-0.4" rx="3.5" ry="4.4" fill={ABEJA_PALETA.torax}
+        stroke={RH_INK} strokeWidth="1.2" />
 
       {/* bracitos manguera con mitón crema (delante del tronco, follow-through).
           Marcados (crt-brazo-l/r) y con pivote en el HOMBRO para que los gestos
@@ -265,8 +269,12 @@ export function AbejaAngelita({
       <Miembro clase="crt-brazo-r" origen="left top"
         d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sway={vivo} delay={-0.45} />
 
-      {/* cabeza clara con contorno */}
+      {/* cabeza OSCURA (casi negra) con contorno — la mitad oscura del meliponino */}
       <circle cx="8.6" cy="-1.0" r={ABEJA_PROPORCION.cabezaR} fill={ABEJA_PALETA.cabeza} stroke={RH_INK} strokeWidth="1.2" />
+      {/* MÁSCARA FACIAL clara: la marca amarilla del clípeo de la angelita real —
+          y, a la vez, el fondo sobre el que la carita (ojos/boca/cejas del agente)
+          sigue leyéndose pese a la cabeza oscura. Va bajo ojos/cachetes/boca. */}
+      <ellipse cx="9.4" cy="-0.2" rx="3.2" ry="3.4" fill={ABEJA_PALETA.cara} opacity="0.95" />
       {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos) */}
       <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.15 }, { cx: 6.9, cy: 0.3, r: 0.85 }]} vivo={vivo} />
       {/* Boca: lip-sync si hay visema; si no, la sonrisa de goma de siempre. */}

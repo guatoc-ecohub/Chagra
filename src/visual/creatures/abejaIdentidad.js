@@ -30,14 +30,21 @@
    para que el lado 3D tiña la sombra de Angelita con su misma línea. */
 export { RH_INK as ABEJA_TINTA } from './_rubberhose.jsx';
 
-/* Paleta del cuerpo — Tetragonisca angustula elevada a rubber-hose andino. */
+/* Paleta del cuerpo — Tetragonisca angustula REAL elevada a rubber-hose andino.
+   La firma de la especie es la ESTRUCTURA DE VALORES: cabeza y tórax OSCUROS
+   (casi negros) + abdomen ámbar PÁLIDO y LISO. Es lo contrario de la Apis
+   europea (cabeza/tórax claros + abdomen con bandas oscuras) — la que saquea
+   las colmenas de angelita; por eso el color es fidelidad, no decoración. */
 export const ABEJA_PALETA = {
-  cuerpo: '#ffb54f',      // ámbar del tronco y del aura viva
-  cuerpoGlow: 'rgba(255,181,79,0.9)', // el mismo ámbar como resplandor (drop-shadow)
-  cabeza: '#ffd76a',      // cabeza clara
-  hiloChumbe: '#9c3b1e',  // hilo tierra dentro de la banda de tinta (chumbe)
-  alaTul: '#bfeaff',      // ala grande de tul
-  alaTulClara: '#eafff6', // ala chica, más pálida
+  cuerpo: '#f2c064',      // ámbar PÁLIDO del abdomen liso y del aura viva
+  cuerpoGlow: 'rgba(242,192,100,0.85)', // el mismo ámbar como resplandor (drop-shadow)
+  cabeza: '#33281a',      // cabeza OSCURA (casi negra) — meliponino, NO Apis
+  torax: '#3d2c19',       // tórax oscuro (un pelo más cálido que la cabeza)
+  acento: '#ffd76a',      // dorado claro SOLO para acentos de UI (certeza del agente)
+  cara: '#ffe3ad',        // máscara facial clara (clípeo amarillo real de la angelita)
+  hiloChumbe: '#c98a3e',  // tergite tenue del abdomen (línea suave, ya NO banda)
+  alaTul: '#cfeeff',      // ala grande de tul (hialina)
+  alaTulClara: '#eafff8', // ala chica, más pálida
   lengua: '#c9524e',      // probóscide (sed / libar)
   gota: '#bfe6ff',        // gotas de lluvia cuando está mojada
 };
