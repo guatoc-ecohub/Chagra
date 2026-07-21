@@ -22,6 +22,7 @@ import * as THREE from 'three';
 import { perfilDeTier } from '../deviceTier.js';
 import {
   floraDeTier,
+  raleParamo,
   calidadDeTier,
   distribucionFlora,
   geomFrailejon,
@@ -267,11 +268,17 @@ function FiguraEscala({ mat, alturaDe }) {
  * La capa de flora del páramo alrededor del Ent. Montar dentro del <Canvas>.
  * `alturaDe(x,z)` (opcional) POSA cada mata sobre el relieve del terreno:
  * sin ella la siembra queda en y=0 (el claro plano de siempre).
- * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, alturaDe?: ((x:number,z:number)=>number)|null}} props
+ * `bioma`: 'bosque' (defecto — cortejo denso, para EscenaEntMaestro) | 'paramo'
+ * (planicie abierta: frailejonal dominante, árboles ralos y lejanos).
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, alturaDe?: ((x:number,z:number)=>number)|null, bioma?: 'bosque'|'paramo'}} props
  */
-export default function FloraParamo({ tier = 'alto', reducedMotion = false, alturaDe = null }) {
+export default function FloraParamo({ tier = 'alto', reducedMotion = false, alturaDe = null, bioma = 'bosque' }) {
   const perfil = perfilDeTier(tier);
-  const conteos = floraDeTier(tier);
+  // En páramo el cortejo de árboles se rala y el frailejonal se potencia.
+  const conteos = useMemo(
+    () => (bioma === 'paramo' ? raleParamo(floraDeTier(tier)) : floraDeTier(tier)),
+    [tier, bioma],
+  );
   const q = calidadDeTier(tier);
 
   // --- Geometrías fusionadas (una vez por tier). Solo lo que tenga matas. ---
@@ -309,14 +316,14 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
 
   // --- Distribución biogeográfica (una vez por tier), posada en el relieve. ---
   const dist = useMemo(() => {
-    const d = distribucionFlora(conteos, 707);
+    const d = distribucionFlora(conteos, 707, bioma);
     if (!alturaDe) return d;
     const posar = (items) => items.map((it) => ({
       ...it,
       pos: [it.pos[0], alturaDe(it.pos[0], it.pos[2]) + (it.pos[1] || 0), it.pos[2]],
     }));
     return Object.fromEntries(Object.entries(d).map(([k, v]) => [k, posar(v)]));
-  }, [conteos, alturaDe]);
+  }, [conteos, alturaDe, bioma]);
 
   // El proscenio fijo (trío foreground): posado en el relieve, tinte neutro.
   const proscenio = useMemo(
