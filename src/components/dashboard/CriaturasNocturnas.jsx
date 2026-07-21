@@ -65,7 +65,7 @@ export const CRIATURAS_NOCTURNAS = [
   },
   {
     id: 'luciernaga',
-    nombre: 'Luciérnaga (cocuyo)',
+    nombre: 'Luciérnaga',
     cientifico: 'Lampyridae',
     eje: 'Bioindicador de la noche',
     rol: 'Escarabajo bioluminiscente: sus larvas comen babosas y caracoles; su presencia indica suelo sano y poca contaminación lumínica.',
@@ -96,7 +96,7 @@ export const CRIATURAS_NOCTURNAS = [
   {
     id: 'tigrillo',
     nombre: 'Tigrillo (oncilla)',
-    cientifico: 'Leopardus tigrinus',
+    cientifico: 'Leopardus pardinoides',
     eje: 'Depredador tope',
     rol: 'Felino pequeño nocturno: caza roedores y aves que atacan cultivos; regula la cadena y mantiene el equilibrio de la finca.',
     frase: 'Soy el que cierra la cadena: donde yo cazo, la plaga no manda.',
@@ -536,7 +536,7 @@ function AvatarMurcielago() {
   );
 }
 
-/* Luciérnaga / cocuyo (Lampyridae) — PERSONAJE COMPLETO.
+/* Luciérnaga (Lampyridae) — PERSONAJE COMPLETO.
    Pose: posada en una HOJA sana, con el FAROL (los últimos segmentos del
    abdomen) latiendo — su luz solo prende donde el campo está limpio, y ese
    pulso es todo el personaje. Anatomía real del coleóptero: cabeza con ojos
@@ -841,7 +841,7 @@ function AvatarArmadillo() {
 }
 
 /* Roseta ABIERTA del tigrillo: anillo INTERRUMPIDO de borde oscuro con el
-   centro leonado — el patrón real de Leopardus tigrinus (no lunar cerrado de
+   centro leonado — el patrón real de Leopardus pardinoides (no lunar cerrado de
    jaguar). Reutilizable en cualquier parte del cuerpo con escala y giro. */
 function RosetaAbierta({ cx, cy, s = 1, rot = 0 }) {
   return (
@@ -853,7 +853,7 @@ function RosetaAbierta({ cx, cy, s = 1, rot = 0 }) {
   );
 }
 
-/* Tigrillo / oncilla (Leopardus tigrinus) — PERSONAJE COMPLETO.
+/* Tigrillo / oncilla (Leopardus pardinoides) — PERSONAJE COMPLETO.
    Felino PEQUEÑO (menos de 3 kg, tamaño de gato casero — NO un jaguar
    chiquito): cabeza pequeña y redondeada, hocico corto, ojos grandes cuya
    pupila se abre REDONDA en la noche, orejas amplias con la mancha blanca en
