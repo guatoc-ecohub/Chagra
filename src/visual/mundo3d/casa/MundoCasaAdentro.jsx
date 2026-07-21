@@ -117,7 +117,7 @@ const TEMA_PANEL = {
 /* Los destinos por defecto (rutas hash de prod); un host con router propio
    pasa sus callbacks y estos no corren. */
 const irAPortales = () => {
-  window.location.hash = '#/vitrina_maestra';
+  window.location.hash = '#/mockups/vitrina-maestra';
 };
 const irAFermentos = () => {
   window.location.hash = '#/diorama_fermentos';

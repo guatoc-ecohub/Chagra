@@ -361,6 +361,88 @@ const LUCES_MUNDOS = [
   { color: LUCES.luna, pos: [0.05, 1.58] },
 ];
 
+function MarcoVentana({ cx, cy, w, h, z, reducedMotion }) {
+  const marco = useRef(null);
+  const grosor = 0.035;
+  const prof = 0.04;
+  useFrame(({ clock }) => {
+    if (reducedMotion) return;
+    const t = clock.elapsedTime;
+    const g = marco.current;
+    if (!g) return;
+    const pulso = 0.55 + 0.25 * Math.sin(t * 1.9);
+    for (let i = 0; i < g.children.length; i += 1) {
+      g.children[i].material.opacity = pulso;
+    }
+  });
+  return (
+    <group ref={marco}>
+      {/* marco superior */}
+      <mesh position={[cx, cy + h / 2 + grosor / 2, z + prof]}>
+        <boxGeometry args={[w + grosor * 2, grosor, 0.025]} />
+        <meshBasicMaterial
+          color={LUCES.candela}
+          transparent
+          opacity={0.55}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      {/* marco inferior */}
+      <mesh position={[cx, cy - h / 2 - grosor / 2, z + prof]}>
+        <boxGeometry args={[w + grosor * 2, grosor, 0.025]} />
+        <meshBasicMaterial
+          color={LUCES.candela}
+          transparent
+          opacity={0.55}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      {/* marco izquierdo */}
+      <mesh position={[cx - w / 2 - grosor / 2, cy, z + prof]}>
+        <boxGeometry args={[grosor, h, 0.025]} />
+        <meshBasicMaterial
+          color={LUCES.candela}
+          transparent
+          opacity={0.55}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      {/* marco derecho */}
+      <mesh position={[cx + w / 2 + grosor / 2, cy, z + prof]}>
+        <boxGeometry args={[grosor, h, 0.025]} />
+        <meshBasicMaterial
+          color={LUCES.candela}
+          transparent
+          opacity={0.55}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      {/* esquineros brillantes */}
+      {[
+        [cx - w / 2, cy + h / 2],
+        [cx + w / 2, cy + h / 2],
+        [cx - w / 2, cy - h / 2],
+        [cx + w / 2, cy - h / 2],
+      ].map(([x, y], i) => (
+        <mesh key={i} position={[x, y, z + prof + 0.01]}>
+          <circleGeometry args={[0.06, 8]} />
+          <meshBasicMaterial
+            color={NIEBLAS.dorada}
+            transparent
+            opacity={0.7}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 function VentanaMundos({ atm, reducedMotion, onPortales }) {
   const velo = useRef(null);
   const luces = useRef(null);
@@ -425,6 +507,8 @@ function VentanaMundos({ atm, reducedMotion, onPortales }) {
           </mesh>
         ))}
       </group>
+      {/* marco dorado pulsante: la ventana SE TOCA */}
+      <MarcoVentana cx={cx} cy={cy} w={w} h={h} z={z} reducedMotion={reducedMotion} />
       {/* el charco de luz que el vano tira al piso (afordancia de "se toca") */}
       <mesh position={[cx, 0.02, -1.9]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[0.7, 18]} />

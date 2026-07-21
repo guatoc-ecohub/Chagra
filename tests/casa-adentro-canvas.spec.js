@@ -22,3 +22,20 @@ test.describe('Casa por dentro, altura del canvas', () => {
     expect(alturas.canvas).toBe(alturas.viewport);
   });
 });
+
+test.describe('Casa por dentro, ventana de los mundos', () => {
+  test('la ventana de los mundos navega a #/mockups/vitrina-maestra', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/?ciclo=12#/mockups/casa-adentro', { waitUntil: 'domcontentloaded' });
+
+    const mundo = page.locator('.mcasa');
+    await expect(mundo).toBeVisible({ timeout: 20_000 });
+
+    const botonVentana = mundo.locator('button', { hasText: 'La ventana de los mundos' });
+    await expect(botonVentana).toBeVisible({ timeout: 10_000 });
+    await botonVentana.click();
+
+    await page.waitForURL(/#\/mockups\/vitrina-maestra/, { timeout: 10_000 });
+    expect(page.url()).toContain('#/mockups/vitrina-maestra');
+  });
+});

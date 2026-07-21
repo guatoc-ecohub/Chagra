@@ -65,6 +65,7 @@ import TransicionMundoKit from '../visual/mundo3d/TransicionMundoKit.jsx';
 import { FaunaAmbiental } from '../visual/creatures/FaunaAmbiental.jsx';
 import { EntFrailejon } from '../visual/creatures/EntFrailejon.jsx';
 import useAvatarCreature from '../hooks/useAvatarCreature.js';
+import { AbejaAngelita } from '../visual/creatures';
 import {
   PALM,
   geomCieloDomo,
@@ -899,6 +900,39 @@ const CSS_VMX = `
   font-weight: 700;
   box-shadow: 0 4px 12px rgba(58, 42, 24, 0.16);
 }
+/* BOTÓN VIVO del juego: Angelita aleteando invita a jugar. */
+.vmx-boton-juego {
+  align-self: center;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 2px solid rgba(214, 168, 72, 0.65);
+  border-radius: 999px;
+  background: linear-gradient(160deg, rgba(58, 36, 22, 0.92) 0%, rgba(74, 44, 24, 0.92) 100%);
+  color: #fff8ea;
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 5px 15px 5px 7px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(58, 42, 24, 0.35);
+  transition: transform 120ms ease, box-shadow 200ms ease;
+}
+.vmx-boton-juego:hover,
+.vmx-boton-juego:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(214, 168, 72, 0.45);
+}
+.vmx-boton-juego:active { transform: translateY(0); }
+.vmx-boton-juego:disabled { opacity: 0.5; cursor: default; }
+.vmx-boton-juego .abeja-juego {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vmx-boton-juego { transition: none; }
+}
 .vmx-chips {
   display: flex;
   gap: 10px;
@@ -1165,6 +1199,10 @@ export default function VitrinaMaestraMundos({ onBack }) {
   const alCrear = useCallback(() => setListo(true), []);
   const senalar = useCallback((id) => setSenalado(id), []);
 
+  const irAMetalSlug = useCallback(() => {
+    window.location.hash = '#/mockups/metal-slug-campo';
+  }, []);
+
   const con3D = !sinCanvas && fase !== 'mundo';
   const enGaleria = fase === 'galeria' && !viaje;
   const MundoElegido = mundoId ? COMPONENTES[mundoId] : null;
@@ -1274,6 +1312,24 @@ export default function VitrinaMaestraMundos({ onBack }) {
                 {defSenalado.emoji} {defSenalado.titulo} — {defSenalado.pisoNombre.toLowerCase()} · toque para entrar
               </p>
             )}
+            <button
+              type="button"
+              className="vmx-boton-juego"
+              onClick={irAMetalSlug}
+              disabled={!enGaleria}
+              data-testid="boton-metal-slug-campo"
+              aria-label="Entrar al juego Metal Slug del campo"
+            >
+              <AbejaAngelita
+                className="abeja-juego"
+                size={44}
+                animated={!reducedMotion}
+                pose="vuela"
+                polen={!reducedMotion}
+                title="Angelita lista para el juego"
+              />
+              <span>Metal Slug del campo</span>
+            </button>
             {!sinCanvas && (
               <div className="vmx-chips" role="list" aria-label="Entrar a un mundo, por piso térmico">
                 {PISOS.map((piso) => (
