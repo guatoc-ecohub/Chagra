@@ -78,21 +78,30 @@ import {
  * guadua, nogal, cedro, cámbulo, gualanday, siete cueros, helecho, heliconia,
  * quiche). Por eso se subieron los árboles y se bajaron los frailejones.
  */
+/*
+ * REDISEÑO 2026-07-20 (páramo espectacular, dir. Jackson): el operador revierte
+ * la degradación del 07-16 para ESTE claro. El frailejón vuelve a ser el
+ * PROTAGONISTA visual: un frailejonal DENSO que impone en primer plano, con una
+ * banda HÉROE de adultos f3 (enagua + roseta plateada + flor) grandes y cercanos.
+ * La queñua (Ent) sigue siendo la guardiana del centro — no se toca su rol.
+ *   · frailejonHero: los gigantes de primer plano (3-4 m), la firma del páramo.
+ *   · el resto de edades puebla el frailejonal alrededor (gradiente de edad).
+ */
 export const FLORA_TIER = {
   alto: {
-    frailejonJoven: 4, frailejon: 4, frailejonViejo: 2, frailejonFlor: 2,
+    frailejonHero: 7, frailejonJoven: 9, frailejon: 8, frailejonViejo: 5, frailejonFlor: 4,
     yarumo: 5, roble: 5, encenillo: 6,
-    aliso: 5, gaque: 4, mortino: 14, romerillo: 14, roca: 9, musgo: 12, niebla: 3,
+    aliso: 5, gaque: 4, mortino: 16, romerillo: 16, roca: 10, musgo: 20, niebla: 3,
   },
   medio: {
-    frailejonJoven: 2, frailejon: 3, frailejonViejo: 1, frailejonFlor: 1,
+    frailejonHero: 4, frailejonJoven: 5, frailejon: 5, frailejonViejo: 2, frailejonFlor: 2,
     yarumo: 3, roble: 3, encenillo: 3,
-    aliso: 3, gaque: 2, mortino: 8, romerillo: 8, roca: 5, musgo: 6, niebla: 0,
+    aliso: 3, gaque: 2, mortino: 9, romerillo: 9, roca: 5, musgo: 10, niebla: 0,
   },
   bajo: {
-    frailejonJoven: 1, frailejon: 2, frailejonViejo: 0, frailejonFlor: 0,
+    frailejonHero: 2, frailejonJoven: 2, frailejon: 3, frailejonViejo: 1, frailejonFlor: 0,
     yarumo: 2, roble: 2, encenillo: 1,
-    aliso: 1, gaque: 0, mortino: 3, romerillo: 3, roca: 2, musgo: 3, niebla: 0,
+    aliso: 1, gaque: 0, mortino: 3, romerillo: 3, roca: 2, musgo: 4, niebla: 0,
   },
 };
 
@@ -851,6 +860,74 @@ export function geomMusgo(seed = 10) {
 }
 
 /* -------------------------------------------------------------------------- */
+/*  FIGURA DE ESCALA — un campesino pequeño al pie del frailejonal              */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * La lente Shadow of the Colossus: la escala inmensa NO se siente por tamaño
+ * absoluto sino por CONTRASTE con una figura conocida. Un campesino de ~1.7 m
+ * con ruana y sombrero, quieto al pie de un frailejón héroe, le da la vara de
+ * medir al ojo — recién ahí el frailejón de 3-4 m se lee "gigante que tardó un
+ * siglo". Low-poly, silueta legible a distancia, mira al frailejonal. Color
+ * horneado en vertexColors como toda la flora (mismo material compartido).
+ * Anti-leak: figura genérica, sin rostro ni rasgos identificables.
+ */
+const PAL_FIG = {
+  ruana: '#8a3b2e', // ruana rojo-tierra andina
+  ruana2: '#6e2f24', // pliegue en sombra
+  pantalon: '#3a3428',
+  bota: '#241f18',
+  piel: '#a8794f',
+  sombrero: '#c8a768', // paja
+  sombreroCinta: '#59452f',
+};
+
+/** Un campesino de ~1.75 unidades (mira a +Z). Pieza única, no instanciada. */
+export function geomCampesinoEscala(seed = 44) {
+  const r = rng(seed);
+  const partes = [];
+  // Piernas + botas.
+  for (const lado of [-1, 1]) {
+    const pierna = new THREE.CylinderGeometry(0.072, 0.088, 0.72, 6, 1);
+    poner(pierna, [lado * 0.1, 0.4, 0]);
+    partes.push(pintar(pierna, PAL_FIG.pantalon));
+    const bota = new THREE.CylinderGeometry(0.095, 0.11, 0.15, 6, 1);
+    poner(bota, [lado * 0.1, 0.075, 0.03]);
+    partes.push(pintar(bota, PAL_FIG.bota));
+  }
+  // Torso bajo la ruana.
+  const torso = new THREE.CylinderGeometry(0.17, 0.2, 0.5, 7, 1);
+  poner(torso, [0, 1.02, 0]);
+  partes.push(pintar(torso, PAL_FIG.ruana2));
+  // La RUANA: manto que cae en trapecio ancho desde los hombros (la firma andina).
+  const ruana = new THREE.CylinderGeometry(0.26, 0.4, 0.66, 6, 1);
+  poner(ruana, [0, 1.06, 0], [0, Math.PI / 6, 0]);
+  partes.push(pintar(ruana, variar(PAL_FIG.ruana, r, 0.05)));
+  // Hombros redondeados de la ruana (le da cuerpo humano, no cono).
+  const hombros = new THREE.SphereGeometry(0.28, 8, 6, 0, Math.PI * 2, 0, Math.PI * 0.55);
+  poner(hombros, [0, 1.3, 0], [0, 0, 0], [1, 0.7, 0.85]);
+  partes.push(pintar(hombros, variar(PAL_FIG.ruana, r, 0.05)));
+  // Cuello + cabeza.
+  const cuello = new THREE.CylinderGeometry(0.06, 0.07, 0.1, 6, 1);
+  poner(cuello, [0, 1.44, 0]);
+  partes.push(pintar(cuello, PAL_FIG.piel));
+  const cabeza = new THREE.SphereGeometry(0.125, 10, 8);
+  poner(cabeza, [0, 1.57, 0], [0, 0, 0], [1, 1.08, 1]);
+  partes.push(pintar(cabeza, PAL_FIG.piel));
+  // Sombrero: ala + copa + cinta (silueta de sombrero campesino).
+  const ala = new THREE.CylinderGeometry(0.28, 0.28, 0.03, 14, 1);
+  poner(ala, [0, 1.65, 0]);
+  partes.push(pintar(ala, PAL_FIG.sombrero));
+  const copa = new THREE.CylinderGeometry(0.135, 0.155, 0.15, 12, 1);
+  poner(copa, [0, 1.73, 0]);
+  partes.push(pintar(copa, PAL_FIG.sombrero));
+  const cinta = new THREE.CylinderGeometry(0.158, 0.158, 0.045, 12, 1);
+  poner(cinta, [0, 1.68, 0]);
+  partes.push(pintar(cinta, PAL_FIG.sombreroCinta));
+  return fusionarSeguro(partes, 'campesino-escala');
+}
+
+/* -------------------------------------------------------------------------- */
 /*  DISTRIBUCIÓN biogeográfica alrededor del Ent                               */
 /* -------------------------------------------------------------------------- */
 
@@ -904,14 +981,19 @@ function sembrar(n, rMin, rMax, r, opts = {}) {
 export function distribucionFlora(conteos, seed = 707) {
   const c = conteos;
   return {
-    // Frailejonal: TRES edades entremezcladas en el mismo anillo interior-medio,
-    // agrupadas, con mucha variación de tamaño + ladeo por instancia (`lean`) →
-    // un paisaje con gradiente de edad, nada clonado. Los jóvenes se acercan más
-    // al claro (rMin menor); los viejos quedan un poco más afuera.
-    frailejonJoven: sembrar(c.frailejonJoven, 3.4, 9.5, rng(seed + 1), { eMin: 0.78, eMax: 1.12, varia: 0.13, lean: 0.14 }),
-    frailejon: sembrar(c.frailejon, 3.8, 10.5, rng(seed + 12), { eMin: 0.86, eMax: 1.22, varia: 0.14, lean: 0.15 }),
-    frailejonViejo: sembrar(c.frailejonViejo, 4.4, 11, rng(seed + 13), { eMin: 0.9, eMax: 1.3, varia: 0.14, lean: 0.17 }),
-    frailejonFlor: sembrar(c.frailejonFlor, 4.5, 9.5, rng(seed + 2), { eMin: 0.9, eMax: 1.2, varia: 0.1, lean: 0.12 }),
+    // Banda HÉROE (2026-07-20): los gigantes de PRIMER PLANO. Un anillo cercano y
+    // parejo (uniforme) de adultos GRANDES (esc 1.5-1.95 → 3-4 m) que rodea el
+    // claro a media distancia: desde cualquier ángulo de órbita, varios quedan
+    // enmarcando la cámara e IMPONEN. Ladeo generoso para que ninguno se lea
+    // clonado. Son la firma del páramo — el personaje principal, por fin visible.
+    frailejonHero: sembrar(c.frailejonHero, 5.5, 9.5, rng(seed + 21), { eMin: 1.5, eMax: 1.95, uniforme: true, varia: 0.12, lean: 0.16 }),
+    // Frailejonal de acompañamiento: TRES edades entremezcladas, agrupadas y
+    // ACERCADAS al claro (rMin bajado desde el rediseño 07-16) con mucha
+    // variación de tamaño + ladeo → gradiente de edad denso, nada clonado.
+    frailejonJoven: sembrar(c.frailejonJoven, 2.6, 8.5, rng(seed + 1), { eMin: 0.8, eMax: 1.18, varia: 0.13, lean: 0.15 }),
+    frailejon: sembrar(c.frailejon, 3.0, 9.5, rng(seed + 12), { eMin: 0.95, eMax: 1.4, varia: 0.14, lean: 0.16 }),
+    frailejonViejo: sembrar(c.frailejonViejo, 3.4, 10.5, rng(seed + 13), { eMin: 1.05, eMax: 1.55, varia: 0.14, lean: 0.18 }),
+    frailejonFlor: sembrar(c.frailejonFlor, 3.2, 9, rng(seed + 2), { eMin: 1.0, eMax: 1.45, varia: 0.1, lean: 0.13 }),
     // Sotobosque.
     mortino: sembrar(c.mortino, 4, 12, rng(seed + 3), { eMin: 0.8, eMax: 1.2, varia: 0.12 }),
     romerillo: sembrar(c.romerillo, 3, 12, rng(seed + 4), { eMin: 0.8, eMax: 1.25, varia: 0.14 }),
