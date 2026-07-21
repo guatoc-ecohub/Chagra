@@ -113,7 +113,7 @@ export function AbejaAngelita({
      'poniendose' (reproduce UNA vez la caída teatral: baja girada, rebasa,
      rebota y asienta — su entrada de día soleado). La cadencia vive en
      angelita-missminutes.css gateada por data-gafas; RM = puestas quietas. */
-  gafas = false,
+  gafas = /** @type {boolean|'poniendose'} */ (false),
   /* ── CEJAS EXPRESIVAS (AngelitaGafas.CejasRubber) ──────────────────────────
      OPT-IN: null (default: la carita de siempre) | 'alegres' | 'altas' |
      'vivas' (con eyebrow-flash al hablar) | 'fruncidas' (concentrada). El

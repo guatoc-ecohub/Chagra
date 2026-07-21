@@ -37,12 +37,12 @@ export function recortarAviso(texto, tope = TOPE_AVISO) {
  *     de la burbuja no anima (CSS).
  *
  * @param {Object} props
- * @param {string|null} props.mensaje — lo que dice Angelita (null → no pinta).
- * @param {string} [props.tipo] — uno de TIPOS_AVISO (angelitaAvisoTipos).
- * @param {boolean} [props.animado=true] — false apaga el typewriter (además
+ * @param {string|null} props.mensaje - lo que dice Angelita (null no pinta).
+ * @param {string} [props.tipo] - uno de TIPOS_AVISO (angelitaAvisoTipos).
+ * @param {boolean} [props.animado=true] - false apaga el typewriter (además
  *   del respeto automático a prefers-reduced-motion).
- * @param {number} [props.velocidadMs=26] — ritmo del typewriter.
- * @param {string} [props.className] — clases extra (posicionamiento del host).
+ * @param {number} [props.velocidadMs=26] - ritmo del typewriter.
+ * @param {string} [props.className] - clases extra (posicionamiento del host).
  */
 export default function BurbujaAngelita({
   mensaje,

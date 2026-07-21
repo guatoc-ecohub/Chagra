@@ -7365,7 +7365,7 @@ const HARD_ALREADY_INVIABLE_RE =
   /(\bno\s+es\s+viable\b|inviable|\bno\s+se\s+da\b|\bno\s+prosper|\bdemasiad[oa]\s+(frio|fria|alt|caliente|calid[oa])\b|\bno\s+(la?\s+)?siembres\b|\bno\s+(es\s+)?recomendable\s+(sembrar|cultivar)\b)/;
 
 /** Marca idempotente del reemplazo de inviabilidad dura. */
-const HARD_ALTITUDE_MARKER = 'no es viable a esa altura';
+const HARD_ALTITUDE_MARKER = 'NO es viable a esa altura';
 
 /**
  * Extrae altitudes (msnm) de un texto SIN el piso de 800 m de `_extractAltitudes`
@@ -7404,7 +7404,7 @@ function _hardAltitudeReplacement(band, alt, demasiadoAlto) {
     ? `a ${alt} msnm hace demasiado frío y hay heladas que lo matan: el ${identity} ${HARD_ALTITUDE_MARKER}`
     : `a ${alt} msnm hace demasiado calor: el ${identity} es de clima más frío y ${HARD_ALTITUDE_MARKER}`;
   return (
-    `Ojo, con sinceridad: ${motivo}. Su rango viable está alrededor de ${band.range}. ` +
+    `Corrección importante: Ojo, con sinceridad: ${motivo}. Su rango viable está alrededor de ${band.range}. ` +
     'No existe una "variedad de altura/de tierra caliente" ni un biopreparado que cambie eso —tampoco un ' +
     'caldo que evite la helada del páramo; esos cuentos solo te hacen perder la semilla y la plata. ' +
     `Si quieres sembrar a ${alt} msnm, mejor escoge un cultivo que sí corresponda a esa altura, y con gusto te ` +

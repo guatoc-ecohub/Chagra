@@ -69,6 +69,7 @@ function prefiereQuietud() {
  * @param {string} [props.tier]  'bajo' apaga line-boil del número (el show
  *   sigue: es feedback de llegada, no decoración).
  * @param {() => void} [props.onLista]  el show terminó: ya es la asistente.
+ * @param {string} [props.className]  clase adicional del contenedor.
  *   El resto de props (enso, energia, confianza, …) pasan a <Angelita>.
  */
 export function AngelitaEntrada({

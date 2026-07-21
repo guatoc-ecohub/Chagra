@@ -48,6 +48,8 @@ jobs:
             paths-ignore:
               - 'scripts/wake-word/**'
               - 'tests/e2e-real/**'
+              # Vite genera este bundle desde fuentes y dependencias ya analizadas.
+              - 'dist-prod/**'
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3

@@ -82,7 +82,7 @@ export const NIVELES_CONFIANZA = {
   },
 };
 
-export const ORDEN_NIVELES = ['alta', 'media', 'baja', 'honesta'];
+export const ORDEN_NIVELES = /** @type {const} */ (['alta', 'media', 'baja', 'honesta']);
 
 /**
  * Normaliza lo que entregue el host a un nivel del hilo. Acepta:

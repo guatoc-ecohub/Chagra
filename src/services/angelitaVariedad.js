@@ -150,6 +150,7 @@ const APERTURAS_POR_TIPO = {
 
 /* Cierres del copy del motor con sus sinónimos. SOLO se cambia el remate del
    mensaje (la pregunta-invitación); las cifras y los hechos quedan intactos. */
+/** @type {Array<[string, string[]]>} */
 const CIERRES_SINONIMOS = [
   ['¿Le hacemos seguimiento?', ['¿Le seguimos la pista?', '¿La vamos mirando juntos?']],
   ['¿Le echamos un ojo a cómo va?', ['¿Le damos una miradita?', '¿Vemos cómo va?']],
@@ -196,7 +197,7 @@ function rematesDe(base) {
  * Variantes deterministas de un mensaje: aperturas × remates. Nunca tocan
  * cifras ni el núcleo factual — solo visten la frase. Puro, sin estado.
  * @param {string} base
- * @param {string} [tipo] — uno de TIPOS_AVISO (default informativa).
+ * @param {string} [tipo] - uno de TIPOS_AVISO (default informativa).
  * @returns {string[]} pool con el base de primero, sin duplicados.
  */
 export function variantesDeterministas(base, tipo = 'informativa') {
@@ -240,8 +241,8 @@ function cifrasDe(texto) {
 /**
  * Valida y limpia una paráfrasis del LLM contra su mensaje base. Devuelve la
  * variante limpia, o null si no pasa los guardrails (se descarta en silencio).
- * @param {string} candidato — lo que devolvió el LLM.
- * @param {string} base — el mensaje original del motor.
+ * @param {string} candidato - lo que devolvió el LLM.
+ * @param {string} base - el mensaje original del motor.
  * @returns {string|null}
  */
 export function validarParafrasis(candidato, base) {
@@ -361,10 +362,10 @@ export async function refrescarPoolLLM(base, tipo = 'informativa') {
  * no repite variante hasta agotar el pool (y al agotar, reinicia el ciclo).
  * Orden barajado con seed diario: cada día suena en otro orden.
  *
- * @param {string} base — el mensaje del motor (ya aprobado para sonar).
- * @param {string} [tipo] — uno de TIPOS_AVISO (afecta las aperturas y el tono
+ * @param {string} base - el mensaje del motor (ya aprobado para sonar).
+ * @param {string} [tipo] - uno de TIPOS_AVISO (afecta las aperturas y el tono
  *   de la paráfrasis LLM). Default 'informativa'.
- * @param {{ ahoraMs?: number, sinLLM?: boolean }} [opts] — reloj inyectable
+ * @param {{ ahoraMs?: number, sinLLM?: boolean }} [opts] - reloj inyectable
  *   (tests) y apagado explícito de la capa LLM.
  * @returns {string} la variante elegida (en el peor caso, el base intacto).
  */

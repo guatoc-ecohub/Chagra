@@ -224,6 +224,8 @@ function MotaDeVilano() {
  * @param {number} [props.energia]
  * @param {string|null} [props.mundoId]  su herramienta por mundo (PropEnMano).
  * @param {boolean} [props.lineBoil]  contorno que hierve (momentos heroicos).
+ * @param {boolean|'poniendose'} [props.gafas]  gafas para la entrada teatral.
+ * @param {string} [props.cejas]  expresión de cejas opcional.
  * @param {string} [props.title]  pisa la narración aria derivada del estado.
  */
 export function Angelita({

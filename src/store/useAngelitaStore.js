@@ -112,7 +112,7 @@ const useAngelitaStore = create(
        * Corre el motor con el contexto en vivo. El shell arma `ctx` con lo que
        * tenga localmente (notificaciones, logro, mundo+datos, ocupado…); el
        * store inyecta la memoria anti-molestia y el silencio.
-       * @param {Object} ctx — ver resolverComportamiento (sin la parte de memoria).
+       * @param {Object} ctx - ver resolverComportamiento (sin la parte de memoria).
        */
       evaluar: (ctx = {}) => {
         const { ultimaHablaPorLlave, ultimoLogroId, silenciado } = get();
@@ -131,7 +131,7 @@ const useAngelitaStore = create(
        * Husmear un mundo: comentario grounded al entrar. Atajo de evaluar()
        * para el caso más común (navegación entre mundos).
        * @param {string} mundo
-       * @param {Object} [datos] — datos reales del mundo (ver comentarioDeMundo).
+       * @param {Object} [datos] - datos reales del mundo (ver comentarioDeMundo).
        * @param {{ ocupado?: boolean, ahoraMs?: number }} [opts]
        */
       entrarMundo: (mundo, datos = {}, opts = {}) =>

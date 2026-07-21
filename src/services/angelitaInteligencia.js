@@ -79,7 +79,7 @@ const ARIA_COMPORTAMIENTO = {
 
 /**
  * Traduce un estado de comportamiento al estado VISUAL que consume la cara.
- * @param {string} estado — uno de ESTADOS_COMPORTAMIENTO.
+ * @param {string} estado - uno de ESTADOS_COMPORTAMIENTO.
  * @param {{ severidad?: ('alta'|'media'|'baja'|null) }} [opts]
  * @returns {string} estado visual canónico (angelitaEstados.js).
  */
@@ -171,7 +171,7 @@ const CULTIVOS_MUNDO = new Set([
 
 /**
  * Resuelve el mundo al que pertenece una pantalla (currentView del shell).
- * @param {string|null|undefined} pantalla
+ * @param {unknown} pantalla
  * @returns {string|null} uno de MUNDOS, o null si la pantalla no mapea.
  */
 export function mundoDePantalla(pantalla) {
@@ -292,8 +292,8 @@ const COMENTARISTA_MUNDO = {
  * datos reales que le pasen; si faltan, cae a un acompañamiento honesto (nunca
  * inventa una cifra ni un dato agronómico).
  *
- * @param {string} mundo — uno de MUNDOS.
- * @param {Object} [datos] — datos reales locales del mundo:
+ * @param {string} mundo - uno de MUNDOS.
+ * @param {Object} [datos] - datos reales locales del mundo:
  *   - mis_matas / vender / finca: { cultivos: Array<{name,count}> }
  *   - mis_animales: { especies: Array<{name,count}>, total?: number }
  *   - clima: { snapshot, describirFase?: (phase)=>string }
@@ -351,7 +351,7 @@ function severidadDelMomento(activeAlerts, pendingTasks, date) {
  * lógica de ranking del saludo proactivo) y le añade la severidad y el estado
  * de comportamiento que la cara necesita.
  *
- * @param {Object} input — ver buildProactiveGreeting (activeAlerts, pendingTasks,
+ * @param {Object} input - ver buildProactiveGreeting (activeAlerts, pendingTasks,
  *   cultivos, altitud, ensoOutlook, date, maxItems).
  * @returns {{ hay: boolean, estado: ('aviso'|'calma'), severidad: ('alta'|'media'|'baja'|null),
  *   hi: string, lead: string, items: Array, restCount: number, prompt: (string|null),
@@ -415,12 +415,12 @@ function llaveCooldown(estado, severidad) {
  * de su tipo de mensaje.
  *
  * @param {Object} p
- * @param {string} p.estado — comportamiento candidato ('aviso'|'celebra'|'husmea'|'calma').
+ * @param {string} [p.estado] - comportamiento candidato ('aviso'|'celebra'|'husmea'|'calma').
  * @param {('alta'|'media'|'baja'|null)} [p.severidad]
  * @param {number} [p.ahoraMs]
- * @param {number|null} [p.ultimaMs] — cuándo surgió por última vez ESE tipo.
- * @param {boolean} [p.ocupado] — el campesino está a mitad de algo (escribiendo, grabando…).
- * @param {boolean} [p.silenciado] — el usuario pidió silencio a Angelita.
+ * @param {number|null} [p.ultimaMs] - cuándo surgió por última vez ESE tipo.
+ * @param {boolean} [p.ocupado] - el campesino está a mitad de algo (escribiendo, grabando…).
+ * @param {boolean} [p.silenciado] - el usuario pidió silencio a Angelita.
  * @returns {boolean}
  */
 export function debeHablar({
@@ -449,18 +449,19 @@ export function debeHablar({
 
 /**
  * @typedef {Object} DecisionAngelita
- * @property {('calma'|'aviso'|'celebra'|'husmea')} estado — comportamiento elegido.
- * @property {string} visualEstado — estado visual canónico para la cara.
- * @property {string|null} mensaje — lo que dice (null si se queda en calma).
- * @property {string} aria — narración para lector de pantalla.
+ * @property {('calma'|'aviso'|'celebra'|'husmea')} estado - comportamiento elegido.
+ * @property {string} visualEstado - estado visual canónico para la cara.
+ * @property {string|null} mensaje - lo que dice (null si se queda en calma).
+ * @property {string} aria - narración para lector de pantalla.
  * @property {('alta'|'media'|'baja'|null)} severidad
  * @property {number} prioridad
- * @property {boolean} interrumpe — si de verdad debe surgir el mensaje ahora.
- * @property {string|null} prompt — prompt sugerido para sembrar al agente.
- * @property {string|null} logroId — id del logro celebrado (para no repetir).
+ * @property {boolean} interrumpe - si de verdad debe surgir el mensaje ahora.
+ * @property {string|null} prompt - prompt sugerido para sembrar al agente.
+ * @property {string|null} logroId - id del logro celebrado (para no repetir).
  */
 
 /** La decisión de reposo: Angelita tranquila, sin mensaje. */
+/** @returns {DecisionAngelita} */
 function decisionCalma() {
   return {
     estado: 'calma',
@@ -484,12 +485,12 @@ function decisionCalma() {
  *
  * @param {Object} ctx
  * @param {ReturnType<typeof notificacionesInteligentes>|null} [ctx.notificaciones]
- * @param {{ id:string, texto:string }|null} [ctx.logro] — logro REAL a celebrar.
- * @param {string|null} [ctx.ultimoLogroId] — último logro ya celebrado (dedup).
- * @param {string|null} [ctx.mundo] — mundo actual (para husmear).
- * @param {Object} [ctx.datosMundo] — datos reales del mundo (ver comentarioDeMundo).
+ * @param {{ id:string, texto:string }|null} [ctx.logro] - logro REAL a celebrar.
+ * @param {string|null} [ctx.ultimoLogroId] - último logro ya celebrado (dedup).
+ * @param {string|null} [ctx.mundo] - mundo actual (para husmear).
+ * @param {Object} [ctx.datosMundo] - datos reales del mundo (ver comentarioDeMundo).
  * @param {number} [ctx.ahoraMs]
- * @param {Object} [ctx.ultimaHablaPorLlave] — { [llaveCooldown]: ms } de la última vez.
+ * @param {Object} [ctx.ultimaHablaPorLlave] - { [llaveCooldown]: ms } de la última vez.
  * @param {boolean} [ctx.ocupado]
  * @param {boolean} [ctx.silenciado]
  * @returns {DecisionAngelita}
@@ -507,7 +508,7 @@ export function resolverComportamiento(ctx = {}) {
     silenciado = false,
   } = ctx;
 
-  /** @type {Array<{estado:string, prioridad:number, severidad:any, mensaje:string, prompt:string|null, logroId:string|null}>} */
+  /** @type {Array<{estado:'aviso'|'celebra'|'husmea', prioridad:number, severidad:'alta'|'media'|'baja'|null, mensaje:string, prompt:string|null, logroId:string|null}>} */
   const candidatos = [];
 
   // Aviso — algo que atender.
@@ -573,7 +574,7 @@ export function resolverComportamiento(ctx = {}) {
   if (!surge) return decisionCalma();
 
   return {
-    estado: /** @type {any} */ (ganador.estado),
+    estado: ganador.estado,
     visualEstado: estadoVisualDeComportamiento(ganador.estado, { severidad: ganador.severidad }),
     mensaje: ganador.mensaje,
     aria: ariaDeComportamiento(ganador.estado),

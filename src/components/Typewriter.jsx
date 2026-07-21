@@ -32,15 +32,15 @@ import './typewriter.css';
  *    el texto (cambiar `texto` reinicia la escritura).
  *
  * API:
- *   @param {string}   texto        — lo que se escribe. Cambiarlo reinicia.
- *   @param {number}   [velocidadMs=26]  — ms por grafema (base del ritmo).
- *   @param {number}   [retardoMs=140]   — espera antes de la primera letra.
- *   @param {boolean}  [cursor=true]     — mostrar el cursor que parpadea.
- *   @param {boolean}  [animado=true]    — false = texto completo de una vez
+ *   @param {string}   texto        - lo que se escribe. Cambiarlo reinicia.
+ *   @param {number}   [velocidadMs=26]  - ms por grafema (base del ritmo).
+ *   @param {number}   [retardoMs=140]   - espera antes de la primera letra.
+ *   @param {boolean}  [cursor=true]     - mostrar el cursor que parpadea.
+ *   @param {boolean}  [animado=true]    - false = texto completo de una vez
  *                                         (además del respeto automático a
  *                                         prefers-reduced-motion).
- *   @param {Function} [onTerminado]     — callback al terminar de escribir.
- *   @param {string}   [className]       — clases extra para el contenedor.
+ *   @param {Function} [onTerminado]     - callback al terminar de escribir.
+ *   @param {string}   [className]       - clases extra para el contenedor.
  */
 
 /** Pausa extra (multiplicador de velocidadMs) tras signos de puntuación. */
