@@ -203,61 +203,55 @@ function resolveSpeciesSlug(doc, speciesSlug = null) {
   return '';
 }
 
-/**
- * Claves que NO se indexan como dato corto: son identificadores/plumbing y
- * solo diluirían el IDF del BM25 sin responder ninguna pregunta del campesino.
- * Se comparan contra el ÚLTIMO segmento de la clave (`requirements.id` → `id`).
- */
-const CLAVES_RUIDO = new Set([
-  'id', 'slug', 'uuid', '_id', 'key', 'ref', 'url', 'href', 'src', 'icon',
-  'version', 'schema_version', 'orden', 'order', 'index', 'idx', 'color', 'hex',
-]);
+function normalizeKey(key) {
+  return String(key)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
 
-/** true si la clave es plumbing y su valor corto no aporta recuperación. */
-function esClaveRuido(clavePlana) {
-  const ultimo = String(clavePlana).split('.').pop().replace(/\[\d+\]$/, '');
-  return CLAVES_RUIDO.has(ultimo.toLowerCase());
+function formatKeyLabel(key) {
+  return String(key)
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .trim();
+}
+
+function isContextualField(key, val) {
+  if (typeof val === 'number' && Number.isFinite(val)) return true;
+  const normalizedKey = normalizeKey(key);
+  return /(^|[^a-z0-9])(clima|ph|altitud|temperatura|dosis|humedad|distancia|msnm)([^a-z0-9]|$)/.test(normalizedKey);
+}
+
+function buildContextualText(key, val) {
+  const label = formatKeyLabel(key);
+  const value = typeof val === 'string' ? val.trim() : String(val);
+  return label ? `${label} ${value}` : value;
 }
 
 export function flattenDoc(doc, prefix = '', speciesSlug = null) {
   const slug = resolveSpeciesSlug(doc, speciesSlug);
   const passages = [];
-
-  // Un dato corto sin su clave es inservible: "calido" suelto no dice nada, y
-  // "0" menos. Se indexa `clave: valor` para que la clave aporte la semántica y
-  // el BM25 pueda casar "zona termica calido" contra `thermal_zones: calido`.
-  const addDatoCorto = (key, val) => {
-    const clave = `${prefix}${key}`;
-    if (esClaveRuido(clave)) return;
-    const legible = String(key).replace(/[_.]/g, ' ').trim();
-    passages.push({ key: clave, text: `${legible}: ${val}`, species: slug });
-  };
-
+  const fieldLabel = (key) => formatKeyLabel(`${prefix}${key}`.replace(/\.$/, ''));
   const addPassage = (key, val) => {
-    if (typeof val === 'string' && val.length > 20) {
-      passages.push({ key: `${prefix}${key}`, text: val, species: slug });
-    } else if (typeof val === 'string' && val.trim()) {
-      // ANTES se caían en silencio: `thermal_zones: 'calido'` (6 chars),
-      // `piso: 'frio'` (4). Medido 2026-07-15: 4.272 de 9.671 valores.
-      addDatoCorto(key, val.trim());
-    } else if (typeof val === 'number' && Number.isFinite(val)) {
-      // ANTES se caían en silencio: `altitud_msnm.optimo_min: 1800`,
-      // `temp_min: 12`. Medido 2026-07-15: 1.770 de 9.671 valores.
-      addDatoCorto(key, val);
+    const path = `${prefix}${key}`;
+    if (isContextualField(path, val) && (typeof val === 'string' || typeof val === 'number')) {
+      passages.push({ key: path, text: buildContextualText(fieldLabel(key), val), species: slug });
+    } else if (typeof val === 'string' && val.length > 20) {
+      passages.push({ key: path, text: val, species: slug });
     } else if (Array.isArray(val)) {
       val.forEach((item, i) => {
-        if (typeof item === 'string' && item.length > 20) {
-          passages.push({ key: `${prefix}${key}[${i}]`, text: item, species: slug });
-        } else if (typeof item === 'string' && item.trim()) {
-          addDatoCorto(`${key}[${i}]`, item.trim());
-        } else if (typeof item === 'number' && Number.isFinite(item)) {
-          addDatoCorto(`${key}[${i}]`, item);
+        const itemPath = `${path}[${i}]`;
+        if (isContextualField(itemPath, item) && (typeof item === 'string' || typeof item === 'number')) {
+          passages.push({ key: itemPath, text: buildContextualText(formatKeyLabel(itemPath), item), species: slug });
+        } else if (typeof item === 'string' && item.length > 20) {
+          passages.push({ key: itemPath, text: item, species: slug });
         } else if (typeof item === 'object' && item !== null) {
-          flattenDoc(item, `${prefix}${key}[${i}].`, slug).forEach((p) => passages.push(p));
+          flattenDoc(item, `${path}[${i}].`, slug).forEach((p) => passages.push(p));
         }
       });
     } else if (typeof val === 'object' && val !== null) {
-      flattenDoc(val, `${prefix}${key}.`, slug).forEach((p) => passages.push(p));
+      flattenDoc(val, `${path}.`, slug).forEach((p) => passages.push(p));
     }
   };
 
