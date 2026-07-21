@@ -25,6 +25,7 @@ import {
   calidadDeTier,
   distribucionFlora,
   geomFrailejon,
+  geomCampesinoEscala,
   geomYarumo,
   geomRoble,
   geomEncenillo,
@@ -160,6 +161,30 @@ function NieblaRasante({ n, reducedMotion }) {
   );
 }
 
+/*
+ * FiguraEscala — el campesino de referencia al pie del frailejonal héroe. Se
+ * planta en el PRIMER PLANO del lado de la cámara en reposo (dirección al Ent),
+ * posado sobre el relieve, mirando hacia el claro (contempla el frailejonal, de
+ * espaldas a la cámara: la silueta pequeña que revela la escala del gigante).
+ */
+const FIGURA_POS = [3.9, 0, 5.7]; // radio ~6.9 hacia la cámara de reposo
+function FiguraEscala({ mat, alturaDe }) {
+  const geo = useMemo(() => geomCampesinoEscala(44), []);
+  useLayoutEffect(() => () => geo.dispose(), [geo]);
+  const y = alturaDe ? alturaDe(FIGURA_POS[0], FIGURA_POS[2]) : 0;
+  // Mira hacia el centro del claro (el frailejonal / el Ent).
+  const rotY = Math.atan2(-FIGURA_POS[0], -FIGURA_POS[2]);
+  return (
+    <mesh
+      geometry={geo}
+      material={mat}
+      position={[FIGURA_POS[0], y, FIGURA_POS[2]]}
+      rotation={[0, rotY, 0]}
+      castShadow
+    />
+  );
+}
+
 /**
  * La capa de flora del páramo alrededor del Ent. Montar dentro del <Canvas>.
  * `alturaDe(x,z)` (opcional) POSA cada mata sobre el relieve del terreno:
@@ -177,6 +202,9 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
   // banco → el frailejonal se lee como un paisaje con gradiente de edad.
   const geos = useMemo(() => {
     const g = {};
+    // El HÉROE del páramo: adulto pleno f3 — enagua larga + roseta plateada + flor.
+    // La banda héroe lo instancia grande y cerca (frailejonHero) para que imponga.
+    if (conteos.frailejonHero) g.frailejonHero = geomFrailejon({ flor: true, q, edad: 0.98 }, 91);
     if (conteos.frailejonJoven) g.frailejonJoven = geomFrailejon({ flor: false, q, edad: 0.26 }, 21);
     if (conteos.frailejon) g.frailejon = geomFrailejon({ flor: false, q, edad: 0.62 }, 1);
     if (conteos.frailejonViejo) g.frailejonViejo = geomFrailejon({ flor: false, q, edad: 0.95 }, 37);
@@ -230,12 +258,19 @@ export default function FloraParamo({ tier = 'alto', reducedMotion = false, altu
       <Especie geo={geos.romerillo} mat={mat} items={dist.romerillo} />
       <Especie geo={geos.mortino} mat={mat} items={dist.mortino} />
 
-      {/* Frailejonar: el ícono del páramo, al frente — tres EDADES entremezcladas
-          (joven al ras, adulto, viejo de columna alta) + los que florecen. */}
+      {/* Frailejonar: el ícono del páramo, al frente — la banda HÉROE (adultos f3
+          grandes y cercanos que IMPONEN en primer plano) + tres EDADES
+          entremezcladas (joven al ras, adulto, viejo de columna alta) + los que
+          florecen. El frailejón vuelve a ser el protagonista visible del páramo. */}
+      <Especie geo={geos.frailejonHero} mat={mat} items={dist.frailejonHero} castShadow={sombra} />
       <Especie geo={geos.frailejonJoven} mat={mat} items={dist.frailejonJoven} />
       <Especie geo={geos.frailejon} mat={mat} items={dist.frailejon} />
       <Especie geo={geos.frailejonViejo} mat={mat} items={dist.frailejonViejo} />
       <Especie geo={geos.frailejonFlor} mat={mat} items={dist.frailejonFlor} />
+
+      {/* La VARA DE MEDIR: un campesino pequeño al pie del frailejonal héroe.
+          Sin él, el ojo no sabe que el frailejón mide 3-4 m (lente Colossus). */}
+      <FiguraEscala mat={mat} alturaDe={alturaDe} />
 
       {/* Árboles de fondo (anillo exterior, velados por la niebla). */}
       <Especie geo={geos.gaque} mat={mat} items={dist.gaque} castShadow={sombra} />
