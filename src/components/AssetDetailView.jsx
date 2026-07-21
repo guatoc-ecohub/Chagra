@@ -10,7 +10,7 @@ import MapPicker from './MapPicker';
 import PlanEditor from './PlanEditor';
 import { useAssetPerformance } from '../hooks/useAssetPerformance';
 import { MATERIAL_CATEGORIES } from '../config/materials';
-import { FARM_CONFIG } from '../config/defaults';
+import { getContextoGeoParaIA } from '../services/perfilFincaService';
 import { geoJsonToWkt, wktToGeoJson } from '../utils/geo';
 import { proximityCheck, findNearestLand, checkInvasiveProximity, getCoords } from '../utils/spatialAnalysis';
 import { ExternalAiButton } from './common/ExternalAiButton';
@@ -869,7 +869,7 @@ export const AssetDetailView = () => {
                     </>
                   )}
                   <ExternalAiButton
-                    context={{ speciesName: name, thermalZones: FARM_CONFIG.THERMAL_ZONES, speciesThermalZones, altitudMsnm: FARM_CONFIG.ALTITUD_MSNM, municipio: FARM_CONFIG.MUNICIPIO }}
+                    context={{ speciesName: name, speciesThermalZones, ...getContextoGeoParaIA() }}
                     buildPrompt={buildOpenExternalPrompt}
                     label="Ayuda IA"
                   />

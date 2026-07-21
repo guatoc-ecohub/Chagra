@@ -2365,7 +2365,7 @@ function poseValleParaAspecto(aspect) {
 }
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = null, onAngelita = null, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null }) {
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = null, onAngelita = null, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null, mundos = MUNDOS_DIR }) {
   /* La pose de reposo (aspecto-consciente, viene del host del Canvas). */
   const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
   const miraReposo = poseReposo.mira || MIRA_VALLE;
@@ -2509,7 +2509,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           discos-espejo); los toris de madera quedan SOLO para los lugares
           secundarios de menos uso. */}
       <VentanasVivas
-        mundos={MUNDOS_DIR}
+        mundos={mundos}
         alturaDe={alturaTerreno}
         nocturno={nocturno}
         practicas={practicas}
@@ -2517,7 +2517,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
         perfil={perfil}
         onEntrar={portada ? null : onEntrar}
       />
-      <PorticosSecundarios mundos={MUNDOS_DIR} alturaDe={alturaTerreno} />
+      <PorticosSecundarios mundos={mundos} alturaDe={alturaTerreno} />
       {/* EL ACCESO AL PÁRAMO — el Ent-queñua+frailejones del filo (VistaParamoEnt)
           se ARCHIVÓ 2026-07-18 (pedido del operador): se veía amontonado en la
           vista del valle. Ver src/mockups/valle/_archivo/vistaParamo.archivado.jsx.
@@ -2532,16 +2532,16 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           en su loma. Separa la profundidad sin mover nada — la casa, los
           hitos y las matas dejan de flotar. De noche se atenúa, no se va. */}
       <SombrasContacto
-        mundos={MUNDOS_DIR}
+        mundos={mundos}
         alturaDe={alturaTerreno}
         nocturno={nocturno}
         franja={clima}
       />
       {!portada && (
-        <PatiosLugares mundos={MUNDOS_DIR} alturaDe={alturaTerreno} nocturno={nocturno} />
+        <PatiosLugares mundos={mundos} alturaDe={alturaTerreno} nocturno={nocturno} />
       )}
 
-      {MUNDOS_DIR.map((m) => (
+      {mundos.map((m) => (
         <MundoLugar
           key={m.id}
           mundo={m}
@@ -2570,7 +2570,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           ciclo del día) se queda: la finca espera, no está muerta. */}
       {!portada && (
         <RotulosLugares
-          mundos={MUNDOS_DIR}
+          mundos={mundos}
           focoId={focoId}
           onEntrar={onEntrar}
           occluders={occluders}
@@ -2686,6 +2686,13 @@ export default function Valle3D({
      vivo pero como paisaje que ESPERA — sin rótulos de mundos ni faro del día,
      con una llegada de cámara más lenta. La UI de la entrada vive en el host. */
   portada = false,
+  /* VALLE DINÁMICO (spec paso 2): los lugares de ESTA finca, ya compuestos por
+     el director (componerMundos). El host los siembra del perfil con
+     construirMundosValle(perfil). Default = el valle completo de siempre: sin
+     perfil, la escena es idéntica a la de antes.
+     OJO: `perfil` (arriba) es el perfil de RENDER del tier — no confundir con
+     el perfil de la FINCA, que llega ya resuelto en esta lista. */
+  mundos = MUNDOS_DIR,
 }) {
   const [listo, setListo] = useState(false);
   /* GUARD DEL NEGRO INTERMITENTE (auditoría 2026-07-16): sin oyente de
@@ -2761,6 +2768,7 @@ export default function Valle3D({
           beatsRef={beatsRef}
           portada={portada}
           pose={pose}
+          mundos={mundos}
         />
       </Suspense>
     </Canvas>

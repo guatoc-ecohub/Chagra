@@ -1,5 +1,18 @@
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
+/*
+ * OJO — LA UBICACIÓN DE LA FINCA YA NO SE LEE DE AQUÍ.
+ *
+ * `VITE_FARM_LAT` / `VITE_FARM_LON` / `VITE_FARM_ALTITUD_MSNM` /
+ * `VITE_FARM_MUNICIPIO` / `VITE_FARM_THERMAL_ZONES` son variables de BUILD:
+ * describen la finca de DEMO, no la del usuario. El onboarding
+ * (OnboardingCondensado, paso 2) captura la ubicación REAL — GPS → municipio
+ * DANE → altitud → piso térmico → vereda — y la guarda en el perfil.
+ *
+ * Quien necesite "dónde está la finca" debe pedir
+ * `getContextoGeoFinca()` (services/perfilFincaService), que hace la cascada
+ * honesta perfil → demo. Estas constantes quedan como ÚLTIMO recurso de demo.
+ */
 export const FARM_CONFIG = {
   LOCATION_ID: import.meta.env.VITE_DEFAULT_LOCATION_ID || '',
   // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish -- fallback de config build-time preexistente (no es copy de UI); el hook lo marca al re-tocar el archivo

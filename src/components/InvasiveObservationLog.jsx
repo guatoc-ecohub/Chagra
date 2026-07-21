@@ -7,7 +7,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, AlertCircle, CheckCircle } from 'lucide-react';
 import { savePayload } from '../services/payloadService';
 import { getAllSpecies } from '../db/catalogDB';
-import { FARM_CONFIG } from '../config/defaults';
+import { getContextoGeoFinca } from '../services/perfilFincaService';
 import PhotoCaptureField from './PhotoCaptureField';
 import NativeSubstituteSuggestion from './NativeSubstituteSuggestion';
 import GeolocationButton from './GeolocationButton';
@@ -16,7 +16,7 @@ import { PEST_STATUSES } from '../constants/assetStatuses';
 
 // Autopilot D (2026-05-03): ordena especies invasoras por relevancia al
 // piso térmico del operador. Las que reportan thermal_zones que matchean
-// FARM_CONFIG.THERMAL_ZONES van primero. Reduce friction visual cuando
+// del piso térmico de la finca (perfil) van primero. Reduce friction visual cuando
 // hay 50+ invasoras en catálogo y solo 5-10 son relevantes a la altitud.
 function sortByThermalRelevance(species, userZones) {
     if (!Array.isArray(userZones) || userZones.length === 0) {
@@ -80,21 +80,25 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
         return () => { cancelled = true; };
     }, []);
 
+    /* El piso térmico sale del PERFIL de la finca (lo que ubicó en el
+       onboarding); VITE_FARM_THERMAL_ZONES queda solo de default de demo. */
+    const userThermalZones = useMemo(() => getContextoGeoFinca().thermalZones, []);
+
     // Lista ordenada por relevancia al piso térmico del operador (Autopilot D).
     const sortedSpeciesList = useMemo(
-        () => sortByThermalRelevance(speciesList, FARM_CONFIG.THERMAL_ZONES),
-        [speciesList]
+        () => sortByThermalRelevance(speciesList, userThermalZones),
+        [speciesList, userThermalZones]
     );
 
     // Cuántas matchean exactamente el piso térmico (para mostrar badge contextual).
     const thermalMatchCount = useMemo(() => {
-        if (!Array.isArray(FARM_CONFIG.THERMAL_ZONES) || FARM_CONFIG.THERMAL_ZONES.length === 0) return 0;
-        const userZoneSet = new Set(FARM_CONFIG.THERMAL_ZONES);
+        if (!Array.isArray(userThermalZones) || userThermalZones.length === 0) return 0;
+        const userZoneSet = new Set(userThermalZones);
         return speciesList.filter((sp) => {
             const spZones = Array.isArray(sp.thermal_zones) ? sp.thermal_zones : [];
             return spZones.some((z) => userZoneSet.has(z));
         }).length;
-    }, [speciesList]);
+    }, [speciesList, userThermalZones]);
 
     const handleInput = (e) => {
         const { name, value } = e.target;
@@ -266,7 +270,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                                 <option value="">Selecciona especie…</option>
                                 {sortedSpeciesList.map((s) => {
                                     const spZones = Array.isArray(s.thermal_zones) ? s.thermal_zones : [];
-                                    const userZones = FARM_CONFIG.THERMAL_ZONES || [];
+                                    const userZones = userThermalZones;
                                     const isRelevant = userZones.length > 0 && spZones.some((z) => userZones.includes(z));
                                     return (
                                         <option key={s.id} value={s.id}>
@@ -279,7 +283,7 @@ export default function InvasiveObservationLog({ onBack, onSave, initialLocation
                     </select>
                     {catalogStatus === 'ready' && thermalMatchCount > 0 && (
                         <p className="text-xs text-slate-500 mt-1">
-                            ★ marca {thermalMatchCount} especies relevantes a tu piso térmico ({(FARM_CONFIG.THERMAL_ZONES || []).join(', ')})
+                            ★ marca {thermalMatchCount} especies relevantes a tu piso térmico ({userThermalZones.join(', ')})
                         </p>
                     )}
                     {catalogStatus === 'error' && (
