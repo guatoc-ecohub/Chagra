@@ -2229,6 +2229,12 @@ const COPY_FABRICA =
 const COPY_LECCION =
   'La guardiana abre la tierra y enseña sus cinco pisos, uno por uno: la hojarasca que abriga, el humus vivo, la zona de raíces, la red de hongos que reparte el alimento y la roca madre.';
 
+const RUTA_MUNDO_MICROFAUNA = '#/mockups/mundo-microfauna-3d';
+
+function abrirMundoMicrofauna() {
+  window.location.hash = RUTA_MUNDO_MICROFAUNA;
+}
+
 /**
  * MundoParamo3D — el páramo altoandino, montable con su propio `<Canvas>`.
  * Sin lógica de negocio: es una vitrina (#/mockups/mundo-paramo-3d). El tier y
@@ -2353,6 +2359,15 @@ export default function MundoParamo3D() {
           >
             {enLeccion ? 'Volver al páramo' : 'La lección del suelo'}
           </button>
+          {enLeccion && (
+            <button
+              type="button"
+              className="paramo-boton"
+              onClick={abrirMundoMicrofauna}
+            >
+              Explorar la vida del suelo
+            </button>
+          )}
           <button
             type="button"
             className="paramo-boton"
