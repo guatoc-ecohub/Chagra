@@ -143,17 +143,16 @@ export function geomAngelita({ q = 1 } = {}) {
   const abd = new THREE.SphereGeometry(0.29, seg(q, 8), seg(q, 6));
   abd.scale(1.5, 0.92, 0.92);
   piezas.push(pintar(poner(abd, [-0.3, 0, 0]), PAL.angelitaCuerpo));
-  /* Las bandas del CHUMBE: el hilo de tierra sobre el ámbar. Es el mismo tono
-     que teje su dibujo 2D — la angelita de los mundos y la del home llevan la
-     misma faja, no una parecida. */
+  /* Tergites APENAS insinuados sobre el ámbar (ya NO bandas de color): el mismo
+     criterio del dibujo 2D — abdomen LISO del meliponino, no la faja de la Apis. */
   for (let i = 0; i < 2; i++) {
-    const b = new THREE.CylinderGeometry(0.27 - i * 0.05, 0.27 - i * 0.05, 0.06, seg(q, 8), 1, true);
-    piezas.push(pintar(poner(b, [-0.2 - i * 0.19, 0, 0], [0, 0, Math.PI / 2]), PAL.angelitaChumbe, 0.95));
+    const b = new THREE.CylinderGeometry(0.27 - i * 0.05, 0.27 - i * 0.05, 0.03, seg(q, 8), 1, true);
+    piezas.push(pintar(poner(b, [-0.2 - i * 0.19, 0, 0], [0, 0, Math.PI / 2]), PAL.angelitaChumbe, 0.4));
   }
-  // Tórax
+  // Tórax OSCURO (meliponino real: cabeza y tórax oscuros, no ámbar)
   const tor = new THREE.SphereGeometry(0.24, seg(q, 8), seg(q, 6));
   tor.scale(1.1, 1, 1);
-  piezas.push(pintar(poner(tor, [0.06, 0.02, 0]), '#e0a341'));
+  piezas.push(pintar(poner(tor, [0.06, 0.02, 0]), PAL.angelitaTorax));
   // Cabeza clara
   const cab = new THREE.SphereGeometry(0.2, seg(q, 8), seg(q, 6));
   piezas.push(pintar(poner(cab, [0.34, 0.03, 0]), PAL.angelitaCabeza));

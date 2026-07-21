@@ -248,7 +248,7 @@ export function AbejaAngelita({
         fill={ABEJA_PALETA.cuerpo} stroke={RH_INK} strokeWidth="1.3"
         style={{ filter: `drop-shadow(0 0 6px ${ABEJA_PALETA.cuerpoGlow})` }} />
       {/* brillo suave de volumen (el lomo del abdomen) — NUNCA una banda */}
-      <ellipse cx="-2.6" cy="-2.2" rx="3.6" ry="1.7" fill={ABEJA_PALETA.acento} opacity="0.28" />
+      <ellipse cx="-2.6" cy="-2.2" rx="3.6" ry="1.7" fill={ABEJA_PALETA.cabeza} opacity="0.28" />
       {/* tergite APENAS insinuado (una línea suave que sigue la curva), el
           detalle de segmento del meliponino, jamás una banda de color */}
       <path d="M-6.6,-2.4 Q-7.3,0 -6.6,2.6" stroke={ABEJA_PALETA.hiloChumbe}
@@ -270,7 +270,7 @@ export function AbejaAngelita({
         d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sway={vivo} delay={-0.45} />
 
       {/* cabeza OSCURA (casi negra) con contorno — la mitad oscura del meliponino */}
-      <circle cx="8.6" cy="-1.0" r={ABEJA_PROPORCION.cabezaR} fill={ABEJA_PALETA.cabeza} stroke={RH_INK} strokeWidth="1.2" />
+      <circle cx="8.6" cy="-1.0" r={ABEJA_PROPORCION.cabezaR} fill={ABEJA_PALETA.testa} stroke={RH_INK} strokeWidth="1.2" />
       {/* MÁSCARA FACIAL clara: la marca amarilla del clípeo de la angelita real —
           y, a la vez, el fondo sobre el que la carita (ojos/boca/cejas del agente)
           sigue leyéndose pese a la cabeza oscura. Va bajo ojos/cachetes/boca. */}
