@@ -244,14 +244,14 @@ export function AbejaAngelita({
           oscuras (esas eran la firma de la Apis europea). Remata redondo — SIN
           aguijón. Va a la izquierda, dejándole el lado derecho al tórax; su
           contorno respira con el boil. */}
-      <ellipse cx="-1.4" cy="0" rx="7.4" ry="5.1"
+      <ellipse cx="-2.0" cy="0.2" rx="8.1" ry="4.5"
         fill={ABEJA_PALETA.cuerpo} stroke={RH_INK} strokeWidth="1.3"
         style={{ filter: `drop-shadow(0 0 6px ${ABEJA_PALETA.cuerpoGlow})` }} />
       {/* brillo suave de volumen (el lomo del abdomen) — NUNCA una banda */}
-      <ellipse cx="-2.6" cy="-2.2" rx="3.6" ry="1.7" fill={ABEJA_PALETA.cabeza} opacity="0.28" />
+      <ellipse cx="-3.2" cy="-1.9" rx="3.9" ry="1.5" fill={ABEJA_PALETA.cabeza} opacity="0.26" />
       {/* tergite APENAS insinuado (una línea suave que sigue la curva), el
           detalle de segmento del meliponino, jamás una banda de color */}
-      <path d="M-6.6,-2.4 Q-7.3,0 -6.6,2.6" stroke={ABEJA_PALETA.hiloChumbe}
+      <path d="M-7.2,-2.1 Q-7.9,0.2 -7.2,2.3" stroke={ABEJA_PALETA.hiloChumbe}
         strokeWidth="0.5" fill="none" strokeLinecap="round" opacity="0.45" />
       {/* TÓRAX oscuro y redondo (peludo): junto con la cabeza forma la mitad
           OSCURA del cuerpo — la estructura de valores INVERTIDA respecto a la
