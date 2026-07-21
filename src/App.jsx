@@ -147,6 +147,11 @@ const EvidenciaIlustrada = lazy(() => import('./mockups/EvidenciaIlustrada'));
 const MockupGuardianesNarrativos = lazy(() => import('./mockups/MockupGuardianesNarrativos'));
 const HojaVidaMataMockup = lazy(() => import('./components/mockups/HojaVidaMataMockup'));
 const VitrinaCriaturasMockup = lazy(() => import('./mockups/vitrina3d/VitrinaCriaturas'));
+// La HOJA DE PRUEBA de la ley visual del valle (AUDITORIA-VALLE.md 1.1):
+// roca, árbol, casa, persona, perro y portal bajo las cinco franjas con la
+// paleta de 16 muestras, la rampa de 3 bandas y el borde tinta. Patrón oro:
+// ningún activo entra al valle si desentona aquí. #/mockups/hoja-prueba-valle.
+const HojaPruebaValleMockup = lazy(() => import('./mockups/HojaPruebaValle'));
 // 3D: el MUNDO BOSQUE VIVO y su guardián, el Ent de la queñua (colorado,
 // Polylepis) — mallas three reales (tronco retorcido con rostro tallado, copa
 // instanciada), device-tiering real. Ruta #/mockups/bosque-vivo-3d, sin auth.
@@ -730,6 +735,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-botica-cana-3d': 'mockup_mundo_botica_cana_3d',
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
   'mockups/mundo-leguminosas-3d': 'mockup_mundo_leguminosas_3d',
+  'mockups/hoja-prueba-valle': 'mockup_hoja_prueba_valle',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2485,6 +2491,17 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El lote de leguminosas y raíces">
               <MundoLeguminosas3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_hoja_prueba_valle':
+        // La hoja de prueba de la ley visual del valle: el patrón oro contra el
+        // que se compara todo activo nuevo (paleta, bandas, borde) bajo las
+        // cinco franjas (?ciclo=). Ruta #/mockups/hoja-prueba-valle, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La hoja de prueba del valle">
+              <HojaPruebaValleMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
