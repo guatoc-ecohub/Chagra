@@ -1,0 +1,91 @@
+{
+  "species_slug": "cymbopogon_flexuosus",
+  "scientific_name": "Cymbopogon flexuosus (Nees ex Steud.) W. Watson",
+  "common_names": [
+    "Limonaria india"
+  ],
+  "family": "Poaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pest_repellent",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "division_mata",
+      "rizoma"
+    ],
+    "best_method": "division_mata",
+    "protocol_resumen": "División de macolla madura: extraer la mata completa con horquilla, separar manualmente en hijuelos de 2-4 macollos cada uno con raíces propias, recortar hojas a 20-30 cm para reducir transpiración y plantar inmediatamente en suelo húmedo a 60-100 cm de distancia. Establecimiento 30-60 días. Rendimiento aceite esencial 0.4-0.8% peso seco (más alto que C. citratus 0.2-0.5%) — variedad preferida para destilación industrial de citral.",
+    "tiempo_a_establecimiento_dias": 45,
+    "notas": "DISTINTA DE Cymbopogon citratus (limonaria común de West Indies): C. flexuosus es el lemongrass del este (India-Ceilán) con mayor concentración de citral y hojas más rojizas en la base. Ambas se confunden frecuentemente; POWO las separa por morfología foliar y origen geográfico.",
+    "fuente": "POWO Kew; GBIF; Pamplona-Roger 2006; AGROSAVIA aromáticas tropicales"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 400,
+      "optimo_max": 1800,
+      "max_absoluto": 2300
+    },
+    "temperatura_c": {
+      "helada_letal": 2,
+      "optimo_min": 18,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La limonaria india o lemongrass East Indian (Cymbopogon flexuosus (Nees ex Steud.) W. Watson, Poaceae, gramínea aromática originaria de India-Ceilán-Sri Lanka tropical) es una poácea perenne macolladora de tallo aéreo introducida en Colombia para destilación industrial de aceite esencial de citral (~70-85% de citral total, mayor que C. citratus ~65-75%), cultivada entre 0 y 1.800 msnm en zonas térmicas cálidas-templadas-moderadas en: Antioquia (Urabá, Bajo Cauca, Magdalena Medio, Suroeste cafetero), Valle del Cauca (cinturón frutícola Tuluá, Buga, Palmira, Ginebra), Cundinamarca templada (La Mesa, Anolaima, Anapoima, Fusagasugá, Tena, Cachipay), Tolima (Espinal, Ibagué, Mariquita, Honda), Huila (Neiva, La Plata, Pitalito), Caldas templada (La Dorada, Victoria), Magdalena (Santa Marta, Aracataca, Fundación), Cesar (Valledupar, Codazzi, La Paz, Bosconia), Bolívar (Cartagena rural, El Carmen de Bolívar), Atlántico, Sucre, Córdoba, Casanare, Meta (Villavicencio, Acacías, Granada), Caquetá (Florencia, El Doncello, Belén), Putumayo (Mocoa, Puerto Asís), Chocó (Quibdó, Istmina). Pertenece al género Cymbopogon (familia Poaceae, subfamilia Panicoideae) junto con C. citratus (West Indian lemongrass — la limonaria común mucho más extendida en Colombia), C. nardus (citronela), C. martinii (palmarosa) y C. winterianus (citronela de Java) — todos los citronelas-limonarias forman grupo botánico-quimotípico unitario distinguible por matices morfológicos foliares y composición de aceite esencial (citral vs citronelal vs geraniol). DIFERENCIACIÓN CRÍTICA con C. citratus (West Indian, ya presente en catálogo): C. flexuosus posee tallos basales rojizo-purpúreos (no verdes), hojas más estrechas (1.0-1.5 cm vs 1.5-2.5 cm en citratus), inflorescencia más vistosa (panícula laxa con espiguillas pareadas vs panícula compacta en citratus) y origen India en lugar del Caribe-Malasia. Es macolla perenne erecta de 1.5-2.5 m altura con hojas largas lanceoladas verde-azuladas-glaucas (60-120 cm largo x 1.0-1.5 cm ancho) acanaladas y aromáticas, base envainadora rojiza, inflorescencia panícula laxa terminal (60-90 cm largo) con espiguillas pareadas (rara vez fructifica en Colombia — propagación exclusivamente vegetativa). Uso tradicional como aromática culinaria (tés digestivos, sazonador en sopas y curries asiáticos asimilados a gastronomía colombiana del Pacífico-Caribe), medicinal (infusión digestiva, carminativa, antiespasmódica, febrífuga, sedante leve, hipotensora moderada), repelente de insectos (mosquitos, zancudos, jejenes — aceite esencial rico en citral repele Aedes aegypti documentado en estudios INS Colombia 2010-2018), industrial (destilación de aceite esencial para perfumería, aromaterapia, cosmética, productos de limpieza ecológicos, repelentes naturales en velas y aerosoles), forrajera de bajo valor (consumida por bovinos solo en escasez extrema por su alto contenido aromático). Manejo agroecológico: propagación clonal por división de macolla en hijuelos de 2-4 macollos cada uno (cada planta madura da 20-40 hijuelos cada 2-3 años), distancia 80-100 cm entre plantas en línea y 100-150 cm entre líneas, sol pleno a sombra parcial leve, riego moderado regular sin encharcamiento, suelos arenosos-arcillosos bien drenados pH 5.5-7.0, fertilización moderada con compost y bocashi 2 kg/planta/año, cosecha foliar trimestral o semestral cortando hojas a 20 cm del suelo (la mata rebrota vigorosamente), cosecha total cada 4-6 años redividiendo y renovando, asocio benéfico con cítricos, plátano, café, cacao, yuca, maíz como repelente perimetral de plagas, ciclo productivo útil 8-15 años. Tolera sequía moderada estacional pero no heladas (helada letal +2 °C). Función en chagra/huerto medicinal como aromática repelente perimetral cálida-templada complementaria a citratus, ornamental gramínea, productora industrial de citral. Fuentes Tier A: GBIF Backbone Taxonomy, POWO Kew, FAO Ecocrop, Pamplona-Roger 2006, JBB Plantas Medicinales, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.396Z"
+}

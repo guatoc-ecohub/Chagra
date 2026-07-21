@@ -1,0 +1,232 @@
+/*
+ * InvernaderoVivo3D.css — vitrina del micro-mundo del invernadero
+ * (#/mockups/invernadero-vivo-3d). Autocontenida: sin fuentes/imágenes
+ * externas. Móvil-first desde 320px. Paleta del patio de trabajo: verde
+ * hortaliza, guadua dorada y el lechoso del plástico.
+ * Solo opacity/transform se animan.
+ */
+
+.invivo {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  background: linear-gradient(180deg, #e3e2ca 0%, #eae4cc 44%, #f1e8cf 100%);
+  color: #2b3226;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.invivo__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.invivo__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7a2c;
+}
+.invivo__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #2e402e;
+}
+.invivo__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.invivo__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.invivo__lienzo {
+  position: relative;
+  height: min(66vh, 32rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(107, 122, 44, 0.3);
+  box-shadow: 0 12px 30px rgba(44, 54, 40, 0.16);
+  background: radial-gradient(120% 90% at 50% 20%, #d3ddc4 0%, #adbfa2 100%);
+}
+.invivo__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+.invivo__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.92rem;
+  color: #44523c;
+}
+
+.invivo__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-top: 0.55rem;
+}
+.invivo__tier {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #55614b;
+}
+.invivo__toggle {
+  min-height: 2.4rem;
+  padding: 0 0.9rem;
+  border: 1px solid rgba(107, 122, 44, 0.45);
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.55);
+  color: #44521c;
+  font: 600 0.85rem/1 system-ui, sans-serif;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.invivo__toggle:active {
+  transform: scale(0.97);
+}
+
+/* ---------------- la ficha (fallback 2D digno, cero GPU) ---------------- */
+
+.invivo__ficha {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.2rem;
+  text-align: center;
+  padding: 1rem;
+}
+.invivo__estampa {
+  position: relative;
+  width: min(64vw, 15rem);
+  height: min(42vw, 10rem);
+  margin-bottom: 0.8rem;
+}
+/* el túnel: media cápsula lechosa con costillas insinuadas */
+.invivo__tunel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 82%;
+  border-radius: 50% 50% 0 0 / 92% 92% 0 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(177, 164, 95, 0.55) 0 3px,
+      transparent 3px 18%
+    ),
+    linear-gradient(180deg, rgba(251, 243, 223, 0.95) 0%, rgba(240, 231, 205, 0.9) 100%);
+  border: 2px solid #b1a45f;
+  border-bottom: 0;
+}
+/* la puerta verde campesina */
+.invivo__puerta {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 22%;
+  height: 52%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #4f7566 0%, #44685a 100%);
+  border: 2px solid #37544a;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+}
+/* las maticas asomando a los lados */
+.invivo__mata {
+  position: absolute;
+  bottom: 0;
+  width: 12%;
+  height: 18%;
+  border-radius: 50% 50% 20% 20% / 70% 70% 20% 20%;
+  background: #5f9a43;
+}
+.invivo__mata--a { left: 12%; height: 15%; background: #74a94e; }
+.invivo__mata--b { left: 26%; height: 21%; }
+.invivo__mata--c { right: 14%; height: 17%; background: #6f9a44; }
+
+.invivo__ficha-nombre {
+  margin: 0;
+  font-weight: 700;
+  color: #2e402e;
+}
+.invivo__ficha-sub {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #55614b;
+}
+
+/* ---------------- los saberes ---------------- */
+
+.invivo__saberes {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.invivo__saberes h2 {
+  margin: 0 0 0.7rem;
+  font-size: 1.15rem;
+  color: #2e402e;
+}
+.invivo__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+.invivo__saberes li {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.8rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(107, 122, 44, 0.18);
+}
+.invivo__emoji {
+  font-size: 1.3rem;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+.invivo__saberes b {
+  display: block;
+  margin-bottom: 0.15rem;
+  color: #33402c;
+}
+.invivo__saberes p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.42;
+}
+.invivo__cierre {
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #44523c;
+  max-width: 42rem;
+}
+
+@media (min-width: 640px) {
+  .invivo__saberes ol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .invivo__toggle {
+    transition: none;
+  }
+}

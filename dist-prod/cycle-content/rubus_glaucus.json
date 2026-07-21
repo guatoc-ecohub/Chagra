@@ -1,0 +1,74 @@
+{
+  "species_slug": "rubus_glaucus",
+  "scientific_name": "Rubus glaucus Benth.",
+  "common_names": [
+    "Mora andina / Mora de Castilla"
+  ],
+  "family": "Rosaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "living_fence"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "acodo",
+    "notas": "Propagacion por acodo de punta o esqueje. La forma silvestre presenta espinas; requiere tutorado en espaldera. Produce frutos a partir del segundo año."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 1800,
+      "optimo_max": 2600,
+      "max_absoluto": 2800
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 13,
+      "optimo_max": 18,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La espina que protege: la mora silvestre ensena que las defensas naturales de las plantas tienen un proposito. Su cultivo en espaldera muestra como la agricultura domestica sin eliminar la esencia silvestre.",
+  "feeding_plan_markdown": "### Plan de alimentación\n\nFuente: Agrosavia Tibaitatá — fichas frutales andinos + Pinheiro-Machado (2017) Biofertilizantes. Manejo mora castilla clima frío 1800-2600 msnm.\n\n- D+0: Aplicar bocashi + roca fosfórica al hoyo · bocashi · 400 g — Hoyo 40x40 cm. Mora requiere P alto al establecimiento — combinar con roca_fosforica si suelo deficiente.\n- D+30: Foliar con biol fase de brotación · biol · 150 ml — Dilución 1:7. Estimula brotación lateral de cañas productivas.\n- D+60: Drench con humus líquido al pie · humus_liquido · 300 ml — Dilución 1:4. Aporta micro flora y aminoácidos antes de cuajado.\n- D+90: Foliar con caldo bordelés preventivo · caldo_bordeles · 100 ml — Concentración 1%. Preventivo Botrytis cinerea y Peronospora — críticos en mora altiplano lluvioso.\n- D+120: Aplicar lixiviado de frutas en fructificación · lixiviado_frutas · 100 ml — Dilución 1:10 drench. Mora produce cosecha sostenida — refuerza llenado de fruto.\n- D+180: Refuerzo con bocashi post-poda · bocashi · 200 g — Después de poda sanitaria. Renueva tejido productivo para próximo flush.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- urtica_dioica — Ortiga (Urtica dioica L.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.370Z"
+}

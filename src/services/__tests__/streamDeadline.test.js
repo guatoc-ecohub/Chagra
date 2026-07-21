@@ -54,7 +54,7 @@ describe('streamDeadline — comportamiento idle (no abortar mientras streamea)'
 
   it('aborta con "first_token" si NUNCA llega un token y pasa el presupuesto del primer token', () => {
     const onTimeout = vi.fn();
-    const dl = createStreamDeadline({ firstTokenMs: 1000, idleMs: 1000, ceilingMs: 5000, onTimeout });
+    const dl = createStreamDeadline(/** @type {any} */ ({ firstTokenMs: 1000, idleMs: 1000, ceilingMs: 5000, onTimeout }));
     dl.start();
     vi.advanceTimersByTime(1000);
     expect(onTimeout).toHaveBeenCalledTimes(1);
@@ -199,7 +199,7 @@ describe('streamDeadline — ciclo de vida y limpieza', () => {
 
   it('start() es idempotente — doble start no deja timers huérfanos', () => {
     const onTimeout = vi.fn();
-    const dl = createStreamDeadline({ firstTokenMs: 1000, idleMs: 1000, ceilingMs: 5000, onTimeout });
+    const dl = createStreamDeadline(/** @type {any} */ ({ firstTokenMs: 1000, idleMs: 1000, ceilingMs: 5000, onTimeout }));
     dl.start();
     dl.start(); // re-arranque: no debe acumular dos timers
     vi.advanceTimersByTime(1000);

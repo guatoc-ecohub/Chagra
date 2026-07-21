@@ -88,7 +88,7 @@ function Motas({ cuantas, reducedMotion }) {
     const r = rng(41);
     return Array.from({ length: cuantas }, (_, i) => ({
       key: `m${i}`,
-      pos: [(r() - 0.5) * 4.6, 0.7 + r() * 1.6, (r() - 0.5) * 3.4],
+      pos: /** @type {[number, number, number]} */ ([(r() - 0.5) * 4.6, 0.7 + r() * 1.6, (r() - 0.5) * 3.4]),
       fase: r() * Math.PI * 2,
       radio: 0.014 + r() * 0.014,
     }));
@@ -139,7 +139,7 @@ function Nubes({ cuantas, reducedMotion }) {
   return (
     <group ref={grupo}>
       {nubes.map((n) => (
-        <group key={n.key} position={n.pos} scale={[n.esc * 1.7, n.esc * 0.55, n.esc]}>
+        <group key={n.key} position={/** @type {[number, number, number]} */ (n.pos)} scale={[n.esc * 1.7, n.esc * 0.55, n.esc]}>
           <mesh>
             <sphereGeometry args={[0.55, 9, 7]} />
             <meshBasicMaterial color="#fbf6ea" transparent opacity={0.8} />

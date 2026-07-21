@@ -91,14 +91,18 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
 
     // Mock localStorage
     originalLocalStorage = globalThis.localStorage;
-    globalThis.localStorage = {
+    globalThis.localStorage = /** @type {any} */ ({
       getItem: vi.fn(() => '[]'),
       setItem: vi.fn(),
-    };
+      length: 0,
+      key: vi.fn(),
+      removeItem: vi.fn(),
+      clear: vi.fn(),
+    });
 
     // Mock window.indexedDB (el código lo chequea antes de usar localStorage)
     originalWindow = globalThis.window;
-    globalThis.window = { indexedDB: {} };
+    globalThis.window = /** @type {any} */ ({ indexedDB: /** @type {any} */ ({}) });
 
     // Reset del store mock
     mockStore = {
@@ -229,7 +233,7 @@ describe('actionExecutor — ejecución de acciones del agente', () => {
       const result = await executeAction(proposal, 'operator-123');
 
       expect(result.status).toBe('executed');
-      expect(result.edited).toBe(true);
+      expect(/** @type {any} */ (result).edited).toBe(true);
       expect(result.result).toEqual({ success: true, message: 'log creado para asset-2' });
     });
 

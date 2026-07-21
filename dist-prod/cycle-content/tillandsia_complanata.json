@@ -1,0 +1,84 @@
+{
+  "species_slug": "tillandsia_complanata",
+  "scientific_name": "Tillandsia complanata Benth.",
+  "common_names": [
+    "Cardo bromelio aplanado"
+  ],
+  "family": "Bromeliaceae",
+  "category": "ornamentales_nativas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "division_mata"
+    ],
+    "best_method": "division_mata",
+    "protocol_resumen": "División de hijuelos basales (keikis) que la planta produce post-floración antes de que la madre muera. Plantar sobre tronco, corteza o canastilla con musgo. NO requiere sustrato sólido (es epífita aérea estricta). Riego por aspersión 2-3 veces por semana en seca. Semilla: dispersión anemófila, germinación lenta sobre corteza de árbol hospedero.",
+    "tiempo_a_establecimiento_dias": 180,
+    "notas": "Bromelia \"tanque\" parcial: la roseta acumula agua en su centro como microhábitat acuático efímero (fitotelma) que aloja anfibios pequeños, larvas de insectos, microalgas. Servicio ecológico crítico en bosques nublados.",
+    "fuente": "Smith & Downs 1977 Bromeliaceae Flora Neotropica; Bernal 2015; POWO; IAvH"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1200,
+      "optimo_min": 1800,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 12,
+      "optimo_max": 22,
+      "max_tolerable": 28
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El cardo bromelio aplanado o tillandsia complanata (Tillandsia complanata Benth., Bromeliaceae) es una bromelia epífita característica y ecológicamente fundamental de los bosques nublados y alto-andinos de los Andes colombianos. Especie ampliamente distribuida desde México hasta Bolivia, en Colombia es común en bosques de las tres cordilleras entre 1.200 y 3.200 msnm en zona térmica templada a fría con humedad relativa alta. Es planta epífita acaule (sin tallo aéreo) con roseta abierta aplanada (de ahí el epíteto \"complanata\" = aplanada) de hojas lineares-acintadas de 30-50 cm de largo y 1,5-2,5 cm de ancho, de color verde-grisáceo con tonos púrpura en la base, dispuestas en plano horizontal sobre la rama hospedera (la disposición aplanada maximiza la captación de neblina y agua de lluvia). Inflorescencia péndula de 30-60 cm con brácteas vistosas rojo-rosadas-anaranjadas y flores tubulares moradas-violetas pequeñas. Función ecológica notable: como bromelia \"tanque\" parcial, la roseta acumula agua de lluvia y neblina en su centro formando un fitotelma — microhábitat acuático efímero que alberga toda una comunidad biótica: anfibios diminutos del género Pristimantis (ranas de cristal y ranas saltarinas andinas que reproducen exclusivamente en bromelias), larvas de mosquitos, copépodos, microalgas, bacterias quimiosintéticas — uno de los servicios ecológicos más fascinantes del bosque nublado donde una sola planta crea hábitat para decenas de especies pequeñas. Polinización ornitofila por colibríes andinos atraídos por las brácteas rojo-rosadas (Coeligena spp., Eriocnemis spp., Heliangelus spp.). Reproducción: tras una floración (que ocurre cada 2-3 años) la planta madre muere pero antes produce 2-5 hijuelos basales (keikis) que la reemplazan — estrategia \"fénix\" típica de bromelias. Dispersión de semillas anemófila (aladas con apéndice plumoso) que aterrizan en troncos y ramas musgosas de árboles hospederos donde germinan lentamente. Cultivo: epífita aérea estricta (NO requiere sustrato), se monta sobre tronco, corteza o canastilla con musgo Sphagnum, riego por aspersión o nebulización 2-3 veces/semana llenando el tanque central. NO regar el suelo: la planta no tiene raíces nutritivas, solo raíces estructurales para sujeción, y absorbe agua y nutrientes a través de tricomas escamosos de las hojas (adaptación CAM modificada característica de Tillandsia). Multiplicación legal sin permiso especial vía división de hijuelos basales — NO está en CITES Apéndice (no amenazada) y NO requiere autorización específica más allá de no extraer cantidades comerciales de bosque silvestre sin permiso MADS. Conservación: especie no amenazada, pero su hábitat (bosque nublado andino) sí lo está por deforestación. Es lección extraordinaria de la complejidad del bosque nublado: una sola epífita crea hábitat para anfibios endémicos, polinizadores colibríes y comunidades microbianas, ejemplo perfecto de cómo en los Andes \"cada planta es un mundo\" y por qué conservar el bosque significa conservar redes ecológicas completas, no especies aisladas. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, IAvH Humboldt Flora Alto-Andina, SiB Colombia.",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.390Z"
+}

@@ -1,0 +1,66 @@
+{
+  "species_slug": "dysphania_ambrosioides",
+  "scientific_name": "Dysphania ambrosioides (L.) Mosyakin & Clemants",
+  "common_names": [
+    "Paico"
+  ],
+  "family": "Amaranthaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Propagación por semilla; se resiembra fácilmente en suelos perturbados. Crece como arvense en huertas y bordes de camino."
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 500,
+      "optimo_max": 2500,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 14,
+      "optimo_max": 24,
+      "max_tolerable": 32
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Vermífugo natural por excelencia de la medicina tradicional colombiana: el paico enseña cómo una arvense común puede ser la botica familiar para desparasitar, y por qué las chagras lo conservan entre los cultivos.",
+  "sources": [
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.378Z"
+}

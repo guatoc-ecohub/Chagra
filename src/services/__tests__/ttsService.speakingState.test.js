@@ -71,13 +71,13 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
     });
     globalThis.fetch = fetchMock;
     originalAudio = globalThis.Audio;
-    globalThis.Audio = MockAudio;
+    globalThis.Audio = /** @type {any} */ (MockAudio);
     originalCreateObjectURL = URL.createObjectURL;
     originalRevokeObjectURL = URL.revokeObjectURL;
     URL.createObjectURL = vi.fn(() => `blob:fake-${Math.random()}`);
     URL.revokeObjectURL = vi.fn();
     originalUtterance = globalThis.SpeechSynthesisUtterance;
-    globalThis.SpeechSynthesisUtterance = MockUtterance;
+    globalThis.SpeechSynthesisUtterance = /** @type {any} */ (MockUtterance);
     speechSynthesisMock = {
       speak: vi.fn(),
       cancel: vi.fn(),
@@ -85,7 +85,7 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
       speaking: false,
       paused: false,
     };
-    window.speechSynthesis = speechSynthesisMock;
+    window.speechSynthesis = /** @type {any} */ (speechSynthesisMock);
   });
 
   afterEach(() => {
@@ -107,7 +107,7 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
     expect(events).toContain(true);
     expect(isAudioPlaying()).toBe(true);
 
-    audio.onended();
+    /** @type {any} */ (audio).onended(new Event(''));
     expect(events[events.length - 1]).toBe(false);
     expect(isAudioPlaying()).toBe(false);
     unsub();
@@ -142,11 +142,11 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
     const utterance = speak('Hola desde Web Speech.');
     expect(utterance).not.toBeNull();
 
-    utterance.onstart();
+    /** @type {any} */ (utterance).onstart(new Event(''));
     expect(isAudioPlaying()).toBe(true);
     expect(events).toContain(true);
 
-    utterance.onend();
+    /** @type {any} */ (utterance).onend(new Event(''));
     expect(isAudioPlaying()).toBe(false);
     expect(events[events.length - 1]).toBe(false);
     unsub();
@@ -186,7 +186,7 @@ describe('ttsService — estado observable de reproducción (voz punta-a-punta)'
     const unsub = onSpeakingChange((v) => events.push(v));
 
     const audio = await speakKokoro('Frase para verificar deduplicación.');
-    audio.onended();
+    /** @type {any} */ (audio).onended(new Event(''));
     stop(); // ya está en false — no debe re-notificar
 
     const trues = events.filter((v) => v === true).length;

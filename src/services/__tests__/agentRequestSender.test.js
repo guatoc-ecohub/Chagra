@@ -65,8 +65,8 @@ describe('agentRequestSender — createAgentRequestSender', () => {
     const sender = createAgentRequestSender({ llmCall });
     await sender({ prompt: 'cómo siembro maíz', route: 'chat' });
 
-    const callArg = llmCall.mock.calls[0][0];
-    const lastMsg = callArg.messages[callArg.messages.length - 1];
+    const callArg = /** @type {any[]} */ (llmCall.mock.calls[0])[0];
+    const lastMsg = /** @type {any[]} */ (callArg.messages)[/** @type {any[]} */ (callArg.messages).length - 1];
     expect(lastMsg.content).toBe('cómo siembro maíz');
   });
 

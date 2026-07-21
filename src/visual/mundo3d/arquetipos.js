@@ -93,6 +93,17 @@ export const ARQUETIPOS = {
     nombre: 'El semillero/vivero', clave: 'la propagación: germinar, repicar y endurecer bajo el túnel protegido',
     ejemplo: 'semillero', tambien: [],
   },
+  // El SUELO VIVO bajo tierra: la RED MICORRÍZICA (el wood-wide web). Familia
+  // propia (una escena espacial genuinamente nueva: la cámara BAJO el suelo): la
+  // red de hongos bioluminiscente que enlaza las raíces de las plantas y reparte
+  // fósforo/agua ↔ carbono, con pulsos de nutrientes corriendo por los hilos y el
+  // Ent asomando. En equipo humilde cae a su espejo 2D (motivo `micorrizas`).
+  // (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  micorrizas: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'micorrizas', espejo: 'mirror',
+    nombre: 'La red del suelo', clave: 'el wood-wide web: la red de hongos que conecta las raíces y reparte nutrientes bajo tierra',
+    ejemplo: 'micorrizas', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {

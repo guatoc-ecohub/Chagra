@@ -180,15 +180,17 @@ function EscenaColocar({ tier, reducedMotion, colocadas, borrador, onTocar }) {
       <Terreno segmentos={segmentos} onTocar={onTocar} />
       <Suspense fallback={null}>
         {colocadas.map((c, i) => (
-          <Infraestructura
-            // eslint-disable-next-line react/no-array-index-key -- lista append/pop only
-            key={`${c.tipo}-${i}`}
-            tipo={c.tipo}
-            pos={c.pos}
-            rot={c.rot}
-            tier={tier}
-            reducedMotion={reducedMotion}
-          />
+            <Infraestructura
+              // eslint-disable-next-line react/no-array-index-key -- lista append/pop only
+              key={`${c.tipo}-${i}`}
+              tipo={c.tipo}
+              pos={c.pos}
+              rot={c.rot}
+              dims={c.dims}
+              params={c.params || {}}
+              tier={tier}
+              reducedMotion={reducedMotion}
+            />
         ))}
         {borrador && (
           <>
@@ -196,6 +198,8 @@ function EscenaColocar({ tier, reducedMotion, colocadas, borrador, onTocar }) {
               tipo={borrador.tipo}
               pos={borrador.pos}
               rot={borrador.rot}
+              dims={borrador.dims}
+              params={borrador.params || {}}
               tier={tier}
               reducedMotion={reducedMotion}
             />
@@ -267,7 +271,7 @@ function Plano2D({ colocadas, borrador, onTocar }) {
       <span className="cinf__plano-rotulo cinf__plano-rotulo--bajo">Tierra caliente (abajo)</span>
       {colocadas.map((c, i) => (
         // eslint-disable-next-line react/no-array-index-key -- lista append/pop only
-        <Marcador2D key={`${c.tipo}-${i}`} item={c} />
+        <Marcador2D key={`${c.tipo}-${i}`} item={c} borrador={false} />
       ))}
       {borrador && <Marcador2D item={borrador} borrador />}
     </div>

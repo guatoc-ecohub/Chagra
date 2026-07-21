@@ -93,7 +93,7 @@ describe('VoiceSelector — rediseño mínima fricción', () => {
     // Y esa velocidad viaja en el siguiente preview.
     fireEvent.click(screen.getByTestId('voice-option-em_alex'));
     await waitFor(() => expect(speakKokoro).toHaveBeenCalled());
-    const [, opts] = speakKokoro.mock.calls[0];
+    const [, opts] = /** @type {any} */ (speakKokoro).mock.calls[0];
     expect(opts.rate).toBeCloseTo(1.1);
   });
 

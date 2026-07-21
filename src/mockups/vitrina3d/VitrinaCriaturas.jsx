@@ -247,7 +247,7 @@ export default function VitrinaCriaturas({ onBack }) {
                 props={['size', 'tier', 'animated', 'look', 'mostrarRol']}
                 variante="creature"
               >
-                <MariquitaRubber size={108} tier={tier} animated={animated} mostrarRol />
+                <MariquitaRubber size={108} tier={tier} animated={animated} mostrarRol className="" />
               </DemoCard>
 
               <DemoCard
@@ -256,7 +256,7 @@ export default function VitrinaCriaturas({ onBack }) {
                 props={['size', 'tier', 'animated', 'mostrarRol']}
                 variante="creature"
               >
-                <AbejorroRubber size={112} tier={tier} animated={animated} mostrarRol />
+                <AbejorroRubber size={112} tier={tier} animated={animated} mostrarRol className="" />
               </DemoCard>
 
               <DemoCard
@@ -265,7 +265,7 @@ export default function VitrinaCriaturas({ onBack }) {
                 props={['size', 'tier', 'animated', 'mostrarRol']}
                 variante="creature"
               >
-                <LombrizRubber size={112} tier={tier} animated={animated} mostrarRol />
+                <LombrizRubber size={112} tier={tier} animated={animated} mostrarRol className="" />
               </DemoCard>
 
               <DemoCard
@@ -274,7 +274,7 @@ export default function VitrinaCriaturas({ onBack }) {
                 props={['size', 'tier', 'animated', 'mostrarRol']}
                 variante="creature"
               >
-                <EscarabajoRubber size={112} tier={tier} animated={animated} mostrarRol />
+                <EscarabajoRubber size={112} tier={tier} animated={animated} mostrarRol className="" />
               </DemoCard>
 
               <DemoCard
@@ -408,6 +408,7 @@ export default function VitrinaCriaturas({ onBack }) {
                       tier={tier}
                       reducedMotion={reducedMotion}
                       autoplay={!reducedMotion}
+                      onEtapa={() => {}}
                     />
                   </Suspense>
                 </div>
@@ -458,7 +459,7 @@ export default function VitrinaCriaturas({ onBack }) {
               >
                 <div className="vitrina__lienzoWrap">
                   <Suspense fallback={<div className="vitrina__loading">Preparando el valle…</div>}>
-                    <ValleEnCalma tier={tier} reducedMotion={reducedMotion} />
+                    <ValleEnCalma tier={/** @type {any} */ (tier)} reducedMotion={reducedMotion} />
                   </Suspense>
                 </div>
               </DemoCard>

@@ -41,7 +41,7 @@ beforeEach(() => {
 
 describe('UX-20 — usePhotoUrl re-fetch on chagra:photo:saved', () => {
   it('re-fetchea cuando assetId matchea el evento global', async () => {
-    render(<Probe assetId="asset-123" />);
+    render(<Probe assetId="asset-123" speciesSlug="" />);
     await waitFor(() => expect(screen.getByTestId('probe').textContent).toMatch(/placeholder/));
 
     act(() => {
@@ -55,7 +55,7 @@ describe('UX-20 — usePhotoUrl re-fetch on chagra:photo:saved', () => {
   });
 
   it('re-fetchea cuando speciesSlug matchea el evento global', async () => {
-    render(<Probe speciesSlug="fragaria" />);
+    render(<Probe speciesSlug="fragaria" assetId="" />);
     await waitFor(() => expect(screen.getByTestId('probe').textContent).toMatch(/placeholder/));
 
     act(() => {
@@ -68,7 +68,7 @@ describe('UX-20 — usePhotoUrl re-fetch on chagra:photo:saved', () => {
   });
 
   it('NO re-fetchea cuando el evento es de otro asset', async () => {
-    render(<Probe assetId="asset-123" />);
+    render(<Probe assetId="asset-123" speciesSlug="" />);
     await waitFor(() => expect(callCount).toBeGreaterThanOrEqual(1));
     const before = callCount;
 
@@ -84,7 +84,7 @@ describe('UX-20 — usePhotoUrl re-fetch on chagra:photo:saved', () => {
   });
 
   it('NO re-fetchea cuando el evento no trae detail', async () => {
-    render(<Probe assetId="asset-123" />);
+    render(<Probe assetId="asset-123" speciesSlug="" />);
     await waitFor(() => expect(callCount).toBeGreaterThanOrEqual(1));
     const before = callCount;
 

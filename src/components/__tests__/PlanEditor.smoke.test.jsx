@@ -52,7 +52,7 @@ describe('PlanEditor smoke', () => {
         },
       ],
     });
-    render(<PlanEditor assetId="asset-1" speciesSlug="solanum_lycopersicum" />);
+    render(<PlanEditor assetId="asset-1" speciesSlug="solanum_lycopersicum" plantingDate={Date.now()} />);
     await waitFor(() => {
       expect(screen.getByText(/Plan de Alimentación/i)).toBeTruthy();
     });
@@ -62,7 +62,7 @@ describe('PlanEditor smoke', () => {
 
   it('muestra CTA "Generar Plan" cuando getPlanForAsset retorna null', async () => {
     mockGetPlanForAsset.mockResolvedValue(null);
-    render(<PlanEditor assetId="asset-2" speciesSlug="zea_mays" />);
+    render(<PlanEditor assetId="asset-2" speciesSlug="zea_mays" plantingDate={Date.now()} />);
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /Generar Plan/i })).toBeTruthy();
     });
@@ -77,7 +77,7 @@ describe('PlanEditor smoke', () => {
       generated_at: Date.now(),
       steps: [],
     });
-    render(<PlanEditor assetId="asset-3" speciesSlug="phaseolus_vulgaris" />);
+    render(<PlanEditor assetId="asset-3" speciesSlug="phaseolus_vulgaris" plantingDate={Date.now()} />);
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /Generar Plan/i })).toBeTruthy();
     });

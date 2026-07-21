@@ -39,8 +39,11 @@
  *   estrellas    0..1 — fracción del presupuesto de estrellas del tier
  */
 
-/* Orden canónico del día (útil para UIs de selección y para tests). */
-export const HORAS = ['amanecer', 'mediodia', 'dorada', 'noche'];
+/* Orden canónico del día (útil para UIs de selección y para tests). El CICLO
+   DIURNO VIVO recorre estas franjas con el reloj real (franjaDeHoraDecimal);
+   `dorada` queda como la hora MADRE fuera del arco (espejo de ATMOSFERA, la
+   piel que las escenas piden explícita). */
+export const HORAS = ['amanecer', 'manana', 'mediodia', 'tarde', 'atardecer', 'noche'];
 
 export const CIELOS_HORA = {
   /* madrugada andina: sol rasante durazno, cenit todavía lavanda, bruma baja
@@ -62,6 +65,28 @@ export const CIELOS_HORA = {
     nieblaCerca: 7,
     nieblaLejos: 32,
     estrellas: 0.2,
+    luciernagas: 0.15,
+  },
+  /* la mañana dorada: el sol ya subió del horizonte pero sigue tibio; luz
+     fresca de trabajo temprano, el aire limpio antes del calor */
+  manana: {
+    fondo: '#f4e4bd',
+    cielo: '#f7e2ac',
+    suelo: '#8a7a52',
+    luz: '#ffe9b8',
+    relleno: '#a9c0dc',
+    niebla: '#eeddb4',
+    sombra: '#43351f',
+    intensidad: 1.05,
+    hemisferio: 0.55,
+    ambiente: 0.28,
+    sol: 0.95,
+    rellenoInt: 0.2,
+    solPos: [8, 6, 4.5],
+    nieblaCerca: 10,
+    nieblaLejos: 42,
+    estrellas: 0,
+    luciernagas: 0,
   },
   /* día pleno: marfil claro, sol alto casi blanco, el aire se abre y la
      niebla se va lejos — la hora de trabajar */
@@ -82,6 +107,28 @@ export const CIELOS_HORA = {
     nieblaCerca: 12,
     nieblaLejos: 48,
     estrellas: 0,
+    luciernagas: 0,
+  },
+  /* la tarde: el sol ya cruzó al otro lado del valle y la luz se inclina
+     ámbar; las sombras se alargan hacia el oriente */
+  tarde: {
+    fondo: '#f0dcae',
+    cielo: '#f4d795',
+    suelo: '#8f7247',
+    luz: '#ffdf9f',
+    relleno: '#9fb4d4',
+    niebla: '#eccf9d',
+    sombra: '#3f2d1a',
+    intensidad: 1.02,
+    hemisferio: 0.55,
+    ambiente: 0.28,
+    sol: 0.95,
+    rellenoInt: 0.22,
+    solPos: [-5, 7, 4],
+    nieblaCerca: 10,
+    nieblaLejos: 38,
+    estrellas: 0,
+    luciernagas: 0,
   },
   /* la hora madre: espejo exacto de ATMOSFERA (atmosferaMadre). El sol en
      [6,9,4] calca la direccional de EscenaBase3D para que una escena montada
@@ -103,6 +150,28 @@ export const CIELOS_HORA = {
     nieblaCerca: 9,
     nieblaLejos: 40,
     estrellas: 0,
+    luciernagas: 0,
+  },
+  /* el atardecer: sol rasante al occidente, naranjas y rosas hondos, relleno
+     lavanda del cielo que ya se apaga; las primeras luciérnagas asoman */
+  atardecer: {
+    fondo: '#eeae7e',
+    cielo: '#e9986a',
+    suelo: '#6e4a3a',
+    luz: '#ffb37a',
+    relleno: '#9d8fc9',
+    niebla: '#e8a97f',
+    sombra: '#38222a',
+    intensidad: 0.92,
+    hemisferio: 0.52,
+    ambiente: 0.26,
+    sol: 0.9,
+    rellenoInt: 0.28,
+    solPos: [-8, 2.5, 4.5],
+    nieblaCerca: 8,
+    nieblaLejos: 34,
+    estrellas: 0.12,
+    luciernagas: 0.35,
   },
   /* noche estrellada de páramo: índigo hondo, luna plata desde el otro lado
      del valle, relleno tibio de fogata y el fog cerrando la distancia */
@@ -123,6 +192,7 @@ export const CIELOS_HORA = {
     nieblaCerca: 6,
     nieblaLejos: 30,
     estrellas: 1,
+    luciernagas: 1,
   },
 };
 
@@ -136,17 +206,37 @@ export function presetDeHora(hora) {
 }
 
 /**
- * Deriva la hora del kit del reloj real (franja ecuatorial andina: el sol
- * sale ~6 y se esconde ~18 todo el año, así que las franjas son estables).
+ * Franja del día para una hora DECIMAL (p. ej. 17.5 = 5:30 pm). Es EL mapa del
+ * ciclo diurno vivo: seis franjas ecuatoriales andinas (el sol sale ~6 y se
+ * esconde ~18 todo el año, así que las bandas son estables).
+ * @param {number} h  hora decimal 0..24
+ * @returns {'amanecer'|'manana'|'mediodia'|'tarde'|'atardecer'|'noche'}
+ */
+export function franjaDeHoraDecimal(h) {
+  /* CREPÚSCULO ECUATORIAL CORTO (DR luz real de los Andes, 2026-06-19): a
+     4-5° N el sol cae casi vertical y el crepúsculo dura ~20-25 minutos, no
+     horas. El sol sale ~5:50-6:10 y se esconde ~17:50-18:15 TODO el año.
+     Las bandas viejas mentían: mostraban 'amanecer' desde las 5:00 (noche
+     cerrada real) y 'atardecer' hasta las 19:00 (a las 18:40 en Colombia ya
+     es noche). Bandas honestas: el filo del día es breve — y por breve,
+     precioso (quien abre la app a las 6:10 pm ALCANZA el atardecer; a las
+     6:45 pm ya lo perdió, como en la vereda). */
+  if (h < 5.7) return 'noche';
+  if (h < 6.75) return 'amanecer';
+  if (h < 11) return 'manana';
+  if (h < 15) return 'mediodia';
+  if (h < 17.5) return 'tarde';
+  if (h < 18.6) return 'atardecer';
+  return 'noche';
+}
+
+/**
+ * Deriva la franja del kit del reloj real (minutos incluidos).
  * @param {Date} [fecha]
- * @returns {'amanecer'|'mediodia'|'dorada'|'noche'}
+ * @returns {'amanecer'|'manana'|'mediodia'|'tarde'|'atardecer'|'noche'}
  */
 export function horaDeReloj(fecha = new Date()) {
-  const h = fecha.getHours();
-  if (h >= 5 && h < 9) return 'amanecer';
-  if (h >= 9 && h < 16) return 'mediodia';
-  if (h >= 16 && h < 19) return 'dorada';
-  return 'noche';
+  return franjaDeHoraDecimal(fecha.getHours() + fecha.getMinutes() / 60);
 }
 
 /** Mezcla dos hex `#rrggbb` hacia `t` (0 = a, 1 = b) sin three (aritmética pura). */
@@ -171,6 +261,7 @@ const CAMPOS_NUMERO = [
   'nieblaCerca',
   'nieblaLejos',
   'estrellas',
+  'luciernagas',
 ];
 
 /**

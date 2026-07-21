@@ -1,0 +1,78 @@
+{
+  "species_slug": "foeniculum_vulgare",
+  "scientific_name": "Foeniculum vulgare Mill.",
+  "common_names": [
+    "Hinojo"
+  ],
+  "family": "Apiaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pest_repellent",
+    "pollinator_attractor"
+  ],
+  "antagonists": [
+    "coffea_arabica",
+    "phaseolus_vulgaris",
+    "solanum_lycopersicum_san_marzano",
+    "zea_mays"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Siembra directa recomendada; el trasplante puede dañar su raíz pivotante profunda."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 1500,
+      "optimo_max": 2800,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 12,
+      "optimo_max": 22,
+      "max_tolerable": 30
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El hinojo (Foeniculum vulgare Mill., familia Apiaceae) es una umbelífera perenne aromática originaria del Mediterráneo, naturalizada y cultivada en huertas familiares colombianas para uso culinario (bulbo, semilla, hoja), medicinal (digestivo, carminativo) e industrial (aceite esencial rico en anetol). Se cultiva en zonas templadas a frías: Cundinamarca (Sabana Bogotá), Boyacá, Antioquia, Quindío y Nariño entre 1.500 y 2.800 msnm en zona térmica templada a fría. Ciclo 4-6 meses a primera cosecha, perennización opcional 2-3 años. Caso de estudio principal en alelopatía: sus exudados radicales (compuestos cumarínicos) inhiben la germinación y crecimiento de la mayoría de vecinos, especialmente tomate, frijol, cilantro y eneldo. Manejo agroecológico: aislamiento mínimo 2-3 m de otras hortalizas O confinamiento en bordura/macetón, asocio compatible solo con hisopo y romero, fertilización moderada con compost al fondo, atrayente de polinizadores beneficiosos (Syrphidae, Braconidae) en floración. Lección viva: enseña la necesidad de planificar diseño espacial del huerto considerando interacciones químicas. Fuentes Tier A: ICA Resolución 3168/2015, Pamplona Roger 2006 Plantas Medicinales, Restrepo 2007 Biopreparados, POWO Kew, GBIF Backbone Taxonomy.",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- phaseolus_vulgaris — Frijol arbustivo / voluble (Phaseolus vulgaris L.)\n- solanum_lycopersicum_san_marzano — Tomate San Marzano (Solanum lycopersicum 'San Marzano')\n- zea_mays — Maíz criollo (Zea mays L.)",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "restrepo-2007-biopreparados",
+      "title": "restrepo-2007-biopreparados",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.360Z"
+}

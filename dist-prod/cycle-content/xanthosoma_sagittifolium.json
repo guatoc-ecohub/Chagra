@@ -1,0 +1,87 @@
+{
+  "species_slug": "xanthosoma_sagittifolium",
+  "scientific_name": "Xanthosoma sagittifolium (L.) Schott",
+  "common_names": [
+    "Malanga blanca / Ocumo blanco"
+  ],
+  "family": "Araceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "cormo",
+    "notas": "Aroidea tropical americana nativa de Centroamérica-Antillas-Sudamérica tropical húmeda (distinta de Colocasia esculenta que es asiática). Hojas grandes sagitado-hastadas (NO peltadas como Colocasia — diferencia diagnóstica clave). Cormo central + cormelos hijos comestibles, pulpa blanca-marfil (cv. blanco), almidón fino. Contiene cristales de oxalato de calcio — REQUIERE COCCIÓN obligatoria mín 30 min. Propagación por cormelos hijos o trozos de cormo madre. Ciclo 8-12 meses. Apta para sotobosque cafetalero-cacaotero y orillas de cuerpos de agua."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 1000,
+      "max_absoluto": 1500
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "moderado"
+  },
+  "valor_pedagogico": "La malanga blanca u ocumo blanco (Xanthosoma sagittifolium (L.) Schott, familia Araceae) es la aroidea tuberosa nativa neotropical por excelencia — domesticada en Centroamérica, Antillas y Amazonía sudamericana hace al menos 4.000-5.000 años por pueblos arawak, tainos, kuna, emberá y otros pueblos neotropicales antes del contacto europeo, distinguible morfológicamente de la papa china asiática (Colocasia esculenta) por sus hojas grandes sagitado-hastadas con peciolo inserto en el borde basal (NO peltadas con peciolo central como Colocasia — diferencia diagnóstica clave para identificación rápida en campo). En Colombia es ampliamente cultivada en el Pacífico colombiano (Chocó-Valle litoral-Cauca litoral-Nariño litoral: Buenaventura, Quibdó, Tadó, Tumaco, Guapi), Caribe húmedo (Magdalena medio, Antioquia bajo, Urabá, Bolívar, Sucre, Córdoba, San Andrés y Providencia), Amazonía (trapecio amazónico, Putumayo, Caquetá, Guaviare), Orinoquía (piedemonte llanero, Casanare, Meta) y zonas bajas inundables del Magdalena medio entre 0 y 1.000 msnm en zona térmica cálida húmeda, donde se conoce con nombres regionales diversos: 'ocumo' o 'mafafa' (Caribe), 'malanga' (Pacífico afrocolombiano), 'uncucha' (Amazonía) y 'tiquisque' (frontera con Centroamérica). Lección viva de identificación botánica precisa Colocasia vs Xanthosoma — la confusión campesina entre 'taro' (papa china asiática Colocasia esculenta) y 'malanga blanca' (ocumo americano Xanthosoma sagittifolium) es uno de los casos pedagógicos más útiles de etnobotánica neotropical: ambas Araceae se cultivan en humedad-calor tropical, ambas producen cormos comestibles, ambas contienen rafidios de oxalato que exigen cocción, pero son géneros distintos con orígenes geográficos opuestos (Asia vs Neotrópico), morfología foliar diferente (peltada vs sagitada-hastada), perfil culinario distinto (Colocasia más mucilaginosa, Xanthosoma más harinosa) y manejo agroecológico diferenciado (Colocasia tolera mejor encharcamiento permanente, Xanthosoma prefiere suelo húmedo pero drenado). Esta lección enseña magistralmente la importancia de la identificación botánica precisa por morfología foliar como herramienta de soberanía agrícola — el campesino que distingue entre las dos especies conserva mejor el germoplasma local y diferencia mejor las técnicas de cocina tradicional. El cormo central (5-15 cm diámetro, 0.5-3 kg) y los cormelos hijos múltiples bien desarrollados son ricos en almidón fácilmente digerible, mucílago, vitaminas B1-B6, vitamina C, potasio, magnesio y proteína vegetal moderada (2-3%), consumidos cocidos en sancocho, ajiaco bogotano (donde a veces sustituye a la papa criolla), sopa, frituras, croquetas y cremas. Las hojas grandes acorazonadas (peciolo de 1-2 m) son comestibles también como espinaca tropical tras cocción prolongada (cocción mín 30 min para destruir oxalatos) — el 'callaloo' caribeño afrocolombiano. Manejo agroecológico: propagación por cormelos hijos (preferencia) o trozos de cormo madre con yemas activas, plantación a 60-80 cm entre plantas en suelo húmedo bien drenado rico en MO con pH 5.5-6.5, ciclo 8-12 meses a cosecha, rendimientos 10-25 t/ha cormos. Asocio tradicional con plátano hartón, yuca dulce, piña, achiote, caña panelera y árboles frutales en finca pacífica-caribe-amazónica. Apta para sotobosque cafetalero-cacaotero (tolerante a sombra parcial 40-60%) y orillas de cuerpos de agua. Plagas: pudrición de cormo Pythium spp. y Erwinia spp. en suelos mal drenados, hormigas arrieras (Atta spp.). Especie pilar de soberanía alimentaria afrocolombiana del Pacífico y caribe húmedo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, FAO EcoCrop, Bernal 2015 Catálogo Plantas Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia, SINCHI Amazonía Colombiana.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.395Z"
+}

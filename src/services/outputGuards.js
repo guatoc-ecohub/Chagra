@@ -275,7 +275,7 @@ const NLU_NOISE_MENTIONS = new Set([
   // una recomendación no está nombrando un cultivo, aunque el resolver a
   // veces case el token contra prosa del catálogo (ver "fuente" arriba). El
   // cotejo es sobre `mentioned` COMPLETO y normalizado, no substring: "pasto
-  // fuente" (mención de una especie real) NO cae acá, solo "fuente" sola.
+  // fuente" (mención de una especie real) NO cae aquí, solo "fuente" sola.
   'fuente', 'fuentes', 'entidad', 'entidades', 'norma', 'normativa',
   'resolucion', 'decreto', 'ley', 'cartilla', 'referencia', 'recomendacion',
   // NOTA: se evaluaron 'ica'/'sena'/'agrosavia'/... y 'car'/'fao' (siglas
@@ -2383,8 +2383,8 @@ export function guardThermalViability(
     return { text: responseText, modified: false, reason: null };
   }
 
-  const fMin = forecastTempMin != null && forecastTempMin !== '' ? Number(forecastTempMin) : NaN;
-  const fMax = forecastTempMax != null && forecastTempMax !== '' ? Number(forecastTempMax) : NaN;
+  const fMin = forecastTempMin != null && /** @type {any} */ (forecastTempMin) !== '' ? Number(forecastTempMin) : NaN;
+  const fMax = forecastTempMax != null && /** @type {any} */ (forecastTempMax) !== '' ? Number(forecastTempMax) : NaN;
   const haveMin = Number.isFinite(fMin);
   const haveMax = Number.isFinite(fMax);
   // Sin NINGÚN dato de pronóstico → no-op graceful (gap documentado).
@@ -2584,6 +2584,26 @@ const DECREE_RE =
   /\b(?:Decreto|Resolución|Res|Dec\.|Decreto\s+No\.?)\s*(?:\d+|[IVXLCDM]+)(?:\s+de\s+\d{4})?\b/gi;
 
 /**
+ * Instituciones y canales oficiales colombianos que suelen aparecer en
+ * consultas de contacto agro/rural. La lista es conservadora y solo cubre
+ * entidades que el usuario puede nombrar como canal oficial genérico.
+ */
+const OFFICIAL_CONTACT_INSTITUTION_RE =
+  /\b(?:ica|agrosavia|umata|alcald[ií]a|secretar[ií]a(?:\s+de)?\s+agricultura|secretar[ií]a(?:\s+de)?\s+desarrollo\s+rural|secretar[ií]a(?:\s+de)?\s+ambiente|gobernaci[oó]n|ministerio\s+de\s+agricultura|corporaci[oó]n\s+aut[oó]noma\s+regional|car\b|invima|ins|sena)\b/;
+
+/**
+ * Textos que suenan a afirmación de contacto específico.
+ */
+const CONTACT_ASSERTION_RE =
+  /\b(?:llama(?:r)?|marc[aá]|contacta(?:r)?|comun[ií]cate|escrib(?:e|a)|consulta(?:r)?|tel[eé]fono|celular|linea|línea|correo|email|whatsapp|direccion|dirección|sede|oficina|atenci[oó]n)\b/;
+
+/**
+ * Patrones de direcciones postales comunes en Colombia.
+ */
+const ADDRESS_RE =
+  /\b(?:calle|cl\.?|cra\.?|carrera|avenida|av\.?|diagonal|transversal|km|kil[oó]metro)\s*[0-9][0-9A-Za-z#\-\s.,]*/i;
+
+/**
  * Guard 5 — contacto inventado. Si el texto incluye teléfonos, correos,
  * URLs o números de decreto/resolución que NO estén en la allowlist
  * verificada, los MARCA/REEMPLAZA por un texto seguro que indica al
@@ -2662,6 +2682,94 @@ export function guardInventedContact(responseText, _resolvedEntities = null, _fi
   }
 
   return { text: responseText, modified: false, reason: null };
+}
+
+/**
+ * Guard de contacto institucional inventado.
+ *
+ * Si el texto afirma un teléfono, celular, línea, correo o dirección concreta
+ * de una entidad como ICA, Agrosavia, UMATA, alcaldía o secretaría, lo
+ * sustituye por una remisión al canal oficial genérico. No toca menciones
+ * legítimas de la entidad sin dato de contacto.
+ *
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardHallucinatedContact(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+
+  if (responseText.includes('Consulte el canal oficial de la entidad')) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const userAskedForContact =
+    typeof userMessage === 'string' && CONTACT_ASSERTION_RE.test(_stripDiacritics(userMessage));
+
+  const protectedText = responseText.replace(EMAIL_RE, (email) => email.replace(/\./g, '__DOT__'));
+  const sentences = _splitSentences(protectedText);
+  const hits = [];
+  let changed = false;
+  let lastWasReplacement = false;
+
+  const replacement =
+    'Consulte el canal oficial de la entidad, por ejemplo la página del ICA (ica.gov.co) o la UMATA de su municipio. ' +
+    'No me es posible confirmar un número telefónico específico sin riesgo de darle uno equivocado.';
+
+  const out = sentences
+    .map((sentence) => {
+      const originalSentence = sentence.replace(/__DOT__/g, '.');
+      const norm = _stripDiacritics(originalSentence);
+      const hasInstitution = OFFICIAL_CONTACT_INSTITUTION_RE.test(norm);
+      if (!hasInstitution) {
+        lastWasReplacement = false;
+        return sentence;
+      }
+
+      const phoneRe = new RegExp(PHONE_RE.source, 'g');
+      const emailRe = new RegExp(EMAIL_RE.source, 'g');
+      const addressRe = new RegExp(ADDRESS_RE.source, ADDRESS_RE.flags);
+      const hasPhone = phoneRe.test(originalSentence);
+      const hasEmail = emailRe.test(originalSentence);
+      const hasAddress = addressRe.test(originalSentence);
+      const hasContactCue = CONTACT_ASSERTION_RE.test(norm);
+
+      if (!(hasPhone || hasEmail || hasAddress || hasContactCue || userAskedForContact)) {
+        lastWasReplacement = false;
+        return sentence;
+      }
+
+      const specificContacts = [];
+      const phones = originalSentence.match(phoneRe) || [];
+      for (const phone of phones) specificContacts.push(phone);
+      const emails = originalSentence.match(emailRe) || [];
+      for (const email of emails) specificContacts.push(email);
+      if (addressRe.test(originalSentence)) specificContacts.push(originalSentence.match(addressRe)?.[0] || 'direccion');
+
+      if (specificContacts.length === 0) {
+        lastWasReplacement = false;
+        return sentence;
+      }
+
+      changed = true;
+      for (const item of specificContacts) if (!hits.includes(item)) hits.push(item);
+      if (lastWasReplacement) return '';
+      lastWasReplacement = true;
+      const trailing = originalSentence.match(/\s*$/)?.[0] || ' ';
+      return `${replacement}${trailing}`;
+    })
+    .join('');
+
+  if (!changed) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('hallucinated_contact');
+  return {
+    text: out.trim() || replacement,
+    modified: true,
+    reason: `contacto_institucional_hallucinado: ${[...new Set(hits)].slice(0, 5).join(', ')}`,
+  };
 }
 
 // ── GUARD: norma numerada afirmada como obligacion ──────────────────────────
@@ -5426,7 +5534,7 @@ function _findInventedClimateVariety(norm) {
         if (opuestoRe.test(s)) {
           return {
             name,
-            clima: entry.clima,
+            clima: /** @type {'frio'|'calido'} */ (entry.clima),
             opuesto: entry.clima === 'calido' ? 'frio' : 'calido',
             // GAP 1 (#1303): el binomio canónico de la especie. Va al texto de
             // neutralización para cubrir el must_include del bench ("Bactris
@@ -7078,8 +7186,8 @@ export function guardInventedBrand(responseText) {
  * ENCIMA de `max` es INVIABLE (no zona-gris). `range` es el texto del rango viable
  * que devolvemos al campesino en la corrección.
  *
- * Solo cultivos de clima inequívoco/acotado: los de banda ancha (maíz, fríjol, yuca)
- * NO entran — su tolerancia amplia haría falsos positivos. La altitud sale de la
+ * Solo cultivos de clima inequívoco/acotado: los de banda ancha (maíz, fríjol)
+ * NO entran. La altitud sale de la
  * PREGUNTA del usuario (o de la respuesta): el caso del bench es "café a 3600 m",
  * "Hass a 2800 m", "mora a 450 m" — datos que el operador da en su mensaje.
  */
@@ -7150,6 +7258,94 @@ const HARD_ALTITUDE_BANDS = [
     max: 3800,
     range: '2200–3600 msnm (clima frío/de altura)',
   },
+  {
+    names: ['platano', 'plátano'],
+    binomial: 'musa x paradisiaca',
+    display: 'plátano',
+    min: 0,
+    max: 2200,
+    range: '0–2200 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['banano', 'guineo'],
+    binomial: 'musa acuminata',
+    display: 'banano / guineo',
+    min: 0,
+    max: 1300,
+    range: '0–1300 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['yuca', 'yuca dulce', 'yuca de comer'],
+    binomial: 'manihot esculenta',
+    display: 'yuca dulce',
+    min: 0,
+    max: 2000,
+    range: '0–2000 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['piña', 'pina'],
+    binomial: 'ananas comosus',
+    display: 'piña',
+    min: 0,
+    max: 1500,
+    range: '0–1500 msnm (tierra cálida)',
+  },
+  {
+    names: ['papaya'],
+    binomial: 'carica papaya',
+    display: 'papaya',
+    min: 0,
+    max: 1600,
+    range: '0–1600 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['mango'],
+    binomial: 'mangifera indica',
+    display: 'mango',
+    min: 0,
+    max: 1800,
+    range: '0–1800 msnm (tierra cálida)',
+  },
+  {
+    names: ['arroz'],
+    binomial: 'oryza sativa',
+    display: 'arroz',
+    min: 0,
+    max: 1300,
+    range: '0–1300 msnm (tierra cálida/templada)',
+  },
+  {
+    names: ['papa', 'papa parda pastusa', 'papa comun', 'pastusa'],
+    binomial: 'solanum tuberosum',
+    display: 'papa',
+    min: 2400,
+    max: 3400,
+    range: '2400–3400 msnm (clima frío)',
+  },
+  {
+    names: ['lulo', 'naranjilla', 'chuva'],
+    binomial: 'solanum quitoense',
+    display: 'lulo / naranjilla / chuva',
+    min: 1200,
+    max: 2800,
+    range: '1200–2800 msnm (clima templado/frío)',
+  },
+  {
+    names: ['tomate de arbol', 'tomate de árbol', 'tamarillo', 'tomate de palo', 'tomate de monte', 'tomate cimarron', 'tomate cimarrón'],
+    binomial: 'solanum betaceum',
+    display: 'tomate de árbol',
+    min: 1200,
+    max: 3000,
+    range: '1200–3000 msnm (clima templado/frío)',
+  },
+  {
+    names: ['gulupa'],
+    binomial: 'passiflora edulis f. edulis',
+    display: 'gulupa',
+    min: 1600,
+    max: 2600,
+    range: '1600–2600 msnm (clima templado/frío)',
+  },
 ];
 
 /**
@@ -7166,10 +7362,10 @@ const HARD_PROMOTES_CROP_RE =
  * promoviendo → no hay nada que suprimir. Sobre texto normalizado.
  */
 const HARD_ALREADY_INVIABLE_RE =
-  /(no\s+es\s+viable|inviable|no\s+se\s+da\b|no\s+prosper|demasiad[oa]\s+(frio|fria|alt|caliente|calid[oa])|no\s+(la?\s+)?siembres|no\s+(es\s+)?recomendable\s+(sembrar|cultivar))/;
+  /(\bno\s+es\s+viable\b|inviable|\bno\s+se\s+da\b|\bno\s+prosper|\bdemasiad[oa]\s+(frio|fria|alt|caliente|calid[oa])\b|\bno\s+(la?\s+)?siembres\b|\bno\s+(es\s+)?recomendable\s+(sembrar|cultivar)\b)/;
 
 /** Marca idempotente del reemplazo de inviabilidad dura. */
-const HARD_ALTITUDE_MARKER = 'no es viable a esa altura';
+const HARD_ALTITUDE_MARKER = 'NO es viable a esa altura';
 
 /**
  * Extrae altitudes (msnm) de un texto SIN el piso de 800 m de `_extractAltitudes`
@@ -7208,12 +7404,21 @@ function _hardAltitudeReplacement(band, alt, demasiadoAlto) {
     ? `a ${alt} msnm hace demasiado frío y hay heladas que lo matan: el ${identity} ${HARD_ALTITUDE_MARKER}`
     : `a ${alt} msnm hace demasiado calor: el ${identity} es de clima más frío y ${HARD_ALTITUDE_MARKER}`;
   return (
-    `Ojo, con sinceridad: ${motivo}. Su rango viable está alrededor de ${band.range}. ` +
+    `Corrección importante: Ojo, con sinceridad: ${motivo}. Su rango viable está alrededor de ${band.range}. ` +
     'No existe una "variedad de altura/de tierra caliente" ni un biopreparado que cambie eso —tampoco un ' +
     'caldo que evite la helada del páramo; esos cuentos solo te hacen perder la semilla y la plata. ' +
     `Si quieres sembrar a ${alt} msnm, mejor escoge un cultivo que sí corresponda a esa altura, y con gusto te ` +
     'oriento cuáles se dan bien ahí.'
   );
+}
+
+function _bandNameHit(norm, name) {
+  const needle = _stripDiacritics(name);
+  if (!needle) return false;
+  if (/^[a-z0-9]+$/.test(needle) && needle.length <= 5) {
+    return new RegExp(`\\b${_escapeRegExpLiteral(needle)}\\b`).test(norm);
+  }
+  return norm.includes(needle);
 }
 
 /**
@@ -7278,7 +7483,7 @@ export function guardHardAltitudeViability(responseText, { userMessage = null } 
   }
 
   for (const band of HARD_ALTITUDE_BANDS) {
-    const nameHit = band.names.some((n) => norm.includes(_stripDiacritics(n)));
+    const nameHit = band.names.some((n) => _bandNameHit(norm, n));
     if (!nameHit && !norm.includes(band.binomial)) continue;
     for (const alt of altitudes) {
       const demasiadoAlto = alt > band.max;
@@ -7565,7 +7770,7 @@ const WARM_COLD_PROMOTES_RE =
  * calor", "inviable" → no re-suprimimos. Anti-FP central. Sobre normalizado.
  */
 const WARM_COLD_ALREADY_FLAGS_RE =
-  /(no\s+se\s+da\b|no\s+prosper|inviable|no\s+es\s+viable|necesita\s+(un\s+)?clima\s+(frio|de\s+altura|fresco)|es\s+de\s+(clima\s+)?(frio|tierra\s+fria|altura)|no\s+(aguanta|resiste|soporta)\s+(el\s+)?calor|demasiado\s+(calor|calid)|no\s+es\s+(el\s+)?clima\s+(adecuad|para))/;
+  /(\bno\s+se\s+da\b|\bno\s+prosper|inviable|\bno\s+es\s+viable\b|necesita\s+(un\s+)?clima\s+(frio|de\s+altura|fresco)|es\s+de\s+(clima\s+)?(frio|tierra\s+fria|altura)|\bno\s+(aguanta|resiste|soporta)\s+(el\s+)?calor\b|demasiado\s+(calor|calid)|\bno\s+es\s+(el\s+)?clima\s+(adecuad|para)\b)/;
 
 /**
  * Construye la corrección de inviabilidad por clima para un cultivo de frío en
@@ -7643,6 +7848,183 @@ export function guardWarmLowlandColdCrop(responseText, { userMessage = null } = 
     text: _warmColdCropReplacement(coldCrop, climaUsuario),
     modified: true,
     reason: `cultivo_frio_en_tierra_caliente: ${coldCrop.names[0]}${warmToponym ? ` (${warmToponym})` : ''}`,
+  };
+}
+
+// ── GUARD: cultivo cálido/templado promovido en páramo/frío textual ─────────
+
+const COLD_HIGHLAND_USER_RE =
+  /\b(paramo[s]?|subparamo[s]?|tierra\s+fria|clima\s+frio|zona\s+fria|frio\s+de\s+altura)\b/;
+
+const COLD_HIGHLAND_TOPONYMS = [
+  'bogota',
+  'tunja',
+  'zipaquira',
+  'sumapaz',
+  'duitama',
+  'sogamoso',
+  'fomeque',
+  'ventaquemada',
+];
+
+const COLD_HIGHLAND_WARM_CROP_MARKER = 'no va en ese piso';
+
+const COLD_HIGHLAND_PROMOTES_RE =
+  /(se\s+da\b|es\s+viable|opcion\s+viable|se\s+puede\s+(cultivar|sembrar|dar)|siembr\w*|sembr\w*|cultiv\w*|manej\w*|aguanta\b|resiste\b|adaptad[oa]\b|se\s+cultiva|produce\b|para\s+(la\s+)?mejor\s+cosecha|distancia\s+de\s+siembra|metros\s+entre\s+plantas)/;
+
+const COLD_HIGHLAND_ALREADY_FLAGS_RE =
+  /(\bno\s+se\s+da\b|\bno\s+prosper|inviable|\bno\s+es\s+viable\b|\bno\s+(aguanta|resiste|soporta)\s+(el\s+)?frio\b|\bno\s+es\s+(el\s+)?(clima|piso|la\s+altura|altura)\s+(adecuad|correct|apropiad|ideal)\b|\bno\s+corresponde\s+a\s+ese\s+(clima|piso|altura)\b|\bdemasiad[oa]\s+frio\b|\bdemasiado\s+fria\b)/;
+
+const COLD_HIGHLAND_CROP_MARKERS = [
+  {
+    names: ['cacao'],
+    display: 'cacao',
+    climate: 'tierra cálida',
+    binomial: 'theobroma cacao',
+  },
+  {
+    names: ['platano', 'plátano'],
+    display: 'plátano',
+    climate: 'tierra cálida o templada',
+    binomial: 'musa x paradisiaca',
+  },
+  {
+    names: ['banano', 'guineo'],
+    display: 'banano / guineo',
+    climate: 'tierra cálida o templada',
+    binomial: 'musa acuminata',
+  },
+  {
+    names: ['yuca', 'yuca dulce', 'yuca de comer'],
+    display: 'yuca dulce',
+    climate: 'tierra cálida o templada',
+    binomial: 'manihot esculenta',
+  },
+  {
+    names: ['mango'],
+    display: 'mango',
+    climate: 'tierra cálida',
+    binomial: 'mangifera indica',
+  },
+  {
+    names: ['papaya'],
+    display: 'papaya',
+    climate: 'tierra cálida o templada',
+    binomial: 'carica papaya',
+  },
+  {
+    names: ['arroz'],
+    display: 'arroz',
+    climate: 'tierra cálida o templada',
+    binomial: 'oryza sativa',
+  },
+  {
+    names: ['piña', 'pina'],
+    display: 'piña',
+    climate: 'tierra cálida',
+    binomial: 'ananas comosus',
+  },
+  {
+    names: ['chontaduro'],
+    display: 'chontaduro',
+    climate: 'tierra cálida',
+    binomial: 'bactris gasipaes',
+  },
+  {
+    names: ['palma'],
+    display: 'palma',
+    climate: 'tierra cálida',
+    binomial: 'bactris gasipaes',
+  },
+  {
+    names: ['maranon', 'marañón', 'merey'],
+    display: 'marañón',
+    climate: 'tierra cálida',
+    binomial: 'anacardium occidentale',
+  },
+  {
+    names: ['copoazu', 'copoazú', 'cupuacu', 'cupuaçu'],
+    display: 'copoazú',
+    climate: 'tierra cálida',
+    binomial: 'theobroma grandiflorum',
+  },
+  {
+    names: ['cafe', 'cafe arabica', 'cafe de altura', 'cafeto'],
+    display: 'café',
+    climate: 'tierra templada o fría, no de páramo',
+    binomial: 'coffea arabica',
+  },
+];
+
+function _coldHighlandContextFromText(userNorm) {
+  if (typeof userNorm !== 'string' || !userNorm) return null;
+  if (COLD_HIGHLAND_USER_RE.test(userNorm)) {
+    if (/\bparamo[s]?\b/.test(userNorm)) {
+      return { label: 'en el páramo', reasonSuffix: 'páramo', kind: 'paramo' };
+    }
+    return { label: 'en clima frío', reasonSuffix: 'clima frio', kind: 'frio' };
+  }
+  const toponym = COLD_HIGHLAND_TOPONYMS.find((t) => userNorm.includes(t)) || null;
+  if (!toponym) return null;
+  return { label: 'en clima frío', reasonSuffix: toponym, kind: 'toponym' };
+}
+
+function _coldHighlandWarmCropReplacement(entry, pisoLabel) {
+  const binom = entry.binomial ? ` (${_displayBinomial(entry.binomial)})` : '';
+  return (
+    `Ojo: ${entry.display}${binom} no va ${pisoLabel}; es un cultivo de ${entry.climate}. ` +
+    'Sembrarlo ahi es inviable.'
+  );
+}
+
+/**
+ * guardColdHighlandWarmCrop - espejo de guardWarmLowlandColdCrop. Detecta un
+ * cultivo cálido o templado promovido en un piso de páramo o frío descrito por
+ * palabra o toponimo, y reemplaza por una advertencia determinista.
+ *
+ * Firma propia (necesita userMessage) - se invoca aparte en applyOutputGuards.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardColdHighlandWarmCrop(responseText, { userMessage = null } = {}) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (responseText.includes(COLD_HIGHLAND_WARM_CROP_MARKER)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const userNorm = typeof userMessage === 'string' ? _stripDiacritics(userMessage) : '';
+  const coldContext = _coldHighlandContextFromText(userNorm);
+  if (!coldContext) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const norm = _stripDiacritics(responseText);
+  if (COLD_HIGHLAND_ALREADY_FLAGS_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  if (!COLD_HIGHLAND_PROMOTES_RE.test(norm)) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const crop = COLD_HIGHLAND_CROP_MARKERS.find((entry) =>
+    entry.names.some((name) => _bandNameHit(userNorm, name)),
+  ) || COLD_HIGHLAND_CROP_MARKERS.find((entry) => entry.names.some((name) => _bandNameHit(norm, name)));
+  if (!crop) {
+    return { text: responseText, modified: false, reason: null };
+  }
+  if (crop.display === 'café' && coldContext.kind === 'frio') {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  bumpGuardTelemetry('cold_highland_warm_crop');
+  return {
+    text: _coldHighlandWarmCropReplacement(crop, coldContext.label),
+    modified: true,
+    reason: `cultivo_calido_en_piso_frio: ${crop.display} (${coldContext.reasonSuffix})`,
   };
 }
 
@@ -7764,7 +8146,7 @@ const BINOMIAL_FALSE_POSITIVES = new Set([
 
 /**
  * ¿El texto contiene al menos un binomio latino?
- * @param {string} normText  texto sin diacríticos y en minúsculas
+ * @param {string} text  texto sin diacríticos y en minúsculas
  * @returns {string|null} el primer binomio encontrado, o null
  */
 function _extractLatinBinomial(text) {
@@ -9463,8 +9845,15 @@ const GUARD_CHAIN = [
  * @returns {{text:string, modified:boolean, reasons:string[]}}
  */
 
-const MAX_CONCISE_WORDS = 250;
-const MAX_CONCISE_WORDS_HARD = 400;
+// 2026-07-12 (operador: "se cortó a menos de la tercera parte"): los umbrales
+// viejos (250/400) MUTILABAN respuestas técnicas legítimas a 2-3 oraciones —
+// una respuesta agroecológica detallada (plagas de la fresa, plan de manejo) es
+// naturalmente 300-600 palabras y ES el valor del agente. Cortarla degrada
+// inteligencia (regla dura del operador). Subidos MUCHO: solo recorta verborrea
+// genuinamente desbocada, y aun así conserva bastantes oraciones (ver kept).
+// La rama de DEDUP (redundancia) se conserva — esa sí es útil sin degradar.
+const MAX_CONCISE_WORDS = 700;
+const MAX_CONCISE_WORDS_HARD = 1300;
 
 /**
  * guardConciseResponse — guard de CONCISIÓN (Item 7).
@@ -9486,7 +9875,11 @@ export function guardConciseResponse(responseText) {
   }
 
   const words = responseText.split(/\s+/).filter(Boolean);
-  if (words.length < MAX_CONCISE_WORDS) {
+  // Gate BAJO solo para poder correr el DEDUP (redundancia) en respuestas
+  // medianas; la truncación por LARGO usa umbrales altos (700/1300) más abajo,
+  // así una respuesta técnica de 200-700 palabras NO-redundante queda intacta.
+  const DEDUP_MIN_WORDS = 200;
+  if (words.length < DEDUP_MIN_WORDS) {
     return { text: responseText, modified: false, reason: null };
   }
 
@@ -9534,15 +9927,16 @@ export function guardConciseResponse(responseText) {
   let reason = '';
 
   if (words.length >= MAX_CONCISE_WORDS_HARD) {
-    // Hard limit: preámbulo de seguridad (si lo hay) + 2 oraciones del cuerpo.
-    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 2)];
+    // Hard limit (>1300 palabras, verborrea real): preámbulo de seguridad + 6
+    // oraciones del cuerpo (antes 2 = stub que mutilaba el plan).
+    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 6)];
     conciseText = `${kept.join(' ').trim()}\n\n¿Quieres que profundice en algo específico?`;
     reason = `guardConciseResponse:hard_limit (${words.length} palabras, max ${MAX_CONCISE_WORDS_HARD})`;
   } else if (hasRedundancy) {
     // Deduplicar: mantener primera mención de cada recomendación
     const seen = new Set();
     const deduped = sentences.filter(s => {
-      const key = s.trim().toLowerCase().slice(0, 60);
+      const key = /** @type {string} */ (/** @type {any} */ (s).trim().toLowerCase().slice(0, 60));
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -9550,11 +9944,15 @@ export function guardConciseResponse(responseText) {
     conciseText = deduped.join(' ').trim();
     if (conciseText.length < 30) conciseText = responseText.slice(0, 500) + '...';
     reason = `guardConciseResponse:redundant_recommendation (${sentences.length} -> ${deduped.length} oraciones)`;
-  } else {
-    // Soft limit: preámbulo de seguridad (si lo hay) + 3 oraciones del cuerpo.
-    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 3)];
+  } else if (words.length >= MAX_CONCISE_WORDS) {
+    // Soft limit (700-1300 palabras): preámbulo de seguridad + 10 oraciones del
+    // cuerpo (antes 3 = mutilaba respuestas técnicas legítimas).
+    const kept = [...sentences.slice(0, prefixCount), ...sentences.slice(prefixCount, prefixCount + 10)];
     conciseText = `${kept.join(' ').trim()}\n\n¿Quieres que profundice en algo específico?`;
     reason = `guardConciseResponse:verbose (${words.length} palabras, recomendado <${MAX_CONCISE_WORDS})`;
+  } else {
+    // 200-700 palabras, no-redundante: respuesta técnica legítima → NO tocar.
+    return { text: responseText, modified: false, reason: null };
   }
 
   bumpGuardTelemetry('concise');
@@ -10272,6 +10670,19 @@ export function applyOutputGuards(
     }
   }
 
+  // GUARD CULTIVO CÁLIDO/TEMPLADO en PÁRAMO/FRÍO textual: cuando el usuario
+  // describe un piso frío o un topónimo altoandino y la respuesta promueve cacao,
+  // plátano, banano, yuca, mango, papaya, arroz, piña, chontaduro, palma, marañón,
+  // copoazú o café como si fueran viables ahí, SUPRIME el cuerpo y lo REEMPLAZA por
+  // una advertencia determinista. Complementa a guardHardAltitudeViability, que
+  // exige altitud numérica.
+  if (runPlantingGuards && !(vis && vis.modified)) {
+    const chw = guardColdHighlandWarmCrop(text, { userMessage });
+    if (chw && chw.modified) {
+      return { text: chw.text, modified: true, reasons: chw.reason ? [chw.reason] : [] };
+    }
+  }
+
   // GUARD PREMISA FALSA EMBEBIDA por PISO TÉRMICO (GR-5, eje premisa_falsa): si la
   // pregunta da por sembrado/prosperando un cultivo en un piso térmico TEXTUAL ("el
   // café que sembré a nivel del mar", "mi mango del páramo") incompatible con el
@@ -10494,6 +10905,17 @@ export function applyOutputGuards(
     text = brandRes.text;
     modified = true;
     if (brandRes.reason) reasons.push(brandRes.reason);
+  }
+  // Guard SAFETY de CONTACTO INSTITUCIONAL HALLUCINADO: si el texto afirma un
+  // teléfono, correo o dirección concreta de una entidad como ICA, Agrosavia,
+  // UMATA, alcaldía o secretaría, lo cambia por una remisión al canal oficial
+  // genérico. Va antes del guard de contacto inventado para capturar el caso
+  // específico con una respuesta más útil. Idempotente.
+  const hallucinatedContactRes = guardHallucinatedContact(text, { userMessage });
+  if (hallucinatedContactRes && hallucinatedContactRes.modified) {
+    text = hallucinatedContactRes.text;
+    modified = true;
+    if (hallucinatedContactRes.reason) reasons.push(hallucinatedContactRes.reason);
   }
   // Guard SAFETY de CONTACTO INVENTADO (teléfonos, correos, URLs, decretos):
   // firma propia (solo el texto). Corre SIEMPRE (no es de siembra). SUPPRESS-AND-REPLACE:

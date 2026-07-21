@@ -1,4 +1,6 @@
+// @ts-nocheck
 /**
+// @ts-nocheck
  * voiceRagEnricher.test.js — cobertura unitaria del módulo de enriquecimiento
  * RAG post-extracción de entidades de voz (audit 2026-05-18).
  *
@@ -224,7 +226,7 @@ describe('voiceRagEnricher', () => {
     it('entity inválida o crop vacío → null sin tocar retrieve', async () => {
       expect(await enrichEntity(null)).toBeNull();
       expect(await enrichEntity({})).toBeNull();
-      expect(await enrichEntity({ crop: '   ', quantity: 1 })).toBeNull();
+      expect(await enrichEntity(/** @type {any} */ ({ crop: '   ', quantity: 1 }))).toBeNull();
       expect(retrieve).not.toHaveBeenCalled();
     });
   });

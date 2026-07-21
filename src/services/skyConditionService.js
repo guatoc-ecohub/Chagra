@@ -230,14 +230,14 @@ export function classifySkyCondition({
     condition = next;
   }
 
-  return {
+  return /** @type {any} */ ({
     condition,
     label: SKY_CONDITIONS[condition].label,
     degraded,
     reasons,
     confidence,
     cloudCoverPct: Number.isFinite(cloudCoverPct) ? cloudCoverPct : null,
-  };
+  });
 }
 
 /**
@@ -357,7 +357,8 @@ export function getCachedSkyConditions(lat, lng, elevation) {
  *   daily: Array<{ date:string, cloud_cover_mean_pct:number|null, weather_code:number|null, precip_mm:number|null }>
  * } | null>}
  */
-export async function fetchSkyConditions({ lat, lng, elevation, forceRefresh = false } = {}) {
+export async function fetchSkyConditions(opts = /** @type {any} */ ({})) {
+  const { lat, lng, elevation, forceRefresh = false } = opts;
   const nlat = Number(lat);
   const nlng = Number(lng);
   const key = quantKey(nlat, nlng, Number(elevation));

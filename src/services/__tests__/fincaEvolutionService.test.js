@@ -8,11 +8,11 @@ import {
 describe('fincaEvolutionService', () => {
   describe('evaluarEvolucionFinca', () => {
     it('lanza error si processes no es array', () => {
-      expect(() => evaluarEvolucionFinca({ processes: 'no-array' })).toThrow();
+      expect(() => evaluarEvolucionFinca(/** @type {any} */ ({ processes: 'no-array' }))).toThrow();
     });
 
     it('lanza error si observations no es array', () => {
-      expect(() => evaluarEvolucionFinca({ observations: 'no-array' })).toThrow();
+      expect(() => evaluarEvolucionFinca(/** @type {any} */ ({ observations: 'no-array' }))).toThrow();
     });
 
     it('con arrays vacíos devuelve scores null y nivelGliessman 0', () => {
@@ -496,7 +496,7 @@ describe('fincaEvolutionService', () => {
             },
           },
         ];
-        const result = evaluarEvolucionFinca({ observations });
+        const result = evaluarEvolucionFinca(/** @type {any} */ ({ observations }));
         
         expect(result.tape.cocreacion_conocimiento).toBeGreaterThan(0);
       });

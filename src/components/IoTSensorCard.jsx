@@ -167,6 +167,7 @@ export default function IoTSensorCard({
             </div>
             <Sparkline
               data={humidityHistory}
+              values={null}
               color="#3b82f6"
               timeLabel="24h"
               unit="%"
@@ -182,6 +183,7 @@ export default function IoTSensorCard({
             </div>
             <Sparkline
               data={temperatureHistory}
+              values={null}
               color="#f97316"
               timeLabel="24h"
               unit="°"

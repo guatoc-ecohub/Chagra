@@ -1,0 +1,89 @@
+{
+  "species_slug": "renealmia_alpinia",
+  "scientific_name": "Renealmia alpinia (Rottb.) Maas",
+  "common_names": [
+    "Pina pina"
+  ],
+  "family": "Zingiberaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "biomass_producer",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "rizoma",
+    "notas": "Propagacion por division de rizomas en sustrato rico en materia organica y humedo. Crece en sotobosque de selvas tropicales. Frutos usados como colorante natural y sus hojas en infusion medicinal."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 50,
+      "optimo_max": 400,
+      "max_absoluto": 800
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 20,
+      "optimo_max": 28,
+      "max_tolerable": 34
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno_a_moderado"
+  },
+  "valor_pedagogico": "La piña piña o matandrea (Renealmia alpinia (Rottb.) Maas, familia Zingiberaceae) es una zingiberácea herbácea perenne rizomatosa robusta (1.5-3 m altura) nativa silvestre del Neotrópico húmedo (Caribe, Mesoamérica, norte de Sudamérica), distribuida en sotobosques de selva tropical húmeda, bordes de quebradas y zonas ribereñas del trópico húmedo colombiano. Produce hojas elípticas lanceoladas con vaina ciliada y filotaxia dística (rasgo diagnóstico Zingiberaceae frente a Costaceae), inflorescencias en panícula basal terminal con brácteas escarlatas y flores tubulares amarillas, y frutos globosos rojo-anaranjados con pulpa-arilo morado oscuro rica en antocianinas (cianidina-3-rutinósido, peonidina) usadas como colorante natural tradicional. Se distribuye en Chocó (Quibdó, Atrato, Bajo Baudó, Bahía Solano, Nuquí), Valle del Cauca (Buenaventura, Bajo Calima, Anchicayá), Cauca (Guapi, Timbiquí, López), Nariño (Tumaco, Olaya Herrera), Amazonas (Leticia, Puerto Nariño), Vaupés, Caquetá, Putumayo y Magdalena medio bajo entre 50 y 400 msnm en zona térmica cálida húmeda con sombra parcial a alta. Ciclo perenne, floración bianual en clima húmedo estable. Lección viva: planta del sotobosque tropical húmedo con usos medicinales (infusión foliar antiinflamatoria, decocción rizomatosa para cólicos) y tintóreos tradicionales (colorante natural morado-rojo para tejidos artesanales, alimentos, cestería), enseñando el conocimiento botánico de las comunidades afrocolombianas e indígenas del Pacífico y Amazonia y su relación profunda con el bosque húmedo como farmacopea, despensa y proveedor de servicios bioculturales. Manejo agroecológico: propagación por división de rizomas con yemas activas en sustrato rico en materia orgánica y humedad alta sostenida, tolerancia a sombra parcial 60-80% (sotobosque), asocio en sistemas agroforestales con cacao, plátano, açaí y heliconias, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia, SINCHI Amazonia Colombiana.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.375Z"
+}

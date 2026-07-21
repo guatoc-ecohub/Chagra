@@ -23,6 +23,7 @@ import { useTheme, resolveAutoTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
 import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
+import Angelita from '../../visual/agente/Angelita';
 // Campana de notificaciones en el header F2 (regresión 2026-07-04): con la flag
 // F2 ON el TopBar legacy (que la montaba) NO se renderiza, así que el home se
 // quedó sin campana. `variant="f2"` es la misma píldora redonda que ya usa
@@ -51,6 +52,12 @@ import PanelVitalidadEspiritu from './PanelVitalidadEspiritu';
 import SceneFincaNature from './SceneFincaNature';
 import SceneHuertoVivo from './SceneHuertoVivo';
 import SceneTrazoMinimal from './SceneTrazoMinimal';
+// EL UMBRAL DEL VALLE + LAS PUERTAS COMO CARTAS (encargo FABLE_50 §A6,
+// "home máximo" 2026-07-16): la vista viva que ES la puerta cinematográfica
+// al valle 3D, y las puertas pintadas como cartas en la mano. Los destinos
+// siguen saliendo de buildPuertas (fuente única); solo cambió la piel.
+import UmbralValle from './UmbralValle';
+import PortalesMano from './PortalesMano';
 import './scene-finca-organismo.css';
 import './scene-finca-nature.css';
 import './scene-huerto-vivo.css';
@@ -611,23 +618,20 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                     )
                   )}
 
-                  {/* fauna sobre la escena. El COLIBRÍ (criatura insignia del
-                      agente) vuela SIEMPRE — es el guía, no ganado; acompaña
-                      también la finca recién empezada. La mariposa y la abeja
-                      (fauna que prospera) sólo aparecen cuando la finca está
-                      poblada. Con una ESCENA VIVA de tema activa NO se
-                      superpone fauna: cada escena trae su PROPIO colibrí y su
-                      fauna (el emoji 🦋/🐝 y el colibrí 2D duplicados rompían
-                      la clave del arte de cada tema). */}
+                  {/* fauna sobre la escena. ANGELITA (la abeja agente) vuela
+                      SIEMPRE — es la guía, no ganado; acompaña también la
+                      finca recién empezada ("solo abejita", operador
+                      2026-07-18: el colibrí jubiló del rol de insignia del
+                      agente). La mariposa y la abeja emoji (fauna que
+                      prospera) sólo aparecen cuando la finca está poblada.
+                      Con una ESCENA VIVA de tema activa NO se superpone
+                      fauna: cada escena trae la suya. */}
                   {!escenaVivaActiva && (
                   <div className="fvh-bichos" aria-hidden="true">
-                    {/* COLIBRÍ insignia. Con la flag VITE_COLIBRI ON (dev) =
-                        modo A/B TEMPORAL: dos barbuditos de páramo, uno a cada
-                        costado, para que el operador elija. IZQUIERDA el
-                        ILUSTRADO (SVG/CSS dibujado); DERECHA el REAL recortado
-                        (sprite en loop, sin recuadro). Cada uno con su etiquetita
-                        ("ilustrado"/"real"). Con la flag OFF (prod), el colibrí
-                        SVG 2D `ColibriVuela` de siempre. */}
+                    {/* Con la flag VITE_COLIBRI ON (dev) = modo A/B TEMPORAL
+                        de barbuditos de páramo (fauna decorativa, no el
+                        agente). Con la flag OFF (prod), ANGELITA volando —
+                        idle vivo 'acompana' con su cerebro de micro-gestos. */}
                     {COLIBRI_REAL ? (
                       <>
                         <span className="fvh-bicho fvh-colibri-ab fvh-colibri-ab-izq" style={{ left: '4%', top: '12%' }}>
@@ -640,8 +644,8 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                         </span>
                       </>
                     ) : (
-                      <span className="fvh-bicho fvh-colibri-vuela" style={{ left: '66%', top: '20%' }}>
-                        <ColibriVuela />
+                      <span className="fvh-bicho fvh-colibri-vuela" style={{ left: '60%', top: '14%' }}>
+                        <Angelita estado="acompana" size={72} title="Angelita acompaña la finca" />
                       </span>
                     )}
                     {poblada && (
@@ -764,29 +768,20 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
           </div>
         </main>
 
-        {/* ── LAS 6 PUERTAS (usabilidad campesina #5) ─────────────────────────
-            Antes: 4 portales con descripción + ~20 tarjetas + ~35 chips abajo.
-            Ahora: SEIS puertas de una-dos palabras, dibujo grande + palabra
-            grande, targets ≥96px (#8). Cada una enruta a un mundo/vista que YA
-            existe (nada nuevo que mantener). "Toda mi finca" abre los mundos
-            completos en la hoja de abajo. */}
+        {/* ── EL UMBRAL DEL VALLE (encargo "home máximo" 2026-07-16) ──────────
+            La vista viva del valle andino a la hora real — y LA PUERTA GRANDE:
+            tocarla inunda la pantalla con el cielo de la franja y aterriza en
+            el valle 3D ('valle3d', existe en ambos shells). Solo con finca
+            propia: la RED institucional del extensionista no es un valle. */}
+        {tieneFincaPropia && <UmbralValle onNavigate={onNavigate} />}
+
+        {/* ── LAS 6 PUERTAS como CARTAS EN LA MANO (usabilidad campesina #5 +
+            FABLE_50 §A6). Antes: tarjetas planas con emoji. Ahora: viñetas de
+            autor sobre el cielo vivo, palabra grande + a dónde abre, targets
+            ≥96px. Cada una enruta a un mundo/vista que YA existe; los destinos
+            salen de buildPuertas (fuente única, tests intactos). */}
         <div className="fvh-portales-tit">¿A dónde va? <span /></div>
-        <nav className="fvh-puertas" aria-label="Puertas de su finca" data-testid="finca-viva-puertas">
-          {buildPuertas({ onNavigate, irATodaMiFinca, mostrarAnimales }).map((p, i) => (
-            <button
-              key={p.id}
-              type="button"
-              className={`fvh-puerta t-${p.tinte}`}
-              data-testid={`puerta-${p.id}`}
-              onClick={p.onClick}
-              style={{ animationDelay: `${0.08 + i * 0.06}s` }}
-              aria-label={`${p.nombre}: abre ${p.abre}`}
-            >
-              <span className="fvh-puerta-emoji" aria-hidden="true">{p.emoji}</span>
-              <span className="fvh-puerta-nombre">{p.nombre}</span>
-            </button>
-          ))}
-        </nav>
+        <PortalesMano puertas={buildPuertas({ onNavigate, irATodaMiFinca, mostrarAnimales })} />
 
         <div className="fvh-fill" />
         <p className="fvh-titulo-sr">{titulo || 'Mi finca viva'}</p>
@@ -1167,55 +1162,6 @@ function WashSolBajo({ cielo, w = 390, h = 360 }) {
       opacity={tono === 'atardecer' ? 0.9 : 0.7}
       pointerEvents="none"
     />
-  );
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-//  COLIBRÍ DE VERDAD (feedback #5) — pico largo, alas, iridiscencia.
-//  Inspirado en ChagraAgentAvatarColibri (mismo plumaje turquesa→violeta).
-// ════════════════════════════════════════════════════════════════════════════
-
-/** Colibrí que vuela estacionario sobre la escena (criatura insignia). */
-function ColibriVuela() {
-  return (
-    <svg viewBox="0 0 64 48" width="44" height="33" aria-hidden="true" className="fvh-colibri-svg">
-      <defs>
-        <linearGradient id="fvh-colibri-plum" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#34d399" />
-          <stop offset="40%" stopColor="#10b981" />
-          <stop offset="72%" stopColor="#06b6d4" />
-          <stop offset="100%" stopColor="#8b5cf6" />
-        </linearGradient>
-        <radialGradient id="fvh-colibri-gorget" cx="50%" cy="50%" r="50%">
-          <stop offset="0" stopColor="#fde68a" />
-          <stop offset="45%" stopColor="#f59e0b" />
-          <stop offset="100%" stopColor="#dc2626" />
-        </radialGradient>
-      </defs>
-      {/* cola en abanico */}
-      <path d="M10 28 L1 24 L6 30 L0 35 L8 33 L5 40 L14 32 Z" fill="url(#fvh-colibri-plum)" opacity="0.9" />
-      {/* ala trasera (batiendo) */}
-      <g className="fvh-ala-tras" style={{ transformOrigin: '24px 24px' }}>
-        <path d="M24 24 Q12 16 4 24 Q12 32 24 28 Z" fill="url(#fvh-colibri-plum)" opacity="0.55" />
-      </g>
-      {/* cuerpo */}
-      <ellipse cx="26" cy="27" rx="13" ry="7.5" fill="url(#fvh-colibri-plum)" transform="rotate(-16 26 27)" />
-      {/* vientre claro */}
-      <ellipse cx="25" cy="30" rx="8" ry="3.4" fill="#fef3c7" opacity="0.5" transform="rotate(-16 25 30)" />
-      {/* cabeza */}
-      <circle cx="40" cy="22" r="6.4" fill="url(#fvh-colibri-plum)" />
-      {/* garganta iridiscente (gorget) */}
-      <ellipse cx="41" cy="26" rx="3.6" ry="2.4" fill="url(#fvh-colibri-gorget)" opacity="0.92" />
-      {/* ojo */}
-      <circle cx="41.5" cy="20.6" r="1.5" fill="#0c0a09" />
-      <circle cx="41" cy="20.1" r="0.5" fill="#fff" opacity="0.95" />
-      {/* PICO LARGO característico del colibrí */}
-      <path d="M46 22 Q58 24 63 30" fill="none" stroke="#26201b" strokeWidth="1.7" strokeLinecap="round" />
-      {/* ala frontal (batiendo, sobre el cuerpo) */}
-      <g className="fvh-ala-fron" style={{ transformOrigin: '28px 23px' }}>
-        <path d="M28 23 Q16 6 2 12 Q14 26 30 21 Z" fill="url(#fvh-colibri-plum)" opacity="0.78" />
-      </g>
-    </svg>
   );
 }
 

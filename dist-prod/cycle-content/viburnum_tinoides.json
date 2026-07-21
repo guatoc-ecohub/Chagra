@@ -1,0 +1,94 @@
+{
+  "species_slug": "viburnum_tinoides",
+  "scientific_name": "Viburnum tinoides L. f.",
+  "common_names": [
+    "Juco / Sietecueros (árbol)"
+  ],
+  "family": "Adoxaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "nurse_plant",
+    "biomass_producer"
+  ],
+  "antagonists": [
+    "eucalyptus_globulus",
+    "pinus_patula"
+  ],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Propagación principal por esqueje semileñoso de 15-20 cm tratado con AIB 1500-2000 ppm (enraizamiento 60-80% en sustrato turba-arena 1:1 con humedad constante y sombra 60%). Semilla fresca de drupas maduras (germinación lenta 90-150 días, requiere estratificación fría 4°C por 60 días). Trasplante a bolsa 4-6 meses. Plantación definitiva 12-15 meses. Crecimiento moderado 40-60 cm/año.",
+    "tiempo_a_establecimiento_dias": 450,
+    "notas": "Atractiva como ornamental nativa en jardines alto-andinos por su floración abundante blanco-crema y sus frutos negro-azulados que atraen aves."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2200,
+      "optimo_max": 3000,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -6,
+      "optimo_min": 7,
+      "optimo_max": 15,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "Viburnum tinoides L. f. (juco, sietecueros arbóreo, garrocho — familia Adoxaceae, antes Caprifoliaceae) es un árbol pequeño a mediano (4-12 m altura) perennifolio nativo de los Andes del norte de Sudamérica (Colombia, Ecuador, Venezuela, Perú), distribuido en el bosque alto andino entre 1800 y 3200 msnm en piso térmico FRÍO de los departamentos de Cundinamarca, Boyacá, Antioquia, Nariño, Cauca y Santander. Es reconocible por sus hojas opuestas verde-lustrosas con nerviación pinnada marcada, sus inflorescencias terminales en corimbo de flores blanco-crema (15-25 cm de diámetro) que floran masivamente en agosto-octubre, y sus frutos drupáceos pequeños negro-azulados muy buscados por avifauna alto-andina (mirlas, semilleros, atrapamoscas, copetones andinos). El nombre 'juco' es de origen muisca-chibcha (Cundinamarca-Boyacá) y se mantiene en topónimos como Jucal y Jucales — pueblos cuya historia agrícola está ligada al bosque de jucal. El nombre 'sietecueros' es polisémico — se usa también para Tibouchina lepidota (Melastomataceae arbórea, flor morada) y para varias herbáceas con corteza exfoliante; aquí refiere específicamente al Viburnum tinoides (NO la confusión es importante destacarla en educación botánica de campo). Lección viva sobre BOTÁNICA NATIVA DEL BOSQUE ALTO ANDINO, NOMBRES POPULARES POLISÉMICOS y RESTAURACIÓN DE BORDES DE BOSQUE: el juco/sietecueros es especie clave para reconectar fragmentos boscosos en la Sabana de Bogotá, el altiplano cundiboyacense, el altiplano nariñense y la Cordillera Central, ya que tolera tanto sombra parcial (interior de bosque) como sol pleno (borde de bosque) — esta plasticidad lo hace ideal para los proyectos de restauración del flanco oriental de la Cordillera Oriental (Cruz Verde-Sumapaz, Chingaza, Iguaque, Guerrero) donde se busca densificar la matriz de pastura abandonada con corredores florales. Manejo agroecológico: propagación principal por esqueje semileñoso con AIB (60-80% enraizamiento), semilla también viable con estratificación fría; trasplante 4-6 meses; plantación 12-15 meses; crecimiento moderado 40-60 cm/año; asocio con sauco peruano (Sambucus peruviana), raque (Vallea stipularis), mortiño (Hesperomeles goudotiana); densidades 300-500 ind/ha en restauración, ornamental nativo en huertos alto-andinos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Humboldt Flora Alto-Andina, JBB Plantas Medicinales, Bernal 2015 Catálogo Plantas Líquenes Colombia.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- hesperomeles_goudotiana — Esmeralda chiquita (Hesperomeles goudotiana (Decne.) Killip)\n- sambucus_peruviana — Sauco peruano (Sambucus peruviana Kunth)\n- vallea_stipularis — Raque (Vallea stipularis L. f.)",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- eucalyptus_globulus — Eucalipto blanco (Eucalyptus globulus Labill.)\n- pinus_patula — Pino pátula (Pinus patula Schiede ex Schltdl. & Cham.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.402Z"
+}

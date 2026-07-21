@@ -1,0 +1,423 @@
+/*
+ * La CARA 3D-first de prod.chagra.app (#/mockups/cara-prod).
+ *
+ * Lenguaje material de la entrada: MADERA (el letrero de tranquera que toda
+ * finca del Oriente cuelga a la entrada) + PAPEL (el cuaderno donde se firma)
+ * + la LUZ del valle (el velo dorado del cruce). Nada de vidrio esmerilado
+ * genérico ni blur costoso: superficies sólidas, dignas y baratas de pintar
+ * en un teléfono de gama baja. Tipografía del mundo (Baloo 2), copy en usted.
+ *
+ * Paleta:
+ *   madera   #7a5233 / #55381f (tabla), #3a2614 (canto)
+ *   papel    #fbf5e7, tinta #33291d
+ *   monte    #3f8f4e (acento) / #2e6f3c (sombra del botón)
+ *   oro      #ffd98a / #ff9d4d (velo del cruce, focus, sol de espera)
+ *   barro    #a33f2a sobre #f7ded4 (error, sin gritar)
+ */
+
+.cprod {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  font-family: 'Baloo 2', system-ui, sans-serif;
+  background: #0d1e2a;
+  color: #33291d;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── El valle detrás de la tranquera ─────────────────────────────────────── */
+.cprod-escena {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  /* Paisaje que espera: la interacción llega al cruzar, no antes. */
+  pointer-events: none;
+}
+
+/* Scrim de cine: apenas asienta el pie del valle para que madera y papel
+   lean siempre. De día pesa un poco más (el mediodía andino quema). */
+.cprod-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 14, 11, 0.16) 0%,
+    rgba(8, 14, 11, 0) 30%,
+    rgba(8, 14, 11, 0) 52%,
+    rgba(8, 14, 11, 0.42) 100%
+  );
+}
+.cprod[data-clima='manana'] .cprod-scrim,
+.cprod[data-clima='mediodia'] .cprod-scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(8, 14, 11, 0.1) 0%,
+    rgba(8, 14, 11, 0) 30%,
+    rgba(8, 14, 11, 0.08) 55%,
+    rgba(8, 14, 11, 0.52) 100%
+  );
+}
+.cprod[data-clima='noche'] .cprod-scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(4, 8, 14, 0.2) 0%,
+    rgba(4, 8, 14, 0) 34%,
+    rgba(4, 8, 14, 0.3) 100%
+  );
+}
+
+/* Cielo de la franja mientras baja el chunk 3D — nunca un rectángulo negro. */
+.cprod-espera {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.cprod-espera__sol {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe6b3, #ff9d4d);
+  box-shadow: 0 0 42px 10px rgba(255, 180, 90, 0.45);
+  animation: cprod-sol 1.7s ease-in-out infinite;
+}
+@keyframes cprod-sol {
+  0%, 100% { transform: scale(0.86); opacity: 0.75; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+/* ── LA TRANQUERA: columna del letrero + papel, parada en el pie del valle ── */
+.cprod-puerta {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0;
+  padding: max(1.2rem, env(safe-area-inset-top)) 1.1rem
+    max(5vh, env(safe-area-inset-bottom)) 1.1rem;
+  overflow-y: auto;
+}
+
+/* Angelita posada sobre el letrero: la primera que recibe. */
+.cprod-abeja {
+  position: relative;
+  z-index: 12;
+  margin-bottom: -12px;
+  align-self: center;
+  transform: translateX(78px);
+  animation: cprod-abeja-posada 3.8s ease-in-out infinite;
+}
+.cprod-abeja__sombra {
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 26px;
+  height: 6px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgba(20, 12, 4, 0.32);
+}
+@keyframes cprod-abeja-posada {
+  0%, 100% { transform: translateX(78px) translateY(0); }
+  50% { transform: translateX(78px) translateY(-4px); }
+}
+
+/* El LETRERO: tabla de madera con el nombre, colgada sobre el papel.
+   Grano barato (repeating-linear-gradient), canto oscuro, dos puntillas. */
+.cprod-letrero {
+  position: relative;
+  z-index: 11;
+  width: min(400px, 100%);
+  padding: 0.9rem 1.4rem 1.05rem;
+  border-radius: 16px;
+  background:
+    repeating-linear-gradient(
+      178deg,
+      rgba(255, 236, 200, 0.05) 0 2px,
+      rgba(30, 16, 6, 0.06) 2px 5px
+    ),
+    linear-gradient(174deg, #7a5233 0%, #6a4629 46%, #55381f 100%);
+  border: 2px solid #3a2614;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 224, 170, 0.28),
+    inset 0 -3px 0 rgba(20, 10, 3, 0.35),
+    0 10px 26px rgba(6, 10, 8, 0.4);
+  text-align: center;
+  transform: rotate(-1.1deg);
+  margin-bottom: -16px;
+}
+/* Las puntillas de la tabla. */
+.cprod-letrero::before,
+.cprod-letrero::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e8d9b8, #6b5636 70%);
+  box-shadow: 0 1px 2px rgba(15, 8, 2, 0.55);
+}
+.cprod-letrero::before { left: 12px; }
+.cprod-letrero::after { right: 12px; }
+
+.cprod-letrero__saludo {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f3d9a8;
+}
+/* El nombre, TALLADO en la tabla: luz abajo, sombra arriba. */
+.cprod-letrero__nombre {
+  margin: 0.05rem 0 0;
+  font-size: clamp(2.5rem, 9vw, 3.1rem);
+  line-height: 1.02;
+  font-weight: 800;
+  letter-spacing: 0.015em;
+  color: #ffedc9;
+  text-shadow:
+    0 -2px 0 rgba(26, 13, 4, 0.55),
+    0 2px 0 rgba(255, 240, 205, 0.22),
+    0 6px 14px rgba(10, 5, 1, 0.35);
+}
+.cprod-letrero__lema {
+  margin: 0.22rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ecd6ab;
+}
+
+/* El PAPEL: donde se firma la entrada. Crema sólido (cero blur), esquinas
+   suaves, borde de cuaderno. Cuelga bajo el letrero (que lo pisa 16px). */
+.cprod-papel {
+  position: relative;
+  z-index: 10;
+  width: min(400px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.9rem 1.3rem 1.15rem;
+  border-radius: 22px;
+  background: #fbf5e7;
+  border: 1.5px solid #e0d2b4;
+  box-shadow: 0 18px 40px rgba(6, 10, 8, 0.42);
+}
+
+.cprod-papel__titulo {
+  margin: 0 0 0.1rem;
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: #4a3a26;
+}
+
+/* Campos: grandes, claros, para manos de trabajo y sol de frente. */
+.cprod-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.cprod-campo__nombre {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #5b4930;
+}
+.cprod-campo input {
+  width: 100%;
+  min-height: 58px;
+  padding: 0.65rem 0.95rem;
+  border-radius: 14px;
+  border: 2px solid #d8c9a8;
+  background: #fffdf6;
+  color: #33291d;
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 600;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.cprod-campo input::placeholder { color: #b3a483; font-weight: 500; }
+.cprod-campo input:focus {
+  outline: none;
+  border-color: #3f8f4e;
+  box-shadow: 0 0 0 3px rgba(63, 143, 78, 0.22);
+}
+.cprod-campo__caja {
+  position: relative;
+  display: block;
+}
+.cprod-campo__caja input { padding-right: 3.4rem; }
+.cprod-campo__ojo {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 46px;
+  min-height: 46px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+.cprod-campo__ojo:hover { background: rgba(63, 143, 78, 0.1); }
+
+/* El error, en barro: claro y sin gritar. */
+.cprod-error {
+  margin: -0.15rem 0 0;
+  padding: 0.55rem 0.8rem;
+  border-radius: 12px;
+  background: #f7ded4;
+  border: 1.5px solid #dbb09e;
+  color: #8c3520;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* ABRIR LA TRANQUERA: el botón-acción del mundo (panza de color, canto
+   inferior grueso, se hunde al tocarlo — mismo gesto que el valle). */
+.cprod-abrir {
+  margin-top: 0.25rem;
+  min-height: 66px;
+  border: none;
+  border-bottom: 5px solid #245c30;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #4ca35c 0%, #3f8f4e 60%, #378045 100%);
+  color: #fffdf4;
+  font-family: inherit;
+  font-size: 1.38rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  text-shadow: 0 1px 0 rgba(20, 50, 26, 0.45);
+  box-shadow: 0 8px 20px rgba(46, 111, 60, 0.35);
+  transition: transform 0.12s ease, border-bottom-width 0.12s ease, filter 0.15s ease;
+}
+.cprod-abrir:hover { filter: brightness(1.05); }
+.cprod-abrir:active {
+  transform: translateY(3px);
+  border-bottom-width: 2px;
+}
+.cprod-abrir:disabled {
+  filter: saturate(0.55) brightness(0.92);
+  cursor: wait;
+}
+
+.cprod-vitrina {
+  margin: -0.2rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #a08d66;
+  text-align: center;
+}
+
+/* Las tres promesas: quietas, al pie del papel, separadas por semillas. */
+.cprod-promesas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.9rem;
+  margin: 0.15rem 0 0;
+  padding: 0.6rem 0 0;
+  border-top: 1.5px dashed #e0d2b4;
+  list-style: none;
+}
+.cprod-promesas li {
+  position: relative;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #71603f;
+  padding-left: 0.85rem;
+}
+.cprod-promesas li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  transform: translateY(-50%) rotate(45deg);
+  border-radius: 60% 0;
+  background: #3f8f4e;
+}
+
+/* El pie, ya sobre el pasto: letra clara sobre el scrim. */
+.cprod-pie {
+  margin: 0.7rem 0 0;
+  max-width: 400px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  color: rgba(250, 244, 226, 0.88);
+  text-shadow: 0 1px 6px rgba(8, 14, 11, 0.6);
+}
+
+/* ── ACTO 2 · abrir la tranquera: el letrero se alza y cede el paso ──────── */
+.cprod-puerta[data-abriendo='si'] {
+  pointer-events: none;
+  animation: cprod-ceder 0.8s cubic-bezier(0.5, 0, 0.75, 0.4) forwards;
+}
+.cprod-puerta[data-abriendo='si'] .cprod-abeja {
+  animation: cprod-abeja-adelante 0.7s cubic-bezier(0.3, 0, 0.6, 0.4) forwards;
+}
+@keyframes cprod-ceder {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-30px) scale(0.985); }
+}
+@keyframes cprod-abeja-adelante {
+  0% { opacity: 1; transform: translateX(78px) translateY(0); }
+  100% { opacity: 0; transform: translateX(60px) translateY(-84px); }
+}
+
+/* El VELO-AMANECER: la luz de la finca crece desde el valle, cubre el cruce
+   (el swap corre bajo el pico) y se disuelve revelando el home ya montado.
+   De día es el sol; de noche, el farol de la casa. La misma luz. */
+.cprod-velo {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background: radial-gradient(
+    130% 105% at 50% 64%,
+    #fff8e4 0%,
+    #ffd98a 38%,
+    rgba(255, 157, 77, 0.97) 72%,
+    rgba(224, 122, 61, 0.97) 100%
+  );
+  opacity: 0;
+  animation: cprod-cruce 2.1s ease-in-out forwards;
+}
+@keyframes cprod-cruce {
+  0% { opacity: 0; }
+  40% { opacity: 1; }
+  62% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── Respeto ─────────────────────────────────────────────────────────────── */
+.cprod :focus-visible {
+  outline: 3px solid #ffcf7d;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cprod-abeja,
+  .cprod-espera__sol,
+  .cprod-puerta[data-abriendo='si'],
+  .cprod-puerta[data-abriendo='si'] .cprod-abeja {
+    animation: none;
+  }
+  .cprod-abrir { transition: none; }
+}
+
+/* Pantallas bajitas (teléfono acostado): la columna respira con scroll. */
+@media (max-height: 560px) {
+  .cprod-puerta { justify-content: flex-start; padding-top: 1.4rem; }
+  .cprod-letrero__nombre { font-size: 2.1rem; }
+  .cprod-pie { margin-bottom: 0.8rem; }
+}

@@ -78,7 +78,7 @@ describe('buildQueryAnalysisBlock', () => {
 
 describe('buildCorpusContext', () => {
   it('retorna vacio sin corpus', () => {
-    expect(buildCorpusContext(null)).toBe('');
+    expect(buildCorpusContext(/** @type {any} */ (null))).toBe('');
     expect(buildCorpusContext([])).toBe('');
   });
 
@@ -437,12 +437,12 @@ describe('modos de respuesta (campesino/experto/maestro)', () => {
   });
 
   it('buildBasePrompt inyecta MODO EXPERTO cuando nivelRespuestas es detallado', () => {
-    const prompt = buildBasePrompt({ query: '¿por qué se enferma mi tomate?', nivelRespuestas: 'detallado' });
+    const prompt = buildBasePrompt(/** @type {any} */ ({ query: '¿por qué se enferma mi tomate?', nivelRespuestas: 'detallado' }));
     expect(prompt).toContain('MODO EXPERTO');
   });
 
   it('buildBasePrompt inyecta MODO CAMPESINO cuando nivelRespuestas es simple', () => {
-    const prompt = buildBasePrompt({ query: '¿por qué se enferma mi tomate?', nivelRespuestas: 'simple' });
+    const prompt = buildBasePrompt(/** @type {any} */ ({ query: '¿por qué se enferma mi tomate?', nivelRespuestas: 'simple' }));
     expect(prompt).toContain('MODO CAMPESINO');
   });
 
@@ -451,7 +451,7 @@ describe('modos de respuesta (campesino/experto/maestro)', () => {
   // UI solo exponía simple/detallado. Ahora nivel_respuestas='maestro' (el
   // valor que guarda la 3ra opción del perfil) debe inyectar el bloque.
   it('buildBasePrompt inyecta MODO MAESTRO cuando nivelRespuestas es maestro', () => {
-    const prompt = buildBasePrompt({ query: '¿por qué se enferma mi tomate?', nivelRespuestas: 'maestro' });
+    const prompt = buildBasePrompt(/** @type {any} */ ({ query: '¿por qué se enferma mi tomate?', nivelRespuestas: 'maestro' }));
     expect(prompt).toContain('MODO MAESTRO');
     expect(prompt).toContain('Habla como quien enseña');
   });
@@ -459,12 +459,12 @@ describe('modos de respuesta (campesino/experto/maestro)', () => {
   it('buildBasePrompt NO duplica el bloque de nivel de detalle (regresión fix dedup)', () => {
     // El registro de respuesta lo maneja MODO EXPERTO; el viejo bloque
     // "NIVEL DE RESPUESTA" no debe reaparecer en paralelo.
-    const prompt = buildBasePrompt({ query: 'algo técnico', nivelRespuestas: 'detallado' });
+    const prompt = buildBasePrompt(/** @type {any} */ ({ query: 'algo técnico', nivelRespuestas: 'detallado' }));
     expect(prompt).not.toContain('NIVEL DE RESPUESTA');
   });
 
   it('buildBasePrompt con nivelRespuestas detallado contiene exactamente UN MODO EXPERTO (no duplicación)', () => {
-    const prompt = buildBasePrompt({ query: 'algo técnico', nivelRespuestas: 'detallado' });
+    const prompt = buildBasePrompt(/** @type {any} */ ({ query: 'algo técnico', nivelRespuestas: 'detallado' }));
     const matches = prompt.match(/=== MODO EXPERTO ===/g);
     expect(matches ? matches.length : 0).toBe(1);
   });

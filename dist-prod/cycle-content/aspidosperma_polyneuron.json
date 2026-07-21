@@ -1,0 +1,87 @@
+{
+  "species_slug": "aspidosperma_polyneuron",
+  "scientific_name": "Aspidosperma polyneuron Müll.Arg.",
+  "common_names": [
+    "Peroba rosada"
+  ],
+  "family": "Apocynaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "en_peligro",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla alada (sámara) recolectada de folículos dehiscentes en estación seca. Sin tratamiento pre-germinativo. Germinación 60-80% a 20-40 días en bandejas con sustrato orgánico. Trasplante a bolsa 2-3 L a las 8 semanas. Plantación definitiva a los 5-7 meses (40-60 cm). Crecimiento juvenil lento 0.6-1 m/año. Productivo de semilla desde los 15-20 años. Turno maderable 60-80 años por densidad alta (0.85-0.95 g/cm³).",
+    "tiempo_a_establecimiento_dias": 150,
+    "notas": "Madera durísima rosa-amarillenta con grano fino muy apreciada en mueblería fina, ebanistería de lujo, instrumentos musicales (guitarras, charangos), parqué patrimonial. Látex de Apocynaceae (tóxico). Crecimiento lento — inversión maderable patrimonial de largo plazo."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 100,
+      "optimo_max": 800,
+      "max_absoluto": 1200
+    },
+    "temperatura_c": {
+      "helada_letal": 10,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La peroba rosada o palo rosa amazónico (Aspidosperma polyneuron Müll.Arg., familia Apocynaceae) es un árbol perennifolio GIGANTE de 25-40 m de altura con tronco recto cilíndrico, copa estrecha-cónica y madera durísima rosa-amarillenta muy apreciada, nativo del bosque húmedo tropical y bosque semicaducifolio neotropical desde el sur de Bolivia y norte de Argentina-Paraguay hasta la Amazonía colombiana en piso térmico CÁLIDO (<1.200 msnm). En Colombia se distribuye en la Amazonía baja (Amazonas, Caquetá, Putumayo, Vaupés, Guainía, Guaviare) y piedemonte amazónico-orinocense (Meta, Casanare). Pertenece a la familia Apocynaceae —misma de la jaca brava (Couma macrocarpa), el frangipán (Plumeria), el pervinca (Catharanthus roseus) y el caucho asiático (Hevea brasiliensis es Euphorbiaceae no Apocynaceae — corrección: el siringueiro es Euphorbiaceae)— con látex característico TÓXICO de la familia. Es UNA DE LAS MADERAS PATRIMONIALES MÁS COTIZADAS DEL CONO SUR Y AMAZONÍA por sus vetas finas rosa-amarillentas, densidad alta (0.85-0.95 g/cm³), excelente trabajabilidad y acabado pulido, gran durabilidad natural. Aprovechamiento histórico intensivo (1900-2000) en mueblería fina, ebanistería de lujo, instrumentos musicales (guitarras clásicas, charangos andinos, requintos, marimbas), parqué patrimonial, esculturas, tornería artística — especialmente en Brasil, Argentina, Paraguay y Bolivia donde la \"peroba rosa\" fue una de las cinco maderas más comercializadas del cono sur. La sobreexplotación llevó a su estatus EN PELIGRO (EN) en la UICN Red List globalmente, con poblaciones reducidas >70% en gran parte de su rango. En Colombia las poblaciones amazónicas están menos exploradas y mejor conservadas relativamente, pero el aprovechamiento silvestre requiere permiso CAR/Ministerio Ambiente. Custodia: comunidades indígenas amazónicas (Tikuna, Bora, Uitoto, Murui-Muinane, Yucuna, Tanimuka del medio-bajo Caquetá-Apaporis-Vaupés) y pueblos del piedemonte amazónico-orinocense. El nombre genérico \"Aspidosperma\" significa \"semilla escudada\" (gr. aspidos = escudo + sperma = semilla) por la sámara con ala persistente; el epíteto \"polyneuron\" significa \"de muchos nervios\" (gr. polys = muchos + neuron = nervio) por la nervadura foliar fina característica. Manejo agroecológico: vivero con semilla alada pre-cosechada en estación seca, plantación 30-60 ind/ha disperso en sistemas agroforestales amazónicos asociada a cacao silvestre amazónico (Theobroma cacao var. \"amazónico\"), copoazú (T. grandiflorum), caucho (Hevea brasiliensis), pijuayo-chontaduro (Bactris gasipaes), umarí (Poraqueiba sericea); protección los primeros 5 años contra ganado y fuego; cosecha maderable turno 60-80 años a diámetros >50 cm (inversión patrimonial intergeneracional, valor económico por individuo muy alto); restauración 80-150 ind/ha en mosaicos del bosque húmedo tropical bajo amazónico asociada a Cedrela odorata, Cariniana pyriformis, Bertholletia excelsa (donde aplique). Lección viva sobre MADERAS PATRIMONIALES AMAZÓNICAS EN PELIGRO (Aspidosperma como caso emblemático de sobreexplotación), CONSERVACIÓN POR USO SOSTENIBLE (plantaciones agroforestales y restauración como estrategia de recuperación), INSTRUMENTOS MUSICALES PATRIMONIALES (guitarras, charangos, marimbas de madera tropical nativa), CITES Y REGULACIÓN INTERNACIONAL DE MADERAS, y AGROFORESTERÍA INTERGENERACIONAL (turno 60-80 años como capital natural heredado). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, UICN Red List, SINCHI Amazonía Colombiana, Libro Rojo de Plantas de Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "uicn-red-list",
+      "title": "uicn-red-list",
+      "tier": "A",
+      "url": "https://www.iucnredlist.org"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.401Z"
+}

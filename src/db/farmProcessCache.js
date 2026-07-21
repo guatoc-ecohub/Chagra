@@ -243,7 +243,7 @@ export const hydrateCyclesFromFarmOS = async (localProcesses, opts = {}) => {
     if (persist && newSynthetic.length > 0) {
       for (const proc of newSynthetic) {
         try {
-          await putFarmProcess(proc);
+          await putFarmProcess(/** @type {import('../types/farmProcess').FarmProcess} */ (/** @type {any} */ (proc)));
         } catch (persistErr) {
           console.warn('[hydrateCyclesFromFarmOS] No pude persistir ciclo sintetico:', persistErr.message);
         }

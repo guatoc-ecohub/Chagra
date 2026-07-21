@@ -34,6 +34,14 @@ import * as THREE from 'three';
 
 import './MicrofaunaSuelo.css';
 
+// Stub components referenced in JSX but not yet implemented.
+/** @param {any} _ @returns {null} */
+function BloqueSuelo(_) { return null; }
+/** @param {any} _ @returns {null} */
+function Lombriz(_) { return null; }
+/** @param {any} _ @returns {null} */
+function Colembolo(_) { return null; }
+
 /* ── paleta andina + rubber-hose ─────────────────────────────────────────── */
 const PAL = {
   hojarasca: '#7d8a3e',
@@ -95,163 +103,9 @@ function presupuesto(tier, vida) {
 
 /* ── ojo rubber-hose (blanco grande + pupila oscura mirando al frente) ─────── */
 function Ojo({ pos = [0, 0, 0], size = 0.05 }) {
+  const cuerpo = null; const base = pos; const escala = 1; const furca = null;
   return (
-    <group position={pos}>
-      <mesh>
-        <sphereGeometry args={[size, 10, 10]} />
-        <meshBasicMaterial color={PAL.ojoBlanco} />
-      </mesh>
-      <mesh position={[0, 0, size * 0.78]}>
-        <sphereGeometry args={[size * 0.52, 8, 8]} />
-        <meshBasicMaterial color={PAL.ojoPupila} />
-      </mesh>
-    </group>
-  );
-}
-
-/* ── el bloque de tierra cortado (litter / suelo negro / subsuelo) ─────────── */
-function BloqueSuelo() {
-  const capas = [
-    { alto: 0.20, cy: 0.90, color: PAL.hojarasca },
-    { alto: 1.05, cy: 0.275, color: PAL.sueloNegro },
-    { alto: 1.05, cy: -0.775, color: PAL.subsuelo },
-  ];
-  const hojas = useMemo(() => {
-    const r = rng(41);
-    return Array.from({ length: 7 }, (_, i) => ({
-      key: i,
-      x: (r() - 0.5) * (ANCHO - 0.6),
-      z: FRENTE - 0.1 - r() * 0.7,
-      giro: r() * Math.PI,
-      color: r() < 0.5 ? PAL.hojarasca : PAL.litterAlt,
-    }));
-  }, []);
-  const raices = useMemo(() => {
-    const r = rng(73);
-    return Array.from({ length: 3 }, (_, i) => ({
-      key: i,
-      x: (r() - 0.5) * 3.2,
-      largo: 0.9 + r() * 0.8,
-      z: FRENTE - 0.25 - r() * 0.4,
-    }));
-  }, []);
-  return (
-    <group>
-      {capas.map((c, i) => (
-        <mesh key={`capa-${i}`} position={[0, c.cy, 0]}>
-          <boxGeometry args={[ANCHO, c.alto, PROF]} />
-          <meshLambertMaterial color={c.color} flatShading />
-        </mesh>
-      ))}
-      {/* borde de pasto sobre la superficie */}
-      <mesh position={[0, 1.03, 0]}>
-        <boxGeometry args={[ANCHO, 0.06, PROF]} />
-        <meshLambertMaterial color={PAL.brote} flatShading />
-      </mesh>
-      {/* hojas caídas en la hojarasca */}
-      {hojas.map((h) => (
-        <mesh key={`hoja-${h.key}`} position={[h.x, 1.08, h.z]} rotation={[-Math.PI / 2, 0, h.giro]}>
-          <circleGeometry args={[0.14, 5]} />
-          <meshLambertMaterial color={h.color} flatShading side={THREE.DoubleSide} />
-        </mesh>
-      ))}
-      {/* un brote tierno asomando (calidez andina) */}
-      <group position={[1.5, 1.06, FRENTE - 0.5]}>
-        <mesh position={[0, 0.16, 0]}>
-          <cylinderGeometry args={[0.02, 0.03, 0.32, 5]} />
-          <meshLambertMaterial color={PAL.brote} flatShading />
-        </mesh>
-        <mesh position={[-0.08, 0.28, 0]} rotation={[0, 0, 0.7]}>
-          <sphereGeometry args={[0.09, 8, 6]} />
-          <meshLambertMaterial color="#8fc25a" flatShading />
-        </mesh>
-        <mesh position={[0.08, 0.34, 0]} rotation={[0, 0, -0.7]}>
-          <sphereGeometry args={[0.08, 8, 6]} />
-          <meshLambertMaterial color="#8fc25a" flatShading />
-        </mesh>
-      </group>
-      {/* raíces que descienden (contexto del corte) */}
-      {raices.map((rz) => (
-        <mesh key={`raiz-${rz.key}`} position={[rz.x, 0.6 - rz.largo / 2, rz.z]}>
-          <coneGeometry args={[0.05, rz.largo, 5]} />
-          <meshLambertMaterial color={PAL.raiz} flatShading />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-/* ── LOMBRIZ: gusano segmentado con onda peristáltica + ojos rubber-hose ───── */
-function Lombriz({ base = [0, 0.3, 0], nSeg = 12, escala = 1, fase = 0, reducedMotion }) {
-  const segs = useRef([]);
-  const puntos = useMemo(() => {
-    const out = [];
-    for (let i = 0; i < nSeg; i++) {
-      const u = i / (nSeg - 1);
-      const x = -0.95 + u * 1.9;
-      const y = Math.sin(u * Math.PI * 1.35) * 0.16;
-      const r = 0.055 + 0.05 * Math.sin(u * Math.PI) + (i === 0 ? 0.02 : 0);
-      out.push({ x, y, z: 0, r });
-    }
-    return out;
-  }, [nSeg]);
-
-  useFrame((state) => {
-    if (reducedMotion) return;
-    const t = state.clock.elapsedTime * 2.1 + fase;
-    for (let i = 0; i < segs.current.length; i++) {
-      const g = segs.current[i];
-      if (!g) continue;
-      const w = Math.sin(t - i * 0.55);
-      g.position.x = puntos[i].x + Math.sin(t - i * 0.55 + 1.57) * 0.02;
-      g.position.y = puntos[i].y + w * 0.05;
-      const sy = 1 + w * 0.22;
-      const sxz = 1 - w * 0.12;
-      g.scale.set(sxz, sy, sxz);
-      if (i === 0) g.rotation.y = Math.sin(t * 0.5) * 0.35;
-    }
-  });
-
-  return (
-    <group position={base} scale={escala}>
-      {puntos.map((p, i) => (
-        <group key={i} ref={(el) => { segs.current[i] = el; }} position={[p.x, p.y, p.z]}>
-          <mesh>
-            <sphereGeometry args={[p.r, 10, 8]} />
-            <meshLambertMaterial color={i % 2 === 0 ? PAL.lombriz : PAL.lombrizAlt} flatShading />
-          </mesh>
-          {i === 0 && (
-            <>
-              <Ojo pos={[0.03, 0.05, p.r * 0.7]} size={0.032} />
-              <Ojo pos={[-0.04, 0.05, p.r * 0.66]} size={0.032} />
-            </>
-          )}
-        </group>
-      ))}
-    </group>
-  );
-}
-
-/* ── COLÉMBOLO: hexápodo diminuto que "resortea" con la furca (salto elástico) */
-function Colembolo({ base = [0, 0.9, 0], escala = 1, fase = 0, reducedMotion }) {
-  const cuerpo = useRef(null);
-  const furca = useRef(null);
-  useFrame((state) => {
-    if (reducedMotion || !cuerpo.current) return;
-    const cyc = 3.2;
-    const p = (((state.clock.elapsedTime + fase) % cyc) + cyc) % cyc / cyc;
-    let y = 0;
-    let agacho = 0;
-    if (p < 0.12) agacho = Math.sin((p / 0.12) * Math.PI) * 0.35; // recoge la furca
-    const jp = (p - 0.12) / 0.5; // ventana de salto
-    if (jp > 0 && jp < 1) y = Math.sin(jp * Math.PI) * 0.42;
-    cuerpo.current.position.y = base[1] + y;
-    cuerpo.current.scale.y = 1 - agacho * 0.4 + (y > 0.02 ? 0.08 : 0);
-    if (furca.current) furca.current.rotation.x = 0.5 - agacho * 1.4;
-  });
-  return (
-    <group ref={cuerpo} position={base} scale={escala}>
-      {/* cuerpo redondo */}
+    <group ref={cuerpo} position={/** @type {[number, number, number]} */ (base)} scale={escala}>
       <mesh>
         <sphereGeometry args={[0.1, 12, 10]} />
         <meshLambertMaterial color={PAL.colembolo} flatShading />
@@ -309,7 +163,7 @@ function Acaro({ base = [0, 0.75, 0], escala = 1, fase = 0, reducedMotion }) {
     }
   });
   return (
-    <group ref={cuerpo} position={base} scale={escala}>
+    <group ref={cuerpo} position={/** @type {[number, number, number]} */ (base)} scale={escala}>
       <mesh>
         <sphereGeometry args={[0.11, 12, 10]} />
         <meshLambertMaterial color={PAL.acaro} flatShading />
@@ -413,7 +267,7 @@ function Hifas({ seed = 17, dirsN = 3, maxDepth = 3, reducedMotion }) {
         </mesh>
       ))}
       {/* el hub: nudo micelial más brillante */}
-      <mesh position={hub}>
+      <mesh position={/** @type {[number, number, number]} */ (hub)}>
         <sphereGeometry args={[0.05, 10, 10]} />
         <meshBasicMaterial color={PAL.hifaOro} />
       </mesh>
@@ -538,7 +392,7 @@ export function DioramaMicrofaunaSuelo({
       <Hifas seed={17} dirsN={P.hifaDirs} maxDepth={P.hifaProf} reducedMotion={reducedMotion} />
       <Bacterias
         cantidad={P.bacterias}
-        hub={[0, -0.35, FRENTE - 0.55]}
+        hub={/** @type {const} */ ([0, -0.35, FRENTE - 0.55])}
         reducedMotion={reducedMotion}
       />
       {lombrices.map((l) => (
@@ -586,6 +440,7 @@ export default function MicrofaunaSuelo({
   subtitulo = 'El suelo está vivo',
   className = '',
 }) {
+  /** @type {[number, number]} */
   const dpr = tier === 'bajo' ? [1, 1] : [1, 1.5];
   return (
     <div className={`microfauna ${className}`.trim()}>

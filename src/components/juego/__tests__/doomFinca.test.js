@@ -290,8 +290,8 @@ describe('comboSeRompe — el combo perdona el fallo de puntería con FEEL ON', 
 
   it('acierto y control nunca rompen el combo', () => {
     for (const r of ['acierto', 'control']) {
-      expect(comboSeRompe(r, false)).toBe(false);
-      expect(comboSeRompe(r, true)).toBe(false);
+      expect(comboSeRompe(/** @type {any} */ (r), false)).toBe(false);
+      expect(comboSeRompe(/** @type {any} */ (r), true)).toBe(false);
     }
   });
 });

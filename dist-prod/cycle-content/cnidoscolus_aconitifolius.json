@@ -1,0 +1,75 @@
+{
+  "species_slug": "cnidoscolus_aconitifolius",
+  "scientific_name": "Cnidoscolus aconitifolius (Mill.) I.M.Johnst.",
+  "common_names": [
+    "Chaya"
+  ],
+  "family": "Euphorbiaceae",
+  "category": "hortalizas_hoja",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "living_fence"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 1500,
+      "max_absoluto": 1900
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "La chaya, ortiga mansa o espinaca maya (Cnidoscolus aconitifolius (Mill.) I.M.Johnst., Euphorbiaceae) es un arbusto-arbolito semicaducifolio nativo de Mesoamérica (península de Yucatán, Guatemala, Belice), domesticado y cultivado por la civilización maya hace más de 3.000 años, adaptado y cultivado en climas cálidos y templados de Colombia (0-1.500 msnm: Caribe, Magdalena Medio, Llanos, Pacífico, valles cálidos), de 2-5 m de altura, con tallos suculentos verdosos que exudan látex blanco al cortarse, hojas grandes lobado-palmatipartidas (15-30 cm) similares a las del aconito (de ahí el epíteto aconitifolius) con tricomas urticantes esparcidos en envés y peciolos. Es lección viva de soberanía alimentaria tropical y la diferencia entre 'verdura cruda' y 'verdura cocida' que enseña a niñas y niños cómo un alimento ancestral maya puede triplicar la nutrición de la espinaca europea con la condición fundamental de cocinarlo siempre antes de consumir: las hojas tiernas hervidas 5-15 minutos contienen 2-3 veces más proteína (5-7% en seco), hierro, calcio, carotenos, vitamina C y vitamina A que la espinaca (Spinacia oleracea), siendo uno de los vegetales foliares más nutritivos del trópico, validado por FAO, INCAP y nutricionistas mesoamericanos. PRECAUCIÓN OBLIGATORIA: las hojas crudas contienen glucósidos cianogénicos (linamarina) y tricomas urticantes; el cocimiento mínimo 5 minutos en agua hirviendo (descartando el agua de cocción la primera vez) destruye completamente los glucósidos y desnaturaliza los tricomas, dejando un vegetal seguro, sabroso y con textura suave similar a espinaca-acelga; NUNCA consumir crudo, NO usar en jugos verdes ni licuados en frío, NO usar en cantidades superiores a 5 hojas medianas por persona al día aún cocida. Usos tradicionales mayas y caribes-mesoamericanos validados por Pérez-Arbeláez y farmacopea mexicana-yucateca: tamales de chaya, sopas, guisos con frijoles y huevo, sustituto de espinaca en omelets y pasteles salados; medicinalmente atribuye propiedades hipoglucemiantes (diabetes tipo 2), antihipertensivas, antiinflamatorias y galactogogas (lactancia). Manejo agroecológico: propagación casi exclusiva por esqueje grueso semileñoso (segmentos de 20-30 cm con 3-4 nudos, dejar cicatrizar el corte 24-48 horas antes de plantar para que el látex selle, prendimiento >90% en lluvias), las variedades cultivadas suelen ser estériles (no producen semilla), suelos drenados, sol pleno a semisombra, distancia 1.5-2 m, cosecha continua de hojas tiernas a partir de los 6-8 meses, fácil mantenimiento, función como huerto perenne alimentario, cerca viva nutricional y reservorio de proteína foliar tropical de bajo insumo. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez-Arbeláez 1947, SiB Colombia, FAO Ecocrop.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.383Z"
+}

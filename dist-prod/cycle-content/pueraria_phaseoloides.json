@@ -1,0 +1,76 @@
+{
+  "species_slug": "pueraria_phaseoloides",
+  "scientific_name": "Pueraria phaseoloides (Roxb.) Benth.",
+  "common_names": [
+    "Kudzu tropical"
+  ],
+  "family": "Fabaceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "nitrogen_fixer",
+    "ground_cover",
+    "invasive"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 1200,
+      "max_absoluto": 1800
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El kudzu tropical (Pueraria phaseoloides (Roxb.) Benth., Fabaceae-Faboideae) es una leguminosa herbácea perenne trepadora-rastrera nativa del sureste asiático (India, Indochina, Indonesia, Filipinas) introducida a Colombia hace décadas como cobertura para plantaciones de palma africana, caucho y cacao en zonas cálidas húmedas (Magdalena Medio, Urabá, Chocó, Putumayo, Caquetá, Amazonas, Llanos Orientales, Valle del Cauca, 0-1.200 msnm). ADVERTENCIA DE MANEJO — POTENCIALMENTE INVASIVO: Pueraria phaseoloides está catalogada como especie con riesgo invasor moderado-alto por IAvH (Humboldt Invasoras Andes) y referenciada en bases globales (ISSG-UICN, GISD), capaz de cubrir y \"sofocar\" árboles jóvenes, vegetación secundaria, cercas y bordes de cultivos si NO se maneja activamente; su pariente cercano Pueraria montana (kudzu del sureste de EE.UU.) es paradigma global de planta invasora (\"the vine that ate the South\"). USAR ÚNICAMENTE en plantaciones perennes establecidas (palma, caucho, cacao adulto, frutales >3 años) donde la competencia con árboles dominantes está resuelta, con manejo controlado de podas regulares y NUNCA en bordes de bosque, áreas de regeneración natural, corredores ribereños o restauración ecológica. Para esos contextos preferir alternativas nativas o naturalizadas no agresivas: Arachis pintoi, Centrosema, Stylosanthes, Calopogonium, Desmodium ovalifolium. Características botánicas: hierba perenne trepadora vigorosa con tallos cilíndricos pubescentes (3-10 m largo), hojas alternas trifoliadas con foliolos rómbicos-ovados grandes (10-20 cm) verde-oscuros pubescentes, inflorescencias en racimos axilares densos con flores papilionadas púrpura-violáceas (1.5 cm), frutos en legumbres lineares-pubescentes (5-10 cm) con 8-15 semillas pardas. Fija nitrógeno biológico atmosférico extraordinariamente (~150-250 kg N/ha/año) con Bradyrhizobium específico. Producción de biomasa masiva (15-30 ton MS/ha/año) con altísimo contenido proteico (18-22% PC). Bajo manejo controlado: cobertura agresiva del suelo, control eficaz de erosión en pendientes cafeteras-palmeras, supresión de malezas heliófilas (paja, cuncho), aporte de N y biomasa, alimentación complementaria de ganado. Manejo agroecológico controlado: propagación por semilla escarificada (agua caliente 70°C/3 min, germinación 60-80%) o estaca con nudos enraizables, siembra al voleo 3-5 kg/ha o líneas a 60 cm, ESTABLECER LÍMITES FÍSICOS (zanjas, vías) o LÍMITES MECÁNICOS (poda quincenal de bordes) para evitar invasión a parches naturales, podas de control cada 30-60 días en márgenes, monitoreo permanente de avance lateral. Lección viva de ecología de invasoras y responsabilidad agronómica: enseña que NO TODA leguminosa fijadora es buena — el contexto, el manejo y los límites son tan importantes como la especie misma; un campesino agroecólogo responsable elige primero las nativas (Arachis pintoi, Cratylia, Desmodium) y solo usa Pueraria phaseoloides bajo manejo estricto donde su agresividad sea ventaja, no problema. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Silvopastoriles, AGROSAVIA Forrajeras 2022, IAvH Invasoras Andes, ISSG-UICN.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "humboldt-invasoras-andes",
+      "title": "humboldt-invasoras-andes",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "issg-uicn-invasoras",
+      "title": "issg-uicn-invasoras",
+      "tier": "A",
+      "url": "http://www.iucngisd.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.387Z"
+}

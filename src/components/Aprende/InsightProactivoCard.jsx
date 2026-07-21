@@ -72,7 +72,7 @@ function ChagraInsightFrame({ children, titulo }) {
             className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center bg-slate-900/70"
             style={{ border: '1px solid rgba(var(--t-accent-rgb),0.5)' }}
           >
-            <ChagraAgentAvatar state="idle" size={22} ariaLabel="Chagra" />
+            <ChagraAgentAvatar state="idle" size={28} ariaLabel="Chagra" />
           </span>
           {/* Glifo de la mano de Chagra — hereda el acento del tema */}
           <span

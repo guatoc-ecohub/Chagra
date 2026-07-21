@@ -9,16 +9,16 @@ import { attachPhotoToCycle, isOutOfDomain } from '../photoCycleService';
 
 describe('attachPhotoToCycle', () => {
   it('rechaza sin processId', async () => {
-    await expect(attachPhotoToCycle({ visionResult: {} })).rejects.toThrow(/process_id/);
+    await expect(attachPhotoToCycle(/** @type {any} */ ({ visionResult: {} }))).rejects.toThrow(/process_id/);
   });
 
   it('rechaza sin visionResult', async () => {
-    await expect(attachPhotoToCycle({ processId: 'p1' })).rejects.toThrow(/visionResult/);
+    await expect(attachPhotoToCycle(/** @type {any} */ ({ processId: 'p1' }))).rejects.toThrow(/visionResult/);
   });
 
   it('guarda evento photo_attached con análisis', async () => {
     const vision = { diagnosis: 'mancha foliar', confidence: 0.85, issues: ['hongo'], treatment_suggestion: 'caldo bordelés' };
-    await attachPhotoToCycle({ processId: 'p1', visionResult: vision, imageHash: 'abc123' });
+    await attachPhotoToCycle(/** @type {any} */ ({ processId: 'p1', visionResult: vision, imageHash: 'abc123' }));
 
     expect(recordFarmEvent).toHaveBeenCalledWith(
       expect.objectContaining({

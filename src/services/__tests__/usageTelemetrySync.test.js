@@ -53,7 +53,10 @@ function makeFakePilotDB() {
 }
 
 const { fetchWithAuthRetry } = vi.hoisted(() => ({
-  fetchWithAuthRetry: vi.fn((...args) => global.fetch(...args)),
+  fetchWithAuthRetry: vi.fn((...args) => {
+    const a = /** @type {[RequestInfo | URL, RequestInit?]} */ (args);
+    return global.fetch(a[0], a[1]);
+  }),
 }));
 
 vi.mock('../../db/dbCore.js', () => ({
@@ -81,7 +84,10 @@ beforeEach(() => {
     status: 200,
     json: async () => ({ ok: true, ingested: 0, dropped: 0 }),
   })));
-  fetchWithAuthRetry.mockImplementation((...args) => global.fetch(...args));
+  fetchWithAuthRetry.mockImplementation((...args) => {
+    const a = /** @type {[RequestInfo | URL, RequestInit?]} */ (args);
+    return global.fetch(a[0], a[1]);
+  });
 });
 
 afterEach(() => {

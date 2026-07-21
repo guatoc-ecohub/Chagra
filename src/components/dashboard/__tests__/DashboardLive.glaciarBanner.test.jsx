@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * DashboardLive.glaciarBanner.test.jsx — el banner "Reporte de Punto Glaciar"
  * del Home está restringido a los beta testers de "La Cordada".

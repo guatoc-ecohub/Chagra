@@ -164,10 +164,12 @@ export function GeometriaParte({ geo }) {
 const _euler = new THREE.Euler();
 function matrizParte(parte) {
   if (!parte._m) {
-    const esc = Array.isArray(parte.escala) ? parte.escala : [1, 1, 1];
+    const esc = /** @type {[number, number, number]} */ (Array.isArray(parte.escala) ? parte.escala : [1, 1, 1]);
+    const pPos = /** @type {[number, number, number]} */ (parte.pos || [0, 0, 0]);
+    const pRot = /** @type {[number, number, number]} */ (parte.rot || [0, 0, 0]);
     parte._m = new THREE.Matrix4().compose(
-      new THREE.Vector3(...(parte.pos || [0, 0, 0])),
-      new THREE.Quaternion().setFromEuler(_euler.set(...(parte.rot || [0, 0, 0]))),
+      new THREE.Vector3(...pPos),
+      new THREE.Quaternion().setFromEuler(_euler.set(...pRot)),
       new THREE.Vector3(...esc),
     );
   }
@@ -461,20 +463,21 @@ function CartelesNombres({ animales, seleccionId, onPick, conTabla }) {
     [conNombre],
   );
 
-  useFrame(({ camera, size }) => {
+  useFrame(({ camera: cam, size }) => {
     if (tick.current++ % 5 !== 0) return;
+    const perspCam = /** @type {import('three').PerspectiveCamera} */ (cam);
     // px por metro a cada distancia (cámara en perspectiva): para estimar el
     // rect EN PANTALLA de una tabla de tamaño constante EN MUNDO.
-    const foco = size.height / (2 * Math.tan(THREE.MathUtils.degToRad(camera.fov) * 0.5));
+    const foco = size.height / (2 * Math.tan(THREE.MathUtils.degToRad(perspCam.fov) * 0.5));
     const pts = anclas.map(({ a, v }) => {
-      _proj.copy(v).project(camera);
+      _proj.copy(v).project(perspCam);
       const x = (_proj.x * 0.5 + 0.5) * size.width;
       const y = (0.5 - _proj.y * 0.5) * size.height;
       return {
         id: a.id,
         x,
         y,
-        pxm: foco / Math.max(camera.position.distanceTo(v), 0.1),
+        pxm: foco / Math.max(perspCam.position.distanceTo(v), 0.1),
         dc: Math.hypot(x - size.width / 2, y - size.height / 2),
         elegible: _proj.z <= 1,
       };
@@ -637,6 +640,7 @@ export default function CorralVivo({ animales: lista, reducedMotion, tier = 'alt
           animal={a}
           modo={a.momento}
           destino={a.pos}
+          origen={a.pos}
           reducedMotion={reducedMotion}
           tier={tier}
           onPick={alPicar}

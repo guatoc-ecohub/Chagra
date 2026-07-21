@@ -462,7 +462,7 @@ describe('authService — OAuth PKCE flow', () => {
         it('serializa refresh concurrente y comparte una sola llamada al backend', async () => {
             vi.mocked(localforage.getItem).mockResolvedValue('refresh-serial');
             vi.mocked(global.fetch).mockImplementation(() => new Promise((resolve) => {
-                setTimeout(() => resolve({
+                setTimeout(() => resolve(/** @type {any} */ ({
                     ok: true,
                     status: 200,
                     headers: /** @type {Headers} */ (/** @type {unknown} */ ({ get: (n) => (n === 'content-type' ? 'application/json' : null) })),
@@ -471,7 +471,7 @@ describe('authService — OAuth PKCE flow', () => {
                         refresh_token: 'refresh-serial-2',
                         expires_in: 3600,
                     }),
-                }), 5);
+                })), 5);
             }));
 
             const [a, b] = await Promise.all([

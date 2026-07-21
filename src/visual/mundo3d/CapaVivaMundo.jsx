@@ -61,6 +61,7 @@ import { useTierPerformance } from './usePerformanceMonitor.jsx';
 const VENTANA_CARGA_MS = 4000;
 
 /* Ancla local de los momentos (referencia estable: r3f no re-aplica). */
+/** @type {[number, number, number]} */
 const ANCLA_MOMENTOS = [0, 0, 0];
 
 /* Siembra determinista por mundo: cada mundo respira con su propia nube. */
@@ -187,7 +188,7 @@ export default function CapaVivaMundo({
       {nubes.map((n) => (
         <ParticulasAmbientales
           key={n.tipo}
-          tipo={n.tipo}
+          tipo={/** @type {"polen"|"luciernagas"|"polvo"|"mariposas"} */ (n.tipo)}
           densidad={n.densidad}
           tier={tierVivo}
           reducedMotion={reducedMotion}
@@ -201,7 +202,7 @@ export default function CapaVivaMundo({
         <MomentoNace
           activo={!!beatNace}
           claveBeat={beatNace?.clave}
-          position={[-0.9, 0, 0.9]}
+          position={/** @type {const} */ ([-0.9, 0, 0.9])}
           tier={tier}
           reducedMotion={reducedMotion}
           onFin={() => setBeatNace(null)}
@@ -209,7 +210,7 @@ export default function CapaVivaMundo({
         <MomentoCosecha
           activo={!!beatCosecha}
           claveBeat={beatCosecha?.clave}
-          position={[0.9, 0, 0.7]}
+          position={/** @type {const} */ ([0.9, 0, 0.7])}
           tier={tier}
           reducedMotion={reducedMotion}
           onFin={() => setBeatCosecha(null)}
@@ -217,7 +218,7 @@ export default function CapaVivaMundo({
         <MomentoVende
           activo={!!beatVende}
           claveBeat={beatVende?.clave}
-          position={[0, 0, 1.1]}
+          position={/** @type {const} */ ([0, 0, 1.1])}
           tier={tier}
           reducedMotion={reducedMotion}
           onFin={() => setBeatVende(null)}
@@ -230,7 +231,7 @@ export default function CapaVivaMundo({
           <HotspotFeedback
             key={h.id}
             activo={h.activo === true || (hotspotActivoId != null && h.id === hotspotActivoId)}
-            pos={h.pos}
+            pos={/** @type {[number, number, number]} */ (h.pos)}
             tier={tier}
             reducedMotion={reducedMotion}
           />

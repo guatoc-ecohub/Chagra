@@ -364,7 +364,7 @@ export async function clearMemory(operatorId) {
  *     vacía como get_companions devolviendo array)  → grounded
  *     (asumimos que devolver payload con datos es match útil)
  *
- * @param {{tool: string, args: object, result: any} | null | undefined} toolEvidence
+ * @param {{tool: string, args: object, result: any} | Array<{tool: string, args: object, result: any} | null | undefined> | null | undefined} toolEvidence
  * @returns {{tool_used: string|null, grounded: boolean}}
  */
 export function computeSourceMetadata(toolEvidence) {
@@ -440,7 +440,7 @@ export function computeSourceMetadata(toolEvidence) {
  * confiar en el veredicto (sin AGE no hay con qué validar binomios).
  *
  * @param {object} base — metadata de fuente ya computado (computeSourceMetadata).
- * @param {null | {hallucinated?: string[], suspect?: string[], age_available?: boolean}} pv
+ * @param {null | {hallucinated?: unknown[], suspect?: unknown[], age_available?: boolean}} pv
  * @returns {object} nuevo metadata (copia de base + flags de advertencia).
  */
 export function mergePostValidateMetadata(base, pv) {
@@ -518,7 +518,7 @@ function _entityConcept(e) {
  *
  * Puro y sin efectos. No muta las entidades.
  *
- * @param {Array<object>|null|undefined} resolvedEntities
+ * @param {Array<object>|null|undefined|string} resolvedEntities
  * @returns {{fuente_url?: string, fuente?: string, fuente_texto?: boolean, confianza?: 'alta'|'media'|'baja'}}
  */
 export function extractGroundingBadges(resolvedEntities) {

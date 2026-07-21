@@ -261,14 +261,23 @@ function FuenteBadge({ metadata }) {
   const md = metadata || {};
   const url = typeof md.fuente_url === 'string' ? md.fuente_url.trim() : '';
   const label = (typeof md.fuente === 'string' && md.fuente.trim()) || 'fuente externa';
+  let safeUrl = null;
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+      safeUrl = parsedUrl.href;
+    }
+  } catch {
+    // Una fuente mal formada se degrada a texto plano o se omite.
+  }
 
   // Forma 1: recurso citado → link clickeable. Sello VERDE del semáforo (la
   // fuente es verificable), pero sigue siendo <a> nativo CSP-safe — el toque
   // navega al recurso, no expande nota.
-  if (/^https?:\/\//i.test(url)) {
+  if (safeUrl) {
     return (
       <a
-        href={url}
+        href={safeUrl}
         target="_blank"
         rel="noopener noreferrer"
         data-testid="fuente-badge"
@@ -466,7 +475,7 @@ export default function ChatBubble({ message, isStreaming = false, promptText, o
       {!isUser && (
         <div className="v3-byline" aria-hidden="true">
           <span className={`v3-byline-avatar${isStreaming ? ' is-streaming' : ''}`}>
-            <ChagraAgentAvatar state={agentState} size={22} ariaLabel="Chagra IA" />
+            <ChagraAgentAvatar state={agentState} size={30} ariaLabel="Chagra IA" />
           </span>
           <span>Chagra</span>
         </div>

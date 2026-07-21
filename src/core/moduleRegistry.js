@@ -100,5 +100,6 @@ export const registry = new ModuleRegistry();
 
 // Expuesto en DEV para inspección desde DevTools.
 if (typeof window !== 'undefined' && import.meta.env && import.meta.env.DEV) {
+  // @ts-ignore custom debug registry
   window.__chagraRegistry = registry;
 }

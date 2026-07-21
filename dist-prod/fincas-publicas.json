@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "guatoc",
+    "nombre": "Guatoc",
+    "operador": "Guatoc Ecohub",
+    "coords": [
+      4.5167,
+      -73.9333
+    ],
+    "altitud": 2400,
+    "biocultural_zone": "andino_alto_páramo",
+    "estado": "activo",
+    "descripcion_corta": "Laboratorio de conservación + restauración de páramo en Choachí.",
+    "farmos_endpoint": "https://farmos.guatoc.co"
+  }
+]

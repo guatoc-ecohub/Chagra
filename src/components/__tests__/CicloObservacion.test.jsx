@@ -32,7 +32,7 @@ afterEach(() => cleanup());
 describe('CicloObservacion — anotar observación en un ciclo', () => {
   it('guarda una nota de texto vía observationService.registerObservation', async () => {
     const onSaved = vi.fn();
-    render(<CicloObservacion processId="p1" onSaved={onSaved} />);
+    render(<CicloObservacion processId="p1" onSaved={onSaved} processHint={undefined} currentStage="" />);
 
     fireEvent.change(screen.getByLabelText('Observación de campo'), {
       target: { value: 'aparecieron pulgones en las hojas' },
@@ -47,7 +47,7 @@ describe('CicloObservacion — anotar observación en un ciclo', () => {
   });
 
   it('no guarda con el campo vacío', () => {
-    render(<CicloObservacion processId="p1" onSaved={() => {}} />);
-    expect(screen.getByText('Guardar nota').disabled).toBe(true);
+    render(<CicloObservacion processId="p1" onSaved={() => {}} processHint={undefined} currentStage="" />);
+    expect(/** @type {HTMLButtonElement} */ (screen.getByText('Guardar nota')).disabled).toBe(true);
   });
 });

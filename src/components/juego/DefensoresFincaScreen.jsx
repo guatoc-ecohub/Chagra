@@ -36,6 +36,21 @@ import {
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 import { agentSounds, isSoundEnabled } from '../../services/agentSoundService';
 import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
+import { Crisopa } from '../../visual/creatures/Crisopa.jsx';
+import { Trichogramma } from '../../visual/creatures/Trichogramma.jsx';
+import { Sirfido } from '../../visual/creatures/Sirfido.jsx';
+
+/**
+ * Los aliados de control biológico que ya tienen su criatura rubber-hose fiel:
+ * en el selector de benéficos se dibujan de verdad (protagonistas), en vez del
+ * emoji genérico. Solo visual — el id y la mecánica del par no cambian.
+ * El resto de benéficos conserva su emoji hasta que tengan su propio dibujo.
+ */
+const CRIATURA_BENEFICO = {
+  crisopa: Crisopa,
+  trichogramma: Trichogramma,
+  sirfido: Sirfido,
+};
 
 // Dimensiones lógicas del LIENZO visible (la cámara recorta el mundo a esto).
 const VIEW_W = 720;
@@ -1054,6 +1069,7 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
           const ayuda = plagaQueControla
             ? `${b.nombre}: controla al ${plagaQueControla.toLowerCase()}`
             : b.nombre;
+          const Criatura = CRIATURA_BENEFICO[b.id];
           return (
             <button
               key={b.id}
@@ -1066,7 +1082,9 @@ function NivelJuego({ nivel, superados, onGanar, onIrA }) {
               title={ayuda}
               className="df-beneficio"
             >
-              <span className="df-beneficio-emoji" aria-hidden="true">{b.emoji}</span>
+              <span className="df-beneficio-emoji" aria-hidden="true">
+                {Criatura ? <Criatura size={38} title="" /> : b.emoji}
+              </span>
               <span className="df-beneficio-nombre">{b.nombre}</span>
             </button>
           );
@@ -1156,7 +1174,7 @@ export default function DefensoresFincaScreen({ onBack, onHome }) {
   useEffect(() => { recordGameStart('defensores'); }, []);
   const [superados, setSuperados] = useState(() => leerSuperados());
   const [nivelNum, setNivelNum] = useState(1);
-  const nivel = useMemo(() => getNivel(nivelNum), [nivelNum]);
+  const nivel = /** @type {any} */ (useMemo(() => getNivel(nivelNum), [nivelNum]));
 
   const handleGanar = useCallback((numero) => {
     setSuperados(guardarSuperado(numero));
