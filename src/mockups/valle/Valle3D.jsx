@@ -60,6 +60,7 @@ import ArrieriaValle from './ArrieriaValle.jsx';
 import AguaVivaValle from './AguaVivaValle.jsx';
 import DetalleSueloValle from './DetalleSueloValle.jsx';
 import { CampesinosValle } from './CampesinosValle.jsx';
+import { PerrosValle } from './PerrosValle.jsx';
 import HatoMovil from './HatoMovil.jsx';
 /* Árboles POR ESPECIE (no genéricos): las mismas mallas del bosque altoandino
    (roble, aliso, gaque) que ya viven en floraParamo — cada árbol se distingue. */
@@ -1647,7 +1648,6 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
     };
     // `entrando` vive en entrandoRef a propósito: un viaje real no debe
     // reiniciar la cadencia del husmeo autónomo.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reducedMotion, entrarMundoAngelita, reposarAngelita]);
 
   useFrame((state) => {
@@ -2484,6 +2484,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           haba, cubio, arracacha + barbecho), cerca de piedra, camino y abrigo. */}
       <LaderaAltaValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} reducedMotion={reducedMotion} />
       {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
+      {!portada && <PerrosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
       {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 10 : tier === 'bajo' ? 4 : 7} radio={4.8} reducedMotion={reducedMotion} />}
       {/* LOGÍSTICA VISIBLE (alma Settlers): la mula acarrea estiércol→pila,
           compost→eras y cosecha→casa por los senderos, y las pilas crecen. */}
