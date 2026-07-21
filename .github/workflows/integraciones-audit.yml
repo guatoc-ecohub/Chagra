@@ -1,0 +1,42 @@
+name: Integraciones no consumidas
+
+# Gate anti-patrón "se construye y no se conecta" (ADR-INTEGRACIONES-NO-CONSUMIDAS,
+# Chagra-strategy/ops/, privado). Falla si una capacidad (export "de conocimiento" en
+# src/services/grafoRelations.js, o — cuando chagra-pro está disponible — un endpoint
+# del sidecar agro-mcp) no tiene consumidor real en src/ Y no está declarada en
+# ops/integraciones-no-consumidas.json con razón + fecha.
+#
+# Este job SOLO tiene acceso al repo público (chagra) — chagra-pro es privado y no se
+# clona acá (anti-leak, ver el header de scripts/audit-integraciones.mjs). Por eso el
+# script degrada con gracia: audita lo que puede ver (grafoRelations.js) y salta la
+# parte de endpoints del sidecar con un warning explícito. La auditoría cruzada
+# completa (con chagra-pro) corre en dev local o en un futuro job del lado
+# chagra-pro que clona este repo público (esa dirección de lectura sí es segura).
+#
+# Barato a propósito (segundos, sin build, sin red, sin GPU) — mismo criterio que
+# unit-tests.yml: correr SIEMPRE en cada PR a main es viable solo si es gratis.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: audit-integraciones
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Auditar integraciones no consumidas
+        run: node scripts/audit-integraciones.mjs

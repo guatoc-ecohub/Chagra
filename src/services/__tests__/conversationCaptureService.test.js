@@ -5,7 +5,7 @@
 /* eslint-disable no-undef */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { captureExchange, isCaptureEnabled, shouldAnonymizePII } from '../conversationCaptureService';
+import { captureExchange, isCaptureEnabled, isConsentRequired, shouldAnonymizePII } from '../conversationCaptureService';
 import * as feedbackService from '../feedbackService';
 
 const waitForFetchCalls = async (count) => {
@@ -64,6 +64,24 @@ describe('conversationCaptureService', () => {
     });
   });
 
+  describe('isConsentRequired', () => {
+    it('exige consentimiento por defecto (privacy-first)', () => {
+      expect(isConsentRequired()).toBe(true);
+    });
+
+    it('reconoce false/0/off como NO-exigir (modo piloto)', () => {
+      for (const v of ['false', '0', 'off', 'FALSE', 'Off']) {
+        vi.stubEnv('VITE_CAPTURE_REQUIRE_CONSENT', v);
+        expect(isConsentRequired()).toBe(false);
+      }
+    });
+
+    it('cualquier otro valor sigue exigiendo consentimiento', () => {
+      vi.stubEnv('VITE_CAPTURE_REQUIRE_CONSENT', 'true');
+      expect(isConsentRequired()).toBe(true);
+    });
+  });
+
   describe('captureExchange', () => {
     it('no envía nada cuando la flag está OFF', () => {
       captureExchange({ userText: 'hola', agentText: 'buenas' });
@@ -75,6 +93,15 @@ describe('conversationCaptureService', () => {
       vi.spyOn(feedbackService, 'hasConsent').mockReturnValue(false);
       captureExchange({ userText: 'hola', agentText: 'buenas' });
       expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it('MODO PILOTO: con REQUIRE_CONSENT=false captura aunque no haya consentimiento', async () => {
+      vi.stubEnv('VITE_CAPTURE_CONVERSATIONS', 'true');
+      vi.stubEnv('VITE_CAPTURE_REQUIRE_CONSENT', 'false');
+      vi.spyOn(feedbackService, 'hasConsent').mockReturnValue(false);
+      captureExchange({ userText: 'hola', agentText: 'buenas' });
+      await waitForFetchCalls(1);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
     });
 
     it('no envía turnos vacíos aunque la flag esté ON', () => {

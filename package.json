@@ -17,6 +17,7 @@
     "test:unit:watch": "vitest",
     "coverage": "vitest run --coverage",
     "audit:bundle": "node scripts/audit-bundle.mjs",
+    "audit:integraciones": "node scripts/audit-integraciones.mjs",
     "grafo:snapshot": "node scripts/snapshot-grafo-crecimiento.mjs",
     "gen:stats": "node scripts/gen-chagra-stats.mjs",
     "validate:ngsi": "node scripts/export-ngsi-ld.mjs",
