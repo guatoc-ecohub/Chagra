@@ -231,10 +231,10 @@ export function AbejaAngelita({
       {/* alitas de tul con contorno + smear (crt-wingbeat ya lleva el estirón).
           La duración del aleteo la modula el clima real (wingDur): dorada rápida,
           lluvia pesada. celebra/reposo (data-pose) mandan por especificidad CSS. */}
-      <ellipse className={wing} style={alaStyle} cx="-1.8" cy="-7" rx="6" ry="3.6" fill={ABEJA_PALETA.alaTul}
-        opacity="0.62" stroke="rgba(42,26,12,0.4)" strokeWidth="0.5" />
-      <ellipse className={wing} style={alaStyle2} cx="2.2" cy="-6.4"
-        rx="4.6" ry="2.8" fill={ABEJA_PALETA.alaTulClara} opacity="0.5" stroke="rgba(42,26,12,0.35)" strokeWidth="0.5" />
+      <ellipse className={wing} style={alaStyle} cx="-3.4" cy="-6" rx="8.8" ry="3.3" fill={ABEJA_PALETA.alaTul}
+        opacity="0.55" stroke="rgba(42,26,12,0.32)" strokeWidth="0.45" />
+      <ellipse className={wing} style={alaStyle2} cx="-0.4" cy="-5.2"
+        rx="6.6" ry="2.7" fill={ABEJA_PALETA.alaTulClara} opacity="0.44" stroke="rgba(42,26,12,0.28)" strokeWidth="0.45" />
 
       {/* patitas manguera con pie crema (detrás del tronco, se mecen suave) */}
       <Miembro d="M-2.6,4.4 C-3.2,6.6 -3.4,8 -3.0,9.2" ancho={1.9} punta={[-3.0, 9.4]} puntaR={1.3} pie sway={vivo} delay={-0.6} />
@@ -244,14 +244,14 @@ export function AbejaAngelita({
           oscuras (esas eran la firma de la Apis europea). Remata redondo — SIN
           aguijón. Va a la izquierda, dejándole el lado derecho al tórax; su
           contorno respira con el boil. */}
-      <ellipse cx="-2.0" cy="0.2" rx="8.1" ry="4.5"
+      <ellipse cx="-1.4" cy="0" rx="7.4" ry="5.1"
         fill={ABEJA_PALETA.cuerpo} stroke={RH_INK} strokeWidth="1.3"
         style={{ filter: `drop-shadow(0 0 6px ${ABEJA_PALETA.cuerpoGlow})` }} />
       {/* brillo suave de volumen (el lomo del abdomen) — NUNCA una banda */}
-      <ellipse cx="-3.2" cy="-1.9" rx="3.9" ry="1.5" fill={ABEJA_PALETA.cabeza} opacity="0.26" />
+      <ellipse cx="-2.6" cy="-2.2" rx="3.6" ry="1.7" fill={ABEJA_PALETA.acento} opacity="0.28" />
       {/* tergite APENAS insinuado (una línea suave que sigue la curva), el
           detalle de segmento del meliponino, jamás una banda de color */}
-      <path d="M-7.2,-2.1 Q-7.9,0.2 -7.2,2.3" stroke={ABEJA_PALETA.hiloChumbe}
+      <path d="M-6.6,-2.4 Q-7.3,0 -6.6,2.6" stroke={ABEJA_PALETA.hiloChumbe}
         strokeWidth="0.5" fill="none" strokeLinecap="round" opacity="0.45" />
       {/* TÓRAX oscuro y redondo (peludo): junto con la cabeza forma la mitad
           OSCURA del cuerpo — la estructura de valores INVERTIDA respecto a la
@@ -270,7 +270,7 @@ export function AbejaAngelita({
         d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sway={vivo} delay={-0.45} />
 
       {/* cabeza OSCURA (casi negra) con contorno — la mitad oscura del meliponino */}
-      <circle cx="8.6" cy="-1.0" r={ABEJA_PROPORCION.cabezaR} fill={ABEJA_PALETA.testa} stroke={RH_INK} strokeWidth="1.2" />
+      <circle cx="8.6" cy="-1.0" r={ABEJA_PROPORCION.cabezaR} fill={ABEJA_PALETA.cabeza} stroke={RH_INK} strokeWidth="1.2" />
       {/* MÁSCARA FACIAL clara: la marca amarilla del clípeo de la angelita real —
           y, a la vez, el fondo sobre el que la carita (ojos/boca/cejas del agente)
           sigue leyéndose pese a la cabeza oscura. Va bajo ojos/cachetes/boca. */}
