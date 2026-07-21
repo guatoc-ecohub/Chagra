@@ -121,6 +121,36 @@ export function crearMaterialContorno() {
   });
 }
 
+/**
+ * La tinta de frente: para filos que no son casco (el anillo de un portal,
+ * una arista dibujada). Mismo color de REGLA_BORDE, FrontSide.
+ * @returns {THREE.MeshBasicMaterial}
+ */
+export function crearMaterialTinta() {
+  return new THREE.MeshBasicMaterial({
+    color: REGLA_BORDE.interactivo.color,
+    toneMapped: false,
+  });
+}
+
+/**
+ * La sombra de contacto: el ÚNICO dispositivo de sombra barata sancionado
+ * (disco radial con el tinte de sombra de la franja — auditoría 4.1). Su
+ * transparencia no cuenta contra la regla del agua: es sombra, no material
+ * de objeto.
+ * @param {string} hexSombra  preset.sombra de la franja (CIELOS_HORA)
+ * @returns {THREE.MeshBasicMaterial}
+ */
+export function crearMaterialSombraContacto(hexSombra) {
+  return new THREE.MeshBasicMaterial({
+    color: hexSombra,
+    transparent: true,
+    opacity: 0.26,
+    depthWrite: false,
+    toneMapped: false,
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /* La luz de la ley: colores y posición del sol vienen del preset       */
 /* aprobado (CIELOS_HORA); las INTENSIDADES aplican la relación         */
