@@ -556,24 +556,6 @@ function QuetzalFugaz() {
    rumbo y su compás — nunca en fila ni al unísono). */
 const VECINOS_BOSQUE = [
   {
-    slug: 'oso-andino',
-    pos: [-3.7, 0.85, 3.0],
-    px: 62,
-    factor: 17,
-    franjas: null,
-    vida: {
-      primero: 'pasea',
-      descanso: [5000, 12000],
-      momentos: {
-        pasea: { dur: 8500, props: { pose: 'anda' }, paseo: [1.7, 0, 1.0] },
-        resopla: { dur: 2600, props: { resopla: true } },
-        rasca: { dur: 3800, props: { rasca: true } },
-        reposo: { dur: 5200, props: { pose: 'reposo' } },
-        mira: { dur: 3000, props: { pose: 'señala' } },
-      },
-    },
-  },
-  {
     slug: 'rana-andina',
     pos: [3.1, 0.32, 3.2],
     px: 24,
@@ -584,20 +566,6 @@ const VECINOS_BOSQUE = [
       momentos: {
         brinca: { dur: 1700, props: { pose: 'celebra' } },
         reposo: { dur: 4600, props: { pose: 'reposo' } },
-      },
-    },
-  },
-  {
-    slug: 'borugo',
-    pos: [-4.9, 0.5, 4.4],
-    px: 36,
-    factor: 10,
-    franjas: ['atardecer', 'noche', 'amanecer'],
-    vida: {
-      descanso: [8000, 18000],
-      momentos: {
-        olfatea: { dur: 3600, props: { olfatea: true } },
-        acurruca: { dur: 6000, props: { acurruca: true } },
       },
     },
   },
