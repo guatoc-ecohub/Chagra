@@ -35,9 +35,22 @@
  *                                 de crédito DOM + clave de pisos accesible.
  *   named    SierraDiorama      → grupo r3f puro para COMPONER dentro de otro
  *                                 <Canvas> (trae luces/niebla/crédito por props).
+ *   named    useViajeSierra     → el estado three-free "tocar piso → bajar al
+ *                                 mundo" (testeable sin Canvas; ver más abajo).
  *
- * ── CABLEO (lo hace el host / otra fable / Opus; este archivo NO toca App.jsx
- *    ni mundoData.js) ─────────────────────────────────────────────────────────
+ * ── INTERACCIÓN (2026-07-21, fix bug P1 huérfanos-3D) ───────────────────────
+ * La vista global YA NO es un panorama mudo: cada banda de piso térmico
+ * (`PisosTermicosBandas`, montada como hija del `<Canvas>`) es tocable, y al
+ * tocarla se dispara el descenso cinematográfico (`TransicionSierraMundo`,
+ * overlay hermano fuera del Canvas) hacia el PRIMER mundo real que
+ * `pisosTermicos.js` declara para ese piso (`piso.mundos[0].view` — la MISMA
+ * fuente de datos que ya cablea `PisosTermicosBandas`, sin duplicar banding:
+ * una sola verdad). `onMitad` (pantalla cubierta) es quien de verdad navega
+ * —vía `onNavigate(view, data)`, el mismo contrato de `navigate` del host—
+ * así el corte de escena ocurre bajo tapa, nunca a la vista.
+ *
+ * ── CABLEO (lo hace el host / otra fable / Opus; este archivo NO toca
+ *    mundoData.js) ────────────────────────────────────────────────────────
  *
  *   import VistaGlobalSierra from './visual/mundo3d/VistaGlobalSierra.jsx';
  *   // p.ej. ruta mockup #/mockups/sierra-global o nodo maestro del registro:
@@ -45,6 +58,7 @@
  *     tier={tier}                 // de decidirTier() (deviceTier.js)
  *     reducedMotion={reducedMotion}
  *     pisoUsuario="frio"          // opcional: resalta el piso de la finca
+ *     onNavigate={navigate}       // opcional: (view, data) => navega de verdad
  *   />                            // 'calido'|'templado'|'frio'|'paramo'|'superparamo'|'nival'
  *
  *   // O componer el grupo dentro de un Canvas propio:
@@ -55,12 +69,19 @@
  *
  * El contenedor padre define el alto (como `.mundo-root`).
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+/* eslint-disable react-refresh/only-export-components -- `useViajeSierra` se
+   exporta a propósito (three-free) para testear el handler real "tocar banda
+   → bajar al mundo" SIN montar el <Canvas> r3f de esta escena (fix bug P1
+   huérfanos-3D). Este archivo se importa perezoso desde App.jsx; no es
+   hot-reload-sensible. */
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { ATMOSFERA } from './atmosferaMadre.js';
 import { perfilDeTier } from './deviceTier.js';
+import PisosTermicosBandas from './PisosTermicosBandas.jsx';
+import TransicionSierraMundo from './TransicionSierraMundo.jsx';
 
 /* ── Geografía del macizo (validada contra el DR: mar al norte, macizo al sur,
       cumbres gemelas + Simmonds, costa de Palomino). Coordenadas de MUNDO:
@@ -435,26 +456,94 @@ const CSS_SIERRA = `
 @media (prefers-reduced-motion: reduce) { .vsierra-canvas { transition: none; } }
 `;
 
+/* Geometría de escena de las bandas de piso térmico: calibrada contra el
+   TERRENO REAL de esta escena (`alturaSierra`/`construirTerreno`, no valores
+   sueltos) para que el "aura" de contorno quede sobre el macizo, no flotando
+   en otro lado. La cumbre real mide ≈5.16 (ver CUMBRE.y=5.0, la misma
+   referencia que ya usan los rótulos); el centro se desplaza hacia el
+   complejo de cumbres (Colón/Bolívar + Simmonds, z≈2.9–4.4) en vez del origen
+   (que cae en la falda, cerca de la costa). */
+const BANDAS_CENTRO = [0.4, 0, 2.6];
+const BANDAS_ALTURA_CUMBRE = CIMA;
+const BANDAS_RADIO_BASE = ANCHO / 2.2; // cubre el ancho real del macizo (22)
+const BANDAS_RADIO_CUMBRE = 0.55;
+
+/**
+ * useViajeSierra — el ESTADO del viaje "tocar piso → bajar al mundo" (three-free,
+ * extraído para ser testeable SIN montar el `<Canvas>` r3f). Encapsula:
+ *   · `handleSeleccionPiso(piso)` — arma el viaje al PRIMER mundo real que
+ *     `pisosTermicos.js` declara para ese piso (`piso.mundos[0]`); honestidad:
+ *     sin mundo asociado, no arma nada (nunca finge una ruta).
+ *   · `handleMitad()` — a mitad de cubierta (pantalla 100% tapada) es cuando
+ *     de verdad se navega (`onNavigate(view, data)`), nunca a la vista.
+ *   · `handleFin()` — apaga el overlay al revelar.
+ * `viaje` alimenta directo a `<TransicionSierraMundo {...viaje}>`.
+ */
+export function useViajeSierra(onNavigate) {
+  const [viaje, setViaje] = useState(null); // null = sin viaje en curso
+
+  const handleSeleccionPiso = useCallback((piso) => {
+    setViaje((actual) => {
+      if (!piso || actual?.activa) return actual; // un viaje a la vez
+      const destino = piso.mundos?.[0]; // el mundo PRIMARIO del piso
+      if (!destino) return actual; // sin mundo asociado: no finge una ruta
+      return {
+        activa: true,
+        direccion: 'bajar',
+        pisoDestino: piso.id,
+        view: destino.view,
+        data: { pisoId: piso.id, mundoId: destino.id },
+      };
+    });
+  }, []);
+
+  const handleMitad = useCallback(() => {
+    setViaje((actual) => {
+      if (actual) onNavigate?.(actual.view, actual.data);
+      return actual;
+    });
+  }, [onNavigate]);
+
+  const handleFin = useCallback(() => {
+    setViaje((v) => (v ? { ...v, activa: false } : v));
+  }, []);
+
+  return { viaje, handleSeleccionPiso, handleMitad, handleFin };
+}
+
 /**
  * VistaGlobalSierra — la vista global montable con su propio `<Canvas>`.
  * Trae la cámara de establishing shot, órbita suave acotada, título, clave de
  * pisos accesible y el pie de crédito DOM a los cuatro pueblos. El host decide
  * cuándo mostrarla (no monta lógica de negocio).
  *
+ * Las bandas de piso térmico (`PisosTermicosBandas`) son tocables: al tocar
+ * una, `TransicionSierraMundo` cubre la pantalla y —a mitad de cubierta,
+ * nunca a la vista— dispara `onNavigate(view, data)` hacia el PRIMER mundo
+ * real que `pisosTermicos.js` asocia a ese piso (única fuente de verdad,
+ * la misma que ya pinta la etiqueta de cada banda).
+ *
  * @param {object} props
  * @param {'alto'|'medio'|'bajo'} [props.tier='alto']  presupuesto de render.
  * @param {boolean} [props.reducedMotion=false]  sin órbita ni nubes; frameloop a demanda.
  * @param {string}  [props.pisoUsuario]  piso de la finca a resaltar (opcional).
+ * @param {(view: string, data?: object) => void} [props.onNavigate]  navega
+ *        de verdad al mundo del piso tocado (mismo contrato que `navigate`
+ *        del host). Sin ella, tocar una banda solo corre la animación de
+ *        viaje (no hay a dónde ir).
  * @param {string}  [props.className]  clases extra del contenedor.
  */
 export default function VistaGlobalSierra({
   tier = 'alto',
   reducedMotion = false,
   pisoUsuario,
+  onNavigate,
   className = '',
 }) {
   const [listo, setListo] = useState(false);
   const perfil = perfilDeTier(tier);
+  const { viaje, handleSeleccionPiso, handleMitad, handleFin } = useViajeSierra(onNavigate);
+
   return (
     <section
       className={`vsierra-root${className ? ` ${className}` : ''}`}
@@ -476,6 +565,17 @@ export default function VistaGlobalSierra({
           pisoUsuario={pisoUsuario}
           credito={false}
         />
+        <PisosTermicosBandas
+          pisoUsuario={pisoUsuario}
+          tier={tier}
+          reducedMotion={reducedMotion}
+          centro={BANDAS_CENTRO}
+          alturaCumbre={BANDAS_ALTURA_CUMBRE}
+          radioBase={BANDAS_RADIO_BASE}
+          radioCumbre={BANDAS_RADIO_CUMBRE}
+          pisoActivo={viaje?.activa ? viaje.pisoDestino : null}
+          onSeleccionPiso={handleSeleccionPiso}
+        />
         <OrbitControls
           makeDefault
           enablePan={false}
@@ -494,6 +594,18 @@ export default function VistaGlobalSierra({
         />
         <AdaptiveDpr pixelated />
       </Canvas>
+
+      {/* Overlay HERMANO del Canvas (nunca dentro): el descenso cinematográfico
+          hacia el mundo del piso tocado. Contrato temporal en TransicionSierraMundo. */}
+      <TransicionSierraMundo
+        activa={!!viaje?.activa}
+        direccion={viaje?.direccion || 'bajar'}
+        pisoDestino={viaje?.pisoDestino || ''}
+        tier={tier}
+        reducedMotion={reducedMotion}
+        onMitad={handleMitad}
+        onFin={handleFin}
+      />
 
       {/* Chrome DOM: título, clave de pisos (accesible) y pie de crédito. */}
       <div className="vsierra-chrome">

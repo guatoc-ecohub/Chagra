@@ -8,20 +8,41 @@
  * abeja VUELA hasta el lugar: el mismo "entrar al mundo" del 3D, dibujado.
  * "Wow" 3D se pierde; el PROPÓSITO no.
  */
+/* eslint-disable react-refresh/only-export-components -- `pct` (proyección
+   isométrica) se exporta para el test de regresión del bug P0 huérfanos-3D
+   (ningún lugar de valleData.js puede caer fuera del viewBox visible): probar
+   la fórmula real en vez de reimplementarla en el test. Este fallback no es
+   hot-reload-sensible (gama baja / sin WebGL). */
 import { MUNDOS_VALLE, MUNDO_VALLE_BY_ID, COSA_DEL_DIA, CLIMAS } from './valleData';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 
-/* Proyección isométrica plana de las coordenadas del valle a la lámina SVG. */
+/*
+ * Proyección isométrica plana de las coordenadas del valle a la lámina SVG
+ * (viewBox 400×340, sin cambios: el arte de fondo —cordillera/piso/quebrada—
+ * es decorativo, no depende de los datos).
+ *
+ * Constantes recalibradas 2026-07-21 (fix bug P0 huérfanos-3D): las viejas
+ * (cx=200+(x−z)·30, cy=150+(x+z)·15) quedaron del "valle chico" y ya no
+ * calzan con el rango real de `valleData.js` (el "valle grande" del
+ * rediseño 2026-07, x∈[-6.4,6.2] z∈[-9.4,9.6] aprox.) — varios lugares
+ * (p.ej. `animales`, `disenio`, `semillero`) caían fuera del 0–100%
+ * visible: en gama baja el campesino simplemente no podía tocarlos.
+ * `clampPct` es el cinturón de seguridad (8–92%, igual que el gemelo 2D
+ * `GemeloValle2D.jsx`): ningún lugar futuro puede volver a quedar fuera de
+ * pantalla aunque cambien las coordenadas.
+ */
+const clampPct = (v) => Math.min(92, Math.max(8, v));
+
 function iso(x, z) {
-  const cx = 200 + (x - z) * 30;
-  const cy = 150 + (x + z) * 15;
+  const cx = 200 + (x - z) * 22;
+  const cy = 170 + (x + z) * 10;
   return { cx, cy };
 }
 
 /* Posición en % dentro de la lámina (para posicionar botones/abeja en CSS). */
-function pct(x, z) {
+export function pct(x, z) {
   const { cx, cy } = iso(x, z);
-  return { left: (cx / 400) * 100, top: (cy / 340) * 100 };
+  return { left: clampPct((cx / 400) * 100), top: clampPct((cy / 340) * 100) };
 }
 
 export default function Valle2DFallback({
@@ -100,7 +121,7 @@ export default function Valle2DFallback({
             const p = pct(ancla.pos[0], ancla.pos[2]);
             return (
               <button type="button" className="valle2d__alerta"
-                style={{ left: `${p.left}%`, top: `${p.top - 12}%` }}
+                style={{ left: `${p.left}%`, top: `${clampPct(p.top - 12)}%` }}
                 onClick={onAlerta}
                 aria-label={`Alerta del día: ${COSA_DEL_DIA.titulo}. ${COSA_DEL_DIA.detalle}`}>
                 <span aria-hidden="true">⚠️</span> {COSA_DEL_DIA.titulo}

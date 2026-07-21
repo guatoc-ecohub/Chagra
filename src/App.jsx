@@ -1780,11 +1780,13 @@ export default function App() {
         // Vista global 3D de la Sierra Nevada de Santa Marta: el macizo maestro
         // (Simmonds + Palomino, bandas de piso térmico, hora dorada). Territorio
         // sagrado tratado con dignidad — crédito a Kogui/Arhuaco/Wiwa/Kankuamo.
-        // Ruta #/mockups/sierra-global, sin auth.
+        // Ruta #/mockups/sierra-global, sin auth. Tocar una banda de piso
+        // térmico SÍ navega de verdad (fix bug P1 huérfanos-3D 2026-07-21):
+        // baja al primer mundo real que declara `pisosTermicos.js` para ese piso.
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Vista global Sierra Nevada">
-              <SierraGlobalMockup />
+              <SierraGlobalMockup onNavigate={navigate} />
             </ErrorFallback>
           </ErrorBoundary>
         );
