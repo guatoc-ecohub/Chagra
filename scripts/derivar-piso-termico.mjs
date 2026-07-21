@@ -77,7 +77,7 @@ function loadPisoTermicoBands() {
  */
 function parsePisoTermicoBand(msnm, id) {
   if (msnm.startsWith('>')) {
-    const min = Number.parseInt(msnm.replace('>', ''), 10);
+    const min = Number.parseInt(msnm.replace(/>/g, ''), 10);
     return { id, min, max: null, label: msnm };
   }
   const [minStr, maxStr] = msnm.split('-');
