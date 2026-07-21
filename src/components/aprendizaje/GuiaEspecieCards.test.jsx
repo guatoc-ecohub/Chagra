@@ -179,6 +179,24 @@ describe('GuiaEspecieCards — módulo APRENDIZAJE', () => {
     expect(etapa4.className).toContain('border-amber-600');
   });
 
+  it('cada etapa muestra su icono de ciclo distinto (no un genérico repetido)', () => {
+    const { container } = render(<GuiaEspecieCards especie="papa" />);
+
+    // Un icono de etapa por card, con el orden fenológico correcto…
+    const ordenes = Array.from(
+      container.querySelectorAll('svg[data-etapa-orden]'),
+      (svg) => svg.getAttribute('data-etapa-orden'),
+    );
+    expect(ordenes).toEqual(['1', '2', '3', '4', '5', '6']);
+
+    // …y los seis glifos son geometrías distintas entre sí.
+    const glifos = Array.from(
+      container.querySelectorAll('svg[data-etapa-orden]'),
+      (svg) => svg.innerHTML,
+    );
+    expect(new Set(glifos).size).toBe(6);
+  });
+
   it('es móvil-first (responsive)', () => {
     render(<GuiaEspecieCards especie="papa" />);
 
