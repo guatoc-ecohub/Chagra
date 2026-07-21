@@ -289,6 +289,10 @@ const MundoFrutales3DMockup = lazy(() => import('./mockups/MundoFrutales3D'));
 // maíz + fríjol + calabaza —, quinua en grupo con panojas de color, yucas
 // frondosas). Standalone tipo botica: no monta el sistema MUNDO ni EscenaBase3D.
 const MundoLeguminosas3DMockup = lazy(() => import('./mockups/MundoLeguminosas3D'));
+// 3D: el ENT MAESTRO — el guardián del suelo vivo enseñando el corte de la
+// tierra (hojarasca, humus, raíces, micorrizas, roca madre). EscenaEntMaestro
+// montada sola, con cámara orbital. Ruta #/mockups/ent-maestro, sin auth.
+const EntMaestro3DMockup = lazy(() => import('./mockups/EntMaestro3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -736,6 +740,9 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
   'mockups/mundo-leguminosas-3d': 'mockup_mundo_leguminosas_3d',
   'mockups/hoja-prueba-valle': 'mockup_hoja_prueba_valle',
+  // 3D: el ENT MAESTRO — el guardián del suelo vivo enseñando el corte de la
+  // tierra. Ruta #/mockups/ent-maestro, sin auth.
+  'mockups/ent-maestro': 'mockup_ent_maestro_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2502,6 +2509,19 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La hoja de prueba del valle">
               <HojaPruebaValleMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_ent_maestro_3d':
+        // Vitrina pública del ENT MAESTRO: el guardián del páramo abre el suelo
+        // y enseña sus cinco capas (hojarasca, humus, raíces, micorrizas, roca
+        // madre). EscenaEntMaestro montada sola con cámara orbital. En equipo
+        // humilde o sin WebGL muestra la ficha 2D del guardián. Ruta
+        // #/mockups/ent-maestro, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El Ent maestro">
+              <EntMaestro3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
