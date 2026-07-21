@@ -1,0 +1,258 @@
+/*
+ * lineaTiempo.css — el vestido del control del tiempo.
+ *
+ * Sobrio a propósito: el protagonista es la ladera, no el widget. Nada brilla,
+ * nada pulsa, nada felicita. La única licencia es la cifra del año, que va grande
+ * porque es la que tiene que pesar.
+ *
+ * Blancos sobre un velo oscuro: la escena de atrás va de un cielo lavado (año 0)
+ * a un páramo gris-verde (año 50), así que el panel no puede depender del fondo.
+ * El velo lo resuelve en los dos extremos.
+ *
+ * Blancos de toque de 44px para mano de campo (guante, barro, sol en la pantalla).
+ */
+
+.lt {
+  --lt-tinta: 248 250 247;
+  --lt-tenue: rgb(248 250 247 / 0.62);
+  --lt-linea: rgb(248 250 247 / 0.24);
+  --lt-verde: 122 168 96;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.9rem 1.05rem 0.75rem;
+  color: rgb(var(--lt-tinta));
+  background: linear-gradient(to top, rgb(18 24 18 / 0.86), rgb(18 24 18 / 0.62));
+  backdrop-filter: blur(7px);
+  border-top: 1px solid var(--lt-linea);
+  font-family: inherit;
+}
+
+/* ---------------------------------------------------------------- cabeza --- */
+
+.lt__cabeza {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* La cifra. Tabular para que no bailen los dígitos al correr el año. */
+.lt__anio {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.lt__nombre {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgb(var(--lt-verde));
+  letter-spacing: 0.01em;
+}
+
+.lt__texto {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--lt-tenue);
+  max-width: 54ch;
+  /* Alto fijo: el panel no debe saltar al cambiar de etapa (el ojo está en la
+     ladera, no acá abajo). */
+  min-height: 3.6em;
+}
+
+/* ------------------------------------------------------------------ riel --- */
+
+.lt__riel {
+  position: relative;
+  height: 44px; /* blanco de toque completo */
+  display: flex;
+  align-items: center;
+}
+
+.lt__pista {
+  position: absolute;
+  inset-inline: 0;
+  height: 5px;
+  border-radius: 99px;
+  background: rgb(255 255 255 / 0.16);
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Lo ya crecido. Va de tierra a monte: el riel mismo cuenta la historia. */
+.lt__crecido {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(to right, #9c7c52 0%, #8a8447 22%, #5f8f4e 55%, #35603f 100%);
+  transition: width 90ms linear;
+}
+
+/* Los hitos: marquitas donde caen las etapas. */
+.lt__hito {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 10px;
+  margin-left: -1px;
+  transform: translateY(-50%);
+  background: rgb(255 255 255 / 0.3);
+  border-radius: 1px;
+}
+
+/* El input real: invisible pero es el que manda (accesible, teclado, a11y). */
+.lt__input {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  background: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: grab;
+}
+
+.lt__input:active {
+  cursor: grabbing;
+}
+
+.lt__input::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgb(var(--lt-tinta));
+  border: 3px solid rgb(var(--lt-verde));
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.45);
+  cursor: grab;
+}
+
+.lt__input::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgb(var(--lt-tinta));
+  border: 3px solid rgb(var(--lt-verde));
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.45);
+  cursor: grab;
+}
+
+.lt__input:focus-visible {
+  outline: none;
+}
+
+.lt__input:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid rgb(var(--lt-verde));
+  outline-offset: 3px;
+}
+
+.lt__input:focus-visible::-moz-range-thumb {
+  outline: 3px solid rgb(var(--lt-verde));
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------- etapas --- */
+
+.lt__etapas {
+  position: relative;
+  height: 30px;
+  margin-top: -0.2rem;
+}
+
+.lt__etapa {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  min-width: 44px;
+  height: 30px;
+  padding: 0 0.4rem;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--lt-tenue);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.lt__etapa:hover {
+  color: rgb(var(--lt-tinta));
+}
+
+.lt__etapa--aqui {
+  color: rgb(var(--lt-tinta));
+  background: rgb(var(--lt-verde) / 0.28);
+}
+
+.lt__etapa:focus-visible {
+  outline: 2px solid rgb(var(--lt-verde));
+  outline-offset: 1px;
+}
+
+/* ------------------------------------------------------------------- pie --- */
+
+.lt__pie {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.lt__andar {
+  flex: none;
+  min-height: 40px;
+  padding: 0 0.95rem;
+  border: 1px solid var(--lt-linea);
+  border-radius: 99px;
+  background: rgb(255 255 255 / 0.08);
+  color: rgb(var(--lt-tinta));
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lt__andar:hover {
+  background: rgb(255 255 255 / 0.16);
+}
+
+.lt__andar:focus-visible {
+  outline: 2px solid rgb(var(--lt-verde));
+  outline-offset: 2px;
+}
+
+.lt__tesis {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: rgb(248 250 247 / 0.42);
+  font-style: italic;
+}
+
+/* --------------------------------------------------------------- pantalla -- */
+
+@media (max-width: 30rem) {
+  .lt__anio {
+    font-size: 1.45rem;
+  }
+  .lt__texto {
+    font-size: 0.78rem;
+    min-height: 4.4em;
+  }
+}
+
+/* Si pidieron calma, el riel no se anima solo. */
+@media (prefers-reduced-motion: reduce) {
+  .lt__crecido {
+    transition: none;
+  }
+}

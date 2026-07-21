@@ -24,7 +24,8 @@ import { getPhotoUrl, getPhotoById } from '../services/photoService';
  * Retorna { url, source, loading } donde source es 'user' | 'catalog'
  * | 'placeholder' | 'specific' (cuando vino de photoId).
  */
-export function usePhotoUrl({ assetId, speciesSlug, photoId } = {}) {
+export function usePhotoUrl(props = {}) {
+  const { assetId, speciesSlug, photoId } = /** @type {any} */ (props);
   const [state, setState] = useState({
     url: null,
     source: null,

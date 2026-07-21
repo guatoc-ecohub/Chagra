@@ -1,0 +1,91 @@
+{
+  "species_slug": "chrysophyllum_cainito",
+  "scientific_name": "Chrysophyllum cainito L.",
+  "common_names": [
+    "Caimito morado"
+  ],
+  "family": "Sapotaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "injerto",
+      "acodo"
+    ],
+    "best_method": "injerto",
+    "protocol_resumen": "Semilla recalcitrante de germinación rápida (15-30 días) pero árboles francos demoran 6-10 años en producir; injerto de yema o púa sobre patrón franco baja a 3-4 años. Acodo aéreo en ramas semileñosas con plástico negro + hormona durante época lluviosa. Plantación a 8-10 m, suelos profundos bien drenados, sensibles a anegamiento.",
+    "tiempo_a_establecimiento_dias": 90,
+    "notas": "Frutos en racimos terminales — cosecha por color (violeta-oscuro brillante) y blandeo al tacto. Pulpa lechosa-mucilaginosa dulce con figura estrellada al corte transversal (origen del nombre comercial \"star apple\").",
+    "fuente": "POWO Kew; GBIF; AGROSAVIA manual frutales tropicales; Pérez Arbeláez 1947"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 50,
+      "optimo_max": 800,
+      "max_absoluto": 1200
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El caimito morado (Chrysophyllum cainito L., Sapotaceae) es un árbol frutal perenne neotropical originario de las Antillas Mayores y norte de Sudamérica (Colombia, Venezuela, Panamá, Centroamérica), ampliamente cultivado en zonas bajas cálidas del Caribe colombiano (Atlántico, Bolívar, Magdalena — patios de Barranquilla, Cartagena, Santa Marta, Valledupar), Chocó biogeográfico (Quibdó, Buenaventura), Valle medio y bajo Magdalena (Honda, La Dorada, Puerto Berrío), zonas cálidas de Antioquia (Bajo Cauca, Urabá), Córdoba (Montería), Sucre (Sincelejo), Cesar y enclaves bajos de Santander (Barrancabermeja). Crece óptimamente entre 0 y 800 msnm con temperaturas de 22-30 °C, requiere sol pleno, suelos profundos bien drenados arcillosos a francos, riego moderado y resiste sequías estacionales una vez establecido. Árbol siempreverde de 12-25 m de altura con copa amplia globosa-densa y hojas pinnado-paralelas verde-brillante por el haz y dorado-bronceadas pubescentes por el envés (carácter taxonómico distintivo de Chrysophyllum — \"hoja dorada\" — visible al voltearlas con el viento, espectáculo visual que da nombre vernáculo \"hoja dorada\" en Centroamérica). Flores pequeñas blanco-cremosas perfumadas en cimas axilares polinizadas por abejas nativas (Meliponini, Trigonini) y mariposas. Frutos baya esférica de 6-10 cm con cáscara lisa violeta-purpúrea oscuro (raza más común) o verde-amarillenta (raza alba), pulpa lechosa-mucilaginosa blanca a rosada muy dulce (15-18 °Brix) con 4-10 semillas grandes negras dispuestas en figura estrellada visible al corte transversal — origen del nombre comercial \"star apple\" en mercados anglófonos. Cosecha por color violeta intenso brillante y blandeo suave; frutos verdes son astringentes por latex no maduro (lección sobre maduración postcosecha y compuestos secundarios). El árbol exuda latex blanco-lechoso al cortarse (carácter Sapotaceae) usado tradicionalmente en Cuba y Antillas como ingrediente menor de gomas de mascar artesanales (no es la fuente principal, ese es Manilkara zapota). Manejo: plantación a 8-10 m entre árboles, asocio en patio tropical con cacao en sombra inicial, plátano nodriza, mango, aguacate criollo, anón, guanábana — sistema multiestrato tradicional de patios caribeños caracterizado por Pérez Arbeláez 1947 como \"ecosistema de patio campesino afrocaribeño\". Función pedagógica excelente: enseña a niñas y niños la diversidad de Sapotaceae neotropicales (junto con níspero/zapote Manilkara zapota, mamey colorado Pouteria sapota, caimo silvestre Pouteria caimito), patrón ecológico de hojas con doble color (dorado-bronceado por envés — adaptación a alta radiación tropical reflejando luz infrarroja y reduciendo pérdida de agua), polinización por abejas nativas sin aguijón (meliponicultura urbana), maduración postcosecha y compuestos astringentes-taninos en frutos inmaduros, latex blanco como carácter Sapotaceae. Importancia cultural en Caribe colombiano como árbol de patio tradicional, alimento dulce de temporada (julio-noviembre en Atlántico), refugio de aves (tángaras Thraupidae se alimentan de frutos maduros y dispersan semillas). Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA manual frutales tropicales, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.398Z"
+}

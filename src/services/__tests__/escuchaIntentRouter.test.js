@@ -52,6 +52,10 @@ describe('routeUtterance', () => {
     { frase: 'abrame el cafe', esperado: { tipo: 'navegar', view: 'cafe' } },
     { frase: 'quiero ver el suelo', esperado: { tipo: 'navegar', view: 'suelo' } },
     { frase: 'muestreme el mercado', esperado: { tipo: 'navegar', view: 'mercado' } },
+    { frase: 'lleveme al mundo del cafe', esperado: { tipo: 'navegar', view: 'valle3d', mundo: 'cafe' } },
+    { frase: 'muestreme el mundo del agua', esperado: { tipo: 'navegar', view: 'valle3d', mundo: 'agua' } },
+    { frase: 'muestreme el agua', esperado: { tipo: 'navegar', view: 'valle3d', mundo: 'agua' } },
+    { frase: 'hola chagra lleveme al mundo del suelo', esperado: { tipo: 'navegar', view: 'valle3d', mundo: 'suelo' } },
     { frase: '¿por qué se amarilla el tomate?', esperado: { tipo: 'agente' } },
     { frase: '¿por qué se amarilla el café?', esperado: { tipo: 'agente' } },
     { frase: '¿por qué se amarilla el plátano?', esperado: { tipo: 'agente' } },
@@ -82,6 +86,9 @@ describe('routeUtterance', () => {
         view: esperado.view,
         etiqueta: expect.any(String),
       });
+      if (esperado.mundo) {
+        expect(/** @type {any} */ (r).initialData).toEqual({ mundo: esperado.mundo });
+      }
     } else {
       expect(r).toMatchObject({ tipo: 'agente' });
       if (r.tipo === 'agente' && 'prompt' in esperado) {

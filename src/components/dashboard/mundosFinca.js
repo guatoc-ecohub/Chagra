@@ -276,6 +276,17 @@ export const MUNDOS_FINCA = [
             { view: 'calendario_finca', label: 'Cuándo sembrar', desc: 'Las fechas de semillero y trasplante para su clima', emoji: '🗓️' },
         ],
     },
+    {
+        id: 'micorrizas',
+        titulo: 'La red del suelo',
+        emoji: '🍄',
+        lema: 'El internet de hongos que conecta y alimenta sus matas bajo tierra',
+        // Turquesa de micelio + mint clarito (fondo de tarjeta).
+        tinte: ['#1f9e86', '#d6f2ea'],
+        // Mundo 3D flagship (la red micorrízica bajo tierra, con pulsos de
+        // nutrientes y el Ent asomando). La tarjeta abre el mundo directo.
+        directo: { view: 'mundo3d_micorrizas' },
+    },
 ];
 
 /** Mapa id → mundo, para resolver desde la ruta 'mundo'. */

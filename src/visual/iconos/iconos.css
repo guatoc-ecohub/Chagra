@@ -1,0 +1,37 @@
+/*
+ * iconos.css — la vida de los iconos propios de la casa (hermanos menores de
+ * los bichos rubber-hose: misma tinta, mismo respeto por reduced-motion).
+ */
+
+/* El VAPOR del tinto: cada voluta sube, se abre y se desvanece, con fases
+   alternadas para que el humo nunca respire en bloque. */
+.icono-taza__vapor {
+  animation: icono-taza-vapor 2.6s ease-in-out infinite;
+  transform-origin: center 70%;
+}
+.icono-taza__vapor--2 {
+  animation-delay: -1.3s;
+}
+.icono-taza__vapor--3 {
+  animation-delay: -0.65s;
+  animation-duration: 3.1s;
+}
+@keyframes icono-taza-vapor {
+  0% { opacity: 0; transform: translateY(2.5px) scaleX(0.9); }
+  35% { opacity: 0.85; }
+  100% { opacity: 0; transform: translateY(-3.5px) scaleX(1.12); }
+}
+
+/* Quieto pero digno: sin animación, el vapor queda presente a media tinta. */
+.icono-taza--quieta .icono-taza__vapor {
+  animation: none;
+  opacity: 0.55;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .icono-taza .icono-taza__vapor {
+    animation: none;
+    opacity: 0.55;
+    transform: none;
+  }
+}

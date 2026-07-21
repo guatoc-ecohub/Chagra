@@ -225,7 +225,7 @@ describe('fetchSkyConditions — fetch directo Open-Meteo', () => {
     const mod = await importFresh();
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
-    await expect(mod.fetchSkyConditions({})).resolves.toBeNull();
+    await expect(mod.fetchSkyConditions(/** @type {any} */ ({}))).resolves.toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

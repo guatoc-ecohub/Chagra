@@ -1,0 +1,65 @@
+{
+  "species_slug": "cocos_nucifera",
+  "scientific_name": "Cocos nucifera L.",
+  "common_names": [
+    "Coco"
+  ],
+  "family": "Arecaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "biomass_producer",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Germinacion en vivero de 6-12 meses; requiere transplante a sitio definitivo con suelo profundo y bien drenado. Palma emblematica de la Costa Caribe y Pacifica colombiana."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 300,
+      "max_absoluto": 500
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 24,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El arbol de la vida tropical: ensenia aprovechamiento integral (agua, alimento, fibra, aceite, vivienda) en sistemas agroforestales de la costa colombiana. Caso de estudio en resiliencia costera y seguridad alimentaria.",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.374Z"
+}

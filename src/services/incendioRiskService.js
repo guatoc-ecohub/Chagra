@@ -196,7 +196,7 @@ export function evaluarRiesgoIncendio(opts = {}) {
     factores.push('En páramo, una quema es especialmente grave: el suelo orgánico (turba) puede arder bajo tierra por semanas y el ecosistema tarda décadas o siglos en recuperarse.');
   }
 
-  return {
+  return /** @type {any} */ ({
     nivel,
     es_estimacion: true,
     fase_enso: fam,
@@ -217,11 +217,12 @@ export function evaluarRiesgoIncendio(opts = {}) {
       'Temporadas secas: climatología IDEAM (régimen de lluvias de Colombia)',
       'Impacto de El Niño en incendios: IDEAM / UNGRD (DR-MISSION-4)',
     ],
-  };
+  });
 }
 
 /** Recomendaciones accionables por nivel y contexto. Cero alarmismo. */
-function recomendacionesPara(nivel, { region, piso } = {}) {
+function recomendacionesPara(nivel, opts = /** @type {any} */ ({})) {
+  const { region, piso } = opts;
   if (nivel === 'bajo') {
     return [
       'Mantén rondas cortafuego limpias y aprovecha para hacer mantenimiento preventivo.',

@@ -1,0 +1,97 @@
+/*
+ * transformacion.css — POWER-UP "modo poder" species-agnostic (aprobado para
+ * TODOS los bichos). Clase maestra `.is-powered-up` + variable `--aura-color`:
+ * cambiando SOLO esa variable cada bicho tiene su aura (abeja dorada, oso rojo,
+ * rana verde, jaguar púrpura…). Cuatro capas de la ficha DR
+ * (ficha DR animación rubber-hose §4). Todo CSS/SVG, cero WebGL.
+ *
+ * DÓNDE VA: sobre un ELEMENTO HTML que envuelve a la creature (avatar/diálogo).
+ * Los pseudo-elementos (::before) y `mix-blend-mode` no aplican a nodos SVG, por
+ * eso la capa 1/2/3 viven en el wrapper DOM; la capa 4 (corrientes) es el
+ * componente `AuraPoder`. Fable extiende a inline por-bicho después.
+ *
+ * GATE: `prefers-reduced-motion` deja el aura ESTÁTICA (sigue leyéndose "en
+ * modo poder") pero sin latir ni levitar.
+ */
+
+.is-powered-up {
+  /* Aura por defecto: dorada (Angelita). Cada bicho la pisa con su color. */
+  --aura-color: #ffd54a;
+  position: relative;
+  transform-origin: center bottom;
+  /* Capa 2 — BOOST estático: satura, aviva y aureola el contorno. */
+  filter: saturate(180%) brightness(120%) drop-shadow(0 0 15px var(--aura-color));
+  /* Capa 3 — INGRAVIDEZ: se agranda y flota (loop senoidal en el keyframe). */
+  animation: poder-levita 1.8s ease-in-out infinite;
+  will-change: transform, filter;
+}
+
+/* Capa 1 — AURA RADIAL: resplandor por detrás que LATE (scale 1.5↔2.2,
+   opacity 0.8↔0.4), fundido en pantalla (screen) para sumar luz, no tapar. */
+.is-powered-up::before {
+  content: '';
+  position: absolute;
+  inset: -35%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--aura-color) 0%, transparent 70%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: poder-aura 1.1s ease-in-out infinite;
+}
+
+@keyframes poder-aura {
+  0%, 100% { transform: scale(1.5); opacity: 0.4; }
+  50%      { transform: scale(2.2); opacity: 0.8; }
+}
+
+@keyframes poder-levita {
+  0%, 100% { transform: scale(1.05) translateY(-10px); }
+  50%      { transform: scale(1.05) translateY(-16px); }
+}
+
+/* Capa 4 — CORRIENTES ascendentes: líneas verticales que suben y se desvanecen,
+   escalonadas por :nth-child (energía que emana). El SVG lo pone `AuraPoder`. */
+.poder-corrientes {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.poder-corriente {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: poder-sube 0.95s linear infinite;
+}
+
+@keyframes poder-sube {
+  0%   { transform: translateY(25%);  opacity: 0; }
+  18%  { opacity: 0.9; }
+  100% { transform: translateY(-140%); opacity: 0; }
+}
+
+/* Stagger: cada corriente arranca en un momento distinto → chorro continuo. */
+.poder-corriente:nth-child(1) { animation-delay: 0s; }
+.poder-corriente:nth-child(2) { animation-delay: 0.16s; }
+.poder-corriente:nth-child(3) { animation-delay: 0.32s; }
+.poder-corriente:nth-child(4) { animation-delay: 0.48s; }
+.poder-corriente:nth-child(5) { animation-delay: 0.64s; }
+.poder-corriente:nth-child(6) { animation-delay: 0.8s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .is-powered-up,
+  .is-powered-up::before,
+  .poder-corriente {
+    animation: none;
+  }
+  /* Fotograma digno: aura visible (poder ON) pero quieta, y una sola corriente
+     insinuada; sin flotar (transform neutro para no dejarla desplazada). */
+  .is-powered-up { transform: scale(1.05); }
+  .is-powered-up::before { opacity: 0.6; transform: scale(1.9); }
+  .poder-corriente { opacity: 0.5; }
+}

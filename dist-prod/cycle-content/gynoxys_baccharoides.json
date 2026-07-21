@@ -1,0 +1,82 @@
+{
+  "species_slug": "gynoxys_baccharoides",
+  "scientific_name": "Gynoxys baccharoides (Kunth) Cass.",
+  "common_names": [
+    "Molasco (Gynoxys baccharoides)"
+  ],
+  "family": "Asteraceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Aquenios con vilano blanco. Recolección temporada seca. Germinación 30-60 días en vivero con sustrato turba + arena 2:1. Trasplante bolsa 4 meses, plantación >12 meses. Esquejes semileñosos viables (~50% prendimiento con auxinas). Crecimiento moderado-rápido (~10-15 cm/año primeros años). Atractor polinizadores. Aplica Ley 1930/2018."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 3000,
+      "optimo_min": 3200,
+      "optimo_max": 3900,
+      "max_absoluto": 4200
+    },
+    "temperatura_c": {
+      "helada_letal": -10,
+      "optimo_min": 3,
+      "optimo_max": 11,
+      "max_tolerable": 16
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El molasco o gynoxys (Gynoxys baccharoides (Kunth) Cass., familia Asteraceae) es un arbolito o arbusto arborescente del páramo y sub-páramo andino colombiano-ecuatoriano-peruano (3.000-4.200 msnm), uno de los pocos árboles compuestos arborescentes que persisten en la franja paramuna por encima del límite del bosque altoandino convencional. El género Gynoxys (Asteraceae-Senecioneae, ~85 especies neotropicales con epicentro andino) representa una de las radiaciones más espectaculares de árboles paramunos del neotrópico, junto con Polylepis (Rosaceae) y Buddleja (Scrophulariaceae). Cuatrecasas y Robinson clarificaron la sistemática del grupo en revisiones 1970-1990. Arbolito 3-8 m altura con tronco corto retorcido y ramificación desde la base, corteza pardo-grisácea fisurada. Hojas opuestas decusadas (rasgo diagnóstico del género — contrasta con la alternancia general de Asteraceae) oblongo-elípticas (4-10 cm) coriáceas con haz verde-oscuro y envés tomentoso blanco-amarillento densamente cubierto por tricomas que cumplen función termorreguladora y reducen pérdida hídrica por viento andino. Inflorescencia en panícula corimbiforme terminal con numerosos capítulos amarillo-dorados pequeños (8-12 mm), flores liguladas marginales + flores discoidales centrales — patrón estructural típico de Senecioneae. Polinización por himenópteros andinos (Bombus rohweri, B. funebris, abejas nativas Meliponini de altura), sírfidos, mariposas paramunas; recurso nectarífero importante en temporada seca. Aquenios con vilano blanco-plateado, dispersión anemócora eficiente. Servicio ecosistémico estratégico: especie pionera + nurse plant en restauración de páramo intervenido, estructura para fauna paramuna (Cinclodes albidiventris, Asthenes flammulata, ratones andinos Akodon, Thomasomys), recurso polinizador en temporada seca crítica para abejas y mariposas. Distribución colombiana: cordillera Central (Cauca, Huila, Tolima, Quindío, Risaralda, Caldas) y porciones del Macizo Colombiano y Andes del sur (Nariño, Putumayo) en complejos paramunos y sub-páramo (3.000-4.200 msnm). Más limitada en cordillera Oriental (presencia escasa en Sumapaz, Chingaza, Iguaque) con géneros relacionados (Paragynoxys) dominando ese cinturón. Amenazas: tala para leña y construcción de cercas en veredas paramunas, quema para apertura de potreros, fragmentación por expansión de papa pastusa, pisoteo ganadero. Protección legal Colombia: Ley 1930/2018 en páramo delimitado, regulación CAR + Decreto 1076/2015 forestal. Estado conservación: Preocupación Menor (LC) a Vulnerable (VU) según complejo paramuno. Manejo agroecológico (restauración con autorización CAR): recolección aquenios maduros temporada seca, vivero con sustrato turba + arena 2:1, plantación intercalada con Polylepis, Diplostephium, Hypericum a densidades 400-800 ind/ha; especie útil para enriquecimiento ecológico de cercas vivas paramunas y restauración de borde bosque altoandino-páramo. Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Ley 1930/2018.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "title": "ley-1930-2018-paramos",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.404Z"
+}

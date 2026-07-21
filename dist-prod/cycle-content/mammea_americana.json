@@ -1,0 +1,90 @@
+{
+  "species_slug": "mammea_americana",
+  "scientific_name": "Mammea americana L.",
+  "common_names": [
+    "Mamey amarillo"
+  ],
+  "family": "Calophyllaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "injerto"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla recalcitrante grande (4-7 cm) viable 1-2 meses; germinación 45-90 días sin tratamiento. Árboles francos productivos a 6-9 años. Plantación a 10-12 m, tolerante a sal marina y vientos costeros (carácter caribeño), suelos bien drenados, sensible a anegamiento prolongado.",
+    "tiempo_a_establecimiento_dias": 120,
+    "notas": "Frutos cosechados maduros por color marrón-óxido firme; pulpa amarillo-anaranjada firme dulce-aromática sabor a albaricoque-mango-melocotón. Semillas y látex tóxicos a insectos — uso como insecticida tradicional (mammeína).",
+    "fuente": "POWO Kew; GBIF; Pérez Arbeláez 1947; SiB Colombia; AGROSAVIA"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 50,
+      "optimo_max": 800,
+      "max_absoluto": 1100
+    },
+    "temperatura_c": {
+      "helada_letal": 5,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El mamey amarillo o mamey de Cartagena (Mammea americana L., Calophyllaceae — antes Clusiaceae sensu lato hasta la reclasificación APG III-IV 2009-2016) es un árbol frutal perenne nativo del Caribe insular (Antillas Mayores) y continental (norte de Sudamérica — Colombia, Venezuela, Panamá), considerado uno de los pocos frutales NATIVOS del Caribe colombiano por excelencia (a diferencia del níspero/zapote Manilkara zapota que es mesoamericano y el mamey colorado Pouteria sapota que es mesoamericano-yucateco — el mamey amarillo SÍ es nativo caribeño-circuncaribe, presente en Colombia desde antes del contacto colonial documentado por crónicas tempranas del siglo XVI en Cartagena de Indias, origen del nombre vernáculo regional \"mamey de Cartagena\"). Distribución colombiana en zonas cálidas costeras del Caribe (Atlántico, Bolívar — especialmente Montes de María y Cartagena, Magdalena — Santa Marta y Ciénaga Grande, Córdoba, Sucre — San Onofre y Tolú, Cesar, La Guajira sur), Chocó biogeográfico (Quibdó, Bahía Solano, Nuquí), zonas bajas de Antioquia (Urabá), Valle medio y bajo Magdalena, Llanos bajos cálidos y zonas urbanas tropicales entre 0 y 800 msnm con temperaturas 22-30 °C, sol pleno, suelos bien drenados, tolerante a brisas salinas y vientos costeros. Árbol siempreverde majestuoso de 15-25 m altura con copa piramidal-densa simétrica de gran valor ornamental y de sombra, madera dura rojiza usada en carpintería de exterior y construcciones rurales tradicionales. Hojas grandes (10-25 cm) opuestas-coriáceas elíptico-oblongas verde-oscuro brillante por el haz con puntos translúcidos visibles al trasluz (glándulas oleíferas características del clado Calophyllaceae-Clusiaceae). Flores blanco-cremosas perfumadas grandes (3-5 cm) solitarias o en grupos pequeños en ramas — polinizadas por abejas, mariposas y murciélagos. Frutos baya esférica-globosa (8-20 cm diámetro, 0.5-2 kg), cáscara marrón-óxido coriácea-fibrosa firme que se pela manualmente revelando pulpa amarillo-anaranjada firme aromática (12-18 °Brix) de sabor delicioso comparado a albaricoque-melocotón-mango-vainilla (de ahí el nombre antillano histórico \"albaricoque de Santo Domingo\" usado por colonos franceses-españoles caribeños), con 1-4 semillas grandes lustrosas marrón-rojizas. Manejo: plantación a 10-12 m, ideal para patios tropicales costeros tradicionales caribeños, asocio con coco, plátano, mango, anón, guanábana, papaya, cacao, ñame, yuca — sistema multiestrato afrocaribe documentado por Pérez Arbeláez 1947. PROPIEDAD INSECTICIDA NATURAL DESTACADA: semillas y látex contienen mammeína (cumarinas insecticidas naturales) usadas tradicionalmente en Antillas-Caribe como insecticida natural para piojos, pulgas, chinches y plagas de cultivos — lección pedagógica importante sobre química verde y biopesticidas tradicionales (precursores naturales de los piretroides modernos), aunque deben manejarse con precaución porque también son tóxicos a peces y mamíferos en dosis altas (no comer las semillas crudas). Las flores se usan tradicionalmente para perfumar licores caribeños (\"crème de mamey\", \"eau de mammée\") por su aroma intenso vainilla-tropical. Función pedagógica excelente: enseña a niñas y niños (1) que SÍ existen frutales NATIVOS del Caribe colombiano (no todos los frutales son foráneos mesoamericanos), (2) la familia Calophyllaceae con sus glándulas oleíferas translúcidas visibles al trasluz como carácter taxonómico (compartido con Calophyllum y Garcinia), (3) biopesticidas naturales mammeína como precursor de químicas verdes modernas, (4) árboles polifuncionales fruta-madera-medicinal-insecticida-ornamental característicos de sistemas agroforestales caribeños tradicionales. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, AGROSAVIA.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.398Z"
+}

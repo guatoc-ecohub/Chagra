@@ -1,0 +1,70 @@
+{
+  "species_slug": "achillea_millefolium",
+  "scientific_name": "Achillea millefolium L.",
+  "common_names": [
+    "Milenrama"
+  ],
+  "family": "Asteraceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "dynamic_accumulator",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 2000,
+      "optimo_max": 3000,
+      "max_absoluto": 3400
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "La milenrama o milhojas (Achillea millefolium L., Asteraceae) es una hierba perenne rizomatosa originaria de Eurasia y Norteamérica templada, cultivada y naturalizada en zonas frías de Colombia (2.000-3.000 msnm: altiplano cundiboyacense, Nariño, Boyacá, Antioquia, Caldas, Risaralda), de 30-80 cm de altura, con hojas alternas finamente bipinnatisectas en filamentos plumosos verde-grisáceos que parecen 'mil hojas' diminutas (de ahí el nombre), corimbos planos terminales muy llamativos de capítulos pequeños (5 mm) blancos, ocasionalmente rosados o púrpura pálido, con flores liguladas externas y flósculos centrales amarillos densamente apiñados. Es lección viva de hemostasia vegetal y compañera multifuncional de huerto que enseña a niñas y niños cómo una hierba que tomó su nombre del héroe homérico Aquiles (Achillea, según la leyenda usada por él para curar heridas en la guerra de Troya) sigue siendo hoy en día una de las pocas plantas medicinales con acción hemostática (parar sangrado de heridas pequeñas) validada farmacognosticamente por Pamplona-Roger y la OMS: los principios activos son aceite esencial con azuleno y proazulenos (chamazuleno), flavonoides, taninos, lactonas sesquiterpénicas y alcaloides (aquileína) con acción astringente, hemostática, antiinflamatoria, espasmolítica y antiséptica. Uso tradicional validado por JBB-Bogotá y Pérez-Arbeláez (1947): cataplasma de hojas frescas trituradas aplicada sobre heridas pequeñas, raspones, cortes superficiales para detener sangrado y acelerar cicatrización (botiquín verde clásico de Boy Scouts y campesinos europeos); infusión de hojas y flores como digestivo, antiespasmódico para cólicos menstruales y diarreas leves, emenagogo y tónico amargo; baños de asiento con cocimiento para hemorroides; gargarismos para gingivitis. Aliada agroecológica de huerta de gran prestigio entre permacultores: en compost actúa como activador biodinámico (preparado 502 de Steiner), acumuladora dinámica de fósforo-potasio-azufre, sembrada cerca de hortalizas mejora su resistencia a plagas, atrae avispas parasitoides (Trichogramma, sírfidos), repele algunos insectos masticadores y enriquece el aroma de hierbas vecinas. Manejo agroecológico: propagación por división de mata cada 2-3 años (cualquier sección de rizoma con yema prendimiento >95%) o por semilla muy fina (sembrar superficial, germinación 10-21 días), suelos drenados pobres a medios, tolera sequía moderada, sol pleno, distancia 30-40 cm, floración perpetua junio-octubre en altiplano, función como atractora masiva de polinizadores y benéficos, cobertura medicinal y compañera de huerto. Fuentes Tier A: GBIF, POWO Kew, Pamplona-Roger 2006, JBB Plantas Medicinales, Pérez-Arbeláez 1947.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.383Z"
+}

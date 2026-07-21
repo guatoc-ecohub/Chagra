@@ -48,7 +48,7 @@ function FondoCutaway({ params, acento }) {
       )}
       {/* las TRES HERMANAS (opt-in): maíz-fríjol-calabaza arriba y, abajo, los
           nódulos rosados del fríjol = el nitrógeno que se ve. Misma lección 2D. */}
-      {params?.milpa && <MilpaCutaway acento={acento} sueloY={tops[0]} />}
+      {params?.milpa && <MilpaCutaway sueloY={tops[0]} />}
       <rect x="0" y="0" width="300" height="200" fill="none" stroke={acento} strokeWidth="2" opacity="0.4" />
     </g>
   );

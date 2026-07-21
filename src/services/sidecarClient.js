@@ -41,10 +41,10 @@ import { buildSidecarHeaders } from './tierService.js';
 // meta-pregunta) se resolvían a especies fantasma (col rizada / Pennisetum
 // setaceum) y el agente construía la respuesta sobre esa basura porque el
 // único filtro (filterNoiseEntities) corría DESPUÉS de que el LLM ya había
-// respondido (outputGuards.applyOutputGuards). Filtramos ACÁ, apenas llega la
+// respondido (outputGuards.applyOutputGuards). Filtramos AQUÍ, apenas llega la
 // respuesta del sidecar, para que ningún consumidor (prompt del LLM incluido)
 // vea entidades-ruido. outputGuards.js no importa nada (0 imports) → no hay
-// ciclo posible al importarlo desde acá.
+// ciclo posible al importarlo desde aquí.
 import { filterNoiseEntities } from './outputGuards.js';
 
 const NLU_TIMEOUT_MS = 18000;

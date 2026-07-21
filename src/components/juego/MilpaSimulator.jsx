@@ -49,7 +49,54 @@ import { agentSounds, isSoundEnabled, setSoundEnabled } from '../../services/age
 import { speak, stop as stopSpeak, isSupported as ttsSupported } from '../../services/ttsService';
 import { recordGameStart, recordGameComplete } from '../../services/usageTelemetryService';
 
+// FUSIÓN MILPA (audit juegos 2026-07-16): "La milpa: las tres hermanas" (mockup
+// SVG pulido, antes URL-only #/mockups/juego-la-milpa) se pliega DENTRO de este
+// simulador como su "modo ilustrado". Una sola entrada en el hub → el simulador
+// hondo (5 sistemas, LER/N/carbono) con un botón para el juego bonito de intro.
+// No se reescribe ninguna mecánica: es cableado/composición.
+import JuegoLaMilpa from '../../mockups/JuegoLaMilpa';
+
+import { Crisopa } from '../../visual/creatures/Crisopa.jsx';
+import { Trichogramma } from '../../visual/creatures/Trichogramma.jsx';
+import { Sirfido } from '../../visual/creatures/Sirfido.jsx';
+
 import './milpa.css';
+
+/**
+ * Los aliados naturales que llegan SOLOS cuando la finca tiene variedad: la
+ * crisopa y el sírfido se comen los áfidos, la avispita Trichogramma parasita
+ * los huevos de las plagas. Es control biológico REAL — un policultivo diverso
+ * les da flores y refugio, y ellos hacen la vigilancia gratis. Puro visual y
+ * educativo; no toca la mecánica del simulador.
+ */
+const ALIADOS_BIOLOGICOS = [
+  { Criatura: Sirfido, nombre: 'Sírfido', hace: 'come áfidos y poliniza' },
+  { Criatura: Crisopa, nombre: 'Crisopa', hace: 'caza mosca blanca y pulgón' },
+  { Criatura: Trichogramma, nombre: 'Avispita', hace: 'ataca el huevo de la plaga' },
+];
+
+/** Tira de los aliados de control biológico que atrae el policultivo. */
+function AliadosNaturales() {
+  return (
+    <div
+      className="rounded-3xl border border-lime-300/25 bg-emerald-950/40 p-3 milpa-fade-in"
+      data-testid="milpa-aliados-naturales"
+    >
+      <p className="mb-2 text-center text-[11px] font-black uppercase tracking-wide text-lime-300/90">
+        Cuando hay variedad, llegan solos los aliados
+      </p>
+      <div className="flex items-start justify-around gap-2">
+        {ALIADOS_BIOLOGICOS.map(({ Criatura, nombre, hace }) => (
+          <div key={nombre} className="flex flex-1 flex-col items-center gap-1 text-center">
+            <Criatura size={52} title={nombre} className="milpa-brota" />
+            <span className="text-[11px] font-black text-emerald-100">{nombre}</span>
+            <span className="text-[9px] leading-tight text-emerald-300/80">{hace}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /** Acentos por color de cultivo (estética Chagra). */
 const ACENTO = {
@@ -196,6 +243,9 @@ export default function MilpaSimulator({ onBack, onHome }) {
   const [consejoVisible, setConsejoVisible] = useState({});
   const [resultadosTemporadas, setResultadosTemporadas] = useState([]);
   const [medallasObtenidas, setMedallasObtenidas] = useState([]);
+  // Modo de vista de la Milpa fusionada: 'simulador' (hondo, por defecto) vs
+  // 'ilustrado' (el mini-juego SVG "tres hermanas"). Una sola entrada, dos caras.
+  const [modoVista, setModoVista] = useState('simulador');
 
   // Telemetría de uso ANÓNIMA: inicio del juego al montar (una vez).
   useEffect(() => { recordGameStart('milpa'); }, []);
@@ -416,6 +466,13 @@ export default function MilpaSimulator({ onBack, onHome }) {
     return asoc.cultivos.map((id) => CULTIVO_POR_ID[id]).filter(Boolean);
   }, [sistemaActivo]);
 
+  // Modo ilustrado (juego SVG "las tres hermanas"). Se monta como pantalla
+  // completa; su "Salir" regresa al simulador hondo. El early-return va DESPUÉS
+  // de todos los hooks para no violar las reglas de hooks.
+  if (modoVista === 'ilustrado') {
+    return <JuegoLaMilpa onBack={() => setModoVista('simulador')} />;
+  }
+
   return (
     <ScreenShell
       title="Asociaciones"
@@ -471,7 +528,21 @@ export default function MilpaSimulator({ onBack, onHome }) {
                 Las plantas se ayudan cuando crecen juntas. Elige una asociación
                 y descubre cómo rinde más que sembrar cada cultivo solo.
               </p>
+              {/* Puente a la "cara bonita" de la Milpa: el mini-juego SVG de las
+                  tres hermanas (fusión audit 2026-07-16). Misma Milpa, modo
+                  ilustrado para entrar jugando. */}
+              <button
+                type="button"
+                data-testid="milpa-modo-ilustrado"
+                onClick={() => setModoVista('ilustrado')}
+                className="mt-3 inline-flex items-center gap-2 rounded-2xl border-2 border-lime-300/50 bg-lime-500/15 px-4 py-2.5 text-sm font-black text-lime-100 hover:bg-lime-500/25 active:scale-[0.98] transition"
+              >
+                <Sparkles size={18} aria-hidden="true" />
+                Jugar «Las tres hermanas» (modo ilustrado)
+              </button>
             </header>
+
+            <AliadosNaturales />
 
             <section className="grid grid-cols-1 gap-3">
               <h3 className="text-sm font-black text-emerald-200">Sistemas</h3>

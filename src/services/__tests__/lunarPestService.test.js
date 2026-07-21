@@ -15,33 +15,33 @@ describe('lunarPestService — pestMonitoringWindow', () => {
     });
 
     test('objeto vacío → null', () => {
-      expect(pestMonitoringWindow({})).toBeNull();
+      expect(pestMonitoringWindow(/** @type {any} */ ({}))).toBeNull();
     });
 
     test('objeto sin daysSinceNewMoon → null', () => {
       expect(
-        pestMonitoringWindow({
+        pestMonitoringWindow(/** @type {any} */ ({
           daysToNewMoon: 5,
           fraction: 0.5,
-        })
+        }))
       ).toBeNull();
     });
 
     test('daysSinceNewMoon null → null', () => {
       expect(
-        pestMonitoringWindow({
+        pestMonitoringWindow(/** @type {any} */ ({
           daysSinceNewMoon: null,
           daysToNewMoon: 5,
-        })
+        }))
       ).toBeNull();
     });
 
     test('daysSinceNewMoon string → null (type check)', () => {
       expect(
-        pestMonitoringWindow({
+        pestMonitoringWindow(/** @type {any} */ ({
           daysSinceNewMoon: '5',
           daysToNewMoon: 10,
-        })
+        }))
       ).toBeNull();
     });
   });

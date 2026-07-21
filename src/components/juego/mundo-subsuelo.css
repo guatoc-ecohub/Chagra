@@ -100,6 +100,42 @@
   100% { transform: translateY(12px); opacity: 0.15; }
 }
 
+/* La gotica de infiltración baja por su canal y desaparece al fondo. */
+.msx-gota {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: msx-gotear 2.6s ease-in infinite;
+}
+@keyframes msx-gotear {
+  0% { transform: translateY(-42px) scale(0.7); opacity: 0; }
+  25% { opacity: 0.9; }
+  85% { opacity: 0.9; }
+  100% { transform: translateY(6px) scale(1); opacity: 0; }
+}
+
+/* El mineral que la red sube a la mata: asciende y titila (uptake). */
+.msx-mineral {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: msx-uptake 3.4s ease-in-out infinite;
+}
+@keyframes msx-uptake {
+  0% { transform: translateY(6px); opacity: 0.4; }
+  50% { transform: translateY(-6px); opacity: 1; }
+  100% { transform: translateY(6px); opacity: 0.4; }
+}
+
+/* Las uniones del micelio respiran (halo que late suave). */
+.msx-nodo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: msx-nodo-latir 3s ease-in-out infinite;
+}
+@keyframes msx-nodo-latir {
+  0%, 100% { transform: scale(0.85); opacity: 0.35; }
+  50% { transform: scale(1.15); opacity: 0.7; }
+}
+
 /* ── HUD: medidor y puntaje con feedback ─────────────────────────────── */
 
 /* La barra se desliza suave hacia su nuevo valor. */
@@ -199,6 +235,9 @@
   .msx-lombriz,
   .msx-chispa,
   .msx-agua,
+  .msx-gota,
+  .msx-mineral,
+  .msx-nodo,
   .msx-meter-fill::after,
   .msx-punch,
   .msx-entra,

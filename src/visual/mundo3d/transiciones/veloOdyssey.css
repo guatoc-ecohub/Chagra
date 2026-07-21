@@ -1,0 +1,663 @@
+/*
+ * veloOdyssey.css — coreografías del velo de cruce entre mundos.
+ *
+ * Contrato compartido con velosData.js (NO cambiar uno sin el otro):
+ *   ·  0%–14%   anticipación (el velo se recoge — movimiento contrario);
+ *   · 14%–46%   lanzamiento (cubre con aceleración);
+ *   · 46%–62%   MESETA: pantalla 100% cubierta (el host intercambia escena
+ *               a los 54%, cronometrado por los timers JS del componente);
+ *   · 62%–100%  resolución (revela con overshoot al entrar; exhala al volver).
+ *
+ * Variables (las setea el componente):
+ *   --vo-claro / --vo-medio / --vo-profundo   tríada del velo
+ *   --vo-ms                                   duración total del cruce
+ *
+ * Solo transform/opacity en lo caliente (compositor). La única excepción es
+ * el abrazo de luz al volver (width/height de UN elemento ~1s — el patrón
+ * clásico de iris con box-shadow gigante, igual que TransicionMundoKit).
+ *
+ * Tier: el componente poda las DECORACIONES por tier (jirones, hojas,
+ * piedritas, halos) — este CSS solo degrada detalles (boil, blur) y trae la
+ * red de seguridad reduced-motion.
+ */
+
+.vo {
+  position: fixed;
+  inset: 0;
+  z-index: 46; /* sobre el velo original (40) y el kit (44) */
+  overflow: hidden;
+  pointer-events: auto; /* escudo: nada de toques a mitad del cruce */
+}
+
+/* ============================ NIEBLA (páramo) =========================== */
+/* Entrar: la bruma SUBE del fondo, se recoge, envuelve y se abre en jirones.
+ * Volver: la niebla condensa en el aire, abraza suave y CAE revelando casa. */
+
+.vo__manto {
+  position: absolute;
+  inset: -6% 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--vo-claro) 88%, #ffffff) 0%,
+    var(--vo-medio) 46%,
+    color-mix(in srgb, var(--vo-profundo) 85%, #2e4650) 100%
+  );
+  will-change: transform, opacity;
+}
+
+.vo[data-velo='niebla'][data-fase='entrando'] .vo__manto {
+  animation: voNieblaEntra var(--vo-ms) linear both;
+}
+
+.vo[data-velo='niebla'][data-fase='saliendo'] .vo__manto {
+  animation: voNieblaVuelve var(--vo-ms) linear both;
+}
+
+@keyframes voNieblaEntra {
+  0% {
+    transform: translateY(104%) scale(1);
+    opacity: 1;
+    animation-timing-function: ease-out;
+  }
+  14% {
+    /* anticipación: la bruma se recoge un respiro antes de trepar */
+    transform: translateY(109%) scale(1);
+    animation-timing-function: cubic-bezier(0.6, 0.05, 0.8, 0.5);
+  }
+  46%,
+  62% {
+    transform: translateY(0%) scale(1);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.22, 1.1, 0.42, 1);
+  }
+  84% {
+    opacity: 0.55;
+  }
+  100% {
+    /* se abre en jirones: crece un poco mientras se disuelve */
+    transform: translateY(-3%) scale(1.14);
+    opacity: 0;
+  }
+}
+
+@keyframes voNieblaVuelve {
+  0% {
+    transform: translateY(0%) scale(1.1);
+    opacity: 0;
+    animation-timing-function: ease-in-out;
+  }
+  14% {
+    opacity: 0.14;
+    animation-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.5);
+  }
+  46%,
+  62% {
+    transform: translateY(0%) scale(1);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.3, 0.6, 0.25, 1);
+  }
+  100% {
+    /* la niebla cae al fondo del valle: uno ya llegó a casa */
+    transform: translateY(78%) scale(1.02);
+    opacity: 0;
+  }
+}
+
+/* Jirones decorativos: bancos alargados que cruzan a distintas alturas. */
+.vo__jiron {
+  position: absolute;
+  width: 72vmax;
+  height: 16vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    color-mix(in srgb, var(--vo-claro) 92%, #ffffff) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  animation: voJiron calc(var(--vo-ms) * 0.9) ease-in-out both;
+  will-change: transform, opacity;
+}
+
+.vo__jiron--1 {
+  top: 12%;
+  left: -30%;
+}
+
+.vo__jiron--2 {
+  top: 44%;
+  left: 40%;
+  animation-delay: calc(var(--vo-ms) * 0.1);
+  animation-direction: reverse;
+}
+
+.vo__jiron--3 {
+  top: 70%;
+  left: -10%;
+  animation-delay: calc(var(--vo-ms) * 0.18);
+}
+
+@keyframes voJiron {
+  0% {
+    transform: translateX(-18vw);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.85;
+  }
+  70% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(26vw);
+    opacity: 0;
+  }
+}
+
+/* ========================= TIERRA (suelo/humus) ========================= */
+/* Bloque de 220vh que barre en vertical: entrar SUBE (uno desciende al
+ * subsuelo); volver BAJA (la tierra cae y uno emerge hacia la luz).
+ * El borde es el horizonte del suelo: pasto, terrones y raicillas (SVG). */
+
+.vo__suelo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 220vh;
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.vo[data-velo='tierra'][data-fase='entrando'] .vo__suelo {
+  animation: voTierraEntra var(--vo-ms) linear both;
+}
+
+.vo[data-velo='tierra'][data-fase='saliendo'] .vo__suelo {
+  animation: voTierraVuelve var(--vo-ms) linear both;
+}
+
+.vo__horizonte {
+  display: block;
+  width: 100%;
+  height: 9vh;
+  flex: none;
+}
+
+.vo__horizonte--frente path {
+  fill: var(--vo-claro);
+}
+
+.vo__horizonte--cola {
+  transform: scaleY(-1);
+}
+
+.vo__horizonte--cola path {
+  fill: var(--vo-profundo);
+}
+
+.vo__suelo-cuerpo {
+  flex: 1;
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    var(--vo-claro) 0%,
+    var(--vo-medio) 34%,
+    var(--vo-profundo) 72%
+  );
+}
+
+/* Piedritas y lombriz de aire: motas que viajan con el bloque de tierra. */
+.vo__piedrita {
+  position: absolute;
+  width: 0.9vmax;
+  height: 0.7vmax;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--vo-claro) 55%, var(--vo-profundo));
+  opacity: 0.8;
+}
+
+.vo__piedrita--1 {
+  left: 18%;
+  top: 22%;
+  width: 1.3vmax;
+}
+
+.vo__piedrita--2 {
+  left: 64%;
+  top: 12%;
+}
+
+.vo__piedrita--3 {
+  left: 41%;
+  top: 38%;
+  width: 0.7vmax;
+}
+
+.vo__piedrita--4 {
+  left: 82%;
+  top: 30%;
+  width: 1.1vmax;
+  height: 0.9vmax;
+}
+
+/* Cobertura en meseta: bloque en -60vh ⇒ el cuerpo tapa 0..100vh completo. */
+@keyframes voTierraEntra {
+  0% {
+    transform: translateY(102vh);
+    animation-timing-function: ease-out;
+  }
+  14% {
+    /* anticipación: el suelo se hunde un respiro antes de tragarse el cielo */
+    transform: translateY(108vh);
+    animation-timing-function: cubic-bezier(0.6, 0.05, 0.8, 0.5);
+  }
+  46%,
+  62% {
+    transform: translateY(-60vh);
+    animation-timing-function: cubic-bezier(0.22, 1.16, 0.42, 1);
+  }
+  100% {
+    transform: translateY(-232vh);
+  }
+}
+
+@keyframes voTierraVuelve {
+  0% {
+    transform: translateY(-320vh);
+    animation-timing-function: ease-out;
+  }
+  14% {
+    transform: translateY(-326vh);
+    animation-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.5);
+  }
+  46%,
+  62% {
+    transform: translateY(-60vh);
+    animation-timing-function: cubic-bezier(0.3, 0.6, 0.25, 1);
+  }
+  100% {
+    transform: translateY(112vh);
+  }
+}
+
+/* ============================ HOJAS (monte) ============================= */
+/* La fronda: un disco de follaje que gira mientras cierra el camino, y al
+ * revelar sigue de largo un pelo (overshoot) antes de disolverse. */
+
+.vo__fronda {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 245vmax;
+  height: 245vmax;
+  margin: -122.5vmax 0 0 -122.5vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--vo-claro) 80%, #ffffff) 0%,
+    var(--vo-medio) 34%,
+    var(--vo-profundo) 76%
+  );
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.vo[data-velo='hojas'][data-fase='entrando'] .vo__fronda {
+  animation: voFrondaEntra var(--vo-ms) linear both;
+}
+
+.vo[data-velo='hojas'][data-fase='saliendo'] .vo__fronda {
+  animation: voFrondaVuelve var(--vo-ms) linear both;
+}
+
+@keyframes voFrondaEntra {
+  0% {
+    transform: scale(0.06) rotate(-52deg);
+    opacity: 0;
+    animation-timing-function: ease-out;
+  }
+  14% {
+    /* anticipación: el remolino se enrosca ANTES de abrirse a cubrir */
+    transform: scale(0.035) rotate(-64deg);
+    opacity: 0.9;
+    animation-timing-function: cubic-bezier(0.6, 0.05, 0.8, 0.5);
+  }
+  46%,
+  62% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.22, 1.2, 0.42, 1);
+  }
+  86% {
+    opacity: 0.5;
+  }
+  100% {
+    /* overshoot: sigue girando de largo mientras el monte se abre */
+    transform: scale(1.3) rotate(26deg);
+    opacity: 0;
+  }
+}
+
+@keyframes voFrondaVuelve {
+  0% {
+    transform: scale(1.28) rotate(30deg);
+    opacity: 0;
+    animation-timing-function: ease-in-out;
+  }
+  14% {
+    opacity: 0.3;
+    animation-timing-function: cubic-bezier(0.55, 0.06, 0.68, 0.5);
+  }
+  46%,
+  62% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.3, 0.6, 0.25, 1);
+  }
+  100% {
+    /* al volver el remolino se deshoja hacia el centro, sin rebote */
+    transform: scale(0.05) rotate(-40deg);
+    opacity: 0;
+  }
+}
+
+/* Hojas sueltas que cruzan en arco delante de la fronda. */
+.vo__hoja {
+  position: absolute;
+  width: 5.5vmax;
+  height: 5.5vmax;
+  opacity: 0;
+  animation: voHoja calc(var(--vo-ms) * 0.82) cubic-bezier(0.35, 0, 0.4, 1) both;
+  will-change: transform, opacity;
+}
+
+.vo__hoja svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.vo__hoja--1 {
+  left: 6%;
+  top: 64%;
+}
+
+.vo__hoja--2 {
+  left: 26%;
+  top: 18%;
+  animation-delay: calc(var(--vo-ms) * 0.08);
+  width: 4vmax;
+  height: 4vmax;
+}
+
+.vo__hoja--3 {
+  left: 58%;
+  top: 70%;
+  animation-delay: calc(var(--vo-ms) * 0.14);
+}
+
+.vo__hoja--4 {
+  left: 74%;
+  top: 26%;
+  animation-delay: calc(var(--vo-ms) * 0.05);
+  width: 3.4vmax;
+  height: 3.4vmax;
+}
+
+.vo__hoja--5 {
+  left: 42%;
+  top: 44%;
+  animation-delay: calc(var(--vo-ms) * 0.2);
+  width: 4.6vmax;
+  height: 4.6vmax;
+}
+
+@keyframes voHoja {
+  0% {
+    transform: translate(-16vw, 10vh) rotate(-30deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  62% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(22vw, -14vh) rotate(280deg);
+    opacity: 0;
+  }
+}
+
+/* ========================== LUZ (casa/valle) ============================ */
+/* Entrar: un destello dorado crece del centro — descubrir a plena luz.
+ * Volver: el hogar ABRAZA desde los bordes (iris cálido que se cierra sobre
+ * uno y reabre): la luz de la casa siempre estuvo ahí. */
+
+.vo__destello {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: 180vmax;
+  height: 180vmax;
+  margin: -90vmax 0 0 -90vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--vo-claro) 70%, #ffffff) 0%,
+    var(--vo-medio) 38%,
+    color-mix(in srgb, var(--vo-profundo) 88%, #142e1c) 80%
+  );
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.vo[data-velo='luz'][data-fase='entrando'] .vo__destello {
+  animation: voDestello var(--vo-ms) linear both;
+}
+
+@keyframes voDestello {
+  0% {
+    transform: scale(0.05);
+    opacity: 0;
+    animation-timing-function: ease-out;
+  }
+  14% {
+    /* anticipación: la chispa se aprieta antes de estallar */
+    transform: scale(0.03);
+    opacity: 0.9;
+    animation-timing-function: cubic-bezier(0.6, 0.05, 0.8, 0.5);
+  }
+  46%,
+  62% {
+    transform: scale(1);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.22, 1.24, 0.42, 1);
+  }
+  100% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
+}
+
+.vo__abrazo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 240vmax;
+  height: 240vmax;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 4px solid color-mix(in srgb, var(--vo-claro) 80%, #ffffff);
+  box-shadow:
+    0 0 0 260vmax color-mix(in srgb, var(--vo-medio) 55%, var(--vo-profundo)),
+    inset 0 0 52px var(--vo-claro);
+}
+
+.vo[data-velo='luz'][data-fase='saliendo'] .vo__abrazo {
+  animation: voAbrazo var(--vo-ms) cubic-bezier(0.35, 0, 0.22, 1) both;
+}
+
+/* Gama baja: el abrazo sin aro ni brillo interior (solo la cobertura). */
+.vo[data-tier='bajo'] .vo__abrazo {
+  border: 0;
+  box-shadow: 0 0 0 260vmax var(--vo-profundo);
+}
+
+@keyframes voAbrazo {
+  0% {
+    width: 240vmax;
+    height: 240vmax;
+  }
+  46%,
+  62% {
+    width: 0vmax;
+    height: 0vmax;
+  }
+  100% {
+    width: 240vmax;
+    height: 240vmax;
+  }
+}
+
+/* Halos de la hora dorada (solo decoración). */
+.vo__halo {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: 40vmax;
+  height: 40vmax;
+  margin: -20vmax 0 0 -20vmax;
+  border-radius: 50%;
+  border: 3px solid var(--vo-claro);
+  opacity: 0;
+  animation: voHalo calc(var(--vo-ms) * 0.55) cubic-bezier(0.3, 0, 0.5, 1) both;
+  will-change: transform, opacity;
+}
+
+.vo__halo--2 {
+  animation-delay: calc(var(--vo-ms) * 0.16);
+  border-color: var(--vo-medio);
+}
+
+@keyframes voHalo {
+  0% {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* ============================ LETRERO =================================== */
+/* Aparece con la cubierta y se despide con la resolución. Asimétrico en el
+ * texto (lo pone el componente): entrar anuncia, volver acoge. */
+
+.vo__letrero {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 9vh;
+  margin: 0;
+  text-align: center;
+  color: #f8fff0;
+  font-size: clamp(14px, 2.4vw, 18px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 10px rgba(10, 24, 12, 0.7);
+  opacity: 0;
+  animation: voLetrero var(--vo-ms) linear both;
+}
+
+@keyframes voLetrero {
+  0% {
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  64% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ====================== LINE-BOIL (solo tier alto) ====================== */
+/* El temblor de tinta a ~4 fps sobre las decoraciones: steps(2) entre dos
+ * poses apenas distintas. Vive en el HIJO para no pelear con el viaje del
+ * padre. Barato: un elemento por decoración, transform puro. */
+
+.vo[data-tier='alto'] .vo__hoja svg,
+.vo[data-tier='alto'] .vo__piedrita {
+  animation: voBoil 0.5s steps(2, jump-none) infinite;
+}
+
+@keyframes voBoil {
+  0% {
+    transform: rotate(-1.4deg) scale(1);
+  }
+  100% {
+    transform: rotate(1.4deg) scale(1.03);
+  }
+}
+
+/* Blur atmosférico del manto de niebla: SOLO tier alto (fill-rate caro). */
+.vo[data-tier='alto'][data-velo='niebla'] .vo__jiron {
+  filter: blur(6px);
+}
+
+/* ================== REDUCED MOTION = corte simple digno ================= */
+/* Via prop: el componente monta SOLO .vo__corte — tinte del velo que cubre
+ * al instante (el swap ocurre bajo tapa) y se desvanece corto. */
+
+.vo__corte {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(165deg, var(--vo-medio) 0%, var(--vo-profundo) 68%);
+  animation: voCorte var(--vo-ms) linear both;
+}
+
+@keyframes voCorte {
+  0%,
+  58% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Red de seguridad si el host no pasó la prop pero el sistema pide calma:
+ * fuera coreografías y decoraciones, solo el corte simple. */
+@media (prefers-reduced-motion: reduce) {
+  .vo .vo__manto,
+  .vo .vo__jiron,
+  .vo .vo__suelo,
+  .vo .vo__fronda,
+  .vo .vo__hoja,
+  .vo .vo__destello,
+  .vo .vo__abrazo,
+  .vo .vo__halo {
+    display: none;
+  }
+
+  .vo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--vo-profundo);
+    animation: voCorte var(--vo-ms) linear both;
+  }
+}

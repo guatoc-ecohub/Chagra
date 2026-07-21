@@ -37,7 +37,9 @@ import './GemeloValle2D.css';
 const VB_W = 480;
 const VB_H = 360;
 function iso(x, z) {
-  return { cx: 240 + (x - z) * 26, cy: 200 + (x + z) * 11 };
+  // (Escala al día con el VALLE GRANDE del rediseño 2026-07: los lugares
+  //  viven en x ∈ [-8.6, 8.6], z ∈ [-9.4, 9.6].)
+  return { cx: 240 + (x - z) * 12, cy: 200 + (x + z) * 8 };
 }
 function pct(x, z) {
   const { cx, cy } = iso(x, z);

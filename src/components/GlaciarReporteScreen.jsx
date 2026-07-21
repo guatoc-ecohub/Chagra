@@ -95,7 +95,12 @@ function emptyForm() {
   };
 }
 
-export default function GlaciarReporteScreen({ onBack, onVerHistorial = null }) {
+export default function GlaciarReporteScreen({ onBack, onVerHistorial = null, onNavigate = undefined }) {
+  // Fallback sin prop (barrido de controles 2026-07-15): el shell de prod no
+  // pasa onVerHistorial (es una prop específica de esta pantalla) → el botón
+  // "Ver historial" quedaba escondido en prod. Con onNavigate (que el shell
+  // SÍ inyecta) el botón vive; el shell viejo sigue pasando la suya.
+  const verHistorial = onVerHistorial ?? (onNavigate ? () => onNavigate('glaciar_historial') : null);
   const [tab, setTab] = useState('nuevo'); // 'nuevo' | 'lista'
   // U-3: el borrador autosalvado se restaura desde IndexedDB en un efecto al
   // montar (loadDraft es async). Arrancamos en vacío y, si hay borrador, lo
@@ -536,6 +541,7 @@ export default function GlaciarReporteScreen({ onBack, onVerHistorial = null }) 
               value={form.distanciaBordeHieloM}
               onChange={(v) => setField('distanciaBordeHieloM', v)}
               placeholder="ej. 12 (desde un hito fijo)"
+              icon={null}
             />
           </Section>
 
@@ -749,7 +755,7 @@ export default function GlaciarReporteScreen({ onBack, onVerHistorial = null }) 
           loading={loadingList}
           onEliminar={handleEliminar}
           onNuevo={() => setTab('nuevo')}
-          onVerHistorial={onVerHistorial}
+          onVerHistorial={verHistorial}
         />
       )}
     </div>

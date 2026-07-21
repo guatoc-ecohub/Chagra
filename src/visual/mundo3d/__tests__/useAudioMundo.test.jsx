@@ -70,7 +70,7 @@ async function cargar() {
 beforeEach(() => {
   buses.length = 0;
   master = null;
-  window.AudioContext = AudioContextMock;
+  window.AudioContext = /** @type {any} */ (AudioContextMock);
   localStorage.clear();
 });
 

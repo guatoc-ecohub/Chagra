@@ -150,7 +150,7 @@ describe('diagnosticarSuelo — cultivos específicos', () => {
 
 describe('formatearGroundingSuelo', () => {
   it('retorna vacío si sin_datos', () => {
-    expect(formatearGroundingSuelo({ sin_datos: true })).toBe('');
+    expect(formatearGroundingSuelo(/** @type {any} */ ({ sin_datos: true }))).toBe('');
     expect(formatearGroundingSuelo(null)).toBe('');
   });
 

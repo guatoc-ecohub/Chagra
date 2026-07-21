@@ -16,8 +16,8 @@ describe('alertEngine - coverage complementaria', () => {
 
     // Mock Notification API completo
     mockNotification = vi.fn();
-    mockNotification.permission = 'granted';
-    mockNotification.requestPermission = vi.fn().mockResolvedValue('granted');
+    /** @type {any} */ (mockNotification).permission = 'granted';
+    /** @type {any} */ (mockNotification).requestPermission = vi.fn().mockResolvedValue('granted');
     vi.stubGlobal('Notification', mockNotification);
 
     // Reset estado del engine
@@ -468,7 +468,7 @@ describe('alertEngine - coverage complementaria', () => {
       const errorNotification = vi.fn(() => {
         throw new Error('Notification error');
       });
-      errorNotification.permission = 'granted';
+      /** @type {any} */ (errorNotification).permission = 'granted';
       
       vi.stubGlobal('Notification', errorNotification);
       

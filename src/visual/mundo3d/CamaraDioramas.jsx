@@ -68,25 +68,25 @@ export default function CamaraDioramas({
   unaVezPorSesion = false,
 }) {
   const { camera } = useThree();
+  const camPersp = /** @type {import('three').PerspectiveCamera} */ (camera);
   /** Estado del beat en curso; null = asentado (o nunca hubo). */
   const beatRef = useRef(null);
 
   useEffect(() => {
-    const enc = resolverEncuadre(mundoId, tier);
+    const enc = resolverEncuadre(mundoId, /** @type {'alto'|'medio'|'bajo'} */ (tier));
     const hasta = new THREE.Vector3(...enc.posicion);
     const tHasta = new THREE.Vector3(...enc.target);
     const fFinal = focalDeFov(camera, enc.fov);
     const c = controls ? controls.current : null;
-
     const clavar = () => {
       beatRef.current = null;
-      camera.position.copy(hasta);
-      camera.setFocalLength(fFinal);
+      camPersp.position.copy(hasta);
+      camPersp.setFocalLength(fFinal);
       if (c) {
         c.target.copy(tHasta);
         c.update();
       }
-      camera.lookAt(tHasta);
+      camPersp.lookAt(tHasta);
     };
 
     const sinBeat =
@@ -115,10 +115,10 @@ export default function CamaraDioramas({
       lambda: enc.beat.lambda,
       escala: dir.length(), // para normalizar el umbral de asentamiento
     };
-    camera.position.copy(desde);
-    camera.setFocalLength(fFinal / enc.beat.lente);
+    camPersp.position.copy(desde);
+    camPersp.setFocalLength(fFinal / enc.beat.lente);
     if (c) c.target.copy(tHasta);
-    camera.lookAt(tHasta);
+    camPersp.lookAt(tHasta);
 
     // El primer gesto del usuario ACELERA la llegada (capture en window:
     // los hotspots DOM no burbujean por el canvas). Sin saltos: solo sube
@@ -141,24 +141,24 @@ export default function CamaraDioramas({
     if (!b) return; // asentado: cero trabajo por frame
     // delta acotado: una pestaña dormida no "salta" la llegada al despertar.
     const dt = Math.min(delta, 1 / 20);
-    const { position } = camera;
+    const { position } = camPersp;
     position.setX(THREE.MathUtils.damp(position.x, b.hasta.x, b.lambda, dt));
     position.setY(THREE.MathUtils.damp(position.y, b.hasta.y, b.lambda, dt));
     position.setZ(THREE.MathUtils.damp(position.z, b.hasta.z, b.lambda, dt));
-    camera.setFocalLength(
-      THREE.MathUtils.damp(camera.getFocalLength(), b.fFinal, b.lambda, dt),
+    camPersp.setFocalLength(
+      THREE.MathUtils.damp(camPersp.getFocalLength(), b.fFinal, b.lambda, dt),
     );
-    camera.lookAt(b.tHasta);
+    camPersp.lookAt(b.tHasta);
     if (position.distanceTo(b.hasta) < EPSILON * b.escala) {
       // Aterrizaje EXACTO en el encuadre curado; el beat muere aquí.
-      camera.position.copy(b.hasta);
-      camera.setFocalLength(b.fFinal);
+      camPersp.position.copy(b.hasta);
+      camPersp.setFocalLength(b.fFinal);
       const c = controls ? controls.current : null;
       if (c) {
         c.target.copy(b.tHasta);
         c.update();
       }
-      camera.lookAt(b.tHasta);
+      camPersp.lookAt(b.tHasta);
       beatRef.current = null;
     }
   });

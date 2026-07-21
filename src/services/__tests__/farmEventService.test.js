@@ -8,7 +8,7 @@ import { newUlid } from '../../utils/id';
 describe('recordFarmEvent — validacion de entrada', () => {
   it('rechaza sin process_id', async () => {
     const { recordFarmEvent } = await import('../farmEventService');
-    await expect(recordFarmEvent({ event_type: 'observation' }))
+    await expect(recordFarmEvent(/** @type {any} */ ({ event_type: 'observation' })))
       .rejects.toThrow(/process_id/);
   });
 
@@ -36,7 +36,7 @@ describe('recordFarmEvent — validacion de entrada', () => {
 describe('createFarmProcess', () => {
   it('valida el proceso antes de escribir', async () => {
     const { createFarmProcess } = await import('../farmEventService');
-    const invalid = { type: 'farm_process' };
+    const invalid = /** @type {any} */ ({ type: 'farm_process' });
     await expect(createFarmProcess(invalid)).rejects.toThrow();
   });
 

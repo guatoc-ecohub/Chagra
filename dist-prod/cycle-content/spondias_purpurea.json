@@ -1,0 +1,97 @@
+{
+  "species_slug": "spondias_purpurea",
+  "scientific_name": "Spondias purpurea L.",
+  "common_names": [
+    "Ciruela criolla"
+  ],
+  "family": "Anacardiaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "living_fence",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje",
+      "acodo"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "PROPAGACIÓN POR ESTACA GRUESA EXTRAORDINARIA: ramas de 1-3 m largo y 5-15 cm grosor clavadas directo en suelo enraízan en 15-45 días — propiedad excepcional usada masivamente en CERCAS VIVAS rurales del Caribe colombiano y centroamericano (millones de km de cercas de jocote en Honduras, Nicaragua, El Salvador, Guatemala, costa caribe colombiana). Árboles productivos a 2-4 años. No requiere injerto.",
+    "tiempo_a_establecimiento_dias": 30,
+    "notas": "CERCA VIVA POR EXCELENCIA: estacas gruesas pre-trozadas (1-3 m) plantadas a 1-2 m entre sí en hilera enraízan masivamente y forman cerca productiva de fruta + leña + sombra ganadera. Frutos pequeños (3-5 cm) amarillos-rojos-purpúreos según raza.",
+    "fuente": "POWO Kew; GBIF; Pérez Arbeláez 1947; AGROSAVIA silvopastoriles"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 50,
+      "optimo_max": 1200,
+      "max_absoluto": 1800
+    },
+    "temperatura_c": {
+      "helada_letal": 3,
+      "optimo_min": 20,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La ciruela criolla, jocote o ciruela campesina (Spondias purpurea L., Anacardiaceae) es un árbol frutal perenne neotropical originario de Mesoamérica (sur de México, Guatemala, Honduras, El Salvador, Nicaragua — donde se llama \"jocote\" del náhuatl xocotl = \"fruta agria-dulce\"), cultivado desde tiempos prehispánicos y naturalizado ampliamente en todo el Neotrópico cálido. En Colombia se cultiva en zonas cálidas-templadas del Caribe (Atlántico, Bolívar, Magdalena, Córdoba, Sucre, Cesar, La Guajira — donde se llama \"ciruela costeña\"), valle medio del Magdalena (Honda, Puerto Berrío, La Dorada — \"ciruela campesina\"), zonas bajas de Antioquia (Bajo Cauca, Urabá, Suroeste), Valle del Cauca cinturón frutícola, Tolima-Huila cálidos, Santander-Norte de Santander (Bucaramanga, Cúcuta, Ocaña), Cundinamarca templada (La Mesa, Anolaima, Anapoima), Llanos bajos cálidos y zonas urbanas en general entre 0 y 1.200 msnm con temperaturas 20-30 °C, sol pleno, suelos bien drenados, muy tolerante a sequías estacionales largas (carácter de Anacardiaceae mesoamericana de bosque seco tropical). Árbol semicaducifolio mediano de 5-15 m altura con copa abierta-irregular, corteza gruesa gris-rojiza, follaje pinnado caduco en estación seca. Hojas alternas-pinnadas con 5-12 folíolos elípticos verde-claro. Flores pequeñas rojo-purpúreas-amarillentas en panículas terminales antes de la brotación foliar (floración en estación seca después de defoliación — fenología característica de árboles caducifolios tropicales). Frutos drupa elipsoide pequeña (3-5 cm) amarilla, roja o purpúrea-oscura según raza (existen razas regionales: \"ciruela amarilla\", \"ciruela roja\", \"ciruela purpúrea\" — todas Spondias purpurea), pulpa amarillo-anaranjada ácido-dulce aromática (10-14 °Brix) con un hueso grande fibroso característico de Spondias. PROPIEDAD AGRONÓMICA EXCEPCIONAL — CERCA VIVA POR EXCELENCIA: estacas gruesas pre-trozadas de ramas de 1-3 m largo y 5-15 cm grosor, plantadas directo en suelo (clavadas o introducidas en hoyo somero) en inicio de lluvias, ENRAÍZAN MASIVAMENTE en 15-45 días sin necesidad de hormona, vivero o cuidado intensivo — propiedad rizogénica extraordinaria que la convierte en el árbol predilecto para CERCAS VIVAS rurales del Caribe colombiano y centroamericano. Millones de kilómetros de cercas de jocote rodean potreros en Honduras, Nicaragua, El Salvador, Guatemala, costa Pacífico nicaragüense-costarricense, Caribe colombiano, Llanos colombo-venezolanos — sistema agroforestal-silvopastoril campesino de bajísimo costo (regalo de estacas entre vecinos), múltiple función (cerca-fruta-leña-sombra ganadera-forraje hojas tiernas-refugio fauna-corredor biológico) y sustentabilidad multidecenal (postes vivos duran décadas mientras los muertos de madera se pudren en 2-5 años). Manejo: cerca viva con estacas a 1-2 m entre sí en hilera, podas regulares para mantener altura y promover fructificación, ramas podadas dan leña, hojas caídas dan biomasa al suelo. Función pedagógica excelente: enseña a niñas y niños (1) propiedad rizogénica excepcional de estacas gruesas Spondias (compárese con Erythrina, Gliricidia, Sambucus — otros taxones de cerca viva regional), (2) sistemas silvopastoriles tradicionales campesinos como agroforestería de base, (3) árboles polifuncionales fruta-leña-cerca-sombra-forraje característicos de campesinado caribeño-centroamericano, (4) fenología de árboles caducifolios tropicales (defoliación-floración-fructificación en estación seca, brotación en lluvias), (5) familia Anacardiaceae (junto con mango, marañón, jobo Spondias mombin, jobo cajá S. dulcis) y sus drupas con hueso fibroso característico. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, AGROSAVIA silvopastoriles.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.399Z"
+}

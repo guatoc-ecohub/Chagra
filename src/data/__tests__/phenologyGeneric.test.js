@@ -83,7 +83,7 @@ describe('phenologyGeneric — getGenericTemplate', () => {
   });
 
   it('retorna null para numero', () => {
-    expect(getGenericTemplate(42)).toBeNull();
+    expect(getGenericTemplate(/** @type {any} */ (42))).toBeNull();
   });
 });
 

@@ -397,6 +397,15 @@ describe('ChatBubble — badges anti-alucinación (#18 fuente · #19 auto-correg
     expect(screen.queryByTestId('fuente-badge')).not.toBeInTheDocument();
   });
 
+  test('#18 fuente_url mal formada no se reinterpreta como enlace', () => {
+    render(
+      <ChatBubble
+        message={base({ tool_used: 'get_biopreparados', grounded: true, fuente_url: 'https://%' })}
+      />,
+    );
+    expect(screen.queryByTestId('fuente-badge')).not.toBeInTheDocument();
+  });
+
   // ── refinamiento 2026-06-03: fuente sin recurso puntual → TEXTO PLANO ──
   test('fuente_texto:true (sin URL) → renderiza "Fuente: X" como TEXTO, NO un <a>', () => {
     render(

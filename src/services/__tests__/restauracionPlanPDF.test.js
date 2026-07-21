@@ -84,7 +84,7 @@ describe('restauracionPlanPDF', () => {
   });
 
   it('no explota sin planData (defaults vacíos)', () => {
-    const blob = generateRestauracionPlanPDF();
+    const blob = generateRestauracionPlanPDF(/** @type {any} */ (undefined));
     expect(blob).toBeInstanceOf(Blob);
     expect(blob.size).toBeGreaterThan(800);
   });

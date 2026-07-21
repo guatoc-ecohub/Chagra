@@ -76,18 +76,20 @@ const ASSETS_TO_CACHE = [
   '/manual/mv-sipsa.html'
 ];
 
-// Grounding del agente precacheado en install (archivos únicos, no las 491
-// fichas — esas se llenan cache-first vía prewarmCorpus al login, ver fetch
-// handler de /cycle-content/*):
-//   - rag-embeddings.json (~7 MB): el ÚNICO archivo que habilita búsqueda
-//     SEMÁNTICA offline. Sin él, una recarga offline degrada a BM25 puro.
-//     Vale el peso del install one-time: es el mayor salto de calidad de
-//     grounding sin red.
-//   - cycle-content/manifest.json (~13 KB): lista de slugs; sin él loadCorpus
-//     cae al fallback legacy (iterar CROP_TAXONOMY) con N-3 fetches fallidos.
+// Grounding precache en install: solo assets livianos esenciales para que el
+// agente funcione offline sin red (grafo de conocimiento, ~163 KB). Los assets
+// PESADOS (rag-embeddings.json ~1.7MB, cycle-content/ ~3.4MB sumando fichas) se
+// cargan la PRIMERA VEZ que se usan (cache-on-use, ver fetch handler abajo) y NO
+// se precachean en install — su primer fetch ocurre cuando el usuario realmente
+// hace búsqueda semántica o abre una ficha de cultivo, no en el arranque.
+//   - rag-embeddings.json: antes precacheado ~1.7MB. Se usa <10% de sesiones
+//     (el agente responde sin RAG la mayor parte del tiempo). Pasar a
+//     cache-on-use reduce el install-time ~1.7MB y el budget del gate.
+//   - cycle-content/manifest.json + /cycle-content/<slug>.json (~3.4MB total):
+//     se llenan cache-first vía prewarmCorpus al login — el manifest es liviano
+//     (~13 KB) pero sin él, loadCorpus cae al fallback legacy. Se mantiene
+//     cache-on-use: loadCorpus lo fetchea al montar el dashboard.
 const RAG_GROUNDING_PRECACHE = [
-  '/rag-embeddings.json',
-  '/cycle-content/manifest.json',
   // grafo-relations.json (~66 KB): relaciones del grafo de conocimiento
   // (plaga→controlador, compatibles, antagonistas, biopreparados, vernáculos)
   // por especie del catálogo. Cierra el "invisible offline": antes el cliente

@@ -1,0 +1,291 @@
+/*
+ * MundoPolinizadores3D.css — vitrina del mundo de la red de polinización
+ * (#/mockups/mundo-polinizadores-3d). Autocontenida: sin fuentes/imágenes
+ * externas. Móvil-first desde 320px. Paleta: el ámbar del polen (el mismo de
+ * Angelita) sobre el verde de huerta.
+ */
+
+.mpoliniz {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  background: linear-gradient(180deg, #eef0d6 0%, #eaeecb 44%, #f2ecd0 100%);
+  color: #2b3226;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.mpoliniz__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.mpoliniz__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #96631a;
+}
+.mpoliniz__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #2e402e;
+}
+.mpoliniz__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.mpoliniz__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.mpoliniz__lienzo {
+  position: relative;
+  height: min(66vh, 32rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(150, 99, 26, 0.25);
+  box-shadow: 0 12px 30px rgba(44, 54, 40, 0.16);
+  background: radial-gradient(120% 90% at 50% 20%, #bfe3f2 0%, #9db486 100%);
+}
+.mpoliniz__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+/* El contenedor `.polz-mundo` (de polinizadores.css) vive dentro del lienzo y
+   llena todo el alto disponible; acá solo se ajusta al marco recortado. */
+.mpoliniz__lienzo .polz-mundo {
+  position: absolute;
+  inset: 0;
+}
+
+.mpoliniz__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  color: #3c4a38;
+  opacity: 0.85;
+}
+
+/* ---- Los tres interruptores ---- */
+.mpoliniz__interruptores {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.mpoliniz__switch {
+  border: 1.5px solid #96631a;
+  background: #fff;
+  color: #6b4712;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.42rem 0.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mpoliniz__switch:hover,
+.mpoliniz__switch:focus-visible {
+  background: #96631a;
+  color: #fff;
+  outline-offset: 2px;
+}
+.mpoliniz__switch[aria-pressed='true'] {
+  background: #6b4712;
+  color: #fff;
+  border-color: #6b4712;
+}
+.mpoliniz__switch--veneno {
+  border-color: #7a8a63;
+  color: #55622f;
+}
+.mpoliniz__switch--veneno:hover,
+.mpoliniz__switch--veneno:focus-visible {
+  background: #7a8a63;
+  color: #fff;
+}
+.mpoliniz__switch--veneno[aria-pressed='true'] {
+  background: #5c6b3d;
+  border-color: #5c6b3d;
+  color: #fff;
+}
+.mpoliniz__dano {
+  flex: 1 1 100%;
+  margin: 0.1rem 0 0;
+  font-size: 0.82rem;
+  color: #5c6b3d;
+}
+
+.mpoliniz__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.mpoliniz__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.mpoliniz__toggle {
+  border: 1.5px solid #96631a;
+  background: #fff;
+  color: #96631a;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.mpoliniz__toggle:hover,
+.mpoliniz__toggle:focus-visible {
+  background: #96631a;
+  color: #fff;
+  outline-offset: 2px;
+}
+
+/* ---- Ficha 2D (fallback digno, sin GPU) ---- */
+.mpoliniz__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: radial-gradient(120% 90% at 50% 25%, #d2ddc9 0%, #a3b295 100%);
+}
+.mpoliniz__estampa {
+  position: relative;
+  width: 180px;
+  height: 160px;
+  margin-bottom: 0.4rem;
+}
+/* la flor amarilla, cartel abierto de la mañana */
+.mpoliniz__flor {
+  position: absolute;
+  bottom: 10px;
+  left: 40px;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #ffe08a 0%, #ffc94a 55%, #e0a52e 100%);
+  box-shadow: inset -6px -6px 12px rgba(0, 0, 0, 0.14);
+}
+.mpoliniz__flor::after {
+  content: '';
+  position: absolute;
+  inset: 30%;
+  border-radius: 50%;
+  background: #c1301f;
+  opacity: 0.55;
+}
+/* el hilo de polen tendido hacia la abeja */
+.mpoliniz__hilo {
+  position: absolute;
+  top: 34px;
+  left: 90px;
+  width: 3px;
+  height: 56px;
+  background: linear-gradient(180deg, #ffc94a 0%, rgba(255, 201, 74, 0.15) 100%);
+  transform: rotate(18deg);
+  border-radius: 2px;
+}
+/* la angelita, chiquita, sobre la flor */
+.mpoliniz__abeja {
+  position: absolute;
+  top: 4px;
+  left: 96px;
+  width: 44px;
+  height: 30px;
+  border-radius: 50% 50% 42% 42% / 58% 58% 42% 42%;
+  background: radial-gradient(circle at 38% 30%, #7a5a2c 0%, #4a3418 70%);
+  box-shadow: inset -5px -4px 8px rgba(0, 0, 0, 0.25);
+}
+.mpoliniz__abeja-banda {
+  position: absolute;
+  top: 6px;
+  left: 14px;
+  width: 8px;
+  height: 20px;
+  border-radius: 4px;
+  background: #ffc94a;
+  opacity: 0.85;
+}
+.mpoliniz__ficha-nombre {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #2e402e;
+}
+.mpoliniz__ficha-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #4c5a44;
+}
+
+/* ---- Saberes ---- */
+.mpoliniz__saberes {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.mpoliniz__saberes h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.7rem;
+  color: #2e402e;
+}
+.mpoliniz__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+@media (min-width: 640px) {
+  .mpoliniz__saberes ol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.mpoliniz__saberes li {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(150, 99, 26, 0.16);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+}
+.mpoliniz__emoji {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+.mpoliniz__saberes b {
+  display: block;
+  font-size: 0.92rem;
+  color: #2e402e;
+}
+.mpoliniz__saberes li p {
+  margin: 0.15rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+.mpoliniz__cierre {
+  margin: 0.9rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #3c4a38;
+  max-width: 42rem;
+}

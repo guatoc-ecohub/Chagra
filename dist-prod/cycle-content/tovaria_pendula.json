@@ -1,0 +1,74 @@
+{
+  "species_slug": "tovaria_pendula",
+  "scientific_name": "Tovaria pendula Ruiz & Pav.",
+  "common_names": [
+    "Vaquero"
+  ],
+  "family": "Tovariaceae",
+  "category": "ornamentales_nativas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio",
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 2000,
+      "optimo_min": 2400,
+      "optimo_max": 3200,
+      "max_absoluto": 3500
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El vaquero (Tovaria pendula Ruiz & Pav., Tovariaceae) es una hierba o subarbusto andino nativo (50-150 cm altura) emblemático del bosque alto-andino y bordes de páramo de Colombia, Ecuador, Perú y Bolivia entre 2.400 y 3.200 msnm, presente en Colombia en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón, Guasca), Boyacá (Iguaque, Cocuy), Santander (Berlín), Antioquia (Belmira), Tolima, Caldas y Nariño. Es la única especie del género Tovaria y única representante de la familia Tovariaceae en Colombia (familia monogenérica, monotípica en Tovaria), lo que la convierte en una rareza taxonómica de altísimo valor para biogeografía andina. Hojas trifoliadas pubescentes, racimos colgantes (de ahí pendula) de flores blanco-verdosas pequeñas pero numerosas que atraen abejas nativas y avispas, frutos en baya pequeña. Es lección viva de soberanía botánica y biogeografía que enseña a niñas y niños por qué cada planta del páramo importa: el vaquero es una rareza evolutiva única, sin parientes botánicos cercanos, y solo sobrevive en bordes de bosque alto-andino bien conservados. Si se pierde el ecosistema, no hay reemplazo posible en ningún jardín del mundo. Por eso aparece en planes de restauración Cruz Verde-Sumapaz (IAvH + CAR Cundinamarca) como indicadora de buen estado sucesional. Manejo agroecológico: propagación por semilla recolectada de frutos maduros (vivero 4-8 meses), trasplante en lluvias en sotobosque o bordes sombreados, distancia 0.5-1 m, función exclusiva en restauración ecológica y jardines pedagógicos de flora nativa. No apta para chagra productiva. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "restauracion-cruz-verde-sumapaz",
+      "title": "restauracion-cruz-verde-sumapaz",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.380Z"
+}

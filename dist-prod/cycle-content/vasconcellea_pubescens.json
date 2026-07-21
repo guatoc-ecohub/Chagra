@@ -1,0 +1,65 @@
+{
+  "species_slug": "vasconcellea_pubescens",
+  "scientific_name": "Vasconcellea pubescens A.DC.",
+  "common_names": [
+    "Papayuela / Papayo de monte"
+  ],
+  "family": "Caricaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Planta dioica (individuos macho y hembra); requiere un macho por cada 5-8 hembras para polinizacion. Crecimiento rapido, vida corta (4-6 años)."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 2000,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 12,
+      "optimo_max": 20,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La papayuela o papayo de monte (Vasconcellea pubescens A.DC., familia Caricaceae) es una caricácea arbustiva-arbórea perenne dioica (plantas separadas masculinas y femeninas) nativa del bosque altoandino colombiano, cultivada tradicionalmente por comunidades campesinas cundiboyacenses como frutal de altura y memoria culinaria de cocina tradicional. Produce frutos elipsoides pequeños amarillo-anaranjados (8-15 cm) aromáticos pero NO comestibles en crudo por su látex blanco rico en papaína y carpaína; requieren cocción en almíbar de panela para neutralizar el látex y desarrollar su sabor característico. Se cultiva en Boyacá (Tibasosa, Duitama, Paipa, Tunja), Cundinamarca (Sumapaz, Chocontá, Subachoque, Sopó, La Calera), Nariño (Pasto, Yacuanquer) y Cauca entre 1.800 y 3.000 msnm en zona térmica templada a fría. Ciclo 18-24 meses a primera cosecha, productiva 5-8 años. Rendimientos 20-40 kg/planta/año. Lección viva pedagógica: la papayuela enseña con ejemplo visible la dioecia (sistema sexual donde existen plantas estrictamente masculinas — solo flores polinizadoras — y plantas femeninas — solo frutos), concepto botánico fundamental para entender el manejo de huertos con mínimo 1 macho cada 8-10 hembras. Sus frutos cocidos en almíbar son memoria viva de la cocina tradicional cundiboyacense (postre dominical campesino con queso campesino fresco). Manejo agroecológico: siembra por semilla (germinación 2-3 semanas), trasplante a sitio definitivo a los 6 meses, asocio con uchuva y feijoa, poda formativa anual. Fuentes Tier A: AGROSAVIA Frutales Andinos, POWO Kew, SIB Colombia, NRC 1989 Lost Crops of the Incas, GBIF Backbone Taxonomy.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.369Z"
+}

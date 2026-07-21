@@ -27,6 +27,7 @@
  * IMPORTANTE — español colombiano (tú/usted), NUNCA voseo argentino.
  */
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- etiquetas visibles de destino; deuda de i18n fuera de este cambio */
+import { MUNDO } from '../visual/mundo3d/mundoData.js';
 
 /** Quita tildes/diéresis y baja a minúsculas para matching tolerante a Whisper. */
 export function normalizarHabla(texto) {
@@ -80,6 +81,23 @@ const DESTINOS = Object.freeze([
   { claves: ['activos'], view: 'activos', etiqueta: 'Mi finca' },
 ]);
 
+/* Mundos 3D que se pueden pedir desde la escucha. La fuente de verdad de que
+ * el mundo existe es `MUNDO`; aquí solo viven las formas en que Whisper suele
+ * transcribir cada destino. El resultado siempre abre `valle3d`, que es el
+ * host real de los mundos, con el id que ese host entiende. */
+const MUNDOS_3D = Object.freeze([
+  { id: 'cafe', claves: ['mundo del cafe', 'mundo cafe', 'cafetal'], directas: [], etiqueta: 'El mundo del café' },
+  { id: 'agua', claves: ['mundo del agua', 'mundo agua'], directas: ['agua'], etiqueta: 'El mundo del agua' },
+  { id: 'suelo', claves: ['mundo del suelo', 'mundo suelo', 'suelo vivo'], directas: [], etiqueta: 'El mundo del suelo' },
+  { id: 'animales', claves: ['mundo de los animales', 'mundo animales', 'mundo del animal'], directas: [], etiqueta: 'El mundo de los animales' },
+  { id: 'sanidad', claves: ['mundo de sanidad', 'mundo sanidad'], directas: [], etiqueta: 'El mundo de sanidad' },
+  { id: 'mercado', claves: ['mundo del mercado', 'mundo mercado'], directas: [], etiqueta: 'El mundo del mercado' },
+  { id: 'clima', claves: ['mundo del clima', 'mundo clima'], directas: [], etiqueta: 'El mundo del clima' },
+  { id: 'semillero', claves: ['mundo del semillero', 'mundo semillero', 'vivero'], directas: [], etiqueta: 'El mundo del semillero' },
+]);
+
+const VERBOS_MOSTRAR_MUNDO = ['muestrame', 'muestreme', 'mostrar', 'muestra', 'muestre'];
+
 /* Verbos/locuciones que declaran intención de IR a un lugar de la app.
  * Aceptamos variantes de tuteo/ustedeo E imperativos que Whisper transcribe
  * del habla real ("llevame", "abrime") — lo que ESCUCHAMOS no se limita al
@@ -125,6 +143,24 @@ function buscarDestino(tokens) {
     }
   }
   return null;
+}
+
+function buscarMundo3D(tokens, permiteDestinoDirecto) {
+  for (const mundo of MUNDOS_3D) {
+    if (!MUNDO[mundo.id]) continue;
+    if (mundo.claves.some((clave) => contieneToken(tokens, clave))) return mundo;
+    if (permiteDestinoDirecto && mundo.directas.some((clave) => contieneToken(tokens, clave))) return mundo;
+  }
+  return null;
+}
+
+function rutaMundo3D(mundo) {
+  return /** @type {{tipo:'navegar', view:string, initialData?:any, etiqueta:string}} */ ({
+    tipo: 'navegar',
+    view: 'valle3d',
+    initialData: { mundo: mundo.id },
+    etiqueta: mundo.etiqueta,
+  });
 }
 
 /**
@@ -182,6 +218,12 @@ export function routeUtterance(texto) {
   }
 
   const destino = buscarDestino(tokens);
+  const muestraMundo = VERBOS_MOSTRAR_MUNDO.some((verbo) => contieneToken(tokens, verbo));
+  const mundo3D = buscarMundo3D(tokens, muestraMundo);
+  if (mundo3D && (tieneVerboNav || tokens.length <= 4)) {
+    return rutaMundo3D(mundo3D);
+  }
+
   if (destino) {
     // Regla 2: verbo de navegación + destino conocido.
     if (tieneVerboNav) {

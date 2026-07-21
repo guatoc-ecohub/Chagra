@@ -164,8 +164,9 @@ describe('AgentHero — integración post-pulido (task #TEST-int)', () => {
       const avatar = sendBtn.querySelector('[data-testid="avatar"]');
       expect(avatar).toBeTruthy();
 
-      // Verifica que tiene los atributos correctos
-      expect(avatar).toHaveAttribute('data-size', '38');
+      // Verifica que tiene los atributos correctos (44: protagonismo de
+      // Angelita — el avatar llena el botón de 44px, 2026-07-18)
+      expect(avatar).toHaveAttribute('data-size', '44');
       expect(avatar).toHaveAttribute('data-state', 'listening');
     });
 

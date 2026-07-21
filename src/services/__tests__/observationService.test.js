@@ -9,19 +9,19 @@ import { registerObservation } from '../observationService';
 
 describe('registerObservation', () => {
   it('rechaza sin processId', async () => {
-    await expect(registerObservation({ text: 'se ve bien' })).rejects.toThrow(/process_id/);
+    await expect(registerObservation(/** @type {any} */ ({ text: 'se ve bien' }))).rejects.toThrow(/process_id/);
   });
 
   it('rechaza sin text', async () => {
-    await expect(registerObservation({ processId: 'p1' })).rejects.toThrow(/text/);
+    await expect(registerObservation(/** @type {any} */ ({ processId: 'p1' }))).rejects.toThrow(/text/);
   });
 
   it('rechaza text vacio', async () => {
-    await expect(registerObservation({ processId: 'p1', text: '' })).rejects.toThrow(/text/);
+    await expect(registerObservation(/** @type {any} */ ({ processId: 'p1', text: '' }))).rejects.toThrow(/text/);
   });
 
   it('llama recordFarmEvent con event_type=observation y payload.text', async () => {
-    const result = await registerObservation({ processId: 'p1', text: 'las hojas están amarillas' });
+    const result = await registerObservation(/** @type {any} */ ({ processId: 'p1', text: 'las hojas están amarillas' }));
     expect(recordFarmEvent).toHaveBeenCalledWith(
       expect.objectContaining({
         process_id: 'p1',
@@ -34,7 +34,7 @@ describe('registerObservation', () => {
   });
 
   it('tolera actor y source custom', async () => {
-    await registerObservation({ processId: 'p1', text: 'crece bien', actor: 'ai', source: 'vision' });
+    await registerObservation(/** @type {any} */ ({ processId: 'p1', text: 'crece bien', actor: 'ai', source: 'vision' }));
     expect(recordFarmEvent).toHaveBeenCalledWith(
       expect.objectContaining({ actor: 'ai', source: 'vision' })
     );

@@ -20,13 +20,16 @@ vi.mock('../ragRetriever', () => ({
 // pero el resultado depende del shape del Blob. Polyfill defensivo: si
 // global no provee FileReader compatible, simulamos suficiente.
 if (typeof globalThis.FileReader === 'undefined') {
-  globalThis.FileReader = class {
+  globalThis.FileReader = /** @type {any} */ (class {
     constructor() { this.onloadend = null; this.onerror = null; this.result = null; }
     readAsDataURL(_blob) {
       this.result = 'data:image/webp;base64,FAKE_BASE64';
       queueMicrotask(() => this.onloadend && this.onloadend());
     }
-  };
+    static get EMPTY() { return 0; }
+    static get LOADING() { return 1; }
+    static get DONE() { return 2; }
+  });
 }
 
 const { analyzeFoliage, __TEST__, __retrieveRagContextForFoliage } = await import('../aiService');

@@ -44,6 +44,6 @@ describe('isCoarseLocation — umbral de geolocalización gruesa', () => {
     expect(isCoarseLocation(null)).toBe(false);
     expect(isCoarseLocation(undefined)).toBe(false);
     expect(isCoarseLocation(NaN)).toBe(false);
-    expect(isCoarseLocation('no-soy-numero')).toBe(false);
+    expect(isCoarseLocation(/** @type {any} */ ('no-soy-numero'))).toBe(false);
   });
 });

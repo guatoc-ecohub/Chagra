@@ -1,0 +1,97 @@
+{
+  "species_slug": "raphanus_sativus_oleifer",
+  "scientific_name": "Raphanus sativus L. var. oleifer",
+  "common_names": [
+    "Rabano forrajero"
+  ],
+  "family": "Brassicaceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "ground_cover",
+    "biomass_producer",
+    "dynamic_accumulator"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Siembra directa al voleo o surcos a 1-2cm. Densidad 10-15 kg/ha. Germinacion 4-7 dias. Ciclo rapido de 60-90 dias. Excelente cobertura de ciclo corto entre cultivos comerciales.",
+    "tiempo_a_establecimiento_dias": 45,
+    "notas": "Brassica de ciclo corto y crecimiento rapido. Raiz pivotante profunda que descompacta suelos. Efecto biofumigante por glucosinolatos. Sus flores atraen abejas y polinizadores nativos.",
+    "fuente": "Restrepo Rivera 2005. Agroecologia colombiana"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 1800,
+      "optimo_max": 2600,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -4,
+      "optimo_min": 14,
+      "optimo_max": 20,
+      "max_tolerable": 26
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El rábano forrajero o rábano oleífero (Raphanus sativus L. var. oleifer, familia Brassicaceae) es una brasicácea anual herbácea cultivada selectivamente del rábano común por mayor desarrollo radicular (raíz pivotante 50-100 cm) y biomasa aérea, usado en sistemas ganaderos y hortícolas andinos colombianos como cover crop de ciclo corto, abono verde rápido, biofumigante natural y forraje secundario para bovinos. Se cultiva en sistemas de rotación con papa, hortalizas y praderas en Cundinamarca (Sabana de Bogotá, Subachoque, Sumapaz), Boyacá (Tunja, Sotaquirá, Sutamarchán), Nariño (Pasto, Túquerres, Sapuyes), Antioquia (oriente — La Unión, La Ceja) y Eje cafetero alto entre 1.800 y 2.600 msnm en zona térmica templada a fría. Ciclo cortísimo 60-90 días desde siembra a incorporación o cosecha. Rendimientos 25-40 t/ha biomasa fresca, 4-7 t/ha materia seca. Lección viva del abono verde express: el rábano forrajero germina y cubre el suelo desnudo en 2-3 semanas (cobertura rápida anti-arvenses por sombreado denso), enseñando el valor de las brasicas como biofumigantes naturales por liberación de isotiocianatos al descomponer biomasa (acción supresora sobre Globodera spp. nematodo dorado de la papa, Rhizoctonia solani, Verticillium dahliae) y como acumuladoras de nutrientes profundos en rotaciones cortas pre-papa o post-cosecha de hortalizas. Su raíz pivotante descompacta suelos arcillosos compactados (bio-tillage) y sus flores blanco-rosadas atraen polinizadores nativos y enemigos naturales. Manejo agroecológico: siembra al voleo 15-25 kg/ha en suelo descansado, asocio con avena o vicia para mejorar C/N de cobertura mixta, incorporación pre-floración para evitar semillación, alternativamente pastoreo controlado por bovinos en franja, no requiere fertilización. Fuentes Tier A: AGROSAVIA Forrajeras 2022, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- avena_sativa — Avena forrajera (Avena sativa L.)\n- vicia_sativa — Veza común (Vicia sativa L.)",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "agrosavia-forrajeras-2022",
+      "title": "agrosavia-forrajeras-2022",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "restrepo-2005-agroecologia",
+      "title": "restrepo-2005-agroecologia",
+      "tier": "B",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.374Z"
+}

@@ -1,0 +1,99 @@
+{
+  "species_slug": "azolla_filiculoides",
+  "scientific_name": "Azolla filiculoides Lam.",
+  "common_names": [
+    "Azolla"
+  ],
+  "family": "Salviniaceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido",
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "nitrogen_fixer",
+    "biomass_producer",
+    "ground_cover",
+    "dynamic_accumulator"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "division_mata",
+      "espora"
+    ],
+    "best_method": "division_mata",
+    "protocol_resumen": "Propagación vegetativa por fragmentación de la fronda (cada fragmento con al menos 1 lóbulo viable regenera colonia completa en 5-10 días). Esporas (megasporas y microsporas) raras en cultivo, no necesarias en propagación práctica. Inoculación inicial: 200-500 g/m² de superficie de agua tranquila a inicio de cultivo (arrozal, estanque piscícola). Duplicación de biomasa en 3-5 días en óptimas condiciones.",
+    "tiempo_a_establecimiento_dias": 15,
+    "notas": "Helecho acuático fijador de N (8-12% N en biomasa seca vía simbiosis con cianobacteria Anabaena azollae en cámaras foliares). Manejo clásico en arrozales asiáticos (China, Vietnam, Filipinas, India): se siembra azolla con el arroz, fija 50-150 kg N/ha/ciclo, al final del ciclo se entierra como abono verde. Adopción incipiente en Colombia: Sevilla (Tolima), Saldaña, Espinal, Ibagué, Aipe (Huila). Excelente alimento proteico para tilapia, cachama, cerdos y aves.",
+    "fuente": "IAvH Flora Alto Andina; Bernal 2015; POWO Kew; GBIF Colombia; FAO Ecocrop; CIAT"
+  },
+  "requirements": {
+    "agua": "pantanoso",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 500,
+      "optimo_max": 2600,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -2,
+      "optimo_min": 15,
+      "optimo_max": 28,
+      "max_tolerable": 32
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "pantanoso"
+  },
+  "valor_pedagogico": "La azolla (Azolla filiculoides Lam., Salviniaceae) es un helecho acuático flotante diminuto que constituye una de las mayores joyas agroecológicas del mundo y una lección viva de simbiosis biológica, soberanía nitrogenada y agricultura circular: es el único helecho del planeta con fijación biológica de nitrógeno gracias a su simbiosis con la cianobacteria Anabaena azollae que vive en cámaras foliares especializadas dentro de sus frondas — una alianza simbiótica que data del Cretácico y que durante el Eoceno (hace 50 millones de años) cubrió el océano Ártico durante 800.000 años fijando suficiente CO₂ atmosférico como para enfriar el planeta y dar inicio a la era de hielo actual ('Evento Azolla', uno de los descubrimientos paleoclimatológicos más impactantes de la última década). Nativa o cosmopolita en humedales templados y tropicales de todos los continentes (excepto Antártida), en Colombia se distribuye en humedales, ciénagas, arrozales y estanques tranquilos entre 0 y 3.000 msnm: humedales fríos de la Sabana de Bogotá (Jaboque, Juan Amarillo, Tibanica), arrozales del Tolima-Huila-Meta-Casanare (Sevilla, Saldaña, Espinal, Ibagué, Aipe, Yopal, Villavicencio), humedales del Valle del Cauca (Sonso, La Guinea), ciénagas del Magdalena medio (Zapatosa, El Sapo), lagunas altoandinas (Tota, Iguaque, Siecha) y planicie inundable de la Orinoquia. Pertenece a la familia Salviniaceae (orden Salviniales, helechos acuáticos heterosporados) y se reconoce por sus frondas diminutas de 1-2 cm de tamaño, escamosas, con dos lóbulos por hoja (uno dorsal flotante verde con cámaras simbióticas que albergan Anabaena, uno ventral sumergido reducido absorbente), de color verde brillante en óptimo crecimiento que vira a rojo-burdeos en estrés (alta luz, frío, fósforo limitante — el rojo proviene de antocianinas protectoras), forma cobertura densa sobre superficie de agua tranquila que da la apariencia de una alfombra verde-rojiza. Reproducción vegetativa explosiva por fragmentación (cada fragmento con al menos 1 lóbulo viable regenera colonia completa en 5-10 días, duplicación de biomasa en 3-5 días en óptimo) y rara reproducción sexual por megasporas-microsporas. Su importancia agroecológica es enorme: fija biológicamente 50-150 kg N/ha/ciclo de cultivo (comparable o superior a la simbiosis Rhizobium-leguminosa), 3-5% N en biomasa fresca, 8-12% en seca (ratio C/N=10-12 ideal para abono verde de liberación rápida), 25-30% proteína cruda en seca (excelente forraje proteico), acumulador dinámico de P, K, Ca, micronutrientes (Fe, Mn, Zn, B) y fitorremediador eficaz de aguas residuales N-amoniacales. Su uso clásico es el manejo dual en arrozales asiáticos (China, Vietnam, Filipinas, India, Indonesia, Bangladesh) practicado desde el siglo XI: se inocula azolla con el arroz al inicio del ciclo, la azolla cubre la lámina de agua del arrozal reduciendo evaporación, sombreando y suprimiendo malezas anuales, mientras fija 50-150 kg N/ha durante el ciclo; al final del ciclo se entierra como abono verde antes de la cosecha del arroz o se cosecha como forraje proteico para cerdos, aves y peces; reemplaza 30-60% de la fertilización nitrogenada sintética del arrozal y mantiene o aumenta el rendimiento. En Colombia esta práctica es incipiente pero adoptada por arroceros agroecológicos del Tolima (Sevilla, Saldaña, Espinal, Ibagué), Huila (Aipe, Campoalegre), Meta (Villavicencio, Acacías) y Casanare (Yopal, Aguazul) — Agrosavia y CIAT documentan rendimientos comparables a fertilización sintética con reducción de 40-50% en costos de N y eliminación de pico de emisión de óxidos de N. Como forraje y alimento proteico es base para sistemas integrados acuicultura-cerdo-aves-arroz (rotación cuatripartita asiática clásica). Manejo agroecológico: inóculo inicial 200-500 g/m² de superficie de agua tranquila al inicio del cultivo de arroz o en estanque piscícola, mantener pH 5.5-7.5, temperatura 15-28°C, profundidad lámina de agua 5-15 cm en arrozal, alta luminosidad, fosfato disponible (fertilización P en arrozales con bajo P); cosecha con malla cada 7-14 días una vez establecida cobertura completa, no agotar (>30% remanente para regeneración); aplicar fresca o enterrada como abono verde, o seca al sol como forraje proteico o ingrediente de concentrado animal. Es lección extraordinaria de simbiosis biológica, fijación biológica de N alternativa a leguminosas, soberanía nitrogenada del arrozal tropical, agricultura circular, integración acuicultura-cultivo y eficiencia evolutiva (la alianza Azolla-Anabaena tiene 70-90 millones de años de coevolución continua, los socios ya no se reconocen como individuos separados sino como un superorganismo simbiótico). Fuentes Tier A: IAvH Humboldt — Flora Alto Andina, POWO Kew, GBIF Colombia, Bernal 2015 Catálogo Plantas y Líquenes Colombia, FAO Ecocrop, Agrosavia.",
+  "sources": [
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "agrosavia-tibaitata",
+      "title": "agrosavia-tibaitata",
+      "tier": "A",
+      "url": "https://www.agrosavia.co/investigacion/centros-de-investigacion/tibaitat%C3%A1"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.391Z"
+}

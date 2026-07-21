@@ -22,6 +22,7 @@ import WATER_DATA from '../data/water-diagnostics.json';
  * @property {number} area_m2 — area del techo en m2
  * @property {number} lluvia_mm — precipitacion anual en mm
  * @property {number} ce — coeficiente de escorrentia
+ * @property {number} eta — eficiencia
  * @property {number} litros_anuales — volumen captado en litros/ano
  * @property {number} litros_diarios — promedio diario
  */

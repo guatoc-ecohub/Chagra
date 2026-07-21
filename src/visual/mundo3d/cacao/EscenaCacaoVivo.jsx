@@ -1,0 +1,407 @@
+/*
+ * EscenaCacaoVivo — el MUNDO donde vive el cacao (piso cálido, 0–1.200 m).
+ *
+ * Una VEGA de tierra caliente EN LA HORA VIVA DEL VALLE: la atmósfera ya no es
+ * un cielo clavado sino la del kit compartido (`AtmosferaMundo`, familia
+ * `sotobosque`) — el cacaotal amanece, dora y anochece CON el valle. Y en
+ * clave de la TOMA B (estilizada Switch/BOTW, decisión por piso térmico):
+ * domo de gradiente con el glow del sol pesado (`DomoCielo`), terreno y lomas
+ * por BANDAS (`useGradienteBandas` + toon), luz dorada dramática de la franja
+ * y silueta fuerte. El cultivo se cuenta como es — las matas de cacao con sus
+ * MAZORCAS pegadas del tronco (caulifloria), el SOMBRÍO de guamos, el plátano
+ * intercalado, y en la lomita la casa con su cajón de fermentar y la pasera.
+ * La cámara LLEGA (CamaraDirector) y se puede girar con el dedo.
+ *
+ * Todo procedural (cero CDN/imágenes). Tier-safe vía `perfilDeTier`: 'alto' con
+ * sombras + bruma + luz colada; 'medio' frugal; 'bajo' mínimo. Con
+ * `reducedMotion` el mundo monta QUIETO (frameloop a demanda). La fauna son los
+ * SVG rubber-hose de la casa como billboards (`Fauna` de FaunaEscena):
+ * mariposas revoloteando y el escarabajo reptando en la hojarasca — la vida que
+ * el cacao bajo sombra sí recibe.
+ *
+ * `foco` (opcional): un punto [x,y,z] que el paso didáctico del host señala con
+ * un anillo que respira. Importa three/@react-three → montar SOLO perezosa.
+ */
+import { useMemo, useRef, useState } from 'react';
+import * as THREE from 'three';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
+import { perfilDeTier } from '../deviceTier.js';
+import { Fauna } from '../escenas/FaunaEscena.jsx';
+import FaunaCalido from '../escenas/FaunaCalido.jsx';
+import FloraCacao from './FloraCacao.jsx';
+import { ANCHO, FONDO, alturaVega, SITIO_CASA } from './floraCacao.geom.js';
+import {
+  AtmosferaMundo,
+  DomoCielo,
+  useAtmosferaMundo,
+  useGradienteBandas,
+  construirTerreno,
+  ruidoTerreno,
+  smoothstep,
+  CamaraDirector,
+} from '../kit/index.js';
+import {
+  mezclar,
+  VERDES,
+  TIERRAS,
+  CORTEZAS,
+  CASA,
+  ACENTOS,
+  LUCES,
+  NIEBLAS,
+  PALETA,
+} from '../paleta/index.js';
+
+/* La identidad del piso cálido dentro de la familia del valle: `sotobosque`
+   (verde hondo bajo techo de hojas). El 60% restante lo pone la HORA. */
+const FAMILIA_CACAOTAL = 'sotobosque';
+
+/* Escala de la escena para el kit (cámara↔centro ~16.5): la niebla del kit cae
+   a radio*1.4→radio*4.6 ≈ el 14→44 que este mundo ya calibró. */
+const RADIO_CACAOTAL = 10;
+
+/* El frustum de sombra a medida de la vega (la luz colada del sombrío). */
+const SOMBRA_CACAOTAL = { left: -16, right: 16, top: 16, bottom: -6, far: 40 };
+
+/* La malla de la vega — el heightfield del KIT (mismo andamiaje que todos los
+   mundos) con la pintura PROPIA del piso cálido: el mantillo pardo de
+   hojarasca que domina bajo el cacao, pasto en los claros, tierra oscura
+   húmeda a manchas y el caminito por donde se llega. */
+function construirVega(seg, plano) {
+  const cMantillo = new THREE.Color(TIERRAS.mantillo); // la hojarasca manda
+  const cMantillo2 = new THREE.Color(TIERRAS.mantilloSombra);
+  const cPasto = new THREE.Color(VERDES.calidoVivo); // el pasto del piso cálido
+  const cTierra = new THREE.Color(TIERRAS.turba); // tierra oscura y húmeda
+  const cCamino = new THREE.Color(mezclar(TIERRAS.camino, TIERRAS.arenaOrilla, 0.35));
+  return construirTerreno({
+    ancho: ANCHO,
+    fondo: FONDO,
+    seg,
+    plano,
+    altura: alturaVega,
+    pintar: (wx, wz, alt, c) => {
+      const adentro = smoothstep(8, 0, Math.abs(wx)) * smoothstep(6, -2, wz) * 0.5 + 0.5;
+      // el mantillo de hojarasca manda bajo el cultivo
+      c.lerpColors(cMantillo, cMantillo2, 0.5 + 0.5 * ruidoTerreno(wx * 0.9, wz * 0.7));
+      // el pasto asoma en los claros y hacia el frente
+      c.lerp(cPasto, smoothstep(0.15, 0.9, ruidoTerreno(wx * 1.1 + 3, wz * 0.9)) * 0.5 * (1.3 - adentro));
+      // la tierra oscura y húmeda a manchas
+      c.lerp(cTierra, smoothstep(0.1, 0.9, ruidoTerreno(wx * 1.5 + 7, wz * 1.3 + 2)) * 0.3);
+      // el caminito por donde se llega a la casa
+      c.lerp(cCamino, smoothstep(1.3, 0, Math.abs(wx - 3 - Math.sin(wz * 0.32) * 2.4)) * smoothstep(8, -12, -wz) * 0.9);
+    },
+  });
+}
+
+/* La casa campesina de tierra caliente con su BENEFICIO de cacao: el CAJÓN de
+   madera donde el grano fermenta en su baba, y la PASERA — la cama elevada
+   donde el grano se seca al sol con su techito corredizo. */
+function CasaSecadero({ pos }) {
+  return (
+    <group position={pos} rotation={[0, -0.4, 0]}>
+      {/* la casa: LA casa campesina de la paleta madre (la misma del valle) */}
+      <mesh position={[0, 0.72, 0]}>
+        <boxGeometry args={[2.6, 1.44, 1.9]} />
+        <meshLambertMaterial color={CASA.encalado} flatShading />
+      </mesh>
+      <mesh position={[0, 0.18, 0]}>
+        <boxGeometry args={[2.64, 0.36, 1.94]} />
+        <meshLambertMaterial color={CASA.zocalo} flatShading />
+      </mesh>
+      {/* la puerta y una ventana (la carpintería pintada de la casa) */}
+      <mesh position={[0.5, 0.62, 0.96]}>
+        <boxGeometry args={[0.44, 0.95, 0.06]} />
+        <meshLambertMaterial color={CASA.carpinteria} flatShading />
+      </mesh>
+      <mesh position={[-0.6, 0.86, 0.96]}>
+        <boxGeometry args={[0.5, 0.44, 0.06]} />
+        <meshLambertMaterial color={CASA.carpinteria} flatShading />
+      </mesh>
+      {/* techo a dos aguas de teja */}
+      <mesh position={[0, 1.62, -0.62]} rotation={[-0.62, 0, 0]}>
+        <boxGeometry args={[3.0, 0.08, 1.5]} />
+        <meshLambertMaterial color={CASA.tejaSombra} flatShading />
+      </mesh>
+      <mesh position={[0, 1.62, 0.62]} rotation={[0.62, 0, 0]}>
+        <boxGeometry args={[3.0, 0.08, 1.5]} />
+        <meshLambertMaterial color={CASA.teja} flatShading />
+      </mesh>
+
+      {/* el CAJÓN DE FERMENTAR, al pie de la casa: madera gruesa, tapa de
+          hoja de plátano y el grano en su baba asomando */}
+      <group position={[-2.2, 0, 0.7]}>
+        <mesh position={[0, 0.32, 0]}>
+          <boxGeometry args={[0.95, 0.64, 0.7]} />
+          <meshLambertMaterial color={PALETA.madera} flatShading />
+        </mesh>
+        <mesh position={[0, 0.66, 0]}>
+          <boxGeometry args={[0.82, 0.06, 0.58]} />
+          <meshLambertMaterial color={mezclar(PALETA.madera, PALETA.maderaClara, 0.45)} flatShading />
+        </mesh>
+        {/* la hoja de plátano que tapa la fermentación */}
+        <mesh position={[0.1, 0.71, 0.05]} rotation={[0, 0.4, 0.06]}>
+          <boxGeometry args={[0.7, 0.03, 0.4]} />
+          <meshLambertMaterial color={VERDES.templadoVivo} flatShading />
+        </mesh>
+      </group>
+
+      {/* la PASERA de secado: patas + cama con el grano marrón extendido +
+          techito translúcido corredizo (la señal del secado) */}
+      <group position={[2.6, 0, 0.4]}>
+        {[[-1.0, -0.55], [1.0, -0.55], [-1.0, 0.55], [1.0, 0.55]].map((q, i) => (
+          <mesh key={i} position={[q[0], 0.35, q[1]]}>
+            <boxGeometry args={[0.09, 0.7, 0.09]} />
+            <meshLambertMaterial color={mezclar(PALETA.madera, PALETA.maderaOscura, 0.5)} flatShading />
+          </mesh>
+        ))}
+        <mesh position={[0, 0.72, 0]}>
+          <boxGeometry args={[2.2, 0.07, 1.3]} />
+          <meshLambertMaterial color={PALETA.maderaClara} flatShading />
+        </mesh>
+        {/* el grano de cacao extendido secándose al sol */}
+        <mesh position={[0, 0.77, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[2.0, 1.1]} />
+          <meshLambertMaterial color={mezclar(TIERRAS.siembra, CORTEZAS.quenual, 0.5)} flatShading />
+        </mesh>
+        {[[-1.05, -0.62], [1.05, -0.62], [-1.05, 0.62], [1.05, 0.62]].map((q, i) => (
+          <mesh key={`p${i}`} position={[q[0], 1.15, q[1]]}>
+            <boxGeometry args={[0.06, 0.85, 0.06]} />
+            <meshLambertMaterial color={mezclar(PALETA.madera, PALETA.maderaOscura, 0.5)} flatShading />
+          </mesh>
+        ))}
+        <mesh position={[0, 1.62, -0.36]} rotation={[-0.5, 0, 0]}>
+          <planeGeometry args={[2.4, 0.95]} />
+          <meshBasicMaterial color={NIEBLAS.lechosa} transparent opacity={0.34} depthWrite={false} side={THREE.DoubleSide} />
+        </mesh>
+        <mesh position={[0, 1.62, 0.36]} rotation={[0.5, 0, 0]}>
+          <planeGeometry args={[2.4, 0.95]} />
+          <meshBasicMaterial color={NIEBLAS.lechosa} transparent opacity={0.34} depthWrite={false} side={THREE.DoubleSide} />
+        </mesh>
+      </group>
+
+      {/* el canasto de cosecha en el patio, con dos mazorcas recién bajadas */}
+      <group position={[-1.5, 0, 1.3]}>
+        <mesh position={[0, 0.18, 0]}>
+          <cylinderGeometry args={[0.24, 0.17, 0.36, 9, 1, true]} />
+          <meshLambertMaterial color={CASA.bejuco} flatShading side={THREE.DoubleSide} />
+        </mesh>
+        <mesh position={[-0.05, 0.4, 0.02]} scale={[0.72, 1.4, 0.72]}>
+          <sphereGeometry args={[0.13, 7, 6]} />
+          <meshLambertMaterial color={mezclar(ACENTOS.guayacan, ACENTOS.ambar, 0.5)} flatShading />
+        </mesh>
+        <mesh position={[0.12, 0.38, -0.06]} rotation={[0, 0, 0.5]} scale={[0.72, 1.4, 0.72]}>
+          <sphereGeometry args={[0.13, 7, 6]} />
+          <meshLambertMaterial color={mezclar(ACENTOS.cafeCereza, TIERRAS.siembra, 0.45)} flatShading />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/* El anillo del paso didáctico: respira sobre el punto que la lección señala.
+   Con reducedMotion queda quieto (presencia sin parpadeo). */
+function FocoPaso({ foco, reducedMotion }) {
+  const anillo = useRef(null);
+  useFrame(({ clock }) => {
+    const m = anillo.current;
+    if (!m) return;
+    if (reducedMotion) {
+      m.material.opacity = 0.42;
+      return;
+    }
+    const t = clock.elapsedTime;
+    m.material.opacity = 0.3 + 0.2 * Math.sin(t * 1.8);
+    m.scale.setScalar(1 + 0.06 * Math.sin(t * 1.8));
+  });
+  if (!foco) return null;
+  return (
+    <mesh ref={anillo} position={[foco[0], foco[1] + 0.12, foco[2]]} rotation={[-Math.PI / 2, 0, 0]}>
+      <ringGeometry args={[1.25, 1.65, 32]} />
+      <meshBasicMaterial
+        color={LUCES.candela}
+        transparent
+        opacity={0.4}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+
+/* La fauna del cacaotal: los SVG rubber-hose de la casa como billboards
+   (contrato del operador: el bicho pone el cuerpo, la escena la coreografía).
+   Mariposas en el aire caliente y el escarabajo reptando en la hojarasca —
+   el descomponedor que la hoja del cacao alimenta. */
+const FAUNA_CACAOTAL = [
+  { tipo: 'mariposa', base: [-3.5, 3.4, 2.4], patron: 'revoloteo', size: 27, fase: 0.6, df: 9 },
+  { tipo: 'mariposa', base: [6.2, 2.0, 3.6], patron: 'revoloteo', size: 23, fase: 2.4, df: 9 },
+  { tipo: 'escarabajo', base: [-1.2, 0.5, 6.2], patron: 'reptar', size: 22, fase: 1.2, df: 8 },
+];
+
+/* La FAUNA EMBLEMÁTICA DEL PISO CÁLIDO-TROPICAL BAJO (0–1.200 m): el cacaotal ES
+   tierra caliente y su dosel está lleno de vida. Especies REALES colombianas con
+   su nombre científico, del DR fauna-piso-cálido (gemini, GBIF): la guacamaya
+   bandera que ronda en lo alto, el tucán posado, el perezoso colgado lentísimo,
+   el mico entre las ramas, la iguana asoleándose en el tronco caído y el morfo
+   azul del sotobosque. Billboards SVG con coreografía por nicho (FaunaCalido).
+   Orden = prominencia: el recorte por tier deja siempre lo insignia. */
+const FAUNA_CALIDO_CACAO = [
+  { tipo: 'guacamaya', base: [0, 6.2, -6.5], patron: 'vuela', size: 66, fase: 0.5, df: 13, title: 'Guacamaya bandera (Ara macao)' },
+  { tipo: 'tucan', base: [-3.0, 4.6, -1.0], patron: 'posa', size: 60, fase: 1.4, df: 9, title: 'Tucán pechiblanco (Ramphastos tucanus)' },
+  { tipo: 'perezoso', base: [3.4, 4.2, -0.4], patron: 'cuelga', size: 66, fase: 0.9, df: 9, title: 'Perezoso de tres dedos (Bradypus variegatus)' },
+  { tipo: 'mico', base: [5.6, 3.6, -1.4], patron: 'trepa', size: 54, fase: 2.2, df: 9, title: 'Mico maicero (Saimiri sciureus)' },
+  { tipo: 'iguana', base: [-5.2, 0.9, 3.0], patron: 'asolea', size: 58, fase: 0.3, df: 8.5, title: 'Iguana verde (Iguana iguana)' },
+  { tipo: 'morfo', base: [-1.8, 2.7, 3.0], patron: 'morfo', size: 40, fase: 0.6, df: 9, title: 'Morfo azul (Morpho peleides)' },
+];
+
+function Diorama({ tier, reducedMotion, foco }) {
+  const perfil = perfilDeTier(tier);
+
+  /* La atmósfera VIVA (misma resolución que monta AtmosferaMundo: barata,
+     cambia por franja) — alimenta el domo y la perspectiva aérea del fondo. */
+  const atm = useAtmosferaMundo({ familia: FAMILIA_CACAOTAL, reducedMotion });
+
+  /* EL gradiente de bandas de la escena (toma B): terreno y lomas comparten
+     los mismos escalones de luz — ilustración en movimiento. */
+  const bandas = useGradienteBandas();
+
+  const geoVega = useMemo(
+    () => construirVega(perfil.segmentosTerreno, perfil.flatShading),
+    [perfil.segmentosTerreno, perfil.flatShading],
+  );
+
+  /* Las lomas calientes del fondo, comidas por la calina DE LA HORA
+     (perspectiva aérea viva: la calina se dora y se apaga con el valle). */
+  const lomas = useMemo(
+    () => ({
+      cerca: mezclar(VERDES.trabajo, atm.niebla, 0.22),
+      media: mezclar(VERDES.trabajo, atm.niebla, 0.3),
+      lejos: mezclar(VERDES.trabajo, atm.niebla, 0.4),
+    }),
+    [atm.niebla],
+  );
+
+  const fauna = useMemo(
+    () => (tier === 'alto' ? FAUNA_CACAOTAL : FAUNA_CACAOTAL.slice(0, 2)),
+    [tier],
+  );
+
+  /* La fauna emblemática del cálido: recortada por tier (alto todo el elenco;
+     medio deja lo insignia — guacamaya + tucán + perezoso). */
+  const faunaCalido = useMemo(
+    () => (tier === 'alto' ? FAUNA_CALIDO_CACAO : FAUNA_CALIDO_CACAO.slice(0, 3)),
+    [tier],
+  );
+
+  const controls = useRef(null);
+  const casaY = alturaVega(SITIO_CASA[0], SITIO_CASA[1]);
+
+  return (
+    <>
+      {/* LA ATMÓSFERA DEL KIT: fondo, niebla, luces y estrellas de LA HORA DEL
+          VALLE (familia sotobosque), con el shadow-map del sombrío en alta. */}
+      <AtmosferaMundo
+        familia={FAMILIA_CACAOTAL}
+        tier={tier}
+        reducedMotion={reducedMotion}
+        radio={RADIO_CACAOTAL}
+        conSuelo={false}
+        sombra={SOMBRA_CACAOTAL}
+      />
+
+      {/* El DOMO de la toma B: gradiente cenit→horizonte + glow del sol pesado
+          de tierra caliente — el atardecer del piso cálido es el cartel. */}
+      <DomoCielo atm={atm} radio={64} />
+
+      {/* LA VEGA por bandas (recibe la sombra del sombrío en gama alta).
+          El look facetado no necesita flag: con perfil.flatShading el terreno
+          ya viene DESINDEXADO con normales planas horneadas (construirTerreno). */}
+      <mesh geometry={geoVega} receiveShadow={perfil.sombras}>
+        <meshToonMaterial vertexColors gradientMap={bandas} />
+      </mesh>
+
+      {/* las lomas calientes del fondo, comidas por la calina de la hora */}
+      <mesh position={[-14, 1.4, -20]} scale={[10, 3.2, 5]}>
+        <sphereGeometry args={[1, 12, 8]} />
+        <meshToonMaterial color={lomas.media} gradientMap={bandas} />
+      </mesh>
+      <mesh position={[8, 1.8, -23]} scale={[12, 4.0, 6]}>
+        <sphereGeometry args={[1, 12, 8]} />
+        <meshToonMaterial color={lomas.lejos} gradientMap={bandas} />
+      </mesh>
+      <mesh position={[21, 1.2, -19]} scale={[8, 2.6, 5]}>
+        <sphereGeometry args={[1, 12, 8]} />
+        <meshToonMaterial color={lomas.cerca} gradientMap={bandas} />
+      </mesh>
+
+      {/* EL CACAOTAL: matas, mazorcas, sombrío, plátano, luz colada */}
+      <FloraCacao tier={tier} reducedMotion={reducedMotion} />
+
+      {/* la casa con su cajón de fermentar y la pasera, en la lomita */}
+      <CasaSecadero pos={[SITIO_CASA[0], casaY, SITIO_CASA[1]]} />
+
+      {/* LA VIDA que la sombra trae: mariposas y el escarabajo del mantillo */}
+      {perfil.criaturas > 0 && <Fauna items={fauna} reducedMotion={reducedMotion} />}
+
+      {/* LA FAUNA EMBLEMÁTICA DEL CÁLIDO: guacamaya en vuelo, tucán posado,
+          perezoso colgado, mico en las ramas, iguana al sol y el morfo azul. */}
+      {perfil.criaturas > 0 && <FaunaCalido items={faunaCalido} reducedMotion={reducedMotion} />}
+
+      {/* el anillo del paso didáctico (lo maneja el host) */}
+      <FocoPaso foco={foco} reducedMotion={reducedMotion} />
+
+      <OrbitControls
+        ref={controls}
+        makeDefault
+        target={[0, 1.2, -4]}
+        enablePan={false}
+        enableZoom
+        minDistance={8}
+        maxDistance={26}
+        minPolarAngle={0.5}
+        maxPolarAngle={1.45}
+        minAzimuthAngle={-1.1}
+        maxAzimuthAngle={1.1}
+        enableDamping
+        dampingFactor={0.08}
+        autoRotate={!reducedMotion}
+        autoRotateSpeed={0.12}
+      />
+      {/* La LLEGADA del kit: dolly de establishing con tilt-down suave — entrar
+          a la vega se siente como llegar por el camino, una vez por sesión. */}
+      <CamaraDirector
+        controls={controls}
+        reposo={[2.5, 7.4, 16.5]}
+        mirada={[0, 2.2, -4]}
+        respiro={0.04}
+        activa={!reducedMotion && tier !== 'bajo'}
+        unaVezClave="mundoCacaotal"
+      />
+      <AdaptiveDpr pixelated />
+    </>
+  );
+}
+
+/**
+ * El mundo del cacaotal bajo sombra. Montar SOLO perezosa (lazy).
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, foco?: number[]|null}} props
+ */
+export default function EscenaCacaoVivo({ tier = 'alto', reducedMotion = false, foco = null }) {
+  const perfil = perfilDeTier(tier);
+  const [listo, setListo] = useState(false);
+  return (
+    <Canvas
+      className={`cacao-canvas${listo ? ' cacao-canvas--lista' : ''}`}
+      dpr={perfil.dpr}
+      gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
+      shadows={perfil.sombras ? 'soft' : false}
+      camera={{ position: [2.5, 7.4, 16.5], fov: 46 }}
+      frameloop={reducedMotion ? 'demand' : 'always'}
+      onCreated={() => setListo(true)}
+    >
+      <Diorama tier={tier} reducedMotion={reducedMotion} foco={foco} />
+    </Canvas>
+  );
+}

@@ -50,4 +50,31 @@ describe('subgrafoATextoCampesino', () => {
     expect(r).toContain('Relaciones encontradas');
     expect(r).toContain('companion_de');
   });
+
+  it('lista conceptos del enriquecimiento (label Concept)', () => {
+    const sg = {
+      nodes: [
+        { labels: ['Concept'], properties: { nombre: 'Piso térmico frío' } },
+        { labels: ['Concept'], properties: { id: 'micorriza_amf' } },
+        { labels: ['Concept'], properties: { name: 'Bombus' } },
+      ],
+    };
+    const r = subgrafoATextoCampesino(sg);
+    expect(r).toContain('Conceptos:');
+    expect(r).toContain('Piso térmico frío');
+    expect(r).toContain('micorriza_amf');
+    expect(r).toContain('Bombus');
+  });
+
+  it('no incluye la sección Conceptos si todos los nodos Concept carecen de nombre/id', () => {
+    const sg = {
+      nodes: [
+        { labels: ['Concept'], properties: {} },
+        { labels: ['Species'], properties: { nombre_comun: 'frijol' } },
+      ],
+    };
+    const r = subgrafoATextoCampesino(sg);
+    expect(r).not.toContain('Conceptos:');
+    expect(r).toContain('Especies: frijol');
+  });
 });
