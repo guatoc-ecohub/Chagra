@@ -31,7 +31,7 @@ import {
   INFRAESTRUCTURA_IDS,
   INFRAESTRUCTURA_CATEGORIAS,
 } from '../../visual/mundo3d/infraestructura/infraestructuraData.js';
-import Infraestructura from '../../visual/mundo3d/infraestructura/Infraestructura.jsx';
+import InfraestructuraViva from '../../visual/mundo3d/infraestructura/InfraestructuraViva.jsx';
 import { decidirTier, permite3D } from '../../visual/mundo3d/deviceTier.js';
 import { ATMOSFERA } from '../../visual/mundo3d/atmosferaMadre.js';
 import './VitrinaInfraestructura.css';
@@ -126,7 +126,7 @@ function LienzoPieza({ tipo, dims, tier, reducedMotion }) {
         <meshLambertMaterial color="#b49873" />
       </mesh>
       <Suspense fallback={null}>
-        <Infraestructura tipo={tipo} dims={dims} tier={tier} reducedMotion={reducedMotion} />
+        <InfraestructuraViva tipo={tipo} dims={dims} tier={tier} reducedMotion={reducedMotion} />
       </Suspense>
       <OrbitControls
         target={[0, dims.alto * 0.42, 0]}
@@ -410,7 +410,7 @@ function DemoColocar({ modo3D, tier, reducedMotion }) {
             <directionalLight position={[-6, 5, -8]} intensity={0.22} color={ATMOSFERA.relleno} />
             <TerrenoDemo segmentos={tier === 'alto' ? 56 : 34} onTocar={tocarTerreno} />
             {colocadas.map((c, i) => (
-              <Infraestructura
+              <InfraestructuraViva
                 key={`${c.tipo}-${i}`}
                 tipo={c.tipo}
                 pos={c.pos}
@@ -422,7 +422,7 @@ function DemoColocar({ modo3D, tier, reducedMotion }) {
             {borrador && (
               <>
                 <AnilloBorrador borrador={borrador} />
-                <Infraestructura
+                <InfraestructuraViva
                   tipo={borrador.tipo}
                   pos={borrador.pos}
                   rot={borrador.rot}
