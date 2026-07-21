@@ -86,8 +86,9 @@ export const PAL = {
   // Cuerpos (cada bicho se reconoce de un vistazo).
   // La angelita NO tiene colores propios acá: son los de su identidad aprobada.
   angelitaCuerpo: ABEJA_PALETA.cuerpo,
-  angelitaCabeza: ABEJA_PALETA.cabeza,
-  angelitaChumbe: ABEJA_PALETA.hiloChumbe, // el hilo de tierra de su banda
+  angelitaCabeza: ABEJA_PALETA.testa, // cabeza oscura real del meliponino
+  angelitaTorax: ABEJA_PALETA.torax, // torax oscuro del meliponino real
+  angelitaChumbe: ABEJA_PALETA.hiloChumbe, // tergite tenue del abdomen (ya NO banda)
   apisCuerpo: '#e5a13c',
   apisBanda: '#4a3524',
   abejorroPelo: '#2b2723', // negro peludo

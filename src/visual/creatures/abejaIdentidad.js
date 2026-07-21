@@ -38,9 +38,9 @@ export { RH_INK as ABEJA_TINTA } from './_rubberhose.jsx';
 export const ABEJA_PALETA = {
   cuerpo: '#f2c064',      // ámbar PÁLIDO del abdomen liso y del aura viva
   cuerpoGlow: 'rgba(242,192,100,0.85)', // el mismo ámbar como resplandor (drop-shadow)
-  cabeza: '#33281a',      // cabeza OSCURA (casi negra) — meliponino, NO Apis
+  cabeza: '#ffd76a',      // dorado histórico: acento de UI del agente (certeza) — NO el color real
+  testa: '#33281a',       // cabeza OSCURA REAL del meliponino (dibujo 2D + billboard 3D), NO Apis
   torax: '#3d2c19',       // tórax oscuro (un pelo más cálido que la cabeza)
-  acento: '#ffd76a',      // dorado claro SOLO para acentos de UI (certeza del agente)
   cara: '#ffe3ad',        // máscara facial clara (clípeo amarillo real de la angelita)
   hiloChumbe: '#c98a3e',  // tergite tenue del abdomen (línea suave, ya NO banda)
   alaTul: '#cfeeff',      // ala grande de tul (hialina)
