@@ -1,0 +1,45 @@
+/*
+ * ArtesaniaAndinaTelarDemo.css — chrome MÍNIMO de la vitrina (título + marco).
+ * Los colores son la MISMA paleta que declara `artesaniaAndina.js`
+ * (ROLES_ANDINOS.fondo/linea): no se inventa tono nuevo para esta página.
+ */
+
+.artei {
+  min-height: 100dvh;
+  background: #ece0c7; /* PALETA_ANDINA.crudo == ROLES_ANDINOS.fondo */
+  color: #2a2016; /* PALETA_ANDINA.tinta == ROLES_ANDINOS.linea */
+  padding: 1.1rem 1rem 2.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.artei__head {
+  max-width: 42rem;
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+.artei__kicker {
+  margin: 0 0 0.3rem;
+  font: 700 0.72rem/1.2 system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.artei__head h1 {
+  margin: 0 0 0.5rem;
+  font: 700 1.35rem/1.25 system-ui, sans-serif;
+}
+
+.artei__lema {
+  margin: 0;
+  font: 500 0.92rem/1.5 system-ui, sans-serif;
+  opacity: 0.86;
+}
+
+.artei__lienzo {
+  width: 100%;
+  max-width: 46rem;
+}

@@ -170,6 +170,11 @@ const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 // 3D: el PÁRAMO altoandino — el ecosistema de la niebla (frailejones, musgo,
 // quenuas, aves) y el NACIMIENTO del agua. Didáctico: la fábrica de agua.
 const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
+// 2D (SVG, three-free): el lenguaje de forma "artesanía andina" — paleta,
+// trazo, patrones de telar, banda chumbe, greca escalonada, marco de tarjeta
+// y siluetas de cerámica low-poly. Rescate de huérfano (ArtesaniaAndina.jsx
+// no tenía consumidor); ver su cabecera para el contrato de cableo.
+const ArtesaniaAndinaTelarMockup = lazy(() => import('./mockups/ArtesaniaAndinaTelarDemo'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -568,6 +573,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
   'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
+  'mockups/artesania-andina-telar': 'mockup_artesania_andina_telar',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1838,6 +1844,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El páramo altoandino">
               <MundoParamo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_artesania_andina_telar':
+        // El lenguaje de forma "artesanía andina" en su capa 2D (SVG,
+        // three-free): paleta, trazo, patrones de telar, banda chumbe, greca
+        // escalonada, marco de tarjeta y siluetas de cerámica. Ruta
+        // #/mockups/artesania-andina-telar, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Artesanía andina">
+              <ArtesaniaAndinaTelarMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
