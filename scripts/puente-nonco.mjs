@@ -284,7 +284,10 @@ function emitCoRelevantRel(fromId, toId, metodo, confianza, razon, createdAt = n
   // NO por una propiedad `id`. Cada valor va con su tipo: strings escapadas y entre
   // comillas, números crudos. Se evita `SET r += {map}` (soporte dudoso) usando SET
   // explícito por propiedad. created_at se pasa como arg para no depender de reloj.
-  const q = (s) => `'${String(s).replace(/'/g, "\\'")}'`;
+  // La barra invertida se escapa PRIMERO: escapar solo la comilla dejaba que un
+  // valor terminado en `\` se comiera la comilla de cierre y siguiera como Cypher
+  // ejecutable (CodeQL js/incomplete-sanitization, high).
+  const q = (s) => `'${String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
   const setClauses = [
     `r.metodo = ${q(metodo)}`,
     `r.confianza = ${Number(confianza)}`,
