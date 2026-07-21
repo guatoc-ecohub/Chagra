@@ -74,6 +74,7 @@ import {
   CSS_ROTULOS,
   CORTE_POS as CORTE_POS_EM,
 } from '../visual/mundo3d/bosque/EscenaEntMaestro.jsx';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { CIELOS_HORA, mezclaHex } from '../visual/mundo3d/cielosHoraData.js';
 import { PALETA, mezclar } from '../visual/mundo3d/atmosferaMadre.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
@@ -600,21 +601,24 @@ function FrailejonalInstanciado({ n }) {
     const tinte = new THREE.Color();
     sitios.forEach((s, i) => {
       const stemH = s.esc * s.alto; // altura visible del tallo (cilindro h=1.0)
-      // tallo: los ancianos más curtidos (oscurecen), los jóvenes casi ocultos
-      dummy.position.set(s.wx, s.y + stemH * 0.5, s.wz);
+      // el color base ya vive en la geometría (vertex colors); la instancia solo
+      // MODULA (multiplica) por edad: ancianos algo más curtidos, jóvenes claros
+      dummy.position.set(s.wx, s.y, s.wz);
       dummy.rotation.set(s.ladeo, s.giro, 0);
       dummy.scale.set(s.esc, Math.max(s.esc * s.alto, 0.02), s.esc);
       dummy.updateMatrix();
       mt.setMatrixAt(i, dummy.matrix);
-      tinte.copy(baseTallo).offsetHSL(0, 0, -0.03 * s.edad + ((i % 5) * 0.01 - 0.02));
+      const gt = 1 - 0.05 * s.edad + ((i % 5) * 0.012 - 0.024);
+      tinte.setRGB(gt, gt * 0.99, gt * 0.97);
       mt.setColorAt(i, tinte);
       // roseta sobre el tallo; los ancianos la lucen algo más plateada (clara)
-      dummy.position.set(s.wx, s.y + stemH + 0.14 * s.esc, s.wz);
-      dummy.rotation.set(s.ladeo, s.giro, 0);
-      dummy.scale.set(s.esc, s.esc * 0.7, s.esc);
+      dummy.position.set(s.wx, s.y + stemH + 0.02 * s.esc, s.wz);
+      dummy.rotation.set(s.ladeo * 0.5, s.giro * 1.3, 0);
+      dummy.scale.set(s.esc, s.esc, s.esc);
       dummy.updateMatrix();
       mr.setMatrixAt(i, dummy.matrix);
-      tinte.copy(baseHoja).offsetHSL(0, -0.02 * s.edad, 0.02 * s.edad + ((i % 4) * 0.012 - 0.018));
+      const gr = 1 + 0.035 * s.edad + ((i % 4) * 0.014 - 0.02);
+      tinte.setRGB(Math.min(gr * 0.99, 1.1), Math.min(gr, 1.12), Math.min(gr * 0.98, 1.08));
       mr.setColorAt(i, tinte);
     });
     mt.instanceMatrix.needsUpdate = true;
