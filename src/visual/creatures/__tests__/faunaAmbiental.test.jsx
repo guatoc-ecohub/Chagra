@@ -46,7 +46,7 @@ describe('1. castAmbiental — data-driven desde el registro', () => {
     expect(cast).not.toContain(CENTRAL_DEFECTO);
     MICROFAUNA_EXCLUIDA.forEach((m) => expect(cast).not.toContain(m));
     // Los personajes reales del registro sí están (oso, jaguar, colibrí…).
-    expect(cast).toContain('oso-andino');
+    expect(cast).toContain('oso-guardian');
     expect(cast).toContain('jaguar');
     expect(cast).toContain('colibri');
   });
@@ -57,9 +57,9 @@ describe('1. castAmbiental — data-driven desde el registro', () => {
   });
 
   it('si el central es otro (oso), la abeja entra al coro y el oso sale', () => {
-    const cast = castAmbiental('oso-andino');
+    const cast = castAmbiental('oso-guardian');
     expect(cast).toContain('abeja-angelita');
-    expect(cast).not.toContain('oso-andino');
+    expect(cast).not.toContain('oso-guardian');
   });
 
   it('el morrocoy (recién aterrizado en CREATURES) ya está en el elenco', () => {
@@ -67,9 +67,9 @@ describe('1. castAmbiental — data-driven desde el registro', () => {
   });
 
   it('excluir saca extras del coro (Angelita donde ya es la acompañante)', () => {
-    const cast = castAmbiental('oso-andino', CREATURES, ['abeja-angelita']);
+    const cast = castAmbiental('oso-guardian', CREATURES, ['abeja-angelita']);
     expect(cast).not.toContain('abeja-angelita');
-    expect(cast).not.toContain('oso-andino');
+    expect(cast).not.toContain('oso-guardian');
     expect(cast).toContain('jaguar');
   });
 });
@@ -107,7 +107,7 @@ describe('3. limiteAmbiental — el presupuesto duro por gama', () => {
 });
 
 describe('4. el pool rotativo — invariantes bajo mil vueltas', () => {
-  const cast = ['colibri', 'oso-andino', 'rana-andina', 'perezoso', 'ardilla', 'jaguar'];
+  const cast = ['colibri', 'oso-guardian', 'rana-andina', 'perezoso', 'ardilla', 'jaguar'];
 
   it('crearEstado arma min(limite, cast) slots, todos descansando', () => {
     const e = crearEstado(cast, 3);
@@ -177,7 +177,7 @@ describe('5. coherencia de entradas — solo el jaguar es mágico', () => {
   it('el jaguar aparece mágico; el resto viene de un lado', () => {
     expect(MAGICOS).toEqual(['jaguar']);
     expect(esMagico('jaguar')).toBe(true);
-    expect(esMagico('oso-andino')).toBe(false);
+    expect(esMagico('oso-guardian')).toBe(false);
     expect(esMagico(null)).toBe(false);
   });
 });
@@ -191,7 +191,7 @@ describe('6. <FaunaAmbiental> — el DOM cumple el presupuesto', () => {
   });
 
   const registro = registroFake([
-    'abeja-angelita', 'colibri', 'oso-andino', 'rana-andina', 'perezoso',
+    'abeja-angelita', 'colibri', 'oso-guardian', 'rana-andina', 'perezoso',
   ]);
 
   it('reduced-motion → la capa NI SE MONTA', () => {

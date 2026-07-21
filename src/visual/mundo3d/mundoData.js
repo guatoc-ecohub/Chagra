@@ -219,33 +219,26 @@ export const MUNDO = {
     pisoTermico: 'templado',
     escena: 'cafe',
     valle: { tipo: 'cafetal', pos: [3.4, 0, 2.2], escala: 1 },
-    params: {
-      // El diorama tiene defaults propios; aquí los hacemos explícitos y
-      // deterministas (mismos cafetos, sombra y estados del grano).
-      cafetos: [
-        { color: '#3f6f3a', pos: [-0.55, 0, 0.42], cerezas: 6 },
-        { color: '#468637', pos: [0.5, 0, 0.12], cerezas: 5 },
-        { color: '#3f6f3a', pos: [0.02, 0, -0.5], cerezas: 4, roya: true },
-        { color: '#457d38', pos: [-0.78, 0, -0.32], cerezas: 5 },
-      ],
-      sombra: [
-        { pos: [-1.65, 0, -0.95], color: '#4b7a3a', alto: 2.2 }, // guamo (Inga)
-        { pos: [1.7, 0, -0.8], color: '#3f6b39', alto: 2.0 },    // nogal cafetero
-      ],
-      granos: [
-        { estado: 'cereza', color: '#b8342a', pos: [-1.5, 0, 0.75] },
-        { estado: 'pergamino', color: '#d4c199', pos: [-1.15, 0, 1.05] },
-        { estado: 'oro', color: '#9fae5a', pos: [-0.72, 0, 1.2] },
-      ],
-    },
+    // La escena es LA LADERA COMPLETA de `cafetal/` (geografía determinista en
+    // floraCafetal.geom): ya no hay cafetos de mesa que declarar aquí. El `id`
+    // ancla la capa viva (partículas/momentos) a la siembra propia del mundo.
+    params: { id: 'cafe' },
+    // Las puertas repartidas EN PROFUNDIDAD ladera arriba (entrada con aire, un
+    // solo foco cerca): el grano en la mata protagonista del camino, la sombra
+    // en el guamo del centro, la roya en su mata señalada, el manejo en la
+    // trampa de broca y el beneficio en la casa que corona la loma. Alturas
+    // horneadas del terreno real (alturaLadera + el porte de cada elemento).
     hotspots: [
-      { id: 'grano', pos: [-0.55, 0.9, 0.42], emoji: '☕', label: 'El grano, paso a paso', view: 'cafe' },
-      { id: 'sombra', pos: [-1.65, 2.5, -0.95], emoji: '🌳', label: 'El café bajo sombra', view: 'biodiversidad' },
-      { id: 'roya', pos: [0.02, 0.85, -0.5], emoji: '🍂', label: 'La roya y la broca', view: 'plagas' },
-      { id: 'manejo', pos: [0.5, 0.82, 0.12], emoji: '🐞', label: 'Manejo sin veneno', view: 'biopreparados' },
-      { id: 'beneficio', pos: [1.0, 0.7, 0.55], emoji: '💧', label: 'Despulpar, fermentar, secar', view: 'poscosecha' },
+      { id: 'grano', pos: [-2.8, 1.9, 5.6], emoji: '☕', label: 'El grano, paso a paso', view: 'cafe' },
+      { id: 'sombra', pos: [3.2, 4.7, 2.4], emoji: '🌳', label: 'El café bajo sombra', view: 'biodiversidad' },
+      { id: 'roya', pos: [-5.6, 2.7, -1.5], emoji: '🍂', label: 'La roya y la broca', view: 'plagas' },
+      { id: 'manejo', pos: [4.6, 2.6, -0.6], emoji: '🐞', label: 'Manejo sin veneno', view: 'biopreparados' },
+      { id: 'beneficio', pos: [10.2, 7.5, -13.6], emoji: '💧', label: 'Despulpar, fermentar, secar', view: 'poscosecha' },
     ],
-    entrada: { zoom: 7.5, narra: 'cafe' },
+    // El centro se corre atrás y abajo para que la mirada de EscenaBase3D
+    // (centro.y + zoom·0.12) caiga en CAMARA.mirada de floraCafetal.geom: la
+    // cámara pasa POR DEBAJO del techo de sombra, no entre las copas.
+    entrada: { zoom: 13, centro: [-0.4, 2.24, -3.4], narra: 'cafe' },
     // El gemelo 2D digno: la ficha del café (misma lección, en cifras y notas).
     fallback2d: {
       escena: 'infografia',

@@ -42,6 +42,10 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { rng } from '../bosque/entQuenua.geom.js';
+import { construirTerreno } from '../kit/terreno.js';
+import { ruidoTerreno } from '../kit/ruido.js';
+import { VERDES, TIERRAS } from '../paleta/paletaMadre.js';
+import { mezclar } from '../atmosferaMadre.js';
 
 /* -------------------------------------------------------------------------- */
 /*  La ladera cafetera (la geografía del mundo, determinista)                  */
@@ -74,6 +78,51 @@ export function alturaLadera(wx, wz) {
   return h;
 }
 
+/*
+ * LA MALLA de la ladera — el heightfield del KIT (mismo andamiaje que todos los
+ * mundos) con la pintura PROPIA del piso templado: arvenses verdes (cobertura
+ * viva), tierra roja andina asomando y el mantillo pardo hacia la sombra. Vivía
+ * duplicada en cada escena que montaba el cafetal; aquí es la geografía única
+ * (headless, testeable, memoizar en quien llama).
+ */
+/*
+ * ⚠️ EL PISO TÉRMICO MANDA EN LA PALETA. Esta ladera se pintaba con
+ * `VERDES.calido` (#98ab4b, oliva amarillento) como color DOMINANTE — la mezcla
+ * `0.5 + 0.5·ruido` lo dejaba pesando la mitad o más del suelo. Pero `calido` es
+ * la banda del piso CÁLIDO, y el *Coffea arabica* colombiano es cultivo de piso
+ * TEMPLADO (la franja cafetera de montaña, ~1.200–1.900 m). Pintar el cafetal
+ * con la paleta del piso de abajo es lo que lo dejaba PARDO Y MUSTIO al lado del
+ * verde del valle: no era la luz ni la niebla, era la banda equivocada.
+ *
+ * Ahora manda el verde templado (`templadoVivo`) y el amarillento queda de
+ * variación al sol (`brote`), que es el reparto real de un cafetal bajo sombra.
+ */
+export function construirLadera(seg, plano) {
+  const cPasto = new THREE.Color(VERDES.templadoVivo); // el verde franco del templado
+  const cPasto2 = new THREE.Color(VERDES.brote); // el pasto al sol, apenas amarillento
+  const cTierra = new THREE.Color(TIERRAS.arcilla); // la tierra roja cafetera
+  const cMantillo = new THREE.Color(TIERRAS.mantillo); // hojarasca bajo el sombrío
+  const cCamino = new THREE.Color(mezclar(TIERRAS.camino, TIERRAS.vega, 0.4));
+  return construirTerreno({
+    ancho: ANCHO,
+    fondo: FONDO,
+    seg,
+    plano,
+    altura: alturaLadera,
+    pintar: (wx, wz, alt, c) => {
+      const enLoma = smoothstep(5, -8, wz);
+      c.lerpColors(cPasto, cPasto2, 0.5 + 0.5 * ruidoTerreno(wx * 0.9, wz * 0.7));
+      // la tierra roja asoma a manchas entre los surcos (ACENTO, no manto: a
+      // 0.45 se comía el verde y dejaba la ladera parda)
+      c.lerp(cTierra, smoothstep(-0.1, 0.85, ruidoTerreno(wx * 1.3, wz * 1.1)) * 0.32 * enLoma);
+      // el mantillo pardo gana hacia lo alto (más sombrío, más hojarasca)
+      c.lerp(cMantillo, enLoma * 0.16);
+      // el caminito seco del frente, por donde se llega
+      c.lerp(cCamino, smoothstep(1.2, 0, Math.abs(wx - Math.sin(wz * 0.4) * 2.2)) * smoothstep(2, 12, wz));
+    },
+  });
+}
+
 /* -------------------------------------------------------------------------- */
 /*  Presupuesto por tier                                                       */
 /* -------------------------------------------------------------------------- */
@@ -104,10 +153,13 @@ export const PAL = {
   // Cafeto
   cafetoTallo: '#5a4430', // tallo leñoso delgado
   cafetoRama: '#6b5138', // la rama plagiotrópica, la percha de las cerezas
-  cafetoHoja: '#24512c', // hoja verde MUY oscura lustrosa (la firma del café)
-  cafetoHojaSol: '#3d7238', // la cara de la hoja que da al sol
-  cafetoHojaSombra: '#1c3f23', // el corazón tupido de cada piso, tras las hojas
-  cafetoBrote: '#7fa24c', // cogollo tierno arriba
+  // La hoja del arábica es oscura y LUSTROSA — pero lustrosa quiere decir que
+  // devuelve luz, no que sea negra. Subidas de valor medidas: la firma oscura
+  // se conserva, se le quita el apagado que la dejaba mustia bajo el sombrío.
+  cafetoHoja: '#2a6332', // hoja verde oscura lustrosa (la firma del café)
+  cafetoHojaSol: '#4d8f40', // la cara de la hoja que da al sol
+  cafetoHojaSombra: '#1b452a', // el corazón tupido de cada piso, tras las hojas
+  cafetoBrote: '#8cb752', // cogollo tierno arriba
 
   // Los estados de la cereza (van POR INSTANCIA, no aquí; referencia — la gama
   // real de la foto de cosecha: verde → pintón naranja → rojo cereza → VINO):
@@ -122,14 +174,14 @@ export const PAL = {
 
   // Guamo (Inga) — el parasol del sombrío
   guamoTronco: '#6b533a',
-  guamoCopa: '#4b7c3a',
-  guamoCopaSol: '#699a48',
+  guamoCopa: '#4e8640',
+  guamoCopaSol: '#74ad4d',
   guama: '#82a854', // las vainas verdes colgantes (la firma del Inga)
 
   // Nogal cafetero (Cordia alliodora) — el sombrío alto y recto
   nogalTronco: '#8a8274',
-  nogalCopa: '#527a40',
-  nogalCopaSol: '#6c9450',
+  nogalCopa: '#57874a',
+  nogalCopaSol: '#79a557',
 
   // Plátano intercalado
   platanoTallo: '#a8b06c',
@@ -224,57 +276,176 @@ function variar(base, r, amt = 0.06) {
  * pisos de ramas plagiotrópicas (horizontales, apenas caídas) alrededor del
  * tallo ortotrópico. Se EXPORTA para que las cerezas y las flores se siembren
  * SOBRE la misma rama que la geometría dibuja — el racimo pegado a la rama.
+ *
+ * ⚠️ LA SILUETA ES EL ENTREGABLE. La tabla anterior tenía los largos DECRECIENDO
+ * de abajo hacia arriba (0.56 → 0.50 → 0.42 → 0.32) sobre un tallo de 1.28 y
+ * remataba en punta: eso es un CONO — más alto que ancho y afilado arriba. De
+ * cerca no se notaba (mandaban la hoja y la cereza), pero a media distancia,
+ * cuando el detalle se pierde y solo queda el contorno, la ladera entera se leía
+ * como un BOSQUE DE PINOS. Ese fue el reclamo que sobrevivió.
+ *
+ * El *Coffea arabica* adulto de finca es al revés: 1,5–3 m de alto contra una
+ * copa de 2,5–4,5 m de diámetro — MÁS ANCHO QUE ALTO —, de contorno redondeado,
+ * elíptico e irregular, nunca cónico ni piramidal. Por eso la tabla nueva:
+ *
+ *   · el HOMBRO ANCHO no está abajo del todo sino en el segundo/tercer piso
+ *     (envolvente OVALADA, no triángulo),
+ *   · el remate de arriba es ROMO y corto (la mata no termina en punta),
+ *   · ancho máximo 0.90×2 = 1.80 contra 1.36 de alto → relación 1,3 a favor del
+ *     ancho, que es la proporción que separa un arbusto de una conífera.
  */
 export const PISOS_CAFETO = [
-  { y: 0.34, ramas: 4, len: 0.56, caida: -0.16 }, // el piso bajo, el más ancho
-  { y: 0.6, ramas: 4, len: 0.5, caida: -0.12 },
-  { y: 0.84, ramas: 3, len: 0.42, caida: -0.08 },
-  { y: 1.06, ramas: 3, len: 0.32, caida: -0.05 }, // el piso alto, el más corto
+  { y: 0.30, ramas: 4, len: 0.76, caida: -0.21 }, // el piso bajo, madera vieja
+  { y: 0.57, ramas: 4, len: 0.9, caida: -0.16 }, // EL HOMBRO: el piso más ancho
+  { y: 0.84, ramas: 4, len: 0.84, caida: -0.12 },
+  { y: 1.08, ramas: 3, len: 0.6, caida: -0.08 },
+  { y: 1.28, ramas: 3, len: 0.36, caida: -0.04 }, // el remate ROMO, no una punta
 ];
 
 /** El ángulo de la rama j del piso i (filotaxis simple, determinista). */
 export const anguloRamaCafeto = (piso, j, n) => (j / n) * Math.PI * 2 + piso * 0.55 + 0.35;
 
-/** Cuántos pisos de ramas dibuja (y carga) cada tier. */
-export const pisosCafetoDeQ = (q) => (q < 0.5 ? 2 : q < 0.85 ? 3 : PISOS_CAFETO.length);
+/** Cuántos pisos de ramas dibuja (y carga) cada tier. Aun recortado a 3, la
+    mata conserva el hombro ancho: queda más SQUAT, jamás más cónica. */
+export const pisosCafetoDeQ = (q) => (q < 0.5 ? 3 : q < 0.85 ? 4 : PISOS_CAFETO.length);
 
 /*
- * Porte columnar REAL del arábica: tallo leñoso central, pisos de RAMAS
- * horizontales visibles (la percha donde la distribución cuelga las cerezas),
- * HOJAS elípticas opuestas — grandes, oscuras, lustrosas: la firma del café —
- * y un corazón tupido por piso que da densidad a la silueta. Las CEREZAS y las
- * FLORES no van aquí: son InstancedMesh aparte, sembradas sobre estas ramas.
+ * LOS PORTES — el manejo colombiano hecho silueta.
+ *
+ * Un cafetal real NO es un molde repetido 120 veces: en la misma ladera conviven
+ * matas de un solo tallo, matas ZOQUEADAS (cortadas bajito para que rebroten,
+ * varios ejes desde el tocón) y matas AGOBIADAS (el tallo doblado para forzar
+ * brotación lateral). Cada manejo da una silueta distinta, y esa VARIEDAD entre
+ * individuos es la segunda mitad de por qué una ladera de café no se lee como
+ * plantación de coníferas: los pinos son todos iguales, los cafetos no.
+ *
+ * Cada eje es un tallo: `dx/dz` su sitio en el tocón, `inclina` cuánto se acuesta,
+ * `alto`/`ancho` su escala, `pisos` cuántos pisos alcanza a levantar.
  */
-export function geomCafeto({ q = 1 } = {}, seed = 1) {
-  const r = rng(seed);
-  const partes = [];
+export const PORTES = {
+  /* UN TALLO: el eje ortotrópico único con sus pisos abiertos. La silueta
+     ovalada de referencia — más ancha que alta, hombro a media altura. */
+  tallo: {
+    ejes: [{ dx: 0, dz: 0, azim: 0, inclina: 0, alto: 1, ancho: 1, pisos: 5 }],
+  },
+  /* ZOQUEADO: se cortó el tallo a 30–40 cm y rebrotaron varios. Base ANCHA y
+     tupida, tres copas cortas que se funden, remate romo y bajo. */
+  zoqueo: {
+    ejes: [
+      { dx: -0.13, dz: -0.06, azim: 3.5, inclina: 0.21, alto: 0.82, ancho: 0.88, pisos: 4 },
+      { dx: 0.12, dz: 0.09, azim: 0.6, inclina: 0.18, alto: 0.94, ancho: 0.82, pisos: 4 },
+      { dx: 0.02, dz: -0.15, azim: 4.9, inclina: 0.14, alto: 0.68, ancho: 0.76, pisos: 3 },
+    ],
+  },
+  /* AGOBIADO: el tallo doblado a propósito. Silueta HORIZONTAL, de seto bajo y
+     extendido — la más lejana posible de un cono. */
+  agobio: {
+    ejes: [
+      { dx: -0.17, dz: 0.05, azim: 2.9, inclina: 0.46, alto: 0.76, ancho: 1.18, pisos: 4 },
+      { dx: 0.15, dz: -0.05, azim: 0.2, inclina: 0.15, alto: 0.9, ancho: 1.0, pisos: 4 },
+    ],
+  },
+};
 
-  // El tallo ortotrópico central.
-  const tallo = new THREE.CylinderGeometry(0.028, 0.058, 1.24, 5, 1);
-  poner(tallo, [0, 0.62, 0]);
+/** Los portes en el orden en que se reparte la ladera (y su peso: el de un solo
+    tallo manda, el zoqueo es frecuente, el agobio es el menos común). */
+export const REPARTO_PORTES = /** @type {const} */ ([
+  ['tallo', 0.44],
+  ['zoqueo', 0.34],
+  ['agobio', 0.22],
+]);
+
+/** El porte que le toca a una mata según su azar (determinista aguas arriba). */
+export function porteDeAzar(u) {
+  let acc = 0;
+  for (const [id, peso] of REPARTO_PORTES) {
+    acc += peso;
+    if (u < acc) return id;
+  }
+  return 'tallo';
+}
+
+/**
+ * Un punto de la rama (piso `i`, rama `j`, avance `t`) del eje `e` de un porte,
+ * en coordenadas LOCALES de la mata. Es la MISMA cuenta que hace la malla, así
+ * que la cereza y la flor caen exactamente sobre la rama dibujada — la única
+ * verdad de dónde carga el café.
+ */
+export function puntoEnRama(porteId, ejeIdx, i, j, t) {
+  const porte = PORTES[porteId] || PORTES.tallo;
+  const eje = porte.ejes[ejeIdx % porte.ejes.length];
+  const p = PISOS_CAFETO[i];
+  const a = anguloRamaCafeto(i, j, p.ramas);
+  // en el marco del eje (antes de acostarlo)
+  const lx = Math.cos(a) * p.len * t * eje.ancho;
+  const ly = (p.y + p.caida * p.len * t) * eje.alto;
+  const lz = Math.sin(a) * p.len * t * eje.ancho;
+  // el eje se acuesta `inclina` hacia su azimut `azim`
+  const ca = Math.cos(eje.azim);
+  const sa = Math.sin(eje.azim);
+  const ci = Math.cos(eje.inclina);
+  const si = Math.sin(eje.inclina);
+  // rotar en el plano (dirección azim, vertical)
+  const along = lx * ca + lz * sa; // componente hacia el azimut
+  const cross = -lx * sa + lz * ca; // componente perpendicular
+  const along2 = along * ci + ly * si;
+  const y2 = ly * ci - along * si;
+  return [eje.dx + along2 * ca - cross * sa, y2, eje.dz + along2 * sa + cross * ca];
+}
+
+/*
+ * UN EJE (un tallo) del cafeto, en su marco propio: tallo leñoso, pisos de
+ * RAMAS plagiotrópicas visibles (la percha donde la distribución cuelga las
+ * cerezas), HOJAS elípticas opuestas y — lo que decide la lectura a distancia —
+ * los LÓBULOS del piso.
+ *
+ * Los lóbulos son la clave del reclamo. Antes cada piso llevaba UNA masa
+ * centrada: de lejos eso suma un volumen liso y continuo, que es justamente la
+ * textura de una conífera. Un cafetal visto a 20–50 m se ve GRANULOSO y
+ * ABULTADO: bultos de follaje con huecos entre ellos. Por eso ahora cada piso
+ * lleva DOS O TRES masas achatadas y DESCENTRADAS: el contorno queda escalonado
+ * y mordido, con luz colándose entre piso y piso. Eso es lo que a distancia
+ * dice "arbusto", y no "árbol de navidad".
+ */
+function geomEjeCafeto(eje, q, r) {
+  const partes = [];
+  const nPisos = Math.min(eje.pisos, pisosCafetoDeQ(q));
+  const nudosPorRama = q < 0.85 ? 1 : 2; // pares de hojas por rama según tier
+  const nLobulos = q < 0.85 ? 2 : 3;
+
+  // El tallo ortotrópico, solo hasta donde llegan sus pisos (un eje zoqueado es
+  // corto de verdad: nada de palos asomando sobre el follaje).
+  const alturaTallo = PISOS_CAFETO[nPisos - 1].y + 0.12;
+  const tallo = new THREE.CylinderGeometry(0.03, 0.064, alturaTallo, 5, 1);
+  poner(tallo, [0, alturaTallo * 0.5, 0]);
   partes.push(pintar(tallo, PAL.cafetoTallo));
 
-  const nPisos = pisosCafetoDeQ(q);
-  const nudosPorRama = q < 0.85 ? 1 : 2; // pares de hojas por rama según tier
   for (let i = 0; i < nPisos; i++) {
     const p = PISOS_CAFETO[i];
 
-    // El corazón tupido del piso (la masa oscura tras las hojas).
-    const core = new THREE.IcosahedronGeometry(p.len * 0.5, 0);
-    poner(
-      core,
-      [(r() - 0.5) * 0.06, p.y + 0.04, (r() - 0.5) * 0.06],
-      [0, r() * Math.PI, 0],
-      [1.3, 0.55, 1.3],
-    );
-    partes.push(pintar(core, variar(PAL.cafetoHojaSombra, r, 0.05)));
+    // LOS LÓBULOS del piso: masas achatadas y descentradas que hacen el
+    // contorno abultado e irregular (una centrada + las de afuera).
+    for (let L = 0; L < nLobulos; L++) {
+      const aL = (L / nLobulos) * Math.PI * 2 + i * 0.9 + r() * 0.4;
+      const radL = L === 0 ? 0 : p.len * (0.36 + r() * 0.22);
+      const masa = new THREE.IcosahedronGeometry(p.len * (L === 0 ? 0.44 : 0.3 + r() * 0.12), 0);
+      poner(
+        masa,
+        [Math.cos(aL) * radL, p.y + 0.03 + (r() - 0.5) * 0.06, Math.sin(aL) * radL],
+        [0, r() * Math.PI, 0],
+        [1.25, 0.5, 1.25], // ACHATADAS: el follaje del piso es una tabla, no una bola
+      );
+      partes.push(
+        pintar(masa, variar(L === 0 ? PAL.cafetoHojaSombra : PAL.cafetoHoja, r, 0.07)),
+      );
+    }
 
     for (let j = 0; j < p.ramas; j++) {
       const a = anguloRamaCafeto(i, j, p.ramas);
       const d = new THREE.Vector3(Math.cos(a), p.caida, Math.sin(a)).normalize();
 
       // La rama plagiotrópica visible (donde cargan racimos y hojas).
-      const rama = new THREE.CylinderGeometry(0.011, 0.021, p.len, 4, 1, true);
+      const rama = new THREE.CylinderGeometry(0.011, 0.022, p.len, 4, 1, true);
       apuntar(
         rama,
         [d.x * p.len * 0.5, p.y + d.y * p.len * 0.5, d.z * p.len * 0.5],
@@ -296,21 +467,65 @@ export function geomCafeto({ q = 1 } = {}, seed = 1) {
           hoja,
           [nx + Math.cos(ah) * 0.1, ny - 0.01, nz + Math.sin(ah) * 0.1],
           [0, -ah, lado * 0.16], // tendida, con una caída leve hacia su lado
-          [0.19 + r() * 0.03, 0.028, 0.1 + r() * 0.02],
+          [0.21 + r() * 0.04, 0.028, 0.11 + r() * 0.02],
         );
         partes.push(
-          pintar(hoja, variar((i + k) % 2 ? PAL.cafetoHojaSol : PAL.cafetoHoja, r, 0.05)),
+          pintar(hoja, variar((i + k) % 2 ? PAL.cafetoHojaSol : PAL.cafetoHoja, r, 0.06)),
         );
       }
     }
   }
 
-  // El cogollo tierno de la punta.
-  const brote = new THREE.IcosahedronGeometry(0.1, 0);
-  poner(brote, [0, 1.28, 0], [0, r() * Math.PI, 0], [1, 0.8, 1]);
-  partes.push(pintar(brote, PAL.cafetoBrote));
+  // EL REMATE: cogollos tiernos ACHATADOS repartidos en la corona. Antes era una
+  // sola mota centrada sobre el eje — una PUNTA, el remate de un pino. La mata
+  // de café no termina en punta: termina en una corona despeinada de brotes.
+  const nBrotes = q < 0.85 ? 2 : 3;
+  for (let b = 0; b < nBrotes; b++) {
+    const ab = (b / nBrotes) * Math.PI * 2 + 0.6;
+    const rb = b === 0 ? 0 : 0.1 + r() * 0.07;
+    const brote = new THREE.IcosahedronGeometry(0.085 + r() * 0.03, 0);
+    poner(
+      brote,
+      [Math.cos(ab) * rb, alturaTallo + (r() - 0.5) * 0.05, Math.sin(ab) * rb],
+      [0, r() * Math.PI, 0],
+      [1.4, 0.62, 1.4],
+    );
+    partes.push(pintar(brote, variar(PAL.cafetoBrote, r, 0.07)));
+  }
 
   return fusionar(partes);
+}
+
+/*
+ * EL CAFETO completo, según su PORTE (manejo). Monta uno o varios ejes y los
+ * acuesta/escala en su sitio del tocón — la MISMA cuenta que hace `puntoEnRama`,
+ * así que la cereza cae sobre la rama que aquí se dibuja.
+ *
+ * La silueta que sale de aquí es MÁS ANCHA QUE ALTA y de contorno mordido: es
+ * la diferencia entre una ladera que se lee "cafetal" y una que se lee "pinar".
+ */
+export function geomCafeto({ q = 1, porte = 'tallo' } = {}, seed = 1) {
+  const r = rng(seed);
+  const def = PORTES[porte] || PORTES.tallo;
+  const partes = [];
+
+  def.ejes.forEach((eje) => {
+    const g = geomEjeCafeto(eje, q, r);
+    // escala (ancho/alto) → acostar `inclina` hacia `azim` → sitio en el tocón.
+    const q4 = new THREE.Quaternion().setFromAxisAngle(
+      new THREE.Vector3(Math.sin(eje.azim), 0, -Math.cos(eje.azim)),
+      eje.inclina,
+    );
+    const m = new THREE.Matrix4().compose(
+      new THREE.Vector3(eje.dx, 0, eje.dz),
+      q4,
+      new THREE.Vector3(eje.ancho, eje.alto, eje.ancho),
+    );
+    g.applyMatrix4(m);
+    partes.push(g);
+  });
+
+  return partes.length === 1 ? partes[0] : fusionar(partes);
 }
 
 /** La cereza del café: OVOIDE (como en la rama real), pintada blanca — el
@@ -517,8 +732,15 @@ export function geomPiedra(seed = 6) {
    va). El ORDEN importa: se recortan por tier con slice, así que las primeras
    posiciones reparten frente y fondo para que hasta 'medio' y 'bajo' lean
    "cafetal bajo sombra", nunca hileras desnudas. */
+/* ⚠️ El segundo sitio ERA [3.2, 2.4] — justo sobre la línea de entrada. Su copa
+   le quedaba a UN METRO del ojo en el encuadre de vitrina y a 8,5 m en el de
+   pantalla completa: no enmarcaba, TAPABA (el reclamo "la cámara está metida
+   entre las copas y la de arriba a la izquierda corta la vista"). Se corre al
+   frente-derecha, fuera del cono de la cámara, donde SIGUE dando sombra a los
+   surcos del frente — que era para lo que estaba: café sin sombrío parece
+   potrero. Verificable: `node scripts/diag/encuadre-mundo.mjs cafe`. */
 const SITIOS_GUAMO = [
-  [-8.5, -5.5], [3.2, 2.4], [6.5, -6.0], [-6.8, 1.6], [-1.5, -8.5],
+  [-8.5, -5.5], [8.8, 4.4], [6.5, -6.0], [-6.8, 1.6], [-1.5, -8.5],
   [11.0, -2.5], [14.2, 1.2], [-12.5, -10.0], [-4.5, -2.0], [2.5, -12.5],
 ];
 const SITIOS_NOGAL = [
@@ -531,6 +753,69 @@ const SITIOS_PLATANO = [
 
 /* La casa/beneficiadero vive arriba al fondo; los surcos la respetan. */
 export const SITIO_CASA = /** @type {[number, number]} */ ([9.0, -14.6]);
+
+/* El SUJETO del mundo: el cafeto protagonista junto al camino de llegada — la
+   mata que enseña qué es un cafeto. Se exporta aparte de SITIOS_HERO para que
+   el diagnóstico de encuadre pueda preguntar "¿está en cuadro?" sin conocer la
+   forma interna de la siembra. */
+export const SITIO_CAFETO_HERO = /** @type {[number, number]} */ ([-2.8, 5.6]);
+
+/*
+ * LA CÁMARA del mundo, declarada JUNTO A LA GEOGRAFÍA (convención de la casa):
+ * así `node scripts/diag/encuadre-mundo.mjs cafe` mide EXACTAMENTE el encuadre
+ * que monta la escena y no puede quedar desfasado de ella.
+ *
+ * Mira loma arriba desde el camino de llegada — entrar es subir.
+ */
+export const CAMARA = {
+  reposo: /** @type {[number, number, number]} */ ([7.6, 7.8, 15.6]),
+  mirada: /** @type {[number, number, number]} */ ([-0.4, 3.8, -3.4]),
+  fov: 40,
+};
+
+/* El `centro` que EscenaBase3D necesita para que su mirada caiga en CAMARA.mirada
+   (la base le suma `zoom * 0.12` a la altura del centro: tilt-down de revelado).
+   Se deriva aquí para que las dos cuentas no puedan separarse. */
+export const ZOOM_LADERA = 13;
+export const CENTRO_LADERA = /** @type {[number, number, number]} */ ([
+  CAMARA.mirada[0],
+  CAMARA.mirada[1] - ZOOM_LADERA * 0.12,
+  CAMARA.mirada[2],
+]);
+
+/*
+ * El LOTE SEMBRADO: dónde el piso lleva cafetal encima. Lo usa el diagnóstico
+ * de encuadre para distinguir "el cuadro está lleno de CULTIVO" de "el cuadro
+ * está lleno de loma pelada" — medir solo terreno engaña, porque lo que llena
+ * el cuadro de un cafetal es la mata, no el barro entre surcos. Respeta el
+ * patio del beneficiadero y la calle del camino: los claros son claros.
+ */
+export function dentroLote(wx, wz) {
+  if (Math.abs(wx) > 15.6) return 0;
+  if (wz > 6.4 || wz < -14.2) return 0;
+  const dx = wx - SITIO_CASA[0];
+  const dz = wz - SITIO_CASA[1];
+  if (dx * dx + dz * dz < 16) return 0; // el patio del beneficiadero
+  const calle = Math.abs(wx - Math.sin(wz * 0.4) * 2.2); // el camino de llegada
+  if (wz > 1.5 && calle < 1.15) return 0;
+  return 1;
+}
+
+/*
+ * Los CAFETOS PROTAGONISTAS del primer plano: tres matas grandes y CARGADAS que
+ * flanquean el camino de entrada (los surcos arrancan en z=2.6; estos viven más
+ * acá, donde la cámara llega). Son la respuesta al reclamo "el café no se
+ * distingue como planta": a esta distancia los pisos de ramas plagiotrópicas,
+ * la hoja elíptica oscura y el racimo de cereza PEGADO a la rama se leen sin
+ * ayuda. Deterministas y en TODOS los tiers (son pocos y son la lección).
+ * `maduro` alto = cosecha a la vista (roja/vino con su pintón); el verde queda
+ * en los surcos del fondo — la maduración despareja real de la ladera.
+ */
+export const SITIOS_HERO = [
+  { px: -2.8, pz: 5.6, esc: 1.6, rotY: 2.2, maduro: 0.85, carga: 1, hero: true, porte: 'tallo' },
+  { px: 4.2, pz: 4.6, esc: 1.35, rotY: 0.7, maduro: 0.7, carga: 1, hero: true, porte: 'zoqueo' },
+  { px: -5.0, pz: 3.2, esc: 1.25, rotY: 4.1, maduro: 0.75, carga: 1, hero: true, porte: 'agobio' },
+];
 
 /** ¿Qué tan maduro está el café en esta franja? Abajo (más caliente) más rojo. */
 function madurezEn(wz, r) {
@@ -572,6 +857,10 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
         rotY: rCaf() * Math.PI * 2,
         maduro: madurezEn(pz, rCaf),
         carga: rCaf(), // qué tan cargada de fruto está la mata
+        // el MANEJO de esta mata (un tallo / zoqueada / agobiada): la variedad
+        // de siluetas entre vecinas es lo que impide que la ladera se lea como
+        // plantación de coníferas — los pinos son clones, los cafetos no.
+        porte: porteDeAzar(rCaf()),
       });
     }
   });
@@ -586,13 +875,24 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
     const paso = sitios.length / c.cafeto;
     for (let k = 0; k < c.cafeto; k++) matas.push(sitios[Math.floor(k * paso)]);
   }
+  // Los protagonistas del primer plano van SIEMPRE (fuera del presupuesto: son
+  // tres y son la lección — hasta 'bajo' tiene que leer "eso es un cafeto").
+  matas.push(...SITIOS_HERO);
 
-  const cafeto = matas.map((s) => ({
-    pos: [s.px, alturaLadera(s.px, s.pz), s.pz],
-    rotY: s.rotY,
-    escala: s.esc,
-    tint: [0.92 + rCaf() * 0.16, 0.92 + rCaf() * 0.16, 0.92 + rCaf() * 0.16],
-  }));
+  /* Los cafetos salen AGRUPADOS POR PORTE: cada manejo es su propia malla y su
+     propio InstancedMesh (tres draw-calls en vez de una, a cambio de que la
+     ladera deje de ser un molde repetido 120 veces). El tinte por instancia
+     suma la última pizca de variación individual. */
+  const cafeto = { tallo: [], zoqueo: [], agobio: [] };
+  matas.forEach((s) => {
+    const banco = cafeto[s.porte] || cafeto.tallo;
+    banco.push({
+      pos: [s.px, alturaLadera(s.px, s.pz), s.pz],
+      rotY: s.rotY,
+      escala: s.esc,
+      tint: [0.9 + rCaf() * 0.2, 0.9 + rCaf() * 0.2, 0.9 + rCaf() * 0.2],
+    });
+  });
 
   // --- Las cerezas: RACIMOS EN FILA sobre la MISMA rama que la geometría
   //     dibuja (PISOS_CAFETO + anguloRamaCafeto) — el café carga pegado a la
@@ -605,15 +905,27 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
   const col = new THREE.Color();
   const cereza = [];
   const nPisos = pisosCafetoDeQ(q);
-  const cargadas = matas.filter((s) => s.carga > 0.3);
-  /* Un punto local de la rama (piso i, rama j, avance t) llevado al mundo:
-     escala de la mata + su giro + su sitio en la ladera. */
-  const enRama = (s, i, j, t, dy, jit, rr) => {
-    const p = PISOS_CAFETO[i];
-    const a = anguloRamaCafeto(i, j, p.ramas);
-    const lx = Math.cos(a) * p.len * t + (rr() - 0.5) * jit;
-    const ly = p.y + p.caida * p.len * t + dy + (rr() - 0.5) * jit * 0.6;
-    const lz = Math.sin(a) * p.len * t + (rr() - 0.5) * jit;
+  // Los héroes del primer plano entran TRES veces a la rueda Y AL FRENTE:
+  // cargan el triple de racimos que una mata del surco y cargan PRIMERO — la
+  // cereza pegada a la rama tiene que leerse desde la entrada en TODOS los
+  // tiers (en 'bajo' el presupuesto se agota rápido: si el héroe espera turno
+  // al final, queda pelado — mordida encontrada en el sanity headless).
+  const cargadas = [
+    ...SITIOS_HERO,
+    ...SITIOS_HERO,
+    ...SITIOS_HERO,
+    ...matas.filter((s) => s.carga > 0.3 && !s.hero),
+  ];
+  /* Un punto local de la rama (eje e, piso i, rama j, avance t) llevado al
+     mundo: `puntoEnRama` hace la MISMA cuenta que la malla — incluido el eje
+     acostado del zoqueo y del agobio —, y aquí solo se le suma la escala de la
+     mata, su giro y su sitio en la ladera. Una sola verdad de dónde carga el
+     café: si la rama se mueve, la cereza se mueve con ella. */
+  const enRama = (s, e, i, j, t, dy, jit, rr) => {
+    const [lx0, ly0, lz0] = puntoEnRama(s.porte || 'tallo', e, i, j, t);
+    const lx = lx0 + (rr() - 0.5) * jit;
+    const ly = ly0 + dy + (rr() - 0.5) * jit * 0.6;
+    const lz = lz0 + (rr() - 0.5) * jit;
     const cosR = Math.cos(s.rotY);
     const sinR = Math.sin(s.rotY);
     return [
@@ -622,16 +934,28 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
       s.pz + (-lx * sinR + lz * cosR) * s.esc,
     ];
   };
+  /* Cuántos ejes tiene el porte de esta mata (para repartirle la carga). */
+  const ejesDe = (s) => (PORTES[s.porte || 'tallo'] || PORTES.tallo).ejes.length;
+  /* Y hasta qué piso llega ESE eje: la cereza nunca puede colgar de un piso que
+     el eje no levantó (un zoqueo corto no carga arriba). */
+  const pisosDe = (s, e) => {
+    const porte = PORTES[s.porte || 'tallo'] || PORTES.tallo;
+    const eje = porte.ejes[e % porte.ejes.length];
+    return Math.min(eje.pisos, nPisos);
+  };
   let gi = 0;
   while (cereza.length < c.cereza && cargadas.length > 0) {
     const s = cargadas[gi % cargadas.length];
     gi += 1;
     if (gi > cargadas.length * 12) break;
+    // un eje al azar de la mata (en zoqueo y agobio la carga se reparte entre
+    // los tallos, como en la mata de verdad)
+    const e = Math.floor(rCer() * ejesDe(s));
     // los pisos BAJOS cargan más (madera más vieja, más cosecha)
-    const i = Math.floor(rCer() * Math.min(nPisos, 3));
+    const i = Math.floor(rCer() * Math.min(pisosDe(s, e), 3));
     const p = PISOS_CAFETO[i];
     const j = Math.floor(rCer() * p.ramas);
-    const cuantas = 3 + Math.floor(rCer() * 4);
+    const cuantas = 3 + Math.floor(rCer() * 4) + (s.hero ? 2 : 0);
     const t0 = 0.2 + rCer() * 0.28;
     for (let k = 0; k < cuantas && cereza.length < c.cereza; k++) {
       const t = t0 + k * 0.085; // el racimo EN FILA, cuenta tras cuenta
@@ -643,9 +967,10 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
       else col.lerpColors(roja, vino, (m - 0.68) / 0.32);
       col.multiplyScalar(0.94 + rCer() * 0.12);
       cereza.push({
-        pos: enRama(s, i, j, t, -0.045, 0.035, rCer), // colgada APENAS bajo la rama
+        pos: enRama(s, e, i, j, t, -0.045, 0.035, rCer), // colgada APENAS bajo la rama
         rotY: rCer() * Math.PI,
-        escala: 0.8 + rCer() * 0.45,
+        // en el héroe la cuenta es un pelín más gorda: legible desde la entrada
+        escala: (0.8 + rCer() * 0.45) * (s.hero ? 1.3 : 1),
         tint: [col.r, col.g, col.b],
       });
     }
@@ -661,12 +986,13 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
     const s = florecidas[fi % florecidas.length];
     fi += 1;
     if (fi > florecidas.length * 6) break;
-    const i = Math.floor(rFlo() * nPisos);
+    const e = Math.floor(rFlo() * ejesDe(s));
+    const i = Math.floor(rFlo() * pisosDe(s, e));
     const p = PISOS_CAFETO[i];
     const j = Math.floor(rFlo() * p.ramas);
     const t = 0.28 + rFlo() * 0.5;
     flor.push({
-      pos: enRama(s, i, j, t, 0.025, 0.02, rFlo), // asomada SOBRE la rama
+      pos: enRama(s, e, i, j, t, 0.025, 0.02, rFlo), // asomada SOBRE la rama
       rotY: rFlo() * Math.PI * 2,
       escala: 0.85 + rFlo() * 0.4,
       tint: [1, 0.99 - rFlo() * 0.03, 0.95 - rFlo() * 0.04],
@@ -722,4 +1048,33 @@ export function centrosSombrio(conteos) {
     ...SITIOS_GUAMO.slice(0, conteos.guamo),
     ...SITIOS_NOGAL.slice(0, conteos.nogal),
   ].map(([x, z]) => /** @type {[number, number, number]} */ ([x, alturaLadera(x, z), z]));
+}
+
+/*
+ * LAS COPAS DEL SOMBRÍO como esferas, para saber CUÁL TAPA LA VISTA.
+ *
+ * Esto existe por una mordida concreta: el diagnóstico de encuadre marchaba
+ * rayos contra el terreno más un dosel uniforme y daba "sin avisos" mientras la
+ * copa de un guamo se le sentaba encima a la cámara y cortaba media vista. El
+ * trazador medía bien la geometría del suelo y era CIEGO al sombrío — y medir
+ * la geometría no es ver la escena.
+ *
+ * Una copa NO es una columna desde el suelo: es una TAPA a cierta altura, y por
+ * debajo se ve (ese es el punto del café de sombra). Por eso van como esferas
+ * en el aire y no como relieve del terreno.
+ */
+export function copasSombrio(conteos = FLORA_CAFETAL.alto) {
+  const copas = [];
+  SITIOS_GUAMO.slice(0, conteos.guamo).forEach(([x, z]) => {
+    // el parasol del Inga: ancho y plano, a unos 3,6 m sobre su sitio
+    copas.push({ c: [x, alturaLadera(x, z) + 3.7, z], r: 3.0, quien: 'guamo' });
+  });
+  SITIOS_NOGAL.slice(0, conteos.nogal).forEach(([x, z]) => {
+    // el nogal: copa recogida y ALTA (por eso estorba menos)
+    copas.push({ c: [x, alturaLadera(x, z) + 4.8, z], r: 1.7, quien: 'nogal' });
+  });
+  SITIOS_PLATANO.slice(0, conteos.platano).forEach(([x, z]) => {
+    copas.push({ c: [x, alturaLadera(x, z) + 2.1, z], r: 1.3, quien: 'plátano' });
+  });
+  return copas;
 }

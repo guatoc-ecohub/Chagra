@@ -66,7 +66,7 @@ import { navegarDesde3D, rutaDesdeMundo3D } from '../prodApp/wire3DNav.js';
 /* El VELO ODYSSEY (lenguaje de transición aprobado por el operador): cubrir →
    swap en la meseta → revelar, con la identidad del DESTINO y variación por
    tier. Barrel DOM-safe: cero three en el bundle base. */
-import { VeloOdyssey } from '../visual/mundo3d/transiciones/index.js';
+import { TunelLamina, rectDeOrigen, VeloOdyssey } from '../visual/mundo3d/transiciones/index.js';
 
 // La escena 3D pesada (three/fiber/drei) en su PROPIO chunk perezoso.
 const Valle3D = lazy(() => import('./valle/Valle3D'));
@@ -174,17 +174,19 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
   const usarNewDonk = ENTRADA_NEWDONK && !reducedMotion;
   const [newDonk, setNewDonk] = useState(null);
 
-  // ── El VELO ODYSSEY en los tres viajes del valle:
-  //    · ABRIR una pantalla 2D (`irA`): el velo del destino cubre y el cambio
-  //      de hash va BAJO la meseta cubierta — antes era un corte seco a los
-  //      700ms que mataba la cámara a mitad de vuelo.
+  // ── El VELO ODYSSEY en los viajes de mundos 3D:
   //    · ENTRAR a un mundo 3D sin New Donk: velo del destino (identidad andina).
   //    · VOLVER al valle: velo `luz` ("de vuelta a casa") — exhala, no repite
   //      la ceremonia de entrada.
   //    Se arma en el handler que zarpa (nunca en un effect) y se apaga solo en
   //    su `onFin`. Reduced-motion no lo arma: corte directo digno.
-  //    null | { fase: 'entrando'|'saliendo', destino, irA?: mundoId }.
+  //    null | { fase: 'entrando'|'saliendo', destino }.
   const [velo, setVelo] = useState(null);
+  // ── TÚNEL LÁMINA 3D→2D: cuando el CTA de un lugar abre su pantalla plana,
+  //    la lámina nace en el botón tocado y recibe el cambio de hash bajo el
+  //    destello cubierto. Es un cruce concreto de la entrada 3D, separado del
+  //    velo que sigue sirviendo para los viajes valle ↔ mundo.
+  const [tunelLamina, setTunelLamina] = useState(null);
 
   // La escucha puede llegar con un mundo ya resuelto por el NLU. Se consume
   // una vez al montar para que volver al valle siga siendo una decisión de la
@@ -352,19 +354,17 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
     [decir],
   );
 
-  // ── ABRIR la pantalla real de un lugar (el cableo 3D→2D de prod, PR #2453):
-  //    el velo del DESTINO cubre y `navegarDesde3D` corre bajo la meseta — el
-  //    usuario nunca ve el corte del swap de shell. Con reduced-motion, corte
-  //    directo (el velo no se arma).
+  // ── ABRIR la pantalla real de un lugar: el túnel recibe el cambio de hash
+  //    bajo su meseta cubierta. Con reduced-motion, corte directo.
   const abrirPantalla = useCallback(
-    (id) => {
+    (id, origen = null) => {
       if (!rutaDesdeMundo3D(id)) return;
       stopSpeak();
       if (reducedMotion) {
         navegarDesde3D(id);
         return;
       }
-      setVelo({ fase: 'entrando', destino: id, irA: id });
+      setTunelLamina({ destino: id, rect: rectDeOrigen(origen) });
     },
     [reducedMotion],
   );
@@ -635,9 +635,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
         />
       )}
       {/* El VELO ODYSSEY del viaje: cubre → swap en la meseta (`onCubierto`) →
-          revela. Con `irA`, el swap es el cambio de hash a la pantalla 2D real
-          (el shell desmonta este árbol ya cubierto: el corte queda escondido).
-          Sin `irA`, el swap es el del framework de mundos. */}
+          revela. El swap es el del framework de mundos. */}
       {velo && (
         <VeloOdyssey
           fase={velo.fase}
@@ -645,10 +643,24 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
           tier={equipo.tier}
           reducedMotion={reducedMotion}
           onCubierto={() => {
-            if (velo.irA) navegarDesde3D(velo.irA);
-            else nav.completarViaje();
+            nav.completarViaje();
           }}
           onFin={() => setVelo(null)}
+        />
+      )}
+      {/* Salida viva valle 3D → pantalla 2D: el túnel termina de cubrir antes
+          de que el shell cambie de ruta, así el intercambio nunca queda a la
+          vista. La lámina usa el rect del CTA tocado o un origen centrado para
+          entradas desde un hotspot 3D sin elemento DOM. */}
+      {tunelLamina && (
+        <TunelLamina
+          fase="saliendo"
+          destino={tunelLamina.destino}
+          rect={tunelLamina.rect}
+          tier={equipo.tier}
+          reducedMotion={reducedMotion}
+          onCubierto={() => navegarDesde3D(tunelLamina.destino)}
+          onFin={() => setTunelLamina(null)}
         />
       )}
       {/* Respaldo (viajes que nadie armó, p. ej. el deep-link inicial): el
@@ -737,7 +749,7 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
                 Antes un setTimeout arrancaba solo, y este panel — con los
                 mundos 3D y sus transiciones aprobadas — era inalcanzable. */}
             {rutaPanel && (
-              <button type="button" className="valle-cta" onClick={() => abrirPantalla(mundoPanel.id)}>
+              <button type="button" className="valle-cta" onClick={(event) => abrirPantalla(mundoPanel.id, event)}>
                 Abrir {mundoPanel.titulo}
               </button>
             )}

@@ -14,12 +14,23 @@
  * mueve la cola — vida, no espectáculo. Todo gateado por reduced-motion Y
  * device-tier ('bajo' las deja quietas y sin cuernos/cola fina).
  *
+ * PASADA NOLAN — el hato obedece EL RELOJ DEL ORDEÑO (EscenaLecheriaViva):
+ *   · `llenura` — la UBRE se llena y se vacía con la hora de verdad: llena
+ *     para la madrugada, vacía tras el ordeño, cargándose despacio el resto
+ *     del día. La vaca es un reloj de leche — y eso enseña.
+ *   · `enOrdeno` — a la hora del ordeño la primera Holstein deja el pasto y
+ *     se para en el BRETE de la sala (PUESTO_ORDENO), quieta, comiendo su
+ *     concentrado mientras la ordeñan.
+ *   · `frio` — en el aire frío del páramo (madrugada y noche) el ALIENTO se
+ *     ve: soplos tibios que salen del hocico y se deshacen.
+ *
  * Pocas y por criterio (≈6): un hato campesino de finca, no un feedlot.
  * Componente r3f: montar dentro del <Canvas> de EscenaLecheriaViva.
  */
 import { useMemo, useRef } from 'react';
+import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import { alturaPotrero } from './floraLecheria.geom.js';
+import { alturaPotrero, PUESTO_ORDENO } from './floraLecheria.geom.js';
 
 /* ── Pelajes por raza (grounded en las razas del DR por piso térmico) ─────── */
 const RAZAS = {
@@ -51,20 +62,27 @@ function manchasDe(fase) {
 
 /**
  * UNA vaca lechera, estilizada de la silueta del corral. Mira a +x.
- * @param {{raza:string, escala?:number, fase?:number, animar?:boolean, fina?:boolean}} p
+ * `ubre` (0..1) es la llenura del reloj del ordeño; `frio` (0..1) hace
+ * visible el aliento; `aliento` gatea el montaje de los soplos (solo si la
+ * escena anima y hace frío — el vaho quieto no existe).
+ * `pastar=false` la deja plantada con la cabeza en la canoa (el brete) pero
+ * VIVA: respira, mueve la cola y su aliento se ve — quieta no es congelada.
+ * @param {{raza:string, escala?:number, fase?:number, animar?:boolean, pastar?:boolean, fina?:boolean, ubre?:number, frio?:number}} p
  */
-function Vaca({ raza, escala = 1, fase = 0, animar = true, fina = true }) {
+function Vaca({ raza, escala = 1, fase = 0, animar = true, pastar = true, fina = true, ubre = 0.7, frio = 0 }) {
   const pelaje = RAZAS[raza] || RAZAS.criolla;
   const cabeza = useRef(null);
   const cola = useRef(null);
   const cuerpo = useRef(null);
+  const aliento = useRef(null);
   const manchas = useMemo(() => (pelaje.manchada ? manchasDe(fase) : []), [pelaje.manchada, fase]);
+  const conAliento = animar && frio > 0.05;
 
   useFrame(({ clock }) => {
     if (!animar) return;
     const t = clock.elapsedTime;
     // pastar: la cabeza baja al pasto en un ciclo lento (agacha y vuelve a mirar)
-    if (cabeza.current) {
+    if (cabeza.current && pastar) {
       const p = 0.5 - 0.5 * Math.cos(t * 0.55 + fase); // 0 arriba, 1 abajo
       const agacha = p * p; // se demora abajo pastando
       cabeza.current.rotation.z = -agacha * 0.95;
@@ -73,9 +91,22 @@ function Vaca({ raza, escala = 1, fase = 0, animar = true, fina = true }) {
     if (cuerpo.current) cuerpo.current.scale.y = 1 + Math.sin(t * 0.9 + fase) * 0.02;
     // la cola espanta moscas
     if (cola.current) cola.current.rotation.x = Math.sin(t * 1.6 + fase) * 0.35;
+    // EL ALIENTO en el frío: un soplo que sale del hocico, crece y se deshace
+    if (aliento.current) {
+      const g = aliento.current;
+      const u = (t * 0.34 + fase * 0.7) % 1; // un soplo por ciclo de respiración
+      const vis = frio * Math.max(0, 1 - u * 1.5);
+      g.position.set(0.54 + u * 0.32, -0.04 + u * 0.17, 0);
+      const s = 0.05 + u * 0.2;
+      g.scale.set(s, s * 0.75, s);
+      for (let k = 0; k < g.children.length; k++) {
+        g.children[k].material.opacity = vis * (k ? 0.14 : 0.26);
+      }
+    }
   });
 
-  const reposoCabeza = animar ? 0 : -0.5; // quieta: pose de pastar sereno
+  // quieta sin pastar = cabeza abajo (en el pasto o en la canoa del brete)
+  const reposoCabeza = animar && pastar ? 0 : -0.5;
 
   return (
     <group scale={escala}>
@@ -116,11 +147,25 @@ function Vaca({ raza, escala = 1, fase = 0, animar = true, fina = true }) {
           </mesh>
         ))}
 
-        {/* LA UBRE — la vaca es de leche (bajo el vientre, atrás) */}
-        <mesh position={[-0.16, 0.32, 0]} scale={[1.1, 0.85, 1.25]}>
-          <sphereGeometry args={[0.13, 10, 8]} />
-          <meshLambertMaterial color={UBRE} flatShading />
-        </mesh>
+        {/* LA UBRE — la vaca es de leche, y la ubre es un RELOJ: llena antes
+            del ordeño (cuelga baja y redonda), vacía después. Eso enseña. */}
+        <group
+          position={[-0.16, 0.36 - 0.06 * ubre, 0]}
+          scale={[0.72 + 0.48 * ubre, 0.58 + 0.52 * ubre, 0.78 + 0.55 * ubre]}
+        >
+          <mesh>
+            <sphereGeometry args={[0.13, 10, 8]} />
+            <meshLambertMaterial color={UBRE} flatShading />
+          </mesh>
+          {/* los pezones (legibles solo en gama fina) */}
+          {fina &&
+            [[0.05, 0.05], [-0.04, -0.05]].map(([px, pz], i) => (
+              <mesh key={i} position={[px, -0.115, pz]}>
+                <cylinderGeometry args={[0.014, 0.018, 0.06, 5]} />
+                <meshLambertMaterial color={UBRE} flatShading />
+              </mesh>
+            ))}
+        </group>
       </group>
 
       {/* cabeza + cuello (pivote en la base del cuello: pasta agachándose) */}
@@ -164,6 +209,24 @@ function Vaca({ raza, escala = 1, fase = 0, animar = true, fina = true }) {
               <meshLambertMaterial color={HUESO} flatShading />
             </mesh>
           ))}
+        {/* EL ALIENTO visible en el frío del páramo: dos soplos aditivos que
+            salen del hocico (viajan CON la cabeza: también pastando) */}
+        {conAliento && (
+          <group ref={aliento} position={[0.54, -0.04, 0]}>
+            {[0, 1].map((k) => (
+              <mesh key={k} position={[k * -0.35, k * 0.1, 0]}>
+                <sphereGeometry args={[1, 6, 5]} />
+                <meshBasicMaterial
+                  color="#eef3f6"
+                  transparent
+                  opacity={0}
+                  depthWrite={false}
+                  blending={THREE.AdditiveBlending}
+                />
+              </mesh>
+            ))}
+          </group>
+        )}
       </group>
 
       {/* cola (espanta moscas) */}
@@ -196,10 +259,18 @@ const HATO = [
 ];
 
 /**
- * El hato lechero pastando. Montar dentro del <Canvas>.
- * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean}} props
+ * El hato lechero pastando — y a la hora del ordeño, la primera Holstein en
+ * el brete de la sala. `llenura`, `enOrdeno` y `frio` vienen del reloj del
+ * ordeño de la escena (hora continua del valle).
+ * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean, llenura?: number, enOrdeno?: number, frio?: number}} props
  */
-export default function GanadoLechero({ tier = 'alto', reducedMotion = false }) {
+export default function GanadoLechero({
+  tier = 'alto',
+  reducedMotion = false,
+  llenura = 0.7,
+  enOrdeno = 0,
+  frio = 0,
+}) {
   const animar = !reducedMotion && tier !== 'bajo';
   const fina = tier !== 'bajo';
   // gama baja: un hato más corto (siluetas legibles, sin pagar de más)
@@ -207,11 +278,32 @@ export default function GanadoLechero({ tier = 'alto', reducedMotion = false }) 
 
   return (
     <group>
-      {hato.map((v, i) => (
-        <group key={i} position={[v.p[0], alturaPotrero(v.p[0], v.p[1]), v.p[1]]} rotation={[0, v.giro, 0]}>
-          <Vaca raza={v.raza} escala={v.escala} fase={v.fase} animar={animar} fina={fina} />
-        </group>
-      ))}
+      {hato.map((v, i) => {
+        // a la hora del ordeño, la primera Holstein deja el pasto y espera en
+        // el brete, quieta, con la ubre llena (la están ordeñando)
+        const alBrete = i === 0 && enOrdeno > 0.35;
+        const px = alBrete ? PUESTO_ORDENO.pos[0] : v.p[0];
+        const pz = alBrete ? PUESTO_ORDENO.pos[1] : v.p[1];
+        const giro = alBrete ? PUESTO_ORDENO.giro : v.giro;
+        // cada vaca con su llenura apenas distinta (ningún hato es parejo)
+        const ubre = alBrete
+          ? Math.max(llenura, 0.85)
+          : Math.min(1, Math.max(0.1, llenura + ((i % 3) - 1) * 0.07));
+        return (
+          <group key={i} position={[px, alturaPotrero(px, pz), pz]} rotation={[0, giro, 0]}>
+            <Vaca
+              raza={v.raza}
+              escala={v.escala}
+              fase={v.fase}
+              animar={animar}
+              pastar={!alBrete}
+              fina={fina}
+              ubre={ubre}
+              frio={frio}
+            />
+          </group>
+        );
+      })}
     </group>
   );
 }
