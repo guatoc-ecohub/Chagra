@@ -604,6 +604,18 @@ export default function AliadosFinca3D() {
   const { tier, reducedMotion } = useMemo(() => decidirTier(), []);
   const perfil = perfilDeTier(tier);
   const activo = ALIADOS.find((a) => a.slug === foco) || null;
+  /* Retrato (teléfono en vertical): la cámara a la altura de los ojos dejaba
+     media pantalla de cielo vacío y la huerta —con sus bichos, que son el
+     sujeto— apretada en una franjita abajo. En retrato la cámara sube y pica
+     hacia el suelo (la receta del mundo tocable del suelo, la referencia de
+     encuadre): la tierra llena el cuadro y el horizonte queda en el tercio
+     de arriba. Se decide al montar: es un mockup, no rota en caliente. */
+  const retrato = useMemo(
+    () => typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(max-aspect-ratio: 19/20)').matches,
+    [],
+  );
 
   return (
     <section
@@ -616,7 +628,7 @@ export default function AliadosFinca3D() {
         className={`alf-canvas${listo ? ' alf-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [0, 5.2, 12], fov: 44 }}
+        camera={retrato ? { position: [0.4, 8.4, 10.6], fov: 50 } : { position: [0, 5.2, 12], fov: 44 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
@@ -627,7 +639,7 @@ export default function AliadosFinca3D() {
           enableZoom
           minDistance={6}
           maxDistance={18}
-          target={[0, 0.8, 0.4]}
+          target={retrato ? [-0.6, 0.2, -1.0] : [0, 0.8, 0.4]}
           minPolarAngle={0.5}
           maxPolarAngle={1.42}
           minAzimuthAngle={-1.15}

@@ -10,7 +10,12 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  /* Altura REAL de viewport, no `100%` de un contenedor sin altura: la ruta
+     del mockup no le da alto al wrapper, así que el 100% colapsaba al
+     contenido y el lienzo 3D quedaba en su mínimo — una franjita que mostraba
+     el canto de la mesa en vez del semillero. Es una ruta standalone
+     (App.jsx), no se embebe en ningún host con altura propia. */
+  height: 100dvh;
   min-height: 22rem;
   background: #efe2c6;
   color: #3a2f22;
@@ -19,7 +24,9 @@
 
 .semillero__lienzo {
   flex: 1 1 auto;
-  min-height: 12rem;
+  /* En teléfono el panel de controles es alto: el piso de 44dvh garantiza que
+     la bandeja —el sujeto— conserve más de dos quintos de la pantalla. */
+  min-height: max(12rem, 44dvh);
   touch-action: none; /* el gesto controla la órbita, no el scroll */
 }
 

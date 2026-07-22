@@ -210,6 +210,30 @@ const MIRA_PART = /** @type {[number, number, number]} */ ([POS_DESPEDIDA[0], PO
 const MIRA_CIERRE = /** @type {[number, number, number]} */ ([POS_DESPEDIDA[0], POS_DESPEDIDA[1] + 0.25, POS_DESPEDIDA[2]]);
 const AREA_VELO = /** @type {[number, number, number]} */ ([2.4, 2.6, 2.4]);
 
+/* ── Retrato (teléfono en vertical, 390×844) ────────────────────────────────
+   A estas distancias el fov horizontal de un cuadro angosto es un PASILLO de
+   ~2 metros: el tableau de la llegada dejaba la res escondida detrás de un
+   poste y los cierres cortaban a los animales por los flancos. La receta no es
+   ampliar el fov (deforma): es ALEJARSE sobre el mismo eje de la toma — o, en
+   la llegada, ponerse de frente y componer en PROFUNDIDAD: la res en primer
+   plano, el puesto detrás. Cada componente elige por aspecto (`esRetrato`). */
+const alejar = (cam, mira, factor, subir = 0) => /** @type {[number, number, number]} */ ([
+  mira[0] + (cam[0] - mira[0]) * factor,
+  mira[1] + (cam[1] - mira[1]) * factor + subir,
+  mira[2] + (cam[2] - mira[2]) * factor,
+]);
+/* La llegada en retrato NO se pone de frente: de frente la cámara queda del
+   otro lado del puesto y el toldo se come el cuadro (probado con captura).
+   Es la MISMA diagonal de escritorio, alejada 1.75× y con la cámara más
+   arriba: el poste del puesto se achica con la distancia y la res queda
+   legible en la franja del medio. */
+const CAM_LLEGADA_ALTO = alejar(CAM_LLEGADA, MIRA_LLEGADA, 1.75, 0.8);
+const CAM_NAC_ALTO = alejar(CAM_NAC_FIN, MIRA_NAC, 1.65, 0.35);
+const CAM_PART_ALTO = alejar(CAM_PART_FIN, MIRA_PART, 1.6, 0.55);
+const CAM_CIERRE_ALTO = alejar(CAM_PART_CIERRE, MIRA_CIERRE, 1.4, 0.3);
+/* Selector compartido: dentro del Canvas, el aspecto sale del estado del cuadro. */
+const esRetrato = (s) => s.size.width / Math.max(1, s.size.height) < 0.95;
+
 /* Chispas de ámbar de la llegada al puesto (XZ alrededor del mostrador). */
 const CHISPAS = [
   [6.3, 4.0], [7.4, 4.1], [6.8, 5.1], [7.5, 4.8], [6.1, 4.7], [7.0, 3.8],
@@ -653,6 +677,7 @@ function MomentoVenta({ reducedMotion, alTerminar }) {
   const finRef = useRef(false);
   const camara = useThree((s) => s.camera);
   const invalidate = useThree((s) => s.invalidate);
+  const retrato = useThree(esRetrato);
 
   useEffect(() => {
     tRef.current = 0;
@@ -662,7 +687,7 @@ function MomentoVenta({ reducedMotion, alTerminar }) {
     if (reducedMotion) {
       /* tableau final: la res ya llegó al puesto, halo sereno */
       colocarVacaEnCamino(partes, 1);
-      camara.position.set(...CAM_LLEGADA);
+      camara.position.set(...(retrato ? CAM_LLEGADA_ALTO : CAM_LLEGADA));
       miraRef.current.set(...MIRA_LLEGADA);
       camara.lookAt(miraRef.current);
       if (halo.current) halo.current.material.opacity = 0.28;
@@ -674,7 +699,7 @@ function MomentoVenta({ reducedMotion, alTerminar }) {
     camara.position.set(...CAM_VALLE);
     miraRef.current.set(...MIRA_VALLE);
     camara.lookAt(miraRef.current);
-  }, [camara, invalidate, reducedMotion]);
+  }, [camara, invalidate, reducedMotion, retrato]);
 
   useFrame((_, delta) => {
     if (reducedMotion) return;
@@ -695,7 +720,7 @@ function MomentoVenta({ reducedMotion, alTerminar }) {
       V_CAM.set(V_POS.x + 2.6, V_POS.y + 2.1, V_POS.z + 4.3);
       V_MIRA.set(V_POS.x, V_POS.y + 0.7, V_POS.z);
     } else {
-      V_CAM.set(...CAM_LLEGADA);
+      V_CAM.set(...(retrato ? CAM_LLEGADA_ALTO : CAM_LLEGADA));
       V_MIRA.set(...MIRA_LLEGADA);
     }
     camara.position.lerp(V_CAM, amortiguacion(t < T_VENTA.salida + 1.5 ? 1.1 : 2.4, dt));
@@ -760,6 +785,7 @@ function MomentoNacimiento({ tier, reducedMotion, alTerminar }) {
   const finRef = useRef(false);
   const camara = useThree((s) => s.camera);
   const invalidate = useThree((s) => s.invalidate);
+  const retrato = useThree(esRetrato);
 
   useEffect(() => {
     tRef.current = 0;
@@ -770,7 +796,7 @@ function MomentoNacimiento({ tier, reducedMotion, alTerminar }) {
     if (reducedMotion) {
       /* tableau: la cría ya está en pie junto a su madre */
       if (pc && pc.nucleo) pc.nucleo.scale.setScalar(ESC_CRIA);
-      camara.position.set(...CAM_NAC_FIN);
+      camara.position.set(...(retrato ? CAM_NAC_ALTO : CAM_NAC_FIN));
       miraRef.current.set(...MIRA_NAC);
       camara.lookAt(miraRef.current);
       invalidate();
@@ -780,7 +806,7 @@ function MomentoNacimiento({ tier, reducedMotion, alTerminar }) {
     camara.position.set(...CAM_NAC_INI);
     miraRef.current.set(...MIRA_NAC);
     camara.lookAt(miraRef.current);
-  }, [camara, invalidate, reducedMotion]);
+  }, [camara, invalidate, reducedMotion, retrato]);
 
   useFrame((_, delta) => {
     if (reducedMotion) return;
@@ -832,7 +858,7 @@ function MomentoNacimiento({ tier, reducedMotion, alTerminar }) {
     }
 
     /* cámara: acercamiento lento hacia la cría (push-in) */
-    V_TMP.set(...CAM_NAC_FIN);
+    V_TMP.set(...(retrato ? CAM_NAC_ALTO : CAM_NAC_FIN));
     V_CAM.set(...CAM_NAC_INI).lerp(V_TMP, suavizar(0.4, 6, t));
     camara.position.lerp(V_CAM, amortiguacion(1.6, dt));
     V_MIRA.set(...MIRA_NAC);
@@ -879,6 +905,7 @@ function MomentoPartida({ tier, reducedMotion, alTerminar }) {
   const finRef = useRef(false);
   const camara = useThree((s) => s.camera);
   const invalidate = useThree((s) => s.invalidate);
+  const retrato = useThree(esRetrato);
 
   useEffect(() => {
     tRef.current = 0;
@@ -887,7 +914,7 @@ function MomentoPartida({ tier, reducedMotion, alTerminar }) {
     partesRef.current = resolverPartes(vacaRef.current);
     if (reducedMotion) {
       /* tableau sereno: la res entera bajo el árbol, el anillo apenas presente */
-      camara.position.set(...CAM_PART_FIN);
+      camara.position.set(...(retrato ? CAM_PART_ALTO : CAM_PART_FIN));
       miraRef.current.set(...MIRA_PART);
       camara.lookAt(miraRef.current);
       if (anillo.current) anillo.current.material.opacity = 0.2;
@@ -897,7 +924,7 @@ function MomentoPartida({ tier, reducedMotion, alTerminar }) {
     camara.position.set(...CAM_PART_INI);
     miraRef.current.set(...MIRA_PART);
     camara.lookAt(miraRef.current);
-  }, [camara, invalidate, reducedMotion]);
+  }, [camara, invalidate, reducedMotion, retrato]);
 
   useFrame((_, delta) => {
     if (reducedMotion) return;
@@ -937,11 +964,11 @@ function MomentoPartida({ tier, reducedMotion, alTerminar }) {
 
     /* cámara: dolly lento y respetuoso; al final, un paso atrás */
     if (t < T_PART.veloFin + 0.5) {
-      V_TMP.set(...CAM_PART_FIN);
+      V_TMP.set(...(retrato ? CAM_PART_ALTO : CAM_PART_FIN));
       V_CAM.set(...CAM_PART_INI).lerp(V_TMP, suavizar(0.3, T_PART.veloFin, t));
       V_MIRA.set(...MIRA_PART);
     } else {
-      V_CAM.set(...CAM_PART_CIERRE);
+      V_CAM.set(...(retrato ? CAM_CIERRE_ALTO : CAM_PART_CIERRE));
       V_MIRA.set(...MIRA_CIERRE);
     }
     camara.position.lerp(V_CAM, amortiguacion(1.1, dt));

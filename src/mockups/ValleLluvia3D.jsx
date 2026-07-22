@@ -832,7 +832,18 @@ const CSS_LLUVIA = `
 .vlluvia-pie p { margin: 0; max-width: 42rem; text-align: center; padding: 0.42rem 0.85rem; border-radius: 0.7rem; background: rgba(24,29,34,0.52); backdrop-filter: blur(3px); color: #eef2f4; font: 500 0.76rem/1.4 system-ui, sans-serif; }
 .vlluvia-volver { pointer-events: auto; position: absolute; top: 0.8rem; right: 0.8rem; padding: 0.4rem 0.8rem; border: 0; border-radius: 999px; background: rgba(24,29,34,0.55); color: #eef2f4; font: 600 0.78rem/1 system-ui, sans-serif; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .vlluvia-canvas { transition: none; } }
-@media (max-width: 640px) { .vlluvia-fases { max-width: 60vw; } .vlluvia-titulo { font-size: 1rem; } }
+/* En teléfono la lista vertical de fases tapaba justo el centro del diorama
+   (la zanja y el río, o sea la lección). Se vuelve una FILA de chips pegada
+   al título: mismo contenido, una franja de alto, y el valle queda libre. */
+@media (max-width: 640px) {
+  .vlluvia-titulo { font-size: 1rem; }
+  /* El space-between empujaba la fila de fases al CENTRO vertical del cuadro,
+     o sea encima del valle: arriba lo de arriba, y el pie se ancla solo. */
+  .vlluvia-chrome { justify-content: flex-start; }
+  .vlluvia-pie { margin-top: auto; }
+  .vlluvia-fases { flex-direction: row; flex-wrap: wrap; gap: 0.25rem; max-width: calc(100vw - 1.6rem); margin: 0.5rem 0.8rem; padding: 0.3rem 0.35rem; }
+  .vlluvia-fases button { width: auto; padding: 0.28rem 0.55rem; font-size: 0.72rem; }
+}
 `;
 
 /**
@@ -854,6 +865,16 @@ export default function ValleLluvia3D({ onBack }) {
   const [pin, setPin] = useState(false);
   const climaRef = useRef({ ...CLIMA_INICIAL });
   const alCambiar = useCallback((id) => setFase(id), []);
+  /* Retrato (teléfono en vertical, 390×844): con la cámara de escritorio la
+     ladera se comía el cuadro entero — ni casa, ni tanque, ni río a la vez.
+     El diorama entero es el sujeto: en retrato la cámara sube, se aleja y
+     abre el fov para que el valle completo quepa en la franja del medio. */
+  const retrato = useMemo(
+    () => typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(max-aspect-ratio: 19/20)').matches,
+    [],
+  );
 
   return (
     <section
@@ -867,7 +888,7 @@ export default function ValleLluvia3D({ onBack }) {
         className={`vlluvia-canvas${listo ? ' vlluvia-canvas--lista' : ''}`}
         dpr={tier === 'alto' ? [1, 1.5] : tier === 'medio' ? [1, 1.3] : 1}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [11.5, 7.6, 12.8], fov: 44 }}
+        camera={retrato ? { position: [11.4, 11.1, 12.9], fov: 52 } : { position: [11.5, 7.6, 12.8], fov: 44 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
