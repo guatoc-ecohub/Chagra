@@ -33,7 +33,7 @@
  * (el valle se ve como hoy); solo una respuesta EXPLÍCITA cambia el mundo.
  */
 import { FARM_CONFIG } from '../config/defaults';
-import { getProfile } from './userProfileService';
+import { getProfile, INVERNADERO_FORMAS } from './userProfileService';
 
 /** Escalas válidas del mundo. `finca` es el default seguro (valle completo). */
 export const ESCALAS_FINCA = Object.freeze(['balcon', 'invernadero', 'finca']);
@@ -50,14 +50,7 @@ export const FUENTES_AGUA = Object.freeze(['quebrada', 'tanque', 'lluvia', 'acue
  * cuadrado · tunel · casa_sombra · malla_sombra · umbraculo · otro.
  * NO se inventa un catálogo paralelo.
  */
-export const TIPOS_INVERNADERO = Object.freeze([
-  'cuadrado',
-  'tunel',
-  'casa_sombra',
-  'malla_sombra',
-  'umbraculo',
-  'otro',
-]);
+export const TIPOS_INVERNADERO = INVERNADERO_FORMAS;
 
 /**
  * @typedef {Object} UbicacionFinca

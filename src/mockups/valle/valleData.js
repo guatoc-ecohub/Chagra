@@ -204,6 +204,36 @@ const LUGARES = [
   },
 ];
 
+/* Piezas de la vitrina que no forman parte de los 14 lugares históricos.
+ * Solo se siembran cuando la persona las agrega para conocerlas. Mantenerlas
+ * fuera de LUGARES conserva intacto el perfil demo y los valles existentes. */
+const LUGARES_PARA_CONOCER = [
+  {
+    id: 'cacao', pos: [7.2, 0, 7.8], escala: 0.9, tipo: 'cafetal',
+    fallbackMundo: { titulo: 'El cacao', emoji: '🍫', lema: 'Conozca el cultivo y beneficio del cacao.', tinte: ['#79502d', '#c9873c'] },
+  },
+  {
+    id: 'papa', pos: [6.8, 0, -3.4], escala: 0.9, tipo: 'huerta',
+    fallbackMundo: { titulo: 'La papa', emoji: '🥔', lema: 'Conozca la tierra de la papa.', tinte: ['#8c6a3f', '#c7a36d'] },
+  },
+  {
+    id: 'abejas', pos: [7.4, 0, 1.8], escala: 0.82, tipo: 'saber',
+    fallbackMundo: { titulo: 'Las abejas', emoji: '🐝', lema: 'Conozca las polinizadoras de la finca.', tinte: ['#87651c', '#e8b83a'] },
+  },
+  {
+    id: 'lluvia', pos: [-6.8, 0, -4.8], escala: 0.82, tipo: 'veleta',
+    fallbackMundo: { titulo: 'La lluvia', emoji: '🌧️', lema: 'Conozca cómo se mueve el agua del cielo.', tinte: ['#58758f', '#9fb3c8'] },
+  },
+  {
+    id: 'sierra', pos: [6.2, 0, -7.2], escala: 0.85, tipo: 'bosque',
+    fallbackMundo: { titulo: 'La Sierra', emoji: '🏔️', lema: 'Conozca la montaña completa.', tinte: ['#456353', '#b8c6b6'] },
+  },
+  {
+    id: 'compost', pos: [-6.6, 0, 8.0], escala: 0.8, tipo: 'compost',
+    fallbackMundo: { titulo: 'El compost', emoji: '🍂', lema: 'Conozca cómo vuelve la materia a la tierra.', tinte: ['#59401f', '#a8854c'] },
+  },
+];
+
 /* ── 2b. LA SIEMBRA: QUÉ LUGARES LE TOCAN A ESTA FINCA ───────────────────────
  * El valle se ARMA del perfil (spec del valle dinámico, paso 2): si la persona
  * tiene un balcón, su valle es un balcón; si tiene 10.000 matas, es el valle
@@ -264,6 +294,7 @@ function perfilSeguro(perfil) {
     escala: ESCALAS_VALLE.includes(p.escala) ? p.escala : 'finca',
     pisoTermico: typeof p.pisoTermico === 'string' ? p.pisoTermico : null,
     invernadero: p.invernadero || null,
+    agua: typeof p.agua === 'string' ? p.agua : null,
     animales: Array.isArray(p.animales) ? p.animales : [],
     cultiva: Array.isArray(p.cultiva) ? p.cultiva : [],
     mundosActivos: Array.isArray(p.mundosActivos) ? p.mundosActivos : [],
@@ -302,20 +333,46 @@ export function construirLugaresValle(perfil) {
     if (typeof regla.requiere === 'function' && !regla.requiere(p)) return false;
     return true;
   });
-  return lugares.length > 0 ? lugares : LUGARES;
+  const opcionales = LUGARES_PARA_CONOCER.filter((l) => p.mundosActivos.includes(l.id));
+  const sembrados = lugares.length > 0 ? [...lugares, ...opcionales] : LUGARES;
+  return sembrados.map((lugar) => {
+    if (lugar.id === 'semillero' && p.invernadero?.tipo) {
+      return { ...lugar, invernaderoTipo: p.invernadero.tipo };
+    }
+    if (lugar.id === 'agua' && p.declarado.agua && p.agua) {
+      return { ...lugar, tipo: p.agua, fuenteAgua: p.agua };
+    }
+    return lugar;
+  });
 }
 
 /** Resuelve un lugar contra el manifiesto real de mundos (título/emoji/tinte). */
 function resolverMundo(l) {
   /** @type {{ titulo?: string, emoji?: string, lema?: string, tinte?: string[] }} */
   const real = MUNDO_BY_ID[l.id] || l.fallbackMundo || {};
-  return {
+  const mundo = {
     ...l,
     titulo: real.titulo || l.id,
     emoji: real.emoji || '📍',
     lema: real.lema || '',
     tinte: real.tinte || ['#3f8f4e', '#dcedc9'],
   };
+  if (l.id === 'semillero' && l.invernaderoTipo) {
+    const nombres = { cuadrado: 'cuadrado', tunel: 'tipo túnel', casa_sombra: 'de casa malla' };
+    mundo.titulo = `Su invernadero ${nombres[l.invernaderoTipo] || ''}`.trim();
+  }
+  if (l.id === 'agua' && l.fuenteAgua) {
+    const nombres = {
+      quebrada: ['Su quebrada', '🏞️'],
+      tanque: ['Su tanque de agua', '🛢️'],
+      lluvia: ['Su agua lluvia', '🌧️'],
+      acueducto: ['Su acueducto', '🚰'],
+    };
+    const [titulo, emoji] = nombres[l.fuenteAgua] || [mundo.titulo, mundo.emoji];
+    mundo.titulo = titulo;
+    mundo.emoji = emoji;
+  }
+  return mundo;
 }
 
 /**
