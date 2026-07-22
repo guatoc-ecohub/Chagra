@@ -80,3 +80,6 @@ chagra-anthropic-judge-key
 # RESULTADO del entrenamiento (public/models/hola-chagra/{examples.bin,
 # metadata.json}) SÍ se commitea — es lo que se shippea.
 /scripts/wake-word/samples/
+
+# Canario nocturno: reportes y datasets (efímeros, nunca commitear)
+/data/canary-runs/
