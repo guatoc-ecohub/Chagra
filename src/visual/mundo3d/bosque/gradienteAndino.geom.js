@@ -1,22 +1,28 @@
 /*
- * gradienteAndino.geom — LA LADERA donde viven los tres Ents, cortada como una
- * lámina de Humboldt.
+ * gradienteAndino.geom — LA LADERA donde viven los cuatro Ents, cortada como
+ * una lámina de Humboldt.
  *
  * De qué se trata
  * ───────────────
- * Los tres árboles maestros no son tres demos sueltos: son la MISMA ladera a
- * tres alturas. Para que eso se vea y no haya que explicarlo, el mundo entero
- * es UN BLOQUE DE MONTAÑA CORTADO — el mismo recurso con el que Humboldt
- * dibujó el Chimborazo: el perfil de la ladera con sus fajas de vegetación, y
- * lo que pasa por dentro a la vista.
+ * Los cuatro árboles maestros no son cuatro demos sueltos: son la MISMA ladera
+ * a cuatro alturas. Para que eso se vea y no haya que explicarlo, el mundo
+ * entero es UN BLOQUE DE MONTAÑA CORTADO — el mismo recurso con el que
+ * Humboldt dibujó el Chimborazo: el perfil de la ladera con sus fajas de
+ * vegetación, y lo que pasa por dentro a la vista.
  *
- *   ARRIBA, sobre el lomo del bloque: tres terrazas —templado, frío, páramo—
- *   cada una con su Ent y su vegetación, y EL AGUA que nace en el páramo,
- *   se despeña dos veces y llega abajo hecha quebrada.
+ *   ARRIBA, sobre el lomo del bloque: cuatro terrazas —tierra caliente,
+ *   templado, frío, páramo— cada una con su Ent y su vegetación, y EL AGUA que
+ *   nace en el páramo, se despeña tres veces y llega abajo hecha quebrada.
+ *
+ *   La terraza de la TIERRA CALIENTE llegó después que las otras tres, y
+ *   agregarla obligó a volver DATO lo que era código: la escalera de
+ *   `alturaLadera` se suma de `ESCARPES` y los pisos se buscan por id
+ *   (`pisoDe`), no por índice. Meter una quinta terraza mañana es agregar dos
+ *   objetos, no reescribir la función madre del mundo.
  *
  *   ABAJO, en la cara cortada: los horizontes del suelo (hojarasca, humus,
  *   zona de raíces, red micorrízica, roca madre) y LA RED DE MICORRIZAS que
- *   amarra las raíces de los tres árboles a lo largo de toda la ladera.
+ *   amarra las raíces de los cuatro árboles a lo largo de toda la ladera.
  *
  * Las dos corrientes son la lección entera y van en espejo: el agua BAJA por
  * encima, el alimento CIRCULA por debajo. Si le tumban el páramo, el roble del
@@ -54,22 +60,50 @@ const suave = (a, b, x) => {
    EL BLOQUE — medidas de la ladera cortada
    ══════════════════════════════════════════════════════════════════════════ */
 export const BLOQUE = {
-  xMin: -14,
+  /* El bloque ARRANCA en la tierra caliente. Antes empezaba en el templado
+     (xMin −14) y eso era una mentira de encuadre: el gradiente andino
+     colombiano no empieza a los 750 metros, empieza al nivel del mar. Cada
+     terraza nueva cuesta ancho de cuadro, y por eso el bloque creció ocho
+     metros-escena hacia la izquierda en vez de comprimir las que ya estaban. */
+  xMin: -22,
   xMax: 14,
   zFrente: 3.4, // el plano del corte: mira a la cámara
   zFondo: -7.4,
   /* Hasta dónde baja el bloque. Es una decisión de ENCUADRE, no de geología:
      cada metro que baja es un metro de tierra oscura que hay que meter en el
      cuadro y que le quita aire a las copas. Lo justo para que la banda de
-     micorrizas del piso más bajo quede DENTRO del bloque y no colgando. */
-  yFondo: -5.0,
+     micorrizas del piso MÁS BAJO (la tierra caliente, que ahora vive 3,6 por
+     debajo del templado) quede DENTRO del bloque y no colgando.
+     La cuenta, para el que la tenga que rehacer: la banda de la terraza más
+     baja cae en −7,15, y bajo la banda tiene que quedar suelo — metro y medio,
+     que es lo que tenía el templado cuando era el piso del fondo. Ni más (cada
+     metro extra es tierra oscura que le roba cuadro a las copas) ni menos (la
+     red se leería colgando del borde). */
+  yFondo: -8.6,
 };
 
-/* Las tres terrazas del gradiente. El desnivel entre una y otra es de 3,6
+/* La cota de la terraza más baja. Todo el resto SUBE desde aquí sumando
+   escarpes: poner la tierra caliente en −3,6 (y no subir las otras tres) es lo
+   que deja intactas las alturas del templado (0), el frío (3,6) y el páramo
+   (7,2), que ya estaban calibradas con la cámara, el agua y la red. */
+export const Y_BASE = -3.6;
+
+/* Las CUATRO terrazas del gradiente. El desnivel entre una y otra es de 3,6
    metros-escena: suficiente para que la ladera SUBA de verdad y no tanto como
-   para que los tres dejen de caber juntos en un retrato — que es la prueba que
-   este mundo tiene que pasar. */
+   para que los cuatro dejen de caber juntos en un retrato — que es la prueba
+   que este mundo tiene que pasar. */
 export const PISOS = [
+  {
+    id: 'calido',
+    nombre: 'Tierra caliente',
+    ent: 'ceiba',
+    y: Y_BASE,
+    x: -17.4,
+    z: -2.2,
+    desde: BLOQUE.xMin,
+    hasta: -12.8,
+    tinte: 'calido',
+  },
   {
     id: 'templado',
     nombre: 'Templado',
@@ -77,7 +111,7 @@ export const PISOS = [
     y: 0,
     x: -8.6,
     z: -2.3,
-    desde: BLOQUE.xMin,
+    desde: -10.4,
     hasta: -4.8,
     tinte: 'templado',
   },
@@ -105,8 +139,16 @@ export const PISOS = [
   },
 ];
 
-/** Los dos escarpes (los taludes entre terraza y terraza), donde cae el agua. */
+/** Un piso por su id (nadie debe volver a escribir `PISOS[2]`: con la tierra
+    caliente al frente, los índices se corrieron y un `[2]` viejo apunta al
+    vecino equivocado). */
+export const pisoDe = (id) => PISOS.find((p) => p.id === id) || PISOS[0];
+
+/** Los TRES escarpes (los taludes entre terraza y terraza), donde cae el agua.
+    `alturaLadera` los SUMA: agregar una terraza es agregar un escarpe aquí y un
+    piso arriba, nada más. */
 export const ESCARPES = [
+  { desde: -12.8, hasta: -10.4, salto: 3.6, base: Y_BASE },
   { desde: -4.8, hasta: -2.4, salto: 3.6, base: 0 },
   { desde: 4.6, hasta: 6.8, salto: 3.6, base: 3.6 },
 ];
@@ -120,7 +162,7 @@ export const ESCARPES = [
  *     queda MÁS BAJO que el pelo de agua, así que la quebrada se desborda sobre
  *     el filo y se asoma por la cara del tajo, que es imposible.
  * Esta banda deja metro y medio de terraza por delante (el labio siempre por
- * encima del agua) y espacio de sobra por detrás para los tres guardianes.
+ * encima del agua) y espacio de sobra por detrás para los cuatro guardianes.
  */
 export function zCauce(x) {
   return 1.15 + 0.75 * Math.sin(x * 0.3 + 1.1);
@@ -138,7 +180,7 @@ export function enEscarpe(x) {
 /** Perfil del cauce en la abscisa x: qué tan hondo y qué tan ancho es el surco,
     y cuánta agua lleva (el "pelo de agua" sobre el fondo). */
 export function perfilCauce(x) {
-  const dn = clamp01((12.4 - x) / 26); // 0 en el nacimiento → 1 en la salida
+  const dn = clamp01((12.4 - x) / 34); // 0 en el nacimiento → 1 en la salida
   const esc = enEscarpe(x);
   return {
     /* El surco se abre aguas abajo… y se ABARRANCA en los dos escarpes. Eso
@@ -162,8 +204,12 @@ export function perfilCauce(x) {
  * TODO salga de aquí es lo que impide que algo quede flotando o enterrado.
  */
 export function alturaLadera(x, z) {
-  // la escalera
-  let y = 3.6 * suave(-4.8, -2.4, x) + 3.6 * suave(4.6, 6.8, x);
+  /* LA ESCALERA, sumada de los ESCARPES y no escrita a mano. Cuando eran dos
+     saltos fijos, meter la tierra caliente obligaba a reescribir esta línea —
+     que es la función madre del mundo y la usan el lomo, el corte, la siembra,
+     el agua y hasta dónde se paran los Ents. Ahora la escalera es DATO. */
+  let y = Y_BASE;
+  for (const e of ESCARPES) y += e.salto * suave(e.desde, e.hasta, x);
   // relieve: lomos y hondonadas suaves (nada de terraza de billar)
   y += 0.3 * Math.sin(x * 0.42 + 1.1) * Math.cos(z * 0.36);
   y += 0.16 * Math.sin(x * 0.9 - z * 0.55);
@@ -318,6 +364,10 @@ function filasDeProfundidad() {
    menos saturación y más plata adentro. Es la misma ley con la que la sierra
    pinta sus bandas — la ladera no puede contradecirla. */
 const FAJA = {
+  /* TIERRA CALIENTE — bosque seco tropical: el verde se va a oliva amarillento
+     y la tierra clara de la vega asoma por todas partes. Es la faja que dice
+     "aquí hace calor y hay estación seca" sin escribirlo. */
+  calido: new THREE.Color(mezclar(VERDES.calido, TIERRAS.vega, 0.42)),
   templado: new THREE.Color(mezclar(VERDES.monte, TIERRAS.mantillo, 0.3)),
   frio: new THREE.Color(mezclar(VERDES.frio, TIERRAS.mantilloSombra, 0.34)),
   paramo: new THREE.Color(mezclar(TIERRAS.pajonal, VERDES.paramoMusgo, 0.42)),
@@ -330,9 +380,13 @@ const ORILLA = new THREE.Color(mezclar(VERDES.paramoMusgo, AGUAS.lagunaOrilla, 0
     tierra que asoma en lo empinado y el verde húmedo de la orilla del agua. */
 export function colorSuperficie(x, z, y, destino = new THREE.Color()) {
   // mezcla entre fajas: la frontera entre pisos no es una raya, es un traslape
+  const aTemplado = suave(-13.6, -9.6, x);
   const aFrio = suave(-5.6, -1.6, x);
   const aParamo = suave(3.8, 7.6, x);
-  destino.copy(FAJA.templado).lerp(FAJA.frio, aFrio).lerp(FAJA.paramo, aParamo);
+  destino.copy(FAJA.calido)
+    .lerp(FAJA.templado, aTemplado)
+    .lerp(FAJA.frio, aFrio)
+    .lerp(FAJA.paramo, aParamo);
   // pendiente: donde la ladera se empina, la tierra y la roca asoman
   const pend = Math.abs(alturaLadera(x + 0.35, z) - alturaLadera(x - 0.35, z)) / 0.7;
   const empinado = clamp01((pend - 0.55) / 1.2);
@@ -354,7 +408,10 @@ export function colorSuperficie(x, z, y, destino = new THREE.Color()) {
 /* Las columnas del bloque. El lomo y la cara del corte DEBEN muestrear la
    misma malla en x: con dos resoluciones distintas los vértices del borde no
    coinciden y se abre una costura de un píxel por la que se ve el cielo. */
-const columnas = (q) => Math.max(56, Math.round(140 * q));
+/* El bloque creció de 28 a 36 metros-escena de largo: la cuenta sube con él
+   para que la densidad de vértices por metro NO caiga (si cae, el escarpe de la
+   tierra caliente se lee como una rampa de plastilina). */
+const columnas = (q) => Math.max(72, Math.round(180 * q));
 
 export function construirLomo({ q = 1 } = {}) {
   const nx = columnas(q);
@@ -663,14 +720,19 @@ export function construirAgua({ q = 1 } = {}) {
 /** El charco del nacimiento y las dos pozas al pie de cada salto. */
 export function construirPozas({ q = 1 } = {}) {
   const partes = [];
-  const sitios = [
-    { x: MANANTIAL.x, r: 0.95 },
-    { x: ESCARPES[1].desde - 0.55, r: 0.7 },
-    { x: ESCARPES[1].hasta + 0.6, r: 1.05 },
-    { x: ESCARPES[0].desde - 0.55, r: 0.78 },
-    { x: ESCARPES[0].hasta + 0.65, r: 1.3 },
-    { x: BLOQUE.xMin + 2.4, r: 1.5 },
-  ];
+  /* Una poza arriba del salto (donde el agua se junta antes de caer) y otra
+     abajo (donde revienta), por CADA escarpe — y las pozas de abajo crecen
+     aguas abajo, porque abajo hay más agua. Recorrer ESCARPES en vez de
+     escribir los índices a mano es lo que hizo que meter la tierra caliente no
+     dejara su salto sin poza. */
+  const sitios = [{ x: MANANTIAL.x, r: 0.95 }];
+  for (let i = ESCARPES.length - 1; i >= 0; i--) {
+    const abajo = 1 + (ESCARPES.length - 1 - i) * 0.22; // más agua río abajo
+    // el agua viene de la derecha (arriba): remanso en `hasta`, marmita en `desde`
+    sitios.push({ x: ESCARPES[i].hasta + 0.62, r: 0.72 * abajo });
+    sitios.push({ x: ESCARPES[i].desde - 0.58, r: 1.04 * abajo });
+  }
+  sitios.push({ x: BLOQUE.xMin + 2.4, r: 1.7 }); // el remanso de la salida
   const viva = new THREE.Color(AGUAS.viva);
   const honda = new THREE.Color(AGUAS.lagunaHonda);
   const orilla = new THREE.Color(AGUAS.lagunaOrilla);
@@ -708,13 +770,122 @@ export function chispasDeAgua(n = 34, seed = 71) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   LA RED DE MICORRIZAS — lo que amarra a los tres por debajo
+   LA FÁBRICA DE AGUA — la niebla entra por la copa y sale hecha quebrada
+   ══════════════════════════════════════════════════════════════════════════ */
+/*
+ * "No veo la lección del páramo."
+ *
+ * Y tenía razón: estaba escrita en el panel y en ninguna otra parte. El texto
+ * decía que la copa de la queñua PEINA LA NIEBLA, que el agua escurre por el
+ * tronco y que de ahí sale la quebrada — pero en la escena solo se veía un
+ * manantial brotando de la nada al lado del árbol. La causa (la niebla) y el
+ * efecto (el agua) no estaban unidos por nada que el ojo pudiera seguir.
+ *
+ * Estas tres piezas son esa unión, y se leen en este orden:
+ *   1. JIRONES de niebla que llegan de la cumbre y se meten en la copa.
+ *   2. GOTAS que nacen en la copa, escurren por el tronco y caen al pie.
+ *   3. el MANANTIAL, que ya existía, y ahora se entiende de dónde salió.
+ *
+ * Nada de esto es licencia poética: es lo que hace un bosque de niebla
+ * altoandino, y es la razón por la que tumbar el páramo seca la quebrada.
+ */
+
+/** El eje por el que viaja la niebla: entra por la cumbre y muere en la copa
+    del guardián del páramo. */
+export function ejeNiebla(piso) {
+  const ySup = alturaLadera(piso.x, piso.z);
+  return {
+    desde: new THREE.Vector3(BLOQUE.xMax + 4.5, ySup + 7.2, piso.z + 2.2),
+    /* El final NO es el borde de la copa: es un metro y medio ADENTRO. La
+       niebla tiene que verse entrando en la masa de hojas, no deteniéndose
+       cortésmente al lado. Si muere afuera, se lee como una nube que pasaba. */
+    hasta: new THREE.Vector3(piso.x - 0.9, ySup + 6.5, piso.z + 0.2),
+  };
+}
+
+/** Los jirones: cada uno con su fase, su talla y su altura. Viajan por el eje y
+    se ADELGAZAN al llegar (la copa se los está tomando). */
+export function jironesDeNiebla(n = 16, seed = 83) {
+  const r = rng(seed);
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    out.push({
+      t: r(),
+      vel: 0.035 + r() * 0.03,
+      alto: (r() - 0.5) * 2.6,
+      lado: (r() - 0.5) * 2.2,
+      /*
+       * ANCHOS Y BAJITOS, NUNCA BOLAS — y con la medida corta.
+       *
+       * La primera pasada les daba hasta 3,4 de largo, que es TRES VECES la
+       * copa de la queñua. De frente pasaba (se leían como banco de niebla),
+       * pero desde el retrato del aliso uno de ellos caía casi de punta contra
+       * la cámara y se veía lo que en realidad era: una bola beige lisa
+       * flotando sobre el páramo. Un jirón chico no se delata desde ningún
+       * ángulo, y con unos cuantos más el banco se ve igual de lleno.
+       */
+      largo: 1.2 + r() * 1.25,
+      grueso: 0.24 + r() * 0.15,
+    });
+  }
+  return out;
+}
+
+/**
+ * EL CAMINO DE UNA GOTA: de la copa al manantial, pegada al tronco.
+ *
+ * Que baje POR EL TRONCO y no por el aire es el detalle que hace la lección:
+ * en un bosque de niebla el agua no llueve, ESCURRE — la copa la atrapa y el
+ * fuste la conduce al suelo. Un campesino que ha visto un árbol chorreando en
+ * una mañana de neblina reconoce esto de una.
+ */
+export function caminoDeGota(piso) {
+  const ySup = alturaLadera(piso.x, piso.z);
+  const px = piso.x;
+  const pz = piso.z;
+  return new THREE.CatmullRomCurve3([
+    new THREE.Vector3(px + 0.75, ySup + 6.9, pz + 0.55),
+    new THREE.Vector3(px + 0.45, ySup + 5.2, pz + 0.85),
+    new THREE.Vector3(px + 0.28, ySup + 3.3, pz + 0.92),
+    new THREE.Vector3(px + 0.24, ySup + 1.4, pz + 0.95),
+    new THREE.Vector3(px + 0.6, ySup + 0.16, pz + 1.7),
+    new THREE.Vector3(
+      (px + MANANTIAL.x) / 2 + 0.4,
+      alturaLadera((px + MANANTIAL.x) / 2 + 0.4, (pz + MANANTIAL.z) / 2) + 0.1,
+      (pz + MANANTIAL.z) / 2,
+    ),
+    new THREE.Vector3(MANANTIAL.x, nivelAgua(MANANTIAL.x) + 0.07, MANANTIAL.z),
+  ], false, 'catmullrom', 0.35);
+}
+
+/** Las gotas que hace la copa. Van en fila india y con velocidades parecidas:
+    un goteo, no una lluvia (si van muy rápido se lee como chorro de manguera). */
+export function gotasDeParamo(n = 14, seed = 89) {
+  const r = rng(seed);
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    out.push({
+      t: i / n + r() * 0.05,
+      vel: 0.085 + r() * 0.045,
+      lado: (r() - 0.5) * 0.16,
+      esc: 0.075 + r() * 0.06,
+    });
+  }
+  return out;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA RED DE MICORRIZAS — lo que amarra a los cuatro por debajo
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* La banda donde vive la red: sigue el lomo de la ladera a una profundidad
    fija, así que la red SUBE con la montaña. Ver la red escalonarse detrás de
    las tres terrazas es, literalmente, la lección. */
-export const PROF_RED = 3.6;
+/* 3,2 y no 3,6: la banda sigue viviendo dentro del horizonte micorrízico
+   (3,0–4,4 m) pero sube un palmo, y ese palmo es lo que deja la red de la
+   TIERRA CALIENTE —que ahora es la terraza más honda— dentro del bloque en vez
+   de colgando por debajo del piso. */
+export const PROF_RED = 3.2;
 
 /** El punto de la banda micorrízica bajo la abscisa x, sobre el plano del corte. */
 export function puntoBanda(x, jitter = 0) {
@@ -748,7 +919,7 @@ export function raizDeSeccion(piso) {
     new THREE.Vector3(piso.x, ySup + 0.15, piso.z),
     new THREE.Vector3(piso.x + 0.1, ySup - 1.1, piso.z + 1.1),
   ];
-  for (const prof of [1.7, 2.5, 3.2]) {
+  for (const prof of [1.5, 2.2, 2.8]) {
     pts.push(new THREE.Vector3(
       piso.x + Math.sin(prof * 1.7) * 0.16,
       yCorte - prof,
@@ -761,7 +932,7 @@ export function raizDeSeccion(piso) {
 
 /**
  * EL ESQUELETO DE LA RED: el rizomorfo que corre toda la ladera, las raíces de
- * sección que bajan de los tres Ents y los filamentos finos que se abren a los
+ * sección que bajan de los cuatro Ents y los filamentos finos que se abren a los
  * lados. Devuelve polilíneas con su grosor y su tipo.
  */
 export function esqueletoRed({ q = 1 } = {}) {
@@ -783,12 +954,15 @@ export function esqueletoRed({ q = 1 } = {}) {
   }
   hilos.push({ pts: troncal2, grosor: 0.032, tipo: 'rizomorfo' });
 
-  /* 3. Las bajantes de los tres Ents (las que enganchan la red al árbol). */
+  /* 3. Las bajantes de los cuatro Ents (las que enganchan la red al árbol).
+        GRUESAS a propósito: son el único trazo que dice "esta red es DE ESTOS
+        ÁRBOLES". Delgadas como estaban, la banda turquesa se leía como un
+        adorno eléctrico bajo tierra y no como la raíz de nadie. */
   for (const piso of PISOS) {
     const curva = raizDeSeccion(piso);
     const pts = [];
     for (let i = 0; i <= 16; i++) pts.push(curva.getPointAt(i / 16));
-    hilos.push({ pts, grosor: 0.075, tipo: 'raiz', piso: piso.id });
+    hilos.push({ pts, grosor: 0.115, tipo: 'raiz', piso: piso.id });
   }
 
   /* 4. Los PUENTES: filamentos que salen del rizomorfo y trepan a buscar la
@@ -861,6 +1035,18 @@ export function construirRed(hilos, { q = 1 } = {}) {
       if (h.tipo === 'raiz') {
         const t = clamp01((h.pts[0].y - y) / Math.max(0.001, h.pts[0].y - h.pts[h.pts.length - 1].y));
         c.copy(raiz).lerp(raizPunta, t * 0.8);
+        /*
+         * EL MANTO: en el último tercio, la raíz se va poniendo TURQUESA.
+         *
+         * Esa es la lección entera y no estaba dibujada. Una ectomicorriza no es
+         * una red que pasa cerca de la raíz: es el hongo FORRANDO la raíz —
+         * la envuelve en un manto y se le mete entre las células. Con la raíz
+         * parda de punta a punta, el ojo veía dos cosas distintas que se tocan;
+         * con el manto pintado, ve UNA SOLA que cambia de dueño. Eso es lo que
+         * hace que un campesino diga "ah, el hongo se le pegó a la raíz".
+         */
+        const manto = suave(0.62, 0.97, t);
+        if (manto > 0) c.lerp(micelio, manto * 0.82);
         return c;
       }
       const n = ruidoFbm(x * 1.4, y * 1.4, z * 1.4);
@@ -882,8 +1068,29 @@ export function nodosDeRed(hilos, { q = 1 } = {}) {
   const r = rng(77);
   const nodos = [];
   for (const piso of PISOS) {
-    // el nodo de intercambio de cada árbol: el más grande, el que importa
-    nodos.push({ p: puntoBanda(piso.x), esc: 0.16, tipo: 'intercambio', piso: piso.id });
+    /*
+     * EL PUESTO DE INTERCAMBIO de cada árbol. Antes era una perlita de 0,16 en
+     * medio de catorce perlitas iguales: nada decía que ESE punto —donde la
+     * raíz del guardián toca la red— fuera distinto de los otros. Ahora es una
+     * perla gorda con SU CORRO alrededor: el ojo tiene dónde parar y entiende
+     * que ahí pasa algo, que es justo lo que hay que entender.
+     */
+    const centro = puntoBanda(piso.x);
+    nodos.push({ p: centro, esc: 0.3, tipo: 'intercambio', piso: piso.id });
+    const corro = Math.max(3, Math.round(6 * q));
+    for (let i = 0; i < corro; i++) {
+      const a = (i / corro) * Math.PI * 2 + piso.x;
+      nodos.push({
+        p: centro.clone().add(new THREE.Vector3(
+          Math.cos(a) * 0.42,
+          Math.sin(a) * 0.3,
+          0.03 + Math.cos(a * 2) * 0.02,
+        )),
+        esc: 0.075 + r() * 0.035,
+        tipo: 'intercambio',
+        piso: piso.id,
+      });
+    }
   }
   const troncal = hilos.find((h) => h.tipo === 'rizomorfo');
   if (troncal) {
@@ -900,7 +1107,7 @@ export function nodosDeRed(hilos, { q = 1 } = {}) {
  * LOS PULSOS que viajan por la red. En el mundo de las micorrizas ya está
  * dicho qué viaja: minerales y agua del hongo hacia la planta, azúcar de la
  * planta hacia el hongo. Aquí los pulsos recorren el rizomorfo de punta a
- * punta — que es lo que hace visible que los tres están conectados.
+ * punta — que es lo que hace visible que los cuatro están conectados.
  */
 export function pulsosDeRed(n = 26, seed = 53) {
   const r = rng(seed);
@@ -919,6 +1126,45 @@ export function pulsosDeRed(n = 26, seed = 53) {
   return out;
 }
 
+/**
+ * LOS PULSOS QUE SUBEN Y BAJAN POR LA RAÍZ DE CADA ÁRBOL — el trato, visible.
+ *
+ * Esto es lo que faltaba para que la red se leyera como LECCIÓN y no como
+ * cableado bonito. Los pulsos del rizomorfo dicen "los cuatro están
+ * conectados", que ya es algo; pero no dicen QUÉ gana el árbol. Estos otros
+ * viajan por la bajante de cada Ent, en los dos sentidos y con dos colores:
+ *
+ *   · VERDE que BAJA  — el azúcar que el árbol fabricó con el sol y le paga al
+ *     hongo. Sale del pie del guardián y se pierde en la red.
+ *   · ÁMBAR/AZUL que SUBE — el fósforo y el agua que el hongo buscó donde la
+ *     raíz sola no llega, y que entran al árbol.
+ *
+ * Verlo dos veces basta para entenderlo: baja comida, sube mineral. Nadie
+ * necesita leer el panel.
+ *
+ * @param {string} pisoId  a qué árbol le pertenece la bajante.
+ * @param {number} n       cuántos pulsos por raíz.
+ */
+export function pulsosDeRaiz(pisoId, n = 5, seed = 61) {
+  const r = rng(seed + pisoId.length * 13);
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    /* Alternados a propósito: si el reparto fuera al azar, una raíz podía
+       quedarse con puros verdes y la mitad de la lección desaparecía en ese
+       árbol. Aquí SIEMPRE se ven las dos direcciones en las cuatro raíces. */
+    const baja = i % 2 === 0;
+    out.push({
+      t: (i / n) + r() * 0.12,
+      vel: 0.16 + r() * 0.1,
+      dir: baja ? 1 : -1, // t=0 es el pie del árbol, t=1 es la red
+      color: baja ? MICO.carbono : (r() > 0.5 ? MICO.fosforo : MICO.agua),
+      esc: 0.075 + r() * 0.045,
+      lado: (r() - 0.5) * 0.05,
+    });
+  }
+  return out;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    PIEDRAS Y DETALLE DE LOS ESCARPES
    ══════════════════════════════════════════════════════════════════════════ */
@@ -930,13 +1176,13 @@ export function construirPiedras({ q = 1 } = {}, seed = 313) {
   const partes = [];
   const roca = new THREE.Color(TIERRAS.rocaParamo);
   const rocaClara = new THREE.Color(mezclar(TIERRAS.rocaParamo, NEUTROS.cal, 0.28));
-  const cuantas = Math.max(14, Math.round(46 * q));
+  const cuantas = Math.max(18, Math.round(62 * q));
   for (let i = 0; i < cuantas; i++) {
     // la mitad en los escarpes, la mitad regadas por las terrazas
     let x;
     let z;
     if (i % 2 === 0) {
-      const e = ESCARPES[i % 4 < 2 ? 0 : 1];
+      const e = ESCARPES[Math.floor(i / 2) % ESCARPES.length];
       x = e.desde + r() * (e.hasta - e.desde);
       z = BLOQUE.zFondo + 1.5 + r() * (BLOQUE.zFrente - BLOQUE.zFondo - 2.4);
     } else {

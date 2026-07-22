@@ -1,12 +1,27 @@
 /*
- * entsGradiente.geom — la GEOMETRÍA de los ÁRBOLES MAESTROS del gradiente
- * andino: el ENT DEL ROBLE (templado y frío) y el ENT DEL ALISO (frío).
+ * entsGradiente.geom — la GEOMETRÍA de los CUATRO ÁRBOLES MAESTROS del
+ * gradiente andino, de abajo hacia arriba:
  *
- * El tercero del gradiente —la QUEÑUA del páramo— NO se redibuja aquí: es el
- * `EntQuenua` que ya existe, traído tal cual desde su casa (`entQuenua.geom.js`
- * + `EntQuenua.jsx`). Este módulo le pone DOS HERMANOS coherentes: la misma
- * talla (rostro que emerge de la madera, brazos que caen con peso, raíces que
- * agarran), pero cada uno con la forma, la corteza y la LECCIÓN de su especie.
+ *   · la CEIBA   (tierra caliente, 0–1.000 m · bosque seco tropical)
+ *   · el ROBLE   (templado y frío, 750–3.450 m)
+ *   · el ALISO   (frío · bosque altoandino)
+ *   · la QUEÑUA  (páramo · el árbol que llega más arriba)
+ *
+ * ── Por qué los cuatro viven en el MISMO módulo ────────────────────────────
+ * Antes eran dos aquí (roble y aliso) y la queñua se traía prestada de su
+ * mundo del páramo. Funcionaba… hasta que se pusieron los tres en un mismo
+ * retrato: la queñua venía de otra talla y se le notaba en la cara. No era
+ * cuestión de retocarle un rasgo; era que la había hecho otra mano.
+ *
+ * Ahora las cuatro especies pasan por el mismo taller: el mismo campo de
+ * rostro, la misma cáscara, los mismos ojos, la misma regla para derivar la
+ * escala de la cara del radio del fuste. Lo que cambia por especie es la
+ * FORMA, la CORTEZA y la LECCIÓN — nunca la anatomía. Por eso se leen como
+ * hermanos: porque literalmente los talló el mismo cincel.
+ *
+ * (El `EntQuenua` original sigue intacto en `entQuenua.geom.js` +
+ * `EntQuenua.jsx`, que es lo que monta el mundo del páramo. De allá se
+ * importan el campo del rostro y la barba de usnea, que son patrimonio común.)
  *
  * ── Qué es cierto de cada uno (y no se puede inventar más) ─────────────────
  *
@@ -45,6 +60,7 @@ import {
   taperTronco,
   taperLineal,
   poner,
+  apuntar,
   pintarPorVertice,
   pintarPlano,
   hornearFollaje,
@@ -52,7 +68,7 @@ import {
 } from './sombreadoVegetal.js';
 import { campoRostro, ROSTRO_BOCA_Y } from './entQuenua.geom.js';
 import { PAL } from './floraParamo.geom.js';
-import { TIERRAS, ACENTOS, CORTEZAS, VERDES, mezclar } from '../paleta/paletaMadre.js';
+import { TIERRAS, ACENTOS, CORTEZAS, VERDES, NEUTROS, mezclar } from '../paleta/paletaMadre.js';
 
 /* Fusión canónica del taller. Las copas llevan normales RADIALES (matojoNube):
    sin `preservarNormales` el merge las recalcula y la masa de hojas vuelve a
@@ -73,15 +89,18 @@ const suave = (a, b, x) => {
 export const PARAMS_TIER = {
   alto: {
     tubular: 96, radial: 14, segRostro: [52, 58], deform: 0.5,
-    hojasCopa: 1, ramas: 1, raices: 1, materialRico: true, flatShading: true,
+    hojasCopa: 1, ramas: 1, raices: 1, barbaDens: 1,
+    materialRico: true, flatShading: true,
   },
   medio: {
     tubular: 60, radial: 10, segRostro: [38, 42], deform: 0.5,
-    hojasCopa: 0.7, ramas: 0.8, raices: 0.8, materialRico: false, flatShading: false,
+    hojasCopa: 0.7, ramas: 0.8, raices: 0.8, barbaDens: 0.72,
+    materialRico: false, flatShading: false,
   },
   bajo: {
     tubular: 36, radial: 7, segRostro: [24, 28], deform: 0.45,
-    hojasCopa: 0.42, ramas: 0.6, raices: 0.6, materialRico: false, flatShading: false,
+    hojasCopa: 0.42, ramas: 0.6, raices: 0.6, barbaDens: 0.4,
+    materialRico: false, flatShading: false,
   },
 };
 
@@ -104,14 +123,15 @@ export const paramsDeTier = (tier) => PARAMS_TIER[tier] || PARAMS_TIER.medio;
 
 /* El ROBLE: macizo, ancho, de corteza gris-parda profundamente fisurada y copa
    en SOMBRILLA (la más ancha del dosel — así lo dibuja ya el roble del páramo).
-   El abuelo del gradiente: el que cruza los tres pisos él solo. */
+   El abuelo del gradiente: el que cruza tres pisos él solo. */
 const ROBLE = {
   id: 'roble',
   nombre: 'El Ent del roble',
   arbol: 'Roble andino',
   cientifico: 'Quercus humboldtii',
   piso: 'Templado y frío · de 750 a 3.450 m',
-  /* fuste: el más grueso de los tres — es el abuelo del gradiente */
+  /* fuste: grueso y macizo — es el abuelo del gradiente (solo la ceiba, que
+     es de otro mundo térmico, le gana en grosor) */
   altura: 8.2,
   r0: 0.92,
   r1: 0.16,
@@ -156,7 +176,7 @@ const ROBLE = {
 };
 
 /* El ALISO: esbelto, erguido, de corteza gris clara casi lisa y copa en AGUJA
-   (el emergente delgado que pincha el dosel). El más joven de los tres: el que
+   (el emergente delgado que pincha el dosel). El más joven de todos: el que
    llega primero al suelo cansado y lo levanta. */
 const ALISO = {
   id: 'aliso',
@@ -201,7 +221,166 @@ const ALISO = {
   senala: { lado: -1, destino: [-1.5, 0.12, 1.75], r0: 0.24 },
 };
 
-export const ESPECIES = { roble: ROBLE, aliso: ALISO };
+/*
+ * La QUEÑUA: el guardián del páramo, ahora TALLADO CON LA MISMA MANO.
+ *
+ * ── Por qué está aquí y no en su casa ──────────────────────────────────────
+ * El Ent de la queñua existe desde antes (`EntQuenua.jsx`) y en su mundo del
+ * páramo se queda tal cual: allá nadie lo compara con nadie. Pero en esta
+ * ladera vive al lado de tres hermanos y ahí sí se notaba: su rostro venía de
+ * otra talla —otra escala de cáscara, otros ojos, otro peso de tinta— y en el
+ * retrato de los cuatro se leía como un primo lejano metido en la foto
+ * familiar. "La cara del de páramo es la más fea y debe parecerse más a los
+ * otros", y era cierto.
+ *
+ * La solución NO fue retocarle la cara a mano hasta que se pareciera: fue
+ * hacerlo pasar por el MISMO taller. Al ser una especie más de este módulo,
+ * su rostro sale de `mallaRostro` + `proporcionesRostro` + el mismo `<Ojo>`
+ * que el roble y el aliso; la escala de su cáscara se DERIVA del radio de su
+ * fuste con la misma regla, y por eso los ojos le quedan del mismo tamaño
+ * relativo y las cejas con el mismo alero. Son cuatro hermanos porque los talló
+ * el mismo cincel, no porque se les hayan copiado los rasgos.
+ *
+ * ── Lo que NO se le quita ──────────────────────────────────────────────────
+ * Sigue siendo la queñua: corteza rojiza que se PELA EN LÁMINAS de papel (la
+ * firma de *Polylepis*), musgo de páramo en cejas y pómulos, barba de usnea
+ * colgando del mentón y copa chica de hojita plateada. Cambia de quién es la
+ * mano que la talló, no quién es el árbol.
+ */
+const QUENUA = {
+  id: 'quenua',
+  nombre: 'El Ent de la queñua',
+  arbol: 'Queñua o colorado',
+  cientifico: 'Polylepis',
+  piso: 'Páramo · el árbol que llega más arriba',
+  /* fuste corto y grueso: arriba del todo nadie crece alto */
+  altura: 6.9,
+  r0: 0.86,
+  r1: 0.15,
+  raigon: 0.46,
+  /* el más retorcido de los cuatro: es el que pelea con el viento del páramo */
+  inclina: 0.085,
+  sinuoso: 0.085,
+  giro: 1.35,
+  semilla: 7,
+  /* corteza: NO se parte en fisuras hondas, se DESPEGA en láminas. Por eso la
+     rugosidad es media y las placas son anchas y planas (papel), no surcos. */
+  rugosidad: 0.82,
+  grano: { surcos: 7.2, fino: 19, bandas: 26, placas: 2.2 },
+  corteza: {
+    grieta: TIERRAS.cacao,
+    cuerpo: CORTEZAS.quenual,
+    cresta: CORTEZAS.quenualPapel, // LA firma: la lámina de papel rojiza
+    liquen: VERDES.paramoLiquen,
+    hastaLiquen: 1.4,
+  },
+  hoja: { base: VERDES.paramoHoja, sol: VERDES.paramoMusgoClaro, luz: VERDES.paramoPlata },
+  /* rostro: derivado de su radio con la regla de la casa (R≈0.74 → [1.82,1.88,
+     1.39]) y desviado apenas hacia lo ANCHO: la queñua es el árbol rechoncho
+     del páramo y su cara lo dice, pero sigue siendo la misma cara. */
+  rostroT: 0.33,
+  rostroEscala: /** @type {[number,number,number]} */ ([1.84, 1.80, 1.41]),
+  relieve: 1.5,
+  musgoRostro: 0.72, // el que más musgo carga: vive en la niebla
+  ramas: { n: 6, desde: 0.55, hasta: 0.94, largo: 1.75, sube: 1.15, grosor: 0.38 },
+  copa: { forma: 'domo', radio: 2.05, achatado: 0.7, alturaExtra: 0.95, lobulos: 9, radioLobulo: 1.12 },
+  raices: { n: 7, largo: 1.15, r0: 0.33 },
+  brazos: { tHombro: 0.45, drop: 2.1, abre: 1.85, r0: 0.27 },
+  /* su brazo maestro señala el NACIMIENTO DEL AGUA, ladera abajo a su derecha:
+     la lección de la queñua no es una cosa que le crece al pie, es lo que sale
+     de ella. */
+  senala: { lado: 1, destino: [1.95, 0.08, 1.5], r0: 0.3 },
+  barba: true, // la cortina de usnea: sin ella no es la queñua
+  leccion: 'agua', // la dibuja la ESCENA (niebla → gota → manantial), no el Ent
+};
+
+/*
+ * La CEIBA: el cuarto Ent, el de la TIERRA CALIENTE.
+ *
+ * ── Por qué faltaba ────────────────────────────────────────────────────────
+ * El gradiente andino colombiano no empieza en el templado. Empieza abajo, en
+ * el bosque seco tropical, y sin ese piso la ladera contaba la historia a
+ * partir de la mitad.
+ *
+ * ── Qué es cierto de ella (y nada más) ─────────────────────────────────────
+ * CEIBA · *Ceiba pentandra* · 0–1.000 msnm · más de 24 °C
+ *   Nativa emblemática del bosque seco tropical colombiano: Caribe (Sucre,
+ *   Córdoba, Magdalena, Bolívar, Cesar) e interior (Huila, Tolima, Valle,
+ *   Cauca). Su rasgo inconfundible son los CONTRAFUERTES: raíces tablares que
+ *   salen del tronco como aletas, tan altas como una persona. Tronco grueso y
+ *   gris, a veces con espinas cónicas cuando es joven. Copa abierta en
+ *   horizontal, como un parasol gigante.
+ *
+ * ── Lo que NO se le inventa ────────────────────────────────────────────────
+ * NI MICORRIZAS NI SIMBIOSIS. No están verificadas y por eso la ceiba no tiene
+ * setas al pie ni nódulos en la raíz: su brazo maestro señala su propio
+ * contrafuerte, que es lo único que aquí se puede afirmar. El roble tiene sus
+ * hongos y el aliso sus nódulos porque de esos SÍ hay fuente. Dibujamos el
+ * árbol, no una lección que todavía no tenemos.
+ */
+const CEIBA = {
+  id: 'ceiba',
+  nombre: 'El Ent de la ceiba',
+  arbol: 'Ceiba',
+  cientifico: 'Ceiba pentandra',
+  piso: 'Tierra caliente · de 0 a 1.000 m · bosque seco tropical',
+  /* el gigante del gradiente: el más alto y con mucho el más grueso */
+  altura: 9.6,
+  r0: 1.22,
+  r1: 0.2,
+  raigon: 0.52,
+  /* APLOMADA. La queñua se retuerce y el roble se ladea; la ceiba es un pilar
+     —así crece un emergente que tiene que sacar la copa por encima del dosel— y
+     esa verticalidad es media silueta. */
+  inclina: 0.02,
+  sinuoso: 0.028,
+  giro: 0.35,
+  semilla: 11,
+  /* corteza LISA y gris: la ceiba no se parte en placas leñosas */
+  rugosidad: 0.42,
+  grano: { surcos: 5.2, fino: 15, bandas: 18, placas: 1.2 },
+  corteza: {
+    grieta: mezclar(TIERRAS.rocaSierra, NEUTROS.tinta, 0.24),
+    cuerpo: mezclar(CORTEZAS.aliso, VERDES.calido, 0.17), // gris con dejo verde
+    cresta: mezclar(CORTEZAS.yarumo, NEUTROS.cal, 0.3),
+    liquen: PAL.liquen2,
+    hastaLiquen: 1.6,
+  },
+  /* hoja de bosque seco: verde oliva amarillento, más claro que el de altura */
+  hoja: {
+    base: mezclar(VERDES.calido, TIERRAS.mantilloSombra, 0.38),
+    sol: VERDES.calidoVivo,
+    luz: VERDES.brote,
+  },
+  /* rostro: la regla de la casa sobre un fuste de radio 1,07 → [2.62,2.72,2.00],
+     desviado apenas hacia lo ancho y sereno. Es la cara más grande de los
+     cuatro porque es el árbol más grande, no porque sea otra talla. */
+  rostroT: 0.32,
+  rostroEscala: /** @type {[number,number,number]} */ ([2.55, 2.56, 1.95]),
+  relieve: 1.35,
+  musgoRostro: 0.16, // en tierra caliente y con estación seca, casi no hay musgo
+  /* ramas HORIZONTALES: `sube` bajo y `largo` grande. Ahí está el parasol. */
+  ramas: { n: 7, desde: 0.63, hasta: 0.97, largo: 3.4, sube: 0.5, grosor: 0.34 },
+  copa: { forma: 'parasol', radio: 4.5, achatado: 0.34, alturaExtra: 0.95, lobulos: 10, radioLobulo: 1.5 },
+  raices: { n: 5, largo: 1.5, r0: 0.28 },
+  /* LOS CONTRAFUERTES: lo que hace ceiba a una ceiba. SEIS y no siete, ALTOS
+     (casi tres metros-escena contra un fuste de 9,6) y DELGADOS: en la primera
+     pasada eran siete, más bajos y más gruesos, y de lejos el pie se leía como
+     una falda derretida. Una tabla se reconoce por el canto; hay que darle
+     altura y quitarle carne para que el canto exista. */
+  contrafuertes: { n: 6, largo: 2.9, alto: 2.9, grosor: 0.34 },
+  /* las espinas cónicas del tronco: pocas y bajas — un rasgo de juventud que a
+     este viejo apenas le queda, pero le queda */
+  espinas: { n: 22, desde: 0.05, hasta: 0.4, largo: 0.3, radio: 0.075 },
+  brazos: { tHombro: 0.43, drop: 2.9, abre: 2.6, r0: 0.36 },
+  /* señala su propio contrafuerte: lo único que de ella se puede afirmar */
+  senala: { lado: -1, destino: [-2.15, 0.35, 1.55], r0: 0.4 },
+  leccion: 'contrafuerte', // la lección ES el árbol; no hay cosa aparte que montar
+};
+
+export const ESPECIES = {
+  ceiba: CEIBA, roble: ROBLE, aliso: ALISO, quenua: QUENUA,
+};
 
 /* ══════════════════════════════════════════════════════════════════════════
    EL FUSTE — curva, conicidad y corteza
@@ -499,7 +678,43 @@ export function lobulosCopa(esp, puntasRama) {
     return lobs;
   }
 
-  // DOMO ancho (roble)
+  if (C.forma === 'parasol') {
+    /*
+     * EL PARASOL DE LA CEIBA. No es un domo más ancho: es un DISCO.
+     *
+     * La diferencia está en la altura de los lóbulos, no en el radio: todos
+     * viven casi en el mismo plano y el anillo de afuera CAE un poco, así que
+     * la silueta es una sombrilla con las alas vencidas. Un domo del mismo
+     * radio se leería como una nube gorda; esto se lee, a contraluz y desde
+     * lejos, como la copa que da sombra a media vereda.
+     */
+    const yTop = cima.y + C.alturaExtra;
+    const n = C.lobulos;
+    lobs.push({ c: [cima.x, yTop - 0.1, cima.z], radio: C.radioLobulo * 1.08 });
+    for (let i = 0; i < n; i++) {
+      const ang = (i / n) * Math.PI * 2 + r() * 0.42;
+      const rad = C.radio * (0.4 + r() * 0.26);
+      lobs.push({
+        c: [cima.x + Math.cos(ang) * rad, yTop - 0.2 + r() * 0.34, cima.z + Math.sin(ang) * rad],
+        radio: C.radioLobulo * (0.82 + r() * 0.24),
+      });
+    }
+    // el ala: el anillo de afuera, más bajo y más chico — el parasol se vence
+    for (let i = 0; i < n; i++) {
+      const ang = (i / n) * Math.PI * 2 + 0.31 + r() * 0.4;
+      const rad = C.radio * (0.76 + r() * 0.3);
+      lobs.push({
+        c: [cima.x + Math.cos(ang) * rad, yTop - 0.92 + r() * 0.34, cima.z + Math.sin(ang) * rad],
+        radio: C.radioLobulo * (0.54 + r() * 0.26),
+      });
+    }
+    for (const p of puntasRama) {
+      lobs.push({ c: [p.x * 1.02, p.y + 0.22, p.z * 1.02], radio: C.radioLobulo * (0.62 + r() * 0.24) });
+    }
+    return lobs;
+  }
+
+  // DOMO ancho (roble, queñua)
   lobs.push({ c: [cima.x, cima.y + C.alturaExtra, cima.z], radio: C.radioLobulo * 1.12 });
   for (const p of puntasRama) {
     lobs.push({ c: [p.x * 1.06, p.y + 0.3, p.z * 1.06], radio: C.radioLobulo * (0.78 + r() * 0.3) });
@@ -723,10 +938,147 @@ export function construirMadera(esp, P) {
     }));
   }
 
+  // las espinas cónicas del fuste (solo la ceiba las declara)
+  partes.push(...geomEspinasCeiba(esp, P));
+
   return { geo: fusionarDura(partes, `madera-${esp.id}`), ramas, brazos: specsBrazos(esp) };
 }
 
-/** Las RAÍCES-contrafuerte en UNA geometría (van fuera del balanceo: agarran). */
+/* ══════════════════════════════════════════════════════════════════════════
+   LOS CONTRAFUERTES DE LA CEIBA — raíces TABLARES, no raíces redondas
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * UNA ALETA de contrafuerte.
+ *
+ * Un contrafuerte de ceiba NO es una raíz gruesa: es una TABLA. Sale del
+ * tronco como la aleta de un cohete, arranca alta (a la altura de la cabeza de
+ * una persona) y se va acostando hasta morir en el suelo varios metros afuera.
+ * Por eso no se puede hacer con `tuboMadera` —un tubo tiene sección redonda y
+ * se leería como una pata de elefante—: hay que barrer una superficie.
+ *
+ * La malla es un manto de dos caras que se juntan en un FILO: el espesor va
+ * lleno abajo y se cierra a cero arriba (por eso el lomo de la aleta es un
+ * canto y no un tubo aplastado) y también se adelgaza hacia la punta.
+ *
+ * OJO CON LOS ATRIBUTOS: esta pieza se fusiona con los tubos de la madera, y
+ * `TubeGeometry` trae position + normal + uv. Si aquí faltara el `uv`,
+ * `fusionarSeguro` trona (y sin él, `mergeGeometries` habría devuelto NULL en
+ * silencio y la ceiba se quedaría sin contrafuertes, que es como decir sin
+ * ceiba). Por eso el uv se escribe aunque nadie lo lea.
+ *
+ * @param {object} esp  la especie (para la corteza y su color)
+ * @param {{ang:number,largo:number,alto:number,grosor:number,seed:number,q:number}} o
+ */
+export function finContrafuerte(esp, { ang, largo, alto, grosor, seed, q = 1 }) {
+  const nu = Math.max(6, Math.round(14 * q)); // a lo largo, del tronco a la punta
+  const nv = Math.max(4, Math.round(9 * q)); // a lo alto, del suelo al filo
+  const cols = nu + 1;
+  const rows = nv + 1;
+  const total = cols * rows * 2;
+  const pos = new Float32Array(total * 3);
+  const uv = new Float32Array(total * 2);
+  const col = new Float32Array(total * 3);
+  const idx = [];
+  const dx = Math.cos(ang);
+  const dz = Math.sin(ang);
+  const px = -Math.sin(ang); // el perpendicular: hacia dónde engorda la tabla
+  const pz = Math.cos(ang);
+  const c = new THREE.Color();
+
+  for (let s = 0; s < 2; s++) {
+    const signo = s === 0 ? 1 : -1;
+    for (let iv = 0; iv < rows; iv++) {
+      const v = iv / nv;
+      for (let iu = 0; iu < cols; iu++) {
+        const u = iu / nu;
+        /* el LOMO: alto pegado al tronco y se acuesta rápido. El exponente
+           1.55 es lo que le da la curva cóncava de aleta; con exponente 1 la
+           tabla salía triangular y parecía una cuña de carpintería. */
+        const h = alto * Math.pow(1 - u, 1.55);
+        const y = v * h;
+        const d = esp.r0 * 0.7 + u * largo; // distancia al eje del fuste
+        /* el ESPESOR: lleno en la base, filo en el lomo (√(1−v²)) y adelgazando
+           hacia la punta. Que se cierre a cero en v=1 es lo que hace que las dos
+           caras se encuentren solas y la tabla quede cerrada sin tapa. */
+        const g = grosor * (1 - 0.7 * u) * Math.sqrt(Math.max(0, 1 - v * v)) * (0.6 + 0.4 * (1 - v));
+        const ondu = Math.sin(u * 5.2 + seed) * 0.055 * largo * (1 - v * 0.55);
+        const k = (s * rows + iv) * cols + iu;
+        pos[k * 3] = dx * d + px * (g * signo + ondu * 0.3);
+        pos[k * 3 + 1] = y - 0.18; // se hunde un palmo: nace de la tierra
+        pos[k * 3 + 2] = dz * d + pz * (g * signo + ondu * 0.3);
+        uv[k * 2] = u;
+        uv[k * 2 + 1] = v;
+        const disp = (0.45 - v) * 0.13 + Math.sin(u * 9 + v * 4.5 + seed) * 0.05;
+        colorCorteza(esp, disp, y, c);
+        /* la GARGANTA entre la tabla y el tronco es lo más oscuro que tiene un
+           pie de ceiba: sin ese apagón, los contrafuertes se leen pegados con
+           colbón en vez de nacidos del árbol. */
+        c.multiplyScalar(0.72 + 0.28 * Math.min(1, u * 2.6));
+        col[k * 3] = c.r;
+        col[k * 3 + 1] = c.g;
+        col[k * 3 + 2] = c.b;
+      }
+    }
+  }
+  for (let s = 0; s < 2; s++) {
+    const base = s * rows * cols;
+    for (let iv = 0; iv < nv; iv++) {
+      for (let iu = 0; iu < nu; iu++) {
+        const a = base + iv * cols + iu;
+        const b = a + 1;
+        const cc = a + cols;
+        const dd = cc + 1;
+        // cada cara mira para su lado: si no, una de las dos queda al revés
+        if (s === 0) idx.push(a, cc, b, b, cc, dd);
+        else idx.push(a, b, cc, b, dd, cc);
+      }
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+/** Las ESPINAS CÓNICAS del tronco joven de la ceiba: pocas, bajas y romas.
+    Es un rasgo real y basta con insinuarlo — un tronco erizado sería otro
+    árbol (y además le quitaría la calma que este guardián tiene que tener). */
+export function geomEspinasCeiba(esp, P) {
+  const E = esp.espinas;
+  if (!E) return [];
+  const r = rng(esp.semilla * 71 + 13);
+  const curva = curvaFuste(esp);
+  const taper = taperFuste(esp);
+  const partes = [];
+  const cuantas = Math.max(6, Math.round(E.n * P.hojasCopa));
+  for (let i = 0; i < cuantas; i++) {
+    const t = E.desde + r() * (E.hasta - E.desde);
+    const ang = r() * Math.PI * 2;
+    const p = curva.getPointAt(t);
+    const radio = taper(t);
+    const dx = Math.cos(ang);
+    const dz = Math.sin(ang);
+    const largo = E.largo * (0.65 + r() * 0.6);
+    const cono = new THREE.ConeGeometry(E.radio * (0.7 + r() * 0.5), largo, 6);
+    /* La espina apunta AFUERA Y ARRIBA, y nace metida en la corteza (0.82 del
+       radio) para que no se vea el disco de la base flotando. */
+    apuntar(
+      cono,
+      [p.x + dx * radio * 0.82, p.y, p.z + dz * radio * 0.82],
+      [dx, 0.42, dz],
+    );
+    partes.push(pintarPlano(cono, new THREE.Color(esp.corteza.cresta).multiplyScalar(0.88)));
+  }
+  return partes;
+}
+
+/** Las RAÍCES-contrafuerte en UNA geometría (van fuera del balanceo: agarran).
+    Para la ceiba, además de las raíces redondas van las ALETAS TABLARES: es su
+    rasgo inconfundible y sin ellas no es una ceiba, es un palo gris. */
 export function construirRaices(esp, P) {
   const raices = specsRaices(esp, Math.max(3, Math.round(esp.raices.n * P.raices)));
   const partes = raices.map((rz, i) => tuboMadera(rz.curve, esp, {
@@ -736,6 +1088,26 @@ export function construirRaices(esp, P) {
     semilla: i,
     ampl: 0.7,
   }));
+
+  if (esp.contrafuertes) {
+    const CF = esp.contrafuertes;
+    const r = rng(esp.semilla * 97 + 3);
+    const n = Math.max(4, Math.round(CF.n * P.raices));
+    for (let i = 0; i < n; i++) {
+      /* Repartidas alrededor pero NUNCA parejas: siete aletas a exactamente
+         51,4 grados leen como turbina. El temblor las vuelve árbol. */
+      const ang = (i / n) * Math.PI * 2 + (r() - 0.5) * 0.5 + esp.giro;
+      partes.push(finContrafuerte(esp, {
+        ang,
+        largo: CF.largo * (0.78 + r() * 0.45),
+        alto: CF.alto * (0.72 + r() * 0.5),
+        grosor: CF.grosor * (0.85 + r() * 0.35),
+        seed: i * 3.7,
+        q: P.raices,
+      }));
+    }
+  }
+
   return { geo: fusionarDura(partes, `raices-${esp.id}`), raices };
 }
 
@@ -946,9 +1318,88 @@ export function geomNodulosFrankia(raices, { q = 1 } = {}, seed = 515) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
+   EL CORTEJO DE LA TIERRA CALIENTE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * UNA CEIBA CHICA para el rodal del piso caliente.
+ *
+ * La flora del proyecto (`floraParamo.geom.js`) está toda calibrada de templado
+ * para arriba: sembrar frailejones o encenillos en la tierra caliente sería la
+ * misma equivocación de piso que ya nos costó los manchones de alquitrán. Y sin
+ * NADA alrededor, el Ent de la ceiba se quedaba parado en un potrero pelado.
+ *
+ * Esta es la pieza mínima que hacía falta: la misma silueta de parasol del
+ * guardián, en chiquito y barata (tronco + tres discos de follaje). Repetida
+ * ocho veces y con el suelo ocre de la faja caliente, la terraza se lee como
+ * bosque seco tropical y no como una terraza a la que se le olvidó la
+ * vegetación.
+ */
+export function geomCeibaChica({ q = 1 } = {}, seed = 401) {
+  const r = rng(seed);
+  const partes = [];
+  const alto = 1.7 + r() * 0.7;
+  const rTronco = 0.13 + r() * 0.05;
+  const segs = Math.max(5, Math.round(9 * q));
+
+  const tronco = new THREE.CylinderGeometry(rTronco * 0.62, rTronco * 1.5, alto, segs);
+  poner(tronco, [0, alto * 0.5, 0]);
+  partes.push(pintarPorVertice(tronco, (x, y, z, i, c) => {
+    // el pie ensanchado insinúa el contrafuerte sin pagar una malla por él
+    const f = clamp01(y / alto);
+    c.set(CEIBA.corteza.cuerpo).lerp(new THREE.Color(CEIBA.corteza.cresta), f * 0.55);
+    c.multiplyScalar(0.86 + Math.sin(x * 9 + z * 7) * 0.1);
+    return c;
+  }));
+
+  /* La copa: TRES discos aplanados a alturas casi iguales. Aplanarlos
+     (escala Y 0,42) es lo único que separa un parasol de un arbolito de nube. */
+  const discos = Math.max(2, Math.round(3 * q));
+  for (let i = 0; i < discos; i++) {
+    const ang = (i / discos) * Math.PI * 2 + r();
+    const rad = (0.42 + r() * 0.36) * (1 + 0.4 * (1 - i / discos));
+    const cx = Math.cos(ang) * rad * 0.9;
+    const cz = Math.sin(ang) * rad * 0.9;
+    const cy = alto + 0.1 + r() * 0.16;
+    const radio = 0.62 + r() * 0.3;
+    const g = matojoNube(radio, seed + i * 13, 0.44);
+    poner(g, [cx, cy, cz], [0, r() * 3, 0], [1.25, 0.42, 1.25]);
+    hornearFollaje(g, {
+      base: CEIBA.hoja.base,
+      sol: CEIBA.hoja.sol,
+      luz: CEIBA.hoja.luz,
+      centro: [cx, cy, cz],
+      radio,
+      ao: 0.55,
+      manchas: 0.18,
+    });
+    partes.push(g);
+  }
+  return fusionar(partes, 'ceiba-chica');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
    LAS LECCIONES EN PALABRAS — español de Colombia, tratando de usted
    ══════════════════════════════════════════════════════════════════════════ */
 export const LECCIONES = {
+  ceiba: {
+    id: 'ceiba',
+    boton: 'La ceiba',
+    titulo: 'La ceiba se sostiene sola',
+    arbol: 'Ceiba · Ceiba pentandra',
+    piso: 'Tierra caliente · de 0 a 1.000 metros · más de 24 °C',
+    /* OJO, para el que venga a "mejorar" este texto: aquí NO se habla de
+       micorrizas ni de ninguna simbiosis de la ceiba. No están verificadas.
+       El roble tiene sus cuatro hongos y el aliso su Frankia porque de esos hay
+       fuente; de la ceiba tenemos el árbol, y el árbol ya es bastante. */
+    texto:
+      'Aquí abajo empieza el gradiente: bosque seco tropical, cero a mil metros. '
+      + 'La ceiba es el árbol grande de ese piso —Caribe, Huila, Tolima, Valle, '
+      + 'Cauca— y usted la reconoce por esas aletas del pie: son los '
+      + 'contrafuertes, raíces tablares tan altas como usted, y son las que '
+      + 'sostienen semejante árbol donde la raíz no puede ahondar. La copa se '
+      + 'abre en horizontal como un parasol: por eso da sombra a media vereda.',
+  },
   roble: {
     id: 'roble',
     boton: 'El roble',
@@ -956,14 +1407,12 @@ export const LECCIONES = {
     arbol: 'Roble andino · Quercus humboldtii',
     piso: 'Templado y frío · de 750 a 3.450 metros',
     texto:
-      'Es el único roble de Suramérica y cruza el gradiente él solo: arranca en el '
-      + 'templado y sube hasta rozar el páramo, formando robledales cerrados. Bajo su '
-      + 'sombra hay un trato firmado: cuatro hongos —Cantharellus, Lactarius, '
-      + 'Cenococcum y Tomentella— le forran las raíces con ectomicorrizas y le buscan '
-      + 'agua y minerales lejos de donde el árbol alcanza; él les paga con azúcar de '
-      + 'sus hojas. Los dos primeros sacan la seta al pie del árbol: cuando usted las '
-      + 've, el trato está andando. Necesita suelo poco profundo pero con capa gruesa '
-      + 'de humus encima.',
+      'Es el único roble de Suramérica y cruza el gradiente él solo: del templado '
+      + 'hasta rozar el páramo, formando robledales cerrados. Bajo su sombra hay un '
+      + 'trato firmado: cuatro hongos —Cantharellus, Lactarius, Cenococcum y '
+      + 'Tomentella— le forran las raíces y le buscan agua y minerales lejos de '
+      + 'donde el árbol alcanza; él les paga con azúcar. Los dos primeros sacan la '
+      + 'seta al pie: cuando usted las ve, el trato está andando.',
   },
   aliso: {
     id: 'aliso',
@@ -985,28 +1434,33 @@ export const LECCIONES = {
     arbol: 'Queñua o colorado · Polylepis',
     piso: 'Páramo',
     texto:
-      'Es el árbol que llega más arriba y la que empieza esta historia. Su copa y el '
-      + 'musgo que la viste peinan la niebla, el agua escurre por el tronco y el suelo '
-      + 'de páramo la guarda como una esponja. De ahí abajo sale la quebrada que riega '
-      + 'el bosque frío y llega al templado.',
+      'Es el árbol que llega más arriba y la que empieza esta historia. MÍRELE LA '
+      + 'COPA: la niebla le entra por ahí y no vuelve a salir. La copa y su musgo la '
+      + 'peinan, el agua se junta en gotas y escurre por el tronco hasta el pie. Eso '
+      + 'que brota a su lado es la misma agua: de ahí sale la quebrada que baja '
+      + 'hasta la tierra caliente. Por eso tumbar el páramo se siente cuatro pisos '
+      + 'más abajo.',
   },
   juntos: {
     id: 'juntos',
-    boton: 'Los tres',
-    titulo: 'Los tres son un solo gradiente',
+    boton: 'Los cuatro',
+    titulo: 'Los cuatro son un solo gradiente',
     arbol: 'El gradiente andino',
-    piso: 'Del páramo al templado',
+    piso: 'Del páramo a la tierra caliente',
     texto:
-      'No son tres árboles sueltos: son la misma ladera a tres alturas. El agua nace '
-      + 'arriba en el páramo, baja por el bosque frío y llega al templado. Y por debajo, '
-      + 'la red de micorrizas amarra las raíces de los tres, así que lo que pasa arriba '
-      + 'se siente abajo. Si le tumban el páramo, el roble del templado se entera.',
+      'No son cuatro árboles sueltos: son la misma ladera a cuatro alturas. El agua '
+      + 'nace en el páramo —la queñua la peina de la niebla— y baja hasta la tierra '
+      + 'caliente, donde la ceiba. Por debajo, la red amarra las raíces de todos: '
+      + 'mire el turquesa que le forra la punta a cada raíz, y lo que viaja por '
+      + 'ellas — baja verde (azúcar) y sube ámbar y azul (mineral y agua). Es un '
+      + 'trato, no una tubería. Si le tumban el páramo, la ceiba se entera.',
   },
 };
 
 /* Verdes por piso térmico, para teñir la vegetación de cada terraza. Salen del
    eje térmico de la paleta madre: a más altura, menos saturación y más plata. */
 export const TINTE_PISO = {
+  calido: { base: mezclar(VERDES.calido, TIERRAS.vega, 0.3), sol: VERDES.calidoVivo, luz: VERDES.brote },
   templado: { base: VERDES.monte, sol: VERDES.templado, luz: VERDES.brote },
   frio: { base: mezclar(VERDES.frio, VERDES.paramoNiebla, 0.4), sol: VERDES.frio, luz: VERDES.aliso },
   paramo: { base: VERDES.paramoMusgo, sol: VERDES.paramoLiquen, luz: VERDES.paramoPlata },

@@ -10,18 +10,18 @@
  * con Ent (hoy, el páramo), que no tiene piso arriba y muestra el de ABAJO.
  * Los demás NO se dibujan. Nada de "los tres/cuatro de fondo".
  *
- * SIN un piso térmico utilizable (sin perfil, perfil de demo, o un piso que
- * TODAVÍA no tiene Ent tallado — hoy, 'calido', a la espera de la ceiba de
- * tierra caliente que entra en otra rama) la regla SIGUE aplicando igual:
+ * SIN un piso térmico utilizable (sin perfil o perfil de demo) la regla
+ * SIGUE aplicando igual:
  * cae al default concreto TEMPLADO + FRÍO, no a "mostrar todo". El roble es
  * el que mejor cuenta el gradiente sin contexto (cruza los tres pisos él
  * solo, de 750 a 3.450 m) y templado es el piso más común de la Colombia
  * andina campesina.
  *
- * AGREGAR UN CUARTO ENT (la ceiba) es una LÍNEA DE DATOS: sumar su id a
- * `MAPA_PISO_ENT` (y darle su terraza en `gradienteAndino.PISOS`). El orden
- * altitudinal y el cálculo del vecino ya saben leerla — nadie tiene que tocar
- * esta lógica.
+ * AGREGAR UN ENT es una LÍNEA DE DATOS: sumar su id a `MAPA_PISO_ENT` (y
+ * darle su terraza en `gradienteAndino.PISOS`). El orden altitudinal y el
+ * cálculo del vecino ya saben leerla — nadie tiene que tocar esta lógica. Así
+ * entró la ceiba de tierra caliente ('calido') el 2026-07-22, y así entraría
+ * un superpáramo mañana.
  *
  * Módulo PURO (sin three, sin React): se puede testear sin montar un Canvas.
  */
@@ -34,10 +34,13 @@
    que ya toma `mockups/valle/valleData.js`). */
 export const ORDEN_PISOS_TERMICOS = Object.freeze(['calido', 'templado', 'frio', 'paramo']);
 
-/* Qué Ent tiene tallado cada piso HOY. `null` = todavía no existe — la única
-   línea que hay que cambiar cuando aterrice la ceiba de tierra caliente. */
+/* Qué Ent tiene tallado cada piso. La ceiba de tierra caliente aterrizó el
+   2026-07-22 (*Ceiba pentandra*, con sus contrafuertes), así que ya no queda
+   ningún piso sin guardián: los cuatro están tallados y el mapa está completo.
+   Tal como decía la nota de arriba, entrar fue UNA LÍNEA — el orden altitudinal
+   y el cálculo del vecino la leyeron solos. */
 export const MAPA_PISO_ENT = Object.freeze({
-  calido: null,
+  calido: 'ceiba',
   templado: 'roble',
   frio: 'aliso',
   paramo: 'quenua',
