@@ -2422,7 +2422,7 @@ export function guardThermalViability(
     }
     if (Number.isFinite(tMax) && haveMax && fMax >= tMax - marginC) {
       partes.push(
-        `riesgo de golpe de calor: ${nombre} se estresa por encima de ~${tMax}°C y el pronóstico sube a ` +
+        `riesgo de golpe de calor: ${nombre} se estresa desde ~${tMax}°C y el pronóstico sube a ` +
           `${Math.round(fMax)}°C`,
       );
     }
@@ -2430,9 +2430,9 @@ export function guardThermalViability(
 
     disparadas.push(nombre);
     advertencias.push(
-      `Ojo con ${nombre}: ${partes.join('; y ')}. No te digo que no lo siembres —hay quien lo logra con ` +
-        `cuidados— pero requiere protección (cobertor/manta térmica en las noches frías, o sombra y mulch ` +
-        `para el calor). Tenlo en cuenta antes de arriesgar la semilla.`,
+      `Ojo con ${nombre}: ${partes.join('; y ')}. No le digo que no lo siembre porque hay quien lo logra con ` +
+        `cuidados, pero requiere protección (cobertor o manta térmica en las noches frías, o sombra y mulch ` +
+        `para el calor). Téngalo en cuenta antes de arriesgar la semilla.`,
     );
   }
 
@@ -4963,7 +4963,7 @@ export function guardOffDomain(responseText, { userMessage = null } = {}) {
  */
 const SYMPTOM_DIAG_INTENT_PATTERNS = [
   /\bmanch(a|as)\b/,
-  /\bhojas?\s+(amarill|seca|negra|cafe|marchit|enroll|con\s+hueco)/,
+  /\bhojas?\s+(amarill|seca|negra|cafe|marchit|enroll|chamusc|mordid|perforad|con\s+hueco)/,
   // "se está secando", "se me está secando", "se me secan", "se le marchitan":
   // tolera el pronombre/clítico intermedio (me/le/te/nos) y la conjugación 3ª pl.
   /\bse\s+(me\s+|le\s+|te\s+|nos\s+)?(esta(n)?\s+)?(secand|marchitand|muriend|pudriend|amarilland|enferman|enrollan|cae|caen|secan|marchitan|mueren|pudren)/,
@@ -4977,6 +4977,7 @@ const SYMPTOM_DIAG_INTENT_PATTERNS = [
   /\b(plaga|enfermedad|hongo|bicho|gusano)s?\s+que\s+(no\s+conozco|no\s+s[eé]\s+qu[eé]|no\s+identifico)/,
   /\bpudric(ion|iones)\b/,
   /\bpuntos?\s+(negro|cafe|amarillo)/,
+  /\b(hueco|agujero|mordida|perforacion|melaza|fumagina)s?\b/,
   // síntomas vagos adicionales reportados en campo
   /\bse\s+(esta\s+)?(poniend|volviend)\s+(amarill|negr|cafe|seca)/,
   /\b(esta|se\s+ve)\s+(triste|mal|enferm|marchit|amarill|deca[ií]d)/,
@@ -4987,6 +4988,82 @@ function _isSymptomDiagnosisQuery(userMessage) {
   if (typeof userMessage !== 'string' || !userMessage.trim()) return false;
   const norm = _stripDiacritics(userMessage);
   return SYMPTOM_DIAG_INTENT_PATTERNS.some((re) => re.test(norm));
+}
+
+// Diagnostico observable: separa el aparato bucal antes de pedir evidencia.
+// Esta guarda se limita a sintomas con una primera hipotesis accionable y no
+// intenta identificar patogenos ni organismos a nivel de especie.
+const CHEWING_DAMAGE_RE = /\b(hueco|huequito|agujero|perforacion|perforad[ao]|mordida|mordido|comida|comido|borde\s+mordisqueado)s?\b/;
+const SUCKING_DAMAGE_RE = /\b(melaza|fumagina|pegajos[ao]s?|amarillamiento|amarillas?|moteado\s+amarillo)\b/;
+const SCORCHED_LEAF_RE = /\b(chamuscad[ao]s?|quemad[ao]s?|borde[s]?\s+(seco|quemado|necrotico)s?|necrosis\s+marginal)\b/;
+const GREENHOUSE_RE = /\b(invernadero|bajo\s+cubierta|cubierta\s+plastica)\b/;
+const TREE_TOMATO_RE = /\b(tomate\s+de\s+(arbol|palo)|tamarillo)\b/;
+
+const FIELD_PHOTO_REQUEST =
+  'Después de hacer esa revisión, envíe una foto de cerca y otra de la planta completa. Con esas imágenes puedo afinar la causa sin retrasar la primera acción.';
+
+/**
+ * Da un triaje comprometido para sintomas cuyo mecanismo ya orienta el manejo.
+ * Reemplaza el cuerpo completo para que no sobrevivan plagas de otro cultivo,
+ * variedades no consultadas ni una inversion entre chupadores y masticadores.
+ *
+ * @param {string} responseText
+ * @param {{userMessage?: string|null, hadVision?: boolean}} [ctx]
+ * @returns {{text:string, modified:boolean, reason:string|null}}
+ */
+export function guardObservableSymptomTriage(
+  responseText,
+  { userMessage = null, hadVision = false } = {},
+) {
+  if (typeof responseText !== 'string' || responseText.length === 0) {
+    return { text: responseText ?? '', modified: false, reason: null };
+  }
+  if (hadVision || typeof userMessage !== 'string' || !userMessage.trim()) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const userNorm = _stripDiacritics(userMessage);
+  const hasChewingDamage = CHEWING_DAMAGE_RE.test(userNorm);
+  const hasSuckingDamage = SUCKING_DAMAGE_RE.test(userNorm);
+  const hasScorchedLeaves = SCORCHED_LEAF_RE.test(userNorm);
+  if (!hasChewingDamage && !hasSuckingDamage && !hasScorchedLeaves) {
+    return { text: responseText, modified: false, reason: null };
+  }
+
+  const parts = [];
+  if (hasScorchedLeaves) {
+    const subject = TREE_TOMATO_RE.test(userNorm) ? 'En el tomate de árbol' : 'En las hojas chamuscadas';
+    const ventilation = GREENHOUSE_RE.test(userNorm)
+      ? 'Abra la ventilación lateral y superior desde ahora y ponga sombra temporal en las horas de mayor radiación.'
+      : 'Ponga sombra temporal en las horas de mayor radiación y revise que el suelo conserve humedad sin encharcarse.';
+    parts.push(
+      `${subject}, la hipótesis más probable es golpe de calor o quemadura de sol, favorecida por poca ventilación. ` +
+        `La segunda posibilidad es necrosis marginal por acumulación de sales o un desbalance de potasio. ${ventilation} ` +
+        'Además, revise la conductividad del agua o del drenaje antes de aplicar más fertilizante.',
+    );
+  }
+  if (hasChewingDamage) {
+    const greenhouse = GREENHOUSE_RE.test(userNorm);
+    parts.push(
+      'Para los huecos o mordidas, la hipótesis más probable es daño de masticadores. ' +
+        (greenhouse
+          ? 'En invernadero, primero sospeche babosas o caracoles. Revise al anochecer el envés, el borde de las camas y debajo de materas o residuos; retire los que encuentre y reduzca refugios húmedos.'
+          : 'Primero revise babosas, caracoles, orugas o tierreros al anochecer y retire los que encuentre.'),
+    );
+  }
+  if (hasSuckingDamage) {
+    parts.push(
+      'Para el amarillamiento, la melaza o la fumagina, la hipótesis más probable es daño de chupadores, como pulgones o mosca blanca. ' +
+        'Revise el envés de las hojas y coloque una trampa amarilla para confirmar presencia antes de tratar.',
+    );
+  }
+
+  bumpGuardTelemetry('observable_symptom_triage');
+  return {
+    text: `${parts.join('\n\n')}\n\n${FIELD_PHOTO_REQUEST}`,
+    modified: true,
+    reason: 'triaje_sintoma_observable',
+  };
 }
 
 /**
@@ -10473,6 +10550,30 @@ export function applyOutputGuards(
     text = toolingLeak.text;
     modified = true;
     if (toolingLeak.reason) reasons.push(toolingLeak.reason);
+  }
+
+  // Una pregunta cortada tiene precedencia sobre cualquier lectura del
+  // síntoma: no se puede inferir qué mezcla o acción iba a completar el usuario.
+  const earlyTruncated = guardTruncatedUserPrompt(text, { userMessage });
+  if (earlyTruncated && earlyTruncated.modified) {
+    return {
+      text: earlyTruncated.text,
+      modified: true,
+      reasons: earlyTruncated.reason ? [earlyTruncated.reason] : [],
+    };
+  }
+
+  // TRIAJE DE SINTOMAS OBSERVABLES: cuando el mecanismo del dano ya permite
+  // orientar una primera accion, responde antes que las guardas genericas de
+  // plagas. El reemplazo elimina contaminacion de otros cultivos y deja la foto
+  // como confirmacion posterior, no como excusa para evitar una hipotesis.
+  const observableTriage = guardObservableSymptomTriage(text, { userMessage, hadVision });
+  if (observableTriage && observableTriage.modified) {
+    return {
+      text: observableTriage.text,
+      modified: true,
+      reasons: observableTriage.reason ? [observableTriage.reason] : [],
+    };
   }
 
   // GUARD CROP-AGNOSTIC SAFETY: debe liderar ANTES que cualquier guard específico.
