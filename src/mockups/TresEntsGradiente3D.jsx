@@ -1,5 +1,5 @@
 /*
- * TresEntsGradiente3D — LOS TRES ÁRBOLES MAESTROS DEL GRADIENTE ANDINO.
+ * TresEntsGradiente3D — LOS ÁRBOLES MAESTROS DEL GRADIENTE ANDINO.
  * Ruta #/mockups/tres-ents-gradiente, sin auth.
  *
  * De qué se trata
@@ -31,6 +31,24 @@
  *
  * Congruencia: paleta madre, materiales madre y `<LuzMadre>` con la familia de
  * cielo `ladera`. Cero rig de luz propio.
+ *
+ * ── SU Ent, no un Ent (regla dura del operador, 2026-07-22) ─────────────────
+ * El mundo se siembra del PERFIL DE LA FINCA (`usePerfilFincaStore`, el mismo
+ * patrón de `mockups/valle/valleData.js`): el campesino de tierra fría abre
+ * este mundo y le sale el ALISO de protagonista, cámara puesta en él, con su
+ * lección al frente. Y MÁXIMO DOS Ents a la vez — no es estética, es
+ * estructural: el protagonista y su único vecino, el de ARRIBA (de donde baja
+ * el agua), salvo el páramo (el tope), que muestra el de ABAJO. El resto NO
+ * se dibuja. Sin un piso térmico utilizable (sin perfil, perfil de demo, o un
+ * piso que aún no tiene Ent tallado) cae al default concreto: templado +
+ * frío — la regla aplica pareja para todos, no hay un "modo sin recortar".
+ * TODO el mapeo piso→Ent, el vecino y el default viven en
+ * `bosque/pisosBosqueGradiente.js` (puro, testeado ahí): agregar el cuarto
+ * Ent (la ceiba de tierra caliente, en otra rama) es una línea de datos en
+ * ese módulo, no un refactor de esta pantalla.
+ *
+ * Los botones manuales SIGUEN: navegar a otro Ent recalcula su par visible
+ * (siempre ≤ 2), mueve la cámara y corre el foco — nunca fuerza un tercero.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
@@ -39,26 +57,33 @@ import * as THREE from 'three';
 import EscenaTresEnts from '../visual/mundo3d/bosque/EscenaTresEnts.jsx';
 import { PISOS, alturaLadera } from '../visual/mundo3d/bosque/gradienteAndino.geom.js';
 import { LECCIONES } from '../visual/mundo3d/bosque/entsGradiente.geom.js';
+import {
+  MAPA_PISO_ENT,
+  PISOS_CON_ENT,
+  protagonistaDePiso,
+  pisosVisiblesParaVista,
+} from '../visual/mundo3d/bosque/pisosBosqueGradiente.js';
 import { LuzMadre, CIELOS, mezclarCielo } from '../visual/mundo3d/paleta/index.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
+import usePerfilFincaStore from '../store/usePerfilFincaStore.js';
 
 /* ══════════════════════════════════════════════════════════════════════════
    LAS VISTAS — dónde se para la cámara
    ══════════════════════════════════════════════════════════════════════════ */
 
 /*
- * EL RETRATO DE LOS TRES (`juntos`) es la vista madre y la razón de ser del
- * mundo: los tres hermanos en un solo cuadro, escalonados por la ladera. En
- * pantalla ANCHA se toma de frente, que es donde la escalera de terrazas se lee
- * como escalera.
+ * EL RETRATO ANCHO (`VISTAS.juntosAncho`/`juntosAlto`) fue la vista madre de
+ * este mundo cuando se veían los tres Ents a la vez: los tres hermanos
+ * escalonados en un solo cuadro. Desde que el máximo-dos es regla dura
+ * (2026-07-22) NINGÚN botón la pide — pero se queda como RED DE SEGURIDAD del
+ * `Camarógrafo` para una `vista` que no tenga retrato propio en `VISTA_ENT`
+ * (nunca debería pasar viniendo de los botones o del perfil, pero un mundo
+ * nunca debe quedar con la cámara mirando a la nada).
  *
  * En pantalla ANGOSTA (teléfono en vertical) de frente no cabe: la ladera mide
  * 28 metros-escena de largo y un retrato 390×844 solo alcanzaría a mostrar un
- * tercio. Entonces la cámara BAJA AL VALLE y mira LADERA ARRIBA: los tres Ents
- * se alinean en profundidad, el cuadro se vuelve alto y angosto como el
- * teléfono, y la lección —que hay que subir para llegar al agua— se lee mejor
- * que de frente. No es un parche de encuadre: es el mismo mundo contado desde
- * donde está parado el campesino.
+ * tercio. Por eso esta vista de respaldo tiene una variante `Alta` que baja al
+ * valle y mira ladera arriba.
  */
 const VISTAS = {
   /* La cámara mira desde ARRIBA de la copa del páramo, no desde la altura de
@@ -98,26 +123,25 @@ function vistaDeEnt(piso) {
   };
 }
 
-const VISTA_ENT = {
-  templado: vistaDeEnt(PISOS[0]),
-  frio: vistaDeEnt(PISOS[1]),
-  paramo: vistaDeEnt(PISOS[2]),
-};
+/* Construido DESDE `PISOS` (la geometría de la ladera), no a mano: cuando la
+   terraza de la ceiba entre a `gradienteAndino.PISOS`, su retrato de cámara
+   sale solo, sin tocar esta pantalla. */
+const VISTA_ENT = Object.fromEntries(PISOS.map((piso) => [piso.id, vistaDeEnt(piso)]));
 
-/* Qué lección le toca a cada vista. */
-const LECCION_DE = {
-  juntos: LECCIONES.juntos,
-  templado: LECCIONES.roble,
-  frio: LECCIONES.aliso,
-  paramo: LECCIONES.quenua,
-};
+/* Qué lección le toca a cada piso — se lee de `MAPA_PISO_ENT` (piso→Ent) y
+   `LECCIONES` (Ent→texto): agregar un piso con Ent no pide tocar esta línea. */
+const LECCION_DE = Object.fromEntries(
+  PISOS_CON_ENT.map((pisoId) => [pisoId, LECCIONES[MAPA_PISO_ENT[pisoId]]]),
+);
 
-const BOTONES = [
-  { id: 'templado', texto: 'El roble' },
-  { id: 'frio', texto: 'El aliso' },
-  { id: 'paramo', texto: 'La queñua' },
-  { id: 'juntos', texto: 'Los tres' },
-];
+/* Un botón por piso CON Ent — nunca "Los tres": el máximo-dos es regla dura,
+   así que la escena no ofrece un camino de vuelta a los tres/cuatro juntos.
+   Navegar a otro Ent no lo agrega a los visibles: LO REEMPLAZA junto a su
+   nuevo vecino (`pisosVisiblesParaVista`). */
+const BOTONES = PISOS_CON_ENT.map((pisoId) => ({
+  id: pisoId,
+  texto: LECCION_DE[pisoId]?.boton || pisoId,
+}));
 
 /* ══════════════════════════════════════════════════════════════════════════
    EL CAMARÓGRAFO — lleva la cámara de una vista a otra
@@ -133,8 +157,12 @@ function Camarografo({ vista, controls }) {
   const animando = useRef(true);
 
   const destino = useMemo(() => {
-    if (vista !== 'juntos') return VISTA_ENT[vista] || VISTAS.juntosAncho;
-    return size.width / Math.max(1, size.height) < 0.95 ? VISTAS.juntosAlto : VISTAS.juntosAncho;
+    /* `vista` siempre debería traer su propio retrato en `VISTA_ENT` (viene
+       del perfil o de un botón, ambos acotados a `PISOS_CON_ENT`). Si no lo
+       trae — un valor corrupto, o un piso nuevo sin terraza todavía — la red
+       de seguridad es la vista panorámica, nunca una cámara mirando a la nada. */
+    return VISTA_ENT[vista]
+      || (size.width / Math.max(1, size.height) < 0.95 ? VISTAS.juntosAlto : VISTAS.juntosAncho);
   }, [vista, size.width, size.height]);
 
   useEffect(() => {
@@ -209,7 +237,19 @@ function Carta({ leccion }) {
    ══════════════════════════════════════════════════════════════════════════ */
 export default function TresEntsGradiente3D() {
   const [listo, setListo] = useState(false);
-  const [vista, setVista] = useState('juntos');
+
+  /* SU Ent, no un Ent: el protagonista sale del piso térmico de la finca.
+     `usePerfilFincaStore` es el mismo store que ya siembra el valle
+     (`EntradaValle3D.jsx`) — se rehidrata solo cuando el onboarding ubica la
+     finca. Sin perfil, con el perfil de demo, o con un piso que aún no tiene
+     Ent (hoy 'calido'), `protagonistaDePiso` cae al default concreto
+     (templado): la regla del máximo-dos aplica igual, nunca a "mostrar todo". */
+  const perfilFinca = usePerfilFincaStore((s) => s.perfil);
+  const protagonista = useMemo(
+    () => protagonistaDePiso(perfilFinca?.pisoTermico),
+    [perfilFinca],
+  );
+  const [vista, setVista] = useState(protagonista);
   const controls = useRef(null);
 
   const { tier } = useMemo(() => decidirTier(), []);
@@ -219,26 +259,28 @@ export default function TresEntsGradiente3D() {
       && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     [],
   );
-  const perfil = useMemo(() => perfilDeTier(tier), [tier]);
+  const perfilRender = useMemo(() => perfilDeTier(tier), [tier]);
 
   /* La atmósfera: la familia `ladera` mezclada 60 % hacia la madre, que es la
      ley de la casa. Es la bruma verde-plata del páramo andino — nunca el
      celeste frío de postal. El fondo y la niebla salen de ahí, ni un hex a mano. */
   const cielo = useMemo(() => mezclarCielo(CIELOS.ladera), []);
 
-  const leccion = LECCION_DE[vista] || LECCIONES.juntos;
-  const foco = vista === 'juntos' ? null : vista;
+  const leccion = LECCION_DE[vista] || LECCION_DE.templado;
+  /* El foco (quién se dibuja SIN apagar) y los pisos que se dibujan del todo
+     son la MISMA decisión, tomada por `vista`: nunca más de dos Ents montados
+     a la vez (`pisosVisiblesParaVista`, `pisosBosqueGradiente.js`). */
+  const foco = vista;
+  const pisosVisibles = useMemo(() => pisosVisiblesParaVista(vista), [vista]);
 
-  const elegir = useCallback((id) => {
-    setVista((v) => (v === id && id !== 'juntos' ? 'juntos' : id));
-  }, []);
+  const elegir = useCallback((id) => setVista(id), []);
 
-  /* Teclado: 1-4 saltan de vista. Un mundo que se maneja con el teclado se
-     puede capturar y revisar sin pelear con el mouse. */
+  /* Teclado: 1..N salta al Ent de ese botón. Un mundo que se maneja con el
+     teclado se puede capturar y revisar sin pelear con el mouse. */
   useEffect(() => {
     const alTeclear = (e) => {
-      const i = ['1', '2', '3', '4'].indexOf(e.key);
-      if (i >= 0) setVista(BOTONES[i].id);
+      const i = Number(e.key) - 1;
+      if (i >= 0 && i < BOTONES.length) setVista(BOTONES[i].id);
     };
     window.addEventListener('keydown', alTeclear);
     return () => window.removeEventListener('keydown', alTeclear);
@@ -260,10 +302,10 @@ export default function TresEntsGradiente3D() {
            está bloqueado → la escena aparece VACÍA en la captura, con todo
            dibujado e invisible. Ya pasó en el bosque de los tres estratos. */
         style={{ opacity: listo ? 1 : 0, transition: 'opacity 0.9s ease' }}
-        dpr={perfil.dpr}
-        gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
+        dpr={perfilRender.dpr}
+        gl={{ antialias: perfilRender.antialias, powerPreference: 'high-performance' }}
         camera={{ position: [0.8, 15.5, 34], fov: 40, near: 0.4, far: 240 }}
-        shadows={!!perfil.sombras}
+        shadows={!!perfilRender.sombras}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
@@ -272,11 +314,11 @@ export default function TresEntsGradiente3D() {
             ladera que uno está mirando. Con la niebla encima, los tres pisos se
             funden en un beige — que es lo contrario de lo que este mundo
             existe para enseñar. */}
-        {perfil.fog && <fog attach="fog" args={[cielo.niebla, 42, 130]} />}
+        {perfilRender.fog && <fog attach="fog" args={[cielo.niebla, 42, 130]} />}
 
         <LuzMadre
           cielo={CIELOS.ladera}
-          perfil={perfil}
+          perfil={perfilRender}
           /* El sol entra por el hombro derecho, del lado del páramo: la luz
              viene de arriba de la ladera y baja con el agua. Las sombras de los
              tres Ents caen hacia el valle. */
@@ -286,9 +328,10 @@ export default function TresEntsGradiente3D() {
 
         <EscenaTresEnts
           tier={tier}
-          perfil={perfil}
+          perfil={perfilRender}
           reducedMotion={reducedMotion}
           foco={foco}
+          pisosVisibles={pisosVisibles}
         />
 
         <Camarografo vista={vista} controls={controls} />
@@ -336,7 +379,7 @@ export default function TresEntsGradiente3D() {
               <button
                 key={b.id}
                 type="button"
-                className={`teg-boton${b.id === 'juntos' ? ' teg-boton--juntos' : ''}`}
+                className="teg-boton"
                 aria-pressed={vista === b.id}
                 onClick={() => elegir(b.id)}
                 title={`Tecla ${i + 1}`}
@@ -364,7 +407,6 @@ const CSS = `
 .teg-boton { pointer-events: auto; appearance: none; border: 1px solid rgba(30,46,28,0.35); border-radius: 999px; padding: 0.44rem 1rem; background: rgba(236,244,228,0.86); color: #253320; font: 600 0.8rem/1.1 system-ui, sans-serif; cursor: pointer; backdrop-filter: blur(3px); transition: background 0.2s ease, border-color 0.2s ease; }
 .teg-boton:hover, .teg-boton:focus-visible { background: rgba(255,255,255,0.95); border-color: rgba(30,46,28,0.6); outline: none; }
 .teg-boton[aria-pressed='true'] { background: #cfe3c2; border-color: rgba(37,51,32,0.75); }
-.teg-boton--juntos { font-weight: 700; }
 .teg-carta { margin: 0 1rem; max-width: 25rem; padding: 0.6rem 0.95rem 0.7rem; border-radius: 0.8rem; background: rgba(28,40,26,0.72); backdrop-filter: blur(4px); color: #eff5e9; }
 .teg-carta-cab h3 { margin: 0; font: 700 0.92rem/1.25 system-ui, sans-serif; }
 .teg-cientifico { margin: 0.1rem 0 0.35rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; font: 500 0.74rem/1.3 system-ui, sans-serif; opacity: 0.9; }
