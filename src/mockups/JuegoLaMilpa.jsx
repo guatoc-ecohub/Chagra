@@ -5,11 +5,11 @@ import './JuegoLaMilpa.css';
  * MOCKUP JUGABLE — "La milpa: las tres hermanas".
  *
  * Mini-juego educativo 2D sobre la milpa mesoamericana/andina: el policultivo
- * de maiz + frijol + ahuyama (calabaza) sembrados en el mismo monticulo. El
+ * de maíz + frijol + ahuyama (calabaza) sembrados en el mismo montículo. El
  * jugador siembra las tres hermanas y ve nacer la SINERGIA:
  *
  *   - El MAIZ crece alto y da el palo por donde el frijol se trepa.
- *   - El FRIJOL le fija nitrogeno a la tierra: todo el monticulo crece mejor.
+ *   - El FRIJOL le fija nitrógeno a la tierra: todo el montículo crece mejor.
  *   - La AHUYAMA tapa el suelo con sus hojas anchas y guarda la humedad
  *     (el agua se gasta mas despacio).
  *
@@ -34,7 +34,7 @@ const C = {
   sol: '#ffce4d', solHi: '#ffe08a', rayo: '#ffb020',
   cerro: '#c98d54', cerroHi: '#dda876',
   tierra: '#6e4a2c', tierraHi: '#8a6038', tierraDark: '#4f3520',
-  maiz: '#5f8f39', maizHi: '#7bad4a', mazorca: '#f3c44e', mazorcaDark: '#d9a02f', pluma: '#c9a05a',
+  maíz: '#5f8f39', maizHi: '#7bad4a', mazorca: '#f3c44e', mazorcaDark: '#d9a02f', pluma: '#c9a05a',
   frijol: '#3f8050', frijolHi: '#66b06a', vaina: '#356e3c', flor: '#e879a6',
   ahLeaf: '#3c7a3a', ahLeafHi: '#64a24a', fruto: '#e8862e', frutoRib: '#c96a1e', frutoStem: '#74812f',
   agua: '#3fa7d6', aguaLo: '#cdeaf5',
@@ -53,14 +53,14 @@ const CONFETTI = Array.from({ length: 22 }, (_, i) => ({
 }));
 
 // ── Modelo de datos ───────────────────────────────────────────────────────
-const MOUNDS_X = [250, 500, 750]; // centro de cada monticulo en el viewBox
+const MOUNDS_X = [250, 500, 750]; // centro de cada montículo en el viewBox
 const GROUND_Y = 470;             // linea de suelo donde nacen las matas
 
 const emptySister = () => ({ planted: false, growth: 0 });
 const initialMounds = () =>
   MOUNDS_X.map((_, i) => ({
     id: i,
-    maiz: emptySister(),
+    maíz: emptySister(),
     frijol: emptySister(),
     ahuyama: emptySister(),
     water: 72,
@@ -69,10 +69,10 @@ const initialMounds = () =>
 
 const initialGame = () => ({
   phase: 'intro', // intro | play | won
-  tool: 'maiz',   // maiz | frijol | ahuyama | agua
+  tool: 'maíz',   // maíz | frijol | ahuyama | agua
   day: 1,
   auto: false,
-  tip: 'Escoja una semilla y toque un monticulo para sembrar. Junte las tres hermanas.',
+  tip: 'Escoja una semilla y toque un montículo para sembrar. Junte las tres hermanas.',
   mounds: initialMounds(),
 });
 
@@ -83,14 +83,14 @@ const growOne = (s, rate, bonus, cap) =>
 
 // Mensajes de la guia (Angelita). Tono "usted" colombiano, sin regionalismos.
 const TIP = {
-  dry: 'Alguna mata quedo seca. Escoja la regadera y deles agua.',
-  pole: 'El frijol encontro el palo del maiz y empezo a treparse.',
-  shade: 'Las hojas anchas de la ahuyama taparon el suelo: la humedad dura mas.',
-  trio: 'Las tres hermanas juntas en el mismo monticulo: se apoyan entre ellas.',
-  alone: 'Sembrada sola, la mata queda mas expuesta. Acompanela con sus hermanas.',
+  dry: 'Alguna mata quedó seca. Escoja la regadera y deles agua.',
+  pole: 'El frijol encontró el palo del maíz y empezó a treparse.',
+  shade: 'Las hojas anchas de la ahuyama taparon el suelo: la humedad dura más.',
+  trio: 'Las tres hermanas juntas en el mismo montículo: se apoyan entre ellas.',
+  alone: 'Sembrada sola, la mata queda más expuesta. Acompáñela con sus hermanas.',
   beanN: 'El frijol maduro le pasa alimento a la tierra: todo crece mejor.',
   grow: 'La milpa va creciendo. Que siga saliendo el sol.',
-  win: 'Milpa completa. Maiz, frijol y ahuyama dieron su cosecha juntas.',
+  win: 'Milpa completa. Maíz, frijol y ahuyama dieron su cosecha juntas.',
 };
 
 // Reductor PURO: avanzar un dia de sol sobre toda la milpa.
@@ -98,24 +98,24 @@ function stepDay(g) {
   if (g.phase !== 'play') return g;
   const events = [];
   const mounds = g.mounds.map((m) => {
-    const wasPole = stageOf(m.maiz) >= 2;
+    const wasPole = stageOf(m.maíz) >= 2;
     const wasLeafy = stageOf(m.ahuyama) >= 2;
-    const wasTrio = stageOf(m.maiz) === 3 && stageOf(m.frijol) === 3 && stageOf(m.ahuyama) === 3;
+    const wasTrio = stageOf(m.maíz) === 3 && stageOf(m.frijol) === 3 && stageOf(m.ahuyama) === 3;
     const wasBeanN = m.frijol.planted && m.frijol.growth >= 78;
 
     const leafy = stageOf(m.ahuyama) >= 2; // sombra ya activa
     const drain = leafy ? 11 : 20;
     const water = clamp(m.water - drain, 0, 100);
     const wet = water >= 25;
-    const nBonus = wasBeanN ? 7 : 0; // nitrogeno del frijol maduro
+    const nBonus = wasBeanN ? 7 : 0; // nitrógeno del frijol maduro
 
-    const maiz = growOne(m.maiz, wet ? 22 : 6, nBonus, 100);
-    const poleReady = stageOf(maiz) >= 2; // el maiz ya sirve de tutor
+    const maíz = growOne(m.maíz, wet ? 22 : 6, nBonus, 100);
+    const poleReady = stageOf(maíz) >= 2; // el maíz ya sirve de tutor
     const frijol = growOne(m.frijol, wet ? 20 : 5, 0, poleReady ? 100 : 33);
     const ahuyama = growOne(m.ahuyama, wet ? 20 : 5, nBonus, 100);
 
-    const plantedCount = [maiz, frijol, ahuyama].filter((s) => s.planted).length;
-    const maxStage = Math.max(stageOf(maiz), stageOf(frijol), stageOf(ahuyama));
+    const plantedCount = [maíz, frijol, ahuyama].filter((s) => s.planted).length;
+    const maxStage = Math.max(stageOf(maíz), stageOf(frijol), stageOf(ahuyama));
     let health = m.health;
     if (!wet) health -= 15;
     else if (plantedCount === 3) health += 12;
@@ -125,18 +125,18 @@ function stepDay(g) {
 
     // Eventos didacticos (se elige el mas relevante por prioridad).
     if (water < 25) events.push({ p: 9, t: TIP.dry });
-    if (!wasTrio && plantedCount === 3 && stageOf(maiz) === 3 && stageOf(frijol) === 3 && stageOf(ahuyama) === 3)
+    if (!wasTrio && plantedCount === 3 && stageOf(maíz) === 3 && stageOf(frijol) === 3 && stageOf(ahuyama) === 3)
       events.push({ p: 8, t: TIP.trio });
-    if (wet && !wasPole && stageOf(maiz) >= 2 && frijol.planted) events.push({ p: 6, t: TIP.pole });
+    if (wet && !wasPole && stageOf(maíz) >= 2 && frijol.planted) events.push({ p: 6, t: TIP.pole });
     if (!wasLeafy && stageOf(ahuyama) >= 2) events.push({ p: 4, t: TIP.shade });
     if (!wasBeanN && frijol.planted && frijol.growth >= 78) events.push({ p: 3, t: TIP.beanN });
     if (plantedCount === 1 && maxStage >= 2) events.push({ p: 2, t: TIP.alone });
 
-    return { ...m, water, maiz, frijol, ahuyama, health };
+    return { ...m, water, maíz, frijol, ahuyama, health };
   });
 
   const won = mounds.every(
-    (m) => stageOf(m.maiz) === 3 && stageOf(m.frijol) === 3 && stageOf(m.ahuyama) === 3
+    (m) => stageOf(m.maíz) === 3 && stageOf(m.frijol) === 3 && stageOf(m.ahuyama) === 3
   );
   let tip;
   if (won) tip = TIP.win;
@@ -147,12 +147,12 @@ function stepDay(g) {
 }
 
 const plantTip = {
-  maiz: 'Sembro maiz: va a dar el palo para el frijol.',
-  frijol: 'Sembro frijol: necesita el maiz para treparse.',
-  ahuyama: 'Sembro ahuyama: sus hojas van a tapar el suelo.',
+  maíz: 'Sembró maíz: va a dar el palo para el frijol.',
+  frijol: 'Sembró frijol: necesita el maíz para treparse.',
+  ahuyama: 'Sembró ahuyama: sus hojas van a tapar el suelo.',
 };
 
-// Reductor PURO: tocar un monticulo con la herramienta activa.
+// Reductor PURO: tocar un montículo con la herramienta activa.
 function applyMoundClick(g, i) {
   if (g.phase !== 'play') return g;
   const tool = g.tool;
@@ -162,10 +162,10 @@ function applyMoundClick(g, i) {
     const mounds = g.mounds.map((m, idx) =>
       idx === i ? { ...m, water: 100, health: clamp(m.health + 6, 18, 100) } : m
     );
-    return { ...g, mounds, tip: 'Le echo agua al monticulo. El agua mantiene la mata contenta.' };
+    return { ...g, mounds, tip: 'Le echó agua al montículo. El agua mantiene la mata contenta.' };
   }
   if (target[tool].planted) {
-    return { ...g, tip: 'Ahi ya sembro esa hermana. Pruebe con otra o con otro monticulo.' };
+    return { ...g, tip: 'Ahí ya sembró esa hermana. Pruebe con otra o con otro montículo.' };
   }
   const mounds = g.mounds.map((m, idx) =>
     idx === i ? { ...m, [tool]: { planted: true, growth: 0 } } : m
@@ -227,13 +227,13 @@ function leafPath(x, y, len, dir) {
  * a las de verdad"). Cada una cuenta su parte de la asociacion:
  *   MAIZ    caña con nudos + hojas LARGAS ACINTADAS que arquean y dejan caer
  *           la punta, penacho arriba, mazorca con amero y barbas al costado.
- *   FRIJOL  enredadera de hoja ACORAZONADA que trepa por la caña del maiz
+ *   FRIJOL  enredadera de hoja ACORAZONADA que trepa por la caña del maíz
  *           (zarcillos incluidos); sin tutor queda tanteando el suelo.
- *   AHUYAMA rastrera de hoja ANCHA LOBULADA que tapa el monticulo (venas
+ *   AHUYAMA rastrera de hoja ANCHA LOBULADA que tapa el montículo (venas
  *           palidas de cucurbita), flor de trompeta naranja y fruto acostillado.
  */
 
-function Maiz({ cx, stage, grow, droop }) {
+function Maíz({ cx, stage, grow, droop }) {
   if (stage === 0) return null;
   const h = 46 + grow * 2.05; // 46..251
   const topY = GROUND_Y - h;
@@ -254,11 +254,11 @@ function Maiz({ cx, stage, grow, droop }) {
       C ${cx + dir * L * 0.16} ${ly - L * 0.68} ${cx + dir * L * 0.6} ${ly - L * (0.6 - caida)} ${tipX} ${tipY}
       C ${cx + dir * L * 0.58} ${ly - L * (0.26 - caida)} ${cx + dir * L * 0.2} ${ly - L * 0.08} ${cx} ${ly + 3} Z`;
     const dVena = `M ${cx} ${ly} Q ${cx + dir * L * 0.44} ${ly - L * (0.48 - caida)} ${tipX} ${tipY}`;
-    nudos.push(<ellipse key={`n${k}`} cx={cx} cy={ly} rx="6.5" ry="3" fill={C.maiz} stroke={INK} strokeWidth="2.5" />);
+    nudos.push(<ellipse key={`n${k}`} cx={cx} cy={ly} rx="6.5" ry="3" fill={C.maíz} stroke={INK} strokeWidth="2.5" />);
     leaves.push(
       <g key={k}>
-        <path d={dHoja} fill={k % 2 ? C.maiz : C.maizHi} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-        <path d={dVena} fill="none" stroke={k % 2 ? C.maizHi : C.maiz} strokeWidth="2.4" strokeLinecap="round" />
+        <path d={dHoja} fill={k % 2 ? C.maíz : C.maizHi} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+        <path d={dVena} fill="none" stroke={k % 2 ? C.maizHi : C.maíz} strokeWidth="2.4" strokeLinecap="round" />
       </g>
     );
   }
@@ -268,14 +268,14 @@ function Maiz({ cx, stage, grow, droop }) {
       <g className="milpa-sway"><g className="milpa-pop" key={stage}>
         {/* la caña, con sus nudos */}
         <path d={tallo} fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" />
-        <path d={tallo} fill="none" stroke={C.maiz} strokeWidth="6" strokeLinecap="round" />
+        <path d={tallo} fill="none" stroke={C.maíz} strokeWidth="6" strokeLinecap="round" />
         {nudos}
         {leaves}
         {stage >= 3 && (
           <g>
             {/* MAZORCA al costado: amero, granos en reticula y barbas */}
             <g transform={`translate(${cx + 15} ${GROUND_Y - h * 0.52}) rotate(-24)`}>
-              <path d="M -3 26 Q -14 6 -7 -16 Q 1 2 -3 26 Z" fill={C.maiz} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+              <path d="M -3 26 Q -14 6 -7 -16 Q 1 2 -3 26 Z" fill={C.maíz} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
               <path d="M 5 26 Q 17 8 11 -14 Q 3 4 5 26 Z" fill={C.maizHi} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
               <ellipse cx="1" cy="-2" rx="13" ry="27" fill={C.mazorca} stroke={INK} strokeWidth="4.5" />
               {[-6, 0, 6].map((gx) => (
@@ -346,7 +346,7 @@ function Frijol({ cx, stage, grow, hasPole }) {
       </g></g>
     );
   }
-  // Con tutor: la enredadera SUBE POR LA CAÑA del maiz — esa es la leccion.
+  // Con tutor: la enredadera SUBE POR LA CAÑA del maíz — esa es la leccion.
   const h = 60 + grow * 1.7;
   const topY = GROUND_Y - h;
   const coils = [];
@@ -466,7 +466,7 @@ function Ahuyama({ cx, stage, grow }) {
   );
 }
 
-// Carita del monticulo (estado de animo): sonrie sano, se apaga si sufre.
+// Carita del montículo (estado de animo): sonrie sano, se apaga si sufre.
 function MoodFace({ cx, health }) {
   const cy = GROUND_Y + 46;
   const happy = health >= 55;
@@ -484,7 +484,7 @@ function MoodFace({ cx, health }) {
   );
 }
 
-// Barra de humedad al pie del monticulo.
+// Barra de humedad al pie del montículo.
 function Moisture({ cx, water }) {
   const w = 16, hMax = 54, x = cx + 96, yBase = GROUND_Y + 70;
   const fill = clamp(water, 0, 100) / 100;
@@ -526,7 +526,7 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
   const reset = useCallback(() => setGame(initialGame()), []);
   const toggleAuto = useCallback(() => setGame((g) => ({ ...g, auto: !g.auto })), []);
 
-  // Unico efecto: el "sol automatico" avanza un dia cada 3.2s mientras juega.
+  // Único efecto: el "sol automatico" avanza un día cada 3.2s mientras juega.
   useEffect(() => {
     if (!(game.auto && game.phase === 'play')) return undefined;
     const id = setInterval(() => setGame((g) => stepDay(g)), 3200);
@@ -540,7 +540,7 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
       <div className="milpa-topbar">
         <h1 className="milpa-title">La milpa: las tres hermanas</h1>
         <div className="milpa-topright">
-          <span className="milpa-day">Dia {day}</span>
+          <span className="milpa-day">Día {day}</span>
           <button type="button" className="milpa-back" onClick={onBack}>Salir</button>
         </div>
       </div>
@@ -548,7 +548,7 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
       {/* ── Escenario SVG ─────────────────────────────────────────────── */}
       <div className="milpa-stage">
         <svg className="milpa-svg" viewBox="0 0 1000 660" role="img"
-          aria-label="Huerta de milpa con tres monticulos: maiz, frijol y ahuyama.">
+          aria-label="Huerta de milpa con tres monticulos: maíz, frijol y ahuyama.">
           <defs>
             <linearGradient id="milpaCielo" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor={C.cielo1} />
@@ -581,20 +581,20 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
             const dry = m.water < 25 || m.health < 40;
             return (
               <g key={m.id}>
-                {/* monticulo de tierra */}
+                {/* montículo de tierra */}
                 <ellipse cx={cx} cy={GROUND_Y + 40} rx="118" ry="60" fill={C.tierra} stroke={INK} strokeWidth="5" />
                 <ellipse cx={cx} cy={GROUND_Y + 30} rx="118" ry="46" fill={C.tierraHi} stroke="none" opacity="0.5" />
-                {/* plantas del monticulo */}
+                {/* plantas del montículo */}
                 <Ahuyama cx={cx} stage={stageOf(m.ahuyama)} grow={m.ahuyama.growth} />
-                <Maiz cx={cx} stage={stageOf(m.maiz)} grow={m.maiz.growth} droop={dry} />
-                <Frijol cx={cx} stage={stageOf(m.frijol)} grow={m.frijol.growth} hasPole={stageOf(m.maiz) >= 2} />
+                <Maíz cx={cx} stage={stageOf(m.maíz)} grow={m.maíz.growth} droop={dry} />
+                <Frijol cx={cx} stage={stageOf(m.frijol)} grow={m.frijol.growth} hasPole={stageOf(m.maíz) >= 2} />
                 <MoodFace cx={cx} health={m.health} />
                 <Moisture cx={cx} water={m.water} />
               </g>
             );
           })}
 
-          {/* Zonas tactiles por monticulo (encima de todo, transparentes) */}
+          {/* Zonas tactiles por montículo (encima de todo, transparentes) */}
           {mounds.map((m, i) => {
             const cx = MOUNDS_X[i];
             return (
@@ -603,7 +603,7 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
                 fill="transparent"
                 tabIndex={phase === 'play' ? 0 : -1}
                 role="button"
-                aria-label={`Monticulo ${i + 1}: tocar para ${tool === 'agua' ? 'regar' : 'sembrar'}.`}
+                aria-label={`Montículo ${i + 1}: tocar para ${tool === 'agua' ? 'regar' : 'sembrar'}.`}
                 onClick={() => clickMound(i)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); clickMound(i); }
@@ -640,9 +640,9 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
       {/* ── Controles ─────────────────────────────────────────────────── */}
       <div className="milpa-controls">
         <div className="milpa-seedrow">
-          <button type="button" className={`milpa-btn ${tool === 'maiz' ? 'active' : ''}`}
-            onClick={() => setTool('maiz')} aria-pressed={tool === 'maiz'}>
-            <span className="milpa-swatch" style={{ background: C.maizHi }} /> Maiz
+          <button type="button" className={`milpa-btn ${tool === 'maíz' ? 'active' : ''}`}
+            onClick={() => setTool('maíz')} aria-pressed={tool === 'maíz'}>
+            <span className="milpa-swatch" style={{ background: C.maizHi }} /> Maíz
           </button>
           <button type="button" className={`milpa-btn ${tool === 'frijol' ? 'active' : ''}`}
             onClick={() => setTool('frijol')} aria-pressed={tool === 'frijol'}>
@@ -663,7 +663,7 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
 
         <label className="milpa-toggle">
           <input type="checkbox" checked={auto} onChange={toggleAuto} disabled={phase !== 'play'} />
-          Sol automatico
+          Sol automático
         </label>
 
         <button type="button" className="milpa-btn ghost" onClick={reset}>Volver a sembrar</button>
@@ -673,11 +673,11 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
       <div className="milpa-legend">
         <div className="milpa-chip">
           <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
-            <line x1="17" y1="32" x2="17" y2="4" stroke={C.maiz} strokeWidth="5" strokeLinecap="round" />
+            <line x1="17" y1="32" x2="17" y2="4" stroke={C.maíz} strokeWidth="5" strokeLinecap="round" />
             <path d={leafPath(17, 18, 12, 1)} fill={C.maizHi} stroke={INK} strokeWidth="2" />
             <path d={leafPath(17, 24, 12, -1)} fill={C.maizHi} stroke={INK} strokeWidth="2" />
           </svg>
-          <div><b>Maiz</b><span>Crece alto y da el palo para que el frijol se trepe.</span></div>
+          <div><b>Maíz</b><span>Crece alto y da el palo para que el frijol se trepe.</span></div>
         </div>
         <div className="milpa-chip">
           <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
@@ -687,7 +687,7 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
             </g>
             <circle cx="17" cy="6" r="4" fill={C.flor} stroke={INK} strokeWidth="2" />
           </svg>
-          <div><b>Frijol</b><span>Le fija alimento a la tierra: enriquece el monticulo.</span></div>
+          <div><b>Frijol</b><span>Le fija alimento a la tierra: enriquece el montículo.</span></div>
         </div>
         <div className="milpa-chip">
           <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
@@ -707,15 +707,15 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
           <div className="milpa-card">
             <h2>La milpa: las tres hermanas</h2>
             <p className="milpa-lead">
-              En la milpa, tres cultivos crecen en el mismo monticulo y se apoyan:
+              En la milpa, tres cultivos crecen en el mismo montículo y se apoyan:
             </p>
             <ul>
-              <li><b>Maiz —</b> crece alto y da el palo para que el frijol se trepe.</li>
+              <li><b>Maíz —</b> crece alto y da el palo para que el frijol se trepe.</li>
               <li><b>Frijol —</b> le pasa alimento a la tierra y la enriquece.</li>
               <li><b>Ahuyama —</b> tapa el suelo con sus hojas y guarda la humedad.</li>
             </ul>
             <p className="milpa-lead">
-              Siembre los tres en cada monticulo, deles agua con la regadera y vea florecer la milpa.
+              Siembre los tres en cada montículo, deles agua con la regadera y vea florecer la milpa.
             </p>
             <button type="button" className="milpa-cta" onClick={start}>Empezar a sembrar</button>
           </div>
@@ -728,7 +728,7 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
           <div className="milpa-card">
             <h2>Milpa completa</h2>
             <p className="milpa-lead">
-              Las tres hermanas dieron su cosecha juntas: el maiz sostuvo al
+              Las tres hermanas dieron su cosecha juntas: el maíz sostuvo al
               frijol, el frijol nutrio la tierra y la ahuyama guardo la humedad.
               Asi se cuida un policultivo.
             </p>
