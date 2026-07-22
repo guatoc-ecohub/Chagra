@@ -23,6 +23,12 @@ import { useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 
+// La ley visual de la casa: el amanecer del kit de cielos y la luz madre.
+// (La escarcha venía con un rig genérico azul-blanco que se veía de demo de
+// three, no de Chagra: la helada del alba pasa a amanecer COMO EL VALLE.)
+import { CIELOS_HORA } from '../../visual/mundo3d/cielosHoraData.js';
+import { LuzMadre, VERDES, NIEBLAS, mezclar } from '../../visual/mundo3d/paleta/index.js';
+
 // Criaturas rubber-hose (SVG puro, sin three)
 import {
   MariquitaRubber,
@@ -114,7 +120,13 @@ function DemoCard({ titulo, descripcion, props: propList = [], variante, childre
   );
 }
 
+// El pasto escarchado: el verde frío de la paleta, aclarado por la bruma del
+// páramo (la escarcha se posa sobre un verde que amanece, no sobre un gris).
+const PASTO_ALBA = mezclar(VERDES.frio, NIEBLAS.paramo, 0.25);
+
 // Anfitrión three para el efecto de escarcha (que es un grupo, no una escena).
+// La hora es EL AMANECER DE LA CASA (CIELOS_HORA.amanecer, durazno rasante y
+// relleno lavanda) montado con <LuzMadre>: mismas proporciones que el valle.
 function EscarchaDemo({ tier, reducedMotion, intensidad }) {
   return (
     <Canvas
@@ -124,13 +136,11 @@ function EscarchaDemo({ tier, reducedMotion, intensidad }) {
       frameloop={reducedMotion ? 'demand' : 'always'}
       gl={{ antialias: tier !== 'bajo', powerPreference: 'high-performance' }}
     >
-      <color attach="background" args={['#d7e6f2']} />
-      <hemisphereLight intensity={0.95} color="#eaf3ff" groundColor="#8ea4b8" />
-      <directionalLight position={[3, 6, 4]} intensity={0.7} color="#ffffff" />
-      <ambientLight intensity={0.4} color="#eef4ff" />
+      <color attach="background" args={[CIELOS_HORA.amanecer.fondo]} />
+      <LuzMadre madre={CIELOS_HORA.amanecer} escala={1.5} />
       <mesh rotation-x={-Math.PI / 2} position={[0, -0.01, 0]}>
         <circleGeometry args={[3.2, 56]} />
-        <meshStandardMaterial color="#6f8a6a" roughness={0.95} />
+        <meshStandardMaterial color={PASTO_ALBA} roughness={0.95} />
       </mesh>
       <EscarchaHelada
         intensidad={intensidad}
