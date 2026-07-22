@@ -62,7 +62,7 @@ const ESPECIES = [
     cientifico: 'Tapirus pinchaque',
     eje: 'Suelo y semillas del bosque',
     frase: 'Soy la danta de montaña: siembro el bosque con cada semilla que dejo.',
-    fuente: 'Tapir andino endémico (EN) · fauna paramuna del catálogo de Chagra',
+    fuente: 'Tapir andino (EN) · Colombia, Ecuador y norte del Perú · fauna paramuna del catálogo de Chagra',
     acc: '#7fd0ff', accRgb: '127, 208, 255',
   },
   {
