@@ -33,14 +33,15 @@ import { OrbitControls, Html, AdaptiveDpr } from '@react-three/drei';
 import { ATMOSFERA } from '../visual/mundo3d/atmosferaMadre.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
 import { ParticulasAmbientales } from '../visual/mundo3d/ParticulasAmbientales.jsx';
+import { NEUTROS, TIERRAS, VERDES } from '../visual/mundo3d/paleta/paletaMadre.js';
 
 /* ── Paleta local del microcosmos (cálida andina + translúcidos de microscopio) */
 const PAL = {
-  litter: '#7d8a3e', // hojarasca verde
+  litter: VERDES.paramoMusgoClaro, // hojarasca verde
   litterAlt: '#96a44e', // hojarasca al sol
-  humus: '#3c2a1b', // la tierra negra, viva
+  humus: TIERRAS.turba, // la tierra negra, viva
   humusAlt: '#4a3625',
-  mineral: '#7c5836', // subsuelo mineral, ocre
+  mineral: TIERRAS.siembra, // subsuelo mineral, ocre
   mineralAlt: '#8f6a44',
   raiz: '#c9a86a', // raíces claras
   piedra: '#9a8b74',
@@ -61,8 +62,8 @@ const PAL = {
   hifaOro: '#ffd27a', // el pulso dorado de la red
   nodo: '#ffe6a8',
   hongo: '#e7c9a0', // sombrerito de hongo
-  ojoBlanco: '#fbf6ec',
-  ojoPupila: '#241a12',
+  ojoBlanco: NEUTROS.hueso,
+  ojoPupila: NEUTROS.tinta,
 };
 
 /* PRNG determinista (mismo corte siempre, sin azar por frame). */
@@ -94,7 +95,7 @@ const ORGANISMOS = [
     oficio: 'El saltarín que recicla',
     texto:
       'Diminuto y saltarín: bajo la panza guarda un resorte con el que brinca lejos del peligro. Mastica hongos y hojarasca en pedacitos cada vez más pequeños y así apura la descomposición, para que otros terminen de convertirla en tierra buena.',
-    anchor: [-1.7, 0.92, 1.16],
+    anchor: [-2.55, 0.98, 1.46],
     color: '#b7a9ef',
     fase: 0.0,
     halo: 0.22,
@@ -108,7 +109,7 @@ const ORGANISMOS = [
     oficio: 'El oso de agua indestructible',
     texto:
       'Gordito y lento, camina con ocho paticas de peluche por la película de agua que envuelve al suelo. Es el ser más resistente que se conoce: si el suelo se seca, se encoge y se duerme (criptobiosis) y así aguanta años, hasta el frío y el vacío. Come jugos de musgos y de otras diminutas criaturas.',
-    anchor: [-0.05, 0.98, 1.18],
+    anchor: [-0.55, 0.2, 1.43],
     color: '#bcd3a3',
     fase: 0.5,
     halo: 0.26,
@@ -122,7 +123,7 @@ const ORGANISMOS = [
     oficio: 'El vigilante de ocho patas',
     texto:
       'Con sus ocho paticas recorre la hojarasca cazando y desmenuzando. Controla las plaguitas pequeñas y reparte la materia orgánica por todo el suelo. Casi nadie lo ve, pero es un guardián que trabaja sin descanso.',
-    anchor: [-1.05, 0.55, 1.2],
+    anchor: [-0.95, 0.98, 1.48],
     color: '#d76a52',
     fase: 0.9,
     halo: 0.24,
@@ -136,7 +137,7 @@ const ORGANISMOS = [
     oficio: 'El aliado casi invisible',
     texto:
       'Un gusanito transparente, más fino que un pelo. Los buenos se comen bacterias y hongos y, al hacerlo, liberan nutrientes para las raíces; otros persiguen larvas de plagas bajo tierra. Tan pequeño que no se ve, y tan útil para la huerta.',
-    anchor: [1.55, 0.6, 1.14],
+    anchor: [2.45, 0.24, 1.42],
     color: '#bfe6d8',
     fase: 2.4,
     halo: 0.26,
@@ -150,7 +151,7 @@ const ORGANISMOS = [
     oficio: 'La ingeniera del suelo',
     texto:
       'Se come la tierra y las hojas viejas y las devuelve convertidas en abono negro y fértil. Al abrir sus túneles deja entrar el aire y el agua: cada lombriz es un arado vivo que nunca descansa. Donde hay lombrices, el suelo está sano.',
-    anchor: [0.5, 0.16, 1.24],
+    anchor: [1.1, -0.02, 1.52],
     color: '#e8a58f',
     fase: 1.7,
     halo: 0.34,
@@ -164,7 +165,7 @@ const ORGANISMOS = [
     oficio: 'El nadador de la gota',
     texto:
       'Una sola célula que nada en la película de agua remando con miles de pelitos (cilios). Se traga bacterias por montones y, al hacerlo, suelta nutrientes que la raíz aprovecha al instante. Donde el suelo está húmedo y vivo, hay un mundo entero de protozoos girando en cada gota.',
-    anchor: [1.3, -0.12, 1.12],
+    anchor: [2.3, -0.52, 1.4],
     color: '#c7e6ec',
     fase: 3.4,
     halo: 0.28,
@@ -178,7 +179,7 @@ const ORGANISMOS = [
     oficio: 'El internet del bosque',
     texto:
       'Son hilos de hongo (hifas) que se enredan con las raíces y se extienden como una red dorada bajo tierra. Le llevan agua y minerales a la planta y, a cambio, reciben su azúcar. Por esta red las plantas hasta se avisan y se comparten alimento entre vecinas.',
-    anchor: [-1.05, -0.5, 0.72],
+    anchor: [-1.8, -0.6, 0.82],
     color: '#ffd27a',
     fase: 3.1,
     halo: 0.4,
@@ -192,7 +193,7 @@ const ORGANISMOS = [
     oficio: 'Las cocineras invisibles',
     texto:
       'Son tan pequeñas que millones caben en una cucharada de tierra. Transforman la materia muerta en alimento que la planta sí puede comer, y algunas capturan el nitrógeno del aire para abonar el suelo. Sin ellas, nada volvería a nacer.',
-    anchor: [0.35, -0.55, 0.8],
+    anchor: [0.45, -0.82, 0.9],
     color: '#ffdf9a',
     fase: 3.8,
     halo: 0.36,
@@ -228,8 +229,8 @@ function Ojo({ pos = [0, 0, 0], r = 0.04 }) {
 /* ── EL CORTE DE SUELO (fondo): hojarasca verde arriba, tierra negra, subsuelo
       ocre; raíces que bajan, piedritas y hojas caídas. Redondeado, low-poly. ── */
 function CorteSuelo() {
-  const ANCHO = 4.6;
-  const PROF = 2.0;
+  const ANCHO = 6.8;
+  const PROF = 2.8;
   const capas = [
     { y: 0.86, h: 0.28, c: PAL.litter, cAlt: PAL.litterAlt }, // hojarasca
     { y: 0.3, h: 0.9, c: PAL.humus, cAlt: PAL.humusAlt }, // tierra negra
@@ -255,7 +256,7 @@ function CorteSuelo() {
   const raices = useMemo(() => {
     const r = rng(41);
     return Array.from({ length: 4 }, (_, i) => ({
-      x: -1.4 + i * 0.95 + (r() - 0.5) * 0.3,
+      x: -2.5 + i * 1.3 + (r() - 0.5) * 0.3,
       largo: 1.1 + r() * 0.9,
       tilt: (r() - 0.5) * 0.5,
     }));
@@ -307,9 +308,9 @@ function PeliculaAgua({ reducedMotion }) {
   const refs = useRef([]);
   const lentes = useMemo(
     () => [
-      { p: [0.2, 0.2, 1.02], s: [1.9, 1.0, 1], fase: 0 },
-      { p: [1.2, -0.1, 0.98], s: [1.0, 0.7, 1], fase: 1.4 },
-      { p: [-0.9, 0.5, 1.0], s: [0.9, 0.6, 1], fase: 2.7 },
+      { p: [-0.55, 0.2, 1.3], s: [1.3, 0.8, 1], fase: 0 },
+      { p: [2.3, -0.25, 1.28], s: [1.15, 0.76, 1], fase: 1.4 },
+      { p: [1.05, -0.05, 1.3], s: [1.1, 0.66, 1], fase: 2.7 },
     ],
     [],
   );
@@ -352,7 +353,7 @@ function Colembolo({ base, reducedMotion }) {
     cuerpo.current.rotation.z = Math.sin(t * 0.7) * 0.08;
   });
   return (
-    <group ref={cuerpo} position={base}>
+    <group ref={cuerpo} position={base} scale={1.16}>
       {/* cuerpo */}
       <mesh scale={[1.25, 0.9, 1]}>
         <sphereGeometry args={[0.13, 14, 12]} />
@@ -401,7 +402,7 @@ function Acaro({ base, reducedMotion }) {
     }
   });
   return (
-    <group ref={cuerpo} position={base}>
+    <group ref={cuerpo} position={base} scale={1.28}>
       <mesh>
         <sphereGeometry args={[0.13, 14, 12]} />
         <meshLambertMaterial color={PAL.acaro} flatShading />
@@ -415,8 +416,12 @@ function Acaro({ base, reducedMotion }) {
       {patasDef.map((pt, i) => (
         <group key={i} position={[0.1 * pt.lado, -0.02, 0.02 * (i % 4 - 1.5)]} rotation={[0, 0, pt.ang * pt.lado]}>
           <group ref={(el) => { patas.current[i] = el; }}>
-            <mesh position={[0.1 * pt.lado, -0.02, 0]} rotation={[0, 0, pt.lado * 0.6]}>
-              <cylinderGeometry args={[0.009, 0.006, 0.2, 4]} />
+            <mesh position={[0.08 * pt.lado, -0.02, 0]} rotation={[0, 0, pt.lado * 0.6]}>
+              <cylinderGeometry args={[0.01, 0.007, 0.18, 4]} />
+              <meshBasicMaterial color={PAL.acaroPata} />
+            </mesh>
+            <mesh position={[0.18 * pt.lado, -0.09, 0]} rotation={[0, 0, pt.lado * 1.05]}>
+              <cylinderGeometry args={[0.008, 0.004, 0.15, 4]} />
               <meshBasicMaterial color={PAL.acaroPata} />
             </mesh>
           </group>
@@ -431,11 +436,11 @@ function Acaro({ base, reducedMotion }) {
 function Lombriz({ base, reducedMotion }) {
   const segs = useRef([]);
   const puntos = useMemo(() => {
-    const n = 11;
+    const n = 15;
     return Array.from({ length: n }, (_, i) => {
       const u = i / (n - 1);
       return {
-        x: -0.5 + u * 1.0,
+        x: -0.78 + u * 1.56,
         y: Math.sin(u * Math.PI * 1.3) * 0.14,
         r: 0.075 * (0.5 + Math.sin(u * Math.PI) * 0.7),
         clitelo: u > 0.32 && u < 0.46,
@@ -454,7 +459,7 @@ function Lombriz({ base, reducedMotion }) {
     }
   });
   return (
-    <group position={base} rotation={[0, 0.2, 0]}>
+    <group position={base} scale={1.14} rotation={[0, 0.2, 0]}>
       {puntos.map((p, i) => (
         <group key={i} ref={(el) => { segs.current[i] = el; }} position={[p.x, p.y, 0]}>
           <mesh>
@@ -548,7 +553,7 @@ function Tardigrado({ base, reducedMotion }) {
     }
   });
   return (
-    <group ref={cuerpo} position={base} rotation={[0, -0.35, 0]}>
+    <group ref={cuerpo} position={base} scale={1.28} rotation={[0, -0.35, 0]}>
       {/* cuerpo segmentado, translúcido */}
       {segmentos.map((s, i) => (
         <mesh key={i} position={[s.x, 0, 0]}>
@@ -960,7 +965,7 @@ function EscenaMicro({ tier, reducedMotion, focus, hover, onSeleccion, onHover }
           tier={tier}
           reducedMotion={reducedMotion}
           position={[0, 0.4, 1.0]}
-          area={[4.4, 2.6, 2.2]}
+          area={[6.5, 2.6, 2.8]}
           semilla={31}
         />
       )}

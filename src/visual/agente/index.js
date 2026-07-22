@@ -10,6 +10,8 @@
  */
 export { Angelita, default } from './Angelita.jsx';
 export { AngelitaEntrada, esDiaSoleado } from './AngelitaEntrada.jsx';
+export { AngelitaGuia } from './AngelitaGuia.jsx';
+export { useAngelitaGuia, calcularPuestoGuia } from '../../hooks/useAngelitaGuia.js';
 export {
   ESTADOS_ANGELITA,
   NIVELES_CONFIANZA,
