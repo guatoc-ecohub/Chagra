@@ -22,12 +22,23 @@
  *   · CAFETO — pisos de ramas horizontales, hoja oscura lustrosa y cerezas
  *     rojas/pintonas pegadas a la rama.
  *
- * TÉCNICA tier-safe (la misma de floraParamo.geom, DR §3): cada pieza se
- * FUSIONA en UNA geometría con color horneado en vertexColors → una draw-call
- * por malla. Los animales devuelven { cuerpo, cabeza, pivote }: la cabeza es
- * una geometría aparte (local al pivote del cuello) para que el consumidor
- * conserve el gesto vivo (pastar, picotear, hocicar) moviendo UN grupo.
- * Cero assets externos: todo procedural, corre headless (three core + merge).
+ * Las señas POR RAZA (pedido explícito del operador — él tiene cerdos):
+ *   · VACA Holstein (manchas negras de capa, ubre llena, MOCHA — sin cuernos),
+ *     criolla (caramelo, cuernos en lira) y cebú/Brahman (giba, papada,
+ *     orejones caídos).
+ *   · CERDO criollo colombiano (las TRES razas del banco de germoplasma de
+ *     AGROSAVIA): zungo pelado (negro, panza baja), san pedreño (negro PELUDO,
+ *     hocico corto, orejas RECTAS medianas) y casco de mula (capa
+ *     rojiza-amarillenta y CASCO ENTERO sin hendidura, como el de una mula).
+ *     Más las comerciales: duroc (colorado, dorso arqueado), landrace (rosado
+ *     LARGO, orejas tapaojos) y pietrain (blanco manchado, jamones) + lechones.
+ *   · GALLINA campesina/negra/blanca + gallo de cola en hoz verde tornasol.
+ *   · PERRO criollo amarillo y OVEJA criolla de vellón por mechones.
+ *
+ * TÉCNICA tier-safe: cada animal se FUSIONA en cuerpo (una malla) + cabeza
+ * (otra, local al pivote del cuello para conservar el gesto vivo) → 2 draw
+ * calls por animal con UN material compartido. Cero assets, cero texturas,
+ * corre headless (three core + merge).
  */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -278,9 +289,15 @@ export const RAZAS_CERDO = {
     pelaje: '#2e2926', trompa: '#4c423c', panza: 1.3, largo: 0.95,
     orejas: 'caida', arco: 0, jamon: 1, manchas: null, calcetin: null,
   },
+  // San Pedreño: negro de PELO ABUNDANTE (el contraste legible con el Zungo
+  // pelado → moteado de pelaje reforzado), HOCICO CORTO (perfil cóncavo) y
+  // OREJAS RECTAS y medianas — fuente Agrosavia/SciELO; el `caida` anterior
+  // contradecía la fuente. El "calcetín claro" quedó NO VERIFICADO en el
+  // brief (ops/BRIEF-FABLE-ANIMALES-COLOMBIANOS.md §2.2) → NO se dibuja.
   sanpedreno: {
     pelaje: '#332b26', trompa: '#c9a58e', panza: 1.15, largo: 0.98,
-    orejas: 'caida', arco: 0, jamon: 1, manchas: null, calcetin: '#d8cec0',
+    orejas: 'parada', arco: 0, jamon: 1, manchas: null, calcetin: null,
+    trompaCorta: 0.72, pelo: 2.6,
   },
   duroc: {
     pelaje: '#8e4a2b', trompa: '#7c4630', panza: 1, largo: 1.02,
@@ -294,7 +311,22 @@ export const RAZAS_CERDO = {
     pelaje: '#e4ded3', trompa: '#cfa290', panza: 0.95, largo: 1.0,
     orejas: 'parada', arco: 0, jamon: 1.28, manchas: '#37312d', calcetin: null,
   },
+  // Casco de Mula: la TERCERA raza criolla porcina colombiana (banco de
+  // germoplasma AGROSAVIA; Orinoquía — Meta, Casanare). Capa entre roja y
+  // amarillenta (NO negra, a diferencia de zungo y san pedreño) y su seña
+  // única: el casco ENTERO, sin hendidura, como el de una mula (sindactilia).
+  cascoDeMula: {
+    pelaje: '#a8683a', trompa: '#8a5636', panza: 1.08, largo: 1.0,
+    orejas: 'caida', arco: 0, jamon: 1, manchas: null, calcetin: null,
+    casco: 'entero',
+  },
 };
+// Grafías que llegan del dato real (mundoData trae 'sanpedreño' con ñ; un
+// hato de farmOS puede escribir 'casco de mula'): registrar alias para que
+// ninguna raza criolla caiga en silencio al fallback (patrón CorralVivo).
+RAZAS_CERDO['sanpedreño'] = RAZAS_CERDO.sanpedreno;
+RAZAS_CERDO['casco de mula'] = RAZAS_CERDO.cascoDeMula;
+RAZAS_CERDO.cascodemula = RAZAS_CERDO.cascoDeMula;
 
 /* Manchas del pietrain: sobre jamones, paletas y flancos. */
 const MANCHAS_CERDO = [
@@ -338,14 +370,26 @@ export function geomCerdo({ raza = 'zungo', q = 1 } = {}, seed = 31) {
       p.push(pintar(paleta, variar(R.pelaje, r, 0.05)));
     }
 
-    // ── Patas cortas con pezuña (calcetines claros si la raza los trae) ──
-    for (const [px, pz] of [[0.28 * L, 0.13], [0.28 * L, -0.13], [-0.30 * L, 0.14], [-0.30 * L, -0.14]]) {
-      const pata = new THREE.CylinderGeometry(0.042, 0.052, 0.26, 6, 1);
-      poner(pata, [px, 0.17, pz]);
-      p.push(pintar(pata, R.calcetin || variar(R.pelaje, r, 0.04)));
-      const pezuna = new THREE.CylinderGeometry(0.046, 0.05, 0.06, 6, 1);
-      poner(pezuna, [px, 0.03, pz]);
-      p.push(pintar(pezuna, '#332c26'));
+    // ── Patas cortas. La pezuña porcina va HENDIDA (dos dedos con canal al
+    //    medio)… salvo en el Casco de Mula, cuyo casco es ENTERO y redondo
+    //    como el de una mula — SU rasgo firma, y se dibuja. ──
+    for (const [px, pz, atras] of /** @type {[number, number, boolean][]} */ ([[0.28 * L, 0.12, false], [0.28 * L, -0.12, false], [-0.31 * L, 0.13, true], [-0.31 * L, -0.13, true]])) {
+      const j = () => (r() - 0.5) * 0.015;
+      const pata = new THREE.CylinderGeometry(0.052, 0.04, 0.24, 8, 1);
+      poner(pata, [px + j(), 0.15, pz + j()], [j() * 2, 0, (atras ? -0.04 : 0.03) + j() * 2]);
+      p.push(pintarPlano(pata, R.calcetin || variar(R.pelaje, r, 0.04)));
+      if (R.casco === 'entero') {
+        // Casco de mula: UNA uña entera color cuerno, más ancha y visible.
+        const casco = new THREE.CylinderGeometry(0.05, 0.058, 0.075, 10, 1);
+        poner(casco, [px, 0.038, pz]);
+        p.push(pintarPlano(casco, '#7a5f43'));
+      } else {
+        for (const dz of [0.026, -0.026]) {
+          const dedo = new THREE.CylinderGeometry(0.023, 0.027, 0.06, 7, 1);
+          poner(dedo, [px, 0.03, pz + dz]);
+          p.push(pintarPlano(dedo, '#332c26'));
+        }
+      }
     }
 
     // ── La colita en tirabuzón ──
@@ -353,36 +397,34 @@ export function geomCerdo({ raza = 'zungo', q = 1 } = {}, seed = 31) {
     poner(cola, [-0.44 * L, 0.56, 0], [0, Math.PI / 2, 0.4]);
     p.push(pintar(cola, variar(R.pelaje, r, 0.06)));
 
-    // ── Manchas del pietrain ──
-    if (R.manchas && q > 0.35) {
-      for (const m of MANCHAS_CERDO) {
-        const mancha = new THREE.SphereGeometry(m.s, 7, 6);
-        poner(mancha, [m.pos[0] * L, m.pos[1], m.pos[2]], [r(), r() * Math.PI, 0], [1, 0.85, 0.4]);
-        p.push(pintar(mancha, variar(R.manchas, r, 0.06)));
-      }
-    }
-
-    const cuerpo = fusionar(p);
+    const cuerpo = hornearPelaje(fusionarHato(p, `cerdo-${raza}`), {
+      // `pelo` refuerza el moteado del pelaje: el San Pedreño peludo se lee
+      // áspero contra el Zungo pelado y liso.
+      yBajo: 0.02, yAlto: 0.58, ao: 0.4, moteado: 0.07 * (R.pelo || 1), semilla: seed,
+    });
 
     // ── CABEZA (pivote al frente): hocica el suelo ──
     const c = [];
-    const craneo = new THREE.SphereGeometry(0.145, 9, 7);
-    poner(craneo, [0.06, -0.02, 0], [0, 0, 0], [1.25, 1, 0.95]);
-    c.push(pintar(craneo, R.pelaje));
-    const papadita = new THREE.SphereGeometry(0.09, 7, 6);
-    poner(papadita, [0.07, -0.12, 0], [0, 0, 0], [1.1, 0.7, 0.9]);
-    c.push(pintar(papadita, variar(R.pelaje, r, 0.05)));
-    const trompa = new THREE.CylinderGeometry(0.06, 0.075, 0.15, 7, 1);
-    poner(trompa, [0.235, -0.055, 0], [0, 0, Math.PI / 2 + 0.18]);
-    c.push(pintar(trompa, R.pelaje));
+    const craneo = new THREE.SphereGeometry(0.14, 12, 10);
+    poner(craneo, [0.06, -0.02, 0], [0, 0, -0.12], [1.28, 1, 0.92]);
+    c.push(pinta(craneo, R.pelaje));
+    const papadita = new THREE.SphereGeometry(0.088, 9, 8);
+    poner(papadita, [0.07, -0.115, 0], [0, 0, 0], [1.15, 0.7, 0.85]);
+    c.push(pintarPlano(papadita, variar(R.pelaje, r, 0.05)));
+    // `trompaCorta` acorta el hocico (San Pedreño: perfil corto y cóncavo).
+    const tl = R.trompaCorta || 1;
+    const trompa = new THREE.CylinderGeometry(0.058 + 0.006 * (1 - tl), 0.078, 0.16 * tl, 10, 2);
+    poner(trompa, [0.15 + 0.08 * tl, -0.06, 0], [0, 0, Math.PI / 2 + 0.22], [1, 1, 0.88]);
+    c.push(pintarPlano(trompa, R.pelaje));
     // El disco del morro (la nariz de cerdo, inconfundible) + ollares.
-    const disco = new THREE.CylinderGeometry(0.062, 0.062, 0.035, 8, 1);
-    poner(disco, [0.315, -0.07, 0], [0, 0, Math.PI / 2 + 0.18]);
-    c.push(pintar(disco, R.trompa));
-    for (const oz of [0.026, -0.026]) {
-      const ollar = new THREE.SphereGeometry(0.012, 5, 4);
-      poner(ollar, [0.335, -0.066, oz]);
-      c.push(pintar(ollar, '#241f1b'));
+    const xMorro = 0.15 + 0.165 * tl;
+    const disco = new THREE.CylinderGeometry(0.06, 0.06, 0.032, 11, 1);
+    poner(disco, [xMorro, -0.08 + 0.012 * (1 - tl), 0], [0, 0, Math.PI / 2 + 0.22]);
+    c.push(pintarPlano(disco, R.trompa));
+    for (const oz of [0.024, -0.024]) {
+      const ollar = new THREE.SphereGeometry(0.011, 5, 4);
+      poner(ollar, [xMorro + 0.018, -0.076 + 0.012 * (1 - tl), oz]);
+      c.push(pintarPlano(ollar, '#241f1b'));
     }
     for (const oz of [0.10, -0.10]) {
       const ojo = new THREE.SphereGeometry(0.02, 6, 5);
@@ -401,6 +443,9 @@ export function geomCerdo({ raza = 'zungo', q = 1 } = {}, seed = 31) {
       const oreja = brote([0.04, 0.10, lado * 0.10], O.dir(lado), O.r, O.largo, 0.4, 5);
       c.push(pintar(oreja, variar(R.pelaje, r, 0.07)));
     }
+    const cabeza = hornearPelaje(fusionarHato(c, `cabeza-cerdo-${raza}`), {
+      yBajo: -0.18, yAlto: 0.12, ao: 0.28, moteado: 0.06 * (R.pelo || 1), semilla: seed + 3,
+    });
 
     return { cuerpo, cabeza: fusionar(c), pivote: [0.40 * L, 0.52, 0] };
   });
