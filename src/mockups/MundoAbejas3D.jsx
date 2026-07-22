@@ -69,6 +69,14 @@ const TARJETAS = [
     texto: 'Las abejas sin aguijon viven en cajas distintas y producen poca miel valiosa. Conservar flores y sitios de anidacion protege su diversidad.',
   },
 ];
+/* A dónde lleva la mirada cada tarjeta: 01 al surco de flores, 02 al
+   panal/colmenas Langstroth, 03 a la caja melipona. Antes `seleccion` solo se
+   pintaba a sí misma; con esto tocar una tarjeta mueve el mundo. */
+const ZONAS = {
+  polinizacion: [0, 0.55, 3.0],
+  miel: [-1.7, 0.75, -1.8],
+  nativas: [3.65, 0.4, -1.7],
+};
 
 function Flor({ posicion, color }) {
   return (
@@ -188,9 +196,33 @@ function AbejaDelEnjambre({ datos, reducedMotion }) {
   );
 }
 
-function Escena({ tier, reducedMotion }) {
+/* Lleva el `target` de OrbitControls hacia la zona de la tarjeta activa.
+   Antes `seleccion` solo cambiaba el borde de su propia tarjeta HTML; esto la
+   cablea a la cámara del Canvas. Sin reducedMotion camina suave (lerp);
+   con reducedMotion salta directo, sin marear. */
+function EnfocarSeleccion({ seleccion, reducedMotion, controlsRef }) {
+  const objetivo = useMemo(() => new THREE.Vector3(...(ZONAS[seleccion] || ZONAS.polinizacion)), [seleccion]);
+  useFrame((_state, delta) => {
+    const controles = controlsRef.current;
+    if (!controles) return;
+    if (reducedMotion) {
+      controles.target.copy(objetivo);
+    } else {
+      controles.target.lerp(objetivo, Math.min(1, delta * 1.6));
+    }
+    controles.update();
+  });
+  /* Ancla inerte (sin geometría ni material) que expone declarativamente a
+     dónde apunta el foco activo — el mismo punto que persigue OrbitControls
+     cuadro a cuadro. Marca la escena y sirve de gancho de prueba. */
+  return <group name="foco-seleccion" position={[objetivo.x, objetivo.y, objetivo.z]} />;
+}
+
+function Escena({ tier, reducedMotion, seleccion }) {
   const perfil = perfilDeTier(tier);
   const abejas = tier === 'bajo' ? ENJAMBRE.slice(0, 4) : tier === 'medio' ? ENJAMBRE.slice(0, 7) : ENJAMBRE;
+  const controlsRef = useRef(/** @type {any} */ (null));
+  const objetivoInicial = ZONAS[seleccion] || ZONAS.polinizacion;
   return (
     <>
       <color attach="background" args={[DORADA.cielo]} />
@@ -208,7 +240,8 @@ function Escena({ tier, reducedMotion }) {
       {FLORES.map(([x, y, z, color]) => <Flor key={`${x}-${z}`} posicion={[x, y, z]} color={color} />)}
       {abejas.map((datos) => <AbejaDelEnjambre key={datos.ancla.join('-')} datos={datos} reducedMotion={reducedMotion} />)}
       <ParticulasAmbientales tipo="polen" tier={tier} reducedMotion={reducedMotion} area={[10, 3.5, 7]} position={[0, 0.5, 0]} />
-      <OrbitControls makeDefault enablePan={false} minDistance={8.5} maxDistance={15} minPolarAngle={0.65} maxPolarAngle={1.35} target={[0, 0.8, 0]} />
+      <OrbitControls ref={controlsRef} makeDefault enablePan={false} minDistance={8.5} maxDistance={15} minPolarAngle={0.65} maxPolarAngle={1.35} target={objetivoInicial} />
+      <EnfocarSeleccion seleccion={seleccion} reducedMotion={reducedMotion} controlsRef={controlsRef} />
       {tier === 'alto' ? <AdaptiveDpr pixelated /> : null}
     </>
   );
@@ -249,7 +282,7 @@ export default function MundoAbejas3D() {
           gl={{ antialias: perfil.antialias, alpha: false, powerPreference: 'high-performance' }}
           camera={{ position: [10, 7.2, 11], fov: 42, near: 0.1, far: 55 }}
         >
-          <Escena tier={decision.tier} reducedMotion={decision.reducedMotion} />
+          <Escena tier={decision.tier} reducedMotion={decision.reducedMotion} seleccion={seleccion} />
         </Canvas>
         <p style={estilos.pista}>{decision.reducedMotion ? 'Vista quieta para su comodidad' : 'Arrastre para recorrer el colmenar'}</p>
       </section>

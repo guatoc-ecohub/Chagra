@@ -15,8 +15,8 @@
  *     rodillos de madera movido por el buey que da vueltas a la palanca, el
  *     canal del guarapo, la HORNILLA con la paila humeando hasta punto de miel
  *     y la mesa con las GAVERAS donde cuaja la panela. El proceso legible de
- *     una mirada: caña → molino → jugo → paila → panela (botón «paso a paso»
- *     con etiquetas sobre la escena).
+ *     una mirada: caña → molino → jugo → paila → panela, con un recorrido de
+ *     5 botones que acerca la cámara al paso activo y resalta su etiqueta.
  *
  * DIRECCIÓN DE ARTE (todo dentro del framework, nada inventado por fuera):
  *   - Atmósfera del MEDIODÍA claro del kit (`CIELOS_HORA.mediodia`): la
@@ -194,11 +194,11 @@ function NubesDia() {
 }
 
 /* Etiqueta didáctica sobre la escena (solo en modo «paso a paso»). */
-function Etiqueta({ pos, texto, paso }) {
+function Etiqueta({ pos, texto, paso, activo }) {
   return (
-    <group position={pos}>
+    <group position={pos} name={paso != null ? `etiqueta-paso-${paso}` : undefined}>
       <Html center distanceFactor={9} zIndexRange={[30, 0]}>
-        <div className="bocana-chip" aria-hidden="true">
+        <div className={`bocana-chip${activo ? ' bocana-chip--activo' : ''}`} aria-hidden="true">
           {paso != null && <b>{paso}</b>}
           {texto}
         </div>
@@ -979,22 +979,58 @@ function MesaGaveras() {
   );
 }
 
-/* Las etiquetas del paso a paso panelero: caña → molino → jugo → paila → panela. */
-function PasosPanela() {
+/* El recorrido de la caña a la panela: caña → molino → jugo → paila →
+   panela. Única fuente de verdad para la etiqueta 3D, el botón del pie y a
+   dónde se acerca la cámara — antes `etiquetas` era un booleano todo-o-nada
+   y esto vivía repetido e inconexo. */
+const RECORRIDO_PANELA = [
+  { paso: 1, texto: 'La caña', pos: [9.5, 3.6, -4.5] },
+  { paso: 2, texto: 'El molino', pos: [6.2, 3.4, 1.2] },
+  { paso: 3, texto: 'El jugo', pos: [4.8, 1.9, 2.8] },
+  { paso: 4, texto: 'La paila', pos: [3.2, 2.5, 4.3] },
+  { paso: 5, texto: 'La panela', pos: [0.7, 2.0, 5.9] },
+];
+/* A dónde mira la cámara cuando no hay paso activo (vista calma original). */
+const OBJETIVO_CALMA = [0.5, 1.0, 1.5];
+
+/* Las etiquetas del paso a paso panelero. Solo la del paso activo se resalta
+   (clase CSS, sin tocar geometría ni materiales de Three). */
+function PasosPanela({ pasoActivo }) {
   return (
     <>
-      <Etiqueta pos={[9.5, 3.6, -4.5]} paso="1" texto="La caña" />
-      <Etiqueta pos={[6.2, 3.4, 1.2]} paso="2" texto="El molino" />
-      <Etiqueta pos={[4.8, 1.9, 2.8]} paso="3" texto="El jugo" />
-      <Etiqueta pos={[3.2, 2.5, 4.3]} paso="4" texto="La paila" />
-      <Etiqueta pos={[0.7, 2.0, 5.9]} paso="5" texto="La panela" />
+      {RECORRIDO_PANELA.map((p) => (
+        <Etiqueta key={p.paso} pos={p.pos} paso={String(p.paso)} texto={p.texto} activo={pasoActivo === p.paso} />
+      ))}
     </>
   );
 }
 
+/* Lleva el `target` de OrbitControls hacia la posición del paso activo del
+   recorrido panelero — antes la cámara nunca se movía con `etiquetas`.
+   Sin reducedMotion camina suave (lerp); con reducedMotion salta directo. */
+function EnfocarPaso({ paso, reducedMotion, controlsRef }) {
+  const objetivo = useMemo(() => {
+    const destino = paso > 0 ? RECORRIDO_PANELA[paso - 1].pos : OBJETIVO_CALMA;
+    return new THREE.Vector3(...destino);
+  }, [paso]);
+  useFrame((_state, delta) => {
+    const controles = controlsRef.current;
+    if (!controles) return;
+    if (reducedMotion) {
+      controles.target.copy(objetivo);
+    } else {
+      controles.target.lerp(objetivo, Math.min(1, delta * 1.4));
+    }
+    controles.update();
+  });
+  /* Ancla inerte (sin geometría ni material): expone declarativamente a
+     dónde apunta el foco activo, y sirve de gancho de prueba. */
+  return <group name="foco-paso" position={[objetivo.x, objetivo.y, objetivo.z]} />;
+}
+
 /* ══════════════════════ LA ESCENA COMPLETA ══════════════════════ */
 
-function EscenaBoticaCana({ tier, reducedMotion, etiquetas }) {
+function EscenaBoticaCana({ tier, reducedMotion, etiquetas, paso }) {
   const perfil = perfilDeTier(tier);
   const geo = useMemo(
     () => construirTerreno(perfil.segmentosTerreno, perfil.flatShading),
@@ -1025,7 +1061,7 @@ function EscenaBoticaCana({ tier, reducedMotion, etiquetas }) {
       <CanalGuarapo />
       <Hornilla reducedMotion={reducedMotion} tier={tier} />
       <MesaGaveras />
-      {etiquetas && <PasosPanela />}
+      {etiquetas && <PasosPanela pasoActivo={paso} />}
 
       {/* unas piedras que amueblan el borde del patio */}
       {[
@@ -1103,12 +1139,15 @@ const CSS_BOCANA = `
 .bocana-canvas--lista { opacity: 1; }
 .bocana-chrome { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: flex-end; }
 .bocana-pie { padding: 0 1rem 0.9rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.6rem; }
+.bocana-recorrido { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.45rem; }
 .bocana-carta { margin: 0; max-width: 34rem; text-align: center; padding: 0.5rem 0.95rem; border-radius: 0.7rem; background: rgba(74,52,24,0.66); backdrop-filter: blur(3px); color: #fbf3e2; font: 500 0.8rem/1.5 system-ui, sans-serif; }
 .bocana-boton { pointer-events: auto; appearance: none; border: 1px solid rgba(74,52,24,0.35); border-radius: 999px; padding: 0.44rem 1rem; background: rgba(255,247,228,0.85); color: #5a3f1c; font: 600 0.8rem/1.1 system-ui, sans-serif; cursor: pointer; backdrop-filter: blur(3px); transition: background 0.2s ease, border-color 0.2s ease; }
 .bocana-boton:hover, .bocana-boton:focus-visible { background: rgba(255,255,255,0.95); border-color: rgba(74,52,24,0.6); outline: none; }
 .bocana-boton[aria-pressed='true'] { background: #ffe8b0; border-color: rgba(90,63,28,0.75); color: #4a3418; }
 .bocana-chip { pointer-events: none; display: inline-flex; align-items: center; gap: 0.3em; padding: 2px 8px; border-radius: 999px; background: rgba(58,42,24,0.82); color: #fdf6e3; font: 600 10px/1.5 system-ui, sans-serif; white-space: nowrap; box-shadow: 0 2px 6px rgba(40,28,10,0.3); }
 .bocana-chip b { display: inline-flex; align-items: center; justify-content: center; width: 1.35em; height: 1.35em; border-radius: 50%; background: #e8a24a; color: #3c2410; font-size: 9px; }
+.bocana-chip--activo { background: #e8a24a; color: #2c1c0a; box-shadow: 0 0 0 2px rgba(255,255,255,0.85), 0 3px 10px rgba(40,28,10,0.4); }
+.bocana-chip--activo b { background: #fdf6e3; color: #6b3e12; }
 .mundo-fauna { pointer-events: none; filter: drop-shadow(0 2px 5px rgba(40, 30, 10, 0.24)); }
 .bocana-leyenda { padding: 1.4rem 1rem 0; }
 .bocana-leyenda h2 { margin: 0 0 0.3rem; font-size: 1.12rem; color: #4a3418; }
@@ -1205,7 +1244,12 @@ const COPY_PASOS =
  */
 export default function MundoBoticaCana3D() {
   const [listo, setListo] = useState(false);
-  const [etiquetas, setEtiquetas] = useState(false);
+  /* 0 = vista calma (sin etiquetas); 1..5 = paso activo del recorrido
+     caña→panela. Antes esto era un booleano todo-o-nada que no movía la
+     cámara ni distinguía un paso de otro. */
+  const [paso, setPaso] = useState(0);
+  const etiquetas = paso > 0;
+  const controlsRef = useRef(/** @type {any} */ (null));
   const tier = useMemo(() => decidirTier().tier, []);
   const reducedMotion = useMemo(
     () =>
@@ -1245,14 +1289,15 @@ export default function MundoBoticaCana3D() {
           frameloop={reducedMotion ? 'demand' : 'always'}
           onCreated={() => setListo(true)}
         >
-          <EscenaBoticaCana tier={tier} reducedMotion={reducedMotion} etiquetas={etiquetas} />
+          <EscenaBoticaCana tier={tier} reducedMotion={reducedMotion} etiquetas={etiquetas} paso={paso} />
           <OrbitControls
+            ref={controlsRef}
             makeDefault
             enablePan={false}
             enableZoom
             minDistance={7}
             maxDistance={22}
-            target={[0.5, 1.0, 1.5]}
+            target={paso > 0 ? RECORRIDO_PANELA[paso - 1].pos : OBJETIVO_CALMA}
             minPolarAngle={0.5}
             maxPolarAngle={1.4}
             minAzimuthAngle={-1.05}
@@ -1262,19 +1307,26 @@ export default function MundoBoticaCana3D() {
             autoRotate={!reducedMotion}
             autoRotateSpeed={0.08}
           />
+          <EnfocarPaso paso={paso} reducedMotion={reducedMotion} controlsRef={controlsRef} />
           <AdaptiveDpr pixelated />
         </Canvas>
 
         <div className="bocana-chrome">
           <div className="bocana-pie">
-            <button
-              type="button"
-              className="bocana-boton"
-              aria-pressed={etiquetas}
-              onClick={() => setEtiquetas((v) => !v)}
-            >
-              {etiquetas ? 'Quitar las etiquetas' : 'Ver nombres y paso a paso'}
-            </button>
+            <ol className="bocana-recorrido" aria-label="Recorrido de la caña a la panela">
+              {RECORRIDO_PANELA.map((p) => (
+                <li key={p.paso}>
+                  <button
+                    type="button"
+                    className="bocana-boton"
+                    aria-pressed={paso === p.paso}
+                    onClick={() => setPaso((actual) => (actual === p.paso ? 0 : p.paso))}
+                  >
+                    {p.paso}. {p.texto}
+                  </button>
+                </li>
+              ))}
+            </ol>
             <p className="bocana-carta" role="status">
               {etiquetas ? COPY_PASOS : COPY_CALMA}
             </p>
