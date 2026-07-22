@@ -314,14 +314,24 @@ export const RAZAS_VACA = {
   },
 };
 
+/* Las caderas de la vaca (x, z, ¿trasera?) y la altura del pivote: compartidas
+   entre la res de patas fijas y la articulada para que ambas pisen igual. */
+const CADERAS_VACA = /** @type {[number, number, boolean][]} */ ([
+  [0.44, 0.17, false], [0.44, -0.17, false], [-0.46, 0.18, true], [-0.46, -0.18, true],
+]);
+const Y_CADERA_VACA = 0.72;
+
 /**
  * La vaca anatómica. Mira a +X, patas en y=0, cruz a ~1.1.
  * `cuerno` (opcional) escala los cuernos por encima de la raza — la ternera va
  * mocha aunque sea criolla.
- * @returns {{cuerpo: THREE.BufferGeometry, cabeza: THREE.BufferGeometry, pivote: [number,number,number]}}
+ * `articulada` (opt-in) entrega las patas como PIEZAS SUELTAS con pivote en la
+ * cadera (para escenas que columpian las patas al andar — el mercado). Con el
+ * default las patas van fusionadas al cuerpo, como siempre (valle/hato).
+ * @returns {{cuerpo: THREE.BufferGeometry, cabeza: THREE.BufferGeometry, pivote: [number,number,number], patas?: THREE.BufferGeometry[], caderas?: [number,number][], yCadera?: number}}
  */
-export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1 } = {}, seed = 21) {
-  return memo(`vaca|${raza}|${ubre}|${cuerno}|${q}|${seed}`, () => {
+export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1, articulada = false } = {}, seed = 21) {
+  return memo(`vaca|${raza}|${ubre}|${cuerno}|${q}|${articulada}|${seed}`, () => {
     const R = RAZAS_VACA[raza] || RAZAS_VACA.holstein;
     const r = rng(seed);
     const p = [];
@@ -373,11 +383,24 @@ export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1 
     }
 
     // ── Patas nacidas de la masa (muslo→caña→pezuña, con jitter) ──
-    for (const [px, pz, atras] of /** @type {[number, number, boolean][]} */ ([[0.44, 0.17, false], [0.44, -0.17, false], [-0.46, 0.18, true], [-0.46, -0.18, true]])) {
-      pataCuadrupedo(p, {
-        x: px, z: pz, yCadera: 0.72, rMuslo: 0.1, rCana: 0.046,
+    //    Articulada: cada pata se construye EN SU SITIO (mismas manchas y mismo
+    //    horneado que el cuerpo — sin costura de color) y luego se traslada al
+    //    origen para colgarla de un grupo pivotado en la cadera.
+    /** @type {THREE.BufferGeometry[]} */
+    const patasSueltas = [];
+    for (const [px, pz, atras] of CADERAS_VACA) {
+      const destino = articulada ? [] : p;
+      pataCuadrupedo(destino, {
+        x: px, z: pz, yCadera: Y_CADERA_VACA, rMuslo: 0.1, rCana: 0.046,
         pelaje: R.pelaje, pezuna: '#3c352d', r, atras, pintor: pinta,
       });
+      if (articulada) {
+        const pata = hornearPelaje(fusionarHato(destino, `vaca-${raza}-pata`), {
+          yBajo: 0.04, yAlto: 1.0, ao: 0.42, moteado: 0.06, semilla: seed,
+        });
+        pata.translate(-px, -Y_CADERA_VACA, -pz);
+        patasSueltas.push(pata);
+      }
     }
 
     // ── Ubre con tetillas (la seña de la lechera) ──
@@ -453,7 +476,14 @@ export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1 
       yBajo: -0.2, yAlto: 0.15, ao: 0.3, moteado: 0.05, semilla: seed + 3,
     });
 
-    return { cuerpo, cabeza, pivote: [0.82, 1.08, 0] };
+    /** @type {{cuerpo: THREE.BufferGeometry, cabeza: THREE.BufferGeometry, pivote: [number,number,number], patas?: THREE.BufferGeometry[], caderas?: [number,number][], yCadera?: number}} */
+    const res = { cuerpo, cabeza, pivote: [0.82, 1.08, 0] };
+    if (articulada) {
+      res.patas = patasSueltas;
+      res.caderas = CADERAS_VACA.map(([px, pz]) => /** @type {[number, number]} */ ([px, pz]));
+      res.yCadera = Y_CADERA_VACA;
+    }
+    return res;
   });
 }
 
