@@ -93,14 +93,18 @@ export const NACEDERO = {
  * entre la turba que empapa y la ceniza que no deja pasar.
  */
 export const HORIZONTES = [
-  { hasta: 0.50, col: '#4f6132', nombre: 'colchón vivo' }, // raíz y musgo trenzados
+  { hasta: 0.50, col: '#5d7038', nombre: 'colchón vivo' }, // raíz y musgo trenzados
   /* La turba viene en DOS: arriba la fibrosa (se le ven las raíces de las que
      está hecha, más clara) y debajo la sáprica, ya deshecha y casi negra. Son
      dos horizontes de verdad y además parten en dos el único manchón oscuro
-     del perfil — que de una sola pieza se leía como un borrón. */
-  { hasta: 1.70, col: '#7d6440', nombre: 'turba fibrosa' },
-  { hasta: 3.00, col: '#54402b', nombre: 'turba sáprica' }, // la esponja honda
-  { hasta: 4.45, col: '#96744a', nombre: 'turba parda' },
+     del perfil — que de una sola pieza se leía como un borrón.
+     Los valores van SUBIDOS a propósito: la mitad alta del perfil es la zona
+     con más carga pedagógica del cuadro y estaba siendo la más oscura — un
+     horizonte que no se ve no enseña nada. "Casi negra" es RELATIVO a sus
+     vecinos, no negro absoluto. */
+  { hasta: 1.70, col: '#8f744a', nombre: 'turba fibrosa' },
+  { hasta: 3.00, col: '#5f4a31', nombre: 'turba sáprica' }, // la esponja honda
+  { hasta: 4.45, col: '#9d7c50', nombre: 'turba parda' },
   { hasta: 4.98, col: '#31251a', nombre: 'la línea de agua' }, // contacto empapado
   { hasta: 6.90, col: '#cfb078', nombre: 'ceniza volcánica' },
   { hasta: 99, col: '#e0d3ae', nombre: 'saprolito' },
@@ -422,6 +426,16 @@ export function geomParedTurba(nac, tiras, { q = 1 } = {}) {
       const yPie = nac.alturaDe(p.x + gx * dBase, p.z + gz * dBase);
       const H = clamp(yFilo - yPie + 0.6, 3.4, 9.5);
 
+      /* EL SOL, HORNEADO. La regla de la casa es cero rig de luz propio, así
+         que la luz que le falta a la lámina se hornea aquí: el sol de LuzMadre
+         entra por el hombro izquierdo-delantero (solPos [-15,29,19] → en
+         planta, (-0.62, 0.79)) y la cara de la pared mira hacia (gx, gz).
+         El dot da cuánto sol recibe ESTE tramo: la testera —la lámina de la
+         vista 2— queda de frente y se enciende; las alas, de perfil, se
+         quedan en su penumbra. Sin esto los horizontes de arriba (los de más
+         carga pedagógica) eran la zona más oscura del cuadro. */
+      const luzSol = clamp(gx * -0.62 + gz * 0.79, 0, 1);
+
       const cierre = remate(i);
       for (let j = 0; j < nv; j++) {
         const v = j / (nv - 1);
@@ -456,6 +470,9 @@ export function geomParedTurba(nac, tiras, { q = 1 } = {}) {
         // luz de cielo: la turba se aclara hacia el filo (arriba pega el cielo
         // abierto; al pie del talud la pared se apaga sola)
         col.multiplyScalar(1.46 - ss(v, 0.06, 1) * 0.5);
+        // el sol horneado del tramo: más arriba pega más (abajo el talud y los
+        // bloques le hacen sombra), y apenas entibia — no lava el perfil
+        col.multiplyScalar(1 + luzSol * (0.32 - 0.14 * v));
         // grano fino, para que ningún horizonte quede de plastilina
         col.multiplyScalar(0.94 + fbmSuelo(s * 7.3, prof * 9.1, seed + 113, 2) * 0.12);
 
@@ -572,9 +589,11 @@ export function geomBloquesTurba(nac, tiras, { q = 1, cada = 9 } = {}) {
 export function geomHilosAgua(nac, tiras, { q = 1, cuantos = 16 } = {}) {
   const r = rng(nac.P.seed + 17);
   const partes = [];
-  const col = new THREE.Color();
-  const arriba = new THREE.Color(AGUAS.espuma);
-  const abajo = new THREE.Color(AGUAS.lagunaOrilla);
+  const espuma = new THREE.Color(AGUAS.espuma);
+  const orillaC = new THREE.Color(AGUAS.lagunaOrilla);
+  const honda = new THREE.Color(AGUAS.viva).lerp(new THREE.Color(AGUAS.lagunaHonda), 0.5);
+  const bruma = new THREE.Color(NIEBLAS.paramo);
+  const brote = new THREE.Color('#3d4a42'); // la banda mojada de la que rezuma
   const n = Math.max(5, Math.round(cuantos * q));
   // se concentran en la testera (el lado que mira a la cámara de reposo)
   const candidatos = [];
@@ -582,6 +601,49 @@ export function geomHilosAgua(nac, tiras, { q = 1, cuantos = 16 } = {}) {
     for (let i = 2; i < tira.length - 2; i++) candidatos.push(tira[i]);
   }
   if (!candidatos.length) return null;
+  const nivelPoza = nac.alturaDe(nac.P.poza.x, nac.P.poza.z) + 0.78;
+  const cc = new THREE.Color();
+
+  /* UNA HEBRA de agua: cinta de TRES vértices por fila — el lomo claro al
+     centro, las orillas frías y hundidas — así el hilo tiene VOLUMEN de agua y
+     no el blanco parejo de un palito. `desvio` la va abriendo de la vertical
+     (el deshilache) y `colorDe` pinta por altura. */
+  const hebra = ({ camino, tx, tz, t0, t1, anchoDe, desvio, colorDe }) => {
+    const seg = Math.max(3, Math.round((8 * (t1 - t0) + 2) * q));
+    const filas = seg + 1;
+    const pos = new Float32Array(filas * 9);
+    const cols = new Float32Array(filas * 9);
+    const idx = [];
+    for (let i = 0; i <= seg; i++) {
+      const u = i / seg;
+      const t = t0 + (t1 - t0) * u;
+      const [x, y, z] = camino(t);
+      const off = desvio * u;
+      const w = anchoDe(t);
+      for (let l = 0; l < 3; l++) {
+        const k = (i * 3 + l) * 3;
+        const sg = l - 1; // orilla, lomo, orilla
+        pos[k] = x + tx * (off + sg * w);
+        pos[k + 1] = y;
+        pos[k + 2] = z + tz * (off + sg * w);
+        colorDe(t, l === 1, cc);
+        cols[k] = cc.r;
+        cols[k + 1] = cc.g;
+        cols[k + 2] = cc.b;
+      }
+      if (i < seg) {
+        const a = i * 3;
+        idx.push(a, a + 1, a + 4, a, a + 4, a + 3);
+        idx.push(a + 1, a + 2, a + 5, a + 1, a + 5, a + 4);
+      }
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+    g.setIndex(idx);
+    g.computeVertexNormals();
+    return g;
+  };
 
   for (let h = 0; h < n; h++) {
     const p = candidatos[Math.floor(r() * candidatos.length)];
@@ -592,65 +654,149 @@ export function geomHilosAgua(nac, tiras, { q = 1, cuantos = 16 } = {}) {
     gx = -gx / gl;
     gz = -gz / gl;
     const yFilo = nac.mesetaDe(p.x, p.z) + 0.08;
+    // TODOS a la misma altura — el contacto turba/ceniza. Es la lección: no tocar.
     const yBrota = yFilo - COTA_MANANTIAL - r() * 0.16;
     const x0 = p.x + gx * (0.75 + r() * 0.35);
     const z0 = p.z + gz * (0.75 + r() * 0.35);
     const yPie = nac.alturaDe(x0 + gx * 0.5, z0 + gz * 0.5);
     const caida = Math.max(0.5, yBrota - yPie);
-    const ancho = 0.035 + r() * 0.055;
-
-    /* El hilo: una cinta angosta que se descuelga con un vaivén (el agua no cae
-       a plomo por una pared con repisas). Encarada al vacío. */
-    const seg = Math.max(3, Math.round(6 * q));
-    const pos = new Float32Array((seg + 1) * 2 * 3);
-    const colores = new Float32Array((seg + 1) * 2 * 3);
-    const idx = [];
+    const ancho = 0.045 + r() * 0.06;
     // tangente horizontal (perpendicular al gradiente) para darle ancho
     const tx = -gz;
     const tz = gx;
-    for (let i = 0; i <= seg; i++) {
-      const t = i / seg;
-      const vaiven = Math.sin(t * 4.5 + h) * 0.09 * t;
-      const x = x0 + gx * (t * 0.28) + tx * vaiven;
-      const z = z0 + gz * (t * 0.28) + tz * vaiven;
-      const y = yBrota - t * caida;
-      const w = ancho * (1 + t * 0.55);
-      col.copy(arriba).lerp(abajo, t * 0.7);
-      for (let l = 0; l < 2; l++) {
-        const k = (i * 2 + l) * 3;
-        const sg = l === 0 ? -1 : 1;
-        pos[k] = x + tx * w * sg;
-        pos[k + 1] = y;
-        pos[k + 2] = z + tz * w * sg;
-        colores[k] = col.r;
-        colores[k + 1] = col.g;
-        colores[k + 2] = col.b;
+    const fase = h * 1.7 + r() * 2;
+
+    /* El eje del hilo: se descuelga con un vaivén (el agua no cae a plomo por
+       una pared con repisas). Encarado al vacío. */
+    const camino = (t) => {
+      const vaiven = Math.sin(t * 4.2 + fase) * 0.1 * t;
+      return [
+        x0 + gx * (t * 0.3) + tx * vaiven,
+        yBrota - t * caida,
+        z0 + gz * (t * 0.3) + tz * vaiven,
+      ];
+    };
+
+    /* El color del agua: nace OSCURO (rezuma de la banda empapada, no está
+       pegado encima), el lomo lleva la luz, las orillas el verde frío, y abajo
+       el conjunto se abre y se deshace hacia la bruma del golpe. */
+    const colorAgua = (t, centro, out) => {
+      if (centro) out.copy(espuma).lerp(orillaC, 0.12 + t * 0.28);
+      else out.copy(orillaC).lerp(honda, 0.45 + t * 0.3).multiplyScalar(0.88);
+      if (t < 0.14) out.lerp(brote, (1 - t / 0.14) * 0.8);
+      out.lerp(bruma, ss(t, 0.72, 1) * 0.4);
+    };
+
+    // el cuerpo: angosto al brotar, ancho al llegar (el agua se abre al caer)
+    partes.push(hebra({
+      camino,
+      tx,
+      tz,
+      t0: 0,
+      t1: 1,
+      anchoDe: (t) => ancho * (0.65 + t * 2.5) * (1 - ss(t, 0.62, 1) * 0.3),
+      desvio: 0,
+      colorDe: colorAgua,
+    }));
+    // el deshilache: hebras que se le abren al hilo madre en la mitad baja
+    for (const lado of [-1, 1]) {
+      if (r() < 0.25) continue;
+      const tD = 0.42 + r() * 0.2;
+      partes.push(hebra({
+        camino,
+        tx,
+        tz,
+        t0: tD,
+        t1: 0.97 + r() * 0.03,
+        anchoDe: (t) => ancho * (0.5 + (t - tD) * 1.1),
+        desvio: lado * (0.1 + r() * 0.17),
+        colorDe: colorAgua,
+      }));
+    }
+
+    /* EL GOLPE. Agua que cae y no hace nada no parece agua: charco oscuro
+       donde pega, abanico de espuma encima, corona de gotas rebotando y un
+       par de chispas a media caída. */
+    const xI = x0 + gx * 0.3;
+    const zI = z0 + gz * 0.3;
+    const yI = nac.alturaDe(xI, zI);
+    if (q > 0.5) {
+      const charco = new THREE.CircleGeometry(0.34 + r() * 0.22, 9);
+      poner(charco, [xI, yI + 0.025, zI], [-Math.PI / 2, 0, r() * 3], [1.25, 1, 1]);
+      partes.push(pintarPlano(charco, honda.clone().lerp(orillaC, 0.35)));
+      const salpica = new THREE.CircleGeometry(0.17 + r() * 0.1, 8);
+      poner(salpica, [xI - gx * 0.06, yI + 0.045, zI - gz * 0.06], [-Math.PI / 2, 0, r() * 3]);
+      partes.push(pintarPlano(salpica, espuma));
+      const cuantasG = 3 + Math.floor(r() * 3);
+      for (let g = 0; g < cuantasG; g++) {
+        const gota = new THREE.IcosahedronGeometry(0.028 + r() * 0.022, 0);
+        const ag = r() * Math.PI * 2;
+        poner(gota, [
+          xI + Math.cos(ag) * (0.12 + r() * 0.3),
+          yI + 0.08 + r() * 0.34,
+          zI + Math.sin(ag) * (0.12 + r() * 0.3),
+        ]);
+        partes.push(pintarPlano(gota, espuma));
       }
-      if (i < seg) {
-        const a = i * 2;
-        idx.push(a, a + 1, a + 3, a, a + 3, a + 2);
+      for (let g = 0; g < 2; g++) {
+        const chispa = new THREE.IcosahedronGeometry(0.02 + r() * 0.015, 0);
+        const [cx, cy, cz] = camino(0.35 + r() * 0.5);
+        poner(chispa, [cx + tx * (r() - 0.5) * 0.3, cy, cz + tz * (r() - 0.5) * 0.3]);
+        partes.push(pintarPlano(chispa, espuma));
       }
     }
-    const cinta = new THREE.BufferGeometry();
-    cinta.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    cinta.setAttribute('color', new THREE.BufferAttribute(colores, 3));
-    cinta.setIndex(idx);
-    cinta.computeVertexNormals();
-    partes.push(cinta);
 
-    /* El golpe abajo: una salpicadura chiquita, no un aro. */
-    if (q > 0.5) {
-      const salpica = new THREE.CircleGeometry(0.16 + r() * 0.1, 7);
-      poner(salpica, [x0 + gx * 0.3, yPie + 0.03, z0 + gz * 0.3], [-Math.PI / 2, 0, r() * 3]);
-      partes.push(pintarPlano(salpica, arriba));
-      for (let g = 0; g < 2; g++) {
-        const gota = new THREE.IcosahedronGeometry(0.035 + r() * 0.02, 0);
-        poner(gota, [
-          x0 + gx * (0.2 + r() * 0.35) + tx * (r() - 0.5) * 0.3,
-          yPie + 0.12 + r() * caida * 0.6,
-          z0 + gz * (0.2 + r() * 0.35) + tz * (r() - 0.5) * 0.3,
-        ]);
-        partes.push(pintarPlano(gota, arriba));
+    /* EL REGATO: los hilos no mueren donde caen — se juntan. Una veta clara
+       que serpentea del golpe hacia la poza y se hunde al entrar al agua.
+       Solo dentro del anfiteatro (aguas abajo el hilo cae directo al cauce). */
+    const dPoza = Math.hypot(xI - nac.P.poza.x, zI - nac.P.poza.z);
+    if (dPoza > 1.2 && dPoza < 10) {
+      const dxP = (nac.P.poza.x - xI) / dPoza;
+      const dzP = (nac.P.poza.z - zI) / dPoza;
+      const txR = -dzP;
+      const tzR = dxP;
+      const pasosR = 9;
+      const pts = [];
+      for (let i = 0; i <= pasosR; i++) {
+        const t = i / pasosR;
+        const wig = Math.sin(t * 5 + fase) * 0.22 * Math.sin(t * Math.PI);
+        const x = xI + dxP * dPoza * t + txR * wig;
+        const z = zI + dzP * dPoza * t + tzR * wig;
+        const y = nac.alturaDe(x, z);
+        pts.push({ x, y, z, t });
+        if (t > 0.3 && y < nivelPoza - 0.05) break; // ya entró a la poza
+      }
+      if (pts.length > 2) {
+        const posR = new Float32Array(pts.length * 6);
+        const colR = new Float32Array(pts.length * 6);
+        const idxR = [];
+        for (let i = 0; i < pts.length; i++) {
+          const pt = pts[i];
+          const w = 0.04 + pt.t * 0.08;
+          // arranca ya FRÍO (agua sobre pasto, no pintura blanca) y se hunde
+          // hacia el verde hondo según se acerca a la poza
+          cc.copy(espuma).lerp(orillaC, 0.55 + pt.t * 0.35).lerp(honda, pt.t * 0.25);
+          for (let l = 0; l < 2; l++) {
+            const k = (i * 2 + l) * 3;
+            const sg = l === 0 ? -1 : 1;
+            posR[k] = pt.x + txR * w * sg;
+            posR[k + 1] = pt.y + 0.035;
+            posR[k + 2] = pt.z + tzR * w * sg;
+            colR[k] = cc.r;
+            colR[k + 1] = cc.g;
+            colR[k + 2] = cc.b;
+          }
+          if (i < pts.length - 1) {
+            const a = i * 2;
+            idxR.push(a, a + 1, a + 3, a, a + 3, a + 2);
+          }
+        }
+        const regato = new THREE.BufferGeometry();
+        regato.setAttribute('position', new THREE.BufferAttribute(posR, 3));
+        regato.setAttribute('color', new THREE.BufferAttribute(colR, 3));
+        regato.setIndex(idxR);
+        regato.computeVertexNormals();
+        partes.push(regato);
       }
     }
   }

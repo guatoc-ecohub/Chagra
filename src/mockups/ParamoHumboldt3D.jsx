@@ -128,8 +128,9 @@ const BOTONES = [
    (llega rápido, frena suave). Suelta el mando apenas el usuario toca la
    escena: si el lerp siguiera vivo mientras alguien arrastra, la cámara le
    pelearía la mano. */
-function Camarografo({ vista, controls }) {
+function Camarografo({ vista, controls, reducedMotion }) {
   const size = useThree((s) => s.size);
+  const invalidate = useThree((s) => s.invalidate);
   const animando = useRef(true);
 
   const destino = useMemo(() => {
@@ -137,7 +138,13 @@ function Camarografo({ vista, controls }) {
     return size.width / Math.max(1, size.height) < 0.95 ? VISTAS.nacederoAlto : VISTAS.nacederoAncho;
   }, [vista, size.width, size.height]);
 
-  useEffect(() => { animando.current = true; }, [destino]);
+  /* El `invalidate()` importa: con `frameloop='demand'` este componente
+     retorna null y su re-render NO pide cuadro — sin esto, el useFrame de
+     abajo jamás corría tras el clic y la cámara no viajaba. */
+  useEffect(() => {
+    animando.current = true;
+    invalidate();
+  }, [destino, invalidate]);
 
   useEffect(() => {
     const c = controls.current;
@@ -150,6 +157,24 @@ function Camarografo({ vista, controls }) {
   useFrame((estado, dt) => {
     if (!animando.current) return;
     const cam = estado.camera;
+    /* CON REDUCED MOTION EL VIAJE ES UN CORTE SECO. No es solo cortesía: con
+       `frameloop='demand'` no corren cuadros seguidos, así que el lerp de
+       abajo NUNCA avanzaba — la cámara se quedaba clavada en la vista madre y
+       los botones cambiaban la carta pero no el cuadro. El único cuadro que
+       corre tras el clic es este (el re-render de este componente invalida),
+       y en él la cámara salta completa. */
+    if (reducedMotion) {
+      cam.position.copy(destino.pos);
+      cam.fov = destino.fov;
+      cam.updateProjectionMatrix();
+      const cc = controls.current;
+      if (cc) {
+        cc.target.copy(destino.mira);
+        cc.update();
+      }
+      animando.current = false;
+      return;
+    }
     const k = 1 - Math.exp(-Math.min(0.1, dt) * 3.0);
     cam.position.lerp(destino.pos, k);
     if (Math.abs(cam.fov - destino.fov) > 0.01) {
@@ -253,7 +278,7 @@ export default function ParamoHumboldt3D() {
 
         <EscenaNacederoParamo tier={tier} perfil={perfil} reducedMotion={reducedMotion} />
 
-        <Camarografo vista={vista} controls={controls} />
+        <Camarografo vista={vista} controls={controls} reducedMotion={reducedMotion} />
 
         <OrbitControls
           ref={controls}
