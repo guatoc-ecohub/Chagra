@@ -131,6 +131,11 @@ export { Escarabajo } from './Escarabajo.jsx';
 export { Crisopa } from './Crisopa.jsx';
 export { Trichogramma } from './Trichogramma.jsx';
 export { Sirfido } from './Sirfido.jsx';
+/* LA GALLINA CRIOLLA — el animal de patio que faltaba en el elenco (44
+   criaturas y ninguna gallina): la del gallinero que camina, la que escarba
+   detrás del ganado y rompe el ciclo de la larva. Dos plumajes (colorada y
+   clara sarabiada) para que la parvada no se vea clonada. */
+export { Gallina } from './Gallina.jsx';
 /* EL ENT DEL PÁRAMO — el árbol-guardián que enseña (frailejón gigante). NO es un
    bicho: es el corazón del "Bosque Vivo". Hereda la MISMA fundación transversal
    (line-boil, lip-sync, modo-poder=guardián, clima) adaptada a su escala y su
@@ -199,6 +204,7 @@ import Escarabajo from './Escarabajo.jsx';
 import Crisopa from './Crisopa.jsx';
 import Trichogramma from './Trichogramma.jsx';
 import Sirfido from './Sirfido.jsx';
+import Gallina from './Gallina.jsx';
 import EntFrailejon from './EntFrailejon.jsx';
 
 /* Registro consultable: slug → componente + binomio verificado. */
@@ -233,6 +239,8 @@ export const CREATURES = {
   crisopa: { Component: Crisopa, nombre: 'Crisopa', cientifico: 'Chrysoperla externa' },
   trichogramma: { Component: Trichogramma, nombre: 'Avispita Trichogramma', cientifico: 'Trichogramma' },
   sirfido: { Component: Sirfido, nombre: 'Mosca de las flores (sírfido)', cientifico: 'Syrphidae' },
+  // El animal de patio de la casa campesina (el del gallinero que camina).
+  gallina: { Component: Gallina, nombre: 'Gallina criolla', cientifico: 'Gallus gallus domesticus' },
   // El árbol-maestro del Bosque Vivo (flora, no fauna): el frailejón guardián.
   'ent-frailejon': { Component: EntFrailejon, nombre: 'El Ent del páramo', cientifico: 'Espeletia sp.' },
 };

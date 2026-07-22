@@ -65,7 +65,7 @@ const P = {
   cobre: mezclar('#b06a3a', TINTE, 0.15), // la paila
   guarapo: mezclar('#c78a2e', TINTE, 0.1), // el jugo dorado hirviendo
   panela: mezclar('#a5622d', TINTE, 0.1), // el bloque cuajado
-  buey: mezclar('#8a7050', TINTE, 0.14), // el buey barcino pardo
+  buey: mezclar('#a3835e', TINTE, 0.12), // el buey barcino (claro: que no lea piedra)
   piedra: mezclar(PALETA.piedra, TINTE, 0.3),
   // las matas de la botica, cada una con su verde propio
   sabila: mezclar('#7fa47a', TINTE, 0.2), // verde grisáceo carnoso
@@ -76,6 +76,31 @@ const P = {
   calendulaFlor: mezclar('#e8862e', TINTE, 0.08), // la flor naranja
   manzanillaFlor: mezclar('#f5efdd', TINTE, 0.05),
   tallo: mezclar('#5d7a3c', TINTE, 0.22),
+  // la caña por piezas (fidelidad botánica: entrenudos, hoja acintada, espiga)
+  canaMorada: mezclar('#7d4a63', TINTE, 0.14), // la variedad morada entreverada
+  canaNudo: mezclar('#8a7838', TINTE, 0.12), // el anillo oscuro del nudo
+  hojaCana: mezclar('#9db855', TINTE, 0.16), // la hoja larga acintada
+  hojaSeca: mezclar('#c2a95c', TINTE, 0.2), // la hoja doblada que se seca abajo
+  penacho: mezclar('#e8dfc0', TINTE, 0.08), // la espiga plumosa plateada
+  espuma: mezclar('#f2e4bc', TINTE, 0.05), // la espuma del hervor
+  cachaza: mezclar('#d8b878', TINTE, 0.1), // lo que retira el cucharón
+};
+
+/* Los trajes de la gente del trapiche: acentos textiles de la paleta madre
+   (cochinilla, índigo, maíz) sobre la tinta rubber-hose — cero hex inventado
+   por fuera de esta tabla. */
+const ROPA = {
+  tinta: '#241a10', // NEUTROS.tinta: la línea rubber-hose
+  piel: '#c98f62',
+  pielSombra: '#a87048',
+  sombrero: '#f0e7d0', // el aguadeño encalado
+  camisa: '#f4ead2',
+  pantalon: '#4a3a2c',
+  ruana: '#33305c', // ACENTOS.indigo: el índigo textil
+  ruanaGuarda: '#f4c542', // ACENTOS.maizTextil: la guarda de la ruana
+  falda: '#8a4a38',
+  panoleta: '#d1382b', // ACENTOS.cochinilla
+  guante: '#fdf6e3',
 };
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -209,6 +234,19 @@ function Etiqueta({ pos, texto, paso, activo }) {
 
 /* ══════════════════════ LA BOTICA CAMPESINA ══════════════════════ */
 
+/* La brisa de la botica: cada mata se mece apenas, con su propia fase — antes
+   ni una hoja se movía. Barato: una rotación por grupo, cero geometría. */
+function Mecer({ fase = 0, amp = 0.05, reducedMotion, children }) {
+  const ref = useRef(null);
+  useFrame(({ clock }) => {
+    if (reducedMotion || !ref.current) return;
+    const t = clock.elapsedTime;
+    ref.current.rotation.z = Math.sin(t * 1.4 + fase) * amp;
+    ref.current.rotation.x = Math.sin(t * 1.05 + fase * 1.7) * amp * 0.6;
+  });
+  return <group ref={ref}>{children}</group>;
+}
+
 /* Cantero: cama de siembra con tablas de madera y tierra negra encima. Las
    matas van de hijos, en coordenadas locales (y=0.28 es el lomo de tierra). */
 function Cantero({ pos, rot = 0, w = 2.6, d = 1.4, children }) {
@@ -237,8 +275,8 @@ function Cantero({ pos, rot = 0, w = 2.6, d = 1.4, children }) {
         <boxGeometry args={[w - 0.16, 0.14, d - 0.16]} />
         <meshLambertMaterial color={P.tierraCantero} flatShading />
       </mesh>
-      {/* las matas, un pelín agrandadas para que se LEAN desde la cámara */}
-      <group position={[0, 0.29, 0]} scale={[1.15, 1.4, 1.15]}>{children}</group>
+      {/* las matas, agrandadas para que se LEAN desde la cámara */}
+      <group position={[0, 0.29, 0]} scale={[1.35, 1.6, 1.35]}>{children}</group>
     </group>
   );
 }
@@ -263,7 +301,7 @@ function Sabila({ pos, esc = 1, semilla = 1 }) {
           rotation={[h.inc, -h.ang, 0]}
           scale={[1, 1, 0.45]}
         >
-          <coneGeometry args={[0.085, h.largo, 4]} />
+          <coneGeometry args={[0.105, h.largo, 4]} />
           <meshLambertMaterial color={P.sabila} flatShading />
         </mesh>
       ))}
@@ -294,7 +332,10 @@ function Ruda({ pos, esc = 1 }) {
         </mesh>
       ))}
       {/* sus flores amarillas menudas */}
-      {[[0.06, 0.36, 0.03], [-0.09, 0.32, -0.04], [0.01, 0.34, -0.1]].map((f, i) => (
+      {[
+        [0.06, 0.36, 0.03], [-0.09, 0.32, -0.04], [0.01, 0.34, -0.1],
+        [0.12, 0.3, -0.02], [-0.02, 0.4, 0.06],
+      ].map((f, i) => (
         <mesh key={`f${i}`} position={f}>
           <sphereGeometry args={[0.03, 5, 4]} />
           <meshLambertMaterial color="#d9c94a" flatShading />
@@ -308,10 +349,10 @@ function Ruda({ pos, esc = 1 }) {
 function Calendula({ pos, esc = 1, semilla = 1 }) {
   const flores = useMemo(() => {
     const rng = crearRng(70 + semilla);
-    return Array.from({ length: 3 }, () => ({
-      x: (rng() - 0.5) * 0.3,
-      z: (rng() - 0.5) * 0.3,
-      h: 0.3 + rng() * 0.14,
+    return Array.from({ length: 5 }, () => ({
+      x: (rng() - 0.5) * 0.38,
+      z: (rng() - 0.5) * 0.34,
+      h: 0.3 + rng() * 0.16,
       lad: (rng() - 0.5) * 0.3,
     }));
   }, [semilla]);
@@ -330,11 +371,11 @@ function Calendula({ pos, esc = 1, semilla = 1 }) {
           </mesh>
           {/* la flor: disco naranja de pétalos + botón del centro */}
           <mesh position={[0, f.h + 0.02, 0]}>
-            <cylinderGeometry args={[0.09, 0.05, 0.035, 9]} />
+            <cylinderGeometry args={[0.115, 0.055, 0.04, 9]} />
             <meshLambertMaterial color={P.calendulaFlor} flatShading />
           </mesh>
-          <mesh position={[0, f.h + 0.05, 0]}>
-            <sphereGeometry args={[0.032, 6, 5]} />
+          <mesh position={[0, f.h + 0.055, 0]}>
+            <sphereGeometry args={[0.038, 6, 5]} />
             <meshLambertMaterial color={mezclar(P.calendulaFlor, '#7a4a1a', 0.55)} flatShading />
           </mesh>
         </group>
@@ -376,7 +417,7 @@ function Limoncillo({ pos, esc = 1, semilla = 1 }) {
     return Array.from({ length: 12 }, (_, i) => ({
       ang: (i / 12) * Math.PI * 2 + rng() * 0.4,
       inc: 0.55 + rng() * 0.45, // bien arqueadas
-      largo: 0.5 + rng() * 0.28,
+      largo: 0.62 + rng() * 0.3,
     }));
   }, [semilla]);
   return (
@@ -402,9 +443,9 @@ function Limoncillo({ pos, esc = 1, semilla = 1 }) {
 /* Ortiga: tallos erguidos de hoja aserrada verde oscuro. Se mira, no se toca. */
 function Ortiga({ pos, esc = 1 }) {
   const tallos = [
-    [0, 0, 0, 0.42],
-    [0.12, 0, 0.08, 0.34],
-    [-0.11, 0, -0.05, 0.3],
+    [0, 0, 0, 0.52],
+    [0.12, 0, 0.08, 0.42],
+    [-0.11, 0, -0.05, 0.38],
   ];
   return (
     <group position={pos} scale={esc}>
@@ -440,7 +481,7 @@ function Manzanilla({ pos, esc = 1, semilla = 1 }) {
     return Array.from({ length: 6 }, () => ({
       x: (rng() - 0.5) * 0.34,
       z: (rng() - 0.5) * 0.3,
-      h: 0.2 + rng() * 0.16,
+      h: 0.28 + rng() * 0.18,
       lad: (rng() - 0.5) * 0.5,
     }));
   }, [semilla]);
@@ -457,11 +498,11 @@ function Manzanilla({ pos, esc = 1, semilla = 1 }) {
             <meshLambertMaterial color={P.tallo} flatShading />
           </mesh>
           <mesh position={[0, f.h + 0.012, 0]}>
-            <cylinderGeometry args={[0.045, 0.02, 0.02, 8]} />
+            <cylinderGeometry args={[0.062, 0.024, 0.024, 8]} />
             <meshLambertMaterial color={P.manzanillaFlor} flatShading />
           </mesh>
-          <mesh position={[0, f.h + 0.03, 0]}>
-            <sphereGeometry args={[0.022, 6, 4]} />
+          <mesh position={[0, f.h + 0.034, 0]}>
+            <sphereGeometry args={[0.028, 6, 4]} />
             <meshLambertMaterial color="#e2b93b" flatShading />
           </mesh>
         </group>
@@ -470,41 +511,57 @@ function Manzanilla({ pos, esc = 1, semilla = 1 }) {
   );
 }
 
-/* La botica completa: tres canteros con las siete matas, cada una en su sitio. */
-function Botica({ etiquetas }) {
+/* La botica completa: tres canteros con las siete matas, cada una en su sitio
+   y cada una MECIÉNDOSE con su propia fase de brisa. */
+function Botica({ etiquetas, reducedMotion }) {
   return (
     <group>
       {/* cantero de las aromáticas de tomar */}
       <Cantero pos={[-7.5, Y_PATIO, 2.4]} rot={0.14}>
-        <Hierbabuena pos={[-0.85, 0, 0.1]} semilla={3} />
-        <Hierbabuena pos={[-0.35, 0, -0.25]} esc={0.85} semilla={7} />
-        <Manzanilla pos={[0.25, 0, 0.15]} semilla={2} />
-        <Manzanilla pos={[0.6, 0, -0.25]} esc={0.85} semilla={5} />
-        <Limoncillo pos={[1.0, 0, 0.12]} semilla={4} />
+        <Mecer fase={0.3} reducedMotion={reducedMotion}>
+          <Hierbabuena pos={[-0.85, 0, 0.1]} semilla={3} />
+          <Hierbabuena pos={[-0.35, 0, -0.25]} esc={0.85} semilla={7} />
+        </Mecer>
+        <Mecer fase={1.6} amp={0.07} reducedMotion={reducedMotion}>
+          <Manzanilla pos={[0.25, 0, 0.15]} semilla={2} />
+          <Manzanilla pos={[0.6, 0, -0.25]} esc={0.85} semilla={5} />
+        </Mecer>
+        <Mecer fase={2.9} amp={0.08} reducedMotion={reducedMotion}>
+          <Limoncillo pos={[1.0, 0, 0.12]} semilla={4} />
+        </Mecer>
       </Cantero>
       {/* cantero de las matas de respeto */}
       <Cantero pos={[-4.5, Y_PATIO, 4.6]} rot={-0.1}>
-        <Ruda pos={[-0.9, 0, 0]} />
-        <Calendula pos={[-0.15, 0, 0.15]} semilla={1} />
-        <Calendula pos={[0.35, 0, -0.28]} esc={0.85} semilla={6} />
-        <Ortiga pos={[0.95, 0, 0.05]} />
+        <Mecer fase={0.9} reducedMotion={reducedMotion}>
+          <Ruda pos={[-0.9, 0, 0]} />
+        </Mecer>
+        <Mecer fase={2.2} amp={0.065} reducedMotion={reducedMotion}>
+          <Calendula pos={[-0.15, 0, 0.15]} semilla={1} />
+          <Calendula pos={[0.35, 0, -0.28]} esc={0.85} semilla={6} />
+        </Mecer>
+        <Mecer fase={4.1} reducedMotion={reducedMotion}>
+          <Ortiga pos={[0.95, 0, 0.05]} />
+        </Mecer>
       </Cantero>
-      {/* el cantero de la sábila, aparte y soleado */}
+      {/* el cantero de la sábila, aparte y soleado (carnosa: apenas se mece) */}
       <Cantero pos={[-7.0, Y_PATIO, 5.9]} rot={0.32} w={2.1} d={1.2}>
-        <Sabila pos={[-0.6, 0, 0]} semilla={1} />
-        <Sabila pos={[0.05, 0, 0.12]} esc={0.85} semilla={5} />
-        <Sabila pos={[0.65, 0, -0.12]} esc={1.1} semilla={9} />
+        <Mecer fase={5.3} amp={0.02} reducedMotion={reducedMotion}>
+          <Sabila pos={[-0.6, 0, 0]} semilla={1} />
+          <Sabila pos={[0.05, 0, 0.12]} esc={0.85} semilla={5} />
+          <Sabila pos={[0.65, 0, -0.12]} esc={1.1} semilla={9} />
+        </Mecer>
       </Cantero>
 
       {etiquetas && (
         <>
-          <Etiqueta pos={[-8.35, Y_PATIO + 1.1, 2.5]} texto="Hierbabuena" />
-          <Etiqueta pos={[-7.2, Y_PATIO + 1.45, 2.7]} texto="Manzanilla" />
-          <Etiqueta pos={[-6.4, Y_PATIO + 1.1, 2.3]} texto="Limoncillo" />
-          <Etiqueta pos={[-5.4, Y_PATIO + 1.35, 4.7]} texto="Ruda" />
-          <Etiqueta pos={[-4.5, Y_PATIO + 1.05, 4.5]} texto="Caléndula" />
-          <Etiqueta pos={[-3.5, Y_PATIO + 1.4, 4.7]} texto="Ortiga" />
-          <Etiqueta pos={[-7.0, Y_PATIO + 1.1, 6.0]} texto="Sábila" />
+          {/* repartidas en dos alturas y bien separadas: antes se encimaban */}
+          <Etiqueta pos={[-8.6, Y_PATIO + 1.05, 2.6]} texto="Hierbabuena" />
+          <Etiqueta pos={[-7.3, Y_PATIO + 1.75, 2.7]} texto="Manzanilla" />
+          <Etiqueta pos={[-6.1, Y_PATIO + 1.15, 2.2]} texto="Limoncillo" />
+          <Etiqueta pos={[-5.6, Y_PATIO + 1.75, 4.8]} texto="Ruda" />
+          <Etiqueta pos={[-4.55, Y_PATIO + 1.1, 4.35]} texto="Caléndula" />
+          <Etiqueta pos={[-3.3, Y_PATIO + 1.7, 4.75]} texto="Ortiga" />
+          <Etiqueta pos={[-7.1, Y_PATIO + 1.15, 6.15]} texto="Sábila" />
         </>
       )}
     </group>
@@ -513,11 +570,24 @@ function Botica({ etiquetas }) {
 
 /* ══════════════════════ LA CAÑA Y LA PANELA ══════════════════════ */
 
-/* El cañal instanciado: tallos + cogollos = 2 draw calls para todo el
-   cañaduzal. Sembrado determinista en la falda caliente, detrás del patio. */
+/* El cañal instanciado CON FIDELIDAD BOTÁNICA (el de antes se leía como un
+   pinar de conos — pecado capital de este mundo). La caña de verdad:
+   - tallo alto y DELGADO, amarillo de madura, con los NUDOS marcados;
+   - unas matas de la variedad MORADA entreveradas;
+   - hojas largas ACINTADAS que nacen del nudo y se ARQUEAN hacia afuera;
+   - las hojas viejas dobladas hacia abajo, ya pajizas, vistiendo el tallo;
+   - y el PENACHO plumoso plateado arriba, solo en las que ya espigaron.
+   Todo sigue instanciado: 5 draw calls para el cañaduzal entero. */
+const CANA_ALTO = 3.0; // más alta que una persona: eso se tiene que sentir
 function Canal({ n }) {
   const tallos = useRef(null);
-  const cogollos = useRef(null);
+  const nudos = useRef(null);
+  const hojas = useRef(null);
+  const hojasSecas = useRef(null);
+  const penachos = useRef(null);
+  const NUDOS_POR = 5;
+  const HOJAS_POR = 5;
+  const SECAS_POR = 3;
   const sitios = useMemo(() => {
     const rng = crearRng(217);
     const lista = [];
@@ -531,64 +601,197 @@ function Canal({ n }) {
       if (gauss(wx, wz, 5.5, 2.2, 3.4, 2.6) > 0.45) continue; // no invade el patio
       lista.push({
         wx, wz, y,
-        esc: 0.8 + rng() * 0.5,
+        esc: 0.85 + rng() * 0.45,
         giro: rng() * Math.PI * 2,
-        ladeo: (rng() - 0.5) * 0.16,
+        ladeo: (rng() - 0.5) * 0.14,
+        morada: rng() < 0.18, // la variedad morada, entreverada
+        espiga: rng() < 0.55, // no todas han espigado
+        rngHoja: rng() * 7,
       });
     }
     return lista;
   }, [n]);
 
   useEffect(() => {
-    const mt = tallos.current, mc = cogollos.current;
-    if (!mt || !mc) return;
-    const dummy = new THREE.Object3D();
+    const mt = tallos.current, mn = nudos.current, mh = hojas.current;
+    const ms = hojasSecas.current, mp = penachos.current;
+    if (!mt || !mn || !mh || !ms || !mp) return;
+    const S = new THREE.Matrix4(); // la matriz del tallo (todo cuelga de ella)
+    const L = new THREE.Object3D(); // pieza local sobre el tallo
+    const M = new THREE.Matrix4();
+    const HALF = new THREE.Matrix4();
     const tinte = new THREE.Color();
     const baseTallo = new THREE.Color(P.cana);
-    const baseVerde = new THREE.Color(P.canaVerde);
+    const baseMorada = new THREE.Color(P.canaMorada);
+    const baseHoja = new THREE.Color(P.hojaCana);
+    const baseSeca = new THREE.Color(P.hojaSeca);
+    const baseNudo = new THREE.Color(P.canaNudo);
+    const dummy = new THREE.Object3D();
+    let iN = 0, iH = 0, iS = 0, iP = 0;
     sitios.forEach((s, i) => {
-      // el tallo alto de la caña
-      dummy.position.set(s.wx, s.y + 1.15 * s.esc, s.wz);
+      // la matriz madre del tallo (inclinadito, girado, a su escala)
+      dummy.position.set(s.wx, s.y, s.wz);
       dummy.rotation.set(s.ladeo, s.giro, s.ladeo * 0.7);
       dummy.scale.set(s.esc, s.esc, s.esc);
       dummy.updateMatrix();
-      mt.setMatrixAt(i, dummy.matrix);
-      tinte.copy(baseTallo).offsetHSL(0, 0, (i % 5) * 0.014 - 0.028);
+      S.copy(dummy.matrix);
+
+      // el tallo delgado (geometría de origen en la base)
+      L.position.set(0, CANA_ALTO / 2, 0);
+      L.rotation.set(0, 0, 0);
+      L.scale.set(1, 1, 1);
+      L.updateMatrix();
+      M.multiplyMatrices(S, L.matrix);
+      mt.setMatrixAt(i, M);
+      tinte.copy(s.morada ? baseMorada : baseTallo).offsetHSL(0, 0, (i % 5) * 0.014 - 0.028);
       mt.setColorAt(i, tinte);
-      // el cogollo de hojas arriba: cono INVERTIDO = fuente de hojas abiertas
-      dummy.position.set(s.wx, s.y + 2.5 * s.esc, s.wz);
-      dummy.rotation.set(Math.PI + s.ladeo, s.giro, s.ladeo * 0.7);
-      dummy.scale.set(s.esc, s.esc * 0.9, s.esc);
-      dummy.updateMatrix();
-      mc.setMatrixAt(i, dummy.matrix);
-      tinte.copy(baseVerde).offsetHSL(0, 0, (i % 4) * 0.016 - 0.024);
-      mc.setColorAt(i, tinte);
+
+      // los NUDOS: anillos apenas más anchos, a tramos parejos
+      for (let k = 0; k < NUDOS_POR; k++) {
+        const hN = CANA_ALTO * (0.16 + (k / NUDOS_POR) * 0.72);
+        L.position.set(0, hN, 0);
+        L.rotation.set(0, 0, 0);
+        L.scale.set(1, 1, 1);
+        L.updateMatrix();
+        M.multiplyMatrices(S, L.matrix);
+        mn.setMatrixAt(iN, M);
+        tinte.copy(baseNudo);
+        if (s.morada) tinte.lerp(baseMorada, 0.5);
+        mn.setColorAt(iN, tinte);
+        iN += 1;
+      }
+
+      // las HOJAS acintadas: nacen de los nudos altos y se ARQUEAN hacia afuera
+      for (let k = 0; k < HOJAS_POR; k++) {
+        const f = k / HOJAS_POR;
+        const hH = CANA_ALTO * (0.55 + f * 0.42);
+        const ang = s.rngHoja + k * 2.4; // vuelta filotáctica
+        const inc = 0.7 + Math.sin(s.rngHoja * 3 + k) * 0.25 + f * 0.25;
+        L.position.set(0, hH, 0);
+        L.rotation.set(0, 0, 0);
+        L.rotation.order = 'YXZ';
+        L.rotation.y = ang;
+        L.rotation.x = inc;
+        const eH = 0.85 + ((i + k) % 4) * 0.12;
+        L.scale.set(1, eH, 1);
+        L.updateMatrix();
+        HALF.makeTranslation(0, 0.675, 0); // la base de la hoja pegada al nudo
+        M.multiplyMatrices(L.matrix, HALF).premultiply(S);
+        mh.setMatrixAt(iH, M);
+        tinte.copy(baseHoja).offsetHSL(0, 0, ((i + k) % 4) * 0.02 - 0.03);
+        mh.setColorAt(iH, tinte);
+        iH += 1;
+      }
+
+      // las hojas VIEJAS: dobladas hacia abajo, pajizas, vistiendo el tallo
+      for (let k = 0; k < SECAS_POR; k++) {
+        const hV = CANA_ALTO * (0.3 + k * 0.12);
+        const ang = s.rngHoja * 1.7 + k * 2.1;
+        L.position.set(0, hV, 0);
+        L.rotation.set(0, 0, 0);
+        L.rotation.order = 'YXZ';
+        L.rotation.y = ang;
+        L.rotation.x = 2.2 + (k % 2) * 0.25; // bien dobladas hacia el suelo
+        L.scale.set(0.8, 0.65, 0.8);
+        L.updateMatrix();
+        HALF.makeTranslation(0, 0.5, 0);
+        M.multiplyMatrices(L.matrix, HALF).premultiply(S);
+        ms.setMatrixAt(iS, M);
+        tinte.copy(baseSeca).offsetHSL(0, 0, (k % 3) * 0.02 - 0.02);
+        ms.setColorAt(iS, tinte);
+        iS += 1;
+      }
+
+      // el PENACHO plumoso arriba — solo donde la caña ya espigó
+      L.position.set(0, CANA_ALTO + 0.32, 0);
+      L.rotation.set(s.ladeo * 1.6, s.giro, 0);
+      const eP = s.espiga ? 1 : 0.0001; // instancia colapsada = caña sin espigar
+      L.scale.set(eP, eP, eP);
+      L.updateMatrix();
+      M.multiplyMatrices(S, L.matrix);
+      mp.setMatrixAt(iP, M);
+      mp.setColorAt(iP, tinte.set(P.penacho));
+      iP += 1;
     });
     mt.instanceMatrix.needsUpdate = true;
-    mc.instanceMatrix.needsUpdate = true;
-    if (mt.instanceColor) mt.instanceColor.needsUpdate = true;
-    if (mc.instanceColor) mc.instanceColor.needsUpdate = true;
+    mn.instanceMatrix.needsUpdate = true;
+    mh.instanceMatrix.needsUpdate = true;
+    ms.instanceMatrix.needsUpdate = true;
+    mp.instanceMatrix.needsUpdate = true;
+    [mt, mn, mh, ms, mp].forEach((m) => {
+      if (m.instanceColor) m.instanceColor.needsUpdate = true;
+    });
   }, [sitios]);
 
   return (
     <group>
+      {/* el tallo: alto, DELGADO, de entrenudos */}
       <instancedMesh ref={tallos} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
-        <cylinderGeometry args={[0.055, 0.075, 2.3, 6]} />
+        <cylinderGeometry args={[0.045, 0.06, CANA_ALTO, 6]} />
         <meshLambertMaterial flatShading />
       </instancedMesh>
-      {/* el penacho: cono facetado invertido (fuente) que lee como hojas abiertas */}
-      <instancedMesh ref={cogollos} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
-        <coneGeometry args={[0.38, 1.25, 6, 1, true]} />
+      {/* el anillo del nudo */}
+      <instancedMesh ref={nudos} args={[undefined, undefined, sitios.length * NUDOS_POR]} frustumCulled={false}>
+        <cylinderGeometry args={[0.062, 0.062, 0.055, 6]} />
+        <meshLambertMaterial flatShading />
+      </instancedMesh>
+      {/* la hoja acintada: cono largo aplanado, base en el origen (ver HALF) */}
+      <instancedMesh ref={hojas} args={[undefined, undefined, sitios.length * HOJAS_POR]} frustumCulled={false}>
+        <coneGeometry args={[0.055, 1.35, 4]} />
         <meshLambertMaterial flatShading side={THREE.DoubleSide} />
+      </instancedMesh>
+      {/* la hoja seca doblada */}
+      <instancedMesh ref={hojasSecas} args={[undefined, undefined, sitios.length * SECAS_POR]} frustumCulled={false}>
+        <coneGeometry args={[0.05, 1.0, 4]} />
+        <meshLambertMaterial flatShading side={THREE.DoubleSide} />
+      </instancedMesh>
+      {/* la espiga plumosa: huso fino plateado */}
+      <instancedMesh ref={penachos} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
+        <coneGeometry args={[0.11, 0.72, 5]} />
+        <meshLambertMaterial flatShading transparent opacity={0.92} />
       </instancedMesh>
     </group>
   );
 }
 
-/* El buey barcino: cuerpo, cabeza con cachos, patas y rabo. Low-poly noble. */
-function Buey() {
+/* El buey barcino, VIVO: antes era un cuerpo rígido que resbalaba en círculo.
+   Ahora camina en rubber-hose: las patas dan el paso en diagonal, la cabeza
+   cabecea con el andar, el rabo (con su borla) espanta moscas, y el cuerpo
+   respira con un squash & stretch manso. reduced-motion lo deja quieto. */
+const PASO_BUEY = 3.1; // frecuencia del paso, casada con la vuelta del molino
+function Buey({ reducedMotion }) {
+  const cuerpo = useRef(null);
+  const cabeza = useRef(null);
+  const rabo = useRef(null);
+  const patas = useRef([]);
+  useFrame(({ clock }) => {
+    if (reducedMotion) return;
+    const t = clock.elapsedTime * PASO_BUEY;
+    // las patas: pares en diagonal, péndulo desde la cadera
+    patas.current.forEach((p2, i) => {
+      if (!p2) return;
+      const fase = i === 0 || i === 3 ? 0 : Math.PI;
+      p2.rotation.z = Math.sin(t + fase) * 0.38;
+    });
+    // el cuerpo sube un pelín en cada paso y se estira/aplasta (squash manso)
+    if (cuerpo.current) {
+      const s = Math.sin(t * 2) * 0.03;
+      cuerpo.current.position.y = Math.abs(Math.sin(t)) * 0.045;
+      cuerpo.current.scale.set(1 - s * 0.6, 1 + s, 1 - s * 0.6);
+    }
+    // la cabeza cabecea con el esfuerzo del tiro
+    if (cabeza.current) {
+      cabeza.current.rotation.z = Math.sin(t) * 0.12 - 0.06;
+      cabeza.current.rotation.x = Math.sin(t * 0.31) * 0.08;
+    }
+    // el rabo se balancea a su propio ritmo (espanta moscas, no marca el paso)
+    if (rabo.current) {
+      rabo.current.rotation.x = Math.sin(clock.elapsedTime * 1.9) * 0.55;
+      rabo.current.rotation.z = 0.5 + Math.sin(clock.elapsedTime * 1.3) * 0.14;
+    }
+  });
   return (
-    <group>
+    <group ref={cuerpo}>
       {/* cuerpo */}
       <mesh position={[0, 0.62, 0]} scale={[1.35, 0.78, 0.62]}>
         <sphereGeometry args={[0.5, 8, 6]} />
@@ -599,15 +802,24 @@ function Buey() {
         <sphereGeometry args={[0.4, 7, 5]} />
         <meshLambertMaterial color={mezclar(P.buey, '#8a7355', 0.3)} flatShading />
       </mesh>
-      {/* cabeza y hocico */}
-      <group position={[0.78, 0.72, 0]}>
+      {/* cabeza y hocico (pivota en la nuca para el cabeceo) */}
+      <group ref={cabeza} position={[0.78, 0.72, 0]}>
         <mesh scale={[0.9, 0.8, 0.7]}>
           <sphereGeometry args={[0.24, 7, 6]} />
           <meshLambertMaterial color={mezclar(P.buey, TINTE, 0.12)} flatShading />
         </mesh>
         <mesh position={[0.18, -0.08, 0]} scale={[0.7, 0.5, 0.55]}>
           <sphereGeometry args={[0.18, 6, 5]} />
-          <meshLambertMaterial color={mezclar(P.buey, '#8a7355', 0.35)} flatShading />
+          <meshLambertMaterial color={mezclar(P.buey, '#d8c4a2', 0.5)} flatShading />
+        </mesh>
+        {/* los ojos mansos (la mirada rubber-hose del que trabaja sin afán) */}
+        <mesh position={[0.13, 0.06, 0.13]}>
+          <sphereGeometry args={[0.03, 5, 4]} />
+          <meshBasicMaterial color="#241a10" />
+        </mesh>
+        <mesh position={[0.13, 0.06, -0.13]}>
+          <sphereGeometry args={[0.03, 5, 4]} />
+          <meshBasicMaterial color="#241a10" />
         </mesh>
         {/* los cachos */}
         <mesh position={[0.02, 0.2, 0.14]} rotation={[0.5, 0, -0.5]}>
@@ -628,20 +840,37 @@ function Buey() {
           <meshLambertMaterial color={P.buey} flatShading />
         </mesh>
       </group>
-      {/* patas */}
+      {/* patas: pivotan en la cadera (la geometría cuelga hacia abajo) */}
       {[
         [0.42, 0.34], [0.42, -0.24], [-0.42, 0.3], [-0.42, -0.26],
       ].map((p2, i) => (
-        <mesh key={i} position={[p2[0], 0.22, p2[1] * 0.62]}>
-          <cylinderGeometry args={[0.055, 0.07, 0.46, 5]} />
-          <meshLambertMaterial color={mezclar(P.buey, '#6a5a44', 0.4)} flatShading />
-        </mesh>
+        <group
+          key={i}
+          position={[p2[0], 0.45, p2[1] * 0.62]}
+          ref={(el) => { patas.current[i] = el; }}
+        >
+          <mesh position={[0, -0.23, 0]}>
+            <cylinderGeometry args={[0.055, 0.07, 0.46, 5]} />
+            <meshLambertMaterial color={mezclar(P.buey, '#6a5a44', 0.4)} flatShading />
+          </mesh>
+          {/* la pezuña */}
+          <mesh position={[0, -0.45, 0.01]} scale={[1, 0.5, 1.1]}>
+            <sphereGeometry args={[0.075, 5, 4]} />
+            <meshLambertMaterial color={mezclar(P.buey, '#3a2c1c', 0.6)} flatShading />
+          </mesh>
+        </group>
       ))}
-      {/* rabo */}
-      <mesh position={[-0.68, 0.62, 0]} rotation={[0, 0, 0.5]}>
-        <cylinderGeometry args={[0.02, 0.035, 0.5, 4]} />
-        <meshLambertMaterial color={mezclar(P.buey, '#6a5a44', 0.5)} flatShading />
-      </mesh>
+      {/* rabo: pivota arriba y remata en su borla */}
+      <group ref={rabo} position={[-0.66, 0.84, 0]} rotation={[0, 0, 0.5]}>
+        <mesh position={[0, -0.24, 0]}>
+          <cylinderGeometry args={[0.02, 0.032, 0.48, 4]} />
+          <meshLambertMaterial color={mezclar(P.buey, '#6a5a44', 0.5)} flatShading />
+        </mesh>
+        <mesh position={[0, -0.5, 0]} scale={[1, 1.4, 1]}>
+          <sphereGeometry args={[0.05, 5, 4]} />
+          <meshLambertMaterial color={mezclar(P.buey, '#3a2c1c', 0.65)} flatShading />
+        </mesh>
+      </group>
     </group>
   );
 }
@@ -658,23 +887,40 @@ function Trapiche({ reducedMotion }) {
   });
   return (
     <group position={TRAPICHE_POS}>
-      {/* la enramada: cuatro horcones altos y techo de paja a un agua,
-          suficientemente arriba para que el molino se LEA debajo */}
+      {/* la enramada, DESTAPADA: antes el techo era una losa baja y opaca que
+          escondía la única pieza viva del mundo. Ahora: cuatro horcones BIEN
+          altos y techo de paja a dos aguas, con los hastiales abiertos — el
+          molino y el buey se LEEN debajo desde la cámara. */}
       {[
         [-1.35, -1.15], [1.35, -1.15], [-1.35, 1.15], [1.35, 1.15],
       ].map((h, i) => (
-        <mesh key={i} position={[h[0], 1.4, h[1]]}>
-          <cylinderGeometry args={[0.07, 0.09, 2.8, 5]} />
+        <mesh key={i} position={[h[0], 1.8, h[1]]}>
+          <cylinderGeometry args={[0.07, 0.09, 3.6, 5]} />
           <meshLambertMaterial color={P.maderaVieja} flatShading />
         </mesh>
       ))}
-      <mesh position={[0, 2.86, 0]} rotation={[0, 0, 0.14]}>
-        <boxGeometry args={[3.4, 0.12, 2.9]} />
+      {/* las soleras que amarran los horcones */}
+      <mesh position={[0, 3.56, -1.15]}>
+        <boxGeometry args={[3.1, 0.1, 0.1]} />
+        <meshLambertMaterial color={P.maderaVieja} flatShading />
+      </mesh>
+      <mesh position={[0, 3.56, 1.15]}>
+        <boxGeometry args={[3.1, 0.1, 0.1]} />
+        <meshLambertMaterial color={P.maderaVieja} flatShading />
+      </mesh>
+      {/* las dos aguas de paja (planos inclinados, no losa) */}
+      <mesh position={[0, 3.94, -0.82]} rotation={[0.62, 0, 0]}>
+        <boxGeometry args={[3.9, 0.09, 1.85]} />
         <meshLambertMaterial color={P.paja} flatShading />
       </mesh>
-      <mesh position={[0, 3.0, 0]} rotation={[0, 0, 0.14]}>
-        <boxGeometry args={[2.9, 0.1, 2.4]} />
-        <meshLambertMaterial color={mezclar(P.paja, '#a8873e', 0.4)} flatShading />
+      <mesh position={[0, 3.94, 0.82]} rotation={[-0.62, 0, 0]}>
+        <boxGeometry args={[3.9, 0.09, 1.85]} />
+        <meshLambertMaterial color={mezclar(P.paja, '#b39348', 0.35)} flatShading />
+      </mesh>
+      {/* el caballete que remata */}
+      <mesh position={[0, 4.42, 0]} rotation={[0, 0, 0]}>
+        <boxGeometry args={[3.95, 0.12, 0.24]} />
+        <meshLambertMaterial color={mezclar(P.paja, '#a8873e', 0.5)} flatShading />
       </mesh>
 
       {/* la mesa del molino */}
@@ -716,9 +962,10 @@ function Trapiche({ reducedMotion }) {
           <boxGeometry args={[0.9, 0.1, 0.1]} />
           <meshLambertMaterial color={P.maderaClara} flatShading />
         </mesh>
-        {/* el buey, enyugado al extremo, andando su círculo */}
-        <group position={[2.9, 0, 0]} rotation={[0, -Math.PI / 2, 0]} scale={1.2}>
-          <Buey />
+        {/* el buey, enyugado al extremo, andando su círculo — mirando HACIA
+            donde camina (antes iba de para atrás y el techo tapaba la pena) */}
+        <group position={[2.9, 0, 0]} rotation={[0, Math.PI / 2, 0]} scale={1.2}>
+          <Buey reducedMotion={reducedMotion} />
           {/* el yugo sobre la nuca */}
           <mesh position={[0.62, 0.98, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.045, 0.045, 0.7, 6]} />
@@ -749,12 +996,35 @@ function Trapiche({ reducedMotion }) {
   );
 }
 
-/* El canal del guarapo: canoa de madera inclinada del molino a la paila,
-   con la cinta de jugo dorado corriendo adentro. */
-function CanalGuarapo() {
-  // del trapiche (6.2, 1.2) hacia la hornilla (3.4, 4.2): largo ~3.9
+/* El canal del guarapo, CORRIENDO: antes la canoa estaba seca (geometría
+   quieta). Ahora el jugo baja en pulsos brillantes del molino a la paila y
+   cae en chorrito con su salpicón de espuma. reduced-motion: cinta quieta. */
+function CanalGuarapo({ reducedMotion }) {
+  const pulsos = useRef(null);
+  const chorro = useRef(null);
+  // del trapiche (6.2, 1.2) hacia la hornilla (3.4, 4.2): largo ~3.9;
+  // el extremo local +x queda en el molino (arriba), el -x en la paila (abajo)
+  useFrame(({ clock }) => {
+    if (reducedMotion) return;
+    const t = clock.elapsedTime;
+    if (pulsos.current) {
+      pulsos.current.children.forEach((p2, i) => {
+        const f = (t * 0.55 + i * 0.27) % 1;
+        p2.position.x = 1.75 - f * 3.5; // baja del molino hacia la paila
+        p2.position.y = 0.085 + Math.sin(f * Math.PI) * 0.015;
+        p2.scale.setScalar(0.75 + Math.sin(f * Math.PI) * 0.45);
+      });
+    }
+    if (chorro.current) {
+      const s = 0.9 + Math.sin(t * 7.3) * 0.14;
+      chorro.current.scale.set(s, 1 + Math.sin(t * 9.1) * 0.12, s);
+    }
+  });
   return (
-    <group position={[4.8, Y_PATIO + 0.55, 2.7]} rotation={[0, 0.82, -0.13]}>
+    // BAJA, como es de verdad: la canoa va casi a ras de patio y el buey la
+    // pasa por encima en su vuelta. La caída va del molino (+x, arriba)
+    // hacia la paila (-x, abajo) — antes estaba inclinada AL REVÉS.
+    <group position={[4.8, Y_PATIO + 0.34, 2.7]} rotation={[0, 0.82, 0.09]}>
       <mesh>
         <boxGeometry args={[4.0, 0.12, 0.3]} />
         <meshLambertMaterial color={P.maderaVieja} flatShading />
@@ -772,13 +1042,39 @@ function CanalGuarapo() {
         <boxGeometry args={[3.9, 0.03, 0.16]} />
         <meshLambertMaterial color={P.guarapo} flatShading />
       </mesh>
-      {/* dos horquetas que lo sostienen */}
-      <mesh position={[-1.3, -0.32, 0]}>
-        <cylinderGeometry args={[0.045, 0.06, 0.6, 5]} />
+      {/* los pulsos de guarapo que BAJAN (el brillo que corre) */}
+      <group ref={pulsos}>
+        {[0, 1, 2, 3].map((i) => (
+          <mesh key={i} position={[1.75 - i * 0.9, 0.09, 0]}>
+            <boxGeometry args={[0.42, 0.035, 0.13]} />
+            <meshLambertMaterial color={mezclar(P.guarapo, '#f0c86a', 0.55)} flatShading />
+          </mesh>
+        ))}
+      </group>
+      {/* el chorrito que cae del pico de la canoa al recibidor */}
+      <group position={[-2.0, -0.12, 0]}>
+        <mesh ref={chorro} position={[0, -0.06, 0]}>
+          <cylinderGeometry args={[0.035, 0.05, 0.3, 5]} />
+          <meshLambertMaterial color={mezclar(P.guarapo, '#f0c86a', 0.4)} flatShading />
+        </mesh>
+        {/* el RECIBIDOR: el cajón de madera donde llega el guarapo antes de
+            pasar a la paila (así es en el trapiche de verdad) */}
+        <mesh position={[-0.1, -0.32, 0]}>
+          <boxGeometry args={[0.55, 0.34, 0.45]} />
+          <meshLambertMaterial color={mezclar(P.maderaVieja, '#5c4228', 0.3)} flatShading />
+        </mesh>
+        <mesh position={[-0.1, -0.18, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.45, 0.36]} />
+          <meshLambertMaterial color={P.guarapo} />
+        </mesh>
+      </group>
+      {/* dos horquetas cortas que la sostienen */}
+      <mesh position={[-1.3, -0.2, 0]}>
+        <cylinderGeometry args={[0.045, 0.06, 0.36, 5]} />
         <meshLambertMaterial color={P.maderaVieja} flatShading />
       </mesh>
-      <mesh position={[1.3, -0.32, 0]}>
-        <cylinderGeometry args={[0.045, 0.06, 0.6, 5]} />
+      <mesh position={[1.3, -0.2, 0]}>
+        <cylinderGeometry args={[0.045, 0.06, 0.36, 5]} />
         <meshLambertMaterial color={P.maderaVieja} flatShading />
       </mesh>
     </group>
@@ -792,6 +1088,7 @@ function Hornilla({ reducedMotion, tier }) {
   const fuego = useRef(null);
   const burbujas = useRef(null);
   const humos = useRef(null);
+  const espuma = useRef(null);
   const puffs = useMemo(() => {
     const rng = crearRng(310);
     return Array.from({ length: 4 }, (_, i) => ({
@@ -813,6 +1110,13 @@ function Hornilla({ reducedMotion, tier }) {
         const f = (t * 0.7 + i * 0.23) % 1;
         b.position.y = 0.02 + f * 0.1;
         b.scale.setScalar(0.5 + f * 0.8);
+      });
+    }
+    // la espuma de la cachaza gira despacio hacia la orilla de la paila
+    if (espuma.current && !reducedMotion) {
+      espuma.current.rotation.y = t * 0.35;
+      espuma.current.children.forEach((e, i) => {
+        e.scale.setScalar(0.85 + Math.sin(t * 2.1 + i * 1.7) * 0.2);
       });
     }
     // el humo: cada bocanada sube, deriva y se disuelve
@@ -883,11 +1187,42 @@ function Hornilla({ reducedMotion, tier }) {
           </mesh>
         ))}
       </group>
-      {/* el mecedor (la pala larga de remover) apoyado en la paila */}
-      <mesh position={[0.5, 1.25, 0.2]} rotation={[0.2, 0, -0.8]}>
-        <cylinderGeometry args={[0.022, 0.028, 1.3, 5]} />
-        <meshLambertMaterial color={P.maderaClara} flatShading />
-      </mesh>
+      {/* la ESPUMA de la cachaza: motas claras que giran hacia la orilla,
+          esperando el cucharón (esa limpieza es la que da panela clara) */}
+      <group ref={espuma} position={[0, 1.12, 0]}>
+        {[0, 1, 2, 3, 4].map((i) => {
+          const a = (i / 5) * Math.PI * 2;
+          const r = 0.34 + (i % 2) * 0.12;
+          return (
+            <mesh key={i} position={[Math.cos(a) * r, 0.015, Math.sin(a) * r]} scale={[1, 0.5, 1]}>
+              <sphereGeometry args={[0.06, 5, 4]} />
+              <meshLambertMaterial color={P.espuma} flatShading />
+            </mesh>
+          );
+        })}
+      </group>
+      {/* la olla de barro donde va la cachaza retirada, con su cucharón */}
+      <group position={[0.95, 0, 0.55]}>
+        <mesh position={[0, 0.2, 0]}>
+          <cylinderGeometry args={[0.2, 0.14, 0.4, 8]} />
+          <meshLambertMaterial color={mezclar(P.adobe, '#7a4a2e', 0.35)} flatShading />
+        </mesh>
+        <mesh position={[0, 0.41, 0]} scale={[1, 0.4, 1]}>
+          <sphereGeometry args={[0.16, 6, 4]} />
+          <meshLambertMaterial color={P.cachaza} flatShading />
+        </mesh>
+        {/* el cucharón de retirar espuma, recostado a la olla */}
+        <group position={[0.14, 0.3, 0.1]} rotation={[0.15, 0.4, -0.9]}>
+          <mesh>
+            <cylinderGeometry args={[0.018, 0.022, 0.85, 5]} />
+            <meshLambertMaterial color={P.maderaClara} flatShading />
+          </mesh>
+          <mesh position={[0, -0.44, 0]} scale={[1, 0.45, 1]}>
+            <sphereGeometry args={[0.07, 6, 5]} />
+            <meshLambertMaterial color={mezclar(P.maderaClara, '#8a6a3e', 0.4)} flatShading />
+          </mesh>
+        </group>
+      </group>
       {/* la chimenea y su humo */}
       <mesh position={[-0.6, 1.25, -0.4]}>
         <boxGeometry args={[0.36, 0.85, 0.36]} />
@@ -913,8 +1248,21 @@ function Hornilla({ reducedMotion, tier }) {
 }
 
 /* La mesa de moldeo: las gaveras (los moldes de madera con sus casillas) y las
-   panelas ya cuajadas, unas en el molde y otras apiladas para el mercado. */
-function MesaGaveras() {
+   panelas ya cuajadas, unas en el molde y otras apiladas para el mercado.
+   La casilla del medio CUAJA a la vista: la miel dorada oscurece despacio
+   hasta el pardo panela, en ciclo (antes la panela nunca cuajaba). */
+function MesaGaveras({ reducedMotion }) {
+  const cuajando = useRef(null);
+  const colMiel = useMemo(() => new THREE.Color(mezclar(P.guarapo, '#f0c86a', 0.35)), []);
+  const colPanela = useMemo(() => new THREE.Color(P.panela), []);
+  useFrame(({ clock }) => {
+    const m = cuajando.current;
+    if (reducedMotion || !m) return;
+    const f = smoothstep(0.15, 0.85, (clock.elapsedTime * 0.09) % 1);
+    m.material.color.lerpColors(colMiel, colPanela, f);
+    // al cuajar se asienta un pelín (squash lento de asentarse)
+    m.scale.y = 1.15 - f * 0.15;
+  });
   return (
     <group position={[0.7, Y_PATIO, 5.9]} rotation={[0, 0.25, 0]}>
       {/* la mesa */}
@@ -951,9 +1299,9 @@ function MesaGaveras() {
           <boxGeometry args={[1.0, 0.14, 0.05]} />
           <meshLambertMaterial color={P.maderaVieja} flatShading />
         </mesh>
-        {/* las panelas dentro de sus casillas */}
+        {/* las panelas dentro de sus casillas: la del medio cuajando en vivo */}
         {[-0.335, 0, 0.335].map((x, i) => (
-          <mesh key={i} position={[x, 0.09, 0]}>
+          <mesh key={i} position={[x, 0.09, 0]} ref={i === 1 ? cuajando : undefined}>
             <boxGeometry args={[0.24, 0.1, 0.56]} />
             <meshLambertMaterial
               color={mezclar(P.panela, '#c07a3a', i * 0.15)}
@@ -985,7 +1333,7 @@ function MesaGaveras() {
    y esto vivía repetido e inconexo. */
 const RECORRIDO_PANELA = [
   { paso: 1, texto: 'La caña', pos: [9.5, 3.6, -4.5] },
-  { paso: 2, texto: 'El molino', pos: [6.2, 3.4, 1.2] },
+  { paso: 2, texto: 'El molino', pos: [6.2, 2.5, 1.6] },
   { paso: 3, texto: 'El jugo', pos: [4.8, 1.9, 2.8] },
   { paso: 4, texto: 'La paila', pos: [3.2, 2.5, 4.3] },
   { paso: 5, texto: 'La panela', pos: [0.7, 2.0, 5.9] },
@@ -1028,6 +1376,144 @@ function EnfocarPaso({ paso, reducedMotion, controlsRef }) {
   return <group name="foco-paso" position={[objetivo.x, objetivo.y, objetivo.z]} />;
 }
 
+/* ══════════════════════ LA GENTE DEL TRAPICHE ══════════════════════ */
+/* La copia hablaba del panelero que conoce el punto y del saber que pasa de
+   abuela a nieta — y en escena no había NI UNA persona. Aquí llegan las dos,
+   rubber-hose de la casa (línea de tinta gruesa, guantes, squash & stretch),
+   como billboards SVG con el MISMO patrón de `Bicho` (Html + distanceFactor). */
+
+/* El panelero: sombrero aguadeño, camisa remangada y el MECEDOR en la mano,
+   revolviendo la paila sin afán. El brazo del mecedor gira por CSS. */
+function PaneleroSVG({ alto = 116 }) {
+  return (
+    <svg
+      width={(120 / 150) * alto}
+      height={alto}
+      viewBox="0 0 120 150"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* el brazo del mecedor, DETRÁS del cuerpo, girando desde el hombro */}
+      <g className="pan-brazo">
+        {/* el mecedor: palo largo con su paleta, hacia la paila */}
+        <line x1="92" y1="50" x2="36" y2="126" stroke={ROPA.tinta} strokeWidth="7" strokeLinecap="round" />
+        <line x1="92" y1="50" x2="36" y2="126" stroke={P.maderaClara} strokeWidth="4" strokeLinecap="round" />
+        <ellipse cx="33" cy="131" rx="12.5" ry="7.5" transform="rotate(-53 33 131)" fill={P.maderaClara} stroke={ROPA.tinta} strokeWidth="1.6" />
+        {/* el brazo-manguera y el guante que agarra el palo */}
+        <path d="M66 57 Q76 62 80 68" stroke={ROPA.tinta} strokeWidth="6.5" strokeLinecap="round" />
+        <circle cx="81" cy="70" r="6.5" fill={ROPA.guante} stroke={ROPA.tinta} strokeWidth="2.2" />
+      </g>
+      {/* cuerpo + cabeza (respiran juntos) */}
+      <g className="pan-cuerpo">
+        {/* piernas y botas */}
+        <line x1="49" y1="102" x2="46" y2="132" stroke={ROPA.pantalon} strokeWidth="9" strokeLinecap="round" />
+        <line x1="62" y1="102" x2="65" y2="132" stroke={ROPA.pantalon} strokeWidth="9" strokeLinecap="round" />
+        <ellipse cx="44" cy="138" rx="8.5" ry="4.5" fill={ROPA.tinta} />
+        <ellipse cx="67" cy="138" rx="8.5" ry="4.5" fill={ROPA.tinta} />
+        {/* la camisa de faena */}
+        <path
+          d="M43 50 Q55 44 68 50 L71 94 Q55 101 40 94 Z"
+          fill={ROPA.camisa}
+          stroke={ROPA.tinta}
+          strokeWidth="2.5"
+        />
+        {/* el pantalón a la cintura */}
+        <path d="M40 90 L71 90 L70 106 Q55 111 41 106 Z" fill={ROPA.pantalon} stroke={ROPA.tinta} strokeWidth="2.2" />
+        {/* el brazo izquierdo en jarra */}
+        <path d="M45 58 Q31 66 38 77" stroke={ROPA.tinta} strokeWidth="6.5" strokeLinecap="round" fill="none" />
+        <circle cx="39" cy="79" r="6" fill={ROPA.guante} stroke={ROPA.tinta} strokeWidth="2.2" />
+        {/* la cabeza: cachetes, bigote y sonrisa de quien conoce el punto */}
+        <circle cx="55" cy="35" r="13" fill={ROPA.piel} stroke={ROPA.tinta} strokeWidth="2.5" />
+        <circle cx="50.5" cy="33" r="1.9" fill={ROPA.tinta} />
+        <circle cx="60.5" cy="33" r="1.9" fill={ROPA.tinta} />
+        <path d="M47 38 Q51 42 55 39 Q59 42 63 38" stroke={ROPA.tinta} strokeWidth="2.2" fill="none" strokeLinecap="round" />
+        <path d="M50 44 Q55 47 60 44" stroke={ROPA.tinta} strokeWidth="1.8" fill="none" strokeLinecap="round" />
+        {/* el aguadeño: ala ancha y copa con cinta */}
+        <ellipse cx="55" cy="25" rx="25" ry="7" fill={ROPA.sombrero} stroke={ROPA.tinta} strokeWidth="2.5" />
+        <path d="M42 24 Q42 10 55 10 Q68 10 68 24 Z" fill={ROPA.sombrero} stroke={ROPA.tinta} strokeWidth="2.5" />
+        <rect x="42" y="19" width="26" height="4.5" fill={ROPA.tinta} />
+      </g>
+    </svg>
+  );
+}
+
+/* La yerbatera de la botica: ruana de índigo con su guarda de maíz, pañoleta
+   de cochinilla, canasto al brazo y el manojo de hierbas en alto — el saber
+   que pasa de abuela a nieta, presente en escena. */
+function YerbateraSVG({ alto = 108 }) {
+  return (
+    <svg
+      width={(110 / 150) * alto}
+      height={alto}
+      viewBox="0 0 110 150"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g className="bot-cuerpo">
+        {/* alpargatas */}
+        <ellipse cx="42" cy="140" rx="8" ry="4" fill={ROPA.sombrero} stroke={ROPA.tinta} strokeWidth="2" />
+        <ellipse cx="63" cy="140" rx="8" ry="4" fill={ROPA.sombrero} stroke={ROPA.tinta} strokeWidth="2" />
+        {/* la falda de tierra */}
+        <path d="M32 96 L74 96 L79 132 Q53 138 27 132 Z" fill={ROPA.falda} stroke={ROPA.tinta} strokeWidth="2.4" />
+        {/* la ruana de índigo con su guarda */}
+        <path d="M36 46 L70 46 L79 98 Q53 106 26 98 Z" fill={ROPA.ruana} stroke={ROPA.tinta} strokeWidth="2.5" />
+        <path d="M29 88 Q53 96 77 88" stroke={ROPA.ruanaGuarda} strokeWidth="3.5" fill="none" />
+        <path d="M53 46 L53 62" stroke={ROPA.tinta} strokeWidth="2" />
+        {/* el brazo del canasto */}
+        <path d="M38 60 Q26 72 30 86" stroke={ROPA.tinta} strokeWidth="6" strokeLinecap="round" fill="none" />
+        <circle cx="30" cy="88" r="5" fill={ROPA.piel} stroke={ROPA.tinta} strokeWidth="2" />
+        {/* el canasto con sus matas recogidas */}
+        <path d="M16 92 Q28 88 40 92 L37 104 Q28 108 19 104 Z" fill={P.maderaClara} stroke={ROPA.tinta} strokeWidth="2.2" />
+        <path d="M18 97 Q28 100 38 97" stroke={ROPA.tinta} strokeWidth="1.4" fill="none" />
+        <circle cx="23" cy="90" r="3.4" fill={P.hierbabuena} />
+        <circle cx="29" cy="88" r="3.8" fill={P.ortiga} />
+        <circle cx="35" cy="90" r="3.2" fill={P.limoncillo} />
+        {/* la cabeza: gafitas redondas y sonrisa de abuela */}
+        <circle cx="53" cy="32" r="12" fill={ROPA.piel} stroke={ROPA.tinta} strokeWidth="2.5" />
+        <circle cx="48.5" cy="31" r="3.6" fill="none" stroke={ROPA.tinta} strokeWidth="1.6" />
+        <circle cx="58.5" cy="31" r="3.6" fill="none" stroke={ROPA.tinta} strokeWidth="1.6" />
+        <line x1="52.1" y1="31" x2="55" y2="31" stroke={ROPA.tinta} strokeWidth="1.6" />
+        <circle cx="48.5" cy="31.5" r="1.5" fill={ROPA.tinta} />
+        <circle cx="58.5" cy="31.5" r="1.5" fill={ROPA.tinta} />
+        <path d="M48 39 Q53 43 58 39" stroke={ROPA.tinta} strokeWidth="2" fill="none" strokeLinecap="round" />
+        {/* la pañoleta de cochinilla, con su nudo */}
+        <path d="M41 30 Q41 16 53 16 Q65 16 65 30 Q53 24 41 30 Z" fill={ROPA.panoleta} stroke={ROPA.tinta} strokeWidth="2.4" />
+        <path d="M63 30 Q70 34 68 40" stroke={ROPA.panoleta} strokeWidth="5" strokeLinecap="round" fill="none" />
+        {/* la trenza negra */}
+        <path d="M43 34 Q38 46 40 56" stroke={ROPA.tinta} strokeWidth="4.5" strokeLinecap="round" fill="none" />
+      </g>
+      {/* el brazo del manojo, en alto, meciéndose (mostrándole a la nieta) */}
+      <g className="bot-brazo">
+        <path d="M68 58 Q80 52 86 42" stroke={ROPA.tinta} strokeWidth="6" strokeLinecap="round" fill="none" />
+        <circle cx="87" cy="41" r="5" fill={ROPA.piel} stroke={ROPA.tinta} strokeWidth="2" />
+        {/* el manojo de hierbas con su florecita */}
+        <path d="M87 38 Q84 26 78 20" stroke={P.ortiga} strokeWidth="2.6" strokeLinecap="round" fill="none" />
+        <path d="M88 37 Q89 24 86 16" stroke={P.hierbabuena} strokeWidth="2.6" strokeLinecap="round" fill="none" />
+        <path d="M89 38 Q95 27 100 23" stroke={P.limoncillo} strokeWidth="2.6" strokeLinecap="round" fill="none" />
+        <circle cx="86" cy="14" r="3" fill={P.manzanillaFlor} stroke="#e2b93b" strokeWidth="1.4" />
+        <circle cx="101" cy="21" r="2.6" fill={P.calendulaFlor} />
+      </g>
+    </svg>
+  );
+}
+
+/* Una persona en escena: billboard Html con el patrón exacto de `Bicho`. */
+function Persona({ pos, df = 7, reducedMotion, title, children }) {
+  return (
+    <group position={pos}>
+      <Html center distanceFactor={df} zIndexRange={[24, 0]}>
+        <div
+          className={`mundo-fauna bocana-persona${reducedMotion ? ' bocana-persona--quieta' : ''}`}
+          aria-hidden="true"
+          title={title}
+        >
+          {children}
+        </div>
+      </Html>
+    </group>
+  );
+}
+
 /* ══════════════════════ LA ESCENA COMPLETA ══════════════════════ */
 
 function EscenaBoticaCana({ tier, reducedMotion, etiquetas, paso }) {
@@ -1044,7 +1530,11 @@ function EscenaBoticaCana({ tier, reducedMotion, etiquetas, paso }) {
   return (
     <>
       <color attach="background" args={[DIA.fondo]} />
-      {perfil.fog && <fog attach="fog" args={[DIA.niebla, DIA.nieblaCerca + 4, DIA.nieblaLejos]} />}
+      {/* la niebla, corrida bien lejos: antes lavaba el cañal y las lomas
+          hasta dejar el fondo lechoso */}
+      {perfil.fog && (
+        <fog attach="fog" args={[DIA.niebla, DIA.nieblaCerca + 12, DIA.nieblaLejos + 14]} />
+      )}
       <LucesDia />
       <NubesDia />
 
@@ -1052,20 +1542,95 @@ function EscenaBoticaCana({ tier, reducedMotion, etiquetas, paso }) {
         <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
       </mesh>
 
-      {/* la botica y sus siete matas */}
-      <Botica etiquetas={etiquetas} />
+      {/* la botica y sus siete matas, con su brisa */}
+      <Botica etiquetas={etiquetas} reducedMotion={reducedMotion} />
 
       {/* la caña y la panela, el proceso en línea */}
       <Canal n={nCanas} />
       <Trapiche reducedMotion={reducedMotion} />
-      <CanalGuarapo />
+      <CanalGuarapo reducedMotion={reducedMotion} />
       <Hornilla reducedMotion={reducedMotion} tier={tier} />
-      <MesaGaveras />
+      <MesaGaveras reducedMotion={reducedMotion} />
       {etiquetas && <PasosPanela pasoActivo={paso} />}
+
+      {/* LA GENTE: el panelero en su paila y la yerbatera en su botica */}
+      <Persona
+        pos={[4.35, Y_PATIO + 0.82, 4.85]}
+        reducedMotion={reducedMotion}
+        title="El panelero, revolviendo la paila hasta el punto"
+      >
+        <PaneleroSVG />
+      </Persona>
+      <Persona
+        pos={[-5.75, Y_PATIO + 0.78, 5.5]}
+        reducedMotion={reducedMotion}
+        title="La yerbatera de la botica, con su manojo y su canasto"
+      >
+        <YerbateraSVG />
+      </Persona>
+
+      {/* el camino de piedra pisada que cose la botica con el trapiche —
+          antes ahí había un hueco de pasto vacío con una piedra sola */}
+      {[
+        [-3.4, 3.9], [-2.3, 3.6], [-1.2, 3.4], [-0.1, 3.3], [1.0, 3.35], [2.0, 3.5],
+      ].map((c, i) => (
+        <mesh
+          key={`c${i}`}
+          position={[c[0], alturaFinca(c[0], c[1]) + 0.04, c[1]]}
+          rotation={[0, i * 1.2, 0]}
+          scale={[1, 0.16, 0.8]}
+        >
+          <dodecahedronGeometry args={[0.34 + (i % 3) * 0.05]} />
+          <meshLambertMaterial color={mezclar(P.piedra, P.patio, 0.35)} flatShading />
+        </mesh>
+      ))}
+      {/* los costales de panela arrimados junto a la mesa, listos pal mercado */}
+      <group position={[-0.7, Y_PATIO, 5.3]} rotation={[0, -0.4, 0]}>
+        {[0, 1].map((i) => (
+          <mesh key={i} position={[i * 0.5, 0.32, i * 0.12]} rotation={[0, i * 0.5, 0]} scale={[1, 1.15, 1]}>
+            <cylinderGeometry args={[0.26, 0.3, 0.56, 7]} />
+            <meshLambertMaterial color={mezclar(P.paja, '#b8a67a', 0.55)} flatShading />
+          </mesh>
+        ))}
+        {/* la boca amarrada del costal */}
+        <mesh position={[0, 0.66, 0]}>
+          <sphereGeometry args={[0.12, 6, 5]} />
+          <meshLambertMaterial color={mezclar(P.paja, '#8a7a52', 0.6)} flatShading />
+        </mesh>
+      </group>
+      {/* la múcura de barro con agua, a la sombra de la botica */}
+      <group position={[-3.3, Y_PATIO, 5.1]}>
+        <mesh position={[0, 0.26, 0]} scale={[1, 1.15, 1]}>
+          <sphereGeometry args={[0.24, 8, 6]} />
+          <meshLambertMaterial color={mezclar(P.adobe, '#8a5a3a', 0.4)} flatShading />
+        </mesh>
+        <mesh position={[0, 0.56, 0]}>
+          <cylinderGeometry args={[0.09, 0.13, 0.16, 7]} />
+          <meshLambertMaterial color={mezclar(P.adobe, '#6a3a22', 0.35)} flatShading />
+        </mesh>
+      </group>
+      {/* el bagazo TENDIDO A SECAR entre el molino y la hornilla: la leña de
+          la propia hornilla — el circuito cerrado que la copia ya contaba */}
+      <group position={[4.9, Y_PATIO, 3.4]} rotation={[0, 0.5, 0]}>
+        <mesh position={[0, 0.05, 0]} scale={[1, 0.12, 0.7]}>
+          <sphereGeometry args={[0.75, 7, 5]} />
+          <meshLambertMaterial color={mezclar(P.paja, '#c2b183', 0.6)} flatShading />
+        </mesh>
+        {[0, 1, 2, 3].map((i) => (
+          <mesh
+            key={i}
+            position={[-0.4 + i * 0.26, 0.1, (i % 2) * 0.2 - 0.1]}
+            rotation={[0, i * 0.8, Math.PI / 2 - 0.12]}
+          >
+            <cylinderGeometry args={[0.03, 0.04, 0.55, 4]} />
+            <meshLambertMaterial color={mezclar(P.paja, '#d8c894', 0.5)} flatShading />
+          </mesh>
+        ))}
+      </group>
 
       {/* unas piedras que amueblan el borde del patio */}
       {[
-        [-1.6, 1.2, 0.3], [10.2, 3.6, 0.4], [-9.8, 0.2, 0.34],
+        [10.2, 3.6, 0.4], [-9.8, 0.2, 0.34],
       ].map((r, i) => (
         <mesh
           key={i}
@@ -1149,6 +1714,16 @@ const CSS_BOCANA = `
 .bocana-chip--activo { background: #e8a24a; color: #2c1c0a; box-shadow: 0 0 0 2px rgba(255,255,255,0.85), 0 3px 10px rgba(40,28,10,0.4); }
 .bocana-chip--activo b { background: #fdf6e3; color: #6b3e12; }
 .mundo-fauna { pointer-events: none; filter: drop-shadow(0 2px 5px rgba(40, 30, 10, 0.24)); }
+.bocana-persona svg { overflow: visible; }
+.pan-brazo { transform-box: view-box; transform-origin: 66px 57px; animation: bocanaRevolver 2.6s ease-in-out infinite; }
+.pan-cuerpo { transform-box: view-box; transform-origin: 55px 138px; animation: bocanaFaena 2.6s ease-in-out infinite; }
+.bot-brazo { transform-box: view-box; transform-origin: 68px 58px; animation: bocanaManojo 3.6s ease-in-out infinite; }
+.bot-cuerpo { transform-box: view-box; transform-origin: 53px 140px; animation: bocanaFaena 3.6s ease-in-out infinite reverse; }
+@keyframes bocanaRevolver { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(9deg); } }
+@keyframes bocanaFaena { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.975); } }
+@keyframes bocanaManojo { 0%, 100% { transform: rotate(5deg); } 50% { transform: rotate(-8deg); } }
+.bocana-persona--quieta *, .bocana-persona--quieta { animation: none !important; }
+@media (prefers-reduced-motion: reduce) { .pan-brazo, .pan-cuerpo, .bot-brazo, .bot-cuerpo { animation: none !important; } }
 .bocana-leyenda { padding: 1.4rem 1rem 0; }
 .bocana-leyenda h2 { margin: 0 0 0.3rem; font-size: 1.12rem; color: #4a3418; }
 .bocana-leyenda ol, .bocana-leyenda ul { margin: 0.6rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.7rem; }
@@ -1259,6 +1834,17 @@ export default function MundoBoticaCana3D() {
     [],
   );
   const perfil = perfilDeTier(tier);
+  /* El encuadre según el formato: en VERTICAL (el teléfono, el formato de
+     Chagra) la cámara nace más alta, más lejos y con más campo — antes el
+     móvil mostraba dos tercios de pasto y ni el trapiche ni la botica. En
+     ancho baja (6.5 → 4.9) para mirar POR DEBAJO del techo de la enramada. */
+  const camaraInicial = useMemo(() => {
+    const vertical =
+      typeof window !== 'undefined' && window.innerWidth < window.innerHeight;
+    return vertical
+      ? { position: [-8.5, 7.0, 14.0], fov: 58 }
+      : { position: [2.0, 4.9, 14.8], fov: 45 };
+  }, []);
 
   return (
     <main className="bocana-root">
@@ -1285,7 +1871,7 @@ export default function MundoBoticaCana3D() {
           className={`bocana-canvas${listo ? ' bocana-canvas--lista' : ''}`}
           dpr={perfil.dpr}
           gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-          camera={{ position: [1.5, 6.5, 14.5], fov: 45 }}
+          camera={camaraInicial}
           frameloop={reducedMotion ? 'demand' : 'always'}
           onCreated={() => setListo(true)}
         >
