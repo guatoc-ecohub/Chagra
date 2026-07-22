@@ -310,6 +310,16 @@ declare global {
       addEventListener: (type: string, cb: () => void) => void;
       removeEventListener: (type: string, cb: () => void) => void;
     }>;
+    /**
+     * API experimental (Network Information), sin tipos en lib.dom.d.ts.
+     * Usada por BateriaConexionIndicator.jsx (rescate #2668 → cableado) para
+     * mostrar la calidad de señal (2G/3G/4G) en modo campo.
+     */
+    connection?: {
+      effectiveType?: string;
+      addEventListener: (type: string, cb: () => void) => void;
+      removeEventListener: (type: string, cb: () => void) => void;
+    };
   }
 }
 

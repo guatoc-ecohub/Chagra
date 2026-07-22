@@ -40,7 +40,7 @@ describe('usePendingSyncCount', () => {
     render(<Sonda />);
     await waitFor(() => expect(screen.getByTestId('pending')).toHaveTextContent('3'));
 
-    syncManager.getSyncStats.mockResolvedValueOnce({ pendingCount: 0, isOnline: true, isSyncing: false });
+    vi.mocked(syncManager.getSyncStats).mockResolvedValueOnce({ pendingCount: 0, isOnline: true, isSyncing: false });
     window.dispatchEvent(new CustomEvent('syncComplete'));
 
     await waitFor(() => expect(screen.getByTestId('pending')).toHaveTextContent('0'));
