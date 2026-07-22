@@ -166,24 +166,13 @@ export const ROUTES = {
       'mejor capability) o deepseek-r1:8b (46 t/s, chain-of-thought).',
   },
   vision: {
-    model: 'gemma3:4b',
+    model: 'qwen3-vl:8b',
     keep_alive_min: 0,
     temperature: 0.2,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench visión M6000 2026-06-23: qwen2.5vl:7b salió el PEOR (alucina + ' +
-      'offload 14 GB → thrash) y gemma3:4b identificaba patógenos mejor. ' +
-      'PERO 2026-07-22, arena visual con la GPU limpia y casos de presencia ' +
-      'emparejados con su ausencia: qwen2.5vl:7b saca 92% (5/5 presencia, ' +
-      '6/7 ausencia) contra 75% de gemma4:e4b y 58% de gemma4:e2b (este ' +
-      'último dice "no" a todo sin mirar). La sospecha es que el bench de ' +
-      'junio lo midió EN THRASHING (el propio texto dice offload 14 GB), y ' +
-      'un modelo partido a CPU alucina. Son tareas distintas —identificar ' +
-      'patógeno en foto vs. verificar elementos en escena 3D— así que ' +
-      'ninguno invalida al otro, pero hay que re-medir patógenos con la GPU ' +
-      'libre antes de dar por bueno el descarte. Detalle en ' +
-      'Chagra-strategy/ops/MODELS.md (fuente única).',
+      'Arena visual 2026-07-22 (12 casos, cada presencia emparejada con su ausencia, GPU limpia): qwen3-vl:8b acierta 12/12 — 5/5 presencia y 7/7 ausencia — a 17s por imagen, 100% GPU sin offload (7,6 GB). Le siguen qwen2.5vl:7b 92% (pero pide 14 GB y SIEMPRE hace offload, verificado con la GPU vacia), gemma4:e4b 75%, gemma3:4b 58% (el que estaba aqui: fallaba 3 de 7 ausencias, o sea decia ver cosas que no estan — inservible como gate) y moondream 0%. El bench del 2026-06-23 daba a qwen2.5vl como el PEOR: lo midio en thrashing por el offload, con granite3.3 ocupando la GPU. El cambio a gemma4:e2b (8,1 GB) libero el espacio que permite este carril. keep_alive_min 0 se conserva: se carga, responde y se descarga, asi que los 17s no compiten con el agente. Detalle en Chagra-strategy/ops/MODELS.md (fuente unica).',
   },
 };
 
