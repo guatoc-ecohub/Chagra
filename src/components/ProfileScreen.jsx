@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   User, Palette, Briefcase, Save, Check, Mic, MapPin, Home, Volume2, Wrench,
   Sprout, ChevronRight, ChevronLeft, Bell, Users, Camera, Trash2, Shield,
-  Archive, LifeBuoy, LayoutGrid, GraduationCap, Vibrate, Waves, Mountain,
+  Archive, LifeBuoy, LayoutGrid, GraduationCap, Vibrate, Waves, Mountain, Type,
 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { esExtensionistaActual } from '../config/extensionistaAccess';
@@ -35,6 +35,9 @@ import { tieneAccesoGlaciarActual, esOperadorActual, operatorOverrideActivo, set
 import { getOperatorPhoto, setOperatorPhotoFromFile, removeOperatorPhotoLocal } from '../services/operatorPhotoService';
 import ProfileSwitcher from './Settings/ProfileSwitcher';
 import { useTheme, getSelectableThemes } from '../hooks/useTheme';
+// T49 (rescate #2668 → cableado): modo lectura (letra grande) para adultos
+// mayores. Es un MODIFICADOR sobre el tema activo, no un tema nuevo.
+import { useModoLectura } from '../hooks/useModoLectura';
 import { fincaVivaHomePerfilActivo } from '../config/fincaVivaHomeFlag';
 import { MSG } from '../config/messages';
 
@@ -313,6 +316,7 @@ export default function ProfileScreen({ onBack, onHome }) {
 
   // ── Estado vivo para las tarjetas del morral ────────────────────────────
   const { theme } = useTheme();
+  const modoLectura = useModoLectura();
   const selectableThemes = getSelectableThemes(fincaVivaHomePerfilActivo());
   const themeLabel = selectableThemes.find((t) => t.id === theme)?.label || theme;
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
@@ -604,6 +608,42 @@ export default function ProfileScreen({ onBack, onHome }) {
                 distinto del avatar del agente IA de abajo. */}
             <AvatarSelector />
             <AgentAvatarSelector />
+
+            {/* Modo lectura (T49): letra más grande en toda la app. Pensado
+                para adultos mayores o para leer bajo el sol del campo, donde
+                el texto pequeño cuesta más. Es un modificador sobre el tema
+                activo, no un tema nuevo — funciona igual en los 4 temas. */}
+            <div className="space-y-3 bg-slate-900/40 border border-slate-800 rounded-2xl p-5">
+              <div className="flex items-center gap-2 px-1">
+                <Type size={18} className="text-emerald-400" />
+                <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Modo lectura</h3>
+              </div>
+              <label className="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-800/50 cursor-pointer min-h-[48px]">
+                <div className="flex flex-col gap-0.5 flex-1">
+                  <span className="text-sm font-bold text-slate-200">Letra grande</span>
+                  <span className="text-xs text-slate-400 leading-snug">
+                    Agranda el texto en toda la app. Útil si le cuesta leer
+                    letra pequeña o si el sol le dificulta ver la pantalla.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={modoLectura.activo}
+                  aria-label="Activar o desactivar el modo lectura (letra grande)"
+                  onClick={modoLectura.toggle}
+                  className={`tap-target relative w-12 h-7 rounded-full transition-colors shrink-0 ${
+                    modoLectura.activo ? 'bg-emerald-600' : 'bg-slate-700'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                      modoLectura.activo ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+            </div>
 
             {/* Estilo de notificación (operador 2026-06-06 + 2026-06-11):
                 decide CUÁL campana única se muestra. */}
