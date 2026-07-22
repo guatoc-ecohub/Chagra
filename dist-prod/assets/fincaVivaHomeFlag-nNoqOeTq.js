@@ -1,1 +1,0 @@
-var e=`VITE_FINCA_VIVA_HOME_PERFIL`;function t(){try{let t={BASE_URL:`/`,DEV:!1,MODE:`production`,PROD:!0,SSR:!1}[e];if(t===!0)return!0;if(typeof t==`string`){let e=t.trim().toLowerCase();return e===`true`||e===`1`}return!1}catch{return!1}}export{t};
