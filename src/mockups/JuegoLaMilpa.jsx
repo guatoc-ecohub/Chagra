@@ -178,22 +178,30 @@ function applyMoundClick(g, i) {
 // ══════════════════════════════════════════════════════════════════════════
 
 function Sol() {
+  // BUG corregido (reporte del operador: "los rayos se salen de la cara"):
+  // el transform-origin inline iba en px del viewBox (150,120) pero el CSS
+  // declara transform-box:fill-box, así que el eje de giro quedaba corrido
+  // (58,28) y los rayos ORBITABAN por fuera del sol. Además la cara bobeaba
+  // sola (milpa-bob) y se despegaba 5px más del anillo de rayos.
+  // Ahora: rayos y cara son geometría simétrica alrededor de (150,120), el
+  // giro usa el centro real del fill-box y TODO el sol bobea junto.
   return (
-    <g>
-      <g className="milpa-sun-rays" style={{ transformOrigin: '150px 120px' }}>
+    <g className="milpa-sun">
+      <g className="milpa-sun-rays">
         {Array.from({ length: 12 }, (_, k) => {
           const a = (k * Math.PI) / 6;
-          const x1 = 150 + Math.cos(a) * 62;
-          const y1 = 120 + Math.sin(a) * 62;
-          const x2 = 150 + Math.cos(a) * 92;
-          const y2 = 120 + Math.sin(a) * 92;
+          const largo = k % 2 === 0 ? 88 : 74; // rayos alternos largo/corto
+          const x1 = 150 + Math.cos(a) * 57;
+          const y1 = 120 + Math.sin(a) * 57;
+          const x2 = 150 + Math.cos(a) * largo;
+          const y2 = 120 + Math.sin(a) * largo;
           return (
             <line key={k} x1={x1} y1={y1} x2={x2} y2={y2}
-              stroke={C.rayo} strokeWidth="9" strokeLinecap="round" />
+              stroke={C.rayo} strokeWidth={k % 2 === 0 ? 9 : 7} strokeLinecap="round" />
           );
         })}
       </g>
-      <g className="milpa-sun-core" style={{ transformOrigin: '150px 120px' }}>
+      <g>
         <circle cx="150" cy="120" r="52" fill={C.sol} stroke={INK} strokeWidth="6" />
         <circle cx="150" cy="120" r="52" fill="none" stroke={C.solHi} strokeWidth="4"
           strokeDasharray="6 22" strokeLinecap="round" />
@@ -214,49 +222,81 @@ function leafPath(x, y, len, dir) {
   return `M ${x} ${y} Q ${x + dir * len * 0.5} ${y - len * 0.9} ${ex} ${ey} Q ${x + dir * len * 0.55} ${y - len * 0.28} ${x} ${y} Z`;
 }
 
+/*
+ * LAS TRES HERMANAS con su silueta REAL (reporte del operador: "no se parecen
+ * a las de verdad"). Cada una cuenta su parte de la asociacion:
+ *   MAIZ    caña con nudos + hojas LARGAS ACINTADAS que arquean y dejan caer
+ *           la punta, penacho arriba, mazorca con amero y barbas al costado.
+ *   FRIJOL  enredadera de hoja ACORAZONADA que trepa por la caña del maiz
+ *           (zarcillos incluidos); sin tutor queda tanteando el suelo.
+ *   AHUYAMA rastrera de hoja ANCHA LOBULADA que tapa el monticulo (venas
+ *           palidas de cucurbita), flor de trompeta naranja y fruto acostillado.
+ */
+
 function Maiz({ cx, stage, grow, droop }) {
   if (stage === 0) return null;
   const h = 46 + grow * 2.05; // 46..251
   const topY = GROUND_Y - h;
   const bend = droop ? 16 : 6;
+  const caida = droop ? 0.15 : 0; // seca: las hojas cuelgan mas
+  const nLeaves = stage === 1 ? 2 : stage === 2 ? 4 : 6;
+  const nudos = [];
   const leaves = [];
-  const nLeaves = stage === 1 ? 2 : stage === 2 ? 4 : 5;
   for (let k = 0; k < nLeaves; k++) {
-    const t = 0.25 + (k / nLeaves) * 0.6;
+    const t = 0.16 + (k / nLeaves) * 0.62;
     const ly = GROUND_Y - h * t;
     const dir = k % 2 === 0 ? 1 : -1;
-    const len = 30 + (1 - t) * 26;
+    // Hoja ACINTADA: larga, arquea hacia arriba-afuera y la punta cae.
+    const L = (40 + (1 - t) * 42) * (0.82 + 0.18 * Math.min(1, grow / 60));
+    const tipX = cx + dir * L * 1.04;
+    const tipY = ly - L * (0.3 - caida);
+    const dHoja = `M ${cx} ${ly - 3}
+      C ${cx + dir * L * 0.16} ${ly - L * 0.68} ${cx + dir * L * 0.6} ${ly - L * (0.6 - caida)} ${tipX} ${tipY}
+      C ${cx + dir * L * 0.58} ${ly - L * (0.26 - caida)} ${cx + dir * L * 0.2} ${ly - L * 0.08} ${cx} ${ly + 3} Z`;
+    const dVena = `M ${cx} ${ly} Q ${cx + dir * L * 0.44} ${ly - L * (0.48 - caida)} ${tipX} ${tipY}`;
+    nudos.push(<ellipse key={`n${k}`} cx={cx} cy={ly} rx="6.5" ry="3" fill={C.maiz} stroke={INK} strokeWidth="2.5" />);
     leaves.push(
       <g key={k}>
-        <path d={leafPath(cx, ly, len, dir)} fill={C.maizHi} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-        <path d={`M ${cx} ${ly} q ${dir * len * 0.55} ${-len * 0.4} ${dir * len} ${-len * 0.42}`}
-          fill="none" stroke={C.maiz} strokeWidth="3" strokeLinecap="round" />
+        <path d={dHoja} fill={k % 2 ? C.maiz : C.maizHi} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+        <path d={dVena} fill="none" stroke={k % 2 ? C.maizHi : C.maiz} strokeWidth="2.4" strokeLinecap="round" />
       </g>
     );
   }
+  const tallo = `M ${cx} ${GROUND_Y} C ${cx - bend} ${GROUND_Y - h * 0.5} ${cx + bend} ${GROUND_Y - h * 0.72} ${cx} ${topY}`;
   return (
     <g transform={`rotate(${droop ? 6 : 0} ${cx} ${GROUND_Y})`}>
       <g className="milpa-sway"><g className="milpa-pop" key={stage}>
-        {/* tallo */}
-        <path d={`M ${cx} ${GROUND_Y} C ${cx - bend} ${GROUND_Y - h * 0.5} ${cx + bend} ${GROUND_Y - h * 0.72} ${cx} ${topY}`}
-          fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" />
-        <path d={`M ${cx} ${GROUND_Y} C ${cx - bend} ${GROUND_Y - h * 0.5} ${cx + bend} ${GROUND_Y - h * 0.72} ${cx} ${topY}`}
-          fill="none" stroke={C.maiz} strokeWidth="6" strokeLinecap="round" />
+        {/* la caña, con sus nudos */}
+        <path d={tallo} fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" />
+        <path d={tallo} fill="none" stroke={C.maiz} strokeWidth="6" strokeLinecap="round" />
+        {nudos}
         {leaves}
         {stage >= 3 && (
           <g>
-            {/* mazorca */}
-            <ellipse cx={cx + 20} cy={GROUND_Y - h * 0.5} rx="15" ry="30" fill={C.mazorca}
-              stroke={INK} strokeWidth="4.5" transform={`rotate(24 ${cx + 20} ${GROUND_Y - h * 0.5})`} />
-            {[-16, -6, 4, 14].map((dy, idx) => (
-              <line key={idx} x1={cx + 10} y1={GROUND_Y - h * 0.5 + dy} x2={cx + 30} y2={GROUND_Y - h * 0.5 + dy - 6}
-                stroke={C.mazorcaDark} strokeWidth="2.5" strokeLinecap="round" />
+            {/* MAZORCA al costado: amero, granos en reticula y barbas */}
+            <g transform={`translate(${cx + 15} ${GROUND_Y - h * 0.52}) rotate(-24)`}>
+              <path d="M -3 26 Q -14 6 -7 -16 Q 1 2 -3 26 Z" fill={C.maiz} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+              <path d="M 5 26 Q 17 8 11 -14 Q 3 4 5 26 Z" fill={C.maizHi} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+              <ellipse cx="1" cy="-2" rx="13" ry="27" fill={C.mazorca} stroke={INK} strokeWidth="4.5" />
+              {[-6, 0, 6].map((gx) => (
+                <path key={gx} d={`M ${gx} -24 Q ${gx * 1.35} -2 ${gx} 20`} stroke={C.mazorcaDark} strokeWidth="2.2" fill="none" />
+              ))}
+              {[-14, -6, 2, 10].map((gy) => (
+                <line key={gy} x1="-10" y1={gy} x2="10.5" y2={gy} stroke={C.mazorcaDark} strokeWidth="1.7" />
+              ))}
+              <path d="M -2 -28 q -6 -8 -12 -9" stroke="#b96a2a" strokeWidth="3" fill="none" strokeLinecap="round" />
+              <path d="M 1 -29 q 1 -10 -3 -15" stroke="#d08a3e" strokeWidth="3" fill="none" strokeLinecap="round" />
+              <path d="M 4 -28 q 7 -7 12 -7" stroke="#b96a2a" strokeWidth="3" fill="none" strokeLinecap="round" />
+            </g>
+            {/* PENACHO (la espiga macho, arriba del todo) */}
+            <line x1={cx} y1={topY} x2={cx} y2={topY - 26} stroke={C.pluma} strokeWidth="4" strokeLinecap="round" />
+            {[-18, -9, 9, 18].map((dx) => (
+              <path key={dx} d={`M ${cx} ${topY} q ${dx * 0.7} -14 ${dx * 1.4} -22`}
+                fill="none" stroke={C.pluma} strokeWidth="3.5" strokeLinecap="round" />
             ))}
-            <path d={`M ${cx + 8} ${GROUND_Y - h * 0.5 - 26} q 12 -6 20 2`} fill={C.maizHi} stroke={INK} strokeWidth="3.5" />
-            {/* penacho (tassel) */}
-            {[-10, 0, 10].map((dx, idx) => (
-              <path key={idx} d={`M ${cx} ${topY} q ${dx} -14 ${dx * 1.4} -30`}
-                fill="none" stroke={C.pluma} strokeWidth="4" strokeLinecap="round" />
+            {[-25, -12, 0, 12, 25].map((dx) => (
+              <circle key={dx} cx={cx + dx} cy={topY - (dx === 0 ? 28 : 22 - Math.abs(dx) * 0.12)} r="2.6"
+                fill={C.mazorcaDark} />
             ))}
           </g>
         )}
@@ -265,82 +305,161 @@ function Maiz({ cx, stage, grow, droop }) {
   );
 }
 
+// Hoja de frijol: CORAZON con la punta hacia abajo (la seña de la trepadora).
+const CORAZON = 'M 0 15 C -12 5 -14 -7 -7 -10 C -2 -12 0 -8 0 -4 C 0 -8 2 -12 7 -10 C 14 -7 12 5 0 15 Z';
+function HojaFrijol({ x, y, s, rot = 0, tono = C.frijolHi }) {
+  const k = s / 15;
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${rot}) scale(${k})`}>
+      <path d={CORAZON} fill={tono} stroke={INK} strokeWidth={3.4 / k} strokeLinejoin="round" />
+      <line x1="0" y1="-3" x2="0" y2="10" stroke={INK} strokeWidth={1.5 / k} opacity="0.3" />
+    </g>
+  );
+}
+
+// Vaina de frijol colgante, con sus semillas marcadas.
+function Vaina({ x, y, rot = 0 }) {
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${rot})`}>
+      <path d="M 0 0 C -1 8 1 16 6 21 C 9 24 13 22 11 17 C 9 10 6 3 2 -2 Z"
+        fill={C.vaina} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <circle cx="3" cy="7" r="1.7" fill="#274f2b" />
+      <circle cx="5.4" cy="12.5" r="1.7" fill="#274f2b" />
+      <circle cx="8" cy="17" r="1.7" fill="#274f2b" />
+    </g>
+  );
+}
+
 function Frijol({ cx, stage, grow, hasPole }) {
   if (stage === 0) return null;
-  // Sin tutor (o recien nacido): mata baja tumbada en el suelo.
+  // Sin tutor (o recien nacido): mata baja que TANTEA buscando palo.
   if (!hasPole || stage === 1) {
     return (
       <g className="milpa-sway-soft"><g className="milpa-pop" key="flop">
-        <path d={`M ${cx - 6} ${GROUND_Y} q -26 -10 -40 6`} fill="none" stroke={INK} strokeWidth="7" strokeLinecap="round" />
-        <path d={`M ${cx - 6} ${GROUND_Y} q -26 -10 -40 6`} fill="none" stroke={C.frijol} strokeWidth="4" strokeLinecap="round" />
-        <path d={leafPath(cx - 30, GROUND_Y - 2, 22, -1)} fill={C.frijolHi} stroke={INK} strokeWidth="3.5" />
-        <path d={leafPath(cx - 12, GROUND_Y - 4, 20, 1)} fill={C.frijolHi} stroke={INK} strokeWidth="3.5" />
+        <path d={`M ${cx - 4} ${GROUND_Y} q -22 -8 -38 4`} fill="none" stroke={INK} strokeWidth="7" strokeLinecap="round" />
+        <path d={`M ${cx - 4} ${GROUND_Y} q -22 -8 -38 4`} fill="none" stroke={C.frijol} strokeWidth="4" strokeLinecap="round" />
+        <HojaFrijol x={cx - 38} y={GROUND_Y - 10} s={13} rot={35} />
+        <HojaFrijol x={cx - 18} y={GROUND_Y - 12} s={12} rot={-20} />
+        {/* el zarcillo levanta la cabeza buscando la caña */}
+        <path d={`M ${cx - 8} ${GROUND_Y - 2} q 4 -14 12 -18 q 7 -3 8 3 q 1 5 -5 5`}
+          fill="none" stroke={C.frijol} strokeWidth="3" strokeLinecap="round" />
       </g></g>
     );
   }
-  // Con tutor: enredadera que sube espiralando junto al maiz.
-  const h = 60 + grow * 1.7; // sube casi tanto como el maiz
+  // Con tutor: la enredadera SUBE POR LA CAÑA del maiz — esa es la leccion.
+  const h = 60 + grow * 1.7;
   const topY = GROUND_Y - h;
   const coils = [];
-  const seg = 26;
+  const seg = 24;
   for (let y = GROUND_Y; y > topY; y -= seg) {
     const side = ((GROUND_Y - y) / seg) % 2 < 1 ? 1 : -1;
-    coils.push(`Q ${cx + side * 22} ${y - seg * 0.5} ${cx} ${y - seg}`);
+    coils.push(`Q ${cx + side * 13} ${y - seg * 0.5} ${cx} ${y - seg}`);
   }
   const coilPath = `M ${cx} ${GROUND_Y} ${coils.join(' ')}`;
-  const leafYs = [0.3, 0.55, 0.78].filter((_, k) => k < (stage >= 3 ? 3 : 2));
+  const nHojas = stage >= 3 ? 4 : 3;
   return (
     <g className="milpa-sway"><g className="milpa-pop" key={stage}>
       <path d={coilPath} fill="none" stroke={INK} strokeWidth="6.5" strokeLinecap="round" />
       <path d={coilPath} fill="none" stroke={C.frijol} strokeWidth="3.5" strokeLinecap="round" />
-      {leafYs.map((t, k) => {
-        const ly = GROUND_Y - h * t;
+      {/* zarcillo en la punta, agarrandose mas arriba */}
+      <path d={`M ${cx} ${topY} q 7 -10 15 -9 q 7 1 4 7 q -3 6 -9 3 q -3 -2 0 -5`}
+        fill="none" stroke={C.frijol} strokeWidth="3" strokeLinecap="round" />
+      {Array.from({ length: nHojas }, (_, k) => {
+        const t = 0.24 + (k / nHojas) * 0.62;
         const dir = k % 2 === 0 ? -1 : 1;
-        return <path key={k} d={leafPath(cx + dir * 14, ly, 24, dir)} fill={C.frijolHi} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />;
+        const ly = GROUND_Y - h * t;
+        const lx = cx + dir * 17;
+        return (
+          <g key={k}>
+            <path d={`M ${cx + dir * 6} ${ly + 5} Q ${cx + dir * 12} ${ly + 1} ${lx} ${ly - 4}`}
+              fill="none" stroke={C.frijol} strokeWidth="2.6" strokeLinecap="round" />
+            <HojaFrijol x={lx + dir * 7} y={ly + 2} s={14 + (k % 2) * 3} rot={dir * 28}
+              tono={k % 2 ? C.frijolHi : '#57a35f'} />
+          </g>
+        );
       })}
       {stage >= 3 && (
         <g>
-          {[[cx - 20, GROUND_Y - h * 0.62], [cx + 18, GROUND_Y - h * 0.44], [cx - 12, GROUND_Y - h * 0.8]].map(([px, py], k) => (
-            <path key={k} d={`M ${px} ${py} q 10 6 6 26 q -6 6 -12 0 q -3 -18 6 -26 Z`}
-              fill={C.vaina} stroke={INK} strokeWidth="3.5" transform={`rotate(${k % 2 ? 18 : -14} ${px} ${py})`} />
+          {/* vainas colgando en racimo + flores rosadas */}
+          <Vaina x={cx - 16} y={GROUND_Y - h * 0.56} rot={-8} />
+          <Vaina x={cx - 9} y={GROUND_Y - h * 0.53} rot={14} />
+          <Vaina x={cx + 15} y={GROUND_Y - h * 0.38} rot={4} />
+          {[[cx + 12, GROUND_Y - h * 0.72], [cx - 10, GROUND_Y - h * 0.88]].map(([fx, fy], k) => (
+            <g key={k}>
+              <circle cx={fx} cy={fy} r="5" fill={C.flor} stroke={INK} strokeWidth="2.6" />
+              <circle cx={fx + 1.5} cy={fy + 2} r="2" fill="#fdd9e8" />
+            </g>
           ))}
-          <circle cx={cx - 6} cy={GROUND_Y - h * 0.9} r="6" fill={C.flor} stroke={INK} strokeWidth="3" />
         </g>
       )}
     </g></g>
   );
 }
 
+// Hoja de ahuyama: ANCHA y LOBULADA (cinco lobulos redondos), con las venas
+// palidas que radian del peciolo — la hoja de cucurbita que tapa el suelo.
+const LOBULADA = 'M 0 9 C -6 9 -10 7 -12 4 C -18 6 -22 1 -19 -3 C -23 -8 -18 -13 -12 -12 C -10 -17 -3 -19 0 -14 C 3 -19 10 -17 12 -12 C 18 -13 23 -8 19 -3 C 22 1 18 6 12 4 C 10 7 6 9 0 9 Z';
+const VENAS_LOB = [[-14, -5], [-7, -12], [0, -14], [7, -12], [14, -5]];
+function HojaAhuyama({ x, y, s, rot = 0, tono = C.ahLeaf }) {
+  const k = s / 20;
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${rot}) scale(${k})`}>
+      <path d={LOBULADA} fill={tono} stroke={INK} strokeWidth={4 / k} strokeLinejoin="round" />
+      {VENAS_LOB.map(([vx, vy], i) => (
+        <path key={i} d={`M 0 7 Q ${vx * 0.45} ${vy * 0.35} ${vx} ${vy}`}
+          fill="none" stroke="#a9cb86" strokeWidth={1.9 / k} strokeLinecap="round" opacity="0.9" />
+      ))}
+    </g>
+  );
+}
+
 function Ahuyama({ cx, stage, grow }) {
   if (stage === 0) return null;
-  const spread = 18 + grow * 0.7; // que tanto se abren las hojas
-  const y = GROUND_Y - 4;
-  const nLeaves = stage === 1 ? 2 : stage === 2 ? 4 : 5;
+  // La rastrera avanza pero SE QUEDA EN SU MONTICULO (medio surco = 125px).
+  const spread = 16 + grow * 0.6; // 16..76
+  const y = GROUND_Y - 5;
+  const nLeaves = stage === 1 ? 2 : stage === 2 ? 5 : 7;
   return (
     <g className="milpa-sway-soft"><g className="milpa-pop" key={stage}>
-      {/* guia rastrera */}
-      <path d={`M ${cx} ${GROUND_Y} q -${spread * 1.6} 8 -${spread * 2.4} 2`} fill="none" stroke={C.ahLeaf} strokeWidth="4" strokeLinecap="round" />
-      <path d={`M ${cx} ${GROUND_Y} q ${spread * 1.6} 8 ${spread * 2.4} 2`} fill="none" stroke={C.ahLeaf} strokeWidth="4" strokeLinecap="round" />
+      {/* guias rastreras serpenteando por el suelo, con zarcillo en la punta */}
+      {[-1, 1].map((dir) => (
+        <g key={dir}>
+          <path d={`M ${cx} ${GROUND_Y} q ${dir * spread * 0.55} 10 ${dir * spread * 1.05} 3 q ${dir * spread * 0.3} -6 ${dir * spread * 0.5} 1`}
+            fill="none" stroke={C.ahLeaf} strokeWidth="4.5" strokeLinecap="round" />
+          <path d={`M ${cx + dir * spread * 1.55} ${GROUND_Y + 4} q ${dir * 7} -6 ${dir * 12} -2 q ${dir * 4} 4 ${dir * 1} 6 q ${dir * -4} 2 ${dir * -5} -2`}
+            fill="none" stroke={C.ahLeafHi} strokeWidth="2.6" strokeLinecap="round" />
+        </g>
+      ))}
+      {/* el manto de hojas anchas que le hace sombra a la maleza */}
       {Array.from({ length: nLeaves }, (_, k) => {
         const dir = k % 2 === 0 ? -1 : 1;
-        const off = (Math.floor(k / 2) + 1) * spread;
+        const off = (Math.floor(k / 2) + 0.6) * spread * 0.45;
         const lx = cx + dir * off;
-        const size = 26 + (stage >= 2 ? 8 : 0);
-        return (
-          <g key={k}>
-            <path d={`M ${lx} ${y} q ${-size} ${-size * 0.5} ${-size * 0.2} ${-size} q ${size * 0.6} ${-size * 0.25} ${size} ${size * 0.15} q ${size * 0.1} ${size * 0.6} ${-size * 0.8} ${size * 0.35} Z`}
-              fill={k % 2 ? C.ahLeafHi : C.ahLeaf} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-            <path d={`M ${lx - size * 0.4} ${y - size * 0.2} l ${-size * 0.3} ${-size * 0.4}`} fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" />
-          </g>
-        );
+        const ly = y - (k % 3) * 4 + (k % 2) * 2;
+        const size = (30 + (stage >= 2 ? 8 : 0)) - (k % 3) * 3;
+        const rot = dir * (8 + (k % 3) * 9);
+        return <HojaAhuyama key={k} x={lx} y={ly} s={size} rot={rot} tono={k % 2 ? C.ahLeafHi : C.ahLeaf} />;
       })}
-      {stage >= 3 && (
-        <g transform={`translate(${cx + spread + 6} ${GROUND_Y - 4})`}>
-          <ellipse cx="0" cy="0" rx="34" ry="26" fill={C.fruto} stroke={INK} strokeWidth="5" />
-          {[-20, -8, 6, 20].map((dx, idx) => (
-            <path key={idx} d={`M ${dx} -24 Q ${dx * 1.1} 0 ${dx} 24`} fill="none" stroke={C.frutoRib} strokeWidth="3" strokeLinecap="round" />
+      {/* flor de trompeta naranja: la seña de la ahuyama en el rastrojo */}
+      {stage >= 2 && (
+        <g transform={`translate(${cx - spread * 1.35} ${GROUND_Y - 10})`}>
+          {[0, 72, 144, 216, 288].map((a) => (
+            <ellipse key={a} cx="0" cy="-6.5" rx="3.6" ry="7" fill="#f2a93b" stroke={INK} strokeWidth="2.4"
+              transform={`rotate(${a})`} />
           ))}
-          <path d="M 0 -25 q 6 -12 14 -14" fill="none" stroke={C.frutoStem} strokeWidth="6" strokeLinecap="round" />
+          <circle cx="0" cy="0" r="3.4" fill={C.fruto} stroke={INK} strokeWidth="2" />
+        </g>
+      )}
+      {stage >= 3 && (
+        <g transform={`translate(${cx + spread * 1.05 + 6} ${GROUND_Y + 4})`}>
+          {/* ahuyama ACHATADA y acostillada, con pedunculo en tirabuzon */}
+          <ellipse cx="0" cy="0" rx="34" ry="22" fill={C.fruto} stroke={INK} strokeWidth="5" />
+          {[-22, -11, 0, 11, 22].map((dx) => (
+            <path key={dx} d={`M ${dx} ${-20 + Math.abs(dx) * 0.28} Q ${dx * 1.12} 0 ${dx} ${20 - Math.abs(dx) * 0.28}`}
+              fill="none" stroke={C.frutoRib} strokeWidth="3" strokeLinecap="round" />
+          ))}
+          <path d="M -11 -15 Q -2 -20 8 -17" fill="none" stroke="#f7ac62" strokeWidth="3.5" strokeLinecap="round" opacity="0.8" />
+          <path d="M 0 -21 q 2 -10 10 -12 q 6 -1 5 4 q -1 4 -5 3" fill="none" stroke={C.frutoStem} strokeWidth="4.5" strokeLinecap="round" />
         </g>
       )}
     </g></g>
@@ -563,14 +682,20 @@ export default function JuegoLaMilpa({ onBack = () => {} }) {
         <div className="milpa-chip">
           <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
             <path d="M 17 32 Q 8 22 17 14 Q 26 8 17 2" fill="none" stroke={C.frijol} strokeWidth="4" strokeLinecap="round" />
+            <g transform="translate(24 22) scale(0.55)">
+              <path d={CORAZON} fill={C.frijolHi} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+            </g>
             <circle cx="17" cy="6" r="4" fill={C.flor} stroke={INK} strokeWidth="2" />
           </svg>
           <div><b>Frijol</b><span>Le fija alimento a la tierra: enriquece el monticulo.</span></div>
         </div>
         <div className="milpa-chip">
           <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
-            <ellipse cx="20" cy="24" rx="10" ry="7" fill={C.fruto} stroke={INK} strokeWidth="3" />
-            <path d="M 14 20 q -8 -6 -2 -12 q 6 2 4 12 Z" fill={C.ahLeafHi} stroke={INK} strokeWidth="2.5" />
+            <ellipse cx="21" cy="26" rx="10" ry="6.5" fill={C.fruto} stroke={INK} strokeWidth="3" />
+            <path d="M 16 22 Q 21 26 16 30 M 26 22 Q 21 26 26 30" fill="none" stroke={C.frutoRib} strokeWidth="1.6" />
+            <g transform="translate(13 12) scale(0.52)">
+              <path d={LOBULADA} fill={C.ahLeafHi} stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+            </g>
           </svg>
           <div><b>Ahuyama</b><span>Tapa el suelo con sus hojas anchas y guarda la humedad.</span></div>
         </div>
