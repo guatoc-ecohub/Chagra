@@ -281,6 +281,12 @@ const BosqueTresEstratos3DMockup = lazy(() => import('./mockups/BosqueTresEstrat
 // templado y la red de micorrizas que amarra sus raíces en la cara cortada
 // de la ladera.
 const TresEntsGradiente3DMockup = lazy(() => import('./mockups/TresEntsGradiente3D'));
+// EL NACEDERO: el páramo dibujado desde cero como lo que es —la fábrica de
+// agua—. Uno se para DENTRO del anfiteatro que el agua le comió a la turbera:
+// la pared cortada es la lámina de Humboldt (el perfil del suelo a la vista),
+// el frailejonal de todas las edades se asoma al filo y la quebrada se despeña
+// al valle.
+const ParamoHumboldt3DMockup = lazy(() => import('./mockups/ParamoHumboldt3D'));
 const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
 const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
 const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
@@ -752,6 +758,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
   'mockups/bosque-tres-estratos': 'mockup_bosque_tres_estratos',
   'mockups/tres-ents-gradiente': 'mockup_tres_ents_gradiente',
+  'mockups/paramo-humboldt-3d': 'mockup_paramo_humboldt_3d',
   'mockups/camara-director': 'mockup_camara_director',
   'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
   'mockups/artesania-andina': 'mockup_artesania_andina',
@@ -2521,6 +2528,22 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Los tres árboles maestros del gradiente">
               <TresEntsGradiente3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_paramo_humboldt_3d':
+        // EL NACEDERO — el páramo desde cero, dibujado como la fábrica de agua
+        // que es. Uno se para DENTRO del anfiteatro que el nacimiento del agua
+        // le comió a la turbera: la pared cortada enseña el perfil del suelo
+        // (colchón vivo, turba negra, turba parda, la línea de agua donde la
+        // turba se topa con la ceniza volcánica y los hilos brotan), el
+        // frailejonal de todas las edades se asoma al filo contra el cielo y la
+        // quebrada se despeña por la portilla hacia el valle.
+        // Ruta #/mockups/paramo-humboldt-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El nacedero del páramo">
+              <ParamoHumboldt3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
