@@ -10,10 +10,26 @@ import { setTimeout as sleep } from 'node:timers/promises';
 const DIST = process.argv[2];
 // <ruta>=<nombre>[=<texto del botón a tocar antes de capturar>]
 const SHOTS = process.argv.slice(3).map((a) => { const [ruta, name, click] = a.split('='); return [name, ruta, click]; });
-const PORT = 8097;
+// PUERTO POR CORRIDA, NO FIJO. Estaba clavado en 8097 y con varios agentes
+// gateando a la vez el segundo encontraba el puerto ocupado, su servidor moría
+// callado, y terminaba fotografiando LA APP DEL OTRO. Lo detectó un agente el
+// 2026-07-22 al ver que sus capturas "después" no eran de su escena.
+// Una captura del mundo equivocado es peor que ninguna: se aprueba arte ajeno.
+const PORT = 8100 + (process.pid % 800);
 const BASE = `http://127.0.0.1:${PORT}`;
 const srv = spawn('python3', ['-m', 'http.server', String(PORT), '--bind', '127.0.0.1'], { cwd: DIST, stdio: 'ignore' });
 await sleep(1800);
+
+// Y comprobar que quien responde es NUESTRO servidor. Si el puerto ya estaba
+// tomado, python muere en silencio y el fetch igual contesta — con otra app.
+try {
+  const r = await fetch(BASE + '/index.html', { signal: AbortSignal.timeout(8000) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+} catch (e) {
+  console.error(`ABORTA: el servidor propio no responde en ${BASE} (${e.message}).`);
+  console.error('  Sin esto se corre el riesgo de fotografiar la app de otra corrida.');
+  srv.kill(); process.exit(1);
+}
 
 // HEADED + GPU nativa: sin flags swiftshader, con display real de stg.
 const browser = await chromium.launch({
