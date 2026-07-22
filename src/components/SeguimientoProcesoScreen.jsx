@@ -49,13 +49,6 @@ const PIG_SANITY_GUARDS = [
   animalDiagnostics?.guardas?.porquinaza_bioseguridad,
   animalDiagnostics?.guardas?.reproduccion_porcina,
 ].filter(Boolean);
-const PIG_STAGE_LABELS = {
-  instalacion: 'Instalación',
-  alimentacion: 'Alimentación',
-  reproduccion: 'Reproducción',
-  sanidad: 'Sanidad',
-  cierre: 'Cierre',
-};
 
 // Etapa inicial por tipo de proceso (primer hito de su secuencia).
 function initialStageFor(processType) {

@@ -47,7 +47,7 @@ import indicatorsData from '../../data/agroecology-indicators.json';
  * @param {Function} [props.onNavigate] navegación a otras vistas (ej. agente)
  */
 export default function MiFincaEvolucionScreen({ onBack, onHome, onNavigate }) {
-  const profile = useMemo(() => getProfile() || {}, []);
+  const profile = useMemo(() => getProfile(), []);
   const fincaSlug = profile.fincaSlug || profile.slug || 'default';
   const ctx = contextoDesdeVocacion(profile.vocacion);
 

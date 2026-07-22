@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   FlaskConical, Sprout, Leaf, Bug, ShieldCheck, ShieldPlus, Layers,
   ShieldAlert, Clock, ScrollText, ChevronDown, Camera, ExternalLink,
-  AlertCircle, Droplets, Hourglass, Repeat, HardHat, Ban, HelpCircle,
+  AlertCircle, Droplets, Hourglass, Repeat, HardHat, Ban,
 } from 'lucide-react';
 import { ScreenShell } from '../common/ScreenShell';
 import PedagogicalBlock from '../common/PedagogicalBlock';

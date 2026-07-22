@@ -60,7 +60,6 @@ import {
   TIERRAS,
   CASA,
   LUCES,
-  NIEBLAS,
   PALETA,
 } from '../paleta/index.js';
 

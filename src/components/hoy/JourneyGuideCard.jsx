@@ -23,7 +23,7 @@ import { getProfile } from '../../services/userProfileService';
  * contenido sale del modelo del DR (agroecologyJourney).
  */
 export default function JourneyGuideCard({ processes = [], onNavigate }) {
-  const profile = useMemo(() => getProfile() || {}, []);
+  const profile = useMemo(() => getProfile(), []);
   const fincaSlug = profile.fincaSlug || profile.slug || 'default';
   const ctx = contextoDesdeVocacion(profile.vocacion);
 

@@ -1,5 +1,4 @@
 import { useMemo, useRef, useState } from 'react';
-import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { AdaptiveDpr, Html, OrbitControls } from '@react-three/drei';
 import { ATMOSFERA, CIELOS, PALETA, mezclar, mezclarCielo } from '../visual/mundo3d/atmosferaMadre.js';

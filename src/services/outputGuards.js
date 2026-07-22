@@ -10273,7 +10273,7 @@ export function applyOutputGuards(
   // instrucciones, grafo), se reemplaza toda la respuesta antes de que otros
   // guards anexen contenido.
   const internals = stripInternalsLeak(text);
-  if (internals && internals.modified) {
+  if (internals.modified) {
     return {
       text: internals.text,
       modified: true,
@@ -10290,7 +10290,7 @@ export function applyOutputGuards(
   // redacción. Corre SIEMPRE (no gateado por entidades). Espejo aplicado-al-texto
   // de sanitizeToolingLeak del sidecar.
   const toolingLeak = guardToolingLeakRedaction(text);
-  if (toolingLeak && toolingLeak.modified) {
+  if (toolingLeak.modified) {
     text = toolingLeak.text;
     modified = true;
     if (toolingLeak.reason) reasons.push(toolingLeak.reason);
@@ -10300,7 +10300,7 @@ export function applyOutputGuards(
   // Una dosis inventada, cura química o plaguicida prohibido no debe sobrevivir
   // debajo de caveats posteriores, independientemente del cultivo.
   const cropAgnosticSafety = guardCropAgnosticSafetyTraps(text, { userMessage });
-  if (cropAgnosticSafety && cropAgnosticSafety.modified) {
+  if (cropAgnosticSafety.modified) {
     return {
       text: cropAgnosticSafety.text,
       modified: true,
@@ -10312,7 +10312,7 @@ export function applyOutputGuards(
   // Una dosis, cura química o asociación riesgosa de tomate no debe sobrevivir
   // debajo de caveats posteriores.
   const tomatoSafety = guardTomateSafetyTraps(text, { userMessage });
-  if (tomatoSafety && tomatoSafety.modified) {
+  if (tomatoSafety.modified) {
     return {
       text: tomatoSafety.text,
       modified: true,
@@ -10326,7 +10326,7 @@ export function applyOutputGuards(
   // otro guard sobre un texto que se va a reemplazar. Firma propia (necesita
   // userMessage), por eso va fuera de GUARD_CHAIN. No-op si la query es agro.
   const offDom = guardOffDomain(text, { userMessage });
-  if (offDom && offDom.modified) {
+  if (offDom.modified) {
     // Respuesta off-domain reemplazada: no corremos más guards sobre la
     // declinación (no hay cultivo/entidad que razonar).
     return { text: offDom.text, modified: true, reasons: offDom.reason ? [offDom.reason] : [] };
@@ -10337,7 +10337,7 @@ export function applyOutputGuards(
   // texto que vamos a reemplazar entero. Firma propia (contexto de visión), por
   // eso va fuera de GUARD_CHAIN.
   const vis = guardVisionWithoutPhoto(text, { hadVision, visionConfidence });
-  if (vis && vis.modified) {
+  if (vis.modified) {
     text = vis.text;
     modified = true;
     if (vis.reason) reasons.push(vis.reason);
@@ -10348,15 +10348,15 @@ export function applyOutputGuards(
   // alimento u organismo benéfico inventado.
   if (!(vis && vis.modified)) {
     const trunc = guardTruncatedUserPrompt(text, { userMessage });
-    if (trunc && trunc.modified) {
+    if (trunc.modified) {
       return { text: trunc.text, modified: true, reasons: trunc.reason ? [trunc.reason] : [] };
     }
     const toxicFood = guardToxicResidueOnFood(text, { userMessage });
-    if (toxicFood && toxicFood.modified) {
+    if (toxicFood.modified) {
       return { text: toxicFood.text, modified: true, reasons: toxicFood.reason ? [toxicFood.reason] : [] };
     }
     const fakeBeneficial = guardRequestedFabricatedBeneficial(text, { userMessage });
-    if (fakeBeneficial && fakeBeneficial.modified) {
+    if (fakeBeneficial.modified) {
       return { text: fakeBeneficial.text, modified: true, reasons: fakeBeneficial.reason ? [fakeBeneficial.reason] : [] };
     }
   }
@@ -10372,7 +10372,7 @@ export function applyOutputGuards(
   // early-return, igual que off-domain y visión-sin-foto.
   if (!(vis && vis.modified)) {
     const dx = guardDiagnosisWithoutPhoto(text, { userMessage, hadVision });
-    if (dx && dx.modified) {
+    if (dx.modified) {
       return { text: dx.text, modified: true, reasons: dx.reason ? [dx.reason] : [] };
     }
   }
@@ -10387,13 +10387,13 @@ export function applyOutputGuards(
   // ya hubo un reemplazo de visión (texto distinto al original).
   if (!(vis && vis.modified)) {
     const fp = guardFalsePremise(text, { userMessage });
-    if (fp && fp.modified) {
+    if (fp.modified) {
       return { text: fp.text, modified: true, reasons: fp.reason ? [fp.reason] : [] };
     }
   }
 
   const wrongAuthority = guardWrongColombiaAuthority(text, { userMessage });
-  if (wrongAuthority && wrongAuthority.modified) {
+  if (wrongAuthority.modified) {
     return {
       text: wrongAuthority.text,
       modified: true,
@@ -10408,7 +10408,7 @@ export function applyOutputGuards(
   // es independiente de la intención de siembra/precio. Como REEMPLAZA el texto
   // entero (la recomendación ilegal es íntegramente dañina), early-return.
   const paramo = guardParamoNormativa(text);
-  if (paramo && paramo.modified) {
+  if (paramo.modified) {
     return {
       text: paramo.text,
       modified: true,
@@ -10442,7 +10442,7 @@ export function applyOutputGuards(
   // Es un guard de SIEMBRA/identidad → solo corre si la consulta no es de precio.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const iv = guardInventedVariety(text, { userMessage });
-    if (iv && iv.modified) {
+    if (iv.modified) {
       return { text: iv.text, modified: true, reasons: iv.reason ? [iv.reason] : [] };
     }
   }
@@ -10457,7 +10457,7 @@ export function applyOutputGuards(
   // early-return. Guard de SIEMBRA/identidad.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const ve = guardVarietyWithoutEvidence(text, { userMessage });
-    if (ve && ve.modified) {
+    if (ve.modified) {
       return { text: ve.text, modified: true, reasons: ve.reason ? [ve.reason] : [] };
     }
   }
@@ -10472,7 +10472,7 @@ export function applyOutputGuards(
   // premisa-falsa. Es un guard de SIEMBRA/viabilidad → solo si la consulta no es de precio.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const hav = guardHardAltitudeViability(text, { userMessage });
-    if (hav && hav.modified) {
+    if (hav.modified) {
       return { text: hav.text, modified: true, reasons: hav.reason ? [hav.reason] : [] };
     }
   }
@@ -10486,7 +10486,7 @@ export function applyOutputGuards(
   // REEMPLAZA todo el cuerpo, early-return. Guard de SIEMBRA/viabilidad.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const wcc = guardWarmLowlandColdCrop(text, { userMessage });
-    if (wcc && wcc.modified) {
+    if (wcc.modified) {
       return { text: wcc.text, modified: true, reasons: wcc.reason ? [wcc.reason] : [] };
     }
   }
@@ -10499,7 +10499,7 @@ export function applyOutputGuards(
   // exige altitud numérica.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const chw = guardColdHighlandWarmCrop(text, { userMessage });
-    if (chw && chw.modified) {
+    if (chw.modified) {
       return { text: chw.text, modified: true, reasons: chw.reason ? [chw.reason] : [] };
     }
   }
@@ -10515,7 +10515,7 @@ export function applyOutputGuards(
   // early-return. Guard de SIEMBRA/viabilidad → solo si la consulta no es de precio.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const efp = guardEmbeddedAltitudeFalsePremise(text, { userMessage, resolvedEntities: entities });
-    if (efp && efp.modified) {
+    if (efp.modified) {
       return { text: efp.text, modified: true, reasons: efp.reason ? [efp.reason] : [] };
     }
   }
@@ -10527,7 +10527,7 @@ export function applyOutputGuards(
   // sobre el cuerpo que ya afirmó una especie no-grounded.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const regional = guardUnidentifiedRegionalCrop(text, { userMessage });
-    if (regional && regional.modified) {
+    if (regional.modified) {
       return { text: regional.text, modified: true, reasons: regional.reason ? [regional.reason] : [] };
     }
   }
@@ -10548,7 +10548,7 @@ export function applyOutputGuards(
   // lo primero. Firma propia (userMessage). Corre SIEMPRE (consulta de manejo, no de
   // siembra). Idempotente.
   const caldoRes = guardClassicCaldoRecipe(text, { userMessage });
-  if (caldoRes && caldoRes.modified) {
+  if (caldoRes.modified) {
     text = caldoRes.text;
     modified = true;
     if (caldoRes.reason) reasons.push(caldoRes.reason);
@@ -10560,7 +10560,7 @@ export function applyOutputGuards(
     // corren siempre.
     if (!runPlantingGuards && PLANTING_GUARDS.has(guard)) continue;
     const res = guard(text, entities, fincaAltitud);
-    if (res && res.modified) {
+    if (res.modified) {
       text = res.text;
       modified = true;
       if (res.reason) reasons.push(res.reason);
@@ -10577,7 +10577,7 @@ export function applyOutputGuards(
       forecastTempMin,
       forecastTempMax,
     });
-    if (thermalRes && thermalRes.modified) {
+    if (thermalRes.modified) {
       text = thermalRes.text;
       modified = true;
       if (thermalRes.reason) reasons.push(thermalRes.reason);
@@ -10590,7 +10590,7 @@ export function applyOutputGuards(
     // Firma propia (userMessage para la altitud). Guard de SIEMBRA. Va tras el
     // térmico (que requiere pronóstico) como red sin pronóstico al caso límite.
     const altRiskRes = guardAltitudeRiskCaveat(text, { userMessage });
-    if (altRiskRes && altRiskRes.modified) {
+    if (altRiskRes.modified) {
       text = altRiskRes.text;
       modified = true;
       if (altRiskRes.reason) reasons.push(altRiskRes.reason);
@@ -10598,7 +10598,7 @@ export function applyOutputGuards(
   }
   // Guard de nombre inventado: firma propia (necesita el nombre del perfil).
   const nameRes = guardInventedName(text, { profileName });
-  if (nameRes && nameRes.modified) {
+  if (nameRes.modified) {
     text = nameRes.text;
     modified = true;
     if (nameRes.reason) reasons.push(nameRes.reason);
@@ -10608,7 +10608,7 @@ export function applyOutputGuards(
   // (no es guard de siembra) pero solo actúa si la respuesta/pregunta tocan un
   // fermento. Fail-safe: ante un claim de salud, redirige a la frase segura.
   const fermRes = guardFermentoHealthClaim(text, { userMessage });
-  if (fermRes && fermRes.modified) {
+  if (fermRes.modified) {
     text = fermRes.text;
     modified = true;
     if (fermRes.reason) reasons.push(fermRes.reason);
@@ -10621,7 +10621,7 @@ export function applyOutputGuards(
   // del LLM. Va DESPUÉS del guard de claims de salud (su redirect queda debajo de
   // la receta; el caveat de inocuidad lidera arriba).
   const fermRecipeRes = guardFermentoRecipeSafety(text, { userMessage });
-  if (fermRecipeRes && fermRecipeRes.modified) {
+  if (fermRecipeRes.modified) {
     text = fermRecipeRes.text;
     modified = true;
     if (fermRecipeRes.reason) reasons.push(fermRecipeRes.reason);
@@ -10634,7 +10634,7 @@ export function applyOutputGuards(
   // el bloque de redirección orgánica (si disparó) queda arriba y el recordatorio MIP
   // detrás —ambos suman, fuerzan la alternativa agroecológica completa. ADITIVO.
   const mipRes = guardPestIntegratedManagement(text, { userMessage });
-  if (mipRes && mipRes.modified) {
+  if (mipRes.modified) {
     text = mipRes.text;
     modified = true;
     if (mipRes.reason) reasons.push(mipRes.reason);
@@ -10646,7 +10646,7 @@ export function applyOutputGuards(
   // combustible. Fail-safe: ADVIERTE que no se recomienda para restauración (no
   // la borra). Determinístico (lista hardcodeada), no depende del grounding.
   const reforestRes = guardReforestacionInvasora(text, { userMessage });
-  if (reforestRes && reforestRes.modified) {
+  if (reforestRes.modified) {
     text = reforestRes.text;
     modified = true;
     if (reforestRes.reason) reasons.push(reforestRes.reason);
@@ -10659,7 +10659,7 @@ export function applyOutputGuards(
   // que su nota quede después de cualquier advertencia de invasora. Determinístico
   // (lista hardcodeada), no depende del grounding.
   const reforestNativasRes = guardReforestacionNativasRol(text, { userMessage });
-  if (reforestNativasRes && reforestNativasRes.modified) {
+  if (reforestNativasRes.modified) {
     text = reforestNativasRes.text;
     modified = true;
     if (reforestNativasRes.reason) reasons.push(reforestNativasRes.reason);
@@ -10672,7 +10672,7 @@ export function applyOutputGuards(
   // aplicar por separado). Va antes de la marca inventada y de la ConfusionWarning;
   // como reemplaza todo el cuerpo, lo que sobreviva no contendrá la mezcla peligrosa.
   const mixRes = guardIncompatibleBiopreparadoMix(text, { userMessage });
-  if (mixRes && mixRes.modified) {
+  if (mixRes.modified) {
     text = mixRes.text;
     modified = true;
     if (mixRes.reason) reasons.push(mixRes.reason);
@@ -10685,7 +10685,7 @@ export function applyOutputGuards(
   // verdad de seguridad (no es comestible + por qué + redirección). Va tras la
   // mezcla incompatible y antes de la marca inventada / ConfusionWarning.
   const toxPrepRes = guardToxicFoodPreparation(text);
-  if (toxPrepRes && toxPrepRes.modified) {
+  if (toxPrepRes.modified) {
     text = toxPrepRes.text;
     modified = true;
     if (toxPrepRes.reason) reasons.push(toxPrepRes.reason);
@@ -10697,7 +10697,7 @@ export function applyOutputGuards(
   // (yuca brava), neutraliza esas frases y antepone el aviso con la molécula + procesar.
   // Va tras la preparación de tóxicos no-comestibles y antes de la marca inventada.
   const rawToxFoodRes = guardToxicRawFoodConsumption(text, resolvedEntities);
-  if (rawToxFoodRes && rawToxFoodRes.modified) {
+  if (rawToxFoodRes.modified) {
     text = rawToxFoodRes.text;
     modified = true;
     if (rawToxFoodRes.reason) reasons.push(rawToxFoodRes.reason);
@@ -10709,7 +10709,7 @@ export function applyOutputGuards(
   // segura (diluir, nunca puro, fitotoxicidad). Va tras los guards de tóxicos y antes
   // de la marca inventada. Idempotente.
   const pureFoliarRes = guardPureFoliarBiopreparado(text, { userMessage });
-  if (pureFoliarRes && pureFoliarRes.modified) {
+  if (pureFoliarRes.modified) {
     text = pureFoliarRes.text;
     modified = true;
     if (pureFoliarRes.reason) reasons.push(pureFoliarRes.reason);
@@ -10722,7 +10722,7 @@ export function applyOutputGuards(
   // antes de la superficie de ConfusionWarning, para que el prefijo tóxico de esta
   // última (si dispara) siga liderando la respuesta.
   const brandRes = guardInventedBrand(text);
-  if (brandRes && brandRes.modified) {
+  if (brandRes.modified) {
     text = brandRes.text;
     modified = true;
     if (brandRes.reason) reasons.push(brandRes.reason);
@@ -10733,7 +10733,7 @@ export function applyOutputGuards(
   // genérico. Va antes del guard de contacto inventado para capturar el caso
   // específico con una respuesta más útil. Idempotente.
   const hallucinatedContactRes = guardHallucinatedContact(text, { userMessage });
-  if (hallucinatedContactRes && hallucinatedContactRes.modified) {
+  if (hallucinatedContactRes.modified) {
     text = hallucinatedContactRes.text;
     modified = true;
     if (hallucinatedContactRes.reason) reasons.push(hallucinatedContactRes.reason);
@@ -10767,7 +10767,7 @@ export function applyOutputGuards(
   // verificada → ICA/Agrosavia/UMATA/CAR). Análogo institucional de la marca y el
   // contacto inventados: va justo tras ellos. Idempotente.
   const institutionRes = guardFabricatedInstitution(text);
-  if (institutionRes && institutionRes.modified) {
+  if (institutionRes.modified) {
     text = institutionRes.text;
     modified = true;
     if (institutionRes.reason) reasons.push(institutionRes.reason);
@@ -10780,7 +10780,7 @@ export function applyOutputGuards(
   // producto-milagro; manejo sanitario + biopreparado real). Va tras la marca inventada
   // (que cubre marcas Título-Caso) — este cubre el genérico-milagro que aquella no atrapa.
   const disgRes = guardDisguisedGenericAgrochem(text);
-  if (disgRes && disgRes.modified) {
+  if (disgRes.modified) {
     text = disgRes.text;
     modified = true;
     if (disgRes.reason) reasons.push(disgRes.reason);
@@ -10789,7 +10789,7 @@ export function applyOutputGuards(
   // "biopreparado Mosca del Mediterráneo", etc.). Va tras marca/genérico
   // inventado y antes de caveats de benéficos: aquí el cuerpo completo es dañino.
   const fakeProductRes = guardInventedProductRecipe(text);
-  if (fakeProductRes && fakeProductRes.modified) {
+  if (fakeProductRes.modified) {
     text = fakeProductRes.text;
     modified = true;
     if (fakeProductRes.reason) reasons.push(fakeProductRes.reason);
@@ -10804,7 +10804,7 @@ export function applyOutputGuards(
   // milagro (que cubre el "sirve para todo" sin binomio) — este cubre el binomio inventado
   // que aquel no atrapa. Usa `entities` (grounding filtrado) ya calculado arriba.
   const extractRes = guardInventedBotanicalExtract(text, entities);
-  if (extractRes && extractRes.modified) {
+  if (extractRes.modified) {
     text = extractRes.text;
     modified = true;
     if (extractRes.reason) reasons.push(extractRes.reason);
@@ -10828,7 +10828,7 @@ export function applyOutputGuards(
   // catálogo. Va tras los aditivos y antes de la superficie de ConfusionWarning,
   // para que el prefijo tóxico de esta última (si dispara) siga liderando.
   const benefRes = guardFabricatedBeneficialBinomial(text, resolvedEntities);
-  if (benefRes && benefRes.modified) {
+  if (benefRes.modified) {
     text = benefRes.text;
     modified = true;
     if (benefRes.reason) reasons.push(benefRes.reason);
@@ -10842,7 +10842,7 @@ export function applyOutputGuards(
   // páramo, puede ofrecer la especie REAL en su lugar. Si corre primero el genérico,
   // el paréntesis ya no existe y este guard no tiene nada que corregir.
   const paramoNativesRes = guardFabricatedParamoNatives(text, resolvedEntities);
-  if (paramoNativesRes && paramoNativesRes.modified) {
+  if (paramoNativesRes.modified) {
     text = paramoNativesRes.text;
     modified = true;
     if (paramoNativesRes.reason) reasons.push(paramoNativesRes.reason);
@@ -10858,7 +10858,7 @@ export function applyOutputGuards(
   // antes de la superficie de ConfusionWarning, para que su prefijo tóxico siga
   // liderando. Conservador: sin grounding no actúa.
   const invBinRes = guardInventedBinomialOutOfGrounding(text, resolvedEntities);
-  if (invBinRes && invBinRes.modified) {
+  if (invBinRes.modified) {
     text = invBinRes.text;
     modified = true;
     if (invBinRes.reason) reasons.push(invBinRes.reason);
@@ -10877,7 +10877,7 @@ export function applyOutputGuards(
         .filter(Boolean)
     );
     const unverifiedGuard = guardUnverifiedTermBinomial(text, { userMessage, resolvedMentions });
-    if (unverifiedGuard && unverifiedGuard.modified) {
+    if (unverifiedGuard.modified) {
       text = unverifiedGuard.text;
       modified = true;
       if (unverifiedGuard.reason) reasons.push(unverifiedGuard.reason);
@@ -10893,7 +10893,7 @@ export function applyOutputGuards(
   // `resolvedEntities` crudo (no `entities` filtrado) porque la CW vive en la
   // entidad tal como la resolvió el sidecar.
   const cwRes = guardSurfaceConfusionWarning(text, resolvedEntities);
-  if (cwRes && cwRes.modified) {
+  if (cwRes.modified) {
     text = cwRes.text;
     modified = true;
     if (cwRes.reason) reasons.push(cwRes.reason);
@@ -10907,7 +10907,7 @@ export function applyOutputGuards(
   // no quede sepultada. Espejo aplicado-al-texto de detectBurnEndorsement del
   // sidecar (el PWA solo lo usaba para la badge; aquí sí reescribe guarded.text).
   const burnRes = guardBurnEndorsementCorrection(text);
-  if (burnRes && burnRes.modified) {
+  if (burnRes.modified) {
     text = burnRes.text;
     modified = true;
     if (burnRes.reason) reasons.push(burnRes.reason);
@@ -10921,7 +10921,7 @@ export function applyOutputGuards(
   //   2. Si > 200 palabras y detecta repetición del mismo consejo,
   //      deduplica (deja la primera mención).
   const conciseRes = guardConciseResponse(text);
-  if (conciseRes && conciseRes.modified) {
+  if (conciseRes.modified) {
     text = conciseRes.text;
     modified = true;
     if (conciseRes.reason) reasons.push(conciseRes.reason);
@@ -10932,7 +10932,7 @@ export function applyOutputGuards(
   // cualquier corrección de seguridad/legal. Firma propia (necesita forecastTempMin
   // y forecastTempMax del pronóstico). Corre SIEMPRE, no es guard de siembra.
   const climaRes = guardClimaConsejo(text, { forecastTempMin, forecastTempMax });
-  if (climaRes && climaRes.modified) {
+  if (climaRes.modified) {
     text = climaRes.text;
     modified = true;
     if (climaRes.reason) reasons.push(climaRes.reason);

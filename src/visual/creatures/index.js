@@ -193,7 +193,6 @@ import Perezoso from './Perezoso.jsx';
 import Ardilla from './Ardilla.jsx';
 import Jaguar from './Jaguar.jsx';
 import Morrocoy from './Morrocoy.jsx';
-import Borugo from './Borugo.jsx';
 import Danta from './Danta.jsx';
 import Condor from './Condor.jsx';
 import Dalmata from './Dalmata.jsx';

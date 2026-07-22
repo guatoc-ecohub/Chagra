@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import {
   Mic, Sprout, FlaskConical, Ban, RotateCcw, ChevronLeft,
-  Leaf, AlertTriangle, GitBranch, RefreshCw,
+  Leaf, GitBranch, RefreshCw,
 } from 'lucide-react';
 import VoiceCapture from './VoiceCapture';
 import PhenologyTimeline from './PhenologyTimeline';

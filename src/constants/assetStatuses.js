@@ -32,11 +32,3 @@ export const STATUS_MAP = {
     pest: PEST_STATUSES
 };
 
-const STATUS_DEFAULT_FOR_TYPE = {
-    'asset--plant': 'growing',
-    'log--maintenance': 'pending',
-    'log--seeding': 'completed',
-    'log--harvest': 'completed',
-    'log--input': 'completed',
-    'log--observation': 'pending'
-};

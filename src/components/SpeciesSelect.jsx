@@ -3,7 +3,7 @@
  * useEffect. La tarea actual solo reemplaza el pipeline de foto del catálogo.
  */
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Loader2, Bug, Check, AlertCircle, AlertTriangle, HelpCircle, Info, WifiOff } from 'lucide-react';
+import { Search, ChevronDown, X, Clock, Sparkles, Camera, ImagePlus, Bug, Check, AlertCircle, AlertTriangle, HelpCircle, Info, WifiOff } from 'lucide-react';
 import VisionLoadingState from './common/VisionLoadingState';
 import { warmVisionModel } from '../services/visionWarmService';
 import { CROP_TAXONOMY } from '../config/taxonomy';
