@@ -1,43 +1,45 @@
 /*
- * EscenaBosqueVivo — el MUNDO donde vive el Ent de la queñua (TAKE A).
+ * EscenaBosqueVivo — EL PÁRAMO DEFINITIVO (2026-07-22).
  *
- * Un anfiteatro de bosque de niebla altoandino con el calibre del VALLE:
- *   · TERRENO con relieve real (heightfield determinista, vertexColors):
- *     el claro del guardián, lomos de musgo, la cañada del arroyo y la
- *     pared del anfiteatro que la niebla se come al fondo.
- *   · EL QUEÑUAL: queñuas (Polylepis) de tronco retorcido rojizo que se
- *     despapela y copas que son MASA de hojas con huecos (matojos-nube con
- *     normales radiales — nada de poliedros literales). Anillo héroe que
- *     enmarca al Ent + anillo lejano de siluetas veladas.
- *   · CICLO DE DÍA real (useCicloDia + CIELOS_HORA sesgados a bosque de
- *     niebla): la atmósfera se AMORTIGUA entre franjas (mismo patrón que
- *     AtmosferaValle) — amanece y anochece, no se teletransporta.
- *   · RAYOS DE SOL colados (godrays baratos: planos aditivos con textura
- *     canvas), BRUMA por capas con parallax entre los árboles y estrellas
- *     de noche.
- *   · CÁMARA consciente del aspecto + CamaraDirector (la llegada con dolly).
+ * El operador revisó los TRES mundos con piezas de páramo y decidió dejar UNO,
+ * armado con lo mejor de cada cual:
+ *   · DE ESTE MUNDO (la base): la iluminación del ciclo de día, la vegetación
+ *     (frailejonal por edades + queñual + sotobosque), el sistema de niebla en
+ *     capas (marea de fog + BrumaParallax + NieblaRasante) y la FaunaBosque
+ *     ("las aves, mariposas que salen están lindas").
+ *   · DEL PÁRAMO VIEJO (MundoParamo3D, archivado): la CÁMARA de la llegada
+ *     ("es increíble" → CamaraJackson, paneo CatmullRom que abre pegado a la
+ *     roseta y se asienta en el plano general) y el FONDO de inmensidad
+ *     (fondoParamo: bóveda, cordillera, mar de nubes, falda, sol velado).
+ *   · DE SueloDemo3D (archivado): el SUELO RICO como terreno (ya era la base
+ *     del anfiteatro; ahora viste su paleta dorada de páramo) + las PEÑAS de
+ *     hito sembradas con distribuirDetalle.
+ *   · FUERA el Ent y el campesino ("están horribles"): ni EntQuenua ni la
+ *     figura de escala. El centro del claro lo toma el PATRIARCA — el
+ *     frailejón más viejo y más alto del rodal — con su queñua matriarca.
  *
- * El guardián (EntQuenua) vive en el MOUNT del centro — otra rama lo eleva
- * de calibre; aquí solo se le prepara el escenario. La fauna es la de
- * FaunaBosque (SVG rubber-hose, el estándar de la casa). Tier-safe vía
- * perfilDeTier; reducedMotion monta QUIETO (frameloop a demanda).
+ * La pared del anfiteatro conserva el abrigo del cuenco SALVO por la ABRA
+ * (bosqueTakeA): la ventana angular por donde la meseta se despeña hacia la
+ * cordillera y el mar de nubes — la inmensidad entra por ahí al encuadre héroe.
  *
+ * Tier-safe vía perfilDeTier; reducedMotion monta QUIETO (frameloop a demanda).
  * Todo procedural (cero CDN/imágenes). Importa three/@react-three → montar
  * SOLO perezosa (lazy) desde el host.
  */
 import { Suspense, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { perfilDeTier } from '../deviceTier.js';
 import useCicloDia from '../useCicloDia.js';
 import { CIELOS_HORA, TRANSICION, mezclaHex } from '../cielosHoraData.js';
-import CamaraDirector from '../escenas/CamaraDirector.jsx';
 import { SombraContacto } from '../escenas/SombraContacto.jsx';
-import SueloRico from '../terreno/SueloRico.jsx';
-import EntQuenua from './EntQuenua.jsx';
+import SueloRico, { Instancias } from '../terreno/SueloRico.jsx';
+import { geomPiedraSuelo, distribuirDetalle } from '../terreno/sueloRico.geom.js';
 import FloraParamo from './FloraParamo.jsx';
 import FaunaBosque from './FaunaBosque.jsx';
+import FondoParamo from './fondoParamo.jsx';
+import { geomFrailejon, calidadDeTier } from './floraParamo.geom.js';
 import {
   alturaBosque,
   sueloDelBosque,
@@ -367,6 +369,139 @@ function Arroyo({ nocturno, perfil }) {
   );
 }
 
+/* ── EL CORAZÓN DEL CLARO: el PATRIARCA y su corte ─────────────────────────
+      Donde vivía el Ent ahora manda el frailejón MÁS VIEJO del rodal — el
+      patriarca en flor, por encima de los héroes del proscenio — con un
+      acompañante, la queñua matriarca (el árbol del páramo, sin rostro) y las
+      piedras del claro. La mirada de reposo cae exactamente aquí. */
+const CENTRO = {
+  patriarca: { x: -1.6, z: 0.6, escala: 2.55, rotY: 0.8 },
+  segundo: { x: 1.9, z: 1.7, escala: 1.3, rotY: 2.4 },
+  matriarca: { x: 4.1, z: -3.9, escala: 1.5, rotY: 1.1 },
+  rocas: [
+    { x: -2.7, z: 1.8, escala: 1.9, rotY: 0.4 },
+    { x: 1.0, z: 2.9, escala: 1.2, rotY: 2.1 },
+    { x: 2.3, z: -1.3, escala: 1.5, rotY: 4.4 },
+  ],
+};
+
+/* Posa una pieza del centro sobre el relieve (formato de `Instancias`). */
+const posarCentro = (p, hundir = 0) => ({
+  pos: [p.x, alturaBosque(p.x, p.z) - hundir, p.z],
+  rotY: p.rotY,
+  escala: p.escala,
+  tint: [1, 1, 1],
+});
+
+function CentroParamo({ tier, perfil }) {
+  const q = tier === 'alto' ? 1 : tier === 'medio' ? 0.62 : 0.45;
+  const geoPatriarca = useMemo(
+    () => geomFrailejon({ flor: true, q: calidadDeTier(tier), edad: 1 }, 407),
+    [tier],
+  );
+  const geoQuenua = useMemo(() => geomQuenua({ q }, 33), [q]);
+  const geoRoca = useMemo(
+    () => geomPiedraSuelo(sueloDelBosque.opts.seed + 555, sueloDelBosque.opts.paleta),
+    [],
+  );
+  const mat = useMemo(
+    () => (perfil.materialRico
+      ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, metalness: 0 })
+      : new THREE.MeshLambertMaterial({ vertexColors: true })),
+    [perfil.materialRico],
+  );
+  const frailejones = useMemo(() => [posarCentro(CENTRO.patriarca), posarCentro(CENTRO.segundo)], []);
+  const quenua = useMemo(() => [posarCentro(CENTRO.matriarca)], []);
+  const rocas = useMemo(() => CENTRO.rocas.map((r) => posarCentro(r, 0.1)), []);
+  useLayoutEffect(() => () => {
+    geoPatriarca.dispose();
+    geoQuenua.dispose();
+    geoRoca.dispose();
+    mat.dispose();
+  }, [geoPatriarca, geoQuenua, geoRoca, mat]);
+  return (
+    <group>
+      <Instancias geo={geoPatriarca} mat={mat} items={frailejones} castShadow={perfil.sombras} />
+      <Instancias geo={geoQuenua} mat={mat} items={quenua} castShadow={perfil.sombras} />
+      <Instancias geo={geoRoca} mat={mat} items={rocas} castShadow={perfil.sombras} />
+    </group>
+  );
+}
+
+/* ── LAS PEÑAS DE HITO (de SueloDemo3D) ────────────────────────────────────
+      Rocas GRANDES cuya silueta se recorta contra la niebla, sembradas con la
+      API de detalle del suelo rico — el reuso probado en la demo del suelo. */
+function Penas({ perfil }) {
+  const geo = useMemo(
+    () => geomPiedraSuelo(sueloDelBosque.opts.seed + 777, sueloDelBosque.opts.paleta),
+    [],
+  );
+  const items = useMemo(
+    () => distribuirDetalle(sueloDelBosque, 6, {
+      seed: 99, rMin: 10, rMax: 26, eMin: 2.2, eMax: 4.0, evitaSendero: 1.6, hundir: 0.12,
+    }),
+    [],
+  );
+  const mat = useMemo(
+    () => (perfil.materialRico
+      ? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0 })
+      : new THREE.MeshLambertMaterial({ vertexColors: true })),
+    [perfil.materialRico],
+  );
+  useLayoutEffect(() => () => {
+    geo.dispose();
+    mat.dispose();
+  }, [geo, mat]);
+  return <Instancias geo={geo} mat={mat} items={items} castShadow={perfil.sombras} />;
+}
+
+/* ── LA CÁMARA DE LA LLEGADA (la del páramo viejo: "es increíble") ─────────
+      Paneo CatmullRom portado de MundoParamo3D: abre PEGADO a la roseta del
+      gigante del proscenio, se cuela bajo entre el frailejonal, barre el
+      occidente de la planicie y SE ASIENTA en el plano general — y al girar
+      hacia el reposo, la abra revela la cordillera y el mar de nubes. Mientras
+      vuela, los OrbitControls están desmontados (nadie pelea la cámara). */
+const DUR_JACKSON = 8.5;
+const _miradaJackson = new THREE.Vector3();
+function CamaraJackson({ pose, onFin }) {
+  const { camera } = useThree();
+  const ini = useRef(/** @type {number|null} */ (null));
+  const hecho = useRef(false);
+  const { curva, va, vb } = useMemo(() => {
+    const y0 = alturaBosque(3.8, 11.2); // el pie del gigante del proscenio
+    return {
+      curva: new THREE.CatmullRomCurve3(
+        [
+          new THREE.Vector3(5.0, y0 + 2.2, 13.9),
+          new THREE.Vector3(-0.5, y0 + 1.4, 7.4),
+          new THREE.Vector3(-6.9, 3.4, 8.2),
+          new THREE.Vector3(2.4, 5.6, 15.8),
+          new THREE.Vector3(pose.position[0], pose.position[1], pose.position[2]),
+        ],
+        false,
+        'catmullrom',
+        0.3,
+      ),
+      va: new THREE.Vector3(3.8, y0 + 3.0, 11.2), // la roseta plateada del gigante
+      vb: new THREE.Vector3(pose.mira[0], pose.mira[1], pose.mira[2]),
+    };
+  }, [pose]);
+  useFrame(({ clock }) => {
+    if (hecho.current) return;
+    if (ini.current == null) ini.current = clock.elapsedTime;
+    const t = Math.min(1, (clock.elapsedTime - ini.current) / DUR_JACKSON);
+    const e = t * t * (3 - 2 * t);
+    curva.getPoint(e, camera.position);
+    _miradaJackson.copy(va).lerp(vb, THREE.MathUtils.smoothstep(e, 0.45, 1));
+    camera.lookAt(_miradaJackson);
+    if (t >= 1) {
+      hecho.current = true;
+      onFin();
+    }
+  });
+  return null;
+}
+
 /* ── RAYOS DE SOL COLADOS (godrays baratos) ────────────────────────────────
       Láminas aditivas con textura canvas (gradiente que se apaga hacia el
       suelo), orientadas HACIA el sol de la franja. Fuertes al amanecer y la
@@ -593,11 +728,14 @@ function BrumaParallax({ franja, reducedMotion }) {
    cielo lechoso del páramo ocupa el tercio alto (la firma: planicie abierta,
    cielo grande). La queñua Ent queda de acento vertical/guardián al fondo, ya no
    como muro de copas. fov 45→46 para que entre más frailejonal. */
-const POSE_BOSQUE = { position: [12.0, 4.7, 17.6], fov: 46, mira: [0, 3.0, 0] };
+const POSE_BOSQUE = { position: [12.0, 5.8, 17.6], fov: 46, mira: [0, 2.5, 0] };
 
-/* Anclas de sombra de contacto que la escena le pasa a SueloRico: el claro del
-   guardián (el Ent es el objeto mayor y necesita el AO ancho que lo planta). */
-const ANCLAS_SUELO = [{ x: 0, z: 0, radio: 2.7 }];
+/* Anclas de sombra de contacto que la escena le pasa a SueloRico: el patriarca
+   y la queñua matriarca del centro (los objetos mayores del claro). */
+const ANCLAS_SUELO = [
+  { x: -1.6, z: 0.6, radio: 1.6 },
+  { x: 4.1, z: -3.9, radio: 2.1 },
+];
 
 function poseBosqueParaAspecto(aspect) {
   if (!aspect || aspect >= 0.9) return { ...POSE_BOSQUE, k: 1 };
@@ -622,11 +760,18 @@ function Diorama({ tier, reducedMotion, pose }) {
   const { franja } = useCicloDia({ reducedMotion });
   const nocturno = franja === 'noche';
   const fracEstrellas = presetBosque(franja).estrellas;
+  // La llegada de Jackson (paneo del páramo viejo): mientras vuela, los
+  // OrbitControls están desmontados. reduced-motion y gama baja la saltan.
+  const [vuelo, setVuelo] = useState(() => !reducedMotion && tier !== 'bajo');
 
   return (
     <>
       {/* Atmósfera del ciclo de día: fondo + niebla + las cuatro luces. */}
       <AtmosferaBosque franja={franja} perfil={perfil} reducedMotion={reducedMotion} />
+
+      {/* LA INMENSIDAD (del páramo viejo): bóveda, cordillera, mar de nubes,
+          falda que se despeña por la abra y el frailejonal del horizonte. */}
+      <FondoParamo franja={franja} tier={tier} reducedMotion={reducedMotion} />
       {fracEstrellas > 0 && perfil.estrellas > 0 && (
         <Stars
           radius={60}
@@ -638,13 +783,14 @@ function Diorama({ tier, reducedMotion, pose }) {
         />
       )}
 
-      {/* El anfiteatro: el SUELO RICO compartido (relieve fbm, color por zona,
-          sendero que entra al claro, detalle al ras) sobre el contrato del
-          bosque (sueloDelBosque = suelo rico + pared del anfiteatro + cañada).
-          El guardián recibe su sombra de contacto como ancla de la escena. */}
+      {/* El terreno: el SUELO RICO dorado de páramo (relieve fbm, color por
+          zona, sendero, detalle al ras) sobre el contrato del cuenco
+          (sueloDelBosque = suelo rico + pared del anfiteatro con la ABRA +
+          cañada). El patriarca recibe su sombra de contacto como ancla. */}
       <SueloRico suelo={sueloDelBosque} tier={tier} anclas={ANCLAS_SUELO} />
 
-      {/* El queñual: héroes que enmarcan + siluetas lejanas en la niebla. */}
+      {/* El queñual (vegetación bendecida): acentos que enmarcan + siluetas
+          lejanas en la niebla. */}
       <Quenual tier={tier} perfil={perfil} />
 
       {/* El suelo vivido: hojarasca y madera muerta con musgo. */}
@@ -675,54 +821,46 @@ function Diorama({ tier, reducedMotion, pose }) {
       {/* La bruma con parallax que da profundidad física al orbitar. */}
       {perfil.fog && <BrumaParallax franja={franja} reducedMotion={reducedMotion} />}
 
-      {/* Sombra de contacto del guardián. En alto/medio la pone SueloRico (ancla
-          de la escena); en 'bajo' SueloRico no dibuja sombras, así que el kit la
-          planta acá para que el Ent no flote. */}
+      {/* ══ EL CENTRO DEL CLARO ══ el patriarca en flor, la queñua matriarca y
+          las piedras (aquí vivía el Ent; el operador lo sacó: "está horrible").
+          Las PEÑAS de hito (SueloDemo3D) recortan su silueta contra la niebla. */}
+      <CentroParamo tier={tier} perfil={perfil} />
+      {tier !== 'bajo' && <Penas perfil={perfil} />}
+
+      {/* Sombra de contacto del patriarca. En alto/medio la pone SueloRico
+          (anclas de la escena); en 'bajo' SueloRico no dibuja sombras, así que
+          el kit la planta acá para que el frailejón mayor no flote. */}
       {!perfil.sombrasContacto && (
-        <SombraContacto pos={[0, 0.04, 0]} radio={2.6} color="#20281c" opacidad={0.34} orden={2} />
+        <SombraContacto pos={[-1.6, 0.04, 0.6]} radio={1.5} color="#20281c" opacidad={0.34} orden={2} />
       )}
 
-      {/* ══ MOUNT DEL ENT ══ El guardián vive AQUÍ (origen del claro). Crece con
-          la grandeza del bosque (scale) SIN tocar su geometría ni su rostro
-          refinado — el corazón acompaña la escala catedral, no la pierde. */}
-      <group name="mount-ent" scale={1.4}>
-        <EntQuenua tier={tier} reducedMotion={reducedMotion} />
-      </group>
-
-      <OrbitControls
-        ref={controls}
-        makeDefault
-        target={pose.mira}
-        enablePan={false}
-        enableZoom
-        minDistance={7}
-        maxDistance={Math.max(30, Math.ceil(22 * pose.k) + 6)}
-        minPolarAngle={0.5}
-        maxPolarAngle={1.5}
-        enableDamping
-        dampingFactor={0.08}
-        autoRotate={!reducedMotion}
-        autoRotateSpeed={0.1}
-      />
-      {/* La LLEGADA: dolly de establecimiento (una vez por sesión) — la
-          cámara arranca mirando al dosel y baja al rostro del guardián. */}
-      <CamaraDirector
-        controls={controls}
-        reposo={pose.position}
-        mirada={[0, 6.4, 0]}
-        duracion={3.0}
-        amplio={1.6}
-        respiro={0.045}
-        activa={!reducedMotion && tier !== 'bajo'}
-        unaVezClave="bosqueTakeA"
-      />
+      {/* LA LLEGADA (Jackson) o el reposo orbitable: nunca los dos a la vez. */}
+      {vuelo ? (
+        <CamaraJackson pose={pose} onFin={() => setVuelo(false)} />
+      ) : (
+        <OrbitControls
+          ref={controls}
+          makeDefault
+          target={pose.mira}
+          enablePan={false}
+          enableZoom
+          minDistance={7}
+          maxDistance={Math.max(30, Math.ceil(22 * pose.k) + 6)}
+          minPolarAngle={0.5}
+          maxPolarAngle={1.5}
+          enableDamping
+          dampingFactor={0.08}
+          autoRotate={!reducedMotion}
+          autoRotateSpeed={0.1}
+        />
+      )}
       <AdaptiveDpr pixelated />
     </>
   );
 }
 
 /**
- * El mundo Bosque Vivo con el Ent de la queñua (TAKE A). Montar SOLO perezosa.
+ * El PÁRAMO DEFINITIVO (mundo Bosque Vivo, take páramo). Montar SOLO perezosa.
  * @param {{tier?: 'alto'|'medio'|'bajo', reducedMotion?: boolean}} props
  */
 export default function EscenaBosqueVivo({ tier = 'alto', reducedMotion = false }) {
@@ -736,13 +874,20 @@ export default function EscenaBosqueVivo({ tier = 'alto', reducedMotion = false 
     ),
     [],
   );
+  // Con la llegada de Jackson activa, la cámara NACE en el arranque del paneo
+  // (pegada a la roseta del gigante); sin ella, directo en la pose de reposo.
+  const conVuelo = !reducedMotion && tier !== 'bajo';
+  const camIni = useMemo(
+    () => (conVuelo ? [5.0, alturaBosque(3.8, 11.2) + 2.2, 13.9] : pose.position),
+    [conVuelo, pose],
+  );
   return (
     <Canvas
       className={`bviva-canvas${listo ? ' bviva-canvas--lista' : ''}`}
       dpr={perfil.dpr}
       gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
       shadows={perfil.sombras ? 'soft' : false}
-      camera={/** @type {any} */ ({ position: pose.position, fov: pose.fov })}
+      camera={/** @type {any} */ ({ position: camIni, fov: pose.fov })}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >

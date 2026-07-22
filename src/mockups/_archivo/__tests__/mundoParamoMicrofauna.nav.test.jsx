@@ -1,3 +1,8 @@
+/*
+ * ARCHIVADO 2026-07-22 junto con MundoParamo3D.jsx (páramo definitivo).
+ * Prueba la puerta lección→microfauna del páramo VIEJO; se conserva porque el
+ * mundo archivado se conserva. Ver src/mockups/_archivo/MundoParamo3D.jsx.
+ */
 import React from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -15,7 +20,7 @@ vi.mock('@react-three/drei', () => ({
   OrbitControls: () => null,
 }));
 
-vi.mock('../../visual/mundo3d/deviceTier.js', () => ({
+vi.mock('../../../visual/mundo3d/deviceTier.js', () => ({
   decidirTier: () => ({ tier: 'medio' }),
   perfilDeTier: () => ({ dpr: [1, 1], antialias: false }),
 }));

@@ -61,6 +61,25 @@ export function xArroyo(z) {
   return 4.7 + Math.sin(z * 0.24 + 1.3) * 1.5;
 }
 
+/*
+ * LA ABRA DEL PÁRAMO (páramo definitivo, 2026-07-22): el anfiteatro cerrado era
+ * la identidad del bosque de niebla, pero el páramo pide lo contrario — un
+ * costado por donde la meseta SE DESPEÑA y se ve la cordillera que no se acaba
+ * y el mar de nubes de abajo (la inmensidad que el operador salvó del páramo
+ * viejo). La abra es una ventana ANGULAR en la pared del anfiteatro, centrada
+ * en el corredor de la cámara de reposo: desde el encuadre héroe se mira
+ * DERECHO por la abra hacia la lejanía; orbitando, el resto del cuenco sigue
+ * abrigado por la pared y su niebla. `fondoParamo.jsx` siembra la falda, el
+ * frailejonal del horizonte y el mar de nubes en esta misma dirección.
+ */
+export const ABRA = { az: -2.17, ancho: 0.7 }; // azimut del corredor de vista + sigma angular
+export function abraParamo(x, z) {
+  let d = Math.atan2(z, x) - ABRA.az;
+  while (d > Math.PI) d -= Math.PI * 2;
+  while (d < -Math.PI) d += Math.PI * 2;
+  return Math.exp(-(d * d) / (2 * ABRA.ancho * ABRA.ancho));
+}
+
 /* La identidad del anfiteatro (lo que crearSueloRico no sabe). */
 function extraAnfiteatro(x, z) {
   const r = Math.hypot(x, z);
@@ -68,7 +87,9 @@ function extraAnfiteatro(x, z) {
   const cresta = 1 + 0.34 * Math.sin(ang * 3 + 1.2)
     + 0.2 * Math.sin(ang * 7 - 0.7)
     + 0.12 * Math.sin(ang * 13 + 2.3);
-  const pared = ss(r, 14, 40) ** 1.2 * 7.4 * cresta;
+  // La abra ABRE la pared (88%): por ahí la meseta sigue de largo hacia la
+  // falda del fondo en vez de estrellarse contra el cuenco.
+  const pared = ss(r, 14, 40) ** 1.2 * 7.4 * cresta * (1 - 0.88 * abraParamo(x, z));
   const dx = x - xArroyo(z);
   const canada = -0.4 * Math.exp(-(dx * dx) / 1.15) * ss(z, -13, -6) * (1 - ss(r, 28, 40));
   return pared + canada;
@@ -108,7 +129,11 @@ const sueloBase = crearSueloRico({
   claro: { radio: 3.2, transicion: 6.3 },
   falda: null, // la pared del anfiteatro (con crestas) la pone extraAnfiteatro
   sendero: { puntos: PUNTOS_SENDERO, ancho: 1.05 },
-  paleta: PALETA_BOSQUE,
+  /* Páramo definitivo (2026-07-22): el suelo viste la PALETA_PARAMO por defecto
+     del suelo rico — pajonal dorado en los lomos, musgo en las hondonadas, roca
+     cálida en la pendiente. Es el suelo que el operador aprobó en SueloDemo3D
+     ("me gusta mucho... el suelo, en general muy bien"); el musgo hondo de
+     bosque cerrado (PALETA_BOSQUE exportada) queda para quien lo retome. */
 });
 
 /**

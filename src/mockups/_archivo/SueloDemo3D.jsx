@@ -1,4 +1,16 @@
 /*
+ * ARCHIVADO 2026-07-22 — pedido del operador (páramo definitivo).
+ *
+ * La demo del SUELO calibre Switch cumplió su misión: su terreno (suelo rico
+ * dorado + peñas de hito con distribuirDetalle) ES ahora el terreno del
+ * PÁRAMO DEFINITIVO (src/visual/mundo3d/bosque/EscenaBosqueVivo.jsx, ruta
+ * #/mockups/paramo-definitivo). Textual del operador: "me gusta mucho... el
+ * suelo, en general muy bien"; su defecto ("le falta más diversidad de páramo
+ * en especies y tamaño de especies") se corrigió allá con las ocho especies de
+ * floraParamo y el gradiente de edades del frailejonal.
+ * NO se borra: queda como referencia de las vistas fijas y el paseo de cámara.
+ */
+/*
  * SueloDemo3D — la escena de prueba del SUELO calibre Switch.
  *
  * Un pedazo de páramo a la hora dorada donde el terreno ES el protagonista:
@@ -18,11 +30,11 @@ import { useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
-import { decidirTier, permite3D, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
-import { crearSueloRico, geomPiedraSuelo, distribuirDetalle } from '../visual/mundo3d/terreno/sueloRico.geom.js';
-import SueloRico, { Instancias } from '../visual/mundo3d/terreno/SueloRico.jsx';
-import { geomCieloDomo } from '../visual/mundo3d/vitrina/miradorAndino.geom.js';
-import { geomFrailejon, calidadDeTier } from '../visual/mundo3d/bosque/floraParamo.geom.js';
+import { decidirTier, permite3D, perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
+import { crearSueloRico, geomPiedraSuelo, distribuirDetalle } from '../../visual/mundo3d/terreno/sueloRico.geom.js';
+import SueloRico, { Instancias } from '../../visual/mundo3d/terreno/SueloRico.jsx';
+import { geomCieloDomo } from '../../visual/mundo3d/vitrina/miradorAndino.geom.js';
+import { geomFrailejon, calidadDeTier } from '../../visual/mundo3d/bosque/floraParamo.geom.js';
 
 /* Luz de páramo a la hora dorada (cielo del domo del mirador). */
 const LUZ = { niebla: '#ddc9a2', sol: '#ffe8bd', cielo: '#dfe6df', suelo: '#4a4634' };
