@@ -14,6 +14,9 @@ export function useModoLectura() {
 
   useEffect(() => {
     const saved = localStorage.getItem(KEY) === '1';
+    // Lectura síncrona de la preferencia guardada al montar (mismo patrón ya
+    // establecido en NetworkStatusBar.jsx).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActivo(saved);
     if (saved) document.documentElement.classList.add('chagra-lectura-grande');
   }, []);
@@ -21,7 +24,7 @@ export function useModoLectura() {
   const toggle = useCallback(() => {
     const next = !activo;
     setActivo(next);
-    try { localStorage.setItem(KEY, next ? '1' : '0'); } catch {}
+    try { localStorage.setItem(KEY, next ? '1' : '0'); } catch { /* noop */ }
     if (next) document.documentElement.classList.add('chagra-lectura-grande');
     else document.documentElement.classList.remove('chagra-lectura-grande');
   }, [activo]);

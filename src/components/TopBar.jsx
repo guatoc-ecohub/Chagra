@@ -2,6 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { CircleUser, HelpCircle, LogOut } from 'lucide-react';
 import { version as APP_VERSION } from '../../package.json';
 import OfflineChip from './OfflineChip';
+// T45 (rescate #2668 → cableado): batería + calidad de señal, junto al chip de
+// "sin conexión". En campo, saber si queda batería o si la señal cae a 2G
+// cambia decisiones (¿grabo video o solo foto? ¿espero a llegar a la casa para
+// sincronizar?). Se apaga sola: si el navegador no expone Battery/Network
+// Information API (la mayoría de desktop y Safari), no renderiza nada.
+import BateriaConexionIndicator from './BateriaConexionIndicator';
 import NotificationsBell from './NotificationsBell';
 import useOllamaWarmStore from '../store/useOllamaWarmStore';
 import useAssetStore from '../store/useAssetStore';
@@ -204,6 +210,7 @@ export default function TopBar({ onNavigate, onLogout }) {
         `}</style>
 
         <OfflineChip />
+        <BateriaConexionIndicator />
 
         {/* Spacer */}
         <div className="flex-1" />

@@ -25,6 +25,9 @@ export default function BateriaConexionIndicator() {
     // Conexión
     const conn = navigator.connection;
     if (conn) {
+      // Lectura síncrona del tipo de red disponible al montar (mismo patrón
+      // ya establecido en NetworkStatusBar.jsx / usePendingSyncCount.js).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTipoRed(conn.effectiveType || 'desconocido');
       conn.addEventListener('change', () => setTipoRed(conn.effectiveType || 'desconocido'));
     }

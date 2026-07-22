@@ -66,6 +66,19 @@ import DemoModeBanner from './components/DemoModeBanner';
 import CriticalAlertBanner from './components/CriticalAlertBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ErrorFallback } from './components/common/ErrorFallback';
+// Badge "N pendientes de sincronizar" (rescate #2668 → cableado): offline-first,
+// el campesino necesita saber si lo que registró ya subió o sigue en cola.
+// Complementa a NetworkStatusBar/SyncProgressIndicator (ver SyncIndicator.jsx):
+// esos son transicionales (aparecen en online/offline/syncComplete y se
+// esconden solos); este es un recordatorio PERSISTENTE mientras pending > 0,
+// incluso si la app arrancó ya online con la cola vieja sin disparar eventos.
+import SyncIndicator from './components/SyncIndicator';
+// Modo lectura (letra grande) para adultos mayores (rescate #2668 → cableado).
+// Se monta acá SOLO por su efecto de boot: relee localStorage y reaplica la
+// clase `chagra-lectura-grande` en <html> al cargar la app (si no se llama
+// desde algún componente montado siempre, el ajuste elegido en Perfil no
+// sobreviviría a un refresh). El toggle real vive en ProfileScreen.
+import { useModoLectura, CSS_LECTURA_GRANDE } from './hooks/useModoLectura';
 
 // Lazy-loaded route components
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
@@ -1078,6 +1091,12 @@ function DashboardLiveView({ onNavigate, onLogout }) {
 
 export default function App() {
   useTheme();
+  // Modo lectura (letra grande, T49): se llama acá SOLO por el efecto de
+  // montaje (relee localStorage y reaplica la clase en <html>). El toggle
+  // visible vive en ProfileScreen › Apariencia; esta instancia no se usa
+  // para renderizar nada, existe para que el ajuste sobreviva a un refresh
+  // sin necesidad de haber abierto Perfil primero.
+  useModoLectura();
   // Atmósfera climática: el clima real (climaService) matiza el tema activo
   // vía data-clima/data-luz/data-enso en <html> (clima-atmosfera.css).
   useClimaAtmosphere();
@@ -3950,6 +3969,13 @@ export default function App() {
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
+      {/* Badge persistente "N pendientes de sincronizar" (rescate #2668).
+          Mismo guard de vista que SyncProgressIndicator: no en pre-auth. */}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncIndicator />}
+      {/* CSS de Modo lectura (T49): la regla vive en useModoLectura.js; se
+          inyecta acá una sola vez, siempre montada, para que el toggle de
+          Perfil › Apariencia tenga efecto en toda la app. */}
+      <style>{CSS_LECTURA_GRANDE}</style>
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}

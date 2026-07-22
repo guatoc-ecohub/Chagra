@@ -8,7 +8,7 @@
  * operaciones encoladas. En el modo campo sin red, muestra cuántos
  * registros (voz, siembra, cosecha) esperan a reconectarse.
  */
-import { usePendingSyncCount } from '../../hooks/usePendingSyncCount';
+import { usePendingSyncCount } from '../hooks/usePendingSyncCount';
 
 export default function SyncIndicator() {
   const { pending } = usePendingSyncCount();
@@ -24,7 +24,7 @@ export default function SyncIndicator() {
         animate-pulse"
       title={`${pending} operaciones pendientes de sincronizar. Toque para reintentar.`}
       onClick={() => {
-        import('../../services/syncManager.js').then(({ syncManager }) => {
+        import('../services/syncManager.js').then(({ syncManager }) => {
           syncManager.syncAll?.();
         }).catch(() => {});
       }}
