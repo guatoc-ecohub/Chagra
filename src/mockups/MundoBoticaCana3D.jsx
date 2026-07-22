@@ -27,7 +27,8 @@
  *     colibrí y mariposa polinizando la botica, escarabajo en la tierra.
  *   - Polen del kit (`ParticulasAmbientales`) sobre los canteros.
  *
- * RENDIMIENTO: cañal instanciado (2 draw calls para todo el cañaduzal),
+ * RENDIMIENTO: cañal instanciado (una draw-call por banco: chala, tallo y hoja
+ * de cada variante de mata, más los penachos — 7 en gama alta, 4 en media),
  * Lambert sin shadow-map, presupuestos por `perfilDeTier`; `reducedMotion`
  * congela buey/humo/burbujas y pasa el frameloop a demanda. Gama baja no
  * llega aquí (la vitrina 2D del framework la cubre).
@@ -45,6 +46,12 @@ import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
 import { ParticulasAmbientales } from '../visual/mundo3d/ParticulasAmbientales.jsx';
 import { crearRng } from '../visual/mundo3d/particulasData.js';
 import { Bicho } from '../visual/mundo3d/escenas/FaunaEscena.jsx';
+import {
+  calidadCana,
+  geomMataCana,
+  geomPenachoCana,
+  variedadPara,
+} from '../visual/mundo3d/cana/floraCana.geom.js';
 
 /* El mediodía claro del kit: única fuente de la atmósfera de esta escena. */
 const DIA = CIELOS_HORA.mediodia;
@@ -59,8 +66,7 @@ const P = {
   maderaVieja: mezclar('#7a5a38', TINTE, 0.2), // postes y tablas curtidas
   maderaClara: mezclar('#a5804e', TINTE, 0.22), // rodillos y palanca
   paja: mezclar('#c9a860', TINTE, 0.22), // el techo de la enramada
-  cana: mezclar('#d4c765', TINTE, 0.12), // el tallo amarillo de la caña madura
-  canaVerde: mezclar('#93b84f', TINTE, 0.16), // el cogollo del cañal
+  cana: mezclar('#d4c765', TINTE, 0.12), // el tallo amarillo de la caña cortada
   adobe: mezclar('#9a5a38', TINTE, 0.22), // la hornilla de barro y ladrillo
   cobre: mezclar('#b06a3a', TINTE, 0.15), // la paila
   guarapo: mezclar('#c78a2e', TINTE, 0.1), // el jugo dorado hirviendo
@@ -76,12 +82,9 @@ const P = {
   calendulaFlor: mezclar('#e8862e', TINTE, 0.08), // la flor naranja
   manzanillaFlor: mezclar('#f5efdd', TINTE, 0.05),
   tallo: mezclar('#5d7a3c', TINTE, 0.22),
-  // la caña por piezas (fidelidad botánica: entrenudos, hoja acintada, espiga)
-  canaMorada: mezclar('#7d4a63', TINTE, 0.14), // la variedad morada entreverada
-  canaNudo: mezclar('#8a7838', TINTE, 0.12), // el anillo oscuro del nudo
-  hojaCana: mezclar('#9db855', TINTE, 0.16), // la hoja larga acintada
-  hojaSeca: mezclar('#c2a95c', TINTE, 0.2), // la hoja doblada que se seca abajo
-  penacho: mezclar('#e8dfc0', TINTE, 0.08), // la espiga plumosa plateada
+  /* La caña EN PIE no se pinta aquí: el cañal usa la paleta horneada de
+     `floraCana.geom.js` (PAL + VARIEDADES), que es la misma del mundo del
+     trapiche. Lo de arriba (`cana`) es solo la caña YA CORTADA del arrume. */
   espuma: mezclar('#f2e4bc', TINTE, 0.05), // la espuma del hervor
   cachaza: mezclar('#d8b878', TINTE, 0.1), // lo que retira el cucharón
 };
@@ -570,186 +573,186 @@ function Botica({ etiquetas, reducedMotion }) {
 
 /* ══════════════════════ LA CAÑA Y LA PANELA ══════════════════════ */
 
-/* El cañal instanciado CON FIDELIDAD BOTÁNICA (el de antes se leía como un
-   pinar de conos — pecado capital de este mundo). La caña de verdad:
-   - tallo alto y DELGADO, amarillo de madura, con los NUDOS marcados;
-   - unas matas de la variedad MORADA entreveradas;
-   - hojas largas ACINTADAS que nacen del nudo y se ARQUEAN hacia afuera;
-   - las hojas viejas dobladas hacia abajo, ya pajizas, vistiendo el tallo;
-   - y el PENACHO plumoso plateado arriba, solo en las que ya espigaron.
-   Todo sigue instanciado: 5 draw calls para el cañaduzal entero. */
-const CANA_ALTO = 3.0; // más alta que una persona: eso se tiene que sentir
-function Canal({ n }) {
-  const tallos = useRef(null);
-  const nudos = useRef(null);
-  const hojas = useRef(null);
-  const hojasSecas = useRef(null);
-  const penachos = useRef(null);
-  const NUDOS_POR = 5;
-  const HOJAS_POR = 5;
-  const SECAS_POR = 3;
-  const sitios = useMemo(() => {
+/* EL CAÑAL. Esta escena dibujaba antes su PROPIA caña: un cilindro liso con
+   cinco anillos que no se veían, unos conos tiesos por hoja y el penacho hecho
+   una lanza. El resultado se leía como un pinar de palos pelados — y el
+   campesino que siembra caña no reconocía la suya, que es justo la autoridad
+   que este mundo necesita para lo que enseña después.
+
+   La caña BUENA ya existía en el repo, con su prueba: `floraCana.geom.js`, la
+   del mundo del trapiche. Trae lo que de verdad delata a la Saccharum
+   officinarum, y no se copia aquí: se SIEMBRA la misma.
+
+     · MACOLLA — la caña no nace de a un tallo: 7 u 8 salen del MISMO PIE y se
+       abren en abanico. Por eso un cañal se lee como masa y no como fila.
+     · NUDOS y ENTRENUDOS — el tallo viene segmentado cada ~20 cm, con el
+       anillo nodal engrosado y más pálido. Es lo primero que la identifica.
+     · HOJA ACINTADA — cinta de más de un metro doblada en V sobre su nervadura
+       pálida: sale del nudo, se arquea y se cae de punta por su propio peso.
+     · CHALA — la hoja seca colgando del tercio bajo, vistiendo el tallo. Sin
+       ella un cañal parece un guadual.
+     · PENACHO — la panícula plumosa y plateada de la que ya espigó. PLUMA, no
+       lanza: treinta ramitas finas cayendo de punta.
+     · VARIEDADES — verde, amarilla, morada y rayada conviven en el mismo lote,
+       como en la finca. El tinte por instancia pinta el TALLO; la hoja va
+       siempre verde, y por eso van en mallas aparte.
+
+   Lo único de aquí es la SIEMBRA: sobre el terreno de esta finca, en la falda
+   baja y esquivando el patio del trapiche. Una draw-call por banco. */
+
+/* Cuántas MATAS (no tallos) según la gama. Cada mata trae 7 u 8 tallos adentro,
+   así que el conteo es mucho menor que el de antes y el cañal queda más tupido:
+   24 matas son ~170 tallos donde antes había 64 palos sueltos. */
+const CANAL_TIER = {
+  alto: { matas: 24, variantes: [0, 1], detalle: 'cerca' },
+  medio: { matas: 15, variantes: [0], detalle: 'cerca' },
+  bajo: { matas: 9, variantes: [0], detalle: 'lejos' },
+};
+/* La mata canónica mide de 3,3 a 4,7 m (es una gramínea gigante). En este
+   diorama se siembra a ~0,8 para que le pase por encima a la enramada del
+   trapiche (3,6 m) sin comerse el encuadre. */
+const ESC_MATA = 0.8;
+/* La hoja y la chala NO llevan el color de la variedad (el morado del tallo no
+   le toca el follaje): van en su propio banco con su tinte casi neutro. */
+const TINTE_HOJA = [0.97, 1, 0.94];
+const TINTE_CHALA = [1, 0.97, 0.92];
+const TINTE_PENACHO = [1, 0.98, 0.94];
+
+/* Un banco de instancias de UNA pieza de la mata: una draw-call por banco, y
+   las matrices se escriben UNA vez (este cañal no se mece: la brisa de esta
+   escena vive en la botica). `base` fija el tinte del banco; sin él manda el de
+   la instancia, que es la VARIEDAD del tallo. */
+function BancoCana({ geo, mat, items, base = null }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const malla = ref.current;
+    if (!malla || !items.length) return;
+    const m = new THREE.Matrix4();
+    const q = new THREE.Quaternion();
+    const e = new THREE.Euler();
+    const p = new THREE.Vector3();
+    const s = new THREE.Vector3();
+    const col = new THREE.Color();
+    items.forEach((it, i) => {
+      p.set(it.pos[0], it.pos[1], it.pos[2]);
+      e.set(0, it.rotY, 0);
+      q.setFromEuler(e);
+      s.setScalar(it.esc);
+      m.compose(p, q, s);
+      malla.setMatrixAt(i, m);
+      // un pelo de claro/oscuro por mata: que el lote no se lea estampado
+      const t = base || it.tinte;
+      const j = base ? 0.93 + it.jit * 0.14 : 1;
+      col.setRGB(t[0] * j, t[1] * j, t[2] * j);
+      malla.setColorAt(i, col);
+    });
+    malla.instanceMatrix.needsUpdate = true;
+    if (malla.instanceColor) malla.instanceColor.needsUpdate = true;
+  }, [items, base]);
+  if (!geo || !items.length) return null;
+  return <instancedMesh ref={ref} args={[geo, mat, items.length]} frustumCulled={false} />;
+}
+
+function Canal({ tier = 'alto' }) {
+  const cfg = CANAL_TIER[tier] || CANAL_TIER.medio;
+  const q = calidadCana(tier);
+
+  /* Las mallas de mata: UNA geometría por variante, construida una sola vez.
+     Dos variantes (la cepa alta y derecha, la cepa tupida y abierta) son lo que
+     evita que el lote se lea como una plantilla repetida. */
+  const variantes = useMemo(
+    () => cfg.variantes.map((v) => geomMataCana(v, { q, detalle: cfg.detalle, vestido: 0.5 }, 101)),
+    [cfg, q],
+  );
+  const geoPenacho = useMemo(() => geomPenachoCana(q, 41), [q]);
+
+  /* La siembra, determinista: la misma finca en cada visita, sin Math.random. */
+  const siembra = useMemo(() => {
     const rng = crearRng(217);
-    const lista = [];
+    const porVariante = variantes.map(() => []);
+    const penachos = [];
     let intentos = 0;
-    while (lista.length < n && intentos < n * 10) {
+    let puestas = 0;
+    while (puestas < cfg.matas && intentos < cfg.matas * 14) {
       intentos += 1;
       const wx = 6.5 + rng() * 8.0;
       const wz = -8.5 + rng() * 6.0;
       const y = alturaFinca(wx, wz);
       if (y > 1.5) continue; // el cañal es de la falda baja, no de la loma
       if (gauss(wx, wz, 5.5, 2.2, 3.4, 2.6) > 0.45) continue; // no invade el patio
-      lista.push({
-        wx, wz, y,
-        esc: 0.85 + rng() * 0.45,
-        giro: rng() * Math.PI * 2,
-        ladeo: (rng() - 0.5) * 0.14,
-        morada: rng() < 0.18, // la variedad morada, entreverada
-        espiga: rng() < 0.55, // no todas han espigado
-        rngHoja: rng() * 7,
-      });
+      const iv = puestas % variantes.length;
+      const rotY = rng() * Math.PI * 2;
+      const esc = ESC_MATA * (0.88 + rng() * 0.26);
+      const jit = rng();
+      const variedad = variedadPara(rng());
+      porVariante[iv].push({ pos: [wx, y, wz], rotY, esc, jit, tinte: variedad.tinte });
+
+      /* El penacho se monta en una PUNTA DE TALLO de verdad —los `topes` que
+         devuelve la mata—, no flotando encima del pie, y solo en las que ya
+         espigaron: un cañal donde todas espigaron no existe. */
+      if (rng() < 0.55) {
+        const topes = variantes[iv].topes;
+        const t = topes[Math.min(topes.length - 1, Math.floor(rng() * topes.length))];
+        const c = Math.cos(rotY);
+        const s = Math.sin(rotY);
+        penachos.push({
+          pos: [wx + (t[0] * c + t[2] * s) * esc, y + t[1] * esc, wz + (-t[0] * s + t[2] * c) * esc],
+          rotY,
+          esc,
+          jit: rng(),
+        });
+      }
+      puestas += 1;
     }
-    return lista;
-  }, [n]);
+    return { porVariante, penachos };
+  }, [variantes, cfg.matas]);
 
-  useEffect(() => {
-    const mt = tallos.current, mn = nudos.current, mh = hojas.current;
-    const ms = hojasSecas.current, mp = penachos.current;
-    if (!mt || !mn || !mh || !ms || !mp) return;
-    const S = new THREE.Matrix4(); // la matriz del tallo (todo cuelga de ella)
-    const L = new THREE.Object3D(); // pieza local sobre el tallo
-    const M = new THREE.Matrix4();
-    const HALF = new THREE.Matrix4();
-    const tinte = new THREE.Color();
-    const baseTallo = new THREE.Color(P.cana);
-    const baseMorada = new THREE.Color(P.canaMorada);
-    const baseHoja = new THREE.Color(P.hojaCana);
-    const baseSeca = new THREE.Color(P.hojaSeca);
-    const baseNudo = new THREE.Color(P.canaNudo);
-    const dummy = new THREE.Object3D();
-    let iN = 0, iH = 0, iS = 0, iP = 0;
-    sitios.forEach((s, i) => {
-      // la matriz madre del tallo (inclinadito, girado, a su escala)
-      dummy.position.set(s.wx, s.y, s.wz);
-      dummy.rotation.set(s.ladeo, s.giro, s.ladeo * 0.7);
-      dummy.scale.set(s.esc, s.esc, s.esc);
-      dummy.updateMatrix();
-      S.copy(dummy.matrix);
+  /* El material del TALLO lleva el color horneado por vértice (el entrenudo y su
+     anillo nodal más pálido) y el tinte de la variedad por instancia encima. */
+  const matTallo = useMemo(
+    () => new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true }),
+    [],
+  );
+  /* La HOJA es una CINTA: a una sola cara media hoja desaparece según de qué
+     lado se mire. Va a dos caras siempre — hoja, chala y penacho. */
+  const matCinta = useMemo(
+    () => new THREE.MeshLambertMaterial({
+      vertexColors: true,
+      flatShading: true,
+      side: THREE.DoubleSide,
+    }),
+    [],
+  );
 
-      // el tallo delgado (geometría de origen en la base)
-      L.position.set(0, CANA_ALTO / 2, 0);
-      L.rotation.set(0, 0, 0);
-      L.scale.set(1, 1, 1);
-      L.updateMatrix();
-      M.multiplyMatrices(S, L.matrix);
-      mt.setMatrixAt(i, M);
-      tinte.copy(s.morada ? baseMorada : baseTallo).offsetHSL(0, 0, (i % 5) * 0.014 - 0.028);
-      mt.setColorAt(i, tinte);
-
-      // los NUDOS: anillos apenas más anchos, a tramos parejos
-      for (let k = 0; k < NUDOS_POR; k++) {
-        const hN = CANA_ALTO * (0.16 + (k / NUDOS_POR) * 0.72);
-        L.position.set(0, hN, 0);
-        L.rotation.set(0, 0, 0);
-        L.scale.set(1, 1, 1);
-        L.updateMatrix();
-        M.multiplyMatrices(S, L.matrix);
-        mn.setMatrixAt(iN, M);
-        tinte.copy(baseNudo);
-        if (s.morada) tinte.lerp(baseMorada, 0.5);
-        mn.setColorAt(iN, tinte);
-        iN += 1;
-      }
-
-      // las HOJAS acintadas: nacen de los nudos altos y se ARQUEAN hacia afuera
-      for (let k = 0; k < HOJAS_POR; k++) {
-        const f = k / HOJAS_POR;
-        const hH = CANA_ALTO * (0.55 + f * 0.42);
-        const ang = s.rngHoja + k * 2.4; // vuelta filotáctica
-        const inc = 0.7 + Math.sin(s.rngHoja * 3 + k) * 0.25 + f * 0.25;
-        L.position.set(0, hH, 0);
-        L.rotation.set(0, 0, 0);
-        L.rotation.order = 'YXZ';
-        L.rotation.y = ang;
-        L.rotation.x = inc;
-        const eH = 0.85 + ((i + k) % 4) * 0.12;
-        L.scale.set(1, eH, 1);
-        L.updateMatrix();
-        HALF.makeTranslation(0, 0.675, 0); // la base de la hoja pegada al nudo
-        M.multiplyMatrices(L.matrix, HALF).premultiply(S);
-        mh.setMatrixAt(iH, M);
-        tinte.copy(baseHoja).offsetHSL(0, 0, ((i + k) % 4) * 0.02 - 0.03);
-        mh.setColorAt(iH, tinte);
-        iH += 1;
-      }
-
-      // las hojas VIEJAS: dobladas hacia abajo, pajizas, vistiendo el tallo
-      for (let k = 0; k < SECAS_POR; k++) {
-        const hV = CANA_ALTO * (0.3 + k * 0.12);
-        const ang = s.rngHoja * 1.7 + k * 2.1;
-        L.position.set(0, hV, 0);
-        L.rotation.set(0, 0, 0);
-        L.rotation.order = 'YXZ';
-        L.rotation.y = ang;
-        L.rotation.x = 2.2 + (k % 2) * 0.25; // bien dobladas hacia el suelo
-        L.scale.set(0.8, 0.65, 0.8);
-        L.updateMatrix();
-        HALF.makeTranslation(0, 0.5, 0);
-        M.multiplyMatrices(L.matrix, HALF).premultiply(S);
-        ms.setMatrixAt(iS, M);
-        tinte.copy(baseSeca).offsetHSL(0, 0, (k % 3) * 0.02 - 0.02);
-        ms.setColorAt(iS, tinte);
-        iS += 1;
-      }
-
-      // el PENACHO plumoso arriba — solo donde la caña ya espigó
-      L.position.set(0, CANA_ALTO + 0.32, 0);
-      L.rotation.set(s.ladeo * 1.6, s.giro, 0);
-      const eP = s.espiga ? 1 : 0.0001; // instancia colapsada = caña sin espigar
-      L.scale.set(eP, eP, eP);
-      L.updateMatrix();
-      M.multiplyMatrices(S, L.matrix);
-      mp.setMatrixAt(iP, M);
-      mp.setColorAt(iP, tinte.set(P.penacho));
-      iP += 1;
-    });
-    mt.instanceMatrix.needsUpdate = true;
-    mn.instanceMatrix.needsUpdate = true;
-    mh.instanceMatrix.needsUpdate = true;
-    ms.instanceMatrix.needsUpdate = true;
-    mp.instanceMatrix.needsUpdate = true;
-    [mt, mn, mh, ms, mp].forEach((m) => {
-      if (m.instanceColor) m.instanceColor.needsUpdate = true;
-    });
-  }, [sitios]);
+  /* Soltar la GPU al desmontar el mundo. */
+  useEffect(
+    () => () => {
+      variantes.forEach((v) => {
+        v.tallos.dispose();
+        v.hojas.dispose();
+        v.chala.dispose();
+      });
+      geoPenacho.dispose();
+      matTallo.dispose();
+      matCinta.dispose();
+    },
+    [variantes, geoPenacho, matTallo, matCinta],
+  );
 
   return (
     <group>
-      {/* el tallo: alto, DELGADO, de entrenudos */}
-      <instancedMesh ref={tallos} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
-        <cylinderGeometry args={[0.045, 0.06, CANA_ALTO, 6]} />
-        <meshLambertMaterial flatShading />
-      </instancedMesh>
-      {/* el anillo del nudo */}
-      <instancedMesh ref={nudos} args={[undefined, undefined, sitios.length * NUDOS_POR]} frustumCulled={false}>
-        <cylinderGeometry args={[0.062, 0.062, 0.055, 6]} />
-        <meshLambertMaterial flatShading />
-      </instancedMesh>
-      {/* la hoja acintada: cono largo aplanado, base en el origen (ver HALF) */}
-      <instancedMesh ref={hojas} args={[undefined, undefined, sitios.length * HOJAS_POR]} frustumCulled={false}>
-        <coneGeometry args={[0.055, 1.35, 4]} />
-        <meshLambertMaterial flatShading side={THREE.DoubleSide} />
-      </instancedMesh>
-      {/* la hoja seca doblada */}
-      <instancedMesh ref={hojasSecas} args={[undefined, undefined, sitios.length * SECAS_POR]} frustumCulled={false}>
-        <coneGeometry args={[0.05, 1.0, 4]} />
-        <meshLambertMaterial flatShading side={THREE.DoubleSide} />
-      </instancedMesh>
-      {/* la espiga plumosa: huso fino plateado */}
-      <instancedMesh ref={penachos} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
-        <coneGeometry args={[0.11, 0.72, 5]} />
-        <meshLambertMaterial flatShading transparent opacity={0.92} />
-      </instancedMesh>
+      {variantes.map((v, i) => (
+        <group key={i}>
+          {/* la chala primero: queda detrás, pegada al tallo */}
+          <BancoCana geo={v.chala} mat={matCinta} items={siembra.porVariante[i]} base={TINTE_CHALA} />
+          {/* el tallo segmentado, teñido por variedad */}
+          <BancoCana geo={v.tallos} mat={matTallo} items={siembra.porVariante[i]} />
+          {/* y encima la hoja verde arqueada del cogollo */}
+          <BancoCana geo={v.hojas} mat={matCinta} items={siembra.porVariante[i]} base={TINTE_HOJA} />
+        </group>
+      ))}
+      {/* los penachos: lo más alto y lo más liviano del cañal */}
+      <BancoCana geo={geoPenacho} mat={matCinta} items={siembra.penachos} base={TINTE_PENACHO} />
     </group>
   );
 }
@@ -1356,6 +1359,15 @@ function PasosPanela({ pasoActivo }) {
 /* Lleva el `target` de OrbitControls hacia la posición del paso activo del
    recorrido panelero — antes la cámara nunca se movía con `etiquetas`.
    Sin reducedMotion camina suave (lerp); con reducedMotion salta directo. */
+/* OJO (queda anotado, no arreglado aquí): este "recorrido" solo RE-APUNTA. El
+   objetivo viaja al paso activo, pero la CÁMARA se queda donde está —contra el
+   tope de `maxDistance`, a 22 unidades— así que el paso 1 muestra el cañal como
+   una mancha lejana y los NUDOS de la caña no se alcanzan a ver nunca desde la
+   app, por fiel que sea la malla. Acercarla no es cambiar una constante: los
+   topes de azimut obligan a mirar siempre desde el lado del trapiche, y a menos
+   de ~16 unidades la enramada se mete entre la cámara y el cañal. Necesita
+   coreografía POR PASO (una posición de ojo por encuadre, como los `OJOS` de
+   `cana/leccionCana.js`), que es tarea aparte de redibujar la caña. */
 function EnfocarPaso({ paso, reducedMotion, controlsRef }) {
   const objetivo = useMemo(() => {
     const destino = paso > 0 ? RECORRIDO_PANELA[paso - 1].pos : OBJETIVO_CALMA;
@@ -1524,8 +1536,6 @@ function EscenaBoticaCana({ tier, reducedMotion, etiquetas, paso }) {
   );
   useEffect(() => () => geo.dispose(), [geo]);
 
-  const nCanas = tier === 'alto' ? 64 : 40;
-
   /* `color`/`fog` se adjuntan a la ESCENA: hijos directos, nunca en <group>. */
   return (
     <>
@@ -1546,7 +1556,7 @@ function EscenaBoticaCana({ tier, reducedMotion, etiquetas, paso }) {
       <Botica etiquetas={etiquetas} reducedMotion={reducedMotion} />
 
       {/* la caña y la panela, el proceso en línea */}
-      <Canal n={nCanas} />
+      <Canal tier={tier} />
       <Trapiche reducedMotion={reducedMotion} />
       <CanalGuarapo reducedMotion={reducedMotion} />
       <Hornilla reducedMotion={reducedMotion} tier={tier} />
