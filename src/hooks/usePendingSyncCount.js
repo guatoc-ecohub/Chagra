@@ -1,9 +1,16 @@
 /**
  * usePendingSyncCount.js — Hook para leer el contador de transacciones pendientes
- * del syncManager. Se actualiza cada 30s o cuando hay cambio de red (online/offline).
+ * del syncManager. Se actualiza cada 30s, al cambiar de red (online/offline) o
+ * cuando el syncManager termina un ciclo de sincronización.
  *
- * Offline-first: lee de IndexedDB via syncManager.getPendingCount().
- * Si la función no existe todavía, usa un fallback que lee la store directamente.
+ * Offline-first: lee de IndexedDB vía `syncManager.getSyncStats()` (el mismo
+ * método que ya usa NetworkStatusBar). Si el syncManager no está disponible
+ * todavía (o falla), cae a un fallback que lee la store directo de IndexedDB.
+ *
+ * NOTA (rescate #2668 → cableado): la versión original llamaba a
+ * `syncManager.getPendingCount()`, un método que nunca existió en ninguna
+ * rama — el contador quedaba siempre en el fallback manual de IDB. Corregido
+ * para usar `getSyncStats()`, el método real ya probado en producción.
  */
 import { useState, useEffect, useCallback } from 'react';
 
@@ -16,9 +23,11 @@ export function usePendingSyncCount() {
   const refresh = useCallback(() => {
     // Leer del syncManager si está disponible, o de IndexedDB directo.
     try {
-      import('../../services/syncManager.js').then(({ syncManager }) => {
-        if (syncManager?.getPendingCount) {
-          syncManager.getPendingCount().then(setPending).catch(() => setPending(0));
+      import('../services/syncManager.js').then(({ syncManager }) => {
+        if (syncManager?.getSyncStats) {
+          syncManager.getSyncStats()
+            .then((stats) => setPending(stats?.pendingCount ?? 0))
+            .catch(() => _leerDeIDB().then(setPending).catch(() => setPending(0)));
         } else {
           _leerDeIDB().then(setPending).catch(() => setPending(0));
         }
@@ -29,12 +38,24 @@ export function usePendingSyncCount() {
   }, []);
 
   useEffect(() => {
+    // Lectura inicial inmediata al montar (mismo patrón ya establecido en
+    // NetworkStatusBar.jsx: sin esto el badge queda desfasado hasta el
+    // primer polling a los 30s).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refresh();
     const interval = setInterval(refresh, 30_000);
     window.addEventListener('online', refresh);
+    // Refrescar en cuanto el syncManager termina un ciclo (éxito o error),
+    // en vez de esperar hasta 30s para que el badge baje/desaparezca.
+    window.addEventListener('syncComplete', refresh);
+    window.addEventListener('syncCompleted', refresh);
+    window.addEventListener('syncError', refresh);
     return () => {
       clearInterval(interval);
       window.removeEventListener('online', refresh);
+      window.removeEventListener('syncComplete', refresh);
+      window.removeEventListener('syncCompleted', refresh);
+      window.removeEventListener('syncError', refresh);
     };
   }, [refresh]);
 
@@ -43,7 +64,7 @@ export function usePendingSyncCount() {
 
 /**
  * Lee el conteo de transacciones pendientes directo de IndexedDB.
- * Fallback si syncManager.getPendingCount no existe.
+ * Fallback si el syncManager todavía no está disponible o `getSyncStats()` falla.
  * @returns {Promise<number>}
  */
 async function _leerDeIDB() {
