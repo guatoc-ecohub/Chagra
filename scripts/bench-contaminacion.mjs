@@ -757,6 +757,14 @@ async function callOllama(model, systemPrompt, userPrompt, { ollamaUrl = OLLAMA_
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
+        // ⚠️ CORREGIDO 2026-07-21: sin `think:false` los modelos "thinking"
+        // (gemma4:e4b, qwen3.x, glm-flash) gastan TODO el presupuesto de tokens
+        // razonando y devuelven `content` VACÍO con done_reason=length. El bench
+        // del 2026-07-21 midió 69% de vacías en gemma4:e4b y lo descalificó por
+        // "mudo": era NUESTRA configuración, no el modelo. Verificado en vivo:
+        // sin el flag → 0 caracteres; con el flag → 1.523 caracteres.
+        // Un modelo mudo puntúa 0% de contaminación falso (premia el silencio).
+        think: false,
         options: { temperature: 0.7, num_predict: 512 },
         keep_alive: '30m',
       }),
@@ -1224,7 +1232,20 @@ async function main() {
     });
     const jsonlPath = join(BENCH_RUNS_DIR, `contaminacion-${ts}.judged.jsonl`);
     const summaryPath = join(BENCH_RUNS_DIR, `contaminacion-${ts}.summary.json`);
-    const fullSummary = { ...summary, model: argVal('--model', DEFAULT_PROD_MODEL), generated_at: new Date().toISOString() };
+    // El modelo se lee de los PROPIOS resultados, no del default de producción:
+    // rotular con DEFAULT_PROD_MODEL hacía que un juicio de gemma4 saliera
+    // etiquetado `granite3.3:8b` y se leyera como si fuera el modelo de prod.
+    const modelosEnResultados = [...new Set(judged.map((r) => r.model).filter(Boolean))];
+    const modelDeclarado = argVal('--model', null);
+    const fullSummary = {
+      ...summary,
+      model: modelDeclarado || modelosEnResultados.join(' + ') || DEFAULT_PROD_MODEL,
+      models_in_results: modelosEnResultados,
+      generated_at: new Date().toISOString(),
+    };
+    if (modelosEnResultados.length > 1) {
+      console.warn(`[judge] ⚠️  los resultados mezclan ${modelosEnResultados.length} modelos: ${modelosEnResultados.join(', ')}`);
+    }
     writeFileSync(jsonlPath, judged.map((r) => JSON.stringify(r)).join('\n') + '\n');
     writeFileSync(summaryPath, JSON.stringify(fullSummary, null, 2) + '\n');
     console.log(`[judge] escrito: ${jsonlPath}`);
