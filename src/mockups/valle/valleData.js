@@ -134,6 +134,10 @@ export const VEGETACION_PISOS = [
  * en el clima medio, el bosque trepando al frío, la veleta arriba en el filo
  * del páramo (desde donde se lee el cielo), y el corral, la huerta y el
  * semillero abajo en la tierra caliente. Pocos y separados > muchos amontonados.
+ *
+ * ESTE ES EL CATÁLOGO COMPLETO, no la lista final: qué lugares le tocan a CADA
+ * finca lo decide `construirLugaresValle(perfil)` (abajo) — el valle se siembra
+ * del perfil, no es el mismo para todos.
  */
 const LUGARES = [
   // (Las posiciones finales las manda COMPOSICION_LUGARES — la capa del
@@ -200,26 +204,201 @@ const LUGARES = [
   },
 ];
 
-/**
- * Mundos del valle, ya resueltos contra el manifiesto real. Cada uno trae su
- * `titulo`, `emoji` y `tinte` verdaderos + la geometría de su lugar. Un lugar
- * sin mundo en el manifiesto (el kiosco de aprender) usa su `fallbackMundo`.
+/* Piezas de la vitrina que no forman parte de los 14 lugares históricos.
+ * Solo se siembran cuando la persona las agrega para conocerlas. Mantenerlas
+ * fuera de LUGARES conserva intacto el perfil demo y los valles existentes. */
+const LUGARES_PARA_CONOCER = [
+  {
+    id: 'cacao', pos: [7.2, 0, 7.8], escala: 0.9, tipo: 'cafetal',
+    fallbackMundo: { titulo: 'El cacao', emoji: '🍫', lema: 'Conozca el cultivo y beneficio del cacao.', tinte: ['#79502d', '#c9873c'] },
+  },
+  {
+    id: 'papa', pos: [6.8, 0, -3.4], escala: 0.9, tipo: 'huerta',
+    fallbackMundo: { titulo: 'La papa', emoji: '🥔', lema: 'Conozca la tierra de la papa.', tinte: ['#8c6a3f', '#c7a36d'] },
+  },
+  {
+    id: 'abejas', pos: [7.4, 0, 1.8], escala: 0.82, tipo: 'saber',
+    fallbackMundo: { titulo: 'Las abejas', emoji: '🐝', lema: 'Conozca las polinizadoras de la finca.', tinte: ['#87651c', '#e8b83a'] },
+  },
+  {
+    id: 'lluvia', pos: [-6.8, 0, -4.8], escala: 0.82, tipo: 'veleta',
+    fallbackMundo: { titulo: 'La lluvia', emoji: '🌧️', lema: 'Conozca cómo se mueve el agua del cielo.', tinte: ['#58758f', '#9fb3c8'] },
+  },
+  {
+    id: 'sierra', pos: [6.2, 0, -7.2], escala: 0.85, tipo: 'bosque',
+    fallbackMundo: { titulo: 'La Sierra', emoji: '🏔️', lema: 'Conozca la montaña completa.', tinte: ['#456353', '#b8c6b6'] },
+  },
+  {
+    id: 'compost', pos: [-6.6, 0, 8.0], escala: 0.8, tipo: 'compost',
+    fallbackMundo: { titulo: 'El compost', emoji: '🍂', lema: 'Conozca cómo vuelve la materia a la tierra.', tinte: ['#59401f', '#a8854c'] },
+  },
+];
+
+/* ── 2b. LA SIEMBRA: QUÉ LUGARES LE TOCAN A ESTA FINCA ───────────────────────
+ * El valle se ARMA del perfil (spec del valle dinámico, paso 2): si la persona
+ * tiene un balcón, su valle es un balcón; si tiene 10.000 matas, es el valle
+ * completo. Aquí vive la regla de QUÉ hay; el DÓNDE lo sigue mandando la capa
+ * del director (COMPOSICION_LUGARES en visual/mundo3d/direccion), que no se
+ * toca: la función siembra, el director compone.
+ *
+ * REGLA DURA — un dato que FALTA nunca resta. Solo una respuesta EXPLÍCITA del
+ * usuario (`perfil.declarado.*`) o una escala declarada encogen el mundo. Un
+ * perfil vacío devuelve el valle de siempre, idéntico.
+ *
+ * Campos:
+ *   escalas   en qué tamaños de mundo cabe el lugar ('balcon'|'invernadero'|'finca')
+ *   requiere  (perfil) => boolean — condición extra; devuelve TRUE si el dato falta
  */
-export const MUNDOS_VALLE = LUGARES.map((l) => {
+const SIEMBRA_LUGARES = {
+  // La quebrada y su toma: hay finca y hay invernadero, no hay balcón.
+  agua: { escalas: ['finca', 'invernadero'] },
+  // El cafetal solo en la finca abierta, y NUNCA en el páramo (a 3.000+ m no
+  // hay café: fidelidad agroecológica, no capricho).
+  cafe: { escalas: ['finca'], requiere: (p) => p.pisoTermico !== 'paramo' },
+  // La milpa: la mata está en toda escala — es el corazón de Chagra.
+  cultivos: { escalas: ['balcon', 'invernadero', 'finca'] },
+  suelo: { escalas: ['balcon', 'invernadero', 'finca'] },
+  sanidad: { escalas: ['balcon', 'invernadero', 'finca'] },
+  // El potrero solo si de verdad tiene animales (si contestó la pregunta y
+  // quedó vacía —'ninguno'— no se dibuja un potrero que no existe).
+  animales: {
+    escalas: ['finca'],
+    requiere: (p) => !p.declarado.animales || p.animales.length > 0,
+  },
+  disenio: { escalas: ['finca'] },
+  clima: { escalas: ['balcon', 'invernadero', 'finca'] },
+  mercado: { escalas: ['finca', 'invernadero'] },
+  // El invernadero/semillero: si la finca ES un invernadero, obvio que va; si
+  // dijo explícitamente que NO tiene, no se le dibuja uno.
+  semillero: {
+    escalas: ['balcon', 'invernadero', 'finca'],
+    requiere: (p) => p.escala === 'invernadero' || !p.declarado.invernadero || !!p.invernadero,
+  },
+  micorrizas: { escalas: ['balcon', 'invernadero', 'finca'] },
+  abono: { escalas: ['finca', 'invernadero'] },
+  aprender: { escalas: ['balcon', 'invernadero', 'finca'] },
+  // El páramo de arriba: no existe en tierra caliente (< 1.000 m).
+  paramo: { escalas: ['finca'], requiere: (p) => p.pisoTermico !== 'calido' },
+};
+
+const ESCALAS_VALLE = ['balcon', 'invernadero', 'finca'];
+
+/* Lectura DEFENSIVA del perfil. valleData es un módulo de DATOS: no importa el
+   servicio del perfil a propósito (arrastraría el dataset DANE de 186 KB a
+   todo chunk que toque el valle). El perfil se le PASA ya normalizado
+   (services/perfilFincaService.derivarPerfilFinca); aquí solo se sanea. */
+function perfilSeguro(perfil) {
+  const p = perfil && typeof perfil === 'object' ? perfil : {};
+  const d = p.declarado && typeof p.declarado === 'object' ? p.declarado : {};
+  return {
+    escala: ESCALAS_VALLE.includes(p.escala) ? p.escala : 'finca',
+    pisoTermico: typeof p.pisoTermico === 'string' ? p.pisoTermico : null,
+    invernadero: p.invernadero || null,
+    agua: typeof p.agua === 'string' ? p.agua : null,
+    animales: Array.isArray(p.animales) ? p.animales : [],
+    cultiva: Array.isArray(p.cultiva) ? p.cultiva : [],
+    mundosActivos: Array.isArray(p.mundosActivos) ? p.mundosActivos : [],
+    declarado: {
+      escala: !!d.escala,
+      invernadero: !!d.invernadero,
+      animales: !!d.animales,
+      cultiva: !!d.cultiva,
+      agua: !!d.agua,
+      ubicacion: !!d.ubicacion,
+    },
+  };
+}
+
+/**
+ * LOS LUGARES DE **SU** VALLE. Siembra el catálogo según el perfil de la finca.
+ *
+ * - Sin perfil (o perfil de demo) devuelve el catálogo COMPLETO: exactamente
+ *   los lugares de siempre, en el mismo orden y con los mismos objetos.
+ * - `perfil.escala` manda el tamaño del mundo.
+ * - `perfil.mundosActivos` FUERZA la entrada de un mundo que la persona
+ *   agregó a mano para conocerlo (la vitrina maestra, paso 5 del spec).
+ * - Si por lo que sea la siembra quedara vacía, cae al catálogo completo: el
+ *   valle nunca se queda sin lugares.
+ *
+ * @param {import('../../services/perfilFincaService').PerfilFinca} [perfil]
+ * @returns {typeof LUGARES}
+ */
+export function construirLugaresValle(perfil) {
+  const p = perfilSeguro(perfil);
+  const lugares = LUGARES.filter((l) => {
+    if (p.mundosActivos.includes(l.id)) return true; // lo agregó para conocerlo
+    const regla = SIEMBRA_LUGARES[l.id];
+    if (!regla) return true; // lugar nuevo sin regla: se siembra (nunca menos)
+    if (!regla.escalas.includes(p.escala)) return false;
+    if (typeof regla.requiere === 'function' && !regla.requiere(p)) return false;
+    return true;
+  });
+  const opcionales = LUGARES_PARA_CONOCER.filter((l) => p.mundosActivos.includes(l.id));
+  const sembrados = lugares.length > 0 ? [...lugares, ...opcionales] : LUGARES;
+  return sembrados.map((lugar) => {
+    if (lugar.id === 'semillero' && p.invernadero?.tipo) {
+      return { ...lugar, invernaderoTipo: p.invernadero.tipo };
+    }
+    if (lugar.id === 'agua' && p.declarado.agua && p.agua) {
+      return { ...lugar, tipo: p.agua, fuenteAgua: p.agua };
+    }
+    return lugar;
+  });
+}
+
+/** Resuelve un lugar contra el manifiesto real de mundos (título/emoji/tinte). */
+function resolverMundo(l) {
   /** @type {{ titulo?: string, emoji?: string, lema?: string, tinte?: string[] }} */
   const real = MUNDO_BY_ID[l.id] || l.fallbackMundo || {};
-  return {
+  const mundo = {
     ...l,
     titulo: real.titulo || l.id,
     emoji: real.emoji || '📍',
     lema: real.lema || '',
     tinte: real.tinte || ['#3f8f4e', '#dcedc9'],
   };
-});
+  if (l.id === 'semillero' && l.invernaderoTipo) {
+    const nombres = { cuadrado: 'cuadrado', tunel: 'tipo túnel', casa_sombra: 'de casa malla' };
+    mundo.titulo = `Su invernadero ${nombres[l.invernaderoTipo] || ''}`.trim();
+  }
+  if (l.id === 'agua' && l.fuenteAgua) {
+    const nombres = {
+      quebrada: ['Su quebrada', '🏞️'],
+      tanque: ['Su tanque de agua', '🛢️'],
+      lluvia: ['Su agua lluvia', '🌧️'],
+      acueducto: ['Su acueducto', '🚰'],
+    };
+    const [titulo, emoji] = nombres[l.fuenteAgua] || [mundo.titulo, mundo.emoji];
+    mundo.titulo = titulo;
+    mundo.emoji = emoji;
+  }
+  return mundo;
+}
 
-export const MUNDO_VALLE_BY_ID = Object.fromEntries(
-  MUNDOS_VALLE.map((m) => [m.id, m]),
-);
+/**
+ * Los mundos de SU valle, ya resueltos contra el manifiesto real. Cada uno trae
+ * su `titulo`, `emoji` y `tinte` verdaderos + la geometría de su lugar. Un lugar
+ * sin mundo en el manifiesto (el kiosco de aprender) usa su `fallbackMundo`.
+ *
+ * @param {import('../../services/perfilFincaService').PerfilFinca} [perfil]
+ */
+export function construirMundosValle(perfil) {
+  return construirLugaresValle(perfil).map(resolverMundo);
+}
+
+/** Índice por id de una lista de mundos ya construida. */
+export function indexarMundosValle(mundos) {
+  return Object.fromEntries(mundos.map((m) => [m.id, m]));
+}
+
+/**
+ * EL VALLE DE MUESTRA (retrocompatible): el catálogo completo resuelto, tal
+ * como estaba antes de que el valle se sembrara del perfil. Es el respaldo de
+ * quien todavía no recibe un perfil — y el default de toda vista del valle.
+ */
+export const MUNDOS_VALLE = LUGARES.map(resolverMundo);
+
+export const MUNDO_VALLE_BY_ID = indexarMundosValle(MUNDOS_VALLE);
 
 /* ── 1. LA COSA DEL DÍA (una sola, anclada a un lugar) ───────────────────────
  * Un único destello: la alerta del día aparece DONDE toca. Aquí, una helada

@@ -8,7 +8,7 @@
  * abeja VUELA hasta el lugar: el mismo "entrar al mundo" del 3D, dibujado.
  * "Wow" 3D se pierde; el PROPÓSITO no.
  */
-import { MUNDOS_VALLE, MUNDO_VALLE_BY_ID, COSA_DEL_DIA, CLIMAS } from './valleData';
+import { MUNDOS_VALLE, indexarMundosValle, COSA_DEL_DIA, CLIMAS } from './valleData';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 
 /* Proyección isométrica plana de las coordenadas del valle a la lámina SVG. */
@@ -33,15 +33,21 @@ export default function Valle2DFallback({
   onEntrar,
   onAlerta,
   webglBloqueado = false,
+  /* LOS LUGARES DE SU VALLE (valle dinámico): la lista sembrada del perfil de
+     la finca, que el host (EntradaValle3D) construye con
+     construirMundosValle(perfil). Default = el valle completo de siempre: sin
+     perfil, esta lámina se ve exactamente como antes. */
+  mundos = MUNDOS_VALLE,
 }) {
   const c = CLIMAS[clima];
-  const ancla = MUNDOS_VALLE.find((m) => m.id === COSA_DEL_DIA.anclaMundo);
+  const lugares = Array.isArray(mundos) && mundos.length > 0 ? mundos : MUNDOS_VALLE;
+  const ancla = lugares.find((m) => m.id === COSA_DEL_DIA.anclaMundo);
   // Mundos ordenados de atrás hacia adelante para que se solapen bien.
-  const orden = [...MUNDOS_VALLE].sort((a, b) => a.pos[0] + a.pos[2] - (b.pos[0] + b.pos[2]));
+  const orden = [...lugares].sort((a, b) => a.pos[0] + a.pos[2] - (b.pos[0] + b.pos[2]));
 
   // "Entrar al mundo": la lámina se acerca hacia el lugar tocado y la abeja
   // vuela hasta él. Sin foco, la abeja ronda el centro del valle.
-  const foco = focoId ? MUNDO_VALLE_BY_ID[focoId] : null;
+  const foco = focoId ? indexarMundosValle(lugares)[focoId] : null;
   const camPos = foco ? pct(foco.pos[0], foco.pos[2]) : { left: 50, top: 50 };
   const abejaPos = foco ? pct(foco.pos[0], foco.pos[2]) : { left: 52, top: 46 };
 

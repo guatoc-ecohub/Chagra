@@ -88,6 +88,8 @@ import {
   calidadDeTier,
 } from '../visual/mundo3d/bosque/floraParamo.geom.js';
 import { rng } from '../visual/mundo3d/bosque/entQuenua.geom.js';
+import usePerfilFincaStore from '../store/usePerfilFincaStore.js';
+import { COPY_VITRINA_PERFIL, estadoMundoVitrina } from './vitrinaPerfil.js';
 
 /* EL VALLE VIVO en la galería: los personajes asoman ENTRE los mundos, desde
    los bordes (nunca sobre los portales ni el chrome), hacen su giño lejano y
@@ -690,7 +692,7 @@ function ArcosPiedra({ tier }) {
   return <instancedMesh ref={ref} args={[geo, MAT_PAISAJE, PORTALES.length]} frustumCulled={false} />;
 }
 
-function PortalMundo({ portal, elegido, interactivo, tier, onElegir, onSenalar }) {
+function PortalMundo({ portal, elegido, interactivo, tier, estado, onElegir, onSenalar }) {
   const halo = useRef(null);
   const q = calidadDeTier(tier);
   const geoVineta = useMemo(() => geomVineta(portal.id, { q }), [portal.id, q]);
@@ -753,6 +755,14 @@ function PortalMundo({ portal, elegido, interactivo, tier, onElegir, onSenalar }
           emissiveIntensity={0.32}
         />
       </mesh>
+      <mesh position={[0, 0, 0.06]}>
+        <torusGeometry args={[0.9, estado === 'conocer' ? 0.025 : 0.04, 5, 26]} />
+        <meshBasicMaterial
+          color={estado === 'propio' ? '#3f8f4e' : estado === 'agregado' ? '#397f9f' : '#d49a35'}
+          transparent
+          opacity={estado === 'conocer' ? 0.72 : 0.95}
+        />
+      </mesh>
       {/* la VENTANA ENTERA es el botón: blanco de toque invisible y generoso */}
       <mesh position={[0, 0, 0.1]} onClick={alTocar} onPointerOver={manito} onPointerOut={normal}>
         <circleGeometry args={[0.95, 18]} />
@@ -766,7 +776,7 @@ function PortalMundo({ portal, elegido, interactivo, tier, onElegir, onSenalar }
    GALERÍA — la montaña completa con las cuatro terrazas de pisos térmicos
    ══════════════════════════════════════════════════════════════════════════ */
 
-function GaleriaVitrina({ elegidoId, interactivo, tier, reducedMotion, onElegir, onSenalar }) {
+function GaleriaVitrina({ elegidoId, interactivo, tier, reducedMotion, estados, onElegir, onSenalar }) {
   const animada = !reducedMotion;
   return (
     <group>
@@ -796,6 +806,7 @@ function GaleriaVitrina({ elegidoId, interactivo, tier, reducedMotion, onElegir,
           elegido={elegidoId === p.id}
           interactivo={interactivo}
           tier={tier}
+          estado={estados[p.id] || 'conocer'}
           onElegir={onElegir}
           onSenalar={onSenalar}
         />
@@ -943,6 +954,48 @@ const CSS_VMX = `
 }
 .vmx-chip:hover, .vmx-chip:focus-visible { background: #fff8ea; transform: translateY(-2px); }
 .vmx-chip:active { transform: translateY(0); }
+.vmx-chip-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(255, 249, 235, 0.54);
+}
+.vmx-chip-wrap[data-estado='propio'] { box-shadow: inset 0 0 0 2px rgba(63,143,78,0.7); }
+.vmx-chip-wrap[data-estado='agregado'] { box-shadow: inset 0 0 0 2px rgba(57,127,159,0.75); }
+.vmx-estado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.vmx-estado--propio { background: #dcebd9; color: #285f34; }
+.vmx-estado--agregado { background: #d9ebf0; color: #285f76; cursor: pointer; }
+.vmx-estado--conocer { background: #f5dfae; color: #674612; cursor: pointer; }
+.vmx-estado:focus-visible { outline: 3px solid #fff8ea; outline-offset: 2px; }
+.vmx-leyenda {
+  align-self: center;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 14px;
+  background: rgba(255,249,235,0.9);
+  color: #4a3520;
+  font-size: 0.76rem;
+  font-weight: 750;
+  box-shadow: 0 3px 12px rgba(58,42,24,0.14);
+}
+.vmx-leyenda b:first-child { color: #285f34; }
+.vmx-leyenda b:last-child { color: #805814; }
 
 /* viñeta de succión durante el dolly */
 .vmx-vineta {
@@ -1039,6 +1092,20 @@ const CSS_VMX = `
   box-shadow: 0 4px 12px rgba(58, 42, 24, 0.22);
   transition: transform 140ms ease;
 }
+.vmx-tarjeta[data-estado='propio'] { box-shadow: 0 0 0 4px #dcebd9, 0 5px 14px rgba(58,42,24,0.24); }
+.vmx-tarjeta[data-estado='agregado'] { box-shadow: 0 0 0 4px #d9ebf0, 0 5px 14px rgba(58,42,24,0.24); }
+.vmx-tarjeta__entrada {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  cursor: pointer;
+}
 .vmx-tarjeta:hover, .vmx-tarjeta:focus-visible { transform: translateY(-3px); }
 .vmx-tarjeta__aro {
   width: 84px;
@@ -1090,6 +1157,34 @@ const CSS_VMX = `
 }
 `;
 
+function AccionMundo({ estado, titulo, onAgregar, onQuitar }) {
+  if (estado === 'propio') {
+    return <span className="vmx-estado vmx-estado--propio">✓ Está en su finca</span>;
+  }
+  if (estado === 'agregado') {
+    return (
+      <button
+        type="button"
+        className="vmx-estado vmx-estado--agregado"
+        onClick={onQuitar}
+        aria-label={`Quitar ${titulo} de los mundos agregados`}
+      >
+        ✓ Agregado para conocer
+      </button>
+    );
+  }
+  return (
+    <button
+      type="button"
+      className="vmx-estado vmx-estado--conocer"
+      onClick={onAgregar}
+      aria-label={COPY_VITRINA_PERFIL.ariaAgregar(titulo)}
+    >
+      {COPY_VITRINA_PERFIL.agregar}
+    </button>
+  );
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    EL MOCKUP — la máquina de fases del cruce maestro
    ══════════════════════════════════════════════════════════════════════════ */
@@ -1107,6 +1202,9 @@ const CSS_VMX = `
  */
 export default function VitrinaMaestraMundos({ onBack }) {
   const [{ tier, reducedMotion }] = useState(() => decidirTier());
+  const perfilFinca = usePerfilFincaStore((s) => s.perfil);
+  const agregarMundo = usePerfilFincaStore((s) => s.agregarMundo);
+  const quitarMundo = usePerfilFincaStore((s) => s.quitarMundo);
   /* EL CENTRAL MANDA: el avatar que la persona eligió (perfil/onboarding) es
      el protagonista de la vitrina — grande, pleno, al frente. Sin elección el
      hook cae a Angelita. El coro ambiental lo excluye del elenco. */
@@ -1117,6 +1215,11 @@ export default function VitrinaMaestraMundos({ onBack }) {
   const [mundoId, setMundoId] = useState(null);
   const [senalado, setSenalado] = useState(null);
   const [listo, setListo] = useState(false);
+
+  const estados = useMemo(
+    () => Object.fromEntries(PORTALES.map((p) => [p.id, estadoMundoVitrina(p.id, perfilFinca)])),
+    [perfilFinca],
+  );
 
   const sinCanvas = !permite3D(tier);
   const portal = mundoId ? PORTAL_POR_ID[mundoId] : null;
@@ -1200,6 +1303,7 @@ export default function VitrinaMaestraMundos({ onBack }) {
             interactivo={enGaleria}
             tier={tier}
             reducedMotion={reducedMotion}
+            estados={estados}
             onElegir={elegir}
             onSenalar={senalar}
           />
@@ -1221,23 +1325,35 @@ export default function VitrinaMaestraMundos({ onBack }) {
               </h3>
               <div className="vmx-piso__grid" role="list">
                 {piso.mundos.map((p) => (
-                  <button
+                  <article
                     key={p.id}
-                    type="button"
                     role="listitem"
                     className="vmx-tarjeta"
+                    data-estado={estados[p.id]}
                     style={{ background: `linear-gradient(160deg, ${p.colorA} 0%, ${p.colorB} 100%)` }}
-                    onClick={() => elegir(p.id)}
                   >
-                    <span
-                      className="vmx-tarjeta__aro"
-                      aria-hidden="true"
-                      style={{ background: `radial-gradient(circle at 50% 30%, ${p.colorA} 0%, ${p.colorB} 85%)` }}
+                    <button
+                      type="button"
+                      className="vmx-tarjeta__entrada"
+                      onClick={() => elegir(p.id)}
+                      aria-label={`Entrar a ${p.titulo}`}
                     >
-                      <span>{p.emoji}</span>
-                    </span>
-                    {p.titulo}
-                  </button>
+                      <span
+                        className="vmx-tarjeta__aro"
+                        aria-hidden="true"
+                        style={{ background: `radial-gradient(circle at 50% 30%, ${p.colorA} 0%, ${p.colorB} 85%)` }}
+                      >
+                        <span>{p.emoji}</span>
+                      </span>
+                      {p.titulo}
+                    </button>
+                    <AccionMundo
+                      estado={estados[p.id]}
+                      titulo={p.titulo}
+                      onAgregar={() => agregarMundo(p.id)}
+                      onQuitar={() => quitarMundo(p.id)}
+                    />
+                  </article>
                 ))}
               </div>
             </section>
@@ -1269,6 +1385,11 @@ export default function VitrinaMaestraMundos({ onBack }) {
             </div>
           </div>
           <div className="vmx-pie">
+            <div className="vmx-leyenda" aria-label="Cómo leer esta vitrina">
+              <b>Verde: lo que usted tiene</b>
+              <span aria-hidden="true">·</span>
+              <b>Dorado: lo que puede conocer</b>
+            </div>
             {defSenalado && (
               <p className="vmx-senal" role="status">
                 {defSenalado.emoji} {defSenalado.titulo} — {defSenalado.pisoNombre.toLowerCase()} · toque para entrar
@@ -1288,17 +1409,28 @@ export default function VitrinaMaestraMundos({ onBack }) {
                       {piso.icono} {piso.nombre}
                     </span>
                     {piso.mundos.map((p) => (
-                      <button
+                      <div
                         key={p.id}
-                        type="button"
                         role="listitem"
-                        className="vmx-chip"
-                        onClick={() => elegir(p.id)}
-                        disabled={!enGaleria}
+                        className="vmx-chip-wrap"
+                        data-estado={estados[p.id]}
                       >
-                        <span aria-hidden="true">{p.emoji}</span>
-                        {p.titulo}
-                      </button>
+                        <button
+                          type="button"
+                          className="vmx-chip"
+                          onClick={() => elegir(p.id)}
+                          disabled={!enGaleria}
+                        >
+                          <span aria-hidden="true">{p.emoji}</span>
+                          {p.titulo}
+                        </button>
+                        <AccionMundo
+                          estado={estados[p.id]}
+                          titulo={p.titulo}
+                          onAgregar={() => agregarMundo(p.id)}
+                          onQuitar={() => quitarMundo(p.id)}
+                        />
+                      </div>
                     ))}
                   </div>
                 ))}

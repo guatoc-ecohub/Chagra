@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Bug } from 'lucide-react';
 import { lunarPhase } from '../utils/skyEphemeris';
 import { pestMonitoringMessage } from '../services/lunarPestService';
-import { FARM_CONFIG } from '../config/defaults';
+import { getContextoGeoFinca } from '../services/perfilFincaService';
 
 /**
  * PestMonitoringWindow, Feature C.1 ADR-033.
@@ -50,7 +50,7 @@ export default function PestMonitoringWindow() {
 }
 
 function computeMessage() {
-  const lat = FARM_CONFIG.LATITUDE ?? 0;
+  const lat = getContextoGeoFinca().lat ?? 0;
   const lunar = lunarPhase(new Date(), { latitude: lat });
   return pestMonitoringMessage(lunar);
 }
