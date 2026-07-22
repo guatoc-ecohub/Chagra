@@ -90,3 +90,122 @@ Detalle: de las 50 queries, 14 pasan de fallar (BM25) a acertar (híbrido) — c
 2. **Plaga→hospedero**: "gusano del cafe" no matchea directamente la ficha de cafe. Fix: 14 sinonimos `plaga_hospedero` en `campesino-synonyms.json`, wireados al retriever via `expandQueryTokens()`.
 3. **int8 quantize**: reduce asset de ~7.9MB (float32, 1024d) a ~1.7MB. Regenerar el asset con `--quantize`.
 4. **Embedder desalineado (RESUELTO 2026-07-02)**: ver sección de auditoría arriba. Cualquier cambio de modelo de embeddings a futuro debe tocar `embedQuery()` Y `build-rag-embeddings.mjs` a la vez, o el híbrido vuelve a degradar en silencio a BM25-only.
+
+## Reranker LLM-as-judge — medido 2026-07-22 (`scripts/bench-reranker.mjs`)
+
+### Por qué
+
+El bench de embedders mostró recall@1 bajo con recall@3 bastante más alto para
+el mejor embedder — un patrón de "el documento correcto SÍ está en el top-K
+pero no de primero", que es justo lo que arregla un reranker. Ollama 0.24 no
+tiene `/api/rerank` (404 verificado) ni `bge-reranker` en su registro (404 en
+dos variantes), así que se implementó como **LLM-as-judge**: el retriever trae
+top-K (embedder `granite-embedding:278m`, elegido por tamaño — 0.56 GB — para
+que quepa junto al agente `gemma4:e2b` ~8 GB en la M6000 de 12 GiB) y un modelo
+chico reordena esos K candidatos. Código: `scripts/lib/reranker.mjs` (modos
+`pointwise` y `listwise`). Script de medición: `scripts/bench-reranker.mjs`.
+
+### ⚠️ Corrección importante al número de motivación de esta tarea
+
+El número que motivó este trabajo (recall@3≈70% para el mejor embedder) **no
+era correcto**. Al armar este bench aparecieron dos problemas reales, ya
+corregidos:
+
+1. **Bug de scoring en `bench-embedders.mjs`** (`rankMetrics()`): `if (pos <=
+   2) r3++` y `if (pos <= 4) r5++` no comprobaban `pos >= 0` — `indexOf`
+   devuelve `-1` cuando el slug esperado no existe en el corpus, y `-1 <= 2`
+   es `true` en JS. Cualquier golden item cuyo `expected` no exista en el
+   corpus contaba como acierto automático de recall@3/@5. Fix: agregado el
+   guard `pos >= 0 &&` (MRR ya lo tenía; solo r3/r5 estaban rotos).
+2. **15 de 44 golden items evaluables referencian slugs que ya no existen**
+   como ficha propia: `solanum_tuberosum`, `lactuca_sativa`,
+   `solanum_lycopersicum`, `fragaria_ananassa`, `daucus_carota`,
+   `pisum_sativum` — el catálogo los reemplazó por variedades
+   (`solanum_tuberosum_pastusa_suprema`, etc.) y `eval/rag-golden.json` nunca
+   se actualizó. En el pipeline de producción esto probablemente NO es un
+   problema real — `ragRetriever.js` tiene `collapseVarieties()` exactamente
+   para este caso (ver "Cuellos conocidos" #1 arriba), y el bench
+   `bench-rag-retrieve.mjs` (que sí corre el pipeline híbrido completo) ya
+   resuelve `"que siembro en tierra fria" → solanum_tuberosum` correctamente.
+   Pero **ni `bench-embedders.mjs` ni este bench de reranker corren
+   `collapseVarieties()`** — ambos son pruebas de embedder/reranker aisladas
+   sobre el corpus crudo (así lo pidió esta tarea, para reusar la metodología
+   existente) — así que para estos 44 queries, esos 15 son un miss
+   estructural que ningún embedder ni reranker puede resolver en este
+   arnés de medición. **Recomendación de seguimiento**: repetir este
+   experimento sobre la salida real de `retrieveInternal()` (post BM25 +
+   semántico + `collapseVarieties()`), no sobre el ranking crudo de un solo
+   embedder — ahí es donde un reranker tendría que demostrar valor real.
+
+Con el fix, la tabla de embedders (mismo golden, corpus actual de 501 fichas)
+queda:
+
+| Embedder | recall@1 | recall@3 | recall@5 | MRR | lat. embed corpus | VRAM residente |
+|---|---|---|---|---|---|---|
+| nomic-embed-text (prod actual) | 18.2% | 38.6% | 40.9% | 0.2781 | 87ms | — |
+| bge-m3 | 29.5% | 38.6% | 40.9% | 0.3489 | 343ms | ~1.3GB |
+| snowflake-arctic-embed2 | 29.5% | 38.6% | 43.2% | 0.3618 | 366ms | ~1.3GB |
+| **granite-embedding:278m** | **31.8%** | 36.4% | 40.9% | 0.3550 | **121ms** | **0.56GB** |
+
+`granite-embedding:278m` no es solo "el que cabe" — tiene el recall@1 más alto
+de los 4 Y es el más barato en VRAM y el más rápido embediendo. Su único
+defecto real: `bert.context_length=512` tokens (verificado `ollama show`) —
+329 de 501 fichas del corpus lo superan y quedan excluidas del ranking
+(`corpus_embed_errors` en el JSON de salida). Truncar en vez de excluir se
+probó primero y *empeoró* el recall@1 medido (31.8%→18.2%): los embeddings
+truncados de esas 329 fichas largas terminaban ganándole el top-1 a la ficha
+correcta en varias queries. Se mantuvo la exclusión (igual que
+`bench-embedders.mjs`) por ser la opción más honesta, no la más completa.
+
+### Resultado — recall@1 con y sin reranker (K=10, n=44, agente `gemma4:e2b` cargado)
+
+| Reranker | recall@1 sin | recall@1 con | Δ | recall@3 con | latencia avg | latencia p95 | ¿Convive con el agente? |
+|---|---|---|---|---|---|---|---|
+| — (baseline) | 31.8% | — | — | 36.4% | — | — | — |
+| **qwen2.5:3b** | 31.8% | **36.4%** | **+4.6pp** | 45.5% | 2303ms | 2838ms | **Sí** (2.31GB) |
+| llama3.2:3b | 31.8% | 29.5% | **-2.3pp** | 34.1% | 3239ms | 3405ms | Sí (2.52GB) |
+| gemma2:2b | — | **CRASH** | — | — | — | — | **No** — tumba el runner |
+| phi4-mini | — | **CRASH** | — | — | — | — | **No** — tumba el runner |
+
+Reproducido 3 veces (recall@1 idéntico en las 3 corridas para qwen2.5:3b y
+llama3.2:3b tras fijar `format` JSON estructurado — ver abajo). Modo usado:
+**listwise** (1 llamado con los K candidatos numerados, el modelo devuelve el
+orden) — ganó por recall Y por latencia contra pointwise (1 llamado por
+candidato) en el sub-experimento dedicado: con qwen2.5:3b sobre 15 queries,
+listwise dio recall@1=20% en 2387ms promedio contra pointwise 13.3% en 4543ms.
+
+**gemma2:2b y phi4-mini NO son un problema de configuración.** Se verificó
+directo por curl, sin el script de por medio: ambos cargan y responden bien
+en solitario (GPU vacía), y ambos truenan reproduciblemente
+(`"llama runner process has terminated: signal arrived during cgo execution"`)
+apenas se intentan cargar con `gemma4:e2b` ya residente — con VRAM de sobra
+sobre el papel (agente 7.96GB + cualquiera de los dos ~2.5-2.9GB ≪ 12GB). No
+es falta de memoria: es una incompatibilidad real de la M6000 (Maxwell sm_52)
++ Ollama 0.24 con esas dos arquitecturas bajo carga concurrente — qwen2.5:3b
+y llama3.2:3b cargan sin problema en las mismas condiciones. El agente
+`gemma4:e2b` sobrevive el crash intacto (confirmado vía `/api/ps` después);
+solo el runner del modelo nuevo muere.
+
+**Ajuste que importó**: sin fijar `num_ctx` explícito (2048, alcanza de sobra
+para K=10 pasajes truncados), Ollama reserva el `num_ctx` por defecto del
+modelo para el KV-cache — eso infló a `gemma2:2b` de ~2.3GB a 3.9GB
+residentes y le hizo desalojar al agente en una corrida temprana. Con
+`num_ctx:2048` fijo, todos los candidatos que sí cargan quedan bajo 2.6GB.
+
+### Veredicto
+
+**+4.6 puntos de recall@1 por +2.3 segundos de latencia por consulta no
+justifica claramente el costo para una app de voz.** El propio criterio de
+esta tarea era "un reranker que suba 20 puntos pero agregue 5 segundos puede
+no servir" — acá se agregan ~2.3s (bajo el límite) pero se ganan solo 4.6pp
+(muy por debajo del techo de ~14pp que separaba recall@1 de coverage@10,
+45.5%). De los 4 candidatos que caben en presupuesto de VRAM real, 2 truenan
+el runner y el único que mejora algo (qwen2.5:3b) lo hace de forma marginal;
+el otro (llama3.2:3b) empeora. **No se recomienda shippear este reranker tal
+como está.** Caminos con más chance antes de reintentar: (1) medir sobre la
+salida de `retrieveInternal()` real (post-`collapseVarieties`), no sobre el
+embedder aislado — el "problema de orden" que motivó esto puede ser bastante
+más chico de lo que parecía; (2) si aun así hay hueco, probar el candidato
+con más headroom no probado por incompatibilidad de GPU (`gemma2:2b`,
+`phi4-mini`) en un GPU más nuevo, o esperar soporte de reranking nativo en
+una versión más reciente de Ollama.
