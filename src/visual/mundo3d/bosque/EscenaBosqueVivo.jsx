@@ -615,12 +615,15 @@ function RayosDeSol({ franja, reducedMotion }) {
       Cartas grandes billboard a radios crecientes: al orbitar, las capas se
       deslizan a velocidades distintas y el bosque gana profundidad física.
       La franja pesa: más bruma al amanecer y de noche. */
+/* Opacidades a la baja (2026-07-22): con 0.10-0.16 × marea hasta 1.32, la
+   bruma velaba el MAR DE NUBES del fondo la mitad del tiempo y el tercio
+   alto del cuadro quedaba gris pelado. La bruma sugiere; el mar se ve. */
 const CAPAS_BRUMA = [
-  { rad: 13.5, y: 2.6, w: 26, h: 6.5, op: 0.16, vel: 0.011, fase: 0 },
-  { rad: 18, y: 4.0, w: 36, h: 9, op: 0.15, vel: -0.008, fase: 2.2 },
-  { rad: 23, y: 6.0, w: 48, h: 12, op: 0.13, vel: 0.006, fase: 4.1 },
-  { rad: 29, y: 8.5, w: 62, h: 15, op: 0.12, vel: -0.004, fase: 1.3 },
-  { rad: 36, y: 12, w: 84, h: 20, op: 0.1, vel: 0.003, fase: 5.5 },
+  { rad: 13.5, y: 2.6, w: 26, h: 6.5, op: 0.11, vel: 0.011, fase: 0 },
+  { rad: 18, y: 4.0, w: 36, h: 9, op: 0.1, vel: -0.008, fase: 2.2 },
+  { rad: 23, y: 6.0, w: 48, h: 12, op: 0.09, vel: 0.006, fase: 4.1 },
+  { rad: 29, y: 8.5, w: 62, h: 15, op: 0.08, vel: -0.004, fase: 1.3 },
+  { rad: 36, y: 12, w: 84, h: 20, op: 0.065, vel: 0.003, fase: 5.5 },
 ];
 const PESO_BRUMA = {
   amanecer: 1.4, manana: 1.0, mediodia: 0.65, tarde: 0.9, atardecer: 1.25, noche: 1.15,
@@ -681,7 +684,9 @@ function BrumaParallax({ franja, reducedMotion }) {
     // cartas de bruma se ESPESAN cuando la marea cierra y adelgazan al abrir →
     // la niebla entra y sale a una, no cada capa por su lado.
     const marea = reducedMotion ? 0 : 0.5 + 0.5 * Math.sin(t * (Math.PI * 2 / 46));
-    const envMarea = 0.7 + 0.62 * marea;
+    // Techo de la marea a la baja: cerrada del todo (1.32×) tapaba el mar de
+    // nubes; ahora respira entre 0.62× y 1.04× y el fondo nunca desaparece.
+    const envMarea = 0.62 + 0.42 * marea;
     let idx = 0;
     for (let c = 0; c < CAPAS_BRUMA.length; c++) {
       const capa = CAPAS_BRUMA[c];

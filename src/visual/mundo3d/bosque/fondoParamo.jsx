@@ -225,9 +225,10 @@ function MarDeNubes({ n, pal, reducedMotion }) {
       return {
         x: Math.sin(a) * r,
         z: -Math.cos(a) * r,
-        // Justo por debajo de la línea del horizonte: un mar por DEBAJO, no un
-        // cielo nublado corriente.
-        y: -2.6 + rng() * 3.0,
+        // Un mar por DEBAJO, no un cielo nublado corriente — pero con las
+        // CRESTAS asomadas sobre la línea del horizonte: antes ([-2.6, 0.4])
+        // el banco entero quedaba hundido y el cielo salía gris pelado.
+        y: -1.5 + rng() * 4.2,
         ancho: 16 + rng() * 32,
         grueso: 2.6 + rng() * 4.2,
         fondo: 12 + rng() * 24,
