@@ -1,0 +1,179 @@
+/*
+ * FrutalesAndinos3D — la vitrina del vergel de clima frío.
+ * Papel cálido de finca, la escena mandando arriba, tabla del elenco que se
+ * apila sola en móvil.
+ */
+
+.vfrut {
+  --vf-tinta: #2b2013;
+  --vf-borde: rgba(43, 32, 19, 0.16);
+
+  min-height: 100dvh;
+  margin: 0;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background: radial-gradient(120% 80% at 50% 0%, #f2f4dc 0%, #e4e2bd 52%, #cfd0a2 100%);
+  color: var(--vf-tinta);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  line-height: 1.55;
+}
+
+.vfrut__head {
+  max-width: 62ch;
+  margin: 0 auto clamp(1.2rem, 3vw, 2rem);
+  text-align: center;
+}
+
+.vfrut__kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.62;
+}
+
+.vfrut__head h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(1.5rem, 4.6vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.vfrut__lema {
+  margin: 0;
+  font-size: clamp(0.95rem, 2.2vw, 1.06rem);
+  opacity: 0.85;
+}
+
+.vfrut__escena {
+  position: relative;
+  max-width: 1120px;
+  height: clamp(300px, 58vh, 580px);
+  margin: 0 auto clamp(1.4rem, 3.5vw, 2.6rem);
+  overflow: hidden;
+  background: #dfe0bb;
+  border: 1px solid var(--vf-borde);
+  border-radius: 18px;
+  box-shadow: 0 14px 32px rgba(43, 32, 19, 0.16);
+}
+
+.vfrut__escena canvas { display: block; }
+
+.vfrut__cargando,
+.vfrut__ficha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 1.4rem;
+  text-align: center;
+}
+
+.vfrut__ficha p {
+  max-width: 46ch;
+  margin: 0;
+  font-size: 0.96rem;
+  opacity: 0.82;
+}
+
+.vfrut__toggle {
+  position: absolute;
+  right: 0.8rem;
+  bottom: 0.8rem;
+  padding: 0.5rem 0.95rem;
+  color: #f6f3e2;
+  font: inherit;
+  font-size: 0.86rem;
+  background: rgba(43, 32, 19, 0.82);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.vfrut__toggle:hover { background: rgba(43, 32, 19, 0.95); }
+
+.vfrut__elenco,
+.vfrut__saberes {
+  max-width: 1120px;
+  margin: 0 auto clamp(1.4rem, 3.5vw, 2.6rem);
+}
+
+.vfrut__elenco h2,
+.vfrut__saberes h2 {
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  text-align: center;
+}
+
+.vfrut__elenco ul,
+.vfrut__saberes ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vfrut__elenco li,
+.vfrut__saberes li {
+  padding: 1rem;
+  background: rgba(255, 254, 244, 0.72);
+  border: 1px solid var(--vf-borde);
+  border-radius: 16px;
+}
+
+.vfrut__elenco h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.02rem;
+}
+
+.vfrut__elenco h3 em {
+  display: block;
+  font-weight: 400;
+  font-size: 0.82rem;
+  opacity: 0.66;
+}
+
+.vfrut__sena {
+  margin: 0 0 0.45rem;
+  font-weight: 600;
+  font-size: 0.94rem;
+}
+
+.vfrut__detalle {
+  margin: 0;
+  font-size: 0.88rem;
+  opacity: 0.82;
+}
+
+.vfrut__saberes li span {
+  display: block;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.vfrut__saberes li h3 {
+  margin: 0.4rem 0 0.35rem;
+  font-size: 1rem;
+}
+
+.vfrut__saberes li p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.84;
+}
+
+.vfrut__nota {
+  max-width: 62ch;
+  margin: 0 auto;
+  padding: 0.9rem 1.1rem;
+  font-size: 0.88rem;
+  text-align: center;
+  background: rgba(255, 254, 244, 0.6);
+  border: 1px dashed var(--vf-borde);
+  border-radius: 14px;
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vfrut * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}
