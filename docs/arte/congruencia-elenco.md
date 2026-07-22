@@ -163,5 +163,31 @@ Se dejan documentados; son decisiones del operador, no del brazo de arte.
 
 ---
 
+## 6. Aplicación de la ley madre a mundos rezagados (pase 2)
+
+El censo de cielos encontró que la adopción de `CIELOS_HORA`/`mezclarCielo` ya
+es casi universal; quedaban DOS rigs inventados a mano, y se convirtieron
+(capturas antes/después en `capturas/congruencia-madre/`):
+
+1. **Polinizadores** (`EscenaPolinizadores.jsx` + `polinizadoresIdentidad.js`) —
+   el último mundo surfaceado con cielo propio: un celeste frío de mediodía
+   (`#bfe3f2`) que se veía de otro juego, y una noche con rebote de suelo FRÍO
+   (`#141a24`, contra la ley del negro cálido). Ahora: el día ES
+   `CIELOS_HORA.mediodia`, la noche ES `CIELOS_HORA.noche` (luna plata de la
+   casa, suelo `N.suelo` cálido), y el ojo de abeja se DERIVA del mediodía madre
+   corrido al violeta-UV (física del síndrome, patrón del páramo con su bruma).
+   Verdes del monte y cerca viva derivados de `VERDES`/`CORTEZAS`/`TIERRAS`.
+2. **VitrinaCriaturas · escarcha** (`mockups/vitrina3d/VitrinaCriaturas.jsx`) —
+   la vitrina del elenco montaba la helada con un rig genérico azul-blanco
+   (cielo `#d7e6f2`, sol `#ffffff`). Ahora amanece con `<LuzMadre
+   madre={CIELOS_HORA.amanecer}>`: durazno rasante, relleno lavanda y pasto
+   `mezclar(VERDES.frio, NIEBLAS.paramo, 0.25)` — la tarjeta decía "amanecer
+   despejado" y por fin lo es.
+
+Deliberados que NO se tocaron: micorrizas (menta bioluminiscente = identidad
+del wood-wide web), restauración (clima dual año 0/año 50 = dispositivo
+narrativo, su año 50 aterriza en el Bosque Vivo), páramo mockup (frío DERIVADO
+de la dorada con `mezclaHex` — el patrón correcto, se citó como referencia).
+
 *Auditoría aditiva. El gate visual antes/después lo hace la orquestación; este
 documento es el mapa, no el veredicto de píxel.*
