@@ -1,4 +1,17 @@
 /*
+ * ARCHIVADO 2026-07-22 — pedido del operador (páramo definitivo).
+ *
+ * Esta vitrina montaba el mundo Bosque Vivo con el Ent de la queñua y la
+ * lección del microsuelo. El operador revisó los TRES mundos con piezas de
+ * páramo y decidió dejar UNO solo: el PÁRAMO DEFINITIVO
+ * (src/visual/mundo3d/bosque/EscenaBosqueVivo.jsx vía MundoEntBosque.jsx,
+ * ruta #/mockups/paramo-definitivo y prod `bosque_vivo`/`diorama_paramo`).
+ * De aquí se conservaron la iluminación, la vegetación, la niebla en capas y
+ * la fauna; el Ent y el campesino quedaron FUERA ("están horribles").
+ * NO se borra (el proyecto ya perdió trabajo por borrar): queda completo por
+ * si se retoma la vitrina con ficha y saberes.
+ */
+/*
  * BosqueVivo3D — vitrina pública del MUNDO BOSQUE VIVO y su guardián: el Ent de
  * la queñua (colorado, *Polylepis*), el árbol más alto del páramo andino.
  * Ruta #/mockups/bosque-vivo-3d, sin auth.
@@ -15,7 +28,7 @@
  * en "usted". Autocontenida: cero CDN/imágenes externas.
  */
 import { lazy, Suspense, useMemo, useState } from 'react';
-import { decidirTier, permite3D } from '../visual/mundo3d/deviceTier.js';
+import { decidirTier, permite3D } from '../../visual/mundo3d/deviceTier.js';
 import './BosqueVivo3D.css';
 
 const MundoEntBosque = lazy(() => import('../visual/mundo3d/bosque/MundoEntBosque.jsx'));

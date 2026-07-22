@@ -170,10 +170,12 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
-  // ── El Bosque Vivo — Ent queñua landmark + microsuelo (capas) ──
+  // ── El PÁRAMO DEFINITIVO (2026-07-22): el mundo único del páramo ──
+  // (antes "Bosque Vivo" con Ent + microsuelo; el operador dejó UNA escena:
+  // frailejonal por edades + inmensidad + cámara de llegada, sin Ent).
   {
     path: 'bosque_vivo',
-    alias: ['bosque', 'bosque_vivo_3d', 'ent', 'quenua'],
+    alias: ['bosque', 'bosque_vivo_3d', 'paramo_definitivo', 'quenua'],
     componente: 'MundoEntBosque',
     importLazy: 'src/visual/mundo3d/bosque/MundoEntBosque.jsx',
     categoria: '3D',
@@ -220,10 +222,12 @@ export const NUCLEO_3D = [
     importLazy: 'src/mockups/MundoGallinero3D.jsx',
     categoria: '3D',
   },
+  // diorama_paramo lleva AL MISMO páramo definitivo (MundoParamo3D quedó
+  // archivado en src/mockups/_archivo/ — ver la decisión del 2026-07-22).
   {
     path: 'diorama_paramo',
-    componente: 'MundoParamo3D',
-    importLazy: 'src/mockups/MundoParamo3D.jsx',
+    componente: 'MundoEntBosque',
+    importLazy: 'src/visual/mundo3d/bosque/MundoEntBosque.jsx',
     categoria: '3D',
   },
   {

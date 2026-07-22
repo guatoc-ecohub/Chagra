@@ -1,4 +1,17 @@
 /*
+ * ARCHIVADO 2026-07-22 — pedido del operador (páramo definitivo).
+ *
+ * El páramo viejo ("actualmente está feo") quedó reemplazado por el PÁRAMO
+ * DEFINITIVO (src/visual/mundo3d/bosque/EscenaBosqueVivo.jsx vía
+ * MundoEntBosque.jsx; prod `diorama_paramo` apunta allá). De aquí SE SALVARON
+ * las dos joyas que el operador nombró: la CÁMARA de la llegada ("es
+ * increíble" → CamaraJackson en EscenaBosqueVivo) y el FONDO de inmensidad
+ * ("le da un toque de inmensidad muy bueno" → fondoParamo.jsx: bóveda,
+ * cordillera, mar de nubes, falda, sol velado, frailejonal del horizonte).
+ * NO se borra: la lección del suelo, la danta, el barbudito y el nacimiento
+ * del agua viven aquí completos por si otra composición los retoma.
+ */
+/*
  * MundoParamo3D — el BOSQUE ALTOANDINO / PÁRAMO: el ecosistema de la niebla.
  *
  * No es paisaje decorativo: es la FÁBRICA DE AGUA de Colombia contada en 3D.
@@ -66,20 +79,20 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr, Html } from '@react-three/drei';
-import { Danta } from '../visual/creatures/Danta.jsx';
-import { BarbuditoParamo } from '../visual/creatures/BarbuditoParamo.jsx';
-import EntQuenua from '../visual/mundo3d/bosque/EntQuenua.jsx';
+import { Danta } from '../../visual/creatures/Danta.jsx';
+import { BarbuditoParamo } from '../../visual/creatures/BarbuditoParamo.jsx';
+import EntQuenua from '../../visual/mundo3d/bosque/EntQuenua.jsx';
 import {
   CorteSuelo,
   CSS_ROTULOS,
   CORTE_POS as CORTE_POS_EM,
-} from '../visual/mundo3d/bosque/EscenaEntMaestro.jsx';
+} from '../../visual/mundo3d/bosque/EscenaEntMaestro.jsx';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { CIELOS_HORA, mezclaHex } from '../visual/mundo3d/cielosHoraData.js';
-import { PALETA, mezclar } from '../visual/mundo3d/atmosferaMadre.js';
-import { NIEBLAS, LUCES, TIERRAS, VERDES } from '../visual/mundo3d/paleta/index.js';
-import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
-import { crearRng } from '../visual/mundo3d/particulasData.js';
+import { CIELOS_HORA, mezclaHex } from '../../visual/mundo3d/cielosHoraData.js';
+import { PALETA, mezclar } from '../../visual/mundo3d/atmosferaMadre.js';
+import { NIEBLAS, LUCES, TIERRAS, VERDES } from '../../visual/mundo3d/paleta/index.js';
+import { decidirTier, perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
+import { crearRng } from '../../visual/mundo3d/particulasData.js';
 
 /* LA BRUMA FRÍA DEL PÁRAMO (pasada 2) — el CONTRASTE deliberado con la hora
    dorada del valle. El páramo altoandino no vive el atardecer tibio: vive su
