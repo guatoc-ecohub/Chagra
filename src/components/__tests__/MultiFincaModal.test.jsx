@@ -30,7 +30,7 @@ vi.mock('../MultiFincaGlobe', () => ({
   default: () => <div data-testid="multifinca-globe-stub" />,
 }));
 
-vi.mock('../OnboardingModal', () => ({
+vi.mock('../FarmOSSetupModal', () => ({
   default: ({ finca, onClose }) => (
     <div data-testid="onboarding-modal-stub">
       <span>{finca?.nombre}</span>
