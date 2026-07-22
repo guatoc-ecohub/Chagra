@@ -38,6 +38,10 @@ const HATO_MUESTRA = [
   { especie: 'cerdo', nombre: 'Canelo', raza: 'duroc', tamano: 'mediano', estado: 'sano' },
   { especie: 'cerdo', nombre: 'Rosita', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
   { especie: 'cerdo', nombre: 'Manchas', raza: 'sanpedreño', tamano: 'pequeño', estado: 'sano' },
+  // Herradura: la TERCERA criolla porcina colombiana (AGROSAVIA) — capa
+  // rojiza-amarillenta y casco entero como el de una mula. Que el hato de
+  // muestra enseñe las tres, no solo dos.
+  { especie: 'cerdo', nombre: 'Herradura', raza: 'casco de mula', tamano: 'mediano', estado: 'sano' },
   { especie: 'cerdo', nombre: 'Tocineta', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
   { especie: 'vaca', nombre: 'Lola', raza: 'normando', tamano: 'grande', estado: 'sano' },
   // Camilo: VENDIDO. En el corral queda su huella; en el mercado llega en cuerpo.
