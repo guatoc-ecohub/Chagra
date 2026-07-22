@@ -21,6 +21,14 @@
  * vegetación, un InstancedMesh por especie; el agua y la red, uno cada una.
  * Todo comparte material de color por vértice: el color vive HORNEADO en la
  * geometría, que es lo que permite que un teléfono barato dibuje esta ladera.
+ *
+ * ── Máximo dos Ents a la vez (`pisosVisibles`, 2026-07-22) ──────────────────
+ * El bloque de montaña, el agua y la red de micorrizas son la ladera entera y
+ * SIEMPRE se dibujan completos (es un solo cerro, no se puede "apagar" un
+ * pedazo). Los Ents y su cortejo de vegetación propia sí se recortan: `prop.
+ * pisosVisibles` (ver `pisosBosqueGradiente.js`) dice cuáles de los tres se
+ * plantan. `TresEntsGradiente3D.jsx` es quien decide ESO según el perfil de
+ * la finca; esta escena solo obedece.
  */
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -333,17 +341,29 @@ function NodosRed({ nodos, reducedMotion, mat }) {
  * @param {{materialRico?:boolean, flatShading?:boolean, sombras?:boolean}} props.perfil
  * @param {boolean} [props.reducedMotion]
  * @param {string|null} [props.foco]  id del piso al que se le está prestando
- *   atención ('templado' | 'frio' | 'paramo' | null): los otros se apagan un
- *   punto para que el ojo sepa a dónde mirar, sin ocultar nada.
+ *   atención ('templado' | 'frio' | 'paramo' | null): de los pisos QUE SÍ se
+ *   dibujan (ver `pisosVisibles`), el que no es el foco se apaga un punto
+ *   para que el ojo sepa a dónde mirar.
+ * @param {string[]|null} [props.pisosVisibles]  qué Ents (y su cortejo de
+ *   vegetación propio) se DIBUJAN — regla dura del operador (2026-07-22):
+ *   máximo dos a la vez, nunca los tres/cuatro de fondo. Se calcula con
+ *   `pisosVisiblesParaVista` de `pisosBosqueGradiente.js`; `null`/`undefined`
+ *   = dibujar todos (red de seguridad, no un modo de producto). El bloque de
+ *   montaña, el agua, la red de micorrizas y la cobertura rasante
+ *   (mortino/romerillo/musgo/roca) NO se recortan: son la ladera compartida,
+ *   no "un bosque".
  */
 export default function EscenaTresEnts({
   tier = 'alto',
   perfil,
   reducedMotion = false,
   foco = null,
+  pisosVisibles = null,
 }) {
   const q = calidadDeTier(tier);
   const denso = tier === 'alto' ? 1 : tier === 'medio' ? 0.62 : 0.35;
+  /* ¿Se dibuja este piso? `pisosVisibles` nulo = todos (red de seguridad). */
+  const seDibuja = (pisoId) => !pisosVisibles || pisosVisibles.includes(pisoId);
 
   /* ── El bloque de montaña ── */
   const lomo = useMemo(() => construirLomo({ q: denso }), [denso]);
@@ -513,38 +533,60 @@ export default function EscenaTresEnts({
         <PulsosRed curva={curvaRed} pulsos={pulsos} reducedMotion={reducedMotion} mat={matNodo} />
       )}
 
-      {/* ── LA VEGETACIÓN DE CADA PISO ── */}
-      <Banco geo={geosVeg.roble} mat={matDe('templado')} items={siembra.roble} castShadow={!!perfil?.sombras} />
-      <Banco geo={geosVeg.gaque} mat={matDe('templado')} items={siembra.gaque} />
-      <Banco geo={geosVeg.aliso} mat={matDe('frio')} items={siembra.aliso} castShadow={!!perfil?.sombras} />
-      <Banco geo={geosVeg.encenillo} mat={matDe('frio')} items={siembra.encenillo} />
-      <Banco geo={geosVeg.frailejon} mat={matDe('paramo')} items={siembra.frailejon} castShadow={!!perfil?.sombras} />
-      <Banco geo={geosVeg.frailejonFlor} mat={matDe('paramo')} items={siembra.frailejonFlor} />
+      {/* ── LA VEGETACIÓN DE CADA PISO — el cortejo del Ent se dibuja SOLO
+          cuando su piso está entre los visibles (`seDibuja`); la cobertura
+          rasante de abajo (mortino/romerillo/musgo/roca) es de toda la
+          ladera y no se recorta nunca. ── */}
+      {seDibuja('templado') && (
+        <>
+          <Banco geo={geosVeg.roble} mat={matDe('templado')} items={siembra.roble} castShadow={!!perfil?.sombras} />
+          <Banco geo={geosVeg.gaque} mat={matDe('templado')} items={siembra.gaque} />
+        </>
+      )}
+      {seDibuja('frio') && (
+        <>
+          <Banco geo={geosVeg.aliso} mat={matDe('frio')} items={siembra.aliso} castShadow={!!perfil?.sombras} />
+          <Banco geo={geosVeg.encenillo} mat={matDe('frio')} items={siembra.encenillo} />
+        </>
+      )}
+      {seDibuja('paramo') && (
+        <>
+          <Banco geo={geosVeg.frailejon} mat={matDe('paramo')} items={siembra.frailejon} castShadow={!!perfil?.sombras} />
+          <Banco geo={geosVeg.frailejonFlor} mat={matDe('paramo')} items={siembra.frailejonFlor} />
+        </>
+      )}
       <Banco geo={geosVeg.mortino} mat={matVeg} items={siembra.mortino} />
       <Banco geo={geosVeg.romerillo} mat={matVeg} items={siembra.romerillo} />
       <Banco geo={geosVeg.musgo} mat={matVeg} items={siembra.musgo} hundir={0.04} />
       <Banco geo={geosVeg.roca} mat={matVeg} items={siembra.roca} hundir={0.12} />
 
       {/* ══════════════════════════════════════════════════════════════════
-          LOS TRES ÁRBOLES MAESTROS
+          LOS ÁRBOLES MAESTROS — máximo dos a la vez (`seDibuja`), nunca los
+          tres/cuatro de fondo: la regla dura del operador (2026-07-22).
           ══════════════════════════════════════════════════════════════════ */}
 
       {/* EL ROBLE — templado y frío. Su mano señala las setas del pie. */}
-      <group position={[PISOS[0].x, alturaDe(PISOS[0]), PISOS[0].z]} rotation={[0, -0.16, 0]}>
-        <EntGradiente especie="roble" tier={tier} reducedMotion={reducedMotion} />
-      </group>
+      {seDibuja('templado') && (
+        <group name="piso-templado" position={[PISOS[0].x, alturaDe(PISOS[0]), PISOS[0].z]} rotation={[0, -0.16, 0]}>
+          <EntGradiente especie="roble" tier={tier} reducedMotion={reducedMotion} />
+        </group>
+      )}
 
       {/* EL ALISO — frío. Su mano señala los nódulos de Frankia de su raíz. */}
-      <group position={[PISOS[1].x, alturaDe(PISOS[1]), PISOS[1].z]} rotation={[0, 0.1, 0]}>
-        <EntGradiente especie="aliso" tier={tier} reducedMotion={reducedMotion} />
-      </group>
+      {seDibuja('frio') && (
+        <group name="piso-frio" position={[PISOS[1].x, alturaDe(PISOS[1]), PISOS[1].z]} rotation={[0, 0.1, 0]}>
+          <EntGradiente especie="aliso" tier={tier} reducedMotion={reducedMotion} />
+        </group>
+      )}
 
       {/* LA QUEÑUA — páramo. El Ent que ya existía, traído tal cual: mismo
           rostro tallado, misma barba de usnea, mismos brazos. Aquí en su casa,
           arriba del todo, con el nacimiento del agua a sus pies. */}
-      <group position={[PISOS[2].x, alturaDe(PISOS[2]), PISOS[2].z]} rotation={[0, 0.22, 0]}>
-        <EntQuenua tier={tier} reducedMotion={reducedMotion} />
-      </group>
+      {seDibuja('paramo') && (
+        <group name="piso-paramo" position={[PISOS[2].x, alturaDe(PISOS[2]), PISOS[2].z]} rotation={[0, 0.22, 0]}>
+          <EntQuenua tier={tier} reducedMotion={reducedMotion} />
+        </group>
+      )}
     </group>
   );
 }
