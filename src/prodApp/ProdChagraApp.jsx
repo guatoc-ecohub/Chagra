@@ -104,7 +104,7 @@ const LAZY_MAP = {
   AgentScreen: lazy(() => import('../components/AgentScreen/AgentScreen.jsx')),
   ProfileScreen: lazy(() => import('../components/ProfileScreen.jsx')),
   EspirituProScreen: lazy(() => import('../components/EspirituProScreen.jsx')),
-  OnboardingProfile: lazy(() => import('../components/OnboardingProfile.jsx')),
+  OnboardingCondensado: lazy(() => import('../components/OnboardingCondensado.jsx')),
   HoyEnFincaScreen: lazy(() => import('../components/hoy/HoyEnFincaScreen.jsx')),
   MiFincaEvolucionScreen: lazy(() => import('../components/hoy/MiFincaEvolucionScreen.jsx')),
   DirectorioEspeciesScreen: lazy(() => import('../components/DirectorioEspecies/DirectorioEspeciesScreen.jsx')),
@@ -183,7 +183,6 @@ const LAZY_MAP = {
   DashboardLive: lazy(() => import('../components/dashboard/DashboardLive.jsx')),
 
   // ── PENDIENTE_DECISION (operador dijo "nada afuera") ────────────
-  OnboardingCondensado: lazy(() => import('../components/OnboardingCondensado.jsx')),
   OnboardingSiembra: lazy(() => import('../mockups/OnboardingSiembra.jsx')),
   // La sala de juegos: el hub que hace VISIBLES los juegos (#juegos) desde
   // Aprender. Los dos de abajo estaban en el manifiesto SIN entrada aquí →

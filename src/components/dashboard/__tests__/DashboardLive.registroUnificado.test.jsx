@@ -32,7 +32,7 @@ vi.mock('../FincaVivaHero', () => ({
   default: (props) => <div data-testid="finca-viva-hero">{props.children}</div>,
 }));
 vi.mock('../FincaRedInstitucional', () => ({ default: () => <div /> }));
-vi.mock('../../OnboardingHero', () => ({ default: () => <div /> }));
+vi.mock('../../PrimerRegistroCard', () => ({ default: () => <div /> }));
 vi.mock('../SelectedBackgroundReveal', () => ({ default: () => <div /> }));
 vi.mock('../MiFincaVivaHomeCard', () => ({ default: () => <div /> }));
 vi.mock('../../CaseStudyTopWidget', () => ({ default: () => null }));

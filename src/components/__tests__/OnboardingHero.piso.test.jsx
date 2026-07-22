@@ -23,7 +23,7 @@ vi.mock('../../config/defaults', () => ({
   FARM_CONFIG: {},
 }));
 
-import OnboardingHero from '../OnboardingHero';
+import OnboardingHero from '../_archivo/OnboardingHero';
 import { saveProfile, getProfile } from '../../services/userProfileService';
 
 beforeEach(() => {

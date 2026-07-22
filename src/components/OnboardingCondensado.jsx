@@ -1,3 +1,5 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- el flujo conserva copy
+   colombiano preexistente; su migracion a messages.js queda fuera de scope. */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   MapPin,
@@ -12,6 +14,11 @@ import {
   Search,
   AlertCircle,
   SkipForward,
+  BadgeCheck,
+  Camera,
+  Download,
+  Mic,
+  Share,
 } from 'lucide-react';
 import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
 import AvatarSelector from './Settings/AvatarSelector';
@@ -36,6 +43,7 @@ import {
   resolveAltitudToSave,
 } from '../services/userProfileService';
 import usePerfilFincaStore from '../store/usePerfilFincaStore';
+import usePwaInstall from '../hooks/usePwaInstall';
 
 /**
  * OnboardingCondensado — la reescritura del onboarding (spec 2026-07-08).
@@ -55,8 +63,8 @@ import usePerfilFincaStore from '../store/usePerfilFincaStore';
  *
  * Todo lo demás (hectáreas, invernadero, manejo, riego, preferencias...) se
  * DIFIERE a la voz / progressive profiling / ProfileScreen — ver el flag
- * `deferred` en PROFILE_QUESTIONS. El flujo viejo (OnboardingProfile) queda
- * cableado en la ruta 'onboarding-perfil-clasico' (sin huérfanos).
+ * `deferred` en PROFILE_QUESTIONS. La ruta histórica
+ * 'onboarding-perfil-clasico' queda como alias de este mismo flujo.
  *
  * Persistencia: MISMAS claves de perfil que el flujo viejo + las nuevas de
  * vereda (vereda_codigo / vereda_source geométrico / barrio). 100% client-side
@@ -352,6 +360,7 @@ export default function OnboardingCondensado({
 }) {
   const [paso, setPaso] = useState(0);
   const [sembrando, setSembrando] = useState(false);
+  const { canInstall, installed, isIos, promptInstall } = usePwaInstall();
   // Marca de inicio para onboarding_tiempo_segundos (regla react: nada impuro
   // en render — se fija una sola vez al montar).
   const startedAtRef = useRef(null);
@@ -1158,8 +1167,8 @@ export default function OnboardingCondensado({
 
         {/* ═══ LISTO ═══ */}
         {paso === 6 && (
-          <div className="flex-1 flex flex-col items-center justify-center text-center gap-5">
-            <ChagraAgentAvatarAngelita size={168} state="speaking" ariaLabel="Angelita, la abeja de Chagra" />
+          <div className="flex-1 flex flex-col items-center justify-center text-center gap-4">
+            <ChagraAgentAvatarAngelita size={140} state="speaking" ariaLabel="Angelita, la abeja de Chagra" />
             <div className="flex flex-col gap-2">
               <h1 className="text-3xl font-black leading-tight text-slate-100">
                 Su finca está lista 🌱
@@ -1172,6 +1181,45 @@ export default function OnboardingCondensado({
                 Ahora háblele al colibrí: «Hola Chagra, ¿cuándo abono el café?»
               </p>
             </div>
+            <div
+              className="grid w-full grid-cols-3 gap-2"
+              aria-label="Capacidades principales de Chagra"
+              data-testid="onb2-capacidades"
+            >
+              {[
+                { Icon: Mic, label: 'Hablar por voz' },
+                { Icon: Camera, label: 'Mostrar una foto' },
+                { Icon: BadgeCheck, label: 'Revisar fuentes' },
+              ].map(({ Icon, label }) => (
+                <div key={label} className="rounded-xl border border-slate-700 bg-slate-900 p-2 text-xs text-slate-300">
+                  {React.createElement(Icon, {
+                    size: 20,
+                    className: 'mx-auto mb-1 text-emerald-300',
+                    'aria-hidden': true,
+                  })}
+                  {label}
+                </div>
+              ))}
+            </div>
+            {installed ? (
+              <p className="text-sm font-bold text-emerald-300" data-testid="onb2-pwa-instalada">
+                Chagra ya está instalada en este equipo.
+              </p>
+            ) : canInstall ? (
+              <button
+                type="button"
+                onClick={promptInstall}
+                className="onboarding-piso-secondary inline-flex items-center justify-center gap-2"
+                data-testid="onb2-instalar-pwa"
+              >
+                <Download size={18} aria-hidden="true" /> Instalar Chagra
+              </button>
+            ) : isIos ? (
+              <p className="text-xs text-slate-400" data-testid="onb2-instalar-ios">
+                Para instalarla, toque <Share size={14} className="inline" aria-hidden="true" /> Compartir y luego
+                Añadir a pantalla de inicio.
+              </p>
+            ) : null}
           </div>
         )}
 

@@ -28,7 +28,7 @@ vi.mock('../../../config/glaciarAccess', () => ({
 
 // Hijos pesados → stubs livianos.
 vi.mock('../AgentHero', () => ({ default: () => <div data-testid="agent-hero" /> }));
-vi.mock('../../OnboardingHero', () => ({ default: () => <div data-testid="onboarding-hero" /> }));
+vi.mock('../../PrimerRegistroCard', () => ({ default: () => <div data-testid="primer-registro-card" /> }));
 vi.mock('../SelectedBackgroundReveal', () => ({ default: () => <div /> }));
 vi.mock('../ClimaStrip', () => ({ default: () => <div /> }));
 vi.mock('../HoyEnFincaStrip', () => ({ default: () => <div /> }));
@@ -47,6 +47,8 @@ vi.mock('../../../services/userProfileService', () => ({
   isModuleVisible: vi.fn(() => true),
   getModuleVisibility: vi.fn(() => ({})),
   hasManualModuleVisibility: vi.fn(() => false),
+  getGuardianEspecie: vi.fn(() => null),
+  setGuardianEspecie: vi.fn(),
   // Orden de módulos del home (reorder por drag, 2026-06-15). Para este test el
   // orden por defecto basta; setModuleOrder es no-op.
   HOME_MODULE_DEFAULT_ORDER: [
@@ -60,7 +62,7 @@ vi.mock('../../../services/userProfileService', () => ({
   setModuleOrder: vi.fn(),
 }));
 
-// Store de assets: plantsCount > 0 para que NO se monte el OnboardingHero de
+// Store de assets: plantsCount > 0 para que NO se monte el primer registro de
 // "primer uso" (no relevante a este test) y mantener el árbol pequeño.
 vi.mock('../../../store/useAssetStore', () => ({
   default: (selector) => selector({ plants: [{ id: 'p1' }], needsPisoCapture: false }),
