@@ -116,6 +116,7 @@ const IMPORTADORES = {
   compost: () => import('./MundoCompost3D.jsx'),
   agua: () => import('./MundoAgua3D.jsx'),
   paramo: () => import('./MundoParamo3D.jsx'),
+  bosque: () => import('./BosqueTresEstratos3D.jsx'),
   suelo: () => import('./MundoSueloVivo3D.jsx'),
   lluvia: () => import('./ValleLluvia3D.jsx'),
   sierra: () => import('../visual/mundo3d/VistaGlobalSierra.jsx'),
@@ -192,6 +193,7 @@ const PISOS = [
     mundos: [
       { id: 'papa', titulo: 'La papa', emoji: '🥔', colorA: '#b28a52', colorB: '#2e2618' },
       { id: 'suelo', titulo: 'El suelo vivo', emoji: '🪱', colorA: '#a97b4f', colorB: '#2b1d10' },
+      { id: 'bosque', titulo: 'El bosque de tres pisos', emoji: '🌳', colorA: '#4e7a46', colorB: '#1b2b1a' },
       { id: 'agua', titulo: 'El agua', emoji: '💧', colorA: '#7db8d4', colorB: '#1e3a4f' },
       { id: 'lluvia', titulo: 'La lluvia', emoji: '🌧️', colorA: '#9fb3c8', colorB: '#26323f' },
     ],
