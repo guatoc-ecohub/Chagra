@@ -589,15 +589,17 @@ export const N_VARIANTES = VARIANTES_MATA.length;
  * tallos, para que el penacho se pueda sembrar EN una punta y no en el aire.
  *
  * @param {number} v  índice de variante (0…N_VARIANTES-1).
- * @param {{q: number, detalle?: 'cerca'|'lejos'}} o  `detalle` decide cuánta
- *   geometría se gasta: la cepa del pasillo se gana sus 44 anillos por tallo
- *   porque a ochenta centímetros se le ven los nudos; la del fondo, 16.
+ * @param {{q: number, detalle?: 'cerca'|'lejos', vestido?: number}} o  `detalle`
+ *   decide cuánta geometría se gasta: la cepa del pasillo se gana sus 44 anillos
+ *   por tallo porque a ochenta centímetros se le ven los nudos; la del fondo,
+ *   16. `vestido` (por defecto 1) regula cuánta CHALA viste el tallo: bajarlo
+ *   despeja los entrenudos cuando la cepa se mira de lejos y en manojo.
  * @param {number} semilla
  * @returns {{tallos: THREE.BufferGeometry, hojas: THREE.BufferGeometry,
  *            chala: THREE.BufferGeometry, topes: [number,number,number][],
  *            alto: number}}
  */
-export function geomMataCana(v, { q, detalle = 'cerca' }, semilla = 101) {
+export function geomMataCana(v, { q, detalle = 'cerca', vestido = 1 }, semilla = 101) {
   const cfg = VARIANTES_MATA[v % VARIANTES_MATA.length];
   const det = DETALLE[detalle] || DETALLE.cerca;
   const r = rng(semilla + v * 37);
@@ -609,7 +611,12 @@ export function geomMataCana(v, { q, detalle = 'cerca' }, semilla = 101) {
      tallos deja de ser macolla), pero sí bajan las hojas y la chala. */
   const nTallos = Math.max(3, Math.round(cfg.tallos * q * q));
   const nHojas = Math.max(2, Math.round(cfg.hojas * q * det.hojas));
-  const nChala = Math.max(1, Math.round(cfg.chala * q * det.chala));
+  /* `vestido` regula CUÁNTA hoja seca viste el tallo. En el cañaveral abierto va
+     completo (1): la chala es lo que lo diferencia de un guadual. Pero en un
+     diorama que se mira de lejos, la chala de 7 tallos junta se vuelve una masa
+     de paja que TAPA los entrenudos — y el tallo segmentado es justamente lo
+     que identifica a la caña. Bajarlo despeja el tallo sin quitarle la chala. */
+  const nChala = Math.max(1, Math.round(cfg.chala * q * det.chala * vestido));
 
   const partesTallo = [];
   const partesHoja = [];
