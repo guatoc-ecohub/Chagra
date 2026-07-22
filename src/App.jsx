@@ -263,6 +263,11 @@ const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
 // de crecimiento con los que se representa el catálogo de flora sin modelar las
 // 581 especies una por una.
 const BosqueTresEstratos3DMockup = lazy(() => import('./mockups/BosqueTresEstratos3D'));
+// Los TRES ÁRBOLES MAESTROS del gradiente andino: un Ent por piso térmico
+// (roble, aliso y la queñua que ya existía), el agua que baja del páramo al
+// templado y la red de micorrizas que amarra sus raíces en la cara cortada
+// de la ladera.
+const TresEntsGradiente3DMockup = lazy(() => import('./mockups/TresEntsGradiente3D'));
 const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
 const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
 const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
@@ -724,6 +729,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
   'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
   'mockups/bosque-tres-estratos': 'mockup_bosque_tres_estratos',
+  'mockups/tres-ents-gradiente': 'mockup_tres_ents_gradiente',
   'mockups/camara-director': 'mockup_camara_director',
   'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
   'mockups/artesania-andina': 'mockup_artesania_andina',
@@ -2468,6 +2474,23 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El bosque nativo y sus tres estratos">
               <BosqueTresEstratos3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_tres_ents_gradiente':
+        // LOS TRES ÁRBOLES MAESTROS DEL GRADIENTE: un Ent por piso térmico —
+        // el roble andino (Quercus humboldtii, templado y frío, con sus
+        // ectomicorrizas y las setas de Cantharellus y Lactarius al pie), el
+        // aliso (Alnus acuminata, frío, con los nódulos de Frankia que le
+        // fijan el nitrógeno) y la queñua del páramo (Polylepis, la fábrica de
+        // agua, el Ent que ya existía). La ladera va cortada como lámina de
+        // Humboldt: el agua baja por encima y la red de micorrizas amarra las
+        // raíces de los tres por debajo.
+        // Ruta #/mockups/tres-ents-gradiente, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Los tres árboles maestros del gradiente">
+              <TresEntsGradiente3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
