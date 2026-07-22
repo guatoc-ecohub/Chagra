@@ -719,9 +719,11 @@ function VecinosDelBosque({ tier, reducedMotion, franja }) {
    corta y cuadrada, y el collar blanco — su firma — bajo la cabeza. La
    versión anterior era un cono vertical con dos tablas: una mancha. */
 const PRIMARIAS_CONDOR = [
-  // [abanico hacia atrás (rad), largo, ancho] — los dedos del planeo
-  [-0.3, 0.34, 0.062], [-0.13, 0.44, 0.066], [0.04, 0.5, 0.07],
-  [0.22, 0.48, 0.066], [0.42, 0.4, 0.06], [0.64, 0.3, 0.055],
+  // [abanico hacia atrás (rad), largo, ancho] — los dedos del planeo.
+  // Abanico ANCHO y dedos angostos: el vano entre dedo y dedo tiene que ser
+  // mayor que el dedo, o de lejos se funden en un bloque aserrado.
+  [-0.36, 0.4, 0.055], [-0.16, 0.52, 0.06], [0.06, 0.6, 0.062],
+  [0.3, 0.56, 0.06], [0.55, 0.46, 0.055], [0.8, 0.34, 0.05],
 ];
 const MAT_CONDOR = { color: '#1d2023', side: THREE.DoubleSide };
 /** Un ala local: se extiende hacia +x, vuela hacia +z (el borde de fuga es −z). */
@@ -758,10 +760,15 @@ function CondorDeAltura({ reducedMotion }) {
     if (!ave.current) return;
     const t = clock.getElapsedTime();
     const a = t * 0.09 + 3.4; // una vuelta cada ~70 s: paciencia de cóndor
-    const r = 14 + Math.sin(t * 0.05) * 2;
-    ave.current.position.set(Math.cos(a) * r, 11.2 + Math.sin(t * 0.21) * 0.8, Math.sin(a) * r);
+    // Órbita más ADENTRO que antes (r 14→12, y 11.2→10.4): a r 14 el fog del
+    // bosque (far ~47-68) se lo comía entero y la silueta no se leía nunca.
+    const r = 12 + Math.sin(t * 0.05) * 2;
+    ave.current.position.set(Math.cos(a) * r, 10.4 + Math.sin(t * 0.21) * 0.8, Math.sin(a) * r);
     ave.current.rotation.y = -a; // el pico hacia donde vuela (tangente)
-    ave.current.rotation.z = 0.14 + Math.sin(t * 0.13) * 0.08; // banqueo suave
+    // Banqueo marcado (0.14→0.34): la cámara va casi al nivel del ave y sin
+    // inclinación las alas quedan de CANTO (4 cm de grosor = invisibles). Con
+    // ~19° el plano del ala se muestra — así es como circula un cóndor real.
+    ave.current.rotation.z = 0.34 + Math.sin(t * 0.13) * 0.08;
     // Casi nunca aletea: dos golpes de ala cada tanto, el resto plancha.
     const rafaga = Math.max(0, Math.sin(t * 0.23) - 0.86) * 7;
     const aleteo = Math.sin(t * 9) * 0.35 * rafaga;
@@ -769,7 +776,7 @@ function CondorDeAltura({ reducedMotion }) {
     if (alaDer.current) alaDer.current.rotation.z = -0.12 - aleteo;
   });
   return (
-    <group ref={ave} position={reducedMotion ? [-9, 11, -8] : [14, 11.2, 0]}>
+    <group ref={ave} position={reducedMotion ? [-6, 9.8, -4] : [12, 10.4, 0]}>
       {/* cuerpo fusiforme HORIZONTAL, tendido en la dirección del vuelo (+z) */}
       <mesh position={[0, 0, 0.02]} scale={[0.72, 0.62, 2.1]}>
         <sphereGeometry args={[0.3, 7, 6]} />
@@ -777,8 +784,8 @@ function CondorDeAltura({ reducedMotion }) {
       </mesh>
       {/* EL COLLAR BLANCO — la firma: un anillo mullido bajo la cabeza */}
       <mesh position={[0, 0.05, 0.52]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.17, 0.17, 0.12, 8]} />
-        <meshLambertMaterial color="#ddd8c9" />
+        <cylinderGeometry args={[0.2, 0.2, 0.14, 8]} />
+        <meshLambertMaterial color="#e8e3d4" />
       </mesh>
       {/* cabeza pequeña y pico corto */}
       <mesh position={[0, 0.1, 0.72]}>
