@@ -290,6 +290,60 @@ function MarDeNubes({ n, pal, reducedMotion }) {
   );
 }
 
+/* ── LAS NUBES ALTAS ────────────────────────────────────────────────────────
+      Lentes delgadas y MUY lejanas, a la altura del tercio alto del cuadro:
+      lo que en un páramo real son las lenticulares colgadas del viento. Pocas,
+      pálidas y estiradas — cargan el cielo sin volverlo "cielo nublado
+      corriente" (el mar sigue estando ABAJO; esto es otra cosa, más arriba). */
+function NubesAltas({ pal, n }) {
+  const sitios = useMemo(() => {
+    const rng = crearRng(431);
+    return Array.from({ length: n }, () => {
+      const a = rng() * Math.PI * 2;
+      const r = 190 + rng() * 90;
+      return {
+        x: Math.sin(a) * r,
+        z: -Math.cos(a) * r,
+        y: 48 + rng() * 46,
+        // Lentes DE VERDAD: anchas y delgadas en toda orientación (grueso ~1/10
+        // del fondo) — gruesas leían como piedras blancas flotando.
+        ancho: 70 + rng() * 60,
+        grueso: 1.6 + rng() * 1.6,
+        fondo: 20 + rng() * 20,
+        giro: rng() * Math.PI,
+        tono: rng(),
+      };
+    });
+  }, [n]);
+  const solN = useMemo(() => new THREE.Vector3(...pal.p.solPos).normalize(), [pal]);
+  return (
+    <group>
+      {sitios.map((s, i) => {
+        const dir = new THREE.Vector3(s.x, s.y, s.z).normalize();
+        const haciaSol = clamp(dir.dot(solN), 0, 1);
+        const color = mezclaHex(
+          mezclaHex(pal.nube, pal.horizonte, 0.42 + s.tono * 0.22),
+          pal.resplandor,
+          haciaSol * 0.35,
+        );
+        return (
+          <mesh
+            key={i}
+            position={[s.x, s.y, s.z]}
+            rotation={[0, s.giro, 0]}
+            scale={[s.ancho, s.grueso, s.fondo]}
+            renderOrder={-88}
+            frustumCulled={false}
+          >
+            <sphereGeometry args={[0.5, 12, 8]} />
+            <meshBasicMaterial color={color} transparent opacity={0.52} depthWrite={false} fog={false} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
 /* ── LA FALDA: la meseta que sigue y SE DESPEÑA ─────────────────────────────
       El anillo sale del cuadro de la maqueta (tam 64 → borde 32), copia su
       cota en la costura (alturaBosque) y se desploma por el hombro de la
@@ -451,6 +505,7 @@ export default function FondoParamo({ franja, tier = 'alto', reducedMotion = fal
       <SolVelado pal={pal} franja={franja} />
       <Cordillera pal={pal} />
       <MarDeNubes n={nNubes} pal={pal} reducedMotion={reducedMotion} />
+      {tier !== 'bajo' && <NubesAltas pal={pal} n={tier === 'alto' ? 5 : 3} />}
       <FaldaParamo pal={pal} />
       {nHorizonte > 0 && <FrailejonalHorizonte n={nHorizonte} q={q} />}
     </group>
