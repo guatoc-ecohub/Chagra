@@ -61,11 +61,17 @@ const TINTA = '#1d2836'; // el peso del cenit a 3.500 m (menos aire encima)
 function paletaFondo(franja) {
   const p = CIELOS_HORA[franja] || CIELOS_HORA.manana;
   const sombra = mezclaHex(p.sombra || '#3a3a44', '#242f39', 0.5);
+  const horizonte = mezclaHex(mezclaHex(p.fondo, LECHOSA, 0.45), FRIO, 0.25);
   return {
     p,
-    horizonte: mezclaHex(mezclaHex(p.fondo, LECHOSA, 0.45), FRIO, 0.25),
+    horizonte,
+    // El velo de la perspectiva aérea: hacia donde se lavan las cuchillas
+    // lejanas. MÁS AZUL que el horizonte (el aire acostado azulea), no gris.
+    aireAzul: mezclaHex(horizonte, FRIO, 0.55),
     cenit: mezclaHex(p.cielo, mezclaHex(AZUL_HONDO, TINTA, 0.6), 0.62),
-    cuchilla: mezclaHex(mezclaHex('#3d4148', sombra, 0.6), AZUL_HONDO, 0.18),
+    // La cuchilla cercana: oscura pero NO tinta plana — contra el cielo pálido
+    // el negro lee cartulina; este arranca ya empujado hacia el azul del aire.
+    cuchilla: mezclaHex(mezclaHex('#4a5260', sombra, 0.5), AZUL_HONDO, 0.28),
     resplandor: mezclaHex(LECHOSA, p.luz, 0.4),
     nube: mezclaHex(LECHOSA, p.cielo, 0.16),
     nubeHonda: mezclaHex(p.niebla, sombra, 0.62),
@@ -121,33 +127,54 @@ function BovedaParamo({ pal }) {
       y se plantan LEJOS, con el pie hundido: un macizo se ve desde un páramo
       con el valle —y su nube— delante, no pegado a la nariz. */
 const CORDILLERA = [
-  { r: 88, base: -8, alto: 14.0, picos: 20, semilla: 11, aire: 0.1 },
-  { r: 140, base: -11, alto: 24.0, picos: 16, semilla: 29, aire: 0.3 },
-  { r: 200, base: -14, alto: 36.0, picos: 12, semilla: 47, aire: 0.42 },
-  { r: 258, base: -17, alto: 46.0, picos: 10, semilla: 71, aire: 0.56 },
+  { r: 88, base: -8, alto: 14.0, picos: 20, semilla: 11, aire: 0.12 },
+  { r: 140, base: -11, alto: 24.0, picos: 16, semilla: 29, aire: 0.38 },
+  { r: 200, base: -14, alto: 36.0, picos: 12, semilla: 47, aire: 0.58 },
+  { r: 258, base: -17, alto: 46.0, picos: 10, semilla: 71, aire: 0.74 },
 ];
 function construirCuchillas(capa, pal, segs = 150) {
-  const { r, base, alto, picos: nPicos, semilla } = capa;
+  const { r, base, alto, picos: nPicos, semilla, aire } = capa;
   const rng = crearRng(semilla);
+  // Cada pico con DOS pendientes distintas (nada de isósceles) y, a veces,
+  // un hombro a media ladera: la cresta rota de un macizo real.
   const picos = Array.from({ length: nPicos }, () => ({
     a: rng() * Math.PI * 2,
-    w: 0.03 + rng() * 0.09,
+    wIzq: 0.03 + rng() * 0.11,
+    wDer: 0.03 + rng() * 0.11,
     h: 0.5 + rng() * 0.8,
+    hombro: rng() < 0.55 ? 0.3 + rng() * 0.45 : 0,
   }));
   const perfil = (a) => {
     let h = 0.3 + 0.14 * Math.sin(a * 3.1 + semilla) + 0.09 * Math.sin(a * 6.7 - semilla * 0.3)
-      + 0.09 * Math.sin(a * 14.3 + semilla * 2.1) + 0.05 * Math.sin(a * 23.7 - semilla);
+      + 0.09 * Math.sin(a * 14.3 + semilla * 2.1) + 0.05 * Math.sin(a * 23.7 - semilla)
+      // el dentado fino: la cresta nunca es una recta entre pico y pico
+      + 0.035 * Math.sin(a * 37.3 + semilla * 1.7) + 0.02 * Math.sin(a * 53.9 - semilla * 0.7);
     for (const p of picos) {
-      let d = Math.abs(a - p.a);
-      if (d > Math.PI) d = Math.PI * 2 - d;
-      h += p.h * Math.exp(-(d * d) / (2 * p.w * p.w));
+      let d = a - p.a;
+      if (d > Math.PI) d -= Math.PI * 2;
+      if (d < -Math.PI) d += Math.PI * 2;
+      const w = d < 0 ? p.wIzq : p.wDer; // flanco izquierdo ≠ flanco derecho
+      h += p.h * Math.exp(-(d * d) / (2 * w * w));
+      if (p.hombro) {
+        const dh = d - p.wDer * 2.1; // la repisa corrida ladera abajo
+        h += p.h * p.hombro * 0.5 * Math.exp(-(dh * dh) / (2 * (p.wDer * 1.5) ** 2));
+      }
     }
     return Math.max(0.08, h) * alto;
   };
   const pos = [];
   const col = [];
-  const cCresta = new THREE.Color(mezclaHex(pal.cuchilla, pal.horizonte, capa.aire));
-  const cFalda = new THREE.Color(mezclaHex(pal.cuchilla, pal.horizonte, Math.max(0, capa.aire - 0.16)));
+  // PERSPECTIVA AÉREA de verdad: cada capa más lejana se lava MÁS hacia el
+  // aire azul (más clara y más azul), y el PIE de cada capa va más velado que
+  // la cresta (hay más aire acostado por delante). Antes era al revés: la
+  // falda salía más oscura y las cuatro capas leían el mismo gris de cartulina.
+  const cCresta = new THREE.Color(mezclaHex(pal.cuchilla, pal.aireAzul, aire));
+  const cFalda = new THREE.Color(mezclaHex(pal.cuchilla, pal.aireAzul, Math.min(1, aire + 0.26)));
+  // La ladera que mira al sol se enciende apenas: el modelado que separa un
+  // macizo de un triángulo plano. Las capas hondas casi no (el aire aplana).
+  const cLuz = new THREE.Color(mezclaHex(mezclaHex(pal.cuchilla, pal.aireAzul, aire), pal.resplandor, 0.34));
+  const aSol = Math.atan2(pal.p.solPos[0], -pal.p.solPos[2]);
+  const cSeg = new THREE.Color();
   const empujar = (x, y, z, c) => { pos.push(x, y, z); col.push(c.r, c.g, c.b); };
   for (let i = 0; i < segs; i++) {
     const a0 = (i / segs) * Math.PI * 2;
@@ -155,10 +182,12 @@ function construirCuchillas(capa, pal, segs = 150) {
     const x0 = Math.sin(a0) * r, z0 = -Math.cos(a0) * r;
     const x1 = Math.sin(a1) * r, z1 = -Math.cos(a1) * r;
     const h0 = base + perfil(a0), h1 = base + perfil(a1);
+    const luz = Math.max(0, Math.cos((a0 + a1) / 2 - aSol)) * (1 - aire) * 0.6;
+    cSeg.copy(cCresta).lerp(cLuz, luz);
     // Dos triángulos por segmento, sin índice (el gotcha de mergeGeometries no
     // muerde donde nunca hay índice que mezclar).
-    empujar(x0, base - 13, z0, cFalda); empujar(x1, base - 13, z1, cFalda); empujar(x0, h0, z0, cCresta);
-    empujar(x1, base - 13, z1, cFalda); empujar(x1, h1, z1, cCresta); empujar(x0, h0, z0, cCresta);
+    empujar(x0, base - 13, z0, cFalda); empujar(x1, base - 13, z1, cFalda); empujar(x0, h0, z0, cSeg);
+    empujar(x1, base - 13, z1, cFalda); empujar(x1, h1, z1, cSeg); empujar(x0, h0, z0, cSeg);
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
