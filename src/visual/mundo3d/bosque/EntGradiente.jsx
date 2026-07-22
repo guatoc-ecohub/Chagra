@@ -1,11 +1,15 @@
 /*
- * EntGradiente — el componente r3f de los dos ÁRBOLES MAESTROS nuevos del
- * gradiente: el ENT DEL ROBLE y el ENT DEL ALISO.
+ * EntGradiente — el componente r3f de los CUATRO ÁRBOLES MAESTROS del
+ * gradiente: la CEIBA (tierra caliente), el ROBLE (templado), el ALISO (frío)
+ * y la QUEÑUA (páramo).
  *
- * Es el hermano de `EntQuenua.jsx` (el Ent del páramo, que NO se toca ni se
- * redibuja): misma talla, mismos gestos, mismo peso ancestral, pero paramétrico
- * por especie. La geometría vive en `entsGradiente.geom.js`; aquí se le pone
- * material, luz y VIDA.
+ * Uno solo para los cuatro, y eso es el punto: mientras la queñua se montaba
+ * con su propio componente, tenía sus propios ojos, su propia escala de
+ * cáscara y su propio peso de tinta — y en el retrato de familia se veía que
+ * la había hecho otra mano. Aquí los cuatro comparten el mismo `<Rostro>`, el
+ * mismo `<Ojo>` y la misma regla de proporciones; lo único que trae cada una
+ * es su forma, su corteza y su lección. La geometría vive en
+ * `entsGradiente.geom.js`; aquí se le pone material, luz y VIDA.
  *
  * Lo que hace vivo a un Ent (y lo que nunca se le puede quitar):
  *   · el balanceo pesado desde la raíz — lento, con inercia, nunca un metrónomo;
@@ -24,11 +28,18 @@
  * (`proporcionesRostro`) para que la relación se conserve en un tronco grueso
  * como el del roble y en uno delgado como el del aliso.
  */
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { crearMaterialVertexColors } from '../paleta/index.js';
-import { factorParpadeo, factorHabla, ROSTRO_BOCA_Y } from './entQuenua.geom.js';
+import {
+  factorParpadeo,
+  factorHabla,
+  ROSTRO_BOCA_Y,
+  specsBarba,
+  geometriaHebraBarba,
+  BARBA,
+} from './entQuenua.geom.js';
 import {
   ESPECIES,
   paramsDeTier,
@@ -147,6 +158,127 @@ function Rostro({ esp, P, mats, reducedMotion, blinkRefs }) {
 
       <Ojo x={-prop.sepOjo} z={prop.zOjo} k={k} blinkRef={blinkRefs.izq} gazeRef={gazeIzq} flip={-1} mats={mats} />
       <Ojo x={prop.sepOjo} z={prop.zOjo} k={k} blinkRef={blinkRefs.der} gazeRef={gazeDer} flip={1} mats={mats} />
+
+      {/* la barba de usnea cuelga del MISMO grupo que la cara: comparte ancla,
+          escala y balanceo, así que nunca se le despega del mentón */}
+      {esp.barba && (
+        <Barba prop={prop} densidad={P.barbaDens} mats={mats} reducedMotion={reducedMotion} />
+      )}
+    </group>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA BARBA DE USNEA — solo la queñua
+   ══════════════════════════════════════════════════════════════════════════ */
+/*
+ * La cortina de líquen colgante (*Usnea*, "barba de viejo") es la firma del
+ * guardián del páramo y no se le puede quitar sin dejar de ser él. Los
+ * mechones y su geometría salen tal cual del taller original
+ * (`specsBarba` / `geometriaHebraBarba`): es patrimonio común, no hay por qué
+ * volver a dibujarlo — y volver a dibujarlo sería justo el error que este
+ * trabajo vino a corregir.
+ *
+ * Lo único que cambia es DÓNDE se cuelga: las coordenadas de los mechones son
+ * las del campo del rostro, así que la barba vive en el mismo grupo que la
+ * cara, con la misma escala de cáscara de la especie y adelantada hasta la
+ * superficie (`frenteL`). Así queda prendida del mentón en cualquier fuste,
+ * grueso o delgado, sin números a mano.
+ */
+function Barba({ prop, densidad, mats, reducedMotion }) {
+  const { hebras, tufts } = useMemo(() => specsBarba(91), []);
+  /* El liquen de la barba se adelgaza por tier; el MUSGO DE LAS CEJAS no. Un
+     `slice` ciego se lo llevaba entero (va al final de la lista) y las cejas de
+     musgo son un rasgo del rostro, no relleno. */
+  const hb = useMemo(
+    () => hebras.slice(0, Math.max(10, Math.round(hebras.length * densidad))),
+    [hebras, densidad],
+  );
+  const tf = useMemo(() => {
+    const liquen = tufts.filter((t) => !t.musgo);
+    const musgo = tufts.filter((t) => t.musgo);
+    return [...liquen.slice(0, Math.max(5, Math.round(liquen.length * densidad))), ...musgo];
+  }, [tufts, densidad]);
+
+  const hebraGeo = useMemo(() => geometriaHebraBarba(), []);
+  const tuftGeo = useMemo(() => new THREE.IcosahedronGeometry(1, 1), []);
+  useLayoutEffect(() => () => { hebraGeo.dispose(); tuftGeo.dispose(); }, [hebraGeo, tuftGeo]);
+
+  const hebraRef = useRef(null);
+  const tuftRef = useRef(null);
+  const grupoRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const mesh = hebraRef.current;
+    if (mesh) {
+      const m = new THREE.Matrix4();
+      const q = new THREE.Quaternion();
+      const e = new THREE.Euler();
+      const p = new THREE.Vector3();
+      const s = new THREE.Vector3();
+      const col = new THREE.Color();
+      for (let i = 0; i < hb.length; i++) {
+        const h = hb[i];
+        p.set(h.pos[0], h.pos[1], h.pos[2]);
+        e.set(h.lean, h.yaw, h.tilt);
+        q.setFromEuler(e);
+        s.set(h.grosor, h.len, h.grosor);
+        m.compose(p, q, s);
+        mesh.setMatrixAt(i, m);
+        // la geometría trae la rampa raíz→punta; el tinte por instancia da el tono
+        if (h.woody) col.copy(BARBA.raicilla);
+        else col.copy(BARBA.usnea).lerp(BARBA.usneaGris, h.tono);
+        mesh.setColorAt(i, col);
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    }
+    const tmesh = tuftRef.current;
+    if (tmesh) {
+      const m = new THREE.Matrix4();
+      const q = new THREE.Quaternion();
+      const p = new THREE.Vector3();
+      const s = new THREE.Vector3();
+      const col = new THREE.Color();
+      for (let i = 0; i < tf.length; i++) {
+        const l = tf[i];
+        p.set(l.pos[0], l.pos[1], l.pos[2]);
+        s.set(l.esc * 1.6, l.esc * 0.7, l.esc * 1.1);
+        m.compose(p, q, s);
+        tmesh.setMatrixAt(i, m);
+        col.copy(l.musgo ? BARBA.musgoCeja : (l.azul ? BARBA.liquenAzul : BARBA.liquen));
+        tmesh.setColorAt(i, col);
+      }
+      tmesh.instanceMatrix.needsUpdate = true;
+      if (tmesh.instanceColor) tmesh.instanceColor.needsUpdate = true;
+    }
+    /*
+     * LOS MATERIALES VAN EN LAS DEPENDENCIAS, y no es por pedantería del linter.
+     *
+     * El material viaja dentro de `args`, y r3f RECONSTRUYE el objeto cuando
+     * `args` cambia. Al apagar o encender al guardián nace un InstancedMesh
+     * NUEVO con todas sus matrices en identidad — y si este efecto no vuelve a
+     * correr, los 34 mechones de líquen se quedan en escala 1 amontonados en el
+     * mentón: el icosaedro unitario del tuft se convierte en UNA BOLA BEIGE
+     * LISA del tamaño de la copa, posada sobre el páramo.
+     *
+     * Es un fallo mudo de los peores: no hay error, la barba simplemente
+     * desaparece y en su lugar aparece un planeta. Solo se ve en la captura, y
+     * solo cuando el foco está en otro piso.
+     */
+  }, [hb, tf, mats.hebra, mats.tuft]);
+
+  useFrame((st) => {
+    if (reducedMotion || !grupoRef.current) return;
+    const t = st.clock.elapsedTime;
+    grupoRef.current.rotation.z = Math.sin(t * 0.5) * 0.02;
+    grupoRef.current.rotation.x = 0.04 + Math.sin(t * 0.4 + 1) * 0.015;
+  });
+
+  return (
+    <group ref={grupoRef} position={[0, 0, prop.frenteL * 0.92]}>
+      <instancedMesh ref={hebraRef} args={[hebraGeo, mats.hebra, hb.length]} frustumCulled={false} />
+      <instancedMesh ref={tuftRef} args={[tuftGeo, mats.tuft, tf.length]} frustumCulled={false} />
     </group>
   );
 }
@@ -220,21 +352,38 @@ function Mano({ spec, esc, mat }) {
  * Un Ent del gradiente. Montar SOLO dentro de un <Canvas>.
  *
  * @param {object} props
- * @param {'roble'|'aliso'} props.especie
+ * @param {'ceiba'|'roble'|'aliso'|'quenua'} props.especie
  * @param {'alto'|'medio'|'bajo'} [props.tier]
  * @param {boolean} [props.reducedMotion]
- * @param {boolean} [props.leccion]  monta la lección hecha cosa al pie del
- *   árbol: el corro de setas del roble (Cantharellus + Lactarius) o los nódulos
- *   de Frankia en las raíces del aliso.
+ * @param {boolean} [props.apagado]  el guardián se APAGA un punto porque el
+ *   foco está en otro piso. La ladera ya apagaba la vegetación de los pisos que
+ *   no se están mirando, pero no a los Ents — y con la ceiba adentro eso dejó
+ *   de ser un detalle: la ceiba mide 9,6 y vive una terraza más abajo, así que
+ *   en el retrato del roble entraba entera, a todo color y MÁS GRANDE que el
+ *   roble. El retrato dejaba de ser de quien decía la carta. Apagar NO es
+ *   esconder: el vecino se sigue viendo, pero deja de pelear por el ojo.
+ * @param {boolean} [props.leccion]  monta la lección hecha COSA al pie del
+ *   árbol, cuando la especie tiene una: el corro de setas del roble
+ *   (*Cantharellus* + *Lactarius*) o los nódulos de *Frankia* en las raíces del
+ *   aliso. La ceiba y la queñua NO tienen: la de la ceiba sería inventarle una
+ *   simbiosis que nadie ha verificado, y la de la queñua no le crece al pie —
+ *   es el agua, y la dibuja la escena.
  */
 export default function EntGradiente({
   especie = 'roble',
   tier = 'alto',
   reducedMotion = false,
   leccion = true,
+  apagado = false,
 }) {
   const esp = ESPECIES[especie] || ESPECIES.roble;
   const P = useMemo(() => paramsDeTier(tier), [tier]);
+  /* Primo hermano del gris con que la ladera apaga la vegetación de los pisos
+     sin foco (`matApagado`), pero un punto MÁS CLARO. Con el gris de la
+     vegetación al pie de la letra, un guardián apagado quedaba en silueta
+     negra: apagar es mandarlo a segundo plano, no borrarlo. El vecino tiene
+     que seguir leyéndose como un árbol con cara. */
+  const TINTE_APAGADO = '#8b8c80';
 
   const swayRef = useRef(null);
   const ojoIzq = useRef(null);
@@ -250,7 +399,11 @@ export default function EntGradiente({
   const leccionGeo = useMemo(() => {
     if (!leccion) return null;
     if (esp.id === 'roble') return geomSetasDelRoble({ q: P.hojasCopa }, 909);
-    return geomNodulosFrankia(raices, { q: P.hojasCopa }, 515);
+    if (esp.id === 'aliso') return geomNodulosFrankia(raices, { q: P.hojasCopa }, 515);
+    /* Ceiba y queñua no montan nada al pie, y es a propósito — ver el JSDoc.
+       Antes esta rama caía en los nódulos de Frankia por descarte, que le
+       habría puesto a la ceiba una simbiosis que nadie ha verificado. */
+    return null;
   }, [esp, P, raices, leccion]);
 
   useEffect(() => () => {
@@ -265,63 +418,116 @@ export default function EntGradiente({
      material blanco para todo (el patrón de la casa). El facetado de la corteza
      va apagado —el relieve es geometría, no facetas— y el de la copa también,
      porque `matojoNube` trae normales radiales que la hacen masa suave. */
-  const matCorteza = useMemo(
-    () => crearMaterialVertexColors(P, { flatShading: false, roughness: 0.94 }),
-    [P],
+  /*
+   * EL APAGÓN se hornea AL CREAR el material, no se le pinta encima después.
+   *
+   * Mutarle el color a un material memoizado cada vez que cambia el foco es
+   * exactamente lo que la regla de inmutabilidad de hooks prohíbe, y con razón:
+   * multiplicar sobre el valor actual habría ido oscureciendo al árbol un poco
+   * más en cada cambio de piso hasta dejarlo negro, sin que nadie avisara. Con
+   * `apagado` en las dependencias, cada estado tiene su material y punto.
+   */
+  const tinte = useMemo(() => (apagado ? new THREE.Color(TINTE_APAGADO) : null), [apagado]);
+  const tenido = useCallback(
+    (c) => (tinte ? new THREE.Color(c).multiply(tinte) : new THREE.Color(c)),
+    [tinte],
   );
-  const matCopa = useMemo(
-    () => crearMaterialVertexColors(P, { flatShading: false, roughness: 0.88 }),
-    [P],
-  );
-  const matLeccion = useMemo(
-    () => crearMaterialVertexColors(P, { flatShading: false, roughness: 0.82 }),
-    [P],
-  );
+
+  const matCorteza = useMemo(() => {
+    const m = crearMaterialVertexColors(P, { flatShading: false, roughness: 0.94 });
+    if (tinte) m.color.multiply(tinte);
+    return m;
+  }, [P, tinte]);
+  const matCopa = useMemo(() => {
+    const m = crearMaterialVertexColors(P, { flatShading: false, roughness: 0.88 });
+    if (tinte) m.color.multiply(tinte);
+    return m;
+  }, [P, tinte]);
+  const matLeccion = useMemo(() => {
+    const m = crearMaterialVertexColors(P, { flatShading: false, roughness: 0.82 });
+    if (tinte) m.color.multiply(tinte);
+    return m;
+  }, [P, tinte]);
   /* Los materiales del rostro: un punto más oscuros que el fuste para que manos
      y párpados no peguen en claro contra la corteza. Se derivan del color de
      grieta de la especie, no de un hex suelto. */
   const matManos = useMemo(() => {
-    const c = new THREE.Color(esp.corteza.grieta).lerp(new THREE.Color(esp.corteza.cuerpo), 0.45);
+    const c = tenido(new THREE.Color(esp.corteza.grieta).lerp(new THREE.Color(esp.corteza.cuerpo), 0.45));
     return P.materialRico
       ? new THREE.MeshStandardMaterial({ color: c, roughness: 0.9 })
       : new THREE.MeshLambertMaterial({ color: c });
-  }, [esp, P.materialRico]);
+  }, [esp, P.materialRico, tenido]);
   const matGrieta = useMemo(() => {
-    const c = new THREE.Color(esp.corteza.grieta).multiplyScalar(0.45);
+    const c = tenido(new THREE.Color(esp.corteza.grieta).multiplyScalar(0.45));
     return P.materialRico
       ? new THREE.MeshStandardMaterial({ color: c, roughness: 0.8 })
       : new THREE.MeshLambertMaterial({ color: c });
-  }, [esp, P.materialRico]);
+  }, [esp, P.materialRico, tenido]);
   const matParpado = useMemo(() => {
-    const c = new THREE.Color(esp.corteza.grieta).lerp(new THREE.Color(esp.corteza.cuerpo), 0.28);
+    const c = tenido(new THREE.Color(esp.corteza.grieta).lerp(new THREE.Color(esp.corteza.cuerpo), 0.28));
     return P.materialRico
       ? new THREE.MeshStandardMaterial({ color: c, roughness: 0.92 })
       : new THREE.MeshLambertMaterial({ color: c });
-  }, [esp, P.materialRico]);
+  }, [esp, P.materialRico, tenido]);
   const matOjo = useMemo(
     () => (P.materialRico
       ? new THREE.MeshStandardMaterial({ color: '#160f0a', roughness: 0.62 })
       : new THREE.MeshLambertMaterial({ color: '#1a120d' })),
     [P.materialRico],
   );
-  const matBrillo = useMemo(() => new THREE.MeshBasicMaterial({ color: '#e6ecdd' }), []);
+  const matBrillo = useMemo(
+    () => new THREE.MeshBasicMaterial({ color: tenido('#e6ecdd') }),
+    [tenido],
+  );
   /* Iris ámbar-miel DISCRETO. En frugal va Lambert CON emisivo, nunca Basic
-     plano: el disco naranja sin sombreado era el peor de los goggles. */
-  const matIris = useMemo(
-    () => (P.materialRico
-      ? new THREE.MeshStandardMaterial({ color: '#b08137', emissive: '#6b4514', emissiveIntensity: 0.5, roughness: 0.55 })
-      : new THREE.MeshLambertMaterial({ color: '#b08137', emissive: '#6b4514', emissiveIntensity: 0.55 })),
-    [P.materialRico],
+     plano: el disco naranja sin sombreado era el peor de los goggles.
+     Y cuando el foco está en otro piso, el iris DEJA DE ARDER: la mirada
+     encendida es del guardián que tiene el turno. */
+  const matIris = useMemo(() => {
+    const emisivo = apagado ? 0.1 : 0.5;
+    return P.materialRico
+      ? new THREE.MeshStandardMaterial({
+        color: tenido('#b08137'), emissive: '#6b4514', emissiveIntensity: emisivo, roughness: 0.55,
+      })
+      : new THREE.MeshLambertMaterial({
+        color: tenido('#b08137'), emissive: '#6b4514', emissiveIntensity: emisivo + 0.05,
+      });
+  }, [P.materialRico, apagado, tenido]);
+
+  /* La BARBA de usnea: Lambert siempre (el líquen no pide PBR y son dos
+     draw-calls instanciados). La hebra lleva vertexColors —la rampa raíz→punta
+     va HORNEADA en la geometría— y el instanceColor le pone el tono; el tuft
+     tinta por instancia sobre blanco. Solo se crean si la especie lleva barba. */
+  const matHebra = useMemo(() => {
+    if (!esp.barba) return null;
+    return new THREE.MeshLambertMaterial({ vertexColors: true, color: tenido('#ffffff') });
+  }, [esp.barba, tenido]);
+  const matTuft = useMemo(
+    () => (esp.barba ? new THREE.MeshLambertMaterial({ color: tenido('#ffffff') }) : null),
+    [esp.barba, tenido],
   );
 
-  useEffect(() => () => {
-    [matCorteza, matCopa, matLeccion, matManos, matGrieta, matParpado, matOjo, matBrillo, matIris]
-      .forEach((m) => m.dispose());
-  }, [matCorteza, matCopa, matLeccion, matManos, matGrieta, matParpado, matOjo, matBrillo, matIris]);
+  const todos = useMemo(
+    () => [matCorteza, matCopa, matLeccion, matManos, matGrieta, matParpado, matOjo, matBrillo,
+      matIris, matHebra, matTuft].filter(Boolean),
+    [matCorteza, matCopa, matLeccion, matManos, matGrieta, matParpado, matOjo, matBrillo,
+      matIris, matHebra, matTuft],
+  );
+
+  useEffect(() => () => { todos.forEach((m) => m.dispose()); }, [todos]);
 
   const matsRostro = useMemo(
-    () => ({ corteza: matCorteza, grieta: matGrieta, parpado: matParpado, ojo: matOjo, iris: matIris, brillo: matBrillo }),
-    [matCorteza, matGrieta, matParpado, matOjo, matIris, matBrillo],
+    () => ({
+      corteza: matCorteza,
+      grieta: matGrieta,
+      parpado: matParpado,
+      ojo: matOjo,
+      iris: matIris,
+      brillo: matBrillo,
+      hebra: matHebra,
+      tuft: matTuft,
+    }),
+    [matCorteza, matGrieta, matParpado, matOjo, matIris, matBrillo, matHebra, matTuft],
   );
 
   /* ── Vida: balanceo pesado desde la raíz + parpadeo lento ── */

@@ -1,45 +1,49 @@
 /*
- * EscenaTresEnts — LA LADERA DE LOS TRES ÁRBOLES MAESTROS, puesta en pie.
+ * EscenaTresEnts — LA LADERA DE LOS CUATRO ÁRBOLES MAESTROS, puesta en pie.
+ * (El archivo conserva el nombre viejo a propósito: la ruta pública
+ * `#/mockups/tres-ents-gradiente` ya está en el registro y renombrarla es
+ * romper enlaces por una cuestión de ortografía.)
  *
  * Monta el bloque de montaña cortado (`gradienteAndino.geom.js`), le siembra la
  * vegetación que le toca a cada piso térmico, le pone el agua que baja y la red
- * de micorrizas que amarra por debajo, y planta los TRES ENTS:
+ * de micorrizas que amarra por debajo, y planta los CUATRO ENTS, de abajo
+ * hacia arriba:
  *
- *   · EL ENT DEL ROBLE  (templado y frío) — `EntGradiente especie="roble"`
- *   · EL ENT DEL ALISO  (frío)            — `EntGradiente especie="aliso"`
- *   · EL ENT DE LA QUEÑUA (páramo)        — `EntQuenua`, el que ya existía,
- *     traído tal cual desde su casa. No se redibuja ni se le cambia un vértice:
- *     es el mismo guardián del páramo, aquí en compañía de sus hermanos.
+ *   · LA CEIBA  (tierra caliente) · EL ROBLE (templado) ·
+ *     EL ALISO (frío) · LA QUEÑUA (páramo)
  *
- * ── El detalle que cierra la lección ───────────────────────────────────────
- * En la terraza del FRÍO, detrás del aliso, hay dos robles chicos. No son
- * relleno: el roble andino cruza el gradiente él solo, de 750 a 3.450 metros, y
- * verlo trepado en el piso del aliso es la única forma de decir eso sin texto.
+ * Los cuatro salen del mismo `EntGradiente`. La queñua venía de su propio
+ * componente y por eso su rostro era de otra mano; ahora los cuatro comparten
+ * cincel y se leen como hermanos.
+ *
+ * ── Los detalles que cierran las lecciones ─────────────────────────────────
+ * · En la terraza del FRÍO, detrás del aliso, hay dos robles chicos. No son
+ *   relleno: el roble andino cruza el gradiente él solo, de 750 a 3.450 metros,
+ *   y verlo trepado en el piso del aliso es la única forma de decirlo sin texto.
+ * · Por la bajante de CADA árbol suben y bajan pulsos de dos colores: el azúcar
+ *   que el árbol le paga al hongo y el mineral que el hongo le devuelve. La red
+ *   turquesa sola decía "están conectados"; esto dice QUÉ se intercambia.
+ * · Sobre el páramo entran jirones de niebla que la copa de la queñua se toma,
+ *   y del tronco bajan gotas hasta el manantial. Esa cadena —niebla, gota,
+ *   quebrada— es la fábrica de agua, dibujada en vez de escrita.
  *
  * ── Presupuesto de dibujo ──────────────────────────────────────────────────
  * El bloque son cuatro draw-calls (lomo, corte, faldón, piedras); la
- * vegetación, un InstancedMesh por especie; el agua y la red, uno cada una.
- * Todo comparte material de color por vértice: el color vive HORNEADO en la
- * geometría, que es lo que permite que un teléfono barato dibuje esta ladera.
- *
- * ── Máximo dos Ents a la vez (`pisosVisibles`, 2026-07-22) ──────────────────
- * El bloque de montaña, el agua y la red de micorrizas son la ladera entera y
- * SIEMPRE se dibujan completos (es un solo cerro, no se puede "apagar" un
- * pedazo). Los Ents y su cortejo de vegetación propia sí se recortan: `prop.
- * pisosVisibles` (ver `pisosBosqueGradiente.js`) dice cuáles de los tres se
- * plantan. `TresEntsGradiente3D.jsx` es quien decide ESO según el perfil de
- * la finca; esta escena solo obedece.
+ * vegetación, un InstancedMesh por especie; el agua, la red, la niebla y las
+ * gotas, uno cada una. Todo comparte material de color por vértice: el color
+ * vive HORNEADO en la geometría, que es lo que permite que un teléfono barato
+ * dibuje esta ladera.
  */
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { crearMaterialVertexColors } from '../paleta/index.js';
-import EntQuenua from './EntQuenua.jsx';
 import EntGradiente from './EntGradiente.jsx';
 import {
   BLOQUE,
   PISOS,
   ESCARPES,
+  pisoDe,
   alturaLadera,
   zCauce,
   construirLomo,
@@ -54,6 +58,12 @@ import {
   construirRed,
   nodosDeRed,
   pulsosDeRed,
+  pulsosDeRaiz,
+  raizDeSeccion,
+  ejeNiebla,
+  jironesDeNiebla,
+  caminoDeGota,
+  gotasDeParamo,
   puntoBanda,
 } from './gradienteAndino.geom.js';
 import { rng } from './sombreadoVegetal.js';
@@ -81,7 +91,11 @@ import {
   geomRoca,
   calidadDeTier,
 } from './floraParamo.geom.js';
+/* La ceibita del rodal caliente NO puede salir de `floraParamo`: allá no hay
+   una sola especie de tierra caliente. Vive con su guardián. */
+import { geomCeibaChica } from './entsGradiente.geom.js';
 import { PALETA as MICO } from '../micorrizas/micorrizas.geom.js';
+import { AGUAS, NEUTROS } from '../paleta/paletaMadre.js';
 
 /* ══════════════════════════════════════════════════════════════════════════
    LA SIEMBRA — dónde cae cada mata
@@ -142,8 +156,18 @@ function sembrar({
   return items;
 }
 
-/** UN BANCO: todas las matas de una especie en un solo InstancedMesh. */
-function Banco({ geo, mat, items, castShadow = false, hundir = 0 }) {
+/**
+ * UN BANCO: todas las matas de una especie en un solo InstancedMesh.
+ *
+ * `aclarar` sube el tinte por instancia por encima de 1. Existe por una razón
+ * concreta: hay arquetipos de la flora —el gaque es el peor— cuyo verde viene
+ * horneado para vivir BAJO UN DOSEL CERRADO, y en estas terrazas al sol se
+ * leían como manchones de ALQUITRÁN al pie de los guardianes. No es un bug de
+ * la escena ni del arquetipo: es que la pieza está calibrada para otra luz.
+ * Aclararla aquí es más honesto (y menos destructivo) que irle a cambiar el
+ * horneado a una geometría que otros mundos usan tal como está.
+ */
+function Banco({ geo, mat, items, castShadow = false, hundir = 0, aclarar = 1 }) {
   const ref = useRef(null);
   useLayoutEffect(() => {
     const mesh = ref.current;
@@ -164,12 +188,13 @@ function Banco({ geo, mat, items, castShadow = false, hundir = 0 }) {
       mesh.setMatrixAt(i, m);
       // ni dos matas del mismo verde: variación chica, la justa para que el
       // rodal no se lea clonado
-      c.setRGB(it.tono, it.tono, it.tono);
+      const tn = it.tono * aclarar;
+      c.setRGB(tn, tn, tn);
       mesh.setColorAt(i, c);
     }
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  }, [items, hundir]);
+  }, [items, hundir, aclarar]);
 
   if (!geo || !items.length) return null;
   return (
@@ -288,6 +313,177 @@ function PulsosRed({ curva, pulsos, reducedMotion, mat }) {
   return <instancedMesh ref={ref} args={[geo, mat, pulsos.length]} frustumCulled={false} />;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   EL TRATO, VISIBLE — lo que sube y lo que baja por la raíz de cada árbol
+   ══════════════════════════════════════════════════════════════════════════ */
+/*
+ * "No veo la lección de micorriza."
+ *
+ * La red estaba dibujada —turquesa, con nodos y con pulsos corriendo de punta
+ * a punta de la ladera— y aun así no ENSEÑABA nada. Lo que decía era "estos
+ * árboles están conectados", que es la mitad menos interesante. Lo que había
+ * que ver es QUÉ SE INTERCAMBIA, y eso pasa en la raíz de cada árbol, no en el
+ * cordón horizontal.
+ *
+ * Esto lo pone en escena: por la bajante de cada Ent viajan perlas de dos
+ * colores y en dos sentidos.
+ *   · VERDE que BAJA del árbol: el azúcar que hizo con el sol y le paga al hongo.
+ *   · ÁMBAR y AZUL que SUBEN: el fósforo y el agua que el hongo le buscó lejos.
+ * Con verlo dos veces se entiende, y no hace falta leer una sola palabra.
+ */
+function PulsosRaiz({ curva, pulsos, reducedMotion, mat }) {
+  const ref = useRef(null);
+  const geo = useMemo(() => new THREE.SphereGeometry(1, 7, 6), []);
+  useLayoutEffect(() => () => geo.dispose(), [geo]);
+  const tmpRef = useRef({
+    m: new THREE.Matrix4(),
+    q: new THREE.Quaternion(),
+    p: new THREE.Vector3(),
+    s: new THREE.Vector3(),
+  });
+
+  useLayoutEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const c = new THREE.Color();
+    for (let i = 0; i < pulsos.length; i++) mesh.setColorAt(i, c.set(pulsos[i].color));
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [pulsos]);
+
+  const colocar = useCallback((t0) => {
+    const mesh = ref.current;
+    const tmp = tmpRef.current;
+    if (!mesh) return;
+    for (let i = 0; i < pulsos.length; i++) {
+      const pu = pulsos[i];
+      let t = (pu.t + t0 * pu.vel * pu.dir) % 1;
+      if (t < 0) t += 1;
+      curva.getPointAt(t, tmp.p);
+      /* Se corren un pelo hacia la cámara: la bajante viaja PEGADA a la cara
+         del corte y un pulso centrado en el eje de la raíz se le esconde
+         adentro justo donde más importa que se vea. */
+      tmp.p.z += 0.12;
+      tmp.p.x += pu.lado;
+      /* Aparecen y desaparecen en las puntas en vez de brotar de la nada: el
+         viaje se lee como un recorrido, no como un parpadeo. */
+      const vive = Math.min(1, Math.sin(Math.min(1, t * 1.06) * Math.PI) * 2.6);
+      tmp.s.setScalar(pu.esc * Math.max(0, vive));
+      tmp.m.compose(tmp.p, tmp.q, tmp.s);
+      mesh.setMatrixAt(i, tmp.m);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [pulsos, curva]);
+
+  useLayoutEffect(() => { colocar(0); }, [colocar]);
+  useFrame(({ clock }) => {
+    if (reducedMotion) return;
+    colocar(clock.getElapsedTime());
+  });
+
+  return <instancedMesh ref={ref} args={[geo, mat, pulsos.length]} frustumCulled={false} />;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   LA FÁBRICA DE AGUA — la niebla entra por la copa, sale hecha quebrada
+   ══════════════════════════════════════════════════════════════════════════ */
+/*
+ * "No veo la lección de páramo."
+ *
+ * Tampoco estaba. El manantial brotaba al lado de la queñua como si el agua se
+ * hiciera sola, y el texto del panel —que la copa PEINA LA NIEBLA— no tenía
+ * ningún dibujo que lo respaldara. Faltaban los dos eslabones del medio.
+ *
+ * `JironesNiebla` trae la niebla de la cumbre y la mete en la copa, donde se
+ * adelgaza hasta desaparecer: la copa se la está tomando. `GotasParamo` la
+ * devuelve hecha agua, escurriendo por el tronco hasta el pie y de ahí al
+ * manantial. Causa, tránsito y efecto, en fila y en el mismo cuadro.
+ */
+function JironesNiebla({ eje, jirones, reducedMotion, mat }) {
+  const ref = useRef(null);
+  const geo = useMemo(() => new THREE.SphereGeometry(1, 9, 6), []);
+  useLayoutEffect(() => () => geo.dispose(), [geo]);
+  const tmpRef = useRef({
+    m: new THREE.Matrix4(), q: new THREE.Quaternion(),
+    p: new THREE.Vector3(), s: new THREE.Vector3(),
+  });
+
+  const colocar = useCallback((t0) => {
+    const mesh = ref.current;
+    const tmp = tmpRef.current;
+    if (!mesh) return;
+    for (let i = 0; i < jirones.length; i++) {
+      const j = jirones[i];
+      const t = (j.t + t0 * j.vel) % 1;
+      tmp.p.copy(eje.desde).lerp(eje.hasta, t);
+      tmp.p.y += j.alto * (1 - t * 0.72);
+      tmp.p.z += j.lado * (1 - t * 0.55);
+      /* SE CONSUME al llegar: entra grande y se apaga contra la copa. Si no se
+         adelgazara, la niebla parecería atravesar el árbol y salir por el otro
+         lado — que es exactamente lo contrario de la lección.
+         OJO CON EL EXPONENTE: con 2,1 la niebla se moría a media ladera y
+         quedaba como una nube suelta en el cielo, sin tocar el árbol — o sea,
+         sin decir nada. Con 3,4 aguanta hasta METERSE en la copa, que es donde
+         tiene que desaparecer para que se entienda quién se la tomó. */
+      const queda = Math.max(0, 1 - Math.pow(t, 3.4));
+      const entra = Math.min(1, t * 7); // tampoco puede aparecer de golpe
+      const f = queda * entra;
+      // más aplastados que anchos: la niebla se ACUESTA sobre la ladera
+      tmp.s.set(j.largo * f, j.grueso * f * 0.44, j.grueso * f * 0.9);
+      tmp.m.compose(tmp.p, tmp.q, tmp.s);
+      mesh.setMatrixAt(i, tmp.m);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [jirones, eje]);
+
+  useLayoutEffect(() => { colocar(0); }, [colocar]);
+  useFrame(({ clock }) => {
+    if (reducedMotion) return;
+    colocar(clock.getElapsedTime());
+  });
+
+  return <instancedMesh ref={ref} args={[geo, mat, jirones.length]} frustumCulled={false} />;
+}
+
+/** Las gotas que la copa fabricó: bajan por el tronco y se van al manantial. */
+function GotasParamo({ curva, gotas, reducedMotion, mat }) {
+  const ref = useRef(null);
+  const geo = useMemo(() => new THREE.SphereGeometry(1, 7, 6), []);
+  useLayoutEffect(() => () => geo.dispose(), [geo]);
+  const tmpRef = useRef({
+    m: new THREE.Matrix4(), q: new THREE.Quaternion(),
+    p: new THREE.Vector3(), s: new THREE.Vector3(),
+  });
+
+  const colocar = useCallback((t0) => {
+    const mesh = ref.current;
+    const tmp = tmpRef.current;
+    if (!mesh) return;
+    for (let i = 0; i < gotas.length; i++) {
+      const g = gotas[i];
+      const t = (g.t + t0 * g.vel) % 1;
+      curva.getPointAt(t, tmp.p);
+      tmp.p.z += g.lado;
+      /* La gota CRECE mientras baja: arriba es rocío que se está juntando y
+         abajo ya es un chorrito. Es el mismo cuento del agua que se hace
+         quebrada, contado en cinco segundos y en un metro de tronco. */
+      const crece = 0.55 + t * 0.75;
+      const vive = Math.min(1, t * 9) * Math.max(0, 1 - Math.pow(Math.max(0, t - 0.9) * 10, 2));
+      tmp.s.setScalar(g.esc * crece * vive);
+      tmp.m.compose(tmp.p, tmp.q, tmp.s);
+      mesh.setMatrixAt(i, tmp.m);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [gotas, curva]);
+
+  useLayoutEffect(() => { colocar(0); }, [colocar]);
+  useFrame(({ clock }) => {
+    if (reducedMotion) return;
+    colocar(clock.getElapsedTime());
+  });
+
+  return <instancedMesh ref={ref} args={[geo, mat, gotas.length]} frustumCulled={false} />;
+}
+
 /** Los nodos de intercambio: perlas donde la red se junta con una raíz. Laten
     despacio — el más grande es el de cada árbol. */
 function NodosRed({ nodos, reducedMotion, mat }) {
@@ -341,17 +537,8 @@ function NodosRed({ nodos, reducedMotion, mat }) {
  * @param {{materialRico?:boolean, flatShading?:boolean, sombras?:boolean}} props.perfil
  * @param {boolean} [props.reducedMotion]
  * @param {string|null} [props.foco]  id del piso al que se le está prestando
- *   atención ('templado' | 'frio' | 'paramo' | null): de los pisos QUE SÍ se
- *   dibujan (ver `pisosVisibles`), el que no es el foco se apaga un punto
- *   para que el ojo sepa a dónde mirar.
- * @param {string[]|null} [props.pisosVisibles]  qué Ents (y su cortejo de
- *   vegetación propio) se DIBUJAN — regla dura del operador (2026-07-22):
- *   máximo dos a la vez, nunca los tres/cuatro de fondo. Se calcula con
- *   `pisosVisiblesParaVista` de `pisosBosqueGradiente.js`; `null`/`undefined`
- *   = dibujar todos (red de seguridad, no un modo de producto). El bloque de
- *   montaña, el agua, la red de micorrizas y la cobertura rasante
- *   (mortino/romerillo/musgo/roca) NO se recortan: son la ladera compartida,
- *   no "un bosque".
+ *   atención ('templado' | 'frio' | 'paramo' | null): los otros se apagan un
+ *   punto para que el ojo sepa a dónde mirar, sin ocultar nada.
  */
 export default function EscenaTresEnts({
   tier = 'alto',
@@ -384,8 +571,34 @@ export default function EscenaTresEnts({
     () => pulsosDeRed(tier === 'alto' ? 26 : tier === 'medio' ? 12 : 0),
     [tier],
   );
+  /* Las bajantes de los cuatro árboles como CURVAS: son el riel por el que
+     viaja el trato (azúcar abajo, mineral arriba). Salen de la misma función
+     que dibujó la raíz, así que las perlas van clavadas sobre ella y no al
+     lado — que es el detalle que separa "se ve moverse algo" de "se ve QUÉ se
+     mueve y POR DÓNDE". */
+  const bajantes = useMemo(
+    () => (tier === 'bajo' ? [] : PISOS.map((p) => ({
+      id: p.id,
+      curva: raizDeSeccion(p),
+      pulsos: pulsosDeRaiz(p.id, tier === 'alto' ? 6 : 4),
+    }))),
+    [tier],
+  );
+
+  /* ── La fábrica de agua del páramo ── */
+  const paramo = useMemo(() => pisoDe('paramo'), []);
+  const eje = useMemo(() => ejeNiebla(paramo), [paramo]);
+  const jirones = useMemo(
+    () => jironesDeNiebla(tier === 'alto' ? 22 : tier === 'medio' ? 13 : 7),
+    [tier],
+  );
+  const curvaGota = useMemo(() => caminoDeGota(paramo), [paramo]);
+  const gotas = useMemo(
+    () => gotasDeParamo(tier === 'alto' ? 14 : tier === 'medio' ? 8 : 5),
+    [tier],
+  );
   /* El rizomorfo como curva: es el riel por el que viajan los pulsos de punta a
-     punta de la ladera. Que crucen los tres pisos es la lección hecha
+     punta de la ladera. Que crucen los cuatro pisos es la lección hecha
      movimiento. */
   const curvaRed = useMemo(() => {
     const pts = [];
@@ -400,6 +613,7 @@ export default function EscenaTresEnts({
      el robledal cerrado dice templado, y el roble chico metido en la terraza
      del frío dice que el roble sube solo. */
   const geosVeg = useMemo(() => ({
+    ceibita: geomCeibaChica({ q }, 401),
     roble: geomRoble({ q }, 31),
     aliso: geomAliso({ q }, 32),
     encenillo: geomEncenillo({ q }, 33),
@@ -413,9 +627,13 @@ export default function EscenaTresEnts({
   }), [q]);
 
   const siembra = useMemo(() => {
-    const templado = PISOS[0];
-    const frio = PISOS[1];
-    const paramo = PISOS[2];
+    /* Por ID, nunca por índice: al meter la tierra caliente al frente del
+       arreglo, un `PISOS[0]` viejo dejó de ser el templado. Ese es el tipo de
+       bug que no da error — solo siembra el robledal en el piso equivocado. */
+    const caliente = pisoDe('calido');
+    const templado = pisoDe('templado');
+    const frio = pisoDe('frio');
+    const alto = pisoDe('paramo');
     const k = (n) => Math.max(1, Math.round(n * denso));
     /* Los ÁRBOLES del cortejo se siembran DETRÁS de los Ents (zAtras): el Ent es
        el protagonista de su terraza y tiene que recortarse contra el rodal, no
@@ -423,6 +641,11 @@ export default function EscenaTresEnts({
        profundidad y el robledal se le tragó el rostro al roble. */
     const zAtras = { zDesde: BLOQUE.zFondo + 0.9, zHasta: -3.6 };
     return {
+      /* TIERRA CALIENTE — el bosque seco tropical: RALO a propósito.
+         Un bosque seco no es un bosque cerrado; es árbol grande, mucho suelo a
+         la vista y matorral disperso. Sembrarlo tan tupido como el robledal
+         habría sido dibujar un piso térmico con la densidad del otro. */
+      ceibita: sembrar({ desde: caliente.desde + 1.6, hasta: caliente.hasta - 0.8, n: k(7), seed: 121, escMin: 0.9, escMax: 1.55, distMin: 2.4, ...zAtras }),
       /* TEMPLADO — el robledal cerrado */
       roble: [
         ...sembrar({ desde: templado.desde + 1, hasta: templado.hasta - 0.6, n: k(5), seed: 101, escMin: 1.05, escMax: 1.5, distMin: 2.6, ...zAtras }),
@@ -430,19 +653,28 @@ export default function EscenaTresEnts({
            cruza el gradiente él solo (750–3.450 m) y esto es decirlo sin texto. */
         ...sembrar({ desde: frio.desde + 1.4, hasta: frio.hasta - 1.4, n: k(2), seed: 102, escMin: 0.7, escMax: 0.92, distMin: 2.6, ...zAtras }),
       ],
-      /* el gaque, domo denso de hoja gruesa: el sotobosque alto del robledal */
-      gaque: sembrar({ desde: templado.desde + 1, hasta: templado.hasta - 0.5, n: k(5), seed: 103, escMin: 0.9, escMax: 1.35, distMin: 1.6 }),
+      /* el gaque, domo denso de hoja gruesa: el sotobosque alto del robledal.
+         VA ATRÁS, con los otros árboles del cortejo. Se había quedado por fuera
+         de esa regla y era el único que podía caer DELANTE del guardián: un
+         domo de hoja gruesa a dos metros de la cámara le tapaba el rostro al
+         roble justo en su propio retrato. */
+      gaque: sembrar({ desde: templado.desde + 1, hasta: templado.hasta - 0.5, n: k(5), seed: 103, escMin: 0.9, escMax: 1.35, distMin: 1.6, ...zAtras }),
       /* FRÍO — el alisal con su encenillo */
       aliso: sembrar({ desde: frio.desde + 0.8, hasta: frio.hasta - 0.8, n: k(4), seed: 106, escMin: 0.85, escMax: 1.15, distMin: 2, ...zAtras }),
       encenillo: sembrar({ desde: frio.desde + 0.8, hasta: frio.hasta - 0.8, n: k(3), seed: 107, escMin: 0.8, escMax: 1.05, distMin: 2, ...zAtras }),
       /* PÁRAMO — el frailejonal manda */
-      frailejon: sembrar({ desde: paramo.desde + 0.6, hasta: paramo.hasta - 0.8, n: k(9), seed: 109, escMin: 1.05, escMax: 1.65, distMin: 1.15 }),
-      frailejonFlor: sembrar({ desde: paramo.desde + 0.8, hasta: paramo.hasta - 1, n: k(3), seed: 110, escMin: 1.1, escMax: 1.5, distMin: 1.6 }),
-      /* el matorral bajo, de una punta a otra de la ladera */
-      mortino: sembrar({ desde: templado.desde + 0.8, hasta: paramo.hasta - 0.6, n: k(16), seed: 111, escMin: 0.8, escMax: 1.2, distMin: 0.85 }),
-      romerillo: sembrar({ desde: frio.desde - 1.5, hasta: paramo.hasta - 0.6, n: k(14), seed: 112, escMin: 0.85, escMax: 1.25, distMin: 0.8 }),
-      musgo: sembrar({ desde: BLOQUE.xMin + 1, hasta: BLOQUE.xMax - 1, n: k(24), seed: 113, escMin: 0.8, escMax: 1.6, distMin: 0.55 }),
-      roca: sembrar({ desde: BLOQUE.xMin + 1, hasta: BLOQUE.xMax - 1, n: k(10), seed: 114, escMin: 0.7, escMax: 1.5, distMin: 1.2 }),
+      frailejon: sembrar({ desde: alto.desde + 0.6, hasta: alto.hasta - 0.8, n: k(9), seed: 109, escMin: 1.05, escMax: 1.65, distMin: 1.15 }),
+      frailejonFlor: sembrar({ desde: alto.desde + 0.8, hasta: alto.hasta - 1, n: k(3), seed: 110, escMin: 1.1, escMax: 1.5, distMin: 1.6 }),
+      /* el matorral bajo, del templado para arriba: el mortiño y el romerillo
+         son de tierra fría y no bajan a la caliente (eso lo cubre el pajonal
+         seco de la faja, que ya lo pinta el terreno) */
+      mortino: sembrar({ desde: templado.desde + 0.8, hasta: alto.hasta - 0.6, n: k(16), seed: 111, escMin: 0.8, escMax: 1.2, distMin: 0.85 }),
+      romerillo: sembrar({ desde: frio.desde - 1.5, hasta: alto.hasta - 0.6, n: k(14), seed: 112, escMin: 0.85, escMax: 1.25, distMin: 0.8 }),
+      musgo: sembrar({ desde: templado.desde, hasta: BLOQUE.xMax - 1, n: k(24), seed: 113, escMin: 0.8, escMax: 1.6, distMin: 0.55 }),
+      /* las PIEDRAS sí van de punta a punta, y en la tierra caliente son más:
+         suelo somero y pedregoso es justo la razón por la que la ceiba
+         necesita contrafuertes */
+      roca: sembrar({ desde: BLOQUE.xMin + 1, hasta: BLOQUE.xMax - 1, n: k(16), seed: 114, escMin: 0.7, escMax: 1.5, distMin: 1.2 }),
     };
   }, [denso]);
 
@@ -488,6 +720,34 @@ export default function EscenaTresEnts({
     () => new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false }),
     [],
   );
+  /* LA NIEBLA: blanca, sin sombreado y muy transparente. Tiene que leerse como
+     AIRE — con un material que reciba luz, los jirones se sombrean por un lado
+     y se vuelven algodones sólidos flotando sobre el páramo. `depthWrite` en
+     falso para que no se recorten entre ellos ni tapen la copa: la niebla se
+     acumula, no se apila. */
+  const matNiebla = useMemo(
+    () => new THREE.MeshBasicMaterial({
+      color: NEUTROS.nieve,
+      transparent: true,
+      opacity: 0.22,
+      depthWrite: false,
+      toneMapped: false,
+    }),
+    [],
+  );
+  /* La GOTA: agua viva con un punto de espuma. Lleva algo de emisivo para que
+     se vea contra el tronco oscuro de la queñua sin tener que hacerla enorme —
+     una gota grande deja de ser gota y pasa a ser bola de chicle. */
+  const matGota = useMemo(
+    () => (perfil?.materialRico
+      ? new THREE.MeshStandardMaterial({
+        color: AGUAS.viva, emissive: AGUAS.lagunaOrilla, emissiveIntensity: 0.45, roughness: 0.2,
+      })
+      : new THREE.MeshLambertMaterial({
+        color: AGUAS.viva, emissive: AGUAS.lagunaOrilla, emissiveIntensity: 0.5,
+      })),
+    [perfil],
+  );
   /* El material de los pisos apagados: multiplica hacia abajo sin desaturar del
      todo. Señalar un piso NO puede ser esconder los otros. */
   const matApagado = useMemo(() => {
@@ -497,11 +757,26 @@ export default function EscenaTresEnts({
   }, [perfil]);
 
   useEffect(() => () => {
-    [matTierra, matVeg, matAgua, matEspuma, matRed, matNodo, matApagado].forEach((m) => m.dispose());
-  }, [matTierra, matVeg, matAgua, matEspuma, matRed, matNodo, matApagado]);
+    [matTierra, matVeg, matAgua, matEspuma, matRed, matNodo, matNiebla, matGota, matApagado]
+      .forEach((m) => m.dispose());
+  }, [matTierra, matVeg, matAgua, matEspuma, matRed, matNodo, matNiebla, matGota, matApagado]);
+
+  /*
+   * ¿SE APAGA ESTE PISO? Solo si el foco es un piso DE VERDAD.
+   *
+   * `foco` viene de la `vista`, y la vista puede traer un valor que no es
+   * ningún piso: es la red de seguridad de `pisosVisiblesParaVista`, la que
+   * dibuja la ladera entera para que un valor raro nunca deje el mundo vacío.
+   * Con la comparación cruda (`foco && foco !== piso`) ESE caso apagaba a los
+   * cuatro guardianes a la vez — la ladera completa en penumbra y sin
+   * protagonista, que es peor que no apagar nada. Apagar tiene sentido cuando
+   * hay alguien a quien resaltar; si no lo hay, no se apaga nadie.
+   */
+  const focoReal = foco && PISOS.some((p) => p.id === foco) ? foco : null;
+  const apagar = (pisoId) => !!focoReal && focoReal !== pisoId;
 
   /* ¿Qué material le toca a la vegetación de un piso? */
-  const matDe = (piso) => (foco && foco !== piso ? matApagado : matVeg);
+  const matDe = (piso) => (apagar(piso) ? matApagado : matVeg);
 
   /* Los Ents se HUNDEN un palmo en la tierra. El pie del fuste es un anillo
      abierto de radio 1,3 y el terreno ondula dentro de esa huella: apoyado al
@@ -509,7 +784,7 @@ export default function EscenaTresEnts({
   const alturaDe = (p) => alturaLadera(p.x, p.z) - 0.22;
 
   return (
-    <group name="ladera-tres-ents">
+    <group name="ladera-cuatro-ents">
       {/* ── EL BLOQUE ── */}
       <mesh geometry={lomo} material={matTierra} receiveShadow />
       <mesh geometry={corte} material={matTierra} receiveShadow />
@@ -526,27 +801,52 @@ export default function EscenaTresEnts({
         mat={matEspuma}
       />
 
-      {/* ── LA RED DEL SUBSUELO: lo que amarra a los tres por debajo ── */}
+      {/* ── LA FÁBRICA DE AGUA DEL PÁRAMO ──
+          La niebla llega de la cumbre, la copa de la queñua se la toma, y lo
+          que baja por el tronco ya es agua. Es la lección del páramo dibujada
+          en vez de escrita: causa (niebla) → tránsito (gotas por el fuste) →
+          efecto (el manantial que ya estaba ahí). */}
+      <JironesNiebla eje={eje} jirones={jirones} reducedMotion={reducedMotion} mat={matNiebla} />
+      <GotasParamo curva={curvaGota} gotas={gotas} reducedMotion={reducedMotion} mat={matGota} />
+
+      {/* ── LA RED DEL SUBSUELO: lo que amarra a los cuatro por debajo ── */}
       <mesh geometry={red} material={matRed} />
       <NodosRed nodos={nodos} reducedMotion={reducedMotion} mat={matNodo} />
       {pulsos.length > 0 && (
         <PulsosRed curva={curvaRed} pulsos={pulsos} reducedMotion={reducedMotion} mat={matNodo} />
       )}
+      {/* …y EL TRATO, árbol por árbol: baja el azúcar, sube el mineral */}
+      {bajantes.map((b) => (
+        <PulsosRaiz
+          key={`trato-${b.id}`}
+          curva={b.curva}
+          pulsos={b.pulsos}
+          reducedMotion={reducedMotion}
+          mat={matNodo}
+        />
+      ))}
 
       {/* ── LA VEGETACIÓN DE CADA PISO — el cortejo del Ent se dibuja SOLO
           cuando su piso está entre los visibles (`seDibuja`); la cobertura
           rasante de abajo (mortino/romerillo/musgo/roca) es de toda la
-          ladera y no se recorta nunca. ── */}
+          ladera y no se recorta nunca.
+          ACLARADOS: el gaque (el peor), el encenillo —árbol de niebla, copa
+          oscura compacta— y el mortiño. Los tres traen el verde horneado para
+          penumbra y al sol de estas terrazas se juntaban en manchones negros
+          al pie de los guardianes. El gaque necesita más mano que los otros. ── */}
+      {seDibuja('calido') && (
+        <Banco geo={geosVeg.ceibita} mat={matDe('calido')} items={siembra.ceibita} castShadow={!!perfil?.sombras} />
+      )}
       {seDibuja('templado') && (
         <>
           <Banco geo={geosVeg.roble} mat={matDe('templado')} items={siembra.roble} castShadow={!!perfil?.sombras} />
-          <Banco geo={geosVeg.gaque} mat={matDe('templado')} items={siembra.gaque} />
+          <Banco geo={geosVeg.gaque} mat={matDe('templado')} items={siembra.gaque} aclarar={1.45} />
         </>
       )}
       {seDibuja('frio') && (
         <>
           <Banco geo={geosVeg.aliso} mat={matDe('frio')} items={siembra.aliso} castShadow={!!perfil?.sombras} />
-          <Banco geo={geosVeg.encenillo} mat={matDe('frio')} items={siembra.encenillo} />
+          <Banco geo={geosVeg.encenillo} mat={matDe('frio')} items={siembra.encenillo} aclarar={1.3} />
         </>
       )}
       {seDibuja('paramo') && (
@@ -555,36 +855,49 @@ export default function EscenaTresEnts({
           <Banco geo={geosVeg.frailejonFlor} mat={matDe('paramo')} items={siembra.frailejonFlor} />
         </>
       )}
-      <Banco geo={geosVeg.mortino} mat={matVeg} items={siembra.mortino} />
+      <Banco geo={geosVeg.mortino} mat={matVeg} items={siembra.mortino} aclarar={1.3} />
       <Banco geo={geosVeg.romerillo} mat={matVeg} items={siembra.romerillo} />
       <Banco geo={geosVeg.musgo} mat={matVeg} items={siembra.musgo} hundir={0.04} />
       <Banco geo={geosVeg.roca} mat={matVeg} items={siembra.roca} hundir={0.12} />
 
       {/* ══════════════════════════════════════════════════════════════════
           LOS ÁRBOLES MAESTROS — máximo dos a la vez (`seDibuja`), nunca los
-          tres/cuatro de fondo: la regla dura del operador (2026-07-22).
+          cuatro de fondo: la regla dura del operador (2026-07-22).
+
+          Los cuatro salen del MISMO componente y eso ya no es un ahorro de
+          código: es la única forma de que se lean como hermanos. Mientras la
+          queñua se montaba aparte, tenía otra talla en la cara y en el retrato
+          de familia se notaba de una.
           ══════════════════════════════════════════════════════════════════ */}
+
+      {/* LA CEIBA — tierra caliente. Su mano señala su propio contrafuerte: es
+          lo único que de ella se puede afirmar sin inventar. */}
+      {seDibuja('calido') && (
+        <group name="piso-calido" position={[pisoDe('calido').x, alturaDe(pisoDe('calido')), pisoDe('calido').z]} rotation={[0, 0.06, 0]}>
+          <EntGradiente especie="ceiba" tier={tier} reducedMotion={reducedMotion} apagado={apagar('calido')} />
+        </group>
+      )}
 
       {/* EL ROBLE — templado y frío. Su mano señala las setas del pie. */}
       {seDibuja('templado') && (
-        <group name="piso-templado" position={[PISOS[0].x, alturaDe(PISOS[0]), PISOS[0].z]} rotation={[0, -0.16, 0]}>
-          <EntGradiente especie="roble" tier={tier} reducedMotion={reducedMotion} />
+        <group name="piso-templado" position={[pisoDe('templado').x, alturaDe(pisoDe('templado')), pisoDe('templado').z]} rotation={[0, -0.16, 0]}>
+          <EntGradiente especie="roble" tier={tier} reducedMotion={reducedMotion} apagado={apagar('templado')} />
         </group>
       )}
 
       {/* EL ALISO — frío. Su mano señala los nódulos de Frankia de su raíz. */}
       {seDibuja('frio') && (
-        <group name="piso-frio" position={[PISOS[1].x, alturaDe(PISOS[1]), PISOS[1].z]} rotation={[0, 0.1, 0]}>
-          <EntGradiente especie="aliso" tier={tier} reducedMotion={reducedMotion} />
+        <group name="piso-frio" position={[pisoDe('frio').x, alturaDe(pisoDe('frio')), pisoDe('frio').z]} rotation={[0, 0.1, 0]}>
+          <EntGradiente especie="aliso" tier={tier} reducedMotion={reducedMotion} apagado={apagar('frio')} />
         </group>
       )}
 
-      {/* LA QUEÑUA — páramo. El Ent que ya existía, traído tal cual: mismo
-          rostro tallado, misma barba de usnea, mismos brazos. Aquí en su casa,
-          arriba del todo, con el nacimiento del agua a sus pies. */}
+      {/* LA QUEÑUA — páramo. Su corteza sigue pelándose en láminas y su barba
+          de usnea sigue colgando, pero la CARA ya salió del mismo cincel que
+          las otras tres. Su mano señala el nacimiento del agua. */}
       {seDibuja('paramo') && (
-        <group name="piso-paramo" position={[PISOS[2].x, alturaDe(PISOS[2]), PISOS[2].z]} rotation={[0, 0.22, 0]}>
-          <EntQuenua tier={tier} reducedMotion={reducedMotion} />
+        <group name="piso-paramo" position={[pisoDe('paramo').x, alturaDe(pisoDe('paramo')), pisoDe('paramo').z]} rotation={[0, 0.22, 0]}>
+          <EntGradiente especie="quenua" tier={tier} reducedMotion={reducedMotion} apagado={apagar('paramo')} />
         </group>
       )}
     </group>

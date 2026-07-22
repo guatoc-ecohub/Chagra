@@ -4,12 +4,13 @@
  *
  * De qué se trata
  * ───────────────
- * Un Ent por piso térmico, y los tres contando la misma historia: la de una
+ * Un Ent por piso térmico, y los cuatro contando la misma historia: la de una
  * ladera de los Andes leída de arriba abajo.
  *
  *   · EL ENT DE LA QUEÑUA (páramo) — *Polylepis*. El árbol que llega más
  *     arriba. Su copa y su musgo peinan la niebla: es una fábrica de agua.
- *     Es el Ent que YA EXISTÍA en el mundo del páramo, traído tal cual.
+ *     Su cara la talló el mismo cincel que las otras tres (ver
+ *     `EntGradiente.jsx`): antes venía de otro componente y se le notaba.
  *   · EL ENT DEL ALISO (frío) — *Alnus acuminata*. Fabrica su propio abono:
  *     la bacteria *Frankia* le arma nódulos en la raíz que fijan el nitrógeno
  *     del aire. Levanta suelos degradados.
@@ -17,12 +18,16 @@
  *     roble de Suramérica, y cruza el gradiente él solo de 750 a 3.450 metros.
  *     Su lección son las ectomicorrizas: cuatro hongos le forran las raíces y
  *     dos de ellos —*Cantharellus* y *Lactarius*— sacan la seta a su pie.
+ *   · EL ENT DE LA CEIBA (tierra caliente) — *Ceiba pentandra*. De cero a mil
+ *     metros, bosque seco tropical. Sus CONTRAFUERTES —raíces tablares tan
+ *     altas como una persona— son lo que la delata. NO tiene lección de
+ *     simbiosis: de la ceiba eso no está verificado, y se dibuja el árbol, no
+ *     una lección que no tenemos.
  *
  * Y lo que los amarra, que es el punto: EL AGUA baja por encima (nace en el
- * páramo, se despeña dos veces, llega abajo hecha quebrada) y LA RED DE
+ * páramo, se despeña tres veces, llega abajo hecha quebrada) y LA RED DE
  * MICORRIZAS circula por debajo, en la cara cortada de la ladera. Dos
- * corrientes en espejo. Si le tumban el páramo, el roble del templado se
- * entera.
+ * corrientes en espejo. Si le tumban el páramo, la ceiba se entera.
  *
  * La ladera está CORTADA como una lámina de Humboldt: el perfil de la montaña
  * con sus fajas de vegetación arriba y los horizontes del suelo abajo. Es el
@@ -55,7 +60,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import * as THREE from 'three';
 import EscenaTresEnts from '../visual/mundo3d/bosque/EscenaTresEnts.jsx';
-import { PISOS, alturaLadera } from '../visual/mundo3d/bosque/gradienteAndino.geom.js';
+import { BLOQUE, PISOS, alturaLadera } from '../visual/mundo3d/bosque/gradienteAndino.geom.js';
 import { LECCIONES } from '../visual/mundo3d/bosque/entsGradiente.geom.js';
 import {
   MAPA_PISO_ENT,
@@ -73,7 +78,7 @@ import usePerfilFincaStore from '../store/usePerfilFincaStore.js';
 
 /*
  * EL RETRATO ANCHO (`VISTAS.juntosAncho`/`juntosAlto`) fue la vista madre de
- * este mundo cuando se veían los tres Ents a la vez: los tres hermanos
+ * este mundo cuando se veían todos los Ents a la vez: los hermanos
  * escalonados en un solo cuadro. Desde que el máximo-dos es regla dura
  * (2026-07-22) NINGÚN botón la pide — pero se queda como RED DE SEGURIDAD del
  * `Camarógrafo` para una `vista` que no tenga retrato propio en `VISTA_ENT`
@@ -85,41 +90,63 @@ import usePerfilFincaStore from '../store/usePerfilFincaStore.js';
  * tercio. Por eso esta vista de respaldo tiene una variante `Alta` que baja al
  * valle y mira ladera arriba.
  */
+/* El CENTRO del bloque, calculado. Con la tierra caliente adentro la ladera va
+   de −22 a +14: encuadrarla mirando al origen —que era el medio cuando solo
+   había tres terrazas— deja la ceiba fuera del cuadro por la izquierda. */
+const X_CENTRO = (BLOQUE.xMin + BLOQUE.xMax) / 2;
+
 const VISTAS = {
   /* La cámara mira desde ARRIBA de la copa del páramo, no desde la altura de
-     los ojos: con el ángulo bajo, las tres terrazas se veían de canto y ni el
-     lomo de la ladera ni el cauce de la quebrada entraban en el cuadro. Un
-     diorama se lee desde arriba y de frente. */
+     los ojos: con el ángulo bajo, las terrazas se veían de canto y ni el lomo
+     de la ladera ni el cauce de la quebrada entraban en el cuadro. Un diorama
+     se lee desde arriba y de frente.
+     Y ahora, además, MÁS ATRÁS: la ladera creció ocho metros-escena al entrarle
+     la terraza de la ceiba y con el encuadre viejo quedaba cortada. */
   juntosAncho: {
-    pos: new THREE.Vector3(0.8, 15.5, 34),
-    mira: new THREE.Vector3(0.3, 4.4, -1.5),
+    pos: new THREE.Vector3(X_CENTRO + 2.4, 17.5, 45),
+    mira: new THREE.Vector3(X_CENTRO, 3.1, -1.5),
     fov: 40,
   },
-  /* El retrato vertical: la misma vista de frente, pero MÁS ATRÁS y con más
-     ángulo, porque en un teléfono en vertical el ancho es lo escaso. La ladera
-     queda como una FRANJA en el medio del cuadro — y esa franja es justo el
-     hueco que dejan el título arriba y la carta de la lección abajo. */
+  /*
+   * El retrato vertical. Dos números que se calibran juntos y no por gusto:
+   *   · la DISTANCIA la manda el ancho. La ladera mide 36 metros-escena y en un
+   *     cuadro 390×844 el campo horizontal es angostísimo: a 95 sobraba cuadro a
+   *     los lados y la franja quedaba flaca; a 82 llega casi de borde a borde,
+   *     que es lo máximo que da la geometría.
+   *   · el OBJETIVO por debajo de la ladera (y negativo) EMPUJA LA FRANJA HACIA
+   *     ARRIBA. Apuntando al centro del bloque quedaba un tercio de cielo vacío
+   *     entre el título y la primera copa.
+   */
   juntosAlto: {
-    pos: new THREE.Vector3(0.4, 16.6, 70),
-    mira: new THREE.Vector3(0.2, 0.9, -1.5),
-    fov: 52,
+    pos: new THREE.Vector3(X_CENTRO + 1, 15, 79),
+    mira: new THREE.Vector3(X_CENTRO, -3.4, -1.5),
+    fov: 54,
   },
 };
 
 /**
  * El retrato de un Ent: el árbol entero, de raíz a copa, con su lección al pie.
  *
- * El objetivo se corre a la IZQUIERDA del árbol a propósito: así el guardián
- * queda en la mitad derecha del cuadro y no debajo de la carta de la lección,
- * que en pantalla ancha vive arriba a la izquierda. Un retrato con el sujeto
- * tapado por su propio texto no es un retrato.
+ * ── Por qué el sujeto va CENTRADO (y antes no) ─────────────────────────────
+ * La primera versión corría el objetivo casi dos metros a la izquierda para que
+ * el guardián quedara en la mitad derecha, lejos de la carta de la lección (que
+ * en pantalla ancha vive arriba a la izquierda). Con árboles parecidos eso
+ * funcionaba. Con la ceiba adentro, no: mide 9,6 y vive una terraza más abajo,
+ * así que al correr el encuadre hacia ella se metía entera en el retrato del
+ * roble Y MÁS GRANDE QUE EL ROBLE. El retrato dejaba de ser de quien decía la
+ * carta.
+ *
+ * Ahora el sujeto va al centro y el vecino se reparte a un lado. Al texto de la
+ * carta se le quitó grasa para que quepa en el cielo de arriba a la izquierda
+ * sin llegarle a la copa: la solución no era mover al árbol, era escribir más
+ * corto.
  */
 function vistaDeEnt(piso) {
   const ySuelo = alturaLadera(piso.x, piso.z);
   return {
-    mira: new THREE.Vector3(piso.x - 1.9, ySuelo + 4.4, piso.z),
-    pos: new THREE.Vector3(piso.x - 0.4, ySuelo + 7.2, piso.z + 19),
-    fov: 38,
+    mira: new THREE.Vector3(piso.x, ySuelo + 4.6, piso.z),
+    pos: new THREE.Vector3(piso.x + 0.7, ySuelo + 6.9, piso.z + 18.5),
+    fov: 37,
   };
 }
 
@@ -242,8 +269,11 @@ export default function TresEntsGradiente3D() {
      `usePerfilFincaStore` es el mismo store que ya siembra el valle
      (`EntradaValle3D.jsx`) — se rehidrata solo cuando el onboarding ubica la
      finca. Sin perfil, con el perfil de demo, o con un piso que aún no tiene
-     Ent (hoy 'calido'), `protagonistaDePiso` cae al default concreto
-     (templado): la regla del máximo-dos aplica igual, nunca a "mostrar todo". */
+     Ent, `protagonistaDePiso` cae al default concreto (templado): la regla
+     del máximo-dos aplica igual, nunca a "mostrar todo".
+     Desde el 2026-07-22 los CUATRO pisos tienen Ent tallado (entró la ceiba de
+     tierra caliente), así que un perfil de tierra caliente ya no cae al
+     default: le sale SU ceiba. */
   const perfilFinca = usePerfilFincaStore((s) => s.perfil);
   const protagonista = useMemo(
     () => protagonistaDePiso(perfilFinca?.pisoTermico),
@@ -291,37 +321,45 @@ export default function TresEntsGradiente3D() {
       className="teg-root"
       data-tier={tier}
       data-vista={vista}
-      aria-label="Los tres árboles maestros del gradiente andino"
+      aria-label="Los árboles maestros del gradiente andino"
     >
       <style>{CSS}</style>
       <Canvas
         className="teg-canvas"
         /* El fundido va en estilo EN LÍNEA, no en una clase: construir la
-           ladera y los tres Ents bloquea el hilo principal un momento y, con el
+           ladera y los Ents bloquea el hilo principal un momento y, con el
            fundido en clase, el navegador se queda con la opacidad en 0 mientras
            está bloqueado → la escena aparece VACÍA en la captura, con todo
            dibujado e invisible. Ya pasó en el bosque de los tres estratos. */
         style={{ opacity: listo ? 1 : 0, transition: 'opacity 0.9s ease' }}
         dpr={perfilRender.dpr}
         gl={{ antialias: perfilRender.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [0.8, 15.5, 34], fov: 40, near: 0.4, far: 240 }}
+        camera={{
+          position: [VISTAS.juntosAncho.pos.x, VISTAS.juntosAncho.pos.y, VISTAS.juntosAncho.pos.z],
+          fov: VISTAS.juntosAncho.fov,
+          near: 0.4,
+          far: 320,
+        }}
         shadows={!!perfilRender.sombras}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
         <color attach="background" args={[cielo.fondo]} />
         {/* La niebla empieza LEJOS: tiene que velar el fondo del valle, no la
-            ladera que uno está mirando. Con la niebla encima, los tres pisos se
+            ladera que uno está mirando. Con la niebla encima, los pisos se
             funden en un beige — que es lo contrario de lo que este mundo
-            existe para enseñar. */}
-        {perfilRender.fog && <fog attach="fog" args={[cielo.niebla, 42, 130]} />}
+            existe para enseñar.
+            Y ARRANCA MÁS LEJOS que antes (42→62): el bloque creció con la
+            terraza de la ceiba y la cámara se fue para atrás, así que con el
+            corte viejo la vista de teléfono llegaba velada de punta a punta. */}
+        {perfilRender.fog && <fog attach="fog" args={[cielo.niebla, 62, 215]} />}
 
         <LuzMadre
           cielo={CIELOS.ladera}
           perfil={perfilRender}
           /* El sol entra por el hombro derecho, del lado del páramo: la luz
              viene de arriba de la ladera y baja con el agua. Las sombras de los
-             tres Ents caen hacia el valle. */
+             Ents caen hacia el valle. */
           solPos={[19, 27, 13]}
           sombra={{ left: -22, right: 22, top: 22, bottom: -22, far: 96 }}
         />
@@ -344,9 +382,9 @@ export default function TresEntsGradiente3D() {
           /* El objetivo ARRANCA en la vista madre. Sin esto queda en el origen
              —dentro del bloque de tierra— y el primer cuadro que ve el usuario
              (y toda captura) sale mirando al piso. */
-          target={[0.3, 4.4, -1.5]}
+          target={[VISTAS.juntosAncho.mira.x, VISTAS.juntosAncho.mira.y, VISTAS.juntosAncho.mira.z]}
           minDistance={7}
-          maxDistance={88}
+          maxDistance={120}
           /* Se puede mirar hacia arriba (a las copas) pero no meterse bajo
              tierra: por debajo del bloque no hay nada que enseñar. */
           minPolarAngle={0.24}
@@ -366,15 +404,15 @@ export default function TresEntsGradiente3D() {
       <div className="teg-chrome">
         <div className="teg-cabeza">
           <h2 className="teg-titulo">
-            Los tres árboles maestros del gradiente
-            <small>Un Ent por piso térmico · el agua baja por encima, las micorrizas amarran por debajo</small>
+            Los árboles maestros del gradiente
+            <small>De la tierra caliente al páramo · el agua baja por encima, las micorrizas amarran por debajo</small>
           </h2>
 
           <Carta leccion={leccion} />
         </div>
 
         <div className="teg-pie">
-          <div className="teg-botones" role="group" aria-label="Los tres Ents del gradiente">
+          <div className="teg-botones" role="group" aria-label="Los Ents del gradiente">
             {BOTONES.map((b, i) => (
               <button
                 key={b.id}
