@@ -15,6 +15,10 @@ const SHOTS = process.argv.slice(3).map((a) => { const [ruta, name, click] = a.s
 // callado, y terminaba fotografiando LA APP DEL OTRO. Lo detectó un agente el
 // 2026-07-22 al ver que sus capturas "después" no eran de su escena.
 // Una captura del mundo equivocado es peor que ninguna: se aprueba arte ajeno.
+const OUT = process.env.GATE_OUT || `/tmp/gate-${process.pid}`;
+import { mkdirSync } from 'node:fs';
+mkdirSync(OUT, { recursive: true });
+console.log(`capturas -> ${OUT}`);
 const PORT = 8100 + (process.pid % 800);
 const BASE = `http://127.0.0.1:${PORT}`;
 const srv = spawn('python3', ['-m', 'http.server', String(PORT), '--bind', '127.0.0.1'], { cwd: DIST, stdio: 'ignore' });
@@ -103,7 +107,12 @@ for (const [name, route, click] of SHOTS) {
       process.exitCode = 1;
       continue;
     }
-    const f = `/tmp/gr-${name}.png`;
+    // CARPETA POR CORRIDA. Antes todos escribían a /tmp/gr-<nombre>.png y con
+    // varios agentes gateando a la vez se borraban las capturas entre ellos —
+    // pasó el 2026-07-22: un agente perdió su antes/después y otro se quedó sin
+    // la evidencia de su PR. La captura ES el entregable; perderla es perder el
+    // trabajo. El nombre de la carpeta se imprime para poder ir a buscarla.
+    const f = `${OUT}/gr-${name}.png`;
     await page.screenshot({ path: f, timeout: 60000 });
     console.log(`OK ${name} renderer="${gpu}" -> ${f}`);
   } catch (e) { console.log(`FAIL ${name}: ${String(e.message).slice(0, 90)}`); }
