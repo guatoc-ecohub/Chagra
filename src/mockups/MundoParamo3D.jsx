@@ -77,6 +77,7 @@ import {
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { CIELOS_HORA, mezclaHex } from '../visual/mundo3d/cielosHoraData.js';
 import { PALETA, mezclar } from '../visual/mundo3d/atmosferaMadre.js';
+import { NIEBLAS, LUCES, TIERRAS, VERDES } from '../visual/mundo3d/paleta/index.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
 import { crearRng } from '../visual/mundo3d/particulasData.js';
 
@@ -99,16 +100,42 @@ const ATMO = {
   relleno: mezclaHex(CIELOS_HORA.dorada.relleno, AZUL_HONDO, 0.5),
   niebla: mezclaHex(CIELOS_HORA.dorada.niebla, FRIO, 0.88), // la bruma, el alma de la escena
   sombra: mezclaHex(CIELOS_HORA.dorada.sombra, '#242f39', 0.62),
-  // luz de páramo encapotado: mucho ambiente, sol tenue (a menudo tras la nube)
-  hemisferio: 0.64,
-  ambiente: 0.46,
-  sol: 0.5,
-  rellenoInt: 0.34,
-  // la humedad cierra la distancia sin tragarse a la guardiana: la bruma es
-  // densa cerca pero deja LEER la silueta monumental de la queñua al fondo
-  nieblaCerca: 6,
-  nieblaLejos: 34,
+  /* Luz de páramo encapotado: mucho ambiente, sol velado. La receta es la MISMA
+     del kit (hemisferio + ambiente + sol + relleno frío); lo que cambia en la
+     pasada 4 es el REPARTO. Con el ambiente casi tan alto como el sol, la
+     escena quedaba sin dirección: todo igual de claro por todos lados, cero
+     modelado, cero contraluz. Se le devuelve peso a la direccional y se le
+     quita al ambiente — el mismo presupuesto, ahora con un lado iluminado y
+     otro en sombra, que es lo que le da bulto al frailejonal. */
+  hemisferio: 0.58,
+  ambiente: 0.33,
+  sol: 0.76,
+  rellenoInt: 0.3,
+  /* ══ PASADA 4 — LA BRUMA DEJA DE SER UNA PARED ══
+     Con la niebla cerrada a 34 m, el páramo terminaba a 34 m: un cuenco de 32
+     metros metido en una caja de leche. No había horizonte, ni cordillera, ni
+     cielo — y sin lejanía no hay monumentalidad, por muy alta que sea la
+     guardiana. La bruma se ABRE para que la meseta se degrade en la distancia,
+     y la densidad que se pierde aquí la devuelven las CORTINAS (bancos de
+     niebla que suben y bajan por capas): bruma con PROFUNDIDAD, no un plano
+     uniforme del mismo gris a todas las distancias. */
+  nieblaCerca: 9,
+  nieblaLejos: 52,
+  /* La dirección del sol la manda AHORA la mancha que se ve en el cielo, no un
+     número heredado. `CIELOS_HORA.dorada` lo pone al frente ([6, 9, 4]) — o sea
+     iluminando de cara y en desacuerdo con el sol velado, que ya se dibujaba
+     ATRÁS. Luz sin origen visible: justo lo que la lente Nolan prohíbe. Aquí el
+     sol está DETRÁS del cuenco y BAJO: de ahí sale el CONTRALUZ que enciende el
+     borde lanudo de cada roseta y tira las sombras hacia la cámara. */
+  solPos: [7.6, 5.6, -19],
 };
+/* El mismo vector, normalizado y llevado lejos: donde se DIBUJA la mancha del
+   sol velado. Luz y fuente, por fin, en el mismo sitio del cielo. */
+const SOL_LEJOS = (() => {
+  const [x, y, z] = ATMO.solPos;
+  const L = Math.hypot(x, y, z);
+  return /** @type {[number, number, number]} */ ([(x / L) * 168, (y / L) * 168, (z / L) * 168]);
+})();
 
 /* La paleta del framework, ahora entintada hacia la BRUMA FRÍA (no la dorada):
    el páramo es plateado y frío de suyo, y la pasada 2 lo lleva a su verdad
@@ -117,21 +144,48 @@ const ATMO = {
 const TINTE = ATMO.niebla;
 const P = {
   turba: mezclar('#3f3a2c', TINTE, 0.28), // suelo húmedo de turba negra, junto al agua
-  paja: mezclar('#bfa863', TINTE, 0.4), // pajonal (Calamagrostis), paja tostada
-  pajaSol: mezclar('#d8c584', TINTE, 0.34), // macolla donde se cuela la poca luz
+  /* El pajonal recupera su ORO. La Calamagrostis del páramo es paja tostada, y
+     ese amarillo terroso contra un cielo de plata fría es EL contraste de color
+     del paisaje — lo que hace que una foto de páramo se reconozca de un
+     vistazo. Entintado al 40% hacia la bruma, la meseta entera caía al mismo
+     gris del aire y la imagen se quedaba sin un solo acorde cálido. */
+  paja: mezclar('#bfa863', TINTE, 0.28), // pajonal (Calamagrostis), paja tostada
+  pajaSol: mezclar('#d8c584', TINTE, 0.22), // macolla donde se cuela la poca luz
   roca: mezclar('#8f9088', TINTE, 0.46), // afloramiento de roca, gris frío alto
   frailejonTallo: mezclar('#b0a27f', TINTE, 0.36), // tallo velludo (hoja marcescente)
   frailejonHoja: mezclar('#93a97f', TINTE, 0.4), // roseta plateada verde-salvia
   frailejonFlor: mezclar('#e6c24a', TINTE, 0.2), // los capítulos amarillos
   quenuaTronco: mezclar('#8a5236', TINTE, 0.34), // Polylepis: corteza rojiza papirosa
   quenuaHoja: mezclar('#7a9166', TINTE, 0.46), // copa plateada de páramo
-  musgo: mezclar('#5f8048', TINTE, 0.32), // cojín de musgo, la esponja del agua
-  musgoClaro: mezclar('#83a35a', TINTE, 0.3),
+  // el musgo del páramo NO es césped de jardín: es verde APAGADO con plata
+  // adentro (regla 1 de la paleta madre — a más altura, menos saturación). Los
+  // cojines saturados se leían como brócoli de plástico sobre la meseta gris.
+  musgo: mezclar('#5f8048', TINTE, 0.46), // cojín de musgo, la esponja del agua
+  musgoClaro: mezclar('#83a35a', TINTE, 0.44),
   piedra: mezclar(PALETA.piedra, TINTE, 0.42), // piedra fría del nacimiento
   agua: mezclar('#4f8fa8', ATMO.cielo, 0.4), // el agua que espeja el cielo frío
-  prado: mezclar('#79a058', TINTE, 0.34), // manchas de prado limpio (calibre Switch)
+  prado: mezclar('#79a058', TINTE, 0.52), // manchas de prado limpio (calibre Switch)
   sendero: mezclar('#b89a5f', TINTE, 0.22), // la tierra pisada del sendero (legible)
   piedraSendero: mezclar('#d3c9ad', TINTE, 0.26), // losas claras del camino
+  /* ══ PASADA 4 — los colores de la LEJANÍA ══
+     La perspectiva aérea es lo que convierte cuatro siluetas en una cordillera:
+     cuanto más lejos, más se lava el monte hacia el color del aire. Se derivan
+     por mezcla de la paleta madre (roca de páramo, bruma de páramo, horizonte),
+     nunca de un hex suelto. */
+  /* La cuchilla más cercana tiene que ser lo más OSCURO del horizonte: es el
+     ancla de valor del cuadro. A contraluz, un macizo a diez kilómetros se ve
+     casi negro-azul contra el cielo, y ese salto es lo que dice "hay mucho aire
+     entre usted y eso". Con la roca a medio tono, la cordillera se disolvía en
+     la misma papilla clara que la bruma y el páramo volvía a ser plano. */
+  cuchilla: mezclar(mezclar(TIERRAS.rocaParamo, ATMO.sombra, 0.62), AZUL_HONDO, 0.22),
+  // el cenit del páramo es HONDO: a 3.500 m hay menos aire encima, y el azul se
+  // vuelve casi tinta. Sin ese peso arriba, el cielo se lee como papel en blanco
+  // y el paisaje pierde la mitad de su fuerza.
+  cenit: mezclar(AZUL_HONDO, ATMO.sombra, 0.6),
+  horizonte: mezclar(mezclar(NIEBLAS.paramo, NIEBLAS.lechosa, 0.28), FRIO, 0.34), // la banda plateada del aire acostado
+  resplandor: mezclar(NIEBLAS.lechosa, LUCES.horizonte, 0.28), // el halo del sol velado
+  nube: mezclar(NIEBLAS.lechosa, ATMO.cielo, 0.08), // la lana del mar de nubes, arriba
+  nubeHonda: mezclar(NIEBLAS.paramo, ATMO.sombra, 0.44), // su vientre, en sombra honda
 };
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -231,6 +285,13 @@ function distHilo(wx, wz) {
 function alturaParamo(wx, wz) {
   let h = 1.2; // la meseta base, alta
   h += ruido(wx * 0.45, wz * 0.45) * 0.55; // ondulación suave del moor
+  /* EL COLCHÓN DE TURBERA (pasada 4): el suelo del páramo NO es un prado liso —
+     es una ESPONJA de cojines y macollas que se hunde al pisarla. Un batido de
+     dos senos cruzados de onda corta (~3 m, que la malla de todo tier resuelve
+     sin aliasing) le pone al terreno el bulto de los montículos de turba. Sin
+     esto, la meseta se lee como césped y la lección del agua pierde su razón:
+     lo que guarda el agua es precisamente ese colchón. */
+  h += Math.sin(wx * 2.05 + wz * 1.31) * Math.sin(wz * 1.87 - wx * 0.94) * 0.085;
   h += gauss(wx, wz, -10, -11, 5.6, 4.6) * 2.3; // cuchilla occidental
   h += gauss(wx, wz, 10, -12, 6.2, 4.4) * 2.8; // cuchilla oriental (más alta)
   h += gauss(wx, wz, 0, -15, 8.5, 3.6) * 1.7; // el fondo que cierra el cuenco
@@ -344,23 +405,531 @@ function LucesParamo() {
   );
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   PASADA 4 — EL PÁRAMO ESPECTACULAR: devolverle el MUNDO al cuenco.
+
+   Hasta aquí el páramo era honesto pero pequeño: una meseta de 32 metros con
+   una pared de niebla a 34. Todo lo que hacía falta para que se sintiera
+   MONUMENTAL estaba fuera de ese radio, y por eso no se sentía:
+
+     · el CIELO, que arriba de los 3.500 m es la mitad del cuadro;
+     · la CORDILLERA, que no se acaba nunca y se lava de azul con la distancia;
+     · el MAR DE NUBES, que a esta altura se mira HACIA ABAJO — la imagen que
+       de verdad dice "usted está muy arriba";
+     · el CONTRALUZ, que nace de una fuente que se ve;
+     · y una niebla que SUBE Y BAJA por capas en vez de estar plantada a una
+       sola distancia.
+
+   Nada de esto reemplaza lo que ya estaba bien resuelto (el frailejón
+   caulirrosulado, la guardiana, la turbera, la lección): se construye ALREDEDOR.
+   Todo lo lejano se dibuja SIN fog y con su color de perspectiva aérea ya
+   horneado — si lo dejáramos al fog, la bruma se lo comería entero y volvería
+   la caja de leche.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── EL CIELO ENORME: una bóveda con el degradé del páramo. Cenit alto y frío,
+      horizonte pálido donde el aire se acuesta, y un lóbulo de resplandor
+      alrededor del sol velado (por eso el cuadro tiene un LADO luminoso y otro
+      hondo, que es lo que le da volumen al aire). Color por vértice, material
+      básico: cero costo de luz, cero textura externa. ── */
+function construirBoveda(radio) {
+  const geo = new THREE.SphereGeometry(radio, 30, 20);
+  const pos = geo.attributes.position;
+  const col = new Float32Array(pos.count * 3);
+  const cCenit = new THREE.Color(P.cenit);
+  const cHorizonte = new THREE.Color(P.horizonte);
+  const cResplandor = new THREE.Color(P.resplandor);
+  const c = new THREE.Color();
+  const solN = new THREE.Vector3(...ATMO.solPos).normalize();
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.set(pos.getX(i), pos.getY(i), pos.getZ(i)).normalize();
+    // 1) el degradé vertical: pálido abajo, hondo arriba (no es lineal — el
+    //    cielo se aclara MUCHO más rápido cerca del horizonte)
+    /* El degradé tiene que CABER en el cuadro. Con la cámara casi a nivel, el
+       borde de arriba de la pantalla apenas llega a unos 20° de elevación: si el
+       azul hondo se reserva para el cenit, el cenit no sale nunca en pantalla y
+       el cielo se ve blanco de punta a punta. El peso del cielo se baja hasta
+       donde el ojo lo va a encontrar. */
+    c.copy(cHorizonte).lerp(cCenit, smoothstep(-0.01, 0.34, v.y) ** 0.9);
+    /* 2) el resplandor del sol velado. El lóbulo tiene que ser ESTRECHO: abierto
+       de par en par lava el cielo entero de blanco y se pierde el cenit hondo
+       que le da altura al páramo. Un halo apretado alrededor de la mancha —y el
+       resto del cielo con su peso— es lo que hace legible el contraluz. */
+    const haciaSol = clamp(v.dot(solN), 0, 1);
+    c.lerp(cResplandor, haciaSol ** 5.5 * (0.8 - smoothstep(0.1, 0.8, v.y) * 0.3));
+    col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  return geo;
+}
+
+function BovedaParamo() {
+  const geo = useMemo(() => construirBoveda(380), []);
+  useEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <mesh geometry={geo} renderOrder={-100} frustumCulled={false}>
+      <meshBasicMaterial vertexColors side={THREE.BackSide} depthWrite={false} fog={false} />
+    </mesh>
+  );
+}
+
+/* ── LA CORDILLERA QUE NO SE ACABA: cuatro anillos de cuchillas a distancias
+      crecientes. Cada capa se lava más hacia el color del aire (perspectiva
+      aérea) — ese lavado es LA herramienta con la que un paisaje dice "esto
+      sigue y sigue". Son siluetas planas a propósito: contra el cielo claro, el
+      páramo real se ve así, recortado y sin detalle. Un tris de degradé
+      vertical (falda honda, cresta besada por el cielo) les da el poco cuerpo
+      que necesitan. ── */
+/* Las capas se ESCALONAN en altura aparente (la de más atrás se ve más alta que
+   la de adelante, como en una cordillera de verdad, donde el macizo lejano es el
+   grande). Si todas asoman lo mismo se pisan en una sola banda y se pierde el
+   escalonado, que es justo lo que cuenta la distancia. Con cuchillas de once
+   metros el horizonte no eran montañas: eran lomas. */
+/* Las cuchillas se plantan LEJOS y con el pie HUNDIDO. La primera versión las
+   puso a 58 m con la base casi al nivel del ojo, y su faldón resultó ser un
+   muro opaco que ocupaba justo la franja donde tenía que verse el mar de nubes:
+   se tapaba a sí mismo el mejor hallazgo de la pasada. Un macizo se ve desde un
+   páramo con el valle —y su nube— DELANTE, no pegado a la nariz. */
+const CORDILLERA = [
+  { r: 88, base: -8, alto: 17.1, picos: 7, semilla: 11, aire: 0.1 },
+  { r: 140, base: -11, alto: 26.9, picos: 6, semilla: 29, aire: 0.32 },
+  { r: 200, base: -14, alto: 39.9, picos: 5, semilla: 47, aire: 0.53 },
+  { r: 258, base: -17, alto: 50.6, picos: 5, semilla: 71, aire: 0.72 },
+];
+function construirCuchillas(capa, segs = 150) {
+  const { r, base, alto, picos: nPicos, semilla } = capa;
+  const rng = crearRng(semilla);
+  const picos = Array.from({ length: nPicos }, () => ({
+    a: rng() * Math.PI * 2,
+    w: 0.16 + rng() * 0.3,
+    h: 0.5 + rng() * 0.6,
+  }));
+  const perfil = (a) => {
+    let h = 0.3 + 0.14 * Math.sin(a * 3.1 + semilla) + 0.09 * Math.sin(a * 6.7 - semilla * 0.3);
+    for (const p of picos) {
+      // distancia angular por el camino corto (la cordillera cierra el anillo)
+      let d = Math.abs(a - p.a);
+      if (d > Math.PI) d = Math.PI * 2 - d;
+      h += p.h * Math.exp(-(d * d) / (2 * p.w * p.w));
+    }
+    return Math.max(0.08, h) * alto;
+  };
+  const pos = [];
+  const col = [];
+  const cCresta = new THREE.Color(mezclar(P.cuchilla, P.horizonte, capa.aire));
+  const cFalda = new THREE.Color(mezclar(P.cuchilla, P.horizonte, Math.max(0, capa.aire - 0.16)));
+  const empujar = (x, y, z, c) => { pos.push(x, y, z); col.push(c.r, c.g, c.b); };
+  for (let i = 0; i < segs; i++) {
+    const a0 = (i / segs) * Math.PI * 2;
+    const a1 = ((i + 1) / segs) * Math.PI * 2;
+    const x0 = Math.sin(a0) * r, z0 = -Math.cos(a0) * r;
+    const x1 = Math.sin(a1) * r, z1 = -Math.cos(a1) * r;
+    const h0 = base + perfil(a0), h1 = base + perfil(a1);
+    // dos triángulos por segmento, sin índice (el gotcha de mergeGeometries no
+    // muerde donde nunca hay índice que mezclar)
+    // el faldón baja lo justo para que no se le vea el pie: más abajo solo sería
+    // muro tapando el valle donde vive la nube
+    empujar(x0, base - 13, z0, cFalda); empujar(x1, base - 13, z1, cFalda); empujar(x0, h0, z0, cCresta);
+    empujar(x1, base - 13, z1, cFalda); empujar(x1, h1, z1, cCresta); empujar(x0, h0, z0, cCresta);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 3));
+  return g;
+}
+function Cordillera() {
+  const geos = useMemo(() => CORDILLERA.map((c) => construirCuchillas(c)), []);
+  useEffect(() => () => geos.forEach((g) => g.dispose()), [geos]);
+  return (
+    <group>
+      {geos.map((g, i) => (
+        <mesh key={i} geometry={g} renderOrder={-90 + i} frustumCulled={false}>
+          {/* SÍ escribe profundidad: así el mar de nubes se mete DELANTE de las
+              cuchillas lejanas y DETRÁS de las cercanas, como un mar de verdad */}
+          <meshBasicMaterial vertexColors side={THREE.DoubleSide} fog={false} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* ── EL MAR DE NUBES: a esta altura las nubes no están arriba — están ABAJO,
+      llenando los valles hasta el filo de las cuchillas. Mirar nubes hacia
+      abajo es la prueba física de que uno está muy alto, y ninguna otra imagen
+      lo dice tan rápido. Un banco instanciado de lana aplastada (1 draw call)
+      que deriva despacio en redondo, con un vientre más hondo debajo para que
+      el banco tenga espesor y no sea una calcomanía. ── */
+function MarDeNubes({ n, reducedMotion }) {
+  const alto = useRef(null);
+  const hondo = useRef(null);
+  const giro = useRef(null);
+  const sitios = useMemo(() => {
+    const rng = crearRng(577);
+    return Array.from({ length: n }, () => {
+      const a = rng() * Math.PI * 2;
+      // el mar arranca justo donde la meseta se despeña (r≈38) y se estira hasta
+      // el pie de las cuchillas: si empieza demasiado lejos se lee como una
+      // franja delgada pegada al horizonte, no como un valle lleno de nubes
+      const r = 38 + rng() * rng() * 170;
+      return {
+        x: Math.sin(a) * r,
+        z: -Math.cos(a) * r,
+        /* La cota del mar de nubes es la decisión de encuadre más delicada de
+           toda la pasada: si queda muy abajo, el hombro de la montaña se lo
+           traga y no se ve nada; si queda muy arriba, deja de ser un mar por
+           DEBAJO y se vuelve un cielo nublado corriente. Va justo por debajo de
+           la línea del horizonte, llenando el valle entre el filo y las
+           cuchillas — que es donde el páramo real lo tiene al amanecer. */
+        y: -4.6 + rng() * 4.4,
+        ancho: 16 + rng() * 32,
+        grueso: 2.6 + rng() * 4.2,
+        fondo: 12 + rng() * 24,
+        giro: rng() * Math.PI,
+        claro: rng(),
+      };
+    });
+  }, [n]);
+  useEffect(() => {
+    const ma = alto.current, mh = hondo.current;
+    if (!ma || !mh) return;
+    const dummy = new THREE.Object3D();
+    const tinte = new THREE.Color();
+    const cNube = new THREE.Color(P.nube);
+    const cSol = new THREE.Color(P.resplandor);
+    const cHondo = new THREE.Color(P.nubeHonda);
+    const solN = new THREE.Vector3(...ATMO.solPos).normalize();
+    const dir = new THREE.Vector3();
+    sitios.forEach((s, i) => {
+      dummy.position.set(s.x, s.y, s.z);
+      dummy.rotation.set(0, s.giro, 0);
+      dummy.scale.set(s.ancho, s.grueso, s.fondo);
+      dummy.updateMatrix();
+      ma.setMatrixAt(i, dummy.matrix);
+      // las nubes del lado del sol se encienden; las opuestas quedan hondas —
+      // el mismo contraluz que baña el frailejonal, ahora a escala de valle
+      dir.set(s.x, 6, s.z).normalize();
+      tinte.copy(cNube).lerp(cSol, clamp(dir.dot(solN), 0, 1) ** 1.7 * 0.85);
+      ma.setColorAt(i, tinte);
+      /* El VIENTRE es lo que hace visible al mar de nubes. Una nube toda del
+         mismo pálido se confunde con la banda del horizonte y desaparece; lo
+         que se ve desde arriba es el CONTRASTE entre el lomo encendido y la
+         panza en sombra. Por eso el vientre baja bien oscuro. */
+      dummy.position.set(s.x, s.y - s.grueso * 0.72, s.z);
+      dummy.scale.set(s.ancho * 1.12, s.grueso * 0.82, s.fondo * 1.12);
+      dummy.updateMatrix();
+      mh.setMatrixAt(i, dummy.matrix);
+      tinte.copy(cHondo).lerp(cNube, 0.06 + s.claro * 0.14);
+      mh.setColorAt(i, tinte);
+    });
+    ma.instanceMatrix.needsUpdate = true;
+    mh.instanceMatrix.needsUpdate = true;
+    if (ma.instanceColor) ma.instanceColor.needsUpdate = true;
+    if (mh.instanceColor) mh.instanceColor.needsUpdate = true;
+  }, [sitios]);
+  useFrame(({ clock }) => {
+    // el banco entero rota despacísimo: el mar de nubes se mueve, pero a la
+    // velocidad de un mar, no de una cortina de humo
+    if (!reducedMotion && giro.current) giro.current.rotation.y = clock.elapsedTime * 0.0055;
+  });
+  return (
+    <group ref={giro}>
+      {/* el color va por INSTANCIA (`setColorAt`), no por vértice: la esfera no
+          trae atributo de color y pedir `vertexColors` la dejaría negra */}
+      <instancedMesh ref={hondo} args={[undefined, undefined, sitios.length]} frustumCulled={false} renderOrder={-81}>
+        <sphereGeometry args={[0.5, 9, 6]} />
+        <meshBasicMaterial fog={false} />
+      </instancedMesh>
+      <instancedMesh ref={alto} args={[undefined, undefined, sitios.length]} frustumCulled={false} renderOrder={-80}>
+        <sphereGeometry args={[0.5, 9, 6]} />
+        <meshBasicMaterial fog={false} />
+      </instancedMesh>
+    </group>
+  );
+}
+
+/* ── LA FALDA DEL PÁRAMO: la meseta no termina en el borde de la maqueta. Un
+      anillo que sale del cuadro, se desploma por el hombro de la montaña y se
+      hunde en el mar de nubes. Lleva el mismo pajonal en el filo y se lava
+      hacia el aire en el borde, así que la vista no encuentra nunca una
+      frontera — solo bruma. ── */
+const FALDA_R0 = 12, FALDA_R1 = 132;
+/* El radio y la altura de la falda, en función del paso `t` (0 = filo de la
+   maqueta, 1 = el fondo del despeñadero). Vive aparte porque el frailejonal del
+   horizonte tiene que sembrarse sobre ESTA misma piel: si cada uno calcula su
+   cota por su lado, las plantas terminan flotando o enterradas. */
+const faldaRadio = (t) => FALDA_R0 + (FALDA_R1 - FALDA_R0) * t ** 2.4;
+function faldaAltura(t, wx, wz) {
+  /* EL HOMBRO DE LA MONTAÑA: la meseta aguanta un trecho más allá del cuadro y
+     después SE DESPEÑA. Ese quiebre es lo que abre el hueco por donde se ve el
+     mar de nubes: sin caída no hay borde del mundo, y sin borde del mundo la
+     meseta se lee como una llanura sin fin, que es lo contrario de estar alto. */
+  const caida = -31 * smoothstep(0.3, 0.8, t) ** 1.25;
+  /* El relieve propio de la falda entra con el MISMO desvanecido que la mezcla:
+     si el terreno arruga desde el primer anillo, la falda se levanta medio metro
+     sobre la maqueta justo en la costura y aparece una plancha oscura tapando el
+     primer plano — que es exactamente lo que pasó. Cerca: cero arruga propia. */
+  const m = smoothstep(0.0, 0.3, t);
+  const propia = 1.15 + caida + ruido(wx * 0.09, wz * 0.09) * (0.5 + t * 7) * m;
+  /* LA COSTURA. El anillo interior arranca DENTRO del cuadrado de la maqueta y
+     copia su misma cota (`alturaParamo`), fundiéndose con la fórmula propia a
+     medida que se aleja. Empatar "más o menos" no sirve: un escalón de medio
+     metro en el borde se lee como una repisa flotando en mitad del páramo —y se
+     ve sobre todo en vertical, donde la cámara retrocede y mira la juntura de
+     frente. Así la falda no empieza en ninguna parte: es la meseta que sigue.
+     El descuento de un palmo evita que las dos mallas peleen el z. */
+  return (alturaParamo(wx, wz) - 0.12) * (1 - m) + propia * m;
+}
+function construirFalda(anillos = 18, segs = 92) {
+  const pos = new Float32Array((anillos + 1) * (segs + 1) * 3);
+  const col = new Float32Array((anillos + 1) * (segs + 1) * 3);
+  // el filo lleva la MISMA mezcla que la meseta de la maqueta (pajonal con su
+  // mota de prado): si arranca en paja pura se ve el escalón de color
+  const cFilo = new THREE.Color(mezclar(P.paja, P.prado, 0.3));
+  const cRoca = new THREE.Color(P.roca);
+  const cAire = new THREE.Color(mezclar(P.cuchilla, P.horizonte, 0.42));
+  const c = new THREE.Color();
+  let p = 0;
+  for (let ia = 0; ia <= anillos; ia++) {
+    const t = ia / anillos;
+    const r = faldaRadio(t); // se estira: más resolución donde el ojo la lee
+    for (let is = 0; is <= segs; is++) {
+      const a = (is / segs) * Math.PI * 2;
+      const wx = Math.sin(a) * r, wz = -Math.cos(a) * r;
+      pos[p] = wx; pos[p + 1] = faldaAltura(t, wx, wz); pos[p + 2] = wz;
+      c.copy(cFilo).lerp(cRoca, smoothstep(0.05, 0.45, t));
+      c.lerp(cAire, smoothstep(0.2, 0.85, t) * 0.9); // la ladera se hunde en el aire
+      col[p] = c.r; col[p + 1] = c.g; col[p + 2] = c.b;
+      p += 3;
+    }
+  }
+  const idx = [];
+  const nx = segs + 1;
+  for (let ia = 0; ia < anillos; ia++) {
+    for (let is = 0; is < segs; is++) {
+      const a = ia * nx + is, b = a + 1, d = a + nx, e = d + 1;
+      idx.push(a, d, b, b, d, e);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  g.setIndex(idx);
+  const plano = g.toNonIndexed();
+  g.dispose();
+  plano.computeVertexNormals();
+  return plano;
+}
+function FaldaParamo() {
+  const geo = useMemo(() => construirFalda(), []);
+  useEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <mesh geometry={geo} renderOrder={-70} frustumCulled={false}>
+      {/* CON fog, a diferencia del resto de la lejanía: la falda es SUELO y
+          tiene que empalmar sin costura con la meseta de la maqueta y disolverse
+          en la misma bruma. La cordillera y las nubes van sin fog porque están
+          más allá de la bruma; la ladera está DENTRO. */}
+      <meshLambertMaterial vertexColors flatShading />
+    </mesh>
+  );
+}
+
+/* ── EL FRAILEJONAL QUE LLEGA AL HORIZONTE: la colonia no se acaba donde acaba
+      la maqueta. Un segundo rodal instanciado sobre la falda —misma silueta
+      firmada (tallo con enagua + roseta radiante), reusada, no duplicada— que
+      se pierde en la bruma. Es la diferencia entre "hay frailejones" y "esto es
+      un FRAILEJONAL": la repetición hasta donde el ojo alcanza. ── */
+function FrailejonalHorizonte({ n }) {
+  const tallos = useRef(null);
+  const rosetas = useRef(null);
+  const geoTallo = useMemo(() => geomTalloEnaguaFrai(), []);
+  const geoRoseta = useMemo(() => geomRosetaFrai(), []);
+  useEffect(() => () => { geoTallo.dispose(); geoRoseta.dispose(); }, [geoTallo, geoRoseta]);
+  const sitios = useMemo(() => {
+    const rng = crearRng(881);
+    const lista = [];
+    let intentos = 0;
+    while (lista.length < n && intentos < n * 8) {
+      intentos += 1;
+      const a = rng() * Math.PI * 2;
+      // se siembra por PASO de la falda (no por radio): así la cota sale de la
+      // misma fórmula que la malla y ninguna planta queda flotando ni enterrada
+      // arranca DESPUÉS del cuadrado de la maqueta (ahí ya siembra el rodal de
+      // cerca): apretado en el filo, ralo hacia el hombro de la montaña
+      const t = 0.17 + rng() * rng() * 0.46;
+      const r = faldaRadio(t);
+      const wx = Math.sin(a) * r, wz = -Math.cos(a) * r;
+      /* EL CORREDOR DE LA CÁMARA. El rodal lejano rodea la meseta entera, y
+         parte de ese anillo cae ENTRE la cámara y el páramo: un frailejón
+         sembrado a cinco metros del ojo se ve de diez pisos y tapa el cuadro.
+         Se despeja una burbuja alrededor del puesto de la cámara — el rodal
+         sigue siendo un anillo completo, pero nadie se para en el lente. */
+      if (Math.hypot(wx - CAM_LIBRE[0], wz - CAM_LIBRE[2]) < 17) continue;
+      const y = faldaAltura(t, wx, wz);
+      if (y < -3.2) continue; // en el despeñadero ya no crece frailejón
+      const esc = 0.7 + rng() * 0.8;
+      lista.push({ wx, wz, y, esc, alto: 0.5 + rng() * 1.7, giro: rng() * Math.PI * 2, ladeo: (rng() - 0.5) * 0.22 });
+    }
+    return lista;
+  }, [n]);
+  useEffect(() => {
+    const mt = tallos.current, mr = rosetas.current;
+    if (!mt || !mr) return;
+    const dummy = new THREE.Object3D();
+    sitios.forEach((s, i) => {
+      const stemH = s.esc * s.alto;
+      dummy.position.set(s.wx, s.y, s.wz);
+      dummy.rotation.set(s.ladeo, s.giro, 0);
+      dummy.scale.set(s.esc, Math.max(stemH, 0.02), s.esc);
+      dummy.updateMatrix();
+      mt.setMatrixAt(i, dummy.matrix);
+      dummy.position.set(s.wx, s.y + stemH + 0.02 * s.esc, s.wz);
+      dummy.rotation.set(s.ladeo * 0.5, s.giro * 1.3, 0);
+      dummy.scale.set(s.esc, s.esc, s.esc);
+      dummy.updateMatrix();
+      mr.setMatrixAt(i, dummy.matrix);
+    });
+    mt.instanceMatrix.needsUpdate = true;
+    mr.instanceMatrix.needsUpdate = true;
+  }, [sitios]);
+  return (
+    <group>
+      <instancedMesh ref={tallos} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
+        <primitive object={geoTallo} attach="geometry" />
+        <meshLambertMaterial flatShading vertexColors />
+      </instancedMesh>
+      <instancedMesh ref={rosetas} args={[undefined, undefined, sitios.length]} frustumCulled={false}>
+        <primitive object={geoRoseta} attach="geometry" />
+        <meshLambertMaterial flatShading vertexColors />
+      </instancedMesh>
+    </group>
+  );
+}
+
+/* ── LAS CORTINAS DE NIEBLA: la bruma con PROFUNDIDAD. Antes la niebla era un
+      valor de `fog`: la misma densidad a la misma distancia, siempre, en todo
+      el cuadro — un plano uniforme. La niebla real del páramo viene en BANCOS
+      que suben del hondón, tapan un cerro, lo destapan y siguen. Estas cortinas
+      son telones anchos a distintas profundidades que suben y bajan desfasados:
+      la guardiana se vela y se revela, las cuchillas aparecen y desaparecen. La
+      textura es un canvas procedural (cero assets externos). ── */
+function texturaCortina() {
+  if (typeof document === 'undefined') return null;
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 96;
+  const g = c.getContext('2d');
+  if (!g) return null;
+  g.fillStyle = 'rgba(255,255,255,0)';
+  g.fillRect(0, 0, 256, 96);
+  // lóbulos blandos: la niebla se amontona a manchones, no en franja pareja
+  const rng = crearRng(313);
+  for (let i = 0; i < 22; i++) {
+    const x = rng() * 256;
+    const y = 26 + rng() * 52;
+    const r = 22 + rng() * 46;
+    const gr = g.createRadialGradient(x, y, 0, x, y, r);
+    gr.addColorStop(0, `rgba(255,255,255,${0.3 + rng() * 0.3})`);
+    gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr;
+    g.beginPath();
+    g.arc(x, y, r, 0, Math.PI * 2);
+    g.fill();
+  }
+  // y se acuesta: densa abajo, deshilachada arriba
+  const gv = g.createLinearGradient(0, 0, 0, 96);
+  gv.addColorStop(0, 'rgba(255,255,255,0)');
+  gv.addColorStop(0.42, 'rgba(255,255,255,1)');
+  gv.addColorStop(0.8, 'rgba(255,255,255,0.85)');
+  gv.addColorStop(1, 'rgba(255,255,255,0)');
+  g.globalCompositeOperation = 'destination-in';
+  g.fillStyle = gv;
+  g.fillRect(0, 0, 256, 96);
+  /* Y los COSTADOS también se deshilachan. Sin esto el telón enseña sus dos
+     bordes verticales y lo que debía ser un banco de niebla se lee como una
+     lámina rectangular pegada al paisaje — el delator número uno del truco. */
+  const gh = g.createLinearGradient(0, 0, 256, 0);
+  gh.addColorStop(0, 'rgba(255,255,255,0)');
+  gh.addColorStop(0.22, 'rgba(255,255,255,1)');
+  gh.addColorStop(0.78, 'rgba(255,255,255,1)');
+  gh.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gh;
+  g.fillRect(0, 0, 256, 96);
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = THREE.RepeatWrapping;
+  return tex;
+}
+
+/* Cada telón: su profundidad, su vaivén y su fase. Los de atrás son enormes y
+   lentos (velan la cordillera); los de adelante, más chicos y vivos. */
+/* Los telones se quedan BAJOS y a media densidad: son bancos de niebla pegados
+   al relieve, no una gasa colgada delante de la cámara. El de más atrás llegaba
+   tan alto y tan opaco que velaba la cordillera entera y borraba el mar de
+   nubes — justo lo que la pasada vino a mostrar. */
+const CORTINAS = [
+  { z: -44, y: 0.4, ancho: 132, alto: 15, op: 0.19, sube: 4.0, vel: 0.052, fase: 0.0 },
+  { z: -26, y: 0.2, ancho: 78, alto: 12, op: 0.18, sube: 3.2, vel: 0.071, fase: 1.9 },
+  { z: -13, y: 0.0, ancho: 52, alto: 10, op: 0.17, sube: 2.4, vel: 0.094, fase: 3.4 },
+  { z: 2, y: -0.2, ancho: 44, alto: 8, op: 0.15, sube: 2.0, vel: 0.118, fase: 5.1 },
+  { z: 12, y: -0.4, ancho: 40, alto: 7, op: 0.13, sube: 1.6, vel: 0.142, fase: 0.9 },
+];
+function CortinasNiebla({ reducedMotion, cuantas }) {
+  const grupo = useRef(null);
+  const tex = useMemo(() => texturaCortina(), []);
+  useEffect(() => () => { if (tex) tex.dispose(); }, [tex]);
+  const telones = useMemo(() => CORTINAS.slice(0, cuantas), [cuantas]);
+  useFrame(({ clock }) => {
+    if (reducedMotion || !grupo.current) return;
+    const t = clock.elapsedTime;
+    grupo.current.children.forEach((m, i) => {
+      const c = telones[i];
+      // SUBE Y BAJA: el banco de niebla trepa la ladera y vuelve a caer
+      m.position.y = c.y + Math.sin(t * c.vel * Math.PI * 2 * 0.16 + c.fase) * c.sube;
+      // y respira de densidad, desfasado del vaivén (nunca los dos a la vez)
+      m.material.opacity = c.op * (0.62 + 0.38 * Math.sin(t * c.vel * 1.7 + c.fase * 1.4));
+    });
+  });
+  if (!tex) return null;
+  return (
+    <group ref={grupo} renderOrder={-40}>
+      {telones.map((c, i) => (
+        <mesh key={i} position={[0, c.y, c.z]} renderOrder={-40 + i} frustumCulled={false}>
+          <planeGeometry args={[c.ancho, c.alto]} />
+          <meshBasicMaterial
+            map={tex}
+            color={mezclar(ATMO.niebla, P.horizonte, 0.45)}
+            transparent
+            opacity={c.op}
+            depthWrite={false}
+            side={THREE.DoubleSide}
+            fog={false}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 /* El sol VELADO del páramo: no un disco franco, sino una mancha pálida y fría
    difuminada tras la niebla — apenas se adivina dónde está detrás de la nube.
-   No ilumina (de eso se encargan las luces); es el ancla del cielo encapotado. */
+   No ilumina (de eso se encargan las luces), pero SÍ manda: la direccional
+   principal sale exactamente de aquí (`ATMO.solPos`), así que lo que el ojo ve
+   como fuente es de verdad la fuente. Está lejos y bajo, detrás de las
+   cuchillas: de ahí el contraluz. */
 function SolVelado() {
   return (
-    <group position={[8, 8.5, -14]}>
+    <group position={SOL_LEJOS} renderOrder={-85}>
       <mesh>
-        <circleGeometry args={[1.9, 40]} />
-        <meshBasicMaterial color="#eaf1f5" transparent opacity={0.5} depthWrite={false} side={THREE.DoubleSide} />
+        <circleGeometry args={[7.5, 40]} />
+        <meshBasicMaterial color={NIEBLAS.lechosa} transparent opacity={0.72} depthWrite={false} fog={false} side={THREE.DoubleSide} />
       </mesh>
-      <mesh position={[0, 0, -0.05]}>
-        <circleGeometry args={[3.6, 40]} />
-        <meshBasicMaterial color={ATMO.luz} transparent opacity={0.16} depthWrite={false} side={THREE.DoubleSide} />
+      <mesh position={[0, 0, -0.4]}>
+        <circleGeometry args={[17, 40]} />
+        <meshBasicMaterial color={P.resplandor} transparent opacity={0.24} depthWrite={false} fog={false} side={THREE.DoubleSide} />
       </mesh>
-      <mesh position={[0, 0, -0.1]}>
-        <circleGeometry args={[6.4, 40]} />
-        <meshBasicMaterial color={ATMO.cielo} transparent opacity={0.1} depthWrite={false} side={THREE.DoubleSide} />
+      <mesh position={[0, 0, -0.8]}>
+        <circleGeometry args={[33, 40]} />
+        <meshBasicMaterial color={P.horizonte} transparent opacity={0.12} depthWrite={false} fog={false} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
@@ -1215,8 +1784,11 @@ function AvesParamo({ n }) {
       const condor = i === 0;
       return {
         condor,
-        radio: condor ? 9 : 4 + rng() * 3,
-        altura: condor ? 8.5 : 4 + rng() * 2.5,
+        // el cóndor se va ARRIBA y LEJOS: contra el cielo grande y la cordillera
+        // es otra vara de medir — un ave enorme que aun así se ve pequeña dice
+        // el tamaño del páramo mejor que cualquier rótulo
+        radio: condor ? 17 : 4 + rng() * 3,
+        altura: condor ? 14.5 : 4 + rng() * 2.5,
         cx: (rng() - 0.5) * 5,
         cz: -5 + (rng() - 0.5) * 5,
         vel: condor ? 0.12 : 0.28 + rng() * 0.18,
@@ -1667,7 +2239,10 @@ function RocioFrio({ tier, reducedMotion, semilla = 17 }) {
    con la trompa en periscopio (su seña-firma) y REPOSA respirando hondo.
    Nunca el mismo gesto dos veces seguidas. reduced-motion / tier bajo =
    quieta y digna en su puesto (el fotograma manda, ni un timer vivo). */
-const DANTA_POS = [4.6, alturaParamo(4.6, 4.2) + 0.85, 4.2]; // el claro del frailejonal, al frente-derecha
+/* La danta se corre al claro del frailejonal de la derecha. Plantada al pie del
+   tajo de la lección, la mole y el cajón de la vitrina se leían como una sola
+   cosa —un animal parado junto a una caja— en vez de fauna en su monte. */
+const DANTA_POS = [6.4, alturaParamo(6.4, 7.8) + 0.85, 7.8];
 const VIDA_DANTA = {
   primero: 'pasea', // abre caminando: lo primero que se ve es que VIVE
   descanso: [6000, 13000],
@@ -1827,10 +2402,14 @@ function texturaHaz() {
   c.height = 256;
   const g = c.getContext('2d');
   if (!g) return null;
-  // vertical: nace pleno arriba y se disuelve hacia el suelo
+  /* Vertical: el haz NACE del aire y MUERE en el aire. Con el borde de arriba a
+     tope (0.9) el quad se recortaba en seco contra el cielo y se leía como una
+     barra blanca pegada encima del paisaje — no como luz. Un haz de verdad no
+     tiene principio: se abre desde la nada. */
   const gv = g.createLinearGradient(0, 0, 0, 256);
-  gv.addColorStop(0, 'rgba(255,255,255,0.9)');
-  gv.addColorStop(0.6, 'rgba(255,255,255,0.32)');
+  gv.addColorStop(0, 'rgba(255,255,255,0)');
+  gv.addColorStop(0.16, 'rgba(255,255,255,0.72)');
+  gv.addColorStop(0.62, 'rgba(255,255,255,0.28)');
   gv.addColorStop(1, 'rgba(255,255,255,0)');
   g.fillStyle = gv;
   g.fillRect(0, 0, 64, 256);
@@ -1857,12 +2436,20 @@ function RayosDeLuz({ n, reducedMotion }) {
       return {
         x: sobreEnt ? ENT_X + 0.5 : (rng() - 0.5) * 17,
         z: sobreEnt ? ENT_Z + 1.2 : -7 + rng() * 12,
-        top: 10.8 + rng() * 2.5,
-        alto: sobreEnt ? 12.5 : 8.5 + rng() * 3.5,
+        /* Los haces se quedan ABAJO, dentro de la bruma que es lo que los hace
+           visibles. Subidos hasta el borde del cuadro y sumando siete capas
+           aditivas, lo que hacían era blanquear el cielo entero: el páramo
+           perdía su cenit hondo y con él la sensación de altura. Un rayo se ve
+           en el aire cargado de humedad, no en el azul limpio de arriba. */
+        top: 8.4 + rng() * 1.8,
+        alto: sobreEnt ? 10.5 : 7 + rng() * 3,
         ancho: sobreEnt ? 3.2 : 1.1 + rng() * 1.5,
-        tilt: -0.1 - rng() * 0.1, // la copa del haz se ladea hacia el sol velado
-        giro: -0.3 + rng() * 0.6,
-        op: sobreEnt ? 0.38 : 0.2 + rng() * 0.12,
+        /* Todos los haces se inclinan del MISMO lado y hacia el sol velado: son
+           rayos de UNA fuente, no palos sueltos. Antes cada uno se ladeaba a su
+           antojo y el ojo no podía trazarlos de vuelta a ningún sitio. */
+        tilt: 0.2 + rng() * 0.07,
+        giro: -0.16 + rng() * 0.3,
+        op: sobreEnt ? 0.22 : 0.09 + rng() * 0.07,
         fase: rng() * Math.PI * 2,
         vel: 0.25 + rng() * 0.3,
       };
@@ -1973,9 +2560,20 @@ function QuenuaGuardiana({ tier, reducedMotion }) {
   );
 }
 
-/* ══ CÁMARAS DE LA ESCENA ══ */
-const CAM_LIBRE = /** @type {[number, number, number]} */ ([0, 6.1, 17.0]);
-const MIRADA_LIBRE = /** @type {[number, number, number]} */ ([0, 1.8, 1.3]);
+/* ══ CÁMARAS DE LA ESCENA ══
+   EL ENCUADRE (pasada 4). El plano general viejo miraba el páramo desde arriba
+   y de frente: la guardiana partía el cuadro por la mitad, el cielo no existía
+   y todo el aire del mundo quedaba fuera de campo. El nuevo baja la cámara
+   hasta casi el nivel del horizonte y la corre al oriente, así que:
+     · el CIELO y la cordillera se quedan con la mitad de arriba (que es lo que
+       hace grande a un paisaje: cuánto aire hay encima de la tierra);
+     · la guardiana sale del centro y se asienta a la derecha del eje;
+     · el frailejonal barre en diagonal hacia la caminante, que ancla la escala
+       abajo a la izquierda;
+     · y el tajo de la lección se va al borde, donde deja de ser un cajón gris
+       en mitad del páramo. */
+const CAM_LIBRE = /** @type {[number, number, number]} */ ([5.6, 4.9, 21.5]);
+const MIRADA_LIBRE = /** @type {[number, number, number]} */ ([-1.0, 4.2, -0.6]);
 const CARA_GUARDIANA = /** @type {[number, number, number]} */ ([ENT_X, Y_ENT + 2.35, ENT_Z]);
 /* Encuadre de la lección: cámara casi HORIZONTAL a media altura del corte (la
    cara frontal de las capas debe LEERSE de frente, no en picada) con el rostro
@@ -1987,21 +2585,51 @@ const CAM_LECCION = /** @type {[number, number, number]} */ ([CORTE_WX + 1.6, Y_
 const MIRADA_LECCION = /** @type {[number, number, number]} */ ([CORTE_WX - 0.6, Y_TAPA - 2.4, CORTE_WZ]);
 const _miradaTmp = new THREE.Vector3();
 
+/* ── EL ENCUADRE EN VERTICAL (pasada 4) — por qué el páramo no cabía en un
+      teléfono. El `fov` de una cámara en perspectiva es VERTICAL: en una
+      pantalla de 390×844 el campo horizontal se estrecha a menos de la mitad
+      que en 1280×800, y con eso el plano general dejaba de existir — el tronco
+      de la guardiana llenaba la pantalla y del páramo no quedaba nada. No es un
+      capricho del móvil: es geometría, y hay que compensarla. Se abre el `fov`
+      y se retrocede la cámara según la relación de aspecto, con tope (un `fov`
+      sin freno deforma el paisaje en ojo de pez y eso sería peor). ── */
+const ASPECTO_REF = 1.6; // el encuadre se compuso en ancho: esta es su casa
+function encuadrePorAspecto(ancho, alto) {
+  const aspecto = alto > 0 ? ancho / alto : ASPECTO_REF;
+  const falta = clamp(ASPECTO_REF / Math.max(aspecto, 0.2), 1, 3.6);
+  const fov = 42 * clamp(1 + (falta - 1) * 0.3, 1, 1.52); // hasta ~64°, no más
+  /* El paso atrás va MUY medido: pasado el borde de la maqueta, la cámara se
+     asoma a la juntura entre el terreno y la falda y se le ve la costura al
+     mundo. El campo lo abre el `fov`; el retroceso solo termina de acomodar. */
+  const atras = clamp(1 + (falta - 1) * 0.06, 1, 1.14);
+  const o = /** @type {[number, number, number]} */ ([
+    MIRADA_LIBRE[0] + (CAM_LIBRE[0] - MIRADA_LIBRE[0]) * atras,
+    MIRADA_LIBRE[1] + (CAM_LIBRE[1] - MIRADA_LIBRE[1]) * atras,
+    MIRADA_LIBRE[2] + (CAM_LIBRE[2] - MIRADA_LIBRE[2]) * atras,
+  ]);
+  return { fov, camLibre: o, lejos: Math.hypot(o[0] - MIRADA_LIBRE[0], o[1] - MIRADA_LIBRE[1], o[2] - MIRADA_LIBRE[2]) };
+}
+
 /* El PANEO DE ENTRADA: abre pegado al rostro de la guardiana, barre el
    frailejonal hacia el occidente y se asienta en el plano general. Mientras
    vuela, los OrbitControls están desmontados (nadie pelea la cámara). */
 const PANEO_DUR = 9;
-function PaneoEntrada({ onFin }) {
+function PaneoEntrada({ onFin, hasta }) {
   const { camera } = useThree();
   const ini = useRef(/** @type {number|null} */ (null));
   const hecho = useRef(false);
   const { curva, va, vb } = useMemo(() => ({
+    /* El paneo cuenta la escala en el orden de Jackson: primero el DETALLE
+       (el rostro de la guardiana, que llena el cuadro), después el barrido a
+       ras del frailejonal, y al final la cámara se abre y RETROCEDE hasta que
+       la guardiana —que llenaba la pantalla— cabe entre las cuchillas y el mar
+       de nubes. La monumentalidad no se declara: se descubre al alejarse. */
     curva: new THREE.CatmullRomCurve3(
       [
         new THREE.Vector3(ENT_X + 2.6, Y_ENT + 2.2, ENT_Z + 5.4),
-        new THREE.Vector3(-6.2, 3.2, 5.2),
-        new THREE.Vector3(-6.8, 4.4, 11.2),
-        new THREE.Vector3(...CAM_LIBRE),
+        new THREE.Vector3(-6.4, 3.0, 4.4),
+        new THREE.Vector3(-5.2, 4.0, 12.6),
+        new THREE.Vector3(...hasta),
       ],
       false,
       'catmullrom',
@@ -2009,6 +2637,7 @@ function PaneoEntrada({ onFin }) {
     ),
     va: new THREE.Vector3(...CARA_GUARDIANA),
     vb: new THREE.Vector3(...MIRADA_LIBRE),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }), []);
   useFrame(({ clock }) => {
     if (hecho.current) return;
@@ -2088,6 +2717,11 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
   const nAves = tier === 'alto' ? 3 : 2;
   const nRomero = tier === 'alto' ? 34 : 18; // sotobosque leñoso más denso
   const nRayos = tier === 'alto' ? 7 : 5; // haces de luz entre la niebla
+  /* presupuestos de la LEJANÍA (pasada 4). Todo instanciado o de una malla: el
+     mundo entero que se agrega cuesta ~8 draw calls, no ocho mil polígonos. */
+  const nNubes = tier === 'alto' ? 64 : 34; // el mar de nubes que llena los valles
+  const nFraiHorizonte = tier === 'alto' ? 120 : 60; // el frailejonal hasta la bruma
+  const nCortinas = tier === 'alto' ? 5 : 3; // telones de niebla que suben y bajan
 
   /* `color`/`fog` se adjuntan a la ESCENA: hijos directos, nunca en <group>. */
   return (
@@ -2095,7 +2729,17 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
       <color attach="background" args={[ATMO.fondo]} />
       {perfil.fog && <fog attach="fog" args={[ATMO.niebla, ATMO.nieblaCerca + 2, ATMO.nieblaLejos]} />}
       <LucesParamo />
+
+      {/* ══ EL MUNDO MÁS ALLÁ DEL CUENCO ══ el cielo enorme, la cordillera que
+          se lava en el aire, el mar de nubes por DEBAJO (la prueba de que
+          estamos muy arriba) y la falda que se despeña hacia él. Se dibuja
+          primero y sin fog: es el fondo del mundo, no parte de la maqueta. */}
+      <BovedaParamo />
       <SolVelado />
+      <Cordillera />
+      <MarDeNubes n={nNubes} reducedMotion={reducedMotion} />
+      <FaldaParamo />
+      <FrailejonalHorizonte n={nFraiHorizonte} />
 
       <mesh geometry={geo}>
         <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
@@ -2156,11 +2800,15 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
       <FrailejonalInstanciado n={nFrailejones} />
 
       {/* ══ ANCLA DE ESCALA HUMANA ══ un frailejón ANCIANO (patriarca de ~3 m)
-          al frente-izquierda con una CAMINANTE del páramo a su pie, mirándolo:
-          el ojo mide la inmensidad por la figura humana conocida (frente-derecha
-          la equilibra la danta). La honestidad de la escala, no un rótulo. */}
-      <FrailejonAnciano pos={[-5.3, alturaParamo(-5.3, 5.4) - 0.05, 5.4]} esc={1.0} giro={0.5} reducedMotion={reducedMotion} />
-      <CaminanteParamo pos={[-4.15, alturaParamo(-4.15, 6.0), 6.0]} giro={-2.2} reducedMotion={reducedMotion} />
+          con una CAMINANTE del páramo a su pie, mirándolo. Es LA vara de medir
+          del cuadro: sin una figura de tamaño conocido, un frailejonal en la
+          niebla podría ser de matas de un palmo o de tres metros y el ojo no
+          tiene cómo saberlo (la lección de Shadow of the Colossus).
+          Van al PRIMER PLANO izquierdo, junto al sendero: allá al fondo la
+          pareja medía cuatro píxeles y la comparación —que es todo el punto—
+          no se podía hacer. Aquí el ojo la lee sin acercarse. */}
+      <FrailejonAnciano pos={[-1.2, alturaParamo(-1.2, 12.2) - 0.05, 12.2]} esc={1.0} giro={0.7} reducedMotion={reducedMotion} />
+      <CaminanteParamo pos={[0.15, alturaParamo(0.15, 12.9), 12.9]} giro={-2.6} reducedMotion={reducedMotion} />
       <Pajonal n={nPaja} />
       <CojinesMusgo n={nMusgo} />
       <RomeroParamo n={nRomero} />
@@ -2186,7 +2834,11 @@ function EscenaParamo({ tier, reducedMotion, fabrica, leccion }) {
           naranja/amarillo — el color honesto del páramo alto (lejos de la danta) */}
       <Roquedal pos={[7.0, alturaParamo(7.0, 3.2), 3.2]} seed={29} esc={1.0} />
 
+      {/* ══ LA NIEBLA CON PROFUNDIDAD ══ los bancos pegados al suelo (los de
+          siempre) MÁS los telones por capas que suben y bajan desfasados: la
+          bruma entra y sale del cuadro en vez de estar clavada a una distancia. */}
       <NieblaEnganchada n={nNiebla} reducedMotion={reducedMotion} />
+      <CortinasNiebla cuantas={nCortinas} reducedMotion={reducedMotion} />
       <RayosDeLuz n={nRayos} reducedMotion={reducedMotion} />
       <PiedrasSendero />
 
@@ -2264,9 +2916,19 @@ export default function MundoParamo3D() {
     if (enLeccion) setModo(reducedMotion ? 'libre' : 'aLibre');
     else setModo(reducedMotion ? 'leccion' : 'aLeccion');
   };
+  /* El encuadre se calcula UNA vez contra la ventana real: en vertical el campo
+     horizontal se estrecha y hay que abrir el `fov` y dar un paso atrás, o el
+     plano general se convierte en un primer plano del tronco. */
+  const encuadre = useMemo(
+    () =>
+      typeof window === 'undefined'
+        ? encuadrePorAspecto(1280, 800)
+        : encuadrePorAspecto(window.innerWidth, window.innerHeight),
+    [],
+  );
   const camIni = useMemo(
-    () => (reducedMotion ? CAM_LIBRE : /** @type {[number, number, number]} */ ([ENT_X + 2.6, Y_ENT + 2.2, ENT_Z + 5.4])),
-    [reducedMotion],
+    () => (reducedMotion ? encuadre.camLibre : /** @type {[number, number, number]} */ ([ENT_X + 2.6, Y_ENT + 2.2, ENT_Z + 5.4])),
+    [reducedMotion, encuadre],
   );
 
   return (
@@ -2280,13 +2942,13 @@ export default function MundoParamo3D() {
         className={`paramo-canvas${listo ? ' paramo-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: camIni, fov: 42 }}
+        camera={{ position: camIni, fov: encuadre.fov, far: 820 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
         <EscenaParamo tier={tier} reducedMotion={reducedMotion} fabrica={fabrica} leccion={enLeccion} />
 
-        {modo === 'entrada' && <PaneoEntrada onFin={() => setModo('libre')} />}
+        {modo === 'entrada' && <PaneoEntrada hasta={encuadre.camLibre} onFin={() => setModo('libre')} />}
         {modo === 'aLeccion' && (
           <VueloCamara
             hasta={CAM_LECCION}
@@ -2298,7 +2960,7 @@ export default function MundoParamo3D() {
         )}
         {modo === 'aLibre' && (
           <VueloCamara
-            hasta={CAM_LIBRE}
+            hasta={encuadre.camLibre}
             miradaDe={MIRADA_LECCION}
             miradaA={MIRADA_LIBRE}
             dur={2.8}
@@ -2311,10 +2973,15 @@ export default function MundoParamo3D() {
             enablePan={false}
             enableZoom
             minDistance={7}
-            maxDistance={24}
+            /* el tope de alejarse deja SIEMPRE espacio al encuadre calculado (en
+               vertical la cámara retrocede, y un tope fijo la empujaba de vuelta) */
+            maxDistance={Math.max(28, encuadre.lejos + 5)}
             target={MIRADA_LIBRE}
             minPolarAngle={0.5}
-            maxPolarAngle={1.42}
+            /* casi al ras del horizonte: es la altura de ojo la que deja entrar
+               el cielo y la cordillera en el cuadro. Con el tope viejo (1.42) la
+               cámara caía en picada y el paisaje se aplastaba contra el suelo. */
+            maxPolarAngle={1.545}
             minAzimuthAngle={-1.1}
             maxAzimuthAngle={1.1}
             enableDamping
