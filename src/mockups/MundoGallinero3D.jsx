@@ -1,11 +1,13 @@
 import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { AdaptiveDpr, OrbitControls } from '@react-three/drei';
+import { AdaptiveDpr, Html, OrbitControls } from '@react-three/drei';
 import { ATMOSFERA, CIELOS, PALETA, mezclar, mezclarCielo } from '../visual/mundo3d/atmosferaMadre.js';
+import { ACENTOS, VERDES, TIERRAS } from '../visual/mundo3d/paleta/paletaMadre.js';
 import { CIELOS_HORA } from '../visual/mundo3d/cielosHoraData.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
 import { ParticulasAmbientales } from '../visual/mundo3d/ParticulasAmbientales.jsx';
+import { Gallina as GallinaCriolla } from '../visual/creatures/Gallina.jsx';
 
 const CIELO = mezclarCielo(CIELOS.corral);
 const DORADA = CIELOS_HORA.dorada;
@@ -20,21 +22,54 @@ const PARCELAS = [
    la parcela 1. Conserva el mismo patrón de dispersión que tenían las
    coordenadas originales (todas caían dentro de una sola parcela). */
 const GALLINAS = [
-  { dx: -1.0, dz: -0.4, rot: 0.1 },
-  { dx: -0.1, dz: 0.4, rot: 1.7 },
-  { dx: 0.7, dz: -0.6, rot: 3.2 },
-  { dx: -0.5, dz: -1.2, rot: 4.5 },
-  { dx: 0.9, dz: 0.6, rot: 5.6 },
-  { dx: -1.3, dz: 0.4, rot: 0.8 },
-  { dx: 0.2, dz: -1.1, rot: 2.5 },
-  { dx: 1.3, dz: -0.2, rot: 3.8 },
+  { dx: -1.5, dz: -0.5, rot: 0.1 },
+  { dx: -0.3, dz: 1.3, rot: 1.7 },
+  { dx: 1.2, dz: -1.0, rot: 3.2 },
+  { dx: -0.9, dz: -1.4, rot: 4.5 },
+  { dx: 1.5, dz: 0.9, rot: 5.6 },
+  { dx: -1.6, dz: 0.8, rot: 0.8 },
+  { dx: 0.4, dz: -1.5, rot: 2.5 },
+  { dx: 1.7, dz: -0.1, rot: 3.8 },
 ];
+/* Matas del huerto: antes eran 18 CLONES (misma escala visual, mismo verde,
+   mismo giro). Cada mata rompe ahora en escala, tono, giro (ángulo áureo:
+   nunca dos vecinas igual) y un ladeo leve — determinista, sin Math.random. */
 const CULTIVOS = Array.from({ length: 18 }, (_, i) => ({
-  x: 2.8 + (i % 6) * 0.55,
-  z: 1.45 + Math.floor(i / 6) * 0.65,
-  escala: 0.78 + ((i * 37) % 17) / 50,
+  x: 2.8 + (i % 6) * 0.55 + (((i * 31) % 7) - 3) / 38,
+  z: 1.45 + Math.floor(i / 6) * 0.65 + (((i * 17) % 5) - 2) / 40,
+  escala: 0.62 + ((i * 37) % 17) / 34,
+  giro: (i * 2.39996) % (Math.PI * 2),
+  ladeo: (((i * 29) % 9) - 4) / 34,
+  tono: (i * 53) % 3,
+  fruto: i % 6 === 2,
 }));
 const POSTES = [-6.1, -2.1, 2.1, 6.1];
+
+/* LOMAS del horizonte: la vereda que faltaba para que la losa no flotara en
+   crema. Anillo completo (la cámara auto-rota 360°) en dos planos de
+   perspectiva aérea: las cercanas con el verde de trabajo, las lejanas ya
+   comidas por la niebla dorada. Todo de la paleta madre, cero hex nuevo. */
+const LOMAS = Array.from({ length: 12 }, (_, i) => {
+  const ang = (i / 12) * Math.PI * 2 + (i % 3) * 0.19;
+  const lejos = i % 2 === 1;
+  const dist = lejos ? 27 + ((i * 7) % 5) : 19 + ((i * 5) % 4);
+  return {
+    x: Math.cos(ang) * dist,
+    z: Math.sin(ang) * dist,
+    r: (lejos ? 9.5 : 6.5) + ((i * 13) % 5),
+    alto: 0.3 + ((i * 11) % 4) / 16,
+    color: lejos
+      ? mezclar(VERDES.templado, CIELO.niebla, 0.4)
+      : mezclar(VERDES.trabajo, CIELO.niebla, 0.16),
+  };
+});
+/* Arbolitos de vereda sobre la sabana (escala y respiro entre la losa y las
+   lomas): matas de monte sueltas, ninguna igual a la otra. */
+const ARBOLES_VEREDA = [
+  { x: -11.5, z: -8, e: 1.25 }, { x: 13, z: -6.5, e: 0.95 }, { x: 10.5, z: 8.5, e: 1.4 },
+  { x: -12.5, z: 6.5, e: 1.05 }, { x: 3, z: -11.5, e: 1.5 }, { x: -5, z: 11.6, e: 0.85 },
+  { x: 15.5, z: 2.5, e: 1.2 },
+];
 
 function Terreno({ pasoActivo }) {
   return (
@@ -65,6 +100,46 @@ function Terreno({ pasoActivo }) {
   );
 }
 
+/* La VEREDA que sostiene la maqueta: sabana de pasto + anillo de lomas con
+   perspectiva aérea + arbolitos sueltos. Antes la losa flotaba sobre crema
+   plano y se leía como diorama de feria escolar; ahora el gallinero es un
+   potrero DE un paisaje. Colores de la paleta madre; la niebla dorada de la
+   atmósfera se come las lomas lejanas (aérea, no lechosa). */
+function Horizonte() {
+  return (
+    <group name="horizonte">
+      {/* sabana de pasto cálido bajo la losa */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.42, 0]}>
+        <circleGeometry args={[48, 30]} />
+        <meshLambertMaterial color={mezclar(VERDES.calido, TIERRAS.vega, 0.34)} />
+      </mesh>
+      {/* el camino de tierra que llega al gallinero (continuidad con la finca) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0.35]} position={[-8.5, -0.4, 6.5]}>
+        <planeGeometry args={[2.1, 16, 1, 1]} />
+        <meshLambertMaterial color={TIERRAS.camino} />
+      </mesh>
+      {LOMAS.map((l, i) => (
+        <mesh key={i} position={[l.x, -0.5, l.z]} scale={[1, l.alto, 0.82]}>
+          <sphereGeometry args={[l.r, 8, 5]} />
+          <meshLambertMaterial color={l.color} flatShading />
+        </mesh>
+      ))}
+      {ARBOLES_VEREDA.map((a, i) => (
+        <group key={i} position={[a.x, -0.42, a.z]} scale={a.e}>
+          <mesh position={[0, 0.55, 0]}>
+            <cylinderGeometry args={[0.09, 0.14, 1.1, 5]} />
+            <meshLambertMaterial color={PALETA.maderaOscura} />
+          </mesh>
+          <mesh position={[0, 1.35, 0]}>
+            <sphereGeometry args={[0.85, 7, 5]} />
+            <meshLambertMaterial color={mezclar(VERDES.monte, CIELO.niebla, 0.14)} flatShading />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 function Cerca() {
   const lineas = [-4.05, 0.05, 4.35];
   return (
@@ -91,8 +166,25 @@ function Cerca() {
   );
 }
 
-function Gallina({ objetivo, indice, reducedMotion }) {
+/* Sombra suave bajo cada gallina (el billboard no proyecta sombra 3D). */
+const ESTILO_GALLINA = {
+  filter: 'drop-shadow(0 2px 3px rgba(71, 49, 20, 0.32))',
+  pointerEvents: 'none',
+  transition: 'transform .25s ease',
+};
+
+/* La gallina RUBBER-HOSE de la casa (SVG de creatures/) como billboard <Html>
+   — el mismo patrón de AbejaDelEnjambre en MundoAbejas3D y de los vecinos del
+   Bosque Vivo. NADA de esferas y conos procedurales: la fauna de Chagra se
+   dibuja, no se extruye. El lerp hacia `objetivo` (el cableado del paso) se
+   conserva tal cual; encima va el arte: mientras camina va en pose 'anda'
+   (cabeceo de gallina + paso alternado) y al llegar picotea. Mira hacia donde
+   va (flip del SVG por el rumbo real, con histéresis para no parpadear). */
+function Gallina({ objetivo, indice, reducedMotion, tier }) {
   const grupo = useRef(null);
+  const capa = useRef(/** @type {HTMLDivElement|null} */ (null));
+  const mirando = useRef(1);
+  const andando = useRef(false);
   /* `actual` guarda la posición viva de la gallina; `objetivo` es a donde
      debe llegar según el paso elegido. Cada frame camina un poco hacia allá
      en vez de teletransportarse — el prop declarativo de abajo ya la deja en
@@ -105,42 +197,56 @@ function Gallina({ objetivo, indice, reducedMotion }) {
     if (reducedMotion) {
       actual.current[0] = objetivo[0];
       actual.current[1] = objetivo[1];
-      grupo.current.rotation.y = objetivo[2];
-      grupo.current.position.y = 0.2;
+      grupo.current.position.y = 0;
     } else {
+      const dx = objetivo[0] - actual.current[0];
+      const dz = objetivo[1] - actual.current[1];
+      const lejos = Math.hypot(dx, dz);
       const avance = Math.min(1, delta * 1.3);
-      actual.current[0] += (objetivo[0] - actual.current[0]) * avance;
-      actual.current[1] += (objetivo[1] - actual.current[1]) * avance;
-      grupo.current.rotation.y = objetivo[2] + Math.sin(t * 0.35) * 0.45;
-      grupo.current.position.y = 0.2 + Math.max(0, Math.sin(t * 2.2)) * 0.025;
+      actual.current[0] += dx * avance;
+      actual.current[1] += dz * avance;
+      /* Estado de marcha → pose del SVG vía dataset (cero re-renders):
+         caminando cabecea y da pasos; llegada, picotea el pasto. */
+      const anda = lejos > 0.22;
+      if (capa.current && anda !== andando.current) {
+        andando.current = anda;
+        capa.current.dataset.marcha = anda ? 'anda' : 'picotea';
+      }
+      /* brinquitos cortos SOLO en marcha (el trotecito de gallina) */
+      grupo.current.position.y = anda ? Math.abs(Math.sin(t * 4.6)) * 0.06 : 0;
+      /* flip por rumbo real, con histéresis */
+      const dir = dx < -0.05 ? -1 : dx > 0.05 ? 1 : mirando.current;
+      if (dir !== mirando.current && capa.current) {
+        mirando.current = dir;
+        /* el SVG mira a la IZQUIERDA (−x): rumbo +x = espejo */
+        capa.current.style.transform = dir > 0 ? 'scaleX(-1)' : '';
+      }
     }
     grupo.current.position.x = actual.current[0];
     grupo.current.position.z = actual.current[1];
   });
+  /* Dos plumajes + dos tallas: parvada criolla, no clonada. */
   const clara = indice % 3 === 0;
-  const cuerpo = clara ? '#d9c5a1' : indice % 2 ? '#9a5431' : '#b86a38';
+  const talla = 52 + ((indice * 7) % 3) * 5;
   return (
-    <group ref={grupo} name={`gallina-${indice}`} position={[objetivo[0], 0.2, objetivo[1]]} rotation={[0, objetivo[2], 0]}>
-      <mesh scale={[0.38, 0.3, 0.52]}>
-        <sphereGeometry args={[0.55, 7, 5]} />
-        <meshLambertMaterial color={cuerpo} flatShading />
+    <group ref={grupo} name={`gallina-${indice}`} position={[objetivo[0], 0, objetivo[1]]}>
+      {/* sombra de contacto en el pasto (ancla la parada) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.115, 0]}>
+        <circleGeometry args={[0.3, 12]} />
+        <meshBasicMaterial color={ATMOSFERA.sombra} transparent opacity={0.2} depthWrite={false} />
       </mesh>
-      <mesh position={[0, 0.22, -0.3]}>
-        <sphereGeometry args={[0.2, 7, 5]} />
-        <meshLambertMaterial color={cuerpo} flatShading />
-      </mesh>
-      <mesh position={[0, 0.28, -0.49]} rotation={[Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[0.07, 0.18, 4]} />
-        <meshLambertMaterial color={PALETA.ambar} />
-      </mesh>
-      <mesh position={[0, 0.43, -0.31]}>
-        <coneGeometry args={[0.07, 0.14, 5]} />
-        <meshLambertMaterial color="#b7432f" />
-      </mesh>
-      <mesh position={[0, 0.04, 0.46]} rotation={[Math.PI / 2.6, 0, 0]}>
-        <coneGeometry args={[0.22, 0.45, 5]} />
-        <meshLambertMaterial color={cuerpo} />
-      </mesh>
+      <Html center distanceFactor={10} position={[0, 0.62, 0]} zIndexRange={[4, 0]} pointerEvents="none">
+        <div ref={capa} aria-hidden="true" data-parvada="gallina" data-marcha="picotea" style={ESTILO_GALLINA}>
+          <GallinaCriolla
+            size={talla}
+            plumaje={clara ? 'clara' : 'colorada'}
+            pose={reducedMotion ? 'reposo' : 'picotea'}
+            compas={-((indice * 0.53) % 2.9)}
+            animated={!reducedMotion}
+            tier={tier}
+          />
+        </div>
+      </Html>
     </group>
   );
 }
@@ -233,22 +339,35 @@ function Huerto() {
           <meshLambertMaterial color={PALETA.tierra} />
         </mesh>
       ))}
-      {CULTIVOS.map((p) => (
-        <group key={`${p.x}-${p.z}`} position={[p.x, 0.38, p.z]} scale={p.escala}>
-          <mesh position={[0, 0.2, 0]}>
-            <cylinderGeometry args={[0.025, 0.035, 0.42, 5]} />
-            <meshLambertMaterial color={PALETA.follajeOscuro} />
-          </mesh>
-          <mesh position={[-0.1, 0.35, 0]} rotation={[0, 0, -0.55]}>
-            <sphereGeometry args={[0.13, 6, 4]} />
-            <meshLambertMaterial color={PALETA.follajeClaro} flatShading />
-          </mesh>
-          <mesh position={[0.1, 0.43, 0]} rotation={[0, 0, 0.55]}>
-            <sphereGeometry args={[0.13, 6, 4]} />
-            <meshLambertMaterial color={PALETA.follaje} flatShading />
-          </mesh>
-        </group>
-      ))}
+      {CULTIVOS.map((p) => {
+        /* Tres familias de verde por mata (brote/trabajo/monte) para que el
+           surco se lea como huerta viva y no como 18 copias del mismo arbolito. */
+        const copaA = p.tono === 0 ? VERDES.brote : p.tono === 1 ? VERDES.trabajo : mezclar(VERDES.monte, VERDES.trabajo, 0.4);
+        const copaB = p.tono === 0 ? VERDES.trabajo : p.tono === 1 ? VERDES.brote : VERDES.monte;
+        return (
+          <group key={`${p.x}-${p.z}`} position={[p.x, 0.38, p.z]} scale={p.escala} rotation={[0, p.giro, p.ladeo]}>
+            <mesh position={[0, 0.2, 0]}>
+              <cylinderGeometry args={[0.025, 0.035, 0.42, 5]} />
+              <meshLambertMaterial color={PALETA.follajeOscuro} />
+            </mesh>
+            <mesh position={[-0.1, 0.35, 0]} rotation={[0, 0, -0.55]}>
+              <sphereGeometry args={[0.12 + (p.tono === 2 ? 0.05 : 0), 6, 4]} />
+              <meshLambertMaterial color={copaA} flatShading />
+            </mesh>
+            <mesh position={[0.1, 0.43, 0]} rotation={[0, 0, 0.55]}>
+              <sphereGeometry args={[0.13, 6, 4]} />
+              <meshLambertMaterial color={copaB} flatShading />
+            </mesh>
+            {/* una que otra mata con su tomate madurando (acento a cucharadas) */}
+            {p.fruto && (
+              <mesh position={[0.05, 0.28, 0.1]}>
+                <sphereGeometry args={[0.05, 6, 4]} />
+                <meshLambertMaterial color={ACENTOS.cafeCereza} />
+              </mesh>
+            )}
+          </group>
+        );
+      })}
     </group>
   );
 }
@@ -274,7 +393,7 @@ function FlechasCiclo() {
   });
 }
 
-function Escena({ tier, reducedMotion, paso }) {
+function Escena({ tier, reducedMotion, paso, vertical }) {
   const cantidad = tier === 'alto' ? 8 : tier === 'medio' ? 6 : 4;
   /* La parcela activa según el paso elegido en el DOM: de aquí sale a dónde
      caminan las gallinas y a dónde se traslada el tractor. Antes `paso`
@@ -283,11 +402,14 @@ function Escena({ tier, reducedMotion, paso }) {
   return (
     <>
       <color attach="background" args={[CIELO.fondo]} />
-      <fog attach="fog" args={[CIELO.niebla, 13, 31]} />
+      {/* niebla más honda que antes (13→31): ahora hay lomas que comer con
+          perspectiva aérea en vez de cortar la losa contra el vacío */}
+      <fog attach="fog" args={[CIELO.niebla, 15, 44]} />
       <hemisphereLight args={[DORADA.cielo, DORADA.suelo, 1.05]} />
       <ambientLight color={DORADA.luz} intensity={0.28} />
       <directionalLight color={ATMOSFERA.luz} intensity={1.15} position={/** @type {[number, number, number]} */ (DORADA.solPos)} />
       <directionalLight color={ATMOSFERA.relleno} intensity={0.22} position={[-6, 5, -3]} />
+      <Horizonte />
       <Terreno pasoActivo={activa.id} />
       <Cerca />
       <TractorGallinas objetivo={[activa.x, activa.z]} reducedMotion={reducedMotion} />
@@ -295,10 +417,13 @@ function Escena({ tier, reducedMotion, paso }) {
       <Huerto />
       <FlechasCiclo />
       {GALLINAS.slice(0, cantidad).map((g, i) => (
-        <Gallina key={i} indice={i} reducedMotion={reducedMotion} objetivo={[activa.x + g.dx, activa.z + g.dz, g.rot]} />
+        <Gallina key={i} indice={i} tier={tier} reducedMotion={reducedMotion} objetivo={[activa.x + g.dx, activa.z + g.dz, g.rot]} />
       ))}
       <ParticulasAmbientales tipo="polen" tier={tier} reducedMotion={reducedMotion} area={[12, 2.5, 8]} semilla={712} />
-      <OrbitControls makeDefault enablePan={false} minDistance={7} maxDistance={19} minPolarAngle={0.48} maxPolarAngle={1.3} target={[0, 0.5, 0]} autoRotate={!reducedMotion} autoRotateSpeed={0.18} />
+      {/* Encuadre por orientación: en retrato la cámara sube y se aleja para
+          que la losa ENTERA quepa, y el target baja para dejarle a la banda
+          inferior (panel del ciclo) aire sin tapar la parvada. */}
+      <OrbitControls makeDefault enablePan={false} minDistance={7} maxDistance={vertical ? 26 : 19} minPolarAngle={0.48} maxPolarAngle={1.3} target={vertical ? [0, -0.8, 0] : [0, 0.5, 0]} autoRotate={!reducedMotion} autoRotateSpeed={0.18} />
       <AdaptiveDpr pixelated />
     </>
   );
@@ -313,7 +438,11 @@ const CSS = `
 .mgall-ciclo button{width:100%;border:0;border-radius:.7rem;padding:.43rem .58rem;text-align:left;background:transparent;color:#453921;font:700 .77rem/1.2 ui-sans-serif,sans-serif;cursor:pointer}.mgall-ciclo button:hover,.mgall-ciclo button[aria-pressed="true"]{background:rgba(111,150,63,.2)}.mgall-ciclo small{display:block;margin-top:.17rem;font-weight:500;line-height:1.3;opacity:.82}
 .mgall-pie{align-self:center;max-width:42rem;margin:0;text-align:center;padding:.5rem .85rem;border-radius:.8rem;background:rgba(46,39,24,.72);color:#fff8dc;font:600 .76rem/1.4 ui-sans-serif,sans-serif;box-shadow:0 5px 18px rgba(45,33,15,.15)}
 .mgall-volver{pointer-events:auto;position:absolute;right:1rem;top:1rem;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:.48rem .8rem;background:rgba(49,43,27,.65);color:#fff8dc;font:700 .76rem/1 ui-sans-serif,sans-serif;cursor:pointer}
-@media(max-width:640px){.mgall-ui{padding:.7rem}.mgall-ciclo{width:min(16rem,72vw)}.mgall-ciclo small{display:none}.mgall-ciclo button[aria-pressed="true"] small{display:block}.mgall-pie{font-size:.69rem}}
+/* Móvil (el cuadro objetivo de Chagra): la cabecera se compacta y el panel del
+   ciclo baja a la BANDA INFERIOR en 2×2 — antes flotaba al centro-izquierda y
+   tapaba a las gallinas. El detalle del paso ya lo cuenta el pie, así que los
+   <small> se ocultan y los 4 botones caben en dos filas sin tocar la escena. */
+@media(max-width:640px){.mgall-ui{padding:.7rem;justify-content:flex-start}.mgall-cabecera{max-width:100%}.mgall-titulo{font-size:1.45rem}.mgall-bajada{max-width:22rem;font-size:.72rem}.mgall-ciclo{margin-top:auto;width:100%;grid-template-columns:repeat(2,1fr);gap:.3rem;padding:.4rem}.mgall-ciclo button{padding:.42rem .5rem;font-size:.72rem}.mgall-ciclo small{display:none}.mgall-pie{align-self:stretch;max-width:none;margin-top:.45rem;font-size:.69rem;padding:.42rem .6rem}}
 @media(prefers-reduced-motion:reduce){.mgall-canvas{transition:none}}
 `;
 
@@ -321,12 +450,16 @@ export default function MundoGallinero3D({ onBack }) {
   const [listo, setListo] = useState(false);
   const [paso, setPaso] = useState('pastoreo');
   const [{ tier, reducedMotion }] = useState(decidirTier);
+  /* Retrato (el móvil 390×844, el objetivo de Chagra): cámara más alta y
+     lejana para que la losa entera entre en cuadro. Se decide al montar,
+     como el tier (girar el teléfono re-monta rutas, no hace falta listener). */
+  const [vertical] = useState(() => typeof window !== 'undefined' && window.innerHeight > window.innerWidth * 1.15);
   const perfil = useMemo(() => perfilDeTier(tier), [tier]);
   return (
     <section className="mgall-root" data-tier={tier} aria-label="Mundo del gallinero con pastoreo rotativo">
       <style>{CSS}</style>
-      <Canvas className="mgall-canvas" data-lista={listo} dpr={perfil.dpr} frameloop={reducedMotion ? 'demand' : 'always'} gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }} camera={{ position: [11, 8.5, 12], fov: 43 }} onCreated={() => setListo(true)}>
-        <Escena tier={tier} reducedMotion={reducedMotion} paso={paso} />
+      <Canvas className="mgall-canvas" data-lista={listo} dpr={perfil.dpr} frameloop={reducedMotion ? 'demand' : 'always'} gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }} camera={vertical ? { position: [13.5, 12.5, 16], fov: 47 } : { position: [11, 8.5, 12], fov: 43 }} onCreated={() => setListo(true)}>
+        <Escena tier={tier} reducedMotion={reducedMotion} paso={paso} vertical={vertical} />
       </Canvas>
       <div className="mgall-ui">
         <header className="mgall-cabecera">
