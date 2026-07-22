@@ -8,7 +8,8 @@ import { spawn } from 'node:child_process';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 const DIST = process.argv[2];
-const SHOTS = process.argv.slice(3).map((a) => { const [ruta, name] = a.split('='); return [name, ruta]; });
+// <ruta>=<nombre>[=<texto del botón a tocar antes de capturar>]
+const SHOTS = process.argv.slice(3).map((a) => { const [ruta, name, click] = a.split('='); return [name, ruta, click]; });
 const PORT = 8097;
 const BASE = `http://127.0.0.1:${PORT}`;
 const srv = spawn('python3', ['-m', 'http.server', String(PORT), '--bind', '127.0.0.1'], { cwd: DIST, stdio: 'ignore' });
@@ -55,11 +56,20 @@ await page.addInitScript(() => {
   };
   window.Worker.prototype = OriginalWorker.prototype;
 });
-for (const [name, route] of SHOTS) {
+for (const [name, route, click] of SHOTS) {
   try {
     await page.goto(BASE + route, { waitUntil: 'load', timeout: 45000 });
     // poll: esperar a que el canvas WebGL tenga tamaño real (no 'load')
     await page.waitForFunction(() => { const c = document.querySelector('canvas'); return c && c.width > 0; }, { timeout: 40000 }).catch(() => {});
+    // Escenas que arrancan en un estado neutro y solo dibujan cuando el usuario
+    // elige (el mercado del hato pide "de la venta"/"del nacimiento"/"de la partida").
+    // Sin esto el gate capturaba la loma vacía y la daba por buena: el arte real
+    // nunca entraba al encuadre. Se pasa como tercer campo: ruta=nombre=Texto del botón.
+    if (click) {
+      await sleep(3500); // que monte antes de buscar el botón
+      await page.getByRole('button', { name: new RegExp(click, 'i') }).first().click()
+        .catch((e) => console.error(`  aviso ${name}: no se pudo tocar "${click}" (${String(e.message).slice(0, 50)})`));
+    }
     await sleep(11000); // asentar la escena en GPU real
     const gpu = await page.evaluate(() => {
       try { const c = document.querySelector('canvas'); const gl = c && (c.getContext('webgl2') || c.getContext('webgl'));
