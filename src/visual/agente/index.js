@@ -19,6 +19,7 @@ export {
   ARIA_DE_ESTADO,
   CEJAS_DE_ESTADO,
   MOMENTOS_IDLE,
+  TEXTO_NO_SE,
   estadoCanonico,
   nivelDeConfianza,
   elegirMomentoIdle,
