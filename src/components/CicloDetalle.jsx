@@ -162,8 +162,8 @@ export default function CicloDetalle({ cycle, altitudeM, onReload }) {
   const pestRisks = useMemo(() => { try { return getPestRisksByStage(displayStage, a.subject_slug) || []; } catch { return []; } }, [displayStage, a.subject_slug]);
   const bios = useMemo(() => { try { return getBiopreparadosForStage(baseStage(displayStage)) || []; } catch { return []; } }, [displayStage]);
   const ensoLabel = getEnsoLabel();
-  const ensoTasks = useMemo(() => { try { return getEnsemblePreventiveTasks(getEnsoServicePhase(), baseStage(displayStage)) || []; } catch { return []; } }, [displayStage]);
-  const tasks = useMemo(() => { try { return getTasksForCycle(effectiveCycle) || []; } catch { return []; } }, [effectiveCycle]);
+  const ensoTasks = useMemo(() => { try { return getEnsemblePreventiveTasks(getEnsoServicePhase(), baseStage(displayStage)); } catch { return []; } }, [displayStage]);
+  const tasks = useMemo(() => { try { return getTasksForCycle(effectiveCycle); } catch { return []; } }, [effectiveCycle]);
   const urgent = useMemo(() => { try { return getUrgentTasks(tasks) || []; } catch { return []; } }, [tasks]);
 
   const handleStage = useCallback(async (newStage) => {

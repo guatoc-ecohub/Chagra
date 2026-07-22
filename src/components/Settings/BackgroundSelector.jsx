@@ -276,11 +276,6 @@ function BackgroundPreviewModal({ option, onConfirm, onClose }) {
   // como la referencia) y se corrige una sola vez al cargar. NO es per-frame.
   const [ratio, setRatio] = useState(3 / 4);
 
-  const handleImgLoad = useCallback((e) => {
-    const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
-    if (w > 0 && h > 0) setRatio(w / h);
-  }, []);
-
   useEffect(() => {
     function onKey(e) {
       if (e.key === 'Escape') onClose();

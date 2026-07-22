@@ -345,7 +345,7 @@ export const generateCuadernoFinca = (fincaData) => {
 
   if (finca.descripcion_corta) {
     y += 4;
-    y = drawParagraph(doc, y, finca.descripcion_corta, { fontSize: 10, color: COLOR_SLATE });
+    drawParagraph(doc, y, finca.descripcion_corta, { fontSize: 10, color: COLOR_SLATE });
   }
 
   // ─── PÁGINA 2: RESUMEN EJECUTIVO ─────────────────────────────────────
@@ -376,7 +376,7 @@ export const generateCuadernoFinca = (fincaData) => {
   }
 
   y += 4;
-  y = drawParagraph(
+  drawParagraph(
     doc,
     y,
     'Este cuaderno consolida la información agronómica registrada en Chagra hasta la fecha de generación. ' +
@@ -392,7 +392,7 @@ export const generateCuadernoFinca = (fincaData) => {
   y = drawSectionTitle(doc, y, 'Inventario de plantas');
 
   if (plants.length === 0) {
-    y = drawParagraph(doc, y, 'No hay plantas registradas en este dispositivo.', { fontSize: 10, color: COLOR_MUTED });
+    drawParagraph(doc, y, 'No hay plantas registradas en este dispositivo.', { fontSize: 10, color: COLOR_MUTED });
   } else {
     const plantRows = plants.map((p) => ({
       id: truncate(p.id || '', 8),
@@ -402,7 +402,7 @@ export const generateCuadernoFinca = (fincaData) => {
       sembrada: getAssetCreated(p),
       sync: p._pending ? 'pend.' : 'ok',
     }));
-    y = drawTable(
+    drawTable(
       doc,
       y,
       [
@@ -425,7 +425,7 @@ export const generateCuadernoFinca = (fincaData) => {
   y = drawSectionTitle(doc, y, 'Zonas');
 
   if (lands.length === 0) {
-    y = drawParagraph(doc, y, 'No hay zonas registradas.', { fontSize: 10, color: COLOR_MUTED });
+    drawParagraph(doc, y, 'No hay zonas registradas.', { fontSize: 10, color: COLOR_MUTED });
   } else {
     const landRows = lands.map((l) => ({
       nombre: getAssetName(l),
@@ -433,7 +433,7 @@ export const generateCuadernoFinca = (fincaData) => {
       estado: getAssetStatus(l),
       creada: getAssetCreated(l),
     }));
-    y = drawTable(
+    drawTable(
       doc,
       y,
       [
@@ -454,7 +454,7 @@ export const generateCuadernoFinca = (fincaData) => {
   y = drawSectionTitle(doc, y, 'Bitácora cronológica');
 
   if (logs.length === 0) {
-    y = drawParagraph(doc, y, 'No hay eventos en la bitácora.', { fontSize: 10, color: COLOR_MUTED });
+    drawParagraph(doc, y, 'No hay eventos en la bitácora.', { fontSize: 10, color: COLOR_MUTED });
   } else {
     // Orden cronológico ascendente (lo que primero se hizo arriba).
     const sortedLogs = [...logs].sort((a, b) => {
@@ -472,7 +472,7 @@ export const generateCuadernoFinca = (fincaData) => {
         descripcion: name,
       };
     });
-    y = drawTable(
+    drawTable(
       doc,
       y,
       [
@@ -493,7 +493,7 @@ export const generateCuadernoFinca = (fincaData) => {
   y = drawSectionTitle(doc, y, 'Cosechas reportadas');
 
   if (harvests.length === 0) {
-    y = drawParagraph(doc, y, 'No hay cosechas reportadas en este período.', { fontSize: 10, color: COLOR_MUTED });
+    drawParagraph(doc, y, 'No hay cosechas reportadas en este período.', { fontSize: 10, color: COLOR_MUTED });
   } else {
     const harvestRows = harvests.map((h) => {
       const qty = (Array.isArray(h.attributes?.quantity) && h.attributes.quantity[0]) || h.quantity || {};
@@ -506,7 +506,7 @@ export const generateCuadernoFinca = (fincaData) => {
         unidad: qtyUnit || '—',
       };
     });
-    y = drawTable(
+    drawTable(
       doc,
       y,
       [
@@ -527,7 +527,7 @@ export const generateCuadernoFinca = (fincaData) => {
   y = drawSectionTitle(doc, y, 'Insumos / biopreparados aplicados');
 
   if (inputs.length === 0) {
-    y = drawParagraph(doc, y, 'No hay aplicaciones de insumos registradas.', { fontSize: 10, color: COLOR_MUTED });
+    drawParagraph(doc, y, 'No hay aplicaciones de insumos registradas.', { fontSize: 10, color: COLOR_MUTED });
   } else {
     const inputRows = inputs.map((i) => {
       const qty = (Array.isArray(i.attributes?.quantity) && i.attributes.quantity[0]) || i.quantity || {};
@@ -542,7 +542,7 @@ export const generateCuadernoFinca = (fincaData) => {
         dosis: qtyValue !== '' ? `${qtyValue} ${qtyUnit}` : '—',
       };
     });
-    y = drawTable(
+    drawTable(
       doc,
       y,
       [

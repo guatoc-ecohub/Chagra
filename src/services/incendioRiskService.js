@@ -164,7 +164,7 @@ export function evaluarRiesgoIncendio(opts = {}) {
   const esNino = fam === 'nino';
 
   const factores = [];
-  let nivel = 'bajo';
+  let nivel;
 
   if (!fireProne) {
     // Pacífico o región sin señal clara → riesgo de incendio estructuralmente bajo.

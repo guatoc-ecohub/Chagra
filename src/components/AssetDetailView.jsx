@@ -1,6 +1,6 @@
 /* eslint-disable chagra-i18n/no-hardcoded-spanish -- legacy UI copy already tracked separately */
 import React, { useState, useMemo, useEffect } from 'react';
-import { X, Calendar, Tag, Activity, MapPin, AlertCircle, Images, Skull, Layers, Sprout } from 'lucide-react';
+import { X, Calendar, Activity, MapPin, AlertCircle, Images, Skull, Layers, Sprout } from 'lucide-react';
 import { SplitFlow } from './SplitFlow';
 import PlantCemeteryModal from './PlantCemeteryModal';
 import useAssetStore from '../store/useAssetStore';

@@ -236,7 +236,7 @@ export const generateRestauracionPlanPDF = (planData) => {
   y += 8;
 
   if (data.descripcion) {
-    y = drawParagraph(doc, y, `Situación descrita: ${data.descripcion}`, { fontSize: 10, color: COLOR_SLATE });
+    drawParagraph(doc, y, `Situación descrita: ${data.descripcion}`, { fontSize: 10, color: COLOR_SLATE });
   }
 
   // ─── PÁGINA 2: ARREGLO + SUCESIÓN ────────────────────────────────────

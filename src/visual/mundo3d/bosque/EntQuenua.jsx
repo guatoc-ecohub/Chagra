@@ -41,7 +41,6 @@ import {
   ROSTRO_BOCA_Y,
   ROSTRO_ESCALA,
   BARBA,
-  CORTEZA,
 } from './entQuenua.geom.js';
 
 /* Un cúmulo de la copa: la MASA de hojas con huecos (malla facetada con color

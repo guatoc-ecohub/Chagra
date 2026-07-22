@@ -127,7 +127,6 @@ function alturaVergel(wx, wz) {
   const f = clamp(explanada(wx, wz) * 1.15, 0, 1);
   return h * (1 - f) + 0.55 * f;
 }
-const Y_SUELO = 0.55;
 
 /* Dónde cae hojarasca: bajo las copas grandes del estrato alto. Los centros
    coinciden con los árboles mayores de la escena. */

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
 import {
   Sprout, Leaf, BookOpen, Database, Droplet, TreePine, Users, ShieldCheck,
-  FileCheck, Cloud, Maximize2, X, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
+  FileCheck, Maximize2, X, ChevronLeft, ChevronRight, ChevronUp, ChevronDown,
 } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
 import ChagraAgentAvatar from './ChagraAgentAvatar';

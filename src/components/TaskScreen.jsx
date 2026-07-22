@@ -68,7 +68,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
             status: initialData?.attributes?.status || initialData?.status || 'pending'
         };
     };
-    const [formData, setFormData] = useState(buildInitial);
+    const [formData] = useState(buildInitial);
     const autosaveKey = isEdit ? `taskscreen-edit-${initialData.id}` : 'taskscreen-create';
     const { savedState: autoForm, save: autoSave, markSubmitted } = useAutosave(autosaveKey, buildInitial());
     const formValues = autoForm || formData;

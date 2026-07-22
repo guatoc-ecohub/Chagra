@@ -65,7 +65,7 @@ export default function CicloVivoFullView({ onBack, onNavigate }) {
 
   // Especie + piso térmico. Piso: perfil primero; altitud del dispositivo como
   // refinamiento best-effort (no bloquea el render). Se lee una sola vez.
-  const [profile] = useState(() => { try { return getProfile() || {}; } catch { return {}; } });
+  const [profile] = useState(() => { try { return getProfile(); } catch { return {}; } });
   const [piso, setPiso] = useState(() => {
     if (profile.piso_termico && PISO_LABEL[profile.piso_termico]) return profile.piso_termico;
     return pisoTermicoFromAltitud(profile.finca_altitud);
@@ -87,7 +87,7 @@ export default function CicloVivoFullView({ onBack, onNavigate }) {
       if (p) {
         setPiso(p);
         // Solo re-sugerimos la especie si el usuario no tiene override propio.
-        if (!profile[PROFILE_ESPECIE_KEY]) setSpKey((prev) => resolverEspecie(null, p) || prev);
+        if (!profile[PROFILE_ESPECIE_KEY]) setSpKey(() => resolverEspecie(null, p));
       }
     }).catch(() => {});
     return () => { alive = false; };
