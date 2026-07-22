@@ -1291,14 +1291,14 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   JAGUAR MÍSTICO — el animal-espíritu del chamán (cosmología andino-amazónica).
+   JAGUAR NOCTURNO — el felino que anda de noche, tratado como LUZ.
    Capas PERMANENTES y sutiles (elegante, no recargado): aura espectral etérea,
    ojos luminosos (fosforescencia), estrellas de constelación en las rosetas y
-   un shimmer espectral. En modo poder se vuelven CHAMÁNICAS (se revela el
+   un shimmer espectral. En modo poder se vuelven más intensas (se revela el
    espíritu). Todo transform/opacity. Se PODA en tier bajo / reduced-motion.
    ─────────────────────────────────────────────────────────────────────────── */
 
-/* AURA ESPECTRAL — la presencia sagrada envuelve al felino; respira lento. */
+/* AURA ESPECTRAL — la presencia envuelve al felino; respira lento. */
 .jaguar-aura-espectral {
   animation: jaguar-aura-espectral 5.2s ease-in-out infinite;
 }
@@ -1357,7 +1357,7 @@
   50%      { opacity: 0.16; transform: translateX(0.5px) scaleX(1.07); }
 }
 
-/* LÍNEAS DE LA CONSTELACIÓN — la geometría sagrada respira (pulso lentísimo,
+/* LÍNEAS DE LA CONSTELACIÓN — la retícula de estrellas respira (pulso lentísimo,
    período co-primo con el titilar de las estrellas). */
 .jaguar-constelacion-linea {
   animation: jaguar-constelacion-linea 6.2s ease-in-out infinite;
@@ -1371,33 +1371,33 @@
    encienden cuando el espíritu se revela (revelación / modo poder, abajo). */
 .jaguar-marcas-espiritu { opacity: 0; }
 
-/* MODO PODER CHAMÁNICO — el jaguar-espíritu se revela: el aura, los ojos y las
+/* MODO PODER NOCTURNO — el felino se revela: el aura, los ojos y las
    estrellas se intensifican y aceleran. Vale tanto en standalone (wrapper
    .jaguar-poder) como en inline (data-poder en el <g>). */
 .jaguar-poder .jaguar-aura-espectral,
 [data-creature='jaguar'][data-poder='1'] .jaguar-aura-espectral {
-  animation-name: jaguar-aura-chaman;
+  animation-name: jaguar-aura-noche;
   animation-duration: 3.0s;
 }
-@keyframes jaguar-aura-chaman {
+@keyframes jaguar-aura-noche {
   0%, 100% { opacity: 0.22; transform: scale(1.02); }
   50%      { opacity: 0.4;  transform: scale(1.1); }
 }
 .jaguar-poder .jaguar-ojo-brillo,
 [data-creature='jaguar'][data-poder='1'] .jaguar-ojo-brillo {
-  animation-name: jaguar-ojo-chaman;
+  animation-name: jaguar-ojo-noche;
   animation-duration: 2.1s;
 }
-@keyframes jaguar-ojo-chaman {
+@keyframes jaguar-ojo-noche {
   0%, 100% { opacity: 0.85; transform: scale(1.02); }
   50%      { opacity: 1;    transform: scale(1.22); }
 }
 .jaguar-poder .jaguar-estrella,
 [data-creature='jaguar'][data-poder='1'] .jaguar-estrella {
-  animation-name: jaguar-titilar-chaman;
+  animation-name: jaguar-titilar-noche;
   animation-duration: 1.5s;
 }
-@keyframes jaguar-titilar-chaman {
+@keyframes jaguar-titilar-noche {
   0%, 100% { opacity: 0.6; transform: scale(1); }
   50%      { opacity: 1;   transform: scale(1.4); }
 }
@@ -1412,18 +1412,18 @@
    La entrada cinematográfica: el jaguar-espíritu SE MANIFIESTA — las marcas
    gemelas brillan sobre las rosetas, la bruma se adensa, el felino LEVITA
    apenas (ingravidez contenida), la sombra del suelo cede (el peso se vuelve
-   espíritu) y aura/ojos/estrellas suben a su registro chamánico. MAJESTAD, no
+   espíritu) y aura/ojos/estrellas suben a su registro nocturno. MAJESTAD, no
    susto: todo lento, digno, transform/opacity. */
 [data-creature='jaguar'][data-revelacion='1'] .jaguar-aura-espectral {
-  animation-name: jaguar-aura-chaman;
+  animation-name: jaguar-aura-noche;
   animation-duration: 3.4s;
 }
 [data-creature='jaguar'][data-revelacion='1'] .jaguar-ojo-brillo {
-  animation-name: jaguar-ojo-chaman;
+  animation-name: jaguar-ojo-noche;
   animation-duration: 2.4s;
 }
 [data-creature='jaguar'][data-revelacion='1'] .jaguar-estrella {
-  animation-name: jaguar-titilar-chaman;
+  animation-name: jaguar-titilar-noche;
   animation-duration: 1.7s;
 }
 [data-creature='jaguar'][data-revelacion='1'] .jaguar-shimmer { animation-duration: 2.6s; }
@@ -1462,7 +1462,7 @@
   50%      { opacity: 0.85; }
 }
 
-/* GLIFOS SAGRADOS (espirales cobre) — invisibles en reposo; se encienden y
+/* GLIFOS (espirales cobre, ornamento geométrico) — invisibles en reposo; se encienden y
    laten en la revelación / el poder (símbolo de poder como adorno). */
 .jaguar-glifos { opacity: 0; }
 [data-creature='jaguar'][data-revelacion='1'] .jaguar-glifos,
@@ -1502,7 +1502,7 @@
 }
 
 /* ── APARICIÓN ESPECTRAL — el jaguar-espíritu se MATERIALIZA y se DESVANECE ───
-   Ciclo místico de presencia (opt-in, data-aparicion): emerge desde la bruma
+   Ciclo de presencia (opt-in, data-aparicion): emerge desde la bruma
    (opacidad que sube + leve escala/ascenso, como si se condensara del aire) se
    queda un rato PRESENTE y vuelve a disolverse en la nada. Solo opacity+transform
    (GPU). El nodo .jaguar-aparicion envuelve TODO el dibujo por fuera de la
@@ -1515,7 +1515,7 @@
   0%   { opacity: 0;    transform: scale(0.94) translateY(1.3px); }  /* la nada */
   14%  { opacity: 0.22; transform: scale(0.97) translateY(0.6px); }  /* se insinúa */
   32%  { opacity: 1;    transform: scale(1) translateY(0); }         /* materializado */
-  66%  { opacity: 1;    transform: scale(1) translateY(0); }         /* presente, sagrado */
+  66%  { opacity: 1;    transform: scale(1) translateY(0); }         /* presente, pleno */
   86%  { opacity: 0.18; transform: scale(0.985) translateY(0.5px); } /* se disuelve */
   100% { opacity: 0;    transform: scale(0.94) translateY(1.3px); }  /* vuelve a la nada */
 }
@@ -1825,7 +1825,7 @@
 [data-creature='borugo'][data-acurruca='1'] .rh-antic,
 [data-creature='borugo'][data-acurruca='1'] .rh-travieso { animation: none; }
 
-/* ── NOCTURNO SAGRADO — el brillo lunar (permanente y sutil) ─────────────────
+/* ── NOCTURNO — el brillo lunar (permanente y sutil) ─────────────────
    Las MOTAS crema de los flancos brillan tenue y los OJOS grandes reflejan la
    luna; en modo poder se vuelve PLATA LUNAR pleno (el ser protegido se revela). */
 .borugo-motas-luz {
