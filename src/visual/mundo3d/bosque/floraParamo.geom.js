@@ -131,8 +131,11 @@ export function raleParamo(c) {
   return {
     ...c,
     // El frailejonal manda: más gigantes héroe y más gradiente de edad.
+    // (Páramo definitivo 2026-07-22: los jóvenes suben a 2.1× — el operador
+    // pidió "diversidad de especies Y de tamaños": un páramo real tiene
+    // rosetas a ras de suelo por cada tronco viejo de dos metros.)
     frailejonHero: boost(c.frailejonHero, 1.55),
-    frailejonJoven: boost(c.frailejonJoven, 1.5),
+    frailejonJoven: boost(c.frailejonJoven, 2.1),
     frailejon: boost(c.frailejon, 1.5),
     frailejonViejo: boost(c.frailejonViejo, 1.55),
     frailejonFlor: boost(c.frailejonFlor, 1.4),
@@ -1073,6 +1076,14 @@ export function distribucionFlora(conteos, seed = 707, bioma = 'bosque') {
       mortino: [4, 12], romerillo: [3, 12], roca: [2, 11], musgo: [1.2, 9],
       gaque: [8.5, 14], roble: [9.5, 16], encenillo: [10, 17], yarumo: [10, 17], aliso: [11, 19],
     };
+  // ESCALAS por bioma (páramo definitivo 2026-07-22). En páramo el rango de
+  // tamaño se ABRE en las dos puntas: rosetas jóvenes casi al ras (0.4) y
+  // patriarcas por encima del héroe estándar (2.4). Es el pedido textual del
+  // operador — "le falta diversidad de páramo en especies y TAMAÑO de
+  // especies": la mezcla de edades es lo que hace verosímil un frailejonal.
+  const E = paramo
+    ? { hero: [1.5, 2.4], joven: [0.4, 1.05], frail: [0.75, 1.5], viejo: [1.0, 1.9], flor: [0.9, 1.6] }
+    : { hero: [1.65, 2.15], joven: [0.8, 1.18], frail: [0.95, 1.4], viejo: [1.05, 1.55], flor: [1.0, 1.45] };
   return {
     // Banda HÉROE (2026-07-20): los gigantes de PRIMER PLANO. Un anillo CERCANO y
     // parejo (uniforme) de adultos GRANDES (esc 1.65-2.15 → 3.5-4.5 m) que rodea
@@ -1082,14 +1093,14 @@ export function distribucionFlora(conteos, seed = 707, bioma = 'bosque') {
     // frente. (El proscenio fijo de FloraParamo.jsx garantiza el trío foreground.)
     // En páramo el anillo se ENSANCHA: héroes también en la media distancia →
     // colosos de frailejón salpicando toda la planicie hasta la niebla.
-    frailejonHero: sembrar(c.frailejonHero, R.hero[0], R.hero[1], rng(seed + 21), { eMin: 1.65, eMax: 2.15, uniforme: true, varia: 0.12, lean: 0.16 }),
+    frailejonHero: sembrar(c.frailejonHero, R.hero[0], R.hero[1], rng(seed + 21), { eMin: E.hero[0], eMax: E.hero[1], uniforme: true, varia: 0.12, lean: 0.16 }),
     // Frailejonal de acompañamiento: TRES edades entremezcladas, agrupadas y
     // ACERCADAS al claro (rMin bajado desde el rediseño 07-16) con mucha
     // variación de tamaño + ladeo → gradiente de edad denso, nada clonado.
-    frailejonJoven: sembrar(c.frailejonJoven, R.joven[0], R.joven[1], rng(seed + 1), { eMin: 0.8, eMax: 1.18, varia: 0.13, lean: 0.15 }),
-    frailejon: sembrar(c.frailejon, R.frail[0], R.frail[1], rng(seed + 12), { eMin: 0.95, eMax: 1.4, varia: 0.14, lean: 0.16 }),
-    frailejonViejo: sembrar(c.frailejonViejo, R.viejo[0], R.viejo[1], rng(seed + 13), { eMin: 1.05, eMax: 1.55, varia: 0.14, lean: 0.18 }),
-    frailejonFlor: sembrar(c.frailejonFlor, R.flor[0], R.flor[1], rng(seed + 2), { eMin: 1.0, eMax: 1.45, varia: 0.1, lean: 0.13 }),
+    frailejonJoven: sembrar(c.frailejonJoven, R.joven[0], R.joven[1], rng(seed + 1), { eMin: E.joven[0], eMax: E.joven[1], varia: 0.13, lean: 0.15 }),
+    frailejon: sembrar(c.frailejon, R.frail[0], R.frail[1], rng(seed + 12), { eMin: E.frail[0], eMax: E.frail[1], varia: 0.14, lean: 0.16 }),
+    frailejonViejo: sembrar(c.frailejonViejo, R.viejo[0], R.viejo[1], rng(seed + 13), { eMin: E.viejo[0], eMax: E.viejo[1], varia: 0.14, lean: 0.18 }),
+    frailejonFlor: sembrar(c.frailejonFlor, R.flor[0], R.flor[1], rng(seed + 2), { eMin: E.flor[0], eMax: E.flor[1], varia: 0.1, lean: 0.13 }),
     // Sotobosque.
     mortino: sembrar(c.mortino, R.mortino[0], R.mortino[1], rng(seed + 3), { eMin: 0.8, eMax: 1.2, varia: 0.12 }),
     romerillo: sembrar(c.romerillo, R.romerillo[0], R.romerillo[1], rng(seed + 4), { eMin: 0.8, eMax: 1.25, varia: 0.14 }),
@@ -1103,4 +1114,41 @@ export function distribucionFlora(conteos, seed = 707, bioma = 'bosque') {
     yarumo: sembrar(c.yarumo, R.yarumo[0], R.yarumo[1], rng(seed + 10), { eMin: 0.9, eMax: 1.15, uniforme: true, varia: 0.06 }),
     aliso: sembrar(c.aliso, R.aliso[0], R.aliso[1], rng(seed + 11), { eMin: 0.9, eMax: 1.12, uniforme: true, varia: 0.08 }),
   };
+}
+
+/*
+ * EL CORREDOR DE LA INMENSIDAD (páramo definitivo 2026-07-22). El encuadre de
+ * reposo mira por la ABRA del anfiteatro (bosqueTakeA: az -2.17) hacia la
+ * cordillera y el mar de nubes; y la cámara vive en el azimut opuesto (+0.97).
+ * Una mata ALTA sembrada al azar dentro de cualquiera de esos dos conos tapa o
+ * el fondo o el primer plano completo. `despejarCorredor` ROTA (mismo radio,
+ * misma escala — no borra nada) las especies altas fuera de ambos conos. Las
+ * bajas (jóvenes, sotobosque, rocas, musgo) se quedan: no llegan al horizonte.
+ */
+const CORREDOR = [
+  { az: -2.17, ancho: 0.6 }, // hacia la abra (el fondo)
+  { az: 0.97, ancho: 0.5 }, // hacia la cámara (el primer plano)
+];
+export function despejarCorredor(dist, claves) {
+  for (const k of claves) {
+    const items = dist[k];
+    if (!items) continue;
+    for (const it of items) {
+      const r = Math.hypot(it.pos[0], it.pos[2]);
+      if (r < 4.5) continue;
+      const az = Math.atan2(it.pos[2], it.pos[0]);
+      for (const cono of CORREDOR) {
+        let d = az - cono.az;
+        while (d > Math.PI) d -= Math.PI * 2;
+        while (d < -Math.PI) d += Math.PI * 2;
+        if (Math.abs(d) < cono.ancho) {
+          const nuevo = cono.az + Math.sign(d || 1) * (cono.ancho + 0.16);
+          it.pos[0] = Math.cos(nuevo) * r;
+          it.pos[2] = Math.sin(nuevo) * r;
+          break;
+        }
+      }
+    }
+  }
+  return dist;
 }

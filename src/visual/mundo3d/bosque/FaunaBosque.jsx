@@ -713,7 +713,45 @@ function VecinosDelBosque({ tier, reducedMotion, franja }) {
 /* ── EL CÓNDOR — la capa lejana ──────────────────────────────────────────
    Silueta oscura de alas planas en V leve que ORBITA el claro por encima de
    los árboles, dentro de la niebla (el fog lo come y lo devuelve: aparece y
-   se pierde solo, sin código extra). Tres mallas, un solo bicho. */
+   se pierde solo, sin código extra).
+   Aunque sea silueta, la FORMA es el retrato del cóndor andino: envergadura
+   enorme y recta, primarias abiertas como DEDOS en la punta del ala, cola
+   corta y cuadrada, y el collar blanco — su firma — bajo la cabeza. La
+   versión anterior era un cono vertical con dos tablas: una mancha. */
+const PRIMARIAS_CONDOR = [
+  // [abanico hacia atrás (rad), largo, ancho] — los dedos del planeo.
+  // Abanico ANCHO y dedos angostos: el vano entre dedo y dedo tiene que ser
+  // mayor que el dedo, o de lejos se funden en un bloque aserrado.
+  [-0.36, 0.4, 0.055], [-0.16, 0.52, 0.06], [0.06, 0.6, 0.062],
+  [0.3, 0.56, 0.06], [0.55, 0.46, 0.055], [0.8, 0.34, 0.05],
+];
+const MAT_CONDOR = { color: '#1d2023', side: THREE.DoubleSide };
+/** Un ala local: se extiende hacia +x, vuela hacia +z (el borde de fuga es −z). */
+function AlaCondor() {
+  return (
+    <>
+      {/* la tabla del brazo: ancha y RECTA, la plancha del planeo */}
+      <mesh position={[0.62, 0, -0.02]}>
+        <boxGeometry args={[1.24, 0.04, 0.6]} />
+        <meshLambertMaterial {...MAT_CONDOR} />
+      </mesh>
+      {/* la mano, apenas más angosta y retrasada */}
+      <mesh position={[1.46, 0, -0.08]}>
+        <boxGeometry args={[0.48, 0.038, 0.46]} />
+        <meshLambertMaterial {...MAT_CONDOR} />
+      </mesh>
+      {/* las primarias digitadas: dedos separados que barren hacia atrás */}
+      {PRIMARIAS_CONDOR.map(([fan, largo, ancho], i) => (
+        <group key={i} position={[1.68, 0, -0.06 - i * 0.015]} rotation={[0, fan, 0]}>
+          <mesh position={[largo / 2, 0, 0]}>
+            <boxGeometry args={[largo, 0.032, ancho]} />
+            <meshLambertMaterial {...MAT_CONDOR} />
+          </mesh>
+        </group>
+      ))}
+    </>
+  );
+}
 function CondorDeAltura({ reducedMotion }) {
   const ave = useRef(null);
   const alaIzq = useRef(null);
@@ -722,10 +760,15 @@ function CondorDeAltura({ reducedMotion }) {
     if (!ave.current) return;
     const t = clock.getElapsedTime();
     const a = t * 0.09 + 3.4; // una vuelta cada ~70 s: paciencia de cóndor
-    const r = 14 + Math.sin(t * 0.05) * 2;
-    ave.current.position.set(Math.cos(a) * r, 11.2 + Math.sin(t * 0.21) * 0.8, Math.sin(a) * r);
+    // Órbita más ADENTRO que antes (r 14→12, y 11.2→10.4): a r 14 el fog del
+    // bosque (far ~47-68) se lo comía entero y la silueta no se leía nunca.
+    const r = 12 + Math.sin(t * 0.05) * 2;
+    ave.current.position.set(Math.cos(a) * r, 10.4 + Math.sin(t * 0.21) * 0.8, Math.sin(a) * r);
     ave.current.rotation.y = -a; // el pico hacia donde vuela (tangente)
-    ave.current.rotation.z = 0.14 + Math.sin(t * 0.13) * 0.08; // banqueo suave
+    // Banqueo marcado (0.14→0.34): la cámara va casi al nivel del ave y sin
+    // inclinación las alas quedan de CANTO (4 cm de grosor = invisibles). Con
+    // ~19° el plano del ala se muestra — así es como circula un cóndor real.
+    ave.current.rotation.z = 0.34 + Math.sin(t * 0.13) * 0.08;
     // Casi nunca aletea: dos golpes de ala cada tanto, el resto plancha.
     const rafaga = Math.max(0, Math.sin(t * 0.23) - 0.86) * 7;
     const aleteo = Math.sin(t * 9) * 0.35 * rafaga;
@@ -733,25 +776,38 @@ function CondorDeAltura({ reducedMotion }) {
     if (alaDer.current) alaDer.current.rotation.z = -0.12 - aleteo;
   });
   return (
-    <group ref={ave} position={reducedMotion ? [-9, 11, -8] : [14, 11.2, 0]}>
-      {/* cuerpo con el collar blanco insinuado */}
-      <mesh rotation={[0, Math.PI / 2, 0]}>
-        <coneGeometry args={[0.22, 1.1, 5]} />
+    <group ref={ave} position={reducedMotion ? [-6, 9.8, -4] : [12, 10.4, 0]}>
+      {/* cuerpo fusiforme HORIZONTAL, tendido en la dirección del vuelo (+z) */}
+      <mesh position={[0, 0, 0.02]} scale={[0.72, 0.62, 2.1]}>
+        <sphereGeometry args={[0.3, 7, 6]} />
         <meshLambertMaterial color="#23262a" />
       </mesh>
-      <mesh position={[0, 0.1, 0.32]}>
-        <sphereGeometry args={[0.13, 6, 5]} />
-        <meshLambertMaterial color="#d8d4c8" />
+      {/* EL COLLAR BLANCO — la firma: un anillo mullido bajo la cabeza */}
+      <mesh position={[0, 0.05, 0.52]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.2, 0.2, 0.14, 8]} />
+        <meshLambertMaterial color="#e8e3d4" />
       </mesh>
-      {/* alas planas de puntas digitadas (cajas finas: silueta, no plumaje) */}
-      <mesh ref={alaIzq} position={[0, 0.06, 0]}>
-        <boxGeometry args={[3.6, 0.045, 0.7]} />
+      {/* cabeza pequeña y pico corto */}
+      <mesh position={[0, 0.1, 0.72]}>
+        <sphereGeometry args={[0.09, 6, 5]} />
+        <meshLambertMaterial color="#23262a" />
+      </mesh>
+      <mesh position={[0, 0.08, 0.86]} rotation={[Math.PI / 2, 0, 0]}>
+        <coneGeometry args={[0.045, 0.16, 5]} />
         <meshLambertMaterial color="#1d2023" />
       </mesh>
-      <mesh ref={alaDer} position={[0, 0.06, 0]} rotation={[0, Math.PI, 0]}>
-        <boxGeometry args={[3.6, 0.045, 0.7]} />
-        <meshLambertMaterial color="#1d2023" />
+      {/* la cola CORTA y CUADRADA (nada de flechas de golondrina) */}
+      <mesh position={[0, 0, -0.72]}>
+        <boxGeometry args={[0.44, 0.032, 0.44]} />
+        <meshLambertMaterial {...MAT_CONDOR} />
       </mesh>
+      {/* alas: tabla recta + mano + primarias como dedos (ver AlaCondor) */}
+      <group ref={alaIzq} position={[0.08, 0.05, 0.06]}>
+        <AlaCondor />
+      </group>
+      <group ref={alaDer} position={[-0.08, 0.05, 0.06]} scale={[-1, 1, 1]}>
+        <AlaCondor />
+      </group>
     </group>
   );
 }

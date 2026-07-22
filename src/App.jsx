@@ -165,10 +165,13 @@ const VitrinaCriaturasMockup = lazy(() => import('./mockups/vitrina3d/VitrinaCri
 // paleta de 16 muestras, la rampa de 3 bandas y el borde tinta. Patrón oro:
 // ningún activo entra al valle si desentona aquí. #/mockups/hoja-prueba-valle.
 const HojaPruebaValleMockup = lazy(() => import('./mockups/HojaPruebaValle'));
-// 3D: el MUNDO BOSQUE VIVO y su guardián, el Ent de la queñua (colorado,
-// Polylepis) — mallas three reales (tronco retorcido con rostro tallado, copa
-// instanciada), device-tiering real. Ruta #/mockups/bosque-vivo-3d, sin auth.
-const BosqueVivo3DMockup = lazy(() => import('./mockups/BosqueVivo3D'));
+// 3D: el PÁRAMO DEFINITIVO (2026-07-22) — el mundo ÚNICO del páramo: la escena
+// del bosque vivo (iluminación + vegetación + niebla en capas + fauna) con la
+// cámara de la llegada y el fondo de inmensidad del páramo viejo, el suelo
+// rico dorado y el frailejonal por edades. Sin Ent ni campesino (decisión del
+// operador). Reemplaza a BosqueVivo3D, MundoParamo3D y SueloDemo3D (los tres
+// archivados en src/mockups/_archivo/). Ruta #/mockups/paramo-definitivo.
+const ParamoDefinitivoMockup = lazy(() => import('./visual/mundo3d/bosque/MundoEntBosque.jsx'));
 // 3D: el MUNDO DEL CAFÉ — el cafetal bajo sombra del piso templado: surcos a
 // curva de nivel, cereza madurando verde→pintón→rojo por instancia, el sombrío
 // de guamos y nogales, y la casa-beneficiadero en la bruma. Device-tiering
@@ -269,9 +272,6 @@ const ValleNoche3DMockup = lazy(() => import('./mockups/ValleNoche3D'));
 // policultivo. Estetica Cuphead andina (linea que respira, squash & stretch),
 // SVG puro, offline, sin gamificacion toxica.
 const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
-// 3D: el PÁRAMO altoandino — el ecosistema de la niebla (frailejones, musgo,
-// quenuas, aves) y el NACIMIENTO del agua. Didáctico: la fábrica de agua.
-const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
 // 3D: el BOSQUE nativo altoandino por ESTRATOS — los doce arquetipos de forma
 // de crecimiento con los que se representa el catálogo de flora sin modelar las
 // 581 especies una por una.
@@ -298,7 +298,6 @@ const MundoMercado3DMockup = lazy(() => import('./mockups/MundoMercado3D'));
 // La CARA 3D-first de prod.chagra.app: entrada-tranquera con el valle vivo de
 // fondo → velo dorado del cruce → el valle como HOME (EntradaValle3D).
 const CaraProd3DMockup = lazy(() => import('./mockups/CaraProd3D'));
-const SueloDemo3DMockup = lazy(() => import('./mockups/SueloDemo3D'));
 const CriaturasNocturnasMockup = lazy(() => import('./mockups/CriaturasNocturnas'));
 // Angelita al máximo: la entrada teatral (gafas + crecimiento) y el repertorio
 // completo de estados del agente, uno al lado del otro.
@@ -689,7 +688,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-animales': 'mockup_mundo3d_animales',
   'mockups/mundo3d-milpa': 'mockup_mundo3d_milpa',
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
-  'mockups/bosque-vivo-3d': 'mockup_bosque_vivo_3d',
+  'mockups/paramo-definitivo': 'mockup_paramo_definitivo',
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
   'mockups/aguacatal-vivo-3d': 'mockup_aguacatal_vivo_3d',
   'mockups/microcuenca': 'mockup_microcuenca',
@@ -755,7 +754,6 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-agua-3d': 'mockup_mundo_agua_3d',
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
-  'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
   'mockups/bosque-tres-estratos': 'mockup_bosque_tres_estratos',
   'mockups/tres-ents-gradiente': 'mockup_tres_ents_gradiente',
   'mockups/paramo-humboldt-3d': 'mockup_paramo_humboldt_3d',
@@ -768,7 +766,6 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-gallinero-3d': 'mockup_mundo_gallinero_3d',
   'mockups/mundo-mercado-3d': 'mockup_mundo_mercado_3d',
   'mockups/cara-prod': 'mockup_cara_prod',
-  'mockups/suelo-demo-3d': 'mockup_suelo_demo_3d',
   'mockups/criaturas-nocturnas': 'mockup_criaturas_nocturnas',
   'mockups/angelita-viva': 'mockup_angelita_viva',
   'mockups/mundo-polinizadores-3d': 'mockup_mundo_polinizadores_3d',
@@ -1695,16 +1692,16 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
-      case 'mockup_bosque_vivo_3d':
-        // Vitrina pública del MUNDO BOSQUE VIVO: el Ent de la queñua (colorado,
-        // Polylepis) en 3D REAL — tronco retorcido con corteza rojiza y rostro
-        // tallado, copa de hojitas instanciadas, meciéndose en la niebla del
-        // páramo. Device-tiering real; en equipo humilde muestra la ficha del
-        // guardián. Ruta #/mockups/bosque-vivo-3d, sin auth.
+      case 'mockup_paramo_definitivo':
+        // EL PÁRAMO DEFINITIVO: el mundo único del páramo (frailejonal por
+        // edades, queñual, niebla en capas, cordillera y mar de nubes por la
+        // abra, cámara de llegada). Ruta #/mockups/paramo-definitivo, sin auth.
         return (
           <ErrorBoundary>
-            <ErrorFallback moduleName="El bosque vivo">
-              <BosqueVivo3DMockup />
+            <ErrorFallback moduleName="El páramo definitivo">
+              <div style={{ position: 'fixed', inset: 0 }}>
+                <ParamoDefinitivoMockup />
+              </div>
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2416,16 +2413,6 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
-      case 'mockup_suelo_demo_3d':
-        // El SUELO calibre Switch (#/mockups/suelo-demo-3d): terreno fbm con
-        // color por zona, sendero, detalle al ras. ?vista=aerea|cerca|sendero.
-        return (
-          <ErrorBoundary>
-            <ErrorFallback moduleName="El suelo del páramo">
-              <SueloDemo3DMockup />
-            </ErrorFallback>
-          </ErrorBoundary>
-        );
       case 'mockup_criaturas_nocturnas':
         // Vitrina de la fauna NOCTURNA colombiana + el cóndor del valle en el
         // estilo biopunk del GuardianEspiritu (#/mockups/criaturas-nocturnas).
@@ -2484,19 +2471,6 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Cámara de director">
               <CamaraDirectorDemoMockup />
-            </ErrorFallback>
-          </ErrorBoundary>
-        );
-      case 'mockup_mundo_paramo_3d':
-        // El páramo altoandino: el ecosistema de la niebla en hora dorada —
-        // frailejones (Espeletia), cojines de musgo, pajonal, quenuas con la
-        // niebla enganchada, aves de páramo y el NACIMIENTO del agua. Didáctico
-        // sobre conservación: el páramo como fábrica de agua (botón «cómo nace
-        // el agua»). Ruta #/mockups/mundo-paramo-3d, sin auth.
-        return (
-          <ErrorBoundary>
-            <ErrorFallback moduleName="El páramo altoandino">
-              <MundoParamo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
