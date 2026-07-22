@@ -122,7 +122,14 @@ async function main() {
   const base = target === 'dev'
     ? (process.env.CANARY_DEV_URL || 'https://chagra-dev.guatoc.co')
     : (process.env.CANARY_PROD_URL || 'https://chagra.app');
-  const now = new Date();
+  // CANARY_DATE (YYYY-MM-DD) fija la fecha para retests REPRODUCIBLES: el banco
+  // dinámico C1 rota sus sujetos por día del año, así que un retest debe usar la
+  // fecha de la corrida original para evaluar los MISMOS sujetos (si cruza la
+  // medianoche UTC sin fijarla, compara químicos distintos → veredicto inválido).
+  const envDate = process.env.CANARY_DATE;
+  const now = /^\d{4}-\d{2}-\d{2}$/.test(envDate || '')
+    ? new Date(`${envDate}T12:00:00Z`)
+    : new Date();
   const dateStr = now.toISOString().slice(0, 10);
   const outDir = process.env.CANARY_OUT_DIR || join(homedir(), 'chagra-canary-runs');
   mkdirSync(outDir, { recursive: true });
