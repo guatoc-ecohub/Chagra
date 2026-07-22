@@ -10,6 +10,7 @@ import '@testing-library/jest-dom';
 import { describe, test, expect, afterEach, vi } from 'vitest';
 
 import GemeloValle2D, { GemeloValleEscena } from '../GemeloValle2D.jsx';
+import Mundo2D from '../Mundo2D.jsx';
 import { MUNDOS_VALLE, COSA_DEL_DIA } from '../../../mockups/valle/valleData';
 
 afterEach(() => cleanup());
@@ -84,5 +85,19 @@ describe('GemeloValle2D — el gemelo 2D de primera clase del valle', () => {
     expect(onHotspot).toHaveBeenCalledWith('mundo', { mundoId: 'suelo' });
     fireEvent.click(getByRole('button', { name: /Alerta del día/ }));
     expect(onHotspot).toHaveBeenCalledWith('hoy_finca');
+  });
+
+  test('todos los hotspots quedan dentro de 0 a 100 por ciento', () => {
+    const { container } = render(<Mundo2D escena="valle2d" entrada={{ params: { clima: 'soleado' } }} />);
+    const hotspots = [...container.querySelectorAll('.gv-poi')];
+    expect(hotspots).toHaveLength(MUNDOS_VALLE.length);
+    hotspots.forEach((hotspot) => {
+      const left = Number.parseFloat(hotspot.style.left);
+      const top = Number.parseFloat(hotspot.style.top);
+      expect(left).toBeGreaterThanOrEqual(0);
+      expect(left).toBeLessThanOrEqual(100);
+      expect(top).toBeGreaterThanOrEqual(0);
+      expect(top).toBeLessThanOrEqual(100);
+    });
   });
 });

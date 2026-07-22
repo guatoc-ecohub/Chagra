@@ -261,7 +261,7 @@ const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
 const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
 const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
-const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
+const ShowcaseArtesaniaMockup = lazy(() => import('./visual/mundo3d/ArtesaniaAndina'));
 const EfectosFuncionalesDemoMockup = lazy(() => import('./mockups/EfectosFuncionalesDemo'));
 const CatalogoInfraDemoMockup = lazy(() => import('./mockups/CatalogoInfraDemo'));
 const MundoAbejas3DMockup = lazy(() => import('./mockups/MundoAbejas3D'));
@@ -2341,12 +2341,12 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'mockup_artesania_andina':
-        // Artesanía andina (FASE 4 audit 3D): lenguaje de forma — 5 siluetas
-        // revolucionadas (vasija/mojón/telar/terraza/tótem) + antes/después.
+        // Showcase del kit ArtesaníaAndina: primitivas y muestrario visual
+        // autocontenido, disponible como ruta pública de mockup.
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="Artesanía andina">
-              <ArtesaniaAndinaDemoMockup />
+              <ShowcaseArtesaniaMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

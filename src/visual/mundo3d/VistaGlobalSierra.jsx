@@ -62,6 +62,8 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { ATMOSFERA } from './atmosferaMadre.js';
 import { perfilDeTier } from './deviceTier.js';
+import PisosTermicosBandas from './PisosTermicosBandas.jsx';
+import TransicionSierraMundo from './TransicionSierraMundo.jsx';
 
 /* ── Geografía del macizo (validada contra el DR: mar al norte, macizo al sur,
       cumbres gemelas + Simmonds, costa de Palomino). Coordenadas de MUNDO:
@@ -470,7 +472,14 @@ export default function VistaGlobalSierra({
   className = '',
 }) {
   const [listo, setListo] = useState(false);
+  const [pisoActivo, setPisoActivo] = useState(null);
+  const [viaje, setViaje] = useState(null);
+  const camaraRef = useRef(null);
   const perfil = perfilDeTier(tier);
+  const iniciarViaje = (piso) => {
+    setPisoActivo(piso.id);
+    setViaje({ activa: true, direccion: 'bajar', pisoDestino: piso.id });
+  };
   return (
     <section
       className={`vsierra-root${className ? ` ${className}` : ''}`}
@@ -484,7 +493,10 @@ export default function VistaGlobalSierra({
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
         camera={{ position: [-1.5, 5.2, -11], fov: 48 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
-        onCreated={() => setListo(true)}
+        onCreated={({ camera }) => {
+          camaraRef.current = camera;
+          setListo(true);
+        }}
       >
         {/* Cámara PARADA sobre el mar Caribe (−Z, norte), mirando al SUR (+Z) y
             un poco hacia arriba: el mar llena el primer plano y las cumbres
@@ -498,6 +510,13 @@ export default function VistaGlobalSierra({
           reducedMotion={reducedMotion}
           pisoUsuario={pisoUsuario}
           credito={false}
+        />
+        <PisosTermicosBandas
+          pisoUsuario={pisoUsuario}
+          pisoActivo={pisoActivo}
+          tier={tier}
+          reducedMotion={reducedMotion}
+          onSeleccionPiso={iniciarViaje}
         />
         <OrbitControls
           makeDefault
@@ -545,6 +564,14 @@ export default function VistaGlobalSierra({
           </div>
         </div>
       </div>
+      <TransicionSierraMundo
+        {...viaje}
+        tier={tier}
+        reducedMotion={reducedMotion}
+        camaraRef={camaraRef}
+        onMitad={() => setPisoActivo(viaje?.pisoDestino ?? null)}
+        onFin={() => setViaje(null)}
+      />
     </section>
   );
 }
