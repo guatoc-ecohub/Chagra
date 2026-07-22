@@ -1825,7 +1825,7 @@
 [data-creature='borugo'][data-acurruca='1'] .rh-antic,
 [data-creature='borugo'][data-acurruca='1'] .rh-travieso { animation: none; }
 
-/* ── NOCTURNO SAGRADO — el brillo lunar (permanente y sutil) ─────────────────
+/* ── NOCTURNO — el brillo lunar (permanente y sutil) ─────────────────
    Las MOTAS crema de los flancos brillan tenue y los OJOS grandes reflejan la
    luna; en modo poder se vuelve PLATA LUNAR pleno (el ser protegido se revela). */
 .borugo-motas-luz {
