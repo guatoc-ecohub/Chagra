@@ -76,6 +76,12 @@ export default defineConfig({
   build: {
     target: 'es2022',
     rolldownOptions: {
+      // Multi-página: la PWA (index.html) + el mockup público del mercado
+      // (mercado.html → mercado.chagra.bio) se emiten en el mismo build.
+      input: {
+        main: resolve(import.meta.dirname, 'index.html'),
+        mercado: resolve(import.meta.dirname, 'mercado.html'),
+      },
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) {
