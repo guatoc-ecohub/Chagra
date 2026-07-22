@@ -29,8 +29,13 @@ export const ENV = {
   // Modelos de inferencia (configurables sin recompilar).
   // Cambia en .env cuando bumpees el modelo local.
   STT_MODEL: import.meta.env?.VITE_STT_MODEL || 'base',
-  // 2026-06-11: default gemma3:4b → granite3.3:8b. gemma3:4b NO carga junto a
-  // granite3.3 pinned (VRAM) → la extracción de voz daba 0 plantas. granite3.3
-  // (hot) extrae bien. Alinea el display + HelpVoiceQuestion con el modelo real.
-  NLU_MODEL: import.meta.env?.VITE_NLU_MODEL || 'granite3.3:8b',
+  // 2026-07-22: granite3.3:8b → gemma4:e2b, por medición con juez semántico sobre
+  // 70 sondas: granite3.3 contamina el 47,7% de sus respuestas y falla el piso
+  // térmico el 41,7% de las veces (le da consejo de tierra caliente a alguien de
+  // páramo). gemma4:e2b baja a 10% global y 6,7% en piso térmico — 4,8x mejor.
+  // Además pesa 8,1GB cargado contra 7,2GB, y CONVIVE con el embedder del RAG
+  // (snowflake-arctic-embed2) en la M6000 de 12GB, cosa que granite3.3 no hacía:
+  // con granite el embedder daba cudaMalloc OOM y el RAG semántico se apagaba en
+  // silencio. Verificado en vivo: embed 200ms + agente 860-1450ms, conviviendo.
+  NLU_MODEL: import.meta.env?.VITE_NLU_MODEL || 'gemma4:e2b',
 };
