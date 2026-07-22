@@ -12,7 +12,7 @@
  * ofrece — no cómo se ve la ladera (eso lo prueba el screenshot del PR).
  */
 import React from 'react';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
@@ -85,8 +85,19 @@ describe('el Ent protagonista sale del piso térmico de la finca', () => {
     expect(escena).toHaveAttribute('data-pisos-visibles', 'templado,frio');
   });
 
-  test('un piso sin Ent tallado todavía (calido) cae al mismo default', () => {
+  /* Desde 2026-07-22 'calido' YA tiene Ent (la ceiba): el caso dejó de ser
+     "piso sin tallar" y pasó a ser un protagonista más. El PR de la ceiba
+     (#2691) entró sin actualizar esta aserción y el archivo quedó rojo en dev. */
+  test('perfil cálido → protagonista cálido (ceiba), vecino templado (el de arriba)', () => {
     perfilRef.current = { pisoTermico: 'calido' };
+    render(<TresEntsGradiente3D />);
+    const escena = screen.getByTestId('escena-stub');
+    expect(escena).toHaveAttribute('data-foco', 'calido');
+    expect(escena).toHaveAttribute('data-pisos-visibles', 'calido,templado');
+  });
+
+  test('un piso sin Ent tallado (desconocido) cae al mismo default', () => {
+    perfilRef.current = { pisoTermico: 'glacial' };
     render(<TresEntsGradiente3D />);
     const escena = screen.getByTestId('escena-stub');
     expect(escena).toHaveAttribute('data-foco', 'templado');
@@ -98,9 +109,17 @@ describe('los botones — se conservan para ir a ver los otros, nunca "Los tres"
   test('hay un botón por Ent y NINGUNO ofrece ver los tres juntos', () => {
     perfilRef.current = { pisoTermico: 'frio' };
     render(<TresEntsGradiente3D />);
-    const botones = screen.getAllByRole('button');
-    expect(botones.map((b) => b.textContent)).toEqual(['El roble', 'El aliso', 'La queñua']);
+    /* El grupo de navegación trae EXACTAMENTE un botón por Ent. Fuera del
+       grupo puede vivir otro cromo (p. ej. «Leer más» de la carta plegable en
+       teléfono) — lo que este test cuida es que la navegación nunca ofrezca
+       un camino de vuelta a "los tres juntos". */
+    const grupo = screen.getByRole('group', { name: /los ents del gradiente/i });
+    const botones = within(grupo).getAllByRole('button');
+    /* El orden es el de PISOS_CON_ENT (cálido→páramo): con la ceiba adentro
+       son CUATRO botones — y sigue sin existir un "verlos todos juntos". */
+    expect(botones.map((b) => b.textContent)).toEqual(['La ceiba', 'El roble', 'El aliso', 'La queñua']);
     expect(screen.queryByRole('button', { name: /los tres/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /los cuatro/i })).not.toBeInTheDocument();
   });
 
   test('navegar a otro Ent reemplaza el par visible, nunca lo agrega a un tercero', () => {

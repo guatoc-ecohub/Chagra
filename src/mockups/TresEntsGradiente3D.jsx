@@ -140,9 +140,22 @@ const VISTAS = {
  * carta se le quitó grasa para que quepa en el cielo de arriba a la izquierda
  * sin llegarle a la copa: la solución no era mover al árbol, era escribir más
  * corto.
+ *
+ * ── Y la variante RETRATO (teléfono en vertical, 390×844) ──────────────────
+ * A 18,5 metros con fov 37 la copa sale en primer plano en un cuadro angosto:
+ * el usuario veía un pedazo de árbol, nunca el árbol. La variante `alto` se
+ * planta MÁS ATRÁS con el fov más abierto, siempre centrada: el Ent entero cae
+ * en la franja libre que dejan el título arriba y la carta plegada abajo.
  */
-function vistaDeEnt(piso) {
+function vistaDeEnt(piso, alto = false) {
   const ySuelo = alturaLadera(piso.x, piso.z);
+  if (alto) {
+    return {
+      mira: new THREE.Vector3(piso.x, ySuelo + 4.6, piso.z),
+      pos: new THREE.Vector3(piso.x, ySuelo + 5.6, piso.z + 21),
+      fov: 47,
+    };
+  }
   return {
     mira: new THREE.Vector3(piso.x, ySuelo + 4.6, piso.z),
     pos: new THREE.Vector3(piso.x + 0.7, ySuelo + 6.9, piso.z + 18.5),
@@ -152,8 +165,9 @@ function vistaDeEnt(piso) {
 
 /* Construido DESDE `PISOS` (la geometría de la ladera), no a mano: cuando la
    terraza de la ceiba entre a `gradienteAndino.PISOS`, su retrato de cámara
-   sale solo, sin tocar esta pantalla. */
+   sale solo, sin tocar esta pantalla. Un retrato por orientación. */
 const VISTA_ENT = Object.fromEntries(PISOS.map((piso) => [piso.id, vistaDeEnt(piso)]));
+const VISTA_ENT_ALTO = Object.fromEntries(PISOS.map((piso) => [piso.id, vistaDeEnt(piso, true)]));
 
 /* Qué lección le toca a cada piso — se lee de `MAPA_PISO_ENT` (piso→Ent) y
    `LECCIONES` (Ent→texto): agregar un piso con Ent no pide tocar esta línea. */
@@ -179,22 +193,32 @@ const BOTONES = PISOS_CON_ENT.map((pisoId) => ({
  * el usuario toca la escena: si el lerp siguiera vivo mientras alguien arrastra
  * con el dedo, la cámara le pelearía la mano y el mundo se sentiría trabado.
  */
-function Camarografo({ vista, controls }) {
+function Camarografo({ vista, controls, reducedMotion }) {
   const size = useThree((s) => s.size);
+  const invalidate = useThree((s) => s.invalidate);
   const animando = useRef(true);
 
+  const retrato = size.width / Math.max(1, size.height) < 0.95;
   const destino = useMemo(() => {
-    /* `vista` siempre debería traer su propio retrato en `VISTA_ENT` (viene
-       del perfil o de un botón, ambos acotados a `PISOS_CON_ENT`). Si no lo
-       trae — un valor corrupto, o un piso nuevo sin terraza todavía — la red
-       de seguridad es la vista panorámica, nunca una cámara mirando a la nada. */
-    return VISTA_ENT[vista]
-      || (size.width / Math.max(1, size.height) < 0.95 ? VISTAS.juntosAlto : VISTAS.juntosAncho);
-  }, [vista, size.width, size.height]);
+    /* `vista` siempre debería traer su propio retrato (viene del perfil o de
+       un botón, ambos acotados a `PISOS_CON_ENT`) — y el retrato se elige POR
+       ORIENTACIÓN: en teléfono vertical la variante `alto`, que retrocede y
+       centra para que el árbol entero quepa en la franja libre de UI. Si la
+       vista no trae retrato — un valor corrupto, o un piso nuevo sin terraza
+       todavía — la red de seguridad es la vista panorámica, nunca una cámara
+       mirando a la nada. */
+    return (retrato ? VISTA_ENT_ALTO[vista] : VISTA_ENT[vista])
+      || (retrato ? VISTAS.juntosAlto : VISTAS.juntosAncho);
+  }, [vista, retrato]);
 
   useEffect(() => {
     animando.current = true;
-  }, [destino]);
+    /* Con `frameloop='demand'` (reduced motion) los cuadros solo corren cuando
+       alguien los pide: sin este empujón el lerp de abajo no arrancaba nunca y
+       la cámara se quedaba COLGADA a mitad de viaje — encima del Ent, viendo
+       un pedazo de copa. Es exactamente lo que salía en las capturas 390×844. */
+    if (typeof invalidate === 'function') invalidate();
+  }, [destino, invalidate]);
 
   useEffect(() => {
     const c = controls.current;
@@ -212,6 +236,20 @@ function Camarografo({ vista, controls }) {
   useFrame((estado, dt) => {
     if (!animando.current) return;
     const cam = estado.camera;
+    /* Con reduced motion NO hay paseo: se CORTA a la vista destino en un solo
+       cuadro. Es lo que pide la preferencia (menos movimiento, no movimiento
+       lento) y además es lo único robusto con `frameloop='demand'`, donde un
+       lerp por cuadro se muere apenas nadie vuelve a pedir un frame. */
+    if (reducedMotion) {
+      cam.position.copy(destino.pos);
+      cam.fov = destino.fov;
+      cam.updateProjectionMatrix();
+      const ctl = controls.current;
+      if (ctl) { ctl.target.copy(destino.mira); ctl.update(); }
+      animando.current = false;
+      return;
+    }
+    estado.invalidate();
     const k = 1 - Math.exp(-Math.min(0.1, dt) * 3.2);
     cam.position.lerp(destino.pos, k);
     if (Math.abs(cam.fov - destino.fov) > 0.01) {
@@ -244,9 +282,19 @@ function Camarografo({ vista, controls }) {
    teléfono. Dos nodos en el DOM cuestan nada y evitan tener que medir la
    ventana en JavaScript para decidir un layout — que es el tipo de cosa que se
    desincroniza con el CSS y termina mostrando las dos o ninguna. */
-function Carta({ leccion }) {
+function Carta({ leccion, plegable = false }) {
+  /* En teléfono la carta arranca PLEGADA: título, especie y dos líneas de
+     texto. La lección completa sigue ahí, a un toque de «Leer más» — plegar
+     no es recortar. Desplegada entera, la carta se comía el 40 % de la
+     pantalla y el Ent quedaba retratado detrás de su propio texto.
+     Al cambiar de Ent la carta vuelve a plegarse SIN efecto: el padre la
+     monta con `key={vista}` y el estado nace de cero. */
+  const [abierta, setAbierta] = useState(false);
   return (
-    <article className="teg-carta" role="status">
+    <article
+      className={`teg-carta${plegable && !abierta ? ' teg-carta-plegada' : ''}`}
+      role="status"
+    >
       <header className="teg-carta-cab">
         <h3>{leccion.titulo}</h3>
         <p className="teg-cientifico">
@@ -255,6 +303,16 @@ function Carta({ leccion }) {
         </p>
       </header>
       <p className="teg-texto">{leccion.texto}</p>
+      {plegable && (
+        <button
+          type="button"
+          className="teg-leer-mas"
+          aria-expanded={abierta}
+          onClick={() => setAbierta((a) => !a)}
+        >
+          {abierta ? 'Ver menos' : 'Leer más'}
+        </button>
+      )}
     </article>
   );
 }
@@ -372,7 +430,7 @@ export default function TresEntsGradiente3D() {
           pisosVisibles={pisosVisibles}
         />
 
-        <Camarografo vista={vista} controls={controls} />
+        <Camarografo vista={vista} controls={controls} reducedMotion={reducedMotion} />
 
         <OrbitControls
           ref={controls}
@@ -426,7 +484,7 @@ export default function TresEntsGradiente3D() {
               </button>
             ))}
           </div>
-          <Carta leccion={leccion} />
+          <Carta key={vista} leccion={leccion} plegable />
         </div>
       </div>
     </section>
@@ -450,6 +508,9 @@ const CSS = `
 .teg-cientifico { margin: 0.1rem 0 0.35rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; font: 500 0.74rem/1.3 system-ui, sans-serif; opacity: 0.9; }
 .teg-piso { opacity: 0.78; }
 .teg-texto { margin: 0; font: 500 0.79rem/1.5 system-ui, sans-serif; }
+/* La carta plegada: dos líneas de texto y el resto detrás de «Leer más». */
+.teg-carta-plegada .teg-texto { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.teg-leer-mas { pointer-events: auto; appearance: none; border: 0; background: none; padding: 0.3rem 0 0; color: #cfe3c2; font: 700 0.75rem/1 system-ui, sans-serif; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 /* En teléfono (o en cualquier ventana angosta) la ladera ocupa la franja del
    medio y no hay cielo lateral que aprovechar: la carta baja al pie, junto a
    los botones, que es donde alcanza el pulgar. */
