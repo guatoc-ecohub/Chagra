@@ -79,6 +79,38 @@ function isPermissionError(msg) {
   return typeof msg === 'string' && /not permitted|permission|forbidden|access denied|no autorizado/i.test(msg);
 }
 
+/**
+ * Extrae la CAUSA legible de un error de la API de ollama (`{"error":"…"}`).
+ * Mismo racional que `jsonApiError`: un "HTTP 404" pelado no distingue "el proxy
+ * perdió la ruta" de "el modelo que pide el canario ya no está en el host", y esa
+ * ambigüedad costó la noche del 2026-07-22 — `granite3.3:8b` desapareció de ollama
+ * a mitad de la corrida y B0/B0f/B0g/C1 cayeron en cascada sin que el reporte
+ * dijera por qué. Ollama lo venía diciendo en el cuerpo desde el primer turno:
+ * `model 'granite3.3:8b' not found`.
+ */
+function ollamaError(res) {
+  const raw = res?.json?.error || (typeof res?.text === 'string' ? res.text.trim() : '');
+  if (!raw) return null;
+  return String(raw).replace(/\s+/g, ' ').slice(0, 200);
+}
+
+/** ¿La causa del error es que el modelo pedido no existe en el host de ollama? */
+function isModelNotFound(msg) {
+  return typeof msg === 'string' && /model\s+.*not found|no such model|pull the model/i.test(msg);
+}
+
+/**
+ * Causa predominante de una tanda de turnos sin respuesta. Se queda con el error
+ * más repetido para que el `detalle` diga "por qué" y no solo "cuántos".
+ */
+function causaPredominante(errores) {
+  const limpios = errores.filter(Boolean);
+  if (!limpios.length) return null;
+  const conteo = new Map();
+  for (const e of limpios) conteo.set(e, (conteo.get(e) || 0) + 1);
+  return [...conteo.entries()].sort((a, b) => b[1] - a[1])[0][0];
+}
+
 const JSONAPI = { Accept: 'application/vnd.api+json', 'Content-Type': 'application/vnd.api+json' };
 // JPEG 1x1 válido (marcador de foto del canario; embebido para no depender de assets).
 const CANARY_JPEG_B64 =
@@ -162,7 +194,10 @@ async function generateChat(base, bearer, systemPrompt, userPrompt, model) {
     timeoutMs: 180000,
   });
   const latency = Date.now() - start;
-  if (!r.ok || !r.json) return { response: '', latency_ms: latency, error: `HTTP ${r.status}` };
+  if (!r.ok || !r.json) {
+    const causa = ollamaError(r);
+    return { response: '', latency_ms: latency, error: `HTTP ${r.status}${causa ? ` — ${causa}` : ''}`, causa };
+  }
   return { response: r.json.message?.content || '', latency_ms: latency, model: r.json.model || model };
 }
 
@@ -226,7 +261,17 @@ async function runConversacion(ctx) {
     }
   }
   const status = turnOk === conversation.length ? 'pass' : 'fail';
-  return { status, valor: `${turnOk}/${conversation.length} respuestas`, detalle: `Conversación compleja sobre ${topic.id} (${turnOk}/${conversation.length} turnos con respuesta).`, data: { topic: topic.id } };
+  // Un "0/4 respuestas" sin causa manda al operador a investigar de cero. El error
+  // que devolvió el transporte ya está en ctx.responses: subirlo al detalle es lo
+  // que convierte el reporte en accionable (mismo racional que B0b, PR #2559).
+  const causa = causaPredominante(ctx.responses.map((r) => r.error));
+  const porQue = status === 'pass' || !causa ? '' : ` Causa: ${causa}.`;
+  return {
+    status,
+    valor: `${turnOk}/${conversation.length} respuestas`,
+    detalle: `Conversación compleja sobre ${topic.id} (${turnOk}/${conversation.length} turnos con respuesta).${porQue}`,
+    data: { topic: topic.id, causa, modelo_ausente: isModelNotFound(causa) },
+  };
 }
 
 /**
@@ -548,6 +593,21 @@ async function runAvicolaFrio(ctx) {
   const systemPrompt = buildEnrichedSystemPrompt(entities);
   const gen = await generateChat(base, token, systemPrompt, q, chatModel);
   const text = gen.response || '';
+
+  // Sin respuesta del transporte no hay nada que juzgar: el golden mide la CALIDAD
+  // de la ración, no la disponibilidad del agente. Antes esto salía como
+  // "(a) sin cantidad g/kg; (b) no ajusta por frío/altura; (d) cascarón" — tres
+  // acusaciones al agente por un HTTP 404, y una línea envenenada en el JSONL del
+  // golden que mañana se lee como regresión de calidad. Mismo criterio que B0c/A2.
+  if (!text && gen.error) {
+    return {
+      status: 'skip',
+      valor: `no evaluable (${gen.error})`,
+      detalle: `El agente no respondió (${gen.error}): sin respuesta no se puede evaluar la ración. NO implica regresión del golden.`,
+      data: { evaluable: false, error: gen.error, modelo_ausente: isModelNotFound(gen.error) },
+    };
+  }
+
   const ev = evalAvicolaFrio(text);
 
   // Golden/regresión: acumula la respuesta + sub-flags para trackear cuándo pasa.
@@ -630,7 +690,7 @@ async function runCalendario(ctx) {
 }
 
 async function runSidecarHealth(ctx) {
-  const { base, sidecarToken } = ctx;
+  const { base, sidecarToken, chatModel } = ctx;
   const h = await httpFetch(`${base}/api/mcp/agro/health`, { headers: { 'X-Chagra-Token': sidecarToken }, timeoutMs: 20000 });
   const health = h.json || {};
   const sidecarOk = h.ok && health.status === 'ok';
@@ -640,13 +700,22 @@ async function runSidecarHealth(ctx) {
   const kokoro = await httpFetch(`${base}/api/kokoro/health`, { timeoutMs: 15000 });
   const kokoroOk = kokoro.ok && /ok|kokoro/i.test(kokoro.text);
   const tags = await httpFetch(`${base}/api/ollama/api/tags`, { headers: { Authorization: `Bearer ${ctx.token || ''}` }, timeoutMs: 15000 });
-  const ollamaTagsOk = tags.ok && Array.isArray(tags.json?.models) && tags.json.models.length > 0;
-  const status = sidecarOk && ollamaOk && toolsOk && kokoroOk && ollamaTagsOk ? 'pass' : 'fail';
+  const modelos = Array.isArray(tags.json?.models) ? tags.json.models.map((m) => m?.name || m?.model).filter(Boolean) : [];
+  const ollamaTagsOk = tags.ok && modelos.length > 0;
+  // "ollama está arriba" NO es "el agente puede responder": el chat pide chatModel
+  // por nombre EXACTO y, si el host ya no lo tiene, ollama contesta 404 y el agente
+  // queda mudo con /health, /tools y kokoro los tres en verde. Eso fue exactamente
+  // la noche del 2026-07-22 (granite3.3:8b borrado del host): D5 dio PASS mientras
+  // B0 iba 0/4. Solo se puede afirmar la ausencia si /tags respondió — si no
+  // pudimos listar, no acusamos (no confundir "no pude medir" con "está roto").
+  const chatModelPresente = ollamaTagsOk ? modelos.includes(chatModel) : null;
+  const status = sidecarOk && ollamaOk && toolsOk && kokoroOk && ollamaTagsOk && chatModelPresente !== false ? 'pass' : 'fail';
+  const faltaModelo = chatModelPresente === false ? ` MODELO DE CHAT AUSENTE: '${chatModel}' no está en el host (ollama devolverá 404 y el agente queda mudo; ${modelos.length} modelos presentes).` : '';
   return {
     status,
-    valor: `sidecar ${health.build_sha || '?'}, ollama=${ollamaOk}, kokoro=${kokoroOk}, tools=${toolsOk}`,
-    detalle: `/health build_sha=${health.build_sha || '?'} (${sidecarOk ? 'ok' : 'DOWN'}), ollama_up=${ollamaOk}, kokoro=${kokoroOk}, /tools=${toolsOk}, ollama/tags=${ollamaTagsOk}.`,
-    data: { build_sha: health.build_sha, sidecarOk, ollamaOk, kokoroOk, toolsOk, ollamaTagsOk },
+    valor: `sidecar ${health.build_sha || '?'}, ollama=${ollamaOk}, kokoro=${kokoroOk}, tools=${toolsOk}${chatModelPresente === false ? `, chatModel=AUSENTE(${chatModel})` : ''}`,
+    detalle: `/health build_sha=${health.build_sha || '?'} (${sidecarOk ? 'ok' : 'DOWN'}), ollama_up=${ollamaOk}, kokoro=${kokoroOk}, /tools=${toolsOk}, ollama/tags=${ollamaTagsOk}.${faltaModelo}`,
+    data: { build_sha: health.build_sha, sidecarOk, ollamaOk, kokoroOk, toolsOk, ollamaTagsOk, chatModel, chatModelPresente, modelos_count: modelos.length },
   };
 }
 
