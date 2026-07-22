@@ -5,11 +5,10 @@
  * ── Por qué existe este módulo ─────────────────────────────────────────────
  * El catálogo de Chagra tiene 581 especies de flora. Modelarlas una por una es
  * imposible y además innecesario: la botánica andina se deja resumir en un
- * puñado de FORMAS DE CRECIMIENTO. El DR primario (taxonomía de ~12 arquetipos,
- * gemini + glm 2026-06-19) fija esa lista; el DR de diferenciación visual de
- * árboles altoandinos (34.5 KB, gemini + glm) dice CÓMO se distingue cada uno a
- * 30 metros. Con doce siluetas bien dibujadas se puede mostrar el catálogo
- * entero sin modelar 581 mallas.
+ * puñado de FORMAS DE CRECIMIENTO. El dossier de taxonomía de arquetipos fija
+ * esa lista de ~12; el de diferenciación visual de árboles altoandinos dice
+ * CÓMO se distingue cada uno a 30 metros. Con doce siluetas bien dibujadas se
+ * puede mostrar el catálogo entero sin modelar 581 mallas.
  *
  * ── La prueba de cada arquetipo ────────────────────────────────────────────
  * Si hay que acercarse para saber qué es, no sirve. Cada forma se diseñó por su
