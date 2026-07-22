@@ -269,31 +269,39 @@ export function AbejaAngelita({
       <Miembro clase="crt-brazo-r" origen="left top"
         d="M5.4,3.0 C6.9,4.2 7.5,5.9 7.0,7.5" ancho={2.2} punta={[7.0, 7.8]} puntaR={1.6} sway={vivo} delay={-0.45} />
 
-      {/* cabeza OSCURA (casi negra) con contorno — la mitad oscura del meliponino */}
-      <circle cx="8.6" cy="-1.0" r={ABEJA_PROPORCION.cabezaR} fill={ABEJA_PALETA.testa} stroke={RH_INK} strokeWidth="1.2" />
-      {/* MÁSCARA FACIAL clara: la marca amarilla del clípeo de la angelita real —
-          y, a la vez, el fondo sobre el que la carita (ojos/boca/cejas del agente)
-          sigue leyéndose pese a la cabeza oscura. Va bajo ojos/cachetes/boca. */}
-      <ellipse cx="9.4" cy="-0.2" rx="3.2" ry="3.4" fill={ABEJA_PALETA.cara} opacity="0.95" />
-      {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos) */}
-      <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.15 }, { cx: 6.9, cy: 0.3, r: 0.85 }]} vivo={vivo} />
-      {/* Boca: lip-sync si hay visema; si no, la sonrisa de goma de siempre. */}
-      {visema
-        ? <BocaVisema cx={8.9} cy={1.4} w={2.8} prof={1.1} visema={visema} />
-        : <Sonrisa cx={8.9} cy={1.4} w={2.8} prof={1.1} />}
-      <OjosRubber
-        ojos={[{ cx: 10.1, cy: -1.9, r: 1.95 }, { cx: 7.4, cy: -2.2, r: 1.45 }]}
-        mirar={[0.3, 0.34]}
-        parpadea={vivo}
-      />
-      {/* cejas expresivas (opt-in): el rasgo que actúa alegría/atención/foco */}
-      {cejas && <CejasRubber estilo={cejas} />}
-      {/* antenas con bombillo que se mecen (secondary motion) */}
-      <AntenaRubber d="M7.7,-4.7 C6.7,-7.3 7.0,-9.3 8.3,-10.1" bulbo={[8.3, -10.3]} sway={vivo} delay={0} />
-      <AntenaRubber d="M9.7,-4.6 C11.0,-6.7 11.3,-8.7 10.5,-10.3" bulbo={[10.5, -10.5]} sway={vivo} delay={-0.3} />
-      {/* gafas de sol (opt-in): por ENCIMA de ojos y cejas — con 'poniendose'
-          caen desde arriba con overshoot y el destello barre el lente */}
-      {gafas && <GafasSol puesta={gafas === 'poniendose' ? 'poniendose' : 'puesta'} animated={vivo} />}
+      {/* CABEZA — agrupada aparte (crt-cabeza) SOLO para que el agente pueda
+          negarla de lado a lado ("no sé", angelita-agente.css) sin mover el
+          resto del cuerpo: el mismo dibujo de siempre, un wrapper más. Con
+          vestuario=true el sombrero se dibuja AFUERA de este grupo (posición
+          fija por coordenadas) — no la sigue si niega; caso opt-in raro que
+          no ocurre en el agente conversacional (donde vive el gesto). */}
+      <g className="crt-cabeza">
+        {/* cabeza OSCURA (casi negra) con contorno — la mitad oscura del meliponino */}
+        <circle cx="8.6" cy="-1.0" r={ABEJA_PROPORCION.cabezaR} fill={ABEJA_PALETA.testa} stroke={RH_INK} strokeWidth="1.2" />
+        {/* MÁSCARA FACIAL clara: la marca amarilla del clípeo de la angelita real —
+            y, a la vez, el fondo sobre el que la carita (ojos/boca/cejas del agente)
+            sigue leyéndose pese a la cabeza oscura. Va bajo ojos/cachetes/boca. */}
+        <ellipse cx="9.4" cy="-0.2" rx="3.2" ry="3.4" fill={ABEJA_PALETA.cara} opacity="0.95" />
+        {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos) */}
+        <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.15 }, { cx: 6.9, cy: 0.3, r: 0.85 }]} vivo={vivo} />
+        {/* Boca: lip-sync si hay visema; si no, la sonrisa de goma de siempre. */}
+        {visema
+          ? <BocaVisema cx={8.9} cy={1.4} w={2.8} prof={1.1} visema={visema} />
+          : <Sonrisa cx={8.9} cy={1.4} w={2.8} prof={1.1} />}
+        <OjosRubber
+          ojos={[{ cx: 10.1, cy: -1.9, r: 1.95 }, { cx: 7.4, cy: -2.2, r: 1.45 }]}
+          mirar={[0.3, 0.34]}
+          parpadea={vivo}
+        />
+        {/* cejas expresivas (opt-in): el rasgo que actúa alegría/atención/foco */}
+        {cejas && <CejasRubber estilo={cejas} />}
+        {/* antenas con bombillo que se mecen (secondary motion) */}
+        <AntenaRubber d="M7.7,-4.7 C6.7,-7.3 7.0,-9.3 8.3,-10.1" bulbo={[8.3, -10.3]} sway={vivo} delay={0} />
+        <AntenaRubber d="M9.7,-4.6 C11.0,-6.7 11.3,-8.7 10.5,-10.3" bulbo={[10.5, -10.5]} sway={vivo} delay={-0.3} />
+        {/* gafas de sol (opt-in): por ENCIMA de ojos y cejas — con 'poniendose'
+            caen desde arriba con overshoot y el destello barre el lente */}
+        {gafas && <GafasSol puesta={gafas === 'poniendose' ? 'poniendose' : 'puesta'} animated={vivo} />}
+      </g>
 
       {/* Vestuario por clima+hora (ruana/sombrero/sudor) — solo con vestuario=true. */}
       {ropa && (

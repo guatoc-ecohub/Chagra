@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { AngelitaEntrada } from '../visual/agente/AngelitaEntrada.jsx';
 import { Angelita } from '../visual/agente/Angelita.jsx';
+import BurbujaAngelita from '../visual/agente/BurbujaAngelita.jsx';
+import { TEXTO_NO_SE } from '../visual/agente/angelitaEstados.js';
 
 /*
  * AngelitaViva — vitrina de LA COMPAÑERA al máximo (#/mockups/angelita-viva).
@@ -25,7 +27,7 @@ const ESTADOS_VITRINA = [
   ['habla', 'respondiendo', 'Lip-sync + gestos + cejas vivas'],
   ['celebra', 'contenta', 'Brinca con chispas y ojos de dicha'],
   ['aviso', 'preocupada', 'Alerta honesta: cejas, sudor, aro'],
-  ['no sabe', 'no-se', 'Se encoge de hombros y lo dice'],
+  ['no sabe', 'no-se', 'Niega con la cabeza y lo dice: "No sé"'],
   ['señala', 'senala', 'Se inclina y apunta al lugar'],
   ['invita', 'invita', 'Venga, le muestro'],
   ['husmea', 'husmea', 'Fisgonea el rastro, cejas fruncidas'],
@@ -167,6 +169,11 @@ export default function AngelitaViva({ onBack }) {
                   visema={estado === 'respondiendo' ? visema : null}
                   confianza={estado === 'respondiendo' ? 'alta' : null}
                 />
+                {/* no-se: el gesto (niega con la cabeza) + el texto EXPLÍCITO,
+                    nunca solo el uno o el otro (feedback del operador). */}
+                {estado === 'no-se' && (
+                  <BurbujaAngelita mensaje={TEXTO_NO_SE} tipo="informativa" animado={false} />
+                )}
                 <figcaption style={{ fontSize: 13 }}>
                   <strong style={{ textTransform: 'capitalize' }}>{nombre}</strong>
                   <div style={{ fontSize: 11.5, opacity: 0.7, marginTop: 2 }}>{nota}</div>

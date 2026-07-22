@@ -12,10 +12,13 @@
  *                                      a fisgonear, la mirada barre el piso,
  *                                      las antenas apuntan, y las virutas de
  *                                      olor entran hacia su nariz.
- *   4. ENTRADA TEATRAL (.ang-entrada)— asoma pequeñita → (si hace sol) se pone
- *                                      las gafas → anticipa y CRECE con
- *                                      overshoot a tamaño de asistente, con su
- *                                      aro de energía. Timing de cartoon puro.
+ *   4. ENTRADA TEATRAL (.ang-entrada)— asoma pequeñita → se queda QUIETA una
+ *                                      pausa (que el ojo la encuentre) →
+ *                                      CRECE con overshoot a tamaño de
+ *                                      asistente (su aro de energía) → (si
+ *                                      hace sol) YA a tamaño completo se pone
+ *                                      las gafas → BRILLO final que remata.
+ *                                      Timing de cartoon puro.
  *
  * REGLAS DE LA CASA (las mismas de creatures.css / angelita-agente.css):
  *   · Solo transform/opacity (GPU, gama baja).
@@ -154,11 +157,15 @@
 }
 
 /* ═══ 4. LA ENTRADA TEATRAL (.ang-entrada) ═══════════════════════════════════
-   Después del paneo del host: asoma PEQUEÑITA (pop elástico) → si hace sol se
-   pone las gafas (fase quieta a escala chiquita: el show es de las gafas) →
-   anticipa (se recoge) y CRECE con overshoot a su tamaño de asistente, con el
-   aro de energía que revienta al llegar. El JS (AngelitaEntrada.jsx) solo
-   cambia la clase de fase; el timing vive aquí. */
+   Después del paneo del host: asoma PEQUEÑITA (pop elástico) → se queda
+   QUIETA a esa misma escala (pausa de 1-2s: el ojo la encuentra ANTES de que
+   pase algo — feedback del operador: tan pequeña que lo que hacía al fondo no
+   se notaba) → CRECE con overshoot a su tamaño de asistente (el aro de
+   energía revienta al llegar: la entrada MAGISTRAL) → si hace sol, YA a
+   tamaño completo se pone las gafas (se ven y resaltan — a escala chiquita se
+   perdían) → BRILLO final que remata y avisa "ya estoy lista", y se apaga
+   solo. El JS (AngelitaEntrada.jsx) solo cambia la clase de fase; el timing
+   vive aquí. */
 .ang-entrada {
   position: relative;
   display: inline-flex;
@@ -172,7 +179,7 @@
 }
 /* espera: todavía nada (el paneo del host sigue andando) */
 .ang-entrada--espera .ang-entrada__escala { transform: scale(0.36); opacity: 0; }
-/* asoma: pop elástico a tamaño pequeñito */
+/* asoma: pop elástico a tamaño pequeñito — aparece */
 .ang-entrada--asoma .ang-entrada__escala {
   animation: ang-asoma 0.9s cubic-bezier(0.3, 1.4, 0.5, 1) both;
 }
@@ -183,9 +190,13 @@
   82% { transform: scale(0.33); }
   100% { transform: scale(0.36); opacity: 1; }
 }
-/* gafas: quieta a escala chica (el one-shot de las gafas manda) */
-.ang-entrada--gafas .ang-entrada__escala { transform: scale(0.36); }
-/* crece: anticipación (se agacha y recoge) → estirón con overshoot → asienta */
+/* quieta: se queda ESTÁTICA a la misma escala en la que asentó `asoma` (cero
+   salto) — la pausa para que el ojo la encuentre antes del número. Angelita
+   (idleCerebro=false en esta fase) sigue viva por su aleteo/boil base, sin
+   gestos grandes que compitan con la entrada que viene. */
+.ang-entrada--quieta .ang-entrada__escala { transform: scale(0.36); opacity: 1; }
+/* crece: anticipación (se agacha y recoge) → estirón con overshoot → asienta.
+   Arranca en la MISMA escala en la que quedó `quieta` (0.36): cero salto. */
 .ang-entrada--crece .ang-entrada__escala {
   animation: ang-crece 1.3s cubic-bezier(0.3, 0.9, 0.35, 1) both;
 }
@@ -198,6 +209,10 @@
   88% { transform: scale(1.04, 1.05); }                 /* rebotico */
   100% { transform: none; }
 }
+/* gafas / brillo: YA a tamaño completo (mismo valor en el que asentó `crece`:
+   cero salto) — las gafas se ven de verdad, no a escala chiquita perdidas. */
+.ang-entrada--gafas .ang-entrada__escala { transform: none; }
+.ang-entrada--brillo .ang-entrada__escala { transform: none; }
 .ang-entrada--lista .ang-entrada__escala { transform: none; }
 
 /* El ARO DE ENERGÍA que revienta cuando alcanza su tamaño (delay = el pico del
@@ -219,6 +234,32 @@
 @keyframes ang-aro {
   0% { transform: scale(0.4); opacity: 0.9; }
   100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* El BRILLITO final (fase `brillo`): un destello suave y breve que remata el
+   show y avisa "ya estoy lista" — y se apaga SOLO (both, no infinite: nunca
+   queda un glow permanente encendido). Distinto del aro (que celebra que
+   CRECIÓ): este marca el cierre de TODO el número, con o sin gafas. */
+.ang-entrada__brillo {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    rgba(255, 224, 130, 0.95) 0%,
+    rgba(255, 200, 90, 0.5) 40%,
+    rgba(255, 200, 90, 0) 72%
+  );
+}
+.ang-entrada--brillo .ang-entrada__brillo {
+  animation: ang-destello-final 0.65s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+@keyframes ang-destello-final {
+  0%   { transform: scale(0.7); opacity: 0; }
+  35%  { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1.35); opacity: 0; }
 }
 
 /* ═══ GATES DE LA CASA ═══════════════════════════════════════════════════════ */
@@ -245,15 +286,21 @@
   [data-agente='angelita'][data-agt-estado='husmea'] .rh-mirada,
   .agm-olor,
   .ang-entrada__escala,
-  .ang-entrada__aro {
+  .ang-entrada__aro,
+  .ang-entrada__brillo {
     animation: none !important;
   }
   .ang-entrada--espera .ang-entrada__escala,
   .ang-entrada--asoma .ang-entrada__escala,
+  .ang-entrada--quieta .ang-entrada__escala,
   .ang-entrada--gafas .ang-entrada__escala,
-  .ang-entrada--crece .ang-entrada__escala {
+  .ang-entrada--crece .ang-entrada__escala,
+  .ang-entrada--brillo .ang-entrada__escala {
     transform: none;
     opacity: 1;
   }
   .agm-olor { opacity: 0.55; }
+  /* El brillito final NO se congela encendido: es un remate, no un glow
+     permanente — RM lo apaga del todo (mismo criterio que el aro). */
+  .ang-entrada__brillo { opacity: 0; }
 }
