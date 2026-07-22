@@ -38,6 +38,7 @@ import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { CIELOS_HORA } from '../visual/mundo3d/cielosHoraData.js';
 import { PALETA, mezclar } from '../visual/mundo3d/atmosferaMadre.js';
+import { geomVaca } from '../visual/mundo3d/finca/fincaRealista.geom.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
 import { ParticulasAmbientales } from '../visual/mundo3d/ParticulasAmbientales.jsx';
 import { crearRng } from '../visual/mundo3d/particulasData.js';
@@ -301,20 +302,26 @@ function SolBajo() {
   );
 }
 
-/* ── La res low-poly (rubber-hose): caja de cuerpo con manchas, cabeza con
-      ojos grandes, orejas y cuernos, cola con borla y patas que pivotan en la
-      cadera. Mira hacia +x. Todos sus materiales son `transparent` para que
-      la partida pueda desvanecerla con dignidad (opacidad 1 el resto del
-      tiempo: costo nulo).
+/* ── La res ANATÓMICA del sistema del hato (fincaRealista.geom): loft orgánico
+      con sombreado horneado por vértice — no cajas apiladas ("la vaca
+      cuadrada", veredicto del operador). Raza criolla: el caramelo campesino
+      de la vereda, cuernos en lira y papada; la cría va mocha y sin ubre.
+      Mira hacia +x. `articulada` entrega las patas como piezas sueltas con
+      pivote en la cadera para que el andar las columpie de verdad.
 
       La res es PURAMENTE declarativa: expone sus partes animables por `name`
-      (res-nucleo/cuerpo/cabeza/cola/pata-N). El momento que la monta la
+      (res-nucleo/cuerpo/cabeza/pata-N; la cola va horneada en el cuerpo y los
+      momentos ya la tratan como opcional). El momento que la monta la
       envuelve en un <group ref>, resuelve las partes UNA vez fuera del render
       (resolverPartes, en efecto) y las anima en useFrame — así ningún ref
-      cruza fronteras de componente (contrato react-hooks v6). ─────────────── */
-const CADERAS = [
-  [-0.45, -0.19], [-0.45, 0.19], [0.42, -0.19], [0.42, 0.19],
-];
+      cruza fronteras de componente (contrato react-hooks v6).
+
+      Material PROPIO por res (no el MATERIAL_HATO compartido del valle): la
+      partida desvanece por `opacity` recorriendo el subárbol y no puede
+      arrastrar a otra res de la escena. `vertexColors` trae el pelaje y el AO
+      horneados; el `color` multiplica el conjunto hacia la niebla dorada —
+      la misma ley de coherencia del resto del mockup. ─────────────────────── */
+const TINTE_RES = mezclar('#fffaf2', TINTE, 0.24);
 
 /* Resuelve las partes animables de una res por nombre, DENTRO de su subárbol
    (dos reses en escena no se pisan). Llamar fuera del render y cachear. */
@@ -332,90 +339,36 @@ function resolverPartes(raiz) {
 
 /** @param {{ position?: [number, number, number]; giro?: number; escala?: number; cria?: boolean; semilla?: number }} props */
 function Vaca({ position = [0, 0, 0], giro = 0, escala = 1, cria = false, semilla = 3 }) {
-  const manchas = useMemo(() => {
-    const rng = crearRng(semilla);
-    return Array.from({ length: 3 }, () => ({
-      x: (rng() - 0.5) * 0.8,
-      y: 0.9 + (rng() - 0.5) * 0.18,
-      s: 0.7 + rng() * 0.6,
-      g: (rng() - 0.5) * 0.5,
-    }));
-  }, [semilla]);
-  const tono = cria ? P.resClara : P.res;
+  const geom = useMemo(
+    () => geomVaca({ raza: 'criolla', ubre: !cria, cuerno: cria ? 0 : null, articulada: true }, semilla),
+    [cria, semilla],
+  );
+  const material = useMemo(
+    () => new THREE.MeshLambertMaterial({
+      vertexColors: true,
+      transparent: true, // la partida desvanece; el resto del tiempo opacidad 1
+      color: new THREE.Color(TINTE_RES),
+    }),
+    [],
+  );
+  useEffect(() => () => material.dispose(), [material]);
   return (
     <group name="res-nucleo" position={position} rotation={[0, giro, 0]} scale={escala}>
-      {/* el torso, la cabeza y la cola comparten el squash & stretch */}
+      {/* el torso y la cabeza comparten el squash & stretch */}
       <group name="res-cuerpo">
-        <mesh position={[0, 0.98, 0]}>
-          <boxGeometry args={[1.3, 0.6, 0.62]} />
-          <meshLambertMaterial color={tono} flatShading transparent />
-        </mesh>
-        {manchas.map((m, i) => (
-          <mesh key={i} position={[m.x, m.y, 0]} rotation={[0, 0, m.g]} scale={m.s}>
-            <boxGeometry args={[0.34, 0.3, 0.66]} />
-            <meshLambertMaterial color={P.mancha} flatShading transparent />
-          </mesh>
-        ))}
-        <group name="res-cabeza" position={[0.76, 1.22, 0]}>
-          <mesh>
-            <boxGeometry args={[0.36, 0.34, 0.3]} />
-            <meshLambertMaterial color={tono} flatShading transparent />
-          </mesh>
-          <mesh position={[0.2, -0.08, 0]}>
-            <boxGeometry args={[0.18, 0.2, 0.24]} />
-            <meshLambertMaterial color={P.hocico} flatShading transparent />
-          </mesh>
-          {/* orejas */}
-          {[-0.21, 0.21].map((dz) => (
-            <mesh key={dz} position={[0, 0.12, dz]} rotation={[dz > 0 ? 0.5 : -0.5, 0, 0]}>
-              <boxGeometry args={[0.06, 0.09, 0.16]} />
-              <meshLambertMaterial color={tono} flatShading transparent />
-            </mesh>
-          ))}
-          {/* cuernos (la cría todavía no los tiene) */}
-          {!cria &&
-            [-0.13, 0.13].map((dz) => (
-              <mesh key={dz} position={[0.02, 0.22, dz]} rotation={[dz > 0 ? 0.6 : -0.6, 0, 0]}>
-                <cylinderGeometry args={[0.02, 0.04, 0.2, 5]} />
-                <meshLambertMaterial color={P.cuerno} flatShading transparent />
-              </mesh>
-            ))}
-          {/* ojos rubber-hose: grandes, francos */}
-          {[-0.12, 0.12].map((dz) => (
-            <group key={dz}>
-              <mesh position={[0.17, 0.08, dz]}>
-                <sphereGeometry args={[0.05, 7, 6]} />
-                <meshLambertMaterial color={P.ojo} flatShading transparent />
-              </mesh>
-              <mesh position={[0.205, 0.08, dz * 1.12]}>
-                <sphereGeometry args={[0.024, 6, 5]} />
-                <meshLambertMaterial color={P.pupila} flatShading transparent />
-              </mesh>
-            </group>
-          ))}
-        </group>
-        <group name="res-cola" position={[-0.66, 1.16, 0]} rotation={[0, 0, 0.5]}>
-          <mesh position={[0, -0.24, 0]}>
-            <cylinderGeometry args={[0.025, 0.035, 0.48, 5]} />
-            <meshLambertMaterial color={tono} flatShading transparent />
-          </mesh>
-          <mesh position={[0, -0.5, 0]}>
-            <sphereGeometry args={[0.06, 6, 5]} />
-            <meshLambertMaterial color={P.mancha} flatShading transparent />
-          </mesh>
+        <mesh geometry={geom.cuerpo} material={material} />
+        <group name="res-cabeza" position={geom.pivote}>
+          <mesh geometry={geom.cabeza} material={material} />
         </group>
       </group>
       {/* patas: pivotan en la cadera (el mesh cuelga del grupo) */}
-      {CADERAS.map((q, i) => (
-        <group key={i} name={`res-pata-${i}`} position={[q[0], 0.66, q[1]]}>
-          <mesh position={[0, -0.33, 0]}>
-            <boxGeometry args={[0.14, 0.66, 0.14]} />
-            <meshLambertMaterial color={tono} flatShading transparent />
-          </mesh>
-          <mesh position={[0, -0.62, 0]}>
-            <boxGeometry args={[0.15, 0.1, 0.15]} />
-            <meshLambertMaterial color={P.mancha} flatShading transparent />
-          </mesh>
+      {(geom.patas ?? []).map((geo, i) => (
+        <group
+          key={i}
+          name={`res-pata-${i}`}
+          position={[geom.caderas?.[i]?.[0] ?? 0, geom.yCadera ?? 0, geom.caderas?.[i]?.[1] ?? 0]}
+        >
+          <mesh geometry={geo} material={material} />
         </group>
       ))}
     </group>

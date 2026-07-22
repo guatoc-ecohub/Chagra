@@ -140,24 +140,24 @@ export const RAZAS_VACA = {
   },
 };
 
-/* Sitios deterministas de las manchas holstein: pegadas al flanco (z=±) y a la
-   grupa, aplastadas contra el cuerpo — parches de capa, no pelotas. */
-const MANCHAS_VACA = [
-  { pos: [0.28, 0.86, 0.29], s: 0.20 },
-  { pos: [-0.14, 0.74, 0.30], s: 0.17 },
-  { pos: [-0.48, 0.92, 0.27], s: 0.19 },
-  { pos: [0.08, 0.92, -0.29], s: 0.18 },
-  { pos: [-0.34, 0.72, -0.30], s: 0.16 },
-  { pos: [0.40, 0.76, -0.28], s: 0.14 },
-  { pos: [-0.52, 1.04, 0.0], s: 0.17, techo: true }, // la de la grupa, vista desde arriba
-];
+/* Las caderas de la vaca (x, z, ¿trasera?) y la altura del pivote: compartidas
+   entre la res de patas fijas y la articulada para que ambas pisen igual. */
+const CADERAS_VACA = /** @type {[number, number, boolean][]} */ ([
+  [0.44, 0.17, false], [0.44, -0.17, false], [-0.46, 0.18, true], [-0.46, -0.18, true],
+]);
+const Y_CADERA_VACA = 0.72;
 
 /**
- * La vaca anatómica. Mira a +X, patas en y=0, cruz a ~1.15.
- * @returns {{cuerpo: THREE.BufferGeometry, cabeza: THREE.BufferGeometry, pivote: [number,number,number]}}
+ * La vaca anatómica. Mira a +X, patas en y=0, cruz a ~1.1.
+ * `cuerno` (opcional) escala los cuernos por encima de la raza — la ternera va
+ * mocha aunque sea criolla.
+ * `articulada` (opt-in) entrega las patas como PIEZAS SUELTAS con pivote en la
+ * cadera (para escenas que columpian las patas al andar — el mercado). Con el
+ * default las patas van fusionadas al cuerpo, como siempre (valle/hato).
+ * @returns {{cuerpo: THREE.BufferGeometry, cabeza: THREE.BufferGeometry, pivote: [number,number,number], patas?: THREE.BufferGeometry[], caderas?: [number,number][], yCadera?: number}}
  */
-export function geomVaca({ raza = 'holstein', ubre = true, q = 1 } = {}, seed = 21) {
-  return memo(`vaca|${raza}|${ubre}|${q}`, () => {
+export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1, articulada = false } = {}, seed = 21) {
+  return memo(`vaca|${raza}|${ubre}|${cuerno}|${q}|${articulada}|${seed}`, () => {
     const R = RAZAS_VACA[raza] || RAZAS_VACA.holstein;
     const r = rng(seed);
     const p = [];
@@ -199,17 +199,25 @@ export function geomVaca({ raza = 'holstein', ubre = true, q = 1 } = {}, seed = 
       p.push(pintar(papada, variar(R.pelaje, r, 0.06)));
     }
 
-    // ── Patas con corvejón y pezuña (muslo ancho → caña fina → casco) ──
-    for (const [px, pz] of [[0.42, 0.19], [0.42, -0.19], [-0.44, 0.20], [-0.44, -0.20]]) {
-      const muslo = new THREE.CylinderGeometry(0.055, 0.085, 0.46, 6, 1);
-      poner(muslo, [px, 0.48, pz]);
-      p.push(pintar(muslo, variar(R.pelaje, r, 0.04)));
-      const cana = new THREE.CylinderGeometry(0.038, 0.05, 0.28, 6, 1);
-      poner(cana, [px, 0.16, pz]);
-      p.push(pintar(cana, variar(R.pelaje, r, 0.05)));
-      const pezuna = new THREE.CylinderGeometry(0.052, 0.058, 0.09, 6, 1);
-      poner(pezuna, [px, 0.045, pz]);
-      p.push(pintar(pezuna, '#3c352d'));
+    // ── Patas nacidas de la masa (muslo→caña→pezuña, con jitter) ──
+    //    Articulada: cada pata se construye EN SU SITIO (mismas manchas y mismo
+    //    horneado que el cuerpo — sin costura de color) y luego se traslada al
+    //    origen para colgarla de un grupo pivotado en la cadera.
+    /** @type {THREE.BufferGeometry[]} */
+    const patasSueltas = [];
+    for (const [px, pz, atras] of CADERAS_VACA) {
+      const destino = articulada ? [] : p;
+      pataCuadrupedo(destino, {
+        x: px, z: pz, yCadera: Y_CADERA_VACA, rMuslo: 0.1, rCana: 0.046,
+        pelaje: R.pelaje, pezuna: '#3c352d', r, atras, pintor: pinta,
+      });
+      if (articulada) {
+        const pata = hornearPelaje(fusionarHato(destino, `vaca-${raza}-pata`), {
+          yBajo: 0.04, yAlto: 1.0, ao: 0.42, moteado: 0.06, semilla: seed,
+        });
+        pata.translate(-px, -Y_CADERA_VACA, -pz);
+        patasSueltas.push(pata);
+      }
     }
 
     // ── Ubre con tetillas (la seña de la vaca lechera) ──
@@ -242,64 +250,14 @@ export function geomVaca({ raza = 'holstein', ubre = true, q = 1 } = {}, seed = 
       }
     }
 
-    const cuerpo = fusionar(p);
-
-    // ── La CABEZA (local al pivote del cuello): pasta subiendo y bajando ──
-    const c = [];
-    const craneo = new THREE.SphereGeometry(0.14, 10, 8);
-    poner(craneo, [0.09, -0.01, 0], [0, 0, 0], [1.2, 1, 0.85]);
-    c.push(pintar(craneo, R.pelaje));
-    const testuz = new THREE.CylinderGeometry(0.085, 0.115, 0.17, 7, 1);
-    poner(testuz, [0.22, -0.06, 0], [0, 0, Math.PI / 2 + 0.25]);
-    c.push(pintar(testuz, R.pelaje));
-    const morro = new THREE.CylinderGeometry(0.09, 0.098, 0.11, 8, 1);
-    poner(morro, [0.325, -0.10, 0], [0, 0, Math.PI / 2 + 0.25]);
-    c.push(pintar(morro, R.hocico));
-    for (const oz of [0.045, -0.045]) {
-      const ollar = new THREE.SphereGeometry(0.016, 5, 4);
-      poner(ollar, [0.375, -0.09, oz]);
-      c.push(pintar(ollar, '#2c2521'));
+    /** @type {{cuerpo: THREE.BufferGeometry, cabeza: THREE.BufferGeometry, pivote: [number,number,number], patas?: THREE.BufferGeometry[], caderas?: [number,number][], yCadera?: number}} */
+    const res = { cuerpo, cabeza, pivote: [0.82, 1.08, 0] };
+    if (articulada) {
+      res.patas = patasSueltas;
+      res.caderas = CADERAS_VACA.map(([px, pz]) => /** @type {[number, number]} */ ([px, pz]));
+      res.yCadera = Y_CADERA_VACA;
     }
-    for (const oz of [0.115, -0.115]) {
-      const ojo = new THREE.SphereGeometry(0.026, 6, 5);
-      poner(ojo, [0.15, 0.05, oz]);
-      c.push(pintar(ojo, '#241d18'));
-    }
-    // Orejas: de lado (holstein/criolla) o grandes y CAÍDAS (cebú).
-    const caida = R.orejas === 'caida';
-    for (const lado of [1, -1]) {
-      const oreja = brote(
-        [0.01, caida ? 0.05 : 0.09, lado * 0.135],
-        caida ? [0.12, -0.55, lado * 0.9] : [0.08, 0.35, lado],
-        caida ? 0.062 : 0.05,
-        caida ? 0.22 : 0.16,
-        0.45,
-        5,
-      );
-      c.push(pintar(oreja, variar(R.pelaje, r, 0.07)));
-    }
-    // Cuernos (escala por raza; la holstein casi ni los muestra).
-    if (R.cuerno > 0.2) {
-      for (const lado of [1, -1]) {
-        const cuerno = brote(
-          [0.0, 0.125, lado * 0.075],
-          [-0.12, 0.9, lado * 0.55],
-          0.028,
-          0.17 * R.cuerno,
-          1,
-          5,
-        );
-        c.push(pintar(cuerno, '#d9cdb2'));
-      }
-    }
-    // Mancha de cara holstein (media cara oscura, la clásica).
-    if (R.manchas && q > 0.35) {
-      const mcara = new THREE.SphereGeometry(0.085, 7, 6);
-      poner(mcara, [0.10, 0.045, 0.09], [0, 0.4, 0], [1, 0.9, 0.5]);
-      c.push(pintar(mcara, R.manchas));
-    }
-
-    return { cuerpo, cabeza: fusionar(c), pivote: [0.80, 1.10, 0] };
+    return res;
   });
 }
 

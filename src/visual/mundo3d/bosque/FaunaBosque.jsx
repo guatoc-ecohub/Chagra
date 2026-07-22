@@ -2,10 +2,10 @@
  * FaunaBosque — LA VIDA del Bosque Vivo. Un bosque sin bichos es un decorado.
  *
  * EL REGISTRO (decisión del operador, 2026-07): la fauna EMBLEMÁTICA del
- * bosque — oso, rana, colibrí, borugo, jaguar, danta — va con los SVG
- * rubber-hose de `src/visual/creatures/` como billboards <Html>: son el
- * estándar de calidad de la casa (la danta ya tiene su SVG — Danta.jsx, la
- * jardinera del bosque — y anda de día/atardecer con los vecinos). La fauna AMBIENTAL de fondo —
+ * bosque — oso (el GUARDIÁN NEGRO; el café y el borugo están archivados y no
+ * se surfacean), rana, colibrí, jaguar — va con los SVG rubber-hose de
+ * `src/visual/creatures/` como billboards <Html>: son el estándar de calidad
+ * de la casa. La fauna AMBIENTAL de fondo —
  * cóndor, venado en la niebla, bandada, quetzal fugaz, mariposas, abejas,
  * escarabajo, luciérnagas — sí es geometría mínima procedural (siluetas que
  * el fog completa). Hubo un intento de oso/rana procedurales: quedó jubilado
@@ -558,8 +558,8 @@ function QuetzalFugaz() {
    acompañan desde el frailejonar y el borde del monte). `franjas` = cuándo
    sale (null = siempre). `vida` = su repertorio de gestos (los que el bicho
    YA sabe hacer: props opt-in de su componente) y el compás de su reloj.
-   `paseo` = hasta dónde camina y vuelve (el oso y la danta, cada uno con su
-   rumbo y su compás — nunca en fila ni al unísono). */
+   `paseo` = hasta dónde camina y vuelve (movimiento 3D real del billboard,
+   con su rumbo y su compás propios — nunca en fila ni al unísono). */
 const VECINOS_BOSQUE = [
   {
     slug: 'rana-andina',
@@ -576,24 +576,29 @@ const VECINOS_BOSQUE = [
     },
   },
   {
-    /* LA DANTA — la jardinera del bosque, por fin en SVG de la casa. Mole
-       diurna y mansa: sale del arbolado del costado derecho y PASEA hacia el
-       claro con su andar pesado (rumbo y compás propios, nunca en fila con el
-       oso), husmea con la trompa en periscopio, reposa y otea. Al caer la
-       noche se retira monte adentro (franjas de día/atardecer). */
-    slug: 'danta',
-    pos: [3.0, 0.95, 2.1],
-    px: 66,
-    factor: 18,
-    franjas: ['manana', 'mediodia', 'tarde', 'atardecer'],
+    /* EL OSO — el GUARDIÁN NEGRO de la luna (OsoGuardian, la dirección vigente
+       del oso de anteojos; el café está archivado y NO vuelve). Vive en el
+       borde del arbolado, asomado al claro — nunca al pie del Ent: el guardián
+       del bosque manda el centro. Abre paseando (se ve que está VIVO), resopla
+       su vaho de páramo, se remece el peso y reposa.
+
+       NOTA de puesta en escena (operador, 2026-07): aquí vivía la danta a
+       billboard grande en pleno centro del claro — a ese tamaño su silueta
+       parada leía como el oso café archivado flotando frente al Ent. La danta
+       sigue en el elenco (vitrina, páramo); esta escena se compone sin ella. */
+    slug: 'oso-guardian',
+    pos: [-3.6, 0.34, 3.2],
+    px: 64,
+    factor: 15,
+    franjas: null,
     vida: {
       primero: 'pasea',
-      descanso: [6000, 13000],
+      descanso: [5000, 11000],
       momentos: {
-        pasea: { dur: 10500, props: { pose: 'anda' }, paseo: [-2.0, 0, 1.1] },
-        husmea: { dur: 4200, props: { husmea: true } },
-        reposo: { dur: 5600, props: { pose: 'reposo' } },
-        mira: { dur: 3200, props: { pose: 'señala' } },
+        pasea: { dur: 9000, props: { pose: 'anda' }, paseo: [1.7, 0, 1.0] },
+        resopla: { dur: 4500, props: { resopla: true } },
+        seAcomoda: { dur: 5200, props: { rasca: true } },
+        reposo: { dur: 4600, props: { pose: 'reposo' } },
       },
     },
   },
@@ -615,7 +620,10 @@ const VECINOS_BOSQUE = [
   },
 ];
 
-const VECINOS_TIER_BAJO = new Set(['oso-andino']);
+/* En tier bajo solo queda el oso, quieto (el colibrí va aparte): el slug DEBE
+   ser uno del roster de arriba — apuntaba al 'oso-andino' archivado y el tier
+   bajo se quedaba sin un solo vecino. */
+const VECINOS_TIER_BAJO = new Set(['oso-guardian']);
 
 const ESTILO_CRITTER = {
   filter: 'drop-shadow(0 2px 3px rgba(25, 32, 28, 0.35))',
