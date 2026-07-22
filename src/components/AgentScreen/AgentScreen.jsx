@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { ArrowLeft, Mic, MicOff, Send, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square, Sprout, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Mic, Sparkles, Wifi, WifiOff, Volume2, VolumeX, RotateCcw, X, Home, Camera, Square, Sprout, HelpCircle } from 'lucide-react';
 import useVoiceRecorder from '../../hooks/useVoiceRecorder';
 import { mensajeErrorCampesino } from '../../utils/mensajeErrorCampesino';
 import { transcribe, queueForRetry } from '../../services/voiceService';
@@ -98,7 +98,6 @@ import { submitDeepResearch, pollDeepResearch, isDeepResearchEnabled } from '../
 // isPro controla el gate de la UI (chip 🔬); x-chagra-tier se inyecta en el
 // sidecarClient/deepResearchClient vía buildSidecarHeaders (defense-in-depth).
 import { getCurrentTier } from '../../services/tierService';
-import DeepResearchCard from '../DeepResearchCard';
 import { normalizeUserInputForRegion, buildClimaContext, buildFincaContext, buildViabilityContext, buildFrostHeatContext, buildAssociationContext, buildInvasiveSafetyContext, buildCuratedFactsContext, applyVoseoFilter, resolveUserRegion, stripRoleLeak, buildPriceDeclineContext, buildPriceAnswer, buildSuggestedEntitiesContext, isLowConfidenceEntity, buildFallbackResponse, pisoTermicoFromAltitud, groupAndLimitCultivos } from '../../services/agentService';
 import { buildPriceReferenceAnswer } from '../../services/marketplaceService';
 import { buildBasePrompt, analyzeQuery, buildQueryAnalysisBlock, buildCorpusVariants, buildResolvedEntitiesBlock, formatToolEvidence, truncateEdgesBlock } from '../../services/agentPromptBase';
@@ -1556,7 +1555,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // numérica. Sin esto, el guard igual funciona vía texto libre del
           // mensaje (degradación por diseño del sidecar).
           const rePisoTermico = (() => {
-            try { const p = getProfile(); if (p && p.piso_termico) return p.piso_termico; } catch (_) { /* noop */ }
+            try { const p = getProfile(); if (p.piso_termico) return p.piso_termico; } catch (_) { /* noop */ }
             return null;
           })();
           const tRE0 = performance.now();
@@ -1877,7 +1876,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             const pisoTermicoChip = (() => {
               try {
                 const p = getProfile();
-                if (p && p.piso_termico) return p.piso_termico;
+                if (p.piso_termico) return p.piso_termico;
               } catch (_) { /* noop */ }
               return pisoTermicoFromAltitud(fincaAltitudChip);
             })();
@@ -2270,7 +2269,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // hacen nada salvo el guard de agroquímico, que usa denylist propia).
       const guardAltitud =
         (fincaActiva && fincaActiva.altitud) ||
-        (() => { try { const p = getProfile(); return (p && p.finca_altitud) || null; } catch (_) { return null; } })();
+        (() => { try { const p = getProfile(); return p.finca_altitud || null; } catch (_) { return null; } })();
       // P0 (prod 2026-05-31): el agente FABRICABA un diagnóstico visual sin foto
       // real ("Analicé una foto, estado 95/100" + hallazgos de Mapacho del RAG
       // de tabaco). hadVision marca si ESTE turno trajo una imagen real
@@ -2280,7 +2279,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // concluyente. Para turnos de texto/voz, visionContext es null → hadVision
       // false → corrige cualquier afirmación visual inventada.
       const guardProfileName =
-        (() => { try { const p = getProfile(); return (p && p.nombre) || null; } catch (_) { return null; } })();
+        (() => { try { const p = getProfile(); return p.nombre || null; } catch (_) { return null; } })();
       // HARDENING térmico (audit #23): mínima/máxima esperadas del pronóstico ya
       // cacheado (mismo snapshot que buildFrostHeatContext — NO se re-pide).
       // Habilita guardThermalViability para advertir helada/golpe de calor sobre
@@ -2434,7 +2433,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // pinta "Dato de otro cultivo · verifica"). Solo corre sobre turnos que
       // IBAN a salir verificados. Graceful: cualquier fallo deja el sello
       // intacto (jamás degrada por error).
-      if (sourceMetadata && sourceMetadata.grounded === true) {
+      if (sourceMetadata.grounded === true) {
         try {
           const cropInFocusIds = Array.from(new Set(
             (resolvedEntities || [])

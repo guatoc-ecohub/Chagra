@@ -81,7 +81,6 @@ const TONO_FILL = {
   seca: 'rgba(251, 191, 36, 0.07)',
   transicion: 'transparent',
 };
-const TONO_LABEL = { lluvia: 'aguas', seca: 'secas', transicion: '' };
 
 /** Días del mes (para ubicar el marcador de "hoy" dentro de su mes). */
 const diasDelMes = (year, month) => new Date(year, month, 0).getDate();

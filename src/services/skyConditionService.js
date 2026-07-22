@@ -433,7 +433,7 @@ export async function fetchSkyConditions(opts = /** @type {any} */ ({})) {
   try {
     return await promise;
   } finally {
-    if (inFlight && inFlight.token === inFlightToken) inFlight = null;
+    if (inFlight.promise === promise) inFlight = null;
   }
 }
 

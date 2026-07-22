@@ -179,7 +179,7 @@ export default function ChatHistory({ messages = [], streamingContent = '', isSt
       {typeof onBack === 'function' && showFloatingBack && (
         <button
           type="button"
-          onClick={onBack ? () => onBack() : undefined}
+          onClick={() => onBack()}
           data-testid="chat-floating-back"
           aria-label="Volver"
           className="chagra-floating-back absolute top-3 left-3 z-20 flex items-center gap-1.5 pl-2 pr-3 py-2 rounded-full bg-slate-900/90 backdrop-blur-sm border border-slate-700 text-amber-300 shadow-lg active:scale-95 hover:bg-slate-800"

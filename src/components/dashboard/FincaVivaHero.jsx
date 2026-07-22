@@ -813,7 +813,7 @@ const PISO_LABEL = {
 function buildUbicacion() {
   let loc = {};
   let perfil = {};
-  try { perfil = getProfile() || {}; } catch (_) { perfil = {}; }
+  try { perfil = getProfile(); } catch (_) { perfil = {}; }
   try { loc = resolveClimaLocation({ profile: perfil }) || {}; } catch (_) { loc = {}; }
 
   const vereda = limpiar(loc.vereda || perfil.vereda);

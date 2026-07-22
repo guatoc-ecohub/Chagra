@@ -26,7 +26,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
-import * as THREE from 'three';
 import { ESPECIES, GeometriaParte } from './CorralVivo.jsx';
 import { PALETA } from '../atmosferaMadre.js';
 
