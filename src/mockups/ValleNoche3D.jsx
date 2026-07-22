@@ -606,6 +606,17 @@ export default function ValleNoche3D() {
   const [listo, setListo] = useState(false);
   const [grillos, setGrillos] = useState(false);
   const tier = useMemo(() => decidirTier().tier, []);
+  /* Retrato (teléfono en vertical): con la toma de escritorio la finca dormida
+     quedaba en una astillita al borde de abajo y el 80 % del cuadro era cielo
+     vacío. La noche es la atmósfera, pero el sujeto es LA FINCA descansando:
+     en retrato la cámara baja y se acerca — casa legible en el tercio bajo,
+     y el cielo del páramo conserva los dos de arriba. */
+  const retrato = useMemo(
+    () => typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(max-aspect-ratio: 19/20)').matches,
+    [],
+  );
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&
@@ -640,7 +651,7 @@ export default function ValleNoche3D() {
         className={`vnoche-canvas${listo ? ' vnoche-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [0, 4.6, 13.5], fov: 42 }}
+        camera={retrato ? { position: [0, 3.4, 10.2], fov: 46 } : { position: [0, 4.6, 13.5], fov: 42 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >

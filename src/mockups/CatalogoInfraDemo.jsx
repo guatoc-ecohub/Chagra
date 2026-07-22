@@ -253,6 +253,16 @@ export default function CatalogoInfraDemo() {
   const [seed, setSeed] = useState(DEFAULTS.invernaderoTunel.seed);
 
   const [autoRotar, setAutoRotar] = useState(true);
+  /* Retrato (teléfono en vertical): a 12 metros con el fov de escritorio, el
+     pasillo horizontal era de ~4.7 m y un invernadero de 15 m se miraba desde
+     ADENTRO de sus arcos. En retrato la cámara retrocede y sube: la pieza
+     entera, con aire, como en la vitrina. */
+  const retrato = useMemo(
+    () => typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(max-aspect-ratio: 19/20)').matches,
+    [],
+  );
   const [frugal, setFrugal] = useState(false);
 
   // Sync controls when piece type changes
@@ -277,7 +287,7 @@ export default function CatalogoInfraDemo() {
       {/* 3D Canvas */}
       <Canvas
         className="demo-canvas"
-        camera={{ position: [0, 6, 12], fov: 45 }}
+        camera={retrato ? { position: [0, 9, 21], fov: 50 } : { position: [0, 6, 12], fov: 45 }}
         gl={{ antialias: !frugal, powerPreference: 'high-performance' }}
         frameloop="always" // Required for damping and auto-rotation
       >

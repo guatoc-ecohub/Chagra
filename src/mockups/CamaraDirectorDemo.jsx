@@ -324,7 +324,12 @@ function Direccion({ indice, tier, reducedMotion, alAsentar }) {
 const estiloMarco = {
   display: 'flex',
   flexDirection: 'column',
-  minHeight: '100dvh',
+  /* Altura FIJA al viewport, no mínima: con `minHeight` el alto real del marco
+     lo decidía el contenido, el área del Canvas quedaba sin altura resuelta y
+     el lienzo 3D se encogía a una franja de nada arriba de la pantalla — en
+     390×844 el valle salía aplastado en un 18 % del alto y el resto era fondo
+     vacío. Con la altura fija, `flex: 1` de verdad reparte lo que sobra. */
+  height: '100dvh',
   background: ATMOSFERA.fondo,
   color: ATMOSFERA.sombra,
   fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif",
@@ -415,7 +420,10 @@ export default function CamaraDirectorDemo() {
 
   return (
     <div style={estiloMarco}>
-      <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
+      {/* El piso de 46dvh es la red de seguridad del encuadre: pase lo que
+          pase con el panel de abajo, la escena conserva más de media pantalla.
+          El sujeto de esta demo ES la toma — sin altura no hay demo. */}
+      <div style={{ flex: 1, minHeight: '46dvh', position: 'relative' }}>
         <Canvas
           frameloop="demand"
           dpr={perfil.dpr}

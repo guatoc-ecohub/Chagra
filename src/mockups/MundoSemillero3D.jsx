@@ -749,6 +749,14 @@ export default function MundoSemillero3D({
   const [auto] = useState(() => decidirTier());
   const tier = tierProp || auto.tier;
   const reducedMotion = reducedMotionProp ?? auto.reducedMotion;
+  /* Retrato (teléfono en vertical): con el lienzo ya a media pantalla, la toma
+     de escritorio dejaba la bandeja —el sujeto— chiquita y al borde izquierdo.
+     La variante retrato es más frontal y cercana: la bandeja al centro. */
+  const [retrato] = useState(
+    () => typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(max-aspect-ratio: 19/20)').matches,
+  );
 
   const [especieId, setEspecieId] = useState(
     ESPECIES[especie] ? especie : 'tomate',
@@ -818,7 +826,7 @@ export default function MundoSemillero3D({
         className="semillero__lienzo"
         dpr={[1, 1.5]}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
-        camera={{ position: [2.5, 1.9, 3.4], fov: 42 }}
+        camera={retrato ? { position: [0.9, 1.8, 3.3], fov: 46 } : { position: [2.5, 1.9, 3.4], fov: 42 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
       >
         <color attach="background" args={[ATMOSFERA.fondo]} />

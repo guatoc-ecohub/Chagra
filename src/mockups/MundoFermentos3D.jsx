@@ -1040,7 +1040,19 @@ const CSS_FERM = `
 .mferm-pie p { margin: 0; max-width: 42rem; text-align: center; padding: 0.42rem 0.85rem; border-radius: 0.7rem; background: rgba(32,24,14,0.5); backdrop-filter: blur(3px); color: #f6efdf; font: 500 0.76rem/1.4 system-ui, sans-serif; }
 .mferm-volver { pointer-events: auto; position: absolute; top: 0.8rem; right: 0.8rem; padding: 0.4rem 0.8rem; border: 0; border-radius: 999px; background: rgba(32,24,14,0.55); color: #f6efdf; font: 600 0.78rem/1 system-ui, sans-serif; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .mferm-canvas { transition: none; } }
-@media (max-width: 640px) { .mferm-estaciones { max-width: 62vw; } .mferm-titulo { font-size: 1rem; } }
+/* En teléfono la lista vertical de estaciones tapaba justo las mesas del
+   taller (el sujeto). Se vuelve una FILA de chips bajo el título: mismo
+   contenido, una franja de alto, y la escena queda libre. */
+@media (max-width: 640px) {
+  .mferm-titulo { font-size: 1rem; }
+  /* El space-between empujaba la fila al CENTRO del cuadro, o sea encima de
+     las mesas del taller: arriba lo de arriba, y el pie se ancla solo. */
+  .mferm-chrome { justify-content: flex-start; }
+  .mferm-pie { margin-top: auto; }
+  .mferm-estaciones { flex-direction: row; flex-wrap: wrap; gap: 0.25rem; max-width: calc(100vw - 1.6rem); margin: 0.5rem 0.8rem; padding: 0.3rem 0.35rem; }
+  .mferm-estaciones button { width: auto; padding: 0.28rem 0.55rem; font-size: 0.72rem; }
+  .mferm-estaciones button[aria-pressed="true"] small { display: none; }
+}
 `;
 
 /**

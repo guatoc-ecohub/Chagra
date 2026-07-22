@@ -886,13 +886,16 @@ function TroncoDescomposicion({ centro, tier, reducedMotion }) {
       buen compost su OLOR A TIERRA. Filamentos finos que abrazan la cúpula de la
       pila, con un pulso tenue. Comparten un material (un solo brillo para el velo);
       reducedMotion los deja quietos. No monta en gama baja. ──────────────────── */
+/* El material del velo es un SINGLETON de módulo (todas las instancias ya lo
+   compartían): el pulso de opacidad de abajo lo muta por cuadro, y mutar un
+   valor que pasó por un hook (useMemo) viola la regla de inmutabilidad — y
+   leer un ref en render viola la de refs. Un módulo no le debe nada a nadie.
+   Vive lo que vive la app: no hay dispose que hacer. */
+const MATERIAL_VELO = new THREE.MeshBasicMaterial({ color: P.actino, transparent: true, opacity: 0.42, depthWrite: false });
+
 function ActinomicetosVelo({ centro, tier, reducedMotion }) {
   const n = tier === 'bajo' ? 0 : tier === 'medio' ? 14 : 24;
-  const material = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: P.actino, transparent: true, opacity: 0.42, depthWrite: false }),
-    [],
-  );
-  useEffect(() => () => material.dispose(), [material]);
+  const material = MATERIAL_VELO;
   const filas = useMemo(() => {
     const r = rng(307);
     return Array.from({ length: n }, () => {
@@ -907,7 +910,7 @@ function ActinomicetosVelo({ centro, tier, reducedMotion }) {
   }, [n]);
   useFrame(({ clock }) => {
     if (reducedMotion) return;
-    material.opacity = 0.32 + 0.16 * Math.sin(clock.elapsedTime * 1.3);
+    MATERIAL_VELO.opacity = 0.32 + 0.16 * Math.sin(clock.elapsedTime * 1.3);
   });
   if (n === 0) return null;
   return (
@@ -1265,6 +1268,17 @@ export default function MundoCompost3D() {
   const [volteo, setVolteo] = useState(false);
   const { tier, reducedMotion } = useMemo(() => decidirTier(), []);
   const perfil = perfilDeTier(tier);
+  /* Retrato (teléfono en vertical): el ciclo del compost es un ANILLO alrededor
+     del origen y la cámara de escritorio, a media altura, solo metía en el
+     cuadro angosto una tajada — la pila salía cortada y las estaciones de los
+     lados ni aparecían. En retrato la cámara sube y se aleja: el anillo entero
+     (residuo → pila → lombriz → suelo) cae dentro de la franja del medio. */
+  const retrato = useMemo(
+    () => typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(max-aspect-ratio: 19/20)').matches,
+    [],
+  );
 
   return (
     <section
@@ -1277,7 +1291,7 @@ export default function MundoCompost3D() {
         className={`compost-canvas${listo ? ' compost-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [8.5, 6, 8.5], fov: 42 }}
+        camera={retrato ? { position: [10.4, 9.4, 10.4], fov: 50 } : { position: [8.5, 6, 8.5], fov: 42 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >

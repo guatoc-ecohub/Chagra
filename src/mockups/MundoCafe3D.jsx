@@ -869,6 +869,16 @@ export default function MundoCafe3D() {
   const [beneficio, setBeneficio] = useState(false);
   const [{ tier, reducedMotion }] = useState(() => decidirTier());
   const perfil = perfilDeTier(tier);
+  /* Retrato (teléfono en vertical): la toma de escritorio picaba sobre los
+     cafetos y DECAPITABA los árboles de sombra — y este mundo existe para
+     enseñar el café BAJO SOMBRA. En retrato la cámara retrocede, abre el fov
+     y mira más arriba: cafetos abajo, guamos y nogales con copa completa. */
+  const retrato = useMemo(
+    () => typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(max-aspect-ratio: 19/20)').matches,
+    [],
+  );
 
   return (
     <section
@@ -881,7 +891,7 @@ export default function MundoCafe3D() {
         className={`cafe3d-canvas${listo ? ' cafe3d-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={{ position: [0, 5, 14], fov: 42 }}
+        camera={retrato ? { position: [0, 4.4, 17], fov: 50 } : { position: [0, 5, 14], fov: 42 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
@@ -892,7 +902,7 @@ export default function MundoCafe3D() {
           enableZoom
           minDistance={7}
           maxDistance={22}
-          target={[0, 1.2, 0]}
+          target={retrato ? [0, 2.4, 0] : [0, 1.2, 0]}
           minPolarAngle={0.5}
           maxPolarAngle={1.45}
           minAzimuthAngle={-1.15}
