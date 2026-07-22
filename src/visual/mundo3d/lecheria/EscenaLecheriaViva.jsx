@@ -6,8 +6,9 @@
  * cuenta la lechería agroecológica COMPLETA, como es de verdad (grounded en el
  * DR de la cadena láctea):
  *
- *   · el SISTEMA SILVOPASTORIL — el hato lechero (Holstein, Normando, criolla y
- *     el cruce con cebú) pastando bajo el banco forrajero de nacedero,
+ *   · el SISTEMA SILVOPASTORIL — el hato lechero por razas de Colombia
+ *     (Holstein, Normando, BON Blanco Orejinegro, criolla y el cruce con
+ *     cebú) pastando bajo el banco forrajero de nacedero,
  *     matarratón, leucaena y botón de oro, con su cerca VIVA de matarratón y el
  *     bebedero. No es potrero pelado: es sombra, forraje y flor (FloraLecheria +
  *     GanadoLechero);

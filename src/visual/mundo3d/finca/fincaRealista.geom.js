@@ -137,16 +137,47 @@ function variar(base, r, amt = 0.06) {
  * Cero geometría extra: la silueta queda limpia (una mancha de vaca es piel,
  * no una piedra pegada).
  */
-function pintarManchas(geo, base, mancha, { escala = 1.6, umbral = 0.58, semilla = 1 } = {}) {
+function pintarManchas(geo, base, mancha, { escala = 1.6, umbral = 0.58, semilla = 1, banda = 0.05 } = {}) {
   const cb = new THREE.Color(base);
   const cm = new THREE.Color(mancha);
   const tmp = new THREE.Color();
-  const banda = 0.05; // borde suave: sin esto el umbral duro serrucha el parche
+  // `banda` es el ancho del borde: 0.05 = parche NÍTIDO (la Holstein clásica);
+  // ancha (~0.2+) = mancha DIFUSA de pelos entremezclados (la Normando) — ese
+  // contraste de borde es un rasgo de raza, no un detalle técnico.
   return pintarPorVertice(geo, (x, y, z) => {
     const n = ruidoFbm(x * escala + semilla * 7.31, y * escala + semilla * 1.7, z * escala);
     const mezcla = clamp01((n - (umbral - banda)) / (banda * 2));
     return tmp.copy(cb).lerp(cm, mezcla);
   });
+}
+
+/**
+ * ANTEOJOS / contorno ocular pigmentado: funde hacia `color` los vértices a
+ * menos de `radio` de cada centro (los ojos), con borde suave. Es la seña
+ * inconfundible de la Normando (manchas oscuras alrededor de los ojos) y el
+ * contorno ocular negro del BON. Se aplica sobre la CABEZA ya fusionada y
+ * ANTES de `hornearPelaje`, para que el AO también sombree el anteojo.
+ */
+function pintarAnteojos(geo, centros, radio, color) {
+  const pos = geo.attributes.position;
+  const col = geo.attributes.color;
+  const cA = new THREE.Color(color);
+  const cV = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const z = pos.getZ(i);
+    let cubre = 0;
+    for (const [cx, cy, cz] of centros) {
+      const d = Math.hypot(x - cx, y - cy, z - cz);
+      if (d < radio) cubre = Math.max(cubre, clamp01((radio - d) / (radio * 0.4)));
+    }
+    if (cubre > 0) {
+      cV.fromBufferAttribute(col, i).lerp(cA, cubre * 0.92);
+      col.setXYZ(i, cV.r, cV.g, cV.b);
+    }
+  }
+  return geo;
 }
 
 /** MECHÓN de lana SUAVE: esfera deformada con ruido, indexada, con normales
@@ -296,13 +327,45 @@ function memo(clave, crear) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*  VACA — Holstein / criolla / cebú (Brahman)                                 */
+/*  VACA — las razas de Colombia por piso térmico                              */
+/*  (brief con fuentes: ops/BRIEF-FABLE-ANIMALES-COLOMBIANOS.md §2.1)          */
 /* -------------------------------------------------------------------------- */
 
+/*
+ * Campos extra de raza (todos opcionales, cada uno es un rasgo VERIFICADO):
+ *   · difusa    — ancho de banda de `pintarManchas`: mancha de borde difuso
+ *                 (pelos entremezclados, Normando) vs parche nítido (Holstein).
+ *   · anteojos  — { radio, color }: pigmento alrededor de los ojos (la seña
+ *                 de la Normando; contorno ocular negro en el BON).
+ *   · orejaNegra— color pleno de oreja (BON: negras por dentro y por fuera).
+ *   · ancho     — ensancha pecho/abdomen (Normando: silueta rectangular).
+ *   · rect      — aplana la línea del lomo (Normando: bloque sólido, no cuña).
+ *   · alza      — factor de altura (BON: patas cortas, cuerpo medio y robusto).
+ * El Romosinuano NO está: su fenotipo quedó sin verificar y no se inventa.
+ */
 export const RAZAS_VACA = {
   holstein: {
     pelaje: '#f2ecdf', manchas: '#26211d', hocico: '#c39793', ubre: '#e2ab9e',
     cuerno: 0, orejas: 'lado', giba: false, papada: false,
+  },
+  // NORMANDO — la lechera rústica de tierra fría (1800-4200 msnm): base blanca
+  // con manchas caoba de BORDE DIFUSO, "anteojos" oscuros alrededor de los
+  // ojos, hocico y orejas pigmentados, cuerpo amplio de pecho y abdomen
+  // (silueta RECTANGULAR, no la cuña de la Holstein). Con cuernos.
+  normando: {
+    pelaje: '#ede4cf', manchas: '#7e4a2c', hocico: '#453931', ubre: '#dfab9c',
+    cuerno: 0.55, orejas: 'lado', giba: false, papada: false,
+    difusa: 0.24, anteojos: { radio: 0.088, color: '#3a2413' }, ancho: 1.12, rect: true,
+  },
+  // BON (Blanco Orejinegro) — criolla colombiana con ~500 años: cuerpo BLANCO
+  // pleno, OREJAS NEGRAS por dentro y por fuera (la seña que se lee a 20 m),
+  // contorno ocular y hocico negros, tamaño medio, robusta y de patas cortas.
+  // Cuernos: sin fuente verificada de forma/tamaño → no se dibujan (regla del
+  // brief: lo no verificado no se inventa).
+  bon: {
+    pelaje: '#f3efe4', manchas: null, hocico: '#2b2521', ubre: '#d9b3a2',
+    cuerno: 0, orejas: 'lado', giba: false, papada: false,
+    orejaNegra: '#211c19', anteojos: { radio: 0.046, color: '#241f1b' }, alza: 0.88,
   },
   criolla: {
     pelaje: '#a5652f', manchas: null, hocico: '#7c5138', ubre: '#cf9c82',
@@ -328,19 +391,39 @@ const Y_CADERA_VACA = 0.72;
  * `articulada` (opt-in) entrega las patas como PIEZAS SUELTAS con pivote en la
  * cadera (para escenas que columpian las patas al andar — el mercado). Con el
  * default las patas van fusionadas al cuerpo, como siempre (valle/hato).
+ * `cola` (default true): en false la res sale SIN cola fusionada, para escenas
+ * que la animan como pieza viva (la lechería espanta moscas).
  * @returns {{cuerpo: THREE.BufferGeometry, cabeza: THREE.BufferGeometry, pivote: [number,number,number], patas?: THREE.BufferGeometry[], caderas?: [number,number][], yCadera?: number}}
  */
-export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1, articulada = false } = {}, seed = 21) {
-  return memo(`vaca|${raza}|${ubre}|${cuerno}|${q}|${articulada}|${seed}`, () => {
+export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1, articulada = false, cola = true } = {}, seed = 21) {
+  if (!RAZAS_VACA[raza]) {
+    // TRONAR CLARO, no callar: pedir una raza inexistente devolvía una Holstein
+    // en silencio y el mundo enseñaba una vaca que no era (bug del brief).
+    console.warn(
+      `[fincaRealista] geomVaca: raza "${raza}" no existe en RAZAS_VACA `
+      + `(${Object.keys(RAZAS_VACA).join(', ')}) — se dibuja una holstein. `
+      + 'Si es una raza nueva, agréguela al catálogo con rasgos VERIFICADOS.',
+    );
+  }
+  return memo(`vaca|${raza}|${ubre}|${cuerno}|${q}|${articulada}|${cola}|${seed}`, () => {
     const R = RAZAS_VACA[raza] || RAZAS_VACA.holstein;
     const r = rng(seed);
     const p = [];
     const nSeg = Math.max(14, Math.round(20 * q));
     const nRad = Math.max(11, Math.round(15 * q));
     const escCuerno = cuerno ?? R.cuerno;
-    // El pintor de pelaje: manchas de capa pintadas (holstein) o color pleno.
+    // La morfología de la raza: alzada (BON bajita), amplitud (Normando ancha)
+    // y línea de lomo (rect = bloque rectangular, sin la caída de la cuña).
+    const alza = R.alza ?? 1;
+    const ancho = R.ancho ?? 1;
+    const llano = R.rect ? 0.4 : 1;
+    const hondo = R.rect ? 1.08 : 1;
+    // El pintor de pelaje: manchas de capa pintadas (nítidas en la holstein,
+    // DIFUSAS en la normando — `difusa` ensancha el borde) o color pleno.
     const pinta = R.manchas
-      ? (g, c) => pintarManchas(g, c, R.manchas, { escala: 1.5, umbral: 0.56, semilla: seed })
+      ? (g, c) => pintarManchas(g, c, R.manchas, {
+        escala: R.difusa ? 1.25 : 1.5, umbral: R.difusa ? 0.55 : 0.56, semilla: seed, banda: R.difusa || 0.05,
+      })
       : (g, c) => pintarPlano(g, c);
 
     // ── El torso ES UNA silueta: grupa alta y huesuda, lomo que cae apenas,
@@ -351,34 +434,34 @@ export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1,
       nRad,
       semilla: seed,
       ruido: 0.02,
-      espina: (t) => 0.9 + 0.05 * campana(t, 0.08, 0.22) - 0.035 * campana(t, 0.45, 0.35) + 0.04 * campana(t, 0.9, 0.2),
+      espina: (t) => alza * (0.9 + (0.05 * campana(t, 0.08, 0.22) - 0.035 * campana(t, 0.45, 0.35) + 0.04 * campana(t, 0.9, 0.2)) * llano),
       arriba: (t) => (0.17 + 0.02 * campana(t, 0.1, 0.3)) * remate(t, 0.3),
-      abajo: (t) => (0.24 + 0.17 * campana(t, 0.42, 0.5) + 0.05 * campana(t, 0.92, 0.25)) * remate(t, 0.42),
-      lado: (t) => (0.27 + 0.02 * campana(t, 0.15, 0.3) - 0.02 * campana(t, 0.75, 0.3)) * remate(t, 0.4),
+      abajo: (t) => (0.24 + 0.17 * campana(t, 0.42, 0.5) + 0.05 * campana(t, 0.92, 0.25)) * remate(t, 0.42) * hondo,
+      lado: (t) => (0.27 + 0.02 * campana(t, 0.15, 0.3) - 0.02 * campana(t, 0.75, 0.3)) * remate(t, 0.4) * ancho,
     });
     p.push(pinta(torso, R.pelaje));
     // Huesos de cadera marcados (lo huesudo de una vaca real).
     for (const dz of [0.16, -0.16]) {
       const hueso = new THREE.SphereGeometry(0.07, 9, 7);
-      poner(hueso, [-0.52, 1.0, dz], [0, 0, 0], [1.15, 0.75, 0.75]);
+      poner(hueso, [-0.52, 1.0 * alza, dz * ancho], [0, 0, 0], [1.15, 0.75, 0.75]);
       p.push(pinta(hueso, variar(R.pelaje, r, 0.04)));
     }
 
     // ── Cuello macizo y CORTO del pecho al pivote de la cabeza (las manchas
     //    pintadas continúan del torso al cuello sin costura) ──
     const cuello = new THREE.CylinderGeometry(0.13, 0.23, 0.42, 10, 3);
-    apuntar(cuello, [0.66, 0.94, 0], [0.66, 0.5, 0], [1, 1, 0.7]);
+    apuntar(cuello, [0.66, 0.94 * alza, 0], [0.66, 0.5, 0], [1, 1, 0.7]);
     p.push(pinta(cuello, R.pelaje));
 
     // ── Giba y papada (cebú); papada leve en la criolla ──
     if (R.giba) {
       const giba = new THREE.SphereGeometry(0.14, 10, 8);
-      poner(giba, [0.4, 1.12, 0], [0, 0, 0.15], [0.9, 1.1, 0.7]);
+      poner(giba, [0.4, 1.12 * alza, 0], [0, 0, 0.15], [0.9, 1.1, 0.7]);
       p.push(pintarPlano(giba, variar(R.pelaje, r, 0.05)));
     }
     if (R.papada) {
       const papada = new THREE.CapsuleGeometry(0.06, R.giba ? 0.44 : 0.3, 4, 8);
-      apuntar(papada, [0.62, 0.6, 0], [0.45, -1, 0], [1, 1, 0.45]);
+      apuntar(papada, [0.62, 0.6 * alza, 0], [0.45, -1, 0], [1, 1, 0.45]);
       p.push(pintarPlano(papada, variar(R.pelaje, r, 0.06)));
     }
 
@@ -391,14 +474,14 @@ export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1,
     for (const [px, pz, atras] of CADERAS_VACA) {
       const destino = articulada ? [] : p;
       pataCuadrupedo(destino, {
-        x: px, z: pz, yCadera: Y_CADERA_VACA, rMuslo: 0.1, rCana: 0.046,
+        x: px, z: pz, yCadera: Y_CADERA_VACA * alza, rMuslo: 0.1, rCana: 0.046,
         pelaje: R.pelaje, pezuna: '#3c352d', r, atras, pintor: pinta,
       });
       if (articulada) {
         const pata = hornearPelaje(fusionarHato(destino, `vaca-${raza}-pata`), {
           yBajo: 0.04, yAlto: 1.0, ao: 0.42, moteado: 0.06, semilla: seed,
         });
-        pata.translate(-px, -Y_CADERA_VACA, -pz);
+        pata.translate(-px, -Y_CADERA_VACA * alza, -pz);
         patasSueltas.push(pata);
       }
     }
@@ -406,22 +489,24 @@ export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1,
     // ── Ubre con tetillas (la seña de la lechera) ──
     if (ubre) {
       const bolsa = new THREE.SphereGeometry(0.155, 11, 9);
-      poner(bolsa, [-0.28, 0.52, 0], [0, 0, 0], [1.2, 0.95, 1.0]);
+      poner(bolsa, [-0.28, 0.52 * alza, 0], [0, 0, 0], [1.2, 0.95, 1.0]);
       p.push(pintarPlano(bolsa, R.ubre));
       for (const [tx, tz] of [[-0.2, 0.07], [-0.2, -0.07], [-0.37, 0.07], [-0.37, -0.07]]) {
         const teta = new THREE.CylinderGeometry(0.016, 0.021, 0.09, 6, 1);
-        poner(teta, [tx, 0.42, tz]);
+        poner(teta, [tx, 0.42 * alza, tz]);
         p.push(pintarPlano(teta, variar(R.ubre, r, 0.06)));
       }
     }
 
-    // ── Cola con borla ──
-    const cola = new THREE.CylinderGeometry(0.015, 0.028, 0.52, 6, 2);
-    apuntar(cola, [-0.66, 0.82, 0.02], [-0.2, -1, 0.08]);
-    p.push(pintarPlano(cola, variar(R.pelaje, r, 0.05)));
-    const borla = new THREE.ConeGeometry(0.032, 0.1, 6, 1);
-    apuntar(borla, [-0.75, 0.56, 0.05], [-0.2, -1, 0.08]);
-    p.push(pintarPlano(borla, R.manchas || '#3c352d'));
+    // ── Cola con borla (omitible: la lechería la anima como pieza viva) ──
+    if (cola) {
+      const rabo = new THREE.CylinderGeometry(0.015, 0.028, 0.52, 6, 2);
+      apuntar(rabo, [-0.66, 0.82 * alza, 0.02], [-0.2, -1, 0.08]);
+      p.push(pintarPlano(rabo, variar(R.pelaje, r, 0.05)));
+      const borla = new THREE.ConeGeometry(0.032, 0.1, 6, 1);
+      apuntar(borla, [-0.75, 0.56 * alza, 0.05], [-0.2, -1, 0.08]);
+      p.push(pintarPlano(borla, R.manchas || '#3c352d'));
+    }
 
     const cuerpo = hornearPelaje(fusionarHato(p, `vaca-${raza}`), {
       yBajo: 0.04, yAlto: 1.0, ao: 0.42, moteado: 0.06, semilla: seed,
@@ -430,8 +515,13 @@ export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1,
     // ── La CABEZA (local al pivote del cuello): cráneo ancho, testuz recta,
     //    morro REDONDEADO — la cabeza de vaca, no una pelota con un tubo ──
     const c = [];
+    // La cara de la normando queda MAYORMENTE blanca (umbral alto): sobre ese
+    // fondo claro es que los ANTEOJOS oscuros se leen — si la mancha difusa
+    // inunda la cabeza, la seña de la raza se ahoga.
     const pintaCara = R.manchas
-      ? (g, col) => pintarManchas(g, col, R.manchas, { escala: 2.4, umbral: 0.55, semilla: seed + 11 })
+      ? (g, col) => pintarManchas(g, col, R.manchas, {
+        escala: 2.4, umbral: R.difusa ? 0.7 : 0.55, semilla: seed + 11, banda: R.difusa || 0.05,
+      })
       : (g, col) => pintarPlano(g, col);
     const craneo = new THREE.SphereGeometry(0.15, 13, 11);
     poner(craneo, [0.06, 0.0, 0], [0, 0, -0.1], [1.25, 1.02, 0.82]);
@@ -453,15 +543,19 @@ export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1,
       c.push(pintarPlano(ojo, '#241d18'));
     }
     // Orejas de pétalo: horizontales y ligeramente caídas (grandes en el cebú).
-    // En la holstein van del color de la mancha de cabeza — la clásica.
+    // En la holstein van del color de la mancha de cabeza — la clásica. En el
+    // BON van NEGRAS PLENAS y un pelo más grandes: sobre el cuerpo blanco son
+    // la seña que se lee a veinte metros.
     const caida = R.orejas === 'caida';
-    const colorOreja = R.manchas ? variar(R.manchas, r, 0.08) : variar(R.pelaje, r, 0.07);
+    const colorOreja = R.orejaNegra
+      || (R.manchas ? variar(R.manchas, r, 0.08) : variar(R.pelaje, r, 0.07));
+    const escOreja = R.orejaNegra ? 1.18 : 1;
     for (const lado of [1, -1]) {
       const oreja = orejaPetalo(
         [0.0, caida ? 0.04 : 0.06, lado * 0.125],
         caida ? [0.1, -0.55, lado * 0.85] : [0.02, -0.12, lado],
-        caida ? 0.2 : 0.14,
-        caida ? 0.1 : 0.085,
+        (caida ? 0.2 : 0.14) * escOreja,
+        (caida ? 0.1 : 0.085) * escOreja,
         0.28,
       );
       c.push(pintarPlano(oreja, colorOreja));
@@ -472,16 +566,28 @@ export function geomVaca({ raza = 'holstein', ubre = true, cuerno = null, q = 1,
         c.push(pintarPlano(cuerno1, '#d9cdb2'));
       }
     }
-    const cabeza = hornearPelaje(fusionarHato(c, `cabeza-vaca-${raza}`), {
+    let cabezaCruda = fusionarHato(c, `cabeza-vaca-${raza}`);
+    // Los ANTEOJOS de la raza (Normando: manchas oscuras alrededor de los ojos;
+    // BON: contorno ocular negro), pintados sobre la cabeza YA fusionada para
+    // que el pigmento cruce cráneo/testuz sin costura.
+    if (R.anteojos) {
+      cabezaCruda = pintarAnteojos(
+        cabezaCruda,
+        [[0.14, 0.045, 0.108], [0.14, 0.045, -0.108]],
+        R.anteojos.radio,
+        R.anteojos.color,
+      );
+    }
+    const cabeza = hornearPelaje(cabezaCruda, {
       yBajo: -0.2, yAlto: 0.15, ao: 0.3, moteado: 0.05, semilla: seed + 3,
     });
 
     /** @type {{cuerpo: THREE.BufferGeometry, cabeza: THREE.BufferGeometry, pivote: [number,number,number], patas?: THREE.BufferGeometry[], caderas?: [number,number][], yCadera?: number}} */
-    const res = { cuerpo, cabeza, pivote: [0.82, 1.08, 0] };
+    const res = { cuerpo, cabeza, pivote: [0.82, 1.08 * alza, 0] };
     if (articulada) {
       res.patas = patasSueltas;
       res.caderas = CADERAS_VACA.map(([px, pz]) => /** @type {[number, number]} */ ([px, pz]));
-      res.yCadera = Y_CADERA_VACA;
+      res.yCadera = Y_CADERA_VACA * alza;
     }
     return res;
   });
