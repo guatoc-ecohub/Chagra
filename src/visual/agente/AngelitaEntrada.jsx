@@ -9,22 +9,34 @@ import { Angelita } from './Angelita.jsx';
  * AngelitaEntrada — LA ENTRADA TEATRAL de la compañera de Chagra.
  *
  * Después del paneo de cámara del host (el valle terminó de presentarse), la
- * abejita hace su aparición de estrella de cartoon años 30:
+ * abejita hace su aparición de estrella de cartoon años 30. Orden (feedback
+ * del operador: "tan pequeña que cuando al fondo hace cualquier cosa no se
+ * nota" — el ojo necesita encontrarla ANTES de que pase algo):
  *
- *   1. ASOMA pequeñita — pop elástico a escala chiquita, curiosa, aleteando.
- *   2. Si es de DÍA y hace SOL (clima 'soleado'/'dorada'): SE PONE LAS GAFAS —
- *      caen giradas desde arriba, rebasan la carita, rebotan y asientan, con
- *      el destello que barre el lente (AngelitaGafas + angelita-missminutes).
- *   3. CRECE — anticipa (se agacha a coger impulso), se estira con OVERSHOOT
- *      hasta su tamaño de asistente, squash de aterrizaje, rebotico, y el aro
- *      de energía ámbar revienta al llegar: ya está aquí la compañera viva.
+ *   1. ASOMA pequeñita — pop elástico a escala chiquita, apareciendo.
+ *   2. QUIETA — se queda ESTÁTICA a esa misma escala chiquita 1-2s: nada de
+ *      idle-cerebro (mirar/acicalarse/la mota que pasa — apagado con
+ *      idleCerebro=false), apenas el aleteo/boil base de <Angelita> para
+ *      leerse viva sin distraer. Es la pausa que deja que el ojo la encuentre
+ *      antes del número.
+ *   3. CRECE — la entrada MAGISTRAL: anticipa (se agacha a coger impulso), se
+ *      estira con OVERSHOOT hasta su tamaño de asistente, squash de
+ *      aterrizaje, rebotico, y el aro de energía ámbar revienta al llegar.
+ *   4. Si es de DÍA y hace SOL (clima 'soleado'/'dorada'): AHORA, ya a tamaño
+ *      completo, SE PONE LAS GAFAS — caen giradas desde arriba, rebasan la
+ *      carita, rebotan y asientan, con el destello que barre el lente
+ *      (AngelitaGafas + angelita-missminutes). A tamaño completo SE VEN Y
+ *      RESALTAN (antes pasaba a escala chiquita y se perdían).
+ *   5. BRILLO — un destello breve que remata y avisa "ya estoy lista"; se
+ *      apaga solo (no un glow permanente).
  *
  * El JS solo es el METRÓNOMO de fases (clases .ang-entrada--*); el timing y
  * las curvas viven en el CSS. Contratos de la casa:
  *   · reduced-motion (o animated=false) NO hace teatro: aparece YA en tamaño
  *     final, con las gafas puestas si corresponde — fotograma digno.
  *   · El line-boil (capa cara) se enciende SOLO durante el número (asoma →
- *     crece) y en tier alto/medio: es su momento heroico, no un loop eterno.
+ *     crece → gafas → brillo), NUNCA en la pausa quieta, y en tier alto/medio:
+ *     es su momento heroico, no un loop eterno.
  *   · Al terminar queda una <Angelita> normal (estadoFinal) y el host sigue
  *     mandando con sus props de siempre; `onLista` avisa el fin del show.
  *
@@ -36,8 +48,10 @@ import { Angelita } from './Angelita.jsx';
    (regla dura de la casa: el metrónomo suelta la clase cuando el gesto terminó
    en identidad, y el empalme no salta). */
 const DUR_ASOMA = 900;    // = ang-asoma
+const DUR_QUIETA = 1500;  // la pausa estática (1-2s): que el ojo la encuentre
 const DUR_GAFAS = 1650;   // = agz-ponerse (950) + destello (500 desde 0.9s) + respiro
 const DUR_CRECE = 1300;   // = ang-crece
+const DUR_BRILLO = 650;   // = ang-destello-final: el remate que avisa "ya lista"
 
 /** ¿Es un momento de gafas? Día con sol en el vocabulario canónico del valle
  *  ('dorada' | 'soleado' | 'niebla' | 'lluvia' | 'noche'). */
@@ -99,14 +113,20 @@ export function AngelitaEntrada({
       timer = window.setTimeout(siguiente, dur);
     };
     timer = window.setTimeout(() => {
+      // 1. Asoma (pop elástico, pequeñita) → 2. Quieta (pausa estática: que
+      // el ojo la encuentre) → 3. Crece (la entrada magistral, overshoot) →
+      // 4. Gafas si hay sol (ya a tamaño completo) → 5. Brillo (remate) → lista.
       paso('asoma', DUR_ASOMA + 350, () => {
-        if (soleado) {
-          paso('gafas', DUR_GAFAS, () => {
-            paso('crece', DUR_CRECE, () => setFase('lista'));
+        paso('quieta', DUR_QUIETA, () => {
+          paso('crece', DUR_CRECE, () => {
+            const rematar = () => paso('brillo', DUR_BRILLO, () => setFase('lista'));
+            if (soleado) {
+              paso('gafas', DUR_GAFAS, rematar);
+            } else {
+              rematar();
+            }
           });
-        } else {
-          paso('crece', DUR_CRECE, () => setFase('lista'));
-        }
+        });
       });
     }, retrasoMs);
     return () => window.clearTimeout(timer);
@@ -121,20 +141,26 @@ export function AngelitaEntrada({
     }
   }, [fase]);
 
-  // Las gafas: caen en la fase 'gafas' (one-shot) y QUEDAN puestas después.
+  // Las gafas: caen en la fase 'gafas' (one-shot, YA a tamaño completo — se
+  // ven y resaltan) y QUEDAN puestas de ahí en adelante (brillo → lista).
   const gafas = useMemo(() => {
     if (!soleado) return false;
     if (sinTeatro) return true;
     if (fase === 'gafas') return 'poniendose';
-    return (fase === 'crece' || fase === 'lista') ? true : false;
+    return (fase === 'brillo' || fase === 'lista') ? true : false;
   }, [soleado, sinTeatro, fase]);
 
-  // Estado del agente por fase: curiosa mientras asoma/se viste, CONTENTA en
-  // el estirón (brinca celebrando mientras crece — puro cartoon), y al quedar
-  // lista, lo que el host pida.
+  // Estado del agente por fase: curiosa mientras asoma/quieta/se viste,
+  // CONTENTA en el estirón (brinca celebrando mientras crece — puro cartoon),
+  // y al quedar lista, lo que el host pida.
   const estado = fase === 'crece' ? 'contenta' : fase === 'lista' ? estadoFinal : 'acompana';
-  // Su momento heroico: line-boil solo durante el número (y no en gama baja).
-  const heroica = !sinTeatro && fase !== 'lista' && fase !== 'espera' && tier !== 'bajo';
+  // En la pausa quieta se apaga el idle-cerebro grande (mirar, acicalarse, la
+  // mota que pasa): "apenas lo mínimo para leerse viva, nada que distraiga".
+  // El aleteo/boil base de <Angelita> sigue intacto (idleCerebro no los toca).
+  const idleCerebro = fase !== 'quieta';
+  // Su momento heroico: line-boil solo durante el número (asoma→crece→gafas→
+  // brillo), NUNCA en la pausa quieta ni en gama baja.
+  const heroica = !sinTeatro && fase !== 'lista' && fase !== 'espera' && fase !== 'quieta' && tier !== 'bajo';
 
   return (
     <span
@@ -148,6 +174,7 @@ export function AngelitaEntrada({
           size={size}
           animated={animated}
           tier={tier}
+          idleCerebro={idleCerebro}
           gafas={gafas}
           lineBoil={heroica}
           clima={clima}
@@ -155,6 +182,7 @@ export function AngelitaEntrada({
         />
       </span>
       <span className="ang-entrada__aro" aria-hidden="true" />
+      <span className="ang-entrada__brillo" aria-hidden="true" />
     </span>
   );
 }

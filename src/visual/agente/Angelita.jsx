@@ -43,8 +43,11 @@ import {
  *   contenta     → brinca celebrando (pose celebra) con chispas doradas.
  *   preocupada   → alerta honesta: cejas fruncidas, gota de sudor, aro coral
  *                  que late, vibración inquieta. Para plaga/sequía/riesgo.
- *   no-se        → LA HONESTA: se encoge de hombros con las palmas arriba y
- *                  un "?" dibujado a mano. Sonríe: no saber no la avergüenza.
+ *   no-se        → LA HONESTA: NIEGA CON LA CABEZA mientras se encoge de
+ *                  hombros con las palmas arriba y un "?" dibujado a mano.
+ *                  Sonríe: no saber no la avergüenza. El texto que la
+ *                  acompaña debe decir "No sé" claro, sin rodeos
+ *                  (angelitaEstados.TEXTO_NO_SE).
  *   senala       → guía: se inclina y apunta (pose señala) con destello en
  *                  el punto señalado.
  *   invita       → guía: se inclina hacia usted y hace "venga" con la manita.
@@ -224,6 +227,11 @@ function MotaDeVilano() {
  * @param {number} [props.energia]
  * @param {string|null} [props.mundoId]  su herramienta por mundo (PropEnMano).
  * @param {boolean} [props.lineBoil]  contorno que hierve (momentos heroicos).
+ * @param {boolean} [props.idleCerebro=true]  false apaga SOLO el reloj de
+ *   micro-gestos (mira/distraída-con-mota/acicala/rasca/sacude/posa) del idle
+ *   'acompana' — el aleteo y el boil base de <AbejaAngelita> siguen intactos.
+ *   Para momentos "viva pero quieta" (la pausa de AngelitaEntrada antes del
+ *   número: nada que compita con la entrada que viene).
  * @param {string} [props.title]  pisa la narración aria derivada del estado.
  */
 export function Angelita({
@@ -241,6 +249,7 @@ export function Angelita({
   energia = 1,
   mundoId = null,
   lineBoil = false,
+  idleCerebro = true,
   /* Gafas de sol (día soleado / entrada teatral): passthrough al cuerpo.
      false | true | 'poniendose' (la caída one-shot). */
   gafas = false,
@@ -266,7 +275,7 @@ export function Angelita({
   /* ═══ IDLE-CEREBRO (solo acompana) — el reloj con jitter que hojea el
      repertorio de micro-gestos. flota → gesto → flota…; posa encadena
      posada → despega. Gates: animated, estado, tier bajo, reduced-motion. */
-  const idleActivo = vivo && e === 'acompana' && tier !== 'bajo';
+  const idleActivo = vivo && e === 'acompana' && tier !== 'bajo' && idleCerebro;
   const [momento, setMomento] = useState('flota');
   useEffect(() => {
     if (!idleActivo || prefiereQuietud()) return undefined;
