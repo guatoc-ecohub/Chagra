@@ -118,9 +118,13 @@ export function detectInfra({ probe } = {}) {
     if (process.env.ANTHROPIC_API_KEY) return true;
     return existsSync(join(process.env.HOME || '', '.config', 'chagra-anthropic-judge-key'));
   });
-  check('fixtures-privadas', () =>
-    existsSync('/home/kortux/Workspace/Chagra-strategy/deepresearch'),
-  );
+  check('fixtures-privadas', () => {
+    // Ruta de fixtures privadas configurable por env; default relativo al HOME
+    // del operador (no hardcodear el path absoluto de una máquina concreta).
+    const dir = process.env.CHAGRA_FIXTURES_DIR
+      || join(process.env.HOME || '', 'Workspace', 'Chagra-strategy', 'deepresearch');
+    return existsSync(dir);
+  });
   check('farmos', () => result.sidecar === true);
   check('age', () => {
     const r = spawnSync(

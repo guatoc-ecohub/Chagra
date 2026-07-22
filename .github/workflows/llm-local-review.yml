@@ -102,8 +102,10 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p .adr-cache
-          # En alpha, los ADRs de Chagra-strategy están en /home/kortux/Workspace/Chagra-strategy o /home/kortux/Chagra-strategy.
-          for base in /home/kortux/Workspace/Chagra-strategy /home/kortux/Chagra-strategy; do
+          # En el runner self-hosted, los ADRs de Chagra-strategy viven bajo el
+          # HOME del runner (configurable con CHAGRA_STRATEGY_DIR si difiere).
+          for base in "${CHAGRA_STRATEGY_DIR:-}" "$HOME/Workspace/Chagra-strategy" "$HOME/Chagra-strategy"; do
+            [ -z "$base" ] && continue
             if [ -d "$base/deepresearch" ]; then
               cp "$base/deepresearch/data-model/adr-019-asset-log-3-reglas-inviolables.md" .adr-cache/adr-019.md 2>/dev/null || true
               cp "$base/deepresearch/architecture/ADR-020-anti-leak-content-boundary.md" .adr-cache/adr-020.md 2>/dev/null || true

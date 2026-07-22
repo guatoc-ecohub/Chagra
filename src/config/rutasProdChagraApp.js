@@ -1027,8 +1027,8 @@ export const EXCLUIDO = [
 
   // ── Componentes específicos ────────────────────────────────────
   {
-    path: 'javier',
-    motivo: 'Dashboard del trabajador "Javier". Rol específico, no genérico.',
+    path: 'campo_trabajador',
+    motivo: 'Dashboard de trabajador de finca (WorkerDashboard). Rol específico, no genérico.',
   },
   {
     path: 'auditoria_inventario',

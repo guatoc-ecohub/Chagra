@@ -94,7 +94,7 @@ const RAG_GROUNDING_PRECACHE = [
   // (plaga→controlador, compatibles, antagonistas, biopreparados, vernáculos)
   // por especie del catálogo. Cierra el "invisible offline": antes el cliente
   // sin red sólo veía el catálogo estático y NO estas aristas. Generado en
-  // build/ops por chagra-pro/scripts/export-grafo-offline.mjs. Se cachea en
+  // build/ops por un script interno de export del grafo offline. Se cachea en
   // RAG_GROUNDING_CACHE (sobrevive deploys; cache-first; degrada a 504).
   '/grafo-relations.json',
 ];
@@ -672,7 +672,7 @@ self.addEventListener('message', (event) => {
   // comparar con `sw:last-acked-version` en localStorage y decidir si
   // mostrar el banner "nueva version disponible". Respondemos por
   // MessageChannel (event.ports[0]) para evitar broadcast a otros clients.
-  // Fix Antigravity QA #18.
+  // Fix QA #18.
   if (event.data && event.data.type === 'GET_VERSION') {
     if (event.ports && event.ports[0]) {
       event.ports[0].postMessage({ type: 'VERSION', version: CACHE_NAME });

@@ -14,7 +14,7 @@ import { ModoCampoProvider } from './hooks/ModoCampoContext';
 import { syncManager } from './services/syncManager';
 import { useLogStore } from './store/useLogStore';
 import { fetchFromFarmOS } from './services/apiService';
-import { PRIMARY_WORKER_NAME } from './config/workerConfig';
+import { PRIMARY_WORKER_NAME, LEGACY_WORKER_NAME } from './config/workerConfig';
 import { renameWorker } from './services/assetService';
 import { getAccessToken } from './services/authService';
 import { registerServiceWorker } from './services/swRegistration';
@@ -48,7 +48,7 @@ if (!canonicalRedirect.redirected) {
     if (navigator.onLine && !localStorage.getItem('chagra:v1:rename_done')) {
       getAccessToken().then((token) => {
         if (!token) return;
-        renameWorker('Jimmy', PRIMARY_WORKER_NAME).then((result) => {
+        renameWorker(LEGACY_WORKER_NAME, PRIMARY_WORKER_NAME).then((result) => {
           if (result.success || result.error === 'not_found') {
             localStorage.setItem('chagra:v1:rename_done', '1');
           }

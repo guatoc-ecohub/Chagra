@@ -1,5 +1,5 @@
 /**
- * swUpdateAck.test.js — cobertura del fix Antigravity QA #18.
+ * swUpdateAck.test.js — cobertura del fix QA #18.
  *
  * Bug: el banner "nueva versión disponible" se mostraba cada reload aunque
  * el usuario ya hubiera clickeado "Actualizar". Persistimos el ack en
@@ -11,7 +11,7 @@
  *   2. Ack persistido y misma versión → NO mostrar banner.
  *   3. Versión cambió (incluido rollback) → SÍ mostrar banner.
  *
- * Refs: Antigravity QA #18, task #128.
+ * Refs: QA #18, task #128.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import {

@@ -19,26 +19,29 @@ import { fileURLToPath } from 'url';
 const TEST_FILE = fileURLToPath(import.meta.url);
 const REPO_DIR = resolve(dirname(TEST_FILE), '../..');
 
+// Flag `i` (case-insensitive) OBLIGATORIO: sin él, `/antigravity/` NO matcheaba
+// el texto real `Antigravity` (mayúscula) y el codename sobrevivía en el bundle
+// servido (public/sw.js). Un leak de identidad/infra no depende de la caja.
 const PROHIBITED_PATTERNS = [
-  /PROHIBITED_INTERNAL/,
-  /ECOCERT_PRESET_INTERNAL/,
-  /MAYACERT_PRESET_INTERNAL/,
-  /CONTROL_UNION_PRESET_INTERNAL/,
-  /IFOAM_PRESET_PRO/,
-  /mollison[-_]?adapted/,
-  /lawton[-_]?curated/,
-  /pfeiffer[-_]?internal/,
-  /appliance[-_]?default[-_]?config/,
-  /antigravity/,
-  /openfang/,
-  /personal_hand/,
-  /\/home\/kortux/,
-  /\/home\/ubuntu/,
-  /kortux/,
+  /PROHIBITED_INTERNAL/i,
+  /ECOCERT_PRESET_INTERNAL/i,
+  /MAYACERT_PRESET_INTERNAL/i,
+  /CONTROL_UNION_PRESET_INTERNAL/i,
+  /IFOAM_PRESET_PRO/i,
+  /mollison[-_]?adapted/i,
+  /lawton[-_]?curated/i,
+  /pfeiffer[-_]?internal/i,
+  /appliance[-_]?default[-_]?config/i,
+  /antigravity/i,
+  /openfang/i,
+  /personal_hand/i,
+  /\/home\/kortux/i,
+  /\/home\/ubuntu/i,
+  /kortux/i,
 ];
 
 const SKIP_DIRS = new Set([
-  'node_modules', 'dist', '.git',
+  'node_modules', 'dist', 'dist-prod', '.git',
   'test-results',    // Playwright artifacts (CI paths)
   '.claude',          // private agent config (not in repo)
   'bench',            // benchmark data/history (contains model names, paths)

@@ -573,9 +573,10 @@ const LoadingFallback = ({ view = null }) => {
 // dashboard legacy), que NUNCA se montaba — `case 'dashboard'` renderiza
 // `DashboardLiveView`. La home viva es `DashboardLive.jsx` (HERRAMIENTAS_TILES +
 // FincaCards + mano radial). Los launchers que SOLO vivían en ese código muerto
-// (`casos` vía CaseStudyTopWidget, `javier` vía el tile) se rescataron a la home
-// viva (HERRAMIENTAS_TILES en DashboardLive). Las rutas `casos`/`caso_detail`/
-// `javier`/`usage_stats` siguen vivas en el router (más abajo) y por hash.
+// (`casos` vía CaseStudyTopWidget, `campo_trabajador` vía el tile) se rescataron
+// a la home viva (HERRAMIENTAS_TILES en DashboardLive). Las rutas `casos`/
+// `caso_detail`/`campo_trabajador`/`usage_stats` siguen vivas en el router (más
+// abajo) y por hash.
 // Ref: CAPABILITIES_STATUS.md §4 (deuda de navegación) + §2 (huérfanos).
 
 // Rutas PÚBLICAS de mockups (vitrinas de discovery). Se resuelven ANTES del
@@ -877,7 +878,7 @@ const HASH_VIEW_ROUTES = {
 
 // Vistas que cuentan como "módulo" para telemetría de piloto.
 const MODULE_VIEWS = new Set([
-  'activos', 'mapa', 'javier', 'bodega', 'task_log', 'historial', 'bitacora',
+  'activos', 'mapa', 'campo_trabajador', 'bodega', 'task_log', 'historial', 'bitacora',
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol', 'compost',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'animales_conejos', 'animales_caprinos', 'estiercol',
@@ -2569,7 +2570,7 @@ export default function App() {
             <TaskScreen onBack={() => navigate('task_log')} onSave={showToast} initialData={currentViewData?.task || currentViewData} />
           </ErrorBoundary>
         );
-      case 'javier':
+      case 'campo_trabajador':
         return (
           <ErrorBoundary>
             <ScreenShell title={`Campo, ${PRIMARY_WORKER_NAME}`} icon={Eye} onBack={() => navigate('dashboard')} onHome={() => navigate('dashboard')}>
