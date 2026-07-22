@@ -15,9 +15,19 @@ const PARCELAS = [
   { id: 'descanso', nombre: '3. Descanso', detalle: 'La parcela reposa, absorbe el abono y se regenera.', x: 4.2, z: -1.8, color: '#a7b85e' },
   { id: 'huerto', nombre: '4. Huerto aliado', detalle: 'Después del descanso, las gallinas ayudan con plagas y fertilidad.', x: 4.2, z: 2.6, color: '#557f39' },
 ];
+/* Posiciones RELATIVAS al centro de la parcela activa (no absolutas): así
+   las 8 gallinas se reparten a donde esté `paso` en vez de vivir siempre en
+   la parcela 1. Conserva el mismo patrón de dispersión que tenían las
+   coordenadas originales (todas caían dentro de una sola parcela). */
 const GALLINAS = [
-  [-5.2, -2.2, 0.1], [-4.3, -1.4, 1.7], [-3.5, -2.4, 3.2], [-4.7, -3, 4.5],
-  [-3.3, -1.2, 5.6], [-5.5, -1.4, 0.8], [-4, -2.9, 2.5], [-2.9, -2, 3.8],
+  { dx: -1.0, dz: -0.4, rot: 0.1 },
+  { dx: -0.1, dz: 0.4, rot: 1.7 },
+  { dx: 0.7, dz: -0.6, rot: 3.2 },
+  { dx: -0.5, dz: -1.2, rot: 4.5 },
+  { dx: 0.9, dz: 0.6, rot: 5.6 },
+  { dx: -1.3, dz: 0.4, rot: 0.8 },
+  { dx: 0.2, dz: -1.1, rot: 2.5 },
+  { dx: 1.3, dz: -0.2, rot: 3.8 },
 ];
 const CULTIVOS = Array.from({ length: 18 }, (_, i) => ({
   x: 2.8 + (i % 6) * 0.55,
@@ -26,19 +36,27 @@ const CULTIVOS = Array.from({ length: 18 }, (_, i) => ({
 }));
 const POSTES = [-6.1, -2.1, 2.1, 6.1];
 
-function Terreno() {
+function Terreno({ pasoActivo }) {
   return (
     <>
       <mesh position={[0, -0.2, 0]}>
         <boxGeometry args={[14, 0.35, 9]} />
         <meshLambertMaterial color={PALETA.tierraClara} />
       </mesh>
-      {PARCELAS.map((p) => (
-        <mesh key={p.id} position={[p.x, 0.01, p.z]}>
-          <boxGeometry args={[3.75, 0.18, 3.8]} />
-          <meshLambertMaterial color={p.color} flatShading />
-        </mesh>
-      ))}
+      {PARCELAS.map((p) => {
+        const activa = p.id === pasoActivo;
+        /* La parcela activa se distingue por estado (no solo por su hex fijo
+           de rol): se aclara hacia PALETA.cal y se levanta un poco. Nada de
+           geometría nueva, solo el color/alto que ya existían reaccionando
+           al paso elegido. */
+        const color = activa ? mezclar(p.color, PALETA.cal, 0.45) : p.color;
+        return (
+          <mesh key={p.id} name={`parcela-${p.id}`} position={[p.x, activa ? 0.05 : 0.01, p.z]}>
+            <boxGeometry args={[3.75, 0.18, 3.8]} />
+            <meshLambertMaterial color={color} flatShading />
+          </mesh>
+        );
+      })}
       <mesh position={[-2.1, 0.02, 2.6]}>
         <boxGeometry args={[3.75, 0.18, 3.8]} />
         <meshLambertMaterial color={mezclar(PALETA.tierra, PALETA.follaje, 0.18)} />
@@ -73,18 +91,36 @@ function Cerca() {
   );
 }
 
-function Gallina({ posicion, indice, reducedMotion }) {
+function Gallina({ objetivo, indice, reducedMotion }) {
   const grupo = useRef(null);
-  useFrame(({ clock }) => {
-    if (reducedMotion || !grupo.current) return;
+  /* `actual` guarda la posición viva de la gallina; `objetivo` es a donde
+     debe llegar según el paso elegido. Cada frame camina un poco hacia allá
+     en vez de teletransportarse — el prop declarativo de abajo ya la deja en
+     el punto correcto en cuanto cambia `paso` (para quien no anima frames),
+     y aquí se suaviza el tránsito cuando sí hay animación. */
+  const actual = useRef([objetivo[0], objetivo[1]]);
+  useFrame(({ clock }, delta) => {
+    if (!grupo.current) return;
     const t = clock.elapsedTime * 1.8 + indice;
-    grupo.current.rotation.y = posicion[2] + Math.sin(t * 0.35) * 0.45;
-    grupo.current.position.y = Math.max(0, Math.sin(t * 2.2)) * 0.025;
+    if (reducedMotion) {
+      actual.current[0] = objetivo[0];
+      actual.current[1] = objetivo[1];
+      grupo.current.rotation.y = objetivo[2];
+      grupo.current.position.y = 0.2;
+    } else {
+      const avance = Math.min(1, delta * 1.3);
+      actual.current[0] += (objetivo[0] - actual.current[0]) * avance;
+      actual.current[1] += (objetivo[1] - actual.current[1]) * avance;
+      grupo.current.rotation.y = objetivo[2] + Math.sin(t * 0.35) * 0.45;
+      grupo.current.position.y = 0.2 + Math.max(0, Math.sin(t * 2.2)) * 0.025;
+    }
+    grupo.current.position.x = actual.current[0];
+    grupo.current.position.z = actual.current[1];
   });
   const clara = indice % 3 === 0;
   const cuerpo = clara ? '#d9c5a1' : indice % 2 ? '#9a5431' : '#b86a38';
   return (
-    <group ref={grupo} position={[posicion[0], 0.2, posicion[1]]} rotation={[0, posicion[2], 0]}>
+    <group ref={grupo} name={`gallina-${indice}`} position={[objetivo[0], 0.2, objetivo[1]]} rotation={[0, objetivo[2], 0]}>
       <mesh scale={[0.38, 0.3, 0.52]}>
         <sphereGeometry args={[0.55, 7, 5]} />
         <meshLambertMaterial color={cuerpo} flatShading />
@@ -109,9 +145,24 @@ function Gallina({ posicion, indice, reducedMotion }) {
   );
 }
 
-function TractorGallinas() {
+function TractorGallinas({ objetivo, reducedMotion }) {
+  const grupo = useRef(null);
+  const actual = useRef([objetivo[0], objetivo[1]]);
+  useFrame((_state, delta) => {
+    if (!grupo.current) return;
+    if (reducedMotion) {
+      actual.current[0] = objetivo[0];
+      actual.current[1] = objetivo[1];
+    } else {
+      const avance = Math.min(1, delta * 0.9);
+      actual.current[0] += (objetivo[0] - actual.current[0]) * avance;
+      actual.current[1] += (objetivo[1] - actual.current[1]) * avance;
+    }
+    grupo.current.position.x = actual.current[0];
+    grupo.current.position.z = actual.current[1];
+  });
   return (
-    <group position={[-0.2, 0.25, -1.8]}>
+    <group ref={grupo} name="tractor-gallinas" position={[objetivo[0], 0.25, objetivo[1]]}>
       <mesh position={[0, 0.55, 0]}>
         <boxGeometry args={[2.5, 1.05, 1.8]} />
         <meshLambertMaterial color={PALETA.maderaClara} transparent opacity={0.35} />
@@ -223,8 +274,12 @@ function FlechasCiclo() {
   });
 }
 
-function Escena({ tier, reducedMotion }) {
+function Escena({ tier, reducedMotion, paso }) {
   const cantidad = tier === 'alto' ? 8 : tier === 'medio' ? 6 : 4;
+  /* La parcela activa según el paso elegido en el DOM: de aquí sale a dónde
+     caminan las gallinas y a dónde se traslada el tractor. Antes `paso`
+     nunca llegaba hasta acá. */
+  const activa = useMemo(() => PARCELAS.find((p) => p.id === paso) ?? PARCELAS[0], [paso]);
   return (
     <>
       <color attach="background" args={[CIELO.fondo]} />
@@ -233,13 +288,15 @@ function Escena({ tier, reducedMotion }) {
       <ambientLight color={DORADA.luz} intensity={0.28} />
       <directionalLight color={ATMOSFERA.luz} intensity={1.15} position={/** @type {[number, number, number]} */ (DORADA.solPos)} />
       <directionalLight color={ATMOSFERA.relleno} intensity={0.22} position={[-6, 5, -3]} />
-      <Terreno />
+      <Terreno pasoActivo={activa.id} />
       <Cerca />
-      <TractorGallinas />
+      <TractorGallinas objetivo={[activa.x, activa.z]} reducedMotion={reducedMotion} />
       <Ponedero />
       <Huerto />
       <FlechasCiclo />
-      {GALLINAS.slice(0, cantidad).map((p, i) => <Gallina key={i} posicion={p} indice={i} reducedMotion={reducedMotion} />)}
+      {GALLINAS.slice(0, cantidad).map((g, i) => (
+        <Gallina key={i} indice={i} reducedMotion={reducedMotion} objetivo={[activa.x + g.dx, activa.z + g.dz, g.rot]} />
+      ))}
       <ParticulasAmbientales tipo="polen" tier={tier} reducedMotion={reducedMotion} area={[12, 2.5, 8]} semilla={712} />
       <OrbitControls makeDefault enablePan={false} minDistance={7} maxDistance={19} minPolarAngle={0.48} maxPolarAngle={1.3} target={[0, 0.5, 0]} autoRotate={!reducedMotion} autoRotateSpeed={0.18} />
       <AdaptiveDpr pixelated />
@@ -269,7 +326,7 @@ export default function MundoGallinero3D({ onBack }) {
     <section className="mgall-root" data-tier={tier} aria-label="Mundo del gallinero con pastoreo rotativo">
       <style>{CSS}</style>
       <Canvas className="mgall-canvas" data-lista={listo} dpr={perfil.dpr} frameloop={reducedMotion ? 'demand' : 'always'} gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }} camera={{ position: [11, 8.5, 12], fov: 43 }} onCreated={() => setListo(true)}>
-        <Escena tier={tier} reducedMotion={reducedMotion} />
+        <Escena tier={tier} reducedMotion={reducedMotion} paso={paso} />
       </Canvas>
       <div className="mgall-ui">
         <header className="mgall-cabecera">
