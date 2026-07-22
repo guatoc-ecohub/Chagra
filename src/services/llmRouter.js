@@ -90,7 +90,12 @@ export const ROUTES = {
     // Override via env VITE_LLM_CHAT_MODEL para experimentos.
     model:
       (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_CHAT_MODEL) ||
-      'granite3.3:8b',
+      // 2026-07-22: granite3.3:8b -> gemma4:e2b. La nota de arriba decía que
+      // granite3.3 se eligió para "mitigar errores geográficos + piso térmico
+      // observados en producción". La medición dice que NO los mitigó: con juez
+      // semántico sobre 70 sondas, granite3.3 falla el piso térmico el 41,7% de
+      // las veces y contamina el 47,7% global. gemma4:e2b: 6,7% y 10%.
+      'gemma4:e2b',
     keep_alive_min: 30,
     temperature: 0.3,
     // 2026-06-06: 512→768. Fuga real (interacción operador): respuesta de
@@ -106,7 +111,7 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'granite3.3:8b (chat+complex unificado, evita cold-start). ' +
+      'gemma4:e2b (chat+complex unificado, evita cold-start). ' +
       'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   chat_complex: {
@@ -116,7 +121,10 @@ export const ROUTES = {
     // evita confusiones taxonómicas con cupo de GPU razonable).
     model:
       (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_COMPLEX_MODEL) ||
-      'granite3.3:8b',
+      // 2026-07-22: la nota de arriba decía que granite3.3 "evita confusiones
+      // taxonómicas". El bench con juez semántico lo desmiente: confusión de
+      // especie y cruce de cultivos al 91,7%. gemma4:e2b baja el cruce a 33,3%.
+      'gemma4:e2b',
     keep_alive_min: 5,
     temperature: 0.3,
     // 2026-06-06: 768→1024. Las queries complejas (planes multi-cultivo,
@@ -127,21 +135,21 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'granite3.3:8b (chat+complex unificado, evita cold-start). ' +
+      'gemma4:e2b (chat+complex unificado, evita cold-start). ' +
       'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   nlu: {
     // NLU REAL = sidecar agro-mcp nlu.ts (granite3.3:8b). Este campo es
     // vestigial: la PWA delega NLU al sidecar /nlu. Ver
     // Chagra-strategy/ops/MODELS.md (fuente única de verdad de modelos).
-    model: 'granite3.3:8b',
+    model: 'gemma4:e2b',
     keep_alive_min: 0,
     temperature: 0,
     max_tokens: 150,
     url: '/api/ollama/v1/chat/completions',
     rationale:
       'Vestigial — NLU real ejecuta en sidecar agro-mcp nlu.ts con ' +
-      'granite3.3:8b (unificado con chat para no tener 2 modelos en 12 GB). ' +
+      'gemma4:e2b (unificado con chat para no tener 2 modelos en 12 GB). ' +
       'Detalle en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   reasoning: {
@@ -164,10 +172,17 @@ export const ROUTES = {
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Bench visión M6000 2026-06-23: qwen2.5vl:7b es el PEOR (alucina + ' +
-      'offload 14 GB → thrash). gemma3:4b co-reside con granite3.3:8b ' +
-      '(10.2/12 GB, sin offload) e identifica patógenos mejor. Validado ' +
-      'contra gate AGE validate_visual_match. Detalle en ' +
+      'Bench visión M6000 2026-06-23: qwen2.5vl:7b salió el PEOR (alucina + ' +
+      'offload 14 GB → thrash) y gemma3:4b identificaba patógenos mejor. ' +
+      'PERO 2026-07-22, arena visual con la GPU limpia y casos de presencia ' +
+      'emparejados con su ausencia: qwen2.5vl:7b saca 92% (5/5 presencia, ' +
+      '6/7 ausencia) contra 75% de gemma4:e4b y 58% de gemma4:e2b (este ' +
+      'último dice "no" a todo sin mirar). La sospecha es que el bench de ' +
+      'junio lo midió EN THRASHING (el propio texto dice offload 14 GB), y ' +
+      'un modelo partido a CPU alucina. Son tareas distintas —identificar ' +
+      'patógeno en foto vs. verificar elementos en escena 3D— así que ' +
+      'ninguno invalida al otro, pero hay que re-medir patógenos con la GPU ' +
+      'libre antes de dar por bueno el descarte. Detalle en ' +
       'Chagra-strategy/ops/MODELS.md (fuente única).',
   },
 };
