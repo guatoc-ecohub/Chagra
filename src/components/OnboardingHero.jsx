@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Camera, Mic, Pencil, MapPin, Check } from 'lucide-react';
 import useAssetStore from '../store/useAssetStore';
-import { FARM_CONFIG } from '../config/defaults';
+import { getContextoGeoFinca } from '../services/perfilFincaService';
 import { getProfile, saveProfile } from '../services/userProfileService';
 import { getPisoTermicoInfo } from '../services/locationService';
 import { useAutosave } from '../hooks/useAutosave';
@@ -21,9 +21,9 @@ import { MSG } from '../config/messages.js';
  *
  * Adaptive (Autopilot 2026-05-06): el copy del header se ajusta al contexto
  * detectado del operador para reducir ambigüedad cold-start:
- *   - Sin zonas creadas Y sin FARM_CONFIG → "primera vez en Chagra"
+ *   - Sin zonas creadas Y sin contexto de finca → "primera vez en Chagra"
  *   - Con zonas pero sin plantas → "ya tienes zonas listas, falta la primera planta"
- *   - Sin zonas pero con FARM_CONFIG → "tu finca está configurada"
+ *   - Sin zonas pero con contexto de finca → "tu finca está configurada"
  *
  * Piso térmico primero (feat/onboarding-ayuda): la altitud es el FILTRO
  * MAESTRO de todos los módulos (suelo/agua/animal/restauración/clima).
@@ -47,7 +47,8 @@ import { MSG } from '../config/messages.js';
 export default function OnboardingHero({ onNavigate, compact = false }) {
   const lands = useAssetStore((s) => s.lands);
   const hasZones = lands.length > 0;
-  const hasFarmContext = !!(FARM_CONFIG.ALTITUD_MSNM || (FARM_CONFIG.THERMAL_ZONES || []).length > 0);
+  const geoFinca = getContextoGeoFinca();
+  const hasFarmContext = !!(geoFinca.altitudMsnm || geoFinca.thermalZones.length > 0);
 
   const { savedState: obState, save: obSave } = useAutosave('onboarding-hero', { lastCta: null, pisoConfirmed: false });
   const [profile] = useState(() => getProfile());

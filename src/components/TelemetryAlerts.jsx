@@ -3,6 +3,7 @@ import { MSG } from '../config/messages.js';
 import { Info } from 'lucide-react';
 import { assetCache } from '../db/assetCache';
 import { FARM_CONFIG } from '../config/defaults';
+import { getContextoGeoParaIA } from '../services/perfilFincaService';
 import AIStreamPanel from './common/AIStreamPanel';
 import IoTSensorCard from './IoTSensorCard';
 import ChagraGrowLoader from './ChagraGrowLoader';
@@ -823,9 +824,7 @@ export default function TelemetryAlerts() {
                 label="Copiar prompt para IA externa"
                 context={{
                   speciesName: 'cultivo en monitoreo',
-                  altitudMsnm: FARM_CONFIG.ALTITUD_MSNM,
-                  municipio: FARM_CONFIG.MUNICIPIO,
-                  thermalZones: FARM_CONFIG.THERMAL_ZONES || [],
+                  ...getContextoGeoParaIA(),
                   speciesThermalZones: [],
                   sintomas: aiAlert || '',
                 }}

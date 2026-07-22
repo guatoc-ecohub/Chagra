@@ -28,12 +28,14 @@ import {
 import { getDepartamentos, getMunicipios } from '../utils/colombiaLocations';
 import {
   PROFILE_QUESTIONS,
+  INVERNADERO_FORMAS,
   getProfile,
   saveProfile,
   markProfileDone,
   markProfileSkipped,
   resolveAltitudToSave,
 } from '../services/userProfileService';
+import usePerfilFincaStore from '../store/usePerfilFincaStore';
 
 /**
  * OnboardingCondensado — la reescritura del onboarding (spec 2026-07-08).
@@ -73,7 +75,41 @@ import {
  *   - onExplorarEjemplo(): SKIP rico → finca de ejemplo (opcional).
  */
 
-const PASOS = ['identidad', 'ubicacion', 'finca', 'listo'];
+const PASOS = ['identidad', 'ubicacion', 'finca', 'escala', 'invernadero', 'agua', 'listo'];
+
+const ESCALAS_TARJETAS = [
+  {
+    id: 'balcon',
+    emoji: '🪴',
+    titulo: 'Un rincón con matas',
+    copy: 'Una mata o varias materas en balcón, terraza o patio',
+  },
+  {
+    id: 'invernadero',
+    emoji: '🏠',
+    titulo: 'Un invernadero',
+    copy: 'El cultivo protegido es el centro de su finca',
+  },
+  {
+    id: 'finca',
+    emoji: '🌄',
+    titulo: 'Una finca o cultivo abierto',
+    copy: 'Desde un lote pequeño hasta 10.000 matas o más',
+  },
+];
+
+const INVERNADEROS_TARJETAS = [
+  { id: 'cuadrado', emoji: '⬜', titulo: 'Cuadrado', copy: 'Techo a dos aguas' },
+  { id: 'tunel', emoji: '🌙', titulo: 'Túnel', copy: 'Plástico curvo en media luna' },
+  { id: 'casa_sombra', emoji: '🪟', titulo: 'Casa malla', copy: 'Paredes y techo de malla' },
+].filter((opcion) => INVERNADERO_FORMAS.includes(opcion.id));
+
+const AGUAS_TARJETAS = [
+  { id: 'quebrada', emoji: '🏞️', titulo: 'Quebrada', copy: 'El agua llega de una corriente' },
+  { id: 'tanque', emoji: '🛢️', titulo: 'Tanque', copy: 'La guarda en tanque o reservorio' },
+  { id: 'lluvia', emoji: '🌧️', titulo: 'Lluvia', copy: 'Cultiva con lluvia o agua recogida' },
+  { id: 'acueducto', emoji: '🚰', titulo: 'Acueducto', copy: 'El agua llega por tubería' },
+];
 
 /**
  * Tarjetas de identidad: UNA elección que fusiona vocacion + rol + finca_tipo
@@ -274,6 +310,41 @@ function FilaDato({ emoji, label, children }) {
   );
 }
 
+/** Opciones grandes y concretas para sembrar una respuesta en el valle. */
+function TarjetasPregunta({ opciones, seleccion, onSelect, testId }) {
+  return (
+    <div className="grid grid-cols-1 gap-2.5">
+      {opciones.map((opcion, i) => {
+        const seleccionada = seleccion === opcion.id;
+        return (
+          <button
+            key={opcion.id}
+            type="button"
+            aria-pressed={seleccionada}
+            onClick={() => onSelect(opcion.id)}
+            className={`anim-brota w-full flex items-center gap-3.5 text-left px-4 py-3.5 min-h-[72px] rounded-2xl border transition-all active:scale-[0.99] ${
+              seleccionada
+                ? 'bg-emerald-900/40 border-emerald-500 ring-1 ring-emerald-500/40 text-white'
+                : 'bg-slate-900 border-slate-700 text-slate-200 hover:border-slate-500'
+            }`}
+            style={{ '--i': i + 1 }}
+            data-testid={`${testId}-${opcion.id}`}
+          >
+            <span className="text-3xl leading-none shrink-0" aria-hidden="true">
+              {opcion.emoji}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-base font-black leading-tight">{opcion.titulo}</span>
+              <span className="block text-sm text-slate-400">{opcion.copy}</span>
+            </span>
+            {seleccionada ? <Check size={18} className="ml-auto text-emerald-400 shrink-0" /> : null}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function OnboardingCondensado({
   onComplete,
   onClose = undefined,
@@ -309,6 +380,29 @@ export default function OnboardingCondensado({
     Array.isArray(perfilInicial.animales) ? perfilInicial.animales : [],
   );
   const [cultivos, setCultivos] = useState(perfilInicial.cultivos_actuales || '');
+
+  // ── Pasos 4 a 6: lo que siembra la forma del valle ────────────────────
+  const setEscalaPerfil = usePerfilFincaStore((s) => s.setEscala);
+  const setInvernaderoPerfil = usePerfilFincaStore((s) => s.setInvernadero);
+  const setAguaPerfil = usePerfilFincaStore((s) => s.setAgua);
+  const [escala, setEscala] = useState(
+    ['balcon', 'invernadero', 'finca'].includes(perfilInicial.escala)
+      ? perfilInicial.escala
+      : null,
+  );
+  const invernaderoInicial = perfilInicial.invernadero_tiene === 'si'
+    || perfilInicial.finca_tipo === 'invernadero';
+  const [tieneInvernadero, setTieneInvernadero] = useState(
+    perfilInicial.invernadero_tiene === 'no' ? false : (invernaderoInicial ? true : null),
+  );
+  const [tipoInvernadero, setTipoInvernadero] = useState(
+    INVERNADERO_FORMAS.includes(perfilInicial.invernadero_forma)
+      ? perfilInicial.invernadero_forma
+      : null,
+  );
+  const [agua, setAgua] = useState(
+    AGUAS_TARJETAS.some((opcion) => opcion.id === perfilInicial.agua) ? perfilInicial.agua : null,
+  );
 
   const manualAltitudNum = useMemo(() => {
     const t = manualAltitud.trim();
@@ -498,6 +592,26 @@ export default function OnboardingCondensado({
     setPaso(3);
   };
 
+  const avanzarDesdeEscala = () => {
+    if (!escala) return;
+    setEscalaPerfil(escala);
+    if (escala === 'invernadero') setTieneInvernadero(true);
+    setPaso(4);
+  };
+
+  const avanzarDesdeInvernadero = () => {
+    if (tieneInvernadero == null) return;
+    if (tieneInvernadero && !tipoInvernadero) return;
+    setInvernaderoPerfil(tieneInvernadero ? { tipo: tipoInvernadero } : null);
+    setPaso(5);
+  };
+
+  const avanzarDesdeAgua = () => {
+    if (!agua) return;
+    setAguaPerfil(agua);
+    setPaso(6);
+  };
+
   const atras = () => {
     if (paso === 0) onClose?.();
     else setPaso((p) => p - 1);
@@ -511,6 +625,9 @@ export default function OnboardingCondensado({
     'Cuéntenos de usted. Su nombre, y qué hace en el campo.',
     'Ubiquemos su finca. Con un toque sabemos su vereda, su altura y su clima. Si algo sale mal, lo corrige ahí mismo.',
     '¿Qué tiene en su finca? Marque lo que tenga. El detalle lo vamos llenando con la voz.',
+    '¿Qué tan grande es su cultivo? Escoja el espacio que más se parece al suyo.',
+    '¿Tiene invernadero? Si tiene, escoja la forma que más se parece al suyo.',
+    '¿De dónde llega el agua que usa en su cultivo?',
     'Su finca está lista. El consejo le va a llegar acertado para su clima.',
   ];
 
@@ -520,7 +637,7 @@ export default function OnboardingCondensado({
       <div className="w-full max-w-md mx-auto flex items-center justify-between gap-3">
         <div className="flex-1 min-w-0">
           <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
-            {paso < 3 ? `Paso ${paso + 1} de 3` : '¡Listo!'}
+            {paso < 6 ? `Paso ${paso + 1} de 6` : '¡Listo!'}
           </p>
           {/* La costura: la firma "cada dato va cosido a su fuente". */}
           <div className="bienvenida-costura" aria-hidden="true">
@@ -531,7 +648,7 @@ export default function OnboardingCondensado({
             />
           </div>
         </div>
-        {paso < 3 && (
+        {paso < 6 && (
           <button
             type="button"
             onClick={saltarTodo}
@@ -931,8 +1048,116 @@ export default function OnboardingCondensado({
           </>
         )}
 
-        {/* ═══ LISTO ═══ */}
+        {/* ═══ PASO 4: ESCALA DEL MUNDO ═══ */}
         {paso === 3 && (
+          <>
+            <div className="flex flex-col gap-1.5">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-400/90">
+                El tamaño de su valle
+              </p>
+              <h1 className="text-2xl font-black leading-tight text-slate-100">
+                ¿Qué tan grande es su cultivo?
+              </h1>
+              <p className="text-sm text-slate-400">
+                Escoja el espacio que más se parece al suyo. Así verá un valle de su tamaño.
+              </p>
+            </div>
+            <TarjetasPregunta
+              opciones={ESCALAS_TARJETAS}
+              seleccion={escala}
+              onSelect={setEscala}
+              testId="onb2-escala"
+            />
+          </>
+        )}
+
+        {/* ═══ PASO 5: INVERNADERO Y FORMA ═══ */}
+        {paso === 4 && (
+          <>
+            <div className="flex flex-col gap-1.5">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-400/90">
+                Una pieza de su finca
+              </p>
+              <h1 className="text-2xl font-black leading-tight text-slate-100">
+                {escala === 'invernadero' ? '¿Cómo es su invernadero?' : '¿Tiene invernadero?'}
+              </h1>
+              <p className="text-sm text-slate-400">
+                {escala === 'invernadero'
+                  ? 'Escoja la forma que más se parece al suyo.'
+                  : 'Si tiene uno, lo sembraremos con su forma en el valle.'}
+              </p>
+            </div>
+
+            {escala !== 'invernadero' ? (
+              <div className="grid grid-cols-2 gap-2.5" role="group" aria-label="¿Tiene invernadero?">
+                <button
+                  type="button"
+                  aria-pressed={tieneInvernadero === true}
+                  onClick={() => setTieneInvernadero(true)}
+                  className={`min-h-[64px] rounded-2xl border px-3 font-bold transition-colors ${
+                    tieneInvernadero === true
+                      ? 'bg-emerald-900/40 border-emerald-500 text-white'
+                      : 'bg-slate-900 border-slate-700 text-slate-300'
+                  }`}
+                  data-testid="onb2-invernadero-si"
+                >
+                  Sí, tengo uno
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={tieneInvernadero === false}
+                  onClick={() => {
+                    setTieneInvernadero(false);
+                    setTipoInvernadero(null);
+                  }}
+                  className={`min-h-[64px] rounded-2xl border px-3 font-bold transition-colors ${
+                    tieneInvernadero === false
+                      ? 'bg-emerald-900/40 border-emerald-500 text-white'
+                      : 'bg-slate-900 border-slate-700 text-slate-300'
+                  }`}
+                  data-testid="onb2-invernadero-no"
+                >
+                  No tengo
+                </button>
+              </div>
+            ) : null}
+
+            {tieneInvernadero === true ? (
+              <TarjetasPregunta
+                opciones={INVERNADEROS_TARJETAS}
+                seleccion={tipoInvernadero}
+                onSelect={setTipoInvernadero}
+                testId="onb2-invernadero-tipo"
+              />
+            ) : null}
+          </>
+        )}
+
+        {/* ═══ PASO 6: FUENTE DE AGUA ═══ */}
+        {paso === 5 && (
+          <>
+            <div className="flex flex-col gap-1.5">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-400/90">
+                El agua de su finca
+              </p>
+              <h1 className="text-2xl font-black leading-tight text-slate-100">
+                ¿De dónde llega el agua?
+              </h1>
+              <p className="text-sm text-slate-400">
+                Escoja la fuente que más usa. El agua de su valle saldrá de ahí.
+              </p>
+            </div>
+            <TarjetasPregunta
+              opciones={AGUAS_TARJETAS}
+              seleccion={agua}
+              onSelect={setAgua}
+              testId="onb2-agua"
+            />
+          </>
+        )}
+
+        {/* ═══ LISTO ═══ */}
+        {paso === 6 && (
           <div className="flex-1 flex flex-col items-center justify-center text-center gap-5">
             <ChagraAgentAvatarAngelita size={168} state="speaking" ariaLabel="Angelita, la abeja de Chagra" />
             <div className="flex flex-col gap-2">
@@ -971,7 +1196,7 @@ export default function OnboardingCondensado({
         )}
 
         <div className="flex items-center gap-3">
-          {paso > 0 && paso < 3 && (
+          {paso > 0 && paso < 6 && (
             <button
               type="button"
               onClick={atras}
@@ -1023,6 +1248,39 @@ export default function OnboardingCondensado({
             </button>
           )}
           {paso === 3 && (
+            <button
+              type="button"
+              onClick={avanzarDesdeEscala}
+              disabled={!escala}
+              className="onboarding-piso-primary !w-auto px-6 disabled:opacity-50"
+              data-testid="onb2-guardar-escala"
+            >
+              Siguiente <ArrowRight size={20} aria-hidden="true" />
+            </button>
+          )}
+          {paso === 4 && (
+            <button
+              type="button"
+              onClick={avanzarDesdeInvernadero}
+              disabled={tieneInvernadero == null || (tieneInvernadero && !tipoInvernadero)}
+              className="onboarding-piso-primary !w-auto px-6 disabled:opacity-50"
+              data-testid="onb2-guardar-invernadero"
+            >
+              Siguiente <ArrowRight size={20} aria-hidden="true" />
+            </button>
+          )}
+          {paso === 5 && (
+            <button
+              type="button"
+              onClick={avanzarDesdeAgua}
+              disabled={!agua}
+              className="onboarding-piso-primary !w-auto px-6 disabled:opacity-50"
+              data-testid="onb2-guardar-agua"
+            >
+              Sembrar mi valle <ArrowRight size={20} aria-hidden="true" />
+            </button>
+          )}
+          {paso === 6 && (
             <button
               type="button"
               onClick={terminar}
