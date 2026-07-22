@@ -311,6 +311,15 @@ const MundoFrutales3DMockup = lazy(() => import('./mockups/MundoFrutales3D'));
 // maíz + fríjol + calabaza —, quinua en grupo con panojas de color, yucas
 // frondosas). Standalone tipo botica: no monta el sistema MUNDO ni EscenaBase3D.
 const MundoLeguminosas3DMockup = lazy(() => import('./mockups/MundoLeguminosas3D'));
+// La HOJA DE PERSONAJE DEL JAGUAR (Panthera onca): el retrato en grande donde
+// las rosetas se pueden juzgar, la lámina de la regla de oro (anillo roto +
+// puntos negros adentro) y el claro del monte en 3D donde el felino camina
+// pisando el terreno. Ruta #/mockups/jaguar-monte-3d, sin auth.
+const JaguarMonte3DMockup = lazy(() => import('./mockups/JaguarMonte3D'));
+// El VERGEL DE FRUTALES ANDINOS: mora, lulo, tomate de árbol, granadilla,
+// uchuva, gulupa y curuba — las siete del clima frío, cada una con su porte y
+// su tutorado. Ruta #/mockups/frutales-andinos-3d, sin auth.
+const FrutalesAndinos3DMockup = lazy(() => import('./mockups/FrutalesAndinos3D'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -760,6 +769,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
   'mockups/mundo-leguminosas-3d': 'mockup_mundo_leguminosas_3d',
   'mockups/hoja-prueba-valle': 'mockup_hoja_prueba_valle',
+  'mockups/jaguar-monte-3d': 'mockup_jaguar_monte_3d',
+  'mockups/frutales-andinos-3d': 'mockup_frutales_andinos_3d',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2552,6 +2563,31 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El lote de leguminosas y raíces">
               <MundoLeguminosas3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_jaguar_monte_3d':
+        // La hoja de personaje del jaguar (Panthera onca): el retrato en grande
+        // (las rosetas solo se juzgan grandes), la lámina de la regla de oro
+        // —anillo roto + puntos negros adentro, lo que lo separa del leopardo—,
+        // el elenco de poses y el claro del monte en 3D donde el felino camina
+        // pisando el terreno. Ruta #/mockups/jaguar-monte-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El jaguar del monte">
+              <JaguarMonte3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_frutales_andinos_3d':
+        // El vergel de frutales andinos de clima frío: la mora en espaldera, el
+        // lulo de hoja gigante, el tomate de árbol, la uchuva con su capacho y
+        // las tres pasifloras (granadilla, gulupa y curuba) en su ramada —
+        // cada una con su porte real. Ruta #/mockups/frutales-andinos-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El vergel de frutales andinos">
+              <FrutalesAndinos3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
