@@ -19,7 +19,18 @@ const browser = await chromium.launch({
   headless: false,
   executablePath: '/run/current-system/sw/bin/chromium',
   env: { ...process.env, DISPLAY: ':0', WAYLAND_DISPLAY: 'wayland-1' },
-  args: ['--no-sandbox', '--disable-setuid-sandbox', '--use-gl=egl', '--ignore-gpu-blocklist',
+  // 2026-07-22: SE QUITÓ --use-gl=egl. Medido en stg con chromium 148:
+  //   con --use-gl=egl   -> ANGLE (Vulkan 1.3.0 (SwiftShader Device (Subzero)))
+  //   sin --use-gl       -> ANGLE (AMD Radeon Vega 10 Graphics, radeonsi raven ACO)
+  //   con --use-gl=angle -> ANGLE (AMD Radeon Vega 10 Graphics)
+  // O sea: el flag que estaba puesto para "usar la GPU real" era justamente el que
+  // forzaba SwiftShader. El encabezado de este archivo decía "sin flags swiftshader"
+  // y llevaba forzándolo. Como SwiftShader NO re-renderiza geometría instanciada
+  // nueva (por eso existe este script), toda captura de escenas con InstancedMesh
+  // podía estar mostrando lo viejo y el gate aprobaba a ciegas.
+  // Sin el flag, chromium elige solo y agarra la Vega. La verificación de renderer
+  // de más abajo ahora sirve de verdad: si vuelve a decir SwiftShader, ALGO ESTÁ MAL.
+  args: ['--no-sandbox', '--disable-setuid-sandbox', '--ignore-gpu-blocklist',
     '--enable-features=Vulkan', '--window-size=420,900'],
 });
 const ctx = await browser.newContext({
@@ -27,6 +38,23 @@ const ctx = await browser.newContext({
   serviceWorkers: 'block',
 });
 const page = await ctx.newPage();
+
+// TROIKA / drei <Text>: en chromium 148 los blob-workers de troika mueren async y
+// dejan TODA la escena 3D suspendida — el canvas queda de un solo color y la captura
+// pasa por buena. Verificado también contra chagra-dev.guatoc.co, así que es del
+// navegador, no de la app.
+// Fix: hacer que `new Worker(blob:)` truene SÍNCRONO. Troika detecta el fallo y cae a
+// su ruta de main-thread, que sí dibuja. Solo afecta a la captura, nunca a producción.
+await page.addInitScript(() => {
+  const OriginalWorker = window.Worker;
+  window.Worker = function (url, opts) {
+    if (String(url).startsWith('blob:')) {
+      throw new Error('[gate] worker de blob deshabilitado: troika cae a main-thread');
+    }
+    return new OriginalWorker(url, opts);
+  };
+  window.Worker.prototype = OriginalWorker.prototype;
+});
 for (const [name, route] of SHOTS) {
   try {
     await page.goto(BASE + route, { waitUntil: 'load', timeout: 45000 });
@@ -38,6 +66,17 @@ for (const [name, route] of SHOTS) {
         const dbg = gl && gl.getExtension('WEBGL_debug_renderer_info');
         return dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : 'n/a'; } catch { return 'err'; }
     });
+    // GUARDA DURA: si el renderer es SwiftShader, la captura NO SIRVE y no se
+    // guarda. SwiftShader no re-renderiza geometría instanciada nueva, así que la
+    // imagen mostraría lo viejo y el gate aprobaría a ciegas — que es exactamente
+    // lo que estuvo pasando mientras el script forzaba --use-gl=egl.
+    // Antes esto solo se IMPRIMÍA, y nadie leía la línea. Ahora truena.
+    if (/swiftshader|llvmpipe|software/i.test(gpu)) {
+      console.error(`ABORTA ${name}: renderer="${gpu}" — es software, NO la GPU real.`);
+      console.error('  La captura mentiría: revise los flags de chromium antes de aprobar arte.');
+      process.exitCode = 1;
+      continue;
+    }
     const f = `/tmp/gr-${name}.png`;
     await page.screenshot({ path: f, timeout: 60000 });
     console.log(`OK ${name} renderer="${gpu}" -> ${f}`);
