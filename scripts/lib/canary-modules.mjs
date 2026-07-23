@@ -547,8 +547,10 @@ async function runCaptura(ctx) {
     return { status: posted > 0 ? 'pass' : 'fail', valor: `endpoint aceptó ${posted}/${withText.length}`, detalle: `POST /log-conversation aceptó ${posted}/${withText.length} turnos (${causa}).`, data: { posted, disk_verified: false, count_reason: reason } };
   }
   const delta = after.n - before.n;
-  const ok = delta >= posted && posted > 0;
-  const porque = ok ? 'incrementa correctamente.'
+  const ok = delta >= withText.length;
+  const porque = ok && posted < withText.length
+    ? `el endpoint /log-conversation respondió no-2xx para ${withText.length - posted} turnos pero el store SÍ capturó (Δ=${delta}): revisar el status code de /log-conversation, la captura en disco funciona.`
+    : ok ? 'incrementa correctamente.'
     : posted === 0 ? `el endpoint /log-conversation rechazó los ${withText.length} turnos → no se capturó nada.`
       : 'NO incrementó lo esperado → posible bug de captura.';
   return { status: ok ? 'pass' : 'fail', valor: `${before.n}→${after.n} (Δ=${delta})`, detalle: `store de conversaciones: ${before.n} → ${after.n} líneas (Δ=${delta}, posteados=${posted}). ${porque}`, data: { posted, before: before.n, after: after.n, delta, disk_verified: true } };
@@ -599,11 +601,12 @@ async function runAvicolaFrio(ctx) {
   // "(a) sin cantidad g/kg; (b) no ajusta por frío/altura; (d) cascarón" — tres
   // acusaciones al agente por un HTTP 404, y una línea envenenada en el JSONL del
   // golden que mañana se lee como regresión de calidad. Mismo criterio que B0c/A2.
-  if (!text && gen.error) {
+  if (!text) {
+    const causa = gen.error || 'el agente devolvió una respuesta vacía (HTTP 200 sin contenido)';
     return {
       status: 'skip',
-      valor: `no evaluable (${gen.error})`,
-      detalle: `El agente no respondió (${gen.error}): sin respuesta no se puede evaluar la ración. NO implica regresión del golden.`,
+      valor: `no evaluable (${causa})`,
+      detalle: `El agente no respondió (${causa}): sin respuesta no se puede evaluar la ración. NO implica regresión del golden.`,
       data: { evaluable: false, error: gen.error, modelo_ausente: isModelNotFound(gen.error) },
     };
   }
@@ -827,14 +830,12 @@ async function runGaps(ctx) {
   let anotados = 0;
 
   // (1) Heurística: el sujeto del tema no resolvió en el grafo.
-  // Solo es evaluable si el agente ALCANZÓ a responder. Con B0 caído (502/530) no
-  // hay entities_grounded, y "el grafo no tiene la especie" queda indistinguible de
-  // "nunca se llegó a preguntar": anotaríamos un gap FANTASMA que manda a la flota
-  // a hacer DR de algo que el grafo quizá ya tiene. El lazo auto-mejorante se
-  // envenena solo. Sin insumo no se concluye nada.
-  const withText = responses.filter((r) => r.agent_text);
-  const heuristicaEvaluable = withText.length > 0;
-  const resolvedAll = norm(withText.flatMap((r) => r.entities_grounded || []).join(' | '));
+  // La resolución de entidades es independiente del chat. Un turno con chat en
+  // 502 puede traer entities_grounded; filtrarlo por agent_text descartaba la
+  // evidencia de que el grafo sí tiene el sujeto y anotaba gaps fantasma.
+  const resueltas = responses.flatMap((r) => r.entities_grounded || []);
+  const heuristicaEvaluable = resueltas.length > 0;
+  const resolvedAll = norm(resueltas.join(' | '));
   const subjectResolved =
     resolvedAll.includes(norm(topic.patogeno).split(' ')[0]) ||
     resolvedAll.includes(norm(topic.cientifico).split(' ')[0]) ||
@@ -860,7 +861,7 @@ async function runGaps(ctx) {
   }
 
   if (anotados === 0 && !heuristicaEvaluable) {
-    return { status: 'skip', valor: 'no evaluable (sin respuestas)', detalle: `B0 no produjo respuestas (agente/backend caído): sin entities_grounded no se puede afirmar que al grafo le falte ${topic.patogeno}/${topic.cientifico}. No se anota gap para no envenenar la cola DR.`, data: { evaluable: false, anotados: 0 } };
+    return { status: 'skip', valor: 'no evaluable (sin entidades resueltas)', detalle: `resolve-entities no devolvió ninguna entidad en ningún turno: no se distingue si al grafo le falta ${topic.patogeno}/${topic.cientifico} o si el resolver está caído. No se anota gap para no envenenar la cola DR.`, data: { evaluable: false, anotados: 0 } };
   }
   if (anotados === 0) return { status: 'pass', valor: 'sin gaps', detalle: `El sujeto del tema (${topic.patogeno}/${topic.cientifico}) resolvió y el juez corrigió con el grafo; sin gap.` };
   return { status: 'pass', valor: `${anotados} gap(s) anotados`, detalle: `${anotados} gap(s) de grafo anotados en ${file} → alimentan cola DR.`, data: { file, anotados, judge_gaps: judgeGaps.length } };
