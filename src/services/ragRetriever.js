@@ -229,6 +229,17 @@ function buildContextualText(key, val) {
   return label ? `${label} ${value}` : value;
 }
 
+// Un passage vale la pena indexar si tiene contenido semántico, no si es largo.
+// El umbral viejo `length > 20` botaba términos cortos valiosos ("roya", "broca",
+// "papa criolla") mientras dejaba pasar ruido largo. Ahora: ≥3 chars Y con al
+// menos una palabra alfabética de ≥3 letras (bota "12", ids hex, "si"/"no").
+function esTextoIndexable(v) {
+  if (typeof v !== 'string') return false;
+  const t = v.trim();
+  if (t.length < 3) return false;
+  return /[a-záéíóúñ]{3,}/i.test(t);
+}
+
 export function flattenDoc(doc, prefix = '', speciesSlug = null) {
   const slug = resolveSpeciesSlug(doc, speciesSlug);
   const passages = [];
@@ -237,14 +248,14 @@ export function flattenDoc(doc, prefix = '', speciesSlug = null) {
     const path = `${prefix}${key}`;
     if (isContextualField(path, val) && (typeof val === 'string' || typeof val === 'number')) {
       passages.push({ key: path, text: buildContextualText(fieldLabel(key), val), species: slug });
-    } else if (typeof val === 'string' && val.length > 20) {
+    } else if (esTextoIndexable(val)) {
       passages.push({ key: path, text: val, species: slug });
     } else if (Array.isArray(val)) {
       val.forEach((item, i) => {
         const itemPath = `${path}[${i}]`;
         if (isContextualField(itemPath, item) && (typeof item === 'string' || typeof item === 'number')) {
           passages.push({ key: itemPath, text: buildContextualText(formatKeyLabel(itemPath), item), species: slug });
-        } else if (typeof item === 'string' && item.length > 20) {
+        } else if (esTextoIndexable(item)) {
           passages.push({ key: itemPath, text: item, species: slug });
         } else if (typeof item === 'object' && item !== null) {
           flattenDoc(item, `${path}[${i}].`, slug).forEach((p) => passages.push(p));
@@ -689,7 +700,7 @@ async function embedQuery(queryText) {
         prompt: queryText,
         // Descarga arctic tras el embed (anti-OOM por co-residencia con granite).
         keep_alive: '5m', // 2026-07-23: nomic (588MB) convive con gemma4:e2b (verificado 8.7/12GB); residente para velocidad. Revertir a '0s' si hay OOM.
-        options: { num_gpu: 0 },
+        // 2026-07-23: se quitó num_gpu:0 (heredado de arctic anti-OOM). nomic (565MB) cabe en GPU con gemma; en CPU era lento y la GPU quedaba ociosa.
       }),
       signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
     });
