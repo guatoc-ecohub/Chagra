@@ -75,13 +75,15 @@ describe('MundoBoticaCana3D', () => {
       expect(screen.getByRole('status')).toHaveTextContent(/Toque el botón/i);
     });
 
-    test('tocar "2. El molino" activa el recorrido, resalta esa etiqueta y acerca la cámara a su posición', () => {
+    test('tocar "2. El molino" activa el recorrido, resalta esa etiqueta y usa su propio ojo de cámara', () => {
       const { container } = render(<MundoBoticaCana3D />);
       fireEvent.click(screen.getByRole('button', { name: '2. El molino' }));
 
       // La cámara (el foco) se mueve al punto del paso 2, no al de reposo.
       const foco = container.querySelector('group[name="foco-paso"]');
-      expect(foco.getAttribute('position')).toBe('6.2,3.4,1.2');
+      expect(foco.getAttribute('position')).toBe('6.2,2.5,1.6');
+      const ojo = container.querySelector('group[name="ojo-paso"]');
+      expect(ojo.getAttribute('position')).toBe('8,4.8,8.1');
 
       // Solo la etiqueta del paso 2 lleva la clase de "activo".
       const etiqueta2 = container.querySelector('div[data-testid="html-billboard"] .bocana-chip--activo');
@@ -93,6 +95,16 @@ describe('MundoBoticaCana3D', () => {
       expect(screen.getByRole('status')).toHaveTextContent(/Siga los números/i);
     });
 
+    test('el paso de la caña acerca el ojo al cañal desde fuera de la enramada', () => {
+      const { container } = render(<MundoBoticaCana3D />);
+      fireEvent.click(screen.getByRole('button', { name: '1. La caña' }));
+
+      const foco = container.querySelector('group[name="foco-paso"]');
+      const ojo = container.querySelector('group[name="ojo-paso"]');
+      expect(foco.getAttribute('position')).toBe('9.5,3.6,-4.5');
+      expect(ojo.getAttribute('position')).toBe('10.4,5.2,3.3');
+    });
+
     test('tocar el mismo paso otra vez vuelve a la vista calma (apaga el recorrido)', () => {
       const { container } = render(<MundoBoticaCana3D />);
       const boton = screen.getByRole('button', { name: '4. La paila' });
@@ -101,6 +113,7 @@ describe('MundoBoticaCana3D', () => {
       fireEvent.click(boton);
       expect(boton).toHaveAttribute('aria-pressed', 'false');
       expect(container.querySelector('group[name="etiqueta-paso-4"]')).toBeNull();
+      expect(container.querySelector('group[name="ojo-paso"]')).toBeNull();
       const foco = container.querySelector('group[name="foco-paso"]');
       expect(foco.getAttribute('position')).toBe('0.5,1,1.5');
     });
