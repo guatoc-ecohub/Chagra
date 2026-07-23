@@ -1335,11 +1335,14 @@ function MesaGaveras({ reducedMotion }) {
    dónde se acerca la cámara — antes `etiquetas` era un booleano todo-o-nada
    y esto vivía repetido e inconexo. */
 const RECORRIDO_PANELA = [
-  { paso: 1, texto: 'La caña', pos: [9.5, 3.6, -4.5] },
-  { paso: 2, texto: 'El molino', pos: [6.2, 2.5, 1.6] },
-  { paso: 3, texto: 'El jugo', pos: [4.8, 1.9, 2.8] },
-  { paso: 4, texto: 'La paila', pos: [3.2, 2.5, 4.3] },
-  { paso: 5, texto: 'La panela', pos: [0.7, 2.0, 5.9] },
+  /* Cada paso conserva el objetivo y define un ojo propio. El primer ojo
+     entra por el lado sur del cañal, lejos de la enramada, para que se lean
+     los nudos del tallo en vez de mirar la mata desde el trapiche. */
+  { paso: 1, texto: 'La caña', pos: [9.5, 3.6, -4.5], ojo: [10.4, 5.2, 3.3] },
+  { paso: 2, texto: 'El molino', pos: [6.2, 2.5, 1.6], ojo: [8.0, 4.8, 8.1] },
+  { paso: 3, texto: 'El jugo', pos: [4.8, 1.9, 2.8], ojo: [7.3, 4.2, 9.1] },
+  { paso: 4, texto: 'La paila', pos: [3.2, 2.5, 4.3], ojo: [5.2, 4.8, 10.7] },
+  { paso: 5, texto: 'La panela', pos: [0.7, 2.0, 5.9], ojo: [2.4, 4.1, 12.5] },
 ];
 /* A dónde mira la cámara cuando no hay paso activo (vista calma original). */
 const OBJETIVO_CALMA = [0.5, 1.0, 1.5];
@@ -1356,36 +1359,40 @@ function PasosPanela({ pasoActivo }) {
   );
 }
 
-/* Lleva el `target` de OrbitControls hacia la posición del paso activo del
-   recorrido panelero — antes la cámara nunca se movía con `etiquetas`.
+/* Lleva el objetivo y el ojo de OrbitControls al encuadre del paso activo.
    Sin reducedMotion camina suave (lerp); con reducedMotion salta directo. */
-/* OJO (queda anotado, no arreglado aquí): este "recorrido" solo RE-APUNTA. El
-   objetivo viaja al paso activo, pero la CÁMARA se queda donde está —contra el
-   tope de `maxDistance`, a 22 unidades— así que el paso 1 muestra el cañal como
-   una mancha lejana y los NUDOS de la caña no se alcanzan a ver nunca desde la
-   app, por fiel que sea la malla. Acercarla no es cambiar una constante: los
-   topes de azimut obligan a mirar siempre desde el lado del trapiche, y a menos
-   de ~16 unidades la enramada se mete entre la cámara y el cañal. Necesita
-   coreografía POR PASO (una posición de ojo por encuadre, como los `OJOS` de
-   `cana/leccionCana.js`), que es tarea aparte de redibujar la caña. */
 function EnfocarPaso({ paso, reducedMotion, controlsRef }) {
-  const objetivo = useMemo(() => {
-    const destino = paso > 0 ? RECORRIDO_PANELA[paso - 1].pos : OBJETIVO_CALMA;
-    return new THREE.Vector3(...destino);
+  const encuadre = useMemo(() => {
+    const destino = paso > 0 ? RECORRIDO_PANELA[paso - 1] : null;
+    return {
+      objetivo: new THREE.Vector3(...(destino?.pos || OBJETIVO_CALMA)),
+      ojo: destino ? new THREE.Vector3(...destino.ojo) : null,
+    };
   }, [paso]);
   useFrame((_state, delta) => {
     const controles = controlsRef.current;
     if (!controles) return;
     if (reducedMotion) {
-      controles.target.copy(objetivo);
+      controles.target.copy(encuadre.objetivo);
+      if (encuadre.ojo) controles.object.position.copy(encuadre.ojo);
     } else {
-      controles.target.lerp(objetivo, Math.min(1, delta * 1.4));
+      const avance = Math.min(1, delta * 1.4);
+      controles.target.lerp(encuadre.objetivo, avance);
+      if (encuadre.ojo) controles.object.position.lerp(encuadre.ojo, avance);
     }
     controles.update();
   });
-  /* Ancla inerte (sin geometría ni material): expone declarativamente a
-     dónde apunta el foco activo, y sirve de gancho de prueba. */
-  return <group name="foco-paso" position={[objetivo.x, objetivo.y, objetivo.z]} />;
+  /* Anclas inertes (sin geometría ni material): exponen declarativamente el
+     objetivo y el ojo del encuadre activo, y sirven de gancho de prueba. */
+  return (
+    <>
+      <group
+        name="foco-paso"
+        position={[encuadre.objetivo.x, encuadre.objetivo.y, encuadre.objetivo.z]}
+      />
+      {encuadre.ojo && <group name="ojo-paso" position={encuadre.ojo.toArray()} />}
+    </>
+  );
 }
 
 /* ══════════════════════ LA GENTE DEL TRAPICHE ══════════════════════ */
