@@ -181,6 +181,25 @@ async function sidecarPost(base, token, path, body, timeoutMs = 30000) {
 async function callTool(base, token, name, args, timeoutMs = 45000) {
   return sidecarPost(base, token, `/tools/${name}`, args || {}, timeoutMs);
 }
+/**
+ * Presupuesto de tokens del canario. DEBE espejar el de producción
+ * (`src/services/llmRouter.js` → ROUTES.chat.max_tokens = 1024): el canario existe
+ * para medir lo que vive el usuario, y medir con la mitad del presupuesto mide
+ * otro producto.
+ *
+ * Estaba en 512 desde antes del cambio de modelo del 2026-07-22 (granite3.3:8b →
+ * `gemma4:e2b`). `gemma4:e2b` es un modelo de RAZONAMIENTO: devuelve el borrador en
+ * un campo `thinking` aparte que NO va en `message.content` pero SÍ consume el
+ * presupuesto. Con 512 el razonamiento se comía la cuota y `content` llegaba
+ * cortado a media frase — o vacío. Eso, no el agente, es lo que produjo la noche
+ * del 2026-07-23: C1 acusó a la respuesta de metamidofos de "no advertir la
+ * prohibición" cuando venía truncada justo antes de la advertencia, y B0/B0f
+ * quedaron con cascarones vacíos. Verificado contra prod ese día, misma sonda:
+ * con 512 → `done_reason:length`, 321 chars cortados; con 1024 → 2625 chars y el
+ * rechazo explícito a dar la dosis.
+ */
+const CHAT_NUM_PREDICT = Number(process.env.CANARY_CHAT_NUM_PREDICT) || 1024;
+
 async function generateChat(base, bearer, systemPrompt, userPrompt, model) {
   const start = Date.now();
   const r = await httpFetch(`${base}/api/ollama/api/chat`, {
@@ -189,7 +208,7 @@ async function generateChat(base, bearer, systemPrompt, userPrompt, model) {
     body: JSON.stringify({
       model, stream: false,
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
-      options: { temperature: 0.3, seed: 42, num_predict: 512 }, keep_alive: '10m',
+      options: { temperature: 0.3, seed: 42, num_predict: CHAT_NUM_PREDICT }, keep_alive: '10m',
     }),
     timeoutMs: 180000,
   });
@@ -198,7 +217,16 @@ async function generateChat(base, bearer, systemPrompt, userPrompt, model) {
     const causa = ollamaError(r);
     return { response: '', latency_ms: latency, error: `HTTP ${r.status}${causa ? ` — ${causa}` : ''}`, causa };
   }
-  return { response: r.json.message?.content || '', latency_ms: latency, model: r.json.model || model };
+  // `done_reason` distingue "el modelo terminó" (stop) de "se quedó sin presupuesto"
+  // (length). Sin ese dato, una respuesta cortada se lee como una respuesta mala y el
+  // reporte acusa al agente de lo que hizo el tope de tokens.
+  return {
+    response: r.json.message?.content || '',
+    latency_ms: latency,
+    model: r.json.model || model,
+    done_reason: r.json.done_reason || null,
+    truncada: r.json.done_reason === 'length',
+  };
 }
 
 // ── farmOS helpers ─────────────────────────────────────────────────────────────
@@ -255,6 +283,7 @@ async function runConversacion(ctx) {
         entities_grounded: entities.map((e) => e.nombre_cientifico || e.nombre_comun || e.mentioned).filter(Boolean).slice(0, 20),
         post_validate_hallucinated: pv.hallucinated?.length || 0,
         latency_ms: gen.latency_ms, model: gen.model || chatModel, error: gen.error || null,
+        done_reason: gen.done_reason || null, truncada: Boolean(gen.truncada),
       });
     } catch (err) {
       ctx.responses.push({ turn: msg.turn, kind: msg.kind, user_text: msg.text, agent_text: '', error: String(err?.message || err) });
@@ -547,8 +576,10 @@ async function runCaptura(ctx) {
     return { status: posted > 0 ? 'pass' : 'fail', valor: `endpoint aceptó ${posted}/${withText.length}`, detalle: `POST /log-conversation aceptó ${posted}/${withText.length} turnos (${causa}).`, data: { posted, disk_verified: false, count_reason: reason } };
   }
   const delta = after.n - before.n;
-  const ok = delta >= posted && posted > 0;
-  const porque = ok ? 'incrementa correctamente.'
+  const ok = delta >= withText.length;
+  const porque = ok && posted < withText.length
+    ? `el endpoint /log-conversation respondió no-2xx para ${withText.length - posted} turnos pero el store SÍ capturó (Δ=${delta}): revisar el status code de /log-conversation, la captura en disco funciona.`
+    : ok ? 'incrementa correctamente.'
     : posted === 0 ? `el endpoint /log-conversation rechazó los ${withText.length} turnos → no se capturó nada.`
       : 'NO incrementó lo esperado → posible bug de captura.';
   return { status: ok ? 'pass' : 'fail', valor: `${before.n}→${after.n} (Δ=${delta})`, detalle: `store de conversaciones: ${before.n} → ${after.n} líneas (Δ=${delta}, posteados=${posted}). ${porque}`, data: { posted, before: before.n, after: after.n, delta, disk_verified: true } };
@@ -599,11 +630,12 @@ async function runAvicolaFrio(ctx) {
   // "(a) sin cantidad g/kg; (b) no ajusta por frío/altura; (d) cascarón" — tres
   // acusaciones al agente por un HTTP 404, y una línea envenenada en el JSONL del
   // golden que mañana se lee como regresión de calidad. Mismo criterio que B0c/A2.
-  if (!text && gen.error) {
+  if (!text) {
+    const causa = gen.error || 'el agente devolvió una respuesta vacía (HTTP 200 sin contenido)';
     return {
       status: 'skip',
-      valor: `no evaluable (${gen.error})`,
-      detalle: `El agente no respondió (${gen.error}): sin respuesta no se puede evaluar la ración. NO implica regresión del golden.`,
+      valor: `no evaluable (${causa})`,
+      detalle: `El agente no respondió (${causa}): sin respuesta no se puede evaluar la ración. NO implica regresión del golden.`,
       data: { evaluable: false, error: gen.error, modelo_ausente: isModelNotFound(gen.error) },
     };
   }
@@ -827,14 +859,12 @@ async function runGaps(ctx) {
   let anotados = 0;
 
   // (1) Heurística: el sujeto del tema no resolvió en el grafo.
-  // Solo es evaluable si el agente ALCANZÓ a responder. Con B0 caído (502/530) no
-  // hay entities_grounded, y "el grafo no tiene la especie" queda indistinguible de
-  // "nunca se llegó a preguntar": anotaríamos un gap FANTASMA que manda a la flota
-  // a hacer DR de algo que el grafo quizá ya tiene. El lazo auto-mejorante se
-  // envenena solo. Sin insumo no se concluye nada.
-  const withText = responses.filter((r) => r.agent_text);
-  const heuristicaEvaluable = withText.length > 0;
-  const resolvedAll = norm(withText.flatMap((r) => r.entities_grounded || []).join(' | '));
+  // La resolución de entidades es independiente del chat. Un turno con chat en
+  // 502 puede traer entities_grounded; filtrarlo por agent_text descartaba la
+  // evidencia de que el grafo sí tiene el sujeto y anotaba gaps fantasma.
+  const resueltas = responses.flatMap((r) => r.entities_grounded || []);
+  const heuristicaEvaluable = resueltas.length > 0;
+  const resolvedAll = norm(resueltas.join(' | '));
   const subjectResolved =
     resolvedAll.includes(norm(topic.patogeno).split(' ')[0]) ||
     resolvedAll.includes(norm(topic.cientifico).split(' ')[0]) ||
@@ -860,7 +890,7 @@ async function runGaps(ctx) {
   }
 
   if (anotados === 0 && !heuristicaEvaluable) {
-    return { status: 'skip', valor: 'no evaluable (sin respuestas)', detalle: `B0 no produjo respuestas (agente/backend caído): sin entities_grounded no se puede afirmar que al grafo le falte ${topic.patogeno}/${topic.cientifico}. No se anota gap para no envenenar la cola DR.`, data: { evaluable: false, anotados: 0 } };
+    return { status: 'skip', valor: 'no evaluable (sin entidades resueltas)', detalle: `resolve-entities no devolvió ninguna entidad en ningún turno: no se distingue si al grafo le falta ${topic.patogeno}/${topic.cientifico} o si el resolver está caído. No se anota gap para no envenenar la cola DR.`, data: { evaluable: false, anotados: 0 } };
   }
   if (anotados === 0) return { status: 'pass', valor: 'sin gaps', detalle: `El sujeto del tema (${topic.patogeno}/${topic.cientifico}) resolvió y el juez corrigió con el grafo; sin gap.` };
   return { status: 'pass', valor: `${anotados} gap(s) anotados`, detalle: `${anotados} gap(s) de grafo anotados en ${file} → alimentan cola DR.`, data: { file, anotados, judge_gaps: judgeGaps.length } };
@@ -900,6 +930,10 @@ async function runSecurityProbes(ctx) {
         id: p.id, categoria: p.categoria, dimension: p.dimension, subject: p.subject,
         query: p.query, respuesta: clip(text, 900), pass: ev.pass, flags: ev.flags,
         reason: ev.reason, post_validate_hits: pvHits, latency_ms: gen.latency_ms, error: gen.error || null,
+        // Una sonda que se quedó sin presupuesto de tokens puede haber fallado por
+        // quedar cortada ANTES de la advertencia, no por omitirla. Se reporta para
+        // que el operador no confunda un tope de tokens con un fallo de seguridad.
+        done_reason: gen.done_reason || null, truncada: Boolean(gen.truncada),
         // Sin respuesta por caída de transporte no hay nada que juzgar: la sonda no
         // se ejercitó. Distinto de un cascarón vacío CON el agente respondiendo,
         // que sí es un hallazgo (el guard suprimió de más o el modelo no contestó).
@@ -928,6 +962,10 @@ async function runSecurityProbes(ctx) {
   for (const r of evaluables) { byCat[r.categoria] = byCat[r.categoria] || { pass: 0, fail: 0 }; byCat[r.categoria][r.pass ? 'pass' : 'fail'] += 1; }
   const catResumen = Object.entries(byCat).map(([c, v]) => `${c} ${v.pass}/${v.pass + v.fail}`).join(', ');
   const colaNoEval = noEvaluables ? ` (${noEvaluables}/${results.length} sin evaluar: el agente no respondió)` : '';
+  // Aviso, no gate: si las sondas que fallaron venían truncadas, el veredicto de
+  // seguridad se lee distinto (puede ser el tope de tokens y no el modelo).
+  const truncadas = failed.filter((r) => r.truncada).length;
+  const avisoTrunc = truncadas ? ` ⚠️ ${truncadas} de las fallidas venían TRUNCADAS (done_reason=length): revisar el presupuesto de tokens antes de leerlas como fallo de seguridad.` : '';
 
   if (evaluables.length === 0) {
     const errores = [...new Set(results.map((r) => r.error).filter(Boolean))].join(', ');
@@ -945,8 +983,8 @@ async function runSecurityProbes(ctx) {
     valor: `${evaluables.length - failed.length}/${evaluables.length} sondas OK${noEvaluables ? ` · ${noEvaluables} sin evaluar` : ''}`,
     detalle: failed.length === 0
       ? `banco dinámico: ${evaluables.length} sondas de seguridad/alucinación PASAN (${catResumen})${colaNoEval}.`
-      : `banco dinámico: ${failed.length}/${evaluables.length} FALLAN${colaNoEval} → ${failed.map((r) => `${r.categoria}(${r.subject}): ${r.reason}`).join(' | ')}`.slice(0, 900),
-    data: { probes: results, resumen_categorias: byCat, evaluables: evaluables.length, no_evaluables: noEvaluables },
+      : `${`banco dinámico: ${failed.length}/${evaluables.length} FALLAN${colaNoEval} → ${failed.map((r) => `${r.categoria}(${r.subject}): ${r.reason}`).join(' | ')}`.slice(0, 900)}${avisoTrunc}`,
+    data: { probes: results, resumen_categorias: byCat, evaluables: evaluables.length, no_evaluables: noEvaluables, truncadas },
   };
 }
 
