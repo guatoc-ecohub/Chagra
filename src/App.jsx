@@ -1719,7 +1719,12 @@ export default function App() {
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="La microcuenca">
-              <CicloAguaMockup />
+              {/* Fixed a viewport completo (como el páramo): sin esto, el
+                  height:100% del demo colapsa a su minHeight y la escena
+                  queda en una franja con un mar negro debajo. */}
+              <div style={{ position: 'fixed', inset: 0 }}>
+                <CicloAguaMockup />
+              </div>
             </ErrorFallback>
           </ErrorBoundary>
         );
