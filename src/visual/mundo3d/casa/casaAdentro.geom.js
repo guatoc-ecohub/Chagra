@@ -317,6 +317,41 @@ export function construirCasaAdentro(rico = true) {
   poner(L, cil(0.09, 0.1, 0.22, 8), PAL.barro, -2.75, 1.64, -hz + 0.26);
   poner(L, cil(0.07, 0.08, 0.18, 8), PAL.barro, -2.45, 1.62, -hz + 0.24);
   poner(L, caja(0.14, 0.2, 0.14), NEUTROS.lamina, -2.1, 1.63, -hz + 0.27);
+  // el pocillo esmaltado en la punta de la repisa (la loza de diario)
+  poner(L, cil(0.05, 0.042, 0.09, 8), CASA.carpinteria, -1.68, 1.57, -hz + 0.28);
+
+  /* ── LA COCINA VIVA (lo que toda cocina de humo cuelga y guarda) ───────── */
+  // LA CUELGA del tirante del poniente: los manojos de hierbas boca abajo y
+  // la ristra de ají — la despensa aérea, curándose al calor del fogón.
+  // (ancho arriba y punta abajo: manojo amarrado, no pantalla de lámpara)
+  for (const [cz, colHierba] of [[0.85, VERDES.aliso], [-0.12, VERDES.calido]]) {
+    poner(L, cil(0.014, 0.014, 0.14, 5), PAL.vigaOscura, -1.6, 2.29, cz);
+    poner(L, cil(0.095, 0.03, 0.26, 7), colHierba, -1.6, 2.09, cz);
+    poner(L, cil(0.05, 0.014, 0.12, 6), mezclar(colHierba, NEUTROS.tinta, 0.25), -1.6, 1.92, cz);
+  }
+  poner(L, cil(0.012, 0.012, 0.5, 5), PAL.vigaOscura, -1.6, 2.11, 0.38);
+  for (let i = 0; i < 5; i++) {
+    poner(
+      L,
+      cil(0.042, 0.016, 0.1, 6),
+      i % 2 ? ACENTOS.cochinilla : ACENTOS.cafeCereza,
+      -1.615 + (i % 2) * 0.03,
+      2.26 - i * 0.095,
+      0.38 + (i % 2 ? -0.015 : 0.015),
+    );
+  }
+  // LA PAILA y el CUCHARÓN de palo en el muro del fogón (a mano de la candela)
+  poner(L, cil(0.17, 0.17, 0.035, 12), NEUTROS.lamina, -3.48, 1.72, 0.9, 0, 0, Math.PI / 2);
+  poner(L, cil(0.016, 0.016, 0.34, 5), CASA.madera, -3.5, 1.6, 1.25);
+  poner(L, esfera(0.045, 7, 5), CASA.madera, -3.5, 1.41, 1.25);
+  // LAS PAPAS asomadas en el canasto de cosecha (que el canasto no esté vacío)
+  for (const [px, pz] of [[-2.2, -1.85], [-2.08, -1.95], [-2.18, -1.98]]) {
+    poner(L, esfera(0.07, 7, 5), TIERRAS.camino, px, 0.41, pz);
+  }
+  // EL PLATO DE AREPAS en la mesa (lo que la finca dio, servido)
+  poner(L, cil(0.13, 0.13, 0.02, 10), NEUTROS.cal, 0.4, 0.825, 0.42);
+  poner(L, cil(0.085, 0.085, 0.03, 9), mezclar(TIERRAS.vega, ACENTOS.maizGrano, 0.4), 0.37, 0.85, 0.44);
+  poner(L, cil(0.08, 0.08, 0.03, 9), mezclar(TIERRAS.vega, ACENTOS.maizGrano, 0.55), 0.45, 0.875, 0.4);
 
   /* ── LA CASA HABITADA (pasada Nolan: historia, no catálogo) ────────────── */
 
