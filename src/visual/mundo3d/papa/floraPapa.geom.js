@@ -81,7 +81,12 @@ export function curvaSurco(wx, fila) {
 
 /* El lote sembrado (dónde hay caballones) y los claros que el lote respeta. */
 export const SITIO_CASA = /** @type {[number, number]} */ ([-11.5, -13.2]);
-export const SITIO_COSECHA = /** @type {[number, number]} */ ([6.8, 4.6]);
+/* El claro de la COSECHA va EN EL ENCUADRE de la llegada: antes vivía en
+   [6.8, 4.6], ~24° a la derecha del eje de la cámara de reposo — la copy
+   prometía "la cosecha destapada" y la foto no la mostraba NUNCA. Aquí queda
+   centro-derecha abajo, con las filas delanteras despejadas por la propia
+   máscara del claro (dentroLote), y las papas criollas se leen de entrada. */
+export const SITIO_COSECHA = /** @type {[number, number]} */ ([3.2, 1.2]);
 
 /** Máscara 0…1 del lote sembrado (dentro hay caballones; fuera, pajonal). */
 export function dentroLote(wx, wz) {
