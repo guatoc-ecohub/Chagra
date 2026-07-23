@@ -133,9 +133,9 @@ export function construirLadera(seg, plano) {
  * el conteo del InstancedMesh de frutos (repartidos entre las matas cargadas).
  */
 export const FLORA_CAFETAL = {
-  alto: { cafeto: 120, cereza: 460, flor: 90, guamo: 10, nogal: 4, platano: 9, hojarasca: 14, piedra: 6 },
-  medio: { cafeto: 70, cereza: 250, flor: 40, guamo: 6, nogal: 2, platano: 5, hojarasca: 8, piedra: 4 },
-  bajo: { cafeto: 30, cereza: 100, flor: 0, guamo: 3, nogal: 1, platano: 2, hojarasca: 4, piedra: 2 },
+  alto: { cafeto: 120, cereza: 680, flor: 90, guamo: 10, nogal: 4, platano: 9, hojarasca: 14, piedra: 6 },
+  medio: { cafeto: 70, cereza: 380, flor: 40, guamo: 6, nogal: 2, platano: 5, hojarasca: 8, piedra: 4 },
+  bajo: { cafeto: 30, cereza: 150, flor: 0, guamo: 3, nogal: 1, platano: 2, hojarasca: 4, piedra: 2 },
 };
 
 /** Conteos para un tier (desconocido → frugal, nunca el más caro). */
@@ -162,11 +162,13 @@ export const PAL = {
   cafetoBrote: '#8cb752', // cogollo tierno arriba
 
   // Los estados de la cereza (van POR INSTANCIA, no aquí; referencia — la gama
-  // real de la foto de cosecha: verde → pintón naranja → rojo cereza → VINO):
-  cerezaVerde: '#7aa244',
-  cerezaPinton: '#e0a33a',
-  cerezaRoja: '#cf2a1d',
-  cerezaVino: '#8e1a20',
+  // real de la foto de cosecha: verde → pintón naranja → rojo cereza → VINO).
+  // Subidos de valor a propósito: bajo el sombrío el fruto tiene que GRITAR
+  // (es lo que hace reconocible el cafetal y lo que enseña la lección).
+  cerezaVerde: '#88b44c',
+  cerezaPinton: '#f2a52f',
+  cerezaRoja: '#e62f1c',
+  cerezaVino: '#b0202a',
 
   // La flor axilar blanca del arábica (nace pegada a la rama, como la cereza)
   florCafe: '#f6f1e2',
@@ -531,7 +533,10 @@ export function geomCafeto({ q = 1, porte = 'tallo' } = {}, seed = 1) {
 /** La cereza del café: OVOIDE (como en la rama real), pintada blanca — el
     color verdadero (verde→pintón→rojo→vino) va POR INSTANCIA. */
 export function geomCereza() {
-  const g = new THREE.IcosahedronGeometry(0.068, 0);
+  /* Radio EXAGERADO adrede (rubber-hose): la cereza real mide 1.5 cm, pero a
+     los 12–14 m de la cámara eso son 3–4 px — invisible. La cuenta gorda es
+     la que deja LEER el racimo verde→rojo desde la entrada. */
+  const g = new THREE.IcosahedronGeometry(0.095, 0);
   g.scale(1, 1.28, 1);
   return pintar(g.index ? g.toNonIndexed() : g, '#ffffff');
 }
@@ -962,15 +967,17 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
       if (t > 0.82) break; // la punta de la rama es de las hojas
       // el estado del fruto: la madurez de la mata + su propio azar
       const m = clamp(s.maduro + (rCer() - 0.5) * 0.45, 0, 1);
+      /* El VINO solo asoma (0.55 de mezcla máxima): el granate en penumbra lee
+         NEGRO y borraba la cosecha — el maduro se queda rojo cereza. */
       if (m < 0.35) col.lerpColors(verde, pinton, m / 0.35);
       else if (m < 0.68) col.lerpColors(pinton, roja, (m - 0.35) / 0.33);
-      else col.lerpColors(roja, vino, (m - 0.68) / 0.32);
-      col.multiplyScalar(0.94 + rCer() * 0.12);
+      else col.lerpColors(roja, vino, ((m - 0.68) / 0.32) * 0.55);
+      col.multiplyScalar(0.98 + rCer() * 0.1);
       cereza.push({
         pos: enRama(s, e, i, j, t, -0.045, 0.035, rCer), // colgada APENAS bajo la rama
         rotY: rCer() * Math.PI,
         // en el héroe la cuenta es un pelín más gorda: legible desde la entrada
-        escala: (0.8 + rCer() * 0.45) * (s.hero ? 1.3 : 1),
+        escala: (1.0 + rCer() * 0.5) * (s.hero ? 1.4 : 1),
         tint: [col.r, col.g, col.b],
       });
     }
