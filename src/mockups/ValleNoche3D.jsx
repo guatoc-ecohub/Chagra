@@ -55,9 +55,9 @@ const P = {
   cal: mezclar(PALETA.cal, TINTE, 0.55),
   teja: mezclar('#9a5a36', TINTE, 0.5),
   madera: mezclar(PALETA.madera, TINTE, 0.45),
-  mata: mezclar(PALETA.follaje, TINTE, 0.55),
-  tierra: mezclar(PALETA.tierra, TINTE, 0.5),
-  camino: mezclar(PALETA.tierraClara, TINTE, 0.55),
+  mata: mezclar(PALETA.follaje, TINTE, 0.42),
+  tierra: mezclar(PALETA.tierra, TINTE, 0.38),
+  camino: mezclar(PALETA.tierraClara, TINTE, 0.42),
   ambar: '#ffd98f', // la ventana encendida: el único calor franco de la escena
 };
 
@@ -299,9 +299,9 @@ function HumoChimenea({ reducedMotion }) {
   return (
     <group ref={grupo}>
       {volutas.map((v, i) => (
-        <mesh key={v.fase} position={[v.x, 0.25 + i * 0.45, 0]} scale={0.14 + i * 0.05}>
+        <mesh key={v.fase} position={[v.x, 0.25 + i * 0.45, 0]} scale={0.12 + i * 0.04}>
           <sphereGeometry args={[1, 8, 6]} />
-          <meshBasicMaterial color="#9aa4c0" transparent opacity={0.22 - i * 0.05} depthWrite={false} />
+          <meshBasicMaterial color="#9aa4c0" transparent opacity={0.18 - i * 0.05} depthWrite={false} />
         </mesh>
       ))}
     </group>
@@ -526,7 +526,7 @@ function CultivosDormidos() {
       Las zetas suben en CSS; reduced-motion las apaga. ── */
 function AngelitaDormida({ tier, reducedMotion }) {
   return (
-    <group position={[2.3, 0, 2.75]}>
+    <group position={[1.95, 0, 3.0]}>
       <mesh position={[0, 0.22, 0]}>
         <cylinderGeometry args={[0.025, 0.035, 0.44, 5]} />
         <meshLambertMaterial color={P.mata} flatShading />
@@ -562,12 +562,12 @@ function AngelitaDormida({ tier, reducedMotion }) {
 /* El claro de luna sobre el pasto: una elipse de plata apenas insinuada. */
 function ClaroDeLuna() {
   return (
-    <mesh position={[-0.9, 0.03, 0.8]} rotation={[-Math.PI / 2, 0, 0]} scale={[1.6, 1, 1]}>
-      <circleGeometry args={[3.4, 28]} />
+    <mesh position={[0.3, 0.03, 1.8]} rotation={[-Math.PI / 2, 0, 0]} scale={[1.7, 1.2, 1]}>
+      <circleGeometry args={[4.6, 28]} />
       <meshBasicMaterial
         color={NOCHE.luz}
         transparent
-        opacity={0.11}
+        opacity={0.1}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
       />
@@ -585,7 +585,7 @@ function EscenaNoche({ tier, reducedMotion }) {
   useEffect(() => () => geo.dispose(), [geo]);
 
   const estrellas = Math.round(
-    (tier === 'alto' ? 220 : tier === 'medio' ? 130 : 60) * NOCHE.estrellas,
+    (tier === 'alto' ? 280 : tier === 'medio' ? 170 : 80) * NOCHE.estrellas,
   );
 
   /* `color`/`fog` se adjuntan a la ESCENA: hijos directos, nunca en <group>. */
