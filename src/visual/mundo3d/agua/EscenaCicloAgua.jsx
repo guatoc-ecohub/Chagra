@@ -980,27 +980,6 @@ function MundoAgua({ tier, reducedMotion, preset, faseFija }) {
   );
 }
 
-/*
- * En vertical (celular parado) el fov 42 — pensado para lienzo apaisado —
- * corta la nube por arriba y aprieta las laderas: se abre el campo y se
- * retrocede un paso para que el viaje nube→loma→agua quepa entero. Solo
- * reencuadra cuando CAMBIA la proporción del lienzo (girar el teléfono);
- * el dedo (OrbitControls) sigue mandando después.
- */
-function EncuadreResponsivo() {
-  const aplicado = useRef(/** @type {boolean|null} */ (null));
-  useFrame(({ camera, size }) => {
-    const vertical = size.width / size.height < 0.9;
-    if (aplicado.current === vertical) return;
-    aplicado.current = vertical;
-    camera.fov = vertical ? 52 : 42;
-    if (vertical) camera.position.set(0.45, 1.5, 7.5);
-    else camera.position.set(0.45, 1.35, 6.25);
-    camera.updateProjectionMatrix();
-  });
-  return null;
-}
-
 /**
  * El ciclo del agua en la finca. Montar SOLO perezosa dentro de un host con
  * altura. Acepta el contrato del framework de mundos (props extra ignoradas).
@@ -1041,7 +1020,6 @@ export default function EscenaCicloAgua({
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
-        <EncuadreResponsivo />
         <AtmosferaViva hora={hora} temporada={temporada} tier={tier} reducedMotion={reducedMotion} />
         <MundoAgua tier={tier} reducedMotion={reducedMotion} preset={preset} faseFija={fase} />
       </Canvas>
