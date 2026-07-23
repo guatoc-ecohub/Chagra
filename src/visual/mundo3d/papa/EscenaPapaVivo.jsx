@@ -304,6 +304,10 @@ function Diorama({ tier, reducedMotion, foco }) {
   const casaY = alturaLadera(SITIO_CASA[0], SITIO_CASA[1]);
   const cosechaY = alturaLadera(SITIO_COSECHA[0], SITIO_COSECHA[1]);
 
+  /* Cuánta luz le FALTA a la hora para que el cultivo se lea (la noche y el
+     atardecer bajan `atm.intensidad`; a mediodía esto es ~0). */
+  const refuerzo = Math.max(0, 1 - atm.intensidad);
+
   return (
     <>
       {/* LA ATMÓSFERA DEL KIT: fondo, luces y estrellas de LA HORA DEL VALLE
@@ -318,6 +322,26 @@ function Diorama({ tier, reducedMotion, foco }) {
         conNiebla={false}
         sombra={SOMBRA_PAPAL}
       />
+      {/* EL PISO DE LECTURA del papal (mismo remedio del cafetal #2707, el
+          aguacatal #2709 y la lechería #2712): de noche los caballones de
+          tierra negra y las matas aporcadas caían a bulto negro y el lote no
+          se leía. Dos luces locales de la escena (no tocan el kit): un relleno
+          hemisférico cálido que COMPENSA lo que la hora apaga (de noche sube,
+          a mediodía casi no suma) y una clave dorada fija SIN sombras — deja
+          ver el surco, la flor lila y la cosecha destapada sin tocar el dibujo
+          de la sombra proyectada. El domo, las estrellas y la bruma siguen
+          contando la hora: la noche se conserva noche, pero el papal se LEE. */}
+      <hemisphereLight
+        color="#f2e6c8"
+        groundColor="#453d2a"
+        intensity={0.38 + 1.15 * refuerzo}
+      />
+      <directionalLight
+        position={[7, 10, 5]}
+        color="#ffe9c0"
+        intensity={0.5 + 0.95 * refuerzo}
+      />
+
       {/* La bruma lechosa de la toma A: cerca y espesa — se come los cerros. */}
       {perfil.fog && <fog attach="fog" args={[nieblaFria, 14, 46]} />}
       {/* La luz FRÍA de la altura: un relleno plata desde arriba que platea

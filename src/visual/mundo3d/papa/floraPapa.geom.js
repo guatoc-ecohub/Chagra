@@ -136,9 +136,9 @@ export function alturaLadera(wx, wz) {
  * la papa el de tubérculos destapados en el rincón de cosecha.
  */
 export const FLORA_PAPA = {
-  alto: { mata: 130, flor: 300, papa: 44, paja: 90, frailejon: 9, monticulo: 3, piedra: 7 },
-  medio: { mata: 78, flor: 160, papa: 26, paja: 52, frailejon: 5, monticulo: 2, piedra: 4 },
-  bajo: { mata: 36, flor: 66, papa: 12, paja: 24, frailejon: 3, monticulo: 1, piedra: 2 },
+  alto: { mata: 130, flor: 300, papa: 84, paja: 90, frailejon: 9, monticulo: 3, piedra: 7 },
+  medio: { mata: 78, flor: 160, papa: 48, paja: 52, frailejon: 5, monticulo: 2, piedra: 4 },
+  bajo: { mata: 36, flor: 66, papa: 22, paja: 24, frailejon: 3, monticulo: 1, piedra: 2 },
 };
 
 /** Conteos para un tier (desconocido → frugal, nunca el más caro). */
@@ -164,11 +164,14 @@ export const PAL = {
   florLila2: '#9a72c4',
   florBlanca: '#f3eef8',
 
-  // El tubérculo va POR INSTANCIA (referencia): la diversidad andina
-  papaCriolla: '#e5b93c', // la amarilla, la reina
-  papaCriolla2: '#d4a52f',
-  papaRoja: '#a4503a', // la pastusa roja
-  papaMorada: '#5c3a66', // la morada andina
+  // El tubérculo va POR INSTANCIA (referencia): la diversidad andina.
+  // Subidos de valor a propósito (receta del cafetal #2707): sobre tierra
+  // negra el tubérculo tiene que GRITAR — la morada original ('#5c3a66')
+  // leía NEGRO en penumbra y borraba la lección de las tres variedades.
+  papaCriolla: '#f2c440', // la amarilla, la reina
+  papaCriolla2: '#e0ad2e',
+  papaRoja: '#c25538', // la pastusa roja
+  papaMorada: '#7d5290', // la morada andina
 
   // Pajonal (los macollos del frío)
   paja: '#b3a95e',
@@ -333,7 +336,11 @@ export function geomFlorPapa() {
 
 /** El tubérculo: bolita apenas ovalada, blanca — el color va POR INSTANCIA. */
 export function geomPapa() {
-  const g = new THREE.IcosahedronGeometry(0.085, 1);
+  /* Radio EXAGERADO adrede (rubber-hose, receta de la cereza del café #2707):
+     la criolla real cabe en la mano, pero a los ~12 m de la cámara eso son
+     unos pocos px — invisible. La cuenta gorda es la que deja LEER la
+     diversidad amarilla/roja/morada en el claro desde la entrada. */
+  const g = new THREE.IcosahedronGeometry(0.125, 1);
   poner(g, [0, 0, 0], [0, 0, 0.35], [1.25, 0.85, 0.95]);
   return pintar(g.index ? g.toNonIndexed() : g, '#ffffff');
 }
@@ -535,16 +542,17 @@ export function distribucionPapal(conteos, seed = 419) {
     const rad = Math.sqrt(rSue()) * 2.1;
     const x = SITIO_COSECHA[0] + Math.cos(a) * rad;
     const z = SITIO_COSECHA[1] + Math.sin(a) * rad * 0.8;
-    // la mayoría criolla amarilla; unas rojas y unas moradas (variedades)
+    // la mayoría criolla amarilla; rojas y moradas en cuota que SE VEA (la
+    // lección son las TRES variedades — con 14% la morada se perdía)
     const v = rSue();
-    if (v > 0.86) col.copy(morada);
-    else if (v > 0.7) col.copy(roja);
+    if (v > 0.8) col.copy(morada);
+    else if (v > 0.6) col.copy(roja);
     else col.lerpColors(criolla, criolla2, rSue());
-    col.multiplyScalar(0.92 + rSue() * 0.16);
+    col.multiplyScalar(0.98 + rSue() * 0.1);
     papa.push({
-      pos: [x, alturaLadera(x, z) + 0.06, z],
+      pos: [x, alturaLadera(x, z) + 0.08, z],
       rotY: rSue() * Math.PI * 2,
-      escala: 0.8 + rSue() * 0.55,
+      escala: 1.0 + rSue() * 0.55,
       tint: [col.r, col.g, col.b],
     });
   }
