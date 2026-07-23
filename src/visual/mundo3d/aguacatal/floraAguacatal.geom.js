@@ -677,7 +677,13 @@ export function distribucionAguacatal(conteos, seed = 411, q = 1) {
     const cuantas = 2 + Math.floor(rFru() * 3); // el racimo FLOJO del aguacate
     for (let k = 0; k < cuantas && frutoHass.length < c.frutoHass; k++) {
       const a = a0 + (rFru() - 0.5) * 0.55;
-      const dy = -0.62 - rFru() * 0.3; // colgado BAJO el follaje, pedúnculo visible
+      /* COLGADO DE VERDAD: la masa se DIBUJA escalada 1.35 en horizontal y
+         ±0.97 en vertical, así que el radio 1.02 y el descuelgue -0.62 de
+         antes dejaban el fruto ENTERRADO en el follaje (por eso "no había
+         aguacates" — sí había, pero adentro). Radio al contorno dibujado y
+         descuelgue por DEBAJO del vientre de la masa: el racimo queda en el
+         aire, pedúnculo a la vista. */
+      const dy = -1.05 - rFru() * 0.35;
       const mz = clamp(madre + (rFru() - 0.5) * 0.5, 0, 1);
       /* El NEGRO solo asoma (0.6 de mezcla máxima): bajo la copa oscura el
          morado-negro pleno lee NEGRO y borraba la cosecha — el maduro se
@@ -686,7 +692,7 @@ export function distribucionAguacatal(conteos, seed = 411, q = 1) {
       else col.lerpColors(morado, negro, ((mz - 0.55) / 0.45) * 0.6);
       col.multiplyScalar(0.98 + rFru() * 0.1);
       frutoHass.push({
-        pos: enCopa(s, m, a, 1.02, dy, rFru),
+        pos: enCopa(s, m, a, 1.28, dy, rFru),
         rotY: rFru() * Math.PI * 2,
         // la cuenta gorda: racimo legible desde la entrada de la finca
         escala: (1.05 + rFru() * 0.45) * s.esc,
@@ -712,7 +718,8 @@ export function distribucionAguacatal(conteos, seed = 411, q = 1) {
       col.lerpColors(cVerde, cClaro, rFru());
       col.multiplyScalar(0.95 + rFru() * 0.1);
       frutoCriollo.push({
-        pos: enCopa(s, m, a, 1.02, -0.7 - rFru() * 0.3, rFru, ALZA_CRIOLLO),
+        // al contorno dibujado y bajo el vientre de la masa, como el Hass
+        pos: enCopa(s, m, a, 1.25, -1.1 - rFru() * 0.35, rFru, ALZA_CRIOLLO),
         rotY: rFru() * Math.PI * 2,
         escala: 1.1 + rFru() * 0.4,
         tint: [col.r, col.g, col.b],
