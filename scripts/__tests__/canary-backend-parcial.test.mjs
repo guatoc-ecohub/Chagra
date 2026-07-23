@@ -104,3 +104,49 @@ describe('B0c (captura) con discrepancia entre endpoint y disco', () => {
     }
   }, 30000);
 });
+
+describe('presupuesto de tokens del chat (espejo de producción)', () => {
+  /**
+   * El canario mide lo que vive el usuario: si pide menos tokens que producción
+   * (`llmRouter.js` → ROUTES.chat.max_tokens = 1024), mide otro producto. Con 512
+   * y un modelo de razonamiento (`gemma4:e2b`, activo desde el 2026-07-22) el
+   * borrador se comía la cuota y `content` llegaba truncado o vacío: así nació el
+   * "5/6 sondas FALLAN" del 2026-07-23, que era el tope de tokens y no el modelo.
+   */
+  let srv; let url; const recibidos = [];
+  beforeAll(async () => {
+    srv = createServer((req, res) => {
+      let cuerpo = '';
+      req.on('data', (c) => { cuerpo += c; });
+      req.on('end', () => {
+        if ((req.url || '').startsWith('/api/ollama/api/chat')) {
+          recibidos.push(JSON.parse(cuerpo || '{}'));
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          // Respuesta cortada a media frase por agotar el presupuesto.
+          return res.end(JSON.stringify({
+            message: { content: 'Como asistente agroecológico, es muy importante que sepas que' },
+            done: true, done_reason: 'length',
+          }));
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end('{}');
+      });
+    });
+    await new Promise((r) => srv.listen(0, '127.0.0.1', r));
+    url = `http://127.0.0.1:${srv.address().port}`;
+  });
+  afterAll(() => new Promise((r) => srv.close(r)));
+
+  it('pide el mismo num_predict que producción y marca la respuesta como truncada', async () => {
+    const r = await runOf('C1')({
+      base: url, sidecarToken: null, token: null, chatModel: 'prueba',
+      target: 'dev', dateStr, outDir: outDir(), now: new Date(`${dateStr}T06:00:00Z`),
+    });
+    expect(recibidos.length).toBeGreaterThan(0);
+    // Regresión dura: nunca por debajo del presupuesto de producción.
+    expect(recibidos[0].options.num_predict).toBeGreaterThanOrEqual(1024);
+    expect(r.data.probes.every((p) => p.truncada)).toBe(true);
+    expect(r.data.truncadas).toBeGreaterThan(0);
+    expect(r.detalle).toMatch(/TRUNCADAS/);
+  }, 30000);
+});

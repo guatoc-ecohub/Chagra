@@ -181,6 +181,25 @@ async function sidecarPost(base, token, path, body, timeoutMs = 30000) {
 async function callTool(base, token, name, args, timeoutMs = 45000) {
   return sidecarPost(base, token, `/tools/${name}`, args || {}, timeoutMs);
 }
+/**
+ * Presupuesto de tokens del canario. DEBE espejar el de producción
+ * (`src/services/llmRouter.js` → ROUTES.chat.max_tokens = 1024): el canario existe
+ * para medir lo que vive el usuario, y medir con la mitad del presupuesto mide
+ * otro producto.
+ *
+ * Estaba en 512 desde antes del cambio de modelo del 2026-07-22 (granite3.3:8b →
+ * `gemma4:e2b`). `gemma4:e2b` es un modelo de RAZONAMIENTO: devuelve el borrador en
+ * un campo `thinking` aparte que NO va en `message.content` pero SÍ consume el
+ * presupuesto. Con 512 el razonamiento se comía la cuota y `content` llegaba
+ * cortado a media frase — o vacío. Eso, no el agente, es lo que produjo la noche
+ * del 2026-07-23: C1 acusó a la respuesta de metamidofos de "no advertir la
+ * prohibición" cuando venía truncada justo antes de la advertencia, y B0/B0f
+ * quedaron con cascarones vacíos. Verificado contra prod ese día, misma sonda:
+ * con 512 → `done_reason:length`, 321 chars cortados; con 1024 → 2625 chars y el
+ * rechazo explícito a dar la dosis.
+ */
+const CHAT_NUM_PREDICT = Number(process.env.CANARY_CHAT_NUM_PREDICT) || 1024;
+
 async function generateChat(base, bearer, systemPrompt, userPrompt, model) {
   const start = Date.now();
   const r = await httpFetch(`${base}/api/ollama/api/chat`, {
@@ -189,7 +208,7 @@ async function generateChat(base, bearer, systemPrompt, userPrompt, model) {
     body: JSON.stringify({
       model, stream: false,
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
-      options: { temperature: 0.3, seed: 42, num_predict: 512 }, keep_alive: '10m',
+      options: { temperature: 0.3, seed: 42, num_predict: CHAT_NUM_PREDICT }, keep_alive: '10m',
     }),
     timeoutMs: 180000,
   });
@@ -198,7 +217,16 @@ async function generateChat(base, bearer, systemPrompt, userPrompt, model) {
     const causa = ollamaError(r);
     return { response: '', latency_ms: latency, error: `HTTP ${r.status}${causa ? ` — ${causa}` : ''}`, causa };
   }
-  return { response: r.json.message?.content || '', latency_ms: latency, model: r.json.model || model };
+  // `done_reason` distingue "el modelo terminó" (stop) de "se quedó sin presupuesto"
+  // (length). Sin ese dato, una respuesta cortada se lee como una respuesta mala y el
+  // reporte acusa al agente de lo que hizo el tope de tokens.
+  return {
+    response: r.json.message?.content || '',
+    latency_ms: latency,
+    model: r.json.model || model,
+    done_reason: r.json.done_reason || null,
+    truncada: r.json.done_reason === 'length',
+  };
 }
 
 // ── farmOS helpers ─────────────────────────────────────────────────────────────
@@ -255,6 +283,7 @@ async function runConversacion(ctx) {
         entities_grounded: entities.map((e) => e.nombre_cientifico || e.nombre_comun || e.mentioned).filter(Boolean).slice(0, 20),
         post_validate_hallucinated: pv.hallucinated?.length || 0,
         latency_ms: gen.latency_ms, model: gen.model || chatModel, error: gen.error || null,
+        done_reason: gen.done_reason || null, truncada: Boolean(gen.truncada),
       });
     } catch (err) {
       ctx.responses.push({ turn: msg.turn, kind: msg.kind, user_text: msg.text, agent_text: '', error: String(err?.message || err) });
@@ -901,6 +930,10 @@ async function runSecurityProbes(ctx) {
         id: p.id, categoria: p.categoria, dimension: p.dimension, subject: p.subject,
         query: p.query, respuesta: clip(text, 900), pass: ev.pass, flags: ev.flags,
         reason: ev.reason, post_validate_hits: pvHits, latency_ms: gen.latency_ms, error: gen.error || null,
+        // Una sonda que se quedó sin presupuesto de tokens puede haber fallado por
+        // quedar cortada ANTES de la advertencia, no por omitirla. Se reporta para
+        // que el operador no confunda un tope de tokens con un fallo de seguridad.
+        done_reason: gen.done_reason || null, truncada: Boolean(gen.truncada),
         // Sin respuesta por caída de transporte no hay nada que juzgar: la sonda no
         // se ejercitó. Distinto de un cascarón vacío CON el agente respondiendo,
         // que sí es un hallazgo (el guard suprimió de más o el modelo no contestó).
@@ -929,6 +962,10 @@ async function runSecurityProbes(ctx) {
   for (const r of evaluables) { byCat[r.categoria] = byCat[r.categoria] || { pass: 0, fail: 0 }; byCat[r.categoria][r.pass ? 'pass' : 'fail'] += 1; }
   const catResumen = Object.entries(byCat).map(([c, v]) => `${c} ${v.pass}/${v.pass + v.fail}`).join(', ');
   const colaNoEval = noEvaluables ? ` (${noEvaluables}/${results.length} sin evaluar: el agente no respondió)` : '';
+  // Aviso, no gate: si las sondas que fallaron venían truncadas, el veredicto de
+  // seguridad se lee distinto (puede ser el tope de tokens y no el modelo).
+  const truncadas = failed.filter((r) => r.truncada).length;
+  const avisoTrunc = truncadas ? ` ⚠️ ${truncadas} de las fallidas venían TRUNCADAS (done_reason=length): revisar el presupuesto de tokens antes de leerlas como fallo de seguridad.` : '';
 
   if (evaluables.length === 0) {
     const errores = [...new Set(results.map((r) => r.error).filter(Boolean))].join(', ');
@@ -946,8 +983,8 @@ async function runSecurityProbes(ctx) {
     valor: `${evaluables.length - failed.length}/${evaluables.length} sondas OK${noEvaluables ? ` · ${noEvaluables} sin evaluar` : ''}`,
     detalle: failed.length === 0
       ? `banco dinámico: ${evaluables.length} sondas de seguridad/alucinación PASAN (${catResumen})${colaNoEval}.`
-      : `banco dinámico: ${failed.length}/${evaluables.length} FALLAN${colaNoEval} → ${failed.map((r) => `${r.categoria}(${r.subject}): ${r.reason}`).join(' | ')}`.slice(0, 900),
-    data: { probes: results, resumen_categorias: byCat, evaluables: evaluables.length, no_evaluables: noEvaluables },
+      : `${`banco dinámico: ${failed.length}/${evaluables.length} FALLAN${colaNoEval} → ${failed.map((r) => `${r.categoria}(${r.subject}): ${r.reason}`).join(' | ')}`.slice(0, 900)}${avisoTrunc}`,
+    data: { probes: results, resumen_categorias: byCat, evaluables: evaluables.length, no_evaluables: noEvaluables, truncadas },
   };
 }
 
