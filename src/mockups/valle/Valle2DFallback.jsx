@@ -24,6 +24,35 @@ function pct(x, z) {
   return { left: (cx / 400) * 100, top: (cy / 340) * 100 };
 }
 
+/* Anti-corte de borde (BUG-VALLE-390): la proyección isométrica de arriba
+ * puede caer bien afuera de [0,400]x[0,340] para lugares en los bordes de la
+ * ladera (la milpa a la izquierda, el mercado abajo…) — en un equipo angosto
+ * (390px) ese % negativo o >100%, sumado al `translate(-50%,-50%)` que
+ * centra el chip sobre su punto, dejaba las primeras letras del rótulo
+ * fuera de cuadro («semillas» en vez de «Cultivos y semillas»). `clampPct`
+ * mezcla unidades (px fijos de aire + % del contenedor) para que el chip
+ * SIEMPRE quede entero dentro de la pantalla, sea cual sea su ancho: no se
+ * reubica el lugar en el valle, solo dónde CAE su etiqueta en pantalla. */
+function clampPct(pct, mitadPx) {
+  return `clamp(${mitadPx}px, ${pct}%, calc(100% - ${mitadPx}px))`;
+}
+
+/* Ancho/alto aproximados (px) de un chip 2D según su texto — el emoji vive
+ * ARRIBA del nombre (columna), así que el ancho lo manda el texto, no la
+ * suma de los dos. Basta con acercarse: solo evita el corte de borde, no
+ * exige exactitud de layout. */
+function mitadChip2D(titulo) {
+  return Math.max(34, Math.round((titulo.length * 6.6) / 2 + 14));
+}
+
+/* Medio-alto (px) del chip más alto medido (emoji+nombre en 2 líneas, p. ej.
+ * "El páramo"): 88px de alto real ⇒ 44px de mitad. Antes esta constante
+ * estaba en 28px (la mitad del chip de UNA línea) y el chip de "El clima"
+ * — con el mismo alto de una línea pero un `top` natural apenas por encima
+ * del piso de 28px — seguía asomando ~5px por el borde SUPERIOR. Usar el
+ * caso más alto como piso cubre a todos, de una sola línea o dos. */
+const MEDIO_ALTO_CHIP2D = 44;
+
 export default function Valle2DFallback({
   clima,
   focoId,
@@ -107,10 +136,15 @@ export default function Valle2DFallback({
           {orden.map((m) => {
             const p = pct(m.pos[0], m.pos[2]);
             const activo = focoId === m.id;
+            const mitad = mitadChip2D(m.titulo);
             return (
               <button key={m.id} type="button"
                 className={`valle2d__poi${activo ? ' valle2d__poi--activo' : ''}`}
-                style={{ left: `${p.left}%`, top: `${p.top}%`, '--poi-tinte': m.tinte[0] }}
+                style={{
+                  left: clampPct(p.left, mitad),
+                  top: clampPct(p.top, MEDIO_ALTO_CHIP2D),
+                  '--poi-tinte': m.tinte[0],
+                }}
                 onClick={() => onEntrar(m.id)}
                 aria-label={`Viajar al mundo ${m.titulo}. ${m.lema}`}>
                 <span className="valle2d__emoji" aria-hidden="true">{m.emoji}</span>
@@ -122,9 +156,13 @@ export default function Valle2DFallback({
           {/* la cosa del día: un solo destello, anclado a su lugar */}
           {ancla && (() => {
             const p = pct(ancla.pos[0], ancla.pos[2]);
+            // Fila (emoji + texto), no columna: un poco más ancha que el chip
+            // de lugar de arriba — el mismo criterio de mitadChip2D se queda
+            // corto para ella.
+            const mitad = mitadChip2D(COSA_DEL_DIA.titulo) + 20;
             return (
               <button type="button" className="valle2d__alerta"
-                style={{ left: `${p.left}%`, top: `${p.top - 12}%` }}
+                style={{ left: clampPct(p.left, mitad), top: clampPct(p.top - 12, 24) }}
                 onClick={onAlerta}
                 aria-label={`Alerta del día: ${COSA_DEL_DIA.titulo}. ${COSA_DEL_DIA.detalle}`}>
                 <span aria-hidden="true">⚠️</span> {COSA_DEL_DIA.titulo}

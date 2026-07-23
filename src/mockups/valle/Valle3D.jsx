@@ -1396,6 +1396,26 @@ function MundoLugar({ mundo, reducedMotion, perfil, onEntrar = null }) {
  * mundos en cualquiera de los dos modos visibles — la navegación no cambia. ── */
 const _proj = new THREE.Vector3();
 
+/* Ancho aproximado (px) del chip según su modo — MISMO criterio que usan las
+ * cajas de anti-colisión de abajo (rectoDe): 'plena' crece con el título,
+ * 'punto'/'oculto' es el círculo fijo de 44px. El nudge anti-corte de borde
+ * (BUG-VALLE-390) reutiliza esta cuenta para no clampear con un margen
+ * distinto al que en verdad ocupa el chip en pantalla. */
+function anchoRotulo(modo, titulo) {
+  return modo === 'plena' ? 76 + titulo.length * 9 : 44;
+}
+
+/* Clampa v al rango [mitad, total-mitad] (deja `mitad` px de aire contra
+ * cada borde). Si el rango se invierte — un título larguísimo en una
+ * pantalla diminuta, el chip no cabe entero de ningún modo — cede al
+ * centro: mejor centrado que pegado a un filo. */
+function clamp1D(v, mitad, total) {
+  const lo = mitad;
+  const hi = total - mitad;
+  if (lo > hi) return total / 2;
+  return Math.min(Math.max(v, lo), hi);
+}
+
 function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, kReposo = 1 }) {
   const botones = useRef({});
   const tapados = useRef({});
@@ -1544,6 +1564,26 @@ function RotulosLugares({ mundos, focoId, onEntrar, occluders, controls = null, 
         // La banda queda en el DOM (data-banda): CSS futuro puede reaccionar
         // (p. ej. chips más grandes en estratégica) sin tocar este JS.
         if (btn.dataset.banda !== enBanda) btn.dataset.banda = enBanda;
+        // Anti-corte de borde (BUG-VALLE-390): el ancla 3D no sabe de bordes
+        // de pantalla — en equipos angostos (390px) un rótulo cerca del filo
+        // del encuadre perdía sus primeras letras (o quedaba imposible de
+        // tocar entero) fuera de cuadro. Se NUDGEA con un transform propio,
+        // por ENCIMA del centrado que ya aplica drei, lo justo para que el
+        // chip completo quede legible y tocable — el portal no se mueve de
+        // su lugar en el valle, solo se corrige dónde CAE su etiqueta.
+        if (modo === 'oculto') {
+          if (btn.style.transform) btn.style.transform = '';
+        } else {
+          const BORDE = 10;
+          const ancho = anchoRotulo(modo, p.titulo);
+          const alto = modo === 'plena' ? 48 : 44;
+          const cx = clamp1D(p.x, ancho / 2 + BORDE, size.width);
+          const cy = clamp1D(p.y, alto / 2 + BORDE, size.height);
+          const dx = cx - p.x;
+          const dy = cy - p.y;
+          const nuevo = dx || dy ? `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)` : '';
+          if (btn.style.transform !== nuevo) btn.style.transform = nuevo;
+        }
       }
     }
   });
@@ -1589,14 +1629,35 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
   const ancla = MUNDO_DIR_BY_ID[COSA_DEL_DIA.anclaMundo];
   const luz = useRef(null);
   const halo = useRef(null);
+  const boton = useRef(null);
   useFrame((state) => {
-    if (reducedMotion) return;
-    const p = (Math.sin(state.clock.elapsedTime * 1.6) + 1) / 2;
-    if (luz.current) luz.current.intensity = 1.4 + p * 2.6;
-    if (halo.current) {
-      const s = 1 + p * 0.5;
-      halo.current.scale.set(s, s, s);
-      halo.current.material.opacity = 0.5 - p * 0.35;
+    if (!reducedMotion) {
+      const p = (Math.sin(state.clock.elapsedTime * 1.6) + 1) / 2;
+      if (luz.current) luz.current.intensity = 1.4 + p * 2.6;
+      if (halo.current) {
+        const s = 1 + p * 0.5;
+        halo.current.scale.set(s, s, s);
+        halo.current.material.opacity = 0.5 - p * 0.35;
+      }
+    }
+    // Anti-corte de borde (BUG-VALLE-390), mismo criterio que RotulosLugares:
+    // el faro del día es un solo chip fijo, pero su ancla puede caer cerca
+    // del filo de la pantalla en equipos angostos y perder sus primeras
+    // letras. Se nudgea hacia adentro sin moverlo de su lugar en el valle.
+    if (boton.current && ancla) {
+      const alturaAncla = alturaTerreno(ancla.pos[0], ancla.pos[2]);
+      _proj.set(ancla.pos[0], alturaAncla + 2.7, ancla.pos[2]).project(state.camera);
+      const sx = (_proj.x * 0.5 + 0.5) * state.size.width;
+      const sy = (0.5 - _proj.y * 0.5) * state.size.height;
+      const BORDE = 10;
+      const ancho = 64 + COSA_DEL_DIA.titulo.length * 9;
+      const alto = 52;
+      const cx = clamp1D(sx, ancho / 2 + BORDE, state.size.width);
+      const cy = clamp1D(sy, alto / 2 + BORDE, state.size.height);
+      const dx = cx - sx;
+      const dy = cy - sy;
+      const nuevo = dx || dy ? `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)` : '';
+      if (boton.current.style.transform !== nuevo) boton.current.style.transform = nuevo;
     }
   });
   if (!ancla) return null;
@@ -1621,6 +1682,7 @@ function Beacon({ onAlerta, reducedMotion, conLuz = true }) {
       {/* Sin distanceFactor: la alerta mantiene su tamaño táctil en píxeles. */}
       <Html center position={[0, 2.7, 0]} zIndexRange={[30, 0]}>
         <button
+          ref={boton}
           type="button"
           className="valle-alerta v3d-alerta"
           onClick={(e) => {
@@ -1743,7 +1805,6 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
     };
     // `entrando` vive en entrandoRef a propósito: un viaje real no debe
     // reiniciar la cadencia del husmeo autónomo.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reducedMotion, entrarMundoAngelita, reposarAngelita]);
 
   useFrame((state) => {
