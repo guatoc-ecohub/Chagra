@@ -22,7 +22,9 @@ import Angelita from '../visual/agente/Angelita';
    cae a 'acompana' (estadoCanonico ya es tolerante, esto solo documenta). */
 const ESTADO_DE_STATE = {
     idle: 'acompana',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
     thinking: 'pensando',
+    // eslint-disable-next-line chagra-i18n/no-hardcoded-spanish
     speaking: 'respondiendo',
     listening: 'escuchando',
 };
@@ -31,8 +33,8 @@ export default function ChagraAgentAvatarAngelita({
     state = 'idle',
     size = 48,
     withLabel = false,
-    onClick,
-    onDoubleClick,
+    onClick = undefined,
+    onDoubleClick = undefined,
     glow = false,
     className = '',
     ariaLabel = 'Chagra IA',
