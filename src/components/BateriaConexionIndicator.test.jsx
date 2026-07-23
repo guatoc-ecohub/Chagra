@@ -42,6 +42,7 @@ describe('BateriaConexionIndicator', () => {
     navigator.connection = {
       effectiveType: '4g',
       addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
     };
 
     render(<BateriaConexionIndicator />);
