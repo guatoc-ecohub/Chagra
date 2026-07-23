@@ -55,6 +55,7 @@ import AbejaTransicion, { AlMontarEscena } from '../visual/creatures/AbejaTransi
 import Mundo, {
   MUNDO,
   decidirTier,
+  permite3D,
   tinteDeMundo,
   tituloDeMundo,
   useNavegacionMundos,
@@ -522,8 +523,8 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
           Mientras se está DENTRO de un mundo, el valle descansa (se desmonta:
           nada de dos escenas sudando la GPU a la vez en un teléfono). */}
       <div className="valle-escena">
-        {!nav.enMundo &&
-          (
+        {!nav.enMundo && (
+          permite3D(equipo.tier) ? (
             <Valle3DGuard
               onError={() => setValle3dError(true)}
               fallback={(
@@ -565,7 +566,33 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
               <AlMontarEscena onMonta={dispararCruceValle} />
             </Suspense>
             </Valle3DGuard>
-          )}
+          ) : (
+            // FIX perf 2026-07-22 (medición fps-mundos): esta rama NUNCA se
+            // alcanzaba — el valle era el ÚNICO mockup 3D de toda la vitrina
+            // que no llamaba `permite3D(tier)` (los ~40 mundos restantes, la
+            // demo del suelo incluida, sí lo hacen y caen a su 2D en tier
+            // 'bajo'). Sin esto, un equipo de gama baja real igual pagaba el
+            // Canvas WebGL completo de Valle3D (cientos de draw calls) con
+            // solo el prop `tier` bajando la calidad de materiales/sombras —
+            // nunca se ahorraba el costo de montar la escena. Medido:
+            // equipo simulado (hardwareConcurrency=4, deviceMemory=2, tier
+            // 'bajo') antes del fix seguía montando Valle3D a ~17fps con
+            // ~200 draw calls / ~185k triángulos; con este fix cae al 2D
+            // digno (Valle2DFallback, sin Canvas). Ver
+            // ops/informes/fps-mundos-2026-07-22.md.
+            <Valle2DFallback
+              clima={clima}
+              focoId={focoId}
+              animo={companero.animo}
+              energia={companero.energia}
+              reducedMotion={reducedMotion}
+              onEntrar={entrarMundo}
+              onAlerta={abrirAlerta}
+              webglBloqueado={equipo.motivo === 'sin-webgl'}
+              mundos={mundosValle}
+            />
+          )
+        )}
         {/* AoE: el minimapa RTS del valle (planta, blips, salto-a-lugar) — solo con el valle a la vista */}
         {!nav.enMundo && (
           <MinimapaValle
