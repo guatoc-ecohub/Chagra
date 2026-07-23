@@ -23,9 +23,12 @@
  *   node scripts/bench-rag-retrieve.mjs
  *   OLLAMA_URL=http://localhost:11434 node scripts/bench-rag-retrieve.mjs
  *   RERANK_URL=http://localhost:7997 node scripts/bench-rag-retrieve.mjs   # activa rerank
+ *   GOLDEN_SET=eval/rag-golden-ampliado.json node scripts/bench-rag-retrieve.mjs  # otro golden set
  *
  * Env:
  *   OLLAMA_URL   default http://localhost:11434 — embedder de query (nomic-embed-text).
+ *   GOLDEN_SET   default eval/rag-golden.json — golden set a evaluar (ruta rel. al
+ *                repo o absoluta). Cada entrada solo requiere {id, query, expected}.
  *   RERANK_URL   default http://localhost:7997  — TEI con bge-reranker-v2-m3 (/rerank).
  *   RAG_POOL_K   default 20 — tamaño del pool que ve el reranker antes del slice(topK).
  *
@@ -47,7 +50,14 @@ const PUBLIC_DIR = join(ROOT_DIR, 'public');
 const CORPUS_ROOT = join(PUBLIC_DIR, 'cycle-content');
 const MANIFEST_PATH = join(CORPUS_ROOT, 'manifest.json');
 const EMBEDDINGS_PATH = join(PUBLIC_DIR, 'rag-embeddings.json');
-const GOLDEN_PATH = join(ROOT_DIR, 'eval', 'rag-golden.json');
+// Golden set: por defecto eval/rag-golden.json (50 queries). Se puede apuntar a
+// otro set (p.ej. eval/rag-golden-ampliado.json) con GOLDEN_SET=<ruta>. Solo se
+// exige que cada entrada tenga {id, query, expected}; campos extra se ignoran.
+const GOLDEN_PATH = process.env.GOLDEN_SET
+  ? (process.env.GOLDEN_SET.startsWith('/')
+      ? process.env.GOLDEN_SET
+      : join(ROOT_DIR, process.env.GOLDEN_SET))
+  : join(ROOT_DIR, 'eval', 'rag-golden.json');
 const OUTPUT_DIR = join(ROOT_DIR, 'data', 'bench-runs');
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
 // Endpoint TEI del cross-encoder. El reranker se sirve FUERA de ollama (ollama
@@ -416,7 +426,9 @@ async function main() {
         : {}),
     },
   };
-  const outputPath = join(OUTPUT_DIR, `rag-retrieve-${new Date().toISOString().slice(0, 10)}.json`);
+  const goldTag = GOLDEN_PATH.replace(/\\/g, '/').split('/').pop().replace(/\.json$/, '');
+  const goldSuffix = goldTag === 'rag-golden' ? '' : `-${goldTag}`;
+  const outputPath = join(OUTPUT_DIR, `rag-retrieve-${new Date().toISOString().slice(0, 10)}${goldSuffix}.json`);
   writeFileSync(outputPath, JSON.stringify(output, null, 2));
   console.log(`[bench] resultados guardados en ${outputPath}`);
 
