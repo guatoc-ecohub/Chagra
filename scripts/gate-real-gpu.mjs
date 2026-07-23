@@ -9,7 +9,11 @@ import { setTimeout as sleep } from 'node:timers/promises';
 
 const DIST = process.argv[2];
 // <ruta>=<nombre>[=<texto del botón a tocar antes de capturar>]
-const SHOTS = process.argv.slice(3).map((a) => { const [ruta, name, click] = a.split('='); return [name, ruta, click]; });
+// La ruta pasa por decodeURIComponent: si la ruta misma lleva '=' (p. ej. el
+// override '?ciclo=12' del ciclo diurno), se pasa percent-encodeada
+// ('...%3Fciclo%3D12') y aquí se restaura — sin eso el split de abajo la
+// partía por el '=' del query y el gate iba a una ruta trunca (2026-07-23).
+const SHOTS = process.argv.slice(3).map((a) => { const [ruta, name, click] = a.split('='); return [name, decodeURIComponent(ruta), click]; });
 // PUERTO POR CORRIDA, NO FIJO. Estaba clavado en 8097 y con varios agentes
 // gateando a la vez el segundo encontraba el puerto ocupado, su servidor moría
 // callado, y terminaba fotografiando LA APP DEL OTRO. Lo detectó un agente el
