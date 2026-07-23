@@ -495,11 +495,14 @@ export const MUNDO = {
         { id: 'paramo', nombre: 'Páramo', rango: '3000–4200 m', color: '#aec7cf', cultivo: 'frailejon', niebla: true, protege: true },
       ],
     },
+    // Hotspots en el espacio de la escena: el diorama de la ladera baja 1.55
+    // (centrado en el origen para el encuadre digno con reduced-motion — ver
+    // DioramaPisos en EscenaEstratos.jsx); estas alturas van bajadas igual.
     hotspots: [
-      { id: 'directorio', pos: [-1.4, 1.7, 0.7], emoji: '🌡️', label: 'Qué siembro según mi altura', view: 'directorio' },
-      { id: 'cafe', pos: [1.0, 1.75, 0.15], emoji: '☕', label: 'El piso del café', view: 'cafe' },
-      { id: 'papa', pos: [-1.0, 2.9, -0.35], emoji: '🥔', label: 'El piso de la papa', view: 'tuberculos' },
-      { id: 'paramo', pos: [0.7, 4.0, -0.9], emoji: '🏔️', label: 'El páramo se cuida', view: 'restauracion' },
+      { id: 'directorio', pos: [-1.4, 0.15, 0.7], emoji: '🌡️', label: 'Qué siembro según mi altura', view: 'directorio' },
+      { id: 'cafe', pos: [1.0, 0.2, 0.15], emoji: '☕', label: 'El piso del café', view: 'cafe' },
+      { id: 'papa', pos: [-1.0, 1.35, -0.35], emoji: '🥔', label: 'El piso de la papa', view: 'tuberculos' },
+      { id: 'paramo', pos: [0.7, 2.45, -0.9], emoji: '🏔️', label: 'El páramo se cuida', view: 'restauracion' },
     ],
     entrada: { zoom: 8, narra: 'pisos' },
   },
