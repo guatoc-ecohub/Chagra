@@ -1,7 +1,26 @@
+import { readFileSync } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const EXT_CANDIDATES = ['.js', '.mjs', '.jsx', '.ts', '.tsx'];
+const CATALOG_MANIFEST_URL = new URL('../public/cycle-content/manifest.json', import.meta.url);
+
+/**
+ * Construye el catalogo minimo que necesita el tier-gate durante el bench.
+ * En la PWA getAllSpecies() lee SQLite; Node no puede abrir ese catalogo con
+ * el mismo adaptador de navegador. El manifest es el corpus real que evalua
+ * este harness, por lo que sus slugs representan exactamente las especies
+ * que deben pasar el filtro antes de medir recall.
+ */
+export function getBenchCatalogSpecies() {
+  const manifest = JSON.parse(readFileSync(CATALOG_MANIFEST_URL, 'utf8'));
+  if (!Array.isArray(manifest.slugs)) {
+    throw new Error('El manifest del corpus debe contener un arreglo de slugs');
+  }
+  return manifest.slugs.map((id) => ({ id }));
+}
+
+const benchCatalogSpecies = getBenchCatalogSpecies();
 
 async function fileExists(url) {
   try {
@@ -55,7 +74,7 @@ export async function load(url, context, nextLoad) {
     return {
       format: 'module',
       shortCircuit: true,
-      source: 'export const getAllSpecies = async () => [];\n',
+      source: `export const getAllSpecies = async () => ${JSON.stringify(benchCatalogSpecies)};\n`,
     };
   }
   if (url.endsWith('.json')) {
