@@ -221,6 +221,124 @@ function NubesDia() {
   );
 }
 
+/* ══════ EL FONDO QUE ATERRIZA LA MAQUETA ══════
+   Antes la finca terminaba en el aire: el borde de la malla contra el crema
+   del cielo, y el diorama se leía recortado y pegado sobre la nada. Aquí
+   llega el patrón del páramo (geomCordilleras de nacederoParamo.geom.js):
+
+   · LA FALDA — un anillo de pasto que continúa el terreno desde debajo de la
+     malla hasta perderse en la niebla del mediodía. Lambert con fog: la misma
+     luz del terreno, y el fog del kit lo funde solo contra el horizonte.
+   · LAS LOMAS — tres anillos de crestas alrededor de la finca, cada uno más
+     alto, más lejos y más pálido. La perspectiva aérea va HORNEADA en los
+     vértices (mezcla hacia la bruma), no delegada al fog — MeshBasic con
+     fog:false, igual que el telón del páramo: se lee igual en cualquier tier.
+   Van en ANILLO completo (no telón plano): la órbita permite ±60° de azimut
+   y ningún ángulo debe mostrar el vacío. Senos de frecuencia ENTERA sobre el
+   ángulo: la silueta cierra el círculo sin costura y sin Math.random. */
+function FondoLomas() {
+  const { geoFalda, geoLomas, matFalda, matLomas } = useMemo(() => {
+    const bruma = new THREE.Color(DIA.niebla);
+    const c = new THREE.Color();
+
+    /* — la falda de pasto: anillo r 12 → 62, hundiéndose apenas — */
+    const NA = 56;
+    const R0 = 12, R1 = 62;
+    const posF = new Float32Array((NA + 1) * 2 * 3);
+    const colF = new Float32Array((NA + 1) * 2 * 3);
+    const idxF = [];
+    const cPasto = new THREE.Color(P.pasto);
+    for (let i = 0; i <= NA; i++) {
+      const a = (i / NA) * Math.PI * 2;
+      const cs = Math.cos(a), sn = Math.sin(a);
+      [[R0, 0.3, 0.12], [R1, -0.5, 0.85]].forEach(([r, y, velo], l) => {
+        const k = (i * 2 + l) * 3;
+        posF[k] = cs * r; posF[k + 1] = y; posF[k + 2] = sn * r;
+        c.copy(cPasto).lerp(bruma, velo);
+        colF[k] = c.r; colF[k + 1] = c.g; colF[k + 2] = c.b;
+      });
+      if (i < NA) {
+        const q = i * 2;
+        idxF.push(q, q + 1, q + 3, q, q + 3, q + 2);
+      }
+    }
+    const geoFalda = new THREE.BufferGeometry();
+    geoFalda.setAttribute('position', new THREE.BufferAttribute(posF, 3));
+    geoFalda.setAttribute('color', new THREE.BufferAttribute(colF, 3));
+    geoFalda.setIndex(idxF);
+    geoFalda.computeVertexNormals();
+
+    /* — las lomas: tres anillos de crestas, verdes de la casa, sin hex nuevo — */
+    const filas = [
+      { r: 26, alto: 4.8, base: -1.2, tono: mezclar(P.pasto, P.ortiga, 0.35), velo: 0.34, kA: 5, kB: 11, kC: 23, fase: 1.7 },
+      { r: 36, alto: 6.6, base: -1.5, tono: mezclar(P.pasto, TINTE, 0.3), velo: 0.6, kA: 4, kB: 9, kC: 19, fase: 4.2 },
+      { r: 48, alto: 9.0, base: -1.8, tono: mezclar(P.pasto, TINTE, 0.5), velo: 0.74, kA: 3, kB: 7, kC: 17, fase: 0.6 },
+    ];
+    const N = 72;
+    const posL = new Float32Array(filas.length * (N + 1) * 2 * 3);
+    const colL = new Float32Array(filas.length * (N + 1) * 2 * 3);
+    const idxL = [];
+    let v0 = 0, p = 0;
+    for (const f of filas) {
+      const cumbre = new THREE.Color(f.tono).lerp(bruma, f.velo);
+      const pie = cumbre.clone().lerp(bruma, 0.5);
+      for (let i = 0; i <= N; i++) {
+        const a = (i / N) * Math.PI * 2;
+        const s =
+          0.45 +
+          0.3 * Math.sin(f.kA * a + f.fase) +
+          0.22 * Math.sin(f.kB * a + f.fase * 2.1) +
+          0.12 * Math.sin(f.kC * a + f.fase * 4.3);
+        const y = f.base + f.alto * clamp(s, 0.15, 1.1);
+        const cs = Math.cos(a), sn = Math.sin(a);
+        for (let l = 0; l < 2; l++) {
+          posL[p] = cs * f.r;
+          posL[p + 1] = l === 0 ? y : f.base;
+          posL[p + 2] = sn * f.r;
+          const cc = l === 0 ? cumbre : pie;
+          colL[p] = cc.r; colL[p + 1] = cc.g; colL[p + 2] = cc.b;
+          p += 3;
+        }
+        if (i < N) {
+          const q = v0 + i * 2;
+          idxL.push(q, q + 1, q + 3, q, q + 3, q + 2);
+        }
+      }
+      v0 += (N + 1) * 2;
+    }
+    const geoLomas = new THREE.BufferGeometry();
+    geoLomas.setAttribute('position', new THREE.BufferAttribute(posL, 3));
+    geoLomas.setAttribute('color', new THREE.BufferAttribute(colL, 3));
+    geoLomas.setIndex(idxL);
+
+    const matFalda = new THREE.MeshLambertMaterial({ vertexColors: true });
+    const matLomas = new THREE.MeshBasicMaterial({
+      vertexColors: true,
+      side: THREE.DoubleSide,
+      fog: false,
+    });
+    return { geoFalda, geoLomas, matFalda, matLomas };
+  }, []);
+
+  useEffect(
+    () => () => {
+      geoFalda.dispose();
+      geoLomas.dispose();
+      matFalda.dispose();
+      matLomas.dispose();
+    },
+    [geoFalda, geoLomas, matFalda, matLomas],
+  );
+
+  return (
+    <group>
+      {/* el telón primero: siempre detrás de todo lo que importa */}
+      <mesh geometry={geoLomas} material={matLomas} renderOrder={-1} />
+      <mesh geometry={geoFalda} material={matFalda} />
+    </group>
+  );
+}
+
 /* Etiqueta didáctica sobre la escena (solo en modo «paso a paso»). */
 function Etiqueta({ pos, texto, paso, activo }) {
   return (
@@ -885,8 +1003,15 @@ function Trapiche({ reducedMotion }) {
   const vuelta = useRef(null);
   useFrame(({ clock }) => {
     if (reducedMotion || !vuelta.current) return;
-    // el paso manso del buey (arranca del lado visible, hacia la cámara)
-    vuelta.current.rotation.y = 2.3 + clock.elapsedTime * 0.22;
+    // El paso manso del buey. ARRANCA EN 3.05, no en 2.3: con la cámara
+    // vertical del teléfono la fase 2.3 lo escondía detrás del molino y la
+    // 4.7 (la vieja "pose visible") caía FUERA del borde derecho del
+    // encuadre — el corazón del trapiche nunca salía en pantalla. En 3.05 el
+    // buey nace en el CLARO de pasto al lado izquierdo del molino (fondo
+    // verde limpio: entre 3.3 y 3.6 quedaba camuflado contra la madera de
+    // la canoa y el molino, y debajo de la pluma de humo de la hornilla),
+    // de cara a la cámara, y camina su vuelta A LA VISTA.
+    vuelta.current.rotation.y = 3.05 + clock.elapsedTime * 0.22;
   });
   return (
     <group position={TRAPICHE_POS}>
@@ -954,8 +1079,12 @@ function Trapiche({ reducedMotion }) {
       </mesh>
 
       {/* LA VUELTA: palanca + buey giran juntos alrededor del eje */}
-      {/* pose base = la del buey visible al frente (también en reduced-motion) */}
-      <group ref={vuelta} position={[0, 0, 0]} rotation={[0, 4.7, 0]}>
+      {/* pose base (reduced-motion y captura): 3.05 = el buey en el claro de
+          pasto al lado izquierdo del molino, de cara a la cámara y ADENTRO
+          del encuadre vertical — la 4.7 de antes quedaba cortada por el
+          borde derecho del teléfono, y entre 3.3 y 3.6 quedaba camuflado
+          contra la canoa y el molino, debajo del humo de la hornilla */}
+      <group ref={vuelta} position={[0, 0, 0]} rotation={[0, 3.05, 0]}>
         {/* la palanca, del eje hacia afuera y bajando al pecho del buey */}
         <mesh position={[1.45, 1.6, 0]} rotation={[0, 0, 0.26]}>
           <boxGeometry args={[3.1, 0.13, 0.13]} />
@@ -967,7 +1096,7 @@ function Trapiche({ reducedMotion }) {
         </mesh>
         {/* el buey, enyugado al extremo, andando su círculo — mirando HACIA
             donde camina (antes iba de para atrás y el techo tapaba la pena) */}
-        <group position={[2.9, 0, 0]} rotation={[0, Math.PI / 2, 0]} scale={1.2}>
+        <group position={[2.9, 0, 0]} rotation={[0, Math.PI / 2, 0]} scale={1.32}>
           <Buey reducedMotion={reducedMotion} />
           {/* el yugo sobre la nuca */}
           <mesh position={[0.62, 0.98, 0]} rotation={[Math.PI / 2, 0, 0]}>
@@ -1344,8 +1473,10 @@ const RECORRIDO_PANELA = [
   { paso: 4, texto: 'La paila', pos: [3.2, 2.5, 4.3], ojo: [5.2, 4.8, 10.7] },
   { paso: 5, texto: 'La panela', pos: [0.7, 2.0, 5.9], ojo: [2.4, 4.1, 12.5] },
 ];
-/* A dónde mira la cámara cuando no hay paso activo (vista calma original). */
-const OBJETIVO_CALMA = [0.5, 1.0, 1.5];
+/* A dónde mira la cámara cuando no hay paso activo. Corrido un pelo hacia el
+   trapiche (0.5→0.9 en x): en el teléfono el molino entero quedaba por fuera
+   del borde derecho y la copia prometía un buey que nunca aparecía. */
+const OBJETIVO_CALMA = [0.9, 1.0, 1.8];
 
 /* Las etiquetas del paso a paso panelero. Solo la del paso activo se resalta
    (clase CSS, sin tocar geometría ni materiales de Three). */
@@ -1516,8 +1647,10 @@ function YerbateraSVG({ alto = 108 }) {
   );
 }
 
-/* Una persona en escena: billboard Html con el patrón exacto de `Bicho`. */
-function Persona({ pos, df = 7, reducedMotion, title, children }) {
+/* Una persona en escena: billboard Html con el patrón exacto de `Bicho`.
+   `espejo` voltea el dibujo (scaleX -1): el mismo SVG sirve mirando a
+   cualquiera de los dos lados sin duplicar arte. */
+function Persona({ pos, df = 7, reducedMotion, espejo = false, title, children }) {
   return (
     <group position={pos}>
       <Html center distanceFactor={df} zIndexRange={[24, 0]}>
@@ -1525,6 +1658,7 @@ function Persona({ pos, df = 7, reducedMotion, title, children }) {
           className={`mundo-fauna bocana-persona${reducedMotion ? ' bocana-persona--quieta' : ''}`}
           aria-hidden="true"
           title={title}
+          style={espejo ? { transform: 'scaleX(-1)' } : undefined}
         >
           {children}
         </div>
@@ -1554,6 +1688,8 @@ function EscenaBoticaCana({ tier, reducedMotion, etiquetas, paso }) {
       )}
       <LucesDia />
       <NubesDia />
+      {/* el horizonte que ATERRIZA la maqueta: falda de pasto + lomas */}
+      <FondoLomas />
 
       <mesh geometry={geo}>
         <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
@@ -1571,15 +1707,22 @@ function EscenaBoticaCana({ tier, reducedMotion, etiquetas, paso }) {
       {etiquetas && <PasosPanela pasoActivo={paso} />}
 
       {/* LA GENTE: el panelero en su paila y la yerbatera en su botica */}
+      {/* El panelero pasa al lado IZQUIERDO de la hornilla y ESPEJADO: donde
+          estaba (4.35, a la derecha de la paila) el encuadre del teléfono lo
+          cortaba por la mitad y el mecedor —el gesto de revolver que ya
+          traía— se quedaba fuera de pantalla: parecía parado sin oficio.
+          Aquí queda entero, con el mecedor metido EN la paila y sin taparle
+          la boca del fogón a la llama. */}
       <Persona
-        pos={[4.35, Y_PATIO + 0.82, 4.85]}
+        pos={[2.2, Y_PATIO + 0.82, 4.9]}
         reducedMotion={reducedMotion}
+        espejo
         title="El panelero, revolviendo la paila hasta el punto"
       >
         <PaneleroSVG />
       </Persona>
       <Persona
-        pos={[-5.75, Y_PATIO + 0.78, 5.5]}
+        pos={[-5.3, Y_PATIO + 0.78, 5.4]}
         reducedMotion={reducedMotion}
         title="La yerbatera de la botica, con su manojo y su canasto"
       >
@@ -1859,7 +2002,7 @@ export default function MundoBoticaCana3D() {
     const vertical =
       typeof window !== 'undefined' && window.innerWidth < window.innerHeight;
     return vertical
-      ? { position: [-8.5, 7.0, 14.0], fov: 58 }
+      ? { position: [-8.0, 7.4, 15.2], fov: 58 }
       : { position: [2.0, 4.9, 14.8], fov: 45 };
   }, []);
 
