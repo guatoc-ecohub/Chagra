@@ -16,7 +16,11 @@
  *     canal del guarapo, la HORNILLA con la paila humeando hasta punto de miel
  *     y la mesa con las GAVERAS donde cuaja la panela. El proceso legible de
  *     una mirada: caña → molino → jugo → paila → panela, con un recorrido de
- *     5 botones que acerca la cámara al paso activo y resalta su etiqueta.
+ *     6 botones que acerca la cámara al paso activo y resalta su etiqueta —
+ *     los cinco de la panela y, al final, uno que vuelve a la casa a ver de
+ *     cerca las siete matas de la botica (antes NINGÚN paso miraba para allá:
+ *     se tallaron nudos de caña y siete matas distintas que la cámara nunca
+ *     enseñaba de cerca).
  *
  * DIRECCIÓN DE ARTE (todo dentro del framework, nada inventado por fuera):
  *   - Atmósfera del MEDIODÍA claro del kit (`CIELOS_HORA.mediodia`): la
@@ -1672,7 +1676,15 @@ function MesaGaveras({ reducedMotion }) {
 /* El recorrido de la caña a la panela: caña → molino → jugo → paila →
    panela. Única fuente de verdad para la etiqueta 3D, el botón del pie y a
    dónde se acerca la cámara — antes `etiquetas` era un booleano todo-o-nada
-   y esto vivía repetido e inconexo. */
+   y esto vivía repetido e inconexo.
+
+   El paso 6, «La botica», se agrega AL FINAL a propósito y no se entreteje
+   entre los cinco de arriba: esos cinco cuentan un PROCESO con causa y efecto
+   (uno lleva al otro), y la botica no es una etapa de ese proceso sino el
+   otro saber de la casa, aparte. Cerrar con ella es como cierra una visita
+   de verdad a una finca: después del bullicio del trapiche, se vuelve a la
+   casa a ver las matas de cerca — sin reescribir ni renumerar los cinco
+   pasos ya resueltos y con prueba. */
 const RECORRIDO_PANELA = [
   /* Cada paso conserva el objetivo y define un ojo propio. El primer ojo
      entra por el lado sur del cañal, lejos de la enramada, para que se lean
@@ -1682,6 +1694,22 @@ const RECORRIDO_PANELA = [
   { paso: 3, texto: 'El jugo', pos: [4.8, 1.9, 2.8], ojo: [7.3, 4.2, 9.1] },
   { paso: 4, texto: 'La paila', pos: [3.2, 2.5, 4.3], ojo: [5.2, 4.8, 10.7] },
   { paso: 5, texto: 'La panela', pos: [0.7, 2.0, 5.9], ojo: [2.4, 4.1, 12.5] },
+  /* La botica queda del otro lado de la finca (centro real de sus tres
+     canteros: x -8.62..-3.23, z 1.95..6.15 — bbox recalculado a mano desde
+     `Botica()`), lejos de la enramada del trapiche (x 4.85..7.55): el ojo
+     entra por el SUR mirando hacia el norte, así que nunca se cruza con el
+     techo de paja. Dos cosas obligaron a alejarse más que en los pasos 2-5:
+     1) el FOV vertical (58° en el teléfono, el formato de Chagra) da un FOV
+     HORIZONTAL angosto en retrato — a la distancia normal del recorrido
+     (~7) los canteros de los extremos (sábila, ortiga) quedaban cortados
+     fuera de cuadro; hubo que retroceder a ~11.5 para que entren los 5,4 m
+     de ancho de los tres canteros. 2) la yerbatera (el personaje de la
+     botica, parada junto al cantero B en x=-5.3,z=5.4) quedaba CASI exacto
+     en la línea cámara→objetivo y tapaba la ruda; el ojo se corrió al oeste
+     (x negativo de más) para que la línea de mira pase al oeste de ella. El
+     offset ojo-objetivo (≈-2.0, 2.8, 11.0) cae en azimut ~-10° y polar ~76°
+     — dentro de los topes de OrbitControls (±60° / 28.6°-80.2°). */
+  { paso: 6, texto: 'La botica', pos: [-5.9, 1.1, 4.1], ojo: [-7.9, 3.9, 15.1] },
 ];
 /* A dónde mira la cámara cuando no hay paso activo. Corrido un pelo hacia el
    trapiche (0.5→0.9 en x): en el teléfono el molino entero quedaba por fuera
@@ -2179,7 +2207,7 @@ const PASOS_PANELA = [
 const COPY_CALMA =
   'A la izquierda, la botica de la casa; a la derecha, la molienda. Toque el botón para ver los nombres de las matas y el paso a paso de la panela.';
 const COPY_PASOS =
-  'Siga los números: la caña del cañal pasa al molino que mueve el buey, el jugo baja por la canoa a la paila de la hornilla, y la miel en su punto cuaja en las gaveras hecha panela.';
+  'Siga los números: la caña del cañal pasa al molino que mueve el buey, el jugo baja por la canoa a la paila de la hornilla, la miel en su punto cuaja en las gaveras hecha panela, y el paso 6 lo devuelve a la casa a ver de cerca las siete matas de la botica.';
 
 /**
  * MundoBoticaCana3D — la botica campesina y el trapiche panelero, montables con
@@ -2269,7 +2297,7 @@ export default function MundoBoticaCana3D() {
 
         <div className="bocana-chrome">
           <div className="bocana-pie">
-            <ol className="bocana-recorrido" aria-label="Recorrido de la caña a la panela">
+            <ol className="bocana-recorrido" aria-label="Recorrido de la botica y de la caña a la panela">
               {RECORRIDO_PANELA.map((p) => (
                 <li key={p.paso}>
                   <button
