@@ -25,8 +25,8 @@
  * de módulo, cero asignaciones por frame) con presupuesto por `tier`. Todo el
  * ruido es determinista (hash de senos + crearRng sembrado): nada de
  * Math.random en render. `reducedMotion` congela el clima en su fase (snap
- * sin animación), NO monta la cortina de lluvia (hilos congelados leen como
- * glitch) y pasa el frameloop a demanda.
+ * sin animación), deja la cortina de lluvia QUIETA como estampa (hilos
+ * sembrados, estirados y ladeados) y pasa el frameloop a demanda.
  *
  * Mockup standalone con su PROPIO <Canvas>. NO toca mundoData ni el host.
  */
@@ -466,8 +466,12 @@ function Charcos({ climaRef, reducedMotion }) {
       Siembra determinista (x, z, suelo, velocidad) por crearRng; por frame
       solo se recomponen matrices sobre temporales de módulo. La intensidad
       decide cuántas gotas viven (el resto se esconde a escala 0) y el viento
-      ladea toda la cortina. No se monta con reduced-motion. ── */
-function CortinaLluvia({ climaRef, n }) {
+      ladea toda la cortina.
+      Con reduced-motion SÍ se monta, pero QUIETA: hilos sembrados a alturas
+      deterministas, estirados y ladeados por el viento — la lluvia como se
+      dibuja en una estampa. Antes no se montaba y la escena de "lluvia" salía
+      seca en cualquier captura o para cualquier usuario con reduced-motion. ── */
+function CortinaLluvia({ climaRef, n, reducedMotion }) {
   const grupo = useRef(null);
   const inst = useRef(null);
   const mat = useRef(null);
@@ -496,9 +500,11 @@ function CortinaLluvia({ climaRef, n }) {
       const g = gotas[i];
       if (i < vivas) {
         const tramo = TECHO_LLUVIA - g.suelo;
-        const y = TECHO_LLUVIA - ((t * 6.4 * g.vel + g.fase * tramo * 7) % tramo);
+        const y = reducedMotion
+          ? g.suelo + g.fase * tramo // estampa: cada hilo quieto en su altura
+          : TECHO_LLUVIA - ((t * 6.4 * g.vel + g.fase * tramo * 7) % tramo);
         TMP_P.set(g.x, y, g.z);
-        TMP_S.set(1, 0.7 + 0.5 * c.lluvia, 1);
+        TMP_S.set(1, (reducedMotion ? 1.15 : 0.7) + 0.5 * c.lluvia, 1);
       } else {
         TMP_P.set(g.x, -1, g.z);
         TMP_S.set(0, 0, 0);
@@ -513,7 +519,9 @@ function CortinaLluvia({ climaRef, n }) {
   return (
     <group ref={grupo}>
       <instancedMesh ref={inst} args={[undefined, undefined, n]} frustumCulled={false}>
-        <cylinderGeometry args={[0.011, 0.011, 0.42, 3]} />
+        {/* hilos un pelo más gruesos y largos: a dpr de teléfono los de 0.011
+            desaparecían y el aguacero se leía como neblina, no como lluvia */}
+        <cylinderGeometry args={[0.016, 0.016, 0.5, 3]} />
         <meshBasicMaterial ref={mat} color="#d7e4ec" transparent opacity={0.2} depthWrite={false} />
       </instancedMesh>
     </group>
@@ -736,7 +744,7 @@ function Rotulo({ pos, texto, sub, distancia = 14 }) {
 }
 
 /* ── El diorama completo (dentro del Canvas) ──────────────────────────────── */
-function DioramaLluvia({ perfil, tier, reducedMotion, fase, pin, climaRef, alCambiar }) {
+function DioramaLluvia({ perfil, tier, reducedMotion, fase, pin, climaRef, alCambiar, retrato }) {
   const geoTerreno = useMemo(() => construirTerreno(), []);
   const geoRio = useMemo(() => construirRio(), []);
   useEffect(
@@ -769,7 +777,7 @@ function DioramaLluvia({ perfil, tier, reducedMotion, fase, pin, climaRef, alCam
       <RioCreciente climaRef={climaRef} geometria={geoRio} reducedMotion={reducedMotion} />
       <Charcos climaRef={climaRef} reducedMotion={reducedMotion} />
       <Nubario climaRef={climaRef} reducedMotion={reducedMotion} />
-      {!reducedMotion ? <CortinaLluvia climaRef={climaRef} n={nGotas} /> : null}
+      <CortinaLluvia climaRef={climaRef} n={nGotas} reducedMotion={reducedMotion} />
       <Arcoiris climaRef={climaRef} />
       <CasitaCosecha climaRef={climaRef} />
       <Zanjas climaRef={climaRef} />
@@ -787,11 +795,25 @@ function DioramaLluvia({ perfil, tier, reducedMotion, fase, pin, climaRef, alCam
         />
       ) : null}
 
-      {/* rótulos didácticos, sobrios */}
-      <Rotulo pos={[TANQUE.x - 0.4, CASA_Y + 1.9, TANQUE.z]} texto="Cosecha de lluvia" sub="el techo llena el tanque" />
-      <Rotulo pos={[ZANJAS[0].x, altura(ZANJAS[0].x, ZANJAS[0].z) + 1.1, ZANJAS[0].z]} texto="Zanja de infiltración" sub="frena el agua y la siembra" distancia={13} />
-      <Rotulo pos={[rioX(1.4), altura(rioX(1.4), 1.4) + 1.2, 1.4]} texto="El río crece" sub="respete su ronda" distancia={13} />
-      <Rotulo pos={[CHARCOS[0].x, CHARCOS[0].y + 0.9, CHARCOS[0].z]} texto="El charco infiltra" sub="suelo cubierto, agua sembrada" distancia={12} />
+      {/* rótulos didácticos, sobrios. En retrato el fov angosto proyectaba los
+          de la izquierda con el centro pegado al borde y el texto salía
+          cortado: se corren a anclas que caen dentro del cuadro, más chicos y
+          sin subtítulo (menos ancho, misma lección). */}
+      {retrato ? (
+        <>
+          <Rotulo pos={[TANQUE.x - 0.4, CASA_Y + 1.9, TANQUE.z]} texto="Cosecha de lluvia" distancia={11} />
+          <Rotulo pos={[ZANJAS[1].x, altura(ZANJAS[1].x, ZANJAS[1].z) + 1.1, ZANJAS[1].z]} texto="Zanja de infiltración" distancia={10} />
+          <Rotulo pos={[rioX(-0.5) + 0.5, altura(rioX(-0.5), -0.5) + 1.2, -0.5]} texto="El río crece" distancia={10} />
+          <Rotulo pos={[CHARCOS[1].x, CHARCOS[1].y + 0.9, CHARCOS[1].z]} texto="El charco infiltra" distancia={10} />
+        </>
+      ) : (
+        <>
+          <Rotulo pos={[TANQUE.x - 0.4, CASA_Y + 1.9, TANQUE.z]} texto="Cosecha de lluvia" sub="el techo llena el tanque" />
+          <Rotulo pos={[ZANJAS[0].x, altura(ZANJAS[0].x, ZANJAS[0].z) + 1.1, ZANJAS[0].z]} texto="Zanja de infiltración" sub="frena el agua y la siembra" distancia={13} />
+          <Rotulo pos={[rioX(1.4), altura(rioX(1.4), 1.4) + 1.2, 1.4]} texto="El río crece" sub="respete su ronda" distancia={13} />
+          <Rotulo pos={[CHARCOS[0].x, CHARCOS[0].y + 0.9, CHARCOS[0].z]} texto="El charco infiltra" sub="suelo cubierto, agua sembrada" distancia={12} />
+        </>
+      )}
 
       <OrbitControls
         makeDefault
@@ -799,7 +821,7 @@ function DioramaLluvia({ perfil, tier, reducedMotion, fase, pin, climaRef, alCam
         enableZoom
         minDistance={3.5}
         maxDistance={20}
-        target={[0.4, 0.8, 0.6]}
+        target={retrato ? [3.0, 0.9, -0.4] : [0.4, 0.8, 0.6]}
         minPolarAngle={0.3}
         maxPolarAngle={1.38}
         enableDamping
@@ -865,10 +887,11 @@ export default function ValleLluvia3D({ onBack }) {
   const [pin, setPin] = useState(false);
   const climaRef = useRef({ ...CLIMA_INICIAL });
   const alCambiar = useCallback((id) => setFase(id), []);
-  /* Retrato (teléfono en vertical, 390×844): con la cámara de escritorio la
-     ladera se comía el cuadro entero — ni casa, ni tanque, ni río a la vez.
-     El diorama entero es el sujeto: en retrato la cámara sube, se aleja y
-     abre el fov para que el valle completo quepa en la franja del medio. */
+  /* Retrato (teléfono en vertical, 390×844): la toma alta anterior llenaba el
+     cuadro de pura ladera — la casa de la cosecha salía partida por el borde
+     derecho y ni el río ni el cielo se leían. La cámara ahora BAJA (menos
+     cenital), mira hacia la casa (target x=3) y deja franja de cielo arriba:
+     casa+tanque completos, el río culebreando y las nubes de la tormenta. */
   const retrato = useMemo(
     () => typeof window !== 'undefined'
       && typeof window.matchMedia === 'function'
@@ -888,7 +911,7 @@ export default function ValleLluvia3D({ onBack }) {
         className={`vlluvia-canvas${listo ? ' vlluvia-canvas--lista' : ''}`}
         dpr={tier === 'alto' ? [1, 1.5] : tier === 'medio' ? [1, 1.3] : 1}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={retrato ? { position: [11.4, 11.1, 12.9], fov: 52 } : { position: [11.5, 7.6, 12.8], fov: 44 }}
+        camera={retrato ? { position: [10.2, 6.5, 13.8], fov: 52 } : { position: [11.5, 7.6, 12.8], fov: 44 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
@@ -900,6 +923,7 @@ export default function ValleLluvia3D({ onBack }) {
           pin={pin}
           climaRef={climaRef}
           alCambiar={alCambiar}
+          retrato={retrato}
         />
       </Canvas>
 
