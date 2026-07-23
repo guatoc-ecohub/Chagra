@@ -71,7 +71,9 @@ describe('MundoBoticaCana3D', () => {
       expect(container.querySelector('group[name="etiqueta-paso-1"]')).toBeNull();
       const foco = container.querySelector('group[name="foco-paso"]');
       expect(foco).toBeTruthy();
-      expect(foco.getAttribute('position')).toBe('0.5,1,1.5');
+      // #2698 reencuadró la vista calma hacia el trapiche para que el molino
+      // y el buey queden dentro del encuadre vertical.
+      expect(foco.getAttribute('position')).toBe('0.9,1,1.8');
       expect(screen.getByRole('status')).toHaveTextContent(/Toque el botón/i);
     });
 
@@ -134,7 +136,9 @@ describe('MundoBoticaCana3D', () => {
       expect(container.querySelector('group[name="etiqueta-paso-4"]')).toBeNull();
       expect(container.querySelector('group[name="ojo-paso"]')).toBeNull();
       const foco = container.querySelector('group[name="foco-paso"]');
-      expect(foco.getAttribute('position')).toBe('0.5,1,1.5');
+      // Al apagar el recorrido se vuelve a la MISMA vista calma que #2698
+      // reencuadró hacia el trapiche (0.9,1,1.8), no al punto de reposo viejo.
+      expect(foco.getAttribute('position')).toBe('0.9,1,1.8');
     });
   });
 });
