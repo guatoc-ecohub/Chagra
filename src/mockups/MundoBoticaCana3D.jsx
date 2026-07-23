@@ -1446,10 +1446,11 @@ function CanalGuarapo({ reducedMotion }) {
         <boxGeometry args={[4.0, 0.14, 0.06]} />
         <meshLambertMaterial color={P.maderaVieja} flatShading />
       </mesh>
-      {/* la cinta de jugo */}
+      {/* la cinta de jugo — aclarada hacia el dorado: con el P.guarapo puro se
+          confundía con la tabla de la canoa y el jugo no se LEÍA líquido */}
       <mesh position={[0, 0.07, 0]}>
-        <boxGeometry args={[3.9, 0.03, 0.16]} />
-        <meshLambertMaterial color={P.guarapo} flatShading />
+        <boxGeometry args={[3.9, 0.03, 0.18]} />
+        <meshLambertMaterial color={mezclar(P.guarapo, '#f0c86a', 0.3)} flatShading />
       </mesh>
       {/* los pulsos de guarapo que BAJAN (el brillo que corre) */}
       <group ref={pulsos}>
@@ -1465,12 +1466,12 @@ function CanalGuarapo({ reducedMotion }) {
           recorrido molino → canoa no se leía */}
       <group position={[1.88, 0, 0]}>
         <mesh ref={nacimiento} position={[0, 0.3, 0]}>
-          <cylinderGeometry args={[0.028, 0.042, 0.38, 5]} />
+          <cylinderGeometry args={[0.05, 0.07, 0.42, 5]} />
           <meshLambertMaterial color={mezclar(P.guarapo, '#f0c86a', 0.45)} flatShading />
         </mesh>
         {/* el salpique donde el chorro toca la canoa */}
-        <mesh position={[0, 0.1, 0]} scale={[1, 0.4, 1]}>
-          <sphereGeometry args={[0.055, 6, 4]} />
+        <mesh position={[0, 0.11, 0]} scale={[1, 0.4, 1]}>
+          <sphereGeometry args={[0.09, 6, 4]} />
           <meshLambertMaterial color={P.espuma} flatShading />
         </mesh>
       </group>
@@ -1479,10 +1480,10 @@ function CanalGuarapo({ reducedMotion }) {
         {motas.espuma.map((d, i) => (
           <mesh
             key={i}
-            position={[1.7 - d.fase * 3.45, 0.095, d.z]}
+            position={[1.7 - d.fase * 3.45, 0.1, d.z]}
             scale={[d.esc, d.esc * 0.5, d.esc]}
           >
-            <sphereGeometry args={[0.032, 5, 4]} />
+            <sphereGeometry args={[0.055, 5, 4]} />
             <meshLambertMaterial color={P.espuma} flatShading />
           </mesh>
         ))}
@@ -1494,10 +1495,10 @@ function CanalGuarapo({ reducedMotion }) {
         {motas.cachaza.map((d, i) => (
           <mesh
             key={i}
-            position={[1.6 - d.fase * 3.3, 0.092, d.z]}
+            position={[1.6 - d.fase * 3.3, 0.098, d.z]}
             scale={[d.esc, d.esc * 0.42, d.esc]}
           >
-            <sphereGeometry args={[0.045, 5, 4]} />
+            <sphereGeometry args={[0.065, 5, 4]} />
             <meshLambertMaterial color={mezclar(P.cachaza, '#a8a45c', 0.35)} flatShading />
           </mesh>
         ))}
@@ -1522,8 +1523,8 @@ function CanalGuarapo({ reducedMotion }) {
         {[
           [-0.2, 0.09], [0.02, -0.1], [-0.06, 0.02],
         ].map((c, i) => (
-          <mesh key={i} position={[c[0], -0.165, c[1]]} scale={[1, 0.4, 1]}>
-            <sphereGeometry args={[0.05 + (i % 2) * 0.015, 5, 4]} />
+          <mesh key={i} position={[c[0], -0.163, c[1]]} scale={[1, 0.4, 1]}>
+            <sphereGeometry args={[0.07 + (i % 2) * 0.018, 5, 4]} />
             <meshLambertMaterial
               color={mezclar(P.cachaza, '#a8a45c', 0.25 + i * 0.12)}
               flatShading
