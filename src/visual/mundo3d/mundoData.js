@@ -71,14 +71,20 @@ export const MUNDO = {
       vidaFrom: 'mundoSubsueloEngine',
       capas: [
         { nombre: 'hojarasca', color: '#6b4a2e', alto: 0.5, bichos: ['lombriz'] },
-        { nombre: 'suelo negro', color: '#3a2a1a', alto: 1.2, bichos: ['lombriz', 'raiz', 'hifa'] },
+        // #3a2a1a leía como masa NEGRA ilegible aun con el piso de luz (QA
+        // visual 2026-07-23): albedo, no iluminación. Sigue siendo la capa más
+        // oscura (la didáctica del "suelo negro" queda), pero ahora se lee.
+        { nombre: 'suelo negro', color: '#4a3624', alto: 1.2, bichos: ['lombriz', 'raiz', 'hifa'] },
         { nombre: 'subsuelo', color: '#8a6a44', alto: 1.0, bichos: ['raiz'] },
       ],
     },
     hotspots: [
       { id: 'juego', pos: [0, 0.6, 0.6], emoji: '🪱', label: 'Despierte su suelo', view: 'subsuelo' },
       { id: 'cuaderno', pos: [1.3, 0.2, 0.4], emoji: '📓', label: 'Cuaderno del suelo', view: 'salud_suelo' },
-      { id: 'crom', pos: [-1.3, 0.2, 0.4], emoji: '🎯', label: 'Cromatografía', view: 'cromatografia' },
+      // La cromatografía lee el PERFIL completo → su puerta va abajo, en el
+      // subsuelo. En y=0.2 su píldora se montaba sobre «Despierte su suelo» y
+      // tapaba el texto en móvil 390px (QA visual 2026-07-23).
+      { id: 'crom', pos: [-1.3, -0.55, 0.4], emoji: '🎯', label: 'Cromatografía', view: 'cromatografia' },
     ],
     entrada: { zoom: 6.5, narra: 'suelo' },
   },
