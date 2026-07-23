@@ -27,6 +27,13 @@
 //                                     [--routes slug1,slug2,...] [--rates 1,4,6]
 //                                     [--window 12000] [--settle 6000] [--port <PID-derivado por defecto>]
 //                                     [--simular-equipo <núcleos>,<GB-RAM>]
+//                                     [--viewport WxH] [--dpr N]
+//
+// --viewport/--dpr (agregados 2026-07-23, ver ops/informes/valle-cuello-
+// 2026-07-23.md): achican el viewport/devicePixelRatio de Playwright sin
+// tocar la escena — sirve para el test canónico de fill-rate (achicar el
+// viewport a casi cero píxeles y ver si el fps se dispara). Default sin
+// pasarlos: 390×844 @dpr2, igual que siempre.
 //
 // --simular-equipo es EXTRA (no lo pidió el encargo original, que solo pedía
 // throttling de CPU): sobreescribe navigator.hardwareConcurrency/deviceMemory
@@ -173,6 +180,8 @@ function parseArgs(argv) {
     // que un Moto E real ejecuta (a un Moto E real decidirTier() lo manda a
     // 'medio' o 'bajo'/2D, un camino de render distinto y más liviano).
     hw: null, mem: null,
+    // --viewport WxH / --dpr N: ver nota en medirRuta(). null = default de siempre.
+    viewport: null, dpr: null,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -184,6 +193,8 @@ function parseArgs(argv) {
     else if (a === '--settle') out.settle = Number(argv[++i]);
     else if (a === '--port') out.port = Number(argv[++i]);
     else if (a === '--simular-equipo') { const [c, m] = argv[++i].split(','); out.hw = Number(c); out.mem = Number(m); }
+    else if (a === '--viewport') { const [w, h] = argv[++i].split('x').map(Number); out.viewport = { width: w, height: h }; }
+    else if (a === '--dpr') out.dpr = Number(argv[++i]);
   }
   return out;
 }
@@ -361,7 +372,12 @@ function percentil(sortedArr, p) {
 
 async function medirRuta(browser, ruta, rate, opts) {
   const ctx = await browser.newContext({
-    viewport: { width: 390, height: 844 }, deviceScaleFactor: 2,
+    // --viewport WxH y --dpr N (opcionales, EXPERIMENTO B de fill-rate,
+    // ver ops/informes/valle-cuello-2026-07-23.md): permiten achicar el
+    // viewport a casi cero píxeles manteniendo la MISMA escena/draw-calls/
+    // triángulos, para separar fill-rate/overdraw de geometría pura. Sin
+    // pasarlos, el comportamiento es idéntico al de siempre (390×844 @2x).
+    viewport: opts.viewport || { width: 390, height: 844 }, deviceScaleFactor: opts.dpr != null ? opts.dpr : 2,
     // OJO: gate-real-gpu.mjs usa reducedMotion:'reduce' porque quiere una
     // captura ESTÁTICA y estable. Aquí es EXACTAMENTE al revés: la app lee
     // prefers-reduced-motion y, si está en 'reduce', pone el frameloop de
@@ -577,7 +593,7 @@ async function main() {
       }
       let r;
       try {
-        r = await medirRuta(browser, ruta, rate, { base, settle: ARGS.settle, window: ARGS.window, hw: ARGS.hw, mem: ARGS.mem });
+        r = await medirRuta(browser, ruta, rate, { base, settle: ARGS.settle, window: ARGS.window, hw: ARGS.hw, mem: ARGS.mem, viewport: ARGS.viewport, dpr: ARGS.dpr });
       } catch (e) {
         // El navegador se cayó (crash de la GPU, OOM, lo que sea): relanzar UNA
         // vez y reintentar esta misma medición en vez de perder TODO el resto
@@ -586,7 +602,7 @@ async function main() {
         try { await browser.close(); } catch { /* ya estaba muerto */ }
         browser = await lanzarBrowser();
         try {
-          r = await medirRuta(browser, ruta, rate, { base, settle: ARGS.settle, window: ARGS.window, hw: ARGS.hw, mem: ARGS.mem });
+          r = await medirRuta(browser, ruta, rate, { base, settle: ARGS.settle, window: ARGS.window, hw: ARGS.hw, mem: ARGS.mem, viewport: ARGS.viewport, dpr: ARGS.dpr });
         } catch (e2) {
           r = {
             slug: ruta.slug, nombre: ruta.nombre, familia: ruta.familia, rate,

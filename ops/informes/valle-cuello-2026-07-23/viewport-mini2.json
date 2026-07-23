@@ -1,0 +1,32 @@
+{
+  "fecha": "2026-07-23T06:18:12.493Z",
+  "dist": "/home/kortux/Workspace/chagra/dist",
+  "ventanaMedicionMs": 15000,
+  "asentamientoMs": 8000,
+  "rates": [
+    1
+  ],
+  "resultados": [
+    {
+      "slug": "mockups/entrada-3d",
+      "nombre": "Valle (EntradaValle3D — home 3D, mismo componente que la ruta valle3d)",
+      "familia": "valle",
+      "rate": 1,
+      "equipoSimulado": null,
+      "status": "ok",
+      "renderer": "ANGLE (AMD, AMD Radeon Vega 10 Graphics (radeonsi raven ACO), OpenGL ES 3.2)",
+      "error": null,
+      "fpsAvg": 15.5,
+      "fpsP5": 10,
+      "fpsP95": 29.9,
+      "worstFrameMs": 250,
+      "drawCallsAvg": 611,
+      "trianglesAvg": 963292,
+      "geometrias": 1967,
+      "texturas": 9,
+      "tiempoPrimerFrameMs": 3365,
+      "jsHeapMB": 46.4,
+      "framesCapturados": 233
+    }
+  ]
+}
