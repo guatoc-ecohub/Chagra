@@ -264,20 +264,24 @@ function FuegoFogon({ tier, reducedMotion, fuerza = 1 }) {
     const p = 0.82 + 0.18 * Math.sin(t * 9.1) * Math.sin(t * 3.7 + 1.2);
     if (llama1.current) llama1.current.scale.set(1, p, 1);
     if (llama2.current) llama2.current.scale.set(1, 1.5 - p * 0.5, 1);
-    if (luz.current) luz.current.intensity = (0.85 + 0.22 * (p - 0.82)) * fuerza;
+    if (luz.current) luz.current.intensity = (1.08 + 0.26 * (p - 0.82)) * fuerza;
   });
   return (
-    <group position={[-2.34, 0.16, 0.2]}>
+    // En la BOCA de la candela, no adentro de la masa: el hueco de la boca es
+    // geometría maciza (caja tinta hasta x=-2.06) y el grupo vivía en -2.34 —
+    // las llamas quedaban ENTERRADAS en el adobe, invisibles. Aquí el fuego
+    // asoma por el frente de la boca, que es donde se ve de verdad.
+    <group position={[-2.06, 0.16, 0.2]}>
       {/* las brasas y las dos lenguas de candela */}
       <mesh position={[0, 0.03, 0]}>
         <boxGeometry args={[0.34, 0.06, 0.4]} />
         <meshBasicMaterial color="#e05a2b" />
       </mesh>
-      <mesh ref={llama1} position={[0.02, 0.16, -0.06]}>
+      <mesh ref={llama1} position={[0.04, 0.16, -0.06]}>
         <coneGeometry args={[0.085, 0.26, 6]} />
         <meshBasicMaterial color="#ff9a3d" transparent opacity={0.92} />
       </mesh>
-      <mesh ref={llama2} position={[-0.04, 0.13, 0.09]}>
+      <mesh ref={llama2} position={[0.07, 0.13, 0.09]}>
         <coneGeometry args={[0.06, 0.18, 6]} />
         <meshBasicMaterial color={LUCES.candela} transparent opacity={0.85} />
       </mesh>
@@ -286,10 +290,10 @@ function FuegoFogon({ tier, reducedMotion, fuerza = 1 }) {
       <pointLight
         ref={luz}
         color="#ffb066"
-        intensity={0.92 * fuerza}
-        distance={6.5}
+        intensity={1.15 * fuerza}
+        distance={7.5}
         decay={1.8}
-        position={[0.1, 0.55, 0]}
+        position={[0.15, 0.55, 0]}
       />
     </group>
   );
@@ -361,13 +365,13 @@ const LUCES_MUNDOS = [
   { color: LUCES.luna, pos: [0.05, 1.58] },
 ];
 
-function VentanaMundos({ atm, reducedMotion, onPortales }) {
+function VentanaMundos({ atm, noche, reducedMotion, onPortales }) {
   const velo = useRef(null);
   const luces = useRef(null);
   useFrame(({ clock }) => {
     if (reducedMotion) return;
     const t = clock.elapsedTime;
-    if (velo.current) velo.current.opacity = 0.2 + 0.1 * Math.sin(t * 1.1);
+    if (velo.current) velo.current.opacity = 0.06 + 0.04 * Math.sin(t * 1.1);
     const g = luces.current;
     if (g) {
       for (let i = 0; i < g.children.length; i++) {
@@ -380,6 +384,19 @@ function VentanaMundos({ atm, reducedMotion, onPortales }) {
   const w = VENTANA_MUNDOS.x1 - VENTANA_MUNDOS.x0 - 0.04;
   const h = VENTANA_MUNDOS.alto - VENTANA_MUNDOS.base - 0.04;
   const z = -SALA.fondo / 2 + 0.02;
+  /* LO QUE SE VE POR EL VANO ES PAISAJE, no un plano quemado: de día el cielo
+     azulado del valle (rellenoFrio templa el crema del corral, que solo
+     dejaba blanco puro), la cordillera lejana en bruma y la loma verde
+     cercana. De noche todo baja a índigo de luna. */
+  const cieloAfuera = noche
+    ? mezclar(CIELO_NOCHE_CASA, LUCES.luna, 0.18)
+    : mezclar(LUCES.rellenoFrio, atm.cielo, 0.32);
+  const cordillera = noche
+    ? mezclar(CIELO_NOCHE_CASA, VERDES.altoAndino, 0.3)
+    : mezclar(VERDES.altoAndino, LUCES.luna, 0.42);
+  const loma = noche
+    ? mezclar(VERDES.monte, CIELO_NOCHE_CASA, 0.72)
+    : mezclar(VERDES.brote, NIEBLAS.dorada, 0.18);
   return (
     <group
       onClick={
@@ -393,19 +410,29 @@ function VentanaMundos({ atm, reducedMotion, onPortales }) {
       onPointerOver={onPortales ? alApuntar : undefined}
       onPointerOut={onPortales ? alSoltar : undefined}
     >
-      {/* el cielo-portal: la hora del valle mezclada con la plata de la luna */}
+      {/* el cielo de afuera (la hora del valle, templada — nunca blanco) */}
       <mesh position={[cx, cy, z]}>
         <planeGeometry args={[w, h]} />
-        <meshBasicMaterial color={mezclar(atm.cielo, LUCES.luna, 0.45)} />
+        <meshBasicMaterial color={cieloAfuera} />
       </mesh>
-      {/* el velo dorado que respira sobre el vano (la invitación) */}
+      {/* la cordillera lejana, en bruma */}
+      <mesh position={[cx, VENTANA_MUNDOS.base + 0.34, z + 0.006]}>
+        <planeGeometry args={[w, 0.42]} />
+        <meshBasicMaterial color={cordillera} />
+      </mesh>
+      {/* la loma verde cercana (el valle asomándose al vano) */}
+      <mesh position={[cx, VENTANA_MUNDOS.base + 0.12, z + 0.012]}>
+        <planeGeometry args={[w, 0.22]} />
+        <meshBasicMaterial color={loma} />
+      </mesh>
+      {/* el velo dorado que respira sobre el vano (la invitación, tenue) */}
       <mesh position={[cx, cy, z + 0.015]}>
         <planeGeometry args={[w, h]} />
         <meshBasicMaterial
           ref={velo}
           color={NIEBLAS.dorada}
           transparent
-          opacity={0.24}
+          opacity={0.08}
           depthWrite={false}
           blending={THREE.AdditiveBlending}
         />
@@ -570,17 +597,23 @@ function Diorama({ tier, reducedMotion, foco, onPortales, onFermentos }) {
           techo. De día la hora del valle; de noche se APAGA a índigo. */}
       <color attach="background" args={[fondoCasa]} />
 
-      {/* LA PENUMBRA es la imagen: el ambiente se queda corto a propósito —
-          una casa de tapia se alumbra por UN vano y el resto es sombra que
-          abriga. De noche baja aún más y queda el fogón. */}
+      {/* LA PENUMBRA sigue siendo la imagen, pero con LUZ DE LECTURA: la
+          cocina tiene que leerse (el fogón, la loza, la cuelga). El refuerzo
+          compensa cuando la atmósfera viene tenue (patrón de #2707) y la base
+          sube para que el interior no sea un pardo ciego. De noche baja y
+          manda el fogón. */}
       <ambientLight
         color={LUCES.ambienteTibio}
-        intensity={sol.deDia ? 0.15 + 0.14 * atm.intensidad : 0.12}
+        intensity={
+          sol.deDia
+            ? 0.24 + 0.16 * atm.intensidad + 0.12 * Math.max(0, 1 - atm.intensidad)
+            : 0.14
+        }
       />
       <hemisphereLight
         skyColor={atm.cielo}
         groundColor={NEUTROS.tinta}
-        intensity={sol.deDia ? 0.19 : 0.12}
+        intensity={sol.deDia ? 0.26 : 0.13}
       />
       {/* LA LUZ TIENE FUENTE: de día la direccional viaja por el arco REAL del
           sol (por eso el rectángulo de la ventana camina y las sombras giran
@@ -625,22 +658,75 @@ function Diorama({ tier, reducedMotion, foco, onPortales, onFermentos }) {
           }
         />
       </mesh>
-      {/* el resplandor del día en el vano de la puerta */}
-      <mesh position={[(PUERTA.x0 + PUERTA.x1) / 2, PUERTA.alto / 2, hz + 0.03]}>
-        <planeGeometry args={[PUERTA.x1 - PUERTA.x0 - 0.04, PUERTA.alto - 0.04]} />
-        <meshBasicMaterial color={mezclar(atm.cielo, NIEBLAS.dorada, 0.35)} side={THREE.DoubleSide} />
-      </mesh>
-      {/* y en la ventana del sur */}
-      <mesh
+      {/* lo que se ve por el vano de la PUERTA: cielo, loma y el pasto del
+          umbral — paisaje de verdad, no un plano dorado quemado */}
+      <group position={[(PUERTA.x0 + PUERTA.x1) / 2, 0, hz + 0.03]}>
+        <mesh position={[0, PUERTA.alto / 2, 0]}>
+          <planeGeometry args={[PUERTA.x1 - PUERTA.x0 - 0.04, PUERTA.alto - 0.04]} />
+          <meshBasicMaterial
+            color={
+              sol.deDia
+                ? mezclar(mezclar(LUCES.rellenoFrio, atm.cielo, 0.4), NIEBLAS.dorada, 0.18)
+                : mezclar(CIELO_NOCHE_CASA, LUCES.luna, 0.16)
+            }
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+        <mesh position={[0, 0.68, 0.012]}>
+          <planeGeometry args={[PUERTA.x1 - PUERTA.x0 - 0.04, 0.3]} />
+          <meshBasicMaterial
+            color={
+              sol.deDia
+                ? mezclar(VERDES.templado, LUCES.luna, 0.3)
+                : mezclar(VERDES.monte, CIELO_NOCHE_CASA, 0.7)
+            }
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+        <mesh position={[0, 0.27, 0.024]}>
+          <planeGeometry args={[PUERTA.x1 - PUERTA.x0 - 0.04, 0.56]} />
+          <meshBasicMaterial
+            color={
+              sol.deDia
+                ? mezclar(VERDES.brote, atm.niebla, 0.3)
+                : mezclar(VERDES.brote, CIELO_NOCHE_CASA, 0.82)
+            }
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      </group>
+      {/* y por la VENTANA DEL SUR: el mismo día con su loma (de aquí sale el
+          haz — luminosa sí, quemada no) */}
+      <group
         position={[
           (VENTANA_SUR.x0 + VENTANA_SUR.x1) / 2,
-          (VENTANA_SUR.base + VENTANA_SUR.alto) / 2,
+          0,
           hz + 0.03,
         ]}
       >
-        <planeGeometry args={[VENTANA_SUR.x1 - VENTANA_SUR.x0 - 0.04, VENTANA_SUR.alto - VENTANA_SUR.base - 0.04]} />
-        <meshBasicMaterial color={mezclar(atm.cielo, NIEBLAS.dorada, 0.35)} side={THREE.DoubleSide} />
-      </mesh>
+        <mesh position={[0, (VENTANA_SUR.base + VENTANA_SUR.alto) / 2, 0]}>
+          <planeGeometry args={[VENTANA_SUR.x1 - VENTANA_SUR.x0 - 0.04, VENTANA_SUR.alto - VENTANA_SUR.base - 0.04]} />
+          <meshBasicMaterial
+            color={
+              sol.deDia
+                ? mezclar(mezclar(LUCES.rellenoFrio, atm.cielo, 0.48), NIEBLAS.dorada, 0.14)
+                : mezclar(CIELO_NOCHE_CASA, LUCES.luna, 0.14)
+            }
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+        <mesh position={[0, VENTANA_SUR.base + 0.16, 0.012]}>
+          <planeGeometry args={[VENTANA_SUR.x1 - VENTANA_SUR.x0 - 0.04, 0.3]} />
+          <meshBasicMaterial
+            color={
+              sol.deDia
+                ? mezclar(VERDES.brote, NIEBLAS.dorada, 0.22)
+                : mezclar(VERDES.monte, CIELO_NOCHE_CASA, 0.72)
+            }
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      </group>
 
       {/* EL RECTÁNGULO DE SOL: la ventana del sur riega su vano en el piso y
           la mancha CAMINA con el día — sliver al pie del muro a mediodía,
@@ -718,33 +804,37 @@ function Diorama({ tier, reducedMotion, foco, onPortales, onFermentos }) {
       <HumoFogon n={nHumo} reducedMotion={reducedMotion} />
 
       {/* LOS DOS ACCESOS legibles desde adentro */}
-      <VentanaMundos atm={atm} reducedMotion={reducedMotion} onPortales={onPortales} />
+      <VentanaMundos atm={atm} noche={!sol.deDia} reducedMotion={reducedMotion} onPortales={onPortales} />
       <RinconFermentos reducedMotion={reducedMotion} onFermentos={onFermentos} />
 
       {/* el anillo del paso didáctico (lo maneja el host) */}
       <FocoPaso foco={foco} reducedMotion={reducedMotion} />
 
+      {/* EL ENCUADRE MIRA AL FOGÓN: el paso 1 se llama "El fogón" y la cámara
+          tiene que abrirle el cuadro — el rincón del fuego, la cuelga y el
+          humo, con la mesa de refilón. (Antes miraba la mesa vacía y el
+          corazón de la cocina quedaba fuera de pantalla.) */}
       <OrbitControls
         ref={controls}
         makeDefault
-        target={[-0.2, 0.98, -0.4]}
+        target={[-1.6, 0.95, 0.15]}
         enablePan={false}
         enableZoom
         minDistance={1.3}
-        maxDistance={3.3}
+        maxDistance={4.0}
         minPolarAngle={0.6}
         maxPolarAngle={1.52}
-        minAzimuthAngle={-1.15}
-        maxAzimuthAngle={1.15}
+        minAzimuthAngle={-1.35}
+        maxAzimuthAngle={1.35}
         enableDamping
         dampingFactor={0.08}
       />
       {/* La LLEGADA: el dolly corto de cruzar el umbral — de la puerta hacia
-          el centro del cuarto, una vez por sesión. */}
+          el rincón del fogón, una vez por sesión. */}
       <CamaraDirector
         controls={controls}
-        reposo={[1.35, 1.95, 2.35]}
-        mirada={[-0.3, 1.35, -0.5]}
+        reposo={[1.5, 1.7, 1.45]}
+        mirada={[-1.6, 1.05, 0.15]}
         respiro={0.03}
         activa={!reducedMotion && tier !== 'bajo'}
         unaVezClave="mundoCasaAdentro"
@@ -779,7 +869,7 @@ export default function EscenaCasaAdentro({
       dpr={perfil.dpr}
       gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
       shadows={perfil.sombras ? 'soft' : false}
-      camera={{ position: [1.35, 1.95, 2.35], fov: 48 }}
+      camera={{ position: [1.5, 1.7, 1.45], fov: 48 }}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={() => setListo(true)}
     >
