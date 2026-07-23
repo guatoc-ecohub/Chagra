@@ -41,6 +41,25 @@ describe('flattenDoc indexa clima y altitud', () => {
     expect(claves).not.toContain('version');
   });
 
+  it('indexa valores cortos con letras, pero conserva fuera el ruido corto y los ids', () => {
+    const passages = flattenDoc({
+      nombre_comun: 'lulo',
+      codigo_fertilizante: 'NPK',
+      respuesta: 'si',
+      cantidad: '12',
+      hash: 'a3f0c9d1e5b7a2f4',
+      uuid: '550e8400-e29b-41d4-a716-446655440000',
+    });
+    const texts = passages.map((p) => p.text);
+
+    expect(texts).toContain('lulo');
+    expect(texts).toContain('NPK');
+    expect(texts).not.toContain('si');
+    expect(texts).not.toContain('12');
+    expect(texts).not.toContain('a3f0c9d1e5b7a2f4');
+    expect(texts).not.toContain('550e8400-e29b-41d4-a716-446655440000');
+  });
+
   it('no rompe lo que ya funcionaba: los textos largos siguen enteros', () => {
     const p = flattenDoc(doc).find((x) => x.key === 'valor_pedagogico');
     expect(p.text).toBe(doc.valor_pedagogico);

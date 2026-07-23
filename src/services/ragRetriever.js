@@ -220,7 +220,7 @@ function formatKeyLabel(key) {
 function isContextualField(key, val) {
   if (typeof val === 'number' && Number.isFinite(val)) return true;
   const normalizedKey = normalizeKey(key);
-  return /(^|[^a-z0-9])(clima|ph|altitud|temperatura|dosis|humedad|distancia|msnm)([^a-z0-9]|$)/.test(normalizedKey);
+  return /(^|[^a-z0-9])(clima|ph|altitud|temperatura|thermal|dosis|humedad|distancia|msnm)([^a-z0-9]|$)/.test(normalizedKey);
 }
 
 function buildContextualText(key, val) {
@@ -229,22 +229,44 @@ function buildContextualText(key, val) {
   return label ? `${label} ${value}` : value;
 }
 
+function isMeaningfulShortString(value) {
+  const text = value.trim();
+  if (text.length <= 2 || !/[a-zA-ZÀ-ÖØ-öø-ÿ]/.test(text)) return false;
+
+  return true;
+}
+
+function isIndexableString(value) {
+  const text = value.trim();
+  // Los UUIDs y hashes hexadecimales no aportan términos recuperables y
+  // degradan el IDF del índice BM25.
+  if (/^[a-f0-9]{8,}$/i.test(text) || /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(text)) {
+    return false;
+  }
+  return text.length > 20 || isMeaningfulShortString(text);
+}
+
+function isIdentifierField(path) {
+  const field = normalizeKey(String(path).split('.').at(-1).replace(/\[\d+\]$/, ''));
+  return ['id', 'slug', 'species_slug', 'species_id', 'version'].includes(field);
+}
+
 export function flattenDoc(doc, prefix = '', speciesSlug = null) {
   const slug = resolveSpeciesSlug(doc, speciesSlug);
   const passages = [];
   const fieldLabel = (key) => formatKeyLabel(`${prefix}${key}`.replace(/\.$/, ''));
   const addPassage = (key, val) => {
     const path = `${prefix}${key}`;
-    if (isContextualField(path, val) && (typeof val === 'string' || typeof val === 'number')) {
+    if (!isIdentifierField(path) && isContextualField(path, val) && (typeof val === 'string' || typeof val === 'number')) {
       passages.push({ key: path, text: buildContextualText(fieldLabel(key), val), species: slug });
-    } else if (typeof val === 'string' && val.length > 20) {
+    } else if (typeof val === 'string' && !isIdentifierField(path) && isIndexableString(val)) {
       passages.push({ key: path, text: val, species: slug });
     } else if (Array.isArray(val)) {
       val.forEach((item, i) => {
         const itemPath = `${path}[${i}]`;
-        if (isContextualField(itemPath, item) && (typeof item === 'string' || typeof item === 'number')) {
+        if (!isIdentifierField(itemPath) && isContextualField(itemPath, item) && (typeof item === 'string' || typeof item === 'number')) {
           passages.push({ key: itemPath, text: buildContextualText(formatKeyLabel(itemPath), item), species: slug });
-        } else if (typeof item === 'string' && item.length > 20) {
+        } else if (typeof item === 'string' && !isIdentifierField(itemPath) && isIndexableString(item)) {
           passages.push({ key: itemPath, text: item, species: slug });
         } else if (typeof item === 'object' && item !== null) {
           flattenDoc(item, `${path}[${i}].`, slug).forEach((p) => passages.push(p));
