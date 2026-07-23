@@ -515,7 +515,9 @@ function CultivosDormidos() {
       </mesh>
       <instancedMesh ref={ref} args={[undefined, undefined, FILAS * POR_FILA]}>
         <coneGeometry args={[0.15, 0.34, 6]} />
-        <meshLambertMaterial color={P.mata} flatShading />
+        {/* un asomo de emissive: la luna viene por detrás y sin esto las matas
+            eran invisibles — el lote se leía como un parche pelado */}
+        <meshLambertMaterial color={P.mata} emissive={P.mata} emissiveIntensity={0.35} flatShading />
       </instancedMesh>
     </group>
   );
