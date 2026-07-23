@@ -1113,6 +1113,9 @@ function Buey({ reducedMotion }) {
       const s = Math.sin(t * 2) * 0.03;
       cuerpo.current.position.y = Math.abs(Math.sin(t)) * 0.045;
       cuerpo.current.scale.set(1 - s * 0.6, 1 + s, 1 - s * 0.6);
+      // y se ECHA AL YUGO: la cabeza va adelante (+x) y el tiro le pide
+      // inclinarse hacia allá — el esfuerzo del que arrastra, no del que pasea
+      cuerpo.current.rotation.z = -0.05 + Math.sin(t * 2 + 0.8) * 0.02;
     }
     // la cabeza cabecea con el esfuerzo del tiro
     if (cabeza.current) {
@@ -1215,8 +1218,18 @@ function Buey({ reducedMotion }) {
 const TRAPICHE_POS = [6.2, Y_PATIO, 1.2];
 function Trapiche({ reducedMotion }) {
   const vuelta = useRef(null);
+  const masas = useRef([]);
   useFrame(({ clock }) => {
     if (reducedMotion || !vuelta.current) return;
+    // LA MECÁNICA COMPLETA: el buey mueve la palanca, la palanca mueve el eje
+    // y el eje muerde la caña con las masas. Antes la palanca daba la vuelta
+    // pero los rodillos quedaban clavados — el molino giraba sin moler. La
+    // mazamorrera (centro) va 1:1 con la palanca; las dos de al lado van
+    // ENGRANADAS y giran al contrario, como en el trapiche de verdad.
+    const angulo = 3.05 + clock.elapsedTime * 0.22;
+    masas.current.forEach((m, i) => {
+      if (m) m.rotation.y = i === 1 ? angulo : -angulo;
+    });
     // El paso manso del buey. ARRANCA EN 3.05, no en 2.3: con la cámara
     // vertical del teléfono la fase 2.3 lo escondía detrás del molino y la
     // 4.7 (la vieja "pose visible") caía FUERA del borde derecho del
@@ -1270,9 +1283,11 @@ function Trapiche({ reducedMotion }) {
         <boxGeometry args={[1.5, 0.84, 1.2]} />
         <meshLambertMaterial color={mezclar(P.maderaVieja, '#5c4228', 0.35)} flatShading />
       </mesh>
-      {/* los TRES rodillos verticales de madera (la mazamorrera al centro) */}
+      {/* los TRES rodillos verticales de madera (la mazamorrera al centro),
+          GIRANDO con la palanca — flatShading a 9 caras: las facetas dejan
+          ver la vuelta sin estrías nuevas */}
       {[-0.38, 0, 0.38].map((x, i) => (
-        <mesh key={i} position={[x, 1.14, 0]}>
+        <mesh key={i} position={[x, 1.14, 0]} ref={(el) => { masas.current[i] = el; }}>
           <cylinderGeometry args={[i === 1 ? 0.19 : 0.16, i === 1 ? 0.19 : 0.16, 0.6, 9]} />
           <meshLambertMaterial
             color={mezclar(P.maderaClara, TINTE, i * 0.08)}
@@ -1286,12 +1301,6 @@ function Trapiche({ reducedMotion }) {
         <meshLambertMaterial color={P.maderaVieja} flatShading />
       </mesh>
 
-      {/* el eje que sube del rodillo mayor a la palanca */}
-      <mesh position={[0, 1.78, 0]}>
-        <cylinderGeometry args={[0.09, 0.09, 0.5, 7]} />
-        <meshLambertMaterial color={P.maderaClara} flatShading />
-      </mesh>
-
       {/* LA VUELTA: palanca + buey giran juntos alrededor del eje */}
       {/* pose base (reduced-motion y captura): 3.05 = el buey en el claro de
           pasto al lado izquierdo del molino, de cara a la cámara y ADENTRO
@@ -1299,6 +1308,12 @@ function Trapiche({ reducedMotion }) {
           borde derecho del teléfono, y entre 3.3 y 3.6 quedaba camuflado
           contra la canoa y el molino, debajo del humo de la hornilla */}
       <group ref={vuelta} position={[0, 0, 0]} rotation={[0, 3.05, 0]}>
+        {/* el eje que sube del rodillo mayor a la palanca — vive DENTRO de la
+            vuelta: gira con ella, que es lo que hace girar la mazamorrera */}
+        <mesh position={[0, 1.78, 0]}>
+          <cylinderGeometry args={[0.09, 0.09, 0.5, 7]} />
+          <meshLambertMaterial color={P.maderaClara} flatShading />
+        </mesh>
         {/* la palanca, del eje hacia afuera y bajando al pecho del buey */}
         <mesh position={[1.45, 1.6, 0]} rotation={[0, 0, 0.26]}>
           <boxGeometry args={[3.1, 0.13, 0.13]} />
@@ -1348,6 +1363,29 @@ function Trapiche({ reducedMotion }) {
 function CanalGuarapo({ reducedMotion }) {
   const pulsos = useRef(null);
   const chorro = useRef(null);
+  const nacimiento = useRef(null);
+  const espuma = useRef(null);
+  const cachaza = useRef(null);
+  /* LO QUE FLOTA EN EL GUARAPO — es lo que el campesino reconoce de una
+     mirada: la ESPUMA clara que hace el jugo al correr y la CACHAZA verdosa
+     (el bagacillo y la tierra que se colaron) que baja flotando hasta que el
+     cucharón la retira en la paila. Motas deterministas, repartidas a lo
+     largo para que la canoa se lea CORRIENDO aun en la pose quieta. */
+  const motas = useMemo(() => {
+    const rng = crearRng(430);
+    return {
+      espuma: Array.from({ length: 6 }, (_, i) => ({
+        fase: i / 6 + rng() * 0.08,
+        z: (rng() - 0.5) * 0.11,
+        esc: 0.7 + rng() * 0.5,
+      })),
+      cachaza: Array.from({ length: 4 }, (_, i) => ({
+        fase: i / 4 + rng() * 0.1,
+        z: (rng() - 0.5) * 0.09,
+        esc: 0.8 + rng() * 0.45,
+      })),
+    };
+  }, []);
   // del trapiche (6.2, 1.2) hacia la hornilla (3.4, 4.2): largo ~3.9;
   // el extremo local +x queda en el molino (arriba), el -x en la paila (abajo)
   useFrame(({ clock }) => {
@@ -1361,9 +1399,34 @@ function CanalGuarapo({ reducedMotion }) {
         p2.scale.setScalar(0.75 + Math.sin(f * Math.PI) * 0.45);
       });
     }
+    // la espuma viaja CON la corriente (misma velocidad que los pulsos)
+    if (espuma.current) {
+      espuma.current.children.forEach((m, i) => {
+        const d = motas.espuma[i];
+        const f = (t * 0.55 + d.fase) % 1;
+        m.position.x = 1.7 - f * 3.45;
+        m.position.z = d.z + Math.sin(t * 2.3 + i * 1.9) * 0.02;
+        m.scale.setScalar(d.esc * (0.8 + Math.sin(f * Math.PI) * 0.35));
+      });
+    }
+    // la cachaza pesa más: baja MÁS DESPACIO que la espuma, rezagándose
+    if (cachaza.current) {
+      cachaza.current.children.forEach((m, i) => {
+        const d = motas.cachaza[i];
+        const f = (t * 0.3 + d.fase) % 1;
+        m.position.x = 1.6 - f * 3.3;
+        m.position.z = d.z + Math.cos(t * 1.7 + i * 2.3) * 0.015;
+        m.scale.setScalar(d.esc * (0.85 + Math.sin(t * 2.6 + i) * 0.12));
+      });
+    }
     if (chorro.current) {
       const s = 0.9 + Math.sin(t * 7.3) * 0.14;
       chorro.current.scale.set(s, 1 + Math.sin(t * 9.1) * 0.12, s);
+    }
+    // el chorrito del NACIMIENTO late con el mordisco de las masas
+    if (nacimiento.current) {
+      const s = 0.85 + Math.sin(t * 6.1 + 1.2) * 0.16;
+      nacimiento.current.scale.set(s, 1 + Math.sin(t * 8.3) * 0.1, s);
     }
   });
   return (
@@ -1397,6 +1460,48 @@ function CanalGuarapo({ reducedMotion }) {
           </mesh>
         ))}
       </group>
+      {/* EL NACIMIENTO: el jugo cae de la salida del molino a la cabeza de la
+          canoa — sin este chorrito la canoa arrancaba llena de la nada y el
+          recorrido molino → canoa no se leía */}
+      <group position={[1.88, 0, 0]}>
+        <mesh ref={nacimiento} position={[0, 0.3, 0]}>
+          <cylinderGeometry args={[0.028, 0.042, 0.38, 5]} />
+          <meshLambertMaterial color={mezclar(P.guarapo, '#f0c86a', 0.45)} flatShading />
+        </mesh>
+        {/* el salpique donde el chorro toca la canoa */}
+        <mesh position={[0, 0.1, 0]} scale={[1, 0.4, 1]}>
+          <sphereGeometry args={[0.055, 6, 4]} />
+          <meshLambertMaterial color={P.espuma} flatShading />
+        </mesh>
+      </group>
+      {/* LA ESPUMA del jugo que corre: motas claras que viajan con la corriente */}
+      <group ref={espuma}>
+        {motas.espuma.map((d, i) => (
+          <mesh
+            key={i}
+            position={[1.7 - d.fase * 3.45, 0.095, d.z]}
+            scale={[d.esc, d.esc * 0.5, d.esc]}
+          >
+            <sphereGeometry args={[0.032, 5, 4]} />
+            <meshLambertMaterial color={P.espuma} flatShading />
+          </mesh>
+        ))}
+      </group>
+      {/* LA CACHAZA: los cuajarones verdosos de bagacillo y tierra que bajan
+          flotando — la impureza que el campesino reconoce y que el cucharón
+          retirará en la paila */}
+      <group ref={cachaza}>
+        {motas.cachaza.map((d, i) => (
+          <mesh
+            key={i}
+            position={[1.6 - d.fase * 3.3, 0.092, d.z]}
+            scale={[d.esc, d.esc * 0.42, d.esc]}
+          >
+            <sphereGeometry args={[0.045, 5, 4]} />
+            <meshLambertMaterial color={mezclar(P.cachaza, '#a8a45c', 0.35)} flatShading />
+          </mesh>
+        ))}
+      </group>
       {/* el chorrito que cae del pico de la canoa al recibidor */}
       <group position={[-2.0, -0.12, 0]}>
         <mesh ref={chorro} position={[0, -0.06, 0]}>
@@ -1413,6 +1518,18 @@ function CanalGuarapo({ reducedMotion }) {
           <planeGeometry args={[0.45, 0.36]} />
           <meshLambertMaterial color={P.guarapo} />
         </mesh>
+        {/* la cachaza que llegó flotando se JUNTA aquí, esperando el cucharón */}
+        {[
+          [-0.2, 0.09], [0.02, -0.1], [-0.06, 0.02],
+        ].map((c, i) => (
+          <mesh key={i} position={[c[0], -0.165, c[1]]} scale={[1, 0.4, 1]}>
+            <sphereGeometry args={[0.05 + (i % 2) * 0.015, 5, 4]} />
+            <meshLambertMaterial
+              color={mezclar(P.cachaza, '#a8a45c', 0.25 + i * 0.12)}
+              flatShading
+            />
+          </mesh>
+        ))}
       </group>
       {/* dos horquetas cortas que la sostienen */}
       <mesh position={[-1.3, -0.2, 0]}>
