@@ -1003,14 +1003,15 @@ function Trapiche({ reducedMotion }) {
   const vuelta = useRef(null);
   useFrame(({ clock }) => {
     if (reducedMotion || !vuelta.current) return;
-    // El paso manso del buey. ARRANCA EN 3.35, no en 2.3: con la cámara
+    // El paso manso del buey. ARRANCA EN 3.05, no en 2.3: con la cámara
     // vertical del teléfono la fase 2.3 lo escondía detrás del molino y la
     // 4.7 (la vieja "pose visible") caía FUERA del borde derecho del
-    // encuadre — el corazón del trapiche nunca salía en pantalla. En 3.35 el
-    // buey nace en el CLARO de pasto entre la botica y la hornilla (fondo
-    // verde limpio: en 3.6 quedaba camuflado contra la madera del molino y
-    // debajo del humo), de cara a la cámara, y camina su vuelta A LA VISTA.
-    vuelta.current.rotation.y = 3.35 + clock.elapsedTime * 0.22;
+    // encuadre — el corazón del trapiche nunca salía en pantalla. En 3.05 el
+    // buey nace en el CLARO de pasto al lado izquierdo del molino (fondo
+    // verde limpio: entre 3.3 y 3.6 quedaba camuflado contra la madera de
+    // la canoa y el molino, y debajo de la pluma de humo de la hornilla),
+    // de cara a la cámara, y camina su vuelta A LA VISTA.
+    vuelta.current.rotation.y = 3.05 + clock.elapsedTime * 0.22;
   });
   return (
     <group position={TRAPICHE_POS}>
@@ -1078,12 +1079,12 @@ function Trapiche({ reducedMotion }) {
       </mesh>
 
       {/* LA VUELTA: palanca + buey giran juntos alrededor del eje */}
-      {/* pose base (reduced-motion y captura): 3.35 = el buey en el claro de
-          pasto adelante-izquierda del molino, de cara a la cámara y ADENTRO
+      {/* pose base (reduced-motion y captura): 3.05 = el buey en el claro de
+          pasto al lado izquierdo del molino, de cara a la cámara y ADENTRO
           del encuadre vertical — la 4.7 de antes quedaba cortada por el
-          borde derecho del teléfono, y la 3.6 lo dejaba camuflado contra la
-          madera del molino y debajo de la pluma de humo de la hornilla */}
-      <group ref={vuelta} position={[0, 0, 0]} rotation={[0, 3.35, 0]}>
+          borde derecho del teléfono, y entre 3.3 y 3.6 quedaba camuflado
+          contra la canoa y el molino, debajo del humo de la hornilla */}
+      <group ref={vuelta} position={[0, 0, 0]} rotation={[0, 3.05, 0]}>
         {/* la palanca, del eje hacia afuera y bajando al pecho del buey */}
         <mesh position={[1.45, 1.6, 0]} rotation={[0, 0, 0.26]}>
           <boxGeometry args={[3.1, 0.13, 0.13]} />
