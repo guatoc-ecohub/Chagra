@@ -16,7 +16,11 @@
  *     canal del guarapo, la HORNILLA con la paila humeando hasta punto de miel
  *     y la mesa con las GAVERAS donde cuaja la panela. El proceso legible de
  *     una mirada: caña → molino → jugo → paila → panela, con un recorrido de
- *     5 botones que acerca la cámara al paso activo y resalta su etiqueta.
+ *     6 botones que acerca la cámara al paso activo y resalta su etiqueta —
+ *     los cinco de la panela y, al final, uno que vuelve a la casa a ver de
+ *     cerca las siete matas de la botica (antes NINGÚN paso miraba para allá:
+ *     se tallaron nudos de caña y siete matas distintas que la cámara nunca
+ *     enseñaba de cerca).
  *
  * DIRECCIÓN DE ARTE (todo dentro del framework, nada inventado por fuera):
  *   - Atmósfera del MEDIODÍA claro del kit (`CIELOS_HORA.mediodia`): la
@@ -46,8 +50,10 @@ import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
 import { ParticulasAmbientales } from '../visual/mundo3d/ParticulasAmbientales.jsx';
 import { crearRng } from '../visual/mundo3d/particulasData.js';
 import { Bicho } from '../visual/mundo3d/escenas/FaunaEscena.jsx';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import {
   calidadCana,
+  geomHojaCana,
   geomMataCana,
   geomPenachoCana,
   variedadPara,
@@ -402,6 +408,101 @@ function Cantero({ pos, rot = 0, w = 2.6, d = 1.4, children }) {
   );
 }
 
+/* ---- El taller de matas: piezas sueltas que se juntan en UNA malla ---- */
+
+/* La matriz de una pieza: se acuesta (rx), se arquea (rz), gira (ry), se
+   escala y se posa — en ese orden, que es como se arma una hoja en la mata. */
+function poner(x, y, z, { ry = 0, rz = 0, rx = 0, esc = 1 } = {}) {
+  const m = new THREE.Matrix4().makeRotationY(ry);
+  if (rz) m.multiply(new THREE.Matrix4().makeRotationZ(rz));
+  if (rx) m.multiply(new THREE.Matrix4().makeRotationX(rx));
+  const [sx, sy, sz] = Array.isArray(esc) ? esc : [esc, esc, esc];
+  if (sx !== 1 || sy !== 1 || sz !== 1) m.multiply(new THREE.Matrix4().makeScale(sx, sy, sz));
+  m.setPosition(x, y, z);
+  return m;
+}
+
+/* Pinta una pieza de un color plano por vértice. Si la pieza YA trae color
+   horneado (la hoja de caña que presta el limoncillo) y el color viene como
+   factores [r,g,b], la ENTINTA multiplicando canal a canal. */
+function pintar(geo, color) {
+  const n = geo.attributes.position.count;
+  const previo = geo.attributes.color;
+  if (previo && Array.isArray(color)) {
+    for (let i = 0; i < n; i++) {
+      previo.setXYZ(
+        i,
+        Math.min(1, previo.getX(i) * color[0]),
+        Math.min(1, previo.getY(i) * color[1]),
+        Math.min(1, previo.getZ(i) * color[2]),
+      );
+    }
+    return geo;
+  }
+  const c = new THREE.Color(color);
+  const arr = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    arr[i * 3] = c.r;
+    arr[i * 3 + 1] = c.g;
+    arr[i * 3 + 2] = c.b;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+  return geo;
+}
+
+/* Junta las piezas {geo, m, color} de una mata en UNA geometría con color por
+   vértice: cada mata queda en una sola draw-call, como los bancos del cañal.
+   ⚠️ mergeGeometries devuelve NULL EN SILENCIO al mezclar indexadas con
+   no-indexadas — aquí todas las piezas son indexadas, y si algún día alguna
+   no lo es, mejor reventar YA que una botica invisible. */
+function unirMata(piezas) {
+  const sueltas = piezas.map(({ geo, m, color }) => {
+    if (m) geo.applyMatrix4(m);
+    return pintar(geo, color);
+  });
+  const g = mergeGeometries(sueltas, false);
+  if (!g) throw new Error('unirMata: mergeGeometries devolvió null (piezas mixtas)');
+  sueltas.forEach((s) => s.dispose());
+  return g;
+}
+
+/* Una HOJA plana de silueta recortada, acostada sobre el plano XY y saliendo
+   por +X: el contorno lleva dientes de sierra (la ortiga) o festones mansos
+   (la hierbabuena) según la `mordida`. Es la pieza que mata el «cono = hoja». */
+function geomHojaSilueta({ largo, ancho, dientes = 5, mordida = 0.4, punta = 0.5, semilla = 1 }) {
+  const r = crearRng(semilla * 37 + 11);
+  const N = dientes * 2;
+  // ancho de la hoja a lo largo: angosta en el pecíolo, panzona al tercio, punta cerrada
+  const w = (t) =>
+    ancho * Math.pow(Math.sin(Math.PI * Math.pow(t, 0.72)), 0.8) * Math.pow(1 - t * 0.55, punta);
+  const sh = new THREE.Shape();
+  sh.moveTo(0, 0);
+  for (let k = 1; k < N; k++) {
+    const t = k / N;
+    const f = k % 2 === 1 ? 1 : 1 - mordida * (0.8 + r() * 0.4);
+    sh.lineTo(largo * t, w(t) * f);
+  }
+  sh.lineTo(largo, 0); // la punta
+  for (let k = N - 1; k >= 1; k--) {
+    const t = k / N;
+    const f = k % 2 === 0 ? 1 : 1 - mordida * (0.8 + r() * 0.4);
+    sh.lineTo(largo * t, -w(t) * f);
+  }
+  sh.closePath();
+  return new THREE.ShapeGeometry(sh);
+}
+
+/* El material único de las matas armadas con `unirMata`: color por vértice y
+   DOS caras, porque las hojas de silueta y las cintas son láminas sin grosor. */
+function MataUnida({ pos, esc = 1, geo }) {
+  useEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <mesh position={pos} scale={esc} geometry={geo}>
+      <meshLambertMaterial vertexColors flatShading side={THREE.DoubleSide} />
+    </mesh>
+  );
+}
+
 /* Sábila (aloe): roseta de hojas gruesas y carnosas que suben en punta —
    la silueta más reconocible de la botica. */
 function Sabila({ pos, esc = 1, semilla = 1 }) {
@@ -435,35 +536,61 @@ function Sabila({ pos, esc = 1, semilla = 1 }) {
   );
 }
 
-/* Ruda: matica redonda de verde glauco azuloso con florecitas amarillas. */
-function Ruda({ pos, esc = 1 }) {
-  const motas = [
-    [0, 0.16, 0, 0.2],
-    [0.14, 0.12, 0.06, 0.14],
-    [-0.13, 0.11, 0.05, 0.13],
-    [0.02, 0.13, -0.13, 0.13],
-    [-0.03, 0.26, 0.02, 0.12],
-  ];
-  return (
-    <group position={pos} scale={esc}>
-      {motas.map((m, i) => (
-        <mesh key={i} position={[m[0], m[1], m[2]]}>
-          <sphereGeometry args={[m[3], 7, 5]} />
-          <meshLambertMaterial color={mezclar(P.ruda, TINTE, (i % 3) * 0.06)} flatShading />
-        </mesh>
-      ))}
-      {/* sus flores amarillas menudas */}
-      {[
-        [0.06, 0.36, 0.03], [-0.09, 0.32, -0.04], [0.01, 0.34, -0.1],
-        [0.12, 0.3, -0.02], [-0.02, 0.4, 0.06],
-      ].map((f, i) => (
-        <mesh key={`f${i}`} position={f}>
-          <sphereGeometry args={[0.03, 5, 4]} />
-          <meshLambertMaterial color="#d9c94a" flatShading />
-        </mesh>
-      ))}
-    </group>
-  );
+/* Ruda: antes era un montón de bolas — y la ruda no es una bola. Es una mata
+   BAJA y RAMIFICADA: ramitas que se abren desde el pie, cada una rematada en
+   RAMILLETES de hojitas menudas y redondeadas de verde glauco azuloso, con
+   las florecitas amarillas en las puntas que ya florecieron. */
+function Ruda({ pos, esc = 1, semilla = 1 }) {
+  const geo = useMemo(() => {
+    const rng = crearRng(55 + semilla);
+    const piezas = [];
+    const RAMAS = 11;
+    for (let i = 0; i < RAMAS; i++) {
+      const ang = (i / RAMAS) * Math.PI * 2 + rng() * 0.6;
+      const inc = 0.35 + rng() * 0.5; // abierta desde el pie, no un palo central
+      const largo = 0.13 + rng() * 0.12; // CORTA: mata compacta, no varas de eneldo
+      const dir = [Math.sin(inc) * Math.cos(ang), Math.cos(inc), -Math.sin(inc) * Math.sin(ang)];
+      // la ramita leñosita
+      piezas.push({
+        geo: new THREE.CylinderGeometry(0.006, 0.01, largo, 4),
+        m: poner((dir[0] * largo) / 2, (dir[1] * largo) / 2, (dir[2] * largo) / 2, {
+          ry: ang,
+          rz: -inc,
+        }),
+        color: mezclar(P.ruda, P.tallo, 0.55),
+      });
+      // ramilletes de hojitas: en la punta siempre, y a medio camino en las largas
+      const nudos = largo > 0.19 ? [0.6, 1] : [1];
+      for (const f of nudos) {
+        const px = dir[0] * largo * f;
+        const py = dir[1] * largo * f;
+        const pz = dir[2] * largo * f;
+        const HOJITAS = 7 + Math.floor(rng() * 3);
+        for (let h = 0; h < HOJITAS; h++) {
+          const a2 = rng() * Math.PI * 2;
+          const r2 = 0.01 + rng() * 0.02; // apretadas: ramillete, no puntos sueltos
+          piezas.push({
+            geo: new THREE.SphereGeometry(0.028 + rng() * 0.016, 5, 4),
+            m: poner(px + Math.cos(a2) * r2, py + 0.006 + rng() * 0.03, pz + Math.sin(a2) * r2, {
+              esc: [1, 0.62, 1], // hojita redondeada, no bola
+            }),
+            // glauco azuloso con cuerpo: hacia el fondo verde, no hacia la niebla
+            color: mezclar(P.ruda, '#3d6248', 0.3 + (h % 3) * 0.12),
+          });
+        }
+      }
+      // la florecita amarilla menuda, solo en las ramas que ya espigaron
+      if (rng() < 0.6) {
+        piezas.push({
+          geo: new THREE.SphereGeometry(0.018 + rng() * 0.008, 5, 4),
+          m: poner(dir[0] * largo, dir[1] * largo + 0.028, dir[2] * largo),
+          color: '#d9c94a',
+        });
+      }
+    }
+    return unirMata(piezas);
+  }, [semilla]);
+  return <MataUnida pos={pos} esc={esc} geo={geo} />;
 }
 
 /* Caléndula: tallos verdes coronados por la flor naranja de pétalos anchos. */
@@ -505,94 +632,181 @@ function Calendula({ pos, esc = 1, semilla = 1 }) {
   );
 }
 
-/* Hierbabuena: mancha baja de verde vivo, hojitas redondas a ras de tierra. */
+/* Hierbabuena: antes era una mancha de bolas a ras de tierra. Ahora es lo que
+   delata a una menta: tallitos CUADRADOS (boxGeometry finita, la firma de la
+   familia) con pares OPUESTOS de hojas ovaladas de borde festoneado, verde
+   vivo, en mata baja y tupida. */
 function Hierbabuena({ pos, esc = 1, semilla = 1 }) {
-  const matas = useMemo(() => {
+  const geo = useMemo(() => {
     const rng = crearRng(90 + semilla);
-    return Array.from({ length: 8 }, () => ({
-      x: (rng() - 0.5) * 0.5,
-      z: (rng() - 0.5) * 0.4,
-      r: 0.07 + rng() * 0.05,
-      claro: rng(),
-    }));
+    const piezas = [];
+    const TALLOS = 12;
+    for (let i = 0; i < TALLOS; i++) {
+      const ang = rng() * Math.PI * 2;
+      const rad = rng() * 0.24;
+      const bx = Math.cos(ang) * rad;
+      const bz = Math.sin(ang) * rad * 0.8;
+      const alto = 0.12 + rng() * 0.13;
+      const ladeo = 0.1 + rng() * 0.35; // cada tallito con su ladeo
+      const rumbo = rng() * Math.PI * 2;
+      const dir = [
+        Math.sin(ladeo) * Math.cos(rumbo),
+        Math.cos(ladeo),
+        -Math.sin(ladeo) * Math.sin(rumbo),
+      ];
+      // el tallo cuadrado
+      piezas.push({
+        geo: new THREE.BoxGeometry(0.013, alto, 0.013),
+        m: poner(bx + (dir[0] * alto) / 2, (dir[1] * alto) / 2, bz + (dir[2] * alto) / 2, {
+          ry: rumbo,
+          rz: -ladeo,
+        }),
+        color: mezclar(P.hierbabuena, P.tallo, 0.45),
+      });
+      // pares opuestos de hojas, cada nudo CRUZADO con el anterior (decusado)
+      const nudos = [0.55, 1];
+      nudos.forEach((f, j) => {
+        const px = bx + dir[0] * alto * f;
+        const py = dir[1] * alto * f;
+        const pz = bz + dir[2] * alto * f;
+        const cruz = rumbo + (j * Math.PI) / 2 + (rng() - 0.5) * 0.4;
+        const escHoja = f === 1 ? 0.8 : 1;
+        for (const lado of [0, Math.PI]) {
+          piezas.push({
+            geo: geomHojaSilueta({
+              largo: 0.095 + rng() * 0.03,
+              ancho: 0.036,
+              dientes: 6,
+              mordida: 0.2, // festón manso, no sierra
+              punta: 0.18, // punta roma: hoja ovalada
+              semilla: semilla * 13 + i * 3 + j,
+            }),
+            m: poner(px, py, pz, {
+              ry: cruz + lado,
+              rz: 0.25 - rng() * 0.55,
+              rx: -Math.PI / 2,
+              esc: escHoja,
+            }),
+            color: mezclar(P.hierbabuena, '#7cc35a', rng() * 0.5),
+          });
+        }
+      });
+    }
+    // y unas hojas bajitas a ras de tierra, que la mata se vea tupida
+    for (let i = 0; i < 10; i++) {
+      const a = rng() * Math.PI * 2;
+      const r2 = 0.07 + rng() * 0.2;
+      piezas.push({
+        geo: geomHojaSilueta({
+          largo: 0.08 + rng() * 0.025,
+          ancho: 0.032,
+          dientes: 6,
+          mordida: 0.2,
+          punta: 0.18,
+          semilla: semilla * 17 + i,
+        }),
+        m: poner(Math.cos(a) * r2, 0.012, Math.sin(a) * r2 * 0.8, {
+          ry: rng() * Math.PI * 2,
+          rz: 0.3 + rng() * 0.25,
+          rx: -Math.PI / 2,
+        }),
+        color: mezclar(P.hierbabuena, '#7cc35a', rng() * 0.5),
+      });
+    }
+    return unirMata(piezas);
   }, [semilla]);
-  return (
-    <group position={pos} scale={esc}>
-      {matas.map((m, i) => (
-        <mesh key={i} position={[m.x, m.r * 0.7, m.z]} scale={[1, 0.8, 1]}>
-          <sphereGeometry args={[m.r, 6, 5]} />
-          <meshLambertMaterial
-            color={mezclar(P.hierbabuena, '#7cc35a', m.claro * 0.5)}
-            flatShading
-          />
-        </mesh>
-      ))}
-    </group>
-  );
+  return <MataUnida pos={pos} esc={esc} geo={geo} />;
 }
 
-/* Limoncillo (limonaria): fuente de hojas largas que se arquean hacia afuera. */
+/* Limoncillo (limonaria): una GRAMÍNEA, pariente de la caña de esta misma
+   escena — y antes eran conos tiesos como púas. Ahora la macolla se arma con
+   la MISMA hoja de cinta del cañal (`geomHojaCana`: doblez en V, nervadura
+   pálida, se arquea y CAE de punta), en tamaño de botica y entintada al verde
+   amarillento que delata al limoncillo. El mismo lenguaje, la misma familia. */
 function Limoncillo({ pos, esc = 1, semilla = 1 }) {
-  const hojas = useMemo(() => {
+  const geo = useMemo(() => {
     const rng = crearRng(110 + semilla);
-    return Array.from({ length: 12 }, (_, i) => ({
-      ang: (i / 12) * Math.PI * 2 + rng() * 0.4,
-      inc: 0.55 + rng() * 0.45, // bien arqueadas
-      largo: 0.62 + rng() * 0.3,
-    }));
+    const piezas = [];
+    // el pie de la macolla: los tallitos apretados de donde nace el abanico
+    piezas.push({
+      geo: new THREE.CylinderGeometry(0.03, 0.055, 0.1, 6),
+      m: poner(0, 0.05, 0),
+      color: mezclar(P.limoncillo, P.pastoSeco, 0.55),
+    });
+    const HOJAS = 16;
+    for (let i = 0; i < HOJAS; i++) {
+      const ang = (i / HOJAS) * Math.PI * 2 + rng() * 0.5;
+      const alza = 0.55 + (i % 3) * 0.22 + rng() * 0.3; // unas paradas, otras echadas
+      piezas.push({
+        geo: geomHojaCana({
+          largo: 0.5 + rng() * 0.32,
+          ancho: 0.026 + rng() * 0.012,
+          caida: 0.55 + rng() * 0.4, // la punta SIEMPRE se desploma: macolla, no púas
+          doblez: 0.3,
+          torsion: 0.5 + rng() * 0.9,
+          lateral: 0.1,
+          filas: 7,
+          semilla: semilla * 10 + i,
+        }),
+        m: poner(Math.cos(ang) * 0.035, 0.075, Math.sin(ang) * 0.035, { ry: ang, rz: alza }),
+        // el entintado amarillento del limoncillo sobre el verde horneado de la caña
+        color: [1.24, 1.06, 0.6],
+      });
+    }
+    return unirMata(piezas);
   }, [semilla]);
-  return (
-    <group position={pos} scale={esc}>
-      {hojas.map((h, i) => (
-        <mesh
-          key={i}
-          position={[Math.cos(h.ang) * 0.05, 0.08, Math.sin(h.ang) * 0.05]}
-          rotation={[h.inc, -h.ang, 0]}
-          scale={[0.5, 1, 1]}
-        >
-          <coneGeometry args={[0.035, h.largo, 4]} />
-          <meshLambertMaterial
-            color={mezclar(P.limoncillo, TINTE, (i % 3) * 0.08)}
-            flatShading
-          />
-        </mesh>
-      ))}
-    </group>
-  );
+  return <MataUnida pos={pos} esc={esc} geo={geo} />;
 }
 
-/* Ortiga: tallos erguidos de hoja aserrada verde oscuro. Se mira, no se toca. */
-function Ortiga({ pos, esc = 1 }) {
-  const tallos = [
-    [0, 0, 0, 0.52],
-    [0.12, 0, 0.08, 0.42],
-    [-0.11, 0, -0.05, 0.38],
-  ];
-  return (
-    <group position={pos} scale={esc}>
-      {tallos.map((t, i) => (
-        <group key={i} position={[t[0], 0, t[2]]}>
-          <mesh position={[0, t[3] / 2, 0]}>
-            <cylinderGeometry args={[0.013, 0.02, t[3], 5]} />
-            <meshLambertMaterial color={mezclar(P.ortiga, TINTE, 0.15)} flatShading />
-          </mesh>
-          {/* pares de hojas en punta */}
-          {[0.4, 0.65, 0.9].map((f, j) => (
-            <group key={j} position={[0, t[3] * f, 0]} rotation={[0, j * 1.1, 0]}>
-              <mesh position={[0.08, 0, 0]} rotation={[0, 0, -1.25]}>
-                <coneGeometry args={[0.035, 0.14, 4]} />
-                <meshLambertMaterial color={P.ortiga} flatShading />
-              </mesh>
-              <mesh position={[-0.08, 0, 0]} rotation={[0, 0, 1.25]}>
-                <coneGeometry args={[0.035, 0.14, 4]} />
-                <meshLambertMaterial color={P.ortiga} flatShading />
-              </mesh>
-            </group>
-          ))}
-        </group>
-      ))}
-    </group>
-  );
+/* Ortiga: antes las hojas eran conitos en punta — y la ortiga tiene hoja
+   ANCHA, en punta pero con el borde ASERRADO, opuesta por pares y cada par
+   CRUZADO con el anterior (decusado). La sierra va recortada de verdad en la
+   silueta (`geomHojaSilueta` con mordida brava). Se mira, no se toca. */
+function Ortiga({ pos, esc = 1, semilla = 1 }) {
+  const geo = useMemo(() => {
+    const rng = crearRng(75 + semilla);
+    const tallos = [
+      [0, 0, 0, 0.52],
+      [0.12, 0, 0.08, 0.42],
+      [-0.11, 0, -0.05, 0.38],
+    ];
+    const piezas = [];
+    tallos.forEach((t, i) => {
+      const [tx, , tz, alto] = t;
+      piezas.push({
+        geo: new THREE.CylinderGeometry(0.011, 0.019, alto, 5),
+        m: poner(tx, alto / 2, tz),
+        color: mezclar(P.ortiga, TINTE, 0.15),
+      });
+      const rumbo = rng() * Math.PI * 2;
+      // pares opuestos a lo largo, más chicos hacia arriba, y el cogollo
+      [0.3, 0.52, 0.74, 0.92, 1.05].forEach((f, j) => {
+        const cruz = rumbo + (j * Math.PI) / 2 + (rng() - 0.5) * 0.3;
+        const escHoja = 1.15 - j * 0.16;
+        for (const lado of [0, Math.PI]) {
+          piezas.push({
+            geo: geomHojaSilueta({
+              largo: 0.2,
+              ancho: 0.078, // ANCHA: casi tan ancha como larga
+              dientes: 5,
+              mordida: 0.45, // la sierra brava del borde
+              punta: 0.55, // pero rematada en punta
+              semilla: semilla * 19 + i * 5 + j,
+            }),
+            m: poner(tx, alto * f, tz, {
+              ry: cruz + lado,
+              rz: f > 1 ? 0.35 : -0.05 - rng() * 0.25, // el cogollo arriba, el resto casi plano
+              rx: -Math.PI / 2,
+              esc: escHoja,
+            }),
+            color: mezclar(P.ortiga, '#7fae54', 0.08 + j * 0.13),
+          });
+        }
+      });
+    });
+    return unirMata(piezas);
+  }, [semilla]);
+  return <MataUnida pos={pos} esc={esc} geo={geo} />;
 }
 
 /* Manzanilla: varitas finas con la florecita blanca de botón amarillo. */
@@ -1462,7 +1676,15 @@ function MesaGaveras({ reducedMotion }) {
 /* El recorrido de la caña a la panela: caña → molino → jugo → paila →
    panela. Única fuente de verdad para la etiqueta 3D, el botón del pie y a
    dónde se acerca la cámara — antes `etiquetas` era un booleano todo-o-nada
-   y esto vivía repetido e inconexo. */
+   y esto vivía repetido e inconexo.
+
+   El paso 6, «La botica», se agrega AL FINAL a propósito y no se entreteje
+   entre los cinco de arriba: esos cinco cuentan un PROCESO con causa y efecto
+   (uno lleva al otro), y la botica no es una etapa de ese proceso sino el
+   otro saber de la casa, aparte. Cerrar con ella es como cierra una visita
+   de verdad a una finca: después del bullicio del trapiche, se vuelve a la
+   casa a ver las matas de cerca — sin reescribir ni renumerar los cinco
+   pasos ya resueltos y con prueba. */
 const RECORRIDO_PANELA = [
   /* Cada paso conserva el objetivo y define un ojo propio. El primer ojo
      entra por el lado sur del cañal, lejos de la enramada, para que se lean
@@ -1472,6 +1694,22 @@ const RECORRIDO_PANELA = [
   { paso: 3, texto: 'El jugo', pos: [4.8, 1.9, 2.8], ojo: [7.3, 4.2, 9.1] },
   { paso: 4, texto: 'La paila', pos: [3.2, 2.5, 4.3], ojo: [5.2, 4.8, 10.7] },
   { paso: 5, texto: 'La panela', pos: [0.7, 2.0, 5.9], ojo: [2.4, 4.1, 12.5] },
+  /* La botica queda del otro lado de la finca (centro real de sus tres
+     canteros: x -8.62..-3.23, z 1.95..6.15 — bbox recalculado a mano desde
+     `Botica()`), lejos de la enramada del trapiche (x 4.85..7.55): el ojo
+     entra por el SUR mirando hacia el norte, así que nunca se cruza con el
+     techo de paja. Dos cosas obligaron a alejarse más que en los pasos 2-5:
+     1) el FOV vertical (58° en el teléfono, el formato de Chagra) da un FOV
+     HORIZONTAL angosto en retrato — a la distancia normal del recorrido
+     (~7) los canteros de los extremos (sábila, ortiga) quedaban cortados
+     fuera de cuadro; hubo que retroceder a ~11.5 para que entren los 5,4 m
+     de ancho de los tres canteros. 2) la yerbatera (el personaje de la
+     botica, parada junto al cantero B en x=-5.3,z=5.4) quedaba CASI exacto
+     en la línea cámara→objetivo y tapaba la ruda; el ojo se corrió al oeste
+     (x negativo de más) para que la línea de mira pase al oeste de ella. El
+     offset ojo-objetivo (≈-2.0, 2.8, 11.0) cae en azimut ~-10° y polar ~76°
+     — dentro de los topes de OrbitControls (±60° / 28.6°-80.2°). */
+  { paso: 6, texto: 'La botica', pos: [-5.9, 1.1, 4.1], ojo: [-7.9, 3.9, 15.1] },
 ];
 /* A dónde mira la cámara cuando no hay paso activo. Corrido un pelo hacia el
    trapiche (0.5→0.9 en x): en el teléfono el molino entero quedaba por fuera
@@ -1969,7 +2207,7 @@ const PASOS_PANELA = [
 const COPY_CALMA =
   'A la izquierda, la botica de la casa; a la derecha, la molienda. Toque el botón para ver los nombres de las matas y el paso a paso de la panela.';
 const COPY_PASOS =
-  'Siga los números: la caña del cañal pasa al molino que mueve el buey, el jugo baja por la canoa a la paila de la hornilla, y la miel en su punto cuaja en las gaveras hecha panela.';
+  'Siga los números: la caña del cañal pasa al molino que mueve el buey, el jugo baja por la canoa a la paila de la hornilla, la miel en su punto cuaja en las gaveras hecha panela, y el paso 6 lo devuelve a la casa a ver de cerca las siete matas de la botica.';
 
 /**
  * MundoBoticaCana3D — la botica campesina y el trapiche panelero, montables con
@@ -2059,7 +2297,7 @@ export default function MundoBoticaCana3D() {
 
         <div className="bocana-chrome">
           <div className="bocana-pie">
-            <ol className="bocana-recorrido" aria-label="Recorrido de la caña a la panela">
+            <ol className="bocana-recorrido" aria-label="Recorrido de la botica y de la caña a la panela">
               {RECORRIDO_PANELA.map((p) => (
                 <li key={p.paso}>
                   <button

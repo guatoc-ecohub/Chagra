@@ -59,8 +59,8 @@ describe('MundoBoticaCana3D', () => {
     render(<MundoBoticaCana3D />);
     expect(screen.getByRole('heading', { name: 'La botica y el trapiche' })).toBeInTheDocument();
     expect(screen.getByLabelText('La botica campesina y el trapiche panelero en 3D')).toBeInTheDocument();
-    expect(screen.getByRole('list', { name: 'Recorrido de la caña a la panela' })).toBeInTheDocument();
-    expect(screen.getAllByRole('button')).toHaveLength(5);
+    expect(screen.getByRole('list', { name: 'Recorrido de la botica y de la caña a la panela' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(6);
   });
 
   // Cableado de `paso`: antes `etiquetas` era un booleano todo-o-nada que no
@@ -105,6 +105,25 @@ describe('MundoBoticaCana3D', () => {
       const ojo = container.querySelector('group[name="ojo-paso"]');
       expect(foco.getAttribute('position')).toBe('9.5,3.6,-4.5');
       expect(ojo.getAttribute('position')).toBe('10.4,5.2,3.3');
+    });
+
+    // Bug de producto: los cinco pasos originales miraban SOLO al trapiche —
+    // los canteros de la botica (las siete matas, PR #2701) nunca quedaban
+    // cerca de la cámara. Este paso 6 cierra el recorrido volviendo a la casa.
+    test('el paso 6 ("La botica") acerca la cámara a los tres canteros de las siete matas', () => {
+      const { container } = render(<MundoBoticaCana3D />);
+      fireEvent.click(screen.getByRole('button', { name: '6. La botica' }));
+
+      const foco = container.querySelector('group[name="foco-paso"]');
+      const ojo = container.querySelector('group[name="ojo-paso"]');
+      expect(foco.getAttribute('position')).toBe('-5.9,1.1,4.1');
+      expect(ojo.getAttribute('position')).toBe('-7.9,3.9,15.1');
+
+      const etiqueta6 = container.querySelector('div[data-testid="html-billboard"] .bocana-chip--activo');
+      expect(etiqueta6).toBeTruthy();
+      expect(etiqueta6).toHaveTextContent('La botica');
+
+      expect(screen.getByRole('button', { name: '6. La botica' })).toHaveAttribute('aria-pressed', 'true');
     });
 
     test('tocar el mismo paso otra vez vuelve a la vista calma (apaga el recorrido)', () => {
