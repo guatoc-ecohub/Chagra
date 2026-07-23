@@ -250,7 +250,7 @@ function Niebla({ x, y, z, r = 0.5 }) {
 
 /* Color del talud de tierra entre terrazas: más cálido abajo, más rocoso y frío
    arriba (el suelo también cuenta el gradiente térmico). */
-const TALUD_COLOR = ['#8a6a44', '#87663f', '#75593a', '#68554a'];
+const TALUD_COLOR = ['#8a6a44', '#8d6b45', '#7e6248', '#71625a'];
 
 function DioramaPisos({ params, reducedMotion, fauna }) {
   const pisos = useMemo(() => params?.pisos || [], [params?.pisos]);
@@ -314,7 +314,12 @@ function DioramaPisos({ params, reducedMotion, fauna }) {
   }, [pisos]);
 
   return (
-    <group position={[0, 0, 0]}>
+    /* El grupo baja 1.55: centra la escalera alrededor del ORIGEN. Sin esto,
+       con reduced-motion (director de cámara inerte, OrbitControls mirando a
+       (0,0,0)) toda la ladera quedaba por encima del centro del cuadro: páramo
+       cortado y medio lienzo vacío abajo. Los hotspots de `pisos` en
+       mundoData.js bajan lo mismo. */
+    <group position={[0, -1.55, 0]}>
       {/* la ladera al fondo: silueta de montaña por capas (profundidad) */}
       <mesh position={[-0.6, 1.3, -3.4]}>
         <coneGeometry args={[3.3, 4.6, 5]} />
@@ -347,7 +352,7 @@ function DioramaPisos({ params, reducedMotion, fauna }) {
       {pisos.map((p, i) => (
         <group key={p.id}>
           <mesh position={[0, pisoY(i), pisoZ(i)]}>
-            <cylinderGeometry args={[1.28 - i * 0.13, 1.34 - i * 0.13, 0.16, 24]} />
+            <cylinderGeometry args={[1.28 - i * 0.13, 1.36 - i * 0.13, 0.22, 24]} />
             <meshLambertMaterial color={p.color} flatShading />
           </mesh>
           {/* TALUD de tierra: el cuerpo de la montaña entre terraza y terraza.
@@ -357,7 +362,7 @@ function DioramaPisos({ params, reducedMotion, fauna }) {
           {i > 0 && (
             <mesh position={[0, pisoY(i) - 0.63, pisoZ(i) - 0.05]}>
               <cylinderGeometry
-                args={[1.18 - i * 0.13, 1.34 - (i - 1) * 0.13, 1.1, 24]}
+                args={[0.95 - i * 0.12, 1.24 - (i - 1) * 0.13, 1.1, 24]}
               />
               <meshLambertMaterial color={TALUD_COLOR[i]} flatShading />
             </mesh>
@@ -424,11 +429,11 @@ function DioramaPisos({ params, reducedMotion, fauna }) {
 export default function EscenaEstratos(props) {
   const esPisos = Array.isArray(props.params?.pisos);
   const cielo = esPisos ? CIELOS.ladera : CIELOS.sotobosque;
-  // Encuadre `pisos`: cámara un poco más alta y atrás para que el PÁRAMO
-  // (frailejones + niebla, el remate de la lección) entre en cuadro — antes el
-  // piso más alto salía cortado por arriba.
-  const camara = esPisos ? { position: [4.7, 4.4, 7.3], fov: 47 } : { position: [3.5, 3, 6], fov: 44 };
-  const centro = esPisos ? [0, 2.2, -0.5] : [0, 1.4, 0];
+  // Encuadre `pisos`: el diorama va centrado en el origen (ver DioramaPisos),
+  // así la pose CRUDA de reduced-motion (target (0,0,0)) también muestra los
+  // cuatro pisos con el páramo de remate — antes salía cortado por arriba.
+  const camara = esPisos ? { position: [4.9, 2.8, 7.9], fov: 47 } : { position: [3.5, 3, 6], fov: 44 };
+  const centro = esPisos ? [0, 0.65, -0.5] : [0, 1.4, 0];
   const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
     <EscenaBase3D
