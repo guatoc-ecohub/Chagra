@@ -40,7 +40,7 @@
  * son SVG en <Html>. Importa three/@react-three → montar SOLO dentro del
  * <Canvas> del bosque.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
@@ -1198,7 +1198,20 @@ function Luciernagas() {
    Revolotean entre los frailejones con rumbo propio (lissajous + fase): nada
    vuela en fila ni bate al unísono. Dos planos por bicha, aleteo de verdad.
    La PRIMERA es la Morpho azul del referente: más grande que todas, la
-   protagonista del primer plano. */
+   protagonista del primer plano.
+   Instanciadas (perf/hermanos-valle-instancing, 2026-07-23): eran 3 <mesh>
+   sueltos por bicha (2 alas + cuerpo) — hasta 24 draw calls en tier alto
+   (8 mariposas), medido como el mayor contribuyente sin instanciar del
+   páramo definitivo (ver ops/informes/hermanos-valle-2026-07-23.md). Ahora
+   son 3 InstancedMesh TOTALES (ala-izq/ala-der/cuerpo) que sirven para las
+   8 a la vez, con el MISMO aleteo/lissajous de siempre: el offset+rotación
+   local del ala (posición 0.11 en X, giro −90° en X, el flip de lado) queda
+   HORNEADO en la geometría (geomAla), así que lo único que cambia por frame
+   es la matriz del cuerpo (posición/yaw/banqueo/escala) compuesta con el
+   aleteo (rotación Z local) vía Matrix4 — mismo patrón que HatoMovil usa
+   para oveja/gallina. Sin `frames={1}`: a diferencia de la vegetación
+   estática del valle, esto SÍ se mueve cada frame (bug documentado en
+   #2710 era al revés: recalcular de más contenido QUIETO). */
 const MARIPOSAS = [
   { color: '#2e7ef0', centro: [2.4, 1.75, 4.4], rx: 1.6, rz: 1.2, v: 0.5, fase: 0.0, esc: 1.7 }, // LA MORPHO
   { color: '#b7a4ff', centro: [-2.0, 1.5, 5.2], rx: 1.3, rz: 1.5, v: 0.62, fase: 2.1 },
@@ -1210,15 +1223,90 @@ const MARIPOSAS = [
   { color: '#4aa3ff', centro: [-0.9, 1.4, 4.2], rx: 1.8, rz: 1.0, v: 0.6, fase: 2.9 },
 ];
 
+/* Geometría del ala, horneada con el MISMO offset/rotación/flip que antes
+   vivía en <group scale={[lado,1,1]}><mesh position={[0.11,0,0]}
+   rotation={[-Math.PI/2,0,0]}>: se rota, LUEGO se traslada (world space del
+   grupo) y por último se aplica el flip de lado — mismo orden T·R·S que
+   componían los Object3D anidados (verificado a mano: BufferGeometry
+   aplica cada llamada al acumulado, así que rotateX→translate→scale replica
+   exactamente scale(translate(rotateX(v)))). El único transform dinámico
+   por frame es el aleteo (rotación Z), que se compone DESPUÉS multiplicando
+   a la derecha de la matriz del cuerpo (mismo efecto que un hijo anidado). */
+function geomAla(lado) {
+  const g = new THREE.PlaneGeometry(0.2, 0.13).rotateX(-Math.PI / 2).translate(0.11, 0, 0);
+  return lado < 0 ? g.scale(-1, 1, 1) : g;
+}
+
 function MariposasDelParamo({ n }) {
-  const cuerpos = useRef([]);
   const bichas = useMemo(() => MARIPOSAS.slice(0, n), [n]);
+  const refAlaIzq = useRef(/** @type {THREE.InstancedMesh|null} */ (null));
+  const refAlaDer = useRef(/** @type {THREE.InstancedMesh|null} */ (null));
+  const refCuerpo = useRef(/** @type {THREE.InstancedMesh|null} */ (null));
+  const geoAlaIzq = useMemo(() => geomAla(1), []);
+  const geoAlaDer = useMemo(() => geomAla(-1), []);
+  const geoCuerpo = useMemo(() => new THREE.CylinderGeometry(0.012, 0.016, 0.14, 4).rotateX(Math.PI / 2), []);
+  // OJO: SIN vertexColors aquí — el color por instancia lo pone
+  // USE_INSTANCING_COLOR (activo solo con mesh.instanceColor, ver setColorAt
+  // abajo), que es independiente del flag `vertexColors`. Con
+  // `vertexColors:true` puesto (bug encontrado en la verificación visual de
+  // esta misma rama), three.js agrega el atributo de color POR VÉRTICE
+  // (USE_COLOR) — que este PlaneGeometry no tiene — y al faltar el atributo
+  // WebGL lo lee como (0,0,0): vColor se multiplica por negro ANTES de
+  // multiplicarlo por el tinte de instancia, y el ala sale negra pese a que
+  // `instanceColor` esté bien pintado. Los materiales de Banco/BancoInstancias
+  // sí llevan vertexColors:true porque SUS geometrías (frailejón, roble…)
+  // vienen con sombreado horneado por vértice de verdad — no es el mismo caso.
+  const matAla = useMemo(
+    () => new THREE.MeshBasicMaterial({
+      color: '#ffffff', side: THREE.DoubleSide, transparent: true, opacity: 0.92,
+    }),
+    [],
+  );
+  const matCuerpo = useMemo(() => new THREE.MeshBasicMaterial({ color: '#3a3428' }), []);
+  // Escrachos reusados: cero alocación por frame/instancia (mismo patrón que
+  // HatoMovil.util.o para oveja/gallina).
+  const util = useMemo(() => ({
+    pos: new THREE.Vector3(),
+    esc: new THREE.Vector3(),
+    euler: new THREE.Euler(0, 0, 0, 'XYZ'),
+    quat: new THREE.Quaternion(),
+    mCuerpo: new THREE.Matrix4(),
+    mFlap: new THREE.Matrix4(),
+    mFinal: new THREE.Matrix4(),
+    col: new THREE.Color(),
+  }), []);
+
+  useLayoutEffect(() => () => {
+    geoAlaIzq.dispose();
+    geoAlaDer.dispose();
+    geoCuerpo.dispose();
+    matAla.dispose();
+    matCuerpo.dispose();
+  }, [geoAlaIzq, geoAlaDer, geoCuerpo, matAla, matCuerpo]);
+
+  // El tinte por bicha (color de ala) no cambia en el tiempo: se pinta una
+  // sola vez, igual que el color por instancia de Banco/BancoInstancias.
+  useLayoutEffect(() => {
+    const pinta = (mesh) => {
+      if (!mesh) return;
+      for (let i = 0; i < bichas.length; i++) mesh.setColorAt(i, util.col.set(bichas[i].color));
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    };
+    pinta(refAlaIzq.current);
+    pinta(refAlaDer.current);
+  }, [bichas, util]);
+
   useFrame(({ clock }) => {
+    const ai = refAlaIzq.current;
+    const ad = refAlaDer.current;
+    const cu = refCuerpo.current;
+    if (!ai || !ad || !cu) return;
     const t = clock.getElapsedTime();
-    for (let i = 0; i < cuerpos.current.length; i++) {
-      const g = cuerpos.current[i];
+    const {
+      pos, esc, euler, quat, mCuerpo, mFlap, mFinal,
+    } = util;
+    for (let i = 0; i < bichas.length; i++) {
       const m = bichas[i];
-      if (!g || !m) continue;
       const w = t * m.v + m.fase;
       const x = m.centro[0] + Math.sin(w) * m.rx;
       const z = m.centro[2] + Math.sin(w * 1.31 + 1.2) * m.rz;
@@ -1226,53 +1314,61 @@ function MariposasDelParamo({ n }) {
       // El rumbo sale del propio camino (derivada): la bicha mira a donde va.
       const dx = Math.cos(w) * m.rx * m.v;
       const dz = Math.cos(w * 1.31 + 1.2) * m.rz * m.v * 1.31;
-      g.position.set(x, y, z);
-      g.rotation.y = Math.atan2(dx, dz);
+      const yaw = Math.atan2(dx, dz);
       // Banqueo: se ladea en las curvas — vista desde arriba deja de ser
       // un papelito plano y se le ve el cuerpo de bicho.
-      g.rotation.z = Math.sin(w * 0.9) * 0.35;
+      const bank = Math.sin(w * 0.9) * 0.35;
       // Aleteo: cada una a su compás (7.5–10 Hz aprox, fase propia). Las alas
       // pasan más tiempo ARRIBA en V (así se leen mariposa, no confeti).
       const flap = Math.sin(t * (7.5 + i * 0.9) + m.fase) * 0.85 + 0.55;
-      if (g.children[0]) g.children[0].rotation.z = flap;
-      if (g.children[1]) g.children[1].rotation.z = -flap;
+
+      pos.set(x, y, z);
+      euler.set(0, yaw, bank);
+      quat.setFromEuler(euler);
+      esc.setScalar(m.esc ?? 1);
+      mCuerpo.compose(pos, quat, esc);
+
+      mFinal.copy(mCuerpo).multiply(mFlap.makeRotationZ(flap));
+      ai.setMatrixAt(i, mFinal);
+      mFinal.copy(mCuerpo).multiply(mFlap.makeRotationZ(-flap));
+      ad.setMatrixAt(i, mFinal);
+      cu.setMatrixAt(i, mCuerpo);
     }
+    ai.instanceMatrix.needsUpdate = true;
+    ad.instanceMatrix.needsUpdate = true;
+    cu.instanceMatrix.needsUpdate = true;
   });
+
+  if (!bichas.length) return null;
   return (
-    <group>
-      {bichas.map((m, i) => (
-        <group
-          key={i}
-          position={/** @type {[number, number, number]} */ (m.centro)}
-          scale={m.esc ?? 1}
-          ref={(el) => {
-            cuerpos.current[i] = el;
-          }}
-        >
-          {/* Dos alas HORIZONTALES con bisagra en el cuerpo (el grupo rota en
-              z = el ala sube y baja de verdad; el plano vive acostado en XZ y
-              extendido hacia afuera para que el pivote quede en el lomo). */}
-          {[1, -1].map((lado) => (
-            <group key={lado} scale={[lado, 1, 1]}>
-              <mesh position={[0.11, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-                <planeGeometry args={[0.2, 0.13]} />
-                <meshBasicMaterial color={m.color} side={2} transparent opacity={0.92} />
-              </mesh>
-            </group>
-          ))}
-          {/* el cuerpito: la línea oscura entre las alas */}
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.012, 0.016, 0.14, 4]} />
-            <meshBasicMaterial color="#3a3428" />
-          </mesh>
-        </group>
-      ))}
-    </group>
+    <>
+      <instancedMesh
+        key={`ala-izq-${bichas.length}`}
+        ref={refAlaIzq}
+        args={[geoAlaIzq, matAla, bichas.length]}
+        frustumCulled={false}
+      />
+      <instancedMesh
+        key={`ala-der-${bichas.length}`}
+        ref={refAlaDer}
+        args={[geoAlaDer, matAla, bichas.length]}
+        frustumCulled={false}
+      />
+      <instancedMesh
+        key={`cuerpo-mariposa-${bichas.length}`}
+        ref={refCuerpo}
+        args={[geoCuerpo, matCuerpo, bichas.length]}
+        frustumCulled={false}
+      />
+    </>
   );
 }
 
 /* ── LAS ABEJAS DEL FRAILEJONAR — el zumbido del primer plano ────────────
-   Tres puntos ámbar orbitando las flores, cada uno a su velocidad. */
+   Tres puntos ámbar orbitando las flores, cada uno a su velocidad.
+   Instanciadas (mismo barrido de perf/hermanos-valle-instancing): 3 <mesh>
+   sueltos → 1 InstancedMesh (solo posición cambia por frame, mismo color
+   para las tres — no hace falta instanceColor). */
 const ABEJAS = [
   { anclaje: [2.9, 1.05, 4.7], r: 0.34, v: 2.6, fase: 0 },
   { anclaje: [3.3, 0.9, 4.3], r: 0.28, v: 3.4, fase: 2.4 },
@@ -1280,37 +1376,33 @@ const ABEJAS = [
 ];
 
 function AbejasDelFrailejonar() {
-  const puntos = useRef([]);
+  const ref = useRef(/** @type {THREE.InstancedMesh|null} */ (null));
+  const geo = useMemo(() => new THREE.SphereGeometry(0.038, 6, 5), []);
+  const mat = useMemo(() => new THREE.MeshBasicMaterial({ color: '#e8b13a' }), []);
+  const util = useMemo(() => ({ m: new THREE.Matrix4(), pos: new THREE.Vector3() }), []);
+  useLayoutEffect(() => () => {
+    geo.dispose();
+    mat.dispose();
+  }, [geo, mat]);
   useFrame(({ clock }) => {
+    const mesh = ref.current;
+    if (!mesh) return;
     const t = clock.getElapsedTime();
+    const { m, pos } = util;
     for (let i = 0; i < ABEJAS.length; i++) {
-      const p = puntos.current[i];
       const b = ABEJAS[i];
-      if (!p) continue;
       const w = t * b.v + b.fase;
-      p.position.set(
+      pos.set(
         b.anclaje[0] + Math.cos(w) * b.r,
         b.anclaje[1] + Math.sin(t * 3.1 + b.fase) * 0.09,
         b.anclaje[2] + Math.sin(w) * b.r,
       );
+      m.makeTranslation(pos.x, pos.y, pos.z);
+      mesh.setMatrixAt(i, m);
     }
+    mesh.instanceMatrix.needsUpdate = true;
   });
-  return (
-    <group>
-      {ABEJAS.map((b, i) => (
-        <mesh
-          key={i}
-          position={/** @type {[number, number, number]} */ (b.anclaje)}
-          ref={(el) => {
-            puntos.current[i] = el;
-          }}
-        >
-          <sphereGeometry args={[0.038, 6, 5]} />
-          <meshBasicMaterial color="#e8b13a" />
-        </mesh>
-      ))}
-    </group>
-  );
+  return <instancedMesh ref={ref} args={[geo, mat, ABEJAS.length]} frustumCulled={false} />;
 }
 
 /**
