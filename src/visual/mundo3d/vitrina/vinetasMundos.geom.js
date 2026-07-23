@@ -1141,6 +1141,7 @@ export const VINETAS_GEOM = {
   cacao: vinetaCacao,
   papa: vinetaPapa,
   abejas: vinetaAbejas,
+  bosque: (opts) => vinetaValle(opts, 116),
 };
 
 /**
