@@ -323,19 +323,21 @@ export function construirCasaAdentro(rico = true) {
   /* ── LA COCINA VIVA (lo que toda cocina de humo cuelga y guarda) ───────── */
   // LA CUELGA del tirante del poniente: los manojos de hierbas boca abajo y
   // la ristra de ají — la despensa aérea, curándose al calor del fogón.
+  // (ancho arriba y punta abajo: manojo amarrado, no pantalla de lámpara)
   for (const [cz, colHierba] of [[0.85, VERDES.aliso], [-0.12, VERDES.calido]]) {
-    poner(L, cil(0.012, 0.012, 0.26, 5), PAL.vigaOscura, -1.6, 2.23, cz);
-    poner(L, cil(0.05, 0.1, 0.24, 7), colHierba, -1.6, 1.98, cz);
+    poner(L, cil(0.014, 0.014, 0.14, 5), PAL.vigaOscura, -1.6, 2.29, cz);
+    poner(L, cil(0.095, 0.03, 0.26, 7), colHierba, -1.6, 2.09, cz);
+    poner(L, cil(0.05, 0.014, 0.12, 6), mezclar(colHierba, NEUTROS.tinta, 0.25), -1.6, 1.92, cz);
   }
-  poner(L, cil(0.012, 0.012, 0.3, 5), PAL.vigaOscura, -1.6, 2.21, 0.38);
-  for (let i = 0; i < 4; i++) {
+  poner(L, cil(0.012, 0.012, 0.5, 5), PAL.vigaOscura, -1.6, 2.11, 0.38);
+  for (let i = 0; i < 5; i++) {
     poner(
       L,
-      cil(0.02, 0.045, 0.11, 6),
+      cil(0.042, 0.016, 0.1, 6),
       i % 2 ? ACENTOS.cochinilla : ACENTOS.cafeCereza,
-      -1.625 + (i % 2) * 0.05,
-      2.06 - i * 0.12,
-      0.38,
+      -1.615 + (i % 2) * 0.03,
+      2.26 - i * 0.095,
+      0.38 + (i % 2 ? -0.015 : 0.015),
     );
   }
   // LA PAILA y el CUCHARÓN de palo en el muro del fogón (a mano de la candela)

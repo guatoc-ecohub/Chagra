@@ -277,13 +277,15 @@ function FuegoFogon({ tier, reducedMotion, fuerza = 1 }) {
         <boxGeometry args={[0.34, 0.06, 0.4]} />
         <meshBasicMaterial color="#e05a2b" />
       </mesh>
+      {/* naranja de candela de verdad (los tonos pálidos leían como conos
+          de papel, no como fuego) */}
       <mesh ref={llama1} position={[0.04, 0.16, -0.06]}>
         <coneGeometry args={[0.085, 0.26, 6]} />
-        <meshBasicMaterial color="#ff9a3d" transparent opacity={0.92} />
+        <meshBasicMaterial color="#d94f16" transparent opacity={0.96} />
       </mesh>
       <mesh ref={llama2} position={[0.07, 0.13, 0.09]}>
         <coneGeometry args={[0.06, 0.18, 6]} />
-        <meshBasicMaterial color={LUCES.candela} transparent opacity={0.85} />
+        <meshBasicMaterial color="#f28c26" transparent opacity={0.92} />
       </mesh>
       {/* la luz de la candela: la casa siempre espera caliente — y de noche,
           cuando el sol se va de verdad, es ELLA la que manda en el cuarto */}
