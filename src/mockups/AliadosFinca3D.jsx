@@ -140,17 +140,22 @@ function FondoLomas() {
     const bruma = new THREE.Color(ATMOSFERA.niebla);
     const c = new THREE.Color();
 
-    /* — la falda de pasto: anillo r 15.5 → 58, hundiéndose apenas — */
+    /* — la falda de pasto: anillo r 7.2 → 50, hundiéndose apenas. Arranca
+       pegada al borde del disco de tierra (r 7.5): la huerta es un claro
+       trabajado DENTRO de un potrero verde, no una pampa de tierra pelada — */
     const NA = 56;
-    const R0 = 15.5, R1 = 58;
+    const R0 = 6.0, R1 = 50;
     const posF = new Float32Array((NA + 1) * 2 * 3);
     const colF = new Float32Array((NA + 1) * 2 * 3);
     const idxF = [];
-    const cPasto = new THREE.Color(P.pasto);
+    /* El verde va HORNEADO y el material es Basic: con Lambert la luz dorada
+       de la hora multiplicaba el oliva a beige y el potrero desaparecía
+       (verificado en captura). Basic + fog: cerca verde firme, lejos bruma. */
+    const cPasto = new THREE.Color(mezclar(PALETA.follaje, TINTE, 0.18));
     for (let i = 0; i <= NA; i++) {
       const a = (i / NA) * Math.PI * 2;
       const cs = Math.cos(a), sn = Math.sin(a);
-      [[R0, -0.02, 0.14], [R1, -0.6, 0.85]].forEach(([r, y, velo], l) => {
+      [[R0, -0.02, 0.05], [R1, -0.6, 0.8]].forEach(([r, y, velo], l) => {
         const k = (i * 2 + l) * 3;
         posF[k] = cs * r; posF[k + 1] = y; posF[k + 2] = sn * r;
         c.copy(cPasto).lerp(bruma, velo);
@@ -167,11 +172,16 @@ function FondoLomas() {
     geoFalda.setIndex(idxF);
     geoFalda.computeVertexNormals();
 
-    /* — las lomas: tres anillos de crestas, verdes de la casa hacia la bruma — */
+    /* — las lomas: tres anillos de crestas, cada uno más lejos y más pálido.
+       La PRIMERA va cerca (r 19, justo pasado el maxDistance de la órbita) y
+       casi sin velo: es la que llena de VERDE la banda entre la huerta y el
+       cielo — con las tres lejanas y pálidas el fondo seguía leyéndose crema
+       muerto (verificado en captura). Perspectiva aérea de verdad: cresta
+       cercana verde, lejanas fundidas en bruma. — */
     const filas = [
-      { r: 26, alto: 4.6, base: -1.2, tono: mezclar(P.follaje, P.follajeOscuro, 0.3), velo: 0.36, kA: 5, kB: 11, kC: 23, fase: 1.7 },
-      { r: 36, alto: 6.4, base: -1.5, tono: mezclar(P.follaje, TINTE, 0.3), velo: 0.6, kA: 4, kB: 9, kC: 19, fase: 4.2 },
-      { r: 48, alto: 8.8, base: -1.8, tono: mezclar(P.follaje, TINTE, 0.5), velo: 0.74, kA: 3, kB: 7, kC: 17, fase: 0.6 },
+      { r: 19, alto: 3.2, base: -0.6, tono: mezclar(P.follaje, P.follajeOscuro, 0.35), velo: 0.16, kA: 5, kB: 11, kC: 23, fase: 1.7 },
+      { r: 28, alto: 5.4, base: -1.0, tono: mezclar(P.follaje, TINTE, 0.25), velo: 0.45, kA: 4, kB: 9, kC: 19, fase: 4.2 },
+      { r: 40, alto: 8.0, base: -1.4, tono: mezclar(P.follaje, TINTE, 0.45), velo: 0.68, kA: 3, kB: 7, kC: 17, fase: 0.6 },
     ];
     const N = 72;
     const posL = new Float32Array(filas.length * (N + 1) * 2 * 3);
@@ -210,7 +220,11 @@ function FondoLomas() {
     geoLomas.setAttribute('color', new THREE.BufferAttribute(colL, 3));
     geoLomas.setIndex(idxL);
 
-    const matFalda = new THREE.MeshLambertMaterial({ vertexColors: true });
+    /* DoubleSide obligatorio: el winding del anillo queda de espaldas a la
+       cámara alta y FrontSide lo cull-eaba entero — la falda no se dibujaba
+       y el "potrero" era el color de fondo pelado (verificado por píxel:
+       #f2d9a8 exacto = ATMOSFERA.fondo). */
+    const matFalda = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
     const matLomas = new THREE.MeshBasicMaterial({
       vertexColors: true,
       side: THREE.DoubleSide,
@@ -238,11 +252,13 @@ function FondoLomas() {
   );
 }
 
-/* El suelo de la huerta: un disco de tierra removida, cálido. */
+/* El suelo de la huerta: el claro de tierra removida donde viven las camas.
+   Chiquito a propósito (r 7.5): lo que no es huerta es pasto (FondoLomas),
+   no una pampa café hasta el horizonte. */
 function SueloHuerta() {
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-      <circleGeometry args={[16, 48]} />
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+      <circleGeometry args={[6.2, 48]} />
       <meshLambertMaterial color={P.tierraClara} flatShading />
     </mesh>
   );
@@ -706,7 +722,11 @@ function EscenaAliados({ tier, reducedMotion, foco }) {
   return (
     <>
       <color attach="background" args={[ATMOSFERA.fondo]} />
-      {perfil.fog && <fog attach="fog" args={[ATMOSFERA.niebla, 14, 34]} />}
+      {/* fog largo: la huerta cabe en r≈6 y la falda de pasto vive entre r 6 y
+          r 50 — con el fog viejo (14→34) el potrero se lavaba a crema antes de
+          leerse verde. Ahora el verde cercano respira y la lejanía igual se
+          funde en la bruma dorada. */}
+      {perfil.fog && <fog attach="fog" args={[ATMOSFERA.niebla, 17, 52]} />}
       <LucesDoradas />
       <SolBajo />
       <FondoLomas />
