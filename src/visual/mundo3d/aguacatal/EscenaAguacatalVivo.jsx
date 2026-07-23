@@ -297,6 +297,10 @@ function Diorama({ tier, reducedMotion, foco }) {
   const controls = useRef(null);
   const casaY = alturaFinca(SITIO_CASA[0], SITIO_CASA[1]);
 
+  /* Cuánta luz le FALTA a la hora para que el cultivo se lea (la noche y el
+     atardecer bajan `atm.intensidad`; a mediodía esto es ~0). */
+  const refuerzo = Math.max(0, 1 - atm.intensidad);
+
   return (
     <>
       {/* LA ATMÓSFERA DEL KIT: fondo, niebla, luces y estrellas de LA HORA DEL
@@ -308,6 +312,25 @@ function Diorama({ tier, reducedMotion, foco }) {
         radio={RADIO_AGUACATAL}
         conSuelo={false}
         sombra={SOMBRA_AGUACATAL}
+      />
+
+      {/* EL PISO DE LECTURA del aguacatal (mismo remedio del cafetal, #2707):
+          las copas perennes son casi negras y de noche el mundo entero caía a
+          silueta. Dos luces locales de la escena (no tocan el kit): un relleno
+          hemisférico cálido que COMPENSA lo que la hora apaga (de noche sube,
+          a mediodía casi no suma) y una clave dorada fija SIN sombras — aclara
+          el techo de copa y deja ver el fruto colgando, sin tocar el dibujo de
+          la sombra proyectada. El domo y la niebla siguen contando la hora:
+          la noche se conserva noche, pero el cultivo se LEE. */}
+      <hemisphereLight
+        color="#f2e6c8"
+        groundColor="#3d4a2a"
+        intensity={0.38 + 1.15 * refuerzo}
+      />
+      <directionalLight
+        position={[7, 10, 5]}
+        color="#ffe9c0"
+        intensity={0.5 + 0.95 * refuerzo}
       />
 
       {/* El DOMO de la toma B: gradiente cenit→horizonte + glow del sol. */}

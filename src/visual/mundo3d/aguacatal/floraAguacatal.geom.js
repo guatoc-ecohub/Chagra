@@ -106,9 +106,9 @@ export function alturaFinca(wx, wz) {
  * frutos son conteos de InstancedMesh repartidos entre los árboles cargados.
  */
 export const FLORA_AGUACATAL = {
-  alto: { hass: 13, criollo: 2, joven: 4, frutoHass: 110, frutoCriollo: 26, panicula: 46, maiz: 12, hojarasca: 18, piedra: 6 },
-  medio: { hass: 9, criollo: 1, joven: 3, frutoHass: 60, frutoCriollo: 14, panicula: 22, maiz: 7, hojarasca: 10, piedra: 4 },
-  bajo: { hass: 5, criollo: 1, joven: 2, frutoHass: 26, frutoCriollo: 8, panicula: 0, maiz: 4, hojarasca: 5, piedra: 2 },
+  alto: { hass: 13, criollo: 2, joven: 4, frutoHass: 170, frutoCriollo: 40, panicula: 46, maiz: 12, hojarasca: 18, piedra: 6 },
+  medio: { hass: 9, criollo: 1, joven: 3, frutoHass: 95, frutoCriollo: 22, panicula: 22, maiz: 7, hojarasca: 10, piedra: 4 },
+  bajo: { hass: 5, criollo: 1, joven: 2, frutoHass: 44, frutoCriollo: 12, panicula: 0, maiz: 4, hojarasca: 5, piedra: 2 },
 };
 
 /** Conteos para un tier (desconocido → frugal, nunca el más caro). */
@@ -132,12 +132,15 @@ export const PAL = {
   copaBrillo: '#3d7038', // los remates altos donde pega la luz
   enves: '#93a873', // el envés pálido de la hoja (asoma horneado a motas)
 
-  // Fruto (referencia — el color real va POR INSTANCIA):
-  frutoVerde: '#5b7c36',
-  frutoMorado: '#503046',
-  frutoNegro: '#251722', // el Hass maduro, morado-negro
-  criolloVerde: '#79a13f', // el criollo, liso y verde aun maduro
-  criolloClaro: '#8fb54a',
+  // Fruto (referencia — el color real va POR INSTANCIA).
+  // Subidos de valor a propósito (como las cerezas del cafetal, #2707): bajo
+  // la copa casi negra el fruto tiene que GRITAR — es lo que hace reconocible
+  // el aguacatal y lo que enseña la maduración verde → morado → negro.
+  frutoVerde: '#6f9440',
+  frutoMorado: '#6d4062',
+  frutoNegro: '#3a2033', // el Hass maduro, morado-negro (con valor: negro puro desaparece)
+  criolloVerde: '#85b148', // el criollo, liso y verde aun maduro
+  criolloClaro: '#9cc455',
   pedunculo: '#8a7a4f', // el rabito del que cuelga
 
   // Floración en panícula (amarillo-verdosa, nunca blanca de azahar)
@@ -410,15 +413,19 @@ export function geomAguacateJoven({ q = 1 } = {}, seed = 8) {
     de su PEDÚNCULO. Pintado blanco — el color real (verde→morado→negro) va
     POR INSTANCIA. El pedúnculo sí lleva su pardo fijo. */
 export function geomFrutoHass() {
+  /* Radio EXAGERADO adrede (rubber-hose, como la cereza del cafetal #2707):
+     a los 12–15 m de la cámara el fruto a escala real son unos pocos px —
+     invisible. El cuerpo gordo es lo que deja LEER el racimo verde→morado→
+     negro colgando desde la entrada. */
   const partes = [];
-  const cuerpo = new THREE.DodecahedronGeometry(0.1, 0); // facetas = cáscara rugosa
-  poner(cuerpo, [0, -0.06, 0], [0.35, 0.4, 0.2], [0.92, 1.28, 0.92]);
+  const cuerpo = new THREE.DodecahedronGeometry(0.14, 0); // facetas = cáscara rugosa
+  poner(cuerpo, [0, -0.085, 0], [0.35, 0.4, 0.2], [0.92, 1.28, 0.92]);
   partes.push(pintar(cuerpo, '#ffffff'));
-  const cuello = new THREE.DodecahedronGeometry(0.06, 0);
-  poner(cuello, [0, 0.06, 0], [0.8, 0.2, 0.5], [0.95, 1.1, 0.95]);
+  const cuello = new THREE.DodecahedronGeometry(0.084, 0);
+  poner(cuello, [0, 0.085, 0], [0.8, 0.2, 0.5], [0.95, 1.1, 0.95]);
   partes.push(pintar(cuello, '#ffffff'));
-  const ped = new THREE.CylinderGeometry(0.011, 0.014, 0.16, 4, 1);
-  poner(ped, [0, 0.18, 0]);
+  const ped = new THREE.CylinderGeometry(0.014, 0.018, 0.2, 4, 1);
+  poner(ped, [0, 0.24, 0]);
   partes.push(pintar(ped, PAL.pedunculo));
   return fusionar(partes);
 }
@@ -427,15 +434,17 @@ export function geomFrutoHass() {
     suave), verde brillante aun maduro. Pintado blanco; tinte por instancia en
     la gama de verdes. */
 export function geomFrutoCriollo() {
+  /* Engordado igual que el Hass: el criollo es EL fruto grande del mundo y
+     tiene que verse desde el patio. */
   const partes = [];
-  const cuerpo = new THREE.IcosahedronGeometry(0.115, 1); // detalle 1 = liso
-  poner(cuerpo, [0, -0.08, 0], [0, 0, 0], [0.95, 1.2, 0.95]);
+  const cuerpo = new THREE.IcosahedronGeometry(0.16, 1); // detalle 1 = liso
+  poner(cuerpo, [0, -0.11, 0], [0, 0, 0], [0.95, 1.2, 0.95]);
   partes.push(pintar(cuerpo, '#ffffff'));
-  const cuello = new THREE.IcosahedronGeometry(0.07, 1);
-  poner(cuello, [0, 0.08, 0], [0, 0, 0], [0.85, 1.25, 0.85]);
+  const cuello = new THREE.IcosahedronGeometry(0.095, 1);
+  poner(cuello, [0, 0.11, 0], [0, 0, 0], [0.85, 1.25, 0.85]);
   partes.push(pintar(cuello, '#ffffff'));
-  const ped = new THREE.CylinderGeometry(0.012, 0.016, 0.18, 4, 1);
-  poner(ped, [0, 0.24, 0]);
+  const ped = new THREE.CylinderGeometry(0.016, 0.021, 0.22, 4, 1);
+  poner(ped, [0, 0.31, 0]);
   partes.push(pintar(ped, PAL.pedunculo));
   return fusionar(partes);
 }
@@ -668,15 +677,25 @@ export function distribucionAguacatal(conteos, seed = 411, q = 1) {
     const cuantas = 2 + Math.floor(rFru() * 3); // el racimo FLOJO del aguacate
     for (let k = 0; k < cuantas && frutoHass.length < c.frutoHass; k++) {
       const a = a0 + (rFru() - 0.5) * 0.55;
-      const dy = -0.62 - rFru() * 0.3; // colgado BAJO el follaje, pedúnculo visible
+      /* COLGADO DE VERDAD: la masa se DIBUJA escalada 1.35 en horizontal y
+         ±0.97 en vertical, así que el radio 1.02 y el descuelgue -0.62 de
+         antes dejaban el fruto ENTERRADO en el follaje (por eso "no había
+         aguacates" — sí había, pero adentro). Radio al contorno dibujado y
+         descuelgue por DEBAJO del vientre de la masa: el racimo queda en el
+         aire, pedúnculo a la vista. */
+      const dy = -1.05 - rFru() * 0.35;
       const mz = clamp(madre + (rFru() - 0.5) * 0.5, 0, 1);
+      /* El NEGRO solo asoma (0.6 de mezcla máxima): bajo la copa oscura el
+         morado-negro pleno lee NEGRO y borraba la cosecha — el maduro se
+         queda en morado profundo, todavía fruto y no hueco. */
       if (mz < 0.55) col.lerpColors(verde, morado, mz / 0.55);
-      else col.lerpColors(morado, negro, (mz - 0.55) / 0.45);
-      col.multiplyScalar(0.94 + rFru() * 0.12);
+      else col.lerpColors(morado, negro, ((mz - 0.55) / 0.45) * 0.6);
+      col.multiplyScalar(0.98 + rFru() * 0.1);
       frutoHass.push({
-        pos: enCopa(s, m, a, 1.02, dy, rFru),
+        pos: enCopa(s, m, a, 1.28, dy, rFru),
         rotY: rFru() * Math.PI * 2,
-        escala: (0.85 + rFru() * 0.35) * s.esc,
+        // la cuenta gorda: racimo legible desde la entrada de la finca
+        escala: (1.05 + rFru() * 0.45) * s.esc,
         tint: [col.r, col.g, col.b],
       });
     }
@@ -699,9 +718,10 @@ export function distribucionAguacatal(conteos, seed = 411, q = 1) {
       col.lerpColors(cVerde, cClaro, rFru());
       col.multiplyScalar(0.95 + rFru() * 0.1);
       frutoCriollo.push({
-        pos: enCopa(s, m, a, 1.02, -0.7 - rFru() * 0.3, rFru, ALZA_CRIOLLO),
+        // al contorno dibujado y bajo el vientre de la masa, como el Hass
+        pos: enCopa(s, m, a, 1.25, -1.1 - rFru() * 0.35, rFru, ALZA_CRIOLLO),
         rotY: rFru() * Math.PI * 2,
-        escala: 0.9 + rFru() * 0.3,
+        escala: 1.1 + rFru() * 0.4,
         tint: [col.r, col.g, col.b],
       });
     }
