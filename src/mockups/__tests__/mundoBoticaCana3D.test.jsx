@@ -136,7 +136,9 @@ describe('MundoBoticaCana3D', () => {
       expect(container.querySelector('group[name="etiqueta-paso-4"]')).toBeNull();
       expect(container.querySelector('group[name="ojo-paso"]')).toBeNull();
       const foco = container.querySelector('group[name="foco-paso"]');
-      expect(foco.getAttribute('position')).toBe('0.5,1,1.5');
+      // Al apagar el recorrido se vuelve a la MISMA vista calma que #2698
+      // reencuadró hacia el trapiche (0.9,1,1.8), no al punto de reposo viejo.
+      expect(foco.getAttribute('position')).toBe('0.9,1,1.8');
     });
   });
 });
