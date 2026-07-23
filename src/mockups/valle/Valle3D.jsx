@@ -274,7 +274,7 @@ const PICOS_LEJANOS = [
 
 function PicosLejanos({ color }) {
   return (
-    <Instances limit={PICOS_LEJANOS.length}>
+    <Instances frames={1} limit={PICOS_LEJANOS.length}>
       <coneGeometry args={[1, 1, 5]} />
       <meshLambertMaterial color={color} opacity={0.85} transparent />
       {PICOS_LEJANOS.map((p, i) => (
@@ -290,7 +290,7 @@ function Cordillera({ color, innerRef, perfil }) {
     // escalado por instancia. El raycast de occlude funciona igual.
     return (
       <group ref={innerRef}>
-        <Instances limit={PICOS_CORDILLERA.length}>
+        <Instances frames={1} limit={PICOS_CORDILLERA.length}>
           <coneGeometry args={[1, 1, 6]} />
           <meshLambertMaterial color={color} opacity={0.92} transparent />
           {PICOS_CORDILLERA.map((p, i) => (
@@ -301,14 +301,21 @@ function Cordillera({ color, innerRef, perfil }) {
       </group>
     );
   }
+  // Rico (tier 'alto'): MISMO look (meshStandardMaterial + flatShading) pero
+  // INSTANCIADO (PERF-VALLE-INSTANCING 2026-07-23) — un cono unidad escalado
+  // por instancia a (r,h,r) reproduce el coneGeometry(r,h) exacto de antes
+  // (escalar un cono unidad de forma isotrópica en XZ y por separado en Y da
+  // el MISMO cono que construirlo con esos radios/alto — three.js corrige
+  // las normales con la matriz inversa-transpuesta, así que la luz no cambia).
   return (
     <group ref={innerRef}>
-      {PICOS_CORDILLERA.map((p, i) => (
-        <mesh key={i} position={[p.x, p.base + p.h / 2, p.z]}>
-          <coneGeometry args={[p.r, p.h, 6]} />
-          <meshStandardMaterial color={color} flatShading roughness={1} opacity={0.92} transparent />
-        </mesh>
-      ))}
+      <Instances frames={1} limit={PICOS_CORDILLERA.length}>
+        <coneGeometry args={[1, 1, 6]} />
+        <meshStandardMaterial color={color} flatShading roughness={1} opacity={0.92} transparent />
+        {PICOS_CORDILLERA.map((p, i) => (
+          <Instance key={i} position={[p.x, p.base + p.h / 2, p.z]} scale={[p.r, p.h, p.r]} />
+        ))}
+      </Instances>
       <PicosLejanos color={color} />
     </group>
   );
@@ -410,15 +417,37 @@ function ArboledaEspecies({ q }) {
 /* ── Materiales/paletas de cada landmark de mundo, por `tipo`. Formas
       redondeadas (cilindros, conos, esferas) — pocas piezas por lugar para
       dejar aire. La arboleda va por especie (mallas de floraParamo); `q` baja
-      el detalle geométrico en perfil frugal. ── */
+      el detalle geométrico en perfil frugal.
+
+   PERF-VALLE-INSTANCING 2026-07-23 — por qué TODA <Instances/> de este
+   archivo lleva `frames={1}`: por defecto drei recalcula la matriz de CADA
+   instancia en CADA frame (para soportar instancias que se mueven). Todo lo
+   que se instancia acá (matas, landmarks) es geometría ESTÁTICA — se siembra
+   una vez y no vuelve a moverse — así que ese recálculo perpetuo es puro
+   desperdicio de CPU. Con ~50 bloques <Instances/> nuevos, el desperdicio
+   dejó de ser gratis: la primera pasada (sin `frames`) BAJÓ el fps pese a
+   haber recortado los draw calls a más de la mitad (menos GPU, pero más CPU
+   por frame). `frames={1}` calcula la matriz UNA vez al montar y no vuelve a
+   tocarla — es la razón por la que el ahorro de draw calls SÍ se nota en
+   fps. Si algún día una instancia necesita moverse, se le quita `frames` a
+   ESE bloque puntual, no a todos. ── */
 function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
   const [fuerte, suave] = tinte;
   switch (tipo) {
-    case 'milpa': // LA PARCELA VIVA (estilo granja de Age of Empires, en modo
+    case 'milpa': { // LA PARCELA VIVA (estilo granja de Age of Empires, en modo
       // milpa): la tierra labrada como base, y encima las TRES HERMANAS
       // juntas — maíz (caña con penacho), fríjol (bejuco enroscado a la
       // caña) y calabaza (frutos naranjas con su hoja ancha tapando el
       // suelo). Se lee POLICULTIVO de un vistazo: nada de hileras clonadas.
+      // PERF-VALLE-INSTANCING 2026-07-23: cada pieza repetida (surco, caña,
+      // hoja, penacho, fríjol, calabaza) pasa de N <mesh> sueltos a 1
+      // <Instances/> — el grupo era el que más pesaba del valle (45→10 draw
+      // calls). Posiciones LOCALES idénticas a las de antes, solo aplanadas.
+      const FILAS_MAIZ = [
+        [-0.75, -0.5, 1.35], [-0.1, -0.25, 1.5], [0.6, -0.55, 1.25],
+        [-0.45, 0.25, 1.45], [0.3, 0.4, 1.3],
+      ];
+      const CALABAZAS = [[-0.55, 0.75], [0.15, 0.85], [0.75, 0.1], [-0.85, 0.05]];
       return (
         <group>
           {/* la tierra labrada de la parcela (la "granja" que se lee de lejos) */}
@@ -427,70 +456,87 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
             <meshStandardMaterial color="#5f4429" flatShading roughness={1} />
           </mesh>
           {/* surcos suaves (dos lomos que cruzan la parcela) */}
-          {[-0.45, 0.35].map((dz, i) => (
-            <mesh key={i} position={[0, 0.09, dz]} rotation={[0, 0, Math.PI / 2]}>
-              <capsuleGeometry args={[0.06, 1.85, 3, 6]} />
-              <meshStandardMaterial color="#6b4e30" flatShading roughness={1} />
-            </mesh>
-          ))}
-          {/* el maíz con su fríjol trepado (quincunce, alturas variadas) */}
-          {[
-            [-0.75, -0.5, 1.35], [-0.1, -0.25, 1.5], [0.6, -0.55, 1.25],
-            [-0.45, 0.25, 1.45], [0.3, 0.4, 1.3],
-          ].map(([dx, dz, h], i) => (
-            <group key={i} position={[dx, 0.08, dz]}>
-              <mesh position={[0, h / 2, 0]} castShadow>
-                <cylinderGeometry args={[0.045, 0.075, h, 6]} />
-                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-              </mesh>
-              {/* hojas de la caña */}
-              <mesh position={[0.15, h * 0.62, 0]} rotation={[0, 0, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.11, 0.46, 4]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              <mesh position={[-0.15, h * 0.44, 0]} rotation={[0, Math.PI, -0.7]} scale={[1, 1, 0.3]}>
-                <coneGeometry args={[0.11, 0.46, 4]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              {/* el penacho */}
-              <mesh position={[0, h + 0.16, 0]}>
-                <coneGeometry args={[0.07, 0.36, 6]} />
-                <meshStandardMaterial color="#e7c96b" flatShading />
-              </mesh>
-              {/* el FRÍJOL enroscado a la caña (dos vueltas del bejuco) */}
-              <mesh position={[0, h * 0.3, 0]} rotation={[Math.PI / 2.3, 0, 0.2]}>
-                <torusGeometry args={[0.1, 0.028, 5, 10]} />
-                <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
-              </mesh>
-              <mesh position={[0.02, h * 0.55, 0]} rotation={[Math.PI / 1.9, 0, -0.3]}>
-                <torusGeometry args={[0.09, 0.026, 5, 10]} />
-                <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
-              </mesh>
-            </group>
-          ))}
-          {/* las CALABAZAS tapando el suelo entre matas (fruto + hoja ancha) */}
-          {[[-0.55, 0.75], [0.15, 0.85], [0.75, 0.1], [-0.85, 0.05]].map(([dx, dz], i) => (
-            <group key={i} position={[dx, 0.09, dz]}>
-              <mesh position={[0, 0.09, 0]} scale={[1, 0.72, 1]} castShadow>
-                <sphereGeometry args={[0.14, 9, 7]} />
-                <meshStandardMaterial color="#d98e2b" flatShading roughness={1} />
-              </mesh>
-              <mesh position={[0, 0.16, 0]}>
-                <cylinderGeometry args={[0.018, 0.025, 0.07, 5]} />
-                <meshStandardMaterial color="#4f7a3a" flatShading />
-              </mesh>
-              {/* la hoja ancha que cubre el suelo */}
-              <mesh position={[0.18, 0.06, 0.1]} rotation={[-Math.PI / 2.2, 0, 0.6]} scale={[1, 1, 0.5]}>
-                <circleGeometry args={[0.16, 7]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} side={2} />
-              </mesh>
-            </group>
-          ))}
+          <Instances frames={1} limit={2}>
+            <capsuleGeometry args={[0.06, 1.85, 3, 6]} />
+            <meshStandardMaterial color="#6b4e30" flatShading roughness={1} />
+            {[-0.45, 0.35].map((dz, i) => (
+              <Instance key={i} position={[0, 0.09, dz]} rotation={[0, 0, Math.PI / 2]} />
+            ))}
+          </Instances>
+          {/* el maíz con su fríjol trepado (quincunce, alturas variadas):
+              caña/hoja/penacho/fríjol, cada pieza en su propia <Instances/> */}
+          <Instances frames={1} limit={FILAS_MAIZ.length} castShadow>
+            <cylinderGeometry args={[0.045, 0.075, 1, 6]} />
+            <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            {FILAS_MAIZ.map(([dx, dz, h], i) => (
+              <Instance key={i} position={[dx, 0.08 + h / 2, dz]} scale={[1, h, 1]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={FILAS_MAIZ.length * 2}>
+            <coneGeometry args={[0.11, 0.46, 4]} />
+            <meshStandardMaterial color={suave} flatShading roughness={1} />
+            {FILAS_MAIZ.flatMap(([dx, dz, h], i) => [
+              <Instance key={`${i}a`} position={[dx + 0.15, 0.08 + h * 0.62, dz]} rotation={[0, 0, -0.7]} scale={[1, 1, 0.3]} />,
+              <Instance key={`${i}b`} position={[dx - 0.15, 0.08 + h * 0.44, dz]} rotation={[0, Math.PI, -0.7]} scale={[1, 1, 0.3]} />,
+            ])}
+          </Instances>
+          <Instances frames={1} limit={FILAS_MAIZ.length}>
+            <coneGeometry args={[0.07, 0.36, 6]} />
+            <meshStandardMaterial color="#e7c96b" flatShading />
+            {FILAS_MAIZ.map(([dx, dz, h], i) => (
+              <Instance key={i} position={[dx, 0.08 + h + 0.16, dz]} />
+            ))}
+          </Instances>
+          {/* el FRÍJOL enroscado a la caña (dos vueltas del bejuco, cada una
+              con su propio radio de tubo → dos <Instances/>) */}
+          <Instances frames={1} limit={FILAS_MAIZ.length}>
+            <torusGeometry args={[0.1, 0.028, 5, 10]} />
+            <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
+            {FILAS_MAIZ.map(([dx, dz, h], i) => (
+              <Instance key={i} position={[dx, 0.08 + h * 0.3, dz]} rotation={[Math.PI / 2.3, 0, 0.2]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={FILAS_MAIZ.length}>
+            <torusGeometry args={[0.09, 0.026, 5, 10]} />
+            <meshStandardMaterial color="#2f6b34" flatShading roughness={1} />
+            {FILAS_MAIZ.map(([dx, dz, h], i) => (
+              <Instance key={i} position={[dx + 0.02, 0.08 + h * 0.55, dz]} rotation={[Math.PI / 1.9, 0, -0.3]} />
+            ))}
+          </Instances>
+          {/* las CALABAZAS tapando el suelo entre matas (fruto + tallo + hoja ancha) */}
+          <Instances frames={1} limit={CALABAZAS.length} castShadow>
+            <sphereGeometry args={[0.14, 9, 7]} />
+            <meshStandardMaterial color="#d98e2b" flatShading roughness={1} />
+            {CALABAZAS.map(([dx, dz], i) => (
+              <Instance key={i} position={[dx, 0.18, dz]} scale={[1, 0.72, 1]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={CALABAZAS.length}>
+            <cylinderGeometry args={[0.018, 0.025, 0.07, 5]} />
+            <meshStandardMaterial color="#4f7a3a" flatShading />
+            {CALABAZAS.map(([dx, dz], i) => (
+              <Instance key={i} position={[dx, 0.25, dz]} />
+            ))}
+          </Instances>
+          {/* la hoja ancha que cubre el suelo */}
+          <Instances frames={1} limit={CALABAZAS.length}>
+            <circleGeometry args={[0.16, 7]} />
+            <meshStandardMaterial color={suave} flatShading roughness={1} side={2} />
+            {CALABAZAS.map(([dx, dz], i) => (
+              <Instance key={i} position={[dx + 0.18, 0.15, dz + 0.1]} rotation={[-Math.PI / 2.2, 0, 0.6]} scale={[1, 1, 0.5]} />
+            ))}
+          </Instances>
         </group>
       );
-    case 'cafetal': // café CON SOMBRÍO (policultivo, no hilera): los arbustos
+    }
+    case 'cafetal': { // café CON SOMBRÍO (policultivo, no hilera): los arbustos
       // cargados de cereza roja DEBAJO de su guamo de sombra y con una mata
       // de plátano al lado — el trío clásico del cafetal campesino.
+      // PERF-VALLE-INSTANCING 2026-07-23: hojas del plátano, arbustos y
+      // cerezas van a <Instances/> (27→7 draw calls); el guamo y el
+      // pseudotallo del plátano son piezas únicas, se quedan como <mesh/>.
+      const ARBUSTOS = [[-0.6, 0.35], [0.05, 0.15], [0.5, 0.55], [-0.2, 0.7]];
+      const CEREZA_OFFSETS = [[0.16, 0.5, 0.16], [-0.14, 0.42, 0.18], [0.05, 0.6, -0.2]];
       return (
         <group>
           {/* el GUAMO de sombrío: tronco alto + copa ancha y plana encima */}
@@ -510,62 +556,70 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
               <cylinderGeometry args={[0.08, 0.12, 1.0, 7]} />
               <meshStandardMaterial color="#7a9a55" flatShading roughness={1} />
             </mesh>
-            {[0, 1, 2, 3].map((k) => (
-              <mesh
-                key={k}
-                position={[0, 0.95, 0]}
-                rotation={[0, (k / 4) * Math.PI * 2 + 0.4, -0.9]}
-                scale={[1, 1, 0.28]}
-                castShadow
-              >
-                <coneGeometry args={[0.2, 0.85, 4]} />
-                <meshStandardMaterial color="#4f9a44" flatShading roughness={1} />
-              </mesh>
-            ))}
+            <Instances frames={1} limit={4} castShadow>
+              <coneGeometry args={[0.2, 0.85, 4]} />
+              <meshStandardMaterial color="#4f9a44" flatShading roughness={1} />
+              {[0, 1, 2, 3].map((k) => (
+                <Instance
+                  key={k}
+                  position={[0, 0.95, 0]}
+                  rotation={[0, (k / 4) * Math.PI * 2 + 0.4, -0.9]}
+                  scale={[1, 1, 0.28]}
+                />
+              ))}
+            </Instances>
           </group>
           {/* los arbustos de café bajo la sombra, con su cereza roja */}
-          {[[-0.6, 0.35], [0.05, 0.15], [0.5, 0.55], [-0.2, 0.7]].map(([dx, dz], i) => (
-            <group key={i} position={[dx, 0, dz]}>
-              <mesh position={[0, 0.16, 0]}>
-                <cylinderGeometry args={[0.05, 0.07, 0.32, 6]} />
-                <meshStandardMaterial color="#6b4a2e" flatShading />
-              </mesh>
-              <mesh position={[0, 0.44, 0]} castShadow>
-                <sphereGeometry args={[0.3, 10, 9]} />
-                <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-              </mesh>
-              {/* la cereza madura que pinta el arbusto */}
-              {[[0.16, 0.5, 0.16], [-0.14, 0.42, 0.18], [0.05, 0.6, -0.2]].map(([bx, by, bz], j) => (
-                <mesh key={j} position={[bx, by, bz]}>
-                  <sphereGeometry args={[0.035, 6, 5]} />
-                  <meshBasicMaterial color="#c9392e" />
-                </mesh>
-              ))}
-            </group>
-          ))}
+          <Instances frames={1} limit={ARBUSTOS.length}>
+            <cylinderGeometry args={[0.05, 0.07, 0.32, 6]} />
+            <meshStandardMaterial color="#6b4a2e" flatShading />
+            {ARBUSTOS.map(([dx, dz], i) => (
+              <Instance key={i} position={[dx, 0.16, dz]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={ARBUSTOS.length} castShadow>
+            <sphereGeometry args={[0.3, 10, 9]} />
+            <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            {ARBUSTOS.map(([dx, dz], i) => (
+              <Instance key={i} position={[dx, 0.44, dz]} />
+            ))}
+          </Instances>
+          {/* la cereza madura que pinta el arbusto (3 por arbusto) */}
+          <Instances frames={1} limit={ARBUSTOS.length * CEREZA_OFFSETS.length}>
+            <sphereGeometry args={[0.035, 6, 5]} />
+            <meshBasicMaterial color="#c9392e" />
+            {ARBUSTOS.flatMap(([dx, dz], i) => CEREZA_OFFSETS.map(([bx, by, bz], j) => (
+              <Instance key={`${i}-${j}`} position={[dx + bx, by, dz + bz]} />
+            )))}
+          </Instances>
         </group>
       );
-    case 'era': // eras del semillero: camellones redondeados (lomos de tierra)
+    }
+    case 'era': { // eras del semillero: camellones redondeados (lomos de tierra)
+      // PERF-VALLE-INSTANCING 2026-07-23: 12→2 draw calls.
+      const CAMELLONES = [-0.42, 0, 0.42];
+      const BROTES = [-0.35, 0, 0.35];
       return (
         <group>
-          {[-0.42, 0, 0.42].map((dz, i) => (
-            <group key={i} position={[0, 0, dz]}>
-              {/* camellón: cilindro tumbado con puntas de esfera */}
-              <mesh position={[0, 0.1, 0]} rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow>
-                <capsuleGeometry args={[0.14, 1.1, 4, 8]} />
-                <meshStandardMaterial color="#6b4630" flatShading roughness={1} />
-              </mesh>
-              {/* brotes verdes del semillero */}
-              {[-0.35, 0, 0.35].map((bx, j) => (
-                <mesh key={j} position={[bx, 0.26, 0]}>
-                  <coneGeometry args={[0.07, 0.2, 5]} />
-                  <meshStandardMaterial color={suave} flatShading />
-                </mesh>
-              ))}
-            </group>
-          ))}
+          {/* camellón: cilindro tumbado con puntas de esfera */}
+          <Instances frames={1} limit={CAMELLONES.length} castShadow receiveShadow>
+            <capsuleGeometry args={[0.14, 1.1, 4, 8]} />
+            <meshStandardMaterial color="#6b4630" flatShading roughness={1} />
+            {CAMELLONES.map((dz, i) => (
+              <Instance key={i} position={[0, 0.1, dz]} rotation={[0, 0, Math.PI / 2]} />
+            ))}
+          </Instances>
+          {/* brotes verdes del semillero (3 por camellón) */}
+          <Instances frames={1} limit={CAMELLONES.length * BROTES.length}>
+            <coneGeometry args={[0.07, 0.2, 5]} />
+            <meshStandardMaterial color={suave} flatShading />
+            {CAMELLONES.flatMap((dz, i) => BROTES.map((bx, j) => (
+              <Instance key={`${i}-${j}`} position={[bx, 0.26, dz]} />
+            )))}
+          </Instances>
         </group>
       );
+    }
     case 'tanque':
       return (
         <group>
@@ -594,12 +648,14 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
             <coneGeometry args={[0.68, 0.36, 12, 1, true]} />
             <meshStandardMaterial color="#a8c8d5" transparent opacity={0.72} side={2} />
           </mesh>
-          {[-0.38, 0, 0.38].map((x) => (
-            <mesh key={x} position={[x, 1.25, 0]}>
-              <capsuleGeometry args={[0.025, 0.16, 3, 5]} />
-              <meshBasicMaterial color="#bfe5f4" transparent opacity={0.8} />
-            </mesh>
-          ))}
+          {/* las gotas colgando del embudo — INSTANCIADAS (3→1 draw call) */}
+          <Instances frames={1} limit={3}>
+            <capsuleGeometry args={[0.025, 0.16, 3, 5]} />
+            <meshBasicMaterial color="#bfe5f4" transparent opacity={0.8} />
+            {[-0.38, 0, 0.38].map((x) => (
+              <Instance key={x} position={[x, 1.25, 0]} />
+            ))}
+          </Instances>
         </group>
       );
     case 'acueducto':
@@ -630,47 +686,57 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
             <cylinderGeometry args={[0.55, 0.62, 0.12, 20]} />
             <meshStandardMaterial color="#3a7fa0" transparent opacity={0.85} metalness={0.4} roughness={0.2} />
           </mesh>
-          {[-0.28, 0.12, 0.4].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.4, 0.2]} rotation={[0.12, 0, 0.08]}>
-              <cylinderGeometry args={[0.025, 0.03, 0.7, 5]} />
-              <meshStandardMaterial color="#4e7d3f" flatShading />
-            </mesh>
-          ))}
+          {/* los juncos de la charca — INSTANCIADOS (3→1 draw call) */}
+          <Instances frames={1} limit={3}>
+            <cylinderGeometry args={[0.025, 0.03, 0.7, 5]} />
+            <meshStandardMaterial color="#4e7d3f" flatShading />
+            {[-0.28, 0.12, 0.4].map((dx, i) => (
+              <Instance key={i} position={[dx, 0.4, 0.2]} rotation={[0.12, 0, 0.08]} />
+            ))}
+          </Instances>
         </group>
       );
     case 'animales': // los animales de la finca (reemplaza la vieja casita)
       return <AnimalesDeFinca reducedMotion={reducedMotion} q={q} />;
-    case 'huerta': // camas de la huerta: lomos redondeados con matas
+    case 'huerta': { // camas de la huerta: lomos redondeados con matas
+      // PERF-VALLE-INSTANCING 2026-07-23: 8→2 draw calls.
+      const CAMAS = [-0.42, 0.42];
+      const MATAS_CAMA = [-0.28, 0, 0.28];
       return (
         <group>
-          {[-0.42, 0.42].map((dx, i) => (
-            <group key={i} position={[dx, 0, 0]}>
-              <mesh position={[0, 0.12, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-                <capsuleGeometry args={[0.16, 0.7, 4, 8]} />
-                <meshStandardMaterial color="#6b4a30" flatShading roughness={1} />
-              </mesh>
-              {[-0.28, 0, 0.28].map((dz, j) => (
-                <mesh key={j} position={[0, 0.3, dz]} castShadow>
-                  <sphereGeometry args={[0.16, 9, 8]} />
-                  <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-                </mesh>
-              ))}
-            </group>
-          ))}
+          <Instances frames={1} limit={CAMAS.length} castShadow>
+            <capsuleGeometry args={[0.16, 0.7, 4, 8]} />
+            <meshStandardMaterial color="#6b4a30" flatShading roughness={1} />
+            {CAMAS.map((dx, i) => (
+              <Instance key={i} position={[dx, 0.12, 0]} rotation={[Math.PI / 2, 0, 0]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={CAMAS.length * MATAS_CAMA.length} castShadow>
+            <sphereGeometry args={[0.16, 9, 8]} />
+            <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            {CAMAS.flatMap((dx, i) => MATAS_CAMA.map((dz, j) => (
+              <Instance key={`${i}-${j}`} position={[dx, 0.3, dz]} />
+            )))}
+          </Instances>
         </group>
       );
+    }
     case 'bosque': // arboleda POR ESPECIE: roble andino + aliso + gaque
       return <ArboledaEspecies q={q} />;
-    case 'mercado': // puesto de mercado campesino: toldo a dos aguas + mesa + canasto
+    case 'mercado': { // puesto de mercado campesino: toldo a dos aguas + mesa + canasto
+      // PERF-VALLE-INSTANCING 2026-07-23: 10→5 draw calls.
+      const PATAS = [[-0.32, 0.22], [0.32, 0.22], [-0.32, -0.22], [0.32, -0.22]];
+      const FRUTAS = [[0, 0.7, 0.08], [0.08, 0.68, 0.13], [-0.05, 0.68, 0.04]];
       return (
         <group>
-          {/* las patas y la mesa del puesto */}
-          {[[-0.32, 0.22], [0.32, 0.22], [-0.32, -0.22], [0.32, -0.22]].map(([x, z], i) => (
-            <mesh key={i} position={[x, 0.24, z]} castShadow>
-              <cylinderGeometry args={[0.03, 0.035, 0.48, 5]} />
-              <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
-            </mesh>
-          ))}
+          {/* las patas de la mesa del puesto */}
+          <Instances frames={1} limit={PATAS.length} castShadow>
+            <cylinderGeometry args={[0.03, 0.035, 0.48, 5]} />
+            <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
+            {PATAS.map(([x, z], i) => (
+              <Instance key={i} position={[x, 0.24, z]} />
+            ))}
+          </Instances>
           <mesh position={[0, 0.49, 0]} castShadow>
             <boxGeometry args={[0.82, 0.06, 0.56]} />
             <meshStandardMaterial color="#a9814f" flatShading roughness={1} />
@@ -685,37 +751,41 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
             <cylinderGeometry args={[0.13, 0.1, 0.14, 9]} />
             <meshStandardMaterial color="#a9773f" flatShading roughness={1} />
           </mesh>
-          {[[0, 0.7, 0.08], [0.08, 0.68, 0.13], [-0.05, 0.68, 0.04]].map(([x, y, z], i) => (
-            <mesh key={i} position={[x, y, z]}>
-              <sphereGeometry args={[0.055, 7, 6]} />
-              <meshStandardMaterial color={suave} flatShading roughness={1} />
-            </mesh>
-          ))}
+          <Instances frames={1} limit={FRUTAS.length}>
+            <sphereGeometry args={[0.055, 7, 6]} />
+            <meshStandardMaterial color={suave} flatShading roughness={1} />
+            {FRUTAS.map(([x, y, z], i) => (
+              <Instance key={i} position={[x, y, z]} />
+            ))}
+          </Instances>
         </group>
       );
+    }
     case 'veleta': // poste con veleta que gira con el viento
       return <Veleta color={fuerte} reducedMotion={reducedMotion} />;
-    case 'invernadero': // el MICRO-MUNDO del semillero: un invernadero de
+    case 'invernadero': { // el MICRO-MUNDO del semillero: un invernadero de
       // verdad — arcos de madera, el plástico traslúcido que brilla al sol,
       // la puerta abierta y las mesas de germinación adentro. Se destaca
       // como pieza propia del valle: la fábrica de la matica.
+      // PERF-VALLE-INSTANCING 2026-07-23: parales/paneles/arcos/mesas/brotes
+      // repetidos → <Instances/> en las 3 formas (cuadrado/túnel).
       if (forma === 'cuadrado') {
+        const PARALES = [[-0.62, -0.65], [0.62, -0.65], [-0.62, 0.65], [0.62, 0.65]];
         return (
           <group>
-            {[[-0.62, -0.65], [0.62, -0.65], [-0.62, 0.65], [0.62, 0.65]].map(([x, z], i) => (
-              <mesh key={i} position={[x, 0.45, z]} castShadow>
-                <cylinderGeometry args={[0.035, 0.045, 0.9, 5]} />
-                <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
-              </mesh>
-            ))}
-            <mesh position={[-0.32, 0.88, 0]} rotation={[0, 0, -0.5]} castShadow>
+            <Instances frames={1} limit={PARALES.length} castShadow>
+              <cylinderGeometry args={[0.035, 0.045, 0.9, 5]} />
+              <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+              {PARALES.map(([x, z], i) => (
+                <Instance key={i} position={[x, 0.45, z]} />
+              ))}
+            </Instances>
+            <Instances frames={1} limit={2} castShadow>
               <boxGeometry args={[0.78, 0.035, 1.42]} />
               <meshStandardMaterial color="#eef7f2" transparent opacity={0.48} side={2} />
-            </mesh>
-            <mesh position={[0.32, 0.88, 0]} rotation={[0, 0, 0.5]} castShadow>
-              <boxGeometry args={[0.78, 0.035, 1.42]} />
-              <meshStandardMaterial color="#eef7f2" transparent opacity={0.48} side={2} />
-            </mesh>
+              <Instance position={[-0.32, 0.88, 0]} rotation={[0, 0, -0.5]} />
+              <Instance position={[0.32, 0.88, 0]} rotation={[0, 0, 0.5]} />
+            </Instances>
             <mesh position={[0, 0.45, 0]}>
               <boxGeometry args={[1.24, 0.84, 1.34]} />
               <meshStandardMaterial color="#e4f2ea" transparent opacity={0.2} side={2} />
@@ -737,15 +807,19 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
           </group>
         );
       }
+      const ARCOS = [-0.65, -0.22, 0.22, 0.65];
+      const MESAS = [-0.26, 0.26];
+      const BROTES_M = [-0.42, -0.14, 0.14, 0.42];
       return (
         <group>
           {/* los arcos del túnel (medio-toroide de pie), en tono madera */}
-          {[-0.65, -0.22, 0.22, 0.65].map((dz, i) => (
-            <mesh key={i} position={[0, 0, dz]}>
-              <torusGeometry args={[0.62, 0.03, 6, 18, Math.PI]} />
-              <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
-            </mesh>
-          ))}
+          <Instances frames={1} limit={ARCOS.length}>
+            <torusGeometry args={[0.62, 0.03, 6, 18, Math.PI]} />
+            <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+            {ARCOS.map((dz, i) => (
+              <Instance key={i} position={[0, 0, dz]} />
+            ))}
+          </Instances>
           {/* la cumbrera que amarra los arcos */}
           <mesh position={[0, 0.62, 0]} rotation={[Math.PI / 2, 0, 0]}>
             <cylinderGeometry args={[0.025, 0.025, 1.5, 5]} />
@@ -765,7 +839,9 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
               roughness={0.6}
             />
           </mesh>
-          {/* el testero trasero cerrado y el delantero con PUERTA abierta */}
+          {/* el testero trasero cerrado y el delantero con PUERTA abierta
+              (geometrías DISTINTAS — ángulos de arco diferentes — quedan
+              cada una como pieza única, no se instancian). */}
           <mesh position={[0, 0, -0.72]}>
             <circleGeometry args={[0.62, 16, 0, Math.PI]} />
             <meshStandardMaterial color="#eef7f2" transparent opacity={0.3} side={2} roughness={0.6} />
@@ -775,20 +851,20 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
             <meshStandardMaterial color="#eef7f2" transparent opacity={0.3} side={2} roughness={0.6} />
           </mesh>
           {/* las DOS mesas de germinación con sus brotecitos en fila viva */}
-          {[-0.26, 0.26].map((dx, i) => (
-            <group key={i} position={[dx, 0, 0]}>
-              <mesh position={[0, 0.18, 0]}>
-                <boxGeometry args={[0.34, 0.05, 1.2]} />
-                <meshStandardMaterial color="#5a4326" flatShading roughness={1} />
-              </mesh>
-              {[-0.42, -0.14, 0.14, 0.42].map((bz, j) => (
-                <mesh key={j} position={[(j % 2) * 0.1 - 0.05, 0.27, bz]}>
-                  <coneGeometry args={[0.05, 0.15, 5]} />
-                  <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-                </mesh>
-              ))}
-            </group>
-          ))}
+          <Instances frames={1} limit={MESAS.length}>
+            <boxGeometry args={[0.34, 0.05, 1.2]} />
+            <meshStandardMaterial color="#5a4326" flatShading roughness={1} />
+            {MESAS.map((dx, i) => (
+              <Instance key={i} position={[dx, 0.18, 0]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={MESAS.length * BROTES_M.length}>
+            <coneGeometry args={[0.05, 0.15, 5]} />
+            <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            {MESAS.flatMap((dx, i) => BROTES_M.map((bz, j) => (
+              <Instance key={`${i}-${j}`} position={[dx + (j % 2) * 0.1 - 0.05, 0.27, bz]} />
+            )))}
+          </Instances>
           {/* el barril de agua junto a la puerta (el riego del vivero) */}
           <mesh position={[0.62, 0.14, 0.78]} castShadow>
             <cylinderGeometry args={[0.11, 0.12, 0.28, 9]} />
@@ -796,23 +872,26 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
           </mesh>
         </group>
       );
+    }
     case 'compost': // LA BIOFÁBRICA: la pila de compost con apariencia de tal
       // — el cajón de madera en U, la pila humeante por capas (estiércol
       // abajo, material fresco, la capa de paja encima) y la horqueta
       // clavada. El ciclo estiércol→abono, legible.
       return (
         <group>
-          {/* el cajón de madera en U que contiene la pila */}
-          {[
-            { p: [0, 0.16, -0.5], s: [1.15, 0.32, 0.08] },
-            { p: [-0.56, 0.16, -0.05], s: [0.08, 0.32, 0.95] },
-            { p: [0.56, 0.16, -0.05], s: [0.08, 0.32, 0.95] },
-          ].map((w, i) => (
-            <mesh key={i} position={/** @type {any} */ (w.p)} castShadow>
-              <boxGeometry args={/** @type {any} */ (w.s)} />
-              <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
-            </mesh>
-          ))}
+          {/* el cajón de madera en U que contiene la pila: la pared frontal
+              es una pieza única; las dos paredes laterales COMPARTEN
+              geometría (mismo tamaño, espejadas en x) → INSTANCIADAS. */}
+          <mesh position={[0, 0.16, -0.5]} castShadow>
+            <boxGeometry args={[1.15, 0.32, 0.08]} />
+            <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
+          </mesh>
+          <Instances frames={1} limit={2} castShadow>
+            <boxGeometry args={[0.08, 0.32, 0.95]} />
+            <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
+            <Instance position={[-0.56, 0.16, -0.05]} />
+            <Instance position={[0.56, 0.16, -0.05]} />
+          </Instances>
           {/* la PILA por capas: estiércol oscuro, compost pardo, paja clara */}
           <mesh position={[0, 0.14, -0.05]} scale={[1, 0.5, 0.9]} castShadow>
             <sphereGeometry args={[0.48, 10, 8]} />
@@ -860,12 +939,13 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
               <boxGeometry args={[0.66, 0.045, 0.52]} />
               <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
             </mesh>
-            {[-0.2, 0.2].map((dz, i) => (
-              <mesh key={i} position={[0, 0.015, dz]}>
-                <boxGeometry args={[0.7, 0.03, 0.09]} />
-                <meshStandardMaterial color="#6b4a2e" flatShading roughness={1} />
-              </mesh>
-            ))}
+            <Instances frames={1} limit={2}>
+              <boxGeometry args={[0.7, 0.03, 0.09]} />
+              <meshStandardMaterial color="#6b4a2e" flatShading roughness={1} />
+              {[-0.2, 0.2].map((dz, i) => (
+                <Instance key={i} position={[0, 0.015, dz]} />
+              ))}
+            </Instances>
             {/* la caneca grande con su tapa y la mediana */}
             <mesh position={[-0.16, 0.29, -0.04]} castShadow>
               <cylinderGeometry args={[0.13, 0.13, 0.42, 9]} />
@@ -880,12 +960,13 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
               <meshStandardMaterial color="#3a86b8" flatShading roughness={0.8} />
             </mesh>
             {/* los tarros del biopreparado listos para el lote (en fila) */}
-            {[-0.02, 0.12, 0.26].map((dx, i) => (
-              <mesh key={i} position={[dx, 0.12, 0.28]}>
-                <cylinderGeometry args={[0.045, 0.045, 0.13, 7]} />
-                <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
-              </mesh>
-            ))}
+            <Instances frames={1} limit={3}>
+              <cylinderGeometry args={[0.045, 0.045, 0.13, 7]} />
+              <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
+              {[-0.02, 0.12, 0.26].map((dx, i) => (
+                <Instance key={i} position={[dx, 0.12, 0.28]} />
+              ))}
+            </Instances>
           </group>
         </group>
       );
@@ -895,12 +976,13 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
       return (
         <group>
           {/* los dos parales y el techito de paja a un agua */}
-          {[-0.5, 0.5].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.55, -0.15]} castShadow>
-              <cylinderGeometry args={[0.04, 0.05, 1.1, 6]} />
-              <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
-            </mesh>
-          ))}
+          <Instances frames={1} limit={2} castShadow>
+            <cylinderGeometry args={[0.04, 0.05, 1.1, 6]} />
+            <meshStandardMaterial color="#8a6a44" flatShading roughness={1} />
+            {[-0.5, 0.5].map((dx, i) => (
+              <Instance key={i} position={[dx, 0.55, -0.15]} />
+            ))}
+          </Instances>
           <mesh position={[0, 1.14, -0.05]} rotation={[0.28, 0, 0]} castShadow>
             <boxGeometry args={[1.3, 0.07, 0.75]} />
             <meshStandardMaterial color="#c9a55a" flatShading roughness={1} />
@@ -910,7 +992,8 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
             <boxGeometry args={[0.86, 0.5, 0.05]} />
             <meshStandardMaterial color="#2e5941" flatShading roughness={1} />
           </mesh>
-          {/* las tres rayitas de tiza del tablero (la lección de hoy) */}
+          {/* las tres rayitas de tiza del tablero (anchos DISTINTOS → piezas
+              únicas, no se instancian) */}
           {[0.74, 0.62, 0.5].map((y, i) => (
             <mesh key={i} position={[i * 0.06 - 0.1, y, -0.11]}>
               <boxGeometry args={[0.42 - i * 0.1, 0.022, 0.01]} />
@@ -922,7 +1005,10 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
             <cylinderGeometry args={[0.09, 0.09, 0.9, 8]} />
             <meshStandardMaterial color="#7a5a38" flatShading roughness={1} />
           </mesh>
-          {/* el libro abierto sobre la banca (dos tapitas en V) */}
+          {/* el libro abierto sobre la banca (dos tapitas en V): la carga de
+              esta pieza es marginal (2 <mesh/>) y su padre tiene rotación
+              propia — no se fuerza el aplanado a <Instances/> para no
+              arriesgar el álgebra de una malla que apenas pesa. */}
           <group position={[0.15, 0.24, 0.55]} rotation={[0, -0.4, 0]}>
             <mesh position={[-0.06, 0, 0]} rotation={[0, 0, 0.5]}>
               <boxGeometry args={[0.14, 0.015, 0.18]} />
@@ -935,74 +1021,98 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
           </group>
         </group>
       );
-    case 'frailejonal': // LA PUERTA DEL PÁRAMO: el frailejonal con su niebla
+    case 'frailejonal': { // LA PUERTA DEL PÁRAMO: el frailejonal con su niebla
       // fría — la seña del alto (coherente con MundoParamo3D: frailejones,
       // piedra y bruma). Tocar aquí sube al mundo del páramo.
+      // PERF-VALLE-INSTANCING 2026-07-23: 19→6 draw calls. Los 4 frailejones
+      // vivían en <group scale={s}>; para instanciar se multiplica esa escala
+      // uniforme s por la posición/escala LOCAL de cada pieza (el mismo
+      // resultado que produce three.js al anidar un mesh dentro de un grupo
+      // escalado, pero aplanado a mano para que quepa en una sola <Instances/>).
+      const FRAILEJONES = [[-0.5, 0.22, 1], [0.2, -0.3, 0.85], [0.55, 0.35, 0.7], [-0.05, 0.5, 0.6]];
+      const NIEBLA = [[-0.35, 0.55, 0.4, 0.3], [0.4, 0.75, 0.1, 0.24], [0, 1.0, -0.25, 0.19]];
+      const HITO = [0.16, 0.11, 0.07];
       return (
         <group>
           {/* el grupito de frailejones (roseta plateada sobre tronco lanudo) */}
-          {[[-0.5, 0.22, 1], [0.2, -0.3, 0.85], [0.55, 0.35, 0.7], [-0.05, 0.5, 0.6]].map(([x, z, s], i) => (
-            <group key={i} position={[x, 0, z]} scale={s}>
-              <mesh position={[0, 0.45, 0]} castShadow>
-                <cylinderGeometry args={[0.11, 0.14, 0.9, 7]} />
-                <meshStandardMaterial color="#6e6a52" flatShading roughness={1} />
-              </mesh>
-              <mesh position={[0, 0.98, 0]} scale={[1, 0.5, 1]} castShadow>
-                <coneGeometry args={[0.34, 0.5, 8]} />
-                <meshStandardMaterial color={suave} flatShading roughness={1} />
-              </mesh>
-              {/* la flor amarilla del frailejón (la seña de la Espeletia) */}
-              <mesh position={[0.1, 1.16, 0.06]}>
-                <sphereGeometry args={[0.05, 6, 5]} />
-                <meshStandardMaterial color="#e8c94f" flatShading />
-              </mesh>
-            </group>
-          ))}
-          {/* la piedra del alto, con su musgo */}
+          <Instances frames={1} limit={FRAILEJONES.length} castShadow>
+            <cylinderGeometry args={[0.11, 0.14, 0.9, 7]} />
+            <meshStandardMaterial color="#6e6a52" flatShading roughness={1} />
+            {FRAILEJONES.map(([x, z, s], i) => (
+              <Instance key={i} position={[x, s * 0.45, z]} scale={s} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={FRAILEJONES.length} castShadow>
+            <coneGeometry args={[0.34, 0.5, 8]} />
+            <meshStandardMaterial color={suave} flatShading roughness={1} />
+            {FRAILEJONES.map(([x, z, s], i) => (
+              <Instance key={i} position={[x, s * 0.98, z]} scale={[s, s * 0.5, s]} />
+            ))}
+          </Instances>
+          {/* la flor amarilla del frailejón (la seña de la Espeletia) */}
+          <Instances frames={1} limit={FRAILEJONES.length}>
+            <sphereGeometry args={[0.05, 6, 5]} />
+            <meshStandardMaterial color="#e8c94f" flatShading />
+            {FRAILEJONES.map(([x, z, s], i) => (
+              <Instance key={i} position={[x + s * 0.1, s * 1.16, z + s * 0.06]} scale={s} />
+            ))}
+          </Instances>
+          {/* la piedra del alto, con su musgo (pieza única) */}
           <mesh position={[0.6, 0.12, -0.35]} scale={[1, 0.7, 0.9]} castShadow>
             <icosahedronGeometry args={[0.22, 0]} />
             <meshStandardMaterial color="#828b90" flatShading roughness={1} />
           </mesh>
           {/* LA NIEBLA FRÍA que arropa el frailejonal (motas traslúcidas que
               hacen páramo, como el vaho de la pila pero frío) */}
-          {[[-0.35, 0.55, 0.4, 0.3], [0.4, 0.75, 0.1, 0.24], [0, 1.0, -0.25, 0.19]].map(([x, yv, z, r], i) => (
-            <mesh key={i} position={[x, yv, z]}>
-              <sphereGeometry args={[r, 8, 6]} />
-              <meshBasicMaterial color="#dfe8ea" transparent opacity={0.2} depthWrite={false} />
-            </mesh>
-          ))}
+          <Instances frames={1} limit={NIEBLA.length}>
+            <sphereGeometry args={[1, 8, 6]} />
+            <meshBasicMaterial color="#dfe8ea" transparent opacity={0.2} depthWrite={false} />
+            {NIEBLA.map(([x, yv, z, r], i) => (
+              <Instance key={i} position={[x, yv, z]} scale={r} />
+            ))}
+          </Instances>
           {/* el hito de piedras apiladas: la seña del sendero de páramo */}
-          {[0.16, 0.11, 0.07].map((r, i) => (
-            <mesh key={i} position={[-0.72, 0.1 + i * 0.17, -0.1]} scale={[1, 0.65, 1]}>
-              <icosahedronGeometry args={[r, 0]} />
-              <meshStandardMaterial color={fuerte} flatShading roughness={1} />
-            </mesh>
-          ))}
+          <Instances frames={1} limit={HITO.length}>
+            <icosahedronGeometry args={[1, 0]} />
+            <meshStandardMaterial color={fuerte} flatShading roughness={1} />
+            {HITO.map((r, i) => (
+              <Instance key={i} position={[-0.72, 0.1 + i * 0.17, -0.1]} scale={[r, r * 0.65, r]} />
+            ))}
+          </Instances>
         </group>
       );
-    case 'hongos': // el suelo vivo: hongos que asoman (el fruto del micelio), con
+    }
+    case 'hongos': { // el suelo vivo: hongos que asoman (el fruto del micelio), con
       // un halo de red bajo la tierra. Toque para BAJAR al mundo subterráneo.
+      // PERF-VALLE-INSTANCING 2026-07-23: 13→4 draw calls. El pie tiene alto
+      // `h` distinto por hongo → geometría unidad (alto 1) escalada en Y.
+      const HONGOS = [[-0.3, 0.1, 0.44], [0.16, -0.22, 0.54], [0.42, 0.26, 0.36], [-0.04, 0.42, 0.3]];
       return (
         <group>
-          {[[-0.3, 0.1, 0.44], [0.16, -0.22, 0.54], [0.42, 0.26, 0.36], [-0.04, 0.42, 0.3]].map(([x, z, h], i) => (
-            <group key={i} position={[x, 0, z]}>
-              {/* pie del hongo, pálido */}
-              <mesh position={[0, h * 0.5, 0]} castShadow>
-                <cylinderGeometry args={[0.05, 0.075, h, 7]} />
-                <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
-              </mesh>
-              {/* sombrero que brilla apenas (bioluminiscencia del suelo) */}
-              <mesh position={[0, h + 0.02, 0]} castShadow>
-                <sphereGeometry args={[0.17, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
-                <meshStandardMaterial color={fuerte} emissive={fuerte} emissiveIntensity={0.35} flatShading roughness={0.8} />
-              </mesh>
-              {/* laminillas claras bajo el sombrero */}
-              <mesh position={[0, h - 0.015, 0]}>
-                <cylinderGeometry args={[0.16, 0.06, 0.03, 10]} />
-                <meshStandardMaterial color={suave} emissive={suave} emissiveIntensity={0.4} />
-              </mesh>
-            </group>
-          ))}
+          {/* pie del hongo, pálido */}
+          <Instances frames={1} limit={HONGOS.length} castShadow>
+            <cylinderGeometry args={[0.05, 0.075, 1, 7]} />
+            <meshStandardMaterial color="#e8e0cf" flatShading roughness={1} />
+            {HONGOS.map(([x, z, h], i) => (
+              <Instance key={i} position={[x, h * 0.5, z]} scale={[1, h, 1]} />
+            ))}
+          </Instances>
+          {/* sombrero que brilla apenas (bioluminiscencia del suelo) */}
+          <Instances frames={1} limit={HONGOS.length} castShadow>
+            <sphereGeometry args={[0.17, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+            <meshStandardMaterial color={fuerte} emissive={fuerte} emissiveIntensity={0.35} flatShading roughness={0.8} />
+            {HONGOS.map(([x, z, h], i) => (
+              <Instance key={i} position={[x, h + 0.02, z]} />
+            ))}
+          </Instances>
+          {/* laminillas claras bajo el sombrero */}
+          <Instances frames={1} limit={HONGOS.length}>
+            <cylinderGeometry args={[0.16, 0.06, 0.03, 10]} />
+            <meshStandardMaterial color={suave} emissive={suave} emissiveIntensity={0.4} />
+            {HONGOS.map(([x, z, h], i) => (
+              <Instance key={i} position={[x, h - 0.015, z]} />
+            ))}
+          </Instances>
           {/* el anillo de micelio asomando en la tierra (la red que baja) */}
           <mesh position={[0, 0.02, 0.1]} rotation={[-Math.PI / 2, 0, 0]}>
             <ringGeometry args={[0.5, 0.64, 22]} />
@@ -1010,6 +1120,7 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
           </mesh>
         </group>
       );
+    }
     default:
       return (
         <mesh position={[0, 0.3, 0]}>
@@ -1022,69 +1133,117 @@ function LandmarkGeom({ tipo, tinte, reducedMotion, q = 1, forma = null }) {
 
 /* ── Matas de un piso térmico (frailejón, papa, café, plátano): pocas, a los
       lados, para que se lea el cambio de vegetación por altura sin amontonar. ── */
-function MataDePiso({ tipo, nocturno }) {
-  switch (tipo) {
-    case 'frailejon': // roseta plateada sobre tronco (Espeletia del páramo)
-      return (
-        <group>
-          <mesh position={[0, 0.45, 0]} castShadow>
+/* ── Matas FIELES instanciadas (PERF-VALLE-INSTANCING 2026-07-23, tier
+      'alto'): antes cada mata dibujaba su propia malla suelta (~2-6 <mesh>
+      por mata × 12 matas = 39 draw calls). Mismo geometría/color/roughness
+      exactos que la vieja <MataDePiso/> (byte-idéntico al ojo) — solo cambia
+      CÓMO se manda a la GPU: una <Instances/> por PIEZA (tronco/copa/hoja),
+      de modo que N matas del mismo tipo comparten 1 solo draw call por
+      pieza. No confundir con <VegetacionInstanciada/> (abajo): esa es la
+      silueta SIMPLIFICADA de los tiers frugales (unidades genéricas +
+      color por instancia); esta conserva el detalle geométrico pleno. ── */
+function MatasFieles({ nocturno }) {
+  const matas = useMemo(
+    () => VEGETACION_PISOS.map((v) => {
+      const [x, z] = v.pos;
+      return { x, y: alturaTerreno(x, z), z, tipo: v.tipo };
+    }),
+    [],
+  );
+  const frailejones = useMemo(() => matas.filter((m) => m.tipo === 'frailejon'), [matas]);
+  const papas = useMemo(() => matas.filter((m) => m.tipo === 'papa'), [matas]);
+  const cafes = useMemo(() => matas.filter((m) => m.tipo === 'cafe'), [matas]);
+  const platanos = useMemo(() => matas.filter((m) => m.tipo === 'platano'), [matas]);
+  // las 3 papas y las 5 hojas de plátano de CADA mata, aplanadas en una sola
+  // lista de instancias (mismos offsets locales que la <MataDePiso/> vieja).
+  const montonesPapa = useMemo(
+    () => papas.flatMap((m) => [-0.28, 0.06, 0.32].map((dx, j) => ({ m, dx, j }))),
+    [papas],
+  );
+  const hojasPlatano = useMemo(
+    () => platanos.flatMap((m) => [0, 1, 2, 3, 4].map((k) => ({ m, k }))),
+    [platanos],
+  );
+  return (
+    <group>
+      {frailejones.length > 0 && (
+        <>
+          {/* roseta plateada sobre tronco (Espeletia del páramo) */}
+          <Instances frames={1} limit={frailejones.length} castShadow>
             <cylinderGeometry args={[0.11, 0.14, 0.9, 7]} />
             <meshStandardMaterial color={nocturno ? '#3a4038' : '#6e6a52'} flatShading roughness={1} />
-          </mesh>
-          {/* roseta: cono achatado plateado */}
-          <mesh position={[0, 0.98, 0]} scale={[1, 0.5, 1]} castShadow>
+            {frailejones.map((m, i) => (
+              <Instance key={i} position={[m.x, m.y + 0.45, m.z]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={frailejones.length} castShadow>
             <coneGeometry args={[0.34, 0.5, 8]} />
             <meshStandardMaterial color={nocturno ? '#4a5b52' : '#9fb59a'} flatShading roughness={1} />
-          </mesh>
-        </group>
-      );
-    case 'papa': // matas bajas y redondas (surco de papa del clima frío)
-      return (
-        <group>
-          {[-0.28, 0.06, 0.32].map((dx, i) => (
-            <mesh key={i} position={[dx, 0.14, (i % 2) * 0.22]} scale={[1, 0.7, 1]} castShadow>
-              <icosahedronGeometry args={[0.22, 0]} />
-              <meshStandardMaterial color={nocturno ? '#2f5240' : '#3f7d52'} flatShading roughness={1} />
-            </mesh>
+            {frailejones.map((m, i) => (
+              <Instance key={i} position={[m.x, m.y + 0.98, m.z]} scale={[1, 0.5, 1]} />
+            ))}
+          </Instances>
+        </>
+      )}
+      {montonesPapa.length > 0 && (
+        // matas bajas y redondas (surco de papa del clima frío)
+        <Instances frames={1} limit={montonesPapa.length} castShadow>
+          <icosahedronGeometry args={[0.22, 0]} />
+          <meshStandardMaterial color={nocturno ? '#2f5240' : '#3f7d52'} flatShading roughness={1} />
+          {montonesPapa.map(({ m, dx, j }, i) => (
+            <Instance
+              key={i}
+              position={[m.x + dx, m.y + 0.14, m.z + (j % 2) * 0.22]}
+              scale={[1, 0.7, 1]}
+            />
           ))}
-        </group>
-      );
-    case 'cafe': // arbusto de café suelto del clima medio
-      return (
-        <group>
-          <mesh position={[0, 0.14, 0]}>
+        </Instances>
+      )}
+      {cafes.length > 0 && (
+        <>
+          {/* arbusto de café suelto del clima medio */}
+          <Instances frames={1} limit={cafes.length}>
             <cylinderGeometry args={[0.05, 0.06, 0.28, 6]} />
             <meshStandardMaterial color="#6b4a2e" flatShading />
-          </mesh>
-          <mesh position={[0, 0.4, 0]} castShadow>
+            {cafes.map((m, i) => (
+              <Instance key={i} position={[m.x, m.y + 0.14, m.z]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={cafes.length} castShadow>
             <sphereGeometry args={[0.3, 10, 9]} />
             <meshStandardMaterial color={nocturno ? '#254a30' : '#3f7d3a'} flatShading roughness={1} />
-          </mesh>
-        </group>
-      );
-    case 'platano': // mata de plátano: pseudotallo + hojas grandes colgantes
-    default:
-      return (
-        <group>
-          <mesh position={[0, 0.55, 0]} castShadow>
+            {cafes.map((m, i) => (
+              <Instance key={i} position={[m.x, m.y + 0.4, m.z]} />
+            ))}
+          </Instances>
+        </>
+      )}
+      {platanos.length > 0 && (
+        <>
+          {/* mata de plátano: pseudotallo + hojas grandes colgantes */}
+          <Instances frames={1} limit={platanos.length} castShadow>
             <cylinderGeometry args={[0.1, 0.14, 1.1, 7]} />
             <meshStandardMaterial color={nocturno ? '#3a5030' : '#7a9a55'} flatShading roughness={1} />
-          </mesh>
-          {[0, 1, 2, 3, 4].map((k) => (
-            <mesh
-              key={k}
-              position={[0, 1.05, 0]}
-              rotation={[0, (k / 5) * Math.PI * 2, -0.9]}
-              scale={[1, 1, 0.28]}
-              castShadow
-            >
-              <coneGeometry args={[0.24, 1.0, 4]} />
-              <meshStandardMaterial color={nocturno ? '#2f5236' : '#4f9a44'} flatShading roughness={1} />
-            </mesh>
-          ))}
-        </group>
-      );
-  }
+            {platanos.map((m, i) => (
+              <Instance key={i} position={[m.x, m.y + 0.55, m.z]} />
+            ))}
+          </Instances>
+          <Instances frames={1} limit={hojasPlatano.length} castShadow>
+            <coneGeometry args={[0.24, 1.0, 4]} />
+            <meshStandardMaterial color={nocturno ? '#2f5236' : '#4f9a44'} flatShading roughness={1} />
+            {hojasPlatano.map(({ m, k }, i) => (
+              <Instance
+                key={i}
+                position={[m.x, m.y + 1.05, m.z]}
+                rotation={[0, (k / 5) * Math.PI * 2, -0.9]}
+                scale={[1, 1, 0.28]}
+              />
+            ))}
+          </Instances>
+        </>
+      )}
+    </group>
+  );
 }
 
 /* ── SILUETAS instanciadas de las matas (perfil frugal, DR FIX 2): cada mata
@@ -1125,7 +1284,7 @@ function VegetacionInstanciada({ nocturno, cada }) {
   return (
     <group>
       {troncos.length > 0 && (
-        <Instances limit={troncos.length}>
+        <Instances frames={1} limit={troncos.length}>
           <cylinderGeometry args={[0.85, 1, 1, 6]} />
           <meshLambertMaterial />
           {troncos.map((m, i) => (
@@ -1139,7 +1298,7 @@ function VegetacionInstanciada({ nocturno, cada }) {
         </Instances>
       )}
       {conos.length > 0 && (
-        <Instances limit={conos.length}>
+        <Instances frames={1} limit={conos.length}>
           <coneGeometry args={[1, 1, 7]} />
           <meshLambertMaterial />
           {conos.map((m, i) => (
@@ -1153,7 +1312,7 @@ function VegetacionInstanciada({ nocturno, cada }) {
         </Instances>
       )}
       {bolas.length > 0 && (
-        <Instances limit={bolas.length}>
+        <Instances frames={1} limit={bolas.length}>
           <sphereGeometry args={[1, 9, 8]} />
           <meshLambertMaterial />
           {bolas.map((m, i) => (
@@ -1172,24 +1331,14 @@ function VegetacionInstanciada({ nocturno, cada }) {
 
 /* Siembra las matas de muestra de cada piso sobre el terreno (posadas en su y).
    Layout por datos: recorre VEGETACION_PISOS. En perfil frugal las matas se
-   dibujan INSTANCIADAS (3 draw calls); en 'alto' conservan su detalle pleno. */
+   dibujan con siluetas simplificadas (3 draw calls); en 'alto' conservan su
+   detalle pleno pero YA INSTANCIADO por pieza (<MatasFieles/>, PERF-VALLE-
+   INSTANCING 2026-07-23): mismo render, de ~39 draw calls sueltos a 7. */
 function VegetacionPisos({ nocturno, perfil }) {
   if (perfil.matasInstanciadas) {
     return <VegetacionInstanciada nocturno={nocturno} cada={perfil.matasCada} />;
   }
-  return (
-    <group>
-      {VEGETACION_PISOS.map((v, i) => {
-        const [x, z] = v.pos;
-        const y = alturaTerreno(x, z);
-        return (
-          <group key={i} position={[x, y, z]}>
-            <MataDePiso tipo={v.tipo} nocturno={nocturno} />
-          </group>
-        );
-      })}
-    </group>
-  );
+  return <MatasFieles nocturno={nocturno} />;
 }
 
 function Veleta({ color, reducedMotion = false }) {
