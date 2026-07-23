@@ -22,19 +22,22 @@ const FEATURES = {
 
 export default function AdminPanel() {
   const [features, setFeatures] = useState(/** @type {Record<string, boolean>} */ ({}));
-  const [buildInfo, setBuildInfo] = useState(/** @type {{sha: string, ts: string}|null} */ (null));
+  const [buildInfo, setBuildInfo] = useState(/** @type {{sha: string, ts: string, builtAt?: string}|null} */ (null));
   const [logs, setLogs] = useState(/** @type {string[]} */ ([]));
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(FEATURES_KEY);
       const parsed = saved ? JSON.parse(saved) : {};
-      const merged = {};
+      const merged = /** @type {Record<string, boolean>} */ ({});
       for (const k of Object.keys(FEATURES)) {
         merged[k] = parsed[k] ?? FEATURES[k].default;
       }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFeatures(merged);
-    } catch {}
+    } catch {
+      // localStorage no está disponible.
+    }
   }, []);
 
   useEffect(() => {
@@ -47,7 +50,9 @@ export default function AdminPanel() {
   const toggleFeature = (key) => {
     const next = { ...features, [key]: !features[key] };
     setFeatures(next);
-    try { localStorage.setItem(FEATURES_KEY, JSON.stringify(next)); } catch {}
+    try { localStorage.setItem(FEATURES_KEY, JSON.stringify(next)); } catch {
+      // localStorage no está disponible.
+    }
   };
 
   const refresh = () => {
