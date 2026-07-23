@@ -20,15 +20,20 @@ const PARCELAS = [
    las 8 gallinas se reparten a donde esté `paso` en vez de vivir siempre en
    la parcela 1. Conserva el mismo patrón de dispersión que tenían las
    coordenadas originales (todas caían dentro de una sola parcela). */
+/* Anillo alrededor del tractor (que va al CENTRO de la parcela activa): la
+   dispersión anterior (radios 1.3–1.8 pero billboards grandes) apilaba las 7
+   gallinas en una sola mancha que TAPABA el tractor entero — el protagonista
+   de "el gallinero que camina" quedaba escondido tras su propia parvada.
+   Radios estirados al borde de la parcela + tallas menores (abajo). */
 const GALLINAS = [
-  { dx: -1.5, dz: -0.5, rot: 0.1 },
-  { dx: -0.3, dz: 1.3, rot: 1.7 },
-  { dx: 1.2, dz: -1.0, rot: 3.2 },
-  { dx: -0.9, dz: -1.4, rot: 4.5 },
-  { dx: 1.5, dz: 0.9, rot: 5.6 },
-  { dx: -1.6, dz: 0.8, rot: 0.8 },
-  { dx: 0.4, dz: -1.5, rot: 2.5 },
-  { dx: 1.7, dz: -0.1, rot: 3.8 },
+  { dx: -1.7, dz: -0.6, rot: 0.1 },
+  { dx: -0.35, dz: 1.55, rot: 1.7 },
+  { dx: 1.4, dz: -1.15, rot: 3.2 },
+  { dx: -1.05, dz: -1.6, rot: 4.5 },
+  { dx: 1.7, dz: 1.05, rot: 5.6 },
+  { dx: -1.8, dz: 0.9, rot: 0.8 },
+  { dx: 0.45, dz: -1.7, rot: 2.5 },
+  { dx: 1.85, dz: -0.1, rot: 3.8 },
 ];
 /* Matas del huerto: antes eran 18 CLONES (misma escala visual, mismo verde,
    mismo giro). Cada mata rompe ahora en escala, tono, giro (ángulo áureo:
@@ -57,9 +62,12 @@ const LOMAS = Array.from({ length: 12 }, (_, i) => {
     z: Math.sin(ang) * dist,
     r: (lejos ? 9.5 : 6.5) + ((i * 13) % 5),
     alto: 0.3 + ((i * 11) % 4) / 16,
+    /* Mezclas subidas (0.4→0.62 / 0.16→0.3): con las anteriores la loma
+       lejana salía como montículo de barro pardo comiéndose el tercio alto
+       del cuadro; con más niebla encima sí se lee perspectiva aérea. */
     color: lejos
-      ? mezclar(VERDES.templado, CIELO.niebla, 0.4)
-      : mezclar(VERDES.trabajo, CIELO.niebla, 0.16),
+      ? mezclar(VERDES.templado, CIELO.niebla, 0.62)
+      : mezclar(VERDES.trabajo, CIELO.niebla, 0.3),
   };
 });
 /* Arbolitos de vereda sobre la sabana (escala y respiro entre la losa y las
@@ -224,9 +232,12 @@ function Gallina({ objetivo, indice, reducedMotion, tier }) {
     grupo.current.position.x = actual.current[0];
     grupo.current.position.z = actual.current[1];
   });
-  /* Dos plumajes + dos tallas: parvada criolla, no clonada. */
+  /* Dos plumajes + tres tallas: parvada criolla, no clonada. Talla bajada
+     (52–62 → 40–48): con la anterior cada billboard medía ~1.2 unidades de
+     mundo y entre 7 se montaban en una pila de calcomanías; a esta talla cada
+     gallina se lee sola y el tractor respira detrás. */
   const clara = indice % 3 === 0;
-  const talla = 52 + ((indice * 7) % 3) * 5;
+  const talla = 40 + ((indice * 7) % 3) * 4;
   return (
     <group ref={grupo} name={`gallina-${indice}`} position={[objetivo[0], 0, objetivo[1]]}>
       {/* sombra de contacto en el pasto (ancla la parada) */}
