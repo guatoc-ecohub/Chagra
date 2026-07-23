@@ -700,7 +700,7 @@ async function embedQuery(queryText) {
         prompt: queryText,
         // Descarga arctic tras el embed (anti-OOM por co-residencia con granite).
         keep_alive: '5m', // 2026-07-23: nomic (588MB) convive con gemma4:e2b (verificado 8.7/12GB); residente para velocidad. Revertir a '0s' si hay OOM.
-        options: { num_gpu: 0 },
+        // 2026-07-23: se quitó num_gpu:0 (heredado de arctic anti-OOM). nomic (565MB) cabe en GPU con gemma; en CPU era lento y la GPU quedaba ociosa.
       }),
       signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
     });
