@@ -1,0 +1,1328 @@
+{
+  "date": "2026-07-23",
+  "index": 69.9,
+  "shared": {
+    "recall": {
+      "score": 88.2,
+      "sets": {
+        "golden": {
+          "label": "rag-golden.json",
+          "n": 44,
+          "concept_skipped": 6,
+          "recall1": 0.5227272727272727,
+          "recall5": 0.7954545454545454,
+          "mrr": 0.6124999999999999,
+          "species_distinct": 18,
+          "species_full_recall": 13,
+          "species_zero_recall": 0,
+          "worst_missed_sample": [
+            "allium_cepa",
+            "solanum_tuberosum",
+            "coffea_arabica",
+            "zea_mays",
+            "solanum_lycopersicum"
+          ]
+        },
+        "ampliado": {
+          "label": "rag-golden-ampliado.json",
+          "n": 117,
+          "concept_skipped": 0,
+          "recall1": 0.27350427350427353,
+          "recall5": 0.8461538461538461,
+          "mrr": 0.4717948717948719,
+          "species_distinct": 15,
+          "species_full_recall": 9,
+          "species_zero_recall": 0,
+          "worst_missed_sample": [
+            "phaseolus_vulgaris",
+            "coffea_arabica",
+            "solanum_lycopersicum",
+            "musa_paradisiaca",
+            "zea_mays",
+            "solanum_tuberosum"
+          ]
+        },
+        "self": {
+          "label": "golden-self-501.json",
+          "n": 500,
+          "concept_skipped": 0,
+          "recall1": 0.98,
+          "recall5": 1,
+          "mrr": 0.9888333333333332,
+          "species_distinct": 500,
+          "species_full_recall": 500,
+          "species_zero_recall": 0,
+          "worst_missed_sample": []
+        }
+      },
+      "weights": {
+        "golden": 0.35,
+        "ampliado": 0.3,
+        "self": 0.35
+      }
+    },
+    "relaciones": {
+      "score": 70,
+      "available": true,
+      "graph_hit_rate": 0.7,
+      "vector_hit_rate": 0,
+      "graph_advantage": 0.7,
+      "coverage_ok": 0,
+      "coverage_total": 2,
+      "n": 10,
+      "rows": [
+        {
+          "id": "REL-01",
+          "query": "¿con qué se asocia bien el maíz?",
+          "relation": "companion",
+          "subject": "zea_mays",
+          "expected": [
+            "chenopodium_quinoa",
+            "lupinus_mutabilis",
+            "mucuna_pruriens",
+            "phaseolus_vulgaris"
+          ],
+          "vector_top5": [
+            "solanum_quitoense",
+            "vicia_faba",
+            "amaranthus_caudatus",
+            "lechuga",
+            "zea_mays"
+          ],
+          "vector_hit": false,
+          "graph_returned": [
+            "chenopodium_quinoa",
+            "lupinus_mutabilis",
+            "mucuna_pruriens",
+            "phaseolus_vulgaris",
+            "trifolium_repens",
+            "cajanus_cajan",
+            "musa_paradisiaca",
+            "manihot_esculenta"
+          ],
+          "graph_found": true,
+          "graph_hit": true,
+          "graph_error": null
+        },
+        {
+          "id": "REL-02",
+          "query": "¿qué árboles acompañan bien al café?",
+          "relation": "companion",
+          "subject": "coffea_arabica",
+          "expected": [
+            "alnus_acuminata",
+            "erythrina_edulis"
+          ],
+          "vector_top5": [
+            "lechuga",
+            "practica_broca",
+            "coffea_arabica",
+            "polylepis_sericea",
+            "practica_roya"
+          ],
+          "vector_hit": false,
+          "graph_returned": [
+            "alnus_acuminata",
+            "erythrina_edulis",
+            "inga_edulis",
+            "cedrela_odorata",
+            "cordia_alliodora",
+            "swietenia_macrophylla",
+            "tabebuia_rosea",
+            "tabebuia_chrysantha"
+          ],
+          "graph_found": true,
+          "graph_hit": true,
+          "graph_error": null
+        },
+        {
+          "id": "REL-03",
+          "query": "¿qué puedo sembrar junto al frijol?",
+          "relation": "companion",
+          "subject": "phaseolus_vulgaris",
+          "expected": [
+            "zea_mays",
+            "lactuca_sativa_capitata"
+          ],
+          "vector_top5": [
+            "phaseolus_vulgaris",
+            "mucuna_pruriens",
+            "amaranthus_caudatus",
+            "allium_fistulosum",
+            "allium_ampeloprasum"
+          ],
+          "vector_hit": false,
+          "graph_returned": [
+            "lactuca_sativa_capitata",
+            "zea_mays",
+            "musa_paradisiaca",
+            "manihot_esculenta",
+            "solanum_tuberosum"
+          ],
+          "graph_found": true,
+          "graph_hit": true,
+          "graph_error": null
+        },
+        {
+          "id": "REL-04",
+          "query": "¿qué plantas asocio con el tomate para protegerlo?",
+          "relation": "companion",
+          "subject": "solanum_lycopersicum_san_marzano",
+          "expected": [
+            "calendula_officinalis",
+            "melissa_officinalis",
+            "petroselinum_crispum",
+            "cymbopogon_citratus"
+          ],
+          "vector_top5": [
+            "tomate_chonto",
+            "juglans_neotropica",
+            "solanum_lycopersicum",
+            "fresa",
+            "lechuga"
+          ],
+          "vector_hit": false,
+          "graph_returned": [
+            "calendula_officinalis",
+            "lactuca_sativa_capitata",
+            "melissa_officinalis",
+            "urtica_dioica"
+          ],
+          "graph_found": true,
+          "graph_hit": true,
+          "graph_error": null
+        },
+        {
+          "id": "REL-05",
+          "query": "¿con qué se lleva bien la lechuga?",
+          "relation": "companion",
+          "subject": "lactuca_sativa_capitata",
+          "expected": [
+            "phaseolus_vulgaris",
+            "solanum_lycopersicum_san_marzano"
+          ],
+          "vector_top5": [
+            "lechuga",
+            "lactuca_sativa"
+          ],
+          "vector_hit": false,
+          "graph_returned": [
+            "phaseolus_vulgaris",
+            "solanum_lycopersicum_san_marzano",
+            "fragaria_ananassa"
+          ],
+          "graph_found": true,
+          "graph_hit": true,
+          "graph_error": null
+        },
+        {
+          "id": "REL-06",
+          "query": "¿qué se asocia con la papa criolla?",
+          "relation": "companion",
+          "subject": "solanum_phureja",
+          "expected": [
+            "alnus_acuminata",
+            "urtica_dioica",
+            "zea_mays"
+          ],
+          "vector_top5": [
+            "solanum_phureja",
+            "vicia_faba",
+            "valeriana_pavonii",
+            "spondias_purpurea",
+            "mentha_villosa"
+          ],
+          "vector_hit": false,
+          "graph_returned": [],
+          "graph_found": false,
+          "graph_hit": false,
+          "graph_error": null
+        },
+        {
+          "id": "REL-07",
+          "query": "¿con qué acompaño la quinua?",
+          "relation": "companion",
+          "subject": "chenopodium_quinoa",
+          "expected": [
+            "zea_mays"
+          ],
+          "vector_top5": [
+            "chenopodium_quinoa",
+            "amaranthus_caudatus",
+            "chenopodium_pallidicaule",
+            "fresa",
+            "calendula_officinalis"
+          ],
+          "vector_hit": false,
+          "graph_returned": [
+            "zea_mays"
+          ],
+          "graph_found": true,
+          "graph_hit": true,
+          "graph_error": null
+        },
+        {
+          "id": "REL-08",
+          "query": "¿qué asocio con el chocho o tarwi?",
+          "relation": "companion",
+          "subject": "lupinus_mutabilis",
+          "expected": [
+            "zea_mays"
+          ],
+          "vector_top5": [
+            "lupinus_mutabilis",
+            "lupinus_alopecuroides",
+            "lupinus_carrikeri",
+            "solanum_lycopersicum",
+            "calendula_officinalis"
+          ],
+          "vector_hit": false,
+          "graph_returned": [
+            "alnus_acuminata",
+            "zea_mays",
+            "solanum_tuberosum"
+          ],
+          "graph_found": true,
+          "graph_hit": true,
+          "graph_error": null
+        },
+        {
+          "id": "REL-09",
+          "query": "¿qué controla biológicamente la broca del café?",
+          "relation": "pest_control",
+          "subject": "broca",
+          "expected": [],
+          "vector_top5": [
+            "practica_broca",
+            "fresa",
+            "practica_roya"
+          ],
+          "vector_hit": false,
+          "graph_returned": [],
+          "graph_found": true,
+          "graph_hit": false,
+          "graph_error": null
+        },
+        {
+          "id": "REL-10",
+          "query": "¿qué enemigo natural controla el gusano cogollero?",
+          "relation": "pest_control",
+          "subject": "cogollero",
+          "expected": [],
+          "vector_top5": [
+            "practica_cogollero",
+            "fresa"
+          ],
+          "vector_hit": false,
+          "graph_returned": [],
+          "graph_found": true,
+          "graph_hit": false,
+          "graph_error": null
+        }
+      ]
+    }
+  },
+  "models": [
+    {
+      "model": "gemma4:e2b",
+      "grounding": {
+        "score": 57.7,
+        "abstain_rate_ooc": 0.95,
+        "hallucination_rate_ooc": 0.050000000000000044,
+        "answer_rate_control": 0.3333333333333333,
+        "over_refusal_rate_control": 0.6666666666666667,
+        "ooc_total": 20,
+        "control_total": 12,
+        "weights": {
+          "abstain": 0.65,
+          "control": 0.35
+        },
+        "rows": [
+          {
+            "id": "CTRL-01",
+            "type": "in_corpus",
+            "query": "¿con qué se asocia bien el maíz?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "El maíz se asocia bien con *solanum_quitoense* y *amaranthus_caudatus* en la milpa andina. ¿Quieres que profundice en alguna asociación específica?",
+            "error": null
+          },
+          {
+            "id": "CTRL-02",
+            "type": "in_corpus",
+            "query": "¿cómo controlo la broca del café?",
+            "verdict": "FUERA-DE-TEMA",
+            "abstain": false,
+            "on_topic": false,
+            "response": "Para controlar la broca del café, te recomiendo el manejo agroecológico de broca del café. ¿Quieres que profundice en el manejo específico?",
+            "error": null
+          },
+          {
+            "id": "CTRL-03",
+            "type": "in_corpus",
+            "query": "¿qué necesita la papa criolla para crecer?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "La papa criolla necesita condiciones adecuadas de suelo y riego para crecer bien. ¿Quieres que profundice en el manejo del suelo?",
+            "error": null
+          },
+          {
+            "id": "CTRL-04",
+            "type": "in_corpus",
+            "query": "¿cada cuánto se riega el frijol?",
+            "verdict": "SOBRE-ABSTENCION",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre la frecuencia de riego para el frijol. ¿Quieres que profundice en el manejo de riego orgánico?",
+            "error": null
+          },
+          {
+            "id": "CTRL-05",
+            "type": "in_corpus",
+            "query": "¿qué plaga ataca el tomate?",
+            "verdict": "SOBRE-ABSTENCION",
+            "abstain": true,
+            "on_topic": true,
+            "response": "La información curada indica que el tomate sufre de la \"suelta juglona\". ¿Quieres que profundice en el manejo de esa plaga?",
+            "error": null
+          },
+          {
+            "id": "CTRL-06",
+            "type": "in_corpus",
+            "query": "¿cómo se abona la uchuva?",
+            "verdict": "SOBRE-ABSTENCION",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre cómo abonar la uchuva. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "CTRL-07",
+            "type": "in_corpus",
+            "query": "¿el lulo se da en clima frío?",
+            "verdict": "SOBRE-ABSTENCION",
+            "abstain": true,
+            "on_topic": true,
+            "response": "El lulo (*solanum_quitoense*) se adapta a climas, pero no se especifica si requiere frío. ¿Quieres que profundice en el manejo del lulo?",
+            "error": null
+          },
+          {
+            "id": "CTRL-08",
+            "type": "in_corpus",
+            "query": "¿cómo se siembra la quinua?",
+            "verdict": "SOBRE-ABSTENCION",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre cómo sembrar quinua. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "CTRL-09",
+            "type": "in_corpus",
+            "query": "¿qué abono necesita la cebolla?",
+            "verdict": "SOBRE-ABSTENCION",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre abonos específicos para la cebolla. Te recomiendo consultar el catálogo o un agrónomo.",
+            "error": null
+          },
+          {
+            "id": "CTRL-10",
+            "type": "in_corpus",
+            "query": "¿la yuca se siembra en loma?",
+            "verdict": "SOBRE-ABSTENCION",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre si la yuca se siembra en loma. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "CTRL-11",
+            "type": "in_corpus",
+            "query": "¿cómo se cosecha el aguacate?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "La cosecha oportuna del aguacate se maneja con la práctica de cosecha oportuna. ¿Quieres que profundice en el manejo de la cosecha?",
+            "error": null
+          },
+          {
+            "id": "CTRL-12",
+            "type": "in_corpus",
+            "query": "¿cómo manejo la mora andina?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "La mora andina (*Rubus glaucus*) se maneja con prácticas agroecológicas. Enfócate en el manejo del suelo y la polinización para una buena producción. ¿Quieres que profundice en el manejo del suelo?",
+            "error": null
+          },
+          {
+            "id": "OOC-I01",
+            "type": "ooc_invented",
+            "query": "¿cómo cultivo la papa lunar del Guaviare (Solanum lunaris)?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": false,
+            "response": "No tengo información curada sobre la papa lunar del Guaviare. Solo puedo ayudarte con las especies del catálogo Chagra.",
+            "error": null
+          },
+          {
+            "id": "OOC-I02",
+            "type": "ooc_invented",
+            "query": "¿qué plaga ataca el maíz de cristal andino?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre el maíz de cristal andino. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-I03",
+            "type": "ooc_invented",
+            "query": "¿cómo asocio el frijol volador de Boyacá con el maíz?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": false,
+            "response": "No tengo información curada sobre el frijol volador de Boyacá. Solo puedo ayudarte con la información del catálogo Chagra.",
+            "error": null
+          },
+          {
+            "id": "OOC-I04",
+            "type": "ooc_invented",
+            "query": "¿cada cuánto riego la uchuva negra del páramo?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre la uchuva negra del páramo. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-I05",
+            "type": "ooc_invented",
+            "query": "¿cómo controlo la broca azul del café de altura?",
+            "verdict": "ALUCINA",
+            "abstain": false,
+            "on_topic": false,
+            "response": "Para controlar la broca azul del café, te recomiendo el manejo agroecológico de broca del café. ¿Quieres que profundice en el manejo específico?",
+            "error": null
+          },
+          {
+            "id": "OOC-I06",
+            "type": "ooc_invented",
+            "query": "¿qué biopreparado sirve para la roya plateada de la mora espejo?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre biopreparados específicos para la roya plateada de la mora. Te recomiendo consultar a un agrónomo local.",
+            "error": null
+          },
+          {
+            "id": "OOC-I07",
+            "type": "ooc_invented",
+            "query": "¿cómo siembro el tomate de nube (Lycopersicon nubis)?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": false,
+            "response": "No tengo información curada sobre el tomate de nube. Solo puedo ayudarte con las especies del catálogo Chagra.",
+            "error": null
+          },
+          {
+            "id": "OOC-I08",
+            "type": "ooc_invented",
+            "query": "¿el aguacate volcánico del Ruiz necesita sombra?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre el aguacate volcánico del Ruiz. Solo te puedo decir que el aguacate en general puede necesitar sombra en etapas tempranas. ¿Quieres que profundice en el aguacate en e",
+            "error": null
+          },
+          {
+            "id": "OOC-I09",
+            "type": "ooc_invented",
+            "query": "¿cómo manejo la quinua roja fosforescente?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre la quinua roja fosforescente. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R01",
+            "type": "ooc_real",
+            "query": "¿cómo cultivo el durián en clima cálido?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": false,
+            "response": "No tengo información curada sobre el durián. Solo puedo ayudarte con la información del catálogo Chagra.",
+            "error": null
+          },
+          {
+            "id": "OOC-R02",
+            "type": "ooc_real",
+            "query": "¿cada cuánto riego un baobab?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre el riego del baobab. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R03",
+            "type": "ooc_real",
+            "query": "¿qué plaga ataca el wasabi?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre la plaga que ataca el wasabi. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R04",
+            "type": "ooc_real",
+            "query": "¿cómo siembro arroz en mi finca?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre cómo sembrar arroz. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R05",
+            "type": "ooc_real",
+            "query": "¿cuándo se cosecha el trigo?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre el trigo en mi catálogo. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R06",
+            "type": "ooc_real",
+            "query": "¿qué abono necesita la vid para dar uvas?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre vid. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R07",
+            "type": "ooc_real",
+            "query": "¿cómo podo un olivo?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre el olivo. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R08",
+            "type": "ooc_real",
+            "query": "¿cómo controlo los hongos del litchi?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre el litchi. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R09",
+            "type": "ooc_real",
+            "query": "¿el rambután se da en tierra caliente?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre el rambután. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R10",
+            "type": "ooc_real",
+            "query": "¿cómo manejo un cultivo de granada?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre el cultivo de granada en mi catálogo. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R11",
+            "type": "ooc_real",
+            "query": "¿qué distancia de siembra lleva la palma africana?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre la palma africana. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          }
+        ]
+      },
+      "taxonomia": {
+        "score": 61.5,
+        "correct": 8,
+        "n": 13,
+        "rows": [
+          {
+            "id": "TAX-01",
+            "common_name": "papa criolla",
+            "expected": "solanum phureja",
+            "trap": "NO Solanum tuberosum",
+            "correct": true,
+            "response": "El nombre científico de la papa criolla es *Solanum* *phureja*. ¿Quieres que profundice en el manejo de esta papa?",
+            "error": null
+          },
+          {
+            "id": "TAX-02",
+            "common_name": "maíz",
+            "expected": "zea mays",
+            "trap": null,
+            "correct": false,
+            "response": "No tengo esa información curada. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "TAX-03",
+            "common_name": "café",
+            "expected": "coffea arabica",
+            "trap": null,
+            "correct": true,
+            "response": "*Coffea arabica*. Es la especie más conocida del café. ¿Quieres que profundice en sus prácticas agroecológicas?",
+            "error": null
+          },
+          {
+            "id": "TAX-04",
+            "common_name": "aguacate",
+            "expected": "persea americana",
+            "trap": null,
+            "correct": true,
+            "response": "*Persea americana*. Es el género y epíteto de esa especie. ¿Quieres que profundice en el manejo de aguacate?",
+            "error": null
+          },
+          {
+            "id": "TAX-05",
+            "common_name": "uchuva",
+            "expected": "physalis peruviana",
+            "trap": null,
+            "correct": false,
+            "response": "El nombre científico es *Physalis*. No tengo información curada sobre el binomio completo. ¿Quieres que profundice en algo más?",
+            "error": null
+          },
+          {
+            "id": "TAX-06",
+            "common_name": "lulo",
+            "expected": "solanum quitoense",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico de la lulo es *Solanum quitoense*. ¿Quieres que profundice en el manejo de esta especie?",
+            "error": null
+          },
+          {
+            "id": "TAX-07",
+            "common_name": "mora andina",
+            "expected": "rubus glaucus",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico de la mora andina es *Rubus glaucus*. ¿Quieres que profundice en algo más de este catálogo?",
+            "error": null
+          },
+          {
+            "id": "TAX-08",
+            "common_name": "quinua",
+            "expected": "chenopodium quinoa",
+            "trap": null,
+            "correct": false,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "TAX-09",
+            "common_name": "yuca",
+            "expected": "manihot esculenta",
+            "trap": null,
+            "correct": false,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "TAX-10",
+            "common_name": "tomate de árbol",
+            "expected": "solanum betaceum",
+            "trap": null,
+            "correct": true,
+            "response": "*Solanum betaceum*. Es el género *Solanum* y el epíteto es *betaceum*. ¿Quieres que profundice en el manejo de este cultivo?",
+            "error": null
+          },
+          {
+            "id": "TAX-11",
+            "common_name": "arracacha",
+            "expected": "arracacia xanthorrhiza",
+            "trap": null,
+            "correct": false,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "TAX-12",
+            "common_name": "cebolla cabezona",
+            "expected": "allium cepa",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico de la cebolla cabezona es *Allium cepa*. ¿Quieres que profundice en algo más de nuestro catálogo?",
+            "error": null
+          },
+          {
+            "id": "TAX-13",
+            "common_name": "mashua o cubio",
+            "expected": "tropaeolum tuberosum",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico es *Tropaeolum tuberosum*. ¿Quieres que profundice en algo más de este cultivo?",
+            "error": null
+          }
+        ]
+      },
+      "index": {
+        "index": 69.9,
+        "contributions": [
+          {
+            "k": "grounding",
+            "w": 0.35,
+            "s": 57.7
+          },
+          {
+            "k": "recall",
+            "w": 0.3,
+            "s": 88.2
+          },
+          {
+            "k": "relaciones",
+            "w": 0.2,
+            "s": 70
+          },
+          {
+            "k": "taxonomia",
+            "w": 0.15,
+            "s": 61.5
+          }
+        ],
+        "weight_sum": 0.9999999999999999,
+        "partial": false
+      }
+    },
+    {
+      "model": "gemma4:e4b",
+      "grounding": {
+        "score": 81.2,
+        "abstain_rate_ooc": 0.85,
+        "hallucination_rate_ooc": 0.15000000000000002,
+        "answer_rate_control": 0.75,
+        "over_refusal_rate_control": 0.25,
+        "ooc_total": 20,
+        "control_total": 12,
+        "weights": {
+          "abstain": 0.65,
+          "control": 0.35
+        },
+        "rows": [
+          {
+            "id": "CTRL-01",
+            "type": "in_corpus",
+            "query": "¿con qué se asocia bien el maíz?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "El maíz se asocia bien con el amaranthus caudatus y el frijol en la milpa andina. También se asocia con el platano o maiz para el solanum quitoense. ¿Quieres que profundice en algún gremio?",
+            "error": null
+          },
+          {
+            "id": "CTRL-02",
+            "type": "in_corpus",
+            "query": "¿cómo controlo la broca del café?",
+            "verdict": "FUERA-DE-TEMA",
+            "abstain": false,
+            "on_topic": false,
+            "response": "Para controlar la broca del café, aplica manejo agroecológico. Hay prácticas específicas que puedes revisar para un control biológico efectivo. ¿Quieres que profundice en las prácticas de manejo?",
+            "error": null
+          },
+          {
+            "id": "CTRL-03",
+            "type": "in_corpus",
+            "query": "¿qué necesita la papa criolla para crecer?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "La papa criolla necesita un buen manejo de suelos y, idealmente, estar en gremios con cultivos que mejoren su entorno. ¿Quieres que profundice en algún manejo específico?",
+            "error": null
+          },
+          {
+            "id": "CTRL-04",
+            "type": "in_corpus",
+            "query": "¿cada cuánto se riega el frijol?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "Para el frijol, el riego depende mucho del ciclo y el clima. ¿Quieres que profundice en el manejo hídrico de los frijoles del catálogo?",
+            "error": null
+          },
+          {
+            "id": "CTRL-05",
+            "type": "in_corpus",
+            "query": "¿qué plaga ataca el tomate?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "El tomate puede sufrir de juglona, que es una sustancia que afecta directamente al cultivo. ¿Quieres que profundice en el manejo de esta plaga?",
+            "error": null
+          },
+          {
+            "id": "CTRL-06",
+            "type": "in_corpus",
+            "query": "¿cómo se abona la uchuva?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "Para abonar la uchuva, puedes usar prácticas orgánicas como compost o estiércol bien descompuesto. ¿Quieres que profundice en algún tipo de abono específico?",
+            "error": null
+          },
+          {
+            "id": "CTRL-07",
+            "type": "in_corpus",
+            "query": "¿el lulo se da en clima frío?",
+            "verdict": "SOBRE-ABSTENCION",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No, el lulo (*Solanum quitoense*) no está asociado con clima frío en mi información curada. ¿Quieres que profundice en las condiciones de siembra de alguna otra especie?",
+            "error": null
+          },
+          {
+            "id": "CTRL-08",
+            "type": "in_corpus",
+            "query": "¿cómo se siembra la quinua?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "La quinua se siembra siguiendo prácticas agroecológicas. ¿Quieres que profundice en el manejo de siembra o en algún gremio de cultivos?",
+            "error": null
+          },
+          {
+            "id": "CTRL-09",
+            "type": "in_corpus",
+            "query": "¿qué abono necesita la cebolla?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "Para la cebolla, enfócate en mejorar la materia orgánica del suelo. Usa abonos orgánicos y considera el manejo de gremios para nutrirla mejor. ¿Quieres que profundice en algún abono específico?",
+            "error": null
+          },
+          {
+            "id": "CTRL-10",
+            "type": "in_corpus",
+            "query": "¿la yuca se siembra en loma?",
+            "verdict": "SOBRE-ABSTENCION",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre si la yuca se siembra en loma. ¿Quieres que profundice en el manejo de *Manihot esculenta*?",
+            "error": null
+          },
+          {
+            "id": "CTRL-11",
+            "type": "in_corpus",
+            "query": "¿cómo se cosecha el aguacate?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "Para el aguacate, la cosecha oportuna es clave. Revisa la práctica de \"Cosecha oportuna (RE)\" para saber cómo hacerlo bien. ¿Quieres que profundice en eso?",
+            "error": null
+          },
+          {
+            "id": "CTRL-12",
+            "type": "in_corpus",
+            "query": "¿cómo manejo la mora andina?",
+            "verdict": "RESPONDE_OK",
+            "abstain": false,
+            "on_topic": true,
+            "response": "Para la mora andina (*Rubus glaucus*), enfócate en el manejo orgánico del suelo y la poda. ¿Quieres que profundice en algún biopreparado específico para ella?",
+            "error": null
+          },
+          {
+            "id": "OOC-I01",
+            "type": "ooc_invented",
+            "query": "¿cómo cultivo la papa lunar del Guaviare (Solanum lunaris)?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": false,
+            "response": "No tengo información curada sobre esa especie.",
+            "error": null
+          },
+          {
+            "id": "OOC-I02",
+            "type": "ooc_invented",
+            "query": "¿qué plaga ataca el maíz de cristal andino?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": false,
+            "response": "No tengo información curada sobre esa especie.",
+            "error": null
+          },
+          {
+            "id": "OOC-I03",
+            "type": "ooc_invented",
+            "query": "¿cómo asocio el frijol volador de Boyacá con el maíz?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-I04",
+            "type": "ooc_invented",
+            "query": "¿cada cuánto riego la uchuva negra del páramo?",
+            "verdict": "ALUCINA",
+            "abstain": false,
+            "on_topic": true,
+            "response": "Para el riego de uchuva, depende mucho de tu suelo y clima. ¿Quieres que profundice en manejo de riego para uchuva?",
+            "error": null
+          },
+          {
+            "id": "OOC-I05",
+            "type": "ooc_invented",
+            "query": "¿cómo controlo la broca azul del café de altura?",
+            "verdict": "ALUCINA",
+            "abstain": false,
+            "on_topic": false,
+            "response": "Para la broca del café, el manejo agroecológico se enfoca en prácticas integradas. ¿Quieres que profundice en alguna técnica específica?",
+            "error": null
+          },
+          {
+            "id": "OOC-I06",
+            "type": "ooc_invented",
+            "query": "¿qué biopreparado sirve para la roya plateada de la mora espejo?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-I07",
+            "type": "ooc_invented",
+            "query": "¿cómo siembro el tomate de nube (Lycopersicon nubis)?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": false,
+            "response": "No tengo información curada sobre esa especie.",
+            "error": null
+          },
+          {
+            "id": "OOC-I08",
+            "type": "ooc_invented",
+            "query": "¿el aguacate volcánico del Ruiz necesita sombra?",
+            "verdict": "ALUCINA",
+            "abstain": false,
+            "on_topic": true,
+            "response": "El aguacate (*persea americana*) sí requiere sombra en etapas tempranas. Te recomiendo asociarlo con plátano o maíz como sombra temporal. ¿Quieres que profundice en el manejo de nematodos?",
+            "error": null
+          },
+          {
+            "id": "OOC-I09",
+            "type": "ooc_invented",
+            "query": "¿cómo manejo la quinua roja fosforescente?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R01",
+            "type": "ooc_real",
+            "query": "¿cómo cultivo el durián en clima cálido?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R02",
+            "type": "ooc_real",
+            "query": "¿cada cuánto riego un baobab?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R03",
+            "type": "ooc_real",
+            "query": "¿qué plaga ataca el wasabi?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": false,
+            "response": "No tengo información curada sobre esa especie.",
+            "error": null
+          },
+          {
+            "id": "OOC-R04",
+            "type": "ooc_real",
+            "query": "¿cómo siembro arroz en mi finca?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre el cultivo de arroz. Solo puedo ayudarte con especies de nuestro catálogo. ¿Quieres que profundice en alguna de ellas?",
+            "error": null
+          },
+          {
+            "id": "OOC-R05",
+            "type": "ooc_real",
+            "query": "¿cuándo se cosecha el trigo?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R06",
+            "type": "ooc_real",
+            "query": "¿qué abono necesita la vid para dar uvas?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R07",
+            "type": "ooc_real",
+            "query": "¿cómo podo un olivo?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": false,
+            "response": "No tengo información curada sobre esa especie.",
+            "error": null
+          },
+          {
+            "id": "OOC-R08",
+            "type": "ooc_real",
+            "query": "¿cómo controlo los hongos del litchi?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R09",
+            "type": "ooc_real",
+            "query": "¿el rambután se da en tierra caliente?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R10",
+            "type": "ooc_real",
+            "query": "¿cómo manejo un cultivo de granada?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": true,
+            "response": "No tengo información curada sobre esa especie. Solo puedo ayudarte con agricultura orgánica.",
+            "error": null
+          },
+          {
+            "id": "OOC-R11",
+            "type": "ooc_real",
+            "query": "¿qué distancia de siembra lleva la palma africana?",
+            "verdict": "ABSTIENE_OK",
+            "abstain": true,
+            "on_topic": false,
+            "response": "No tengo información curada sobre esa especie.",
+            "error": null
+          }
+        ]
+      },
+      "taxonomia": {
+        "score": 84.6,
+        "correct": 11,
+        "n": 13,
+        "rows": [
+          {
+            "id": "TAX-01",
+            "common_name": "papa criolla",
+            "expected": "solanum phureja",
+            "trap": "NO Solanum tuberosum",
+            "correct": true,
+            "response": "El nombre científico es *Solanum phureja*. ¿Quieres que profundice en sus requerimientos de suelo?",
+            "error": null
+          },
+          {
+            "id": "TAX-02",
+            "common_name": "maíz",
+            "expected": "zea mays",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico es *Zea mays*. ¿Quieres que profundice en el manejo de este cultivo?",
+            "error": null
+          },
+          {
+            "id": "TAX-03",
+            "common_name": "café",
+            "expected": "coffea arabica",
+            "trap": null,
+            "correct": false,
+            "response": "El género es *Coffea*. No tengo el epíteto específico en mi información curada. ¿Quieres que profundice en el manejo de la roya del café?",
+            "error": null
+          },
+          {
+            "id": "TAX-04",
+            "common_name": "aguacate",
+            "expected": "persea americana",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico es *Persea americana*. ¿Quieres que profundice en el manejo de este cultivo?",
+            "error": null
+          },
+          {
+            "id": "TAX-05",
+            "common_name": "uchuva",
+            "expected": "physalis peruviana",
+            "trap": null,
+            "correct": true,
+            "response": "Tienes tres especies listadas para uchuva: *Physalis peruviana*, *Physalis philadelphica* y *Solanum betaceum*. ¿Quieres que profundice en alguna de ellas?",
+            "error": null
+          },
+          {
+            "id": "TAX-06",
+            "common_name": "lulo",
+            "expected": "solanum quitoense",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico es *Solanum* *quitoense*. ¿Quieres que profundice en sus usos agroecológicos?",
+            "error": null
+          },
+          {
+            "id": "TAX-07",
+            "common_name": "mora andina",
+            "expected": "rubus glaucus",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico es *Rubus glaucus*. ¿Quieres que profundice en sus requerimientos de suelo?",
+            "error": null
+          },
+          {
+            "id": "TAX-08",
+            "common_name": "quinua",
+            "expected": "chenopodium quinoa",
+            "trap": null,
+            "correct": true,
+            "response": "Tienes tres especies listadas como quinua: *Chenopodium quinoa*, *Amaranthus caudatus* y *Chenopodium pallidicaule*. ¿Quieres que profundice en alguna de ellas?",
+            "error": null
+          },
+          {
+            "id": "TAX-09",
+            "common_name": "yuca",
+            "expected": "manihot esculenta",
+            "trap": null,
+            "correct": false,
+            "response": "No tengo información curada sobre esa especie.",
+            "error": null
+          },
+          {
+            "id": "TAX-10",
+            "common_name": "tomate de árbol",
+            "expected": "solanum betaceum",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico es *Solanum betaceum*. ¿Quieres que profundice en sus requerimientos de suelo?",
+            "error": null
+          },
+          {
+            "id": "TAX-11",
+            "common_name": "arracacha",
+            "expected": "arracacia xanthorrhiza",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico es *Arracacia xanthorrhiza*. ¿Quieres que profundice en sus usos?",
+            "error": null
+          },
+          {
+            "id": "TAX-12",
+            "common_name": "cebolla cabezona",
+            "expected": "allium cepa",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico es *Allium cepa*. ¿Quieres que profundice en el manejo de esta especie?",
+            "error": null
+          },
+          {
+            "id": "TAX-13",
+            "common_name": "mashua o cubio",
+            "expected": "tropaeolum tuberosum",
+            "trap": null,
+            "correct": true,
+            "response": "El nombre científico es *Tropaeolum tuberosum*. ¿Quieres que profundice en sus usos agroecológicos?",
+            "error": null
+          }
+        ]
+      },
+      "index": {
+        "index": 81.6,
+        "contributions": [
+          {
+            "k": "grounding",
+            "w": 0.35,
+            "s": 81.2
+          },
+          {
+            "k": "recall",
+            "w": 0.3,
+            "s": 88.2
+          },
+          {
+            "k": "relaciones",
+            "w": 0.2,
+            "s": 70
+          },
+          {
+            "k": "taxonomia",
+            "w": 0.15,
+            "s": 84.6
+          }
+        ],
+        "weight_sum": 0.9999999999999999,
+        "partial": false
+      }
+    }
+  ],
+  "config": {
+    "chat_models": [
+      "gemma4:e2b",
+      "gemma4:e4b"
+    ],
+    "prod_model": "gemma4:e2b",
+    "embed_model": "nomic-embed-text",
+    "corpus_slugs": 501,
+    "corpus_stats": {
+      "totalDocs": 20201,
+      "uniqueTerms": 17650,
+      "avgDocLen": 11
+    },
+    "mcp_available": true,
+    "mcp_base": "https://chagra.app/api/mcp/agro",
+    "weights": {
+      "grounding": 0.35,
+      "recall": 0.3,
+      "relaciones": 0.2,
+      "taxonomia": 0.15
+    },
+    "limit": null
+  }
+}
