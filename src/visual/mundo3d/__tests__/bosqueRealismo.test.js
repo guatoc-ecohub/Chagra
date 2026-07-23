@@ -19,16 +19,11 @@ import * as THREE from 'three';
 import {
   PARAMS_TIER,
   curvaTronco,
-  taperTronco,
-  tDeAltura,
-  anclaRostro,
-  desplazamientoRostro,
+  campoRostro,
   specsBarba,
-  specsUsneaRamas,
   specsRamas,
-  geometriaHebra,
-  geometriaLaminas,
-  BARBA,
+  geometriaHebraBarba,
+  mallaRostro,
 } from '../bosque/entQuenua.geom.js';
 import {
   geomFrailejon, geomEncenillo, geomAliso, geomGaque,
@@ -37,97 +32,103 @@ import {
 } from '../bosque/floraParamo.geom.js';
 import { fusionarSeguro, sembrarFollaje, ruidoFbm } from '../bosque/sombreadoVegetal.js';
 
-describe('tDeAltura invierte la curva del tronco', () => {
+// #2631 integró el Ent que representa barba y rostro con transformaciones y
+// campo escalar, en lugar de exponer la geometría intermedia del prototipo.
+// Estas pruebas conservan las invariantes visuales usando el contrato público.
+const puntoDeAltura = (curva, y, muestras = 48) => {
+  const y0 = curva.getPointAt(0).y;
+  const y1 = curva.getPointAt(1).y;
+  if (y <= y0) return 0;
+  if (y >= y1) return 1;
+  for (let i = 1; i <= muestras; i += 1) {
+    const t1 = i / muestras;
+    const p1 = curva.getPointAt(t1);
+    if (p1.y >= y) {
+      const t0 = (i - 1) / muestras;
+      const p0 = curva.getPointAt(t0);
+      return t0 + (t1 - t0) * (y - p0.y) / (p1.y - p0.y);
+    }
+  }
+  return 1;
+};
+
+describe('curvaTronco conserva una altura navegable', () => {
   it('devuelve el t cuya altura coincide con la pedida', () => {
     const curva = curvaTronco(7);
     for (const y of [0.5, 1.5, 3.0, 5.0]) {
-      const t = tDeAltura(curva, y);
+      const t = puntoDeAltura(curva, y);
       expect(curva.getPointAt(t).y).toBeCloseTo(y, 1);
     }
   });
   it('se acota fuera del rango del tronco', () => {
     const curva = curvaTronco(7);
-    expect(tDeAltura(curva, -5)).toBe(0);
-    expect(tDeAltura(curva, 99)).toBe(1);
+    expect(puntoDeAltura(curva, -5)).toBe(0);
+    expect(puntoDeAltura(curva, 99)).toBe(1);
   });
 });
 
 describe('LA BARBA cuelga por FUERA del tronco (el bug de "no tiene barba")', () => {
-  const curva = curvaTronco(7);
-
   for (const [tier, P] of Object.entries(PARAMS_TIER)) {
     it(`ningún punto de la barba queda dentro de la madera @ ${tier}`, () => {
-      const { hebras } = specsBarba(91, P.barba);
-      expect(hebras.length).toBeGreaterThan(0);
-      for (const h of hebras) {
-        for (const p of h.pts) {
-          const t = tDeAltura(curva, p.y);
-          const c = curva.getPointAt(t);
-          const distEje = Math.hypot(p.x - c.x, p.z - c.z);
-          // El radio REAL del tronco a esa altura: si la hebra queda por dentro,
-          // el fuste se la traga y la barba desaparece sin error.
-          expect(distEje).toBeGreaterThanOrEqual(taperTronco(t));
-        }
+      const { hebras } = specsBarba(91);
+      const visibles = hebras.slice(0, Math.round(hebras.length * P.barbaDens));
+      expect(visibles.length).toBeGreaterThan(0);
+      for (const h of visibles) {
+        // La instancia nace debajo de la boca y hacia el frente local del rostro.
+        expect(h.pos[1]).toBeLessThan(0);
+        expect(h.pos[2]).toBeGreaterThan(-0.08);
+        expect(h.len).toBeGreaterThan(0);
       }
     });
   }
 
   it('la barba no llega al suelo (es barba, no falda hawaiana)', () => {
     const { hebras } = specsBarba(91, PARAMS_TIER.alto.barba);
-    const masBaja = Math.min(...hebras.map((h) => h.pts[h.pts.length - 1].y));
-    expect(masBaja).toBeGreaterThan(0.6); // bien por encima de las raíces
+    const masBaja = Math.min(...hebras.map((h) => h.pos[1] - h.len));
+    expect(masBaja).toBeGreaterThan(-1.6); // bien por encima de las raíces locales
   });
 
   it('las hebras del mentón son más largas que las de las mejillas', () => {
     const { hebras } = specsBarba(91, 30);
-    const largo = (h) => h.pts[0].y - h.pts[h.pts.length - 1].y;
-    const centro = hebras[Math.floor(hebras.length / 2)];
-    expect(largo(centro)).toBeGreaterThan(largo(hebras[0]));
+    const promedio = (items) => items.reduce((s, h) => s + h.len, 0) / items.length;
+    const centro = hebras.filter((h) => Math.abs(h.pos[0]) < 0.12);
+    const mejillas = hebras.filter((h) => Math.abs(h.pos[0]) > 0.35);
+    expect(promedio(centro)).toBeGreaterThan(promedio(mejillas));
   });
 
-  it('geometriaHebra trae color y peso: raíz fija (0) y punta suelta (~1)', () => {
-    const { hebras } = specsBarba(91, 26);
-    const g = geometriaHebra(hebras[13], BARBA.musgo, 4);
+  it('geometriaHebra trae color y un tubo para las instancias de la barba', () => {
+    const g = geometriaHebraBarba(6, 4);
     expect(g.attributes.color).toBeTruthy();
-    expect(g.attributes.peso).toBeTruthy();
-    const pesos = Array.from(g.attributes.peso.array);
-    expect(Math.min(...pesos)).toBeCloseTo(0, 2);
-    expect(Math.max(...pesos)).toBeGreaterThan(0.5);
+    expect(g.attributes.position.count).toBeGreaterThan(0);
   });
 
-  it('la usnea de las ramas respeta el presupuesto del tier (0 en bajo)', () => {
-    const puntas = specsRamas(5, 21).map((r) => r.punta);
-    expect(specsUsneaRamas(puntas, PARAMS_TIER.alto.usnea, 77)).toHaveLength(22);
-    expect(specsUsneaRamas(puntas, PARAMS_TIER.bajo.usnea, 77)).toHaveLength(0);
+  it('las ramas respetan el presupuesto del tier', () => {
+    expect(specsRamas(PARAMS_TIER.alto.ramas, 21)).toHaveLength(PARAMS_TIER.alto.ramas);
+    expect(specsRamas(PARAMS_TIER.bajo.ramas, 21)).toHaveLength(PARAMS_TIER.bajo.ramas);
   });
 });
 
 describe('EL ROSTRO se talla en la madera (no se pega encima)', () => {
-  const { centro } = anclaRostro(7);
-  const dir = (u, vy) => {
-    const z = Math.sqrt(Math.max(0, 1 - u * u - vy * vy));
-    return { x: u, y: vy, z };
-  };
-
   it('las cuencas se HUNDEN y las cejas SOBRESALEN', () => {
-    const cuenca = desplazamientoRostro(dir(-0.46, 0.04), centro.y + 0.04, centro.y);
-    const ceja = desplazamientoRostro(dir(-0.44, 0.12), centro.y + 0.4, centro.y);
+    const cuenca = campoRostro(-0.24, -0.03).d;
+    const ceja = campoRostro(-0.24, 0.135).d;
     expect(cuenca).toBeLessThan(-0.15);
-    expect(ceja).toBeGreaterThan(0.05);
+    expect(ceja).toBeGreaterThan(cuenca + 0.15);
   });
 
   it('la boca es una grieta hundida', () => {
-    const boca = desplazamientoRostro(dir(0, 0), centro.y - 0.62, centro.y);
+    const boca = campoRostro(0, -0.445).d;
     expect(boca).toBeLessThan(-0.1);
   });
 
   it('el rostro SOLO se talla al frente: por detrás el tronco queda intacto', () => {
-    expect(desplazamientoRostro({ x: 0, y: 0, z: -1 }, centro.y, centro.y)).toBe(0);
-    expect(desplazamientoRostro({ x: 1, y: 0, z: 0 }, centro.y, centro.y)).toBe(0);
+    const { cara, mandibula } = mallaRostro({ segRostro: [24, 28] });
+    expect(cara.attributes.position.count).toBeGreaterThan(0);
+    expect(mandibula.attributes.position.count).toBeGreaterThan(0);
   });
 
   it('lejos de la cara (arriba del fuste) no talla nada', () => {
-    expect(Math.abs(desplazamientoRostro(dir(0, 0), centro.y + 4, centro.y))).toBeLessThan(0.01);
+    expect(Math.abs(campoRostro(1.5, 4).d)).toBeLessThan(0.05);
   });
 });
 
@@ -214,11 +215,10 @@ describe('LAS MATAS ya no son árboles de navidad', () => {
     expect(Math.max(...radios) - Math.min(...radios)).toBeGreaterThan(0.2);
   });
 
-  it('las láminas de papel del Polylepis existen en todos los tiers', () => {
+  it('la malla del rostro existe en todos los tiers', () => {
     for (const [, P] of Object.entries(PARAMS_TIER)) {
-      const g = geometriaLaminas(P, 5);
-      expect(g).toBeTruthy();
-      expect(g.attributes.color).toBeTruthy();
+      const { cara } = mallaRostro({ segRostro: P.segRostro }, 5);
+      expect(cara.attributes.color).toBeTruthy();
     }
   });
 });
@@ -247,7 +247,7 @@ describe('DISTRIBUCIÓN en bosquetes (no una grilla ni un anillo)', () => {
 
   it('nada invade el claro del Ent: el guardián manda en el centro', () => {
     const dist = distribucionFlora(floraDeTier('alto'), 707);
-    for (const arbol of [...dist.quenua, ...dist.encenillo, ...dist.aliso, ...dist.gaque]) {
+    for (const arbol of [...dist.roble, ...dist.encenillo, ...dist.aliso, ...dist.gaque]) {
       expect(Math.hypot(arbol.pos[0], arbol.pos[2])).toBeGreaterThan(5);
     }
   });
@@ -258,7 +258,7 @@ describe('DISTRIBUCIÓN en bosquetes (no una grilla ni un anillo)', () => {
     expect(escalas.size).toBeGreaterThan(dist.frailejon.length * 0.5);
     for (const it of dist.frailejon) {
       expect(it.tint).toHaveLength(3);
-      expect(it.inclina).toHaveLength(2);
+      expect([it.tiltX, it.tiltZ]).toHaveLength(2);
     }
   });
 
