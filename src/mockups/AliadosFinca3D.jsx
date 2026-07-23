@@ -57,7 +57,18 @@ const P = {
   brote: mezclar('#6ac06a', TINTE, 0.1), // la vida que nace del compost
   turriculo: mezclar('#5a3d28', TINTE, 0.12), // turrículos de la lombriz
   ave: '#2f2b23', // silueta de las aves a contraluz
+  // — las hortalizas de las camas (cada cultivo con su verde propio) —
+  lechuga: mezclar('#8fbf4a', TINTE, 0.12), // roseta verde-amarilla, brillante
+  lechugaCentro: mezclar('#c9dd7a', TINTE, 0.1), // el cogollo tierno del centro
+  col: mezclar('#8aa883', TINTE, 0.12), // repollo glauco (verde azulado-gris)
+  colHoja: mezclar('#6f9468', TINTE, 0.14), // hoja envolvente, un punto más honda
+  tomateFruto: mezclar('#c9432e', TINTE, 0.08), // el rojo del fruto maduro
+  zanahoriaPluma: mezclar('#5f9a44', TINTE, 0.12), // penacho plumoso
+  zanahoriaRaiz: mezclar('#d97a2a', TINTE, 0.08), // el hombro naranja que asoma
+  pasto: mezclar(PALETA.follajeClaro, TINTE, 0.25), // la falda que aterriza la huerta
 };
+
+const clamp = (x, a, b) => (x < a ? a : x > b ? b : x);
 
 /* Ruido determinista barato (mulberry32) para sembrar igual en cada carga. */
 function crearRng(semilla) {
@@ -113,6 +124,120 @@ function SolBajo() {
   );
 }
 
+/* ══════ EL FONDO QUE ATERRIZA LA HUERTA ══════
+   Antes el disco de tierra terminaba contra el crema plano del cielo y la
+   huerta se leía flotando sobre café muerto. Llega el patrón de la botica
+   (que a su vez viene del telón del páramo):
+   · LA FALDA — anillo de pasto que continúa el terreno desde el borde del
+     disco hasta perderse en la niebla dorada. Lambert con fog.
+   · LAS LOMAS — tres anillos de crestas, cada uno más alto, más lejos y más
+     pálido. La perspectiva aérea va HORNEADA en los vértices (mezcla hacia la
+     bruma), MeshBasic con fog:false: se lee igual en cualquier tier.
+   Senos de frecuencia ENTERA sobre el ángulo: la silueta cierra el anillo sin
+   costura y sin Math.random. */
+function FondoLomas() {
+  const { geoFalda, geoLomas, matFalda, matLomas } = useMemo(() => {
+    const bruma = new THREE.Color(ATMOSFERA.niebla);
+    const c = new THREE.Color();
+
+    /* — la falda de pasto: anillo r 15.5 → 58, hundiéndose apenas — */
+    const NA = 56;
+    const R0 = 15.5, R1 = 58;
+    const posF = new Float32Array((NA + 1) * 2 * 3);
+    const colF = new Float32Array((NA + 1) * 2 * 3);
+    const idxF = [];
+    const cPasto = new THREE.Color(P.pasto);
+    for (let i = 0; i <= NA; i++) {
+      const a = (i / NA) * Math.PI * 2;
+      const cs = Math.cos(a), sn = Math.sin(a);
+      [[R0, -0.02, 0.14], [R1, -0.6, 0.85]].forEach(([r, y, velo], l) => {
+        const k = (i * 2 + l) * 3;
+        posF[k] = cs * r; posF[k + 1] = y; posF[k + 2] = sn * r;
+        c.copy(cPasto).lerp(bruma, velo);
+        colF[k] = c.r; colF[k + 1] = c.g; colF[k + 2] = c.b;
+      });
+      if (i < NA) {
+        const q = i * 2;
+        idxF.push(q, q + 1, q + 3, q, q + 3, q + 2);
+      }
+    }
+    const geoFalda = new THREE.BufferGeometry();
+    geoFalda.setAttribute('position', new THREE.BufferAttribute(posF, 3));
+    geoFalda.setAttribute('color', new THREE.BufferAttribute(colF, 3));
+    geoFalda.setIndex(idxF);
+    geoFalda.computeVertexNormals();
+
+    /* — las lomas: tres anillos de crestas, verdes de la casa hacia la bruma — */
+    const filas = [
+      { r: 26, alto: 4.6, base: -1.2, tono: mezclar(P.follaje, P.follajeOscuro, 0.3), velo: 0.36, kA: 5, kB: 11, kC: 23, fase: 1.7 },
+      { r: 36, alto: 6.4, base: -1.5, tono: mezclar(P.follaje, TINTE, 0.3), velo: 0.6, kA: 4, kB: 9, kC: 19, fase: 4.2 },
+      { r: 48, alto: 8.8, base: -1.8, tono: mezclar(P.follaje, TINTE, 0.5), velo: 0.74, kA: 3, kB: 7, kC: 17, fase: 0.6 },
+    ];
+    const N = 72;
+    const posL = new Float32Array(filas.length * (N + 1) * 2 * 3);
+    const colL = new Float32Array(filas.length * (N + 1) * 2 * 3);
+    const idxL = [];
+    let v0 = 0, p = 0;
+    for (const f of filas) {
+      const cumbre = new THREE.Color(f.tono).lerp(bruma, f.velo);
+      const pie = cumbre.clone().lerp(bruma, 0.5);
+      for (let i = 0; i <= N; i++) {
+        const a = (i / N) * Math.PI * 2;
+        const s =
+          0.45 +
+          0.3 * Math.sin(f.kA * a + f.fase) +
+          0.22 * Math.sin(f.kB * a + f.fase * 2.1) +
+          0.12 * Math.sin(f.kC * a + f.fase * 4.3);
+        const y = f.base + f.alto * clamp(s, 0.15, 1.1);
+        const cs = Math.cos(a), sn = Math.sin(a);
+        for (let l = 0; l < 2; l++) {
+          posL[p] = cs * f.r;
+          posL[p + 1] = l === 0 ? y : f.base;
+          posL[p + 2] = sn * f.r;
+          const cc = l === 0 ? cumbre : pie;
+          colL[p] = cc.r; colL[p + 1] = cc.g; colL[p + 2] = cc.b;
+          p += 3;
+        }
+        if (i < N) {
+          const q = v0 + i * 2;
+          idxL.push(q, q + 1, q + 3, q, q + 3, q + 2);
+        }
+      }
+      v0 += (N + 1) * 2;
+    }
+    const geoLomas = new THREE.BufferGeometry();
+    geoLomas.setAttribute('position', new THREE.BufferAttribute(posL, 3));
+    geoLomas.setAttribute('color', new THREE.BufferAttribute(colL, 3));
+    geoLomas.setIndex(idxL);
+
+    const matFalda = new THREE.MeshLambertMaterial({ vertexColors: true });
+    const matLomas = new THREE.MeshBasicMaterial({
+      vertexColors: true,
+      side: THREE.DoubleSide,
+      fog: false,
+    });
+    return { geoFalda, geoLomas, matFalda, matLomas };
+  }, []);
+
+  useEffect(
+    () => () => {
+      geoFalda.dispose();
+      geoLomas.dispose();
+      matFalda.dispose();
+      matLomas.dispose();
+    },
+    [geoFalda, geoLomas, matFalda, matLomas],
+  );
+
+  return (
+    <group>
+      {/* el telón primero: siempre detrás de todo lo que importa */}
+      <mesh geometry={geoLomas} material={matLomas} renderOrder={-1} />
+      <mesh geometry={geoFalda} material={matFalda} />
+    </group>
+  );
+}
+
 /* El suelo de la huerta: un disco de tierra removida, cálido. */
 function SueloHuerta() {
   return (
@@ -123,9 +248,148 @@ function SueloHuerta() {
   );
 }
 
-/* ── Cama de siembra: marco de madera + tierra + hileras de matas (lechugas
-      redondas y brotes cónicos alternados). Determinista por semilla. ── */
-function CamaSiembra({ pos, largo, ancho, rot = 0, semilla, denso }) {
+/* ══════ LAS HORTALIZAS ══════
+   Cada cultivo con su FORMA propia (como las 7 aromáticas de la botica): que
+   una lechuga se lea lechuga y un tomate se lea tomate desde la cámara. Todas
+   low-poly Lambert flatShading, deterministas (la variación entra por props). */
+
+/* Lechuga: ROSETA — corona de hojas abiertas alrededor de un cogollo tierno. */
+function Lechuga({ x, z, esc, giro, verde }) {
+  const hojas = 6;
+  return (
+    <group position={[x, 0.32, z]} rotation={[0, giro, 0]} scale={esc}>
+      {Array.from({ length: hojas }, (_, i) => {
+        const a = (i / hojas) * Math.PI * 2;
+        return (
+          <mesh
+            key={i}
+            position={[Math.cos(a) * 0.13, 0.07, Math.sin(a) * 0.13]}
+            rotation={[Math.PI / 2 - 0.95, 0, -a + Math.PI / 2]}
+          >
+            <circleGeometry args={[0.17, 5]} />
+            <meshLambertMaterial
+              color={mezclar(P.lechuga, P.follajeClaro, verde * 0.5)}
+              flatShading
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+        );
+      })}
+      {/* el cogollo del centro, más claro y tierno */}
+      <mesh position={[0, 0.09, 0]} scale={[1, 0.75, 1]}>
+        <sphereGeometry args={[0.11, 6, 5]} />
+        <meshLambertMaterial color={P.lechugaCentro} flatShading />
+      </mesh>
+    </group>
+  );
+}
+
+/* Col (repollo): BOLA glauca apretada + hojas grandes envolventes abiertas. */
+function Col({ x, z, esc, giro, verde }) {
+  return (
+    <group position={[x, 0.32, z]} rotation={[0, giro, 0]} scale={esc}>
+      {/* la cabeza compacta */}
+      <mesh position={[0, 0.16, 0]} scale={[1, 0.85, 1]}>
+        <sphereGeometry args={[0.2, 7, 5]} />
+        <meshLambertMaterial color={mezclar(P.col, P.follajeClaro, verde * 0.3)} flatShading />
+      </mesh>
+      {/* tres hojas grandes que la abrazan sin cerrarse */}
+      {[0, 2.1, 4.2].map((a, i) => (
+        <mesh
+          key={i}
+          position={[Math.cos(a) * 0.19, 0.1, Math.sin(a) * 0.19]}
+          rotation={[Math.PI / 2 - 1.25, 0, -a + Math.PI / 2]}
+        >
+          <circleGeometry args={[0.24, 6]} />
+          <meshLambertMaterial color={P.colHoja} flatShading side={THREE.DoubleSide} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* Tomatera: MATA ALTA amarrada a su tutor de madera, con frutos rojos. */
+function Tomatera({ x, z, esc, giro, verde }) {
+  return (
+    <group position={[x, 0.32, z]} rotation={[0, giro, 0]} scale={esc}>
+      {/* el tutor (estaca de madera, huerta trabajada) */}
+      <mesh position={[0.1, 0.48, 0.04]} rotation={[0, 0, 0.05]}>
+        <cylinderGeometry args={[0.022, 0.028, 0.96, 5]} />
+        <meshLambertMaterial color={P.camaMarco} flatShading />
+      </mesh>
+      {/* el tallo */}
+      <mesh position={[0, 0.4, 0]} rotation={[0, 0, -0.06]}>
+        <cylinderGeometry args={[0.025, 0.04, 0.8, 5]} />
+        <meshLambertMaterial color={P.follajeOscuro} flatShading />
+      </mesh>
+      {/* el follaje: tres masas irregulares subiendo por el tutor */}
+      {[
+        [0.06, 0.42, 0.06, 0.15],
+        [-0.09, 0.62, -0.04, 0.13],
+        [0.03, 0.82, 0.02, 0.12],
+      ].map(([hx, hy, hz, r], i) => (
+        <mesh key={i} position={[hx, hy, hz]}>
+          <icosahedronGeometry args={[r, 0]} />
+          <meshLambertMaterial
+            color={mezclar(P.follajeOscuro, P.follaje, 0.3 + verde * 0.4)}
+            flatShading
+          />
+        </mesh>
+      ))}
+      {/* los frutos rojos colgando (la firma de la tomatera) */}
+      {[
+        [0.14, 0.52, 0.1],
+        [-0.13, 0.68, 0.06],
+        [0.1, 0.78, -0.08],
+      ].map(([fx, fy, fz], i) => (
+        <mesh key={i} position={[fx, fy, fz]}>
+          <sphereGeometry args={[0.055, 6, 5]} />
+          <meshLambertMaterial color={P.tomateFruto} flatShading />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/* Zanahoria: PENACHO plumoso de hojas finas + el hombro naranja asomado. */
+function Zanahoria({ x, z, esc, giro, verde }) {
+  const plumas = 5;
+  return (
+    <group position={[x, 0.32, z]} rotation={[0, giro, 0]} scale={esc}>
+      {/* el hombro de la raíz asomando de la tierra */}
+      <mesh position={[0, 0.025, 0]}>
+        <cylinderGeometry args={[0.045, 0.055, 0.06, 6]} />
+        <meshLambertMaterial color={P.zanahoriaRaiz} flatShading />
+      </mesh>
+      {/* el penacho: conos finos abiertos en abanico */}
+      {Array.from({ length: plumas }, (_, i) => {
+        const a = (i / plumas) * Math.PI * 2;
+        const inclina = i === 0 ? 0 : 0.42;
+        return (
+          <mesh
+            key={i}
+            position={[Math.cos(a) * 0.045 * (i === 0 ? 0 : 1), 0.2, Math.sin(a) * 0.045 * (i === 0 ? 0 : 1)]}
+            rotation={[Math.sin(a) * inclina, 0, -Math.cos(a) * inclina]}
+          >
+            <coneGeometry args={[0.035, 0.36, 4]} />
+            <meshLambertMaterial
+              color={mezclar(P.zanahoriaPluma, P.follajeClaro, verde * 0.5)}
+              flatShading
+            />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+const CULTIVOS = { lechuga: Lechuga, col: Col, tomate: Tomatera, zanahoria: Zanahoria };
+
+/* ── Cama de siembra: marco de madera + tierra + HILERAS POR CULTIVO, como se
+      siembra de verdad: cada fila una hortaliza (cultivos[j]). Determinista
+      por semilla. La fila j=0 queda al fondo (z negativo): ahí van las matas
+      altas (tomateras) para no tapar las bajas. ── */
+function CamaSiembra({ pos, largo, ancho, rot = 0, semilla, denso, cultivos }) {
   const matas = useMemo(() => {
     const rng = crearRng(semilla);
     const lista = [];
@@ -138,15 +402,15 @@ function CamaSiembra({ pos, largo, ancho, rot = 0, semilla, denso }) {
         lista.push({
           x,
           z,
-          tipo: (i + j) % 3 === 0 ? 'brote' : 'lechuga',
-          esc: 0.82 + rng() * 0.4,
-          giro: rng() * Math.PI,
+          tipo: cultivos[j % cultivos.length],
+          esc: 0.82 + rng() * 0.35,
+          giro: rng() * Math.PI * 2,
           verde: rng(),
         });
       }
     }
     return lista;
-  }, [largo, ancho, semilla, denso]);
+  }, [largo, ancho, semilla, denso, cultivos]);
 
   return (
     <group position={[pos[0], 0, pos[1]]} rotation={[0, rot, 0]}>
@@ -160,22 +424,11 @@ function CamaSiembra({ pos, largo, ancho, rot = 0, semilla, denso }) {
         <boxGeometry args={[largo, 0.16, ancho]} />
         <meshLambertMaterial color={P.tierra} flatShading />
       </mesh>
-      {/* las matas */}
-      {matas.map((m, i) =>
-        m.tipo === 'lechuga' ? (
-          <mesh key={i} position={[m.x, 0.34 + 0.12 * m.esc, m.z]} scale={[m.esc, m.esc * 0.7, m.esc]}>
-            <sphereGeometry args={[0.26, 7, 5]} />
-            <meshLambertMaterial color={mezclar(P.follaje, P.follajeClaro, m.verde)} flatShading />
-          </mesh>
-        ) : (
-          <group key={i} position={[m.x, 0.32, m.z]} rotation={[0, m.giro, 0]}>
-            <mesh position={[0, 0.16 * m.esc, 0]} scale={m.esc}>
-              <coneGeometry args={[0.16, 0.42, 5]} />
-              <meshLambertMaterial color={mezclar(P.follajeOscuro, P.follaje, m.verde)} flatShading />
-            </mesh>
-          </group>
-        ),
-      )}
+      {/* las hortalizas, cada una con su forma */}
+      {matas.map((m, i) => {
+        const Mata = CULTIVOS[m.tipo];
+        return <Mata key={i} x={m.x} z={m.z} esc={m.esc} giro={m.giro} verde={m.verde} />;
+      })}
     </group>
   );
 }
@@ -456,12 +709,14 @@ function EscenaAliados({ tier, reducedMotion, foco }) {
       {perfil.fog && <fog attach="fog" args={[ATMOSFERA.niebla, 14, 34]} />}
       <LucesDoradas />
       <SolBajo />
+      <FondoLomas />
       <SueloHuerta />
 
-      {/* las camas de siembra: la huerta trabajada */}
-      <CamaSiembra pos={[-2.6, -0.4]} largo={3.4} ancho={2.0} semilla={7} denso={alto} />
-      <CamaSiembra pos={[2.4, -0.6]} largo={3.0} ancho={1.9} rot={0.12} semilla={13} denso={alto} />
-      <CamaSiembra pos={[0, 2.2]} largo={3.8} ancho={1.8} rot={-0.06} semilla={19} denso={alto} />
+      {/* las camas de siembra: la huerta trabajada, cada hilera su cultivo
+          (tomateras al fondo de su cama para no tapar las matas bajas) */}
+      <CamaSiembra pos={[-2.6, -0.4]} largo={3.4} ancho={2.0} semilla={7} denso={alto} cultivos={['tomate', 'lechuga', 'zanahoria']} />
+      <CamaSiembra pos={[2.4, -0.6]} largo={3.0} ancho={1.9} rot={0.12} semilla={13} denso={alto} cultivos={['tomate', 'col', 'lechuga']} />
+      <CamaSiembra pos={[0, 2.2]} largo={3.8} ancho={1.8} rot={-0.06} semilla={19} denso={alto} cultivos={['col', 'zanahoria', 'lechuga']} />
 
       {/* las ZONAS DE TRABAJO, una por aliado */}
       <ZonaHoja pos={ZONAS.mariquita} />
