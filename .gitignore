@@ -83,3 +83,9 @@ chagra-anthropic-judge-key
 
 # Canario nocturno: reportes y datasets (efímeros, nunca commitear)
 /data/canary-runs/
+
+# Experimento chunking passage-level (exp/rag-chunking-passages) — artefactos grandes, NO commitear
+# (se ignora el CONTENIDO, no el dir, para poder re-incluir results.json: git no
+#  desciende a un dir excluido, así que un `!` sobre el dir entero no funciona.)
+/data/rag-chunking-exp/*
+!/data/rag-chunking-exp/results.json

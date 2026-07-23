@@ -1,0 +1,1343 @@
+{
+  "bench": "rag-chunking-passages",
+  "date": "2026-07-23T19:52:05.620Z",
+  "embed_host": "http://alpha:11434",
+  "model": "nomic-embed-text",
+  "n_queries": 50,
+  "ceiling_hits": 44,
+  "ceiling_pct": 88,
+  "method": "puro semántico (cosine), colapso variedad→base (parts[0:2]), max-pool por especie; match base==expected||startsWith; 50 queries golden",
+  "passage_corpus": {
+    "total_passages": 20201,
+    "unique_texts": 3909,
+    "truncate_chars": 5000,
+    "truncated_passages": 22
+  },
+  "arms": {
+    "A_doc_prod": {
+      "label": "doc-level PROD (extractPassageText, 1 vec/especie)",
+      "metrics": {
+        "recall@1": 40,
+        "recall@3": 56,
+        "recall@5": 58,
+        "MRR": 0.4833
+      }
+    },
+    "B_doc_flatten": {
+      "label": "doc-level flatten (concat flattenDoc, 1 vec/especie)",
+      "metrics": {
+        "recall@1": 10,
+        "recall@3": 18,
+        "recall@5": 30,
+        "MRR": 0.1861
+      }
+    },
+    "C_passage_max": {
+      "label": "passage-level max-pool (flattenDoc, N vec/especie)",
+      "metrics": {
+        "recall@1": 12,
+        "recall@3": 32,
+        "recall@5": 42,
+        "MRR": 0.2646
+      }
+    },
+    "D_passage_mean": {
+      "label": "passage-level mean-pool (flattenDoc, N vec/especie)",
+      "metrics": {
+        "recall@1": 0,
+        "recall@3": 0,
+        "recall@5": 0,
+        "MRR": 0.0261
+      }
+    },
+    "E_passage_top3": {
+      "label": "passage-level top3-mean (flattenDoc, N vec/especie)",
+      "metrics": {
+        "recall@1": 6,
+        "recall@3": 20,
+        "recall@5": 32,
+        "MRR": 0.1664
+      }
+    }
+  },
+  "best_passage_arm": "C_passage_max",
+  "delta_bestPassage_vs_docProd": {
+    "recall@1_pp": -28,
+    "recall@3_pp": -24,
+    "recall@5_pp": -16,
+    "MRR": -0.2187
+  },
+  "gained_at5": [],
+  "lost_at5": [
+    "G06:zea_mays (A=4→best=156)",
+    "G07:solanum_lycopersicum (A=1→best=10)",
+    "G11:persea_americana (A=1→best=20)",
+    "G14:rubus_glaucus (A=3→best=6)",
+    "G23:solanum_lycopersicum (A=2→best=6)",
+    "G26:zea_mays (A=2→best=28)",
+    "G32:pisum_sativum (A=2→best=91)",
+    "G41:coffea_arabica (A=3→best=10)"
+  ],
+  "per_query": {
+    "A_doc_prod": [
+      {
+        "id": "G01",
+        "expected": "coffea_arabica",
+        "rank": 12
+      },
+      {
+        "id": "G02",
+        "expected": "allium_cepa",
+        "rank": 410
+      },
+      {
+        "id": "G03",
+        "expected": "solanum_tuberosum",
+        "rank": 46
+      },
+      {
+        "id": "G04",
+        "expected": "lactuca_sativa",
+        "rank": 1
+      },
+      {
+        "id": "G05",
+        "expected": "coffea_arabica",
+        "rank": 326
+      },
+      {
+        "id": "G06",
+        "expected": "zea_mays",
+        "rank": 4
+      },
+      {
+        "id": "G07",
+        "expected": "solanum_lycopersicum",
+        "rank": 1
+      },
+      {
+        "id": "G08",
+        "expected": "solanum_tuberosum",
+        "rank": 7
+      },
+      {
+        "id": "G09",
+        "expected": "phaseolus_vulgaris",
+        "rank": 1
+      },
+      {
+        "id": "G10",
+        "expected": "fragaria_ananassa",
+        "rank": 25
+      },
+      {
+        "id": "G11",
+        "expected": "persea_americana",
+        "rank": 1
+      },
+      {
+        "id": "G12",
+        "expected": "allium_cepa",
+        "rank": 135
+      },
+      {
+        "id": "G13",
+        "expected": "manihot_esculenta",
+        "rank": 1
+      },
+      {
+        "id": "G14",
+        "expected": "rubus_glaucus",
+        "rank": 3
+      },
+      {
+        "id": "G15",
+        "expected": "daucus_carota",
+        "rank": 1
+      },
+      {
+        "id": "G16",
+        "expected": "musa_paradisiaca",
+        "rank": 432
+      },
+      {
+        "id": "G17",
+        "expected": "solanum_tuberosum",
+        "rank": 1
+      },
+      {
+        "id": "G18",
+        "expected": "zea_mays",
+        "rank": 22
+      },
+      {
+        "id": "G19",
+        "expected": "solanum_betaceum",
+        "rank": 10
+      },
+      {
+        "id": "G20",
+        "expected": "coffea_arabica",
+        "rank": 1
+      },
+      {
+        "id": "G21",
+        "expected": "coffea_arabica",
+        "rank": 3
+      },
+      {
+        "id": "G22",
+        "expected": "lactuca_sativa",
+        "rank": 1
+      },
+      {
+        "id": "G23",
+        "expected": "solanum_lycopersicum",
+        "rank": 2
+      },
+      {
+        "id": "G24",
+        "expected": "solanum_tuberosum",
+        "rank": 1
+      },
+      {
+        "id": "G25",
+        "expected": "coffea_arabica",
+        "rank": 3
+      },
+      {
+        "id": "G26",
+        "expected": "zea_mays",
+        "rank": 2
+      },
+      {
+        "id": "G27",
+        "expected": "phaseolus_vulgaris",
+        "rank": 1
+      },
+      {
+        "id": "G28",
+        "expected": "persea_americana",
+        "rank": 1
+      },
+      {
+        "id": "G29",
+        "expected": "allium_cepa",
+        "rank": 1
+      },
+      {
+        "id": "G30",
+        "expected": "coriandrum_sativum",
+        "rank": 1
+      },
+      {
+        "id": "G31",
+        "expected": "manihot_esculenta",
+        "rank": 1
+      },
+      {
+        "id": "G32",
+        "expected": "pisum_sativum",
+        "rank": 2
+      },
+      {
+        "id": "G33",
+        "expected": "rubus_glaucus",
+        "rank": 2
+      },
+      {
+        "id": "G34",
+        "expected": "solanum_quitoense",
+        "rank": 13
+      },
+      {
+        "id": "G35",
+        "expected": "physalis_peruviana",
+        "rank": 1
+      },
+      {
+        "id": "G36",
+        "expected": "coffea_arabica",
+        "rank": 30
+      },
+      {
+        "id": "G37",
+        "expected": "solanum_tuberosum",
+        "rank": 1
+      },
+      {
+        "id": "G38",
+        "expected": "solanum_lycopersicum",
+        "rank": 69
+      },
+      {
+        "id": "G39",
+        "expected": "biopreparado",
+        "rank": null
+      },
+      {
+        "id": "G40",
+        "expected": "musa_paradisiaca",
+        "rank": 399
+      },
+      {
+        "id": "G41",
+        "expected": "coffea_arabica",
+        "rank": 3
+      },
+      {
+        "id": "G42",
+        "expected": "daucus_carota",
+        "rank": 1
+      },
+      {
+        "id": "G43",
+        "expected": "solanum_tuberosum",
+        "rank": 1
+      },
+      {
+        "id": "G44",
+        "expected": "associacion",
+        "rank": null
+      },
+      {
+        "id": "G45",
+        "expected": "phaseolus_vulgaris",
+        "rank": 1
+      },
+      {
+        "id": "G46",
+        "expected": "mito_lunar",
+        "rank": null
+      },
+      {
+        "id": "G47",
+        "expected": "suelo_acido",
+        "rank": null
+      },
+      {
+        "id": "G48",
+        "expected": "agua_calidad",
+        "rank": null
+      },
+      {
+        "id": "G49",
+        "expected": "erosion",
+        "rank": null
+      },
+      {
+        "id": "G50",
+        "expected": "coffea_arabica",
+        "rank": 127
+      }
+    ],
+    "B_doc_flatten": [
+      {
+        "id": "G01",
+        "expected": "coffea_arabica",
+        "rank": 16
+      },
+      {
+        "id": "G02",
+        "expected": "allium_cepa",
+        "rank": 431
+      },
+      {
+        "id": "G03",
+        "expected": "solanum_tuberosum",
+        "rank": 258
+      },
+      {
+        "id": "G04",
+        "expected": "lactuca_sativa",
+        "rank": 10
+      },
+      {
+        "id": "G05",
+        "expected": "coffea_arabica",
+        "rank": 192
+      },
+      {
+        "id": "G06",
+        "expected": "zea_mays",
+        "rank": 2
+      },
+      {
+        "id": "G07",
+        "expected": "solanum_lycopersicum",
+        "rank": 217
+      },
+      {
+        "id": "G08",
+        "expected": "solanum_tuberosum",
+        "rank": 26
+      },
+      {
+        "id": "G09",
+        "expected": "phaseolus_vulgaris",
+        "rank": 44
+      },
+      {
+        "id": "G10",
+        "expected": "fragaria_ananassa",
+        "rank": 12
+      },
+      {
+        "id": "G11",
+        "expected": "persea_americana",
+        "rank": 5
+      },
+      {
+        "id": "G12",
+        "expected": "allium_cepa",
+        "rank": 80
+      },
+      {
+        "id": "G13",
+        "expected": "manihot_esculenta",
+        "rank": 1
+      },
+      {
+        "id": "G14",
+        "expected": "rubus_glaucus",
+        "rank": 4
+      },
+      {
+        "id": "G15",
+        "expected": "daucus_carota",
+        "rank": 7
+      },
+      {
+        "id": "G16",
+        "expected": "musa_paradisiaca",
+        "rank": 341
+      },
+      {
+        "id": "G17",
+        "expected": "solanum_tuberosum",
+        "rank": 110
+      },
+      {
+        "id": "G18",
+        "expected": "zea_mays",
+        "rank": 178
+      },
+      {
+        "id": "G19",
+        "expected": "solanum_betaceum",
+        "rank": 325
+      },
+      {
+        "id": "G20",
+        "expected": "coffea_arabica",
+        "rank": 1
+      },
+      {
+        "id": "G21",
+        "expected": "coffea_arabica",
+        "rank": 5
+      },
+      {
+        "id": "G22",
+        "expected": "lactuca_sativa",
+        "rank": 4
+      },
+      {
+        "id": "G23",
+        "expected": "solanum_lycopersicum",
+        "rank": 57
+      },
+      {
+        "id": "G24",
+        "expected": "solanum_tuberosum",
+        "rank": 7
+      },
+      {
+        "id": "G25",
+        "expected": "coffea_arabica",
+        "rank": 4
+      },
+      {
+        "id": "G26",
+        "expected": "zea_mays",
+        "rank": 3
+      },
+      {
+        "id": "G27",
+        "expected": "phaseolus_vulgaris",
+        "rank": 20
+      },
+      {
+        "id": "G28",
+        "expected": "persea_americana",
+        "rank": 1
+      },
+      {
+        "id": "G29",
+        "expected": "allium_cepa",
+        "rank": 1
+      },
+      {
+        "id": "G30",
+        "expected": "coriandrum_sativum",
+        "rank": 2
+      },
+      {
+        "id": "G31",
+        "expected": "manihot_esculenta",
+        "rank": 1
+      },
+      {
+        "id": "G32",
+        "expected": "pisum_sativum",
+        "rank": 72
+      },
+      {
+        "id": "G33",
+        "expected": "rubus_glaucus",
+        "rank": 2
+      },
+      {
+        "id": "G34",
+        "expected": "solanum_quitoense",
+        "rank": 55
+      },
+      {
+        "id": "G35",
+        "expected": "physalis_peruviana",
+        "rank": 17
+      },
+      {
+        "id": "G36",
+        "expected": "coffea_arabica",
+        "rank": 85
+      },
+      {
+        "id": "G37",
+        "expected": "solanum_tuberosum",
+        "rank": 80
+      },
+      {
+        "id": "G38",
+        "expected": "solanum_lycopersicum",
+        "rank": 57
+      },
+      {
+        "id": "G39",
+        "expected": "biopreparado",
+        "rank": null
+      },
+      {
+        "id": "G40",
+        "expected": "musa_paradisiaca",
+        "rank": 361
+      },
+      {
+        "id": "G41",
+        "expected": "coffea_arabica",
+        "rank": 4
+      },
+      {
+        "id": "G42",
+        "expected": "daucus_carota",
+        "rank": 33
+      },
+      {
+        "id": "G43",
+        "expected": "solanum_tuberosum",
+        "rank": 22
+      },
+      {
+        "id": "G44",
+        "expected": "associacion",
+        "rank": null
+      },
+      {
+        "id": "G45",
+        "expected": "phaseolus_vulgaris",
+        "rank": 7
+      },
+      {
+        "id": "G46",
+        "expected": "mito_lunar",
+        "rank": null
+      },
+      {
+        "id": "G47",
+        "expected": "suelo_acido",
+        "rank": null
+      },
+      {
+        "id": "G48",
+        "expected": "agua_calidad",
+        "rank": null
+      },
+      {
+        "id": "G49",
+        "expected": "erosion",
+        "rank": null
+      },
+      {
+        "id": "G50",
+        "expected": "coffea_arabica",
+        "rank": 103
+      }
+    ],
+    "C_passage_max": [
+      {
+        "id": "G01",
+        "expected": "coffea_arabica",
+        "rank": 10
+      },
+      {
+        "id": "G02",
+        "expected": "allium_cepa",
+        "rank": 404
+      },
+      {
+        "id": "G03",
+        "expected": "solanum_tuberosum",
+        "rank": 86
+      },
+      {
+        "id": "G04",
+        "expected": "lactuca_sativa",
+        "rank": 2
+      },
+      {
+        "id": "G05",
+        "expected": "coffea_arabica",
+        "rank": 148
+      },
+      {
+        "id": "G06",
+        "expected": "zea_mays",
+        "rank": 156
+      },
+      {
+        "id": "G07",
+        "expected": "solanum_lycopersicum",
+        "rank": 10
+      },
+      {
+        "id": "G08",
+        "expected": "solanum_tuberosum",
+        "rank": 146
+      },
+      {
+        "id": "G09",
+        "expected": "phaseolus_vulgaris",
+        "rank": 1
+      },
+      {
+        "id": "G10",
+        "expected": "fragaria_ananassa",
+        "rank": 119
+      },
+      {
+        "id": "G11",
+        "expected": "persea_americana",
+        "rank": 20
+      },
+      {
+        "id": "G12",
+        "expected": "allium_cepa",
+        "rank": 6
+      },
+      {
+        "id": "G13",
+        "expected": "manihot_esculenta",
+        "rank": 2
+      },
+      {
+        "id": "G14",
+        "expected": "rubus_glaucus",
+        "rank": 6
+      },
+      {
+        "id": "G15",
+        "expected": "daucus_carota",
+        "rank": 5
+      },
+      {
+        "id": "G16",
+        "expected": "musa_paradisiaca",
+        "rank": 407
+      },
+      {
+        "id": "G17",
+        "expected": "solanum_tuberosum",
+        "rank": 2
+      },
+      {
+        "id": "G18",
+        "expected": "zea_mays",
+        "rank": 41
+      },
+      {
+        "id": "G19",
+        "expected": "solanum_betaceum",
+        "rank": 293
+      },
+      {
+        "id": "G20",
+        "expected": "coffea_arabica",
+        "rank": 4
+      },
+      {
+        "id": "G21",
+        "expected": "coffea_arabica",
+        "rank": 4
+      },
+      {
+        "id": "G22",
+        "expected": "lactuca_sativa",
+        "rank": 4
+      },
+      {
+        "id": "G23",
+        "expected": "solanum_lycopersicum",
+        "rank": 6
+      },
+      {
+        "id": "G24",
+        "expected": "solanum_tuberosum",
+        "rank": 3
+      },
+      {
+        "id": "G25",
+        "expected": "coffea_arabica",
+        "rank": 2
+      },
+      {
+        "id": "G26",
+        "expected": "zea_mays",
+        "rank": 28
+      },
+      {
+        "id": "G27",
+        "expected": "phaseolus_vulgaris",
+        "rank": 2
+      },
+      {
+        "id": "G28",
+        "expected": "persea_americana",
+        "rank": 2
+      },
+      {
+        "id": "G29",
+        "expected": "allium_cepa",
+        "rank": 1
+      },
+      {
+        "id": "G30",
+        "expected": "coriandrum_sativum",
+        "rank": 1
+      },
+      {
+        "id": "G31",
+        "expected": "manihot_esculenta",
+        "rank": 1
+      },
+      {
+        "id": "G32",
+        "expected": "pisum_sativum",
+        "rank": 91
+      },
+      {
+        "id": "G33",
+        "expected": "rubus_glaucus",
+        "rank": 4
+      },
+      {
+        "id": "G34",
+        "expected": "solanum_quitoense",
+        "rank": 183
+      },
+      {
+        "id": "G35",
+        "expected": "physalis_peruviana",
+        "rank": 1
+      },
+      {
+        "id": "G36",
+        "expected": "coffea_arabica",
+        "rank": 21
+      },
+      {
+        "id": "G37",
+        "expected": "solanum_tuberosum",
+        "rank": 1
+      },
+      {
+        "id": "G38",
+        "expected": "solanum_lycopersicum",
+        "rank": 22
+      },
+      {
+        "id": "G39",
+        "expected": "biopreparado",
+        "rank": null
+      },
+      {
+        "id": "G40",
+        "expected": "musa_paradisiaca",
+        "rank": 365
+      },
+      {
+        "id": "G41",
+        "expected": "coffea_arabica",
+        "rank": 10
+      },
+      {
+        "id": "G42",
+        "expected": "daucus_carota",
+        "rank": 2
+      },
+      {
+        "id": "G43",
+        "expected": "solanum_tuberosum",
+        "rank": 2
+      },
+      {
+        "id": "G44",
+        "expected": "associacion",
+        "rank": null
+      },
+      {
+        "id": "G45",
+        "expected": "phaseolus_vulgaris",
+        "rank": 2
+      },
+      {
+        "id": "G46",
+        "expected": "mito_lunar",
+        "rank": null
+      },
+      {
+        "id": "G47",
+        "expected": "suelo_acido",
+        "rank": null
+      },
+      {
+        "id": "G48",
+        "expected": "agua_calidad",
+        "rank": null
+      },
+      {
+        "id": "G49",
+        "expected": "erosion",
+        "rank": null
+      },
+      {
+        "id": "G50",
+        "expected": "coffea_arabica",
+        "rank": 8
+      }
+    ],
+    "D_passage_mean": [
+      {
+        "id": "G01",
+        "expected": "coffea_arabica",
+        "rank": 10
+      },
+      {
+        "id": "G02",
+        "expected": "allium_cepa",
+        "rank": 366
+      },
+      {
+        "id": "G03",
+        "expected": "solanum_tuberosum",
+        "rank": 170
+      },
+      {
+        "id": "G04",
+        "expected": "lactuca_sativa",
+        "rank": 36
+      },
+      {
+        "id": "G05",
+        "expected": "coffea_arabica",
+        "rank": 62
+      },
+      {
+        "id": "G06",
+        "expected": "zea_mays",
+        "rank": 39
+      },
+      {
+        "id": "G07",
+        "expected": "solanum_lycopersicum",
+        "rank": 69
+      },
+      {
+        "id": "G08",
+        "expected": "solanum_tuberosum",
+        "rank": 171
+      },
+      {
+        "id": "G09",
+        "expected": "phaseolus_vulgaris",
+        "rank": 26
+      },
+      {
+        "id": "G10",
+        "expected": "fragaria_ananassa",
+        "rank": 27
+      },
+      {
+        "id": "G11",
+        "expected": "persea_americana",
+        "rank": 190
+      },
+      {
+        "id": "G12",
+        "expected": "allium_cepa",
+        "rank": 155
+      },
+      {
+        "id": "G13",
+        "expected": "manihot_esculenta",
+        "rank": 137
+      },
+      {
+        "id": "G14",
+        "expected": "rubus_glaucus",
+        "rank": 144
+      },
+      {
+        "id": "G15",
+        "expected": "daucus_carota",
+        "rank": 171
+      },
+      {
+        "id": "G16",
+        "expected": "musa_paradisiaca",
+        "rank": 227
+      },
+      {
+        "id": "G17",
+        "expected": "solanum_tuberosum",
+        "rank": 180
+      },
+      {
+        "id": "G18",
+        "expected": "zea_mays",
+        "rank": 202
+      },
+      {
+        "id": "G19",
+        "expected": "solanum_betaceum",
+        "rank": 382
+      },
+      {
+        "id": "G20",
+        "expected": "coffea_arabica",
+        "rank": 11
+      },
+      {
+        "id": "G21",
+        "expected": "coffea_arabica",
+        "rank": 15
+      },
+      {
+        "id": "G22",
+        "expected": "lactuca_sativa",
+        "rank": 42
+      },
+      {
+        "id": "G23",
+        "expected": "solanum_lycopersicum",
+        "rank": 67
+      },
+      {
+        "id": "G24",
+        "expected": "solanum_tuberosum",
+        "rank": 225
+      },
+      {
+        "id": "G25",
+        "expected": "coffea_arabica",
+        "rank": 12
+      },
+      {
+        "id": "G26",
+        "expected": "zea_mays",
+        "rank": 68
+      },
+      {
+        "id": "G27",
+        "expected": "phaseolus_vulgaris",
+        "rank": 12
+      },
+      {
+        "id": "G28",
+        "expected": "persea_americana",
+        "rank": 18
+      },
+      {
+        "id": "G29",
+        "expected": "allium_cepa",
+        "rank": 41
+      },
+      {
+        "id": "G30",
+        "expected": "coriandrum_sativum",
+        "rank": 250
+      },
+      {
+        "id": "G31",
+        "expected": "manihot_esculenta",
+        "rank": 68
+      },
+      {
+        "id": "G32",
+        "expected": "pisum_sativum",
+        "rank": 307
+      },
+      {
+        "id": "G33",
+        "expected": "rubus_glaucus",
+        "rank": 63
+      },
+      {
+        "id": "G34",
+        "expected": "solanum_quitoense",
+        "rank": 168
+      },
+      {
+        "id": "G35",
+        "expected": "physalis_peruviana",
+        "rank": 7
+      },
+      {
+        "id": "G36",
+        "expected": "coffea_arabica",
+        "rank": 16
+      },
+      {
+        "id": "G37",
+        "expected": "solanum_tuberosum",
+        "rank": 234
+      },
+      {
+        "id": "G38",
+        "expected": "solanum_lycopersicum",
+        "rank": 55
+      },
+      {
+        "id": "G39",
+        "expected": "biopreparado",
+        "rank": null
+      },
+      {
+        "id": "G40",
+        "expected": "musa_paradisiaca",
+        "rank": 295
+      },
+      {
+        "id": "G41",
+        "expected": "coffea_arabica",
+        "rank": 13
+      },
+      {
+        "id": "G42",
+        "expected": "daucus_carota",
+        "rank": 117
+      },
+      {
+        "id": "G43",
+        "expected": "solanum_tuberosum",
+        "rank": 118
+      },
+      {
+        "id": "G44",
+        "expected": "associacion",
+        "rank": null
+      },
+      {
+        "id": "G45",
+        "expected": "phaseolus_vulgaris",
+        "rank": 13
+      },
+      {
+        "id": "G46",
+        "expected": "mito_lunar",
+        "rank": null
+      },
+      {
+        "id": "G47",
+        "expected": "suelo_acido",
+        "rank": null
+      },
+      {
+        "id": "G48",
+        "expected": "agua_calidad",
+        "rank": null
+      },
+      {
+        "id": "G49",
+        "expected": "erosion",
+        "rank": null
+      },
+      {
+        "id": "G50",
+        "expected": "coffea_arabica",
+        "rank": 14
+      }
+    ],
+    "E_passage_top3": [
+      {
+        "id": "G01",
+        "expected": "coffea_arabica",
+        "rank": 5
+      },
+      {
+        "id": "G02",
+        "expected": "allium_cepa",
+        "rank": 426
+      },
+      {
+        "id": "G03",
+        "expected": "solanum_tuberosum",
+        "rank": 97
+      },
+      {
+        "id": "G04",
+        "expected": "lactuca_sativa",
+        "rank": 2
+      },
+      {
+        "id": "G05",
+        "expected": "coffea_arabica",
+        "rank": 239
+      },
+      {
+        "id": "G06",
+        "expected": "zea_mays",
+        "rank": 94
+      },
+      {
+        "id": "G07",
+        "expected": "solanum_lycopersicum",
+        "rank": 25
+      },
+      {
+        "id": "G08",
+        "expected": "solanum_tuberosum",
+        "rank": 25
+      },
+      {
+        "id": "G09",
+        "expected": "phaseolus_vulgaris",
+        "rank": 14
+      },
+      {
+        "id": "G10",
+        "expected": "fragaria_ananassa",
+        "rank": 66
+      },
+      {
+        "id": "G11",
+        "expected": "persea_americana",
+        "rank": 17
+      },
+      {
+        "id": "G12",
+        "expected": "allium_cepa",
+        "rank": 92
+      },
+      {
+        "id": "G13",
+        "expected": "manihot_esculenta",
+        "rank": 2
+      },
+      {
+        "id": "G14",
+        "expected": "rubus_glaucus",
+        "rank": 7
+      },
+      {
+        "id": "G15",
+        "expected": "daucus_carota",
+        "rank": 58
+      },
+      {
+        "id": "G16",
+        "expected": "musa_paradisiaca",
+        "rank": 386
+      },
+      {
+        "id": "G17",
+        "expected": "solanum_tuberosum",
+        "rank": 25
+      },
+      {
+        "id": "G18",
+        "expected": "zea_mays",
+        "rank": 171
+      },
+      {
+        "id": "G19",
+        "expected": "solanum_betaceum",
+        "rank": 388
+      },
+      {
+        "id": "G20",
+        "expected": "coffea_arabica",
+        "rank": 3
+      },
+      {
+        "id": "G21",
+        "expected": "coffea_arabica",
+        "rank": 5
+      },
+      {
+        "id": "G22",
+        "expected": "lactuca_sativa",
+        "rank": 3
+      },
+      {
+        "id": "G23",
+        "expected": "solanum_lycopersicum",
+        "rank": 25
+      },
+      {
+        "id": "G24",
+        "expected": "solanum_tuberosum",
+        "rank": 5
+      },
+      {
+        "id": "G25",
+        "expected": "coffea_arabica",
+        "rank": 2
+      },
+      {
+        "id": "G26",
+        "expected": "zea_mays",
+        "rank": 48
+      },
+      {
+        "id": "G27",
+        "expected": "phaseolus_vulgaris",
+        "rank": 3
+      },
+      {
+        "id": "G28",
+        "expected": "persea_americana",
+        "rank": 1
+      },
+      {
+        "id": "G29",
+        "expected": "allium_cepa",
+        "rank": 1
+      },
+      {
+        "id": "G30",
+        "expected": "coriandrum_sativum",
+        "rank": 12
+      },
+      {
+        "id": "G31",
+        "expected": "manihot_esculenta",
+        "rank": 2
+      },
+      {
+        "id": "G32",
+        "expected": "pisum_sativum",
+        "rank": 325
+      },
+      {
+        "id": "G33",
+        "expected": "rubus_glaucus",
+        "rank": 8
+      },
+      {
+        "id": "G34",
+        "expected": "solanum_quitoense",
+        "rank": 141
+      },
+      {
+        "id": "G35",
+        "expected": "physalis_peruviana",
+        "rank": 1
+      },
+      {
+        "id": "G36",
+        "expected": "coffea_arabica",
+        "rank": 14
+      },
+      {
+        "id": "G37",
+        "expected": "solanum_tuberosum",
+        "rank": 5
+      },
+      {
+        "id": "G38",
+        "expected": "solanum_lycopersicum",
+        "rank": 23
+      },
+      {
+        "id": "G39",
+        "expected": "biopreparado",
+        "rank": null
+      },
+      {
+        "id": "G40",
+        "expected": "musa_paradisiaca",
+        "rank": 394
+      },
+      {
+        "id": "G41",
+        "expected": "coffea_arabica",
+        "rank": 5
+      },
+      {
+        "id": "G42",
+        "expected": "daucus_carota",
+        "rank": 13
+      },
+      {
+        "id": "G43",
+        "expected": "solanum_tuberosum",
+        "rank": 5
+      },
+      {
+        "id": "G44",
+        "expected": "associacion",
+        "rank": null
+      },
+      {
+        "id": "G45",
+        "expected": "phaseolus_vulgaris",
+        "rank": 8
+      },
+      {
+        "id": "G46",
+        "expected": "mito_lunar",
+        "rank": null
+      },
+      {
+        "id": "G47",
+        "expected": "suelo_acido",
+        "rank": null
+      },
+      {
+        "id": "G48",
+        "expected": "agua_calidad",
+        "rank": null
+      },
+      {
+        "id": "G49",
+        "expected": "erosion",
+        "rank": null
+      },
+      {
+        "id": "G50",
+        "expected": "coffea_arabica",
+        "rank": 21
+      }
+    ]
+  }
+}
