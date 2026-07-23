@@ -25,7 +25,9 @@ import { Lombriz } from '../../creatures/Lombriz.jsx';
 import { Escarabajo } from '../../creatures/Escarabajo.jsx';
 import { Mariposa } from '../../creatures/Mariposa.jsx';
 import { coreografia } from '../faunaFuncional.js';
-import { CIELOS, PALETA } from '../atmosferaMadre.js';
+import { CIELOS, PALETA, mezclar } from '../atmosferaMadre.js';
+import useCicloDia from '../useCicloDia.js';
+import { presetDeHora } from '../cielosHoraData.js';
 
 const ANCHO = 4.4;
 const PROF = 2.2;
@@ -56,19 +58,25 @@ function Terron({ pos, r, color }) {
 }
 
 /* Una raíz: cono principal que desciende + un par de raicillas laterales finas.
-   Orgánica (conos afilados), no una caja — baja buscando agua y minerales. */
+   Orgánica (conos afilados), no una caja — baja buscando agua y minerales.
+   VOLTEADA con la punta hacia abajo (como RaizNodulos): el cono de three trae
+   el ápice arriba y, en relieve sobre el corte, leía como espina que sube
+   (QA visual 2026-07-23) — una raíz es gruesa arriba y se afina bajando. */
 function Raiz({ pos, largo }) {
   return (
     <group position={pos}>
-      <mesh>
+      <mesh rotation={[Math.PI, 0, 0]}>
         <coneGeometry args={[0.055, largo, 6]} />
         <meshLambertMaterial color="#c9a86a" flatShading />
       </mesh>
-      <mesh position={[0.07, -largo * 0.18, 0]} rotation={[0, 0, -0.7]}>
+      {/* raicillas: nacen en la parte ALTA y ramifican hacia abajo-afuera —
+          sin voltear quedaban con la punta arriba cruzadas en X en el ápice
+          (leían como palos de espantapájaros, no como raíz). */}
+      <mesh position={[0.09, largo * 0.12, 0]} rotation={[Math.PI, 0, 0.55]}>
         <coneGeometry args={[0.022, largo * 0.55, 5]} />
         <meshLambertMaterial color="#bd9a5a" flatShading />
       </mesh>
-      <mesh position={[-0.06, -largo * 0.32, 0.02]} rotation={[0, 0, 0.8]}>
+      <mesh position={[-0.08, largo * 0.02, 0.02]} rotation={[Math.PI, 0, -0.6]}>
         <coneGeometry args={[0.018, largo * 0.42, 5]} />
         <meshLambertMaterial color="#bd9a5a" flatShading />
       </mesh>
@@ -81,7 +89,7 @@ function Raiz({ pos, largo }) {
 function Hifa({ pos, giro, largo }) {
   return (
     <mesh position={pos} rotation={[0, 0, giro]}>
-      <cylinderGeometry args={[0.007, 0.007, largo, 3]} />
+      <cylinderGeometry args={[0.012, 0.012, largo, 3]} />
       <meshBasicMaterial color="#f2ece0" />
     </mesh>
   );
@@ -349,6 +357,18 @@ function Milpa({ total, config, reducedMotion }) {
 function Diorama({ params, reducedMotion }) {
   const vida = clamp01(params?.vida);
 
+  /* EL PISO DE LECTURA del corte (mismo remedio del cafetal/aguacatal, #2707):
+     la cara cortada mira al frente (+z) y el sol de la franja — cenital de día,
+     apagado de noche — nunca la ilumina de lleno: el "suelo negro" caía a masa
+     negra ilegible (QA visual 2026-07-23). Dos luces locales de la escena que
+     COMPENSAN lo que la hora apaga (`refuerzo` sube de noche, a mediodía casi
+     no suma): un relleno hemisférico cálido y una clave frontal SIN sombras
+     que baña la cara del corte. El domo y la niebla siguen contando la hora:
+     la noche se conserva noche, pero las capas y su vida se LEEN. */
+  const { franja } = useCicloDia({ reducedMotion });
+  const madre = useMemo(() => presetDeHora(franja), [franja]);
+  const refuerzo = Math.max(0, 1 - (madre.intensidad ?? 1));
+
   const { bloques, ambiente, terrones, briznas, lombrices, escarabajo, total } = useMemo(() => {
     const capas = params?.capas || [];
     const alturaTotal = capas.reduce((s, c) => s + (c.alto || 0.6), 0) || 1;
@@ -365,29 +385,40 @@ function Diorama({ params, reducedMotion }) {
       const color = capa.color || '#5a3d28';
       bloq.push({ key: `c${ci}`, cy, alto, color });
 
-      // grumos que rompen la cara plana (pocos, siempre; textura de tierra)
+      // grumos que rompen la cara plana (pocos, siempre; textura de tierra).
+      // ACLARADOS un paso hacia el crema: del mismo color de la capa eran
+      // invisibles (QA visual 2026-07-23) — la textura existía y no se leía.
       const nT = 2 + Math.round(alto * 2);
+      const colorTerron = mezclar(color, '#f0e2c8', 0.18);
       for (let i = 0; i < nT; i++) {
         terr.push({
           key: `t${ci}-${i}`,
           pos: [(r() - 0.5) * (ANCHO - 0.5), cy + (r() - 0.5) * alto * 0.7, CARA - 0.04],
           rr: 0.09 + r() * 0.08,
-          color,
+          color: colorTerron,
         });
       }
 
       // vida-textura por capa: raíces y hifas, tanta como diga `vida`, con aire
       const tipos = (capa.bichos || []).filter((b) => b === 'raiz' || b === 'hifa');
-      const n = Math.round(vida * (1.5 + alto * 2.2));
+      const n = Math.round(vida * (3 + alto * 3.4));
       for (let i = 0; i < n; i++) {
         const tipo = tipos.length ? tipos[i % tipos.length] : 'raiz';
         const x = (r() - 0.5) * (ANCHO - 0.8);
-        const z = CARA - 0.03 - r() * 0.12; // pegada a la cara cortada (frente)
+        // EN RELIEVE sobre la cara cortada, no dentro del bloque: antes iba en
+        // CARA-0.03-r()*0.12 y quedaba ENTERRADA — una hifa de radio 0.007 no
+        // asomaba jamás y la raíz apenas la punta (QA visual 2026-07-23: el
+        // corte prometía micorrizas y no se veía ni una).
+        const z = CARA + 0.015 + r() * 0.03;
         const y = cy + (r() - 0.5) * alto * 0.55;
         if (tipo === 'hifa') {
           amb.push({ key: `h${ci}-${i}`, tipo, pos: [x, y, z], giro: (r() - 0.5) * 2.2, largo: 0.3 + r() * 0.4 });
         } else {
-          amb.push({ key: `r${ci}-${i}`, tipo, pos: [x, y, z], largo: 0.32 + r() * alto });
+          // La raíz cuelga ANCLADA al tope de su capa (desciende desde arriba,
+          // como en la tierra real) — suelta a mitad de banda flotaba.
+          const largo = 0.32 + r() * alto;
+          const yTope = cy + alto / 2 - r() * 0.12;
+          amb.push({ key: `r${ci}-${i}`, tipo, pos: [x, yTope - largo / 2, z], largo });
         }
       }
 
@@ -422,6 +453,10 @@ function Diorama({ params, reducedMotion }) {
 
   return (
     <group position={[0, -total / 2, 0]}>
+      {/* el piso de lectura: relleno cálido + clave frontal hacia la cara del
+          corte (target implícito en el origen del grupo, delante del bloque) */}
+      <hemisphereLight color="#f2e6c8" groundColor="#4a3524" intensity={0.34 + 1.15 * refuerzo} />
+      <directionalLight position={[1.4, 2.2, 7]} color="#ffe9c0" intensity={0.55 + 0.95 * refuerzo} />
       {/* las capas: bloques apilados, cara frontal expuesta (el corte) */}
       {bloques.map((b) => (
         <mesh key={b.key} position={[0, b.cy, 0]}>
