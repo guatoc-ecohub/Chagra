@@ -25,8 +25,8 @@
  * de módulo, cero asignaciones por frame) con presupuesto por `tier`. Todo el
  * ruido es determinista (hash de senos + crearRng sembrado): nada de
  * Math.random en render. `reducedMotion` congela el clima en su fase (snap
- * sin animación), NO monta la cortina de lluvia (hilos congelados leen como
- * glitch) y pasa el frameloop a demanda.
+ * sin animación), deja la cortina de lluvia QUIETA como estampa (hilos
+ * sembrados, estirados y ladeados) y pasa el frameloop a demanda.
  *
  * Mockup standalone con su PROPIO <Canvas>. NO toca mundoData ni el host.
  */
@@ -466,8 +466,12 @@ function Charcos({ climaRef, reducedMotion }) {
       Siembra determinista (x, z, suelo, velocidad) por crearRng; por frame
       solo se recomponen matrices sobre temporales de módulo. La intensidad
       decide cuántas gotas viven (el resto se esconde a escala 0) y el viento
-      ladea toda la cortina. No se monta con reduced-motion. ── */
-function CortinaLluvia({ climaRef, n }) {
+      ladea toda la cortina.
+      Con reduced-motion SÍ se monta, pero QUIETA: hilos sembrados a alturas
+      deterministas, estirados y ladeados por el viento — la lluvia como se
+      dibuja en una estampa. Antes no se montaba y la escena de "lluvia" salía
+      seca en cualquier captura o para cualquier usuario con reduced-motion. ── */
+function CortinaLluvia({ climaRef, n, reducedMotion }) {
   const grupo = useRef(null);
   const inst = useRef(null);
   const mat = useRef(null);
@@ -496,9 +500,11 @@ function CortinaLluvia({ climaRef, n }) {
       const g = gotas[i];
       if (i < vivas) {
         const tramo = TECHO_LLUVIA - g.suelo;
-        const y = TECHO_LLUVIA - ((t * 6.4 * g.vel + g.fase * tramo * 7) % tramo);
+        const y = reducedMotion
+          ? g.suelo + g.fase * tramo // estampa: cada hilo quieto en su altura
+          : TECHO_LLUVIA - ((t * 6.4 * g.vel + g.fase * tramo * 7) % tramo);
         TMP_P.set(g.x, y, g.z);
-        TMP_S.set(1, 0.7 + 0.5 * c.lluvia, 1);
+        TMP_S.set(1, (reducedMotion ? 1.15 : 0.7) + 0.5 * c.lluvia, 1);
       } else {
         TMP_P.set(g.x, -1, g.z);
         TMP_S.set(0, 0, 0);
@@ -513,7 +519,9 @@ function CortinaLluvia({ climaRef, n }) {
   return (
     <group ref={grupo}>
       <instancedMesh ref={inst} args={[undefined, undefined, n]} frustumCulled={false}>
-        <cylinderGeometry args={[0.011, 0.011, 0.42, 3]} />
+        {/* hilos un pelo más gruesos y largos: a dpr de teléfono los de 0.011
+            desaparecían y el aguacero se leía como neblina, no como lluvia */}
+        <cylinderGeometry args={[0.016, 0.016, 0.5, 3]} />
         <meshBasicMaterial ref={mat} color="#d7e4ec" transparent opacity={0.2} depthWrite={false} />
       </instancedMesh>
     </group>
@@ -769,7 +777,7 @@ function DioramaLluvia({ perfil, tier, reducedMotion, fase, pin, climaRef, alCam
       <RioCreciente climaRef={climaRef} geometria={geoRio} reducedMotion={reducedMotion} />
       <Charcos climaRef={climaRef} reducedMotion={reducedMotion} />
       <Nubario climaRef={climaRef} reducedMotion={reducedMotion} />
-      {!reducedMotion ? <CortinaLluvia climaRef={climaRef} n={nGotas} /> : null}
+      <CortinaLluvia climaRef={climaRef} n={nGotas} reducedMotion={reducedMotion} />
       <Arcoiris climaRef={climaRef} />
       <CasitaCosecha climaRef={climaRef} />
       <Zanjas climaRef={climaRef} />

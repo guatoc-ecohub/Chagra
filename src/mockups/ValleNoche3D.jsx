@@ -233,7 +233,7 @@ function CieloEstrellado({ n, reducedMotion }) {
       Da la dirección de la luz principal (la direccional sale de aquí). ── */
 function LunaAndina() {
   return (
-    <group position={[-11, 10.5, -13]}>
+    <group position={[-3.1, 8.3, -15]}>
       <mesh>
         <circleGeometry args={[1.35, 40]} />
         <meshBasicMaterial color="#f2f0e2" transparent opacity={0.98} depthWrite={false} side={THREE.DoubleSide} />
@@ -268,6 +268,10 @@ function LucesNocturnas() {
       <ambientLight intensity={NOCHE.ambiente} color={NOCHE.luz} />
       <directionalLight position={[-9, 9, -9]} intensity={NOCHE.sol} color={NOCHE.luz} />
       <directionalLight position={[8, 3, 9]} intensity={NOCHE.rellenoInt} color={NOCHE.relleno} />
+      {/* relleno de luna suave desde donde ELLA está: sin esto el pasto del
+          primer plano se iba a negro plano y la finca no se leía dormida sino
+          apagada. Tenue a propósito: sigue siendo noche. */}
+      <directionalLight position={[-3, 8, -12]} intensity={0.18} color={NOCHE.luz} />
     </>
   );
 }
@@ -315,7 +319,7 @@ function CasaDormida({ reducedMotion }) {
     vela.current.intensity = 0.85 + Math.sin(t * 1.3) * 0.05 + Math.sin(t * 7.7) * 0.04;
   });
   return (
-    <group position={[2.6, 0, 0.4]}>
+    <group position={[1.3, 0, 0.1]}>
       {/* paredes + techo a cuatro aguas (cono de 4 lados girado 45°) */}
       <mesh position={[0, 0.72, 0]}>
         <boxGeometry args={[2.3, 1.44, 1.9]} />
@@ -351,7 +355,106 @@ function CasaDormida({ reducedMotion }) {
         <planeGeometry args={[0.05, 0.46]} />
         <meshBasicMaterial color={P.madera} />
       </mesh>
+      {/* el resplandor de la vela sobre el aire: un halo suave (el mismo
+          sprite radial de las estrellas, entintado ámbar) para que la ventana
+          se lea encendida desde lejos, no como un rectángulo pegado */}
+      <mesh position={[0.5, 0.86, 1.0]}>
+        <planeGeometry args={[1.6, 1.6]} />
+        <meshBasicMaterial
+          map={spriteEstrella()}
+          color={P.ambar}
+          transparent
+          opacity={0.38}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
       <pointLight ref={vela} position={[0.5, 0.9, 1.4]} intensity={0.85} distance={5.5} color={P.ambar} />
+    </group>
+  );
+}
+
+/* ── Las lomas lejanas del páramo: crestas recortadas contra el cielo. Dos
+      capas de ShapeGeometry barata (1 draw call cada una); el fog las entinta
+      hacia la niebla nocturna y las separa en profundidad. Sin ellas el
+      horizonte era una raya y el valle no tenía abrazo. ── */
+function SiluetaLomas({ z, base, amp, semilla, color }) {
+  const geo = useMemo(() => {
+    const rng = crearRng(semilla);
+    const fase = rng() * Math.PI * 2;
+    const forma = new THREE.Shape();
+    forma.moveTo(-36, -2);
+    const pasos = 26;
+    for (let i = 0; i <= pasos; i++) {
+      const x = -36 + (72 * i) / pasos;
+      const y = base
+        + Math.sin(x * 0.16 + fase) * amp
+        + Math.sin(x * 0.37 + fase * 2.3) * amp * 0.45;
+      forma.lineTo(x, Math.max(0.4, y));
+    }
+    forma.lineTo(36, -2);
+    forma.closePath();
+    return new THREE.ShapeGeometry(forma, 1);
+  }, [base, amp, semilla]);
+  useEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <mesh geometry={geo} position={[0, 0, z]}>
+      <meshBasicMaterial color={color} />
+    </mesh>
+  );
+}
+
+/* Fincas vecinas veladas a lo lejos: puntitos ámbar sobre la falda de la loma
+   cercana. El valle duerme acompañado — otras cocinas también quedaron con la
+   vela puesta. fog=false para que el punto pinche la niebla como luz real. */
+const FINCAS_LEJANAS = [
+  [-6.4, 2.35, -13.6],
+  [5.6, 1.95, -13.6],
+  [10.4, 3.0, -13.7],
+];
+function FincasLejanas() {
+  return FINCAS_LEJANAS.map(([x, y, z]) => (
+    <group key={`${x}:${z}`} position={[x, y, z]}>
+      <mesh>
+        <circleGeometry args={[0.09, 8]} />
+        <meshBasicMaterial color={P.ambar} fog={false} transparent opacity={0.9} depthWrite={false} />
+      </mesh>
+      <mesh position={[0, 0, 0.01]}>
+        <planeGeometry args={[0.7, 0.7]} />
+        <meshBasicMaterial
+          map={spriteEstrella()}
+          color={P.ambar}
+          fog={false}
+          transparent
+          opacity={0.3}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+    </group>
+  ));
+}
+
+/* La cerca de palos junto al camino: cuatro postes y dos largueros. Lo mínimo
+   para que el sendero se lea de finca y no de parque. */
+const POSTES = [1.5, 2.6, 3.7, 4.8];
+function CercaDelCamino() {
+  return (
+    <group position={[0.18, 0, 0]}>
+      {POSTES.map((z) => (
+        <mesh key={z} position={[0, 0.28, z]}>
+          <cylinderGeometry args={[0.035, 0.045, 0.56, 5]} />
+          <meshLambertMaterial color={P.tronco} flatShading />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.44, 3.15]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.022, 0.022, 3.5, 4]} />
+        <meshLambertMaterial color={P.madera} flatShading />
+      </mesh>
+      <mesh position={[0, 0.24, 3.15]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.022, 0.022, 3.5, 4]} />
+        <meshLambertMaterial color={P.madera} flatShading />
+      </mesh>
     </group>
   );
 }
@@ -405,7 +508,7 @@ function CultivosDormidos() {
     malla.instanceMatrix.needsUpdate = true;
   }, []);
   return (
-    <group position={[-4.6, 0, 1.6]}>
+    <group position={[-2.5, 0, 2.4]}>
       <mesh position={[0, 0.02, 0.75]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[5.4, 3.1]} />
         <meshLambertMaterial color={P.tierra} />
@@ -423,7 +526,7 @@ function CultivosDormidos() {
       Las zetas suben en CSS; reduced-motion las apaga. ── */
 function AngelitaDormida({ tier, reducedMotion }) {
   return (
-    <group position={[4.5, 0, 2.3]}>
+    <group position={[2.3, 0, 2.75]}>
       <mesh position={[0, 0.22, 0]}>
         <cylinderGeometry args={[0.025, 0.035, 0.44, 5]} />
         <meshLambertMaterial color={P.mata} flatShading />
@@ -459,12 +562,12 @@ function AngelitaDormida({ tier, reducedMotion }) {
 /* El claro de luna sobre el pasto: una elipse de plata apenas insinuada. */
 function ClaroDeLuna() {
   return (
-    <mesh position={[-2.5, 0.03, -1.5]} rotation={[-Math.PI / 2, 0, 0]} scale={[1.6, 1, 1]}>
+    <mesh position={[-0.9, 0.03, 0.8]} rotation={[-Math.PI / 2, 0, 0]} scale={[1.6, 1, 1]}>
       <circleGeometry args={[3.4, 28]} />
       <meshBasicMaterial
         color={NOCHE.luz}
         transparent
-        opacity={0.07}
+        opacity={0.11}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
       />
@@ -494,6 +597,11 @@ function EscenaNoche({ tier, reducedMotion }) {
       <CieloEstrellado n={estrellas} reducedMotion={reducedMotion} />
       <LunaAndina />
 
+      {/* el abrazo del páramo: dos crestas de silueta y las fincas vecinas */}
+      <SiluetaLomas z={-22} base={3.9} amp={1.4} semilla={17} color="#0b1024" />
+      <SiluetaLomas z={-14} base={2.3} amp={0.95} semilla={53} color="#0a0e20" />
+      <FincasLejanas />
+
       <mesh geometry={geo}>
         <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
       </mesh>
@@ -504,10 +612,11 @@ function EscenaNoche({ tier, reducedMotion }) {
       <AngelitaDormida tier={tier} reducedMotion={reducedMotion} />
 
       {/* el camino que va de la puerta hacia el borde del valle */}
-      <mesh position={[2.1, 0.025, 4.2]} rotation={[-Math.PI / 2, 0, -0.12]}>
-        <planeGeometry args={[0.9, 5.5]} />
+      <mesh position={[0.8, 0.025, 3.4]} rotation={[-Math.PI / 2, 0, -0.08]}>
+        <planeGeometry args={[0.85, 5.8]} />
         <meshLambertMaterial color={P.camino} />
       </mesh>
+      <CercaDelCamino />
 
       {/* monte disperso en las faldas (alturas del mismo heightfield) */}
       <Arbol pos={[-7.5, alturaValle(-7.5, -3.5), -3.5]} esc={1.25} />
@@ -515,6 +624,10 @@ function EscenaNoche({ tier, reducedMotion }) {
       <Arbol pos={[8.4, alturaValle(8.4, 3.2), 3.2]} esc={0.9} />
       <Arbol pos={[-8.8, alturaValle(-8.8, 2.4), 2.4]} esc={1.05} />
       <Arbol pos={[-4.9, alturaValle(-4.9, -7.5), -7.5]} esc={1.35} />
+      {/* monte cercano: los que sí entran al encuadre de retrato */}
+      <Arbol pos={[-2.3, alturaValle(-2.3, -1.6), -1.6]} esc={1.15} />
+      <Arbol pos={[3.1, alturaValle(3.1, -0.9), -0.9]} esc={0.9} />
+      <Arbol pos={[-1.7, alturaValle(-1.7, 4.2), 4.2]} esc={0.75} />
 
       {/* las luciérnagas del framework, velando surcos y potrero */}
       <ParticulasAmbientales
@@ -531,6 +644,15 @@ function EscenaNoche({ tier, reducedMotion }) {
         reducedMotion={reducedMotion}
         position={[3.5, 0.1, -3]}
         semilla={23}
+      />
+      {/* tercer enjambre en primer plano: profundidad de campo de a de veras */}
+      <ParticulasAmbientales
+        tipo="luciernagas"
+        densidad={0.8}
+        tier={tier}
+        reducedMotion={reducedMotion}
+        position={[0.4, 0.2, 4.4]}
+        semilla={7}
       />
     </>
   );
@@ -606,11 +728,11 @@ export default function ValleNoche3D() {
   const [listo, setListo] = useState(false);
   const [grillos, setGrillos] = useState(false);
   const tier = useMemo(() => decidirTier().tier, []);
-  /* Retrato (teléfono en vertical): con la toma de escritorio la finca dormida
-     quedaba en una astillita al borde de abajo y el 80 % del cuadro era cielo
-     vacío. La noche es la atmósfera, pero el sujeto es LA FINCA descansando:
-     en retrato la cámara baja y se acerca — casa legible en el tercio bajo,
-     y el cielo del páramo conserva los dos de arriba. */
+  /* Retrato (teléfono en vertical): el fov angosto del retrato partía la casa
+     contra el borde derecho y dejaba el cuadro casi vacío. La casa ahora vive
+     cerca del eje, la cámara mira ligeramente a la derecha (target x=0.7) y el
+     fov abre a 52°: casa completa con su ventana, camino con cerca, surcos y
+     luciérnagas en el tercio bajo; luna y lomas del páramo arriba. */
   const retrato = useMemo(
     () => typeof window !== 'undefined'
       && typeof window.matchMedia === 'function'
@@ -651,7 +773,7 @@ export default function ValleNoche3D() {
         className={`vnoche-canvas${listo ? ' vnoche-canvas--lista' : ''}`}
         dpr={perfil.dpr}
         gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
-        camera={retrato ? { position: [0, 3.4, 10.2], fov: 46 } : { position: [0, 4.6, 13.5], fov: 42 }}
+        camera={retrato ? { position: [0.7, 3.1, 11.2], fov: 52 } : { position: [0, 4.6, 13.5], fov: 42 }}
         frameloop={reducedMotion ? 'demand' : 'always'}
         onCreated={() => setListo(true)}
       >
@@ -662,7 +784,7 @@ export default function ValleNoche3D() {
           enableZoom
           minDistance={7}
           maxDistance={19}
-          target={[0, 1.1, 0]}
+          target={retrato ? [0.7, 1.15, 0] : [0, 1.1, 0]}
           minPolarAngle={0.55}
           maxPolarAngle={1.42}
           minAzimuthAngle={-1.0}
