@@ -39,7 +39,7 @@ describe('Mundos — el mapa cubre todo lo que el home F2 exponía (sin huérfan
     // Inventario/plantas y animales (ex bloque 2)
     'activos', 'mapa', 'reportar_invasora', 'asociaciones', 'biodiversidad', 'animales',
     // Mercado (ex bloque 5)
-    'mercado',
+    'mercado', 'fermentos',
     // Seguimiento de procesos (ex tarjetas condicionales)
     'seguimiento_reforestacion', 'seguimiento_silvopastoreo', 'seguimiento_paramo', 'seguimiento_cerdos',
   ];
