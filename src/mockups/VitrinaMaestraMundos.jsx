@@ -144,7 +144,8 @@ const COMPONENTES = /** @type {Record<string, import('react').ComponentType<any>
    ningún arco se monte sobre otro). El orden dentro de `mundos` ES el arco de
    izquierda a derecha; colorA/colorB alimentan el iris del cruce, la brasa,
    los chips y la rejilla 2D — no el paisaje. */
-const PISOS = [
+// eslint-disable-next-line react-refresh/only-export-components
+export const PISOS = [
   {
     id: 'calido',
     nombre: 'Tierra cálida',
@@ -189,7 +190,7 @@ const PISOS = [
     radio: 12.0,
     alturaAro: 4.75,
     escala: 1.18,
-    angulos: [-42, -14, 14, 42],
+    angulos: [-56, -28, 0, 28, 56],
     mundos: [
       { id: 'papa', titulo: 'La papa', emoji: '🥔', colorA: '#b28a52', colorB: '#2e2618' },
       { id: 'suelo', titulo: 'El suelo vivo', emoji: '🪱', colorA: '#a97b4f', colorB: '#2b1d10' },
