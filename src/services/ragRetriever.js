@@ -20,7 +20,7 @@ const BM25_PARAMS = {
 const BM25_WEIGHT = 1.0;
 const SEMANTIC_WEIGHT = 1.5;
 
-// ── Kill-switch REVERSIBLE de la capa SEMÁNTICA (arctic-embed2) ────────────
+// ── Kill-switch REVERSIBLE de la capa SEMÁNTICA (nomic-embed-text) ────────────
 // La semántica (similitud coseno sobre embeddings snowflake-arctic-embed2) va
 // ACTIVADA por defecto en producción — es el comportamiento aprobado: mejora
 // la resolución folk (papa criolla↔Solanum phureja, broca↔Hypothenemus,
@@ -32,8 +32,8 @@ const SEMANTIC_WEIGHT = 1.5;
 // valor ⇒ ON (default seguro para prod). Ver .env.example y docs/RAG.md.
 //
 // Por qué existe el flag y no es "siempre on": la mitad SEMÁNTICA embebe la
-// query EN VIVO vía Ollama (embedQuery). Si el embedder arctic-embed2 (4.6 GB)
-// co-reside con granite3.3:8b (~7.2 GB) en la M6000 (12 GiB) puede disparar un
+// query EN VIVO vía Ollama (embedQuery). Si el embedder (nomic-embed-text, 588 MB)
+// co-reside con gemma4:e2b (~8.1 GB) en la M6000 (12 GiB) puede disparar un
 // cudaMalloc OOM que tumba al agente. La mitigación de runtime es
 // keep_alive:'0s' (ver embedQuery); este flag es el kill-switch si aún así hay
 // presión de VRAM en prod.
@@ -671,28 +671,24 @@ async function embedQuery(queryText) {
       // conserva pero en Ollama 0.24 NO fuerza CPU (verificado en vivo) — la
       // mitigación que sí funciona es keep_alive:'0s'.
       //
-      // FIX P0 (auditoría RAG 2026-07-02): el commit anterior de esta rama
-      // había puesto `model: 'nomic-embed-text'` aquí, con el comentario (falso)
-      // de que "el corpus se generó con nomic-embed-text". El corpus real de
-      // `public/rag-embeddings.json` (verificado: 501 vectores, TODOS de
-      // dimensión 1024) fue re-indexado con snowflake-arctic-embed2 en #1825 y
-      // #1828 — nomic-embed-text emite 768d. Con el modelo equivocado pasan dos
-      // cosas, cualquiera de las dos deja el híbrido en BM25-only silencioso:
-      // (a) si el modelo no está pulled en el host de Ollama, el POST devuelve
-      // 404 y embedQuery() retorna null; (b) si SÍ está pulled, cosineSimilarity()
-      // descarta el par por `a.length !== b.length` (768 vs 1024) y el score
-      // semántico da 0 para TODOS los docs. En ambos casos combineResults()
-      // fusiona con semanticNorm=0 en todo el corpus, así que el ranking final
-      // es idéntico al de BM25-only — exactamente el +0.0pp que reportó el
-      // benchmark de este PR. snowflake-arctic-embed2 es también el modelo
-      // documentado como fuente de verdad en Chagra-strategy/ops/MODELS.md
-      // ("embeddings (RAG) | snowflake-arctic-embed2 | ragRetriever.js:442") y
-      // el que usa scripts/bench-complejos-con-tools.mjs. Restaurado en esta línea.
+      // INVARIANTE CRÍTICA: el modelo de acá DEBE coincidir con el que indexó
+      // `public/rag-embeddings.json`. Si no coinciden, cosineSimilarity() descarta
+      // todos los pares por `a.length !== b.length` (dimensiones distintas) y el
+      // híbrido cae a BM25-only EN SILENCIO (+0.0pp semántico). Ya pasó el
+      // 2026-07-02 con arctic(1024d) vs un corpus nomic(768d).
+      //
+      // 2026-07-23: se MIGRÓ de snowflake-arctic-embed2 a nomic-embed-text, con
+      // el corpus re-indexado a 768d (RAG_EMBED_MODEL=nomic-embed-text
+      // build-rag-embeddings.mjs). Motivo, medido sobre eval/rag-golden.json (50
+      // queries) con AMBOS re-indexados: nomic recall@5 44% / @3 42% / MRR .351
+      // vs arctic 38% / 38% / .340 — nomic gana +6pp@5. Y nomic pesa 274MB vs
+      // 1.3GB de arctic (verificado en VRAM), así que convive con gemma4:e2b sin
+      // que Ollama lo desaloje. Actualizar también Chagra-strategy/ops/MODELS.md.
       body: JSON.stringify({
-        model: 'snowflake-arctic-embed2',
+        model: 'nomic-embed-text', // 2026-07-23: nomic gana recall (+6pp@5) y es +liviano (274MB, convive con gemma sin desalojo). Corpus re-indexado a 768d.
         prompt: queryText,
         // Descarga arctic tras el embed (anti-OOM por co-residencia con granite).
-        keep_alive: '0s',
+        keep_alive: '5m', // 2026-07-23: nomic (588MB) convive con gemma4:e2b (verificado 8.7/12GB); residente para velocidad. Revertir a '0s' si hay OOM.
         options: { num_gpu: 0 },
       }),
       signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
