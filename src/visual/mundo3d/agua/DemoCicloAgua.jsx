@@ -26,18 +26,24 @@ import { useState } from 'react';
 import { decidirTier } from '../deviceTier.js';
 import EscenaCicloAgua from './EscenaCicloAgua.jsx';
 
+/* Franja plegable abajo: colapsada deja el 3D como protagonista (criterio
+   suelo-demo-3d) y solo muestra el relato + la fase; expandida trae la
+   lección completa y el resto de controles. */
 const PANEL = {
   position: 'absolute',
-  left: 12,
-  bottom: 12,
-  padding: '10px 14px',
+  left: 10,
+  right: 10,
+  bottom: 10,
+  maxWidth: 460,
+  padding: '8px 12px',
   borderRadius: 10,
   background: 'rgba(20, 16, 10, 0.72)',
   color: '#f4e9d4',
   fontFamily: 'system-ui, sans-serif',
   fontSize: 13,
-  lineHeight: 1.7,
-  maxWidth: 330,
+  lineHeight: 1.45,
+  maxHeight: '45%',
+  overflowY: 'auto',
 };
 
 const BOTON = (activo) => ({
@@ -70,6 +76,8 @@ export default function DemoCicloAgua() {
   const [temporada, setTemporada] = useState(
     /** @type {'lluvia'|'seca'|'auto'} */ ('lluvia'),
   );
+  /* Colapsado por defecto: la comparación suelo vivo / pelado manda. */
+  const [abierto, setAbierto] = useState(false);
 
   const etiquetaHora = (h) =>
     `${Math.floor(h)}:${String(Math.round((h % 1) * 60)).padStart(2, '0')}`;
@@ -85,14 +93,20 @@ export default function DemoCicloAgua() {
       />
 
       <div style={PANEL}>
-        <div>
-          <strong>La misma loma, bajo la misma nube</strong> — a la izquierda,
-          suelo vivo: se traga el aguacero y lo devuelve todo el verano. A la
-          derecha, suelo pelado: lo bota de una y se lleva la tierra.
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <strong style={{ flex: 1 }}>Suelo vivo (izq.) vs pelado (der.)</strong>
+          <button
+            type="button"
+            style={{ ...BOTON(false), marginTop: 0, whiteSpace: 'nowrap' }}
+            onClick={() => setAbierto((a) => !a)}
+            aria-expanded={abierto}
+          >
+            {abierto ? 'menos ▾' : 'más ▸'}
+          </button>
         </div>
 
-        <div style={{ marginTop: 6 }}>
-          Fase del aguacero: <strong>{fase === null ? 'corriendo sola' : fase.toFixed(2)}</strong>
+        <div style={{ opacity: 0.85, fontSize: 12, marginTop: 2 }}>
+          {fase === null ? 'El ciclo corre solo (46 s).' : relato(fase)}
         </div>
         <input
           type="range"
@@ -104,55 +118,66 @@ export default function DemoCicloAgua() {
           style={{ width: '100%' }}
           aria-label="Fase del aguacero"
         />
-        <div style={{ opacity: 0.85, fontSize: 12, minHeight: '2.4em' }}>
-          {fase === null ? 'El ciclo corre solo (46 s).' : relato(fase)}
-        </div>
-        <button type="button" style={BOTON(fase === null)} onClick={() => setFase(null)}>
-          ciclo automático
-        </button>
 
-        <div style={{ marginTop: 8 }}>
-          Hora: <strong>{hora === null ? 'reloj real' : etiquetaHora(hora)}</strong>
-          {hora !== null && hora > 11.5 && hora < 15 ? ' — sol pico: mire el aspersor' : ''}
-        </div>
-        <input
-          type="range"
-          min={0}
-          max={24}
-          step={0.1}
-          value={hora ?? 12}
-          onChange={(e) => setHora(Number(e.target.value))}
-          style={{ width: '100%' }}
-          aria-label="Hora del día"
-        />
-        <button type="button" style={BOTON(hora === null)} onClick={() => setHora(null)}>
-          reloj real
-        </button>
+        {abierto && (
+          <>
+            <div style={{ marginTop: 4 }}>
+              La misma loma, bajo la misma nube — a la izquierda, suelo vivo: se
+              traga el aguacero y lo devuelve todo el verano. A la derecha,
+              suelo pelado: lo bota de una y se lleva la tierra.
+            </div>
 
-        <div style={{ marginTop: 8 }}>
-          {['lluvia', 'seca', 'auto'].map((t) => (
-            <button
-              key={t}
-              type="button"
-              style={BOTON(temporada === t)}
-              onClick={() => setTemporada(/** @type {any} */ (t))}
-            >
-              {t}
+            <div style={{ marginTop: 6 }}>
+              Fase: <strong>{fase === null ? 'corriendo sola' : fase.toFixed(2)}</strong>
+            </div>
+            <button type="button" style={BOTON(fase === null)} onClick={() => setFase(null)}>
+              ciclo automático
             </button>
-          ))}
-        </div>
-        <div style={{ marginTop: 4 }}>
-          {['alto', 'medio', 'bajo'].map((t) => (
-            <button
-              key={t}
-              type="button"
-              style={BOTON(tier === t)}
-              onClick={() => setTier(/** @type {any} */ (t))}
-            >
-              {t}
+
+            <div style={{ marginTop: 8 }}>
+              Hora: <strong>{hora === null ? 'reloj real' : etiquetaHora(hora)}</strong>
+              {hora !== null && hora > 11.5 && hora < 15 ? ' — sol pico: mire el aspersor' : ''}
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={24}
+              step={0.1}
+              value={hora ?? 12}
+              onChange={(e) => setHora(Number(e.target.value))}
+              style={{ width: '100%' }}
+              aria-label="Hora del día"
+            />
+            <button type="button" style={BOTON(hora === null)} onClick={() => setHora(null)}>
+              reloj real
             </button>
-          ))}
-        </div>
+
+            <div style={{ marginTop: 8 }}>
+              {['lluvia', 'seca', 'auto'].map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  style={BOTON(temporada === t)}
+                  onClick={() => setTemporada(/** @type {any} */ (t))}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            <div style={{ marginTop: 4 }}>
+              {['alto', 'medio', 'bajo'].map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  style={BOTON(tier === t)}
+                  onClick={() => setTier(/** @type {any} */ (t))}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
