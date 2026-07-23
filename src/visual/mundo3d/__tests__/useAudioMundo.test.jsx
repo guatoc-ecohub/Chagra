@@ -84,6 +84,9 @@ describe('useAudioMundo', () => {
     vi.useFakeTimers();
     const timer = vi.spyOn(globalThis, 'setTimeout');
     const { useAudioMundo, usePrefsStore } = await cargar();
+    // #2400 migra la preferencia valle3d al cargar el store y jsdom notifica
+    // localStorage con temporizadores. No son eventos del ambiente sonoro.
+    timer.mockClear();
     act(() => usePrefsStore.setState({ sonido: 'on' }));
     function Host({ agua }) {
       useAudioMundo({ mundoId: 'valle', reducedMotion: true });
