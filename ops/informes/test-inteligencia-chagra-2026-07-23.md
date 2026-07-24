@@ -454,15 +454,16 @@ SCORE = media armónica(identificación 0.6, honestidad 0.4).
 | 4 | `gemma4:e4b` | 16.7% | 100% | 0 | 3.7 | 25.0 |
 | 4 | `qwen2.5vl:7b` | 16.7% | 100% | 0 | 8.7 | 25.0 |
 | 4 | `minicpm-v:8b` | 16.7% | 100% | 0 | 9.4 | 25.0 |
-| 7 | `gemma4:e2b` | 11.1% | 100% | 0 | 3.3 | 17.2 |
+| 7 | `ministral-3:latest` | 16.7% | 80% | 0 | n/d | 24.4 |
+| 8 | `gemma4:e2b` | 11.1% | 100% | 0 | 3.3 | 17.2 |
 | 8 | `qwen3-vl:8b` (brazo visual HOY) | 11.1% | 80% | 16 | 13.7 | 16.9 |
 | 9 | `qwen3-vl:4b` | 5.6% | 60% | 19 | 10.0 | 8.7 |
 | 10 | `llava:7b` | 0% | 100% | 0 | 10.2 | 0 |
 | 11 | `llama3.2-vision:11b` (alucina en sanas) | 16.7% | 0% | 0 | 18.7 | 0 |
 | 12 | `moondream` (roto) | 0% | 0% | 17 | 1.5 | 0 |
 
-`ministral-3:latest`, `ministral-3:14b` y `gemma4:12b`-visión: EN ESPERA por orden del
-operador. (`gemma4:12b` además está BLOQUEADO: `ollama pull` da 412 "requires a newer
+`ministral-3:latest` medido (24.4, arriba); `ministral-3:14b`-visión no cerró (9.1 GB
+offloadea en la M6000). `gemma4:12b`-visión BLOQUEADO: `ollama pull` da 412 "requires a newer
 version of Ollama" — la 0.24 de alpha no lo corre.)
 
 ## TABLA 2 — TEXTO / INTELIGENCIA (stack completo RAG+grafo+MCP, mejor→peor por ÍNDICE)
