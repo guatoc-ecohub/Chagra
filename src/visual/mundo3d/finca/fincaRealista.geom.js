@@ -328,14 +328,9 @@ RAZAS_CERDO['sanpedreño'] = RAZAS_CERDO.sanpedreno;
 RAZAS_CERDO['casco de mula'] = RAZAS_CERDO.cascoDeMula;
 RAZAS_CERDO.cascodemula = RAZAS_CERDO.cascoDeMula;
 
-/* Manchas del pietrain: sobre jamones, paletas y flancos. */
-const MANCHAS_CERDO = [
-  { pos: [-0.30, 0.46, 0.16], s: 0.11 },
-  { pos: [0.20, 0.50, -0.17], s: 0.09 },
-  { pos: [-0.05, 0.56, 0.19], s: 0.08 },
-  { pos: [0.28, 0.44, 0.16], s: 0.08 },
-  { pos: [-0.26, 0.40, -0.17], s: 0.10 },
-];
+// El hato puede registrar la raza sin eñe. Ambas grafías deben usar la misma
+// ficha para evitar que una de ellas caiga al cerdo zungo por defecto.
+RAZAS_CERDO['sanpedreño'] = RAZAS_CERDO.sanpedreno;
 
 /**
  * El cerdo por raza. Mira a +X, patas en y=0, lomo a ~0.62.
