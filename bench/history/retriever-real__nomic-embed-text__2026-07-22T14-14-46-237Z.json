@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "bench": "retriever-real",
+  "date": "2026-07-22T14:14:46.237Z",
+  "model": "nomic-embed-text",
+  "config": "recall",
+  "commit": "cf722545",
+  "metrics": {
+    "recall1": 25,
+    "recall3": 50,
+    "recall5": 63.6,
+    "mrr": 0.3792,
+    "latency_avg_ms": 492.3,
+    "latency_p95_ms": 496
+  },
+  "passCount": null,
+  "failCount": null,
+  "passPct": null,
+  "notes": "",
+  "seed": false
+}

@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "bench": "retriever-real",
+  "date": "2026-07-22T14:14:46.238Z",
+  "model": "bge-m3",
+  "config": "recall",
+  "commit": "cf722545",
+  "metrics": {
+    "recall1": 29.5,
+    "recall3": 47.7,
+    "recall5": 65.9,
+    "mrr": 0.4193,
+    "latency_avg_ms": 3167.7,
+    "latency_p95_ms": 3352.3
+  },
+  "passCount": null,
+  "failCount": null,
+  "passPct": null,
+  "notes": "",
+  "seed": false
+}
