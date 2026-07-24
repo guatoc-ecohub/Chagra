@@ -660,7 +660,15 @@ día (GPU compartida con campesinos > enriquecimiento).
 | `aya:8b` | 10% | 2/16 | **0/8** | 1/6 |
 | `exaone3.5:2.4b` | 7% | 1/16 | **0/8** | 1/6 |
 | `phi4-mini` | 0% · vacío | 0/16 | 0/8 | 0/6 |
-| `gemma4:e4b` · `gemma4:e2b` | _(judging)_ | | | |
+| `gemma4:e4b` · `gemma4:e2b` | _no medible_ | — | — | — |
+
+**8 modelos evaluados por-perfil; 6 con dato válido.** `gemma4:e4b`/`e2b`: sus respuestas son
+MUY verbosas (~1500 caracteres/turno) y **rompen la llamada al juez `claude-code`** (el batch de
+5 casos genera un prompt demasiado grande → "command failed"). Sus remote-runs SÍ corrieron
+30/30 ok — solo la fase de juicio no cerró; se cierran en el próximo ciclo con un juez de mayor
+contexto (`codex`/`gemini-flash`). `phi4-mini` devuelve vacío en `/api/chat` bajo la config del
+audit. La muestra por-perfil es chica (`--limit 30` → 16/8/6) pero el patrón es claro y el
+veredicto principal no depende de esta tabla.
 
 **Hallazgo inesperado:** `granite33-dpo` (fine-tune propio, que PERDIÓ en el índice de texto)
 **LIDERA la auditoría dura por-perfil** — mejor en campesino (6/16) y **gomelo (3/8)**, los
