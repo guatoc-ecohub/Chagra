@@ -25,7 +25,8 @@ import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import { CamaraOdyssey } from '../visual/mundo3d/TunelOdyssey.jsx';
-import { MuralParallax, MURAL_DF } from './murales/MuralParallax.jsx';
+import { MuralParallax } from './murales/MuralParallax.jsx';
+import { MURAL_DF } from './murales/muralDimensions.js';
 import { MURAL_CAFE } from './murales/muralCafe.jsx';
 import { MURAL_AGUA } from './murales/muralAgua.jsx';
 import { MURAL_SEMILLERO } from './murales/muralSemillero.jsx';
@@ -51,13 +52,19 @@ const POSE_VALLE = {
 };
 
 /* La "boca" de cada mural: de frente sobre su normal, FOV 20 (casi
-   ortográfico) a 9.2 unidades — el mismo encuadre de NewDonk2Den3D, donde
-   el plano llena ~70% de la vista y el 3D asoma por los bordes. */
-function poseBocaDe(id) {
+   ortográfico) y base de 9.2 unidades. En vertical se aleja lo necesario
+   para que la valla quepa completa y el 3D asome por los bordes. */
+function poseBocaDe(id, aspectoPantalla = 16 / 9) {
   const v = VALLAS[id];
   const n = new THREE.Vector3(Math.sin(v.rotY), 0, Math.cos(v.rotY));
+  /* En un teléfono vertical, conservar FOV 20 a 9.2 unidades recorta más de
+     la mitad del mural. Alejar la boca según el aspecto mantiene el mismo
+     aplanado Odyssey y deja la valla completa dentro del ancho disponible. */
+  const medioFov = THREE.MathUtils.degToRad(20 / 2);
+  const distanciaParaAncho = 4.35 / (2 * Math.tan(medioFov) * aspectoPantalla);
+  const distancia = Math.max(9.2, distanciaParaAncho);
   return {
-    pos: new THREE.Vector3().fromArray(v.pos).addScaledVector(n, 9.2),
+    pos: new THREE.Vector3().fromArray(v.pos).addScaledVector(n, distancia),
     mira: new THREE.Vector3().fromArray(v.pos),
     fov: 20,
   };
@@ -402,6 +409,11 @@ export default function MuralesNewDonk({ onBack }) {
     () => typeof window !== 'undefined'
       && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
   );
+  const [aspectoPantalla] = useState(() => (
+    typeof window !== 'undefined' && window.innerHeight > 0
+      ? window.innerWidth / window.innerHeight
+      : 16 / 9
+  ));
   /* Arranque directo para demo/QA: ?mural=cafe|agua|semillero&plano=2d */
   const [muralActivo, setMuralActivo] = useState(() => {
     if (typeof window === 'undefined') return 'cafe';
@@ -452,7 +464,10 @@ export default function MuralesNewDonk({ onBack }) {
     setFase('valle3d');
   }, []);
 
-  const poseBoca = useMemo(() => poseBocaDe(muralActivo), [muralActivo]);
+  const poseBoca = useMemo(
+    () => poseBocaDe(muralActivo, aspectoPantalla),
+    [aspectoPantalla, muralActivo],
+  );
   const temaActivo = TEMAS.find((t) => t.id === muralActivo);
 
   const enValle = fase === 'valle3d';

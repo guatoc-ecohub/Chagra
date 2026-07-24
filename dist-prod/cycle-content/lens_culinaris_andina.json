@@ -1,0 +1,70 @@
+{
+  "species_slug": "lens_culinaris_andina",
+  "scientific_name": "Lens culinaris Medik. var. andina",
+  "common_names": [
+    "Lenteja andina"
+  ],
+  "family": "Fabaceae",
+  "category": "granos_legumbres",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "nitrogen_fixer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Siembra directa en surcos. Variedad tolerante a sequia relativa del altiplano. Inocular con Rhizobium especifico para Lens."
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 2000,
+      "optimo_min": 2400,
+      "optimo_max": 3000,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -3,
+      "optimo_min": 12,
+      "optimo_max": 18,
+      "max_tolerable": 24
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La lenteja andina (Lens culinaris Medik. variedad andina) es una leguminosa de grano alto en proteína (~24-26%) y fibra, tradicionalmente cultivada en sistemas campesinos del altiplano colombiano para autoconsumo y mercados locales. Se siembra en Boyacá (Tunja, Sotaquirá, Toca), Cundinamarca (Ubaté, Chiquinquirá), Nariño y Norte de Santander entre 2.000 y 2.800 msnm en zona térmica fría. Ciclo corto 90-110 días, rendimientos 0.8-1.5 t/ha en sistema agroecológico. Fija nitrógeno biológico (~50-90 kg N/ha) por simbiosis con Rhizobium, mejorando suelos antecesores. Manejo: rotación con cereales (cebada, trigo, quinua), control mecánico de malezas en estado de roseta, baja demanda de insumos. Fuentes Tier A: AGROSAVIA Leguminosas Andinas, NRC 1989 Cultivos Andinos, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-leguminosas-andinas",
+      "title": "agrosavia-leguminosas-andinas",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.368Z"
+}

@@ -1,0 +1,82 @@
+{
+  "species_slug": "oreocallis_grandiflora",
+  "scientific_name": "Oreocallis grandiflora (Lam.) R.Br.",
+  "common_names": [
+    "Ñacha (Oreocallis grandiflora)"
+  ],
+  "family": "Proteaceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Semillas aladas de folículos maduros. Germinación 30-60 días en sustrato turba + arena + materia orgánica 2:1:1. Trasplante bolsa 4-6 meses. Plantación >14 meses. Crecimiento lento (~8-12 cm/año en altura). Atractor de colibríes paramunos (Aglaeactis cupripennis, Coeligena helianthea, Eriocnemis derbyi). Aplica Ley 1930/2018 en páramo delimitado."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 3000,
+      "optimo_min": 3100,
+      "optimo_max": 3700,
+      "max_absoluto": 4000
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 5,
+      "optimo_max": 13,
+      "max_tolerable": 18
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La ñacha o gañal (Oreocallis grandiflora (Lam.) R.Br., familia Proteaceae) es uno de los arbolitos más emblemáticos y vistosos del sub-páramo y bosque altoandino del sur de Colombia, Ecuador y Perú (3.000-4.000 msnm). Pertenece a la familia Proteaceae — una de las familias gondwánicas más antiguas (>90 millones de años, separación de Sudamérica y Australia), con representantes icónicos australianos (Banksia, Grevillea) y un puñado de géneros andinos (Oreocallis, Roupala, Lomatia) que documentan la conexión paleobiogeográfica austral. El género Oreocallis es monotípico o casi monotípico (O. grandiflora ampliamente distribuida + O. mucronata más restringida). Arbolito o arbusto arborescente 3-8 m altura, tronco corto retorcido con corteza grisácea fisurada, ramificación desde la base. Hojas alternas oblongo-lanceoladas (8-15 cm) coriáceas con haz verde-oscuro lustroso y envés blanco-grisáceo tomentoso, margen entero ligeramente revoluto — adaptación a la radiación intensa y al viento andino. Inflorescencia en racimo terminal espectacular: 10-30 flores tubulares rojo-coral a rojo-rosado de 4-6 cm con estambres exertos coloridos, perfectamente diseñadas para polinización por colibríes paramunos (síndrome ornitófilo trochilido): Aglaeactis cupripennis, Coeligena helianthea, Eriocnemis derbyi (colibrí endémico Cordillera Central críticamente amenazado), Pterophanes cyanopterus. Servicio ecosistémico estratégico: recurso nectarífero crítico para colibríes andinos especialmente en temporada seca cuando otras Proteaceae andinas y Ericaceae han fructificado; mantenimiento de redes mutualistas planta-polinizador altoandinas; estructura forestal del ecotono altoandino-páramo. Distribución colombiana: presencia documentada principalmente en cordillera Central (Cauca, Huila, Nariño, Tolima) y porciones del Macizo Colombiano y Andes del sur, en complejos paramunos y bosque altoandino (3.000-4.000 msnm) — distribución más boreal y disyunta en cordillera Oriental, ausente del Cocuy. Folículos maduros pardos abriéndose en dos valvas, semillas aladas anemócoras. Amenazas: tala para leña y construcción de cercas en veredas paramunas, quema para apertura de potreros, fragmentación de hábitat, expansión de papa pastusa y haba sobre límite agronómico (~3.500 msnm), cambio climático con migración altitudinal restringida por techo paramuno. Protección legal Colombia: Ley 1930/2018 cuando crece en páramo delimitado, regulación CAR + bosque natural Decreto 1076/2015 fuera de delimitación paramuna. Estado conservación: Vulnerable (VU) Libro Rojo Plantas Colombia por fragmentación y declive poblacional. Manejo agroecológico (restauración con autorización CAR): recolección de folículos maduros antes de dehiscencia (temporada seca), extracción de semillas aladas, germinación en vivero con sustrato turba + arena + MO 2:1:1, plantación intercalada con Drimys granadensis, Weinmannia tomentosa, Hesperomeles obtusifolia en densidades 400-600 ind/ha; especie clave para cercas vivas paramunas multipropósito (sombra ganadera baja densidad + atractor colibríes + producción miel). Fuentes Tier A: POWO Kew, GBIF Taxonomic Backbone, Bernal 2015, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, Ley 1930/2018.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "title": "ley-1930-2018-paramos",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.404Z"
+}

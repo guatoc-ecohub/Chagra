@@ -12,12 +12,11 @@
  * mural se lee como lámina digna.
  */
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
+import { FichasMural } from './FichasMural.jsx';
+import { MURAL_PX } from './muralDimensions.js';
 
 /* Mismas dimensiones que el mural original: 640×360 px que con
    distanceFactor 2.5 proyectan ~4.0 × 2.25 unidades de mundo. */
-export const MURAL_PX = { w: 640, h: 360 };
-export const MURAL_DF = 2.5;
-
 const CSS_MNP = `
 .mnd-mural {
   position: relative;
@@ -154,6 +153,7 @@ export function MuralParallax({ tema, reducedMotion = false, celebra = false }) 
           />
         </div>
         <span className="mnd-placa" style={{ background: tema.placaFondo }}>{tema.placa}</span>
+        <FichasMural mundo={tema.id} reducedMotion={reducedMotion} />
       </div>
     </div>
   );

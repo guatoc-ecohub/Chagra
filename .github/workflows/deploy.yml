@@ -113,6 +113,12 @@ jobs:
           # VITE_CAPTURE_ANONYMIZE); el store cae en /var/lib/agro-mcp/conversations
           # (fuera del rsync --delete del deploy). Habeas Data: Ley 1581.
           VITE_CAPTURE_CONVERSATIONS: "true"
+          # MODO PILOTO 2026-07-18: captura para TODOS los usuarios sin el gate de
+          # consentimiento in-app (auditoría del agente durante pruebas). Default
+          # del código es exigir consentimiento; este flag lo desactiva SOLO en
+          # prod-piloto. Habeas Data Ley 1581: informar a los usuarios del piloto
+          # fuera de la app. Revertir a "true" (o quitar) al cerrar el piloto.
+          VITE_CAPTURE_REQUIRE_CONSENT: "false"
           # Token X-Chagra-Token shared-secret. NOTA: termina en bundle JS
           # publico - defense-in-depth, NO auth real (auth real = nginx CORS
           # lockdown). Sincronizado con SOPS de alpha; rotacion coordinada.

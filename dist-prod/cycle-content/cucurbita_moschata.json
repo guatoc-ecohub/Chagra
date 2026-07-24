@@ -1,0 +1,83 @@
+{
+  "species_slug": "cucurbita_moschata",
+  "scientific_name": "Cucurbita moschata Duchesne",
+  "common_names": [
+    "Ahuyama Amarilla"
+  ],
+  "family": "Cucurbitaceae",
+  "category": "granos_legumbres",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Especie distinta de Cucurbita maxima (zapallo de cabello/loche andino): C. moschata es la ahuyama tropical-templada de cuello largo o calabaza moscada de tierra caliente y media. Siembra directa al inicio de lluvias, 2-3 semillas por hoyo a 2-3 cm de profundidad, distancia 2-3 m entre matas por su porte rastrero expansivo. Ciclo 4-5 meses."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 200,
+      "optimo_max": 1800,
+      "max_absoluto": 2200
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 18,
+      "optimo_max": 28,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La ahuyama amarilla o zapallo cuello (Cucurbita moschata Duchesne, Cucurbitaceae) es una de las tres cucurbitas domesticadas en Mesoamérica y Sudamérica (junto con Cucurbita maxima y Cucurbita pepo), distintiva por su fruto de cuello largo o piriforme, piel verde-ocre que vira a amarillo-crema al madurar, y carne anaranjada intensa rica en betacaroteno (precursor de vitamina A). En Colombia se cultiva ampliamente en clima cálido y templado de Caribe (Córdoba, Sucre, Bolívar), valles interandinos (Tolima, Huila, Valle), Llanos (Casanare, Meta) y zona andina hasta los 1.800-2.000 msnm. Es lección viva de las 'tres hermanas' mesoamericanas adaptadas al trópico colombiano: la ahuyama se asocia históricamente con maíz y fríjol en policultivo donde el maíz da soporte, el fríjol fija nitrógeno y la ahuyama cubre el suelo con su porte rastrero, suprime arvenses, conserva humedad y reduce evaporación. A diferencia de Cucurbita maxima (zapallo de cabello, loche, criollo andino) que prefiere clima frío de altura, la C. moschata es la calabaza de tierra caliente, más resistente a calor, humedad alta y a la mosca blanca. Fruto multifuncional: pulpa para sopas (sancocho, mute santandereano), dulces (dulce de ahuyama, conserva), purés y compotas; semillas tostadas como botana o como antiparasitario tradicional (cucurbitina); flores comestibles en frituras; hojas tiernas en cocidos. Manejo agroecológico: siembra directa al inicio de lluvias, distancia 2-3 m entre matas; asociación clásica con maíz (Zea mays) y fríjol voluble (Phaseolus vulgaris); abono orgánico al hoyo (compost o bocashi); biopreparados caldo de ceniza o caldo sulfocalcio contra oídio (Erysiphe cichoracearum). Conservación de semilla local fácil porque la planta es monoica y fácil de polinizar a mano, lo cual permite mantener variedades familiares por generaciones. Fuentes Tier A: Pérez Arbeláez 1947 Plantas Útiles, AGROSAVIA Leguminosas Andinas (manejo policultivo), NRC 1989 Cultivos Andinos, GBIF Backbone, POWO Kew, FAO EcoCrop.",
+  "sources": [
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-leguminosas-andinas",
+      "title": "agrosavia-leguminosas-andinas",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "nrc-1989-cultivos-andinos",
+      "title": "nrc-1989-cultivos-andinos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.381Z"
+}

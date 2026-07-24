@@ -56,6 +56,10 @@ function elementoFalso(rect) {
 /**
  * Deja correr varios cortes CORTOS de `act()` hasta que `predicado` sea
  * cierto (o se agoten los intentos). Ver nota de infraestructura arriba.
+ *
+ * @param {{current:any}} result
+ * @param {(estado:any)=>boolean} [predicado]
+ * @param {{intentos?:number,pasoMs?:number}} [opciones]
  */
 async function asentar(result, predicado = () => true, { intentos = 12, pasoMs = 20 } = {}) {
   for (let i = 0; i < intentos; i += 1) {

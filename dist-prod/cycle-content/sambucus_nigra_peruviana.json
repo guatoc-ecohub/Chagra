@@ -1,0 +1,72 @@
+{
+  "species_slug": "sambucus_nigra_peruviana",
+  "scientific_name": "Sambucus nigra subsp. peruviana (Kunth) R. Bolli",
+  "common_names": [
+    "Sauco"
+  ],
+  "family": "Adoxaceae",
+  "category": "cercas_vivas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "living_fence",
+    "pollinator_attractor",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "esqueje",
+    "notas": "Su estaca prende fácilmente, permitiendo establecer cercas funcionales en poco tiempo."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2200,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 10,
+      "optimo_max": 18,
+      "max_tolerable": 24
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El sauco andino (Sambucus nigra L. subsp. peruviana) es un arbusto/árbol pequeño nativo de los Andes ampliamente naturalizado en Colombia, cultivado por sus flores (té) y frutos (mermeladas, vinos artesanales). Se encuentra en Cundinamarca (Sabana Bogotá, Choachí, Ubaque, La Calera), Boyacá altiplano, Nariño y Cauca entre 2.000 y 3.000 msnm en zona térmica fría a templada. Propagación por estaca leñosa (estaca de 30-50 cm) con 70-90% prendimiento sin hormonas. Crecimiento rápido alcanza 3-5 m en 3 años. Manejo agroecológico: cercas vivas en linderos, sombra de patio campesino, atrayente polinizadores (abejas, abejorros), fortalecedor de inmunidad de cultivos asociados. Fuentes Tier A: Jardín Botánico Bogotá, AGROSAVIA, POWO Kew, GBIF Backbone Taxonomy, Bernal et al. Catálogo Plantas y Líquenes Colombia.",
+  "sources": [
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.365Z"
+}

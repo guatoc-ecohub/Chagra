@@ -30,7 +30,7 @@ export default function AdvertenciaPeso({
   titulo = 'Ojo, esto es serio',
   children,
   animated = true,
-  className,
+  className = '',
 }) {
   const cls = className ? `cfz-peso ${className}` : 'cfz-peso';
   return (

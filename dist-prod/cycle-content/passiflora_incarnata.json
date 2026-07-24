@@ -1,0 +1,97 @@
+{
+  "species_slug": "passiflora_incarnata",
+  "scientific_name": "Passiflora incarnata L.",
+  "common_names": [
+    "Pasionaria medicinal"
+  ],
+  "family": "Passifloraceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "naturalizada",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje",
+      "acodo"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Esqueje semileñoso de 20-30 cm con 3-4 nudos en primavera-verano, defoliar mitad inferior, plantar en sustrato arena+turba 1:1 con humedad constante y sombra parcial. Enraizamiento 30-45 días. Semilla viable previa escarificación mecánica suave (lija) y estratificación fría 30 días en refrigerador, germinación 30-90 días variable. Tutorado obligatorio sobre malla o cerca.",
+    "tiempo_a_establecimiento_dias": 45,
+    "notas": "DISTINTA DE Passiflora edulis (maracuyá frutal comercial) y P. ligularis (granadilla frutal andina): P. incarnata es la passiflora MEDICINAL SEDANTE por excelencia, sus frutos son pequeños amarillo-verdosos (4-6 cm) poco apreciados comercialmente pero comestibles maduros. Las hojas y flores secas son la droga vegetal de interés farmacéutico internacional.",
+    "fuente": "POWO Kew; Pamplona-Roger 2006; JBB Plantas Medicinales"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 200,
+      "optimo_min": 800,
+      "optimo_max": 2000,
+      "max_absoluto": 2400
+    },
+    "temperatura_c": {
+      "helada_letal": -3,
+      "optimo_min": 16,
+      "optimo_max": 28,
+      "max_tolerable": 34
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "La pasionaria medicinal o passionflower (Passiflora incarnata L., Passifloraceae, sinónimos antiguos Passiflora kerii Spreng., Granadilla incarnata Medik.) es una passiflora trepadora perenne medicinal originaria del sureste de Estados Unidos (Florida, Texas, Carolinas, Georgia, Virginia, Tennessee — única passiflora nativa templada de Norteamérica con tolerancia a heladas suaves), naturalizada e introducida en Colombia para uso medicinal en huertos botánicos universitarios, jardines medicinales y cultivos especializados entre 800 y 2.000 msnm en zonas térmicas cálidas-templadas-moderadas: Antioquia (Medellín, Suroeste cafetero, Oriente templado — Rionegro, La Ceja, Marinilla, Guarne), Cundinamarca templada (La Mesa, Anolaima, Anapoima, Fusagasugá, Tena, Cachipay, Sasaima, Albán, Útica, Pacho), Quindío (Armenia, Calarcá, Salento bajo, Filandia bajo), Risaralda (Pereira, Santa Rosa de Cabal baja, Belén de Umbría baja), Caldas (Manizales bajo, Chinchiná, Palestina, Anserma), Valle del Cauca templado (Sevilla, Caicedonia, Buga zona alta, Tuluá zona alta, Trujillo), Tolima (Ibagué bajo, Líbano, Falan, Honda, Mariquita), Huila (Pitalito, Garzón, La Plata baja), Cauca (Popayán bajo, Santander de Quilichao, Caldono), Santander (Bucaramanga, Floridablanca, Piedecuesta, San Gil, Barichara), Norte de Santander (Cúcuta templada, Ocaña). Pertenece al género Passiflora (familia Passifloraceae) que incluye en Colombia más de 80 especies — desde frutales comerciales (maracuyá P. edulis, granadilla P. ligularis, gulupa P. edulis f. flavicarpa, badea P. quadrangularis, curuba P. tripartita var. mollissima) hasta especies silvestres ornamentales y medicinales — Colombia es uno de los centros de mayor diversidad mundial de Passiflora con ~150 spp nativas (Bernal 2015). DIFERENCIACIÓN CRÍTICA con passifloras frutales comerciales: P. incarnata es la passiflora MEDICINAL SEDANTE por excelencia farmacéuticamente reconocida (registrada en farmacopeas europeas — Comisión E alemana, EMA, USP), frutos pequeños amarillo-verdosos (4-6 cm) poco interesantes comercialmente, hojas trilobuladas profundamente con margen aserrado, flores grandes vistosas (6-9 cm diámetro) blanco-lavandas con corona filamentosa lila-azulada característica de toda la 'flor de la pasión' (los misioneros españoles del siglo XVI interpretaban sus estructuras florales como símbolos del calvario cristiano — 3 estilos = 3 clavos, 5 estambres = 5 llagas, corona filamentosa = corona de espinas, 10 sépalos+pétalos = 10 apóstoles fieles, espina central = lanza romana, zarcillos = látigos, lóbulos foliares = manos de los verdugos), tiempo de floración prolongado mayo-septiembre andino. Frutos comestibles maduros (amarillos a marrones cuando maduros) pero el interés es medicinal: hojas y flores secas como infusión sedante leve a moderada, ansiolítica suave, antiespasmódica gastrointestinal y muscular, hipnótica suave nocturna (inducción del sueño sin efecto narcótico fuerte), antitusiva. Fitoquímica: alcaloides indólicos (harmano, harmina, harmol — beta-carbolinas), flavonoides C-glucósidos (vitexina, isovitexina, orientina, isoorientina, apigenina, crisina — chrysin es activo benzodiacepino-mimético leve), cumarinas, glucósidos cianogénicos en concentraciones bajas. Uso medicinal documentado en farmacopeas internacionales y conservado popularmente en Colombia. Manejo agroecológico: propagación clonal por esqueje semileñoso (más rápida y fiable) o semilla previamente escarificada-estratificada, distancia 2-3 m sobre malla o cerca de tutorado obligatorio (trepadora con zarcillos foliares — alcanza 4-8 m de longitud), sol pleno preferido (tolera sombra parcial leve matutina), riego moderado regular, suelos arenoso-arcillosos bien drenados pH 5.5-7.0, podas formativas anuales en agosto-septiembre andino, tolera heladas suaves (-3 °C) — único passiflora con esa tolerancia explica su uso para sustituir maracuyá en zonas templadas frías de altiplano. Función en chagra/huerto medicinal-ornamental como cobertura vertical sobre cercas y tutorados con función dual ornamental (flores espectaculares de la pasión cristiana) y medicinal sedante leve cosmopolita, atractora extraordinaria de polinizadores grandes (Xylocopa abejorros carpinteros, abejas Apis, mariposas Heliconius cuyas larvas se especializan en passifloras), fuente alimentaria nectarífera de avispas benéficas. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, JBB Plantas Medicinales, Pamplona-Roger 2006, Bernal 2015, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.397Z"
+}

@@ -1935,6 +1935,25 @@ REGLA DE MÁXIMA PRIORIDAD (CASO B obligatorio):
  * @param {Array|null} resolvedEntities - Entidades resueltas por el sidecar.
  * @returns {string} - rawResponse si es válida, o fallback estructurado.
  */
+/**
+ * _countFromResult — cuenta genérica de resultados de un tool, cubriendo las
+ * shapes comunes (`*_count` o un array `matches`/`resultados`/`canales`/...).
+ * Así CUALQUIER tool aporta "encontré N" en el fallback, no solo los que tienen
+ * caso explícito abajo. Devuelve null si no hay conteo reconocible.
+ * @param {object} result
+ * @returns {number|null}
+ */
+function _countFromResult(result) {
+  if (!result || typeof result !== 'object') return null;
+  for (const k of ['matches_count', 'resultados_count', 'canales_count', 'controls_count', 'count']) {
+    if (Number.isFinite(result[k])) return result[k];
+  }
+  for (const k of ['matches', 'resultados', 'canales', 'controls', 'controladores', 'companions', 'recipes', 'items']) {
+    if (Array.isArray(result[k])) return result[k].length;
+  }
+  return null;
+}
+
 export function buildFallbackResponse(rawResponse, toolEvidence = null, resolvedEntities = null) {
   if (rawResponse && typeof rawResponse === 'string' && rawResponse.trim().length > 0) {
     return rawResponse;
@@ -1957,24 +1976,44 @@ export function buildFallbackResponse(rawResponse, toolEvidence = null, resolved
         continue;
       }
 
-      // Extraer info relevante del resultado (según el tool)
-      if (toolName === 'get_species' && result.species_name) {
-        knownFacts.push(`La especie que mencionaste es ${result.species_name}.`);
-        if (result.viabilidad) {
-          knownFacts.push(`En tu zona es ${result.viabilidad === 'viable' ? 'viable' : result.viabilidad === 'marginal' ? 'marginal' : 'no viable'} para sembrar.`);
+      // Extraer info relevante del resultado. Shapes VERIFICADAS contra el
+      // sidecar 2026-07-18 (las viejas —species_name/controls/recipes— estaban
+      // stale y nunca hacían match → el fallback caía siempre en el genérico).
+      const sp = result.species;
+      if (toolName === 'get_species' && sp && typeof sp === 'object') {
+        const nombre = sp.nombre_comun || sp.nombre_cientifico || sp.id;
+        if (nombre) knownFacts.push(`La especie que mencionaste es ${nombre}.`);
+        const via = sp.viabilidad || result.viabilidad;
+        if (via) {
+          knownFacts.push(`En tu zona es ${via === 'viable' ? 'viable' : via === 'marginal' ? 'marginal' : 'no viable'} para sembrar.`);
         }
-      } else if (toolName === 'get_pest_controllers' && result.controls) {
-        const controls = Array.isArray(result.controls) ? result.controls : [];
-        if (controls.length > 0) {
-          knownFacts.push(`Encontré ${controls.length} control(es) para esa plaga.`);
-        }
-      } else if (toolName === 'get_biopreparados' && result.recipes) {
-        const recipes = Array.isArray(result.recipes) ? result.recipes : [];
-        if (recipes.length > 0) {
-          knownFacts.push(`Encontré ${recipes.length} receta(s) de biopreparados.`);
-        }
+      } else if (toolName === 'get_pest_controllers' && Number.isFinite(result.matches_count)) {
+        if (result.matches_count > 0) knownFacts.push(`Encontré ${result.matches_count} control(es) para esa plaga.`);
+      } else if (toolName === 'get_biopreparados' && Number.isFinite(result.matches_count)) {
+        if (result.matches_count > 0) knownFacts.push(`Encontré ${result.matches_count} receta(s) de biopreparados.`);
+      } else if (toolName === 'get_folk_sintoma' && Array.isArray(result.resultados) && result.resultados.length) {
+        const r0 = result.resultados[0];
+        if (r0 && r0.mapea_a) knownFacts.push(`"${result.query || r0.sintoma_folk}" corresponde a ${r0.mapea_a}.`);
+      } else if (toolName === 'get_aporte_nutricional' && result.nutrientes && typeof result.nutrientes === 'object') {
+        const n = result.nutrientes;
+        const bits = [];
+        if (Number.isFinite(n.energia_kcal)) bits.push(`${n.energia_kcal} kcal`);
+        if (Number.isFinite(n.proteina_g)) bits.push(`${n.proteina_g} g proteína`);
+        if (Number.isFinite(n.hierro_mg)) bits.push(`${n.hierro_mg} mg hierro`);
+        if (bits.length) knownFacts.push(`${result.nombre_comun || 'La especie'}: ${bits.join(', ')} por ${result.unidad || '100 g'}.`);
+      } else if (toolName === 'get_suelo' && result.ph_optimo) {
+        knownFacts.push(`${result.nombre_comun || 'La especie'}: pH óptimo ${result.ph_optimo}${result.correccion_suelo ? `; corrección de suelo: ${result.correccion_suelo}` : ''}.`);
+      } else if (toolName === 'get_canales_comercializacion' && Number.isFinite(result.canales_count)) {
+        if (result.canales_count > 0) knownFacts.push(`Encontré ${result.canales_count} canal(es) de comercialización.`);
       } else {
-        knownFacts.push(`Consulté "${toolName}" y obtuve información útil.`);
+        // Genérico: cualquier tool con un conteo/array reconocible aporta algo
+        // útil, no el vago "obtuve información útil".
+        const n = _countFromResult(result);
+        if (Number.isFinite(n) && n > 0) {
+          knownFacts.push(`Consulté "${toolName}" y encontré ${n} resultado(s).`);
+        } else {
+          knownFacts.push(`Consulté "${toolName}" y obtuve información.`);
+        }
       }
     }
   }

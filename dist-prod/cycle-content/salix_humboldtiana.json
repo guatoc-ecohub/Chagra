@@ -1,0 +1,94 @@
+{
+  "species_slug": "salix_humboldtiana",
+  "scientific_name": "Salix humboldtiana Willd.",
+  "common_names": [
+    "Sauce andino"
+  ],
+  "family": "Salicaceae",
+  "category": "arboles_sombra",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "nurse_plant",
+    "biomass_producer",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "esqueje"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Estacas de 30-50cm de madera de 1-2 años, plantadas directamente en suelo humedo ribereno en epoca lluviosa. Enraizamiento en 15-30 dias.",
+    "tiempo_a_establecimiento_dias": 30,
+    "notas": "Arbol ribereno de crecimiento rapido. Ideal para estabilizacion de margenes de quebradas y rios de montana."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 2000,
+      "optimo_min": 2500,
+      "optimo_max": 3200,
+      "max_absoluto": 3600
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 8,
+      "optimo_max": 16,
+      "max_tolerable": 22
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "medio"
+  },
+  "valor_pedagogico": "El sauce andino o sauce de Humboldt (Salix humboldtiana Willd., familia Salicaceae) es una salicácea arbórea perenne caducifolia (8-20 m altura) nativa de los Andes tropicales sudamericanos, dedicada por Willdenow al naturalista Alexander von Humboldt tras su expedición americana 1799-1804. Produce hojas linear-lanceoladas estrechas (5-15 cm), flores en amentos cilíndricos diclinos (especie dioica) y semillas algodonosas con pelos de dispersión anemócora. Se distribuye en riberas de quebradas, ríos y humedales altoandinos colombianos: Cundinamarca (cuenca alta Bogotá-Tunjuelo, La Calera, Sopó, Cota), Boyacá (cuenca Chicamocha alta, Sogamoso, Paipa), Antioquia (Río Negro, Río Grande), Nariño y Cauca entre 2.500 y 3.200 msnm en zona térmica fría. Ciclo perenne, longevidad 60-100 años, crecimiento rápido (1-2 m/año en condiciones óptimas). Lección viva en restauración hidrológica: árbol ribereño andino por excelencia, sus raíces fasciculadas densas retienen las orillas de quebradas y ríos de montaña previniendo erosión hídrica lateral, su corteza rica en salicina (precursor del ácido acetilsalicílico) es bioactiva, y su rol es clave en la protección de fuentes hídricas y nacimientos del páramo Cruz Verde, Sumapaz, Iguaque y Chingaza. Forma corredores ribereños con aliso (Alnus acuminata) y arrayán (Myrcianthes leucoxyla). Manejo agroecológico: propagación facilísima por estaca leñosa de 30-50 cm directamente en suelo húmedo (90% prendimiento), siembra en franjas ribereñas a 2 m entre plantas para estabilización de margen, atrayente de aves insectívoras y fauna acuática, no plantar en cultivos por competencia hídrica. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Humboldt Flora Alto-Andina, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "restauracion-cruz-verde-sumapaz",
+      "title": "restauracion-cruz-verde-sumapaz",
+      "tier": "B",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.372Z"
+}

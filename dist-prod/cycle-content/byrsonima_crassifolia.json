@@ -1,0 +1,85 @@
+{
+  "species_slug": "byrsonima_crassifolia",
+  "scientific_name": "Byrsonima crassifolia (L.) Kunth",
+  "common_names": [
+    "Peralejo"
+  ],
+  "family": "Malpighiaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla muy dura escarificación obligatoria: lima o ácido sulfúrico 15 min. Germinación 50-70% a 20-45 días (lenta y desigual). Vivero 5-7 meses. Plantación a 25-35 cm.",
+    "tiempo_a_establecimiento_dias": 100,
+    "notas": "Frutal silvestre patrimonial bs-T, sabanas y bosque seco premontano. Fruto pequeño amarillo-anaranjado dulce-aromático (\"nance\") consumo fresco, dulces, fermentados (\"chicha de nance\"). Resistente a incendios sabaneros (corteza gruesa). Mercado consolidado Caribe-Antioquia-Llanos.",
+    "fuente": "Bernal 2015; POWO; Pérez Arbeláez 1947; Agrosavia frutales tropicales; etnobotánica llanera-caribeña"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1200,
+      "max_absoluto": 1500
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El peralejo o nance (Byrsonima crassifolia (L.) Kunth, Malpighiaceae) es uno de los frutales silvestres más patrimoniales y simultáneamente más subutilizados del bosque seco tropical (bs-T), sabanas Caribe-Llanos y bosque premontano seco colombiano, conocido como \"nance\" en Caribe colombiano y Centroamérica, \"chaparro\" en los Llanos Orientales, \"noro\" en la Costa Pacífica, \"manero\" en Antioquia y \"changunga\" en algunas zonas. Es especie ecológicamente CLAVE en las sabanas naturales del Orinoquía colombiano (Casanare, Arauca, Meta, Vichada) y de las sabanas del Caribe seco (La Guajira, Cesar, Magdalena), donde forma poblaciones extensivas y es uno de los pocos árboles que resisten los fuegos sabaneros estacionales recurrentes gracias a una corteza GRUESA RUGOSA ANTICOMBUSTIBLE (rasgo diagnóstico de la especie con espesor 2-4 cm en árboles maduros que aísla térmicamente el cambium vascular). Esta resistencia al fuego le ha permitido coexistir milenariamente con el régimen de incendios naturales y antropogénicos de las sabanas neotropicales, convirtiéndolo en árbol fundamental de la ecología sabanera y en patrimonio bio-cultural llanero-caribeño. Nativo del Neotrópico desde México hasta Brasil-Paraguay, en Colombia es nativo silvestre dominante en sabanas naturales de Orinoquía (Casanare, Arauca, Meta, Vichada), bs-T de Caribe (La Guajira, Cesar, Magdalena, Atlántico, Bolívar, Córdoba, Sucre), Valle del Magdalena (Tolima, Huila, Santander), Valle del Cauca, sabanas del piedemonte llanero, y zonas secas de Antioquia, Caldas y Bajo Cauca, entre 0-1.200 msnm en zona térmica cálida con precipitaciones 700-2500 mm/año y suelos típicamente ácidos pobres oxisoles-ultisoles. Árbol pequeño-mediano caducifolio de 5-15 m de altura con copa amplia abierta hasta 8 m de diámetro, fuste corto tortuoso, corteza gruesa rugosa pardo-grisácea anticombustible, hojas elípticas-obovadas opuestas verde-oscuras coriáceas con envés blanco-tomentoso (tomento blanco al revés foliar, rasgo diagnóstico fácil al voltear la hoja), flores amarillas a anaranjadas en racimos terminales pequeños vistosos melíferos, frutos drupa globosa pequeña amarillo-anaranjada de 1-2 cm de diámetro con pulpa aromática dulce-ácida apetente y una semilla central. La fruta nance/peralejo se cosecha entre julio-octubre (maduración estacional vinculada al régimen pluvial) cuando cae naturalmente al suelo (se recoge a mano del suelo o se sacude el árbol sobre lonas), tiene aroma distintivo intenso característico (notas a queso fermentado, mango maduro, pera tropical), consumo fresco como golosina natural, procesado en dulces tradicionales (dulce de nance Caribe, conserva en almíbar), mermeladas, gelatinas, refrescos (\"agua de nance\"), helados artesanales, y especialmente fermentados alcohólicos tradicionales: la \"chicha de nance\" del Casanare-Arauca-Meta es una bebida fermentada patrimonio llanero servida en fiestas y festividades, y el \"licor de nance\" o \"miche de nance\" es destilado artesanal apreciado. El mercado de nance fresco y procesado tiene presencia consolidada en plazas de mercado de Barranquilla, Cartagena, Santa Marta, Valledupar, Sincelejo, Montería, Medellín, Villavicencio, Yopal con precios estables 2-6 USD/kg fresco y 8-15 USD/kg en conserva-mermelada artesanal. Como Malpighiaceae fija parcialmente nitrógeno (familia con mecanismos simbióticos no convencionales con bacterias diazotróficas Rhizobiaceae y Azospirillum), atrae polinizadores nativos clave: abejas Apidae (Apis mellifera, Meliponini Tetragonisca, Melipona, Trigona), abejorros Centris y Bombus (estos últimos con relación mutualista especializada por aceites florales que Centris colecta como recompensa floral exclusiva de Malpighiaceae), avispas Vespidae, moscas Syrphidae. La dispersión de la semilla es por avifauna frugívora (Turdus, Tangara, Thraupis, Ramphastos), mamíferos pequeños (zarigüeyas Didelphis, micos Cebus capucinus, Saimiri sciureus) y ganado bovino-equino en sabanas extensivas. Su madera marrón-rojiza dura de densidad media-alta (0.7-0.85 g/cm³) es apreciada en postes para cerca viva (durabilidad 10-15 años en suelo gracias a tanninos en duramen), construcción rural, mangos de herramienta, leña de alta calidad calórica, y carbón vegetal artesanal. La corteza es rica en taninos (8-15% peso seco) y se usa tradicionalmente como curtiente vegetal en cuero artesanal Caribe-Llanos, tinte natural pardo-rojizo para textiles tradicionales, y medicinal (decocción astringente para diarreas, lavados antisépticos). Manejo agroecológico: propagación por semilla con escarificación mecánica o ácido sulfúrico 15 min (germinación 50-70% a 20-45 días, lenta y desigual — recomendable sembrar abundante para compensar), vivero 5-7 meses a sol pleno, plantación definitiva a 25-35 cm de altura, distancia 6×6 m (200-300 árb/ha) en frutal comercial o 4×4 m en restauración productiva, primera fructificación año 4-5, productividad estable 30-80 kg/árb/año a partir del año 7. Esqueje leñoso opcional para clonar variedades selectas con fruta más grande y dulce. Es lección extraordinaria de frutales silvestres patrimoniales subutilizados de sabanas neotropicales: una especie nativa adaptada a fuegos sabaneros recurrentes que provee simultáneamente fruta apetente con mercado local consolidado, bebida fermentada tradicional, polinizadores nativos especializados Centris (servicio ecosistémico crítico), madera-postería durables, taninos curtientes-tintes-medicinales, y resiliencia ecológica en suelos ácidos pobres incendiables donde pocos cultivos prosperan. Su domesticación moderna por Agrosavia y universidades regionales (Universidad de los Llanos, Universidad del Atlántico, Corpoica) abre potencial agroindustrial para conservas, mermeladas, vinos y licores premium con denominación de origen llanera-caribeña. Defenderlo es defender la soberanía alimentaria de sabanas (ecosistemas que la agroindustria del arroz, palma y soya está destruyendo masivamente sin considerar alternativas frutales nativas), la dignidad de las economías campesinas-indígenas llanero-caribeñas, y la memoria gastronómica de la chicha de nance llanera y los dulces de nance costeños. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Pérez Arbeláez 1947 Plantas Útiles Colombia, Agrosavia frutales tropicales.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- coffea_arabica — Café caturra / Castillo / Cenicafé 1 (Coffea arabica L.)\n- crescentia_cujete — Totumo (Crescentia cujete L.)\n- gliricidia_sepium — Matarratón (Gliricidia sepium (Jacq.) Kunth ex Walp.)\n- pithecellobium_dulce — Chiminango (Pithecellobium dulce (Roxb.) Benth.)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.390Z"
+}

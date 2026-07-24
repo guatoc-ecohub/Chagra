@@ -55,6 +55,27 @@ export function isCaptureEnabled() {
   }
 }
 
+/**
+ * ¿Se exige consentimiento por-usuario (hasConsent) para capturar?
+ * Default TRUE (privacy-first). Puesto en `false` vía VITE_CAPTURE_REQUIRE_CONSENT
+ * (build), la captura se aplica a TODOS los usuarios sin el gate de consentimiento
+ * in-app — modo PILOTO para auditar el agente con toda la data (los usuarios del
+ * piloto deben ser informados fuera de la app; Habeas Data Ley 1581).
+ */
+export function isConsentRequired() {
+  try {
+    const raw = import.meta.env?.VITE_CAPTURE_REQUIRE_CONSENT;
+    if (raw === false) return false;
+    if (typeof raw === 'string') {
+      const v = raw.trim().toLowerCase();
+      if (v === 'false' || v === '0' || v === 'off') return false;
+    }
+    return true; // default: exige consentimiento
+  } catch (_) {
+    return true;
+  }
+}
+
 function getBaseUrl() {
   try {
     const raw = import.meta.env?.VITE_SIDECAR_URL;
@@ -124,7 +145,9 @@ function anonymizeIdentity(identity) {
  */
 export function captureExchange({ userText = '', agentText = '', identity = {}, meta = {} } = /** @type {any} */ ({})) {
   if (!isCaptureEnabled()) return;
-  if (!hasConsent()) return;
+  // Gate de consentimiento: por defecto exigido (privacy-first). En modo PILOTO
+  // (VITE_CAPTURE_REQUIRE_CONSENT=false) se captura a todos los usuarios.
+  if (isConsentRequired() && !hasConsent()) return;
   // No capturamos turnos vacíos (p. ej. abortados sin respuesta).
   if (!userText && !agentText) return;
 

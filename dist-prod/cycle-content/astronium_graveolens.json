@@ -1,0 +1,87 @@
+{
+  "species_slug": "astronium_graveolens",
+  "scientific_name": "Astronium graveolens Jacq.",
+  "common_names": [
+    "Guayacán negro"
+  ],
+  "family": "Anacardiaceae",
+  "category": "arboles_sombra",
+  "cultivable": true,
+  "conservation_status": "en_peligro",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "biomass_producer",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla pequeña dentro de drupa-sámara con ala persistente del cáliz. Recolección de frutos maduros en estación seca. Sin tratamiento pre-germinativo. Germinación 50-70% a 20-40 días en bandejas con sustrato arenoso. Trasplante a bolsa 1.5-2 L a las 8 semanas. Plantación definitiva a los 5-6 meses (30-50 cm). Crecimiento juvenil lento 0.5-1 m/año. Productivo desde los 15-20 años. Turno maderable 60-80 años por densidad altísima (1-1.2 g/cm³).",
+    "tiempo_a_establecimiento_dias": 120,
+    "notas": "Madera durísima jaspeada negro-rojiza-amarilla con vetas espectaculares — una de las maderas más apreciadas del neotrópico para mueblería fina, ebanistería de lujo y artesanía. Resistente a termitas y hongos. Tolerante a sequía estacional severa."
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 50,
+      "optimo_max": 800,
+      "max_absoluto": 1200
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El guayacán negro o diomate (Astronium graveolens Jacq., familia Anacardiaceae) es un árbol perennifolio-semicaducifolio de 20-30 m de altura con fuste recto cilíndrico y madera durísima jaspeada negro-rojiza-amarilla muy apreciada, nativo del bosque seco tropical (bs-T) y bosque húmedo tropical bajo neotropical desde el sur de México hasta Brasil-Paraguay. En Colombia se distribuye en piso térmico CÁLIDO (<1.200 msnm) en bs-T del Caribe (Bolívar, Sucre, Córdoba, Cesar, Magdalena, La Guajira sur), valle medio del Magdalena (Antioquia, Santander), Pacífico norte (Chocó-Darién, Valle), bosques semihúmedos del piedemonte llanero (Meta, Casanare) y Catatumbo (Norte de Santander). Pertenece a la familia Anacardiaceae —misma de mango, marañón, caracolí— con savia resinosa potencialmente irritante (urushiol-related). Es UNA DE LAS MADERAS MÁS APRECIADAS DEL NEOTRÓPICO por sus vetas espectaculares jaspeadas negro-rojizo-amarillas, densidad altísima (1-1.2 g/cm³), resistencia natural a termitas, hongos y agua, durabilidad excepcional (durmientes de ferrocarril y postes hasta 50 años de servicio sin tratamiento), y trabajabilidad fina con acabado pulido vidrioso. Aprovechamiento histórico (1900-1990) en mueblería fina, ebanistería de lujo, parqué patrimonial, esculturas, instrumentos musicales (vihuelas, charangos, requintos), artesanía de tornería, mangos de herramientas. La sobreexplotación llevó a su estatus VULNERABLE (VU) en el Libro Rojo de Plantas de Colombia y a su listado en el Apéndice III CITES Colombia, con aprovechamiento silvestre que requiere permiso CAR/Ministerio Ambiente. Custodia de comunidades campesinas costeñas del Caribe colombiano (Bolívar, Sucre, Córdoba, Magdalena, Cesar) que lo conservan como árbol patrimonial en potreros silvopastoriles, fincas ganaderas y reservas forestales protectoras. Su nombre \"diomate\" proviene del castellano costeño \"duro de matar\" — alusión a la dureza extrema de su madera y a su capacidad de rebrotar tras incendios y talas parciales. El epíteto específico \"graveolens\" significa \"de olor fuerte\" (lat. gravis = pesado, olens = oloroso), aludiendo al olor resinoso característico de la madera fresca. Manejo agroecológico: vivero con semilla pre-cosechada en estación seca, plantación 30-60 ind/ha disperso en potreros silvopastoriles del Caribe-Magdalena (densidad baja por porte y crecimiento lento), protección los primeros 5 años contra ganado y fuego, cosecha maderable turno 60-80 años a diámetros >50 cm (inversión patrimonial de largo plazo, valor económico por individuo muy alto), restauración 100-200 ind/ha en mosaicos del bs-T asociado a Tabebuia rosea, Pseudobombax septenatum, Bursera simaruba, Cordia alliodora, Gliricidia sepium. Lección viva sobre MADERAS PATRIMONIALES NEOTROPICALES (alternativa a maderas tropicales asiáticas y africanas importadas), SOBREEXPLOTACIÓN MADERERA HISTÓRICA y conservación, BOSQUE SECO TROPICAL EN PELIGRO CRÍTICO (<8% de cobertura original en Colombia según Pizano & García 2014), SILVOPASTOREO PATRIMONIAL (árboles de alto valor en potreros), e INVERSIÓN MADERABLE INTERGENERACIONAL (turno 60-80 años como capital natural heredado). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, Libro Rojo de Plantas de Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, Pérez-Arbeláez 1947 Plantas Útiles Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "libro-rojo-plantas-colombia",
+      "title": "libro-rojo-plantas-colombia",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.401Z"
+}

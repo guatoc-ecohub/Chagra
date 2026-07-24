@@ -1,0 +1,75 @@
+{
+  "species_slug": "valeriana_jatamansi_andina",
+  "scientific_name": "Valeriana microphylla Kunth",
+  "common_names": [
+    "Valeriana andina"
+  ],
+  "family": "Caprifoliaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio",
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 2800,
+      "optimo_min": 3000,
+      "optimo_max": 3800,
+      "max_absoluto": 4200
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "La valeriana andina (Valeriana microphylla Kunth, Caprifoliaceae, comercializada en mercados andinos también como 'valeriana jatamansi andina' por similitud farmacológica con la verdadera V. jatamansi himaláyica) es una hierba perenne pequeña nativa de los Andes neotropicales (Colombia, Ecuador, Perú, Bolivia, Venezuela), propia del páramo y bosque alto-andino entre 3.000 y 3.800 msnm en Colombia (Cundinamarca: Cruz Verde, Sumapaz, Chingaza, Verjón; Boyacá: Iguaque, Pisba, Cocuy; Santander: Almorzadero, Berlín; Nariño, Tolima, Cauca), de 15-40 cm de altura, con roseta basal de hojas pequeñas elípticas a obovado-espatuladas (1-3 cm) coriáceas, márgenes ondulados, y panículas terminales laxas de flores diminutas blanco-rosadas tubulares con cinco lóbulos asimétricos. Sus raíces son aromáticas, fasciculadas, con olor terroso-balsámico-pungente característico del género Valeriana (debido a iridoides y aceites esenciales). Es lección viva de farmacología andina ancestral y distinción taxonómica entre dos valerianas nativas colombianas que enseña a niñas y niños cómo dos especies del mismo género pueden compartir uso medicinal pero tener ecologías diferentes: a diferencia de Valeriana pavonii (sotobosque alto-andino 2.500-3.300 msnm, planta robusta), V. microphylla es la valeriana de páramo verdadero (3.000-4.000 msnm, planta enana adaptada al frío extremo, viento y radiación UV alta). Uso tradicional muisca y campesino-paramuno validado por JBB-Bogotá, IAvH-Humboldt y Pérez-Arbeláez: las raíces frescas o secas en infusión-decocción suave son uno de los sedantes naturales más antiguos y reconocidos del altiplano cundiboyacense, usadas para insomnio, ansiedad, taquicardia nerviosa, dolor de cabeza tensional, cólicos menstruales, y como ansiolítico ante exámenes y eventos estresantes. Los principios activos son ácido valeriánico, valerenal, valepotriatos, iridoides y aceites esenciales con acción comprobada sobre receptores GABA-A, similar mecanísticamente a benzodiacepinas pero sin dependencia. Manejo agroecológico: propagación por semilla recolectada en mata madura silvestre (germinación 30-60 días en sustrato húmedo frío) o división del rizoma (operar a inicios de lluvias), vivero 12-18 meses antes de trasplante, suelos turbosos-arenosos drenados con pH ligeramente ácido, sol pleno (planta de páramo abierto), cosecha de raíces a partir del segundo año (mejor tercer año), función como medicinal de páramo, atractora de moscas-flores (Syrphidae) paramunas, indicadora de páramo conservado, y candidata clave para programas de domesticación ex-situ para reducir presión sobre poblaciones silvestres paramunas (protegidas hoy por Ley 1930/2018). PRECAUCIÓN: no usar en embarazo, lactancia, ni en menores de 3 años; no combinar con sedantes farmacológicos sin supervisión médica. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.383Z"
+}

@@ -1,0 +1,72 @@
+{
+  "species_slug": "allium_cepa",
+  "scientific_name": "Allium cepa L.",
+  "common_names": [
+    "Cebolla cabezona"
+  ],
+  "family": "Amaryllidaceae",
+  "category": "tuberculos_raices",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "frio",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "En la chagra chiguana se prefiere la siembra por bulbitos (cebollín de siembra) para acelerar el ciclo."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 1500,
+      "optimo_max": 2800,
+      "max_absoluto": 3500
+    },
+    "temperatura_c": {
+      "helada_letal": -6,
+      "optimo_min": 13,
+      "optimo_max": 24,
+      "max_tolerable": 30
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La cebolla cabezona (Allium cepa L.) se cultiva en diversos departamentos de Colombia, incluyendo Cundinamarca, Boyacá, Nariño y Antioquia, entre 0 y 3500 msnm, con óptimo entre 1500 y 2800 msnm en zonas térmicas frías y templadas. Su manejo agronómico incluye propagación por semilla o bulbitos (cebollín de siembra) para acelerar el ciclo, con un ciclo vegetativo de 90-120 días, asociaciones beneficiosas con zanahoria y lechuga que mejoran la salud del huerto, y requiere manejo de plagas como trips, minadores de hojas y áfidos mediante monitoreo frecuente y biopreparados andinos. En el contexto campesino andino, esta hortaliza ha sido tradicionalmente utilizada en guisos, sopros y ensaladas como ingrediente esencial, preservando sabores prehispánicos en las cocinas rurales. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Allium cepa L.",
+  "feeding_plan_markdown": "### Plan de alimentación\n\nFuente: ICA Guía fertilizantes (2019) + Restrepo (1996). Cebolla cabezona clima frío altiplano cundiboyacense, ciclo 5-6 meses.\n\n- D+0: Incorporar bocashi + ceniza al surco · bocashi · 100 g — Surco preparado 0-15 cm. Complementar con 50 g/m² de ceniza_madera para aporte K y prevención de mildiú.\n- D+20: Foliar con biol fase macollamiento · biol · 100 ml — Dilución 1:10. Estimula desarrollo foliar antes de inicio de bulbificación.\n- D+45: Foliar con purín de ortiga preventivo · purin_ortiga · 100 ml — Dilución 1:10. Repelente preventivo de trips (Thrips tabaci) — vector de virus IYSV en cebolla.\n- D+75: Drench con humus líquido inicio bulbificación · humus_liquido · 150 ml — Dilución 1:7. Aporte de aminoácidos para llenado de bulbo.\n- D+105: Foliar con caldo bordelés preventivo · caldo_bordeles · 100 ml — Concentración 0.5%. Preventivo Peronospora destructor (mildiú velloso) en época lluviosa.\n- D+135: Suspender riego para curado de bulbo · biofertilizante no especificado · dosis no especificada — Reducir riego 70% en últimas 3 semanas antes de cosecha. Curado in situ mejora conservación post-cosecha.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-sol-andina",
+      "title": "agrosavia-sol-andina",
+      "tier": "A",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.356Z"
+}

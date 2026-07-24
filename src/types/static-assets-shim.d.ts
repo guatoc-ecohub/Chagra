@@ -11,3 +11,10 @@
  */
 declare module '*.css';
 declare module '*.png';
+// Vite `?raw` suffix (import de un archivo como string crudo, p.ej. para leer
+// App.jsx como texto y verificar contratos de rutas por regex sin montar el
+// módulo — ver src/__tests__/App.mockup-routes-contract.test.js).
+declare module '*?raw' {
+  const contenido: string;
+  export default contenido;
+}

@@ -1,0 +1,81 @@
+{
+  "species_slug": "gaultheria_anastomosans",
+  "scientific_name": "Gaultheria anastomosans (L.f.) Kunth",
+  "common_names": [
+    "Asnao"
+  ],
+  "family": "Ericaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio",
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 2400,
+      "optimo_min": 2800,
+      "optimo_max": 3600,
+      "max_absoluto": 4000
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "El asnao o chaquillo (Gaultheria anastomosans (L.f.) Kunth, Ericaceae) es un arbusto andino nativo (30-150 cm altura) propio del bosque alto-andino, subpáramo y páramo colombiano entre 2.800 y 3.600 msnm, presente en Cundinamarca (Cruz Verde, Sumapaz, Chingaza, Verjón), Boyacá (Iguaque, Cocuy, Pisba), Santander (Berlín, Almorzadero), Antioquia (Belmira), Tolima, Cauca y Nariño. Pertenece a la familia Ericaceae (igual que arándanos y uva camarona) y al género Gaultheria del que se extrae tradicionalmente el aceite esencial wintergreen (con metilsalicilato como compuesto activo, presente también en Gaultheria anastomosans). Hojas coriáceas alternas elípticas con margen serrado-glanduloso aromáticas (al estrujarse desprenden olor a wintergreen característico), flores urceoladas (en forma de urna) colgantes blanco-rosadas pequeñas (5-8 mm) que atraen abejorros y abejas nativas, frutos en cápsula carnosa blanca-rosada subglobosa (5-10 mm) comestible de sabor mentolado-dulce característico. Es lección viva de etnobotánica medicinal y soberanía alimentaria-medicinal que enseña a niñas y niños cómo una sola hoja de chaquillo machacada huele a pomada de mentol natural, mostrando que la naturaleza ya tenía el wintergreen mucho antes que la farmacia: los frutos y hojas se han usado tradicionalmente para infecciones respiratorias, inflamaciones musculares y como expectorante por comunidades campesinas de Boyacá-Cundinamarca (uso validado farmacognosticamente por JBB). Frutos comestibles directamente o en preparaciones. Por eso aparece en planes de restauración Cruz Verde-Sumapaz como especie productiva nativa de doble propósito. Manejo agroecológico: propagación por semilla (sustrato ácido pH 4.5-5.5, germinación 90-120 días) o esqueje semileñoso, vivero 12-18 meses, distancia 0.8-1.5 m, fructificación a partir de 3-4 años, función como cobertura baja, frutal silvestre, medicinal y atractor de polinizadores en restauración. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "restauracion-cruz-verde-sumapaz",
+      "title": "restauracion-cruz-verde-sumapaz",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.381Z"
+}

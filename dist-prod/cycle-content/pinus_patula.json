@@ -1,0 +1,102 @@
+{
+  "species_slug": "pinus_patula",
+  "scientific_name": "Pinus patula Schiede ex Schltdl. & Cham.",
+  "common_names": [
+    "Pino pátula"
+  ],
+  "family": "Pinaceae",
+  "category": "especies_invasoras",
+  "cultivable": false,
+  "conservation_status": "invasor",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "invasive"
+  ],
+  "antagonists": [
+    "quercus_humboldtii"
+  ],
+  "especies_nativas_sustitutas": [
+    "alnus_acuminata",
+    "escallonia_paniculata",
+    "miconia_squamulosa",
+    "quercus_humboldtii",
+    "weinmannia_tomentosa"
+  ],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Las acículas acidifican el suelo; requiere limpieza de sitio post-tala."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2200,
+      "optimo_max": 3000,
+      "max_absoluto": 3400
+    },
+    "temperatura_c": {
+      "helada_letal": -10,
+      "optimo_min": 10,
+      "optimo_max": 18,
+      "max_tolerable": 24
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "SE BUSCA: El 'Acidificador'. El pino pátula (Pinus patula Schiede ex Schltdl. & Cham., familia Pinaceae) es una conífera nativa de México introducida en Colombia desde mediados del siglo XX para programas de reforestación industrial masiva (CAR, antiguas SmurfitKappa-Cartón Colombia) y naturalizada como invasora en bosques altoandinos, particularmente impactando el bosque de roble negro (Quercus humboldtii) endémico. Se distribuye en Cundinamarca (Tabio, Subachoque, San Antonio del Tequendama, La Calera), Boyacá altiplano, Nariño, Antioquia y Cauca entre 1.800 y 3.400 msnm en zona térmica fría. Árbol perenne 20-35 m que alfombra el suelo con sus agujas resinosas no degradables, acidificando el sustrato (pH puede descender de 5.5 a 4.0) y impidiendo la germinación de robles, alisos y encenillos nativos. Su sombra densa y alelopatía bloquean regeneración natural. Manejo: estrategia 'desmonte por núcleos' (clearcut + replante con Alnus acuminata + Quercus humboldtii), descortezamiento en anillo para árboles aislados, prohibición nuevas plantaciones cerca de remanentes nativos. Fuentes Tier A: Calderón Sáenz 2003 Invasoras Colombia, POWO Kew, GBIF Backbone Taxonomy.",
+  "antagonists_markdown": "### Antagonistas (no asociar)\n\nEvite sembrar estas especies cerca; compiten o comparten plagas/patógenos:\n- quercus_humboldtii — Roble negro andino (Quercus humboldtii Bonpl.)",
+  "sources": [
+    {
+      "id": "calderon-saenz-2003-invasoras",
+      "title": "calderon-saenz-2003-invasoras",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "humboldt-invasoras-andes",
+      "title": "humboldt-invasoras-andes",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "res-684-2018-mads",
+      "title": "res-684-2018-mads",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "title": "ley-1930-2018-paramos",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "car-cundi-2019",
+      "title": "car-cundi-2019",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "restauracion-cruz-verde-sumapaz",
+      "title": "restauracion-cruz-verde-sumapaz",
+      "tier": "B",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.364Z"
+}

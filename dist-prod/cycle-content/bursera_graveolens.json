@@ -1,0 +1,85 @@
+{
+  "species_slug": "bursera_graveolens",
+  "scientific_name": "Bursera graveolens (Kunth) Triana & Planch.",
+  "common_names": [
+    "Palo santo"
+  ],
+  "family": "Burseraceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "pest_repellent",
+    "pollinator_attractor",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "Semilla fresca germinación moderada sin tratamiento. Germinación 50-70% a 20-30 días. Vivero 5-8 meses a sol pleno. Plantación a 25-30 cm. Crecimiento lento.",
+    "tiempo_a_establecimiento_dias": 90,
+    "notas": "Madera y resina aromática \"palo santo\" uso ceremonial-medicinal ancestral indígena Caribe-Pacífico. CRÍTICO ÉTICO: solo cosechar madera CAÍDA NATURAL — NO cortar árboles vivos (presión de mercado en Ecuador-Perú llevó a deforestación de bosque seco; en Colombia evitar mismo error). Resina aromática limoneno-α-pineno repelente insectos.",
+    "fuente": "Bernal 2015; POWO; Pérez Arbeláez 1947; Pamplona-Roger 2006; etnobotánica Caribe-Pacífico colombiano"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1000,
+      "max_absoluto": 1500
+    },
+    "temperatura_c": {
+      "helada_letal": 8,
+      "optimo_min": 22,
+      "optimo_max": 32,
+      "max_tolerable": 38
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "El palo santo (Bursera graveolens (Kunth) Triana & Planch., Burseraceae) es uno de los árboles aromático-ceremoniales más patrimoniales y simultáneamente más amenazados del bosque seco tropical (bs-T) del Caribe-Pacífico colombiano y de toda Suramérica seca. La madera y la resina poseen un aceite esencial aromático característico (dominado por limoneno, α-pineno, mentofurano y carvone) usado desde tiempos precolombinos por culturas indígenas Wayúu, Zenú, Embera, Wounaan y Kuna en sahumerios ceremoniales para purificación espiritual de espacios, ritos funerarios (\"palo de las ánimas\"), curaciones tradicionales, y como repelente natural de insectos domésticos (zancudos Aedes, Anopheles, jejenes Culicoides). Esta tradición milenaria sostuvo poblaciones naturales saludables durante siglos hasta que en los años 2010-2020 el mercado new-age internacional (yoga, aromaterapia, espiritualidad alternativa Estados Unidos-Europa-Asia) descubrió el \"palo santo\" y disparó una presión de cosecha catastrófica especialmente en Ecuador (provincia de Manabí, Loja) y Perú (Tumbes, Piura) donde se talaron árboles vivos masivamente para exportación, llevando a la inclusión de la especie en listas de preocupación CITES y a la consolidación de la regla ética inviolable de la cadena de valor sostenible: \"PALO SANTO ÉTICO = SOLO MADERA CAÍDA NATURAL\" — el aceite esencial solo se desarrolla plenamente durante 5-10 años de descomposición natural in situ del árbol caído (procesos de oxidación y polimerización biológica que conducen al perfil aromático característico), por lo cual cortar árboles vivos no solo es ambientalmente destructivo sino que produce madera olfativamente inferior. En Colombia este aprendizaje histórico es crítico para evitar repetir el error ecuatoriano-peruano: el bs-T del Caribe (La Guajira, Cesar, Magdalena, Bolívar, Sucre, Córdoba) y de la región seca del Pacífico (Tumaco-Barbacoas, Cauca, Valle) tiene poblaciones nativas de Bursera graveolens que pueden ser aprovechadas de manera comunitaria sostenible si se mantiene la regla de ningún corte vivo y rotación de cosecha de madera caída a 20-30 años. Nativo del Neotrópico desde México hasta Perú-Bolivia, en Colombia es nativo silvestre del bs-T Caribe-Pacífico entre 0-1.000 msnm en zona térmica cálida con precipitaciones 600-1500 mm/año. Árbol caducifolio de 5-10 m de altura (rara vez hasta 12 m) con corteza papirácea descamable rojiza-grisácea característica (rasgo diagnóstico de la familia Burseraceae), copa rala abierta, fuste corto torcido a veces ramificado desde la base, hojas pinnadas compuestas con folíolos elípticos verde-oscuros aromáticos al frote (liberan inmediatamente fragancia cítrica-resinosa diagnóstica), flores blanco-verdosas pequeñas en panículas terminales melíferas, frutos drupa pequeña globosa verde-roja a la madurez con una semilla negra brillante. El aceite esencial (concentración 6-10% peso seco madera vieja caída) contiene limoneno (40-60%), α-pineno (10-15%), mentofurano (5-10%), carvone (3-8%), y sesquiterpenos menores con propiedades antiinflamatorias, ansiolíticas suaves (efecto sedativo demostrado in vitro y modelos animales), repelente de insectos vectores (zancudos, jejenes, garrapatas) en concentraciones >5%, y antimicrobianas amplio espectro (Staphylococcus, Streptococcus, Candida). En medicina tradicional colombiana caribeña-pacífica el palo santo se usa en sahumerio doméstico para \"limpiezas energéticas\", repelente de mosquitos transmisores de dengue-zika-chikungunya en hogares rurales (sustituye espirales químicos sintéticos), tisana suave de hojas frescas para resfriados y dispepsia, y aplicación tópica del aceite para dolores musculares y picaduras. En sistemas agroforestales del bs-T acepta densidades 200-400 árb/ha en restauración productiva sostenible, asociado con gliricidia, cordia, crescentia y prosopis nativos, tolerando excepcionalmente sequías prolongadas de 5-7 meses, suelos arenosos pobres rocosos áridos y radiación solar plena extrema. El manejo sostenible debe garantizar: (1) ningún corte de árboles vivos, (2) cosecha solo de ramas y troncos caídos naturalmente con descomposición mínima de 5 años in situ, (3) rotación de zonas de cosecha a 20-30 años, (4) certificación comunitaria de origen sostenible para acceder a mercados premium (precio diferencial 3-5x sobre madera no certificada), (5) participación equitativa de comunidades indígenas-campesinas en cadena de valor. Manejo agroecológico: propagación por semilla fresca (germinación 50-70% a 20-30 días, sin tratamiento), vivero 5-8 meses a sol pleno, plantación definitiva a 25-30 cm en suelos arenosos drenados, distancia 5×5 m, crecimiento lento (5-7 m en 15-20 años), primera floración año 6-8, cosecha sostenible solo de madera caída a partir del año 20+. Esqueje leñoso opcional pero germinación baja. Es lección extraordinaria de ética agroecológica: una especie patrimonial milenaria que el mercado internacional puede destruir en una década si se permite el corte vivo, y que solo el manejo comunitario riguroso con regla absoluta de \"solo caído natural\" puede mantener viva indefinidamente. Defenderlo es defender la memoria ceremonial indígena Caribe-Pacífico, la salud doméstica rural frente a insecticidas químicos, la dignidad de las comunidades cosecheras frente a la depredación extractiva, y un ecosistema bs-T cuya destrucción global puso al palo santo ecuatoriano-peruano al borde de la extinción comercial. Colombia tiene la oportunidad histórica de hacerlo bien. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Pérez Arbeláez 1947 Plantas Útiles Colombia, Pamplona-Roger 2006 Plantas Medicinales.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- cordia_alliodora — Nogal cafetero (Cordia alliodora (Ruiz & Pav.) Oken)\n- crescentia_cujete — Totumo (Crescentia cujete L.)\n- gliricidia_sepium — Matarratón (Gliricidia sepium (Jacq.) Kunth ex Walp.)\n- prosopis_juliflora — Algarrobo (Prosopis juliflora (Sw.) DC.)",
+  "sources": [
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "pamplona-roger-2006-plantas-medicinales",
+      "title": "pamplona-roger-2006-plantas-medicinales",
+      "tier": "B",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.390Z"
+}

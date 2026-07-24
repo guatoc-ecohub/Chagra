@@ -1,0 +1,97 @@
+{
+  "species_slug": "spondias_dulcis",
+  "scientific_name": "Spondias dulcis Parkinson",
+  "common_names": [
+    "Jobo cajá"
+  ],
+  "family": "Anacardiaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "windbreak"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla",
+      "esqueje",
+      "acodo"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Estacas gruesas semileñosas (carácter compartido con S. purpurea pero menos vigoroso). Semilla recalcitrante viable 1-2 meses germina en 30-60 días. Acodo aéreo en ramas semileñosas durante lluvias. Árboles francos productivos a 4-6 años, injertados a 2-3 años. Plantación a 10-12 m.",
+    "tiempo_a_establecimiento_dias": 60,
+    "notas": "Frutos grandes (6-10 cm) elipsoides amarillo-dorados maduros con pulpa firme aromática sabor único piña-mango-manzana-ciruela. Hueso grande fibroso espinoso característico — adaptación de dispersión por mamíferos grandes en su origen oceánico polinesio.",
+    "fuente": "POWO Kew; GBIF; Pérez Arbeláez 1947; AGROSAVIA frutales tropicales; FAO Ecocrop"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 50,
+      "optimo_max": 900,
+      "max_absoluto": 1300
+    },
+    "temperatura_c": {
+      "helada_letal": 4,
+      "optimo_min": 22,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El jobo cajá, cajá-manga, ambarella o manga del Perú (Spondias dulcis Parkinson, Anacardiaceae — sinónimo histórico Spondias cytherea Sonn.) es un árbol frutal perenne tropical originario de las islas del Pacífico Sur (Polinesia, Melanesia — origen oceánico, no neotropical, a diferencia de sus hermanas Spondias americanas mombin y purpurea), domesticado en Polinesia hace miles de años, llevado por exploradores europeos (Captain Cook 1768-1779, traslado documentado a las Antillas francesas en el siglo XVIII) y ampliamente naturalizado en todo el trópico mundial (Indias, Sudeste Asiático, Caribe, Brasil — donde se llama \"cajá-manga\" y se popularizó masivamente, Centroamérica, África). En Colombia se cultiva en zonas cálidas costeras y de valle (Atlántico, Bolívar, Magdalena, Córdoba, Sucre, Cesar, La Guajira, Chocó, valle bajo y medio del Magdalena, Llanos bajos, Antioquia bajo Cauca-Urabá, Valle del Cauca cinturón frutícola, Tolima-Huila cálidos) entre 0 y 900 msnm con temperaturas 22-30 °C, sol pleno, suelos bien drenados, riego moderado, tolerante a sequías estacionales y vientos costeros. Árbol semicaducifolio mediano-grande de 12-25 m altura con copa amplia abierta-irregular, corteza gruesa gris-marrón fisurada, follaje pinnado parcialmente caduco en estación seca. Hojas grandes (25-60 cm) alternas-pinnadas con 9-25 folíolos elípticos-lanceolados verde-brillante. Flores pequeñas blanco-verdosas perfumadas en panículas terminales largas (30-50 cm) polinizadas por abejas, mariposas y mosquitas-de-las-flores. Frutos drupa elipsoide grande (6-10 cm largo, 3-6 cm ancho, 100-400 g) — frutos significativamente más grandes que sus hermanas Spondias americanas —, cáscara firme amarillo-dorada-anaranjada al madurar, pulpa amarillo-clara firme jugosa-aromática aroma único intermedio entre piña-mango-manzana-ciruela-vainilla (15-18 °Brix maduro), con un hueso grande fibroso-espinoso característico (la masa fibrosa rodea el hueso interno y forma una \"red espinosa\" alrededor — adaptación de dispersión por mamíferos grandes del origen oceánico polinesio). Frutos consumidos en madurez para fruta fresca y a medio madurar (verde-amarillentos) para encurtidos, ensaladas tropicales y bebidas refrescantes (en Brasil y Caribe se hace \"suco de cajá-manga\" famoso). Manejo: plantación a 10-12 m, ideal en patios tropicales caribeños y de valles cálidos, asocio con mango, aguacate, anón, mamey amarillo, níspero, papayo, plátano. Función pedagógica destacada: enseña a niñas y niños (1) BIOGEOGRAFÍA de Spondias — el género tiene origen pantropical con tres centros principales (Sudamérica neotropical jobo S. mombin, Mesoamérica ciruela S. purpurea, Oceanía polinesia ambarella S. dulcis — todos llegaron a Colombia por rutas distintas y en épocas distintas), (2) HISTORIA de la dispersión postcolombina de cultivos por expediciones europeas (Cook, Bligh) entre Oceanía y América-Caribe — lección de historia botánica colonial, (3) adaptación de hueso fibroso-espinoso como dispersión por mamíferos grandes terrestres (en Polinesia: cerdos, ratas; en Neotrópico naturalizado: tapires, dantas, zaínos, monos), (4) familia Anacardiaceae frutales globales (mango Mangifera, marañón Anacardium, jobo Spondias mombin, ciruela Spondias purpurea, ambarella Spondias dulcis, pistacho Pistacia) y (5) por qué se llama \"cajá-manga\" en Brasil — porque combina caracteres de cajá (S. mombin nativo neotropical, fruta pequeña) y de manga (Mangifera indica asiática, fruta grande aromática) en un solo fruto. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, AGROSAVIA, FAO Ecocrop.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "agrosavia-manual-frutales-tropicales",
+      "title": "agrosavia-manual-frutales-tropicales",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.399Z"
+}

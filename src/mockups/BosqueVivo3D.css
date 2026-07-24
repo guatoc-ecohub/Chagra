@@ -1,0 +1,233 @@
+/*
+ * BosqueVivo3D.css — vitrina del Ent de la queñua (#/mockups/bosque-vivo-3d).
+ * Autocontenida: sin fuentes/imágenes externas. Móvil-first desde 320px.
+ * Paleta de páramo alto: gris-verde frío y niebla, con el rojizo del colorado.
+ * Solo opacity/transform se animan.
+ */
+
+.bviva {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  background: linear-gradient(180deg, #cfd8d6 0%, #dce2dc 44%, #e8e6d8 100%);
+  color: #26302b;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.bviva__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.bviva__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7a4432;
+}
+.bviva__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #2a3b31;
+}
+.bviva__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.bviva__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.bviva__lienzo {
+  position: relative;
+  height: min(66vh, 32rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(122, 68, 50, 0.25);
+  box-shadow: 0 12px 30px rgba(40, 52, 44, 0.16);
+  background: radial-gradient(120% 90% at 50% 20%, #c7d1cf 0%, #aeb9b3 100%);
+}
+.bviva__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+.bviva-canvas {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.bviva-canvas--lista {
+  opacity: 1;
+}
+
+.bviva__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  color: #3a4a40;
+  opacity: 0.85;
+}
+
+.bviva__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.bviva__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.bviva__toggle {
+  border: 1.5px solid #7a4432;
+  background: #fff;
+  color: #7a4432;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.bviva__toggle:hover,
+.bviva__toggle:focus-visible {
+  background: #7a4432;
+  color: #fff;
+  outline-offset: 2px;
+}
+
+/* ---- Ficha 2D (fallback digno, sin GPU) ---- */
+.bviva__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: radial-gradient(120% 90% at 50% 25%, #cfd7d0 0%, #9fa89f 100%);
+}
+.bviva__arbol2d {
+  position: relative;
+  width: 120px;
+  height: 170px;
+  margin-bottom: 0.4rem;
+}
+.bviva__copa {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 118px;
+  height: 100px;
+  transform: translateX(-50%);
+  border-radius: 46% 54% 60% 40% / 58% 56% 44% 42%;
+  background: radial-gradient(circle at 40% 35%, #8b9c72 0%, #5c6f47 70%, #4a5b3a 100%);
+  box-shadow: inset -8px -6px 14px rgba(0, 0, 0, 0.18);
+}
+.bviva__tronco {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 30px;
+  height: 92px;
+  transform: translateX(-50%);
+  border-radius: 40% 40% 30% 30%;
+  background: linear-gradient(90deg, #5c3226 0%, #9a5236 45%, #c4835c 60%, #6e3a2a 100%);
+}
+.bviva__cara {
+  position: absolute;
+  bottom: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+.bviva__ojo {
+  width: 8px;
+  height: 10px;
+  border-radius: 50%;
+  background: #17110d;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25), inset 1px -1px 0 rgba(240, 245, 235, 0.6);
+}
+.bviva__ficha-nombre {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #2a3b31;
+}
+.bviva__ficha-sub {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #4a5a4a;
+}
+
+/* ---- Saberes ---- */
+.bviva__saberes {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.bviva__saberes h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.7rem;
+  color: #2a3b31;
+}
+.bviva__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+@media (min-width: 640px) {
+  .bviva__saberes ol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.bviva__saberes li {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(122, 68, 50, 0.16);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+}
+.bviva__emoji {
+  font-size: 1.4rem;
+  line-height: 1.2;
+}
+.bviva__saberes b {
+  display: block;
+  font-size: 0.92rem;
+  color: #2a3b31;
+}
+.bviva__saberes li p {
+  margin: 0.15rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.42;
+}
+.bviva__cierre {
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-style: italic;
+  color: #3a4a3a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bviva-canvas {
+    transition: none;
+  }
+}
