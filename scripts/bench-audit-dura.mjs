@@ -100,12 +100,12 @@ export async function callOllama(messages, {
   ollamaUrl = DEFAULT_OLLAMA_URL,
   fetchImpl = fetch,
   timeoutMs = Number(process.env.AUDIT_TIMEOUT_MS || 180_000),
-  numPredict = 600,
+  numPredict = Number(process.env.AUDIT_NUM_PREDICT || 600),
 } = {}) {
   const response = await fetchImpl(ollamaUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, messages, stream: false, think: false, keep_alive: '30m', options: { temperature: 0.2, num_predict: numPredict } }),
+    body: JSON.stringify({ model, messages, stream: false, think: false, keep_alive: process.env.AUDIT_KEEP_ALIVE || '2m', options: { temperature: 0.2, num_predict: numPredict } }),
     signal: AbortSignal.timeout(timeoutMs),
   });
   if (!response.ok) throw new Error(`Ollama HTTP ${response.status}: ${(await response.text()).slice(0, 300)}`);
