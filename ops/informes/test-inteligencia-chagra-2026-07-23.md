@@ -564,7 +564,11 @@ Ordenada por ÍNDICE v2 (rendimiento en lo difícil):
 | 11 | `qwen3:4b` | 74.5 | 60.2 | −14.3 | chat |
 | 12 | `qwen3.5:9b` (base) | 70.2 | 51.5 | −18.7 | chat |
 | 13 | `aya:8b` | 79.1 | 40.5 | **−38.6** | chat |
-| — | falcon3 / phi4-mini-reasoning / llama3.2:3b / granite33-curado / qwen35-chagra-cand | (débiles v1) | _(corriendo)_ | — | chat |
+| 14 | `llama3.2:3b` | 51.5 | 63.3 | +11.8 (artefacto: T=0 en v1) | chat |
+| 15 | `falcon3:3b` | 61.1 | 61.4 | +0.3 (débil, plano) | chat |
+| 16 | `phi4-mini-reasoning` | 60.2 | 55.6 | −4.6 (contaminador v1) | chat |
+| 17 | `granite33-curado` (propio) | 40.5 | 41.5 | +1.0 (mudo↔mudo) | chat |
+| 17 | `qwen35-chagra-cand` (propio) | 40.5 | 40.5 | 0 (roto↔roto) | chat |
 
 **Veredicto de robustez — `qwen3.5:4b` gana con preguntas duras, y la ventaja CRECE:**
 - **`qwen3.5:4b` es #1 en v2 (76.3) por margen amplio** (el 2º, `exaone3.5`, está en 72.1).
@@ -587,5 +591,6 @@ se AGRANDA.** Es el modelo más robusto de su clase (razona en vez de memorizar)
 texto (v1 y v2), iguala en visión, tiene tools, y pesa 3.4 GB. El candidato a modelo único
 sale REFORZADO del test duro. (Prod no se cambió — es evidencia para el operador.)
 
-_(Faltan 5 modelos débiles/mudos del sweep de madrugada + gemma4:12b bloqueado por versión de
-Ollama. Índices v2 crudos en `scratchpad/v2*.log`.)_
+**Tabla v2 COMPLETA (18 modelos).** Los 5 débiles no mueven el veredicto (mudos/planos, o
+artefacto v1 en llama3.2:3b). `gemma4:12b` queda bloqueado (Ollama 0.24 → 412). Índices v2
+crudos en `scratchpad/v2*.log`.
