@@ -56,12 +56,14 @@
  *
  * El contenedor padre define el alto (como `.mundo-root`).
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { ATMOSFERA } from './atmosferaMadre.js';
 import { perfilDeTier } from './deviceTier.js';
+import PisosTermicosBandas from './PisosTermicosBandas.jsx';
+import TransicionSierraMundo from './TransicionSierraMundo.jsx';
 
 /* ── Geografía del macizo (validada contra el DR: mar al norte, macizo al sur,
       cumbres gemelas + Simmonds, costa de Palomino). Coordenadas de MUNDO:
@@ -380,6 +382,8 @@ function CreditoPueblos() {
  * @param {boolean} [props.luces=true]  monta las luces de la hora dorada.
  * @param {boolean} [props.atmosfera=true]  fondo + niebla dorada de la escena.
  * @param {boolean} [props.credito=true]  pie de crédito 3D a los cuatro pueblos.
+ * @param {(piso:object)=>void} [props.onSeleccionPiso]  avisa al host al llegar a un piso.
+ * @param {string|null} [props.pisoActivo=null]  piso resaltado desde el host.
  */
 export function SierraDiorama({
   tier = 'alto',
@@ -388,6 +392,8 @@ export function SierraDiorama({
   luces = true,
   atmosfera = true,
   credito = true,
+  onSeleccionPiso,
+  pisoActivo = null,
 }) {
   const perfil = perfilDeTier(tier);
   const geo = useMemo(
@@ -422,6 +428,16 @@ export function SierraDiorama({
       <Rotulo pos={[PALOMINO.x, PALOMINO.y, PALOMINO.z]} texto="Palomino" sub="Caribe · 0 m" distancia={11} alto={0.45} />
 
       {pisoUsuario && <MarcadorPiso piso={pisoUsuario} />}
+      <PisosTermicosBandas
+        pisoUsuario={pisoUsuario}
+        tier={tier}
+        reducedMotion={reducedMotion}
+        alturaCumbre={CIMA}
+        radioBase={4}
+        radioCumbre={0.35}
+        onSeleccionPiso={onSeleccionPiso}
+        pisoActivo={pisoActivo}
+      />
       {credito && <CreditoPueblos />}
     </>
   );
@@ -461,16 +477,28 @@ const CSS_SIERRA = `
  * @param {'alto'|'medio'|'bajo'} [props.tier='alto']  presupuesto de render.
  * @param {boolean} [props.reducedMotion=false]  sin órbita ni nubes; frameloop a demanda.
  * @param {string}  [props.pisoUsuario]  piso de la finca a resaltar (opcional).
+ * @param {(piso:object)=>void} [props.onSeleccionPiso]  se llama al llegar al piso seleccionado.
  * @param {string}  [props.className]  clases extra del contenedor.
  */
 export default function VistaGlobalSierra({
   tier = 'alto',
   reducedMotion = false,
   pisoUsuario,
+  onSeleccionPiso,
   className = '',
 }) {
   const [listo, setListo] = useState(false);
+  const [pisoActivo, setPisoActivo] = useState(null);
+  const [viaje, setViaje] = useState(null);
   const perfil = perfilDeTier(tier);
+  const seleccionarPiso = useCallback((piso) => {
+    setPisoActivo(piso.id);
+    setViaje({ piso, activa: true });
+  }, []);
+  const llegarAPiso = useCallback(() => {
+    if (viaje?.piso) onSeleccionPiso?.(viaje.piso);
+  }, [onSeleccionPiso, viaje]);
+  const terminarViaje = useCallback(() => setViaje(null), []);
   return (
     <section
       className={`vsierra-root${className ? ` ${className}` : ''}`}
@@ -498,6 +526,8 @@ export default function VistaGlobalSierra({
           reducedMotion={reducedMotion}
           pisoUsuario={pisoUsuario}
           credito={false}
+          onSeleccionPiso={seleccionarPiso}
+          pisoActivo={pisoActivo}
         />
         <OrbitControls
           makeDefault
@@ -517,6 +547,15 @@ export default function VistaGlobalSierra({
         />
         <AdaptiveDpr pixelated />
       </Canvas>
+
+      <TransicionSierraMundo
+        activa={viaje?.activa ?? false}
+        pisoDestino={viaje?.piso.id}
+        tier={tier}
+        reducedMotion={reducedMotion}
+        onMitad={llegarAPiso}
+        onFin={terminarViaje}
+      />
 
       {/* Chrome DOM anclado a la composición: título arriba; abajo la clave de
           pisos (accesible) y el pie de crédito, apoyados sobre la playa/mar del
