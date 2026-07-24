@@ -36,6 +36,9 @@ import {
   geomPerro,
   geomOveja,
 } from '../../visual/mundo3d/finca/fincaRealista.geom.js';
+import { GESTOS } from './gestosAnimal.js';
+
+const POSICION_CERDA = [-1.55, 0, 0.35];
 
 /* El material de las mallas fusionadas con color horneado por vértice que usa
    la ARBOLEDA por especie. flatShading le da carácter a un tronco — pero a un
@@ -52,34 +55,6 @@ export const MATERIAL_FINCA = new THREE.MeshLambertMaterial({
 export const MATERIAL_HATO = new THREE.MeshLambertMaterial({
   vertexColors: true,
 });
-
-/* Los GESTOS de idle: reescriben solo la rotación del grupo-cabeza (el cuerpo
-   queda plantado). Amplitudes chicas: vida, no espectáculo. */
-const GESTOS = {
-  // La vaca pasta: baja el hocico al pasto con calma y lo sube a rumiar.
-  pasta: (g, t, fase) => {
-    g.rotation.z = -0.15 - (Math.sin(t * 0.55 + fase) * 0.5 + 0.5) * 0.55;
-  },
-  // La gallina picotea: golpes secos con pausas.
-  picotea: (g, t, fase) => {
-    const c = (Math.sin(t * 2.4 + fase) + 1) / 2;
-    g.rotation.z = -Math.pow(c, 4) * 0.9;
-  },
-  // El cerdo hocica el suelo: empuja el morro hacia abajo-adelante.
-  hocica: (g, t, fase) => {
-    const c = Math.max(0, Math.sin(t * 1.1 + fase));
-    g.rotation.z = -(c ** 4) * 0.35;
-  },
-  // El perro mira: barre el paisaje con la cabeza, a veces la ladea.
-  mira: (g, t, fase) => {
-    g.rotation.y = Math.sin(t * 0.4 + fase) * 0.45;
-    g.rotation.x = Math.sin(t * 0.23 + fase * 2) * 0.1;
-  },
-  // La oveja tantea el pasto, más tímida que la vaca.
-  tantea: (g, t, fase) => {
-    g.rotation.z = -0.1 - (Math.sin(t * 0.7 + fase) * 0.5 + 0.5) * 0.35;
-  },
-};
 
 /*
  * Un animal realista: cuerpo + cabeza pivotante. `geom` es el resultado de la
@@ -113,6 +88,30 @@ function Animal({ geom, gesto, pos = [0, 0, 0], giro = 0, escala = 1, fase = 0, 
         <mesh geometry={geom.cabeza} material={MATERIAL_HATO} castShadow />
       </group>
     </group>
+  );
+}
+
+function Lechon({ geom, cerdaPos, desplazamiento, giro, escala = 1, fase, reducedMotion }) {
+  const lechon = useRef(null);
+  useFrame((state) => {
+    if (reducedMotion || !lechon.current) return;
+    GESTOS.sigueCerda(lechon.current, state.clock.elapsedTime, fase, cerdaPos, desplazamiento, giro);
+  });
+  const pos = [
+    cerdaPos[0] + desplazamiento[0],
+    cerdaPos[1] + desplazamiento[1],
+    cerdaPos[2] + desplazamiento[2],
+  ];
+  return (
+    <mesh
+      ref={lechon}
+      geometry={geom}
+      material={MATERIAL_HATO}
+      position={pos}
+      rotation={[0, giro, 0]}
+      scale={escala}
+      castShadow
+    />
   );
 }
 
@@ -159,9 +158,9 @@ export default function AnimalesDeFinca({ reducedMotion = false, q = 1 }) {
       {/* los cerdos POR RAZA: negro zungo, colorado duroc, landrace con cría */}
       <Animal geom={g.zungo} gesto="hocica" pos={[-1.45, 0, -0.5]} giro={0.3} escala={0.62} reducedMotion={rm} />
       <Animal geom={g.duroc} gesto="hocica" pos={[-0.95, 0, -1.0]} giro={1.1} escala={0.6} fase={1.9} reducedMotion={rm} />
-      <Animal geom={g.landrace} gesto="hocica" pos={[-1.55, 0, 0.35]} giro={-0.7} escala={0.62} fase={3.4} reducedMotion={rm} />
-      <mesh geometry={g.lechon} material={MATERIAL_HATO} position={[-1.2, 0, 0.62]} rotation={[0, -0.4, 0]} castShadow />
-      <mesh geometry={g.lechon} material={MATERIAL_HATO} position={[-1.75, 0, 0.72]} rotation={[0, 0.9, 0]} scale={0.9} castShadow />
+      <Animal geom={g.landrace} gesto="hocica" pos={POSICION_CERDA} giro={-0.7} escala={0.62} fase={3.4} reducedMotion={rm} />
+      <Lechon geom={g.lechon} cerdaPos={POSICION_CERDA} desplazamiento={[0.35, 0, 0.27]} giro={-0.4} fase={0.8} reducedMotion={rm} />
+      <Lechon geom={g.lechon} cerdaPos={POSICION_CERDA} desplazamiento={[-0.2, 0, 0.37]} giro={0.9} escala={0.9} fase={2.7} reducedMotion={rm} />
       {/* las ovejas criollas — vellones DISTINTOS (seed propia) */}
       <Animal geom={g.oveja1} gesto="tantea" pos={[-0.45, 0, 1.05]} giro={1.4} escala={0.52} fase={1.7} reducedMotion={rm} />
       <Animal geom={g.oveja2} gesto="tantea" pos={[0.15, 0, 1.35]} giro={0.5} escala={0.48} fase={4.1} reducedMotion={rm} />
