@@ -19,7 +19,7 @@ import {
 } from '../../services/userProfileService';
 import { buildCropSuggestions } from '../../data/cropSuggestions';
 import { syncManager } from '../../services/syncManager';
-import { iconForTheme } from './themeIcon';
+import BotonAnarquiaGlyph from './BotonAnarquiaGlyph';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
 import Angelita from '../../visual/agente/Angelita';
 import { lunarPhase, solarTimes, moonPathD } from '../../utils/skyEphemeris';
@@ -1388,9 +1388,12 @@ export default function AgentHero({ onNavigate }) {
                 .agentport-iconbtn:active { transform: scale(0.9); }
                 .agentport-iconbtn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-                /* Botón Ⓐ — herramienta. Ícono del tema dentro; anillo que respira
-                   (pulseRing del demo) y se rellena con el acento al abrir. */
-                .agentport-tool { padding: 7px; }
+                /* Botón Ⓐ — herramienta. Dentro vive "El Machetazo Forjado"
+                   (BotonAnarquiaGlyph, variante #4): el aro de la propia Ⓐ hace
+                   de borde del FAB, así que el padding es mínimo para que el
+                   glifo llene el botón. Anillo que respira (pulseRing del demo)
+                   y acento al abrir. */
+                .agentport-tool { padding: 2px; }
                 .agentport-tool .agentport-tool-ico { width: 100%; height: 100%; display: inline-flex; }
                 .agentport-tool .agentport-tool-ico svg { width: 100%; height: 100%; display: block; }
                 .agentport-tool:not(.is-open) {
@@ -1407,15 +1410,9 @@ export default function AgentHero({ onNavigate }) {
                     0%, 100% { box-shadow: 0 0 12px -2px rgb(var(--t-accent-rgb) / 0.55); }
                     50% { box-shadow: 0 0 24px 2px rgb(var(--t-accent-rgb) / 0.85); }
                 }
-                /* al abrir, el ícono se vuelve blanco para contrastar con el acento
-                   (cubre también los rellenos de la Ⓐ de herramientas: cabeza del
-                   azadón, hoja y punta del machete) */
-                .agentport-tool.is-open .agentport-tool-ico path,
-                .agentport-tool.is-open .agentport-tool-ico line,
-                .agentport-tool.is-open .agentport-tool-ico circle[stroke] { stroke: #fff; }
-                .agentport-tool.is-open .agentport-tool-ico circle[fill],
-                .agentport-tool.is-open .agentport-tool-ico polygon[fill],
-                .agentport-tool.is-open .agentport-tool-ico path[fill]:not([fill="none"]) { fill: #fff; }
+                /* al abrir, el glifo pasa a esténcil blanco sobre el acento —
+                   lo maneja el propio BotonAnarquiaGlyph vía el ancestro
+                   `.is-open` (reglas .is-open .baf-* en su CSS scoped). */
                 @keyframes agentport-pulse-ring {
                     0% { box-shadow: 0 0 0 0 rgb(var(--t-accent-rgb) / 0.45); }
                     70% { box-shadow: 0 0 0 12px rgb(var(--t-accent-rgb) / 0); }
@@ -2043,15 +2040,18 @@ export default function AgentHero({ onNavigate }) {
                             aria-expanded={menuOpen && !menuClosing}
                             className={['agentport-iconbtn agentport-tool !w-11 !h-11', menuOpen && !menuClosing ? 'is-open' : ''].join(' ')}
                         >
-                            {/* key={theme}: al cambiar el tema el ícono se REMONTA →
-                                corre el markSwap del demo (y la "forja" de la Ⓐ de
-                                herramientas vuelve a dibujarse trazo a trazo). */}
+                            {/* Glifo Ⓐ = "El Machetazo Forjado" (variante #4 elegida por
+                                el operador 2026-07-09): pala + azadón + machete se estampan
+                                a golpes y FORMAN la A; el aro de la Ⓐ es el borde del FAB.
+                                Es el MISMO glifo en todos los temas (identidad del agente).
+                                key={theme}: al cambiar el tema el ícono se REMONTA → corre
+                                el markSwap del demo y el estampado vuelve a dibujarse. */}
                             <span
                                 key={theme}
                                 className={['agentport-tool-ico', themeSwapped ? 'agentport-swap' : ''].join(' ')}
                                 aria-hidden="true"
                             >
-                                {iconForTheme(theme)}
+                                <BotonAnarquiaGlyph />
                             </span>
                         </button>
 

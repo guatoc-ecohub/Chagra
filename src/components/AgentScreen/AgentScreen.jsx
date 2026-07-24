@@ -147,7 +147,7 @@ import ManoChagraGlyph from '../dashboard/ManoChagraGlyph';
 // AgentHero): el acceso a capacidades entra por el ícono del tema, no por la
 // mano (operador 2026-06-18). Misma fuente que TopBar.jsx / AgentHero.jsx.
 import { useTheme } from '../../hooks/useTheme';
-import { iconForTheme } from '../dashboard/themeIcon';
+import BotonAnarquiaGlyph from '../dashboard/BotonAnarquiaGlyph';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 // Agente guiado: selección PURA de un insight verificado proactivo a partir del
 // texto del turno (cultivo detectado → dato con fuente que el usuario no vio).
@@ -3991,11 +3991,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           <div className="flex items-center gap-2 px-1 pb-1 pt-0.5">
             {/* Botón Ⓐ — abre la MANO de Chagra (AgentRedMenu). Este botón ES la
                 raíz geométrica de la red (anchorRef): la mano brota de él, igual
-                que en el home. El GLIFO del botón es el ÍCONO DEL TEMA (no la
-                mano): paridad con home/TopBar y AgentHero — el acceso a
-                capacidades entra por el ícono del tema en el compositor
-                (operador 2026-06-18). `key={theme}` remonta el SVG al cambiar de
-                tema para que la "forja" de la Ⓐ biopunk vuelva a dibujarse. */}
+                que en el home. El GLIFO del botón es "El Machetazo Forjado"
+                (BotonAnarquiaGlyph, variante #4 elegida por el operador
+                2026-07-09): pala + azadón + machete se estampan y FORMAN la A —
+                paridad exacta con el Ⓐ de AgentHero. `key={theme}` remonta el
+                SVG al cambiar de tema para que el estampado vuelva a dibujarse. */}
             <button
               ref={aButtonRef}
               type="button"
@@ -4005,8 +4005,8 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               aria-expanded={sheetOpen}
               className={['as-iconbtn as-tool', sheetOpen ? 'is-open' : ''].join(' ')}
             >
-              <span key={theme} className="w-[20px] h-[20px] flex items-center justify-center" aria-hidden="true">
-                {iconForTheme(theme)}
+              <span key={theme} className="w-10 h-10 flex items-center justify-center" aria-hidden="true">
+                <BotonAnarquiaGlyph />
               </span>
             </button>
 
