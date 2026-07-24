@@ -30,4 +30,11 @@ describe('App route contracts', () => {
     expect(hashRoutes.get(route)).toBe(view);
     expect(switchCases.has(view)).toBe(true);
   });
+
+  it('conecta ShowcaseArtesania como ruta mockup publica', () => {
+    const mockupRoutes = new Map(getRouteEntries('MOCKUP_HASH_ROUTES').map(({ route, view }) => [route, view]));
+
+    expect(mockupRoutes.get('mockups/showcase-artesania')).toBe('mockup_showcase_artesania');
+    expect(switchCases.has('mockup_showcase_artesania')).toBe(true);
+  });
 });
