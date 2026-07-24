@@ -95,7 +95,7 @@ export const ROUTES = {
       // observados en producción". La medición dice que NO los mitigó: con juez
       // semántico sobre 70 sondas, granite3.3 falla el piso térmico el 41,7% de
       // las veces y contamina el 47,7% global. gemma4:e2b: 6,7% y 10%.
-      'gemma4:e2b',
+      'qwen3.5:4b',
     keep_alive_min: 30,
     temperature: 0.3,
     // 2026-06-06: 512→768. Fuga real (interacción operador): respuesta de
@@ -124,7 +124,7 @@ export const ROUTES = {
       // 2026-07-22: la nota de arriba decía que granite3.3 "evita confusiones
       // taxonómicas". El bench con juez semántico lo desmiente: confusión de
       // especie y cruce de cultivos al 91,7%. gemma4:e2b baja el cruce a 33,3%.
-      'gemma4:e2b',
+      'qwen3.5:4b',
     keep_alive_min: 5,
     temperature: 0.3,
     // 2026-06-06: 768→1024. Las queries complejas (planes multi-cultivo,
@@ -142,7 +142,7 @@ export const ROUTES = {
     // NLU REAL = sidecar agro-mcp nlu.ts (granite3.3:8b). Este campo es
     // vestigial: la PWA delega NLU al sidecar /nlu. Ver
     // Chagra-strategy/ops/MODELS.md (fuente única de verdad de modelos).
-    model: 'gemma4:e2b',
+    model: 'qwen3.5:4b',
     keep_alive_min: 0,
     temperature: 0,
     max_tokens: 150,
