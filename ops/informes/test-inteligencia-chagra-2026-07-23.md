@@ -594,3 +594,18 @@ sale REFORZADO del test duro. (Prod no se cambió — es evidencia para el opera
 **Tabla v2 COMPLETA (18 modelos).** Los 5 débiles no mueven el veredicto (mudos/planos, o
 artefacto v1 en llama3.2:3b). `gemma4:12b` queda bloqueado (Ollama 0.24 → 412). Índices v2
 crudos en `scratchpad/v2*.log`.
+
+### `ministral-3` — el falso retador (confirma el patrón)
+
+Los ministral son multimodales y **lideran v1** (los únicos que superan a qwen3.5:4b en fácil):
+`ministral-3:14b` **86.1** y `ministral-3:latest` **86.0** vs 84.7. Pero en el set DURO se
+**derrumban**, igual que los gemma:
+
+| Modelo | v1 | v2 | Δ | ~GB |
+|--------|:---:|:---:|:---:|:---:|
+| `ministral-3:latest` | 86.0 | 69.0 | **−17.0** | 6.0 |
+| `ministral-3:14b` | 86.1 | 63.5 | **−22.6** | 9.1 |
+
+En v2 quedan en 69.0 / 63.5 — **por debajo de qwen3.5:4b (76.3)**, y pesan 2–3× más. Otro
+caso de "brilla en lo memorizable, no razona lo difícil". **qwen3.5:4b sigue siendo #1 en el
+set duro** y el más eficiente. El retador de v1 no aguanta v2.
