@@ -232,3 +232,108 @@ seguimiento histórico. Para mover la vara tras una mejora aprobada: correr con
   aristas del grafo). Mide la ventaja del grafo sobre el vector; una cobertura del grafo
   al 100% "por construcción" no es el punto — el punto es que el vector NO resuelve lo
   relacional. Los huecos del grafo (subject `found:false`) se reportan como fallo honesto.
+
+---
+
+## 8. Comparativa de 10 candidatos de modelo (dims dependientes del modelo)
+
+RECALL (88.2) y RELACIONES (70.0) NO dependen del modelo de chat, así que se dejan
+CONSTANTES y solo se re-corren GROUNDING (0.35) y TAXONOMÍA (0.15) por candidato
+(`FIXED_RECALL=88.2 FIXED_RELACIONES=70.0`, ~2.5x más barato). Todo con `think:false`,
+greedy, secuencial + `ollama stop` (keep_alive 2m) entre modelos, en ventana-día (prod
+usa `gemma4:e2b`). Las respuestas VACÍAS de reasoning cuentan como fallo de grounding.
+
+### Tabla de DECISIÓN (método prod-faithful por modelo)
+
+La pregunta que decide es "¿qué tan bueno sería este modelo EN PRODUCCIÓN?". Prod corre
+`/api/generate` con prompt concatenado, y ese formato le sienta mejor a los gemma (su
+prompt de sistema fue afinado ahí). Un fine-tune, en cambio, se desplegaría con su chat
+template (`/api/chat`). Por eso **cada fila usa el método con el que ESE modelo se
+desplegaría** — mezclar es lo correcto aquí; forzar a gemma a `/api/chat` lo castiga ~5 pt
+por un método que prod no usa.
+
+| # | Modelo | método | GROUNDING | TAXONOMÍA | **ÍNDICE** |
+|---|--------|--------|:---:|:---:|:---:|
+| 1 | `gemma3:4b` | generate | 75.0 | 100.0 | **81.7** |
+| 2 | `gemma4:e4b` | generate | 81.2 | 84.6 | **81.6** |
+| 3 | `granite33-dpo` (propio) | chat | 77.9 | 69.2 | **78.1** |
+| 4 | `qwen35-sft-alpha` (propio) | chat | 70.3 | 84.6 | **77.8** |
+| 5 | `qwen3.5:9b` (base) | chat | 48.8 | 84.6 | **70.2** |
+| 6 | `gemma4:e2b` (PROD HOY) | generate | 57.7 | 61.5 | **69.9** |
+| 7 | `granite-keeper` (propio) | chat | 36.4 | 100.0 | **68.2** |
+| 8 | `qwen35-dpo-alpha` (propio) | chat | 35.4 | 69.2 | **63.2** |
+| 9 | `granite33-curado` (propio) | chat | 0.0 · MUDO | 0.0 | **40.5** |
+| 10 | `qwen35-chagra-cand` (propio) | chat | 0.0 · ROTO | 0.0 | **40.5** |
+
+RECALL=88.2 y RELACIONES=70.0 constantes (no dependen del modelo). El "piso" 40.5 es
+exactamente `0.30·88.2 + 0.20·70` renormalizado = un modelo MUDO (grounding y taxonomía en 0).
+
+### Tabla de CONTROL (todos con `/api/chat`, método homogéneo)
+
+Control secundario: mismo método para todos, para aislar el efecto del modelo del efecto
+del método. Aquí gemma pierde ~5 pt (a gemma le sienta mejor `/api/generate` de prod).
+
+| Modelo | GROUNDING | TAXONOMÍA | VACÍAS | ÍNDICE |
+|--------|:---:|:---:|:---:|:---:|
+| `gemma4:e4b` | 84.1 | 92.3 | 0 | **83.7** |
+| `gemma3:4b` | 77.5 | 84.6 | 0 | 80.3 |
+| `granite33-dpo` | 77.9 | 69.2 | 0 | 78.1 |
+| `qwen35-sft-alpha` | 70.3 | 84.6 | 0 | 77.8 |
+| `qwen3.5:9b` | 48.8 | 84.6 | 0 | 70.2 |
+| `granite-keeper` | 36.4 | 100.0 | 0 | 68.2 |
+| `gemma4:e2b` | 48.0 | 46.2 | 0 | 64.2 |
+| `qwen35-dpo-alpha` | 35.4 | 69.2 | 0 | 63.2 |
+| `granite33-curado` | 0.0 | 0.0 | **32** | 40.5 |
+| `qwen35-chagra-cand` | 0.0 | 0.0 | **32** | 40.5 |
+
+### Anexo — ¿por qué fallaron los 2 fine-tunes MUDOS? (check diferencial)
+
+Los dos que sacan 40.5 emiten VACÍO en las 32 llamadas del grounding+taxonomía **bajo el
+system prompt de grounding de prod**. Para distinguir *incompatibilidad de formato* de
+*modelo roto*, se les tiraron 3 preguntas del golden SIN ese prompt (system mínimo
+"Responde en español, breve."):
+
+- **`granite33-curado` → RESPONDE bien sin el prompt de grounding** ("El maíz se asocia
+  muy bien con la papa y con el fríjol…"; broca → "manejo agroecológico… monitoreo con
+  trampas"). Su mudez es **INCOMPATIBILIDAD** fine-tune × prompt-de-grounding estricto: el
+  SFT no vio ese prompt en entrenamiento y colapsa a abstención total. **Rescatable**
+  ajustando el prompt o re-entrenando con el de prod. (Ojo: su taxonomía cruda es errónea
+  — "papa criolla = Solanum tuberosum var. tandilense", inventado — así que aun rescatado
+  no sería fuerte.)
+- **`qwen35-chagra-cand` → SIGUE MUDO incluso sin el prompt** (3/3 `[VACIO]`). Está
+  **ROTO** (over-refusal generalizado del DPO / export dañado, template `{{ .Prompt }}`).
+  **No rescatable** sin re-entrenar distinto.
+
+**Veredicto — ¿valió el fine-tune propio, o `gemma4:e4b` base es el techo?**
+
+**No valió para producción: ningún fine-tune propio superó a los gemma base.** El mejor
+checkpoint propio desplegable (`granite33-dpo` 78.1, `qwen35-sft-alpha` 77.8) queda por
+debajo de `gemma3:4b` (81.7 — que además YA está desplegado como NLU del sidecar y pesa
+3.3 GB) y de `gemma4:e4b` (81.6). Matices que sí importan para la próxima iteración:
+
+- **El SFT ayudó, el DPO degradó.** `qwen35-sft-alpha` (77.8) superó a su base
+  `qwen3.5:9b` (70.2) por **+7.6** → el SFT propio SÍ mejoró la base. Pero el paso DPO la
+  empeoró: `qwen35-dpo-alpha` (63.2) < base. El DPO empujó a over-refusal (grounding 35.4:
+  se abstiene hasta de lo que sabe). Mismo patrón en granite: `granite33-dpo` (78.1) fue
+  el mejor, pero `granite-keeper` over-abstiene (grounding 36.4) y `granite33-curado` quedó
+  mudo. **Lección: el DPO tal como se hizo colapsa el grounding; re-entrenar con el prompt
+  de prod y sin ese paso DPO.**
+- **El techo sigue siendo `gemma4:e4b`** (83.7 con su método nativo; 81.6 prod-faithful) y
+  **`gemma3:4b` lo iguala** en prod-faithful (81.7) siendo mucho más liviano — el candidato
+  de mejor costo/beneficio para subir el índice de prod hoy, sin fine-tune propio.
+
+---
+
+## 9. Bench visual profundo — ¿`gemma4:e4b` reemplaza a `qwen3-vl:8b`?
+
+18 plagas/enfermedades reales etiquetadas por nombre científico (`public/plaga-images/`,
+mapeadas a nombre común canónico según el vocabulario de plagas del grafo AGE) + 5 plantas
+sanas de control. 8 modelos multimodales, prompt agronómico de una línea, `temperature 0`,
+`think:false`. Tres métricas: **IDENTIFICACIÓN** (tarea real: el campesino fotografía su
+planta enferma), **HONESTIDAD** (¿inventa diagnóstico en una planta sana?) y **LATENCIA**.
+
+<!-- VISION_TABLE -->
+
+**Veredicto — ¿e4b iguala/supera a `qwen3-vl:8b` en diagnóstico real?**
+
+<!-- VISION_VERDICT -->

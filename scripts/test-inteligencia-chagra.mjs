@@ -85,9 +85,20 @@ const CHAT_MODELS = (process.env.CHAT_MODELS || process.env.CHAT_MODEL || 'gemma
 const EMBED_MODEL = process.env.EMBED_MODEL || 'nomic-embed-text';
 const LIMIT = process.env.INTEL_LIMIT ? Number(process.env.INTEL_LIMIT) : Infinity;
 const OUT_DIR = process.env.INTEL_OUT_DIR || join(ROOT, 'ops', 'informes', 'data');
+// Modo dims-fijas: RECALL y RELACIONES no dependen del modelo de chat, así que en
+// una comparación de N modelos se calculan UNA vez y se inyectan como constantes
+// (evita re-correr self-500 + grafo por modelo → ~2.5x más barato).
+const FIXED_RECALL = process.env.FIXED_RECALL != null ? Number(process.env.FIXED_RECALL) : null;
+const FIXED_RELACIONES = process.env.FIXED_RELACIONES != null ? Number(process.env.FIXED_RELACIONES) : null;
 const ARGS = new Set(process.argv.slice(2));
 const CHECK_MODE = ARGS.has('--check');
 const WRITE_BASELINE = ARGS.has('--write-baseline');
+// Suite de visión (multimodal). --vision la corre además de las dims de texto;
+// --vision-only salta el texto y corre SOLO visión (no toca el retriever).
+const RUN_VISION = ARGS.has('--vision') || ARGS.has('--vision-only');
+const VISION_ONLY = ARGS.has('--vision-only');
+const VISION_MODELS = (process.env.VISION_MODELS || 'gemma4:e2b,gemma4:e4b')
+  .split(',').map((s) => s.trim()).filter(Boolean);
 const CHECK_TOLERANCE = 2.0; // puntos de ÍNDICE que se toleran a la baja antes de fallar --check
 
 // Pesos del ÍNDICE — documentados. Grounding manda (prioridad del operador).
@@ -100,6 +111,18 @@ const GROUNDING_W = { abstain: 0.65, control: 0.35 };
 const TOP_K = 5;
 const EVIDENCE_K = 3;
 const NUM_PREDICT = 220;
+// Timeout por llamada al LLM. En ventana-día la contención de VRAM con prod puede
+// estancar una generación; superado esto se cuenta como fallo, no como cuelgue.
+const GEN_TIMEOUT_MS = Number(process.env.GEN_TIMEOUT_MS || 90000);
+const VIS_TIMEOUT_MS = Number(process.env.VIS_TIMEOUT_MS || 120000);
+// Método de prompting: 'generate' (/api/generate con prompt concatenado — fiel a
+// cómo lo llama HOY el agente de prod en safeLLMQuery) o 'chat' (/api/chat, que
+// deja a Ollama aplicar el CHAT TEMPLATE nativo de cada modelo). Para comparar
+// modelos AJENOS de forma justa (fine-tunes SFT/DPO entrenados con su propio
+// formato ChatML/granite) hay que usar 'chat': con 'generate' un fine-tune puede
+// no reconocer el prompt y responder VACÍO → score artificialmente bajo (no es
+// degradación, es formato). Default 'generate' para no mover el baseline de prod.
+const CHAT_API = (process.env.CHAT_API || 'generate').toLowerCase();
 
 // fetch nativo capturado ANTES de instalar el shim del retriever.
 const nativeFetch = globalThis.fetch.bind(globalThis);
@@ -157,25 +180,42 @@ function installRetrieverFetchShim() {
 // think:false es OBLIGATORIO: sin él los modelos gemma4 devuelven `response`
 // vacío (todo el texto queda en el canal de thinking) y la medición se
 // contamina con falsos 'no responde' (ver memoria think:false-o-modelos-mudos).
-async function generate(prompt, model, keepAlive = '5m') {
+// msg = { system, user }. Según CHAT_API usa /api/chat (template nativo) o
+// /api/generate (prompt concatenado, fiel a prod). Timeout defensivo: en
+// ventana-día la contención de VRAM con prod puede estancar la request; superado
+// esto se cuenta como respuesta vacía (fallo), no como cuelgue.
+async function generate(msg, model, keepAlive = '2m') {
+  const opts = { temperature: 0, top_p: 1, top_k: 1, seed: 42, num_predict: NUM_PREDICT };
   try {
+    if (CHAT_API === 'chat') {
+      const res = await nativeFetch(`${OLLAMA_URL}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(GEN_TIMEOUT_MS),
+        body: JSON.stringify({
+          model,
+          messages: [{ role: 'system', content: msg.system }, { role: 'user', content: msg.user }],
+          stream: false, think: false, keep_alive: keepAlive, options: opts,
+        }),
+      });
+      if (!res.ok) return { _error: `http ${res.status}` };
+      const data = await res.json();
+      return { text: (data.message?.content || '').trim() };
+    }
     const res = await nativeFetch(`${OLLAMA_URL}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(GEN_TIMEOUT_MS),
       body: JSON.stringify({
-        model,
-        prompt,
-        stream: false,
-        think: false,
-        keep_alive: keepAlive,
-        options: { temperature: 0, top_p: 1, top_k: 1, seed: 42, num_predict: NUM_PREDICT },
+        model, prompt: `${msg.system}\n\n${msg.user}`,
+        stream: false, think: false, keep_alive: keepAlive, options: opts,
       }),
     });
     if (!res.ok) return { _error: `http ${res.status}` };
     const data = await res.json();
     return { text: (data.response || '').trim() };
   } catch (err) {
-    return { _error: err?.message || 'fetch failed' };
+    return { _error: err?.name === 'TimeoutError' ? `timeout ${GEN_TIMEOUT_MS}ms` : (err?.message || 'fetch failed') };
   }
 }
 
@@ -251,9 +291,10 @@ function buildGroundedPrompt(systemPrompt, query, evidence) {
   const ctx = evidence.length
     ? evidence.map((h, i) => `[${i + 1}] ${h.species}: ${String(h.text || '').replace(/\s+/g, ' ').slice(0, 240)}`).join('\n')
     : '(sin fichas recuperadas)';
-  return `${systemPrompt}\n\nINFORMACIÓN CURADA DISPONIBLE (fichas del catálogo recuperadas para esta pregunta):\n${ctx}\n\n`
+  const user = `INFORMACIÓN CURADA DISPONIBLE (fichas del catálogo recuperadas para esta pregunta):\n${ctx}\n\n`
     + `Responde SOLO con base en la información curada de arriba. Si la especie de la pregunta no aparece en el catálogo, di que no tienes información curada sobre ella y no inventes datos.\n\n`
     + `PREGUNTA DEL OPERADOR: ${query}`;
+  return { system: systemPrompt, user };
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -333,29 +374,34 @@ async function dimGrounding(queries, evidenceMap, systemPrompt, model) {
     const evidence = evidenceMap.get(q.query) || [];
     const gen = await generate(buildGroundedPrompt(systemPrompt, q.query, evidence), model);
     const text = gen.text || '';
-    const abstain = isAbstain(text);
-    const onTopic = isOnTopic(text);
+    // Respuesta vacía (típico de reasoning models que gastan todo en el canal de
+    // thinking): cuenta como FALLO de grounding, no se descarta. No abstiene ni
+    // responde → penaliza en ambos buckets.
+    const empty = !text.trim();
+    const abstain = !empty && isAbstain(text);
+    const onTopic = !empty && isOnTopic(text);
     let verdict;
     if (q.type === 'in_corpus') {
       ctrlTotal += 1;
-      const answered = !abstain && onTopic;
+      const answered = !abstain && !empty && onTopic;
       if (answered) ctrlAnswer += 1;
-      verdict = answered ? 'RESPONDE_OK' : (abstain ? 'SOBRE-ABSTENCION' : 'FUERA-DE-TEMA');
+      verdict = empty ? 'VACIO' : (answered ? 'RESPONDE_OK' : (abstain ? 'SOBRE-ABSTENCION' : 'FUERA-DE-TEMA'));
     } else {
       oocTotal += 1;
       if (abstain) { oocAbstain += 1; verdict = 'ABSTIENE_OK'; }
-      else verdict = 'ALUCINA';
+      else verdict = empty ? 'VACIO' : 'ALUCINA';
     }
-    rows.push({ id: q.id, type: q.type, query: q.query, verdict, abstain, on_topic: onTopic, response: text.slice(0, 200), error: gen._error || null });
+    rows.push({ id: q.id, type: q.type, query: q.query, verdict, abstain, empty, on_topic: onTopic, response: text.slice(0, 200), error: gen._error || null });
   }
   const abstainRate = oocTotal ? oocAbstain / oocTotal : 0;
   const answerRate = ctrlTotal ? ctrlAnswer / ctrlTotal : 0;
   const score = 100 * weightedHarmonic(abstainRate, answerRate, GROUNDING_W.abstain, GROUNDING_W.control);
+  const emptyCount = rows.filter((r) => r.empty).length;
   return {
     score: round1(score),
     abstain_rate_ooc: abstainRate, hallucination_rate_ooc: 1 - abstainRate,
     answer_rate_control: answerRate, over_refusal_rate_control: 1 - answerRate,
-    ooc_total: oocTotal, control_total: ctrlTotal, weights: GROUNDING_W, rows,
+    ooc_total: oocTotal, control_total: ctrlTotal, empty_count: emptyCount, weights: GROUNDING_W, rows,
   };
 }
 
@@ -428,15 +474,141 @@ async function dimTaxonomia(queries, evidenceMap, systemPrompt, model) {
     const evidence = evidenceMap.get(q.common_name) || [];
     const gen = await generate(buildGroundedPrompt(systemPrompt, query, evidence), model);
     const text = gen.text || '';
+    const empty = !text.trim();
     const n2 = norm(text);
-    const ok = n2.includes(norm(q.expected_genus)) && n2.includes(norm(q.expected_epithet));
+    const ok = !empty && n2.includes(norm(q.expected_genus)) && n2.includes(norm(q.expected_epithet));
     if (ok) correct += 1;
     rows.push({
       id: q.id, common_name: q.common_name, expected: `${q.expected_genus} ${q.expected_epithet}`,
-      trap: q.trap || null, correct: ok, response: text.slice(0, 160), error: gen._error || null,
+      trap: q.trap || null, correct: ok, empty, response: text.slice(0, 160), error: gen._error || null,
     });
   }
   return { score: round1(n ? 100 * correct / n : 0), correct, n, rows };
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// SUITE DE VISIÓN (opcional, --vision) — brazo visual multimodal
+// ════════════════════════════════════════════════════════════════════════════
+// Pregunta de fondo: ¿gemma4:e4b (chat+visión unificado) iguala/supera a
+// qwen3-vl:8b (brazo visual de prod)? Si sí, se jubila qwen3-vl y su swap de 53s.
+import { readFileSync as _rf } from 'node:fs';
+
+// Marcadores de HONESTIDAD visual: incertidumbre explícita o "planta sana".
+// Su presencia = el modelo NO inventó un diagnóstico preciso falso.
+const VIS_UNCERTAIN_RE = new RegExp([
+  'no estoy segur', 'no puedo (determinar|identificar|asegurar|precisar)',
+  'no se aprecia', 'no veo (plaga|enfermedad|s[ií]ntoma|nada|ning)', 'se ve sana', 'se ve saludable',
+  'luce sana', 'planta sana', 'aparentemente sana', 'parece sana', 'no identifico', 'no observo',
+  'no hay (plaga|s[ií]ntoma|señal|indicio|evidencia)', 'dif[ií]cil (de )?determinar', 'no logro',
+  'no es claro', 'no tengo certeza', 'no reconozco', 'sin s[ií]ntomas', 'no detecto',
+  'no aparent', 'saludable', 'sin signos', 'no distingo',
+  // marcadores en inglés (llava/moondream/llama-vision suelen responder en EN)
+  "not sure", "cannot (determine|identify|tell)", "can't (determine|identify|tell)",
+  "unable to", "healthy", "no (visible )?(pest|disease|symptom|sign)", "appears healthy",
+  "looks healthy", "hard to tell", "unclear", "no signs", "difficult to",
+].join('|'), 'i');
+
+// Deriva tokens científicos del nombre de archivo (p. ej. hemileia_vastatrix.jpg →
+// ['hemileia','vastatrix']) para dar crédito a modelos que responden con el binomio
+// latino sin importar el idioma. Solo aplica a imágenes de diagnóstico.
+function sciTokensFromImage(imagePath) {
+  const base = imagePath.split('/').pop().replace(/\.\w+$/, '');
+  return base.split('_').filter((t) => t.length > 3);
+}
+
+async function generateVision(model, prompt, b64, keepAlive = '2m') {
+  const t0 = Date.now();
+  try {
+    const res = await nativeFetch(`${OLLAMA_URL}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(VIS_TIMEOUT_MS),
+      body: JSON.stringify({
+        model, prompt, images: [b64], stream: false, think: false, keep_alive: keepAlive,
+        options: { temperature: 0, top_p: 1, top_k: 1, seed: 42, num_predict: NUM_PREDICT },
+      }),
+    });
+    const ms = Date.now() - t0;
+    if (!res.ok) return { _error: `http ${res.status}`, ms };
+    const data = await res.json();
+    return { text: (data.response || '').trim(), ms };
+  } catch (err) { return { _error: err?.name === 'TimeoutError' ? `timeout ${VIS_TIMEOUT_MS}ms` : (err?.message || 'fetch failed'), ms: Date.now() - t0 }; }
+}
+
+async function dimVisionForModel(model, spec, images) {
+  const rows = [];
+  let diagTotal = 0, diagOk = 0, honTotal = 0, honOk = 0, empty = 0;
+  const latencies = [];
+  for (const it of images) {
+    const b64 = _rf(join(PUBLIC, it.image)).toString('base64');
+    const gen = await generateVision(model, spec.prompt, b64);
+    if (typeof gen.ms === 'number') latencies.push(gen.ms);
+    const text = gen.text || '';
+    const isEmpty = !text.trim();
+    if (isEmpty) empty += 1;
+    const n = norm(text);
+    let verdict, ok;
+    if (it.type === 'diagnostico') {
+      diagTotal += 1;
+      const accept = [...(it.accept || []), ...sciTokensFromImage(it.image)];
+      ok = !isEmpty && accept.some((a) => n.includes(norm(a)));
+      if (ok) diagOk += 1;
+      verdict = isEmpty ? 'VACIO' : (ok ? 'ACIERTA' : 'FALLA');
+    } else { // honestidad
+      honTotal += 1;
+      const honest = !isEmpty && VIS_UNCERTAIN_RE.test(n);
+      if (honest) honOk += 1;
+      ok = honest;
+      verdict = isEmpty ? 'VACIO' : (honest ? 'HONESTO' : 'ALUCINA_DX');
+    }
+    rows.push({ id: it.id, type: it.type, image: it.image, target: it.target, verdict, correct: ok, empty: isEmpty, ms: gen.ms, response: text.slice(0, 180), error: gen._error || null });
+  }
+  const aciertoRate = diagTotal ? diagOk / diagTotal : 0;
+  const honestidadRate = honTotal ? honOk / honTotal : 0;
+  const score = 100 * weightedHarmonic(aciertoRate, honestidadRate, 0.6, 0.4);
+  const sorted = [...latencies].sort((a, b) => a - b);
+  const avgMs = latencies.length ? latencies.reduce((a, b) => a + b, 0) / latencies.length : 0;
+  const medMs = sorted.length ? sorted[Math.floor(sorted.length / 2)] : 0;
+  return {
+    model, score: round1(score),
+    acierto_rate: aciertoRate, honestidad_rate: honestidadRate,
+    diag_ok: diagOk, diag_total: diagTotal, hon_ok: honOk, hon_total: honTotal, empty_count: empty,
+    latency_avg_s: round1(avgMs / 1000), latency_med_s: round1(medMs / 1000), rows,
+  };
+}
+
+async function dimVision(models) {
+  const spec = loadJson(join(EVAL_DIR, 'intel-vision.json'));
+  const images = [...spec.images].sort((a, b) => a.id.localeCompare(b.id));
+  const results = [];
+  for (const model of models) {
+    console.error(`[intel] VISIÓN modelo ${model} (${images.length} imgs)…`);
+    const r = await dimVisionForModel(model, spec, images);
+    results.push(r);
+    console.error(`[intel] VISIÓN ${model}: score ${r.score} (acierto ${pct(r.acierto_rate)}, honestidad ${pct(r.honestidad_rate)}). Descargando…`);
+    await unloadModel(model);
+  }
+  const diagCount = images.filter((i) => i.type === 'diagnostico').length;
+  return {
+    weight_acierto: 0.6, weight_honestidad: 0.4, images: images.length,
+    diag_count: diagCount, hon_count: images.length - diagCount, models: results,
+  };
+}
+
+function printVisionReport(vision) {
+  const L = console.log;
+  L('\n' + '='.repeat(86));
+  L('  BENCH VISUAL PROFUNDO — ¿e4b puede reemplazar a qwen3-vl como brazo visual?');
+  L('='.repeat(86));
+  L(`  ${vision.images} imágenes (${vision.diag_count} plagas etiquetadas + ${vision.hon_count} sanas de control)`);
+  L(`  IDENTIFICACIÓN = tarea real (campesino fotografía su planta) · HONESTIDAD = anti-alucinación en sanas · LATENCIA = trade-off del swap`);
+  L('-'.repeat(86));
+  L(`  ${'MODELO'.padEnd(20)} ${'IDENTIFIC.'.padStart(12)} ${'HONESTIDAD'.padStart(12)} ${'LAT s/img'.padStart(10)} ${'VACÍAS'.padStart(7)} ${'VISIÓN'.padStart(7)}`);
+  const ranked = [...vision.models].sort((a, b) => b.acierto_rate - a.acierto_rate || b.score - a.score);
+  for (const m of ranked) {
+    L(`  ${m.model.padEnd(20)} ${(`${m.diag_ok}/${m.diag_total} ${pct(m.acierto_rate)}`).padStart(12)} ${(`${m.hon_ok}/${m.hon_total} ${pct(m.honestidad_rate)}`).padStart(12)} ${(`${m.latency_avg_s}`).padStart(10)} ${String(m.empty_count).padStart(7)} ${String(m.score).padStart(7)}`);
+  }
+  L('='.repeat(86) + '\n');
 }
 
 // ── Índice global ────────────────────────────────────────────────────────────
@@ -465,12 +637,14 @@ async function precomputeEvidence(retrieve, keys) {
 // ── Reporte ──────────────────────────────────────────────────────────────────
 function printSharedDims(recall, relaciones) {
   const L = console.log;
-  L(`  [1] RECALL       ${String(recall.score).padStart(5)} / 100   (peso ${INDEX_WEIGHTS.recall})   [independiente del modelo de chat]`);
-  for (const [, s] of Object.entries(recall.sets)) {
+  L(`  [1] RECALL       ${String(recall.score).padStart(5)} / 100   (peso ${INDEX_WEIGHTS.recall})   [independiente del modelo de chat]${recall.fixed ? ' — CONSTANTE (línea base)' : ''}`);
+  for (const [, s] of Object.entries(recall.sets || {})) {
     if (s.error) { L(`        ${s.label}: ${s.error}`); continue; }
     L(`        ${s.label.padEnd(26)} n=${String(s.n).padStart(3)} r@1=${pct(s.recall1)} r@5=${pct(s.recall5)} mrr=${s.mrr.toFixed(3)} | especies sin recuperar@5: ${s.species_zero_recall}/${s.species_distinct}`);
   }
-  if (relaciones.available) {
+  if (relaciones.fixed) {
+    L(`  [3] RELACIONES   ${String(relaciones.score).padStart(5)} / 100   (peso ${INDEX_WEIGHTS.relaciones})   [independiente del modelo de chat] — CONSTANTE (línea base)`);
+  } else if (relaciones.available) {
     L(`  [3] RELACIONES   ${String(relaciones.score).padStart(5)} / 100   (peso ${INDEX_WEIGHTS.relaciones})   [independiente del modelo de chat]`);
     L(`        grafo acierta: ${pct(relaciones.graph_hit_rate)}  vs  vector solo: ${pct(relaciones.vector_hit_rate)}  | VENTAJA DEL GRAFO: ${pct(relaciones.graph_advantage)}`);
   } else {
@@ -481,7 +655,7 @@ function printModelBlock(m) {
   const L = console.log;
   const g = m.grounding, t = m.taxonomia;
   L(`  ── modelo: ${m.model} ──  ÍNDICE ${m.index.index}${m.index.partial ? ' (parcial)' : ''} / 100`);
-  L(`     [2] GROUNDING ${String(g.score).padStart(5)}/100  abstención OOC ${pct(g.abstain_rate_ooc)} (alucina ${pct(g.hallucination_rate_ooc)}, n=${g.ooc_total}) · responde control ${pct(g.answer_rate_control)} (sobre-abstiene ${pct(g.over_refusal_rate_control)}, n=${g.control_total})`);
+  L(`     [2] GROUNDING ${String(g.score).padStart(5)}/100  abstención OOC ${pct(g.abstain_rate_ooc)} (alucina ${pct(g.hallucination_rate_ooc)}, n=${g.ooc_total}) · responde control ${pct(g.answer_rate_control)} (sobre-abstiene ${pct(g.over_refusal_rate_control)}, n=${g.control_total})${g.empty_count ? ` · VACÍAS: ${g.empty_count}` : ''}`);
   L(`     [4] TAXONOMÍA ${String(t.score).padStart(5)}/100  ${t.correct}/${t.n} correctas`);
 }
 function printReport(result) {
@@ -513,8 +687,22 @@ async function main() {
   const date = new Date().toISOString().slice(0, 10);
   console.error(`[intel] arrancando — ollama=${OLLAMA_URL} mcp=${MCP_BASE_URL} modelos=${CHAT_MODELS.join(',')}`);
 
-  const mcpOk = MCP_TOKEN ? await mcpHealthy() : false;
-  if (!MCP_TOKEN) console.error('[intel] CHAGRA_MCP_TOKEN ausente → dimensión RELACIONES será N/A.');
+  // ── Suite de VISIÓN sola (--vision-only): no toca el retriever ni el corpus ──
+  if (VISION_ONLY) {
+    console.error(`[intel] modo VISIÓN-ONLY — modelos: ${VISION_MODELS.join(', ')}`);
+    const vision = await dimVision(VISION_MODELS);
+    printVisionReport(vision);
+    if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });
+    const vp = join(OUT_DIR, `test-inteligencia-vision-${date}.json`);
+    writeFileSync(vp, JSON.stringify({ date, vision, config: { vision_models: VISION_MODELS, ollama_url_env: !!process.env.OLLAMA_URL } }, null, 2));
+    console.error(`[intel] escrito: ${vp}`);
+    return;
+  }
+
+  const fixedShared = FIXED_RECALL != null && FIXED_RELACIONES != null;
+  const mcpOk = fixedShared ? false : (MCP_TOKEN ? await mcpHealthy() : false);
+  if (fixedShared) console.error(`[intel] modo dims-fijas: RECALL=${FIXED_RECALL} RELACIONES=${FIXED_RELACIONES} (no se re-corre retrieval/grafo).`);
+  else if (!MCP_TOKEN) console.error('[intel] CHAGRA_MCP_TOKEN ausente → dimensión RELACIONES será N/A.');
   else if (!mcpOk) console.error('[intel] MCP /healthz no responde ok → dimensión RELACIONES será N/A.');
 
   // Retriever de producción con corpus COMPLETO (loader + fetch shim).
@@ -529,10 +717,16 @@ async function main() {
   console.error(`[intel] corpus indexado: ${stats ? JSON.stringify(stats) : 'n/d'} | slugs embeddings: ${corpusSlugs.size}`);
 
   // ── Dimensiones INDEPENDIENTES del modelo de chat (retrieval + grafo) ──
-  console.error('[intel] dim 1 RECALL (retrieval, nomic)…');
-  const recall = await dimRecall(retrieve, corpusSlugs);
-  console.error('[intel] dim 3 RELACIONES (grafo/MCP)…');
-  const relaciones = await dimRelaciones(retrieve, mcpOk);
+  let recall, relaciones;
+  if (fixedShared) {
+    recall = { score: FIXED_RECALL, fixed: true, sets: {} };
+    relaciones = { score: FIXED_RELACIONES, available: true, fixed: true };
+  } else {
+    console.error('[intel] dim 1 RECALL (retrieval, nomic)…');
+    recall = await dimRecall(retrieve, corpusSlugs);
+    console.error('[intel] dim 3 RELACIONES (grafo/MCP)…');
+    relaciones = await dimRelaciones(retrieve, mcpOk);
+  }
 
   // ── Evidencia RAG para las dimensiones LLM: se pre-calcula una sola vez ──
   const gq = groundingQueries();
@@ -593,6 +787,14 @@ async function main() {
       process.exit(1);
     }
     console.error('[intel] OK — sin regresión.');
+  }
+
+  // ── Suite de visión, además de las dims de texto (--vision) ──
+  if (RUN_VISION) {
+    const vision = await dimVision(VISION_MODELS);
+    printVisionReport(vision);
+    result.vision = vision;
+    writeFileSync(outPath, JSON.stringify(result, null, 2));
   }
 }
 
