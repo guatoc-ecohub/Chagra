@@ -553,17 +553,19 @@ export function geomYarumo({ q = 1 } = {}, seed = 2) {
     puntas.push([base[0] + dir[0] * largo, base[1] + dir[1] * largo, base[2] + dir[2] * largo]);
   }
 
-  // Hojas palmeadas: discos aplanados de 7 lóbulos, envés blanco, colgando.
-  const porPunta = Math.max(2, Math.round(3 * q));
+  // Hojas palmeadas: discos aplanados de 7 lóbulos, envés blanco, formando una
+  // SOMBRILLA ancha y CHATA sostenida en lo alto del fuste pálido desnudo — la
+  // firma inconfundible del yarumo (Cecropia) que remata el estrato emergente.
+  const porPunta = Math.max(3, Math.round(4 * q));
   for (const p of puntas) {
     for (let i = 0; i < porPunta; i++) {
       const ang = (i / porPunta) * Math.PI * 2 + r();
-      const rad = 0.18 + r() * 0.12;
-      const hoja = new THREE.ConeGeometry(0.42, 0.09, 7, 1); // 7-gono chato = "mano"
+      const rad = 0.22 + r() * 0.18; // se abre más ancha = parasol
+      const hoja = new THREE.ConeGeometry(0.52, 0.08, 7, 1); // 7-gono chato = "mano"
       apuntar(
         hoja,
-        [p[0] + Math.cos(ang) * rad, p[1] - 0.05 - r() * 0.08, p[2] + Math.sin(ang) * rad],
-        [Math.cos(ang) * 0.4, 0.9, Math.sin(ang) * 0.4],
+        [p[0] + Math.cos(ang) * rad, p[1] - 0.02 - r() * 0.05, p[2] + Math.sin(ang) * rad],
+        [Math.cos(ang) * 0.55, 0.78, Math.sin(ang) * 0.55], // más horizontal = plato
         [1, 0.5, 1],
       );
       partes.push(pintar(hoja, variar(PAL.yarumoEnves, r, 0.05)));
@@ -605,20 +607,23 @@ export function geomRoble({ q = 1 } = {}, seed = 3) {
     partes.push(pintar(rama, PAL.robleTronco));
   }
 
-  // Copa ANCHA: domo central + corona de lóbulos alrededor (masa de hojas).
-  const lobs = [{ c: [top.x, top.y + 0.55, top.z], radio: 0.9 }];
-  const nL = Math.max(3, Math.round(5 * q));
+  // Copa ANCHA y EXTENDIDA: la más ancha del dosel. Domo central APLANADO +
+  // corona de lóbulos que se ABREN horizontal → sombrilla frondosa de roble
+  // (hojas agrupadas hacia los extremos de las ramas, DR). Ancha y baja de
+  // perfil: contrasta con la pirámide invertida del encenillo y la aguja del aliso.
+  const lobs = [{ c: [top.x, top.y + 0.46, top.z], radio: 1.04 }];
+  const nL = Math.max(4, Math.round(6 * q));
   for (let i = 0; i < nL; i++) {
-    const ang = (i / nL) * Math.PI * 2 + r() * 0.6;
-    const rad = 0.6 + r() * 0.5;
+    const ang = (i / nL) * Math.PI * 2 + r() * 0.5;
+    const rad = 0.95 + r() * 0.62; // se ABRE ancho (antes 0.6–1.1)
     lobs.push({
-      c: [Math.cos(ang) * rad, H + 0.1 + r() * 0.7, Math.sin(ang) * rad],
-      radio: 0.55 + r() * 0.32,
+      c: [top.x + Math.cos(ang) * rad, H + 0.12 + r() * 0.48, top.z + Math.sin(ang) * rad],
+      radio: 0.6 + r() * 0.34,
     });
   }
   copaMasa(lobs, {
     base: PAL.robleHoja, sol: PAL.robleHoja2, luz: PAL.robleLuz,
-    q, seed: seed + 7, achatado: 0.82, huecos: 0.44, mordida: 0.4, ao: 0.66, manchas: 0.15,
+    q, seed: seed + 7, achatado: 0.86, huecos: 0.44, mordida: 0.4, ao: 0.66, manchas: 0.15,
   }).forEach((cc) => partes.push(cc));
 
   // Bellotas (unas pocas, cuelgan del borde de la copa).
@@ -645,9 +650,11 @@ export function geomRoble({ q = 1 } = {}, seed = 3) {
 /* -------------------------------------------------------------------------- */
 
 /*
- * Copa oscura, compacta e irregular —masa de hojas sombría— sobre tronco rojizo
- * algo torcido, con barbas de musgo colgando (vive envuelto en niebla). Más
- * estrecho y sombrío que el roble.
+ * LA FIRMA DEL ENCENILLO (DR primario): copa en PIRÁMIDE INVERTIDA / triángulo
+ * invertido, con el follaje concentrado en UNA sola capa superior ANCHA que se
+ * estrecha hacia el tronco rojizo torcido. Barbas de musgo colgando del borde
+ * (vive envuelto en niebla). Esa silueta de "paraguas triangular al revés" es
+ * lo que lo distingue del domo redondo del roble a treinta metros.
  */
 export function geomEncenillo({ q = 1 } = {}, seed = 4) {
   const r = rng(seed);
@@ -662,27 +669,45 @@ export function geomEncenillo({ q = 1 } = {}, seed = 4) {
   partes.push(geo);
   const top = curva.getPointAt(1);
 
-  // Copa estrecha y alta: lóbulos apilados que suben poco a poco.
-  const lobs = [{ c: [top.x, top.y + 0.45, top.z], radio: 0.62 }];
-  const nL = Math.max(3, Math.round(5 * q));
-  for (let i = 0; i < nL; i++) {
-    const f = i / nL;
-    const ang = r() * Math.PI * 2;
-    const rad = 0.15 + r() * 0.42;
-    lobs.push({
-      c: [Math.cos(ang) * rad, H + 0.1 + f * 0.9 + r() * 0.3, Math.sin(ang) * rad],
-      radio: 0.4 + r() * 0.28,
-    });
+  // PIRÁMIDE INVERTIDA: anillos de lóbulos cuyo radio CRECE con la altura →
+  // el vértice del triángulo abajo (pegado al fuste) y la boca ancha arriba.
+  // La masa se concentra en la banda superior (más lóbulos y más grandes),
+  // como manda el DR: "follaje concentrado en una sola capa superior".
+  const cyBase = top.y + 0.02; // donde la copa toca el fuste (vértice angosto)
+  const alturaCopa = 1.4;
+  const lobs = [
+    // El vértice del triángulo invertido: un núcleo ESTRECHO al pie de la copa.
+    { c: [top.x, cyBase + 0.05, top.z], radio: 0.26 },
+  ];
+  const niveles = Math.max(3, Math.round(4 * q));
+  for (let k = 1; k <= niveles; k++) {
+    const f = k / niveles; // 0 abajo (angosto) → 1 arriba (ancho)
+    const y = cyBase + f * alturaCopa;
+    const anilloR = 0.1 + f * f * 1.05; // se ABRE fuerte hacia arriba (embudo)
+    // La masa se concentra ARRIBA (boca ancha del embudo): pocos lóbulos abajo,
+    // muchos en la corona → "follaje en una sola capa superior" (DR).
+    const porNivel = f < 0.34 ? 1 : Math.max(2, Math.round((1 + f * 4) * q));
+    for (let i = 0; i < porNivel; i++) {
+      const ang = (i / porNivel) * Math.PI * 2 + r() * 1.2;
+      const rad = anilloR * (0.72 + r() * 0.46);
+      lobs.push({
+        c: [top.x + Math.cos(ang) * rad, y + (r() - 0.5) * 0.12, top.z + Math.sin(ang) * rad],
+        radio: (0.28 + f * 0.32) + r() * 0.12, // lóbulos más grandes en la corona
+      });
+    }
   }
   copaMasa(lobs, {
     base: PAL.encenilloHoja, sol: PAL.encenilloHoja2, luz: PAL.encenilloLuz,
     q, seed: seed + 7, achatado: 0.78, huecos: 0.4, mordida: 0.34, ao: 0.68, manchas: 0.16,
   }).forEach((cc) => partes.push(cc));
 
-  // Barbas de musgo/usnea colgando del borde de la copa (el velo de la niebla).
+  // Barbas de musgo/usnea colgando del BORDE ANCHO de arriba (los últimos
+  // lóbulos = la boca de la pirámide invertida) → el velo de la niebla cuelga
+  // de la capa superior, no del vértice angosto pegado al fuste.
   const nBarbas = Math.max(2, Math.round(5 * q));
+  const desdeArriba = Math.max(1, Math.floor(lobs.length * 0.45));
   for (let i = 0; i < nBarbas; i++) {
-    const lb = lobs[i % lobs.length];
+    const lb = lobs[lobs.length - 1 - (i % desdeArriba)];
     const ang = r() * Math.PI * 2;
     const largo = 0.28 + r() * 0.3;
     const barba = new THREE.ConeGeometry(0.04, largo, 4, 1);
@@ -719,16 +744,18 @@ export function geomAliso({ q = 1 } = {}, seed = 5) {
   partes.push(geo);
   const top = curva.getPointAt(1);
 
-  // Copa cónica: lóbulos que se estrechan y sesgan hacia arriba desde el fuste.
+  // Copa CÓNICA-AGUJA: columna de lóbulos apilados que se ADELGAZAN hasta una
+  // PUNTA fina — el aliso es el emergente esbelto que pincha el dosel (silueta
+  // opuesta a la sombrilla chata del yarumo). Estrecha, alta y puntiaguda.
   const lobs = [];
-  const nL = Math.max(4, Math.round(6 * q));
+  const nL = Math.max(5, Math.round(7 * q));
   for (let i = 0; i < nL; i++) {
-    const f = i / (nL - 1); // 0 abajo → 1 punta
+    const f = i / (nL - 1); // 0 base → 1 punta
     const ang = r() * Math.PI * 2;
-    const rad = (0.62 - f * 0.5) * (0.4 + r() * 0.7);
+    const rad = (0.5 - f * 0.46) * (0.4 + r() * 0.6); // casi 0 en la punta
     lobs.push({
-      c: [top.x + Math.cos(ang) * rad, H - 1.0 + f * 2.1 + r() * 0.15, top.z + Math.sin(ang) * rad],
-      radio: (0.52 - f * 0.24) + r() * 0.12,
+      c: [top.x + Math.cos(ang) * rad, H - 0.85 + f * 2.2 + r() * 0.12, top.z + Math.sin(ang) * rad],
+      radio: (0.46 - f * 0.34) + r() * 0.08, // se afina hacia la aguja
     });
   }
   copaMasa(lobs, {
@@ -792,19 +819,21 @@ export function geomMortino({ q = 1 } = {}, seed = 7) {
   const r = rng(seed);
   const partes = [];
 
+  // Arbusto BAJO y EXTENDIDO del piso del monte: cojín ancho que abraza el suelo
+  // (más ancho que alto) → lee sotobosque, no arbolito, bajo el dosel.
   const lobs = [];
   const nBlobs = Math.max(3, Math.round(5 * q));
   for (let i = 0; i < nBlobs; i++) {
     const ang = r() * Math.PI * 2;
-    const rad = r() * 0.3;
+    const rad = r() * 0.42; // se extiende ancho por el piso
     lobs.push({
-      c: [Math.cos(ang) * rad, 0.2 + r() * 0.42, Math.sin(ang) * rad],
-      radio: 0.2 + r() * 0.16,
+      c: [Math.cos(ang) * rad, 0.13 + r() * 0.3, Math.sin(ang) * rad], // más bajo
+      radio: 0.2 + r() * 0.17,
     });
   }
   copaMasa(lobs, {
     base: PAL.mortinoHoja, sol: PAL.mortinoHoja2, luz: '#9ab06a',
-    q, seed: seed + 5, achatado: 0.8, huecos: 0.34, mordida: 0.32, ao: 0.58, manchas: 0.18, densidad: 8,
+    q, seed: seed + 5, achatado: 0.84, huecos: 0.34, mordida: 0.32, ao: 0.58, manchas: 0.18, densidad: 8,
   }).forEach((cc) => partes.push(cc));
 
   // Brotes rojizos nuevos (puntas tiernas).
@@ -844,16 +873,19 @@ export function geomRomerillo({ q = 1 } = {}, seed = 8) {
   const r = rng(seed);
   const partes = [];
 
+  // Cojín BAJO de ramitas que se ARQUEAN hacia afuera (mata de páramo que se
+  // abre en abanico), no aguja vertical: silueta de matorral raso del piso.
   const nRamitas = Math.max(6, Math.round(14 * q));
   for (let i = 0; i < nRamitas; i++) {
     const ang = r() * Math.PI * 2;
-    const rad = r() * 0.28;
-    const largo = 0.28 + r() * 0.32;
+    const rad = r() * 0.34; // más extendido por el suelo
+    const largo = 0.22 + r() * 0.26; // ramitas más cortas (cojín)
     const ramita = new THREE.ConeGeometry(0.05, largo, 4, 1);
     apuntar(
       ramita,
-      [Math.cos(ang) * rad, largo * 0.4, Math.sin(ang) * rad],
-      [Math.cos(ang) * 0.35 + (r() - 0.5) * 0.3, 1, Math.sin(ang) * 0.35 + (r() - 0.5) * 0.3],
+      [Math.cos(ang) * rad, 0.16 + largo * 0.26, Math.sin(ang) * rad],
+      // ARQUEA hacia afuera (0.75 lateral vs 0.85 vertical) → abanico bajo
+      [Math.cos(ang) * 0.75 + (r() - 0.5) * 0.3, 0.85, Math.sin(ang) * 0.75 + (r() - 0.5) * 0.3],
     );
     partes.push(pintar(ramita, variar(r() > 0.5 ? PAL.romerilloHoja : PAL.romerilloHoja2, r, 0.1)));
   }
@@ -863,7 +895,7 @@ export function geomRomerillo({ q = 1 } = {}, seed = 8) {
       const ang = r() * Math.PI * 2;
       const rad = r() * 0.26;
       const flor = new THREE.IcosahedronGeometry(0.035, 0);
-      poner(flor, [Math.cos(ang) * rad, 0.35 + r() * 0.3, Math.sin(ang) * rad]);
+      poner(flor, [Math.cos(ang) * rad, 0.24 + r() * 0.2, Math.sin(ang) * rad]);
       partes.push(pintar(flor, PAL.romerilloFlor));
     }
   }

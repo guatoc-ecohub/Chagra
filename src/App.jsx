@@ -259,6 +259,10 @@ const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 // 3D: el PÁRAMO altoandino — el ecosistema de la niebla (frailejones, musgo,
 // quenuas, aves) y el NACIMIENTO del agua. Didáctico: la fábrica de agua.
 const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
+// 3D: el BOSQUE nativo altoandino por ESTRATOS — los doce arquetipos de forma
+// de crecimiento con los que se representa el catálogo de flora sin modelar las
+// 581 especies una por una.
+const BosqueTresEstratos3DMockup = lazy(() => import('./mockups/BosqueTresEstratos3D'));
 const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
 const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
 const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
@@ -719,6 +723,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
   'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
+  'mockups/bosque-tres-estratos': 'mockup_bosque_tres_estratos',
   'mockups/camara-director': 'mockup_camara_director',
   'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
   'mockups/artesania-andina': 'mockup_artesania_andina',
@@ -2449,6 +2454,20 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El páramo altoandino">
               <MundoParamo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_bosque_tres_estratos':
+        // El bosque nativo altoandino por ESTRATOS: dosel (palma de cera,
+        // encenillo, cedro, nogal), sotobosque (mano de oso, helecho arbóreo,
+        // chusque, arbusto florecido, bejuco con bromelias) y suelo (helechos,
+        // hierba de sombra, cojines de musgo y hojarasca). Doce arquetipos de
+        // forma de crecimiento con los que se representa el catálogo de 581
+        // especies. Ruta #/mockups/bosque-tres-estratos, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El bosque nativo y sus tres estratos">
+              <BosqueTresEstratos3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
