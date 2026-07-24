@@ -33,6 +33,17 @@ codifican la filosofía del operador: **grounding manda** ("fuerte en lo que sab
 | 3 | **RELACIONES** (grafo) | 0.20 | ¿Responde queries relacionales que solo el grafo AGE resuelve ("con qué se asocia el maíz")? | No |
 | 4 | **TAXONOMÍA** | 0.15 | ¿Da el nombre científico CORRECTO (incluye los errores históricos: papa criolla = *Solanum phureja*, NO *tuberosum*)? | Sí |
 
+> **REGLA DEL JUEZ (blinda la validez de TODAS las tablas):** ningún modelo LOCAL juzga —
+> evita circularidad (un modelo juzgándose a sí mismo o a sus pares) y la falta de finura de
+> los jueces LLM chicos. El scoring es:
+> - **Texto (v1/v2), visión, contaminación, robustez, taxonomía:** **determinístico** —
+>   matching léxico + reglas (recall por prefijo especie↔variedad, regex de abstención/rechazo,
+>   género+epíteto, tokens de plaga). Sin juez LLM. `nomic-embed-text` es solo *retriever*, NO juez.
+> - **Auditoría dura por-perfil (§12):** juez **`claude-code` (Sonnet)** — externo, no-local.
+>
+> (Para el próximo ciclo el juez por defecto será `codex` o `gemini-flash` — crédito propio,
+> no toca la GPU de prod. No se cambió el método a mitad de esta corrida.)
+
 `ÍNDICE = Σ(peso_i · puntaje_i) / Σ(pesos disponibles)`. Si una dimensión no corre
 (p. ej. MCP inalcanzable), se excluye y se renormaliza (el índice se marca *parcial*).
 
