@@ -302,10 +302,10 @@ export function parseJudgeVerdict(raw) {
  * @param {{ ollamaCall: (prompt:string)=>Promise<string> }} opts
  * @returns {Promise<{cumple:boolean, score:number, source:'judge'|'keywords'}>}
  */
-export async function scoreWithJudge(item, { ollamaCall } = {}) {
+export async function scoreWithJudge(item, { ollamaCall } = /** @type {any} */ ({})) {
   const kwFlex = scoreKeywordsFlexible(item.response, item.expectedKeywords);
   const kwScore = kwFlex.total > 0 ? kwFlex.matched / kwFlex.total : 0;
-  const fallback = { cumple: kwScore >= 0.5, score: kwScore, source: 'keywords' };
+  const fallback = { cumple: kwScore >= 0.5, score: kwScore, source: /** @type {'keywords'|'judge'} */ ('keywords') };
 
   if (typeof ollamaCall !== 'function') return fallback;
 
@@ -314,7 +314,7 @@ export async function scoreWithJudge(item, { ollamaCall } = {}) {
     const raw = await ollamaCall(prompt);
     const verdict = parseJudgeVerdict(raw);
     if (!verdict) return fallback;
-    return { cumple: verdict.cumple, score: verdict.score, source: 'judge' };
+    return { cumple: verdict.cumple, score: verdict.score, source: /** @type {'keywords'|'judge'} */ ('judge') };
   } catch (_) {
     return fallback;
   }
@@ -430,13 +430,13 @@ export function parseAHVerdict(raw) {
  * @param {{ ollamaCall: (prompt:string)=>Promise<string> }} opts
  * @returns {Promise<{pass:boolean|null, mustCovered:number|null, mustTotal:number|null, redFlagsHit:number|null, source:'judge'|'unjudged'}>}
  */
-export async function scoreAntiHalluc(item, { ollamaCall } = {}) {
+export async function scoreAntiHalluc(item, { ollamaCall } = /** @type {any} */ ({})) {
   const unjudged = {
     pass: null,
     mustCovered: null,
     mustTotal: Array.isArray(item.mustInclude) ? item.mustInclude.length : null,
     redFlagsHit: null,
-    source: 'unjudged',
+    source: /** @type {'judge'|'unjudged'} */ ('unjudged'),
   };
   if (typeof ollamaCall !== 'function') return unjudged;
   if (typeof item.response !== 'string' || item.response.trim().length === 0) {
@@ -447,7 +447,7 @@ export async function scoreAntiHalluc(item, { ollamaCall } = {}) {
     const raw = await ollamaCall(prompt);
     const verdict = parseAHVerdict(raw);
     if (!verdict) return unjudged;
-    return { ...verdict, source: 'judge' };
+    return { ...verdict, source: /** @type {'judge'|'unjudged'} */ ('judge') };
   } catch (_) {
     return unjudged;
   }
@@ -532,7 +532,7 @@ export function makeAnthropicJudgeCall({
   maxTokens = 256,
   apiUrl = 'https://api.anthropic.com/v1/messages',
   anthropicVersion = '2023-06-01',
-} = {}) {
+} = /** @type {any} */ ({})) {
   if (!apiKey || typeof apiKey !== 'string') {
     throw new Error('makeAnthropicJudgeCall: falta apiKey (no se loguea su valor).');
   }
@@ -629,7 +629,7 @@ export function resolveMustThreshold({ threshold, env = process.env } = {}) {
  * @param {{ threshold?: number, env?: Record<string,string|undefined> }} [opts]
  * @returns {{pass:boolean, mustCovered:number, mustTotal:number, coverage:number, threshold:number, redFlagsHit:number, source:'deterministic'}}
  */
-export function scoreAntiHallucDeterministic(item = {}, opts = {}) {
+export function scoreAntiHallucDeterministic(item = /** @type {any} */ ({}), opts = {}) {
   const must = Array.isArray(item.mustInclude) ? item.mustInclude : [];
   const red = Array.isArray(item.redFlags) ? item.redFlags : [];
   const response = typeof item.response === 'string' ? item.response : '';
@@ -830,11 +830,16 @@ export function parseBatchAHVerdicts(raw) {
  * @param {{ timeoutMs?: number }} [opts]
  * @returns {Promise<string>}
  */
-export async function spawnClaudeCode(prompt, { timeoutMs = 300_000 } = {}) {
+export async function spawnClaudeCode(prompt, { timeoutMs = 300_000, model } = {}) {
   const { execFile } = await import('node:child_process');
   const { promisify } = await import('node:util');
   const execFileAsync = promisify(execFile);
-  const { stdout } = await execFileAsync('claude-code', ['-p', prompt], {
+  // El juez SIEMPRE lleva --model explícito. Sin el flag, claude-code usa el default
+  // de la sesión (Opus): más lento y, peor, NO reproducible — el score dependería de
+  // en qué máquina/sesión se corrió el bench. `RECOMMENDED_ANTHROPIC_JUDGE_MODEL` ya
+  // declaraba sonnet como juez canónico desde 2026-05-31 y nunca se cableó aquí.
+  const judgeModel = model || process.env.JUDGE_MODEL || 'sonnet';
+  const { stdout } = await execFileAsync('claude-code', ['-p', '--model', judgeModel, prompt], {
     timeout: timeoutMs,
     maxBuffer: 1024 * 1024 * 4, // 4MB — suficiente para un batch de 10 veredictos
     encoding: 'utf-8',
@@ -866,7 +871,7 @@ export async function spawnClaudeCode(prompt, { timeoutMs = 300_000 } = {}) {
 export function makeClaudeCliJudgeCall({ spawnImpl, timeoutMs = 300_000 } = {}) {
   const doSpawn = typeof spawnImpl === 'function'
     ? spawnImpl
-    : (prompt) => spawnClaudeCode(prompt, { timeoutMs });
+    : (prompt) => spawnClaudeCode(prompt, { timeoutMs, model: process.env.JUDGE_MODEL || "sonnet" });
 
   return async function claudeCliJudgeCall(items) {
     const arr = Array.isArray(items) ? items : [];
@@ -876,7 +881,7 @@ export function makeClaudeCliJudgeCall({ spawnImpl, timeoutMs = 300_000 } = {}) 
       mustCovered: null,
       mustTotal: Array.isArray(item.mustInclude) ? item.mustInclude.length : null,
       redFlagsHit: null,
-      source: 'unjudged',
+      source: /** @type {'judge'|'unjudged'} */ ('unjudged'),
     }));
 
     if (arr.length === 0) return [];
@@ -903,7 +908,7 @@ export function makeClaudeCliJudgeCall({ spawnImpl, timeoutMs = 300_000 } = {}) 
           mustCovered: null,
           mustTotal: Array.isArray(item.mustInclude) ? item.mustInclude.length : null,
           redFlagsHit: null,
-          source: 'unjudged',
+          source: /** @type {'judge'|'unjudged'} */ ('unjudged'),
         };
       }
       return {
@@ -912,7 +917,7 @@ export function makeClaudeCliJudgeCall({ spawnImpl, timeoutMs = 300_000 } = {}) 
         mustCovered: v.mustCovered,
         mustTotal: v.mustTotal,
         redFlagsHit: v.redFlagsHit,
-        source: 'judge',
+        source: /** @type {'judge'|'unjudged'} */ ('judge'),
       };
     });
   };
@@ -931,7 +936,7 @@ export function makeClaudeCliJudgeCall({ spawnImpl, timeoutMs = 300_000 } = {}) 
  * @param {{ judgeCall?: Function }} opts
  * @returns {Promise<Array<{id:string,pass:boolean|null,mustCovered:number|null,mustTotal:number|null,redFlagsHit:number|null,source:'judge'|'unjudged'}>>}
  */
-export async function scoreAntiHallucBatch(items, { judgeCall } = {}) {
+export async function scoreAntiHallucBatch(items, { judgeCall } = /** @type {any} */ ({})) {
   const arr = Array.isArray(items) ? items : [];
   const unjudgedAll = arr.map((item) => ({
     id: item.id,
@@ -939,7 +944,7 @@ export async function scoreAntiHallucBatch(items, { judgeCall } = {}) {
     mustCovered: null,
     mustTotal: Array.isArray(item.mustInclude) ? item.mustInclude.length : null,
     redFlagsHit: null,
-    source: 'unjudged',
+    source: /** @type {'judge'|'unjudged'} */ ('unjudged'),
   }));
 
   if (typeof judgeCall !== 'function') return unjudgedAll;
@@ -1095,7 +1100,7 @@ export function parseContaminationVerdicts(raw) {
 export function makeContaminationJudgeCall({ spawnImpl, timeoutMs = 300_000 } = {}) {
   const doSpawn = typeof spawnImpl === 'function'
     ? spawnImpl
-    : (prompt) => spawnClaudeCode(prompt, { timeoutMs });
+    : (prompt) => spawnClaudeCode(prompt, { timeoutMs, model: process.env.JUDGE_MODEL || "sonnet" });
 
   return async function contaminationJudgeCall(items) {
     const arr = Array.isArray(items) ? items : [];
