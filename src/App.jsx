@@ -290,6 +290,7 @@ const ParamoHumboldt3DMockup = lazy(() => import('./mockups/ParamoHumboldt3D'));
 const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
 const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
 const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
+const ShowcaseArtesaniaMockup = lazy(() => import('./visual/mundo3d/ArtesaniaAndina'));
 const EfectosFuncionalesDemoMockup = lazy(() => import('./mockups/EfectosFuncionalesDemo'));
 const CatalogoInfraDemoMockup = lazy(() => import('./mockups/CatalogoInfraDemo'));
 const MundoAbejas3DMockup = lazy(() => import('./mockups/MundoAbejas3D'));
@@ -760,6 +761,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/camara-director': 'mockup_camara_director',
   'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
   'mockups/artesania-andina': 'mockup_artesania_andina',
+  'mockups/showcase-artesania': 'mockup_showcase_artesania',
   'mockups/efectos-funcionales': 'mockup_efectos_funcionales',
   'mockups/catalogo-infra': 'mockup_catalogo_infra',
   'mockups/mundo-abejas-3d': 'mockup_mundo_abejas_3d',
@@ -2397,6 +2399,14 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Artesanía andina">
               <ArtesaniaAndinaDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_showcase_artesania':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Muestrario de artesanía andina">
+              <ShowcaseArtesaniaMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
