@@ -325,6 +325,10 @@ const JaguarMonte3DMockup = lazy(() => import('./mockups/JaguarMonte3D'));
 // uchuva, gulupa y curuba — las siete del clima frío, cada una con su porte y
 // su tutorado. Ruta #/mockups/frutales-andinos-3d, sin auth.
 const FrutalesAndinos3DMockup = lazy(() => import('./mockups/FrutalesAndinos3D'));
+// Vitrinas que ya tenían una escena completa, pero no una entrada pública.
+const CanaTrapiche3DMockup = lazy(() => import('./mockups/CanaTrapiche3D'));
+const CondorCielo3DMockup = lazy(() => import('./mockups/CondorCielo3D'));
+const NavegadorGrafoDemoMockup = lazy(() => import('./mockups/NavegadorGrafoDemo'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -775,6 +779,9 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/hoja-prueba-valle': 'mockup_hoja_prueba_valle',
   'mockups/jaguar-monte-3d': 'mockup_jaguar_monte_3d',
   'mockups/frutales-andinos-3d': 'mockup_frutales_andinos_3d',
+  'mockups/cana-trapiche-3d': 'mockup_cana_trapiche_3d',
+  'mockups/condor-cielo-3d': 'mockup_condor_cielo_3d',
+  'mockups/navegador-grafo': 'mockup_navegador_grafo',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2590,6 +2597,30 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El vergel de frutales andinos">
               <FrutalesAndinos3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_cana_trapiche_3d':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La caña y el trapiche">
+              <CanaTrapiche3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_condor_cielo_3d':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El cóndor del páramo">
+              <CondorCielo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_navegador_grafo':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El grafo de la finca">
+              <NavegadorGrafoDemoMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
