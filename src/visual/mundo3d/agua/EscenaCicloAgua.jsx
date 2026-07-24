@@ -234,7 +234,7 @@ function Poros({ P, faseFija, reducedMotion }) {
   const lista = useMemo(() => porosSuelo(P), [P]);
   const geo = useMemo(() => new THREE.SphereGeometry(1, 6, 5), []);
   const mat = useMemo(() => new THREE.MeshBasicMaterial({ toneMapped: false }), []);
-  const tmp = useMemo(tmpMat, []);
+  const tmp = useMemo(() => tmpMat(), []);
   const col = useMemo(() => new THREE.Color(), []);
 
   const escribir = (t) => {
@@ -298,13 +298,13 @@ function FlecosQuebrada({ eje, P, faseFija, reducedMotion }) {
     () => new THREE.MeshBasicMaterial({ color: PAL.espuma, transparent: true, opacity: 0.75, depthWrite: false }),
     [],
   );
-  const tmp = useMemo(tmpMat, []);
+  const tmp = useRef(tmpMat());
 
   const escribir = (t, tMov) => {
     const mesh = ref.current;
     if (!mesh) return;
     const E = cicloAguacero(t, DUR);
-    const { m, q, s, p } = tmp;
+    const { m, q, s, p } = tmp.current;
     const caudal = 0.5 + E.caudalVivo * 0.5 + E.escorrenMuerta * 0.5;
     for (let i = 0; i < lista.length; i++) {
       const o = lista[i];
@@ -355,6 +355,7 @@ function Quebrada({ P, faseFija, reducedMotion }) {
     }),
     [],
   );
+  const matPlumaRef = useRef(matPluma);
   useLayoutEffect(() => () => {
     clara.dispose(); pluma.dispose(); matClara.dispose(); matPluma.dispose();
   }, [clara, pluma, matClara, matPluma]);
@@ -363,7 +364,7 @@ function Quebrada({ P, faseFija, reducedMotion }) {
     const E = cicloAguacero(t, DUR);
     /* sin aguacero no hay pluma: la quebrada se aclara sola en un par de días.
        Con aguacero, la ladera pelada la vuelve chocolate en minutos. */
-    matPluma.opacity = clamp01(E.erosion * 1.15) * 0.92;
+    matPlumaRef.current.opacity = clamp01(E.erosion * 1.15) * 0.92;
   };
   useLayoutEffect(() => { pintar(faseDe({ elapsedTime: 0 }, faseFija, reducedMotion)); });
   useFrame((st) => pintar(faseDe(st.clock, faseFija, reducedMotion)));
@@ -392,7 +393,7 @@ function Nacimiento({ faseFija, reducedMotion }) {
     () => new THREE.MeshLambertMaterial({ color: PAL.clara, transparent: true, opacity: 0.92 }),
     [],
   );
-  const tmp = useMemo(tmpMat, []);
+  const tmp = useMemo(() => tmpMat(), []);
   const semillas = useMemo(
     () => Array.from({ length: n }, (_, i) => ({ t0: i / n, tam: 0.5 + ((i * 37) % 10) / 14 })),
     [],
@@ -478,13 +479,14 @@ function Carcavas({ curvas, faseFija, reducedMotion }) {
     }),
     [],
   );
+  const matAguaRef = useRef(matAgua);
   useLayoutEffect(() => () => {
     geo.dispose(); abanico.dispose(); matTierra.dispose(); matAgua.dispose();
   }, [geo, abanico, matTierra, matAgua]);
 
   const pintar = (t) => {
     const E = cicloAguacero(t, DUR);
-    matAgua.opacity = clamp01(E.escorrenMuerta) * 0.85;
+    matAguaRef.current.opacity = clamp01(E.escorrenMuerta) * 0.85;
   };
   useLayoutEffect(() => { pintar(faseDe({ elapsedTime: 0 }, faseFija, reducedMotion)); });
   useFrame((st) => pintar(faseDe(st.clock, faseFija, reducedMotion)));
@@ -511,13 +513,13 @@ function FlecosSuelo({ curvas, P, faseFija, reducedMotion }) {
   const lista = useMemo(() => flecosEscorrentia(curvas, P), [curvas, P]);
   const geo = useMemo(() => new THREE.SphereGeometry(1, 5, 4), []);
   const mat = useMemo(() => new THREE.MeshLambertMaterial({ color: PAL.subsuelo }), []);
-  const tmp = useMemo(tmpMat, []);
+  const tmp = useRef(tmpMat());
 
   const escribir = (t, tMov) => {
     const mesh = ref.current;
     if (!mesh) return;
     const E = cicloAguacero(t, DUR);
-    const { m, q, s, p } = tmp;
+    const { m, q, s, p } = tmp.current;
     const vivo = clamp01(E.escorrenMuerta * 1.2);
     for (let i = 0; i < lista.length; i++) {
       const o = lista[i];
@@ -560,12 +562,13 @@ function AguaZanja({ curva, faseFija, reducedMotion }) {
     }),
     [],
   );
+  const matRef = useRef(mat);
   useLayoutEffect(() => () => { geo.dispose(); mat.dispose(); }, [geo, mat]);
   const pintar = (t) => {
     const E = cicloAguacero(t, DUR);
     /* se llena con el aguacero y se VACÍA despacio: no porque se evapore, sino
        porque se está metiendo. Una zanja que se seca rápido está trabajando. */
-    mat.opacity = clamp01(E.lluvia * 0.7 + E.cargaViva * 0.5) * 0.8;
+    matRef.current.opacity = clamp01(E.lluvia * 0.7 + E.cargaViva * 0.5) * 0.8;
   };
   useLayoutEffect(() => { pintar(faseDe({ elapsedTime: 0 }, faseFija, reducedMotion)); });
   useFrame((st) => pintar(faseDe(st.clock, faseFija, reducedMotion)));
@@ -590,7 +593,7 @@ function Lluvia({ P, faseFija, reducedMotion }) {
     }),
     [],
   );
-  const tmp = useMemo(tmpMat, []);
+  const tmp = useMemo(() => tmpMat(), []);
   const CIELO = 5.0;
 
   const escribir = (t, tMov) => {
@@ -645,7 +648,7 @@ function Vapor({ P, calina, faseFija, reducedMotion }) {
     }),
     [],
   );
-  const tmp = useMemo(tmpMat, []);
+  const tmp = useMemo(() => tmpMat(), []);
 
   const escribir = (t, tMov) => {
     const mesh = ref.current;
@@ -701,7 +704,7 @@ function NieblaParamo({ P, reducedMotion }) {
     }),
     [],
   );
-  const tmp = useMemo(tmpMat, []);
+  const tmp = useMemo(() => tmpMat(), []);
   const escribir = (tMov) => {
     const mesh = ref.current;
     if (!mesh) return;
@@ -753,7 +756,7 @@ function Condensacion({ P, lista, reducedMotion }) {
     () => new THREE.MeshLambertMaterial({ color: PAL.espuma, transparent: true, opacity: 0.9 }),
     [],
   );
-  const tmp = useMemo(tmpMat, []);
+  const tmp = useMemo(() => tmpMat(), []);
   const escribir = (tMov) => {
     const mesh = ref.current;
     if (!mesh) return;
@@ -796,7 +799,7 @@ function Goteo({ matas, reducedMotion }) {
     () => new THREE.MeshLambertMaterial({ color: PAL.clara, transparent: true, opacity: 0.92 }),
     [],
   );
-  const tmp = useMemo(tmpMat, []);
+  const tmp = useMemo(() => tmpMat(), []);
   const escribir = (tMov) => {
     const mesh = ref.current;
     if (!mesh) return;
@@ -847,7 +850,7 @@ function Aspersor({ calina, reducedMotion }) {
     () => new THREE.MeshLambertMaterial({ color: PAL.clara, transparent: true, opacity: 0.85 }),
     [],
   );
-  const tmp = useMemo(tmpMat, []);
+  const tmp = useMemo(() => tmpMat(), []);
   const escribir = (tMov) => {
     const mesh = ref.current;
     if (!mesh) return;
