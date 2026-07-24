@@ -37,5 +37,9 @@ export const ENV = {
   // (snowflake-arctic-embed2) en la M6000 de 12GB, cosa que granite3.3 no hacía:
   // con granite el embedder daba cudaMalloc OOM y el RAG semántico se apagaba en
   // silencio. Verificado en vivo: embed 200ms + agente 860-1450ms, conviviendo.
-  NLU_MODEL: import.meta.env?.VITE_NLU_MODEL || 'gemma4:e2b',
+  // 2026-07-24: gemma4:e2b → qwen3.5:4b (quirúrgico a prod). Ganador del maratón
+  // #2738: índice texto 84.7 (+14.8 vs e2b), y en el set duro v2 la ventaja crece
+  // +3→+13 (razona, no memoriza). Multimodal + tools, 3.4GB. Prueba dura end-to-end
+  // contra el stack vivo confirmó RAG 88.2 / grounding 81.2 / grafo 70 / taxonomía 92.3.
+  NLU_MODEL: import.meta.env?.VITE_NLU_MODEL || 'qwen3.5:4b',
 };
