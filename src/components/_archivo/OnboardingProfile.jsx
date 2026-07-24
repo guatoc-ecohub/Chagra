@@ -1,3 +1,8 @@
+/**
+ * Archivado en 2026-07-22 porque el flujo extendido quedo reemplazado por
+ * OnboardingCondensado. Las preguntas diferidas siguen disponibles en Perfil.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- archivo historico sin uso. */
 import React, { useMemo, useState } from 'react';
 import {
   Sprout,
@@ -14,8 +19,8 @@ import {
   saveProfile,
   markProfileDone,
   markProfileSkipped,
-} from '../services/userProfileService';
-import { PISO_TERMICO_INFO } from '../services/locationService';
+} from '../../services/userProfileService';
+import { PISO_TERMICO_INFO } from '../../services/locationService';
 
 /**
  * OnboardingProfile — flujo de onboarding extendido (#200).
@@ -141,7 +146,7 @@ export default function OnboardingProfile({
   const explorarEjemploFallback = onNavigate
     ? async () => {
       try {
-        const { seedExampleFinca } = await import('../services/demoFincaEjemplo');
+        const { seedExampleFinca } = await import('../../services/demoFincaEjemplo');
         await seedExampleFinca();
       } catch (err) {
         console.error('[OnboardingProfile] No se pudo sembrar la finca de ejemplo:', err);

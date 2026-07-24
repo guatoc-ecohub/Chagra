@@ -1,3 +1,7 @@
+/**
+ * Archivado en 2026-07-22 porque no es un onboarding de perfil.
+ * FarmOSSetupModal conserva la configuracion tecnica que contenia.
+ */
 import React, { useState } from 'react';
 import { X, ExternalLink, Server, ArrowRight, ChevronDown } from 'lucide-react';
 

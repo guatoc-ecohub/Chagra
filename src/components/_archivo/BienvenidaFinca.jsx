@@ -1,11 +1,15 @@
+/**
+ * Archivado en 2026-07-22 porque duplicaba la entrada de primer uso.
+ * OnboardingCondensado lo reemplaza e incorpora sus capacidades utiles.
+ */
 /* eslint-disable react-refresh/only-export-components -- bienvenidaYaVista/
    marcarBienvenidaVista son los helpers de gating "una sola vez" y deben
    exportarse junto al componente (mismo patrón que NotifPermissionPrompt). */
 import React, { useEffect, useRef, useState } from 'react';
 import { Mic, Camera, BadgeCheck, MapPin, ArrowRight, Volume2, Sparkles, Glasses, Share, Download, WifiOff, Save, Smartphone, Check } from 'lucide-react';
-import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
-import usePwaInstall from '../hooks/usePwaInstall';
-import { MSG } from '../config/messages.js';
+import ChagraAgentAvatarAngelita from '../ChagraAgentAvatarAngelita';
+import usePwaInstall from '../../hooks/usePwaInstall';
+import { MSG } from '../../config/messages.js';
 
 /**
  * BienvenidaFinca — la PRIMERA impresión de Chagra (primera vez, una sola vez).
@@ -134,7 +138,7 @@ export function marcarBienvenidaVista() {
 /** Lee el momento en voz alta. Import perezoso del ttsService (no pesa en el
  * bundle del dashboard) y fail-silent: sin red/voz no rompe nada. */
 function escucharTexto(texto) {
-  import('../services/ttsService')
+  import('../../services/ttsService')
     .then((m) => m.speakSentences(texto).catch(() => {}))
     .catch(() => {});
 }

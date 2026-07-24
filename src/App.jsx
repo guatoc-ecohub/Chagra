@@ -361,7 +361,6 @@ const CaprinosScreen = lazy(() => import('./components/CaprinosScreen'));
 const EstiercolScreen = lazy(() => import('./components/EstiercolScreen'));
 const CompostScreen = lazy(() => import('./components/CompostScreen'));
 const AgentScreen = lazy(() => import('./components/AgentScreen/AgentScreen'));
-const OnboardingProfile = lazy(() => import('./components/OnboardingProfile'));
 const OnboardingCondensado = lazy(() => import('./components/OnboardingCondensado'));
 const LocationDetectedScreen = lazy(() => import('./components/LocationDetectedScreen'));
 const VoiceCapture = lazy(() => import('./components/VoiceCapture'));
@@ -2641,13 +2640,12 @@ export default function App() {
           </ErrorBoundary>
         );
       case 'onboarding-perfil-clasico':
-        // #200: el onboarding extendido ORIGINAL (hasta 25 preguntas
-        // condicionales). Se conserva cableado (features no huérfanas) como
-        // camino largo/diagnóstico mientras el operador valida el condensado.
+        // Alias de compatibilidad para enlaces guardados antes de consolidar
+        // el onboarding. Ambos paths montan el unico flujo vigente.
         return (
           <ErrorBoundary>
-            <OnboardingProfile
-              onComplete={() => navigate('ubicacion-detectada', { next: 'dashboard' })}
+            <OnboardingCondensado
+              onComplete={() => navigate('dashboard')}
               onClose={() => navigate(currentViewData?.back || 'dashboard')}
               onExplorarEjemplo={async () => {
                 try {

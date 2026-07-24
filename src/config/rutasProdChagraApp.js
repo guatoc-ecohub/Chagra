@@ -443,8 +443,14 @@ export const NUCLEO_APP = [
   // ── Onboarding ──────────────────────────────────────────────────
   {
     path: 'onboarding-perfil',
-    componente: 'OnboardingProfile',
-    importLazy: 'src/components/OnboardingProfile.jsx',
+    componente: 'OnboardingCondensado',
+    importLazy: 'src/components/OnboardingCondensado.jsx',
+    categoria: '2D-app',
+  },
+  {
+    path: 'onboarding-perfil-clasico',
+    componente: 'OnboardingCondensado',
+    importLazy: 'src/components/OnboardingCondensado.jsx',
     categoria: '2D-app',
   },
 
@@ -1156,7 +1162,7 @@ export const EXCLUIDO = [
   },
   {
     path: 'mockup_primer_cultivo',
-    motivo: 'Onboarding viejo. Reemplazado por OnboardingProfile/OnboardingCondensado.',
+    motivo: 'Onboarding viejo. Reemplazado por OnboardingCondensado.',
   },
   {
     path: 'mockup_guardianes',
@@ -1211,18 +1217,11 @@ export const EXCLUIDO = [
 export const PENDIENTE_DECISION = [
   // ── Onboarding: ¿Profile o Siembra (mockup)? ──────────────────
   {
-    path: 'onboarding-perfil-clasico',
-    componente: 'OnboardingCondensado',
-    importLazy: 'src/components/OnboardingCondensado.jsx',
-    decision: null,
-    motivo: 'Variante clásica del onboarding. Decidir si convive con OnboardingProfile o se elimina.',
-  },
-  {
     path: 'mockup_onboarding_siembra',
     componente: 'OnboardingSiembra',
     importLazy: 'src/mockups/OnboardingSiembra.jsx',
     decision: null,
-    motivo: 'Onboarding como ritual de siembra (SVG animado). ¿Reemplaza o complementa OnboardingProfile?',
+    motivo: 'Onboarding como ritual de siembra (SVG animado). ¿Reemplaza o complementa OnboardingCondensado?',
   },
 
   // ── Juegos PROMOVIDOS a NUCLEO_APP (smoke-test OK, 2026-07-14) ─
