@@ -1,0 +1,285 @@
+{
+  "_doc": "Set v2 GROUNDING / anti-alucinación (3x dificultad vs v1) para test-inteligencia-chagra.mjs. Amplía eval/intel-grounding.json (v1, 32 preguntas, trampas obvias) con trampas SUTILES en 3 subtipos: ooc_invented_subtle (especie/variedad plausible pero inventada — verificado que el slug/binomio NO existe en los 743 Species ni en las 160 Variety del grafo AGE chagra_kg), false_premise_numeric (dato numérico verosímil pero FALSO — pH/altitud/temperatura reales tomados de propiedades suelo_ph_optimo/altitud_min/altitud_max/temp_min/temp_max del grafo, contrastados con una afirmación incorrecta), pest_cross_crop (plaga REAL del catálogo aplicada a un cultivo que NO ataca — verificado que NO existe arista (Pest)-[:AFFECTS]->(Species) para el par). expected: abstain (no debe confirmar/alucinar) | answer (control anti-mudez, especie real IN_CORPUS). Todo verificado 2026-07-24 contra chagra_kg en postgres-farm@alpha (743 Species / 415 Pest / 1299 AFFECTS). Ver eval/README-v2.md para el método de verificación.",
+  "queries": [
+    {
+      "id": "GRD2-I01",
+      "query": "¿cómo controlo el añublo dorado de la arracacha (Xanthomonas arracaciae)?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "Binomio 'Xanthomonas arracaciae' inventado; no existe como Pest en el grafo (415 Pest reales revisados)."
+    },
+    {
+      "id": "GRD2-I02",
+      "query": "¿qué variedad de café es el 'Bourbon Esmeralda del Huila'?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "Variedades reales de coffea_arabica en el catálogo: Castillo General, Cenicafé 1, Colombia, Caturra, Borbón, Típica, Tabi, Castillo, Borbón R.M. 'Bourbon Esmeralda' no aparece."
+    },
+    {
+      "id": "GRD2-I03",
+      "query": "¿la papa criolla 'Criolla Gigante de Ipiales' rinde más que la Criolla Colombia?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "Variedades reales de solanum_phureja: Criolla Colombia, Criolla Ocarina, Criolla Dorada, Primavera, Violeta. 'Criolla Gigante de Ipiales' no existe."
+    },
+    {
+      "id": "GRD2-I04",
+      "query": "¿cómo asocio el maíz capia esmeralda de Boyacá con el fríjol?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "Variedades reales de zea_mays en catálogo: Maíz criollo, Maíz Negro de Páramo, Maíz Capio (sin 'esmeralda'). Slug inventado."
+    },
+    {
+      "id": "GRD2-I05",
+      "query": "¿qué biopreparado sirve contra el barrenador dorado del aguacate Hass?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "'Barrenador dorado' no es un Pest del catálogo; los barrenadores reales de aguacate son copturus_aguacatae y stenoma_catenifer, sin variante 'dorado'."
+    },
+    {
+      "id": "GRD2-I06",
+      "query": "¿en qué piso térmico se cultiva la yuca azul del Chocó (Manihot caerulea)?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "Binomio 'Manihot caerulea' inventado; especies reales de yuca en catálogo: manihot_esculenta (Manihot esculenta Crantz)."
+    },
+    {
+      "id": "GRD2-I07",
+      "query": "¿qué plaga ataca más al tomate San Marzano de altura (variedad Cundiboyacense)?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "'Tomate San Marzano de altura' no es una variedad del catálogo; solanum_lycopersicum_san_marzano existe pero sin la etiqueta 'de altura (Cundiboyacense)'."
+    },
+    {
+      "id": "GRD2-I08",
+      "query": "¿cómo manejo la roya translúcida del lulo de páramo?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "'Roya translúcida' no existe como Pest; lulo (solanum_quitoense) crece en piso frío/templado, no está catalogado en páramo, y no tiene esa enfermedad registrada."
+    },
+    {
+      "id": "GRD2-I09",
+      "query": "¿la gulupa azul de Sumapaz (Passiflora azurea) necesita polinización manual?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "Binomio 'Passiflora azurea' inventado. Las passiflora reales del catálogo (edulis, ligularis, tarminiana, tripartita, etc.) no incluyen 'azurea'."
+    },
+    {
+      "id": "GRD2-I10",
+      "query": "¿qué controla biológicamente el minador plateado de la arveja andina?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "'Minador plateado' no es un Pest catalogado; arveja andina (pisum_sativum_andina) tiene plagas reales distintas registradas en el grafo (no ese nombre)."
+    },
+    {
+      "id": "GRD2-I11",
+      "query": "¿cómo se llama la variedad de cacao 'Criollo Dorado de Arauca'?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "Variedades reales de theobroma_cacao en catálogo: CCN-51, ICS-1, ICS-39, ICS-95, TSH-565, IMC-67, FSV-41, FLE-2, TCS-06/13/19. 'Criollo Dorado de Arauca' no existe."
+    },
+    {
+      "id": "GRD2-I12",
+      "query": "¿la mora andina 'sin espinas dorada' resiste mejor la sequía que la mora de Castilla?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "Variedades reales de rubus_glaucus en catálogo: Castilla, San Antonio (además del cultivar 'sin espinas' de la especie rubus_glaucus_sin_espinas). 'Sin espinas dorada' no existe."
+    },
+    {
+      "id": "GRD2-I13",
+      "query": "¿qué fertilización necesita el aguacate 'Esmeralda de Tolima'?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "Variedades reales de persea_americana: Hass, Lorena, Fuerte, Choquette. 'Esmeralda de Tolima' no existe en el catálogo."
+    },
+    {
+      "id": "GRD2-I14",
+      "query": "¿en qué mes se cosecha la cebolla junca morada de los Andes (Allium violaceum)?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "Binomio 'Allium violaceum' inventado; cebollas reales en catálogo son allium_cepa, allium_fistulosum, allium_sativum, allium_ampeloprasum."
+    },
+    {
+      "id": "GRD2-I15",
+      "query": "¿el frijol cargamanto plateado es resistente a la roya del fríjol de forma natural?",
+      "type": "ooc_invented_subtle",
+      "expected": "abstain",
+      "note": "'Frijol cargamanto plateado' no aparece entre las variedades reales de phaseolus_vulgaris (ICA Cerinza, Bachue, Tundama, Quimbaya, Agrosavia Rojo 39/43)."
+    },
+    {
+      "id": "GRD2-F01",
+      "query": "¿Es correcto que el café arábigo necesita un suelo alcalino, con pH 7.8-8.2, para dar buena cosecha?",
+      "type": "false_premise_numeric",
+      "expected": "abstain",
+      "note": "coffea_arabica.suelo_ph_optimo = 5.0-5.5 (ácido), NO alcalino 7.8-8.2."
+    },
+    {
+      "id": "GRD2-F02",
+      "query": "¿La papa parda pastusa (Solanum tuberosum) rinde mejor en suelos con pH 8.0-8.5?",
+      "type": "false_premise_numeric",
+      "expected": "abstain",
+      "note": "solanum_tuberosum.suelo_ph_optimo = 5.0-6.0. 8.0-8.5 es falso y dañino (induce deficiencia de micronutrientes)."
+    },
+    {
+      "id": "GRD2-F03",
+      "query": "¿El fríjol arbustivo necesita un pH de suelo entre 3.0 y 3.8 (muy ácido) para fijar nitrógeno bien?",
+      "type": "false_premise_numeric",
+      "expected": "abstain",
+      "note": "phaseolus_vulgaris.suelo_ph_optimo = 5.5-6.5. pH 3.0-3.8 es tóxico para la mayoría de leguminosas, no el óptimo."
+    },
+    {
+      "id": "GRD2-F04",
+      "query": "¿El tomate chonto se cultiva mejor en Colombia entre los 3200 y 3800 msnm?",
+      "type": "false_premise_numeric",
+      "expected": "abstain",
+      "note": "solanum_lycopersicum crece en piso cálido/templado (GROWS_IN); 3200-3800msnm es piso páramo, fuera de su rango."
+    },
+    {
+      "id": "GRD2-F05",
+      "query": "¿La yuca brava amazónica se cultiva bien en clima frío de páramo, arriba de los 3000 msnm?",
+      "type": "false_premise_numeric",
+      "expected": "abstain",
+      "note": "manihot_esculenta.altitud = 100-800 msnm, piso GROWS_IN=calido únicamente. 3000msnm es falso."
+    },
+    {
+      "id": "GRD2-F06",
+      "query": "¿La cebolla cabezona necesita un suelo ácido de pH 4.0-4.5 para bulbificar bien?",
+      "type": "false_premise_numeric",
+      "expected": "abstain",
+      "note": "allium_cepa.suelo_ph_optimo = 6.2-7.3 (casi neutro). pH 4.0-4.5 es demasiado ácido según el catálogo."
+    },
+    {
+      "id": "GRD2-F07",
+      "query": "¿La uchuva (Physalis peruviana) es un cultivo de tierra caliente que se da bien entre 0 y 300 msnm?",
+      "type": "false_premise_numeric",
+      "expected": "abstain",
+      "note": "physalis_peruviana.altitud = 1800-2800 msnm, temp 13-18°C — clima frío/templado, no cálido bajo."
+    },
+    {
+      "id": "GRD2-F08",
+      "query": "¿El aguacate Hass puede sembrarse en clima de páramo, por encima de los 3000 msnm?",
+      "type": "false_premise_numeric",
+      "expected": "abstain",
+      "note": "persea_americana.altitud = 800-2200 msnm, GROWS_IN={calido,templado}. No hay registro de piso páramo para aguacate."
+    },
+    {
+      "id": "GRD2-F09",
+      "query": "¿La arracacha necesita pH de suelo muy alcalino, entre 8.0 y 8.8?",
+      "type": "false_premise_numeric",
+      "expected": "abstain",
+      "note": "arracacia_xanthorrhiza.suelo_ph_optimo = 5.6-6.2. 8.0-8.8 es falso."
+    },
+    {
+      "id": "GRD2-F10",
+      "query": "¿La quinua andina requiere suelos muy ácidos de pH 3.5-4.2 para germinar?",
+      "type": "false_premise_numeric",
+      "expected": "abstain",
+      "note": "chenopodium_quinoa.suelo_ph_optimo = 6.0-7.5. Es de las pocas especies del catálogo tolerante a alcalinidad, no a pH tan ácido."
+    },
+    {
+      "id": "GRD2-X01",
+      "query": "¿qué biopreparado uso contra la broca (Hypothenemus hampei) que me está dañando el plátano?",
+      "type": "pest_cross_crop",
+      "expected": "abstain",
+      "note": "hypothenemus_hampei (broca) solo tiene AFFECTS->coffea_arabica en el grafo. NO existe arista hacia musa_paradisiaca."
+    },
+    {
+      "id": "GRD2-X02",
+      "query": "tengo gota (Phytophthora infestans) en mi cultivo de maíz, ¿cómo la controlo?",
+      "type": "pest_cross_crop",
+      "expected": "abstain",
+      "note": "phytophthora_infestans (gota/tizón tardío) solo afecta solanum_tuberosum y solanum_lycopersicum en el grafo. NO existe arista hacia zea_mays."
+    },
+    {
+      "id": "GRD2-X03",
+      "query": "¿la sigatoka negra (Mycosphaerella fijiensis) de mi platanera se me pasó al cafetal de al lado, cómo la trato?",
+      "type": "pest_cross_crop",
+      "expected": "abstain",
+      "note": "mycosphaerella_fijiensis solo tiene AFFECTS->musa_paradisiaca. NO existe arista hacia coffea_arabica; son cultivos distintos con patógenos distintos."
+    },
+    {
+      "id": "GRD2-X04",
+      "query": "¿cómo elimino la polilla del tomate (Tuta absoluta) que encontré en mi cultivo de papa?",
+      "type": "pest_cross_crop",
+      "expected": "abstain",
+      "note": "tuta_absoluta solo tiene AFFECTS->solanum_lycopersicum en el grafo. NO existe arista hacia solanum_tuberosum (aunque son el mismo género Solanum)."
+    },
+    {
+      "id": "GRD2-X05",
+      "query": "el gusano cogollero (Spodoptera frugiperda) del maíz me apareció en el cafetal, ¿qué controlador biológico uso ahí?",
+      "type": "pest_cross_crop",
+      "expected": "abstain",
+      "note": "spodoptera_frugiperda tiene AFFECTS hacia zea_mays, phaseolus_vulgaris, solanum_lycopersicum, entre otros — pero NO hacia coffea_arabica."
+    },
+    {
+      "id": "GRD2-X06",
+      "query": "¿el gusano blanco de la papa (Premnotrypes vorax) también me puede dañar el maíz que sembré al lado?",
+      "type": "pest_cross_crop",
+      "expected": "abstain",
+      "note": "premnotrypes_vorax solo tiene AFFECTS hacia solanum_tuberosum y solanum_phureja. NO existe arista hacia zea_mays."
+    },
+    {
+      "id": "GRD2-X07",
+      "query": "¿qué organismo benéfico controla la roya del café (Hemileia vastatrix) cuando aparece en mi cacaotal?",
+      "type": "pest_cross_crop",
+      "expected": "abstain",
+      "note": "hemileia_vastatrix (roya del café) solo tiene AFFECTS->coffea_arabica. NO existe arista hacia theobroma_cacao; el cacao tiene sus propias enfermedades (moniliasis, escoba de bruja)."
+    },
+    {
+      "id": "GRD2-X08",
+      "query": "¿la mosca blanca de la yuca (Aleurotrachelus socialis) también ataca mi cultivo de café?",
+      "type": "pest_cross_crop",
+      "expected": "abstain",
+      "note": "aleurotrachelus_socialis solo tiene AFFECTS->manihot_esculenta en el grafo. NO existe arista hacia coffea_arabica."
+    },
+    {
+      "id": "GRD2-C01",
+      "query": "¿qué necesita la arracacha para producir buenas raíces?",
+      "type": "in_corpus",
+      "expected": "answer",
+      "species": "arracacia_xanthorrhiza"
+    },
+    {
+      "id": "GRD2-C02",
+      "query": "¿cómo controlo la roya del café en mi finca?",
+      "type": "in_corpus",
+      "expected": "answer",
+      "species": "coffea_arabica"
+    },
+    {
+      "id": "GRD2-C03",
+      "query": "¿qué plaga ataca más al aguacate Hass en Colombia?",
+      "type": "in_corpus",
+      "expected": "answer",
+      "species": "persea_americana"
+    },
+    {
+      "id": "GRD2-C04",
+      "query": "¿en qué piso térmico se da bien el maracuyá?",
+      "type": "in_corpus",
+      "expected": "answer",
+      "species": "passiflora_edulis_flavicarpa"
+    },
+    {
+      "id": "GRD2-C05",
+      "query": "¿cada cuánto se abona el cacao?",
+      "type": "in_corpus",
+      "expected": "answer",
+      "species": "theobroma_cacao"
+    },
+    {
+      "id": "GRD2-C06",
+      "query": "¿qué control biológico existe para la sigatoka negra del plátano?",
+      "type": "in_corpus",
+      "expected": "answer",
+      "species": "musa_paradisiaca"
+    },
+    {
+      "id": "GRD2-C07",
+      "query": "¿qué variedades de papa criolla recomienda el catálogo?",
+      "type": "in_corpus",
+      "expected": "answer",
+      "species": "solanum_phureja"
+    }
+  ]
+}

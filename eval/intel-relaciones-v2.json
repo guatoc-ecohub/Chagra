@@ -1,0 +1,647 @@
+{
+  "_doc": "Set v2 RELACIONES / grafo multi-hop (3x dificultad vs v1) para test-inteligencia-chagra.mjs. v1 (eval/intel-relaciones.json, 10 preguntas) era 1-hop (companion o pest_control directo). v2 exige 2-3 saltos verificados contra el grafo AGE chagra_kg: (A) Species-[GROWS_IN]->PisoTermico + Pest-[AFFECTS]->Species + Controlador-[CONTROLS]->Pest (15, un piso térmico distinto por pregunta); (B) intersección Species-[FIXES_NITROGEN]->EcosystemService ∩ Species-[COMPATIBLE_WITH]->cultivo (8); (C) Variety-[IS_VARIETY_OF]->Species con resistencia varietal (campo resistencias) a una Pest + su CONTROLS (4); (D) Animal-[POLINIZA]->Species, incluyendo polinizadores no obvios como murciélagos y abejas nativas sin aguijón (3). Cada entrada trae 'chain' documentando los nodos/aristas exactos recorridos. Todo verificado 2026-07-24 contra chagra_kg (1299 AFFECTS, 873 CONTROLS, 1093 GROWS_IN, 1035 COMPATIBLE_WITH, 78 FIXES_NITROGEN, 92 POLINIZA, 158 IS_VARIETY_OF). Ver eval/README-v2.md.",
+  "queries": [
+    {
+      "id": "REL2-A01",
+      "query": "en piso frío, ¿qué controla biológicamente la gota de la papa criolla?",
+      "hops": 3,
+      "chain": [
+        "Species:solanum_phureja",
+        "GROWS_IN->PisoTermico:frio",
+        "Pest:phytophthora_infestans(Tizón tardío / gota (papa y tomate))-AFFECTS->Species:solanum_phureja",
+        "CONTROLS->Biopreparado:caldo_bordeles,BeneficialOrganism:bacillus_subtilis,BeneficialOrganism:trichoderma_harzianum,BeneficialOrganism:trichoderma_asperellum"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "solanum_phureja",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "phytophthora_infestans"
+      },
+      "expected_entities": [
+        "caldo_bordeles",
+        "bacillus_subtilis",
+        "trichoderma_harzianum",
+        "trichoderma_asperellum"
+      ]
+    },
+    {
+      "id": "REL2-A02",
+      "query": "en piso templado, ¿qué controla biológicamente la broca del café?",
+      "hops": 3,
+      "chain": [
+        "Species:coffea_arabica",
+        "GROWS_IN->PisoTermico:templado",
+        "Pest:hypothenemus_hampei(Broca del café)-AFFECTS->Species:coffea_arabica",
+        "CONTROLS->Biopreparado:bacillus_subtilis_foliar,Biopreparado:beauveria_bassiana,BeneficialOrganism:mirax_insularis"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "coffea_arabica",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "hypothenemus_hampei"
+      },
+      "expected_entities": [
+        "bacillus_subtilis_foliar",
+        "beauveria_bassiana",
+        "mirax_insularis"
+      ]
+    },
+    {
+      "id": "REL2-A03",
+      "query": "en piso frío, ¿qué controla biológicamente el gusano cogollero del maíz?",
+      "hops": 3,
+      "chain": [
+        "Species:zea_mays",
+        "GROWS_IN->PisoTermico:frio",
+        "Pest:spodoptera_frugiperda(Gusano cogollero del maíz)-AFFECTS->Species:zea_mays",
+        "CONTROLS->Biopreparado:bacillus_thuringiensis,Biopreparado:trichogramma_spp,BeneficialOrganism:trichogramma_spp,BeneficialOrganism:steinernema_carpocapsae"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "zea_mays",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "spodoptera_frugiperda"
+      },
+      "expected_entities": [
+        "bacillus_thuringiensis",
+        "trichogramma_spp",
+        "trichogramma_spp",
+        "steinernema_carpocapsae"
+      ]
+    },
+    {
+      "id": "REL2-A04",
+      "query": "en piso templado, ¿qué controla biológicamente la mosca blanca del fríjol?",
+      "hops": 3,
+      "chain": [
+        "Species:phaseolus_vulgaris",
+        "GROWS_IN->PisoTermico:templado",
+        "Pest:bemisia_tabaci_canonical(Mosca blanca (complejo))-AFFECTS->Species:phaseolus_vulgaris",
+        "CONTROLS->Biopreparado:jadam_wetting_agent_jwa,Biopreparado:extracto_neem,BeneficialOrganism:isaria_fumosorosea,BeneficialOrganism:encarsia_spp"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "phaseolus_vulgaris",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "bemisia_tabaci_canonical"
+      },
+      "expected_entities": [
+        "jadam_wetting_agent_jwa",
+        "extracto_neem",
+        "isaria_fumosorosea",
+        "encarsia_spp"
+      ]
+    },
+    {
+      "id": "REL2-A05",
+      "query": "en piso cálido, ¿qué controla biológicamente la polilla del tomate?",
+      "hops": 3,
+      "chain": [
+        "Species:solanum_lycopersicum",
+        "GROWS_IN->PisoTermico:calido",
+        "Pest:tuta_absoluta(Polilla del tomate)-AFFECTS->Species:solanum_lycopersicum",
+        "CONTROLS->Biopreparado:bacillus_thuringiensis,Biopreparado:trichogramma_spp,BeneficialOrganism:podisus_nigrispinus,BeneficialOrganism:phthorimaea_operculella_granulovirus"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "solanum_lycopersicum",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "tuta_absoluta"
+      },
+      "expected_entities": [
+        "bacillus_thuringiensis",
+        "trichogramma_spp",
+        "podisus_nigrispinus",
+        "phthorimaea_operculella_granulovirus"
+      ]
+    },
+    {
+      "id": "REL2-A06",
+      "query": "en piso templado, ¿qué controla biológicamente la pudrición radicular del aguacate?",
+      "hops": 3,
+      "chain": [
+        "Species:persea_americana",
+        "GROWS_IN->PisoTermico:templado",
+        "Pest:phytophthora_cinnamomi(Pudrición radicular del aguacate)-AFFECTS->Species:persea_americana",
+        "CONTROLS->Biopreparado:fosfito_potasio,BeneficialOrganism:bacillus_amyloliquefaciens,BeneficialOrganism:pseudomonas_fluorescens,BeneficialOrganism:trichoderma_viride"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "persea_americana",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "phytophthora_cinnamomi"
+      },
+      "expected_entities": [
+        "fosfito_potasio",
+        "bacillus_amyloliquefaciens",
+        "pseudomonas_fluorescens",
+        "trichoderma_viride"
+      ]
+    },
+    {
+      "id": "REL2-A07",
+      "query": "en piso cálido, ¿qué controla biológicamente la mosca blanca de la yuca?",
+      "hops": 3,
+      "chain": [
+        "Species:manihot_esculenta",
+        "GROWS_IN->PisoTermico:calido",
+        "Pest:aleurotrachelus_socialis(Mosca blanca de la yuca)-AFFECTS->Species:manihot_esculenta",
+        "CONTROLS->BeneficialOrganism:beauveria_bassiana,BeneficialOrganism:encarsia_formosa,BeneficialOrganism:delphastus_pusillus,BeneficialOrganism:amitus_fuscipennis"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "manihot_esculenta",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "aleurotrachelus_socialis"
+      },
+      "expected_entities": [
+        "beauveria_bassiana",
+        "encarsia_formosa",
+        "delphastus_pusillus",
+        "amitus_fuscipennis"
+      ]
+    },
+    {
+      "id": "REL2-A08",
+      "query": "en piso frío, ¿qué controla biológicamente el trips de la cebolla?",
+      "hops": 3,
+      "chain": [
+        "Species:allium_cepa",
+        "GROWS_IN->PisoTermico:frio",
+        "Pest:thrips_tabaci(Trips de la cebolla)-AFFECTS->Species:allium_cepa",
+        "CONTROLS->BeneficialOrganism:amblyseius_cucumeris,BeneficialOrganism:orius_insidiosus,BeneficialOrganism:amblyseius_spp,BeneficialOrganism:beauveria_bassiana"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "allium_cepa",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "thrips_tabaci"
+      },
+      "expected_entities": [
+        "amblyseius_cucumeris",
+        "orius_insidiosus",
+        "amblyseius_spp",
+        "beauveria_bassiana"
+      ]
+    },
+    {
+      "id": "REL2-A09",
+      "query": "en piso cálido, ¿qué controla biológicamente la sigatoka negra del plátano?",
+      "hops": 3,
+      "chain": [
+        "Species:musa_paradisiaca",
+        "GROWS_IN->PisoTermico:calido",
+        "Pest:mycosphaerella_fijiensis(Sigatoka negra)-AFFECTS->Species:musa_paradisiaca",
+        "CONTROLS->Biopreparado:trichoderma_harzianum_suelo,Biopreparado:caldo_sulfocalcico,BeneficialOrganism:bacillus_subtilis,BeneficialOrganism:trichoderma_harzianum"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "musa_paradisiaca",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "mycosphaerella_fijiensis"
+      },
+      "expected_entities": [
+        "trichoderma_harzianum_suelo",
+        "caldo_sulfocalcico",
+        "bacillus_subtilis",
+        "trichoderma_harzianum"
+      ]
+    },
+    {
+      "id": "REL2-A10",
+      "query": "en piso páramo, ¿qué controla biológicamente el gusano blanco de la papa parda pastusa?",
+      "hops": 3,
+      "chain": [
+        "Species:solanum_tuberosum",
+        "GROWS_IN->PisoTermico:paramo",
+        "Pest:premnotrypes_vorax(Gusano blanco de la papa)-AFFECTS->Species:solanum_tuberosum",
+        "CONTROLS->BeneficialOrganism:beauveria_bassiana,BeneficialOrganism:heterorhabditis_bacteriophora,BeneficialOrganism:metarhizium_anisopliae,Biopreparado:steinernema_carpocapsae"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "solanum_tuberosum",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "premnotrypes_vorax"
+      },
+      "expected_entities": [
+        "beauveria_bassiana",
+        "heterorhabditis_bacteriophora",
+        "metarhizium_anisopliae",
+        "steinernema_carpocapsae"
+      ]
+    },
+    {
+      "id": "REL2-A11",
+      "query": "en piso cálido, ¿qué maneja biológicamente el nematodo agallador del tomate?",
+      "hops": 3,
+      "chain": [
+        "Species:solanum_lycopersicum",
+        "GROWS_IN->PisoTermico:calido",
+        "Pest:meloidogyne_incognita(Nematodo agallador)-AFFECTS->Species:solanum_lycopersicum",
+        "CONTROLS->Tecnica:tecnica_cultivo_trampa_tagetes,BeneficialOrganism:trichoderma_viride,BeneficialOrganism:pasteuria_penetrans,BeneficialOrganism:trichoderma_harzianum"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "solanum_lycopersicum",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "meloidogyne_incognita"
+      },
+      "expected_entities": [
+        "tecnica_cultivo_trampa_tagetes",
+        "trichoderma_viride",
+        "pasteuria_penetrans",
+        "trichoderma_harzianum"
+      ]
+    },
+    {
+      "id": "REL2-A12",
+      "query": "en piso templado, ¿qué controla biológicamente la chisa o gallina ciega del maíz?",
+      "hops": 3,
+      "chain": [
+        "Species:zea_mays",
+        "GROWS_IN->PisoTermico:templado",
+        "Pest:phyllophaga_menetriesi(Chisa)-AFFECTS->Species:zea_mays",
+        "CONTROLS->BeneficialOrganism:bacillus_popilliae,Biopreparado:steinernema_carpocapsae,Biopreparado:steinernema_feltiae,Biopreparado:heterorhabditis_bacteriophora"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "zea_mays",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "phyllophaga_menetriesi"
+      },
+      "expected_entities": [
+        "bacillus_popilliae",
+        "steinernema_carpocapsae",
+        "steinernema_feltiae",
+        "heterorhabditis_bacteriophora"
+      ]
+    },
+    {
+      "id": "REL2-A13",
+      "query": "en piso templado, ¿qué controla biológicamente el ojo de gallo del café?",
+      "hops": 3,
+      "chain": [
+        "Species:coffea_arabica",
+        "GROWS_IN->PisoTermico:templado",
+        "Pest:mycena_citricolor(Ojo de gallo del café)-AFFECTS->Species:coffea_arabica",
+        "CONTROLS->BeneficialOrganism:trichoderma_harzianum,BeneficialOrganism:bacillus_subtilis"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "coffea_arabica",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "mycena_citricolor"
+      },
+      "expected_entities": [
+        "trichoderma_harzianum",
+        "bacillus_subtilis"
+      ]
+    },
+    {
+      "id": "REL2-A14",
+      "query": "en piso frío, ¿qué controla biológicamente la antracnosis del fríjol?",
+      "hops": 3,
+      "chain": [
+        "Species:phaseolus_vulgaris",
+        "GROWS_IN->PisoTermico:frio",
+        "Pest:colletotrichum_lindemuthianum(Antracnosis del fríjol)-AFFECTS->Species:phaseolus_vulgaris",
+        "CONTROLS->Biopreparado:bacillus_subtilis_foliar,Biopreparado:caldo_bordeles,BeneficialOrganism:trichoderma_asperellum,BeneficialOrganism:bacillus_subtilis"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "phaseolus_vulgaris",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "colletotrichum_lindemuthianum"
+      },
+      "expected_entities": [
+        "bacillus_subtilis_foliar",
+        "caldo_bordeles",
+        "trichoderma_asperellum",
+        "bacillus_subtilis"
+      ]
+    },
+    {
+      "id": "REL2-A15",
+      "query": "en piso templado, ¿qué controla biológicamente la chinche de la chamusquina del aguacate?",
+      "hops": 3,
+      "chain": [
+        "Species:persea_americana",
+        "GROWS_IN->PisoTermico:templado",
+        "Pest:monalonion_velezangeli(Chinche de la chamusquina)-AFFECTS->Species:persea_americana",
+        "CONTROLS->BeneficialOrganism:beauveria_bassiana,BeneficialOrganism:metarhizium_anisopliae,BeneficialOrganism:harmonia_axyridis"
+      ],
+      "relation": "piso_pest_control",
+      "subject": "persea_americana",
+      "mcp_tool": "get_pest_controllers",
+      "mcp_args": {
+        "pest_id_or_name": "monalonion_velezangeli"
+      },
+      "expected_entities": [
+        "beauveria_bassiana",
+        "metarhizium_anisopliae",
+        "harmonia_axyridis"
+      ]
+    },
+    {
+      "id": "REL2-B01",
+      "query": "¿qué especie fijadora de nitrógeno se asocia bien con el maíz (según el catálogo)?",
+      "hops": 2,
+      "chain": [
+        "Species:lupinus_mutabilis(Chocho / Tarwi)-FIXES_NITROGEN->EcosystemService:fijacion_nitrogeno",
+        "Species:lupinus_mutabilis-COMPATIBLE_WITH->Species:zea_mays"
+      ],
+      "relation": "companion_and_fixer",
+      "subject": "zea_mays",
+      "mcp_tool": "get_multihop_companions",
+      "mcp_args": {
+        "species_id": "zea_mays",
+        "filter": "fixes_nitrogen"
+      },
+      "expected_entities": [
+        "lupinus_mutabilis"
+      ]
+    },
+    {
+      "id": "REL2-B02",
+      "query": "¿qué árbol fijador de nitrógeno acompaña bien al café?",
+      "hops": 2,
+      "chain": [
+        "Species:erythrina_edulis(Chachafruto / Balú)-FIXES_NITROGEN->EcosystemService:fijacion_nitrogeno",
+        "Species:erythrina_edulis-COMPATIBLE_WITH->Species:coffea_arabica"
+      ],
+      "relation": "companion_and_fixer",
+      "subject": "coffea_arabica",
+      "mcp_tool": "get_multihop_companions",
+      "mcp_args": {
+        "species_id": "coffea_arabica",
+        "filter": "fixes_nitrogen"
+      },
+      "expected_entities": [
+        "erythrina_edulis"
+      ]
+    },
+    {
+      "id": "REL2-B03",
+      "query": "¿qué especie fijadora de nitrógeno se asocia con la papa criolla?",
+      "hops": 2,
+      "chain": [
+        "Species:alnus_acuminata(Aliso andino)-FIXES_NITROGEN->EcosystemService:fijacion_nitrogeno",
+        "Species:alnus_acuminata-COMPATIBLE_WITH->Species:solanum_phureja"
+      ],
+      "relation": "companion_and_fixer",
+      "subject": "solanum_phureja",
+      "mcp_tool": "get_multihop_companions",
+      "mcp_args": {
+        "species_id": "solanum_phureja",
+        "filter": "fixes_nitrogen"
+      },
+      "expected_entities": [
+        "alnus_acuminata"
+      ]
+    },
+    {
+      "id": "REL2-B04",
+      "query": "¿con qué leguminosa fijadora de nitrógeno se asocia bien la quinua?",
+      "hops": 2,
+      "chain": [
+        "Species:vicia_sativa(Veza común)-FIXES_NITROGEN->EcosystemService:fijacion_nitrogeno",
+        "Species:vicia_sativa-COMPATIBLE_WITH->Species:chenopodium_quinoa"
+      ],
+      "relation": "companion_and_fixer",
+      "subject": "chenopodium_quinoa",
+      "mcp_tool": "get_multihop_companions",
+      "mcp_args": {
+        "species_id": "chenopodium_quinoa",
+        "filter": "fixes_nitrogen"
+      },
+      "expected_entities": [
+        "vicia_sativa"
+      ]
+    },
+    {
+      "id": "REL2-B05",
+      "query": "¿qué abono verde fijador de nitrógeno se intercala con el maíz?",
+      "hops": 2,
+      "chain": [
+        "Species:crotalaria_juncea(Sunn hemp)-FIXES_NITROGEN->EcosystemService:fijacion_nitrogeno",
+        "Species:crotalaria_juncea-COMPATIBLE_WITH->Species:zea_mays"
+      ],
+      "relation": "companion_and_fixer",
+      "subject": "zea_mays",
+      "mcp_tool": "get_multihop_companions",
+      "mcp_args": {
+        "species_id": "zea_mays",
+        "filter": "fixes_nitrogen"
+      },
+      "expected_entities": [
+        "crotalaria_juncea"
+      ]
+    },
+    {
+      "id": "REL2-B06",
+      "query": "¿qué leguminosa fijadora de nitrógeno se asocia bien con el plátano?",
+      "hops": 2,
+      "chain": [
+        "Species:cajanus_cajan(Gandul)-FIXES_NITROGEN->EcosystemService:fijacion_nitrogeno",
+        "Species:cajanus_cajan-COMPATIBLE_WITH->Species:musa_paradisiaca"
+      ],
+      "relation": "companion_and_fixer",
+      "subject": "musa_paradisiaca",
+      "mcp_tool": "get_multihop_companions",
+      "mcp_args": {
+        "species_id": "musa_paradisiaca",
+        "filter": "fixes_nitrogen"
+      },
+      "expected_entities": [
+        "cajanus_cajan"
+      ]
+    },
+    {
+      "id": "REL2-B07",
+      "query": "¿qué cobertura fijadora de nitrógeno se usa bajo el aguacate?",
+      "hops": 2,
+      "chain": [
+        "Species:arachis_pintoi(Maní forrajero)-FIXES_NITROGEN->EcosystemService:fijacion_nitrogeno",
+        "Species:arachis_pintoi-COMPATIBLE_WITH->Species:persea_americana"
+      ],
+      "relation": "companion_and_fixer",
+      "subject": "persea_americana",
+      "mcp_tool": "get_multihop_companions",
+      "mcp_args": {
+        "species_id": "persea_americana",
+        "filter": "fixes_nitrogen"
+      },
+      "expected_entities": [
+        "arachis_pintoi"
+      ]
+    },
+    {
+      "id": "REL2-B08",
+      "query": "¿qué árbol fijador de nitrógeno del género Alnus acompaña al cafetal?",
+      "hops": 2,
+      "chain": [
+        "Species:alnus_acuminata(Aliso andino)-FIXES_NITROGEN->EcosystemService:fijacion_nitrogeno",
+        "Species:alnus_acuminata-COMPATIBLE_WITH->Species:coffea_arabica"
+      ],
+      "relation": "companion_and_fixer",
+      "subject": "coffea_arabica",
+      "mcp_tool": "get_multihop_companions",
+      "mcp_args": {
+        "species_id": "coffea_arabica",
+        "filter": "fixes_nitrogen"
+      },
+      "expected_entities": [
+        "alnus_acuminata"
+      ]
+    },
+    {
+      "id": "REL2-C01",
+      "query": "la variedad de café Castillo General es resistente a la roya, ¿qué la controla biológicamente en un lote donde no hay resistencia varietal?",
+      "hops": 3,
+      "chain": [
+        "Variety:Castillo General-IS_VARIETY_OF->Species:coffea_arabica",
+        "resistencias[resistente]->Pest:hemileia_vastatrix(Roya del café)",
+        "CONTROLS->Biopreparado:trichoderma_harzianum_suelo,Biopreparado:caldo_bordeles,BeneficialOrganism:trichoderma_harzianum,BeneficialOrganism:bacillus_subtilis,BeneficialOrganism:lecanicillium_lecanii"
+      ],
+      "relation": "variety_resistance_control",
+      "subject": "coffea_arabica",
+      "mcp_tool": "get_variedades_cultivo",
+      "mcp_args": {
+        "species_id": "coffea_arabica"
+      },
+      "expected_entities": [
+        "trichoderma_harzianum_suelo",
+        "caldo_bordeles",
+        "trichoderma_harzianum",
+        "bacillus_subtilis",
+        "lecanicillium_lecanii"
+      ],
+      "variety": "Castillo General",
+      "resistant_to_pest": "hemileia_vastatrix",
+      "resistance_level": "resistente"
+    },
+    {
+      "id": "REL2-C02",
+      "query": "la variedad de café Cenicafé 1 es tolerante al nematodo de las agallas del café, ¿qué organismos benéficos lo controlan biológicamente?",
+      "hops": 3,
+      "chain": [
+        "Variety:Cenicafé 1-IS_VARIETY_OF->Species:coffea_arabica",
+        "resistencias[tolerante]->Pest:meloidogyne_exigua(Nematodo agallador del café)",
+        "CONTROLS->BeneficialOrganism:trichoderma_harzianum,BeneficialOrganism:purpureocillium_lilacinum,BeneficialOrganism:pasteuria_penetrans"
+      ],
+      "relation": "variety_resistance_control",
+      "subject": "coffea_arabica",
+      "mcp_tool": "get_variedades_cultivo",
+      "mcp_args": {
+        "species_id": "coffea_arabica"
+      },
+      "expected_entities": [
+        "trichoderma_harzianum",
+        "purpureocillium_lilacinum",
+        "pasteuria_penetrans"
+      ],
+      "variety": "Cenicafé 1",
+      "resistant_to_pest": "meloidogyne_exigua",
+      "resistance_level": "tolerante"
+    },
+    {
+      "id": "REL2-C03",
+      "query": "la variedad de café Colombia es resistente a la roya del cafeto, ¿a qué especie pertenece esa variedad y qué biopreparado se usa contra esa plaga?",
+      "hops": 3,
+      "chain": [
+        "Variety:Colombia-IS_VARIETY_OF->Species:coffea_arabica",
+        "resistencias[resistente]->Pest:hemileia_vastatrix(Roya del café)",
+        "CONTROLS->Biopreparado:trichoderma_harzianum_suelo,Biopreparado:caldo_bordeles"
+      ],
+      "relation": "variety_resistance_control",
+      "subject": "coffea_arabica",
+      "mcp_tool": "get_variedades_cultivo",
+      "mcp_args": {
+        "species_id": "coffea_arabica"
+      },
+      "expected_entities": [
+        "trichoderma_harzianum_suelo",
+        "caldo_bordeles"
+      ],
+      "variety": "Colombia",
+      "resistant_to_pest": "hemileia_vastatrix",
+      "resistance_level": "resistente"
+    },
+    {
+      "id": "REL2-C04",
+      "query": "la variedad de café Borbón R.M. es resistente a la llaga macana, ¿qué biopreparado controla esa enfermedad?",
+      "hops": 3,
+      "chain": [
+        "Variety:Borbón R.M.-IS_VARIETY_OF->Species:coffea_arabica",
+        "resistencias[resistente]->Pest:ceratocystis_fimbriata(Llaga macana / muerte descendente del café)",
+        "CONTROLS->Biopreparado:trichoderma_harzianum_suelo"
+      ],
+      "relation": "variety_resistance_control",
+      "subject": "coffea_arabica",
+      "mcp_tool": "get_variedades_cultivo",
+      "mcp_args": {
+        "species_id": "coffea_arabica"
+      },
+      "expected_entities": [
+        "trichoderma_harzianum_suelo"
+      ],
+      "variety": "Borbón R.M.",
+      "resistant_to_pest": "ceratocystis_fimbriata",
+      "resistance_level": "resistente"
+    },
+    {
+      "id": "REL2-D01",
+      "query": "¿qué poliniza principalmente la gulupa amarilla colombiana?",
+      "hops": 2,
+      "chain": [
+        "Animal:tetragonisca_angustula(abeja angelita (Tetragonisca angustula))-POLINIZA->Species:passiflora_edulis_amarilla_colombia"
+      ],
+      "relation": "pollinator",
+      "subject": "passiflora_edulis_amarilla_colombia",
+      "mcp_tool": "get_subgrafo_relacional",
+      "mcp_args": {
+        "species_id": "passiflora_edulis_amarilla_colombia",
+        "relation": "POLINIZA"
+      },
+      "expected_entities": [
+        "tetragonisca_angustula"
+      ]
+    },
+    {
+      "id": "REL2-D02",
+      "query": "¿qué animal poliniza el marañón?",
+      "hops": 2,
+      "chain": [
+        "Animal:glossophaga_soricina(murciélago nectarívoro (Glossophaga soricina))-POLINIZA->Species:anacardium_occidentale"
+      ],
+      "relation": "pollinator",
+      "subject": "anacardium_occidentale",
+      "mcp_tool": "get_subgrafo_relacional",
+      "mcp_args": {
+        "species_id": "anacardium_occidentale",
+        "relation": "POLINIZA"
+      },
+      "expected_entities": [
+        "glossophaga_soricina"
+      ]
+    },
+    {
+      "id": "REL2-D03",
+      "query": "¿qué poliniza la guayaba según el catálogo?",
+      "hops": 2,
+      "chain": [
+        "Animal:tetragonisca_angustula(abeja angelita (Tetragonisca angustula))-POLINIZA->Species:psidium_guajava"
+      ],
+      "relation": "pollinator",
+      "subject": "psidium_guajava",
+      "mcp_tool": "get_subgrafo_relacional",
+      "mcp_args": {
+        "species_id": "psidium_guajava",
+        "relation": "POLINIZA"
+      },
+      "expected_entities": [
+        "tetragonisca_angustula"
+      ]
+    }
+  ]
+}

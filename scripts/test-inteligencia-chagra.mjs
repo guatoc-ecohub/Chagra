@@ -123,6 +123,9 @@ const VIS_TIMEOUT_MS = Number(process.env.VIS_TIMEOUT_MS || 120000);
 // no reconocer el prompt y responder VACÍO → score artificialmente bajo (no es
 // degradación, es formato). Default 'generate' para no mover el baseline de prod.
 const CHAT_API = (process.env.CHAT_API || 'generate').toLowerCase();
+// Sufijo de set de evaluación: '' = sets v1 (intel-grounding.json…), '-v2' = sets
+// duros v2 (intel-grounding-v2.json…, 120 preguntas verificadas contra el grafo).
+const SET_SUFFIX = process.env.SET_SUFFIX || '';
 
 // fetch nativo capturado ANTES de instalar el shim del retriever.
 const nativeFetch = globalThis.fetch.bind(globalThis);
@@ -282,7 +285,19 @@ const ABSTAIN_RE = new RegExp([
   'no figura', 'no s[eé] de ese', 'fuera de.*(scope|cat[aá]logo|mi )', 'no tengo datos',
   'no la tengo', 'no lo tengo', 'no se encuentra en',
 ].join('|'), 'i');
+// Rechazo de PREMISA FALSA (set v2: false_premise_numeric, pest_cross_crop): el
+// modelo corrige/rechaza en vez de confirmar el dato falso. Eso es comportamiento
+// CORRECTO ante la trampa (no es alucinación). p. ej. "no, el café necesita suelo
+// ácido", "la broca no ataca el plátano".
+const REJECT_RE = new RegExp([
+  'no es (correct|ciert|verdad|as[ií]|exact|el caso)', 'incorrect', 'es falso', '\\bfalso\\b',
+  'no es (un )?dato', 'en realidad', 'de hecho', 'por el contrario', 'al contrario', 'm[aá]s bien',
+  'no necesita', 'no requiere', 'no ataca', 'no afecta', 'no es plaga de', 'no corresponde',
+  'no da[ñn]a', 'eso no', 'no es as[ií]', 'no deber[ií]a', 'realmente no', 'no suele',
+  'esa premisa', 'premisa (falsa|incorrecta|err)', 'no es lo correcto', 'contrario a',
+].join('|'), 'i');
 const AGRO_TERMS = ['planta', 'suelo', 'riego', 'abono', 'biopreparado', 'siembra', 'cosecha', 'plaga', 'cultivo', 'poda', 'semilla', 'sombra', 'asocia', 'compost', 'clima', 'fertiliz', 'organic'];
+function isReject(text) { return REJECT_RE.test(norm(text)); }
 function isAbstain(text) { return ABSTAIN_RE.test(norm(text)); }
 function isOnTopic(text) { const n = norm(text); return AGRO_TERMS.some((t) => n.includes(t)); }
 
@@ -358,12 +373,12 @@ async function dimRecall(retrieve, corpusSlugs) {
 // DIMENSIÓN 2 — GROUNDING / anti-alucinación
 // ════════════════════════════════════════════════════════════════════════════
 function groundingQueries() {
-  const set = loadJson(join(EVAL_DIR, 'intel-grounding.json'));
+  const set = loadJson(join(EVAL_DIR, `intel-grounding${SET_SUFFIX}.json`));
   let queries = [...set.queries].sort((a, b) => a.id.localeCompare(b.id));
   if (Number.isFinite(LIMIT)) {
-    const byType = { ooc_real: [], ooc_invented: [], in_corpus: [] };
-    for (const q of queries) (byType[q.type] || (byType[q.type] = [])).push(q);
-    queries = [...byType.ooc_real.slice(0, LIMIT), ...byType.ooc_invented.slice(0, LIMIT), ...byType.in_corpus.slice(0, LIMIT)];
+    const byType = {};
+    for (const q of queries) (byType[q.type] ||= []).push(q);
+    queries = Object.values(byType).flatMap((arr) => arr.slice(0, LIMIT));
   }
   return queries;
 }
@@ -388,7 +403,8 @@ async function dimGrounding(queries, evidenceMap, systemPrompt, model) {
       verdict = empty ? 'VACIO' : (answered ? 'RESPONDE_OK' : (abstain ? 'SOBRE-ABSTENCION' : 'FUERA-DE-TEMA'));
     } else {
       oocTotal += 1;
-      if (abstain) { oocAbstain += 1; verdict = 'ABSTIENE_OK'; }
+      const reject = !empty && !abstain && isReject(text);
+      if (abstain || reject) { oocAbstain += 1; verdict = (reject && !abstain) ? 'RECHAZA_OK' : 'ABSTIENE_OK'; }
       else verdict = empty ? 'VACIO' : 'ALUCINA';
     }
     rows.push({ id: q.id, type: q.type, query: q.query, verdict, abstain, empty, on_topic: onTopic, response: text.slice(0, 200), error: gen._error || null });
@@ -457,21 +473,25 @@ async function dimRelaciones(retrieve, mcpOk) {
 // DIMENSIÓN 4 — TAXONOMÍA
 // ════════════════════════════════════════════════════════════════════════════
 function taxonomiaQueries() {
-  const set = loadJson(join(EVAL_DIR, 'intel-taxonomia.json'));
+  const set = loadJson(join(EVAL_DIR, `intel-taxonomia${SET_SUFFIX}.json`));
   let queries = [...set.queries].sort((a, b) => a.id.localeCompare(b.id));
   if (Number.isFinite(LIMIT)) queries = queries.slice(0, LIMIT);
   return queries;
 }
-function taxPromptQuery(common) {
-  return `¿Cuál es el nombre científico (binomio en latín) de la especie conocida como "${common}"? Responde solo el género y el epíteto.`;
+// Clave de retrieval (para la evidencia) y texto de la pregunta. v2 trae su propio
+// `query` completo + `variety_name`; v1 trae `common_name`.
+function taxKey(q) { return q.common_name || q.variety_name || q.corpus_slug || q.query; }
+function taxPromptQuery(q) {
+  if (q.query) return q.query;
+  return `¿Cuál es el nombre científico (binomio en latín) de la especie conocida como "${q.common_name}"? Responde solo el género y el epíteto.`;
 }
 async function dimTaxonomia(queries, evidenceMap, systemPrompt, model) {
   const rows = [];
   let correct = 0, n = 0;
   for (const q of queries) {
     n += 1;
-    const query = taxPromptQuery(q.common_name);
-    const evidence = evidenceMap.get(q.common_name) || [];
+    const query = taxPromptQuery(q);
+    const evidence = evidenceMap.get(taxKey(q)) || [];
     const gen = await generate(buildGroundedPrompt(systemPrompt, query, evidence), model);
     const text = gen.text || '';
     const empty = !text.trim();
@@ -479,7 +499,7 @@ async function dimTaxonomia(queries, evidenceMap, systemPrompt, model) {
     const ok = !empty && n2.includes(norm(q.expected_genus)) && n2.includes(norm(q.expected_epithet));
     if (ok) correct += 1;
     rows.push({
-      id: q.id, common_name: q.common_name, expected: `${q.expected_genus} ${q.expected_epithet}`,
+      id: q.id, subject: q.common_name || q.variety_name, expected: `${q.expected_genus} ${q.expected_epithet}`,
       trap: q.trap || null, correct: ok, empty, response: text.slice(0, 160), error: gen._error || null,
     });
   }
@@ -755,7 +775,7 @@ async function main() {
   // ── Evidencia RAG para las dimensiones LLM: se pre-calcula una sola vez ──
   const gq = groundingQueries();
   const tq = taxonomiaQueries();
-  const evKeys = [...gq.map((q) => q.query), ...tq.map((q) => q.common_name)];
+  const evKeys = [...gq.map((q) => q.query), ...tq.map((q) => taxKey(q))];
   console.error(`[intel] pre-calculando evidencia RAG para ${evKeys.length} queries LLM…`);
   const evidenceMap = await precomputeEvidence(retrieve, evKeys);
 

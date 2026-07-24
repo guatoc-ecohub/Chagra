@@ -1,0 +1,289 @@
+{
+  "_doc": "Set v2 CROSS-THERMAL (eje NUEVO, no existía en v1) para test-inteligencia-chagra.mjs. Mide si el agente distingue manejo/piso térmico por especie/variedad en vez de generalizar por género o por 'conocimiento de mundo' genérico. 4 subtipos, todos verificados contra GROWS_IN de chagra_kg (662 Species con piso asignado; pisos: calido=309, templado=384, frio=331, paramo=69): (A) huecos de dato reales — coffea_canephora sin ninguna arista GROWS_IN, y 2 casos de gap parcial (piso sí, altitud_min/max no) — el agente debe admitir el hueco (3); (B) mismo género o incluso misma especie con piso térmico DIFERENTE por variedad/color/forma — maracuyá/gulupa (misma especie), papa criolla/tuberosum, chirimoya/guanábana (Annona), rocoto/pimentón (Capsicum), banano/plátano (Musa), ñame/ibia (Dioscorea), coliflor/brócoli y coles de Bruselas/repollo (Brassica oleracea), frambuesa/mora (Rubus) (9); (C) rangos numéricos exactos de los 4 nodos PisoTermico, fuente IDEAM/IGAC (4); (D) especies de amplitud térmica inusual — registradas en los 3 pisos no-páramo a la vez, para no asumir un rango estrecho (4). Ver eval/README-v2.md para el método de verificación completo.",
+  "queries": [
+    {
+      "id": "THM2-A01",
+      "query": "¿en qué piso térmico se cultiva el café robusta (Coffea canephora) según el catálogo?",
+      "type": "data_gap",
+      "species": "coffea_canephora",
+      "gap_type": "SIN DATO",
+      "expected": "abstain_partial",
+      "note": "coffea_canephora NO tiene ninguna arista GROWS_IN en el grafo (a diferencia de coffea_arabica, que sí: piso templado, 1500-2000msnm). El agente debe decir que no tiene ese dato, NO inventar 'tierra caliente' por conocimiento general."
+    },
+    {
+      "id": "THM2-A02",
+      "query": "¿entre qué altitudes en msnm crece exactamente la papa parda pastusa (Solanum tuberosum) según el catálogo?",
+      "type": "data_gap",
+      "species": "solanum_tuberosum",
+      "gap_type": "PARCIAL",
+      "expected": "abstain_partial",
+      "note": "solanum_tuberosum SÍ tiene GROWS_IN (piso frío + páramo) pero NO tiene las propiedades altitud_min/altitud_max pobladas en el nodo Species — el agente puede dar el piso térmico pero no debe inventar un rango numérico exacto en msnm."
+    },
+    {
+      "id": "THM2-A03",
+      "query": "¿a qué altitud exacta en msnm crece el banano Cavendish (Musa AAA) según el catálogo?",
+      "type": "data_gap",
+      "species": "musa_aaa_cavendish",
+      "gap_type": "PARCIAL",
+      "expected": "abstain_partial",
+      "note": "musa_aaa_cavendish SÍ tiene GROWS_IN (piso cálido) pero NO tiene altitud_min/altitud_max como propiedad — misma situación que solanum_tuberosum."
+    },
+    {
+      "id": "THM2-B01",
+      "query": "¿el maracuyá y la gulupa se cultivan en el mismo piso térmico?",
+      "type": "same_genus_diff_piso",
+      "species": [
+        "passiflora_edulis_flavicarpa",
+        "passiflora_edulis_morada"
+      ],
+      "expected_pisos": [
+        [
+          "calido",
+          "templado"
+        ],
+        [
+          "frio",
+          "templado"
+        ]
+      ],
+      "note": "Maracuyá (P. edulis f. flavicarpa) = cálido+templado (0-1300msnm, 24-28°C). Gulupa (P. edulis f. edulis) = frío+templado (1800-2300msnm, 15-20°C). Misma especie, pisos casi opuestos."
+    },
+    {
+      "id": "THM2-B02",
+      "query": "¿la papa criolla (Solanum phureja) crece en páramo igual que la papa parda pastusa (Solanum tuberosum)?",
+      "type": "same_genus_diff_piso",
+      "species": [
+        "solanum_phureja",
+        "solanum_tuberosum"
+      ],
+      "expected_pisos": [
+        [
+          "frio"
+        ],
+        [
+          "frio",
+          "paramo"
+        ]
+      ],
+      "note": "Papa criolla = SOLO frío (2500-3200msnm). Papa parda pastusa = frío + páramo. La papa criolla NO está catalogada para páramo, a diferencia de la tuberosum."
+    },
+    {
+      "id": "THM2-B03",
+      "query": "¿la chirimoya se cultiva en el mismo piso que la guanábana, por ser ambas del género Annona?",
+      "type": "same_genus_diff_piso",
+      "species": [
+        "annona_cherimola",
+        "annona_muricata"
+      ],
+      "expected_pisos": [
+        [
+          "frio",
+          "templado"
+        ],
+        [
+          "calido"
+        ]
+      ],
+      "note": "Chirimoya = frío+templado (clima de altura). Guanábana = cálido únicamente. Mismo género Annona, requerimientos térmicos opuestos."
+    },
+    {
+      "id": "THM2-B04",
+      "query": "¿el rocoto se cultiva en el mismo piso que el pimentón, por ser ambos Capsicum?",
+      "type": "same_genus_diff_piso",
+      "species": [
+        "capsicum_pubescens_rocoto",
+        "capsicum_annuum"
+      ],
+      "expected_pisos": [
+        [
+          "frio",
+          "templado"
+        ],
+        [
+          "calido",
+          "templado"
+        ]
+      ],
+      "note": "Rocoto (Capsicum pubescens) = frío+templado (1800-3200msnm) — el único ají del catálogo adaptado a clima frío. Pimentón (C. annuum) = cálido+templado."
+    },
+    {
+      "id": "THM2-B05",
+      "query": "¿el banano Cavendish se cultiva en los mismos pisos que el plátano?",
+      "type": "same_genus_diff_piso",
+      "species": [
+        "musa_aaa_cavendish",
+        "musa_paradisiaca"
+      ],
+      "expected_pisos": [
+        [
+          "calido"
+        ],
+        [
+          "calido",
+          "templado"
+        ]
+      ],
+      "note": "Banano Cavendish = SOLO cálido. Plátano = cálido+templado (0-1800msnm) — el plátano tolera un rango más amplio."
+    },
+    {
+      "id": "THM2-B06",
+      "query": "¿el ñame blanco (Dioscorea alata) crece en el mismo piso que la ibia o ñame andino (Dioscorea trifida)?",
+      "type": "same_genus_diff_piso",
+      "species": [
+        "dioscorea_alata",
+        "dioscorea_trifida"
+      ],
+      "expected_pisos": [
+        [
+          "calido"
+        ],
+        [
+          "frio",
+          "templado"
+        ]
+      ],
+      "note": "Dioscorea alata = SOLO cálido. Dioscorea trifida (ibia/name andino) = frío+templado. Mismo género, climas opuestos pese a que ambos se llaman 'ñame' en distintas regiones."
+    },
+    {
+      "id": "THM2-B07",
+      "query": "¿la coliflor y el brócoli, siendo ambos Brassica oleracea, se cultivan en los mismos pisos?",
+      "type": "same_genus_diff_piso",
+      "species": [
+        "brassica_oleracea_botrytis",
+        "brassica_oleracea_italica"
+      ],
+      "expected_pisos": [
+        [
+          "frio"
+        ],
+        [
+          "frio",
+          "templado"
+        ]
+      ],
+      "note": "Coliflor (var. botrytis) = SOLO piso frío en el catálogo. Brócoli (var. italica) = frío+templado. Misma especie, variedades botánicas con rango de piso distinto registrado."
+    },
+    {
+      "id": "THM2-B08",
+      "query": "¿la frambuesa roja se cultiva en los mismos pisos que la mora andina, por ser ambas Rubus?",
+      "type": "same_genus_diff_piso",
+      "species": [
+        "rubus_idaeus_heritage",
+        "rubus_glaucus"
+      ],
+      "expected_pisos": [
+        [
+          "frio"
+        ],
+        [
+          "frio",
+          "templado"
+        ]
+      ],
+      "note": "Frambuesa roja (Rubus idaeus) = SOLO piso frío. Mora andina (Rubus glaucus) = frío+templado — tolera más calor que la frambuesa."
+    },
+    {
+      "id": "THM2-B09",
+      "query": "¿las coles de Bruselas se cultivan en el mismo rango de pisos que el repollo?",
+      "type": "same_genus_diff_piso",
+      "species": [
+        "brassica_oleracea_gemmifera",
+        "brassica_oleracea_var_capitata"
+      ],
+      "expected_pisos": [
+        [
+          "frio"
+        ],
+        [
+          "frio",
+          "templado"
+        ]
+      ],
+      "note": "Coles de Bruselas = SOLO piso frío. Repollo = frío+templado — dentro del mismo género/especie, no todas las variedades de Brassica oleracea tienen el mismo rango registrado."
+    },
+    {
+      "id": "THM2-C01",
+      "query": "¿entre qué altitudes y temperatura media está el piso térmico cálido según el catálogo (fuente IDEAM/IGAC)?",
+      "type": "piso_range_fact",
+      "piso": "calido",
+      "expected_altitud": "0-1000 msnm",
+      "expected_temp": ">24°C",
+      "source": "IDEAM, IGAC"
+    },
+    {
+      "id": "THM2-C02",
+      "query": "¿entre qué altitudes y temperatura media está el piso térmico templado según el catálogo (fuente IDEAM/IGAC)?",
+      "type": "piso_range_fact",
+      "piso": "templado",
+      "expected_altitud": "1000-2000 msnm",
+      "expected_temp": "18-24°C",
+      "source": "IDEAM, IGAC"
+    },
+    {
+      "id": "THM2-C03",
+      "query": "¿entre qué altitudes y temperatura media está el piso térmico frío según el catálogo (fuente IDEAM/IGAC)?",
+      "type": "piso_range_fact",
+      "piso": "frio",
+      "expected_altitud": "2000-3000 msnm",
+      "expected_temp": "12-18°C",
+      "source": "IDEAM, IGAC"
+    },
+    {
+      "id": "THM2-C04",
+      "query": "¿entre qué altitudes y temperatura media está el piso térmico páramo según el catálogo (fuente IDEAM/IGAC)?",
+      "type": "piso_range_fact",
+      "piso": "paramo",
+      "expected_altitud": "3000-9999 msnm",
+      "expected_temp": "<12°C",
+      "source": "IDEAM, IGAC"
+    },
+    {
+      "id": "THM2-D01",
+      "query": "¿en cuántos y cuáles pisos térmicos crece la calabaza/auyama según el catálogo?",
+      "type": "wide_piso_range",
+      "species": "cucurbita_maxima",
+      "expected_pisos": [
+        "frio",
+        "calido",
+        "templado"
+      ],
+      "note": "Cucurbita maxima está registrada GROWS_IN en los 3 pisos no-páramo — no asumir que es solo de clima cálido."
+    },
+    {
+      "id": "THM2-D02",
+      "query": "¿la limonaria (Cymbopogon citratus) solo se da en clima cálido?",
+      "type": "wide_piso_range",
+      "species": "cymbopogon_citratus",
+      "expected_pisos": [
+        "frio",
+        "calido",
+        "templado"
+      ],
+      "note": "Limonaria está registrada en los 3 pisos no-páramo — pese a ser una planta 'tropical' de uso común, el catálogo la registra también en frío y templado."
+    },
+    {
+      "id": "THM2-D03",
+      "query": "¿la yerbabuena (Mentha spicata) tiene un piso térmico único según el catálogo?",
+      "type": "wide_piso_range",
+      "species": "mentha_spicata",
+      "expected_pisos": [
+        "frio",
+        "calido",
+        "templado"
+      ],
+      "note": "Mentha spicata está registrada en los 3 pisos no-páramo — es una de las especies de mayor amplitud térmica del catálogo."
+    },
+    {
+      "id": "THM2-D04",
+      "query": "¿el eucalipto (Eucalyptus grandis) tiene un rango de piso térmico estrecho?",
+      "type": "wide_piso_range",
+      "species": "eucalyptus_grandis",
+      "expected_pisos": [
+        "frio",
+        "calido",
+        "templado"
+      ],
+      "note": "Eucalyptus grandis está registrado en los 3 pisos no-páramo — amplitud de adaptación inusualmente amplia, a diferencia de Eucalyptus globulus que en el catálogo solo está en frío+templado."
+    }
+  ]
+}
