@@ -2,9 +2,17 @@
 
 **Autor:** harness `scripts/test-inteligencia-chagra.mjs` (rama `eval/test-inteligencia`).
 **Qué es:** la vara. Un número —el ÍNDICE DE INTELIGENCIA— reproducible, para saber
-si un cambio mejoró o empeoró al agente. Este informe fija la línea base de hoy y,
-por pedido del operador, compara el modelo de producción (`gemma4:e2b`) contra el
-candidato más grande (`gemma4:e4b`) para decidir si vale migrar.
+si un cambio mejoró o empeoró al agente. Este informe fija la línea base de hoy (§2),
+compara **10 candidatos de modelo de chat** (§8, incluidos los fine-tunes propios) y
+corre un **bench visual profundo de 8 modelos multimodales** (§9, ¿jubilar el swap de
+qwen3-vl?). Índices clave de un vistazo:
+
+- **ÍNDICE de prod hoy (`gemma4:e2b`, prod-faithful): 69.9 / 100.** Techo desplegable:
+  `gemma3:4b` 81.7 ≈ `gemma4:e4b` 81.6.
+- **Fine-tunes propios: ninguno superó a los gemma base** (mejor `granite33-dpo` 78.1).
+  El SFT ayudó (+7.6 sobre su base) pero el DPO degradó a over-refusal. Ver §8.
+- **Brazo visual: `gemma3:4b` (33.3% id, 100% honestidad) supera al `qwen3-vl:8b` actual
+  (11.1%) → el swap de 53 s no se justifica.** Ver §9.
 
 > Reglas de honestidad del test: mide de verdad. Si una dimensión sale mal, el número
 > lo dice. Un índice inflado no sirve. Todas las corridas van contra el stack REAL
@@ -332,8 +340,68 @@ sanas de control. 8 modelos multimodales, prompt agronómico de una línea, `tem
 `think:false`. Tres métricas: **IDENTIFICACIÓN** (tarea real: el campesino fotografía su
 planta enferma), **HONESTIDAD** (¿inventa diagnóstico en una planta sana?) y **LATENCIA**.
 
-<!-- VISION_TABLE -->
+Tabla con el **prompt agronómico abierto** (el de la UX real: "¿qué plaga ves?"),
+ordenada por IDENTIFICACIÓN. VISIÓN = media armónica(identificación 0.6, honestidad 0.4).
 
-**Veredicto — ¿e4b iguala/supera a `qwen3-vl:8b` en diagnóstico real?**
+| Modelo | IDENTIFICACIÓN | HONESTIDAD | VACÍAS | LATENCIA | VISIÓN |
+|--------|:---:|:---:|:---:|:---:|:---:|
+| **`gemma3:4b`** | **6/18 · 33.3%** | 5/5 · 100% | 0 | 5.4 s | **45.5** |
+| `gemma4:e4b` | 3/18 · 16.7% | 5/5 · 100% | 0 | 3.7 s | 25.0 |
+| `qwen2.5vl:7b` | 3/18 · 16.7% | 5/5 · 100% | 0 | 8.7 s | 25.0 |
+| `gemma4:e2b` (prod chat) | 2/18 · 11.1% | 5/5 · 100% | 0 | 3.3 s | 17.2 |
+| `qwen3-vl:8b` (brazo visual HOY) | 2/18 · 11.1% | 4/5 · 80% | **16** | 13.7 s | 16.9 |
+| `llava:7b` | 0/18 · 0% | 5/5 · 100% | 0 | 10.2 s | 0 |
+| `llama3.2-vision:11b` | 3/18 · 16.7% | **0/5 · 0%** | 0 | 18.7 s | 0 |
+| `moondream` | 0/18 · 0% | 0/5 · 0% | **17** | 1.5 s | 0 |
 
-<!-- VISION_VERDICT -->
+Lecturas crudas verificadas (no artefactos):
+- **`qwen3-vl:8b` emite VACÍO en 16/18** — se calla en vez de arriesgar un nombre; las 2
+  que sí nombra (roya → "Hemileia vastatrix", mosca blanca → "Bemisia") son correctas. Su
+  11.1% es comportamiento REAL de identificación abierta, no bug del harness.
+- **`llama3.2-vision:11b` honestidad 0% es REAL y grave:** inventa diagnósticos falsos en
+  TODAS las plantas sanas ("trombosis de la rama", "tuberculosis de la papa", y degenera en
+  repetición "de la fijación de la fijación…"). Alucinador visual peligroso.
+- **`moondream` está roto:** vacío o basura ("!!!", "1. Yes", "ida-96461").
+
+### `qwen3-vl:8b` con sus DOS prompts (el número que decide)
+
+El operador avisó que `qwen3-vl` es extremadamente prompt-sensitive (en un arena viejo de
+presencia/ausencia sacó 100% con un prompt yes/no estricto). Se verificó:
+
+| prompt | roya (D01) | sana (control) | resto (16 diag) |
+|--------|-----------|----------------|-----------------|
+| **abierto** (agronómico) | ✓ "Hemileia vastatrix" | ✓ honesto "se ve sana" | vacío |
+| **estricto** ("nombre en 1 línea; si sana 'planta sana'") | ✗ "roña del café" (mal: roña≠roya) | ✗ vacío | vacío |
+
+Número completo de `qwen3-vl:8b` sobre las 23 imágenes, con los DOS prompts:
+
+| prompt de qwen3-vl | IDENTIFICACIÓN | HONESTIDAD | VACÍAS | VISIÓN |
+|--------------------|:---:|:---:|:---:|:---:|
+| abierto (agronómico) | 2/18 · 11.1% | 4/5 · 80% | 16 | 16.9 |
+| estricto (1 línea) | 1/18 · **5.6%** | 4/5 · 80% | 14 | 8.8 |
+
+El prompt estricto lo deja **peor** (5.6% vs 11.1%). Cualquiera de los dos queda muy por
+debajo de `gemma3:4b` (33.3%) y `gemma4:e4b` (16.7%) con el prompt agronómico normal.
+
+El prompt estricto **NO rescata** a `qwen3-vl`: lo empeora (confunde roya con roña, y se
+enmudece hasta en la sana). Su fortaleza del arena viejo era una tarea DISTINTA (yes/no de
+presencia), no identificación abierta. Depender de un prompt especial que los gemma NO
+necesitan es, en sí, una **desventaja operativa**.
+
+**Veredicto — ¿e4b iguala/supera a `qwen3-vl:8b` en diagnóstico real? SÍ — lo supera, y `gemma3:4b` lo supera por mucho.**
+
+En la tarea REAL (identificar la plaga a partir de la foto, con el MISMO prompt agronómico):
+`gemma3:4b` (33.3%, 100% honestidad) **triplica** en identificación al brazo visual actual
+`qwen3-vl:8b` (11.1%, 16 vacías) y es más honesto; `gemma4:e4b` (16.7%, 100%) también lo
+supera. **El swap de 53 s a `qwen3-vl` NO se justifica para identificación abierta de plagas.**
+
+- **Recomendación:** unificar el brazo visual en `gemma3:4b` (ya cargado como NLU del
+  sidecar, 3.3 GB, 5.4 s/img) o en `gemma4:e4b` si ya está caliente para chat — y **jubilar
+  el swap de 53 s** a `qwen3-vl`. Evitar `llama3.2-vision` (alucina en sanas) y `moondream`
+  (roto).
+- **Caveat honesto:** la identificación ABSOLUTA es baja en todos (0–33%). Son fotos de
+  síntoma en primer plano SIN contexto; el agente real suma el texto del usuario + RAG +
+  grafo, así que el diagnóstico end-to-end es mejor que la visión pura. Lo accionable acá es
+  el **ranking relativo** (gemma3:4b > gemma4/qwen2.5vl > qwen3-vl > llama/moondream), no el
+  valor absoluto. El brazo visual puro es débil: hay que apoyarlo con contexto, no confiarle
+  el diagnóstico solo.

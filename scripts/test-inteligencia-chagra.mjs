@@ -495,17 +495,38 @@ import { readFileSync as _rf } from 'node:fs';
 
 // Marcadores de HONESTIDAD visual: incertidumbre explícita o "planta sana".
 // Su presencia = el modelo NO inventó un diagnóstico preciso falso.
+// Marcadores de HONESTIDAD visual: incertidumbre explícita, hedge o "planta
+// sana". Cubre las formas REALES en que los modelos se abstienen en español
+// (validado con respuestas crudas 2026-07-23: "no se puede determinar",
+// "parece estar sana", "no se observa ninguna plaga", "difícil saber",
+// "no puedo confirmarlo con certeza", "sin más información") + inglés.
 const VIS_UNCERTAIN_RE = new RegExp([
-  'no estoy segur', 'no puedo (determinar|identificar|asegurar|precisar)',
-  'no se aprecia', 'no veo (plaga|enfermedad|s[ií]ntoma|nada|ning)', 'se ve sana', 'se ve saludable',
-  'luce sana', 'planta sana', 'aparentemente sana', 'parece sana', 'no identifico', 'no observo',
-  'no hay (plaga|s[ií]ntoma|señal|indicio|evidencia)', 'dif[ií]cil (de )?determinar', 'no logro',
-  'no es claro', 'no tengo certeza', 'no reconozco', 'sin s[ií]ntomas', 'no detecto',
-  'no aparent', 'saludable', 'sin signos', 'no distingo',
-  // marcadores en inglés (llava/moondream/llama-vision suelen responder en EN)
-  "not sure", "cannot (determine|identify|tell)", "can't (determine|identify|tell)",
-  "unable to", "healthy", "no (visible )?(pest|disease|symptom|sign)", "appears healthy",
-  "looks healthy", "hard to tell", "unclear", "no signs", "difficult to",
+  // — incertidumbre / no puedo (ES) —
+  'no s[eé]\\b', 'no estoy segur', 'no tengo (certeza|seguridad|informaci|datos)',
+  'no (se )?pued[oe]n? (determinar|identificar|saber|confirmar|precisar|asegurar|decir|dar|establecer)',
+  'no es posible (dar|determinar|identificar|confirmar|precisar|un diagn|saber)',
+  'no logro (determinar|identificar|ver)', 'no (se )?aprecia', 'no identifico', 'no observo', 'no detecto',
+  'no reconozco', 'no distingo', 'no es (posible )?(clar|concluyente|definitiv)', 'no concluyente',
+  // — no hay plaga / sano (ES) —
+  'no (se )?(observa|ve|aprecia|nota|detecta)n? (ning|una |alguna |plaga|enfermedad|s[ií]ntoma|signo|indicio|evidencia|problema)',
+  'no hay (plaga|enfermedad|s[ií]ntoma|señal|signo|indicio|evidencia|problema)',
+  'sin (s[ií]ntoma|signos|plaga|evidencia|problema)', 'no aparent', 'no veo (plaga|enfermedad|s[ií]ntoma|nada|ning|signo)',
+  '(se ve|parece|luce|est[aá]|en) .{0,14}(sana|sano|saludable|buen estado|buena salud|buen estado general)',
+  '\\bsana\\b', '\\bsano\\b', 'saludable', 'buen estado', 'buena salud',
+  // — hedge / se necesita más (ES) —
+  'dif[ií]cil (de )?(saber|determinar|identificar|decir|precisar|confirmar)',
+  'no puedo confirmar', 'sin (poder )?confirmar', 'no confirmo', 'con certeza',
+  'solo con (la|una|esta) (imagen|foto|fotograf)', 'a partir de (la|una|esta) (imagen|foto)',
+  'necesit[ao].{0,20}(m[aá]s informaci|examen|an[aá]lisis|detalle|inspecci)', 'requiere.{0,20}(examen|an[aá]lisis|inspecci)',
+  'consult[ae] .{0,12}(agr[oó]nom|t[eé]cnic|especialista|profesional|experto)',
+  'podr[ií]a ser', 'posiblemente', 'probablemente', 'tal vez', 'quiz[aá]', 'no descarto', 'parec(e|er[ií]a)',
+  // — inglés (llava/moondream/llama-vision) —
+  "not (sure|certain|possible)", "cannot (be )?(sure|determine|identify|tell|confirm|say)",
+  "can't (be )?(sure|determine|identify|tell|confirm|say)", "unable to (determine|identify|tell|confirm)",
+  "\\bhealthy\\b", "appears (healthy|normal|fine)", "looks (healthy|normal|fine|good)",
+  "no (visible |apparent )?(pest|disease|symptom|sign|issue|problem)", "hard to (tell|determine|say)",
+  "difficult to (tell|determine|identify|say)", "unclear", "not clear", "no signs", "without more",
+  "more (information|detail|examination)", "consult", "possibly", "might be", "could be", "seems",
 ].join('|'), 'i');
 
 // Deriva tokens científicos del nombre de archivo (p. ej. hemileia_vastatrix.jpg →
@@ -579,6 +600,9 @@ async function dimVisionForModel(model, spec, images) {
 
 async function dimVision(models) {
   const spec = loadJson(join(EVAL_DIR, 'intel-vision.json'));
+  // Override del prompt para probar sensibilidad (p. ej. el prompt estricto que
+  // exige qwen3-vl). Si no se pasa, usa el prompt agronómico del set.
+  if (process.env.VISION_PROMPT_OVERRIDE) spec.prompt = process.env.VISION_PROMPT_OVERRIDE;
   const images = [...spec.images].sort((a, b) => a.id.localeCompare(b.id));
   const results = [];
   for (const model of models) {
