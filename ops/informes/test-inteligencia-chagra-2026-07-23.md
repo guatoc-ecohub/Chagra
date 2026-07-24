@@ -654,11 +654,20 @@ día (GPU compartida con campesinos > enriquecimiento).
 
 | Modelo | overall | campesino | **gomelo** | científico |
 |--------|:---:|:---:|:---:|:---:|
-| **`qwen3.5:4b`** ⭐ | **20%** | 3/16 | **1/8** | 2/6 |
+| `granite33-dpo` (propio) | **30%** | 6/16 | **3/8** | 0/6 |
+| **`qwen3.5:4b`** ⭐ | 20% | 3/16 | **1/8** | 2/6 |
 | `gemma3:4b` | 17% | 3/16 | **1/8** | 1/6 |
 | `aya:8b` | 10% | 2/16 | **0/8** | 1/6 |
 | `exaone3.5:2.4b` | 7% | 1/16 | **0/8** | 1/6 |
-| `gemma4:e4b` · `granite33-dpo` · `phi4-mini` · `gemma4:e2b` | _(en curso)_ | | | |
+| `phi4-mini` | 0% · vacío | 0/16 | 0/8 | 0/6 |
+| `gemma4:e4b` · `gemma4:e2b` | _(judging)_ | | | |
+
+**Hallazgo inesperado:** `granite33-dpo` (fine-tune propio, que PERDIÓ en el índice de texto)
+**LIDERA la auditoría dura por-perfil** — mejor en campesino (6/16) y **gomelo (3/8)**, los
+registros informales, pero **0/6 en científico** (el registro técnico-exige-fuente). El DPO
+propio parece haber afinado el trato coloquial/campesino a costa del técnico. Ojo el tamaño:
+gomelo n=8 (3 vs 1 de qwen3.5:4b = diferencia de 2 casos) — señal real pero muestra chica.
+`phi4-mini` devuelve vacío en `/api/chat` bajo la config del audit → no medible (0%).
 
 Lectura: bajo las trampas duras multi-turno, incluso los modelos fuertes en el índice pasan
 poco (10–17%) — el registro **gomelo** (irónico, afirma premisas falsas con confianza) es de
