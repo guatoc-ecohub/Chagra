@@ -189,6 +189,12 @@ const CacaoVivo3DMockup = lazy(() => import('./mockups/CacaoVivo3D'));
 // blanca por instancia, la cosecha de criollas (amarilla/roja/morada) y los
 // frailejones en silueta. Device-tiering real. Ruta #/mockups/papa-viva-3d, sin auth.
 const PapaVivo3DMockup = lazy(() => import('./mockups/PapaVivo3D'));
+// 3D: el MUNDO DE LOS FRUTALES — mango y cítricos juntos, porque juntos
+// enseñan el PISO TÉRMICO: el mango es de tierra caliente y el cítrico sube al
+// clima medio. La escala relativa es la lección: el mango eclipsa al cítrico.
+// Brote de hoja vino del mango, panícula terminal, pecíolo alado y espinas del
+// cítrico. Device-tiering real. Ruta #/mockups/frutales-vivo-3d, sin auth.
+const FrutalesVivo3DMockup = lazy(() => import('./mockups/FrutalesVivo3D'));
 // 3D: el MUNDO DE LOS ESTANQUES — la piscicultura de la finca por piso térmico
 // en una sola ladera: la quebrada baja al estanque frío (trucha, agua
 // oxigenada), el caño sigue al estanque cálido (mojarra + cachama en
@@ -662,6 +668,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/invernadero-vivo-3d': 'mockup_invernadero_vivo_3d',
   'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
   'mockups/papa-viva-3d': 'mockup_papa_viva_3d',
+  'mockups/frutales-vivo-3d': 'mockup_frutales_vivo_3d',
   'mockups/mundo-piscicultura-3d': 'mockup_mundo_piscicultura_3d',
   'mockups/lecheria-viva-3d': 'mockup_lecheria_viva_3d',
   'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
@@ -1741,6 +1748,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo de la papa">
               <PapaVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_frutales_vivo_3d':
+        // Vitrina pública del MUNDO DE LOS FRUTALES: mango y cítricos en la
+        // misma escena en 3D REAL, porque juntos enseñan el PISO TÉRMICO — el
+        // mango es de tierra caliente y el cítrico sube al clima medio. El
+        // mango con su copa más ancha que alta, el brote de hoja color vino y
+        // la panícula terminal; el cítrico compacto, con pecíolo alado y
+        // espinas. La escala relativa ES la lección. En equipo humilde muestra
+        // la ficha. Ruta #/mockups/frutales-vivo-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de los frutales">
+              <FrutalesVivo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
