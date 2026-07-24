@@ -498,9 +498,15 @@ function QuetzalFugaz() {
   });
   return (
     <group ref={grupo} visible={false}>
+      {/* El esmeralda es un ACENTO iridiscente legítimo (como el oro aposemático
+          o la barba del colibrí), pero el GLOW propio no: ningún animal del
+          elenco se autoilumina con emissive plano — la única iridiscencia
+          sancionada es la barba del colibrí, dirigida por ángulo (×0.5). El
+          cometa lo hacen la MOTION fugaz + la luz dorada de la escena, no un
+          neón verde. Antes: emissive="#073d20" en cuerpo y cabeza. */}
       <mesh scale={[1.4, 1, 1]}>
         <sphereGeometry args={[0.1, 7, 6]} />
-        <meshLambertMaterial color="#1fa05a" emissive="#073d20" />
+        <meshLambertMaterial color="#1fa05a" />
       </mesh>
       {/* el pecho rojo */}
       <mesh position={[0.06, -0.06, 0]} scale={[1, 0.9, 0.85]}>
@@ -509,7 +515,7 @@ function QuetzalFugaz() {
       </mesh>
       <mesh position={[0.12, 0.06, 0]}>
         <sphereGeometry args={[0.06, 6, 5]} />
-        <meshLambertMaterial color="#23b565" emissive="#073d20" />
+        <meshLambertMaterial color="#23b565" />
       </mesh>
       <mesh position={[0.18, 0.05, 0]} rotation={[0, 0, -Math.PI / 2]}>
         <coneGeometry args={[0.018, 0.05, 4]} />
