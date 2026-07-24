@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Sprout, AlertTriangle, CheckCircle, ChevronDown, ChevronUp, Bug, Wrench } from 'lucide-react';
+import { Sprout, AlertTriangle, ChevronDown, ChevronUp, Bug, Wrench } from 'lucide-react';
 import { GUIAS_DEMO } from '../../data/aprendizaje/guias-demo.js';
+import { IconoEtapaCiclo } from '../../visual/icons/index.js';
 
 /**
  * GuiaEspecieCards — tarjetas visuales del módulo de APRENDIZAJE.
@@ -56,18 +57,6 @@ export default function GuiaEspecieCards({ especie = 'papa', etapas: etapasProp 
     return colors[orden - 1] || colors[colors.length - 1];
   };
 
-  const getEtapaIcon = (orden) => {
-    const icons = [
-      <Sprout size={16} />,    // Germinación
-      <Sprout size={16} />,    // Vegetativo
-      <CheckCircle size={16} />, // Floración
-      <CheckCircle size={16} />, // Fructificación
-      <CheckCircle size={16} />, // Cosecha
-      <CheckCircle size={16} />  // Producto
-    ];
-    return icons[orden - 1] || icons[icons.length - 1];
-  };
-
   return (
     <div
       data-testid="guia-especie-cards"
@@ -108,7 +97,7 @@ export default function GuiaEspecieCards({ especie = 'papa', etapas: etapasProp 
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
                   <div className={`p-1.5 rounded-lg ${getEtapaColor(etapa.orden)}`}>
-                    {getEtapaIcon(etapa.orden)}
+                    <IconoEtapaCiclo orden={etapa.orden} size={16} />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-slate-100">
