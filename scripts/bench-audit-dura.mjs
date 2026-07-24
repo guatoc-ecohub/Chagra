@@ -99,7 +99,7 @@ export async function callOllama(messages, {
   model = DEFAULT_MODEL,
   ollamaUrl = DEFAULT_OLLAMA_URL,
   fetchImpl = fetch,
-  timeoutMs = 120_000,
+  timeoutMs = Number(process.env.AUDIT_TIMEOUT_MS || 180_000),
   numPredict = 600,
 } = {}) {
   const response = await fetchImpl(ollamaUrl, {
@@ -148,7 +148,10 @@ export async function runCase(item, options = {}) {
 
 export async function runCases(cases, options = {}) {
   const results = [];
-  await warmupModel(options);
+  // Warmup NO debe abortar la corrida: en carga fría un modelo grande puede
+  // exceder el timeout del callOllama. Si falla, seguimos — el primer caso
+  // absorbe la carga (con su propio timeout+catch por caso).
+  try { await warmupModel(options); } catch { /* cold load; los casos siguen igual */ }
   for (let index = 0; index < cases.length; index += 1) {
     const result = await runCase(cases[index], options);
     results.push(result);
