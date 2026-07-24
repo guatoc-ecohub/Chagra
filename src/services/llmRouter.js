@@ -18,6 +18,7 @@
  */
 
 import { analyzeQueryComplexity } from './queryComplexityAnalyzer';
+import { ENV } from '../config/env';
 
 /**
  * BUG A (fuga de roles, incidente prod 2026-05-30) — stop sequences anti
@@ -87,15 +88,11 @@ export const ROUTES = {
     // Plus: usar el mismo modelo para chat simple y complex elimina el
     // cold-start cuando el router escala (no hay 2do modelo que cargar).
     // Tradeoff de latencia amortizado por UX queueing + tip flotante.
-    // Override via env VITE_LLM_CHAT_MODEL para experimentos.
-    model:
-      (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_CHAT_MODEL) ||
-      // 2026-07-22: granite3.3:8b -> gemma4:e2b. La nota de arriba decía que
-      // granite3.3 se eligió para "mitigar errores geográficos + piso térmico
-      // observados en producción". La medición dice que NO los mitigó: con juez
-      // semántico sobre 70 sondas, granite3.3 falla el piso térmico el 41,7% de
-      // las veces y contamina el 47,7% global. gemma4:e2b: 6,7% y 10%.
-      'gemma4:e2b',
+    // Modelo leído de ENV.CHAT_MODEL (src/config/env.js, fuente única de
+    // verdad — override en build-time con VITE_LLM_CHAT_MODEL para
+    // experimentos, sin tocar código). Ver el comentario de esa clave para
+    // el historial de bench (granite3.3 → gemma4:e2b → gemma4:e4b).
+    model: ENV.CHAT_MODEL,
     keep_alive_min: 30,
     temperature: 0.3,
     // 2026-06-06: 512→768. Fuga real (interacción operador): respuesta de
@@ -111,20 +108,15 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'gemma4:e2b (chat+complex unificado, evita cold-start). ' +
+      `${ENV.CHAT_MODEL} (chat+complex unificado, evita cold-start). ` +
       'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   chat_complex: {
-    // Override por env para que el operador pueda probar otros modelos
-    // sin redeploy de código. Si VITE_LLM_COMPLEX_MODEL no está seteado,
-    // usa el modelo complex configurado (según bench interno, la opción que
-    // evita confusiones taxonómicas con cupo de GPU razonable).
-    model:
-      (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_COMPLEX_MODEL) ||
-      // 2026-07-22: la nota de arriba decía que granite3.3 "evita confusiones
-      // taxonómicas". El bench con juez semántico lo desmiente: confusión de
-      // especie y cruce de cultivos al 91,7%. gemma4:e2b baja el cruce a 33,3%.
-      'gemma4:e2b',
+    // Modelo leído de ENV.CHAT_COMPLEX_MODEL (src/config/env.js, fuente
+    // única de verdad — override en build-time con VITE_LLM_COMPLEX_MODEL
+    // para experimentos, sin tocar código). Ver el comentario de esa clave
+    // para el historial de bench (granite3.3 → gemma4:e2b → gemma4:e4b).
+    model: ENV.CHAT_COMPLEX_MODEL,
     keep_alive_min: 5,
     temperature: 0.3,
     // 2026-06-06: 768→1024. Las queries complejas (planes multi-cultivo,
@@ -135,21 +127,22 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'gemma4:e2b (chat+complex unificado, evita cold-start). ' +
+      `${ENV.CHAT_COMPLEX_MODEL} (chat+complex unificado, evita cold-start). ` +
       'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   nlu: {
-    // NLU REAL = sidecar agro-mcp nlu.ts (granite3.3:8b). Este campo es
-    // vestigial: la PWA delega NLU al sidecar /nlu. Ver
-    // Chagra-strategy/ops/MODELS.md (fuente única de verdad de modelos).
-    model: 'gemma4:e2b',
+    // NLU REAL = sidecar agro-mcp nlu.ts (repo aparte chagra-pro, su propia
+    // env var runtime NLU_MODEL). Este campo es vestigial: la PWA delega NLU
+    // al sidecar /nlu. Se deja consistente con ENV.NLU_MODEL (src/config/env.js,
+    // fuente única de verdad) por si algún caller legacy invoca esta ruta.
+    model: ENV.NLU_MODEL,
     keep_alive_min: 0,
     temperature: 0,
     max_tokens: 150,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Vestigial — NLU real ejecuta en sidecar agro-mcp nlu.ts con ' +
-      'gemma4:e2b (unificado con chat para no tener 2 modelos en 12 GB). ' +
+      'Vestigial — NLU real ejecuta en sidecar agro-mcp nlu.ts con su propio ' +
+      `NLU_MODEL runtime (debe alinearse con ${ENV.NLU_MODEL}). ` +
       'Detalle en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   reasoning: {
