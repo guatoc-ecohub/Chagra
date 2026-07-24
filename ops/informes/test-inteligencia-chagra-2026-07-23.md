@@ -474,24 +474,28 @@ se lee JUNTO a GROUNDING para no premiar al mudo (un mudo saca 0 % contam pero g
 
 | # | Modelo | ÍNDICE | GROUND. | TAXON. | CONTAM↓ | ~GB | método |
 |---|--------|:---:|:---:|:---:|:---:|:---:|:---|
-| 1 | **`qwen3.5:4b`** ⭐ | **84.7** | 86.9 | 92.3 | **5%** | 3.4 | chat |
-| 2 | `gemma3:4b` | 81.7 | 75.0 | 100 | 15% | 3.3 | generate |
-| 3 | `gemma4:e4b` | 81.6 | 81.2 | 84.6 | 10% | 9.6 | generate |
-| 4 | `phi4-mini` | 79.4 | 75.0 | 84.6 | 25% | 2.5 | chat |
-| 5 | `aya:8b` | 79.1 | 74.2 | 84.6 | 30% | 5.0 | chat |
-| 6 | `exaone3.5:2.4b` | 78.3 | 65.3 | 100 | 45% | 1.6 | chat |
-| 7 | `granite33-dpo` (propio) | 78.1 | 77.9 | 69.2 | 5% | 4.9 | chat |
-| 8 | `qwen35-sft-alpha` (propio) | 77.8 | 70.3 | 84.6 | 10% | 4.8 | chat |
-| 9 | `qwen3:4b` | 74.5 | 54.3 | 100 | 35% | 2.5 | chat |
-| 10 | `qwen3.5:9b` (base) | 70.2 | 48.8 | 84.6 | 0% | 6.6 | chat |
-| 11 | `gemma4:e2b` (PROD HOY) | 69.9 | 57.7 | 61.5 | 5% | 7.2 | generate |
-| 12 | `granite-keeper` (propio) | 68.2 | 36.4 | 100 | 0% | 5.1 | chat |
-| 13 | `qwen35-dpo-alpha` (propio) | 63.2 | 35.4 | 69.2 | 10% | 4.8 | chat |
-| 14 | `falcon3:3b` | 61.1 | 32.6 | 61.5 | 50% | 2.0 | chat |
-| 15 | `phi4-mini-reasoning` | 60.2 | 13.6 | 100 | **90%** | 3.2 | chat |
-| 16 | `llama3.2:3b` | 51.5 | 31.4 | 0 | 0% | 2.0 | chat |
-| 17 | `granite33-curado` (propio) | 40.5 | 0·MUDO | 0 | 0% | 4.9 | chat |
-| 17 | `qwen35-chagra-cand` (propio) | 40.5 | 0·ROTO | 0 | 0% | 5.6 | chat |
+| 1 | `ministral-3:14b` ¹ | 86.1 | 87.5 | 100 | 10% | 9.1 | chat |
+| 2 | `ministral-3:latest` ¹ | 86.0 | 87.2 | 100 | 15% | 6.0 | chat |
+| 3 | **`qwen3.5:4b`** ⭐ | **84.7** | 86.9 | 92.3 | **5%** | 3.4 | chat |
+| 4 | `gemma3:4b` | 81.7 | 75.0 | 100 | 15% | 3.3 | generate |
+| 5 | `gemma4:e4b` | 81.6 | 81.2 | 84.6 | 10% | 9.6 | generate |
+| 6 | `phi4-mini` | 79.4 | 75.0 | 84.6 | 25% | 2.5 | chat |
+| 7 | `aya:8b` | 79.1 | 74.2 | 84.6 | 30% | 5.0 | chat |
+| 8 | `exaone3.5:2.4b` | 78.3 | 65.3 | 100 | 45% | 1.6 | chat |
+| 9 | `granite33-dpo` (propio) | 78.1 | 77.9 | 69.2 | 5% | 4.9 | chat |
+| 10 | `qwen35-sft-alpha` (propio) | 77.8 | 70.3 | 84.6 | 10% | 4.8 | chat |
+| 11 | `qwen3:4b` | 74.5 | 54.3 | 100 | 35% | 2.5 | chat |
+| 12 | `qwen3.5:9b` (base) | 70.2 | 48.8 | 84.6 | 0% | 6.6 | chat |
+| 13 | `gemma4:e2b` (PROD HOY) | 69.9 | 57.7 | 61.5 | 5% | 7.2 | generate |
+| 14 | `granite-keeper` (propio) | 68.2 | 36.4 | 100 | 0% | 5.1 | chat |
+| 15 | `qwen35-dpo-alpha` (propio) | 63.2 | 35.4 | 69.2 | 10% | 4.8 | chat |
+| 16 | `falcon3:3b` | 61.1 | 32.6 | 61.5 | 50% | 2.0 | chat |
+| 17 | `phi4-mini-reasoning` | 60.2 | 13.6 | 100 | **90%** | 3.2 | chat |
+| 18 | `llama3.2:3b` | 51.5 | 31.4 | 0 | 0% | 2.0 | chat |
+| 19 | `granite33-curado` (propio) | 40.5 | 0·MUDO | 0 | 0% | 4.9 | chat |
+| 19 | `qwen35-chagra-cand` (propio) | 40.5 | 0·ROTO | 0 | 0% | 5.6 | chat |
+
+¹ **`ministral-3` lidera texto FÁCIL (v1) pero se DERRUMBA en el duro (v2): `:latest` 86.0→69.0, `:14b` 86.1→63.5** (ver §11). Debajo de qwen3.5:4b en v2 (76.3) y pesa 2–3×. `qwen3.5:4b` sigue siendo el ganador robusto.
 
 Notas: latencia de texto no se instrumentó por modelo (se usa ~GB como proxy de costo).
 `phi4-mini` y `falcon3` sufrieron false-mute bajo contención en la primera pasada (40.5);
