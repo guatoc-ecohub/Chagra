@@ -609,3 +609,11 @@ Los ministral son multimodales y **lideran v1** (los únicos que superan a qwen3
 En v2 quedan en 69.0 / 63.5 — **por debajo de qwen3.5:4b (76.3)**, y pesan 2–3× más. Otro
 caso de "brilla en lo memorizable, no razona lo difícil". **qwen3.5:4b sigue siendo #1 en el
 set duro** y el más eficiente. El retador de v1 no aguanta v2.
+
+En VISIÓN tampoco superan: `ministral-3:latest` = **24.4** (16.7 % id, 80 % honestidad) —
+empata a la mitad de tabla, muy por debajo de `qwen3.5:4b`/`gemma3:4b` (45.5). (`ministral-3:14b`
+9.1 GB offloadea en la M6000 y no cerró el bench visual en la ventana — dato menor.)
+
+**Cierre del test a full:** ni fine-tunes propios, ni gemma grandes, ni ministral, ni VLM
+nuevos superan a `qwen3.5:4b` en el conjunto texto-duro + visión + tools + tamaño. El modelo
+único sale del test exhaustivo como el ganador robusto e indiscutible.
