@@ -112,6 +112,21 @@ function MigaVolver({ onSalir, mundoId }) {
   );
 }
 
+function FincaFuenteBadge({ fuente }) {
+  if (!fuente) return null;
+  const texto =
+    fuente.general === 'real'
+      ? 'Datos reales de la finca'
+      : fuente.general === 'muestra'
+        ? 'Datos de muestra parcial'
+        : 'Datos de finca faltantes';
+  return (
+    <span className="mundo-fuente" data-fuente={fuente.general} data-testid="mundo-fuente-badge">
+      {texto}
+    </span>
+  );
+}
+
 function MundoInterno({
   mundoId, tier = 'alto', reducedMotion = false, onHotspot, onSalir, animo = 'sereno', energia = 1,
   hablando = false, focoId = null, focoToken = 0,
@@ -141,6 +156,7 @@ function MundoInterno({
      muestra). Se llama SIEMPRE (antes de cualquier return) por regla de hooks. */
   const fincaViva = useFincaViva();
   const estadoReal = estadoFinca ?? fincaViva;
+  const fuenteGeneral = estadoReal?._fuente || null;
 
   const alTimeout3D = useCallback(() => setCaido3d(true), []);
   const reintentar3D = useCallback(() => {
@@ -165,6 +181,8 @@ function MundoInterno({
     const espejo = resolverMundo(mundoId, 'bajo');
     return (
       <div className="mundo-root" data-dim="2d" data-mundo={mundoId} data-caida3d="1">
+        <MigaVolver onSalir={onSalir} mundoId={mundoId} />
+        <FincaFuenteBadge fuente={fuenteGeneral} />
         <div className="mundo-caida__contenido">
           {espejo.modo === '2d' && (
             <Mundo2D
@@ -182,7 +200,6 @@ function MundoInterno({
         {/* Sin invitación de audio acá: el aviso de caída ya ocupa ese lugar
             (señal mala ≠ momento de invitar); queda para la próxima entrada. */}
         <AvisoCaida3D tinte={tinte} onReintentar={reintentar3D} />
-        <MigaVolver onSalir={onSalir} mundoId={mundoId} />
       </div>
     );
   }
@@ -197,6 +214,8 @@ function MundoInterno({
       : plan.entrada.params;
     return (
       <div className="mundo-root" data-dim="3d" data-mundo={mundoId}>
+        <MigaVolver onSalir={onSalir} mundoId={mundoId} />
+        <FincaFuenteBadge fuente={fuenteGeneral} />
         <Suspense fallback={<MundoCargando tinte={tinte} onTimeout={alTimeout3D} />}>
           {/* `Escena` es un `lazy` resuelto en useMemo (fresco al reintentar —
               mecanismo de caída digna, ver cabecera). react-hooks/static-components
@@ -241,7 +260,6 @@ function MundoInterno({
         {/* Invitación de PRIMER USO del sonido ambiental (una sola vez): vive
             en el host para cubrir app y vitrinas por igual (allá no hay Perfil). */}
         <InvitacionAudioMundo reducedMotion={reducedMotion} tinte={tinte} />
-        <MigaVolver onSalir={onSalir} mundoId={mundoId} />
       </div>
     );
   }
@@ -249,6 +267,8 @@ function MundoInterno({
   // 2D
   return (
     <div className="mundo-root" data-dim="2d" data-mundo={mundoId}>
+      <MigaVolver onSalir={onSalir} mundoId={mundoId} />
+      <FincaFuenteBadge fuente={fuenteGeneral} />
       <Mundo2D
         escena={plan.escena}
         motivo={plan.motivo}
@@ -260,7 +280,6 @@ function MundoInterno({
         energia={energia}
       />
       <InvitacionAudioMundo reducedMotion={reducedMotion} tinte={tinte} />
-      <MigaVolver onSalir={onSalir} mundoId={mundoId} />
     </div>
   );
 }
