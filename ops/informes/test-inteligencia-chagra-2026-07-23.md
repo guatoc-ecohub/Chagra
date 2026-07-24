@@ -643,9 +643,11 @@ día (GPU compartida con campesinos > enriquecimiento).
 
 | Modelo | overall | campesino | **gomelo** | científico |
 |--------|:---:|:---:|:---:|:---:|
+| **`qwen3.5:4b`** ⭐ | **20%** | 3/16 | **1/8** | 2/6 |
 | `gemma3:4b` | 17% | 3/16 | **1/8** | 1/6 |
 | `aya:8b` | 10% | 2/16 | **0/8** | 1/6 |
 | `exaone3.5:2.4b` | 7% | 1/16 | **0/8** | 1/6 |
+| `gemma4:e4b` · `granite33-dpo` · `phi4-mini` · `gemma4:e2b` | _(en curso)_ | | | |
 
 Lectura: bajo las trampas duras multi-turno, incluso los modelos fuertes en el índice pasan
 poco (10–17%) — el registro **gomelo** (irónico, afirma premisas falsas con confianza) es de
