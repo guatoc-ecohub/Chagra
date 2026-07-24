@@ -24,18 +24,27 @@ import { retrieve } from './ragRetriever';
 import { callTool, isSidecarEnabled, judgeVision } from './sidecarClient';
 import { parseJsonTolerant } from '../utils/parseJsonTolerant';
 import { hashImage, getCached, setCached } from './visionCacheService';
+import { ENV } from '../config/env';
 
 // Ruta relativa: Nginx proxea /api/ollama/ → http://localhost:11434/
 // Ruta final: /api/ollama/api/generate → http://localhost:11434/api/generate
 const OLLAMA_BASE = '/api/ollama';
 const OLLAMA_URL = `${OLLAMA_BASE}/api/generate`;
-// Modelo de diagnóstico multimodal configurado.
-const DIAGNOSIS_MODEL = 'gemma3:4b';
-// Modelo de visión configurado para reconocimiento de especies. La
-// selección de primary y de los fallbacks se basa en bench interno de
-// confiabilidad del parseo JSON y de latencia en GPU local.
-const VISION_SPECIES_MODEL = 'llama3.2-vision:11b';
-const VISION_SPECIES_FALLBACK_MODEL = 'gemma3:4b';
+// Modelo de diagnóstico multimodal — lee de ENV.VISION_MODEL (src/config/env.js,
+// fuente única de verdad de los modelos del agente).
+const DIAGNOSIS_MODEL = ENV.VISION_MODEL;
+// Modelo(s) de visión para reconocimiento de especies.
+// 2026-07-23 (PR #2738 §9): primary y fallback 1 unificados en
+// ENV.VISION_MODEL (gemma3:4b) — retira `llama3.2-vision:11b` como primary,
+// que en el bench profundo (18 plagas + 5 sanas) dio 0% honestidad y
+// alucinó diagnóstico en TODAS las muestras sanas de control (peligroso
+// para una feature de salud de planta). Efecto secundario conocido: al
+// unificarse, fallback 1 ahora coincide con el primary (mismo valor), así
+// que el único respaldo real de arquitectura distinta que queda es
+// fallback 2 (qwen2.5vl:7b) — colapsar la cadena a 2 niveles es un
+// follow-up fuera de este cambio, no una decisión tomada en este commit.
+const VISION_SPECIES_MODEL = ENV.VISION_MODEL;
+const VISION_SPECIES_FALLBACK_MODEL = ENV.VISION_MODEL;
 const VISION_SPECIES_FALLBACK_2_MODEL = 'qwen2.5vl:7b';
 
 // Prompt base sin contexto RAG. Fallback usado cuando el corpus no cargó
