@@ -32,6 +32,11 @@ import * as THREE from 'three';
 import { perfilDeTier } from '../../visual/mundo3d/deviceTier.js';
 import CamaraDirector from '../../visual/mundo3d/escenas/CamaraDirector.jsx';
 import DirectorValle from './DirectorValle.jsx';
+import MonitorRendimiento, {
+  detectarTierInicial,
+  presupuestoDeTier,
+  useTierPerformance,
+} from '../../visual/mundo3d/usePerformanceMonitor.jsx';
 import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
 /* EL CEREBRO DE ANGELITA (auditoría 2026-07-18: estaba construido y
    DESCONECTADO — ningún componente vivo lo consumía). La abeja del valle
@@ -2713,6 +2718,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
 
   return (
     <>
+      {!reducedMotion && <MonitorRendimiento key={tier} tier={tier} />}
       {/* Fondo + niebla + luces, amortiguadas hacia la franja del día. */}
       <AtmosferaValle c={c} perfil={perfil} reducedMotion={reducedMotion} />
       {fracEstrellas > 0 && perfil.estrellas > 0 && (
@@ -2889,7 +2895,7 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
         />
       )}
 
-      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} />
+      <CriaturasValle reducedMotion={reducedMotion} cupo={perfil.criaturas} tier={tier} />
       {!portada && (
         <Beacon onAlerta={onAlerta} reducedMotion={reducedMotion} conLuz={perfil.luzBeacon} />
       )}
@@ -2957,7 +2963,6 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
           última palabra sobre la cámara mientras cae dentro del mundo. Solo
           hace algo cuando `aplanando` (fase 'viajando'); inerte el resto. */}
       <AplaneNewDonk foco={foco} aplanando={aplanando} />
-      <AdaptiveDpr pixelated />
     </>
   );
 }
@@ -3012,10 +3017,12 @@ export default function Valle3D({
      restauración automática, y al `webglcontextrestored` esta key REMONTA el
      <Canvas> entero — contexto nuevo, escena repintada, nunca negro fijo. */
   const [glKey, setGlKey] = useState(0);
+  const tierInicial = useMemo(() => detectarTierInicial({ tier, reducedMotion }), [tier, reducedMotion]);
   /* El PERFIL DE RENDER del tier (DR-3D-PERF-GAMABAJA): 'alto' conserva este
      look intacto; 'medio'/'bajo' degradan sombras, DPR, antialias, densidad e
      instancian lo repetido. El default 'alto' preserva a los hosts viejos. */
-  const perfil = useMemo(() => perfilDeTier(tier), [tier]);
+  const perfil = useMemo(() => perfilDeTier(tierInicial), [tierInicial]);
+  const presupuesto = useMemo(() => presupuestoDeTier(tierInicial), [tierInicial]);
   /* La pose de reposo según el ASPECTO del equipo (una vez por montaje: girar
      el teléfono re-monta rutas enteras en la práctica; no vale un resize
      listener que mueva la cámara bajo los dedos del usuario). */
@@ -3033,8 +3040,8 @@ export default function Valle3D({
       key={glKey}
       className={`valle-canvas${listo ? ' valle-canvas--listo' : ''}`}
       shadows={perfil.sombras}
-      dpr={perfil.dpr}
-      gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }}
+      dpr={presupuesto.dpr}
+      gl={{ antialias: tierInicial === 'alto', powerPreference: 'high-performance' }}
       camera={/** @type {any} */ ({ position: pose.position, fov: pose.fov })}
       frameloop={reducedMotion ? 'demand' : 'always'}
       onCreated={({ gl }) => {
@@ -3072,7 +3079,7 @@ export default function Valle3D({
           onAngelita={onAngelita}
           reducedMotion={reducedMotion}
           perfil={perfil}
-          tier={tier}
+          tier={tierInicial}
           aplanando={aplanando}
           camaraDirector={camaraDirector}
           beatsRef={beatsRef}

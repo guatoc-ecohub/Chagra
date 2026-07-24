@@ -1,0 +1,77 @@
+{
+  "species_slug": "foeniculum_vulgare_azoricum",
+  "scientific_name": "Foeniculum vulgare Mill. var. azoricum",
+  "common_names": [
+    "Hinojo bulbo"
+  ],
+  "family": "Apiaceae",
+  "category": "hortalizas_hoja",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Variedad de hinojo seleccionada por su bulbo engrosado en la base de las hojas. Requiere aporque para blanquear el bulbo. Siembra directa por su raiz pivotante sensible al trasplante."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 1500,
+      "optimo_max": 2600,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 12,
+      "optimo_max": 22,
+      "max_tolerable": 28
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El hinojo de bulbo o hinojo de Florencia (Foeniculum vulgare Mill. var. azoricum (Mill.) Thell., familia Apiaceae) es la variedad cultivar seleccionada de Foeniculum vulgare a partir de poblaciones de las islas Azores, diferenciada de la forma silvestre y de las variedades semilleras (var. dulce, var. vulgare) por su base foliar engrosada y carnosa que forma un pseudobulbo comestible blanco-verdoso de sabor anisado dulce y textura crujiente. Se cultiva en zonas templadas a frías colombianas (Cundinamarca, Boyacá, Antioquia oriental, Nariño, Cauca) entre 1.500 y 2.600 msnm con sol pleno, riego regular y suelo profundo de buena fertilidad. Su raíz pivotante sensible al trasplante obliga a siembra directa en surcos definitivos, y el bulbo se desarrolla en 3-4 meses tras la nascencia, requiriendo aporque progresivo de tierra contra la base foliar para blanquear y enternecer el pseudobulbo (similar al apio y al puerro). Lección viva: variedad de hinojo seleccionada por su bulbo comestible que enseña el aporque como técnica agronómica de blanqueado (la ausencia de luz inhibe la síntesis de clorofila y favorece textura tierna), la diferencia entre la forma silvestre alelopática semillera y la domesticada hortícola (un mismo binomio botánico puede contener cultivares con uso, manejo y química radicalmente distintos por selección humana milenaria), y el principio de selección varietal por órgano cosechado (semilla vs bulbo vs hoja) como motor de la diversidad agrícola europea introducida en Colombia. Comparte con el hinojo silvestre los exudados radicales cumarínicos alelopáticos, por lo que requiere aislamiento mínimo 2-3 m de tomate, frijol, cilantro y eneldo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, ICA Resolución 3168/2015, FAO EcoCrop, JBB Plantas Medicinales.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "fao-ecocrop",
+      "title": "fao-ecocrop",
+      "tier": "A",
+      "url": "https://gaez.fao.org/pages/ecocrop"
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.376Z"
+}

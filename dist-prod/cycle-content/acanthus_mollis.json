@@ -1,0 +1,83 @@
+{
+  "species_slug": "acanthus_mollis",
+  "scientific_name": "Acanthus mollis L.",
+  "common_names": [
+    "Acanto andino"
+  ],
+  "family": "Acanthaceae",
+  "category": "cercas_vivas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "living_fence",
+    "pollinator_attractor"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "division_mata",
+      "rizoma"
+    ],
+    "best_method": "division_mata",
+    "protocol_resumen": "Division de matas establecidas en epoca lluviosa. Cada division con 2-3 yemas y raices. Plantar a 50-80cm de distancia. Crece formando macollos densos.",
+    "notas": "Herbacea perenne de follaje ornamental, naturalizada en los Andes colombianos. Flores altas en espiga. Ideal para bordes de cerca viva y control de erosion en taludes.",
+    "fuente": "Perez Arbelaez 1947; GBIF"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1500,
+      "optimo_min": 1800,
+      "optimo_max": 2600,
+      "max_absoluto": 3000
+    },
+    "temperatura_c": {
+      "helada_letal": -5,
+      "optimo_min": 12,
+      "optimo_max": 20,
+      "max_tolerable": 26
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El acanto (Acanthus mollis L., familia Acanthaceae) es una herbácea perenne mediterránea naturalizada en los Andes colombianos como ornamental y cerca viva. Sus hojas profundamente lobuladas de hasta 80 cm de largo son la segunda más grandes entre las herbáceas cultivadas en clima frío, e inspiraron los capiteles corintios de la arquitectura griega clásica del siglo V a.C., conexión arte-naturaleza que conecta huerto y patrimonio cultural. Se cultiva en Cundinamarca (Sabana de Bogotá, Subachoque, Cota, Tabio), Boyacá (Tunja, Villa de Leyva) y Antioquia (oriente) entre 1.500 y 2.600 msnm en zona térmica templada a fría, en sombra parcial bajo árboles o muros orientados al sur. Lección viva: enseña adaptaciones morfológicas para capturar luz difusa en sotobosque — hojas amplias con cutícula brillante que reflejan exceso lumínico, y espigas florales erguidas hasta 1.5 m que sobresalen del follaje para acceder a polinizadores aéreos (abejorros, abejas carpinteras Xylocopa). Manejo agroecológico: propagación por división de mata en época lluviosa con 2-3 yemas y raíces, plantar a 50-80 cm para macollos densos, riego moderado primer año, control de erosión en taludes por rizomas superficiales, follaje resistente a heladas leves (-5°C). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez Arbeláez 1947 Plantas Útiles de Colombia, Jardín Botánico Bogotá, Humboldt Flora Alto Andina.",
+  "sources": [
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "jbb-plantas-medicinales",
+      "title": "jbb-plantas-medicinales",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.377Z"
+}

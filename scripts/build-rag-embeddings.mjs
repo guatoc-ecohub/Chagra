@@ -148,6 +148,31 @@ function extractPassageText(doc) {
   const bodyText = body.join(' ').trim();
   if (bodyText) parts.push(bodyText);
 
+  // Clima / altitud / piso termico (RUNPATH 2026-07-15 #9): antes NO se embebian,
+  // asi que la capa SEMANTICA nunca recuperaba DONDE crece una mata (complementa
+  // el fix BM25 de flattenDoc, #00). Se construyen frases legibles para que nomic
+  // capte "clima frio / altura alta", no numeros sueltos.
+  const clima = [];
+  if (Array.isArray(doc.thermal_zones) && doc.thermal_zones.length) {
+    clima.push(`Piso termico: ${doc.thermal_zones.join(', ')}.`);
+  }
+  const req = doc.requirements;
+  if (req && typeof req === 'object') {
+    const alt = req.altitud_msnm;
+    if (alt && typeof alt === 'object') {
+      const lo = alt.optimo_min ?? alt.min_absoluto;
+      const hi = alt.optimo_max ?? alt.max_absoluto;
+      if (lo != null && hi != null) clima.push(`Altitud optima: ${lo} a ${hi} msnm.`);
+    }
+    const temp = req.temperatura_c;
+    if (temp && typeof temp === 'object' && temp.optimo_min != null && temp.optimo_max != null) {
+      clima.push(`Temperatura optima: ${temp.optimo_min} a ${temp.optimo_max} grados C.`);
+    }
+    if (typeof req.agua === 'string' && req.agua) clima.push(`Requerimiento de agua: ${req.agua}.`);
+  }
+  const climaText = clima.join(' ').trim();
+  if (climaText) parts.push(climaText);
+
   return parts.join('. ').trim();
 }
 

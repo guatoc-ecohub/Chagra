@@ -10779,7 +10779,7 @@ export function applyOutputGuards(
   // exige altitud numérica.
   if (runPlantingGuards && !(vis && vis.modified)) {
     const chw = guardColdHighlandWarmCrop(text, { userMessage });
-    if (chw.modified) {
+    if (chw && chw.modified) {
       return { text: chw.text, modified: true, reasons: chw.reason ? [chw.reason] : [] };
     }
   }
@@ -11013,7 +11013,7 @@ export function applyOutputGuards(
   // genérico. Va antes del guard de contacto inventado para capturar el caso
   // específico con una respuesta más útil. Idempotente.
   const hallucinatedContactRes = guardHallucinatedContact(text, { userMessage });
-  if (hallucinatedContactRes.modified) {
+  if (hallucinatedContactRes && hallucinatedContactRes.modified) {
     text = hallucinatedContactRes.text;
     modified = true;
     if (hallucinatedContactRes.reason) reasons.push(hallucinatedContactRes.reason);
