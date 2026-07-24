@@ -1,11 +1,12 @@
 import { useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { AdaptiveDpr, OrbitControls } from '@react-three/drei';
+import { AdaptiveDpr, Html, OrbitControls } from '@react-three/drei';
 import { ATMOSFERA, CIELOS, PALETA, mezclar, mezclarCielo } from '../visual/mundo3d/atmosferaMadre.js';
 import { CIELOS_HORA } from '../visual/mundo3d/cielosHoraData.js';
 import { decidirTier, perfilDeTier } from '../visual/mundo3d/deviceTier.js';
 import { ParticulasAmbientales } from '../visual/mundo3d/ParticulasAmbientales.jsx';
+import { Gallina as GallinaCriolla } from '../visual/creatures/Gallina.jsx';
 
 const CIELO = mezclarCielo(CIELOS.corral);
 const DORADA = CIELOS_HORA.dorada;
@@ -75,39 +76,43 @@ function Cerca() {
 
 function Gallina({ posicion, indice, reducedMotion }) {
   const grupo = useRef(null);
+  const capa = useRef(null);
+  const rumbo = useRef(1);
   useFrame(({ clock }) => {
     if (reducedMotion || !grupo.current) return;
     const t = clock.elapsedTime * 1.8 + indice;
-    grupo.current.rotation.y = posicion[2] + Math.sin(t * 0.35) * 0.45;
+    const siguienteRumbo = Math.sin(t * 0.35) < -0.05 ? -1 : Math.sin(t * 0.35) > 0.05 ? 1 : rumbo.current;
+    if (siguienteRumbo !== rumbo.current && capa.current) {
+      rumbo.current = siguienteRumbo;
+      capa.current.style.transform = siguienteRumbo > 0 ? 'scaleX(-1)' : '';
+    }
     grupo.current.position.y = Math.max(0, Math.sin(t * 2.2)) * 0.025;
   });
-  const clara = indice % 3 === 0;
-  const cuerpo = clara ? '#d9c5a1' : indice % 2 ? '#9a5431' : '#b86a38';
   return (
-    <group ref={grupo} position={[posicion[0], 0.2, posicion[1]]} rotation={[0, posicion[2], 0]}>
-      <mesh scale={[0.38, 0.3, 0.52]}>
-        <sphereGeometry args={[0.55, 7, 5]} />
-        <meshLambertMaterial color={cuerpo} flatShading />
+    <group ref={grupo} position={[posicion[0], 0, posicion[1]]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.115, 0]}>
+        <circleGeometry args={[0.3, 12]} />
+        <meshBasicMaterial color={ATMOSFERA.sombra} transparent opacity={0.2} depthWrite={false} />
       </mesh>
-      <mesh position={[0, 0.22, -0.3]}>
-        <sphereGeometry args={[0.2, 7, 5]} />
-        <meshLambertMaterial color={cuerpo} flatShading />
-      </mesh>
-      <mesh position={[0, 0.28, -0.49]} rotation={[Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[0.07, 0.18, 4]} />
-        <meshLambertMaterial color={PALETA.ambar} />
-      </mesh>
-      <mesh position={[0, 0.43, -0.31]}>
-        <coneGeometry args={[0.07, 0.14, 5]} />
-        <meshLambertMaterial color="#b7432f" />
-      </mesh>
-      <mesh position={[0, 0.04, 0.46]} rotation={[Math.PI / 2.6, 0, 0]}>
-        <coneGeometry args={[0.22, 0.45, 5]} />
-        <meshLambertMaterial color={cuerpo} />
-      </mesh>
+      <Html center position={[0, 0.62, 0]} distanceFactor={10} zIndexRange={[4, 0]} pointerEvents="none">
+        <div ref={capa} aria-hidden="true" data-parvada="gallina" style={ESTILO_GALLINA}>
+          <GallinaCriolla
+            size={52 + ((indice * 7) % 3) * 5}
+            plumaje={indice % 3 === 0 ? 'clara' : 'colorada'}
+            animated={!reducedMotion}
+            compas={-((indice * 0.53) % 2.9)}
+            tier={reducedMotion ? 'bajo' : undefined}
+          />
+        </div>
+      </Html>
     </group>
   );
 }
+
+const ESTILO_GALLINA = {
+  filter: 'drop-shadow(0 2px 3px rgba(71, 49, 20, 0.32))',
+  pointerEvents: 'none',
+};
 
 function TractorGallinas() {
   return (

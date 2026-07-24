@@ -1,0 +1,55 @@
+[data-creature='gallina'] .gna-cabeza {
+  transform-box: fill-box;
+  transform-origin: 88% 92%;
+}
+
+[data-creature='gallina'] .gna-cola {
+  transform-box: fill-box;
+  transform-origin: left bottom;
+}
+
+[data-creature='gallina'] .gna-cuerpo {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: gna-respira 1.7s ease-in-out infinite;
+}
+
+[data-creature='gallina'] .gna-cabeza {
+  animation: gna-picoteo 2.9s ease-in-out infinite;
+}
+
+[data-creature='gallina'] .gna-cola {
+  animation: gna-cola 3.7s ease-in-out infinite;
+}
+
+@keyframes gna-respira {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025, 0.975); }
+}
+
+@keyframes gna-picoteo {
+  0%, 46%, 100% { transform: rotate(0deg); }
+  58% { transform: rotate(-34deg); }
+  70% { transform: rotate(-37deg); }
+  82% { transform: rotate(3deg); }
+}
+
+@keyframes gna-cola {
+  0%, 100% { transform: rotate(0deg); }
+  35% { transform: rotate(5deg); }
+  70% { transform: rotate(-4deg); }
+}
+
+[data-tier='bajo'] .gna-cuerpo,
+[data-tier='bajo'] .gna-cabeza,
+[data-tier='bajo'] .gna-cola {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='gallina'] .gna-cuerpo,
+  [data-creature='gallina'] .gna-cabeza,
+  [data-creature='gallina'] .gna-cola {
+    animation: none;
+  }
+}
