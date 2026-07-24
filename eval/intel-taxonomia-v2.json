@@ -1,0 +1,339 @@
+{
+  "_doc": "Set v2 TAXONOMÍA (3x dificultad vs v1) para test-inteligencia-chagra.mjs. v1 (eval/intel-taxonomia.json, 13 preguntas) medía género+epíteto de especies conocidas. v2 amplía a 5 subtipos verificados contra chagra_kg: (A) Variety-[IS_VARIETY_OF]->Species — variedad específica a especie correcta, incl. trampa 'Conilon' (robusta) vs arábiga (8); (B) nombre regional/folk-name -> identidad correcta, tomado directamente de los 34 nodos ConfusionWarning + RegionalLabel del grafo (source DR-LANG-2) — incluye casos de toxicidad real (yuca brava) y ambigüedad regional genuina que NO debe resolverse a una sola especie (guineo) (10); (C) pares CONFUSED_WITH reales del grafo — 4 de las 4 aristas existentes (4); (D) mismo género, especies distintas más allá de papa criolla/v1 — café robusta vs arábiga, plátano HÍBRIDO (Musa×paradisiaca) vs banano Cavendish puro (Musa AAA), etc. (4); (E) misma familia (HAS_FAMILY), género distinto — arracacha/zanahoria (Apiaceae), mora/fresa (Rosaceae), etc. (4). Todo verificado 2026-07-24 contra 743 Species / 160 Variety / 130 Family / 34 ConfusionWarning / 325 RegionalLabel / 4 CONFUSED_WITH en chagra_kg. Ver eval/README-v2.md.",
+  "queries": [
+    {
+      "id": "TAX2-A01",
+      "query": "¿a qué especie pertenece la variedad 'Castillo General'?",
+      "type": "variety_to_species",
+      "variety_name": "Castillo General",
+      "expected_genus": "coffea",
+      "expected_epithet": "arabica",
+      "corpus_slug": "coffea_arabica",
+      "trap": "NO Coffea canephora (robusta)"
+    },
+    {
+      "id": "TAX2-A02",
+      "query": "¿a qué especie pertenece la variedad 'Conilon'?",
+      "type": "variety_to_species",
+      "variety_name": "Conilon",
+      "expected_genus": "coffea",
+      "expected_epithet": "canephora",
+      "corpus_slug": "coffea_canephora",
+      "trap": "NO Coffea arabica — Conilon es variedad de ROBUSTA, no de arábiga"
+    },
+    {
+      "id": "TAX2-A03",
+      "query": "¿a qué especie pertenece la variedad 'Diacol Capiro'?",
+      "type": "variety_to_species",
+      "variety_name": "Diacol Capiro",
+      "expected_genus": "solanum",
+      "expected_epithet": "tuberosum",
+      "corpus_slug": "solanum_tuberosum",
+      "trap": "NO Solanum phureja (esa es la papa criolla)"
+    },
+    {
+      "id": "TAX2-A04",
+      "query": "¿a qué especie pertenece la variedad 'Criolla Colombia'?",
+      "type": "variety_to_species",
+      "variety_name": "Criolla Colombia",
+      "expected_genus": "solanum",
+      "expected_epithet": "phureja",
+      "corpus_slug": "solanum_phureja",
+      "trap": "NO Solanum tuberosum"
+    },
+    {
+      "id": "TAX2-A05",
+      "query": "¿a qué especie pertenece la variedad 'ICA Cerinza'?",
+      "type": "variety_to_species",
+      "variety_name": "ICA Cerinza",
+      "expected_genus": "phaseolus",
+      "expected_epithet": "vulgaris",
+      "corpus_slug": "phaseolus_vulgaris",
+      "trap": "NO Phaseolus lunatus"
+    },
+    {
+      "id": "TAX2-A06",
+      "query": "¿a qué especie pertenece la variedad 'CCN-51'?",
+      "type": "variety_to_species",
+      "variety_name": "CCN-51",
+      "expected_genus": "theobroma",
+      "expected_epithet": "cacao",
+      "corpus_slug": "theobroma_cacao",
+      "trap": "NO otra especie de Theobroma"
+    },
+    {
+      "id": "TAX2-A07",
+      "query": "¿a qué especie pertenece la variedad 'Hass'?",
+      "type": "variety_to_species",
+      "variety_name": "Hass",
+      "expected_genus": "persea",
+      "expected_epithet": "americana",
+      "corpus_slug": "persea_americana",
+      "trap": "'Hass' es CULTIVAR, no especie — la especie sigue siendo Persea americana"
+    },
+    {
+      "id": "TAX2-A08",
+      "query": "¿a qué especie pertenece la variedad 'La Selva'?",
+      "type": "variety_to_species",
+      "variety_name": "La Selva",
+      "expected_genus": "solanum",
+      "expected_epithet": "quitoense",
+      "corpus_slug": "solanum_quitoense",
+      "trap": "NO Solanum quitoense_amazonico (es un registro distinto en el catálogo, 'naranjilla amazónica')"
+    },
+    {
+      "id": "TAX2-B01",
+      "query": "en Antioquia y el Eje Cafetero le dicen 'cura' al aguacate, ¿a qué especie corresponde?",
+      "type": "regional_folk_name",
+      "corpus_slug": "persea_americana",
+      "correct_identity": "Persea americana",
+      "trap": "NO es sacerdote ni remedio médico — 'cura' es el nombre regional del aguacate"
+    },
+    {
+      "id": "TAX2-B02",
+      "query": "¿el 'choclo' se refiere al maíz seco para grano o a otra cosa?",
+      "type": "regional_folk_name",
+      "corpus_slug": "zea_mays",
+      "correct_identity": "Zea mays",
+      "trap": "Choclo SOLO aplica al maíz TIERNO/inmaduro, NO al grano seco ni al maíz para animal"
+    },
+    {
+      "id": "TAX2-B03",
+      "query": "¿puedo comer la 'yuca brava' recién cosechada igual que la yuca dulce?",
+      "type": "regional_folk_name",
+      "corpus_slug": "manihot_esculenta",
+      "correct_identity": "Manihot esculenta",
+      "trap": "Yuca brava es TÓXICA (alta en cianuro) — requiere detoxificación (rayado + lavado), NO es apta para consumo directo como la yuca dulce"
+    },
+    {
+      "id": "TAX2-B04",
+      "query": "en la Andina Sur al 'taxo' ¿le corresponde qué especie de Passiflora?",
+      "type": "regional_folk_name",
+      "corpus_slug": "passiflora_tarminiana",
+      "correct_identity": "Passiflora tarminiana",
+      "trap": "Es la curuba comestible, NO una pasiflora ornamental no comestible"
+    },
+    {
+      "id": "TAX2-B05",
+      "query": "¿la 'naranjilla' es un cítrico (Citrus) o corresponde a otro género?",
+      "type": "regional_folk_name",
+      "corpus_slug": "solanum_quitoense",
+      "correct_identity": "Solanum quitoense",
+      "trap": "Es el lulo (género Solanum), NO un cítrico — el nombre 'naranjilla' confunde por el color de la fruta"
+    },
+    {
+      "id": "TAX2-B06",
+      "query": "¿el 'maracuyá' y la 'gulupa' son exactamente lo mismo?",
+      "type": "regional_folk_name",
+      "corpus_slug": "passiflora_edulis_flavicarpa / passiflora_edulis_morada",
+      "correct_identity": "Passiflora edulis f. flavicarpa (maracuyá, amarillo, tropical) vs Passiflora edulis f. edulis (gulupa, morada, clima frío)",
+      "trap": "Son la MISMA especie (Passiflora edulis) pero formas/variedades distintas por color y piso térmico — NO son especies diferentes, pero tampoco intercambiables en manejo"
+    },
+    {
+      "id": "TAX2-B07",
+      "query": "en Boyacá al 'arraquín' ¿a qué especie corresponde, y con qué se confunde?",
+      "type": "regional_folk_name",
+      "corpus_slug": "arracacia_xanthorrhiza",
+      "correct_identity": "Arracacia xanthorrhiza",
+      "trap": "Es la arracacha — se confunde con apio de hoja (Apium graveolens) o zanahoria, pero es un género distinto (Arracacia)"
+    },
+    {
+      "id": "TAX2-B08",
+      "query": "en el Pacífico a la 'papa china' ¿le corresponde la papa andina (Solanum tuberosum)?",
+      "type": "regional_folk_name",
+      "corpus_slug": "colocasia_esculenta",
+      "correct_identity": "Colocasia esculenta",
+      "trap": "Papa china = malanga/taro (Colocasia esculenta, familia Araceae), NO tiene relación con la papa andina (Solanum tuberosum, Solanaceae)"
+    },
+    {
+      "id": "TAX2-B09",
+      "query": "¿el 'guineo' siempre se refiere a la misma especie en toda Colombia?",
+      "type": "regional_folk_name",
+      "corpus_slug": "AMBIGUO (regional)",
+      "correct_identity": "Musa AAB (plátano) en Caribe/Pacífico, o Musa AAA (banano) según región",
+      "trap": "NO es siempre lo mismo: es ambivalente y depende de la región — requiere confirmación regional antes de dar manejo específico, no asumir 'banano de exportación' ni 'plátano de freír' por defecto"
+    },
+    {
+      "id": "TAX2-B10",
+      "query": "¿el 'cogollero' es cualquier oruga que defolia el maíz?",
+      "type": "regional_folk_name",
+      "corpus_slug": "spodoptera_frugiperda",
+      "correct_identity": "Spodoptera frugiperda",
+      "trap": "Se refiere específicamente a Spodoptera frugiperda atacando el verticilo del maíz, NO a 'cualquier defoliador' u 'oruga común' genérica"
+    },
+    {
+      "id": "TAX2-C01",
+      "query": "¿la arracacha y el apio de hoja son la misma especie porque a veces se confunden?",
+      "type": "confused_with_pair",
+      "corpus_slugs": [
+        "arracacia_xanthorrhiza",
+        "apium_graveolens"
+      ],
+      "scientific_names": [
+        "Arracacia xanthorrhiza",
+        "Apium graveolens"
+      ],
+      "trap": "Misma familia (Apiaceae), géneros DIFERENTES (Arracacia vs Apium) — no son la misma especie ni intercambiables en manejo"
+    },
+    {
+      "id": "TAX2-C02",
+      "query": "¿el cilantro y el cilantro cimarrón son la misma planta con dos nombres regionales?",
+      "type": "confused_with_pair",
+      "corpus_slugs": [
+        "coriandrum_sativum",
+        "eryngium_foetidum"
+      ],
+      "scientific_names": [
+        "Coriandrum sativum",
+        "Eryngium foetidum"
+      ],
+      "trap": "Ambos son Apiaceae pero géneros DIFERENTES (Coriandrum vs Eryngium) — sabor similar, plantas distintas, el cimarrón tolera más el clima cálido"
+    },
+    {
+      "id": "TAX2-C03",
+      "query": "¿el maracuyá amarillo y la gulupa morada son especies distintas de Passiflora?",
+      "type": "confused_with_pair",
+      "corpus_slugs": [
+        "passiflora_edulis_flavicarpa",
+        "passiflora_edulis_morada"
+      ],
+      "scientific_names": [
+        "Passiflora edulis f. flavicarpa",
+        "Passiflora edulis f. edulis"
+      ],
+      "trap": "NO son especies distintas: ambas son Passiflora edulis, formas/variedades diferentes por color de fruta y piso térmico de cultivo"
+    },
+    {
+      "id": "TAX2-C04",
+      "query": "¿la malanga blanca (bore) y el taro son la misma especie?",
+      "type": "confused_with_pair",
+      "corpus_slugs": [
+        "xanthosoma_sagittifolium",
+        "colocasia_esculenta"
+      ],
+      "scientific_names": [
+        "Xanthosoma sagittifolium",
+        "Colocasia esculenta"
+      ],
+      "trap": "Misma familia (Araceae), géneros DIFERENTES (Xanthosoma vs Colocasia) — se confunden por el hábito visual similar de la hoja"
+    },
+    {
+      "id": "TAX2-D01",
+      "query": "¿el café robusta es la misma especie que el café arábigo que domina la caficultura colombiana?",
+      "type": "same_genus_diff_species",
+      "corpus_slugs": [
+        "coffea_canephora",
+        "coffea_arabica"
+      ],
+      "scientific_names": [
+        "Coffea canephora",
+        "Coffea arabica"
+      ],
+      "trap": "NO — son especies distintas del mismo género Coffea; en Colombia domina ampliamente el arábigo, el robusta es marginal"
+    },
+    {
+      "id": "TAX2-D02",
+      "query": "¿el plátano y el banano Cavendish son genéticamente equivalentes, solo con nombres distintos?",
+      "type": "same_genus_diff_species",
+      "corpus_slugs": [
+        "musa_paradisiaca",
+        "musa_aaa_cavendish"
+      ],
+      "scientific_names": [
+        "Musa × paradisiaca",
+        "Musa AAA (subgrupo Cavendish)"
+      ],
+      "trap": "NO — el plátano es un HÍBRIDO (nótese el '×') entre Musa acuminata y M. balbisiana (genoma AAB), mientras el banano Cavendish es un triploide puro de M. acuminata (AAA)"
+    },
+    {
+      "id": "TAX2-D03",
+      "query": "¿el ñame blanco (Dioscorea alata) y el ñame blanco africano (Dioscorea rotundata) son la misma especie?",
+      "type": "same_genus_diff_species",
+      "corpus_slugs": [
+        "dioscorea_alata",
+        "dioscorea_rotundata"
+      ],
+      "scientific_names": [
+        "Dioscorea alata",
+        "Dioscorea rotundata"
+      ],
+      "trap": "NO — mismo género Dioscorea, especies distintas; comparten el calificativo 'blanco' en el nombre común pero son taxonómicamente diferentes"
+    },
+    {
+      "id": "TAX2-D04",
+      "query": "¿la mashua/cubio y la capuchina de jardín son la misma especie de Tropaeolum?",
+      "type": "same_genus_diff_species",
+      "corpus_slugs": [
+        "tropaeolum_tuberosum",
+        "tropaeolum_majus"
+      ],
+      "scientific_names": [
+        "Tropaeolum tuberosum",
+        "Tropaeolum majus"
+      ],
+      "trap": "NO — mismo género Tropaeolum, especies distintas: la mashua es tubérculo alimenticio andino, la capuchina es ornamental/comestible en flor, usos muy diferentes"
+    },
+    {
+      "id": "TAX2-E01",
+      "query": "¿la arracacha y la zanahoria son de la misma familia botánica? ¿del mismo género?",
+      "type": "same_family_diff_genus",
+      "corpus_slugs": [
+        "arracacia_xanthorrhiza",
+        "daucus_carota_subsp_sativus"
+      ],
+      "expected_family": "Apiaceae",
+      "expected_genera": [
+        "Arracacia",
+        "Daucus"
+      ],
+      "trap": "Misma FAMILIA (Apiaceae), géneros diferentes (Arracacia vs Daucus) — parientes lejanos, no el mismo cultivo"
+    },
+    {
+      "id": "TAX2-E02",
+      "query": "¿la mora andina y la fresa son parientes botánicos cercanos?",
+      "type": "same_family_diff_genus",
+      "corpus_slugs": [
+        "rubus_glaucus",
+        "fragaria_ananassa_monterrey"
+      ],
+      "expected_family": "Rosaceae",
+      "expected_genera": [
+        "Rubus",
+        "Fragaria"
+      ],
+      "trap": "Misma familia (Rosaceae), géneros diferentes (Rubus vs Fragaria) — comparten familia con manzano/durazno/ciruelo también presentes en el catálogo"
+    },
+    {
+      "id": "TAX2-E03",
+      "query": "¿el tomate, la uchuva y el lulo son todos el mismo género botánico?",
+      "type": "same_family_diff_genus",
+      "corpus_slugs": [
+        "solanum_lycopersicum",
+        "physalis_peruviana",
+        "solanum_quitoense"
+      ],
+      "expected_family": "Solanaceae",
+      "expected_genera": [
+        "Solanum",
+        "Physalis",
+        "Solanum"
+      ],
+      "trap": "Misma familia (Solanaceae) los tres, pero la uchuva es del género Physalis (NO Solanum) — tomate y lulo sí comparten género Solanum"
+    },
+    {
+      "id": "TAX2-E04",
+      "query": "¿el café y el cacao pertenecen a la misma familia botánica?",
+      "type": "same_family_diff_genus",
+      "corpus_slugs": [
+        "coffea_arabica",
+        "theobroma_cacao"
+      ],
+      "expected_family": "Rubiaceae vs Malvaceae",
+      "expected_genera": [
+        "Coffea",
+        "Theobroma"
+      ],
+      "trap": "NO — café es Rubiaceae (género Coffea) y cacao es Malvaceae (género Theobroma), familias DISTINTAS pese a ser ambos cultivos emblemáticos de sombrío"
+    }
+  ]
+}
