@@ -547,33 +547,45 @@ model-independent). Se añadió un clasificador de RECHAZO de premisa (RECHAZA_O
 marcar como alucinación una corrección correcta. **El DELTA v1→v2 = robustez: el que MENOS
 cae razona; el que se derrumba memorizó el patrón fácil.**
 
-| Modelo | ÍNDICE v1 | ÍNDICE v2 | Δ (robustez) |
-|--------|:---:|:---:|:---:|
-| `granite-keeper` | 68.2 | 64.8 | **−3.4** (ya conservador) |
-| `qwen35-dpo-alpha` | 63.2 | 62.8 | −0.4 (ya degradado) |
-| `exaone3.5:2.4b` | 78.3 | 72.1 | **−6.2** |
-| **`qwen3.5:4b`** ⭐ | **84.7** | **76.3** | **−8.4** (líder absoluto v2) |
-| `phi4-mini` | 79.4 | 69.5 | −9.9 |
-| `granite33-dpo` (propio) | 78.1 | 64.2 | −13.9 |
-| `qwen3:4b` | 74.5 | 60.2 | −14.3 |
-| `qwen35-sft-alpha` (propio) | 77.8 | 62.5 | −15.3 |
-| `qwen3.5:9b` (base) | 70.2 | 51.5 | −18.7 |
-| `aya:8b` | 79.1 | 40.5 | **−38.6** (COLAPSA a mudo) |
-| `gemma3:4b` | 81.7 | _(corriendo)_ | — |
-| `gemma4:e4b` | 81.6 | _(corriendo)_ | — |
-| `gemma4:e2b` (PROD) | 69.9 | _(corriendo)_ | — |
-| falcon3 / phi4-mini-reasoning / llama3.2:3b / granite33-curado / qwen35-chagra-cand | — | _(corriendo)_ | — |
+Ordenada por ÍNDICE v2 (rendimiento en lo difícil):
 
-**Lectura de robustez (preliminar, faltan gemmas):**
-- **`qwen3.5:4b` sigue liderando el ÍNDICE ABSOLUTO en v2 (76.3)** y cae moderado (−8.4):
-  combina el techo de capacidad con buena robustez. Sigue siendo el candidato a modelo único.
-- **Los que menos caen son los ya-conservadores** (`granite-keeper` −3.4, `exaone3.5` −6.2):
-  bajan poco porque ya se abstenían mucho — robustez "barata", con techo bajo.
-- **`aya:8b` se DERRUMBA** (−38.6, a mudo): fuerte en v1 fácil, frágil ante las trampas
-  sutiles — memorizó el patrón, no razona. `qwen3.5:9b` base también cae fuerte (−18.7),
-  MÁS que su hermano 4B (−8.4): el 4B es más robusto que el 9B base.
-- Los fine-tunes propios caen fuerte (`granite33-dpo` −13.9, `qwen35-sft-alpha` −15.3):
-  el fine-tune ajustó al patrón fácil, no generalizó a lo difícil.
+| # | Modelo | v1 | **v2** | Δ (robustez) | método |
+|---|--------|:---:|:---:|:---:|:---|
+| 1 | **`qwen3.5:4b`** ⭐ | 84.7 | **76.3** | −8.4 | chat |
+| 2 | `exaone3.5:2.4b` | 78.3 | 72.1 | −6.2 | chat |
+| 3 | `phi4-mini` | 79.4 | 69.5 | −9.9 | chat |
+| 4 | `granite-keeper` (propio) | 68.2 | 64.8 | **−3.4** | chat |
+| 5 | `granite33-dpo` (propio) | 78.1 | 64.2 | −13.9 | chat |
+| 6 | `gemma3:4b` | 81.7 | 63.1 | **−18.6** | generate |
+| 7 | `qwen35-dpo-alpha` (propio) | 63.2 | 62.8 | −0.4 | chat |
+| 8 | `gemma4:e2b` (PROD HOY) | 69.9 | 62.5 | −7.4 | generate |
+| 8 | `qwen35-sft-alpha` (propio) | 77.8 | 62.5 | −15.3 | chat |
+| 10 | `gemma4:e4b` | 81.6 | 62.2 | **−19.4** | generate |
+| 11 | `qwen3:4b` | 74.5 | 60.2 | −14.3 | chat |
+| 12 | `qwen3.5:9b` (base) | 70.2 | 51.5 | −18.7 | chat |
+| 13 | `aya:8b` | 79.1 | 40.5 | **−38.6** | chat |
+| — | falcon3 / phi4-mini-reasoning / llama3.2:3b / granite33-curado / qwen35-chagra-cand | (débiles v1) | _(corriendo)_ | — | chat |
 
-_(Tabla parcial — se completa con gemma3:4b/e4b/e2b + los 5 restantes cuando cierre el
-sweep de la madrugada. Índices v2 crudos en `scratchpad/v2*.log`.)_
+**Veredicto de robustez — `qwen3.5:4b` gana con preguntas duras, y la ventaja CRECE:**
+- **`qwen3.5:4b` es #1 en v2 (76.3) por margen amplio** (el 2º, `exaone3.5`, está en 72.1).
+  Cae solo −8.4. Combina el mayor techo de capacidad CON robustez — el resto o cae fuerte o
+  ya venía con techo bajo.
+- **Los gemma se DERRUMBAN en lo difícil:** `gemma3:4b` −18.6 y `gemma4:e4b` −19.4. En v1 fácil
+  igualaban/rozaban a qwen3.5:4b (81.7/81.6 vs 84.7, +3); en v2 duro quedan en 63.1/62.2 vs
+  76.3 → **la ventaja de qwen3.5:4b se ABRE de +3 a +13 puntos.** Rinden bien en lo memorizable,
+  no razonan las trampas sutiles.
+- **`aya:8b` colapsa** (−38.6, a mudo): el más frágil — fuerte solo en lo fácil.
+- **Robustez "barata":** `granite-keeper` (−3.4), `qwen35-dpo-alpha` (−0.4), `exaone3.5` (−6.2)
+  caen poco porque YA eran conservadores/degradados (techo bajo). No es razonamiento, es que
+  no tenían de dónde caer.
+- **Fine-tunes propios:** caen fuerte (`granite33-dpo` −13.9, `qwen35-sft-alpha` −15.3) — el
+  fine-tune ajustó al patrón fácil, no generalizó. `qwen3.5:9b` base cae MÁS (−18.7) que su
+  hermano 4B (−8.4): acá el 4B es más robusto que el 9B base.
+
+**Conclusión del test a full:** con el set duro, **`qwen3.5:4b` no solo lidera — su liderazgo
+se AGRANDA.** Es el modelo más robusto de su clase (razona en vez de memorizar), el mejor en
+texto (v1 y v2), iguala en visión, tiene tools, y pesa 3.4 GB. El candidato a modelo único
+sale REFORZADO del test duro. (Prod no se cambió — es evidencia para el operador.)
+
+_(Faltan 5 modelos débiles/mudos del sweep de madrugada + gemma4:12b bloqueado por versión de
+Ollama. Índices v2 crudos en `scratchpad/v2*.log`.)_
