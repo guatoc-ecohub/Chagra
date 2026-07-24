@@ -4,23 +4,31 @@
  *
  * Muestra 3 ejemplos REALES y bien diferenciados de lo que se puede hacer
  * por voz — registrar en el cuaderno, pedir consejo hablado, preguntar un
- * dato en vivo — rotando uno cada ~4s con una onda de voz sutil que late.
+ * dato en vivo — rotando uno cada ~6s con cross-fade suave (el que sale se
+ * desvanece hacia arriba mientras entra el siguiente; solo transform/opacity,
+ * amigable con la GPU). La rotación se PAUSA mientras el usuario tiene el
+ * mouse encima o el foco dentro de la tarjeta (está leyendo), y los puntos
+ * indicadores son botones: un toque salta directo a ese ejemplo.
  *
  * Honestidad del copy: NO promete "IA en su teléfono". El reconocimiento
  * del wake-word sí es on-device, pero el agente necesita señal para
  * responder — por eso el encabezado vende el gesto ("con las manos
  * ocupadas"), no una capacidad que no existe.
  *
- * Accesibilidad: respeta prefers-reduced-motion — sin animación, los 3
- * ejemplos se muestran quietos en lista (misma información, cero vaivén).
+ * Accesibilidad: respeta prefers-reduced-motion — sin animación ni timer,
+ * los 3 ejemplos se muestran quietos en lista (misma información, cero
+ * vaivén). Con movimiento normal la escena anuncia el ejemplo vigente vía
+ * aria-live="polite".
  *
  * Solo UI/copy: cero lógica de wake-word, cero deps nuevas (emoji + CSS).
  * Español colombiano (tú/usted), NUNCA voseo argentino.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './ejemplosVoz.css';
 
-/** Los 3 ejemplos canónicos — cada uno una capacidad DISTINTA. */
+/** Los 3 ejemplos canónicos — cada uno una capacidad DISTINTA y groundeada:
+ *  registrar en la bitácora, consejo sobre un mundo real (café), y la
+ *  capability `precio` (precios mayoristas del día) de agentCapabilities. */
 // eslint-disable-next-line react-refresh/only-export-components -- constante de copy que los tests validan junto al componente (patrón NotifPermissionPrompt)
 export const EJEMPLOS_VOZ = [
   {
@@ -43,7 +51,9 @@ export const EJEMPLOS_VOZ = [
   },
 ];
 
-const ROTACION_MS = 4000;
+const ROTACION_MS = 6000;
+/** Duración de la animación de salida (debe calzar con ejemplos-voz-sale). */
+const SALIDA_MS = 450;
 
 /** ¿El usuario pidió movimiento reducido a nivel de sistema? */
 const prefiereMenosMovimiento = () =>
@@ -83,19 +93,49 @@ export default function EjemplosVoz() {
   // con el panel abierto, el próximo montaje la recoge (suficiente acá).
   const [sinMovimiento] = useState(prefiereMenosMovimiento);
   const [idx, setIdx] = useState(0);
+  // Índice del ejemplo que está SALIENDO (cross-fade); null si no hay salida.
+  const [saliente, setSaliente] = useState(null);
+  // Pausado mientras el usuario lee (hover o foco dentro de la tarjeta).
+  const [pausado, setPausado] = useState(false);
+  // Espejo de idx para que el interval no dependa del render (sin re-crear
+  // el timer en cada rotación) y sin setState dentro de un updater.
+  const idxRef = useRef(0);
+
+  const irA = useCallback((siguiente) => {
+    if (siguiente === idxRef.current) return;
+    setSaliente(idxRef.current);
+    idxRef.current = siguiente;
+    setIdx(siguiente);
+  }, []);
 
   useEffect(() => {
-    if (sinMovimiento) return undefined;
+    if (sinMovimiento || pausado) return undefined;
     const timer = setInterval(() => {
-      setIdx((i) => (i + 1) % EJEMPLOS_VOZ.length);
+      irA((idxRef.current + 1) % EJEMPLOS_VOZ.length);
     }, ROTACION_MS);
     return () => clearInterval(timer);
-  }, [sinMovimiento]);
+  }, [sinMovimiento, pausado, irA]);
+
+  // Desmonta el ejemplo saliente al terminar su animación. Timeout (no
+  // onAnimationEnd) para que funcione igual en jsdom, donde las animaciones
+  // CSS no corren.
+  useEffect(() => {
+    if (saliente === null) return undefined;
+    const timer = setTimeout(() => setSaliente(null), SALIDA_MS);
+    return () => clearTimeout(timer);
+  }, [saliente, idx]);
+
+  const pausar = useCallback(() => setPausado(true), []);
+  const reanudar = useCallback(() => setPausado(false), []);
 
   return (
     <div
       className="ejemplos-voz rounded-xl border border-slate-700/50 bg-slate-800/40 p-4 space-y-3"
       data-testid="ejemplos-voz"
+      onMouseEnter={pausar}
+      onMouseLeave={reanudar}
+      onFocus={pausar}
+      onBlur={reanudar}
     >
       <div className="flex items-center justify-between gap-3">
         <h4 className="text-[13px] font-bold text-slate-200">
@@ -110,21 +150,41 @@ export default function EjemplosVoz() {
         </div>
       ) : (
         <>
-          {/* key={idx} remonta el nodo → la animación de entrada corre en cada
-              rotación. min-height evita brincos entre frases de largo distinto. */}
-          <div className="ejemplos-voz-escena" aria-live="off">
+          {/* Cross-fade: el saliente (absoluto, decorativo) se desvanece
+              mientras el entrante (key={idx} → remonta y anima) aparece.
+              min-height en la escena evita brincos entre frases distintas. */}
+          <div className="ejemplos-voz-escena" aria-live="polite" aria-atomic="true">
+            {saliente !== null && (
+              <div
+                className="ejemplos-voz-paso ejemplos-voz-paso--sale"
+                key={`sale-${saliente}`}
+                aria-hidden="true"
+              >
+                <Ejemplo ejemplo={EJEMPLOS_VOZ[saliente]} />
+              </div>
+            )}
             <div className="ejemplos-voz-paso" key={idx} data-testid="ejemplos-voz-activo">
               <Ejemplo ejemplo={EJEMPLOS_VOZ[idx]} />
             </div>
           </div>
-          <div className="flex justify-center gap-1.5" aria-hidden="true">
+          <div className="flex justify-center gap-1" role="group" aria-label="Elegir ejemplo">
             {EJEMPLOS_VOZ.map((e, i) => (
-              <span
+              <button
                 key={e.capacidad}
-                className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
-                  i === idx ? 'bg-emerald-400' : 'bg-slate-600'
-                }`}
-              />
+                type="button"
+                onClick={() => irA(i)}
+                aria-label={`Ver ejemplo: ${e.capacidad}`}
+                aria-current={i === idx ? 'true' : undefined}
+                data-testid={`ejemplos-voz-punto-${i}`}
+                className="p-1.5 rounded-full group"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`block w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
+                    i === idx ? 'bg-emerald-400' : 'bg-slate-600 group-hover:bg-slate-500'
+                  }`}
+                />
+              </button>
             ))}
           </div>
         </>

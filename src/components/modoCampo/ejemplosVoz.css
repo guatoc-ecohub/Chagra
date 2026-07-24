@@ -30,10 +30,13 @@
   50%      { transform: scaleY(1);    opacity: 1; }
 }
 
-/* --- Escena del ejemplo que rota ------------------------------------------ */
+/* --- Escena del ejemplo que rota (cross-fade) ------------------------------ */
 /* min-height reserva el espacio de la frase más larga en dos líneas:
- * sin brincos de layout cuando cambia el ejemplo. */
+ * sin brincos de layout cuando cambia el ejemplo. position:relative ancla al
+ * ejemplo saliente (absoluto) mientras se desvanece. Solo transform/opacity:
+ * GPU-friendly, cero reflow. */
 .ejemplos-voz-escena {
+  position: relative;
   min-height: 86px;
   display: flex;
   align-items: flex-start;
@@ -42,15 +45,29 @@
   width: 100%;
   animation: ejemplos-voz-entra 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+/* El que sale: se superpone (absoluto) y se desvanece hacia arriba mientras
+ * entra el siguiente — la duración calza con SALIDA_MS del componente. */
+.ejemplos-voz-paso--sale {
+  position: absolute;
+  inset: 0;
+  animation: ejemplos-voz-sale 0.45s ease-out both;
+  pointer-events: none;
+}
 @keyframes ejemplos-voz-entra {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+@keyframes ejemplos-voz-sale {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-8px); }
+}
 
 /* --- Movimiento reducido ---------------------------------------------------
  * El JSX ya cambia a lista estática (matchMedia); esto cubre además el caso
- * de que la preferencia cambie con el panel ya montado: todo quieto. */
+ * de que la preferencia cambie con el panel ya montado: todo quieto y el
+ * saliente oculto de una (sin doble texto superpuesto). */
 @media (prefers-reduced-motion: reduce) {
   .ejemplos-voz-barra { animation: none; opacity: 0.8; }
   .ejemplos-voz-paso { animation: none; }
+  .ejemplos-voz-paso--sale { animation: none; display: none; }
 }
