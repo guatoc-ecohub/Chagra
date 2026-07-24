@@ -1,5 +1,6 @@
-import { useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import * as THREE from 'three';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { AdaptiveDpr, Html, OrbitControls } from '@react-three/drei';
 import { ATMOSFERA, CIELOS, PALETA, mezclar, mezclarCielo } from '../visual/mundo3d/atmosferaMadre.js';
 import { ACENTOS, VERDES, TIERRAS } from '../visual/mundo3d/paleta/paletaMadre.js';
@@ -48,6 +49,49 @@ const CULTIVOS = Array.from({ length: 18 }, (_, i) => ({
   fruto: i % 6 === 2,
 }));
 const POSTES = [-6.1, -2.1, 2.1, 6.1];
+const VISTAS_PASO = {
+  pastoreo: { posicion: [-9.4, 5.2, 7.2], mira: [-4.2, 0.55, -1.8] },
+  traslado: { posicion: [7.4, 4.7, 8.2], mira: [0, 0.7, -1.8] },
+  descanso: { posicion: [10.2, 5.1, 5.8], mira: [4.2, 0.5, -1.8] },
+  huerto: { posicion: [8.4, 4.2, 10.2], mira: [4.2, 0.7, 2.6] },
+};
+
+function CamaraPaso({ paso, controls, reducedMotion }) {
+  const { camera } = useThree();
+  const viaje = useRef(null);
+  const pasoAnterior = useRef(paso);
+
+  useEffect(() => {
+    if (paso === pasoAnterior.current) return;
+    pasoAnterior.current = paso;
+    const vista = VISTAS_PASO[paso];
+    const control = controls.current;
+    if (!vista || !control) return;
+    viaje.current = {
+      progreso: 0,
+      duracion: reducedMotion ? 0.001 : 1.1,
+      desdePosicion: camera.position.clone(),
+      haciaPosicion: new THREE.Vector3(...vista.posicion),
+      desdeMira: control.target.clone(),
+      haciaMira: new THREE.Vector3(...vista.mira),
+    };
+  }, [camera, controls, paso, reducedMotion]);
+
+  useFrame((_, delta) => {
+    const estado = viaje.current;
+    const control = controls.current;
+    if (!estado || !control) return;
+    estado.progreso = Math.min(1, estado.progreso + delta / estado.duracion);
+    const t = estado.progreso;
+    const suave = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
+    camera.position.lerpVectors(estado.desdePosicion, estado.haciaPosicion, suave);
+    control.target.lerpVectors(estado.desdeMira, estado.haciaMira, suave);
+    control.update();
+    if (estado.progreso === 1) viaje.current = null;
+  });
+
+  return null;
+}
 
 /* LOMAS del horizonte: la vereda que faltaba para que la losa no flotara en
    crema. Anillo completo (la cámara auto-rota 360°) en dos planos de
@@ -409,6 +453,7 @@ function Escena({ tier, reducedMotion, paso, vertical }) {
      caminan las gallinas y a dónde se traslada el tractor. Antes `paso`
      nunca llegaba hasta acá. */
   const activa = useMemo(() => PARCELAS.find((p) => p.id === paso) ?? PARCELAS[0], [paso]);
+  const controls = useRef(null);
   return (
     <>
       <color attach="background" args={[CIELO.fondo]} />
@@ -433,7 +478,8 @@ function Escena({ tier, reducedMotion, paso, vertical }) {
       {/* Encuadre por orientación: en retrato la cámara sube y se aleja para
           que la losa ENTERA quepa, y el target baja para dejarle a la banda
           inferior (panel del ciclo) aire sin tapar la parvada. */}
-      <OrbitControls makeDefault enablePan={false} minDistance={7} maxDistance={vertical ? 26 : 19} minPolarAngle={0.48} maxPolarAngle={1.3} target={vertical ? [0, -0.8, 0] : [0, 0.5, 0]} autoRotate={!reducedMotion} autoRotateSpeed={0.18} />
+      <OrbitControls ref={controls} makeDefault enablePan={false} minDistance={7} maxDistance={vertical ? 26 : 19} minPolarAngle={0.48} maxPolarAngle={1.3} target={vertical ? [0, -0.8, 0] : [0, 0.5, 0]} autoRotate={!reducedMotion} autoRotateSpeed={0.18} />
+      <CamaraPaso paso={paso} controls={controls} reducedMotion={reducedMotion} />
       <AdaptiveDpr pixelated />
     </>
   );
@@ -468,7 +514,7 @@ export default function MundoGallinero3D({ onBack }) {
   return (
     <section className="mgall-root" data-tier={tier} aria-label="Mundo del gallinero con pastoreo rotativo">
       <style>{CSS}</style>
-      <Canvas className="mgall-canvas" data-lista={listo} dpr={perfil.dpr} frameloop={reducedMotion ? 'demand' : 'always'} gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }} camera={vertical ? { position: [13.5, 12.5, 16], fov: 47 } : { position: [11, 8.5, 12], fov: 43 }} onCreated={() => setListo(true)}>
+      <Canvas className="mgall-canvas" data-lista={listo} data-paso={paso} dpr={perfil.dpr} frameloop={reducedMotion ? 'demand' : 'always'} gl={{ antialias: perfil.antialias, powerPreference: 'high-performance' }} camera={vertical ? { position: [13.5, 12.5, 16], fov: 47 } : { position: [11, 8.5, 12], fov: 43 }} onCreated={() => setListo(true)}>
         <Escena tier={tier} reducedMotion={reducedMotion} paso={paso} vertical={vertical} />
       </Canvas>
       <div className="mgall-ui">
