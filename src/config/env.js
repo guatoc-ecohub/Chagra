@@ -85,9 +85,17 @@ export const ENV = {
   // "No mergear — para revisión" al momento de este cambio. Confirmar con
   // el operador que la lectura de ambos benches se concilia antes de que
   // este PR llegue a producción (dev→main).
-  NLU_MODEL: import.meta.env?.VITE_NLU_MODEL || 'gemma3:4b',
-  EXTRACTOR_MODEL: import.meta.env?.VITE_EXTRACTOR_MODEL || 'gemma3:4b',
-  CHAT_MODEL: import.meta.env?.VITE_LLM_CHAT_MODEL || 'gemma3:4b',
-  CHAT_COMPLEX_MODEL: import.meta.env?.VITE_LLM_COMPLEX_MODEL || 'gemma3:4b',
-  VISION_MODEL: import.meta.env?.VITE_VISION_MODEL || 'gemma3:4b',
+  // 2026-07-24 (maratón #2738, §10-12): gemma3:4b → qwen3.5:4b como default de
+  // las 5 claves. Ganador ROBUSTO del test exhaustivo (25+ modelos): índice de
+  // texto 84.7 (#1 desplegable; +14.8 vs prod e2b 69.9), y en el set DURO v2 su
+  // ventaja se ABRE de +3 a +13 (razona, no memoriza). Iguala visión (45.5 = gemma3:4b)
+  // y supera al qwen3-vl:8b actual (16.9) sin su swap de 53s. Multimodal + tools +
+  // thinking, 3.4GB → un solo modelo para chat+visión+agente. Contaminación 5% (la
+  // más baja de su nivel). qwen3.5:4b (3.4GB) + qwen3-vl (7.6GB) sí caben juntos si se
+  // quisiera separar visión. Detalle: informe test-inteligencia-chagra-2026-07-23 + MODELS.md.
+  NLU_MODEL: import.meta.env?.VITE_NLU_MODEL || 'qwen3.5:4b',
+  EXTRACTOR_MODEL: import.meta.env?.VITE_EXTRACTOR_MODEL || 'qwen3.5:4b',
+  CHAT_MODEL: import.meta.env?.VITE_LLM_CHAT_MODEL || 'qwen3.5:4b',
+  CHAT_COMPLEX_MODEL: import.meta.env?.VITE_LLM_COMPLEX_MODEL || 'qwen3.5:4b',
+  VISION_MODEL: import.meta.env?.VITE_VISION_MODEL || 'qwen3.5:4b',
 };
