@@ -160,32 +160,6 @@
       }
     },
     {
-      "id": "hemileia_vastatrix_roya",
-      "labels": [
-        "Pest"
-      ],
-      "properties": {
-        "id": "hemileia_vastatrix_roya",
-        "aka": "Hemileia vastatrix (roya)",
-        "tipo": "hongo",
-        "fuente_taxonomia": "gbif",
-        "nombre_cientifico": "Hemileia vastatrix"
-      }
-    },
-    {
-      "id": "hypothenemus_hampei_broca",
-      "labels": [
-        "Pest"
-      ],
-      "properties": {
-        "id": "hypothenemus_hampei_broca",
-        "aka": "Hypothenemus hampei (broca)",
-        "tipo": "insecto",
-        "fuente_taxonomia": "gbif",
-        "nombre_cientifico": "Hypothenemus hampei"
-      }
-    },
-    {
       "id": "bemisia_tabaci",
       "labels": [
         "Pest"
@@ -194,21 +168,21 @@
         "id": "bemisia_tabaci",
         "aka": "Bemisia tabaci",
         "tipo": "insecto",
-        "fuente_taxonomia": "gbif",
-        "nombre_cientifico": "Bemisia tabaci"
-      }
-    },
-    {
-      "id": "spodoptera_frugiperda_cogollero",
-      "labels": [
-        "Pest"
-      ],
-      "properties": {
-        "id": "spodoptera_frugiperda_cogollero",
-        "aka": "Spodoptera frugiperda (cogollero)",
-        "tipo": "insecto",
-        "fuente_taxonomia": "gbif",
-        "nombre_cientifico": "Spodoptera frugiperda"
+        "fuente": "Agrosavia (control biológico de moscas blancas en algodón y berenjena); CIAT/Alliance Bioversity (Bemisia como vector de virus en fríjol).",
+        "familia": "Aleyrodidae",
+        "targets": "multi",
+        "confianza": "alta",
+        "nombre_comun": "Mosca blanca (complejo)",
+        "sintoma_clave": "Insectos blancos diminutos que vuelan en nube al sacudir la planta y se concentran en el envés de las hojas. Causan amarillamiento, debilitamiento y deformación; por la melaza que secretan crece el hongo negro (fumagina). El daño más grave es indirecto: transmite virus (begomovirus, geminivirus) que enrollan, amarillan y mosaican las hojas, especialmente en fríjol, tomate, algodón y hortalizas.",
+        "umbral_accion": "5 adultos/hoja en plantas jóvenes | >5 ninfas/hoja",
+        "anti_confusion": "La mosca blanca Bemisia tabaci NO es lo mismo que la mosca blanca de los invernaderos (Trialeurodes vaporariorum): ambas son moscas blancas y se confunden en campo, pero Bemisia es el vector principal de begomovirus y predomina en zonas cálidas; se distinguen por la posición de las alas en reposo (Bemisia las lleva en forma de tejado más inclinado).",
+        "origen_dataset": "pest-grounding-topcrops-2026-06-14",
+        "nombre_cientifico": "Bemisia tabaci",
+        "cultivos_afectados": "tomate; ají; frijol; yuca; hortalizas; Capsicum annuum; Gossypium hirsutum; Phaseolus vulgaris",
+        "manejo_agroecologico": "Manejo integrado: barreras físicas (mallas, cultivos trampa, coberturas reflectivas), trampas amarillas pegajosas para monitoreo, eliminación de malezas hospederas y de plantas con virus, y control biológico con parasitoides (avispas Encarsia spp. y Eretmocerus spp.) y entomopatógenos (Lecanicillium lecanii, Beauveria bassiana). Evitar insecticidas de amplio espectro que generan resistencia y matan enemigos naturales. Contra los virus que transmite no hay cura: el manejo es preventivo (controlar el vector y eliminar focos).",
+        "practicas_culturales": "Trampas amarillas adhesivas | Eliminación de malezas hospedantes | Uso de variedades tolerantes | Barreras vivas | Manejo integrado biotipo B | Eliminación hospederos | Manejo integrado Valle del Sinú | Rotación",
+        "quimico_ica_menor_tox": "Aceite de parafina (registro ICA) | Spiromesifen (registro ICA) | Jabones potásicos | Rotación neonicotinoides | jabón potásico",
+        "fuente_taxonomia": "gbif"
       }
     },
     {
@@ -1489,6 +1463,8 @@
         "id": "spodoptera_frugiperda",
         "aka": "Spodoptera frugiperda",
         "tipo": "insecto_lepidoptero",
+        "fuente_taxonomia": "gbif",
+        "nombre_cientifico": "Spodoptera frugiperda",
         "alias": "cogollero",
         "fuente": "Agrosavia (Corpoica) — Manejo integrado del gusano cogollero del maíz, Spodoptera frugiperda; control biológico, microbiológico y físico; ICA.",
         "familia": "Noctuidae",
@@ -1499,7 +1475,6 @@
         "umbral_accion": "20% de plantas con daño fresco | 20% plantas con daño fresco | >20% plantas",
         "anti_confusion": "El daño del gusano cogollero (Spodoptera frugiperda) NO es lo mismo que el de la polilla del tomate (Tuta absoluta): el cogollero ataca el cogollo del maíz dejando raspaduras y excremento abundante tipo aserrín; Tuta absoluta mina las hojas del tomate formando galerías transparentes y perfora el fruto bajo el cáliz.",
         "origen_dataset": "pest-grounding-topcrops-2026-06-14",
-        "nombre_cientifico": "Spodoptera frugiperda",
         "cultivos_afectados": "maíz; arroz; sorgo; hortalizas; Zea mays; Sorghum bicolor",
         "manejo_agroecologico": "Manejo integrado: buena preparación del suelo, rotación de cultivos y eliminación oportuna de malezas hospederas; conservación del control biológico natural (parasitoides de huevos como Trichogramma y Telenomus; el agua de lluvia mata larvas pequeñas); y aplicación de bioinsumos sobre larvas pequeñas: la bacteria Bacillus thuringiensis (Bt) y el hongo Nomuraea (Metarhizium) rileyi. El momento (larvas pequeñas) y la colocación del producto en el cogollo son la clave del control.",
         "practicas_culturales": "Siembras escalonadas | Control de malezas hospedantes | Trampas con feromona sexual | Aporques tempranos | Monitoreo | Eliminación residuos | Rotación | Siembra escalonada",
@@ -3472,31 +3447,6 @@
       }
     },
     {
-      "id": "bemisia_tabaci_canonical",
-      "labels": [
-        "Pest"
-      ],
-      "properties": {
-        "id": "bemisia_tabaci_canonical",
-        "aka": "Bemisia tabaci | Bemisia tabaci biotipo B",
-        "tipo": "insecto_hemiptero",
-        "fuente": "Agrosavia (control biológico de moscas blancas en algodón y berenjena); CIAT/Alliance Bioversity (Bemisia como vector de virus en fríjol).",
-        "familia": "Aleyrodidae",
-        "targets": "multi",
-        "confianza": "alta",
-        "nombre_comun": "Mosca blanca (complejo)",
-        "sintoma_clave": "Insectos blancos diminutos que vuelan en nube al sacudir la planta y se concentran en el envés de las hojas. Causan amarillamiento, debilitamiento y deformación; por la melaza que secretan crece el hongo negro (fumagina). El daño más grave es indirecto: transmite virus (begomovirus, geminivirus) que enrollan, amarillan y mosaican las hojas, especialmente en fríjol, tomate, algodón y hortalizas.",
-        "umbral_accion": "5 adultos/hoja en plantas jóvenes | >5 ninfas/hoja",
-        "anti_confusion": "La mosca blanca Bemisia tabaci NO es lo mismo que la mosca blanca de los invernaderos (Trialeurodes vaporariorum): ambas son moscas blancas y se confunden en campo, pero Bemisia es el vector principal de begomovirus y predomina en zonas cálidas; se distinguen por la posición de las alas en reposo (Bemisia las lleva en forma de tejado más inclinado).",
-        "origen_dataset": "pest-grounding-topcrops-2026-06-14",
-        "nombre_cientifico": "Bemisia tabaci",
-        "cultivos_afectados": "tomate; ají; frijol; yuca; hortalizas; Capsicum annuum; Gossypium hirsutum; Phaseolus vulgaris",
-        "manejo_agroecologico": "Manejo integrado: barreras físicas (mallas, cultivos trampa, coberturas reflectivas), trampas amarillas pegajosas para monitoreo, eliminación de malezas hospederas y de plantas con virus, y control biológico con parasitoides (avispas Encarsia spp. y Eretmocerus spp.) y entomopatógenos (Lecanicillium lecanii, Beauveria bassiana). Evitar insecticidas de amplio espectro que generan resistencia y matan enemigos naturales. Contra los virus que transmite no hay cura: el manejo es preventivo (controlar el vector y eliminar focos).",
-        "practicas_culturales": "Trampas amarillas adhesivas | Eliminación de malezas hospedantes | Uso de variedades tolerantes | Barreras vivas | Manejo integrado biotipo B | Eliminación hospederos | Manejo integrado Valle del Sinú | Rotación",
-        "quimico_ica_menor_tox": "Aceite de parafina (registro ICA) | Spiromesifen (registro ICA) | Jabones potásicos | Rotación neonicotinoides | jabón potásico"
-      }
-    },
-    {
       "id": "anarsia_lineatella",
       "labels": [
         "Pest"
@@ -3804,6 +3754,8 @@
         "id": "hemileia_vastatrix",
         "aka": "Hemileia vastatrix",
         "tipo": "hongo_basidiomiceto",
+        "fuente_taxonomia": "gbif",
+        "nombre_cientifico": "Hemileia vastatrix",
         "alias": "roya",
         "fuente": "Cenicafé — manejo de la roya del cafeto y variedades resistentes (Colombia, Castillo, Cenicafé 1, Tabi); Avances Técnicos Cenicafé (razas de Hemileia vastatrix).",
         "familia": "Pucciniales",
@@ -3814,7 +3766,6 @@
         "umbral_accion": "10% de incidencia en hojas",
         "anti_confusion": "La roya (Hemileia vastatrix) NO es lo mismo que la mancha de hierro o cercosporiosis (Cercospora coffeicola): la roya produce un polvo amarillo-anaranjado en el envés de la hoja y causa caída masiva de hojas; la mancha de hierro produce manchas circulares pardas con centro grisáceo y halo amarillo, ataca hojas Y granos, y no forma el polvo anaranjado.",
         "origen_dataset": "pest-grounding-topcrops-2026-06-14",
-        "nombre_cientifico": "Hemileia vastatrix",
         "cultivos_afectados": "café",
         "manejo_agroecologico": "La opción más eficiente y sostenible en Colombia es renovar y sembrar variedades resistentes desarrolladas por Cenicafé: Variedad Colombia, Castillo®, Cenicafé 1 y Tabi, con resistencia durable. Complementar con manejo agronómico que dé vigor a la planta: nutrición adecuada, manejo de la densidad y del sombrío para reducir la humedad foliar prolongada, y monitoreo. En cafetales susceptibles el control químico (fungicidas) se usa de forma oportuna según el monitoreo de incidencia.",
         "practicas_culturales": "Uso de variedades resistentes (Castillo®) | Manejo de sombra y aireación | Fertilización balanceada (evitar exceso de nitrógeno) | Podas de renovación",
@@ -4984,6 +4935,8 @@
         "id": "hypothenemus_hampei",
         "aka": "Hypothenemus hampei",
         "tipo": "insecto_coleoptero",
+        "fuente_taxonomia": "gbif",
+        "nombre_cientifico": "Hypothenemus hampei",
         "fuente": "Cenicafé — Manejo Integrado de la Broca (MIB), control cultural RE-RE y control biológico con Beauveria bassiana; validaciones en Huila y Caldas.",
         "familia": "Curculionidae_Scolytinae",
         "targets": "cafe",
@@ -4993,7 +4946,6 @@
         "umbral_accion": "5% de infestación en frutos | ≥2% infestación; ≥5% daño económico",
         "anti_confusion": "El orificio de la broca (Hypothenemus hampei) en el fruto del café NO debe confundirse con el daño de otras causas: la broca deja una perforación limpia y diminuta justo en la corona/punta de la cereza por donde entra al grano; al abrir el fruto se ven las galerías y los pequeños escarabajos o larvas dentro de la almendra.",
         "origen_dataset": "pest-grounding-topcrops-2026-06-14",
-        "nombre_cientifico": "Hypothenemus hampei",
         "cultivos_afectados": "café; Coffea arabica; Coffea canephora",
         "manejo_agroecologico": "Manejo Integrado de la Broca (MIB) de Cenicafé, cuyo pilar es el control cultural: el RE-RE (recolección oportuna y completa de todos los frutos maduros y el repase de los que quedan, incluidos caídos), que elimina el hábitat de la broca. Se complementa con control biológico mediante el hongo Beauveria bassiana (aplicado cuando los adultos están volando fuera del grano) y avispas parasitoides (Cephalonomia stephanoderis, Prorops nasuta), trampas con alcoholes, y muestreo de infestación. El control cultural es el más importante; sin él los demás son poco efectivos.",
         "practicas_culturales": "Recolección de frutos caídos y residuales (RE-RE) | Manejo de sombra | Cosecha oportuna y completa | Trampas con alcoholes (metanol:etanol) | Re-Re: recolección y repase de frutos | Recolección frutos caídos | Muestreos 30 árboles/ha",
@@ -20548,7 +20500,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "solanum_lycopersicum_san_marzano",
       "label": "AFFECTS",
       "properties": {}
@@ -21256,7 +21208,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "solanum_lycopersicum_sungold",
       "label": "AFFECTS",
       "properties": {}
@@ -21406,7 +21358,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "solanum_lycopersicum_cerasiforme_uvalina",
       "label": "AFFECTS",
       "properties": {}
@@ -21508,12 +21460,6 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
-      "target": "capsicum_annuum",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
       "source": "xanthomonas_campestris_vesicatoria",
       "target": "capsicum_annuum",
       "label": "AFFECTS",
@@ -21532,7 +21478,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "phaseolus_vulgaris_nuna",
       "label": "AFFECTS",
       "properties": {}
@@ -21670,7 +21616,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "gossypium_hirsutum",
       "label": "AFFECTS",
       "properties": {}
@@ -21719,12 +21665,6 @@
     },
     {
       "source": "ralstonia_solanacearum",
-      "target": "solanum_lycopersicum",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "bemisia_tabaci_canonical",
       "target": "solanum_lycopersicum",
       "label": "AFFECTS",
       "properties": {}
@@ -22228,7 +22168,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "phaseolus_vulgaris",
       "label": "AFFECTS",
       "properties": {}
@@ -22266,12 +22206,6 @@
     {
       "source": "plasmodiophora_brassicae",
       "target": "brassica_oleracea_italica",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "bemisia_tabaci_canonical",
-      "target": "cucurbita_moschata",
       "label": "AFFECTS",
       "properties": {}
     },
@@ -22882,7 +22816,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "capsicum_annuum_aji_dulce_caribe",
       "label": "AFFECTS",
       "properties": {}
@@ -22942,7 +22876,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "solanum_lycopersicum_cerasiforme",
       "label": "AFFECTS",
       "properties": {}
@@ -23320,7 +23254,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "phaseolus_vulgaris_bola_roja",
       "label": "AFFECTS",
       "properties": {}
@@ -23465,12 +23399,6 @@
     },
     {
       "source": "piojo_harinoso_de_la_yuca",
-      "target": "manihot_esculenta",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "bemisia_tabaci_canonical",
       "target": "manihot_esculenta",
       "label": "AFFECTS",
       "properties": {}
@@ -24310,7 +24238,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "capsicum_frutescens",
       "label": "AFFECTS",
       "properties": {}
@@ -24364,7 +24292,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "manihot_glaziovii",
       "label": "AFFECTS",
       "properties": {}
@@ -24670,7 +24598,7 @@
       "properties": {}
     },
     {
-      "source": "bemisia_tabaci_canonical",
+      "source": "bemisia_tabaci",
       "target": "capsicum_annuum_generic",
       "label": "AFFECTS",
       "properties": {}
@@ -25324,86 +25252,20 @@
       "properties": {}
     },
     {
-      "source": "spodoptera_frugiperda_cogollero",
-      "target": "zea_mays",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "spodoptera_frugiperda",
-      "target": "zea_mays",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "spodoptera_frugiperda_cogollero",
-      "target": "solanum_lycopersicum",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
       "source": "spodoptera_frugiperda",
       "target": "solanum_lycopersicum",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "spodoptera_frugiperda_cogollero",
-      "target": "capsicum_annuum",
       "label": "AFFECTS",
       "properties": {}
     },
     {
       "source": "spodoptera_frugiperda",
       "target": "capsicum_annuum",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "bemisia_tabaci",
-      "target": "solanum_lycopersicum",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "bemisia_tabaci_canonical",
-      "target": "solanum_lycopersicum",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "bemisia_tabaci",
-      "target": "phaseolus_vulgaris",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "bemisia_tabaci_canonical",
-      "target": "phaseolus_vulgaris",
       "label": "AFFECTS",
       "properties": {}
     },
     {
       "source": "bemisia_tabaci",
       "target": "cucurbita_pepo",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "bemisia_tabaci_canonical",
-      "target": "cucurbita_pepo",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "bemisia_tabaci",
-      "target": "capsicum_annuum",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "bemisia_tabaci_canonical",
-      "target": "capsicum_annuum",
       "label": "AFFECTS",
       "properties": {}
     },
@@ -25474,18 +25336,6 @@
       "properties": {}
     },
     {
-      "source": "spodoptera_frugiperda_cogollero",
-      "target": "zea_mays",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "spodoptera_frugiperda",
-      "target": "zea_mays",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
       "source": "botrytis_cinerea",
       "target": "rubus_glaucus",
       "label": "AFFECTS",
@@ -25506,18 +25356,6 @@
     {
       "source": "bipolaris_oryzae",
       "target": "oryza_sativa",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "spodoptera_frugiperda_cogollero",
-      "target": "zea_mays",
-      "label": "AFFECTS",
-      "properties": {}
-    },
-    {
-      "source": "spodoptera_frugiperda",
-      "target": "zea_mays",
       "label": "AFFECTS",
       "properties": {}
     },
@@ -27173,7 +27011,7 @@
     },
     {
       "source": "beauveria_bassiana",
-      "target": "hypothenemus_hampei_broca",
+      "target": "hypothenemus_hampei",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -27551,7 +27389,7 @@
     },
     {
       "source": "trichoderma_harzianum",
-      "target": "hemileia_vastatrix_roya",
+      "target": "hemileia_vastatrix",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -27575,7 +27413,7 @@
     },
     {
       "source": "cephalonomia_stephanoderis",
-      "target": "hypothenemus_hampei_broca",
+      "target": "hypothenemus_hampei",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -27641,13 +27479,13 @@
     },
     {
       "source": "trichogramma_pretiosum",
-      "target": "spodoptera_frugiperda_cogollero",
+      "target": "spodoptera_frugiperda",
       "label": "CONTROLS",
       "properties": {}
     },
     {
       "source": "podisus_nigrispinus",
-      "target": "spodoptera_frugiperda_cogollero",
+      "target": "spodoptera_frugiperda",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -27881,7 +27719,7 @@
     },
     {
       "source": "isaria_fumosorosea",
-      "target": "bemisia_tabaci_canonical",
+      "target": "bemisia_tabaci",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -27893,37 +27731,37 @@
     },
     {
       "source": "encarsia_spp",
-      "target": "bemisia_tabaci_canonical",
+      "target": "bemisia_tabaci",
       "label": "CONTROLS",
       "properties": {}
     },
     {
       "source": "cales_noacki",
-      "target": "bemisia_tabaci_canonical",
+      "target": "bemisia_tabaci",
       "label": "CONTROLS",
       "properties": {}
     },
     {
       "source": "nesidiocoris_tenuis",
-      "target": "bemisia_tabaci_canonical",
+      "target": "bemisia_tabaci",
       "label": "CONTROLS",
       "properties": {}
     },
     {
       "source": "apanteles_congregatus",
-      "target": "bemisia_tabaci_canonical",
+      "target": "bemisia_tabaci",
       "label": "CONTROLS",
       "properties": {}
     },
     {
       "source": "euseius_scutalis",
-      "target": "bemisia_tabaci_canonical",
+      "target": "bemisia_tabaci",
       "label": "CONTROLS",
       "properties": {}
     },
     {
       "source": "apoanagyrus_diversicornis",
-      "target": "bemisia_tabaci_canonical",
+      "target": "bemisia_tabaci",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -27935,7 +27773,7 @@
     },
     {
       "source": "delphastus_pusillus",
-      "target": "bemisia_tabaci_canonical",
+      "target": "bemisia_tabaci",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -28385,7 +28223,7 @@
     },
     {
       "source": "bacillus_thuringiensis",
-      "target": "spodoptera_frugiperda_cogollero",
+      "target": "spodoptera_frugiperda",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -29662,36 +29500,6 @@
       "properties": {}
     },
     {
-      "source": "trichogramma_pretiosum",
-      "target": "spodoptera_frugiperda_cogollero",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "trichogramma_pretiosum",
-      "target": "spodoptera_frugiperda",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "telenomus_remus",
-      "target": "spodoptera_frugiperda_cogollero",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "telenomus_remus",
-      "target": "spodoptera_frugiperda",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "beauveria_bassiana",
-      "target": "spodoptera_frugiperda_cogollero",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
       "source": "beauveria_bassiana",
       "target": "spodoptera_frugiperda",
       "label": "CONTROLS",
@@ -29704,18 +29512,6 @@
       "properties": {}
     },
     {
-      "source": "beauveria_bassiana",
-      "target": "bemisia_tabaci",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "beauveria_bassiana",
-      "target": "bemisia_tabaci_canonical",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
       "source": "cotesia_flavipes",
       "target": "diatraea_indigenella",
       "label": "CONTROLS",
@@ -29724,12 +29520,6 @@
     {
       "source": "beauveria_bassiana",
       "target": "trips_frankliniella_occidentalis",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "beauveria_bassiana",
-      "target": "hypothenemus_hampei_broca",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -29776,26 +29566,8 @@
       "properties": {}
     },
     {
-      "source": "telenomus_remus",
-      "target": "spodoptera_frugiperda_cogollero",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "telenomus_remus",
-      "target": "spodoptera_frugiperda",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
       "source": "trichoderma_harzianum",
       "target": "botrytis_cinerea",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "cotesia_marginiventris",
-      "target": "spodoptera_frugiperda_cogollero",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -29824,18 +29596,6 @@
       "properties": {}
     },
     {
-      "source": "trichogramma_pretiosum",
-      "target": "spodoptera_frugiperda_cogollero",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "trichogramma_pretiosum",
-      "target": "spodoptera_frugiperda",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
       "source": "trichoderma_harzianum",
       "target": "botrytis_cinerea",
       "label": "CONTROLS",
@@ -29850,30 +29610,6 @@
     {
       "source": "bacillus_subtilis",
       "target": "botrytis_cinerea",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "beauveria_bassiana",
-      "target": "bemisia_tabaci",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "beauveria_bassiana",
-      "target": "bemisia_tabaci_canonical",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "trichogramma_pretiosum",
-      "target": "spodoptera_frugiperda_cogollero",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "trichogramma_pretiosum",
-      "target": "spodoptera_frugiperda",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -29922,18 +29658,6 @@
     {
       "source": "aphidius_colemani",
       "target": "myzus_persicae",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "beauveria_bassiana",
-      "target": "hypothenemus_hampei",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "cephalonomia_stephanoderis",
-      "target": "hypothenemus_hampei",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -30094,12 +29818,6 @@
       "properties": {}
     },
     {
-      "source": "beauveria_bassiana",
-      "target": "hypothenemus_hampei",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
       "source": "bacillus_subtilis",
       "target": "mycena_citricolor",
       "label": "CONTROLS",
@@ -30124,37 +29842,13 @@
       "properties": {}
     },
     {
-      "source": "cotesia_marginiventris",
-      "target": "spodoptera_frugiperda",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
       "source": "trichogramma_exiguum",
       "target": "spodoptera_frugiperda",
       "label": "CONTROLS",
       "properties": {}
     },
     {
-      "source": "trichogramma_pretiosum",
-      "target": "spodoptera_frugiperda",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "podisus_nigrispinus",
-      "target": "spodoptera_frugiperda",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
       "source": "chrysoperla_externa",
-      "target": "spodoptera_frugiperda",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "bacillus_thuringiensis",
       "target": "spodoptera_frugiperda",
       "label": "CONTROLS",
       "properties": {}
@@ -30449,55 +30143,7 @@
     },
     {
       "source": "amitus_fuscipennis",
-      "target": "bemisia_tabaci_canonical",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "encarsia_formosa",
-      "target": "bemisia_tabaci_canonical",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "eretmocerus_mundus",
-      "target": "bemisia_tabaci_canonical",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "amblyseius_swirskii",
-      "target": "bemisia_tabaci_canonical",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "chrysoperla_externa",
-      "target": "bemisia_tabaci_canonical",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "chrysoperla_carnea",
-      "target": "bemisia_tabaci_canonical",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "paecilomyces_fumosoroseus",
-      "target": "bemisia_tabaci_canonical",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "lecanicillium_lecanii",
-      "target": "bemisia_tabaci_canonical",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "beauveria_bassiana",
-      "target": "bemisia_tabaci_canonical",
+      "target": "bemisia_tabaci",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -30600,12 +30246,6 @@
     {
       "source": "beauveria_bassiana",
       "target": "tetranychus_urticae",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "trichoderma_harzianum",
-      "target": "hemileia_vastatrix",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -31330,26 +30970,14 @@
       "properties": {}
     },
     {
-      "source": "bacillus_thuringiensis",
-      "target": "spodoptera_frugiperda",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "trichogramma_spp",
-      "target": "spodoptera_frugiperda",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
       "source": "jadam_wetting_agent_jwa",
-      "target": "bemisia_tabaci_canonical",
+      "target": "bemisia_tabaci",
       "label": "CONTROLS",
       "properties": {}
     },
     {
       "source": "extracto_neem",
-      "target": "bemisia_tabaci_canonical",
+      "target": "bemisia_tabaci",
       "label": "CONTROLS",
       "properties": {}
     },
@@ -31798,12 +31426,6 @@
       "properties": {}
     },
     {
-      "source": "beauveria_bassiana",
-      "target": "hypothenemus_hampei",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
       "source": "bacillus_thuringiensis_kurstaki",
       "target": "tecia_solanivora",
       "label": "CONTROLS",
@@ -31824,12 +31446,6 @@
     {
       "source": "beauveria_bassiana",
       "target": "brevicoryne_brassicae",
-      "label": "CONTROLS",
-      "properties": {}
-    },
-    {
-      "source": "beauveria_bassiana",
-      "target": "bemisia_tabaci_canonical",
       "label": "CONTROLS",
       "properties": {}
     },
