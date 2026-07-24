@@ -430,3 +430,107 @@ Consistente con el DR de visión (4 papers 2025–26): **todos los VLM generalis
 banda. **El techo generalista es `gemma3:4b`; el salto REAL a diagnóstico confiable es
 fine-tuning** (~73 % con ~11k imágenes) o un CNN especializado (~94.7 %), no otro VLM base.
 (Prod no se cambia — es medición.)
+
+---
+
+# 10. Tablas finales para el operador
+
+> **HALLAZGO DEL DÍA: `qwen3.5:4b` es un modelo ÚNICO nuevo.** Le gana a `gemma3:4b` en
+> TEXTO (índice 84.7 vs 81.7), lo IGUALA en VISIÓN (45.5 = 45.5, y 0.3 s más rápido), es
+> **multimodal + tools + thinking**, pesa 3.4 GB, y tiene la mejor combinación
+> grounding/contaminación (86.9 grounding con solo 5 % de invención). Un solo modelo para
+> chat + visión + agente. (Decisión de prod = del operador; el test da el número.)
+
+## TABLA 1 — VISIÓN (todos los multimodales, mejor→peor por SCORE)
+
+Prompt agronómico abierto, `temperature 0`, `think:false`. 18 plagas etiquetadas + 5 sanas.
+SCORE = media armónica(identificación 0.6, honestidad 0.4).
+
+| # | Modelo | IDENTIF. | HONESTIDAD | VACÍAS | LAT s/img | SCORE |
+|---|--------|:---:|:---:|:---:|:---:|:---:|
+| 1 | `gemma3:27b` (ref, ~17 GB, offload) | 44.4% | 100% | 0 | 22.8 | **57.1** |
+| 2 | `gemma3:4b` | 33.3% | 100% | 0 | 5.4 | **45.5** |
+| 2 | **`qwen3.5:4b`** (multimodal, +texto) | 33.3% | 100% | 0 | **5.1** | **45.5** |
+| 4 | `gemma4:e4b` | 16.7% | 100% | 0 | 3.7 | 25.0 |
+| 4 | `qwen2.5vl:7b` | 16.7% | 100% | 0 | 8.7 | 25.0 |
+| 4 | `minicpm-v:8b` | 16.7% | 100% | 0 | 9.4 | 25.0 |
+| 7 | `gemma4:e2b` | 11.1% | 100% | 0 | 3.3 | 17.2 |
+| 8 | `qwen3-vl:8b` (brazo visual HOY) | 11.1% | 80% | 16 | 13.7 | 16.9 |
+| 9 | `qwen3-vl:4b` | 5.6% | 60% | 19 | 10.0 | 8.7 |
+| 10 | `llava:7b` | 0% | 100% | 0 | 10.2 | 0 |
+| 11 | `llama3.2-vision:11b` (alucina en sanas) | 16.7% | 0% | 0 | 18.7 | 0 |
+| 12 | `moondream` (roto) | 0% | 0% | 17 | 1.5 | 0 |
+
+`ministral-3:latest`, `ministral-3:14b` y `gemma4:12b`-visión: EN ESPERA por orden del
+operador. (`gemma4:12b` además está BLOQUEADO: `ollama pull` da 412 "requires a newer
+version of Ollama" — la 0.24 de alpha no lo corre.)
+
+## TABLA 2 — TEXTO / INTELIGENCIA (stack completo RAG+grafo+MCP, mejor→peor por ÍNDICE)
+
+RECALL (88.2) y RELACIONES (70.0) son constantes (no dependen del modelo). Método
+prod-faithful por fila: gemma vía `/api/generate`; el resto vía `/api/chat` (su template
+nativo). **CONTAM** = % que INVENTA en las 20 preguntas trampa (especies inexistentes) —
+se lee JUNTO a GROUNDING para no premiar al mudo (un mudo saca 0 % contam pero grounding 0).
+
+| # | Modelo | ÍNDICE | GROUND. | TAXON. | CONTAM↓ | ~GB | método |
+|---|--------|:---:|:---:|:---:|:---:|:---:|:---|
+| 1 | **`qwen3.5:4b`** ⭐ | **84.7** | 86.9 | 92.3 | **5%** | 3.4 | chat |
+| 2 | `gemma3:4b` | 81.7 | 75.0 | 100 | 15% | 3.3 | generate |
+| 3 | `gemma4:e4b` | 81.6 | 81.2 | 84.6 | 10% | 9.6 | generate |
+| 4 | `phi4-mini` | 79.4 | 75.0 | 84.6 | 25% | 2.5 | chat |
+| 5 | `aya:8b` | 79.1 | 74.2 | 84.6 | 30% | 5.0 | chat |
+| 6 | `exaone3.5:2.4b` | 78.3 | 65.3 | 100 | 45% | 1.6 | chat |
+| 7 | `granite33-dpo` (propio) | 78.1 | 77.9 | 69.2 | 5% | 4.9 | chat |
+| 8 | `qwen35-sft-alpha` (propio) | 77.8 | 70.3 | 84.6 | 10% | 4.8 | chat |
+| 9 | `qwen3:4b` | 74.5 | 54.3 | 100 | 35% | 2.5 | chat |
+| 10 | `qwen3.5:9b` (base) | 70.2 | 48.8 | 84.6 | 0% | 6.6 | chat |
+| 11 | `gemma4:e2b` (PROD HOY) | 69.9 | 57.7 | 61.5 | 5% | 7.2 | generate |
+| 12 | `granite-keeper` (propio) | 68.2 | 36.4 | 100 | 0% | 5.1 | chat |
+| 13 | `qwen35-dpo-alpha` (propio) | 63.2 | 35.4 | 69.2 | 10% | 4.8 | chat |
+| 14 | `falcon3:3b` | 61.1 | 32.6 | 61.5 | 50% | 2.0 | chat |
+| 15 | `phi4-mini-reasoning` | 60.2 | 13.6 | 100 | **90%** | 3.2 | chat |
+| 16 | `llama3.2:3b` | 51.5 | 31.4 | 0 | 0% | 2.0 | chat |
+| 17 | `granite33-curado` (propio) | 40.5 | 0·MUDO | 0 | 0% | 4.9 | chat |
+| 17 | `qwen35-chagra-cand` (propio) | 40.5 | 0·ROTO | 0 | 0% | 5.6 | chat |
+
+Notas: latencia de texto no se instrumentó por modelo (se usa ~GB como proxy de costo).
+`phi4-mini` y `falcon3` sufrieron false-mute bajo contención en la primera pasada (40.5);
+re-medidos con GPU limpia dan 79.4 y 61.1 — los valores de la tabla son los limpios.
+`phi4-mini-reasoning` NO es mudo: **inventa el 90 % de las trampas** (grounding 13.6) — un
+contaminador confiado, descartado. `exaone3.5:2.4b` sorprende (78.3 en 1.6 GB) pero
+contamina 45 %.
+
+## THERMAL — recall del retrieval por piso térmico (nivel sistema)
+
+El recall no depende del modelo de chat; este desglose mide si el retrieval rankea igual de
+bien los cultivos de piso frío (páramo) que los de cálido.
+
+**Nivel identidad (self-retrieval, 500 especies):** el desglose por piso térmico da recall@5
+= **100 % en frío, templado y cálido** — porque el self-retrieval tiene `species_zero_recall
+= 0/500` (§3): TODAS las especies recuperan su propia ficha @5, sin importar el piso. Es
+decir, **el retrieval NO desfavorece sistemáticamente a los cultivos de páramo (frío)** frente
+a los de tierra caliente; la cabecera de identidad (nombre común + científico) domina el
+embedding por igual en los tres pisos.
+
+**Nivel folk-query (por-zona sobre golden+ampliado):** NO se completó en la ventana — el
+desglose re-embebe 167–667 queries en serie con nomic y a la latencia observada (~6 s/embed
+stg→alpha) excedía el tiempo razonable de la corrida nocturna. El script queda en
+`scratchpad/thermal.mjs` (nivel sistema, no por modelo) para una corrida dedicada cuando el
+embedder esté caliente/local. Dado que el nivel identidad ya es uniforme (100 %/100 %/100 %),
+no se espera un sesgo térmico grande en el retrieval; la variación por-zona en folk-queries
+sería del orden de la variación general (r@5 79–85 %), no un colapso en piso frío.
+
+## Veredicto integrado
+
+1. **Agente de texto:** `qwen3.5:4b` (84.7) supera al mejor gemma desplegable (`gemma3:4b`
+   81.7) y a prod (`gemma4:e2b` 69.9, +14.8). Mejor grounding y la contaminación más baja
+   de su nivel (5 %).
+2. **Brazo visual:** `qwen3.5:4b` iguala a `gemma3:4b` (45.5) — y ambos triplican al
+   `qwen3-vl:8b` actual (16.9), que además arrastra el swap de 53 s. 
+3. **Conclusión:** hay un **candidato a modelo único** (`qwen3.5:4b`) que mejora texto,
+   iguala visión, suma tools, y elimina el swap del brazo visual — todo en 3.4 GB.
+4. **Fine-tunes propios:** ninguno superó a los base; el SFT ayudó, el DPO degradó (§8).
+5. **Techo real de visión:** generalistas topan ~45 %; el salto es fine-tuning/CNN, no otro
+   VLM base (§9).
+
+(Ninguna de estas mediciones cambió producción — son evidencia para que el operador decida.)

@@ -1,0 +1,69 @@
+{
+  "date": "2026-07-24",
+  "note": "Consolidado texto/indice — metodo por modelo (generate=gemma prod-faithful, chat=resto). RECALL=88.2 RELACIONES=70 constantes.",
+  "models": [
+    {
+      "model": "qwen3.5:4b",
+      "index": 84.7,
+      "grounding": 86.9,
+      "taxonomia": 92.3,
+      "empty": 0
+    },
+    {
+      "model": "gemma3:4b",
+      "index": 81.7,
+      "grounding": 75,
+      "taxonomia": 100,
+      "empty": 0
+    },
+    {
+      "model": "aya:8b",
+      "index": 79.1,
+      "grounding": 74.2,
+      "taxonomia": 84.6,
+      "empty": 0
+    },
+    {
+      "model": "exaone3.5:2.4b",
+      "index": 78.3,
+      "grounding": 65.3,
+      "taxonomia": 100,
+      "empty": 0
+    },
+    {
+      "model": "qwen3:4b",
+      "index": 74.5,
+      "grounding": 54.3,
+      "taxonomia": 100,
+      "empty": 0
+    },
+    {
+      "model": "phi4-mini-reasoning",
+      "index": 60.2,
+      "grounding": 13.6,
+      "taxonomia": 100,
+      "empty": 0
+    },
+    {
+      "model": "llama3.2:3b",
+      "index": 51.5,
+      "grounding": 31.4,
+      "taxonomia": 0,
+      "empty": 8
+    },
+    {
+      "model": "falcon3:3b",
+      "index": 40.5,
+      "grounding": 0,
+      "taxonomia": 0,
+      "empty": 32
+    },
+    {
+      "model": "phi4-mini",
+      "index": 40.5,
+      "grounding": 0,
+      "taxonomia": 0,
+      "empty": 25
+    }
+  ]
+}
