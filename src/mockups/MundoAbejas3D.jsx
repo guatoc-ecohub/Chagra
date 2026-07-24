@@ -9,6 +9,9 @@
  *   · CICLO DE FORRAJEO — cada Angelita vuela a una flor, SE POSA, liba un
  *     momento, y sigue a la siguiente; al cerrar la ronda ENTRA a la piquera de
  *     su vivienda y sale cargada. Máquina de estados en refs (cero re-render).
+ *   · EL RASTRO DE POLEN — en vuelo va soltando motas ámbar que suben y se
+ *     apagan: la sarta dibuja el RECORRIDO flor→flor. Así la polinización se lee
+ *     como PROCESO (y no como abejas quietas) hasta con la escena detenida.
  *   · LA FLOR RESPONDE — se estremece cuando la visitan, la corola se abre un
  *     punto y suelta un puff de polen que sube y se disuelve. Las visitas
  *     viajan por un Float32Array compartido: la abeja escribe, la flor lee.
@@ -318,6 +321,26 @@ const puntoDeFlor = (f) => new THREE.Vector3(f.p[0], f.p[1] + 0.62 * f.esc + 0.0
    módulo a propósito — es un canal de animación entre hermanos, no estado de
    interfaz; el mundo se monta uno a la vez y el canal se limpia al montar. */
 const VISITAS = new Float32Array(FLORES.length);
+
+/* ═══════════════════ EL RASTRO DE POLEN ═══════════════════
+   La lección que un cuadro FIJO no contaba: la abeja no solo se posa — LLEVA el
+   polen de una flor a la siguiente. Ahí está la polinización, y en una captura
+   congelada no se veía (parecían abejas quietas encima de las flores). Cada
+   forrajera en vuelo va soltando motas ámbar que suben y se desvanecen: la sarta
+   dibuja el RECORRIDO flor→flor, así el PROCESO se lee hasta con la escena
+   detenida. Mismo canal entre hermanos que VISITAS: la abeja escribe una mota en
+   un anillo de módulo, el rastro la lee y la apaga. Cero re-render por cuadro. */
+const RASTRO_MAX = 66;
+const rastroPos = new Float32Array(RASTRO_MAX * 3);
+const rastroVida = new Float32Array(RASTRO_MAX); // 0 = mota apagada
+let rastroCursor = 0;
+function emitirPolen(x, y, z) {
+  const i = rastroCursor;
+  rastroPos[i * 3] = x; rastroPos[i * 3 + 1] = y; rastroPos[i * 3 + 2] = z;
+  rastroVida[i] = 1;
+  rastroCursor = (rastroCursor + 1) % RASTRO_MAX;
+}
+function limpiarRastro() { rastroVida.fill(0); }
 
 /* UNA flor: tallo con dos hojas y corola de pétalos ahuecados. Se mece con su
    brisa propia y REACCIONA a la visita — se estremece, la corola se abre un
@@ -686,7 +709,7 @@ function pintar(capa, ref, dir, k) {
    React es `libando` (dos veces por parada), que enciende la probóscide y el
    polvillo de polen del propio dibujo de la casa. Con reduced-motion la abeja
    queda POSADA en su primera flor: quieta, pero polinizando. */
-function AbejaForrajera({ datos, reducedMotion }) {
+function AbejaForrajera({ datos, reducedMotion, rastro = true }) {
   const grupo = useRef(/** @type {any} */ (null));
   const capa = useRef(/** @type {HTMLDivElement|null} */ (null));
   const pincel = useRef({ dir: 1, k: 1 });
@@ -743,6 +766,16 @@ function AbejaForrajera({ datos, reducedMotion }) {
       v.x += Math.sin(t * 4.6 + datos.fase) * 0.06 * (1 - s);
       v.z += Math.cos(t * 3.9 + datos.fase) * 0.05 * (1 - s);
       g.position.copy(v);
+      /* va soltando polen mientras viaja: la sarta ámbar ES el recorrido
+         flor→flor. Cada ~0,08s una mota bajo el cuerpo, con leve deriva. */
+      if (rastro && t - (e.emit || 0) > 0.075) {
+        e.emit = t;
+        emitirPolen(
+          v.x + Math.sin(t * 21 + datos.fase) * 0.05,
+          v.y - 0.05,
+          v.z + Math.cos(t * 17 + datos.fase) * 0.05,
+        );
+      }
       if (u >= 1) {
         e.fase = parada.tipo === 'flor' ? 'posada' : 'boca';
         e.t0 = t;
@@ -798,6 +831,44 @@ function AbejaForrajera({ datos, reducedMotion }) {
         </div>
       </Html>
     </group>
+  );
+}
+
+/* EL RASTRO, VISIBLE. Un solo InstancedMesh lee el anillo de motas que las
+   forrajeras van soltando en vuelo y las pinta: suben un punto y se apagan. La
+   sarta ámbar dibuja el recorrido flor→flor — la polinización que un cuadro
+   fijo no mostraba. Cero geometría por mota (una instancia reusada), cero
+   re-render: todo se escribe en las matrices cuadro a cuadro. */
+function RastroPolen({ reducedMotion }) {
+  const malla = useRef(/** @type {any} */ (null));
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  useFrame((_s, delta) => {
+    const m = malla.current;
+    if (!m) return;
+    for (let i = 0; i < RASTRO_MAX; i++) {
+      const v = rastroVida[i];
+      if (v > 0) {
+        const s = 0.026 + v * 0.075;
+        dummy.position.set(
+          rastroPos[i * 3],
+          rastroPos[i * 3 + 1] + (1 - v) * 0.42, // sube al desvanecerse
+          rastroPos[i * 3 + 2],
+        );
+        dummy.scale.setScalar(s);
+        if (!reducedMotion) rastroVida[i] = Math.max(0, v - delta * 0.7);
+      } else {
+        dummy.scale.setScalar(0); // apagada: colapsada, no se ve
+      }
+      dummy.updateMatrix();
+      m.setMatrixAt(i, dummy.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  });
+  return (
+    <instancedMesh ref={malla} args={[undefined, undefined, RASTRO_MAX]} frustumCulled={false}>
+      <sphereGeometry args={[1, 6, 5]} />
+      <meshBasicMaterial color={C.miel} transparent opacity={0.85} depthWrite={false} />
+    </instancedMesh>
   );
 }
 
@@ -890,8 +961,10 @@ function Escena({ tier, reducedMotion, seleccion }) {
   const guardianas = tier === 'bajo' ? GUARDIANAS.slice(0, 1) : GUARDIANAS;
   const controlsRef = useRef(/** @type {any} */ (null));
   const objetivoInicial = ZONAS[seleccion] || ZONAS.polinizacion;
-  /* el canal de visitas arranca limpio cada vez que el mundo se monta */
-  useEffect(() => { VISITAS.fill(0); }, []);
+  /* los canales entre hermanos (visitas y rastro) arrancan limpios cada vez que
+     el mundo se monta */
+  const rastroOn = tier !== 'bajo';
+  useEffect(() => { VISITAS.fill(0); limpiarRastro(); }, []);
   return (
     <>
       <color attach="background" args={[DORADA.cielo]} />
@@ -934,11 +1007,13 @@ function Escena({ tier, reducedMotion, seleccion }) {
         <Flor key={`flor-${i}`} indice={i} datos={datos} reducedMotion={reducedMotion} motas={tier !== 'bajo'} />
       ))}
       {forrajeras.map((datos, i) => (
-        <AbejaForrajera key={`for-${i}`} datos={datos} reducedMotion={reducedMotion} />
+        <AbejaForrajera key={`for-${i}`} datos={datos} reducedMotion={reducedMotion} rastro={rastroOn} />
       ))}
       {guardianas.map((datos, i) => (
         <AbejaGuardiana key={`gua-${i}`} datos={datos} reducedMotion={reducedMotion} />
       ))}
+      {/* el polen viajando de flor en flor: el proceso, no solo las abejas */}
+      {rastroOn ? <RastroPolen reducedMotion={reducedMotion} /> : null}
 
       <ParticulasAmbientales tipo="polen" tier={tier} reducedMotion={reducedMotion} area={[9, 3, 6]} position={[0, 1.0, 1.2]} />
       <OrbitControls ref={controlsRef} makeDefault enablePan={false} minDistance={7} maxDistance={22} minPolarAngle={0.6} maxPolarAngle={1.36} target={objetivoInicial} />
