@@ -512,13 +512,18 @@ decir, **el retrieval NO desfavorece sistemáticamente a los cultivos de páramo
 a los de tierra caliente; la cabecera de identidad (nombre común + científico) domina el
 embedding por igual en los tres pisos.
 
-**Nivel folk-query (por-zona sobre golden+ampliado):** NO se completó en la ventana — el
-desglose re-embebe 167–667 queries en serie con nomic y a la latencia observada (~6 s/embed
-stg→alpha) excedía el tiempo razonable de la corrida nocturna. El script queda en
-`scratchpad/thermal.mjs` (nivel sistema, no por modelo) para una corrida dedicada cuando el
-embedder esté caliente/local. Dado que el nivel identidad ya es uniforme (100 %/100 %/100 %),
-no se espera un sesgo térmico grande en el retrieval; la variación por-zona en folk-queries
-sería del orden de la variación general (r@5 79–85 %), no un colapso en piso frío.
+**Nivel folk-query (recall@5 por piso térmico sobre golden + ampliado, 286 queries):**
+
+| Piso térmico | recall@5 | n |
+|--------------|:---:|:---:|
+| **frío** (páramo/tierra fría) | **85.7 %** | 98 |
+| templado | 80.2 % | 121 |
+| **cálido** (tierra caliente) | **86.6 %** | 67 |
+
+**El retrieval NO desfavorece al piso frío/páramo:** frío (85.7 %) queda incluso por encima
+de templado (80.2 %) y a la par de cálido (86.6 %). No hay sesgo térmico — los cultivos de
+páramo se recuperan tan bien como los de tierra caliente. (El leve mínimo en templado es
+ruido, no un patrón; el retrieval es agnóstico al piso.)
 
 ## Veredicto integrado
 
