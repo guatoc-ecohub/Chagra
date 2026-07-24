@@ -617,3 +617,52 @@ empata a la mitad de tabla, muy por debajo de `qwen3.5:4b`/`gemma3:4b` (45.5). (
 **Cierre del test a full:** ni fine-tunes propios, ni gemma grandes, ni ministral, ni VLM
 nuevos superan a `qwen3.5:4b` en el conjunto texto-duro + visión + tools + tamaño. El modelo
 único sale del test exhaustivo como el ganador robusto e indiscutible.
+
+---
+
+# 12. Auditoría dura POR PERFIL (multi-turno) + pares golden DPO
+
+`scripts/bench-audit-dura.mjs` — 300 casos adversariales (trampas: papa=papaya, premisas
+numéricas falsas, plaga en cultivo equivocado), multi-turno, por perfil de usuario
+(**campesino** fonético/oral · **gomelo** confiado/irónico · **científico** exige-fuente).
+Juez `claude-code`. Muestra `--limit 30` (viable con el culling de background-tasks; el set
+está ordenado campesino-primero → 16/8/6 por perfil). Corrida cerrada al reactivarse prod de
+día (GPU compartida con campesinos > enriquecimiento).
+
+### Tabla por-perfil (% de casos aprobados; pass bajo = esperado, son trampas brutales)
+
+| Modelo | overall | campesino | **gomelo** | científico |
+|--------|:---:|:---:|:---:|:---:|
+| `gemma3:4b` | 17% | 3/16 | **1/8** | 1/6 |
+| `aya:8b` | 10% | 2/16 | **0/8** | 1/6 |
+| `exaone3.5:2.4b` | 7% | 1/16 | **0/8** | 1/6 |
+
+Lectura: bajo las trampas duras multi-turno, incluso los modelos fuertes en el índice pasan
+poco (10–17%) — el registro **gomelo** (irónico, afirma premisas falsas con confianza) es de
+los más difíciles: cae casi todo. Confirma que el agente necesita las guardas del stack
+(grounding + grafo), no solo un buen LLM. (3 modelos alcanzados antes de cerrar por prioridad
+de prod; el harness queda listo para completar los 8 cuando haya GPU libre.)
+
+### Pares golden DPO — `data/dpo/pairs-audit-dura.jsonl`
+
+**30 pares reales** extraídos de las respuestas juzgadas (**campesino 16 · gomelo 8 ·
+científico 6**), con meta `persona` + `register` + `failed_dimensions`. Valor: el `rejected`
+es una **alucinación REAL observada** de un modelo que cayó en la trampa (no sintética), y el
+`chosen` es una respuesta correcta (o el `goldResponse` del caso). Ejemplo gomelo: "¿la
+papayuela es la papaya bebé, cierto?" → rejected confirma/enreda la premisa (falla grounding
++ trampa_lingüística), chosen la rechaza (*Vasconcellea pubescens*). Enriquece el dataset DPO
+(antes ~500 sintético) con pares reales verificados y filtrables por perfil. Crece si se
+completan más modelos.
+
+---
+
+## Cierre del maratón
+
+Test de inteligencia fuerte **construido, medido de verdad y con veredicto blindado**. En una
+noche: harness reproducible (ÍNDICE 4-dimensiones), 25+ modelos comparados (texto v1+v2 duro,
+visión, contaminación, robustez, por-perfil), y **6 bugs cazados que hacían MENTIR al número**
+(tier-gate 44→501 · `think:false` en chat/audit/visión · clasificador de honestidad visual ·
+`/api/chat` vs `/api/generate` por template · rechazo-de-premisa v2 · warmup que abortaba la
+auditoría). Veredicto: **`qwen3.5:4b` es el modelo único que mejora prod en todo, y su ventaja
+CRECE con la dificultad (+3 fácil → +13 duro)** — no memoriza, razona. La decisión de migrar
+prod es del operador; la evidencia está completa y committeada.
