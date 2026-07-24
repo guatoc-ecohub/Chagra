@@ -459,7 +459,7 @@ export default function GemeloValle2D({
                   className={`gv-poi${activo ? ' gv-poi--activo' : ''}`}
                   style={{
                     left: `${clampPct(p.left)}%`,
-                    top: `${p.top - (alto / VB_H) * 100 - 1.5}%`,
+                    top: `${clampPct(p.top - (alto / VB_H) * 100 - 1.5)}%`,
                     '--poi-tinte': m.tinte[0],
                   }}
                   onClick={() => onEntrar?.(m.id)}
@@ -478,7 +478,10 @@ export default function GemeloValle2D({
                 <button
                   type="button"
                   className="gv-alerta"
-                  style={{ left: `${clampPct(p.left)}%`, top: `${p.top - 14}%` }}
+                  style={{
+                    left: `${clampPct(p.left)}%`,
+                    top: `${clampPct(p.top - 14)}%`,
+                  }}
                   onClick={() => onAlerta?.()}
                   aria-label={`Alerta del día: ${alerta.titulo}. ${alerta.detalle || ''}`}
                 >
