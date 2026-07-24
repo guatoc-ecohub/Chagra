@@ -11,7 +11,10 @@
  *     (`avanzarFisica`, `rectsOverlap`).
  *   - Lógica de disparo/par arma↔plaga/rescate → `metalSlugCampoEngine` (puro, testeado).
  *   - Data agronómica REAL → `../data/metalSlugCampoData` (enemigos, armas, rehenes, nivel).
- *   - Sprites rubber-hose canónicos → `../visual/creatures` (Abeja héroe, Oso rehén).
+ *   - Sprites rubber-hose canónicos → `../visual/creatures` (Abeja héroe, Oso rehén,
+ *     y LA DUPLA de la casa: Dante el beagle viejo + Oliver el dálmata — compañeros
+ *     automáticos vía `./metalslug/DuoPerros.jsx`: Dante HUELE escondites y señala
+ *     el arma correcta tras un tiro errado; Oliver corre, desentierra y TRAE).
  *   - Tier + reduced-motion → `../visual/mundo3d/deviceTier` (mismo criterio que el Odyssey).
  *
  * Determinismo: la simulación corre a PASO FIJO (1/60 s) con acumulador, así el
@@ -57,6 +60,15 @@ import StyleJuice, {
   BarraVida,
   IndicadorMunicion,
 } from './metalslug/JuiceMetalSlug.jsx';
+import {
+  SpriteDante,
+  SpriteOliver,
+  PistaDante,
+  Escondite,
+  DuoIntro,
+  DuoCelebra,
+  StyleDuoPerros,
+} from './metalslug/DuoPerros.jsx';
 
 /* ── Geometría del mundo (coords diseño; x→derecha, y→abajo). ───────────────── */
 const ALTO_2D = 520; // alto de diseño de la vista
@@ -87,6 +99,27 @@ const COLOR_POR_TIPO = Object.freeze({
 /* Arsenal CURADO del prototipo: intersección con el arsenal real del nivel (sin
    invento). Enseña los pares que de verdad se enfrentan en el nivel 1. */
 const ARSENAL_CURADO = ['bt', 'catarina', 'beauveria', 'crisopa'];
+
+/* ── LA DUPLA: Dante y Oliver (siempre juntos, complementarios). ──────────────
+   Dante (beagle, 15 años) es la NARIZ: huele los escondites enterrados y, si
+   el jugador yerra de arma, señala el control biológico correcto. Oliver
+   (dálmata joven) son las PATAS: desentierra y TRAE la merienda al jugador.
+   Compañeros automáticos — cero botones nuevos, cero daño recibido. */
+const DANTE_VEL = 2.5; // px/tick — trote sereno de perro de 15 años
+const DANTE_MAX = 3.8; // catch-up suave (nunca se queda del todo atrás)
+const OLIVER_VEL = 5.2; // px/tick — trote eléctrico de perro joven
+const OLIVER_DASH = 8.4; // px/tick — el disparado por la merienda
+const DANTE_S = 56; // lado del sprite (bajito y orejón)
+const OLIVER_S = 70; // lado del sprite (alto y esbelto)
+const PIES = 0.84; // fracción del sprite donde apoyan las patas (viewBox canónico)
+const PUNTOS_ESCONDITE = 75; // premio si la energía ya está llena
+const OLFATEO_S = 1.6; // lo que Dante tarda confirmando el rastro
+const CAVA_S = 0.55; // lo que Oliver tarda desenterrando
+const CELEBRA_S = 4.2; // fiesta de la dupla al liberar al oso
+const PISTA_S = 4.5; // vida de la burbuja-pista de Dante
+
+/* Escondites enterrados del nivel (deterministas, lejos de matas y del rehén). */
+const ESCONDITES_NIVEL = [{ x: 800 }, { x: 1650 }, { x: 2260 }];
 
 /* Instancias de plaga sembradas por el nivel (grounding: todas son de NIVEL.enemigos). */
 const SIEMBRA_PLAGAS = [
@@ -135,6 +168,16 @@ function crearMundo() {
     enemigos,
     proyectiles: [],
     rehen: { x: 2500, y: SUELO_Y - 88, w: 80, h: 88, liberado: false },
+    escondites: ESCONDITES_NIVEL.map((e, i) => ({ id: `esc${i}`, x: e.x, estado: 'oculto' })),
+    duo: {
+      dante: { x: 46, mira: 1, anda: false },
+      oliver: { x: 86, mira: 1, anda: false, carga: false },
+      fase: 'trote', // 'trote'|'rastreo'|'busca'|'entrega'|'celebra'
+      faseT: 0,
+      escIdx: -1,
+      marcaT: 0, // sub-reloj (olfateo confirmando / cavada)
+      pista: null, // { armaId, hasta } — la seña de Dante tras un tiro errado
+    },
     cam: 0,
     puntaje: 0,
     armaIdx: 0,
@@ -155,6 +198,141 @@ function sembrarEfecto(w, tipo, x, y) {
 const FX_VIDA_S = 0.6; // duración visible del estallido (s)
 
 /* ── SIMULACIÓN (scope de módulo: sin estado React, muta el mundo `w`). ──────── */
+
+/* Acerca a un perro hacia `objetivo` a `vel` px/tick. Devuelve true al llegar.
+   Marca `anda` (gate del galope CSS) y `mira` (flip del sprite). */
+function perroHacia(p, objetivo, vel) {
+  const dx = objetivo - p.x;
+  if (Math.abs(dx) <= 3) {
+    p.anda = false;
+    return true;
+  }
+  p.x = Math.max(16, Math.min(MUNDO_W - 30, p.x + Math.sign(dx) * Math.min(vel, Math.abs(dx))));
+  p.mira = dx > 0 ? 1 : -1;
+  p.anda = true;
+  return false;
+}
+
+/**
+ * Un tick de la DUPLA (paso fijo, determinista — cero Math.random).
+ * Máquina de fases: trote (siguen al jugador) → rastreo (Dante huele el
+ * escondite) → busca (Oliver dash al hallazgo) → entrega (Oliver trae la
+ * merienda) → trote. 'celebra' la dispara el rescate del oso.
+ * @param {Object} w mundo mutable.
+ */
+function simularDuo(w) {
+  const d = w.duo;
+  const j = w.jugador;
+  const dante = d.dante;
+  const oliver = d.oliver;
+  d.faseT += STEP;
+
+  /* la pista de Dante caduca sola */
+  if (d.pista && w.reloj > d.pista.hasta) d.pista = null;
+
+  switch (d.fase) {
+    case 'trote': {
+      /* Dante trota ATRÁS del jugador, sin afán; la banda elástica crece con
+         la distancia (15 años: dignidad primero, pero JAMÁS se queda — la
+         dupla nunca se parte en dos pantallas). */
+      const atras = j.x - j.mira * 88;
+      const exceso = Math.max(0, Math.abs(atras - dante.x) - 140);
+      perroHacia(dante, atras, Math.min(DANTE_MAX + exceso / 90, MOVE_SPEED * 1.5));
+      /* Oliver ORBITA juguetón entre Dante y el jugador: se adelanta, vuelve,
+         nunca abandona al viejo (la seña de la dupla). Sin ENCIMÁRSELE al
+         viejo: si la órbita cae sobre Dante, se corre un cuerpo. */
+      let orbita = j.x + Math.sin(w.reloj * 1.7) * 95 - j.mira * 18;
+      if (Math.abs(orbita - dante.x) < 44) {
+        orbita = dante.x + 44 * (orbita >= dante.x ? 1 : -1);
+      }
+      perroHacia(oliver, orbita, OLIVER_VEL);
+      /* ¿hay escondite cerca sin descubrir? La trufa lo agarra primero. */
+      const i = w.escondites.findIndex(
+        (e) => e.estado === 'oculto' && Math.abs(j.x - e.x) < 230,
+      );
+      if (i >= 0) {
+        w.escondites[i].estado = 'olido';
+        d.fase = 'rastreo';
+        d.escIdx = i;
+        d.faseT = 0;
+        d.marcaT = 0;
+      }
+      break;
+    }
+    case 'rastreo': {
+      /* Dante va al montículo y CONFIRMA con la trufa (olfatea, cabeza al
+         suelo). Oliver espera a su lado ladeando la cabeza (no entiende
+         de olores, entiende de correr). */
+      const esc = w.escondites[d.escIdx];
+      const llego = perroHacia(dante, esc.x - 26, DANTE_VEL * 1.2);
+      perroHacia(oliver, esc.x - 78, OLIVER_VEL);
+      if (llego) {
+        d.marcaT += STEP;
+        if (d.marcaT >= OLFATEO_S) {
+          esc.estado = 'revelado';
+          d.fase = 'busca';
+          d.faseT = 0;
+          d.marcaT = 0;
+        }
+      }
+      break;
+    }
+    case 'busca': {
+      /* Oliver sale DISPARADO al hallazgo y desentierra. Dante se queda
+         plantado junto al montículo (trabajo hecho, orgullo de sabueso). */
+      const esc = w.escondites[d.escIdx];
+      const llego = perroHacia(oliver, esc.x + 6, OLIVER_DASH);
+      if (llego) {
+        d.marcaT += STEP;
+        if (d.marcaT >= CAVA_S) {
+          esc.estado = 'recogido';
+          oliver.carga = true;
+          d.fase = 'entrega';
+          d.faseT = 0;
+          d.marcaT = 0;
+          sembrarEfecto(w, 'errado', esc.x, SUELO_Y - 14); // polvareda de cavada
+        }
+      }
+      break;
+    }
+    case 'entrega': {
+      /* Oliver TRAE el atadito hasta el jugador; Dante retoma su puesto. */
+      const llego = perroHacia(oliver, j.x + j.mira * 8, OLIVER_DASH);
+      perroHacia(dante, j.x - j.mira * 88, DANTE_MAX);
+      if (llego) {
+        oliver.carga = false;
+        w.escondites[d.escIdx].estado = 'entregado';
+        const premio = j.energia < ENERGIA_INICIAL ? 'energia' : 'semillas';
+        if (premio === 'energia') j.energia += 1;
+        else w.puntaje += PUNTOS_ESCONDITE;
+        w._eventoEntrega = premio;
+        sembrarEfecto(w, 'rescate', j.x + j.w / 2, j.y + 10);
+        d.fase = 'trote';
+        d.escIdx = -1;
+        d.faseT = 0;
+      }
+      break;
+    }
+    case 'celebra': {
+      /* Fiesta junto al oso liberado: Dante aúlla, Oliver brinca y menea.
+         La cuenta NO corre hasta que AMBOS lleguen (la fiesta es de la dupla
+         completa: si el viejo viene en camino, el oso espera el aullido). */
+      const llegoD = perroHacia(dante, w.rehen.x - 64, DANTE_MAX + 1.6);
+      const llegoO = perroHacia(oliver, w.rehen.x + 96, OLIVER_DASH);
+      dante.fiesta = llegoD;
+      if (!(llegoD && llegoO)) {
+        d.faseT = Math.min(d.faseT, CELEBRA_S - 2.8);
+      } else if (d.faseT >= CELEBRA_S) {
+        d.fase = 'trote';
+        d.faseT = 0;
+        dante.fiesta = false;
+      }
+      break;
+    }
+    default:
+      d.fase = 'trote';
+  }
+}
 
 /**
  * Un tick de simulación de PASO FIJO (STEP s). Muta `w` en sitio y marca eventos
@@ -217,6 +395,11 @@ function simularTick(w, ahora, teclas, reducedMotion) {
         w._eventoErrado = impacto.enemigoId;
         w._shake = Math.max(w._shake || 0, reducedMotion ? 0 : 3);
         sembrarEfecto(w, 'errado', ix, iy);
+        /* Dante SEÑALA el aliado correcto (pedagogía del par arma↔plaga:
+           la trufa del viejo sabe qué controla a qué). */
+        const en = getEnemigo(impacto.enemigoId);
+        const armaOk = en?.controladores?.find((a) => ARSENAL_CURADO.includes(a));
+        if (armaOk) w.duo.pista = { armaId: armaOk, hasta: w.reloj + PISTA_S };
       }
       // proyectil consumido: no se reencola
     } else {
@@ -246,7 +429,13 @@ function simularTick(w, ahora, teclas, reducedMotion) {
     w._eventoRehen = true;
     w._shake = Math.max(w._shake || 0, reducedMotion ? 0 : 6);
     sembrarEfecto(w, 'rescate', w.rehen.x + w.rehen.w / 2, w.rehen.y + w.rehen.h / 2);
+    /* la dupla se une a la fiesta: Dante aúlla, Oliver cola-helicóptero */
+    w.duo.fase = 'celebra';
+    w.duo.faseT = 0;
   }
+
+  /* la dupla (Dante y Oliver): siempre juntos, complementarios */
+  simularDuo(w);
 
   /* envejecer estallidos visuales (solo arte) */
   if (w.efectos.length) {
@@ -283,8 +472,21 @@ function despacharEventos(w, reducedMotion, d) {
   }
   if (w._eventoErrado) {
     const e = getEnemigo(w._eventoErrado);
-    d.setToast(`Ese control no le sirve a ${e?.nombre_comun || 'esa plaga'}. Pruebe con su aliado correcto.`);
+    d.setToast({
+      texto: `Ese control no le sirve a ${e?.nombre_comun || 'esa plaga'}. Pruebe con su aliado correcto.`,
+      tono: 'reganio',
+    });
     w._eventoErrado = null;
+  }
+  if (w._eventoEntrega) {
+    d.setToast({
+      texto:
+        w._eventoEntrega === 'energia'
+          ? '¡Dante lo olió y Oliver se lo trajo! Merienda campesina: +1 de energía.'
+          : `¡Dante lo olió y Oliver se lo trajo! Semillas criollas: +${PUNTOS_ESCONDITE} puntos.`,
+      tono: 'duo',
+    });
+    w._eventoEntrega = null;
   }
   if (w._eventoGolpe) {
     d.setFlashDano((n) => n + 1);
@@ -318,12 +520,20 @@ export default function MetalSlugCampo({ onBack }) {
   return (
     <div className="msc-root" data-tier={tier} data-rm={reducedMotion ? '1' : '0'}>
       <StyleMSC />
+      {/* estilos de la dupla en la RAÍZ: la intro también los usa (retratos) */}
+      <StyleDuoPerros />
       <button type="button" className="msc-volver" onClick={onBack}>
         ← Volver
       </button>
 
       {pantalla === 'intro' ? (
-        <Intro nivel={NIVEL} arsenal={arsenal} onJugar={() => setPantalla('juego')} />
+        <Intro
+          nivel={NIVEL}
+          arsenal={arsenal}
+          tier={tier}
+          reducedMotion={reducedMotion}
+          onJugar={() => setPantalla('juego')}
+        />
       ) : (
         <Juego
           tier={tier}
@@ -337,7 +547,7 @@ export default function MetalSlugCampo({ onBack }) {
 }
 
 /* ── Pantalla de inicio: contexto del nivel + arsenal. ──────────────────────── */
-function Intro({ nivel, arsenal, onJugar }) {
+function Intro({ nivel, arsenal, tier, reducedMotion, onJugar }) {
   return (
     <div className="msc-intro">
       <div className="msc-intro-card">
@@ -357,6 +567,9 @@ function Intro({ nivel, arsenal, onJugar }) {
             })}
           </ul>
         </div>
+        {/* la dupla de la casa: presentados con nombre propio */}
+        {/* @ts-ignore IntrinsicAttributes & object - memo-wrapped component */}
+        <DuoIntro tier={tier} reducedMotion={reducedMotion} />
         <p className="msc-ayuda">
           Muévase con <kbd>←</kbd> <kbd>→</kbd>, salte con <kbd>espacio</kbd>, dispare con <kbd>J</kbd>{' '}
           y cambie de control biológico con <kbd>K</kbd>. En el celular, use los botones de abajo.
@@ -643,6 +856,81 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
               ),
             )}
 
+            {/* escondites enterrados (los encuentra la trufa de Dante) */}
+            {w.escondites.map((e) => (
+              <div
+                key={e.id}
+                className="msc-escondite"
+                data-estado={e.estado}
+                style={{ left: e.x - 22, top: SUELO_Y - 18, width: 44, height: 22 }}
+              >
+                {/* @ts-ignore IntrinsicAttributes & object - memo-wrapped component */}
+                <Escondite estado={e.estado} reducedMotion={reducedMotion} />
+              </div>
+            ))}
+
+            {/* LA DUPLA: Dante (nariz) y Oliver (patas) — siempre juntos */}
+            <div
+              className="msc-perro msc-perro--dante"
+              data-mira={w.duo.dante.mira}
+              data-anda={w.duo.dante.anda ? '1' : '0'}
+              style={{
+                left: w.duo.dante.x - DANTE_S / 2,
+                top: SUELO_Y - DANTE_S * PIES,
+                width: DANTE_S,
+                height: DANTE_S,
+              }}
+            >
+              <div className="msc-perro-flip">
+                <div className="msc-perro-bob">
+                  {/* @ts-ignore IntrinsicAttributes & object - memo-wrapped component */}
+                  <SpriteDante
+                    tier={tier}
+                    reducedMotion={reducedMotion}
+                    olfatea={w.duo.fase === 'rastreo' || w.duo.fase === 'busca'}
+                    aulla={w.duo.fase === 'celebra' && !!w.duo.dante.fiesta}
+                    senala={!!w.duo.pista}
+                  />
+                </div>
+              </div>
+              {w.duo.pista && (() => {
+                const armaPista = getArma(w.duo.pista.armaId);
+                return armaPista ? (
+                  /* @ts-ignore IntrinsicAttributes & object - memo-wrapped component */
+                  <PistaDante
+                    nombre={armaPista.nombre}
+                    color={COLOR_POR_TIPO[armaPista.tipo] || '#2bb3a3'}
+                  />
+                ) : null;
+              })()}
+            </div>
+            <div
+              className="msc-perro msc-perro--oliver"
+              data-mira={w.duo.oliver.mira}
+              data-anda={w.duo.oliver.anda ? '1' : '0'}
+              data-dash={w.duo.fase === 'busca' || w.duo.fase === 'entrega' ? '1' : '0'}
+              style={{
+                left: w.duo.oliver.x - OLIVER_S / 2,
+                top: SUELO_Y - OLIVER_S * PIES,
+                width: OLIVER_S,
+                height: OLIVER_S,
+              }}
+            >
+              <div className="msc-perro-flip">
+                <div className="msc-perro-bob">
+                  {/* @ts-ignore IntrinsicAttributes & object - memo-wrapped component */}
+                  <SpriteOliver
+                    tier={tier}
+                    reducedMotion={reducedMotion}
+                    menea={w.duo.fase === 'celebra' || w.duo.oliver.carga}
+                    ladea={w.duo.fase === 'rastreo'}
+                    celebra={w.duo.fase === 'celebra'}
+                    carga={w.duo.oliver.carga}
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* rehén (oso andino) */}
             <div
               className={`msc-rehen ${w.rehen.liberado ? 'msc-rehen--libre' : 'msc-rehen--preso'}`}
@@ -700,13 +988,18 @@ function Juego({ tier, reducedMotion, arsenal, onSalirIntro }) {
         {avisoRehen && <AvisoConservacion rehen={avisoRehen} onCerrar={() => setAvisoRehen(null)} />}
 
         {/* toast de arma equivocada */}
-        {toast && <div className="msc-toast" role="status">{toast}</div>}
+        {toast && (
+          <div className={`msc-toast msc-toast--${toast.tono}`} role="status">
+            {toast.texto}
+          </div>
+        )}
 
         {/* fin de nivel */}
         {fin && (
           <FinNivel
             fin={fin}
             puntaje={w.puntaje}
+            reducedMotion={reducedMotion}
             onReintentar={reiniciar}
             onSalir={onSalirIntro}
           />
@@ -841,11 +1134,16 @@ function AvisoConservacion({ rehen, onCerrar }) {
 }
 
 /* ── Fin de nivel. ──────────────────────────────────────────────────────────── */
-function FinNivel({ fin, puntaje, onReintentar, onSalir }) {
+function FinNivel({ fin, puntaje, reducedMotion, onReintentar, onSalir }) {
   const gano = fin.estado === 'gano';
   return (
     <div className="msc-overlay msc-overlay--fin" role="dialog" aria-label="Fin del nivel">
       <div className={`msc-fin ${gano ? 'msc-fin--gano' : 'msc-fin--perdio'}`}>
+        {/* la dupla celebra la victoria: Dante aúlla, Oliver cola-helicóptero */}
+        {gano && (
+          /* @ts-ignore IntrinsicAttributes & object - memo-wrapped component */
+          <DuoCelebra reducedMotion={reducedMotion} />
+        )}
         <h2>{gano ? '¡Finca cuidada!' : 'Se acabó la energía'}</h2>
         <p>{fin.razon}</p>
         <p className="msc-fin-puntaje">{puntaje} puntos</p>
