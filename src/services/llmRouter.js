@@ -91,7 +91,7 @@ export const ROUTES = {
     // Modelo leído de ENV.CHAT_MODEL (src/config/env.js, fuente única de
     // verdad — override en build-time con VITE_LLM_CHAT_MODEL para
     // experimentos, sin tocar código). Ver el comentario de esa clave para
-    // el historial de bench (granite3.3 → gemma4:e2b → gemma4:e4b).
+    // el historial de bench (granite3.3 → gemma4:e2b → gemma4:e4b → gemma3:4b).
     model: ENV.CHAT_MODEL,
     keep_alive_min: 30,
     temperature: 0.3,
@@ -115,7 +115,7 @@ export const ROUTES = {
     // Modelo leído de ENV.CHAT_COMPLEX_MODEL (src/config/env.js, fuente
     // única de verdad — override en build-time con VITE_LLM_COMPLEX_MODEL
     // para experimentos, sin tocar código). Ver el comentario de esa clave
-    // para el historial de bench (granite3.3 → gemma4:e2b → gemma4:e4b).
+    // para el historial de bench (granite3.3 → gemma4:e2b → gemma4:e4b → gemma3:4b).
     model: ENV.CHAT_COMPLEX_MODEL,
     keep_alive_min: 5,
     temperature: 0.3,
@@ -159,13 +159,22 @@ export const ROUTES = {
       'mejor capability) o deepseek-r1:8b (46 t/s, chain-of-thought).',
   },
   vision: {
-    model: 'qwen3-vl:8b',
+    // 2026-07-23 (PR #2738 §9): qwen3-vl:8b JUBILADO. Bench profundo (18
+    // plagas + 5 sanas control) da a gemma3:4b 45.5 (33.3% ident., 100%
+    // honestidad) contra 16.9 de qwen3-vl:8b (11.1% ident., 80% honestidad,
+    // + el swap de ~53s que este cambio elimina al unificar con el modelo
+    // de texto). Ver ENV.VISION_MODEL en src/config/env.js (fuente única)
+    // para el caveat metodológico pendiente de confirmación (el bench
+    // "Arena visual 2026-07-22" citado abajo usaba un diseño distinto —
+    // presencia SIEMPRE emparejada con su ausencia — que no se re-testeó
+    // con el dataset nuevo).
+    model: ENV.VISION_MODEL,
     keep_alive_min: 0,
     temperature: 0.2,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Arena visual 2026-07-22 (12 casos, cada presencia emparejada con su ausencia, GPU limpia): qwen3-vl:8b acierta 12/12 — 5/5 presencia y 7/7 ausencia — a 17s por imagen, 100% GPU sin offload (7,6 GB). Le siguen qwen2.5vl:7b 92% (pero pide 14 GB y SIEMPRE hace offload, verificado con la GPU vacia), gemma4:e4b 75%, gemma3:4b 58% (el que estaba aqui: fallaba 3 de 7 ausencias, o sea decia ver cosas que no estan — inservible como gate) y moondream 0%. El bench del 2026-06-23 daba a qwen2.5vl como el PEOR: lo midio en thrashing por el offload, con granite3.3 ocupando la GPU. El cambio a gemma4:e2b (8,1 GB) libero el espacio que permite este carril. keep_alive_min 0 se conserva: se carga, responde y se descarga, asi que los 17s no compiten con el agente. Detalle en Chagra-strategy/ops/MODELS.md (fuente unica).',
+      'Histórico (Arena visual 2026-07-22, 12 casos, cada presencia emparejada con su ausencia, GPU limpia): qwen3-vl:8b acierta 12/12 — 5/5 presencia y 7/7 ausencia — a 17s por imagen, 100% GPU sin offload (7,6 GB). Le seguían qwen2.5vl:7b 92%, gemma4:e4b 75%, gemma3:4b 58% (fallaba 3 de 7 ausencias — inservible como gate en ESE diseño) y moondream 0%. Superseded por PR #2738 §9 (dataset distinto, 18 plagas + 5 sanas): gemma3:4b sale primero en identificación y honestidad. Detalle en Chagra-strategy/ops/MODELS.md (fuente unica).',
   },
 };
 
