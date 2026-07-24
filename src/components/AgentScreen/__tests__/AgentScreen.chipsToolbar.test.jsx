@@ -68,6 +68,9 @@ vi.mock('../../../services/tierService', () => ({
 
 vi.mock('../../../hooks/useTheme', () => ({
   useTheme: () => ({ theme: 'nature' }),
+  // La escena viva del agente resuelve el tema efectivo (auto→nature/biopunk2)
+  // con resolveAutoTheme; el mock lo pasa tal cual (aquí el tema ya es concreto).
+  resolveAutoTheme: (t) => t,
 }));
 
 vi.mock('../../../hooks/useVoiceRecorder', () => ({

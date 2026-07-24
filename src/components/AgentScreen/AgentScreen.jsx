@@ -136,6 +136,11 @@ import { executeAction, setActionGateCallback } from '../../services/actionExecu
 import { getToolsForLLM } from '../../services/llmTools';
 import { useRotatingTip } from '../../services/tipsService';
 import ChatHistory from './ChatHistory';
+// REINVENCIÓN 2026-07 — "El organismo que conversa": el fondo del chat deja de
+// ser un rectángulo plano con velo y pasa a ser un MUNDO VIVO por tema que
+// respira y REACCIONA al estado del agente (idle/escuchando/pensando/hablando),
+// la misma alma del home "Finca Organismo". Reemplaza al `.agent-scrim`.
+import AgentLivingScene from './AgentLivingScene';
 import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
@@ -146,7 +151,7 @@ import ManoChagraGlyph from '../dashboard/ManoChagraGlyph';
 // Ícono del TEMA para el botón Ⓐ del compositor (paridad con home/TopBar y
 // AgentHero): el acceso a capacidades entra por el ícono del tema, no por la
 // mano (operador 2026-06-18). Misma fuente que TopBar.jsx / AgentHero.jsx.
-import { useTheme } from '../../hooks/useTheme';
+import { useTheme, resolveAutoTheme } from '../../hooks/useTheme';
 import { iconForTheme } from '../dashboard/themeIcon';
 import { fincaVivaHomePerfilActivo } from '../../config/fincaVivaHomeFlag';
 // Agente guiado: selección PURA de un insight verificado proactivo a partir del
@@ -3549,14 +3554,29 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     !((!inputText.trim() && !agentAttachment) || state === STATE_RECORDING || queuePending.length >= 1);
   const agentSendAccent = fincaVivaHomePerfilActivo() && enviarHabilitado;
 
+  // REINVENCIÓN "organismo que conversa": el estado del agente DIRIGE la escena
+  // viva de fondo (respira / anillos que contraen al escuchar / doble latido al
+  // pensar / ondas que emanan al hablar). Una sola fuente de verdad para el
+  // fondo Y el nameplate del header — el organismo y la palabra laten juntos.
+  const presenceState =
+    state === STATE_RECORDING ? 'listening'
+      : state === STATE_THINKING ? 'thinking'
+        : isVoicePlaying ? 'speaking'
+          : 'idle';
+  // biopunk/biopunk2 comparten piel base (sin data-theme); `auto` se resuelve a
+  // nature/biopunk2 con la MISMA regla del home (resolveAutoTheme). La escena se
+  // elige con el tema EFECTIVO — así el organismo del agente y la escena del home
+  // hablan el mismo idioma visual.
+  const sceneTheme = resolveAutoTheme(theme);
+
   return (
     <div className={`h-[100dvh] flex flex-col overflow-hidden relative text-white ${entranceClassRef.current}`}>
-      {/* Velo de legibilidad: deja ver --app-bg-image del body PERO garantiza
-          contraste. Token-aware (.agent-scrim → navy denso en bio-punk, crema
-          sutil en claros). Antes era bg-slate-950/82 fijo y, accediendo al
-          agente directo (#agente), la foto lavaba chips/sugerencias/Volver
-          (fix legibilidad 2026-06-15). */}
-      <div className="absolute inset-0 agent-scrim backdrop-blur-[2px] pointer-events-none" aria-hidden="true" />
+      {/* ORGANISMO QUE CONVERSA — el fondo del chat es un mundo vivo por tema que
+          respira y reacciona al estado del agente. Reemplaza al rectángulo plano
+          con velo (`.agent-scrim`): cubre la foto del body con su propio
+          gradiente opaco, y los mensajes van sobre superficies opacas (.v3-card)
+          legibles al sol. Respeta prefers-reduced-motion (estado quieto digno). */}
+      <AgentLivingScene theme={sceneTheme} state={presenceState} />
       {/* B1: animación de entrada (fade+rise). Respeta prefers-reduced-motion. */}
       <style>{AGENT_ENTRANCE_CSS}{AGENT_COMPOSITOR_CSS}{AGENT_V3_CSS}</style>
 
