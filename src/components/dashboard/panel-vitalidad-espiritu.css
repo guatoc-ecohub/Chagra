@@ -16,8 +16,8 @@
   --pve-acido: #9dff3f;
   --pve-ambar: #ffb54f;
   --pve-crema: #eafff6;
-  --pve-tinta: #7fa3b8; /* la tinta del mockup (#5b7f93) aclarada un paso:
-                           sobre el home real hay menos negro detrás */
+  --pve-tinta: #93b7cb; /* la tinta del mockup (#5b7f93) aclarada dos pasos:
+                           legible al sol sobre el vidrio del home real */
   --pve-vidrio: rgba(7, 16, 48, 0.72);
   --pve-borde: rgba(45, 255, 196, 0.28);
   --pve-acc: var(--pve-ambar); /* acento de la guardiana (la angelita) */
@@ -95,7 +95,20 @@
 .pve-ring-val {
   stroke: var(--pve-acc);
   filter: drop-shadow(0 0 4px rgba(var(--pve-acc-rgb), 0.8));
+  /* llenado real al montar (una transition nunca dispara en el primer render):
+     arranca vacío (--pve-circ inline) y llega al offset del dato + una
+     respiración lenta de opacidad (compositable) que lo mantiene vivo */
+  animation:
+    pve-ring-in 1.2s 0.45s cubic-bezier(0.2, 0.8, 0.3, 1) backwards,
+    pve-alma 4.5s 2s ease-in-out infinite;
   transition: stroke-dashoffset 1.1s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+@keyframes pve-ring-in {
+  from { stroke-dashoffset: var(--pve-circ, 164); }
+}
+@keyframes pve-alma {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.78; }
 }
 .pve-ring-num {
   font-size: 15px;
@@ -122,7 +135,7 @@
 .pve-vivas-cap {
   display: block;
   font-family: var(--pve-mono);
-  font-size: 8px;
+  font-size: 8.5px;
   letter-spacing: 1px;
   color: var(--pve-tinta);
   margin-top: 3px;
@@ -154,11 +167,21 @@
   border-radius: 2px;
   background: linear-gradient(90deg, var(--pve-c1, var(--pve-savia)), var(--pve-c2, var(--pve-acido)));
   box-shadow: 0 0 6px var(--pve-c1, var(--pve-savia));
+  /* crecen al montar (from width:0 → el ancho del dato), escalonadas por eje;
+     costo de layout solo en la entrada, después quedan quietas */
+  animation: pve-fill-in 1s cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
   transition: width 1.1s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.pve-eje:nth-child(1) .pve-eje-fill { animation-delay: 0.55s; }
+.pve-eje:nth-child(2) .pve-eje-fill { animation-delay: 0.7s; }
+.pve-eje:nth-child(3) .pve-eje-fill { animation-delay: 0.85s; }
+.pve-eje:nth-child(4) .pve-eje-fill { animation-delay: 1s; }
+@keyframes pve-fill-in {
+  from { width: 0; }
 }
 .pve-eje-val {
   font-family: var(--pve-mono);
-  font-size: 9px;
+  font-size: 9.5px;
   color: var(--pve-tinta);
   text-align: right;
   white-space: nowrap;
@@ -182,7 +205,7 @@
   padding-top: 9px;
   border-top: 1px dashed rgba(45, 255, 196, 0.18);
   font-family: var(--pve-mono);
-  font-size: 9.5px;
+  font-size: 10px;
   letter-spacing: 0.4px;
   color: var(--pve-tinta);
   display: flex;
@@ -202,7 +225,7 @@
 .pve-nota {
   margin: 9px 0 0;
   font-family: var(--pve-mono);
-  font-size: 8.5px;
+  font-size: 9px;
   letter-spacing: 0.4px;
   color: var(--pve-tinta);
   opacity: 0.85;
@@ -215,5 +238,9 @@
     transform: none;
   }
   .pve-ring-val,
-  .pve-eje-fill { transition: none; }
+  .pve-eje-fill {
+    /* quietud digna: sin llenado ni respiración, el dato queda pintado */
+    animation: none;
+    transition: none;
+  }
 }

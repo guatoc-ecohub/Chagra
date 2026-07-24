@@ -59,10 +59,13 @@ export default function PanelVitalidadEspiritu({ modelo }) {
                 : `Vitalidad de la finca: dato en camino. ${vitalidad.fuente}`}
             >
               <circle className="pve-ring-track" cx="31" cy="31" r="26" fill="none" strokeWidth="4" />
+              {/* --pve-circ = punto de partida (anillo vacío) de la animación
+                  de llenado al montar (pve-ring-in en el CSS) */}
               <circle
                 className="pve-ring-val" cx="31" cy="31" r="26" fill="none" strokeWidth="4"
                 strokeLinecap="round" strokeDasharray={CIRC} strokeDashoffset={offset}
                 transform="rotate(-90 31 31)"
+                style={{ '--pve-circ': CIRC }}
               />
               <text x="31" y="36" textAnchor="middle" className="pve-ring-num">
                 {vitalidadOk ? vitalidad.valor : '—'}

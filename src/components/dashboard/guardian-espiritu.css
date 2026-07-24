@@ -32,8 +32,11 @@
     inset 0 0 40px rgba(45, 255, 196, 0.05);
 }
 
-/* estrellas de fondo, sutiles */
-.ge-stars { position: absolute; inset: 0; pointer-events: none; opacity: 0.7; }
+/* estrellas de fondo, sutiles (solo opacity — compositable) */
+.ge-stars { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.7; }
+.ge-tw { animation: ge-tw 3.6s ease-in-out infinite; }
+.ge-tw2 { animation-delay: -1.3s; animation-duration: 4.4s; }
+.ge-tw3 { animation-delay: -2.5s; animation-duration: 5.2s; }
 
 /* ---------------------------- cabecera ----------------------------------- */
 .ge-head { position: relative; display: flex; flex-direction: column; gap: 2px; margin-bottom: 12px; }
@@ -65,8 +68,10 @@
   background: linear-gradient(180deg, rgba(var(--ge-acc-rgb), 0.1), rgba(var(--ge-acc-rgb), 0.02));
   border: 1px solid rgba(var(--ge-acc-rgb), 0.28);
   margin-bottom: 12px;
+  animation: ge-hero-in 0.38s cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
 }
 .ge-hero-avatar {
+  position: relative;
   flex: 0 0 auto;
   width: 78px;
   height: 78px;
@@ -74,6 +79,16 @@
   place-items: center;
   border-radius: 50%;
   background: radial-gradient(circle at 42% 36%, rgba(var(--ge-acc-rgb), 0.28), rgba(var(--ge-acc-rgb), 0.02) 70%);
+}
+/* aura viva del espíritu elegido: un anillo que respira (transform+opacity) */
+.ge-hero-avatar::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--ge-acc-rgb), 0.55);
+  animation: ge-aura 3.2s ease-in-out infinite;
+  pointer-events: none;
 }
 .ge-hero-avatar svg { width: 100%; height: 100%; }
 .ge-hero-txt { min-width: 0; }
@@ -98,9 +113,9 @@
   display: inline-block;
   margin-top: 5px;
   font-family: var(--ge-mono);
-  font-size: 8.5px;
+  font-size: 9px;
   letter-spacing: 0.6px;
-  color: rgba(169, 195, 210, 0.7);
+  color: rgba(183, 207, 221, 0.85); /* legible al sol: un paso más de contraste */
 }
 
 /* --------------------------- chips de especie --------------------------- */
@@ -134,8 +149,9 @@
 }
 .ge-chip-avatar svg { width: 100%; height: 100%; }
 .ge-chip-nombre { font-size: 11px; font-weight: 700; line-height: 1.15; color: var(--ge-crema); }
-.ge-chip-eje { font-size: 8.5px; line-height: 1.2; color: rgba(169, 195, 210, 0.8); }
+.ge-chip-eje { font-size: 9px; line-height: 1.2; color: rgba(183, 207, 221, 0.88); }
 .ge-chip:hover { border-color: rgba(45, 255, 196, 0.42); transform: translateY(-1px); }
+.ge-chip:active { transform: translateY(0) scale(0.97); }
 .ge-chip.on {
   border-color: var(--ge-chip-acc, var(--ge-savia));
   background: linear-gradient(180deg, rgba(var(--ge-chip-acc-rgb), 0.24), rgba(var(--ge-chip-acc-rgb), 0.05));
@@ -185,7 +201,23 @@
   to { transform: scaleX(1); opacity: 0.8; }
 }
 
+@keyframes ge-tw {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+
+@keyframes ge-hero-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ge-aura {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.07); opacity: 0.95; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .ge-av-vuela, .ge-av-flota, .ge-ala, .ge-aleteo { animation: none !important; }
+  .ge-av-vuela, .ge-av-flota, .ge-ala, .ge-aleteo,
+  .ge-tw, .ge-hero, .ge-hero-avatar::before { animation: none !important; }
   .ge-chip { transition: none; }
 }

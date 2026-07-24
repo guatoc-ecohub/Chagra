@@ -86,13 +86,15 @@ function ramaD([ox, oy], [nx, ny]) {
   return `M${ox},${oy} C${c1x},${c1y} ${c2x},${c2y} ${nx},${ny}`;
 }
 
-/** Etiqueta-cápsula dentro del SVG (misma receta del mockup aprobado). */
+/** Etiqueta-cápsula dentro del SVG (misma receta del mockup aprobado).
+ * Legible al sol: cápsula más opaca, borde más presente y tipo un punto
+ * más grande que el mockup (en pantalla real el SVG se ve más chico). */
 function TagSvg({ x, y, texto }) {
-  const w = texto.length * 4.6 + 16;
+  const w = texto.length * 5 + 17;
   return (
     <g className="adm-tag" aria-hidden="true">
-      <rect x={x - w / 2} y={y} width={w} height="13" rx="6.5" fill="rgba(4,10,28,0.78)" stroke="rgba(45,255,196,0.35)" strokeWidth="0.6" />
-      <text x={x} y={y + 8.8} textAnchor="middle" fontFamily="ui-monospace,monospace" fontSize="6.5" letterSpacing="1.2" fill="#bfffe9">
+      <rect x={x - w / 2} y={y} width={w} height="13.5" rx="6.75" fill="rgba(4,10,28,0.88)" stroke="rgba(45,255,196,0.45)" strokeWidth="0.7" />
+      <text x={x} y={y + 9.3} textAnchor="middle" fontFamily="ui-monospace,monospace" fontSize="7.2" letterSpacing="1.1" fill="#d4ffee">
         {texto}
       </text>
     </g>
@@ -104,7 +106,7 @@ function TagSvg({ x, y, texto }) {
  * La vaina completa es el botón (membrana + núcleo + glifo + etiqueta), con
  * un hit-area invisible r=30 (~60px en móvil) para dedos de campo.
  */
-function RamaMundo({ mundo, lugar, sello, onOpen }) {
+function RamaMundo({ mundo, lugar, sello, onOpen, idx = 0 }) {
   const [nx, ny] = lugar.node;
   const d = ramaD(lugar.origen, lugar.node);
   const entrar = () => onOpen(mundo);
@@ -112,7 +114,12 @@ function RamaMundo({ mundo, lugar, sello, onOpen }) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(mundo); }
   };
   return (
-    <g className="adm-rama" style={{ '--adm-acc': lugar.acc }}>
+    <g
+      className="adm-rama"
+      /* brote escalonado: cada rama aparece un tris después de la anterior
+         (solo opacity — GPU-friendly y sin pelear con el transform del SVG) */
+      style={{ '--adm-acc': lugar.acc, animationDelay: `${0.12 + idx * 0.07}s` }}
+    >
       {/* la rama: corteza + brillo + savia que fluye hacia la vaina */}
       <path d={d} fill="none" stroke={lugar.raiz ? '#6b8f2f' : '#0f8f6c'} strokeWidth="3.4" strokeLinecap="round" opacity="0.9" />
       <path d={d} fill="none" stroke={lugar.acc} strokeWidth="1" strokeLinecap="round" opacity="0.45" />
@@ -264,8 +271,8 @@ export default function ArbolDeMundos({ onNavigate, mostrarAnimales = true, plan
 
           {/* LAS RAMAS VIVAS: una por mundo real de la finca (fuente única
               mundosFinca.js — mismo gate y mismas rutas que la grilla) */}
-          {mundos.map((m) => (
-            <RamaMundo key={m.id} mundo={m} lugar={lugarDe(m)} sello={sello(m)} onOpen={abrir} />
+          {mundos.map((m, i) => (
+            <RamaMundo key={m.id} mundo={m} lugar={lugarDe(m)} sello={sello(m)} onOpen={abrir} idx={i} />
           ))}
 
           {/* EL CORAZÓN DE LA FINCA: late y bombea savia a todas las ramas */}
