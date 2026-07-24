@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "bench": "retriever-real",
+  "date": "2026-07-22T14:14:46.238Z",
+  "model": "granite-embedding:278m",
+  "config": "recall",
+  "commit": "cf722545",
+  "metrics": {
+    "recall1": 27.3,
+    "recall3": 50,
+    "recall5": 59.1,
+    "mrr": 0.3977,
+    "latency_avg_ms": 2310.3,
+    "latency_p95_ms": 2336
+  },
+  "passCount": null,
+  "failCount": null,
+  "passPct": null,
+  "notes": "",
+  "seed": false
+}

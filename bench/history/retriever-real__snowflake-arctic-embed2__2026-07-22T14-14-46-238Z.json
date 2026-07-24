@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "bench": "retriever-real",
+  "date": "2026-07-22T14:14:46.238Z",
+  "model": "snowflake-arctic-embed2",
+  "config": "recall",
+  "commit": "cf722545",
+  "metrics": {
+    "recall1": 45.5,
+    "recall3": 63.6,
+    "recall5": 75,
+    "mrr": 0.5689,
+    "latency_avg_ms": 3378.7,
+    "latency_p95_ms": 3400.1
+  },
+  "passCount": null,
+  "failCount": null,
+  "passPct": null,
+  "notes": "",
+  "seed": false
+}
