@@ -10,6 +10,7 @@ import '@testing-library/jest-dom';
 import { describe, test, expect, afterEach, vi } from 'vitest';
 
 import GemeloValle2D, { GemeloValleEscena } from '../GemeloValle2D.jsx';
+import Mundo2D from '../Mundo2D.jsx';
 import { MUNDOS_VALLE, COSA_DEL_DIA } from '../../../mockups/valle/valleData';
 
 afterEach(() => cleanup());
@@ -84,5 +85,44 @@ describe('GemeloValle2D — el gemelo 2D de primera clase del valle', () => {
     expect(onHotspot).toHaveBeenCalledWith('mundo', { mundoId: 'suelo' });
     fireEvent.click(getByRole('button', { name: /Alerta del día/ }));
     expect(onHotspot).toHaveBeenCalledWith('hoy_finca');
+  });
+
+  test('cada hotspot y alerta queda dentro del lienzo, incluso con coordenadas extremas', () => {
+    const mundos = [
+      {
+        id: 'abono_fuera', pos: [-30, 0, 12], escala: 1, tipo: 'compost', titulo: 'Abono', emoji: 'A', lema: '', tinte: ['#59401f', '#a8854c'],
+      },
+      {
+        id: 'disenio_fuera', pos: [30, 0, -12], escala: 1, tipo: 'bosque', titulo: 'Diseño', emoji: 'D', lema: '', tinte: ['#456353', '#b8c6b6'],
+      },
+    ];
+    const { container } = render(
+      <GemeloValle2D
+        mundos={[...MUNDOS_VALLE, ...mundos]}
+        alerta={{ anclaMundo: 'abono_fuera', titulo: 'Alerta', detalle: '' }}
+        onEntrar={vi.fn()}
+        onAlerta={vi.fn()}
+      />,
+    );
+
+    const botones = container.querySelectorAll('.gv-poi, .gv-alerta');
+    expect(botones).toHaveLength(MUNDOS_VALLE.length + mundos.length + 1);
+    botones.forEach((boton) => {
+      expect(parseFloat(boton.style.left)).toBeGreaterThanOrEqual(0);
+      expect(parseFloat(boton.style.left)).toBeLessThanOrEqual(100);
+      expect(parseFloat(boton.style.top)).toBeGreaterThanOrEqual(0);
+      expect(parseFloat(boton.style.top)).toBeLessThanOrEqual(100);
+    });
+  });
+
+  test('Mundo2D monta el gemelo del valle y conserva el contrato de hotspots', () => {
+    const onHotspot = vi.fn();
+    const { container, getByRole } = render(
+      <Mundo2D escena="valle2d" entrada={{ alertaView: 'hoy_finca' }} onHotspot={onHotspot} />,
+    );
+    expect(container.querySelector('.gemelo-valle')).toBeInTheDocument();
+    const suelo = MUNDOS_VALLE.find((m) => m.id === 'suelo');
+    fireEvent.click(getByRole('button', { name: new RegExp(`Viajar al mundo ${suelo.titulo}`) }));
+    expect(onHotspot).toHaveBeenCalledWith('mundo', { mundoId: 'suelo' });
   });
 });
