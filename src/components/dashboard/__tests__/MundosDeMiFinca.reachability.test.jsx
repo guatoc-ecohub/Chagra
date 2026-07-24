@@ -27,6 +27,52 @@ afterEach(() => cleanup());
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const appSrc = fs.readFileSync(path.resolve(__dir, '../../../App.jsx'), 'utf8');
+const srcDir = path.resolve(__dir, '../../../');
+
+function sourceFiles(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      return entry.name === '__tests__' ? [] : sourceFiles(file);
+    }
+    return /\.(?:js|jsx|mjs|ts|tsx)$/.test(entry.name) ? [file] : [];
+  });
+}
+
+const sources = sourceFiles(srcDir).map((file) => fs.readFileSync(file, 'utf8'));
+
+function eventNames(pattern) {
+  return new Set(sources.flatMap((source) => [...source.matchAll(pattern)].map((match) => match[2])));
+}
+
+const emittedCustomEvents = eventNames(
+  /(?:window|document)\.dispatchEvent\(\s*new\s+CustomEvent\(\s*(['"])([^'"]+)\1/g,
+);
+const listenedCustomEvents = eventNames(
+  /(?:window|document)\.addEventListener\(\s*(['"])([^'"]+)\1/g,
+);
+
+function emittedNavigationViews() {
+  const views = new Set();
+  const eventPattern = /new\s+CustomEvent\(\s*['"](?:chagraNavigate|chagra:nav)['"]\s*,\s*\{\s*detail:\s*/g;
+
+  for (const source of sources) {
+    for (const match of source.matchAll(eventPattern)) {
+      const detail = source.slice(match.index + match[0].length, match.index + match[0].length + 180);
+      const objectView = detail.match(/^\{\s*view:\s*['"]([^'"]+)['"]/);
+      const directView = detail.match(/^['"]([^'"]+)['"]/);
+      const view = objectView?.[1] || directView?.[1];
+      if (view) views.add(view);
+    }
+  }
+
+  return views;
+}
+
+function isHandledByAppRouter(view) {
+  return appSrc.includes(`case '${view}':`)
+    || (/^seguimiento_/.test(view) && appSrc.includes('parseSeguimientoView'));
+}
 
 describe('Mundos — el mapa cubre todo lo que el home F2 exponía (sin huérfanos)', () => {
   // Las vistas que ANTES eran tiles/tarjetas sueltas del home F2 y ahora deben
@@ -60,6 +106,24 @@ describe('Mundos — el mapa cubre todo lo que el home F2 exponía (sin huérfan
     }
     // Y la propia ruta de mundo existe.
     expect(appSrc).toContain("case 'mundo':");
+  });
+
+  test('todo CustomEvent emitido por la app tiene al menos un listener', () => {
+    for (const eventName of emittedCustomEvents) {
+      expect(
+        listenedCustomEvents.has(eventName),
+        `evento huérfano: '${eventName}' se emite sin listener en src/`,
+      ).toBe(true);
+    }
+  });
+
+  test('todo destino literal emitido por navegación global tiene handler en App.jsx', () => {
+    for (const view of emittedNavigationViews()) {
+      expect(
+        isHandledByAppRouter(view),
+        `endpoint huérfano: '${view}' se emite por navegación global sin handler en App.jsx`,
+      ).toBe(true);
+    }
   });
 
   test('el manifiesto es sano: ids únicos, tinte, y directo XOR entradas', () => {
