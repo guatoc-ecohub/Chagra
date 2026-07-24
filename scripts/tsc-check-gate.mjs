@@ -97,23 +97,38 @@ function sortedByFile(byFile) {
 }
 
 /**
+ * Devuelve la salida de un proceso tsc que terminó con diagnósticos de tipo.
+ * Un fallo de proceso no tiene un baseline comparable y debe bloquear el gate.
+ *
+ * @param {{ status?: number | null, signal?: string | null, stdout?: string | Buffer, stderr?: string | Buffer }} error
+ * @returns {string}
+ *
+ */
+export function outputFromTscDiagnostic(error) {
+  if (typeof error.status !== 'number') {
+    const detail = error.signal ? ` por señal ${error.signal}` : '';
+    throw new Error(`tsc no terminó correctamente${detail}. El gate no puede comparar un resultado incompleto.`);
+  }
+  return (error.stdout || '') + (error.stderr || '');
+}
+
+/**
  * Corre `tsc --noEmit -p jsconfig.json` y devuelve stdout+stderr combinados.
- * tsc sale con código != 0 cuando hay errores — eso es esperado, no un fallo
- * de esta función.
+ * tsc sale con código != 0 cuando hay errores de tipo, lo cual es esperado.
+ * Los fallos del proceso se propagan para no interpretarlos como cero errores.
  *
  * @returns {string}
  */
 export function runTsc() {
   const tscBin = require.resolve('typescript/bin/tsc');
   try {
-    return execFileSync(process.execPath, [tscBin, '--noEmit', '-p', 'jsconfig.json'], {
+    return execFileSync(process.execPath, [tscBin, '--noEmit', '--pretty', 'false', '-p', 'jsconfig.json'], {
       cwd: REPO_ROOT,
       encoding: 'utf8',
       maxBuffer: 200 * 1024 * 1024,
     });
   } catch (e) {
-    // tsc exit code != 0 al reportar errores: la salida real viene en stdout.
-    return (e.stdout || '') + (e.stderr || '');
+    return outputFromTscDiagnostic(e);
   }
 }
 
@@ -143,36 +158,19 @@ export function writeBaseline(parsed, path = BASELINE_PATH) {
  * @param {{ total: number, byFile: Record<string, number> }} current
  * @param {{ totalErrors?: number, byFile?: Record<string, number> }} baseline
  */
-// Zona EXPERIMENTAL 3D: mockups y el framework de mundos son código visual r3f
-// type-loose POR DISEÑO (JSX de three, props laxas) y NO son rutas de producción
-// del agente/datos. Un archivo NUEVO aquí NO bloquea el gate — así el trabajo
-// visual de fable no traba los promotes por deuda de tipos cosmética. La deuda
-// de PRODUCCIÓN (servicios, store, agente) sigue 100% blindada. Ver
-// feedback_ci_green_not_real_value: esto NO esconde regresiones reales, exime
-// una zona conscientemente laxa. Las regresiones (archivo que EMPEORA) sí fallan
-// en todos lados.
-const ZONA_EXPERIMENTAL_3D = /^src\/(mockups\/|visual\/(mundo3d|creatures|effects|scenes|laminas)\/)/;
-
 export function compareToBaseline(current, baseline) {
   const baselineByFile = baseline.byFile || {};
   const newFiles = [];
-  const newFilesExentos = [];
   const regressions = [];
   const improved = [];
 
   for (const file of Object.keys(current.byFile).sort()) {
     const currentCount = current.byFile[file];
     const baselineCount = baselineByFile[file] || 0;
-    const exento = ZONA_EXPERIMENTAL_3D.test(file);
     if (baselineCount === 0) {
-      if (exento) newFilesExentos.push({ file, count: currentCount });
-      else newFiles.push({ file, count: currentCount });
+      newFiles.push({ file, count: currentCount });
     } else if (currentCount > baselineCount) {
-      // Regresión: en la zona experimental 3D (JSX de three, type-loose) NO
-      // bloquea — cablear un componente suele sumar 1-2 errores de props laxas.
-      // En PRODUCCIÓN sí bloquea (deuda real). El total sube pero es cosmético.
-      if (exento) newFilesExentos.push({ file, count: currentCount - baselineCount });
-      else regressions.push({ file, baselineCount, currentCount, delta: currentCount - baselineCount });
+      regressions.push({ file, baselineCount, currentCount, delta: currentCount - baselineCount });
     } else if (currentCount < baselineCount) {
       improved.push({ file, baselineCount, currentCount, delta: baselineCount - currentCount });
     }
@@ -181,7 +179,6 @@ export function compareToBaseline(current, baseline) {
   return {
     ok: newFiles.length === 0 && regressions.length === 0,
     newFiles,
-    newFilesExentos,
     regressions,
     improved,
     totalCurrent: current.total,
@@ -199,12 +196,6 @@ export function formatReport(comparison) {
     for (const { file, count } of comparison.newFiles) {
       lines.push(`  - ${file}: ${count} error(es)`);
     }
-  }
-
-  if (comparison.newFilesExentos && comparison.newFilesExentos.length > 0) {
-    const n = comparison.newFilesExentos.reduce((s, i) => s + i.count, 0);
-    lines.push('');
-    lines.push(`(exentos: ${comparison.newFilesExentos.length} archivo(s) nuevos de la zona experimental 3D con ${n} error(es) de tipo cosméticos — NO bloquean el gate)`);
   }
 
   if (comparison.regressions.length > 0) {
