@@ -9,8 +9,10 @@
  *   - Grounding responsable + legal: disclaimer visible ("no curan", "consulte
  *     a un profesional de la salud"); la ruda va con veto fuerte (abortiva /
  *     fototóxica) en la estación "Con cuidado".
- *   - Complementa (no duplica) la huerta de la cocina: NO incluye hierbabuena
- *     ni poleo (que viven en el mundo de aromáticas de cocina).
+ *   - Complementa (no duplica) la huerta de la cocina: el poleo NO aparece
+ *     (vive solo en aromáticas de cocina). La yerbabuena sí aparece, pero como
+ *     CRUCE medicinal (campo `cruce` que remite a la cocina, sin repetir su uso
+ *     culinario) y con el veto de no confundirla con el poleo (abortivo).
  *   - Créditos de fotos con atribución (cumplimiento de licencia abierta).
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
@@ -123,10 +125,26 @@ describe('BoticaScreen — con cuidado (seguridad + la planta de respeto)', () =
 });
 
 describe('BoticaScreen — complementa la cocina y cita las fotos', () => {
-  it('NO duplica la huerta de la cocina: sin hierbabuena ni poleo', () => {
+  it('el poleo NO aparece en la botica (vive solo en la cocina)', () => {
     const slugs = PLANTAS_BOTICA.map((p) => p.slug);
-    expect(slugs).not.toContain('hierbabuena');
     expect(slugs).not.toContain('poleo');
+  });
+
+  it('la yerbabuena aparece como CRUCE medicinal (remite a la cocina, sin duplicar)', () => {
+    const yerba = PLANTAS_BOTICA.find((p) => p.slug === 'yerbabuena');
+    expect(yerba, 'la yerbabuena debe estar en la botica').toBeTruthy();
+    expect(yerba.grupo).toBe('barriga');
+    // El cruce remite a la cocina: no duplicamos el uso culinario, lo enlazamos.
+    expect(yerba.cruce?.mundo).toMatch(/cocina/i);
+    // Se pinta la nota de cruce en la ficha.
+    render(<BoticaScreen onBack={() => {}} />);
+    expect(screen.getByTestId('cruce-yerbabuena').textContent).toMatch(/cocina/i);
+  });
+
+  it('la yerbabuena avisa de NO confundirla con el poleo (abortivo)', () => {
+    const yerba = PLANTAS_BOTICA.find((p) => p.slug === 'yerbabuena');
+    expect(yerba.veto).toMatch(/poleo/i);
+    expect(yerba.veto).toMatch(/abortiv/i);
   });
 
   it('cada planta lleva su catalogId real (grounding del catálogo)', () => {
