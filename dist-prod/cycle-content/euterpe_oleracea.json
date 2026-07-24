@@ -1,0 +1,82 @@
+{
+  "species_slug": "euterpe_oleracea",
+  "scientific_name": "Euterpe oleracea Mart.",
+  "common_names": [
+    "Asai"
+  ],
+  "family": "Arecaceae",
+  "category": "frutales_perennes",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Palma nativa de la Amazonia colombiana; crece en rebrotes multiples desde la base (multitallo). Sus frutos son la base del 'asai' de la canasta amazonica."
+  },
+  "requirements": {
+    "agua": "alto",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 200,
+      "max_absoluto": 500
+    },
+    "temperatura_c": {
+      "helada_letal": 10,
+      "optimo_min": 24,
+      "optimo_max": 30,
+      "max_tolerable": 35
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "moderado"
+  },
+  "valor_pedagogico": "El açaí o asaí (Euterpe oleracea Mart., familia Arecaceae, subfamilia Arecoideae) es una arecácea palmiforme cespitosa multitallo nativa silvestre de la cuenca amazónica y zonas estuarinas del bajo Amazonas y el Pacífico colombiano, considerada producto forestal no maderable (PFNM) emblemático del Chocó biogeográfico y la Amazonia colombiana. Forma touceiras o macollas de 4-10 estipes (tallos) desde una misma base por rebrote basal, alcanzando 15-25 m de altura, con hojas pinnadas verde-oscuras, inflorescencias en panícula entre las hojas y frutos pequeños globosos negro-morados (1-2 cm) con un único pirene grande y mesocarpo carnoso delgado rico en antocianinas (cianidina-3-glucósido, cianidina-3-rutinósido), ácidos grasos monoinsaturados (oleico 60%), polifenoles antioxidantes y minerales. Se distribuye en Chocó (Quibdó, Atrato medio, Bajo Baudó, Bahía Solano, Nuquí), Valle del Cauca (Buenaventura, Bajo Calima), Cauca (Guapi, Timbiquí, López), Nariño (Tumaco, Mosquera, Olaya Herrera), Amazonas (Leticia, Puerto Nariño, Trapecio amazónico) y Vaupés (Mitú) entre 0 y 200 msnm en zona térmica cálida húmeda con altísima pluviosidad (3.000-9.000 mm/año). Ciclo perenne, primera fructificación a los 4-5 años, productividad sostenida 30-50 años. Rendimientos 6-12 kg fruto/estipe/año, 30-60 kg/touceira/año. Lección viva: el açaí enseña el aprovechamiento sostenible de productos forestales no maderables del Pacífico y la Amazonia colombiana por comunidades afrocolombianas e indígenas (Embera, Wounaan, Tikuna, Yagua), su rol en la canasta amazónica como superalimento (concentra antioxidantes y energía), y la importancia de los manglares ribereños y bosques de várzea estuarina como ecosistemas de provisión. Manejo agroecológico: aprovechamiento por extractivismo regulado certificado con comunidades locales, propagación por semilla en germinador con sombra (90-180 días germinación), siembra a 4-6 m entre touceiras en sistemas agroforestales con plátano, cacao y maderables nativos, cosecha manual de racimos por trepador, no requiere agroquímicos. Fuentes Tier A: SINCHI Amazonia Colombiana, POWO Kew, GBIF Backbone Taxonomy, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
+  "sources": [
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "gbif-colombia",
+      "title": "gbif-colombia",
+      "tier": "A",
+      "url": "https://www.gbif.org/country/CO"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "sinchi-amazonia-colombiana",
+      "title": "sinchi-amazonia-colombiana",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.374Z"
+}

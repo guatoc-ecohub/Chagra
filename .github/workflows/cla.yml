@@ -2,7 +2,7 @@ name: CLA Assistant
 
 # Requiere firma del Contributor License Agreement (CLA) en cada PR externo.
 # Verifica que todos los autores del PR hayan firmado el CLA (via archivo
-# cla.json en branch cla-signatures) o esten en la allowlist (bots, org).
+# signatures/cla.json en branch cla-signatures) o esten en la allowlist (bots, org).
 #
 # Gate de compliance legal: sin CLA firmado, el PR no puede mergearse.
 # Modelo: Apache ICLA estandar (Apache Software Foundation), adaptado a
@@ -11,12 +11,16 @@ name: CLA Assistant
 #
 # Trigger:
 #   - apertura/reapertura/sync de PR contra `main`
-#   - comentarios sobre issues/PRs (para captar la frase de firma
+#   - comentarios sobre PRs (para captar la frase de firma
 #     "I have read the CLA Document and I hereby sign the CLA").
 #
 # El action contributor-assistant/github-action@v2.6.1 tiene un bug
 # con pull_request_target que crashea para org accounts. Reemplazamos
 # con un check manual via GH API + jq que verifica el signatures file.
+#
+# Fix #cla-raiz-1784647801: la rama cla-signatures no existe todavia,
+# asi que leemos signatures/cla.json via API y tratamos 404 como lista
+# de firmas vacia.
 
 on:
   issue_comment:
@@ -25,27 +29,20 @@ on:
     types: [opened, closed, synchronize, reopened]
 
 permissions:
-  actions: write
-  contents: write
-  pull-requests: write
-  statuses: write
+  contents: read
+  pull-requests: read
 
 jobs:
   CLAAssistant:
     runs-on: ubuntu-latest
+    # En issue_comment solo reaccionar a comentarios en PRs, no en issues comunes.
+    if: github.event_name == 'pull_request_target' || github.event.issue.pull_request
     steps:
-      - name: Checkout cla-signatures branch
-        uses: actions/checkout@v4
-        with:
-          ref: cla-signatures
-          path: cla-data
-
       - name: Verify CLA signatures
         id: cla-check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
           COMMENT_BODY: ${{ github.event.comment.body }}
           EVENT_NAME: ${{ github.event_name }}
         run: |
@@ -54,7 +51,8 @@ jobs:
           # Allowlist
           ALLOWLIST="dependabot[bot],renovate[bot],github-actions[bot],guatoc-ecohub,kortux"
 
-          # Si el evento es un comentario de "recheck" o "I have read..." y el PR está cerrado, restart
+          # Si el evento es un comentario de "recheck" o "I have read...", verificamos.
+          # Cualquier otro comentario se ignora.
           if [ "$EVENT_NAME" = "issue_comment" ]; then
             if [ "$COMMENT_BODY" != "recheck" ] && [ "$COMMENT_BODY" != "I have read the CLA Document and I hereby sign the CLA" ]; then
               echo "Comentario irrelevante, ignorando"
@@ -62,10 +60,12 @@ jobs:
             fi
           fi
 
+          REPO="${{ github.repository }}"
+
           # Obtener authors del PR. En pull_request_target, commit author
           # puede venir null; obtenemos el PR author como fallback.
-          PR_AUTHOR_LOGIN=$(gh api "/repos/${{ github.repository }}/pulls/$PR_NUMBER" --jq '.user.login')
-          COMMIT_AUTHORS=$(gh api "/repos/${{ github.repository }}/pulls/$PR_NUMBER/commits" --jq '[.[].author.login | select(. != null)] | unique')
+          PR_AUTHOR_LOGIN=$(gh api "/repos/$REPO/pulls/$PR_NUMBER" --jq '.user.login')
+          COMMIT_AUTHORS=$(gh api "/repos/$REPO/pulls/$PR_NUMBER/commits" --jq '[.[].author.login | select(. != null)] | unique')
           echo "PR Author: $PR_AUTHOR_LOGIN"
           echo "Commit authors: $COMMIT_AUTHORS"
 
@@ -73,8 +73,24 @@ jobs:
           ALL_AUTHORS=$(echo "$COMMIT_AUTHORS" | jq --arg pr "$PR_AUTHOR_LOGIN" '. + [$pr] | unique')
           echo "All authors to check: $ALL_AUTHORS"
 
-          # Verificar cada author contra allowlist + signatures
-          CLA_DATA=$(cat cla-data/signatures/cla.json)
+          # Leer signatures/cla.json del branch cla-signatures via API.
+          # Si el branch o el archivo no existe, no hay firmas todavia.
+          CLA_DATA='{"contributors":[]}'
+          SIGNATURES_API="/repos/$REPO/contents/signatures/cla.json?ref=cla-signatures"
+          API_ERR=$(mktemp)
+          if gh api "$SIGNATURES_API" > /tmp/cla-signatures.json 2>"$API_ERR"; then
+            CLA_DATA=$(jq -r '.content' /tmp/cla-signatures.json | base64 -d)
+            echo "Loaded signatures file"
+          else
+            if grep -q 'HTTP 404' "$API_ERR"; then
+              echo "No signatures file found in cla-signatures branch; treating as empty"
+            else
+              echo "Error reading signatures file:"
+              cat "$API_ERR"
+              exit 1
+            fi
+          fi
+
           echo "$ALL_AUTHORS" | jq -r '.[]' > /tmp/cla-authors.txt
 
           UNSIGNED_FILE=$(mktemp)
@@ -87,7 +103,7 @@ jobs:
               echo "✅ $author en allowlist"
               continue
             fi
-            SIGNED=$(echo "$CLA_DATA" | jq --arg login "$author" '[.contributors[] | select(.login == $login)] | length')
+            SIGNED=$(echo "$CLA_DATA" | jq --arg login "$author" '[(.contributors // [])[] | select(.login == $login)] | length')
             if [ "$SIGNED" -gt 0 ]; then
               echo "✅ $author firmó CLA"
               continue
@@ -99,6 +115,4 @@ jobs:
           if [ -s "$UNSIGNED_FILE" ]; then
             exit 1
           fi
-          echo "✅ CLA verificado"
-
           echo "✅ CLA verificado"

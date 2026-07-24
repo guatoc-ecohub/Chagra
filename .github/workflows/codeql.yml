@@ -65,6 +65,10 @@ jobs:
               - 'tests/e2e-real/**'
               - 'stress/**'
               - 'bench/**'
+              # Vitest ejecuta estas fábricas THREE; CodeQL las interpreta como
+              # invocaciones no ejecutables aunque el módulo exporta funciones.
+              - 'src/visual/mundo3d/__tests__/**'
+              # Vite genera este bundle desde fuentes y dependencias ya analizadas.
               - 'dist-prod/**'
 
       - name: Autobuild

@@ -1,0 +1,62 @@
+{
+  "species_slug": "agrostis_foliata",
+  "scientific_name": "Agrostis foliata Roem. & Schult.",
+  "common_names": [
+    "Pasto agrostis foliado"
+  ],
+  "family": "Poaceae",
+  "category": "abonos_verdes_coberturas",
+  "cultivable": false,
+  "conservation_status": "nativo_silvestre",
+  "thermal_zones": [
+    "frio",
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "ground_cover"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": null,
+  "requirements": {
+    "agua": null,
+    "altitud_msnm": {
+      "min_absoluto": 2500,
+      "optimo_min": 3000,
+      "optimo_max": 3800,
+      "max_absoluto": 4200
+    },
+    "temperatura_c": null,
+    "radiacion": null,
+    "drenaje_requerido": null
+  },
+  "valor_pedagogico": "Agrostis foliata (Poaceae) es una gramínea nativa rastrera del sub-páramo y páramo andino colombiano (2.500-4.200 msnm) en Cundinamarca-Sumapaz, Boyacá-Chingaza y cordillera Central. Forma matas bajas y estolones que tejen cobertura continua sobre suelo desnudo, función clave en restauración tras sobrepastoreo o quemas. Lección viva: en el páramo no todo es frailejón — las gramíneas son las costureras del suelo, retienen humedad atmosférica y abren paso a especies más exigentes. No se cultiva en chagra: se respeta donde aparece espontánea como indicadora de regeneración. Fuentes Tier A: Bernal 2015 Catálogo Plantas Colombia, POWO Kew, GBIF Backbone, Humboldt Flora Alto-Andina.",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.380Z"
+}

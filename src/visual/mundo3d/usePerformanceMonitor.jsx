@@ -40,9 +40,8 @@
  * el barrel `mundo3d/index.js` (regla del barrel: three-free). Importarlo SOLO
  * desde código 3D perezoso (escenas/, chunk vendor-three), como useEntradaAbeja.
  *
- * IMPORTANTE (cableo): `EscenaBase3D` hoy monta `<AdaptiveDpr>` de drei, que
- * también llama `setDpr`. Al cablear este monitor con `ajustarDpr` (default)
- * hay que RETIRAR `<AdaptiveDpr>` o pasar `ajustarDpr={false}`: dos manos en la
+ * IMPORTANTE (cableo): si el Canvas todavía usa `<AdaptiveDpr>`, hay que
+ * quitarlo o montar este monitor con `ajustarDpr={false}`. Dos manos en la
  * misma perilla pelean. Y con `frameloop='demand'` (reduced-motion) el muestreo
  * de fps no significa nada: no montar el monitor en ese modo.
  */
@@ -52,16 +51,97 @@
    componente monitor) que se importa SIEMPRE dentro de un <Canvas> vía el
    chunk vendor-three; no es hot-reload-sensible. Van juntos a propósito: el
    monitor escribe el store y las escenas leen las derivaciones. */
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { useThree } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
+import usePrefsStore from '../../store/usePrefsStore.js';
+import { decidirTier } from './deviceTier.js';
 
 /* ─── 1) Derivaciones puras (sin canvas, sin GPU, sin React) ────────────── */
 
 /** Techo de DPR por tier estático. El DR §6 prohíbe pasar de 1.5. */
 export const TECHO_DPR = { alto: 1.5, medio: 1.25, bajo: 1 };
 
+const TIERS = ['bajo', 'medio', 'alto'];
+const FPS_BAJO = 30;
+const FPS_ALTO = 52;
+const FPS_BAJO_CONSECUTIVOS = 4;
+const FPS_ALTO_CONSECUTIVOS = 5;
+
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
+
+const indiceTier = (tier) => Math.max(0, TIERS.indexOf(tier));
+
+const limitarTier = (tier, techo = 'alto') => TIERS[Math.min(indiceTier(tier), indiceTier(techo))] || 'bajo';
+
+const tierInferior = (tier) => TIERS[Math.max(0, indiceTier(tier) - 1)] || 'bajo';
+
+const tierSuperior = (tier, techo = 'alto') => {
+  const siguiente = TIERS[Math.min(TIERS.length - 1, indiceTier(tier) + 1)] || 'alto';
+  return limitarTier(siguiente, techo);
+};
+
+const objCongelado = (obj) => Object.freeze(obj);
+
+export const PRESUPUESTO_TIER = objCongelado({
+  alto: objCongelado({
+    maxCriaturasAmbientales: 5,
+    maxFlora: 100,
+    bloom: true,
+    sombras: true,
+    dpr: 1.5,
+    postfx: true,
+  }),
+  medio: objCongelado({
+    maxCriaturasAmbientales: 3,
+    maxFlora: 56,
+    bloom: false,
+    sombras: false,
+    dpr: 1.25,
+    postfx: false,
+  }),
+  bajo: objCongelado({
+    maxCriaturasAmbientales: 1,
+    maxFlora: 24,
+    bloom: false,
+    sombras: false,
+    dpr: 1,
+    postfx: false,
+  }),
+});
+
+export function presupuestoDeTier(tier) {
+  return PRESUPUESTO_TIER[tier] || PRESUPUESTO_TIER.medio;
+}
+
+/**
+ * Heurística de arranque para el presupuesto vivo.
+ * Usa el tier del host como techo, pero lo baja si el equipo o la ruta lo
+ * sugieren (UA viejo, ahorro, bajo recurso, valle3d apagado).
+ * @param {{
+ *   tier?: 'alto'|'medio'|'bajo',
+ *   valle3d?: boolean,
+ *   ua?: string,
+ * }} [opts]
+ * @returns {'alto'|'medio'|'bajo'}
+ */
+export function detectarTierInicial({ tier, valle3d = true, ua } = {}) {
+  if (!valle3d) return 'bajo';
+
+  const decision = decidirTier();
+  let base = decision.tier;
+
+  if (TIERS.includes(tier)) {
+    base = limitarTier(base, tier);
+  }
+
+  const userAgent = ua ?? (typeof window !== 'undefined' ? window.navigator?.userAgent ?? '' : '');
+  const androidViejo = /Android\s([0-6]|7\.[0-1])/.test(userAgent);
+  const iosViejo = /(iPhone|iPad|iPod).+OS (1[0-2])_/.test(userAgent);
+  if (androidViejo || iosViejo) base = 'bajo';
+
+  return base;
+}
 
 /**
  * Factor de arranque por tier: 'alto' parte pleno (solo puede bajar si el
@@ -112,39 +192,54 @@ export function escalaParticulasPorFactor(factor) {
 
 /**
  * @typedef {Object} Calidad3D
- * @property {'alto'|'medio'|'bajo'} tier    techo estático (deviceTier)
+ * @property {'alto'|'medio'|'bajo'} tier    tier actual en vivo
+ * @property {'alto'|'medio'|'bajo'} techo   techo de escalado del monitor
  * @property {number} factor                 0..1 continuo del monitor
  * @property {'alto'|'medio'|'bajo'} nivel   perilla discreta en vivo
- * @property {number} dpr                    DPR cuantizado, ≤ TECHO_DPR[tier]
+ * @property {number} dpr                    DPR cuantizado, ≤ techo del presupuesto
  * @property {number} escalaParticulas       0.4..1 para conteos/densidades
  * @property {boolean} fallback              calidad clavada hacia abajo
  */
 
-/** @param {'alto'|'medio'|'bajo'} tier @param {number} factor @param {boolean} fallback @returns {Calidad3D} */
-function derivar(tier, factor, fallback) {
+/** @param {'alto'|'medio'|'bajo'} tier @param {'alto'|'medio'|'bajo'} techo @param {number} factor @param {boolean} fallback @param {number} fps */
+function derivar(tier, techo, factor, fallback, fps = 0) {
+  const cierre = limiteTierSeguro(techo);
+  const t = limitarTier(tier, cierre);
   const f = Math.round(clamp01(factor) * 100) / 100;
+  const presupuesto = presupuestoDeTier(t);
   return Object.freeze({
-    tier,
+    tier: t,
+    techo: cierre,
     factor: f,
     fallback,
+    fps,
     nivel: nivelPorFactor(f),
-    dpr: dprPorFactor(f, TECHO_DPR[tier] ?? 1.25),
+    presupuesto,
+    dpr: dprPorFactor(f, presupuesto.dpr ?? TECHO_DPR[t] ?? 1.25),
     escalaParticulas: escalaParticulasPorFactor(f),
   });
 }
 
-let calidad = derivar('medio', factorInicialPorTier('medio'), false);
+function limiteTierSeguro(tier) {
+  return TIERS.includes(tier) ? tier : 'medio';
+}
+
+let calidad = derivar('medio', 'medio', factorInicialPorTier('medio'), false, 0);
 let fpsUltimo = 0;
+let frioPersistente = 0;
+let calientePersistente = 0;
 const oyentes = new Set();
 
 /** Notifica SOLO si algo derivado cambió (el fps queda fuera a propósito). */
 function emitir(sig) {
   if (
     sig.tier === calidad.tier &&
+    sig.techo === calidad.techo &&
     sig.factor === calidad.factor &&
     sig.nivel === calidad.nivel &&
     sig.dpr === calidad.dpr &&
-    sig.fallback === calidad.fallback
+    sig.fallback === calidad.fallback &&
+    sig.fps === calidad.fps
   ) return;
   calidad = sig;
   oyentes.forEach((fn) => fn());
@@ -172,32 +267,79 @@ export function leerFps() {
  * @param {'alto'|'medio'|'bajo'} tier
  */
 export function sembrarCalidad(tier) {
-  if (tier === calidad.tier) return;
-  emitir(derivar(tier, factorInicialPorTier(tier), false));
+  const techo = limiteTierSeguro(tier);
+  if (calidad.techo === techo) return;
+  frioPersistente = 0;
+  calientePersistente = 0;
+  emitir(derivar(techo, techo, factorInicialPorTier(techo), false, fpsUltimo));
 }
 
 /** Reset total (tests / dev). @param {'alto'|'medio'|'bajo'} [tier] */
 export function reiniciarCalidad(tier = 'medio') {
   fpsUltimo = 0;
-  calidad = derivar(tier, factorInicialPorTier(tier), false);
+  frioPersistente = 0;
+  calientePersistente = 0;
+  calidad = derivar(tier, tier, factorInicialPorTier(tier), false, 0);
   oyentes.forEach((fn) => fn());
+}
+
+function registrarFPS(fps) {
+  if (!Number.isFinite(fps)) return;
+  fpsUltimo = fps;
+  if (fps < FPS_BAJO) {
+    frioPersistente += 1;
+    calientePersistente = 0;
+    return;
+  }
+  if (fps >= FPS_ALTO) {
+    calientePersistente += 1;
+    frioPersistente = 0;
+    return;
+  }
+  frioPersistente = 0;
+  calientePersistente = 0;
+}
+
+function aplicarTierSegunFPS() {
+  let siguiente = calidad.tier;
+  if (frioPersistente >= FPS_BAJO_CONSECUTIVOS) {
+    siguiente = tierInferior(calidad.tier);
+    frioPersistente = 0;
+  } else if (calientePersistente >= FPS_ALTO_CONSECUTIVOS) {
+    siguiente = tierSuperior(calidad.tier, calidad.techo);
+    calientePersistente = 0;
+  }
+  if (siguiente !== calidad.tier) {
+    emitir(derivar(siguiente, calidad.techo, calidad.factor, calidad.fallback, fpsUltimo));
+  }
 }
 
 /** Callback de cambio del monitor drei. Tras fallback solo se acepta bajar. */
 function acusarCambio(api) {
-  fpsUltimo = api.fps;
+  registrarFPS(api.fps);
   const factor = calidad.fallback ? Math.min(calidad.factor, api.factor) : api.factor;
-  emitir(derivar(calidad.tier, factor, calidad.fallback));
+  emitir(derivar(calidad.tier, calidad.techo, factor, calidad.fallback, fpsUltimo));
+  aplicarTierSegunFPS();
 }
 
 /** Callback de fallback del monitor drei: clava la calidad hacia abajo. */
 function acusarFallback(api) {
-  fpsUltimo = api.fps;
-  emitir(derivar(calidad.tier, Math.min(calidad.factor, api.factor), true));
+  registrarFPS(api.fps);
+  emitir(derivar(calidad.tier, calidad.techo, Math.min(calidad.factor, api.factor), true, fpsUltimo));
 }
 
 /** Internos expuestos SOLO para tests unitarios (no consumir en escenas). */
-export const __internos = { acusarCambio, acusarFallback, emitir, derivar };
+export const __internos = {
+  acusarCambio,
+  acusarFallback,
+  emitir,
+  derivar,
+  registrarFPS,
+  aplicarTierSegunFPS,
+  limitarTier,
+  tierInferior,
+  tierSuperior,
+};
 
 /* ─── 3) Piezas React ───────────────────────────────────────────────────── */
 
@@ -208,6 +350,38 @@ export const __internos = { acusarCambio, acusarFallback, emitir, derivar };
  */
 export function useCalidad3D() {
   return useSyncExternalStore(suscribir, leerCalidad, leerCalidad);
+}
+
+/**
+ * Lectura reactiva del presupuesto vivo. El `tierInicial` sale de la heurística
+ * del host; `tier`/`presupuesto` vienen del store dinámico.
+ * @param {{
+ *   tier?: 'alto'|'medio'|'bajo',
+ *   reducedMotion?: boolean,
+ *   valle3d?: boolean,
+ *   ua?: string,
+ * }} [opts]
+ */
+export function useTierPerformance({ tier, reducedMotion = false, valle3d = true, ua } = {}) {
+  const valle3dHabilitado = usePrefsStore((s) => s.valle3d);
+  const tierInicial = useMemo(
+    () => detectarTierInicial({
+      tier,
+      valle3d: valle3d && valle3dHabilitado,
+      ua,
+    }),
+    [tier, valle3d, valle3dHabilitado, ua],
+  );
+  const calidadViva = useCalidad3D();
+  return {
+    tierInicial,
+    tier: calidadViva.tier,
+    presupuesto: calidadViva.presupuesto || presupuestoDeTier(calidadViva.tier),
+    reducedMotion,
+    samplerActivo: !reducedMotion,
+    fallback: calidadViva.fallback,
+    dpr: calidadViva.dpr,
+  };
 }
 
 /** Aplica el DPR del store al renderer. Hijo del Canvas, no dibuja nada. */

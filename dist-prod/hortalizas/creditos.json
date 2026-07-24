@@ -1,0 +1,92 @@
+[
+  {
+    "slug": "tomate",
+    "file": "tomate.jpg",
+    "commonsTitle": "Bangladeshi Tomato.jpg",
+    "autor": "Jubair Bin Iqbal",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Bangladeshi_Tomato.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "cebolla-larga",
+    "file": "cebolla-larga.jpg",
+    "commonsTitle": "Harvest of Scallions (spring onions), Trimingham, Norfolk.JPG",
+    "autor": "Kolforn",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:-2021-11-06_Harvest_of_Scallions_(spring_onions),_Trimingham,_Norfolk.JPG",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "cebolla-bulbo",
+    "file": "cebolla-bulbo.jpg",
+    "commonsTitle": "Common onion harvested at Goodnestone Park Kent England.jpg",
+    "autor": "Acabashi",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Common_onion_harvested_at_Goodnestone_Park_Kent_England.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "zanahoria",
+    "file": "zanahoria.jpg",
+    "commonsTitle": "Carrot harvest.jpg",
+    "autor": "woodleywonderworks",
+    "licencia": "CC BY 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Carrot_harvest.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "repollo",
+    "file": "repollo.jpg",
+    "commonsTitle": "Brassica oleracea var. capitata (4170722993).jpg",
+    "autor": "Dinesh Valke",
+    "licencia": "CC BY-SA 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Brassica_oleracea_var._capitata_(4170722993).jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "lechuga",
+    "file": "lechuga.jpg",
+    "commonsTitle": "Green lettuce in a kitchen garden.jpg",
+    "autor": "Basile Morin",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Green_lettuce_in_a_kitchen_garden.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "cilantro",
+    "file": "cilantro.jpg",
+    "commonsTitle": "Coriandrum Leaf.jpg",
+    "autor": "SarKaLay",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Coriandrum_Leaf.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "remolacha",
+    "file": "remolacha.jpg",
+    "commonsTitle": "Beetroots in a basket.jpg",
+    "autor": "W.carter",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Beetroots_in_a_basket.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "acelga",
+    "file": "acelga.jpg",
+    "commonsTitle": "Swiss Chard Rainbow.jpg",
+    "autor": "Alex from Ithaca, NY",
+    "licencia": "CC BY 2.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Swiss_Chard_Rainbow.jpg",
+    "fuente": "Wikimedia Commons"
+  }
+]

@@ -1,0 +1,89 @@
+{
+  "species_slug": "cytisus_monspessulanus",
+  "scientific_name": "Cytisus monspessulanus L.",
+  "common_names": [
+    "Retamo liso"
+  ],
+  "family": "Fabaceae",
+  "category": "especies_invasoras",
+  "cultivable": false,
+  "conservation_status": "invasor",
+  "thermal_zones": [
+    "frio"
+  ],
+  "roles_in_guild": [
+    "invasive",
+    "nitrogen_fixer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [
+    "erythrina_edulis",
+    "hesperomeles_goudotiana",
+    "miconia_squamulosa",
+    "vallea_stipularis",
+    "viburnum_triphyllum",
+    "weinmannia_tomentosa"
+  ],
+  "propagation": {
+    "metodo_principal": "semilla",
+    "notas": "Especial cuidado con el banco de semillas; el fuego estimula la germinación masiva."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1800,
+      "optimo_min": 2400,
+      "optimo_max": 2800,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 10,
+      "optimo_max": 18,
+      "max_tolerable": 24
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "SE BUSCA: El 'Falso Nativo'. El retamo liso (Cytisus monspessulanus L., sinonimia Genista monspessulana, familia Fabaceae) es un arbusto leguminoso mediterráneo introducido en Colombia que invade páramos y bosques altoandinos perturbados, particularmente en Cundinamarca (Páramo de Sumapaz, Chingaza, Cruz Verde), Boyacá (Iguaque), Antioquia y Nariño entre 2.500 y 3.500 msnm. Arbusto 1-3 m altura con flores amarillas vistosas que lo disfrazan de planta ornamental inofensiva. Fija nitrógeno (~50-100 kg N/ha/año) y altera el equilibrio nutricional del suelo paramuno (oligotrófico por naturaleza), desplazando flora nativa adaptada a baja fertilidad como frailejones y pajonales. Su erradicación es acto de soberanía hídrica porque protege la función reguladora hídrica del páramo. Manejo: arranque mecánico anterior a floración (pre-banco de semillas) + monitoreo trienal del banco residual (semillas viables 10-25 años en suelo). Listada Res. 684/2018 MADS. Fuentes Tier A: Humboldt Invasoras Andes, Mongabay reporte retamo 2024, Resolución 684/2018 MADS, GBIF Backbone Taxonomy.",
+  "sources": [
+    {
+      "id": "humboldt-invasoras-andes",
+      "title": "humboldt-invasoras-andes",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "mongabay-retamo-2024",
+      "title": "mongabay-retamo-2024",
+      "tier": "B",
+      "url": "https://es.mongabay.com"
+    },
+    {
+      "id": "res-684-2018-mads",
+      "title": "res-684-2018-mads",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "car-cundi-2019",
+      "title": "car-cundi-2019",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "issg-uicn-invasoras",
+      "title": "issg-uicn-invasoras",
+      "tier": "A",
+      "url": "http://www.iucngisd.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.360Z"
+}

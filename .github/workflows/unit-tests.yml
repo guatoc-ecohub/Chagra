@@ -21,7 +21,7 @@ name: Unit Tests (vitest)
 # estabilizar esos 2 tests; ver el cuerpo del PR para el detalle.
 on:
   pull_request:
-    branches: [main]
+    branches: [main, dev, app-3d]
   push:
     branches: [main]
 

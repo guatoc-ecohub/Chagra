@@ -1,0 +1,72 @@
+[
+  {
+    "slug": "cultivo",
+    "file": "cultivo.jpg",
+    "commonsTitle": "File:Andenbeere (Physalis) Anbau in Pfalz-1, Josef Schlaghecken.jpg",
+    "autor": "Schlaghecken Josef",
+    "licencia": "CC BY-SA 4.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Andenbeere_(Physalis)_Anbau_in_Pfalz-1,_Josef_Schlaghecken.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "planta",
+    "file": "planta.jpg",
+    "commonsTitle": "File:Kluse - Physalis peruviana - Kapstachelbeere 05 ies.jpg",
+    "autor": "Frank Vincentz",
+    "licencia": "CC BY-SA 3.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Kluse_-_Physalis_peruviana_-_Kapstachelbeere_05_ies.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "siembra",
+    "file": "siembra.jpg",
+    "commonsTitle": "File:Kluse - Physalis peruviana - Kapstachelbeere 07 ies.jpg",
+    "autor": "Frank Vincentz",
+    "licencia": "CC BY-SA 3.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Kluse_-_Physalis_peruviana_-_Kapstachelbeere_07_ies.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "capacho",
+    "file": "capacho.jpg",
+    "commonsTitle": "File:Kluse - Physalis peruviana - Kapstachelbeere 01 ies.jpg",
+    "autor": "Frank Vincentz",
+    "licencia": "CC BY-SA 3.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Kluse_-_Physalis_peruviana_-_Kapstachelbeere_01_ies.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "flor",
+    "file": "flor.jpg",
+    "commonsTitle": "File:20241102Physalis peruviana3.jpg",
+    "autor": "AnRo0002",
+    "licencia": "CC0",
+    "licenciaUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:20241102Physalis_peruviana3.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "cosecha",
+    "file": "cosecha.jpg",
+    "commonsTitle": "File:Kluse - Physalis peruviana - Kapstachelbeere 03 ies.jpg",
+    "autor": "Frank Vincentz",
+    "licencia": "CC BY-SA 3.0",
+    "licenciaUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Kluse_-_Physalis_peruviana_-_Kapstachelbeere_03_ies.jpg",
+    "fuente": "Wikimedia Commons"
+  },
+  {
+    "slug": "poscosecha",
+    "file": "poscosecha.jpg",
+    "commonsTitle": "File:Cape gooseberry pods.jpg",
+    "autor": "Fumikas Sagisavas",
+    "licencia": "CC0",
+    "licenciaUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "fuenteUrl": "https://commons.wikimedia.org/wiki/File:Cape_gooseberry_pods.jpg",
+    "fuente": "Wikimedia Commons"
+  }
+]

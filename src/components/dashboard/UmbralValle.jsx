@@ -136,7 +136,7 @@ export default function UmbralValle({ onNavigate }) {
       camino: tinte(CAMINO, 0.08),
       astro: esNoche ? '#e3e9f4' : clima.luz,
       haloAstro: esNoche ? 'rgba(214,224,246,0.35)' : `${'rgba(255,226,160,0.4)'}`,
-      estrellas: (clima.estrellas || 0) > 0,
+      estrellas: clima.estrellas === true || Number(clima.estrellas) > 0,
       luciernagas: (clima.luciernagas || 0) > 0,
       /* la ventana espera encendida del atardecer al amanecer */
       ventanaPrendida: esNoche || franja === 'atardecer' || franja === 'amanecer',

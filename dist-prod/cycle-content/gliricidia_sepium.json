@@ -1,0 +1,72 @@
+{
+  "species_slug": "gliricidia_sepium",
+  "scientific_name": "Gliricidia sepium (Jacq.) Kunth ex Walp.",
+  "common_names": [
+    "Matarratón"
+  ],
+  "family": "Fabaceae",
+  "category": "cercas_vivas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido",
+    "templado"
+  ],
+  "roles_in_guild": [
+    "living_fence",
+    "nitrogen_fixer",
+    "biomass_producer"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "esqueje",
+      "semilla"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Estacas de 1.5-2m de largo y 5-10cm de diametro, plantadas directamente a 30cm de profundidad en epoca lluviosa. Sin hojas en la porcion enterrada. Prendimiento superior al 90%.",
+    "notas": "Clasica cerca viva colombiana. Estaca enraiza sin hormonas. Fija N atmosferico. Follaje forrajero rico en proteinas para rumiantes.",
+    "fuente": "Perez Arbelaez 1947; AGROSAVIA sistemas silvopastoriles"
+  },
+  "requirements": {
+    "agua": "bajo",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 1200,
+      "max_absoluto": 1600
+    },
+    "temperatura_c": {
+      "helada_letal": 0,
+      "optimo_min": 20,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El matarratón (Gliricidia sepium (Jacq.) Walp.) es una leguminosa arbórea nativa de Mesoamérica naturalizada y ampliamente usada en sistemas agroforestales colombianos. Fija nitrógeno biológico (~100-200 kg N/ha/año) por simbiosis con Rhizobium, sirviendo como cerca viva, sombra ganadera, banco proteico forrajero y especie pionera en restauración. Se cultiva en zonas templadas y cálidas: Tolima, Huila, Valle del Cauca, Antioquia, Cauca, Magdalena y Llanos Orientales entre 0 y 1.700 msnm en zona térmica cálida a templada. Propagación por estaca leñosa (60-80% prendimiento), crecimiento rápido alcanza 3-4 m primer año. Manejo agroecológico: poda anual a 1.5 m altura, biomasa cortada se usa como mulch verde o forraje (proteína 20-25%). Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
+  "sources": [
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "agrosavia-silvopastoriles",
+      "title": "agrosavia-silvopastoriles",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.376Z"
+}

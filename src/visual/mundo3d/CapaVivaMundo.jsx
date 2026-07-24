@@ -51,6 +51,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { MomentoNace, MomentoCosecha, MomentoVende } from './MomentosFinca.jsx';
 import HotspotFeedback from './HotspotFeedback.jsx';
 import { ParticulasAmbientales } from './ParticulasAmbientales.jsx';
+import { useTierPerformance } from './usePerformanceMonitor.jsx';
 
 /*
  * Ventana de carga: cambios de estadoFinca dentro de este lapso tras montar se
@@ -116,6 +117,10 @@ export default function CapaVivaMundo({
   activo = true,
   hotspotActivoId = null,
 }) {
+  const rendimiento = useTierPerformance({ tier, reducedMotion });
+  const presupuesto = rendimiento.presupuesto;
+  const tierVivo = rendimiento.tier;
+
   /* ── beats vivos (estado React; los flancos se detectan en el efecto) ── */
   const [beatNace, setBeatNace] = useState(null); // { clave }
   const [beatCosecha, setBeatCosecha] = useState(null); // { clave, cultivo }
@@ -185,8 +190,9 @@ export default function CapaVivaMundo({
           key={n.tipo}
           tipo={/** @type {"polen"|"luciernagas"|"polvo"|"mariposas"} */ (n.tipo)}
           densidad={n.densidad}
-          tier={tier}
+          tier={tierVivo}
           reducedMotion={reducedMotion}
+          maxParticulas={presupuesto.maxFlora}
           semilla={semilla}
         />
       ))}

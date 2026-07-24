@@ -172,6 +172,10 @@ const HojaPruebaValleMockup = lazy(() => import('./mockups/HojaPruebaValle'));
 // operador). Reemplaza a BosqueVivo3D, MundoParamo3D y SueloDemo3D (los tres
 // archivados en src/mockups/_archivo/). Ruta #/mockups/paramo-definitivo.
 const ParamoDefinitivoMockup = lazy(() => import('./visual/mundo3d/bosque/MundoEntBosque.jsx'));
+// 3D: el MUNDO BOSQUE VIVO y su guardián, el Ent de la queñua (colorado,
+// Polylepis) — mallas three reales (tronco retorcido con rostro tallado, copa
+// instanciada), device-tiering real. Ruta #/mockups/bosque-vivo-3d, sin auth.
+const BosqueVivo3DMockup = lazy(() => import('./mockups/BosqueVivo3D'));
 // 3D: el MUNDO DEL CAFÉ — el cafetal bajo sombra del piso templado: surcos a
 // curva de nivel, cereza madurando verde→pintón→rojo por instancia, el sombrío
 // de guamos y nogales, y la casa-beneficiadero en la bruma. Device-tiering
@@ -298,6 +302,7 @@ const MundoMercado3DMockup = lazy(() => import('./mockups/MundoMercado3D'));
 // La CARA 3D-first de prod.chagra.app: entrada-tranquera con el valle vivo de
 // fondo → velo dorado del cruce → el valle como HOME (EntradaValle3D).
 const CaraProd3DMockup = lazy(() => import('./mockups/CaraProd3D'));
+const SueloDemo3DMockup = lazy(() => import('./mockups/SueloDemo3D'));
 const CriaturasNocturnasMockup = lazy(() => import('./mockups/CriaturasNocturnas'));
 // Angelita al máximo: la entrada teatral (gafas + crecimiento) y el repertorio
 // completo de estados del agente, uno al lado del otro.
@@ -689,6 +694,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-milpa': 'mockup_mundo3d_milpa',
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
   'mockups/paramo-definitivo': 'mockup_paramo_definitivo',
+  'mockups/bosque-vivo-3d': 'mockup_bosque_vivo_3d',
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
   'mockups/aguacatal-vivo-3d': 'mockup_aguacatal_vivo_3d',
   'mockups/microcuenca': 'mockup_microcuenca',
@@ -757,6 +763,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/bosque-tres-estratos': 'mockup_bosque_tres_estratos',
   'mockups/tres-ents-gradiente': 'mockup_tres_ents_gradiente',
   'mockups/paramo-humboldt-3d': 'mockup_paramo_humboldt_3d',
+  'mockups/mundo-paramo-3d': 'mockup_mundo_paramo_3d',
   'mockups/camara-director': 'mockup_camara_director',
   'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
   'mockups/artesania-andina': 'mockup_artesania_andina',
@@ -766,6 +773,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-gallinero-3d': 'mockup_mundo_gallinero_3d',
   'mockups/mundo-mercado-3d': 'mockup_mundo_mercado_3d',
   'mockups/cara-prod': 'mockup_cara_prod',
+  'mockups/suelo-demo-3d': 'mockup_suelo_demo_3d',
   'mockups/criaturas-nocturnas': 'mockup_criaturas_nocturnas',
   'mockups/angelita-viva': 'mockup_angelita_viva',
   'mockups/mundo-polinizadores-3d': 'mockup_mundo_polinizadores_3d',
@@ -1702,6 +1710,16 @@ export default function App() {
               <div style={{ position: 'fixed', inset: 0 }}>
                 <ParamoDefinitivoMockup />
               </div>
+      case 'mockup_bosque_vivo_3d':
+        // Vitrina pública del MUNDO BOSQUE VIVO: el Ent de la queñua (colorado,
+        // Polylepis) en 3D REAL — tronco retorcido con corteza rojiza y rostro
+        // tallado, copa de hojitas instanciadas, meciéndose en la niebla del
+        // páramo. Device-tiering real; en equipo humilde muestra la ficha del
+        // guardián. Ruta #/mockups/bosque-vivo-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El bosque vivo">
+              <BosqueVivo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -1725,6 +1743,7 @@ export default function App() {
               <div style={{ position: 'fixed', inset: 0 }}>
                 <CicloAguaMockup />
               </div>
+              <CicloAguaMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2418,6 +2437,108 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_suelo_demo_3d':
+        // El SUELO calibre Switch (#/mockups/suelo-demo-3d): terreno fbm con
+        // color por zona, sendero, detalle al ras. ?vista=aerea|cerca|sendero.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El suelo del páramo">
+              <SueloDemo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_criaturas_nocturnas':
+        // Vitrina de la fauna NOCTURNA colombiana + el cóndor del valle en el
+        // estilo biopunk del GuardianEspiritu (#/mockups/criaturas-nocturnas).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Criaturas nocturnas">
+              <CriaturasNocturnasMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_angelita_viva':
+        // Angelita al máximo (#/mockups/angelita-viva): la entrada teatral
+        // (asoma pequeñita → gafas si hace sol → crece con overshoot) y el
+        // repertorio de estados del agente. ?estado=<nombre> agranda uno.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Angelita, la compañera viva">
+              <AngelitaVivaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_catalogo_infra':
+        // Catálogo de infraestructura procedural (AG/Gemini): 8 piezas
+        // paramétricas low-poly (invernadero/gallinero/galpón/…) + demo.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Catálogo de infraestructura">
+              <CatalogoInfraDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_efectos_funcionales':
+        // Efectos funcionales (FASE 3 audit 3D): invernadero→microclima,
+        // almacén se llena tras cosecha, reservorio con lluvia/sequía.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Efectos de la infraestructura">
+              <EfectosFuncionalesDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_momento_venta_mercado_3d':
+        // Momento 3D (FASE 2 audit 3D): venta / nacimiento / partida como
+        // momentos coreografiados con cámara dirigida. Sin gore, digno.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Un momento en la finca">
+              <MomentoVentaMercado3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_camara_director':
+        // Cámara de director (FASE 4 audit 3D): demo del secuenciador
+        // useCamaraDirector — 4 tomas coreografiadas sobre valle low-poly.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Cámara de director">
+              <CamaraDirectorDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_paramo_3d':
+        // El páramo altoandino: el ecosistema de la niebla en hora dorada —
+        // frailejones (Espeletia), cojines de musgo, pajonal, quenuas con la
+        // niebla enganchada, aves de páramo y el NACIMIENTO del agua. Didáctico
+        // sobre conservación: el páramo como fábrica de agua (botón «cómo nace
+        // el agua»). Ruta #/mockups/mundo-paramo-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Artesanía andina">
+              <ArtesaniaAndinaDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_abejas_3d':
+        return (<ErrorBoundary><ErrorFallback moduleName="El mundo de las abejas"><MundoAbejas3DMockup /></ErrorFallback></ErrorBoundary>);
+      case 'mockup_mundo_gallinero_3d':
+        return (<ErrorBoundary><ErrorFallback moduleName="El gallinero con pastoreo"><MundoGallinero3DMockup onBack={() => navigate('dashboard')} /></ErrorFallback></ErrorBoundary>);
+      case 'mockup_mundo_mercado_3d':
+        return (<ErrorBoundary><ErrorFallback moduleName="El mercado campesino"><MundoMercado3DMockup /></ErrorFallback></ErrorBoundary>);
+      case 'mockup_cara_prod':
+        // La CARA 3D-first de prod.chagra.app (#/mockups/cara-prod): la
+        // entrada-tranquera (login con el valle 3D vivo de fondo), el cruce
+        // con velo dorado y el valle como home. Sin auth (vitrina de diseño);
+        // codex cabla `onIngresar` al flujo real de LoginScreen.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La cara de Chagra (prod 3D)">
+              <CaraProd3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mockup_criaturas_nocturnas':
         // Vitrina de la fauna NOCTURNA colombiana + el cóndor del valle en el
         // estilo biopunk del GuardianEspiritu (#/mockups/criaturas-nocturnas).
@@ -2590,6 +2711,59 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El vergel de frutales andinos">
               <FrutalesAndinos3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_hoja_prueba_valle':
+        // La hoja de prueba de la ley visual del valle: el patrón oro contra el
+        // que se compara todo activo nuevo (paleta, bandas, borde) bajo las
+        // cinco franjas (?ciclo=). Ruta #/mockups/hoja-prueba-valle, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La hoja de prueba del valle">
+              <HojaPruebaValleMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_botica_cana_3d':
+        // La botica y el trapiche: los canteros de plantas medicinales y
+        // aromáticas de la casa campesina (ruda, caléndula, hierbabuena,
+        // sábila, limoncillo, ortiga, manzanilla — cada una con su copia
+        // didáctica de saber campesino) + la molienda panelera: el cañal, el
+        // trapiche de rodillos que mueve el buey, la hornilla con la paila
+        // hirviendo y las gaveras. Botón «paso a paso»: caña → molino → jugo
+        // → paila → panela. Ruta #/mockups/mundo-botica-cana-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La botica y el trapiche">
+              <MundoBoticaCana3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_frutales_3d':
+        // El huerto de frutales del solar: el aguacate mayor, el mango de
+        // copa ancha con su poda, los cítricos cargados, el guayabo, el
+        // papayo de tronco solo, el injerto joven con tutor, el plateo al
+        // pie de cada árbol y la cosecha a mano (escalera + canastos).
+        // Ruta #/mockups/mundo-frutales-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El huerto de frutales">
+              <MundoFrutales3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_leguminosas_3d':
+        // El lote de leguminosas y raíces andinas, denso: el frijolar de vara
+        // en hileras (con la mata héroe que abre el corte del subsuelo y los
+        // nódulos rosados de Rhizobium — el nitrógeno que se ve), la milpa de
+        // las tres hermanas (maíz + fríjol + calabaza), la quinua en grupo con
+        // panojas rojas/doradas/moradas y las yucas frondosas de raíz tuberosa.
+        // Botón «ver el saber bajo tierra». Ruta #/mockups/mundo-leguminosas-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El lote de leguminosas y raíces">
+              <MundoLeguminosas3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

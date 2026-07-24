@@ -1,0 +1,68 @@
+{
+  "species_slug": "codiaeum_variegatum",
+  "scientific_name": "Codiaeum variegatum (L.) Rumph. ex A.Juss.",
+  "common_names": [
+    "Croton ornamental"
+  ],
+  "family": "Euphorbiaceae",
+  "category": "cercas_vivas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "calido"
+  ],
+  "roles_in_guild": [
+    "living_fence"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "esqueje"
+    ],
+    "best_method": "esqueje",
+    "protocol_resumen": "Esquejes de 15-20cm de tallos semimaduros, enraizar en sustrato humedo con alta humedad ambiental. Tiempo de enraizamiento 3-4 semanas.",
+    "notas": "Arbusto ornamental de follaje vistoso con variacion cromatica (verde, amarillo, rojo, naranja). Cerca viva densa de baja altura en climas calidos.",
+    "fuente": "Perez Arbelaez 1947; GBIF"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 0,
+      "optimo_min": 0,
+      "optimo_max": 800,
+      "max_absoluto": 1500
+    },
+    "temperatura_c": {
+      "helada_letal": 2,
+      "optimo_min": 20,
+      "optimo_max": 30,
+      "max_tolerable": 36
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "bueno"
+  },
+  "valor_pedagogico": "El croton ornamental (Codiaeum variegatum (L.) Rumph. ex A.Juss., Euphorbiaceae) es un arbusto introducido del sudeste asiático, aclimatado en zona cálida colombiana (0-1.500 msnm) en patios y cercas vivas de Tolima, Huila, Valle del Cauca, Magdalena y Llanos. Propagación por estaca semimadura de 15-20 cm, enraíza en 3-4 semanas. Sus hojas combinan verde, amarillo, rojo y naranja — el color depende de la radiación: a más sol, más antocianinas y carotenoides; a la sombra domina la clorofila (verde). Lección viva: el color de una hoja no es decoración fija, sino respuesta química a la luz — bioquímica al alcance del patio. Atención: como toda euforbiácea, su látex es irritante y tóxico si se ingiere; no apta para huertos infantiles sin supervisión. Fuentes Tier A: Pérez Arbeláez 1947, POWO Kew, GBIF Backbone.",
+  "sources": [
+    {
+      "id": "perez-arbelaez-1947-plantas-utiles",
+      "title": "perez-arbelaez-1947-plantas-utiles",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.377Z"
+}

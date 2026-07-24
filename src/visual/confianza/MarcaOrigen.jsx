@@ -31,7 +31,7 @@ export default function MarcaOrigen({
   origen = 'general',
   soloMarca = false,
   animated = true,
-  className,
+  className = '',
 }) {
   const id = origenDelSaber(origen) || 'general';
   const o = ORIGENES_SABER[id];

@@ -1,0 +1,111 @@
+{
+  "id": "demo-mancha-foliar-fresa-guatoc-2026-05-15",
+  "title": "Mancha foliar en fresa Monterrey — Guatoc invernadero 2026-05",
+  "finca_slug": "guatoc",
+  "zone_freetext": "invernadero túnel norte",
+  "subject": {
+    "species_ids": ["fragaria_ananassa_monterrey"],
+    "count_total": 120,
+    "count_affected": 3
+  },
+  "problem": {
+    "name_freetext": "Mancha foliar (Mycosphaerella fragariae)",
+    "pest_id": null,
+    "severity": "medium",
+    "detected_at": "2026-05-15T08:30:00-05:00"
+  },
+  "state": "monitoring",
+  "state_history": [
+    { "state": "open", "at": "2026-05-15T08:30:00-05:00", "notes": "Caso creado tras detección de manchas foliares" },
+    { "state": "in_treatment", "at": "2026-05-15T10:00:00-05:00", "notes": "Caldo bordelés 0.5% aplicado" },
+    { "state": "monitoring", "at": "2026-05-17T09:00:00-05:00", "notes": "Manchas detenidas, brotes nuevos sanos" }
+  ],
+  "treatments_applied": [
+    {
+      "biopreparado_id": "caldo_bordeles",
+      "applied_at": "2026-05-15T10:00:00-05:00",
+      "dose": "0.5% (CuSO4 + Ca(OH)2)",
+      "notes": "Cobertura foliar completa, evitando floración. RAG sugerido por agente Chagra y validado."
+    }
+  ],
+  "event_log_ids": [],
+  "photo_asset_ids": [],
+  "outcome": {
+    "closed_at": null,
+    "final_count_affected": null,
+    "lessons_learned": "El caldo bordelés temprano + suspensión riego aspersión + poda + ventilación resuelve mancha foliar en 3-4 días. Replicar en otras camas si aparece."
+  },
+  "visibility": "public",
+  "validation": {
+    "status": "certified",
+    "validator_name": "Ing. Diana Pérez Caicedo",
+    "validator_credentials": "Ing. Agrónoma UNAL Palmira · Reg. ICA AG-2018-3421",
+    "validated_at": "2026-05-17T14:20:00-05:00",
+    "notes": "Diagnóstico compatible con Mycosphaerella fragariae. Tratamiento agroecológico apropiado."
+  },
+  "timeline": [
+    {
+      "id": "tl-001",
+      "event_type": "observation",
+      "date": "2026-05-15T08:30:00-05:00",
+      "description": "Manchas circulares de 2-5 mm con halo púrpura observadas en 3 plantas del lote túnel norte. Hojas viejas más afectadas.",
+      "photo_url": "/placeholder-species.svg",
+      "actor": "Operador campo"
+    },
+    {
+      "id": "tl-002",
+      "event_type": "intervention",
+      "date": "2026-05-15T10:00:00-05:00",
+      "description": "Aplicación de caldo bordelés al 0.5% (CuSO4 + Ca(OH)2). Cobertura foliar completa, evitando floración.",
+      "actor": "Operador campo"
+    },
+    {
+      "id": "tl-003",
+      "event_type": "observation",
+      "date": "2026-05-16T09:00:00-05:00",
+      "description": "Manchas detenidas. No hay nuevas. Aspecto general estable.",
+      "actor": "Operador campo"
+    },
+    {
+      "id": "tl-004",
+      "event_type": "intervention",
+      "date": "2026-05-17T09:00:00-05:00",
+      "description": "Poda sanitaria de hojas más afectadas. Disposición en compost caliente (>60°C) para inactivar esporas.",
+      "actor": "Operador campo"
+    },
+    {
+      "id": "tl-005",
+      "event_type": "result",
+      "date": "2026-05-18T17:00:00-05:00",
+      "description": "Recuperación clínica. Brotes nuevos sanos. Mantenimiento: riego basal solo (no aspersión), distancia entre plantas 30 cm, cobertura paja seca.",
+      "actor": "Operador campo"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "rec-001",
+      "text": "Aplicar caldo bordelés 0.5% al primer signo, cobertura foliar completa, evitar floración. Repetir cada 7-10 días si persiste.",
+      "suggested_by": "Agente Chagra (RAG: AGROSAVIA 2019 + Cenicafé 2013)",
+      "validation_required": true,
+      "validated_by": "Ing. Diana Pérez Caicedo",
+      "validated_at": "2026-05-17T14:20:00-05:00"
+    },
+    {
+      "id": "rec-002",
+      "text": "Suspender riego por aspersión. Adoptar riego por goteo. Mejora drenaje y reduce humedad foliar.",
+      "suggested_by": "Agente Chagra (RAG: FAO Riego Eficiente)",
+      "validation_required": true,
+      "validated_by": "Ing. Diana Pérez Caicedo",
+      "validated_at": "2026-05-17T14:20:00-05:00"
+    },
+    {
+      "id": "rec-003",
+      "text": "Aumentar distancia entre plantas a 30 cm para ventilación. Cobertura con paja seca para reducir splash.",
+      "suggested_by": "Operador campo (experiencia)",
+      "validation_required": false
+    }
+  ],
+  "created_at": "2026-05-15T08:30:00-05:00",
+  "created_by_did": null,
+  "updated_at": "2026-05-18T18:00:00-05:00"
+}
