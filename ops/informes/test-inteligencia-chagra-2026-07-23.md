@@ -405,3 +405,28 @@ supera. **El swap de 53 s a `qwen3-vl` NO se justifica para identificación abie
   el **ranking relativo** (gemma3:4b > gemma4/qwen2.5vl > qwen3-vl > llama/moondream), no el
   valor absoluto. El brazo visual puro es débil: hay que apoyarlo con contexto, no confiarle
   el diagnóstico solo.
+
+### Modelos nuevos probados (recomendados por el DR de visión)
+
+Se pullearon y midieron 3 modelos recientes con el MISMO bench (18 plagas + 5 sanas):
+
+| Modelo | IDENTIFICACIÓN | HONESTIDAD | VACÍAS | LATENCIA | VISIÓN |
+|--------|:---:|:---:|:---:|:---:|:---:|
+| `gemma3:27b` (referencia, ~17 GB) | **8/18 · 44.4%** | 5/5 · 100% | 0 | 22.8 s | **57.1** |
+| `minicpm-v:8b` | 3/18 · 16.7% | 5/5 · 100% | 0 | 9.4 s | 25.0 |
+| `qwen3-vl:4b` | 1/18 · 5.6% | 3/5 · 60% | **19** | 10.0 s | 8.7 |
+
+- **`gemma3:27b` es el mejor de TODOS los medidos (44.4% id, 100% honestidad)** — confirma el
+  patrón "más grande identifica más" — pero pesa ~17 GB, **offloadea en la M6000 (12 GB) y
+  tarda 22.8 s/img**: no es candidato de prod, solo referencia del techo generalista.
+- **`minicpm-v:8b`** (que el DR marcaba fuerte) rinde igual que `gemma4:e4b`/`qwen2.5vl:7b`
+  (16.7%, 100% honesto) — **no supera a `gemma3:4b`**.
+- **`qwen3-vl:4b`** repite el patrón mudo de su hermano `:8b` (19/23 en vacío) — peor aún.
+
+**Veredicto de la ronda nueva: ninguno de los nuevos supera a `gemma3:4b` (45.5) entre los
+DESPLEGABLES.** El único que lo pasa es `gemma3:27b` (57.1), no desplegable en la M6000.
+Consistente con el DR de visión (4 papers 2025–26): **todos los VLM generalistas caen en
+~15–45 % en diagnóstico agrícola real** — `gemma3:27b` (44.4 %) está en el borde alto de esa
+banda. **El techo generalista es `gemma3:4b`; el salto REAL a diagnóstico confiable es
+fine-tuning** (~73 % con ~11k imágenes) o un CNN especializado (~94.7 %), no otro VLM base.
+(Prod no se cambia — es medición.)
