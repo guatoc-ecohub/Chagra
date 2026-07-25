@@ -136,6 +136,22 @@ export { Sirfido } from './Sirfido.jsx';
    detrás del ganado y rompe el ciclo de la larva. Dos plumajes (colorada y
    clara sarabiada) para que la parvada no se vea clonada. */
 export { Gallina } from './Gallina.jsx';
+/* LA ZARIGÜEYA (chucha/fara/runcho) — el MARSUPIAL NOCTURNO de la finca: LA
+   QUE CARGA. El personaje base LLEVA LAS CRÍAS AL LOMO (no es un adorno que se
+   agrega después: es su firma de SILUETA y es conducta real de Didelphis —
+   salen del marsupio a los ~70 días y viajan en la espalda mientras la madre
+   forrajea). Su firma no depende del color: crías al lomo, hocico en cuña,
+   cola prensil desnuda con gancho y orejas grandes redondas — todo sobrevive
+   al test de negro sobre blanco (ver ZARIGUYA_FIRMA). */
+export { Zariguya } from './Zariguya.jsx';
+/* La IDENTIDAD de la zarigüeya como datos (paleta ceniza + cara pálida + piel
+   rosada desnuda, proporciones, su perfil de clima y —explícito— su CONTRATO
+   DE SILUETA). Solo datos: jamás arrastra three al bundle base — igual que
+   dantaIdentidad/jaguarIdentidad. */
+export {
+  ZARIGUYA_FIRMA, ZARIGUYA_PALETA, ZARIGUYA_PROPORCION, ZARIGUYA_SLUG,
+  ZARIGUYA_TINTA, PERFIL_ZARIGUYA,
+} from './zariguyaIdentidad.js';
 /* EL ENT DEL PÁRAMO — el árbol-guardián que enseña (frailejón gigante). NO es un
    bicho: es el corazón del "Bosque Vivo". Hereda la MISMA fundación transversal
    (line-boil, lip-sync, modo-poder=guardián, clima) adaptada a su escala y su
@@ -204,6 +220,7 @@ import Crisopa from './Crisopa.jsx';
 import Trichogramma from './Trichogramma.jsx';
 import Sirfido from './Sirfido.jsx';
 import Gallina from './Gallina.jsx';
+import Zariguya from './Zariguya.jsx';
 import EntFrailejon from './EntFrailejon.jsx';
 
 /* Registro consultable: slug → componente + binomio verificado. */
@@ -240,6 +257,9 @@ export const CREATURES = {
   sirfido: { Component: Sirfido, nombre: 'Mosca de las flores (sírfido)', cientifico: 'Syrphidae' },
   // El animal de patio de la casa campesina (el del gallinero que camina).
   gallina: { Component: Gallina, nombre: 'Gallina criolla', cientifico: 'Gallus gallus domesticus' },
+  // El marsupial nocturno de la finca (la que sale de noche a limpiar la
+  // huerta — con las crías al lomo).
+  zariguya: { Component: Zariguya, nombre: 'Zarigüeya (chucha)', cientifico: 'Didelphis marsupialis' },
   // El árbol-maestro del Bosque Vivo (flora, no fauna): el frailejón guardián.
   'ent-frailejon': { Component: EntFrailejon, nombre: 'El Ent del páramo', cientifico: 'Espeletia sp.' },
 };
