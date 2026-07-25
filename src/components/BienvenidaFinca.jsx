@@ -3,7 +3,7 @@
    exportarse junto al componente (mismo patrón que NotifPermissionPrompt). */
 import React, { useEffect, useRef, useState } from 'react';
 import { Mic, Camera, BadgeCheck, MapPin, ArrowRight, Volume2, Sparkles, Glasses, Share, Download, WifiOff, Save, Smartphone, Check } from 'lucide-react';
-import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
+import ChagraAgentAvatar from './ChagraAgentAvatar';
 import usePwaInstall from '../hooks/usePwaInstall';
 import { MSG } from '../config/messages.js';
 
@@ -13,8 +13,10 @@ import { MSG } from '../config/messages.js';
  * Secuencia de 5 "momentos" a pantalla completa, pensada para que en ~40
  * segundos el campesino sienta "esto es MÍO y me entiende":
  *
- *   1. Bienvenida — el colibrí del abutilón (avatar del agente) saluda con la
- *      identidad cuaderno-de-campo / finca viva. Nada de wizard corporativo.
+ *   1. Bienvenida — el compAI elegido (Angelita la abeja por defecto, fix
+ *      2026-07-25: antes SIEMPRE el colibrí, jubilado como cara del agente
+ *      desde 2026-07-18) saluda con la identidad cuaderno-de-campo / finca
+ *      viva. Nada de wizard corporativo.
  *   2. Capacidades estrella — hablarle por voz, mostrarle una foto de la mata,
  *      y respuestas verificadas (LA COSTURA: la tarjeta lleva el borde cosido).
  *   3. "Hola Chagra" (modo campo, manos ocupadas) — foto real de manos en la
@@ -260,7 +262,7 @@ export default function BienvenidaFinca({ onUbicar, onClose, onExplorarEjemplo =
         {paso === 0 && (
           <>
             <div className="bienvenida-item bienvenida-flotar" style={{ '--bv-delay': '0ms' }}>
-              <ChagraAgentAvatarAngelita size={188} state="idle" ariaLabel="Angelita, la abeja de Chagra" />
+              <ChagraAgentAvatar size={188} state="idle" ariaLabel="Chagra IA" />
             </div>
             <div className="bienvenida-item flex flex-col gap-3" style={{ '--bv-delay': '120ms' }}>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">

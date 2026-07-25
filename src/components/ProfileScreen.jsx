@@ -1110,7 +1110,9 @@ export default function ProfileScreen({ onBack, onHome }) {
  *
  * Toggle "Voz del agente activa" persistido en usePrefsStore (key
  * `chagra:prefs:tts-enabled`). Al desactivar, stop() inmediato del
- * ttsService. Equivalente al doble-click del avatar colibrí.
+ * ttsService. Equivalente al doble-click del avatar del agente (Angelita
+ * por defecto, o el que el usuario haya elegido — fix 2026-07-25: el copy
+ * de abajo decía "colibrí", jubilado como cara del agente desde 2026-07-18).
  */
 function AgentVoiceSection() {
   const ttsEnabled = usePrefsStore((s) => s.ttsEnabled);
@@ -1137,7 +1139,7 @@ function AgentVoiceSection() {
           <span className="text-sm font-bold text-slate-200">Voz del agente activa</span>
           <span className="text-xs text-slate-400 leading-snug">
             Cuando está activa, Chagra IA lee en voz alta sus respuestas con una
-            sola voz natural. Doble click en el avatar colibrí silencia o
+            sola voz natural. Doble click en el avatar del agente silencia o
             reactiva sin abrir esta pantalla.
           </span>
         </div>
