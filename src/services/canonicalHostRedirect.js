@@ -53,12 +53,23 @@ export function isProdAppHost(hostname) {
   return normalizeHostname(hostname) === 'prod.chagra.app';
 }
 
+export function isThreeDWorldHost(hostname) {
+  // 3d.guatoc.co = despliegue standalone de los mundos 3D auditados (build
+  // app-3d), fuera del dominio chagra.app. Igual que prod.chagra.app, NO debe
+  // redirigir al canónico. Host EXACTO (no wildcard *.guatoc.co): otros
+  // subdominios de guatoc.co — p.ej. chagra.guatoc.co, el dominio legado de
+  // producción — deben seguir rebotando a chagra.app (ver test de
+  // canonicalHostRedirect que lo asume explícitamente).
+  return normalizeHostname(hostname) === '3d.guatoc.co';
+}
+
 export function isAllowedHost(hostname) {
   return (
     isCanonicalHost(hostname) ||
     isLocalDevHost(hostname) ||
     isPreviewHost(hostname) ||
-    isProdAppHost(hostname)
+    isProdAppHost(hostname) ||
+    isThreeDWorldHost(hostname)
   );
 }
 
