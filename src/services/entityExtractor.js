@@ -39,7 +39,8 @@ const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
 // está hot para no evictar el chat) SIGUE VALIENDO: ahora el hot es e2b.
 // Y el motivo de fondo cambió a favor: granite3.3 contamina 47,7% contra 10%
 // de e2b, medido con juez semántico sobre 70 sondas.
-const MODEL = 'gemma4:e2b';
+// 2026-07-24: gemma4:e2b → qwen3.5:4b (unificado con chat; ganador del maratón #2738).
+const MODEL = 'qwen3.5:4b';
 // El modelo responde en pocos segundos para extracción JSON con format:json.
 // Nginx permite hasta 120s en /api/ollama/; 60s cliente es el punto medio seguro.
 const TIMEOUT_MS = 60000;
