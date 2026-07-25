@@ -15,8 +15,12 @@
  * estático (una seed fija): el trazo sigue con su textura pero sin vibrar.
  */
 
-/* Los 3 estados de seed que rotan (line-boil de 3 fotogramas). */
-export const BOIL_SEEDS = [2, 11, 23];
+import { RH_LINE_BOIL } from './rubberhoseSpec.js';
+
+/* Los 3 estados de seed que rotan (line-boil de 3 fotogramas). Los VALORES
+   canónicos (seeds, frecuencia, escala, compás) viven en `rubberhoseSpec.js`:
+   cualquier emulación CSS del boil debe latir a ese mismo compás. */
+export const BOIL_SEEDS = RH_LINE_BOIL.seeds;
 
 /**
  * @param {Object} props
@@ -30,11 +34,11 @@ export const BOIL_SEEDS = [2, 11, 23];
  */
 export function LineBoilFilter({
   id,
-  baseFrequency = 0.025,
-  scale = 4.5,
+  baseFrequency = RH_LINE_BOIL.baseFrequency,
+  scale = RH_LINE_BOIL.scale,
   animated = true,
   seeds = BOIL_SEEDS,
-  dur = '0.4s',
+  dur = RH_LINE_BOIL.dur,
 }) {
   return (
     <filter id={id} x="-20%" y="-20%" width="140%" height="140%">

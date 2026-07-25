@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import './creatures.css';
 import { CreatureFilters } from './_filters.jsx';
+import { LineBoilFilter } from './LineBoilFilter.jsx';
 
 /* Escarabajo estercolero — Dichotomius belus (propio de Colombia). Élitros
    negros brillantes con sutura, cabeza con cuerno, patas que caminan y la bola
@@ -12,18 +13,23 @@ export function Escarabajo({
   className = '',
   inline = false,
   animated = true,
+  /* Line-boil canónico de la familia (LineBoilFilter) — OPT-IN como en los 9
+     bichos: default false → los consumidores existentes NO cambian. */
+  lineBoil = false,
   title = 'Escarabajo estercolero',
   ...rest
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, '');
   const glow = `crt-glow-${uid}`;
   const blur = `crt-blur-${uid}`;
+  const boil = `crt-boil-${uid}`;
   const bola = animated ? 'crt-ball' : undefined;
   const patas = animated ? 'crt-legs' : undefined;
 
   const defs = (
     <defs>
       <CreatureFilters glow={glow} blur={blur} />
+      {lineBoil && <LineBoilFilter id={boil} animated={animated} />}
     </defs>
   );
   const bolaG = (
@@ -50,12 +56,17 @@ export function Escarabajo({
     </g>
   );
 
+  /* El line-boil envuelve bicho Y bola en un nodo aparte (no colisiona con
+     el glow del cuerpo). */
+  const cuerpoVivo = lineBoil
+    ? <g filter={`url(#${boil})`}>{bolaG}{body}</g>
+    : <>{bolaG}{body}</>;
+
   if (inline) {
     return (
       <g className={className} data-creature="escarabajo">
         {defs}
-        {bolaG}
-        {body}
+        {cuerpoVivo}
       </g>
     );
   }
@@ -64,8 +75,7 @@ export function Escarabajo({
       role="img" aria-label={title} data-creature="escarabajo" {...rest}>
       <title>{title}</title>
       {defs}
-      {bolaG}
-      {body}
+      {cuerpoVivo}
     </svg>
   );
 }
