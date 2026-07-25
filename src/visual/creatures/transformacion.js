@@ -43,6 +43,7 @@ export const AURA_POR_BICHO = Object.freeze({
   'ent-frailejon': '#8fdcae',  // VERDE-PLATEADO del guardián del páramo (modo-guardián: el frailejón se yergue a intervenir)
   dalmata: '#3b7dff',          // AZUL COBALTO leal (el perro atlético de la casa)
   beagle: '#c9772e',           // CANELA DE RASTRO (la nariz de oro del sabueso)
+  zariguya: '#ff9ecb',         // ROSA DE LUNA (la piel desnuda de orejas, trufa y cola prensil, encendida de noche: el color de LA QUE CARGA)
 });
 
 /* Aura por defecto si el slug no está mapeado (la dorada de la guía). */
