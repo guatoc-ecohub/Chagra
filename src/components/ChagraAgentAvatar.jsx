@@ -1,5 +1,7 @@
 import ChagraAgentAvatarMaiz from './ChagraAgentAvatarMaiz';
 import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
+import ChagraAgentAvatarZariguya from './ChagraAgentAvatarZariguya';
+import Angelita from '../visual/agente/Angelita';
 import useAgentAvatarType from '../hooks/useAgentAvatarType';
 
 /**
@@ -22,10 +24,49 @@ import useAgentAvatarType from '../hooks/useAgentAvatarType';
  * Mismas props que los avatares hijos: state, size, withLabel, onClick,
  * onDoubleClick, glow, className, ariaLabel (+ visema/confianza que
  * Angelita entiende y el maíz ignora).
+ *
+ * API "rica" (fix 2026-07-25 — bug: varios call-sites que necesitaban el
+ * vocabulario Spanish completo de Angelita, `angelitaEstados.js` —p.ej.
+ * 'contenta', 'invita', 'acompana'— importaban `<Angelita>` CRUDO, sin pasar
+ * por este dispatcher, así que ignoraban la elección del usuario (AgentFab,
+ * AgentHero, FincaVivaHero, ColibriTransition). Se acepta ahora una prop
+ * alterna `estado` (en vez de `state`) para esos call-sites: si el tipo
+ * elegido no es Angelita, se traduce al vocabulario angosto (idle/thinking/
+ * speaking/listening) que maíz y zarigüeya entienden; si es Angelita, pasa
+ * directo sin perder fidelidad.
+ *
+ * 3ra opción (2026-07-25): 'zariguya' — la zarigüeya (crías al lomo, PR
+ * #2783), adaptador en ChagraAgentAvatarZariguya.jsx.
  */
-export default function ChagraAgentAvatar(props) {
+const STATE_DE_ESTADO_RICO = {
+    acompana: 'idle',
+    escuchando: 'listening',
+    pensando: 'thinking',
+    respondiendo: 'speaking',
+    contenta: 'speaking',
+    invita: 'speaking',
+};
+
+const AVATAR_ANGOSTO = {
+    maiz: ChagraAgentAvatarMaiz,
+    zariguya: ChagraAgentAvatarZariguya,
+};
+
+export default function ChagraAgentAvatar({ estado, ...props }) {
     const [type] = useAgentAvatarType();
-    if (type === 'maiz') return <ChagraAgentAvatarMaiz {...props} />;
+    const ComponenteAngosto = AVATAR_ANGOSTO[type];
+
+    if (estado !== undefined) {
+        // Call-site "rico": solo Angelita entiende el vocabulario completo;
+        // maíz/zarigüeya reciben la traducción angosta (idle/thinking/
+        // speaking/listening).
+        if (ComponenteAngosto) {
+            return <ComponenteAngosto state={STATE_DE_ESTADO_RICO[estado] || 'idle'} {...props} />;
+        }
+        return <Angelita estado={estado} {...props} />;
+    }
+
+    if (ComponenteAngosto) return <ComponenteAngosto {...props} />;
     // default → Angelita, el agente de Chagra.
     return <ChagraAgentAvatarAngelita {...props} />;
 }

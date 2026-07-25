@@ -22,6 +22,7 @@ import {
   NUTRICION_MILPA,
   SECCIONES_MILPA,
 } from '../../data/milpaFinca';
+import LaminaMaiz from './LaminaMaiz';
 import './milpa.css';
 
 /**
@@ -328,6 +329,21 @@ function SeccionSembrar() {
           Variedades del catálogo de Chagra (ficha de ciclo de cada especie). Escoja las
           adaptadas a su piso térmico y guarde su propia semilla criolla.
         </p>
+      </div>
+
+      {/* Lámina botánica de la mata de maíz — conocer sus partes antes de sembrar */}
+      <div className="space-y-3" data-testid="milpa-lamina-maiz">
+        <p className="flex items-center gap-2 text-sm font-black text-slate-100 uppercase tracking-wide">
+          <Wheat size={16} aria-hidden="true" className="text-amber-300" /> Conozca la mata de maíz
+        </p>
+        <p className="text-sm leading-relaxed text-slate-300">
+          Antes de sembrar, mírela por dentro: la caña con sus nudos, las hojas de lámina y
+          vaina, el <strong className="text-amber-200">penacho</strong> (la flor macho de arriba)
+          y la <strong className="text-amber-200">mazorca</strong> con sus barbas (la flor hembra)
+          donde se arman los granos. Saber cuál parte es cuál ayuda a entender cuándo está el choclo
+          y cuándo guardar la semilla.
+        </p>
+        <LaminaMaiz />
       </div>
 
       {/* Pasos de siembra: el arreglo espacial y la época */}

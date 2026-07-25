@@ -38,8 +38,9 @@
  * QUIÉN ES QUIÉN: la IDENTIDAD (paleta/medidas) sigue en abejaIdentidad.js y
  * _faunaRubberTokens.js; la CADENCIA CSS en creatures.css. Aquí vive SOLO la
  * conducta en el tiempo, parametrizada por especie: Angelita la estrena, y el
- * resto de la familia rubber-hose (oso, colibrí, rana andina, perezoso,
- * ardilla, jaguar, morrocoy, borugo) entra con su perfil sin tocar la máquina.
+ * resto de la familia rubber-hose (oso, colibrí, zariguya, rana andina,
+ * perezoso, ardilla, jaguar, morrocoy, borugo) entra con su perfil sin tocar
+ * la máquina.
  * Sin perfil propio un bicho caería al de la abeja — personalidad equivocada
  * por construcción — así que TODO personaje nuevo declara el suyo aquí.
  *
@@ -138,6 +139,20 @@ export const IDLE_PERFILES = {
     percha: { base: 46, jitter: 8, dur: 9 },
     celebra: { dur: 2.0, grados: 360 },
     noche: { freq: 0.55, amp: 0.07, rot: -8 },
+  },
+  /* Didelphis — la chucha nocturna CARGADA DE CRÍAS: pasos cortos y
+     frecuentes, se para a husmear cada nada (su "aseo" es tantear el aire) y
+     no da volteretas largas — lleva tres bichos en el lomo. De noche NO se
+     acurruca como los demás: es cuando sale a trabajar (freq alta, rot casi
+     nulo). */
+  zariguya: {
+    medio: 'suelo', poseBase: 'anda',
+    respira: { freq: 1.45, amp: 0.042, vaiven: 0.28 },
+    vuelta: { base: 31, jitter: 4, dur: 1.5, grados: 360, anticipo: 21 },
+    aseo: { base: 8, jitter: 2.5, dur: 1.1 },
+    percha: { base: 33, jitter: 6, dur: 5.5 },
+    celebra: { dur: 1.7, grados: 360 },
+    noche: { freq: 1.6, amp: 0.05, rot: -2 },
   },
   /* Atelopus spp. — la rana arlequín ZEN (slug real de RanaAndina.jsx y de
      creatures.css): la garganta late; su "vuelta" es la voltereta de brinco y

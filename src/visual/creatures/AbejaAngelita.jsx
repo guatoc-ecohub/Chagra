@@ -228,6 +228,29 @@ export function AbejaAngelita({
       {/* aura viva */}
       <circle r={auraR} fill={ABEJA_PALETA.cuerpo} opacity={auraOp} filter={`url(#${blur})`} />
 
+      {/* RUANA primero, bajo las alas (ARREGLO "la abeja parece burro"):
+          `AccesoriosClima` es especie-agnóstico y pinta la ruana OPACA y de
+          último — antes se pintaba junto a sombrero/sudor, DESPUÉS de las
+          alas (más abajo), tapándolas. Las alas son el rasgo que hace
+          reconocible la silueta de una abeja (sin ellas se lee como un
+          bulto con patas — un burro con poncho); el poncho además sube en
+          arco sobre el cuello (el "cuello en V") hasta invadir el espacio de
+          la segunda ala. Bastó reordenar EL PINTADO: la ruana sola, antes
+          de las alas, para que estas queden ENCIMA — cero cambios en
+          `AccesoriosClima.jsx` (sigue sirviendo igual al oso/colibrí/etc.)
+          ni en la lógica de la hora/clima (`ropaDeClimaBicho`, intacta).
+          Sombrero/sudor NO se tocan: siguen su lugar de siempre, después de
+          la cabeza (más abajo) — ese orden ya era correcto (el sombrero va
+          ENCIMA de la cabeza). */}
+      {ropa?.ruana && (
+        <AccesoriosClima
+          estado={{ ruana: true }}
+          tronco={{ cx: 0, cy: 0, rx: ABEJA_PROPORCION.troncoRx, ry: ABEJA_PROPORCION.troncoRy }}
+          cabeza={{ cx: 8.6, cy: -1.0, r: ABEJA_PROPORCION.cabezaR }}
+          animated={vivo}
+        />
+      )}
+
       {/* alitas de tul con contorno + smear (crt-wingbeat ya lleva el estirón).
           La duración del aleteo la modula el clima real (wingDur): dorada rápida,
           lluvia pesada. celebra/reposo (data-pose) mandan por especificidad CSS. */}
@@ -303,10 +326,13 @@ export function AbejaAngelita({
         {gafas && <GafasSol puesta={gafas === 'poniendose' ? 'poniendose' : 'puesta'} animated={vivo} />}
       </g>
 
-      {/* Vestuario por clima+hora (ruana/sombrero/sudor) — solo con vestuario=true. */}
-      {ropa && (
+      {/* Sombrero + sudor por clima+hora — solo con vestuario=true. La ruana
+          YA se pintó arriba, antes de las alas (ver el bloque de más arriba);
+          este orden (después de la cabeza) sigue siendo el correcto para el
+          sombrero, que debe quedar ENCIMA de la cabeza. */}
+      {(ropa?.sombrero || ropa?.sudor) && (
         <AccesoriosClima
-          estado={ropa}
+          estado={{ sombrero: ropa.sombrero, sudor: ropa.sudor }}
           tronco={{ cx: 0, cy: 0, rx: ABEJA_PROPORCION.troncoRx, ry: ABEJA_PROPORCION.troncoRy }}
           cabeza={{ cx: 8.6, cy: -1.0, r: ABEJA_PROPORCION.cabezaR }}
           animated={vivo}

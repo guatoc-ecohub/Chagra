@@ -21,7 +21,7 @@
  * las sombras de contacto; solo cutaway lo necesita (su bloque centra en 0).
  */
 import { Suspense, lazy, useMemo, useRef, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 import { AbejaEscena } from './useEntradaAbeja.jsx';
@@ -44,11 +44,40 @@ import useCicloDia from '../useCicloDia.js';
 import { presetDeHora } from '../cielosHoraData.js';
 import { perfilDeTier } from '../deviceTier.js';
 import CapaVivaMundo from '../CapaVivaMundo.jsx';
+/* Álgebra pura de anti-colisión de etiquetas 3D→pantalla (proyección + cajas
+   AABB), la MISMA que ya generaliza `RotulosLugares` (Valle3D.jsx) para el kit
+   `EtiquetasMundo` — se reusa aquí en vez de duplicarla una tercera vez; solo
+   la POLÍTICA de foco (abajo) es propia de los hotspots. */
+import { proyectarAPantalla, rectanguloDe, seSolapan } from '../kit/etiquetasAntiColision.js';
 
 /* El bloom sutil de la hora dorada: chunk LAZY con gate ESTRICTO
    `tier === 'alto' && !reducedMotion` — medio y bajo NI LO DESCARGAN
    (el import dinámico solo dispara cuando el elemento llega a renderizarse). */
 const BloomSutil = lazy(() => import('./BloomSutil.jsx'));
+
+/* ── ANTI-COLISIÓN de hotspots en pantalla (ARREGLO ETIQUETAS ENCIMADAS,
+ * SPEC-UX-01): el MISMO criterio ya aprobado de `RotulosLugares` (Valle3D.jsx)
+ * y su port `CartelesNombres` (CorralVivo.jsx) — portado a la base compartida
+ * por los 9 arquetipos que la componen (los otros 2 de la familia de 11 — el
+ * valle y su calma — no la usan: el valle ya trae su propio RotulosLugares,
+ * la calma no tiene hotspots).
+ *
+ * Sin esto, `EscenaBase3D` pintaba la etiqueta COMPLETA de cada hotspot sin
+ * saber de las demás: dos puntos de interés cercanos EN PANTALLA (cámara
+ * alejada, auto-rotate) quedaban con sus rótulos encimados e ilegibles.
+ *
+ * NOTA de política (por qué NO se llama `resolverModos` del kit tal cual):
+ * `resolverModos` deja que CUALQUIER punto intente 'pleno' (útil para chips
+ * didácticos sueltos). Los hotspots son botones de NAVEGACIÓN, no chips, y el
+ * criterio YA aprobado para ellos (RotulosLugares banda 'media' / CorralVivo
+ * `CartelesNombres`) es más calmo: SOLO el activo/enfocado intenta 'pleno' —
+ * los demás van derecho a 'punto'. Se reusa la geometría pura del kit
+ * (`proyectarAPantalla`/`rectanguloDe`/`seSolapan`) pero se mantiene ESA
+ * política aquí, para no romper la lectura ya validada del valle/corral.
+ *
+ * Reusado el scratch (cero basura de GC en el hilo caliente del useFrame).
+ */
+const _projHotspot = new THREE.Vector3();
 
 function Contenido({
   params, hotspots, entrada, tinte, reducedMotion, onHotspot, cielo, animo, energia, piso = 0,
@@ -66,6 +95,12 @@ function Contenido({
   // Háptica del tap (DR-3D-HAPTICA): un tick seco al tocar un hotspot —
   // "toqué algo vivo, respondió". Gate triple interno; no-op en iOS.
   const haptics = useHaptics({ reducedMotion });
+  // Anti-colisión de hotspots (ver bloque de arriba): refs de los botones +
+  // memoria del último "candidato" (histéresis anti-parpadeo, mismo criterio
+  // de RotulosLugares/CartelesNombres).
+  const botonesHotspot = useRef({});
+  const plenaHotspot = useRef(null);
+  const tickHotspot = useRef(0);
   const zoom = entrada?.zoom ?? 6.5;
   const acento = (tinte && tinte[0]) || '#3f8f4e';
   const centro = entrada?.centro || /** @type {[number, number, number]} */ ([0, (params?.alto ?? 1.1) * 0.5, 0]);
@@ -104,6 +139,63 @@ function Contenido({
       setResaltado({ id: focoId, token: focoToken });
     }
   }
+
+  // Anti-colisión de hotspots en pantalla (ver `rectoDeHotspot`/`seSolapanHotspot`
+  // arriba): ~12 pasadas/s (corre en el PRIMER frame — importa con
+  // frameloop='demand' de reduced-motion, que renderiza pocos frames), imperativo
+  // sobre `dataset` (cero re-render de React por cuadro). El hotspot `activo`
+  // (tocado, o el que acaba de enfocar un comando de voz — ambos setean `activo`
+  // arriba) manda su espacio primero; si no hay ninguno activo, el más cercano
+  // al centro del encuadre, con histéresis (solo cambia si otro queda 20% más
+  // centrado — anti-parpadeo). Los demás ceden a un punto-chip con solo el
+  // emoji; quien ni así cabe cede del todo (el CSS lo trae de vuelta si el
+  // teclado lo enfoca — mismo contrato que `.v3d-poi` del valle).
+  useFrame(({ camera, size }) => {
+    if (!hotspots || !hotspots.length) return;
+    if (tickHotspot.current++ % 5 !== 0) return;
+
+    const pts = hotspots.map((h) => {
+      _projHotspot.set(h.pos[0], h.pos[1], h.pos[2]);
+      const p = proyectarAPantalla(_projHotspot, _projHotspot, camera, size);
+      return {
+        id: h.id,
+        label: h.label || '',
+        ...p,
+        dc: Math.hypot(p.x - size.width / 2, p.y - size.height / 2),
+      };
+    });
+
+    let candidata = null;
+    if (activo && pts.some((p) => p.id === activo && !p.detras)) {
+      candidata = activo;
+    } else {
+      const previa = pts.find((p) => p.id === plenaHotspot.current && !p.detras);
+      const cercana = pts.filter((p) => !p.detras).sort((a, b) => a.dc - b.dc)[0];
+      candidata = previa && cercana && cercana.dc > previa.dc * 0.8 ? previa.id : (cercana?.id ?? null);
+    }
+    plenaHotspot.current = candidata;
+
+    const tomados = [];
+    const pisa = (r) => tomados.some((o) => seSolapan(r, o));
+    const orden = [...pts].sort((a, b) =>
+      a.id === candidata ? -1 : b.id === candidata ? 1 : a.dc - b.dc,
+    );
+    for (const p of orden) {
+      let modo = 'oculto';
+      if (!p.detras) {
+        const esPlena = p.id === candidata;
+        const r = esPlena
+          ? rectanguloDe(p.x, p.y, 76 + p.label.length * 9, 48)
+          : rectanguloDe(p.x, p.y, 44, 44);
+        if (!pisa(r)) {
+          tomados.push(r);
+          modo = esPlena ? 'plena' : 'punto';
+        }
+      }
+      const btn = botonesHotspot.current[p.id];
+      if (btn && btn.dataset.modo !== modo) btn.dataset.modo = modo;
+    }
+  });
 
   return (
     <>
@@ -183,7 +275,11 @@ function Contenido({
           <group key={h.id} position={h.pos}>
             <Html center distanceFactor={zoom + 2} zIndexRange={[30, 0]}>
               <button
+                ref={(el) => {
+                  botonesHotspot.current[h.id] = el;
+                }}
                 type="button"
+                data-modo={h.id === activo ? 'plena' : 'punto'}
                 className={`mundo-hotspot${activo === h.id ? ' mundo-hotspot--activo' : ''}${esComando ? ' mundo-hotspot--comando' : ''}`}
                 style={{ '--hs-tinte': acento }}
                 onPointerDown={(e) => e.stopPropagation()}

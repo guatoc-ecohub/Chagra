@@ -1,0 +1,27 @@
+<!doctype html>
+<!--
+  compai-gate-harness.html — Harness AISLADO, temporal, para verificar EN
+  VIVO el fix "el compAI elegido aparece en toda la app" (2026-07-25):
+  monta AgentAvatarSelector (real, 3 opciones) y AgentFab (real, boton
+  flotante) uno junto al otro, SIN pasar por login/auth (el backend de
+  autenticacion no esta disponible en este entorno de desarrollo). Clic en
+  una tarjeta del selector debe cambiar el FAB al instante (mismo hook
+  useAgentAvatarType + evento 'chagra:agent-avatar-changed').
+
+  NO participa de ningun test de regresion visual con snapshots (a
+  diferencia de component-harness.html) — es solo para captura manual de
+  la verificacion de este fix. Ver tests/visual/compai-gate-harness.jsx.
+
+  Uso: npx vite tests/visual/compai-gate-harness.html
+-->
+<html lang="es-CO">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>compAI gate — selector + FAB</title>
+  </head>
+  <body class="bg-slate-950 text-white">
+    <div id="gate-root"></div>
+    <script type="module" src="./compai-gate-harness.jsx"></script>
+  </body>
+</html>
