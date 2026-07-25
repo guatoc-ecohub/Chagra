@@ -104,6 +104,12 @@ export default function JaguarBillboard({
      omóplatos y baja la testa. Un data-attr en el wrapper no lo lograría: el
      CSS de creatures lee `[data-acecha]` en la RAÍZ del SVG, no en el padre. */
   const [acechando, setAcechando] = useState(false);
+  /* La MARCHA va por estado por la misma razón: cambia cada varios segundos.
+     Mientras el felino SE DESPLAZA (fases anda/acecha) el SVG recibe
+     pose='camina' — el rig de PERFIL con ciclo de patas real (sin esto el
+     billboard PATINA: se traslada con las patas quietas, el bug que reportó
+     el operador). Parado a observar vuelve al frontal majestuoso ('anda'). */
+  const [andando, setAndando] = useState(true);
 
   const yDe = (x, z) => (typeof suelo === 'function' ? suelo(x, z) : suelo);
 
@@ -130,7 +136,7 @@ export default function JaguarBillboard({
       px: inicio.x, pz: inicio.z,
       esp: 1, espT: 1,        // espejo (scaleX) suavizado
       proxAcecho: azar(26, 55),
-      lastTf: '', dataAcecha: false,
+      lastTf: '', dataAcecha: false, dataAnda: true,
       init: false,
     };
   }
@@ -205,6 +211,12 @@ export default function JaguarBillboard({
       s.dataAcecha = enAcecho;
       setAcechando(enAcecho);
     }
+    // ¿se está DESPLAZANDO? → marcha de perfil; ¿parado a observar? → frontal
+    const enMarcha = s.fase !== 'observa';
+    if (enMarcha !== s.dataAnda) {
+      s.dataAnda = enMarcha;
+      setAndando(enMarcha);
+    }
 
     /* ── SOMBRA DE CONTACTO pegada a las zarpas ────────────────────────────── */
     if (sombra.current) {
@@ -221,6 +233,7 @@ export default function JaguarBillboard({
           <div ref={capa} aria-hidden="true" data-vecino="jaguar" style={ESTILO_JAGUAR}>
             <Jaguar
               size={px}
+              pose={andando && animated ? 'camina' : 'anda'}
               animated={animated}
               tier={tier}
               clima={clima}
