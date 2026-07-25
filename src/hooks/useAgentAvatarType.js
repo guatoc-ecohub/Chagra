@@ -9,7 +9,11 @@ const STORAGE_KEY = 'chagra:agent-avatar-type';
 // nunca como cara del agente.
 //
 // 'maiz' = planta de maíz, alternativa cultural ancestral.
-export const AVATAR_TYPES = ['angelita', 'maiz'];
+//
+// 'zariguya' = la zarigüeya (crías al lomo), 3ra opción (2026-07-25, tras el
+// merge de `art(creatures): la zarigüeya entra al elenco — con las crías al
+// lomo (#2783)`). Adaptador en ChagraAgentAvatarZariguya.jsx.
+export const AVATAR_TYPES = ['angelita', 'maiz', 'zariguya'];
 export const DEFAULT_AVATAR_TYPE = 'angelita';
 
 // Nombre propio para copy que necesita NOMBRAR al compAI elegido (ej. "hábletele
@@ -20,6 +24,7 @@ export const DEFAULT_AVATAR_TYPE = 'angelita';
 export const AVATAR_NOMBRE = {
     angelita: 'Angelita',
     maiz: 'su planta de maíz',
+    zariguya: 'su zarigüeya',
 };
 
 // Slugs históricos guardados en localStorage de instalaciones viejas:

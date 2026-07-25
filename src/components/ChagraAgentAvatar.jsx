@@ -1,5 +1,6 @@
 import ChagraAgentAvatarMaiz from './ChagraAgentAvatarMaiz';
 import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
+import ChagraAgentAvatarZariguya from './ChagraAgentAvatarZariguya';
 import Angelita from '../visual/agente/Angelita';
 import useAgentAvatarType from '../hooks/useAgentAvatarType';
 
@@ -29,9 +30,13 @@ import useAgentAvatarType from '../hooks/useAgentAvatarType';
  * 'contenta', 'invita', 'acompana'— importaban `<Angelita>` CRUDO, sin pasar
  * por este dispatcher, así que ignoraban la elección del usuario (AgentFab,
  * AgentHero, FincaVivaHero, ColibriTransition). Se acepta ahora una prop
- * alterna `estado` (en vez de `state`) para esos call-sites: si type==='maiz'
- * se traduce al vocabulario angosto que el maíz entiende; si es Angelita, pasa
+ * alterna `estado` (en vez de `state`) para esos call-sites: si el tipo
+ * elegido no es Angelita, se traduce al vocabulario angosto (idle/thinking/
+ * speaking/listening) que maíz y zarigüeya entienden; si es Angelita, pasa
  * directo sin perder fidelidad.
+ *
+ * 3ra opción (2026-07-25): 'zariguya' — la zarigüeya (crías al lomo, PR
+ * #2783), adaptador en ChagraAgentAvatarZariguya.jsx.
  */
 const STATE_DE_ESTADO_RICO = {
     acompana: 'idle',
@@ -42,19 +47,26 @@ const STATE_DE_ESTADO_RICO = {
     invita: 'speaking',
 };
 
+const AVATAR_ANGOSTO = {
+    maiz: ChagraAgentAvatarMaiz,
+    zariguya: ChagraAgentAvatarZariguya,
+};
+
 export default function ChagraAgentAvatar({ estado, ...props }) {
     const [type] = useAgentAvatarType();
+    const ComponenteAngosto = AVATAR_ANGOSTO[type];
 
     if (estado !== undefined) {
         // Call-site "rico": solo Angelita entiende el vocabulario completo;
-        // el maíz recibe la traducción angosta (idle/thinking/speaking/listening).
-        if (type === 'maiz') {
-            return <ChagraAgentAvatarMaiz state={STATE_DE_ESTADO_RICO[estado] || 'idle'} {...props} />;
+        // maíz/zarigüeya reciben la traducción angosta (idle/thinking/
+        // speaking/listening).
+        if (ComponenteAngosto) {
+            return <ComponenteAngosto state={STATE_DE_ESTADO_RICO[estado] || 'idle'} {...props} />;
         }
         return <Angelita estado={estado} {...props} />;
     }
 
-    if (type === 'maiz') return <ChagraAgentAvatarMaiz {...props} />;
+    if (ComponenteAngosto) return <ComponenteAngosto {...props} />;
     // default → Angelita, el agente de Chagra.
     return <ChagraAgentAvatarAngelita {...props} />;
 }
