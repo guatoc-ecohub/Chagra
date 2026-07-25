@@ -105,6 +105,51 @@
   line-height: 1;
 }
 
+/* ── ANTI-COLISIÓN en pantalla (SPEC-UX-01 — mismo criterio de `.v3d-poi` del
+      valle 3D / `RotulosLugares`, portado a los hotspots del framework base):
+      con dos o más puntos de interés cerca EN PANTALLA (cámara alejada,
+      auto-rotate), el botón deja de crecer con su texto y se calma a un
+      punto-chip de 44px — `data-modo` lo escribe `EscenaBase3D` en un
+      `useFrame` imperativo (cero re-render). El activo (tocado, o el más
+      cercano al centro del encuadre) conserva su nombre completo. ── */
+.mundo-hotspot[data-modo='punto'] {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  gap: 0;
+}
+.mundo-hotspot[data-modo='punto'] .mundo-hotspot__txt {
+  display: none;
+}
+.mundo-hotspot[data-modo='punto'] .mundo-hotspot__emoji {
+  font-size: 1.35rem;
+}
+/* Cedió del todo el espacio (ni el punto-chip cabe ya): se retira de la vista
+   y del toque MIENTRAS esté oculto. El teclado (Tab) lo trae de vuelta
+   entero — nunca deja una puerta del mundo inalcanzable. */
+.mundo-hotspot[data-modo='oculto'] {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.mundo-hotspot[data-modo='oculto']:focus-visible {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  width: auto;
+  height: auto;
+  padding: 0.4em 0.85em 0.4em 0.5em;
+  gap: 0.4em;
+}
+.mundo-hotspot[data-modo='oculto']:focus-visible .mundo-hotspot__txt {
+  display: inline;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mundo-hotspot[data-modo] {
+    transition: none;
+  }
+}
+
 /* ── Placa del animal (corral-espejo): el toque abre nombre + raza + tamaño
       (+ estado). Misma familia de papel que el hotspot; tocar de nuevo cierra.
       Piso táctil ≥44px (WCAG 2.5.5) y señal de estado que no es solo color. */
