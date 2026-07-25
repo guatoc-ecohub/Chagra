@@ -180,6 +180,8 @@ const LAZY_MAP = {
   AprenderConAgente: lazy(() => import('../components/Aprende/AprenderConAgente.jsx')),
   CursoChagra: lazy(() => import('../components/curso/CursoChagra.jsx')),
   DashboardLive: lazy(() => import('../components/dashboard/DashboardLive.jsx')),
+  // Reactivada (fix 2026-07-25, sacada de EXCLUIDO — ver rutasProdChagraApp.js).
+  EntradaCampesina: lazy(() => import('../mockups/EntradaCampesina.jsx')),
 
   // ── PENDIENTE_DECISION (operador dijo "nada afuera") ────────────
   OnboardingCondensado: lazy(() => import('../components/OnboardingCondensado.jsx')),
