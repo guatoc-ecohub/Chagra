@@ -21,7 +21,7 @@
 
 import { streamOllama } from './ollamaStream';
 import { retrieve } from './ragRetriever';
-import { callTool, isSidecarEnabled, judgeVision } from './sidecarClient';
+import { callTool, isSidecarEnabled, judgeVisionAsync } from './sidecarClient';
 import { parseJsonTolerant } from '../utils/parseJsonTolerant';
 import { hashImage, getCached, setCached } from './visionCacheService';
 
@@ -499,10 +499,19 @@ export const recognizeSpeciesGrounded = async (imageBlob, options = {}) => {
   // confirmó que el NOMBRE existe en catálogo, pero no que la imagen coincida
   // (el modelo de visión pudo alucinar el binomial). Best-effort: el sidecar
   // capa a 500 ms y nunca bloquea; cualquier fallo → null (no degrada la UX).
+  // Gate ASYNC (#328): el juez local tarda ~16-23s (minicpm-v:8b en CPU, fuera de
+  // la VRAM del agente); el sync `/judge-vision` lo abortaba el propio cliente a
+  // TOOL_TIMEOUT_MS=5s → veredicto SIEMPRE null (gate muerto). Encolamos SIN
+  // bloquear el diagnóstico (no metemos 20s de latencia a la foto). `_grounded.judge`
+  // queda `{status:'async', request_id}`; el veredicto se recoge luego con
+  // `judgeVisionResult(request_id)` (badge que se resuelve solo). Best-effort:
+  // cualquier fallo → null (no degrada la UX, igual que antes).
   const runJudge = async (speciesId) => {
     try {
       const b64 = await blobToBase64(imageBlob);
-      return await judgeVision(speciesId, b64);
+      const q = await judgeVisionAsync(speciesId, b64);
+      if (!q || !q.request_id) return null;
+      return { status: 'async', request_id: q.request_id };
     } catch (_) {
       return null;
     }
