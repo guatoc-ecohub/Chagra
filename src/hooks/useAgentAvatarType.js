@@ -9,8 +9,23 @@ const STORAGE_KEY = 'chagra:agent-avatar-type';
 // nunca como cara del agente.
 //
 // 'maiz' = planta de maíz, alternativa cultural ancestral.
-export const AVATAR_TYPES = ['angelita', 'maiz'];
+//
+// 'zariguya' = la zarigüeya (crías al lomo), 3ra opción (2026-07-25, tras el
+// merge de `art(creatures): la zarigüeya entra al elenco — con las crías al
+// lomo (#2783)`). Adaptador en ChagraAgentAvatarZariguya.jsx.
+export const AVATAR_TYPES = ['angelita', 'maiz', 'zariguya'];
 export const DEFAULT_AVATAR_TYPE = 'angelita';
+
+// Nombre propio para copy que necesita NOMBRAR al compAI elegido (ej. "hábletele
+// a X", el rótulo visible de la transición home→conversación). Los ariaLabel
+// genéricos de los avatares siguen diciendo "Chagra IA" (convención ya usada
+// en WelcomeStatsHero, ChatBubble, AgentHero, InsightProactivoCard, etc.) —
+// este mapa es SOLO para los pocos textos que sí necesitan el nombre propio.
+export const AVATAR_NOMBRE = {
+    angelita: 'Angelita',
+    maiz: 'su planta de maíz',
+    zariguya: 'su zarigüeya',
+};
 
 // Slugs históricos guardados en localStorage de instalaciones viejas:
 // ambos colibríes migran a Angelita sin que el usuario haga nada.
