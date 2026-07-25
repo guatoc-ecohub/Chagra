@@ -27,6 +27,8 @@
  *   · terreno.js      construirTerreno (heightfield con color por vértice)
  *   · atmosfera.js    atmosferaDeFamilia + useAtmosferaMundo (hora viva del valle)
  *   · AtmosferaMundo  el drop-in <color>/<fog>/luces/estrellas/sombras
+ *   · EtiquetasMundo  etiquetas 3D→pantalla que NUNCA se pisan (anti-colisión
+ *                     + foco), extraído de `RotulosLugares` del valle
  *   + re-exports de las piezas madre ya probadas (paleta, cielos, tier, cámara,
  *     transiciones, sombra de contacto, ciclo diurno).
  */
@@ -68,6 +70,12 @@ export { decidirTier, permite3D, perfilDeTier } from '../deviceTier.js';
 
 /* ── Sombra de contacto / AO barato ─────────────────────────────────────────── */
 export { SombraContacto } from '../escenas/SombraContacto.jsx';
+
+/* ── Etiquetas 3D→pantalla que no se pisan (anti-colisión + foco) ──────────── */
+export { default as EtiquetasMundo } from './EtiquetasMundo.jsx';
+export {
+  proyectarAPantalla, rectanguloDe, seSolapan, clamp1D, anchoDeChip, resolverModos,
+} from './etiquetasAntiColision.js';
 
 /* ── Cámara (establishing shot + encuadres por mundo) ───────────────────────── */
 export { default as CamaraDirector } from '../escenas/CamaraDirector.jsx';
