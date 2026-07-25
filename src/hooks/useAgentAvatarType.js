@@ -12,6 +12,16 @@ const STORAGE_KEY = 'chagra:agent-avatar-type';
 export const AVATAR_TYPES = ['angelita', 'maiz'];
 export const DEFAULT_AVATAR_TYPE = 'angelita';
 
+// Nombre propio para copy que necesita NOMBRAR al compAI elegido (ej. "hábletele
+// a X", el rótulo visible de la transición home→conversación). Los ariaLabel
+// genéricos de los avatares siguen diciendo "Chagra IA" (convención ya usada
+// en WelcomeStatsHero, ChatBubble, AgentHero, InsightProactivoCard, etc.) —
+// este mapa es SOLO para los pocos textos que sí necesitan el nombre propio.
+export const AVATAR_NOMBRE = {
+    angelita: 'Angelita',
+    maiz: 'su planta de maíz',
+};
+
 // Slugs históricos guardados en localStorage de instalaciones viejas:
 // ambos colibríes migran a Angelita sin que el usuario haga nada.
 const LEGACY_TYPES = { colibri: 'angelita', colibri_svg: 'angelita' };

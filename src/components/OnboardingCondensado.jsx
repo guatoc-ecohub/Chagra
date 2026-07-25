@@ -13,7 +13,8 @@ import {
   AlertCircle,
   SkipForward,
 } from 'lucide-react';
-import ChagraAgentAvatarAngelita from './ChagraAgentAvatarAngelita';
+import ChagraAgentAvatar from './ChagraAgentAvatar';
+import useAgentAvatarType, { AVATAR_NOMBRE, DEFAULT_AVATAR_TYPE } from '../hooks/useAgentAvatarType';
 import AvatarSelector from './Settings/AvatarSelector';
 import { useGeolocation } from '../hooks/useGeolocation';
 import {
@@ -65,9 +66,11 @@ import usePerfilFincaStore from '../store/usePerfilFincaStore';
  * la ubicación GUARDADA del perfil).
  *
  * Visual: tokens de tema existentes (onboarding-piso-primary/secondary,
- * bienvenida-costura como progreso), colibrí como guía, botón "Escuchar"
- * (TTS perezoso), tarjetas grandes con emoji (baja alfabetización), avance
- * automático en elección única. Español colombiano (usted, SIN voseo).
+ * bienvenida-costura como progreso), el compAI elegido como guía (fix
+ * 2026-07-25: antes decía "colibrí", jubilado como cara del agente desde
+ * 2026-07-18), botón "Escuchar" (TTS perezoso), tarjetas grandes con emoji
+ * (baja alfabetización), avance automático en elección única. Español
+ * colombiano (usted, SIN voseo).
  *
  * Props:
  *   - onComplete(profile): al terminar o saltar todo.
@@ -352,6 +355,11 @@ export default function OnboardingCondensado({
 }) {
   const [paso, setPaso] = useState(0);
   const [sembrando, setSembrando] = useState(false);
+  // El compAI que el usuario ya eligió (o Angelita por defecto, ver
+  // useAgentAvatarType) — fix 2026-07-25: antes esta pantalla mostraba
+  // Angelita SIEMPRE, sin importar la elección, y despedía al usuario
+  // nombrando al colibrí jubilado.
+  const [avatarType] = useAgentAvatarType();
   // Marca de inicio para onboarding_tiempo_segundos (regla react: nada impuro
   // en render — se fija una sola vez al montar).
   const startedAtRef = useRef(null);
@@ -667,7 +675,7 @@ export default function OnboardingCondensado({
           <>
             <div className="flex items-center gap-4">
               <div className="shrink-0">
-                <ChagraAgentAvatarAngelita size={96} state="idle" ariaLabel="Angelita, la abeja de Chagra" />
+                <ChagraAgentAvatar size={96} state="idle" ariaLabel="Chagra IA" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-2xl font-black leading-tight text-slate-100">
@@ -1159,7 +1167,7 @@ export default function OnboardingCondensado({
         {/* ═══ LISTO ═══ */}
         {paso === 6 && (
           <div className="flex-1 flex flex-col items-center justify-center text-center gap-5">
-            <ChagraAgentAvatarAngelita size={168} state="speaking" ariaLabel="Angelita, la abeja de Chagra" />
+            <ChagraAgentAvatar size={168} state="speaking" ariaLabel="Chagra IA" />
             <div className="flex flex-col gap-2">
               <h1 className="text-3xl font-black leading-tight text-slate-100">
                 Su finca está lista 🌱
@@ -1169,7 +1177,7 @@ export default function OnboardingCondensado({
                 {pisoInfo ? ` · clima ${pisoInfo.label.toLowerCase()}` : ''}
               </p>
               <p className="text-sm text-slate-400">
-                Ahora háblele al colibrí: «Hola Chagra, ¿cuándo abono el café?»
+                Ahora háblele a {AVATAR_NOMBRE[avatarType] || AVATAR_NOMBRE[DEFAULT_AVATAR_TYPE]}: «Hola Chagra, ¿cuándo abono el café?»
               </p>
             </div>
           </div>
