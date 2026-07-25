@@ -138,7 +138,7 @@ export const GuildSuggestions = ({ speciesId, onSelectCompanion }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma3:4b',
+          model: 'qwen3.5:4b',
           stream: false,
           messages: [
             { role: 'system', content: 'Asistente de diseño de gremios agroecológicos. Responde SOLO en JSON válido, sin texto adicional.' },

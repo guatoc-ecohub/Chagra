@@ -534,7 +534,7 @@ export default function TelemetryAlerts() {
         const content = await streamOllama(
           `${OLLAMA_URL}/api/chat`,
           {
-            model: 'gemma3:4b',
+            model: 'qwen3.5:4b',
             messages: [
               { role: 'system', content: 'Asistente agronómico para finca agroecológica andina (2400msnm). PROHIBIDO recomendar agroquímicos sintéticos. Solo biopreparados orgánicos (biol, caldo sulfocálcico, caldo bordelés, purín de ortiga, compost tea, microorganismos de montaña, Trichoderma). Responde en máximo 3 frases concisas, sin superlativos, sin repetir información.' },
               { role: 'user', content: userPrompt },
@@ -549,7 +549,7 @@ export default function TelemetryAlerts() {
             onDone: (parsed) => {
               if (parentSignal?.aborted) return;
               setAiMeta({
-                model: parsed.model || 'gemma3:4b',
+                model: parsed.model || 'qwen3.5:4b',
                 totalDuration: parsed.total_duration ? (parsed.total_duration / 1e9).toFixed(1) : null,
                 evalCount: parsed.eval_count || null,
                 promptTokens: parsed.prompt_eval_count || null,
