@@ -1,5 +1,11 @@
 # `src/visual/creatures` — personajes de fauna reutilizables
 
+> **LA LEY**: la guía de consistencia rubber-hose (los dos registros, los
+> parámetros canónicos, cómo montar un personaje nuevo y el checklist de
+> revisión) vive en **`src/visual/GUIA-RUBBERHOSE.md`**; sus valores, como
+> datos, en **`rubberhoseSpec.js`**. Un personaje aprobado se ve IGUAL en
+> todas partes — por construcción, no por buena intención.
+
 Librería de **personajes de fauna de la chagra** como componentes SVG limpios,
 parametrizables y sin dependencias nuevas. Nace para **dejar de redibujar el
 mismo bicho** en cada mockup/escena: hoy el colibrí, la abeja angelita, la
