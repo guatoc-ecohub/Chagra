@@ -693,13 +693,18 @@ const ESTILO_ANGELITA = {
   willChange: 'transform',
 };
 
-/* Escribe el transform del billboard una sola vez por cambio real: el flip de
-   rumbo (mira hacia donde va) y la escala de entrar/salir de la piquera. */
+/* Escribe el transform del billboard cuando cambia de verdad: el flip de
+   rumbo (mira hacia donde va) y la escala de entrar/salir de la piquera.
+   `dir` ahora es CONTINUO (dirV suavizado en el useFrame, no el ±1 crudo de
+   `e.dir`) para que el giro pase por 0 como una hoja de papel en vez de
+   espejarse en un solo cuadro. El umbral baja de 0.02 a 0.005: con un valor
+   continuo, 0.02 se tragaba varios cuadros de la transición y el giro se
+   veía a saltos en vez de fluido. */
 function pintar(capa, ref, dir, k) {
   if (!capa) return;
-  if (ref.dir === dir && Math.abs(ref.k - k) < 0.02) return;
+  if (Math.abs(ref.dir - dir) < 0.005 && Math.abs(ref.k - k) < 0.005) return;
   ref.dir = dir; ref.k = k;
-  capa.style.transform = `scale(${k.toFixed(2)}) scaleX(${dir})`;
+  capa.style.transform = `scale(${k.toFixed(2)}) scaleX(${dir.toFixed(2)})`;
 }
 
 /* UNA Angelita forrajera con su CICLO completo:
@@ -712,7 +717,9 @@ function pintar(capa, ref, dir, k) {
 function AbejaForrajera({ datos, reducedMotion, rastro = true }) {
   const grupo = useRef(/** @type {any} */ (null));
   const capa = useRef(/** @type {HTMLDivElement|null} */ (null));
-  const pincel = useRef({ dir: 1, k: 1 });
+  /* `dir` es el último valor PINTADO (lo que compara `pintar`); `dirV` es el
+     rumbo SUAVIZADO que persigue a `e.dir` cuadro a cuadro (el giro real). */
+  const pincel = useRef({ dir: 1, dirV: 1, k: 1 });
   const [libando, setLibando] = useState(reducedMotion);
 
   const paradas = useMemo(() => {
@@ -725,7 +732,7 @@ function AbejaForrajera({ datos, reducedMotion, rastro = true }) {
   /* vector de trabajo en un ref (no en useMemo): se escribe cuadro a cuadro */
   const aux = useRef(new THREE.Vector3());
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, delta) => {
     const g = grupo.current;
     if (!g || reducedMotion) return;
     const t = clock.elapsedTime;
@@ -761,10 +768,15 @@ function AbejaForrajera({ datos, reducedMotion, rastro = true }) {
       const v = aux.current;
       v.lerpVectors(e.desde, parada.p, s);
       /* el arco del viaje + el bamboleo del vuelo lento y flotante del
-         meliponino (no la línea recta de un dron) */
-      v.y += Math.sin(Math.PI * u) * e.arco;
-      v.x += Math.sin(t * 4.6 + datos.fase) * 0.06 * (1 - s);
-      v.z += Math.cos(t * 3.9 + datos.fase) * 0.05 * (1 - s);
+         meliponino (no la línea recta de un dron). El sobre del bamboleo va
+         en Math.sin(PI*u) — CERO en ambos extremos — igual que el arco de
+         altura: con (1-s) quedaba en amplitud PLENA justo al salir de
+         `e.desde` (la flor exacta) y la abeja daba un salto de ~0.06u en el
+         primer cuadro del tramo. */
+      const sobre = Math.sin(Math.PI * u);
+      v.y += sobre * e.arco;
+      v.x += Math.sin(t * 4.6 + datos.fase) * 0.06 * sobre;
+      v.z += Math.cos(t * 3.9 + datos.fase) * 0.05 * sobre;
       g.position.copy(v);
       /* va soltando polen mientras viaja: la sarta ámbar ES el recorrido
          flor→flor. Cada ~0,08s una mota bajo el cuerpo, con leve deriva. */
@@ -779,6 +791,7 @@ function AbejaForrajera({ datos, reducedMotion, rastro = true }) {
       if (u >= 1) {
         e.fase = parada.tipo === 'flor' ? 'posada' : 'boca';
         e.t0 = t;
+        e.anticipado = false; // rearma el disparo de anticipación de la próxima posada
         if (parada.tipo === 'flor') setLibando(true);
       }
     } else if (e.fase === 'posada') {
@@ -787,6 +800,16 @@ function AbejaForrajera({ datos, reducedMotion, rastro = true }) {
       g.position.copy(parada.p);
       g.position.y += Math.abs(Math.sin(t * 2.4 + datos.fase)) * 0.025;
       VISITAS[parada.i] = 1;
+      /* ANTICIPACIÓN del giro: ~0.15s antes de que cierre la posada, ya se
+         sabe hacia dónde sigue (la próxima parada) — se adelanta `e.dir`
+         mientras la abeja SIGUE quieta, así el dirV suavizado llega ya girado
+         cuando arranca a volar (si el flip esperara al vuelo, la abeja saldría
+         "atrasada" mirando para el lado viejo). */
+      if (!e.anticipado && datos.posa - (t - e.t0) <= 0.15) {
+        e.anticipado = true;
+        const siguiente = paradas[(e.destino + 1) % paradas.length].p;
+        e.dir = siguiente.x < parada.p.x - 0.05 ? -1 : siguiente.x > parada.p.x + 0.05 ? 1 : e.dir;
+      }
       if (t - e.t0 > datos.posa) { setLibando(false); avanzar(parada.p); }
     } else if (e.fase === 'boca') {
       /* en la boca de la piquera, tanteando con las antenas antes de entrar */
@@ -813,7 +836,11 @@ function AbejaForrajera({ datos, reducedMotion, rastro = true }) {
       k = u;
       if (u >= 1) avanzar(parada.p);
     }
-    pintar(capa.current, pincel.current, e.dir, k);
+    /* dirV persigue a e.dir (±1 discreto) con suavizado exponencial por
+       delta: ~0.2s para cruzar por 0 y girar "como papel" en vez del flip de
+       espejo en un solo cuadro (delta*9 → tau≈0.11s, ~3 taus ≈ 0.2s). */
+    pincel.current.dirV += (e.dir - pincel.current.dirV) * Math.min(1, delta * 9);
+    pintar(capa.current, pincel.current, pincel.current.dirV, k);
   });
 
   const inicio = reducedMotion ? paradas[0].p : PIQUERAS[datos.casa].boca;
