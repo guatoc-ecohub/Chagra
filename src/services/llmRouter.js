@@ -169,7 +169,12 @@ export const ROUTES = {
     // presencia SIEMPRE emparejada con su ausencia — que no se re-testeó
     // con el dataset nuevo).
     model: ENV.VISION_MODEL,
-    keep_alive_min: 0,
+    // 2026-07-26 — ERA 0, decisión del operador: QUITARLO. El 0 venía de
+    // cuando visión era `qwen3-vl:8b` y "no cabía" junto al chat en 12 GiB.
+    // Medido, esa premisa es falsa: los dos modelos conviven (9691/12288 MiB)
+    // y con keep_alive normal la foto baja de ~8,5 s a 0,8 s. Ver
+    // `keepAliveEfectivo` abajo para la medición completa y la guarda.
+    keep_alive_min: 10,
     temperature: 0.2,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
@@ -212,6 +217,42 @@ export function getModelFor(task) {
  *   ]);
  *   const response = await streamOpenAI(url, body, onToken);
  */
+/**
+ * keep_alive efectivo de una ruta. **La guarda que faltaba.**
+ *
+ * `keep_alive: 0` significa "descargá el modelo apenas contestes". Es una
+ * estrategia legítima cuando la ruta usa un modelo PROPIO (se carga, responde
+ * y libera la GPU). Pero desde que los roles se unificaron en un solo modelo
+ * (`config/env.js`: chat, nlu, extractor, complex y visión son todos
+ * `qwen3.5:4b`), ese 0 dejó de liberar a un invitado y pasó a **echar al
+ * dueño de casa**: cada turno con foto le decía a Ollama que descargara el
+ * modelo del que depende el chat, y el siguiente mensaje pagaba el arranque
+ * en frío completo.
+ *
+ * MEDIDO en alpha (2026-07-26, Quadro M6000 12 GiB):
+ *   · el mecanismo, probado con un modelo señuelo para no tocar producción:
+ *     `gemma3:4b` residente + una petición con `keep_alive:0` → desaparece.
+ *   · el costo, en el carril de visión: con 0, cada foto paga carga en frío
+ *     (8,51 s y 5,72 s). Con `keep_alive` normal: 6,70 s la primera y luego
+ *     **0,80 s y 0,78 s**.
+ *   · y no hacía falta: `qwen3.5:4b` (6,0 GB) y `qwen3-vl:4b` (4,8 GB)
+ *     CONVIVEN en 9691 de 12288 MiB. La premisa de que no cabían era falsa.
+ *
+ * Por eso la regla es estructural y no ruta-por-ruta: **ninguna ruta puede
+ * pedir la descarga del modelo que sirve el chat.** Si una ruta futura vuelve
+ * a compartir modelo con el chat, queda protegida sola.
+ *
+ * @param {ModelRoute} route
+ * @returns {number} minutos de keep_alive a enviar.
+ */
+export function keepAliveEfectivo(route) {
+  const min = Number(route?.keep_alive_min) || 0;
+  if (min > 0) return min;
+  // Comparte modelo con el chat → jamás 0: se hereda el del chat.
+  if (route?.model && route.model === ROUTES.chat.model) return ROUTES.chat.keep_alive_min;
+  return min;
+}
+
 export function buildLLMRequest(task, messages, overrides = {}) {
   const route = getModelFor(task);
   const body = {
@@ -221,7 +262,8 @@ export function buildLLMRequest(task, messages, overrides = {}) {
     max_tokens: overrides.max_tokens ?? route.max_tokens,
     // keep_alive controla cuánto Ollama mantiene el modelo en RAM tras
     // esta request. Formato Ollama: número en segundos o sufijo "m"/"h".
-    keep_alive: `${route.keep_alive_min}m`,
+    // Pasa por la guarda: una ruta nunca descarga el modelo del chat.
+    keep_alive: `${keepAliveEfectivo(route)}m`,
   };
   // BUG A fix (2026-05-30): forward stop sequences (de la ruta o del
   // override). Ollama OpenAI-compat respeta `stop` (string[]). Solo se
