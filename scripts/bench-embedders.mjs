@@ -112,10 +112,19 @@ function rankMetrics(rankings, goldenItems) {
   let r1 = 0, r3 = 0, r5 = 0, rr = 0;
   const n = goldenItems.length;
   for (const { expectedSlug, ranked } of rankings) {
-    const pos = ranked.indexOf(expectedSlug); // 0-based
+    const pos = ranked.indexOf(expectedSlug); // 0-based, -1 si no aparece
     if (pos === 0) r1++;
-    if (pos <= 2) r3++;
-    if (pos <= 4) r5++;
+    // BUG FIX (encontrado armando el bench de reranker en feat/rag-reranker):
+    // sin el `pos >= 0 &&`, un expectedSlug que NO existe en el corpus
+    // (indexOf devuelve -1) contaba como HIT automático de recall@3/@5
+    // porque -1 <= 2 y -1 <= 4 son ambos true en JS. Afectaba a 15/44 items
+    // evaluables del golden (slugs base como solanum_tuberosum/lactuca_sativa
+    // que el catálogo ya solo tiene como variedades, ej.
+    // solanum_tuberosum_pastusa_suprema) e inflaba recall@3 70.5%→36.4% real
+    // y recall@5 75%→40.9% real. recall@1 y MRR no estaban afectados (ya
+    // tenían el guard correcto).
+    if (pos >= 0 && pos <= 2) r3++;
+    if (pos >= 0 && pos <= 4) r5++;
     if (pos >= 0) rr += 1 / (pos + 1);
   }
   return {

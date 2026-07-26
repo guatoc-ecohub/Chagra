@@ -51,7 +51,7 @@ import { fvhSkinClass } from '../../config/fvhSkin';
  * @param {Function} [props.onNavigate]
  */
 export default function MiFincaVivaScreen({ onBack, onHome, onNavigate }) {
-  const profile = useMemo(() => getProfile() || {}, []);
+  const profile = useMemo(() => getProfile(), []);
   const fincaSlug = profile.fincaSlug || profile.slug || 'default';
 
   // Audio on/off — comparte la preferencia con el sonido del agente, así un solo

@@ -66,6 +66,19 @@ import DemoModeBanner from './components/DemoModeBanner';
 import CriticalAlertBanner from './components/CriticalAlertBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ErrorFallback } from './components/common/ErrorFallback';
+// Badge "N pendientes de sincronizar" (rescate #2668 → cableado): offline-first,
+// el campesino necesita saber si lo que registró ya subió o sigue en cola.
+// Complementa a NetworkStatusBar/SyncProgressIndicator (ver SyncIndicator.jsx):
+// esos son transicionales (aparecen en online/offline/syncComplete y se
+// esconden solos); este es un recordatorio PERSISTENTE mientras pending > 0,
+// incluso si la app arrancó ya online con la cola vieja sin disparar eventos.
+import SyncIndicator from './components/SyncIndicator';
+// Modo lectura (letra grande) para adultos mayores (rescate #2668 → cableado).
+// Se monta acá SOLO por su efecto de boot: relee localStorage y reaplica la
+// clase `chagra-lectura-grande` en <html> al cargar la app (si no se llama
+// desde algún componente montado siempre, el ajuste elegido en Perfil no
+// sobreviviría a un refresh). El toggle real vive en ProfileScreen.
+import { useModoLectura, CSS_LECTURA_GRANDE } from './hooks/useModoLectura';
 
 // Lazy-loaded route components
 const LoginScreen = lazy(() => import('./components/LoginScreen'));
@@ -156,6 +169,13 @@ const HojaPruebaValleMockup = lazy(() => import('./mockups/HojaPruebaValle'));
 // Polylepis) — mallas three reales (tronco retorcido con rostro tallado, copa
 // instanciada), device-tiering real. Ruta #/mockups/bosque-vivo-3d, sin auth.
 const BosqueVivo3DMockup = lazy(() => import('./mockups/BosqueVivo3D'));
+// 3D: el PÁRAMO DEFINITIVO (2026-07-22) — el mundo ÚNICO del páramo: la escena
+// del bosque vivo (iluminación + vegetación + niebla en capas + fauna) con la
+// cámara de la llegada y el fondo de inmensidad del páramo viejo, el suelo
+// rico dorado y el frailejonal por edades. Sin Ent ni campesino (decisión del
+// operador). Reemplaza a BosqueVivo3D, MundoParamo3D y SueloDemo3D (los tres
+// archivados en src/mockups/_archivo/). Ruta #/mockups/paramo-definitivo.
+const ParamoDefinitivoMockup = lazy(() => import('./visual/mundo3d/bosque/MundoEntBosque.jsx'));
 // 3D: el MUNDO DEL CAFÉ — el cafetal bajo sombra del piso templado: surcos a
 // curva de nivel, cereza madurando verde→pintón→rojo por instancia, el sombrío
 // de guamos y nogales, y la casa-beneficiadero en la bruma. Device-tiering
@@ -189,6 +209,12 @@ const CacaoVivo3DMockup = lazy(() => import('./mockups/CacaoVivo3D'));
 // blanca por instancia, la cosecha de criollas (amarilla/roja/morada) y los
 // frailejones en silueta. Device-tiering real. Ruta #/mockups/papa-viva-3d, sin auth.
 const PapaVivo3DMockup = lazy(() => import('./mockups/PapaVivo3D'));
+// 3D: el MUNDO DE LOS FRUTALES — mango y cítricos juntos, porque juntos
+// enseñan el PISO TÉRMICO: el mango es de tierra caliente y el cítrico sube al
+// clima medio. La escala relativa es la lección: el mango eclipsa al cítrico.
+// Brote de hoja vino del mango, panícula terminal, pecíolo alado y espinas del
+// cítrico. Device-tiering real. Ruta #/mockups/frutales-vivo-3d, sin auth.
+const FrutalesVivo3DMockup = lazy(() => import('./mockups/FrutalesVivo3D'));
 // 3D: el MUNDO DE LOS ESTANQUES — la piscicultura de la finca por piso térmico
 // en una sola ladera: la quebrada baja al estanque frío (trucha, agua
 // oxigenada), el caño sigue al estanque cálido (mojarra + cachama en
@@ -258,10 +284,32 @@ const ValleNoche3DMockup = lazy(() => import('./mockups/ValleNoche3D'));
 const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 // 3D: el PÁRAMO altoandino — el ecosistema de la niebla (frailejones, musgo,
 // quenuas, aves) y el NACIMIENTO del agua. Didáctico: la fábrica de agua.
-const MundoParamo3DMockup = lazy(() => import('./mockups/MundoParamo3D'));
+// MERGE dev→main 2026-07-26: import MUERTO retirado. `main` lo agregó en 1850e3f5 y
+// `dev` archivó el mundo en src/mockups/_archivo/MundoParamo3D.jsx (decisión 2026-07-22);
+// la constante no se usaba en ningún lado y el import habría roto el build tras el merge.
+// `diorama_paramo` ahora carga MundoEntBosque (ver src/config/rutasProdChagraApp.js).
 const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
 const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
 const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
+// 3D: el BOSQUE nativo altoandino por ESTRATOS — los doce arquetipos de forma
+// de crecimiento con los que se representa el catálogo de flora sin modelar las
+// 581 especies una por una.
+const BosqueTresEstratos3DMockup = lazy(() => import('./mockups/BosqueTresEstratos3D'));
+// Los TRES ÁRBOLES MAESTROS del gradiente andino: un Ent por piso térmico
+// (roble, aliso y la queñua que ya existía), el agua que baja del páramo al
+// templado y la red de micorrizas que amarra sus raíces en la cara cortada
+// de la ladera.
+const TresEntsGradiente3DMockup = lazy(() => import('./mockups/TresEntsGradiente3D'));
+// EL NACEDERO: el páramo dibujado desde cero como lo que es —la fábrica de
+// agua—. Uno se para DENTRO del anfiteatro que el agua le comió a la turbera:
+// la pared cortada es la lámina de Humboldt (el perfil del suelo a la vista),
+// el frailejonal de todas las edades se asoma al filo y la quebrada se despeña
+// al valle.
+const ParamoHumboldt3DMockup = lazy(() => import('./mockups/ParamoHumboldt3D'));
+const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
+const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
+const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
+const ShowcaseArtesaniaMockup = lazy(() => import('./visual/mundo3d/ArtesaniaAndina'));
 const EfectosFuncionalesDemoMockup = lazy(() => import('./mockups/EfectosFuncionalesDemo'));
 const CatalogoInfraDemoMockup = lazy(() => import('./mockups/CatalogoInfraDemo'));
 const MundoAbejas3DMockup = lazy(() => import('./mockups/MundoAbejas3D'));
@@ -289,6 +337,19 @@ const MundoFrutales3DMockup = lazy(() => import('./mockups/MundoFrutales3D'));
 // maíz + fríjol + calabaza —, quinua en grupo con panojas de color, yucas
 // frondosas). Standalone tipo botica: no monta el sistema MUNDO ni EscenaBase3D.
 const MundoLeguminosas3DMockup = lazy(() => import('./mockups/MundoLeguminosas3D'));
+// La HOJA DE PERSONAJE DEL JAGUAR (Panthera onca): el retrato en grande donde
+// las rosetas se pueden juzgar, la lámina de la regla de oro (anillo roto +
+// puntos negros adentro) y el claro del monte en 3D donde el felino camina
+// pisando el terreno. Ruta #/mockups/jaguar-monte-3d, sin auth.
+const JaguarMonte3DMockup = lazy(() => import('./mockups/JaguarMonte3D'));
+// El VERGEL DE FRUTALES ANDINOS: mora, lulo, tomate de árbol, granadilla,
+// uchuva, gulupa y curuba — las siete del clima frío, cada una con su porte y
+// su tutorado. Ruta #/mockups/frutales-andinos-3d, sin auth.
+const FrutalesAndinos3DMockup = lazy(() => import('./mockups/FrutalesAndinos3D'));
+// Vitrinas que ya tenían una escena completa, pero no una entrada pública.
+const CanaTrapiche3DMockup = lazy(() => import('./mockups/CanaTrapiche3D'));
+const CondorCielo3DMockup = lazy(() => import('./mockups/CondorCielo3D'));
+const NavegadorGrafoDemoMockup = lazy(() => import('./mockups/NavegadorGrafoDemo'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -653,6 +714,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-milpa': 'mockup_mundo3d_milpa',
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
   'mockups/bosque-vivo-3d': 'mockup_bosque_vivo_3d',
+  'mockups/paramo-definitivo': 'mockup_paramo_definitivo',
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
   'mockups/aguacatal-vivo-3d': 'mockup_aguacatal_vivo_3d',
   'mockups/microcuenca': 'mockup_microcuenca',
@@ -662,6 +724,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/invernadero-vivo-3d': 'mockup_invernadero_vivo_3d',
   'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
   'mockups/papa-viva-3d': 'mockup_papa_viva_3d',
+  'mockups/frutales-vivo-3d': 'mockup_frutales_vivo_3d',
   'mockups/mundo-piscicultura-3d': 'mockup_mundo_piscicultura_3d',
   'mockups/lecheria-viva-3d': 'mockup_lecheria_viva_3d',
   'mockups/mundo3d-clima': 'mockup_mundo3d_clima',
@@ -722,6 +785,13 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/camara-director': 'mockup_camara_director',
   'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
   'mockups/artesania-andina': 'mockup_artesania_andina',
+  'mockups/bosque-tres-estratos': 'mockup_bosque_tres_estratos',
+  'mockups/tres-ents-gradiente': 'mockup_tres_ents_gradiente',
+  'mockups/paramo-humboldt-3d': 'mockup_paramo_humboldt_3d',
+  'mockups/camara-director': 'mockup_camara_director',
+  'mockups/momento-venta-mercado-3d': 'mockup_momento_venta_mercado_3d',
+  'mockups/artesania-andina': 'mockup_artesania_andina',
+  'mockups/showcase-artesania': 'mockup_showcase_artesania',
   'mockups/efectos-funcionales': 'mockup_efectos_funcionales',
   'mockups/catalogo-infra': 'mockup_catalogo_infra',
   'mockups/mundo-abejas-3d': 'mockup_mundo_abejas_3d',
@@ -736,6 +806,11 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo-frutales-3d': 'mockup_mundo_frutales_3d',
   'mockups/mundo-leguminosas-3d': 'mockup_mundo_leguminosas_3d',
   'mockups/hoja-prueba-valle': 'mockup_hoja_prueba_valle',
+  'mockups/jaguar-monte-3d': 'mockup_jaguar_monte_3d',
+  'mockups/frutales-andinos-3d': 'mockup_frutales_andinos_3d',
+  'mockups/cana-trapiche-3d': 'mockup_cana_trapiche_3d',
+  'mockups/condor-cielo-3d': 'mockup_condor_cielo_3d',
+  'mockups/navegador-grafo': 'mockup_navegador_grafo',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -1073,6 +1148,12 @@ function DashboardLiveView({ onNavigate, onLogout }) {
 
 export default function App() {
   useTheme();
+  // Modo lectura (letra grande, T49): se llama acá SOLO por el efecto de
+  // montaje (relee localStorage y reaplica la clase en <html>). El toggle
+  // visible vive en ProfileScreen › Apariencia; esta instancia no se usa
+  // para renderizar nada, existe para que el ajuste sobreviva a un refresh
+  // sin necesidad de haber abierto Perfil primero.
+  useModoLectura();
   // Atmósfera climática: el clima real (climaService) matiza el tema activo
   // vía data-clima/data-luz/data-enso en <html> (clima-atmosfera.css).
   useClimaAtmosphere();
@@ -1657,6 +1738,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El bosque vivo">
               <BosqueVivo3DMockup />
+      case 'mockup_paramo_definitivo':
+        // EL PÁRAMO DEFINITIVO: el mundo único del páramo (frailejonal por
+        // edades, queñual, niebla en capas, cordillera y mar de nubes por la
+        // abra, cámara de llegada). Ruta #/mockups/paramo-definitivo, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El páramo definitivo">
+              <div style={{ position: 'fixed', inset: 0 }}>
+                <ParamoDefinitivoMockup />
+              </div>
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -1675,6 +1766,12 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="La microcuenca">
               <CicloAguaMockup />
+              {/* Fixed a viewport completo (como el páramo): sin esto, el
+                  height:100% del demo colapsa a su minHeight y la escena
+                  queda en una franja con un mar negro debajo. */}
+              <div style={{ position: 'fixed', inset: 0 }}>
+                <CicloAguaMockup />
+              </div>
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -1741,6 +1838,21 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo de la papa">
               <PapaVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_frutales_vivo_3d':
+        // Vitrina pública del MUNDO DE LOS FRUTALES: mango y cítricos en la
+        // misma escena en 3D REAL, porque juntos enseñan el PISO TÉRMICO — el
+        // mango es de tierra caliente y el cítrico sube al clima medio. El
+        // mango con su copa más ancha que alta, el brote de hoja color vino y
+        // la panícula terminal; el cítrico compacto, con pecíolo alado y
+        // espinas. La escala relativa ES la lección. En equipo humilde muestra
+        // la ficha. Ruta #/mockups/frutales-vivo-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de los frutales">
+              <FrutalesVivo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -2447,8 +2559,244 @@ export default function App() {
         // el agua»). Ruta #/mockups/mundo-paramo-3d, sin auth.
         return (
           <ErrorBoundary>
-            <ErrorFallback moduleName="El páramo altoandino">
-              <MundoParamo3DMockup />
+            <ErrorFallback moduleName="Artesanía andina">
+              <ArtesaniaAndinaDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_showcase_artesania':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Muestrario de artesanía andina">
+              <ShowcaseArtesaniaMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_abejas_3d':
+        return (<ErrorBoundary><ErrorFallback moduleName="El mundo de las abejas"><MundoAbejas3DMockup /></ErrorFallback></ErrorBoundary>);
+      case 'mockup_mundo_gallinero_3d':
+        return (<ErrorBoundary><ErrorFallback moduleName="El gallinero con pastoreo"><MundoGallinero3DMockup onBack={() => navigate('dashboard')} /></ErrorFallback></ErrorBoundary>);
+      case 'mockup_mundo_mercado_3d':
+        return (<ErrorBoundary><ErrorFallback moduleName="El mercado campesino"><MundoMercado3DMockup /></ErrorFallback></ErrorBoundary>);
+      case 'mockup_cara_prod':
+        // La CARA 3D-first de prod.chagra.app (#/mockups/cara-prod): la
+        // entrada-tranquera (login con el valle 3D vivo de fondo), el cruce
+        // con velo dorado y el valle como home. Sin auth (vitrina de diseño);
+        // codex cabla `onIngresar` al flujo real de LoginScreen.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La cara de Chagra (prod 3D)">
+              <CaraProd3DMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_criaturas_nocturnas':
+        // Vitrina de la fauna NOCTURNA colombiana + el cóndor del valle en el
+        // estilo biopunk del GuardianEspiritu (#/mockups/criaturas-nocturnas).
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Criaturas nocturnas">
+              <CriaturasNocturnasMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_angelita_viva':
+        // Angelita al máximo (#/mockups/angelita-viva): la entrada teatral
+        // (asoma pequeñita → gafas si hace sol → crece con overshoot) y el
+        // repertorio de estados del agente. ?estado=<nombre> agranda uno.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Angelita, la compañera viva">
+              <AngelitaVivaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_catalogo_infra':
+        // Catálogo de infraestructura procedural (AG/Gemini): 8 piezas
+        // paramétricas low-poly (invernadero/gallinero/galpón/…) + demo.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Catálogo de infraestructura">
+              <CatalogoInfraDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_efectos_funcionales':
+        // Efectos funcionales (FASE 3 audit 3D): invernadero→microclima,
+        // almacén se llena tras cosecha, reservorio con lluvia/sequía.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Efectos de la infraestructura">
+              <EfectosFuncionalesDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_momento_venta_mercado_3d':
+        // Momento 3D (FASE 2 audit 3D): venta / nacimiento / partida como
+        // momentos coreografiados con cámara dirigida. Sin gore, digno.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Un momento en la finca">
+              <MomentoVentaMercado3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_camara_director':
+        // Cámara de director (FASE 4 audit 3D): demo del secuenciador
+        // useCamaraDirector — 4 tomas coreografiadas sobre valle low-poly.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Cámara de director">
+              <CamaraDirectorDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_bosque_tres_estratos':
+        // El bosque nativo altoandino por ESTRATOS: dosel (palma de cera,
+        // encenillo, cedro, nogal), sotobosque (mano de oso, helecho arbóreo,
+        // chusque, arbusto florecido, bejuco con bromelias) y suelo (helechos,
+        // hierba de sombra, cojines de musgo y hojarasca). Doce arquetipos de
+        // forma de crecimiento con los que se representa el catálogo de 581
+        // especies. Ruta #/mockups/bosque-tres-estratos, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El bosque nativo y sus tres estratos">
+              <BosqueTresEstratos3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_tres_ents_gradiente':
+        // LOS TRES ÁRBOLES MAESTROS DEL GRADIENTE: un Ent por piso térmico —
+        // el roble andino (Quercus humboldtii, templado y frío, con sus
+        // ectomicorrizas y las setas de Cantharellus y Lactarius al pie), el
+        // aliso (Alnus acuminata, frío, con los nódulos de Frankia que le
+        // fijan el nitrógeno) y la queñua del páramo (Polylepis, la fábrica de
+        // agua, el Ent que ya existía). La ladera va cortada como lámina de
+        // Humboldt: el agua baja por encima y la red de micorrizas amarra las
+        // raíces de los tres por debajo.
+        // Ruta #/mockups/tres-ents-gradiente, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Los tres árboles maestros del gradiente">
+              <TresEntsGradiente3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_paramo_humboldt_3d':
+        // EL NACEDERO — el páramo desde cero, dibujado como la fábrica de agua
+        // que es. Uno se para DENTRO del anfiteatro que el nacimiento del agua
+        // le comió a la turbera: la pared cortada enseña el perfil del suelo
+        // (colchón vivo, turba negra, turba parda, la línea de agua donde la
+        // turba se topa con la ceniza volcánica y los hilos brotan), el
+        // frailejonal de todas las edades se asoma al filo contra el cielo y la
+        // quebrada se despeña por la portilla hacia el valle.
+        // Ruta #/mockups/paramo-humboldt-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El nacedero del páramo">
+              <ParamoHumboldt3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_botica_cana_3d':
+        // La botica y el trapiche: los canteros de plantas medicinales y
+        // aromáticas de la casa campesina (ruda, caléndula, hierbabuena,
+        // sábila, limoncillo, ortiga, manzanilla — cada una con su copia
+        // didáctica de saber campesino) + la molienda panelera: el cañal, el
+        // trapiche de rodillos que mueve el buey, la hornilla con la paila
+        // hirviendo y las gaveras. Botón «paso a paso»: caña → molino → jugo
+        // → paila → panela. Ruta #/mockups/mundo-botica-cana-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La botica y el trapiche">
+              <MundoBoticaCana3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_frutales_3d':
+        // El huerto de frutales del solar: el aguacate mayor, el mango de
+        // copa ancha con su poda, los cítricos cargados, el guayabo, el
+        // papayo de tronco solo, el injerto joven con tutor, el plateo al
+        // pie de cada árbol y la cosecha a mano (escalera + canastos).
+        // Ruta #/mockups/mundo-frutales-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El huerto de frutales">
+              <MundoFrutales3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_leguminosas_3d':
+        // El lote de leguminosas y raíces andinas, denso: el frijolar de vara
+        // en hileras (con la mata héroe que abre el corte del subsuelo y los
+        // nódulos rosados de Rhizobium — el nitrógeno que se ve), la milpa de
+        // las tres hermanas (maíz + fríjol + calabaza), la quinua en grupo con
+        // panojas rojas/doradas/moradas y las yucas frondosas de raíz tuberosa.
+        // Botón «ver el saber bajo tierra». Ruta #/mockups/mundo-leguminosas-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El lote de leguminosas y raíces">
+              <MundoLeguminosas3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_jaguar_monte_3d':
+        // La hoja de personaje del jaguar (Panthera onca): el retrato en grande
+        // (las rosetas solo se juzgan grandes), la lámina de la regla de oro
+        // —anillo roto + puntos negros adentro, lo que lo separa del leopardo—,
+        // el elenco de poses y el claro del monte en 3D donde el felino camina
+        // pisando el terreno. Ruta #/mockups/jaguar-monte-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El jaguar del monte">
+              <JaguarMonte3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_frutales_andinos_3d':
+        // El vergel de frutales andinos de clima frío: la mora en espaldera, el
+        // lulo de hoja gigante, el tomate de árbol, la uchuva con su capacho y
+        // las tres pasifloras (granadilla, gulupa y curuba) en su ramada —
+        // cada una con su porte real. Ruta #/mockups/frutales-andinos-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El vergel de frutales andinos">
+              <FrutalesAndinos3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_cana_trapiche_3d':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La caña y el trapiche">
+              <CanaTrapiche3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_condor_cielo_3d':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El cóndor del páramo">
+              <CondorCielo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_navegador_grafo':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El grafo de la finca">
+              <NavegadorGrafoDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_hoja_prueba_valle':
+        // La hoja de prueba de la ley visual del valle: el patrón oro contra el
+        // que se compara todo activo nuevo (paleta, bandas, borde) bajo las
+        // cinco franjas (?ciclo=). Ruta #/mockups/hoja-prueba-valle, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="La hoja de prueba del valle">
+              <HojaPruebaValleMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
@@ -3931,6 +4279,13 @@ export default function App() {
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <EscuchaOverlay />}
       {currentView === 'dashboard' && <PendingTasksWidget onEdit={(task) => navigate('edit_task', { task })} />}
       {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncProgressIndicator />}
+      {/* Badge persistente "N pendientes de sincronizar" (rescate #2668).
+          Mismo guard de vista que SyncProgressIndicator: no en pre-auth. */}
+      {currentView !== 'loading' && currentView !== 'login' && currentView !== 'oauth-callback' && !currentView.startsWith('mockup_') && <SyncIndicator />}
+      {/* CSS de Modo lectura (T49): la regla vive en useModoLectura.js; se
+          inyecta acá una sola vez, siempre montada, para que el toggle de
+          Perfil › Apariencia tenga efecto en toda la app. */}
+      <style>{CSS_LECTURA_GRANDE}</style>
       {toast && (
         <div
           role={toast.isError ? 'alert' : 'status'}

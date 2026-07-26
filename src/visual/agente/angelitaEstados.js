@@ -117,11 +117,17 @@ export const ARIA_DE_ESTADO = {
   respondiendo: 'Angelita le está respondiendo',
   contenta: 'Angelita está contenta',
   preocupada: 'Angelita está preocupada: hay algo que conviene revisar',
-  'no-se': 'Angelita no sabe la respuesta, y se lo dice con honestidad',
+  'no-se': 'Angelita niega con la cabeza: no sabe la respuesta, y se lo dice con honestidad',
   senala: 'Angelita le está señalando algo',
   invita: 'Angelita lo invita a acercarse',
   husmea: 'Angelita está husmeando: revisa la finca con cuidado',
 };
+
+/* Cuando Angelita NO SABE, el globo (BurbujaAngelita) debe decirlo CLARO: "No
+   sé" a secas, nunca una evasiva ni un rodeo — decir "no sé" es la conducta
+   correcta (política anti-alucinación de Chagra), no una falla que disimular.
+   Los hosts que compongan el mensaje del estado 'no-se' parten de aquí. */
+export const TEXTO_NO_SE = 'No sé.';
 
 /* ── EL REPERTORIO DEL IDLE VIVO (estado acompana) ───────────────────────────
    Una vecina de verdad EXISTE aunque nadie le hable: entre ratos de vuelo

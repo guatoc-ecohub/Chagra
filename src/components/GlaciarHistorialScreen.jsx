@@ -15,7 +15,7 @@
  * Español Colombia (usted/tú, SIN voseo).
  */
 import { useState, useEffect, useCallback } from 'react';
-import { List, Snowflake, MapPin, Calendar, Loader2, ChevronLeft, Home, AlertCircle, Trash2, ArrowLeft, Download, CheckCircle2 } from 'lucide-react';
+import { List, Snowflake, MapPin, Loader2, AlertCircle, Trash2, Download, CheckCircle2 } from 'lucide-react';
 import { ScreenShell } from './common/ScreenShell';
 import { glaciarReportes } from '../db/glaciarReportes';
 import { MSG } from '../config/messages.js';

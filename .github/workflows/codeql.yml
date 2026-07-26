@@ -2,7 +2,7 @@ name: CodeQL SAST
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, dev, app-3d]
   push:
     # Corre en main (post-merge) y en ramas efímeras de trabajo. Esto permite
     # ver los hallazgos de CodeQL en la pestaña Security de cada rama antes
@@ -46,8 +46,25 @@ jobs:
           # local, unused-var en un smoke) son ruido de dev, no superficie de prod.
           config: |
             paths-ignore:
+              # Tooling que corre en NUESTRA infra y jamás llega al navegador del
+              # campesino: benches, scrapers e indexadores. Sus alertas medium
+              # (file-access-to-http, http-to-file-access) describen justo lo que
+              # hacen por diseño: leer un archivo y mandarlo a ollama, o bajar de
+              # GBIF y escribir a disco. Se excluyen POR PATRÓN, no scripts/ entero:
+              # scripts/seed-demo SÍ entra al bundle (src/main.jsx lo importa).
               - 'scripts/wake-word/**'
+              - 'scripts/bench-*'
+              - 'scripts/lib/bench-*'
+              - 'scripts/scrape-*'
+              - 'scripts/extract-*'
+              - 'scripts/run-bench-*'
+              - 'scripts/build-rag-*'
+              - 'scripts/diag/**'
+              - 'scripts/experimentos/**'
+              - 'scripts/ml/**'
               - 'tests/e2e-real/**'
+              - 'stress/**'
+              - 'bench/**'
               # Vitest ejecuta estas fábricas THREE; CodeQL las interpreta como
               # invocaciones no ejecutables aunque el módulo exporta funciones.
               - 'src/visual/mundo3d/__tests__/**'

@@ -18,6 +18,8 @@
  *
  * Uso:  node scripts/diag/encuadre-mundo.mjs yuca
  *       node scripts/diag/encuadre-mundo.mjs quinua
+ *       node scripts/diag/encuadre-mundo.mjs valle
+ *       node scripts/diag/encuadre-mundo.mjs frutales
  */
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -51,17 +53,94 @@ const MUNDOS = {
     sujeto: { nombre: 'la era de la trilla', clave: 'SITIO_TRILLA' },
     altoCultivo: 1.6, // la mata de quinua con su panoja
   },
-  /* La LADERA CAFETERA. El sujeto es el cafeto protagonista del camino: la mata
-     que enseña qué es un cafeto. `altoCultivo` se deja FIJO entre corridas para
-     que el antes/después mida la CÁMARA y la siembra, no el número que uno
-     mismo acaba de mover. */
-  cafe: {
-    modulo: 'src/visual/mundo3d/cafetal/floraCafetal.geom.js',
-    altura: 'alturaLadera',
-    sujeto: { nombre: 'el cafeto protagonista del camino', clave: 'SITIO_CAFETO_HERO' },
-    altoCultivo: 1.5, // la mata de café adulta bajo sombrío
+  valle: {
+    camaraFija: { pos: [10.5, 9, 13.5], mira: [0, 1.6, 1.4], fov: 40 },
+    sujeto: { nombre: 'la casa ancla' },
+    sujetoFijo: [-0.9, 2.6],
+    alturaFija: (x, z) => {
+      const t = Math.max(0, Math.min(1, (-z + 8) / 19));
+      const suave = t * t * (3 - 2 * t);
+      const subida = suave * 5.4;
+      const ondul = Math.sin(x * 0.42) * 0.14 + Math.cos(z * 0.36 + x * 0.2) * 0.12;
+      const cauce = -0.32 * Math.exp(-((x - 1.2) ** 2) / 6) * Math.exp(-((z + 1) ** 2) / 55);
+      return subida + ondul + cauce;
+    },
+    altoCultivo: 0,
+  },
+  /* Los FRUTALES no son un lote continuo: son un HUERTO — copas sueltas, y de
+     dos tamaños que no se parecen en nada. Medirlo con `dentroLote * altoCultivo`
+     mentiría en las dos direcciones (rellenaría el claro entre palos y aplanaría
+     el mango contra el cítrico). Va con dosel propio, armado de la MISMA siembra
+     que la escena dibuja, y separado POR CAPA: la lección de este mundo es que
+     el mango eclipse al cítrico, y eso hay que poder contarlo en píxeles. */
+  frutales: {
+    modulo: 'src/visual/mundo3d/frutales/floraFrutales.geom.js',
+    altura: 'alturaFinca',
+    /* El sujeto de este mundo no es un claro en el suelo sino un ÁRBOL de 10 m
+       de copa: los rayos le pegan en la cara del domo, a 4–5 m del tronco, así
+       que hay que preguntarle por su radio real y no por el del claro. */
+    sujeto: { nombre: 'el palo de mango del patio', punto: [-4.2, 8.6], radio: 5.3 },
+    doselHuerto: true,
   },
 };
+
+/*
+ * El dosel de un HUERTO: la altura de copa en cada punto, sacada de la siembra
+ * real del mundo (`distribucionFrutales` con el tier alto, la misma semilla).
+ * Cada copa es un domo achatado, no una caja: en el borde baja hasta la falda,
+ * que es donde de verdad termina la silueta.
+ *
+ * Las proporciones salen de leer `geomMango` y `geomCitrico`, no de suponer.
+ *
+ * OJO — la copa es un ELIPSOIDE HUECO POR DEBAJO, no una columna maciza desde
+ * el suelo. Un palo de mango tiene 2,6 m de aire entre la sombra y la falda de
+ * la copa: por ahí se ve el huerto de arriba, y ese hueco es justamente lo que
+ * hace que la lección se lea. Modelarlo macizo infla el «cultivo en cuadro» y
+ * vuelve a caer en el pecado que este script existe para evitar — dar un número
+ * cómodo en vez de mirar. De ahí que el dosel devuelva `base` además de `alto`.
+ *
+ * Mango: centro local y=3.05, semialto 1.35, radio 3.1 → copa de 1.7 a 4.4 de
+ * alto. Con la escala de sitio (1.2–1.7) el héroe da ~7,5 m de alto por ~10,5 m
+ * de ancho. Cítrico: centro y=1.20, semialto 0.72, radio 1.0.
+ */
+const COPAS = {
+  mango: { cy: 3.05, hy: 1.35, rad: 3.1 },
+  'cítrico': { cy: 1.2, hy: 0.72, rad: 1.0 },
+};
+
+function doselDeHuerto(geom) {
+  const conteos = geom.frutalesDeTier('alto');
+  const dist = geom.distribucionFrutales(conteos, 421, 1);
+  const arma = (capa) => (a) => {
+    const f = COPAS[capa];
+    return {
+      x: a.pos[0], z: a.pos[2], capa,
+      cy: f.cy * a.escala, hy: f.hy * a.escala, rad: f.rad * a.escala,
+    };
+  };
+  const copas = [
+    ...dist.mango.map(arma('mango')),
+    ...dist.citrico.map(arma('cítrico')),
+  ];
+  return (x, z) => {
+    let alto = 0;
+    let base = 0;
+    let capa = null;
+    for (const c of copas) {
+      const dx = x - c.x;
+      const dz = z - c.z;
+      const d2 = (dx * dx + dz * dz) / (c.rad * c.rad);
+      if (d2 >= 1) continue;
+      const semi = c.hy * Math.sqrt(1 - d2); // el elipsoide se adelgaza hacia el borde
+      if (c.cy + semi > alto) {
+        alto = c.cy + semi;
+        base = c.cy - semi;
+        capa = c.capa;
+      }
+    }
+    return { alto, base, capa };
+  };
+}
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const cruz = (a, b) => [
@@ -92,9 +171,23 @@ function golpear(origen, dir, altura, dosel, maxDist = 90) {
     // fuera del heightfield: se acabó el mundo, es cielo/telón
     if (Math.abs(p[0]) > 20 || p[2] < -19 || p[2] > 19) return null;
     const suelo = altura(p[0], p[2]);
-    const sobre = dosel(p[0], p[2]);
-    if (p[1] <= suelo + sobre) {
-      return { t, punto: p, altura: suelo, enCultivo: sobre > 0.01 };
+    /* el dosel puede responder un número (lote continuo: yuca, quinua, papa) o
+       `{alto, capa}` (huerto de copas sueltas, donde importa CUÁL copa) */
+    const d = dosel(p[0], p[2]);
+    if (typeof d === 'number') {
+      /* LOTE CONTINUO (papa, yuca, quinua): la mata tapa desde el suelo. Esta
+         rama queda EXACTAMENTE como se calibró la línea base de la casa — no se
+         toca, o se corre el metro con el que se mide todo lo demás. */
+      if (p[1] <= suelo + d) {
+        return { t, punto: p, altura: suelo, enCultivo: d > 0.01, capa: null };
+      }
+    } else {
+      /* HUERTO: la copa deja pasar por debajo de su falda, y por ese hueco es
+         que se ve la ladera de arriba. */
+      const enCopa = d.alto > 0.01 && p[1] <= suelo + d.alto && p[1] >= suelo + d.base;
+      if (p[1] <= suelo || enCopa) {
+        return { t, punto: p, altura: suelo, enCultivo: enCopa, capa: enCopa ? d.capa : null };
+      }
     }
     t += t < 18 ? 0.16 : 0.55;
   }
@@ -109,32 +202,26 @@ async function main() {
     process.exit(2);
   }
 
-  const geom = await import(resolve(RAIZ, def.modulo));
-  const altura = geom[def.altura];
+  const geom = def.modulo ? await import(resolve(RAIZ, def.modulo)) : {};
+  const altura = def.alturaFija || geom[def.altura];
   /* La cámara sale del PROPIO módulo del mundo (constante CAMARA, que vive
      junto a la geografía): así este diagnóstico no puede quedar desfasado de lo
      que la escena monta de verdad. El papal, que es anterior a esa convención,
      la trae escrita a mano aquí arriba. */
   const cam = def.camaraFija || { ...geom.CAMARA, pos: geom.CAMARA.reposo, mira: geom.CAMARA.mirada };
   if (!cam || !cam.pos) throw new Error(`el módulo de «${cual}» no exporta CAMARA`);
-  /* Override por bandera: un mundo puede tener MÁS DE UNA cámara que se
-     fotografía (la de pantalla completa y la de la tarjeta de vitrina, que sale
-     de camaraDioramas). Las dos hay que medirlas: la vitrina es la que la gente
-     ve primero.  --pos x,y,z  --mira x,y,z  --fov n */
-  const trio = (s) => s.split(',').map(Number);
-  const fPos = process.argv.includes('--pos') ? trio(process.argv[process.argv.indexOf('--pos') + 1]) : null;
-  const fMira = process.argv.includes('--mira') ? trio(process.argv[process.argv.indexOf('--mira') + 1]) : null;
-  const fFov = process.argv.includes('--fov') ? Number(process.argv[process.argv.indexOf('--fov') + 1]) : null;
-  if (fPos) cam.pos = fPos;
-  if (fMira) cam.mira = fMira;
-  if (fFov) cam.fov = fFov;
-  const sujeto = geom[def.sujeto.clave];
+  const sujeto = def.sujetoFijo || def.sujeto.punto || geom[def.sujeto.clave];
+  /* 2.55 m es el radio del CLARO con que se calibraron papa/yuca/quinua; un
+     sujeto con cuerpo (un árbol) declara el suyo. */
+  const radioSujeto = def.sujeto.radio || Math.sqrt(6.5);
   /* El dosel: cuánto levanta el cultivo sobre el suelo en cada punto del lote.
      Se apoya en el `dentroLote` del propio mundo, así que respeta los claros
-     (la era, el patio, el sitio de cosecha) sin duplicar esa lógica aquí. */
+     (la era, el patio, el sitio de cosecha) sin duplicar esa lógica aquí. Un
+     HUERTO (copas sueltas) usa su propio dosel de copas, armado más abajo. */
   const alto = def.altoCultivo || 0;
-  const dosel = (x, z) =>
-    geom.dentroLote && alto ? geom.dentroLote(x, z) * alto : 0;
+  const dosel = def.doselHuerto
+    ? doselDeHuerto(geom)
+    : (x, z) => (geom.dentroLote && alto ? geom.dentroLote(x, z) * alto : 0);
 
   const adelante = norm(sub(cam.mira, cam.pos));
   const derecha = norm(cruz(adelante, [0, 1, 0]));
@@ -150,8 +237,16 @@ async function main() {
 
   let cielo = 0;
   let suelo = 0;
-  const porTercio = [0, 0, 0]; // golpes de suelo por tercio vertical del cuadro
+  const porTercio = [0, 0, 0]; // golpes por tercio vertical del cuadro
+  /* Y el mismo reparto contando SOLO TERRENO. La diferencia no es cosmética:
+     terreno en el tercio alto es la cámara enterrada mirando contra la loma
+     (el desastre que este script existe para atrapar), pero COPA en el tercio
+     alto es un palo de mango pasándote por encima — que es precisamente lo que
+     un mundo de frutales quiere. Medirlos juntos confunde la enfermedad con la
+     cura; el papal nunca lo delató porque no tiene nada alto sembrado. */
+  const porTercioSuelo = [0, 0, 0];
   let enLote = 0; // rayos que caen sobre el cultivo sembrado
+  const porCapa = {}; // en un huerto: qué copa se llevó cada rayo
   let masCerca = Infinity;
   let masLejos = 0;
   let sumaDist = 0;
@@ -175,7 +270,9 @@ async function main() {
         continue;
       }
       suelo += 1;
-      porTercio[Math.min(2, Math.floor((f / FILAS) * 3))] += 1;
+      const tercio = Math.min(2, Math.floor((f / FILAS) * 3));
+      porTercio[tercio] += 1;
+      if (!g.enCultivo) porTercioSuelo[tercio] += 1;
       masCerca = Math.min(masCerca, g.t);
       masLejos = Math.max(masLejos, g.t);
       sumaDist += g.t;
@@ -183,7 +280,7 @@ async function main() {
       // ¿este rayo cayó encima del sujeto?
       const dx = g.punto[0] - sujeto[0];
       const dz = g.punto[2] - sujeto[1];
-      if (dx * dx + dz * dz < 6.5) {
+      if (dx * dx + dz * dz < radioSujeto * radioSujeto) {
         if (sujetoFila === null) sujetoFila = f;
         sujetoCol = cN;
       }
@@ -192,6 +289,7 @@ async function main() {
       // misma (el campo de color de la quinua), esto importa más que dónde cae
       // tal o cual rincón: mide si el cultivo llena el cuadro.
       if (g.enCultivo) enLote += 1;
+      if (g.capa) porCapa[g.capa] = (porCapa[g.capa] || 0) + 1;
     }
   }
 
@@ -207,10 +305,15 @@ async function main() {
   console.log(`\n  cielo/telón : ${pct(cielo)}`);
   console.log(`  terreno     : ${pct(suelo)}`);
   console.log(
-    `  reparto vertical del terreno — tercio alto ${pct(porTercio[0])} · medio ${pct(
+    `  reparto vertical del cuadro — tercio alto ${pct(porTercio[0])} · medio ${pct(
       porTercio[1],
     )} · bajo ${pct(porTercio[2])}`,
   );
+  if (porTercio[0] !== porTercioSuelo[0]) {
+    console.log(
+      `  de eso, TERRENO pelado — tercio alto ${pct(porTercioSuelo[0])} (lo que delata la cámara enterrada)`,
+    );
+  }
   if (suelo > 0) {
     console.log(
       `  distancia   : más cerca ${masCerca.toFixed(1)} m · promedio ${(sumaDist / suelo).toFixed(
@@ -219,81 +322,26 @@ async function main() {
     );
   }
 
-  console.log(`  sobre el CULTIVO sembrado: ${pct(enLote)} del cuadro`);
+  const mideCultivo = Boolean((geom.dentroLote && alto) || def.doselHuerto);
+  console.log(`  sobre el CULTIVO sembrado: ${mideCultivo ? `${pct(enLote)} del cuadro` : 'no aplica a esta escena'}`);
 
-  const avisosCopa = [];
-
-  /* ¿Hay una COPA tapando la vista? El ray-march de arriba golpea terreno más
-     dosel: es CIEGO a los árboles de sombra, que no son relieve del suelo sino
-     una tapa en el aire con hueco debajo. Y esa ceguera ya costó caro — un
-     mundo dio "sin avisos" con la copa de un guamo sentada sobre la cámara,
-     cortando media vista. Si el mundo declara sus copas, aquí se miden. */
-  if (geom.copasSombrio) {
-    const copas = geom.copasSombrio();
-    /* Un mundo de café DE SOMBRA tiene que tener techo de hojas: contar todo el
-       follaje del sombrío como "estorbo" castigaría justo lo que hace bien. Lo
-       que estorba es la copa CERCA del ojo — la que ya no enmarca sino tapa. */
-    const CERCA_COPA = 7;
-    let tapados = 0;
-    let tapadosCerca = 0;
-    let masCercaCopa = Infinity;
-    let culpable = null;
-    for (let f = 0; f < FILAS; f++) {
-      for (let cN = 0; cN < COLS; cN++) {
-        const sx = ((cN + 0.5) / COLS) * 2 - 1;
-        const sy = 1 - ((f + 0.5) / FILAS) * 2;
-        const dir = norm([
-          adelante[0] + derecha[0] * sx * mediaH + arriba[0] * sy * mediaV,
-          adelante[1] + derecha[1] * sx * mediaH + arriba[1] * sy * mediaV,
-          adelante[2] + derecha[2] * sx * mediaH + arriba[2] * sy * mediaV,
-        ]);
-        let tapa = null;
-        for (const copa of copas) {
-          // intersección rayo-esfera (la copa como bola en el aire)
-          const oc = sub(cam.pos, copa.c);
-          const b = 2 * (oc[0] * dir[0] + oc[1] * dir[1] + oc[2] * dir[2]);
-          const cc = oc[0] * oc[0] + oc[1] * oc[1] + oc[2] * oc[2] - copa.r * copa.r;
-          const disc = b * b - 4 * cc;
-          if (disc < 0) continue;
-          const t = (-b - Math.sqrt(disc)) / 2;
-          if (t > 0.2 && (!tapa || t < tapa.t)) tapa = { t, copa };
-        }
-        if (tapa) {
-          tapados += 1;
-          if (tapa.t < CERCA_COPA) tapadosCerca += 1;
-          if (tapa.t < masCercaCopa) {
-            masCercaCopa = tapa.t;
-            culpable = tapa.copa;
-          }
-        }
-      }
-    }
+  /* En un huerto, el reparto ENTRE copas es la lección misma: si el mundo
+     enseña que el mango es el gigante de abajo y el cítrico el chico de arriba,
+     eso tiene que verse en el reparto del cuadro, no solo en el modelo. */
+  const capas = Object.keys(porCapa);
+  if (capas.length) {
     console.log(
-      `  bajo COPAS del sombrío: ${pct(tapados)} del cuadro ` +
-        `(de eso, CERCA —a menos de ${CERCA_COPA} m—: ${pct(tapadosCerca)})`,
+      `  reparto por copa — ${capas
+        .sort((a, b) => porCapa[b] - porCapa[a])
+        .map((k) => `${k} ${pct(porCapa[k])}`)
+        .join(' · ')}`,
     );
-    if (culpable) {
+    if (porCapa['mango'] && porCapa['cítrico']) {
+      const razon = porCapa['mango'] / porCapa['cítrico'];
       console.log(
-        `    la más encima: ${culpable.quien} a ${masCercaCopa.toFixed(1)} m ` +
-          `(${culpable.c.map((v) => v.toFixed(1)).join(', ')})`,
-      );
-    }
-    /* Los umbrales miran la copa CERCANA, no el techo: una copa a 10 m es el
-       sombrío del cafetal (y debe estar); a menos de 5 m es una hoja en el
-       lente. Más de un octavo del cuadro en follaje cercano = cámara metida
-       ENTRE las copas, que fue exactamente el reclamo. */
-    if (masCercaCopa < 5) {
-      avisosCopa.push(
-        `la copa de un ${culpable.quien} está a ${masCercaCopa.toFixed(
-          1,
-        )} m de la cámara: no enmarca, TAPA`,
-      );
-    }
-    if (tapadosCerca / total > 0.125) {
-      avisosCopa.push(
-        `el follaje del sombrío a menos de ${CERCA_COPA} m tapa ${pct(
-          tapadosCerca,
-        )} del cuadro: la cámara está metida ENTRE las copas, no debajo`,
+        `  el mango ocupa ${razon.toFixed(1)}× el cuadro del cítrico  ${
+          razon >= 2 ? '✓ la escala se SIENTE' : '✗ no eclipsa: la lección no llega'
+        }`,
       );
     }
   }
@@ -316,19 +364,21 @@ async function main() {
      Es decir, la casa compone en plano general de diorama —el tercio alto casi
      libre de terreno y el sujeto abajo—, NO en primer plano cercano. Un umbral
      de "falta primer plano" en 6 m marcaba en rojo hasta al propio papal. */
-  const avisos = [...avisosCopa];
+  const avisos = [];
   if (cielo / total < 0.12) avisos.push('casi no hay cielo: el cuadro se siente tapiado');
   if (cielo / total > 0.55) avisos.push('demasiado cielo: el mundo queda vacío abajo');
-  if (porTercio[0] / total > 0.1) {
+  /* Sobre TERRENO pelado, no sobre copa: un mango que te tapa el cielo es la
+     escena bien compuesta, una loma que te lo tapa es la cámara enterrada. */
+  if (porTercioSuelo[0] / total > 0.1) {
     avisos.push(
-      'el tercio ALTO tiene terreno encima del umbral de la casa (papal: 0.6%): la cámara está mirando contra la loma',
+      'el tercio ALTO tiene TERRENO encima del umbral de la casa (papal: 0.6%): la cámara está enterrada, mirando contra la loma',
     );
   }
   if (suelo > 0 && masCerca > 14) {
     avisos.push('nada cerca de la cámara: la escena se ve lejana incluso para el estilo de la casa');
   }
   if (sujetoFila === null) avisos.push('EL SUJETO NO ESTÁ EN CUADRO — esto es un bloqueante');
-  if (enLote / total < 0.12) {
+  if (mideCultivo && enLote / total < 0.12) {
     avisos.push('el cultivo sembrado ocupa muy poco cuadro: se está fotografiando el paisaje, no el cultivo');
   }
 

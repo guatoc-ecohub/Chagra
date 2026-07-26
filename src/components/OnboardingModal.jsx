@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ExternalLink, Server, BookOpen, ArrowRight, ChevronDown } from 'lucide-react';
+import { X, ExternalLink, Server, ArrowRight, ChevronDown } from 'lucide-react';
 
 export function OnboardingModal({finca, onClose, onConfigureLater}) {
     const [showTech, setShowTech] = useState(false);

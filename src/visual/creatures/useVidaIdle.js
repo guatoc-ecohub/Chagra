@@ -22,7 +22,7 @@
  * Costo: UN setTimeout vivo por instancia activa; la mirada es un listener
  * passive + rAF-throttle con DOM directo (cero re-renders por mover el mouse).
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   elegirMomentoVida,
   duracionDeMomentoVida,

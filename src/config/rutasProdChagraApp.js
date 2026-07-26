@@ -170,10 +170,15 @@ export const NUCLEO_3D = [
     categoria: '3D',
   },
 
-  // ── El Bosque Vivo — Ent queñua landmark + microsuelo (capas) ──
+  // ── El PÁRAMO DEFINITIVO (2026-07-22): el mundo único del páramo ──
+  // (antes "Bosque Vivo" con Ent + microsuelo; el operador dejó UNA escena:
+  // frailejonal por edades + inmensidad + cámara de llegada, sin Ent).
   {
     path: 'bosque_vivo',
-    alias: ['bosque', 'bosque_vivo_3d', 'ent', 'quenua'],
+    // 'ent' se CONSERVA (merge dev→main 2026-07-26): era alias de bosque_vivo en
+    // `main` y `dev` lo quitó. Mantenerlo evita romper enlaces ya guardados por
+    // usuarios — es aditivo y no cuesta nada (ver DIAGNOSTICO §3.2).
+    alias: ['bosque', 'bosque_vivo_3d', 'paramo_definitivo', 'quenua', 'ent'],
     componente: 'MundoEntBosque',
     importLazy: 'src/visual/mundo3d/bosque/MundoEntBosque.jsx',
     categoria: '3D',
@@ -220,10 +225,12 @@ export const NUCLEO_3D = [
     importLazy: 'src/mockups/MundoGallinero3D.jsx',
     categoria: '3D',
   },
+  // diorama_paramo lleva AL MISMO páramo definitivo (MundoParamo3D quedó
+  // archivado en src/mockups/_archivo/ — ver la decisión del 2026-07-22).
   {
     path: 'diorama_paramo',
-    componente: 'MundoParamo3D',
-    importLazy: 'src/mockups/MundoParamo3D.jsx',
+    componente: 'MundoEntBosque',
+    importLazy: 'src/visual/mundo3d/bosque/MundoEntBosque.jsx',
     categoria: '3D',
   },
   {
@@ -405,6 +412,16 @@ export const NUCLEO_APP = [
     path: 'dashboard',
     componente: 'DashboardLive',
     importLazy: 'src/components/dashboard/DashboardLive.jsx',
+    categoria: '2D-app',
+  },
+  // Reactivada (fix 2026-07-25, sacada de EXCLUIDO): tarjeta 2D de un solo
+  // pulgar para el camino simple (campesino, baja alfabetización). NO es
+  // duplicado de EntradaValle3D — ese motivo era falso, verificado con
+  // capturas (EXPERIENCIA-ONBOARDING-2026-07-25.md §1.4).
+  {
+    path: 'mockup_entrada_campesina',
+    componente: 'EntradaCampesina',
+    importLazy: 'src/mockups/EntradaCampesina.jsx',
     categoria: '2D-app',
   },
   {
@@ -1094,10 +1111,12 @@ export const EXCLUIDO = [
   },
 
   // ── Duplicados de Entrada ──────────────────────────────────────
-  {
-    path: 'mockup_entrada_campesina',
-    motivo: 'Duplicado de EntradaValle3D. EntradaValle3D es la definitiva.',
-  },
+  // `mockup_entrada_campesina` SALIÓ de acá (fix 2026-07-25): el motivo era
+  // falso — EntradaCampesina (tarjeta 2D de un solo pulgar) y EntradaValle3D
+  // (escena 3D navegable) NO son duplicados, son las dos vistas que el
+  // encargo pide (campesino simple vs. técnico completo). Verificado con
+  // capturas — ver `ops/EXPERIENCIA-ONBOARDING-2026-07-25.md §1.4`. Ahora
+  // vive en NUCLEO_APP.
   {
     path: 'mockup_home_campesino',
     motivo: 'Home duplicado. DashboardLive + AgentHero es el home real.',

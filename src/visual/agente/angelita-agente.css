@@ -538,11 +538,12 @@
   38%      { transform: scale(1.02); opacity: 0.5; }   /* latido de alerta */
 }
 
-/* ── NO-SÉ — la honestidad hecha gesto: encoge los hombros (squash del cuerpo
-   hacia arriba) mientras ambas manitas se abren palmas-arriba con overshoot,
+/* ── NO-SÉ — la honestidad hecha gesto: NIEGA CON LA CABEZA (de lado a lado,
+   ver agt-niega más abajo) mientras encoge los hombros (squash del cuerpo
+   hacia arriba) y ambas manitas se abren palmas-arriba con overshoot,
    sostiene el "pues no sé, vea" y suelta. El signo ? flota arriba con line-boil
    de baja cadencia (steps — dibujado a mano, no péndulo). La sonrisa se queda:
-   no saber NO la avergüenza. */
+   no saber NO la avergüenza — decir "no sé" es la conducta correcta. */
 [data-agt-vivo='1'][data-agt-estado='no-se'] .agt-cuerpo {
   animation: agt-encoge 3.6s cubic-bezier(0.4, 0, 0.3, 1.35) infinite;
 }
@@ -595,6 +596,29 @@
   26%  { transform: rotate(-83deg); }
   68%  { transform: rotate(-86deg); }
   86%  { transform: rotate(4deg); }
+}
+/* NIEGA CON LA CABEZA — el gesto que faltaba (feedback del operador: "no sabe
+   debe ser no con la cabeza", no solo el encogimiento de hombros). Pivota
+   SOLO la cabeza (.crt-cabeza, agrupada aparte en AbejaAngelita.jsx: cabeza +
+   carita + antenas + gafas) de lado a lado — el cuerpo sigue con SU encogida
+   (agt-encoge) por debajo; los dos transforms componen porque son nodos
+   distintos. Decae en 3-4 negaciones y se asienta antes de repetir — no es un
+   tic nervioso sin fin, es "no… no… no." dicho con la cabeza. */
+.crt-cabeza {
+  transform-box: fill-box;
+  transform-origin: center bottom; /* pivota desde el cuello, no desde (0,0) del SVG */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-estado='no-se'] .crt-cabeza {
+  animation: agt-niega 3.3s cubic-bezier(0.4, 0, 0.3, 1) infinite;
+}
+@keyframes agt-niega {
+  0%, 62%, 100% { transform: rotate(0deg); }
+  8%   { transform: rotate(-9deg); }
+  17%  { transform: rotate(8deg); }
+  26%  { transform: rotate(-8deg); }
+  35%  { transform: rotate(7deg); }
+  44%  { transform: rotate(-5deg); }
+  53%  { transform: rotate(3deg); }
 }
 .agt-nose-signo {
   transform-box: fill-box;
@@ -973,6 +997,7 @@
   .agt-vuelo, .agt-mota,
   [data-agente='angelita'] .crt-brazo-l,
   [data-agente='angelita'] .crt-brazo-r,
+  [data-agente='angelita'] .crt-cabeza,
   [data-agente='angelita'] .rh-blink,
   [data-agente='angelita'] .rh-mirada,
   [data-agente='angelita'] .rh-mirada > circle:last-of-type { animation: none !important; }

@@ -151,6 +151,10 @@ function Diorama({ tier, reducedMotion, foco }) {
   const controls = useRef(null);
   const casaY = alturaLadera(SITIO_CASA[0], SITIO_CASA[1]);
 
+  /* Cuánta luz le FALTA a la hora para que el cultivo se lea (la noche y el
+     atardecer bajan `atm.intensidad`; a mediodía esto es ~0). */
+  const refuerzo = Math.max(0, 1 - atm.intensidad);
+
   return (
     <>
       {/* LA ATMÓSFERA DEL KIT: fondo, niebla, luces y estrellas de LA HORA DEL
@@ -162,6 +166,23 @@ function Diorama({ tier, reducedMotion, foco }) {
         radio={RADIO_CAFETAL}
         conSuelo={false}
         sombra={SOMBRA_CAFETAL}
+      />
+
+      {/* EL PISO DE LECTURA del cafetal: el sombrío es penumbra, NO ceguera.
+          Dos luces locales de la escena (no tocan el kit): un relleno hemisférico
+          cálido que COMPENSA lo que la hora apaga (de noche sube, a mediodía casi
+          no suma) y una clave dorada fija SIN sombras — aclara lo que el guamo
+          tapa pero deja intacto el dibujo de la sombra proyectada. El domo y la
+          niebla siguen contando la hora: el ambiente de sombra se conserva. */}
+      <hemisphereLight
+        color="#f2e6c8"
+        groundColor="#41502e"
+        intensity={0.38 + 1.15 * refuerzo}
+      />
+      <directionalLight
+        position={[7, 10, 5]}
+        color="#ffe9c0"
+        intensity={0.5 + 0.95 * refuerzo}
       />
 
       {/* El DOMO de la toma B: gradiente cenit→horizonte + glow del sol de la

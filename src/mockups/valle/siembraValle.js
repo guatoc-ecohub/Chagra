@@ -226,7 +226,6 @@ export function sembrarArboleda(especies, zona, claros, alturaDe, r) {
 
   // Un candidato por especie (un intento): anillo de claro, rodal o libre.
   const candidato = (sp) => {
-    const z = sp.zona || zona;
     const caja = cajas[sp.clave];
     if (sp.bordeClaro && claros.length && r() < sp.bordeClaro) {
       const c = claros[Math.floor(r() * claros.length)];

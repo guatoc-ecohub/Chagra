@@ -23,7 +23,7 @@ import { useTheme, resolveAutoTheme } from '../../hooks/useTheme';
 import { iconForTheme } from './themeIcon';
 import { colibriRealActivo } from '../../config/colibriFlag';
 import { BarbuditoIlustrado, BarbuditoRealLoop } from '../colibri/Barbudito';
-import Angelita from '../../visual/agente/Angelita';
+import ChagraAgentAvatar from '../ChagraAgentAvatar';
 // Campana de notificaciones en el header F2 (regresión 2026-07-04): con la flag
 // F2 ON el TopBar legacy (que la montaba) NO se renderiza, así que el home se
 // quedó sin campana. `variant="f2"` es la misma píldora redonda que ya usa
@@ -645,7 +645,7 @@ export default function FincaVivaHero({ onNavigate, onOpenAgent, onGestionar, on
                       </>
                     ) : (
                       <span className="fvh-bicho fvh-colibri-vuela" style={{ left: '60%', top: '14%' }}>
-                        <Angelita estado="acompana" size={72} title="Angelita acompaña la finca" />
+                        <ChagraAgentAvatar estado="acompana" size={72} title="Chagra IA" ariaLabel="Chagra IA" />
                       </span>
                     )}
                     {poblada && (
@@ -813,7 +813,7 @@ const PISO_LABEL = {
 function buildUbicacion() {
   let loc = {};
   let perfil = {};
-  try { perfil = getProfile() || {}; } catch (_) { perfil = {}; }
+  try { perfil = getProfile(); } catch (_) { perfil = {}; }
   try { loc = resolveClimaLocation({ profile: perfil }) || {}; } catch (_) { loc = {}; }
 
   const vereda = limpiar(loc.vereda || perfil.vereda);

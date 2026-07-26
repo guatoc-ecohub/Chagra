@@ -58,6 +58,9 @@ const COLOR_RAZA = {
   zungo: '#4a3a35',
   'sanpedreño': '#6b4a3c',
   sanpedreno: '#6b4a3c',
+  // Casco de Mula (criolla AGROSAVIA): capa rojiza-amarillenta, NO negra.
+  'casco de mula': '#a8683a',
+  cascodemula: '#a8683a',
   duroc: '#a55636',
   landrace: '#e3b6a4',
   normando: '#c9a06a',
@@ -70,6 +73,11 @@ const COLOR_RAZA = {
 };
 const PELAJES = ['#c9a06a', '#e7d9c2', '#8a6a55', '#d8b58a', '#efe7d8', '#a55636'];
 
+/* Razas de OREJA RECTA verificadas (San Pedreño: "orejas rectas y medianas",
+   Agrosavia/SciELO; pietrain también las lleva paradas). El resto de cerdos
+   del corral quedan con la oreja caída criolla de siempre. */
+const OREJA_RECTA = new Set(['sanpedreño', 'sanpedreno', 'pietrain']);
+
 /*
  * Cada ESPECIE = gesto de idle + altura de referencia + tabla de PARTES.
  * Parte: { geo, pos, rot?, escala?, color? | porRaza, cuerpo? (la anima el
@@ -77,6 +85,7 @@ const PELAJES = ['#c9a06a', '#e7d9c2', '#8a6a55', '#d8b58a', '#efe7d8', '#a55636
  * Las siluetas vienen de los animales low-poly ya validados del recinto
  * (gallina que picotea, vaca capsular, oveja de vellón) + el cerdo criollo.
  */
+// eslint-disable-next-line react-refresh/only-export-components -- tabla de datos compartida con EscenaRecinto/EscenaMercado/AnimalMomento (export pre-existente)
 export const ESPECIES = {
   gallina: {
     gesto: 'picotea',
@@ -130,8 +139,8 @@ export const ESPECIES = {
       { geo: ['capsula', [0.2, 0.34, 4, 8]], pos: [0, 0.3, 0], rot: [0, 0, Math.PI / 2], porRaza: true, cuerpo: true, vientre: true },
       { geo: ['esfera', [0.13, 8, 6]], pos: [0.32, 0.34, 0], porRaza: true, cuerpo: true },
       { geo: ['cilindro', [0.055, 0.065, 0.09, 8]], pos: [0.45, 0.31, 0], rot: [0, 0, Math.PI / 2], color: '#d99a8a', cuerpo: true, fina: true },
-      { geo: ['cono', [0.045, 0.11, 4]], pos: [0.3, 0.46, 0.08], rot: [0.35, 0, 0.25], porRaza: true, cuerpo: true, fina: true },
-      { geo: ['cono', [0.045, 0.11, 4]], pos: [0.3, 0.46, -0.08], rot: [-0.35, 0, 0.25], porRaza: true, cuerpo: true, fina: true },
+      { geo: ['cono', [0.045, 0.11, 4]], pos: [0.3, 0.46, 0.08], rot: [0.75, 0, 0.4], rotRecta: [0.14, 0, 0.06], porRaza: true, cuerpo: true, fina: true },
+      { geo: ['cono', [0.045, 0.11, 4]], pos: [0.3, 0.46, -0.08], rot: [-0.75, 0, 0.4], rotRecta: [-0.14, 0, 0.06], porRaza: true, cuerpo: true, fina: true },
       { geo: ['cono', [0.018, 0.12, 4]], pos: [-0.3, 0.38, 0], rot: [0, 0, 1.2], color: '#d99a8a', cuerpo: true, fina: true },
       { geo: ['cilindro', [0.035, 0.032, 0.2, 4]], pos: [0.16, 0.1, 0.1], color: '#7a5c4a' },
       { geo: ['cilindro', [0.035, 0.032, 0.2, 4]], pos: [0.16, 0.1, -0.1], color: '#7a5c4a' },
@@ -160,20 +169,24 @@ export function GeometriaParte({ geo }) {
   return <icosahedronGeometry args={args} />;
 }
 
-/* La matriz LOCAL de una parte, compuesta una sola vez y cacheada en la tabla. */
+/* La matriz LOCAL de una parte, compuesta una sola vez y cacheada en la tabla.
+   Una parte con `rotRecta` (orejas) tiene DOS variantes cacheadas: la caída de
+   siempre y la recta de las razas de oreja parada (San Pedreño, pietrain). */
 const _euler = new THREE.Euler();
-function matrizParte(parte) {
-  if (!parte._m) {
+function matrizParte(parte, recta = false) {
+  const usaRecta = recta && parte.rotRecta;
+  const clave = usaRecta ? '_mRecta' : '_m';
+  if (!parte[clave]) {
     const esc = /** @type {[number, number, number]} */ (Array.isArray(parte.escala) ? parte.escala : [1, 1, 1]);
     const pPos = /** @type {[number, number, number]} */ (parte.pos || [0, 0, 0]);
-    const pRot = /** @type {[number, number, number]} */ (parte.rot || [0, 0, 0]);
-    parte._m = new THREE.Matrix4().compose(
+    const pRot = /** @type {[number, number, number]} */ ((usaRecta ? parte.rotRecta : parte.rot) || [0, 0, 0]);
+    parte[clave] = new THREE.Matrix4().compose(
       new THREE.Vector3(...pPos),
       new THREE.Quaternion().setFromEuler(_euler.set(...pRot)),
       new THREE.Vector3(...esc),
     );
   }
-  return parte._m;
+  return parte[clave];
 }
 
 function colorDe(a, i) {
@@ -194,6 +207,7 @@ function colorDe(a, i) {
  */
 const ORO = 2.39996323; // ángulo áureo: la espiral del girasol
 const EJE_Y = new THREE.Vector3(0, 1, 0);
+// eslint-disable-next-line react-refresh/only-export-components -- normalizador compartido entre mundos (export pre-existente)
 export function normalizarAnimales(lista) {
   const n = Math.max(lista.length, 1);
   return lista.map((a, i) => {
@@ -218,6 +232,7 @@ export function normalizarAnimales(lista) {
       especie,
       nombre: a.nombre || '',
       raza: a.raza || '',
+      orejaRecta: OREJA_RECTA.has((a.raza || '').toLowerCase().trim()),
       tamano: a.tamano || 'mediano',
       estado,
       momento,
@@ -271,7 +286,7 @@ function componer(destino, animal, parte, conGesto, t) {
   if (parte.vientre && animal.vientre !== 1) {
     destino.multiply(_mVientre.makeScale(1, 1.05, animal.vientre));
   }
-  destino.multiply(matrizParte(parte));
+  destino.multiply(matrizParte(parte, animal.orejaRecta));
 }
 
 /*

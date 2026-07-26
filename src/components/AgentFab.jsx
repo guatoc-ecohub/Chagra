@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import Angelita from '../visual/agente/Angelita';
+import ChagraAgentAvatar from './ChagraAgentAvatar';
 import useAgentNotificationStore from '../store/useAgentNotificationStore';
 import usePrefsStore from '../store/usePrefsStore';
 import { isSpeaking, stop, replayLast, isKokoroAvailable } from '../services/ttsService';
@@ -16,13 +16,15 @@ import { notificacionesInteligentes } from '../services/angelitaInteligencia';
 import './agent-fab-skin.css';
 
 /**
- * AgentFab — Angelita, el agente vivo presente en TODA pantalla.
+ * AgentFab — el compAI elegido por el usuario, vivo, presente en TODA pantalla.
  *
  * Decisión del operador (2026-07-16): "Angelita como el agente, jubila el
- * colibrí". El FAB deja de ser un porthole con foto de colibrí: es Angelita
- * volando libre en la esquina — compañía, no interrupción. El colibrí
- * (barbudito) se retira del rol de asistente y queda de decoración en los
- * mundos 3D (faunaFuncional, rol polinizador).
+ * colibrí". El FAB deja de ser un porthole con foto de colibrí: es el compAI
+ * elegido (Angelita por defecto, o la planta de maíz si el usuario la
+ * escogió — `useAgentAvatarType`, ver fix 2026-07-25) volando/creciendo libre
+ * en la esquina — compañía, no interrupción. El colibrí (barbudito) se retira
+ * del rol de asistente y queda de decoración en los mundos 3D (faunaFuncional,
+ * rol polinizador).
  *
  * Sus tres momentos (rubber-hose, angelitaEstados.js):
  *   - default        → 'acompana': idle-cerebro vivo (flota, se acicala, se
@@ -122,11 +124,11 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     <button
       type="button"
       className={fvhSkinClass(`chagra-fab${hover ? ' is-hover' : ''}${responseReady ? ' is-ready' : ''}`)}
-      aria-label={responseReady ? 'Angelita (Chagra IA) tiene respuesta nueva' : 'Angelita, la asistente Chagra IA'}
+      aria-label={responseReady ? 'Chagra IA tiene respuesta nueva' : 'Chagra IA, su compañero de Chagra'}
       title={
         responseReady
-          ? 'Angelita tiene respuesta nueva. Doble click silencia o reactiva la voz'
-          : 'Hablar con Angelita. Doble click silencia o reactiva la voz'
+          ? 'Chagra IA tiene respuesta nueva. Doble click silencia o reactiva la voz'
+          : 'Hablar con Chagra IA. Doble click silencia o reactiva la voz'
       }
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
@@ -166,17 +168,21 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       }}
     >
       {/* pointer-events:none — CRÍTICO: el click debe caer en el BOTÓN, nunca
-          en el SVG. Angelita se REMONTA al cambiar de estado (key=estado en su
-          .agt-vuelo) y hover/pressed cambian el estado: si el mousedown cae en
-          un nodo del dibujo que se desconecta antes del mouseup, el navegador
-          se traga el click (verificado con playwright 2026-07-16). */}
+          en el SVG. Angelita (o el maíz) se REMONTA al cambiar de estado
+          (key=estado en su .agt-vuelo) y hover/pressed cambian el estado: si
+          el mousedown cae en un nodo del dibujo que se desconecta antes del
+          mouseup, el navegador se traga el click (verificado con playwright
+          2026-07-16). `estado` viaja en el vocabulario RICO de Angelita —
+          ChagraAgentAvatar lo traduce si el usuario eligió maíz (fix
+          2026-07-25: antes este FAB ignoraba la elección por completo). */}
       <span style={{ pointerEvents: 'none', display: 'flex' }} aria-hidden="true">
-        <Angelita
+        <ChagraAgentAvatar
           estado={estado}
           size={82}
           direccion="izquierda"
           className={responseReady ? 'agt-avatar-glow' : undefined}
-          title="Angelita, la asistente de Chagra"
+          title="Chagra IA"
+          ariaLabel="Chagra IA"
         />
       </span>
     </button>

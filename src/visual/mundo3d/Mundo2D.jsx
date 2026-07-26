@@ -12,14 +12,14 @@ import LaminaMundo from './laminas2d/LaminaMundo.jsx';
 import Infografia from './laminas2d/Infografia.jsx';
 import Ficha from './laminas2d/Ficha.jsx';
 import LaminaCultivo from './laminas2d/LaminaCultivo.jsx';
-import MundoValle2D from './laminas2d/MundoValle2D.jsx';
+import { GemeloValleEscena } from './GemeloValle2D.jsx';
 
 const MAPA_2D = {
   mirror: LaminaMundo,
   infografia: Infografia,
   ficha: Ficha,
   lamina: LaminaCultivo,
-  valle2d: MundoValle2D,
+  valle2d: GemeloValleEscena,
 };
 
 export default function Mundo2D({

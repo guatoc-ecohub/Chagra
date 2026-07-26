@@ -38,6 +38,10 @@ const HATO_MUESTRA = [
   { especie: 'cerdo', nombre: 'Canelo', raza: 'duroc', tamano: 'mediano', estado: 'sano' },
   { especie: 'cerdo', nombre: 'Rosita', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
   { especie: 'cerdo', nombre: 'Manchas', raza: 'sanpedreño', tamano: 'pequeño', estado: 'sano' },
+  // Herradura: la TERCERA criolla porcina colombiana (AGROSAVIA) — capa
+  // rojiza-amarillenta y casco entero como el de una mula. Que el hato de
+  // muestra enseñe las tres, no solo dos.
+  { especie: 'cerdo', nombre: 'Herradura', raza: 'casco de mula', tamano: 'mediano', estado: 'sano' },
   { especie: 'cerdo', nombre: 'Tocineta', raza: 'landrace', tamano: 'pequeño', estado: 'sano' },
   { especie: 'vaca', nombre: 'Lola', raza: 'normando', tamano: 'grande', estado: 'sano' },
   // Camilo: VENDIDO. En el corral queda su huella; en el mercado llega en cuerpo.
@@ -67,14 +71,20 @@ export const MUNDO = {
       vidaFrom: 'mundoSubsueloEngine',
       capas: [
         { nombre: 'hojarasca', color: '#6b4a2e', alto: 0.5, bichos: ['lombriz'] },
-        { nombre: 'suelo negro', color: '#3a2a1a', alto: 1.2, bichos: ['lombriz', 'raiz', 'hifa'] },
+        // #3a2a1a leía como masa NEGRA ilegible aun con el piso de luz (QA
+        // visual 2026-07-23): albedo, no iluminación. Sigue siendo la capa más
+        // oscura (la didáctica del "suelo negro" queda), pero ahora se lee.
+        { nombre: 'suelo negro', color: '#4a3624', alto: 1.2, bichos: ['lombriz', 'raiz', 'hifa'] },
         { nombre: 'subsuelo', color: '#8a6a44', alto: 1.0, bichos: ['raiz'] },
       ],
     },
     hotspots: [
       { id: 'juego', pos: [0, 0.6, 0.6], emoji: '🪱', label: 'Despierte su suelo', view: 'subsuelo' },
       { id: 'cuaderno', pos: [1.3, 0.2, 0.4], emoji: '📓', label: 'Cuaderno del suelo', view: 'salud_suelo' },
-      { id: 'crom', pos: [-1.3, 0.2, 0.4], emoji: '🎯', label: 'Cromatografía', view: 'cromatografia' },
+      // La cromatografía lee el PERFIL completo → su puerta va abajo, en el
+      // subsuelo. En y=0.2 su píldora se montaba sobre «Despierte su suelo» y
+      // tapaba el texto en móvil 390px (QA visual 2026-07-23).
+      { id: 'crom', pos: [-1.3, -0.55, 0.4], emoji: '🎯', label: 'Cromatografía', view: 'cromatografia' },
     ],
     entrada: { zoom: 6.5, narra: 'suelo' },
   },
@@ -485,11 +495,14 @@ export const MUNDO = {
         { id: 'paramo', nombre: 'Páramo', rango: '3000–4200 m', color: '#aec7cf', cultivo: 'frailejon', niebla: true, protege: true },
       ],
     },
+    // Hotspots en el espacio de la escena: el diorama de la ladera baja 1.55
+    // (centrado en el origen para el encuadre digno con reduced-motion — ver
+    // DioramaPisos en EscenaEstratos.jsx); estas alturas van bajadas igual.
     hotspots: [
-      { id: 'directorio', pos: [-1.4, 1.7, 0.7], emoji: '🌡️', label: 'Qué siembro según mi altura', view: 'directorio' },
-      { id: 'cafe', pos: [1.0, 1.75, 0.15], emoji: '☕', label: 'El piso del café', view: 'cafe' },
-      { id: 'papa', pos: [-1.0, 2.9, -0.35], emoji: '🥔', label: 'El piso de la papa', view: 'tuberculos' },
-      { id: 'paramo', pos: [0.7, 4.0, -0.9], emoji: '🏔️', label: 'El páramo se cuida', view: 'restauracion' },
+      { id: 'directorio', pos: [-1.4, 0.15, 0.7], emoji: '🌡️', label: 'Qué siembro según mi altura', view: 'directorio' },
+      { id: 'cafe', pos: [1.0, 0.2, 0.15], emoji: '☕', label: 'El piso del café', view: 'cafe' },
+      { id: 'papa', pos: [-1.0, 1.35, -0.35], emoji: '🥔', label: 'El piso de la papa', view: 'tuberculos' },
+      { id: 'paramo', pos: [0.7, 2.45, -0.9], emoji: '🏔️', label: 'El páramo se cuida', view: 'restauracion' },
     ],
     entrada: { zoom: 8, narra: 'pisos' },
   },

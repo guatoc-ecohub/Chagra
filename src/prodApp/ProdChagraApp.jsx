@@ -74,7 +74,6 @@ const LAZY_MAP = {
   MundoScreen: lazy(() => import('../components/MundoScreen.jsx')),
   MundoAbejas3D: lazy(() => import('../mockups/MundoAbejas3D.jsx')),
   MundoGallinero3D: lazy(() => import('../mockups/MundoGallinero3D.jsx')),
-  MundoParamo3D: lazy(() => import('../mockups/MundoParamo3D.jsx')),
   MundoBoticaCana3D: lazy(() => import('../mockups/MundoBoticaCana3D.jsx')),
   MundoFrutales3D: lazy(() => import('../mockups/MundoFrutales3D.jsx')),
   MundoLeguminosas3D: lazy(() => import('../mockups/MundoLeguminosas3D.jsx')),
@@ -181,6 +180,8 @@ const LAZY_MAP = {
   AprenderConAgente: lazy(() => import('../components/Aprende/AprenderConAgente.jsx')),
   CursoChagra: lazy(() => import('../components/curso/CursoChagra.jsx')),
   DashboardLive: lazy(() => import('../components/dashboard/DashboardLive.jsx')),
+  // Reactivada (fix 2026-07-25, sacada de EXCLUIDO — ver rutasProdChagraApp.js).
+  EntradaCampesina: lazy(() => import('../mockups/EntradaCampesina.jsx')),
 
   // ── PENDIENTE_DECISION (operador dijo "nada afuera") ────────────
   OnboardingCondensado: lazy(() => import('../components/OnboardingCondensado.jsx')),

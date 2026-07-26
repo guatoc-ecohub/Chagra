@@ -1020,7 +1020,19 @@ const CSS_AGUA = `
 .magua-pie p { margin: 0; max-width: 40rem; text-align: center; padding: 0.42rem 0.85rem; border-radius: 0.7rem; background: rgba(26,32,18,0.5); backdrop-filter: blur(3px); color: #f2f4e6; font: 500 0.76rem/1.4 system-ui, sans-serif; }
 .magua-volver { pointer-events: auto; position: absolute; top: 0.8rem; right: 0.8rem; padding: 0.4rem 0.8rem; border: 0; border-radius: 999px; background: rgba(26,32,18,0.55); color: #f2f4e6; font: 600 0.78rem/1 system-ui, sans-serif; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .magua-canvas { transition: none; } }
-@media (max-width: 640px) { .magua-estaciones { max-width: 60vw; } .magua-titulo { font-size: 1rem; } }
+/* En teléfono la lista vertical de estaciones tapaba media ladera con el
+   camino del agua (el sujeto). Se vuelve una FILA de chips bajo el título:
+   mismo contenido, una franja de alto, y la escena queda libre. */
+@media (max-width: 640px) {
+  .magua-titulo { font-size: 1rem; }
+  /* El space-between empujaba la fila al CENTRO del cuadro, o sea encima del
+     camino del agua: arriba lo de arriba, y el pie se ancla solo. */
+  .magua-chrome { justify-content: flex-start; }
+  .magua-pie { margin-top: auto; }
+  .magua-estaciones { flex-direction: row; flex-wrap: wrap; gap: 0.25rem; max-width: calc(100vw - 1.6rem); margin: 0.5rem 0.8rem; padding: 0.3rem 0.35rem; }
+  .magua-estaciones button { width: auto; padding: 0.28rem 0.55rem; font-size: 0.72rem; }
+  .magua-estaciones button[aria-pressed="true"] small { display: none; }
+}
 `;
 
 /**

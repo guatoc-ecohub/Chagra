@@ -65,6 +65,19 @@ const POSE_ORBITA = {
   mira: new THREE.Vector3(0, 1.4, 0),
   fov: 46,
 };
+/* Retrato (teléfono en vertical, 390×844): desde la pose de escritorio, a
+   media altura, la copa del árbol grande quedaba ENTRE la cámara y la loma
+   del túnel — el sujeto de la escena tapado por un vecino. En retrato la
+   cámara sube y pica por encima de la copa: loma, casa y túnel legibles. */
+/* La MISMA diagonal de la pose de escritorio (el valle se compuso para esa
+   vista: de frente, la loma esconde la casita y hasta la boca del túnel), pero
+   más lejos y más arriba, con el fov un pelo más abierto: loma, casita y eras
+   caben en el cuadro angosto sin que la loma se lo coma. */
+const POSE_ORBITA_ALTO = {
+  pos: new THREE.Vector3(10.6, 8.6, 14.6),
+  mira: new THREE.Vector3(-0.2, 0.9, -0.8),
+  fov: 50,
+};
 const POSE_BOCA = {
   pos: new THREE.Vector3(-2.2, 1.14, 1.05),
   mira: new THREE.Vector3(-2.2, 1.02, -1.6),
@@ -1245,6 +1258,13 @@ const CSS_ODY = `
 export default function JuegoMiFincaOdyssey({ onBack }) {
   const [{ tier, reducedMotion }] = useState(() => decidirTier());
   const [listo, setListo] = useState(false);
+  /* La pose del valle según la orientación (una vez al montar: es un mockup). */
+  const [poseValle] = useState(
+    () => (typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(max-aspect-ratio: 19/20)').matches
+      ? POSE_ORBITA_ALTO : POSE_ORBITA),
+  );
   const [cuidados, setCuidados] = useState(0);
   const sinCanvas = tier === 'bajo';
   const {
@@ -1276,13 +1296,13 @@ export default function JuegoMiFincaOdyssey({ onBack }) {
           className={`ody-canvas${listo ? ' ody-canvas--lista' : ''}`}
           dpr={tier === 'alto' ? [1, 1.5] : [1, 1.25]}
           gl={{ antialias: tier === 'alto', powerPreference: 'high-performance' }}
-          camera={{ position: POSE_ORBITA.pos.toArray(), fov: POSE_ORBITA.fov }}
+          camera={{ position: poseValle.pos.toArray(), fov: poseValle.fov }}
           frameloop={reducedMotion && enValle ? 'demand' : 'always'}
           onCreated={() => setListo(true)}
         >
           <CamaraOdyssey
             fase={fase}
-            poseValle={POSE_ORBITA}
+            poseValle={poseValle}
             poseBoca={POSE_BOCA}
             reducedMotion={reducedMotion}
             onLlegada={alLlegarCamara}

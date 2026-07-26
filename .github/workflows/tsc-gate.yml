@@ -13,7 +13,12 @@ on:
   pull_request:
     branches: [main, dev, app-3d]
   push:
-    branches: [main, feat/**, fix/**, chore/**]
+    # CONDICIÓN #2 del merge dev→main (2026-07-26): `dev` e `integra/**` entran al
+    # disparador de PUSH. Antes, los gates solo corrían en los PR individuales y en
+    # `main`, nunca sobre el RESULTADO INTEGRADO en `dev` — por eso 678 commits
+    # entraron a ciegas (ver ops/DIAGNOSTICO-brecha-dev-main.md §5.2). Sin esto la
+    # brecha se vuelve a abrir sola.
+    branches: [main, dev, app-3d, 'integra/**', feat/**, fix/**, chore/**]
 
 permissions:
   contents: read

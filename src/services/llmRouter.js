@@ -18,6 +18,7 @@
  */
 
 import { analyzeQueryComplexity } from './queryComplexityAnalyzer';
+import { ENV } from '../config/env';
 
 /**
  * BUG A (fuga de roles, incidente prod 2026-05-30) — stop sequences anti
@@ -87,15 +88,11 @@ export const ROUTES = {
     // Plus: usar el mismo modelo para chat simple y complex elimina el
     // cold-start cuando el router escala (no hay 2do modelo que cargar).
     // Tradeoff de latencia amortizado por UX queueing + tip flotante.
-    // Override via env VITE_LLM_CHAT_MODEL para experimentos.
-    model:
-      (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_CHAT_MODEL) ||
-      // 2026-07-22: granite3.3:8b -> gemma4:e2b. La nota de arriba decía que
-      // granite3.3 se eligió para "mitigar errores geográficos + piso térmico
-      // observados en producción". La medición dice que NO los mitigó: con juez
-      // semántico sobre 70 sondas, granite3.3 falla el piso térmico el 41,7% de
-      // las veces y contamina el 47,7% global. gemma4:e2b: 6,7% y 10%.
-      'qwen3.5:4b',
+    // Modelo leído de ENV.CHAT_MODEL (src/config/env.js, fuente única de
+    // verdad — override en build-time con VITE_LLM_CHAT_MODEL para
+    // experimentos, sin tocar código). Ver el comentario de esa clave para
+    // el historial de bench (granite3.3 → gemma4:e2b → gemma4:e4b → gemma3:4b).
+    model: ENV.CHAT_MODEL,
     keep_alive_min: 30,
     temperature: 0.3,
     // 2026-06-06: 512→768. Fuga real (interacción operador): respuesta de
@@ -111,20 +108,15 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'gemma4:e2b (chat+complex unificado, evita cold-start). ' +
+      `${ENV.CHAT_MODEL} (chat+complex unificado, evita cold-start). ` +
       'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   chat_complex: {
-    // Override por env para que el operador pueda probar otros modelos
-    // sin redeploy de código. Si VITE_LLM_COMPLEX_MODEL no está seteado,
-    // usa el modelo complex configurado (según bench interno, la opción que
-    // evita confusiones taxonómicas con cupo de GPU razonable).
-    model:
-      (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_LLM_COMPLEX_MODEL) ||
-      // 2026-07-22: la nota de arriba decía que granite3.3 "evita confusiones
-      // taxonómicas". El bench con juez semántico lo desmiente: confusión de
-      // especie y cruce de cultivos al 91,7%. gemma4:e2b baja el cruce a 33,3%.
-      'qwen3.5:4b',
+    // Modelo leído de ENV.CHAT_COMPLEX_MODEL (src/config/env.js, fuente
+    // única de verdad — override en build-time con VITE_LLM_COMPLEX_MODEL
+    // para experimentos, sin tocar código). Ver el comentario de esa clave
+    // para el historial de bench (granite3.3 → gemma4:e2b → gemma4:e4b → gemma3:4b).
+    model: ENV.CHAT_COMPLEX_MODEL,
     keep_alive_min: 5,
     temperature: 0.3,
     // 2026-06-06: 768→1024. Las queries complejas (planes multi-cultivo,
@@ -135,21 +127,22 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'gemma4:e2b (chat+complex unificado, evita cold-start). ' +
+      `${ENV.CHAT_COMPLEX_MODEL} (chat+complex unificado, evita cold-start). ` +
       'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   nlu: {
-    // NLU REAL = sidecar agro-mcp nlu.ts (granite3.3:8b). Este campo es
-    // vestigial: la PWA delega NLU al sidecar /nlu. Ver
-    // Chagra-strategy/ops/MODELS.md (fuente única de verdad de modelos).
-    model: 'qwen3.5:4b',
+    // NLU REAL = sidecar agro-mcp nlu.ts (repo aparte chagra-pro, su propia
+    // env var runtime NLU_MODEL). Este campo es vestigial: la PWA delega NLU
+    // al sidecar /nlu. Se deja consistente con ENV.NLU_MODEL (src/config/env.js,
+    // fuente única de verdad) por si algún caller legacy invoca esta ruta.
+    model: ENV.NLU_MODEL,
     keep_alive_min: 0,
     temperature: 0,
     max_tokens: 150,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Vestigial — NLU real ejecuta en sidecar agro-mcp nlu.ts con ' +
-      'gemma4:e2b (unificado con chat para no tener 2 modelos en 12 GB). ' +
+      'Vestigial — NLU real ejecuta en sidecar agro-mcp nlu.ts con su propio ' +
+      `NLU_MODEL runtime (debe alinearse con ${ENV.NLU_MODEL}). ` +
       'Detalle en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   reasoning: {
@@ -166,13 +159,22 @@ export const ROUTES = {
       'mejor capability) o deepseek-r1:8b (46 t/s, chain-of-thought).',
   },
   vision: {
-    model: 'qwen3-vl:8b',
+    // 2026-07-23 (PR #2738 §9): qwen3-vl:8b JUBILADO. Bench profundo (18
+    // plagas + 5 sanas control) da a gemma3:4b 45.5 (33.3% ident., 100%
+    // honestidad) contra 16.9 de qwen3-vl:8b (11.1% ident., 80% honestidad,
+    // + el swap de ~53s que este cambio elimina al unificar con el modelo
+    // de texto). Ver ENV.VISION_MODEL en src/config/env.js (fuente única)
+    // para el caveat metodológico pendiente de confirmación (el bench
+    // "Arena visual 2026-07-22" citado abajo usaba un diseño distinto —
+    // presencia SIEMPRE emparejada con su ausencia — que no se re-testeó
+    // con el dataset nuevo).
+    model: ENV.VISION_MODEL,
     keep_alive_min: 0,
     temperature: 0.2,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'Arena visual 2026-07-22 (12 casos, cada presencia emparejada con su ausencia, GPU limpia): qwen3-vl:8b acierta 12/12 — 5/5 presencia y 7/7 ausencia — a 17s por imagen, 100% GPU sin offload (7,6 GB). Le siguen qwen2.5vl:7b 92% (pero pide 14 GB y SIEMPRE hace offload, verificado con la GPU vacia), gemma4:e4b 75%, gemma3:4b 58% (el que estaba aqui: fallaba 3 de 7 ausencias, o sea decia ver cosas que no estan — inservible como gate) y moondream 0%. El bench del 2026-06-23 daba a qwen2.5vl como el PEOR: lo midio en thrashing por el offload, con granite3.3 ocupando la GPU. El cambio a gemma4:e2b (8,1 GB) libero el espacio que permite este carril. keep_alive_min 0 se conserva: se carga, responde y se descarga, asi que los 17s no compiten con el agente. Detalle en Chagra-strategy/ops/MODELS.md (fuente unica).',
+      'Histórico (Arena visual 2026-07-22, 12 casos, cada presencia emparejada con su ausencia, GPU limpia): qwen3-vl:8b acierta 12/12 — 5/5 presencia y 7/7 ausencia — a 17s por imagen, 100% GPU sin offload (7,6 GB). Le seguían qwen2.5vl:7b 92%, gemma4:e4b 75%, gemma3:4b 58% (fallaba 3 de 7 ausencias — inservible como gate en ESE diseño) y moondream 0%. Superseded por PR #2738 §9 (dataset distinto, 18 plagas + 5 sanas): gemma3:4b sale primero en identificación y honestidad. Detalle en Chagra-strategy/ops/MODELS.md (fuente unica).',
   },
 };
 

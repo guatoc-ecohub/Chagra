@@ -20,7 +20,7 @@
 
 import { SPECIES_DEFAULTS } from '../config/speciesDefaults';
 import { CROP_TAXONOMY } from '../config/taxonomy';
-import { FARM_CONFIG } from '../config/defaults';
+import { getContextoGeoFinca } from './perfilFincaService';
 import { retrieve } from './ragRetriever';
 
 const DEFAULT_MAX_ASSETS = parseInt(import.meta.env.VITE_LLM_CONTEXT_MAX_ASSETS || '50', 10);
@@ -231,9 +231,14 @@ export const getSuggestedCompanions = (speciesId) => {
  * El caller envía esto a /api/ollama/api/generate y parsea el JSON response.
  */
 export const buildGuildPrompt = (speciesName, estrato) => {
-  const altitud = FARM_CONFIG.ALTITUD_MSNM;
-  const zonas = (FARM_CONFIG.THERMAL_ZONES || []).join(', ') || 'no especificada';
-  const municipio = FARM_CONFIG.MUNICIPIO || 'Colombia';
+  /* La finca sale del PERFIL del usuario (lo que ubicó en el onboarding), no
+     de las variables de build: antes, en prod sin VITE_FARM_*, el gremio se
+     pedía "en Colombia, piso térmico no especificada" aunque la persona
+     acabara de ubicar su vereda. Las envs quedan de default de demo. */
+  const geo = getContextoGeoFinca();
+  const altitud = geo.altitudMsnm;
+  const zonas = (geo.thermalZones || []).join(', ') || 'no especificada';
+  const municipio = geo.municipio || 'Colombia';
   const ctxAltitud = altitud != null
     ? `a ${altitud} msnm (piso térmico: ${zonas})`
     : `(piso térmico: ${zonas})`;

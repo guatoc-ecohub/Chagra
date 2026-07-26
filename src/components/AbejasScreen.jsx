@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Hexagon, Flower2, HeartPulse, ShieldAlert, Recycle, Info, Droplets,
+  Hexagon, Flower2, ShieldAlert, Recycle, Info, Droplets,
   Sprout, Leaf, AlertTriangle, ArrowRight, CheckCircle2, Home as HomeIcon,
   MessageCircleQuestion,
 } from 'lucide-react';

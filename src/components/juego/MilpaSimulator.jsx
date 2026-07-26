@@ -5,7 +5,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScreenShell } from '../common/ScreenShell';
-import { Sprout, RotateCcw, Volume2, VolumeX, Sparkles, Trophy, Target, Leaf } from 'lucide-react';
+import { Sprout, RotateCcw, Volume2, VolumeX, Sparkles, Trophy, Target } from 'lucide-react';
 
 import {
   CULTIVOS_INFO,
@@ -35,7 +35,6 @@ import {
   identificarAsociacion,
   aplicarEvento,
   resumenFinca,
-  EVENTOS,
   SALUD_MAX,
   ASOCIACIONES,
   avanzarTemporada,
@@ -1119,40 +1118,6 @@ function SinergiaDato({ texto, valor }) {
     <div className="rounded-2xl bg-slate-900/45 p-2 text-center ring-1 ring-emerald-700/40">
       <p className="text-[10px] font-bold uppercase tracking-wide text-emerald-300">{texto}</p>
       <p className="text-sm font-black text-lime-200">{valor}</p>
-    </div>
-  );
-}
-
-/** Celda de comparación con barras animadas. */
-function ResultadoCelda({ etiqueta, valor, maxValor, acento }) {
-  const porcentaje = Math.min(100, Math.max(0, (valor / maxValor) * 100));
-
-  return (
-    <div className="rounded-2xl bg-slate-900/60 p-3">
-      <p className="text-[11px] font-bold uppercase tracking-wide text-emerald-200">{etiqueta}</p>
-      <div className="mt-2 relative">
-        {/* Barra animada */}
-        <div className="h-8 w-full overflow-hidden rounded-lg bg-slate-800">
-          <div
-            className={`h-full rounded-lg bg-gradient-to-r ${
-              acento
-                ? 'from-lime-400 via-emerald-400 to-lime-300'
-                : 'from-amber-600 via-orange-500 to-amber-400'
-            } transition-all duration-1000 ease-out milpa-brota`}
-            style={{ width: `${porcentaje}%` }}
-          />
-        </div>
-        {/* Número flotante */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <p
-            className={`text-lg font-black ${
-              acento ? 'text-lime-200' : 'text-amber-200'
-            } drop-shadow-lg`}
-          >
-            {valor}
-          </p>
-        </div>
-      </div>
     </div>
   );
 }

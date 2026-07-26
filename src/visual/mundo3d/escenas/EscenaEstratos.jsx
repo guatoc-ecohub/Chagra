@@ -227,11 +227,11 @@ function Frailejon() {
 
 const CULTIVOS = { platano: Platano, cafe: Cafeto, papa: Papa, frailejon: Frailejon };
 
-function SiluetaCultivo({ tipo, x, y, z }) {
+function SiluetaCultivo({ tipo, x, y, z, esc = 1 }) {
   const Comp = CULTIVOS[tipo];
   if (!Comp) return null;
   return (
-    <group position={[x, y, z]}>
+    <group position={[x, y, z]} scale={[esc, esc, esc]}>
       <Comp />
     </group>
   );
@@ -248,27 +248,78 @@ function Niebla({ x, y, z, r = 0.5 }) {
   );
 }
 
+/* Color del talud de tierra entre terrazas: más cálido abajo, más rocoso y frío
+   arriba (el suelo también cuenta el gradiente térmico). */
+const TALUD_COLOR = ['#8a6a44', '#8d6b45', '#7e6248', '#71625a'];
+
 function DioramaPisos({ params, reducedMotion, fauna }) {
   const pisos = useMemo(() => params?.pisos || [], [params?.pisos]);
-  // Cultivos por terraza, con aire (2 por piso, jitter determinista).
+  // Cultivos por terraza, con aire (3 por piso, jitter y escala deterministas —
+  // antes iban 2 matas diminutas por piso y la ladera se veía pelada).
   const siembra = useMemo(() => {
     const out = [];
     let s = 11;
     pisos.forEach((p, i) => {
-      const cuenta = p.cultivo === 'frailejon' ? 2 : 2;
+      const cuenta = 3;
+      const ancho = 0.72 - i * 0.07; // las terrazas se angostan al subir
       for (let j = 0; j < cuenta; j++) {
         s = (s * 1103515245 + 12345) >>> 0;
-        const x = ((s % 1000) / 1000 - 0.5) * 1.5 + (j === 0 ? -0.45 : 0.5);
+        const x = (j - (cuenta - 1) / 2) * ancho + ((s % 1000) / 1000 - 0.5) * 0.3;
         s = (s * 1103515245 + 12345) >>> 0;
-        const z = pisoZ(i) + ((s % 1000) / 1000 - 0.5) * 0.5;
-        out.push({ key: `${i}-${j}`, tipo: p.cultivo, x, y: pisoY(i) + 0.07, z });
+        const z = pisoZ(i) + ((s % 1000) / 1000 - 0.5) * 0.45;
+        s = (s * 1103515245 + 12345) >>> 0;
+        const esc = 0.85 + ((s % 1000) / 1000) * 0.35;
+        out.push({ key: `${i}-${j}`, tipo: p.cultivo, x, y: pisoY(i) + 0.07, z, esc });
+      }
+    });
+    return out;
+  }, [pisos]);
+
+  // Pasto/paja y piedras por terraza: textura menuda que quita lo "pelado"
+  // sin robarse el protagonismo de los cultivos. Determinista (LCG).
+  const menudencia = useMemo(() => {
+    const out = [];
+    let s = 29;
+    pisos.forEach((p, i) => {
+      const rMax = 1.05 - i * 0.13;
+      for (let k = 0; k < 6; k++) {
+        s = (s * 1103515245 + 12345) >>> 0;
+        const a = ((s % 1000) / 1000) * Math.PI * 2;
+        s = (s * 1103515245 + 12345) >>> 0;
+        const rr = 0.35 + ((s % 1000) / 1000) * (rMax - 0.35);
+        out.push({
+          key: `t-${i}-${k}`,
+          tipo: 'pasto',
+          x: Math.cos(a) * rr,
+          y: pisoY(i) + 0.08,
+          z: pisoZ(i) + Math.sin(a) * rr * 0.55,
+          // paja amarillenta en el páramo, pasto verde abajo
+          color: i === pisos.length - 1 ? '#b8b183' : '#7a9a3f',
+        });
+      }
+      if (i >= 2) {
+        s = (s * 1103515245 + 12345) >>> 0;
+        const a = ((s % 1000) / 1000) * Math.PI * 2;
+        out.push({
+          key: `r-${i}`,
+          tipo: 'roca',
+          x: Math.cos(a) * (rMax - 0.15),
+          y: pisoY(i) + 0.12,
+          z: pisoZ(i) + Math.sin(a) * (rMax - 0.15) * 0.55,
+          color: PALETA.piedra,
+        });
       }
     });
     return out;
   }, [pisos]);
 
   return (
-    <group position={[0, 0, 0]}>
+    /* El grupo baja 1.55: centra la escalera alrededor del ORIGEN. Sin esto,
+       con reduced-motion (director de cámara inerte, OrbitControls mirando a
+       (0,0,0)) toda la ladera quedaba por encima del centro del cuadro: páramo
+       cortado y medio lienzo vacío abajo. Los hotspots de `pisos` en
+       mundoData.js bajan lo mismo. */
+    <group position={[0, -1.55, 0]}>
       {/* la ladera al fondo: silueta de montaña por capas (profundidad) */}
       <mesh position={[-0.6, 1.3, -3.4]}>
         <coneGeometry args={[3.3, 4.6, 5]} />
@@ -278,28 +329,72 @@ function DioramaPisos({ params, reducedMotion, fauna }) {
         <coneGeometry args={[2.6, 3.7, 5]} />
         <meshLambertMaterial color="#adc0c6" flatShading />
       </mesh>
+      {/* nieve en los picos: remata el cuento térmico (arriba, el frío manda) */}
+      <mesh position={[-0.6, 3.22, -3.39]}>
+        <coneGeometry args={[0.52, 0.78, 5]} />
+        <meshLambertMaterial color="#e9f1f2" flatShading />
+      </mesh>
+      <mesh position={[1.4, 2.6, -2.99]}>
+        <coneGeometry args={[0.34, 0.52, 5]} />
+        <meshLambertMaterial color="#e9f1f2" flatShading />
+      </mesh>
+      {/* cordillera lejana, más pálida: una capa más de profundidad */}
+      <mesh position={[3.1, 0.7, -4.8]}>
+        <coneGeometry args={[3.6, 2.8, 4]} />
+        <meshLambertMaterial color="#c2d1d6" flatShading />
+      </mesh>
+      <mesh position={[-3.4, 0.6, -4.9]}>
+        <coneGeometry args={[3.2, 2.5, 4]} />
+        <meshLambertMaterial color="#c6d4d8" flatShading />
+      </mesh>
 
       {/* las cuatro terrazas que suben, cada una con su color térmico */}
       {pisos.map((p, i) => (
         <group key={p.id}>
           <mesh position={[0, pisoY(i), pisoZ(i)]}>
-            <cylinderGeometry args={[1.28 - i * 0.13, 1.34 - i * 0.13, 0.16, 24]} />
+            <cylinderGeometry args={[1.28 - i * 0.13, 1.36 - i * 0.13, 0.22, 24]} />
             <meshLambertMaterial color={p.color} flatShading />
           </mesh>
-          {/* faldón sombreado del escalón: da la sensación de pendiente */}
+          {/* TALUD de tierra: el cuerpo de la montaña entre terraza y terraza.
+              Antes había un palito de 0.14 de radio y los pisos flotaban como
+              torta en pedestal; este cono truncado llena el aire y la ladera
+              se lee como UNA montaña escalonada, no como platos apilados. */}
           {i > 0 && (
-            <mesh position={[0, pisoY(i) - 0.5, pisoZ(i) + 0.28]}>
-              <cylinderGeometry args={[0.14, 0.14, 0.86, 6]} />
-              <meshLambertMaterial color="#6b5a3e" flatShading />
+            <mesh position={[0, pisoY(i) - 0.63, pisoZ(i) - 0.05]}>
+              <cylinderGeometry
+                args={[0.95 - i * 0.12, 1.24 - (i - 1) * 0.13, 1.1, 24]}
+              />
+              <meshLambertMaterial color={TALUD_COLOR[i]} flatShading />
             </mesh>
           )}
         </group>
       ))}
+      {/* la falda que asienta la ladera en el suelo (antes el piso cálido
+          también flotaba) */}
+      <mesh position={[0, -0.02, 0.6]}>
+        <cylinderGeometry args={[1.34, 1.62, 0.32, 24]} />
+        <meshLambertMaterial color={TALUD_COLOR[0]} flatShading />
+      </mesh>
 
       {/* la vegetación emblemática de cada piso */}
       {siembra.map((c) => (
-        <SiluetaCultivo key={c.key} tipo={c.tipo} x={c.x} y={c.y} z={c.z} />
+        <SiluetaCultivo key={c.key} tipo={c.tipo} x={c.x} y={c.y} z={c.z} esc={c.esc} />
       ))}
+
+      {/* pasto/paja y piedras: la textura menuda de cada piso */}
+      {menudencia.map((m) =>
+        m.tipo === 'pasto' ? (
+          <mesh key={m.key} position={[m.x, m.y, m.z]}>
+            <coneGeometry args={[0.05, 0.16, 4]} />
+            <meshLambertMaterial color={m.color} flatShading />
+          </mesh>
+        ) : (
+          <mesh key={m.key} position={[m.x, m.y, m.z]} rotation={[0.4, 1.1, 0.2]}>
+            <dodecahedronGeometry args={[0.1, 0]} />
+            <meshLambertMaterial color={m.color} flatShading />
+          </mesh>
+        ),
+      )}
 
       {/* niebla del páramo (piso más alto): capta agua, quieta y digna */}
       {pisos.map((p, i) =>
@@ -334,8 +429,11 @@ function DioramaPisos({ params, reducedMotion, fauna }) {
 export default function EscenaEstratos(props) {
   const esPisos = Array.isArray(props.params?.pisos);
   const cielo = esPisos ? CIELOS.ladera : CIELOS.sotobosque;
-  const camara = esPisos ? { position: [4.4, 3.7, 6.4], fov: 46 } : { position: [3.5, 3, 6], fov: 44 };
-  const centro = esPisos ? [0, 1.95, -0.4] : [0, 1.4, 0];
+  // Encuadre `pisos`: el diorama va centrado en el origen (ver DioramaPisos),
+  // así la pose CRUDA de reduced-motion (target (0,0,0)) también muestra los
+  // cuatro pisos con el páramo de remate — antes salía cortado por arriba.
+  const camara = esPisos ? { position: [4.9, 2.8, 7.9], fov: 47 } : { position: [3.5, 3, 6], fov: 44 };
+  const centro = esPisos ? [0, 0.65, -0.5] : [0, 1.4, 0];
   const fauna = faunaDeMundo(props.mundoId, { tier: props.tier });
   return (
     <EscenaBase3D

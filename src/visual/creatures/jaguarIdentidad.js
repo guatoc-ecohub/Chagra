@@ -48,16 +48,16 @@ export const JAGUAR_PALETA = {
   colmillo: '#fff8ec',      // colmillos del rugido
   vibrisa: '#f7edd8',       // bigotes (vibrisas) crema claro
   sombraSuelo: 'rgba(36,22,8,0.38)', // la sombra bajo las zarpas (peso real)
-  /* ── Místico (el jaguar-espíritu del chamán, cosmología andino-amazónica) ──
-     Paleta de acentos: violeta/azul (cielo nocturno, la piel = noche estrellada)
-     + DORADO/COBRE (orfebrería andina Tairona/Zenú + el sol del jaguar). */
-  espectral: '#b98cff',     // aura etérea / presencia sagrada (violeta espectral)
-  estrella: '#efe6ff',      // el titileo de las constelaciones en las rosetas
-  ojoBrillo: '#ffe6a0',     // fosforescencia del ojo-espíritu (visión nocturna)
-  bruma: '#cdb4ff',         // el velo de niebla del mundo-espíritu a los pies
-  mota: '#ece1ff',          // motas de luz que flotan lento (polvo del espíritu)
+  /* ── Registro NOCTURNO (el felino que anda de noche, como LUZ y no como
+     símbolo) — acentos violeta/azul del cielo de noche + un cobre cálido que
+     lo amarra al resto del elenco. */
+  espectral: '#b98cff',     // el halo tenue que lo envuelve (violeta espectral)
+  estrella: '#efe6ff',      // el titileo de estrellas sobre las rosetas
+  ojoBrillo: '#ffe6a0',     // el ojo que devuelve la luz de noche (tapetum)
+  bruma: '#cdb4ff',         // el velo de niebla a los pies
+  mota: '#ece1ff',          // motas de luz que flotan lento
   marcaEspiritu: '#c9a4ff', // las rosetas gemelas que BRILLAN en la revelación
-  cobre: '#e0a24a',         // glifos de geometría sagrada (cobre de orfebrería)
+  cobre: '#e0a24a',         // glifos de ornamento geométrico (acento cobre)
 };
 
 export const JAGUAR_PROPORCION = {
