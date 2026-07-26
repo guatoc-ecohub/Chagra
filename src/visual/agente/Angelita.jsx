@@ -207,6 +207,18 @@ function MotaDeVilano() {
   );
 }
 
+/* Las zetitas del sueño (momento 'cabecea'): dos z dibujadas a mano que brotan
+   junto a su cabeza mientras se le van los ojos — y se ESFUMAN de golpe cuando
+   despierta del brinco (el CSS las corta con el susto). Trazo de la casa. */
+function Zetitas() {
+  return (
+    <g stroke={RH_INK} strokeLinecap="round" strokeLinejoin="round" fill="none" aria-hidden="true">
+      <path className="agt-zzz" d="M12.6,-9.2 h2.5 l-2.5,2.4 h2.5" strokeWidth="0.8" />
+      <path className="agt-zzz agt-zzz--2" d="M15.8,-13.2 h1.8 l-1.8,1.8 h1.8" strokeWidth="0.65" />
+    </g>
+  );
+}
+
 /**
  * Angelita — el cuerpo visible del agente de Chagra. Solo arte: el host cablea
  * la inteligencia y este componente la ENCARNA por estados.
@@ -526,6 +538,11 @@ export function Angelita({
   const mota = (vivo && e === 'acompana' && momento === 'distraida')
     ? <MotaDeVilano />
     : null;
+  // Las zetitas del 'cabecea': viven montadas durante todo el acompana
+  // (invisibles, opacity 0) y las DISPARA el selector [data-agt-idle='cabecea']
+  // del CSS — así el one-shot corre cada vez que el gesto entra, sin depender
+  // de un remontaje de React.
+  const zetitas = (vivo && e === 'acompana') ? <Zetitas /> : null;
   // SEÑALA — el destello donde apunta (abajo-derecha, donde cae su bracito).
   const destelloPoi = e === 'senala' ? (
     <g
@@ -636,6 +653,7 @@ export function Angelita({
       {estelasInvita}
       {virutasOlor}
       {mota}
+      {zetitas}
     </svg>
   );
 }

@@ -307,10 +307,14 @@ export function AbejaAngelita({
         <ellipse cx="9.4" cy="-0.2" rx="3.2" ry="3.4" fill={ABEJA_PALETA.cara} opacity="0.95" />
         {/* chapetas campesinas + sonrisa + ojos de goma (parpadean juntos) */}
         <Cachetes puntos={[{ cx: 10.4, cy: 0.7, r: 1.15 }, { cx: 6.9, cy: 0.3, r: 0.85 }]} vivo={vivo} />
-        {/* Boca: lip-sync si hay visema; si no, la sonrisa de goma de siempre. */}
-        {visema
-          ? <BocaVisema cx={8.9} cy={1.4} w={2.8} prof={1.1} visema={visema} />
-          : <Sonrisa cx={8.9} cy={1.4} w={2.8} prof={1.1} />}
+        {/* Boca: lip-sync si hay visema; si no, la sonrisa de goma de siempre.
+            Envuelta en `.crt-boca` (pivote centrado) para que los GESTOS del
+            agente la agarren por CSS (el bostezo la abre en grande). */}
+        <g className="crt-boca" style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
+          {visema
+            ? <BocaVisema cx={8.9} cy={1.4} w={2.8} prof={1.1} visema={visema} />
+            : <Sonrisa cx={8.9} cy={1.4} w={2.8} prof={1.1} />}
+        </g>
         <OjosRubber
           ojos={[{ cx: 10.1, cy: -1.9, r: 1.95 }, { cx: 7.4, cy: -2.2, r: 1.45 }]}
           mirar={[0.3, 0.34]}
