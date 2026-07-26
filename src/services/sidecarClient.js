@@ -148,10 +148,12 @@ async function getJson(path, query, timeoutMs) {
 }
 
 /**
- * Wrapper interno: POST con timeout + headers + degrade-to-null.
- * No exportado — el contrato público son planNlu y callTool.
+ * Wrapper POST con timeout + headers + degrade-to-null (offline/timeout/non-2xx → null).
+ * Exportado como primitivo compartido para servicios de feature que hablan con el
+ * mismo sidecar (p.ej. redService.js / RED de trueque). Mantiene el mismo auth-retry,
+ * tier header y degradación graceful que el resto del cliente.
  */
-async function postJson(path, body, timeoutMs) {
+export async function postJson(path, body, timeoutMs) {
   if (!isSidecarEnabled()) return null;
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
     console.debug('[sidecar] offline — skip', path);
