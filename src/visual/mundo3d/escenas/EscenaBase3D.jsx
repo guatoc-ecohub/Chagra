@@ -89,6 +89,10 @@ function Contenido({
 }) {
   const controls = useRef(null);
   const [activo, setActivo] = useState(null);
+  // El PARTE DE VIAJE de la abeja (auditoría #50): useEntradaAbeja lo escribe
+  // cada frame (fase del cruce + posición viva) y CamaraDirector lo lee para
+  // ESCOLTARLA en la picada de entrada. Un ref compartido, cero re-renders.
+  const viajeAbeja = useRef({ fase: 'oculta', pos: new THREE.Vector3() });
   // `rebote`: cada toque de hotspot lo incrementa → Angelita da un microrrebote
   // (carácter de compañera, ref. el zorro de Ori / el ganso de Untitled Goose).
   const [rebote, setRebote] = useState(0);
@@ -324,6 +328,7 @@ function Contenido({
         piso={piso}
         tier={tier}
         mundoId={params?.id || params?.tipo || null}
+        viajeRef={viajeAbeja}
       />
 
       <OrbitControls
@@ -353,6 +358,7 @@ function Contenido({
         duracion={2.1}
         respiro={zoom * 0.005}
         activa={!reducedMotion && !frugal}
+        siga={viajeAbeja}
       />
       {/* Bloom SUTIL solo donde sobra GPU: tier alto sin reduced-motion. El
           gate es estricto a propósito (contrato de costo del DR de gama baja):
