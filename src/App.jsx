@@ -288,9 +288,10 @@ const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 // `dev` archivó el mundo en src/mockups/_archivo/MundoParamo3D.jsx (decisión 2026-07-22);
 // la constante no se usaba en ningún lado y el import habría roto el build tras el merge.
 // `diorama_paramo` ahora carga MundoEntBosque (ver src/config/rutasProdChagraApp.js).
-const CamaraDirectorDemoMockup = lazy(() => import('./mockups/CamaraDirectorDemo'));
-const MomentoVentaMercado3DMockup = lazy(() => import('./mockups/MomentoVentaMercado3D'));
-const ArtesaniaAndinaDemoMockup = lazy(() => import('./mockups/ArtesaniaAndinaDemo'));
+// MERGE dev→main 2026-07-26: aquí `main` volvía a declarar CamaraDirectorDemo,
+// MomentoVentaMercado3D y ArtesaniaAndinaDemo. `dev` ya las declara más abajo.
+// El merge fusionó LIMPIO y dejó las tres DUPLICADAS — sin marcador de conflicto
+// que lo avisara. Se retira la copia de arriba (build roto: 'has already been declared').
 // 3D: el BOSQUE nativo altoandino por ESTRATOS — los doce arquetipos de forma
 // de crecimiento con los que se representa el catálogo de flora sin modelar las
 // 581 especies una por una.
@@ -1738,6 +1739,16 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El bosque vivo">
               <BosqueVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      // MERGE dev→main 2026-07-26: el bloque de arriba llegaba MUTILADO. `main`
+      // insertó `case 'mockup_bosque_vivo_3d'` pero sus tres líneas de cierre
+      // (</ErrorFallback>, </ErrorBoundary>, `);`) se perdieron: git tomó el
+      // `case` siguiente de `dev` como contexto y fusionó LIMPIO, sin marcador.
+      // Resultado: <ErrorFallback> quedaba abierto y todo el archivo pasaba a
+      // parsearse como JSX — el build reventaba 2.000 líneas más abajo, en un
+      // comentario. Se restauran los cierres.
       case 'mockup_paramo_definitivo':
         // EL PÁRAMO DEFINITIVO: el mundo único del páramo (frailejonal por
         // edades, queñual, niebla en capas, cordillera y mar de nubes por la
