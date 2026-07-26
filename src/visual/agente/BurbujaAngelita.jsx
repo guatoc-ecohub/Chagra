@@ -96,13 +96,21 @@ export default function BurbujaAngelita({
     const n = ref.current;
     if (!n) return;
     const ancho = globalThis.innerWidth || 0;
-    // Se mide SIN el desvío ya aplicado, para no acumular corrección sobre
-    // corrección en cada re-medida (scroll, rotación de pantalla…).
     const caja = n.getBoundingClientRect();
-    const crudo = { left: caja.left - desvioX, right: caja.right - desvioX };
-    const nuevo = correccionEnPantalla(crudo, ancho);
-    setDesvioX((previo) => (Math.abs(previo - nuevo) > 0.5 ? nuevo : previo));
-  }, [desvioX]);
+    /* SIN LAYOUT NO SE MIDE. Un rect de 0×0 significa que el nodo no está
+       maquetado (jsdom en los tests, `display:none`, el frame antes del
+       primer paint). Medir ahí daba una corrección basada en la nada y —como
+       el rect nunca cambiaba— el cálculo no convergía nunca: bucle infinito
+       de renders. Lo cazaron los tests con "Maximum update depth exceeded". */
+    if (caja.width < 1 && caja.height < 1) return;
+    /* El rect YA incluye el `translateX` aplicado, así que la corrección es
+       incremental y converge sola: cuando la burbuja quede dentro, la
+       corrección da 0 y el estado deja de cambiar. */
+    setDesvioX((previo) => {
+      const nuevo = previo + correccionEnPantalla(caja, ancho);
+      return Math.abs(previo - nuevo) > 0.5 ? nuevo : previo;
+    });
+  }, []);
 
   useLayoutEffect(() => {
     if (!mensaje) return undefined;
