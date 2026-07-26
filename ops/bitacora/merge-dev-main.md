@@ -192,3 +192,119 @@ configurable, sin literales dispersos — y retira `llama3.2-vision:11b`, que se
 da **0% de honestidad y alucina diagnóstico en TODAS las muestras sanas de control** (peligroso en una
 función de salud de planta).
 
+---
+
+## Verificación
+
+### Los 34 commits de `main`, uno por uno
+
+**Historia (garantía fuerte):** `git merge-base --is-ancestor` para los 34 → **los 34 son ancestros**.
+`git rev-list --count HEAD..origin/main` = **0** y `HEAD..origin/dev` = **0**: no queda **nada** de
+ninguna de las dos ramas fuera de la rama de integración.
+
+**Contenido (lo que la historia NO garantiza):** para cada commit se extrajeron sus líneas agregadas
+(≥12 caracteres) y se buscó cada una en el árbol fusionado.
+
+| Resultado | Commits |
+|---|---|
+| **100 % de líneas presentes** | **22 de 34** — incluidos `fe417d7f` (230/230), `6f72ff3b` (28/28), `7515fea9` (4/4), `e6a1d81f` (81/81), `cd88a118` (39/39), `1cfdab85` (14/14), `e7180af8` (157/157), `1c58c794` (92/92), `71a52c70` (41/41), `28fef3f2` (42/42), `cf2d0131` (433/433), `c0b98007` (641/641) |
+| ≥96 % (resto = comentarios, JSDoc `-`/`—`, imports reordenados por `dev`) | `1850e3f5` 98,2 % · `f9046ece` 98,2 % · `d3d3169a` 97,9 % · `519953a3` 99,6 % · `7d651d52` 96,4 % · `6f3b64c2` 99,6 % |
+| **Falsos negativos del método** (artefacto regenerado = 1 sola línea minificada) | `13eec2bf` 0 % y `130ddb39` 88 % — **verificados aparte**: el grafo tiene `pisos_termicos` en **549 de 554** especies y `relations_exported` lo incluye; el texto embebido **sí** contiene `Piso termico`, `Altitud optima` y `Temperatura optima` |
+| **Superados a propósito** | `0443e08e` 12,5 % (gemma4:e2b → lo reemplazó `qwen3.5:4b`, del propio `main`) · `5721584d` 25 % (los literales `'qwen3.5:4b'` pasaron a `ENV.*`; **el valor efectivo sigue siendo `qwen3.5:4b`**) |
+| 🔴 **Decisión abierta, NO la tomé yo** | **`8d323eea` 0 %** — el carril de visión. Ver §Decisión pendiente. |
+
+> **Los guards de seguridad agroecológica están intactos, y no por inspección: por sus propios tests.**
+> `outputGuards.bannedPesticideSuppress`, `agentPromptBase` (los 10 plaguicidas vetados),
+> `outputGuards.agente5bugsV2` (triaje por cultivo), `buildFallbackResponse`, `conversationCapture`,
+> `outputGuards` y `outputGuards.coverage-canario`: **338 tests, 0 fallos.**
+
+### Gates
+
+| Gate | Resultado |
+|---|---|
+| Gate de CI (`unit-tests.yml`, 5 archivos) | ✅ **149/149** |
+| Tests de los commits críticos de `main` | ✅ **338/338** (1 skip) |
+| RAG (`ragClima` + `ragRetriever` + `hybrid` + `synonyms` + `rag-embedding`) | 🟡 48/50 — **los 2 fallos también fallan en `origin/main` puro** |
+| Grafo (`grafoRelations`, `grafoConocimientoAmp`, `affectsGate`, `chipIntentRouter`) | ✅ **122/122** |
+| `sidecarClient` | 🟡 1 fallo — **también falla en `origin/main` puro** (preexistente) |
+| `npx vite build` | ✅ **EXIT=0** |
+| `tsc:check` | 🟡 **608 errores en 149 archivos** (`main` 39, `dev` 381). Baseline regenerado con `--force`: es el número real del árbol fusionado y el gate lo congela ahí. **Es deuda, y es el precio de los 678 commits sin verificar.** |
+
+### 🔴 Gate visual — encontró un falso positivo mío, y por eso sirvió
+
+Primera corrida: **las 7 capturas salieron con el MISMO md5** y 80 KB cada una — todas la tarjeta
+*"Algo falló"*. La app entera reventaba con `Cannot read properties of null (reading 'useState')`.
+
+**No era el merge.** Aislado con dos experimentos: `origin/main` y `origin/dev`, construidos con el
+mismo toolchain, **corrían bien**. La causa era mía: copié `node_modules` con `cp -a` y me traje
+**37 MB de caché `.vite`** de otro estado del proyecto → dos copias de React.
+Solución: `node_modules` como **symlink** al del repo principal, rebuild.
+
+> Vale dejarlo escrito porque casi reporto una regresión que no existía. **El build daba EXIT=0 en los
+> dos casos** — verde con la app muerta. Es exactamente el motivo por el que el gate es por captura.
+
+Segunda corrida, ya con el build sano — `ops/capturas/merge-dev-main-2026-07-26/`:
+
+| Escena | Conflictos | Qué se ve |
+|---|---|---|
+| `paramo-definitivo` | — | Frailejonal, niebla en capas, cordillera, cóndor, quebrada, fauna, *"La fábrica de agua"* |
+| `bosque-vivo` | (el `case` que reparé a mano) | Monta y dibuja |
+| `botica-cana` | **51 (el peor)** | Cañal, trapiche con buey, paila humeando, gaveras, canteros, los 6 pasos |
+| `suelo-vivo` | 24 | Dibuja |
+| `entrada-valle` | 22 (`Valle3D`) | Valle nocturno, minimapa, hotspots, Angelita, alerta de helada |
+| `abejas` | — | Dibuja |
+| `vitrina-maestra` | 17 | Dibuja |
+
+**GPU real confirmada por el propio gate:** `ANGLE (AMD, AMD Radeon Vega 10 Graphics (radeonsi raven
+ACO), OpenGL ES 3.2)` — **no SwiftShader**. Los 7 md5 distintos y 538–771 KB (contra los 80 KB
+idénticos de la tarjeta de error).
+
+---
+
+## 🔴 Decisión pendiente — NO la tomé yo
+
+**El carril de visión (`8d323eea`, uno de los 34).** Dos benches se contradicen y ninguno gana solo:
+
+- **`main`** → `vision.model = 'qwen3-vl:8b'`. Respaldo: *Arena visual 2026-07-22*, 12 casos con
+  **cada presencia emparejada con su ausencia**: qwen3-vl:8b 12/12; gemma3:4b 58 %, fallando **3 de 7
+  ausencias** (decía ver lo que no estaba) — "inservible como gate".
+- **`dev`** → `ENV.VISION_MODEL = 'qwen3.5:4b'`. Respaldo: bench profundo PR #2738 (18 plagas + 5
+  sanas), donde qwen3-vl:8b saca 16.9.
+
+**Resolví la ESTRUCTURA (leer de `ENV`, que es mejor y no está en disputa) y dejé el VALOR en
+`qwen3.5:4b`,** que es lo que `dev` traía y lo coherente con el resto de claves. **Pero el valor es
+suyo, no mío**, por tres razones:
+1. `8d323eea` es uno de los 34 y es el único cuyo contenido **no** sobrevive.
+2. El comentario del propio `dev` en `src/config/env.js` dice, textual, que el bench nuevo **no**
+   repite el diseño pareado presencia/ausencia, y pide *"confirmar con el operador … antes de que
+   este PR llegue a producción (dev→main)"*. Este merge **es** ese dev→main.
+3. Un juez de visión que falla las ausencias **aprueba arte que no está ahí**.
+
+**Para volver a `main`: una línea** en `src/config/env.js` →
+`VISION_MODEL: import.meta.env?.VITE_VISION_MODEL || 'qwen3-vl:8b'`.
+
+---
+
+## Lo que NO pude verificar
+
+| Qué | Por qué |
+|---|---|
+| **Prueba de migración con base poblada** | No ejecutada. El DIAGNÓSTICO ya la deja descartada por código (`src/db/` byte a byte idéntico, `DB_VERSION=27`), y **el merge no toca `src/db/`**. Sigue siendo la única prueba que convertiría "no hay cambio de esquema" en "verificado end-to-end". |
+| **Suite completa (913 archivos)** | No corrida. Corrí el gate de CI + los tests de los 34 + RAG + grafo. **No sé el número absoluto de fallos.** |
+| **eslint** | No corrido — instrucción explícita (~18 min). |
+| **Las otras ~40 rutas 3D** | Capturé **7 de ~46**, elegidas por peso de conflicto. Las demás **no tienen captura**. |
+| **Que el arte de `dev` sea "mejor"** | Verifiqué que **dibuja**, no que guste. Eso lo juzga el operador. |
+| **`mundo3d-agua` vacío** | No lo revisé: el DIAGNÓSTICO §5.4 ya probó que es **idéntico en las dos ramas** — deuda previa, no del merge. |
+| **Copy contra escena en `bosque-vivo`** | La vitrina promete *"su rostro tallado en la madera"* (el Ent) y la escena que carga es el páramo definitivo, que por decisión del 2026-07-22 va **sin Ent**. Se ve bien, pero **el texto y la escena no dicen lo mismo**. No lo toqué: es contenido, no merge. |
+| **Que `origin/dev` no se mueva** | Hay otro agente mergeando `feat/compai-fuente-unica` y `fable/compai-gestos-entrada` a `dev`. Esta rama fusiona `origin/dev` = `3ef4954d`, **fijo**. Ver §Sobre `dev` moviéndose. |
+
+## Sobre `dev` moviéndose
+
+Elegí **fijar `origin/dev` en `3ef4954d`** y entregar, en vez de esperar. Razones: los 125 conflictos
+ya están resueltos y **documentados uno por uno**, y el diagnóstico midió que la brecha crece
+**+5,7 conflictos/día** — esperar a que otro agente termine sólo agranda lo que hay que rehacer.
+
+**Lo que falta cuando `dev` aterrice** es un `git merge origin/dev` de remate sobre esta rama. Debería
+ser barato: lo que entre nuevo es trabajo de `compai` (avatares/gestos), que toca
+`ChagraAgentAvatar*`, `useAgentAvatarType.js` y `visual/agente/` — **en esos archivos ya gana `dev`**,
+así que el criterio está fijado. **No lo hice yo para no fusionar trabajo ajeno a medio terminar.**
