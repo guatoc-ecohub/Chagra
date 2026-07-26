@@ -3,6 +3,19 @@ import { fileURLToPath } from 'node:url';
 
 const EXT_CANDIDATES = ['.js', '.mjs', '.jsx', '.ts', '.tsx'];
 
+// Catálogo REAL para el tier-gate del bench (fix 2026-07-26).
+// ANTES: getAllSpecies() se stubeaba a `[]`. Eso hacía que ragRetriever.buildCorpus()
+// tomara la rama FAIL-CLOSED (audit P0-1) y degradara el corpus a las ~44 especies
+// de CROP_TAXONOMY — mientras que PRODUCCIÓN carga 463 (= catalog.sqlite ∩ manifest).
+// Resultado: el bench medía un corpus 10x más chico que el real y reportaba ceros
+// "por ausencia" (la ficha esperada ni siquiera estaba indexada), así que el número
+// de recall del CI no era el de prod. Ahora leemos el mismo catalog.sqlite que sirve
+// el navegador, vía node:sqlite, replicando `SELECT data FROM species` + JSON.parse
+// de src/db/catalogDB.js (misma forma de fila).
+// Si el catálogo no se puede leer, degradamos a [] (comportamiento anterior) pero
+// GRITANDO, para que nadie vuelva a leer un recall deflactado como si fuera de prod.
+const CATALOG_PATH = fileURLToPath(new URL('../public/catalog.sqlite', import.meta.url));
+
 async function fileExists(url) {
   try {
     const s = await stat(fileURLToPath(url));
@@ -55,7 +68,30 @@ export async function load(url, context, nextLoad) {
     return {
       format: 'module',
       shortCircuit: true,
-      source: 'export const getAllSpecies = async () => [];\n',
+      source: [
+        "import { DatabaseSync } from 'node:sqlite';",
+        `const CATALOG_PATH = ${JSON.stringify(CATALOG_PATH)};`,
+        'let cache = null;',
+        'export const getAllSpecies = async () => {',
+        '  if (cache) return cache;',
+        '  try {',
+        '    const db = new DatabaseSync(CATALOG_PATH, { readOnly: true });',
+        // Mismo query y mismo parseo que src/db/catalogDB.js::getAllSpecies().
+        "    const rows = db.prepare('SELECT data FROM species').all();",
+        '    db.close();',
+        '    cache = rows.map((r) => JSON.parse(r.data));',
+        '    console.info(`[bench-loader] catálogo real: ${cache.length} especies desde catalog.sqlite (tier-gate como en prod).`);',
+        '  } catch (err) {',
+        '    cache = [];',
+        "    console.warn('[bench-loader] AVISO: no se pudo leer catalog.sqlite (' + err.message + ').');",
+        "    console.warn('[bench-loader] getAllSpecies() devuelve [] → el tier-gate degradará FAIL-CLOSED a ~44 especies.');",
+        "    console.warn('[bench-loader] El recall que imprima este bench NO es el de producción (463 especies). NO lo reportes como tal.');",
+        '  }',
+        '  return cache;',
+        '};',
+        'export const getSpeciesById = async (id) => (await getAllSpecies()).find((s) => s.id === id) || null;',
+        '',
+      ].join('\n'),
     };
   }
   if (url.endsWith('.json')) {
