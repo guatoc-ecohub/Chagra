@@ -267,6 +267,40 @@
   filter: blur(0.42px);
 }
 
+/* SE PICA EL OJO (guino) — el gesto que el operador nombró por su nombre en el
+   SPEC y que faltaba en el repertorio. Un PARPADEO es biología: los dos ojos,
+   involuntario. Un GUIÑO es complicidad: UN solo ojo, a propósito, y con la
+   cabecita ladeada de "usted y yo sabemos". Por eso se anima el segundo <g>
+   de .rh-blink (el ojo de un lado) y NO el grupo entero.
+   1.8s = MOMENTOS_IDLE.guino.dur (regla dura: el keyframe y el scheduler
+   miden lo mismo o el empalme salta). */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='guino'] .rh-blink {
+  animation: none;  /* el parpadeo normal calla: el guiño debe leerse solo */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='guino'] .rh-blink > g:last-of-type {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: agt-guino 1.8s cubic-bezier(0.4, 0, 0.3, 1.2) 1;
+}
+@keyframes agt-guino {
+  0%, 26%   { transform: scale(1.09) scaleY(1); }
+  36%       { transform: scale(1.09) scaleY(0.06); }  /* se cierra, decidido */
+  56%       { transform: scale(1.09) scaleY(0.06); }  /* lo sostiene: es a propósito */
+  70%       { transform: scale(1.09) scaleY(1.14); }  /* se abre pasado de rosca */
+  100%      { transform: scale(1.09) scaleY(1); }
+}
+/* …y el cuerpo lo acompaña con un ladeo corto — el guiño es de la CRIATURA,
+   no de un ojo suelto. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='guino'] .agt-cuerpo {
+  animation: agt-guino-cuerpo 1.8s ease-in-out 1;
+}
+@keyframes agt-guino-cuerpo {
+  0%, 100% { transform: rotate(0deg) scale(1, 1); }
+  34%      { transform: rotate(-3.4deg) scale(1.02, 0.98); }  /* ladea y guiña */
+  62%      { transform: rotate(-2.6deg) scale(1, 1); }
+  82%      { transform: rotate(0.8deg) scale(0.99, 1.01); }   /* vuelve, satisfecha */
+}
+
 /* SE POSA — aterrizar CUESTA: se alza un pelo eligiendo el sitio, baja con
    peso (ease-in), amortigua con squash y queda abajo (fill forwards empalma
    con la quietud de 'posada'). Las alitas siguen frenando en el aire. */
