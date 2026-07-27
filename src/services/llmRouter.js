@@ -169,12 +169,45 @@ export const ROUTES = {
     // presencia SIEMPRE emparejada con su ausencia — que no se re-testeó
     // con el dataset nuevo).
     model: ENV.VISION_MODEL,
-    keep_alive_min: 0,
+    // 2026-07-26 — ERA 0, decisión del operador: QUITARLO. El 0 venía de
+    // cuando visión era `qwen3-vl:8b` y "no cabía" junto al chat en 12 GiB.
+    // Medido, esa premisa es falsa: los dos modelos conviven (9691/12288 MiB)
+    // y con keep_alive normal la foto baja de ~8,5 s a 0,8 s. Ver
+    // `keepAliveEfectivo` abajo para la medición completa y la guarda.
+    keep_alive_min: 10,
     temperature: 0.2,
+    // marca de rol: la usa `keepAliveEfectivo` y el segundo paso.
+    _paso: 1,
     max_tokens: 512,
     url: '/api/ollama/v1/chat/completions',
     rationale:
       'Histórico (Arena visual 2026-07-22, 12 casos, cada presencia emparejada con su ausencia, GPU limpia): qwen3-vl:8b acierta 12/12 — 5/5 presencia y 7/7 ausencia — a 17s por imagen, 100% GPU sin offload (7,6 GB). Le seguían qwen2.5vl:7b 92%, gemma4:e4b 75%, gemma3:4b 58% (fallaba 3 de 7 ausencias — inservible como gate en ESE diseño) y moondream 0%. Superseded por PR #2738 §9 (dataset distinto, 18 plagas + 5 sanas): gemma3:4b sale primero en identificación y honestidad. Detalle en Chagra-strategy/ops/MODELS.md (fuente unica).',
+  },
+  /* ── EL SEGUNDO PASO DEL DIAGNÓSTICO DE FOTO ─────────────────────────────
+     Decisión del operador 2026-07-26: el primero contesta de una y este
+     vuelve a mirar en segundo plano, avisando SÓLO si encuentra algo que el
+     otro pasó por alto. Un modelo DISTINTO del chat a propósito — si fuera el
+     mismo, la segunda mirada no aportaría nada nuevo.
+
+     ⚠️ `num_predict` amplio y NO se le cree a `think:false`: qwen3-vl:4b
+     razona igual, y con presupuesto corto devuelve CADENA VACÍA
+     (`done_reason: "length"`). Medido: con 90 sacaba 4/11; con presupuesto
+     suficiente, 11/11. No es que no sepa — es que no lo dejan hablar.
+
+     ⚠️ Convivencia MEDIDA en alpha: qwen3.5:4b (6,0 GB) + qwen3-vl:4b
+     (4,8 GB) = 9691/12288 MiB, y el chat sigue contestando en 0,70 s — pero
+     SÓLO serializado. Disparándolo en paralelo con el embebedor del RAG se
+     reprodujo el DESALOJO del chat pineado, con 8,56 s de recarga. El cerrojo
+     de un-solo-vuelo vive en services/segundaOpinionFoto.js. */
+  visionRevision: {
+    model: ENV.VISION_REVIEW_MODEL,
+    keep_alive_min: 10,
+    temperature: 0.1,
+    max_tokens: 700,
+    url: '/api/ollama/v1/chat/completions',
+    _paso: 2,
+    rationale:
+      'Segundo paso del diagnostico de foto. Bench propio sobre 19 fotos reales de matas del repo, emparejado presencia/ausencia (scripts/bench-vision-matas.mjs, 2026-07-26): qwen3-vl:4b 19/19 (11/11 enfermas, 8/8 sanas) contra 18/19 de qwen3.5:4b, que nunca alarma de mas pero dejo pasar la broca del cafe. Precio: 2,3x en latencia (6,22 s vs 2,75 s de mediana) porque razona aunque se le pida que no; por eso corre en segundo plano, nunca en el camino critico. Los errores de ambos son de TIPO OPUESTO: el segundo cubre el hueco del primero.',
   },
 };
 
@@ -212,6 +245,42 @@ export function getModelFor(task) {
  *   ]);
  *   const response = await streamOpenAI(url, body, onToken);
  */
+/**
+ * keep_alive efectivo de una ruta. **La guarda que faltaba.**
+ *
+ * `keep_alive: 0` significa "descargá el modelo apenas contestes". Es una
+ * estrategia legítima cuando la ruta usa un modelo PROPIO (se carga, responde
+ * y libera la GPU). Pero desde que los roles se unificaron en un solo modelo
+ * (`config/env.js`: chat, nlu, extractor, complex y visión son todos
+ * `qwen3.5:4b`), ese 0 dejó de liberar a un invitado y pasó a **echar al
+ * dueño de casa**: cada turno con foto le decía a Ollama que descargara el
+ * modelo del que depende el chat, y el siguiente mensaje pagaba el arranque
+ * en frío completo.
+ *
+ * MEDIDO en alpha (2026-07-26, Quadro M6000 12 GiB):
+ *   · el mecanismo, probado con un modelo señuelo para no tocar producción:
+ *     `gemma3:4b` residente + una petición con `keep_alive:0` → desaparece.
+ *   · el costo, en el carril de visión: con 0, cada foto paga carga en frío
+ *     (8,51 s y 5,72 s). Con `keep_alive` normal: 6,70 s la primera y luego
+ *     **0,80 s y 0,78 s**.
+ *   · y no hacía falta: `qwen3.5:4b` (6,0 GB) y `qwen3-vl:4b` (4,8 GB)
+ *     CONVIVEN en 9691 de 12288 MiB. La premisa de que no cabían era falsa.
+ *
+ * Por eso la regla es estructural y no ruta-por-ruta: **ninguna ruta puede
+ * pedir la descarga del modelo que sirve el chat.** Si una ruta futura vuelve
+ * a compartir modelo con el chat, queda protegida sola.
+ *
+ * @param {ModelRoute} route
+ * @returns {number} minutos de keep_alive a enviar.
+ */
+export function keepAliveEfectivo(route) {
+  const min = Number(route?.keep_alive_min) || 0;
+  if (min > 0) return min;
+  // Comparte modelo con el chat → jamás 0: se hereda el del chat.
+  if (route?.model && route.model === ROUTES.chat.model) return ROUTES.chat.keep_alive_min;
+  return min;
+}
+
 export function buildLLMRequest(task, messages, overrides = {}) {
   const route = getModelFor(task);
   const body = {
@@ -221,7 +290,8 @@ export function buildLLMRequest(task, messages, overrides = {}) {
     max_tokens: overrides.max_tokens ?? route.max_tokens,
     // keep_alive controla cuánto Ollama mantiene el modelo en RAM tras
     // esta request. Formato Ollama: número en segundos o sufijo "m"/"h".
-    keep_alive: `${route.keep_alive_min}m`,
+    // Pasa por la guarda: una ruta nunca descarga el modelo del chat.
+    keep_alive: `${keepAliveEfectivo(route)}m`,
   };
   // BUG A fix (2026-05-30): forward stop sequences (de la ruta o del
   // override). Ollama OpenAI-compat respeta `stop` (string[]). Solo se
