@@ -204,6 +204,52 @@ bundle**: `grep __CHAGRA_VIEW__ dist/assets/*.js` → `main-COd84QdM.js`. Ademá
 marcador: en `antes/` el campo `vista` sale **`null`** (no existía) y en `despues/` sale con nombre —
 o sea que las dos corridas son de bundles distintos, y eso queda probado por los datos, no por la fe.
 
+#### La regresión que más fácil se cuela: dejar afuera al campesino
+
+`ops/capturas/fuga-login-2026-07-26/con-sesion/` — misma sonda, misma build, pero **con token
+sembrado** (`--sesion`). **9 paradas, 0 lo botaron a login:**
+
+| Parada | vista montada |
+|---|---|
+| `01-raiz` · `02-dashboard` | `dashboard` |
+| `03-agente` | `agente` (Angelita saludando) |
+| `04-inventario` | `activos` |
+| `05-perfil` | `perfil` |
+| `06-informes` | `informes` |
+| **`12-puerta-evento-inventario`** | **`activos`** — la puerta sigue abriendo para él |
+| **`13-puerta-evento-dashboard`** | `dashboard` |
+
+**La misma puerta, en tres estados** — es la prueba más limpia que salió de todo esto:
+
+| | quién | qué se abre |
+|---|---|---|
+| `antes/12-*.png` | anónimo | **Activos** 🔴 la fuga |
+| `despues/12-*.png` | anónimo | **login** ✅ cerrada |
+| `con-sesion/12-*.png` | con sesión | **Activos** ✅ el campesino intacto |
+
+> `07-valle3d` con sesión monta `dashboard`, no `valle3d`. **No es del arreglo:** `valle3d` **no tiene
+> ruta hash** (`grep -c "'valle3d':" src/App.jsx` → **0**); se llega por la banda de MundosDeMiFinca
+> con `navigate('valle3d')`, y `#valle3d` siempre cayó al `|| 'dashboard'`. Deuda previa.
+>
+> El banner *"El servidor tuvo un problema"* en esas capturas es que en `stg` no hay farmOS detrás
+> del token sembrado. No toca el gate: la pantalla real **montó**, que es lo que se estaba probando.
+
+#### Tests
+
+`npx vitest run src/__tests__/ src/mockups/__tests__/mockupRoutes.reachability.test.jsx
+src/config/__tests__/vistasPublicas.test.js --no-file-parallelism`
+→ **12 archivos, 52 tests, 0 fallos.**
+
+> ⚠️ **Casi reporto una regresión que no existía.** En una corrida ANTERIOR, con la sonda de
+> chromium y el `vite preview` peleando por la CPU de `stg`, **6 tests de ruta de `App` fallaron**, y
+> todos eran del tipo *"con sesión autenticada monta X"* — exactamente la regresión que este encargo
+> advierte. Antes de tocar nada los corrí **en el worktree baseline `3ef4954d` sin mis cambios**
+> (`/home/kortux/Workspace/wt-baseline-dev`): **pasaban**. Eso apuntaba a que eran míos. Pero
+> aislados también pasaban, y con la máquina libre y `--no-file-parallelism` pasan los 52.
+> Era **contención de CPU**, no el arreglo. Queda escrito porque el camino corto —"fallan 6, debe ser
+> mi cambio" o "pasan solos, no pasa nada"— llevaba a la conclusión equivocada en las dos
+> direcciones.
+
 #### Cómo repetir la prueba
 
 ```bash

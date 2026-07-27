@@ -1,0 +1,207 @@
+{
+  "base": "http://127.0.0.1:4173",
+  "conSesion": true,
+  "generado": "2026-07-27T01:10:15.277Z",
+  "resultados": [
+    {
+      "caso": "01-raiz",
+      "hash": "",
+      "que": "la raíz — sin sesión debe caer en LOGIN, no en el valle",
+      "url": "http://127.0.0.1:4173/",
+      "hashFinal": "",
+      "vista": "dashboard",
+      "titulo": "Chagra",
+      "texto": "Chagra su mano en el campo 🔋 📶▁▃▅ v1.0.55 PASO 1 DE 5 Saltar BIENVENIDO A CHAGRA Esta chagra es suya Un cuaderno de campo que escucha, mira y aprende de su finca. Escuchar en voz alta Siguiente 📍 Primero: ¿dónde está ",
+      "inputs": [
+        "file"
+      ],
+      "canvas": 1,
+      "login": false,
+      "errores": [
+        "[pageerror] Failed to execute 'open' on 'IDBFactory': access to the Indexed Database API is denied in this context.",
+        "[pageerror] Failed to execute 'open' on 'IDBFactory': access to the Indexed Database API is denied in this context.",
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ],
+      "captura": "01-raiz.png"
+    },
+    {
+      "caso": "02-dashboard",
+      "hash": "#dashboard",
+      "que": "el home real",
+      "url": "http://127.0.0.1:4173/#dashboard",
+      "hashFinal": "#dashboard",
+      "vista": "dashboard",
+      "titulo": "Chagra",
+      "texto": "Chagra su mano en el campo 🔋 📶▁▃▅▇ v1.0.55 PASO 1 DE 5 Saltar BIENVENIDO A CHAGRA Esta chagra es suya Un cuaderno de campo que escucha, mira y aprende de su finca. Escuchar en voz alta Siguiente 📍 Primero: ¿dónde está",
+      "inputs": [
+        "file"
+      ],
+      "canvas": 1,
+      "login": false,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ],
+      "captura": "02-dashboard.png"
+    },
+    {
+      "caso": "03-agente",
+      "hash": "#agente",
+      "que": "el agente (pantalla real)",
+      "url": "http://127.0.0.1:4173/#agente",
+      "hashFinal": "#agente",
+      "vista": "agente",
+      "titulo": "Chagra",
+      "texto": "Chagra IA AGENTE AGROECOLÓGICO Con señal Buenas noches. Soy Angelita, de Chagra. Todo tranquilo por ahora — no hay nada urgente en tu finca. El calendario marca segunda temporada seca (junio–agosto), pero el clima real m",
+      "inputs": [
+        "file"
+      ],
+      "canvas": 0,
+      "login": false,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ],
+      "captura": "03-agente.png"
+    },
+    {
+      "caso": "04-inventario",
+      "hash": "#inventario",
+      "que": "inventario de la finca (datos reales)",
+      "url": "http://127.0.0.1:4173/#inventario",
+      "hashFinal": "#inventario",
+      "vista": "activos",
+      "titulo": "Chagra",
+      "texto": "Activos GUATOC Siembras Zonas Infraestructura Insumos El servidor tuvo un problema. Volveré a intentar en unos segundos. Zonas Ver todos (0) Sin zonas registradas Cree su primera zona desde la pestaña Infraestructura, o ",
+      "inputs": [
+        "Buscar activo..."
+      ],
+      "canvas": 0,
+      "login": false,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ],
+      "captura": "04-inventario.png"
+    },
+    {
+      "caso": "05-perfil",
+      "hash": "#perfil",
+      "que": "perfil del usuario",
+      "url": "http://127.0.0.1:4173/#perfil",
+      "hashFinal": "#perfil",
+      "vista": "perfil",
+      "titulo": "Chagra",
+      "texto": "Perfil de Usuario 1 Trabajador OPERADOR DE CAMPO guatoc Apariencia Tema, fondo y avatar Chagra Mi finca Buenas, así se ve tu app Colores reales de este tema, en vivo. Mis cultivos Al día Almanaque 2 tareas ¿Cuándo siembr",
+      "inputs": [
+        "file"
+      ],
+      "canvas": 0,
+      "login": false,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ],
+      "captura": "05-perfil.png"
+    },
+    {
+      "caso": "06-informes",
+      "hash": "#informes",
+      "que": "informes de la finca",
+      "url": "http://127.0.0.1:4173/#informes",
+      "hashFinal": "#informes",
+      "vista": "informes",
+      "titulo": "Chagra",
+      "texto": "Informes 1 Reportes descargables consolidados de la finca. Cada uno se genera con la data sincronizada al momento, incluye registros pendientes de sync con un marcador. Historial completo (CSV) Cosechas, aplicaciones de ",
+      "inputs": [
+        "checkbox"
+      ],
+      "canvas": 0,
+      "login": false,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ],
+      "captura": "06-informes.png"
+    },
+    {
+      "caso": "07-valle3d",
+      "hash": "#valle3d",
+      "que": "el valle de la app — es el PRIVADO, va tras login",
+      "url": "http://127.0.0.1:4173/#valle3d",
+      "hashFinal": "#valle3d",
+      "vista": "dashboard",
+      "titulo": "Chagra",
+      "texto": "Chagra su mano en el campo 🔋 📶▁▃▅ v1.0.55 PASO 1 DE 5 Saltar BIENVENIDO A CHAGRA Esta chagra es suya Un cuaderno de campo que escucha, mira y aprende de su finca. Escuchar en voz alta Siguiente 📍 Primero: ¿dónde está ",
+      "inputs": [
+        "file"
+      ],
+      "canvas": 1,
+      "login": false,
+      "errores": [
+        "[pageerror] Failed to execute 'open' on 'IDBFactory': access to the Indexed Database API is denied in this context.",
+        "[pageerror] Failed to execute 'open' on 'IDBFactory': access to the Indexed Database API is denied in this context.",
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ],
+      "captura": "07-valle3d.png"
+    },
+    {
+      "caso": "12-puerta-evento-inventario",
+      "hash": "",
+      "evento": "activos",
+      "que": "la PUERTA: pedirle al bus de la app una pantalla real, sin sesión",
+      "url": "http://127.0.0.1:4173/",
+      "hashFinal": "",
+      "vista": "activos",
+      "titulo": "Chagra",
+      "texto": "Activos GUATOC Siembras Zonas Infraestructura Insumos El servidor tuvo un problema. Volveré a intentar en unos segundos. Zonas Ver todos (0) Sin zonas registradas Cree su primera zona desde la pestaña Infraestructura, o ",
+      "inputs": [
+        "Buscar activo..."
+      ],
+      "canvas": 0,
+      "login": false,
+      "errores": [
+        "[pageerror] Failed to execute 'open' on 'IDBFactory': access to the Indexed Database API is denied in this context.",
+        "[pageerror] Failed to execute 'open' on 'IDBFactory': access to the Indexed Database API is denied in this context.",
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ],
+      "captura": "12-puerta-evento-inventario.png"
+    },
+    {
+      "caso": "13-puerta-evento-dashboard",
+      "hash": "",
+      "evento": "dashboard",
+      "que": "la PUERTA: el home real por el bus, sin sesión",
+      "url": "http://127.0.0.1:4173/",
+      "hashFinal": "",
+      "vista": "dashboard",
+      "titulo": "Chagra",
+      "texto": "Chagra su mano en el campo 🔋 📶▁▃▅ v1.0.55 PASO 1 DE 5 Saltar BIENVENIDO A CHAGRA Esta chagra es suya Un cuaderno de campo que escucha, mira y aprende de su finca. Escuchar en voz alta Siguiente 📍 Primero: ¿dónde está ",
+      "inputs": [
+        "file"
+      ],
+      "canvas": 1,
+      "login": false,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+        "[console] Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+      ],
+      "captura": "13-puerta-evento-dashboard.png"
+    }
+  ]
+}
