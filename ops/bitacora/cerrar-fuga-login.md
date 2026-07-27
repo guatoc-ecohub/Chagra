@@ -169,6 +169,15 @@ también quedan gateados sin tocarlos.
 la suite E2E es informativa y no bloquea merge). Ese spec va a `/#login` y espera el campo de
 usuario — camino público, intacto.
 
+**Build con el arreglo:** `npx vite build` → **EXIT=0**, 3m22s.
+
+**Que el bundle servido es el NUEVO** (el otro agente ya se quemó hoy con un build verde y la app
+muerta por caché de `node_modules`): se borró `node_modules/.vite` antes de construir, `node_modules`
+es un **symlink** al del repo principal, y se comprobó que el marcador nuevo **está dentro del
+bundle**: `grep __CHAGRA_VIEW__ dist/assets/*.js` → `main-COd84QdM.js`. Además la sonda lee ese mismo
+marcador: en `antes/` el campo `vista` sale **`null`** (no existía) y en `despues/` sale con nombre —
+o sea que las dos corridas son de bundles distintos, y eso queda probado por los datos, no por la fe.
+
 #### Cómo repetir la prueba
 
 ```bash
