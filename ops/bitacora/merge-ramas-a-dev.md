@@ -263,6 +263,39 @@ imagen: el fix `aparecioRef` de `useEntradaAbeja.jsx` es un guard de una línea
 `visibility:hidden` después del atrape. Es correcto y acotado, pero **queda
 pendiente el gate visual del cruce**; lo hereda quien tenga sesión en el arnés.
 
+### Tests — suite COMPLETA tras los DOS merges (cerrada después del push)
+```
+Test Files  39 failed | 824 passed | 2 skipped (865)
+Tests       64 failed | 12018 passed | 1 expected fail | 25 skipped (12108)
+Duration    2232 s
+```
+Contra la corrida del merge 1 (63 rojos) aparece **UN** rojo nuevo:
+
+```
+src/components/__tests__/AssetDetailView.smoke.test.jsx
+  > PlanSection wiring (audit 070.7)
+  > monta PlanEditor cuando la planta es una species con feeding_plan_template
+```
+
+No toca nada del compAI. **Verificado en vez de supuesto** — corrido aislado:
+
+| árbol | resultado |
+|---|---|
+| mi merge | **8/8 pasa** |
+| `origin/dev` limpio | **8/8 pasa** |
+
+Es **flaky bajo carga**, no una regresión. Y la causa es mía y conocida: esa
+suite corrió **en paralelo con el gate visual** (chromium headed + servidor de
+vite), y el propio reporte lo delata — `environment 8651 s` sobre 2232 s de
+reloj es contención pura.
+
+**Lección para el próximo**: el gate visual y la suite completa **no se solapan**
+en esta máquina; un test de humo de componente se cae por timing y regala un
+falso rojo que cuesta media hora descartar.
+
+**Veredicto: 0 regresiones.** Los 63 rojos estructurales son preexistentes en
+`dev` y el 64.º es ruido de contención.
+
 ### Coordinación con el frente `dev`→`main`
 `integra/dev-a-main-2026-07-26` **ya está entregada** y fijó su base en
 `origin/dev` @ `3ef4954d`. Todo lo que yo aterrice en `dev` queda **después** de
