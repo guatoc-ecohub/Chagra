@@ -293,3 +293,42 @@ en localforage (DB `Chagra`, store `syncQueue`), consiguió
 
 **Una foto vacía no aprueba nada.** Así que el segundo paso queda **verificado
 por tests y por build, no por imagen de punta a punta**.
+
+---
+
+### 🔴 HALLAZGO TARDÍO — el cableado de visión tiene un agente VIVO otra vez
+
+A las 01:26, revisando el worktree principal, aparecieron **dos capturas nuevas**
+que no existían en mi foto de entrada:
+
+```
+01:20:51  capturas-compai/gate-so-2-conversacion.png   (191 KB)
+01:26:26  capturas-compai/gate-so-1-foto-adjunta.png   ( 91 KB)
+```
+
+Y sí: hay un proceso **vivo** corriendo `gate-segunda-opinion.mjs` con chromium
+headed sobre `/home/kortux/Workspace/chagra`. Alguien retomó ese frente.
+
+**Consecuencia operativa: NO mergeo el cableado de visión a `dev`.** Ese trabajo
+tiene dueño activo en este momento; meterlo yo por debajo sería duplicarlo y
+fabricarle conflictos a quien lo está gateando. Mi rescate queda **commiteado y
+pusheado** en `integra/consolidacion-final-2026-07-26` (`9996e69d`) para que no
+se vuelva a perder si el agente se cae otra vez — que ya pasó una vez hoy.
+
+#### Y lo que esa captura enseña — el segundo paso NO cierra de punta a punta
+
+`gate-so-2-conversacion.png` muestra la pantalla del agente con la foto real
+adjunta (*"Foto enviada para análisis"*, una mata de col en su cama de tierra),
+el avatar elegible funcionando (*"Chagra IA · AGENTE AG…"* con el maíz), y
+abajo, en rojo:
+
+```
+Chagra no pudo responder (código 404). Intente de nuevo.
+IA offline o lenta — las respuestas pueden tardar más de lo normal.
+```
+
+O sea: la pantalla **monta y adjunta la foto**, pero el modelo de visión
+**no contesta (404)** desde ese arnés. El segundo par de ojos no llega a
+correr. Eso confirma —desde otro frente y con otra herramienta— lo que ya
+había concluido: **la ida y vuelta real del segundo paso sigue sin prueba
+visual**, y no por culpa del código sino porque el arnés no alcanza el backend.
