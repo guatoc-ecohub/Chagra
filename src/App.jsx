@@ -604,6 +604,7 @@ const EspirituProScreen = lazy(() => import('./components/EspirituProScreen'));
 import HomeRegionalGreeting from './components/HomeRegionalGreeting';
 import { fincaVivaHomePerfilActivo } from './config/fincaVivaHomeFlag';
 import { esExtensionistaActual } from './config/extensionistaAccess';
+import { construirVistasPublicas, decidirNavegacion } from './config/vistasPublicas';
 
 localforage.config({
   name: 'Chagra',
@@ -792,6 +793,14 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/condor-cielo-3d': 'mockup_condor_cielo_3d',
   'mockups/navegador-grafo': 'mockup_navegador_grafo',
 };
+
+// LA PUERTA DE `chagra.app`: las únicas vistas que se montan SIN sesión.
+// Se construye DESDE `MOCKUP_HASH_ROUTES` (las vitrinas que el router ya abría
+// antes del check de auth) + las 3 de la entrada, así que una vitrina nueva
+// entra sola y no hay dos listas que mantener sincronizadas.
+// Todo lo demás —lo que tiene datos de finca— pasa por el gate de `navigate`.
+// Ver `src/config/vistasPublicas.js` para el porqué de producto.
+const VISTAS_PUBLICAS = construirVistasPublicas(Object.values(MOCKUP_HASH_ROUTES));
 
 const HASH_VIEW_ROUTES = {
   agente: 'agente',
@@ -1141,10 +1150,16 @@ export default function App() {
   // Solo activos post-login (no en loading ni login para no atrapar shift+?
   // accidental al escribir password).
   const [currentView, setCurrentView] = useState('loading');
-  // Landing 3D público: la raíz sin sesión monta el valle 3D como "tema" de
-  // entrada. `sinSesion` recuerda que no hay auth para que el botón volver del
-  // valle mande a login (y no al dashboard vacío).
+  // `sinSesion` recuerda que el chequeo de auth dio negativo, para que los
+  // botones "volver" de las vitrinas manden a login y no al dashboard vacío.
   const [sinSesion, setSinSesion] = useState(false);
+  // ESPEJO SÍNCRONO de la sesión, para el gate de `navigate`.
+  // `navigate` es síncrono (lo llaman handlers de click y de evento);
+  // `isAuthenticated()` es async porque lee IndexedDB vía localforage. Sin este
+  // espejo el gate no podría decidir sin volverse async y romper a todos sus
+  // llamadores. Tri-estado: null = todavía no sabemos → `navigate` verifica
+  // antes de dejar pasar (nunca adivina que sí).
+  const sesionRef = useRef(null);
   // Estado online reactivo: usado para mostrar el aviso offline del agente
   // ANTES de intentar el dynamic import de AgentScreen (ver `case 'agente'`).
   // Sin esto, abrir el agente offline con su chunk no cacheado caía en el
@@ -1186,11 +1201,9 @@ export default function App() {
   // conversación monta detrás; al terminar, queda la conversación limpia.
   const [colibriTransition, setColibriTransition] = useState(false);
 
-  // navigate(view, data), único entry point para cambiar vista. Limpia
-  // currentViewData salvo cuando se pasa explícitamente. Sin esto, navegar
-  // dashboard → vista_con_initialData → dashboard → misma_vista_otra_vez
-  // reusaba el initialData stale (bug latente de UX).
-  const navigate = useCallback((view, initialData = null) => {
+  // Monta la vista, sin preguntar nada. NO se llama directo desde la app: el
+  // único camino público es `navigate`, que primero pasa por el gate de sesión.
+  const aplicarVista = useCallback((view, initialData = null) => {
     // Transición Angelita solo en home→conversación (la portada con el hero del
     // agente → el agente). Otras entradas al agente (FAB, tile, notificación)
     // conservan la entrada suave estándar del AgentScreen, sin video.
@@ -1216,6 +1229,68 @@ export default function App() {
       }
     } catch (_) { /* telemetría nunca rompe el flujo */ }
   }, [currentView]);
+
+  // Espejo de solo lectura de la vista montada, para diagnóstico externo (misma
+  // idea que window.__CHAGRA_BUILD_SHA__ en main.jsx). Lo lee la sonda de la
+  // puerta, `scripts/diag/sonda-fuga-login.mjs`, para poder afirmar QUÉ pantalla
+  // quedó montada sin adivinar por el DOM. Solo el nombre de la vista.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    /** @type {any} */ (window).__CHAGRA_VIEW__ = currentView;
+  }, [currentView]);
+
+  // navigate(view, data) — ÚNICO entry point para cambiar de vista, y LA PUERTA.
+  //
+  // Antes esto solo seteaba la vista, sin volver a mirar la sesión: quien
+  // consiguiera una referencia a `navigate` abría cualquier pantalla. El valle
+  // público la recibía entera (`onNavigate={navigate}`), así que un anónimo
+  // aterrizaba en el valle y entraba caminando a las pantallas de verdad.
+  // Ahora toda navegación pasa por el gate, venga de donde venga: puertas del
+  // valle, eventos `chagraNavigate`/`chagra:nav`, deep-links, botones internos.
+  //
+  // Limpia currentViewData salvo cuando se pasa explícitamente. Sin esto,
+  // navegar dashboard → vista_con_initialData → dashboard → misma_vista_otra_vez
+  // reusaba el initialData stale (bug latente de UX).
+  const navigate = useCallback((view, initialData = null) => {
+    const decision = decidirNavegacion({
+      vista: view,
+      vistasPublicas: VISTAS_PUBLICAS,
+      sesion: sesionRef.current,
+    });
+
+    // Sesión desconocida (arranque en frío, o alguien navegó antes de que
+    // resolviera el chequeo inicial). NO se adivina: se confirma contra
+    // localforage y recién ahí se decide. El campesino con token no pierde
+    // nada — llega a donde iba, un tick después.
+    if (decision.verificar) {
+      isAuthenticated()
+        .then((hayToken) => {
+          sesionRef.current = hayToken;
+          if (!hayToken) setSinSesion(true);
+          const confirmada = decidirNavegacion({
+            vista: view,
+            vistasPublicas: VISTAS_PUBLICAS,
+            sesion: hayToken,
+          });
+          aplicarVista(confirmada.vista, confirmada.gateada ? null : initialData);
+        })
+        .catch(() => {
+          // Si ni siquiera se pudo leer el almacenamiento, se cierra: fail-closed.
+          sesionRef.current = false;
+          setSinSesion(true);
+          aplicarVista('login', null);
+        });
+      return;
+    }
+
+    if (decision.gateada) {
+      setSinSesion(true);
+      aplicarVista('login', null);
+      return;
+    }
+
+    aplicarVista(view, initialData);
+  }, [aplicarVista]);
 
   useEffect(() => {
     const handleNavigate = (e) => navigate(e.detail.view, e.detail.initialData || null);
@@ -1320,11 +1395,18 @@ export default function App() {
     }
 
     isAuthenticated().then((isAuth) => {
+      // Primer chequeo real de la sesión: es el que deja el espejo síncrono
+      // listo, para que a partir de acá `navigate` decida sin volver a esperar.
+      sesionRef.current = isAuth;
       if (!isAuth) {
         setSinSesion(true);
-        // La raíz sin sesión aterriza en el valle 3D (tema de entrada). El
-        // login sigue accesible con #login o el botón volver del valle.
-        navigate(hash === 'login' ? 'login' : 'valle3d');
+        // LA RAÍZ SIN SESIÓN VA A LOGIN. Antes aterrizaba en el valle 3D como
+        // "tema" de entrada, y desde ahí las puertas abrían las pantallas de
+        // verdad: esa era la fuga. En `chagra.app` el 2D es el hogar y el valle
+        // que se muestra es el PRIVADO — el de la finca del usuario—, así que va
+        // detrás del login. El valle público, para cualquiera y sin cuenta, es
+        // el otro producto (`prod.chagra.app` / `3d.guatoc.co`, bundle aparte).
+        navigate('login');
         return;
       }
       const targetView = HASH_VIEW_ROUTES[hash] || 'dashboard';
@@ -1361,16 +1443,17 @@ export default function App() {
         navigate('dashboard');
         return;
       }
-      isAuthenticated().then((isAuth) => {
-        if (!isAuth) return;
-        // Gate glaciar (La Cordada): un usuario no autorizado que navega a
-        // #glaciar es redirigido al dashboard en vez de montar el módulo.
-        if (routeView === 'glaciar' && !tieneAccesoGlaciarActual()) {
-          navigate('dashboard');
-          return;
-        }
-        navigate(routeView);
-      });
+      // Gate glaciar (La Cordada): un usuario no autorizado que navega a
+      // #glaciar es redirigido al dashboard en vez de montar el módulo.
+      if (routeView === 'glaciar' && !tieneAccesoGlaciarActual()) {
+        navigate('dashboard');
+        return;
+      }
+      // El chequeo de sesión ya NO se hace acá: lo hace `navigate`, para todas
+      // las entradas por igual. Antes este `isAuthenticated().then(...)` era el
+      // único que miraba auth en el camino del hash, y hacía `return` en silencio
+      // — dejando al usuario en la pantalla anterior en vez de mandarlo a login.
+      navigate(routeView);
     };
 
     window.addEventListener('hashchange', handleHashRoute);
@@ -1556,6 +1639,10 @@ export default function App() {
 
   const handleLogout = useCallback(async () => {
     await logoutUser();
+    // El espejo se cierra ANTES de navegar: si quedara en `true`, el gate
+    // seguiría dejando pasar a las pantallas reales hasta el próximo chequeo.
+    sesionRef.current = false;
+    setSinSesion(true);
     navigate('login');
   }, [navigate]);
 
@@ -1575,6 +1662,8 @@ export default function App() {
         return;
       }
       logoutUser().catch(() => { /* tokens podrían persistir; getAccessToken igual da null */ });
+      sesionRef.current = false;
+      setSinSesion(true);
       showToast('Sesión vencida. Vuelve a entrar.', true);
       navigate('login');
     };
@@ -1608,7 +1697,17 @@ export default function App() {
       case 'login':
         return (
           <ErrorBoundary>
-            <LoginScreen onLoginSuccess={() => { setSinSesion(false); navigate('dashboard'); }} onSave={showToast} />
+            <LoginScreen
+              onLoginSuccess={() => {
+                // Se abre el espejo en el mismo gesto que se limpia `sinSesion`:
+                // sin esto el gate mandaría el dashboard recién ganado de vuelta
+                // a login (o pagaría un chequeo async de más en cada navegación).
+                sesionRef.current = true;
+                setSinSesion(false);
+                navigate('dashboard');
+              }}
+              onSave={showToast}
+            />
           </ErrorBoundary>
         );
       case 'oauth-callback':
@@ -1617,9 +1716,15 @@ export default function App() {
         return (
           <ErrorBoundary>
             <OAuthCallback
-              onSuccess={() => navigate('dashboard')}
+              onSuccess={() => {
+                // El intercambio ya dejó el token guardado: se abre el espejo.
+                sesionRef.current = true;
+                setSinSesion(false);
+                navigate('dashboard');
+              }}
               onError={(msg) => {
                 showToast(msg || 'No se pudo iniciar sesión con PKCE.', true);
+                sesionRef.current = false;
                 navigate('login');
               }}
             />
@@ -3680,6 +3785,12 @@ export default function App() {
         // reimplementar). Se llega por la banda de MundosDeMiFinca, gated por
         // el flag de prefs `valle3d` (default OFF, Perfil) + device-tier;
         // adentro el tiering decide 3D pleno/frugal o el valle 2D digno.
+        //
+        // ESTE valle es el PRIVADO — la finca del usuario— y `valle3d` NO está
+        // en VISTAS_PUBLICAS, así que un anónimo no llega hasta acá. El
+        // `onNavigate` que recibe es el `navigate` GATEADO: aunque alguien monte
+        // esta vista por otro camino, las puertas ya no abren nada real sin
+        // sesión (esa era la fuga: el valle entregaba el router crudo).
         return (
           <ErrorBoundary>
             <ErrorFallback moduleName="El valle de su finca (3D)">

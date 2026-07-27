@@ -61,4 +61,74 @@ el mercado (`mercado.html`, entry aparte que ni siquiera importa `App.jsx`).
 es coincidencia EXACTA de host a propósito — `chagra.guatoc.co`, el dominio legado, debe seguir
 rebotando al canónico. Convertirlo en comodín rompería ese rebote.
 
-*(el resto de la bitácora se completa en el mismo commit que el arreglo)*
+### Paso 2 — la evidencia ANTES, con el navegador y sin sesión
+
+Sonda nueva y reproducible: `scripts/diag/sonda-fuga-login.mjs`. Abre `dist/` servido por
+`vite preview`, en un contexto de navegador **limpio** (sin token, sin storage), y por cada parada
+anota **qué pantalla quedó montada** + captura. Corrida contra el build de `3ef4954d` **sin tocar**:
+
+`ops/capturas/fuga-login-2026-07-26/antes/`
+
+- **`01-raiz.png`** — la raíz sin sesión: **"El valle de mi finca" / "SU FINCA, HOY"**, minimapa con
+  hotspots, *"Toque un lugar para entrar"* y la barra de voz *"Pregúntele a su finca…"*.
+  **Ni rastro de login.**
+- **`04-inventario.png`** — `#inventario` sin sesión: **el mismo valle**. Todas las rutas reales
+  caían ahí, porque el boot mandaba al valle todo lo que no fuera vitrina.
+
+La fuga está fotografiada, no deducida.
+
+### Paso 3 — el arreglo
+
+Tres cambios, uno por cada cosa que el encargo nombra. El primero es la raíz de las otras dos.
+
+**1. `navigate` re-chequea autenticación — la puerta.**
+`navigate` era el único sitio que llama `setCurrentView` (verificado: `grep setCurrentView` da 1 sola
+asignación), así que es un **chokepoint real**: gatearlo cierra TODAS las entradas a la vez —puertas
+del valle, eventos `chagraNavigate`/`chagra:nav`, deep-links, botones internos— sin perseguirlas una
+por una.
+
+Se partió en dos: `aplicarVista` (monta, no pregunta) y `navigate` (pregunta, después monta).
+La decisión vive aparte y es **pura**, en `src/config/vistasPublicas.js` → `decidirNavegacion()`.
+
+El problema a resolver: `navigate` es **síncrono** (lo llaman handlers de click) y `isAuthenticated()`
+es **async** (lee IndexedDB). Se resolvió con un **espejo síncrono tri-estado** (`sesionRef`):
+
+| `sesionRef` | qué hace `navigate` |
+|---|---|
+| `true` | pasa, **síncrono** — el campesino no paga ni un tick de más |
+| `false` | desvía a `login` |
+| `null` (todavía no sabemos) | **no adivina**: confirma con `isAuthenticated()` y recién ahí decide |
+
+El tri-estado es el punto fino: adivinar "sí" deja la fuga abierta; adivinar "no" botaría al campesino
+al login en cada arranque en frío. Si el almacenamiento ni siquiera se puede leer, **fail-closed**.
+El espejo se actualiza en los 5 puntos donde la sesión cambia de verdad: chequeo de boot, login OK,
+callback OAuth (OK y error), logout, y `chagra:session-expired`.
+
+**2. La raíz sin sesión va a login.** `navigate(hash === 'login' ? 'login' : 'valle3d')` → `navigate('login')`.
+
+**3. El valle ya no entrega el router crudo.** `valle3d` **no** está en `VISTAS_PUBLICAS`, así que un
+anónimo no llega; y el `onNavigate` que recibe es el `navigate` **gateado**, así que aunque se montara
+por otro camino, sus puertas no abren nada real sin sesión.
+
+**Lo que quedó público, a propósito** — `VISTAS_PUBLICAS` se construye **desde `MOCKUP_HASH_ROUTES`**
+(`construirVistasPublicas(Object.values(...))`), no con una lista nueva a mano ni con un
+`startsWith('mockup_')`:
+- se abre **exactamente lo que el router ya abría** antes del check de auth → no se cierra de más;
+- una vitrina nueva entra sola, sin acordarse de tocar dos listas;
+- el prefijo habría dejado afuera `mundo_casa_adentro` (mapeada desde `casa_adentro`), que **sí** es
+  pública. Hay un test que lo fija.
+
+Más las 3 de la entrada: `loading`, `login` y **`oauth-callback`** — esta última va abierta a
+propósito: cuando vuelve del proveedor todavía **no hay token**, gatearla mataría el login que está
+justo por completarse.
+
+**Lo que NO se tocó:** `isThreeDWorldHost` sigue siendo coincidencia exacta de host (convertirlo en
+comodín rompería el rebote del dominio legado `chagra.guatoc.co`), y el bundle público del 3D
+(`ProdChagraApp`) no se tocó en absoluto.
+
+### Paso 4 — verificación
+
+**Tests del gate** (`src/config/__tests__/vistasPublicas.test.js`, nuevos): **14/14 verdes.**
+Cubren las tres ramas del tri-estado, que el campesino con sesión **entra a todo**, que las vitrinas
+siguen abiertas, que `oauth-callback` no se gatea, y los bordes (`''`/`null`/vista inventada → login).
+
