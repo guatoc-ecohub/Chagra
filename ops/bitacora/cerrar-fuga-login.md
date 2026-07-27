@@ -75,7 +75,19 @@ anota **qué pantalla quedó montada** + captura. Corrida contra el build de `3e
 - **`04-inventario.png`** — `#inventario` sin sesión: **el mismo valle**. Todas las rutas reales
   caían ahí, porque el boot mandaba al valle todo lo que no fuera vitrina.
 
-La fuga está fotografiada, no deducida.
+**Y la puerta, que es lo que de verdad importa.** El valle recibía `onNavigate={navigate}`; ese
+mismo `navigate` está publicado en el bus de eventos de la app (`chagraNavigate`), que es lo que
+dispara un hotspot al tocarlo. La sonda lo empuja desde afuera —sin depender de acertarle a un
+canvas 3D— y **sin sesión**:
+
+| Caso | Qué se ve, sin cuenta |
+|---|---|
+| **`12-puerta-evento-inventario.png`** | **La pantalla REAL de Activos.** Chip de finca, pestañas *Siembras / Zonas / Infraestructura / Insumos*, buscador, botón **"Registrar Siembra"** y el indicador **"Sincronizando"** corriendo. |
+| **`13-puerta-evento-dashboard.png`** | El onboarding real: *"BIENVENIDO A CHAGRA — **Esta chagra es suya**"*, **PASO 1 DE 5**, con "Sincronizando" activo. |
+
+Los 13 casos: **12 de 13 sin login**. El único que mostraba login era `#login` explícito.
+
+La fuga está fotografiada, no deducida: **un anónimo escribía en la app.**
 
 ### Paso 3 — el arreglo
 
