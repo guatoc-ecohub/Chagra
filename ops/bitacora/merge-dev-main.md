@@ -308,3 +308,64 @@ ya están resueltos y **documentados uno por uno**, y el diagnóstico midió que
 ser barato: lo que entre nuevo es trabajo de `compai` (avatares/gestos), que toca
 `ChagraAgentAvatar*`, `useAgentAvatarType.js` y `visual/agente/` — **en esos archivos ya gana `dev`**,
 así que el criterio está fijado. **No lo hice yo para no fusionar trabajo ajeno a medio terminar.**
+
+---
+
+## REMATE — 2026-07-27: `git merge origin/dev` (`5b68141c`)
+
+Esta rama había fijado su base en `dev` @ `3ef4954d`. `dev` avanzó después a
+`45fd1f66` con toda la consolidación del compAI, así que faltaba el remate.
+
+```
+antes:   38 adelante / 12 atrás de origin/dev
+después: 39 adelante /  0 atrás de origin/dev
+```
+
+Entran 12 commits / 64 archivos / +4297 líneas: núcleo portable del compAI,
+12 gestos ociosos, entrada al mundo, cruce 2D→3D, señal de ocupado,
+diagnóstico de foto en dos pasos y la marcha de perfil del jaguar.
+
+**Fusión automática limpia, cero conflictos marcados.** Que es justo lo que
+obliga a mirar: el peligro son los que git resuelve mal en silencio.
+
+### Verificado a mano (no por ausencia de marcadores)
+
+| qué | cómo | resultado |
+|---|---|---|
+| los 34 commits propios de `main` | `git merge-base --is-ancestor origin/main HEAD` | ✅ `origin/main` sigue siendo ancestro |
+| guards de plaguicida vetado | `outputGuards.js` en el diff | ✅ **el merge no lo toca** |
+| `App.jsx` (corrupción silenciosa de `389123d2`) | idem | ✅ **el merge no lo toca** |
+| fix #2785 (avatar elegible) | `grep` en `AgentFab.jsx` | ✅ `ChagraAgentAvatar`×3, cero `<Angelita>` a mano |
+| estructura nueva del FAB | idem | ✅ `estaOcupado`×2, `alternarSilencio`×4 |
+| marcadores sueltos | `grep` en `src/ tests/ scripts/` | ✅ vacío |
+
+Las dos cosas que se pelearon en `AgentFab.jsx` (avatar elegible **y** botón de
+silencio hermano enfocable) **siguen conviviendo**: el remate no revirtió ninguna.
+
+### Gates del remate
+
+| Gate | Resultado |
+|---|---|
+| `npx vite build` | ✅ **EXIT=0** |
+| Gate visual GPU real | ✅ 3 capturas, ver abajo |
+
+### 🔴 Gate visual — GPU real, mirado por contenido
+
+`ops/capturas/remate-dev-main-2026-07-27/` · renderer verificado por el propio
+script, que **aborta** si sale software:
+
+```
+ANGLE (AMD, AMD Radeon Vega 10 Graphics (radeonsi raven ACO), OpenGL ES 3.2)
+```
+
+3 md5 distintos, 249–502 KB (contra los 80 KB idénticos de la tarjeta *"Algo
+falló"* del falso positivo de la corrida anterior).
+
+| Escena | Qué se ve DE VERDAD |
+|---|---|
+| `paramo-definitivo` | Frailejonal, niebla en capas, cordillera, cóndor volando, quebrada azul, oso y rana iluminados, *"La fábrica de agua"* |
+| `vitrina-maestra` | *"El mirador de los mundos"*: 15 arcos-portal con su vista viva adentro, quebrada, piedras de paso, el compAI en la esquina y la leyenda verde/dorado. **Es el archivo que traía 17 conflictos y dibuja entero.** |
+| `angelita-viva` | El compAI **vivo**: entrada teatral (con gafas al sol), *"El repertorio del agente"*, gesto `Calma` — *"flota viva, mira, se acicala"* |
+
+O sea: los 12 gestos y el núcleo portable que entraron por `dev` **llegaron
+dibujando** a esta rama, no sólo compilando.
