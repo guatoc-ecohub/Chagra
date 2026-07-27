@@ -13,6 +13,7 @@
  *   --sesion   siembra un token válido en IndexedDB (localforage) para probar la
  *              REGRESIÓN: que el campesino con sesión sigue entrando a todo.
  *   --base     origen servido (default http://127.0.0.1:4173)
+ *   --solo     lista de prefijos de caso, ej. `--solo 01,04,12`. Salta el resto.
  *
  * Salida: <out>/<caso>.png por parada + <out>/veredicto.json con el resumen.
  */
@@ -66,6 +67,14 @@ const PARADAS = [
   },
 ];
 
+// --solo 01,04,12 → corre solo esas paradas (por prefijo de caso). Sirve para
+// repetir lo caro sin volver a montar las escenas 3D, que bajo swiftshader
+// tardan minutos cada una.
+const soloArg = getFlag('solo', null);
+const PARADAS_ACTIVAS = soloArg
+  ? PARADAS.filter((p) => soloArg.split(',').some((s) => p.caso.startsWith(s.trim())))
+  : PARADAS;
+
 const chromiumPath = execSync('which chromium', { encoding: 'utf8' }).trim();
 
 const browser = await chromium.launch({
@@ -104,7 +113,7 @@ function esLogin(h) {
 
 const resultados = [];
 
-for (const parada of PARADAS) {
+for (const parada of PARADAS_ACTIVAS) {
   const ctx = await browser.newContext({
     viewport: { width: 1280, height: 860 },
     locale: 'es-CO',

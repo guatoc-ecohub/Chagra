@@ -132,3 +132,75 @@ comodín rompería el rebote del dominio legado `chagra.guatoc.co`), y el bundle
 Cubren las tres ramas del tri-estado, que el campesino con sesión **entra a todo**, que las vitrinas
 siguen abiertas, que `oauth-callback` no se gatea, y los bordes (`''`/`null`/vista inventada → login).
 
+**Composición del set público** (medido sobre el árbol, no estimado):
+
+| | |
+|---|---|
+| rutas hash de vitrina (`MOCKUP_HASH_ROUTES`) | **98** |
+| vistas públicas distintas que producen | **96** |
+| \+ vistas de entrada (`loading`, `login`, `oauth-callback`) | **99 en total** |
+| vistas sin el prefijo `mockup_` | **1: `mundo_casa_adentro`** |
+| ¿`valle3d` público? | **no** |
+| ¿`dashboard` público? | **no** |
+
+Esa única fila sin prefijo es la razón de peso para construir el set **desde la tabla** y no con un
+`startsWith('mockup_')`: el prefijo habría cerrado `casa_adentro`, que sí es pública. Hay test.
+
+**Chokepoint verificado, no supuesto:** `grep -n setCurrentView src/App.jsx` → **una sola
+asignación**, dentro de `aplicarVista`. Por eso gatear `navigate` cierra todas las entradas.
+Y los despachadores del bus (`chagraNavigate` / `chagra:nav`) que viven fuera de `App.jsx`
+—`FarmMap`, `AgentScreen`, `ProfileScreen`, `NetworkStatusBar`, `ClimaStrip`,
+`InvasiveObservationLog`, `useGlobalKeyboardShortcuts`— entran todos por esos listeners, así que
+también quedan gateados sin tocarlos.
+
+**El gate REQUERIDO de CI no se rompe:** `playwright.yml` exige solo `offline.spec.js` (el resto de
+la suite E2E es informativa y no bloquea merge). Ese spec va a `/#login` y espera el campo de
+usuario — camino público, intacto.
+
+#### Cómo repetir la prueba
+
+```bash
+npx vite build
+npx vite preview --port 4173 --host 127.0.0.1
+# sin sesión (lo que ve alguien de afuera)
+node scripts/diag/sonda-fuga-login.mjs --out ops/capturas/<dir>/despues
+# con sesión (que el campesino no perdió acceso)
+node scripts/diag/sonda-fuga-login.mjs --sesion --out ops/capturas/<dir>/con-sesion
+```
+
+---
+
+## 🟡 La decisión que NO tomé yo — qué queda público
+
+Las **96 vitrinas** siguen abiertas sin sesión. Es la lectura literal del encargo
+(*"averiguá qué tiene que seguir accesible —landing, mercado, lo que se comparte por enlace— y no lo
+cierres de más"*) y no contienen datos de finca: son las pantallas de discovery que se comparten por
+enlace.
+
+**Pero la tabla de producto dice, textual, que en `chagra.app` entra el campesino "login desde la
+entrada, para todo".** Si "para todo" incluye las vitrinas, el cambio es **una línea**:
+
+```js
+// src/App.jsx — cerrar también las vitrinas en el dominio de la app
+const VISTAS_PUBLICAS = construirVistasPublicas([]);
+```
+
+No lo hice porque cerrarlas rompería los enlaces compartidos y el descubrimiento, y el encargo pedía
+explícitamente no cerrar de más. **La fuga —las pantallas con datos— queda cerrada en las dos
+lecturas.** Es del operador decidir si las vitrinas se van también.
+
+---
+
+## Lo que NO pude verificar
+
+| Qué | Por qué |
+|---|---|
+| **La app en `chagra.app` de verdad** | Probé `dist/` servido por `vite preview` en `stg`. **No desplegué** (prohibido) ni probé contra el host vivo. Si nginx sirve algo por fuera del bundle, no lo cubre esta prueba. |
+| **El bundle público del 3D** (`dist-prod`) | Verifiqué **por código** que es otro entry (`index-prod.html` → `main-prod.jsx` → `ProdChagraApp`) y que `deploy.yml` solo rsyncea `dist/`. **No lo construí ni lo serví** para confirmar que su propio gate sigue igual — pero tampoco lo toqué. |
+| **La suite E2E completa (40 specs)** | No corrida. Sí verifiqué que el **gate requerido** (`offline.spec.js`) usa un camino público y no se rompe. Los specs informativos que cargan la raíz sin sembrar sesión ahora verán login en vez del valle — antes tampoco llegaban a una pantalla real. |
+| **La suite unitaria completa (913 archivos)** | No corrida. Corrí los tests del gate + los de ruta de `App`. |
+| **eslint** | No corrido — instrucción explícita. Se verificó con `npx vite build`. |
+| **Sesión real contra farmOS** | La sonda siembra un token válido en localforage (mismo patrón que `shot3d-ruta.mjs`). Es fiel **para el gate**, porque `isAuthenticated()` solo mira token + expiry; pero las pantallas no traen datos reales detrás. |
+| **El deep-link se sigue perdiendo tras el login** | Un anónimo que abre `#agente` ahora ve login y, al entrar, aterriza en `dashboard`, no en el agente. **No es regresión** (antes se perdía igual, cayendo al valle), pero ahora se nota más. Guardar el destino y restaurarlo post-login es trabajo aparte. |
+| **`isPreAuthView` usa `startsWith('mockup_')`** | Deuda **previa**, cosmética: `mundo_casa_adentro` no entra en ese guard, así que en esa vitrina se muestran banners/FAB globales. No es fuga de datos (sin sesión no hay datos). No lo toqué para no ampliar el alcance. |
+
