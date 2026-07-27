@@ -70,6 +70,34 @@ describe('MOMENTOS_IDLE', () => {
     expect(Object.keys(MOMENTOS_IDLE)).toContain('guino');
     expect(MOMENTOS_IDLE.guino.peso).toBeGreaterThan(0);
   });
+
+  /* Los 12 momentos elegibles por azar (merge de fable/compai-gestos-entrada,
+     2026-07-26). Se fija la lista COMPLETA a propósito: el repertorio vive en
+     el núcleo portable porque es la fuente única que comparten la PWA y el
+     compAI de 3d.guatoc.co. Si alguien agrega un gesto sólo en
+     `angelitaEstados.js` (o sólo en el CSS), este test lo cachetea: la
+     divergencia entre los dos compAI es justo lo que el núcleo existe para
+     cerrar. */
+  it('tiene los 12 momentos ociosos elegibles por azar', () => {
+    const elegibles = Object.keys(MOMENTOS_IDLE)
+      .filter((m) => MOMENTOS_IDLE[m].peso > 0)
+      .sort();
+    expect(elegibles).toEqual([
+      'acicala', 'bosteza', 'cabecea', 'distraida', 'estira', 'guino',
+      'mira', 'posa', 'rasca', 'rascanuca', 'sacude', 'voltereta',
+    ]);
+  });
+
+  /* REGLA DURA del módulo: `dur` debe coincidir con el keyframe one-shot del
+     CSS. Aquí sólo se puede comprobar la mitad barata (que exista y sea un
+     número sano); la otra mitad la comprueba el gate visual con captura. */
+  it('cada momento nuevo declara una duración numérica sana', () => {
+    for (const m of ['guino', 'estira', 'bosteza', 'rascanuca', 'cabecea', 'voltereta']) {
+      expect(typeof MOMENTOS_IDLE[m].dur, `${m}.dur`).toBe('number');
+      expect(MOMENTOS_IDLE[m].dur).toBeGreaterThan(500);
+      expect(MOMENTOS_IDLE[m].dur).toBeLessThan(6000);
+    }
+  });
 });
 
 describe('elegirMomentoIdle', () => {
