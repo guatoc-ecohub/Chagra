@@ -332,3 +332,54 @@ O sea: la pantalla **monta y adjunta la foto**, pero el modelo de visión
 correr. Eso confirma —desde otro frente y con otra herramienta— lo que ya
 había concluido: **la ida y vuelta real del segundo paso sigue sin prueba
 visual**, y no por culpa del código sino porque el arnés no alcanza el backend.
+
+---
+
+### Verificaciones duras del remate — contra "construido pero no cableado"
+
+Un build verde no prueba que la ruta viva. Comprobado sobre el `dist` REAL del
+remate, no sobre el repo:
+
+**Los 12 gestos llegaron al bundle** (`dist/assets/*.css|js`), los 12:
+`guino · estira · bosteza · rascanuca · cabecea · voltereta · mira ·
+distraida · acicala · rasca · sacude · posa` — cero ausentes.
+
+**El guiño que ganó es el de Fable, y también en el compilado**:
+
+```
+fuente:  [data-agt-idle='guino'] .rh-blink > g:first-of-type
+bundle:  guino] .rh-blink>g:first-of-type
+```
+
+Y en `AbejaAngelita.jsx` los ojos se declaran
+`ojos={[{cx:10.1, r:1.95}, {cx:7.4, r:1.45}]}` ⇒ **el primero ES el grande**.
+Así que `g:first-of-type` anima el ojo que se lee contra la cabeza oscura, no
+el chiquito del fondo. La decisión del operador queda probada **en el artefacto
+que se sirve**, no sólo en el repo.
+
+### Los guards que el operador nombró — re-corridos DESPUÉS del remate
+
+> *"los guards que impiden recetar un plaguicida vetado con dosis"*
+
+```
+Test Files  7 passed (7)
+Tests       338 passed | 1 skipped (339)      EXIT=0
+```
+
+**338/338**, el número exacto de antes del remate. No se perdió ninguno.
+(`outputGuards.bannedPesticideSuppress`, `agentPromptBase`,
+`outputGuards.agente5bugsV2`, `buildFallbackResponse`,
+`conversationCaptureService`, `outputGuards`, `outputGuards.coverage-canario`.)
+
+### Baseline de la suite completa — medida, no supuesta
+
+`origin/dev` @ `45fd1f66` (corrido en worktree limpio, `wt-merge-a-dev`):
+
+```
+Test Files   39 failed | 824 passed | 2 skipped (865)
+Tests        64 failed | 12018 passed | 1 expected fail | 25 skipped (12108)
+```
+
+**`dev` ya trae 64 fallos propios** (TTS/voz, ClimaStrip, RAG, mockups de
+navegación, sync…). Cualquier rojo del remate se compara **contra esta lista**
+antes de llamarlo regresión.
