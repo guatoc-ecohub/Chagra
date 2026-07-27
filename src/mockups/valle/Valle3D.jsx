@@ -23,7 +23,7 @@
 /* Nota: las props de three (position, args, intensity, castShadow, etc.) son
    válidas en el reconciliador de R3F, no en el DOM — el config de ESLint del
    repo no activa react/no-unknown-property, así que no requieren disable. */
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
   Html, Float, Stars, OrbitControls, Detailed, Instances, Instance,
@@ -43,6 +43,14 @@ import { AbejaAngelita } from '../../visual/creatures/AbejaAngelita.jsx';
    (CompaneroAbeja) lo usa para husmear con criterio: comentarios grounded
    por mundo, con la anti-molestia (cooldowns) resuelta adentro del store. */
 import useAngelitaStore from '../../store/useAngelitaStore';
+/* EL COMPAI HABLA CON DATOS REALES (auditoría 2026-07-26, ítem #38): el
+   inventario vivo de la finca + su traducción a lo que cada comentarista sabe
+   leer, y el sensor de "¿está a mitad de algo?" que el motor esperaba desde
+   siempre y nadie alimentaba. Los tres cuelgan del núcleo portable del compAI
+   (src/compai/nucleo) — la fuente única que comparte con 3d.guatoc.co. */
+import useInventarioCompai from '../../hooks/useInventarioCompai';
+import { datosDeMundo } from '../../compai/nucleo/datosFinca.js';
+import { estaOcupado } from '../../services/compaiOcupado.js';
 import BurbujaAngelita from '../../visual/agente/BurbujaAngelita';
 /* La CAPA DE ESTADO de Angelita (auditoría §5b): módulo puro, sin three — el
    mismo repertorio (mojada/sed/comiendo/vuelo) que usan los mundos 3D. */
@@ -1900,6 +1908,35 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   const entrarMundoAngelita = useAngelitaStore((s) => s.entrarMundo);
   const reposarAngelita = useAngelitaStore((s) => s.reposar);
 
+  /* ── LOS DATOS REALES DE LA FINCA (auditoría 2026-07-26, ítem #38) ────────
+     ESTE ERA EL BUG MÁS CARO DEL compAI: los dos disparadores de abajo
+     llamaban `entrarMundoAngelita(mundo, {})` — con el objeto VACÍO. Por eso
+     cada comentario caía a la rama honesta-pero-genérica ("todavía no me ha
+     contado qué tiene sembrado") AUNQUE el usuario tuviera sus matas en
+     IndexedDB. El motor siempre supo hablar con datos; nadie se los pasaba.
+
+     `useInventarioCompai` lee el store de activos (offline-first sobre
+     IndexedDB) y `datosDeMundo` lo traduce a la forma exacta que cada
+     comentarista sabe leer. Cero red, cero dato inventado: finca vacía sigue
+     cayendo a la rama honesta, que es como debe ser. Va por ref para que un
+     cambio de inventario no re-ate la cadencia del husmeo. */
+  const inventarioCompai = useInventarioCompai();
+  const inventarioRef = useRef(inventarioCompai);
+  useEffect(() => { inventarioRef.current = inventarioCompai; }, [inventarioCompai]);
+  /* El clima que el shell alcanzó a cachear — el único dato del husmeo que NO
+     sale del inventario. Sin él, el comentarista del clima dice la verdad. */
+  const climaExtra = useMemo(
+    () => (estadoFinca?.snapshotClima ? { snapshot: estadoFinca.snapshotClima } : undefined),
+    [estadoFinca?.snapshotClima],
+  );
+  const climaExtraRef = useRef(climaExtra);
+  useEffect(() => { climaExtraRef.current = climaExtra; }, [climaExtra]);
+  /* Un solo lugar donde se arman los datos: los dos disparadores lo usan. */
+  const datosParaMundo = useCallback(
+    (mundo) => datosDeMundo(mundo, inventarioRef.current, climaExtraRef.current || {}),
+    [],
+  );
+
   // 1) Navegación real: al entrar/salir de un mundo de verdad, la abeja
   //    husmea ese lugar (o vuelve a calma al salir). `focoId` es el id CRUDO
   //    del lugar del valle (Escena ya lo resuelve); se traduce al vocabulario
@@ -1907,12 +1944,13 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
   const focoIdPrevio = useRef(focoId);
   useEffect(() => {
     if (focoId && focoId !== focoIdPrevio.current) {
-      entrarMundoAngelita(LUGAR_A_MUNDO_ANGELITA[focoId] || 'finca', {});
+      const mundo = LUGAR_A_MUNDO_ANGELITA[focoId] || 'finca';
+      entrarMundoAngelita(mundo, datosParaMundo(mundo));
     } else if (!focoId && focoIdPrevio.current) {
       reposarAngelita();
     }
     focoIdPrevio.current = focoId;
-  }, [focoId, entrarMundoAngelita, reposarAngelita]);
+  }, [focoId, entrarMundoAngelita, reposarAngelita, datosParaMundo]);
 
   // 2) Husmeo autónomo: nunca a mitad de un viaje real (entrandoRef, para
   //    que un viaje NO reinicie la cadencia), nunca con reduced-motion (cero
@@ -1938,7 +1976,9 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
         const lugar = HUSMEO_LUGARES[husmeoIdx.current % HUSMEO_LUGARES.length];
         husmeoIdx.current += 1;
         const mundo = LUGAR_A_MUNDO_ANGELITA[lugar];
-        const decision = mundo ? entrarMundoAngelita(mundo, {}) : null;
+        const decision = mundo
+          ? entrarMundoAngelita(mundo, datosParaMundo(mundo), { ocupado: estaOcupado() })
+          : null;
         if (decision?.interrumpe) {
           husmeoLugarRef.current = lugar;
           if (ocultarTimer) clearTimeout(ocultarTimer);
@@ -1963,8 +2003,9 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
       if (ocultarTimer) clearTimeout(ocultarTimer);
     };
     // `entrando` vive en entrandoRef a propósito: un viaje real no debe
-    // reiniciar la cadencia del husmeo autónomo.
-  }, [reducedMotion, entrarMundoAngelita, reposarAngelita]);
+    // reiniciar la cadencia del husmeo autónomo. `datosParaMundo` es estable
+    // (useCallback sin deps, lee refs) — el inventario cambia sin re-atar nada.
+  }, [reducedMotion, entrarMundoAngelita, reposarAngelita, datosParaMundo]);
 
   useFrame((state) => {
     if (!ref.current) return;
