@@ -12,7 +12,17 @@ import {
   markError as outboxMarkError,
   recoverStaleProcessing as outboxRecoverStale,
 } from '../../services/agentOutboxService';
-import { analyzeFoliage } from '../../services/aiService';
+import { analyzeFoliage, revisarFoliage } from '../../services/aiService';
+// EL SEGUNDO PASO del diagnóstico de foto (bitácora compai-unificado §17-19):
+// el primero contesta de una, este vuelve a mirar en segundo plano y habla
+// SÓLO si discrepa.
+import {
+  pedirSegundaOpinion,
+  lecturaDesdeHallazgo,
+  extraerDeRevision,
+} from '../../services/segundaOpinionFoto';
+import { warmVisionReviewModel, modelosResidentes } from '../../services/visionWarmService';
+import { ENV } from '../../config/env';
 import { captureAndCompress } from '../../services/photoService';
 import { processPhotoItem, buildPhotoUserMessage } from '../../services/agentOutboxPhoto';
 import { isAnalyzableImageAttachment, buildAttachmentRejection } from '../../services/agentOutboxAttachment';
@@ -3219,7 +3229,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         try { agentSounds.start(); } catch { /* sonido opcional */ }
         if (onNavigate) onNavigate(view);
       },
-      onPhoto: () => cameraInputAgentRef.current?.click(),
+      onPhoto: () => abrirCamara(),
     });
     // Tras cualquier acción (o no-op de capacidad por lanzar) cerramos la mano.
     if (acted) setSheetOpen(false);
@@ -3236,6 +3246,83 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     } else if (action.tipo === 'ask' && action.prompt) {
       handleSubmit(action.prompt);
     }
+  };
+
+  // ── EL SEGUNDO PASO DEL DIAGNÓSTICO DE FOTO ───────────────────────────────
+  //
+  // `qwen3.5:4b` ya contestó y el usuario lo está leyendo. Ahora `qwen3-vl:4b`
+  // vuelve a mirar LA MISMA foto y —sólo si discrepa— el compAI le comenta la
+  // duda. Los errores de los dos modelos son de tipo OPUESTO (medido, 19 fotos
+  // reales): el primero nunca alarma de más pero dejó pasar la broca del café;
+  // el segundo no deja pasar ninguna enferma. El segundo cubre el hueco del
+  // primero.
+  //
+  // ⚠️ SE LLAMA DESPUÉS DE `await handleSubmit(...)`, NUNCA ANTES NI EN
+  // PARALELO. No es estilo: `handleSubmit` corre el pipeline completo, y ahí
+  // dentro va el embebedor del RAG. Disparar la segunda opinión mientras el
+  // embebedor trabaja es EXACTAMENTE la concurrencia que en `alpha` desalojó
+  // al `qwen3.5:4b` pineado y le costó 8,56 s al mensaje siguiente. Serializado
+  // los dos modelos conviven (9691/12288 MiB) y el chat sigue en 0,70 s.
+  //
+  // Y no bloquea: es fire-and-forget. Si no alcanza a correr, el usuario se
+  // queda con la primera respuesta y no se entera — el segundo paso es una red
+  // de seguridad, NO una promesa (por eso tampoco se anuncia en pantalla:
+  // prometer una revisión que quizá no llegue es peor que no ofrecerla).
+  const lanzarSegundaOpinionFoto = (blob, finding) => {
+    // Sin foto no hay nada que re-mirar. Y sin `finding` tampoco: cuando
+    // `analyzeFoliage` devuelve null es porque NO HAY MATA en la imagen
+    // (guard `isPlant:false`) o no se pudo leer — en los dos casos no existe
+    // una primera lectura con la que contrastar, y una "segunda opinión" sobre
+    // una foto sin planta sería justo la fabricación que el proyecto persigue.
+    if (!blob || !finding) return;
+    // SPEC decisión #2 — el canal ESPEJA: si le habló, por voz; si escribió,
+    // por texto. `ttsEnabled` es esa señal: la pantalla lo enciende sola cuando
+    // la entrada fue de voz.
+    const canal = ttsEnabled ? 'voz' : 'texto';
+    pedirSegundaOpinion({
+      primeraLectura: lecturaDesdeHallazgo(finding),
+      mirarDeNuevo: () => revisarFoliage(blob),
+      extraer: extraerDeRevision,
+      canal,
+      avisar: (texto, { canal: porDonde } = {}) => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: texto,
+            timestamp: Date.now(),
+            // Marca para tests y telemetría: esta burbuja no salió del
+            // pipeline del agente, salió de la segunda mirada.
+            _segundaOpinion: true,
+          },
+        ]);
+        if (porDonde === 'voz') {
+          try { speak(texto, { rate: 0.9, pitch: 1.0 }); } catch { /* si no hay voz, queda escrito */ }
+        }
+      },
+      guardas: { modelosResidentes, modeloChat: ENV.CHAT_MODEL },
+    }).catch(() => { /* degrada en silencio: la primera respuesta ya cumplió */ });
+  };
+
+  // ABRIR LA CÁMARA — y precalentar el segundo paso mientras el usuario enfoca.
+  //
+  // `qwen3-vl:4b` tarda 17,5 s la primera vez y ~5 s ya residente (medido).
+  // Entre que se toca el botón y se elige la foto pasan varios segundos de los
+  // humanos: es la ventana para cargarlo gratis. Precalentar DESPUÉS, cuando
+  // la foto ya salió, no sirve de nada.
+  //
+  // ⚠️ `ocupado` NO es decorativo: si hay un turno del agente en vuelo, el
+  // embebedor del RAG puede estar corriendo, y precalentar encima es la
+  // concurrencia que desalojó al chat pineado (8,56 s). En ese caso NO se
+  // precalienta y el segundo paso pagará sus 17 s en segundo plano — el mal
+  // menor, y sin que el usuario espere por ello.
+  //
+  // Todas las puertas a la cámara pasan por aquí para que el precalentado no
+  // se quede sólo en una de ellas.
+  const abrirCamara = () => {
+    warmVisionReviewModel({ ocupado: () => isThinking || state === STATE_RECORDING })
+      .catch(() => { /* fire-and-forget: si falla, sólo se paga el arranque en frío */ });
+    cameraInputAgentRef.current?.click();
   };
 
   // ── Foto inline desde el compositor del AgentScreen ───────────────────────
@@ -3310,6 +3397,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             finding && typeof finding.confidence === 'number' ? finding.confidence : null,
         },
       });
+      // El turno YA terminó (incluido el embebedor del RAG). Recién ahora se
+      // dispara la segunda mirada: serializada, nunca en paralelo.
+      lanzarSegundaOpinionFoto(item.blob, finding);
       return;
     }
     if (!inputText.trim()) return;
@@ -3455,6 +3545,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               finding && typeof finding.confidence === 'number' ? finding.confidence : null,
           },
         });
+        // 4) Y la SEGUNDA MIRADA, ya con el turno cerrado (ver el bloque de
+        //    `lanzarSegundaOpinionFoto`: serializada a propósito). Va en las
+        //    DOS entradas de foto —esta y la del compositor inline— porque
+        //    cablear sólo una dejaría sin segundo paso a la mitad de la gente.
+        lanzarSegundaOpinionFoto(item.blob, finding);
         await outboxMarkAnswered(item.id);
         return true;
       }
@@ -4012,7 +4107,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             {/* Cámara — sin `capture`, abre galería+cámara igual que AgentHero */}
             <button
               type="button"
-              onClick={() => cameraInputAgentRef.current?.click()}
+              onClick={abrirCamara}
               disabled={state === STATE_RECORDING || queuePending.length >= 1}
               aria-label="Tomar o elegir foto"
               className="as-iconbtn"

@@ -12,18 +12,26 @@ async function importFresh() {
   return import('../visionWarmService.js');
 }
 
+/**
+ * ⚠️ 2026-07-26 — estos tests pasaron de `warmVisionModel` a
+ * `warmVisionReviewModel`. Motivo: hoy `VISION_MODEL === CHAT_MODEL`, y en ese
+ * caso `warmVisionModel` NO toca la red a propósito (su fetch le acortaba el
+ * pin de 24 h del modelo del chat a 5 min — medido en `alpha` con señuelo).
+ * El que de verdad sale a la red al abrir la cámara —y por tanto el que tiene
+ * que aguantar el modo sin señal— es el del SEGUNDO paso.
+ */
 describe('visionWarmService offline-first', () => {
-  it('warmVisionModel() returns false when offline (does not throw)', async () => {
+  it('warmVisionReviewModel() returns false when offline (does not throw)', async () => {
     setOnline(false);
     // Resetea el estado interno para forzar que se intente el fetch
     await importFresh();
-    const { warmVisionModel, __resetVisionWarmState } = await importFresh();
+    const { warmVisionReviewModel, __resetVisionWarmState } = await importFresh();
     __resetVisionWarmState();
 
     let result;
     let threw = false;
     try {
-      result = await warmVisionModel();
+      result = await warmVisionReviewModel();
     } catch {
       threw = true;
     }
@@ -31,22 +39,22 @@ describe('visionWarmService offline-first', () => {
     expect(result).toBe(false);
   });
 
-  it('warmVisionModel() returns false on fetch failure with navigator.onLine true (network down)', async () => {
+  it('warmVisionReviewModel() returns false on fetch failure with navigator.onLine true (network down)', async () => {
     setOnline(true);
     // Simula red caída incluso con navigator.onLine = true
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
     await importFresh();
-    const { warmVisionModel, __resetVisionWarmState } = await importFresh();
+    const { warmVisionReviewModel, __resetVisionWarmState } = await importFresh();
     __resetVisionWarmState();
 
-    const result = await warmVisionModel();
+    const result = await warmVisionReviewModel();
     expect(result).toBe(false);
   });
 
-  it('warmVisionModel() idempotency: returns true when already in-flight', async () => {
+  it('warmVisionReviewModel() idempotency: returns true when already in-flight', async () => {
     setOnline(true);
     await importFresh();
-    const { warmVisionModel, __resetVisionWarmState } = await importFresh();
+    const { warmVisionReviewModel, __resetVisionWarmState } = await importFresh();
     __resetVisionWarmState();
 
     // Force fetch to never resolve (simulate in-flight), but with a short timeout
@@ -57,10 +65,10 @@ describe('visionWarmService offline-first', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     // Fire two calls in parallel - the first takes the lock, the second sees _warmInFlight
-    const p1 = warmVisionModel();
+    const p1 = warmVisionReviewModel();
     // Small tick to let _warmInFlight be set
     await new Promise((r) => setTimeout(r, 10));
-    const r2 = await warmVisionModel();
+    const r2 = await warmVisionReviewModel();
 
     // Cleanup: resolve the fetch so p1 can complete
     resolveFetch?.(/** @type {any} */ ({ ok: true, status: 200 }));

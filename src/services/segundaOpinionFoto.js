@@ -124,6 +124,106 @@ export function redactarSegundaOpinion({ hallazgo, queMirar, confianza = 'media'
 }
 
 /**
+ * Convierte el hallazgo crudo del PRIMER paso (`analyzeFoliage`, que devuelve
+ * `{score, issues[], treatment_suggestion}`) en la frase que se compara con la
+ * segunda lectura. Sin esto se estarían comparando peras con manzanas: JSON
+ * contra prosa.
+ *
+ * @param {{issues?: string[], score?: number}|null} hallazgo
+ * @returns {string}
+ */
+export function lecturaDesdeHallazgo(hallazgo) {
+  if (!hallazgo) return '';
+  const issues = Array.isArray(hallazgo.issues) ? hallazgo.issues.filter(Boolean) : [];
+  if (issues.length) return `ENFERMA. ${issues.join('; ')}`;
+  // Sin problemas listados, el primer paso está diciendo que la ve sana.
+  return 'SANA. No se observa problema.';
+}
+
+/* Fórmulas con las que el modelo se cubre: si aparecen, la confianza BAJA.
+   Se leen de SUS palabras, no se inventan — la confianza que se le dice al
+   usuario tiene que salir de algo, o es adorno (SPEC decisión #3). */
+const DUDA = /no estoy segur|no se distingue|no se aprecia con claridad|no es (del todo )?clar|dif[íi]cil de|posiblemente|podr[íi]a|puede que|tal vez|quiz[áa]s?|parece(r[íi]a)? que|sospech|aparent/i;
+/* Y las que indican que lo vio sin dudar. */
+const CERTEZA = /claramente|con claridad|evidente|sin duda|definitivamente|inconfundible|es clar[oa] que|se observa n[íi]tid/i;
+/* El arranque de la seña de campo: la frase que le dice al usuario QUÉ mirar.
+   Va anclada al principio de la oración para no cazar un "mire" a mitad de
+   una descripción. */
+const SENA = /^(?:y\s+)?(?:f[íi]jese|revise|mire|obs[eé]rve|observe|busque|compruebe|verifique|confirme|[áa]bral|abra|levante|raspe|corte|toque|acerque|compare|para confirmar|para salir de dudas|le sugiero|le recomiendo|recomiendo|sugiero)\b/i;
+
+/**
+ * De la respuesta CRUDA del segundo modelo a las tres piezas con las que habla
+ * el compAI: `{hallazgo, queMirar, confianza}`.
+ *
+ * Es el `extraer` que `pedirSegundaOpinion` recibe por parámetro. Sin él la
+ * segunda opinión salía como un bloque de texto del modelo pegado tal cual —
+ * y el SPEC pide justo lo contrario: **qué vio, qué mirar para confirmarlo, y
+ * qué tan seguro está** (decisión #3).
+ *
+ * ⚠️ Lo primero que hace es **quitar el bloque `<think>`**: `qwen3-vl:4b`
+ * IGNORA `think:false` y razona igual (medido — es lo que vaciaba las
+ * respuestas cuando el presupuesto era corto). Ese razonamiento no es para el
+ * usuario; si se colara, el compAI le leería en voz alta su propio monólogo.
+ *
+ * Tolerante a las dos formas en que contesta: veredicto + descripción + seña
+ * en tres líneas, o todo junto en un párrafo.
+ *
+ * @param {string} crudo
+ * @returns {{hallazgo: string, queMirar: string|null, confianza: 'baja'|'media'|'alta'}}
+ */
+export function extraerDeRevision(crudo) {
+  const texto = String(crudo || '')
+    // El monólogo del modelo, fuera. Con y sin cierre (respuesta truncada).
+    .replace(/<think>[\s\S]*?<\/think>/gi, ' ')
+    .replace(/<think>[\s\S]*$/i, ' ')
+    // Etiquetas que a veces repite del propio prompt.
+    .replace(/^\s*l[íi]nea\s*\d\s*[:.-]\s*/gim, '')
+    .trim();
+
+  const confianza = DUDA.test(texto) ? 'baja' : CERTEZA.test(texto) ? 'alta' : 'media';
+
+  // Un renglón que es SÓLO el veredicto no aporta nada al usuario: ya se lo
+  // dice la frase de apertura. Se descarta.
+  const soloVeredicto = /^\W*(sana|sano|enferma|enfermo|saludable)\W*$/i;
+  const lineas = texto
+    .split(/\r?\n+/)
+    .map((l) => l.trim())
+    .filter((l) => l && !soloVeredicto.test(l));
+
+  if (lineas.length >= 2) {
+    // Si la última línea es la seña de campo, se separa; si no, todo es hallazgo.
+    const ultima = lineas[lineas.length - 1];
+    if (SENA.test(ultima)) {
+      return { hallazgo: lineas.slice(0, -1).join(' '), queMirar: despuntar(ultima), confianza };
+    }
+    return { hallazgo: lineas.join(' '), queMirar: null, confianza };
+  }
+
+  const unico = lineas[0] || '';
+  if (!unico) return { hallazgo: '', queMirar: null, confianza };
+
+  // Todo en un párrafo: se busca la oración que da la seña de campo.
+  const oraciones = unico.split(/(?<=[.;!?])\s+/).map((s) => s.trim()).filter(Boolean);
+  const i = oraciones.findIndex((s) => SENA.test(s));
+  if (i > 0) {
+    return {
+      hallazgo: oraciones.slice(0, i).join(' '),
+      queMirar: despuntar(oraciones.slice(i).join(' ')),
+      confianza,
+    };
+  }
+  return { hallazgo: unico, queMirar: null, confianza };
+}
+
+/* La seña se va a insertar tras "Para salir de dudas, …": se le quita su
+   propio arranque imperativo y la mayúscula para que no quede "Para salir de
+   dudas, Fíjese si…". */
+function despuntar(s) {
+  const t = String(s || '').trim().replace(/^y\s+/i, '');
+  return t ? `${t.charAt(0).toLowerCase()}${t.slice(1)}`.replace(/\.$/, '') : '';
+}
+
+/**
  * ¿Se puede correr el segundo paso ahora mismo? Comprueba, en este orden:
  * red, que no haya otro vuelo, y que el modelo de chat siga residente (si se
  * fue, la GPU está peleada y meter otra carga sólo empeora las cosas).
@@ -216,6 +316,8 @@ export async function pedirSegundaOpinion({
 
 export default {
   pedirSegundaOpinion,
+  lecturaDesdeHallazgo,
+  extraerDeRevision,
   redactarSegundaOpinion,
   coincidenLasLecturas,
   puedeCorrerSegundoPaso,

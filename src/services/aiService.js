@@ -33,6 +33,9 @@ const OLLAMA_URL = `${OLLAMA_BASE}/api/generate`;
 // Modelo de diagnóstico multimodal — lee de ENV.VISION_MODEL (src/config/env.js,
 // fuente única de verdad de los modelos del agente).
 const DIAGNOSIS_MODEL = ENV.VISION_MODEL;
+// El SEGUNDO paso del diagnóstico: un modelo distinto que vuelve a mirar la
+// foto en segundo plano (ver `revisarFoliage` y services/segundaOpinionFoto.js).
+const REVIEW_MODEL = ENV.VISION_REVIEW_MODEL;
 // Modelo(s) de visión para reconocimiento de especies.
 // 2026-07-23 (PR #2738 §9): primary y fallback 1 unificados en
 // ENV.VISION_MODEL (gemma3:4b) — retira `llama3.2-vision:11b` como primary,
@@ -282,6 +285,109 @@ export const analyzeFoliage = async (imageBlob, options = {}) => {
     }
   }
   return result;
+};
+
+/**
+ * revisarFoliage — EL SEGUNDO PASO del diagnóstico de foto.
+ *
+ * Vuelve a mirar LA MISMA imagen con `ENV.VISION_REVIEW_MODEL` (un modelo
+ * DISTINTO del que contestó de una) para que el compAI pueda avisar si el
+ * primero dejó pasar algo. Quién decide si eso se le dice al usuario —y con
+ * qué palabras— NO es esto: es `services/segundaOpinionFoto.js`, que calla si
+ * las dos lecturas coinciden.
+ *
+ * Por qué existe, medido (scripts/bench-vision-matas.mjs, 19 fotos reales de
+ * matas, emparejado presencia/ausencia): los errores de los dos modelos son de
+ * TIPO OPUESTO — `qwen3.5:4b` nunca alarma de más pero dejó pasar la broca del
+ * café; `qwen3-vl:4b` no deja pasar ninguna enferma (11/11) pero alarma de más
+ * y tarda 2,3×. El segundo cubre justo el hueco del primero.
+ *
+ * ⚠️ `num_predict` AMPLIO y sin confiar en `think:false`: el modelo de revisión
+ * razona igual, y con presupuesto corto devuelve CADENA VACÍA
+ * (`done_reason: "length"`). Con 90 sacaba 4/11; con presupuesto suficiente,
+ * 11/11. No es que no sepa — es que no lo dejan hablar.
+ *
+ * ⚠️ NUNCA se llama en paralelo con otra carga de modelo: en `alpha` se
+ * reprodujo el DESALOJO del chat pineado (8,56 s de recarga) al dispararlo
+ * junto al embebedor del RAG. El cerrojo de un-solo-vuelo lo pone
+ * `segundaOpinionFoto.js`.
+ *
+ * Devuelve TEXTO plano (no JSON): lo que interesa es el veredicto en prosa
+ * para poder compararlo con la primera lectura y, si discrepa, contárselo al
+ * usuario con las palabras del compAI.
+ *
+ * El formato pedido son TRES líneas —veredicto · qué ve · la seña de campo—
+ * porque el SPEC (decisión #3) exige que el diagnóstico termine en **qué
+ * mirar para confirmarlo**. Quien las separa es `extraerDeRevision()` en
+ * `segundaOpinionFoto.js`, y es tolerante: si el modelo contesta todo en un
+ * párrafo, igual encuentra la seña. El formato ayuda; no se depende de él.
+ *
+ * @param {Blob} imageBlob
+ * @param {Object} [options]
+ * @param {AbortSignal} [options.signal]
+ * @returns {Promise<string|null>} la segunda lectura, o null si no se pudo.
+ */
+export const revisarFoliage = async (imageBlob, { signal } = {}) => {
+  // Con 4000 de presupuesto y un modelo que razona sin freno, una foto rara
+  // podría tener la GPU ocupada varios minutos — y esta es la ruta de FONDO,
+  // la que nunca debe estorbarle al chat. Si el caller no trae su propio
+  // `signal`, se le pone tope. Medido: las fotos que sí contestan van de 20 a
+  // 37 s, así que 120 s corta lo patológico sin cortar lo normal.
+  const reloj = signal ? null : new AbortController();
+  const tope = reloj ? setTimeout(() => reloj.abort(), 120000) : null;
+  try {
+    const base64 = await blobToBase64(imageBlob);
+    const prompt = [
+      'Mire la foto de esta planta de una finca campesina colombiana.',
+      '¿Tiene algún problema sanitario visible (plaga o enfermedad)?',
+      'Responda en TRES líneas, en español, tratando de usted:',
+      'Línea 1: una sola palabra, SANA o ENFERMA.',
+      'Línea 2: qué ve en la foto.',
+      'Línea 3: empiece con "Fíjese" y diga la seña concreta que hay que mirar',
+      'en la mata para confirmarlo en campo.',
+      'No invente nombres de patógenos si no está seguro.',
+    ].join(' ');
+    const text = await streamOllama(
+      OLLAMA_URL,
+      {
+        model: REVIEW_MODEL,
+        prompt,
+        images: [base64],
+        // `think:false` se manda igual, pero NO se le cree: medido contra
+        // alpha el 2026-07-26, el modelo devuelve `thinking` de 2426-2581
+        // caracteres CON el flag puesto. Es una petición, no un interruptor.
+        think: false,
+        // ⚠️ 4000 NO ES UN NÚMERO AL AZAR — es lo que costó medirlo. El
+        // razonamiento se come el presupuesto ENTERO antes de escribir una
+        // sola letra, y cuánto razona DEPENDE DE LA FOTO:
+        //
+        //   broca.jpg    np 700  → "length", thinking 2426, response ""  VACÍO
+        //   broca.jpg    np 1500 → "stop",   eval 748,      response ok
+        //   mycena…jpg   np 1500 → "length", thinking 4130+, response ""  VACÍO
+        //   mycena…jpg   np 4000 → "stop",   eval 1133,     response ok
+        //
+        // O sea: un presupuesto que le basta a una foto le queda corto a la
+        // siguiente, y el fallo NO es un error — es CADENA VACÍA. El segundo
+        // paso se queda mudo y nadie se entera de por qué.
+        //
+        // Y no, `/no_think` en el prompt tampoco lo apaga: probado, siguió
+        // razonando 4130 caracteres. A este modelo se le da presupuesto o no
+        // habla. NO BAJAR sin volver a medir `done_reason` Y la longitud de
+        // `response` sobre VARIAS fotos, no una.
+        options: { temperature: 0.1, num_predict: 4000 },
+      },
+      null,
+      { signal: signal || reloj?.signal, meta: { paso: 2, rol: 'vision_revision' } },
+    );
+    const limpio = String(text || '').trim();
+    return limpio || null;
+  } catch (err) {
+    // Degrada en silencio: la primera respuesta ya cumplió con el usuario.
+    console.debug('[aiService.revisarFoliage] segundo paso omitido:', err?.message);
+    return null;
+  } finally {
+    if (tope) clearTimeout(tope);
+  }
 };
 
 /**

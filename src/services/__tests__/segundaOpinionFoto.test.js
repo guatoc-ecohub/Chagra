@@ -5,6 +5,8 @@ import {
   coincidenLasLecturas,
   puedeCorrerSegundoPaso,
   habilitarSegundaOpinion,
+  extraerDeRevision,
+  lecturaDesdeHallazgo,
 } from '../segundaOpinionFoto';
 
 /**
@@ -160,5 +162,117 @@ describe('pedirSegundaOpinion — cuándo habla y cuándo no', () => {
     const r = await puedeCorrerSegundoPaso();
     expect(r.puede).toBe(false);
     expect(r.razon).toBe('apagada');
+  });
+});
+
+describe('lecturaDesdeHallazgo — el JSON del paso 1, en prosa comparable', () => {
+  it('con issues, dice ENFERMA y los enumera', () => {
+    const t = lecturaDesdeHallazgo({ score: 40, issues: ['mancha foliar', 'clorosis'] });
+    expect(t).toMatch(/^ENFERMA/);
+    expect(t).toMatch(/mancha foliar/);
+  });
+
+  it('sin issues, dice SANA — que es lo que el paso 1 está afirmando', () => {
+    expect(lecturaDesdeHallazgo({ score: 95, issues: [] })).toMatch(/^SANA/);
+  });
+
+  it('sin hallazgo devuelve vacío (y entonces el paso 2 calla por parseo dudoso)', () => {
+    expect(lecturaDesdeHallazgo(null)).toBe('');
+    expect(coincidenLasLecturas(lecturaDesdeHallazgo(null), 'ENFERMA, tiene broca')).toBe(true);
+  });
+});
+
+describe('extraerDeRevision — de la respuesta cruda a lo que el compAI dice', () => {
+  it('⚠️ TIRA EL BLOQUE <think>: el modelo razona aunque se le pida que no', () => {
+    // Medido: qwen3-vl:4b IGNORA `think:false`. Si ese monólogo se colara, el
+    // compAI le leería al campesino su propio razonamiento en voz alta.
+    const r = extraerDeRevision(
+      '<think>El usuario quiere saber si la planta está enferma. Veamos...</think>\n'
+      + 'ENFERMA\nLas hojas tienen manchas negras.\nFíjese si las manchas tienen borde amarillo.',
+    );
+    expect(r.hallazgo).not.toMatch(/think|usuario quiere|Veamos/i);
+    expect(r.hallazgo).toMatch(/manchas negras/);
+  });
+
+  it('aguanta un <think> SIN CERRAR (respuesta truncada)', () => {
+    const r = extraerDeRevision('<think>me quedé sin presupuesto a mitad de');
+    expect(r.hallazgo).toBe('');
+  });
+
+  it('separa las tres líneas: veredicto fuera, qué ve, y la seña de campo', () => {
+    const r = extraerDeRevision(
+      'ENFERMA\nSe observa un objeto oscuro e irregular sobre el fruto.\n'
+      + 'Fíjese si el grano tiene un huequito con polvillo alrededor.',
+    );
+    expect(r.hallazgo).toBe('Se observa un objeto oscuro e irregular sobre el fruto.');
+    expect(r.queMirar).toMatch(/^fíjese si el grano/);
+    // El veredicto suelto NO se repite: ya lo dice la frase de apertura.
+    expect(r.hallazgo).not.toMatch(/^ENFERMA/);
+  });
+
+  it('si contesta todo en un párrafo, igual encuentra la seña', () => {
+    const r = extraerDeRevision(
+      'La hoja presenta manchas concéntricas. Revise el envés para ver si hay polvillo naranja.',
+    );
+    expect(r.hallazgo).toMatch(/manchas concéntricas/);
+    expect(r.queMirar).toMatch(/revise el envés/);
+  });
+
+  it('quita las etiquetas "Línea N:" que a veces repite del prompt', () => {
+    const r = extraerDeRevision('Línea 1: ENFERMA\nLínea 2: hay clorosis\nLínea 3: Mire las nervaduras');
+    expect(r.hallazgo).toBe('hay clorosis');
+    expect(r.queMirar).toMatch(/^mire las nervaduras/);
+  });
+
+  it('sin seña, no la inventa', () => {
+    const r = extraerDeRevision('ENFERMA\nHay algo raro en el tallo.');
+    expect(r.queMirar).toBeNull();
+  });
+
+  it('la confianza sale de SUS palabras, no de la nada', () => {
+    expect(extraerDeRevision('Posiblemente sea un hongo').confianza).toBe('baja');
+    expect(extraerDeRevision('No estoy seguro de lo que veo').confianza).toBe('baja');
+    expect(extraerDeRevision('Se ve claramente una perforación').confianza).toBe('alta');
+    expect(extraerDeRevision('Hay manchas en la hoja').confianza).toBe('media');
+  });
+});
+
+describe('el caso REAL de la broca, extremo a extremo', () => {
+  // Es la corrida verificada contra alpha (bitácora compai-unificado §19):
+  // el paso 1 dijo SANA, el paso 2 vio el daño.
+  const CRUDO_PASO2 = 'ENFERMA\nSe observa un objeto oscuro e irregular en el fruto, '
+    + 'posiblemente una perforación.\nFíjese si el grano tiene un huequito con polvillo.';
+
+  it('habla, y habla como el operador mandó', async () => {
+    const avisar = vi.fn();
+    const r = await pedirSegundaOpinion({
+      primeraLectura: lecturaDesdeHallazgo({ score: 90, issues: [] }), // el paso 1 la vio SANA
+      mirarDeNuevo: async () => CRUDO_PASO2,
+      extraer: extraerDeRevision,
+      avisar,
+      canal: 'texto',
+    });
+    expect(r.razon).toBe('discrepa');
+    const dicho = avisar.mock.calls[0][0];
+    // Duda en primera persona…
+    expect(dicho).toMatch(/^Me quedé mirando otra vez su foto/);
+    // …NUNCA corrige…
+    expect(dicho).not.toMatch(/me equivoqu|en realidad|estaba mal|corrijo|error/i);
+    // …dice qué mirar…
+    expect(dicho).toMatch(/huequito con polvillo/);
+    // …y NO le lee al campesino el veredicto crudo en mayúsculas.
+    expect(dicho).not.toMatch(/ENFERMA/);
+  });
+
+  it('con la confianza baja del propio modelo, suena todavía más prudente', async () => {
+    const avisar = vi.fn();
+    await pedirSegundaOpinion({
+      primeraLectura: 'SANA. No se observa problema.',
+      mirarDeNuevo: async () => CRUDO_PASO2,
+      extraer: extraerDeRevision,
+      avisar,
+    });
+    // "posiblemente" en la respuesta del modelo ⇒ confianza baja ⇒ duda explícita.
+    expect(avisar.mock.calls[0][0]).toMatch(/no estoy segura/);
   });
 });
