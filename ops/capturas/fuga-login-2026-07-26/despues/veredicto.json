@@ -1,0 +1,275 @@
+{
+  "base": "http://127.0.0.1:4173",
+  "conSesion": false,
+  "generado": "2026-07-27T01:05:07.486Z",
+  "resultados": [
+    {
+      "caso": "01-raiz",
+      "hash": "",
+      "que": "la raíz — sin sesión debe caer en LOGIN, no en el valle",
+      "url": "http://127.0.0.1:4173/",
+      "hashFinal": "",
+      "vista": "login",
+      "titulo": "Chagra",
+      "texto": "Chagra El cuaderno vivo de su finca agroecológica Registre, aprenda y cuide la tierra, con inteligencia que protege el páramo, aunque no tenga señal. Funciona sin internet Sus datos son suyos Software libre Entre a su fi",
+      "inputs": [
+        "Su usuario",
+        "Su contraseña"
+      ],
+      "canvas": 0,
+      "login": true,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "01-raiz.png"
+    },
+    {
+      "caso": "02-dashboard",
+      "hash": "#dashboard",
+      "que": "el home real",
+      "url": "http://127.0.0.1:4173/#dashboard",
+      "hashFinal": "#dashboard",
+      "vista": "login",
+      "titulo": "Chagra",
+      "texto": "Chagra El cuaderno vivo de su finca agroecológica Registre, aprenda y cuide la tierra, con inteligencia que protege el páramo, aunque no tenga señal. Funciona sin internet Sus datos son suyos Software libre Entre a su fi",
+      "inputs": [
+        "Su usuario",
+        "Su contraseña"
+      ],
+      "canvas": 0,
+      "login": true,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "02-dashboard.png"
+    },
+    {
+      "caso": "03-agente",
+      "hash": "#agente",
+      "que": "el agente (pantalla real)",
+      "url": "http://127.0.0.1:4173/#agente",
+      "hashFinal": "#agente",
+      "vista": "login",
+      "titulo": "Chagra",
+      "texto": "Chagra El cuaderno vivo de su finca agroecológica Registre, aprenda y cuide la tierra, con inteligencia que protege el páramo, aunque no tenga señal. Funciona sin internet Sus datos son suyos Software libre Entre a su fi",
+      "inputs": [
+        "Su usuario",
+        "Su contraseña"
+      ],
+      "canvas": 0,
+      "login": true,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "03-agente.png"
+    },
+    {
+      "caso": "04-inventario",
+      "hash": "#inventario",
+      "que": "inventario de la finca (datos reales)",
+      "url": "http://127.0.0.1:4173/#inventario",
+      "hashFinal": "#inventario",
+      "vista": "login",
+      "titulo": "Chagra",
+      "texto": "Chagra El cuaderno vivo de su finca agroecológica Registre, aprenda y cuide la tierra, con inteligencia que protege el páramo, aunque no tenga señal. Funciona sin internet Sus datos son suyos Software libre Entre a su fi",
+      "inputs": [
+        "Su usuario",
+        "Su contraseña"
+      ],
+      "canvas": 0,
+      "login": true,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "04-inventario.png"
+    },
+    {
+      "caso": "05-perfil",
+      "hash": "#perfil",
+      "que": "perfil del usuario",
+      "url": "http://127.0.0.1:4173/#perfil",
+      "hashFinal": "#perfil",
+      "vista": "login",
+      "titulo": "Chagra",
+      "texto": "Chagra El cuaderno vivo de su finca agroecológica Registre, aprenda y cuide la tierra, con inteligencia que protege el páramo, aunque no tenga señal. Funciona sin internet Sus datos son suyos Software libre Entre a su fi",
+      "inputs": [
+        "Su usuario",
+        "Su contraseña"
+      ],
+      "canvas": 0,
+      "login": true,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "05-perfil.png"
+    },
+    {
+      "caso": "06-informes",
+      "hash": "#informes",
+      "que": "informes de la finca",
+      "url": "http://127.0.0.1:4173/#informes",
+      "hashFinal": "#informes",
+      "vista": "login",
+      "titulo": "Chagra",
+      "texto": "Chagra El cuaderno vivo de su finca agroecológica Registre, aprenda y cuide la tierra, con inteligencia que protege el páramo, aunque no tenga señal. Funciona sin internet Sus datos son suyos Software libre Entre a su fi",
+      "inputs": [
+        "Su usuario",
+        "Su contraseña"
+      ],
+      "canvas": 0,
+      "login": true,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "06-informes.png"
+    },
+    {
+      "caso": "07-valle3d",
+      "hash": "#valle3d",
+      "que": "el valle de la app — es el PRIVADO, va tras login",
+      "url": "http://127.0.0.1:4173/#valle3d",
+      "hashFinal": "#valle3d",
+      "vista": "login",
+      "titulo": "Chagra",
+      "texto": "Chagra El cuaderno vivo de su finca agroecológica Registre, aprenda y cuide la tierra, con inteligencia que protege el páramo, aunque no tenga señal. Funciona sin internet Sus datos son suyos Software libre Entre a su fi",
+      "inputs": [
+        "Su usuario",
+        "Su contraseña"
+      ],
+      "canvas": 0,
+      "login": true,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "07-valle3d.png"
+    },
+    {
+      "caso": "08-vitrina-entrada-3d",
+      "hash": "#/mockups/entrada-3d",
+      "que": "vitrina pública — DEBE seguir abierta",
+      "url": "http://127.0.0.1:4173/#/mockups/entrada-3d",
+      "hashFinal": "#/mockups/entrada-3d",
+      "vista": "mockup_entrada_3d",
+      "titulo": "Chagra",
+      "texto": "▾ 💧 ☕ 🌾 🌱 🐞 🐔 🌳 ⛅ 🧺 🌱 🍄 🐄 📖 🏔️ Agua Cafe Cultivos Suelo Sanidad Animales Disenio Clima Mercado Semillero Micorrizas Abono Aprender Paramo Toque un lugar para entrar ‹ Volver SU FINCA, HOY El valle de mi finca",
+      "inputs": [],
+      "canvas": 1,
+      "login": false,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "08-vitrina-entrada-3d.png"
+    },
+    {
+      "caso": "09-vitrina-mercado",
+      "hash": "#/mockups/mercado",
+      "que": "vitrina pública del mercado — DEBE seguir abierta",
+      "url": "http://127.0.0.1:4173/#/mockups/mercado",
+      "hashFinal": "#/mockups/mercado",
+      "vista": "mockup_mercado",
+      "titulo": "Chagra",
+      "texto": "Volver mercado.chagra.bio MERCADO CAMPESINO DE LA MONTAÑA Sepa a qué altura crece su comida. Cada cosecha llega con la cara de quien la sembró, su finca y su vereda. Toque un producto y conozca de dónde viene, hasta el m",
+      "inputs": [],
+      "canvas": 0,
+      "login": false,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "09-vitrina-mercado.png"
+    },
+    {
+      "caso": "10-vitrina-paramo",
+      "hash": "#/mockups/paramo-definitivo",
+      "que": "vitrina 3D pública — DEBE seguir abierta",
+      "url": "http://127.0.0.1:4173/#/mockups/paramo-definitivo",
+      "hashFinal": "#/mockups/paramo-definitivo",
+      "vista": "mockup_paramo_definitivo",
+      "titulo": "Chagra",
+      "texto": "La fábrica de agua ▴",
+      "inputs": [],
+      "canvas": 1,
+      "login": false,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "10-vitrina-paramo.png"
+    },
+    {
+      "caso": "11-login",
+      "hash": "#login",
+      "que": "el login mismo — siempre alcanzable",
+      "url": "http://127.0.0.1:4173/#login",
+      "hashFinal": "#login",
+      "vista": "login",
+      "titulo": "Chagra",
+      "texto": "Chagra El cuaderno vivo de su finca agroecológica Registre, aprenda y cuide la tierra, con inteligencia que protege el páramo, aunque no tenga señal. Funciona sin internet Sus datos son suyos Software libre Entre a su fi",
+      "inputs": [
+        "Su usuario",
+        "Su contraseña"
+      ],
+      "canvas": 0,
+      "login": true,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "11-login.png"
+    },
+    {
+      "caso": "12-puerta-evento-inventario",
+      "hash": "",
+      "evento": "activos",
+      "que": "la PUERTA: pedirle al bus de la app una pantalla real, sin sesión",
+      "url": "http://127.0.0.1:4173/",
+      "hashFinal": "",
+      "vista": "login",
+      "titulo": "Chagra",
+      "texto": "Chagra El cuaderno vivo de su finca agroecológica Registre, aprenda y cuide la tierra, con inteligencia que protege el páramo, aunque no tenga señal. Funciona sin internet Sus datos son suyos Software libre Entre a su fi",
+      "inputs": [
+        "Su usuario",
+        "Su contraseña"
+      ],
+      "canvas": 0,
+      "login": true,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "12-puerta-evento-inventario.png"
+    },
+    {
+      "caso": "13-puerta-evento-dashboard",
+      "hash": "",
+      "evento": "dashboard",
+      "que": "la PUERTA: el home real por el bus, sin sesión",
+      "url": "http://127.0.0.1:4173/",
+      "hashFinal": "",
+      "vista": "login",
+      "titulo": "Chagra",
+      "texto": "Chagra El cuaderno vivo de su finca agroecológica Registre, aprenda y cuide la tierra, con inteligencia que protege el páramo, aunque no tenga señal. Funciona sin internet Sus datos son suyos Software libre Entre a su fi",
+      "inputs": [
+        "Su usuario",
+        "Su contraseña"
+      ],
+      "canvas": 0,
+      "login": true,
+      "errores": [
+        "[console] [Config] Variable de entorno requerida no definida: VITE_FARMOS_CLIENT_ID. Revise .env o .env.local.",
+        "[console] Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "captura": "13-puerta-evento-dashboard.png"
+    }
+  ]
+}

@@ -171,6 +171,32 @@ usuario — camino público, intacto.
 
 **Build con el arreglo:** `npx vite build` → **EXIT=0**, 3m22s.
 
+#### La prueba de afuera, DESPUÉS — `ops/capturas/fuga-login-2026-07-26/despues/`
+
+Mismo navegador limpio, misma sonda, build con el arreglo. **13 de 13 paradas:**
+
+| Parada | `vista` montada | ¿login? |
+|---|---|---|
+| `01-raiz` · `02-dashboard` · `03-agente` · `04-inventario` · `05-perfil` · `06-informes` | **`login`** | **SÍ** |
+| `07-valle3d` — el valle privado de la app | **`login`** | **SÍ** |
+| **`12-puerta-evento-inventario`** — la puerta que abría Activos | **`login`** | **SÍ** |
+| **`13-puerta-evento-dashboard`** | **`login`** | **SÍ** |
+| `08-vitrina-entrada-3d` | `mockup_entrada_3d` | no — **sigue abierta** ✅ |
+| `09-vitrina-mercado` | `mockup_mercado` | no — **sigue abierta** ✅ |
+| `10-vitrina-paramo` | `mockup_paramo_definitivo` | no — **sigue abierta** ✅ |
+
+**El antes y el después, lado a lado:** antes **12 de 13 sin login** (incluida la pantalla real de
+Activos y el onboarding); ahora **login en todo lo real y en las dos puertas**, y **exactamente las
+3 vitrinas** siguen públicas. Ni una de más, ni una de menos.
+
+`09-vitrina-mercado.png` se ve entero —*"Sepa a qué altura crece su comida"*, fincas por altitud,
+productos— o sea que **lo público no se rompió**, no solo "no da login".
+
+> Nota honesta sobre las capturas: en la parada `08` el `page.screenshot()` **venció el timeout**
+> (las escenas 3D bajo swiftshader en `stg` tardan minutos) y esa PNG no se escribió en esta corrida.
+> El **veredicto sí quedó registrado** (`vista: mockup_entrada_3d`), y la escena está fotografiada en
+> `antes/08-*.png`, que es el mismo componente público. Lo mismo pasó con `antes/07`.
+
 **Que el bundle servido es el NUEVO** (el otro agente ya se quemó hoy con un build verde y la app
 muerta por caché de `node_modules`): se borró `node_modules/.vite` antes de construir, `node_modules`
 es un **symlink** al del repo principal, y se comprobó que el marcador nuevo **está dentro del
