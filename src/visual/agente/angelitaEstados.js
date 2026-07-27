@@ -129,18 +129,72 @@ export const ARIA_DE_ESTADO = {
    Los hosts que compongan el mensaje del estado 'no-se' parten de aquí. */
 export const TEXTO_NO_SE = 'No sé.';
 
-/* EL REPERTORIO OCIOSO SE MUDÓ AL NÚCLEO PORTABLE (2026-07-26).
-   `MOMENTOS_IDLE`, `elegirMomentoIdle` y `duracionDeMomento` viven ahora en
-   `src/compai/nucleo/gestos.js`: son la fuente única que comparten la PWA y
-   el compAI del valle de `3d.guatoc.co`, que antes no tenía ninguna conducta.
-   Aquí se re-exportan para no romper a ningún consumidor — el repertorio es
-   el mismo (más el `guino` que pedía el SPEC). Ver
-   `src/compai/nucleo/MANIFIESTO.md`. */
-export {
-  MOMENTOS_IDLE,
-  elegirMomentoIdle,
-  duracionDeMomento,
-} from '../../compai/nucleo/gestos.js';
+/* ── EL REPERTORIO DEL IDLE VIVO (estado acompana) ───────────────────────────
+   Una vecina de verdad EXISTE aunque nadie le hable: entre ratos de vuelo
+   sereno ('flota') se distrae con una mota que pasa, mira alrededor, se
+   acicala las antenas con la manita, se rasca la barriguita, sacude las alas
+   y — de vez en cuando — SE POSA a descansar (aterriza con peso, respira
+   plegadita y vuelve a despegar). Angelita.jsx hojea este repertorio con un
+   reloj de jitter (nunca metrónomo); la CADENCIA de cada momento vive en
+   angelita-agente.css bajo [data-agt-idle=…].
+
+   REGLA DURA: `dur` (ms) debe COINCIDIR con la duración del keyframe one-shot
+   del CSS de ese momento — el scheduler suelta el atributo exactamente cuando
+   el gesto termina en identidad, y así el empalme no salta.
+   `peso` = probabilidad relativa al elegir (0 = no se elige por azar: son los
+   momentos de secuencia — flota es el "entre-gestos"; posada/despega los
+   encadena el propio scheduler después de posa). */
+export const MOMENTOS_IDLE = {
+  flota: { dur: [3200, 8600], peso: 0 },  // vuelo sereno entre gestos (dur al azar)
+  mira: { dur: 2600, peso: 3 },       // mira alrededor, curiosa (ojos primero, cabeza después)
+  distraida: { dur: 3600, peso: 2 },  // pasa una mota de vilano y la sigue con los ojos
+  acicala: { dur: 3000, peso: 2 },    // se acicala la antena con la manita (aseo de abeja)
+  rasca: { dur: 2400, peso: 1.5 },    // se rasca la barriguita, satisfecha
+  sacude: { dur: 1500, peso: 1.5 },   // sacudón de alas: escalofrío alegre que la esponja
+  guino: { dur: 1800, peso: 1.2 },    // se pica el ojo: complicidad, no biología (SPEC)
+  estira: { dur: 2600, peso: 1.4 },   // se estira a gusto: bracitos arriba, bosteza el cuerpo
+  bosteza: { dur: 3200, peso: 1.1 },  // bostezo de goma: boca enorme, manita tarde a taparla
+  rascanuca: { dur: 2400, peso: 1.3 },// se rasca la nuca, medio apenada (rascarse distinto)
+  cabecea: { dur: 3600, peso: 0.9 },  // se le van los ojos… zzz… y DESPIERTA de un brinco
+  voltereta: { dur: 1700, peso: 0.8 },// pirueta juguetona: vuelta de campana con anticipación
+  posa: { dur: 1150, peso: 2 },       // aterriza con peso (→ posada → despega)
+  posada: { dur: [3400, 5200], peso: 0 }, // descansa posada: alitas plegadas, respira hondo
+  despega: { dur: 950, peso: 0 },     // se agacha, coge impulso y vuelve al aire
+};
+
+/* Los momentos elegibles por azar (peso > 0), congelados una vez. */
+const GESTOS_IDLE = Object.keys(MOMENTOS_IDLE).filter((m) => MOMENTOS_IDLE[m].peso > 0);
+
+/**
+ * Elige el próximo micro-gesto del idle: azar ponderado que NUNCA repite el
+ * anterior (una criatura viva no se rasca dos veces seguidas como un GIF).
+ * Pura y testeable: el azar se inyecta.
+ * @param {string|null} [previo]  el último gesto hecho (se excluye).
+ * @param {() => number} [rand]  fuente de azar 0..1 (default Math.random).
+ * @returns {string} nombre del momento elegido.
+ */
+export function elegirMomentoIdle(previo = null, rand = Math.random) {
+  const candidatos = GESTOS_IDLE.filter((m) => m !== previo);
+  const total = candidatos.reduce((s, m) => s + MOMENTOS_IDLE[m].peso, 0);
+  let bola = rand() * total;
+  for (const m of candidatos) {
+    bola -= MOMENTOS_IDLE[m].peso;
+    if (bola <= 0) return m;
+  }
+  return candidatos[candidatos.length - 1];
+}
+
+/**
+ * Duración en ms de un momento del idle; los rangos [min,max] salen con
+ * jitter (el reloj de una criatura viva no es de cuarzo).
+ * @param {string} momento
+ * @param {() => number} [rand]
+ * @returns {number}
+ */
+export function duracionDeMomento(momento, rand = Math.random) {
+  const m = MOMENTOS_IDLE[momento] || MOMENTOS_IDLE.flota;
+  return Array.isArray(m.dur) ? Math.round(m.dur[0] + rand() * (m.dur[1] - m.dur[0])) : m.dur;
+}
 
 /* ── CONFIANZA (modo científico) ─────────────────────────────────────────────
    Chagra valora la honestidad sobre la alucinación: cuando el agente responde

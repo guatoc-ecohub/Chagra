@@ -50,6 +50,10 @@ import usePerfilFincaStore from '../store/usePerfilFincaStore.js';
 import useCicloDia from '../visual/mundo3d/useCicloDia.js';
 import Valle2DFallback from './valle/Valle2DFallback';
 import AbejaTransicion, { AlMontarEscena } from '../visual/creatures/AbejaTransicion.jsx';
+/* La señal de SALIDA del compAI (auditoría #47/#51): al volver al valle, el
+   mesh vuela al punto de suelta, la CÁMARA retrocede acompañando y el overlay
+   2D la retoma — salir es el reverso del mismo viaje, no un corte. */
+import { avisarSalidaAbeja } from '../visual/creatures/senalSalidaAbeja.js';
 /* El framework de MUNDOS (three-free en el barrel; los dioramas 3D bajan
    perezosos en `vendor-three`): tocar un lugar del valle ENTRA de verdad. */
 import Mundo, {
@@ -453,7 +457,15 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
   //    exhala (asimetría del lenguaje aprobado), no repite la ceremonia de
   //    entrada.
   const salirDelMundo = useCallback(() => {
-    if (!reducedMotion) setVelo({ fase: 'saliendo', destino: 'valle' });
+    if (!reducedMotion) {
+      // El compAI SALE del mundo con usted (SPEC: "sale de él cuando se va al
+      // valle"): el mesh vuela al punto de suelta, el director de cámara
+      // escucha la misma señal y RETROCEDE acompañando (no corta), y el
+      // overlay 2D retoma a la abeja en ese mismo píxel.
+      avisarSalidaAbeja();
+      setCruceValle('volver');
+      setVelo({ fase: 'saliendo', destino: 'valle' });
+    }
     nav.volverAlValle();
     decir('De vuelta al valle de su finca.');
   }, [nav, decir, reducedMotion]);
@@ -594,11 +606,13 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
           />
         )}
         {/* El OVERLAY del cruce: la abeja 2D vuela y se clava como mesh 3D — así
-            el usuario SÍ ve el 2D→3D. Se desmonta solo al terminar (onFin);
-            reducedMotion → AbejaTransicion no monta nada. */}
-        {cruceValle === 'entrar' && !reducedMotion && (
+            el usuario SÍ ve el 2D→3D. Al VOLVER de un mundo corre el reverso
+            ('volver': brota del punto de suelta donde el mesh se apagó y crece
+            hacia usted — empalme de capas del mismo viaje). Se desmonta solo al
+            terminar (onFin); reducedMotion → AbejaTransicion no monta nada. */}
+        {cruceValle && !reducedMotion && (
           <AbejaTransicion
-            sentido="entrar"
+            sentido={cruceValle}
             tier={equipo.tier}
             animo={companero.animo}
             energia={companero.energia}
