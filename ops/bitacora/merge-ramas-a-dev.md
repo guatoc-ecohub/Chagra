@@ -207,6 +207,62 @@ Además `feat/compai-cableado-vision` (+5) está **viva en este momento** (es la
 rama del árbol principal, con 8 archivos sin commitear): mergearla sería
 partirla por la mitad. Queda explícitamente fuera.
 
+## RESULTADO DE LOS GATES
+
+### Tests — merge 1 (`276fb18a`), suite COMPLETA
+```
+Test Files  38 failed | 825 passed | 2 skipped (865)
+Tests       63 failed | 12017 passed | 1 expected fail | 25 skipped (12106)
+```
+63 rojos. **Ninguno es mío.** Se corrieron los **mismos archivos** en el worktree
+limpio de `origin/dev` y el diff de nombres de test da **vacío**:
+
+```
+comm -23 fallos-merge.txt fallos-dev-limpio.txt   →   (nada)
+```
+
+Los 63 son **preexistentes en `dev`** (TTS/Kokoro, temas y contraste, ClimaStrip,
+RAG tier-gate, service worker, fotos de especie…), ninguno toca el compAI.
+Ojo con el subconjunto: la primera comparación dejó fuera `scripts/__tests__/`
+(el regex sólo cogía `src/` y `tests/`) y aparecieron 6 "regresiones" falsas;
+al correr también esos 3 archivos en dev limpio fallan idéntico. **0 regresiones.**
+
+### Tests — compAI, alcance dirigido tras el merge 2
+```
+Test Files  8 passed (8)      Tests  70 passed (70)
+```
+(`src/compai/nucleo/`, `src/visual/agente/`, AgentFab.)
+
+### Build
+`npx vite build` → **verde, 2m 29s**.
+
+### Gate visual — GPU REAL, 12 gestos ✅
+`ANGLE (AMD, AMD Radeon Vega 10 Graphics (radeonsi raven ACO), OpenGL ES 3.2)`
+13 capturas en `ops/capturas/merge-ramas-a-dev-2026-07-26/`, **todas con md5
+distinto** (13/13) — o sea los gestos DISPARAN de verdad, no es un PNG repetido.
+
+Mirados por contenido, no sólo contados:
+- **`guino`**: se cierra el ojo **GRANDE** (el cercano) a una rendija mientras el
+  chico sigue abierto, y el cuerpo ladea. **La resolución a favor de Fable queda
+  probada en imagen**, no por decreto.
+- **`cabecea`**: sale la **zetita "z"** junto a la cabeza con los ojos caídos —
+  el componente `Zetitas` nuevo renderiza.
+- **`bosteza`**: ojos apretados en línea, boca abierta y bracito subiendo.
+
+### 🔴 Lo que NO pude verificar — y por qué
+**La entrada al mundo (cruce 2D→3D) no la pude capturar.** La ruta
+`#/mockups/entrada-3d` renderiza **pantalla en negro sin `<canvas>`** en el
+arnés: la app no monta sin sesión y el mockup queda detrás de esa puerta.
+Dos intentos, uno además arruinado por `ERR_NETWORK_CHANGED` (la interfaz de red
+de la máquina cambió a mitad de carga). Las capturas negras **no se commitean**:
+una foto vacía no prueba nada y aprobaría a ciegas.
+
+Lo que sí está verificado de ese trabajo es **por lectura de código**, no por
+imagen: el fix `aparecioRef` de `useEntradaAbeja.jsx` es un guard de una línea
+—`cruceVivo && !aparecioRef.current`— que impide re-estampar el
+`visibility:hidden` después del atrape. Es correcto y acotado, pero **queda
+pendiente el gate visual del cruce**; lo hereda quien tenga sesión en el arnés.
+
 ### Coordinación con el frente `dev`→`main`
 `integra/dev-a-main-2026-07-26` **ya está entregada** y fijó su base en
 `origin/dev` @ `3ef4954d`. Todo lo que yo aterrice en `dev` queda **después** de
