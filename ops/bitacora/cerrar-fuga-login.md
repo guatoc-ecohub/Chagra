@@ -192,6 +192,20 @@ Activos y el onboarding); ahora **login en todo lo real y en las dos puertas**, 
 `09-vitrina-mercado.png` se ve entero —*"Sepa a qué altura crece su comida"*, fincas por altitud,
 productos— o sea que **lo público no se rompió**, no solo "no da login".
 
+> ⚠️ **Ojo con leer mal las capturas de `despues/`: varias pesan EXACTAMENTE lo mismo (324.993 B).**
+> Ese "todas iguales" es la firma del fallo que quemó a otro agente hoy (capturas con el mismo md5 =
+> la tarjeta *"Algo falló"*, app muerta con build verde). **Acá no es eso, y se comprobó, no se
+> supuso:**
+> - los **md5 son distintos** entre ellas (`0695672fe0ea` la raíz vs `8bda420273ac` la puerta), o sea
+>   que la app **está viva y repintando**, no congelada en una tarjeta de error;
+> - el veredicto dice `vista: "login"` y el texto leído del DOM es *"Chagra · El cuaderno vivo de su
+>   finca…"*, no "Algo falló";
+> - las que **no** son login pesan distinto (348.529 el mercado, 373.195 el páramo) — el gate
+>   discrimina.
+>
+> El tamaño coincide simplemente porque es **la misma pantalla de login**, que es el resultado
+> correcto. Pesos iguales no bastan como prueba en ninguna dirección: hay que mirar md5 + DOM.
+
 > Nota honesta sobre las capturas: en la parada `08` el `page.screenshot()` **venció el timeout**
 > (las escenas 3D bajo swiftshader en `stg` tardan minutos) y esa PNG no se escribió en esta corrida.
 > El **veredicto sí quedó registrado** (`vista: mockup_entrada_3d`), y la escena está fotografiada en
