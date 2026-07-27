@@ -14,8 +14,13 @@
   display: inline-flex;
   align-items: flex-start;
   gap: 0.45rem;
-  max-width: 400px;
-  min-width: 150px;
+  /* Nunca más ancha que la pantalla. En un teléfono de 430 px una burbuja de
+     400 px centrada en el personaje se salía por el borde y el aviso quedaba
+     cortado — y el usuario es campesino con teléfono modesto. El ajuste fino
+     de la POSICIÓN lo hace `correccionEnPantalla` en BurbujaAngelita.jsx;
+     esto es el techo de ancho. */
+  max-width: min(400px, calc(100vw - 20px));
+  min-width: min(150px, calc(100vw - 20px));
   padding: 0.5rem 0.8rem 0.5rem 0.55rem;
   border: 1px solid var(--ab-borde);
   border-radius: 16px;

@@ -105,10 +105,15 @@ function puntoDeCruce(camera, foco, out) {
  * @param {string}  [opts.hora='dorada']  hora de cielosHoraData: de 'noche'
  *   Angelita se ACURRUCA (idle nocturno de creatureIdle).
  * @param {string}  [opts.tier='alto']  'bajo' → idle frugal (solo respiración).
+ * @param {{ current: { fase: string, pos: THREE.Vector3 } }|null} [opts.viajeRef]
+ *   canal de solo-escritura hacia la CÁMARA (auditoría #50): cada frame el hook
+ *   publica aquí la fase del cruce ('oculta'|'picada'|'no'|'salida') y la
+ *   posición viva de la abeja, para que el director de cámara la ESCOLTE en la
+ *   picada y la despida en la salida — sin acoplar cámara y criatura por props.
  */
 export function useEntradaAbeja(foco, {
   entrando = true, energia = 1, reducedMotion = false, piso = 0, vuelo = VUELO_NEUTRO,
-  cruce = false, saliendo = false, hora = 'dorada', tier = 'alto',
+  cruce = false, saliendo = false, hora = 'dorada', tier = 'alto', viajeRef = null,
 } = {}) {
   const ref = useRef(null);
   const caraRef = useRef(null);
@@ -131,7 +136,15 @@ export function useEntradaAbeja(foco, {
   const prevX = useRef(foco.x);
   // Visibilidad del billboard DOM + su sombra (el <Html> de drei es un portal:
   // no hereda `group.visible`, así que se apaga a mano por estilo).
+  // `aparecioRef` (BUG-COMPAI-ENTRADA, 2026-07-26): una vez que la abeja
+  // APARECIÓ, queda marcado — AbejaEscena lo lee en render para NO volver a
+  // estampar el `visibility:hidden` inicial. Sin esto, cualquier re-render de
+  // React posterior al atrape (p.ej. `hablando` al narrar el mundo) re-aplicaba
+  // el estilo inline y la abeja quedaba escondida PARA SIEMPRE: el cruce
+  // espectacular existía en el código y nadie lo veía en vivo.
+  const aparecioRef = useRef(false);
   const ponVis = (visible) => {
+    if (visible) aparecioRef.current = true;
     if (visRef.current) visRef.current.style.visibility = visible ? '' : 'hidden';
     if (sombraRef.current) sombraRef.current.visible = visible;
   };
@@ -140,6 +153,14 @@ export function useEntradaAbeja(foco, {
   // montar la escena (que nace de un tap para entrar al mundo) → gesto-derivado.
   const haptics = useHaptics({ reducedMotion });
   const posadaEn = useRef(null); // el foco ya celebrado (no repetir por frame)
+  // El PARTE DE VIAJE para la cámara (auditoría #50): fase + posición viva.
+  const avisarViaje = (faseViaje) => {
+    const v = viajeRef && viajeRef.current;
+    if (v) {
+      v.fase = faseViaje;
+      v.pos.copy(ref.current.position);
+    }
+  };
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
@@ -152,11 +173,12 @@ export function useEntradaAbeja(foco, {
     //    CRUCE_SUELTA_S. Con reduced-motion no hay viaje: el host corta en seco
     //    y este mesh muere con la escena, visible hasta el final.
     if (saliendo && !reducedMotion) {
-      if (fase.current === 'oculta') { ponVis(false); return; } // salió antes de nacer
+      if (fase.current === 'oculta') { ponVis(false); avisarViaje('salida'); return; } // salió antes de nacer
       if (salioEn.current === null) salioEn.current = t;
-      if (t - salioEn.current >= CRUCE_SUELTA_S) { ponVis(false); return; }
+      if (t - salioEn.current >= CRUCE_SUELTA_S) { ponVis(false); avisarViaje('salida'); return; }
       puntoDeCruce(state.camera, foco, _punto);
       ref.current.position.lerp(_punto, CRUCE_HUIDA);
+      avisarViaje('salida');
       return; // sin vagar ni sombra: es un suspiro de 180 ms hacia la cámara
     }
     salioEn.current = null;
@@ -169,7 +191,7 @@ export function useEntradaAbeja(foco, {
     if (fase.current === 'oculta') {
       puntoDeCruce(state.camera, foco, _punto);
       ref.current.position.copy(_punto);
-      if (vida < CRUCE_ATRAPA_S) { ponVis(false); return; }
+      if (vida < CRUCE_ATRAPA_S) { ponVis(false); avisarViaje('oculta'); return; }
       fase.current = 'picada';
       ponVis(true);
     } else if (fase.current === 'picada' && vida >= CRUCE_ATRAPA_S + CRUCE_PICADA_S) {
@@ -262,8 +284,9 @@ export function useEntradaAbeja(foco, {
       sombraRef.current.scale.setScalar(1 + h * SOMBRA.ensanchaPorAltura);
       sombraRef.current.material.opacity = Math.max(SOMBRA.opacidadMin, SOMBRA.opacidadBase - h * SOMBRA.atenuaPorAltura);
     }
+    avisarViaje(fase.current); // el parte de viaje del frame (picada o vuelo normal)
   });
-  return { ref, caraRef, sombraRef, visRef, idleRef };
+  return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef };
 }
 
 /**
@@ -301,6 +324,9 @@ export function AbejaEscena({
   //    cabla el dato real con useFincaViva. Si NO se pasa, la abeja usa el
   //    `animo`/`energia` sueltos de siempre (contrato viejo intacto).
   estadoFinca = null, hayAlerta = false,
+  // El canal hacia la cámara (auditoría #50): la escena lo comparte con su
+  // director para que la cámara ESCOLTE la picada de entrada. Opcional.
+  viajeRef = null,
 }) {
   // La señal de SALIDA del host (avisarSalidaAbeja): cruza el reconciler de r3f
   // vía store externo. Al montar se limpia (la señal es de la escena ANTERIOR);
@@ -343,9 +369,9 @@ export function AbejaEscena({
   // La hora del valle (cielosHoraData): de noche el idle la ACURRUCA. Se lee UNA
   // vez al montar — determinista, nada de reloj en render.
   const hora = useMemo(() => horaDeReloj(), []);
-  const { ref, caraRef, sombraRef, visRef, idleRef } = useEntradaAbeja(foco, {
+  const { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef } = useEntradaAbeja(foco, {
     entrando, energia: energiaReal, reducedMotion, piso, vuelo: vueloClima,
-    cruce: cruceVivo, saliendo, hora, tier,
+    cruce: cruceVivo, saliendo, hora, tier, viajeRef,
   });
   // Microrrebote: cada toque de hotspot sube `rebote`; reiniciamos la animación
   // CSS (quitar → reflow → poner) para que dispare aun en toques seguidos. El
@@ -381,7 +407,9 @@ export function AbejaEscena({
           <div
             ref={visRef}
             className="mundo-abeja"
-            style={cruceVivo ? { visibility: 'hidden' } : undefined}
+            /* hidden SOLO hasta el atrape: después del primer ponVis(true) los
+               re-renders NO deben volver a esconderla (BUG-COMPAI-ENTRADA). */
+            style={cruceVivo && !aparecioRef.current ? { visibility: 'hidden' } : undefined}
             aria-hidden="true"
             data-hablando={hablando && vivo ? '1' : undefined}
             data-mojada={mojada && vivo ? '1' : undefined}
