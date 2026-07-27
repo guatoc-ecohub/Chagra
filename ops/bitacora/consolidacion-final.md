@@ -151,5 +151,145 @@ queda **después** de esa foto ⇒ necesita `git merge origin/dev` al final.
 
 ## Registro de ejecución
 
-### Paso 0 — cerrado
+### Paso 0 — cerrado (`d8e97792`)
 Bitácora commiteada antes de tocar una sola línea de código.
+
+---
+
+### CORRECCIÓN a mitad de camino — el paso 2 ya estaba hecho
+
+Aviso del coordinador confirmado **verificando, no creyendo**:
+
+```
+origin/dev                                   = 45fd1f66
+integra/merge-a-dev-2026-07-26 ... origin/dev = 0 adelante / 0 atrás
+```
+
+O sea `integra/merge-a-dev-2026-07-26` **ya es `origin/dev`**: el otro agente
+alcanzó a pushear antes de caerse. Esa rama queda **absorbida y redundante**
+— no se mergea encima de nada. `origin/main` intacto (avanzó por su propio
+carril, `e6a1d81f`, ajeno a esto).
+
+Mi rama sale de ahí, así que **no rehago nada**: sólo agrego encima.
+
+---
+
+### Paso 1 — rescate de `feat/compai-cableado-vision` (`9996e69d`)
+
+El agente **NO terminó**. Confirmado con el árbol en la mano, no por reporte:
+la rama **sigue en `315e497d`** con los 8 archivos **staged y sin commitear**,
+y el proceso de `git commit` (PID 1915827) murió a los ~30 min sin aterrizar,
+atascado en el `eslint` del `pre-commit` (PID 1916125, 8:58 de CPU quemada).
+
+**El trabajo en sí sí está completo** — otra cosa es que el commit no llegara:
+- los 8 archivos estaban **todos** en el índice (el agente ya había hecho el
+  `git add` explícito de los 8: iba a commitear, no estaba a mitad de escribir);
+- trae **sus propios tests** (4 archivos, incluido uno nuevo);
+- y esos tests **pasan**.
+
+Rescatado sin tocar el worktree principal: `git diff --cached --binary` (lectura
+pura) y `git apply -3` sobre esta rama. **Los 8 md5 del resultado coinciden uno
+a uno con los del índice original** — es el mismo contenido, no una reescritura.
+
+`AgentScreen.jsx` no cambió entre `315e497d` y `45fd1f66`, así que el 3-way
+aplicó sobre base idéntica. Cero marcadores de conflicto.
+
+Qué cablea: `revisarFoliage()` (segundo par de ojos sobre la misma foto),
+`warmVisionReviewModel()` + `modelosResidentes()` (precalentar para no cobrarle
+la espera al usuario), `puedeCorrerSegundoPaso()` (si no hay con qué, no se
+promete) y `lanzarSegundaOpinionFoto()` serializada en `AgentScreen`, para no
+pisar el modelo del chat.
+
+**Gates del paso 1**
+- `vitest` dirigido (compAI + visión + núcleo + `visual/agente`):
+  **11 archivos / 122 tests, TODOS verdes**.
+- `npx vite build`: **verde, 2m 57s**.
+
+---
+
+### Paso 3 — EL REMATE: `integra/dev-a-main-2026-07-26` ← `origin/dev` (`5b68141c`)
+
+Era el paso que faltaba. La rama había fijado su base en `dev` @ `3ef4954d` y
+resolvió 125 conflictos ahí; `dev` avanzó después a `45fd1f66`.
+
+```
+antes:  38 adelante / 12 atrás de origin/dev
+merge:  git merge origin/dev  ->  automática, CERO conflictos marcados
+después: 39 adelante /  0 atrás de origin/dev
+```
+
+Entran 12 commits / 64 archivos / +4297 líneas.
+
+#### Cero conflictos NO es cero riesgo — lo verificado a mano
+
+El peligro de este merge no son los marcadores, son los que git resuelve mal en
+silencio (ya pasó hoy: un `case` de `App.jsx` fusionó limpio y reventaba el
+build 2.000 líneas más abajo). Comprobado uno por uno:
+
+| qué | cómo se comprobó | resultado |
+|---|---|---|
+| los 34 commits propios de `main` | `git merge-base --is-ancestor origin/main HEAD` | ✅ `main` entero sigue dentro |
+| guards de plaguicida vetado | `outputGuards.js` en el diff del merge | ✅ **el merge no lo toca** |
+| `App.jsx` (donde ya hubo corrupción silenciosa) | idem | ✅ **el merge no lo toca** |
+| el fix #2785 (avatar elegible) | `grep` en `AgentFab.jsx` | ✅ `ChagraAgentAvatar`×3, cero `<Angelita>` a mano |
+| la estructura nueva del FAB | idem | ✅ `estaOcupado`×2, `alternarSilencio`×4 |
+| marcadores sueltos | `grep '^<<<<<<< \|^>>>>>>> ' src/ tests/ scripts/` | ✅ vacío |
+
+Las dos cosas que el otro agente peleó en `AgentFab.jsx` (avatar elegible **y**
+botón de silencio hermano) **siguen conviviendo** después del remate: el merge
+no revirtió ninguna.
+
+#### El guiño de Fable — verificado en el código, no por decreto
+`OjosRubber` declara los ojos `[{r:1.95},{r:1.45}]` ⇒ **el primero ES el
+grande**, así que `g:first-of-type` anima el ojo que se lee. Y los **12 gestos**
+(peso > 0) están en el núcleo portable `src/compai/nucleo/gestos.js`:
+`mira · distraida · acicala · rasca · sacude · guino · estira · bosteza ·
+rascanuca · cabecea · voltereta · posa`
+(`flota`, `posada` y `despega` son de secuencia, peso 0).
+`angelitaEstados.js` **re-exporta** del núcleo — no copia.
+
+---
+
+### Gate visual del remate — GPU REAL, mirado por contenido ✅
+
+`ops/capturas/remate-dev-main-2026-07-27/` (en la rama del remate). El script
+`scripts/gate-real-gpu.mjs` **aborta solo** si el renderer es software; imprimió:
+
+```
+ANGLE (AMD, AMD Radeon Vega 10 Graphics (radeonsi raven ACO), OpenGL ES 3.2)
+```
+
+3 capturas, 3 md5 distintos, 249–502 KB — contra los ~80 KB idénticos que da la
+tarjeta *"Algo falló"* cuando la app está muerta. **Miradas, no contadas:**
+
+| Escena | Qué se ve DE VERDAD |
+|---|---|
+| `paramo-definitivo` | Frailejonal, niebla en capas, cordillera, cóndor volando, quebrada azul, oso y rana iluminados, *"La fábrica de agua"* |
+| `vitrina-maestra` | *"El mirador de los mundos"*: 15 arcos-portal con su vista viva adentro, quebrada, piedras de paso, el compAI en la esquina, leyenda verde/dorado. **Es el archivo que traía 17 conflictos y dibuja entero.** |
+| `angelita-viva` | El compAI **vivo**: entrada teatral con gafas al sol, *"El repertorio del agente"*, gesto `Calma` — *"flota viva, mira, se acicala"* |
+
+Los 12 gestos y el núcleo portable **llegaron dibujando** al remate, no sólo
+compilando.
+
+### Gate visual del rescate de visión — parcial, y lo digo como es
+
+`ops/capturas/cableado-vision-2026-07-27/gr-diagnostico-foto.png`, capturada
+sobre el build de ESTA rama (la que lleva `9996e69d`).
+
+**Lo que la captura SÍ prueba**: la pantalla del diagnóstico de foto renderiza
+íntegra con el cableado dentro — foto real de la hoja, los dos hallazgos
+anotados sobre la imagen (`1` *"Aquí: la roya"* AVANZADO y `2` *"Manchitas
+nuevas"* APENAS EMPEZANDO), *"Es la roya del café · Hemileia vastatrix · en el
+envés de la hoja"* y la confianza *Alta · 88%*. **Cero regresión visual.**
+
+**Lo que la captura NO prueba, y no lo voy a vender como que sí**: esa ruta es
+la *muestra de demostración* del mockup. **No ejecuta la ida y vuelta real al
+modelo de visión.** El segundo paso de verdad necesita sesión iniciada y el
+backend detrás del proxy; sobre un `dist` servido con `python -m http.server`
+no hay proxy que valga. El agente anterior chocó con lo mismo: sembró la sesión
+en localforage (DB `Chagra`, store `syncQueue`), consiguió
+`isAuthenticated: true`, y aun así la app **no montó en tres intentos** — su
+única captura es `gate-so-FALLO-sin-pantalla.png`, una pantalla vacía.
+
+**Una foto vacía no aprueba nada.** Así que el segundo paso queda **verificado
+por tests y por build, no por imagen de punta a punta**.
