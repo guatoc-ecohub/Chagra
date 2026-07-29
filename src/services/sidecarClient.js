@@ -393,6 +393,24 @@ const ALLOWED_TOOLS = new Set([
   'get_cultivos_viables',
   'get_diseno_finca',
   'get_dosis_biopreparado',
+  // ── Reconciliación allow-list · Fase 3 (SSOT 2026-07-29). main las exponía
+  //    (39 tools), dev no (35) → el NLU las ruteaba y el cliente las rechazaba
+  //    con `not_allowed` → el turno degradaba a RAG SIN grounding en silencio.
+  //    Las 4 son read-only del grafo AGE / dataset institucional local, con args
+  //    que el NLU SÍ rellena desde una frase. VERIFICADAS EN VIVO (200):
+  //  - get_folk_sintoma: mapea un nombre folk de síntoma/enfermedad al grafo
+  //    (args `sintoma`/`cultivo`). Muy ruteada por el NLU. found:false → pide
+  //    foto/descripción, NUNCA inventa a qué plaga corresponde.
+  //  - get_aporte_nutricional: aporte nutricional (ICBF TCAC) por especie
+  //    (arg `species_id_or_name`). found:false si no documentado.
+  //  - get_canales_comercializacion: canales de comercialización por especie
+  //    (arg `species_id_or_name`).
+  //  - get_practicas_agua: prácticas de manejo del agua (arg `accion`:
+  //    conservacion|captacion|tratamiento|riesgo).
+  'get_folk_sintoma',
+  'get_aporte_nutricional',
+  'get_canales_comercializacion',
+  'get_practicas_agua',
   // FASE 2 (deferidas, NO exponer aún):
   //  - get_grado_dia: requiere `fecha_siembra` (ISO YYYY-MM-DD, sin default) que
   //    el NLU no puede sintetizar con fiabilidad desde una frase libre de chat.
