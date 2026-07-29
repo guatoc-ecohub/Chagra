@@ -47,7 +47,7 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // Sidecar agro-mcp (ADR-045 Fase 2 Step B/C). Detrás de feature flag
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
-import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, confusionEspecieGuard, pestVsDiseaseGuard, companionSpeciesGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
+import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, confusionEspecieGuard, pestVsDiseaseGuard, companionSpeciesGuard, toxicSafetyGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -904,7 +904,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // formatToolEvidence y analyzeQuery viven en agentPromptBase (funciones
   // puras, testeables y medibles fuera de React).
 
-  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '', confusionEspecieBlock = '', pestVsDiseaseBlock = '', groundingPolicyBlock = '') => {
+  const callLLM = async (query, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities = null, fermentoBlock = '', subgrafoBloque = '', biopreparadoBlock = '', pisoTermicoBlock = '', confusionEspecieBlock = '', pestVsDiseaseBlock = '', groundingPolicyBlock = '', toxicSafetyBlock = '') => {
     // Fase 3 del "pensando" visible: generación en el LLM. Cuando llega el
     // primer token, la UI pasa sola al parcial streaming (streamingContent).
     setThinkingPhase('escribiendo');
@@ -1155,6 +1155,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       ? `\n\n${pestVsDiseaseBlock}`
       : '';
 
+    // PISO DE SEGURIDAD ANTE VENENOS (chagra-pro P0 #2, query-side). El sidecar
+    // /toxic-safety-guard escaneó la CONSULTA del usuario: si nombró un
+    // plaguicida tóxico/prohibido, armó un bloque de advertencia + alternativas
+    // MIP. Va de ÚLTIMO (máxima recency, después de todas las guardas) porque es
+    // seguridad y debe DOMINAR — y es INDEPENDIENTE del RAG: cierra el hueco de
+    // la abstención (el guard de salida no ve el veneno si el modelo no repite
+    // el nombre). '' (no-op) cuando la consulta no menciona veneno o el sidecar
+    // no respondió (degradación graceful — no rompe el turno).
+    const toxicSafetyContext = (typeof toxicSafetyBlock === 'string' && toxicSafetyBlock.trim())
+      ? `\n\n${toxicSafetyBlock}`
+      : '';
+
     // MODO CIENTÍFICO (#17) — bloque answer/hedge/abstain ya formateado por
     // el sidecar (WIRING real de grounding-policy.ts/grounding-prompt-
     // formatter.ts). Va DENTRO del cluster de grounding (después de la cadena
@@ -1199,6 +1211,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       pisoTermico: pisoTermicoSafetyBlock,
       confusionEspecie: confusionEspecieSafetyBlock,
       pestVsDisease: pestVsDiseaseSafetyBlock,
+      toxicSafety: toxicSafetyContext,
     });
 
     const messages = [
@@ -1523,6 +1536,11 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // coinciden). '' por default → no-op (degradación graceful, incluye el
       // caso de desacuerdo catálogo↔heurística — fail-safe a propósito).
       let pestVsDiseaseBlock = '';
+      // PISO DE SEGURIDAD ANTE VENENOS (chagra-pro P0 #2, query-side). Bloque de
+      // advertencia toxicidad + MIP ya formateado por el sidecar
+      // (/toxic-safety-guard) cuando la CONSULTA menciona un plaguicida
+      // tóxico/prohibido. '' por default → no-op (degradación graceful).
+      let toxicSafetyBlock = '';
       // MODO CIENTÍFICO (#17) — WIRING real de grounding-policy.ts/grounding-
       // prompt-formatter.ts (audit 2026-07-04-optimizacion-grounding-
       // velocidad-inteligencia.md win #4). El sidecar decide answer/hedge/
@@ -1565,13 +1583,14 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           // /resolve-entities (mismo turno, antes del LLM) — CERO latencia
           // serial añadida. Los seis wrappers son no-throw (devuelven null en
           // error/timeout), así que Promise.all no puede rechazar por ellos.
-          const [resolved, fermento, biopreparado, pisoTermico, confusionEspecie, pestVsDisease] = await Promise.all([
+          const [resolved, fermento, biopreparado, pisoTermico, confusionEspecie, pestVsDisease, toxicSafety] = await Promise.all([
             resolveEntities(textForLLM, { fincaAltitud: reAltitud, context: contextMemory }),
             fermentoPrefilter(textForLLM),
             biopreparadoGrounding(textForLLM),
             pisoTermicoGuard(textForLLM, { fincaAltitud: reAltitud, pisoTermico: rePisoTermico }),
             confusionEspecieGuard(textForLLM),
             pestVsDiseaseGuard(textForLLM),
+            toxicSafetyGuard(textForLLM),
           ]);
           const tRE1 = performance.now();
           // FERMENTOS: si el sidecar marcó intención-fermento, inyectamos su
@@ -1648,6 +1667,18 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               termCategoria: pestVsDisease.term_categoria,
               manejoEquivocadoDetectado: pestVsDisease.manejo_equivocado_detectado,
               reason: pestVsDisease.reason,
+            });
+          }
+          // PISO DE SEGURIDAD ANTE VENENOS (P0 #2): si el sidecar detectó que la
+          // CONSULTA menciona un plaguicida tóxico/prohibido, inyectamos su
+          // bloque de advertencia + MIP (máxima recency, independiente del RAG).
+          // Si el sidecar no respondió (null) o no hay veneno, toxicSafetyBlock
+          // queda '' → no-op, el turno sigue sin romperse (fail-safe).
+          if (toxicSafety && toxicSafety.has_toxic_mention && typeof toxicSafety.system_prompt_block === 'string' && toxicSafety.system_prompt_block.trim()) {
+            toxicSafetyBlock = toxicSafety.system_prompt_block;
+            console.debug('[sidecar] toxic-safety-guard', {
+              toxics: toxicSafety.toxics,
+              reason: toxicSafety.reason,
             });
           }
           if (resolved && Array.isArray(resolved.entities) && resolved.entities.length > 0) {
@@ -2233,7 +2264,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       const deterministicPrice = buildPriceAnswer({ userMessage: text, toolEvidence });
       const rawResponse = deterministicPrice != null
         ? deterministicPrice
-        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock, pisoTermicoBlock, confusionEspecieBlock, pestVsDiseaseBlock, groundingPolicyBlock);
+        : await callLLM(textForLLM, contextMemory, contextCorpus, toolEvidence, resolvedEntities, suggestedEntities, fermentoBlock, edgesTruncated, biopreparadoBlock, pisoTermicoBlock, confusionEspecieBlock, pestVsDiseaseBlock, groundingPolicyBlock, toxicSafetyBlock);
       if (deterministicPrice != null) {
         console.debug('[precio] respuesta determinista SIPSA (sin LLM)', { route: nluRoute });
       }
