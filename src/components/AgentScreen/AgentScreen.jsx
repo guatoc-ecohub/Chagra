@@ -48,6 +48,7 @@ import { createStreamDeadline } from '../../services/streamDeadline';
 // `VITE_USE_SIDECAR_AGRO_MCP` — con flag off, las funciones devuelven null
 // y el AgentScreen se comporta idéntico al pipeline RAG-only previo.
 import { isSidecarEnabled, planNlu, callTool, executeToolChain, resolveEntities, fermentoPrefilter, biopreparadoGrounding, pisoTermicoGuard, confusionEspecieGuard, pestVsDiseaseGuard, companionSpeciesGuard, toxicSafetyGuard, postValidate, getClimaIdeam, isToolAllowed } from '../../services/sidecarClient';
+import { retrieveCorpus } from '../../services/corpusRetriever';
 // CHIPS DE MODO (A3/A4, decisión operador 2026-06-02): el router PURO mapea
 // la intención forzada del chip → tool determinístico, SALTANDO el NLU
 // (que misroutea). `planForcedIntent` decide tool+args; `isStubIntent` marca
@@ -1484,7 +1485,15 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       await addTurn(operatorId, { role: 'user', content: text.trim() });
 
       const contextMemory = wasFreshSession ? '' : await getContextString(operatorId, 10);
-      const contextCorpus = await retrieve(textForLLM, TOP_N_RAG, 'agente');
+      const contextCorpusBase = await retrieve(textForLLM, TOP_N_RAG, 'agente');
+      // #2593 corpus→chat: suma los chunks del corpus server-side (pgvector +
+      // reranker neural bge-reranker-v2-m3 + gate low_relevance) vía
+      // /hybrid-retrieve. Gated por VITE_USE_CORPUS_RETRIEVAL (OFF por defecto)
+      // y fail-soft (devuelve [] si falla) → sin el flag, cero cambio en el chat.
+      const corpusExtra = await retrieveCorpus(textForLLM, 3);
+      const contextCorpus = corpusExtra.length
+        ? [...contextCorpusBase, ...corpusExtra]
+        : contextCorpusBase;
 
       // ADR-045 Fase 2 Step B/C — sidecar NLU + MCP tool grounding.
       // Solo si flag VITE_USE_SIDECAR_AGRO_MCP=true Y estamos online.
