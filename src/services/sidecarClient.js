@@ -974,10 +974,10 @@ export async function judgeVision(speciesId, imageB64) {
 /**
  * Gate ASÍNCRONO del juez de visión (#328). El juez local tarda ~16-23s
  * (minicpm-v:8b en CPU, fuera de la VRAM del agente) y el sync `/judge-vision`
- * lo aborta el propio cliente a TOOL_TIMEOUT_MS=5s → veredicto siempre null.
- * Este par desacopla: `judgeVisionAsync` ENCOLA (202 en ~11ms) y devuelve
- * `{request_id}`; `judgeVisionResult` recoge el veredicto luego (poll). Así el
- * diagnóstico NO se bloquea esperando al juez.
+ * lo aborta el propio cliente a TOOL_TIMEOUT_MS=5s → veredicto siempre null
+ * (gate muerto). Este par desacopla: `judgeVisionAsync` ENCOLA (202 en ~11ms)
+ * y devuelve `{request_id}`; `judgeVisionResult` recoge el veredicto luego
+ * (poll). Así el diagnóstico NO se bloquea esperando al juez.
  *
  * @param {string} speciesId @param {string} imageB64
  * @returns {Promise<null | {request_id: string}>}
@@ -997,7 +997,11 @@ export async function judgeVisionAsync(speciesId, imageB64) {
 }
 
 /**
- * Recoge el veredicto async por `request_id`.
+ * Recoge el veredicto async por `request_id` (poll del gate #328). El sidecar
+ * devuelve `{status:'pending'}` mientras el juez CPU no termina, `{status:'done',
+ * plausible, confidence, motivo}` cuando resuelve, o `{status:'error', reason}`.
+ * Pasa el body crudo del sidecar tal cual (el consumidor decide por `status`).
+ *
  * @param {string} requestId
  * @returns {Promise<null | {status:'done', plausible:boolean|null, confidence:number|null, motivo:string} | {status:'pending'} | {status:'error', reason?:string}>}
  */
