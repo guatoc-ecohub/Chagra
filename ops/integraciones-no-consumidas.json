@@ -53,5 +53,47 @@
       "reason": "Construido chagra-pro #77 (serie ubicación, PRs #75-77) para una cascada Tier1/Tier2 vía sidecar. El propio spec tests/ubicacion-auto.spec.js lo documenta: 'muchos tests están skipped hasta que se mergee el PR 4/4'. Ese PR4 SÍ se mergeó (#1143, 2026-06) pero implementó otra cosa — un fallback OFFLINE (32 dptos x municipios curados) para cuando Nominatim falla, no la llamada al sidecar. locationService.js::resolveUbicacion() es una reimplementación cliente (Nominatim + fallback offline) con el mismo nombre mas no llama al endpoint. A diferencia de los otros casos, esto NO parece un olvido sino una decisión de producto razonable (mejor para offline-first evitar el round-trip a alpha) que dejó el endpoint del sidecar como infraestructura huérfana sin que nadie lo haya limpiado del lado chagra-pro. No cablear — si acaso, evaluar deprecar el endpoint en chagra-pro. Caso 5 del ADR, encontrado por este script.",
       "date": "2026-07-15"
     }
+  ],
+  "orphan_components": [
+    {
+      "id": "src/visual/mundo3d/ArtesaniaAndina.jsx",
+      "reason": "Extensión D-5 del audit (2026-07-21, ver ADR-INTEGRACIONES-NO-CONSUMIDAS-2026-07-15 §componentes): verificado con grep en todo src/ — únicamente su smoke test (__tests__/artesania.smoke.test.jsx) importa el componente; ningún archivo de producto lo hace. Solo el módulo de datos hermano (artesaniaAndina.js: PERFILES_VASIJA/SEGMENTOS_VASIJA) tiene consumidor real (el propio ArtesaniaAndina.jsx). Encontrado por el nuevo check, no cableado en este PR (es una PR de test, no de producto) — requiere decidir en qué mundo/vitrina se monta.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/CamaraDioramas.jsx",
+      "reason": "Verificado con grep: nadie importa el componente React <CamaraDioramas>. Lo que SÍ está cableado (App.jsx, mockups/vitrina3d/VitrinaMundos.jsx) es resolverEncuadre() desde el módulo hermano camaraDioramas.js — la lógica de encuadre se usa directo, sin pasar por el wrapper de componente. El 'import CamaraDioramas from ...' que aparece en el docstring de camaraDioramas.js es un ejemplo de uso en prosa, no código real (y su ruta relativa ni siquiera resuelve). Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/CielosHora.jsx",
+      "reason": "El propio comentario de CapaVivaMundo.jsx dice literalmente 'CielosHora.jsx no existe en dev a la fecha de esta capa; cuando aterrice, se compone aquí mismo' — es un scaffold para una integración futura documentada, todavía sin consumidor real. Encontrado por el nuevo check; no se cablea en este PR (decisión de producto pendiente, no un olvido silencioso).",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/GemeloValle2D.jsx",
+      "reason": "Verificado con grep en src/: el único importador es su propio smoke test (__tests__/gemeloValle2D.smoke.test.jsx). Sin consumidor de producto. Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/PisosTermicosBandas.jsx",
+      "reason": "El comentario de pisosTermicos.js dice 'Lo consume el overlay PisosTermicosBandas.jsx (bandas r3f)', pero verificado con grep: ningún archivo real importa el componente — la intención de diseño no llegó a cablearse. Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/TransicionMundoKit.jsx",
+      "reason": "Verificado con grep: el único importador real es su propio test (__tests__/transicionMundoKit.test.jsx). Su hermano TransicionSierraMundo.jsx solo lo menciona en un comentario de docstring ('misma filosofía que'), no en código. Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/TransicionSierraMundo.jsx",
+      "reason": "Mismo caso que TransicionMundoKit.jsx: sin consumidor real fuera de su propia prosa de docstring y su export default. Ninguno de los dos está montado en una ruta viva hoy. Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    },
+    {
+      "id": "src/visual/mundo3d/infraestructura/InfraestructuraViva.jsx",
+      "reason": "Exportado por el barrel infraestructura/index.js ('export { default as InfraestructuraViva } from ./InfraestructuraViva.jsx'), pero ese barrel a su vez no tiene NINGÚN importador real — solo la variante base Infraestructura.jsx (importada directo, sin pasar por el barrel) está cableada hoy. La variante 'Viva' (auto-alimentada) quedó construida sin consumidor. Encontrado por el nuevo check.",
+      "date": "2026-07-21"
+    }
   ]
 }
