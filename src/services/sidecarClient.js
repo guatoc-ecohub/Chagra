@@ -395,15 +395,24 @@ const ALLOWED_TOOLS = new Set([
   'get_cultivos_viables',
   'get_diseno_finca',
   'get_dosis_biopreparado',
-  // ── Reconciliación 41→46 (fix grounding P0, 2026-07-25): el sidecar/NLU creció
-  //    a 46 tools; estas 4 quedaron ruteables por el NLU pero fuera del whitelist
-  //    → el cliente las rechazaba con not_allowed y el turno degradaba a RAG SIN
-  //    grounding EN SILENCIO. Son read-only del grafo/catálogo con args que el NLU
-  //    SÍ rellena desde una frase de chat (mismo patrón que las ya expuestas):
-  'get_aporte_nutricional', //      aporte nutricional (energía/proteína) por alimento
-  'get_canales_comercializacion', // dónde vender + régimen INVIMA/MADR por cultivo
-  'get_folk_sintoma', //            síntoma campesino → patógeno (muy ruteada por el NLU)
-  'get_practicas_agua', //          prácticas de agua + IRCA rural + protección de cauces
+  // ── Reconciliación allow-list · Fase 3 (SSOT 2026-07-29). main las exponía
+  //    (39 tools), dev no (35) → el NLU las ruteaba y el cliente las rechazaba
+  //    con `not_allowed` → el turno degradaba a RAG SIN grounding en silencio.
+  //    Las 4 son read-only del grafo AGE / dataset institucional local, con args
+  //    que el NLU SÍ rellena desde una frase. VERIFICADAS EN VIVO (200):
+  //  - get_folk_sintoma: mapea un nombre folk de síntoma/enfermedad al grafo
+  //    (args `sintoma`/`cultivo`). Muy ruteada por el NLU. found:false → pide
+  //    foto/descripción, NUNCA inventa a qué plaga corresponde.
+  //  - get_aporte_nutricional: aporte nutricional (ICBF TCAC) por especie
+  //    (arg `species_id_or_name`). found:false si no documentado.
+  //  - get_canales_comercializacion: canales de comercialización por especie
+  //    (arg `species_id_or_name`).
+  //  - get_practicas_agua: prácticas de manejo del agua (arg `accion`:
+  //    conservacion|captacion|tratamiento|riesgo).
+  'get_folk_sintoma',
+  'get_aporte_nutricional',
+  'get_canales_comercializacion',
+  'get_practicas_agua',
   // FASE 2 (deferidas, NO exponer aún):
   //  - get_grado_dia: requiere `fecha_siembra` (ISO YYYY-MM-DD, sin default) que
   //    el NLU no puede sintetizar con fiabilidad desde una frase libre de chat.
