@@ -167,7 +167,7 @@ describe('aiService — analyzeFoliage integración RAG', () => {
 
     expect(streamOllamaMock).toHaveBeenCalledTimes(1);
     const [, body, , options] = streamOllamaMock.mock.calls[0];
-    expect(body.model).toBe('gemma3:4b');
+    expect(body.model).toBe('qwen3-vl:8b');
     expect(body.prompt).toContain('<CONTEXTO_CIENTÍFICO>');
     expect(body.prompt).toContain('Mycosphaerella fragariae');
     expect(body.prompt).toContain('caldo bordelés');

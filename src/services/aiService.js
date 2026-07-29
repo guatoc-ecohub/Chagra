@@ -30,12 +30,12 @@ import { hashImage, getCached, setCached } from './visionCacheService';
 const OLLAMA_BASE = '/api/ollama';
 const OLLAMA_URL = `${OLLAMA_BASE}/api/generate`;
 // Modelo de diagnóstico multimodal configurado.
-const DIAGNOSIS_MODEL = 'gemma3:4b';
+const DIAGNOSIS_MODEL = 'qwen3-vl:8b';
 // Modelo de visión configurado para reconocimiento de especies. La
 // selección de primary y de los fallbacks se basa en bench interno de
 // confiabilidad del parseo JSON y de latencia en GPU local.
 const VISION_SPECIES_MODEL = 'llama3.2-vision:11b';
-const VISION_SPECIES_FALLBACK_MODEL = 'gemma3:4b';
+const VISION_SPECIES_FALLBACK_MODEL = 'qwen3-vl:8b';
 const VISION_SPECIES_FALLBACK_2_MODEL = 'qwen2.5vl:7b';
 
 // Prompt base sin contexto RAG. Fallback usado cuando el corpus no cargó

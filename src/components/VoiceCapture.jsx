@@ -621,7 +621,7 @@ export default function VoiceCapture({ onSave, onPlantsSaved, hideDoneScreen = f
                 active
                 label="Extrayendo entidades"
                 accent="muzo"
-                meta={<span className="font-mono">gemma3:4b</span>}
+                meta={<span className="font-mono">qwen3.5:4b</span>}
               />
             </div>
           )}

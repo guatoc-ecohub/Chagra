@@ -111,7 +111,7 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'gemma4:e2b (chat+complex unificado, evita cold-start). ' +
+      'qwen3.5:4b (chat+complex unificado, evita cold-start). ' +
       'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   chat_complex: {
@@ -135,7 +135,7 @@ export const ROUTES = {
     stop: CHAT_STOP_SEQUENCES,
     url: '/api/ollama/v1/chat/completions',
     rationale:
-      'gemma4:e2b (chat+complex unificado, evita cold-start). ' +
+      'qwen3.5:4b (chat+complex unificado, evita cold-start). ' +
       'Detalle + por qué + alternativas en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   nlu: {
@@ -149,7 +149,7 @@ export const ROUTES = {
     url: '/api/ollama/v1/chat/completions',
     rationale:
       'Vestigial — NLU real ejecuta en sidecar agro-mcp nlu.ts con ' +
-      'gemma4:e2b (unificado con chat para no tener 2 modelos en 12 GB). ' +
+      'qwen3.5:4b (unificado con chat para no tener 2 modelos en 12 GB). ' +
       'Detalle en Chagra-strategy/ops/MODELS.md (fuente única).',
   },
   reasoning: {
