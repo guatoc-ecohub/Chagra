@@ -397,6 +397,7 @@ export default function CromatografiaScreen({ onBack, onNavigate: _onNavigate })
     }
 
     setError(null);
+    // @ts-ignore zona type mismatch with interpretarCromatografia param
     const resultado = interpretarCromatografia(observaciones);
     setInterpretarResult(resultado);
   }, [interpretarForm]);

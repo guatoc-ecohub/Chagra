@@ -54,9 +54,9 @@ describe('buildZenodoMetadata — creators', () => {
   });
 
   it('creators explícitos se respetan si son objetos con name', () => {
-    const result = buildZenodoMetadata([], {
+    const result = buildZenodoMetadata([], /** @type {any} */ ({
       creators: [{ name: 'Carla López', affiliation: 'UIAA' }],
-    });
+    }));
     expect(result.metadata.creators).toEqual([
       { name: 'Carla López', affiliation: 'UIAA' },
     ]);
@@ -319,9 +319,9 @@ describe('buildZenodoMetadata — casos edge', () => {
   });
 
   it('DOI opcional se incluye si se provee', () => {
-    const result = buildZenodoMetadata([], {
+    const result = buildZenodoMetadata([], /** @type {any} */ ({
       doi: '10.5281/zenodo.1234567',
-    });
+    }));
     expect(result.metadata.doi).toBe('10.5281/zenodo.1234567');
   });
 
@@ -339,17 +339,17 @@ describe('buildZenodoMetadata — shape completo Zenodo', () => {
           guia: 'Ana Pérez',
           montana: 'cocuy_ritacuba',
           puntoId: 'RITACUBA-01',
-          createdAt: 1642261200000, // 2022-01-15
+          createdAt: 1642261200000,
           fechaISO: '2022-01-15T08:30:00.000Z',
           tipoSuperficie: 'hielo_glaciar_azul',
           dureza: 'H1',
         },
       ],
-      {
+      /** @type {any} */ ({
         title: 'Monitoreo Glaciar Cocuy 2022',
         creators: ['Ana Pérez', 'Juan García'],
         doi: '10.5281/zenodo.9999999',
-      }
+      })
     );
 
     // Verificar estructura requerida por Zenodo

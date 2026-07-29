@@ -72,6 +72,7 @@ const vitestGlobals = {
 export default defineConfig([
   globalIgnores([
     'dist',
+    'dist-prod',
     // Modo campo (#2088): librerías de terceros vendoreadas TAL CUAL (UMD
     // minificado de @tensorflow/tfjs-core|layers|data|backend-wasm y
     // @tensorflow-models/speech-commands, ver scripts/wake-word/vendor-libs.mjs).

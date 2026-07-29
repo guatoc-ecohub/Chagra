@@ -334,8 +334,8 @@ describe('voseoFilter — robustez y edge cases', () => {
   });
 
   it('retorna número/objeto sin throw', () => {
-    expect(filterVoseo(42)).toBe(42);
-    expect(filterVoseo({ a: 1 })).toEqual({ a: 1 });
+    expect(filterVoseo(/** @type {any} */ (42))).toBe(42);
+    expect(filterVoseo(/** @type {any} */ ({ a: 1 }))).toEqual({ a: 1 });
   });
 
   it('no rompe palabras que contienen "vos" como substring', () => {

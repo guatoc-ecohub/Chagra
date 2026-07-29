@@ -344,7 +344,7 @@ function IniciarProcesoForm({ def, locationOptions, onCancel, onCreated }) {
           notes: notes.trim() || undefined,
         },
       };
-      await createFarmProcess(process);
+      await createFarmProcess(/** @type {import('../types/farmProcess').FarmProcess} */ (/** @type {any} */ (process)));
       // Nota de inicio (opcional) como evento del ciclo.
       if (notes.trim()) {
         await recordFarmEvent({
@@ -964,7 +964,7 @@ function ProcesoDetalle({ def, proceso, stageSeq, locationOptions = [], onReload
       )}
 
       {/* Observaciones (reusa el motor del ciclo) */}
-      <CicloObservacion processId={processId} currentStage={a.current_stage} onSaved={() => { loadEvents(); onReload?.(); }} />
+      <CicloObservacion processId={processId} processHint={a.attributes?.process_type || ''} currentStage={a.current_stage} onSaved={() => { loadEvents(); onReload?.(); }} />
 
       {/* Fotos del proceso */}
       <CicloFotos processId={processId} />

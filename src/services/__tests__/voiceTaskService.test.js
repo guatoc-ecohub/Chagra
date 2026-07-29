@@ -9,7 +9,7 @@ import { completeTaskByVoice, rescheduleTaskByVoice } from '../voiceTaskService'
 
 describe('completeTaskByVoice', () => {
   it('rechaza sin processId', async () => {
-    await expect(completeTaskByVoice({ taskName: 'regar' })).rejects.toThrow(/process_id/);
+    await expect(completeTaskByVoice(/** @type {any} */ ({ taskName: 'regar' }))).rejects.toThrow(/process_id/);
   });
 
   it('registra task_completed', async () => {

@@ -520,6 +520,7 @@ export default function DoomFincaScreen({ onBack, onHome }) {
           // Hook E2E (solo dev o ?e2e): expone la pose del jugador para que las
           // pruebas tactiles verifiquen movimiento REAL (no animacion de plagas).
           if (e2eHook) {
+            // @ts-ignore e2e debug hook
             window.__doomPlayer = { x: w.player.x, y: w.player.y, angulo: w.player.angulo, t: w.t };
           }
 

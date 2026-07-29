@@ -28,7 +28,7 @@ describe('locationService (#201) — piso térmico offline-safe', () => {
   it('null para altitud inválida', () => {
     expect(getPisoTermicoInfo(null)).toBeNull();
     expect(getPisoTermicoInfo(-50)).toBeNull();
-    expect(getPisoTermicoInfo('abc')).toBeNull();
+    expect(getPisoTermicoInfo(/** @type {any} */ ('abc'))).toBeNull();
   });
 
   it('cada piso térmico tiene color, rango y cultivos', () => {

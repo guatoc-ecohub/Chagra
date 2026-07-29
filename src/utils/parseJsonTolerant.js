@@ -44,9 +44,14 @@ export function parseJsonTolerant(text) {
 
   const stripFences = (s) => s.replace(/```(?:json|JSON)?\s*/g, '').replace(/```/g, '').trim();
 
+  /**
+   * @param {string} s
+   * @param {string} strategy
+   * @returns {null | { ok: true, value: unknown, strategy: string, repaired: boolean }}
+   */
   const tryParse = (s, strategy) => {
     try {
-      return { ok: true, value: JSON.parse(s), strategy, repaired: strategy !== 'direct' };
+      return /** @type {const} */ ({ ok: true, value: JSON.parse(s), strategy, repaired: strategy !== 'direct' });
     } catch {
       return null;
     }

@@ -20,7 +20,7 @@ import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import AndroidInstallBanner, { DISMISS_KEY, DISMISS_TTL_MS } from '../AndroidInstallBanner';
 
 function makeBipEvent(outcome = 'accepted') {
-  const event = new Event('beforeinstallprompt');
+  const event = /** @type {any} */ (new Event('beforeinstallprompt'));
   event.preventDefault = vi.fn();
   event.prompt = vi.fn().mockResolvedValue(undefined);
   event.userChoice = Promise.resolve({ outcome });

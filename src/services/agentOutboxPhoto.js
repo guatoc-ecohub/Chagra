@@ -116,10 +116,11 @@ export function buildPhotoUserMessage(item, createUrl) {
  *  - el prompt resultante nunca es vacío.
  *
  * @param {object} item                          item outbox (kind 'photo')
- * @param {{analyze:(b:Blob)=>Promise<any>, createUrl:(b:Blob)=>string|null}} deps
+ * @param {{analyze:(b:Blob)=>Promise<any>, createUrl:(b:Blob)=>string|null}} opts
  * @returns {Promise<{message:object, prompt:string, finding:any, imageUrl:string|null}>}
  */
-export async function processPhotoItem(item, { analyze, createUrl } = {}) {
+export async function processPhotoItem(item, opts = /** @type {any} */ ({})) {
+  const { analyze, createUrl } = opts;
   const caption = (item && item.text ? item.text : '').trim();
   const { message, imageUrl } = buildPhotoUserMessage(item, createUrl);
   let finding = null;

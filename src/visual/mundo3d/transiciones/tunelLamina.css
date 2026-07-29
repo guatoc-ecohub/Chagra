@@ -1,0 +1,414 @@
+/*
+ * tunelLamina.css — coreografías del TÚNEL ODYSSEY 2D↔3D (TunelLamina.jsx).
+ *
+ * Contrato compartido con tunelLaminaData.js / velosData.js (NO cambiar uno
+ * sin el otro):
+ *   ·  0%–14%   anticipación (la hoja se recoge — toma aire antes del salto);
+ *   · 14%–46%   lanzamiento (la hoja se incrusta, el túnel pasa de largo);
+ *   · 46%–62%   MESETA: pantalla 100% cubierta por el destello (el host
+ *               intercambia lámina↔mundo a los 54%, cronometrado por los
+ *               timers JS del componente);
+ *   · 62%–100%  resolución (el destello se disuelve: entrar aterriza con
+ *               overshoot; volver exhala y la hoja se posa en su rect).
+ *
+ * Variables (las setea el componente):
+ *   --tl-claro / --tl-medio / --tl-profundo   tríada del velo del destino
+ *   --tl-ms                                   duración total del cruce
+ *   --tl-dx / --tl-dy / --tl-s                el FLIP del vuelo de la hoja
+ *
+ * SOLO transform/opacity en todo lo animado (compositor puro): la hoja vuela
+ * por FLIP (maquetada en su rect, viaja por transform), los anillos y el
+ * destello son discos que escalan, la viñeta solo respira opacidad.
+ */
+
+.tl {
+  position: fixed;
+  inset: 0;
+  z-index: 47; /* sobre el velo Odyssey (46), el kit (44) y el velo viejo (40) */
+  overflow: hidden;
+  pointer-events: auto; /* escudo: nada de toques a mitad del túnel */
+  perspective: 900px; /* la incrustación: la hoja se ladea DENTRO de la pantalla */
+}
+
+/* ── Viñeta: el cuaderno se apaga alrededor mientras la hoja despega. ────── */
+.tl__vineta {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    118% 94% at 50% 46%,
+    rgba(0, 0, 0, 0) 46%,
+    color-mix(in srgb, var(--tl-profundo) 78%, #0d1509) 100%
+  );
+  opacity: 0;
+  will-change: opacity;
+}
+
+.tl[data-fase='entrando'] .tl__vineta {
+  animation: tlVinetaEntra var(--tl-ms) linear both;
+}
+
+.tl[data-fase='saliendo'] .tl__vineta {
+  animation: tlVinetaVuelve var(--tl-ms) linear both;
+}
+
+@keyframes tlVinetaEntra {
+  0% { opacity: 0; }
+  14% { opacity: 0.28; }
+  46% { opacity: 0.9; }
+  62% { opacity: 1; }
+  86% { opacity: 0.35; }
+  100% { opacity: 0; }
+}
+
+@keyframes tlVinetaVuelve {
+  0% { opacity: 0; }
+  40% { opacity: 0.95; }
+  62% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* ── La HOJA: el arte de la lámina, maquetada en su rect, volando por FLIP. ─
+ * Entrar: se recoge (anticipación), se lanza al punto de fuga ladeándose un
+ * pelo (rotateX: el papel se incrusta, no solo crece) y el destello la traga.
+ * Volver: aparece grande bajo el destello y ATERRIZA de vuelta en su rect,
+ * exhalando sin rebote, hasta fundirse con la lámina real del cuaderno. */
+.tl__hoja {
+  position: absolute;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+  opacity: 0;
+}
+
+.tl__papel {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #fbf6e8; /* papel del cuaderno de campo */
+  box-shadow:
+    0 2px 0 rgba(51, 32, 15, 0.18),
+    0 14px 34px rgba(13, 21, 9, 0.38);
+}
+
+/* Fallback cuando el host no presta el arte: una hoja con el tinte del mundo. */
+.tl__papel--muda {
+  background:
+    linear-gradient(
+      168deg,
+      color-mix(in srgb, var(--tl-claro) 55%, #fbf6e8) 0%,
+      #fbf6e8 38%,
+      color-mix(in srgb, var(--tl-medio) 30%, #fbf6e8) 100%
+    );
+  border: 3px solid color-mix(in srgb, var(--tl-profundo) 42%, #fbf6e8);
+}
+
+.tl[data-fase='entrando'] .tl__hoja {
+  animation: tlHojaEntra var(--tl-ms) linear both;
+}
+
+.tl[data-fase='saliendo'] .tl__hoja {
+  animation: tlHojaVuelve var(--tl-ms) linear both;
+}
+
+@keyframes tlHojaEntra {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotateX(0deg);
+    animation-timing-function: ease-out;
+  }
+  14% {
+    /* anticipación: la hoja se recoge — el papel toma aire antes del salto */
+    opacity: 1;
+    transform: translate(0, 0) scale(0.955) rotateX(-2.5deg);
+    animation-timing-function: cubic-bezier(0.5, -0.08, 0.75, 0.55);
+  }
+  32% {
+    /* mitad del vuelo: la incrustación — la hoja se ladea hacia adentro */
+    opacity: 1;
+    transform: translate(calc(var(--tl-dx) * 0.42), calc(var(--tl-dy) * 0.42))
+      scale(calc(1 + (var(--tl-s) - 1) * 0.34)) rotateX(7deg);
+    animation-timing-function: cubic-bezier(0.35, 0.1, 0.55, 1);
+  }
+  46% {
+    opacity: 1;
+    transform: translate(var(--tl-dx), var(--tl-dy)) scale(var(--tl-s)) rotateX(0deg);
+  }
+  54%,
+  100% {
+    /* tragada por el destello: ya manda la luz del mundo */
+    opacity: 0;
+    transform: translate(var(--tl-dx), var(--tl-dy)) scale(var(--tl-s)) rotateX(0deg);
+  }
+}
+
+@keyframes tlHojaVuelve {
+  0%,
+  56% {
+    /* espera bajo el destello: aparece cuando la pantalla ya está cubierta */
+    opacity: 0;
+    transform: translate(var(--tl-dx), var(--tl-dy)) scale(var(--tl-s)) rotateX(0deg);
+  }
+  62% {
+    opacity: 1;
+    transform: translate(var(--tl-dx), var(--tl-dy)) scale(var(--tl-s)) rotateX(0deg);
+    /* aterrizar es EXHALAR: la curva de regreso del lenguaje, sin rebote */
+    animation-timing-function: cubic-bezier(0.3, 0.6, 0.25, 1);
+  }
+  93% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotateX(0deg);
+  }
+  100% {
+    /* se funde con la lámina real del cuaderno, que ya está debajo */
+    opacity: 0;
+    transform: translate(0, 0) scale(1) rotateX(0deg);
+  }
+}
+
+/* ── El TÚNEL: anillos con la tríada del destino que pasan de largo. ───────
+ * Entrar: nacen chicos en el punto de fuga y crecen hasta rebasar la pantalla
+ * (volar tubo adentro). Volver: al revés — el túnel lo escupe a uno de vuelta. */
+.tl__tunel {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.tl__anillo {
+  position: absolute;
+  left: -60vmax;
+  top: -60vmax;
+  width: 120vmax;
+  height: 120vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0) 52%,
+    color-mix(in srgb, var(--tl-claro) 72%, #ffffff) 57%,
+    var(--tl-medio) 63%,
+    rgba(0, 0, 0, 0) 70%
+  );
+  opacity: 0;
+  transform: scale(0.1);
+  will-change: transform, opacity;
+}
+
+.tl__anillo--2 {
+  background: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0) 54%,
+    var(--tl-medio) 59%,
+    color-mix(in srgb, var(--tl-profundo) 72%, var(--tl-medio)) 64%,
+    rgba(0, 0, 0, 0) 70%
+  );
+}
+
+.tl__anillo--3 {
+  background: radial-gradient(
+    circle,
+    rgba(0, 0, 0, 0) 50%,
+    color-mix(in srgb, var(--tl-claro) 60%, var(--tl-medio)) 56%,
+    rgba(0, 0, 0, 0) 66%
+  );
+}
+
+.tl[data-fase='entrando'] .tl__anillo--1 { animation: tlAnilloEntra1 var(--tl-ms) linear both; }
+.tl[data-fase='entrando'] .tl__anillo--2 { animation: tlAnilloEntra2 var(--tl-ms) linear both; }
+.tl[data-fase='entrando'] .tl__anillo--3 { animation: tlAnilloEntra3 var(--tl-ms) linear both; }
+.tl[data-fase='saliendo'] .tl__anillo--1 { animation: tlAnilloVuelve1 var(--tl-ms) linear both; }
+.tl[data-fase='saliendo'] .tl__anillo--2 { animation: tlAnilloVuelve2 var(--tl-ms) linear both; }
+.tl[data-fase='saliendo'] .tl__anillo--3 { animation: tlAnilloVuelve3 var(--tl-ms) linear both; }
+
+/* Cada anillo vive su tramo del lanzamiento: pasan de largo escalonados. */
+@keyframes tlAnilloEntra1 {
+  0%, 16% { opacity: 0; transform: scale(0.08); }
+  24% { opacity: 0.85; transform: scale(0.34); animation-timing-function: cubic-bezier(0.3, 0, 0.7, 0.4); }
+  44% { opacity: 0; transform: scale(2.4); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+
+@keyframes tlAnilloEntra2 {
+  0%, 24% { opacity: 0; transform: scale(0.08); }
+  32% { opacity: 0.8; transform: scale(0.3); animation-timing-function: cubic-bezier(0.3, 0, 0.7, 0.4); }
+  50% { opacity: 0; transform: scale(2.2); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+
+@keyframes tlAnilloEntra3 {
+  0%, 31% { opacity: 0; transform: scale(0.06); }
+  38% { opacity: 0.75; transform: scale(0.26); animation-timing-function: cubic-bezier(0.3, 0, 0.7, 0.4); }
+  55% { opacity: 0; transform: scale(1.9); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+
+/* Volver: los anillos vienen de afuera hacia el punto de fuga (reversa). */
+@keyframes tlAnilloVuelve1 {
+  0%, 14% { opacity: 0; transform: scale(2.3); }
+  22% { opacity: 0.8; transform: scale(1.5); animation-timing-function: cubic-bezier(0.35, 0.1, 0.6, 0.9); }
+  42% { opacity: 0; transform: scale(0.1); }
+  100% { opacity: 0; transform: scale(0.1); }
+}
+
+@keyframes tlAnilloVuelve2 {
+  0%, 21% { opacity: 0; transform: scale(2.1); }
+  29% { opacity: 0.75; transform: scale(1.35); animation-timing-function: cubic-bezier(0.35, 0.1, 0.6, 0.9); }
+  48% { opacity: 0; transform: scale(0.08); }
+  100% { opacity: 0; transform: scale(0.08); }
+}
+
+@keyframes tlAnilloVuelve3 {
+  0%, 28% { opacity: 0; transform: scale(1.9); }
+  35% { opacity: 0.7; transform: scale(1.2); animation-timing-function: cubic-bezier(0.35, 0.1, 0.6, 0.9); }
+  54% { opacity: 0; transform: scale(0.06); }
+  100% { opacity: 0; transform: scale(0.06); }
+}
+
+/* ── Motas de velocidad (solo tier alto): puntitos que rasgan hacia afuera. ─ */
+.tl__mota {
+  position: absolute;
+  left: -0.5vmin;
+  top: -0.5vmin;
+  width: 1vmin;
+  height: 1vmin;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tl-claro) 85%, #ffffff);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.tl[data-fase='entrando'] .tl__mota,
+.tl[data-fase='saliendo'] .tl__mota {
+  animation: tlMota var(--tl-ms) linear both;
+}
+
+.tl[data-fase='saliendo'] .tl__mota { animation-direction: reverse; }
+
+.tl__mota--1 { --mx: -46vmax; --my: -30vmax; }
+.tl__mota--2 { --mx: 48vmax; --my: -22vmax; animation-delay: calc(var(--tl-ms) * 0.05) !important; }
+.tl__mota--3 { --mx: -38vmax; --my: 34vmax; animation-delay: calc(var(--tl-ms) * 0.09) !important; }
+.tl__mota--4 { --mx: 44vmax; --my: 30vmax; animation-delay: calc(var(--tl-ms) * 0.13) !important; }
+
+@keyframes tlMota {
+  0%, 18% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  26% { opacity: 0.9; transform: translate(calc(var(--mx) * 0.25), calc(var(--my) * 0.25)) scale(1); }
+  44% { opacity: 0; transform: translate(var(--mx), var(--my)) scale(2.4); }
+  100% { opacity: 0; transform: translate(var(--mx), var(--my)) scale(2.4); }
+}
+
+/* ── El DESTELLO: la luz del mundo destino cubre el intercambio. ──────────
+ * Mismo papel que en TransicionNewDonk: crece del punto de fuga, mesetea
+ * cubriendo TODO (46%–62%, ahí ocurre el swap) y se disuelve revelando. */
+.tl__destello {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 175vmax;
+  height: 175vmax;
+  margin: -87.5vmax 0 0 -87.5vmax;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--tl-claro) 74%, #ffffff) 0%,
+    var(--tl-claro) 30%,
+    var(--tl-medio) 58%,
+    color-mix(in srgb, var(--tl-profundo) 88%, #101907) 86%
+  );
+  transform: scale(0.04);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.tl[data-fase='entrando'] .tl__destello {
+  animation: tlDestelloEntra var(--tl-ms) linear both;
+}
+
+.tl[data-fase='saliendo'] .tl__destello {
+  animation: tlDestelloVuelve var(--tl-ms) linear both;
+}
+
+@keyframes tlDestelloEntra {
+  0%, 30% { opacity: 0; transform: scale(0.04); }
+  38% { opacity: 0.75; transform: scale(0.3); animation-timing-function: cubic-bezier(0.3, 0, 0.6, 0.6); }
+  46% { opacity: 1; transform: scale(1); }
+  62% {
+    opacity: 1;
+    transform: scale(1.02);
+    /* revelar con overshoot y asentado: el mundo ATERRIZA, no aparece */
+    animation-timing-function: cubic-bezier(0.22, 1.28, 0.42, 1);
+  }
+  100% { opacity: 0; transform: scale(1.09); }
+}
+
+@keyframes tlDestelloVuelve {
+  0% { opacity: 0; transform: scale(0.05); animation-timing-function: ease-out; }
+  14% {
+    /* anticipación: la luz se junta un respiro antes de crecer */
+    opacity: 0.22;
+    transform: scale(0.08);
+    animation-timing-function: cubic-bezier(0.5, -0.1, 0.75, 0.55);
+  }
+  46% { opacity: 1; transform: scale(1); }
+  62% { opacity: 1; transform: scale(1.02); animation-timing-function: cubic-bezier(0.3, 0.6, 0.25, 1); }
+  100% { opacity: 0; transform: scale(1.1); }
+}
+
+/* ── Letrero (opcional): habla bajito, abajo, como sus hermanos. ─────────── */
+.tl__letrero {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 9vh;
+  margin: 0;
+  text-align: center;
+  color: #f4ffe6;
+  font-size: clamp(14px, 2.4vw, 18px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 10px rgba(16, 35, 15, 0.7);
+  opacity: 0;
+  animation: tlLetrero var(--tl-ms) linear both;
+}
+
+@keyframes tlLetrero {
+  0% { opacity: 0; }
+  16% { opacity: 1; }
+  58% { opacity: 1; }
+  74% { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* ── Reduced-motion: corte simple y digno con el tinte del destino. ──────── */
+.tl__corte {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    164deg,
+    var(--tl-claro) 0%,
+    var(--tl-medio) 46%,
+    var(--tl-profundo) 100%
+  );
+  animation: tlCorte var(--tl-ms) linear both;
+}
+
+@keyframes tlCorte {
+  0% { opacity: 1; }
+  55% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Red de seguridad: si el sistema pide calma, TODO colapsa al corte aunque
+ * el host no haya pasado la prop (el componente igual la respeta primero). */
+@media (prefers-reduced-motion: reduce) {
+  .tl__hoja,
+  .tl__anillo,
+  .tl__mota,
+  .tl__tunel { display: none; }
+
+  .tl[data-fase] .tl__vineta,
+  .tl[data-fase] .tl__destello {
+    animation-duration: 180ms;
+  }
+}

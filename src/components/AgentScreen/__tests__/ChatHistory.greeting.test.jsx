@@ -68,6 +68,6 @@ describe('ChatHistory — saludo proactivo (empty state)', () => {
   it('sin saludo resuelto → copy estático de siempre (backward compat)', () => {
     render(<ChatHistory messages={[]} proactiveGreeting={null} />);
     expect(screen.queryByTestId('proactive-greeting')).toBeNull();
-    expect(screen.getByText(/Soy tu asistente agroecológico/i)).toBeInTheDocument();
+    expect(screen.getByText(/Soy Angelita, su asistente agroecológica/i)).toBeInTheDocument();
   });
 });

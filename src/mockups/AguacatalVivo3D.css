@@ -1,0 +1,274 @@
+/*
+ * AguacatalVivo3D.css — vitrina del mundo del aguacate (#/mockups/aguacatal-vivo-3d).
+ * Autocontenida: sin fuentes/imágenes externas. Móvil-first desde 320px.
+ * Paleta de piso templado alto: verde hoja profundo, luz fresca de ladera y el
+ * morado-negro del Hass como acento. Solo opacity/transform se animan.
+ */
+
+.aviva {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 1rem 0.9rem 2.5rem;
+  /* la familia ladera bajo la hora viva: verde fresco, nunca pardo mustio */
+  background: linear-gradient(180deg, #dde5cd 0%, #e5e8cd 44%, #eeeacf 100%);
+  color: #263123;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.aviva__head {
+  max-width: 46rem;
+  margin: 0 auto 1rem;
+}
+.aviva__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5e3a54;
+}
+.aviva__head h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 2.2rem);
+  line-height: 1.15;
+  color: #27402a;
+}
+.aviva__lema {
+  margin: 0.4rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  max-width: 40rem;
+}
+
+.aviva__escena {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.aviva__lienzo {
+  position: relative;
+  height: min(66vh, 32rem);
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(94, 58, 84, 0.25);
+  box-shadow: 0 12px 30px rgba(38, 49, 35, 0.16);
+  background: radial-gradient(120% 90% at 50% 20%, #c9dcc4 0%, #a4bd9d 100%);
+}
+.aviva__lienzo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none;
+}
+.aguacatal-canvas {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.aguacatal-canvas--lista {
+  opacity: 1;
+}
+
+.aviva__cargando {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 0.9rem;
+  color: #37472f;
+  opacity: 0.85;
+}
+
+.aviva__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.aviva__tier {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.aviva__toggle {
+  border: 1.5px solid #5e3a54;
+  background: #fff;
+  color: #5e3a54;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.aviva__toggle:hover,
+.aviva__toggle:focus-visible {
+  background: #5e3a54;
+  color: #fff;
+  outline-offset: 2px;
+}
+
+/* ---- Ficha 2D (fallback digno, sin GPU) ---- */
+/* La escala también aquí: el árbol ENORME y la casita al pie. */
+.aviva__ficha {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: radial-gradient(120% 90% at 50% 25%, #cfdcc6 0%, #9fb295 100%);
+}
+.aviva__estampa {
+  position: relative;
+  width: 200px;
+  height: 190px;
+  margin-bottom: 0.4rem;
+}
+/* la copa densa, verde muy oscuro, dominando la estampa */
+.aviva__copa {
+  position: absolute;
+  top: 0;
+  left: 22px;
+  width: 150px;
+  height: 96px;
+  border-radius: 52% 48% 58% 42% / 68% 72% 28% 32%;
+  background: radial-gradient(circle at 40% 28%, #3d703877 0%, #24512c 55%, #16301b 100%);
+  box-shadow: inset -10px -8px 16px rgba(0, 0, 0, 0.22);
+}
+.aviva__copa-baja {
+  position: absolute;
+  top: 62px;
+  left: 8px;
+  width: 120px;
+  height: 52px;
+  border-radius: 60% 40% 55% 45% / 70% 66% 34% 30%;
+  background: radial-gradient(circle at 45% 30%, #2f5c2f88 0%, #1d3f24 60%, #152e1a 100%);
+}
+.aviva__tronco {
+  position: absolute;
+  top: 96px;
+  left: 88px;
+  width: 16px;
+  height: 88px;
+  border-radius: 40%;
+  background: linear-gradient(90deg, #4e4234 0%, #6a5844 55%, #493e30 100%);
+}
+/* los frutos colgando del borde de la copa, con su rabito */
+.aviva__fruto {
+  position: absolute;
+  width: 15px;
+  height: 20px;
+  border-radius: 46% 54% 48% 52% / 38% 36% 64% 62%;
+}
+.aviva__fruto::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 6px;
+  width: 2.5px;
+  height: 7px;
+  background: #8a7a4f;
+  border-radius: 2px;
+}
+.aviva__fruto--verde {
+  top: 102px;
+  left: 44px;
+  background: radial-gradient(circle at 35% 30%, #6f9440 0%, #5b7c36 70%);
+}
+.aviva__fruto--pinton {
+  top: 112px;
+  left: 128px;
+  background: radial-gradient(circle at 35% 30%, #5e4152 0%, #503046 70%);
+}
+.aviva__fruto--negro {
+  top: 96px;
+  left: 152px;
+  background: radial-gradient(circle at 35% 30%, #3a2a35 0%, #251722 70%);
+}
+/* la casita campesina, CHIQUITA al pie del árbol: la lección de escala */
+.aviva__casita {
+  position: absolute;
+  bottom: 4px;
+  left: 10px;
+  width: 46px;
+  height: 30px;
+  background: linear-gradient(180deg, #f3ede0 0%, #e6ddc9 100%);
+  border-radius: 2px;
+  box-shadow: inset 0 -6px 0 rgba(90, 74, 52, 0.25);
+}
+.aviva__techo {
+  position: absolute;
+  top: -13px;
+  left: -4px;
+  width: 0;
+  height: 0;
+  border-left: 27px solid transparent;
+  border-right: 27px solid transparent;
+  border-bottom: 14px solid #a0522d;
+}
+.aviva__ficha-nombre {
+  margin: 0;
+  font-weight: 700;
+  color: #1f3322;
+}
+.aviva__ficha-sub {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #33462e;
+}
+
+/* ---- Saberes ---- */
+.aviva__saberes {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+.aviva__saberes h2 {
+  font-size: 1.15rem;
+  color: #27402a;
+  margin: 0 0 0.7rem;
+}
+.aviva__saberes ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+@media (min-width: 640px) {
+  .aviva__saberes ol {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.aviva__saberes li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(39, 64, 42, 0.14);
+  border-radius: 12px;
+  padding: 0.7rem 0.8rem;
+}
+.aviva__emoji {
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+.aviva__saberes b {
+  display: block;
+  margin-bottom: 0.15rem;
+  color: #27402a;
+}
+.aviva__saberes p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.aviva__cierre {
+  margin: 1rem 0 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #2f4030;
+  border-left: 3px solid #5e3a54;
+  padding-left: 0.7rem;
+}

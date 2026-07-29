@@ -199,7 +199,7 @@ describe('AgentHero — compositor real (no teaser)', () => {
     await waitFor(() => expect(sendMock).toHaveBeenCalled());
     expect(onNavigate).not.toHaveBeenCalled();
     // El texto sigue en el compositor (no se borró).
-    expect(ta.value).toBe('no me pierdas');
+    expect(/** @type {HTMLTextAreaElement} */ (ta).value).toBe('no me pierdas');
   });
 });
 

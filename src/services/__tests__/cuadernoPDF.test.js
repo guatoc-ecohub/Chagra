@@ -181,12 +181,12 @@ describe('cuadernoPDF', () => {
       const finca = { slug: 'guatoc', nombre: 'Guatoc' };
       const operator = { name: 'Op', role: 'Operador' };
 
-      const data = await buildFincaData({
+      const data = await buildFincaData(/** @type {any} */ ({
         assetCache: fakeAssetCache,
         logCache: fakeLogCache,
         finca,
         operator,
-      });
+      }));
 
       expect(data.finca).toEqual(finca);
       expect(data.operatorName).toBe('Op');
@@ -200,12 +200,12 @@ describe('cuadernoPDF', () => {
     });
 
     it('period es null cuando no hay logs', async () => {
-      const data = await buildFincaData({
+      const data = await buildFincaData(/** @type {any} */ ({
         assetCache: { getByType: async () => [] },
         logCache: { getAll: async () => [] },
         finca: {},
         operator: {},
-      });
+      }));
       expect(data.period).toBeNull();
     });
   });

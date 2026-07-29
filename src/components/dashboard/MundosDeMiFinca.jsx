@@ -208,6 +208,25 @@ export default function MundosDeMiFinca({ onNavigate, mostrarAnimales = true, pl
                 </button>
             )}
 
+            {/* ── Galería de mundos 3D (hub): todos los mundos como portales de
+                piedra con el cruce Odyssey. Mismo gate que el valle (flag +
+                device-tier). Es el índice navegable de TODO el 3D. ── */}
+            {mostrarValle3d && (
+                <button
+                    type="button"
+                    className="mf-espiritu mf-galeria3d"
+                    data-testid="entrada-galeria3d"
+                    onClick={() => onNavigate?.('mockup_vitrina_maestra')}
+                    aria-label="Galería de mundos en 3D: todos los mundos de su finca como portales de piedra"
+                >
+                    <span className="mf-espiritu-glifo" aria-hidden="true">🗺️</span>
+                    <span className="mf-espiritu-txt">
+                        <b>Galería de mundos</b>
+                        <small>Todos sus mundos en 3D, uno por uno, como portales</small>
+                    </span>
+                </button>
+            )}
+
             {tieneEspiritu && (
                 <button
                     type="button"

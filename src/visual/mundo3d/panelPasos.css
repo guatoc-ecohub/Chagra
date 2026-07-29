@@ -1,0 +1,186 @@
+/*
+ * panelPasos.css — la lección plegable de los mundos 3D (PanelPasos.jsx).
+ *
+ * REGLA DURA del operador: el texto de la lección NO puede tapar el mundo ni a
+ * sus personajes. Por eso el panel vive PLEGADO por defecto como una pastilla
+ * de una línea en la esquina inferior IZQUIERDA (la zona menos ocupada de los
+ * dioramas: el sujeto — el Ent, la mata, el fogón — vive en el centro y arriba).
+ * Abierto, es una carta angosta (máx. 24rem) pegada a esa misma esquina, con
+ * altura acotada y scroll interno: nunca una franja que cruce la escena.
+ *
+ * Cada mundo pinta su acento con variables --pp-* (las pone PanelPasos desde
+ * su prop `tema`); aquí van los valores por defecto.
+ *
+ * Legibilidad primero: cuerpo ≥0.98rem, objetivos táctiles ≥44px (2.75rem),
+ * contraste alto sobre fondo oscuro translúcido. Usuarios: una niña de 11 años
+ * y campesinos con el celular en la mano, al sol.
+ */
+
+.ppasos {
+  position: absolute;
+  left: max(0.7rem, env(safe-area-inset-left));
+  bottom: max(0.7rem, env(safe-area-inset-bottom));
+  z-index: 4;
+  max-width: min(24rem, calc(100% - 1.4rem));
+  pointer-events: none; /* el aire alrededor sigue siendo del mundo */
+  color: var(--pp-tinta, #f2efe0);
+}
+.ppasos > * { pointer-events: auto; }
+.ppasos [hidden] { display: none !important; }
+
+/* ── La pastilla (estado plegado / cerrado) ─────────────────────────────── */
+.ppasos__pastilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  max-width: 100%;
+  padding: 0.45rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--pp-fondo, rgba(22, 18, 10, 0.7));
+  box-shadow:
+    inset 0 0 0 1px var(--pp-borde, rgba(216, 196, 146, 0.3)),
+    0 4px 16px rgba(10, 10, 8, 0.35);
+  backdrop-filter: blur(6px);
+  color: var(--pp-tinta, #f2efe0);
+  font: 700 0.9rem/1.2 system-ui, sans-serif;
+  text-align: left;
+}
+.ppasos__pastilla-punto {
+  flex: none;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--pp-activo, #e2b252);
+  box-shadow: 0 0 8px 1px var(--pp-activo, #e2b252);
+}
+.ppasos__pastilla-etiqueta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ppasos__pastilla-flecha {
+  flex: none;
+  color: var(--pp-kicker, #d9be85);
+  font-size: 0.8rem;
+}
+
+/* ── La carta (estado abierto) ──────────────────────────────────────────── */
+.ppasos__carta {
+  width: min(24rem, calc(100vw - 1.4rem));
+  max-width: 100%;
+  padding: 0.75rem 0.9rem 0.85rem;
+  border-radius: 1rem;
+  background: var(--pp-fondo, rgba(22, 18, 10, 0.7));
+  box-shadow:
+    inset 0 0 0 1px var(--pp-borde, rgba(216, 196, 146, 0.3)),
+    0 6px 24px rgba(12, 12, 8, 0.35);
+  backdrop-filter: blur(6px);
+  animation: ppasos-abrir 0.22s ease;
+}
+.ppasos__cabecera {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.ppasos__kicker {
+  flex: 1 1 auto;
+  margin: 0.45rem 0 0;
+  font: 600 0.72rem/1.25 system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pp-kicker, #d9be85);
+}
+.ppasos__plegar {
+  flex: none;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  margin: -0.3rem -0.4rem 0 0;
+  border: 0;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--pp-borde, rgba(216, 196, 146, 0.3));
+  color: var(--pp-tinta, #f2efe0);
+  font: 700 1rem/1 system-ui, sans-serif;
+}
+.ppasos__texto {
+  margin: 0.35rem 0 0.7rem;
+  font: 500 0.98rem/1.45 system-ui, sans-serif;
+  color: var(--pp-tinta, #f2efe0);
+  max-height: min(34dvh, 13rem); /* la carta jamás se come la escena */
+  overflow-y: auto;
+}
+.ppasos__carta > .ppasos__texto:last-child { margin-bottom: 0.1rem; }
+
+/* ── Navegación de pasos ────────────────────────────────────────────────── */
+.ppasos__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.ppasos__btn {
+  min-height: 2.75rem;
+  min-width: 3rem;
+  padding: 0 0.85rem;
+  border: 0;
+  border-radius: 0.7rem;
+  cursor: pointer;
+  background: linear-gradient(180deg, var(--pp-acento-a, rgba(226, 178, 82, 0.95)), var(--pp-acento-b, rgba(186, 132, 45, 0.95)));
+  color: var(--pp-tinta-accion, #241703);
+  font: 700 1rem/1 system-ui, sans-serif;
+  transition: transform 0.15s ease;
+}
+.ppasos__btn:active { transform: scale(0.96); }
+.ppasos__btn[disabled] { opacity: 0.35; cursor: default; }
+.ppasos__puntos { display: flex; gap: 0.4rem; margin: 0 auto; }
+.ppasos__punto {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: rgba(238, 234, 214, 0.32);
+}
+.ppasos__punto--activo {
+  background: var(--pp-activo, #e2b252);
+  box-shadow: 0 0 8px 1px var(--pp-activo, #e2b252);
+}
+
+/* ── Acción única (mundos sin pasos, p. ej. la invitación del Ent) ─────── */
+.ppasos__accion {
+  display: block;
+  width: 100%;
+  min-height: 2.9rem;
+  border: 0;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  background: linear-gradient(180deg, var(--pp-acento-a, rgba(226, 178, 82, 0.95)), var(--pp-acento-b, rgba(186, 132, 45, 0.95)));
+  color: var(--pp-tinta-accion, #241703);
+  font: 700 0.98rem/1 system-ui, sans-serif;
+  transition: transform 0.15s ease;
+}
+.ppasos__accion:active { transform: scale(0.97); }
+
+/* ── Foco de teclado SIEMPRE visible ────────────────────────────────────── */
+.ppasos__pastilla:focus-visible,
+.ppasos__plegar:focus-visible,
+.ppasos__btn:focus-visible,
+.ppasos__accion:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
+}
+
+@keyframes ppasos-abrir {
+  from { opacity: 0; transform: translateY(0.5rem); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ── Calma: sin animación de plegado ni transiciones ────────────────────── */
+.ppasos--rm .ppasos__carta { animation: none; }
+.ppasos--rm .ppasos__btn,
+.ppasos--rm .ppasos__accion { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .ppasos__carta { animation: none; }
+  .ppasos__btn, .ppasos__accion { transition: none; }
+}

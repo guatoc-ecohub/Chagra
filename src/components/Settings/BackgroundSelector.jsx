@@ -3,6 +3,7 @@ import { Check, X, Zap } from 'lucide-react';
 import useThemeBackgroundStore, {
   BACKGROUND_CATALOG,
   getBackgroundSrc,
+  esGradiente,
 } from '../../store/useThemeBackgroundStore';
 
 /**
@@ -337,19 +338,17 @@ function BackgroundPreviewModal({ option, onConfirm, onClose }) {
         {/* micelio DETRÁS de la imagen → asoma por el borde, nunca la tapa */}
         <MyceliumBorder ratio={ratio} />
 
-        {/* imagen COMPLETA — contain, sin recorte, sobre fondo oscuro */}
-        <img
-          src={src}
-          alt={option.label}
-          onLoad={handleImgLoad}
+        {/* fondo COMPLETO — gradiente andino (las fotos-oso se archivaron) */}
+        <div
+          role="img"
+          aria-label={option.label}
           style={{
             position: 'absolute',
             inset: 0,
             width: '100%',
             height: '100%',
-            objectFit: 'contain',
+            background: esGradiente(src) ? src : `#04070d url('${src}') center/contain no-repeat`,
             borderRadius: '16px',
-            background: '#04070d',
             boxShadow: '0 18px 60px -20px #000',
             zIndex: 2,
           }}
@@ -469,12 +468,10 @@ export default function BackgroundSelector() {
                 }`}
               >
                 <div className="relative w-full aspect-[4/3] bg-slate-800 overflow-hidden">
-                  <img
-                    src={thumbSrc}
-                    alt=""
+                  <div
                     aria-hidden="true"
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full"
+                    style={{ background: esGradiente(thumbSrc) ? thumbSrc : `url('${thumbSrc}') center/cover` }}
                   />
                   {isSelected && (
                     <span className="absolute top-2 right-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500 text-white shadow">

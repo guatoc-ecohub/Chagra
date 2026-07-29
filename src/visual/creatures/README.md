@@ -20,8 +20,15 @@ calidad dispar. Aquí vive la **versión canónica** de cada uno.
 
 | Componente | Especie (binomio verificado) | Notas |
 |---|---|---|
-| `AbejaAngelita` | *Tetragonisca angustula* | Meliponino nativo **SIN aguijón** — NO *Apis*. Alitas de tul que baten. |
-| `Colibri` | *Colibri coruscans* | Colibrí chillón andino. Pico largo, garganta violeta, alas que baten. |
+| `AbejaAngelita` | *Tetragonisca angustula* | Meliponino nativo **SIN aguijón** — NO *Apis*. Alitas de tul que baten. Rubber-hose. |
+| `Colibri` | *Colibri coruscans* | Colibrí chillón andino. Pico largo, garganta violeta, alas que baten. **Rubber-hose** (adoptado). |
+| `OsoAndino` | *Tremarctos ornatus* | Oso de anteojos, guardián del páramo. Mole parda con **anteojos crema** (su firma). De suelo, se sienta. Rubber-hose. |
+| `RanaAndina` | *Atelopus* spp. | Rana arlequín del páramo. Verde húmedo con manchas ocre, vientre dorado, ojos saltones y bocota. Rubber-hose. |
+| `Perezoso` | *Bradypus variegatus* | Perezoso de tres dedos, templado. **Cuelga de una rama** por sus **garras largas** curvas, con **antifaz** y **tinte verdoso** de algas. La quietud extrema: todo en **cámara lenta** (mecerse zen, parpadeo larguísimo). Poder **turquesa**. Rubber-hose, showcase completo. |
+| `Ardilla` | *Notosciurus granatensis* | Ardilla de cola roja del templado. Rufa con **línea dorsal** oscura (su firma), **cola tupida** y dientes de roedor. Ágil e inquieta: su firma es la **inspección invertida** (se cuelga de cabeza). De suelo, se sienta. Rubber-hose. |
+| `Jaguar` | *Panthera onca* | Felino de tierra cálida. Leonado con **rosetas** (manchas de centro ocre — su firma), musculoso, mirada felina ámbar. Majestuoso y **acechador**: acecho de hombros, cola pesada, rugido. Aura **púrpura**. Rubber-hose. |
+| `Morrocoy` | *Chelonoidis carbonarius* | Galápago de patas rojas de tierra cálida. Caparazón de **domo geométrico** (escudos **hexagonales** con anillos de edad — su firma), patas y cabeza **rojizas** con escamas naranja-fuego. **Ancestral, lento, sabio**: caparazón que respira, **retracción elástica** (cabeza y patas entran a la concha), asentimiento sabio. Aura **bronce**. Rubber-hose. |
+| `Borugo` | *Cuniculus taczanowskii* | La paca/lapa de montaña andina, roedor **nocturno**. Pardo con **hileras de motas crema** en los flancos (su firma), hocico con bigotes, ojos grandes que reflejan la luna. **Tierno, tímido, sereno**: olfateo (`olfatea`) y acurrucarse a salvo (`acurruca`). Aura **plata lunar**. El **animal de cierre** — honrado vivo, a salvo y digno. Rubber-hose. |
 | `Lombriz` | *Martiodrilus crassus* | Lombriz gigante nativa. Cuerpo segmentado con clitelo. Sin animación propia (su movimiento lo da la escena). |
 | `Mariposa` | *Dione juno* | Pasionaria de alas largas. Cuatro alas que abren y cierran. |
 | `Escarabajo` | *Dichotomius belus* | Estercolero colombiano. Élitros brillantes, cuerno, y bola de abono que rueda. |
@@ -89,8 +96,84 @@ que **el oso andino y el colibrí lo hereden sin redibujar**:
 estados reactivos. Standalone (avatares/catálogo) sin `tier` = rubber-hose pleno.
 
 **Estrenado por**: `AbejaAngelita` (referencia de composición del KIT).
-**Pendientes de adoptar**: `OsoAndino` (nuevo) y `Colibri` — componen las mismas
-piezas + clases `rh-*` con SUS proporciones. No hay que reinventar la cadencia.
+**Ya adoptado por**: `OsoAndino`, `Colibri`, `RanaAndina` y `Jaguar` — componen las mismas
+piezas + clases `rh-*` con SUS proporciones (identidad en `faunaAndina.js`), y
+heredan los gestos species-agnostic (`rh-g-celebra` / `rh-g-reposo` /
+`rh-g-senala`) solo con `data-pose`. No se reinventa la cadencia.
+
+**Showcase COMPLETO (toda la fundación transversal)**: `AbejaAngelita` y
+`OsoAndino` cablean además — sin duplicar código — el **lip-sync** (`visema` →
+`BocaVisema`), el **modo poder** (`poder` → aura de 4 capas con su color:
+dorada la abeja, **roja** el oso), la **ropa por clima+hora** (`vestuario` →
+`AccesoriosClima`; el oso de páramo **nunca suda**), el **prop por mundo**
+(`mundoId` → `PropEnMano`) y el **line-boil** (`lineBoil`). El oso suma su
+CARÁCTER de mole seria: boil más lento y pesado, cejas de ceño, gruñido
+(`resopla` → vaho) y rascado (`rasca`) — todo aditivo en `creatures.css`, RM +
+tier-safe. El **`Jaguar`** hace lo propio con su carácter de felino ACECHADOR:
+boil controlado y elegante, **acecho de hombros** (los omóplatos suben —
+`.jaguar-hombros`), **cola** que ondea con peso, **cejas fieras**, **rugido**
+corporal (`ruge` → fauces con colmillos) y modo **acecho** (`acecha` → cabeza
+baja + creep agazapado); su aura de poder es **púrpura**. Los demás bichos
+heredan la misma fundación pasando sus parámetros.
+
+La **`Ardilla`** cierra la misma fundación completa con su CARÁCTER opuesto —
+pizpireta, ÁGIL, curiosa e INQUIETA: aura **ÁMBAR** en poder, boil VELOZ (no
+pesado), **cola tupida** que se sacude, hocico que olfatea, dientes de roedor y
+su gesto-FIRMA la **inspección invertida** (`inspecciona` → se cuelga de cabeza a
+espiar) más el **roer** una semilla (`roe`). Templada, pero del contrato
+compartido: **nunca suda** (se abriga de noche/frío, jamás gotea). Todo aditivo
+en `creatures.css`, RM + tier-safe.
+
+El **`Morrocoy`** cierra los OCHO con su carácter de galápago ANCESTRAL, LENTO,
+SABIO y PACIENTE (el anciano de la chagra): aura **BRONCE** en poder, boil LENTO
+de **paso pesado** (la sabiduría no corre), **caparazón de domo hexagonal** que
+**respira** (`.morrocoy-caparazon`, escudos con anillos de edad — su firma),
+**patas rojizas** con escamas naranja-fuego, y su gesto-FIRMA la **retracción
+elástica** (`seRetrae` → cabeza y patas entran a la concha con squash&stretch)
+más el **asentimiento sabio** (`asiente`). De tierra cálida y del contrato
+compartido: **nunca suda**. Suma su capa ANCESTRAL permanente (resplandor cobrizo
++ shimmer de brasa). Todo aditivo en `creatures.css`, RM + tier-safe.
+
+El **`Borugo`** cierra la familia (9º y ÚLTIMO bicho, el **animal de cierre**) con
+su CARÁCTER de **ternura nocturna** — la paca de montaña, tímida y serena: aura
+**PLATA LUNAR** en poder, boil SUAVE (nada de comedia bruta), **hileras de motas
+crema** en los flancos (su firma) que brillan tenue con luz lunar, **ojos grandes**
+que reflejan la luna, **bigotes** que se abren y **orejitas** atentas; su gesto-
+FIRMA es el **olfateo** (`olfatea` → la nariz que tiembla + bigotes + orejas) y el
+**acurrucarse a salvo** (`acurruca` → se ovilla digno, el corazón emotivo del
+cierre). Nocturno de montaña: **nunca suda** (ruana de noche/frío). En la vereda
+lo cazan; aquí lo honramos **vivo, a salvo y querido**. Todo aditivo en
+`creatures.css`, RM + tier-safe.
+
+## El Ent del páramo — el árbol-maestro (no un bicho)
+
+El **`EntFrailejon`** es el **corazón del "Bosque Vivo"**: un **frailejón gigante**
+(*Espeletia* sp.), el árbol-guardián **vivo, ancestral y sabio** que ENSEÑA. NO es
+fauna: es el **árbol central**, con **presencia GRANDE** e imponente. Traduce a los
+Andes el alma de un árbol-guardián de la fantasía clásica: un **rostro sabio en la
+corteza** (ojos hundidos entre las grietas, **cejas de corteza** serenas, boca en
+la hendidura), tronco alto vestido con la **faldita** de hojas muertas, **corona en
+roseta** de hojas plateadas y pubescentes (su cabellera) con **flores amarillas**, y
+**raíces** que se asientan. Se mueve **LENTO y con peso** — quietud imponente, nada
+hiperactivo.
+
+Hereda la MISMA fundación transversal, **adaptada a su escala y su lentitud**:
+- **Expresividad de árbol vivo** — `lineBoil` MUY lento (corteza ancestral),
+  **balanceo** de todo el árbol, roseta que **respira y se mece** (`.ent-hoja`),
+  parpadeo lento y raíces asentadas.
+- **Lip-sync** — la boca entre las **grietas del tronco** (`visema` → `BocaVisema`)
+  para cuando enseña/habla.
+- **Modo-GUARDIÁN** (su "modo poder", `poder`) — cuando el páramo peligra el Ent se
+  **yergue**: aura **verde-plateada** de 4 capas, la **roseta se abre** y brilla, las
+  flores encienden; sobrio y épico.
+- **Clima de páramo** (`vestuario`) — **ESCARCHA** en las hojas de noche/frío y
+  **NEBLINA** que cruza el tronco; del contrato compartido pero **JAMÁS suda** (vive
+  en el frío).
+- **Enseñanza** — `useEntGuion()` trae el guion de botánica/clima/conservación/caza
+  en **usted** colombiano; **fallback digno** de 4 snippets hasta que aterrice
+  `src/data/entGuion.js` (punto de integración listo: `useEntGuion({ guion })`).
+
+Todo aditivo en `creatures.css`, RM + tier-safe.
 
 ## Técnica
 

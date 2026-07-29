@@ -45,6 +45,8 @@ import {
   resolveClimaLocation,
   CLIMA_UPDATED_EVENT,
 } from '../../services/climaService.js';
+import { getProfile } from '../../services/userProfileService.js';
+import { normalizarPisoUsuario } from './pisosTermicos.js';
 
 /** Re-evalúa la atmósfera cada 10 min (mismo ritmo que useClimaAtmosphere). */
 const REEVAL_MS = 10 * 60 * 1000;
@@ -152,11 +154,18 @@ export function cosechaRecienteDe(summary, now = new Date()) {
   return { cultivo: reciente.crop, mundoId: null };
 }
 
+/** Piso confirmado del perfil, o derivado de la altitud real de la finca. */
+export function pisoTermicoDePerfil(profile) {
+  const declarado = normalizarPisoUsuario(profile?.piso_termico);
+  if (declarado) return declarado;
+  return normalizarPisoUsuario(profile?.finca_altitud ?? profile?.altitud);
+}
+
 /**
  * Arma el `estadoFinca` completo desde las piezas ya cargadas. Puro: la vista
  * (useFincaViva) inyecta procesos/plantas/cosecha/atmósfera ya resueltos.
  */
-function armarEstadoFinca({ processes, plants, summary, atmosfera, now = new Date() }) {
+function armarEstadoFinca({ processes, plants, summary, atmosfera, pisoTermico, now = new Date() }) {
   const { clima, enso, agua } = atmosfera;
 
   // saludFinca: conteos REALES de matas (buildFincaScene, la misma fuente que el
@@ -177,6 +186,7 @@ function armarEstadoFinca({ processes, plants, summary, atmosfera, now = new Dat
   return {
     clima,
     enso,
+    pisoTermico,
     cosechaReciente: cosechaRecienteDe(summary, now),
     saludFinca,
     // Sin inventario de hato real (no hay asset animal): [] = "dato en camino".
@@ -204,6 +214,9 @@ export function useFincaViva() {
   const plants = useAssetStore((s) => s.plants);
   const summary = useCosechaStore((s) => s.summary);
   const cosechaCargando = useCosechaStore((s) => s.isLoading);
+  let profile = null;
+  try { profile = getProfile(); } catch (_) { profile = null; }
+  const pisoTermico = pisoTermicoDePerfil(profile);
 
   // Cargar los procesos una vez (y limpiar si el hook se desmonta antes).
   useEffect(() => {
@@ -239,8 +252,8 @@ export function useFincaViva() {
   // Identidad estable mientras las piezas no cambian: reaccionFinca (memoizado
   // en la escena por identidad de estadoFinca) no recalcula por render.
   return useMemo(
-    () => armarEstadoFinca({ processes, plants, summary, atmosfera }),
-    [processes, plants, summary, atmosfera],
+    () => armarEstadoFinca({ processes, plants, summary, atmosfera, pisoTermico }),
+    [processes, plants, summary, atmosfera, pisoTermico],
   );
 }
 

@@ -1,0 +1,173 @@
+/*
+ * artesaniaUi — el lenguaje HECHO A MANO para la UI DOM de Chagra.
+ *
+ * Las mismas TRES REGLAS de tramaAndina.js, en CSS puro (cero imágenes):
+ *   1. Nada perfectamente recto → esquinas DESIGUALES (border-radius con
+ *      ocho valores: ningún par de esquinas repite) y sombras corridas.
+ *   2. El remate se ve → la puntada (outline discontinuo hueso), la guarda
+ *      tejida como filo, el cordón trenzado como separador.
+ *   3. La gravedad → el botón se APLASTA al presionar (squash rubber-hose),
+ *      no se hunde en un plano perfecto.
+ *
+ * Colores calcados de la paleta madre / PALETA_ANDINA (fuente comentada).
+ * Prefijo `artes-` para no chocar con nadie. Tono usted en cualquier texto.
+ */
+
+:root {
+  --artes-crudo: #ece0c7; /* PALETA_ANDINA.crudo — fique/lana sin teñir */
+  --artes-hueso: #f6efe0; /* PALETA_ANDINA.hueso — algodón claro */
+  --artes-tinta: #241a10; /* NEUTROS.tinta — negro cálido, nunca #000 */
+  --artes-fique: #c9b593; /* TIERRAS.vega — la cabuya */
+  --artes-fique-oscuro: #8a7a5f; /* vega hacia tinta */
+  --artes-cochinilla: #d1382b; /* ACENTOS.cochinilla */
+  --artes-maiz: #f4c542; /* ACENTOS.maizTextil */
+  --artes-indigo: #33305c; /* ACENTOS.indigo */
+  --artes-paramo: #aeb890; /* VERDES.paramoSage */
+}
+
+/* ------------------------------------------------------------------ */
+/* PANEL — el contenedor tejido: fondo crudo, línea de tinta que       */
+/* respira (esquinas desiguales), puntada interior y guarda de filo.   */
+/* ------------------------------------------------------------------ */
+.artes-panel {
+  position: relative;
+  background: var(--artes-crudo);
+  color: var(--artes-tinta);
+  border: 3px solid var(--artes-tinta);
+  /* regla 1: ocho radios y ninguno repite — la mano no calca esquinas */
+  border-radius: 14px 11px 15px 12px / 12px 15px 11px 14px;
+  /* la sombra corrida: el objeto está APOYADO, no flotando en el éter */
+  box-shadow: 3px 4px 0 rgba(36, 26, 16, 0.18);
+  padding: 14px 16px 20px;
+}
+
+/* regla 2: la puntada — el remate cosido a mano, siempre visible */
+.artes-panel::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 2px dashed rgba(246, 239, 224, 0.9); /* hueso */
+  border-radius: 10px 8px 11px 9px / 9px 11px 8px 10px;
+  pointer-events: none;
+}
+
+/* la guarda tejida en el filo de abajo: franjas + cruce de telar */
+.artes-panel::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 6px;
+  height: 8px;
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(36, 26, 16, 0.22) 0 2px,
+      transparent 2px 7px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      var(--artes-cochinilla) 0 14px,
+      var(--artes-crudo) 14px 17px,
+      var(--artes-maiz) 17px 31px,
+      var(--artes-crudo) 31px 34px,
+      var(--artes-indigo) 34px 48px,
+      var(--artes-crudo) 48px 51px,
+      var(--artes-paramo) 51px 65px,
+      var(--artes-crudo) 65px 68px
+    );
+  pointer-events: none;
+}
+
+/* variante sin guarda (paneles muy chicos o apilados) */
+.artes-panel--liso::after {
+  display: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* BOTÓN — tejido, con squash de caucho al presionar (regla 3).        */
+/* ------------------------------------------------------------------ */
+.artes-boton {
+  display: inline-block;
+  background: var(--artes-hueso);
+  color: var(--artes-tinta);
+  font-weight: 700;
+  border: 3px solid var(--artes-tinta);
+  border-radius: 12px 15px 11px 14px / 14px 11px 15px 12px;
+  box-shadow: 2px 3px 0 rgba(36, 26, 16, 0.25);
+  padding: 8px 18px 10px;
+  cursor: pointer;
+  transition: transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 120ms ease;
+}
+
+.artes-boton:hover {
+  background: var(--artes-crudo);
+}
+
+.artes-boton:active {
+  /* squash & stretch: se aplasta y se ensancha, como cosa viva */
+  transform: scale(1.04, 0.92) translateY(2px);
+  box-shadow: 1px 1px 0 rgba(36, 26, 16, 0.25);
+}
+
+.artes-boton:focus-visible {
+  outline: 3px dashed var(--artes-indigo);
+  outline-offset: 3px;
+}
+
+/* el botón de acento: la cucharada de cochinilla, no el balde */
+.artes-boton--acento {
+  background: var(--artes-cochinilla);
+  color: var(--artes-hueso);
+}
+
+.artes-boton--acento:hover {
+  background: #b32e23; /* cochinilla hacia tinta */
+}
+
+/* ------------------------------------------------------------------ */
+/* CORDÓN — el separador como soga trenzada de fique (dos hebras).     */
+/* Reemplaza cualquier <hr> plano: hasta la división es del taller.    */
+/* ------------------------------------------------------------------ */
+.artes-cordon {
+  height: 6px;
+  border: none;
+  border-radius: 3px;
+  margin: 12px 4px;
+  background:
+    repeating-linear-gradient(
+      60deg,
+      var(--artes-fique) 0 6px,
+      var(--artes-fique-oscuro) 6px 9px,
+      var(--artes-fique) 9px 12px
+    );
+  /* la soga cuelga apenas (regla 3): una curvita, no una recta láser */
+  transform: scaleY(0.96);
+  clip-path: ellipse(52% 120% at 50% -40%);
+}
+
+/* ------------------------------------------------------------------ */
+/* ETIQUETA — el marbete cosido: para chips, nombres, estados.         */
+/* ------------------------------------------------------------------ */
+.artes-etiqueta {
+  display: inline-block;
+  background: var(--artes-fique);
+  color: var(--artes-tinta);
+  font-size: 0.82em;
+  font-weight: 600;
+  border: 2px solid var(--artes-tinta);
+  border-radius: 9px 7px 10px 8px / 8px 10px 7px 9px;
+  padding: 2px 10px 3px;
+  box-shadow: 1px 2px 0 rgba(36, 26, 16, 0.15);
+}
+
+/* ------------------------------------------------------------------ */
+/* Accesibilidad: sin animación para quien la pidió quieta.            */
+/* ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .artes-boton {
+    transition: none;
+  }
+}

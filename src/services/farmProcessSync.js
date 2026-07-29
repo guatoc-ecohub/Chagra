@@ -274,7 +274,7 @@ export async function enqueueFarmProcessEvent(event, process, assetId) {
   if (!payload) return null;
 
   try {
-    const { default: syncManager } = await import('./syncManager');
+    const { syncManager } = await import('./syncManager');
 
     const tx = await syncManager.saveTransaction({
       type: eventType === 'sowing_confirmed' ? 'seeding' : eventType,

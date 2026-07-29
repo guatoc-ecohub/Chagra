@@ -251,7 +251,7 @@ function MataCampo({ pos, color = '#4e8f3f' }) {
   );
 }
 
-function Diorama({ params, reducedMotion, tier, fauna, estadoFinca }) {
+function Diorama({ params, reducedMotion, tier, fauna, estadoFinca, onHotspot = () => {} }) {
   const puestos = params?.puestos || [
     { color: '#c96a2f', pos: [-0.85, 0, 0.2] },
     { color: '#3f8f4e', pos: [0.9, 0, -0.1] },
@@ -307,7 +307,7 @@ function Diorama({ params, reducedMotion, tier, fauna, estadoFinca }) {
         <meshLambertMaterial color="#6d8a3e" />
       </mesh>
       {parcela.map(([x, z, c], i) => (
-        <MataCampo key={i} pos={[Number(x), 0, Number(z)]} color={c} />
+        <MataCampo key={i} pos={[Number(x), 0, Number(z)]} color={/** @type {string} */ (c)} />
       ))}
 
       {/* el anillo vivo de la plaza (el borde de la feria) */}
@@ -348,6 +348,7 @@ function Diorama({ params, reducedMotion, tier, fauna, estadoFinca }) {
             destino={[x, 0, 0.4]}
             reducedMotion={reducedMotion}
             tier={tier}
+            onPick={onHotspot}
           />
         );
       })}

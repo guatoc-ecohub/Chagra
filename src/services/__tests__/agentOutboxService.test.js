@@ -152,7 +152,7 @@ describe('agentOutboxService — persistencia / restauración', () => {
   });
 
   it('rechaza kind inválido', async () => {
-    await expect(enqueue({ kind: 'video', text: 'x' })).rejects.toThrow(/kind inválido/);
+    await expect(enqueue(/** @type {any} */ ({ kind: 'video', text: 'x' }))).rejects.toThrow(/kind inválido/);
   });
 
   it('SOBREVIVE a "cierre de app": el item sigue ahí tras re-leer la outbox', async () => {

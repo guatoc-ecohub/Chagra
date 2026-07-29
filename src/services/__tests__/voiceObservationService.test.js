@@ -9,15 +9,15 @@ import { registerVoiceObservation } from '../voiceObservationService';
 
 describe('registerVoiceObservation', () => {
   it('rechaza sin processId', async () => {
-    await expect(registerVoiceObservation({ transcription: 'se ve bien' })).rejects.toThrow(/process_id/);
+    await expect(registerVoiceObservation(/** @type {any} */ ({ transcription: 'se ve bien' }))).rejects.toThrow(/process_id/);
   });
 
   it('rechaza transcription vacia', async () => {
-    await expect(registerVoiceObservation({ processId: 'p1', transcription: '' })).rejects.toThrow(/transcription/);
+    await expect(registerVoiceObservation(/** @type {any} */ ({ processId: 'p1', transcription: '' }))).rejects.toThrow(/transcription/);
   });
 
   it('guarda con source=voice y capture_mode=voice', async () => {
-    await registerVoiceObservation({ processId: 'p1', transcription: 'el cafetal está florido' });
+    await registerVoiceObservation(/** @type {any} */ ({ processId: 'p1', transcription: 'el cafetal está florido' }));
     expect(recordFarmEvent).toHaveBeenCalledWith(
       expect.objectContaining({
         process_id: 'p1',

@@ -99,7 +99,7 @@ describe('BUG #7 — auto-asignar zona al agregar planta', () => {
     const select = screen.getByLabelText('¿En qué lote o zona va?');
     // El efecto de auto-asignación deja parentLandId = land-uno → opción
     // seleccionada NO es la de "Sin zona por ahora" (value vacío).
-    expect(select.value).toBe('land-uno');
+    expect(/** @type {HTMLSelectElement} */ (select).value).toBe('land-uno');
   });
 
   it('ofrece la elección explícita "Sin zona por ahora"', () => {
@@ -119,7 +119,7 @@ describe('BUG #7 — auto-asignar zona al agregar planta', () => {
     render(<AssetsDashboard onBack={() => {}} initialTab="plant" initialShowForm />);
     const select = screen.getByLabelText('¿En qué lote o zona va?');
     // Sin zona elegida aún → cae a la opción vacía "Sin zona por ahora".
-    expect(select.value).toBe('');
+    expect(/** @type {HTMLSelectElement} */ (select).value).toBe('');
   });
 });
 

@@ -75,7 +75,7 @@ const templates = [
 ];
 
 for (const t of templates) {
-  registry.set(t.species_slug, t);
+  registry.set(t.species_slug, /** @type {PhenologyTemplate} */ (t));
 }
 
 /**
@@ -129,7 +129,7 @@ export function getTemplate(speciesSlug) {
   if (parent && parent !== speciesSlug) {
     const parentTemplate = registry.get(parent);
     if (parentTemplate) {
-      return { ...parentTemplate, species_slug: speciesSlug, derived_from: parent };
+      return /** @type {any} */ ({ ...parentTemplate, species_slug: speciesSlug, derived_from: parent });
     }
   }
   return null;

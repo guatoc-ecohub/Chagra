@@ -364,7 +364,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
     setRagLoading(true);
     (async () => {
       try {
-        const insights = await enrichEntity(/** @type {{crop: string, quantity?: number, location?: string}} */ ({ crop: formData.name }));
+        const insights = await enrichEntity(/** @type {any} */ ({ crop: formData.name }));
         if (cancelled) return;
         setRagInsights(insights || null);
       } catch (err) {
@@ -818,7 +818,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         const plantingDateIso = formData.fechaGerminacion
           ? new Date(formData.fechaGerminacion).toISOString()
           : new Date().toISOString();
-        generatePlanForPlant(/** @type {{assetId: string, speciesSlug: string|null, plantingDate: string}} */ ({
+        generatePlanForPlant(/** @type {any} */ ({
           assetId: assetUUIDs[0],
           speciesSlug: formData.speciesId,
           plantingDate: plantingDateIso,
@@ -1474,7 +1474,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         value={formData.notes}
         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
         placeholder="Notas de campo (opcional)"
-        rows={/** @type {number} */ ("2")}
+        rows={2}
         className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[56px]"
       />
 
@@ -1622,7 +1622,7 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
         value={formData.notes}
         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
         placeholder="Notas (opcional)"
-        rows={/** @type {number} */ ("2")}
+        rows={2}
         className="w-full p-3 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm min-h-[56px]"
       />
 
@@ -1999,8 +1999,9 @@ export default function AssetsDashboard({ onBack, initialTab, initialShowForm = 
       {/* Map picker modal (Fase 17.3) */}
       {showMapPicker && (
         <MapPicker
-          mode={/** @type {string} */ (showMapPicker)}
+          mode={/** @type {any} */ (showMapPicker)}
           initial={formData.geometry}
+          center={null}
           onSave={(geometry) => {
             setFormData((prev) => ({ ...prev, geometry }));
             setShowMapPicker(false);

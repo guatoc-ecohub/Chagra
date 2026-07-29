@@ -32,6 +32,13 @@ const STORAGE_KEY_VALLE3D = 'chagra:prefs:valle3d';
 // carga posterior a esta migración lo vuelve a encender una sola vez y después
 // respeta el valor elegido por el usuario.
 const STORAGE_KEY_VALLE3D_MIGRATED = 'chagra:prefs:valle3d:migrated-v1';
+// Avatar del USUARIO (2026-07-13): el animal de la chagra que la persona
+// elige como su avatar (slug del registro CREATURES de src/visual/creatures).
+// Default: la abeja angelita. El store solo persiste el slug como string —
+// la resolución slug→componente vive en useAvatarCreature (hooks), para no
+// arrastrar los SVG de fauna a todo consumidor del store.
+const STORAGE_KEY_AVATAR_CREATURE = 'chagra:prefs:avatar-creature';
+export const AVATAR_CREATURE_DEFAULT = 'abeja-angelita';
 
 function load(key, fallback) {
   try {
@@ -68,6 +75,7 @@ const usePrefsStore = create((set, _get) => ({
   haptics: load(STORAGE_KEY_HAPTICS, 'auto'),
   sonido: load(STORAGE_KEY_SONIDO, 'off'),
   valle3d: loadValle3d(),
+  avatarCreatureId: load(STORAGE_KEY_AVATAR_CREATURE, AVATAR_CREATURE_DEFAULT),
 
   setVoiceRegion: (region) => {
     save(STORAGE_KEY_VOICE_REGION, region);
@@ -101,6 +109,12 @@ const usePrefsStore = create((set, _get) => ({
     const valid = SONIDO_MODES.includes(mode) ? mode : 'off';
     save(STORAGE_KEY_SONIDO, valid);
     set({ sonido: valid });
+  },
+
+  setAvatarCreatureId: (id) => {
+    const slug = typeof id === 'string' && id.trim() ? id.trim() : AVATAR_CREATURE_DEFAULT;
+    save(STORAGE_KEY_AVATAR_CREATURE, slug);
+    set({ avatarCreatureId: slug });
   },
 
   setValle3d: (flag) => {

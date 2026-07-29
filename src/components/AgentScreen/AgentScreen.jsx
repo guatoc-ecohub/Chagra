@@ -106,6 +106,7 @@ import { appendScientificFooter } from '../../services/semaforoConfianza';
 // Nubosidad real para el grounding (fix Choachí 2026-06) — solo lee caches.
 import { summarizeSkyForGrounding } from '../../services/skyConditionService';
 import { assembleSystemContent, TOP_N_RAG } from '../../services/promptAssembler';
+import { buildSpatialContextPin } from '../../services/spatialAgentContext';
 import { applyOutputGuards, classifyQueryIntent } from '../../services/outputGuards';
 import { createStreamGuard } from '../../services/streamGuards';
 import { getProfile, getModuleVisibility } from '../../services/userProfileService';
@@ -119,7 +120,8 @@ import { prependCorrectionBlock } from './responseGuards';
 // idea contextual (cultivo/clima/temporada) sin inventar alarmas. Lógica pura
 // y testeable extraída a proactiveGreeting; aquí solo la hidratamos desde los
 // stores en vivo y la pintamos en el empty-state del chat.
-import { resolveProactiveGreeting } from '../../services/proactiveGreeting';
+import { resolveProactiveGreeting, saludoPorHora } from '../../services/proactiveGreeting';
+import { saludoDePantalla } from '../../services/saludoPantalla';
 import useLogStore from '../../store/useLogStore';
 // Bug UX 2026-05-30: preservar respuesta parcial ante abort/timeout/cancel.
 // La lógica pura del merge del estado final vive en agentPartialMerge (testeable
@@ -137,7 +139,6 @@ import ChatHistory from './ChatHistory';
 import ActionConfirmModal from '../ActionConfirmModal';
 import FeedbackConsentModal from '../FeedbackConsentModal';
 import ChagraAgentAvatar from '../ChagraAgentAvatar';
-import ChagraAgentAvatarColibriPhoto from '../ChagraAgentAvatarColibriPhoto';
 import { AgentManoOverlay } from '../agent/AgentShell';
 import { mapCapabilityPick } from '../agent/capabilityRouting';
 import { agentSounds } from '../../services/agentSoundService';
@@ -235,6 +236,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // Contexto ambiental de la finca (#202 mejora inteligencia): alertas activas
   // del alertEngine para que el agente las tenga en cuenta sin pedir fetch.
   const activeAlerts = useAlertStore((s) => s.activeAlerts);
+  // El valle 3D entrega un pin de turno 0 al abrir el chat. No se mezcla con
+  // el texto del usuario ni se persiste en memoria conversacional: permanece
+  // como sistema durante esta sesión y el flujo del chat sigue intacto.
+  const spatialContextPin = useMemo(
+    () => buildSpatialContextPin(initialContext?.spatialContext),
+    [initialContext],
+  );
 
   const [messages, setMessages] = useState([]);
   // Agente guiado: ids de insights ya ofrecidos/vistos en esta sesión de chat,
@@ -259,7 +267,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const [thinkingPhase, setThinkingPhase] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [error, setError] = useState('');
-  const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '' });
+  const [actionModal, setActionModal] = useState({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
   // Task #194: Modal de consentimiento para feedback
   const [feedbackConsentModal, setFeedbackConsentModal] = useState({ isOpen: false, pendingAction: null });
   const ttsSupported = isSupported();
@@ -566,6 +574,19 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         ensoOutlook = getEnsoOutlook({ phase, region, probabilities: probs });
       }
     } catch (_) { /* sin ENSO no pasa nada — la idea cae a temporada/piso */ }
+    // SALUDO CONTEXTUAL POR PANTALLA (2026-07-16): si el operador tocó a
+    // Angelita desde una pantalla mapeada (AgentFab pasa `desdePantalla`),
+    // ella saluda sobre ESO — "¿le ayudo con la germinación?" en #semilla.
+    // Los pendientes URGENTES siguen mandando (una alerta de plaga le gana
+    // a la cortesía); el saludo de pantalla solo reemplaza la idea genérica.
+    const saludoPantalla = saludoDePantalla(initialContext?.desdePantalla);
+    const greetingDePantalla = (hi) => ({
+      state: 'idea',
+      hi: hi || saludoPorHora(),
+      lead: saludoPantalla,
+      items: [],
+      restCount: 0,
+    });
     resolveProactiveGreeting({
       activeAlerts,
       getPendingTasks: () => useLogStore.getState().getPendingTasks(),
@@ -573,8 +594,17 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       altitud: finca?.altitud != null ? Number(finca.altitud) : null,
       ensoOutlook,
     }).then((g) => {
-      if (alive) setProactiveGreeting(g);
-    }).catch(() => { /* degrada silencioso al copy estático */ });
+      if (!alive) return;
+      if (saludoPantalla && (!g || g.state !== 'pending')) {
+        setProactiveGreeting(greetingDePantalla(g?.hi));
+      } else {
+        setProactiveGreeting(g);
+      }
+    }).catch(() => {
+      // Degrada silencioso: con saludo de pantalla lo usamos igual; sin él,
+      // cae al copy estático de siempre.
+      if (alive && saludoPantalla) setProactiveGreeting(greetingDePantalla());
+    });
     return () => { alive = false; };
     // Solo al montar: el saludo es la primera impresión, no debe re-evaluarse en
     // cada cambio de inventario/alerta mientras el operador ya está leyéndolo.
@@ -803,7 +833,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
     const wasEdited = JSON.stringify(params) !== JSON.stringify(actionModal.parameters);
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '' });
+    setActionModal({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
     if (resolver) {
       resolver({
         status: wasEdited ? 'edited' : 'approved',
@@ -815,7 +845,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   const handleActionReject = () => {
     const resolver = actionGateResolverRef.current;
     actionGateResolverRef.current = null;
-    setActionModal({ isOpen: false, intent: null, llmResponse: '' });
+    setActionModal({ isOpen: false, intent: null, llmResponse: '', toolName: '', description: '', parameters: {} });
     if (resolver) {
       resolver({ status: 'rejected' });
     }
@@ -945,7 +975,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         const { getActiveDiseaseForCycle } = await import('../../services/diseaseObservationService');
         const STAGE_LBL = { sowing: 'Siembra', emergence: 'Brotó', vegetative: 'Creciendo', flowering: 'Floración', fruiting: 'Frutos', harvest_window: 'Cosecha', closed: 'Terminado' };
         const cycles = (await listFarmProcesses({ status: 'active' })) || [];
-        return await Promise.all(cycles.slice(0, 5).map(async (c) => {
+        return await Promise.all(cycles.slice(0, 5).map(async (/** @type {any} */ c) => {
           const at = c.attributes || {};
           const id = c.process_id || c.id;
           const base = String(at.current_stage || '').replace(/_confirmed$/, '');
@@ -1174,6 +1204,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
 
     const messages = [
       { role: 'system', content: assembled.content },
+      ...(spatialContextPin ? [{ role: 'system', content: spatialContextPin }] : []),
       ...(contextMemory ? [{ role: 'user', content: contextMemory }] : []),
       { role: 'user', content: query },
     ];
@@ -1348,7 +1379,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         // que runAgentPipeline corra el merge del estado final y preserve el
         // texto streamed si lo hubo. cancelReasonRef lo setea handleCancelLLM
         // (cancel) o el timer/watchdog (timeout); por defecto 'abort' genérico.
-        const interruptErr = new Error('Inferencia interrumpida');
+        const interruptErr = /** @type {Error & {interrupted: boolean, interruptReason: string}} */ (new Error('Inferencia interrumpida'));
         interruptErr.interrupted = true;
         interruptErr.interruptReason = cancelReasonRef.current || 'abort';
         throw interruptErr;
@@ -1778,9 +1809,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             // es cliente-side, usa datos del DR consolidado, y sus guardas
             // anti-mito afloran en la respuesta del agente.
             if (!toolEvidence) {
-              const modules = [
+              const modules = /** @type {Array<[Function, () => Promise<any>, string, string]>} */ ([
                 [hasSoilDiagnosticIntent, () => import('../../services/soilDiagnostic'), 'soil_diagnostic', 'suelo'],
-              ];
+              ]);
               // Agua, animal, restauracion, riesgo-incendio si el intent matcher existe
               try {
                 const { hasWaterDiagnosticIntent, hasAnimalDiagnosticIntent, hasRestauracionDiagnosticIntent, hasIncendioRiskIntent } = await import('../../services/knowledgeIntentRouter');
@@ -1804,7 +1835,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               for (const [hasIntent, loadMod, tool, label] of modules) {
                 if (hasIntent(textForLLM)) {
                   try {
-                    const mod = await loadMod();
+                    const mod = /** @type {{diagnosticar: Function, formatear: Function}} */ (await loadMod());
                     const diag = mod.diagnosticar(textForLLM, { altitud: restAltitud });
                     if (diag && (diag.sin_datos === false || diag.alerta)) {
                       const bloque = mod.formatear(diag);
@@ -1858,7 +1889,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             if (forcedPlan && forcedPlan.localGrounding === 'precio_referencia') {
               const priceMsg = buildPriceReferenceAnswer(forcedPlan.args?.producto || textForLLM);
               if (priceMsg) {
-                const userMessage = { role: 'user', content: trimmed, timestamp: Date.now() };
+                const userMessage = { role: 'user', content: text.trim(), timestamp: Date.now() };
                 const assistantMessage = {
                   role: 'assistant',
                   content: priceMsg,
@@ -1866,7 +1897,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
                 };
                 setMessages((prev) => [...prev, userMessage, assistantMessage]);
                 try {
-                  await addTurn(operatorId, { role: 'user', content: trimmed });
+                  await addTurn(operatorId, { role: 'user', content: text.trim() });
                   await addTurn(operatorId, { role: 'assistant', content: priceMsg });
                 } catch (e) {
                   console.warn('[Agent] precio addTurn failed (continuo):', e?.message);
@@ -2324,6 +2355,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
       // del assistant fue grounded contra el catálogo (tool MCP devolvió
       // match) o fue solo generativo del LLM. ChatBubble lee este metadata
       // para renderizar el badge verde/amber/gris (ver computeSourceMetadata).
+      /** @type {any} */
       let sourceMetadata = computeSourceMetadata(toolEvidence);
 
       // #18 + #20: surfacéa en metadata las señales del grounding curado que la
@@ -2371,13 +2403,13 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               : [],
           }
         : {};
-      sourceMetadata = {
+      sourceMetadata = /** @type {any} */ ({
         ...sourceMetadata,
         ...evidenceSourceLink,
         ...groundingBadges,
         ...groundingSemaphoreMeta,
         auto_corrected: responseAutoCorrected,
-      };
+      });
       const profileMode = (() => {
         try {
           return getProfile()?.nivel_respuestas || '';
@@ -2458,7 +2490,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             .filter((n) => typeof n === 'string' && n.trim().length > 0);
           if (expected.length > 0) {
             const pv = await postValidate(responseBody, expected);
-            sourceMetadata = mergePostValidateMetadata(sourceMetadata, pv);
+            sourceMetadata = /** @type {any} */ (mergePostValidateMetadata(sourceMetadata, pv));
             if (sourceMetadata.hallucinated_names || sourceMetadata.suspect_names) {
               console.debug('[sidecar] post-validate flags', {
                 hallucinated: sourceMetadata.hallucinated_names,
@@ -2532,10 +2564,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
           session_id: `${operatorId}:${activeFincaSlug || 'sin-finca'}`,
           nlu_route: nluRoute,
           entities_grounded: Array.isArray(resolvedEntities)
-            ? resolvedEntities.map((e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
+            ? resolvedEntities.map((/** @type {any} */ e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
             : [],
           guards_fired: guarded.modified ? guarded.reasons || [] : [],
-          grounded_status: sourceMetadata?.source || sourceMetadata?.grounded_status || null,
+          grounded_status: (/** @type {any} */ (sourceMetadata))?.source || (/** @type {any} */ (sourceMetadata))?.grounded_status || null,
           latency_ms: Math.round(performance.now() - pipelineStartedAt),
           model: selectChatRoute(textForLLM),
           eval_rate: currentLlmStats?.eval_rate ?? null,
@@ -2559,10 +2591,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
             latency: { t_first_token_ms: currentLlmStats?.first_token_ms ?? null },
             grounding: {
               entities: Array.isArray(resolvedEntities)
-                ? resolvedEntities.map((e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
+                ? resolvedEntities.map((/** @type {any} */ e) => e?.canonical_id || e?.id || e?.mentioned).filter(Boolean)
                 : [],
               tools: Array.isArray(toolEvidence)
-                ? toolEvidence.map((t) => t?.tool || t?.name).filter(Boolean)
+                ? toolEvidence.map((/** @type {any} */ t) => t?.tool || t?.name).filter(Boolean)
                 : [],
               rag_chunks: Array.isArray(contextCorpus) ? contextCorpus.length : 0,
               nlu_route: nluRoute || durableRoute,
@@ -3558,10 +3590,12 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         >
           <Home size={20} />
         </button>
-        {/* Avatar + título */}
-        <ChagraAgentAvatarColibriPhoto
+        {/* Avatar + título. 2026-07-16: iba directo a la foto del colibrí
+            saltándose el wrapper — ahora respeta la preferencia (default
+            Angelita, "jubila el colibrí" — operador). */}
+        <ChagraAgentAvatar
           state={state === STATE_RECORDING ? 'listening' : (state === STATE_THINKING || isVoicePlaying) ? 'thinking' : 'idle'}
-          size={36}
+          size={52}
           onDoubleClick={async () => {
             if (isSpeaking() || ttsEnabled) {
               stop(); setTtsEnabled(false); agentSounds.cancel(); return;
@@ -4062,7 +4096,7 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
               }}
             >
               <ChagraAgentAvatar
-                size={38}
+                size={46}
                 state={state === STATE_THINKING ? 'thinking' : 'idle'}
                 ariaLabel="Enviar al agente"
               />

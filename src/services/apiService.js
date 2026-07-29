@@ -314,8 +314,8 @@ export const fetchFromFarmOS = async (endpoint, options = {}, _retried = false) 
       const ctype = response.headers?.get?.('content-type') || '';
       const cleanMsg = buildCleanErrorMessage('FarmOS API Error', response.status, response.statusText, errorDetail, ctype);
       const error = new Error(cleanMsg);
-      error.status = response.status;
-      error.detail = errorDetail;  // raw preservado para debug en console
+      /** @type {any} */ (error).status = response.status;
+      /** @type {any} */ (error).detail = errorDetail;  // raw preservado para debug en console
       throw error;
     }
     // Incoming: mapear `type: log--activity` → `log--task` etc. en la

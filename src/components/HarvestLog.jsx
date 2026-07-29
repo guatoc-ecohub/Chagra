@@ -368,6 +368,7 @@ export default function HarvestLog({ onBack, onSave }) {
           rows={3}
           value={formData.notes}
           onChange={handleInput}
+          // @ts-ignore placeholder not in strict prop types
           placeholder="Ej: fruta pequeña, algo picada por pájaros…"
         />
       </RegistroShell>

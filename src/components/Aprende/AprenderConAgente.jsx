@@ -30,6 +30,7 @@ import {
 
 import lecciones from '../../data/agro-lecciones.json';
 import todasLasCards from '../../data/agro-insight-cards.json';
+import { SalaJuegosBanner } from '../juego/HubJuegos.jsx';
 import InsightCard from './InsightCard.jsx';
 import ManoChagraGlyph from '../dashboard/ManoChagraGlyph.jsx';
 import LessonInfographic from '../LessonInfographic.jsx';
@@ -442,6 +443,13 @@ export default function AprenderConAgente({ onBack, onAskAgent, initialSlug, onN
       </div>
 
       <main className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+        {/* LA SALA DE JUEGOS — primero y bien visible (feedback del operador
+            2026-07-16: "no veo los juegos"): el toldo de feria abre el hub
+            con los 9 juegos (#juegos). Jugar también es aprender. */}
+        {typeof onNavigate === 'function' && (
+          <SalaJuegosBanner onNavigate={onNavigate} />
+        )}
+
         {/* ¿Nuevo en Chagra? El curso guiado enseña a USAR la app (video +
             lección + probar), del primer registro a la venta. Va arriba de las
             lecciones sueltas: es el camino para volverse autónomo. */}

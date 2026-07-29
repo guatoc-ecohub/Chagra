@@ -4,7 +4,7 @@
 > `node bench/run.mjs --regen-index`. No editar a mano (un test verifica
 > que este sincronizado).
 
-Generado: 2026-06-17. Entradas: 19 (15 benches/meta + 4 suites de test).
+Generado: 2026-07-18. Entradas: 18 (14 benches/meta + 4 suites de test).
 
 ## Como se usa
 
@@ -81,13 +81,6 @@ _Bench largo de FarmProcess con escenarios + eliminacion temprana._
 | id | que hace | tipo | infra | ejecutar |
 |---|---|---|---|---|
 | `nocturno-farm-process` | Bench nocturno de FarmProcess con escenarios smoke (2) o full (20+), checkpointing y eliminacion temprana de modelos fallidos. Delega en lib/bench-nocturno-runner.mjs. | Bench LLM | gpu, ollama | `node bench/run.mjs nocturno-farm-process` |
-
-### Cluster: meta
-_Herramientas sobre resultados de benches (no corren modelo)._
-
-| id | que hace | tipo | infra | ejecutar |
-|---|---|---|---|---|
-| `summary-diff` | Herramienta META: compara dos summary.md y emite gate GREEN/YELLOW/RED (exit 0/1/2/3). NO corre modelos. Requiere --baseline y --current. | Meta | ninguna | `node scripts/bench-summary-diff.mjs --baseline=<a/summary.md> --current=<b/summary.md>` |
 
 ## Suites de test
 

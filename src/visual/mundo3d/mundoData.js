@@ -14,6 +14,7 @@
  *     valle,      // (opcional) landmark en el mapa del valle: { tipo, pos, escala }
  *     gate,       // (opcional) perfil requerido (p.ej. 'animales')
  *     ambiental,  // (opcional) el clima ya vive en el ambiente del valle
+ *     pisoTermico,// piso de anclaje en la Sierra (la compatibilidad se deriva)
  *   }
  *
  * Sumar un mundo = UNA de estas entradas + assets de la librería (lámina/creature/
@@ -58,6 +59,7 @@ export const MUNDO = {
   // 🌱 EL SUELO VIVO — el PROTOTIPO del DR (cutaway). Reusa mundoSubsueloEngine
   //    para la densidad de vida (`params.vida` 0..1; aquí, valor de muestra).
   suelo: {
+    pisoTermico: 'templado',
     escena: 'cutaway',
     valle: { tipo: 'era', pos: [-1.1, 0, 3.6], escala: 1 },
     params: {
@@ -84,6 +86,7 @@ export const MUNDO = {
   //    Todo es DATOS: la curva de la quebrada + los hitos del recorrido los
   //    leen por igual el diorama 3D (EscenaFlujo) y su gemelo 2D (FondoFlujo).
   agua: {
+    pisoTermico: 'paramo',
     escena: 'flujo',
     valle: { tipo: 'quebrada', pos: [0.6, 0, -1.4], escala: 1 },
     params: {
@@ -125,6 +128,7 @@ export const MUNDO = {
   //    real de farmOS aquí mismo (misma forma; `pos` es opcional — sin él, los
   //    sitios salen solos). MUESTRA compartida con el mercado (mismo dato):
   animales: {
+    pisoTermico: 'calido',
     escena: 'recinto',
     valle: { tipo: 'corral', pos: [-4.6, 0, -1.8], escala: 1 },
     gate: 'animales',
@@ -141,6 +145,7 @@ export const MUNDO = {
 
   // 🌳 DISEÑO DE LA FINCA — la verticalidad del bosque comestible (estratos).
   disenio: {
+    pisoTermico: 'templado',
     escena: 'estratos',
     valle: { tipo: 'bosque', pos: [4.8, 0, -2.6], escala: 1.1 },
     params: {},
@@ -155,6 +160,7 @@ export const MUNDO = {
   // 🗺️ EL VALLE — el mapa navegable (valle). Es "un mundo más" del registro: su
   //    escena ES el mapa entero; sus hotspots son los demás mundos.
   valle: {
+    pisoTermico: 'calido',
     escena: 'valle',
     params: { clima: 'soleado' },
     entrada: { narra: 'bienvenida', clima: 'soleado', alertaView: 'hoy_finca' },
@@ -165,6 +171,7 @@ export const MUNDO = {
   // 🐄 ESTIÉRCOL Y COMPOST — REUSA `cutaway` para el corte de la pila (capas
   //    café/verde, calor). Prueba viva de "sumar un SÍ-3D = datos, sin código".
   abono: {
+    pisoTermico: 'templado',
     escena: 'cutaway',
     valle: { tipo: 'huerta', pos: [1.8, 0, 4.4], escala: 0.95 },
     params: {
@@ -186,6 +193,7 @@ export const MUNDO = {
 
   // 🌾 CULTIVOS — arquetipo `lamina`: reusa la lámina de maíz de la librería.
   cultivos: {
+    pisoTermico: 'calido',
     escena: 'lamina',
     valle: { tipo: 'milpa', pos: [-3.2, 0, 1.6], escala: 1.15 },
     params: { lamina: 'maiz' },
@@ -208,35 +216,29 @@ export const MUNDO = {
   //    Cada punto es una puerta a una pantalla REAL. En equipo humilde cae a su
   //    ficha 2D digna (la infografía del café).
   cafe: {
+    pisoTermico: 'templado',
     escena: 'cafe',
     valle: { tipo: 'cafetal', pos: [3.4, 0, 2.2], escala: 1 },
-    params: {
-      // El diorama tiene defaults propios; aquí los hacemos explícitos y
-      // deterministas (mismos cafetos, sombra y estados del grano).
-      cafetos: [
-        { color: '#3f6f3a', pos: [-0.55, 0, 0.42], cerezas: 6 },
-        { color: '#468637', pos: [0.5, 0, 0.12], cerezas: 5 },
-        { color: '#3f6f3a', pos: [0.02, 0, -0.5], cerezas: 4, roya: true },
-        { color: '#457d38', pos: [-0.78, 0, -0.32], cerezas: 5 },
-      ],
-      sombra: [
-        { pos: [-1.65, 0, -0.95], color: '#4b7a3a', alto: 2.2 }, // guamo (Inga)
-        { pos: [1.7, 0, -0.8], color: '#3f6b39', alto: 2.0 },    // nogal cafetero
-      ],
-      granos: [
-        { estado: 'cereza', color: '#b8342a', pos: [-1.5, 0, 0.75] },
-        { estado: 'pergamino', color: '#d4c199', pos: [-1.15, 0, 1.05] },
-        { estado: 'oro', color: '#9fae5a', pos: [-0.72, 0, 1.2] },
-      ],
-    },
+    // La escena es LA LADERA COMPLETA de `cafetal/` (geografía determinista en
+    // floraCafetal.geom): ya no hay cafetos de mesa que declarar aquí. El `id`
+    // ancla la capa viva (partículas/momentos) a la siembra propia del mundo.
+    params: { id: 'cafe' },
+    // Las puertas repartidas EN PROFUNDIDAD ladera arriba (entrada con aire, un
+    // solo foco cerca): el grano en la mata protagonista del camino, la sombra
+    // en el guamo del centro, la roya en su mata señalada, el manejo en la
+    // trampa de broca y el beneficio en la casa que corona la loma. Alturas
+    // horneadas del terreno real (alturaLadera + el porte de cada elemento).
     hotspots: [
-      { id: 'grano', pos: [-0.55, 0.9, 0.42], emoji: '☕', label: 'El grano, paso a paso', view: 'cafe' },
-      { id: 'sombra', pos: [-1.65, 2.5, -0.95], emoji: '🌳', label: 'El café bajo sombra', view: 'biodiversidad' },
-      { id: 'roya', pos: [0.02, 0.85, -0.5], emoji: '🍂', label: 'La roya y la broca', view: 'plagas' },
-      { id: 'manejo', pos: [0.5, 0.82, 0.12], emoji: '🐞', label: 'Manejo sin veneno', view: 'biopreparados' },
-      { id: 'beneficio', pos: [1.0, 0.7, 0.55], emoji: '💧', label: 'Despulpar, fermentar, secar', view: 'poscosecha' },
+      { id: 'grano', pos: [-2.8, 1.9, 5.6], emoji: '☕', label: 'El grano, paso a paso', view: 'cafe' },
+      { id: 'sombra', pos: [3.2, 4.7, 2.4], emoji: '🌳', label: 'El café bajo sombra', view: 'biodiversidad' },
+      { id: 'roya', pos: [-5.6, 2.7, -1.5], emoji: '🍂', label: 'La roya y la broca', view: 'plagas' },
+      { id: 'manejo', pos: [4.6, 2.6, -0.6], emoji: '🐞', label: 'Manejo sin veneno', view: 'biopreparados' },
+      { id: 'beneficio', pos: [10.2, 7.5, -13.6], emoji: '💧', label: 'Despulpar, fermentar, secar', view: 'poscosecha' },
     ],
-    entrada: { zoom: 7.5, narra: 'cafe' },
+    // El centro se corre atrás y abajo para que la mirada de EscenaBase3D
+    // (centro.y + zoom·0.12) caiga en CAMARA.mirada de floraCafetal.geom: la
+    // cámara pasa POR DEBAJO del techo de sombra, no entre las copas.
+    entrada: { zoom: 13, centro: [-0.4, 2.24, -3.4], narra: 'cafe' },
     // El gemelo 2D digno: la ficha del café (misma lección, en cifras y notas).
     fallback2d: {
       escena: 'infografia',
@@ -257,6 +259,7 @@ export const MUNDO = {
 
   // 🍊 FRUTALES — arquetipo `ficha`: tarjeta de especie foto-secuencial.
   frutales: {
+    pisoTermico: 'calido',
     escena: 'ficha',
     params: {
       nombre: 'Frutales de la finca',
@@ -283,6 +286,7 @@ export const MUNDO = {
   //    intermediario). Cada punto es una puerta a una pantalla REAL. En equipo
   //    humilde cae a su ficha 2D digna (la infografía del mercado y la despensa).
   mercado: {
+    pisoTermico: 'calido',
     escena: 'mercado',
     valle: { tipo: 'mercado', pos: [1.2, 0, 6.6], escala: 1 },
     params: {
@@ -334,6 +338,7 @@ export const MUNDO = {
   //    (mariquita, carábido). Cada punto es una puerta a una pantalla REAL. En
   //    equipo humilde cae a su ficha 2D digna (la infografía de la sanidad).
   sanidad: {
+    pisoTermico: 'templado',
     escena: 'sanidad',
     valle: { tipo: 'huerta', pos: [3.8, 0, 4.9], escala: 0.95 },
     params: {
@@ -388,6 +393,7 @@ export const MUNDO = {
   //    hacia 2040–2050). NOTA DE CONCIENCIA, esperanza no colapso: el páramo es la
   //    fábrica de agua. En equipo humilde cae al gemelo 2D (mirror → cielo).
   clima: {
+    pisoTermico: 'paramo',
     escena: 'boveda',
     valle: { tipo: 'veleta', pos: [-3.8, 0, -4.8], escala: 1 },
     ambiental: true,
@@ -430,6 +436,7 @@ export const MUNDO = {
   //    arquetipo `cutaway` (mismas capas + vida) y enciende el módulo `milpa`.
   //    Policultivo, no monocultivo: juntas rinden más y se cuidan (push-pull).
   milpa: {
+    pisoTermico: 'calido',
     escena: 'cutaway',
     params: {
       vida: 0.5,
@@ -464,6 +471,7 @@ export const MUNDO = {
   //    gradiente ALTITUDINAL, que vive en `params.pisos` (de bajo a alto) y lo
   //    leen por igual el diorama 3D y su gemelo 2D. Vitrina: #/mockups/mundo3d-bosque.
   pisos: {
+    pisoTermico: 'frio',
     escena: 'estratos',
     params: {
       // Pisos de bajo (cálido) a alto (páramo). Verificado (catálogo thermal_zones
@@ -498,6 +506,7 @@ export const MUNDO = {
   //    ficha 2D digna (la infografía del semillero).
   //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
   semillero: {
+    pisoTermico: 'templado',
     escena: 'semillero',
     valle: { tipo: 'semillero', pos: [-2.6, 0, 6.2], escala: 1 },
     params: {
@@ -535,6 +544,32 @@ export const MUNDO = {
         ],
       },
     },
+  },
+
+  // 🍄 EL SUELO VIVO — la RED MICORRÍZICA bajo tierra (arquetipo SÍ-3D nuevo
+  //    `micorrizas`, el "wood-wide web"). La cámara baja BAJO EL SUELO y se ve lo
+  //    invisible: la red de hongos bioluminiscente que enlaza las raíces del maíz,
+  //    el fríjol y la ahuyama (las tres hermanas) y del árbol madre, con PULSOS de
+  //    nutrientes corriendo por los hilos —fósforo/agua que SUBEN a la mata, azúcar
+  //    que BAJA al hongo— y los PUENTES entre plantas distintas (el reparto). El
+  //    Ent de la queñua asoma enseñando. Se ancla en TEMPLADO (el corazón de la
+  //    chagra), pero el suelo vivo aplica a todos los pisos. Cada punto es una
+  //    puerta real; en equipo humilde cae a su espejo 2D.
+  //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
+  micorrizas: {
+    pisoTermico: 'templado',
+    escena: 'micorrizas',
+    valle: { tipo: 'hongos', pos: [-2.7, 0, 3.3], escala: 1 },
+    params: {},
+    hotspots: [
+      { id: 'reparto', pos: [-1.4, -1.3, 0.3], emoji: '🤝', label: 'Se ayudan bajo tierra', view: 'asociaciones' },
+      { id: 'intercambio', pos: [0.5, -2.1, 0.2], emoji: '💛', label: 'Fósforo por azúcar', view: 'salud_suelo' },
+      { id: 'cuidar', pos: [-2.4, -0.35, 0.4], emoji: '🛡️', label: 'Cuide la red: compost, no queme', view: 'compost' },
+      { id: 'arbol', pos: [2.6, 0.4, -0.3], emoji: '🌳', label: 'El árbol madre alimenta', view: 'restauracion' },
+    ],
+    entrada: { zoom: 6.5, narra: 'micorrizas' },
+    // El gemelo 2D digno (mirror → motivo `micorrizas`): la misma red, dibujada.
+    fallback2d: { escena: 'mirror' },
   },
 };
 

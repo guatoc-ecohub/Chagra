@@ -165,7 +165,12 @@
    media REBOTA al toque, la cara VOLTEA (scaleX imperativo por frame). */
 .mundo-abeja {
   pointer-events: none;
-  filter: drop-shadow(0 4px 8px rgba(40, 30, 10, 0.28));
+  /* ATENUADA en los mundos 3D a propósito: la Angelita del billboard cansaba
+     la vista — "demasiado brillante, solo dorada". Bajamos saturación y brillo
+     del billboard y suavizamos su sombra. NO toca la Angelita 2D del home ni los
+     avatares: ellos NO montan `.mundo-abeja` (se ven exactamente igual). Esto se
+     compone sobre el tinte de clima del SVG (ya rebajado en creatureClimaCuerpo). */
+  filter: saturate(0.85) brightness(0.95) drop-shadow(0 4px 8px rgba(40, 30, 10, 0.22));
   transform-origin: center bottom;
 }
 .mundo-abeja__rebote {
@@ -311,15 +316,13 @@
 
 /* ── Caída digna: el chunk 3D no bajó (señal intermitente) → espejo 2D ──── */
 .mundo-caida {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 12px;
+  position: relative;
   z-index: 6;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 0.8rem;
+  margin: 0 12px 12px;
   padding: 0.6rem 0.8rem;
   color: #2a2016;
   background: rgba(255, 251, 242, 0.95);
@@ -351,9 +354,15 @@
   outline: 2px solid #2a2016;
   outline-offset: 2px;
 }
-/* que el aviso no tape el final del espejo 2D en pantallas de 320px */
-.mundo-root[data-caida3d='1'] .mundo2d {
-  padding-bottom: 7.5rem;
+/* El espejo y el aviso ocupan filas distintas: nunca se enciman. */
+.mundo-root[data-caida3d='1'] {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+.mundo-caida__contenido {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
 }
 
 /* ── La miga: volver al valle + dónde-estoy (consistente en todo mundo) ── */

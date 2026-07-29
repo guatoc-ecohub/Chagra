@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * useHaptics — pruebas del contrato DR-3D-HAPTICA (§9):
  * patrones exactos del catálogo, gate triple (soporte + pref + reduced-motion),
@@ -38,10 +39,10 @@ describe('useHaptics — catálogo y disparo', () => {
     ];
     for (const [metodo, patron] of casos) {
       vibrate.mockClear();
-      result.current[metodo]();
+      /** @type {any} */ (result.current)[metodo]();
       // cancel-then-fire: primero vibrate(0), luego el patrón del catálogo.
       expect(vibrate).toHaveBeenNthCalledWith(1, 0);
-      expect(vibrate).toHaveBeenNthCalledWith(2, patron);
+      expect(vibrate).toHaveBeenNthCalledWith(2, /** @type {any} */ (patron));
     }
   });
 
@@ -61,7 +62,7 @@ describe('useHaptics — catálogo y disparo', () => {
     result.current.tap();
     result.current.tap(); // inmediato → dentro de la ventana de 120 ms
     const disparosTap = vibrate.mock.calls.filter(
-      (c) => c[0] === PATRONES_HAPTICOS.tap,
+      (c) => /** @type {any} */ (c)[0] === PATRONES_HAPTICOS.tap,
     );
     expect(disparosTap).toHaveLength(1);
   });

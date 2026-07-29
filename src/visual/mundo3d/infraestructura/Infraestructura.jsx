@@ -65,7 +65,7 @@ export default function Infraestructura({
   const frugal = esFrugal(tier);
 
   return (
-    <group position={pos} rotation={[0, rot, 0]}>
+    <group position={/** @type {[number, number, number]} */ (pos)} rotation={[0, rot, 0]}>
       <Pieza
         dims={dims}
         params={params}

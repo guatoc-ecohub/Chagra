@@ -1,0 +1,35 @@
+/*
+ * climaAccesorios.css — cadencia de los accesorios de clima (ruana/sombrero/sudor)
+ * de `AccesoriosClima.jsx`. Todo transform/opacity (GPU, gama baja). RM congela.
+ */
+
+/* SUDOR — la gotita salta de la frente y cae (solo con sol de día caluroso). */
+.crt-sudor .crt-gota-sudor {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: crt-sudor-salta 1.2s ease-in infinite;
+}
+@keyframes crt-sudor-salta {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+  12%  { opacity: 0.95; }
+  70%  { transform: translate(1.2px, 5px) scale(1.05); opacity: 0.9; }
+  100% { transform: translate(1.6px, 8px) scale(0.7); opacity: 0; }
+}
+
+/* RUANA — respira suave con el cuerpo (pliegue que se mece). */
+.crt-ruana {
+  transform-box: fill-box;
+  transform-origin: center top;
+  animation: crt-ruana-mece 3.4s ease-in-out infinite;
+}
+@keyframes crt-ruana-mece {
+  0%, 100% { transform: skewX(0deg); }
+  50%      { transform: skewX(1.4deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-sudor .crt-gota-sudor,
+  .crt-ruana { animation: none; }
+  /* Fotograma digno: la gota de sudor visible y quieta en la frente. */
+  .crt-sudor .crt-gota-sudor { opacity: 0.9; }
+}

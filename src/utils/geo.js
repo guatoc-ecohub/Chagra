@@ -399,10 +399,10 @@ export const latLngToPoint = (latlng) => ({
  * @returns {{ type: 'Polygon', coordinates: [[number, number]] }} GeoJSON Polygon.
  */
 export const latLngsToPolygon = (latlngs) => {
-  const ring = latlngs.map((ll) => [ll.lng, ll.lat]);
+  const ring = latlngs.map((ll) => /** @type {[number,number]} */ ([ll.lng, ll.lat]));
   return {
     type: 'Polygon',
-    coordinates: [closeRing(ring)],
+    coordinates: /** @type {any} */ ([closeRing(ring)]),
   };
 };
 

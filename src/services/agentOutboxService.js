@@ -77,7 +77,8 @@ function txDone(tx) {
  * @param {Object} [args.meta]       - metadata passthrough
  * @returns {Promise<number>} id del registro encolado
  */
-export async function enqueue({ kind, text = '', blob = null, mime = null, fileName = null, meta = {} } = {}) {
+export async function enqueue(opts = /** @type {any} */ ({})) {
+  const { kind, text = '', blob = null, mime = null, fileName = null, meta = {} } = opts;
   if (!VALID_KINDS.includes(kind)) {
     throw new Error(`[agentOutbox] kind inválido: ${kind} (debe ser ${VALID_KINDS.join(' | ')})`);
   }

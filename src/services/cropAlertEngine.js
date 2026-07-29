@@ -150,7 +150,7 @@ export async function runCropAlerts() {
     // subject_label no están en el tipo estrecho de FarmProcess.attributes).
     /** @type {any} */
     const a = c?.attributes || {};
-    const id = c?.process_id || c?.id;
+    const id = c?.process_id || /** @type {any} */ (c)?.id;
     if (!id) continue;
     const type = `crop_pest_${id}`;
 

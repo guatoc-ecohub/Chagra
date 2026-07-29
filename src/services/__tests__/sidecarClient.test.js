@@ -408,7 +408,7 @@ describe('sidecarClient — feature flag on', () => {
       expect(await getNormativaIca('delete_database', {})).toBeNull();
       expect(await getNormativaIca('', {})).toBeNull();
       expect(await getNormativaIca(null, {})).toBeNull();
-      expect(await getNormativaIca(42, {})).toBeNull();
+      expect(await getNormativaIca(/** @type {any} */ (42), {})).toBeNull();
       expect(fetchMock).not.toHaveBeenCalled();
     });
 
@@ -1091,6 +1091,57 @@ describe('sidecarClient — feature flag on', () => {
       const res = await pestVsDiseaseGuard('el trozador es plaga o enfermedad');
       expect(res).toBeNull();
     });
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// resolveEntities — filtro de entidades-ruido ANTES del prompt (canario
+// 2026-07-20): el resolver mapeó "ICA" → col rizada (Brassica oleracea) y
+// "Fuente" → Pennisetum setaceum, y el agente construyó su respuesta sobre
+// esas especies fantasma porque nada filtraba resolveEntities() antes de que
+// agentPromptBase.js las inyectara como "ENTIDADES RESUELTAS... autoritativo".
+// filterNoiseEntities (outputGuards.js) ya existía pero solo corría post-LLM
+// (applyOutputGuards). Este test cubre el cableado nuevo: filtrado en el
+// parseo mismo de /resolve-entities.
+// ──────────────────────────────────────────────────────────────────────────
+describe('sidecarClient — resolveEntities filtra entidades-ruido (canario 2026-07-20)', () => {
+  beforeEach(() => {
+    enableFlag();
+  });
+
+  it('descarta "ICA"→col rizada y "Fuente"→Pennisetum setaceum, conserva la especie real', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, {
+      entities: [
+        { mentioned: 'ICA', kind: 'species', nombre_comun: 'col rizada', nombre_cientifico: 'Brassica oleracea' },
+        { mentioned: 'Fuente', kind: 'species', nombre_comun: 'pasto fuente', nombre_cientifico: 'Pennisetum setaceum' },
+        { mentioned: 'papa', kind: 'species', nombre_comun: 'papa', nombre_cientifico: 'Solanum tuberosum' },
+      ],
+      grounding: null,
+    }));
+    const { resolveEntities } = await importFresh();
+    const res = await resolveEntities('¿de dónde sale esa recomendación? Dame la fuente o la entidad (ICA)');
+    expect(res.entities).toHaveLength(1);
+    expect(res.entities[0].mentioned).toBe('papa');
+  });
+
+  it('NO-REGRESIÓN: "pasto fuente" (mención completa) sobrevive el filtro', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, {
+      entities: [
+        { mentioned: 'pasto fuente', kind: 'species', nombre_comun: 'pasto fuente', nombre_cientifico: 'Pennisetum setaceum' },
+      ],
+      grounding: null,
+    }));
+    const { resolveEntities } = await importFresh();
+    const res = await resolveEntities('¿el pasto fuente es invasor?');
+    expect(res.entities).toHaveLength(1);
+    expect(res.entities[0].mentioned).toBe('pasto fuente');
+  });
+
+  it('entities vacío/ausente → sigue devolviendo [] sin romper', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, { grounding: null }));
+    const { resolveEntities } = await importFresh();
+    const res = await resolveEntities('hola');
+    expect(res).toEqual({ entities: [], grounding: null });
   });
 });
 

@@ -287,6 +287,171 @@ export async function getPestSynonyms() {
   return (rootCache && rootCache._pest_synonyms) || {};
 }
 
+// ---- SLICE conocimiento ampliado (2026-07-14) ---------------------------
+//
+// Seis nuevas secciones sourceadas (piso_termico, micorrizas, polinizacion,
+// cambio_climatico, fitoquimica, alelopatia). Cada una vive como clave
+// top-level con prefijo `_` (metadatos, igual que `_pest_index`). Los
+// accesores devuelven `null` si la sección no existe (degradación limpia
+// cuando se sirve un JSON viejo sin el enriquecimiento).
+
+const KNOWLEDGE_TOPIC_KEYS = [
+  '_piso_termico',
+  '_micorrizas',
+  '_polinizacion',
+  '_cambio_climatico',
+  '_fitoquimica',
+  '_alelopatia',
+];
+
+/**
+ * Lista de ids de tópicos de conocimiento ampliado disponibles en el grafo
+ * offline. Útil para que la UI o el agente decidan qué bloques de grounding
+ * inyectar.
+ * @returns {Promise<string[]>}
+ */
+export async function getKnowledgeTopics() {
+  await loadGrafoRelations();
+  if (!rootCache) return [];
+  return KNOWLEDGE_TOPIC_KEYS.filter((k) => rootCache[k]);
+}
+
+/**
+ * Sección cruda de un tópico de conocimiento (`_piso_termico`, `_micorrizas`,
+ * etc.). `null` si no existe o el cache no cargó.
+ * @param {string} topic uno de los ids declarados en `KNOWLEDGE_TOPIC_KEYS`
+ *   (con o sin `_` inicial — se normaliza).
+ * @returns {Promise<object | null>}
+ */
+export async function getKnowledgeTopic(topic) {
+  if (!topic) return null;
+  await loadGrafoRelations();
+  if (!rootCache) return null;
+  const key = topic.startsWith('_') ? topic : `_${topic}`;
+  if (!KNOWLEDGE_TOPIC_KEYS.includes(key)) return null;
+  return rootCache[key] ?? null;
+}
+
+/**
+ * Bloque de texto de grounding offline para un tópico de conocimiento. Si el
+ * tópico no existe devuelve ''. El formato es compacto y separaSources (citas
+ * DOI/autor/año) para que el LLM los cite.
+ * @param {string} topic
+ * @returns {Promise<string>}
+ */
+export async function buildKnowledgeTopicBlock(topic) {
+  const data = await getKnowledgeTopic(topic);
+  if (!data) return '';
+
+  const header = topic.startsWith('_') ? topic.slice(1) : topic;
+  const lines = [];
+  lines.push(`CONOCIMIENTO DEL GRAFO (offline) — ${header}:`);
+
+  if (typeof data.definicion === 'string' && data.definicion) {
+    lines.push(`- Definición: ${data.definicion}`);
+  }
+
+  const fuentes = Array.isArray(data.fuentes) ? data.fuentes : [];
+  if (fuentes.length) {
+    const citas = fuentes.map((f) => f.cite).filter(Boolean);
+    if (citas.length) lines.push(`- Fuentes: ${citas.join(' | ')}`);
+  }
+
+  // Piso térmico: enumerar pisos con especies
+  if (Array.isArray(data.pisos)) {
+    for (const piso of data.pisos) {
+      const alt = piso.altitud_m;
+      const t = piso.temperatura_media_c;
+      const altStr = alt ? `${alt.min}-${alt.max} m` : '?';
+      const tStr = t ? `${t.min}-${t.max} °C` : '?';
+      const cultivos = Array.isArray(piso.cultivos_representativos)
+        ? piso.cultivos_representativos
+        : [];
+      const nativas = Array.isArray(piso.especies_nativas_representativas)
+        ? piso.especies_nativas_representativas
+        : [];
+      const todas = [...cultivos, ...nativas];
+      const especiesStr = todas.length ? todas.join(', ') : 'sin especies del catálogo';
+      lines.push(
+        `- Piso ${piso.nombre} (${altStr}, ${tStr}): ${especiesStr}.`,
+      );
+      if (typeof piso.notas === 'string' && piso.notas) {
+        lines.push(`  · ${piso.notas}`);
+      }
+    }
+  }
+
+  // Micorrizas / polinizadores / etc.: enumerar tipos o elementos
+  if (Array.isArray(data.tipos)) {
+    for (const tipo of data.tipos) {
+      const hosp = Array.isArray(tipo.hospederos_en_grafo)
+        ? tipo.hospederos_en_grafo
+        : [];
+      const hospStr = hosp.length ? hosp.join(', ') : 'sin huéspedes en catálogo';
+      lines.push(`- ${tipo.nombre}: ${hospStr}.`);
+      if (typeof tipo.caracteristicas === 'string' && tipo.caracteristicas) {
+        lines.push(`  · ${tipo.caracteristicas}`);
+      }
+    }
+  }
+
+  if (Array.isArray(data.polinizadores)) {
+    for (const pol of data.polinizadores) {
+      const cultivos = Array.isArray(pol.cultivos_beneficiados_en_grafo)
+        ? pol.cultivos_beneficiados_en_grafo
+        : [];
+      const cultStr = cultivos.length ? cultivos.join(', ') : 'sin cultivos en catálogo';
+      lines.push(`- ${pol.nombre}: beneficia a ${cultStr}.`);
+      if (typeof pol.servicio === 'string' && pol.servicio) {
+        lines.push(`  · Servicio: ${pol.servicio}`);
+      }
+    }
+  }
+
+  if (Array.isArray(data.efectos)) {
+    for (const ef of data.efectos) {
+      lines.push(`- Efecto: ${ef.nombre}.`);
+      if (typeof ef.descripcion === 'string' && ef.descripcion) {
+        lines.push(`  · ${ef.descripcion}`);
+      }
+    }
+  }
+
+  if (Array.isArray(data.estrategias_resiliencia)) {
+    for (const est of data.estrategias_resiliencia) {
+      const nucleo = Array.isArray(est.especies_nucleo_en_grafo)
+        ? est.especies_nucleo_en_grafo
+        : [];
+      const nucleoStr = nucleo.length ? nucleo.join(', ') : 'sin especies en catálogo';
+      lines.push(`- Estrategia: ${est.nombre} (especies clave: ${nucleoStr}).`);
+    }
+  }
+
+  if (Array.isArray(data.metabolitos)) {
+    for (const met of data.metabolitos) {
+      const ejemplos = Array.isArray(met.ejemplos_en_grafo) ? met.ejemplos_en_grafo : [];
+      const ejStr = ejemplos
+        .map((e) => (e && e.especie_id ? `${e.especie_id}→${e.compuesto || '?'}` : ''))
+        .filter(Boolean)
+        .join(', ');
+      lines.push(`- ${met.nombre}: ${ejStr || 'sin ejemplos en catálogo'}.`);
+    }
+  }
+
+  if (Array.isArray(data.ejemplos_en_grafo)) {
+    for (const ej of data.ejemplos_en_grafo) {
+      if (!ej || !ej.especie_id) continue;
+      const comps = ej.compuesto_principal ? ` (${ej.compuesto_principal})` : '';
+      lines.push(`- ${ej.especie_id}${comps}.`);
+      if (typeof ej.uso_agroecologico === 'string' && ej.uso_agroecologico) {
+        lines.push(`  · Uso: ${ej.uso_agroecologico}`);
+      }
+    }
+  }
+
+  return lines.length > 1 ? lines.join('\n') : '';
+}
+
 /**
  * Reinicia el cache en memoria (uso en tests).
  */

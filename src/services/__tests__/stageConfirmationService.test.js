@@ -19,11 +19,11 @@ import { confirmStage } from '../stageConfirmationService';
 
 describe('confirmStage', () => {
   it('rechaza sin processId', async () => {
-    await expect(confirmStage({ newStage: 'flowering' })).rejects.toThrow(/process_id/);
+    await expect(confirmStage(/** @type {any} */ ({ newStage: 'flowering' }))).rejects.toThrow(/process_id/);
   });
 
   it('rechaza sin newStage', async () => {
-    await expect(confirmStage({ processId: 'p1' })).rejects.toThrow(/newStage/);
+    await expect(confirmStage(/** @type {any} */ ({ processId: 'p1' }))).rejects.toThrow(/newStage/);
   });
 
   it('lanza si proceso no existe', async () => {
@@ -40,13 +40,13 @@ describe('confirmStage', () => {
         updated_at: 1000,
       },
     };
-    vi.mocked(getFarmProcess).mockResolvedValue(mockProcess);
+    vi.mocked(getFarmProcess).mockResolvedValue(/** @type {any} */ (mockProcess));
 
     const result = await confirmStage({ processId: 'p1', newStage: 'flowering', reason: 'Flores visibles' });
 
     expect(recordFarmEvent).toHaveBeenCalled();
-    expect(mockProcess.attributes.current_stage).toBe('flowering');
-    expect(putFarmProcess).toHaveBeenCalledWith(mockProcess);
+    expect(/** @type {any} */ (mockProcess).attributes.current_stage).toBe('flowering');
+    expect(putFarmProcess).toHaveBeenCalledWith(/** @type {any} */ (mockProcess));
     expect(result.process.attributes.current_stage).toBe('flowering');
   });
 
@@ -56,7 +56,7 @@ describe('confirmStage', () => {
       type: 'farm_process',
       attributes: { current_stage: 'vegetative', updated_at: 1000 },
     };
-    vi.mocked(getFarmProcess).mockResolvedValue(mockProcess);
+    vi.mocked(getFarmProcess).mockResolvedValue(/** @type {any} */ (mockProcess));
 
     await confirmStage({ processId: 'p1', newStage: 'flowering' });
 

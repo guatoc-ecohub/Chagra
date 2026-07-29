@@ -22,7 +22,7 @@ const process = {
 
 describe('FarmProcessSummary', () => {
   it('muestra estado vacío sin proceso', () => {
-    render(<FarmProcessSummary process={null} />);
+    render(<FarmProcessSummary process={null} lastObservation={null} pestRisks={[]} />);
     expect(screen.getByText(/No hay ciclo activo/)).toBeDefined();
   });
 
@@ -49,7 +49,7 @@ describe('FarmProcessSummary', () => {
   });
 
   it('omite timeline en modo compacto', () => {
-    render(<FarmProcessSummary process={process} compact={true} />);
+    render(<FarmProcessSummary process={process} compact={true} lastObservation={null} pestRisks={[]} />);
     expect(screen.queryByText(/Timeline solanum_lycopersicum/)).toBeNull();
   });
 });

@@ -22,7 +22,7 @@ const EVENTS = [
 describe('aggregateLLMMetrics — totals', () => {
   it('retorna ceros para lista vacía o no-array', () => {
     for (const input of [[], null, undefined, 'x']) {
-      const { totals, byModel, byFlujo } = aggregateLLMMetrics(input);
+      const { totals, byModel, byFlujo } = aggregateLLMMetrics(/** @type {any} */ (input));
       expect(totals.total).toBe(0);
       expect(totals.successRate).toBe(0);
       expect(byModel).toEqual({});

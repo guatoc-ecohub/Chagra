@@ -202,8 +202,8 @@ const TONE_CLASSES = {
 };
 
 /**
- * AgentColibriChip — colibri clickable que abre el agente desde el home.
- * Default idle (vuelo estacionario), hover thinking (libando), click navega.
+ * AgentAngelitaChip — Angelita clickable que abre el agente desde el home.
+ * Default idle (vuelo estacionario), hover thinking, click navega.
  * Se anima en mouse over para invitar al click y en touch press en mobile.
  *
  * Bug móvil "Abrir Chagra IA no abre el overlay" (2026-06-20): el botón solo
@@ -217,7 +217,7 @@ const TONE_CLASSES = {
  * para suprimir el ghost-click, deduplicando con `navigatedByTouchRef` para que
  * el click sintético —si igual llega— no navegue dos veces.
  */
-function AgentColibriChip({ onNavigate, size = 26 }) {
+function AgentAngelitaChip({ onNavigate, size = 36 }) {
   const [hover, setHover] = useState(false);
   const [pressed, setPressed] = useState(false);
   const interactive = typeof onNavigate === 'function';
@@ -447,12 +447,12 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate = und
         aria-label="Impacto de Chagra"
       >
         <div className="flex items-center justify-between gap-2 px-1">
-          {/* Header con colibri clickable → abre el agente desde el home.
-              Hover anima a state thinking (libando), click navega y muestra el
+          {/* Header con Angelita clickable → abre el agente desde el home.
+              Hover anima a state thinking, click navega y muestra el
               tap feedback con scale. Si no hay onNavigate, queda inerte como
               header decorativo (ej. en pre-login). */}
           <h2 className="flex items-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-slate-400 min-w-0">
-            <AgentColibriChip onNavigate={onNavigate} size={collapsed ? 20 : 26} />
+            <AgentAngelitaChip onNavigate={onNavigate} size={collapsed ? 28 : 36} />
             <span className="truncate">Chagra · impacto</span>
           </h2>
           <div className="flex items-center gap-2 shrink-0">
@@ -609,7 +609,7 @@ export default function WelcomeStatsHero({ mode = 'post-login', onNavigate = und
             <div className="flex items-center justify-between gap-2 pt-4">
               <div>
                 <h2 className="flex items-center gap-2.5 text-base sm:text-lg font-black uppercase tracking-wider text-slate-200">
-                  <AgentColibriChip onNavigate={onNavigate} size={38} />
+                  <AgentAngelitaChip onNavigate={onNavigate} size={48} />
                   Chagra · impacto
                 </h2>
                 {isPreLogin && (

@@ -94,9 +94,9 @@ describe('interpretarCromatografia', () => {
 
   it('debería rechazar observaciones inválidas', () => {
     /** @type {ObservacionZona[]} */
-    const observaciones = [
+    const observaciones = /** @type {any} */ ([
       { zona: 'zonainvalida', colores: ['marron_oscuro'] },
-    ];
+    ]);
 
     const resultado = interpretarCromatografia(observaciones);
 
@@ -107,9 +107,9 @@ describe('interpretarCromatografia', () => {
 
   it('debería rechazar colores inválidos', () => {
     /** @type {ObservacionZona[]} */
-    const observaciones = [
+    const observaciones = /** @type {any} */ ([
       { zona: 'central', colores: ['colorinvalido'] },
-    ];
+    ]);
 
     const resultado = interpretarCromatografia(observaciones);
 

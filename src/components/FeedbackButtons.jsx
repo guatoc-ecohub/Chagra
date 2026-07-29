@@ -16,7 +16,7 @@ export default function FeedbackButtons({
   response,
   edges = [],
   onConsentNeeded,
-  onFeedbackSent,
+  onFeedbackSent = undefined,
   modulo = null,
   enAsistente = false,
 }) {

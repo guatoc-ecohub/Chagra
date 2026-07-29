@@ -1,0 +1,73 @@
+{
+  "species_slug": "melissa_officinalis",
+  "scientific_name": "Melissa officinalis L.",
+  "common_names": [
+    "Toronjil"
+  ],
+  "family": "Lamiaceae",
+  "category": "medicinales_alelopaticas",
+  "cultivable": true,
+  "conservation_status": "cultivo_comun",
+  "thermal_zones": [
+    "templado",
+    "frio"
+  ],
+  "roles_in_guild": [
+    "crop",
+    "pollinator_attractor",
+    "pest_repellent"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "metodo_principal": "division_mata",
+    "notas": "Fácil propagación vegetativa mediante la separación de macollos estacionales."
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 1000,
+      "optimo_min": 1800,
+      "optimo_max": 2700,
+      "max_absoluto": 3200
+    },
+    "temperatura_c": {
+      "helada_letal": -15,
+      "optimo_min": 10,
+      "optimo_max": 20,
+      "max_tolerable": 27
+    },
+    "radiacion": "sombra_parcial",
+    "drenaje_requerido": "bueno_a_moderado"
+  },
+  "valor_pedagogico": "Melissa officinalis, conocida como toronjil o melisa, se cultiva en Colombia en departamentos como Bogotá DC, Boyacá, Cauca, Cundinamarca, Huila, Santander y Valle del Cauca, entre 1200 y 2800 msnm en zonas térmicas templadas y frías. Su manejo agronómico incluye propagación vegetativa mediante división de macollos estacionales, ciclo perenne de 2-3 años con podas de renovación, asociaciones beneficiosas con tomate y coles para confundir plagas mediante su aroma cítrico, y manejo de áfidos y trips mediante monitoreo y biopreparados andinos. En el contexto campesino andino, sus hojas se utilizan tradicionalmente en infusiones digestivas y calmantes, siendo parte del botiquín casero desde la época colonial para aliviar nerviosismo y trastornos del sueño. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Melissa officinalis L.",
+  "companions_markdown": "### Especies asociadas favorables\n\nEstas especies favorecen el cultivo cuando se siembran cerca:\n- solanum_lycopersicum_san_marzano — Tomate San Marzano (Solanum lycopersicum 'San Marzano')",
+  "sources": [
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "agrosavia-sol-andina",
+      "title": "agrosavia-sol-andina",
+      "tier": "A",
+      "url": "https://www.agrosavia.co"
+    },
+    {
+      "id": "ica-resolucion-3168-2015",
+      "title": "ica-resolucion-3168-2015",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.362Z"
+}

@@ -1,0 +1,333 @@
+/*
+ * minimapaValle.css — el minimapa RTS del valle (MinimapaValle.jsx).
+ *
+ * Estética AoE aterrizada a Chagra: marco de madera con tachuelas de latón,
+ * mapa oscuro adentro, blips que brillan, cono de cámara translúcido.
+ * Overlay de esquina inferior-derecha, colapsable, legible en teléfono.
+ * Autocontenido: cero assets, todo CSS/SVG.
+ */
+
+.mmv {
+  position: absolute;
+  right: 12px;
+  top: 74px; /* bajo el título 'El valle de mi finca'; ya no lo tapan la barra de preguntar ni el botón Voz */
+  z-index: 30;
+  width: 182px; /* +20%: a 152px los iconos no se leían (operador) */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+}
+
+/* ── El marco: madera barnizada con bisel, tachuelas de latón ──────────── */
+.mmv-marco {
+  position: relative;
+  padding: 5px;
+  border-radius: 13px;
+  background:
+    linear-gradient(155deg, #8a6733 0%, #5d431d 42%, #7d5c2a 68%, #3c2b11 100%);
+  box-shadow:
+    0 5px 16px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 228, 165, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+}
+
+.mmv-tachuela {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe9b0, #b78a3a 55%, #6d4d1c);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+.mmv-tachuela--tl { top: 3px; left: 3px; }
+.mmv-tachuela--tr { top: 3px; right: 3px; }
+.mmv-tachuela--bl { bottom: 3px; left: 3px; }
+.mmv-tachuela--br { bottom: 3px; right: 3px; }
+
+/* ── El mapa ───────────────────────────────────────────────────────────── */
+.mmv-mapa {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 9px;
+  background: #17231a;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.55),
+    inset 0 0 14px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+/* El terreno del mapa va MÁS CLARO que la escena (antes lo oscurecía a 0.88):
+   así los pisos térmicos se distinguen y el páramo se lee arriba, y encima los
+   blips de colores resaltan contra un fondo claro en vez de pelearse con él. */
+.mmv-terreno {
+  filter: brightness(1.18) saturate(0.86);
+}
+
+/* Las crestas separan los pisos: con el fondo claro pueden marcarse más. */
+.mmv-cresta {
+  fill: none;
+  stroke-width: 0.9;
+  opacity: 0.72;
+}
+
+.mmv-cordillera path {
+  fill: none;
+  stroke: #9fb5a8;
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.55;
+}
+
+.mmv-senderos path {
+  fill: none;
+  stroke: #cfa268;
+  stroke-width: 0.9;
+  stroke-dasharray: 2 1.7;
+  stroke-linecap: round;
+  opacity: 0.62;
+}
+
+.mmv-quebrada-brillo {
+  fill: none;
+  stroke: #7fd4ff;
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  opacity: 0.22;
+}
+.mmv-quebrada {
+  fill: none;
+  stroke: #a9e2ff;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  opacity: 0.9;
+}
+
+.mmv-casa rect {
+  fill: #f3ead8;
+  stroke: rgba(0, 0, 0, 0.4);
+  stroke-width: 0.4;
+}
+.mmv-casa-techo {
+  fill: #b0582f;
+  stroke: rgba(0, 0, 0, 0.35);
+  stroke-width: 0.4;
+}
+
+.mmv-vineta {
+  pointer-events: none;
+}
+
+/* ── El cono de cámara (viewport RTS) ──────────────────────────────────── */
+.mmv-cam {
+  pointer-events: none;
+  transition: transform 0.7s cubic-bezier(0.33, 1, 0.68, 1);
+}
+.mmv-cam-cono {
+  fill: rgba(255, 255, 255, 0.09);
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+
+/* ── Los blips ─────────────────────────────────────────────────────────── */
+.mmv-blip {
+  cursor: pointer;
+  outline: none;
+}
+.mmv-blip-tap {
+  fill: transparent;
+  pointer-events: all;
+}
+.mmv-blip-punto {
+  stroke: rgba(0, 0, 0, 0.5);
+  stroke-width: 0.7;
+  paint-order: stroke;
+  transition: stroke 0.2s ease;
+}
+.mmv-blip-emoji {
+  font-size: 8px; /* era 5px: ilegible. A 182px de mapa esto son ~14px reales */
+  pointer-events: none;
+  dominant-baseline: middle;
+}
+.mmv-blip:hover .mmv-blip-punto,
+.mmv-blip:focus-visible .mmv-blip-punto {
+  stroke: rgba(255, 255, 255, 0.95);
+  stroke-width: 1.1;
+}
+.mmv-blip--foco .mmv-blip-punto,
+.mmv-blip--armado .mmv-blip-punto {
+  stroke: #fff;
+  stroke-width: 1.1;
+}
+
+/* En pantalla táctil el hit-area del blip crece hacia el target de 44px
+   (r es geometry property CSS en SVG2; el atributo r="8.2" queda de base). */
+@media (pointer: coarse) {
+  .mmv-blip-tap { r: 15.5px; }
+}
+
+/* el aro que pulsa sobre el lugar en foco */
+.mmv-blip-aro {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 1.1;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mmv-pulso 1.7s ease-out infinite;
+}
+@keyframes mmv-pulso {
+  0% { transform: scale(0.55); opacity: 0.95; }
+  70% { transform: scale(1.12); opacity: 0.18; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+
+/* ── Los labels: chips con el nombre del lugar ─────────────────────────────
+   HTML posicionado en % sobre el área del mapa (inset = padding del marco).
+   Aparecen en hover / foco de teclado / blip armado (táctil); el del foco
+   de la escena queda fijo. Aparición y salida con la misma transición. */
+.mmv-labels {
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.mmv-label {
+  /* desplazamiento respecto del blip: arriba-centrado por defecto,
+     ajustable por modificadores de borde */
+  --lx: -50%;
+  --ly: calc(-100% - 9px);
+  position: absolute;
+  max-width: 132px;
+  padding: 3px 7px;
+  border: 1px solid rgba(255, 233, 176, 0.28);
+  border-radius: 7px;
+  background: rgba(10, 16, 12, 0.9);
+  color: #f6efdd;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transform: translate(var(--lx), var(--ly)) scale(0.92);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+.mmv-label--on {
+  opacity: 1;
+  transform: translate(var(--lx), var(--ly)) scale(1);
+}
+
+/* cerca del borde superior el chip baja; cerca de los laterales se corre */
+.mmv-label--abajo { --ly: 11px; }
+.mmv-label--izq { --lx: -12%; }
+.mmv-label--der { --lx: -88%; }
+
+/* el label del lugar en foco: fijo, con el latón del marco más presente */
+.mmv-label--foco {
+  border-color: rgba(255, 233, 176, 0.55);
+}
+
+/* la pista del 2º toque (solo en el chip armado por táctil) */
+.mmv-label-pista {
+  display: block;
+  margin-top: 1px;
+  font-size: 8.5px;
+  font-style: normal;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* ── Plegar / desplegar ────────────────────────────────────────────────── */
+.mmv-toggle {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  z-index: 2;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe3a0, #b78a3a 60%, #6d4d1c);
+  color: #3c2b11;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mmv-toggle:focus-visible {
+  outline: 2px solid #ffe9b0;
+  outline-offset: 1px;
+}
+
+.mmv--cerrado {
+  width: auto;
+}
+.mmv-toggle--abrir {
+  position: static;
+  width: 42px;
+  height: 42px;
+  font-size: 20px;
+  border-radius: 50%;
+}
+
+/* ── Presupuesto: tier bajo o "menos movimiento" ───────────────────────── */
+.mmv--quieto .mmv-blip-aro {
+  animation: none;
+  transform: scale(1);
+  opacity: 0.6;
+}
+.mmv--quieto .mmv-cam {
+  transition: none;
+}
+.mmv--quieto .mmv-terreno {
+  filter: none;
+}
+.mmv--quieto .mmv-quebrada-brillo {
+  display: none;
+}
+.mmv--quieto .mmv-label {
+  transition: none;
+  transform: translate(var(--lx), var(--ly)) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mmv .mmv-blip-aro { animation: none; transform: scale(1); opacity: 0.6; }
+  .mmv .mmv-cam { transition: none; }
+  .mmv .mmv-label {
+    transition: none;
+    transform: translate(var(--lx), var(--ly)) scale(1);
+  }
+}
+
+/* ── Teléfono: más chico, más pegado a la esquina ──────────────────────── */
+@media (max-width: 480px) {
+  .mmv {
+    width: 126px;
+    right: 8px;
+    bottom: 8px;
+  }
+  .mmv-toggle {
+    width: 24px;
+    height: 24px;
+  }
+  .mmv-label {
+    max-width: 112px;
+    font-size: 9.5px;
+  }
+  .mmv-label-pista {
+    font-size: 8px;
+  }
+}

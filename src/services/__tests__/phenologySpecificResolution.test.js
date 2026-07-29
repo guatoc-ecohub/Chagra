@@ -21,7 +21,7 @@ describe('Tarea #62 — fenología específica vs genérica', () => {
     it('la especie específica gana incluso si se pasa una categoría con genérico', () => {
       // Aunque exista genérico para 'cereales', maíz tiene plantilla propia.
       const windows = calculateWindows({ speciesSlug: 'zea_mays', sowingDate: SOWING, category: 'cereales' });
-      expect(windows.every((w) => !w.isGeneric)).toBe(true);
+      expect(windows.every((w) => !(/** @type {any} */ (w)).isGeneric)).toBe(true);
       // Cosecha de maíz cae en ventana específica de su plantilla.
       const harvest = windows.find((w) => w.code === 'harvest_window');
       expect(harvest.status).toBe('computed');
@@ -73,7 +73,7 @@ describe('Tarea #62 — fenología específica vs genérica', () => {
     it('todas las etapas de plantilla especifica tienen isGeneric falso', () => {
       const windows = calculateWindows({ speciesSlug: 'solanum_tuberosum', sowingDate: SOWING, altitudeM: 2000 });
       for (const w of windows) {
-        expect(w.isGeneric).toBe(false);
+        expect(/** @type {any} */ (w).isGeneric).toBe(false);
       }
     });
   });
@@ -102,8 +102,8 @@ describe('Tarea #62 — fenología específica vs genérica', () => {
     it('un cultivar usa la plantilla específica de la especie madre (NO el genérico)', () => {
       const t = getTemplate('solanum_lycopersicum_san_marzano');
       expect(t).toBeTruthy();
-      expect(t.derived_from).toBe('solanum_lycopersicum');
-      expect(t.is_generic).toBeFalsy();
+      expect(/** @type {any} */ (t).derived_from).toBe('solanum_lycopersicum');
+      expect(/** @type {any} */ (t).is_generic).toBeFalsy();
       // Conserva el slug pedido pero las etapas reales del tomate.
       expect(t.species_slug).toBe('solanum_lycopersicum_san_marzano');
       expect(t.stages.find((s) => s.code === 'flowering')).toBeTruthy();
@@ -116,7 +116,7 @@ describe('Tarea #62 — fenología específica vs genérica', () => {
       const ch = cultivar.find((w) => w.code === 'harvest_window');
       expect(ch.windowStart).toBe(ph.windowStart);
       expect(ch.windowEnd).toBe(ph.windowEnd);
-      expect(ch.isGeneric).toBeFalsy();
+      expect(/** @type {any} */ (ch).isGeneric).toBeFalsy();
     });
 
     it('la etapa derivada del cultivar avanza igual que la de la especie madre', () => {
@@ -200,7 +200,7 @@ describe('Tarea #62 — fenología específica vs genérica', () => {
     it('las ventanas genéricas se marcan isGeneric y bajan la confianza', () => {
       const windows = calculateWindows({ speciesSlug: 'allium_fistulosum', sowingDate: SOWING, category: 'hortalizas_hoja' });
       const veg = windows.find((w) => w.code === 'vegetative');
-      expect(veg.isGeneric).toBe(true);
+      expect(/** @type {any} */ (veg).isGeneric).toBe(true);
       // Confianza fuerte hacia abajo: NO aparenta dato firme de la especie.
       expect(veg.confidence).toBeLessThanOrEqual(0.3);
       // La fuente declara explícitamente que es aproximación por tipo.
@@ -225,7 +225,7 @@ describe('Tarea #62 — fenología específica vs genérica', () => {
     it('plantilla generica con altitud mantiene confianza baja en no-sowing', () => {
       const windows = calculateWindows({ speciesSlug: 'allium_fistulosum', sowingDate: SOWING, altitudeM: 1500, category: 'hortalizas_hoja' });
       const veg = windows.find((w) => w.code === 'vegetative');
-      expect(veg.isGeneric).toBe(true);
+      expect(/** @type {any} */ (veg).isGeneric).toBe(true);
       expect(veg.confidence).toBeLessThanOrEqual(0.3);
     });
   });

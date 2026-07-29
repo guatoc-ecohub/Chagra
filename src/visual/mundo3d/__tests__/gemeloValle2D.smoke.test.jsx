@@ -31,7 +31,7 @@ describe('GemeloValle2D — el gemelo 2D de primera clase del valle', () => {
 
   test('tocar un lugar dispara onEntrar con el id del mundo', () => {
     const onEntrar = vi.fn();
-    const { getByRole } = render(<GemeloValle2D clima="soleado" onEntrar={onEntrar} />);
+    const { getByRole } = render(<GemeloValle2D clima="soleado" onEntrar={onEntrar} onAlerta={vi.fn()} />);
     const cafe = MUNDOS_VALLE.find((m) => m.id === 'cafe');
     fireEvent.click(getByRole('button', { name: new RegExp(`Viajar al mundo ${cafe.titulo}`) }));
     expect(onEntrar).toHaveBeenCalledWith('cafe');
@@ -39,35 +39,35 @@ describe('GemeloValle2D — el gemelo 2D de primera clase del valle', () => {
 
   test('la cosa del día se ancla a su mundo y dispara onAlerta', () => {
     const onAlerta = vi.fn();
-    const { getByRole } = render(<GemeloValle2D clima="soleado" onAlerta={onAlerta} />);
+    const { getByRole } = render(<GemeloValle2D clima="soleado" onAlerta={onAlerta} onEntrar={vi.fn()} />);
     const alerta = getByRole('button', { name: new RegExp(`Alerta del día: ${COSA_DEL_DIA.titulo}`) });
     fireEvent.click(alerta);
     expect(onAlerta).toHaveBeenCalledTimes(1);
   });
 
   test('el clima tiñe la lámina (data-clima) y la noche trae estrellas', () => {
-    const { container, rerender } = render(<GemeloValle2D clima="noche" />);
+    const { container, rerender } = render(<GemeloValle2D clima="noche" onEntrar={vi.fn()} onAlerta={vi.fn()} />);
     const raiz = container.querySelector('.gemelo-valle');
     expect(raiz).toHaveAttribute('data-clima', 'noche');
     expect(container.querySelectorAll('.gv-titila').length).toBeGreaterThan(5);
-    rerender(<GemeloValle2D clima="lluvia" />);
+    rerender(<GemeloValle2D clima="lluvia" onEntrar={vi.fn()} onAlerta={vi.fn()} />);
     expect(container.querySelector('.gv-lluvia')).toBeInTheDocument();
-    rerender(<GemeloValle2D clima="niebla" />);
+    rerender(<GemeloValle2D clima="niebla" onEntrar={vi.fn()} onAlerta={vi.fn()} />);
     expect(container.querySelector('.gv-niebla')).toBeInTheDocument();
   });
 
   test('reducedMotion congela la lámina a un fotograma digno (data-quieto)', () => {
-    const { container } = render(<GemeloValle2D clima="noche" reducedMotion />);
+    const { container } = render(<GemeloValle2D clima="noche" reducedMotion onEntrar={vi.fn()} onAlerta={vi.fn()} />);
     expect(container.querySelector('.gemelo-valle')).toHaveAttribute('data-quieto', 'si');
     // sin movimiento no hay luciérnagas (decoración solo-animada)
     expect(container.querySelector('.gv-luciernaga')).not.toBeInTheDocument();
   });
 
   test('focoId acerca la cámara-lámina hacia el lugar (entrar al mundo)', () => {
-    const { container } = render(<GemeloValle2D clima="soleado" focoId="suelo" />);
+    const { container } = render(<GemeloValle2D clima="soleado" focoId="suelo" onEntrar={vi.fn()} onAlerta={vi.fn()} />);
     expect(container.querySelector('.gemelo-valle')).toHaveAttribute('data-entrando', 'si');
     const cam = container.querySelector('.gemelo-valle__cam');
-    expect(cam.style.transform).toContain('scale(1.45)');
+    expect(cam.getAttribute('style')).toContain('scale(1.45)');
   });
 
   test('adaptador GemeloValleEscena habla el contrato del framework (onHotspot)', () => {

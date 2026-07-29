@@ -75,13 +75,13 @@ describe('voiceTelemetryService', () => {
 
   describe('recordEvent', () => {
     it('persiste un evento y retorna el objeto', async () => {
-      const ev = await recordEvent({
+      const ev = await recordEvent(/** @type {any} */ ({
         event_type: 'voice_capture_start',
         flujo: 'siembra',
         duration_ms: 1500,
         accepted: true,
         connectivity: 'online',
-      });
+      }));
 
       expect(ev).not.toBeNull();
       expect(ev.event_type).toBe('voice_capture_start');
@@ -92,7 +92,7 @@ describe('voiceTelemetryService', () => {
 
     it('retorna null si openDB falla', async () => {
       vi.mocked(openDB).mockRejectedValueOnce(new Error('DB error'));
-      const ev = await recordEvent({ event_type: 'test' });
+      const ev = await recordEvent(/** @type {any} */ ({ event_type: 'test' }));
       expect(ev).toBeNull();
     });
   });

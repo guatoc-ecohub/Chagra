@@ -1,0 +1,94 @@
+{
+  "species_slug": "puya_clava_herculis",
+  "scientific_name": "Puya clava-herculis Mez & Sodiro",
+  "common_names": [
+    "Puya gigante de páramo"
+  ],
+  "family": "Bromeliaceae",
+  "category": "ornamentales_nativas",
+  "cultivable": false,
+  "conservation_status": "nativo_protegido",
+  "thermal_zones": [
+    "paramo"
+  ],
+  "roles_in_guild": [
+    "pollinator_attractor",
+    "nurse_plant"
+  ],
+  "antagonists": [],
+  "especies_nativas_sustitutas": [],
+  "propagation": {
+    "methods": [
+      "semilla"
+    ],
+    "best_method": "semilla",
+    "protocol_resumen": "PROHIBIDA EXTRACCIÓN — Ley 1930/2018 Páramos. Solo investigación con permiso MADS-IAvH. Reproducción exclusivamente por semilla en sitio natural: una planta produce 100.000-1.000.000 de semillas en su única floración a los 15-30 años (estrategia monocárpica masiva). Germinación lenta en suelo de páramo sobre musgo. NO transferir a horticultura: es especie de hábitat páramo y NO sobrevive fuera de él.",
+    "tiempo_a_establecimiento_dias": 730,
+    "notas": "Compañera ecológica icónica del frailejón (Espeletia spp.): juntos forman el paisaje arquetípico del páramo andino colombiano-ecuatoriano. La puya provee refugio invernal a colibríes paramunos y oso de anteojos (Tremarctos ornatus) que consume su pulpa carnosa. Bajo PROTECCIÓN de Ley 1930/2018 Páramos.",
+    "fuente": "Humboldt 2016 Frailejones; Bernal 2015; POWO; Smith & Downs 1977; Ley 1930/2018 Páramos"
+  },
+  "requirements": {
+    "agua": "medio",
+    "altitud_msnm": {
+      "min_absoluto": 3000,
+      "optimo_min": 3500,
+      "optimo_max": 4200,
+      "max_absoluto": 4500
+    },
+    "temperatura_c": {
+      "helada_letal": -8,
+      "optimo_min": 3,
+      "optimo_max": 12,
+      "max_tolerable": 18
+    },
+    "radiacion": "sol_pleno",
+    "drenaje_requerido": "excelente"
+  },
+  "valor_pedagogico": "La puya gigante de páramo o puya hércules (Puya clava-herculis Mez & Sodiro, Bromeliaceae) es una de las plantas más espectaculares y emblemáticas del páramo andino colombiano-ecuatoriano y compañera ecológica inseparable del frailejón en el paisaje arquetípico del alto-andino. Especie nativa de los páramos de Colombia y Ecuador en la Cordillera Oriental, Central y Occidental entre 3.000 y 4.500 msnm en zona térmica paramuna (temperaturas medias 3-12°C, radiación UV-B intensa, suelo turboso ácido, oscilación térmica diurna extrema -8 a +18°C). Es planta bromelia terrestre monocárpica gigante (es decir: florece una sola vez en su vida y muere): durante 15-30 años acumula biomasa en forma de roseta basal de 1-1,5 m de diámetro con hojas largas espinosas (hasta 60 cm) en disposición radial densa, y al final del ciclo produce una única inflorescencia masiva erguida en forma de clava o maza vegetal de hasta 2-3 metros de altura (de ahí \"clava-herculis\" = clava de Hércules en latín, comparando la inflorescencia con el arma del héroe griego) cubierta de cientos a miles de flores tubulares verde-azuladas-blanquecinas que producen néctar abundante. Tras producir 100.000 a 1.000.000 de semillas en una sola floración (estrategia \"big bang\" reproductivo de bromelias monocárpicas), la planta madre muere por completo. Es lección extraordinaria de cómo la evolución resuelve la reproducción en hábitats extremos: en lugar de florecer pequeño cada año (estrategia anual) o de hacer múltiples floraciones medianas (estrategia plurianual), la puya invierte décadas acumulando reservas para un solo evento reproductivo masivo que satura el ambiente con semillas, garantizando que alguna fracción germine en sitios óptimos. Función ecológica crítica en el páramo: (1) Refugio invernal y nidificación para colibríes paramunos como el Oxypogon (chivito andino, endémico Colombia), el inca alirrosa Coeligena phalerata y otros; (2) Fuente esencial de alimento para el oso de anteojos (Tremarctos ornatus, único oso de Suramérica, especie casi-amenazada VU) que se alimenta de la pulpa carnosa de su base y de la inflorescencia, siendo dispersor primario de sus semillas a través de las heces — relación coevolutiva planta-oso única en los Andes; (3) Refugio térmico microclimático en su roseta espinosa donde anfibios paramunos, reptiles, roedores pequeños se cobijan del frío nocturno; (4) Compañera ecológica del frailejón (Espeletia spp., Asteraceae): juntos forman el paisaje arquetípico del páramo y comparten polinizadores y dispersores. Protección legal absoluta: Ley 1930/2018 de Páramos prohíbe cualquier actividad que afecte el ecosistema paramuno; extracción de puya silvestre es delito ambiental con penas hasta 144 meses de prisión (Ley 1333/2009). La especie NO ES CULTIVABLE en jardinería doméstica ni comercial: requiere las condiciones únicas del páramo (UV-B alta, oscilación térmica extrema, suelo turboso, microbiota local) que NO se reproducen en cualquier otro ambiente — intentar cultivarla fuera del páramo resulta en muerte. Su uso único permitido es la restauración ecológica de páramos degradados (post-quema, post-ganadería, post-minería) con permiso MADS-IAvH-Parques Nacionales y usando semillas locales del mismo páramo para preservar genotipos adaptados (NO mezclar genotipos entre páramos diferentes — cada páramo es una isla genética). Es lección extraordinaria de conservación ecosistémica: la puya enseña que el páramo NO es un conjunto de plantas aisladas sino una red coevolutiva (puya-frailejón-colibrí-oso-musgo-suelo turboso) donde sacar una pieza colapsa todo el sistema, y donde el agua que toma Bogotá, Bucaramanga, Tunja, Pereira proviene literalmente del trabajo conjunto de estas plantas almacenando lluvia y neblina. Conservar el páramo es conservar el agua de Colombia. Fuentes Tier A: Humboldt 2016 Frailejones, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, IAvH Humboldt Flora Alto-Andina, SiB Colombia.",
+  "sources": [
+    {
+      "id": "humboldt-2016-frailejones",
+      "title": "humboldt-2016-frailejones",
+      "tier": "A",
+      "url": "https://www.humboldt.org.co"
+    },
+    {
+      "id": "bernal-2015-plantas-liquenes-colombia",
+      "title": "bernal-2015-plantas-liquenes-colombia",
+      "tier": "A",
+      "url": "http://catalogoplantasdecolombia.unal.edu.co"
+    },
+    {
+      "id": "powo-kew",
+      "title": "powo-kew",
+      "tier": "A",
+      "url": "https://powo.science.kew.org"
+    },
+    {
+      "id": "gbif-taxonomic-backbone",
+      "title": "gbif-taxonomic-backbone",
+      "tier": "A",
+      "url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    },
+    {
+      "id": "humboldt-flora-alto-andina",
+      "title": "humboldt-flora-alto-andina",
+      "tier": "A",
+      "url": null
+    },
+    {
+      "id": "sib-colombia",
+      "title": "sib-colombia",
+      "tier": "A",
+      "url": "https://sibcolombia.net"
+    },
+    {
+      "id": "ley-1930-2018-paramos",
+      "title": "ley-1930-2018-paramos",
+      "tier": "A",
+      "url": null
+    }
+  ],
+  "_generated_by": "scripts/build-cycle-content-from-catalog.mjs",
+  "_generated_at": "2026-05-19T00:42:57.391Z"
+}

@@ -150,9 +150,9 @@ describe('dataBackup.downloadBackupJSON', () => {
     try {
       const result = await downloadBackupJSON();
       expect(createObjectURL).toHaveBeenCalledTimes(1);
-      const blobArg = createObjectURL.mock.calls[0][0];
+      const blobArg = /** @type {any[]} */ (createObjectURL.mock.calls[0])[0];
       expect(blobArg).toBeInstanceOf(Blob);
-      expect(blobArg.type).toBe('application/json');
+      expect(/** @type {any} */ (blobArg).type).toBe('application/json');
       expect(clickSpy).toHaveBeenCalledTimes(1);
       // El filename debe seguir el patrón chagra-backup-YYYY-MM-DD-HHMM.json
       expect(result._filename).toMatch(/^chagra-backup-\d{4}-\d{2}-\d{2}-\d{4}\.json$/);

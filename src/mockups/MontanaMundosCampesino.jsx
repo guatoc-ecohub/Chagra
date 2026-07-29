@@ -46,6 +46,7 @@ import SceneFincaOrganismo from '../components/dashboard/SceneFincaOrganismo';
 import '../components/dashboard/scene-finca-organismo.css';
 import GuardianEspiritu from '../components/dashboard/GuardianEspiritu';
 import ArbolDeMundos from '../components/dashboard/ArbolDeMundos';
+import { navegarDesde3D } from '../prodApp/wire3DNav.js';
 
 // ── Geometría de la escena (unidades del viewBox 390×1440) ──────────────────
 const VB_W = 390;
@@ -965,7 +966,12 @@ export default function MontanaMundosCampesino({ onBack = null }) {
               style={{ left: pct(m.x, VB_W), top: pct(m.y, VB_H) }}
               data-testid={`mm2-mundo-${m.id}`}
               aria-label={`${m.etiqueta}: abre ${m.abre}`}
-              onClick={() => (m.escena ? setEscena(m.escena) : avisar(`Aquí se abre ${m.abre}.`))}
+              onClick={() => {
+                if (m.escena) { setEscena(m.escena); return; }
+                avisar(`Aquí se abre ${m.abre}.`);
+                // Navegar a la ruta 2D correspondiente (wire nav 3D→2D)
+                setTimeout(() => navegarDesde3D(m.id), 600);
+              }}
             >
               <span className="mm2-mundo-halo" aria-hidden="true" />
               <span className="mm2-mundo-etiqueta">

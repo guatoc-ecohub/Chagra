@@ -38,12 +38,12 @@ import {
 } from '../milpaGameEngine';
 
 /** Helper: parcela con los cultivos indicados. */
-const parcelaCon = (...cultivos) =>
-  cultivos.reduce((p, c) => sembrarEnParcela(p, c), crearParcela('t'));
+const parcelaCon = (/** @type {string[]} */ ...cultivos) =>
+  cultivos.reduce((p, c) => sembrarEnParcela(/** @type {any} */ (p), c), /** @type {any} */ (crearParcela('t')));
 
 describe('milpaGameEngine — siembra', () => {
   it('siembra y quita un cultivo (toggle), sin duplicar', () => {
-    let p = crearParcela('1');
+    let p = /** @type {any} */ (crearParcela('1'));
     p = sembrarEnParcela(p, CULTIVOS.MAIZ);
     expect(p.cultivos).toEqual([CULTIVOS.MAIZ]);
     p = sembrarEnParcela(p, CULTIVOS.MAIZ); // toggle off
@@ -51,12 +51,12 @@ describe('milpaGameEngine — siembra', () => {
   });
 
   it('ignora cultivos que no son válidos', () => {
-    const p = sembrarEnParcela(crearParcela('1'), 'invalido');
+    const p = sembrarEnParcela(/** @type {any} */ (crearParcela('1')), 'invalido');
     expect(p.cultivos).toEqual([]);
   });
 
   it('limita la siembra por espacios de parcela', () => {
-    let p = crearParcela('1');
+    let p = /** @type {any} */ (crearParcela('1'));
     p = sembrarEnParcela(p, CULTIVOS.MAIZ);
     p = sembrarEnParcela(p, CULTIVOS.FRIJOL);
     p = sembrarEnParcela(p, CULTIVOS.AHUYAMA);
@@ -70,11 +70,11 @@ describe('milpaGameEngine — siembra', () => {
   });
 
   it('espaciosUsadosParcela devuelve 0 para parcela vacía', () => {
-    expect(espaciosUsadosParcela(crearParcela('1'))).toBe(0);
+    expect(espaciosUsadosParcela(/** @type {any} */ (crearParcela('1')))).toBe(0);
   });
 
   it('cabeCultivoEnParcela rechaza cultivos inválidos', () => {
-    const p = crearParcela('1');
+    const p = /** @type {any} */ (crearParcela('1'));
     expect(cabeCultivoEnParcela(p, 'invalido')).toBe(false);
   });
 
@@ -134,8 +134,8 @@ describe('milpaGameEngine — siembra', () => {
 
   it('describirAsociacionCompleta devuelve vacío para tipo desconocido', () => {
     expect(describirAsociacionCompleta('inexistente')).toBe('');
-    expect(describirAsociacionCompleta(null)).toBe('');
-    expect(describirAsociacionCompleta(undefined)).toBe('');
+    expect(describirAsociacionCompleta(/** @type {any} */ (null))).toBe('');
+    expect(describirAsociacionCompleta(/** @type {any} */ (undefined))).toBe('');
   });
 
   it('reconoce asociaciones completas', () => {
@@ -215,7 +215,7 @@ describe('milpaGameEngine — relaciones agroecológicas reales', () => {
   });
 
   it('el LER crece con la asociación', () => {
-    expect(lerParcela(crearParcela('1'))).toBe(0);
+    expect(lerParcela(/** @type {any} */ (crearParcela('1')))).toBe(0);
     expect(lerParcela(parcelaCon(CULTIVOS.MAIZ))).toBe(1);
     expect(lerParcela(parcelaCon(CULTIVOS.MAIZ, CULTIVOS.FRIJOL))).toBe(1.32);
     expect(
@@ -239,7 +239,7 @@ describe('milpaGameEngine — salud: asociación supera al monocultivo', () => {
   });
 
   it('la parcela vacía tiene salud 0', () => {
-    expect(saludParcela(crearParcela('1'))).toBe(0);
+    expect(saludParcela(/** @type {any} */ (crearParcela('1')))).toBe(0);
   });
 
   it('agregar un cultivo que sinergiza sube la salud', () => {
@@ -266,7 +266,7 @@ describe('milpaGameEngine — resistencia a eventos por diversidad', () => {
   });
 
   it('la cobertura protege de la sequía', () => {
-    const eventoSequia = EVENTOS.find((e) => e.id === 'sequia');
+    const eventoSequia = /** @type {any} */ (EVENTOS.find((e) => e.id === 'sequia'));
     const sinCobertura = factorResistencia(parcelaCon(CULTIVOS.MAIZ), eventoSequia);
     const conCobertura = factorResistencia(
       parcelaCon(CULTIVOS.MAIZ, CULTIVOS.AHUYAMA),
@@ -276,7 +276,7 @@ describe('milpaGameEngine — resistencia a eventos por diversidad', () => {
   });
 
   it('ante el mismo evento, la asociación pierde menos salud', () => {
-    const evento = EVENTOS.find((e) => e.id === 'sequia');
+    const evento = /** @type {any} */ (EVENTOS.find((e) => e.id === 'sequia'));
     const mono = aplicarEvento(parcelaCon(CULTIVOS.MAIZ), evento);
     const milpa = aplicarEvento(
       parcelaCon(CULTIVOS.MAIZ, CULTIVOS.FRIJOL, CULTIVOS.AHUYAMA),
@@ -293,7 +293,7 @@ describe('milpaGameEngine — resistencia a eventos por diversidad', () => {
   });
 
   it('eventos específicos afectan menos a sus sistemas resistentes', () => {
-    const eventoBroca = EVENTOS.find((e) => e.id === 'broca');
+    const eventoBroca = /** @type {any} */ (EVENTOS.find((e) => e.id === 'broca'));
     const safCafe = parcelaCon(CULTIVOS.CAFE, CULTIVOS.GUAMO, CULTIVOS.PLATANO);
     const r = aplicarEvento(safCafe, eventoBroca);
     // SAF café debe resistir mejor la broca
@@ -303,7 +303,7 @@ describe('milpaGameEngine — resistencia a eventos por diversidad', () => {
 
 describe('milpaGameEngine — resumen de finca', () => {
   it('finca vacía devuelve ceros sin reventar', () => {
-    const r = resumenFinca([crearParcela('1'), crearParcela('2')]);
+    const r = resumenFinca([/** @type {any} */ (crearParcela('1')), /** @type {any} */ (crearParcela('2'))]);
     expect(r.parcelasSembradas).toBe(0);
     expect(r.ventajaPct).toBe(0);
     expect(r.lerPromedio).toBe(0);
@@ -346,7 +346,7 @@ describe('milpaGameEngine — resumen de finca', () => {
 
 describe('milpaGameEngine — sistema de temporadas', () => {
   it('crea un juego con parcelas y temporadas', () => {
-    const juego = crearJuego(4, 3);
+    const juego = /** @type {any} */ (crearJuego(4, 3));
     expect(juego.parcelas).toHaveLength(4);
     expect(juego.temporadaActual).toBe(1);
     expect(juego.numTemporadas).toBe(3);
@@ -354,21 +354,21 @@ describe('milpaGameEngine — sistema de temporadas', () => {
   });
 
   it('avanza de temporada correctamente', () => {
-    let juego = crearJuego(4, 2);
+    let juego = /** @type {any} */ (crearJuego(4, 2));
     juego.parcelas[0] = parcelaCon(CULTIVOS.MAIZ, CULTIVOS.FRIJOL, CULTIVOS.AHUYAMA);
 
-    const resultado1 = avanzarTemporada(juego);
+    const resultado1 = /** @type {any} */ (avanzarTemporada(juego));
     expect(resultado1.continua).toBe(true);
     expect(resultado1.juego.temporadaActual).toBe(2);
     expect(resultado1.juego.historicoTemporadas).toHaveLength(1);
 
-    const resultado2 = avanzarTemporada(resultado1.juego);
+    const resultado2 = /** @type {any} */ (avanzarTemporada(resultado1.juego));
     expect(resultado2.continua).toBe(false);
     expect(resultado2.juego.temporadaActual).toBe(2); // No avanza si termina
   });
 
   it('verifica logros desbloqueados', () => {
-    const juego = crearJuego(6, 1);
+    const juego = /** @type {any} */ (crearJuego(6, 1));
     juego.parcelas = [
       parcelaCon(CULTIVOS.MAIZ, CULTIVOS.FRIJOL, CULTIVOS.AHUYAMA),
       parcelaCon(CULTIVOS.CAFE, CULTIVOS.GUAMO, CULTIVOS.PLATANO),
@@ -386,7 +386,7 @@ describe('milpaGameEngine — sistema de temporadas', () => {
   });
 
   it('verificarLogros sin historial devuelve array vacío', () => {
-    const juego = crearJuego(6, 1);
+    const juego = /** @type {any} */ (crearJuego(6, 1));
     const logros = verificarLogros(juego);
     expect(logros).toEqual([]);
   });
@@ -434,7 +434,7 @@ describe('milpaGameEngine — campesino vecino y puntaje final', () => {
       nitrogenoPromedio: 70,
       coberturaPromedio: 60,
     };
-    const r = verificarSuperoCampesinoVecino(resumen, 1);
+    const r = /** @type {any} */ (verificarSuperoCampesinoVecino(resumen, 1));
     expect(r.supero).toBe(true);
     expect(r.medalla).toContain('🏅');
     expect(r.detalles.ler.supero).toBe(true);
@@ -459,7 +459,7 @@ describe('milpaGameEngine — campesino vecino y puntaje final', () => {
   });
 
   it('calcularPuntajeFinal devuelve un número entre 0 y 1000', () => {
-    const juego = crearJuego(4, 3);
+    const juego = /** @type {any} */ (crearJuego(4, 3));
     juego.parcelas = [
       parcelaCon(CULTIVOS.MAIZ, CULTIVOS.FRIJOL, CULTIVOS.AHUYAMA),
       parcelaCon(CULTIVOS.CAFE, CULTIVOS.GUAMO, CULTIVOS.PLATANO),

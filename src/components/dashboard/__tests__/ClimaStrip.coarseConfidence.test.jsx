@@ -44,7 +44,7 @@ vi.mock('../../../config/defaults', () => ({
 
 vi.mock('../../../services/userProfileService', () => {
     const getProfile = vi.fn(() => ({}));
-    const getProfileMunicipio = vi.fn(() => getProfile()?.municipio ?? null);
+    const getProfileMunicipio = vi.fn(() => /** @type {any} */ (getProfile())?.municipio ?? null);
     return { getProfile, getProfileMunicipio, isModuleVisible: vi.fn(() => true) };
 });
 import { getProfile, getProfileMunicipio } from '../../../services/userProfileService';
@@ -150,7 +150,7 @@ describe('ClimaStrip — re-fijar ubicación siempre alcanzable (re-pin)', () =>
         vi.mocked(getProfileMunicipio).mockReturnValue('Choachí');
         const eventSpy = vi.fn();
         window.addEventListener('chagra:nav', eventSpy);
-        render(<ClimaStrip />);
+        render(<ClimaStrip onNavigate={() => {}} />);
 
         const repin = await screen.findByTestId('clima-repin');
         fireEvent.click(repin);

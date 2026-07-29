@@ -335,7 +335,7 @@ export const LOGROS = Object.freeze([
 
 /** Alias para retrocompatibilidad. */
 export const TRES_HERMANAS = CULTIVOS_INFO.filter(c =>
-  [CULTIVOS.MAIZ, CULTIVOS.FRIJOL, CULTIVOS.AHUYAMA].includes(c.id)
+  [CULTIVOS.MAIZ, CULTIVOS.FRIJOL, CULTIVOS.AHUYAMA].includes(/** @type {'maiz'|'frijol'|'ahuyama'} */ (c.id))
 );
 export const HERMANA_POR_ID = CULTIVO_POR_ID;
 export const CIFRAS_MILPA = CIFRAS_SISTEMAS.milpa;

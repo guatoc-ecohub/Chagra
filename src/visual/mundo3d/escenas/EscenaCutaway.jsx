@@ -171,12 +171,12 @@ function GuiaFrijol({ base, alto = 1.5, vueltas = 4 }) {
     <group position={[x, y, z]}>
       {cuentas.map((c) => (
         <group key={c.key}>
-          <mesh position={c.pos}>
+          <mesh position={/** @type {[number, number, number]} */ (c.pos)}>
             <sphereGeometry args={[0.026, 5, 4]} />
             <meshLambertMaterial color="#4f8a34" flatShading />
           </mesh>
           {c.hoja && (
-            <mesh position={c.pos} rotation={[0, -c.ang, 0.6]}>
+            <mesh position={/** @type {[number, number, number]} */ (c.pos)} rotation={[0, -c.ang, 0.6]}>
               <coneGeometry args={[0.04, 0.15, 4]} />
               <meshLambertMaterial color="#5f9a3f" flatShading />
             </mesh>
@@ -201,7 +201,7 @@ function Calabaza({ base }) {
   return (
     <group position={[x, y, z]}>
       {hojas.map((h) => (
-        <mesh key={`${h.p[0]}-${h.p[2]}`} position={h.p} rotation={[-Math.PI / 2, 0, h.rot]}>
+        <mesh key={`${h.p[0]}-${h.p[2]}`} position={/** @type {[number, number, number]} */ (h.p)} rotation={[-Math.PI / 2, 0, h.rot]}>
           <coneGeometry args={[h.r, 0.06, 5]} />
           <meshLambertMaterial color={PALETA.follaje} flatShading />
         </mesh>
@@ -253,7 +253,7 @@ function RaizNodulos({ base, largo = 1.4 }) {
         <meshLambertMaterial color="#bd9a5a" flatShading />
       </mesh>
       {nodulos.map((nd) => (
-        <mesh key={nd.key} position={nd.pos}>
+        <mesh key={nd.key} position={/** @type {[number, number, number]} */ (nd.pos)}>
           <sphereGeometry args={[nd.r, 6, 5]} />
           <meshLambertMaterial color="#e0a3ad" flatShading />
         </mesh>
@@ -407,7 +407,7 @@ function Diorama({ params, reducedMotion }) {
     const nB = 1 + Math.round(vida * 3);
     const briz = Array.from({ length: nB }, (_, i) => ({
       key: `b${i}`,
-      pos: [(r() - 0.5) * (ANCHO - 1), alturaTotal + 0.12, (r() - 0.5) * (PROF - 0.6)],
+      pos: /** @type {[number, number, number]} */ ([(r() - 0.5) * (ANCHO - 1), alturaTotal + 0.12, (r() - 0.5) * (PROF - 0.6)]),
       alto: 0.16 + r() * 0.12,
       giro: r() * Math.PI,
     }));

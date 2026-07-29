@@ -86,7 +86,7 @@ export function ensoTaskPhase(phase) {
  *   tempMaxC:number|null, tempMinC:number|null, precipMm:number|null,
  *   ensoPhase:string, degraded:boolean, confidence:string|null, fuente:string }}
  */
-export function buildClimaHoy({ snapshot = null, sky = null, elevationM = null } = {}) {
+export function buildClimaHoy({ snapshot = null, sky = null, elevationM = null } = /** @type {any} */ ({})) {
   const openmeteo = snapshot?.openmeteo;
   const forecast = openmeteo?.available && Array.isArray(openmeteo.forecast_7d)
     ? openmeteo.forecast_7d
@@ -217,7 +217,7 @@ export function buildTareasSemana({
       diasDesdeSiembra: est?.daysElapsed ?? null,
       confianza: est?.stage?.confidence ?? null,
       fuentes: est?.stage?.sources || [],
-      tareas: tareas.slice(0, maxPorCiclo),
+      tareas: tareas.slice(0, maxPorCiclo).map(t => /** @type {{ task: string, description: string, priority: string, origen: 'enso'|'etapa' }} */ (t)),
     });
   }
   return grupos;
@@ -268,7 +268,7 @@ export function buildAgenda({
         stageCode: w.code,
         stageLabel: w.label || STAGE_LABELS[w.code] || w.code,
         emoji: STAGE_EMOJIS[w.code] || '🌱',
-        tipo: w.code === 'harvest_window' ? 'cosecha' : 'etapa',
+        tipo: /** @type {'cosecha'|'etapa'} */ (w.code === 'harvest_window' ? 'cosecha' : 'etapa'),
         confianza: w.confidence,
         fuentes: w.sources || [],
         ventana: { inicio: w.windowStart, fin: w.windowEnd },

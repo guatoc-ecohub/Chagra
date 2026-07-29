@@ -125,7 +125,11 @@ function NubePuntos({ cfg, n, zona, reducedMotion, semilla }) {
         p[j + 2] = base[j + 2] + Math.cos(t * 0.4 * vel[i] + fase[i]) * amp;
       }
     } else if (cfg.gesto === 'errar') {
-      /* Luciérnagas: erran despacio y PULSAN con desfase (flash asimétrico). */
+      /* Luciérnagas: erran despacio y DESTELLAN como bicho real — flash CORTO
+         (onda^6: encendida ~1/3 del ciclo, el resto brasa mínima) y ciclos que
+         no se repiten (una modulación lenta, desfasada por bicho, apaga
+         destellos enteros a ratos). El prado chispea salteado — ni a coro ni
+         a media luz. Cero asignaciones por frame, igual que antes. */
       const c = geo.attributes.color.array;
       const { colBase } = datos;
       const { frecuencia, minimo } = cfg.parpadeo;
@@ -134,8 +138,10 @@ function NubePuntos({ cfg, n, zona, reducedMotion, semilla }) {
         p[j] = base[j] + Math.sin(t * 0.3 * vel[i] + fase[i]) * amp;
         p[j + 1] = base[j + 1] + Math.sin(t * 0.23 * vel[i] + fase[i] * 2.1) * amp * 0.5;
         p[j + 2] = base[j + 2] + Math.cos(t * 0.27 * vel[i] + fase[i]) * amp;
-        const onda = Math.max(0, Math.sin(t * frecuencia * vel[i] + fase[i] * 3));
-        const pulso = minimo + (1 - minimo) * onda * onda * onda;
+        const respiro = 0.72 + 0.28 * Math.sin(t * 0.11 * vel[i] + fase[i] * 5.3);
+        const onda = Math.max(0, Math.sin(t * frecuencia * vel[i] + fase[i] * 3)) * respiro;
+        const o2 = onda * onda;
+        const pulso = minimo + (1 - minimo) * o2 * o2 * o2;
         c[j] = colBase[j] * pulso;
         c[j + 1] = colBase[j + 1] * pulso;
         c[j + 2] = colBase[j + 2] * pulso;

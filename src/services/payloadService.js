@@ -198,11 +198,11 @@ export const savePayload = async (type, payload) => {
         }
       }
       await syncManager.saveTransaction({ type: type.replace("plant_asset", "planting"), payload: { ...payload, endpoint } });
-      return { success: false, message: `Guardado local. Pendiente de sincronización (${error.message})` };
+      return { success: false, message: `Guardado local. Pendiente de sincronización (${error.message})`, data: null };
     }
   } else {
     await syncManager.saveTransaction({ type: type.replace("plant_asset", "planting"), payload: { ...payload, endpoint } });
-    return { success: false, message: 'Sin conexión. Guardado localmente. Pendiente sincronización' };
+    return { success: false, message: 'Sin conexión. Guardado localmente. Pendiente sincronización', data: null };
   }
 };
 

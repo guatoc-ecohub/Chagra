@@ -123,9 +123,9 @@ const MaterialCard = ({ item, onRefill }) => {
  * - Exportación del inventario como archivo descargable (CSV/JSON).
  * - Sparklines de consumo histórico derivados de logs de tipo input.
  *
- * @returns {JSX.Element}
+ * @returns {React.ReactNode}
  */
-export const InventoryDashboard = () => {
+export const InventoryDashboard = (/** @type {any} */ _props) => {
   const materials = useAssetStore((s) => s.materials);
   const refillMaterial = useAssetStore((s) => s.refillMaterial);
 

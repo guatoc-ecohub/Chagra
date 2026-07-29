@@ -163,7 +163,7 @@ export default function InventoryAuditDashboard() {
                         <tbody className="divide-y divide-slate-800/50">
                             {stats.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-12 text-center text-slate-600 italic text-sm">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-slate-600 italic text-sm">
                                         No hay materiales para auditar o filtros muy restrictivos.
                                     </td>
                                 </tr>

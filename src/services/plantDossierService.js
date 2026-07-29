@@ -121,7 +121,7 @@ export async function getBioinsumosForPlant(speciesSlug) {
     seen.add(key);
     deduped.push(it);
   }
-  return { items: deduped, fromGraph };
+  return { items: /** @type {Array<{nombre:string, uso:string, etapa?:string, source:'grafo'|'catalogo'}>} */ (deduped), fromGraph };
 }
 
 /**
@@ -227,8 +227,8 @@ export async function getAssociatedCycles(speciesSlug) {
  * }>}
  */
 export async function buildPlantDossier(plant) {
-  const slug = (plant && (plant.cropSlug || plant.slug || plant.subject_slug)) || null;
-  const label = (plant && (plant.canonical || plant.label || plant.crop || plant.subject_label)) || slug || 'Planta';
+  const slug = (plant && (plant.cropSlug || plant.slug || /** @type {any} */ (plant).subject_slug)) || null;
+  const label = (plant && (plant.canonical || plant.label || plant.crop || /** @type {any} */ (plant).subject_label)) || slug || 'Planta';
 
   // Sin slug canónico no podemos consultar grafo/fenología/gremios: devolvemos
   // el esqueleto vacío (la UI muestra el estado "sin ficha de catálogo").

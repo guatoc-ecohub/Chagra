@@ -62,6 +62,7 @@ export default function CamaraDirector({
   unaVezClave = null,
 }) {
   const { camera } = useThree();
+  const camPersp = /** @type {import('three').PerspectiveCamera} */ (camera);
   // ¿Saltar el intro? Se decide UNA vez al montar (ref-initializer): inactiva,
   // o clave ya presentada. La respiración igual queda gateada por `activa`.
   const saltarIntro = useRef(!activa || (unaVezClave !== null && yaPresentados.has(unaVezClave)));
@@ -90,13 +91,13 @@ export default function CamaraDirector({
     // El "lente que se asienta": del focal de reposo (el fov que ya fijó el
     // Canvas) a uno ~12% más corto (más abierto) al arrancar. `setFocalLength`
     // actualiza fov + projection matrix por método.
-    const fRep = camera.getFocalLength();
+    const fRep = camPersp.getFocalLength();
     const fAmp = fRep / 1.12;
     intro.current = { p: 0, desde, hasta, tDesde, tHasta, fAmp, fRep };
-    camera.position.copy(desde);
-    camera.setFocalLength(fAmp);
+    camPersp.position.copy(desde);
+    camPersp.setFocalLength(fAmp);
     if (tDesde && c) c.target.copy(tDesde);
-    camera.lookAt(tDesde || tHasta);
+    camPersp.lookAt(tDesde || tHasta);
 
     // El primer gesto del usuario ACELERA la presentación (capture en window:
     // también los hotspots DOM, que no burbujean por el canvas). Sin saltos:
@@ -118,16 +119,16 @@ export default function CamaraDirector({
       // delta acotado: una pestaña dormida no "salta" el dolly al despertar.
       st.p = Math.min(1, st.p + Math.min(delta, 1 / 20) / duracion);
       const e = easeOutCubic(st.p);
-      camera.position.lerpVectors(st.desde, st.hasta, e);
+      camPersp.position.lerpVectors(st.desde, st.hasta, e);
       if (st.tDesde && c) c.target.lerpVectors(st.tDesde, st.tHasta, e);
-      camera.setFocalLength(THREE.MathUtils.lerp(st.fAmp, st.fRep, e));
-      camera.lookAt(c ? c.target : st.tHasta);
+      camPersp.setFocalLength(THREE.MathUtils.lerp(st.fAmp, st.fRep, e));
+      camPersp.lookAt(c ? c.target : st.tHasta);
       if (st.p >= 1) {
         // Aterrizaje EXACTO en la pose de reposo. El target solo se fija si
         // este director lo condujo (`mirada`); si otro lo lleva (CamaraViajera
         // en el valle), ni tocarlo.
-        camera.position.copy(st.hasta);
-        camera.setFocalLength(st.fRep);
+        camPersp.position.copy(st.hasta);
+        camPersp.setFocalLength(st.fRep);
         if (c) {
           if (st.tDesde) c.target.copy(st.tHasta);
           c.update();

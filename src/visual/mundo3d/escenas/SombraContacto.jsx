@@ -38,7 +38,7 @@ export function SombraContacto({
   refExt, pos = [0, 0, 0], radio = 0.5, color = '#2e2012', opacidad = 0.35, orden = 2,
 }) {
   return (
-    <mesh ref={refExt} position={pos} rotation={[-Math.PI / 2, 0, 0]} renderOrder={orden}>
+    <mesh ref={refExt} position={/** @type {[number, number, number]} */ (pos)} rotation={[-Math.PI / 2, 0, 0]} renderOrder={orden}>
       <planeGeometry args={[radio * 2, radio * 2]} />
       <meshBasicMaterial
         map={texturaRadial()}

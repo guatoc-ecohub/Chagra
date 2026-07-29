@@ -32,7 +32,7 @@ vi.mock('../../../db/farmProcessCache', () => ({
 
 let mockProfile = { rol: 'campesino' };
 vi.mock('../../../services/userProfileService', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = /** @type {any} */ (await importOriginal());
   return {
     ...actual,
     getProfile: vi.fn(() => mockProfile),

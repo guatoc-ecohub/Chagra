@@ -128,7 +128,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
         <div className="h-[100dvh] w-full bg-slate-950 text-slate-100 flex flex-col overflow-y-auto">
             <header className="p-4 sticky top-0 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 flex items-center gap-4 z-10 shrink-0 shadow-lg">
                 <button
-                    onClick={onBack}
+                    onClick={/** @type {React.MouseEventHandler<HTMLButtonElement>} */ (onBack)}
                     aria-label="Volver"
                     className="p-3 bg-slate-800 rounded-full active:bg-slate-700 min-h-[56px] min-w-[56px] flex justify-center items-center shrink-0 border border-slate-700"
                 >
@@ -183,7 +183,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
                                         onClick={() => autoSave({ status: s.id })}
                                         className={`transition-all ${formValues.status === s.id ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-slate-950 scale-105' : 'opacity-60 hover:opacity-100'}`}
                                     >
-                                        <StatusBadge status={s.id} type="task" />
+                                        <StatusBadge status={s.id} type="task" onChange={() => {}} />
                                     </button>
                                 ))}
                             </div>
@@ -241,7 +241,7 @@ function TaskScreen({ onBack, onSave, initialData }) {
                         name="notes"
                         value={formValues.notes}
                         onChange={handleInput}
-                        rows="3"
+                        rows={3}
                         placeholder="Instrucciones específicas para el operario..."
                         className="p-4 rounded-xl bg-slate-900 border-2 border-slate-800 text-lg text-white outline-none focus:border-slate-600"
                     />

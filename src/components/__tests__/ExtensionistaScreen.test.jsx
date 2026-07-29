@@ -148,7 +148,7 @@ describe('ExtensionistaScreen — con rol extensionista', () => {
 
     const selector = screen.getByTestId('finca-selector');
     expect(selector).toBeInTheDocument();
-    expect(selector.value).toBe('finca-la-esperanza');
+    expect(/** @type {HTMLSelectElement} */ (selector).value).toBe('finca-la-esperanza');
 
     fireEvent.change(selector, { target: { value: 'finca-el-paramo' } });
     expect(setActiveFinca).toHaveBeenCalledWith('finca-el-paramo');

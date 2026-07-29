@@ -40,6 +40,7 @@ import { perfilDeTier } from './deviceTier.js';
 
 /* La direccional de relleno vive fija al lado opuesto del valle (como en
    EscenaBase3D); solo su color e intensidad cambian con la hora. */
+/** @type {[number, number, number]} */
 const RELLENO_POS = [-5, 4, -6];
 
 /* Convierte un preset (hex + números) a objetos three mutables in-place. */
@@ -110,7 +111,7 @@ function amortiguar(actual, objetivo, k) {
  * El cielo por hora del día. Montar DENTRO de un <Canvas>.
  *
  * @param {object} props
- * @param {'amanecer'|'mediodia'|'dorada'|'noche'|'auto'} [props.hora='dorada']
+ * @param {'amanecer'|'manana'|'mediodia'|'tarde'|'dorada'|'atardecer'|'noche'|'auto'} [props.hora='dorada']
  *        Momento del día; 'auto' lo deriva del reloj real (horaDeReloj).
  * @param {'alto'|'medio'|'bajo'} [props.tier='medio']
  *        Tier del equipo (decidirTier); gobierna niebla y estrellas.

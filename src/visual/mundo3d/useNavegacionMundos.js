@@ -21,9 +21,10 @@
  *
  * Sin three, sin DOM: puro estado. Seguro en el bundle base.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { resolverMundo } from './resolverMundo.js';
 import useHaptics from './useHaptics.js';
+import { mundosPorPisoTermico } from './mundosPorPisoTermico.js';
 
 /** ¿Este mundo tiene una escena montable (3D o 2D) en el registro? */
 export function puedeEntrarAlMundo(mundoId) {
@@ -34,6 +35,7 @@ export function puedeEntrarAlMundo(mundoId) {
 /**
  * @param {object} [opts]
  * @param {boolean} [opts.reducedMotion=false]  corte simple: sin fases de viaje.
+ * @param {unknown} [opts.pisoUsuario=null] piso o altitud real de la finca.
  * @returns {{
  *   fase: 'valle'|'viajando'|'mundo'|'regresando',
  *   mundoId: string|null,
@@ -45,7 +47,7 @@ export function puedeEntrarAlMundo(mundoId) {
  *   puedeEntrar: (id: string) => boolean,
  * }}
  */
-export function useNavegacionMundos({ reducedMotion = false } = {}) {
+export function useNavegacionMundos({ reducedMotion = false, pisoUsuario = null } = {}) {
   const [estado, setEstado] = useState({ fase: 'valle', mundoId: null });
   // El mundo que aún no abre su puerta (para el aviso "pronto" del host).
   const [pronto, setPronto] = useState(null);
@@ -58,7 +60,9 @@ export function useNavegacionMundos({ reducedMotion = false } = {}) {
   // Espejo de la fase actual para disparar hápticas FUERA del updater de
   // estado (los updaters deben ser puros — StrictMode los corre dos veces).
   const faseRef = useRef(estado.fase);
-  faseRef.current = estado.fase;
+  useEffect(() => {
+    faseRef.current = estado.fase;
+  }, [estado.fase]);
 
   useEffect(() => () => clearTimeout(prontoTimer.current), []);
 
@@ -103,7 +107,7 @@ export function useNavegacionMundos({ reducedMotion = false } = {}) {
   }, [haptics]);
 
   return {
-    fase: estado.fase,
+    fase: /** @type {'valle'|'viajando'|'mundo'|'regresando'} */ (estado.fase),
     mundoId: estado.mundoId,
     /** Hay overlay de viaje en pantalla (ida o vuelta). */
     enViaje: estado.fase === 'viajando' || estado.fase === 'regresando',

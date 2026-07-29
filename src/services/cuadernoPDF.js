@@ -619,14 +619,14 @@ export const generateCuadernoFinca = (fincaData) => {
  * Arma el shape `fincaData` desde los caches reales del dispositivo.
  *
  * @param {object} options
- * @param {Function} options.openDB    - typeof import('../db/dbCore').openDB
  * @param {object}   options.assetCache - typeof import('../db/assetCache').assetCache
  * @param {object}   options.logCache   - typeof import('../db/logCache').logCache
  * @param {object}   options.finca      - finca activa (de fincaActiveStore)
  * @param {object}   options.operator   - { name, role }
  * @returns {Promise<object>} shape consumido por generateCuadernoFinca
  */
-export const buildFincaData = async ({ assetCache, logCache, finca, operator } = {}) => {
+export const buildFincaData = async (options = /** @type {any} */ ({})) => {
+  const { assetCache, logCache, finca, operator } = /** @type {any} */ (options);
   const [plants, lands, structures, materials, logs] = await Promise.all([
     assetCache.getByType('plant'),
     assetCache.getByType('land'),

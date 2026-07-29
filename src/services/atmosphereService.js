@@ -145,7 +145,8 @@ function readEstado(day, openmeteo) {
  * @param {number} [opts.elevation]  msnm de la finca (piso térmico → niebla)
  * @returns {'despejado'|'nublado'|'lluvia'|'niebla'|null}
  */
-export function deriveCondicion({ snapshot, now = new Date(), luz = 'dia', elevation } = {}) {
+export function deriveCondicion(opts = /** @type {any} */ ({})) {
+  const { snapshot, now = new Date(), luz = 'dia', elevation } = opts;
   const om = snapshot?.openmeteo;
   const forecast = om?.available && Array.isArray(om.forecast_7d) ? om.forecast_7d : null;
   if (!forecast || forecast.length === 0) return null;

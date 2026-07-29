@@ -79,7 +79,7 @@ describe('tagPassagesOrigin', () => {
 
   it('input no-array → []', () => {
     expect(tagPassagesOrigin(null)).toEqual([]);
-    expect(tagPassagesOrigin('x')).toEqual([]);
+    expect(tagPassagesOrigin(/** @type {any} */ ('x'))).toEqual([]);
   });
 });
 

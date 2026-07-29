@@ -35,7 +35,12 @@ const OLLAMA_CHAT_URL = '/api/ollama/api/chat';
 // Fix: usar granite3.3 (YA cargado, hot) — extrae el JSON bien sin esperar
 // carga ni evictar el chat. Verificado en vivo: granite3.3 devuelve
 // {crop,quantity,location} correcto donde gemma3:4b daba vacío.
-const MODEL = 'granite3.3:8b';
+// 2026-07-22: granite3.3:8b → gemma4:e2b. La razón original (usar el que ya
+// está hot para no evictar el chat) SIGUE VALIENDO: ahora el hot es e2b.
+// Y el motivo de fondo cambió a favor: granite3.3 contamina 47,7% contra 10%
+// de e2b, medido con juez semántico sobre 70 sondas.
+// 2026-07-24: gemma4:e2b → qwen3.5:4b (unificado con chat; ganador del maratón #2738).
+const MODEL = 'qwen3.5:4b';
 // El modelo responde en pocos segundos para extracción JSON con format:json.
 // Nginx permite hasta 120s en /api/ollama/; 60s cliente es el punto medio seguro.
 const TIMEOUT_MS = 60000;
@@ -116,6 +121,7 @@ export function _resetSystemPromptCache() {
 
 // location puede venir vacia cuando el operador no menciona el lugar;
 // la UI resuelve al DEFAULT_LOCATION_ID en ese caso (ver VoiceConfirmation).
+/** @param {Object} e */
 const isValidEntity = (e) =>
   e &&
   typeof e.crop === 'string' && e.crop.trim().length > 0 &&
@@ -195,8 +201,8 @@ export async function extractEntities(text, { onToken } = {}) {
     }
 
     if (!Array.isArray(parsed)) {
-      if (Array.isArray(parsed?.entities)) parsed = parsed.entities;
-      else if (Array.isArray(parsed?.data)) parsed = parsed.data;
+      if (Array.isArray(/** @type {any} */ (parsed)?.entities)) parsed = /** @type {any} */ (parsed).entities;
+      else if (Array.isArray(/** @type {any} */ (parsed)?.data)) parsed = /** @type {any} */ (parsed).data;
       // Fallback: un único objeto {crop, quantity, location} → wrap en array.
       // Algunos modelos chicos (sin format:json en edge cases)
       // emiten una sola entidad como objeto plano.
@@ -204,7 +210,7 @@ export async function extractEntities(text, { onToken } = {}) {
       else parsed = [];
     }
 
-    return parsed
+    return /** @type {any[]} */ (parsed)
       .filter(isValidEntity)
       .map((e) => ({
         crop: e.crop.toLowerCase().trim(),
@@ -212,7 +218,7 @@ export async function extractEntities(text, { onToken } = {}) {
         location: (e.location || '').trim(),
       }));
   } catch (err) {
-    if (err.name === 'AbortError') {
+    if (/** @type {Error} */ (err).name === 'AbortError') {
       throw new Error('Tiempo agotado al extraer entidades');
     }
     throw err;

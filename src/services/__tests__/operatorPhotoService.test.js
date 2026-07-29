@@ -42,21 +42,25 @@ const SAMPLE_DATA_URL = 'data:image/jpeg;base64,/9j/AAAQ'; // bytes irrelevantes
 // Instala mocks de Image + FileReader + canvas.toDataURL para que
 // resizePhotoToDataUrl corra bajo jsdom devolviendo un data-URL controlado.
 function installCanvasMocks({ width = 1024, height = 768 } = {}) {
-  globalThis.FileReader = class {
+  globalThis.FileReader = /** @type {any} */ (class {
+    onload = null;
+    result = null;
     readAsDataURL() {
       queueMicrotask(() => {
         this.result = SAMPLE_DATA_URL;
         this.onload && this.onload();
       });
     }
-  };
-  globalThis.Image = class {
+  });
+  globalThis.Image = /** @type {any} */ (class {
+    onload = null;
     set src(_v) {
       this.width = width;
       this.height = height;
       queueMicrotask(() => this.onload && this.onload());
     }
-  };
+  });
+  // @ts-expect-error — test mock, not strictly a full HTMLElement
   vi.spyOn(document, 'createElement').mockImplementation((tag) => {
     if (tag === 'canvas') {
       return {

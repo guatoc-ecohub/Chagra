@@ -33,7 +33,7 @@ const TIPOS = ['invernadero_tunel', 'invernadero_capilla', 'almacen_bodega', 'ga
 
 const html = (tipo, estadoFinca, tier) =>
   renderToStaticMarkup(
-    <Infraestructura tipo={tipo} tier={tier} reducedMotion estadoFinca={estadoFinca} />,
+    <Infraestructura tipo={tipo} tier={tier} reducedMotion estadoFinca={estadoFinca} dims={[1,1,1]} params={{}} />,
   );
 const nMesh = (s) => (s.match(/<mesh/g) || []).length;
 

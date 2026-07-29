@@ -45,6 +45,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { CapaCielo, cieloEscena } from '../visual/scenes';
 import { Colibri, Mariposa, Lombriz } from '../visual/creatures';
 import { LaminaMataEtapa } from '../visual/laminas';
+import { AngelitaGuia } from '../visual/agente';
 import '../visual/effects/effects.css';
 import './dia-en-finca.css';
 
@@ -126,6 +127,45 @@ const OBSERVAR = {
   pregunta: '¿Salieron lombrices? Donde hay lombriz después del aguacero, la tierra está viva.',
 };
 
+// ── LA GUÍA DE ANGELITA: qué enseña en cada punto de esta pantalla ───────────
+// El mecanismo (useAngelitaGuia + <AngelitaGuia>, src/hooks y src/visual/agente)
+// es GENÉRICO — cualquier vista 2D lo adopta declarando { ref, texto, gesto }
+// por elemento. Aquí solo ponemos el contenido: qué hay y el PORQUÉ
+// agroecológico real detrás de cada tarea del día (nunca relleno). El gesto
+// reutiliza el repertorio ya existente de angelitaEstados.js — cero estados
+// nuevos.
+const GUIA_ANGELITA = {
+  cielo: {
+    texto: 'Los aguaceros de la tarde casi siempre llegan después del mediodía: por eso conviene adelantarse.',
+    gesto: 'senala',
+    tipo: 'informativa',
+  },
+  cafe: {
+    texto: 'El café mojado por el aguacero coge hongos y pierde calidad — guárdelo antes de que llueva.',
+    gesto: 'senala',
+    tipo: 'atencion',
+  },
+  tomate: {
+    texto: 'El tallo se pone quebradizo justo donde nace la flor: un aguacero fuerte se lo puede tronar.',
+    gesto: 'senala',
+    tipo: 'sugerencia',
+  },
+  tanque: {
+    texto: 'El agua de lluvia no trae cloro ni sales: es mejor para el semillero que la del acueducto.',
+    gesto: 'invita',
+    tipo: 'sugerencia',
+  },
+  // El único punto HONESTO a propósito: ella sabe que la lombriz es señal de
+  // suelo vivo, pero NO sabe si hoy salieron — eso solo lo sabe quien mire.
+  // Estado 'nose' (angelitaEstados.js): decir "no sé" es la conducta correcta
+  // del proyecto, no un relleno.
+  lombriz: {
+    texto: 'Lombriz después del aguacero es señal de suelo vivo — pero eso solo lo sabe quien mire, yo no.',
+    gesto: 'nose',
+    tipo: 'informativa',
+  },
+};
+
 /* La escena del header: cielo paramétrico REUSADO (CapaCielo) + las lomas y la
    era de café secando de esta finca. La era es narrativa: si la tarea prioritaria
    se marca hecha, el café desaparece de la era (quedó bajo techo). aria-hidden:
@@ -202,6 +242,26 @@ export default function DiaEnFinca({ onBack = undefined } = {}) {
   const [hechas, setHechas] = useState({});
   const [aviso, setAviso] = useState(null);
   const avisoTimer = useRef(null);
+
+  // ── Los elementos reales que Angelita señala (useAngelitaGuia) ────────────
+  // Las secundarias son una lista (SECUNDARIAS.map): un mapa de refs por id en
+  // vez de un useRef fijo por parada — el hook acepta esa forma vía un getter
+  // función (`ref: () => refsSecundarias.current[id]`).
+  const refTitular = useRef(null);
+  const refPrioridad = useRef(null);
+  const refObservar = useRef(null);
+  const refsSecundarias = useRef({});
+
+  const paradasGuia = useMemo(
+    () => [
+      { id: 'cielo', ref: refTitular, ...GUIA_ANGELITA.cielo },
+      { id: 'cafe', ref: refPrioridad, ...GUIA_ANGELITA.cafe },
+      { id: 'tomate', ref: () => refsSecundarias.current.tomate, ...GUIA_ANGELITA.tomate },
+      { id: 'tanque', ref: () => refsSecundarias.current.tanque, ...GUIA_ANGELITA.tanque },
+      { id: 'lombriz', ref: refObservar, ...GUIA_ANGELITA.lombriz },
+    ],
+    [],
+  );
 
   const f = DIA[franja];
 
@@ -283,7 +343,7 @@ export default function DiaEnFinca({ onBack = undefined } = {}) {
             <p className="df-fecha">
               El día en su finca · {fecha}
             </p>
-            <h1 className="df-titular">{f.titular}</h1>
+            <h1 className="df-titular" ref={refTitular}>{f.titular}</h1>
             <ul className="df-pulso" aria-label="Cómo está su finca ahora">
               <li><span aria-hidden="true">{f.clima.emoji}</span> {f.clima.frase}</li>
               <li><span aria-hidden="true">🌱</span> {ESTADO.matas} matas vivas</li>
@@ -304,7 +364,7 @@ export default function DiaEnFinca({ onBack = undefined } = {}) {
 
           {/* ── 1. LO PRIMERO HOY ── */}
           <p className="df-ceja">Lo primero hoy</p>
-          <article className={`df-carta df-carta-mayor ${hechas[PRIORIDAD.id] ? 'df-hecha' : ''}`}>
+          <article ref={refPrioridad} className={`df-carta df-carta-mayor ${hechas[PRIORIDAD.id] ? 'df-hecha' : ''}`}>
             <span className="df-nudo" aria-hidden="true" />
             <ul className="df-porques" aria-label="Por qué hoy">
               {PRIORIDAD.porques.map((p) => (
@@ -333,7 +393,11 @@ export default function DiaEnFinca({ onBack = undefined } = {}) {
           {/* ── 2. TAMBIÉN HOY, SI ALCANZA ── */}
           <p className="df-ceja">También hoy, si alcanza</p>
           {SECUNDARIAS.map((s) => (
-            <article key={s.id} className={`df-carta df-carta-menor ${hechas[s.id] ? 'df-hecha' : ''}`}>
+            <article
+              key={s.id}
+              ref={(el) => { refsSecundarias.current[s.id] = el; }}
+              className={`df-carta df-carta-menor ${hechas[s.id] ? 'df-hecha' : ''}`}
+            >
               <span className="df-nudo" aria-hidden="true" />
               <div className="df-menor-cuerpo">
                 <h3 className="df-carta-tit df-carta-tit-menor">{s.titulo}</h3>
@@ -362,7 +426,7 @@ export default function DiaEnFinca({ onBack = undefined } = {}) {
 
           {/* ── 3. PARA OBSERVAR HOY (educativo: sin marcar, sin premio) ── */}
           <p className="df-ceja">Para observar hoy</p>
-          <aside className="df-observar">
+          <aside ref={refObservar} className="df-observar">
             <span className="df-nudo df-nudo-hoja" aria-hidden="true" />
             <div className="df-observar-bicho">
               <Lombriz size={52} title="Lombriz de tierra" />
@@ -387,6 +451,13 @@ export default function DiaEnFinca({ onBack = undefined } = {}) {
       </main>
 
       {aviso && <div className="df-aviso" role="status">{aviso}</div>}
+
+      {/* Angelita guía: vuela hasta cada tarea/observación y explica su
+          porqué agroecológico — mecanismo reutilizable (src/hooks/
+          useAngelitaGuia.js), NO exclusivo de esta pantalla. Con
+          recordarCierreId: si el campesino la cierra, no vuelve a insistir
+          en este dispositivo. */}
+      <AngelitaGuia paradas={paradasGuia} recordarCierreId="mockup-dia-en-finca" />
     </div>
   );
 }
