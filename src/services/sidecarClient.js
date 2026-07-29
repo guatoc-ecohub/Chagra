@@ -664,6 +664,37 @@ export async function pisoTermicoGuard(userMessage, opts = {}) {
 }
 
 /**
+ * PISO DE SEGURIDAD ANTE VENENOS query-side (chagra-pro P0 #2, determinista,
+ * PRE-LLM). Llama `POST ${BASE}/toxic-safety-guard` con `{ user_message }`: si
+ * la CONSULTA del usuario menciona un plaguicida tóxico/prohibido (clorpirifos,
+ * glifosato, paraquat, lorsban…), el sidecar devuelve un `system_prompt_block`
+ * de advertencia + alternativas MIP para inyectar al system prompt,
+ * INDEPENDIENTE del RAG. Cierra el hueco de la abstención (`low_relevance`),
+ * donde el guard de SALIDA `detectPoisonEndorsement` no ve nada porque el
+ * modelo respondió "no tengo información" sin repetir el nombre del veneno.
+ * FAIL-SAFE: null ante error/timeout → no-op, el turno sigue sin romperse.
+ *
+ * @param {string} userMessage
+ * @returns {Promise<null | {
+ *   has_toxic_mention: boolean,
+ *   toxics: string[],
+ *   system_prompt_block: string,
+ *   reason: string,
+ * }>}
+ */
+export async function toxicSafetyGuard(userMessage) {
+  if (!userMessage || typeof userMessage !== 'string') return null;
+  const raw = await postJson('/toxic-safety-guard', { user_message: userMessage }, NLU_TIMEOUT_MS);
+  if (!raw || typeof raw !== 'object') return null;
+  return {
+    has_toxic_mention: raw.has_toxic_mention === true,
+    toxics: Array.isArray(raw.toxics) ? raw.toxics.filter((t) => typeof t === 'string') : [],
+    system_prompt_block: typeof raw.system_prompt_block === 'string' ? raw.system_prompt_block : '',
+    reason: typeof raw.reason === 'string' ? raw.reason : '',
+  };
+}
+
+/**
  * GUARDA de CONFUSIÓN DE ESPECIE / familia botánica equivocada (chagra-pro
  * #292, determinista, PRE-LLM — segundo driver de contaminación
  * cross-domain, sonda `confusion_especie` de `bench-contaminacion.mjs`,
