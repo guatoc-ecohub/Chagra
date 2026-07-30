@@ -85,7 +85,7 @@ export function alturaBase(wx, wz) {
 /* Las filas del lote (z del centro de cada surco). La quinua se siembra en
    surcos separados unos 70–80 cm, siguiendo la curva de nivel de la ladera. */
 export const FILAS_QUINUA = [];
-for (let z = 7.0; z >= -11.0; z -= 0.86) FILAS_QUINUA.push(Number(z.toFixed(3)));
+for (let z = 9.2; z >= -11.0; z -= 0.86) FILAS_QUINUA.push(Number(z.toFixed(3)));
 
 /** La curva de nivel del surco: el surco serpentea con la ladera. */
 export function curvaSurco(wx, fila) {
@@ -95,7 +95,7 @@ export function curvaSurco(wx, fila) {
 /* Los sitios del mundo. La ERA DE LA TRILLA va ARRIBA, en el filo plano, junto
    a la casa: así es de verdad (se trilla en piso duro y parejo, no en la
    pendiente) y así queda cerca de la cámara, de primer plano. */
-export const SITIO_TRILLA = /** @type {[number, number]} */ ([5.8, 9.4]);
+export const SITIO_TRILLA = /** @type {[number, number]} */ ([4.6, 7.4]);
 export const SITIO_CASA = /** @type {[number, number]} */ ([-9.8, 10.6]);
 
 /** Máscara 0…1 del lote sembrado (dentro hay surcos; fuera, pajonal). */
@@ -103,7 +103,7 @@ export function dentroLote(wx, wz) {
   let m =
     smoothstep(-16, -13.5, wx) *
     smoothstep(16, 13.5, wx) *
-    smoothstep(8.0, 6.4, wz) *
+    smoothstep(10.2, 8.7, wz) *
     smoothstep(-12.4, -10.4, wz);
   // la era de la trilla y el patio de la casa están fuera del sembrado
   const dTx = wx - SITIO_TRILLA[0];
@@ -159,23 +159,25 @@ export function alturaQuinual(wx, wz) {
  *              cielo   tercio alto   cultivo en cuadro
  *   papal      32.8%      0.6%            59.4%
  *   yucal      34.8%      0.2%            52.5%
- *   quinual    34.8%      0.0%            38.1%
+ *   quinual    37.2%      0.0%            46.7%
  *
- * LA ALTURA DE LA CÁMARA ES EL PARÁMETRO CRÍTICO y costó encontrarla. La
- * primera versión iba a 10,4 m y parecía razonable — hasta que el trazado
- * mostró que el cultivo llenaba apenas el 19% del cuadro. El motivo: con las
- * matas a 1,6 m y los surcos a 0,86 m, una cámara rasante deja que la primera
- * fila tape las cinco de atrás, y la ladera no baja lo suficiente para
- * compensar. Subiendo a 14 m el campo se abre y el color se lee hasta el fondo.
+ * HISTORIA DEL ENCUADRE (no repetir el camino): la v1 iba a 10,4 m con el lote
+ * arrancando lejos y daba 19% de cultivo; la v2 subió a 14 m y el trazado dio
+ * 38% — pero la FOTO mostró la trampa de la cámara cenital: desde arriba lo
+ * que se ve es la TIERRA entre surcos (franjas cafés) y las panojas quedan de
+ * puntitos. La v3 (esta) baja a 10,2 m, se acerca al filo Y EXTIENDE LAS FILAS
+ * hasta el pie de la cámara: oblicua, las filas se traslapan y el campo se lee
+ * como masa de color — que es como se ve un quinual de verdad. La era quedó
+ * metida en el lote como ancla del primer plano derecho.
  *
- * Si alguien mueve esto, que vuelva a correr el trazado: medir el tamaño de las
- * panojas NO es ver la escena.
+ * Si alguien mueve esto, que corra el trazado Y MIRE LA FOTO: el trazado solo
+ * no atrapó la trampa cenital (medir área del lote NO es ver el color).
  */
 export const CAMARA = {
-  reposo: /** @type {[number, number, number]} */ ([0.6, 14.0, 15.8]),
-  mirada: /** @type {[number, number, number]} */ ([0.2, 3.5, -2.0]),
-  objetivo: /** @type {[number, number, number]} */ ([0.3, 3.2, -1.5]),
-  fov: 50,
+  reposo: /** @type {[number, number, number]} */ ([2.2, 10.2, 13.4]),
+  mirada: /** @type {[number, number, number]} */ ([0.6, 2.6, -3.6]),
+  objetivo: /** @type {[number, number, number]} */ ([0.7, 2.4, -3.0]),
+  fov: 48,
 };
 
 /* -------------------------------------------------------------------------- */
@@ -188,9 +190,9 @@ export const CAMARA = {
  * el campo de color es el entregable. Las panojas van una por mata.
  */
 export const FLORA_QUINUA = {
-  alto: { mata: 190, gavilla: 9, paja: 70, piedra: 8 },
-  medio: { mata: 120, gavilla: 6, paja: 40, piedra: 5 },
-  bajo: { mata: 48, gavilla: 3, paja: 18, piedra: 3 },
+  alto: { mata: 280, gavilla: 9, paja: 70, piedra: 8 },
+  medio: { mata: 170, gavilla: 6, paja: 40, piedra: 5 },
+  bajo: { mata: 62, gavilla: 3, paja: 18, piedra: 3 },
 };
 
 /** Conteos para un tier (desconocido → frugal, nunca el más caro). */
@@ -219,7 +221,7 @@ export const VARIEDADES = [
     nombre: 'Tunkahuán',
     alto: [1.6, 2.3],
     panoja: 'amarantiforme', // grande, ramificada, poco compacta
-    largoPanoja: [0.32, 0.52],
+    largoPanoja: [0.46, 0.7],
     // púrpura que vira a púrpura-anaranjado al madurar
     colores: ['#7b4a86', '#8f4a72', '#a55a52', '#b8703c'],
     dulce: false,
@@ -229,7 +231,7 @@ export const VARIEDADES = [
     nombre: 'Aurora',
     alto: [0.9, 1.3],
     panoja: 'glomerulada', // semicompacta
-    largoPanoja: [0.2, 0.32],
+    largoPanoja: [0.3, 0.44],
     // blanco-rosada
     colores: ['#e8d7c4', '#e3bdb0', '#d9a79e', '#c9908c'],
     dulce: false,
@@ -239,7 +241,7 @@ export const VARIEDADES = [
     nombre: 'Blanca de Jericó',
     alto: [1.2, 2.1],
     panoja: 'amarantiforme', // erecta y ramificada
-    largoPanoja: [0.26, 0.44],
+    largoPanoja: [0.38, 0.58],
     // follaje y panoja verdes: madura sin encenderse
     colores: ['#7d9147', '#8ba055', '#9aad63', '#b0b96a'],
     dulce: true, // baja en saponina: casi no pide lavado
@@ -249,7 +251,7 @@ export const VARIEDADES = [
     nombre: 'Punto Rojo',
     alto: [1.4, 2.1],
     panoja: 'amarantiforme', // semicompacta
-    largoPanoja: [0.28, 0.46],
+    largoPanoja: [0.4, 0.62],
     // púrpura-rojizo, el más encendido del lote
     colores: ['#8e3550', '#a33546', '#b34338', '#6d2f4e'],
     dulce: false,
@@ -767,8 +769,11 @@ export function distribucionQuinual(conteos, esqs, seed = 811) {
     /* EL COLOR DE MADUREZ. Dentro de una misma tabla las plantas no maduran
        todas el mismo día, así que el color se mueve a lo largo de la rampa de
        la variedad. Eso es lo que le da al lote su vibración: es un bloque de
-       color, pero no es un bloque plano. */
-    const madurez = rMat();
+       color, pero no es un bloque plano. El muestreo va SESGADO al centro de
+       la rampa (0.2–0.8): las puntas —el verde tierno y el pardo pasado— son
+       minoría, porque este mundo es el quinual EN SU PUNTO y lo que hace la
+       foto es el tramo encendido de cada variedad. */
+    const madurez = 0.2 + 0.6 * rMat();
     const paleta = v.colores;
     const fPos = madurez * (paleta.length - 1);
     const i0 = Math.floor(fPos);
@@ -777,10 +782,12 @@ export function distribucionQuinual(conteos, esqs, seed = 811) {
     col2.set(paleta[i1]);
     col.lerp(col2, fPos - i0);
 
-    // el TALLO y la hoja van un paso más apagados que la panoja: la que grita
-    // es la panoja, y si gritan las dos el campo se vuelve una mancha
-    const tinteMata = col.clone().lerp(new THREE.Color('#8b9a6a'), 0.42);
-    tinteMata.multiplyScalar(0.9 + rMat() * 0.18);
+    // el TALLO y la hoja viran al DORADO de la senescencia (así se ve un
+    // quinual en su punto: el follaje ya entregó y se enciende cálido) con el
+    // color de la variedad todavía asomado. La que grita sigue siendo la
+    // panoja; el follaje pone la cama tibia en vez de un pardo muerto.
+    const tinteMata = col.clone().lerp(new THREE.Color('#c9a25a'), 0.45);
+    tinteMata.multiplyScalar(0.95 + rMat() * 0.16);
 
     mata[variante].push({
       pos: [s.px, y, s.pz],
@@ -792,7 +799,7 @@ export function distribucionQuinual(conteos, esqs, seed = 811) {
     // LA PANOJA, encima de la mata, con el largo de su variedad
     const largoPanoja =
       v.largoPanoja[0] + rMat() * (v.largoPanoja[1] - v.largoPanoja[0]);
-    const tintePanoja = col.clone().multiplyScalar(0.92 + rMat() * 0.16);
+    const tintePanoja = col.clone().multiplyScalar(0.98 + rMat() * 0.14);
     const item = {
       pos: [s.px, y + altoReal * 0.93, s.pz],
       rotY: rMat() * Math.PI * 2,
