@@ -217,8 +217,10 @@ export function mundoDePantalla(pantalla) {
    revienta con `ReferenceError` en tiempo de ejecución — y el build de Vite
    NO lo ve (lo cazaron los tests del store). */
 import { comentarioDeMundo, COMENTARISTA_MUNDO } from '../compai/nucleo/comentarista.js';
+import { preguntaDeAprendiz } from '../compai/nucleo/modoAprendiz.js';
 
 export { comentarioDeMundo, COMENTARISTA_MUNDO };
+export { preguntaDeAprendiz };
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * 4b. CLIMA VIVO (#111) — traduce una ReaccionClima del núcleo
@@ -446,6 +448,8 @@ function decisionCalma() {
  * @param {boolean} [ctx.ocupado]
  * @param {boolean} [ctx.silenciado]
  * @param {number} [ctx.molestia] contador adaptativo (#102/#106, sección 7).
+ * @param {() => number} [ctx.rand] fuente de azar 0..1 para el modo aprendiz
+ *   (#110, inyectable → testeable); default Math.random.
  * @returns {DecisionAngelita}
  */
 export function resolverComportamiento(ctx = {}) {
@@ -462,6 +466,7 @@ export function resolverComportamiento(ctx = {}) {
     ocupado = false,
     silenciado = false,
     molestia = 0,
+    rand = Math.random,
   } = ctx;
 
   /** @type {Array<{estado:string, prioridad:number, severidad:any, mensaje:string, prompt:string|null, logroId:string|null}>} */
@@ -504,9 +509,15 @@ export function resolverComportamiento(ctx = {}) {
     });
   }
 
-  // Husmea — comentario grounded del mundo donde entró.
+  // Husmea — comentario grounded del mundo donde entró. #110 "modo
+  // aprendiz": a veces, en contexto apto y con probabilidad baja, en vez
+  // del comentario declarativo el compañero PREGUNTA para provocar
+  // observación (dimensión educativa — Julieta 11 años). No tiene cooldown
+  // propio: sigue siendo un 'husmea' normal, así que respeta el MISMO
+  // cooldown por mundo y la MISMA cadencia adaptativa de siempre.
   if (mundo) {
-    const comentario = comentarioDeMundo(mundo, datosMundo);
+    const pregunta = preguntaDeAprendiz({ mundo, datosMundo, rand });
+    const comentario = pregunta || comentarioDeMundo(mundo, datosMundo);
     if (comentario) {
       candidatos.push({
         estado: 'husmea',

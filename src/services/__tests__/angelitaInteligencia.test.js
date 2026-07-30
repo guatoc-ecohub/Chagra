@@ -345,6 +345,28 @@ describe('resolverComportamiento — arbitraje', () => {
     expect(d.interrumpe).toBe(true);
   });
 
+  it('#110 modo aprendiz: con rand bajo, el husmeo pregunta en vez de comentar', () => {
+    const d = resolverComportamiento({
+      ahoraMs: ahora,
+      mundo: 'mis_matas',
+      datosMundo: { cultivos: [{ name: 'Tomate', count: 4 }] },
+      rand: () => 0.001, // dentro de PROBABILIDAD_PREGUNTA
+    });
+    expect(d.estado).toBe('husmea'); // sigue siendo husmea, mismo cooldown/prioridad
+    expect(d.mensaje).toMatch(/\?/);
+    expect(d.interrumpe).toBe(true);
+  });
+
+  it('#110 modo aprendiz: con rand alto, sigue el comentario normal (no siempre pregunta)', () => {
+    const d = resolverComportamiento({
+      ahoraMs: ahora,
+      mundo: 'mis_matas',
+      datosMundo: { cultivos: [{ name: 'Tomate', count: 4 }] },
+      rand: () => 0.99,
+    });
+    expect(d.mensaje).toMatch(/tomate/i);
+  });
+
   it('husmea respeta cooldown POR MUNDO → si ya comentó ese mundo, calla', () => {
     const llave = 'husmea:mis_matas';
     const d = resolverComportamiento({
