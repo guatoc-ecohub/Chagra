@@ -573,7 +573,7 @@ function playSentenceBlob(url, rate) {
     // mundo, o un efecto que re-dispara) apilan voces "papá noel" que se pisan
     // y se quedan en loop. speak()/speakSentences() ya cortan; este path no lo
     // hacía y era la raíz del solape/loop de la voz em_santa.
-    if (currentKokoroAudio && currentKokoroAudio !== null) {
+    if (currentKokoroAudio) {
       try {
         currentKokoroAudio.pause();
         currentKokoroAudio.onended = null;
