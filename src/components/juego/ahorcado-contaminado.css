@@ -195,6 +195,12 @@
   --nube-y: -52px;
   --nube-x: 0px;
   --mata-doblez: 0deg;
+  /* Mariposas secundarias: sus colores viven en variables para que la
+     degradación (p2/p4/p6) las vaya apagando en transición, no de golpe. */
+  --mar-ala: #f6a34c;
+  --mar-ala-borde: #c86f1d;
+  --mar-mota: #fde68a;
+  --mar-cuerpo: #4a3524;
 }
 
 /* ── Cielo: crossfade sano → tóxico ── */
@@ -730,9 +736,13 @@
 
 .jp-ah-vivo.p6:not(.gano) .jp-ah-bruma { opacity: 0.2; }
 
-/* ── La abejita polinizadora ──
- * Órbita (trayectoria) en el grupo padre; aleteo, squash y expresión en los
- * hijos. Estados: feliz → preocupada → tambaleo → desmayada (sin morbo). */
+/* ── Angelita, la protagonista (AbejaAngelita REAL en modo inline) ──
+ * La ÓRBITA (trayectoria) vive en los wrappers del juego; el dibujo y su
+ * actuación (aleteo crt-wing, parpadeo rh-blink, antics rh-*, jadeo, cejas)
+ * son del componente compartido src/visual/creatures/AbejaAngelita — que NO
+ * se modifica: el juego solo lo dirige por props (pose/animo/energia/sed) y
+ * con estas riendas CSS de alcance jp-ah-. Estados: feliz → preocupada →
+ * tambaleo → desmayada (sin morbo). */
 
 .jp-ah-abeja-orbita {
   animation: jp-ah-vuelo-feliz 9s ease-in-out infinite;
@@ -755,69 +765,11 @@
   to { transform: translateY(2.5px); }
 }
 
-.jp-ah-abeja-cuerpo {
-  fill: #ffd23e;
-  stroke: #3a2c1a;
-  stroke-width: 1.3;
-  transition: fill 1.4s ease;
-}
-
-.jp-ah-franja { fill: #3a2c1a; }
-
-.jp-ah-abeja-cabeza {
-  fill: #3a2c1a;
-}
-
-.jp-ah-antenas path {
-  fill: none;
-  stroke: #3a2c1a;
-  stroke-width: 1.1;
-  stroke-linecap: round;
-  transform-box: fill-box;
-  transform-origin: bottom right;
-  transition: transform 1s ease;
-}
-
-.jp-ah-antenas circle { fill: #3a2c1a; }
-
-.jp-ah-ala ellipse {
-  fill: rgba(219, 234, 254, 0.8);
-  stroke: #93c5fd;
-  stroke-width: 0.9;
-}
-
-.jp-ah-ala {
-  transform-box: fill-box;
-  transform-origin: center bottom;
-  animation: jp-ah-aleteo 0.16s linear infinite alternate;
-  transition: transform 1s ease;
-}
-
-.jp-ah-ala.ala-der { animation-delay: -0.08s; }
-
-@keyframes jp-ah-aleteo {
-  from { transform: scaleY(1) rotate(-4deg); }
-  to { transform: scaleY(0.4) rotate(6deg); }
-}
-
-.jp-ah-ojos-abiertos ellipse { fill: #ffffff; }
-.jp-ah-ojos-abiertos .jp-ah-pupila { fill: #1c140c; }
-
-.jp-ah-sonrisa,
-.jp-ah-ojos-cerrados path {
-  fill: none;
-  stroke: #ffffff;
-  stroke-width: 0.8;
-  stroke-linecap: round;
-}
-
-.jp-ah-ojos-cerrados { opacity: 0; }
-
-.jp-ah-patitas path {
-  fill: none;
-  stroke: #3a2c1a;
-  stroke-width: 1;
-  stroke-linecap: round;
+/* El marco de Angelita: solo transiciona el FILTRO (el gris del desmayo
+   entra suave). Su transform (escala + espejo) va como atributo en el JSX y
+   este nodo no lleva animaciones CSS — nada se lo pisa. */
+.jp-ah-angelita {
+  transition: filter 1.4s ease;
 }
 
 .jp-ah-zzz { opacity: 0; }
@@ -829,7 +781,7 @@
   fill: #cbd5e1;
 }
 
-/* Estados de la abeja por paso */
+/* Estados de Angelita por paso */
 .jp-ah-vivo.p3:not(.gano) .jp-ah-abeja-orbita {
   animation: jp-ah-vuelo-preocupado 6s ease-in-out infinite;
 }
@@ -844,7 +796,10 @@
   animation: jp-ah-tambaleo 3s ease-in-out infinite;
 }
 
-.jp-ah-vivo.p5:not(.gano) .jp-ah-ala { animation-duration: 0.34s; }
+/* Alas de tul PESADAS: el aleteo del kit (crt-wingbeat 0.15s) se arrastra —
+   casi no puede volar. Sin clima en props, el componente no estampa duración
+   inline: esta rienda CSS manda. */
+.jp-ah-vivo.p5:not(.gano) .jp-ah-angelita .crt-wing { animation-duration: 0.42s; }
 
 @keyframes jp-ah-tambaleo {
   0%, 100% { transform: translate(182px, 116px) rotate(-16deg); }
@@ -875,16 +830,21 @@
   to { transform: scale(1.03, 0.97); }
 }
 
-.jp-ah-vivo.p6:not(.gano) .jp-ah-ala {
-  animation: none;
-  transform: scaleY(0.5) rotate(48deg);
-  opacity: 0.7;
+/* Desmayada: React ya la puso en pose reposo (alitas plegadas del kit) y
+   ánimo descansa (sin antics ni miradas). Aquí el juego le cierra los OJITOS
+   aplastando el grupo rh-blink del componente (su transform-box/origin ya
+   vienen inline del kit) y la destiñe con un gris suave que entra en
+   transición — dormida digna, sin morbo. */
+.jp-ah-vivo.p6:not(.gano) .jp-ah-angelita {
+  filter: grayscale(0.55) brightness(0.92);
 }
 
-.jp-ah-vivo.p6:not(.gano) .jp-ah-antenas path { transform: rotate(34deg); }
-.jp-ah-vivo.p6:not(.gano) .jp-ah-ojos-abiertos { opacity: 0; }
-.jp-ah-vivo.p6:not(.gano) .jp-ah-ojos-cerrados { opacity: 1; }
-.jp-ah-vivo.p6:not(.gano) .jp-ah-abeja-cuerpo { fill: #d9c383; }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-angelita .rh-blink {
+  animation: none;
+  transform: scaleY(0.14);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-angelita .rh-mirada { animation: none; }
 .jp-ah-vivo.p6:not(.gano) .jp-ah-zzz { opacity: 1; }
 
 .jp-ah-vivo.p6:not(.gano) .jp-ah-zzz text {
@@ -903,11 +863,14 @@
 /* Celebración al ganar: vuelo alegre más vivo */
 .jp-ah-vivo.gano .jp-ah-abeja-orbita { animation-duration: 5s; }
 
-/* ── La mariposa: compañera de la abeja; el químico la espanta ── */
+/* ── Las mariposas: secundarias que acompañan a Angelita ──
+ * Corrección del operador: NO se sacan y NO huyen de escena — el químico
+ * también las mata. Se apagan CON la protagonista, por grados: aleteo
+ * pesado y vuelo bajo (p2) → tambaleo (p4) → caen marchitas al suelo (p6).
+ * Todo con :not(.gano): al ganar reviven solas con la escena. */
 
 .jp-ah-mariposa-orbita {
   animation: jp-ah-mariposeo 11s ease-in-out infinite;
-  transition: opacity 2s ease;
 }
 
 @keyframes jp-ah-mariposeo {
@@ -918,26 +881,41 @@
   85% { transform: translate(300px, 102px) rotate(4deg); }
 }
 
+/* La mariposita chiquita baila su propia órbita al otro lado de la chagra,
+   sobre el surco de brotes — dos compañeras, no un clon en el mismo camino. */
+.mariposa-orbita-2 {
+  animation: jp-ah-mariposeo-2 13s ease-in-out infinite;
+}
+
+@keyframes jp-ah-mariposeo-2 {
+  0%, 100% { transform: translate(58px, 64px) rotate(-5deg); }
+  25% { transform: translate(86px, 50px) rotate(7deg); }
+  50% { transform: translate(100px, 68px) rotate(-4deg); }
+  75% { transform: translate(76px, 82px) rotate(6deg); }
+}
+
 .jp-ah-mariposa {
   animation: jp-ah-abeja-bob 1.1s ease-in-out infinite alternate;
 }
 
-.jp-ah-mariposa-cuerpo { fill: #4a3524; }
+.jp-ah-mariposa-cuerpo { fill: var(--mar-cuerpo); transition: fill 1.4s ease; }
 
 .jp-ah-mariposa-antena {
   fill: none;
-  stroke: #4a3524;
+  stroke: var(--mar-cuerpo);
   stroke-width: 0.7;
   stroke-linecap: round;
+  transition: stroke 1.4s ease;
 }
 
 .jp-ah-mariposa-ala path {
-  fill: #f6a34c;
-  stroke: #c86f1d;
+  fill: var(--mar-ala);
+  stroke: var(--mar-ala-borde);
   stroke-width: 0.8;
+  transition: fill 1.4s ease, stroke 1.4s ease;
 }
 
-.jp-ah-mariposa-ala circle { fill: #fde68a; }
+.jp-ah-mariposa-ala circle { fill: var(--mar-mota); transition: fill 1.4s ease; }
 
 .jp-ah-mariposa-ala {
   transform-box: fill-box;
@@ -952,14 +930,104 @@
   to { transform: scaleX(0.3); }
 }
 
-/* Con el segundo error la mariposa se ALEJA de la chagra (huye del químico) */
-.jp-ah-vivo.p2:not(.gano) .jp-ah-mariposa-orbita {
-  animation: jp-ah-mariposa-huye 2.6s ease-in both;
+/* p2: el aleteo se hace PESADO y vuelan más bajo, cerca de la chagra que
+   sufre. El color de las alas empieza a apagarse (variables en transición). */
+.jp-ah-vivo.p2:not(.gano) {
+  --mar-ala: #dda45c;
+  --mar-ala-borde: #a9722e;
 }
 
-@keyframes jp-ah-mariposa-huye {
-  0% { transform: translate(288px, 92px) rotate(6deg); opacity: 1; }
-  100% { transform: translate(392px, 30px) rotate(-14deg); opacity: 0; }
+.jp-ah-vivo.p2:not(.gano) .jp-ah-mariposa-orbita {
+  animation: jp-ah-mariposa-pesada 7s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p2:not(.gano) .mariposa-orbita-2 {
+  animation: jp-ah-mariposa-pesada-2 8s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-mariposa-ala { animation-duration: 0.6s; }
+
+@keyframes jp-ah-mariposa-pesada {
+  0%, 100% { transform: translate(282px, 108px) rotate(4deg); }
+  30% { transform: translate(258px, 96px) rotate(-7deg); }
+  60% { transform: translate(300px, 116px) rotate(6deg); }
+  80% { transform: translate(272px, 122px) rotate(-4deg); }
+}
+
+@keyframes jp-ah-mariposa-pesada-2 {
+  0%, 100% { transform: translate(70px, 92px) rotate(5deg); }
+  35% { transform: translate(92px, 104px) rotate(-6deg); }
+  70% { transform: translate(58px, 112px) rotate(4deg); }
+}
+
+/* p4: tambalean — el mismo lenguaje del tambaleo de Angelita (p5),
+   anticipándolo: las chiquitas caen primero que la protagonista. */
+.jp-ah-vivo.p4:not(.gano) {
+  --mar-ala: #bd9464;
+  --mar-ala-borde: #8a6a42;
+  --mar-mota: #dccda6;
+}
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-mariposa-orbita {
+  animation: jp-ah-mariposa-tambalea 3.6s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p4:not(.gano) .mariposa-orbita-2 {
+  animation: jp-ah-mariposa-tambalea-2 3.2s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-mariposa-ala { animation-duration: 0.95s; }
+
+@keyframes jp-ah-mariposa-tambalea {
+  0%, 100% { transform: translate(266px, 128px) rotate(-12deg); }
+  25% { transform: translate(280px, 140px) rotate(14deg); }
+  55% { transform: translate(254px, 146px) rotate(-16deg); }
+  80% { transform: translate(272px, 136px) rotate(10deg); }
+}
+
+@keyframes jp-ah-mariposa-tambalea-2 {
+  0%, 100% { transform: translate(76px, 118px) rotate(10deg); }
+  30% { transform: translate(62px, 132px) rotate(-14deg); }
+  65% { transform: translate(88px, 138px) rotate(12deg); }
+}
+
+/* p6: caen marchitas al suelo — de costado, alitas plegadas, quietas y
+   desteñidas. NO desaparecen: quedan en la chagra apagada, acompañando a
+   Angelita hasta el final (o hasta que el jugador gane y revivan todas). */
+.jp-ah-vivo.p6:not(.gano) {
+  --mar-ala: #a08e77;
+  --mar-ala-borde: #6f6152;
+  --mar-mota: #b3a992;
+  --mar-cuerpo: #55483a;
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-mariposa-orbita {
+  animation: jp-ah-mariposa-cae 1.5s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.jp-ah-vivo.p6:not(.gano) .mariposa-orbita-2 {
+  animation: jp-ah-mariposa-cae-2 1.7s cubic-bezier(0.4, 0, 1, 1) 0.25s both;
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-mariposa { animation: none; }
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-mariposa-ala {
+  animation: none;
+  transform: scaleX(0.2);
+}
+
+@keyframes jp-ah-mariposa-cae {
+  0% { transform: translate(258px, 140px) rotate(-10deg); }
+  60% { transform: translate(232px, 168px) rotate(52deg); }
+  76% { transform: translate(228px, 163px) rotate(62deg); }
+  100% { transform: translate(226px, 170px) rotate(74deg); }
+}
+
+@keyframes jp-ah-mariposa-cae-2 {
+  0% { transform: translate(78px, 130px) rotate(8deg); }
+  62% { transform: translate(64px, 170px) rotate(-48deg); }
+  78% { transform: translate(62px, 165px) rotate(-58deg); }
+  100% { transform: translate(60px, 172px) rotate(-68deg); }
 }
 
 /* ── Chispas + florecitas de victoria ── */
@@ -1048,10 +1116,19 @@
     transition: none !important;
   }
 
-  /* Las órbitas animadas posicionaban abeja y mariposa: sin animación quedan
-     en (0,0), así que las plantamos en un punto legible por estado. */
+  /* Las órbitas animadas posicionaban a Angelita y las mariposas: sin
+     animación quedan en (0,0), así que las plantamos en un punto legible por
+     estado. Las mariposas NO desaparecen: bajan y terminan caídas de costado
+     junto a la protagonista (mismo guion que con movimiento). */
   .jp-ah-mariposa-orbita { transform: translate(288px, 80px); }
-  .jp-ah-vivo.p2:not(.gano) .jp-ah-mariposa-orbita { opacity: 0; }
+  .mariposa-orbita-2 { transform: translate(84px, 64px); }
+  .jp-ah-vivo.p2:not(.gano) .jp-ah-mariposa-orbita { transform: translate(276px, 108px); }
+  .jp-ah-vivo.p2:not(.gano) .mariposa-orbita-2 { transform: translate(76px, 100px); }
+  .jp-ah-vivo.p4:not(.gano) .jp-ah-mariposa-orbita { transform: translate(266px, 136px) rotate(-10deg); }
+  .jp-ah-vivo.p4:not(.gano) .mariposa-orbita-2 { transform: translate(74px, 126px) rotate(8deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-mariposa-orbita { transform: translate(226px, 170px) rotate(74deg); }
+  .jp-ah-vivo.p6:not(.gano) .mariposa-orbita-2 { transform: translate(60px, 172px) rotate(-68deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-mariposa-ala { transform: scaleX(0.2); }
   .jp-ah-abeja-orbita { transform: translate(200px, 80px); }
   .jp-ah-vivo.p3:not(.gano) .jp-ah-abeja-orbita { transform: translate(185px, 105px); }
   .jp-ah-vivo.p5:not(.gano) .jp-ah-abeja-orbita { transform: translate(180px, 128px) rotate(-16deg); }

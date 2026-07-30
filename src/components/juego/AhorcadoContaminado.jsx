@@ -6,6 +6,11 @@ import {
   PALABRAS,
   PALABRAS_POR_CATEGORIA,
 } from '../../data/juegos/ahorcadoContaminado';
+// La abeja REAL de la casa (Tetragonisca angustula rubber-hose, la del compai):
+// import directo del componente — NO del index (el index arrastra el registry
+// con toda la fauna al chunk del juego). El componente compartido no se toca:
+// el juego solo lo DIRIGE por props + CSS propio (prefijo jp-ah-).
+import AbejaAngelita from '../../visual/creatures/AbejaAngelita.jsx';
 import './ahorcado-contaminado.css';
 
 const MAX_ERRORES = 6;
@@ -21,8 +26,8 @@ const ETAPAS_CONTAMINACION = [
   { clase: 'paso-2', texto: 'Las hojas se marchitan y empiezan a caer.' },
   { clase: 'paso-3', texto: 'El suelo fértil se agrieta y pierde su vida.' },
   { clase: 'paso-4', texto: 'El agua de riego se enturbió: ya no está limpia.' },
-  { clase: 'paso-5', texto: 'La abejita polinizadora tambalea, casi no puede volar.' },
-  { clase: 'paso-6', texto: 'La chagra quedó contaminada. La abejita no pudo más.' },
+  { clase: 'paso-5', texto: 'Angelita, la abejita polinizadora, tambalea: casi no puede volar.' },
+  { clase: 'paso-6', texto: 'La chagra quedó contaminada. Angelita y sus amigas no pudieron más.' },
 ];
 
 function normalizar(letra) {
@@ -51,13 +56,74 @@ function MedidorSalud({ errores }) {
 }
 
 /**
+ * actuacionAngelita — la DIRECCIÓN de escena de la protagonista.
+ *
+ * Angelita es el componente compartido (src/visual/creatures/AbejaAngelita):
+ * aquí no se redibuja nada, solo se le dan indicaciones de actuación por sus
+ * props públicos (pose/animo/energia/sed/polen/cejas) según cuántos errores
+ * lleva la partida. La trayectoria (órbita, tambaleo, caída) es del CSS del
+ * juego; la INTERPRETACIÓN (aleteo, parpadeo, jadeo, cejas) es toda suya.
+ */
+function actuacionAngelita(errores, ganado, perdido) {
+  if (ganado) {
+    // Revivió con la chagra: salto de celebración + polen otra vez.
+    return { pose: 'celebra', animo: 'pleno', energia: 1, sed: false, polen: true, cejas: 'alegres' };
+  }
+  if (perdido) {
+    // Desmayada, sin morbo: alitas plegadas (reposo), sin antics (descansa).
+    // Los ojitos cerrados + el gris los pone el CSS del juego (p6).
+    return { pose: 'reposo', animo: 'descansa', energia: 0.12, sed: false, polen: false, cejas: null };
+  }
+  if (errores >= 5) {
+    return { pose: 'vuela', animo: 'sediento', energia: 0.25, sed: true, polen: false, cejas: 'fruncidas' };
+  }
+  if (errores >= 4) {
+    // El agua se enturbió: jadea con la lengüita afuera (sed real del prop).
+    return { pose: 'vuela', animo: 'sediento', energia: 0.4, sed: true, polen: false, cejas: 'altas' };
+  }
+  if (errores >= 3) {
+    return { pose: 'vuela', animo: 'atento', energia: 0.55, sed: false, polen: false, cejas: 'altas' };
+  }
+  if (errores >= 2) {
+    return { pose: 'vuela', animo: 'sereno', energia: 0.75, sed: false, polen: false, cejas: null };
+  }
+  // Chagra sana: plena, cargada de polen (la loca de flor en flor).
+  return { pose: 'vuela', animo: 'pleno', energia: 1, sed: false, polen: true, cejas: null };
+}
+
+/**
+ * Mariposita — secundaria de la escena (dibujo propio del juego, a escala del
+ * paisaje). Secundaria pero NO desechable: ya no huye del químico — acompaña
+ * a Angelita en la degradación (aleteo pesado → tambaleo → cae marchita) y
+ * revive con ella al ganar. La coreografía completa vive en el CSS (jp-ah-).
+ */
+function Mariposita() {
+  return (
+    <g className="jp-ah-mariposa">
+      <g className="jp-ah-mariposa-ala ala-m-izq">
+        <path d="M-1,0 C-6,-6 -11,-6 -11,-1 C-11,3 -6,4 -1,1 Z" />
+        <circle cx="-7" cy="-2" r="1.1" />
+      </g>
+      <g className="jp-ah-mariposa-ala ala-m-der">
+        <path d="M1,0 C6,-6 11,-6 11,-1 C11,3 6,4 1,1 Z" />
+        <circle cx="7" cy="-2" r="1.1" />
+      </g>
+      <ellipse className="jp-ah-mariposa-cuerpo" cx="0" cy="0" rx="1.4" ry="4" />
+      <path className="jp-ah-mariposa-antena" d="M-0.6,-3.6 Q-2,-6 -3,-6.6" />
+      <path className="jp-ah-mariposa-antena" d="M0.6,-3.6 Q2,-6 3,-6.6" />
+    </g>
+  );
+}
+
+/**
  * EscenaChagra — la escena viva que reemplaza la horca (y los emojis).
  *
  * Una parcela andina dibujada en SVG (rubber-hose para los seres vivos:
  * squash&stretch, line-boil sutil) que se contamina un paso por cada error:
  * entra la nube de químico, la mata se marchita, el suelo se agrieta, el
- * agua se enturbia y la abejita tambalea hasta caer (desmayada, sin morbo:
- * esto es educativo). Al ganar, la escena revive y florece.
+ * agua se enturbia y Angelita — la abeja angelita REAL de la casa — tambalea
+ * hasta caer (desmayada, sin morbo: esto es educativo). Sus compañeras
+ * mariposas se apagan CON ella, no desaparecen. Al ganar, todas reviven.
  *
  * Los pasos se acumulan como clases p1..pN para que el CSS aplique cada
  * degradación de forma progresiva y con transiciones suaves.
@@ -66,6 +132,7 @@ function EscenaChagra({ errores, ganado, perdido }) {
   const n = Math.min(errores, MAX_ERRORES);
   const pasos = Array.from({ length: n }, (_, i) => `p${i + 1}`).join(' ');
   const estado = ganado ? 'gano' : perdido ? 'perdio' : '';
+  const angelita = actuacionAngelita(errores, ganado, perdido);
 
   return (
     <svg
@@ -349,43 +416,29 @@ function EscenaChagra({ errores, ganado, perdido }) {
         </g>
       </g>
 
-      {/* ── La abejita polinizadora (rubber-hose, vuela → tambalea → cae) ── */}
+      {/* ── Angelita, la protagonista (la abeja REAL de la casa) ──
+          El componente compartido entra en modo inline: el juego pone la
+          ÓRBITA (vuela → preocupada → tambalea → cae) en los wrappers, y la
+          actuación (aleteo, parpadeo, jadeo, cejas, polen) es del componente
+          vía props. El marco escala y ESPEJA (mira hacia la mata, que queda a
+          su izquierda) en un <g> sin clases animadas: las animaciones CSS de
+          los wrappers no le pisan el transform. */}
       <g className="jp-ah-abeja-orbita">
         <g className="jp-ah-abeja">
-          <g className="jp-ah-ala ala-izq">
-            <ellipse cx="-2" cy="-9" rx="4.6" ry="7" />
-          </g>
-          <g className="jp-ah-ala ala-der">
-            <ellipse cx="3" cy="-8" rx="4" ry="6" />
-          </g>
-          <ellipse className="jp-ah-abeja-cuerpo" cx="0" cy="0" rx="8.4" ry="5.8" />
-          <path className="jp-ah-franja" d="M-1,-5.6 C-2.4,-2 -2.4,2 -1,5.6 L2.4,5.4 C1,2 1,-2 2.4,-5.4 Z" />
-          <path className="jp-ah-franja" d="M4.6,-4.6 C3.6,-1.8 3.6,1.8 4.6,4.6 L7.4,3.4 C6.6,1.4 6.6,-1.4 7.4,-3.4 Z" />
-          <circle className="jp-ah-abeja-cabeza" cx="-9.6" cy="-1" r="4.4" />
-          <g className="jp-ah-antenas">
-            <path d="M-11.5,-4.5 C-13,-7 -14.5,-8 -15.5,-8.5" />
-            <circle cx="-15.8" cy="-8.8" r="1" />
-            <path d="M-9,-5 C-9.5,-8 -10.5,-9.5 -11,-10.5" />
-            <circle cx="-11.2" cy="-10.9" r="1" />
-          </g>
-          <g className="jp-ah-ojos-abiertos">
-            <ellipse cx="-11.2" cy="-1.6" rx="1.25" ry="1.8" />
-            <ellipse cx="-8.4" cy="-1.6" rx="1.25" ry="1.8" />
-            <circle className="jp-ah-pupila" cx="-11.4" cy="-1.3" r="0.55" />
-            <circle className="jp-ah-pupila" cx="-8.6" cy="-1.3" r="0.55" />
-            <path className="jp-ah-sonrisa" d="M-11.4,1.6 Q-9.9,2.8 -8.4,1.6" />
-          </g>
-          <g className="jp-ah-ojos-cerrados">
-            <path d="M-12.3,-1.4 Q-11.2,-0.3 -10.1,-1.4" />
-            <path d="M-9.5,-1.4 Q-8.4,-0.3 -7.3,-1.4" />
-          </g>
-          <g className="jp-ah-patitas">
-            <path d="M-3,5 q-1,2.5 -2.5,3" />
-            <path d="M1,5.6 q0,2.5 -1,3.2" />
-            <path d="M5,5 q1,2.5 0.5,3.4" />
+          <g className="jp-ah-angelita" transform="scale(-1.15 1.15)">
+            <AbejaAngelita
+              inline
+              animated
+              pose={angelita.pose}
+              animo={angelita.animo}
+              energia={angelita.energia}
+              sed={angelita.sed}
+              polen={angelita.polen}
+              cejas={angelita.cejas}
+            />
           </g>
         </g>
-        {/* zZz: la abejita quedó desmayada (educativo, sin morbo) */}
+        {/* zZz: Angelita quedó desmayada (educativo, sin morbo) */}
         <g className="jp-ah-zzz">
           <text className="z-1" x="8" y="-14">z</text>
           <text className="z-2" x="15" y="-22">z</text>
@@ -393,20 +446,15 @@ function EscenaChagra({ errores, ganado, perdido }) {
         </g>
       </g>
 
-      {/* ── Mariposa: revolotea sana; con el químico se aleja de la chagra ── */}
+      {/* ── Mariposas: secundarias que acompañan a Angelita — el químico ya no
+          las espanta fuera de escena: se van apagando CON ella (aleteo pesado
+          → tambaleo → caen marchitas al suelo) y reviven juntas al ganar. ── */}
       <g className="jp-ah-mariposa-orbita">
-        <g className="jp-ah-mariposa">
-          <g className="jp-ah-mariposa-ala ala-m-izq">
-            <path d="M-1,0 C-6,-6 -11,-6 -11,-1 C-11,3 -6,4 -1,1 Z" />
-            <circle cx="-7" cy="-2" r="1.1" />
-          </g>
-          <g className="jp-ah-mariposa-ala ala-m-der">
-            <path d="M1,0 C6,-6 11,-6 11,-1 C11,3 6,4 1,1 Z" />
-            <circle cx="7" cy="-2" r="1.1" />
-          </g>
-          <ellipse className="jp-ah-mariposa-cuerpo" cx="0" cy="0" rx="1.4" ry="4" />
-          <path className="jp-ah-mariposa-antena" d="M-0.6,-3.6 Q-2,-6 -3,-6.6" />
-          <path className="jp-ah-mariposa-antena" d="M0.6,-3.6 Q2,-6 3,-6.6" />
+        <Mariposita />
+      </g>
+      <g className="jp-ah-mariposa-orbita mariposa-orbita-2">
+        <g transform="scale(0.68)">
+          <Mariposita />
         </g>
       </g>
 
