@@ -1,3 +1,4 @@
+/* eslint-disable chagra-i18n/no-hardcoded-spanish -- vitrina de diseño: copy de muestra, no cadenas de UI de producción (ADR-050) */
 /*
  * Mundo3DMercado — vitrina pública del MUNDO DEL MERCADO (ruta
  * #/mockups/mundo3d-mercado).
@@ -27,6 +28,16 @@ import AcompananteMundo, { useAcompanante } from './valle/AcompananteMundo.jsx';
 import './Mundo3DMercado.css';
 
 const TINTE = ['#b98a2f', '#f7ecd2'];
+
+/* La MUESTRA de la vitrina: un día de mercado con cosecha de tomate en los
+   canastos. En la app real los canastos son ESPEJO VIVO de la cosecha reciente
+   (useFincaViva, anti-fabricación §5b); aquí NO hay sesión ni finca que
+   reflejar, y el framework sanciona explícitamente que "una vitrina fije su
+   muestra" (Mundo.jsx): sin esto la plaza pública se vería siempre vacía y la
+   vitrina no enseñaría qué ES el mundo. Mismo espíritu que HATO_MUESTRA. */
+const FINCA_MUESTRA = {
+  cosechaReciente: { cultivo: 'tomate', mundoId: 'mercado' },
+};
 
 /* Lo que se ve en la plaza, contado en una leyenda didáctica y verificada:
    comercialización justa de verdad (cadena corta + procedencia + precio justo),
@@ -105,6 +116,7 @@ export default function Mundo3DMercado() {
             animo="alegre"
             energia={0.95}
             hablando={acompanante.hablando}
+            estadoFinca={FINCA_MUESTRA}
           />
         </AcompananteMundo>
         <div className="m3dmer__barra">
