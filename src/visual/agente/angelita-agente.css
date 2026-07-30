@@ -526,6 +526,87 @@
   74%  { transform: scaleY(1.15); }      /* reabre encantada */
 }
 
+/* MIRA-Y-VUELVE — deja lo que está haciendo, VOLTEA la cabecita derecho hacia
+   usted (el frente, no de reojo como 'mira'), sostiene el contacto un
+   instante — y vuelve la vista a lo suyo. Es el gesto de "¿me está viendo?" /
+   "sigo aquí con usted", distinto del 'mira' curioso (que mira ALREDEDOR, sin
+   usted de por medio). 2.6s = MOMENTOS_IDLE.mirausted.dur. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='mirausted'] .crt-cabeza {
+  animation: agt-mirausted-cabeza 2.6s ease-in-out 1;
+}
+@keyframes agt-mirausted-cabeza {
+  0%, 12%, 100% { transform: rotate(0deg); }
+  32%  { transform: rotate(-6deg); }   /* voltea derecho hacia usted */
+  38%, 68% { transform: rotate(-5.2deg); } /* sostiene la mirada */
+  84%  { transform: rotate(1deg); }    /* vuelve a lo suyo, con un pelín de overshoot */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='mirausted'] .rh-mirada {
+  animation: agt-mirausted-pupila 2.6s ease-in-out 1;
+}
+@keyframes agt-mirausted-pupila {
+  0%, 12%, 100% { transform: translate(0, 0); }
+  32%, 68% { transform: translate(0, 0.35px); }  /* pupilas al frente, hacia usted */
+}
+/* Los ojos se abren un poco más al reconocerla a usted (atención, no susto). */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='mirausted'] .rh-blink {
+  animation: agt-mirausted-ojos 2.6s ease-in-out 1;
+}
+@keyframes agt-mirausted-ojos {
+  0%, 12%, 100% { transform: scaleY(1); }
+  32%, 68% { transform: scaleY(1.1); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='mirausted'] .agt-cuerpo {
+  animation: agt-mirausted-cuerpo 2.6s ease-in-out 1;
+}
+@keyframes agt-mirausted-cuerpo {
+  0%, 100% { transform: rotate(0deg); }
+  32%, 68% { transform: rotate(-1.5deg); }  /* un ladeo chiquito, del cuerpo entero */
+}
+
+/* CUENTA CON LAS PATITAS — la vecina que enumera algo con las manitas: cada
+   bracito baja y "toca" como si contara con los dedos (uno… dos…), la cabeza
+   acompaña el conteo con un cabeceo breve por cada toque. Asíncrono (el
+   brazo derecho cuenta primero, el izquierdo remata) para que no se lea como
+   un espejo perfecto — una criatura contando, no un metrónomo.
+   3.0s = MOMENTOS_IDLE.cuenta.dur. */
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cuenta'] .crt-brazo-r {
+  animation: agt-cuenta-brazo-r 3.0s cubic-bezier(0.4, 0, 0.3, 1.2) 1;
+}
+@keyframes agt-cuenta-brazo-r {
+  0%, 10%, 100% { transform: rotate(0deg); }
+  22%  { transform: rotate(-96deg); }   /* uno… */
+  30%  { transform: rotate(-84deg); }
+  46%  { transform: rotate(-100deg); }  /* dos… */
+  54%  { transform: rotate(-84deg); }
+  86%  { transform: rotate(4deg); }     /* recoge */
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cuenta'] .crt-brazo-l {
+  animation: agt-cuenta-brazo-l 3.0s cubic-bezier(0.4, 0, 0.3, 1.2) 1;
+}
+@keyframes agt-cuenta-brazo-l {
+  0%, 58%, 100% { transform: rotate(0deg); }
+  70%  { transform: rotate(88deg); }    /* tres — el remate, un pelín tarde */
+  78%  { transform: rotate(76deg); }
+  90%  { transform: rotate(-3deg); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cuenta'] .crt-cabeza {
+  animation: agt-cuenta-cabeza 3.0s ease-in-out 1;
+}
+@keyframes agt-cuenta-cabeza {
+  0%, 10%, 100% { transform: rotate(0deg) translateY(0); }
+  22%, 30% { transform: rotate(-2.2deg) translateY(0.3px); }  /* asiente: uno */
+  46%, 54% { transform: rotate(-2.4deg) translateY(0.35px); } /* dos */
+  70%, 78% { transform: rotate(2deg) translateY(0.3px); }     /* tres */
+  90%  { transform: rotate(0deg) translateY(0); }
+}
+[data-agente='angelita'][data-agt-vivo='1'][data-agt-idle='cuenta'] .agt-cuerpo {
+  animation: agt-cuenta-cuerpo 3.0s ease-in-out 1;
+}
+@keyframes agt-cuenta-cuerpo {
+  0%, 100% { transform: scale(1, 1); }
+  26%, 50%, 74% { transform: scale(1.015, 0.985); }  /* un pulsito por cada toque */
+}
+
 /* SE POSA — aterrizar CUESTA: se alza un pelo eligiendo el sitio, baja con
    peso (ease-in), amortigua con squash y queda abajo (fill forwards empalma
    con la quietud de 'posada'). Las alitas siguen frenando en el aire. */

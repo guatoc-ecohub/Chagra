@@ -48,6 +48,11 @@ import {
 import usePerfilFincaStore from '../store/usePerfilFincaStore.js';
 /* El reloj del ciclo diurno vivo (franja real del día + override ?ciclo=). */
 import useCicloDia from '../visual/mundo3d/useCicloDia.js';
+/* El ESPEJO VIVO del dato real (#38 — el husmeo hablaba con la boca vacía:
+   este estadoFinca solo traía clima/animo/energia de muestra, nunca
+   saludFinca/cosechaReciente/enso reales). Hook puro (three-free), ya
+   consumido fuera de su propio módulo por Mundo.jsx — mismo patrón aquí. */
+import useFincaViva from '../visual/mundo3d/useFincaViva.js';
 import Valle2DFallback from './valle/Valle2DFallback';
 import AbejaTransicion, { AlMontarEscena } from '../visual/creatures/AbejaTransicion.jsx';
 /* La señal de SALIDA del compAI (auditoría #47/#51): al volver al valle, el
@@ -231,9 +236,23 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
     () => animoDeFinca(clima, { hayAlerta: !alertaVista }),
     [clima, alertaVista],
   );
+  /* #38 — datos REALES de la finca para que el husmeo autónomo (CompaneroAbeja
+     en Valle3D.jsx) comente lo que de verdad hay, no un pool genérico. Antes
+     este objeto solo traía clima/animo/energia de muestra: reaccionDeFinca
+     caía siempre a sus defaults (saludFinca/cosechaReciente/enso neutros).
+     `fincaViva` es anti-fabricación (useFincaViva): sin dato real, sus campos
+     quedan undefined y reaccionDeFinca usa su propio neutro — nunca inventa. */
+  const fincaViva = useFincaViva();
   const estadoFinca = useMemo(
-    () => ({ clima, animo: companero.animo, energia: companero.energia }),
-    [clima, companero.animo, companero.energia],
+    () => ({
+      clima,
+      animo: companero.animo,
+      energia: companero.energia,
+      enso: fincaViva.enso,
+      cosechaReciente: fincaViva.cosechaReciente,
+      saludFinca: fincaViva.saludFinca,
+    }),
+    [clima, companero.animo, companero.energia, fincaViva.enso, fincaViva.cosechaReciente, fincaViva.saludFinca],
   );
 
   // ── Angelita VIVA (auditoría S5): además del idle (respira/flota, en CSS),

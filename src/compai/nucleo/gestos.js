@@ -13,6 +13,23 @@
  * su nombre en el SPEC y no estaba entre los 9 gestos. Un parpadeo es
  * biología; un guiño es complicidad, que es otra cosa.
  *
+ * Y con él entran **`estira`, `bosteza`, `rascanuca`, `cabecea` y
+ * `voltereta`** (merge de `fable/compai-gestos-entrada`, 2026-07-26): el
+ * repertorio elegible por azar pasa de 6 a **12 momentos**, que es lo que
+ * pedía el SPEC — *"no es predecible, siempre hace cosas diferentes"*. Con 6
+ * gestos y anti-repetición el ciclo se leía; con 12 deja de leerse.
+ *
+ * NUEVO 2026-07-30 (Ola 2, batch 1, #13/#14): **`mirausted`** ("mirar al
+ * usuario y volver la vista", distinto del 'mira' curioso que mira ALREDEDOR
+ * sin usted de por medio) y **`cuenta`** ("contar algo con las patitas") —
+ * los 2 gestos del pedido original de #13/#14 que faltaban del repertorio de
+ * 12. Con ellos son **14 momentos**.
+ *
+ * Entran AQUÍ y no en `angelitaEstados.js` a propósito: el núcleo es la fuente
+ * única, y si el repertorio se quedara en la PWA el compAI de `3d.guatoc.co`
+ * heredaría otra vez un personaje más pobre — que es exactamente la divergencia
+ * que este núcleo existe para cerrar.
+ *
  * REGLA DURA: `dur` (ms) debe COINCIDIR con la duración del keyframe one-shot
  * del CSS de ese momento — el scheduler suelta el atributo exactamente cuando
  * el gesto termina en identidad, y así el empalme no salta.
@@ -31,6 +48,13 @@ export const MOMENTOS_IDLE = {
   rasca: { dur: 2400, peso: 1.5 },    // se rasca la barriguita, satisfecha
   sacude: { dur: 1500, peso: 1.5 },   // sacudón de alas: escalofrío alegre que la esponja
   guino: { dur: 1800, peso: 1.2 },    // se pica el ojo: complicidad, no biología (SPEC)
+  estira: { dur: 2600, peso: 1.4 },   // se estira a gusto: bracitos arriba, bosteza el cuerpo
+  bosteza: { dur: 3200, peso: 1.1 },  // bostezo de goma: boca enorme, manita tarde a taparla
+  rascanuca: { dur: 2400, peso: 1.3 },// se rasca la nuca, medio apenada (rascarse distinto)
+  cabecea: { dur: 3600, peso: 0.9 },  // se le van los ojos… zzz… y DESPIERTA de un brinco
+  voltereta: { dur: 1700, peso: 0.8 },// pirueta juguetona: vuelta de campana con anticipación
+  mirausted: { dur: 2600, peso: 2.2 },// voltea derecho hacia usted, sostiene, y vuelve a lo suyo
+  cuenta: { dur: 3000, peso: 1.3 },   // cuenta algo con las patitas: toca uno, dos, tres…
   posa: { dur: 1150, peso: 2 },       // aterriza con peso (→ posada → despega)
   posada: { dur: [3400, 5200], peso: 0 }, // descansa posada: alitas plegadas, respira hondo
   despega: { dur: 950, peso: 0 },     // se agacha, coge impulso y vuelve al aire
