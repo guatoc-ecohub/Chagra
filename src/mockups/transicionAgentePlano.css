@@ -115,9 +115,12 @@
   justify-content: center;
   flex-direction: column;
 }
+/* Sin drop-shadow CSS sobre el sprite: el filtro del wrapper interactúa mal
+   con los filtros SVG internos de la creature (boil/aura) y pinta la REGIÓN
+   del filtro como un cuadro — verificado en captura GPU. La profundidad la
+   vende la sombra-elipse dedicada de abajo. */
 .tap-abeja {
   will-change: transform;
-  filter: drop-shadow(0 6px 14px rgba(20, 30, 15, 0.35));
   animation: tapFlota 3.4s ease-in-out infinite;
 }
 @keyframes tapFlota {

@@ -78,12 +78,15 @@
 /* EL VUELO de ida: brinquito de llamada → anticipación (se echa atrás,
    CONTRA el sentido del viaje, con squash) → se clava a la boca del túnel
    estirándose y encogiéndose — la opacidad muere SECA en el cubierto. */
+/* Sin drop-shadow CSS sobre el sprite: un filter del wrapper interactúa mal
+   con los filtros SVG internos de la creature (boil/aura) y pinta la REGIÓN
+   del filtro como un cuadro — verificado en captura GPU. La profundidad del
+   personaje la venden su propia aura y la sombra-elipse de la llegada. */
 .apt__vuelo {
   display: flex;
   align-items: center;
   justify-content: center;
   will-change: transform, opacity;
-  filter: drop-shadow(0 6px 14px rgba(20, 30, 15, 0.35));
   animation: aptIda var(--apt-ida-ms) cubic-bezier(0.55, -0.1, 0.7, 0.92) both;
 }
 @keyframes aptIda {
@@ -248,7 +251,6 @@
   align-items: center;
   justify-content: center;
   will-change: transform, opacity;
-  filter: drop-shadow(0 5px 12px rgba(20, 30, 15, 0.32));
   animation:
     aptCondensa var(--apt-vuelo2-ms) cubic-bezier(0.3, 0.6, 0.35, 1) var(--apt-salida-ms) both,
     aptAplana var(--apt-aplane-ms) cubic-bezier(0.34, 1.4, 0.64, 1)
