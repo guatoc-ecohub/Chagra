@@ -321,7 +321,7 @@ function llaveCooldown(estado, severidad) {
  * @param {number|null} [p.ultimaMs] — cuándo surgió por última vez ESE tipo.
  * @param {boolean} [p.ocupado] — el campesino está a mitad de algo (escribiendo, grabando…).
  * @param {boolean} [p.silenciado] — el usuario pidió silencio a Angelita.
- * @param {number} [p.molestia] — contador adaptativo (#102/#106, sección 7):
+ * @param {number} [p.molestia] contador adaptativo (#102/#106, sección 7):
  *   estira/encoge el cooldown base. 0 = cadencia normal. NO afecta aviso_alta
  *   (urgencia real habla siempre, contador o no).
  * @returns {boolean}
@@ -397,7 +397,7 @@ function decisionCalma() {
  * @param {Object} [ctx.ultimaHablaPorLlave] — { [llaveCooldown]: ms } de la última vez.
  * @param {boolean} [ctx.ocupado]
  * @param {boolean} [ctx.silenciado]
- * @param {number} [ctx.molestia] — contador adaptativo (#102/#106, sección 7).
+ * @param {number} [ctx.molestia] contador adaptativo (#102/#106, sección 7).
  * @returns {DecisionAngelita}
  */
 export function resolverComportamiento(ctx = {}) {
@@ -539,9 +539,12 @@ export const MOLESTIA_MAX = 15;
 
 /**
  * Aplica una señal al contador de molestia, clamped. Pura — el store es quien
- * persiste el resultado.
+ * persiste el resultado. `senal` es `string` (no `keyof typeof MOLESTIA_DELTA`)
+ * a propósito: en runtime puede llegar cualquier string (evento externo,
+ * telemetría futura) y una señal desconocida debe degradar sin mutar el
+ * contador, no romper el tipado en el caller.
  * @param {number} contadorActual
- * @param {keyof MOLESTIA_DELTA} senal
+ * @param {string} senal una de MOLESTIA_DELTA; desconocida = no-op.
  * @returns {number} nuevo contador, clamped a [MOLESTIA_MIN, MOLESTIA_MAX].
  */
 export function aplicarSenalMolestia(contadorActual, senal) {
