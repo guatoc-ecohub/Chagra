@@ -70,15 +70,18 @@ function crestaSuave(rng, yCresta, amplitud, nPuntos = 9) {
   return d;
 }
 
-/* La cordillera nevada del fondo: picos AGUDOS (L, no Q) + manto de nieve. */
+/* La cordillera nevada del fondo: picos AGUDOS (L, no Q) + manto de nieve.
+   Irregular a dos escalas (base alternada + espolones altos ocasionales) para
+   que no lea como sierra de papel: cada pico con su propia altura. */
 function nevado(rng) {
-  const nPicos = 16;
+  const nPicos = 18;
   const cresta = [];
   for (let i = 0; i <= nPicos; i += 1) {
-    const x = (i / nPicos) * ANCHO;
+    const x = (i / nPicos) * ANCHO + (rng() - 0.5) * 34;
     const pico = i % 2 === 0;
-    const y = (pico ? 210 : 292) + (rng() - 0.5) * 58;
-    cresta.push([x, y]);
+    const espolon = pico && rng() < 0.28 ? -52 : 0;
+    const y = Math.max(168, (pico ? 222 : 298) + espolon + (rng() - 0.5) * 64);
+    cresta.push([i === 0 ? 0 : i === nPicos ? ANCHO : x, y]);
   }
   const linea = cresta.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(' L ');
   const roca = `M -40 ${cresta[0][1]} L ${linea} L ${ANCHO + 40} ${cresta[nPicos][1]} L ${ANCHO + 40} 430 L -40 430 Z`;
@@ -112,7 +115,7 @@ const CAPAS = [
 const AJUSTE_ESTAMPA = {
   clima: [-170, -46],
   agua: [150, 8],
-  suelo: [-60, 26],
+  suelo: [64, 30], // a la derecha del rótulo TEMPLADO del eje (no taparlo)
   cafe: [30, -20],
   micorrizas: [40, 30],
   valle: [-30, 22],
@@ -232,16 +235,16 @@ export default function VistaGlobalPisos({ mundoActual = null, onNavigate, onCer
         .navg-estampa:focus-visible { outline: none; }
         .navg-aqui { animation: navg-pulso 2.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
         .navg-niebla { animation: navg-respira 9s ease-in-out infinite; }
-        .navg-agua-caida { stroke-dasharray: 10 7; animation: navg-cae 1.6s linear infinite; }
+        .navg-velo { animation: navg-velo-late 2.8s ease-in-out infinite; }
         .navg-botones { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; }
         .navg-boton { border: 1.5px solid #cdbf9b; background: rgba(26, 32, 27, 0.82); color: #f2ead4;
           font: 600 14px 'Baloo 2', Georgia, serif; padding: 8px 14px; border-radius: 999px; cursor: pointer; }
         .navg-boton:hover { background: rgba(58, 66, 52, 0.92); }
         @keyframes navg-pulso { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.12); opacity: 0.55; } }
         @keyframes navg-respira { 0%, 100% { opacity: 0.34; } 50% { opacity: 0.16; } }
-        @keyframes navg-cae { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -34; } }
+        @keyframes navg-velo-late { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
         @media (prefers-reduced-motion: reduce) {
-          .navg-aqui, .navg-niebla, .navg-agua-caida { animation: none; }
+          .navg-aqui, .navg-niebla, .navg-velo { animation: none; }
         }
       `}</style>
       <svg viewBox={`0 0 ${ANCHO} ${ALTO}`} preserveAspectRatio="xMidYMid slice">
@@ -306,13 +309,33 @@ export default function VistaGlobalPisos({ mundoActual = null, onNavigate, onCer
 
         {/* ── NUESTRO APORTE, arriba junto al nevado: el páramo y LA CHORRERA ── */}
         <g aria-hidden="true">
-          {/* La peña de la cascada: un tajo de roca en la capa del páramo bajo. */}
-          <path d="M 985 402 L 1075 396 L 1092 520 L 968 526 Z" fill="#5c7280" />
-          <path d="M 1002 402 L 1022 400 L 1030 520 L 1006 522 Z" fill="#46596a" opacity="0.55" />
-          {/* El agua que cae: dos hebras blancas con caída animada. */}
-          <path className="navg-agua-caida" d="M 1024 402 C 1020 440 1030 470 1022 516" stroke="#f3f8f9" strokeWidth="9" fill="none" strokeLinecap="round" />
-          <path className="navg-agua-caida" d="M 1040 404 C 1042 442 1034 472 1044 514" stroke="#e8f1f3" strokeWidth="5" fill="none" strokeLinecap="round" style={{ animationDelay: '0.6s' }} />
-          <ellipse cx="1032" cy="522" rx="40" ry="12" fill="#eef5f6" opacity="0.85" filter="url(#navg-borroso)" />
+          {/* El peñón de la cascada: dos hombros de roca con la muesca por donde
+              se descuelga el agua (nada de trapecios: la peña tiene quiebres). */}
+          <path
+            d="M 972 428 L 1000 408 L 1014 414 L 1012 452 L 1004 500 L 1012 524 L 966 528 L 976 480 Z"
+            fill="#57666f"
+          />
+          <path
+            d="M 1052 412 L 1082 404 L 1102 430 L 1090 478 L 1098 524 L 1046 526 L 1054 486 L 1046 448 Z"
+            fill="#5c6d76"
+          />
+          <path d="M 972 428 L 1000 408 L 990 470 L 972 480 Z" fill="#43525b" opacity="0.8" />
+          <path d="M 1082 404 L 1102 430 L 1088 486 L 1076 452 Z" fill="#45545d" opacity="0.8" />
+          {/* El agua: una CINTA sólida que se abre al caer, con su velo interior. */}
+          <path
+            d="M 1018 414 C 1014 448 1022 470 1012 522 L 1048 522 C 1042 468 1050 446 1046 414 Z"
+            fill="#f2f8f9"
+            opacity="0.96"
+          />
+          <path
+            d="M 1026 414 C 1024 452 1030 480 1024 520 L 1036 520 C 1034 478 1038 450 1038 414 Z"
+            fill="#ffffff"
+            className="navg-velo"
+          />
+          <path d="M 1018 414 C 1030 420 1040 420 1046 414 L 1044 426 C 1036 431 1028 431 1020 426 Z" fill="#dcebee" />
+          {/* La bruma del golpe abajo, y el charco que arranca la quebrada. */}
+          <ellipse cx="1031" cy="526" rx="44" ry="13" fill="#eef5f6" opacity="0.9" filter="url(#navg-borroso)" />
+          <ellipse cx="1031" cy="514" rx="20" ry="7" fill="#ffffff" opacity="0.55" filter="url(#navg-borroso)" />
           {/* La quebrada que sigue ladera abajo, piso por piso, hasta el valle. */}
           <path
             d="M 1032 524 C 1010 570 1090 610 1052 660 C 1020 704 1090 750 1044 800 C 1010 844 1060 900 1020 952"

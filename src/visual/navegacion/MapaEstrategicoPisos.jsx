@@ -71,40 +71,26 @@ function FichaMundo({ mundo, x, y, color, actual, onNavigate }) {
         }
       }}
     >
-      {actual && <circle r="37" fill="none" stroke="#e5b54a" strokeWidth="3.5" className="navm-aqui" />}
-      <ellipse cx="0" cy="24" rx="22" ry="7" fill="#1c2418" opacity="0.35" />
-      <circle r="27" fill="#f7f0dd" stroke={tono(color, 0.72)} strokeWidth="3" />
-      <circle r="22" fill={tono(color, 1.35)} opacity="0.35" />
-      <text y="8" textAnchor="middle" fontSize="24" aria-hidden="true">
+      {actual && <circle r="34" fill="none" stroke="#e5b54a" strokeWidth="3.5" className="navm-aqui" />}
+      <ellipse cx="0" cy="22" rx="20" ry="6.5" fill="#1c2418" opacity="0.35" />
+      <circle r="25" fill="#f7f0dd" stroke={tono(color, 0.72)} strokeWidth="3" />
+      <circle r="20" fill={tono(color, 1.35)} opacity="0.35" />
+      <text y="8" textAnchor="middle" fontSize="22" aria-hidden="true">
         {mundo.emoji}
       </text>
       <text
-        y="47"
+        y="45"
         textAnchor="middle"
-        fontSize="14"
+        fontSize="13.5"
         fontWeight="600"
         fontFamily="Georgia, 'Times New Roman', serif"
-        fill="#241f14"
+        fill={actual ? '#7c5c12' : '#241f14'}
         stroke="#efe6cd"
         strokeWidth="4"
         paintOrder="stroke"
       >
-        {mundo.titulo}
+        {actual ? `★ ${mundo.titulo}` : mundo.titulo}
       </text>
-      {actual && (
-        <text
-          y="-40"
-          textAnchor="middle"
-          fontSize="13"
-          fontFamily="Georgia, 'Times New Roman', serif"
-          fill="#8a6a1f"
-          stroke="#f7f0dd"
-          strokeWidth="4"
-          paintOrder="stroke"
-        >
-          ★ Usted está aquí
-        </text>
-      )}
     </g>
   );
 }
@@ -134,7 +120,9 @@ export default function MapaEstrategicoPisos({ mundoActual = null, onNavigate, o
         const x = terraza.cy === TERRAZAS[0].cy && n === 1
           ? CX
           : CX + ((idx + 0.5) / enFila - 0.5) * 2 * terraza.semiAncho * margen;
-        const y = terraza.cy + (fila === 0 ? -semiAlto * 0.22 : semiAlto * 0.38);
+        // Filas separadas para que los rótulos de la fila alta no choquen con
+        // las fichas de la baja (el diamante isométrico no da más alto útil).
+        const y = terraza.cy + (fila === 0 ? -semiAlto * 0.26 : semiAlto * 0.34);
         return { mundo, x, y };
       });
       return { banda, terraza, semiAlto, fichas };
