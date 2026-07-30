@@ -78,6 +78,12 @@ import BosqueDensoValle from './BosqueDensoValle.jsx';
 import CafetalDensoValle from './CafetalDensoValle.jsx';
 import ParamoDensoValle from './ParamoDensoValle.jsx';
 import LaderaAltaValle from './LaderaAltaValle.jsx';
+/* Los GUARDIANES del gradiente (pedido del operador 2026-07-30): el Ent del
+   piso térmico de ESTA finca + máximo un vecino, al fondo del flanco
+   izquierdo. La regla del máximo-dos y el mapeo piso→Ent viven en
+   pisosBosqueGradiente.js; la composición (puestos, escalas, la lección del
+   intento archivado de 2026-07-18), en EntsDelValle. */
+import EntsDelValle from './EntsDelValle.jsx';
 import ArrieriaValle from './ArrieriaValle.jsx';
 import AguaVivaValle from './AguaVivaValle.jsx';
 import DetalleSueloValle from './DetalleSueloValle.jsx';
@@ -1957,7 +1963,12 @@ function CompaneroAbeja({ foco, focoId = null, entrando, animo, energia, reduced
      sale del inventario. Sin él, el comentarista del clima dice la verdad. */
   const climaExtra = useMemo(
     () => (estadoFinca?.snapshotClima ? { snapshot: estadoFinca.snapshotClima } : undefined),
-    [estadoFinca?.snapshotClima],
+    /* Dep `estadoFinca` entero (no `?.snapshotClima`): el React Compiler
+       rehúsa memoizar con una dep más ESPECÍFICA que la que infiere
+       (react-hooks/preserve-manual-memoization) y el error pre-existente
+       bloqueaba el lefthook de todo el que tocara este archivo. Recalcular
+       el ternario cuando cambia el objeto es gratis; el consumo va por ref. */
+    [estadoFinca],
   );
   const climaExtraRef = useRef(climaExtra);
   useEffect(() => { climaExtraRef.current = climaExtra; }, [climaExtra]);
@@ -2752,7 +2763,7 @@ function poseValleParaAspecto(aspect) {
 }
 
 /* ── Contenido de la escena (dentro del Canvas). ── */
-function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = null, onAngelita = null, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null, mundos = MUNDOS_DIR }) {
+function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = null, onAngelita = null, reducedMotion, perfil, tier = 'alto', estadoFinca = null, hayAlerta = false, aplanando = false, camaraDirector = false, beatsRef = null, portada = false, pose = null, mundos = MUNDOS_DIR, pisoTermico = null }) {
   /* La pose de reposo (aspecto-consciente, viene del host del Canvas). */
   const poseReposo = pose || { position: CAMARA_VALLE.position, fov: CAMARA_VALLE.fov, k: 1, mira: MIRA_VALLE };
   const miraReposo = poseReposo.mira || MIRA_VALLE;
@@ -2871,6 +2882,10 @@ function Escena({ clima, focoId, animo, energia, onEntrar, onAlerta, onCasa = nu
       {/* La LADERA ALTA poblada: terrazas de clima frío en policultivo (papa,
           haba, cubio, arracacha + barbecho), cerca de piedra, camino y abrigo. */}
       <LaderaAltaValle alturaDe={alturaTerreno} tier={tier} nocturno={nocturno} reducedMotion={reducedMotion} />
+      {/* LOS GUARDIANES DEL GRADIENTE: el Ent del piso de esta finca (+ máx un
+          vecino apagado) emergiendo al fondo del flanco izquierdo — landmark,
+          no primer plano. Máximo-dos y mapeo piso→Ent: pisosBosqueGradiente. */}
+      <EntsDelValle pisoTermico={pisoTermico} alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />
       {!portada && <CampesinosValle alturaDe={alturaTerreno} tier={tier} reducedMotion={reducedMotion} />}
       {!portada && <HatoMovil alturaDe={alturaTerreno} tier={tier === 'alto' ? 10 : tier === 'bajo' ? 4 : 7} radio={4.8} reducedMotion={reducedMotion} />}
       {/* LOGÍSTICA VISIBLE (alma Settlers): la mula acarrea estiércol→pila,
@@ -3080,6 +3095,10 @@ export default function Valle3D({
      OJO: `perfil` (arriba) es el perfil de RENDER del tier — no confundir con
      el perfil de la FINCA, que llega ya resuelto en esta lista. */
   mundos = MUNDOS_DIR,
+  /* El PISO TÉRMICO del perfil de la finca ('calido'|'templado'|'frio'|
+     'paramo'|null): decide QUÉ Ent-guardián emerge al fondo del valle
+     (EntsDelValle). null → el default del mapeo (templado, el roble). */
+  pisoTermico = null,
 }) {
   const [listo, setListo] = useState(false);
   /* GUARD DEL NEGRO INTERMITENTE (auditoría 2026-07-16): sin oyente de
@@ -3158,6 +3177,7 @@ export default function Valle3D({
           portada={portada}
           pose={pose}
           mundos={mundos}
+          pisoTermico={pisoTermico}
         />
       </Suspense>
     </Canvas>
