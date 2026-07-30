@@ -173,6 +173,13 @@ const HojaPruebaValleMockup = lazy(() => import('./mockups/HojaPruebaValle'));
 // operador). Reemplaza a BosqueVivo3D, MundoParamo3D y SueloDemo3D (los tres
 // archivados en src/mockups/_archivo/). Ruta #/mockups/paramo-definitivo.
 const ParamoDefinitivoMockup = lazy(() => import('./visual/mundo3d/bosque/MundoEntBosque.jsx'));
+// 3D: EL MONTE QUE VUELVE — el potrero volviéndose bosque, a través del
+// tiempo (50 años, riel no lineal). Rescate de huérfano (deuda
+// "construido-no-cableado": RestauracionEnElTiempo.jsx y su escena
+// EscenaRestauracion/AguaQueVuelve no tenían NINGÚN consumidor). Device-
+// tiering real (3D en equipo que da, corte SVG LaderaEnFranjas si no). Ruta
+// #/mockups/restauracion-tiempo-3d, sin auth.
+const RestauracionTiempo3DMockup = lazy(() => import('./mockups/RestauracionTiempo3D'));
 // 3D: el MUNDO DEL CAFÉ — el cafetal bajo sombra del piso templado: surcos a
 // curva de nivel, cereza madurando verde→pintón→rojo por instancia, el sombrío
 // de guamos y nogales, y la casa-beneficiadero en la bruma. Device-tiering
@@ -206,6 +213,19 @@ const CacaoVivo3DMockup = lazy(() => import('./mockups/CacaoVivo3D'));
 // blanca por instancia, la cosecha de criollas (amarilla/roja/morada) y los
 // frailejones en silueta. Device-tiering real. Ruta #/mockups/papa-viva-3d, sin auth.
 const PapaVivo3DMockup = lazy(() => import('./mockups/PapaVivo3D'));
+// 3D: el MUNDO DE LA YUCA — el yucal de clima medio en el arranque: el tallo
+// leñoso pelado y anillado de cicatrices, el follaje arriba no más, el
+// semillero de estacas inclinadas y el racimo de raíces recién destapado.
+// Rescate de huérfano (construido-no-cableado): YucaViva3D.jsx no tenía
+// entrada en el router. Device-tiering real. Ruta #/mockups/yuca-viva-3d, sin
+// auth.
+const YucaViva3DMockup = lazy(() => import('./mockups/YucaViva3D'));
+// 3D: el MUNDO DE LA QUINUA — el quinual maduro de tierra fría (2.500-3.200
+// m): la ladera a manchas de color por variedad y la era donde se trilla, se
+// avienta y se le lava lo amargo. Rescate de huérfano (construido-no-
+// cableado): QuinuaViva3D.jsx no tenía entrada en el router. Device-tiering
+// real. Ruta #/mockups/quinua-viva-3d, sin auth.
+const QuinuaViva3DMockup = lazy(() => import('./mockups/QuinuaViva3D'));
 // 3D: el MUNDO DE LOS FRUTALES — mango y cítricos juntos, porque juntos
 // enseñan el PISO TÉRMICO: el mango es de tierra caliente y el cítrico sube al
 // clima medio. La escala relativa es la lección: el mango eclipsa al cítrico.
@@ -710,6 +730,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/mundo3d-milpa': 'mockup_mundo3d_milpa',
   'mockups/mundo3d-bosque': 'mockup_mundo3d_bosque',
   'mockups/paramo-definitivo': 'mockup_paramo_definitivo',
+  'mockups/restauracion-tiempo-3d': 'mockup_restauracion_tiempo_3d',
   'mockups/cafetal-vivo-3d': 'mockup_cafetal_vivo_3d',
   'mockups/aguacatal-vivo-3d': 'mockup_aguacatal_vivo_3d',
   'mockups/microcuenca': 'mockup_microcuenca',
@@ -719,6 +740,8 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/invernadero-vivo-3d': 'mockup_invernadero_vivo_3d',
   'mockups/cacao-vivo-3d': 'mockup_cacao_vivo_3d',
   'mockups/papa-viva-3d': 'mockup_papa_viva_3d',
+  'mockups/yuca-viva-3d': 'mockup_yuca_viva_3d',
+  'mockups/quinua-viva-3d': 'mockup_quinua_viva_3d',
   'mockups/frutales-vivo-3d': 'mockup_frutales_vivo_3d',
   'mockups/mundo-piscicultura-3d': 'mockup_mundo_piscicultura_3d',
   'mockups/lecheria-viva-3d': 'mockup_lecheria_viva_3d',
@@ -1755,6 +1778,17 @@ export default function App() {
             </ErrorFallback>
           </ErrorBoundary>
         );
+      case 'mockup_restauracion_tiempo_3d':
+        // EL MONTE QUE VUELVE: el potrero volviéndose bosque a través del
+        // tiempo (50 años, riel no lineal). Ruta #/mockups/restauracion-
+        // tiempo-3d, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El monte que vuelve">
+              <RestauracionTiempo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
       case 'mundo_casa_adentro':
         return (
           <ErrorBoundary>
@@ -1841,6 +1875,32 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El mundo de la papa">
               <PapaVivo3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_yuca_viva_3d':
+        // Vitrina pública del MUNDO DE LA YUCA: el yucal de clima medio en 3D
+        // REAL — el tallo leñoso pelado y anillado de cicatrices, el follaje
+        // arriba no más, el semillero de estacas inclinadas y el racimo de
+        // raíces recién destapado. En equipo humilde muestra la ficha del
+        // corte. Ruta #/mockups/yuca-viva-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de la yuca">
+              <YucaViva3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_quinua_viva_3d':
+        // Vitrina pública del MUNDO DE LA QUINUA: el quinual maduro de tierra
+        // fría en 3D REAL — la ladera a manchas de color por variedad y la
+        // era donde se trilla, se avienta y se le lava lo amargo. En equipo
+        // humilde muestra la ficha de las dos panojas. Ruta
+        // #/mockups/quinua-viva-3d.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo de la quinua">
+              <QuinuaViva3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
