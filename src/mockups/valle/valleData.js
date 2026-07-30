@@ -232,6 +232,14 @@ const LUGARES_PARA_CONOCER = [
     id: 'compost', pos: [-6.6, 0, 8.0], escala: 0.8, tipo: 'compost',
     fallbackMundo: { titulo: 'El compost', emoji: '🍂', lema: 'Conozca cómo vuelve la materia a la tierra.', tinte: ['#59401f', '#a8854c'] },
   },
+  // El BOSQUE NATIVO altoandino de tres estratos (mundo `bosque`): el monte de
+  // niebla que abraza la finca, arriba en el frío. Tocarlo abre el bosque de
+  // dosel/sotobosque/suelo leído como una lámina de Humboldt viva. Pieza "para
+  // conocer" (no altera el perfil demo), igual que la Sierra. (Al final: anti-conflicto.)
+  {
+    id: 'bosque', pos: [6.0, 0, -5.2], escala: 1.1, tipo: 'bosque',
+    fallbackMundo: { titulo: 'El bosque nativo', emoji: '🌿', lema: 'El bosque altoandino de niebla y sus tres estratos: dosel, sotobosque y suelo.', tinte: ['#3f6f3a', '#c4d6c0'] },
+  },
 ];
 
 /* ── 2b. LA SIEMBRA: QUÉ LUGARES LE TOCAN A ESTA FINCA ───────────────────────

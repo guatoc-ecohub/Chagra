@@ -282,6 +282,9 @@ const JuegoLaMilpaMockup = lazy(() => import('./mockups/JuegoLaMilpa'));
 // de crecimiento con los que se representa el catálogo de flora sin modelar las
 // 581 especies una por una.
 const BosqueTresEstratos3DMockup = lazy(() => import('./mockups/BosqueTresEstratos3D'));
+// Vitrina del MUNDO `bosque` cableado (arquetipo nuevo → EscenaBosque): monta
+// <Mundo mundoId="bosque"> del framework. Ruta #/mockups/mundo-bosque-nativo.
+const MundoBosqueNativo3DMockup = lazy(() => import('./mockups/MundoBosqueNativo3D'));
 // Los TRES ÁRBOLES MAESTROS del gradiente andino: un Ent por piso térmico
 // (roble, aliso y la queñua que ya existía), el agua que baja del páramo al
 // templado y la red de micorrizas que amarra sus raíces en la cara cortada
@@ -767,6 +770,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/valle-noche-3d': 'mockup_valle_noche_3d',
   'mockups/juego-la-milpa': 'mockup_juego_la_milpa',
   'mockups/bosque-tres-estratos': 'mockup_bosque_tres_estratos',
+  'mockups/mundo-bosque-nativo': 'mockup_mundo_bosque_nativo',
   'mockups/tres-ents-gradiente': 'mockup_tres_ents_gradiente',
   'mockups/paramo-humboldt-3d': 'mockup_paramo_humboldt_3d',
   'mockups/camara-director': 'mockup_camara_director',
@@ -2529,6 +2533,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El bosque nativo y sus tres estratos">
               <BosqueTresEstratos3DMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_mundo_bosque_nativo':
+        // Vitrina del MUNDO `bosque` cableado (arquetipo nuevo → EscenaBosque):
+        // monta <Mundo mundoId="bosque"> del framework, con device-tiering real.
+        // Prueba de punta a punta el registro del bosque de niebla de 3 estratos.
+        // Ruta #/mockups/mundo-bosque-nativo, sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El mundo del bosque nativo">
+              <MundoBosqueNativo3DMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );

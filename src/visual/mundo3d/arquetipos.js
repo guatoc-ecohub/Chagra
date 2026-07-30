@@ -104,6 +104,17 @@ export const ARQUETIPOS = {
     nombre: 'La red del suelo', clave: 'el wood-wide web: la red de hongos que conecta las raíces y reparte nutrientes bajo tierra',
     ejemplo: 'micorrizas', tambien: [],
   },
+  // El bosque nativo altoandino de TRES ESTRATOS: familia propia (una escena a
+  // ESCALA DE BOSQUE, autocontenida como el valle — no un diorama chico de la
+  // base). Su lección es la verticalidad del bosque de niebla nativo leída como
+  // una lámina de Humboldt viva: dosel / sotobosque / suelo, con epífitas y
+  // niebla. En equipo humilde cae a su ficha 2D (la lámina de los tres estratos).
+  // (anti-conflicto: arquetipo 3D nuevo al final del bloque.)
+  bosque: {
+    dim: '3d', role: 'mundo3d-archetype', motivo: 'bosque', espejo: 'mirror',
+    nombre: 'El bosque nativo', clave: 'el bosque altoandino de niebla y sus tres estratos: dosel, sotobosque y suelo, con epífitas',
+    ejemplo: 'bosque', tambien: [],
+  },
 
   // ── Arquetipos 2D (primera clase) ────────────────────────────────────────
   mirror: {
