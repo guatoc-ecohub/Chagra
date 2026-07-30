@@ -12,6 +12,7 @@ import { render, screen, cleanup, fireEvent, act } from '@testing-library/react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import AgentFab from '../AgentFab';
 import useAngelitaStore from '../../store/useAngelitaStore';
+import useAgentNotificationStore from '../../store/useAgentNotificationStore';
 import { EVENTO_ESCUCHA } from '../../services/escuchaService';
 
 beforeEach(() => {
@@ -127,5 +128,33 @@ describe('AgentFab — menú del toque corto, cableado VIVO (#66/#70)', () => {
     fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(useAngelitaStore.getState().molestia).toBeGreaterThan(0);
+  });
+});
+
+describe('AgentFab — cadencia adaptativa: señales de atención positiva (#102/#106)', () => {
+  it('hablar directo (gesto largo) baja el contador de molestia', () => {
+    useAngelitaStore.setState({ molestia: 5 });
+    render(<AgentFab onNavigate={() => {}} />);
+    const personaje = screen.getByRole('button', { name: /Chagra IA/i });
+    fireEvent.touchStart(personaje);
+    act(() => { vi.advanceTimersByTime(650); });
+    expect(useAngelitaStore.getState().molestia).toBeLessThan(5);
+  });
+
+  it('menú → "Hablar" también baja el contador de molestia', () => {
+    useAngelitaStore.setState({ molestia: 5 });
+    render(<AgentFab onNavigate={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
+    fireEvent.click(screen.getByRole('menuitem', { name: /^Hablar$/i }));
+    expect(useAngelitaStore.getState().molestia).toBeLessThan(5);
+  });
+
+  it('tocar el FAB con una respuesta esperando ("abrir el tip") baja el contador', () => {
+    useAngelitaStore.setState({ molestia: 5 });
+    useAgentNotificationStore.setState({ responseReady: true, lastAssistantMessage: 'hola' });
+    render(<AgentFab onNavigate={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA tiene respuesta nueva/i }));
+    expect(useAngelitaStore.getState().molestia).toBeLessThan(5);
+    useAgentNotificationStore.setState({ responseReady: false, lastAssistantMessage: null });
   });
 });

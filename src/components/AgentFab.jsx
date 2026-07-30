@@ -86,11 +86,14 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     silenciar(!useAngelitaStore.getState().silenciado);
   }, [silenciar]);
 
-  /** Mantener presionado el personaje: habla DIRECTO, sin menú (#66/#70). */
+  /** Mantener presionado el personaje: habla DIRECTO, sin menú (#66/#70).
+   *  Hablarle es la señal de ATENCIÓN más fuerte que hay (#102/#106): baja
+   *  el contador de molestia y acelera la cadencia. */
   const hablarDirecto = useCallback(() => {
     activarEscucha({ fuente: 'compai_largo' });
+    registrarSenalMolestia('hablarle');
     try { navigator.vibrate?.(22); } catch { /* sin motor */ }
-  }, []);
+  }, [registrarSenalMolestia]);
 
   const iniciarPulsacionLarga = useCallback(() => {
     fueLargo.current = false;
@@ -168,6 +171,9 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
     // Si la pulsación larga ya disparó "hablar directo", el dedo NO debe
     // además abrir el menú: un solo gesto, una sola acción.
     if (fueLargo.current) { fueLargo.current = false; return; }
+    // Tocar el FAB con una respuesta esperándolo es "abrir el tip" (#102/
+    // #106): atención positiva, el contador de molestia baja.
+    if (responseReady) registrarSenalMolestia('abrirTip');
     setMenuAbierto(true);
   };
 
@@ -175,7 +181,8 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
   const handleMenuHablar = useCallback(() => {
     setMenuAbierto(false);
     activarEscucha({ fuente: 'compai_menu' });
-  }, []);
+    registrarSenalMolestia('hablarle');
+  }, [registrarSenalMolestia]);
 
   /** Menú → "Enviar foto": abre el agente con la cámara ya disparada. */
   const handleMenuFoto = useCallback(() => {
