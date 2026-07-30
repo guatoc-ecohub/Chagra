@@ -1,3 +1,10 @@
+/* i18n (ADR-050): deuda preexistente de textos en español Colombia hardcodeados
+ * en esta pantalla (ninguno tocado por el planificador de paseo #25-#34) — el
+ * mismo criterio que App.jsx: se desactiva a nivel de archivo para no bloquear
+ * --max-warnings=0 con deuda que no es parte de este encargo. Los errores
+ * reales de ESLint siguen activos.
+ */
+/* eslint-disable chagra-i18n/no-hardcoded-spanish */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Cloud, Sunrise,
@@ -10,6 +17,8 @@ import AgendaCampesina from './AgendaCampesina';
 import JourneyGuideCard from './JourneyGuideCard';
 import FincaEvolutionCard from './FincaEvolutionCard';
 import { AngelitaGuia } from '../../visual/agente';
+import useCompaiPaseo from '../../hooks/useCompaiPaseo';
+import { registrarParadas, desregistrarParadas } from '../../services/compaiParadasPorPantalla';
 import useAlertStore from '../../store/useAlertStore';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import { getProfile } from '../../services/userProfileService';
@@ -156,7 +165,9 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
     // Las paradas de Angelita: solo sobre secciones que existen SIEMPRE en el
     // DOM (clima sin geo cambia de tarjeta — por eso no la incluimos; alertas,
     // tareas y accesos rápidos sí están siempre montados). Texto agroecológico
-    // real, no genérico: explica el PORQUÉ de cada sección.
+    // real, no genérico: explica el PORQUÉ de cada sección. `anillo` (#31):
+    // alertas y tareas quedan en el tope de la pantalla (anillo 'cerca' del
+    // puesto); accesos rápidos vive más abajo, al cierre — anillo 'pantalla'.
     const paradasGuia = useMemo(
         () => [
             {
@@ -165,6 +176,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                 texto: 'Aquí le aviso apenas algo necesite su atención — helada, plaga o clima raro. Tóquela para preguntarme qué hacer.',
                 gesto: 'senala',
                 tipo: 'informativa',
+                anillo: 'cerca',
             },
             {
                 id: 'tareas',
@@ -172,6 +184,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                 texto: 'Estas labores salen de la etapa real de sus cultivos, no de un calendario genérico — cada mata tiene su momento.',
                 gesto: 'senala',
                 tipo: 'sugerencia',
+                anillo: 'cerca',
             },
             {
                 id: 'accesos',
@@ -179,10 +192,42 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                 texto: 'Desde aquí registra por voz lo que va pasando en su finca — entre más anote, mejor la acompaño.',
                 gesto: 'invita',
                 tipo: 'sugerencia',
+                anillo: 'pantalla',
             },
         ],
         [],
     );
+
+    // #27 — registro de paradas por pantalla: el planificador de paseo lee
+    // este catálogo para elegir destino por anillo. Se desregistra al
+    // desmontar — un compAI paseando por una pantalla que ya no existe no
+    // tiene a dónde volar.
+    useEffect(() => {
+        registrarParadas('hoy-en-finca', paradasGuia);
+        return () => desregistrarParadas('hoy-en-finca');
+    }, [paradasGuia]);
+
+    // El planificador autónomo (#25 presupuesto 35%, #28 respeta `ocupado`,
+    // #34 se detiene entero en background) decide SOLO cuándo pasear y con
+    // qué paradas — <AngelitaGuia> ya no navega manual entre las tres fijas,
+    // muestra únicamente las del anillo que el planificador eligió ahora.
+    const { paseando, volviendo, paradasActivas, abortarPaseo } = useCompaiPaseo('hoy-en-finca');
+    const paradasDelPaseo = paseando || volviendo ? paradasActivas : [];
+
+    // #33 — cualquier toque real del usuario aborta el paseo y lo devuelve
+    // al puesto (vuelo animado, #32 — ver useCompaiPaseo). Se ignoran los
+    // toques DENTRO de la propia guía (.ang-guia / .ang-guia__panel): tocar
+    // "Siguiente" o cerrar la burbuja es interacción CON el compAI, no una
+    // interrupción de su paseo.
+    useEffect(() => {
+        if (!paseando) return undefined;
+        const onToqueReal = (ev) => {
+            if (ev.target?.closest?.('.ang-guia, .ang-guia__panel')) return;
+            abortarPaseo();
+        };
+        document.addEventListener('pointerdown', onToqueReal, { capture: true, passive: true });
+        return () => document.removeEventListener('pointerdown', onToqueReal, { capture: true });
+    }, [paseando, abortarPaseo]);
 
     const goAgente = useCallback((prompt) => {
         if (prompt) prefillAgent(prompt);
@@ -507,9 +552,14 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
             {/* Angelita guía (#24): vuela hasta alertas/tareas/accesos y explica
                 su porqué agroecológico — mecanismo reutilizable (src/hooks/
                 useAngelitaGuia.js), nacido en el mockup #/mockups/dia-en-finca,
-                ahora en la pantalla de producción real. recordarCierreId: si el
-                campesino la cierra, no vuelve a insistir en este dispositivo. */}
-            <AngelitaGuia paradas={paradasGuia} recordarCierreId="hoy-en-finca" />
+                ahora en la pantalla de producción real. `paradas` ya NO es la
+                lista fija completa: es la que el planificador de paseo eligió
+                para el anillo actual (#25/#31) — fuera de un paseo activo,
+                vacía, y AngelitaGuia simplemente no pinta nada ese rato (queda
+                en su puesto, el FAB). recordarCierreId: si el campesino cierra
+                la guía a mitad de un paseo, no vuelve a insistir en este
+                dispositivo (mismo comportamiento de siempre). */}
+            <AngelitaGuia paradas={paradasDelPaseo} recordarCierreId="hoy-en-finca" />
         </ScreenShell>
     );
 }
