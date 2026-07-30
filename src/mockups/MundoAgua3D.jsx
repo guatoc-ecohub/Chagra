@@ -219,6 +219,72 @@ function construirTerreno(seg, plano) {
   return geo;
 }
 
+/* ── CURVAS DE NIVEL (restricción del operador: todo relieve lleva su capa
+      topográfica COINCIDENTE — huesos reales, piel dibujada). Marching
+      squares sobre la MISMA altura() que talla el terreno: las isolíneas
+      coinciden por construcción, no por calco. Tinta café discreta de mapa,
+      un solo draw call (LineSegments). Determinista: se paga una vez. ── */
+function construirCurvasNivel(paso, seg) {
+  const nx = seg + 1;
+  const H = new Float32Array(nx * nx);
+  let hMin = Infinity, hMax = -Infinity;
+  for (let iz = 0; iz <= seg; iz++) {
+    const wz = -FONDO / 2 + (FONDO * iz) / seg;
+    for (let ix = 0; ix <= seg; ix++) {
+      const h = altura(-ANCHO / 2 + (ANCHO * ix) / seg, wz);
+      H[iz * nx + ix] = h;
+      if (h < hMin) hMin = h;
+      if (h > hMax) hMax = h;
+    }
+  }
+  const pos = [];
+  const alza = 0.035; // apenas sobre el pasto, para no pelear con el z-buffer
+  const px = (ix) => -ANCHO / 2 + (ANCHO * ix) / seg;
+  const pz = (iz) => -FONDO / 2 + (FONDO * iz) / seg;
+  for (let nivel = Math.ceil(hMin / paso) * paso; nivel < hMax; nivel += paso) {
+    for (let iz = 0; iz < seg; iz++) {
+      for (let ix = 0; ix < seg; ix++) {
+        const h00 = H[iz * nx + ix], h10 = H[iz * nx + ix + 1];
+        const h01 = H[(iz + 1) * nx + ix], h11 = H[(iz + 1) * nx + ix + 1];
+        const lo = Math.min(h00, h10, h01, h11);
+        const hi = Math.max(h00, h10, h01, h11);
+        if (nivel < lo || nivel >= hi) continue;
+        const x0 = px(ix), x1 = px(ix + 1), z0 = pz(iz), z1 = pz(iz + 1);
+        const cortes = [];
+        const corta = (ha, hb, ax, az, bx, bz) => {
+          if ((ha < nivel) === (hb < nivel)) return;
+          const k = (nivel - ha) / (hb - ha);
+          cortes.push([ax + (bx - ax) * k, az + (bz - az) * k]);
+        };
+        corta(h00, h10, x0, z0, x1, z0);
+        corta(h10, h11, x1, z0, x1, z1);
+        corta(h11, h01, x1, z1, x0, z1);
+        corta(h01, h00, x0, z1, x0, z0);
+        for (let c = 0; c + 1 < cortes.length; c += 2) {
+          pos.push(cortes[c][0], nivel + alza, cortes[c][1]);
+          pos.push(cortes[c + 1][0], nivel + alza, cortes[c + 1][1]);
+        }
+      }
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  return geo;
+}
+
+function CurvasDeNivel({ tier }) {
+  const geo = useMemo(
+    () => construirCurvasNivel(tier === 'bajo' ? 0.7 : 0.35, tier === 'alto' ? 110 : 84),
+    [tier],
+  );
+  useEffect(() => () => geo.dispose(), [geo]);
+  return (
+    <lineSegments geometry={geo} frustumCulled={false}>
+      <lineBasicMaterial color="#5d4e32" transparent opacity={0.3} depthWrite={false} />
+    </lineSegments>
+  );
+}
+
 /* Curva 3D sobre el terreno a partir de una polilínea XZ (para cintas de agua
    y para que las gotas viajen). `alza` la levanta apenas del lecho. */
 function curvaSobreTerreno(ptsXZ, alza = 0.06) {
@@ -1056,6 +1122,10 @@ function DioramaAgua({ perfil, tier, reducedMotion, estacion, onSoltar, controle
       <mesh geometry={geoTerreno}>
         <meshLambertMaterial vertexColors flatShading={perfil.flatShading} />
       </mesh>
+
+      {/* la capa topográfica: curvas de nivel de la MISMA altura() del
+          terreno (coinciden por construcción) — coordenadas reales visibles */}
+      <CurvasDeNivel tier={tier} />
 
       {/* el agua: quebrada + canal + reservorio, respirando (la quebrada un
           poco más clara para dejar ver la sabaleta que remonta) */}

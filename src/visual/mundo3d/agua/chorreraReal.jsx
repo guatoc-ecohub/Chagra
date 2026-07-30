@@ -15,14 +15,16 @@
  *     blanca bajo la cumbre), cárcavas verticales y franja mojada.
  *   · EL BOSQUE DE NIEBLA: dosel instanciado denso y caótico sobre la cara
  *     (la escala de la pared la dan las copas diminutas) + fleco de cresta.
- *   · EL AGUA (volumétrica, no calcomanía): el hilo nace BIEN ABAJO de la
- *     cresta (T_NACE) y baja en 3 SECCIONES con desfase lateral de repisa en
- *     repisa — columna corta arriba, tramo medio escalonado, caída larga que
- *     se abre al pie. Cada caída es una columna con PANZA (sección en arco,
- *     normales reales), shader de estrías/hebras deshilachadas/espuma, el pie
- *     REVIENTA en bruma volumétrica instanciada (ciclo de vida: nace densa,
- *     sube, se disuelve) y mechones de gotas caen delante del velo. El tramo
- *     bajo se DESHILACHA en hilos paralelos — la firma de la foto.
+ *   · EL AGUA (volumétrica, no calcomanía): UNA SOLA cascada — el hilo nace
+ *     BIEN ABAJO de la cresta (T_NACE) y baja en CINCO SALTOS calcados del
+ *     zoom de foto-real-chorrera-montana, corriéndose a la IZQUIERDA en cada
+ *     repisa (deriva neta derecha→izquierda vista desde el domo). El salto 2
+ *     es el velo ancho y blanco; los bajos, hilo delgado serpenteante. Cada
+ *     caída es una columna con PANZA (sección en arco, normales reales),
+ *     shader de estrías/hebras/espuma, el pie REVIENTA en bruma volumétrica
+ *     instanciada y mechones de gotas caen delante del velo. CERO chorros
+ *     extra: los "hilos paralelos" y "rezumaderos" de la v1 no existen en el
+ *     mundo real y fueron eliminados (corrección del operador).
  *
  * Proporción REAL: ~590 m de caída total (la más alta de Colombia) contra una
  * finca de juguete — la pared mide ~19 veces la loma del nacimiento. El agua
@@ -84,21 +86,32 @@ function crestaY(x) {
   h += 12 * Math.exp(-(((x + 6) / 16) ** 4)); // el domo (potencia 4: lomo, no cono)
   h -= 16 * suavizar(4, 34, x); // hombro derecho: la cresta baja al valle
   h -= 9 * Math.exp(-(((x + 31) / 14) ** 2)); // collado izquierdo
-  h *= 1 - suavizar(25, 94, x) * 0.7; // flanco derecho muere en cuadro
+  // el flanco derecho muere PRONTO y DURO: entre este macizo y el morro del
+  // Chiflón hay un portezuelo real (la foto wide muestra la V del cañón
+  // vecino) — el hombro largo de la v1 tapaba esa separación
+  h *= 1 - suavizar(22, 56, x) * 0.93;
   h *= 1 - suavizar(40, 100, -x) * 0.55; // costado izquierdo
   return CH.base + Math.max(3, h);
 }
 
-/* ── LA RUTA DEL AGUA (pathX real): el hilo se desvía de repisa en repisa —
-      columna superior con deriva leve, escalón corto a la izquierda, saltos
-      encadenados casi en plomada. x=0 es el canal (flanco derecho del domo). */
-const T_NACE = 0.8; // el hilo nace BIEN ABAJO de la cresta, no del skyline
-const SALTOS = [0.62, 0.485]; // repisas donde el agua golpea y se desvía
-const CORTES = [T_NACE, ...SALTOS, 0.14]; // secciones de la caída
+/* ── LA RUTA DEL AGUA (calcada del zoom de foto-real-chorrera-montana):
+      UN solo hilo en CINCO saltos distinguibles — (1) el labio fino y corto,
+      (2) el velo ANCHO blanco (el tramo más brillante), (3) y (4) tramos
+      medios que se corren a la IZQUIERDA en cada repisa, (5) la caída baja
+      larga y hebrosa que muere en la V del bosque. Deriva neta DERECHA →
+      IZQUIERDA vista desde el domo (x local + = derecha del espectador; la
+      foto manda). x=0 es el canal (flanco derecho del domo). */
+const T_NACE = 0.75; // el hilo nace BIEN ABAJO de la cresta, no del skyline
+const SALTOS = [0.69, 0.545, 0.435, 0.325]; // repisas donde golpea y se desvía
+const CORTES = [T_NACE, ...SALTOS, 0.14]; // los 5 saltos de la caída
 const RUTA = [
-  [0.8, 2.4], [0.635, 2.1],
-  [0.6, 0.9], [0.5, 0.1],
-  [0.47, 0.7], [0.3, -0.1], [0.12, -0.7],
+  // deriva lateral REAL de la foto: ~23% de la altura de la caída (una caída
+  // de ~32 u recorre ~7 u hacia la izquierda; con ±3 u leía casi a plomada)
+  [0.75, 3.4], [0.7, 3.2], // salto 1: el labio, casi a plomo
+  [0.545, 2.7], [0.52, 1.85], // salto 2 ancho; en la repisa se corre a la izq.
+  [0.435, 1.45], [0.41, 0.65], // salto 3 + corrimiento
+  [0.325, 0.15], [0.3, -0.75], // salto 4 + corrimiento
+  [0.22, -1.7], [0.14, -3.4], // salto 5: el tramo largo, serpenteando
 ];
 function rutaX(t) {
   if (t >= RUTA[0][0]) return RUTA[0][1];
@@ -307,8 +320,9 @@ function construirPared(pal, res) {
           (1 - (1 - suavizar(0, 0.38, t)) * 0.3) *
           (1 - g.amph * 0.3 - g.slot * 0.2),
       );
-      // perspectiva aérea horneada + velo del atardecer (la pared vive lejos)
-      tmp.lerp(cAire, 0.2 + suavizar(0.52, 0.99, t) * 0.16);
+      // perspectiva aérea horneada + velo del atardecer (la pared vive lejos;
+      // 0.2 de base la deslavaba a gris — la foto real es verde HONDO)
+      tmp.lerp(cAire, 0.11 + suavizar(0.52, 0.99, t) * 0.14);
       // la CONTRALUZ: el filo del skyline arde dorado (el sol cuelga detrás)
       tmp.lerp(cArde, suavizar(0.9, 1.0, t) * 0.4);
       if (tRaw < 0) tmp.multiplyScalar(1 - (tRaw / (-APRON / NT)) * 0.55);
@@ -393,7 +407,7 @@ function construirBosque(pal, cuantas) {
       (parche - 0.5) * 0.09 + (rng() - 0.5) * 0.1,
     );
     col.multiplyScalar(sombraGranForma(x, fp.y) * (0.62 + t * 0.36));
-    col.lerp(cAire, 0.2);
+    col.lerp(cAire, 0.12);
     inst.setColorAt(puestos, col);
     puestos++;
   }
@@ -417,6 +431,68 @@ function construirBosque(pal, cuantas) {
   }
   inst.instanceMatrix.needsUpdate = true;
   return inst;
+}
+
+/* ── EL FRAILEJONAL DE LA CRESTA: la cumbre en mesa del farallón ES páramo
+      (foto-real-chorrera-montana: la meseta sobre La Chorrera). Pocos, en
+      silueta contra el cielo dorado, y ATERRIZADOS: cada base va clavada en
+      la superficie real de la pared (caraLocal.y − 0.06) — corrección del
+      operador: en el render viejo los frailejones se veían FLOTANDO. Dos
+      draw calls (tallos + rosetas instanciados). ── */
+function construirFrailejonal(pal, cuantas) {
+  const rng = crearRng(211);
+  const geoTallo = new THREE.CylinderGeometry(0.055, 0.075, 1, 5);
+  geoTallo.translate(0, 0.5, 0); // el pie del tallo EN su origen: aterriza solo
+  const geoRoseta = new THREE.IcosahedronGeometry(0.17, 0);
+  geoRoseta.scale(1, 0.82, 1);
+  const matTallo = new THREE.MeshBasicMaterial({ fog: false });
+  const matRoseta = new THREE.MeshBasicMaterial({ fog: false });
+  const tallos = new THREE.InstancedMesh(geoTallo, matTallo, cuantas);
+  const rosetas = new THREE.InstancedMesh(geoRoseta, matRoseta, cuantas);
+  const m4 = new THREE.Matrix4();
+  const q = new THREE.Quaternion();
+  const v = new THREE.Vector3();
+  const esc = new THREE.Vector3();
+  const col = new THREE.Color();
+  const cArde = new THREE.Color(mezclar(pal.resplandor, '#ffd9a0', 0.4));
+  let puestos = 0;
+  let guarda = cuantas * 30;
+  while (puestos < cuantas && guarda-- > 0) {
+    const x = -42 + rng() * 64;
+    const t = 0.963 + rng() * 0.026;
+    if (Math.abs(x - rutaX(t)) < 4) continue; // el canal del agua queda libre
+    const fp = caraLocal(x, t);
+    const alto = 0.5 + rng() * 0.42;
+    const yBase = fp.y - 0.06; // clavado en la cara: JAMÁS flotando
+    q.setFromAxisAngle(v.set(0, 1, 0), rng() * Math.PI * 2);
+    m4.compose(v.set(x, yBase, fp.z - 0.2), q, esc.set(alto * 0.8, alto, alto * 0.8));
+    tallos.setMatrixAt(puestos, m4);
+    col.set(0x453a24).offsetHSL(0, 0, (rng() - 0.5) * 0.05);
+    col.lerp(cArde, 0.12);
+    tallos.setColorAt(puestos, col);
+    m4.compose(
+      v.set(x, yBase + alto * 0.96, fp.z - 0.2),
+      q,
+      esc.set(alto * 0.95, alto * 0.9, alto * 0.95),
+    );
+    rosetas.setMatrixAt(puestos, m4);
+    // la roseta plateada agarra el último sol de la tarde
+    col.set(0xaeb287).offsetHSL((rng() - 0.5) * 0.03, 0, (rng() - 0.5) * 0.07);
+    col.lerp(cArde, 0.3);
+    rosetas.setColorAt(puestos, col);
+    puestos++;
+  }
+  for (let i = puestos; i < cuantas; i++) {
+    m4.makeScale(0, 0, 0);
+    tallos.setMatrixAt(i, m4);
+    rosetas.setMatrixAt(i, m4);
+  }
+  tallos.instanceMatrix.needsUpdate = true;
+  rosetas.instanceMatrix.needsUpdate = true;
+  const grupo = new THREE.Group();
+  grupo.add(tallos);
+  grupo.add(rosetas);
+  return grupo;
 }
 
 /* ═══ EL AGUA (el enfoque volumétrico del valle, portado) ════════════════════
@@ -491,7 +567,9 @@ const aguaFrag = /* glsl */ `
     vec3 N = normalize(vN);
     vec3 V = normalize(cameraPosition - vW);
     vec3 L = normalize(${SOL_GLSL});
-    float dif = 0.62 + 0.52 * max(dot(N, L), 0.0);
+    // la receta de luz del agua BUENA (waterfalls del valle, veredicto del
+    // operador): panza que modela + silueta fría plateada, no dorada
+    float dif = 0.55 + 0.58 * max(dot(N, L), 0.0);
     vec3 Hv = normalize(L + V);
     float spec = pow(max(dot(N, Hv), 0.0), 42.0);
     float fres = pow(1.0 - max(dot(N, V), 0.0), 2.6);
@@ -501,8 +579,8 @@ const aguaFrag = /* glsl */ `
     vec3 body = uTint * (0.66 + streak * 0.30);
     vec3 foam = vec3(1.06, 1.05, 1.00) * uBright;   // espuma: LO MÁS BLANCO
     vec3 col = mix(body, foam, foamK) * dif
-             + vec3(1.25, 1.15, 0.98) * (spec * 0.85 + glint * 1.5)
-             + vec3(0.72, 0.66, 0.55) * fres * 0.35;
+             + vec3(1.25, 1.18, 1.02) * (spec * 0.85 + glint * 1.5)
+             + vec3(0.55, 0.62, 0.72) * fres * 0.35;
     col *= 1.0 + impact * 0.22;
     gl_FragColor = vec4(col, min(a, 1.0) * 0.97 * uAlpha);
   }
@@ -553,9 +631,11 @@ function rutaCaida(xc, tTop, tBot, anchos, SEGS) {
   return { muestras, w, xo };
 }
 
-/* caída VOLUMÉTRICA: grid con sección en arco (panza hacia la cámara) */
+/* caída VOLUMÉTRICA: grid con sección en arco (panza hacia la cámara).
+   SEGS 110 = la resolución del agua BUENA del valle: la caída fluye sin
+   codos poligonales (con 64 se veían quiebres duros en el serpenteo). */
 function construirCaida(xc, tTop, tBot, anchos, tinte) {
-  const SEGS = 64;
+  const SEGS = 110;
   const NW = 8;
   const { muestras, w, xo } = rutaCaida(xc, tTop, tBot, anchos, SEGS);
   const prof = anchos.prof ?? 0.34;
@@ -606,7 +686,7 @@ function construirCaida(xc, tTop, tBot, anchos, tinte) {
 }
 
 function construirSombraCaida(xc, tTop, tBot, anchos) {
-  const SEGS = 40;
+  const SEGS = 70;
   const { muestras, w, xo } = rutaCaida(xc, tTop, tBot, anchos, SEGS);
   const posArr = [];
   const uvArr = [];
@@ -768,6 +848,12 @@ function construirChorrera(pal, tier) {
   bosque.frustumCulled = false;
   grupo.add(bosque);
 
+  // el páramo de la cumbre: frailejones aterrizados en la mesa del farallón
+  const frailejonal = construirFrailejonal(pal, tier === 'alto' ? 26 : tier === 'medio' ? 18 : 10);
+  frailejonal.renderOrder = -85;
+  frailejonal.traverse((o) => { o.frustumCulled = false; });
+  grupo.add(frailejonal);
+
   /* la caída en 3 secciones (columna corta → tramo medio escalonado → caída
      larga que se abre al pie), cada una: sombra + cuerpo + corazón */
   const brumaPts = [];
@@ -795,11 +881,14 @@ function construirChorrera(pal, tier) {
     }
   };
 
+  /* Los anchos siguen la foto: salto 2 = el velo ANCHO y brillante; el labio
+     y los tramos bajos, hilo delgado. UNA sola cascada — cero chorros extra. */
+  const ANCHO_SALTO = [0.8, 1.5, 1.0, 0.9, 0.85];
   for (let s = 0; s < CORTES.length - 1; s++) {
     const ultimo = s === CORTES.length - 2;
-    const tA = CORTES[s] - (s === 0 ? 0.002 : -0.02);
-    const tB = CORTES[s + 1] - (ultimo ? 0 : 0.04);
-    const segW = [1.35, 1.1, 1.25][s] ?? 1.2; // HILO delgado: el tramo medio el más fino
+    const tA = CORTES[s] + (s === 0 ? -0.002 : 0.012);
+    const tB = CORTES[s + 1] - (ultimo ? 0 : 0.022);
+    const segW = ANCHO_SALTO[s] ?? 0.9;
     grupo.add(construirSombraCaida(rutaX, tA, tB, { base: segW, fan: 0.45, abanico: ultimo ? 0.42 : 0.4 }));
     const cuerpo = construirCaida(rutaX, tA, tB, {
       base: segW,
@@ -807,12 +896,23 @@ function construirChorrera(pal, tier) {
       abanico: ultimo ? 0.42 : 0.4,
       vTiles: 2.6 + (CORTES[s] - CORTES[s + 1]) * 3,
       prof: 0.42,
-      brillo: s === 0 ? 1.3 : 1.16,
+      brillo: s === 1 ? 1.32 : 1.14, // el velo del salto 2, lo más blanco
     }, 0xe8efe9);
     grupo.add(cuerpo.mesh);
-    // corazón denso y brillante del chorro
-    const corazon = construirCaida(rutaX, CORTES[s] - 0.006, CORTES[s + 1] - (ultimo ? 0 : 0.018), {
-      base: 0.62, fan: 0.28, abanico: 0.6, vTiles: 3.2, prof: 0.7, brillo: 1.3,
+    // velo trasero tenue POR SECCIÓN (la profundidad en capas del agua BUENA
+    // del valle): corrido apenas y pegado al hilo — cuerpo de la MISMA caída
+    if (tier !== 'bajo') {
+      const veloSeg = construirCaida((t) => rutaX(t) + (s % 2 ? -0.27 : 0.27), CORTES[s] - 0.004, CORTES[s + 1] - (ultimo ? 0 : 0.016), {
+        base: segW * 1.55, fan: 0.6, abanico: ultimo ? 0.7 : 0.5,
+        vTiles: 2.0 + (CORTES[s] - CORTES[s + 1]) * 2.4, prof: 0.2, brillo: 0.9,
+      }, 0xd6dcd6);
+      veloSeg.mesh.position.z -= 0.27;
+      veloSeg.mesh.renderOrder = 2;
+      grupo.add(veloSeg.mesh);
+    }
+    // corazón denso y brillante del chorro (proporcional a su salto)
+    const corazon = construirCaida(rutaX, CORTES[s] - 0.006, CORTES[s + 1] - (ultimo ? 0 : 0.01), {
+      base: segW * 0.44, fan: 0.28, abanico: 0.6, vTiles: 3.2, prof: 0.7, brillo: 1.3,
     }, 0xf4f6f0);
     corazon.mesh.position.z += 0.2;
     grupo.add(corazon.mesh);
@@ -832,41 +932,19 @@ function construirChorrera(pal, tier) {
     cortina(xp, pie.y + 4.4, pie.z, 1.7, 4.2, tier === 'bajo' ? 3 : 6);
   }
 
-  // velo trasero del tramo largo (profundidad en capas, solo la caída final)
-  if (tier !== 'bajo') {
-    const velo = construirCaida((t) => rutaX(t) - 0.35, CORTES[2] - 0.004, CORTES[3] - 0.02, {
-      base: 1.9, fan: 0.6, abanico: 0.7, vTiles: 2.4, prof: 0.2, brillo: 0.9,
-    }, 0xd6dcd6);
-    velo.mesh.position.z -= 0.35;
-    velo.mesh.renderOrder = 2;
-    grupo.add(velo.mesh);
-  }
+  const F = CORTES.length - 1; // índice del pie
 
-  // el tramo bajo se DESHILACHA en hilos paralelos: la firma de la foto
-  for (const [dx, w, top] of [[1.1, 0.5, 0.03], [-1.0, 0.38, 0.06], [1.8, 0.28, 0.09]]) {
-    const hilo = construirCaida((t) => rutaX(t) + dx, SALTOS[1] - top, CORTES[3] + 0.03, {
-      base: w, fan: 0.22, abanico: 0.8, vTiles: 2.2, prof: 0.5, brillo: 1.0,
-    }, 0xf0ece2);
-    hilo.mat.uniforms.uTint.value.multiplyScalar(0.85);
-    grupo.add(hilo.mesh);
-  }
+  /* ⛔ AQUÍ VIVÍAN los "hilos paralelos deshilachados" y los "rezumaderos":
+     chorros fantasma que NO existen en el mundo real (corrección dura del
+     operador, que ve La Chorrera desde el domo). La Chorrera es UNA. */
 
-  // rezumaderos: hilos húmedos discretos por la roca del anfiteatro
-  if (tier === 'alto') {
-    for (const [xs, t0, t1, ws] of [[-4.2, 0.6, 0.4, 0.15], [5.1, 0.57, 0.37, 0.11]]) {
-      const rezuma = construirCaida(xs, t0, t1, {
-        base: ws, fan: 0.05, abanico: 0.4, vTiles: 2.0, prof: 0.05, brillo: 0.62, alphaK: 0.5,
-      }, 0xd6d8d0);
-      rezuma.mat.uniforms.uTint.value.multiplyScalar(0.72);
-      grupo.add(rezuma.mesh);
-    }
-  }
-
-  // bruma grande de la base: La Chorrera muere en un colchón blanco
-  const xb = rutaX(CORTES[3]);
-  const base = caraLocal(xb, CORTES[3] - 0.02);
-  pluma(xb, base.y + 1.3, base.z + 0.9, 5.5, tier === 'bajo' ? 5 : 9, 1.1);
-  pluma(xb + 1.5, base.y + 0.4, base.z + 1.3, 3.4, tier === 'bajo' ? 3 : 5, 0.85);
+  // bruma grande de la base: La Chorrera muere en un colchón blanco —
+  // PROPORCIONADA al hilo como en el agua buena del valle (con r 5.5 el
+  // colchón leía como un plato blanco tragándose el pie de la caída)
+  const xb = rutaX(CORTES[F]);
+  const base = caraLocal(xb, CORTES[F] - 0.02);
+  pluma(xb, base.y + 1.0, base.z + 0.8, 3.2, tier === 'bajo' ? 4 : 8, 0.9);
+  pluma(xb + 1.2, base.y + 0.3, base.z + 1.0, 2.1, tier === 'bajo' ? 2 : 4, 0.8);
 
   grupo.add(nubeDeQuads(brumaPts, brumaVert, brumaFrag).mesh);
   grupo.add(nubeDeQuads(gotaPts, gotaVert, gotaFrag).mesh);

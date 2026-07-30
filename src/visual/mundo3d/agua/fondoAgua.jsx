@@ -233,6 +233,146 @@ function CordilleraAgua({ pal, capas }) {
       solo se monta — el macizo de cartón que ocupaba este lugar fue borrado
       EN FIRME: la forma la dicta el referente real, no se vuelve a inventar. */
 
+/* ── EL CHIFLÓN + LA ROCA BLANCA (la OTRA montaña) ──────────────────────────
+      Corrección geográfica del operador (fotos reales chiflon-rocablanca +
+      wide-ubicacion-chiflon, ops/refs-chorrera): el Chiflón NO va pegado a
+      La Chorrera — es una caída MÁS PEQUEÑA en una montaña APARTE, a la
+      DERECHA desde el domo, junto a un farallón de ROCA CLARA expuesta (la
+      Roca Blanca, con su socavón en sombra al pie). Aquí es un morro boscoso
+      lejano con el hilo delgado INSINUADO (en la foto wide es un chorrito):
+      estático, luz horneada, dos draw calls. */
+/* az +0.44 rad ≈ el corrimiento angular Chorrera→Chiflón que muestra la foto
+   wide, ajustado para que el chorrito quede DENTRO del encuadre de reposo
+   (hfov/2 ≈ 32.8°): se insinúa al borde derecho, bien separado de la caída */
+const CHIFLON = { az: AZ_CHORRERA + 0.44, r: 90, base: -11, alto: 24, medio: 24 };
+function construirMorroChiflon(pal) {
+  const NX = 120, NY = 30; // denso: la Roca Blanca necesita borde nítido
+  // (con 84×18 la interpolación de vértices la volvía un blob difuso)
+  const cima = (x) => {
+    const u = x / CHIFLON.medio; // −1..1 a lo largo del morro
+    let h = CHIFLON.alto * (0.42 + 0.58 * Math.exp(-(u * u) / (0.5 * 0.5)));
+    h *= 1 - smoothstep(0.55, 1, Math.abs(u)) * 0.9;
+    h += ruido(x * 0.45 + 9.1, 3.3) * 1.2;
+    return Math.max(1.0, h);
+  };
+  const pos = new Float32Array((NX + 1) * (NY + 1) * 3);
+  const col = new Float32Array((NX + 1) * (NY + 1) * 3);
+  // OJO: mezclar interpola en espacio LINEAL — 10% hacia el aire claro ya
+  // dispara la luminancia (el morro salía sage lavado; medido en el gate).
+  // El verde se deja casi puro y el aire entra apenas.
+  const cMonte = new THREE.Color('#22392c');
+  const cMonteL = new THREE.Color(mezclar('#456339', pal.aire, 0.05));
+  const cRoca = new THREE.Color(mezclar('#e8e2d2', pal.aire, 0.24));
+  const cRocaBanda = new THREE.Color(mezclar('#a89f8a', pal.aire, 0.3));
+  const cSocavon = new THREE.Color(mezclar('#2a241c', pal.aire, 0.22));
+  const cAire = new THREE.Color(pal.aire);
+  const c = new THREE.Color();
+  let p = 0;
+  for (let iy = 0; iy <= NY; iy++) {
+    const t = iy / NY;
+    for (let ix = 0; ix <= NX; ix++) {
+      const x = -CHIFLON.medio + (2 * CHIFLON.medio * ix) / NX;
+      const y = CHIFLON.base + (cima(x) - CHIFLON.base) * t;
+      const z = (1 - t) * 1.8 + ruido(x * 0.3 + 1.7, y * 0.4 + 6.2) * 0.7;
+      pos[p] = x; pos[p + 1] = y; pos[p + 2] = z;
+      // bosque cerrado con rodales que respiran + grano de dosel (sin el
+      // grano fino el morro salía una loma LISA gris — visto en el gate)
+      const mota = ruido(x * 0.5 + 4.4, y * 0.6 + 2.2) * 0.5 + 0.5;
+      c.copy(cMonte).lerp(cMonteL, mota * 0.6);
+      c.multiplyScalar(0.78 + 0.3 * (ruido(x * 1.9 + 7.7, y * 2.3 + 3.1) * 0.5 + 0.5));
+      // LA ROCA BLANCA: farallón claro VERTICAL (más alto que ancho, como en
+      // la foto), borde duro con mordiscos de ruido, bedding horizontal y el
+      // socavón en sombra al pie
+      const borde = ruido(x * 1.3 + 2.9, y * 1.1 + 5.5) * 0.14;
+      const mRoca = Math.exp(-(((x + 4) / 3.4) ** 2) - (((t - 0.5) / 0.19) ** 2)) + borde;
+      if (mRoca > 0.42) {
+        const banda = Math.sin(y * 2.4 + x * 0.2) * 0.5 + 0.5;
+        c.lerp(cRoca, Math.min(1, (mRoca - 0.42) * 4.5));
+        c.lerp(cRocaBanda, smoothstep(0.52, 0.85, banda) * 0.6 * Math.min(1, mRoca));
+        const mCueva = Math.exp(-(((x + 4.2) / 2.8) ** 2) - (((t - 0.36) / 0.055) ** 2));
+        c.lerp(cSocavon, Math.min(1, mCueva * 1.8));
+      }
+      c.lerp(cAire, 0.05 + t * 0.04); // lejanía horneada, sin deslavarlo:
+      // es la OTRA montaña boscosa (oscura en la foto wide), no una cuchilla
+      col[p] = c.r; col[p + 1] = c.g; col[p + 2] = c.b;
+      p += 3;
+    }
+  }
+  const idx = [];
+  for (let iy = 0; iy < NY; iy++) {
+    for (let ix = 0; ix < NX; ix++) {
+      const a = iy * (NX + 1) + ix, b = a + 1, d = a + NX + 1, e = d + 1;
+      // winding CCW visto desde +z local (el espectador): con (a,d,b) la
+      // normal caía a −z y el morro entero se culleaba — invisible en el gate
+      idx.push(a, b, d, b, e, d);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  g.setIndex(idx);
+  return g;
+}
+/* el hilo del Chiflón: cinta delgada con dos quiebres, MUCHO menor que La
+   Chorrera (en la foto wide es un hilo) — cae por el flanco derecho del morro */
+function construirHiloChiflon(pal) {
+  const puntos = [
+    [6.2, 0.66], [5.9, 0.5], [5.2, 0.38], [4.9, 0.24], [4.4, 0.08],
+  ];
+  const pos = [];
+  const col = [];
+  const cHilo = new THREE.Color(mezclar('#f6f8f2', pal.aire, 0.2));
+  const cPie = new THREE.Color(mezclar(pal.lechosa, pal.aire, 0.35));
+  const c = new THREE.Color();
+  for (let i = 0; i < puntos.length; i++) {
+    const [x, t] = puntos[i];
+    const y = CHIFLON.base + (CHIFLON.alto * 0.92 - CHIFLON.base) * t;
+    const w = 0.22 + (1 - t) * 0.16;
+    const z = (1 - t) * 1.8 + 0.55;
+    c.copy(cHilo).lerp(cPie, 1 - t);
+    pos.push(x - w / 2, y, z, x + w / 2, y, z);
+    col.push(c.r, c.g, c.b, c.r, c.g, c.b);
+  }
+  const idx = [];
+  for (let i = 0; i < puntos.length - 1; i++) {
+    const a = i * 2;
+    idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
+  g.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 3));
+  g.setIndex(idx);
+  return g;
+}
+function ChiflonRocaBlanca({ pal }) {
+  const geos = useMemo(
+    () => ({ morro: construirMorroChiflon(pal), hilo: construirHiloChiflon(pal) }),
+    [pal],
+  );
+  useLayoutEffect(
+    () => () => {
+      geos.morro.dispose();
+      geos.hilo.dispose();
+    },
+    [geos],
+  );
+  const marco = useMemo(() => {
+    const x = Math.sin(CHIFLON.az) * CHIFLON.r;
+    const z = -Math.cos(CHIFLON.az) * CHIFLON.r;
+    return { pos: /** @type {[number,number,number]} */ ([x, 0, z]), ry: Math.atan2(-x, -z) };
+  }, []);
+  return (
+    <group position={marco.pos} rotation={[0, marco.ry, 0]}>
+      <mesh geometry={geos.morro} renderOrder={-84} frustumCulled={false}>
+        <meshBasicMaterial vertexColors fog={false} />
+      </mesh>
+      <mesh geometry={geos.hilo} renderOrder={-83} frustumCulled={false}>
+        <meshBasicMaterial vertexColors fog={false} side={THREE.DoubleSide} />
+      </mesh>
+    </group>
+  );
+}
+
 /* ── LA NIEBLA DEL VALLE ────────────────────────────────────────────────────
       Bancos bajos hacia la VEGA (+z): el valle de abajo lleno de tarde. Los
       del lado del sol se doran; el resto queda lechoso. Estáticos. */
@@ -426,6 +566,7 @@ export default function FondoAgua({ cielo, altura, mitadX, mitadZ, salidaQuebrad
       <SolLejano pal={pal} />
       <CordilleraAgua pal={pal} capas={capas} />
       <ChorreraReal pal={pal} tier={tier} reducedMotion={reducedMotion} />
+      <ChiflonRocaBlanca pal={pal} />
       <NieblaValle pal={pal} n={nNiebla} />
       <FaldaAgua
         alturaFn={altura}
