@@ -1033,6 +1033,10 @@ function DioramaAgua({ perfil, tier, reducedMotion, estacion, onSoltar, controle
       {/* el mismo sol del valle: dirección [6,9,4], sin shadow-map */}
       <directionalLight position={[6, 9, 4]} intensity={0.95 * CIELO.intensidad} color={ATMOSFERA.luz} />
       <directionalLight position={[-5, 4, -6]} intensity={0.24} color={ATMOSFERA.relleno} />
+      {/* la CONTRALUZ dorada desde el sol DIBUJADO de la lámina (fondoAgua
+          lo pinta sobre la loma): el borde tibio que hace hora dorada de
+          verdad — luz con origen visible, juez visual 2026-07-30 */}
+      <directionalLight position={[-9, 2.6, -8.5]} intensity={0.3} color="#ffd9a0" />
 
       {/* la LÁMINA: bóveda, sol lejano, cordillera, el macizo de La Chorrera,
           la niebla del valle y la falda que continúa el terreno */}
