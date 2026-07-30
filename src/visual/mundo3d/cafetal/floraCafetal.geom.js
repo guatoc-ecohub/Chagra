@@ -744,12 +744,18 @@ export function geomPiedra(seed = 6) {
    frente-derecha, fuera del cono de la cámara, donde SIGUE dando sombra a los
    surcos del frente — que era para lo que estaba: café sin sombrío parece
    potrero. Verificable: `node scripts/diag/encuadre-mundo.mjs cafe`. */
+/* ⚠️ Gate 2026-07-30: el guamo [11.0, -2.5] y el nogal [9.5, -10.5] caían
+   EXACTOS sobre la línea cámara→casa del beneficio — la casa que corona la
+   loma (y su puerta `beneficio`) quedaba invisible detrás de sus copas. Se
+   corren al flanco derecho, donde SIGUEN sombreando sus surcos, y queda
+   abierto el corredor visual de la composición: camino → surcos → casa →
+   montes con niebla. Misma jugada documentada arriba con el segundo sitio. */
 const SITIOS_GUAMO = [
   [-8.5, -5.5], [8.8, 4.4], [6.5, -6.0], [-6.8, 1.6], [-1.5, -8.5],
-  [11.0, -2.5], [14.2, 1.2], [-12.5, -10.0], [-4.5, -2.0], [2.5, -12.5],
+  [13.5, -2.0], [14.2, 1.2], [-12.5, -10.0], [-4.5, -2.0], [2.5, -12.5],
 ];
 const SITIOS_NOGAL = [
-  [9.5, -10.5], [-6.5, -13.0], [14.0, -7.5], [-15.2, -3.0],
+  [16.0, -10.5], [-6.5, -13.0], [14.0, -7.5], [-15.2, -3.0],
 ];
 const SITIOS_PLATANO = [
   [-11.5, -3.0], [-2.4, 1.9], [4.0, -3.8], [9.8, 2.8], [-3.0, -11.0],
@@ -773,7 +779,13 @@ export const SITIO_CAFETO_HERO = /** @type {[number, number]} */ ([-2.8, 5.6]);
  * Mira loma arriba desde el camino de llegada — entrar es subir.
  */
 export const CAMARA = {
-  reposo: /** @type {[number, number, number]} */ ([7.6, 7.8, 15.6]),
+  /* Se retiró y se levantó otro paso (gate 2026-07-30): desde [7.6, 7.8, 15.6]
+     el ojo quedaba DENTRO del techo de sombra — copas de guamo llenando la
+     banda alta del cuadro, cero cielo, cero montes, la casa invisible. Desde
+     aquí el sombrío se lee como techo (se pasa POR DEBAJO), la loma revela la
+     casa del beneficio y arriba queda la banda de cielo con los montes comidos
+     por la niebla. La mirada NO cambia (mundoData deriva su `centro` de ella). */
+  reposo: /** @type {[number, number, number]} */ ([10.2, 9.9, 21.4]),
   mirada: /** @type {[number, number, number]} */ ([-0.4, 3.8, -3.4]),
   fov: 40,
 };
@@ -1007,10 +1019,17 @@ export function distribucionCafetal(conteos, seed = 311, q = 1) {
   }
 
   // --- El sombrío y el plátano (sitios fijos recortados por tier). ---
+  // El FACTOR DE FILO (gate 2026-07-30): los árboles del filo de la loma crecen
+  // menos — expuestos al viento de la cuchilla, como en la montaña real. Además
+  // de verdad agronómica es dirección de arte: con el dosel del filo a ~11 m el
+  // ojo de la vitrina (clamp de OrbitControls ≤ ~9.9 m) quedaba SIEMPRE debajo
+  // de esas copas y la banda alta del cuadro era pura copa — ni montes ni cielo.
+  // Capadas a ~8.7 m, la loma revela casa, silueta de montes y cielo detrás.
+  const filo = (p) => 1 - 0.4 * smoothstep(2.5, 5.2, alturaLadera(p[0], p[1]));
   const enLadera = (p, esc, rr) => ({
     pos: [p[0], alturaLadera(p[0], p[1]), p[1]],
     rotY: rr() * Math.PI * 2,
-    escala: esc,
+    escala: esc * filo(p),
     tint: [0.94 + rr() * 0.12, 0.94 + rr() * 0.12, 0.94 + rr() * 0.12],
   });
   const rArb = rng(seed + 4);
