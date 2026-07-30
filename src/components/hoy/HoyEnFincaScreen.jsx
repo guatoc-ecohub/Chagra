@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     Cloud, Sunrise,
     Bell, BellOff, MapPin, Droplets, Sprout, Mic, Bug,
@@ -9,6 +9,7 @@ import { ScreenShell } from '../common/ScreenShell';
 import AgendaCampesina from './AgendaCampesina';
 import JourneyGuideCard from './JourneyGuideCard';
 import FincaEvolutionCard from './FincaEvolutionCard';
+import { AngelitaGuia } from '../../visual/agente';
 import useAlertStore from '../../store/useAlertStore';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import { getProfile } from '../../services/userProfileService';
@@ -101,6 +102,16 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
     const [processes, setProcesses] = useState([]);
     const [ciclosCargados, setCiclosCargados] = useState(false);
 
+    // ── Angelita guía (#24, auditoría UX): la MISMA mecánica reutilizable
+    // que nace en #/mockups/dia-en-finca (useAngelitaGuia/<AngelitaGuia>),
+    // ahora en la pantalla REAL de producción — vuela hasta las alertas, las
+    // tareas de la semana y los accesos rápidos y explica su porqué. La
+    // tarjeta de clima queda fuera: cambia de marcado entero según haya o no
+    // geo guardada (dos ramas JSX distintas) y un solo ref no cubre ambas.
+    const refAlertas = useRef(null);
+    const refTareas = useRef(null);
+    const refAccesos = useRef(null);
+
     useEffect(() => {
         let alive = true;
         if (geo) {
@@ -139,6 +150,37 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
 
     const fechaLarga = useMemo(
         () => new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' }),
+        [],
+    );
+
+    // Las paradas de Angelita: solo sobre secciones que existen SIEMPRE en el
+    // DOM (clima sin geo cambia de tarjeta — por eso no la incluimos; alertas,
+    // tareas y accesos rápidos sí están siempre montados). Texto agroecológico
+    // real, no genérico: explica el PORQUÉ de cada sección.
+    const paradasGuia = useMemo(
+        () => [
+            {
+                id: 'alertas',
+                ref: refAlertas,
+                texto: 'Aquí le aviso apenas algo necesite su atención — helada, plaga o clima raro. Tóquela para preguntarme qué hacer.',
+                gesto: 'senala',
+                tipo: 'informativa',
+            },
+            {
+                id: 'tareas',
+                ref: refTareas,
+                texto: 'Estas labores salen de la etapa real de sus cultivos, no de un calendario genérico — cada mata tiene su momento.',
+                gesto: 'senala',
+                tipo: 'sugerencia',
+            },
+            {
+                id: 'accesos',
+                ref: refAccesos,
+                texto: 'Desde aquí registra por voz lo que va pasando en su finca — entre más anote, mejor la acompaño.',
+                gesto: 'invita',
+                tipo: 'sugerencia',
+            },
+        ],
         [],
     );
 
@@ -300,6 +342,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
 
                 {/* ── 2. ALERTAS DEL DÍA ────────────────────────────────── */}
                 <section
+                    ref={refAlertas}
                     aria-label="Alertas de hoy"
                     className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-4"
                 >
@@ -349,6 +392,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
 
                 {/* ── 3. TAREAS DEL CICLO — ESTA SEMANA ─────────────────── */}
                 <section
+                    ref={refTareas}
                     aria-label="Tareas de la semana"
                     className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-4"
                 >
@@ -424,7 +468,7 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                 </section>
 
                 {/* ── 4. ACCESOS RÁPIDOS ────────────────────────────────── */}
-                <section aria-label="Accesos rápidos">
+                <section ref={refAccesos} aria-label="Accesos rápidos">
                     <div className="grid grid-cols-3 gap-2">
                         {QUICK_ACTIONS.map((accion) => (
                             <button
@@ -459,6 +503,13 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
                     Ver el mapa de la finca
                 </button>
             </div>
+
+            {/* Angelita guía (#24): vuela hasta alertas/tareas/accesos y explica
+                su porqué agroecológico — mecanismo reutilizable (src/hooks/
+                useAngelitaGuia.js), nacido en el mockup #/mockups/dia-en-finca,
+                ahora en la pantalla de producción real. recordarCierreId: si el
+                campesino la cierra, no vuelve a insistir en este dispositivo. */}
+            <AngelitaGuia paradas={paradasGuia} recordarCierreId="hoy-en-finca" />
         </ScreenShell>
     );
 }
