@@ -584,6 +584,51 @@ export const MUNDO = {
     // El gemelo 2D digno (mirror → motivo `micorrizas`): la misma red, dibujada.
     fallback2d: { escena: 'mirror' },
   },
+
+  // 🏔️ EL PÁRAMO — la FÁBRICA DE AGUA de la finca (arquetipo SÍ-3D `paramo`). El
+  //    mundo alto de la cordillera: la planicie altoandina sobre 3.000+ m, con el
+  //    FRAILEJONAL caulirrósulo (tallo vestido de enagua de necromasa + roseta
+  //    afelpada plateada que le peina el agua a la niebla), el pajonal/sotobosque,
+  //    la NIEBLA densa en capas y la INMENSIDAD de la montaña (cordillera y mar de
+  //    nubes). Render ilustrado tipo lámina de Humboldt + atmósfera Ghibli, huesos
+  //    reales (estructura/escala/altitud EXACTAS del DR-paramo-frailejon). El
+  //    páramo se CUIDA, no se ara: sus puertas hablan de agua, conservación y vida.
+  //    Reusa el páramo definitivo aprobado (bosque/EscenaBosqueVivo) — cero arte
+  //    nuevo. En equipo humilde cae a su ficha 2D (infografía del páramo).
+  //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
+  paramo: {
+    pisoTermico: 'paramo',
+    escena: 'paramo',
+    // La puerta de arriba del valle (zona alta/lejana de la ladera): espeja el
+    // landmark de valleData (LUGARES.paramo) para el mapa navegable.
+    valle: { tipo: 'frailejonal', pos: [-0.9, 0, -7.6], escala: 0.95 },
+    params: {},
+    // Puertas del páramo (por DATOS). Cada `view` es una vista REAL de App.jsx.
+    // `pos` queda para el anclaje 3D fino de Opus; la capa DOM usa emoji+label.
+    hotspots: [
+      { id: 'agua', pos: [-1.6, 3.4, 0.6], emoji: '💧', label: 'La fábrica de agua', view: 'agua', data: { tema: 'nacimiento' } },
+      { id: 'cuidar', pos: [4.1, 3.0, -3.9], emoji: '🏔️', label: 'El páramo se cuida, no se ara', view: 'restauracion' },
+      { id: 'vida', pos: [1.9, 2.6, 1.7], emoji: '🦅', label: 'La vida del páramo', view: 'biodiversidad' },
+    ],
+    entrada: { zoom: 9, narra: 'paramo' },
+    // El gemelo 2D digno: la ficha del páramo (misma lección, en cifras y notas).
+    fallback2d: {
+      escena: 'infografia',
+      params: {
+        titulo: 'El páramo, la fábrica de agua',
+        cifras: [
+          { valor: '3.000–4.200', unidad: 'm', label: 'la altura del páramo andino, por encima del bosque altoandino y bajo las nieves' },
+          { valor: '~1', unidad: 'cm/año', label: 'lo que crece un frailejón: los grandes son viejísimos, por eso la colonia va dispersa' },
+          { valor: '~50', unidad: '%', label: 'de los páramos del mundo están en Colombia: un ecosistema casi único que nos toca cuidar' },
+        ],
+        notas: [
+          'El frailejón peina el agua de la niebla con sus hojas de lana (tricomas) y la enagua de hojas muertas lo abriga del frío; el musgo la guarda como esponja y la suelta despacio al suelo.',
+          'De aquí, gota a gota, nace el agua que baja a la finca. Por eso el páramo se cuida, no se ara: ni ganado, ni quema, ni papa en lo alto.',
+          'Es un mundo de niebla y frío: casi sin árboles, con frailejonal y pajonal sobre suelo negro y turberas. La vida de aquí —cóndor, oso, venadito— vive de esa agua.',
+        ],
+      },
+    },
+  },
 };
 
 /** Ids de todos los mundos registrados. */
