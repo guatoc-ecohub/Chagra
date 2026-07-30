@@ -24,7 +24,7 @@ import { Suspense, lazy, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, OrbitControls, Stars } from '@react-three/drei';
 import * as THREE from 'three';
-import { AbejaEscena } from './useEntradaAbeja.jsx';
+import { CompaiEscena } from './CompaiEscena.jsx';
 import CamaraDirector from './CamaraDirector.jsx';
 import { SombraContacto } from './SombraContacto.jsx';
 import { ESTADO_FINCA_MUESTRA } from './reaccionFinca.js';
@@ -311,11 +311,14 @@ function Contenido({
         );
       })}
 
-      {/* Angelita: una sola por mundo (la del footer se oculta dentro). `entrando`
-          vive AHORA en si hay hotspot activo — con foco se posa junto a la puerta,
-          sin foco RONDA (idle propio, ya no un fotograma clavado). `hablando` la
-          hace pulsar cuando el agente narra; `rebote` es el microrrebote del toque. */}
-      <AbejaEscena
+      {/* EL COMPAÑERO del mundo: según el avatar elegido (CompaiEscena resuelve
+          angelita/maíz/zarigüeya). Una sola por mundo (la del footer se oculta
+          dentro). `entrando` vive AHORA en si hay hotspot activo — con foco se
+          posa junto a la puerta, sin foco RONDA (idle propio, ya no un fotograma
+          clavado). `hablando` la hace pulsar cuando el agente narra; `rebote` es
+          el microrrebote del toque. Hoy maíz/zarigüeya caen a Angelita (fallback,
+          sin regresión) hasta que el Fable de compai (#5) les dé arte 3D. */}
+      <CompaiEscena
         foco={foco}
         entrando={!!activo}
         hablando={hablando}
