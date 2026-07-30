@@ -584,6 +584,34 @@ export const MUNDO = {
     // El gemelo 2D digno (mirror → motivo `micorrizas`): la misma red, dibujada.
     fallback2d: { escena: 'mirror' },
   },
+
+  // 💦 LA CHORRERA — la QUEBRADA DE MONTAÑA con su salto (arquetipo SÍ-3D nuevo
+  //    `chorrera`). No es el `flujo` (el agua que BAJA por la pendiente para
+  //    regar): aquí el agua CAE. El bosque de niebla andino (~2200–2800 msnm)
+  //    hecho lugar: el cauce rocoso estrecho de alta pendiente, la CHORRERA
+  //    sobre el escarpe estratificado (roca sedimentaria angular), el POZO
+  //    cristalino de guijarros pulidos en la base, la escalera de terrazas y
+  //    micro-cascadas, y el bosque prehistórico de helechos arborescentes,
+  //    musgo aterciopelado y epífitas bajo la niebla. Huesos reales de la
+  //    quebrada de Guatoc (DR-chorrera-quebrada-guatoc), piel dibujada estilo
+  //    lámina naturalista de Humboldt + atmósfera Ghibli. Agua SIN física
+  //    (planos + shader + sprites). En equipo humilde cae a su espejo 2D.
+  //    (anti-conflicto de merge: entrada de mundo nueva SIEMPRE al final.)
+  chorrera: {
+    pisoTermico: 'frio',
+    escena: 'chorrera',
+    valle: { tipo: 'chorrera', pos: [2.4, 0, -3.6], escala: 1 },
+    params: {},
+    hotspots: [
+      { id: 'salto', pos: [0, 2.2, -0.6], emoji: '💦', label: 'El salto de agua', view: 'agua', data: { tema: 'nacimiento' } },
+      { id: 'pozo', pos: [0.15, 0.7, 0.35], emoji: '💧', label: 'El pozo cristalino', view: 'biodiversidad' },
+      { id: 'helechos', pos: [-2.85, 1.6, 1.7], emoji: '🌿', label: 'Helechos y musgos', view: 'restauracion' },
+      { id: 'ronda', pos: [2.7, 1.4, 1.15], emoji: '🌳', label: 'La ronda que la cuida', view: 'restauracion' },
+    ],
+    entrada: { zoom: 8.5, centro: [0, 1.7, -0.3], narra: 'chorrera' },
+    // El gemelo 2D digno (mirror → motivo `chorrera`): la misma quebrada, dibujada.
+    fallback2d: { escena: 'mirror' },
+  },
 };
 
 /** Ids de todos los mundos registrados. */
