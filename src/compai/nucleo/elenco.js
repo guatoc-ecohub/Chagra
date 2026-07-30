@@ -34,6 +34,13 @@ export const TAMANO_CANONICO = 14.2;
 export const ELENCO = {
   angelita: { nombre: 'Angelita', gentilicio: 'la abeja de la casa', enPWA: true },
   maiz: { nombre: 'Maíz', gentilicio: 'la planta de maíz', enPWA: true },
+  // La zarigüeya entró al elenco de la PWA el 2026-07-25 (PR #2783, crías al
+  // lomo) — DESPUÉS de que este núcleo se escribió el 2026-07-26 y se le
+  // olvidó incluirla aquí. Sin esta entrada, normalizarCompanero('zariguya')
+  // devolvía null y leerCompanero/escribirCompanero la rechazaban en
+  // silencio: la tercera opción de useAgentAvatarType.js nunca sobrevivía
+  // el cruce por el núcleo (bug encontrado cableando #96).
+  zariguya: { nombre: 'Zarigüeya', gentilicio: 'la zarigüeya', enPWA: true },
   oso: { nombre: 'Oso andino', gentilicio: 'el oso andino', enPWA: false },
   jaguar: { nombre: 'Jaguar', gentilicio: 'el jaguar', enPWA: false },
   guacamaya: { nombre: 'Guacamaya', gentilicio: 'la guacamaya', enPWA: false },
