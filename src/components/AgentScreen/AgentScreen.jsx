@@ -619,8 +619,9 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
   // normal NO debe re-disparar el prompt.
   useEffect(() => {
     if (!initialContext) return;
-    const { prefilledPrompt, prompt, sourceLabel, sourceUrl, alertContext, autoSend, fromVoice } = initialContext;
+    const { prefilledPrompt, prompt, sourceLabel, sourceUrl, alertContext, autoSend, fromVoice, autoOpenCamera } = initialContext;
     let autoSendTimer = null;
+    let autoCameraTimer = null;
     // Alias defensivo: varias pantallas de mundo pasaban la clave `prompt`
     // (SemillaScreen, PlatanoBanano, Poscosecha, Almacenamiento, Compost,
     // SaludSuelo…) creyendo que prellenaban el input, pero solo se leía
@@ -640,6 +641,16 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         setInputText(seed);
       }
     }
+    // "Enviar foto" desde el menú del gesto del compañero (#66/#70, AgentFab):
+    // llega con autoOpenCamera y disparamos el mismo input oculto que usa el
+    // botón de cámara del compositor — el diagnóstico real llega después
+    // (handleAgentPhotoPick de siempre); aquí solo destrabamos el picker sin
+    // que el operador tenga que buscar el botón.
+    if (autoOpenCamera) {
+      autoCameraTimer = setTimeout(() => {
+        cameraInputAgentRef.current?.click();
+      }, 250);
+    }
     if (sourceUrl || sourceLabel || alertContext) {
       setAlertContextBanner({
         sourceLabel: sourceLabel || null,
@@ -647,7 +658,10 @@ export default function AgentScreen({ onBack, onNavigate, initialContext }) {
         alertContext: alertContext || null,
       });
     }
-    return () => { if (autoSendTimer) clearTimeout(autoSendTimer); };
+    return () => {
+      if (autoSendTimer) clearTimeout(autoSendTimer);
+      if (autoCameraTimer) clearTimeout(autoCameraTimer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
