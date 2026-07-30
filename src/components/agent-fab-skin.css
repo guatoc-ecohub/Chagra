@@ -48,3 +48,24 @@
 .fvh-skin.chagra-fab.is-ready {
   border-color: rgb(var(--c-amber-400, 251 191 36) / 0.8) !important;
 }
+
+/* ============================================================================
+   Menú del gesto de interacción (#66/#70, 2026-07-30) — AgentFabMenu.jsx.
+   SIN scope de .fvh-skin: se ve igual en todos los temas y en prod (la flag
+   VITE_FINCA_VIVA_HOME_PERFIL no gobierna el gesto, solo la piel del plinto).
+   ========================================================================== */
+.agt-fab-menu-item:hover,
+.agt-fab-menu-item:focus-visible {
+  background: rgb(var(--t-accent-rgb, 16 185 129) / 0.18);
+  outline: none;
+}
+.agt-fab-menu-item:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--t-accent-rgb, 16 185 129) / 0.6);
+}
+.agt-fab-menu-item:active {
+  background: rgb(var(--t-accent-rgb, 16 185 129) / 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agt-fab-menu-item { transition: none !important; }
+}
