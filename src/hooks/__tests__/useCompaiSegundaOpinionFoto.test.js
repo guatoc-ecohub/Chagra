@@ -54,7 +54,7 @@ describe('useCompaiSegundaOpinionFoto — pedirRevision (cableado real)', () => 
   beforeEach(() => {
     vi.clearAllMocks();
     habilitarSegundaOpinion(true);
-    getGpuSnapshot.mockResolvedValue({
+    vi.mocked(getGpuSnapshot).mockResolvedValue({
       available: true,
       models: [{ name: 'qwen3.5:4b' }, { name: 'qwen3-vl:4b' }],
     });
@@ -80,7 +80,7 @@ describe('useCompaiSegundaOpinionFoto — pedirRevision (cableado real)', () => 
   });
 
   it('si la segunda mirada coincide (misma foto, mismo veredicto), NO avisa', async () => {
-    streamOllama.mockResolvedValue('SANA\nSe ve una hoja saludable');
+    vi.mocked(streamOllama).mockResolvedValue('SANA\nSe ve una hoja saludable');
     const { result } = renderHook(() => useCompaiSegundaOpinionFoto());
     const avisar = vi.fn();
     await act(async () => {
@@ -92,12 +92,12 @@ describe('useCompaiSegundaOpinionFoto — pedirRevision (cableado real)', () => 
     });
     expect(streamOllama).toHaveBeenCalledTimes(1);
     // Llama al modelo de revisión configurado, no al de la primera lectura.
-    expect(streamOllama.mock.calls[0][1].model).toBe('qwen3-vl:4b');
+    expect(vi.mocked(streamOllama).mock.calls[0][1].model).toBe('qwen3-vl:4b');
     expect(avisar).not.toHaveBeenCalled();
   });
 
   it('si discrepa, avisa por el canal pedido con el texto redactado', async () => {
-    streamOllama.mockResolvedValue('ENFERMA\nEl fruto está perforado, para confirmar ábralo');
+    vi.mocked(streamOllama).mockResolvedValue('ENFERMA\nEl fruto está perforado, para confirmar ábralo');
     const { result } = renderHook(() => useCompaiSegundaOpinionFoto());
     const avisar = vi.fn();
     await act(async () => {
@@ -115,7 +115,7 @@ describe('useCompaiSegundaOpinionFoto — pedirRevision (cableado real)', () => 
   });
 
   it('si la GPU está apretada (chat no residente), no dispara Ollama', async () => {
-    getGpuSnapshot.mockResolvedValue({ available: true, models: [{ name: 'qwen3-vl:4b' }] });
+    vi.mocked(getGpuSnapshot).mockResolvedValue({ available: true, models: [{ name: 'qwen3-vl:4b' }] });
     const { result } = renderHook(() => useCompaiSegundaOpinionFoto());
     const avisar = vi.fn();
     await act(async () => {

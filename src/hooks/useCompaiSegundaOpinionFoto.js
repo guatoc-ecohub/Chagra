@@ -73,7 +73,8 @@ function extraerHallazgo(crudo) {
  * @returns {{ pedirRevision: (p: {imageBlob: Blob, finding: Object|null, canal?: 'voz'|'texto', avisar: (texto:string, meta:{canal:string}) => void}) => Promise<void>, enVuelo: () => boolean }}
  */
 export function useCompaiSegundaOpinionFoto() {
-  const pedirRevision = useCallback(async ({ imageBlob, finding, canal = 'texto', avisar }) => {
+  /** @param {{imageBlob: Blob, finding: Object|null, canal?: 'voz'|'texto', avisar: (texto:string, meta:{canal:string}) => void}} p */
+  const pedirRevision = useCallback(async ({ imageBlob, finding, canal = /** @type {'voz'|'texto'} */ ('texto'), avisar }) => {
     if (!imageBlob || typeof avisar !== 'function') return;
     const primeraLectura = textoDePrimeraLectura(finding);
     if (!primeraLectura) return; // sin diagnóstico previo no hay con qué comparar
