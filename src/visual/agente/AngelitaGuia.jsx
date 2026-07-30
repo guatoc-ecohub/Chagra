@@ -90,6 +90,7 @@ export function AngelitaGuia({
             mensaje={guia.parada.texto}
             tipo={guia.parada.tipo}
             className="ang-guia__burbuja"
+            permiteEscucha
           />
           <div className="ang-guia__nav">
             {guia.total > 1 && (
