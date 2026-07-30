@@ -33,7 +33,9 @@ const PASOS = [
     kicker: 'Paso 1 de 4 · La panoja',
     texto:
       'Lo que remata cada mata es la PANOJA, y no todas son iguales. La compacta —glomerulada— lleva los granitos apretados contra el eje y se ve maciza. La suelta —amarantiforme— abre sus ramitas y cuelga como una escoba. Mírelas: en este lote están las dos, y saber cuál es cuál es saber qué sembró.',
-    foco: enSuelo(-2.4, 2.0),
+    // La PRIMERA fila, la que queda al pie de la cámara: ahí las dos panojas
+    // se ven de cerca y el anillo no se ahoga entre las matas del fondo.
+    foco: enSuelo(-3.2, 7.8),
   },
   {
     id: 'color',
