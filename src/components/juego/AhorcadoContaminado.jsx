@@ -128,6 +128,22 @@ function EscenaChagra({ errores, ganado, perdido }) {
         d="M0,152 Q40,116 90,134 Q150,152 200,126 Q262,100 320,132 Q345,144 360,138 L360,152 Z"
       />
 
+      {/* ── Nubes blancas amigables (se van cuando llega el químico) ── */}
+      <g className="jp-ah-nube-blanca" transform="translate(70 26)">
+        <g className="jp-ah-nube-blanca-forma">
+          <ellipse cx="0" cy="0" rx="21" ry="9" />
+          <ellipse cx="-13" cy="4" rx="12" ry="7" />
+          <ellipse cx="13" cy="4" rx="13" ry="7" />
+        </g>
+      </g>
+      <g className="jp-ah-nube-blanca nube-blanca-2" transform="translate(196 40) scale(0.65)">
+        <g className="jp-ah-nube-blanca-forma">
+          <ellipse cx="0" cy="0" rx="21" ry="9" />
+          <ellipse cx="-13" cy="4" rx="12" ry="7" />
+          <ellipse cx="13" cy="4" rx="13" ry="7" />
+        </g>
+      </g>
+
       {/* ── Frailejones de silueta en la loma (toque de páramo) ── */}
       <g className="jp-ah-frailejon" transform="translate(254 130)">
         <rect x="-2" y="-12" width="4" height="14" rx="2" />
@@ -136,6 +152,7 @@ function EscenaChagra({ errores, ganado, perdido }) {
             <ellipse key={a} cx="0" cy="-16" rx="2.6" ry="7.5" transform={`rotate(${a} 0 -10)`} />
           ))}
         </g>
+        <circle className="jp-ah-frailejon-flor" cx="0" cy="-24" r="2.2" />
       </g>
       <g className="jp-ah-frailejon" transform="translate(300 138) scale(0.7)">
         <rect x="-2" y="-12" width="4" height="14" rx="2" />
@@ -144,6 +161,7 @@ function EscenaChagra({ errores, ganado, perdido }) {
             <ellipse key={a} cx="0" cy="-16" rx="2.6" ry="7.5" transform={`rotate(${a} 0 -10)`} />
           ))}
         </g>
+        <circle className="jp-ah-frailejon-flor" cx="0" cy="-24" r="2.2" />
       </g>
 
       {/* ── Suelo (fértil → agrietado) ── */}
@@ -193,6 +211,19 @@ function EscenaChagra({ errores, ganado, perdido }) {
         </g>
       ))}
 
+      {/* ── Surco de brotecitos: la chagra es parcela cultivada ── */}
+      {[
+        [24, 160], [52, 166], [80, 172], [108, 178],
+      ].map(([x, y], i) => (
+        <g key={i} transform={`translate(${x} ${y})`}>
+          <g className={`jp-ah-brote brote-${i + 1}`}>
+            <path className="jp-ah-brote-tallo" d="M0,0 Q0,-4 0,-7" />
+            <path className="jp-ah-brote-hoja" d="M0,-6 C-3,-8 -6,-8 -8,-6 C-6,-4 -2,-4 0,-6 Z" />
+            <path className="jp-ah-brote-hoja" d="M0,-7 C3,-9 6,-9 8,-7 C6,-5 2,-5 0,-7 Z" />
+          </g>
+        </g>
+      ))}
+
       {/* ── Florecitas de victoria (brotan al ganar) ── */}
       {[
         [70, 151], [212, 154], [255, 151],
@@ -210,6 +241,7 @@ function EscenaChagra({ errores, ganado, perdido }) {
 
       {/* ── La mata protagonista (rubber-hose: respira, se marchita) ── */}
       <g className="jp-ah-mata-anclaje" transform="translate(118 149)">
+        <ellipse className="jp-ah-mata-sombra" cx="0" cy="1.5" rx="21" ry="3.4" />
         <g className="jp-ah-mata">
           <path className="jp-ah-tallo" d="M0,0 C-2,-22 2,-40 0,-58" />
           {/* Pares de hojas: la unión al tallo queda en el (0,0) local de cada
@@ -358,6 +390,23 @@ function EscenaChagra({ errores, ganado, perdido }) {
           <text className="z-1" x="8" y="-14">z</text>
           <text className="z-2" x="15" y="-22">z</text>
           <text className="z-3" x="23" y="-30">z</text>
+        </g>
+      </g>
+
+      {/* ── Mariposa: revolotea sana; con el químico se aleja de la chagra ── */}
+      <g className="jp-ah-mariposa-orbita">
+        <g className="jp-ah-mariposa">
+          <g className="jp-ah-mariposa-ala ala-m-izq">
+            <path d="M-1,0 C-6,-6 -11,-6 -11,-1 C-11,3 -6,4 -1,1 Z" />
+            <circle cx="-7" cy="-2" r="1.1" />
+          </g>
+          <g className="jp-ah-mariposa-ala ala-m-der">
+            <path d="M1,0 C6,-6 11,-6 11,-1 C11,3 6,4 1,1 Z" />
+            <circle cx="7" cy="-2" r="1.1" />
+          </g>
+          <ellipse className="jp-ah-mariposa-cuerpo" cx="0" cy="0" rx="1.4" ry="4" />
+          <path className="jp-ah-mariposa-antena" d="M-0.6,-3.6 Q-2,-6 -3,-6.6" />
+          <path className="jp-ah-mariposa-antena" d="M0.6,-3.6 Q2,-6 3,-6.6" />
         </g>
       </g>
 

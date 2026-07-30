@@ -274,7 +274,7 @@
 
 .jp-ah-niebla {
   fill: #ffffff;
-  opacity: 0.2;
+  opacity: 0.14;
 }
 
 .jp-ah-frailejon rect,
@@ -282,6 +282,40 @@
   fill: var(--frailejon);
   transition: fill 1.4s ease;
 }
+
+.jp-ah-frailejon-flor {
+  fill: #f4c945;
+  stroke: #c99a1e;
+  stroke-width: 0.7;
+  transition: fill 1.4s ease, opacity 1.4s ease;
+}
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-frailejon-flor { fill: #8f8a76; opacity: 0.5; }
+
+/* ── Nubes blancas amigables (huyen del químico) ── */
+
+.jp-ah-nube-blanca-forma ellipse {
+  fill: #ffffff;
+  opacity: 0.85;
+}
+
+.jp-ah-nube-blanca {
+  transition: opacity 1.4s ease;
+}
+
+.jp-ah-nube-blanca-forma {
+  animation: jp-ah-nube-blanca-deriva 9s ease-in-out infinite alternate;
+}
+
+.nube-blanca-2 .jp-ah-nube-blanca-forma { animation-delay: -4.5s; }
+
+@keyframes jp-ah-nube-blanca-deriva {
+  from { transform: translateX(-5px); }
+  to { transform: translateX(5px); }
+}
+
+.jp-ah-vivo.p1:not(.gano) .jp-ah-nube-blanca { opacity: 0.5; }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-nube-blanca { opacity: 0; }
 
 .jp-ah-vivo.p3:not(.gano) { --montana-cerca: #87906f; }
 .jp-ah-vivo.p5:not(.gano) {
@@ -400,6 +434,41 @@
 .jp-ah-vivo.p3:not(.gano) .jp-ah-pasto path { animation: none; transform: rotate(-28deg); }
 .jp-ah-vivo.p5:not(.gano) { --pasto: #8a7a52; }
 .jp-ah-vivo.p5:not(.gano) .jp-ah-pasto path { transform: rotate(-52deg); }
+
+/* ── Surco de brotecitos (parcela cultivada) ── */
+
+.jp-ah-brote {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  transition: transform 1.2s ease, opacity 1.2s ease;
+}
+
+.jp-ah-brote-tallo {
+  fill: none;
+  stroke: var(--tallo);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  transition: stroke 1.4s ease;
+}
+
+.jp-ah-brote-hoja {
+  fill: var(--hoja);
+  transition: fill 1.4s ease;
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-brote { transform: rotate(-16deg) scale(0.94); }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-brote { transform: rotate(-34deg) scale(0.8); }
+.jp-ah-vivo.p5:not(.gano) .jp-ah-brote { transform: rotate(-58deg) scale(0.66); opacity: 0.75; }
+
+/* ── Sombra de la mata (ancla al suelo, da profundidad) ── */
+
+.jp-ah-mata-sombra {
+  fill: #1d130b;
+  opacity: 0.16;
+  transition: opacity 1.4s ease;
+}
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-mata-sombra { opacity: 0.08; }
 
 /* ── La mata protagonista ──
  * Respira (squash&stretch con volumen preservado). El doblez por
@@ -834,6 +903,65 @@
 /* Celebración al ganar: vuelo alegre más vivo */
 .jp-ah-vivo.gano .jp-ah-abeja-orbita { animation-duration: 5s; }
 
+/* ── La mariposa: compañera de la abeja; el químico la espanta ── */
+
+.jp-ah-mariposa-orbita {
+  animation: jp-ah-mariposeo 11s ease-in-out infinite;
+  transition: opacity 2s ease;
+}
+
+@keyframes jp-ah-mariposeo {
+  0%, 100% { transform: translate(288px, 92px) rotate(6deg); }
+  20% { transform: translate(258px, 74px) rotate(-8deg); }
+  45% { transform: translate(300px, 62px) rotate(5deg); }
+  70% { transform: translate(322px, 88px) rotate(-6deg); }
+  85% { transform: translate(300px, 102px) rotate(4deg); }
+}
+
+.jp-ah-mariposa {
+  animation: jp-ah-abeja-bob 1.1s ease-in-out infinite alternate;
+}
+
+.jp-ah-mariposa-cuerpo { fill: #4a3524; }
+
+.jp-ah-mariposa-antena {
+  fill: none;
+  stroke: #4a3524;
+  stroke-width: 0.7;
+  stroke-linecap: round;
+}
+
+.jp-ah-mariposa-ala path {
+  fill: #f6a34c;
+  stroke: #c86f1d;
+  stroke-width: 0.8;
+}
+
+.jp-ah-mariposa-ala circle { fill: #fde68a; }
+
+.jp-ah-mariposa-ala {
+  transform-box: fill-box;
+  animation: jp-ah-mariposa-aleteo 0.34s ease-in-out infinite alternate;
+}
+
+.jp-ah-mariposa-ala.ala-m-izq { transform-origin: right center; }
+.jp-ah-mariposa-ala.ala-m-der { transform-origin: left center; animation-direction: alternate-reverse; }
+
+@keyframes jp-ah-mariposa-aleteo {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.3); }
+}
+
+/* Con el segundo error la mariposa se ALEJA de la chagra (huye del químico) */
+.jp-ah-vivo.p2:not(.gano) .jp-ah-mariposa-orbita {
+  animation: jp-ah-mariposa-huye 2.6s ease-in both;
+}
+
+@keyframes jp-ah-mariposa-huye {
+  0% { transform: translate(288px, 92px) rotate(6deg); opacity: 1; }
+  100% { transform: translate(392px, 30px) rotate(-14deg); opacity: 0; }
+}
+
 /* ── Chispas + florecitas de victoria ── */
 
 .jp-ah-chispa {
@@ -860,10 +988,12 @@
   50% { opacity: 1; transform: scale(1.15) rotate(24deg); }
 }
 
+/* Las florecitas silvestres VIVEN en la chagra sana, se marchitan con la
+   contaminación y re-brotan con overshoot al ganar. */
 .jp-ah-flor-extra {
   transform-box: fill-box;
   transform-origin: bottom center;
-  transform: scale(0);
+  transition: transform 1.2s ease, opacity 1.2s ease;
 }
 
 .jp-ah-flor-extra-tallo {
@@ -871,10 +1001,30 @@
   stroke: #3f8f4f;
   stroke-width: 1.2;
   stroke-linecap: round;
+  transition: stroke 1.4s ease;
 }
 
-.jp-ah-flor-extra-petalo { fill: #fbd0e0; stroke: #e78fb3; stroke-width: 0.5; }
-.jp-ah-flor-extra-centro { fill: #f4b31c; }
+.jp-ah-flor-extra-petalo {
+  fill: #fbd0e0;
+  stroke: #e78fb3;
+  stroke-width: 0.5;
+  transition: fill 1.4s ease, stroke 1.4s ease;
+}
+
+.jp-ah-flor-extra-centro { fill: #f4b31c; transition: fill 1.4s ease; }
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-flor-extra {
+  transform: scale(0.7) rotate(-24deg);
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-flor-extra-petalo { fill: #cbb3ba; stroke: #a98f96; }
+.jp-ah-vivo.p2:not(.gano) .jp-ah-flor-extra-centro { fill: #b09a6a; }
+.jp-ah-vivo.p2:not(.gano) .jp-ah-flor-extra-tallo { stroke: #8f9257; }
+
+.jp-ah-vivo.p3:not(.gano) .jp-ah-flor-extra {
+  transform: scale(0.45) rotate(-48deg);
+  opacity: 0;
+}
 
 .jp-ah-vivo.gano .jp-ah-flor-extra {
   animation: jp-ah-brotar 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
@@ -898,8 +1048,10 @@
     transition: none !important;
   }
 
-  /* La órbita animada posicionaba a la abeja: sin animación queda en (0,0),
-     así que la plantamos en un punto legible por estado. */
+  /* Las órbitas animadas posicionaban abeja y mariposa: sin animación quedan
+     en (0,0), así que las plantamos en un punto legible por estado. */
+  .jp-ah-mariposa-orbita { transform: translate(288px, 80px); }
+  .jp-ah-vivo.p2:not(.gano) .jp-ah-mariposa-orbita { opacity: 0; }
   .jp-ah-abeja-orbita { transform: translate(200px, 80px); }
   .jp-ah-vivo.p3:not(.gano) .jp-ah-abeja-orbita { transform: translate(185px, 105px); }
   .jp-ah-vivo.p5:not(.gano) .jp-ah-abeja-orbita { transform: translate(180px, 128px) rotate(-16deg); }
