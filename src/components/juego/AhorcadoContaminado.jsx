@@ -33,7 +33,7 @@ const ETAPAS_CONTAMINACION = [
   { clase: 'paso-3', texto: 'El suelo fértil se agrieta y pierde su vida.' },
   { clase: 'paso-4', texto: 'El agua de riego se enturbió: ya no está limpia.' },
   { clase: 'paso-5', texto: 'Angelita, la abejita polinizadora, tambalea: casi no puede volar.' },
-  { clase: 'paso-6', texto: 'La chagra quedó contaminada. Angelita y sus amigas no pudieron más.' },
+  { clase: 'paso-6', texto: 'La chagra quedó contaminada. Angelita cayó y las mariposas huyeron.' },
 ];
 
 function normalizar(letra) {
@@ -99,9 +99,10 @@ function actuacionAngelita(errores, ganado, perdido) {
 
 /**
  * Mariposita — secundaria de la escena (dibujo propio del juego, a escala del
- * paisaje). Secundaria pero NO desechable: ya no huye del químico — acompaña
- * a Angelita en la degradación (aleteo pesado → tambaleo → cae marchita) y
- * revive con ella al ganar. La coreografía completa vive en el CSS (jp-ah-).
+ * paisaje). Corrección del operador: "que la una mariposa muera, el resto
+ * huyen". La mariposa que MUERE es la Dione (la grande, más abajo); estas dos
+ * chiquitas son "el resto" → al ver caer a su compañera HUYEN de la escena
+ * (se asustan y se van de cuadro). Reviven al ganar. Coreografía en el CSS.
  */
 function Mariposita() {
   return (
@@ -128,9 +129,10 @@ function Mariposita() {
  * squash&stretch, line-boil sutil) que se contamina un paso por cada error:
  * entra la nube de químico, la mata se marchita, el suelo se agrieta, el
  * agua se enturbia y Angelita — la abeja angelita REAL de la casa — tambalea
- * hasta caer (desmayada, sin morbo: esto es educativo). Sus compañeras (la
- * abejita obrera del arte anterior y las mariposas) se apagan CON ella, no
- * desaparecen. Al ganar, todas reviven.
+ * hasta caer (desmayada, sin morbo: esto es educativo). La acompañan la
+ * abejita obrera y el colibrí (que caen CON ella) y las mariposas: UNA muere
+ * (la Dione cae) y las otras dos, al verla caer, HUYEN de la escena
+ * (corrección del operador). Al ganar, todas reviven y re-entran.
  *
  * Los pasos se acumulan como clases p1..pN para que el CSS aplique cada
  * degradación de forma progresiva y con transiciones suaves.
@@ -538,9 +540,11 @@ function EscenaChagra({ errores, ganado, perdido }) {
         </g>
       </g>
 
-      {/* ── Mariposas: secundarias que acompañan a Angelita — el químico ya no
-          las espanta fuera de escena: se van apagando CON ella (aleteo pesado
-          → tambaleo → caen marchitas al suelo) y reviven juntas al ganar. ── */}
+      {/* ── Mariposas chiquitas: "el resto" que HUYE (corrección del operador
+          "que la una mariposa muera, el resto huyen"). Cuando la Dione (abajo)
+          cae por la contaminación, estas dos se asustan y se van de cuadro
+          (aleteo nervioso → escapan volando fuera de la escena). Reviven y
+          re-entran al ganar. ── */}
       <g className="jp-ah-mariposa-orbita">
         <Mariposita />
       </g>
@@ -551,10 +555,11 @@ function EscenaChagra({ errores, ganado, perdido }) {
       </g>
 
       {/* ── La mariposa pasionaria (Mariposa REAL de la casa, Dione juno) ──
-          La mariposa adicional que pidió el operador: la creature canónica
+          LA mariposa que MUERE (corrección del operador): la creature canónica
           del kit (cuatro alas independientes, ocelos). Aletea alto sobre el
-          surco, se destiñe y tambalea con la contaminación, y en p6 cae
-          plegada junto a sus compañeras. Revive con todas al ganar. */}
+          surco, se destiñe y tambalea con la contaminación, y en p6 CAE
+          plegada al suelo — su caída es la que espanta al resto. Revive al
+          ganar. */}
       <g className="jp-ah-dione-orbita">
         <g className="jp-ah-dione-marco" transform="scale(0.5)">
           <Mariposa inline animated />
