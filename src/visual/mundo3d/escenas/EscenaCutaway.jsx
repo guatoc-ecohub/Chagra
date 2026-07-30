@@ -105,6 +105,64 @@ function Brizna({ pos, alto, giro }) {
   );
 }
 
+/* ── EL ABONO (la pila de compost) — señales propias, gateadas a `abono` ─────
+   QA visual 2026-07-30 (juez gemini sobre la vitrina): la pila renderea limpia
+   pero le faltaba lo que la hace COMPOST — el CALOR. El vapor de la fase
+   termófila (55–65 °C, donde trabajan los actinomicetos) es la señal didáctica
+   de que la pila está VIVA y trabajando, no un montón de tierra quieta. */
+
+/* VaporCompost: 2–3 volutas translúcidas que suben de la pila, se abren y se
+   reinician (la disipación del calor). Frugal por contrato (DR §6): esferas
+   low-poly `meshBasic` transparente, sin sombras, sin partículas nuevas. Con
+   reduced-motion quedan quietas a media altura, tenues (escena digna, no
+   muerta). */
+function VaporCompost({ top, reducedMotion }) {
+  const refs = useRef([]);
+  const volutas = useMemo(() => ([
+    { x: -0.95, z: 0.35, fase: 0.0, dur: 4.6 },
+    { x: 0.2, z: -0.15, fase: 0.45, dur: 5.4 },
+    { x: 1.05, z: 0.4, fase: 0.8, dur: 4.1 },
+  ]), []);
+  useFrame((state) => {
+    if (reducedMotion) return;
+    const t = state.clock.elapsedTime;
+    volutas.forEach((v, i) => {
+      const g = refs.current[i];
+      if (!g) return;
+      const f = ((t / v.dur) + v.fase) % 1; // 0 nace en la pila → 1 se disipa
+      g.position.y = top + 0.18 + f * 0.95;
+      g.position.x = v.x + Math.sin((t * 0.7) + v.fase * 6) * 0.08;
+      const s = 0.7 + f * 0.9; // se abre mientras sube
+      g.scale.set(s, s, s);
+      g.children.forEach((m) => {
+        if (m.material) m.material.opacity = 0.55 * (1 - f) + 0.05;
+      });
+    });
+  });
+  return (
+    <group>
+      {volutas.map((v, i) => (
+        <group
+          key={v.fase}
+          ref={(el) => { refs.current[i] = el; }}
+          position={[v.x, top + 0.18 + (reducedMotion ? 0.45 : 0), v.z]}
+        >
+          {/* gris CÁLIDO, no blanco: contra el cielo crema del perfil tierra el
+              blanco desaparecía (QA visual 2026-07-30, primera pasada) */}
+          <mesh>
+            <sphereGeometry args={[0.19, 6, 5]} />
+            <meshBasicMaterial color="#cdbfa2" transparent opacity={reducedMotion ? 0.3 : 0.5} depthWrite={false} />
+          </mesh>
+          <mesh position={[0.11, 0.19, 0.02]}>
+            <sphereGeometry args={[0.13, 6, 5]} />
+            <meshBasicMaterial color="#cdbfa2" transparent opacity={reducedMotion ? 0.22 : 0.4} depthWrite={false} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 /* Una criatura de la librería como BILLBOARD SVG (three-free) que respira/asoma.
    Con reduced-motion se congela en su fotograma (escena digna, no muerta). */
 function Fauna({ base, phase, deriva = 0, asomo = 0.05, reducedMotion, children }) {
@@ -387,7 +445,7 @@ function Milpa({ total, config, reducedMotion }) {
   );
 }
 
-function Diorama({ params, reducedMotion }) {
+function Diorama({ params, abono = false, reducedMotion }) {
   const vida = clamp01(params?.vida);
   /* Con la milpa el diorama BAJA (precedente: DioramaPisos en EscenaEstratos):
      las hermanas suben ~1.7 sobre el bloque y el target de reposo es el origen —
@@ -421,7 +479,13 @@ function Diorama({ params, reducedMotion }) {
     capas.forEach((capa, ci) => {
       const alto = capa.alto || 0.6;
       const cy = top - alto / 2;
-      const color = capa.color || '#5a3d28';
+      // ABONO (QA visual 2026-07-30, gateado): la "tierra negra" del registro
+      // (#2f2418) caía a masa casi negra en el corte — mismo caso de albedo del
+      // suelo negro (QA 2026-07-23), pero aquí el registro es solo-lectura, así
+      // que el paso hacia el crema se da al render. Leve (0.1): sigue siendo la
+      // capa más oscura (el humus terminado ES negro), pero muestra su textura.
+      const colorRegistro = capa.color || '#5a3d28';
+      const color = abono ? mezclar(colorRegistro, '#f0e2c8', 0.1) : colorRegistro;
       bloq.push({ key: `c${ci}`, cy, alto, color });
 
       // grumos que rompen la cara plana (pocos, siempre; textura de tierra).
@@ -462,13 +526,25 @@ function Diorama({ params, reducedMotion }) {
       }
 
       // lombriz de librería: asoma por el corte de las capas que la declaran
-      // (suelo negro / tierra viva). Máx 2 en total → "vida, no relleno".
-      if ((capa.bichos || []).includes('lombriz') && worms.length < 2 && vida > 0.22) {
+      // (suelo negro / tierra viva). Máx 2 en total → "vida, no relleno". En la
+      // PILA DE COMPOST caben 3 (gateado): la lombriz es la obrera estrella del
+      // abono y el juez visual pedía más vida trabajando (QA 2026-07-30).
+      const maxWorms = abono ? 3 : 2;
+      if ((capa.bichos || []).includes('lombriz') && worms.length < maxWorms && vida > 0.22) {
         worms.push({
           key: `w${ci}`,
           base: [(r() - 0.5) * (ANCHO - 1.4), cy + 0.02, CARA + 0.06],
           phase: r() * Math.PI * 2,
         });
+        // en la pila, la capa que declara lombriz trae una COMPAÑERA (la
+        // lombricultura nunca es una lombriz sola) — sin pasar del tope.
+        if (abono && worms.length < maxWorms) {
+          worms.push({
+            key: `w${ci}b`,
+            base: [(r() - 0.5) * (ANCHO - 1.4), cy - alto * 0.18, CARA + 0.06],
+            phase: r() * Math.PI * 2,
+          });
+        }
       }
       top -= alto;
     });
@@ -488,7 +564,7 @@ function Diorama({ params, reducedMotion }) {
       : null;
 
     return { bloques: bloq, ambiente: amb, terrones: terr, briznas: briz, lombrices: worms, escarabajo: beetle, total: alturaTotal };
-  }, [params, vida]);
+  }, [params, vida, abono]);
 
   return (
     <group position={[0, -total / 2 - baja, 0]}>
@@ -505,10 +581,13 @@ function Diorama({ params, reducedMotion }) {
       ))}
       {/* grumos que quiebran la cara plana del corte */}
       {terrones.map((t) => <Terron key={t.key} pos={t.pos} r={t.rr} color={t.color} />)}
-      {/* el borde de pasto sobre la superficie */}
+      {/* el borde sobre la superficie: pasto en el suelo vivo; en la PILA DE
+          COMPOST (gateado) es la COBERTURA SECA de hojas/rastrojo — una pila
+          con tapa de césped leía como colina con pasto, no como compost
+          (QA visual 2026-07-30). Las briznas quedan: el compost vivo brota. */}
       <mesh position={[0, total + 0.03, 0]}>
         <boxGeometry args={[ANCHO, 0.08, PROF]} />
-        <meshLambertMaterial color="#6f9a45" flatShading />
+        <meshLambertMaterial color={abono ? '#a5824e' : '#6f9a45'} flatShading />
       </mesh>
       {briznas.map((b) => <Brizna key={b.key} pos={b.pos} alto={b.alto} giro={b.giro} />)}
       {/* la vida-textura del suelo: raíces que bajan y la red de hifas */}
@@ -528,6 +607,8 @@ function Diorama({ params, reducedMotion }) {
           <Escarabajo size={42} animated={!reducedMotion} />
         </Fauna>
       )}
+      {/* el CALOR de la pila (solo abono): el vapor de la fase termófila */}
+      {abono && <VaporCompost top={total} reducedMotion={reducedMotion} />}
       {/* la milpa: las tres hermanas arriba y los nódulos de N abajo (opt-in) */}
       {params?.milpa && <Milpa total={total} config={params.milpa} reducedMotion={reducedMotion} />}
     </group>
@@ -550,6 +631,10 @@ const CAMARA_MILPA = { position: [3.2, 2.4, 7.8], fov: 44 };
 export default function EscenaCutaway(props) {
   const alto = (props.params?.capas || []).reduce((s, c) => s + (c.alto || 0.6), 0) || 1.5;
   const esMilpa = Boolean(props.params?.milpa);
+  /* El gate del ABONO va por `mundoId` (el registro es solo-lectura y sus
+     `params` no traen bandera propia): mismo patrón de rama que `params.milpa`
+     — suelo y milpa NO entran por aquí. */
+  const esAbono = props.mundoId === 'abono' && !esMilpa;
   const cielo = esMilpa ? CIELO_MILPA : CIELOS.tierra;
   /* El centro del encuadre (la mirada del intro + anti-colisión de chips) sube
      con la milpa a media composición; el corte pelado se queda donde estaba. */
@@ -564,7 +649,7 @@ export default function EscenaCutaway(props) {
       entrada={entrada}
       piso={-alto / 2 - (esMilpa ? 0.55 : 0)}
     >
-      <Diorama params={props.params} reducedMotion={props.reducedMotion} />
+      <Diorama params={props.params} abono={esAbono} reducedMotion={props.reducedMotion} />
     </EscenaBase3D>
   );
 }
