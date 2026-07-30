@@ -34,6 +34,7 @@ import {
   aplicarSenalMolestia,
   multiplicadorDeCadencia,
   cadenciaEfectivaMs,
+  recortarMensaje,
 } from '../angelitaInteligencia';
 // Contrato con la CARA: los estados visuales canónicos que el dibujo entiende.
 import { ESTADOS_ANGELITA } from '../../visual/agente/angelitaEstados';
@@ -127,6 +128,21 @@ describe('comentarioDeMundo — grounded + honesto', () => {
     expect(s).toMatch(/todavía no me ha contado/i);
     expect(s).not.toMatch(/\d/); // no inventa números
     sinVoseo(s);
+  });
+
+  it('mis_matas: con `agro` (#80/#81, dato real del catálogo) lo teje en el comentario', () => {
+    const s = comentarioDeMundo('mis_matas', {
+      cultivos: [{ name: 'Fríjol', count: 2 }],
+      agro: 'le fija nitrógeno al suelo — buena vecina para las que comen mucho',
+    });
+    expect(s).toMatch(/fríjol/i);
+    expect(s).toMatch(/nitrógeno/i);
+    sinVoseo(s);
+  });
+
+  it('mis_matas: sin `agro` (sin match en el catálogo) no cambia el texto de siempre', () => {
+    const s = comentarioDeMundo('mis_matas', { cultivos: [{ name: 'Fríjol', count: 2 }] });
+    expect(s).not.toMatch(/ojo:/i);
   });
 
   it('mis_animales: cuenta real o fallback honesto', () => {
@@ -338,6 +354,9 @@ describe('resolverComportamiento — arbitraje', () => {
       ahoraMs: ahora,
       mundo: 'mis_animales',
       datosMundo: { total: 8 },
+      // rand=1 nunca cae bajo PROBABILIDAD_PREGUNTA (#110): este test cubre
+      // el comentario declarativo, no el modo aprendiz (cubierto aparte).
+      rand: () => 1,
     });
     expect(d.estado).toBe('husmea');
     expect(d.visualEstado).toBe('senala');
@@ -446,5 +465,44 @@ describe('cadencia adaptativa (#102/#106)', () => {
     expect(debeHablar({
       estado: 'aviso', severidad: 'alta', ahoraMs, ultimaMs: ahoraMs, molestia: MOLESTIA_MAX,
     })).toBe(true);
+  });
+});
+
+describe('recortarMensaje (#59 — tope de 2-3 líneas)', () => {
+  it('mensaje corto no se toca', () => {
+    expect(recortarMensaje('Tiene maíz registrado.')).toBe('Tiene maíz registrado.');
+  });
+
+  it('null/undefined pasan igual (nunca lanza)', () => {
+    expect(recortarMensaje(null)).toBeNull();
+    expect(recortarMensaje(undefined)).toBeNull();
+  });
+
+  it('mensaje largo se recorta al tope y nunca lo excede', () => {
+    const largo = 'Esta es una oración normal que describe algo de la finca. '.repeat(6);
+    const r = recortarMensaje(largo);
+    expect(r.length).toBeLessThanOrEqual(220);
+    expect(r.length).toBeLessThan(largo.length);
+  });
+
+  it('prefiere cortar en frontera de oración cuando cae cerca del tope', () => {
+    const primeraFrase = 'Tiene café registrado en su finca, la que más tiene.'; // 53 chars
+    const relleno = 'Y aquí sigue más texto que empuja el mensaje bien largo hasta pasarse.';
+    const r = recortarMensaje(`${primeraFrase} ${relleno}`, 60);
+    expect(r).toBe(primeraFrase);
+    expect(r.endsWith('.')).toBe(true);
+  });
+
+  it('sin frontera de oración cercana, corta en espacio y cierra con elipsis', () => {
+    const r = recortarMensaje('palabra '.repeat(10).trim(), 20);
+    expect(r.endsWith('…')).toBe(true);
+    expect(r.length).toBeLessThanOrEqual(21);
+  });
+
+  it('resolverComportamiento nunca devuelve un mensaje más largo que el tope', () => {
+    const decision = resolverComportamiento({
+      logro: { id: 'cosecha:1', texto: 'X'.repeat(400) },
+    });
+    expect(decision.mensaje.length).toBeLessThanOrEqual(220);
   });
 });

@@ -48,9 +48,14 @@ export const COMENTARISTA_MUNDO = {
     if (top) {
       const n = Number(top.count);
       const nombre = nombreLimpio(top.name);
+      // #80/#81: dato agroecológico REAL de esa especie (catálogo Chagra),
+      // no un inventario genérico — cuando lo hay, se teje en el mismo
+      // comentario; sin match no cambia una coma del texto de siempre.
+      const agro = typeof datos.agro === 'string' && datos.agro.trim() ? datos.agro.trim() : null;
+      const cola = agro ? ` Y ojo: ${nombre} ${agro}.` : '';
       return n > 1
-        ? `De sus matas, la que más tiene es ${nombre} — ${n} registradas. ¿Le hacemos seguimiento?`
-        : `Tiene ${nombre} registrado en su finca. ¿Le echamos un ojo a cómo va?`;
+        ? `De sus matas, la que más tiene es ${nombre} — ${n} registradas. ¿Le hacemos seguimiento?${cola}`
+        : `Tiene ${nombre} registrado en su finca. ¿Le echamos un ojo a cómo va?${cola}`;
     }
     return 'Todavía no me ha contado qué tiene sembrado. Cuando registre sus matas, le sigo el rastro a cada una.';
   },
