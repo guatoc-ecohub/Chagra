@@ -404,7 +404,7 @@ export function debeHablar({
 
 /**
  * @typedef {Object} DecisionAngelita
- * @property {('calma'|'aviso'|'celebra'|'husmea')} estado — comportamiento elegido.
+ * @property {('calma'|'aviso'|'celebra'|'husmea'|'luto')} estado — comportamiento elegido.
  * @property {string} visualEstado — estado visual canónico para la cara.
  * @property {string|null} mensaje — lo que dice (null si se queda en calma).
  * @property {string} aria — narración para lector de pantalla.
@@ -415,10 +415,13 @@ export function debeHablar({
  * @property {string|null} logroId — id del logro celebrado (para no repetir).
  */
 
-/** La decisión de reposo: Angelita tranquila, sin mensaje. */
+/**
+ * La decisión de reposo: Angelita tranquila, sin mensaje.
+ * @returns {DecisionAngelita}
+ */
 function decisionCalma() {
   return {
-    estado: 'calma',
+    estado: /** @type {const} */ ('calma'),
     visualEstado: VISUAL_CALMA,
     mensaje: null,
     aria: ARIA_COMPORTAMIENTO.calma,
@@ -441,6 +444,8 @@ function decisionCalma() {
  * @param {ReturnType<typeof notificacionesInteligentes>|null} [ctx.notificaciones]
  * @param {{ id:string, texto:string }|null} [ctx.logro] — logro REAL a celebrar.
  * @param {string|null} [ctx.ultimoLogroId] — último logro ya celebrado (dedup).
+ * @param {{ id:string, texto:string }|null} [ctx.luto] pérdida REAL a lamentar (#109).
+ * @param {string|null} [ctx.ultimoLutoId] última pérdida ya lamentada (dedup, #109).
  * @param {string|null} [ctx.mundo] — mundo actual (para husmear).
  * @param {Object} [ctx.datosMundo] — datos reales del mundo (ver comentarioDeMundo).
  * @param {number} [ctx.ahoraMs]
