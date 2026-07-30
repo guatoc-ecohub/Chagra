@@ -128,7 +128,7 @@ const TONO = {
 // eslint-disable-next-line react-refresh/only-export-components -- parche de material compartido con AnimalMomento (misma piel en hato y momentos)
 export function parchePelaje(shader) {
   shader.vertexShader = shader.vertexShader
-    .replace('#include <common>', '#include <common>\nvarying float vArribaPel;')
+    .replace('#include <common>', '#include <common>\nvarying float vArribaPel;\nvarying vec3 vPosPel;')
     .replace(
       '#include <defaultnormal_vertex>',
       `#include <defaultnormal_vertex>
@@ -136,16 +136,19 @@ export function parchePelaje(shader) {
 	#ifdef USE_INSTANCING
 		nPel = ( instanceMatrix * vec4( nPel, 0.0 ) ).xyz;
 	#endif
-	vArribaPel = normalize( ( modelMatrix * vec4( nPel, 0.0 ) ).xyz ).y;`,
+	vArribaPel = normalize( ( modelMatrix * vec4( nPel, 0.0 ) ).xyz ).y;
+	vPosPel = position;`,
     );
   shader.fragmentShader = shader.fragmentShader
-    .replace('#include <common>', '#include <common>\nvarying float vArribaPel;')
+    .replace('#include <common>', '#include <common>\nvarying float vArribaPel;\nvarying vec3 vPosPel;')
     .replace(
       '#include <opaque_fragment>',
       `float arribaPel = smoothstep( -0.85, 0.9, vArribaPel );
-	float rimPel = pow( 1.0 - clamp( dot( normalize( normal ), normalize( vViewPosition ) ), 0.0, 1.0 ), 2.2 );
+	float rimPel = pow( 1.0 - clamp( dot( normalize( normal ), normalize( vViewPosition ) ), 0.0, 1.0 ), 2.0 );
+	float granoPel = fract( sin( dot( floor( vPosPel * 64.0 ), vec3( 127.1, 311.7, 74.7 ) ) ) * 43758.5453 );
 	outgoingLight *= mix( vec3( 0.46, 0.43, 0.47 ), vec3( 1.22, 1.12, 0.98 ), arribaPel );
-	outgoingLight += vec3( 1.0, 0.83, 0.55 ) * rimPel * ( 0.16 + 0.62 * arribaPel );
+	outgoingLight *= 0.965 + 0.07 * granoPel;
+	outgoingLight += vec3( 1.0, 0.83, 0.55 ) * rimPel * ( 0.28 + 0.85 * arribaPel );
 	#include <opaque_fragment>`,
     );
 }
@@ -531,6 +534,13 @@ const _mVientre = new THREE.Matrix4();
 const _mResp = new THREE.Matrix4();
 const _cTinte = new THREE.Color();
 
+/* LA POSE VIVA: cada animal congela su esqueleto en un instante DISTINTO
+   (determinista por fase). En una foto fija —o con reduced-motion— el hato no
+   es un ejército de clones en T-pose: una vaca pasta, otra mira de lado, un
+   cerdo hocica. El reloj animado ARRANCA desde ese mismo instante (tPose + t):
+   continuidad sin salto y desincronía gratis entre animales. */
+const tPose = (a) => a.fase * 5.21;
+
 /* matriz final de una instancia: hueso(FK) × (vientre) × parte × (aliento).
    El vientre de la preñada ensancha SOLO las partes `vientre` (el cuerpo),
    en el espacio del animal (z = los flancos; todas las especies miran a +x).
@@ -576,7 +586,8 @@ function ParteInstanciada({ parte, lista, fantasma, animar, onPick }) {
     const m = ref.current;
     if (!m) return;
     listaP.forEach((a, i) => {
-      componer(_mTmp, a, parte, false, 0);
+      // pose viva congelada (no T-pose): cada animal en su instante propio
+      componer(_mTmp, a, parte, true, tPose(a));
       m.setMatrixAt(i, _mTmp);
       if (parte.porRaza) {
         m.setColorAt(i, parte.tinte ? _cTinte.copy(a.color).multiplyScalar(parte.tinte) : a.color);
@@ -595,7 +606,8 @@ function ParteInstanciada({ parte, lista, fantasma, animar, onPick }) {
     if (!animar || !parte.cuerpo || !m) return;
     const t = state.clock.elapsedTime;
     listaP.forEach((a, i) => {
-      componer(_mTmp, a, parte, true, t);
+      // el reloj de cada animal arranca en su pose congelada: cero salto
+      componer(_mTmp, a, parte, true, tPose(a) + t);
       m.setMatrixAt(i, _mTmp);
     });
     m.instanceMatrix.needsUpdate = true;

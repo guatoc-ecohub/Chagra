@@ -21,7 +21,7 @@
  *                queda su huella-fantasma, aquí llega en cuerpo.
  *
  * La pasada de mundo abierto del corral vive también aquí: el material lleva
- * parchePelaje (smooth + countershading + rim de hora dorada), la tabla de
+ * parchePelaje (smooth + countershading + rim de hora dorada + grano), la tabla de
  * partes respeta `soloRaza` (la giba del cebú viaja con él al mercado) y
  * `rotRecta` (la oreja parada del San Pedreño), y una sombra de contacto
  * propia lo POSA en el piso (crece al nacer, se desvanece en el adiós):
