@@ -6446,7 +6446,8 @@
       "estrato": "alto",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "nota_conservacion": "Endémica del Chocó biogeográfico colombiano. Especie clave en sistemas agroforestales del Pacífico."
     },
     {
       "id": "solanum_tuberosum_pastusa_suprema",
@@ -7596,7 +7597,8 @@
         "aguacate criollo",
         "abacate"
       ],
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "mangifera_indica",
@@ -7636,7 +7638,8 @@
         "spondias_dulcis",
         "stylosanthes_guianensis"
       ],
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "ananas_comosus",
@@ -7677,7 +7680,8 @@
       "nombre_comunes_regionales": [
         "Ijibo"
       ],
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "bajo"
     },
     {
       "id": "musa_paradisiaca",
@@ -7793,7 +7797,8 @@
       "nombre_comunes_regionales": [
         "Õre ingavrea"
       ],
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "citrus_latifolia",
@@ -7827,7 +7832,8 @@
         "ica-resolucion-3168-2015"
       ],
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "citrus_sinensis",
@@ -7864,7 +7870,8 @@
       "companions": [
         "eugenia_stipitata"
       ],
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "acca_sellowiana",
@@ -8360,7 +8367,8 @@
       "cultivar": false,
       "nombre_comunes_regionales": [
         "Ijibo"
-      ]
+      ],
+      "estrato": "bajo"
     },
     {
       "id": "pouteria_caimito",
@@ -8503,7 +8511,10 @@
       "valor_pedagogico": "La jabuticaba o jaboticaba (Myrciaria cauliflora) es un árbol frutal brasileño de la familia Myrtaceae, singular por su caulifloria (frutos nacen directamente en tronco y ramas gruesas), produciendo cientos de frutos pequeños redondos negro-purpúreos de pulpa dulce blanca que se consumen frescos o en jaleas. De origen brasilero, se cultiva en Colombia como frutal de patio en Antioquia, Cundinamarca, Valle del Cauca y Santander (400-1.400 msnm). Árbol de lento crecimiento, fructificación 6-8 años desde semilla, producción estacional masiva (diciembre-febrero) que literalmente cubre el tronco. Los frutos son muy perecederos (fermentan en 3-4 días post-cosecha), por lo que se consumen frescos o procesados localmente. Lección: enseña el fenómeno de caulifloria en botánica, la adaptación de especies exóticas a contextos colombianos, y el manejo de especies de frutos extremadamente perecederos en circuitos locales. Fuentes: POWO Kew, GBIF.",
       "validation_level": "claude_draft",
       "tracking_mode": "individual",
-      "cultivar": false
+      "cultivar": false,
+      "roles_in_guild": [
+        "crop"
+      ]
     },
     {
       "id": "eugenia_uniflora",
@@ -13432,7 +13443,7 @@
         "paja paramuna",
         "festuca paramuna"
       ],
-      "nombre_cientifico": "Festuca spp. (complejo paramuno)",
+      "nombre_cientifico": "Festuca paramuno (complejo paramuno)",
       "familia_botanica": "Poaceae",
       "category": "abonos_verdes_coberturas",
       "thermal_zones": [
@@ -13663,7 +13674,8 @@
       ],
       "valor_pedagogico": "El cordoncillo de Bogotá (Piper bogotense C.DC., Piperaceae) es un arbusto o arbolito andino endémico de Colombia (1-4 m altura), propio del sotobosque del bosque alto-andino y bordes de páramo entre 2.200 y 3.000 msnm, con distribución concentrada en la cordillera Oriental: Cundinamarca (cerros orientales de Bogotá, Cruz Verde, Sumapaz, Verjón, Chingaza, Guasca), Boyacá (Iguaque, Arcabuco, Chiquinquirá), Santander (Berlín, Almorzadero) y norte de Tolima. Hojas elípticas-lanceoladas de 8-15 cm con punto pellúcido aromático característico (aceites esenciales con safrol, miristicina, eugenol), espigas erectas blanco-amarillentas características del género Piper. Su carácter endémico colombiano lo convierte en pieza clave de soberanía botánica y patrimonio biológico nacional. Es lección viva sobre el sotobosque andino que enseña a niñas y niños por qué los bosques nativos son irreemplazables: el cordoncillo solo existe aquí, ningún país más en el mundo lo tiene, y depende del microclima húmedo, sombreado y mantillado del bosque alto-andino que solo las especies nativas pueden generar. Uso tradicional medicinal por comunidades campesinas de Cundinamarca-Boyacá: hojas en cataplasma para inflamaciones, infusión digestiva carminativa (uso validado farmacognosticamente por JBB e ICTA-UNAL); también usado como repelente natural de insectos en huertos (frotando hojas sobre tutores). Manejo agroecológico: propagación por esqueje semileñoso (90% prendimiento bajo cámara húmeda con hojas reducidas a 1/3) o semilla recolectada de espigas maduras (vivero 4-6 meses), trasplante en lluvias bajo sombra parcial, distancia 1.5-2 m, función ecológica como sotobosque enriquecedor en planes de restauración Cruz Verde-Sumapaz y como repelente vivo en linderos de huertas frío-paramunas. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, IAvH Flora Alto Andina, JBB Plantas Medicinales, Plan Restauración Cruz Verde-Sumapaz, SiB Colombia.",
       "tracking_mode": "individual",
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "nota_conservacion": "Endémica de los bosques altoandinos de la cordillera Oriental colombiana (Cundinamarca)."
     },
     {
       "_curation_status": "PENDING_DR_VERIFICATION_2026-05-18 (ver Chagra-strategy/dr-queue/species-verification-pending.md)",
@@ -15313,7 +15325,8 @@
       ],
       "valor_pedagogico": "El paragyn de Uribe (Paragynoxys uribei Cuatrec., familia Asteraceae) es un arbolito o arbusto arborescente del sub-páramo y bosque altoandino colombiano (3.000-4.000 msnm), nombrado por José Cuatrecasas en honor al sacerdote-botánico Lorenzo Uribe-Uribe S.J., pionero del estudio florístico colombiano y autor de la \"Flora de Colombia\". El género Paragynoxys (Asteraceae-Senecioneae, ~15 especies neotropicales) representa una de las pocas radiaciones de árboles compuestos arborescentes del páramo y bosque altoandino colombiano-venezolano-ecuatoriano. Tronco corto retorcido con corteza rugosa pardo-grisácea, ramas con cicatrices foliares prominentes (tipo \"candelabro\"). Hojas alternas grandes (10-20 cm largo) oval-lanceoladas, coriáceas, con haz verde-oscuro lustroso y envés tomentoso blanco-grisáceo que refracta radiación UV-B y reduce transpiración por viento andino. Inflorescencia en panícula terminal de capítulos amarillo-crema con flores liguladas y discoidales — patrón estructural de Senecioneae arborescentes. Distribución colombiana endémica: complejos paramunos de la Cordillera Oriental (Sumapaz-Cruz Verde-Chingaza-Iguaque-Pisba-Cocuy) y porciones altas del Macizo Colombiano (Las Hermosas, Sotará, Doña Juana), con poblaciones fragmentadas resultado del avance histórico de la frontera agropecuaria papera + ganadería bovina extensiva sobre el subpáramo. Servicio ecosistémico: componente estructural clave del ecotono bosque altoandino-páramo, junto con Drimys granadensis, Weinmannia tomentosa, Hesperomeles obtusifolia, Escallonia myrtilloides — su presencia indica buena conservación del cinturón altimontano y diversidad de hábitats para fauna endémica (Cinclodes albidiventris, Anisognathus igniventris). Amenazas: tala para construcción de cercas y leña, quema para apertura de potreros, expansión de papa pastusa sobre límite agronómico, fragmentación de hábitat, cambio climático con migración altitudinal ascendente que tiene techo geográfico en cumbres paramunas. Protección: Ley 1930/2018 (Páramos), Resolución 1912/2017 MADS-IAvH lista nacional especies amenazadas, jurisdicción CAR Cundinamarca/CORPOBOYACÁ/CORPORINOQUIA según subregión. Estado conservación: Vulnerable (VU) según Libro Rojo Plantas Colombia, con tendencia poblacional decreciente. Manejo agroecológico (solo restauración con autorización CAR): recolección de aquenios maduros temporada seca (julio-agosto cordillera oriental), germinación en vivero municipal con sustrato turba de páramo + arena gruesa 2:1, plantación intercalada con Weinmannia tomentosa, Drimys granadensis, Hesperomeles obtusifolia, Escallonia myrtilloides para restaurar matriz forestal del ecotono altoandino-páramo a densidades 400-800 ind/ha. Exclusión ganadera 5-7 años obligatoria. Monitoreo bianual. Fuentes Tier A: Bernal 2015 Catálogo Plantas y Líquenes Colombia, Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, GBIF Taxonomic Backbone, POWO Kew, Ley 1930/2018.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "nota_conservacion": "Endémica del páramo colombiano (Boyacá, Santander). Asteraceae arbustiva de alta montaña."
     },
     {
       "id": "vernonanthura_patens",
@@ -15769,7 +15782,8 @@
       ],
       "valor_pedagogico": "La aragoa o falso ciprés de páramo (Aragoa abietina Kunth, familia Plantaginaceae sensu APG IV) es un arbusto erecto del páramo colombiano endémico de la cordillera Oriental, uno de los elementos diagnósticos del cortejo florístico de los frailejonales-pajonales de Sumapaz, Cruz Verde, Chingaza, Iguaque, Pisba y Cocuy (3.100-4.200 msnm). El género Aragoa (~19 especies) es endémico de los páramos colombiano-venezolanos (con presencia marginal en la Sierra Nevada del Cocuy + Sierra de Perijá venezolana), descrito por Alexander von Humboldt y Aimé Bonpland durante el viaje a las regiones equinocciales (1799-1804) y nombrado en honor al naturalista español Diego de Aragón. Recientes filogenias moleculares (Albach et al. 2005, Tank & Olmstead 2008) confirmaron que Aragoa, antes en Scrophulariaceae, pertenece a la familia Plantaginaceae sensu APG IV, formando un clado con Veronica, Plantago y Digitalis — una transición notable de la sistemática clásica a la filogenética. Arbusto erecto 1-2.5 m altura, ramificación densa desde la base con apariencia de pequeño ciprés o conífera (de ahí el nombre vernáculo \"falso ciprés de páramo\" o \"pino de páramo\"). Hojas pequeñas (4-10 mm) imbricadas linear-lanceoladas escuamiformes en disposición decusada o tetrástica, coriáceas, dispuestas en ramillas terminales que recuerdan estructuralmente a Cupressus o Callitris — convergencia adaptativa a las condiciones del páramo (alta radiación UV-B, viento, heladas radiativas, baja humedad atmosférica diurna alternando con saturación nocturna). Flores axilares solitarias pequeñas blanco-rosadas (5-8 mm), corola tubular 4-5 lobada, polinización entomófila por himenópteros andinos pequeños (abejas Halictidae, Andrenidae, dípteros sírfidos). Fruto cápsula bivalva con semillas diminutas anemócoras. Servicio ecosistémico estratégico: componente estructural diagnóstico del frailejonal-pajonal paramuno colombiano, recurso polinizador, suelo y micrositios bajo cobertura aragoide para germinación de especies anuales y bryofitos paramunos, contribución al servicio hidrológico paramuno por interceptación de niebla y rocío en la masa foliar densa. Lección viva: endemismo de la cordillera Oriental colombiana + biogeografía paramuna + convergencia adaptativa morfológica con coníferas (siendo angiospermo, no gimnospermo) en respuesta al ambiente paramuno extremo. Distribución colombiana: cordillera Oriental exclusiva (Sumapaz, Cruz Verde, Chingaza, Guerrero, Iguaque, La Rusia, Pisba, Cocuy, Tamá) en franja sub-páramo a páramo medio (3.100-4.200 msnm). Amenazas: quema para apertura de potreros, pisoteo ganadero, minería de carbón en flancos paramunos (Boyacá-Santander), turismo no regulado en PNN Chingaza y Cocuy. Protección legal: Ley 1930/2018 (Páramos), Resolución 1912/2017 MADS-IAvH lista nacional amenazadas (con varias Aragoa listadas), jurisprudencia Sentencia T-361/2017 Corte Constitucional. Estado conservación: Vulnerable (VU) Libro Rojo Plantas Colombia por endemismo restringido + amenaza activa. Manejo agroecológico (restauración con autorización CAR): siembra superficial de semillas diminutas en vivero con sustrato turba de páramo + arena 1:1, vivero de altura bajo malla 50%, plantación intercalada con Espeletia spp., Hypericum juniperinum, Loricaria complanata, Diplostephium rosmarinifolium en frailejonales degradados a densidades 200-400 ind/ha con exclusión ganadera estricta. Fuentes Tier A: Bernal 2015 Catálogo Plantas Colombia (endemismo confirmado), Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, GBIF Taxonomic Backbone, POWO Kew, Ley 1930/2018.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "nota_conservacion": "Endémica del páramo colombiano. Plantaginaceae arbustiva de la superpáramo."
     },
     {
       "id": "valeriana_arborea",
@@ -15826,7 +15840,8 @@
       ],
       "valor_pedagogico": "La valeriana arbórea (Valeriana arborea Killip, familia Caprifoliaceae sensu APG IV, antes Valerianaceae) es una rareza ecológica y taxonómica del páramo colombiano: una valeriana arborescente — hábito altamente inusual en un género (Valeriana ~250 especies pantemperadas) dominado por hierbas y subarbustos. Endémica de Colombia, restringida a complejos paramunos de la cordillera Oriental (Sumapaz, Chingaza, Cocuy) y porciones del Macizo Colombiano (3.000-4.100 msnm). Descrita por Ellsworth Killip (1890-1968), botánico del Smithsonian Institution especialista en flora andina, durante sus expediciones colombianas 1922-1944. Filogenias moleculares recientes (Bell 2004, Donoghue et al. 2003) reposicionaron Valerianaceae dentro de Caprifoliaceae sensu lato APG IV, agrupándola con Lonicera, Sambucus y Dipsacus en el clado Dipsacales. Arbusto arborescente erecto 1.5-3.5 m altura con tronco corto y ramificación esparcida desde baja, corteza pardo-grisácea estriada. Hojas opuestas decusadas (rasgo diagnóstico de Dipsacales) pinnatífidas a pinnatipartidas (8-18 cm largo) con 3-7 pares de foliolos lanceolados aserrados, glabras a subglabras, fuertemente aromáticas al frote por presencia de valepotriatos y ácido valérico (principios activos sedantes característicos del género — uso etnomédico documentado para infusiones calmantes en tradición campesina cundiboyacense, aunque siempre con la advertencia de NO confundir con especies cultivadas medicinales y de NO extraer del páramo). Inflorescencia en cima corimbiforme terminal grande con numerosas flores pequeñas blancas a blanco-rosadas tubulares 4-7 mm, polinización entomófila por himenópteros andinos (Bombus, abejas Halictidae, Andrenidae), sírfidos y mariposas paramunas. Aquenios pequeños comprimidos coronados por vilano plumoso, dispersión anemócora eficiente. Servicio ecosistémico: recurso polinizador en plena temporada de floración paramuna, nurse plant para regeneración de especies más lentas, contribución a la diversidad estructural del frailejonal-pajonal. Lección viva de biogeografía y radiación adaptativa: el género Valeriana es uno de los grupos angiospermos con mayor proporción de endemismos paramunos colombiano-andinos (>40 especies neotropicales con epicentro andino), V. arborea ilustra la radiación adaptativa \"isleña\" del género en los páramos colombianos, con hábitos que van desde herbáceo rastrero (V. pavonii) a arborescente erecto (V. arborea) pasando por subarbustivo (V. jatamansi andina). Amenazas: extracción ilegal para uso etnomédico (a pesar de la prohibición), quema, fragmentación, expansión papera. Protección legal: Ley 1930/2018, Resolución 1912/2017 MADS-IAvH listado nacional especies amenazadas (varias Valeriana paramunas listadas), Decreto 1076/2015 MADS Compilatorio. Estado conservación: Vulnerable (VU) a En Peligro (EN) según localidad — endemismo restringido + amenaza activa. Manejo agroecológico (restauración ecológica con autorización CAR; PROHIBIDA la extracción etnomédica): recolección aquenios maduros temporada seca, vivero de altura con sustrato turba + arena 2:1, plantación 200-500 ind/ha en frailejonales paramunos en restauración, asocio con Espeletia spp., Aragoa abietina, Hypericum juniperinum. Esquejes semileñosos viables como alternativa propagativa. Fuentes Tier A: Bernal 2015 Catálogo Plantas Colombia (endemismo + autoría), Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, GBIF Taxonomic Backbone, POWO Kew, Ley 1930/2018.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "nota_conservacion": "Endémica de los páramos colombianos. Valerianaceae arbustiva de la cordillera Central y Oriental."
     },
     {
       "id": "lupinus_carrikeri",
@@ -15890,7 +15905,8 @@
       ],
       "valor_pedagogico": "El chocho de Carriker (Lupinus carrikeri C.P.Sm., familia Fabaceae) es un arbusto erecto endémico del páramo colombiano, una de las especies de Lupinus paramuno con porte arbustivo más robusto del cinturón altoandino (3.100-4.200 msnm). Descrito por Charles Piper Smith (botánico del USDA especialista mundial en Lupinus) en honor a Melbourne Armstrong Carriker Jr. (1879-1965), ornitólogo y colector estadounidense que vivió y trabajó largamente en Colombia (1908-1947) reuniendo una de las colecciones zoológicas y botánicas más extensas de la flora altoandina colombiana, depositada en parte en el Museo Americano de Historia Natural y en el ICN/Universidad Nacional de Colombia. El género Lupinus (~250 especies con epicentro andino y mediterráneo) es uno de los grupos de leguminosas con mayor diversidad altoandina-paramuna; los chochos colombianos forman un complejo de >30 especies, varias endémicas restringidas (L. carrikeri, L. alopecuroides \"lupino-zorro\" emblemático, L. tominensis, L. bogotensis). Arbusto erecto 0.5-2 m altura con tronco corto y ramificación densa desde la base, corteza pardo-grisácea. Hojas alternas digitado-compuestas con 7-13 foliolos oblongo-lanceolados (3-7 cm largo) sericeo-pubescentes en haz y envés con tricomas plateados que cumplen función termorreguladora + protección UV-B (rasgo compartido con otros Lupinus paramunos como L. alopecuroides). Inflorescencia en racimo terminal erecto grande (20-40 cm) con numerosas flores zigomorfas papilionáceas azul-violáceas a azul-púrpura características de Fabaceae-Papilionoideae, polinización entomófila por Bombus rohweri (abejorro paramuno endémico del cinturón altoandino colombiano-venezolano) que opera el mecanismo \"buzz pollination\" (vibración torácica que libera el polen desde la quilla floral) — relación mutualista crítica para ambas especies. Fruto legumbre vellosa con semillas duras café-oscuras. Fijación biológica de nitrógeno: simbiosis con Bradyrhizobium spp. en nódulos radiculares (~30-60 kg N/ha/año) que mejora la fertilidad de suelos turbosos paramunos oligotróficos — servicio ecosistémico crítico para la sucesión vegetal y la restauración de áreas paramunas degradadas. Servicio ecosistémico estratégico: recurso polinizador para Bombus rohweri y otros polinizadores andinos en plena temporada paramuna, fijación de N que facilita el establecimiento de otras especies pioneras y de bosque altoandino, atractor visual para fauna y turismo paramuno regulado, nurse plant. Distribución colombiana: cordillera Oriental (Sumapaz, Chingaza, Iguaque, Pisba, Cocuy) y cordillera Central (porciones Cauca-Huila) en franja sub-páramo a páramo medio (3.100-4.200 msnm). Amenazas: quema, pisoteo ganadero, fragmentación, expansión papera; algunas poblaciones críticamente fragmentadas. Protección legal: Ley 1930/2018 (Páramos), Resolución 1912/2017 MADS-IAvH lista nacional amenazadas, jurisprudencia Sentencia T-361/2017 Corte Constitucional. Estado conservación: Vulnerable (VU) Libro Rojo Plantas Colombia. Manejo agroecológico (restauración con autorización CAR, NO cultivo): recolección legumbres maduras temporada seca, escarificación mecánica + inmersión agua caliente, germinación rápida en vivero, plantación intercalada con Espeletia spp., Aragoa abietina, Hypericum juniperinum a densidades 200-600 ind/ha como pionera fijadora de N en frailejonales paramunos degradados. Asocio óptimo con Polylepis spp. para restauración multiservicio. Fuentes Tier A: Bernal 2015 Catálogo Plantas Colombia (endemismo + autoría), Humboldt Flora Alto-Andina, Libro Rojo Plantas Colombia, GBIF Taxonomic Backbone, POWO Kew, Ley 1930/2018.",
       "validation_level": "claude_draft",
-      "tracking_mode": "individual"
+      "tracking_mode": "individual",
+      "nota_conservacion": "Endémica del páramo colombiano. Fabaceae arbustiva endémica de la Sierra Nevada del Cocuy."
     },
     {
       "id": "acacia_melanoxylon",
@@ -16037,7 +16053,8 @@
       ],
       "valor_pedagogico": "El kiwi (Actinidia deliciosa (A.Chev.) C.F.Liang & A.R.Ferguson, Actinidiaceae) es un frutal templado-frío trepador (liana leñosa) originario del centro-sur de China (provincia de Hunan-Hubei) y desarrollado comercialmente en Nueva Zelanda durante el siglo XX, introducido a Colombia como cultivo emergente desde la década de 2010 en Boyacá y Sabana Bogotá. Crece entre 2.200 y 2.700 msnm en zona térmica fría con acumulación significativa de horas frío (≥600 h <7°C), presente como cultivo experimental-comercial en Boyacá (Paipa, Duitama, Sotaquirá, Toca, Sogamoso, Tibasosa, Nobsa), Cundinamarca (Sopó, Sibaté, Subachoque, Cogua, Zipaquirá, Tenjo, Tabio) y altiplano antioqueño (Santa Rosa de Osos, Belmira). Liana leñosa caducifolia de 5-10 m con tallos volubles que requieren obligatoriamente soporte de espaldera, parral en T o pérgola robusta. Hojas grandes (8-15 cm) cordadas tomentoso-rojizas en envés. Especie DIOICA (lección biológica clave): hay plantas macho que solo dan flores polinizadoras y plantas hembra que dan frutos; sin macho compatible el cultivo no produce. Flores grandes (3-5 cm) blanco-amarillentas perfumadas, atractivo para Apis mellifera (pero kiwi produce solo polen, no néctar, lo que requiere planeación apícola especial con colmenas dedicadas en floración). Frutos baya ovoide-cilíndrica de 5-8 cm, piel marrón-verdosa tomentosa peluda, pulpa verde-esmeralda intensa con semillas negras radiales pequeñas crujientes, sabor dulce-acidulado intenso (13-18° Brix), altísimo contenido vitamina C (90 mg/100g, superior a naranja). Lección viva de innovación productiva del altiplano colombiano y soberanía frutícola emergente: enseña a niñas y niños que Colombia puede producir kiwi propio adaptado al altiplano boyacense-sabanero, alternativa local fresca al kiwi neozelandés-chileno importado. Manejo agroecológico: instalación obligatoria de parral en T a 1.8 m de altura, distancia 4×5 m (500 plantas/ha + 70 machos/ha distribuidos), poda invernal severa de renovación de cargadores, fertilización abundante con compost + biol + bocashi (cultivo exigente), control de Pseudomonas syringae pv. actinidiae (PSA o cancro bacteriano) con cobre estricto + poda sanitaria + control de heladas, riego abundante en formación de fruto. Asocios: tagasaste cortavientos N-fijador imprescindible, frutillas o pasto manejado bajo parral, leguminosas de cobertura. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "rastrero"
     },
     {
       "id": "agave_americana",
@@ -16201,7 +16218,8 @@
       ],
       "valor_pedagogico": "El corozo de puerco o macahuite (Aiphanes aculeata Willd., familia Arecaceae, subfamilia Arecoideae) es una arecácea palmiforme espinosa subarbórea (4-10 m altura) nativa de los valles secos interandinos colombianos y zonas xerofíticas del Caribe colombiano, caracterizada por su estipe cubierto de espinas largas negras conspicuas (rasgo diagnóstico del género Aiphanes), hojas pinnadas verde-claras irregularmente segmentadas y frutos pequeños globosos (1-2 cm) anaranjado-rojizos en racimos colgantes, ricos en β-caroteno (provitamina A), aceites grasos saturados (palmítico, esteárico) y carbohidratos. Se distribuye en Caribe colombiano (Magdalena, Bolívar, Cesar, La Guajira media), valles secos interandinos del Magdalena medio (Tolima, Huila, Cundinamarca), Santanderes (Cañón del Chicamocha, Cañón del Sogamoso), Antioquia (cañón del Cauca), Valle del Cauca (zonas xerofíticas Yotoco-Tuluá) entre 50 y 400 msnm en zona térmica cálida seca a subhúmeda. Ciclo perenne, longevidad 25-40 años, fructificación bianual. Lección viva: palma rústica de tierras secas que enseña adaptación a suelos pobres y períodos de sequía prolongada (mecanismo CAM facultativo, control estomático), sus frutos son fuente de vitamina A y aceites en la cocina campesina costeña (refrescos tradicionales del Caribe colombiano, dulces, vino artesanal de corozo), enseñando el potencial de las palmas nativas en sistemas agroforestales del bosque seco tropical (bs-T) hoy ecosistema crítico en Colombia (apenas 5% remanente). Manejo agroecológico: propagación por semilla recolectada en racimos maduros, germinación lenta 3-6 meses, siembra a 6-8 m entre plantas en sistemas silvopastoriles con cuajilla (Pithecellobium dulce), guácimo (Guazuma ulmifolia) y trupillo (Prosopis juliflora), tolerancia altísima a sequía y suelos pedregosos, no requiere agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Humboldt Catálogo Plantas, Bernal 2015 Catálogo Plantas Colombia, SIB Colombia.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "allium_ampeloprasum",
@@ -16637,7 +16655,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "anón"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "annona_mucosa",
@@ -16687,7 +16706,8 @@
       ],
       "valor_pedagogico": "El biribá o anona amazónica (Annona mucosa Jacq., sinónimo anterior Rollinia mucosa (Jacq.) Baill., familia Annonaceae) es un árbol frutal nativo amazónico (5-12 m altura, copa abierta) de la cuenca amazónica occidental y central, distribuido naturalmente en bosque húmedo tropical de tierra firme de Colombia (Caquetá, Putumayo, Amazonas, Vaupés, Guainía), Ecuador (Napo, Pastaza), Perú (Loreto, Madre de Dios) y Brasil (Acre, Amazonas, Pará). Produce frutos sincárpicos esféricos a obovoides grandes (10-20 cm diámetro, 0.5-2 kg peso) de cáscara amarilla brillante con proyecciones cónicas o gibas piramidales (los carpelos individuales fusionados) que recuerdan a la chirimoya andina, pulpa blanco-cremosa muy aromática y mucilaginosa (de ahí el epíteto mucosa) extraordinariamente dulce (18-22 °Brix) con sabor a piña-mango-lemon meringue (de ahí su nombre comercial inglés 'lemon meringue fruit') y semillas negras numerosas elipsoidales planas. Es una de las anonáceas tropicales más codiciadas por su sabor y aroma, comercializada en mercados regionales de Leticia, Florencia, Mocoa, Mitú e Inírida, y cada vez más demandada como fruta exótica en cadenas gourmet internacionales. Lección viva: árbol-tesoro de la chagra amazónica que enseña cuatro conceptos críticos: (1) la nomenclatura botánica viva — el cambio reciente de Rollinia a Annona (Maas et al. 2011, reclassification of Annonaceae basada en filogenia molecular) muestra que la taxonomía no es estática, sino una construcción científica en evolución constante; los profesores y agricultores deben actualizar sus libros para no confundir a niñas y niños con nombres obsoletos; (2) la familia Annonaceae como uno de los clados angiospermos más antiguos (linaje Magnoliid basal, divergente del resto de eudicotiledóneas hace ~125 millones de años), con flores con muchos estambres en disposición espiralada (estado plesiomórfico), polinización por escarabajos tempranos (síndrome cantarofilia ancestral) y olores fermentados que atraen al género polinizador Cyclocephala (escarabajo melolontino); (3) el contraste con su prima andina chirimoya (Annona cherimola), que es de zonas templadas (1.500-2.500 msnm), versus el biribá que es estrictamente cálido (0-1.000 msnm) — ejemplo magistral de radiación adaptativa altitudinal dentro del mismo género; (4) la sub-utilización económica del biribá en Colombia, conocido y consumido localmente en la Amazonía pero invisible en mercados de Bogotá, Medellín o Cali, situación que invita a reflexión sobre cadenas de valor y conocimiento campesino-indígena marginalizado. Manejo agroecológico: siembra en sistemas agroforestales con sombra parcial inicial (50%) bajo plátano o guamo (Inga edulis), asocio con copoazú, asaí, piña y yuca, cosecha manual de fruto maduro caído (no se corta del árbol — cae al madurar, indicador claro), cero agroquímicos, control biológico de Bephratelloides cubensis (perforador de la semilla) por podas sanitarias y trampas de luz. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "annona_squamosa",
@@ -16733,7 +16753,8 @@
       ],
       "valor_pedagogico": "El anón (Annona squamosa L.) es un frutal de la familia Annonaceae adaptado a climas cálidos-secos a templados bajos colombianos, valorado por su fruto pulposo dulce de aroma característico. Se cultiva en Tolima (Norte, Mariquita), Huila (Garzón, La Plata), Cundinamarca (Tocaima, Apulo), Valle del Cauca, Antioquia y Magdalena entre 0 y 1.600 msnm en zona térmica cálida a templada. Árbol pequeño 4-6 m, ciclo a primera cosecha 3-4 años. Frutos cosechados pintones (cambio color, semi-firmes) para madurar fuera del árbol. Manejo agroecológico: poda formación copa baja, fertilización con compost + roca fosfórica, control de la perforadora del fruto (Bephratelloides cubensis) con embolsado de frutos y captura de adultos con trampas amarillas. Polinización manual mejora cuajado (Annona spp. son auto-poco-fértiles). Fuentes Tier A: AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "arrabidaea_chica",
@@ -16896,7 +16917,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "Vetoñu"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "astronium_graveolens",
@@ -16977,7 +16999,8 @@
       ],
       "valor_pedagogico": "La palma de vino o palma real llanera (Attalea butyracea (Mutis ex L.f.) Wess.Boer, Arecaceae-Cocoseae) es una palma nativa neotropical de gran porte, una de las palmas más conspicuas y económicamente importantes de los Llanos Orientales colombianos (Casanare, Meta, Arauca, Vichada), valles interandinos (Magdalena Medio, Valle del Cauca, Tolima, Huila, Cesar), Caribe (Córdoba, Sucre, Bolívar, Magdalena, La Guajira), Catatumbo (Norte de Santander) y partes bajas del piedemonte amazónico, entre 0 y 1.000 msnm en sabanas inundables, bosques de galería, potreros y zonas agropecuarias en transformación. Es la palma silvestre más característica del paisaje ganadero llanero y costeño colombiano, sobreviviendo a quemas, pastoreo extensivo y deforestación parcial gracias a su yema apical bien protegida — actúa como \"nurse plant\" en restauración de sabanas y bosques tropicales secos. Palma emergente solitaria majestuosa de 12-20 m altura, estípite columnar grueso (40-60 cm diámetro) gris-pardo recubierto en su porción media-baja de bases foliares persistentes (rasgo distintivo frente a Oenocarpus que es liso), corona apical de 15-25 hojas pinnadas erectas-arqueadas de hasta 10 m largo verde-medias con raquis robusto y foliolos numerosos rígidos dispuestos en planos a veces irregulares, monoica con inflorescencias interfoliares grandes (1.5-2 m), infrutescencias pesadas (20-50 kg) con 500-2.000 frutos drupáceos elipsoides (5-8 cm largo, 4-5 cm ancho) amarillo-anaranjados al madurar, mesocarpo carnoso-fibroso oleaginoso dulce-aromático comestible muy apetecido por ganado vacuno, cerdos, danta, chigüiro y pequeños mamíferos (de ahí \"corozo de puerco/marrano\"), endocarpo durísimo lignificado con 1-3 semillas (cuesco) que contienen almendra blanca oleaginosa comestible. Importancia multipropósito EXCEPCIONAL: (1) frutos: mesocarpo y almendra comestibles humanos y forraje porcino-bovino crítico durante la temporada seca llanera; (2) vino de palma o \"guarapo de palma\": savia dulce extraída por sangría del meristemo apical o de la inflorescencia masculina, fermentada espontáneamente en 1-3 días para producir bebida tradicional llanera de 4-8% alcohol — práctica ancestral sikuani, achagua, sáliba, cocama y de campesinos llaneros (CUIDADO: extracción no sostenible si mata la palma; preferir sangría parcial controlada o cosecha exclusiva de frutos); (3) hojas: techos rurales de palma muy duraderos (5-10 años), esteras, abanicos, cestas, escobas; (4) palmito: comestible (uso solo de palmas a tumbar); (5) endocarpos (cuescos): carbón vegetal de alto poder calórico, semillas decorativas; (6) ecológicamente: hábitat clave para múltiples especies de aves (guacamayas, loros, pavas, paujiles), mamíferos (perezoso, mono araña, capuchino) y reptiles (iguanas) que dependen de los frutos en sabanas y bosques secos donde otros recursos escasean. Manejo agroecológico sostenible: propagación por semilla (latencia 6-12 meses, germinación 40-60% con remoción del mesocarpo y estratificación), vivero 18-24 meses, trasplante a sabanas-potreros o SAF de cacao-cítricos como sombra alta, distancia 8-12 m, fructificación 10-15 años, cosecha sostenible 1-3 racimos/planta/año durante 60-80 años. Lección viva de palmicultura sostenible llanera-caribeña y resiliencia frente a fuego/sequía: la palma de vino enseña cómo el paisaje cultural llanero coexiste con vegetación nativa que provee alimentación, bebida tradicional, fibra y hábitat de fauna — manejada agroecológicamente reemplazaría parcialmente cultivos exógenos de alto insumo (palma africana, arroz) por bioeconomía nativa adaptada. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015 Plantas y Líquenes de Colombia, IAvH Flora, Pérez Arbeláez 1947, SiB Colombia.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "attalea_speciosa",
@@ -17217,7 +17240,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "pijuayo"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "beta_vulgaris_altissima",
@@ -17501,7 +17525,8 @@
       ],
       "valor_pedagogico": "El borojó del Chocó o borojó silvestre (Borojoa sorbilis (Ducke) Cuatrec., familia Rubiaceae) es un frutal nativo dioico del bioma chocoano biogeográfico y amazónico, distinto al borojó pacífico Borojoa patinoi (ya en catálogo) que es el cultivado comercialmente del Chocó. B. sorbilis se distribuye en bosque húmedo y muy húmedo tropical entre 0 y 1.000 msnm en Colombia (Chocó: Bajo Atrato, San Juan, Baudó, Quibdó; Amazonas: Leticia, Puerto Nariño, La Pedrera, Tarapacá; Vaupés: Mitú; Guaviare; Caquetá; Putumayo), Brasil amazónico (Amazonas, Pará, Acre, Rondonia), Perú (Loreto, Ucayali, Madre de Dios) y Ecuador amazónico. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del manejo ancestral del bosque por parte de los pueblos indígenas TIKUNA (trapecio amazónico colombiano), HUITOTO/MUINANE/BORA (medio Caquetá-Putumayo), YAGUA y COFAN del piedemonte amazónico, y EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano, y por las COMUNIDADES AFROCOLOMBIANAS del Chocó biogeográfico (Cocomacia, Acadesan, consejos comunitarios del Bajo Atrato, San Juan, Baudó) que durante generaciones han manejado rodales naturales en sistemas agroforestales tradicionales asociados a cacao (Theobroma cacao), bacao (T. bicolor), chontaduro (Bactris gasipaes) y don pedrito (Oenocarpus mapora). Pertenece al género Borojoa (Rubiaceae, tribu Gardenieae — algunos autores la ubican aún en género Alibertia) junto a B. patinoi y B. claviflora. Arbusto a árbol pequeño dioico de 3-6 m altura con tallos ramificados, hojas opuestas decusadas elípticas verdes brillantes 15-30 cm largo coriáceas con nervadura prominente, flores pequeñas blanco-cremas tubulares aromáticas polinizadas por abejas euglosinas y trigonas, fruto baya carnosa globosa-elipsoidal 6-10 cm diámetro (algo menor que B. patinoi de 8-12 cm), pulpa marrón-vinotinta agridulce densa con sabor a chocolate-tamarindo conteniendo 100-200 semillas pequeñas planas — consumida fresca, en jugo, mermelada, dulce de fruta, helado, considerada planta medicinal energética-afrodisíaca por la tradición chocoana-amazónica (alto contenido en aminoácidos esenciales, proteínas — 1.5%, fósforo, calcio, hierro, vitamina B). Manejo agroecológico: regeneración natural por dispersión de tortugas, monos y pájaros frugívoros; siembra enriquecimiento bajo dosel a 4-6 m entre plantas; tolerancia alta a sombra (60-80%); cultivo asociado a otras especies del agroforestal chocoano-amazónico; tolerancia a inundación estacional. Función en chagra/agroforestal chocoana-amazónica como cosecha comunitaria sostenible (cadena de valor 'borojó silvestre' con denominación de origen pendiente), conservación de la biodiversidad del bioma chocoano (uno de los hot-spots de biodiversidad del planeta), conservación de género Borojoa endémico-amazónico, banco genético frutal de Rubiaceae nativa. Fuentes Tier A: POWO Kew, GBIF, Sinchi (Instituto Amazónico de Investigaciones Científicas), IIAP Pacífico, Cárdenas-Salinas frutales amazónicos, Bernal 2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "brachiaria_brizantha",
@@ -18100,7 +18125,8 @@
       ],
       "valor_pedagogico": "El peralejo o nance (Byrsonima crassifolia (L.) Kunth, Malpighiaceae) es uno de los frutales silvestres más patrimoniales y simultáneamente más subutilizados del bosque seco tropical (bs-T), sabanas Caribe-Llanos y bosque premontano seco colombiano, conocido como \"nance\" en Caribe colombiano y Centroamérica, \"chaparro\" en los Llanos Orientales, \"noro\" en la Costa Pacífica, \"manero\" en Antioquia y \"changunga\" en algunas zonas. Es especie ecológicamente CLAVE en las sabanas naturales del Orinoquía colombiano (Casanare, Arauca, Meta, Vichada) y de las sabanas del Caribe seco (La Guajira, Cesar, Magdalena), donde forma poblaciones extensivas y es uno de los pocos árboles que resisten los fuegos sabaneros estacionales recurrentes gracias a una corteza GRUESA RUGOSA ANTICOMBUSTIBLE (rasgo diagnóstico de la especie con espesor 2-4 cm en árboles maduros que aísla térmicamente el cambium vascular). Esta resistencia al fuego le ha permitido coexistir milenariamente con el régimen de incendios naturales y antropogénicos de las sabanas neotropicales, convirtiéndolo en árbol fundamental de la ecología sabanera y en patrimonio bio-cultural llanero-caribeño. Nativo del Neotrópico desde México hasta Brasil-Paraguay, en Colombia es nativo silvestre dominante en sabanas naturales de Orinoquía (Casanare, Arauca, Meta, Vichada), bs-T de Caribe (La Guajira, Cesar, Magdalena, Atlántico, Bolívar, Córdoba, Sucre), Valle del Magdalena (Tolima, Huila, Santander), Valle del Cauca, sabanas del piedemonte llanero, y zonas secas de Antioquia, Caldas y Bajo Cauca, entre 0-1.200 msnm en zona térmica cálida con precipitaciones 700-2500 mm/año y suelos típicamente ácidos pobres oxisoles-ultisoles. Árbol pequeño-mediano caducifolio de 5-15 m de altura con copa amplia abierta hasta 8 m de diámetro, fuste corto tortuoso, corteza gruesa rugosa pardo-grisácea anticombustible, hojas elípticas-obovadas opuestas verde-oscuras coriáceas con envés blanco-tomentoso (tomento blanco al revés foliar, rasgo diagnóstico fácil al voltear la hoja), flores amarillas a anaranjadas en racimos terminales pequeños vistosos melíferos, frutos drupa globosa pequeña amarillo-anaranjada de 1-2 cm de diámetro con pulpa aromática dulce-ácida apetente y una semilla central. La fruta nance/peralejo se cosecha entre julio-octubre (maduración estacional vinculada al régimen pluvial) cuando cae naturalmente al suelo (se recoge a mano del suelo o se sacude el árbol sobre lonas), tiene aroma distintivo intenso característico (notas a queso fermentado, mango maduro, pera tropical), consumo fresco como golosina natural, procesado en dulces tradicionales (dulce de nance Caribe, conserva en almíbar), mermeladas, gelatinas, refrescos (\"agua de nance\"), helados artesanales, y especialmente fermentados alcohólicos tradicionales: la \"chicha de nance\" del Casanare-Arauca-Meta es una bebida fermentada patrimonio llanero servida en fiestas y festividades, y el \"licor de nance\" o \"miche de nance\" es destilado artesanal apreciado. El mercado de nance fresco y procesado tiene presencia consolidada en plazas de mercado de Barranquilla, Cartagena, Santa Marta, Valledupar, Sincelejo, Montería, Medellín, Villavicencio, Yopal con precios estables 2-6 USD/kg fresco y 8-15 USD/kg en conserva-mermelada artesanal. Como Malpighiaceae fija parcialmente nitrógeno (familia con mecanismos simbióticos no convencionales con bacterias diazotróficas Rhizobiaceae y Azospirillum), atrae polinizadores nativos clave: abejas Apidae (Apis mellifera, Meliponini Tetragonisca, Melipona, Trigona), abejorros Centris y Bombus (estos últimos con relación mutualista especializada por aceites florales que Centris colecta como recompensa floral exclusiva de Malpighiaceae), avispas Vespidae, moscas Syrphidae. La dispersión de la semilla es por avifauna frugívora (Turdus, Tangara, Thraupis, Ramphastos), mamíferos pequeños (zarigüeyas Didelphis, micos Cebus capucinus, Saimiri sciureus) y ganado bovino-equino en sabanas extensivas. Su madera marrón-rojiza dura de densidad media-alta (0.7-0.85 g/cm³) es apreciada en postes para cerca viva (durabilidad 10-15 años en suelo gracias a tanninos en duramen), construcción rural, mangos de herramienta, leña de alta calidad calórica, y carbón vegetal artesanal. La corteza es rica en taninos (8-15% peso seco) y se usa tradicionalmente como curtiente vegetal en cuero artesanal Caribe-Llanos, tinte natural pardo-rojizo para textiles tradicionales, y medicinal (decocción astringente para diarreas, lavados antisépticos). Manejo agroecológico: propagación por semilla con escarificación mecánica o ácido sulfúrico 15 min (germinación 50-70% a 20-45 días, lenta y desigual — recomendable sembrar abundante para compensar), vivero 5-7 meses a sol pleno, plantación definitiva a 25-35 cm de altura, distancia 6×6 m (200-300 árb/ha) en frutal comercial o 4×4 m en restauración productiva, primera fructificación año 4-5, productividad estable 30-80 kg/árb/año a partir del año 7. Esqueje leñoso opcional para clonar variedades selectas con fruta más grande y dulce. Es lección extraordinaria de frutales silvestres patrimoniales subutilizados de sabanas neotropicales: una especie nativa adaptada a fuegos sabaneros recurrentes que provee simultáneamente fruta apetente con mercado local consolidado, bebida fermentada tradicional, polinizadores nativos especializados Centris (servicio ecosistémico crítico), madera-postería durables, taninos curtientes-tintes-medicinales, y resiliencia ecológica en suelos ácidos pobres incendiables donde pocos cultivos prosperan. Su domesticación moderna por Agrosavia y universidades regionales (Universidad de los Llanos, Universidad del Atlántico, Corpoica) abre potencial agroindustrial para conservas, mermeladas, vinos y licores premium con denominación de origen llanera-caribeña. Defenderlo es defender la soberanía alimentaria de sabanas (ecosistemas que la agroindustria del arroz, palma y soya está destruyendo masivamente sin considerar alternativas frutales nativas), la dignidad de las economías campesinas-indígenas llanero-caribeñas, y la memoria gastronómica de la chicha de nance llanera y los dulces de nance costeños. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Pérez Arbeláez 1947 Plantas Útiles Colombia, Agrosavia frutales tropicales.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "caesalpinia_sappan",
@@ -18999,7 +19025,8 @@
       ],
       "valor_pedagogico": "El caimito morado (Chrysophyllum cainito L., Sapotaceae) es un árbol frutal perenne neotropical originario de las Antillas Mayores y norte de Sudamérica (Colombia, Venezuela, Panamá, Centroamérica), ampliamente cultivado en zonas bajas cálidas del Caribe colombiano (Atlántico, Bolívar, Magdalena — patios de Barranquilla, Cartagena, Santa Marta, Valledupar), Chocó biogeográfico (Quibdó, Buenaventura), Valle medio y bajo Magdalena (Honda, La Dorada, Puerto Berrío), zonas cálidas de Antioquia (Bajo Cauca, Urabá), Córdoba (Montería), Sucre (Sincelejo), Cesar y enclaves bajos de Santander (Barrancabermeja). Crece óptimamente entre 0 y 800 msnm con temperaturas de 22-30 °C, requiere sol pleno, suelos profundos bien drenados arcillosos a francos, riego moderado y resiste sequías estacionales una vez establecido. Árbol siempreverde de 12-25 m de altura con copa amplia globosa-densa y hojas pinnado-paralelas verde-brillante por el haz y dorado-bronceadas pubescentes por el envés (carácter taxonómico distintivo de Chrysophyllum — \"hoja dorada\" — visible al voltearlas con el viento, espectáculo visual que da nombre vernáculo \"hoja dorada\" en Centroamérica). Flores pequeñas blanco-cremosas perfumadas en cimas axilares polinizadas por abejas nativas (Meliponini, Trigonini) y mariposas. Frutos baya esférica de 6-10 cm con cáscara lisa violeta-purpúrea oscuro (raza más común) o verde-amarillenta (raza alba), pulpa lechosa-mucilaginosa blanca a rosada muy dulce (15-18 °Brix) con 4-10 semillas grandes negras dispuestas en figura estrellada visible al corte transversal — origen del nombre comercial \"star apple\" en mercados anglófonos. Cosecha por color violeta intenso brillante y blandeo suave; frutos verdes son astringentes por latex no maduro (lección sobre maduración postcosecha y compuestos secundarios). El árbol exuda latex blanco-lechoso al cortarse (carácter Sapotaceae) usado tradicionalmente en Cuba y Antillas como ingrediente menor de gomas de mascar artesanales (no es la fuente principal, ese es Manilkara zapota). Manejo: plantación a 8-10 m entre árboles, asocio en patio tropical con cacao en sombra inicial, plátano nodriza, mango, aguacate criollo, anón, guanábana — sistema multiestrato tradicional de patios caribeños caracterizado por Pérez Arbeláez 1947 como \"ecosistema de patio campesino afrocaribeño\". Función pedagógica excelente: enseña a niñas y niños la diversidad de Sapotaceae neotropicales (junto con níspero/zapote Manilkara zapota, mamey colorado Pouteria sapota, caimo silvestre Pouteria caimito), patrón ecológico de hojas con doble color (dorado-bronceado por envés — adaptación a alta radiación tropical reflejando luz infrarroja y reduciendo pérdida de agua), polinización por abejas nativas sin aguijón (meliponicultura urbana), maduración postcosecha y compuestos astringentes-taninos en frutos inmaduros, latex blanco como carácter Sapotaceae. Importancia cultural en Caribe colombiano como árbol de patio tradicional, alimento dulce de temporada (julio-noviembre en Atlántico), refugio de aves (tángaras Thraupidae se alimentan de frutos maduros y dispersan semillas). Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA manual frutales tropicales, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "cicer_arietinum",
@@ -19587,7 +19614,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "Wajocaci"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "crassula_ovata",
@@ -20755,7 +20783,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "Emimuañe"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "festuca_arundinacea",
@@ -20856,7 +20885,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "higuera común"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "foeniculum_vulgare_azoricum",
@@ -21079,7 +21109,8 @@
       ],
       "valor_pedagogico": "La jagua o huito (Genipa americana L., Rubiaceae) es un árbol neotropical nativo (8-15 m altura, ocasionalmente hasta 20 m, tronco recto con corteza gris-clara) ampliamente distribuido en tierras cálidas y templadas de Colombia entre 0 y 1.200 msnm, presente en Caribe, Pacífico (especialmente Chocó-Darién), valle del Magdalena, Catatumbo, Orinoquía y Amazonía colombiana. Hojas grandes simples opuestas oblongo-elípticas (15-35 cm) brillantes con estípulas interpeciolares características de Rubiaceae, flores tubulares blanco-cremas a amarillentas (3-5 cm) muy fragantes que atraen polillas esfíngidas crepusculares y abejas, frutos en baya globosa-elipsoide (8-12 cm) marrón-grisácea con pulpa amarillenta dulce-ácida aromática y semillas numerosas planas. Es lección viva de soberanía cromática indígena amazónico-pacífica que enseña a niñas y niños cómo los pueblos Embera, Wounaan, Tikuna, Yagua, Kichwa, Bora, Huitoto y comunidades afrocolombianas del Pacífico han usado el fruto verde como tinte azul-negro corporal ceremonial (kipará/jagua) durante milenios: el jugo del fruto verde inmaduro contiene genipina incolora que reacciona con aminoácidos cutáneos formando una pigmentación azul-negra profunda que dura 12-15 días sin dañar la piel, usada en pintura corporal ritual, marcaje de pertenencia clánica, repelente espiritual de malas energías, protección contra insectos (la planta tiene actividad antimalárica documentada) y como tinte natural permanente para fibras vegetales (chambira, werregue, iraca) y artesanía cestera. La pulpa madura es comestible (mermeladas, jaleas, bebidas fermentadas tradicionales como jugo de jagua chocoano). Manejo agroecológico: propagación por semilla fresca (germinación 30-60 días), vivero 6-12 meses, distancia 6-8 m, fructificación a partir de 5-7 años, función como árbol multipropósito frutal-tintóreo-medicinal en sistemas agroforestales Pacífico y Amazonía, atractor de polinizadores nocturnos y nurse plant en restauración de selva húmeda tropical. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, IAvH Flora, JBB Plantas Medicinales.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "gossypium_barbadense_criollo",
@@ -21250,7 +21281,8 @@
       ],
       "valor_pedagogico": "La pitaya blanca o pitaya roja de cáscara (Hylocereus undatus (Haw.) Britton & Rose, Cactaceae subfamilia Cactoideae tribu Hylocereeae) es un cactus epífito-hemiepífito trepador perenne originario de Mesoamérica (sur de México, Belize, Guatemala, Honduras, Costa Rica) y naturalizado-cultivado pantropicalmente como frutal comercial de exportación, en Colombia cultivado entre 200 y 1.500 msnm en zonas térmicas cálidas-templadas-moderadas: Valle del Cauca (cinturón frutícola de Buga, Palmira, Tulúa), Tolima (Lérida, Líbano, Falan), Cundinamarca (Cáqueza, Fómeque, Ubaque, Quetame, La Mesa, Anolaima — junto con la pitahaya amarilla S. megalanthus), Boyacá (San Eduardo, Páez, Miraflores), Huila (Garzón, Pitalito), Santander (Lebrija, San Vicente de Chucurí), Antioquia (Suroeste, Urabá) y Magdalena Medio. Pertenece a la familia Cactaceae tribu Hylocereeae (igual tribu que la pitahaya amarilla colombiana Selenicereus megalanthus, ahora reclasificada como Selenicereus undatus en algunas taxonomías recientes — sinónimo Selenicereus undatus (Haw.) D.R.Hunt 2017), planta trepadora epífita-hemiepífita con tallos verdes triangulares-3-angulados de hasta 20 m con aréolas con espinas cortas amarillentas (1-4 mm), crecimiento trepador con raíces aéreas adventicias que se adhieren a árboles tutores o estructuras de tutorado (concreto/madera/tela polietileno), flores blanco-cremas gigantes (25-30 cm de diámetro) que abren una sola noche tropical y son polinizadas por murciélagos nectarívoros (Glossophaga soricina, Anoura geoffroyi) y polillas esfíngidas — en cultivos comerciales se realiza polinización manual al amanecer para asegurar cuajado, frutos baya elipsoidal con cáscara rojo-rosado-magenta brillante con escamas (brácteas) verde-anaranjadas grandes y pulpa blanca translúcida con semillas negras pequeñas masticables (sabor dulce-refrescante delicado, parecido a kiwi-pera-melón). Es lección viva extraordinaria de bioeconomía agroexportadora, polinización por murciélagos, cactáceas no espinosas trepadoras epífitas y cultivo intensivo bajo tutor que enseña a niñas y niños cómo Colombia produce dos pitayas distintas (la blanca H. undatus de cáscara roja y la amarilla S. megalanthus de cáscara amarilla, distintas en distribución, ciclo y mercado — Colombia es líder mundial de S. megalanthus y productora notable de H. undatus). Diferencia diagnóstica didáctica: H. undatus tallos triangulares con espinas más cortas, fruto cáscara roja con escamas verdes anchas, pulpa blanca; S. megalanthus tallos similares pero más delgados con espinas amarillas, fruto cáscara amarilla con brácteas cortas, pulpa blanca translúcida. Ambas comparten ciclo Hylocereeae epífito-trepador-tutorado, polinización por murciélagos y exportación de alto valor. Rica en betacianinas antioxidantes (en cultivares de pulpa roja), vitamina C, fibra, prebióticos (oligofructosa), efecto laxante suave. Producto bandera del programa 'Colombia, semilla de exportación' y mercados orgánicos certificados. Manejo agroecológico: propagación por esqueje de cladodio maduro de 30-40 cm (segmento cicatrizado 5-7 días a la sombra antes de siembra), tutorado obligatorio sobre 'T' de concreto con tela polietileno o sobre tutor vivo (matarratón Gliricidia sepium, leucaena, eritrina), distancia 3x3 m o doble fila 2.5x1.5 m, plena producción a partir del año 2-3 (más rápido que la pitahaya amarilla — H. undatus es de ciclo más corto), cosecha 30-40 días post-floración cuando cáscara cambia de verde a rojo-rosado intenso, polinización manual al amanecer del día siguiente a apertura floral, vida productiva 15-20 años. Función en chagra como frutal de alto valor agregado, atractora de murciélagos polinizadores nocturnos, cultivo de exportación sostenible, soporte vivo trepador en sistemas agroforestales tutorados. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Manual Frutales Tropicales, SiB Colombia, ICA Resolución 3168, Bernal 2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "bajo"
     },
     {
       "id": "ilex_kunthiana",
@@ -21483,7 +21515,8 @@
       ],
       "valor_pedagogico": "El guamo macheto (Inga densiflora Benth.) se cultiva en departamentos andinos y amazónicos de Colombia como Putumayo, Caquetá, Meta, Amazonas y parte de la cordillera oriental entre 0 y 2200 msnm, con óptimo entre 500 y 1800 msnm en zonas térmicas templadas. Su manejo agronómico incluye propagación por semilla fresca (recalcitrante) con germinación de 15-30 días, ciclo de establecimiento de 6-12 meses hasta primera producción de vainas, se asocia beneficiosamente con café y cacao como sombra temporal en sistemas agroforestales, y fija nitrógeno atmosférico mediante nodulación con rhizobios, mejorando la fertilidad del suelo. En el contexto cultural muisca y campesino andino, los frutos (vainas) se consumen tradicionalmente como snack dulce y la madera se usa para postes y leña. Según el inventario taxonómico de GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Inga densiflora Benth.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "inga_feuilleei",
@@ -21585,7 +21618,8 @@
       ],
       "valor_pedagogico": "El guamo de monte (Inga vera Willd.) es un árbol nativo de la familia Fabaceae distribución en la Amazonía colombiana, particularmente en los departamentos de Amazonas, Caquetá, Putumayo, Guainía y Vaupés, entre 0 y 1200 msnm en zonas térmicas cálidas. Su manejo agronómico incluye propagación por semilla recalcitrante que debe sembrarse inmediatamente após recolección, con germinación rápida de 7-15 días, aunque también se reproduce por esquejes semi-leñosos. Como especie fijadora de nitrógeno, forma nodulaciones con rizobios simbiontes que enriquecen el suelo, siendo utilizada传统的 en sistemas agroforestales amazónicos como sombra para cultivos como café y cacao. En el contexto cultural indigenous amazonico, sus frutos vainas carnosas son consumidos directamente y sus semillas sirven para propagación de sistemas agroforestales tradicionales. Según la taxonomía verificada por GBIF Backbone Taxonomy y Plants of the World Online (POWO), su nombre científico válido es Inga vera Willd., especie nativa de la región tropical americana.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "ipomoea_aquatica",
@@ -22497,7 +22531,8 @@
       ],
       "valor_pedagogico": "La magnolia colombiana o molinillo (Magnolia caricifragrans, Magnoliaceae) es una de las magnolias endémicas más representativas de los bosques andinos premontanos cafeteros de Colombia, distribuida exclusivamente en las cordilleras Central y Occidental colombianas, principalmente en Antioquia, Caldas, Risaralda, Quindío y Valle del Cauca entre 1.200 y 2.000 msnm. Árbol perennifolio de 15-25 metros de altura con fuste cilíndrico recto, copa piramidal-redondeada, corteza gris lisa con lenticelas características, hojas alternas grandes coriáceas oblongo-elípticas verde oscuro brillantes en haz y pálidas pubescentes en envés, flores solitarias terminales grandes (10-15 cm) blanco-cremas con tépalos carnosos y aroma intenso a frutas frescas o cítricos característicos de las Magnoliaceae primitivas, conos folicíferos rojo-anaranjados al madurar con semillas rodeadas de arilo carnoso rojo dispersadas por aves frugívoras. La familia Magnoliaceae es uno de los linajes más antiguos de plantas con flores (130-140 millones de años de antigüedad, Cretácico inferior) y conserva características florales primitivas: tépalos no diferenciados en pétalos y sépalos, ovario apocárpico (carpelos libres), polinización por escarabajos primitivos Coleoptera anteriores a la diversificación de las abejas. Esto la convierte en una de las plantas vivas más interesantes para la enseñanza de la evolución vegetal. Colombia es uno de los países con mayor diversidad de magnolias del Neotrópico (33 especies conocidas, la mayoría endémicas) pero también con el mayor número de magnolias amenazadas: M. caricifragrans está categorizada como endémica colombiana con poblaciones silvestres altamente reducidas por la deforestación histórica del bosque andino premontano cafetero (especialmente en el Eje Cafetero entre 1900-1970 cuando se transformaron millones de hectáreas a cafetal y potrero). Su conservación ex situ depende hoy de jardines botánicos (Jardín Botánico de Bogotá, JB Quindío, JB Joaquín Antonio Uribe Medellín), arboretos cafeteros y huertos patrimoniales rurales. Es lección de soberanía botánica y biogeografía: cada cordillera de los Andes colombianos alberga magnolias endémicas únicas (M. caricifragrans en zona cafetera, M. yarumalensis en Antioquia, M. hernandezii en Quindío, M. mahechae en Valle, M. wolfii en Quindío) que constituyen patrimonio genético irreemplazable del país y de la humanidad. Recuperar las magnolias colombianas en cafetales con sombrío diversificado, huertos patrimoniales y programas de restauración bosque andino es acto de conservación cultural y genética. Fuentes Tier A: Lozano-Contreras 2003 Magnoliaceae Colombia, Calderón-Sáenz et al. 2007 Libro Rojo Magnoliaceae Colombia, Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "nota_conservacion": "Endémica de Colombia (Antioquia, Caldas). Magnoliaceae arbórea en peligro por pérdida de hábitat."
     },
     {
       "id": "magnolia_yarumalensis",
@@ -22595,7 +22630,8 @@
       ],
       "valor_pedagogico": "El manzano de Sabana (Malus domestica (Suckow) Borkh. cv. Sabanera, Rosaceae) es un frutal templado caducifolio de la Sabana Bogotá y altiplano cundiboyacense, cultivado tradicionalmente entre 2.300 y 2.800 msnm en zona térmica fría con acumulación natural de horas frío (300-600 h <7°C). Presente en Cundinamarca (Sopó, Chía, Cota, Tenjo, Subachoque, Choachí, Ubaté), Boyacá (Paipa, Duitama, Sotaquirá, Tibasosa, Tunja), Nariño (Ipiales, Túquerres, Pasto) y altiplano antioqueño (Santa Rosa de Osos, Belmira). Árbol de 4-8 m de altura, copa redondeada, follaje caducifolio que reposa en periodo seco. Flores blanco-rosadas en corimbo que aparecen antes que las hojas, atrayendo abejas (Apis mellifera) y polinizadores nativos (Bombus rubicundus, Xylocopa). Frutos en pomo globoso de 5-8 cm, piel verde-amarilla con chapa rosa-rojiza al sol, pulpa blanca crujiente dulce-acidulada (12-14° Brix). Lección viva de soberanía alimentaria templada andina: enseña a niñas y niños que Colombia sí produce manzana propia, adaptada al clima frío de altura, sin necesidad de importar manzana chilena/argentina/estadounidense de menor frescura y mayor huella de carbono. Manejo agroecológico: poda de formación en vaso o eje central, distancia 4×5 m (500 árboles/ha), fertilización con compost + biol foliar, control de Cydia pomonella (gusano de la manzana) con trampas de feromona + Bacillus thuringiensis, manejo de Venturia inaequalis (sarna del manzano) con caldo bordelés + caldo sulfocálcico preventivo. Asocios productivos en altiplano: tagasaste (Cytisus proliferus) como cortavientos y aporte N, papa criolla en calles primeros 2 años, fresa Monterrey como cobertura productiva, trébol blanco fijador. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015, Pérez-Arbeláez 1947 Plantas Útiles.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "mammea_americana",
@@ -22643,7 +22679,8 @@
       ],
       "valor_pedagogico": "El mamey amarillo o mamey de Cartagena (Mammea americana L., Calophyllaceae — antes Clusiaceae sensu lato hasta la reclasificación APG III-IV 2009-2016) es un árbol frutal perenne nativo del Caribe insular (Antillas Mayores) y continental (norte de Sudamérica — Colombia, Venezuela, Panamá), considerado uno de los pocos frutales NATIVOS del Caribe colombiano por excelencia (a diferencia del níspero/zapote Manilkara zapota que es mesoamericano y el mamey colorado Pouteria sapota que es mesoamericano-yucateco — el mamey amarillo SÍ es nativo caribeño-circuncaribe, presente en Colombia desde antes del contacto colonial documentado por crónicas tempranas del siglo XVI en Cartagena de Indias, origen del nombre vernáculo regional \"mamey de Cartagena\"). Distribución colombiana en zonas cálidas costeras del Caribe (Atlántico, Bolívar — especialmente Montes de María y Cartagena, Magdalena — Santa Marta y Ciénaga Grande, Córdoba, Sucre — San Onofre y Tolú, Cesar, La Guajira sur), Chocó biogeográfico (Quibdó, Bahía Solano, Nuquí), zonas bajas de Antioquia (Urabá), Valle medio y bajo Magdalena, Llanos bajos cálidos y zonas urbanas tropicales entre 0 y 800 msnm con temperaturas 22-30 °C, sol pleno, suelos bien drenados, tolerante a brisas salinas y vientos costeros. Árbol siempreverde majestuoso de 15-25 m altura con copa piramidal-densa simétrica de gran valor ornamental y de sombra, madera dura rojiza usada en carpintería de exterior y construcciones rurales tradicionales. Hojas grandes (10-25 cm) opuestas-coriáceas elíptico-oblongas verde-oscuro brillante por el haz con puntos translúcidos visibles al trasluz (glándulas oleíferas características del clado Calophyllaceae-Clusiaceae). Flores blanco-cremosas perfumadas grandes (3-5 cm) solitarias o en grupos pequeños en ramas — polinizadas por abejas, mariposas y murciélagos. Frutos baya esférica-globosa (8-20 cm diámetro, 0.5-2 kg), cáscara marrón-óxido coriácea-fibrosa firme que se pela manualmente revelando pulpa amarillo-anaranjada firme aromática (12-18 °Brix) de sabor delicioso comparado a albaricoque-melocotón-mango-vainilla (de ahí el nombre antillano histórico \"albaricoque de Santo Domingo\" usado por colonos franceses-españoles caribeños), con 1-4 semillas grandes lustrosas marrón-rojizas. Manejo: plantación a 10-12 m, ideal para patios tropicales costeros tradicionales caribeños, asocio con coco, plátano, mango, anón, guanábana, papaya, cacao, ñame, yuca — sistema multiestrato afrocaribe documentado por Pérez Arbeláez 1947. PROPIEDAD INSECTICIDA NATURAL DESTACADA: semillas y látex contienen mammeína (cumarinas insecticidas naturales) usadas tradicionalmente en Antillas-Caribe como insecticida natural para piojos, pulgas, chinches y plagas de cultivos — lección pedagógica importante sobre química verde y biopesticidas tradicionales (precursores naturales de los piretroides modernos), aunque deben manejarse con precaución porque también son tóxicos a peces y mamíferos en dosis altas (no comer las semillas crudas). Las flores se usan tradicionalmente para perfumar licores caribeños (\"crème de mamey\", \"eau de mammée\") por su aroma intenso vainilla-tropical. Función pedagógica excelente: enseña a niñas y niños (1) que SÍ existen frutales NATIVOS del Caribe colombiano (no todos los frutales son foráneos mesoamericanos), (2) la familia Calophyllaceae con sus glándulas oleíferas translúcidas visibles al trasluz como carácter taxonómico (compartido con Calophyllum y Garcinia), (3) biopesticidas naturales mammeína como precursor de químicas verdes modernas, (4) árboles polifuncionales fruta-madera-medicinal-insecticida-ornamental característicos de sistemas agroforestales caribeños tradicionales. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, AGROSAVIA.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "manihot_glaziovii",
@@ -22776,7 +22813,8 @@
       "nombre_comunes_regionales": [
         "Canangucho",
         "Neí"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "mauritia_minor",
@@ -22818,7 +22856,8 @@
       ],
       "valor_pedagogico": "El canangucho menor o moriche pequeño (Mauritia minor Burret, Arecaceae) es una palma neotropical nativa de humedales y aguajales de zonas bajas inundables de la cuenca amazónica-orinoquia colombo-venezolano-brasileña (Colombia: Vaupés, Guainía, Vichada, Putumayo, Caquetá, Amazonas, enclaves específicos en Meta y Casanare; Venezuela: Amazonas y Bolívar; Brasil: Roraima, Amazonas — humedales restringidos), distinta de su hermana mucho más conocida Mauritia flexuosa (canangucho mayor / moriche / aguaje / buriti — la palma emblema de los Llanos colombo-venezolanos y de la Amazonía peruano-brasileña, frecuente en morichales-aguajales-buritizales — palma de hasta 25-35 m altura). Mauritia minor es palma de PORTE MENOR (8-15 m altura vs 25-35 m de M. flexuosa) y distribución mucho MÁS RESTRINGIDA a humedales bajos del piedemonte amazónico-orinoquia entre 100 y 500 msnm, con preferencia por suelos saturados permanentemente (carácter de Mauritia compartido — adaptación a anegamiento crónico con neumatóforos y raíces adventicias aéreas), temperaturas cálidas 23-30 °C, sol pleno. Palma SOLITARIA (no cespitosa, distinta de Bactris, Astrocaryum) con estipe único columnar liso gris-marrón con cicatrices foliares anulares prominentes, corona apical de 8-15 hojas grandes palmadas-costapalmadas verde-claro brillante (3-5 m largo) con segmentos rígidos pendulares colgantes característicos de Mauritia (la \"corona péndula\" da el aspecto inconfundible del género). Característica botánica destacada: DIOICIA ESTRICTA — los individuos son macho o hembra separados (no hermafroditas), solo las palmas hembras producen frutos. Inflorescencias grandes pendulares ramificadas con miles de flores pequeñas amarillo-cremosas polinizadas principalmente por escarabajos y mosquitas-de-las-palmas (Curculionidae, Drosophilidae). Frutos drupa elipsoide-aovada pequeña-mediana (3-5 cm — significativamente más pequeños que los de M. flexuosa que alcanzan 5-7 cm) con cáscara escamosa marrón-rojiza brillante característica de Mauritia (escamas romboidales imbricadas — carácter taxonómico inmediato del género), pulpa amarillo-anaranjada fibrosa-cremosa aceitosa muy rica en betacaroteno (provitamina A — concentraciones altas, lección nutricional sobre biofortificación natural), aceite vegetal comestible, ácidos grasos insaturados y vitamina E, con un hueso grande interno. Importancia cultural y ecológica enorme para pueblos indígenas amazónico-orinoquia (Tikuna, Huitoto, Bora, Sikuani, Cubeo, Kurripaco, Wayuu interior, Piapoco) que aprovechan toda la palma: frutos para alimento humano (consumo directo, masas fermentadas-no-fermentadas, jugos refrescantes \"champu de canangucho\"), hojas para techos de malocas y artesanías-canastos-esteras, fibras para cuerdas-redes-hamacas tradicionales, larvas comestibles de gorgojos (Rhynchophorus palmarum — \"mojojoy\") que crecen en estipes muertos como fuente proteica destacada de las dietas indígenas, palmito comestible de palmas jóvenes (en sostenibilidad — no debe extraerse de poblaciones silvestres). Función pedagógica excepcional: enseña a niñas y niños (1) palmas Arecaceae como familia clave de selva tropical-humedales sudamericanos (junto con Euterpe açaí, Bactris chontaduro, Attalea seje-mil-pesos, Astrocaryum corozo, Oenocarpus seje-bacaba), (2) DIOICIA estricta como sistema reproductivo (compárese con monoicas como cocotero, palma africana, dátiles), (3) adaptaciones a humedales tropicales saturados (neumatóforos, raíces adventicias aéreas, copa péndula tolerante a vientos), (4) BIOFORTIFICACIÓN NATURAL con betacaroteno-provitamina A — el canangucho es uno de los frutos más ricos en provitamina A del planeta (lección nutricional sobre soberanía alimentaria indígena vs alimentos ultraprocesados industriales), (5) aprovechamiento integral indígena de la palma (alimento humano-techo-fibras-larvas comestibles-palmito) como ejemplo de \"todo se aprovecha\" — sostenibilidad cultural amazónica, (6) DISTINCIÓN entre canangucho menor (M. minor — palma pequeña restringida humedales bajos) vs canangucho mayor (M. flexuosa — palma grande Llanos-Amazonía-Pantanal) — lección taxonómica de especies hermanas congenéricas con distribución y tamaño distintos. Fuentes Tier A: GBIF, POWO Kew, Sinchi Amazonía colombiana, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "medicago_sativa",
@@ -22919,7 +22958,8 @@
       ],
       "valor_pedagogico": "El mamón o quenepa (Melicoccus bijugatus Jacq., Sapindaceae — sinónimo histórico Melicocca bijuga L.) es un árbol frutal perenne nativo de las Antillas Mayores (Cuba, Jamaica, Puerto Rico, La Española) y posiblemente del norte de Sudamérica (Colombia, Venezuela — origen disputado entre Antillas y costa norte sudamericana), ampliamente cultivado y naturalizado en todo el Caribe insular y continental (Antillas, Caribe colombiano, Venezuela, Panamá, México sur, Centroamérica, Florida sur). Es el mamón-quenepa POPULAR Y CALLEJERO POR EXCELENCIA del Caribe colombiano (distinto del mamoncillo continental Talisia olivaeformis con el que se confunde popularmente — ver entrada complementaria de Talisia en este mismo batch — pero Melicoccus es el verdadero \"mamón de Cartagena\" comercial, vendido en racimos en plazas de mercado y vendedores ambulantes de Cartagena, Barranquilla, Santa Marta, Sincelejo, Montería, Valledupar en temporada junio-septiembre). Distribución colombiana en zonas cálidas costeras del Caribe (Atlántico, Bolívar — especialmente Cartagena origen del nombre regional, Magdalena, Córdoba, Sucre, Cesar, La Guajira sur), Chocó biogeográfico, valle bajo del Magdalena, zonas bajas de Antioquia (Urabá, Bajo Cauca), Llanos bajos cálidos (Casanare-Meta-Arauca) y zonas urbanas tropicales entre 0 y 800 msnm con temperaturas 22-30 °C, sol pleno, suelos bien drenados, muy tolerante a sequías estacionales costeras y vientos salinos. Árbol siempreverde majestuoso de 18-25 m altura con copa amplia piramidal-redondeada simétrica de gran valor ornamental y de sombra urbana (plantado masivamente en parques y avenidas de ciudades caribeñas), madera dura amarilla-clara usada en carpintería. Hojas alternas-paripinnadas con 4 folíolos elípticos verde-oscuro brillante (epíteto \"bijugatus\" = \"con dos pares de folíolos\"). Característica botánica destacada: DIOICIA ESTRICTA — los árboles son macho o hembra separados (no hermafroditas), solo las hembras producen frutos. Esta característica es lección pedagógica importante porque (1) significa que para producción comercial se debe plantar ratio 1 macho : 8-10 hembras o injertar ramas macho en árboles hembras, (2) muchos productores compran árboles de semilla y descubren después de 6-10 años que tienen un macho improductivo (frustración común — promueve uso de injerto sobre franco), (3) ejemplifica diversidad de sistemas reproductivos vegetales (compáralo con hermafroditas como mango, aguacate; monoicos como maíz, cucurbitáceas; dioicos como papayo, kiwi, mamón). Flores pequeñas blanco-cremosas perfumadas en panículas terminales (flores macho con estambres, flores hembra con ovario sin estambres funcionales) polinizadas por abejas nativas y mariposas. Frutos baya esférica-aovada (2-3 cm) en racimos densos de 15-50 frutos por racimo, cáscara coriácea verde-amarillenta firme que se rompe con los dientes liberando pulpa arilo gelatinoso rosado-anaranjado-amarillo claro dulce-acidulado (10-14 °Brix) muy refrescante alrededor de una semilla grande única lustrosa beige-rosada. Manejo: plantación a 10-12 m, ideal en patios tropicales caribeños tradicionales, asocio con mango, aguacate, anón, guanábana, papayo, plátano, coco, mamey amarillo Mammea americana, níspero Manilkara zapota. Importancia económica creciente en Caribe colombiano como fruta callejera comercial de temporada (vendedores ambulantes con racimos enteros), exportación nicho a mercados étnicos hispano-caribeños en Estados Unidos (Miami, NYC). Función pedagógica excepcional: enseña a niñas y niños (1) DIOICIA estricta como sistema reproductivo vegetal distintivo, (2) distinción geográfica importante entre mamón antillano-naturalizado Melicoccus bijugatus vs mamoncillo continental nativo Talisia olivaeformis (lección de biogeografía caribeña — ambos confusamente llamados \"mamón/mamoncillo\" en habla popular pero son géneros distintos de Sapindaceae), (3) consumo callejero tradicional caribeño rompiendo cáscara con dientes (técnica práctica), (4) diversidad de Sapindaceae frutales (mamón, mamoncillo, lichi, longan, ackee). Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, AGROSAVIA.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "melinis_minutiflora",
@@ -23339,7 +23379,8 @@
       "valor_pedagogico": "La mora de árbol negra (Morus nigra L., Moraceae) es un frutal templado caducifolio originario del suroeste asiático (Persia-Mesopotamia) introducido en Colombia desde la época colonial y naturalizado en altiplanos templados y templado-fríos. Crece entre 1.800 y 2.500 msnm en zonas térmicas templadas y frías, presente en Cundinamarca (Sasaima, La Mesa, Anolaima, Sopó, Tabio, Subachoque, Tenjo, La Calera), Boyacá (Villa de Leyva, Moniquirá, Arcabuco, Sutamarchán, Paipa), Santander (San Gil, Barichara, Charalá), Antioquia (Santa Rosa de Osos, La Ceja, Rionegro) y Norte de Santander (Pamplona). Es importantísimo distinguir esta especie de la mora andina (Rubus glaucus): Morus nigra es un ÁRBOL de 6-12 m con frutos compuestos en sorosis (no en agregado de drupas como Rubus), mientras Rubus glaucus es un arbusto sarmentoso con espinas y frutos en agregado de drupas pequeñas. Lección biológica fundamental para niñas y niños. Hojas alternas ovaladas-cordadas con margen aserrado, ásperas al tacto, caedizas en zonas frías. Flores en amentos colgantes verde-amarillentos (anemofilia parcial + entomofilia). Frutos en sorosis cilíndrica de 2-3.5 cm, color rojo-vino a negro-púrpura al madurar, jugo muy intenso (manchador), sabor dulce-acidulado complejo (15-18° Brix) con altísimo contenido de antocianinas y vitamina C. Lección viva de patrimonio frutícola colonial y nutrición funcional: enseña a niñas y niños que la mora de árbol colombiana es superfruta nativa-naturalizada de antioxidantes y que su jugo manchador era usado tradicionalmente como tinta vegetal. Manejo agroecológico: poda fuerte invernal de renovación, distancia 6×6 m (278 árboles/ha), prácticamente no requiere fertilización (rústica), cosecha extendida 6-8 semanas con caída natural al suelo (recolectar con malla bajo el árbol), control de Drosophila suzukii con trampas vinagre-azúcar, manejo casi nulo de enfermedades. Asocios: tagasaste cortavientos, gallinas en pradera bajo el árbol que comen frutas caídas (sinergia avícola), café variedades de sombra parcial en zona templada. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, Pérez-Arbeláez 1947 Plantas Útiles, AGROSAVIA Manual Frutales Tropicales.",
       "validation_level": "claude_draft",
       "_anti_confusion": "Morus nigra = morera/mora de árbol (Moraceae). NO confundir con Rubus glaucus (mora andina).",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "myrcia_popayanensis",
@@ -24083,7 +24124,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "Punamañe"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "oenocarpus_mapora",
@@ -24131,7 +24173,8 @@
         "posuy",
         "manaco",
         "corunto"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "opuntia_ficus_indica",
@@ -24180,7 +24223,8 @@
       "nombre_comunes_regionales": [
         "tuna",
         "Nopal"
-      ]
+      ],
+      "estrato": "bajo"
     },
     {
       "id": "oreopanax_floribundum",
@@ -24538,7 +24582,8 @@
       "valor_pedagogico": "La gulupa amarilla colombiana (Passiflora edulis Sims, cultivar amarillo de altitud, Passifloraceae) es un cultivar híbrido-seleccionado de Passiflora edulis adaptado a clima templado-frío de altitud (1.800-2.400 msnm) que combina la coloración externa amarilla del maracuyá tropical (P. edulis f. flavicarpa) con el porte, sabor aromático intenso y aptitud para zonas frías de la gulupa morada (P. edulis f. edulis) — material distinto al maracuyá común de tierra caliente (registrado como `passiflora_edulis_flavicarpa` en este catálogo), desarrollado en programas colombianos de mejoramiento de pasifloras de exportación con cultivos comerciales emergentes en Cundinamarca (Tena, Granada, Cáqueza, Fómeque), Boyacá (Garagoa, Tenza, Pachavita), Antioquia (Oriente — La Ceja, Marinilla, El Carmen), Caldas (Manizales rural) y Valle del Cauca (Sevilla, Caicedonia). Pertenece a la familia Passifloraceae como el resto del complejo Passiflora cultivado en Colombia (gulupa morada, maracuyá amarillo de tierra caliente, granadilla, curuba mollissima, badea). Liana trepadora vigorosa con zarcillos axilares, hojas alternas trilobadas verde brillante con margen serrado, flores hermafroditas grandes (8-10 cm) con la corona filamentosa púrpura-blanca característica de las pasifloras, fruto baya globosa-elipsoidal con cáscara amarilla brillante (a diferencia de la morada de la gulupa tradicional), arilos gelatinosos anaranjados con semillas negras envueltas, aroma intenso característico, mayor acidez balanceada con dulzor que en la gulupa morada estándar — perfil sensorial valorado en mercados europeos de exportación. Es lección viva de mejoramiento participativo, biocomercio y diferenciación de mercado que enseña a niñas y niños cómo la diversidad genética de un mismo género (Passiflora) permite a Colombia exportar gulupa morada, gulupa amarilla, maracuyá tropical, granadilla, curuba y badea — cada una a un nicho de mercado distinto. Manejo agroecológico: propagación por semilla seleccionada (germinación 14-21 días a 22-26°C) o por injerto sobre patrón resistente a Fusarium oxysporum (mejor rendimiento y vida útil), micorrizas obligatorias al trasplante, tutorado en T o emparrado de alambre a 2-2.2 m, distancia 3x3 m o 4x2 m, ciclo a primera cosecha 10-14 meses, ciclo productivo 2-4 años antes de renovación, manejo integrado de plagas (trips, ácaros, áfidos, mosca de la fruta) y enfermedades (virus mosaico, antracnosis, septoriosis). Función en chagra como frutal de exportación diversificado dentro del complejo Passiflora cultivable en clima frío de altitud. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Sol Andina, SiB Colombia, Bernal 2015, ICA Resolución 3168.",
       "validation_level": "claude_draft",
       "_anti_confusion": "Passifloraceae (género Passiflora). NO confundir con Psidium (guayaba), Musa (plátano) ni Mangifera.",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "rastrero"
     },
     {
       "id": "passiflora_incarnata",
@@ -24990,7 +25035,8 @@
       ],
       "valor_pedagogico": "La tagua o palma marfil vegetal (Phytelephas macrocarpa Ruiz & Pav., Arecaceae-Phytelepheae) es una palma nativa neotropical de la región amazónica occidental, presente en la Amazonía colombiana (Putumayo, Caquetá, Amazonas, Guaviare), Pacífico colombiano (con la especie hermana Phytelephas seemannii dominante en Chocó-Valle-Nariño) y a lo largo del piedemonte amazónico Andino entre 100 y 800 msnm en bosque húmedo tropical, várzeas y bosques de galería. Palma acaule o de estípite muy corto (hasta 2 m, mayormente subterráneo o procumbente), corona basal de 8-15 hojas pinnadas grandes (5-8 m largo) verde-medias con raquis arqueado y foliolos numerosos lanceolados regularmente dispuestos, dioica (plantas masculinas y femeninas separadas), inflorescencias densas globosas de coloración crema y aroma dulce intenso muy atractor de abejas-orquídeas Euglossini y escarabajos polinizadores, infrutescencias compuestas en cabezuelas pesadas (10-25 kg) con 6-20 frutos drupáceos espinosos exteriores (cabeza-de-negro) cada uno conteniendo 5-9 semillas endurísimas blanco-marfil del tamaño de un huevo de gallina — endospermo cristalino-translúcido al madurar que da el nombre \"marfil vegetal\" o \"ivory nut\" por su parecido al marfil animal en dureza, color y tallabilidad. Importancia económica histórica y contemporánea EXCEPCIONAL: el endospermo seco y curado de las semillas (la \"tagua\") es uno de los productos forestales no maderables más emblemáticos de Colombia y Ecuador. Tallada artesanalmente en botones, joyería, figuras, dijes, esculturas miniatura — sustituye éticamente el marfil animal de elefante (prohibido por CITES) en aplicaciones de lujo, moda y arte. La tagua colombiana del Pacífico (Phytelephas seemannii) abasteció gran parte de la industria mundial de botones entre 1900-1940 antes del plástico (Manizales-Pereira-Chocó), industria que ha resurgido en el siglo XXI como producto sostenible certificable. Frutos jóvenes con endospermo lechoso comestible (sabor a coco), maduros con endospermo durísimo no comestible humano. Manejo agroecológico-extractivista sostenible: propagación por semilla (germinación lenta 6-18 meses con latencia profunda, plántulas crecen 20-30 cm/año), vivero 2-4 años, trasplante a SAF o enriquecimiento de bosque, distancia 5-8 m, fructificación 10-15 años (palma de inversión generacional), cosecha sostenible de cabezuelas caídas naturalmente cada 3-4 meses por planta hembra productiva durante 50-80 años (longevidad excepcional). Lección viva de bioeconomía sostenible y conservación de biodiversidad: la tagua es ejemplo paradigmático de producto forestal no maderable (PFNM) que enseña cómo un bosque colombiano conservado en pie produce más valor económico de largo plazo (productos artesanales de exportación, ecoturismo, captura de carbono, agua) que un bosque tumbado para ganadería extensiva — modelo de economía verde de comunidades afro y campesinas del Pacífico-Amazonía. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015 Plantas y Líquenes de Colombia, IAvH Flora, Pérez Arbeláez 1947, SiB Colombia.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "phytelephas_seemannii",
@@ -25030,7 +25076,8 @@
       ],
       "valor_pedagogico": "La tagua del Pacífico (Phytelephas seemannii O.F.Cook, familia Arecaceae) es una palma dioica acaule a subterránea endémica del bioma chocoano biogeográfico — Pacífico colombiano (Chocó: Bajo Atrato, San Juan, Baudó, Quibdó, Nuquí, Bahía Solano; Valle del Cauca pacífico: Buenaventura, Bajo Calima; Cauca pacífico: Guapi, Timbiquí, López de Micay; Nariño pacífico: Tumaco, Barbacoas, Mosquera) y Pacífico panameño (Darién) — entre 0 y 1.200 msnm en bosque húmedo tropical y bosque muy húmedo tropical (>4000 mm precipitación anual) con suelos ácidos lateríticos derivados de aluviones de los ríos Atrato, San Juan, Baudó, Mira y Patía. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del manejo ancestral del bosque chocoano por parte de las COMUNIDADES AFROCOLOMBIANAS del Pacífico colombiano (consejos comunitarios Cocomacia, Acadesan, Cocomasur del Bajo Atrato y San Juan que tienen titulación colectiva de territorios desde Ley 70/1993) y los pueblos indígenas EMBERA (Embera-Dóbida, Embera-Chamí, Embera-Katío) y WOUNAAN del bajo Atrato y San Juan, que durante siglos han manejado rodales naturales (taguales) en sistemas agroforestales tradicionales con extracción rotacional sostenible de la 'pepa' (semilla endurecida que al madurar se vuelve marfil vegetal de dureza similar a la del marfil animal) para tallar botones, joyería, esculturas miniatura y artesanía exportable. Palma acaule de tallo postrado subterráneo a corto emergente (0.5-3 m), hojas pinnadas erectas de 5-9 m con folíolos de 1-1.5 m, infrutescencias compactas globosas en cabezuela de 15-30 cm con 4-10 frutos drupáceos cubiertos de espinas blandas conteniendo 4-9 semillas cada uno (endospermo marfil vegetal). Polinización por escarabajos curculiónidos y derelómidos. Pertenece a tribu Phytelepheae junto a P. macrocarpa, P. tenuicaulis y P. tumacana. Distinta a Phytelephas macrocarpa (tagua amazónica) por su distribución pacífica estricta, infrutescencias más pequeñas y manejo cultural específico afrochocoano. Manejo agroecológico: regeneración natural por escarabajo dispersor; siembra enriquecimiento bajo dosel a 8-12 m entre plantas; tolerante a sombra del 60-80%; resiliente a inundación temporal de orillas. Función en chagra/agroforestal del Pacífico como sustento económico de comunidades afrocolombianas y Embera-Wounaan (cadena de valor de artesanía marfil vegetal con certificación FairTrade), conservación de palma casi-amenazada por sobreextracción histórica, restauración de bosques chocoanos degradados, banco genético del bioma con mayor biodiversidad endémica de Colombia. Fuentes Tier A: POWO Kew, GBIF, Bernal & Galeano 2010 Palmas de Colombia (referencia obligada para palmas colombianas), Sinchi, IIAP Pacífico (Instituto de Investigaciones Ambientales del Pacífico Chocó), Cárdenas-Salinas frutales amazónicos.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "pithecellobium_dulce",
@@ -25081,7 +25128,8 @@
       ],
       "valor_pedagogico": "El chiminango, payandé o pinto (Pithecellobium dulce (Roxb.) Benth., Fabaceae subfamilia Mimosoideae) es uno de los frutales silvestres más patrimoniales del bosque seco tropical (bs-T) colombiano, ampliamente distribuido en cercas vivas tradicionales del Caribe y Valle del Cauca, fuente de fruta dulce-ácida apetente para consumo fresco y dulces caseros. Su nombre español \"chiminango\" es de origen quechua-mochica y \"payandé\" parece ser de origen muisca-chibcha (el municipio de Payandé en Tolima toma su nombre del árbol). Nativo del Neotrópico desde México hasta Venezuela y Andes peruanos, en Colombia se distribuye dominante en bs-T de Caribe (La Guajira, Cesar, Magdalena, Atlántico, Bolívar, Córdoba, Sucre), Valle del Cauca, Cauca, Tolima, Huila, Santanderes y piedemonte llanero entre 0-1.200 msnm en zona térmica exclusivamente cálida. Naturalizado tan extensamente en India, Filipinas y México que muchos lo creen asiático (donde es \"guamúchil\"), pero el origen genético-evolutivo es netamente neotropical americano. Árbol mediano caducifolio de 8-15 m de altura con espinas estipulares pequeñas (1-5 mm) en pares en las axilas foliares (no causan riesgo significativo de manejo, a diferencia de Prosopis juliflora), copa redondeada de 6-10 m de diámetro, fuste corto tortuoso con corteza grisácea fisurada, hojas bipinnadas con un solo par de pinnas y 2 folíolos terminales asimétricos, flores blanco-rosadas en cabezuelas globulosas pequeñas melíferas, frutos en vaina linear espiralada característica (rasgo diagnóstico) marrón-rojiza dehiscente a la madurez exponiendo el arilo blanco-rosado a rojizo dulce-ácido sabroso que rodea las semillas negras brillantes (estos arilos son la parte comestible). El fruto se cosecha entre marzo-mayo y septiembre-noviembre dependiendo del régimen pluvial regional, las vainas maduras se cosechan con cuidado de las pequeñas espinas estipulares, se abren a mano y se chupan los arilos como golosina natural muy apetente especialmente para niños del Caribe colombiano. También se preparan dulces caseros tradicionales, mermeladas, refrescos (agua de chiminango), y vinos artesanales de fermentación. Como leguminosa Mimosoideae fija nitrógeno biológico mediante rizobios y tolera notablemente suelos pobres, compactados y salinos costeros (hasta 8-10 dS/m de conductividad eléctrica), siendo una de las pocas leguminosas viables en zonas salinizadas del Caribe colombiano. Es planta melífera importante: la floración blanco-rosada (febrero-abril y agosto-octubre) produce miel monoflora aromática \"miel de chiminango\" apreciada en apicultura caribeña, y atrae masivamente abejas nativas Meliponini, abejas africanizadas Apis mellifera scutellata y avifauna nectarívora. Como árbol de cerca viva tradicional del bs-T se planta a 50-80 cm de distancia en línea cercando potreros y huertos, podándose anualmente a 2-3 m de altura, generando rebrotes vigorosos densos que cumplen función de cerca viva infranqueable para ganado y simultáneamente proveen frutos cosechables, forraje suplementario tierno (proteína 18-22% MS), madera de buena densidad para postes (durabilidad 8-12 años en suelo) y leña doméstica. Su madera marrón clara de densidad media-alta (0.7-0.8 g/cm³) es apreciada en construcción rural ligera, postes para cerca, mangos de herramienta, leña. En restauración del bs-T degradado funciona como pionera tolerante a salinidad, sequía y suelos compactados, ayudando a recuperar pastizales degradados del Caribe seco. Manejo agroecológico: propagación por semilla fresca sin tratamiento pre-germinativo (germinación 80-90% a 5-10 días), vivero 3-4 meses a sol pleno, plantación definitiva a 25-35 cm de altura, distancia 50-80 cm para cerca viva o 8×8 m para silvopastoril (80-120 árb/ha), poda anual de cerca viva en estación seca, primera cosecha de frutos año 3-4. Esqueje leñoso opcional para clonar variedades selectas con arilo más dulce. Es lección extraordinaria de frutales silvestres patrimoniales subutilizados del bs-T colombiano: una especie nativa que provee simultáneamente fruta dulce de mercado local, forraje, madera, leña, miel monoflora, cerca viva, fijación de N en suelos salinos donde poco prospera, y resiliencia climática en zonas áridas — un solo árbol que sostiene la economía campesina del Caribe y el Valle. Defenderlo es defender la soberanía alimentaria local frente al monocultivo y la importación de frutas exóticas que no toleran el bs-T degradado. Fuentes Tier A: Bernal et al. 2015 Catálogo Plantas y Líquenes Colombia, POWO Kew, GBIF Backbone Taxonomy, Agrosavia frutales tropicales, Pérez Arbeláez 1947 Plantas Útiles Colombia.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "polygonum_punctatum",
@@ -25216,7 +25264,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "Uyei"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "pourouma_cecropiifolia_silvestre",
@@ -25259,7 +25308,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "Uyei"
-      ]
+      ],
+      "estrato": "alto"
     },
     {
       "id": "pouteria_torta",
@@ -25299,7 +25349,8 @@
       ],
       "valor_pedagogico": "El caimito del monte (Pouteria torta (Mart.) Radlk., familia Sapotaceae) es un árbol frutal silvestre nativo neotropical distinto al caimito cultivado Pouteria caimito (ya en catálogo) — esta entrada documenta la especie silvestre del bosque chocoano biogeográfico y amazónico, manejada por comunidades indígenas y afrocolombianas en sistemas agroforestales tradicionales y forestales no maderables. Se distribuye en bosque húmedo y muy húmedo tropical entre 0 y 1.300 msnm en Colombia (Chocó biogeográfico: Chocó, Valle del Cauca pacífico — Buenaventura, Bajo Calima; Cauca pacífico: Guapi, Timbiquí; Nariño pacífico: Tumaco, Barbacoas; toda la Amazonia colombiana: Leticia, Puerto Nariño, La Pedrera, Tarapacá, Mitú, Inírida; Caquetá, Putumayo, Guaviare; piedemonte llanero del Meta), Venezuela amazónica, Ecuador amazónico, Perú (Loreto, Ucayali, Madre de Dios), Bolivia (Pando, Beni) y Brasil amazónico extenso. Es PEDAGÓGICAMENTE EXCELENTE como lección viva del aprovechamiento de frutales silvestres del bosque tropical húmedo por parte de los pueblos indígenas TIKUNA (trapecio amazónico — Leticia, Puerto Nariño, comunidades Maranguapé), HUITOTO/MUINANE/BORA (medio Caquetá-Putumayo — territorios de Predio Putumayo, Aduche), YAGUA (Amazonas), COFAN (piedemonte putumayense), INGA (Sibundoy, alto Putumayo), SIONA (Putumayo) del piedemonte amazónico colombiano, y por las COMUNIDADES AFROCOLOMBIANAS del Chocó biogeográfico (consejos comunitarios Cocomacia, Acadesan, Cocomasur del Bajo Atrato, San Juan, Baudó, Buenaventura, Guapi, Timbiquí, Tumaco) y comunidades EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano-vallecaucano. Pertenece al género Pouteria (Sapotaceae, subfamilia Chrysophylloideae) con ~325 especies pantropicales — el género más diverso de Sapotaceae — donde encontramos varios frutales emblemáticos (P. caimito caimito cultivado ya en catálogo, P. lucuma lúcumo andino, P. sapota mamey-zapote mesoamericano, P. campechiana canistel, P. macrophylla cutite). Distinta a P. caimito por su distribución silvestre amplia (no cultivada intensivamente), fruto más pequeño (4-7 cm vs 6-10 cm en P. caimito cultivada), forma elipsoidal-oblonga (vs globosa en P. caimito), y manejo cultural de poblaciones silvestres-semicultivadas. Árbol perennifolio de 15-25 m altura con tronco recto cilíndrico, corteza marrón-grisácea exudante de látex blanco lechoso (carácter diagnóstico de Sapotaceae — látex de muchas Sapotaceae es base del chicle natural balatá-gutapercha), hojas alternas elípticas-oblanceoladas 10-20 cm verde-oscuras coriáceas brillantes con haz glabro y envés más claro, flores pequeñas blanco-cremas tubulares en fascículos axilares polinizadas por insectos pequeños (mosquitas, abejas trigonas, escarabajos), fruto baya elipsoidal-oblonga 4-7 cm amarillo-anaranjado-marrón cuando madura con cáscara coriácea conteniendo 1-3 semillas grandes elipsoidales marrón-brillantes envueltas en pulpa blanca-amarillenta-cremosa dulce-aromática-mucilaginosa (sabor a flan-vainilla-caimito con notas tropicales). USOS: pulpa consumida fresca directa del fruto (refrescante y muy energética por azúcares), en jugos, helados, mermeladas, dulces; semillas tostadas comestibles; látex blanco como pegamento natural y base de chicle; madera dura para construcción rústica y carpintería de talleres comunitarios. Manejo agroecológico: sombra parcial 50-70%; siembra a 8-12 m entre árboles en sistema agroforestal con cacao, bacao, borojó, copoazú, sorva; cosecha manual cuando el fruto amarillea-amaronea completamente; dispersión natural por monos churucos (Lagothrix), aulladores (Alouatta), tucanes y paujiles. Función en chagra/agroforestal chocoano-amazónica como cosecha comunitaria sostenible de frutal silvestre, conservación del género Pouteria neotropical (uno de los más diversos), banco genético de Sapotaceae silvestre (importante para mejoramiento de P. caimito cultivada), seguridad alimentaria estacional comunitaria. Fuentes Tier A: POWO Kew, GBIF, Sinchi, IIAP Pacífico, Cárdenas-Salinas frutales amazónicos, Bernal 2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "prosopis_juliflora",
@@ -25454,7 +25505,8 @@
       ],
       "valor_pedagogico": "El cerezo ducezno (Prunus avium (L.) L. cv. Ducezno, Rosaceae) es un frutal templado caducifolio europeo naturalizado en el altiplano cundiboyacense por colonos europeos del siglo XIX-XX. Crece entre 2.400 y 2.800 msnm en zona térmica fría con acumulación natural de horas frío altas (≥600 h <7°C), presente en Cundinamarca (Subachoque, Tabio, Tenjo, Cogua, Chía, Sopó, La Calera), Boyacá (Paipa, Duitama, Sogamoso, Tibasosa, Tunja, Nobsa), altiplano nariñense (Pasto, Ipiales, Túquerres) y altiplano antioqueño (Santa Rosa de Osos, Belmira). Árbol de 8-15 m de altura, copa piramidal abierta, follaje caducifolio que se torna rojizo-anaranjado en otoño tropical. Flores blancas en umbela perfumadas que abren con las hojas, fuertísimo atractivo para abejas (Apis mellifera) y abejorros nativos (Bombus rubicundus, Bombus funebris). Frutos en drupa globosa pequeña de 18-25 mm, piel rojo-oscura a casi negra brillante, pulpa rojo-vinosa firme dulce-acidulada (16-22° Brix) con carozo redondeado adherido. Lección viva de patrimonio agrofloral europeo-andino: enseña a niñas y niños que las cerezas frescas del altiplano colombiano son una rareza productiva de cosecha corta (3-4 semanas anuales) que vale celebrar y proteger, alternativa local a cerezas chilenas importadas. Manejo agroecológico: poda de formación en eje central modificado, distancia 5×6 m (333 árboles/ha), aclareo selectivo, fertilización con compost + biol foliar + bocashi, control de Drosophila suzukii (mosca de las alas manchadas) con trampas de vinagre+azúcar+jabón y red antiinsectos, manejo de Monilinia laxa con caldo bordelés preventivo y poda sanitaria. Asocios: tagasaste cortavientos N-fijador, sauce alianta polinizador, manzano sabanero como compañía sinérgica (mismo ciclo). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "prunus_domestica_ciruela_imperial",
@@ -25501,7 +25553,8 @@
       ],
       "valor_pedagogico": "La ciruela imperial (Prunus domestica L. cv. Imperial, Rosaceae) es un frutal templado caducifolio eurasiático cultivado tradicionalmente en altiplanos andinos colombianos desde la época colonial. Crece entre 2.200 y 2.700 msnm en zona térmica fría, presente en Cundinamarca (Sopó, Chía, Tabio, Tenjo, Subachoque, Choachí, Ubaque, Sasaima), Boyacá (Nuevo Colón, Jenesano, Tibaná, Ramiriquí, Tibasosa, Paipa, Duitama), Nariño (Pasto, Buesaco, Sandoná, Ipiales), Norte de Santander (Pamplona, Chitagá) y altiplano antioqueño (Santa Rosa de Osos, La Unión). Árbol de 4-8 m de altura, copa redondeada-extendida, hábito ramificado. Flores blanco-puras en corimbo de 2-3 flores que abren antes que las hojas, atractivo para Apis mellifera y polinizadores nativos. Frutos en drupa elipsoidal de 4-6 cm, piel violeta-azulada cubierta de pruína blanquecina característica, pulpa amarillo-ámbar jugosa dulce-acidulada (13-16° Brix), carozo libre (freestone) elíptico. Lección viva de patrimonio frutícola colonial andino y soberanía alimentaria templada: enseña a niñas y niños que la ciruela colombiana del altiplano es alternativa local fresca de mucho mejor calidad que la ciruela importada en compota o seca, y que el ciruelo es un árbol de doble propósito (frutal+ornamental con floración espectacular). Manejo agroecológico: poda de formación en vaso abierto o eje central modificado, distancia 4×5 m (500 árboles/ha), fertilización con compost + bocashi + biol foliar, control de Monilinia fructicola (podredumbre parda) con caldo bordelés y poda sanitaria, manejo de Hoplocampa flava (avispa del ciruelo) con trampas de feromonas, control de Anastrepha con trampas McPhail. Asocios: tagasaste cortavientos N-fijador, fresa Monterrey cobertura productiva, manzano sabanero compañía sinérgica, trébol blanco como cobertura N-fijadora. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "prunus_persica_amarilla",
@@ -25547,7 +25600,8 @@
       ],
       "valor_pedagogico": "El durazno amarillo Sabanero (Prunus persica (L.) Batsch cv. Amarillo Sabanero, Rosaceae) es un frutal templado caducifolio de origen chino con tradición de cultivo de ≥3 siglos en el altiplano colombiano. Se cultiva entre 2.000 y 2.600 msnm en zona térmica fría y templada-fría, presente en Antioquia (Santa Rosa de Osos, Belmira, La Unión, Sonsón, Yarumal), Boyacá (Nuevo Colón, Jenesano, Tibaná, Ramiriquí, Boyacá-Boyacá, Tibasosa), Cundinamarca (Sasaima, Pacho, San Francisco, Sopó, Choachí), Nariño (Buesaco, Pasto, Sandoná) y Norte de Santander (Pamplona). Árbol de 3-6 m de altura, copa abierta. Flores rosadas solitarias antes de las hojas, fuerte atractivo para abejas. Frutos drupáceos globosos de 5-7 cm, piel pubescente amarilla con chapa roja al sol, pulpa amarilla-naranja firme jugosa muy dulce-aromática (11-14° Brix) y carozo libre (freestone) en variedad amarilla. Es lección viva de soberanía alimentaria templada y patrimonio campesino antioqueño-boyacense: enseña a niñas y niños que el durazno colombiano es muchísimo más fresco, sabroso y de menor huella de carbono que el durazno chileno importado en lata o fresco. Manejo agroecológico: poda de formación en vaso abierto (mejor luminosidad), aclareo de frutos al estado de chícharo (40% de frutos jóvenes), distancia 4×5 m (500 árboles/ha), fertilización con compost + bocashi + biol foliar, control de Monilinia fructicola (podredumbre parda) con caldo bordelés + caldo sulfocálcico preventivo, manejo de Anastrepha fraterculus (mosca de la fruta) con trampas McPhail + bioplaguicida Beauveria bassiana, control de Taphrina deformans (lepra del durazno) con Bordelés en yema dormante. Asocios: tagasaste cortavientos, fresa como cobertura productiva, papa criolla calles primeros 2 años, trébol blanco fijador. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015, Pérez-Arbeláez 1947 Plantas Útiles.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "prunus_serotina_capuli",
@@ -25594,7 +25648,8 @@
       ],
       "valor_pedagogico": "El capulí (Prunus serotina Ehrh. subsp. capuli) es un árbol frutal nativo de los Andes con frutos tipo cereza pequeña dulce-ácida ampliamente consumidos en Colombia, además de su uso ornamental y forestal en sistemas agroforestales. Crece naturalmente y se cultiva en Cundinamarca (Choachí, Ubaque, Fómeque), Boyacá (Soatá, Tibaná), Nariño (Pasto, Túquerres), Cauca y Tolima entre 2.000 y 3.200 msnm en zona térmica fría. Árbol caducifolio puede alcanzar 8-12 m, copa esférica densa. Manejo agroecológico: propagación por semilla (estratificación frío 60 días) o injerto; uso en cercas vivas, sombra de potreros, restauración bosque altoandino. Frutas atraen avifauna nativa. Fuentes Tier A: Catálogo de Plantas y Líquenes Colombia (Bernal et al.), POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA, ICA Resolución 3168/2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "pseudobombax_septenatum",
@@ -25740,7 +25795,8 @@
       "valor_pedagogico": "La guayaba ácida o cas (Psidium friedrichsthalianum (O.Berg) Nied., familia Myrtaceae) es un árbol pequeño-mediano (5-10 m altura, tronco característico de corteza papirácea exfoliante color cobrizo-canela) nativo de Mesoamérica (Costa Rica, Nicaragua, Panamá, sur de México) y noroccidente sudamericano (vertiente pacífica y amazónica de Colombia: Chocó, Valle del Cauca, Cauca, Nariño, Putumayo, Caquetá, Amazonas), donde aparece naturalmente en bosques húmedos tropicales secundarios y se cultiva tradicionalmente en huertas familiares por sus frutos altamente ácidos. Produce frutos esféricos pequeños a medianos (3-5 cm diámetro) de cáscara amarilla brillante lisa al madurar, pulpa blanca-rosada muy ácida (pH 2.5-3.0) con numerosas semillas pequeñas duras, sabor que combina la guayaba dulce común con un toque cítrico y resinoso muy distintivo. Lección viva: árbol-puente entre Centroamérica y Sudamérica que enseña cinco conceptos críticos: (1) la diferencia entre las dos especies del género Psidium domesticadas — la guayaba dulce común (P. guajava) cosmopolita y supercultivada, versus la guayaba ácida (P. friedrichsthalianum) regional y artesanal — como ejemplo de domesticación parcial y mantenimiento de variabilidad silvestre cercana al ancestro, lección útil para entender el continuo silvestre-cultivado; (2) el rol del intercambio biótico de plantas útiles a lo largo del puente terrestre centroamericano-sudamericano post-cierre del istmo de Panamá (3 millones de años atrás), parte del Gran Intercambio Biótico Americano (GABI); (3) el uso como portainjerto resistente — la guayaba ácida es la planta madre injertable preferida para injertar guayaba dulce comercial (P. guajava) en zonas con problemas de Meloidogyne incognita (nematodo del nudo radical) o hongos del suelo, lección práctica de injertación interespecífica y manejo agroecológico de patógenos sin agroquímicos; (4) la cultura gastronómica costarricense del 'fresco de cas' (jugo agridulce con azúcar) como ejemplo de patrimonio gastronómico regional asociado a una sola especie botánica, lección de etnobiología aplicada; (5) los compuestos volátiles aromáticos de la familia Myrtaceae (eugenol, mirceno, limoneno, ácido ascórbico abundante 100-200 mg/100 g) como base bioquímica del aroma característico y de las propiedades antimicrobianas reconocidas en medicina tradicional para tratamiento de afecciones gastrointestinales y respiratorias. Manejo agroecológico: siembra en huertas familiares y cercas vivas; asocio con cítricos, plátano, lulo amazónico y café; cosecha manual escalonada (mayo-agosto en piedemonte amazónico colombiano); cero agroquímicos; control biológico de Anastrepha fraterculus (mosca de la fruta) por trampas McPhail con cebos proteínicos y bolsas de papel sobre frutos en desarrollo. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía, FAO EcoCrop.",
       "validation_level": "claude_draft",
       "_anti_confusion": "Psidium = guayaba (Myrtaceae). NO confundir con Acca sellowiana (feijoa) ni Passiflora.",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "psophocarpus_tetragonolobus",
@@ -25829,7 +25885,8 @@
       ],
       "valor_pedagogico": "La pera Anjou (Pyrus communis L. cv. Anjou, Rosaceae) es un frutal templado caducifolio europeo tradicionalmente cultivado en el altiplano cundiboyacense desde la época colonial. Crece entre 2.200 y 2.700 msnm en zona térmica fría con acumulación de horas frío suficientes (≥400 h <7°C), presente en Cundinamarca (Sopó, Chía, Subachoque, Tenjo, Cogua, Zipaquirá, Ubaté), Boyacá (Paipa, Tibasosa, Duitama, Sogamoso, Nobsa, Tunja), Nariño (Pasto, Ipiales) y altiplano antioqueño (Santa Rosa de Osos, Belmira, La Unión). Árbol de 5-10 m de altura, copa piramidal-elongada, hábito más erecto que el manzano. Flores blancas en corimbo agrupado que abren antes que las hojas, fuerte atractivo para Apis mellifera y polinizadores nativos. Frutos en pomo piriforme característico (8-12 cm), piel verde-amarillenta con chapa rosa-asalmonada al sol, pulpa blanco-cremosa jugosa muy dulce-perfumada (13-15° Brix) que madura post-cosecha (climatérico). Lección viva de patrimonio frutícola colonial andino: enseña a niñas y niños que los huertos campesinos de la Sabana llevan más de tres siglos integrando perales europeos al paisaje productivo, formando parte de la identidad cundiboyacense. Manejo agroecológico: poda de formación en eje central modificado, distancia 4×5 m (500 árboles/ha), aclareo de frutos manual para tamaño comercial, fertilización con compost + bocashi + biol, control de Erwinia amylovora (fuego bacteriano) con cobre + poda sanitaria estricta, manejo de Psylla pyri con caldo sulfocálcico + parasitoides nativos. Asocios: tagasaste como cortavientos N-fijador, fresa Monterrey como cobertura, manzano sabanero para polinización cruzada (autoincompatible). Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, AGROSAVIA Manual Frutales Tropicales, ICA Resolución 3168/2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "raphanus_sativus_longipinnatus",
@@ -26066,7 +26123,8 @@
       "valor_pedagogico": "La mora de Castilla sin espinas (Rubus glaucus Benth. cv. sin espinas, también llamado morera andina) es una rosácea perenne híbrida desarrollada para facilitar la cosecha (sin espinas en cañas), variedad comercial dominante en Colombia. Se cultiva en Cundinamarca (Subachoque, San Bernardo, Silvania), Boyacá, Antioquia, Cauca, Nariño y Valle del Cauca entre 1.800 y 2.800 msnm en zona térmica fría a templada. Ciclo a primera cosecha 8-10 meses; productividad sostenida 5-8 años. Rendimiento 10-15 t/ha en sistema agroecológico. Tutorado horizontal con alambre doble o espaldera T. Manejo: poda anual cañas viejas, mulch grueso (paja, virutas), fertilización con compost + biol, control de antracnosis (Colletotrichum gloeosporioides) con caldo bordelés. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft",
       "_anti_confusion": "Rubus glaucus = mora andina/de Castilla (Rosaceae). NO confundir con Morus nigra (morera).",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "bajo"
     },
     {
       "id": "rubus_idaeus_golden",
@@ -26111,7 +26169,8 @@
       "valor_pedagogico": "Frambuesa dorada cultivada en zonas frías de Colombia (Cundinamarca, Boyacá, Nariño, Santander) entre 2000-2600 msnm, en zona térmica frío. Propagación por hijuelos con excelente enraizamiento; ciclo productiva de 3-5 años con podas de renovación. Se asocia con leguminosas (frijol, alfalfa) que fijan nitrógeno y protegen de erosión. Plagas principales: araña roja (Tetranychus urticae), trips y botrytis en frutos por exceso de humedad. Contexto cultural: los muiscas cultivaban frutales nativos de altura como uchuva y mora; la introducción de Rubus spp. doradas data del siglo XX con cultivares traídos de Norteamérica. Los agricultores andinos valoran esta variedad por su bajo requerimiento de frío comparado con rojas y por su dulzura sin astringencia. Fuente: ICA Resolución 3168-2015 regula el material vegetal de frutales menores en Colombia.",
       "validation_level": "claude_draft",
       "_anti_confusion": "Rubus glaucus = mora andina/de Castilla (Rosaceae). NO confundir con Morus nigra (morera).",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "bajo"
     },
     {
       "id": "rubus_idaeus_heritage",
@@ -26157,7 +26216,8 @@
       "valor_pedagogico": "La frambuesa roja variedad Heritage (Rubus idaeus L. cv. Heritage) es una rosácea perenne primocane (fructifica primer año en tallo nuevo) ampliamente adoptada en cultivo agroecológico colombiano altoandino. Se cultiva en Cundinamarca (Sabana Bogotá, Choachí, Sumapaz), Boyacá (Sotaquirá, Sogamoso) y Nariño entre 2.200 y 2.800 msnm en zona térmica fría. Ciclo a primera cosecha 6-8 meses; productividad sostenida 5-7 años con poda anual. Estructura de espaldera con alambre doble. Manejo agroecológico: mulch grueso (paja, virutas) para conservar humedad y suprimir malezas, fertilización con compost maduro + biol foliar, control de antracnosis (Colletotrichum) con caldo bordelés. Fuentes Tier A: AGROSAVIA, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft",
       "_anti_confusion": "Rubus glaucus = mora andina/de Castilla (Rosaceae). NO confundir con Morus nigra (morera).",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "bajo"
     },
     {
       "id": "salvia_officinalis",
@@ -26413,7 +26473,8 @@
       ],
       "valor_pedagogico": "La pitahaya amarilla (Selenicereus megalanthus (K.Schum. ex Vaupel) Moran, Cactaceae) es un cactus epífito-hemiepífito trepador perenne originario del piedemonte amazónico-andino de Colombia, Ecuador, Perú y Bolivia, cultivado comercialmente en Colombia entre 1.200 y 1.900 msnm en clima templado-cálido moderado en Boyacá (Miraflores, Páez, San Eduardo, principal productor — denominación de origen 'Pitahaya de Miraflores' bajo estudio), Cundinamarca (Caqueza, Fómeque, Ubaque, Quetame), Huila, Valle del Cauca y Santander. Pertenece a la familia Cactaceae tribu Hylocereeae (igual que la pitaya roja Hylocereus undatus y Hylocereus costaricensis), de tallos verdes triangulares-3-angulados con aréolas y espinas cortas blanco-amarillentas, crecimiento trepador con raíces aéreas que se adhieren a árboles tutores o estructuras de tutorado (concreto/madera/tela polietileno), flores nocturnas blanco-cremas gigantes (25-35 cm de diámetro, las más grandes de la flora colombiana cultivada) que abren una sola noche y son polinizadas por murciélagos nectarívoros (Anoura, Glossophaga) y polillas esfíngidas — aunque en cultivos comerciales se realiza polinización manual matinal para asegurar cuajado. Fruto baya elipsoidal con cáscara amarillo-brillante con brácteas (escamas) cortas y pulpa blanca translúcida con semillas negras pequeñas masticables (sabor dulce delicado, único en el mundo: Colombia es líder mundial de exportación de S. megalanthus). Es lección viva de bioeconomía sostenible, biocomercio y agroexportación colombiana que enseña a niñas y niños cómo un cactus nativo amazónico-andino se convirtió en uno de los frutales de mayor valor agregado del país (USD 8-15/kg en mercados de exportación a Europa, Asia, Norteamérica). Producto bandera del programa 'Colombia, semilla de exportación' y mercados orgánicos certificados; rica en antioxidantes (betacianinas), vitamina C, prebióticos (oligofructosa), efecto laxante suave. Manejo agroecológico: propagación por esqueje de cladodio maduro (segmento de 30-40 cm, cicatrizado 5-7 días antes de siembra) o semilla (sin uso comercial — variabilidad genética alta), tutorado obligatorio sobre 'T' de concreto con tela polietileno o sobre tutor vivo (matarratón, leucaena), distancia 3x3 m o doble fila 2.5x1.5 m, plena producción a partir de año 3-4, cosecha 8-9 meses post-floración cuando cáscara cambia de verde a amarillo intenso, polinización manual al amanecer para maximizar cuajado. Función en chagra como frutal de alto valor agregado, atractora de murciélagos polinizadores nocturnos, cultivo de exportación sostenible. Fuentes Tier A: GBIF, POWO Kew, AGROSAVIA Sol Andina, SiB Colombia, Bernal 2015, ICA Resolución 3168.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "bajo"
     },
     {
       "id": "setaria_sphacelata",
@@ -26586,7 +26647,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "Tomate de árbol"
-      ]
+      ],
+      "estrato": "medio"
     },
     {
       "id": "solanum_betaceum_naranja",
@@ -26624,7 +26686,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "Tomate de árbol"
-      ]
+      ],
+      "estrato": "medio"
     },
     {
       "id": "solanum_lycopersicum_cerasiforme_uvalina",
@@ -26752,7 +26815,8 @@
       "valor_pedagogico": "La naranjilla amazónica o lulo de tierras bajas (Solanum quitoense Lam. var. septentrionale, familia Solanaceae) es la variedad ecotípica de zonas bajas amazónicas y piedemonte (200-1.200 msnm) del complejo del lulo andino (S. quitoense var. quitoense, 1.600-2.400 msnm) que se cultiva en chagras campesinas e indígenas del piedemonte amazónico colombiano (Caquetá: Florencia, Belén de los Andaquíes, San Vicente del Caguán; Putumayo: Mocoa, Villagarzón, Puerto Asís; Amazonas: Leticia, Tarapacá; Vichada: Cumaribo). Se diferencia de la variedad andina típica por dos rasgos morfo-fisiológicos diagnósticos: (1) ausencia o reducción drástica de espinas en tallo y hojas (variedad inerme, mientras el lulo andino es espinoso), (2) mayor tolerancia térmica (óptimo 20-28 °C versus 16-22 °C de la variedad andina) y altitudinal hacia abajo, (3) frutos más pequeños (3-5 cm diámetro vs 5-8 cm del lulo andino) y menos ácidos. Produce frutos esféricos anaranjados-amarillentos pubescentes (vellosidades estrelladas marrones que se desprenden al frotar) de pulpa verde gelatinosa rica en vitamina C, ácido cítrico, ácido málico y carotenoides. Lección viva: planta-puente entre el piedemonte amazónico y el altiplano cundiboyacense que enseña tres conceptos botánicos y agroecológicos críticos: (1) el concepto de variedad ecotípica como adaptación local intraespecífica — la misma especie Solanum quitoense desarrolla dos ecotipos diferenciados (andino espinoso vs amazónico inerme) por presión selectiva diferencial de altitud, temperatura y herbivoría, ejemplo magistral de plasticidad fenotípica y selección adaptativa local; (2) la importancia de conservar germoplasma campesino e indígena de variedades adaptadas localmente como soberanía genética y alimentaria, especialmente frente al riesgo de erosión genética por hibridación con la variedad comercial andina; (3) el rol del lulo amazónico en la cadena de valor regional — pulpa congelada en frigoríficos de Florencia y Mocoa, jugos en cafeterías y restaurantes amazónicos, mermeladas artesanales en mercados campesinos. Manejo agroecológico: siembra bajo sombra de plátano, guamo (Inga edulis) o copoazú, asocio en SAF con yuca y piña, control biológico de Neoleucinodes elegantalis (perforador del fruto) con Trichogramma pretiosum, vigilancia de Meloidogyne incognita (nematodo del nudo radical), cero agroquímicos. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy, GBIF Colombia, AGROSAVIA Manual Frutales Tropicales, Bernal 2015 Catálogo Plantas Colombia, SINCHI Amazonía.",
       "validation_level": "claude_draft",
       "_anti_confusion": "Solanum quitoense = lulo/naranjilla. NO confundir con Solanum lycopersicum (tomate).",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "medio"
     },
     {
       "id": "solanum_sessiliflorum",
@@ -26903,7 +26967,8 @@
       ],
       "valor_pedagogico": "El jobo cajá, cajá-manga, ambarella o manga del Perú (Spondias dulcis Parkinson, Anacardiaceae — sinónimo histórico Spondias cytherea Sonn.) es un árbol frutal perenne tropical originario de las islas del Pacífico Sur (Polinesia, Melanesia — origen oceánico, no neotropical, a diferencia de sus hermanas Spondias americanas mombin y purpurea), domesticado en Polinesia hace miles de años, llevado por exploradores europeos (Captain Cook 1768-1779, traslado documentado a las Antillas francesas en el siglo XVIII) y ampliamente naturalizado en todo el trópico mundial (Indias, Sudeste Asiático, Caribe, Brasil — donde se llama \"cajá-manga\" y se popularizó masivamente, Centroamérica, África). En Colombia se cultiva en zonas cálidas costeras y de valle (Atlántico, Bolívar, Magdalena, Córdoba, Sucre, Cesar, La Guajira, Chocó, valle bajo y medio del Magdalena, Llanos bajos, Antioquia bajo Cauca-Urabá, Valle del Cauca cinturón frutícola, Tolima-Huila cálidos) entre 0 y 900 msnm con temperaturas 22-30 °C, sol pleno, suelos bien drenados, riego moderado, tolerante a sequías estacionales y vientos costeros. Árbol semicaducifolio mediano-grande de 12-25 m altura con copa amplia abierta-irregular, corteza gruesa gris-marrón fisurada, follaje pinnado parcialmente caduco en estación seca. Hojas grandes (25-60 cm) alternas-pinnadas con 9-25 folíolos elípticos-lanceolados verde-brillante. Flores pequeñas blanco-verdosas perfumadas en panículas terminales largas (30-50 cm) polinizadas por abejas, mariposas y mosquitas-de-las-flores. Frutos drupa elipsoide grande (6-10 cm largo, 3-6 cm ancho, 100-400 g) — frutos significativamente más grandes que sus hermanas Spondias americanas —, cáscara firme amarillo-dorada-anaranjada al madurar, pulpa amarillo-clara firme jugosa-aromática aroma único intermedio entre piña-mango-manzana-ciruela-vainilla (15-18 °Brix maduro), con un hueso grande fibroso-espinoso característico (la masa fibrosa rodea el hueso interno y forma una \"red espinosa\" alrededor — adaptación de dispersión por mamíferos grandes del origen oceánico polinesio). Frutos consumidos en madurez para fruta fresca y a medio madurar (verde-amarillentos) para encurtidos, ensaladas tropicales y bebidas refrescantes (en Brasil y Caribe se hace \"suco de cajá-manga\" famoso). Manejo: plantación a 10-12 m, ideal en patios tropicales caribeños y de valles cálidos, asocio con mango, aguacate, anón, mamey amarillo, níspero, papayo, plátano. Función pedagógica destacada: enseña a niñas y niños (1) BIOGEOGRAFÍA de Spondias — el género tiene origen pantropical con tres centros principales (Sudamérica neotropical jobo S. mombin, Mesoamérica ciruela S. purpurea, Oceanía polinesia ambarella S. dulcis — todos llegaron a Colombia por rutas distintas y en épocas distintas), (2) HISTORIA de la dispersión postcolombina de cultivos por expediciones europeas (Cook, Bligh) entre Oceanía y América-Caribe — lección de historia botánica colonial, (3) adaptación de hueso fibroso-espinoso como dispersión por mamíferos grandes terrestres (en Polinesia: cerdos, ratas; en Neotrópico naturalizado: tapires, dantas, zaínos, monos), (4) familia Anacardiaceae frutales globales (mango Mangifera, marañón Anacardium, jobo Spondias mombin, ciruela Spondias purpurea, ambarella Spondias dulcis, pistacho Pistacia) y (5) por qué se llama \"cajá-manga\" en Brasil — porque combina caracteres de cajá (S. mombin nativo neotropical, fruta pequeña) y de manga (Mangifera indica asiática, fruta grande aromática) en un solo fruto. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015, AGROSAVIA, FAO Ecocrop.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "stenocereus_griseus",
@@ -26948,7 +27013,8 @@
       ],
       "valor_pedagogico": "El cardón datos o iguaraya (Stenocereus griseus (Haw.) Buxb., Cactaceae subfamilia Cactoideae tribu Pachycereeae) es un cactus columnar arborescente frutal silvestre nativo del bosque seco tropical caribeño, endémico regional del norte de Colombia-Venezuela-Antillas Holandesas (igual área biogeográfica que Cereus repandus pero coexistiendo en mosaico), distribuido en Colombia entre 0 y 500 msnm en La Guajira (Alta y Media Guajira — Uribia, Maicao, Manaure, Cabo de la Vela, Macuira, Riohacha — territorio Wayúu), Magdalena (Santa Marta, Tayrona zonas secas, Ciénaga sur), norte de Cesar (Valledupar zonas secas), Atlántico, Bolívar (interior seco), y zonas muy áridas del valle medio del Magdalena. Catalogado en CITES Apéndice II como toda la familia Cactaceae — requiere permiso ICA-MADS para movilización comercial y aprovechamiento sostenible. Pertenece a la familia Cactaceae subfamilia Cactoideae tribu Pachycereeae (igual tribu que el saguaro Carnegiea gigantea y otros cactos columnares mexicanos), planta arborescente de 6-10 m con tallos columnares cilíndricos suculentos verde-grisáceos de 8-15 cm de diámetro con 8-10 costillas y aréolas blancas con espinas grises-marrones, ramificación candelabriforme desde la base o tronco corto, flores blanco-cremosas medianas (8-12 cm) nocturnas polinizadas por murciélagos nectarívoros (Leptonycteris curasoae, Glossophaga soricina) y polillas esfíngidas, frutos baya esférica-elipsoidal de 5-8 cm con cáscara espinosa que se desprende fácilmente al madurar revelando pulpa carnosa roja-púrpura dulce (sabor parecido a la pitaya colombiana pero más intenso, rica en betalaínas antioxidantes) con muchas semillas pequeñas negras comestibles. Es lección viva extraordinaria de soberanía alimentaria indígena Wayúu, fruta silvestre del bosque seco tropical, endemismo norandino-caribeño y conservación CITES de cactáceas frutales nativas que enseña a niñas y niños cómo el pueblo Wayúu (más de 380.000 personas en la frontera colombo-venezolana) tiene en los datos (iguarayas) una de sus principales fuentes calóricas-nutricionales durante la temporada de lluvias cortas (mayo-junio), consumidos frescos directamente o procesados en chichi-iguaraya (bebida fermentada tradicional similar a la chicha de maíz pero con frutos de cardón), dulce-conserva, mermelada, jugos y sirope; las semillas tostadas son aperitivo tradicional; los tallos columnares jóvenes se cosechan-pelan-fermentan en cadushi guajiro (alimento tradicional); los tallos viejos secos vacíos sirven como vigas de techos en arquitectura tradicional rancho-bajareque guajiro; cercas vivas espinosas tradicionales contra ganado caprino-ovino. Coevolución mutualista cactus-murciélago en peligro: Leptonycteris curasoae está en peligro UICN y depende críticamente del néctar y polen de cardones columnares caribeños para su ciclo migratorio Colombia-Venezuela-Antillas Holandesas-Aruba-Curazao. Manejo agroecológico: propagación por esqueje de 40-60 cm de tallo columnar cicatrizado 15-21 días a la sombra antes de enterrar 15 cm en suelo arenoso muy drenado, distancia 2-3 m monocultivo frutal o 1.5 m en cerca, tolera sequía extrema y salinidad moderada, suelos pobres pedregosos arenosos calcáreos, producción de iguarayas año 4-6 con plena producción año 8-10, vida productiva 50-80 años, asocio xerofítico con Cereus repandus, Opuntia, Pereskia guamacho, prosopis trupillo, agaves. NO movilizar fuera de rango natural sin permiso CITES-ICA. Función en chagra como frutal silvestre nativo de zona muy seca, atractor murciélagos polinizadores en peligro, cerca viva, restaurador de bosque seco tropical Caribe, patrimonio biocultural Wayúu y soberanía alimentaria indígena. Fuentes Tier A: GBIF, POWO Kew, Bernal 2015, Pérez Arbeláez 1947, SiB Colombia, Libro Rojo Plantas Colombia, CITES Apéndice II Cactaceae / ICA Resolución 3168.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "bajo"
     },
     {
       "id": "swietenia_macrophylla",
@@ -27096,7 +27162,8 @@
       ],
       "valor_pedagogico": "El mamoncillo (Talisia olivaeformis (Kunth) Radlk., Sapindaceae) es un árbol frutal perenne nativo del Caribe continental colombo-venezolano y zonas secas tropicales del norte de Sudamérica (Colombia, Venezuela, Guayanas, Antillas Menores), distinto del mamón/quenepa de Antillas (Melicoccus bijugatus — Sapindaceae también pero género distinto y de origen diferente, ver entrada complementaria en este mismo batch), aunque popularmente ambos se confunden bajo el nombre genérico \"mamón\" o \"mamoncillo\" en el Caribe colombiano. Talisia olivaeformis es el verdadero mamoncillo NATIVO continental colombo-venezolano, mientras que Melicoccus bijugatus es el mamón-quenepa originario de las Antillas. Distribución colombiana en zonas cálidas secas del Caribe (Atlántico, Bolívar, Magdalena, Cesar — La Mata, La Paz, Codazzi, Aguachica; Guajira media-sur — Riohacha, Maicao; Norte de Santander — Cúcuta, Ocaña), valle medio del Magdalena (Honda, Puerto Berrío, La Dorada), zonas bajas de Santander (Bucaramanga, Lebrija, Girón) y enclaves de Llanos bajos (Casanare-Arauca) entre 0 y 900 msnm con temperaturas 22-30 °C, sol pleno, suelos bien drenados arcillo-arenosos calcáreos típicos del bosque seco tropical (BST). Árbol siempreverde de 10-25 m altura con copa piramidal-redondeada densa muy ornamental, madera dura amarillenta usada en carpintería rural y postes de cerca durables. Hojas grandes (15-35 cm) alternas-paripinnadas con 4-8 folíolos elípticos verde-oscuro brillante (carácter de Sapindaceae junto con tamarindo, lichi, longan, guayabo). Flores pequeñas blanco-cremosas perfumadas en panículas terminales-axilares polinizadas por abejas nativas (Trigonini, Apini), avispas y mariposas. Frutos baya elipsoide (2-3 cm) en racimos largos pendulares de 10-40 frutos por racimo, cáscara coriácea verde-amarillenta a marrón-oliva (origen del epíteto \"olivaeformis\" = \"en forma de oliva\") que se rompe con los dientes — característica práctica de consumo callejero caribeño donde se compran racimos enteros y se van mascando uno a uno —, pulpa arilo gelatinoso translúcido amarillo-rosado ácido-dulce (10-15 °Brix) rodea una semilla grande única lustrosa marrón. Manejo: árbol prácticamente silvestre rústico en BST, no requiere mayor manejo agronómico, plantación a 8-10 m, tolerante a sequías estacionales largas, suelos pobres calcáreos y vientos cálidos secos del Caribe. Importante en SISTEMAS SILVOPASTORILES de bosque seco tropical donde proporciona sombra a ganadería bovina-caprina y forraje complementario por hojas tiernas-frutos caídos. Función ecológica importante para fauna del BST: frutos consumidos por loros (Amazona, Pionus), tucanes, monos aulladores y capuchinos, agutíes y ñeques que dispersan semillas. Función pedagógica: enseña diversidad Sapindaceae tropicales (mamoncillo Talisia, mamón Melicoccus, lichi Litchi, longan Dimocarpus, ackee Blighia, guayabo Cupania — todos con frutos arilo gelatinoso comestible alrededor de semilla), distinción importante entre mamoncillo continental nativo vs mamón antillano introducido (lección de biogeografía caribeña), importancia del bosque seco tropical colombiano como ecosistema en peligro crítico (<10% remanente) con frutales nativos subutilizados, técnica práctica de consumo callejero de Sapindaceae con cáscara que se rompe a dientes. Fuentes Tier A: GBIF, POWO Kew, Pérez Arbeláez 1947, SiB Colombia, Bernal 2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "taraxacum_officinale",
@@ -27235,7 +27302,8 @@
       ],
       "valor_pedagogico": "El cacao blanco, bacao o patashte (Theobroma bicolor Humb. & Bonpl., familia Malvaceae — antes Sterculiaceae) es un frutal nativo neotropical hermano del cacao común (Theobroma cacao — ya en catálogo) distribuido desde el sur de México (Chiapas — patashte maya) por Centroamérica (Guatemala, Belice, Honduras), Colombia (Chocó biogeográfico: Chocó, Valle del Cauca pacífico — Bajo Calima, Cauca pacífico, Nariño pacífico; Amazonia: Leticia, Caquetá, Putumayo, Vaupés, Guaviare, Amazonas; piedemonte llanero del Meta y Casanare), Ecuador, Perú amazónico, Venezuela amazónica y Brasil amazónico, entre 0 y 1.400 msnm en bosque húmedo tropical. Es PEDAGÓGICAMENTE EXCELENTE como lección viva de manejo ancestral por parte de las CULTURAS PREHISPÁNICAS MAYAS (patashte ceremonial mencionado en Popol Vuh y códices), los pueblos indígenas amazónicos TIKUNA (trapecio amazónico — Leticia, Puerto Nariño), HUITOTO/MUINANE/BORA (medio Caquetá-Putumayo donde se considera 'cacao de monte' sagrado), YAGUA, COFAN, INGA del piedemonte amazónico, y EMBERA (Dóbida, Chamí, Katío) y WOUNAAN del Pacífico chocoano, así como por las COMUNIDADES AFROCOLOMBIANAS del Chocó (Cocomacia, Acadesan, consejos comunitarios del Bajo Atrato, San Juan, Baudó, Buenaventura, Guapi, Tumaco) que durante siglos lo han manejado como 'bacao' en sistemas agroforestales tradicionales — frecuentemente intercalado con cacao común (T. cacao), copoazú (T. grandiflorum — ya en catálogo), borojó (Borojoa patinoi y B. sorbilis), chontaduro (Bactris gasipaes), don pedrito (Oenocarpus mapora) y plátano (Musa spp.). Pertenece al género Theobroma (Malvaceae, subfamilia Byttnerioideae) junto a T. cacao, T. grandiflorum (copoazú), T. subincanum (cacao de monte), T. speciosum y T. obovatum. Árbol de 8-15 m altura con tronco recto cilíndrico, hojas alternas elípticas-ovaladas 20-30 cm verde-oscuras coriáceas con envés blanquecino-tomentoso (característica diagnóstica — de ahí 'bicolor'), inflorescencias caulifloras (flores directamente sobre tronco y ramas gruesas — fenómeno caulifloría como en T. cacao) con flores pequeñas blanco-rosadas polinizadas por mosquitas Forcipomyia (Ceratopogonidae), fruto cápsula leñosa elipsoidal-oblonga 15-30 cm largo x 8-15 cm ancho con cáscara dura amarilla-anaranjada cuando madura conteniendo 30-50 semillas inmersas en pulpa blanca-cremosa dulce-acidulada aromática. Diferencias con T. cacao: fruto más grande, cáscara amarilla (no roja-purpúrea), pulpa más dulce-aromática (perfil mango-piña-cacao), semillas más grandes y de uso menos chocolatero (más para harina y pulpa fresca); diferencias con T. grandiflorum: pulpa más dulce (no tan ácida), fruto menos elongado, hojas con envés tomentoso (vs envés glabro en grandiflorum). USOS: pulpa fresca consumida directamente, en jugos, helados, mermeladas, dulces; semillas tostadas y molidas dan bebida 'patashte' o 'chicha de bacao' (tradición maya y amazónica) similar al chocolate pero más ligera; semillas también consumidas tostadas como 'pepas' (similar a almendras); cáscara como abono y forraje. Manejo agroecológico: requiere sombra parcial 40-60% (igual que T. cacao); siembra a 5-7 m entre plantas; asocio con cacao, plátano, copoazú, borojó, palmas en sistema agroforestal multiestrato; tolerancia mayor a humedad alta que T. cacao (resistente a monilia y escoba de bruja); cosecha cuando el fruto suene hueco al golpe. Función en chagra/agroforestal pacífica y amazónica como cosecha comunitaria sostenible, conservación de género Theobroma neotropical, diversificación de cadena cacaotera (mercado especialidad 'cacao blanco' creciente), banco genético prehispánico mesoamericano-amazónico. Fuentes Tier A: POWO Kew, GBIF, Sinchi, IIAP Pacífico, Cárdenas-Salinas frutales amazónicos, AGROSAVIA Pacífico, Bernal 2015.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "alto"
     },
     {
       "id": "tigridia_pavonia",
@@ -27552,7 +27620,8 @@
       ],
       "valor_pedagogico": "El arándano azul variedad Emerald (Vaccinium corymbosum L. cv. Emerald, tipo southern highbush bush) es un cultivo de creciente expansión agroindustrial en Colombia con destino exportación y mercados gourmet. Se cultiva en Cundinamarca (Sabana Bogotá), Boyacá altiplano, Antioquia y Nariño entre 2.000 y 2.800 msnm en zona térmica fría a templada. Crítico requerimiento: suelos ácidos pH 4.5-5.5 con MO >5%, drenaje excelente, riego goteo constante. Productividad comercial a partir del 3er año, ciclo productivo 12-15 años. Manejo agroecológico: cama elevada con sustrato modificado (turba + corteza pino + virutas), mulch ácido (aserrín de pino), fertilización orgánica con compost ácido + harina de sangre, baja densidad de plantación (4×3 m). Fuentes Tier A: AGROSAVIA Manual Arándano 2018, ICA Resolución 3168/2015, POWO Kew, GBIF Backbone Taxonomy.",
       "validation_level": "claude_draft",
-      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)"
+      "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
+      "estrato": "bajo"
     },
     {
       "id": "vallea_stipularis",
@@ -27702,7 +27771,8 @@
       "_provenance": "promoted 2026-06-25 from cycle-content + AGE graph (grounded)",
       "nombre_comunes_regionales": [
         "Papayuela"
-      ]
+      ],
+      "estrato": "medio"
     },
     {
       "id": "verbena_officinalis",
@@ -28392,7 +28462,8 @@
       "valor_pedagogico": "El lichi (Litchi chinensis Sonn.) es un árbol frutal de la familia Sapindaceae (misma familia del mamoncillo y el rambután), originario del sur de China, donde se cultiva en franjas subtropicales entre 15° y 30° de latitud con inviernos frescos y secos que inducen la floración. En Colombia es una especie introducida y poco extendida: su cultivo comercial es marginal porque el trópico bajo cálido rara vez ofrece el descenso térmico nocturno que el lichi necesita para florecer bien; los reportes de siembra en el país se concentran en fincas de clima medio con noches frescas (aprox. 1.000-1.700 msnm), análogas a las usadas para el rambután y mangostino asiáticos. El fruto es una drupa de cáscara rugosa roja con arilo blanco translúcido dulce-aromático, muy apreciado fresco. Lección pedagógica: el lichi ilustra cómo la floración de muchos frutales subtropicales depende de un estímulo de frío (vernalización floral) ausente en el trópico ecuatorial, y por qué su cultivo en Colombia sigue siendo experimental/de nicho a diferencia del rambután (mismo grupo Sapindaceae) que sí prospera en tierra caliente. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy. Nota: la altitud y viabilidad exactas de cultivo en Colombia no están documentadas en literatura agronómica nacional consultada; validar en campo.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "nephelium_lappaceum",
@@ -28434,7 +28505,8 @@
       "valor_pedagogico": "El rambután (Nephelium lappaceum L., Sapindaceae) es un árbol frutal de origen asiático (sudeste asiático) con investigación de adaptación activa en Colombia desde mediados de la década de 2000. El material de Corpoica se estableció en el C.I. La Libertad (Villavicencio, Meta) a 467 msnm, temperatura media 28,9°C y precipitación de 3.000 mm/año, confirmando su vocación de tierra caliente húmeda (piedemonte llanero, 0-600 msnm). El fruto es una drupa cubierta de espinas blandas ('pelos') rojas a amarillas, con arilo blanco translúcido dulce similar al lichi (mismo género emparentado). Especie dioica: las plantas hembra necesitan machos o clones autofértiles cercanos para buena fructificación, por lo cual el cultivo tecnificado usa clones injertados. Lección pedagógica: el rambután muestra el potencial de diversificación frutícola de la Orinoquia colombiana (piedemonte del Meta) con especies exóticas bien adaptadas al trópico bajo húmedo, y la importancia de la polinización cruzada/dioecia en el manejo agronómico de frutales asiáticos. Fuentes Tier A: POWO Kew, GBIF; investigación Corpoica/Agrosavia (Rev. Colombiana de Ciencias Hortícolas, piedemonte del Meta).",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "garcinia_mangostana",
@@ -28477,7 +28549,8 @@
       "valor_pedagogico": "El mangostino o mangostán (Garcinia mangostana L., familia Clusiaceae) es un árbol frutal de origen sudasiático (archipiélago malayo), introducido a Colombia en la década de 1930 con los primeros cultivos en el norte del Tolima (Mariquita, Fresno, Armero-Guayabal). Actualmente se cultiva también en Risaralda, Antioquia, Meta, Quindío, Boyacá y Caldas, entre 0 y 1.200 msnm, en clima cálido-húmedo con temperaturas de 24-26°C y humedad relativa alta (80%); no tolera sequías prolongadas. El fruto es una baya de cáscara gruesa morada con pulpa blanca segmentada de sabor dulce-ácido, considerada una de las frutas tropicales más finas del mundo. Su semilla poliembriónica reproduce clones de la madre, pero el árbol crece muy lentamente (8-12 años a primera cosecha), lo que limita su expansión comercial. Lección pedagógica: el mangostino enseña el concepto de poliembrionía apomíctica (reproducción por semilla genéticamente idéntica) y el reto agronómico de los cultivos de ciclo de establecimiento muy largo para la planeación de la chagra. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; reportes agronómicos regionales (Tolima/eje cafetero).",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "dimocarpus_longan",
@@ -28520,7 +28593,8 @@
       "valor_pedagogico": "El longan (Dimocarpus longan Lour., Sapindaceae) es un árbol frutal del sur de China y sudeste asiático, pariente cercano del lichi y el rambután (misma familia Sapindaceae), con el que comparte el requerimiento de un periodo fresco para floración. Su presencia en Colombia es puntual y experimental, sin reportes consolidados de cultivo comercial; se estima que, de establecerse, prosperaría en climas medios frescos análogos a los usados para lichi (aprox. 900-1.600 msnm), más que en tierra caliente plena. El fruto es una drupa pequeña de cáscara delgada café-amarillenta con arilo blanco translúcido dulce, de textura similar al lichi pero de sabor más suave y almizclado. Lección pedagógica: el longan permite comparar dentro de un mismo género de Sapindaceae (junto a lichi, mamoncillo, rambután) cómo especies emparentadas divergen en requerimientos climáticos, ilustrando el concepto de nicho climático específico dentro de una misma familia botánica. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy. Nota: viabilidad y altitud de cultivo en Colombia no están documentadas en literatura agronómica nacional consultada; validar en campo.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "annona_muricata",
@@ -28562,7 +28636,8 @@
       "valor_pedagogico": "La guanábana (Annona muricata L., familia Annonaceae) es un árbol frutal de origen centroamericano-caribeño, ampliamente naturalizado y cultivado en tierra caliente colombiana (Tolima, Valle del Cauca, Caribe, Meta, Santanderes) entre 0 y 1.200 msnm. Produce el fruto comestible más grande del género Annona (hasta 30 cm), de cáscara verde con espinas blandas y pulpa blanca fibrosa dulce-ácida, muy usada en jugos, sorbetes y postres. La polinización natural es deficiente (depende de pequeños escarabajos nitidúlidos atraídos por el olor floral nocturno), por lo que huertos comerciales suelen requerir polinización manual para buena cuajadura de fruto. Comparte género con el anón (Annona squamosa) y la chirimoya (Annona cherimola), ya presentes en el catálogo, permitiendo comparar el gradiente térmico del género: guanábana en tierra caliente, chirimoya en clima medio-frío. Lección pedagógica: muestra la limitación de polinizadores como cuello de botella productivo y la diversidad térmica dentro de un mismo género botánico. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "annona_reticulata",
@@ -28605,7 +28680,8 @@
       "valor_pedagogico": "El anón corazón o corazón de buey (Annona reticulata L., Annonaceae) es un árbol frutal centroamericano-caribeño naturalizado en tierra caliente y media-baja de Colombia (Caribe, valles interandinos, 0-1.300 msnm), tercer miembro del género Annona documentado en el catálogo junto al anón (A. squamosa) y la chirimoya (A. cherimola), completando el gradiente térmico cálido-templado-frío de las anonáceas comestibles colombianas. Su fruto tiene cáscara lisa reticulada rojiza-parda (de ahí 'reticulata') y pulpa cremosa dulce con muchas semillas, de calidad algo inferior a la chirimoya pero de árbol más rústico y tolerante a suelos pesados y encharcamiento ocasional, razón por la cual se usa frecuentemente como patrón (portainjerto) para injertar chirimoya en zonas donde esta última no arraiga bien. Lección pedagógica: enseña el uso de especies rústicas emparentadas como patrones de injerto para extender el rango de cultivo de parientes más exigentes, técnica común en fruticultura tropical. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "tamarindus_indica",
@@ -28680,7 +28756,7 @@
       },
       "radiacion": "sol_pleno",
       "agua": "medio",
-      "drenaje_requerido": "regular",
+      "drenaje_requerido": "moderado",
       "propagation": {
         "metodo_principal": "semilla",
         "notas": "Propagación por semilla flotante (dispersión natural por agua de mar/ríos) o esqueje; planta pionera de crecimiento muy rápido y fructificación precoz (menos de 1 año)."
@@ -28692,7 +28768,8 @@
       "valor_pedagogico": "El noni (Morinda citrifolia L., familia Rubiaceae, misma familia del café) es un arbusto o árbol pequeño de origen indo-pacífico, naturalizado en la costa Caribe colombiana y zonas cálidas húmedas del Pacífico, entre 0 y 900 msnm, donde crece como especie pionera de rápido crecimiento en suelos degradados y bordes costeros. Su fruto ovalado de superficie reticulada, que madura de verde a blanco-amarillento con olor fuertemente fermentado característico, se consume principalmente en jugos y preparaciones fermentadas por su reputación etnobotánica como tónico, aunque su uso culinario directo es limitado por el sabor/olor intensos. Es planta de fácil naturalización y alta producción de semillas flotantes, por lo que en algunos contextos se comporta como invasora de bajo riesgo en bordes de manglar y playas. Lección pedagógica: ilustra el concepto de especie pionera de sucesión ecológica costera y la diferencia entre valor alimenticio directo y valor etnobotánico/funcional de una misma fruta. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "bajo"
     },
     {
       "id": "plukenetia_volubilis",
@@ -28736,7 +28813,8 @@
       "valor_pedagogico": "El sacha inchi o maní del inca (Plukenetia volubilis L., familia Euphorbiaceae) es una liana perenne nativa de la Amazonía y el piedemonte andino-amazónico (Perú, Ecuador, Colombia), cultivada en Colombia en Putumayo, Caquetá y Meta, entre 200 y 1.800 msnm en clima cálido-húmedo a templado. Produce cápsulas en forma de estrella con semillas oleaginosas ricas en ácidos grasos omega-3 (mayor concentración que la linaza), que se consumen tostadas, en aceite prensado en frío o harina. Es una liana vigorosa que requiere tutorado tipo espaldera similar al maracuyá, con producción sostenida por varios años una vez establecida. Su auge comercial reciente responde a la demanda de superalimentos con perfil lipídico saludable, posicionando a comunidades amazónicas como proveedoras de una materia prima de alto valor agregado. Lección pedagógica: muestra cómo un cultivo amazónico tradicional puede insertarse en cadenas de valor de 'superalimentos' globales sin perder su base agroecológica campesina, y el manejo de lianas oleaginosas en sistemas agroforestales de piedemonte. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "bajo"
     },
     {
       "id": "averrhoa_carambola",
@@ -28779,7 +28857,8 @@
       "valor_pedagogico": "El carambolo (Averrhoa carambola L., familia Oxalidaceae) es un árbol frutal de origen sudasiático naturalizado en tierra caliente y media-baja de Colombia (Valle del Cauca, Tolima, Caribe, Casanare), entre 0 y 1.300 msnm. Su fruto de sección estrellada al cortarse transversalmente (de ahí el nombre inglés 'star fruit') tiene cáscara cerosa amarilla comestible y pulpa jugosa que va de ácida a dulce según el cultivar, alta en ácido oxálico (por lo que personas con enfermedad renal deben evitarlo). Se consume fresco, en jugos, ensaladas y como decoración culinaria por su forma geométrica llamativa. Comparte género con el bilimbi o vinagrillo (Averrhoa bilimbi), pariente mucho más ácido usado para encurtidos, ambas especies presentes en este batch para ilustrar el rango de acidez dentro de un mismo género de Oxalidaceae. Lección pedagógica: enseña la variación de sabor (dulce-ácido) dentro de una misma especie según el cultivar, y el concepto de antinutriente (oxalatos) relevante para la nutrición humana. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "bajo"
     },
     {
       "id": "anacardium_occidentale",
@@ -28822,7 +28901,8 @@
       "tracking_mode": "individual",
       "cultivar": false,
       "validation_level": "claude_draft",
-      "advertencia_toxicologica": "La nuez cruda (semilla) contiene urushiol en la cáscara, compuesto alergénico de contacto (mismo grupo químico del mango y la hiedra venenosa) que causa dermatitis severa; requiere tueste/procesamiento térmico industrial antes de consumirse como nuez de marañón. El pedúnculo carnoso (pseudofruto) no presenta este riesgo y se come fresco sin problema."
+      "advertencia_toxicologica": "La nuez cruda (semilla) contiene urushiol en la cáscara, compuesto alergénico de contacto (mismo grupo químico del mango y la hiedra venenosa) que causa dermatitis severa; requiere tueste/procesamiento térmico industrial antes de consumirse como nuez de marañón. El pedúnculo carnoso (pseudofruto) no presenta este riesgo y se come fresco sin problema.",
+      "estrato": "alto"
     },
     {
       "id": "quararibea_cordata",
@@ -28909,7 +28989,8 @@
       "valor_pedagogico": "La pomarrosa o manzana rosa (Syzygium malaccense (L.) Merr. & L.M.Perry, familia Myrtaceae, misma familia del clavo ya presente en el catálogo) es un árbol frutal de origen malayo-indonesio naturalizado en tierra caliente húmeda de Colombia (Caribe, Pacífico, Amazonía, valles interandinos bajos), entre 0 y 1.200 msnm. Su fruto piriforme de cáscara delgada rosada-cerosa y pulpa blanca crujiente con aroma a rosas se consume fresco, en ensaladas de fruta y encurtidos; el árbol también se cultiva como ornamental por su follaje denso y flores rojas vistosas polinizadas por aves e insectos. Tolera suelos húmedos e incluso encharcamiento estacional, por lo que se adapta bien a huertos de patio en tierra caliente con lluvias abundantes. Lección pedagógica: enseña la semilla recalcitrante (que no tolera desecación ni almacenamiento prolongado, a diferencia de semillas ortodoxas) como estrategia reproductiva de muchas especies de bosque húmedo tropical, relevante para el manejo de vivero. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "carica_papaya",
@@ -28997,7 +29078,8 @@
       "valor_pedagogico": "La uva (Vitis vinifera L., familia Vitaceae) se cultiva en Colombia en un sistema atípico de viticultura tropical de baja altitud: el municipio de La Unión, en el norte del Valle del Cauca, a unos 940-950 msnm y temperatura media de 27°C, se autodenomina 'la capital vitícola de Colombia' y produce variedades como Red Globe e Isabella (esta última Vitis labrusca, especie distinta) mediante poda forzada que induce hasta dos cosechas anuales en ausencia de estación de reposo invernal. Esta técnica de poda drástica (dejando 2-3 yemas por sarmiento) sustituye la latencia invernal que la vid necesita en climas templados, permitiendo su cultivo en trópico cálido-templado bajo. El fruto, una baya agrupada en racimos, se consume fresco o se procesa en vino y jugos artesanales locales. Lección pedagógica: la vid ilustra cómo el manejo agronómico (poda inductiva) puede sustituir un requerimiento climático ausente (frío invernal), abriendo cultivos de zona templada a condiciones tropicales mediante técnica cultural en lugar de mejoramiento genético. Fuentes Tier A: POWO Kew, GBIF; investigación regional Valle del Cauca (La Unión, Roldanillo, Toro) y Agrosavia/Universidad Nacional sobre vid en clima frío tropical.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "rastrero"
     },
     {
       "id": "manilkara_zapota",
@@ -29043,7 +29125,8 @@
       "valor_pedagogico": "El zapote de carne o níspero costeño (Manilkara zapota (L.) P.Royen, familia Sapotaceae) es un árbol frutal de origen mesoamericano-caribeño cultivado en la llanura del Caribe colombiano, el valle del Magdalena y el Valle del Cauca, entre 0 y 1.600 msnm. Se distingue deliberadamente en su nombre del níspero ya presente en el catálogo (Eriobotrya japonica, especie asiática de clima frío no emparentada) para evitar la confusión que genera el uso del mismo nombre común 'níspero' en distintas regiones de Colombia para frutas completamente distintas. Su fruto, de cáscara áspera parda y pulpa marrón-anaranjada muy dulce y granulosa, se consume fresco cuando está bien maduro (astringente si se come verde por su alto contenido de taninos). El árbol es además la fuente histórica del chicle natural (chicozapote), obtenido de su látex, antes de la sustitución por gomas sintéticas. Lección pedagógica: es un caso ejemplar de homonimia de nombres comunes regionales ('níspero' para especies no emparentadas de climas opuestos), que enseña por qué el nombre científico es indispensable para evitar errores de identificación. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "pouteria_lucuma",
@@ -29086,7 +29169,8 @@
       "valor_pedagogico": "La lúcuma (Pouteria lucuma (Ruiz & Pav.) Kuntze, familia Sapotaceae, emparentada con el abiu y el zapote ya presentes en el catálogo) es un árbol frutal andino nativo de los valles interandinos templado-fríos de Colombia, Ecuador, Perú y Bolivia, entre 1.500 y 3.000 msnm. En Colombia su uso se concentra en comunidades indígenas Inga y Kamëntšá del Alto Putumayo, donde forma parte de los recursos genéticos ancestrales de la chagra, aunque está en franco declive frente al avance de monocultivos de fríjol, granadilla, lulo y tomate de árbol. Su fruto, de cáscara verde-parda y pulpa amarilla-anaranjada seca, harinosa y muy dulce (sabor a caramelo/maple), se consume fresco o en batidos y helados, siendo muy popular en Perú y Ecuador pero prácticamente desconocido en el resto de Colombia. Lección pedagógica: es un caso de erosión genética de un cultivo ancestral andino-amazónico por sustitución de monocultivos comerciales, relevante para discutir la conservación de agrobiodiversidad en la chagra Inga-Kamëntšá. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; Universidad Nacional de Colombia (AgroNET, Alto Putumayo).",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "manihot_esculenta_dulce",
@@ -29253,7 +29337,7 @@
       },
       "radiacion": "sol_pleno",
       "agua": "alto",
-      "drenaje_requerido": "regular",
+      "drenaje_requerido": "moderado",
       "propagation": {
         "metodo_principal": "semilla",
         "notas": "Propagación por semilla (germinación lenta e irregular, meses); en mejoramiento genético se usa como parental para híbridos interespecíficos OxG (Elaeis oleifera x Elaeis guineensis) que combinan su resistencia a Pudrición del Cogollo con la productividad de la palma africana."
@@ -29296,7 +29380,7 @@
       },
       "radiacion": "sol_pleno",
       "agua": "bajo",
-      "drenaje_requerido": "regular",
+      "drenaje_requerido": "moderado",
       "propagation": {
         "metodo_principal": "semilla",
         "notas": "Propagación por semilla (germinación lenta, 6-12 meses, escarificación mecánica del endocarpo acelera el proceso); palma muy rústica y espinosa (tronco y hojas con espinas duras), tolerante a suelos pobres y sequía estacional."
@@ -29431,7 +29515,7 @@
       },
       "radiacion": "sol_pleno",
       "agua": "alto",
-      "drenaje_requerido": "regular",
+      "drenaje_requerido": "moderado",
       "propagation": {
         "metodo_principal": "semilla",
         "notas": "Siembra directa (al voleo o en surco) en sistemas de secano o riego por inundación controlada; ciclo 100-150 días según variedad. Requiere lámina de agua constante en el sistema tradicional de riego (arroz de riego) o depende de lluvias en el arroz de secano."
@@ -29786,7 +29870,7 @@
       },
       "radiacion": "sol_pleno",
       "agua": "bajo",
-      "drenaje_requerido": "regular",
+      "drenaje_requerido": "moderado",
       "propagation": {
         "metodo_principal": "semilla (autosiembra)",
         "notas": "Se autopropaga por semilla en suelos removidos (comportamiento de maleza noble); en huerto se favorece dejándola crecer en bordes o se siembra al voleo para cosecha de hojas y tallos tiernos."
@@ -29830,7 +29914,7 @@
       },
       "radiacion": "sol_pleno",
       "agua": "medio",
-      "drenaje_requerido": "regular",
+      "drenaje_requerido": "moderado",
       "propagation": {
         "metodo_principal": "semilla",
         "notas": "Siembra directa o por esqueje de tallo (enraiza fácilmente); cosecha continua por corte de hojas y brotes tiernos cada 2-3 semanas, planta perenne de patio de bajo mantenimiento."
@@ -29875,7 +29959,7 @@
       },
       "radiacion": "sol_pleno",
       "agua": "medio",
-      "drenaje_requerido": "regular",
+      "drenaje_requerido": "moderado",
       "propagation": {
         "metodo_principal": "semilla (autosiembra)",
         "notas": "Se autopropaga abundantemente por semilla en suelos removidos; en huerto se cosecha por corte de hojas y puntas tiernas antes de floración, cuando el amargor de las hojas es mínimo."
@@ -29920,7 +30004,7 @@
       },
       "radiacion": "sol_pleno",
       "agua": "medio",
-      "drenaje_requerido": "regular",
+      "drenaje_requerido": "moderado",
       "propagation": {
         "metodo_principal": "semilla (autosiembra)",
         "notas": "Se autopropaga por semilla en suelos removidos de clima frío; se cosechan hojas y puntas tiernas antes de floración; pariente silvestre de la quinua (Chenopodium quinoa) con la que comparte manejo similar como planta pionera de suelos fértiles."
@@ -30063,7 +30147,8 @@
       "valor_pedagogico": "El caqui o persimonio (Diospyros kaki L.f., familia Ebenaceae) es un árbol frutal caducifolio de origen chino-japonés, introducido a Colombia y cultivado de forma incipiente en fincas de clima frío de Boyacá y Cundinamarca, en altitudes análogas a las de otros frutales caducifolios ya presentes en el catálogo (durazno, manzano, peral, membrillo), aproximadamente entre 2.000 y 2.600 msnm, donde las noches frescas suplen parcialmente el requerimiento de horas-frío que la especie tiene en su rango de origen subtropical. Su fruto, una baya anaranjada de pulpa dulce y textura gelatinosa cuando está muy maduro (astringente si se come antes de tiempo por alto contenido de taninos), se consume fresco o deshidratado. Lección pedagógica: junto a durazno, manzano y peral, permite enseñar el requerimiento de horas-frío (acumulación de temperaturas bajas invernales) como factor limitante para frutales caducifolios de origen templado cultivados en trópico de altura, y el fenómeno de astringencia por taninos que desaparece con la maduración completa. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy. Nota: la altitud óptima específica de cultivo comercial en Colombia no está consolidada en fuentes agronómicas nacionales consultadas; se estima por analogía con otros frutales caducifolios de Boyacá/Cundinamarca y debe validarse en campo.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "stevia_rebaudiana",
@@ -30325,7 +30410,8 @@
       "valor_pedagogico": "La guinda o ciruela india (Ziziphus mauritiana Lam., familia Rhamnaceae) es un árbol frutal de origen indo-asiático naturalizado en el bosque seco tropical del Caribe colombiano, registrado en Colombia con el nombre común 'guinda' (distinto de 'ponsigué', nombre usado para esta misma especie en Venezuela, y distinto también del azufaifo propiamente dicho, Ziziphus jujuba, especie asiática emparentada pero diferente). Su fruto, una drupa pequeña ovalada que pasa de verde a amarillo-rojizo al madurar, tiene pulpa crujiente dulce-ácida comparada con la manzana en miniatura, y se consume fresco o deshidratado. Es un árbol muy espinoso (espinas estipulares en pares) y extremadamente rústico, tolerante a sequías prolongadas y suelos pobres arenosos, por lo que se adapta bien como cerca viva defensiva además de productiva en zonas secas del Caribe. Lección pedagógica: es otro caso de nombre común regional que varía entre países para la misma especie ('guinda' en Colombia, 'ponsigué' en Venezuela), reforzando la lección ya presentada con el níspero y el sagú sobre la necesidad del nombre científico para evitar ambigüedad. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; SiB Colombia (registro como 'Guinda').",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "vigna_radiata",
@@ -30413,7 +30499,8 @@
       "valor_pedagogico": "La mandarina (Citrus reticulata Blanco, familia Rutaceae) es uno de los cítricos más consumidos de Colombia (Tolima, Huila, Santander, Valle del Cauca, eje cafetero), cultivada entre 200 y 2.200 msnm en clima cálido a templado, y complementa en el catálogo a la naranja (Citrus sinensis) y la lima Tahití (Citrus latifolia), ya presentes, ampliando la representación de cítricos de consumo masivo colombiano. Se distingue de estos por su cáscara delgada y fácilmente desprendible a mano (sin necesidad de cuchillo), rasgo que la hace popular como fruta de consumo directo e infantil, y por segmentos que se separan con facilidad. Al igual que otros cítricos, se propaga por injerto sobre patrones tolerantes a suelos específicos (naranjo agrio para suelos pesados, limón rugoso para suelos arenosos), técnica estándar de la citricultura mundial que asegura uniformidad varietal y adelanta la entrada en producción frente a la siembra por semilla. Lección pedagógica: junto a naranja y lima ya documentadas, permite enseñar el manejo de patrones e injertos en cítricos como técnica universal del grupo, y la variación de facilidad de pelado entre especies de un mismo género. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; ICA Resolución 3168/2015.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "citrus_aurantiifolia",
@@ -30457,7 +30544,8 @@
       "valor_pedagogico": "El limón común o limón criollo (Citrus aurantiifolia (Christm.) Swingle, familia Rutaceae, conocido internacionalmente como 'Key lime' o 'lima mexicana') es el cítrico ácido de uso diario más extendido en la cocina colombiana (jugos, aderezos, ceviches, limonada), distinto de la lima Tahití (Citrus latifolia, ya presente en el catálogo, de fruto más grande y sin semillas) por su tamaño pequeño, alto contenido de semillas y aroma más intenso. Se cultiva en tierra caliente y media de casi todo el país (Caribe, Tolima, Huila, Valle del Cauca), entre 0 y 1.600 msnm, en árboles de porte medio espinosos con floración casi continua que permite cosecha escalonada durante buena parte del año en clima cálido estable. Lección pedagógica: junto a la lima Tahití, permite comparar dos cítricos ácidos de aspecto similar pero orígenes genéticos y usos culinarios distintos (con semilla y aroma intenso vs. sin semilla y aroma suave), un ejercicio útil de identificación varietal dentro de un género con altísima variabilidad e hibridación natural. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; ICA Resolución 3168/2015.",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "alto"
     },
     {
       "id": "phyllanthus_acidus",
@@ -30502,7 +30590,8 @@
       "valor_pedagogico": "La grosella o grosella estrellada (Phyllanthus acidus (L.) Skeels, familia Phyllanthaceae), llamada 'jumbalín' en el archipiélago de San Andrés y Providencia, es un árbol frutal de origen surasiático cultivado tradicionalmente en patios del Caribe colombiano (Santa Marta, Cartagena, Guajira) y reportado también en Cali, entre 0 y 1.000 msnm. Sus frutos pequeños, translúcidos, acostillados en forma de estrella al corte transversal, son muy ácidos para comer directamente del árbol, por lo que su uso principal es el dulce de grosella tradicional, muy apreciado en Semana Santa en la costa Caribe (especialmente Guajira y Magdalena), preparado en almíbar espeso. Es una fruta de patio que ha ido desapareciendo de los huertos caseros costeños frente a otras opciones comerciales, similar en su trayectoria de erosión cultural a la lúcuma andina ya documentada en este lote. Lección pedagógica: enseña cómo un fruto demasiado ácido para consumo fresco puede tener alto valor cultural-culinario procesado (dulce en almíbar), y documenta la pérdida progresiva de árboles frutales tradicionales de patio caribeño. Fuentes Tier A: POWO Kew, GBIF Backbone Taxonomy; registros etnobotánicos de Santa Marta/Guajira (dulce de grosella).",
       "tracking_mode": "individual",
       "cultivar": false,
-      "validation_level": "claude_draft"
+      "validation_level": "claude_draft",
+      "estrato": "bajo"
     },
     {
       "id": "averrhoa_bilimbi",
@@ -30593,6 +30682,503 @@
       ],
       "cultivar": false,
       "validation_level": "claude_draft"
+    },
+    {
+      "id": "solanum_lycopersicum",
+      "nombre_comun": "Tomate",
+      "nombre_cientifico": "Solanum lycopersicum L.",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 2000,
+        "max_absoluto": 3000
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "id": "capsicum_annuum",
+      "nombre_comun": "Ají/Chile",
+      "nombre_cientifico": "Capsicum annuum L.",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 300,
+        "optimo_max": 1500,
+        "max_absoluto": 2500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "id": "capsicum_chinense",
+      "nombre_comun": "Ají habanero",
+      "nombre_cientifico": "Capsicum chinense Jacq.",
+      "familia_botanica": "Solanaceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1000,
+        "max_absoluto": 2000
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "id": "brassica_oleracea",
+      "nombre_comun": "Repollo/Col",
+      "nombre_cientifico": "Brassica oleracea L.",
+      "familia_botanica": "Brassicaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1000,
+        "optimo_max": 2800,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "id": "lactuca_sativa",
+      "nombre_comun": "Lechuga",
+      "nombre_cientifico": "Lactuca sativa L.",
+      "familia_botanica": "Asteraceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1200,
+        "optimo_max": 2800,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "id": "beta_vulgaris",
+      "nombre_comun": "Remolacha/Acelga",
+      "nombre_cientifico": "Beta vulgaris L.",
+      "familia_botanica": "Amaranthaceae",
+      "category": "hortalizas_hoja",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 800,
+        "optimo_max": 2800,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "id": "pisum_sativum",
+      "nombre_comun": "Arveja",
+      "nombre_cientifico": "Pisum sativum L.",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1500,
+        "optimo_max": 3000,
+        "max_absoluto": 3600
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "id": "lens_culinaris",
+      "nombre_comun": "Lenteja",
+      "nombre_cientifico": "Lens culinaris Medik.",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1500,
+        "optimo_max": 3000,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "id": "phaseolus_lunatus",
+      "nombre_comun": "Fríjol lima",
+      "nombre_cientifico": "Phaseolus lunatus L.",
+      "familia_botanica": "Fabaceae",
+      "category": "granos_legumbres",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "crop",
+        "nitrogen_fixer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 500,
+        "optimo_max": 1800,
+        "max_absoluto": 2500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "id": "daucus_carota",
+      "nombre_comun": "Zanahoria",
+      "nombre_cientifico": "Daucus carota L.",
+      "familia_botanica": "Apiaceae",
+      "category": "tuberculos_raices",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1200,
+        "optimo_max": 2800,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "id": "fragaria_ananassa",
+      "nombre_comun": "Fresa",
+      "nombre_cientifico": "Fragaria x ananassa Duchesne ex Rozier",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1500,
+        "optimo_max": 2500,
+        "max_absoluto": 3200
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "estrato": "bajo"
+    },
+    {
+      "id": "passiflora_tripartita",
+      "nombre_comun": "Curuba",
+      "nombre_cientifico": "Passiflora tripartita (Juss.) Poir.",
+      "familia_botanica": "Passifloraceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1500,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "estrato": "rastrero"
+    },
+    {
+      "id": "panicum_maximum",
+      "nombre_comun": "Pasto guinea",
+      "nombre_cientifico": "Panicum maximum Jacq.",
+      "familia_botanica": "Poaceae",
+      "category": "abonos_verdes_coberturas",
+      "thermal_zones": [
+        "calido",
+        "templado"
+      ],
+      "roles_in_guild": [
+        "ground_cover",
+        "biomass_producer"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 0,
+        "optimo_min": 0,
+        "optimo_max": 1500,
+        "max_absoluto": 2000
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "estrato": "bajo"
+    },
+    {
+      "id": "vaccinium_corymbosum",
+      "nombre_comun": "Arándano azul",
+      "nombre_cientifico": "Vaccinium corymbosum L.",
+      "familia_botanica": "Ericaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 500,
+        "optimo_min": 1500,
+        "optimo_max": 3000,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "estrato": "bajo"
+    },
+    {
+      "id": "cynara_cardunculus",
+      "nombre_comun": "Alcachofa",
+      "nombre_cientifico": "Cynara cardunculus L.",
+      "familia_botanica": "Asteraceae",
+      "category": "hortalizas_fruto_flor",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 800,
+        "optimo_min": 1000,
+        "optimo_max": 2800,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ]
+    },
+    {
+      "id": "prunus_avium",
+      "nombre_comun": "Cerezo",
+      "nombre_cientifico": "Prunus avium (L.) L.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1000,
+        "optimo_min": 1800,
+        "optimo_max": 2800,
+        "max_absoluto": 3200
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "estrato": "alto"
+    },
+    {
+      "id": "prunus_serotina",
+      "nombre_comun": "Capulí",
+      "nombre_cientifico": "Prunus serotina Ehrh.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 2000,
+        "optimo_max": 3000,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "estrato": "alto"
+    },
+    {
+      "id": "rubus_idaeus",
+      "nombre_comun": "Frambuesa",
+      "nombre_cientifico": "Rubus idaeus L.",
+      "familia_botanica": "Rosaceae",
+      "category": "frutales_perennes",
+      "thermal_zones": [
+        "templado",
+        "frio"
+      ],
+      "roles_in_guild": [
+        "crop"
+      ],
+      "cultivable": true,
+      "conservation_status": "cultivo_comun",
+      "altitud_msnm": {
+        "min_absoluto": 1200,
+        "optimo_min": 2000,
+        "optimo_max": 3200,
+        "max_absoluto": 3500
+      },
+      "source_ids": [
+        "agrosavia-2011-tomate",
+        "bernal-2015-plantas-liquenes-colombia",
+        "gbif-taxonomic-backbone"
+      ],
+      "estrato": "bajo"
     }
   ],
   "sources": [
@@ -31374,6 +31960,16 @@
       "institucion": "AGROSAVIA — Corporación Colombiana de Investigación Agropecuaria",
       "tier": "A",
       "url": "https://redcol.minciencias.gov.co/Record/Agrosavia2_c70ed384746b15638fd7c1d1b174b515"
+    },
+    {
+      "id": "agrosavia-2011-tomate",
+      "tipo": "ficha_tecnica_institucional",
+      "autores": "AGROSAVIA (Corporación Colombiana de Investigación Agropecuaria)",
+      "titulo": "Manual técnico del cultivo de tomate bajo condiciones controladas",
+      "institucion": "AGROSAVIA",
+      "año": 2011,
+      "tier": "A",
+      "url": "https://repository.agrosavia.co/handle/20.500.12324/1271"
     }
   ],
   "biopreparados": [

@@ -1150,6 +1150,18 @@
               "type": "string",
               "description": "Citación legible humana (no ref a sources[].id estructural). Las refs estructurales viven en species.source_ids."
             },
+            "recurrence": {
+              "type": "string",
+              "description": "Frecuencia de recurrencia del plan. Ej: 'anual' para cultivos perennes cuyo plan se repite cada año."
+            },
+            "perennial_note": {
+              "type": "string",
+              "description": "Nota sobre el carácter perenne del cultivo y la recurrencia del plan de alimentación."
+            },
+            "derived_from": {
+              "type": "string",
+              "description": "Id de la species base de la cual se deriva este plan (variedades que heredan el plan base con ajustes)."
+            },
             "primary_steps": {
               "type": "array",
               "minItems": 1,
@@ -1496,6 +1508,14 @@
             "C"
           ],
           "description": "Calidad de la fuente (criterios formalizados en Batch 6A Pasada 6, 2026-05-22). A=peer-review/oficial gobierno (CR/EN/ICA/MADS/AGROSAVIA/IAvH/MinCultura/MinSalud/UICN); B=técnico/divulgación (Restrepo, manuales práctica, cartillas asociaciones); C=blogs/wikis no peer-review (excluir de catálogo strict)."
+        },
+        "_url_pendiente": {
+          "type": ["boolean", "null"],
+          "description": "Indica si la URL está pendiente de verificación. true = pendiente, false/null = resuelto o no aplica."
+        },
+        "_isbn_pendiente": {
+          "type": ["boolean", "null"],
+          "description": "Indica si el ISBN está pendiente de verificación."
         }
       },
       "additionalProperties": false
