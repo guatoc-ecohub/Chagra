@@ -591,6 +591,10 @@ export default function EntradaValle3D({ onBack, onNavigate, initialMundoId = nu
                    adentro; una sola vez por sesión. */
                 camaraDirector
                 mundos={mundosDir}
+                /* El GUARDIÁN del piso: el Ent del piso térmico de ESTA finca
+                   emerge al fondo del valle (EntsDelValle). Sin perfil, el
+                   mapeo cae solo a su default (templado, el roble). */
+                pisoTermico={perfilFinca?.pisoTermico ?? null}
               />
               {/* Dispara el cruce 2D→3D cuando el chunk 3D del valle resolvió
                   (hermano de <Valle3D> en el Suspense). DOM puro, sin three. */}
