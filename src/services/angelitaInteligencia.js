@@ -43,12 +43,17 @@ import { buildProactiveGreeting, saludoPorHora } from './proactiveGreeting';
  * 1. LOS ESTADOS DE COMPORTAMIENTO — el vocabulario de la API.
  * ────────────────────────────────────────────────────────────────────────── */
 
-/** Los cuatro estados canónicos del comportamiento de Angelita. */
+/** Los estados canónicos del comportamiento de Angelita. */
 export const ESTADOS_COMPORTAMIENTO = /** @type {const} */ ([
   'calma',
   'aviso',
   'celebra',
   'husmea',
+  // #109 "luto y fiesta": luto breve, digno, NUNCA culposo, al registrar una
+  // planta muerta. Comparte prioridad de arbitraje con celebra (un momento
+  // que el motor SÍ debe interrumpir para acompañar), pero su cara y su tono
+  // son opuestos — ver VISUAL_LUTO / ARIA_COMPORTAMIENTO.luto abajo.
+  'luto',
 ]);
 
 /**
@@ -62,12 +67,16 @@ export const ESTADOS_COMPORTAMIENTO = /** @type {const} */ ([
  *   aviso   → 'preocupada' si es urgente; 'invita' si es un aviso tranquilo
  *   celebra → 'contenta'   (brinquito de celebración)
  *   husmea  → 'senala'     (se inclina y apunta a lo que mira del mundo)
+ *   luto    → 'preocupada' (la cara más cercana al recogimiento que YA existe
+ *             — sin fabricar un dibujo nuevo; #109 diferencia el TONO del
+ *             texto y el `tipo` de aviso — visual/burbuja gris — no la pose)
  */
 const VISUAL_CALMA = 'acompana';
 const VISUAL_AVISO_URGENTE = 'preocupada';
 const VISUAL_AVISO_TRANQUILO = 'invita';
 const VISUAL_CELEBRA = 'contenta';
 const VISUAL_HUSMEA = 'senala';
+const VISUAL_LUTO = 'preocupada';
 
 /** Narración para lectores de pantalla — usted, cercano, sin tecnicismos. */
 const ARIA_COMPORTAMIENTO = {
@@ -75,6 +84,7 @@ const ARIA_COMPORTAMIENTO = {
   aviso: 'Angelita tiene algo importante que contarle',
   celebra: 'Angelita está contenta por usted',
   husmea: 'Angelita curiosea y le comenta algo de este mundo',
+  luto: 'Angelita lo acompaña en silencio, con cariño',
 };
 
 /**
@@ -91,6 +101,8 @@ export function estadoVisualDeComportamiento(estado, opts = {}) {
       return VISUAL_CELEBRA;
     case 'husmea':
       return VISUAL_HUSMEA;
+    case 'luto':
+      return VISUAL_LUTO;
     case 'calma':
     default:
       return VISUAL_CALMA;
@@ -108,6 +120,9 @@ const PRIORIDAD = {
   aviso_alta: 100,
   aviso_media: 70,
   celebra: 60,
+  // #109: el luto pesa como un aviso medio — de verdad interrumpe (no es un
+  // dato que espera su turno), pero nunca por encima de una alerta real.
+  luto: 65,
   aviso_baja: 45,
   husmea: 20,
   calma: 0,
@@ -202,8 +217,42 @@ export function mundoDePantalla(pantalla) {
    revienta con `ReferenceError` en tiempo de ejecución — y el build de Vite
    NO lo ve (lo cazaron los tests del store). */
 import { comentarioDeMundo, COMENTARISTA_MUNDO } from '../compai/nucleo/comentarista.js';
+import { preguntaDeAprendiz } from '../compai/nucleo/modoAprendiz.js';
 
 export { comentarioDeMundo, COMENTARISTA_MUNDO };
+export { preguntaDeAprendiz };
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * 4b. CLIMA VIVO (#111) — traduce una ReaccionClima del núcleo
+ *    (compai/nucleo/climaVivo.js) al mismo contrato `notificaciones` que
+ *    consume `evaluar()`/`resolverComportamiento`, para que pase por la
+ *    MISMA anti-molestia y el MISMO cooldown de aviso que cualquier otra
+ *    alerta — cero camino paralelo, cero timer propio.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * @param {import('../compai/nucleo/climaVivo').ReaccionClima|null} reaccion
+ * @returns {{ hay:boolean, estado:string, severidad:(string|null), lead:(string|null),
+ *   prompt:(string|null), prioridad:number }}
+ */
+export function notificacionDeClima(reaccion) {
+  if (!reaccion) {
+    return { hay: false, estado: 'calma', severidad: null, lead: null, prompt: null, prioridad: PRIORIDAD.calma };
+  }
+  const prioridad = reaccion.severidad === 'alta'
+    ? PRIORIDAD.aviso_alta
+    : reaccion.severidad === 'media'
+      ? PRIORIDAD.aviso_media
+      : PRIORIDAD.aviso_baja;
+  return {
+    hay: true,
+    estado: 'aviso',
+    severidad: reaccion.severidad,
+    lead: reaccion.mensaje,
+    prompt: null,
+    prioridad,
+  };
+}
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * 4. NOTIFICACIONES INTELIGENTES — qué atender hoy, priorizado y sin ruido.
@@ -294,6 +343,7 @@ export const COOLDOWN_MS = {
   aviso_media: 20 * MINUTO,
   aviso_baja: 45 * MINUTO,
   celebra: 0,              // se dedup por logro.id, no por reloj
+  luto: 0,                 // se dedup por evento.id (#109, misma idea de celebra)
   husmea: 20 * MINUTO,     // no comenta el mismo mundo cada vez que pasa
   calma: 0,
 };
@@ -354,7 +404,7 @@ export function debeHablar({
 
 /**
  * @typedef {Object} DecisionAngelita
- * @property {('calma'|'aviso'|'celebra'|'husmea')} estado — comportamiento elegido.
+ * @property {('calma'|'aviso'|'celebra'|'husmea'|'luto')} estado — comportamiento elegido.
  * @property {string} visualEstado — estado visual canónico para la cara.
  * @property {string|null} mensaje — lo que dice (null si se queda en calma).
  * @property {string} aria — narración para lector de pantalla.
@@ -365,10 +415,13 @@ export function debeHablar({
  * @property {string|null} logroId — id del logro celebrado (para no repetir).
  */
 
-/** La decisión de reposo: Angelita tranquila, sin mensaje. */
+/**
+ * La decisión de reposo: Angelita tranquila, sin mensaje.
+ * @returns {DecisionAngelita}
+ */
 function decisionCalma() {
   return {
-    estado: 'calma',
+    estado: /** @type {const} */ ('calma'),
     visualEstado: VISUAL_CALMA,
     mensaje: null,
     aria: ARIA_COMPORTAMIENTO.calma,
@@ -391,6 +444,8 @@ function decisionCalma() {
  * @param {ReturnType<typeof notificacionesInteligentes>|null} [ctx.notificaciones]
  * @param {{ id:string, texto:string }|null} [ctx.logro] — logro REAL a celebrar.
  * @param {string|null} [ctx.ultimoLogroId] — último logro ya celebrado (dedup).
+ * @param {{ id:string, texto:string }|null} [ctx.luto] pérdida REAL a lamentar (#109).
+ * @param {string|null} [ctx.ultimoLutoId] última pérdida ya lamentada (dedup, #109).
  * @param {string|null} [ctx.mundo] — mundo actual (para husmear).
  * @param {Object} [ctx.datosMundo] — datos reales del mundo (ver comentarioDeMundo).
  * @param {number} [ctx.ahoraMs]
@@ -398,6 +453,8 @@ function decisionCalma() {
  * @param {boolean} [ctx.ocupado]
  * @param {boolean} [ctx.silenciado]
  * @param {number} [ctx.molestia] contador adaptativo (#102/#106, sección 7).
+ * @param {() => number} [ctx.rand] fuente de azar 0..1 para el modo aprendiz
+ *   (#110, inyectable → testeable); default Math.random.
  * @returns {DecisionAngelita}
  */
 export function resolverComportamiento(ctx = {}) {
@@ -405,6 +462,8 @@ export function resolverComportamiento(ctx = {}) {
     notificaciones = null,
     logro = null,
     ultimoLogroId = null,
+    luto = null,
+    ultimoLutoId = null,
     mundo = null,
     datosMundo = {},
     ahoraMs = Date.now(),
@@ -412,6 +471,7 @@ export function resolverComportamiento(ctx = {}) {
     ocupado = false,
     silenciado = false,
     molestia = 0,
+    rand = Math.random,
   } = ctx;
 
   /** @type {Array<{estado:string, prioridad:number, severidad:any, mensaje:string, prompt:string|null, logroId:string|null}>} */
@@ -441,9 +501,28 @@ export function resolverComportamiento(ctx = {}) {
     });
   }
 
-  // Husmea — comentario grounded del mundo donde entró.
+  // Luto (#109) — una pérdida real registrada, aún no acompañada. Mismo
+  // patrón de dedup por id que celebra (nunca dos veces la misma planta).
+  if (luto && luto.id && luto.texto && luto.id !== ultimoLutoId) {
+    candidatos.push({
+      estado: 'luto',
+      prioridad: PRIORIDAD.luto,
+      severidad: null,
+      mensaje: luto.texto,
+      prompt: null,
+      logroId: luto.id,
+    });
+  }
+
+  // Husmea — comentario grounded del mundo donde entró. #110 "modo
+  // aprendiz": a veces, en contexto apto y con probabilidad baja, en vez
+  // del comentario declarativo el compañero PREGUNTA para provocar
+  // observación (dimensión educativa — Julieta 11 años). No tiene cooldown
+  // propio: sigue siendo un 'husmea' normal, así que respeta el MISMO
+  // cooldown por mundo y la MISMA cadencia adaptativa de siempre.
   if (mundo) {
-    const comentario = comentarioDeMundo(mundo, datosMundo);
+    const pregunta = preguntaDeAprendiz({ mundo, datosMundo, rand });
+    const comentario = pregunta || comentarioDeMundo(mundo, datosMundo);
     if (comentario) {
       candidatos.push({
         estado: 'husmea',

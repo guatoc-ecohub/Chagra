@@ -21,6 +21,7 @@ import {
   mundoDePantalla,
   comentarioDeMundo,
   notificacionesInteligentes,
+  notificacionDeClima,
   debeHablar,
   resolverComportamiento,
   llaveDeDecision,
@@ -41,8 +42,8 @@ const MINUTO = 60 * 1000;
 const sinVoseo = (s) => expect(s).not.toMatch(/\bvos\b|tenés|querés|podés|\btú\b/i);
 
 describe('estados de comportamiento', () => {
-  it('expone los cuatro estados canónicos', () => {
-    expect(ESTADOS_COMPORTAMIENTO).toEqual(['calma', 'aviso', 'celebra', 'husmea']);
+  it('expone los cinco estados canónicos (incluye luto, #109)', () => {
+    expect(ESTADOS_COMPORTAMIENTO).toEqual(['calma', 'aviso', 'celebra', 'husmea', 'luto']);
   });
 
   it('mapea cada estado a vocabulario VISUAL conocido (contrato con la cara)', () => {
@@ -203,6 +204,33 @@ describe('notificacionesInteligentes', () => {
   });
 });
 
+describe('notificacionDeClima (#111 — vive el clima real)', () => {
+  it('sin reacción (null) → calma, no inventa aviso', () => {
+    const n = notificacionDeClima(null);
+    expect(n.hay).toBe(false);
+    expect(n.estado).toBe('calma');
+    expect(n.severidad).toBeNull();
+  });
+
+  it('reacción de helada (severidad alta) → aviso con prioridad máxima', () => {
+    const n = notificacionDeClima({
+      tipo: 'helada', mensaje: 'Uy, mañana hiela.', estado: 'aviso', severidad: 'alta', gesto: 'abriga',
+    });
+    expect(n.hay).toBe(true);
+    expect(n.estado).toBe('aviso');
+    expect(n.severidad).toBe('alta');
+    expect(n.prioridad).toBe(100);
+    expect(n.lead).toBe('Uy, mañana hiela.');
+  });
+
+  it('reacción de sequía (severidad baja) → prioridad de aviso_baja', () => {
+    const n = notificacionDeClima({
+      tipo: 'sequia', mensaje: 'Tengo sed.', estado: 'aviso', severidad: 'baja', gesto: 'pideAgua',
+    });
+    expect(n.prioridad).toBe(45);
+  });
+});
+
 describe('debeHablar — anti-molestia', () => {
   const ahora = 1_000_000_000;
 
@@ -273,6 +301,38 @@ describe('resolverComportamiento — arbitraje', () => {
     expect(d2.estado).toBe('calma');
   });
 
+  it('lamenta una pérdida real (#109, dedup por id, tono nunca culposo)', () => {
+    const ctx = { ahoraMs: ahora, luto: { id: 'luto-planta-7', texto: 'Se nos fue el tomate. Pasa, y se aprende.' } };
+    const d1 = resolverComportamiento(ctx);
+    expect(d1.estado).toBe('luto');
+    expect(d1.visualEstado).toBe('preocupada');
+    expect(d1.logroId).toBe('luto-planta-7');
+    expect(d1.mensaje).not.toMatch(/usted (la |lo )?(dej[oó]|mat[oó])|su culpa|descuid/i);
+    // ya lamentada → no repite
+    const d2 = resolverComportamiento({ ...ctx, ultimoLutoId: 'luto-planta-7' });
+    expect(d2.estado).toBe('calma');
+  });
+
+  it('luto y celebra son independientes: lamentar una planta no bloquea celebrar un logro', () => {
+    const d = resolverComportamiento({
+      ahoraMs: ahora,
+      logro: { id: 'cosecha-9', texto: '¡Buena cosecha!' },
+      ultimoLutoId: 'luto-planta-7', // otra planta, ya lamentada antes
+    });
+    expect(d.estado).toBe('celebra');
+  });
+
+  it('luto le gana a husmear (prioridad 65 > 20) pero no a un aviso urgente', () => {
+    const d = resolverComportamiento({
+      ahoraMs: ahora,
+      notificaciones: avisoAlto,
+      luto: { id: 'luto-planta-8', texto: 'Se nos fue la lechuga.' },
+      mundo: 'mis_matas',
+      datosMundo: { cultivos: [{ name: 'Café', count: 2 }] },
+    });
+    expect(d.estado).toBe('aviso'); // la helada real manda
+  });
+
   it('husmea un mundo con comentario grounded', () => {
     const d = resolverComportamiento({
       ahoraMs: ahora,
@@ -283,6 +343,28 @@ describe('resolverComportamiento — arbitraje', () => {
     expect(d.visualEstado).toBe('senala');
     expect(d.mensaje).toMatch(/8 animales/i);
     expect(d.interrumpe).toBe(true);
+  });
+
+  it('#110 modo aprendiz: con rand bajo, el husmeo pregunta en vez de comentar', () => {
+    const d = resolverComportamiento({
+      ahoraMs: ahora,
+      mundo: 'mis_matas',
+      datosMundo: { cultivos: [{ name: 'Tomate', count: 4 }] },
+      rand: () => 0.001, // dentro de PROBABILIDAD_PREGUNTA
+    });
+    expect(d.estado).toBe('husmea'); // sigue siendo husmea, mismo cooldown/prioridad
+    expect(d.mensaje).toMatch(/\?/);
+    expect(d.interrumpe).toBe(true);
+  });
+
+  it('#110 modo aprendiz: con rand alto, sigue el comentario normal (no siempre pregunta)', () => {
+    const d = resolverComportamiento({
+      ahoraMs: ahora,
+      mundo: 'mis_matas',
+      datosMundo: { cultivos: [{ name: 'Tomate', count: 4 }] },
+      rand: () => 0.99,
+    });
+    expect(d.mensaje).toMatch(/tomate/i);
   });
 
   it('husmea respeta cooldown POR MUNDO → si ya comentó ese mundo, calla', () => {
