@@ -744,8 +744,23 @@
  * con estas riendas CSS de alcance jp-ah-. Estados: feliz → preocupada →
  * tambaleo → desmayada (sin morbo). */
 
+/* ENTRADA espectacular (el lenguaje del cruce de Angelita, AbejaTransicion:
+   anticipa → se CLAVA en barrel roll → rebasa → asienta): corre UNA vez al
+   montar la escena y, mejor aún, se RE-DISPARA sola al ganar desde p3+ (las
+   reglas de órbita por paso llevan :not(.gano); al volver a la animación base
+   el nombre cambia y la entrada vuelve a correr = revivir espectacular). */
 .jp-ah-abeja-orbita {
-  animation: jp-ah-vuelo-feliz 9s ease-in-out infinite;
+  animation:
+    jp-ah-angelita-entrada 1.6s cubic-bezier(0.33, 1, 0.55, 1) both,
+    jp-ah-vuelo-feliz 9s ease-in-out 1.6s infinite;
+}
+
+@keyframes jp-ah-angelita-entrada {
+  0% { transform: translate(392px, 4px) rotate(356deg) scale(0.3); }
+  16% { transform: translate(366px, 16px) rotate(370deg) scale(0.42); }
+  62% { transform: translate(206px, 96px) rotate(-30deg) scale(1.12); }
+  82% { transform: translate(180px, 52px) rotate(5deg) scale(0.96); }
+  100% { transform: translate(188px, 60px) rotate(-4deg) scale(1); }
 }
 
 @keyframes jp-ah-vuelo-feliz {
@@ -860,8 +875,378 @@
   100% { transform: translateY(-7px); opacity: 0; }
 }
 
-/* Celebración al ganar: vuelo alegre más vivo */
-.jp-ah-vivo.gano .jp-ah-abeja-orbita { animation-duration: 5s; }
+/* Celebración al ganar: re-entrada rápida + vuelo alegre más vivo (dos
+   duraciones: la primera es de la entrada, la segunda de la órbita). */
+.jp-ah-vivo.gano .jp-ah-abeja-orbita { animation-duration: 1.2s, 5s; }
+
+/* ── La abejita obrera: la abeja del arte anterior, ahora SECUNDARIA ──
+ * Pedido del operador: no se saca. Vuela al otro lado de la chagra (sobre el
+ * agua) y muere CON Angelita: aleteo pesado (p2) → tambaleo (p4) → cae
+ * desmayada a la orilla (p6: ojitos cerrados, alitas plegadas, desteñida).
+ * Todo con :not(.gano): al ganar revive con las demás. */
+
+.jp-ah-abeja2-orbita {
+  animation: jp-ah-abeja2-vuelo 10s ease-in-out infinite;
+}
+
+@keyframes jp-ah-abeja2-vuelo {
+  0%, 100% { transform: translate(300px, 74px) rotate(4deg) scale(0.8); }
+  30% { transform: translate(262px, 92px) rotate(-6deg) scale(0.8); }
+  60% { transform: translate(318px, 104px) rotate(5deg) scale(0.8); }
+  80% { transform: translate(330px, 82px) rotate(-4deg) scale(0.8); }
+}
+
+.jp-ah-abeja2 {
+  animation: jp-ah-abeja-bob 1.3s ease-in-out infinite alternate,
+    jp-ah-boil 0.55s linear infinite;
+}
+
+.jp-ah-abeja-cuerpo {
+  fill: #ffd23e;
+  stroke: #3a2c1a;
+  stroke-width: 1.3;
+  transition: fill 1.4s ease;
+}
+
+.jp-ah-franja { fill: #3a2c1a; }
+
+.jp-ah-abeja-cabeza {
+  fill: #3a2c1a;
+}
+
+.jp-ah-antenas path {
+  fill: none;
+  stroke: #3a2c1a;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: bottom right;
+  transition: transform 1s ease;
+}
+
+.jp-ah-antenas circle { fill: #3a2c1a; }
+
+.jp-ah-ala ellipse {
+  fill: rgba(219, 234, 254, 0.8);
+  stroke: #93c5fd;
+  stroke-width: 0.9;
+}
+
+.jp-ah-ala {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: jp-ah-aleteo 0.16s linear infinite alternate;
+  transition: transform 1s ease;
+}
+
+.jp-ah-ala.ala-der { animation-delay: -0.08s; }
+
+@keyframes jp-ah-aleteo {
+  from { transform: scaleY(1) rotate(-4deg); }
+  to { transform: scaleY(0.4) rotate(6deg); }
+}
+
+.jp-ah-ojos-abiertos ellipse { fill: #ffffff; }
+.jp-ah-ojos-abiertos .jp-ah-pupila { fill: #1c140c; }
+
+.jp-ah-sonrisa,
+.jp-ah-ojos-cerrados path {
+  fill: none;
+  stroke: #ffffff;
+  stroke-width: 0.8;
+  stroke-linecap: round;
+}
+
+.jp-ah-ojos-cerrados { opacity: 0; }
+
+.jp-ah-patitas path {
+  fill: none;
+  stroke: #3a2c1a;
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+/* p2: el aleteo se le hace pesado y baja a volar cerca del agua. */
+.jp-ah-vivo.p2:not(.gano) .jp-ah-abeja2-orbita {
+  animation: jp-ah-abeja2-pesada 7s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-ala { animation-duration: 0.3s; }
+
+@keyframes jp-ah-abeja2-pesada {
+  0%, 100% { transform: translate(296px, 104px) rotate(-5deg) scale(0.8); }
+  35% { transform: translate(268px, 118px) rotate(7deg) scale(0.8); }
+  70% { transform: translate(316px, 124px) rotate(-6deg) scale(0.8); }
+}
+
+/* p4: tambalea igual que su compañera grande. */
+.jp-ah-vivo.p4:not(.gano) .jp-ah-abeja2-orbita {
+  animation: jp-ah-abeja2-tambalea 3.4s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-ala { animation-duration: 0.45s; }
+
+@keyframes jp-ah-abeja2-tambalea {
+  0%, 100% { transform: translate(288px, 128px) rotate(-14deg) scale(0.8); }
+  25% { transform: translate(302px, 140px) rotate(16deg) scale(0.8); }
+  55% { transform: translate(276px, 146px) rotate(-18deg) scale(0.8); }
+  80% { transform: translate(294px, 136px) rotate(12deg) scale(0.8); }
+}
+
+/* p6: cae desmayada a la orilla del agua turbia, junto a la chagra apagada. */
+.jp-ah-vivo.p6:not(.gano) .jp-ah-abeja2-orbita {
+  animation: jp-ah-abeja2-cae 1.4s cubic-bezier(0.4, 0, 1, 1) 0.15s both;
+}
+
+@keyframes jp-ah-abeja2-cae {
+  0% { transform: translate(288px, 138px) rotate(-10deg) scale(0.8); }
+  62% { transform: translate(310px, 182px) rotate(24deg) scale(0.8); }
+  76% { transform: translate(312px, 177px) rotate(19deg) scale(0.8); }
+  100% { transform: translate(314px, 184px) rotate(16deg) scale(0.8); }
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-abeja2 {
+  animation: jp-ah-desmayo 3s ease-in-out infinite alternate;
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-ala {
+  animation: none;
+  transform: scaleY(0.5) rotate(48deg);
+  opacity: 0.7;
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-antenas path { transform: rotate(34deg); }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-ojos-abiertos { opacity: 0; }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-ojos-cerrados { opacity: 1; }
+.jp-ah-vivo.p6:not(.gano) .jp-ah-abeja-cuerpo { fill: #d9c383; }
+
+/* ── El colibrí chillón: secundaria de aire (Colibri REAL del kit) ──
+ * Entra DARDEANDO desde fuera de cuadro (entrada espectacular de la casa:
+ * dardo que se pasa → corrige con overshoot → se asienta) y se cierne sobre
+ * la flor. Su actuación (dardos, estelas, parpadeo) es del componente vía
+ * los MISMOS props de Angelita; aquí van la órbita y el desmayo (p6: caído
+ * al pie de la mata, ojitos cerrados con el truco rh-blink, gris suave). */
+
+.jp-ah-colibri-orbita {
+  animation:
+    jp-ah-colibri-entrada 1.3s cubic-bezier(0.3, 1.4, 0.5, 1) both,
+    jp-ah-colibri-vuelo 7s ease-in-out 1.3s infinite;
+}
+
+.jp-ah-colibri-marco { transition: filter 1.4s ease; }
+
+@keyframes jp-ah-colibri-entrada {
+  0% { transform: translate(-34px, 12px); }
+  55% { transform: translate(152px, 32px); }
+  75% { transform: translate(96px, 46px); }
+  100% { transform: translate(108px, 38px); }
+}
+
+@keyframes jp-ah-colibri-vuelo {
+  0%, 100% { transform: translate(108px, 38px); }
+  20% { transform: translate(148px, 30px); }
+  45% { transform: translate(158px, 50px); }
+  70% { transform: translate(118px, 54px); }
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-colibri-marco { filter: saturate(0.8); }
+
+.jp-ah-vivo.p3:not(.gano) .jp-ah-colibri-orbita {
+  animation: jp-ah-colibri-preocupado 5s ease-in-out infinite;
+}
+
+@keyframes jp-ah-colibri-preocupado {
+  0%, 100% { transform: translate(122px, 62px) rotate(-6deg); }
+  35% { transform: translate(146px, 72px) rotate(7deg); }
+  70% { transform: translate(108px, 76px) rotate(-8deg); }
+}
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-colibri-marco { filter: saturate(0.6) brightness(0.96); }
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-colibri-orbita {
+  animation: jp-ah-colibri-tambalea 2.8s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-colibri-marco .crt-wing { animation-duration: 0.34s; }
+
+@keyframes jp-ah-colibri-tambalea {
+  0%, 100% { transform: translate(112px, 80px) rotate(-14deg); }
+  25% { transform: translate(128px, 92px) rotate(15deg); }
+  55% { transform: translate(100px, 96px) rotate(-17deg); }
+  80% { transform: translate(120px, 88px) rotate(11deg); }
+}
+
+/* p6: cae al pie de la mata, del lado contrario a Angelita — los dos
+   polinizadores juntos. React ya lo puso en reposo/descansa (posado, alitas
+   plegadas, respirando); el juego cierra ojitos y destiñe. */
+.jp-ah-vivo.p6:not(.gano) .jp-ah-colibri-orbita {
+  animation: jp-ah-colibri-cae 1.4s cubic-bezier(0.4, 0, 1, 1) 0.1s both;
+}
+
+@keyframes jp-ah-colibri-cae {
+  0% { transform: translate(114px, 84px) rotate(-10deg); }
+  60% { transform: translate(96px, 156px) rotate(-30deg); }
+  78% { transform: translate(93px, 150px) rotate(-24deg); }
+  100% { transform: translate(92px, 162px) rotate(-20deg); }
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-colibri-marco {
+  filter: grayscale(0.55) brightness(0.92);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-colibri-marco .rh-blink {
+  animation: none;
+  transform: scaleY(0.14);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-colibri-marco .rh-mirada { animation: none; }
+
+/* ── La mariposa pasionaria: la adicional (Mariposa REAL del kit) ──
+ * Aletea alto sobre el surco con sus cuatro alas independientes; se destiñe
+ * (saturate progresivo), tambalea y cae plegada junto a sus compañeras. */
+
+.jp-ah-dione-orbita {
+  animation:
+    jp-ah-dione-entrada 1.8s cubic-bezier(0.34, 1.3, 0.6, 1) both,
+    jp-ah-dione-vuelo 12s ease-in-out 1.8s infinite;
+}
+
+.jp-ah-dione-marco { transition: filter 1.4s ease; }
+
+@keyframes jp-ah-dione-entrada {
+  0% { transform: translate(-32px, 152px) rotate(-20deg); }
+  60% { transform: translate(74px, 92px) rotate(14deg); }
+  100% { transform: translate(56px, 112px) rotate(4deg); }
+}
+
+@keyframes jp-ah-dione-vuelo {
+  0%, 100% { transform: translate(56px, 112px) rotate(4deg); }
+  30% { transform: translate(84px, 100px) rotate(-6deg); }
+  55% { transform: translate(96px, 120px) rotate(5deg); }
+  80% { transform: translate(66px, 126px) rotate(-5deg); }
+}
+
+.jp-ah-vivo.p2:not(.gano) .jp-ah-dione-marco { filter: saturate(0.75); }
+.jp-ah-vivo.p2:not(.gano) .jp-ah-dione-marco .crt-fwing { animation-duration: 0.6s; }
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-dione-orbita {
+  animation: jp-ah-dione-tambalea 3.8s ease-in-out infinite;
+}
+
+.jp-ah-vivo.p4:not(.gano) .jp-ah-dione-marco { filter: saturate(0.5) brightness(0.95); }
+.jp-ah-vivo.p4:not(.gano) .jp-ah-dione-marco .crt-fwing { animation-duration: 0.9s; }
+
+@keyframes jp-ah-dione-tambalea {
+  0%, 100% { transform: translate(70px, 132px) rotate(-10deg); }
+  30% { transform: translate(88px, 142px) rotate(12deg); }
+  65% { transform: translate(58px, 148px) rotate(-13deg); }
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-dione-orbita {
+  animation: jp-ah-dione-cae 1.6s cubic-bezier(0.4, 0, 1, 1) 0.2s both;
+}
+
+@keyframes jp-ah-dione-cae {
+  0% { transform: translate(70px, 140px) rotate(-8deg); }
+  62% { transform: translate(44px, 164px) rotate(-60deg); }
+  78% { transform: translate(42px, 159px) rotate(-52deg); }
+  100% { transform: translate(40px, 168px) rotate(-75deg); }
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-dione-marco { filter: grayscale(0.75) brightness(0.9); }
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-dione-marco .crt-fwing {
+  animation: none;
+  transform: scaleX(0.3);
+}
+
+/* ── El escarabajo estercolero: secundaria de suelo (Escarabajo REAL) ──
+ * Entra RODANDO su bola desde el borde (frena con un pasito de arrastre) y
+ * patrulla el primer plano. El suelo agrietado (p3) lo pone lento; en p5 se
+ * frena donde va (play-state paused: sin saltos) y en p6 se VUELCA gris —
+ * un suelo muerto no tiene abono que rodar. */
+
+.jp-ah-escarabajo-orbita {
+  animation:
+    jp-ah-escarabajo-entrada 1.8s cubic-bezier(0.3, 1.2, 0.5, 1) both,
+    jp-ah-escarabajo-camina 16s ease-in-out 1.8s infinite alternate;
+}
+
+.jp-ah-escarabajo-marco {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: filter 1.4s ease, transform 1.2s ease;
+}
+
+@keyframes jp-ah-escarabajo-entrada {
+  0% { transform: translate(392px, 186px); }
+  70% { transform: translate(208px, 184px); }
+  85% { transform: translate(219px, 184px); }
+  100% { transform: translate(214px, 185px); }
+}
+
+@keyframes jp-ah-escarabajo-camina {
+  from { transform: translate(214px, 185px); }
+  to { transform: translate(140px, 187px); }
+}
+
+.jp-ah-vivo.p3:not(.gano) .jp-ah-escarabajo-orbita { animation-duration: 1.8s, 34s; }
+.jp-ah-vivo.p3:not(.gano) .jp-ah-escarabajo-marco { filter: saturate(0.7); }
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-escarabajo-orbita { animation-play-state: paused, paused; }
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-escarabajo-orbita { animation-play-state: paused, paused; }
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-escarabajo-marco {
+  transform: scale(-0.75, 0.75) rotate(160deg);
+  filter: grayscale(0.7) brightness(0.9);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-escarabajo-marco .crt-legs,
+.jp-ah-vivo.p6:not(.gano) .jp-ah-escarabajo-marco .crt-ball { animation: none; }
+
+/* ── La lombriz nativa: secundaria de suelo (Lombriz REAL del kit) ──
+ * BROTA del suelo fértil con overshoot (su entrada) y se mece; el suelo
+ * agrietado la retrae y palidece, y en p6 queda lánguida sobre la tierra
+ * muerta. Al ganar re-brota — el suelo vivo vuelve. */
+
+.jp-ah-lombriz-marco {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation:
+    jp-ah-lombriz-brota 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    jp-ah-lombriz-mece 4.6s ease-in-out 1.4s infinite alternate;
+  transition: filter 1.4s ease, transform 1.2s ease;
+}
+
+@keyframes jp-ah-lombriz-brota {
+  0% { transform: translateY(16px) scaleY(0.2); }
+  70% { transform: translateY(-2px) scaleY(1.08); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+@keyframes jp-ah-lombriz-mece {
+  from { transform: rotate(-6deg); }
+  to { transform: rotate(7deg); }
+}
+
+.jp-ah-vivo.p3:not(.gano) .jp-ah-lombriz-marco {
+  animation: none;
+  transform: translateY(7px) rotate(24deg);
+  filter: saturate(0.6) brightness(0.95);
+}
+
+.jp-ah-vivo.p5:not(.gano) .jp-ah-lombriz-marco {
+  animation: none;
+  transform: translateY(9px) rotate(52deg);
+  filter: saturate(0.4) brightness(0.92);
+}
+
+.jp-ah-vivo.p6:not(.gano) .jp-ah-lombriz-marco {
+  animation: none;
+  transform: translateY(10px) rotate(80deg);
+  filter: grayscale(0.7) brightness(0.9);
+}
 
 /* ── Las mariposas: secundarias que acompañan a Angelita ──
  * Corrección del operador: NO se sacan y NO huyen de escena — el químico
@@ -1129,6 +1514,22 @@
   .jp-ah-vivo.p6:not(.gano) .jp-ah-mariposa-orbita { transform: translate(226px, 170px) rotate(74deg); }
   .jp-ah-vivo.p6:not(.gano) .mariposa-orbita-2 { transform: translate(60px, 172px) rotate(-68deg); }
   .jp-ah-vivo.p6:not(.gano) .jp-ah-mariposa-ala { transform: scaleX(0.2); }
+  .jp-ah-abeja2-orbita { transform: translate(300px, 88px) scale(0.8); }
+  .jp-ah-vivo.p2:not(.gano) .jp-ah-abeja2-orbita { transform: translate(290px, 112px) scale(0.8); }
+  .jp-ah-vivo.p4:not(.gano) .jp-ah-abeja2-orbita { transform: translate(288px, 136px) rotate(-14deg) scale(0.8); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-abeja2-orbita { transform: translate(314px, 184px) rotate(16deg) scale(0.8); }
+  .jp-ah-colibri-orbita { transform: translate(120px, 42px); }
+  .jp-ah-vivo.p3:not(.gano) .jp-ah-colibri-orbita { transform: translate(122px, 66px); }
+  .jp-ah-vivo.p5:not(.gano) .jp-ah-colibri-orbita { transform: translate(112px, 84px) rotate(-12deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-colibri-orbita { transform: translate(92px, 162px) rotate(-20deg); }
+  .jp-ah-dione-orbita { transform: translate(64px, 112px); }
+  .jp-ah-vivo.p4:not(.gano) .jp-ah-dione-orbita { transform: translate(72px, 136px) rotate(-8deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-dione-orbita { transform: translate(40px, 168px) rotate(-75deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-dione-marco .crt-fwing { transform: scaleX(0.3); }
+  .jp-ah-escarabajo-orbita { transform: translate(200px, 185px); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-ala { transform: scaleY(0.5) rotate(48deg); }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-ojos-cerrados { opacity: 1; }
+  .jp-ah-vivo.p6:not(.gano) .jp-ah-ojos-abiertos { opacity: 0; }
   .jp-ah-abeja-orbita { transform: translate(200px, 80px); }
   .jp-ah-vivo.p3:not(.gano) .jp-ah-abeja-orbita { transform: translate(185px, 105px); }
   .jp-ah-vivo.p5:not(.gano) .jp-ah-abeja-orbita { transform: translate(180px, 128px) rotate(-16deg); }

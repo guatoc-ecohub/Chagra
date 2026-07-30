@@ -6,11 +6,17 @@ import {
   PALABRAS,
   PALABRAS_POR_CATEGORIA,
 } from '../../data/juegos/ahorcadoContaminado';
-// La abeja REAL de la casa (Tetragonisca angustula rubber-hose, la del compai):
-// import directo del componente — NO del index (el index arrastra el registry
-// con toda la fauna al chunk del juego). El componente compartido no se toca:
-// el juego solo lo DIRIGE por props + CSS propio (prefijo jp-ah-).
+// Las creatures REALES de la casa (familia rubber-hose compartida): imports
+// directos de cada componente — NO del index (el index arrastra el registry
+// con toda la fauna al chunk del juego). Los componentes compartidos no se
+// tocan: el juego solo los DIRIGE por props + CSS propio (prefijo jp-ah-).
+// Angelita protagoniza; colibrí, mariposa pasionaria, lombriz y escarabajo
+// la acompañan como secundarias (pedido del operador) y mueren CON ella.
 import AbejaAngelita from '../../visual/creatures/AbejaAngelita.jsx';
+import { Colibri } from '../../visual/creatures/Colibri.jsx';
+import { Escarabajo } from '../../visual/creatures/Escarabajo.jsx';
+import { Mariposa } from '../../visual/creatures/Mariposa.jsx';
+import { Lombriz } from '../../visual/creatures/Lombriz.jsx';
 import './ahorcado-contaminado.css';
 
 const MAX_ERRORES = 6;
@@ -122,8 +128,9 @@ function Mariposita() {
  * squash&stretch, line-boil sutil) que se contamina un paso por cada error:
  * entra la nube de químico, la mata se marchita, el suelo se agrieta, el
  * agua se enturbia y Angelita — la abeja angelita REAL de la casa — tambalea
- * hasta caer (desmayada, sin morbo: esto es educativo). Sus compañeras
- * mariposas se apagan CON ella, no desaparecen. Al ganar, todas reviven.
+ * hasta caer (desmayada, sin morbo: esto es educativo). Sus compañeras (la
+ * abejita obrera del arte anterior y las mariposas) se apagan CON ella, no
+ * desaparecen. Al ganar, todas reviven.
  *
  * Los pasos se acumulan como clases p1..pN para que el CSS aplique cada
  * degradación de forma progresiva y con transiciones suaves.
@@ -278,6 +285,19 @@ function EscenaChagra({ errores, ganado, perdido }) {
         </g>
       ))}
 
+      {/* ── La lombriz nativa (Lombriz REAL de la casa, Martiodrilus) ──
+          Secundaria de SUELO: asoma del suelo fértil con overshoot (su
+          entrada), se mece sana; cuando el suelo se agrieta (p3) palidece y
+          se retrae, y en p6 queda lánguida sobre la tierra muerta. Su
+          movimiento es de la escena (la creature no trae idle propio). */}
+      <g transform="translate(16 172)">
+        <g className="jp-ah-lombriz-marco">
+          <g className="jp-ah-lombriz-cuerpo" transform="scale(0.38)">
+            <Lombriz inline animated />
+          </g>
+        </g>
+      </g>
+
       {/* ── Surco de brotecitos: la chagra es parcela cultivada ── */}
       {[
         [24, 160], [52, 166], [80, 172], [108, 178],
@@ -375,6 +395,17 @@ function EscenaChagra({ errores, ganado, perdido }) {
         </g>
       </g>
 
+      {/* ── El escarabajo estercolero (Escarabajo REAL, Dichotomius belus) ──
+          Secundaria de SUELO: entra rodando su bola de abono desde el borde
+          (su entrada) y patrulla el primer plano. El suelo agrietado (p3) lo
+          arrastra, y en p6 queda volcado, quieto y gris — el suelo sin vida
+          no tiene abono que rodar. Espejado: empuja la bola hacia adelante. */}
+      <g className="jp-ah-escarabajo-orbita">
+        <g className="jp-ah-escarabajo-marco" transform="scale(-0.75 0.75)">
+          <Escarabajo inline animated />
+        </g>
+      </g>
+
       {/* ── Chispas de victoria alrededor de la flor ── */}
       <g className="jp-ah-chispas" transform="translate(118 88)">
         {[
@@ -446,6 +477,67 @@ function EscenaChagra({ errores, ganado, perdido }) {
         </g>
       </g>
 
+      {/* ── El colibrí chillón (Colibri REAL de la casa, hermano del kit) ──
+          Secundaria de AIRE: entra DARDEANDO desde fuera de cuadro con
+          anticipación y overshoot (la entrada espectacular de la familia) y
+          se cierne sobre la flor de la mata. Recibe la MISMA dirección de
+          actuación que Angelita (pose/animo/energia): se apaga con ella y en
+          p6 cae al pie de la mata, al otro lado de su amiga — los dos
+          polinizadores juntos. Al ganar re-entra celebrando. */}
+      <g className="jp-ah-colibri-orbita">
+        <g className="jp-ah-colibri-marco" transform="scale(0.8)">
+          <Colibri
+            inline
+            animated
+            pose={angelita.pose}
+            animo={angelita.animo}
+            energia={angelita.energia}
+          />
+        </g>
+      </g>
+
+      {/* ── La abejita obrera (la abeja del arte anterior) ──
+          Pedido del operador: NO se saca — queda como SECUNDARIA de Angelita.
+          Vuela al otro lado de la chagra (sobre el agua) y muere CON la
+          protagonista: aleteo pesado → tambaleo → cae desmayada a la orilla
+          (ojitos cerrados, alitas plegadas). Revive con todas al ganar. */}
+      <g className="jp-ah-abeja2-orbita">
+        <g className="jp-ah-abeja2">
+          <g className="jp-ah-ala ala-izq">
+            <ellipse cx="-2" cy="-9" rx="4.6" ry="7" />
+          </g>
+          <g className="jp-ah-ala ala-der">
+            <ellipse cx="3" cy="-8" rx="4" ry="6" />
+          </g>
+          <ellipse className="jp-ah-abeja-cuerpo" cx="0" cy="0" rx="8.4" ry="5.8" />
+          <path className="jp-ah-franja" d="M-1,-5.6 C-2.4,-2 -2.4,2 -1,5.6 L2.4,5.4 C1,2 1,-2 2.4,-5.4 Z" />
+          <path className="jp-ah-franja" d="M4.6,-4.6 C3.6,-1.8 3.6,1.8 4.6,4.6 L7.4,3.4 C6.6,1.4 6.6,-1.4 7.4,-3.4 Z" />
+          <circle className="jp-ah-abeja-cabeza" cx="-9.6" cy="-1" r="4.4" />
+          <g className="jp-ah-antenas">
+            <path d="M-11.5,-4.5 C-13,-7 -14.5,-8 -15.5,-8.5" />
+            <circle cx="-15.8" cy="-8.8" r="1" />
+            <path d="M-9,-5 C-9.5,-8 -10.5,-9.5 -11,-10.5" />
+            <circle cx="-11.2" cy="-10.9" r="1" />
+          </g>
+          <g className="jp-ah-ojos-abiertos">
+            <ellipse cx="-11.2" cy="-1.6" rx="1.25" ry="1.8" />
+            <ellipse cx="-8.4" cy="-1.6" rx="1.25" ry="1.8" />
+            <circle className="jp-ah-pupila" cx="-11.4" cy="-1.3" r="0.55" />
+            <circle className="jp-ah-pupila" cx="-8.6" cy="-1.3" r="0.55" />
+            <path className="jp-ah-sonrisa" d="M-11.4,1.6 Q-9.9,2.8 -8.4,1.6" />
+          </g>
+          <g className="jp-ah-ojos-cerrados">
+            <path d="M-12.3,-1.4 Q-11.2,-0.3 -10.1,-1.4" />
+            <path d="M-9.5,-1.4 Q-8.4,-0.3 -7.3,-1.4" />
+          </g>
+          <g className="jp-ah-patitas">
+            <path d="M-3,5 q-1,2.5 -2.5,3" />
+            <path d="M1,5.6 q0,2.5 -1,3.2" />
+            <path d="M5,5 q1,2.5 0.5,3.4" />
+          </g>
+        </g>
+      </g>
+
       {/* ── Mariposas: secundarias que acompañan a Angelita — el químico ya no
           las espanta fuera de escena: se van apagando CON ella (aleteo pesado
           → tambaleo → caen marchitas al suelo) y reviven juntas al ganar. ── */}
@@ -455,6 +547,17 @@ function EscenaChagra({ errores, ganado, perdido }) {
       <g className="jp-ah-mariposa-orbita mariposa-orbita-2">
         <g transform="scale(0.68)">
           <Mariposita />
+        </g>
+      </g>
+
+      {/* ── La mariposa pasionaria (Mariposa REAL de la casa, Dione juno) ──
+          La mariposa adicional que pidió el operador: la creature canónica
+          del kit (cuatro alas independientes, ocelos). Aletea alto sobre el
+          surco, se destiñe y tambalea con la contaminación, y en p6 cae
+          plegada junto a sus compañeras. Revive con todas al ganar. */}
+      <g className="jp-ah-dione-orbita">
+        <g className="jp-ah-dione-marco" transform="scale(0.5)">
+          <Mariposa inline animated />
         </g>
       </g>
 
