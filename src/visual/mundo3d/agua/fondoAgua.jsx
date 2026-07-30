@@ -67,8 +67,9 @@ function paletaLejania(cielo) {
     horizonte,
     aire,
     cenit: mezclar(cielo.cielo, '#8fa3b8', 0.45),
-    // El monte lejano al atardecer: verde hondo empujado al azul del aire.
-    cuchilla: mezclar('#4d5b50', aire, 0.2),
+    // El monte lejano al atardecer: verde hondo empujado al azul del aire
+    // (con base verde-azulada: el marrón puro leía a chocolate en el smoke).
+    cuchilla: mezclar('#4f6058', aire, 0.24),
     resplandor: mezclar('#ffe9b8', ATMOSFERA.luz, 0.5),
     lechosa: '#f6f2e0',
     niebla: cielo.niebla,
