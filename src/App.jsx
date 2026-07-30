@@ -366,6 +366,10 @@ const FrutalesAndinos3DMockup = lazy(() => import('./mockups/FrutalesAndinos3D')
 const CanaTrapiche3DMockup = lazy(() => import('./mockups/CanaTrapiche3D'));
 const CondorCielo3DMockup = lazy(() => import('./mockups/CondorCielo3D'));
 const NavegadorGrafoDemoMockup = lazy(() => import('./mockups/NavegadorGrafoDemo'));
+// La NAVEGACIÓN UNIFICADA por pisos térmicos: los tres zooms (minimapa de
+// esquina, mapa estratégico de terrazas y la vista global tipo lámina con el
+// nevado y la Chorrera arriba) leyendo el mismo dato mundo→piso.
+const NavegacionPisosMockup = lazy(() => import('./mockups/NavegacionPisosTermicos'));
 const HarvestLog = lazy(() => import('./components/HarvestLog'));
 const SeedingLog = lazy(() => import('./components/SeedingLog'));
 const InputLog = lazy(() => import('./components/InputLog'));
@@ -841,6 +845,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/cana-trapiche-3d': 'mockup_cana_trapiche_3d',
   'mockups/condor-cielo-3d': 'mockup_condor_cielo_3d',
   'mockups/navegador-grafo': 'mockup_navegador_grafo',
+  'mockups/navegacion-pisos': 'mockup_navegacion_pisos',
 };
 
 const HASH_VIEW_ROUTES = {
@@ -2752,6 +2757,18 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="El grafo de la finca">
               <NavegadorGrafoDemoMockup />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_navegacion_pisos':
+        // Navegación unificada por pisos térmicos: minimapa + mapa estratégico
+        // + vista global (lámina del paisaje con nevado y Chorrera). Tocar un
+        // mundo navega a su pantalla real. Ruta #/mockups/navegacion-pisos,
+        // sin auth.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Navegación por pisos térmicos">
+              <NavegacionPisosMockup onNavigate={navigate} onBack={() => navigate('dashboard')} />
             </ErrorFallback>
           </ErrorBoundary>
         );
