@@ -293,10 +293,14 @@
    un toque gira la fase; el velo del cielo cambia con ella. Ámbar de "prepárese",
    jamás rojo. Acento por fase (frío en Niña, tibio neutro, cálido en Niño). */
 .mundo-enso {
-  max-width: 13.5rem;
+  /* Tarjeta ancha, no cápsula: con el copy didáctico completo la cápsula
+     angosta se volvía una columna de ~10 renglones que se salía del marco. */
+  width: 16.5rem;
+  max-width: 16.5rem;
   align-items: flex-start;
   gap: 0.5rem;
-  padding: 0.34rem 0.6rem 0.34rem 0.42rem;
+  padding: 0.4rem 0.65rem 0.42rem 0.5rem;
+  border-radius: 14px;
 }
 .mundo-enso__rueda {
   flex: 0 0 auto;
