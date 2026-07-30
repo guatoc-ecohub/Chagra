@@ -21,6 +21,7 @@ import {
   mundoDePantalla,
   comentarioDeMundo,
   notificacionesInteligentes,
+  notificacionDeClima,
   debeHablar,
   resolverComportamiento,
   llaveDeDecision,
@@ -200,6 +201,33 @@ describe('notificacionesInteligentes', () => {
     const n = notificacionesInteligentes({ activeAlerts: [], pendingTasks: [tareaHoy] });
     expect(n.hay).toBe(true);
     expect(['media', 'baja']).toContain(n.severidad);
+  });
+});
+
+describe('notificacionDeClima (#111 — vive el clima real)', () => {
+  it('sin reacción (null) → calma, no inventa aviso', () => {
+    const n = notificacionDeClima(null);
+    expect(n.hay).toBe(false);
+    expect(n.estado).toBe('calma');
+    expect(n.severidad).toBeNull();
+  });
+
+  it('reacción de helada (severidad alta) → aviso con prioridad máxima', () => {
+    const n = notificacionDeClima({
+      tipo: 'helada', mensaje: 'Uy, mañana hiela.', estado: 'aviso', severidad: 'alta', gesto: 'abriga',
+    });
+    expect(n.hay).toBe(true);
+    expect(n.estado).toBe('aviso');
+    expect(n.severidad).toBe('alta');
+    expect(n.prioridad).toBe(100);
+    expect(n.lead).toBe('Uy, mañana hiela.');
+  });
+
+  it('reacción de sequía (severidad baja) → prioridad de aviso_baja', () => {
+    const n = notificacionDeClima({
+      tipo: 'sequia', mensaje: 'Tengo sed.', estado: 'aviso', severidad: 'baja', gesto: 'pideAgua',
+    });
+    expect(n.prioridad).toBe(45);
   });
 });
 

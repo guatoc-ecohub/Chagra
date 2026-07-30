@@ -206,6 +206,38 @@ import { comentarioDeMundo, COMENTARISTA_MUNDO } from '../compai/nucleo/comentar
 export { comentarioDeMundo, COMENTARISTA_MUNDO };
 
 /* ─────────────────────────────────────────────────────────────────────────────
+ * 4b. CLIMA VIVO (#111) — traduce una ReaccionClima del núcleo
+ *    (compai/nucleo/climaVivo.js) al mismo contrato `notificaciones` que
+ *    consume `evaluar()`/`resolverComportamiento`, para que pase por la
+ *    MISMA anti-molestia y el MISMO cooldown de aviso que cualquier otra
+ *    alerta — cero camino paralelo, cero timer propio.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * @param {import('../compai/nucleo/climaVivo').ReaccionClima|null} reaccion
+ * @returns {{ hay:boolean, estado:string, severidad:(string|null), lead:(string|null),
+ *   prompt:(string|null), prioridad:number }}
+ */
+export function notificacionDeClima(reaccion) {
+  if (!reaccion) {
+    return { hay: false, estado: 'calma', severidad: null, lead: null, prompt: null, prioridad: PRIORIDAD.calma };
+  }
+  const prioridad = reaccion.severidad === 'alta'
+    ? PRIORIDAD.aviso_alta
+    : reaccion.severidad === 'media'
+      ? PRIORIDAD.aviso_media
+      : PRIORIDAD.aviso_baja;
+  return {
+    hay: true,
+    estado: 'aviso',
+    severidad: reaccion.severidad,
+    lead: reaccion.mensaje,
+    prompt: null,
+    prioridad,
+  };
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
  * 4. NOTIFICACIONES INTELIGENTES — qué atender hoy, priorizado y sin ruido.
  * ────────────────────────────────────────────────────────────────────────── */
 
