@@ -7,17 +7,24 @@
  *
  *     avatarType ('angelita'|'maiz'|'zariguya')  →  cómo se presenta en 3D.
  *
- * REGLA DEL FALLBACK: hoy SOLO Angelita tiene presencia 3D propia (coreografía
- * useEntradaAbeja + ABEJA_PRESENCIA). El maíz y la zarigüeya YA son opciones de
- * avatar (useAgentAvatarType) pero todavía NO tienen arte 3D — esperan el Fable
- * de compai (#5). Mientras tanto caen a Angelita: es mejor la abeja que un maíz
- * o una zarigüeya "volando" con la coreografía de la abeja (sería peor). Cuando
- * el Fable aterrice su <XEscena> + su presencia, se registran aquí y el mundo
- * refleja la elección SIN tocar EscenaBase3D ni las escenas de cada mundo.
+ * REGLA DEL FALLBACK: todo tipo del registro sin `EscenaComponent` propio cae
+ * a Angelita (mejor la abeja que un compañero volando con coreografía ajena).
+ * Desde 2026-07-29 los TRES tipos tienen presencia propia: Angelita
+ * (useEntradaAbeja, la nativa), el MAÍZ (MaizCompaiEscena: arraigado, brota y
+ * se inclina al foco) y la ZARIGÜEYA (ZariguyaCompaiEscena: trota por el piso
+ * y se encarama — jamás vuela). El mundo refleja la elección SIN tocar
+ * EscenaBase3D ni las escenas de cada mundo.
  *
- * SOLO DATOS + tipos: no arrastra three ni componentes de arte al importarse.
+ * NOTA de peso: desde que Fable registró las escenas, este módulo SÍ arrastra
+ * arte (y three, transitivamente). Es correcto: vive dentro de escenas/ (el
+ * chunk perezoso `vendor-three`) y sus únicos consumidores son CompaiEscena /
+ * useCompaiElegido, que ya viven ahí. JAMÁS importarlo desde el bundle base.
  */
 import { ABEJA_PRESENCIA } from '../../creatures/abejaIdentidad.js';
+import { MAIZ_PRESENCIA } from '../../creatures/maizIdentidad.js';
+import { ZARIGUYA_PRESENCIA } from '../../creatures/zariguyaIdentidad.js';
+import { MaizCompaiEscena } from './MaizCompaiEscena.jsx';
+import { ZariguyaCompaiEscena } from './ZariguyaCompaiEscena.jsx';
 import { AVATAR_TYPES, DEFAULT_AVATAR_TYPE } from '../../../hooks/useAgentAvatarType.js';
 
 /**
@@ -48,16 +55,19 @@ import { AVATAR_TYPES, DEFAULT_AVATAR_TYPE } from '../../../hooks/useAgentAvatar
  * @property {boolean} esFallback  el tipo pedido no resolvió a una escena propia.
  */
 
-/* El mapa. `EscenaComponent: null` = todavía lo dibuja Angelita. Fable rellena. */
+/* El mapa. `EscenaComponent: null` = lo dibuja Angelita (regla del fallback).
+   Angelita queda en null A PROPÓSITO: su escena (AbejaEscena) es el fallback
+   nativo que CompaiEscena monta directo — registrarla aquí sería un ciclo de
+   imports con useEntradaAbeja sin ganar nada. */
 const REGISTRO = {
   angelita: { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'abeja-angelita', pendienteFable: false },
-  // TODO(fable #5): MaizCompaiEscena + maizIdentidad (presencia propia, brisa
-  //   asimétrica). Hoy: fallback a Angelita.
-  maiz: { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'abeja-angelita', pendienteFable: true },
-  // TODO(fable #5): ZariguyaCompaiEscena + su presencia 3D. zariguyaIdentidad ya
-  //   trae FIRMA/PALETA/PROPORCION; falta _PRESENCIA + coreografía (marsupial
-  //   nocturno que camina, NO vuela). Hoy: fallback a Angelita.
-  zariguya: { EscenaComponent: null, presencia: ABEJA_PRESENCIA, especie: 'abeja-angelita', pendienteFable: true },
+  // El MAÍZ compañero (fable #5): arraigado — brota del montículo, se mece
+  // con brisa asimétrica, se INCLINA hacia el foco y el penacho vibra.
+  maiz: { EscenaComponent: MaizCompaiEscena, presencia: MAIZ_PRESENCIA, especie: 'maiz', pendienteFable: false },
+  // La ZARIGÜEYA compañera (fable #5): marsupial nocturno DE PISO — llega
+  // trotando, merodea, se encarama al foco en alto y husmea. Crías al lomo
+  // de serie (su firma). Jamás vuela.
+  zariguya: { EscenaComponent: ZariguyaCompaiEscena, presencia: ZARIGUYA_PRESENCIA, especie: 'zariguya', pendienteFable: false },
 };
 
 /**

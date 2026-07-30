@@ -18,15 +18,20 @@ describe('compaiRegistry.resolverCompai', () => {
     expect(c.presencia).toBe(ABEJA_PRESENCIA);
   });
 
-  it('maíz y zarigüeya: pendientes de Fable → fallback a Angelita (sin regresión)', () => {
+  it('maíz y zarigüeya: arte 3D propio registrado (ya NO caen a Angelita)', () => {
+    // Fable #5 (2026-07-29): MaizCompaiEscena + ZariguyaCompaiEscena
+    // registradas con presencia propia — el mundo refleja la elección.
     for (const tipo of ['maiz', 'zariguya']) {
       const c = resolverCompai(tipo);
       expect(c.avatarType).toBe(tipo);
-      expect(c.pendienteFable).toBe(true);
-      // Hoy caen a la abeja: sin escena propia y con la presencia de Angelita.
-      expect(c.EscenaComponent).toBeNull();
-      expect(c.esFallback).toBe(true);
-      expect(c.presencia).toBe(ABEJA_PRESENCIA);
+      expect(c.pendienteFable).toBe(false);
+      expect(typeof c.EscenaComponent).toBe('function');
+      expect(c.esFallback).toBe(false);
+      expect(c.especie).toBe(tipo);
+      // Presencia PROPIA (no la de la abeja), cumpliendo el contrato.
+      expect(c.presencia).not.toBe(ABEJA_PRESENCIA);
+      expect(typeof c.presencia.billboardBase).toBe('number');
+      expect(c.presencia.sombra).toBeTruthy();
     }
   });
 
