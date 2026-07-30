@@ -1,0 +1,343 @@
+/*
+ * agentePlano.css — coreografías del CRUCE DEL AGENTE 3D → PLANO
+ * (AgentePlanoTransicion.jsx).
+ *
+ * Contrato compartido con agentePlanoData.js (NO cambiar uno sin el otro):
+ * el reloj del agente se deriva del reloj del túnel; el CSS anima "a ciegas"
+ * con las variables que setea el componente:
+ *
+ *   --apt-x0 / --apt-y0          percha de partida (centro del rect `desde`)
+ *   --apt-bx / --apt-by          boca del túnel (centro, FUGA_Y del lenguaje)
+ *   --apt-dx-ida / --apt-dy-ida  delta percha → boca
+ *   --apt-dx-lleg / --apt-dy-lleg  delta boca → ancla de llegada
+ *   --apt-ang                    ángulo boca → ancla (orienta la estela)
+ *   --apt-s1                     escala del avatar posado (lado / LADO_VUELO)
+ *   --apt-ida-ms                 ventana del tramo ida (0 → cubierto)
+ *   --apt-cometa-ini/-ms         ventana de la estela sobre el destello
+ *   --apt-salida-ms/--apt-vuelo2-ms  ventana del tramo llegada
+ *   --apt-aplane-ms              presión contra el vidrio (solo posar)
+ *   --apt-empalme-ms             fundido final encima del avatar real
+ *
+ * SOLO transform/opacity en todo lo animado (compositor puro). El overlay
+ * vuela POR ENCIMA del túnel (z 48 > 47): el alma cruza sobre el destello.
+ * Los callbacks los disparan timers JS del componente, nunca `animationend`.
+ */
+
+.apt {
+  position: fixed;
+  inset: 0;
+  z-index: 48; /* sobre el túnel lámina (47): la abeja vuela sobre el destello */
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Escalas de arranque/llegada por sentido (unifican los keyframes):
+   posar parte a tamaño de mundo y termina a tamaño de avatar; alzar parte
+   del avatar posado y termina a tamaño de mundo. */
+.apt--posar {
+  --apt-s-ini: 1;
+  --apt-s-fin: var(--apt-s1);
+}
+.apt--alzar {
+  --apt-s-ini: var(--apt-s1);
+  --apt-s-fin: 0.92;
+}
+
+/* ══ TRAMO IDA: la llamada + el clavado a la boca del túnel ══════════════ */
+
+/* Ancla 0×0 en la percha de partida: el flex centra al hijo sobre el punto. */
+.apt__ida {
+  position: absolute;
+  left: var(--apt-x0);
+  top: var(--apt-y0);
+  width: 0;
+  height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* LA LLAMADA: un pulso de aura — "me llaman al otro lado". Vive en el primer
+   tercio de la ida y muere solo. */
+.apt__pulso {
+  position: absolute;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255, 213, 74, 0.85);
+  opacity: 0;
+  transform: scale(0.4);
+  will-change: transform, opacity;
+  animation: aptPulso calc(var(--apt-ida-ms) * 0.32) ease-out both;
+}
+@keyframes aptPulso {
+  0% { transform: scale(0.4); opacity: 0.9; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* EL VUELO de ida: brinquito de llamada → anticipación (se echa atrás,
+   CONTRA el sentido del viaje, con squash) → se clava a la boca del túnel
+   estirándose y encogiéndose — la opacidad muere SECA en el cubierto. */
+.apt__vuelo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 6px 14px rgba(20, 30, 15, 0.35));
+  animation: aptIda var(--apt-ida-ms) cubic-bezier(0.55, -0.1, 0.7, 0.92) both;
+}
+@keyframes aptIda {
+  0% {
+    transform: translate(0, 0) scale(var(--apt-s-ini));
+    opacity: 1;
+  }
+  14% {
+    /* la llamada: brinquito atento hacia arriba */
+    transform: translate(0, -7px) scale(calc(var(--apt-s-ini) * 1.06), calc(var(--apt-s-ini) * 0.98));
+    opacity: 1;
+  }
+  32% {
+    /* anticipación: se echa atrás y coge impulso (squash) */
+    transform:
+      translate(calc(var(--apt-dx-ida) * -0.07), calc(var(--apt-dy-ida) * -0.07 + 5px))
+      scale(calc(var(--apt-s-ini) * 1.12), calc(var(--apt-s-ini) * 0.8));
+  }
+  44% {
+    /* suelta el resorte: estirada en el despegue */
+    transform:
+      translate(calc(var(--apt-dx-ida) * 0.06), calc(var(--apt-dy-ida) * 0.06))
+      scale(calc(var(--apt-s-ini) * 0.82), calc(var(--apt-s-ini) * 1.18));
+  }
+  96% { opacity: 1; }
+  100% {
+    /* tragada por la boca del túnel, SECA, en el instante del cubierto */
+    transform: translate(var(--apt-dx-ida), var(--apt-dy-ida)) scale(0.1);
+    opacity: 0;
+  }
+}
+
+/* El barrel roll del clavado (arranca tras la anticipación). */
+.apt__giro {
+  will-change: transform;
+  animation: aptGira var(--apt-ida-ms) cubic-bezier(0.6, 0, 0.6, 1) both;
+}
+.apt__giro > svg { display: block; }
+@keyframes aptGira {
+  0%, 34% { transform: rotate(0deg); }
+  42% { transform: rotate(-15deg); } /* wind-up */
+  100% { transform: rotate(324deg); }
+}
+
+/* El puff del tragado: un anillo revienta en la boca del túnel donde la
+   abeja desapareció (vende el "pop" del cruce de capa). */
+.apt__puff {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 214, 106, 0.9);
+  opacity: 0;
+  transform: translate(var(--apt-dx-ida), var(--apt-dy-ida)) scale(0.2);
+  will-change: transform, opacity;
+  animation: aptPuff 300ms ease-out calc(var(--apt-ida-ms) - 60ms) both;
+}
+@keyframes aptPuff {
+  0% { transform: translate(var(--apt-dx-ida), var(--apt-dy-ida)) scale(0.2); opacity: 0.9; }
+  100% { transform: translate(var(--apt-dx-ida), var(--apt-dy-ida)) scale(1.5); opacity: 0; }
+}
+
+/* ══ EL COMETA: el alma en tránsito sobre el destello ════════════════════ */
+
+/* Nace en la boca del túnel y corre hacia el ancla de llegada mientras la
+   pantalla está cubierta: la continuidad VISIBLE a través del intercambio.
+   Semilla oscura + estela dorada: lee sobre destellos claros y oscuros. */
+.apt__cometa {
+  position: absolute;
+  left: var(--apt-bx);
+  top: var(--apt-by);
+  width: 0;
+  height: 0;
+  will-change: transform, opacity;
+  opacity: 0;
+  animation: aptCometa var(--apt-cometa-ms) cubic-bezier(0.4, 0.1, 0.5, 1)
+    var(--apt-cometa-ini) both;
+}
+@keyframes aptCometa {
+  0% { transform: translate(0, 0); opacity: 0; }
+  14% { opacity: 1; }
+  82% { opacity: 1; }
+  100% {
+    transform: translate(calc(var(--apt-dx-lleg) * 0.46), calc(var(--apt-dy-lleg) * 0.46));
+    opacity: 0;
+  }
+}
+.apt__estela {
+  position: absolute;
+  left: -86px;
+  top: -3px;
+  width: 86px;
+  height: 6px;
+  border-radius: 3px;
+  transform-origin: 100% 50%;
+  transform: rotate(var(--apt-ang));
+  background: linear-gradient(
+    90deg,
+    rgba(255, 213, 74, 0) 0%,
+    rgba(255, 213, 74, 0.55) 55%,
+    rgba(255, 240, 190, 0.95) 100%
+  );
+  filter: drop-shadow(0 0 8px rgba(255, 213, 74, 0.7));
+}
+.apt__nucleo {
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff7dd 0%, #ffd54a 55%, rgba(58, 42, 8, 0.9) 100%);
+}
+
+/* ══ TRAMO LLEGADA: condensa, frena en arco, aterriza y se aplana ════════ */
+
+/* Ancla 0×0 en la boca; el arco lo hacen DOS ejes con easings distintos:
+   la X sale disparada y frena largo; la Y arranca perezosa y cae al final.
+   La recta se vuelve un arco por encima, sin path ni layout. */
+.apt__llegada {
+  position: absolute;
+  left: var(--apt-bx);
+  top: var(--apt-by);
+  width: 0;
+  height: 0;
+  animation: aptEmpalme var(--apt-empalme-ms) ease-out
+    calc(var(--apt-salida-ms) + var(--apt-vuelo2-ms) + var(--apt-aplane-ms)) both;
+}
+@keyframes aptEmpalme {
+  0% { opacity: 1; }
+  100% { opacity: 0; } /* se funde ENCIMA del avatar real ya revelado */
+}
+.apt__arcoX {
+  will-change: transform;
+  animation: aptLlegaX var(--apt-vuelo2-ms) cubic-bezier(0.16, 0.8, 0.3, 1)
+    var(--apt-salida-ms) both;
+}
+@keyframes aptLlegaX {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(var(--apt-dx-lleg)); }
+}
+.apt__arcoY {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 480px; /* el aplane: la abeja se presiona DENTRO del vidrio */
+  will-change: transform;
+  animation: aptLlegaY var(--apt-vuelo2-ms) cubic-bezier(0.62, 0.02, 0.48, 1)
+    var(--apt-salida-ms) both;
+}
+@keyframes aptLlegaY {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(var(--apt-dy-lleg)); }
+}
+
+/* EL CUERPO: sale del destello hecho luz (estirado, casi estela), se condensa
+   en abeja a mitad de vuelo, frena, ATERRIZA con squash & stretch y asienta.
+   Después del vuelo, el APLANE (segunda animación): una presión con rotateX
+   que colapsa — el volumen se rinde y queda calcomanía sobre el vidrio. */
+.apt__cuerpo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 5px 12px rgba(20, 30, 15, 0.32));
+  animation:
+    aptCondensa var(--apt-vuelo2-ms) cubic-bezier(0.3, 0.6, 0.35, 1) var(--apt-salida-ms) both,
+    aptAplana var(--apt-aplane-ms) cubic-bezier(0.34, 1.4, 0.64, 1)
+      calc(var(--apt-salida-ms) + var(--apt-vuelo2-ms)) both;
+}
+@keyframes aptCondensa {
+  0% { transform: scale(0.14, 1.25); opacity: 0; }
+  12% { transform: scale(0.4, 1.18); opacity: 1; } /* la luz se condensa */
+  52% { transform: scale(0.96); } /* abeja plena, planeando */
+  76% { transform: scale(calc(var(--apt-s-fin) * 1.05)); }
+  83% {
+    /* touchdown: squash franco contra el vidrio */
+    transform: translateY(3px) scale(calc(var(--apt-s-fin) * 1.22), calc(var(--apt-s-fin) * 0.74));
+  }
+  92% {
+    /* rebote que rebasa (stretch) y … */
+    transform: translateY(-2px) scale(calc(var(--apt-s-fin) * 0.94), calc(var(--apt-s-fin) * 1.1));
+  }
+  100% { transform: translateY(0) scale(var(--apt-s-fin)); } /* …asienta */
+}
+@keyframes aptAplana {
+  0% { transform: rotateX(0deg) scale(var(--apt-s-fin)); }
+  42% { transform: rotateX(17deg) scale(calc(var(--apt-s-fin) * 1.05)); }
+  100% { transform: rotateX(0deg) scale(var(--apt-s-fin)); }
+}
+/* Al alzar no hay aplane (aplane-ms = 0): el cuerpo termina a escala de
+   mundo y la sombra que RENACE debajo le devuelve el volumen. */
+
+/* LA SOMBRA: lo que dice "yo floto en un mundo". En el vuelo de llegada nace
+   tímida y crece con la cercanía del piso; en el aplane SE FUNDE con la abeja
+   (el volumen muere: eso ES volverse plano). Al alzar corre solo la primera
+   parte — la sombra se queda (el volumen regresó). */
+.apt__sombra {
+  position: absolute;
+  top: 26px;
+  width: 42px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(20, 30, 15, 0.4) 0%, rgba(20, 30, 15, 0) 70%);
+  will-change: transform, opacity;
+  opacity: 0;
+  animation: aptSombraNace var(--apt-vuelo2-ms) ease-out var(--apt-salida-ms) both;
+}
+@keyframes aptSombraNace {
+  0% { transform: translateY(10px) scale(0.3); opacity: 0; }
+  55% { transform: translateY(6px) scale(0.55); opacity: 0.18; }
+  100% { transform: translateY(0) scale(1); opacity: 0.4; }
+}
+.apt--posar .apt__sombra {
+  animation:
+    aptSombraNace var(--apt-vuelo2-ms) ease-out var(--apt-salida-ms) both,
+    aptSombraFunde var(--apt-aplane-ms) ease-in
+      calc(var(--apt-salida-ms) + var(--apt-vuelo2-ms)) both;
+}
+@keyframes aptSombraFunde {
+  0% { transform: translateY(0) scale(1); opacity: 0.4; }
+  100% { transform: translateY(-12px) scale(0.4, 0.2); opacity: 0; } /* sube y muere en ella */
+}
+
+/* LA ONDA del vidrio: al momento del aplane, un anillo recorre el cristal —
+   "tocó SU pantalla". Solo al posar. */
+.apt__onda {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 213, 74, 0.75);
+  opacity: 0;
+  transform: scale(0.3);
+  will-change: transform, opacity;
+}
+.apt--posar .apt__onda {
+  animation: aptOnda 420ms ease-out calc(var(--apt-salida-ms) + var(--apt-vuelo2-ms)) both;
+}
+@keyframes aptOnda {
+  0% { transform: scale(0.3); opacity: 0.85; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+/* ══ Gama baja: queda el cruce esencial (dos vuelos + squash del aterrizaje,
+   que son el empalme) sin barrel roll, pulso, puff ni onda. El cometa no lo
+   monta el JS. ══ */
+[data-tier='bajo'].apt .apt__giro { animation: none; }
+[data-tier='bajo'].apt .apt__pulso,
+[data-tier='bajo'].apt .apt__puff,
+[data-tier='bajo'].apt .apt__onda { animation: none; opacity: 0; }
+
+/* RM defensivo: el componente ya no monta nada con reduced-motion; si algún
+   host se equivoca, no se anima ni se ve nada. */
+@media (prefers-reduced-motion: reduce) {
+  .apt { display: none; }
+}

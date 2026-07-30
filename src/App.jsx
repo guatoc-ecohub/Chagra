@@ -149,6 +149,8 @@ const MontanaMundosCampesinoMockup = lazy(() => import('./mockups/MontanaMundosC
 const EntradaCampesinaMockup = lazy(() => import('./mockups/EntradaCampesina'));
 const HomeCampesinoMockup = lazy(() => import('./mockups/HomeCampesino'));
 const BotonAnarquiaMockup = lazy(() => import('./mockups/BotonAnarquia'));
+// El cruce del agente 3D → plano (la abeja cruza el túnel y aterriza de avatar).
+const TransicionAgentePlanoMockup = lazy(() => import('./mockups/TransicionAgentePlano'));
 const AvatarGameBiopunk = lazy(() => import('./mockups/AvatarGameBiopunk'));
 const AvatarGameVerdeVivo = lazy(() => import('./mockups/AvatarGameVerdeVivo'));
 const AvatarGameLibre = lazy(() => import('./mockups/AvatarGameLibre'));
@@ -754,6 +756,7 @@ const MOCKUP_HASH_ROUTES = {
   'mockups/entrada-campesina': 'mockup_entrada_campesina',
   'mockups/home-campesino': 'mockup_home_campesino',
   'mockups/boton-anarquia': 'mockup_boton_anarquia',
+  'mockups/transicion-agente-plano': 'mockup_transicion_agente_plano',
   'mockups/avatar-biopunk': 'mockup_avatar_biopunk',
   'mockups/avatar-verde-vivo': 'mockup_avatar_verde_vivo',
   'mockups/avatar-libre': 'mockup_avatar_libre',
@@ -2070,6 +2073,14 @@ export default function App() {
           <ErrorBoundary>
             <ErrorFallback moduleName="Botón anarquía">
               <BotonAnarquiaMockup onBack={() => navigate('dashboard')} />
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'mockup_transicion_agente_plano':
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="El agente cruza a lo plano">
+              <TransicionAgentePlanoMockup />
             </ErrorFallback>
           </ErrorBoundary>
         );
