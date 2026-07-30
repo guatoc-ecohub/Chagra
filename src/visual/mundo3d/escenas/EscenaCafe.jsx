@@ -212,18 +212,23 @@ function Diorama({ tier, reducedMotion }) {
         <meshLambertMaterial vertexColors />
       </mesh>
 
-      {/* las montañas cafeteras del fondo, comidas por la niebla de la hora */}
-      <mesh position={[-14, 3.0, -23]} scale={[10, 4.6, 5]}>
+      {/* las montañas cafeteras del fondo, comidas por la niebla de la hora.
+          Gate 2026-07-30: se acercaron, se subieron y se les APAGÓ el fog de
+          escena (`fog={false}`) — su color YA trae la niebla mezclada a mano
+          (montes.*) y el fog de la base (zoom·1.4 … zoom·4.6) se las tragaba
+          DOBLE: la banda alta del cuadro quedaba en bruma vacía, sin la
+          silueta que vuelve cielo el cielo. */}
+      <mesh position={[-15, 5.0, -21]} scale={[11, 5.2, 5]}>
         <sphereGeometry args={[1, 12, 8]} />
-        <meshLambertMaterial color={montes.media} />
+        <meshLambertMaterial color={montes.media} fog={false} />
       </mesh>
-      <mesh position={[8, 3.4, -26]} scale={[12, 5.6, 6]}>
+      <mesh position={[6, 6.0, -24]} scale={[13, 6.4, 6]}>
         <sphereGeometry args={[1, 12, 8]} />
-        <meshLambertMaterial color={montes.lejos} />
+        <meshLambertMaterial color={montes.lejos} fog={false} />
       </mesh>
-      <mesh position={[21, 2.2, -22]} scale={[8, 3.6, 5]}>
+      <mesh position={[20, 3.6, -19]} scale={[9, 4.2, 5]}>
         <sphereGeometry args={[1, 12, 8]} />
-        <meshLambertMaterial color={montes.cerca} />
+        <meshLambertMaterial color={montes.cerca} fog={false} />
       </mesh>
 
       {/* EL CAFETAL ENTERO: surcos a curva de nivel con los tres protagonistas
