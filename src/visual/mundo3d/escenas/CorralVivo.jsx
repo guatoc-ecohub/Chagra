@@ -251,6 +251,35 @@ export function normalizarAnimales(lista) {
   });
 }
 
+/* ── La POSE del corral (NO exportada: solo el hato del corral; el mercado
+   posa sus vendidos aparte en AnimalMomento) ────────────────────────────────
+   El rumbo pseudo-aleatorio de normalizarAnimales es honesto pero CIEGO a la
+   cámara: a un animal le puede tocar quedar exactamente de espaldas al encuadre
+   de entrada y su silueta muere (QA visual 2026-07-30: Camilo, el cebú vendido,
+   leía "medio piedra" de espaldas — un lomo translúcido sin cabeza ni patas
+   visibles). Aquí cada animal se orienta TANGENTE al anillo del ciclo — el hato
+   CAMINA el anillo del abono, que es la tesis del mundo — con un jitter
+   determinista por animal (vida, no formación). En tangente, desde cualquier
+   borde del corral el animal queda de perfil o tres cuartos: la silueta
+   (cabeza, lomo, patas) siempre lee. Muta los objetos frescos que devuelve
+   normalizarAnimales; la función compartida no cambia. */
+const _posV = new THREE.Vector3();
+const _posQ = new THREE.Quaternion();
+const _posE = new THREE.Vector3();
+function posarHatoCorral(animales) {
+  for (const a of animales) {
+    const angulo = Math.atan2(a.pos[2], a.pos[0]);
+    const jitter = Math.sin(a.fase * 7.3) * 0.35;
+    const rumbo = -(angulo + Math.PI / 2) + jitter;
+    a.mat.compose(
+      _posV.set(a.pos[0], a.pos[1], a.pos[2]),
+      _posQ.setFromAxisAngle(EJE_Y, rumbo),
+      _posE.set(a.escala, a.escala, a.escala),
+    );
+  }
+  return animales;
+}
+
 /* El gesto de idle de la especie como matriz sobre el pivote del piso (las
    mismas amplitudes chicas del recinto original: vida, no espectáculo). */
 function matrizGesto(m, gesto, t, fase) {
@@ -339,7 +368,10 @@ function ParteInstanciada({ parte, lista, fantasma, animar, onPick }) {
         color={parte.porRaza ? '#ffffff' : parte.color}
         flatShading
         transparent={fantasma}
-        opacity={fantasma ? 0.35 : 1}
+        /* 0.35 sobre el piso de madera clara dejaba al fantasma casi invisible
+           (pelaje cebú #d9d2c4 ≈ el piso); 0.45 conserva la poética de la
+           huella pero la silueta vuelve a leer (QA visual 2026-07-30). */
+        opacity={fantasma ? 0.45 : 1}
         depthWrite={!fantasma}
       />
     </instancedMesh>
@@ -603,7 +635,7 @@ function PlacaAnimal({ animal, onCerrar }) {
  * grupos aparte), señales de preñez, carteles con nombre y la placa del toque.
  */
 export default function CorralVivo({ animales: lista, reducedMotion, tier = 'alto' }) {
-  const animales = useMemo(() => normalizarAnimales(lista || []), [lista]);
+  const animales = useMemo(() => posarHatoCorral(normalizarAnimales(lista || [])), [lista]);
   const [seleccion, setSeleccion] = useState(null);
   // GATE doble: reduced-motion apaga el idle; gama baja tampoco lo paga.
   const animar = !reducedMotion && tier !== 'bajo';
