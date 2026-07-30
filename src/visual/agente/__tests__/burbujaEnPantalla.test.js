@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { correccionEnPantalla } from '../BurbujaAngelita';
+import { correccionEnPantalla } from '../burbujaAngelitaUtils.js';
 
 /**
  * La burbuja del compAI va anclada al personaje con `<Html center>`, o sea
