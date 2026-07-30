@@ -170,35 +170,64 @@ export function MaizCompai({
   );
 
   // ── LA MAZORCA AL COSTADO (LA FIRMA: la carga que alimenta) ───────────────
-  // Envuelta en su amero, recostada en el tallo, con las barbas cobrizas
-  // asomando por la punta. Grupo propio (.maiz-mazorca): pesa y se mece con
-  // su propio retraso (follow-through del cuerpo).
+  // REDISEÑADA (feedback del operador, bitácora de integración 2026-07-30):
+  // la versión anterior — elipse alargada de punta pelada — leía FÁLICA.
+  // Regla de la casa para formas orgánicas alargadas: ENVOLVER en chala,
+  // INCLINAR y dar GROSOR. Ahora es un choclo de verdad:
+  //   · CORTO Y ANCHO (rx 3.0 / ry 3.7 — antes 2.55 / 4.7): bulto, no vara.
+  //   · RECOSTADO en diagonal (32° — antes 20°): la punta se aleja del tallo
+  //     y la base cae hacia el nudo del culmo, como nace el choclo real.
+  //   · ENVUELTO EN SU CHALA: copa delantera que abraza la mitad baja con
+  //     escote en V + dos puntas que se ABREN hacia afuera (el gesto de
+  //     recién-deshojado) + una bráctea asomando por detrás de la punta.
+  //   · GRANOS VISIBLES: hileras escalonadas de granitos redondos en la
+  //     parte descubierta — se lee "mazorca" a primera vista.
+  //   · Barbas en MECHÓN corto y ladeado por la punta (ya no en penacho).
+  // Grupos .maiz-mazorca / .maiz-barba intactos: la cadencia CSS no cambia.
   const mazorca = (
-    <g transform="translate(4.3 2.8) rotate(20)">
+    <g transform="translate(4.9 2.2) rotate(32)">
       <g className="maiz-mazorca" style={{ transformBox: 'fill-box', transformOrigin: 'center top' }}>
-        {/* bráctea de atrás del amero */}
-        <path d="M-1.4,-4.4 C-3.6,-1.8 -3.8,2.6 -1.8,5.2 C-3.0,1.8 -2.8,-1.6 -1.4,-4.4 Z"
-          fill={P.amero} stroke={RH_INK} strokeWidth="0.8" />
-        {/* el grano */}
-        <ellipse cx="0" cy="0" rx={PR.mazorcaRx} ry={PR.mazorcaRy}
+        {/* bráctea de ATRÁS: asoma pelada detrás de la punta (profundidad) */}
+        <path d="M-0.8,-1.6 C-2.9,-2.2 -4.3,-3.9 -4.8,-6.3 C-3.2,-5.7 -1.9,-4.5 -1.0,-2.9 Z"
+          fill={P.hoja} stroke={RH_INK} strokeWidth="0.8" strokeLinejoin="round" />
+        {/* el choclo: corto y ancho, la punta apenas asoma de la chala */}
+        <ellipse cx="0" cy="-0.4" rx={PR.mazorcaRx} ry={PR.mazorcaRy}
           fill={P.mazorca} stroke={RH_INK} strokeWidth="1.2" />
-        {/* hileras de granos (dos costuras + tres arcos) */}
-        <g stroke={P.grano} strokeWidth="0.5" fill="none" opacity="0.85">
-          <path d="M-0.9,-4.3 C-1.3,-1.4 -1.3,1.6 -0.9,4.3" />
-          <path d="M1.0,-4.2 C1.4,-1.4 1.4,1.5 1.0,4.2" />
-          <path d="M-2.2,-1.6 C-0.7,-2.1 0.8,-2.1 2.2,-1.6" />
-          <path d="M-2.4,0.4 C-0.8,-0.1 0.9,-0.1 2.4,0.4" />
-          <path d="M-2.2,2.4 C-0.7,1.9 0.8,1.9 2.2,2.4" />
+        {/* GRANOS: hileras escalonadas en la parte descubierta */}
+        <g fill={P.grano} stroke={RH_INK} strokeWidth="0.3" opacity="0.95">
+          <circle cx="-1.4" cy="-3.1" r="0.52" />
+          <circle cx="0" cy="-3.1" r="0.52" />
+          <circle cx="1.4" cy="-3.1" r="0.52" />
+          <circle cx="-2.1" cy="-2.0" r="0.52" />
+          <circle cx="-0.7" cy="-2.0" r="0.52" />
+          <circle cx="0.7" cy="-2.0" r="0.52" />
+          <circle cx="2.1" cy="-2.0" r="0.52" />
+          <circle cx="-1.4" cy="-0.9" r="0.52" />
+          <circle cx="0" cy="-0.9" r="0.52" />
+          <circle cx="1.4" cy="-0.9" r="0.52" />
+          <circle cx="-0.7" cy="0.2" r="0.52" />
+          <circle cx="0.7" cy="0.2" r="0.52" />
         </g>
-        {/* bráctea de adelante (el amero que la abraza) */}
-        <path d="M1.6,-4.0 C3.3,-1.2 3.3,2.8 1.3,5.4 C2.5,2.0 2.5,-1.2 1.6,-4.0 Z"
-          fill={P.amero} stroke={RH_INK} strokeWidth="0.8" opacity="0.95" />
-        {/* LAS BARBAS (sedas) cobrizas por la punta — grupo propio, tiemblan */}
+        {/* LA CHALA (amero): copa delantera que abraza la mitad baja, escote en V */}
+        <path d="M-3.3,-1.0 C-3.6,1.8 -2.0,3.9 0.0,3.9 C2.0,3.9 3.6,1.8 3.3,-1.0
+                 C2.2,0.2 1.1,0.7 0.0,0.7 C-1.1,0.7 -2.2,0.2 -3.3,-1.0 Z"
+          fill={P.amero} stroke={RH_INK} strokeWidth="1.0" strokeLinejoin="round" />
+        {/* las puntas de la chala se ABREN hacia afuera (recién deshojado) */}
+        <path d="M-3.2,-0.8 C-4.2,-1.6 -4.8,-2.8 -4.9,-4.2 C-3.7,-3.4 -3.0,-2.2 -2.8,-0.7 Z"
+          fill={P.amero} stroke={RH_INK} strokeWidth="0.8" strokeLinejoin="round" />
+        <path d="M3.2,-0.8 C4.3,-1.5 5.4,-1.8 6.3,-1.6 C5.5,-0.4 4.4,0.2 3.0,0.2 Z"
+          fill={P.amero} stroke={RH_INK} strokeWidth="0.8" strokeLinejoin="round" />
+        {/* nervaduras de la chala */}
+        <g stroke={P.vena} strokeWidth="0.45" fill="none" opacity="0.7">
+          <path d="M-1.3,3.5 C-1.5,2.4 -1.7,1.5 -2.2,0.4" />
+          <path d="M1.3,3.5 C1.5,2.4 1.7,1.5 2.2,0.4" />
+        </g>
+        {/* LAS BARBAS (sedas) cobrizas: mechón corto y ladeado — tiemblan */}
         <g className="maiz-barba" style={{ transformBox: 'fill-box', transformOrigin: 'center bottom' }}>
           <g stroke={P.barba} strokeWidth="0.75" fill="none" strokeLinecap="round">
-            <path d="M-0.4,-4.5 C-0.2,-6.0 0.8,-6.9 2.0,-7.0" />
-            <path d="M0.2,-4.6 C0.8,-6.2 2.0,-7.2 3.3,-7.1" />
-            <path d="M-0.8,-4.4 C-1.2,-5.8 -0.8,-6.9 0.2,-7.6" />
+            <path d="M-0.5,-3.8 C-1.3,-4.7 -1.6,-5.6 -1.2,-6.5" />
+            <path d="M0.1,-4.0 C0.4,-5.1 1.1,-5.9 2.1,-6.2" />
+            <path d="M0.6,-3.8 C1.5,-4.4 2.5,-4.6 3.3,-4.4" />
           </g>
         </g>
       </g>

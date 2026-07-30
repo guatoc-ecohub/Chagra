@@ -105,8 +105,8 @@ export const MAIZ_PROPORCION = {
   caraR: 4.7,               // la carita de choclo entre brácteas
   penachoLargo: 7.5,        // cuánto sube el plumero sobre la cabeza (firma)
   hojas: 4,                 // dos brazos-cinta arriba + dos hojas caídas abajo
-  mazorcaRx: 2.55,          // la mazorca al costado (firma)
-  mazorcaRy: 4.7,
+  mazorcaRx: 3.0,           // la mazorca al costado (firma): CORTA Y ANCHA,
+  mazorcaRy: 3.7,           // envuelta en su chala — bulto que alimenta, no vara
   monticuloRx: 8.8,         // la base de tierra (el arraigo, firma)
   monticuloRy: 3.4,
 };
