@@ -614,6 +614,10 @@ const MundoSubsuelo = lazy(() => import('./components/juego/MundoSubsuelo'));
 // en asociaciones-comparativa.json. Rescatado de "construido-pero-no-cableado"
 // (audit juegos 2026-07-16): existía exportado en juego/index.js pero sin ruta.
 const MonoVsPoliSimulator = lazy(() => import('./components/juego/MonoVsPoliSimulator'));
+// Ahorcado Contaminado: ahorcado clásico con metáfora de contaminación,
+// consume el dataset fundamentado de síntomas/plaguicidas vetados/
+// alternativas agroecológicas (Tarea #38) — juego construido en Tarea #93.
+const AhorcadoContaminado = lazy(() => import('./components/juego/AhorcadoContaminado'));
 // Modo extensionista (panel supervisor multi-finca, ADR-048 MVP). Gateado por
 // feature flag VITE_FEATURE_EXTENSIONISTA + rol (ver config/extensionistaAccess).
 const ExtensionistaScreen = lazy(() => import('./components/ExtensionistaScreen'));
@@ -878,6 +882,7 @@ const HASH_VIEW_ROUTES = {
   'mi-finca-odyssey': 'finca_odyssey',
   'mono-vs-poli': 'mono_vs_poli',
   'monocultivo-policultivo': 'mono_vs_poli',
+  'ahorcado-contaminado': 'ahorcado_contaminado',
   toxicologia: 'toxicologia',
   suelo: 'suelo',
   agua: 'agua',
@@ -1036,7 +1041,7 @@ const MODULE_VIEWS = new Set([
   'biodiversidad', 'informes', 'perfil', 'ayuda', 'help',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'estiercol', 'compost',
   'animales', 'animales_gallinas', 'animales_abejas', 'animales_vacas', 'animales_conejos', 'animales_caprinos', 'estiercol',
-  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'finca_odyssey', 'mono_vs_poli', 'sembrar', 'cosechar', 'mi_cosecha', 'insumos', 'biopreparados',
+  'hoy_finca',   'faq', 'evolucion', 'juego', 'defensores', 'milpa', 'doom_finca', 'subsuelo', 'finca_odyssey', 'mono_vs_poli', 'ahorcado_contaminado', 'sembrar', 'cosechar', 'mi_cosecha', 'insumos', 'biopreparados',
   'observacion', 'reportar_invasora', 'sanidad_sintoma', 'mantenimiento', 'new_task',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'aromaticas', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
   'agente', 'voz', 'voz_planta', 'procesos', 'registro_voz', 'registro_unificado', 'ciclo', 'germinacion', 'ciclo_nutrientes', 'calendario_finca', 'suelo', 'agua', 'cafe', 'uchuva', 'frutales', 'clima_boletin', 'salud_suelo', 'semilla', 'poscosecha', 'almacenamiento', 'nutricion', 'toxicologia', 'aprende', 'curso', 'directorio', 'mercados',
@@ -2897,6 +2902,19 @@ export default function App() {
             <ErrorFallback moduleName="Monocultivo vs Policultivo">
               <ScreenShell title="Mono vs Poli" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
                 <MonoVsPoliSimulator />
+              </ScreenShell>
+            </ErrorFallback>
+          </ErrorBoundary>
+        );
+      case 'ahorcado_contaminado':
+        // Ahorcado clásico con metáfora de contaminación (Tarea #93, dataset de
+        // la Tarea #38). No trae navegación propia → lo envolvemos en
+        // ScreenShell (como 'subsuelo'/'mono_vs_poli') para dar Volver/Inicio.
+        return (
+          <ErrorBoundary>
+            <ErrorFallback moduleName="Ahorcado Contaminado">
+              <ScreenShell title="Ahorcado Contaminado" onBack={() => navigate('juego')} onHome={() => navigate('dashboard')}>
+                <AhorcadoContaminado />
               </ScreenShell>
             </ErrorFallback>
           </ErrorBoundary>
