@@ -1,11 +1,12 @@
 /*
  * FaunaBosque — LA VIDA del Bosque Vivo. Un bosque sin bichos es un decorado.
  *
- * EL REGISTRO (decisión del operador, 2026-07): la fauna EMBLEMÁTICA del
- * bosque — oso (el GUARDIÁN NEGRO; el café y el borugo están archivados y no
- * se surfacean), rana, colibrí, jaguar — va con los SVG rubber-hose de
+ * EL REGISTRO (decisión del operador, 2026-07, afinado 2026-07-29): la fauna
+ * EMBLEMÁTICA del páramo — rana y colibrí — va con los SVG rubber-hose de
  * `src/visual/creatures/` como billboards <Html>: son el estándar de calidad
- * de la casa. La fauna AMBIENTAL de fondo —
+ * de la casa. El OSO y el JAGUAR SALIERON del elenco del páramo por orden del
+ * operador (feedback mundos 2026-07-29); siguen en CREATURES para otros
+ * mundos. La fauna AMBIENTAL de fondo —
  * cóndor, venado en la niebla, bandada, quetzal fugaz, mariposas, abejas,
  * escarabajo, luciérnagas — sí es geometría mínima procedural (siluetas que
  * el fog completa). Hubo un intento de oso/rana procedurales: quedó jubilado
@@ -19,10 +20,8 @@
  *   · MEDIO  — los VECINOS rubber-hose en SU casa, ya no muebles: un
  *     IDLE-CEREBRO local (el patrón useVidaIdle de PR #2482, adaptado) hojea
  *     el repertorio que cada bicho YA sabe hacer con un reloj con jitter —
- *     el oso PASEA unos pasos y vuelve (movimiento 3D real del billboard),
- *     resopla, se rasca, se sienta; el jaguar acecha y ruge en la niebla; el
- *     borugo olfatea y se acurruca; la rana pega su brinquito. Nunca el
- *     mismo gesto dos veces seguidas, nunca al unísono.
+ *     la rana pega su brinquito y reposa. Nunca el mismo gesto dos veces
+ *     seguidas, nunca al unísono.
  *   · CERCA — MARIPOSAS (la Morpho azul manda) y ABEJAS sobre el frailejonar,
  *     el COLIBRÍ que llega a una flor, liba y se va a otra (y a veces se
  *     pierde un rato del cuadro), un ESCARABAJO arrastrándose por el musgo y
@@ -31,7 +30,7 @@
  * Ritmo, no metrónomo: cada bicho lleva su fase, su reloj y su jitter propios
  * (nada aparece ni parpadea al unísono, ningún ciclo se siente en loop). La
  * franja del día sale de useCicloDia (?ciclo= para fotografiar una hora).
- * Tier-safe: bajo = solo el oso y el colibrí, quietos; medio = vecinos vivos +
+ * Tier-safe: bajo = solo la rana y el colibrí, quietos; medio = vecinos vivos +
  * cóndor + visitantes + pocas mariposas; alto = todo. reducedMotion = nada
  * animado ni intermitente: fotograma digno.
  *
@@ -54,7 +53,7 @@ const azar = (a, b) => a + Math.random() * (b - a);
    Un reloj con jitter: descanso (identidad) → gesto → descanso → otro
    gesto… Nunca repite el mismo gesto dos veces seguidas. El primer compás
    llega rápido (el bosque no arranca muerto) y `primero` deja fijar el
-   gesto de apertura (el oso SIEMPRE abre paseando: se ve que está vivo).
+   gesto de apertura (un bicho que abre moviéndose se ve que está vivo).
    Gate `activo=false` (reduced-motion, tier bajo) = ni un timer vivo. */
 function useRelojDeVida(vida, activo) {
   const [momento, setMomento] = useState(/** @type {string|null} */ (null));
@@ -562,6 +561,10 @@ function QuetzalFugaz() {
    con su rumbo y su compás propios — nunca en fila ni al unísono). */
 const VECINOS_BOSQUE = [
   {
+    /* ORDEN DEL OPERADOR (feedback mundos 2026-07-29): del elenco del páramo
+       SALEN el oso y el jaguar — y se QUEDAN el colibrí y los pájaros
+       dibujados ("se ven espectacular"). El oso-guardian y el jaguar siguen
+       vivos en CREATURES para otros mundos; este roster ya no los llama. */
     slug: 'rana-andina',
     pos: [3.1, 0.32, 3.2],
     px: 24,
@@ -575,55 +578,12 @@ const VECINOS_BOSQUE = [
       },
     },
   },
-  {
-    /* EL OSO — el GUARDIÁN NEGRO de la luna (OsoGuardian, la dirección vigente
-       del oso de anteojos; el café está archivado y NO vuelve). Vive en el
-       borde del arbolado, asomado al claro — nunca al pie del Ent: el guardián
-       del bosque manda el centro. Abre paseando (se ve que está VIVO), resopla
-       su vaho de páramo, se remece el peso y reposa.
-
-       NOTA de puesta en escena (operador, 2026-07): aquí vivía la danta a
-       billboard grande en pleno centro del claro — a ese tamaño su silueta
-       parada leía como el oso café archivado flotando frente al Ent. La danta
-       sigue en el elenco (vitrina, páramo); esta escena se compone sin ella. */
-    slug: 'oso-guardian',
-    pos: [-3.6, 0.34, 3.2],
-    px: 64,
-    factor: 15,
-    franjas: null,
-    vida: {
-      primero: 'pasea',
-      descanso: [5000, 11000],
-      momentos: {
-        pasea: { dur: 9000, props: { pose: 'anda' }, paseo: [1.7, 0, 1.0] },
-        resopla: { dur: 4500, props: { resopla: true } },
-        seAcomoda: { dur: 5200, props: { rasca: true } },
-        reposo: { dur: 4600, props: { pose: 'reposo' } },
-      },
-    },
-  },
-  {
-    slug: 'jaguar',
-    pos: [-6.8, 0.7, -4.8],
-    px: 44,
-    factor: 15,
-    mistico: true,
-    franjas: ['amanecer', 'atardecer', 'noche'],
-    vida: {
-      primero: 'acecha',
-      descanso: [14000, 30000],
-      momentos: {
-        acecha: { dur: 6000, props: { acecha: true } },
-        ruge: { dur: 2600, props: { ruge: true } },
-      },
-    },
-  },
 ];
 
-/* En tier bajo solo queda el oso, quieto (el colibrí va aparte): el slug DEBE
-   ser uno del roster de arriba — apuntaba al 'oso-andino' archivado y el tier
-   bajo se quedaba sin un solo vecino. */
-const VECINOS_TIER_BAJO = new Set(['oso-guardian']);
+/* En tier bajo queda la rana, quieta (el colibrí va aparte): el slug DEBE ser
+   uno del roster de arriba — con el oso fuera del elenco (orden del operador),
+   la rana es la única vecina de a pie que queda en el páramo. */
+const VECINOS_TIER_BAJO = new Set(['rana-andina']);
 
 const ESTILO_CRITTER = {
   filter: 'drop-shadow(0 2px 3px rgba(25, 32, 28, 0.35))',
