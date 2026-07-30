@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Angelita from '../visual/agente/Angelita';
 import useAgentNotificationStore from '../store/useAgentNotificationStore';
 import usePrefsStore from '../store/usePrefsStore';
-import { isSpeaking, stop, replayLast, isKokoroAvailable } from '../services/ttsService';
+import { isSpeaking, stop, replayLast, isKokoroAvailable, speakSentences } from '../services/ttsService';
 import { agentSounds } from '../services/agentSoundService';
 import { fvhSkinClass } from '../config/fvhSkin';
 /* EL CEREBRO DE ANGELITA (auditoría 2026-07-18: construido y DESCONECTADO).
@@ -15,6 +15,8 @@ import useLogStore from '../store/useLogStore';
 import { notificacionesInteligentes } from '../services/angelitaInteligencia';
 import { estaOcupado } from '../services/compaiOcupado.js';
 import { activarEscucha } from '../services/escuchaService';
+import { useCompaiClimaVivo } from '../hooks/useCompaiClimaVivo';
+import { useCompaiSusurroNocturno } from '../hooks/useCompaiSusurroNocturno';
 import AgentFabMenu from './AgentFabMenu';
 import './agent-fab-skin.css';
 
@@ -146,6 +148,26 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       .catch(() => { /* degrada silencioso: sin dato real, la abeja no inventa aviso */ });
     return () => { vivo = false; };
   }, [activeAlerts, setLastMessage, setResponseReady]);
+
+  // #111 "Vive el clima real": reacciona al MISMO snapshot de clima que ya
+  // consume el husmeo (climaService, cero red aquí) — pre-lluvia avisa/se
+  // emociona, helada se abriga, sequía pide agua. Pasa por la misma
+  // anti-molestia que cualquier otro aviso (ver useCompaiClimaVivo).
+  useCompaiClimaVivo({
+    onMensaje: (mensaje) => { setLastMessage(mensaje); setResponseReady(true); },
+  });
+
+  // #108 "Susurro nocturno": de noche baja voz + brillo, comenta la fase
+  // lunar real + el clima de mañana, invita a descansar. CANDADO CIENTÍFICO:
+  // susurroDeNoche() jamás menciona sembrar por luna (ver
+  // compai/nucleo/susurroNocturno.js) — sólo dice el hecho astronómico.
+  useCompaiSusurroNocturno({
+    onSusurro: (mensaje, { rate }) => {
+      setLastMessage(mensaje);
+      setResponseReady(true);
+      if (ttsEnabled) speakSentences(mensaje, { rate }).catch(() => { /* degrada a solo texto */ });
+    },
+  });
 
   // Estado de Angelita: el tacto manda sobre el aviso, y el aviso sobre el idle.
   const estado = pressed
