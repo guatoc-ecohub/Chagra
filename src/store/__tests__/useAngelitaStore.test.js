@@ -22,6 +22,7 @@ const reset = () => {
     mundoActual: null,
     ultimaHablaPorLlave: {},
     ultimoLogroId: null,
+    ultimoLutoId: null,
     silenciado: false,
     molestia: 0,
     hoyNoFecha: null,
@@ -62,6 +63,20 @@ describe('useAngelitaStore', () => {
     // mismo logro → ya no se celebra
     useAngelitaStore.getState().celebrar({ id: 'racha-3', texto: '¡Tres días seguidos anotando!' });
     expect(useAngelitaStore.getState().estado).toBe('calma');
+  });
+
+  it('lamentar una pérdida real (#109), con dedup por id — independiente de celebrar', () => {
+    useAngelitaStore.getState().lamentar({ id: 'luto-tomate-3', texto: 'Se nos fue el tomate. Pasa, y se aprende.' });
+    expect(useAngelitaStore.getState().estado).toBe('luto');
+    expect(useAngelitaStore.getState().visualEstado).toBe('preocupada');
+    expect(useAngelitaStore.getState().tipo).toBe('luto');
+    useAngelitaStore.getState().reposar();
+    // mismo evento → ya no se lamenta de nuevo
+    useAngelitaStore.getState().lamentar({ id: 'luto-tomate-3', texto: 'Se nos fue el tomate. Pasa, y se aprende.' });
+    expect(useAngelitaStore.getState().estado).toBe('calma');
+    // celebrar sigue funcionando después de un luto (memorias independientes)
+    useAngelitaStore.getState().celebrar({ id: 'cosecha-1', texto: '¡Buena cosecha!' });
+    expect(useAngelitaStore.getState().estado).toBe('celebra');
   });
 
   it('silenciar la deja en calma y no habla', () => {

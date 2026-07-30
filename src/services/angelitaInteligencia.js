@@ -43,12 +43,17 @@ import { buildProactiveGreeting, saludoPorHora } from './proactiveGreeting';
  * 1. LOS ESTADOS DE COMPORTAMIENTO — el vocabulario de la API.
  * ────────────────────────────────────────────────────────────────────────── */
 
-/** Los cuatro estados canónicos del comportamiento de Angelita. */
+/** Los estados canónicos del comportamiento de Angelita. */
 export const ESTADOS_COMPORTAMIENTO = /** @type {const} */ ([
   'calma',
   'aviso',
   'celebra',
   'husmea',
+  // #109 "luto y fiesta": luto breve, digno, NUNCA culposo, al registrar una
+  // planta muerta. Comparte prioridad de arbitraje con celebra (un momento
+  // que el motor SÍ debe interrumpir para acompañar), pero su cara y su tono
+  // son opuestos — ver VISUAL_LUTO / ARIA_COMPORTAMIENTO.luto abajo.
+  'luto',
 ]);
 
 /**
@@ -62,12 +67,16 @@ export const ESTADOS_COMPORTAMIENTO = /** @type {const} */ ([
  *   aviso   → 'preocupada' si es urgente; 'invita' si es un aviso tranquilo
  *   celebra → 'contenta'   (brinquito de celebración)
  *   husmea  → 'senala'     (se inclina y apunta a lo que mira del mundo)
+ *   luto    → 'preocupada' (la cara más cercana al recogimiento que YA existe
+ *             — sin fabricar un dibujo nuevo; #109 diferencia el TONO del
+ *             texto y el `tipo` de aviso — visual/burbuja gris — no la pose)
  */
 const VISUAL_CALMA = 'acompana';
 const VISUAL_AVISO_URGENTE = 'preocupada';
 const VISUAL_AVISO_TRANQUILO = 'invita';
 const VISUAL_CELEBRA = 'contenta';
 const VISUAL_HUSMEA = 'senala';
+const VISUAL_LUTO = 'preocupada';
 
 /** Narración para lectores de pantalla — usted, cercano, sin tecnicismos. */
 const ARIA_COMPORTAMIENTO = {
@@ -75,6 +84,7 @@ const ARIA_COMPORTAMIENTO = {
   aviso: 'Angelita tiene algo importante que contarle',
   celebra: 'Angelita está contenta por usted',
   husmea: 'Angelita curiosea y le comenta algo de este mundo',
+  luto: 'Angelita lo acompaña en silencio, con cariño',
 };
 
 /**
@@ -91,6 +101,8 @@ export function estadoVisualDeComportamiento(estado, opts = {}) {
       return VISUAL_CELEBRA;
     case 'husmea':
       return VISUAL_HUSMEA;
+    case 'luto':
+      return VISUAL_LUTO;
     case 'calma':
     default:
       return VISUAL_CALMA;
@@ -108,6 +120,9 @@ const PRIORIDAD = {
   aviso_alta: 100,
   aviso_media: 70,
   celebra: 60,
+  // #109: el luto pesa como un aviso medio — de verdad interrumpe (no es un
+  // dato que espera su turno), pero nunca por encima de una alerta real.
+  luto: 65,
   aviso_baja: 45,
   husmea: 20,
   calma: 0,
@@ -326,6 +341,7 @@ export const COOLDOWN_MS = {
   aviso_media: 20 * MINUTO,
   aviso_baja: 45 * MINUTO,
   celebra: 0,              // se dedup por logro.id, no por reloj
+  luto: 0,                 // se dedup por evento.id (#109, misma idea de celebra)
   husmea: 20 * MINUTO,     // no comenta el mismo mundo cada vez que pasa
   calma: 0,
 };
@@ -437,6 +453,8 @@ export function resolverComportamiento(ctx = {}) {
     notificaciones = null,
     logro = null,
     ultimoLogroId = null,
+    luto = null,
+    ultimoLutoId = null,
     mundo = null,
     datosMundo = {},
     ahoraMs = Date.now(),
@@ -470,6 +488,19 @@ export function resolverComportamiento(ctx = {}) {
       mensaje: logro.texto,
       prompt: null,
       logroId: logro.id,
+    });
+  }
+
+  // Luto (#109) — una pérdida real registrada, aún no acompañada. Mismo
+  // patrón de dedup por id que celebra (nunca dos veces la misma planta).
+  if (luto && luto.id && luto.texto && luto.id !== ultimoLutoId) {
+    candidatos.push({
+      estado: 'luto',
+      prioridad: PRIORIDAD.luto,
+      severidad: null,
+      mensaje: luto.texto,
+      prompt: null,
+      logroId: luto.id,
     });
   }
 

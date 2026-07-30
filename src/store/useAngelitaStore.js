@@ -18,7 +18,7 @@ import { tipoDeDecision } from '../visual/agente/angelitaAvisoTipos';
  * cabeza pura; este store la pone en el tiempo real de la app.
  *
  * Lo que expone para leer (selectores):
- *   - estado        → comportamiento actual: 'calma'|'aviso'|'celebra'|'husmea'.
+ *   - estado        → comportamiento actual: 'calma'|'aviso'|'celebra'|'husmea'|'luto'.
  *   - visualEstado  → estado visual canónico que la cara pinta directamente.
  *   - mensaje       → lo que Angelita dice ahora (null en calma).
  *   - aria          → narración para lector de pantalla.
@@ -31,6 +31,9 @@ import { tipoDeDecision } from '../visual/agente/angelitaAvisoTipos';
  *   - evaluar(ctx)  → corre el motor con el contexto en vivo y actualiza estado.
  *   - entrarMundo(mundo, datos) → husmear un mundo (comentario grounded).
  *   - celebrar(logro)           → celebrar un logro REAL (dedup por id).
+ *   - lamentar(evento)          → #109: acompañar en luto una pérdida REAL
+ *                      (planta marcada muerta/baja), dedup por id, tono
+ *                      breve y digno — NUNCA culposo.
  *   - reposar()                 → volver a la calma (default).
  *   - silenciar(bool)           → el usuario pide/quita silencio (persistente,
  *                      indefinido — hasta que lo vuelva a prender).
@@ -83,6 +86,9 @@ const useAngelitaStore = create(
       // Persistidos (anti-molestia). NO se limpian al reposar.
       ultimaHablaPorLlave: /** @type {Record<string, number>} */ ({}),
       ultimoLogroId: /** @type {string|null} */ (null),
+      // #109: dedup del luto, mismo patrón que ultimoLogroId (la misma
+      // planta perdida no se lamenta dos veces).
+      ultimoLutoId: /** @type {string|null} */ (null),
       silenciado: false,
       // Contador adaptativo (#102/#106): sube con silenciar/abortar-paseo/
       // cerrar-tip-sin-leer, baja con abrir-tip/hablarle. Clamped en el motor.
@@ -131,7 +137,11 @@ const useAngelitaStore = create(
           prioridad: decision.prioridad,
           prompt: decision.prompt,
           mundoActual: mundo ?? s.mundoActual,
-          ultimoLogroId: decision.logroId || s.ultimoLogroId,
+          // decision.logroId sirve de dedup tanto para celebra (logro) como
+          // para luto (#109) — cada uno actualiza SU propia llave, para que
+          // lamentar una planta no dé por "ya celebrado" el próximo logro.
+          ultimoLogroId: decision.estado === 'celebra' ? (decision.logroId || s.ultimoLogroId) : s.ultimoLogroId,
+          ultimoLutoId: decision.estado === 'luto' ? (decision.logroId || s.ultimoLutoId) : s.ultimoLutoId,
           ultimaHablaPorLlave: llave
             ? { ...s.ultimaHablaPorLlave, [llave]: ahora }
             : s.ultimaHablaPorLlave,
@@ -146,12 +156,13 @@ const useAngelitaStore = create(
        * @param {Object} ctx — ver resolverComportamiento (sin la parte de memoria).
        */
       evaluar: (ctx = {}) => {
-        const { ultimaHablaPorLlave, ultimoLogroId, silenciado, molestia } = get();
+        const { ultimaHablaPorLlave, ultimoLogroId, ultimoLutoId, silenciado, molestia } = get();
         const decision = resolverComportamiento({
           ...ctx,
           ahoraMs: ctx.ahoraMs ?? Date.now(),
           ultimaHablaPorLlave,
           ultimoLogroId,
+          ultimoLutoId,
           silenciado: silenciado || get().hoyNoActivo(),
           molestia,
         });
@@ -177,6 +188,18 @@ const useAngelitaStore = create(
        */
       celebrar: (logro, opts = {}) =>
         get().evaluar({ logro, ocupado: opts.ocupado }),
+
+      /**
+       * #109 "luto y fiesta": acompañar en luto una pérdida REAL (planta
+       * marcada como muerta/baja). Dedup por id — la misma planta no se
+       * lamenta dos veces. Simétrico a celebrar(), tono opuesto: breve,
+       * digno, NUNCA culposo (nunca "usted la dejó morir", siempre
+       * acompañamiento — ver mensajesLuto en angelitaVariedad/PlantCemeteryModal).
+       * @param {{ id: string, texto: string }} evento
+       * @param {{ ocupado?: boolean }} [opts]
+       */
+      lamentar: (evento, opts = {}) =>
+        get().evaluar({ luto: evento, ocupado: opts.ocupado }),
 
       /** Volver a la calma (default). No borra la memoria anti-molestia. */
       reposar: () =>
@@ -238,6 +261,7 @@ const useAngelitaStore = create(
       partialize: (s) => ({
         ultimaHablaPorLlave: s.ultimaHablaPorLlave,
         ultimoLogroId: s.ultimoLogroId,
+        ultimoLutoId: s.ultimoLutoId,
         silenciado: s.silenciado,
         molestia: s.molestia,
         hoyNoFecha: s.hoyNoFecha,
