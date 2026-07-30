@@ -92,16 +92,17 @@ const VISTAS = {
      se retrata en contrapicado) y el cuadro sube hasta la copa, que es donde
      está la lección: ahí es donde la niebla entra y no vuelve a salir. */
   quenua: {
-    /* a 16.5 del guardián: con menos aire la copa no cabía en el cuadro, y la
-       copa ES la lección — el retrato que la corta cuenta otra cosa. La cámara
-       queda justo sobre la boca de la portilla: se le mira desde la puerta por
-       donde su agua se va. */
+    /* a 18 del guardián: con menos aire la copa quedaba ROZANDO el borde del
+       cuadro, y la copa ES la lección — un retrato que se la corta (o se la
+       aprieta) cuenta otra cosa. A la corona se le deja cielo encima, como en
+       cualquier lámina que se respete. La cámara queda sobre la boca de la
+       portilla: se le mira desde la puerta por donde su agua se va. */
     pos: new THREE.Vector3(
-      GUARDIAN.x + Math.sin(GUARDIAN.rotY) * 16.5,
+      GUARDIAN.x + Math.sin(GUARDIAN.rotY) * 18,
       GUARDIAN.y + 2.1,
-      GUARDIAN.z + Math.cos(GUARDIAN.rotY) * 16.5,
+      GUARDIAN.z + Math.cos(GUARDIAN.rotY) * 18,
     ),
-    mira: new THREE.Vector3(GUARDIAN.x, GUARDIAN.y + 5.1, GUARDIAN.z),
+    mira: new THREE.Vector3(GUARDIAN.x, GUARDIAN.y + 5.0, GUARDIAN.z),
     fov: 50,
   },
   /* EL AGUA QUE BAJA: en la portilla, de espaldas al anfiteatro, viendo cómo
