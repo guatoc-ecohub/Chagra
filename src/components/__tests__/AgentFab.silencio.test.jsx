@@ -1,11 +1,10 @@
 /**
  * AgentFab.silencio.test.jsx — verifica que el interruptor de silencio
  * (auditoría 2026-07-26, ítems #101/#103) esté REALMENTE cableado a la UI,
- * no solo presente en el store sin nadie que lo llame.
- *
- * Dos caminos al mismo flag `useAngelitaStore.silenciar`:
- *   1. el botón visible pegado al personaje (🔔/🔕, aria-pressed).
- *   2. mantener presionado el personaje mismo (pulsación larga, 600ms).
+ * no solo presente en el store sin nadie que lo llame. Actualizado 2026-07-30
+ * (#66/#70): el gesto largo dejó de silenciar y pasó a "hablar directo" — el
+ * silencio manual queda SOLO en el botón visible 🔔/🔕; el "hoy no" (#107)
+ * vive en el menú del toque corto (AgentFabMenu.test.jsx cubre ese camino).
  *
  * Español de Colombia (usted), sin voseo.
  */
@@ -13,6 +12,8 @@ import { render, screen, cleanup, fireEvent, act } from '@testing-library/react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import AgentFab from '../AgentFab';
 import useAngelitaStore from '../../store/useAngelitaStore';
+import useAgentNotificationStore from '../../store/useAgentNotificationStore';
+import { EVENTO_ESCUCHA } from '../../services/escuchaService';
 
 beforeEach(() => {
   useAngelitaStore.setState({ silenciado: false });
@@ -23,7 +24,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('AgentFab — interruptor de silencio (#101/#103)', () => {
+describe('AgentFab — interruptor de silencio manual (#101/#103)', () => {
   it('el botón visible alterna silenciado en el store', () => {
     render(<AgentFab onNavigate={() => {}} />);
     const boton = screen.getByRole('button', { name: /Que su compañero se quede callado/i });
@@ -38,9 +39,13 @@ describe('AgentFab — interruptor de silencio (#101/#103)', () => {
     fireEvent.click(botonActivo);
     expect(useAngelitaStore.getState().silenciado).toBe(false);
   });
+});
 
-  it('mantener presionado el personaje (600ms) silencia sin abrir el agente', () => {
+describe('AgentFab — gesto sobre el personaje (#66/#70)', () => {
+  it('mantener presionado (600ms) habla DIRECTO — activarEscucha, sin abrir menú ni navegar', () => {
     const onNavigate = vi.fn();
+    const onEscucha = vi.fn();
+    window.addEventListener(EVENTO_ESCUCHA, onEscucha);
     render(<AgentFab onNavigate={onNavigate} />);
     const personaje = screen.getByRole('button', { name: /Chagra IA/i });
 
@@ -48,17 +53,23 @@ describe('AgentFab — interruptor de silencio (#101/#103)', () => {
     act(() => {
       vi.advanceTimersByTime(650);
     });
-    expect(useAngelitaStore.getState().silenciado).toBe(true);
+    expect(onEscucha).toHaveBeenCalledTimes(1);
+    // El gesto largo fue "hábleme", no "cállese": no silencia.
+    expect(useAngelitaStore.getState().silenciado).toBe(false);
 
-    // El gesto largo fue "cállese", no "hábleme": el click que sigue al
-    // touchend no debe además navegar al agente.
+    // El click que sigue al touchend no debe además abrir el menú.
     fireEvent.touchEnd(personaje);
     fireEvent.click(personaje);
     expect(onNavigate).not.toHaveBeenCalled();
+    expect(screen.queryByRole('menu', { name: /Menú de Chagra IA/i })).not.toBeInTheDocument();
+
+    window.removeEventListener(EVENTO_ESCUCHA, onEscucha);
   });
 
-  it('una pulsación corta (menor a 600ms) NO silencia y sí abre el agente', () => {
+  it('una pulsación corta (menor a 600ms) abre el MENÚ, no navega directo ni habla', () => {
     const onNavigate = vi.fn();
+    const onEscucha = vi.fn();
+    window.addEventListener(EVENTO_ESCUCHA, onEscucha);
     render(<AgentFab onNavigate={onNavigate} />);
     const personaje = screen.getByRole('button', { name: /Chagra IA/i });
 
@@ -67,9 +78,83 @@ describe('AgentFab — interruptor de silencio (#101/#103)', () => {
       vi.advanceTimersByTime(150);
     });
     fireEvent.touchEnd(personaje);
-    expect(useAngelitaStore.getState().silenciado).toBe(false);
 
     fireEvent.click(personaje);
-    expect(onNavigate).toHaveBeenCalled();
+    expect(onNavigate).not.toHaveBeenCalled();
+    expect(onEscucha).not.toHaveBeenCalled();
+    expect(screen.getByRole('menu', { name: /Menú de Chagra IA/i })).toBeInTheDocument();
+
+    window.removeEventListener(EVENTO_ESCUCHA, onEscucha);
+  });
+});
+
+describe('AgentFab — menú del toque corto, cableado VIVO (#66/#70)', () => {
+  it('menú → "Hablar" activa el micrófono (mismo trigger que el gesto largo)', () => {
+    const onEscucha = vi.fn();
+    window.addEventListener(EVENTO_ESCUCHA, onEscucha);
+    render(<AgentFab onNavigate={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
+    fireEvent.click(screen.getByRole('menuitem', { name: /^Hablar$/i }));
+    expect(onEscucha).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument(); // se cierra al elegir
+    window.removeEventListener(EVENTO_ESCUCHA, onEscucha);
+  });
+
+  it('menú → "Enviar foto" navega al agente con autoOpenCamera', () => {
+    const onNavigate = vi.fn();
+    render(<AgentFab onNavigate={onNavigate} pantalla="mundo_cultivos" />);
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
+    fireEvent.click(screen.getByRole('menuitem', { name: /Enviar foto/i }));
+    expect(onNavigate).toHaveBeenCalledWith('agente', expect.objectContaining({
+      autoOpenCamera: true,
+      desdePantalla: 'mundo_cultivos',
+    }));
+  });
+
+  it('menú → "Que se quede callado hoy" activa hoyNoActivo() REAL en el store (#107)', () => {
+    useAngelitaStore.setState({ hoyNoFecha: null });
+    render(<AgentFab onNavigate={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
+    fireEvent.click(screen.getByRole('menuitem', { name: /Que se quede callado hoy/i }));
+    expect(useAngelitaStore.getState().hoyNoActivo()).toBe(true);
+    // Angelita queda en calma: entrarMundo con datos reales no debe hablar.
+    useAngelitaStore.getState().entrarMundo('clima', { snapshot: { alertas_locales: [{}] } });
+    expect(useAngelitaStore.getState().estado).toBe('calma');
+  });
+
+  it('cerrar el menú sin elegir nada registra una señal de molestia (#102/#106)', () => {
+    useAngelitaStore.setState({ molestia: 0 });
+    render(<AgentFab onNavigate={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(useAngelitaStore.getState().molestia).toBeGreaterThan(0);
+  });
+});
+
+describe('AgentFab — cadencia adaptativa: señales de atención positiva (#102/#106)', () => {
+  it('hablar directo (gesto largo) baja el contador de molestia', () => {
+    useAngelitaStore.setState({ molestia: 5 });
+    render(<AgentFab onNavigate={() => {}} />);
+    const personaje = screen.getByRole('button', { name: /Chagra IA/i });
+    fireEvent.touchStart(personaje);
+    act(() => { vi.advanceTimersByTime(650); });
+    expect(useAngelitaStore.getState().molestia).toBeLessThan(5);
+  });
+
+  it('menú → "Hablar" también baja el contador de molestia', () => {
+    useAngelitaStore.setState({ molestia: 5 });
+    render(<AgentFab onNavigate={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA, su compañero de Chagra/i }));
+    fireEvent.click(screen.getByRole('menuitem', { name: /^Hablar$/i }));
+    expect(useAngelitaStore.getState().molestia).toBeLessThan(5);
+  });
+
+  it('tocar el FAB con una respuesta esperando ("abrir el tip") baja el contador', () => {
+    useAngelitaStore.setState({ molestia: 5 });
+    useAgentNotificationStore.setState({ responseReady: true, lastAssistantMessage: 'hola' });
+    render(<AgentFab onNavigate={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: /Chagra IA tiene respuesta nueva/i }));
+    expect(useAngelitaStore.getState().molestia).toBeLessThan(5);
+    useAgentNotificationStore.setState({ responseReady: false, lastAssistantMessage: null });
   });
 });

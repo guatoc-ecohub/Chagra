@@ -4,6 +4,7 @@ import {
   resolverComportamiento,
   llaveDeDecision,
   estadoVisualDeComportamiento,
+  aplicarSenalMolestia,
 } from '../services/angelitaInteligencia';
 import { variarMensaje } from '../services/angelitaVariedad';
 import { tipoDeDecision } from '../visual/agente/angelitaAvisoTipos';
@@ -22,20 +23,42 @@ import { tipoDeDecision } from '../visual/agente/angelitaAvisoTipos';
  *   - mensaje       → lo que Angelita dice ahora (null en calma).
  *   - aria          → narración para lector de pantalla.
  *   - prompt        → prompt sugerido para sembrar al agente al tocarla.
+ *   - molestia      → contador adaptativo (#102/#106): sube al silenciar/
+ *                      cerrar sin leer, baja al prestarle atención real.
+ *   - hoyNoFecha    → fecha (YYYY-MM-DD local) del "hoy no" activo, o null.
  *
  * Lo que expone para actuar:
  *   - evaluar(ctx)  → corre el motor con el contexto en vivo y actualiza estado.
  *   - entrarMundo(mundo, datos) → husmear un mundo (comentario grounded).
  *   - celebrar(logro)           → celebrar un logro REAL (dedup por id).
  *   - reposar()                 → volver a la calma (default).
- *   - silenciar(bool)           → el usuario pide/quita silencio.
+ *   - silenciar(bool)           → el usuario pide/quita silencio (persistente,
+ *                      indefinido — hasta que lo vuelva a prender).
+ *   - marcarHoyNo()  → lo calla el RESTO DEL DÍA (#107); se resetea solo a
+ *                      medianoche local, sin que el usuario tenga que volver
+ *                      a prenderlo (a diferencia de silenciar(), que es manual).
+ *   - registrarSenalMolestia(senal) → aplica una señal (#102/#106) al contador
+ *                      adaptativo. Ver MOLESTIA_DELTA en angelitaInteligencia.
  *
- * ANTI-MOLESTIA + LOCAL-FIRST: los cooldowns (`ultimaHablaPorLlave`) y el flag
- * de silencio se PERSISTEN en localStorage — para que la cadencia sobreviva
- * recargas y Angelita no repita lo mismo al volver. Cero red: todo funciona
- * offline. Sólo persistimos lo mínimo (cooldowns + silencio); el mensaje en
- * curso es efímero por sesión.
+ * ANTI-MOLESTIA + LOCAL-FIRST: los cooldowns (`ultimaHablaPorLlave`), el flag
+ * de silencio, el contador de molestia y el "hoy no" se PERSISTEN en
+ * localStorage — para que la cadencia sobreviva recargas y Angelita no repita
+ * lo mismo al volver. Cero red: todo funciona offline. Sólo persistimos lo
+ * mínimo; el mensaje en curso es efímero por sesión.
+ *
+ * TELEMETRÍA LOCAL (#106): `registrarSenalMolestia` es también el único punto
+ * de telemetría de "cuánto molesta" — un contador en memoria, SIN PII, que
+ * nunca sale del dispositivo (no hay `fetch`, no hay red en este store). Sirve
+ * de bitácora corta para depurar la cadencia, no de analítica.
  */
+
+/** Fecha local (YYYY-MM-DD) de "hoy", para el reset del "hoy no" a medianoche. */
+function fechaLocalHoy(ahora = new Date()) {
+  const y = ahora.getFullYear();
+  const m = String(ahora.getMonth() + 1).padStart(2, '0');
+  const d = String(ahora.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
 
 const inicial = {
   estado: 'calma',
@@ -61,6 +84,13 @@ const useAngelitaStore = create(
       ultimaHablaPorLlave: /** @type {Record<string, number>} */ ({}),
       ultimoLogroId: /** @type {string|null} */ (null),
       silenciado: false,
+      // Contador adaptativo (#102/#106): sube con silenciar/abortar-paseo/
+      // cerrar-tip-sin-leer, baja con abrir-tip/hablarle. Clamped en el motor.
+      molestia: 0,
+      // "Hoy no" (#107): fecha (YYYY-MM-DD local) del día en que se activó, o
+      // null si no está activo. Se lee comparándola contra fechaLocalHoy() —
+      // un día distinto = vencido, sin necesidad de un timer en background.
+      hoyNoFecha: /** @type {string|null} */ (null),
 
       // Efímero por sesión (NO persistido): ¿ya saludó en esta sesión? El
       // primer husmeo de la sesión se clasifica como 'bienvenida'.
@@ -111,17 +141,19 @@ const useAngelitaStore = create(
       /**
        * Corre el motor con el contexto en vivo. El shell arma `ctx` con lo que
        * tenga localmente (notificaciones, logro, mundo+datos, ocupado…); el
-       * store inyecta la memoria anti-molestia y el silencio.
+       * store inyecta la memoria anti-molestia, el silencio (manual + "hoy
+       * no", vencido a medianoche) y el contador de cadencia adaptativa.
        * @param {Object} ctx — ver resolverComportamiento (sin la parte de memoria).
        */
       evaluar: (ctx = {}) => {
-        const { ultimaHablaPorLlave, ultimoLogroId, silenciado } = get();
+        const { ultimaHablaPorLlave, ultimoLogroId, silenciado, molestia } = get();
         const decision = resolverComportamiento({
           ...ctx,
           ahoraMs: ctx.ahoraMs ?? Date.now(),
           ultimaHablaPorLlave,
           ultimoLogroId,
-          silenciado,
+          silenciado: silenciado || get().hoyNoActivo(),
+          molestia,
         });
         get()._aplicar(decision, ctx.mundo ?? get().mundoActual);
         return decision;
@@ -150,10 +182,53 @@ const useAngelitaStore = create(
       reposar: () =>
         set((s) => ({ ...inicial, silenciado: s.silenciado, mundoActual: s.mundoActual })),
 
-      /** El usuario pide (o quita) silencio a Angelita. */
+      /** El usuario pide (o quita) silencio a Angelita. Persistente e
+       *  indefinido — a diferencia de marcarHoyNo(), NO se vence solo. */
       silenciar: (flag = true) => {
         set({ silenciado: Boolean(flag) });
-        if (flag) get().reposar();
+        if (flag) {
+          get().reposar();
+          get().registrarSenalMolestia('silenciar');
+        }
+      },
+
+      /**
+       * "Hoy no" (#107): lo calla el RESTO DEL DÍA. Se resetea SOLO a la
+       * medianoche local siguiente — el usuario no tiene que acordarse de
+       * volver a prenderlo, a diferencia del silencio manual. Cuenta como
+       * señal de molestia (misma familia que silenciar): el usuario está
+       * pidiendo que lo dejen tranquilo.
+       */
+      marcarHoyNo: () => {
+        set({ hoyNoFecha: fechaLocalHoy() });
+        get().reposar();
+        get().registrarSenalMolestia('silenciar');
+      },
+
+      /** Quita el "hoy no" antes de que venza solo (control explícito). */
+      quitarHoyNo: () => set({ hoyNoFecha: null }),
+
+      /**
+       * ¿Sigue vigente el "hoy no"? Vencido = fecha guardada distinta a la de
+       * HOY (no hace falta un timer en background: se compara al leer).
+       * @returns {boolean}
+       */
+      hoyNoActivo: () => {
+        const { hoyNoFecha } = get();
+        if (!hoyNoFecha) return false;
+        return hoyNoFecha === fechaLocalHoy();
+      },
+
+      /**
+       * Aplica una señal de molestia (#102/#106) al contador adaptativo — el
+       * único punto de "telemetría" de este store: local, sin PII, sin red
+       * (ver angelitaInteligencia.MOLESTIA_DELTA para las señales válidas y
+       * su peso). Señales negativas (positivas para el usuario) bajan el
+       * contador y aceleran la cadencia; las de rechazo la frenan.
+       * @param {'silenciar'|'abortarPaseo'|'cerrarTipSinLeer'|'abrirTip'|'hablarle'} senal
+       */
+      registrarSenalMolestia: (senal) => {
+        set((s) => ({ molestia: aplicarSenalMolestia(s.molestia, senal) }));
       },
     }),
     {
@@ -164,6 +239,8 @@ const useAngelitaStore = create(
         ultimaHablaPorLlave: s.ultimaHablaPorLlave,
         ultimoLogroId: s.ultimoLogroId,
         silenciado: s.silenciado,
+        molestia: s.molestia,
+        hoyNoFecha: s.hoyNoFecha,
       }),
     },
   ),

@@ -19,6 +19,7 @@ import FincaEvolutionCard from './FincaEvolutionCard';
 import { AngelitaGuia } from '../../visual/agente';
 import useCompaiPaseo from '../../hooks/useCompaiPaseo';
 import { registrarParadas, desregistrarParadas } from '../../services/compaiParadasPorPantalla';
+import useAngelitaStore from '../../store/useAngelitaStore';
 import useAlertStore from '../../store/useAlertStore';
 import { listFarmProcesses } from '../../db/farmProcessCache';
 import { getProfile } from '../../services/userProfileService';
@@ -213,21 +214,24 @@ export default function HoyEnFincaScreen({ onBack, onHome, onNavigate }) {
     // muestra únicamente las del anillo que el planificador eligió ahora.
     const { paseando, volviendo, paradasActivas, abortarPaseo } = useCompaiPaseo('hoy-en-finca');
     const paradasDelPaseo = paseando || volviendo ? paradasActivas : [];
+    const registrarSenalMolestia = useAngelitaStore((s) => s.registrarSenalMolestia);
 
     // #33 — cualquier toque real del usuario aborta el paseo y lo devuelve
     // al puesto (vuelo animado, #32 — ver useCompaiPaseo). Se ignoran los
     // toques DENTRO de la propia guía (.ang-guia / .ang-guia__panel): tocar
     // "Siguiente" o cerrar la burbuja es interacción CON el compAI, no una
-    // interrupción de su paseo.
+    // interrupción de su paseo. Abortar un paseo cuenta como señal de
+    // molestia (#102/#106): el usuario quiso seguir con lo suyo.
     useEffect(() => {
         if (!paseando) return undefined;
         const onToqueReal = (ev) => {
             if (ev.target?.closest?.('.ang-guia, .ang-guia__panel')) return;
             abortarPaseo();
+            registrarSenalMolestia('abortarPaseo');
         };
         document.addEventListener('pointerdown', onToqueReal, { capture: true, passive: true });
         return () => document.removeEventListener('pointerdown', onToqueReal, { capture: true });
-    }, [paseando, abortarPaseo]);
+    }, [paseando, abortarPaseo, registrarSenalMolestia]);
 
     const goAgente = useCallback((prompt) => {
         if (prompt) prefillAgent(prompt);
