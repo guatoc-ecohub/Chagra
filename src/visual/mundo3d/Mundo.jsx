@@ -51,6 +51,9 @@ const IMPORTA_ESCENA = {
   // (bosque/EscenaBosqueVivo: inmensidad + frailejonal + niebla) y le añade la
   // capa de navegación del framework.
   paramo: () => import('./escenas/EscenaParamo.jsx'),
+  // El bosque nativo altoandino de 3 estratos: escena a ESCALA DE BOSQUE,
+  // autocontenida (Canvas propio) como el valle — no un diorama de la base.
+  bosque: () => import('./escenas/EscenaBosque.jsx'),
 };
 /* React.lazy EXIGE que la promesa resuelva a `{ default: Componente }`. El
    `importa().then(m => m.default || m)` resolvía al COMPONENTE pelado, así que
