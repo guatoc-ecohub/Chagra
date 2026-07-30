@@ -14,9 +14,16 @@
  *   · DE SueloDemo3D (archivado): el SUELO RICO como terreno (ya era la base
  *     del anfiteatro; ahora viste su paleta dorada de páramo) + las PEÑAS de
  *     hito sembradas con distribuirDetalle.
- *   · FUERA el Ent y el campesino ("están horribles"): ni EntQuenua ni la
- *     figura de escala. El centro del claro lo toma el PATRIARCA — el
- *     frailejón más viejo y más alto del rodal — con su queñua matriarca.
+ *
+ * ── EL ENT VUELVE, PERO ES LA QUEÑUA (2026-07-30) ──────────────────────────
+ * El operador había sacado el Ent ("está horrible") — pero eso era la vieja
+ * `EntQuenua` standalone, de otra mano. Cerró la decisión de reintegrarlo con
+ * el cincel RECONCILIADO (`EntGradiente especie="quenua"`, el aprobado en
+ * `tres-ents-gradiente`): el guardián del páramo es la QUEÑUA (Polylepis), y el
+ * FRAILEJÓN pasa a PAISAJE (frailejonal + patriarca en flor de acompañamiento).
+ * El Ent y su vecino salen del mapa compartido `pisosBosqueGradiente` (no a
+ * mano): protagonista = queñua; vecino visible = el piso de abajo (frío =
+ * aliso) en silueta ladera abajo. Máximo dos. El campesino sigue fuera.
  *
  * La pared del anfiteatro conserva el abrigo del cuenco SALVO por la ABRA
  * (bosqueTakeA): la ventana angular por donde la meseta se despeña hacia la
@@ -39,7 +46,9 @@ import { geomPiedraSuelo, distribuirDetalle } from '../terreno/sueloRico.geom.js
 import FloraParamo from './FloraParamo.jsx';
 import FaunaBosque from './FaunaBosque.jsx';
 import FondoParamo from './fondoParamo.jsx';
+import EntGradiente from './EntGradiente.jsx';
 import { geomFrailejon, calidadDeTier } from './floraParamo.geom.js';
+import { MAPA_PISO_ENT, protagonistaDePiso, vecinoDePiso } from './pisosBosqueGradiente.js';
 import {
   alturaBosque,
   sueloDelBosque,
@@ -50,6 +59,19 @@ import {
   geomTroncosCaidos,
   curvaArroyo,
 } from './bosqueTakeA.geom.js';
+
+/* ── EL ENT POR PISO TÉRMICO (cerrando el gap: antes esto solo lo consumía el
+      mockup `tres-ents-gradiente`) ────────────────────────────────────────────
+   Este mundo ES el páramo, el tope del gradiente. Su Ent protagonista y su
+   único vecino visible salen del MISMO mapa compartido que la ladera de los
+   cuatro maestros (`pisosBosqueGradiente.js`, ya aprobado y testeado), no de
+   un valor a mano: así el día que se retoque el gradiente, este mundo lo
+   hereda. Protagonista = la QUEÑUA (Polylepis); vecino = el piso de ABAJO
+   (frío → ALISO), que se dibuja SOLO como silueta ladera abajo (máximo dos). */
+const PISO_MUNDO = 'paramo';
+const ENT_PROTAGONISTA = MAPA_PISO_ENT[protagonistaDePiso(PISO_MUNDO)]; // 'quenua'
+const PISO_VECINO = vecinoDePiso(PISO_MUNDO); // 'frio'
+const ENT_VECINO = PISO_VECINO ? MAPA_PISO_ENT[PISO_VECINO] : null; // 'aliso'
 
 /* ── LA ATMÓSFERA DEL BOSQUE DE NIEBLA ─────────────────────────────────────
       Los presets del día salen de CIELOS_HORA (la misma familia del valle:
@@ -369,18 +391,27 @@ function Arroyo({ nocturno, perfil }) {
   );
 }
 
-/* ── EL CORAZÓN DEL CLARO: el PATRIARCA y su corte ─────────────────────────
-      Donde vivía el Ent ahora manda el frailejón MÁS VIEJO del rodal — el
-      patriarca en flor, por encima de los héroes del proscenio — con un
-      acompañante, la queñua matriarca (el árbol del páramo, sin rostro) y las
-      piedras del claro. La mirada de reposo cae exactamente aquí. */
+/* ── EL CORAZÓN DEL CLARO: la QUEÑUA-ENT y su corte de frailejones ──────────
+      El operador cerró la decisión (2026-07-30): el guardián del páramo VUELVE,
+      pero es la QUEÑUA (el cincel reconciliado de `EntGradiente`, el que aprobó
+      en `tres-ents-gradiente` — NO la vieja `EntQuenua` standalone que sacó por
+      "horrible"). El FRAILEJÓN pasa a PAISAJE: el patriarca en flor y su segundo
+      quedan de acompañantes contundentes, flanqueando al Ent sin taparle la
+      cara. La queñua se sale ADELANTE y a un lado del proscenio para que la
+      mirada de reposo caiga en su rostro, con el frailejonal desplegándose
+      alrededor. La lección (el agua que nace aquí y baja al valle) la señala su
+      brazo maestro y la cuenta el panel del mundo (entGuion, la queñua). */
 const CENTRO = {
-  patriarca: { x: -1.6, z: 0.6, escala: 2.55, rotY: 0.8 },
-  segundo: { x: 1.9, z: 1.7, escala: 1.3, rotY: 2.4 },
-  matriarca: { x: 4.1, z: -3.9, escala: 1.5, rotY: 1.1 },
+  /* La queñua-Ent: adelante-izquierda del claro, girada a encarar la cámara de
+     reposo (que se para en +x/+z). Base posada sobre el relieve. */
+  ent: { x: -1.2, z: 1.4, rotY: 0.62 },
+  /* Frailejones de PAISAJE (ya no protagonistas): el patriarca en flor a la
+     derecha del Ent y un segundo detrás-izquierda, más un joven al frente. */
+  patriarca: { x: 3.0, z: 0.2, escala: 2.15, rotY: 0.8 },
+  segundo: { x: -4.2, z: -1.1, escala: 1.45, rotY: 2.4 },
   rocas: [
-    { x: -2.7, z: 1.8, escala: 1.9, rotY: 0.4 },
-    { x: 1.0, z: 2.9, escala: 1.2, rotY: 2.1 },
+    { x: -2.7, z: 2.4, escala: 1.9, rotY: 0.4 },
+    { x: 1.6, z: 2.9, escala: 1.2, rotY: 2.1 },
     { x: 2.3, z: -1.3, escala: 1.5, rotY: 4.4 },
   ],
 };
@@ -393,13 +424,11 @@ const posarCentro = (p, hundir = 0) => ({
   tint: [1, 1, 1],
 });
 
-function CentroParamo({ tier, perfil }) {
-  const q = tier === 'alto' ? 1 : tier === 'medio' ? 0.62 : 0.45;
+function CentroParamo({ tier, perfil, reducedMotion }) {
   const geoPatriarca = useMemo(
     () => geomFrailejon({ flor: true, q: calidadDeTier(tier), edad: 1 }, 407),
     [tier],
   );
-  const geoQuenua = useMemo(() => geomQuenua({ q }, 33), [q]);
   const geoRoca = useMemo(
     () => geomPiedraSuelo(sueloDelBosque.opts.seed + 555, sueloDelBosque.opts.paleta),
     [],
@@ -411,18 +440,28 @@ function CentroParamo({ tier, perfil }) {
     [perfil.materialRico],
   );
   const frailejones = useMemo(() => [posarCentro(CENTRO.patriarca), posarCentro(CENTRO.segundo)], []);
-  const quenua = useMemo(() => [posarCentro(CENTRO.matriarca)], []);
   const rocas = useMemo(() => CENTRO.rocas.map((r) => posarCentro(r, 0.1)), []);
+  /* La queñua-Ent se HUNDE un palmo: el pie del fuste es un anillo abierto y,
+     al ras, por el lado de abajo se le vería el hueco del tubo (igual que en la
+     ladera de los cuatro maestros). */
+  const entY = alturaBosque(CENTRO.ent.x, CENTRO.ent.z) - 0.22;
   useLayoutEffect(() => () => {
     geoPatriarca.dispose();
-    geoQuenua.dispose();
     geoRoca.dispose();
     mat.dispose();
-  }, [geoPatriarca, geoQuenua, geoRoca, mat]);
+  }, [geoPatriarca, geoRoca, mat]);
   return (
     <group>
+      {/* EL GUARDIÁN: la queñua-Ent, protagonista del piso páramo. */}
+      <group
+        name={`ent-${ENT_PROTAGONISTA}`}
+        position={[CENTRO.ent.x, entY, CENTRO.ent.z]}
+        rotation={[0, CENTRO.ent.rotY, 0]}
+      >
+        <EntGradiente especie={ENT_PROTAGONISTA} tier={tier} reducedMotion={reducedMotion} />
+      </group>
+      {/* EL PAISAJE: frailejones en flor de acompañamiento + las piedras. */}
       <Instancias geo={geoPatriarca} mat={mat} items={frailejones} castShadow={perfil.sombras} />
-      <Instancias geo={geoQuenua} mat={mat} items={quenua} castShadow={perfil.sombras} />
       <Instancias geo={geoRoca} mat={mat} items={rocas} castShadow={perfil.sombras} />
     </group>
   );
@@ -733,13 +772,16 @@ function BrumaParallax({ franja, reducedMotion }) {
    cielo lechoso del páramo ocupa el tercio alto (la firma: planicie abierta,
    cielo grande). La queñua Ent queda de acento vertical/guardián al fondo, ya no
    como muro de copas. fov 45→46 para que entre más frailejonal. */
-const POSE_BOSQUE = { position: [12.0, 5.8, 17.6], fov: 46, mira: [0, 2.5, 0] };
+/* La mirada de reposo se corre un pelo hacia la queñua-Ent (adelante-izquierda
+   del claro) y sube apenas: el rostro tallado del guardián queda legible sin
+   perder la planicie de frailejonal que se despliega a la derecha. */
+const POSE_BOSQUE = { position: [12.0, 5.8, 17.6], fov: 46, mira: [-0.7, 3.0, 0.6] };
 
-/* Anclas de sombra de contacto que la escena le pasa a SueloRico: el patriarca
-   y la queñua matriarca del centro (los objetos mayores del claro). */
+/* Anclas de sombra de contacto que la escena le pasa a SueloRico: la queñua-Ent
+   (el guardián) y el frailejón patriarca (los objetos mayores del claro). */
 const ANCLAS_SUELO = [
-  { x: -1.6, z: 0.6, radio: 1.6 },
-  { x: 4.1, z: -3.9, radio: 2.1 },
+  { x: -1.2, z: 1.4, radio: 1.7 },
+  { x: 3.0, z: 0.2, radio: 1.6 },
 ];
 
 function poseBosqueParaAspecto(aspect) {
@@ -793,8 +835,16 @@ function Diorama({ tier, reducedMotion, pose }) {
       <AtmosferaBosque franja={franja} perfil={perfil} reducedMotion={reducedMotion} />
 
       {/* LA INMENSIDAD (del páramo viejo): bóveda, cordillera, mar de nubes,
-          falda que se despeña por la abra y el frailejonal del horizonte. */}
-      <FondoParamo franja={franja} tier={tier} reducedMotion={reducedMotion} />
+          falda que se despeña por la abra y el frailejonal del horizonte. Y el
+          VECINO de abajo (frío = aliso) en silueta ladera abajo + la chorrera
+          que amarra el agua del páramo con ese piso (máximo dos, decisión
+          2026-07-30 vía `pisosBosqueGradiente`). */}
+      <FondoParamo
+        franja={franja}
+        tier={tier}
+        reducedMotion={reducedMotion}
+        vecino={ENT_VECINO}
+      />
       {fracEstrellas > 0 && perfil.estrellas > 0 && (
         <Stars
           radius={60}
@@ -844,17 +894,18 @@ function Diorama({ tier, reducedMotion, pose }) {
       {/* La bruma con parallax que da profundidad física al orbitar. */}
       {perfil.fog && <BrumaParallax franja={franja} reducedMotion={reducedMotion} />}
 
-      {/* ══ EL CENTRO DEL CLARO ══ el patriarca en flor, la queñua matriarca y
-          las piedras (aquí vivía el Ent; el operador lo sacó: "está horrible").
-          Las PEÑAS de hito (SueloDemo3D) recortan su silueta contra la niebla. */}
-      <CentroParamo tier={tier} perfil={perfil} />
+      {/* ══ EL CENTRO DEL CLARO ══ la QUEÑUA-ENT (el guardián del páramo, de
+          vuelta con el cincel reconciliado) con el frailejonal en flor de
+          paisaje a su lado y las piedras. Las PEÑAS de hito (SueloDemo3D)
+          recortan su silueta contra la niebla. */}
+      <CentroParamo tier={tier} perfil={perfil} reducedMotion={reducedMotion} />
       {tier !== 'bajo' && <Penas perfil={perfil} />}
 
-      {/* Sombra de contacto del patriarca. En alto/medio la pone SueloRico
+      {/* Sombra de contacto de la queñua-Ent. En alto/medio la pone SueloRico
           (anclas de la escena); en 'bajo' SueloRico no dibuja sombras, así que
-          el kit la planta acá para que el frailejón mayor no flote. */}
+          el kit la planta acá para que el guardián no flote. */}
       {!perfil.sombrasContacto && (
-        <SombraContacto pos={[-1.6, 0.04, 0.6]} radio={1.5} color="#20281c" opacidad={0.34} orden={2} />
+        <SombraContacto pos={[-1.2, 0.04, 1.4]} radio={1.6} color="#20281c" opacidad={0.34} orden={2} />
       )}
 
       {/* LA LLEGADA (Jackson) o el reposo orbitable: nunca los dos a la vez. */}
