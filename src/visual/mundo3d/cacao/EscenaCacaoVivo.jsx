@@ -29,6 +29,9 @@ import { OrbitControls, AdaptiveDpr } from '@react-three/drei';
 import { perfilDeTier } from '../deviceTier.js';
 import { Fauna } from '../escenas/FaunaEscena.jsx';
 import FaunaCalido from '../escenas/FaunaCalido.jsx';
+import { SombraContacto } from '../escenas/SombraContacto.jsx';
+import EntGradiente from '../bosque/EntGradiente.jsx';
+import { MAPA_PISO_ENT, protagonistaDePiso, vecinoDePiso } from '../bosque/pisosBosqueGradiente.js';
 import FloraCacao from './FloraCacao.jsx';
 import { ANCHO, FONDO, alturaVega, SITIO_CASA } from './floraCacao.geom.js';
 import {
@@ -63,6 +66,31 @@ const RADIO_CACAOTAL = 10;
 
 /* El frustum de sombra a medida de la vega (la luz colada del sombrío). */
 const SOMBRA_CACAOTAL = { left: -16, right: 16, top: 16, bottom: -6, far: 40 };
+
+/* ── EL ENT POR PISO TÉRMICO (mismo mapa compartido que la ladera, el bosque y
+      el páramo — `pisosBosqueGradiente`, ya aprobado y testeado) ──────────────
+   El cacaotal ES tierra caliente (0–1.200 m), así que su guardián es la CEIBA
+   (*Ceiba pentandra*), el emergente del bosque seco tropical. Y aquí no es
+   decorado: la ceiba juvenil es sombrío DOCUMENTADO del cacao y el café en el
+   Caribe-Magdalena (catálogo v3.2) — el paso 2 de este mundo pregunta justo
+   "¿por qué bajo sombra?", y la ceiba es esa sombra hecha guardián. El
+   protagonista y su único vecino salen del MISMO módulo compartido (no a mano):
+   protagonista = ceiba (cálido); vecino = el piso de ARRIBA (templado → ROBLE),
+   dibujado SOLO como silueta apagada en la loma del fondo (máximo dos). */
+const PISO_MUNDO = 'calido';
+const ENT_PROTAGONISTA = MAPA_PISO_ENT[protagonistaDePiso(PISO_MUNDO)]; // 'ceiba'
+const PISO_VECINO = vecinoDePiso(PISO_MUNDO); // 'templado'
+const ENT_VECINO = PISO_VECINO ? MAPA_PISO_ENT[PISO_VECINO] : null; // 'roble'
+
+/* Dónde se posan (con `alturaVega`, hundidos un palmo como en la ladera: el pie
+   del fuste es un anillo abierto). La CEIBA emergente va atrás-izquierda del
+   cacaotal, su copa-parasol oversailando las matas (el sombrío) y el fuste
+   sacando la cabeza por encima de todo — lejos de la casa/pasera (que viven
+   atrás-derecha, en SITIO_CASA). El ROBLE-vecino, apagado y chico, en la loma
+   del fondo: un guiño al piso de arriba, no un árbol del lote (misma gramática
+   que el bosque y el páramo). */
+const SITIO_ENT = { x: -6.6, z: -5.6, rotY: 0.5 };
+const SITIO_VECINO = { x: -2.6, z: -14.6, rotY: -0.4, escala: 0.72 };
 
 /* La malla de la vega — el heightfield del KIT (mismo andamiaje que todos los
    mundos) con la pintura PROPIA del piso cálido: el mantillo pardo de
@@ -256,6 +284,62 @@ const FAUNA_CALIDO_CACAO = [
   { tipo: 'morfo', base: [-1.8, 2.7, 3.0], patron: 'morfo', size: 40, fase: 0.6, df: 9, title: 'Morfo azul (Morpho peleides)' },
 ];
 
+/* ── EL GUARDIÁN DEL CACAOTAL: la CEIBA-ENT emergente + el ROBLE-vecino ──────
+   La ceiba maestra plantada como sombrío del cálido, con su rostro tallado y su
+   copa-parasol por encima de las matas; el roble del piso de arriba, apagado y
+   chico, al fondo. Reusa `EntGradiente` (el cincel reconciliado, mismo que el
+   bosque y el páramo) — cero geometría nueva. La ceiba NO monta lección al pie
+   (ni setas ni nódulos: la geom es explícita, no se le inventa simbiosis). */
+function GuardianCacaotal({ tier, perfil, reducedMotion }) {
+  const entY = alturaVega(SITIO_ENT.x, SITIO_ENT.z) - 0.22;
+  const vecY = alturaVega(SITIO_VECINO.x, SITIO_VECINO.z) - 0.16;
+  return (
+    <group>
+      {/* EL GUARDIÁN: la ceiba-Ent, protagonista del piso cálido. */}
+      <group
+        name={`ent-${ENT_PROTAGONISTA}`}
+        position={[SITIO_ENT.x, entY, SITIO_ENT.z]}
+        rotation={[0, SITIO_ENT.rotY, 0]}
+      >
+        <EntGradiente especie={ENT_PROTAGONISTA} tier={tier} reducedMotion={reducedMotion} />
+      </group>
+
+      {/* Su sombra de contacto cuando NO hay shadow-map real (gama baja): el
+          gigante no puede flotar. En alto/medio la planta el directional. */}
+      {!perfil.sombras && (
+        <SombraContacto
+          pos={[SITIO_ENT.x, alturaVega(SITIO_ENT.x, SITIO_ENT.z) + 0.05, SITIO_ENT.z]}
+          radio={2.3}
+          color="#241a10"
+          opacidad={0.32}
+          orden={2}
+        />
+      )}
+
+      {/* EL VECINO: el roble del piso de ARRIBA (templado), apagado y chico, en
+          la loma del fondo — la silueta que insinúa a dónde sube el gradiente.
+          Sin su lección al pie (`leccion={false}`): es fondo, no protagonista.
+          Solo si sobra GPU. */}
+      {ENT_VECINO && tier !== 'bajo' && (
+        <group
+          name={`ent-vecino-${ENT_VECINO}`}
+          position={[SITIO_VECINO.x, vecY, SITIO_VECINO.z]}
+          rotation={[0, SITIO_VECINO.rotY, 0]}
+          scale={SITIO_VECINO.escala}
+        >
+          <EntGradiente
+            especie={ENT_VECINO}
+            tier={tier}
+            reducedMotion={reducedMotion}
+            apagado
+            leccion={false}
+          />
+        </group>
+      )}
+    </group>
+  );
+}
+
 function Diorama({ tier, reducedMotion, foco }) {
   const perfil = perfilDeTier(tier);
 
@@ -338,6 +422,10 @@ function Diorama({ tier, reducedMotion, foco }) {
 
       {/* EL CACAOTAL: matas, mazorcas, sombrío, plátano, luz colada */}
       <FloraCacao tier={tier} reducedMotion={reducedMotion} />
+
+      {/* EL GUARDIÁN del piso cálido: la ceiba-Ent emergente (el sombrío hecho
+          maestro) + el roble-vecino apagado en la loma del fondo. */}
+      <GuardianCacaotal tier={tier} perfil={perfil} reducedMotion={reducedMotion} />
 
       {/* la casa con su cajón de fermentar y la pasera, en la lomita */}
       <CasaSecadero pos={[SITIO_CASA[0], casaY, SITIO_CASA[1]]} />
