@@ -25,6 +25,14 @@ import {
   resolverComportamiento,
   llaveDeDecision,
   COOLDOWN_MS,
+  CADENCIA_MIN_MS,
+  CADENCIA_BASE_MS,
+  CADENCIA_MAX_MS,
+  MOLESTIA_MIN,
+  MOLESTIA_MAX,
+  aplicarSenalMolestia,
+  multiplicadorDeCadencia,
+  cadenciaEfectivaMs,
 } from '../angelitaInteligencia';
 // Contrato con la CARA: los estados visuales canónicos que el dibujo entiende.
 import { ESTADOS_ANGELITA } from '../../visual/agente/angelitaEstados';
@@ -306,5 +314,55 @@ describe('resolverComportamiento — arbitraje', () => {
     expect(llaveDeDecision({ estado: 'calma' })).toBeNull();
     expect(llaveDeDecision({ estado: 'husmea' }, 'clima')).toBe('husmea:clima');
     expect(llaveDeDecision({ estado: 'aviso', severidad: 'media' })).toBe('aviso_media');
+  });
+});
+
+describe('cadencia adaptativa (#102/#106)', () => {
+  it('aplicarSenalMolestia suma/resta y clampea', () => {
+    expect(aplicarSenalMolestia(0, 'silenciar')).toBe(3);
+    expect(aplicarSenalMolestia(0, 'abrirTip')).toBe(-2);
+    expect(aplicarSenalMolestia(MOLESTIA_MAX, 'silenciar')).toBe(MOLESTIA_MAX); // no se pasa del techo
+    expect(aplicarSenalMolestia(MOLESTIA_MIN, 'hablarle')).toBe(MOLESTIA_MIN); // no se pasa del piso
+    expect(aplicarSenalMolestia(5, 'senalDesconocida')).toBe(5); // señal inválida no muta nada
+  });
+
+  it('multiplicadorDeCadencia: 0 es 1x, molestia estira, atención encoge', () => {
+    expect(multiplicadorDeCadencia(0)).toBe(1);
+    expect(multiplicadorDeCadencia(MOLESTIA_MAX)).toBeCloseTo(3, 5);
+    expect(multiplicadorDeCadencia(MOLESTIA_MIN)).toBeCloseTo(0.4, 5);
+    // monótono: más molestia nunca acelera, más atención nunca frena.
+    expect(multiplicadorDeCadencia(5)).toBeGreaterThan(multiplicadorDeCadencia(0));
+    expect(multiplicadorDeCadencia(-5)).toBeLessThan(multiplicadorDeCadencia(0));
+  });
+
+  it('cadenciaEfectivaMs respeta SIEMPRE el piso de 13s y el techo de 6min', () => {
+    expect(cadenciaEfectivaMs(COOLDOWN_MS.aviso_media, MOLESTIA_MIN)).toBeGreaterThanOrEqual(CADENCIA_MIN_MS);
+    expect(cadenciaEfectivaMs(COOLDOWN_MS.husmea, MOLESTIA_MAX)).toBeLessThanOrEqual(CADENCIA_MAX_MS);
+    // cooldown 0 (aviso_alta) no se modula: sigue "siempre puede".
+    expect(cadenciaEfectivaMs(0, MOLESTIA_MAX)).toBe(0);
+  });
+
+  it('cadenciaEfectivaMs(CADENCIA_BASE_MS, 0) queda cerca de la base (referencia del SPEC ~46s)', () => {
+    expect(cadenciaEfectivaMs(CADENCIA_BASE_MS, 0)).toBe(CADENCIA_BASE_MS);
+  });
+
+  it('debeHablar: con mucha molestia, un cooldown que ya venció sin modular sigue vetado', () => {
+    const ahoraMs = 1000000;
+    // husmea (20 min base) con mucha molestia se estira, pero el TECHO (6 min)
+    // gobierna: a los 3 min SIN modular ya hubiera hablado (era husmea, no
+    // aplica), y CON el multiplicador tampoco alcanza el techo modulado.
+    const tresMin = 3 * 60 * 1000;
+    const sieteMin = 7 * 60 * 1000;
+    const conMolestiaAntesDelTecho = debeHablar({ estado: 'husmea', ahoraMs, ultimaMs: ahoraMs - tresMin, molestia: MOLESTIA_MAX });
+    const conMolestiaTrasElTecho = debeHablar({ estado: 'husmea', ahoraMs, ultimaMs: ahoraMs - sieteMin, molestia: MOLESTIA_MAX });
+    expect(conMolestiaAntesDelTecho).toBe(false); // el techo (6 min) aún no pasó
+    expect(conMolestiaTrasElTecho).toBe(true); // pasado el techo modulado, sí habla
+  });
+
+  it('debeHablar: aviso_alta habla siempre pase lo que pase con la molestia', () => {
+    const ahoraMs = 1000000;
+    expect(debeHablar({
+      estado: 'aviso', severidad: 'alta', ahoraMs, ultimaMs: ahoraMs, molestia: MOLESTIA_MAX,
+    })).toBe(true);
   });
 });

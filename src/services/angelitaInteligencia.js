@@ -321,6 +321,9 @@ function llaveCooldown(estado, severidad) {
  * @param {number|null} [p.ultimaMs] — cuándo surgió por última vez ESE tipo.
  * @param {boolean} [p.ocupado] — el campesino está a mitad de algo (escribiendo, grabando…).
  * @param {boolean} [p.silenciado] — el usuario pidió silencio a Angelita.
+ * @param {number} [p.molestia] — contador adaptativo (#102/#106, sección 7):
+ *   estira/encoge el cooldown base. 0 = cadencia normal. NO afecta aviso_alta
+ *   (urgencia real habla siempre, contador o no).
  * @returns {boolean}
  */
 export function debeHablar({
@@ -330,13 +333,15 @@ export function debeHablar({
   ultimaMs = null,
   ocupado = false,
   silenciado = false,
+  molestia = 0,
 } = {}) {
   if (silenciado) return false;
   if (estado === 'calma' || !estado) return false;
   const urgente = estado === 'aviso' && severidad === 'alta';
   // Nunca interrumpe a mitad de una tarea, salvo urgencia real.
   if (ocupado && !urgente) return false;
-  const requerido = COOLDOWN_MS[llaveCooldown(estado, severidad)] ?? 0;
+  const base = COOLDOWN_MS[llaveCooldown(estado, severidad)] ?? 0;
+  const requerido = urgente ? 0 : cadenciaEfectivaMs(base, molestia);
   if (requerido > 0) {
     if (ultimaMs != null && ahoraMs - ultimaMs < requerido) return false;
   }
@@ -392,6 +397,7 @@ function decisionCalma() {
  * @param {Object} [ctx.ultimaHablaPorLlave] — { [llaveCooldown]: ms } de la última vez.
  * @param {boolean} [ctx.ocupado]
  * @param {boolean} [ctx.silenciado]
+ * @param {number} [ctx.molestia] — contador adaptativo (#102/#106, sección 7).
  * @returns {DecisionAngelita}
  */
 export function resolverComportamiento(ctx = {}) {
@@ -405,6 +411,7 @@ export function resolverComportamiento(ctx = {}) {
     ultimaHablaPorLlave = {},
     ocupado = false,
     silenciado = false,
+    molestia = 0,
   } = ctx;
 
   /** @type {Array<{estado:string, prioridad:number, severidad:any, mensaje:string, prompt:string|null, logroId:string|null}>} */
@@ -468,6 +475,7 @@ export function resolverComportamiento(ctx = {}) {
     ultimaMs: ultimaHablaPorLlave[llave] ?? null,
     ocupado,
     silenciado,
+    molestia,
   });
 
   if (!surge) return decisionCalma();
@@ -490,6 +498,90 @@ export function llaveDeDecision(decision, mundo = null) {
   if (!decision || decision.estado === 'calma') return null;
   if (decision.estado === 'husmea') return `husmea:${mundo}`;
   return llaveCooldown(decision.estado, decision.severidad);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * 7. CADENCIA ADAPTATIVA (#102/#106) — el compañero habla menos si lo
+ *    ignoran/silencian/cierran seguido, y más si le prestan atención.
+ *
+ * Un solo contador entero de "molestia" (persistido en useAngelitaStore, NO
+ * aquí — este módulo sigue siendo puro/sin storage). Sube con señales de
+ * rechazo, baja con señales de atención real. El contador se traduce en un
+ * MULTIPLICADOR sobre los cooldowns base de la sección 5 — nunca los
+ * reemplaza: la cadencia sigue respetando aviso_alta=siempre-puede-hablar,
+ * solo estira/encoge lo demás.
+ *
+ * Rango del contador: [-MOLESTIA_MAX_BUENA, MOLESTIA_MAX] — clamped, nunca
+ * corre libre. Positivo = molesta, negativo = le presta atención.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+const SEGUNDO = 1000;
+
+/** Piso y techo de la cadencia adaptativa (nunca más rápido que el piso, y
+ *  el techo evita un silencio eterno del que ya no se recupera). */
+export const CADENCIA_MIN_MS = 13 * SEGUNDO;
+export const CADENCIA_BASE_MS = 46 * SEGUNDO;
+export const CADENCIA_MAX_MS = 6 * 60 * SEGUNDO;
+
+/** Cuánto sube/baja el contador por cada señal (enteros, para que sea legible
+ *  en devtools/telemetría — nada de floats acumulando error). */
+export const MOLESTIA_DELTA = {
+  silenciar: 3,
+  abortarPaseo: 2,
+  cerrarTipSinLeer: 1,
+  abrirTip: -2,
+  hablarle: -3,
+};
+
+/** El contador de molestia nunca corre libre: clamped a un rango razonable. */
+export const MOLESTIA_MIN = -10;
+export const MOLESTIA_MAX = 15;
+
+/**
+ * Aplica una señal al contador de molestia, clamped. Pura — el store es quien
+ * persiste el resultado.
+ * @param {number} contadorActual
+ * @param {keyof MOLESTIA_DELTA} senal
+ * @returns {number} nuevo contador, clamped a [MOLESTIA_MIN, MOLESTIA_MAX].
+ */
+export function aplicarSenalMolestia(contadorActual, senal) {
+  const delta = MOLESTIA_DELTA[senal];
+  if (!Number.isFinite(delta)) return contadorActual;
+  const base = Number.isFinite(contadorActual) ? contadorActual : 0;
+  return Math.min(MOLESTIA_MAX, Math.max(MOLESTIA_MIN, base + delta));
+}
+
+/**
+ * Traduce el contador de molestia a un multiplicador de cadencia: más
+ * molestia → cooldowns más largos (habla menos); más atención (contador
+ * negativo) → cooldowns más cortos (habla más), sin pasar nunca el piso.
+ * Lineal y simple a propósito — es un modulador, no un modelo.
+ * @param {number} contador
+ * @returns {number} multiplicador, ej. 0.6 (más seguido) .. 3 (mucho más raro).
+ */
+export function multiplicadorDeCadencia(contador) {
+  const c = Number.isFinite(contador) ? contador : 0;
+  if (c >= 0) {
+    // 0 → 1x (cadencia base); MOLESTIA_MAX → 3x (mucho más espaciado).
+    return 1 + (c / MOLESTIA_MAX) * 2;
+  }
+  // 0 → 1x; MOLESTIA_MIN → 0.4x (más seguido, nunca por debajo del piso).
+  return 1 + (c / MOLESTIA_MIN) * -0.6;
+}
+
+/**
+ * Cadencia efectiva (ms) para un cooldown base, dado el contador de molestia
+ * — clamped SIEMPRE entre CADENCIA_MIN_MS y CADENCIA_MAX_MS. Úsese para
+ * modular cooldowns de tips/husmeo (no toca aviso_alta, que sigue en 0 =
+ * siempre puede hablar: una helada no espera a que el contador baje).
+ * @param {number} cooldownBaseMs
+ * @param {number} contadorMolestia
+ * @returns {number}
+ */
+export function cadenciaEfectivaMs(cooldownBaseMs, contadorMolestia) {
+  if (!(cooldownBaseMs > 0)) return 0; // 0 = "siempre puede" no se modula
+  const mult = multiplicadorDeCadencia(contadorMolestia);
+  return Math.min(CADENCIA_MAX_MS, Math.max(CADENCIA_MIN_MS, Math.round(cooldownBaseMs * mult)));
 }
 
 export default resolverComportamiento;
