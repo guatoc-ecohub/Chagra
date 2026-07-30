@@ -23,6 +23,7 @@ import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { crearMaterialVertexColors } from '../paleta/index.js';
 import { VERDES, TIERRAS, NEUTROS, mezclar } from '../paleta/paletaMadre.js';
+import EntGradiente from './EntGradiente.jsx';
 import {
   ARQUETIPOS,
   ESTRATOS,
@@ -38,6 +39,19 @@ const MECIDO = {
   sotobosque: { amp: 0.014, per: 3.4 },
   suelo: { amp: 0, per: 1 },
 };
+
+/* ── EL GUARDIÁN DEL CLARO Y SU VECINO ──────────────────────────────────────
+   El bosque tiene su Ent-por-piso igual que la ladera de los cuatro maestros y
+   el páramo: el árbol maestro del piso térmico de la finca (roble en templado,
+   aliso en frío) se para en el CLARO, y su único vecino —el que le señala el
+   mapa compartido `pisosBosqueGradiente`— queda AL FONDO, hundido en el rodal y
+   apagado un punto (silueta que acompaña, no protagonista). Máximo dos. Qué Ent
+   va en cada uno lo decide el padre (`BosqueTresEstratos3D`) desde el mapa; aquí
+   solo se plantan. Estos dos sitios van a mano porque son PERSONAJES, no rodal:
+   el protagonista cae en el centro del claro (el mismo `CLARO` que la siembra
+   deja pelado de árboles grandes) y el vecino a un lado, entre los fustes. */
+const SITIO_ENT = { x: 0, z: 12, rotY: 0.09 };
+const SITIO_VECINO = { x: 8.5, z: 0.5, rotY: -0.24 };
 
 /* ══════════════════════════════════════════════════════════════════════════
    UN BANCO: todas las matas de UN arquetipo en un solo InstancedMesh
@@ -182,12 +196,18 @@ function SueloBosque({ mat, extension }) {
  * @param {string|null} [props.destacado]  id de estrato a destacar (los otros se
  *   apagan un poco). Es la ayuda pedagógica: sirve para señalar «este es el
  *   dosel» sin ocultar el resto del bosque.
+ * @param {string|null} [props.entProtagonista]  especie del Ent maestro del
+ *   piso térmico de la finca (`roble`|`aliso`), que se planta en el claro.
+ * @param {string|null} [props.entVecino]  especie del Ent vecino, apagado y al
+ *   fondo. Se salta en gama baja.
  */
 export default function BosqueTresEstratos({
   tier = 'alto',
   perfil,
   reducedMotion = false,
   destacado = null,
+  entProtagonista = null,
+  entVecino = null,
   extension = 23,
   seed = 4242,
 }) {
@@ -244,6 +264,34 @@ export default function BosqueTresEstratos({
           />
         );
       })}
+
+      {/* EL GUARDIÁN: el Ent maestro del piso térmico de la finca, protagonista
+          en el centro del claro. Se hunde un palmo (el pie del fuste es un
+          anillo abierto: al ras se le vería el hueco del tubo, igual que en la
+          ladera de los cuatro maestros). Su lección al pie (el corro de setas
+          del roble o los nódulos de Frankia del aliso) la monta EntGradiente. */}
+      {entProtagonista && (
+        <group
+          name={`ent-guardian-${entProtagonista}`}
+          position={[SITIO_ENT.x, alturaSuelo(SITIO_ENT.x, SITIO_ENT.z) - 0.2, SITIO_ENT.z]}
+          rotation={[0, SITIO_ENT.rotY, 0]}
+        >
+          <EntGradiente especie={entProtagonista} tier={tier} reducedMotion={reducedMotion} />
+        </group>
+      )}
+
+      {/* EL VECINO: el Ent del piso de arriba (de donde baja el agua), apagado y
+          al fondo entre el rodal — silueta que acompaña, no protagonista. Se
+          salta en gama baja para no cargarla con un segundo árbol tallado. */}
+      {entVecino && tier !== 'bajo' && (
+        <group
+          name={`ent-vecino-${entVecino}`}
+          position={[SITIO_VECINO.x, alturaSuelo(SITIO_VECINO.x, SITIO_VECINO.z) - 0.2, SITIO_VECINO.z]}
+          rotation={[0, SITIO_VECINO.rotY, 0]}
+        >
+          <EntGradiente especie={entVecino} tier={tier} reducedMotion={reducedMotion} apagado />
+        </group>
+      )}
     </group>
   );
 }
