@@ -1,0 +1,361 @@
+/*
+ * ZariguyaCompaiEscena — LA COREOGRAFÍA DE LA ZARIGÜEYA COMPAÑERA
+ * (avatarType 'zariguya').
+ *
+ * Molde: useEntradaAbeja/AbejaEscena (la escena posee la coreografía, la
+ * creature posee el cuerpo — que YA existía: Zariguya.jsx, con las crías al
+ * lomo). Pero la chucha NO vuela — es un marsupial NOCTURNO de piso, y su
+ * coreografía entera sale de esa verdad:
+ *
+ *   · CAMINA: se desplaza PEGADA AL SUELO con trote de pasos cortos (bob de
+ *     paso + bamboleo de cadera — el waddle del marsupial), jamás la deriva
+ *     flotante de la abeja.
+ *   · ENTRADA = LLEGA TROTANDO desde el borde del diorama (nace oculta en el
+ *     mismo ancla de tiempo del cruce del host y aparece trotando hacia su
+ *     percha) — nada de picada desde la cámara.
+ *   · SE ENCARAMA: si el foco está en alto (hotspot elevado), sube a él como
+ *     a un tronco — la cola prensil y las manitas son para eso.
+ *   · RONDA: sin foco activo, MERODEA por el piso en óvalos irregulares
+ *     (ondas co-primas, lentas) y se detiene a HUSMEAR cada tanto (el cuerpo
+ *     ya trae esa reacción-firma: data-husmea).
+ *   · NOCTURNA: la noche es SU jornada — de noche no se acurruca como los
+ *     demás: sigue trabajando (por eso NO se le pasa hora='noche' al idle).
+ *   · SALIDA: sale CORRIENDO por donde vino y se apaga en CRUCE_SUELTA_MS
+ *     (el mismo reloj del overlay del host).
+ *
+ * Vive en escenas/ (chunk perezoso `vendor-three`): importa @react-three,
+ * así que NUNCA se importa desde el barrel base del framework.
+ */
+/* eslint-disable react-refresh/only-export-components -- este módulo (hook de
+   coreografía + su componente de escena) se importa SIEMPRE perezoso dentro de
+   un <Canvas> vía CompaiEscena/EscenaBase3D; no es hot-reload-sensible. Van
+   juntos a propósito (mismo contrato que useEntradaAbeja). */
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { Html } from '@react-three/drei';
+import * as THREE from 'three';
+import { Zariguya } from '../../creatures/Zariguya.jsx';
+import { ZARIGUYA_PRESENCIA, ZARIGUYA_TINTA, ZARIGUYA_SLUG } from '../../creatures/zariguyaIdentidad.js';
+import { idleDeCreature, IDLE_NEUTRO } from '../../creatures/creatureIdle.js';
+import { useLipSync } from '../../creatures/useLipSync.js';
+import { horaDeReloj } from '../cielosHoraData.js';
+import { CRUCE_ATRAPA_MS, CRUCE_SUELTA_MS } from '../../creatures/AbejaTransicion.jsx';
+import { useSalidaAbeja, resetSalidaAbeja } from '../../creatures/senalSalidaAbeja.js';
+import { SombraContacto } from './SombraContacto.jsx';
+import { reaccionDeFinca } from './reaccionFinca.js';
+import useHaptics from '../useHaptics.js';
+
+/* LA IDENTIDAD COMPARTIDA (zariguyaIdentidad.js): percha, tamaño y sombra de
+   la MISMA fuente que el dibujo 2D — una sola chucha. */
+const PERCHA = ZARIGUYA_PRESENCIA.percha;
+const SOMBRA = ZARIGUYA_PRESENCIA.sombra;
+
+const CRUCE_ATRAPA_S = CRUCE_ATRAPA_MS / 1000;
+const CRUCE_SUELTA_S = CRUCE_SUELTA_MS / 1000;
+const TROTE_S = 2.0;        // ventana de entrada con lerp reforzado (llega al trote)
+const TROTE_EMPUJE = 2.4;   // refuerzo del lerp durante la llegada
+const ENTRA_DESDE_X = 2.4;  // desde qué borde llega (offset del foco)
+const PASO_FREQ = 7.3;      // frecuencia del trote (pasos cortos de marsupial)
+const ENCARAME_UMBRAL = 0.35; // foco más alto que esto sobre el piso → se encarama
+
+const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
+
+/* Temporal reutilizado por frame (cero alloc en el loop). */
+const _dest = new THREE.Vector3();
+
+/**
+ * Coreografía de la zarigüeya DE PISO. Devuelve `{ ref, caraRef, sombraRef,
+ * visRef, idleRef, aparecioRef }` — el mismo contrato de refs que
+ * useEntradaAbeja (la escena los cuelga igual).
+ *
+ * @param {THREE.Vector3} foco  a dónde va (hotspot activo o centro).
+ * @param {object} [opts]
+ * @param {boolean} [opts.entrando=true]  con foco se percha junto a él (o se
+ *   ENCARAMA si está en alto); sin foco, merodea por el piso.
+ * @param {number}  [opts.energia=1]  0..1 — brío del trote.
+ * @param {boolean} [opts.reducedMotion=false]  aparece ya llegada y quieta.
+ * @param {number}  [opts.piso=0]  y del suelo por el que camina.
+ * @param {boolean} [opts.cruce=true]  espera el ancla del overlay para entrar.
+ * @param {boolean} [opts.saliendo=false]  sale corriendo y se apaga.
+ * @param {string}  [opts.hora='dorada']  hora del valle — la noche NO la
+ *   duerme (nocturna): se usa solo para matices, nunca para acurrucarla.
+ * @param {string}  [opts.tier='alto']  'bajo' → idle frugal.
+ */
+export function useAndanzaZariguya(foco, {
+  entrando = true, energia = 1, reducedMotion = false, piso = 0,
+  cruce = true, saliendo = false, hora = 'dorada', tier = 'alto',
+} = {}) {
+  const ref = useRef(null);
+  const caraRef = useRef(null);
+  const sombraRef = useRef(null);
+  const visRef = useRef(null);
+  const idleRef = useRef(null);
+  const nacioEn = useRef(null);
+  const salioEn = useRef(null);
+  const llegoEn = useRef(null);
+  const posadaEn = useRef(null);
+  const ultimoTf = useRef('');
+  const ultimaPose = useRef('anda');
+  const prevX = useRef(foco.x);
+  const aparecioRef = useRef(false);
+  // Fase de entrada: 'oculta' (pre-ancla) → 'trote' (llega) → 'no'.
+  const fase = useRef(cruce && !reducedMotion ? 'oculta' : 'no');
+  const ponVis = (visible) => {
+    if (visible) aparecioRef.current = true;
+    if (visRef.current) visRef.current.style.visibility = visible ? '' : 'hidden';
+    if (sombraRef.current) sombraRef.current.visible = visible;
+  };
+  const haptics = useHaptics({ reducedMotion });
+
+  useFrame((state) => {
+    if (!ref.current) return;
+    const t = state.clock.elapsedTime;
+    if (nacioEn.current === null) {
+      nacioEn.current = t;
+      // Nace en el BORDE por el que va a entrar (no en el cielo ni en la
+      // cámara: los marsupiales llegan caminando).
+      ref.current.position.set(foco.x - ENTRA_DESDE_X, piso + PERCHA.y, foco.z + 0.35);
+    }
+    const vida = t - nacioEn.current;
+
+    // ── SALIDA: sale corriendo por donde vino y se apaga en el reloj del
+    //    overlay (CRUCE_SUELTA_S) — el host retoma la capa 2D ahí.
+    if (saliendo && !reducedMotion) {
+      if (fase.current === 'oculta') { ponVis(false); return; } // salió antes de entrar
+      if (salioEn.current === null) salioEn.current = t;
+      if (t - salioEn.current >= CRUCE_SUELTA_S) { ponVis(false); return; }
+      _dest.set(foco.x - ENTRA_DESDE_X * 1.6, piso + PERCHA.y, foco.z + 0.35);
+      ref.current.position.lerp(_dest, 0.22);
+      if (caraRef.current) caraRef.current.style.transform = 'scaleX(-1)'; // mira por donde huye
+      state.invalidate();
+      return;
+    }
+    salioEn.current = null;
+
+    // ── ENTRADA: oculta en el borde hasta el ancla del overlay; después
+    //    aparece y llega AL TROTE (lerp reforzado) a su percha.
+    if (fase.current === 'oculta') {
+      if (vida < CRUCE_ATRAPA_S) { ponVis(false); state.invalidate(); return; }
+      fase.current = 'trote';
+      ponVis(true);
+    } else if (fase.current === 'trote' && vida >= CRUCE_ATRAPA_S + TROTE_S) {
+      fase.current = 'no';
+    }
+    if (!aparecioRef.current) ponVis(true); // sin cruce (RM): aparece ya
+    const empuje = fase.current === 'trote' ? TROTE_EMPUJE : 1;
+
+    // ── PERSONALIDAD IDLE (creatureIdle, perfil 'zariguya'): pasos cortos,
+    //    husmeos frecuentes, voltereta rara (lleva tres crías encima),
+    //    celebración al llegar. NOCTURNA: jamás se le pasa 'noche' — la noche
+    //    es su jornada, no su siesta (el acurruque genérico la dormiría).
+    const idle = fase.current !== 'no' ? IDLE_NEUTRO : idleDeCreature(t, {
+      especie: ZARIGUYA_SLUG, hora: hora === 'noche' ? 'dorada' : hora,
+      reducedMotion, tier,
+      llegadaHace: llegoEn.current === null ? null : t - llegoEn.current,
+    });
+    const quieta = Math.max(0, idle.posada);
+    const brio = 0.35 + 0.65 * energia;
+
+    // ── A DÓNDE VA: percha junto al foco (o ENCARAMADA si el foco vive en
+    //    alto) — o merodeo por el piso en óvalos irregulares (ondas co-primas
+    //    lentas: pasos de chucha, no vuelo de abeja).
+    const encarama = entrando && (foco.y - piso) > ENCARAME_UMBRAL;
+    const vagarX = reducedMotion || entrando
+      ? 0
+      : (Math.sin(t * 0.31) * 0.55 + Math.sin(t * 0.83) * 0.12) * (1 - quieta);
+    const vagarZ = reducedMotion || entrando
+      ? 0
+      : (Math.cos(t * 0.31) * 0.4 + Math.sin(t * 0.57 + 1.3) * 0.12) * (1 - quieta);
+    const yDest = encarama ? foco.y + 0.12 : piso + PERCHA.y;
+    _dest.set(
+      foco.x + (entrando ? PERCHA.x : 0.3 + vagarX),
+      yDest,
+      foco.z + (entrando ? PERCHA.z : 0.55 + vagarZ),
+    );
+
+    // ── EL TROTE: qué tanto se está moviendo decide el paso (bob + waddle).
+    const dist = ref.current.position.distanceTo(_dest);
+    const moviendo = reducedMotion ? 0 : clamp01(dist * 2.5) * (1 - quieta);
+    const pasoBob = Math.abs(Math.sin(t * PASO_FREQ)) * 0.035 * moviendo * brio;
+    const waddle = Math.sin(t * PASO_FREQ) * 3.2 * moviendo;
+    _dest.y += pasoBob;
+    // Lerp terrestre: más lento que el vuelo de la abeja; al encaramarse sube
+    // con calma (trepa, no salta).
+    ref.current.position.lerp(_dest, (encarama ? 0.028 : 0.038) * brio * empuje);
+
+    // Llegó a su percha: celebración idle + roce háptico (una vez por foco).
+    if (entrando && posadaEn.current !== foco && ref.current.position.distanceTo(_dest) < 0.28) {
+      posadaEn.current = foco;
+      llegoEn.current = t;
+      haptics.tap();
+    }
+
+    // VOLTEO: mira hacia donde camina (el hocico vive en +x del dibujo).
+    if (caraRef.current) {
+      const vx = ref.current.position.x - prevX.current;
+      if (Math.abs(vx) > 0.0015) caraRef.current.style.transform = `scaleX(${vx < 0 ? -1 : 1})`;
+      prevX.current = ref.current.position.x;
+    }
+
+    // El gesto del frame (waddle del trote + idle de personalidad) — un solo
+    // style-write cacheado; la pose discreta viaja como data-pose.
+    if (idleRef.current) {
+      const tf = `rotate(${(idle.rot + waddle).toFixed(1)}deg) scale(${idle.sx.toFixed(3)},${idle.sy.toFixed(3)})`;
+      if (tf !== ultimoTf.current) { ultimoTf.current = tf; idleRef.current.style.transform = tf; }
+      if (idle.pose !== ultimaPose.current) {
+        ultimaPose.current = idle.pose;
+        idleRef.current.setAttribute('data-pose', idle.pose);
+      }
+    }
+
+    // Sombra de contacto: la sigue por el piso; al encaramarse se abre y
+    // atenúa (peso visual sin shadow-maps).
+    if (sombraRef.current) {
+      const pos = ref.current.position;
+      const h = Math.max(0, pos.y - piso);
+      sombraRef.current.position.set(pos.x, piso + 0.03, pos.z);
+      sombraRef.current.scale.setScalar(1 + h * SOMBRA.ensanchaPorAltura);
+      sombraRef.current.material.opacity = Math.max(SOMBRA.opacidadMin, SOMBRA.opacidadBase - h * SOMBRA.atenuaPorAltura);
+    }
+
+    // frameloop='demand': trote/merodeo/idle piden el próximo frame.
+    if (idle.activo || moviendo > 0 || fase.current !== 'no') state.invalidate();
+  });
+  return { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef };
+}
+
+/* Ritmo del HUSMEO escénico: cada tanto se para a leer el aire (la
+   reacción-firma del cuerpo, data-husmea). Períodos con jitter para que
+   nunca sea de reloj. */
+const HUSMEA_CADA_MS = 8600;
+const HUSMEA_JITTER_MS = 2800;
+const HUSMEA_DURA_MS = 1400;
+
+/**
+ * La zarigüeya ya montada en una escena: drop-in del contrato de AbejaEscena
+ * (CompaiEscena le pasa las mismas props). Billboard `<Html>` con el cuerpo
+ * `Zariguya` (crías al lomo = su firma, de serie); PULSA al narrar y REBOTA
+ * al toque con las clases genéricas del billboard (`.mundo-abeja*`), y cada
+ * tanto se detiene a HUSMEAR (su reacción propia).
+ */
+export function ZariguyaCompaiEscena({
+  foco, entrando = true, animo = 'sereno', energia = 1, reducedMotion = false, piso = 0,
+  hablando = false, rebote = 0, mundoId = null, tier = 'alto', cruce = true,
+  estadoFinca = null, hayAlerta = false,
+}) {
+  // La señal de SALIDA del host (compartida: la señal es del MUNDO, no de la
+  // especie que viva dentro).
+  const saliendo = useSalidaAbeja();
+  useEffect(() => {
+    resetSalidaAbeja();
+    return resetSalidaAbeja;
+  }, []);
+  const reaccion = useMemo(
+    () => (estadoFinca ? reaccionDeFinca(estadoFinca, { hayAlerta }) : null),
+    [estadoFinca, hayAlerta],
+  );
+  const animoReal = reaccion?.animo ?? animo;
+  const energiaReal = reaccion?.energia ?? energia;
+  const climaReal = estadoFinca?.clima ?? null;
+  const ensoReal = estadoFinca?.enso ?? 'neutro';
+  // La hora del valle: para la zarigüeya la noche es JORNADA (el hook no la
+  // acurruca); aquí solo se lee una vez, determinista.
+  const hora = useMemo(() => horaDeReloj(), []);
+
+  const { ref, caraRef, sombraRef, visRef, idleRef, aparecioRef } = useAndanzaZariguya(foco, {
+    entrando, energia: energiaReal, reducedMotion, piso,
+    cruce: cruce && !reducedMotion, saliendo, hora, tier,
+  });
+
+  // Microrrebote del toque (mismo patrón de reflow que AbejaEscena).
+  const reboteRef = useRef(null);
+  useEffect(() => {
+    if (reducedMotion || rebote === 0 || !reboteRef.current) return undefined;
+    const el = reboteRef.current;
+    el.removeAttribute('data-rebote');
+    void el.offsetWidth; // fuerza reflow → reinicia el keyframe
+    el.setAttribute('data-rebote', '1');
+    const t = setTimeout(() => el.removeAttribute('data-rebote'), 640);
+    return () => clearTimeout(t);
+  }, [rebote, reducedMotion]);
+
+  // EL HUSMEO: cada ~8.6s (con jitter) se detiene a leer el aire un momento.
+  // Estado discreto (un re-render cada tanto, jamás por frame). Gate RM.
+  const [husmea, setHusmea] = useState(false);
+  useEffect(() => {
+    if (reducedMotion) return undefined;
+    let vivo = true;
+    let timer;
+    const ciclo = () => {
+      if (!vivo) return;
+      timer = setTimeout(() => {
+        if (!vivo) return;
+        setHusmea(true);
+        timer = setTimeout(() => {
+          if (!vivo) return;
+          setHusmea(false);
+          ciclo();
+        }, HUSMEA_DURA_MS);
+      }, HUSMEA_CADA_MS + Math.random() * HUSMEA_JITTER_MS);
+    };
+    ciclo();
+    return () => { vivo = false; clearTimeout(timer); };
+  }, [reducedMotion]);
+
+  const size = ZARIGUYA_PRESENCIA.billboardBase + Math.round(energiaReal * ZARIGUYA_PRESENCIA.billboardPorEnergia);
+  const vivo = !reducedMotion;
+  // LIP-SYNC: la chucha "habla" cuando el agente narra (única boca del mundo).
+  const { visema } = useLipSync({ activo: vivo });
+  const cruceVivo = cruce && !reducedMotion;
+  return (
+    <>
+      <group ref={ref} position={[foco.x - ENTRA_DESDE_X, piso + PERCHA.y, foco.z + 0.35]}>
+        <Html center distanceFactor={ZARIGUYA_PRESENCIA.distancia} zIndexRange={[40, 10]}>
+          <div
+            ref={visRef}
+            className="mundo-abeja"
+            /* hidden SOLO hasta que entra trotando; después de aparecer, los
+               re-renders no deben volver a esconderla (patrón BUG-COMPAI-ENTRADA).
+               La lectura del ref en render es la excepción heredada del molde
+               (useEntradaAbeja): el ref ES la memoria de "ya apareció" que el
+               useFrame escribe imperativo. */
+            // eslint-disable-next-line react-hooks/refs
+            style={cruceVivo && !aparecioRef.current ? { visibility: 'hidden' } : undefined}
+            aria-hidden="true"
+            data-hablando={hablando && vivo ? '1' : undefined}
+          >
+            <div ref={reboteRef} className="mundo-abeja__rebote">
+              {/* Capa del gesto (waddle + idle) — imperativa por frame; propia
+                  para no pisar la transition del volteo de la cara. */}
+              <div ref={idleRef} style={{ transformOrigin: 'center bottom' }} data-creature={ZARIGUYA_SLUG}>
+                <div ref={caraRef} className="mundo-abeja__cara">
+                  <Zariguya
+                    size={size}
+                    animo={animoReal}
+                    energia={energiaReal}
+                    husmea={husmea && vivo}
+                    clima={climaReal}
+                    enso={ensoReal}
+                    visema={vivo ? visema : null}
+                    mundoId={mundoId}
+                    animated={vivo}
+                    tier={tier}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </Html>
+      </group>
+      {/* Su sombra: pegada al piso que camina, tintada con la tinta de la casa. */}
+      <SombraContacto
+        refExt={sombraRef}
+        pos={[foco.x - ENTRA_DESDE_X, piso + 0.03, foco.z + 0.35]}
+        radio={SOMBRA.radio}
+        color={ZARIGUYA_TINTA}
+        opacidad={SOMBRA.opacidad}
+        orden={3}
+      />
+    </>
+  );
+}

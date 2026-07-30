@@ -1,0 +1,114 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAÍZ COMPAÑERO — LA CADENCIA (maiz-*). El dibujo vive en MaizCompai.jsx y
+   la identidad en maizIdentidad.js; aquí SOLO el tiempo. Todo transform/
+   opacity (GPU, gama baja). Gates RM + tier al final.
+   El idle del maíz ES LA BRISA: cada hoja con su compás (la duración/delay
+   los pone el JSX por hoja — períodos co-primos: 3.1s · 3.4s · 4.1s · 4.6s),
+   penacho 3.9s, mazorca 4.7s, barbas 2.3s, polen 5.9s, boil 2.9s. El viento
+   jamás mueve la mata en bloque: eso es lo que la hace verse VIVA y no un
+   sprite que oscila.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* BOIL VEGETAL — la mata respira más lento que un bicho (savia, no pulso).
+   Reescribe SOLO su boil (misma clase .rh-boil, especificidad por
+   data-creature) con longhands, como la zarigüeya. */
+[data-creature='maiz'] .rh-boil {
+  animation-name: maiz-boil;
+  animation-duration: 2.9s;
+  animation-timing-function: ease-in-out;
+}
+@keyframes maiz-boil {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50%      { transform: translateY(0.25px) scale(1.014, 0.988); } /* respiración de savia */
+}
+
+/* LAS HOJAS-CINTA EN LA BRISA — el corazón del idle. La animación es la MISMA
+   para las cuatro; la ASIMETRÍA la ponen la duración y el delay inline de
+   cada hoja (co-primos) + su transform-origin (la unión al tallo). alternate:
+   el vaivén va y vuelve sin salto. */
+.maiz-hoja {
+  animation: maiz-hoja-brisa 3.4s ease-in-out infinite alternate;
+  animation-duration: var(--brisa-dur, 3.4s);
+  animation-delay: var(--brisa-delay, 0s);
+}
+@keyframes maiz-hoja-brisa {
+  from { transform: rotate(-2.4deg); }
+  to   { transform: rotate(3.2deg); }
+}
+
+/* EL PENACHO SE MECE — el plumero acusa la brisa con más viaje que las hojas
+   (está en la punta del mástil: física de látigo). */
+.maiz-penacho {
+  animation: maiz-penacho-mece 3.9s ease-in-out infinite alternate;
+}
+@keyframes maiz-penacho-mece {
+  from { transform: rotate(-3.2deg); }
+  to   { transform: rotate(3.8deg); }
+}
+
+/* EL PENACHO VIBRA — su reacción-firma: cuando algo la emociona (toque de
+   hotspot, celebración), el plumero tiembla rapidito. PISA el mecer (misma
+   propiedad, selector más específico). data-vibra puede vivir en el svg
+   (prop `vibra` del cuerpo, standalone) O en la capa del gesto de la escena
+   (imperativo, MaizCompaiEscena) — el descendiente cubre ambos. */
+[data-vibra='1'] .maiz-penacho {
+  animation: maiz-penacho-vibra 0.16s linear infinite;
+}
+@keyframes maiz-penacho-vibra {
+  0%, 100% { transform: rotate(-4.5deg) translateY(0); }
+  50%      { transform: rotate(4.5deg) translateY(-0.3px); }
+}
+
+/* LA MAZORCA PESA — follow-through: cuelga del tallo y llega tarde al vaivén. */
+.maiz-mazorca {
+  animation: maiz-mazorca-pesa 4.7s ease-in-out infinite alternate;
+}
+@keyframes maiz-mazorca-pesa {
+  from { transform: rotate(-1.6deg); }
+  to   { transform: rotate(2.2deg); }
+}
+
+/* LAS BARBAS TIEMBLAN — sedas al viento (lo más liviano se mueve más rápido). */
+.maiz-barba {
+  animation: maiz-barba-tiembla 2.3s ease-in-out infinite alternate;
+}
+@keyframes maiz-barba-tiembla {
+  from { transform: rotate(-4deg); }
+  to   { transform: rotate(5deg); }
+}
+
+/* EL POLEN FLOTA — motitas que suben y se apagan (la espiga suelta vida). */
+.maiz-polen {
+  animation: maiz-polen-flota 5.9s ease-in-out infinite;
+}
+@keyframes maiz-polen-flota {
+  0%   { transform: translateY(0); opacity: 0; }
+  25%  { opacity: 0.8; }
+  70%  { opacity: 0.35; }
+  100% { transform: translateY(-3.2px); opacity: 0; }
+}
+
+/* SED — el personaje MÁS sensible a la seca (PERFIL_MAIZ.sequia 0.95): la
+   brisa se le apaga (hojas vencidas, quietas) y el penacho cae el vaivén.
+   Es un ESTADO del cuerpo, no un adorno: sin agua el maíz no baila. */
+[data-creature='maiz'][data-sed='1'] .maiz-hoja,
+[data-creature='maiz'][data-sed='1'] .maiz-penacho,
+[data-creature='maiz'][data-sed='1'] .maiz-barba {
+  animation-duration: 7.9s;
+}
+
+/* device-tier 'bajo': se apaga el idle continuo (brisa, penacho, mazorca,
+   barbas, polen, boil reescrito); lo reactivo (vibra) sigue contando la
+   verdad — mismo contrato que la zarigüeya. */
+[data-tier='bajo'][data-creature='maiz'] .rh-boil,
+[data-tier='bajo'][data-creature='maiz'] .maiz-hoja,
+[data-tier='bajo'][data-creature='maiz'] .maiz-penacho,
+[data-tier='bajo'][data-creature='maiz'] .maiz-mazorca,
+[data-tier='bajo'][data-creature='maiz'] .maiz-barba,
+[data-tier='bajo'][data-creature='maiz'] .maiz-polen { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-creature='maiz'] .rh-boil,
+  .maiz-hoja, .maiz-penacho, .maiz-mazorca, .maiz-barba, .maiz-polen,
+  [data-creature='maiz'][data-vibra='1'] .maiz-penacho { animation: none !important; }
+}
