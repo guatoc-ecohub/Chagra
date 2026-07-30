@@ -17,6 +17,7 @@ import { estaOcupado } from '../services/compaiOcupado.js';
 import { activarEscucha } from '../services/escuchaService';
 import { useCompaiClimaVivo } from '../hooks/useCompaiClimaVivo';
 import { useCompaiSusurroNocturno } from '../hooks/useCompaiSusurroNocturno';
+import { useCompaiAgroecologiaReal } from '../hooks/useCompaiAgroecologiaReal';
 import AgentFabMenu from './AgentFabMenu';
 import './agent-fab-skin.css';
 
@@ -167,6 +168,14 @@ export default function AgentFab({ onNavigate, pantalla = null }) {
       setResponseReady(true);
       if (ttsEnabled) speakSentences(mensaje, { rate }).catch(() => { /* degrada a solo texto */ });
     },
+  });
+
+  // #80/#81 "agroecología según SU finca real": el compañero comenta con lo
+  // que el catálogo Chagra sabe de SU cultivo puntual (rol en el gremio,
+  // temperatura de helada real) — no un inventario genérico. Sin match en
+  // el catálogo, no dice nada nuevo (el husmeo de siempre sigue igual).
+  useCompaiAgroecologiaReal({
+    onMensaje: (mensaje) => { setLastMessage(mensaje); setResponseReady(true); },
   });
 
   // Estado de Angelita: el tacto manda sobre el aviso, y el aviso sobre el idle.
