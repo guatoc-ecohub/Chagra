@@ -251,7 +251,7 @@ export async function fetchClimaSnapshot({ lat, lng, elevation, forceRefresh = f
     try {
         return await promise;
     } finally {
-        if (inFlight.promise === promise) inFlight = null;
+        if (inFlight && inFlight.token === inFlightToken) inFlight = null;
     }
 }
 
