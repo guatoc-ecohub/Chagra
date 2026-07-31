@@ -220,7 +220,7 @@ async function importPublicKey(pub) {
  */
 export async function sign(secretKey, bytes) {
   const privateKey = await importPrivateKey(secretKey);
-  const sig = await crypto.subtle.sign(ED25519, privateKey, bytes);
+  const sig = await crypto.subtle.sign(ED25519, privateKey, /** @type {BufferSource} */ (bytes));
   return new Uint8Array(sig);
 }
 
@@ -235,7 +235,7 @@ export async function verify(did, bytes, sig) {
   try {
     const pub = publicKeyFromDid(did);
     const publicKey = await importPublicKey(pub);
-    return await crypto.subtle.verify(ED25519, publicKey, sig, bytes);
+    return await crypto.subtle.verify(ED25519, publicKey, /** @type {BufferSource} */ (sig), /** @type {BufferSource} */ (bytes));
   } catch {
     // Cualquier error de formato/decodificación es una firma inválida, no una excepción.
     return false;
