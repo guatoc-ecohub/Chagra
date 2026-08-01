@@ -1,0 +1,316 @@
+/*
+ * transicionAgentePlano.css — la vitrina del cruce del agente 3D → plano.
+ *
+ * Dos escenarios: la LÁMINA del valle (páramo al atardecer — lámina Humboldt
+ * dibujada en CSS puro, cero fotorealismo) y la PANTALLA de la gente (la del
+ * agua). El cruce en sí vive en agentePlano.css + tunelLamina.css — este
+ * archivo solo viste los dos lados. Solo transform/opacity en lo animado.
+ */
+
+.tap {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: #0d1509;
+}
+
+/* ══ EL VALLE: lámina de páramo al atardecer ═════════════════════════════ */
+
+.tap-valle {
+  position: absolute;
+  inset: 0;
+}
+
+.tap-cielo {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    #1b2a4a 0%,
+    #37517c 34%,
+    #b4788a 58%,
+    #e8a05c 74%,
+    #f2c064 84%
+  );
+}
+
+.tap-sol {
+  position: absolute;
+  left: 58%;
+  top: 56%;
+  width: 30vmin;
+  height: 30vmin;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 236, 170, 0.95) 0%,
+    rgba(255, 210, 120, 0.5) 34%,
+    rgba(255, 190, 100, 0) 70%
+  );
+}
+
+/* Cordones de montaña: siluetas superpuestas, de la bruma al primer plano. */
+.tap-loma {
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  bottom: 0;
+}
+.tap-loma--lejos {
+  height: 46%;
+  background: #45577a;
+  clip-path: polygon(0 62%, 12% 40%, 26% 58%, 43% 26%, 58% 52%, 74% 34%, 88% 56%, 100% 44%, 100% 100%, 0 100%);
+  opacity: 0.85;
+}
+.tap-loma--media {
+  height: 38%;
+  background: #3c5a4a;
+  clip-path: polygon(0 48%, 15% 66%, 32% 38%, 49% 62%, 66% 42%, 82% 64%, 100% 50%, 100% 100%, 0 100%);
+}
+.tap-loma--cerca {
+  height: 26%;
+  background: linear-gradient(180deg, #2c4433 0%, #1c2e1f 100%);
+  clip-path: polygon(0 34%, 18% 52%, 38% 30%, 60% 54%, 79% 38%, 100% 56%, 100% 100%, 0 100%);
+}
+
+/* La niebla del páramo: una banda que respira despacio entre cordones. */
+.tap-niebla {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: 24%;
+  height: 16%;
+  background: linear-gradient(
+    90deg,
+    rgba(236, 240, 238, 0) 0%,
+    rgba(236, 240, 238, 0.34) 22%,
+    rgba(236, 240, 238, 0.16) 48%,
+    rgba(236, 240, 238, 0.38) 74%,
+    rgba(236, 240, 238, 0) 100%
+  );
+  filter: blur(6px);
+  animation: tapNiebla 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes tapNiebla {
+  0% { transform: translateX(-3%); }
+  100% { transform: translateX(3%); }
+}
+
+.tap-frailejon {
+  position: absolute;
+  display: block;
+  filter: drop-shadow(0 3px 4px rgba(13, 21, 9, 0.4));
+}
+
+/* ── La compañera viva en la lámina: flota con sombra debajo (volumen). ── */
+.tap-percha {
+  position: absolute;
+  width: 0;
+  height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+/* Sin drop-shadow CSS sobre el sprite: el filtro del wrapper interactúa mal
+   con los filtros SVG internos de la creature (boil/aura) y pinta la REGIÓN
+   del filtro como un cuadro — verificado en captura GPU. La profundidad la
+   vende la sombra-elipse dedicada de abajo. */
+.tap-abeja {
+  will-change: transform;
+  animation: tapFlota 3.4s ease-in-out infinite;
+}
+@keyframes tapFlota {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+.tap-abeja-sombra {
+  width: 44px;
+  height: 12px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(13, 21, 9, 0.42) 0%, rgba(13, 21, 9, 0) 70%);
+  will-change: transform, opacity;
+  animation: tapFlotaSombra 3.4s ease-in-out infinite;
+}
+@keyframes tapFlotaSombra {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(0.78); opacity: 0.5; }
+}
+
+.tap-encabezado {
+  position: absolute;
+  top: max(18px, env(safe-area-inset-top));
+  left: 22px;
+  right: 22px;
+  color: #f6f1e4;
+  text-shadow: 0 2px 8px rgba(13, 21, 9, 0.6);
+}
+.tap-eyebrow {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 4px;
+}
+.tap-encabezado h1 {
+  margin: 0;
+  font-size: clamp(20px, 4.6vw, 30px);
+  font-weight: 700;
+}
+
+.tap-panel {
+  position: absolute;
+  left: 22px;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  max-width: min(340px, calc(100vw - 44px));
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(20, 30, 18, 0.78);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(246, 241, 228, 0.14);
+  color: #f6f1e4;
+}
+.tap-panel h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+.tap-panel p {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  opacity: 0.88;
+}
+.tap-cta {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #241a05;
+  background: linear-gradient(180deg, #ffe08a 0%, #ffd54a 100%);
+  box-shadow: 0 4px 14px rgba(255, 213, 74, 0.35);
+  cursor: pointer;
+}
+.tap-cta:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ══ LA PANTALLA DE LA GENTE: la del agua ════════════════════════════════ */
+
+.tap-pantalla {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #f4f8f4 0%, #e8f0ea 100%);
+  color: #1f2d22;
+  overflow-y: auto;
+}
+
+.tap-pantalla-encabezado {
+  padding: max(18px, env(safe-area-inset-top)) 20px 8px;
+}
+.tap-volver {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 6px 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #2e6b46;
+  cursor: pointer;
+}
+.tap-volver:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.tap-pantalla-encabezado h1 {
+  margin: 2px 0 0;
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 800;
+}
+
+.tap-tarjetas {
+  display: grid;
+  gap: 12px;
+  padding: 14px 20px 140px;
+  max-width: 560px;
+}
+.tap-tarjeta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid rgba(31, 45, 34, 0.08);
+  box-shadow: 0 2px 8px rgba(31, 45, 34, 0.06);
+}
+.tap-tarjeta-dato {
+  min-width: 74px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #2e6b46;
+}
+.tap-tarjeta p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* El AGENTE PLANO posado: calcomanía viva en la esquina — halo de vidrio,
+   SIN sombra proyectada (el volumen se quedó en el mundo). */
+.tap-chip {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 30%, #fffdf4 0%, #fdf2cf 62%, #f5df9a 100%);
+  border: 2px solid rgba(255, 213, 74, 0.9);
+  box-shadow:
+    0 0 0 4px rgba(255, 213, 74, 0.18),
+    0 2px 10px rgba(31, 45, 34, 0.18);
+  animation: tapChipNace 260ms ease-out both;
+}
+@keyframes tapChipNace {
+  0% { transform: scale(0.9); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.tap-burbuja {
+  position: fixed;
+  max-width: min(320px, calc(100vw - 36px));
+  display: flex;
+  justify-content: flex-end;
+  animation: tapBurbujaNace 340ms ease-out 180ms both;
+}
+@keyframes tapBurbujaNace {
+  0% { transform: translateY(8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* El ancla del aterrizaje (invisible; existe para depurar el empalme). */
+.tap-ancla {
+  position: fixed;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Reduced-motion: la lámina queda quieta y digna; los nacimientos, sin brinco. */
+@media (prefers-reduced-motion: reduce) {
+  .tap-niebla,
+  .tap-abeja,
+  .tap-abeja-sombra {
+    animation: none;
+  }
+  .tap-chip,
+  .tap-burbuja {
+    animation: none;
+  }
+}
